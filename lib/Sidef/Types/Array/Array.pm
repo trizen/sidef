@@ -2284,7 +2284,7 @@ package Sidef::Types::Array::Array {
             return (
                     $len > 0
                     ? bless([map { $self->[CORE::rand($len)] } 1 .. $amount], ref($self))
-                    : bless([], ref($self))
+                    : bless([],                                               ref($self))
                    );
         }
 

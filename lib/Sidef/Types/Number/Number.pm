@@ -5643,7 +5643,7 @@ package Sidef::Types::Number::Number {
     sub sqrt_cfrac {
         my ($n, $max) = @_;
 
-        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        $n   = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
         $max = defined($max) ? CORE::int($max) : (0 + 'inf');
 
         Math::GMPz::Rmpz_sgn($n) < 0
@@ -6019,7 +6019,7 @@ package Sidef::Types::Number::Number {
 
     sub length {
         my ($x) = @_;
-        my $z = _any2mpz($$x) // return undef;
+        my $z   = _any2mpz($$x) // return undef;
         my $neg = (Math::GMPz::Rmpz_sgn($z) < 0) ? 1 : 0;
         __PACKAGE__->_set_uint(CORE::length(Math::GMPz::Rmpz_get_str($z, 10)) - $neg);
     }
@@ -6785,7 +6785,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_divexact($r, $k, $r) if Math::GMPz::Rmpz_sgn($r);
 
         my $r_str = Math::GMPz::Rmpz_get_str($r, 10);
-        my $mu = Math::Prime::Util::GMP::moebius($r_str) || return ZERO;
+        my $mu    = Math::Prime::Util::GMP::moebius($r_str) || return ZERO;
 
         if (Math::GMPz::Rmpz_cmp($r, $k) == 0) {
             return ($mu == 1 ? ONE : MONE);
@@ -6964,8 +6964,8 @@ package Sidef::Types::Number::Number {
 
     sub double_factorial {
         my ($x) = @_;
-        my $ui = _any2ui($$x) // (goto &nan);
-        my $z  = Math::GMPz::Rmpz_init();
+        my $ui  = _any2ui($$x) // (goto &nan);
+        my $z   = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_2fac_ui($z, $ui);
         bless \$z;
     }
@@ -7074,8 +7074,8 @@ package Sidef::Types::Number::Number {
 
     sub primorial {
         my ($x) = @_;
-        my $ui = _any2ui($$x) // (goto &nan);
-        my $z  = Math::GMPz::Rmpz_init();
+        my $ui  = _any2ui($$x) // (goto &nan);
+        my $z   = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_primorial_ui($z, $ui);
         bless \$z;
     }
@@ -7087,8 +7087,8 @@ package Sidef::Types::Number::Number {
 
     sub lucas {
         my ($x) = @_;
-        my $ui = _any2ui($$x) // (goto &nan);
-        my $z  = Math::GMPz::Rmpz_init();
+        my $ui  = _any2ui($$x) // (goto &nan);
+        my $z   = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_lucnum_ui($z, $ui);
         bless \$z;
     }
@@ -9458,7 +9458,7 @@ package Sidef::Types::Number::Number {
                      $_ < ULONG_MAX
                        ? __PACKAGE__->_set_uint($_)
                        : __PACKAGE__->_set_str('int', $_)
-                 } Math::Prime::Util::GMP::trial_factor(_big2pistr($n) || (return Sidef::Types::Array::Array->new()),)
+                 } Math::Prime::Util::GMP::trial_factor(_big2pistr($n) // (return Sidef::Types::Array::Array->new))
                 ]
             );
         }

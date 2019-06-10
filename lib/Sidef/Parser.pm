@@ -1746,7 +1746,7 @@ package Sidef::Parser {
                     local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $has_kids ? $parent : $obj;
                     my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
 
-                    my $code = '{' . $args . substr($_, pos);
+                    my $code  = '{' . $args . substr($_, pos);
                     my $block = $self->parse_block(code => \$code, with_vars => 1);
                     pos($_) += pos($code) - length($args) - 1;
 
@@ -1872,7 +1872,7 @@ package Sidef::Parser {
             # "try/catch" construct
             if (/\Gtry\h*(?=\{)/gc) {
                 my $try_block = $self->parse_block(code => $opt{code});
-                my $obj = bless({try => $try_block}, 'Sidef::Types::Block::Try');
+                my $obj       = bless({try => $try_block}, 'Sidef::Types::Block::Try');
 
                 $self->parse_whitespace(code => $opt{code});
 

@@ -82,7 +82,7 @@ package Sidef::Deparse::Sidef {
             grep { $_ ne '' }
               map {
                     ref($_) eq 'HASH' ? $self->deparse_script($_)
-                  : ref($_) ? $self->deparse_expr({self => $_})
+                  : ref($_)           ? $self->deparse_expr({self => $_})
                   : $self->_dump_string($_)
               } @args
           )

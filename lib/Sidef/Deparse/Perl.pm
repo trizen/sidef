@@ -532,7 +532,7 @@ HEADER
             $sep,
             map {
                     ref($_) eq 'HASH' ? $self->deparse_script($_)
-                  : ref($_) ? $self->deparse_expr({self => $_})
+                  : ref($_)           ? $self->deparse_expr({self => $_})
                   : $self->_dump_string($_)
               } @args
           )
@@ -845,7 +845,7 @@ HEADER
                                              ? (
                                                 join(' ',
                                                      grep { $_ ne $class_name }
-                                                     map { ref($_) ? $self->_get_reftype($_) : $_ } @{$self->{inherit}})
+                                                     map  { ref($_) ? $self->_get_reftype($_) : $_ } @{$self->{inherit}})
                                                )
                                              : ''
                                             )

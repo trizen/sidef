@@ -1373,7 +1373,7 @@ package Sidef::Types::String::String {
                    and exists $chars[$i + 1]
                    and $chars[$i + 1] eq '{') {
                 if (ref $parser eq 'Sidef::Parser') {
-                    my $code = 'do' . CORE::join('', @chars[$i + 1 .. $#chars]);
+                    my $code  = 'do' . CORE::join('', @chars[$i + 1 .. $#chars]);
                     my $block = $parser->parse_expr(code => \$code);
                     push @inline_expressions, [$i, $block];
                     splice(@chars, $i--, 1 + pos($code) - 2);

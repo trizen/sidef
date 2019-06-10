@@ -168,31 +168,29 @@ package Sidef::Types::Array::Matrix {
     sub _new_diagonal {
         my (undef, @diag) = @_;
         my $n = scalar(@diag);
-        __PACKAGE__->new(
-            [
-             map {
-                 [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
-                  shift(@diag),
-                  (Sidef::Types::Number::Number::ZERO) x ($n - $_)
-                 ]
-               } 1 .. $n
-            ]
-        );
+#<<<
+        __PACKAGE__->new([
+         map { [
+                (Sidef::Types::Number::Number::ZERO) x ($_ - 1),
+                shift(@diag),
+                (Sidef::Types::Number::Number::ZERO) x ($n - $_)
+            ] } 1 .. $n
+        ]);
+#>>>
     }
 
     sub _new_anti_diagonal {
         my (undef, @diag) = @_;
         my $n = scalar(@diag);
-        __PACKAGE__->new(
-            [
-             map {
-                 [(Sidef::Types::Number::Number::ZERO) x ($n - $_),
-                  shift(@diag),
-                  (Sidef::Types::Number::Number::ZERO) x ($_ - 1)
-                 ]
-               } 1 .. $n
-            ]
-        );
+#<<<
+        __PACKAGE__->new([
+         map { [
+                (Sidef::Types::Number::Number::ZERO) x ($n - $_),
+                shift(@diag),
+                (Sidef::Types::Number::Number::ZERO) x ($_ - 1)
+            ] } 1 .. $n
+        ]);
+#>>>
     }
 
     sub diagonal {

@@ -991,8 +991,8 @@ package Sidef::Optimizer {
                         my $arg = $call->{arg}[$j];
                         push @{$obj->{call}[$i]{arg}},
                             ref($arg) eq 'HASH' ? {$self->optimize($arg)}
-                          : ref($arg) ? $self->optimize_expr({self => $arg})
-                          :             $arg;
+                          : ref($arg)           ? $self->optimize_expr({self => $arg})
+                          :                       $arg;
                     }
                 }
 
@@ -1002,8 +1002,8 @@ package Sidef::Optimizer {
                         my $arg = $call->{block}[$j];
                         push @{$obj->{call}[$i]{block}},
                             ref $arg eq 'HASH' ? {$self->optimize($arg)}
-                          : ref($arg) ? $self->optimize_expr({self => $arg})
-                          :             $arg;
+                          : ref($arg)          ? $self->optimize_expr({self => $arg})
+                          :                      $arg;
                     }
                 }
 

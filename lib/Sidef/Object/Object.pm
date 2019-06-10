@@ -186,7 +186,7 @@ package Sidef::Object::Object {
                 %$o = (
                     map {
                         my $v = $obj->{$_};
-                        my $r = Scalar::Util::reftype($v);
+                        my $r = Scalar::Util::reftype($v) // '';
                         ($_ => ($r eq 'HASH' || $r eq 'ARRAY' ? __SUB__->($v, $r) : $v))
                     } CORE::keys(%{$obj})
                 );
@@ -197,7 +197,7 @@ package Sidef::Object::Object {
                 $addr{$refaddr} = $o;
                 @$o = (
                     map {
-                        my $r = Scalar::Util::reftype($_);
+                        my $r = Scalar::Util::reftype($_) // '';
                         $r eq 'ARRAY' || $r eq 'HASH' ? __SUB__->($_, $r) : $_
                     } @{$obj}
                 );
