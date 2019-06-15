@@ -21,3 +21,9 @@ Speculations:
     * Make all core methods (including user-defined methods) real multimethods, using Class::Multimethods.
     * Bootstrap Sidef by writing a code generator in Sidef that generates Perl code.
     * Rewrite all core libraries in Sidef.
+
+Changes:
+    * Change the ternary operator `bool ? (true) : (false)` to `bool ?? (true) !! (false)`.
+    * Allow `?` at the end of (boolean) methods and rename `.is_PROPERTY` to `.PROPERTY?`. (e.g.: `n.is_prime` would become `n.prime?`)
+    * Allow `:` at the end of a method call, followed by an argument. (e.g.: `a.push: 42` would be equivalent with `a.push(42)`)
+    * Rename the conversion methods `.to_n`, `.to_s`, `.to_a` to `.Num`, `.Str`, `.Arr`.
