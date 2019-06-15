@@ -8904,11 +8904,12 @@ package Sidef::Types::Number::Number {
         }
 
         # Return early if n is too small
-        Math::GMPz::Rmpz_cmp_ui($n, 53) > 0 or return 1;
+        Math::GMPz::Rmpz_cmp_ui($n, 101) > 0 or return 1;
 
         # Check for very small factors
         if (ULONG_MAX >= 18446744073709551615) {
             Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 16294579238595022365) == 1 or return 0;
+            Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n,  7145393598349078859) == 1 or return 0;
         }
         else {
             Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 3234846615) == 1 or return 0;
@@ -8928,12 +8929,15 @@ package Sidef::Types::Number::Number {
             push(@checks, 1e7) if ($size > 20_000);
             push(@checks, 1e8) if ($size > 30_000);
 
+            my $prev;
+
             foreach my $k (@checks) {
 
                 my $primorial = (
                     $cache{$k} //= do {
                         my $z = Math::GMPz::Rmpz_init_nobless();
                         Math::GMPz::Rmpz_primorial_ui($z, $k);
+                        Math::GMPz::Rmpz_divexact($z, $z, $prev) if defined($prev);
                         $z;
                     }
                 );
@@ -8943,6 +8947,8 @@ package Sidef::Types::Number::Number {
                 if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
                     return 0;
                 }
+
+                $prev = $primorial;
             }
         }
 
