@@ -8579,7 +8579,7 @@ package Sidef::Types::Number::Number {
         $limit = 15_485_863 if $limit > 15_485_863;
 
         if (@table < $n) {
-            @table[0] = 2;
+            $table[0] = 2;
             push @table, Math::Prime::Util::GMP::sieve_primes($table[-1] + 1, $limit);
         }
 

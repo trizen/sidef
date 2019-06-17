@@ -134,11 +134,11 @@ You can find more info about Sidef, by clicking on the following links:
 
 =over 2
 
-=item * Gitbook: L<http://trizen.gitbooks.io/sidef-lang/content/>
+=item * Gitbook: L<https://trizen.gitbooks.io/sidef-lang/content/>
 
 =item * Tutorial: L<https://github.com/trizen/sidef/wiki>
 
-=item * RosettaCode: L<http://rosettacode.org/wiki/Sidef>
+=item * RosettaCode: L<https://rosettacode.org/wiki/Sidef>
 
 =back
 
