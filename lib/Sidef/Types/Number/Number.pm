@@ -7074,15 +7074,110 @@ package Sidef::Types::Number::Number {
 
     sub primorial {
         my ($x) = @_;
-        my $ui  = _any2ui($$x) // (goto &nan);
+        my $ui  = _any2ui($$x) // goto &nan;
         my $z   = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_primorial_ui($z, $ui);
         bless \$z;
     }
 
+    sub primorial_inflation {    # A108951(n)
+        my ($n) = @_;
+
+        $n = $$n;
+
+        if (ref($n) eq 'Math::GMPq') {    # handle rational inputs (not very efficient)
+
+            my $num = Math::GMPz::Rmpz_init();
+            my $den = Math::GMPz::Rmpz_init();
+
+            Math::GMPq::Rmpq_get_num($num, $n);
+            Math::GMPq::Rmpq_get_den($den, $n);
+
+            my $t1 = (bless \$num)->primorial_inflation;
+            my $t2 = (bless \$den)->primorial_inflation;
+
+            return $t1->div($t2);
+        }
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
+        return ZERO if exists($factors{'0'});
+
+        state %cache;
+
+        my $prod = Math::GMPz::Rmpz_init_set_ui(1);
+        my $tmp  = Math::GMPz::Rmpz_init();
+
+        while (my ($p, $e) = each %factors) {
+
+            if (not $p < ULONG_MAX) {
+                goto &nan;
+            }
+
+            my $primorial = ($p <= 1e5)
+              ? (
+                $cache{$p} //= do {
+                    my $z = Math::GMPz::Rmpz_init_nobless();
+                    Math::GMPz::Rmpz_primorial_ui($z, $p);
+                    $z;
+                }
+              )
+              : do {
+                Math::GMPz::Rmpz_primorial_ui($tmp, $p);
+                $tmp;
+              };
+
+            if ($e > 1) {
+                Math::GMPz::Rmpz_pow_ui($tmp, $primorial, $e);
+                Math::GMPz::Rmpz_mul($prod, $prod, $tmp);
+            }
+            else {
+                Math::GMPz::Rmpz_mul($prod, $prod, $primorial);
+            }
+        }
+
+        bless \$prod;
+    }
+
+    sub primorial_deflation {    # A319626(n) / A319627(n)
+        my ($n) = @_;
+
+        my $prod = Math::GMPq::Rmpq_init();
+        my $tmp  = Math::GMPq::Rmpq_init();
+
+        Math::GMPq::Rmpq_set_ui($prod, 1, 1);
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
+
+        while (my ($p, $e) = each %factors) {
+
+            my $q = ($p <= 2) ? 1 : Math::Prime::Util::GMP::prev_prime($p);
+
+            if ($p < ULONG_MAX) {
+                Math::GMPq::Rmpq_set_ui($tmp, $p, $q);
+            }
+            else {
+                Math::GMPq::Rmpq_set_str($tmp, "$p/$q", 10);
+            }
+
+            if ($e > 1) {
+                Math::GMPq::Rmpq_pow_ui($tmp, $tmp, $e);
+            }
+
+            Math::GMPq::Rmpq_mul($prod, $prod, $tmp);
+        }
+
+        if (Math::GMPq::Rmpq_integer_p($prod)) {
+            $prod = _mpq2mpz($prod);
+        }
+
+        bless \$prod;
+    }
+
     sub pn_primorial {
         my ($x) = @_;
-        __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::pn_primorial(_any2ui($$x) // (goto &nan)));
+        __PACKAGE__->_set_str('int', Math::Prime::Util::GMP::pn_primorial(_any2ui($$x) // goto &nan));
     }
 
     sub lucas {
@@ -8909,7 +9004,7 @@ package Sidef::Types::Number::Number {
         # Check for very small factors
         if (ULONG_MAX >= 18446744073709551615) {
             Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 16294579238595022365) == 1 or return 0;
-            Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n,  7145393598349078859) == 1 or return 0;
+            Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 7145393598349078859) == 1  or return 0;
         }
         else {
             Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 3234846615) == 1 or return 0;

@@ -3092,6 +3092,22 @@ Return the
 
 =cut
 
+=head2 primorial_deflation
+
+Number.primorial_deflation() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 primorial_inflation
+
+Number.primorial_inflation() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prod
 
 Number.prod() -> I<Obj>
