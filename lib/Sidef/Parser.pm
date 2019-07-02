@@ -2843,6 +2843,7 @@ package Sidef::Parser {
 
         my @methods;
         local *_ = $opt{code};
+        my $orig_pos = pos($_);
 
         {
             if ((/\G(?![-=]>)/ && /\G(?=$self->{operators_re})/o) || /\G\./gc) {
@@ -2871,7 +2872,7 @@ package Sidef::Parser {
                         else {
                             $self->fatal_error(
                                                code  => $_,
-                                               pos   => pos($_) - 1,
+                                               pos   => $orig_pos,
                                                error => "operator `$method` requires a right-side operand",
                                               );
                         }
@@ -3351,6 +3352,7 @@ package Sidef::Parser {
                        )
                   ) {
 
+                    my $orig_pos = pos($_);
                     my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
 
                     if (defined($method)) {
@@ -3380,7 +3382,7 @@ package Sidef::Parser {
                             else {
                                 $self->fatal_error(
                                                    code  => $_,
-                                                   pos   => pos($_) - 1,
+                                                   pos   => $orig_pos,
                                                    error => "operator `$method` requires a right-side operand",
                                                   );
                             }
