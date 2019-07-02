@@ -32,7 +32,7 @@ package Sidef::Types::Glob::DirHandle {
         $_[0]{dir};
     }
 
-    sub get_files {
+    sub entries {
         my ($self) = @_;
 
         $self->rewind;
@@ -44,11 +44,7 @@ package Sidef::Types::Glob::DirHandle {
         Sidef::Types::Array::Array->new(\@files);
     }
 
-    *read_dir = \&get_files;
-    *readdir  = \&get_files;
-    *entries  = \&get_files;
-
-    sub get_file {
+    sub read {    # read the next entry from the self directory handle
         my ($self) = @_;
 
         my $basedir = ($self->{basedir} //= "$self->{dir}");
@@ -77,23 +73,31 @@ package Sidef::Types::Glob::DirHandle {
         return undef;
     }
 
-    *read = \&get_file;
+    sub files {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new([grep { $_->is_file } @{$self->entries}]);
+    }
+
+    sub dirs {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new([grep { $_->is_dir } @{$self->entries}]);
+    }
 
     sub tell {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(telldir($self->{dh}));
+        Sidef::Types::Number::Number->new(CORE::telldir($self->{dh}));
     }
 
     sub seek {
         my ($self, $pos) = @_;
-        seekdir($self->{dh}, CORE::int($pos))
+        CORE::seekdir($self->{dh}, CORE::int($pos))
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub rewind {
         my ($self) = @_;
-        rewinddir($self->{dh})
+        CORE::rewinddir($self->{dh})
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }

@@ -54,6 +54,14 @@ Return the
 
 =cut
 
+=head2 dirs
+
+DirHandle.dirs() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 each
 
 DirHandle.each() -> I<Obj>
@@ -68,7 +76,13 @@ DirHandle.entries() -> I<Obj>
 
 Return the
 
-Aliases: I<read_dir>, I<readdir>, I<get_files>
+=cut
+
+=head2 files
+
+DirHandle.files() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -93,8 +107,6 @@ Return the
 DirHandle.read() -> I<Obj>
 
 Return the
-
-Aliases: I<get_file>
 
 =cut
 

@@ -9,7 +9,7 @@ desktopFilesPaths.each { |path|
     path.open(\var dir_h) || next;
 
     var counter = 0;
-    dir_h.readdir.shuffle.each { |fullpath|
+    dir_h.entries.shuffle.each { |fullpath|
 
         fullpath.is_a(File) || next;
 
