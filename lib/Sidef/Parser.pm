@@ -591,6 +591,7 @@ package Sidef::Parser {
                               );
         }
 
+        my $orig_pos   = pos($_);
         my $beg_delim  = quotemeta $delim;
         my $pair_delim = exists($self->{delim_pairs}{$delim}) ? $self->{delim_pairs}{$delim} : ();
 
@@ -618,7 +619,7 @@ package Sidef::Parser {
           || $self->fatal_error(
                                 error => sprintf(qq{can't find the quoted string terminator <<%s>>}, $pair_delim // $delim),
                                 code  => $_,
-                                pos   => pos($_)
+                                pos   => $orig_pos,
                                );
 
         $self->{line} += $string =~ s/\R\K//g if not $opt{no_count_line};
