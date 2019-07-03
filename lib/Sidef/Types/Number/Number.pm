@@ -11161,10 +11161,18 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
 
         if (!defined($k)) {
+            state %cache;
             foreach my $k (2 .. 7) {
 
-                if (__cmp__($$n, CORE::int(10**($k / 3)) - 1) < 0) {
-                    return Sidef::Types::Bool::Bool::TRUE;
+                if ($k > 2) {
+                    my $t = (
+                        $cache{$k} //= do {
+                            my $z = Math::GMPz::Rmpz_init();
+                            Math::GMPz::Rmpz_ui_pow_ui($z, 10, 3 * ($k - 1));
+                            $z;
+                        }
+                    );
+                    __cmp__($$n, $t) < 0 and return Sidef::Types::Bool::Bool::TRUE;
                 }
 
                 $n->is_prob_squarefree(__PACKAGE__->_set_uint(10**$k))
