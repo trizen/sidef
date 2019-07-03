@@ -7110,9 +7110,7 @@ package Sidef::Types::Number::Number {
 
         while (my ($p, $e) = each %factors) {
 
-            if (not $p < ULONG_MAX) {
-                goto &nan;
-            }
+            ($p < ULONG_MAX) || goto &nan;
 
             my $primorial = ($p <= 1e5)
               ? (
@@ -11161,6 +11159,20 @@ package Sidef::Types::Number::Number {
 
     sub is_prob_squarefree {
         my ($n, $k) = @_;
+
+        if (!defined($k)) {
+            foreach my $k (2 .. 7) {
+
+                if (__cmp__($$n, CORE::int(10**($k / 3)) - 1) < 0) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+
+                $n->is_prob_squarefree(__PACKAGE__->_set_uint(10**$k))
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
 
         _valid(\$k);
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
