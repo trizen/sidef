@@ -1157,33 +1157,35 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
-    sub _flatten {    # this exists for performance reasons
-        my ($self, $class) = @_;
+    sub _flatten {
+        my %addr;    # keeps track of seen objects
 
-        my @array;
-        foreach my $item (@{$self}) {
-            CORE::push(@array,
-                       (ref($item) eq $class or ref($item) =~ /^Sidef::Types::Array::/)
-                       ? _flatten($item, $class)
-                       : $item);
-        }
+        my $sub = sub {
+            my ($obj) = @_;
 
-        @array;
+            my $class   = ref($obj);
+            my $refaddr = Scalar::Util::refaddr($obj);
+
+            exists($addr{$refaddr})
+              and return @{$addr{$refaddr}};
+
+            my @flat;
+            $addr{$refaddr} = \@flat;
+
+            foreach my $item (@$obj) {
+                CORE::push(@flat, ((ref($item) eq $class or UNIVERSAL::can($item, 'flatten')) ? $item->flatten : $item));
+            }
+
+            @flat;
+        };
+
+        local *Sidef::Types::Array::Array::flatten = $sub;
+        $sub->($_[0]);
     }
 
     sub flatten {
         my ($self) = @_;
-
-        my @flat;
-        my $class = ref($self);
-        foreach my $item (@{$self}) {
-            CORE::push(@flat,
-                       (ref($item) eq $class or ref($item) =~ /^Sidef::Types::Array::/)
-                       ? _flatten($item, $class)
-                       : $item);
-        }
-
-        bless \@flat;
+        bless [$self->_flatten];
     }
 
     *flat = \&flatten;
