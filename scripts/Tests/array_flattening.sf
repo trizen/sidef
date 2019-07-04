@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+# Test array flattening (`Array.flat` method)
+
+var arr = [[1], 2, [[3,4], 5], [[[]]], [[[6]]], 7, 8, []]
+assert_eq(arr.flat, @(1..8))
+
+# Cyclic references
+var a = [1,[2],3]
+a[3] = a
+
+assert_eq(a.flat, [1,2,3,1,2,3])
+
+# Pair objects
+assert_eq(Pair([3],Pair([4], 5)).flat, [3,4,5])
+assert_eq([Pair([3],Pair([4], 5))].flat, [3,4,5])
+assert_eq([[Pair([3],Pair([4], 5))]].flat, [3,4,5])
+assert_eq([[Pair([3,[]],[[Pair([[],4], [[[5]]])]])]].flat, [3,4,5])
+
+say "** Test passed!"

@@ -1173,7 +1173,7 @@ package Sidef::Types::Array::Array {
             $addr{$refaddr} = \@flat;
 
             foreach my $item (@$obj) {
-                CORE::push(@flat, ((ref($item) eq $class or UNIVERSAL::can($item, 'flatten')) ? $item->flatten : $item));
+                CORE::push(@flat, ((ref($item) eq $class or UNIVERSAL::isa($item, __PACKAGE__)) ? $item->flatten : $item));
             }
 
             @flat;

@@ -145,11 +145,14 @@ scripts/Expensive/calendar.sf
 scripts/Expensive/calendar_all_uppercase.sf
 scripts/Expensive/closed_form_fibonacci.sf
 scripts/Expensive/coin_change.sf
+scripts/Expensive/concurrent_computing.sf
 scripts/Expensive/dice_game_solver.sf
 scripts/Expensive/ekg_sequence_convergence.sf
 scripts/Expensive/factorial_approximations.sf
+scripts/Expensive/fforks.sf
 scripts/Expensive/fibonacci_validation.sf
 scripts/Expensive/fibonacci_word.sf
+scripts/Expensive/fork.sf
 scripts/Expensive/gauss_logarithm_approx.sf
 scripts/Expensive/genetic_algorithm.sf
 scripts/Expensive/julia_set.sf
@@ -312,7 +315,6 @@ scripts/RosettaCode/compare_a_list_of_strings_1.sf
 scripts/RosettaCode/compile-time_calculation.sf
 scripts/RosettaCode/compile-time_calculation_1.sf
 scripts/RosettaCode/compound_data_type.sf
-scripts/RosettaCode/concurrent_computing.sf
 scripts/RosettaCode/conjugate_transpose.sf
 scripts/RosettaCode/constrained_random_points_on_a_circle.sf
 scripts/RosettaCode/continued_fractions_from_rationals.sf
@@ -369,7 +371,6 @@ scripts/RosettaCode/first_class_environments.sf
 scripts/RosettaCode/five_weekends.sf
 scripts/RosettaCode/flatten_a_list.sf
 scripts/RosettaCode/floyd_warshall_algorithm.sf
-scripts/RosettaCode/fork.sf
 scripts/RosettaCode/formatted_numeric_output.sf
 scripts/RosettaCode/formatted_numeric_output_1.sf
 scripts/RosettaCode/free_polyominoes_enumeration.sf
@@ -642,6 +643,7 @@ scripts/Tests/array_autovivification.sf
 scripts/Tests/array_binary_search.sf
 scripts/Tests/array_binsert.sf
 scripts/Tests/array_compare.sf
+scripts/Tests/array_flattening.sf
 scripts/Tests/array_index_bindex.sf
 scripts/Tests/array_unique.sf
 scripts/Tests/array_xor.sf
@@ -724,7 +726,6 @@ scripts/Tests/execute_system_command.sf
 scripts/Tests/expression_call.sf
 scripts/Tests/extended_builtin_class.sf
 scripts/Tests/extreme_floating_point_values.sf
-scripts/Tests/fforks.sf
 scripts/Tests/fibonacci_closed_solution.sf
 scripts/Tests/fibonacci_iterative.sf
 scripts/Tests/fibonacci_mystery.sf
