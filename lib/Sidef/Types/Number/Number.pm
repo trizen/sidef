@@ -9586,11 +9586,13 @@ package Sidef::Types::Number::Number {
             undef %cache;
         }
 
-        my $B = exists($cache{$k}) ? $cache{$k} : do {
-            my $t = Math::GMPz::Rmpz_init_nobless();
-            Math::GMPz::Rmpz_primorial_ui($t, $k);
-            $cache{$k} = $t;
-        };
+        my $B = (
+            $cache{$k} //= do {
+                my $t = Math::GMPz::Rmpz_init_nobless();
+                Math::GMPz::Rmpz_primorial_ui($t, $k);
+                $t;
+            }
+        );
 
         my $g = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_gcd($g, $n, $B);
@@ -10233,9 +10235,8 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (!exists $r{$n}) {
-            return Sidef::Types::Array::Array->new;
-        }
+        exists($r{$n})
+          || return Sidef::Types::Array::Array->new;
 
         Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @{$r{$n}}]);
     }
@@ -11108,11 +11109,13 @@ package Sidef::Types::Number::Number {
             undef %cache;
         }
 
-        my $B = exists($cache{$k}) ? $cache{$k} : do {
-            my $t = Math::GMPz::Rmpz_init_nobless();
-            Math::GMPz::Rmpz_primorial_ui($t, $k);
-            $cache{$k} = $t;
-        };
+        my $B = (
+            $cache{$k} //= do {
+                my $t = Math::GMPz::Rmpz_init_nobless();
+                Math::GMPz::Rmpz_primorial_ui($t, $k);
+                $t;
+            }
+        );
 
         my $g = Math::GMPz::Rmpz_init();
         my $t = Math::GMPz::Rmpz_init_set($n);
@@ -11200,11 +11203,13 @@ package Sidef::Types::Number::Number {
             undef %cache;
         }
 
-        my $B = exists($cache{$k}) ? $cache{$k} : do {
-            my $t = Math::GMPz::Rmpz_init_nobless();
-            Math::GMPz::Rmpz_primorial_ui($t, $k);
-            $cache{$k} = $t;
-        };
+        my $B = (
+            $cache{$k} //= do {
+                my $t = Math::GMPz::Rmpz_init_nobless();
+                Math::GMPz::Rmpz_primorial_ui($t, $k);
+                $t;
+            }
+        );
 
         my $g = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_gcd($g, $n, $B);
