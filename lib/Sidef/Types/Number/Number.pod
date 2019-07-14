@@ -2852,6 +2852,14 @@ Return the
 
 =cut
 
+=head2 pn_primes
+
+Number.pn_primes() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 pn_primorial
 
 Number.pn_primorial() -> I<Obj>

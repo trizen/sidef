@@ -786,6 +786,29 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);
 
+      Math_GMPz: {
+
+            if (Math::GMPz::Rmpz_fits_slong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_si;
+            }
+
+            if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_ui;
+            }
+
+            goto &Math::GMPz::Rmpz_get_d;
+        }
+
+      Math_GMPq: {
+
+            if (Math::GMPq::Rmpq_integer_p($x)) {
+                @_ = ($x = _mpq2mpz($x));
+                goto Math_GMPz;
+            }
+
+            goto &Math::GMPq::Rmpq_get_d;
+        }
+
       Math_MPFR: {
             push @_, $ROUND;
 
@@ -800,29 +823,6 @@ package Sidef::Types::Number::Number {
             }
 
             goto &Math::MPFR::Rmpfr_get_d;
-        }
-
-      Math_GMPq: {
-
-            if (Math::GMPq::Rmpq_integer_p($x)) {
-                @_ = ($x = _mpq2mpz($x));
-                goto Math_GMPz;
-            }
-
-            goto &Math::GMPq::Rmpq_get_d;
-        }
-
-      Math_GMPz: {
-
-            if (Math::GMPz::Rmpz_fits_slong_p($x)) {
-                goto &Math::GMPz::Rmpz_get_si;
-            }
-
-            if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
-                goto &Math::GMPz::Rmpz_get_ui;
-            }
-
-            goto &Math::GMPz::Rmpz_get_d;
         }
 
       Math_MPC: {
@@ -9320,6 +9320,17 @@ package Sidef::Types::Number::Number {
              : Math::Prime::Util::GMP::sieve_primes(2, (_big2uistr($x) // 0), 0)
             ]
         );
+    }
+
+    sub pn_primes {
+        my ($x, $y) = @_;
+
+        if (defined($y)) {
+            _valid(\$y);
+            return $x->nth_prime->primes($y->nth_prime);
+        }
+
+        $x->nth_prime->primes;
     }
 
     sub sum_primes {
