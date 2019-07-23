@@ -240,6 +240,18 @@ package Sidef::Types::Range::RangeNumber {
         $self->to_a->bsearch_ge($block);
     }
 
+    sub primes {
+        my ($self) = @_;
+
+        if ($self->{step}->abs->is_one) {
+            my $left  = Sidef::Types::Number::Number->new($self->{from});
+            my $right = Sidef::Types::Number::Number->new($self->{to});
+            return Sidef::Types::Number::Number::primes($left, $right);
+        }
+
+        $self->to_a->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_prime }));
+    }
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new("$self");

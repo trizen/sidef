@@ -81,6 +81,14 @@ Aliases: I<call>
 
 =cut
 
+=head2 primes
+
+RangeNumber.primes() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prod
 
 RangeNumber.prod() -> I<Obj>
