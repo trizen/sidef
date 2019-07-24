@@ -249,7 +249,7 @@ package Sidef::Types::Range::RangeNumber {
             return Sidef::Types::Number::Number::primes($left, $right);
         }
 
-        $self->to_a->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_prime }));
+        $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_prime }));
     }
 
     sub dump {
