@@ -9026,6 +9026,8 @@ package Sidef::Types::Number::Number {
 
             foreach my $k (@checks) {
 
+                #~ say "Checking factors < $k";
+
                 my $primorial = (
                     $cache{$k} //= do {
                         my $z = Math::GMPz::Rmpz_init_nobless();
@@ -9038,6 +9040,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_gcd($g, $primorial, $n);
 
                 if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+                    ## say "Composite with a factor < $k";
                     return 0;
                 }
 
@@ -9045,7 +9048,15 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        #~ say "No small factor...";
         return 1;
+    }
+
+    sub primality_pretest {
+        my ($n) = @_;
+        _primality_pretest($$n)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub is_prime {

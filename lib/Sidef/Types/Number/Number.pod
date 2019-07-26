@@ -2934,6 +2934,14 @@ Return the
 
 =cut
 
+=head2 primality_pretest
+
+Number.primality_pretest() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prime
 
 Number.prime() -> I<Obj>
