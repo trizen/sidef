@@ -628,11 +628,55 @@ Aliases: I<integers>
 
 =cut
 
+=head2 is_alnum
+
+String.is_alnum() -> I<Obj>
+
+Return the
+
+Aliases: I<is_alphanum>
+
+=cut
+
+=head2 is_alpha
+
+String.is_alpha() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_ascii
+
+String.is_ascii() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_digit
+
+String.is_digit() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_empty
 
 String.is_empty() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 is_lc
+
+String.is_lc() -> I<Obj>
+
+Return the
+
+Aliases: I<is_lowercase>
 
 =cut
 
@@ -649,6 +693,42 @@ Aliases: I<looks_like_number>
 =head2 is_palindrome
 
 String.is_palindrome() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_punct
+
+String.is_punct() -> I<Obj>
+
+Return the
+
+Aliases: I<is_punctuation>
+
+=cut
+
+=head2 is_space
+
+String.is_space() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_uc
+
+String.is_uc() -> I<Obj>
+
+Return the
+
+Aliases: I<is_uppercase>
+
+=cut
+
+=head2 is_word
+
+String.is_word() -> I<Obj>
 
 Return the
 

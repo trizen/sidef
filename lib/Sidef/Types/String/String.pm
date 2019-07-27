@@ -404,6 +404,77 @@ package Sidef::Types::String::String {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    sub is_lowercase {
+        my ($self) = @_;
+        ($$self =~ /^[[:lower:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    *is_lc = \&is_lowercase;
+
+    sub is_uppercase {
+        my ($self) = @_;
+        ($$self =~ /^[[:upper:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    *is_uc = \&is_uppercase;
+
+    sub is_ascii {
+        my ($self) = @_;
+        ($$self =~ /^[[:ascii:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_space {
+        my ($self) = @_;
+        ($$self =~ /^[[:space:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_word {
+        my ($self) = @_;
+        ($$self =~ /^[[:word:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_punctuation {
+        my ($self) = @_;
+        ($$self =~ /^[[:punct:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    *is_punct = \&is_punctuation;
+
+    sub is_digit {
+        my ($self) = @_;
+        ($$self =~ /^[[:digit:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_alpha {
+        my ($self) = @_;
+        ($$self =~ /^[[:alpha:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_alphanum {
+        my ($self) = @_;
+        ($$self =~ /^[[:alnum:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    *is_alnum = \&is_alphanum;
+
     sub index {
         my ($self, $substr, $pos) = @_;
         Sidef::Types::Number::Number->_set_int(
