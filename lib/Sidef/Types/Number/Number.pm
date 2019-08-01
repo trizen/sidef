@@ -5891,8 +5891,50 @@ package Sidef::Types::Number::Number {
         }
 #>>>
 
-        my @digits;
+        # Subquadratic algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
+        if (Math::GMPz::Rmpz_fits_ulong_p($k)) {
 
+            # Find r such that B^(2r - 2) <= A < B^(2r)
+            my $r = (__ilog__($n, $k) >> 1) + 1;
+
+            my $A = $n;
+            my $B = Math::GMPz::Rmpz_get_ui($k);
+
+            my $Q = Math::GMPz::Rmpz_init();
+            my $R = Math::GMPz::Rmpz_init();
+
+            my @digits = map { __PACKAGE__->_set_uint($_) } sub {
+                my ($A, $r) = @_;
+
+                if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
+                    return Math::GMPz::Rmpz_get_ui($A);
+                }
+
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_ui_pow_ui($t, $B, 2 * ($r - 1));    # can this be optimized away?
+
+                if (Math::GMPz::Rmpz_cmp($t, $A) > 0) {
+                    --$r;
+                }
+
+                Math::GMPz::Rmpz_ui_pow_ui($t, $B, $r);
+                Math::GMPz::Rmpz_divmod($Q, $R, $A, $t);
+
+                my $w = ($r + 1) >> 1;
+                Math::GMPz::Rmpz_set($t, $Q);
+
+                my @right = __SUB__->($R, $w);
+                my @left  = __SUB__->($t, $w);
+
+                (@right, (0) x ($r - scalar(@right)), @left);
+              }
+              ->($A, $r);
+
+            return Sidef::Types::Array::Array->new(\@digits);
+        }
+
+        # This algorithm will be used only when base > ULONG_MAX
+        my @digits;
         while (Math::GMPz::Rmpz_sgn($t) > 0) {
             my $m = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_divmod($t, $m, $t, $k);

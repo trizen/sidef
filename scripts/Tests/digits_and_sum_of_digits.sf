@@ -1,0 +1,32 @@
+#!/usr/bin/ruby
+
+# Tests for `Num.digits(base)` and `Num.sumdigits(base)`. Also for `Arr.digits2num(base)`.
+
+for a in (100 .. 103) {
+
+    var N = a!
+    var b = (a>>1 + 1)!
+
+    assert_eq(N.digits(b).sum, N.sumdigits(b))
+    assert_eq(N.digits(b).digits2num(b), N)
+}
+
+for a in (1..100) {
+    var N = a!.irand
+    var b = irand(2**64)
+
+    assert_eq(N.digits(b).sum, N.sumdigits(b))
+    assert_eq(N.digits(b).digits2num(b), N)
+}
+
+for a in (1..20, 90..100) {
+
+    var N = a!.irand
+
+    for b in (60..66) {
+        assert_eq(N.digits(b).sum, N.sumdigits(b))
+        assert_eq(N.digits(b).digits2num(b), N)
+    }
+}
+
+say "** Test passed!"
