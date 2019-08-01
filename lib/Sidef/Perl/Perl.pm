@@ -16,11 +16,7 @@ package Sidef::Perl::Perl {
         sub {
             my ($val) = @_;
 
-            my $ref = CORE::ref($val);
-
-            if (not defined $val) {
-                return undef;
-            }
+            my $ref = CORE::ref($val // return undef);
 
             if ($ref eq 'ARRAY') {
                 my $array = $refs{$val} //= Sidef::Types::Array::Array->new([]);

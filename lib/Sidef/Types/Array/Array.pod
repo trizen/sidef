@@ -1112,6 +1112,14 @@ Return the
 
 =cut
 
+=head2 map_slice
+
+Array.map_slice() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 match
 
 Array.match() -> I<Obj>

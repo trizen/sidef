@@ -1400,6 +1400,25 @@ package Sidef::Types::Array::Array {
         bless \@array;
     }
 
+    sub map_slice {
+        my ($self, $n, $block) = @_;
+
+        $n = CORE::int($n);
+
+        my @array;
+        my $end = @$self;
+        for (my $i = $n - 1 ; $i < $end ; $i += $n) {
+            CORE::push(@array, $block->run(@$self[$i - ($n - 1) .. $i]));
+        }
+
+        my $mod = $end % $n;
+        if ($mod != 0) {
+            CORE::push(@array, $block->run(@$self[$end - $mod .. $end - 1]));
+        }
+
+        bless \@array;
+    }
+
     sub each_index {
         my ($self, $block) = @_;
 

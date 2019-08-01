@@ -5,6 +5,7 @@
 #
 
 class SnakeGame(w, h) {
+
     const readkey = frequire('Term::ReadKey')
     const ansi    = frequire('Term::ANSIColor')
 
@@ -17,10 +18,12 @@ class SnakeGame(w, h) {
         DOWN  = [+1, +0],
     )
 
-    define BG_COLOR    = "on_black"
-    define FOOD_COLOR  = ("red"        + " " + BG_COLOR)
-    define SNAKE_COLOR = ("bold green" + " " + BG_COLOR)
-    define SLEEP_SEC   = 0.02
+    define (
+        BG_COLOR    = "on_black"
+        FOOD_COLOR  = ("red"        + " " + BG_COLOR)
+        SNAKE_COLOR = ("bold green" + " " + BG_COLOR)
+        SLEEP_SEC   = 0.02
+    )
 
     const (
         A_VOID  = ansi.colored(' ', BG_COLOR),

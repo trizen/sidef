@@ -1623,7 +1623,7 @@ HEADER
                             'do{my$bool='
                           . $code . 'eq'
                           . $self->deparse_args(@{$call->{arg}})
-                          . ';ref($bool)?$bool:($bool?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)}'
+                          . ';ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)}'
                           . ($method eq '!=' ? '->not' : '');
                         next;
                     }
@@ -1636,7 +1636,7 @@ HEADER
                           . $code
                           . '}~~do{'
                           . $self->deparse_args(@{$call->{arg}})
-                          . '};ref($bool)?$bool:($bool?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)}'
+                          . '};ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)}'
                           . ($method eq '!~' ? '->not' : '');
                         next;
                     }
@@ -1647,8 +1647,8 @@ HEADER
                             'do{my$cmp='
                           . $code . 'cmp'
                           . $self->deparse_args(@{$call->{arg}})
-                          . ';ref($cmp)?$cmp:($cmp<0?Sidef::Types::Number::Number::MONE:'
-                          . '$cmp>0?Sidef::Types::Number::Number::ONE:Sidef::Types::Number::Number::ZERO)}';
+                          . ';ref($cmp) ? $cmp : (($cmp<0) ? Sidef::Types::Number::Number::MONE : '
+                          . '($cmp>0) ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO)}';
                         next;
                     }
 
@@ -1660,7 +1660,7 @@ HEADER
                         if ($method eq '!') {
                             $code = '('
                               . $self->deparse_args(@{$call->{arg}})
-                              . '?Sidef::Types::Bool::Bool::FALSE:Sidef::Types::Bool::Bool::TRUE)';
+                              . '? Sidef::Types::Bool::Bool::FALSE : Sidef::Types::Bool::Bool::TRUE)';
                             next;
                         }
 
@@ -1712,7 +1712,7 @@ HEADER
                             $code =
                                 '((CORE::say'
                               . $self->deparse_args(@{$call->{arg}})
-                              . ')?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)';
+                              . ') ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)';
                             next;
                         }
 
@@ -1720,7 +1720,7 @@ HEADER
                             $code =
                                 '((CORE::print'
                               . $self->deparse_args(@{$call->{arg}})
-                              . ')?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)';
+                              . ') ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)';
                             next;
                         }
 
@@ -1728,7 +1728,7 @@ HEADER
                             $code =
                                 '((CORE::defined'
                               . $self->deparse_args(@{$call->{arg}})
-                              . ')?Sidef::Types::Bool::Bool::TRUE:Sidef::Types::Bool::Bool::FALSE)';
+                              . ') ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)';
                             next;
                         }
                     }
