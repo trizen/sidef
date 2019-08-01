@@ -1094,22 +1094,29 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::lcm(@$self);
     }
 
-    sub digits2num {
+    sub digits2num {    # Algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
         my ($self, $base) = @_;
 
         state $ten = Sidef::Types::Number::Number->_set_uint(10);
-
         $base //= $ten;
 
-        my $sum       = Sidef::Types::Number::Number::ZERO;
-        my $base_prod = Sidef::Types::Number::Number::ONE;
+        my @l = @$self;
+        my ($B, $k) = ($base, scalar(@l));
 
-        foreach my $v (@$self) {
-            $sum       = $sum->add($base_prod->mul($v));
-            $base_prod = $base_prod->mul($base);
+        while ($k > 1) {
+
+            my @T;
+            for (0 .. ($k >> 1) - 1) {
+                CORE::push(@T, $l[2 * $_]->add($B->mul($l[2 * $_ + 1])));
+            }
+
+            CORE::push(@T, $l[-1]) if ($k & 1);
+            @l = @T;
+            $B = $B->mul($B);
+            $k = ($k >> 1) + ($k & 1);
         }
 
-        $sum;
+        $l[0] // Sidef::Types::Number::Number::ZERO;
     }
 
     sub _min_max_by {
