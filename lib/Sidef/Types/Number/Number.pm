@@ -5984,6 +5984,43 @@ package Sidef::Types::Number::Number {
         }
 #>>>
 
+        # Subquadratic algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
+        if (Math::GMPz::Rmpz_fits_ulong_p($k)) {
+
+            # Find r such that B^(2r - 2) <= A < B^(2r)
+            my $r = (__ilog__($n, $k) >> 1) + 1;
+
+            my $A = $n;
+            my $B = Math::GMPz::Rmpz_get_ui($k);
+
+            my $Q = Math::GMPz::Rmpz_init();
+            my $R = Math::GMPz::Rmpz_init();
+
+            my $total = sub {
+                my ($A, $r) = @_;
+
+                if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
+                    return Math::GMPz::Rmpz_get_ui($A);
+                }
+
+                my $w = ($r + 1) >> 1;
+                my $t = Math::GMPz::Rmpz_init();
+
+                Math::GMPz::Rmpz_ui_pow_ui($t, $B, $r);
+                Math::GMPz::Rmpz_divmod($Q, $R, $A, $t);
+                Math::GMPz::Rmpz_set($t, $Q);
+
+                __SUB__->($R, $w) + __SUB__->($t, $w);
+              }
+              ->($A, $r);
+
+            if ($total < ULONG_MAX) {
+                return __PACKAGE__->_set_uint($total);
+            }
+        }
+
+        # This algorithm will be used only for very large bases,
+        # base > ULONG_MAX, or when the sum of digits exceeds ULONG_MAX.
         my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
         while (Math::GMPz::Rmpz_sgn($t) > 0) {
