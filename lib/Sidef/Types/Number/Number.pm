@@ -5871,14 +5871,14 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my $t   = Math::GMPz::Rmpz_init_set($n);
-        my $sgn = Math::GMPz::Rmpz_sgn($t);
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
 
         if ($sgn == 0) {
             return Sidef::Types::Array::Array->new([ZERO]);
         }
         elsif ($sgn < 0) {
-            Math::GMPz::Rmpz_abs($t, $t);
+            $n = Math::GMPz::Rmpz_init_set($n);
+            Math::GMPz::Rmpz_abs($n, $n);
         }
 
 #<<<
@@ -5886,7 +5886,7 @@ package Sidef::Types::Number::Number {
             $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
             return Sidef::Types::Array::Array->new([
                 map { __PACKAGE__->_set_uint($k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_}) }
-                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($t, $k))
+                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($n, $k))
             ]);
         }
 #>>>
@@ -5935,9 +5935,12 @@ package Sidef::Types::Number::Number {
 
         # This algorithm will be used only when base > ULONG_MAX
         my @digits;
-        while (Math::GMPz::Rmpz_sgn($t) > 0) {
+
+        $n = Math::GMPz::Rmpz_init_set($n);    # copy
+
+        while (Math::GMPz::Rmpz_sgn($n) > 0) {
             my $m = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_divmod($t, $m, $t, $k);
+            Math::GMPz::Rmpz_divmod($n, $m, $n, $k);
             push @digits, bless \$m;
         }
 
@@ -6007,22 +6010,21 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my $m   = Math::GMPz::Rmpz_init();
-        my $t   = Math::GMPz::Rmpz_init_set($n);
-        my $sgn = Math::GMPz::Rmpz_sgn($t);
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
 
         if ($sgn == 0) {
             return ZERO;
         }
         elsif ($sgn < 0) {
-            Math::GMPz::Rmpz_abs($t, $t);
+            $n = Math::GMPz::Rmpz_init_set($n);
+            Math::GMPz::Rmpz_abs($n, $n);
         }
 
 #<<<
         if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
             $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
-            return __PACKAGE__->_set_uint(scalar Math::GMPz::Rmpz_popcount($t)) if ($k == 2);
-            return __PACKAGE__->_set_uint(List::Util::sum(map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($t, $k))));
+            return __PACKAGE__->_set_uint(scalar Math::GMPz::Rmpz_popcount($n)) if ($k == 2);
+            return __PACKAGE__->_set_uint(List::Util::sum(map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($n, $k))));
         }
 #>>>
 
@@ -6056,17 +6058,19 @@ package Sidef::Types::Number::Number {
               }
               ->($A, $r);
 
-            if ($total < ULONG_MAX) {
-                return __PACKAGE__->_set_uint($total);
-            }
+            ($total < ULONG_MAX)
+              && return __PACKAGE__->_set_uint($total);
         }
 
         # This algorithm will be used only for very large bases,
         # base > ULONG_MAX, or when the sum of digits exceeds ULONG_MAX.
+        my $m   = Math::GMPz::Rmpz_init();
         my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
-        while (Math::GMPz::Rmpz_sgn($t) > 0) {
-            Math::GMPz::Rmpz_divmod($t, $m, $t, $k);
+        $n = Math::GMPz::Rmpz_init_set($n);    # copy
+
+        while (Math::GMPz::Rmpz_sgn($n) > 0) {
+            Math::GMPz::Rmpz_divmod($n, $m, $n, $k);
             Math::GMPz::Rmpz_add($sum, $sum, $m);
         }
 
