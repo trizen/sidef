@@ -2565,9 +2565,7 @@ package Sidef::Types::Number::Number {
 
             if ($e > 0) {
                 state $t = Math::GMPz::Rmpz_init_nobless();
-                $y == 2
-                  ? do { Math::GMPz::Rmpz_set_ui($t, 0); Math::GMPz::Rmpz_setbit($t, $e) }
-                  : Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
+                Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
                 Math::GMPz::Rmpz_cmp($t, $x) > 0 and --$e;
             }
 

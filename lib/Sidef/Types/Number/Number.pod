@@ -2088,6 +2088,14 @@ Return the
 
 =cut
 
+=head2 is_power_of
+
+Number.is_power_of() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_prime
 
 Number.is_prime() -> I<Obj>
