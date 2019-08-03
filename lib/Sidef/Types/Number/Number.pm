@@ -2564,9 +2564,9 @@ package Sidef::Types::Number::Number {
             my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || return) - 1;
 
             if ($e > 0) {
-                my $t = Math::GMPz::Rmpz_init();
+                state $t = Math::GMPz::Rmpz_init_nobless();
                 $y == 2
-                  ? Math::GMPz::Rmpz_setbit($t, $e)
+                  ? do { Math::GMPz::Rmpz_set_ui($t, 0); Math::GMPz::Rmpz_setbit($t, $e) }
                   : Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
                 Math::GMPz::Rmpz_cmp($t, $x) > 0 and --$e;
             }
@@ -2575,8 +2575,8 @@ package Sidef::Types::Number::Number {
         }
 
         my $e = 0;
-        my $t = Math::GMPz::Rmpz_init();
 
+        state $t    = Math::GMPz::Rmpz_init_nobless();
         state $logx = Math::MPFR::Rmpfr_init2_nobless(64);
         state $logy = Math::MPFR::Rmpfr_init2_nobless(64);
 
@@ -11412,6 +11412,23 @@ package Sidef::Types::Number::Number {
 
     *is_pow           = \&is_power;
     *is_perfect_power = \&is_power;
+
+    sub is_power_of {
+        my ($n, $k) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+
+        my $e = __ilog__($n, $k) // return Sidef::Types::Bool::Bool::FALSE;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_pow_ui($t, $k, $e);
+
+        (Math::GMPz::Rmpz_cmp($t, $n) == 0)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
 
     sub is_powerful {
         my ($n) = @_;

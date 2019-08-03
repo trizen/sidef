@@ -1100,23 +1100,23 @@ package Sidef::Types::Array::Array {
         state $ten = Sidef::Types::Number::Number->_set_uint(10);
         $base //= $ten;
 
-        my @l = @$self;
-        my ($B, $k) = ($base, scalar(@l));
+        my @L = @$self;
+        my ($B, $k) = ($base, scalar(@L));
 
         while ($k > 1) {
 
             my @T;
             for (0 .. ($k >> 1) - 1) {
-                CORE::push(@T, $l[2 * $_]->add($B->mul($l[2 * $_ + 1])));
+                CORE::push(@T, $L[2 * $_]->add($B->mul($L[2 * $_ + 1])));
             }
 
-            CORE::push(@T, $l[-1]) if ($k & 1);
-            @l = @T;
+            CORE::push(@T, $L[-1]) if ($k & 1);
+            @L = @T;
             $B = $B->mul($B);
             $k = ($k >> 1) + ($k & 1);
         }
 
-        $l[0] // Sidef::Types::Number::Number::ZERO;
+        $L[0] // Sidef::Types::Number::Number::ZERO;
     }
 
     sub _min_max_by {
