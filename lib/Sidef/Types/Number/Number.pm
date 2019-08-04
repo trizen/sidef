@@ -5856,16 +5856,16 @@ package Sidef::Types::Number::Number {
     sub digits {
         my ($n, $k) = @_;
 
-        $n = _any2mpz($$n) // return undef;
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
 
         if (defined($k)) {
             _valid(\$k);
 
-            $k = _any2mpz($$k) // return undef;
+            $k = _any2mpz($$k) // return Sidef::Types::Array::Array->new;
 
             # Not defined for k <= 1
             if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
-                return undef;
+                return Sidef::Types::Array::Array->new;
             }
         }
 
@@ -6099,9 +6099,23 @@ package Sidef::Types::Number::Number {
     }
 
     sub length {
-        my ($x) = @_;
-        my $z   = _any2mpz($$x) // return undef;
+        my ($z, $base) = @_;
+
+        $z = _any2mpz($$z) // return undef;
+
         my $neg = (Math::GMPz::Rmpz_sgn($z) < 0) ? 1 : 0;
+
+        if (defined($base)) {
+            _valid(\$base);
+            $base = _any2mpz($$base) // return undef;
+            if ($neg) {
+                $z = Math::GMPz::Rmpz_init_set($z);
+                Math::GMPz::Rmpz_abs($z, $z);
+            }
+            my $e = __ilog__($z, $base) // return $_[0]->digits($_[1])->length;
+            return __PACKAGE__->_set_uint($e + 1);
+        }
+
         __PACKAGE__->_set_uint(CORE::length(Math::GMPz::Rmpz_get_str($z, 10)) - $neg);
     }
 
@@ -9935,12 +9949,11 @@ package Sidef::Types::Number::Number {
                 my @d = (1);
 
                 foreach my $p (sort { $a <=> $b } keys %table) {
-                    my $e = $table{$p};
 
                     my @t;
                     my $r = 1;
 
-                    for my $i (1 .. $e) {
+                    for my $i (1 .. $table{$p}) {
                         $r *= $p;
                         foreach my $u (@d) {
                             push(@t, $u * $r) if ($u * $r - 1 < $k);
