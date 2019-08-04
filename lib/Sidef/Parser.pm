@@ -1951,6 +1951,8 @@ package Sidef::Parser {
                   $self->get_init_vars(code      => $opt{code},
                                        with_vals => 0);
 
+                $self->backtrack_whitespace();
+
                 @{$var_names}
                   || $self->fatal_error(
                                         code  => $_,
