@@ -9902,8 +9902,59 @@ package Sidef::Types::Number::Number {
 
     *dconv = \&dirichlet_convolution;
 
+    # Divisors d of n, such that d <= k, with k = n when `k` is not specified
     sub divisors {
-        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
+        my ($n, $k) = @_;
+
+        $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
+
+        if (defined($k)) {
+            _valid(\$k);
+
+            $k = _any2mpz($$k) // return Sidef::Types::Array::Array->new();
+
+            if (Math::GMPz::Rmpz_fits_ulong_p($k)) {    # k is a native integer
+
+                $k = Math::GMPz::Rmpz_get_ui($k) || return Sidef::Types::Array::Array->new();
+
+                my @factors;
+
+                if (($k <= 1e6 or $k == 1e7 or $k == 1e8) and $n > $k) {
+                    my $f = $_[0]->trial_factor($_[1]);
+                    @factors = map { Math::GMPz::Rmpz_get_ui($$_) } grep { $$_ <= $k } @$f;
+                }
+                else {
+                    @factors = grep { $_ - 1 < $k } Math::Prime::Util::GMP::factor($n);
+                }
+
+                @factors || return Sidef::Types::Array::Array->new([ONE]);
+
+                my %table;
+                ++$table{$_} for @factors;
+
+                my @d = (1);
+
+                foreach my $p (sort { $a <=> $b } keys %table) {
+                    my $e = $table{$p};
+
+                    my @t;
+                    my $r = 1;
+
+                    for my $i (1 .. $e) {
+                        $r *= $p;
+                        foreach my $u (@d) {
+                            push(@t, $u * $r) if ($u * $r - 1 < $k);
+                        }
+                    }
+
+                    push @d, @t;
+                }
+
+                return Sidef::Types::Array::Array->new([map { __PACKAGE__->_set_uint($_) } sort { $a <=> $b } @d]);
+            }
+
+            return Sidef::Types::Array::Array->new([grep { $$_ <= $k } @{$_[0]->divisors}]);
+        }
 
         Sidef::Types::Array::Array->new(
                                         [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
