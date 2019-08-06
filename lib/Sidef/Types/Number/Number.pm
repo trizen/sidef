@@ -8132,7 +8132,9 @@ package Sidef::Types::Number::Number {
             $mertens_table->{$n} = $M;
         };
 
-        __PACKAGE__->_set_int($mertens->($y) - $mertens->($x) + Math::Prime::Util::GMP::moebius($x));
+        ($x == 1)
+          ? __PACKAGE__->_set_int($mertens->($y))
+          : __PACKAGE__->_set_int($mertens->($y) - $mertens->($x) + Math::Prime::Util::GMP::moebius($x));
     }
 
     sub cyclotomic_polynomial {
