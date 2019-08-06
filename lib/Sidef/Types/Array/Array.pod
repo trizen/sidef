@@ -308,6 +308,14 @@ Return the
 
 =cut
 
+=head2 cfrac2num
+
+Array.cfrac2num() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 change_to
 
 Array.change_to() -> I<Obj>
@@ -1109,6 +1117,8 @@ Aliases: I<map_operator>
 Array.map_reduce() -> I<Obj>
 
 Return the
+
+Aliases: I<reduce_map>
 
 =cut
 

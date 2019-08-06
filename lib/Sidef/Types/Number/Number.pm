@@ -5858,6 +5858,16 @@ package Sidef::Types::Number::Number {
 
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
 
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+        if ($sgn == 0) {
+            return Sidef::Types::Array::Array->new([ZERO]);
+        }
+        elsif ($sgn < 0) {
+            $n = Math::GMPz::Rmpz_init_set($n);
+            Math::GMPz::Rmpz_abs($n, $n);
+        }
+
         if (defined($k)) {
             _valid(\$k);
 
@@ -5867,16 +5877,6 @@ package Sidef::Types::Number::Number {
             if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
                 return Sidef::Types::Array::Array->new;
             }
-        }
-
-        my $sgn = Math::GMPz::Rmpz_sgn($n);
-
-        if ($sgn == 0) {
-            return Sidef::Types::Array::Array->new([ZERO]);
-        }
-        elsif ($sgn < 0) {
-            $n = Math::GMPz::Rmpz_init_set($n);
-            Math::GMPz::Rmpz_abs($n, $n);
         }
 
 #<<<
@@ -5997,6 +5997,16 @@ package Sidef::Types::Number::Number {
 
         $n = _any2mpz($$n) // return undef;
 
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+        if ($sgn == 0) {
+            return ZERO;
+        }
+        elsif ($sgn < 0) {
+            $n = Math::GMPz::Rmpz_init_set($n);
+            Math::GMPz::Rmpz_abs($n, $n);
+        }
+
         if (defined($k)) {
             _valid(\$k);
 
@@ -6006,16 +6016,6 @@ package Sidef::Types::Number::Number {
             if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
                 return undef;
             }
-        }
-
-        my $sgn = Math::GMPz::Rmpz_sgn($n);
-
-        if ($sgn == 0) {
-            return ZERO;
-        }
-        elsif ($sgn < 0) {
-            $n = Math::GMPz::Rmpz_init_set($n);
-            Math::GMPz::Rmpz_abs($n, $n);
         }
 
 #<<<

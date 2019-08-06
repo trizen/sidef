@@ -1119,6 +1119,19 @@ package Sidef::Types::Array::Array {
         $L[0] // Sidef::Types::Number::Number::ZERO;
     }
 
+    sub cfrac2num {
+        my ($self) = @_;
+
+        my $res = $self->[-1];
+        my $end = $#{$self};
+
+        for my $k (1 .. $end) {
+            $res = $res->inv->add($self->[$end - $k]);
+        }
+
+        $res;
+    }
+
     sub _min_max_by {
         my ($self, $block, $order) = @_;
 
@@ -2250,6 +2263,8 @@ package Sidef::Types::Array::Array {
 
         bless \@list, ref($self);
     }
+
+    *reduce_map = \&map_reduce;
 
     sub length {
         my ($self) = @_;
