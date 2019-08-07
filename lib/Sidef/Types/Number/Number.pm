@@ -5697,7 +5697,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_submul($y, $r, $z);    # y = y - t*z
             Math::GMPz::Rmpz_neg($y, $y);           # y = -y
 
-            # z = floor((n - y*y) / z)
+            # z = ((n - y*y) / z)
             Math::GMPz::Rmpz_mul($t, $y, $y);       # t = y*y
             Math::GMPz::Rmpz_sub($t, $n, $t);       # t = n-t
             Math::GMPz::Rmpz_divexact($z, $t, $z);  # z = t/z
@@ -6105,7 +6105,7 @@ package Sidef::Types::Number::Number {
 
         $x = _any2mpz($$x) // return undef;
 
-        my $neg = ((Math::GMPz::Rmpz_sgn($x) || return ZERO) < 0) ? 1 : 0;
+        my $neg = ((Math::GMPz::Rmpz_sgn($x) || return ONE) < 0) ? 1 : 0;
 
         if (defined($y)) {
             _valid(\$y);
@@ -6120,8 +6120,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_abs($x, $x);
         }
 
-        __PACKAGE__->_set_uint(
-                   1 + (__ilog__($x, $y) // return $_[0]->digits(ref($y) ? (bless \$y) : __PACKAGE__->_set_uint($y))->length));
+        __PACKAGE__->_set_uint(1 + (__ilog__($x, $y) // return ZERO));
     }
 
     *len  = \&length;
