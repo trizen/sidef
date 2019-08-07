@@ -2552,14 +2552,15 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         # ilog(x, y <= 1) = NaN
-        Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0 and return;
+        $y <= 1 and return;
 
         # ilog(x <= 0, y) = NaN
         Math::GMPz::Rmpz_sgn($x) <= 0 and return;
 
         # Return faster for y <= 62
-        if (Math::GMPz::Rmpz_cmp_ui($y, 62) <= 0) {
-            $y = Math::GMPz::Rmpz_get_ui($y);
+        if ($y <= 62) {
+
+            $y = Math::GMPz::Rmpz_get_ui($y) if ref($y);
 
             my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || return) - 1;
 
@@ -2571,6 +2572,9 @@ package Sidef::Types::Number::Number {
 
             return $e;
         }
+
+        # Make sure `y` is a Math::GMPz object
+        $y = Math::GMPz::Rmpz_init_set_ui($y) if !ref($y);
 
         my $e = 0;
 
@@ -2612,14 +2616,12 @@ package Sidef::Types::Number::Number {
 
     sub ilog2 {
         my ($x) = @_;
-        state $two = Math::GMPz::Rmpz_init_set_ui(2);
-        __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), $two) // goto &nan);
+        __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), 2) // goto &nan);
     }
 
     sub ilog10 {
         my ($x) = @_;
-        state $ten = Math::GMPz::Rmpz_init_set_ui(10);
-        __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), $ten) // goto &nan);
+        __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), 10) // goto &nan);
     }
 
     sub msb {
@@ -5898,8 +5900,8 @@ package Sidef::Types::Number::Number {
             my $A = $n;
             my $B = Math::GMPz::Rmpz_get_ui($k);
 
-            my $Q = Math::GMPz::Rmpz_init();
-            my $R = Math::GMPz::Rmpz_init();
+            state $Q = Math::GMPz::Rmpz_init_nobless();
+            state $R = Math::GMPz::Rmpz_init_nobless();
 
             my @digits = map { __PACKAGE__->_set_uint($_) } sub {
                 my ($A, $r) = @_;
@@ -6035,8 +6037,8 @@ package Sidef::Types::Number::Number {
             my $A = $n;
             my $B = Math::GMPz::Rmpz_get_ui($k);
 
-            my $Q = Math::GMPz::Rmpz_init();
-            my $R = Math::GMPz::Rmpz_init();
+            state $Q = Math::GMPz::Rmpz_init_nobless();
+            state $R = Math::GMPz::Rmpz_init_nobless();
 
             my $total = sub {
                 my ($A, $r) = @_;
@@ -6099,24 +6101,27 @@ package Sidef::Types::Number::Number {
     }
 
     sub length {
-        my ($z, $base) = @_;
+        my ($x, $y) = @_;
 
-        $z = _any2mpz($$z) // return undef;
+        $x = _any2mpz($$x) // return undef;
 
-        my $neg = (Math::GMPz::Rmpz_sgn($z) < 0) ? 1 : 0;
+        my $neg = ((Math::GMPz::Rmpz_sgn($x) || return ZERO) < 0) ? 1 : 0;
 
-        if (defined($base)) {
-            _valid(\$base);
-            $base = _any2mpz($$base) // return undef;
-            if ($neg) {
-                $z = Math::GMPz::Rmpz_init_set($z);
-                Math::GMPz::Rmpz_abs($z, $z);
-            }
-            my $e = __ilog__($z, $base) // return $_[0]->digits($_[1])->length;
-            return __PACKAGE__->_set_uint($e + 1);
+        if (defined($y)) {
+            _valid(\$y);
+            $y = _any2mpz($$y) // return undef;
+        }
+        else {
+            $y = 10;
         }
 
-        __PACKAGE__->_set_uint(CORE::length(Math::GMPz::Rmpz_get_str($z, 10)) - $neg);
+        if ($neg) {
+            $x = Math::GMPz::Rmpz_init_set($x);
+            Math::GMPz::Rmpz_abs($x, $x);
+        }
+
+        __PACKAGE__->_set_uint(
+                   1 + (__ilog__($x, $y) // return $_[0]->digits(ref($y) ? (bless \$y) : __PACKAGE__->_set_uint($y))->length));
     }
 
     *len  = \&length;
