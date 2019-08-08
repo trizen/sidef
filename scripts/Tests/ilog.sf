@@ -5,12 +5,21 @@
 #
 
 for n in (1..100) {
+
     assert_eq(ilog(3**n, 3), n)
     assert_eq(ilog2(2**n), n)
+
     assert_eq(ilog10(10**n), n)
+    assert_eq(ilog10(10**n + 1), n)
+    assert_eq(ilog10(10**n - 1), n-1)
+
     assert_eq(ilog(3**n), log(3**n).int)
     assert_eq(ilog2(exp(n)), log2(exp(n)).int)
     assert_eq(ilog(exp(n), 3), log(exp(n), 3).int)
+
+    assert_eq(ilog(100**n, 100), n)
+    assert_eq(ilog(100**n + 1, 100), n)
+    assert_eq(ilog(100**n - 1, 100), n-1)
 }
 
 assert_eq(gather {
