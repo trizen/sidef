@@ -2228,29 +2228,35 @@ package Sidef::Parser {
                 my $strings = $self->get_quoted_words(code => $opt{code});
 
                 if ($type eq 'w' or $type eq '<') {
-                    return Sidef::Types::Array::Array->new(
-                                                [map { Sidef::Types::String::String->new(s{\\(?=[\\#\s])}{}gr) } @{$strings}]);
+                    return Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new(s{\\(?=[\\#\s])}{}gr) }
+                                                           @{$strings});
                 }
-                elsif ($type eq 'i') {
-                    return Sidef::Types::Array::Array->new(
-                                           [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr)->int } @{$strings}]);
+
+                if ($type eq 'i') {
+                    return
+                      Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr)->int }
+                                                        split(/[\s,]+/, join(' ', @$strings)));
                 }
-                elsif ($type eq 'n') {
-                    return Sidef::Types::Array::Array->new(
-                                                [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } @{$strings}]);
+
+                if ($type eq 'n') {
+                    return
+                      Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
+                                                        split(/[\s,]+/, join(' ', @$strings)));
                 }
-                elsif ($type eq 'v') {
+
+                if ($type eq 'v') {
                     return
                       Sidef::Types::Array::Vector->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
                                                          split(/[\s,]+/, join(' ', @$strings)));
                 }
-                elsif ($type eq 'm') {
+
+                if ($type eq 'm') {
                     my @matrix;
                     my $data = join(' ', @$strings);
                     foreach my $line (split(/\s*;\s*/, $data)) {
                         push @matrix,
-                          Sidef::Types::Array::Array->new(
-                                     [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, $line)]);
+                          Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
+                                                            split(/[\s,]+/, $line));
                     }
                     return Sidef::Types::Array::Matrix->new(@matrix);
                 }
