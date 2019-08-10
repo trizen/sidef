@@ -321,8 +321,8 @@ package Sidef::Types::Number::Number {
                    );
         }
 
-        # Floating-point
-        if ($s =~ /^([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)\z/) {
+        # Decimal expansion (parsed as a rational value)
+        if ($s =~ tr/e.// and $s =~ /^([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)\z/) {
             my $frac = _str2frac($1);
 
             if (index($frac, '/') != -1) {
@@ -400,16 +400,18 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        # Floating point value
-        if ($s =~ tr/e.//) {
-            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            if (Math::MPFR::Rmpfr_set_str($r, $s, 10, $ROUND)) {
-                Math::MPFR::Rmpfr_set_nan($r);
-            }
-            return $r;
-        }
+#<<<
+        # Decimal expansion (parsed as a floating-point value)
+        #~ if ($s =~ tr/e.//) {
+            #~ my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            #~ if (Math::MPFR::Rmpfr_set_str($r, $s, 10, $ROUND)) {
+                #~ Math::MPFR::Rmpfr_set_nan($r);
+            #~ }
+            #~ return $r;
+        #~ }
+#>>>
 
-        # Remove the plus sign (if any)
+        # Remove a leading plus sign
         $s =~ s/^\+// if substr($s, 0, 1) eq '+';
 
         # Fractional value
