@@ -9103,7 +9103,7 @@ package Sidef::Types::Number::Number {
         # Must be positive
         (Math::GMPz::Rmpz_sgn($n) > 0) || return;
 
-        # Check for divisibilty by 2
+        # Check for divisibility by 2
         if (Math::GMPz::Rmpz_even_p($n)) {
             return (Math::GMPz::Rmpz_cmp_ui($n, 2) == 0);
         }
