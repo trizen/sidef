@@ -9601,9 +9601,20 @@ package Sidef::Types::Number::Number {
             return bless \$z;
         }
 
-        foreach my $p (2, 3, 5, 7, 11) {
+        foreach my $p (2, 3, 5) {
             if (Math::GMPz::Rmpz_divisible_ui_p($z, $p)) {
                 return __PACKAGE__->_set_uint($p);
+            }
+        }
+
+        state $bounds = [map { __PACKAGE__->_set_uint($_) } (1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8)];
+
+        foreach my $k (@$bounds) {
+
+            my $factors = $_[0]->trial_factor($k);
+
+            if (@$factors > 1) {
+                return $factors->[0];
             }
         }
 
@@ -9615,15 +9626,6 @@ package Sidef::Types::Number::Number {
 
         if (Math::Prime::Util::GMP::is_prob_prime($nstr)) {
             return bless \$z;
-        }
-
-        foreach my $k (1e4, 1e6, 1e7) {
-
-            my @f = Math::Prime::Util::GMP::trial_factor($nstr, $k);
-
-            if (@f > 1) {
-                return __PACKAGE__->_set_uint($f[0]);
-            }
         }
 
         my @f = Math::Prime::Util::GMP::factor($nstr);
