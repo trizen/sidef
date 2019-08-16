@@ -437,8 +437,6 @@ package Sidef::Types::Set::Bag {
         bless \%new, ref($self);
     }
 
-    *map_2D = \&map_2d;
-
     sub map_kv {
         my ($self, $block) = @_;
 
@@ -517,8 +515,6 @@ package Sidef::Types::Set::Bag {
 
         bless \%new, ref($self);
     }
-
-    *grep_2D = \&grep_2d;
 
     sub grep_kv {
         my ($self, $block) = @_;
@@ -684,8 +680,6 @@ package Sidef::Types::Set::Bag {
 
         $self;
     }
-
-    *each_2D = \&each_2d;
 
     sub each_kv {
         my ($self, $block) = @_;

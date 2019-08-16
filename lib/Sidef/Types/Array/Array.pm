@@ -1000,6 +1000,16 @@ package Sidef::Types::Array::Array {
                             sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
     }
 
+    sub sum_2d {
+        my ($self, $block) = @_;
+        $self->map_2d($block)->sum;
+    }
+
+    sub prod_2d {
+        my ($self, $block) = @_;
+        $self->map_2d($block)->prod;
+    }
+
     sub sum {
         my ($self, $arg) = @_;
 
@@ -1310,8 +1320,6 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
-    *each_2D = \&each_2d;
-
     sub each_slice {
         my ($self, $n, $block) = @_;
 
@@ -1532,8 +1540,6 @@ package Sidef::Types::Array::Array {
         bless \@array, ref($self);
     }
 
-    *map_2D = \&map_2d;
-
     sub map_kv {
         my ($self, $block) = @_;
 
@@ -1587,8 +1593,6 @@ package Sidef::Types::Array::Array {
 
         bless \@array, ref($self);
     }
-
-    *grep_2D = \&grep_2d;
 
     sub grep_kv {
         my ($self, $block) = @_;

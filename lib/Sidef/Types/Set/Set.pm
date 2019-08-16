@@ -174,8 +174,6 @@ package Sidef::Types::Set::Set {
         bless \%new, ref($self);
     }
 
-    *map_2D = \&map_2d;
-
     sub collect {
         my ($self, $block) = @_;
 
@@ -218,8 +216,6 @@ package Sidef::Types::Set::Set {
 
         bless \%new, ref($self);
     }
-
-    *grep_2D = \&grep_2d;
 
     sub count_by {
         my ($self, $block) = @_;
@@ -306,8 +302,6 @@ package Sidef::Types::Set::Set {
         $self;
     }
 
-    *each_2D = \&each_2d;
-
     sub sort_by {
         my ($self, $block) = @_;
         $self->values->sort_by($block);
@@ -336,6 +330,30 @@ package Sidef::Types::Set::Set {
     sub min_by {
         my ($self, $block) = @_;
         $self->values->min_by($block);
+    }
+
+    sub sum {
+        my ($self, $block) = @_;
+        $self->to_a->sum($block);
+    }
+
+    *sum_by = \&sum;
+
+    sub prod {
+        my ($self, $block) = @_;
+        $self->to_a->prod($block);
+    }
+
+    *prod_by = \&prod;
+
+    sub sum_2d {
+        my ($self, $block) = @_;
+        $self->to_a->sum_2d($block);
+    }
+
+    sub prod_2d {
+        my ($self, $block) = @_;
+        $self->to_a->prod_2d($block);
     }
 
     sub has {

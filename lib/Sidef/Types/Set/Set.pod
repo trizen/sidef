@@ -178,8 +178,6 @@ Set.each_2d() -> I<Obj>
 
 Return the
 
-Aliases: I<each_2D>
-
 =cut
 
 =head2 grep
@@ -197,8 +195,6 @@ Aliases: I<select>
 Set.grep_2d() -> I<Obj>
 
 Return the
-
-Aliases: I<grep_2D>
 
 =cut
 
@@ -231,8 +227,6 @@ Return the
 Set.map_2d() -> I<Obj>
 
 Return the
-
-Aliases: I<map_2D>
 
 =cut
 
@@ -294,6 +288,24 @@ Return the
 
 =cut
 
+=head2 prod
+
+Set.prod() -> I<Obj>
+
+Return the
+
+Aliases: I<prod_by>
+
+=cut
+
+=head2 prod_2d
+
+Set.prod_2d() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 shift
 
 Set.shift() -> I<Obj>
@@ -313,6 +325,24 @@ Return the
 =head2 sort_by
 
 Set.sort_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum
+
+Set.sum() -> I<Obj>
+
+Return the
+
+Aliases: I<sum_by>
+
+=cut
+
+=head2 sum_2d
+
+Set.sum_2d() -> I<Obj>
 
 Return the
 
