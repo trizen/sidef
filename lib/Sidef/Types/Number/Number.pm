@@ -9607,6 +9607,11 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        if (Math::GMPz::Rmpz_fits_ulong_p($z)) {
+            my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_ui($z));
+            return __PACKAGE__->_set_uint($f[0]);
+        }
+
         state $bounds = [map { __PACKAGE__->_set_uint($_) } (1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8)];
 
         foreach my $k (@$bounds) {
@@ -9618,17 +9623,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my $nstr = (
-                      Math::GMPz::Rmpz_fits_ulong_p($z)
-                    ? Math::GMPz::Rmpz_get_ui($z)
-                    : Math::GMPz::Rmpz_get_str($z, 10)
-                   );
-
-        if (Math::Prime::Util::GMP::is_prob_prime($nstr)) {
-            return bless \$z;
-        }
-
-        my @f = Math::Prime::Util::GMP::factor($nstr);
+        my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($z, 10));
 
         __PACKAGE__->_set_str('int', $f[0]);
     }
