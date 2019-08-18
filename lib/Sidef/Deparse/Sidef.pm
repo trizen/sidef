@@ -182,7 +182,10 @@ package Sidef::Deparse::Sidef {
         }
 
         $table->{lc($str)} // do {
-            if ($type eq 'float') {
+            if ($str eq 'Inf' or $str eq 'Inf.neg' or $str eq 'NaN') {
+                $str;
+            }
+            elsif ($type eq 'float') {
                 "$str.float";
             }
             elsif (index($str, '/') != -1) {

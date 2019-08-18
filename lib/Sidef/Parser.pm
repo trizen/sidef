@@ -2247,7 +2247,7 @@ package Sidef::Parser {
                 if ($type eq 'v') {
                     my @list =
                       map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, join(' ', @$strings));
-                    return Sidef::Types::Array::Vector->new(\@list);
+                    return Sidef::Types::Array::Vector->new(@list);    # this must be passed as a list
                 }
 
                 if ($type eq 'm') {
