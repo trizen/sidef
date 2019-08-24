@@ -92,6 +92,16 @@ Aliases: I<xor>
 
 =cut
 
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
 =head2 abs
 
 Vector.abs() -> I<Obj>
@@ -223,15 +233,5 @@ Aliases: I<dump>, I<to_str>
 Vector.zero() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 |
-
-I<Obj> B<|> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<or>
 
 =cut

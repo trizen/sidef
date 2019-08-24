@@ -62,6 +62,48 @@ Return the
 
 =cut
 
+=head2 |>
+
+I<Obj> B<|E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ||
+
+I<Obj> B<||> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ~~
+
+I<Obj> B<~~> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ¦
+
+I<Obj> B<¦> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<：>
+
+=cut
+
+=head2 ⫶
+
+I<Obj> B<⫶> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 alias_method
 
 Object.alias_method() -> I<Obj>
@@ -251,48 +293,6 @@ Aliases: I<println>
 =head2 undef_method
 
 Object.undef_method() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 |>
-
-I<Obj> B<|E<gt>> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 ||
-
-I<Obj> B<||> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 ~~
-
-I<Obj> B<~~> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 ¦
-
-I<Obj> B<¦> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<：>
-
-=cut
-
-=head2 ⫶
-
-I<Obj> B<⫶> I<Obj> -> I<Obj>
 
 Return the
 

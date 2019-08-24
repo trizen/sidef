@@ -82,6 +82,26 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =cut
 
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>, I<union>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
 =head2 append
 
 Hash.append() -> I<Obj>
@@ -439,25 +459,5 @@ Return the
 Hash.values() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 |
-
-I<Obj> B<|> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<or>, I<union>
-
-=cut
-
-=head2 ≠
-
-I<Obj> B<≠> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<!=>, I<ne>
 
 =cut

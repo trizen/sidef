@@ -284,6 +284,187 @@ Aliases: I<xdownto>
 
 =cut
 
+=head2 C
+
+    Num.C
+    Num.catalan_G
+
+Returns the Catalan constant: 0.915965594177...
+
+Aliases: I<catalan_G>
+
+=cut
+
+=head2 Y
+
+Number.Y() -> I<Obj>
+
+Return the
+
+Aliases: I<γ>, I<euler_gamma>
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
+=head2 ~
+
+I<Obj> B<~> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<not>
+
+=cut
+
+=head2 Γ
+
+Number.Γ() -> I<Obj>
+
+Return the
+
+Aliases: I<gamma>
+
+=cut
+
+=head2 δ
+
+Number.δ() -> I<Obj>
+
+Return the
+
+Aliases: I<kronecker_delta>
+
+=cut
+
+=head2 ζ
+
+Number.ζ() -> I<Obj>
+
+Return the
+
+Aliases: I<zeta>
+
+=cut
+
+=head2 η
+
+Number.η() -> I<Obj>
+
+Return the
+
+Aliases: I<eta>
+
+=cut
+
+=head2 μ
+
+Number.μ() -> I<Obj>
+
+Return the
+
+Aliases: I<mobius>, I<möbius>, I<moebius>
+
+=cut
+
+=head2 σ
+
+Number.σ() -> I<Obj>
+
+Return the
+
+Aliases: I<sigma>
+
+=cut
+
+=head2 Ψ
+
+Number.Ψ() -> I<Obj>
+
+Return the
+
+Aliases: I<digamma>
+
+=cut
+
+=head2 Ω
+
+Number.Ω() -> I<Obj>
+
+Return the
+
+Aliases: I<big_omega>, I<bigomega>, I<prime_power_sigma0>
+
+=cut
+
+=head2 ω
+
+Number.ω() -> I<Obj>
+
+Return the
+
+Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
+
+=cut
+
+=head2 ϕ
+
+Number.ϕ() -> I<Obj>
+
+Return the
+
+Aliases: I<totient>, I<euler_phi>, I<eulerphi>, I<euler_totient>
+
+=cut
+
+=head2 ≅
+
+I<Obj> B<≅> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<=~=>, I<approx_eq>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
 =head2 abs
 
     n.abs
@@ -783,17 +964,6 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<n
 
     bsearch_le(1e6,       { .exp <=> 1e+9 })  #  20   (exp( 20) <= 1e+9)
     bsearch_le(-1e6, 1e6, { .exp <=> 1e-9 })  # -21   (exp(-21) <= 1e-9)
-
-=cut
-
-=head2 C
-
-    Num.C
-    Num.catalan_G
-
-Returns the Catalan constant: 0.915965594177...
-
-Aliases: I<catalan_G>
 
 =cut
 
@@ -3798,16 +3968,6 @@ Return the
 
 =cut
 
-=head2 Y
-
-Number.Y() -> I<Obj>
-
-Return the
-
-Aliases: I<γ>, I<euler_gamma>
-
-=cut
-
 =head2 zero
 
 Number.zero() -> I<Obj>
@@ -3829,165 +3989,5 @@ Return the
 Number.znprimroot() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 |
-
-I<Obj> B<|> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<or>
-
-=cut
-
-=head2 ~
-
-I<Obj> B<~> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<not>
-
-=cut
-
-=head2 Γ
-
-Number.Γ() -> I<Obj>
-
-Return the
-
-Aliases: I<gamma>
-
-=cut
-
-=head2 δ
-
-Number.δ() -> I<Obj>
-
-Return the
-
-Aliases: I<kronecker_delta>
-
-=cut
-
-=head2 ζ
-
-Number.ζ() -> I<Obj>
-
-Return the
-
-Aliases: I<zeta>
-
-=cut
-
-=head2 η
-
-Number.η() -> I<Obj>
-
-Return the
-
-Aliases: I<eta>
-
-=cut
-
-=head2 μ
-
-Number.μ() -> I<Obj>
-
-Return the
-
-Aliases: I<mobius>, I<möbius>, I<moebius>
-
-=cut
-
-=head2 σ
-
-Number.σ() -> I<Obj>
-
-Return the
-
-Aliases: I<sigma>
-
-=cut
-
-=head2 Ψ
-
-Number.Ψ() -> I<Obj>
-
-Return the
-
-Aliases: I<digamma>
-
-=cut
-
-=head2 Ω
-
-Number.Ω() -> I<Obj>
-
-Return the
-
-Aliases: I<big_omega>, I<bigomega>, I<prime_power_sigma0>
-
-=cut
-
-=head2 ω
-
-Number.ω() -> I<Obj>
-
-Return the
-
-Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
-
-=cut
-
-=head2 ϕ
-
-Number.ϕ() -> I<Obj>
-
-Return the
-
-Aliases: I<totient>, I<euler_phi>, I<eulerphi>, I<euler_totient>
-
-=cut
-
-=head2 ≅
-
-I<Obj> B<≅> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<=~=>, I<approx_eq>
-
-=cut
-
-=head2 ≠
-
-I<Obj> B<≠> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<!=>, I<ne>
-
-=cut
-
-=head2 ≤
-
-I<Obj> B<≤> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<lt>=>, I<le>
-
-=cut
-
-=head2 ≥
-
-I<Obj> B<≥> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<gt>=>, I<ge>
 
 =cut

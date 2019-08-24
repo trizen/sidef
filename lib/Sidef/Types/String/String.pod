@@ -182,6 +182,56 @@ Aliases: I<xor>
 
 =cut
 
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
+=head2 ~
+
+I<Obj> B<~> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<not>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
 =head2 apply_escapes
 
 String.apply_escapes() -> I<Obj>
@@ -1207,55 +1257,5 @@ Aliases: I<wordcase>
 String.words() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 |
-
-I<Obj> B<|> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<or>
-
-=cut
-
-=head2 ~
-
-I<Obj> B<~> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<not>
-
-=cut
-
-=head2 ≠
-
-I<Obj> B<≠> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<!=>, I<ne>
-
-=cut
-
-=head2 ≤
-
-I<Obj> B<≤> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<lt>=>, I<le>
-
-=cut
-
-=head2 ≥
-
-I<Obj> B<≥> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<gt>=>, I<ge>
 
 =cut

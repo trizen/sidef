@@ -22,6 +22,26 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 «
+
+I<Obj> B<«> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>E<lt>>, I<write_from>
+
+=cut
+
+=head2 »
+
+I<Obj> B<»> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>E<gt>>, I<read_to>
+
+=cut
+
 =head2 autoflush
 
 FileHandle.autoflush() -> I<Obj>
@@ -351,25 +371,5 @@ Return the
 FileHandle.words() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 «
-
-I<Obj> B<«> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<lt>E<lt>>, I<write_from>
-
-=cut
-
-=head2 »
-
-I<Obj> B<»> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<gt>E<gt>>, I<read_to>
 
 =cut

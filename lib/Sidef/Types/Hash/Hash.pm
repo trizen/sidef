@@ -189,7 +189,9 @@ package Sidef::Types::Hash::Hash {
 
     sub set_keys {
         my ($self, @keys) = @_;
-        undef @{$self}{@keys};
+        if (@keys) {
+            undef @{$self}{@keys};
+        }
         $self;
     }
 

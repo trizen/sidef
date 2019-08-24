@@ -102,6 +102,26 @@ Aliases: I<xor>
 
 =cut
 
+=head2 I
+
+Matrix.I() -> I<Obj>
+
+Return the
+
+Aliases: I<identity>
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
 =head2 abs
 
 Matrix.abs() -> I<Obj>
@@ -245,16 +265,6 @@ Return the
 Matrix.horizontal_flip() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 I
-
-Matrix.I() -> I<Obj>
-
-Return the
-
-Aliases: I<identity>
 
 =cut
 
@@ -491,15 +501,5 @@ Return the
 Matrix.zero() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 |
-
-I<Obj> B<|> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<or>
 
 =cut

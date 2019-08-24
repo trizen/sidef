@@ -82,6 +82,62 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =cut
 
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<∪>, I<or>, I<union>
+
+=cut
+
+=head2 ∋
+
+I<Obj> B<∋> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 ∌
+
+I<Obj> B<∌> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ≡
+
+I<Obj> B<≡> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
+
+=cut
+
 =head2 all
 
 Set.all() -> I<Obj>
@@ -371,61 +427,5 @@ Return the
 Set.to_set() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 |
-
-I<Obj> B<|> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<∪>, I<or>, I<union>
-
-=cut
-
-=head2 ∋
-
-I<Obj> B<∋> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
-
-=cut
-
-=head2 ∌
-
-I<Obj> B<∌> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 ≡
-
-I<Obj> B<≡> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 ≤
-
-I<Obj> B<≤> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
-
-=cut
-
-=head2 ≥
-
-I<Obj> B<≥> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
 =cut

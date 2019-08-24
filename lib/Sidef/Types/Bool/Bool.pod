@@ -38,6 +38,14 @@ Return the
 
 =cut
 
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 false
 
 Bool.false() -> I<Obj>
@@ -107,14 +115,6 @@ Aliases: I<dump>, I<to_str>
 =head2 true
 
 Bool.true() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 |
-
-I<Obj> B<|> I<Obj> -> I<Obj>
 
 Return the
 

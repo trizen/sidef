@@ -142,6 +142,114 @@ Aliases: I<xor>
 
 =cut
 
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
+=head2 |>>
+
+I<Obj> B<|E<gt>E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<pipeline_map_op>
+
+=cut
+
+=head2 |X>
+
+Array.|XE<gt>() -> I<Obj>
+
+Return the
+
+Aliases: I<pipeline_cross_op>
+
+=cut
+
+=head2 |Z>
+
+Array.|ZE<gt>() -> I<Obj>
+
+Return the
+
+Aliases: I<pipeline_zip_op>
+
+=cut
+
+=head2 «
+
+I<Obj> B<«> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>E<lt>>, I<push>, I<append>
+
+=cut
+
+=head2 »
+
+I<Obj> B<»> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
+
+=cut
+
+=head2 ∋
+
+I<Obj> B<∋> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<contain>, I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 ∌
+
+I<Obj> B<∌> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
 =head2 abbrev
 
 Array.abbrev() -> I<Obj>
@@ -1845,113 +1953,5 @@ Array.zip_op() -> I<Obj>
 Return the
 
 Aliases: I<zip_operator>
-
-=cut
-
-=head2 |
-
-I<Obj> B<|> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<or>
-
-=cut
-
-=head2 |>>
-
-I<Obj> B<|E<gt>E<gt>> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<pipeline_map_op>
-
-=cut
-
-=head2 |X>
-
-Array.|XE<gt>() -> I<Obj>
-
-Return the
-
-Aliases: I<pipeline_cross_op>
-
-=cut
-
-=head2 |Z>
-
-Array.|ZE<gt>() -> I<Obj>
-
-Return the
-
-Aliases: I<pipeline_zip_op>
-
-=cut
-
-=head2 «
-
-I<Obj> B<«> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<lt>E<lt>>, I<push>, I<append>
-
-=cut
-
-=head2 »
-
-I<Obj> B<»> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
-
-=cut
-
-=head2 ∋
-
-I<Obj> B<∋> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<contain>, I<include>, I<contains>, I<includes>
-
-=cut
-
-=head2 ∌
-
-I<Obj> B<∌> I<Obj> -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 ≠
-
-I<Obj> B<≠> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<!=>, I<ne>
-
-=cut
-
-=head2 ≤
-
-I<Obj> B<≤> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<lt>=>, I<le>
-
-=cut
-
-=head2 ≥
-
-I<Obj> B<≥> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<gt>=>, I<ge>
 
 =cut

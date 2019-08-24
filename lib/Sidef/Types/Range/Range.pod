@@ -75,6 +75,16 @@ Aliases: I<eq>
 
 =cut
 
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
 =head2 accumulate
 
 Range.accumulate() -> I<Obj>
@@ -424,15 +434,5 @@ Return the
 Range.zip_operator() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 ≠
-
-I<Obj> B<≠> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<!=>, I<ne>
 
 =cut

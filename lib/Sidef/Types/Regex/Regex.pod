@@ -82,6 +82,46 @@ Aliases: I<gt>
 
 =cut
 
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<union>
+
+=cut
+
+=head2 ≠
+
+I<Obj> B<≠> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
 =head2 call
 
 Regex.call() -> I<Obj>
@@ -127,45 +167,5 @@ Regex.to_s() -> I<Obj>
 Return the
 
 Aliases: I<dump>, I<to_str>
-
-=cut
-
-=head2 |
-
-I<Obj> B<|> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<union>
-
-=cut
-
-=head2 ≠
-
-I<Obj> B<≠> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<!=>, I<ne>
-
-=cut
-
-=head2 ≤
-
-I<Obj> B<≤> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<lt>=>, I<le>
-
-=cut
-
-=head2 ≥
-
-I<Obj> B<≥> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<E<gt>=>, I<ge>
 
 =cut
