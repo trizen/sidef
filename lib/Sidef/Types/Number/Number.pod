@@ -385,6 +385,16 @@ Aliases: I<sigma>
 
 =cut
 
+=head2 ϕ
+
+Number.ϕ() -> I<Obj>
+
+Return the
+
+Aliases: I<totient>, I<euler_phi>, I<eulerphi>, I<euler_totient>
+
+=cut
+
 =head2 Ψ
 
 Number.Ψ() -> I<Obj>
@@ -412,16 +422,6 @@ Number.ω() -> I<Obj>
 Return the
 
 Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
-
-=cut
-
-=head2 ϕ
-
-Number.ϕ() -> I<Obj>
-
-Return the
-
-Aliases: I<totient>, I<euler_phi>, I<eulerphi>, I<euler_totient>
 
 =cut
 

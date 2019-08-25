@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
 use utf8;
-use 5.010;
+use 5.016;
 use strict;
 use autodie;
 use warnings;
+
+use feature 'fc';
 
 use lib qw(.);
 use open IO => ':encoding(UTF-8)';
@@ -100,20 +102,30 @@ sub parse_pod_file {
     return \%data;
 }
 
+sub transform_method_names {
+    map { [$_->[0], ($_->[1] =~ /[a-z]/) ? ('B_' . $_->[1]) : ('A_' . $_->[1])] } @_;
+}
+
 sub sort_methods_by_length {
-    map { $_->[0] }
+#<<<
+      map  { $_->[0] }
       sort {
              (length($a->[1] =~ tr/_//dr) <=> length($b->[1] =~ tr/_//dr))
-          || (lc($a->[1]) cmp lc($b->[1]))
+          || (fc($a->[1]) cmp fc($b->[1]))
           || ($b->[1] cmp $a->[1])
-      }
-      map { [$_->[0], ($_->[1] =~ /[a-z]/) ? ('B_' . $_->[1]) : ('A_' . $_->[1])] } @_;
+      } transform_method_names(@_);
+#>>>
 }
 
 sub sort_methods_by_name {
-    map    { $_->[0] }
-      sort { (lc($a->[1] =~ tr/_//dr) cmp lc($b->[1] =~ tr/_//dr)) || (lc($a->[1]) cmp lc($b->[1])) || ($a->[1] cmp $b->[1]) }
-      map  { [$_->[0], ($_->[1] =~ /[a-z]/) ? ('B_' . $_->[1]) : ('A_' . $_->[1])] } @_;
+#<<<
+      map  { $_->[0] }
+      sort {
+             (fc($a->[1] =~ tr/_//dr) cmp fc($b->[1] =~ tr/_//dr))
+          || (fc($a->[1]) cmp fc($b->[1]))
+          || ($a->[1] cmp $b->[1])
+      } transform_method_names(@_);
+#>>>
 }
 
 sub process_file {
