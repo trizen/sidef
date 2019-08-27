@@ -16,14 +16,13 @@ package Sidef::Object::LazyMethod {
 
     sub method {
         my ($self, $method, @args) = @_;
-
-        $self->new(
-                   @{$self->{calls}},
-                   {
-                    method => $method,
-                    args   => \@args,
-                   }
-                  );
+        __PACKAGE__->new(
+                         @{$self->{calls}},
+                         {
+                          method => $method,
+                          args   => \@args,
+                         }
+                        );
     }
 
     sub DESTROY { }

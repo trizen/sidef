@@ -3022,11 +3022,13 @@ Return the
 
 =cut
 
-=head2 pminus1_factor
+=head2 pm1_factor
 
-Number.pminus1_factor() -> I<Obj>
+Number.pm1_factor() -> I<Obj>
 
 Return the
+
+Aliases: I<pminus1_factor>
 
 =cut
 
@@ -3088,11 +3090,13 @@ Aliases: I<hammingweight>
 
 =cut
 
-=head2 pplus1_factor
+=head2 pp1_factor
 
-Number.pplus1_factor() -> I<Obj>
+Number.pp1_factor() -> I<Obj>
 
 Return the
+
+Aliases: I<pplus1_factor>
 
 =cut
 

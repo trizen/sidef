@@ -9100,13 +9100,13 @@ package Sidef::Types::Number::Number {
             $n = _any2mpz($n) // return;
         }
 
-        # Must be positive
-        (Math::GMPz::Rmpz_sgn($n) > 0) || return;
-
         # Check for divisibility by 2
         if (Math::GMPz::Rmpz_even_p($n)) {
             return (Math::GMPz::Rmpz_cmp_ui($n, 2) == 0);
         }
+
+        # Must be positive
+        (Math::GMPz::Rmpz_sgn($n) > 0) || return;
 
         # Return early if n is too small
         Math::GMPz::Rmpz_cmp_ui($n, 101) > 0 or return 1;
@@ -9793,6 +9793,8 @@ package Sidef::Types::Number::Number {
                                        );
     }
 
+    *pm1_factor = \&pminus1_factor;
+
     sub pplus1_factor {
         my ($n, $B1) = @_;
         _valid(\$B1) if defined($B1);
@@ -9805,6 +9807,8 @@ package Sidef::Types::Number::Number {
                                         ]
                                        );
     }
+
+    *pp1_factor = \&pplus1_factor;
 
     sub holf_factor {
         my ($n, $k) = @_;

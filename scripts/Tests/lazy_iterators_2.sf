@@ -36,4 +36,11 @@ for p in (kter) {
     die "kter error!"
 }
 
+do {
+    var lz = (1..100 -> lazy)
+
+    assert_eq(lz.map{ _**2 + 1}.grep{.is_prime}.first(10), [2, 5, 17, 37, 101, 197, 257, 401, 577, 677])
+    assert_eq(lz.grep{.is_prime}.first(10), [2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
+}
+
 say "** Test passed!"
