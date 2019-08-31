@@ -591,7 +591,7 @@ package Sidef::Types::Block::Block {
         $range //= $inf_range;
 
         my @array;
-        my $max = CORE::int($n);
+        my $max = CORE::int($n // 1);
 
         _iterate(
             sub {
@@ -603,7 +603,9 @@ package Sidef::Types::Block::Block {
             $range
                 );
 
-        Sidef::Types::Array::Array->new(\@array);
+        defined($n)
+          ? Sidef::Types::Array::Array->new(\@array)
+          : $array[0];
     }
 
     sub nth {
