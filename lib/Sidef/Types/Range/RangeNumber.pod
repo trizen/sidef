@@ -63,9 +63,41 @@ Return the
 
 =cut
 
+=head2 gcd
+
+RangeNumber.gcd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gcd_by
+
+RangeNumber.gcd_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 iter
 
 RangeNumber.iter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lcm
+
+RangeNumber.lcm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 lcm_by
+
+RangeNumber.lcm_by() -> I<Obj>
 
 Return the
 

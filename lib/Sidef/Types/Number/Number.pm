@@ -8881,7 +8881,7 @@ package Sidef::Types::Number::Number {
         my (@vals) = @_;
         _valid(\(@vals));
 
-        @vals || return ZERO;
+        @vals || return ZERO;    # By convention, gcd of an empty set is 0.
         @vals == 1 and return $vals[0];
 
         my $r = Math::GMPz::Rmpz_init();
@@ -8936,7 +8936,7 @@ package Sidef::Types::Number::Number {
         my (@vals) = @_;
         _valid(\(@vals));
 
-        @vals or return ZERO;
+        @vals or return ONE;    # By convention, lcm of an empty set is 1.
         @vals == 1 and return $vals[0];
 
         if (@vals > 2) {
@@ -9252,6 +9252,8 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_pseudoprime = \&is_fermat_pseudoprime;
+
     sub is_euler_pseudoprime {
         my ($n, @bases) = @_;
         _valid(\(@bases));
@@ -9267,7 +9269,7 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_strong_pseudoprime {
+    sub is_strong_fermat_pseudoprime {
         my ($n, @bases) = @_;
         _valid(\(@bases));
         __is_int__($$n)
@@ -9281,6 +9283,8 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    *is_strong_pseudoprime = \&is_strong_fermat_pseudoprime;
 
     sub is_fibonacci_pseudoprime {
         my ($n) = @_;

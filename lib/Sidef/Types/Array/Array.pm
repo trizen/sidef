@@ -965,7 +965,7 @@ package Sidef::Types::Array::Array {
         $self->reduce_operator('+', $initial);
     }
 
-    sub _sum_prod_by {
+    sub _reduce_by {
         my ($self, $method, $result, $callback) = @_;
 
         my @list;
@@ -990,14 +990,14 @@ package Sidef::Types::Array::Array {
     sub sum_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_sum_prod_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
+        $self->_reduce_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
     }
 
     sub sum_kv {
         my ($self, $block) = @_;
-        $self->_sum_prod_by('sum',
-                            Sidef::Types::Number::Number::ZERO,
-                            sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
+        $self->_reduce_by('sum',
+                          Sidef::Types::Number::Number::ZERO,
+                          sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
     }
 
     sub sum_2d {
@@ -1038,14 +1038,14 @@ package Sidef::Types::Array::Array {
     sub prod_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_sum_prod_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
+        $self->_reduce_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
     }
 
     sub prod_kv {
         my ($self, $block) = @_;
-        $self->_sum_prod_by('prod',
-                            Sidef::Types::Number::Number::ONE,
-                            sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
+        $self->_reduce_by('prod',
+                          Sidef::Types::Number::Number::ONE,
+                          sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
     }
 
     sub prod {
@@ -1060,15 +1060,8 @@ package Sidef::Types::Array::Array {
 
     sub gcd_by {
         my ($self, $block) = @_;
-
         $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @list;
-        foreach my $n (@$self) {
-            push @list, $block->run($n);
-        }
-
-        Sidef::Types::Number::Number::gcd(@list);
+        $self->_reduce_by('gcd', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
     }
 
     sub gcd {
@@ -1083,15 +1076,8 @@ package Sidef::Types::Array::Array {
 
     sub lcm_by {
         my ($self, $block) = @_;
-
         $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @list;
-        foreach my $n (@$self) {
-            push @list, $block->run($n);
-        }
-
-        Sidef::Types::Number::Number::lcm(@list);
+        $self->_reduce_by('lcm', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
     }
 
     sub lcm {

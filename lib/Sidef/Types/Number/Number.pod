@@ -2048,14 +2048,6 @@ Return the
 
 =cut
 
-=head2 is_fermat_pseudoprime
-
-Number.is_fermat_pseudoprime() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 is_fibonacci_pseudoprime
 
 Number.is_fibonacci_pseudoprime() -> I<Obj>
@@ -2316,6 +2308,16 @@ Aliases: I<is_provable_prime>
 
 =cut
 
+=head2 is_pseudoprime
+
+Number.is_pseudoprime() -> I<Obj>
+
+Return the
+
+Aliases: I<is_fermat_pseudoprime>
+
+=cut
+
 =head2 isqrt
 
 Number.isqrt() -> I<Obj>
@@ -2423,6 +2425,8 @@ Return the
 Number.is_strong_pseudoprime() -> I<Obj>
 
 Return the
+
+Aliases: I<is_strong_fermat_pseudoprime>
 
 =cut
 

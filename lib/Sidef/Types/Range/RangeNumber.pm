@@ -112,7 +112,7 @@ package Sidef::Types::Range::RangeNumber {
         );
     }
 
-    sub _sum_prod_by {
+    sub _reduce_by {
         my ($self, $method, $result, $callback) = @_;
 
         my @list;
@@ -139,7 +139,7 @@ package Sidef::Types::Range::RangeNumber {
     sub sum_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_sum_prod_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[0]) });
+        $self->_reduce_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[0]) });
     }
 
     sub sum {
@@ -184,7 +184,7 @@ package Sidef::Types::Range::RangeNumber {
     sub prod_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_sum_prod_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[0]) });
+        $self->_reduce_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[0]) });
     }
 
     sub prod {
@@ -197,11 +197,48 @@ package Sidef::Types::Range::RangeNumber {
         if (    $self->{step}->is_one
             and $self->{from}->is_one
             and $self->{to}->is_pos) {
-            $self->{_asc} //= 1;
             return $self->{to}->factorial;
         }
 
         Sidef::Types::Number::Number::prod($self->to_list);
+    }
+
+    sub lcm_by {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_reduce_by('lcm', Sidef::Types::Number::Number::ONE, sub { $block->run($_[0]) });
+    }
+
+    sub lcm {
+        my ($self, $arg) = @_;
+
+        if (defined($arg)) {
+            goto &lcm_by;
+        }
+
+        if (    $self->{step}->is_one
+            and $self->{from}->is_one
+            and $self->{to}->is_pos) {
+            return $self->{to}->consecutive_lcm;
+        }
+
+        Sidef::Types::Number::Number::lcm($self->to_list);
+    }
+
+    sub gcd_by {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_reduce_by('gcd', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[0]) });
+    }
+
+    sub gcd {
+        my ($self, $arg) = @_;
+
+        if (defined($arg)) {
+            goto &gcd_by;
+        }
+
+        Sidef::Types::Number::Number::gcd($self->to_list);
     }
 
     sub bsearch {

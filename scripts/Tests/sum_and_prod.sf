@@ -56,14 +56,45 @@ do {
     assert_eq(arr, ["12", "42"])
 }
 
-# gcd/lcm
+# Array gcd/lcm
 do {
     var arr = ["48", "120", "42"]
 
     assert_eq(arr.lcm, lcm(42, 48, 120))
     assert_eq(arr.gcd, gcd(42, 48, 120))
 
+    assert_eq(arr.lcm { _ }, lcm(42, 48, 120))
+    assert_eq(arr.lcm { .to_i**2 }, lcm(42**2, 48**2, 120**2))
+
+    assert_eq(arr.gcd { _ }, gcd(42, 48, 120))
+    assert_eq(arr.gcd { .to_i**2 }, gcd(42**2, 48**2, 120**2))
+
     assert_eq(arr, ["48", "120", "42"])
+}
+
+# Range gcd/lcm
+do {
+
+    assert_eq(lcm(1..10), lcm(@|1..10))
+    assert_eq(lcm(200..250), lcm(@|200..250))
+
+    assert_eq(lcm(20..10), 1)
+    assert_eq(gcd(20..10), 0)
+
+    assert_eq(lcm(1..-10), 1)
+    assert_eq(gcd(1..-10), 0)
+
+    assert_eq(20..10 -> lcm { _ }, 1)
+    assert_eq(20..10 -> gcd { _ }, 0)
+
+    assert_eq(1..10    -> lcm { _ },   lcm(1..10))
+    assert_eq(200..250 -> lcm { _+1 }, lcm(201..251))
+
+    assert_eq(gcd(42..60 `by` 2), 2)
+    assert_eq(gcd(42..60 `by` 3), 3)
+
+    assert_eq(4..10 -> gcd { _! }, 24)
+    assert_eq(4..10 -> flip.gcd { _! }, 24)
 }
 
 say "** Test passed!"
