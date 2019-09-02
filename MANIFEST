@@ -682,6 +682,7 @@ scripts/Tests/chebyshev_coefficients_test.sf
 scripts/Tests/class_attr_inheritance.sf
 scripts/Tests/class_attributes.sf
 scripts/Tests/class_field_inheritance.sf
+scripts/Tests/class_global_variables.sf
 scripts/Tests/class_inheritance.sf
 scripts/Tests/class_inside_module.sf
 scripts/Tests/class_redefinition.sf

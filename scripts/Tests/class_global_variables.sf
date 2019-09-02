@@ -1,0 +1,41 @@
+#!/usr/bin/ruby
+
+# Tests for global class variables.
+
+class Example {
+
+    Example!hidden = 'secret'
+
+    method foo(str) {
+        str + ' ' + Example!hidden
+    }
+}
+
+assert_eq(Example!hidden, 'secret')
+
+var obj1 = Example()
+var obj2 = Example()
+
+assert_eq(obj1.foo('abc'), 'abc secret')
+assert_eq(obj2.foo('xyz'), 'xyz secret')
+
+Example!hidden = 'public'     # globally change the value of Example!hidden
+
+assert_eq(obj1.foo('abc'), 'abc public')
+assert_eq(obj2.foo('xyz'), 'xyz public')
+
+do {  # locally change the value of Example!hidden
+    local Example!hidden = 'bar'
+
+    assert_eq(obj1.foo('abc'), 'abc bar')
+    assert_eq(obj2.foo('xyz'), 'xyz bar')
+
+    assert_eq(Example!hidden, 'bar')
+}
+
+assert_eq(obj1.foo('abc'), 'abc public')
+assert_eq(obj2.foo('xyz'), 'xyz public')
+
+assert_eq(Example!hidden, 'public')
+
+say "** Test passed!"
