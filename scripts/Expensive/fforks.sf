@@ -25,15 +25,15 @@ do {
 
 do {
     var t =  {
-        var lwp = "LWP::UserAgent".require.new(
+        var lwp = try { "LWP::UserAgent".require.new(
             timeout => 30,
             show_progress => 1,
-        )
+        ) } \\ Sys.kill('KILL', $$)
         lwp.default_header("Referer" => "foo")
         lwp
     }.ffork
 
-    var r = t.wait
+    var r = t.wait \\ die "LWP::UserAgent cannot be loaded"
     assert_eq(r.default_header("Referer"), "foo")
     r.default_header("Referer" => "bar")
     assert_eq(r.default_header("Referer"), "bar")

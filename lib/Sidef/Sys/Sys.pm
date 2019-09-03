@@ -14,7 +14,12 @@ package Sidef::Sys::Sys {
 
     sub exit {
         my ($self, $code) = @_;
-        exit($code // 0);
+        CORE::exit($code // 0);
+    }
+
+    sub kill {
+        my ($self, $signal, @list) = @_;
+        Sidef::Types::Number::Number->new(CORE::kill("$signal", map { CORE::int($_) } @list));
     }
 
     sub wait {
@@ -24,7 +29,7 @@ package Sidef::Sys::Sys {
 
     sub fork {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(fork() // return undef);
+        Sidef::Types::Number::Number->new(CORE::fork() // return undef);
     }
 
     sub alarm {

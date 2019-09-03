@@ -272,6 +272,14 @@ Return the
 
 =cut
 
+=head2 kill
+
+Sys.kill() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nanosleep
 
 Sys.nanosleep() -> I<Obj>
