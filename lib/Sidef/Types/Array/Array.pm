@@ -1139,6 +1139,7 @@ package Sidef::Types::Array::Array {
         my $old_key = $block->run($minmax);
 
         foreach my $i (1 .. $#$self) {
+
             my $value   = $self->[$i];
             my $new_key = $block->run($value);
 
@@ -2985,6 +2986,57 @@ package Sidef::Types::Array::Array {
     }
 
     *nth_perm = \&nth_permutation;
+
+    sub next_permutation {
+        my ($self) = @_;
+
+        my $k = $#$self;
+        return Sidef::Types::Bool::Bool::FALSE if ($k < 0);
+
+        my $i = $k - 1;
+        while ($i >= 0 and $self->[$i]->ge($self->[$i + 1])) {
+            --$i;
+        }
+
+        if ($i == -1) {
+            @$self = CORE::reverse(@$self);
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if ($self->[$i + 1]->gt($self->[$k])) {
+            @{$self}[$i + 1 .. $k] = CORE::reverse(@{$self}[$i + 1 .. $k]);
+        }
+
+        my $j = $i + 1;
+        while ($self->[$i]->ge($self->[$j])) {
+            ++$j;
+        }
+        @{$self}[$i, $j] = @{$self}[$j, $i];
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
+
+    sub unique_permutations {
+        my ($self, $block) = @_;
+        my $vals = Sidef::Types::Array::Array->new([@$self]);
+
+        my @results;
+
+        for (1) {
+            defined($block)
+              ? $block->run(@$vals)
+              : CORE::push(@results, bless([@$vals]));
+        }
+
+        while ($vals->next_permutation) {
+            defined($block)
+              ? $block->run(@$vals)
+              : CORE::push(@results, bless([@$vals]));
+        }
+
+        defined($block) ? $block : Sidef::Types::Array::Array->new(\@results);
+    }
+
+    *uniq_permutations = \&unique_permutations;
 
     sub perm2num {
         my ($self) = @_;
