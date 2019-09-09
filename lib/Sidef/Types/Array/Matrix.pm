@@ -383,30 +383,6 @@ package Sidef::Types::Array::Matrix {
         bless($m1->scalar_operator('^', $m2));
     }
 
-    sub map {
-        my ($A, $block) = @_;
-
-        my %indices;
-
-        my @new;
-        foreach my $i (0 .. $#{$A}) {
-
-            my @row;
-            my $r = $A->[$i];
-
-            $indices{$i} //= Sidef::Types::Number::Number->_set_uint($i);
-
-            foreach my $j (0 .. $#{$A->[$i]}) {
-                $indices{$j} //= Sidef::Types::Number::Number->_set_uint($j);
-                push @row, $block->run($r->[$j], $indices{$i}, $indices{$j});
-            }
-
-            CORE::push(@new, bless(\@row, 'Sidef::Types::Array::Array'));
-        }
-
-        bless \@new;
-    }
-
     sub sum {
         my ($A, $block) = @_;
         Sidef::Types::Array::Array->new([map { @$_ } @$A])->sum($block);
