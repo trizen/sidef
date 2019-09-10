@@ -10462,8 +10462,10 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new;
         }
 
-        my %seen;
-        my %mpz_lookup;
+        my %cache;
+        my %mpz_cache;
+        my %factor_cache;
+        my %divisor_cache;
 
         my $P = Math::GMPz::Rmpz_init();
 
@@ -10473,20 +10475,28 @@ package Sidef::Types::Number::Number {
             return [1] if ($n == 1);
 
             my $key = "$n $m";
-            if (exists $seen{$key}) {
-                return $seen{$key};
+            if (exists $cache{$key}) {
+                return $cache{$key};
             }
 
             my (@R, @D);
+            $divisor_cache{$n} //= [Math::Prime::Util::GMP::divisors($n)];
 
-            foreach my $d (Math::Prime::Util::GMP::divisors($n)) {
+            foreach my $d (@{$divisor_cache{$n}}) {
                 if ($d >= $m) {
+
                     if ($d < ULONG_MAX) {
                         push @D, $d;
                     }
                     else {
-                        push @D, ($mpz_lookup{$d} //= Math::GMPz::Rmpz_init_set_str("$d", 10));
+                        push @D, ($mpz_cache{$d} //= Math::GMPz::Rmpz_init_set_str("$d", 10));
                     }
+
+                    $factor_cache{$D[-1]} //= do {
+                        my %factors;
+                        @factors{Math::Prime::Util::GMP::factor($D[-1] - 1)} = ();
+                        [keys %factors];
+                    };
                 }
             }
 
@@ -10495,11 +10505,7 @@ package Sidef::Types::Number::Number {
             }
 
             foreach my $d (@D) {
-
-                my %factors;
-                @factors{Math::Prime::Util::GMP::factor($d - 1)} = ();
-
-                foreach my $p (keys %factors) {
+                foreach my $p (@{$factor_cache{$d}}) {
 
                     if (!ref($d) and $p < ULONG_MAX) {    # optimization for small d and p
 
@@ -10642,10 +10648,13 @@ package Sidef::Types::Number::Number {
                 }
             }
 
-            $seen{$key} = \@R;
+            $cache{$key} = \@R;
           }
           ->($n, 3);
 
+        my %seen;
+
+        @$results = grep { !$seen{$_}++ } @$results;
         @$results = sort { $a <=> $b } @$results;
         @$results = map  { ref($_) ? bless(\$_) : __PACKAGE__->_set_uint($_) } @$results;
 
