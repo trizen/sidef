@@ -10449,6 +10449,209 @@ package Sidef::Types::Number::Number {
         $n->inverse_totient->len;
     }
 
+    sub inverse_sigma {
+        my ($n) = @_;
+
+        # Code based on invphi.gp v1.3 by Max Alekseyev.
+        # https://home.gwu.edu/~maxal/gpscripts/invphi.gp
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return Sidef::Types::Array::Array->new(ZERO) if !Math::GMPz::Rmpz_sgn($n);
+            return Sidef::Types::Array::Array->new;
+        }
+
+        my %seen;
+        my %mpz_lookup;
+
+        my $P = Math::GMPz::Rmpz_init();
+
+        my $results = sub {
+            my ($n, $m) = @_;
+
+            return [1] if ($n == 1);
+
+            my $key = "$n $m";
+            if (exists $seen{$key}) {
+                return $seen{$key};
+            }
+
+            my (@R, @D);
+
+            foreach my $d (Math::Prime::Util::GMP::divisors($n)) {
+                if ($d >= $m) {
+                    if ($d < ULONG_MAX) {
+                        push @D, $d;
+                    }
+                    else {
+                        push @D, ($mpz_lookup{$d} //= Math::GMPz::Rmpz_init_set_str("$d", 10));
+                    }
+                }
+            }
+
+            if (ref($n) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                $n = Math::GMPz::Rmpz_get_ui($n);
+            }
+
+            foreach my $d (@D) {
+
+                my %factors;
+                @factors{Math::Prime::Util::GMP::factor($d - 1)} = ();
+
+                foreach my $p (keys %factors) {
+
+                    if (!ref($d) and $p < ULONG_MAX) {    # optimization for small d and p
+
+                        my $r = $d * ($p - 1) + 1;
+
+                        if ($r < ULONG_MAX) {
+                            my $k = Math::Prime::Util::GMP::valuation($r, $p) - 1;
+
+                            next if ($k < 1);
+
+                            my $s = $p;
+                            for (1 .. $k) {
+                                $s *= $p;
+                            }
+
+                            if ($s < ULONG_MAX) {
+                                next if ($r != $s);
+
+                                my $z = $p;
+                                for (1 .. $k - 1) {
+                                    $z *= $p;
+                                }
+
+                                my $u = $n / $d;
+                                if (ref($u) and Math::GMPz::Rmpz_fits_ulong_p($u)) {
+                                    $u = Math::GMPz::Rmpz_get_ui($u);
+                                }
+
+                                my $ref = __SUB__->($u, $d);
+
+                                foreach my $v (@$ref) {
+                                    if (ref($v)) {
+                                        if (!Math::GMPz::Rmpz_divisible_ui_p($v, $p)) {
+                                            push @R, $v * $z;
+                                        }
+                                    }
+                                    else {
+                                        if ($v % $p != 0) {
+                                            if ($v * $z < ULONG_MAX) {
+                                                push @R, $v * $z;
+                                            }
+                                            else {
+                                                my $w = Math::GMPz::Rmpz_init_set_ui($z);
+                                                Math::GMPz::Rmpz_mul_ui($w, $w, $v);
+                                                push @R, $w;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                next;
+                            }
+                        }
+                    }
+
+                    if ($p < ULONG_MAX) {
+                        if (ref($d)) {
+                            Math::GMPz::Rmpz_mul_ui($P, $d, $p - 1);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set_ui($P, $d);
+                            Math::GMPz::Rmpz_mul_ui($P, $P, $p - 1);
+                        }
+                        Math::GMPz::Rmpz_add_ui($P, $P, 1);
+                    }
+                    else {
+                        $p = Math::GMPz::Rmpz_init_set_str("$p", 10);
+                        if (ref($d)) {
+                            Math::GMPz::Rmpz_mul($P, $d, $p - 1);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_mul_ui($P, $p - 1, $d);
+                        }
+                        Math::GMPz::Rmpz_add_ui($P, $P, 1);
+                    }
+
+                    my $k = Math::Prime::Util::GMP::valuation($P, $p) - 1;
+
+                    next if ($k < 1);
+
+                    my $t = Math::GMPz::Rmpz_init();
+
+                    if (ref($p)) {
+                        Math::GMPz::Rmpz_pow_ui($t, $p, $k + 1);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k + 1);
+                    }
+
+                    next if (Math::GMPz::Rmpz_cmp($t, $P) != 0);
+
+                    if (ref($p)) {
+                        Math::GMPz::Rmpz_divexact($t, $t, $p);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_divexact_ui($t, $t, $p);
+                    }
+
+                    my $u = Math::GMPz::Rmpz_init();
+
+                    if (ref($d)) {
+                        Math::GMPz::Rmpz_divexact($u, $n, $d);
+                    }
+                    else {
+                        if (ref($n)) {
+                            Math::GMPz::Rmpz_divexact_ui($u, $n, $d);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set_ui($u, $n);
+                            Math::GMPz::Rmpz_divexact_ui($u, $u, $d);
+                        }
+                    }
+
+                    if (Math::GMPz::Rmpz_fits_ulong_p($u)) {
+                        $u = Math::GMPz::Rmpz_get_ui($u);
+                    }
+
+                    my $native_p = !ref($p);
+                    my $ref      = __SUB__->($u, $d);
+
+                    foreach my $v (@$ref) {
+                        if (ref($v)) {
+                            if ($native_p) {
+                                if (!Math::GMPz::Rmpz_divisible_ui_p($v, $p)) {
+                                    push @R, $v * $t;
+                                }
+                            }
+                            else {
+                                if (!Math::GMPz::Rmpz_divisible_p($v, $p)) {
+                                    push @R, $v * $t;
+                                }
+                            }
+                        }
+                        else {
+                            if ($v % $p != 0) {
+                                push @R, $v * $t;
+                            }
+                        }
+                    }
+                }
+            }
+
+            $seen{$key} = \@R;
+          }
+          ->($n, 3);
+
+        @$results = sort { $a <=> $b } @$results;
+        @$results = map  { ref($_) ? bless(\$_) : __PACKAGE__->_set_uint($_) } @$results;
+
+        Sidef::Types::Array::Array->new($results);
+    }
+
     sub jordan_totient {
         my ($n, $k) = @_;
         $k //= ONE;

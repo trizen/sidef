@@ -1842,6 +1842,14 @@ Aliases: I<polygonal_inverse>
 
 =cut
 
+=head2 inverse_sigma
+
+Number.inverse_sigma() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 inverse_totient
 
 Number.inverse_totient() -> I<Obj>
