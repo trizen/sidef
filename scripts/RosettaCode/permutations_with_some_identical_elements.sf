@@ -1,0 +1,51 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/Permutations_with_some_identical_elements
+#
+
+func next_unique_perm (array) {
+
+    var k = array.end
+    return ([], false) if (k < 0)
+    var i = k-1
+
+    while ((i >= 0) && (array[i] >= array[i+1])) {
+        --i
+    }
+
+    return (array.flip, false) if (i == -1)
+
+    if (array[i+1] > array[k]) {
+        array = [array.slice(0, i)..., array.slice(i+1, k).flip...]
+    }
+
+    var j = i+1
+    while (array[i] >= array[j]) {
+        j++
+    }
+
+    array.clone!
+    array.swap(i,j)
+
+    return (array, true)
+}
+
+func unique_permutations(array) {
+    var perm  = array
+    var perms = [perm]
+    loop {
+        (perm, var more) = next_unique_perm(perm)
+        break if !more
+        perms << perm
+    }
+    return perms
+}
+
+for arr in ([[1,1,2], [1,1,2,2,2,3], %w(A A B B B C)]) {
+    say "\nPermutations with array = #{arr}:"
+    var perms1 = unique_permutations(arr)
+    var perms2 = arr.permutations.uniq
+    assert_eq(perms1, perms2)
+    say perms1.map{.join}.join(' ')
+}

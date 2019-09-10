@@ -306,6 +306,7 @@ scripts/RosettaCode/character_codes.sf
 scripts/RosettaCode/check_machin_like_formulas.sf
 scripts/RosettaCode/check_that_file_exists.sf
 scripts/RosettaCode/cheryl_s_birthday.sf
+scripts/RosettaCode/chi_squared_test.sf
 scripts/RosettaCode/cholesky_decomposition.sf
 scripts/RosettaCode/cipolla_algorithm.sf
 scripts/RosettaCode/classes.sf
@@ -355,6 +356,7 @@ scripts/RosettaCode/euler_method.sf
 scripts/RosettaCode/extract_file_extension.sf
 scripts/RosettaCode/extreme_floating_point_values.sf
 scripts/RosettaCode/factorial.sf
+scripts/RosettaCode/factorions.sf
 scripts/RosettaCode/factors_of_a_mersenne_number.sf
 scripts/RosettaCode/factors_of_an_integers.sf
 scripts/RosettaCode/faulhaber_s_formula_2.sf
@@ -487,6 +489,7 @@ scripts/RosettaCode/pascal_s_triangle_puzzle.sf
 scripts/RosettaCode/perfect_shuffle.sf
 scripts/RosettaCode/perlin_noise.sf
 scripts/RosettaCode/permutations_by_swapping.sf
+scripts/RosettaCode/permutations_with_some_identical_elements.sf
 scripts/RosettaCode/pernicious_numbers.sf
 scripts/RosettaCode/phrase_reversals.sf
 scripts/RosettaCode/pick_random_element.sf

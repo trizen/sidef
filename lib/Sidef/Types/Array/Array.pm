@@ -3017,7 +3017,7 @@ package Sidef::Types::Array::Array {
 
     sub unique_permutations {
         my ($self, $block) = @_;
-        my $vals = Sidef::Types::Array::Array->new([@$self]);
+        my $vals = bless([@$self]);
 
         my @results;
 
@@ -3033,7 +3033,7 @@ package Sidef::Types::Array::Array {
               : CORE::push(@results, bless([@$vals]));
         }
 
-        defined($block) ? $block : Sidef::Types::Array::Array->new(\@results);
+        defined($block) ? $block : bless(\@results);
     }
 
     *uniq_permutations = \&unique_permutations;
