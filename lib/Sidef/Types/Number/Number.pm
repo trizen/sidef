@@ -5283,7 +5283,24 @@ package Sidef::Types::Number::Number {
         my (@vals) = @_;
         @vals || return ZERO;
         _valid(\(@vals));
-        bless \_binsplit([map { $$_ } @vals], \&__add__);
+
+        my @left;
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        foreach my $n (@vals) {
+            if (ref($$n) eq 'Math::GMPz') {
+                Math::GMPz::Rmpz_add($sum, $sum, $$n);
+            }
+            else {
+                push @left, $$n;
+            }
+        }
+
+        if (@left) {
+            $sum = __add__($sum, _binsplit(\@left, \&__add__));
+        }
+
+        bless \$sum;
     }
 
     sub prod {
@@ -10492,7 +10509,7 @@ package Sidef::Types::Number::Number {
                         push @D, ($mpz_cache{$d} //= Math::GMPz::Rmpz_init_set_str("$d", 10));
                     }
 
-                    $factor_cache{$D[-1]} //= do {
+                    $factor_cache{$d} //= do {
                         my %factors;
                         @factors{Math::Prime::Util::GMP::factor($D[-1] - 1)} = ();
                         [keys %factors];
