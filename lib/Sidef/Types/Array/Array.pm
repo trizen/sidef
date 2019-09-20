@@ -404,7 +404,7 @@ package Sidef::Types::Array::Array {
 
     *partition = \&part;
 
-    sub split {
+    sub segment {
         my ($self, @indices) = @_;
 
         my @parts;
@@ -430,6 +430,33 @@ package Sidef::Types::Array::Array {
 
         foreach my $item (@$self) {
             if ($block->run($item)) {
+                CORE::push(@array, [CORE::splice(@tmp)]);
+            }
+            else {
+                CORE::push(@tmp, $item);
+            }
+        }
+
+        if (@tmp) {
+            CORE::push(@array, \@tmp);
+        }
+
+        @array = map { bless $_ } @array;
+        bless \@array;
+    }
+
+    sub split {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &split_by;
+        }
+
+        my @tmp;
+        my @array;
+
+        foreach my $item (@$self) {
+            if ($item eq $obj) {
                 CORE::push(@array, [CORE::splice(@tmp)]);
             }
             else {

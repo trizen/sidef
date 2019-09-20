@@ -1616,6 +1616,14 @@ Aliases: I<scalar_div>
 
 =cut
 
+=head2 segment
+
+Array.segment() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 shift
 
 Array.shift() -> I<Obj>
