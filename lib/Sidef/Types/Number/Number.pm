@@ -8168,10 +8168,20 @@ package Sidef::Types::Number::Number {
         $n = _any2ui($$n) // goto &nan;
         $x = $$x;
 
+        return ONE if ($n == 0);
+
+        return bless(\__dec__($x)) if ($n == 1);
+        return bless(\__inc__($x)) if ($n == 2);
+
         my $x_is_mpz = ref($x) eq 'Math::GMPz';
 
         my %factors;
         @factors{Math::Prime::Util::GMP::factor($n)} = ();
+
+        # Special case for x = 1: cyclotomic(n, 1) is the greatest common divisor of the prime factors of n.
+        if ($x_is_mpz ? (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0) : __eq__($x, 1)) {
+            return __PACKAGE__->_set_uint(Math::Prime::Util::GMP::gcd(keys %factors));
+        }
 
         # Generate the squarefree divisors of n, along
         # with the number of prime factors of each divisor
