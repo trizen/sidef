@@ -4177,16 +4177,16 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_const_pi($pi, $ROUND);     # pi = π
 
         my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        Math::MPFR::Rmpfr_log($t, $pi, $ROUND);      # t = log(π)
-        Math::MPFR::Rmpfr_mul_z($t, $t, $n, $ROUND); # t = n*log(π)
+        Math::MPFR::Rmpfr_log($t, $pi, $ROUND);         # t = log(π)
+        Math::MPFR::Rmpfr_mul_z($t, $t, $n, $ROUND);    # t = n*log(π)
 
         my $s = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_ui_sub($s, 1, $n);          # s = 1-n
+        Math::GMPz::Rmpz_ui_sub($s, 1, $n);             # s = 1-n
 
-        Math::MPFR::Rmpfr_mul_z($L, $L, $s, $ROUND); # L = (1 - n)*log(2)
-        Math::MPFR::Rmpfr_sub($L, $L, $t, $ROUND);   # L -= n*log(π)
+        Math::MPFR::Rmpfr_mul_z($L, $L, $s, $ROUND);    # L = (1 - n)*log(2)
+        Math::MPFR::Rmpfr_sub($L, $L, $t, $ROUND);      # L -= n*log(π)
 
-        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {     # n is a native unsigned integer
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {        # n is a native unsigned integer
             Math::MPFR::Rmpfr_zeta_ui($t, Math::GMPz::Rmpz_get_ui($n), $ROUND);
         }
         else {
@@ -5662,7 +5662,7 @@ package Sidef::Types::Number::Number {
     sub sqrt_cfrac {
         my ($n, $max) = @_;
 
-        $n   = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
         $max = defined($max) ? CORE::int($max) : (0 + 'inf');
 
         Math::GMPz::Rmpz_sgn($n) < 0
@@ -5717,13 +5717,13 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_neg($y, $y);           # y = -y
 
             # z = ((n - y*y) / z)
-            Math::GMPz::Rmpz_mul($t, $y, $y);       # t = y*y
-            Math::GMPz::Rmpz_sub($t, $n, $t);       # t = n-t
-            Math::GMPz::Rmpz_divexact($z, $t, $z);  # z = t/z
+            Math::GMPz::Rmpz_mul($t, $y, $y);         # t = y*y
+            Math::GMPz::Rmpz_sub($t, $n, $t);         # t = n-t
+            Math::GMPz::Rmpz_divexact($z, $t, $z);    # z = t/z
 
             # t = floor((x + y) / z)
-            Math::GMPz::Rmpz_add($t, $x, $y);       # t = x+y
-            Math::GMPz::Rmpz_tdiv_q($t, $t, $z);    # t = floor(t/z)
+            Math::GMPz::Rmpz_add($t, $x, $y);         # t = x+y
+            Math::GMPz::Rmpz_tdiv_q($t, $t, $z);      # t = floor(t/z)
 
             $r = $t;
             push @cfrac, bless \$t;
@@ -5790,8 +5790,8 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_sub($y, $t, $y);    # y = t-y
 
             # z = (n - y*y)/z
-            Math::GMPz::Rmpz_mul($t, $y, $y);    # t = y*y
-            Math::GMPz::Rmpz_sub($t, $n, $t);    # t = n-t
+            Math::GMPz::Rmpz_mul($t, $y, $y);         # t = y*y
+            Math::GMPz::Rmpz_sub($t, $n, $t);         # t = n-t
             Math::GMPz::Rmpz_divexact($z, $t, $z);    # z = t/z
 
             ++$period;
@@ -6112,9 +6112,9 @@ package Sidef::Types::Number::Number {
         my $r = Math::GMPz::Rmpz_init();
         my $t = Math::GMPz::Rmpz_init();
 
-        Math::GMPz::Rmpz_sub_ui($t, $p, 1);    # t = p-1
-        Math::GMPz::Rmpz_sub($r, $n, $$sum);   # r = n-sum
-        Math::GMPz::Rmpz_divexact($r, $r, $t); # r = r/t
+        Math::GMPz::Rmpz_sub_ui($t, $p, 1);       # t = p-1
+        Math::GMPz::Rmpz_sub($r, $n, $$sum);      # r = n-sum
+        Math::GMPz::Rmpz_divexact($r, $r, $t);    # r = r/t
 
         bless \$r;
     }
@@ -6903,7 +6903,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_divexact($r, $k, $r) if Math::GMPz::Rmpz_sgn($r);
 
         my $r_str = Math::GMPz::Rmpz_get_str($r, 10);
-        my $mu    = Math::Prime::Util::GMP::moebius($r_str) || return ZERO;
+        my $mu = Math::Prime::Util::GMP::moebius($r_str) || return ZERO;
 
         if (Math::GMPz::Rmpz_cmp($r, $k) == 0) {
             return ($mu == 1 ? ONE : MONE);
@@ -7803,8 +7803,8 @@ package Sidef::Types::Number::Number {
         ## (-b ± sqrt(b^2 - 4ac)) / (2a)
         #
 
-        my $u = __mul__($y, $y);                             # b^2
-        my $t = __mul__(__mul__($x, $z), $four);             # 4ac
+        my $u = __mul__($y, $y);                    # b^2
+        my $t = __mul__(__mul__($x, $z), $four);    # 4ac
         my $s = __sqrt__(_any2mpfr_mpc(__sub__($u, $t)));    # sqrt(b^2 - 4ac)
 
         my $n1 = __sub__($s, $y);                            #   sqrt(b^2 - 4ac) - b
@@ -8165,26 +8165,39 @@ package Sidef::Types::Number::Number {
 
         _valid(\$x);
 
-        $n = _any2mpz($$n) // goto &nan;
+        $n = _any2ui($$n) // goto &nan;
         $x = $$x;
 
-        my $t = Math::GMPz::Rmpz_init();
+        my $x_is_mpz = ref($x) eq 'Math::GMPz';
+
+        my %factors;
+        @factors{Math::Prime::Util::GMP::factor($n)} = ();
+
+        # Generate the squarefree divisors of n, along
+        # with the number of prime factors of each divisor
+        my @sd;
+        foreach my $p (keys %factors) {
+            push @sd, map { [$_->[0] * $p, $_->[1] + 1] } @sd;
+            push @sd, [$p, 1];
+        }
+
+        push @sd, [1, 0];
 
         my @terms;
-        foreach my $d (Math::Prime::Util::GMP::divisors(Math::GMPz::Rmpz_get_str($n, 10))) {
+        foreach my $pair (@sd) {
+            my ($d, $c) = @$pair;
 
-            if (($d || next) < ULONG_MAX) {
-                Math::GMPz::Rmpz_divexact_ui($t, $n, $d);
-            }
-            else {
-                Math::GMPz::Rmpz_set_str($t, "$d", 10);
-                Math::GMPz::Rmpz_divexact($t, $n, $t);
-            }
+            my $t    = CORE::int($n / $d);
+            my $base = $x_is_mpz
+              ? do {
+                my $z = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_pow_ui($z, $x, $t);
+                Math::GMPz::Rmpz_sub_ui($z, $z, 1);
+                $z;
+              }
+              : __dec__(__pow__($x, $t));
 
-            my $mu   = Math::Prime::Util::GMP::moebius(Math::GMPz::Rmpz_get_str($t, 10)) || next;
-            my $base = __dec__(__pow__($x, $d));
-
-            push @terms, ($mu == 1 ? $base : __inv__($base));
+            unshift @terms, (($c % 2 == 0) ? $base : __inv__($base));
         }
 
         @terms || return ONE;
@@ -9726,9 +9739,9 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
         $k = _any2ui($$k)  // return Sidef::Types::Array::Array->new();
 
-        return Sidef::Types::Array::Array->new() if Math::GMPz::Rmpz_sgn($n) <= 0;
+        return Sidef::Types::Array::Array->new()          if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Array::Array->new(bless \$n) if $k <= 0;
-        return Sidef::Types::Array::Array->new(ONE) if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+        return Sidef::Types::Array::Array->new(ONE)       if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         state %cache;
 
@@ -11634,7 +11647,7 @@ package Sidef::Types::Number::Number {
 
         if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
             Math::GMPz::Rmpz_divexact($g, $n, $g);
-            return Sidef::Types::Bool::Bool::TRUE if Math::GMPz::Rmpz_cmp_ui($g, 1) == 0;
+            return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($g, 1) == 0;
             return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_perfect_power_p($g);
             Math::GMPz::Rmpz_gcd($g, $g, $B);
             return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_cmp_ui($g, 1) > 0;
@@ -11873,27 +11886,27 @@ package Sidef::Types::Number::Number {
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
 
-        Math::GMPz::Rmpz_sub_ui($u, $k, 2);    # u = k-2
-        Math::GMPz::Rmpz_mul($t, $n, $u);      # t = n*u
-        Math::GMPz::Rmpz_mul_2exp($t, $t, 3);  # t = t*8
+        Math::GMPz::Rmpz_sub_ui($u, $k, 2);      # u = k-2
+        Math::GMPz::Rmpz_mul($t, $n, $u);        # t = n*u
+        Math::GMPz::Rmpz_mul_2exp($t, $t, 3);    # t = t*8
 
-        Math::GMPz::Rmpz_sub_ui($u, $u, 2);    # u = u-2
-        Math::GMPz::Rmpz_mul($u, $u, $u);      # u = u^2
+        Math::GMPz::Rmpz_sub_ui($u, $u, 2);      # u = u-2
+        Math::GMPz::Rmpz_mul($u, $u, $u);        # u = u^2
 
-        Math::GMPz::Rmpz_add($t, $t, $u);      # t = t+u
+        Math::GMPz::Rmpz_add($t, $t, $u);        # t = t+u
         Math::GMPz::Rmpz_perfect_square_p($t) || return 0;
-        Math::GMPz::Rmpz_sqrt($t, $t);         # t = sqrt(t)
+        Math::GMPz::Rmpz_sqrt($t, $t);           # t = sqrt(t)
 
-        Math::GMPz::Rmpz_sub_ui($u, $k, 4);    # u = k-4
+        Math::GMPz::Rmpz_sub_ui($u, $k, 4);      # u = k-4
 
         $second
-          ? Math::GMPz::Rmpz_sub($t, $u, $t)    # t = t-u
-          : Math::GMPz::Rmpz_add($t, $t, $u);   # t = t+u
+          ? Math::GMPz::Rmpz_sub($t, $u, $t)     # t = t-u
+          : Math::GMPz::Rmpz_add($t, $t, $u);    # t = t+u
 
-        Math::GMPz::Rmpz_add_ui($u, $u, 2);     # u = u+2
-        Math::GMPz::Rmpz_mul_2exp($u, $u, 1);   # u = u*2
+        Math::GMPz::Rmpz_add_ui($u, $u, 2);      # u = u+2
+        Math::GMPz::Rmpz_mul_2exp($u, $u, 1);    # u = u*2
 
-        Math::GMPz::Rmpz_divisible_p($t, $u);   # true iff u|t
+        Math::GMPz::Rmpz_divisible_p($t, $u);    # true iff u|t
     }
 
     sub is_polygonal {
@@ -11943,13 +11956,13 @@ package Sidef::Types::Number::Number {
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
 
-        Math::GMPz::Rmpz_sub_ui($u, $k, 2);    # u = k-2
-        Math::GMPz::Rmpz_mul($t, $n, $u);      # t = n*u
-        Math::GMPz::Rmpz_mul_2exp($t, $t, 3);  # t = t*8
+        Math::GMPz::Rmpz_sub_ui($u, $k, 2);      # u = k-2
+        Math::GMPz::Rmpz_mul($t, $n, $u);        # t = n*u
+        Math::GMPz::Rmpz_mul_2exp($t, $t, 3);    # t = t*8
 
-        Math::GMPz::Rmpz_sub_ui($u, $u, 2);    # u = u-2
-        Math::GMPz::Rmpz_mul($u, $u, $u);      # u = u^2
-        Math::GMPz::Rmpz_add($t, $t, $u);      # t = t+u
+        Math::GMPz::Rmpz_sub_ui($u, $u, 2);      # u = u-2
+        Math::GMPz::Rmpz_mul($u, $u, $u);        # u = u^2
+        Math::GMPz::Rmpz_add($t, $t, $u);        # t = t+u
 
         Math::GMPz::Rmpz_sgn($t) < 0 && goto &_nan;    # `t` is negative
 
@@ -12016,8 +12029,8 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
 
-        Math::GMPz::Rmpz_mul($r, $n, $k);    # r = n*k
-        Math::GMPz::Rmpz_sub($r, $r, $k);    # r = r-k
+        Math::GMPz::Rmpz_mul($r, $n, $k);         # r = n*k
+        Math::GMPz::Rmpz_sub($r, $r, $k);         # r = r-k
         Math::GMPz::Rmpz_submul_ui($r, $n, 2);    # r = r-2*n
         Math::GMPz::Rmpz_add_ui($r, $r, 4);       # r = r+4
         Math::GMPz::Rmpz_mul($r, $r, $n);         # r = r*n
@@ -12092,13 +12105,13 @@ package Sidef::Types::Number::Number {
             my $t = Math::MPFR::Rmpfr_init2($PREC);
             my $u = Math::MPFR::Rmpfr_init2($PREC);
 
-            Math::MPFR::Rmpfr_sub_ui($u, $k, 2, $ROUND);    # u = k-2
-            Math::MPFR::Rmpfr_mul($t, $n, $u, $ROUND);      # t = n*u
-            Math::MPFR::Rmpfr_mul_2ui($t, $t, 3, $ROUND);   # t = t*8
+            Math::MPFR::Rmpfr_sub_ui($u, $k, 2, $ROUND);     # u = k-2
+            Math::MPFR::Rmpfr_mul($t, $n, $u, $ROUND);       # t = n*u
+            Math::MPFR::Rmpfr_mul_2ui($t, $t, 3, $ROUND);    # t = t*8
 
-            Math::MPFR::Rmpfr_sub_ui($u, $u, 2, $ROUND);    # u = u-2
-            Math::MPFR::Rmpfr_sqr($u, $u, $ROUND);          # u = u^2
-            Math::MPFR::Rmpfr_add($t, $t, $u, $ROUND);      # t = t+u
+            Math::MPFR::Rmpfr_sub_ui($u, $u, 2, $ROUND);     # u = u-2
+            Math::MPFR::Rmpfr_sqr($u, $u, $ROUND);           # u = u^2
+            Math::MPFR::Rmpfr_add($t, $t, $u, $ROUND);       # t = t+u
 
             # Return a complex number for `t < 0`
             if (Math::MPFR::Rmpfr_sgn($t) < 0) {
@@ -12107,8 +12120,8 @@ package Sidef::Types::Number::Number {
                 goto Math_MPC__Math_MPC;
             }
 
-            Math::MPFR::Rmpfr_sqrt($t, $t, $ROUND);         # t = sqrt(t)
-            Math::MPFR::Rmpfr_sub_ui($u, $k, 4, $ROUND);    # u = k-4
+            Math::MPFR::Rmpfr_sqrt($t, $t, $ROUND);          # t = sqrt(t)
+            Math::MPFR::Rmpfr_sub_ui($u, $k, 4, $ROUND);     # u = k-4
 
             $second
               ? Math::MPFR::Rmpfr_sub($t, $u, $t, $ROUND)    # t = u-t
@@ -12136,16 +12149,16 @@ package Sidef::Types::Number::Number {
             my $t = Math::MPC::Rmpc_init2($PREC);
             my $u = Math::MPC::Rmpc_init2($PREC);
 
-            Math::MPC::Rmpc_sub_ui($u, $k, 2, $ROUND);    # u = k-2
-            Math::MPC::Rmpc_mul($t, $n, $u, $ROUND);      # t = n*u
-            Math::MPC::Rmpc_mul_2ui($t, $t, 3, $ROUND);   # t = t*8
+            Math::MPC::Rmpc_sub_ui($u, $k, 2, $ROUND);     # u = k-2
+            Math::MPC::Rmpc_mul($t, $n, $u, $ROUND);       # t = n*u
+            Math::MPC::Rmpc_mul_2ui($t, $t, 3, $ROUND);    # t = t*8
 
-            Math::MPC::Rmpc_sub_ui($u, $u, 2, $ROUND);    # u = u-2
-            Math::MPC::Rmpc_sqr($u, $u, $ROUND);          # u = u^2
-            Math::MPC::Rmpc_add($t, $t, $u, $ROUND);      # t = t+u
+            Math::MPC::Rmpc_sub_ui($u, $u, 2, $ROUND);     # u = u-2
+            Math::MPC::Rmpc_sqr($u, $u, $ROUND);           # u = u^2
+            Math::MPC::Rmpc_add($t, $t, $u, $ROUND);       # t = t+u
 
-            Math::MPC::Rmpc_sqrt($t, $t, $ROUND);         # t = sqrt(t)
-            Math::MPC::Rmpc_sub_ui($u, $k, 4, $ROUND);    # u = k-4
+            Math::MPC::Rmpc_sqrt($t, $t, $ROUND);          # t = sqrt(t)
+            Math::MPC::Rmpc_sub_ui($u, $k, 4, $ROUND);     # u = k-4
 
             $second
               ? Math::MPC::Rmpc_sub($t, $u, $t, $ROUND)    # t = u-t
