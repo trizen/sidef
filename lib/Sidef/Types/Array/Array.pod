@@ -1028,6 +1028,14 @@ Return the
 
 =cut
 
+=head2 join_insert
+
+Array.join_insert() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 keys
 
 Array.keys() -> I<Obj>
@@ -1695,6 +1703,14 @@ Return the
 =head2 split
 
 Array.split() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 split_by
+
+Array.split_by() -> I<Obj>
 
 Return the
 

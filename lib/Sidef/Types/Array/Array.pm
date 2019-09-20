@@ -422,6 +422,29 @@ package Sidef::Types::Array::Array {
         bless \@parts;
     }
 
+    sub split_by {
+        my ($self, $block) = @_;
+
+        my @tmp;
+        my @array;
+
+        foreach my $item (@$self) {
+            if ($block->run($item)) {
+                CORE::push(@array, [CORE::splice(@tmp)]);
+            }
+            else {
+                CORE::push(@tmp, $item);
+            }
+        }
+
+        if (@tmp) {
+            CORE::push(@array, \@tmp);
+        }
+
+        @array = map { bless $_ } @array;
+        bless \@array;
+    }
+
     sub or {
         my ($self, $array) = @_;
 
@@ -2318,7 +2341,7 @@ package Sidef::Types::Array::Array {
             return (
                     $len > 0
                     ? bless([map { $self->[CORE::rand($len)] } 1 .. $amount], ref($self))
-                    : bless([],                                               ref($self))
+                    : bless([], ref($self))
                    );
         }
 
@@ -2976,9 +2999,9 @@ package Sidef::Types::Array::Array {
         Math::GMPz::Rmpz_fac_ui($f, scalar(@arr));    # f = factorial(len)
 
         while (my $len = scalar(@arr)) {
-            Math::GMPz::Rmpz_divexact_ui($f, $f, $len);    # f = f/len
-            Math::GMPz::Rmpz_divmod($q, $n, $n, $f);       # q = n//f ;; n = n%f
-            Math::GMPz::Rmpz_mod_ui($q, $q, $len);         # q = q%len
+            Math::GMPz::Rmpz_divexact_ui($f, $f, $len);                              # f = f/len
+            Math::GMPz::Rmpz_divmod($q, $n, $n, $f);                                 # q = n//f ;; n = n%f
+            Math::GMPz::Rmpz_mod_ui($q, $q, $len);                                   # q = q%len
             CORE::push(@perm, CORE::splice(@arr, Math::GMPz::Rmpz_get_ui($q), 1));
         }
 
@@ -3361,6 +3384,18 @@ package Sidef::Types::Array::Array {
 
     *chrs   = \&join_bytes;
     *decode = \&join_bytes;
+
+    sub join_insert {
+        my ($self, $obj) = @_;
+
+        my @array;
+        foreach my $item (@$self) {
+            CORE::push(@array, $item, $obj);
+        }
+
+        CORE::pop(@array);
+        bless \@array;
+    }
 
     sub reverse {
         my ($self) = @_;
