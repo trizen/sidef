@@ -5752,10 +5752,11 @@ package Sidef::Types::Number::Number {
 
         my $t = Math::GMPz::Rmpz_init();
         my $x = Math::GMPz::Rmpz_init();
-        my $y = Math::GMPz::Rmpz_init_set($x);
         my $z = Math::GMPz::Rmpz_init_set_ui(1);
 
         Math::GMPz::Rmpz_sqrt($x, $n);
+
+        my $y = Math::GMPz::Rmpz_init_set($x);
 
         # Optimization for native integers
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {

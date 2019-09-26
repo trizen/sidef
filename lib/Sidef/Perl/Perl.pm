@@ -67,8 +67,14 @@ package Sidef::Perl::Perl {
             }
 
             if ($ref eq '') {
+
                 if (Scalar::Util::looks_like_number($val)) {
-                    return Sidef::Types::Number::Number->new($val, 10);
+
+                    if ($val =~ /e/) {    # parse as float when in exponential notation
+                        return Sidef::Types::Number::Number->_set_str('float', "$val");
+                    }
+
+                    return Sidef::Types::Number::Number->new("$val");
                 }
 
                 return Sidef::Types::String::String->new($val);
