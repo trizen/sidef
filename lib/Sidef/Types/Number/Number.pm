@@ -11498,8 +11498,16 @@ package Sidef::Types::Number::Number {
 
     sub is_squarefree {
         my ($x) = @_;
-        __is_int__($$x)
-          && Math::Prime::Util::GMP::moebius(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
+        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+
+        my $z = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
+
+        if (Math::GMPz::Rmpz_sizeinbase($z, 2) > 100) {
+            state $lim = __PACKAGE__->_set_uint(1e6);
+            $x->is_prob_squarefree($lim) || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Math::Prime::Util::GMP::moebius(_big2uistr($z) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
