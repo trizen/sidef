@@ -10575,9 +10575,9 @@ package Sidef::Types::Number::Number {
                                     $u = Math::GMPz::Rmpz_get_ui($u);
                                 }
 
-                                my $ref = __SUB__->($u, $d);
+                                my $array = __SUB__->($u, $d);
 
-                                foreach my $v (@$ref) {
+                                foreach my $v (@$array) {
                                     if (ref($v)) {
                                         if (!Math::GMPz::Rmpz_divisible_ui_p($v, $p)) {
                                             push @R, $v * $z;
@@ -10648,7 +10648,13 @@ package Sidef::Types::Number::Number {
                     my $u = Math::GMPz::Rmpz_init();
 
                     if (ref($d)) {
-                        Math::GMPz::Rmpz_divexact($u, $n, $d);
+                        if (ref($n)) {
+                            Math::GMPz::Rmpz_divexact($u, $n, $d);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set_ui($u, $n);
+                            Math::GMPz::Rmpz_divexact($u, $u, $d);
+                        }
                     }
                     else {
                         if (ref($n)) {
@@ -10665,9 +10671,9 @@ package Sidef::Types::Number::Number {
                     }
 
                     my $native_p = !ref($p);
-                    my $ref      = __SUB__->($u, $d);
+                    my $array    = __SUB__->($u, $d);
 
-                    foreach my $v (@$ref) {
+                    foreach my $v (@$array) {
                         if (ref($v)) {
                             if ($native_p) {
                                 if (!Math::GMPz::Rmpz_divisible_ui_p($v, $p)) {
