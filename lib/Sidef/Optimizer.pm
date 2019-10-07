@@ -938,6 +938,11 @@ package Sidef::Optimizer {
                 $info->{ast} = {$self->optimize($info->{ast})};
             }
         }
+        elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
+            $obj->{cond}  = {$self->optimize($obj->{cond})};
+            $obj->{true}  = {$self->optimize($obj->{true})};
+            $obj->{false} = {$self->optimize($obj->{false})};
+        }
 
         if (not exists($expr->{ind}) and not exists($expr->{call})) {
             return (ref($obj) eq 'HASH' ? {self => $obj} : $obj);
