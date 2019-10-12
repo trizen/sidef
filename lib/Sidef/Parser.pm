@@ -1747,7 +1747,7 @@ package Sidef::Parser {
                     local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $has_kids ? $parent : $obj;
                     my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
 
-                    my $code  = '{' . $args . substr($_, pos);
+                    my $code = '{' . $args . substr($_, pos);
                     my $block = $self->parse_block(code => \$code, with_vars => 1);
                     pos($_) += pos($code) - length($args) - 1;
 
@@ -1873,7 +1873,7 @@ package Sidef::Parser {
             # "try/catch" construct
             if (/\Gtry\h*(?=\{)/gc) {
                 my $try_block = $self->parse_block(code => $opt{code});
-                my $obj       = bless({try => $try_block}, 'Sidef::Types::Block::Try');
+                my $obj = bless({try => $try_block}, 'Sidef::Types::Block::Try');
 
                 $self->parse_whitespace(code => $opt{code});
 
@@ -2861,7 +2861,7 @@ package Sidef::Parser {
                     my $has_arg;
                     if (/\G\h*(?=[({])/gc || $req_arg) {
                         my $arg = (
-                                     $req_arg ? $self->parse_obj(code => $opt{code}, multiline => 1)
+                                     $req_arg   ? $self->parse_obj(code => $opt{code}, multiline => 1)
                                    : /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
                                    : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
                                    :              die "[PARSER ERROR] Something is wrong in the if condition"
@@ -3345,17 +3345,13 @@ package Sidef::Parser {
                     $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
                 }
 
-                # Tight-binded operator
+                # Tightly-binded operator
                 if (
-                    /\G(?!\h*[=-]>)/
+                    /\G(?![=-]>)/    # not '=>' or '->'
                     && (
-                        /\G(?=$self->{operators_re})/o
-                        || (
-                            /\G\h*\.(?!\.)/gc
-                            ? do { $self->parse_whitespace(code => $opt{code}); 1 }
-                            : 0
-                           )
-                        || /\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/
+                        /\G(?=$self->{operators_re})/o                         # operator
+                        || /\G\h*\.\h*(?!\.\.)(?=$self->{operators_re})/gco    # dot followed by operator
+                        || /\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/                                # unicode superscript
                        )
                   ) {
 
@@ -3503,7 +3499,7 @@ package Sidef::Parser {
                             $methods = $self->parse_methods(code => $opt{code});
                         }
                         else {
-                            my $code   = substr($_, pos);
+                            my $code = substr($_, pos);
                             my $dot_op = $code =~ /^\./;
                             if   ($dot_op) { $code = ". $code" }
                             else           { $code = ".$code" }
