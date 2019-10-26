@@ -11503,17 +11503,27 @@ package Sidef::Types::Number::Number {
     }
 
     sub is_squarefree {
-        my ($x) = @_;
-        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+        my ($n) = @_;
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
 
-        my $z = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
+        my $z = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
 
         if (Math::GMPz::Rmpz_sizeinbase($z, 2) > 100) {
             state $lim = __PACKAGE__->_set_uint(1e6);
-            $x->is_prob_squarefree($lim) || return Sidef::Types::Bool::Bool::FALSE;
+            $n->is_prob_squarefree($lim) || return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        Math::Prime::Util::GMP::moebius(_big2uistr($z) // return Sidef::Types::Bool::Bool::FALSE)
+        $z = _big2uistr($z) // return Sidef::Types::Bool::Bool::FALSE;
+
+        if ($HAS_PRIME_UTIL and $z < ULONG_MAX) {
+            return (
+                    Math::Prime::Util::is_square_free($z)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        Math::Prime::Util::GMP::moebius($z)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
