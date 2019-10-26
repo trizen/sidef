@@ -2438,6 +2438,14 @@ Aliases: I<is_strong_fermat_pseudoprime>
 
 =cut
 
+=head2 is_super_pseudoprime
+
+Number.is_super_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_totient
 
 Number.is_totient() -> I<Obj>

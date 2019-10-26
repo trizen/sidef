@@ -9271,6 +9271,7 @@ package Sidef::Types::Number::Number {
     sub miller_rabin_random {
         my ($n, $k) = @_;
         _valid(\$k);
+
         __is_int__($$n)
           && Math::Prime::Util::GMP::miller_rabin_random(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
                                                          _any2ui($$k) // 20,)
@@ -9281,6 +9282,7 @@ package Sidef::Types::Number::Number {
     sub is_fermat_pseudoprime {
         my ($n, @bases) = @_;
         _valid(\(@bases));
+
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_pseudoprime(
             _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
@@ -9294,6 +9296,35 @@ package Sidef::Types::Number::Number {
     }
 
     *is_pseudoprime = \&is_fermat_pseudoprime;
+
+    sub is_super_pseudoprime {
+        my ($n, @bases) = @_;
+        _valid(\(@bases));
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::Prime::Util::GMP::is_pseudoprime(
+            $n,
+            do {
+                @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
+                @bases ? (@bases) : (2);
+            }
+        ) || return Sidef::Types::Bool::Bool::FALSE;
+
+        # Using Thomas Ordowski's criterion from A050217.
+        my @factors =
+          map { ($_ < ULONG_MAX) ? ($_ - 1) : Math::GMPz::Rmpz_init_set_str("$_", 10) - 1 } Math::Prime::Util::GMP::factor($n);
+        my $gcd = Math::Prime::Util::GMP::gcd(@factors);
+
+        @bases = (2) if !@bases;
+
+        foreach my $base (@bases) {
+            Math::Prime::Util::GMP::powmod($base, $gcd, $n) eq '1' or return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
 
     sub is_euler_pseudoprime {
         my ($n, @bases) = @_;
