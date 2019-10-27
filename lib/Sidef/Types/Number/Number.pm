@@ -11442,6 +11442,38 @@ package Sidef::Types::Number::Number {
         $s < ULONG_MAX ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
     }
 
+    sub is_abundant {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+
+        my $nstr = (
+                      Math::GMPz::Rmpz_fits_ulong_p($n)
+                    ? Math::GMPz::Rmpz_get_ui($n)
+                    : Math::GMPz::Rmpz_get_str($n, 10)
+                   );
+
+        my $sigma = Math::Prime::Util::GMP::sigma($nstr);
+
+        if ($nstr < ULONG_MAX and $sigma < ULONG_MAX) {
+            return (
+                    (($sigma >> 1) > $nstr)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        state $s = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_str($s, "$sigma", 10);
+        Math::GMPz::Rmpz_div_2exp($s, $s, 1);
+
+        (Math::GMPz::Rmpz_cmp($s, $n) > 0)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub sopfr {    # https://oeis.org/A001414
         my ($n) = @_;
         my $s = Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan));
@@ -12280,8 +12312,6 @@ package Sidef::Types::Number::Number {
         if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
 
             $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
-
-            # Return False if base is <= 1
             $k <= 1 and return Sidef::Types::Bool::Bool::FALSE;
 
             my $str = Math::GMPz::Rmpz_get_str($n, $k);
@@ -12303,6 +12333,8 @@ package Sidef::Types::Number::Number {
 
         return Sidef::Types::Bool::Bool::TRUE;
     }
+
+    *is_palindromic = \&is_palindrome;
 
     sub shift_left {
         my ($x, $y) = @_;

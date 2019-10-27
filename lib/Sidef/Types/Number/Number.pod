@@ -1952,6 +1952,14 @@ Return the
 
 =cut
 
+=head2 is_abundant
+
+Number.is_abundant() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_aks_prime
 
 Number.is_aks_prime() -> I<Obj>
@@ -2201,6 +2209,8 @@ Return the
 Number.is_palindrome() -> I<Obj>
 
 Return the
+
+Aliases: I<is_palindromic>
 
 =cut
 
