@@ -2196,6 +2196,14 @@ Return the
 
 =cut
 
+=head2 is_palindrome
+
+Number.is_palindrome() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_perrin_pseudoprime
 
 Number.is_perrin_pseudoprime() -> I<Obj>

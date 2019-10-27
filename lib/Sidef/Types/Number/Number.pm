@@ -9314,13 +9314,16 @@ package Sidef::Types::Number::Number {
 
         # Using Thomas Ordowski's criterion from A050217.
         my @factors =
-          map { ($_ < ULONG_MAX) ? ($_ - 1) : Math::GMPz::Rmpz_init_set_str("$_", 10) - 1 } Math::Prime::Util::GMP::factor($n);
+          map { ($_ < ULONG_MAX) ? ($_ - 1) : (Math::GMPz::Rmpz_init_set_str("$_", 10) - 1) }
+          Math::Prime::Util::GMP::factor($n);
+
         my $gcd = Math::Prime::Util::GMP::gcd(@factors);
 
         @bases = (2) if !@bases;
 
         foreach my $base (@bases) {
-            Math::Prime::Util::GMP::powmod($base, $gcd, $n) eq '1' or return Sidef::Types::Bool::Bool::FALSE;
+            Math::Prime::Util::GMP::powmod($base, $gcd, $n) eq '1'
+              or return Sidef::Types::Bool::Bool::FALSE;
         }
 
         return Sidef::Types::Bool::Bool::TRUE;
@@ -12260,6 +12263,45 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
         bless \__polygonal_root__(_any2mpfr_mpc($$x), _any2mpfr_mpc($$y), 1);
+    }
+
+    sub is_palindrome {
+        my ($n, $k) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        # Optimization for bases <= 62
+        if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
+
+            $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
+
+            # Return False if base is <= 1
+            $k <= 1 and return Sidef::Types::Bool::Bool::FALSE;
+
+            my $str = Math::GMPz::Rmpz_get_str($n, $k);
+
+            return (
+                    ($str eq reverse($str))
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        my @digits = @{$_[0]->digits($_[1])};
+        my $len    = scalar(@digits) - 1;
+
+        foreach my $i (0 .. ($len >> 1)) {
+            Math::GMPz::Rmpz_cmp(${$digits[$i]}, ${$digits[$len - $i]})
+              && return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub shift_left {
