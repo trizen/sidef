@@ -16,11 +16,12 @@ package Sidef::Types::Number::Number {
                   LONG_MIN  => Math::GMPq::_long_min(),
                  };
 
-    our ($ROUND, $PREC);
+    our ($ROUND, $PREC, $MPZ);
 
     BEGIN {
         $ROUND = Math::MPFR::MPFR_RNDN();
         $PREC  = 192;
+        $MPZ   = bless \Math::GMPz::Rmpz_init();
     }
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
@@ -172,16 +173,34 @@ package Sidef::Types::Number::Number {
         ) for @_;
     }
 
+    require Devel::Peek;
+
     sub _set_uint {
         $_[1] <= 8192
           ? ($cache[$_[1]] //= bless \Math::GMPz::Rmpz_init_set_ui($_[1]))
-          : bless \Math::GMPz::Rmpz_init_set_ui($_[1]);
+          : do {
+            if (Devel::Peek::SvREFCNT($MPZ) > 0) {
+                $MPZ = bless \Math::GMPz::Rmpz_init_set_ui($_[1]);
+            }
+            else {
+                Math::GMPz::Rmpz_set_ui($$MPZ, $_[1]);
+            }
+            $MPZ;
+        }
     }
 
     sub _set_int {
         $_[1] == -1 && return MONE;
         $_[1] >= 0  && goto &_set_uint;
-        bless \Math::GMPz::Rmpz_init_set_si($_[1]);
+
+        if (Devel::Peek::SvREFCNT($MPZ) > 0) {
+            $MPZ = bless \Math::GMPz::Rmpz_init_set_si($_[1]);
+        }
+        else {
+            Math::GMPz::Rmpz_set_si($$MPZ, $_[1]);
+        }
+
+        $MPZ;
     }
 
     sub _dump {
@@ -12703,12 +12722,7 @@ package Sidef::Types::Number::Number {
         if (ref($obj) eq 'Sidef::Types::Block::Block') {
             my @array;
             for (my $i = 0 ; $i < $x ; ++$i) {
-                push @array,
-                  $obj->run(
-                            $i <= 8192
-                            ? __PACKAGE__->_set_uint($i)
-                            : bless \Math::GMPz::Rmpz_init_set_ui($i)
-                           );
+                push @array, $obj->run(__PACKAGE__->_set_uint($i));
             }
             return Sidef::Types::Array::Array->new(\@array);
         }
@@ -12723,12 +12737,7 @@ package Sidef::Types::Number::Number {
         my $end = CORE::int(__numify__($$x));
 
         for (my ($i, $j) = (0, 0) ; $j < $end ; ++$i) {
-            push @items,
-              $block->run(
-                          $i <= 8192
-                          ? __PACKAGE__->_set_uint($i)
-                          : bless \Math::GMPz::Rmpz_init_set_ui($i)
-                         ) // next;
+            push @items, $block->run(__PACKAGE__->_set_uint($i)) // next;
             ++$j;
         }
 
@@ -12741,11 +12750,7 @@ package Sidef::Types::Number::Number {
         $x = CORE::int(__numify__($$x));
 
         for (my $i = 0 ; $i < $x ; ++$i) {
-            $block->run(
-                        $i <= 8192
-                        ? __PACKAGE__->_set_uint($i)
-                        : bless \Math::GMPz::Rmpz_init_set_ui($i)
-                       );
+            $block->run(__PACKAGE__->_set_uint($i));
         }
 
         return $_[0];
