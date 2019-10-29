@@ -16,13 +16,14 @@ package Sidef::Types::Number::Number {
                   LONG_MIN  => Math::GMPq::_long_min(),
                  };
 
-    our ($ROUND, $PREC, $MPZ);
+    our ($ROUND, $PREC);
 
     BEGIN {
         $ROUND = Math::MPFR::MPFR_RNDN();
         $PREC  = 192;
-        $MPZ   = bless \Math::GMPz::Rmpz_init();
     }
+
+    my $MPZ = bless \Math::GMPz::Rmpz_init();
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
 

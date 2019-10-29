@@ -1624,6 +1624,14 @@ Return the
 
 =cut
 
+=head2 segment_by
+
+Array.segment_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 shift
 
 Array.shift() -> I<Obj>

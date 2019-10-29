@@ -16,6 +16,10 @@ package Sidef::Types::Range::RangeNumber {
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 
+    my $MPZ = bless(\Math::GMPz::Rmpz_init(), 'Sidef::Types::Number::Number');
+
+    require Devel::Peek;
+
     sub new {
         my (undef, $from, $to, $step) = @_;
 
@@ -43,6 +47,8 @@ package Sidef::Types::Range::RangeNumber {
 
     *call = \&new;
 
+    my @cache;
+
     sub iter {
         my ($self) = @_;
 
@@ -50,7 +56,6 @@ package Sidef::Types::Range::RangeNumber {
         my $from = $self->{from};
         my $to   = $self->{to};
 
-        my $tmp;
         my $times = ($self->{_times} //= $to->sub($from)->add($step)->div($step));
 
         if (ref($times) eq 'Sidef::Types::Number::Number') {
@@ -80,9 +85,23 @@ package Sidef::Types::Range::RangeNumber {
                     return Sidef::Types::Block::Block->new(
                         code => sub {
                             --$repetitions >= 0 or return undef;
-                            $tmp = bless(\Math::GMPz::Rmpz_init_set_si($from), 'Sidef::Types::Number::Number');
+
+                            if ($from <= 8192 and $from >= 0) {
+                                my $obj = ($cache[$from] //=
+                                           bless(\Math::GMPz::Rmpz_init_set_ui($from), 'Sidef::Types::Number::Number'));
+                                $from += $step;
+                                return $obj;
+                            }
+
+                            if (Devel::Peek::SvREFCNT($$MPZ) > 1) {
+                                $MPZ = bless(\Math::GMPz::Rmpz_init_set_si($from), 'Sidef::Types::Number::Number');
+                            }
+                            else {
+                                Math::GMPz::Rmpz_set_si($$MPZ, $from);
+                            }
+
                             $from += $step;
-                            $tmp;
+                            $MPZ;
                         },
                     );
                 }
@@ -92,9 +111,15 @@ package Sidef::Types::Range::RangeNumber {
                 return Sidef::Types::Block::Block->new(
                     code => sub {
                         --$repetitions >= 0 or return undef;
-                        $tmp = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
+                        if (Devel::Peek::SvREFCNT($$MPZ) > 1) {
+                            $MPZ = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set($$MPZ, $counter_mpz);
+                        }
+
                         Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step);
-                        $tmp;
+                        $MPZ;
                     },
                 );
             }
@@ -102,6 +127,7 @@ package Sidef::Types::Range::RangeNumber {
 
         my $asc = ($self->{_asc} //= !!($step->is_pos // return Sidef::Types::Block::Block->new(code => sub { undef; })));
 
+        my $tmp;
         Sidef::Types::Block::Block->new(
             code => sub {
                 ($asc ? $from->le($to) : $from->ge($to)) || return undef;

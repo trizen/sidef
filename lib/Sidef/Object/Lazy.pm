@@ -18,8 +18,8 @@ package Sidef::Object::Lazy {
 
         my $iter = $self->{obj}->iter;
 
-      ITEM: while (defined(my $item = $iter->run())) {
-            my @arg = ($item);
+      ITEM: for (; ;) {
+            my @arg = ($iter->run() // last);
             foreach my $call (@{$self->{calls}}) {
                 @arg = $call->(@arg);
                 @arg || next ITEM;
