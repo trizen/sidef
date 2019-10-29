@@ -419,7 +419,24 @@ package Sidef::Types::Array::Array {
             $prev_i = $i + 1;
         }
 
+        if ($prev_i <= $end) {
+            CORE::push(@parts, bless [@{$self}[$prev_i .. $end]]);
+        }
+
         bless \@parts;
+    }
+
+    sub segment_by {
+        my ($self, $block) = @_;
+
+        my @indices;
+        foreach my $i (0 .. $#$self) {
+            if ($block->run($self->[$i])) {
+                CORE::push(@indices, $i);
+            }
+        }
+
+        $self->segment(@indices);
     }
 
     sub split_by {

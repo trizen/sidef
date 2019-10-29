@@ -8221,17 +8221,16 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sqrt($t, $n);
         Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
 
+        my $L    = 0;
         my $sqrt = Math::GMPz::Rmpz_get_ui($t);
-
-        my $L = 0;
 
         foreach my $k (1 .. $sqrt) {
             if ($k * $k < ULONG_MAX) {
-                Math::GMPz::Rmpz_div_ui($t, $n, $k * $k);
+                Math::GMPz::Rmpz_tdiv_q_ui($t, $n, $k * $k);
             }
             else {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $k, 2);
-                Math::GMPz::Rmpz_div($t, $n, $t);
+                Math::GMPz::Rmpz_tdiv_q($t, $n, $t);
             }
             $L += Math::GMPz::Rmpz_get_si(${mertens($t)});    # most of the time is spent here
         }
