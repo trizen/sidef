@@ -8073,7 +8073,7 @@ package Sidef::Types::Number::Number {
 
         state $mertens_table = {
 
-            # M(10^n), where M(n) is Mertens's function.
+            # M(10^n), where M(x) is Mertens's function.
             # OEIS: https://oeis.org/A084237
             "1"                       => "1",
             "10"                      => "-1",
@@ -8178,6 +8178,66 @@ package Sidef::Types::Number::Number {
         ($x == 1)
           ? __PACKAGE__->_set_int($mertens->($y))
           : __PACKAGE__->_set_int($mertens->($y) - $mertens->($x) + Math::Prime::Util::GMP::moebius($x));
+    }
+
+    sub liouville_sum {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
+
+        state $liouville_table = {
+
+            # L(10^n), where L(x) is Liouville's summatory function.
+            # OIES: https://oeis.org/A090410
+            '1'                    => '1',
+            '10'                   => '0',
+            '100'                  => '-2',
+            '1000'                 => '-14',
+            '10000'                => '-94',
+            '100000'               => '-288',
+            '1000000'              => '-530',
+            '10000000'             => '-842',
+            '100000000'            => '-3884',
+            '1000000000'           => '-25216',
+            '10000000000'          => '-116026',
+            '100000000000'         => '-342224',
+            '1000000000000'        => '-522626',
+            '10000000000000'       => '-966578',
+            '100000000000000'      => '-7424752',
+            '1000000000000000'     => '-29445104',
+            '10000000000000000'    => '-97617938',
+            '100000000000000000'   => '-271676470',
+            '1000000000000000000'  => '-618117940',
+            '10000000000000000000' => '-810056106',
+        };
+
+        if (defined(my $value = $liouville_table->{$n})) {
+            return __PACKAGE__->_set_int($value);
+        }
+
+        state $t = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_sqrt($t, $n);
+        Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
+
+        my $sqrt = Math::GMPz::Rmpz_get_ui($t);
+
+        my $L = 0;
+
+        foreach my $k (1 .. $sqrt) {
+            if ($k * $k < ULONG_MAX) {
+                Math::GMPz::Rmpz_div_ui($t, $n, $k * $k);
+            }
+            else {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $k, 2);
+                Math::GMPz::Rmpz_div($t, $n, $t);
+            }
+            $L += Math::GMPz::Rmpz_get_si(${mertens($t)});    # most of the time is spent here
+        }
+
+        $liouville_table->{$n} = $L;
+        __PACKAGE__->_set_int($L);
     }
 
     sub cyclotomic_polynomial {
