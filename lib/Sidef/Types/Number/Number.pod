@@ -1130,6 +1130,24 @@ Return the
 
 =cut
 
+=head2 composite
+
+Number.composite() -> I<Obj>
+
+Return the
+
+Aliases: I<nth_composite>
+
+=cut
+
+=head2 composite_count
+
+Number.composite_count() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 conj
 
 Number.conj() -> I<Obj>
@@ -2172,19 +2190,23 @@ Return the
 
 =cut
 
-=head2 is_nminus1_prime
+=head2 is_nm1_prime
 
-Number.is_nminus1_prime() -> I<Obj>
+Number.is_nm1_prime() -> I<Obj>
 
 Return the
+
+Aliases: I<is_nminus1_prime>
 
 =cut
 
-=head2 is_nplus1_prime
+=head2 is_np1_prime
 
-Number.is_nplus1_prime() -> I<Obj>
+Number.is_np1_prime() -> I<Obj>
 
 Return the
+
+Aliases: I<is_nplus1_prime>
 
 =cut
 

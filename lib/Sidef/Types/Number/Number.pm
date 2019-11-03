@@ -8913,6 +8913,59 @@ package Sidef::Types::Number::Number {
 
     *prime = \&nth_prime;
 
+    sub composite_count {
+        my ($n) = @_;
+        $n->sub($n->prime_count)->dec;    # n - pi(n) - 1
+    }
+
+    sub nth_composite {
+        my ($n) = @_;
+        $n = _any2ui($$n) // goto &nan;
+
+        return ONE if ($n == 0);                         # not composite, but...
+        return __PACKAGE__->_set_uint(4) if ($n == 1);
+
+        # Lower and upper bounds from A002808 (for n >= 4).
+        my $min = CORE::int($n + $n / CORE::log($n) + $n / (CORE::log($n)**2));
+        my $max = CORE::int($n + $n / CORE::log($n) + (3 * $n) / (CORE::log($n)**2));
+
+        if ($n < 4) {
+            $min = 4;
+            $max = 8;
+        }
+
+        my $k = 0;
+
+        while (1) {
+            $k = ($min + $max) >> 1;
+
+            my $pi =
+              $HAS_PRIME_UTIL
+              ? Math::Prime::Util::prime_count($k)
+              : ${__PACKAGE__->_set_uint($k)->prime_count};
+
+            my $cmp = ($k <=> ($pi + 1 + $n));
+
+            if ($cmp > 0) {
+                $max = $k - 1;
+            }
+            elsif ($cmp < 0) {
+                $min = $k + 1;
+            }
+            else {
+                last;
+            }
+        }
+
+        if ($HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($k) : Math::Prime::Util::GMP::is_prob_prime($k)) {
+            --$k;
+        }
+
+        __PACKAGE__->_set_uint($k);
+    }
+
+    *composite = \&nth_composite;
+
     sub legendre {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -9556,6 +9609,8 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_nm1_prime = \&is_nminus1_prime;
+
     sub is_nplus1_prime {
         my ($x) = @_;
 
@@ -9567,6 +9622,8 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    *is_np1_prime = \&is_nplus1_prime;
 
     sub is_ecpp_prime {
         my ($x) = @_;
