@@ -12502,6 +12502,42 @@ package Sidef::Types::Number::Number {
 
     *is_palindromic = \&is_palindrome;
 
+    sub reverse {
+        my ($n, $k) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2mpz($$k) // goto &nan;
+        }
+
+        # Optimization for bases <= 62
+        if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
+
+            $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
+            $k <= 1 and goto &nan;
+
+            my $str = scalar(CORE::reverse(Math::GMPz::Rmpz_get_str($n, $k))) =~ s/^0+//r;
+
+            $str || return ZERO;
+
+            if ($k == 10) {
+                return (
+                        ($str < ULONG_MAX)
+                        ? __PACKAGE__->_set_uint($str)
+                        : __PACKAGE__->_set_str('int', $str)
+                       );
+            }
+
+            return bless \Math::GMPz::Rmpz_init_set_str("$str", $k);
+        }
+
+        $_[0]->digits($_[1])->flip->digits2num($_[1]);
+    }
+
+    *flip = \&reverse;
+
     sub shift_left {
         my ($x, $y) = @_;
 

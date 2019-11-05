@@ -1638,6 +1638,16 @@ Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
 =cut
 
+=head2 flip
+
+Number.flip() -> I<Obj>
+
+Return the
+
+Aliases: I<reverse>
+
+=cut
+
 =head2 flipbit
 
 Number.flipbit() -> I<Obj>
