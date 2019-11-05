@@ -1157,6 +1157,16 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::lcm(@$self);
     }
 
+    sub all_prime {
+        my ($self) = @_;
+        Sidef::Types::Number::Number::all_prime(@$self);
+    }
+
+    sub all_composite {
+        my ($self) = @_;
+        Sidef::Types::Number::Number::all_composite(@$self);
+    }
+
     sub digits2num {    # Algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
         my ($self, $base) = @_;
 

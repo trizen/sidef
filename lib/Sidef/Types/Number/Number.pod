@@ -548,6 +548,22 @@ Aliases: I<airy>
 
 =cut
 
+=head2 all_composite
+
+Number.all_composite() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 all_prime
+
+Number.all_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 approx_cmp
 
     approx_cmp(a, b)

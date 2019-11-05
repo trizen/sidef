@@ -284,6 +284,22 @@ Return the
 
 =cut
 
+=head2 all_composite
+
+Array.all_composite() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 all_prime
+
+Array.all_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 any
 
 Array.any() -> I<Obj>

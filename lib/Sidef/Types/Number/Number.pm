@@ -9344,6 +9344,36 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub all_prime {
+        my (@vals) = @_;
+        _valid(\(@vals));
+
+        foreach my $n (@vals) {
+            _primality_pretest($$n)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        foreach my $n (@vals) {
+            Math::Prime::Util::GMP::is_prob_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
+
+    sub all_composite {
+        my (@vals) = @_;
+        _valid(\(@vals));
+
+        foreach my $n (@vals) {
+            (_primality_pretest($$n) // return Sidef::Types::Bool::Bool::FALSE) || next;
+            Math::Prime::Util::GMP::is_prob_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
+              && return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
+
     sub is_prime {
         my ($n) = @_;
         _primality_pretest($$n)
