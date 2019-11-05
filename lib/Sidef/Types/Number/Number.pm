@@ -12522,9 +12522,14 @@ package Sidef::Types::Number::Number {
 
             $str || return ZERO;
 
+            if (substr($str, -1) eq '-') {    # support for negative numbers
+                chop($str);
+                $str = "-$str";
+            }
+
             if ($k == 10) {
                 return (
-                        ($str < ULONG_MAX)
+                        ($str < ULONG_MAX and $str > 0)
                         ? __PACKAGE__->_set_uint($str)
                         : __PACKAGE__->_set_str('int', $str)
                        );
@@ -12533,7 +12538,7 @@ package Sidef::Types::Number::Number {
             return bless \Math::GMPz::Rmpz_init_set_str("$str", $k);
         }
 
-        $_[0]->digits($_[1])->flip->digits2num($_[1]);
+        $_[0]->digits($_[1])->flip->digits2num($_[1])->mul($_[0]->sgn);
     }
 
     *flip = \&reverse;
