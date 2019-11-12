@@ -918,10 +918,10 @@ package Sidef::Types::Number::Number {
                     substr($mantissa, 0, 0, '0.' . ('0' x CORE::abs($exponent)));
                 }
 
-                $mantissa = reverse($mantissa);
+                $mantissa = CORE::reverse($mantissa);
                 $mantissa =~ s/^0+//;
                 $mantissa =~ s/^\.//;
-                $mantissa = reverse($mantissa);
+                $mantissa = CORE::reverse($mantissa);
 
                 return ($sgn . $mantissa);
             }
@@ -4008,7 +4008,7 @@ package Sidef::Types::Number::Number {
             push @terms, __mul__($k ? __pow__($x, $k) : $ONE, $q);
         }
 
-        bless \_binsplit([reverse @terms], \&__add__);
+        bless \_binsplit([CORE::reverse(@terms)], \&__add__);
     }
 
     sub bernfrac {
@@ -5926,7 +5926,7 @@ package Sidef::Types::Number::Number {
             $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
             return Sidef::Types::Array::Array->new([
                 map { __PACKAGE__->_set_uint($k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_}) }
-                    split(//, scalar reverse scalar Math::GMPz::Rmpz_get_str($n, $k))
+                    split(//, scalar CORE::reverse scalar Math::GMPz::Rmpz_get_str($n, $k))
             ]);
         }
 #>>>
@@ -9857,15 +9857,22 @@ package Sidef::Types::Number::Number {
             return __PACKAGE__->_set_uint($f[0]);
         }
 
-        state $bounds = [map { __PACKAGE__->_set_uint($_) } (1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8)];
+        state %cache;
 
-        foreach my $k (@$bounds) {
+        my $size = Math::GMPz::Rmpz_sizeinbase($z, 2);
 
+        foreach my $j (2 .. 8) {
+
+            my $k       = ($cache{$j} //= __PACKAGE__->_set_uint(10**$j));
             my $factors = $_[0]->trial_factor($k);
 
             if (@$factors > 1) {
                 return $factors->[0];
             }
+
+            last if (($j >= 5) && ($size <= 100));    # 30 digits
+            last if (($j >= 6) && ($size <= 133));    # 40 digits
+            last if (($j >= 7) && ($size <= 150));    # 45 digits
         }
 
         my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($z, 10));
@@ -12483,7 +12490,7 @@ package Sidef::Types::Number::Number {
             my $str = Math::GMPz::Rmpz_get_str($n, $k);
 
             return (
-                    ($str eq reverse($str))
+                    ($str eq CORE::reverse($str))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
