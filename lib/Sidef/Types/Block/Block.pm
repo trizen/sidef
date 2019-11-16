@@ -277,8 +277,8 @@ package Sidef::Types::Block::Block {
             ', ',
             map {
                     ref($_) && defined(UNIVERSAL::can($_, 'dump')) ? $_->dump
-                  : ref($_)     ? Sidef::normalize_type(ref($_))
-                  : defined($_) ? Sidef::normalize_type($_)
+                  : ref($_)                                        ? Sidef::normalize_type(ref($_))
+                  : defined($_)                                    ? Sidef::normalize_type($_)
                   : 'nil'
               } @args
           )
@@ -632,6 +632,16 @@ package Sidef::Types::Block::Block {
                 );
 
         return $nth;
+    }
+
+    sub sum {
+        my ($self, $range) = @_;
+        $range->sum_by($self);
+    }
+
+    sub prod {
+        my ($self, $range) = @_;
+        $range->prod_by($self);
     }
 
     sub cache {

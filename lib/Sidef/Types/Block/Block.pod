@@ -204,6 +204,22 @@ Return the
 
 =cut
 
+=head2 prod
+
+Block.prod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sum
+
+Block.sum() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 thr
 
 Block.thr() -> I<Obj>
