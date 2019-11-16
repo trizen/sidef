@@ -1,0 +1,30 @@
+#!/usr/bin/ruby
+
+do {
+    var p = (2**127 - 1)
+
+    for k in (-100 .. 100) {
+        var t = next_composite(p+k)
+        assert(t.is_composite)
+    }
+}
+
+do {
+    var p = 4171
+
+    for k in (-100 .. 100) {
+        var t = next_composite(p+k)
+        assert(t.is_composite)
+    }
+}
+
+do {
+    var n = 0
+    var arr = []
+    20.of {
+        arr << (n = next_composite(n))
+    }
+    assert_eq(arr, {.is_composite}.first(20))
+}
+
+say "** Test passed!"

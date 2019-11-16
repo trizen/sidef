@@ -9273,13 +9273,13 @@ package Sidef::Types::Number::Number {
             $n = _any2mpz($n) // return;
         }
 
+        # Must be positive (first check -- don't change the order)
+        (Math::GMPz::Rmpz_sgn($n) > 0) || return;
+
         # Check for divisibility by 2
         if (Math::GMPz::Rmpz_even_p($n)) {
             return (Math::GMPz::Rmpz_cmp_ui($n, 2) == 0);
         }
-
-        # Must be positive
-        (Math::GMPz::Rmpz_sgn($n) > 0) || return;
 
         # Return early if n is too small
         Math::GMPz::Rmpz_cmp_ui($n, 101) > 0 or return 1;
@@ -9734,6 +9734,36 @@ package Sidef::Types::Number::Number {
     sub next_prime {
         my $p = Math::Prime::Util::GMP::next_prime(&_big2uistr // goto &nan) || goto &nan;
         $p < ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
+    }
+
+    sub next_composite {
+        my ($n) = @_;
+        $n = _any2mpz($$n) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
+        Math::GMPz::Rmpz_cmp_ui($n, 3) <= 0 and return __PACKAGE__->_set_uint(4);
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_slong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) + 1;
+            return __PACKAGE__->_set_uint($n) if (($n & 1) == 0);
+            ++$n if ($HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($n) : Math::Prime::Util::GMP::is_prob_prime($n));
+            return __PACKAGE__->_set_uint($n);
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add_ui($r, $n, 1);
+
+        if (Math::GMPz::Rmpz_even_p($r)) {
+            return bless \$r;
+        }
+
+        if (Math::GMPz::Rmpz_probab_prime_p($r, 0) and Math::Prime::Util::GMP::is_prob_prime(Math::GMPz::Rmpz_get_str($r, 10)))
+        {
+            Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        }
+
+        return bless \$r;
     }
 
     sub znorder {
