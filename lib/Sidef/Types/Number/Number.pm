@@ -12564,12 +12564,8 @@ package Sidef::Types::Number::Number {
                 $str = "-$str";
             }
 
-            if ($k == 10) {
-                return (
-                        ($str < ULONG_MAX and $str > 0)
-                        ? __PACKAGE__->_set_uint($str)
-                        : __PACKAGE__->_set_str('int', $str)
-                       );
+            if ($k == 10 and $str < ULONG_MAX and $str > 0) {
+                return __PACKAGE__->_set_uint($str);
             }
 
             return bless \Math::GMPz::Rmpz_init_set_str("$str", $k);

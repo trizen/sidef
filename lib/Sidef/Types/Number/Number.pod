@@ -2954,6 +2954,14 @@ Aliases: I<call>
 
 =cut
 
+=head2 next_composite
+
+Number.next_composite() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 next_pow
 
 Number.next_pow() -> I<Obj>
