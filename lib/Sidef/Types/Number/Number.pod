@@ -983,6 +983,16 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<n
 
 =cut
 
+=head2 by
+
+Number.by() -> I<Obj>
+
+Return the
+
+Aliases: I<grep>, I<first>
+
+=cut
+
 =head2 carmichael_lambda
 
     carmichael_lambda(n)
@@ -3055,6 +3065,8 @@ Return the
 Number.of() -> I<Obj>
 
 Return the
+
+Aliases: I<map>
 
 =cut
 

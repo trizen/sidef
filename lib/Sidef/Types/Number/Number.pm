@@ -12936,7 +12936,11 @@ package Sidef::Types::Number::Number {
     }
 
     sub of {
-        my ($x, $obj) = @_;
+        my ($x, $obj, $range) = @_;
+
+        if (defined($range) and ref($obj) eq 'Sidef::Types::Block::Block') {
+            return $range->lazy->map($obj)->first($x);
+        }
 
         $x = CORE::int(__numify__($$x));
 
@@ -12951,13 +12955,44 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([($obj) x $x]);
     }
 
-    sub defs {
-        my ($x, $block) = @_;
+    *map = \&of;
+
+    sub by {
+        my ($x, $block, $range) = @_;
+
+        if (defined($range) and ref($block) eq 'Sidef::Types::Block::Block') {
+            return $block->first($x, $range);
+        }
+
+        $x = CORE::int(__numify__($$x));
 
         my @items;
-        my $end = CORE::int(__numify__($$x));
+        for (my ($i, $j) = (0, 0) ; $j < $x ; ++$i) {
+            my $k = __PACKAGE__->_set_uint($i);
+            if ($block->run($k)) {
+                push @items, $k;
+                ++$j;
+            }
+        }
 
-        for (my ($i, $j) = (0, 0) ; $j < $end ; ++$i) {
+        Sidef::Types::Array::Array->new(\@items);
+    }
+
+    *first = \&by;
+    *grep  = \&by;
+
+    sub defs {
+        my ($x, $block, $range) = @_;
+
+        if (defined($range) and ref($block) eq 'Sidef::Types::Block::Block') {
+            state $defined = Sidef::Types::Block::Block->new(code => sub { defined($_[0]) });
+            return $range->lazy->map($block)->grep($defined)->first($x);
+        }
+
+        $x = CORE::int(__numify__($$x));
+
+        my @items;
+        for (my ($i, $j) = (0, 0) ; $j < $x ; ++$i) {
             push @items, $block->run(__PACKAGE__->_set_uint($i)) // next;
             ++$j;
         }
@@ -12979,6 +13014,11 @@ package Sidef::Types::Number::Number {
 
     sub th {
         my ($n, $block, $range) = @_;
+
+        if (ref($block) ne 'Sidef::Types::Block::Block') {
+            return undef;
+        }
+
         $block->nth($n, $range);
     }
 
