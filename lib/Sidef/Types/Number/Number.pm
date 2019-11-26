@@ -7733,6 +7733,28 @@ package Sidef::Types::Number::Number {
     *fib       = \&fibonacci;
     *Fibonacci = \&fibonacci;
 
+    sub motzkin {    # OEIS: A001006
+        my ($n) = @_;
+
+        $n = 1 + (_any2ui($$n) // (goto &nan));
+
+        my $x = Math::GMPz::Rmpz_init_set_ui(0);
+        my $y = Math::GMPz::Rmpz_init_set_ui(1);
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        foreach my $k (2 .. $n) {
+            Math::GMPz::Rmpz_mul_ui($x, $x, 3 * $k * ($k - 1));
+            Math::GMPz::Rmpz_mul_ui($t, $y, $k * (2 * $k - 1));
+            Math::GMPz::Rmpz_add($x, $x, $t);
+            Math::GMPz::Rmpz_tdiv_q_ui($x, $x, ($k + 1) * ($k - 1));
+            ($x, $y) = ($y, $x);
+        }
+
+        Math::GMPz::Rmpz_tdiv_q_ui($y, $y, $n);
+        bless \$y;
+    }
+
     sub stirling {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -12955,8 +12977,6 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([($obj) x $x]);
     }
 
-    *map = \&of;
-
     sub by {
         my ($x, $block, $range) = @_;
 
@@ -12979,7 +12999,6 @@ package Sidef::Types::Number::Number {
     }
 
     *first = \&by;
-    *grep  = \&by;
 
     sub defs {
         my ($x, $block, $range) = @_;

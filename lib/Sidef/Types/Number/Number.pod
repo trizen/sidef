@@ -989,7 +989,7 @@ Number.by() -> I<Obj>
 
 Return the
 
-Aliases: I<grep>, I<first>
+Aliases: I<first>
 
 =cut
 
@@ -2912,6 +2912,14 @@ Return the
 
 =cut
 
+=head2 motzkin
+
+Number.motzkin() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 msb
 
 Number.msb() -> I<Obj>
@@ -3065,8 +3073,6 @@ Return the
 Number.of() -> I<Obj>
 
 Return the
-
-Aliases: I<map>
 
 =cut
 
