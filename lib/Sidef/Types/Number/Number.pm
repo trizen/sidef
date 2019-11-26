@@ -7743,15 +7743,16 @@ package Sidef::Types::Number::Number {
 
         state $t = Math::GMPz::Rmpz_init_nobless();
 
+        # Algorithm due to Peter Luschny, May 16 2016.
         foreach my $k (2 .. $n) {
             Math::GMPz::Rmpz_mul_ui($x, $x, 3 * $k * ($k - 1));
             Math::GMPz::Rmpz_mul_ui($t, $y, $k * (2 * $k - 1));
             Math::GMPz::Rmpz_add($x, $x, $t);
-            Math::GMPz::Rmpz_tdiv_q_ui($x, $x, ($k + 1) * ($k - 1));
+            Math::GMPz::Rmpz_divexact_ui($x, $x, ($k + 1) * ($k - 1));
             ($x, $y) = ($y, $x);
         }
 
-        Math::GMPz::Rmpz_tdiv_q_ui($y, $y, $n);
+        Math::GMPz::Rmpz_divexact_ui($y, $y, $n);
         bless \$y;
     }
 
