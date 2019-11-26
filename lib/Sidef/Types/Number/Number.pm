@@ -1205,6 +1205,11 @@ package Sidef::Types::Number::Number {
     }
 
     sub phi {
+
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0]->euler_phi;
+        }
+
         state $five4_f = (Math::MPFR::Rmpfr_init_set_d_nobless(1.25, $ROUND))[0];
 
         my $phi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
