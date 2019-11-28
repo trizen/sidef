@@ -9551,6 +9551,75 @@ package Sidef::Types::Number::Number {
 
     *is_strong_pseudoprime = \&is_strong_fermat_pseudoprime;
 
+    sub is_chebyshev_pseudoprime {    # OEIS: A175530
+        my ($n) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 7056721) < 0 and return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_odd_p($n) or return Sidef::Types::Bool::Bool::FALSE;
+
+        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+
+        # V_n(P,1) == P (mod n) for any integer P.
+        foreach my $i (1 .. 10) {     # test with random values of P
+
+            my $P = CORE::int(CORE::rand(1e6)) + 11;
+            my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($nstr, $P, 1, $nstr);
+
+            if ($V ne $P) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if ($i == 1 and Math::Prime::Util::GMP::is_prob_prime($nstr)) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        # V_n(P,1) == P (mod n) for any integer P.
+        foreach my $P (1, 3 .. 10) {    # test with small P
+            my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($nstr, $P, 1, $nstr);
+
+            if ($V ne $P) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        # Odd composite integer n is a Chebyshev pseudoprime iff:
+        #       n == {+1,-1} (mod p-1)
+        #       n == {+1,-1} (mod p+1)
+        # for each prime p|n.
+
+        my @factor = Math::Prime::Util::GMP::factor($nstr);
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $v = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_sub_ui($t, $n, 1);
+        Math::GMPz::Rmpz_add_ui($u, $n, 1);
+
+        foreach my $p (@factor) {
+
+            ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($v, $p)
+              : Math::GMPz::Rmpz_set_str($v, "$p", 10);
+
+            Math::GMPz::Rmpz_sub_ui($v, $v, 1);
+            Math::GMPz::Rmpz_divisible_p($t, $v)
+              || Math::GMPz::Rmpz_divisible_p($u, $v)
+              || return Sidef::Types::Bool::Bool::FALSE;
+
+            Math::GMPz::Rmpz_add_ui($v, $v, 2);
+            Math::GMPz::Rmpz_divisible_p($u, $v)
+              || Math::GMPz::Rmpz_divisible_p($t, $v)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
+
     sub is_fibonacci_pseudoprime {
         my ($n) = @_;
 
@@ -9786,8 +9855,8 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        if (Math::GMPz::Rmpz_probab_prime_p($r, 0) and Math::Prime::Util::GMP::is_prob_prime(Math::GMPz::Rmpz_get_str($r, 10)))
-        {
+        if (    Math::GMPz::Rmpz_probab_prime_p($r, 0)
+            and Math::Prime::Util::GMP::is_prob_prime(Math::GMPz::Rmpz_get_str($r, 10))) {
             Math::GMPz::Rmpz_add_ui($r, $r, 1);
         }
 
@@ -9831,7 +9900,6 @@ package Sidef::Types::Number::Number {
 
             my $u = Math::GMPz::Rmpz_init();
             my $d = Math::GMPz::Rmpz_init_set_ui(0);
-
             my $s = Math::GMPz::Rmpz_get_str($n, 10);
 
             return $d if ($s eq '0' or $s eq '1');
@@ -10298,10 +10366,14 @@ package Sidef::Types::Number::Number {
         }
 
         Sidef::Types::Array::Array->new(
-                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
-                                           Math::Prime::Util::GMP::divisors($n)
-                                        ]
-                                       );
+            [
+             map {
+                 ($_ < ULONG_MAX)
+                   ? __PACKAGE__->_set_uint($_)
+                   : __PACKAGE__->_set_str('int', $_)
+             } Math::Prime::Util::GMP::divisors($n)
+            ]
+        );
     }
 
     sub udivisors {
@@ -11043,6 +11115,7 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *psi         = \&dedekind_psi;
     *DedekindPsi = \&dedekind_psi;
 
     sub carmichael_lambda {
@@ -11050,6 +11123,7 @@ package Sidef::Types::Number::Number {
         $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
+    *lambda           = \&carmichael_lambda;
     *CarmichaelLambda = \&carmichael_lambda;
 
     sub liouville {

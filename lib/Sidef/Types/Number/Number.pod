@@ -993,18 +993,6 @@ Aliases: I<first>
 
 =cut
 
-=head2 carmichael_lambda
-
-    carmichael_lambda(n)
-
-Carmichael lambda function: C<λ(n)>, defined as the smallest positive integer C<m> such that:
-
-    aᵐ ≡ 1 (mod n)
-
-for every integer C<a> between C<1> and C<n> that is coprime to C<n>.
-
-=cut
-
 =head2 catalan
 
     n.catalan
@@ -1277,14 +1265,6 @@ Number.de() -> I<Obj>
 Return the
 
 Aliases: I<denominator>
-
-=cut
-
-=head2 dedekind_psi
-
-Number.dedekind_psi() -> I<Obj>
-
-Return the
 
 =cut
 
@@ -2046,6 +2026,14 @@ Return the
 
 =cut
 
+=head2 is_chebyshev_pseudoprime
+
+Number.is_chebyshev_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_complex
 
 Number.is_complex() -> I<Obj>
@@ -2587,6 +2575,20 @@ Number.laguerre() -> I<Obj>
 Return the
 
 Aliases: I<laguerreL>, I<laguerre_polynomial>
+
+=cut
+
+=head2 lambda
+
+    lambda(n)
+
+Carmichael lambda function: C<λ(n)>, defined as the smallest positive integer C<m> such that:
+
+    aᵐ ≡ 1 (mod n)
+
+for every integer C<a> between C<1> and C<n> that is coprime to C<n>.
+
+Alias: I<carmichael_lambda>.
 
 =cut
 
@@ -3431,6 +3433,16 @@ Return the
 Number.prod() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 psi
+
+Number.psi() -> I<Obj>
+
+Return the
+
+Aliases: I<dedekind_psi>
 
 =cut
 
