@@ -9591,7 +9591,7 @@ package Sidef::Types::Number::Number {
         #       n == {+1,-1} (mod p+1)
         # for each prime p|n.
 
-        my @factor = Math::Prime::Util::GMP::factor($nstr);
+        my @factors = Math::Prime::Util::GMP::factor($nstr);
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
@@ -9600,7 +9600,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sub_ui($t, $n, 1);
         Math::GMPz::Rmpz_add_ui($u, $n, 1);
 
-        foreach my $p (@factor) {
+        foreach my $p (@factors) {
 
             ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_set_ui($v, $p)
@@ -11901,7 +11901,7 @@ package Sidef::Types::Number::Number {
 
     *is_square_free = \&is_squarefree;
 
-    sub is_totient {
+    sub is_totient {    # OEIS: A002202
         my ($x) = @_;
         __is_int__($$x)
           && Math::Prime::Util::GMP::is_totient(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
@@ -11909,12 +11909,105 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_carmichael {
+    sub is_carmichael {    # OEIS: A002997
         my ($x) = @_;
         __is_int__($$x)
           && Math::Prime::Util::GMP::is_carmichael(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_lucas_carmichael {    # OEIS: A006972
+        my ($n) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        # Small or even
+        Math::GMPz::Rmpz_cmp_ui($n, 399) < 0 and return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_odd_p($n) or return Sidef::Types::Bool::Bool::FALSE;
+
+        # Divisible by small square
+        foreach my $p (3, 5, 7, 11) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        state $np1 = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_add_ui($np1, $n, 1);
+
+        my $size = Math::GMPz::Rmpz_sizeinbase($n, 10);
+
+        # Check the Lucas-Korselt criterion: p+1 | n+1, for small p|n.
+        if ($size > 30) {
+
+            my $trial_limit = 1e3;
+
+#<<<
+            if    ($size > 70) { $trial_limit = 1e7 }
+            elsif ($size > 60) { $trial_limit = 1e6 }
+            elsif ($size > 50) { $trial_limit = 1e5 }
+            elsif ($size > 40) { $trial_limit = 1e4 }
+#>>>
+
+            state %cache;
+            $cache{$trial_limit} //= __PACKAGE__->_set_uint($trial_limit);
+
+            my @trial_factors = @{$_[0]->trial_factor($cache{$trial_limit})};
+            pop @trial_factors;
+
+            my %seen;
+            foreach my $p (@trial_factors) {
+                my $q = Math::GMPz::Rmpz_get_ui($$p) + 1;
+
+                if ($seen{$q}++) {    # not squarefree
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+
+                Math::GMPz::Rmpz_divisible_ui_p($np1, $q)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+
+        # No Lucas-Carmichael number is known that is also a Fermat base-2 pseudoprime.
+        # However, it is conjectured that infinitely many such numbers exist.
+        # If there exists a squarefree composite number N such that p-1 | N-1 and
+        # p+1 | N+1 for every p|N, then N must have an odd number ≥ 5 of prime factors.
+        # See: https://www.sciencedirect.com/science/article/pii/S0022314X14002108
+
+        if (Math::Prime::Util::GMP::is_pseudoprime($nstr, 2)) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my @factors = Math::Prime::Util::GMP::factor($nstr);
+
+        scalar(@factors) >= 3
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        my %seen;
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        # Check the Lucas-Korselt criterion: p+1 | n+1, for all p|n.
+        foreach my $p (@factors) {
+
+            if ($seen{$p}++) {    # not squarefree
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($t, $p)
+              : Math::GMPz::Rmpz_set_str($t, "$p", 10);
+
+            Math::GMPz::Rmpz_add_ui($t, $t, 1);
+
+            Math::GMPz::Rmpz_divisible_p($np1, $t)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub is_fundamental {
