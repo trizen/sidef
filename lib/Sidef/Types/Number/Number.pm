@@ -9633,6 +9633,101 @@ package Sidef::Types::Number::Number {
         $U eq '0' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_strong_fibonacci_pseudoprime {
+        my ($n) = @_;
+
+       # A strong Fibonacci pseudoprime is a composite number n which satisfies the following congruence with Q = -1 and all P:
+       #   V_n(P,Q) = P (mod n)
+
+        # The first several strong Fibonacci pseudoprimes, are:
+        #   443372888629441, 39671149333495681, 842526563598720001,
+        #   2380296518909971201, 3188618003602886401, 33711266676317630401
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        state $min = Math::GMPz::Rmpz_init_set_str_nobless("443372888629441", 10);
+
+        Math::GMPz::Rmpz_cmp($n, $min) < 0 and return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_odd_p($n) or return Sidef::Types::Bool::Bool::FALSE;
+
+        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+
+        # Check if n is a Fermat pseudoprime to base-2.
+        Math::Prime::Util::GMP::is_pseudoprime($nstr, 2)
+          || return Sidef::Types::Bool::Bool::FALSE;
+
+        # V_n(P,-1) == P (mod n) for any integer P.
+        foreach my $i (1 .. 10) {    # test with random values of P
+
+            my $P = CORE::int(CORE::rand(1e6)) + 11;
+            my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($nstr, $P, -1, $nstr);
+
+            if ($V ne $P) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if ($i == 1 and Math::Prime::Util::GMP::is_prob_prime($nstr)) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        # V_n(P,-1) == P (mod n) for any integer P.
+        foreach my $P (1, 3 .. 10) {    # test with small P
+            my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($nstr, $P, -1, $nstr);
+
+            if ($V ne $P) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        # Odd composite integer n is a strong Fibonacci pseudoprime iff:
+        #     1) n is a Carmichael number: p-1 | n-1
+        #     2) 2(p + 1) | (n − 1) or 2(p + 1) | (n − p)
+        # for each prime p|n.
+
+        my @factors = Math::Prime::Util::GMP::factor($nstr);
+
+        state $nm1 = Math::GMPz::Rmpz_init_nobless();
+        state $u   = Math::GMPz::Rmpz_init_nobless();
+        state $v   = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_sub_ui($nm1, $n, 1);
+
+        my %seen;
+
+        foreach my $p (@factors) {
+
+            if ($seen{$p}++) {    # not squarefree
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($v, $p)
+              : Math::GMPz::Rmpz_set_str($v, "$p", 10);
+
+            # Check Korselt's criterion for Carmichael numbers:
+            #   p-1 | n-1, for all p|n.
+
+            Math::GMPz::Rmpz_sub_ui($u, $v, 1);
+            Math::GMPz::Rmpz_divisible_p($nm1, $u) || return Sidef::Types::Bool::Bool::FALSE;
+
+            # Check if any of the following condition is satisifed:
+            #    2(p + 1) | (n − 1)
+            #    2(p + 1) | (n − p)
+
+            Math::GMPz::Rmpz_sub($u, $n, $v);
+            Math::GMPz::Rmpz_add_ui($v, $v, 1);
+            Math::GMPz::Rmpz_mul_2exp($v, $v, 1);
+
+            Math::GMPz::Rmpz_divisible_p($nm1, $v)
+              || Math::GMPz::Rmpz_divisible_p($u, $v)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
+
     sub is_lucas_pseudoprime {
         my ($n) = @_;
         __is_int__($$n)
@@ -11934,6 +12029,19 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+
+        # No Lucas-Carmichael number is known that is also a Carmichael number or a Fermat base-2 pseudoprime.
+        # However, it is conjectured that infinitely many such numbers exist.
+
+        # If there exists a squarefree composite number N such that p-1 | N-1 and
+        # p+1 | N+1 for every p|N, then N must have an odd number ≥ 5 of prime factors.
+        # See: https://www.sciencedirect.com/science/article/pii/S0022314X14002108
+
+        if (Math::Prime::Util::GMP::is_pseudoprime($nstr, 2)) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
         state $np1 = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_add_ui($np1, $n, 1);
 
@@ -11968,18 +12076,6 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_divisible_ui_p($np1, $q)
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
-        }
-
-        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
-
-        # No Lucas-Carmichael number is known that is also a Fermat base-2 pseudoprime.
-        # However, it is conjectured that infinitely many such numbers exist.
-        # If there exists a squarefree composite number N such that p-1 | N-1 and
-        # p+1 | N+1 for every p|N, then N must have an odd number ≥ 5 of prime factors.
-        # See: https://www.sciencedirect.com/science/article/pii/S0022314X14002108
-
-        if (Math::Prime::Util::GMP::is_pseudoprime($nstr, 2)) {
-            return Sidef::Types::Bool::Bool::FALSE;
         }
 
         my @factors = Math::Prime::Util::GMP::factor($nstr);
