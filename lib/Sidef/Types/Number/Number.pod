@@ -2018,6 +2018,14 @@ Return the
 
 =cut
 
+=head2 is_bruckman_lucas_pseudoprime
+
+Number.is_bruckman_lucas_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_carmichael
 
 Number.is_carmichael() -> I<Obj>
