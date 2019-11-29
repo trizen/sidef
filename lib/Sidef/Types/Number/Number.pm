@@ -9632,7 +9632,33 @@ package Sidef::Types::Number::Number {
         $V eq '1' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_fibonacci_pseudoprime {         # OEIS: A081264 (odd composites)
+    sub is_pell_pseudoprime {              # OEIS: A099011 (odd composites)
+        my ($n) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 2) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_even_p($n) and return Sidef::Types::Bool::Bool::FALSE;
+
+        my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 2, -1, $n);
+        my $delta = Math::GMPz::Rmpz_ui_kronecker(2, $n);
+
+        if ($delta == 1) {
+            return ($U eq '1' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE);
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        ($U < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($t, $U)
+          : Math::GMPz::Rmpz_set_str($t, "$U", 10);
+
+        Math::GMPz::Rmpz_add_ui($t, $t, 1);
+        Math::GMPz::Rmpz_cmp($t, $n) ? Sidef::Types::Bool::Bool::FALSE : Sidef::Types::Bool::Bool::TRUE;
+    }
+
+    sub is_fibonacci_pseudoprime {    # OEIS: A081264 (odd composites)
         my ($n) = @_;
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;

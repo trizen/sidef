@@ -2276,6 +2276,14 @@ Aliases: I<is_palindromic>
 
 =cut
 
+=head2 is_pell_pseudoprime
+
+Number.is_pell_pseudoprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_perrin_pseudoprime
 
 Number.is_perrin_pseudoprime() -> I<Obj>
