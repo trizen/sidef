@@ -9632,6 +9632,18 @@ package Sidef::Types::Number::Number {
         $V eq '1' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_pell_lucas_pseudoprime {        # OEIS: A270342 (primes + composites), A270345 (composites)
+        my ($n) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 2) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+
+        my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 2, -1, $n);
+        $V eq '2' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_pell_pseudoprime {              # OEIS: A099011 (odd composites)
         my ($n) = @_;
 
