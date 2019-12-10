@@ -3096,15 +3096,20 @@ package Sidef::Types::Array::Array {
         my ($self, $block) = @_;
         my $vals = bless([@$self]);
 
+        my $break = 1;
         my @results;
 
-        for (1) {
-            defined($block)
-              ? $block->run(@$vals)
-              : CORE::push(@results, bless([@$vals]));
+        foreach my $n (1, 2) {
+            if ($n == 1) {
+                defined($block)
+                  ? $block->run(@$vals)
+                  : CORE::push(@results, bless([@$vals]));
+            }
+            $break = 0;
+            last;
         }
 
-        while ($vals->next_permutation) {
+        while (!$break and $vals->next_permutation) {
             defined($block)
               ? $block->run(@$vals)
               : CORE::push(@results, bless([@$vals]));

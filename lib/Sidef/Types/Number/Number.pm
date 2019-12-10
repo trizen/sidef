@@ -9654,9 +9654,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_even_p($n) and return Sidef::Types::Bool::Bool::FALSE;
 
         my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 2, -1, $n);
-        my $delta = Math::GMPz::Rmpz_ui_kronecker(2, $n);
 
-        if ($delta == 1) {
+        if (Math::GMPz::Rmpz_ui_kronecker(2, $n) == 1) {
             return ($U eq '1' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE);
         }
 
@@ -9676,10 +9675,10 @@ package Sidef::Types::Number::Number {
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        Math::GMPz::Rmpz_cmp_ui($n, 5) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0 or return Sidef::Types::Bool::Bool::FALSE;
         Math::GMPz::Rmpz_divisible_ui_p($n, 5) and return Sidef::Types::Bool::Bool::FALSE;
 
-        my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 1, -1, $n - Math::GMPz::Rmpz_kronecker_ui($n, 5));
+        my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 1, -1, $n - Math::GMPz::Rmpz_ui_kronecker(5, $n));
         $U eq '0' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
     }
 
