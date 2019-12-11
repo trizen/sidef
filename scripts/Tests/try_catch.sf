@@ -62,4 +62,29 @@ assert_eq(try { die -1 }, nil)
     assert_eq(try { die 1 } catch { _+42 }, 42+n)
 }
 
+do {
+    var x = 42
+    try { x += 1 }
+    if (false) {
+        die 'error'
+    }
+    assert_eq(x, 43)
+}
+
+do {
+    var x = 42
+    try { x += 1 } catch { 'something' }
+    if (false) {
+        die 'error'
+    }
+    assert_eq(x, 43)
+}
+
+do {
+    var x = 42
+    try { x += 1 } if (false)
+    { die 'error' }
+    assert_eq(x, 42)
+}
+
 say "** Test passed!"

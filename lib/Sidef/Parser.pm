@@ -1085,7 +1085,7 @@ package Sidef::Parser {
                 my $obj = (
                     $double_quoted
                     ? do {
-                        state $str = Sidef::Types::String::String->new;    # load the string module
+                        state $str = Sidef::Types::String::String->new;                                # load the string module
                         Sidef::Types::String::String::apply_escapes($package->$method($string), $self);
                       }
                     : $package->$method($string =~ s{\\\\}{\\}gr)
@@ -1747,7 +1747,7 @@ package Sidef::Parser {
                     local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $has_kids ? $parent : $obj;
                     my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
 
-                    my $code = '{' . $args . substr($_, pos);
+                    my $code  = '{' . $args . substr($_, pos);
                     my $block = $self->parse_block(code => \$code, with_vars => 1);
                     pos($_) += pos($code) - length($args) - 1;
 
@@ -1873,12 +1873,15 @@ package Sidef::Parser {
             # "try/catch" construct
             if (/\Gtry\h*(?=\{)/gc) {
                 my $try_block = $self->parse_block(code => $opt{code});
-                my $obj = bless({try => $try_block}, 'Sidef::Types::Block::Try');
+                my $obj       = bless({try => $try_block}, 'Sidef::Types::Block::Try');
 
                 $self->parse_whitespace(code => $opt{code});
 
                 if (/\Gcatch\h*(?=\{)/gc) {
                     $obj->{catch} = $self->parse_block(code => $opt{code}, with_vars => 1);
+                }
+                else {
+                    $self->backtrack_whitespace();
                 }
 
                 return $obj;
@@ -2551,8 +2554,8 @@ package Sidef::Parser {
                     ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
                     and defined(
                         my $var = (
-                            first { $_->{name} eq $name }
-                            (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})
+                                 first { $_->{name} eq $name }
+                                 (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})
                                   )
                                )
                   ) {
@@ -3499,7 +3502,7 @@ package Sidef::Parser {
                             $methods = $self->parse_methods(code => $opt{code});
                         }
                         else {
-                            my $code = substr($_, pos);
+                            my $code   = substr($_, pos);
                             my $dot_op = $code =~ /^\./;
                             if   ($dot_op) { $code = ". $code" }
                             else           { $code = ".$code" }
