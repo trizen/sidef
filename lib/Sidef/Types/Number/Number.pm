@@ -8543,7 +8543,7 @@ package Sidef::Types::Number::Number {
         return $count;
     }
 
-    sub prime_count {
+    sub _prime_count {
         my ($x, $y) = @_;
 
         state $primepi_lookup = {
@@ -8609,50 +8609,28 @@ package Sidef::Types::Number::Number {
         };
 
         if (defined($y)) {
-            _valid(\$y);
-            $x = _big2istr($x) // return ZERO;
-            $x = 2 if $x < 2;
-            $y = _big2uistr($y) // return ZERO;
+            $x = 2 if ($x < 2);
         }
         else {
-            $y = _big2uistr($x) // return ZERO;
+            $y = $x;
             $x = 2;
         }
 
-        return ZERO if ($y < $x);
+        return 0 if ($y < $x);
 
-        if ($x eq '2' and exists($primepi_lookup->{$y})) {
-
-            my $prime_count = $primepi_lookup->{$y};
-
-            return (
-                    ($prime_count < ULONG_MAX)
-                    ? __PACKAGE__->_set_uint($prime_count)
-                    : __PACKAGE__->_set_str('int', $prime_count)
-                   );
+        if ($x eq '2' and defined(my $value = $primepi_lookup->{$y})) {
+            return $value;
         }
 
         # Support for arbitrary large integers (slow for wide ranges)
         if ($y >= ULONG_MAX and !$HAS_PRIME_UTIL) {
-
             my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
-
-            return (
-                    ($prime_count < ULONG_MAX)
-                    ? __PACKAGE__->_set_uint($prime_count)
-                    : __PACKAGE__->_set_str('int', $prime_count)
-                   );
+            return $prime_count;
         }
 
         if ($HAS_PRIME_UTIL) {
-
             my $prime_count = Math::Prime::Util::prime_count("$x", "$y");
-
-            return (
-                    ($prime_count < ULONG_MAX)
-                    ? __PACKAGE__->_set_uint("$prime_count")
-                    : __PACKAGE__->_set_str('int', "$prime_count")
-                   );
+            return "$prime_count";
         }
 
         my ($x_n, $x_pi);
@@ -8686,12 +8664,7 @@ package Sidef::Types::Number::Number {
 
                 my $prime_count = $y_count - $x_count;
                 ++$prime_count if ($x == 2 or Math::Prime::Util::GMP::is_prime($x));
-
-                return (
-                        ($prime_count < ULONG_MAX)
-                        ? __PACKAGE__->_set_uint($prime_count)
-                        : __PACKAGE__->_set_str('int', $prime_count)
-                       );
+                return $prime_count;
             }
         }
 
@@ -8700,9 +8673,32 @@ package Sidef::Types::Number::Number {
         my $prime_count = _prime_count_range(Math::Prime::Util::GMP::next_prime($x - 1), Math::Prime::Util::GMP::prev_prime($y + 1));
 #>>>
 
-        ($prime_count < ULONG_MAX)
-          ? __PACKAGE__->_set_uint($prime_count)
-          : __PACKAGE__->_set_str('int', $prime_count);
+        return $prime_count;
+    }
+
+    sub prime_count {
+        my ($x, $y) = @_;
+
+        if (defined($y)) {
+            _valid(\$y);
+            $x = _big2istr($x) // return ZERO;
+            $x = 2 if $x < 2;
+            $y = _big2uistr($y) // return ZERO;
+        }
+        else {
+            $y = _big2uistr($x) // return ZERO;
+            $x = 2;
+        }
+
+        return ZERO if ($y < $x);
+
+        my $count = _prime_count($x, $y);
+
+        return (
+                ($count < ULONG_MAX)
+                ? __PACKAGE__->_set_uint($count)
+                : __PACKAGE__->_set_str('int', $count)
+               );
     }
 
     *primepi = \&prime_count;
@@ -8814,8 +8810,6 @@ package Sidef::Types::Number::Number {
             return __PACKAGE__->_set_uint($count);
         }
 
-        state $t = bless \Math::GMPz::Rmpz_init();
-
         my $pp_count = sub {
             my ($n) = @_;
 
@@ -8830,8 +8824,7 @@ package Sidef::Types::Number::Number {
                     $count += $pi_table->[$r];
                 }
                 else {
-                    Math::GMPz::Rmpz_set_ui($$t, $r);
-                    $count += Math::GMPz::Rmpz_get_ui(${$t->prime_count});
+                    $count += _prime_count($r);
                 }
             }
 
@@ -8991,10 +8984,11 @@ package Sidef::Types::Number::Number {
         while (1) {
             $k = ($min + $max) >> 1;
 
-            my $pi =
-              $HAS_PRIME_UTIL
-              ? Math::Prime::Util::prime_count($k)
-              : ${__PACKAGE__->_set_uint($k)->prime_count};
+            my $pi = (
+                      $HAS_PRIME_UTIL
+                      ? Math::Prime::Util::prime_count($k)
+                      : _prime_count($k)
+                     );
 
             my $cmp = ($k <=> ($pi + 1 + $n));
 
