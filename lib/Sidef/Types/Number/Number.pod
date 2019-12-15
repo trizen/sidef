@@ -3076,6 +3076,14 @@ Return the
 
 =cut
 
+=head2 nth_semiprime
+
+Number.nth_semiprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nu
 
 Number.nu() -> I<Obj>
@@ -3717,6 +3725,14 @@ Return the
 =head2 seed
 
 Number.seed() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 semiprime_count
+
+Number.semiprime_count() -> I<Obj>
 
 Return the
 

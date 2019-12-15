@@ -605,7 +605,9 @@ package Sidef::Types::Number::Number {
                 goto &Math::GMPz::Rmpz_get_ui;
             }
 
-            if (Math::GMPz::Rmpz_sgn($x) >= 0 and Math::GMPz::Rmpz_cmp_ui($x, ~0) <= 0) {
+            state $t = Math::GMPz::Rmpz_init_set_str(join('', ~0), 10);
+
+            if (Math::GMPz::Rmpz_sgn($x) >= 0 and Math::GMPz::Rmpz_cmp($x, $t) <= 0) {
                 return Math::GMPz::Rmpz_get_str($x, 10);
             }
 
@@ -9315,26 +9317,81 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub _semiprime_count {
+        my ($n) = @_;
+
+        if ($HAS_PRIME_UTIL) {
+            return Math::Prime::Util::semiprime_count($n);
+        }
+
+        my $count  = 0;
+        my $t      = 0;
+        my $s      = Math::Prime::Util::GMP::sqrtint($n);
+        my $primes = Math::Prime::Util::GMP::primes($s);
+
+        foreach my $p (@$primes) {
+            $count += _prime_count(int($n / $p)) - ++$t + 1;
+        }
+
+        return $count;
+    }
+
     sub semiprime_count {
         my ($n) = @_;
         $n = _any2ui($$n) // goto &nan;
+        my $count = _semiprime_count($n);
+        ($count < ULONG_MAX) ? __PACKAGE__->_set_uint($count) : __PACKAGE__->_set_str('int', $count);
+    }
 
-        my $count = 0;
+    sub nth_semiprime {
+        my ($n) = @_;
+        $n = _any2ui($$n) // goto &nan;
+
+        return ONE                       if ($n == 0);    # not semiprime, but...
+        return __PACKAGE__->_set_uint(4) if ($n == 1);
 
         if ($HAS_PRIME_UTIL) {
-            $count = Math::Prime::Util::semiprime_count($n);
+            my $k = Math::Prime::Util::nth_semiprime($n);
+            return (
+                    ($k < ULONG_MAX)
+                    ? __PACKAGE__->_set_uint("$k")
+                    : __PACKAGE__->_set_str('int', "$k")
+                   );
         }
-        else {
-            my $t      = 0;
-            my $s      = Math::Prime::Util::GMP::sqrtint($n);
-            my $primes = Math::Prime::Util::GMP::primes($s);
 
-            foreach my $p (@$primes) {
-                $count += _prime_count(int($n / $p)) - ++$t + 1;
+        # n-th semiprime is ~ n * log(n) / log(log(n))
+        my $max = CORE::int($n * CORE::log($n) / CORE::log(CORE::log($n)));
+        my $min = CORE::int(0.965 * $max);
+
+        if ($n < 3e3) {
+            $min = 4;
+            $max = 11465;
+        }
+
+        my $k = 0;
+
+        while (1) {
+            $k = ($min + $max) >> 1;
+
+            my $pi2 = _semiprime_count($k);
+            my $cmp = ($pi2 <=> $n);
+
+            if ($cmp > 0) {
+                $max = $k - 1;
+            }
+            elsif ($cmp < 0) {
+                $min = $k + 1;
+            }
+            else {
+                last;
             }
         }
 
-        ($count < ULONG_MAX) ? __PACKAGE__->_set_uint($count) : __PACKAGE__->_set_str('int', $count);
+        while (!Math::Prime::Util::GMP::is_semiprime($k)) {
+            --$k;
+        }
+
+        ($k < ULONG_MAX) ? __PACKAGE__->_set_uint($k) : __PACKAGE__->_set_str('int', $k);
     }
 
     sub _primality_pretest {
