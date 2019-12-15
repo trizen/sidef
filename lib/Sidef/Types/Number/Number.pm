@@ -605,6 +605,10 @@ package Sidef::Types::Number::Number {
                 goto &Math::GMPz::Rmpz_get_ui;
             }
 
+            if (Math::GMPz::Rmpz_sgn($x) >= 0 and Math::GMPz::Rmpz_cmp_ui($x, ~0) <= 0) {
+                return Math::GMPz::Rmpz_get_str($x, 10);
+            }
+
             return;
         }
 
@@ -9309,6 +9313,28 @@ package Sidef::Types::Number::Number {
           && Math::Prime::Util::GMP::is_semiprime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub semiprime_count {
+        my ($n) = @_;
+        $n = _any2ui($$n) // goto &nan;
+
+        my $count = 0;
+
+        if ($HAS_PRIME_UTIL) {
+            $count = Math::Prime::Util::semiprime_count($n);
+        }
+        else {
+            my $t      = 0;
+            my $s      = Math::Prime::Util::GMP::sqrtint($n);
+            my $primes = Math::Prime::Util::GMP::primes($s);
+
+            foreach my $p (@$primes) {
+                $count += _prime_count(int($n / $p)) - ++$t + 1;
+            }
+        }
+
+        ($count < ULONG_MAX) ? __PACKAGE__->_set_uint($count) : __PACKAGE__->_set_str('int', $count);
     }
 
     sub _primality_pretest {
