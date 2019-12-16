@@ -967,6 +967,14 @@ This function finds a value C<k> such that f(k-1) < 0 and f(k) >= 0. Returns C<n
 
 =cut
 
+=head2 bsearch_inverse
+
+Number.bsearch_inverse() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bsearch_le
 
     bsearch_le(n, {...})
@@ -3076,14 +3084,6 @@ Return the
 
 =cut
 
-=head2 nth_semiprime
-
-Number.nth_semiprime() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 nu
 
 Number.nu() -> I<Obj>
@@ -3727,6 +3727,16 @@ Return the
 Number.seed() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 semiprime
+
+Number.semiprime() -> I<Obj>
+
+Return the
+
+Aliases: I<nth_semiprime>
 
 =cut
 

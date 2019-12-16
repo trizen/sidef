@@ -8738,7 +8738,7 @@ package Sidef::Types::Number::Number {
         }
 
         # Support for large integers
-        if ($y >= ULONG_MAX) {
+        if ($y >= ~0) {
 
             $x = Math::GMPz::Rmpz_init_set_str("$x", 10);
             $y = Math::GMPz::Rmpz_init_set_str("$y", 10);
@@ -9393,6 +9393,8 @@ package Sidef::Types::Number::Number {
 
         ($k < ULONG_MAX) ? __PACKAGE__->_set_uint($k) : __PACKAGE__->_set_str('int', $k);
     }
+
+    *semiprime = \&nth_semiprime;
 
     sub _primality_pretest {
         my ($n) = @_;
@@ -13550,6 +13552,52 @@ package Sidef::Types::Number::Number {
     *tuples                 = \&variations;
     *tuples_with_repetition = \&variations_with_repetition;
 
+    sub bsearch_inverse {
+        my ($min, $max, $block) = @_;
+
+        my $prec = CORE::int($PREC);
+
+        my $left   = Math::MPFR::Rmpfr_init2($prec);
+        my $right  = Math::MPFR::Rmpfr_init2($prec);
+        my $middle = Math::MPFR::Rmpfr_init2($prec);
+
+        if (defined($block)) {
+            _valid(\$max);
+            Math::MPFR::Rmpfr_set($left,  (_any2mpfr($$min) // return undef), $ROUND);
+            Math::MPFR::Rmpfr_set($right, (_any2mpfr($$max) // return undef), $ROUND);
+        }
+        else {
+            $block = $max;
+            Math::MPFR::Rmpfr_set($right, (_any2mpfr($$min) // return undef), $ROUND);
+            Math::MPFR::Rmpfr_set_ui($left, 0, $ROUND);
+        }
+
+        while (1) {
+
+            Math::MPFR::Rmpfr_add($middle, $left, $right, $ROUND);
+            Math::MPFR::Rmpfr_div_2ui($middle, $middle, 1, $ROUND);
+
+            my $item = Math::MPFR::Rmpfr_init2($prec);
+            Math::MPFR::Rmpfr_set($item, $middle, $ROUND);
+
+            my $value = bless(\$item, __PACKAGE__);
+            my $cmp   = CORE::int($block->run($value)) || return $value;
+
+            if ($cmp > 0) {
+                Math::MPFR::Rmpfr_set($right, $middle, $ROUND);
+            }
+            elsif ($cmp < 0) {
+                Math::MPFR::Rmpfr_set($left, $middle, $ROUND);
+            }
+
+            if (Math::MPFR::Rmpfr_cmp($left, $right) >= 0) {
+                last;
+            }
+        }
+
+        return undef;
+    }
+
     sub bsearch {
         my ($left, $right, $block) = @_;
 
@@ -13564,7 +13612,6 @@ package Sidef::Types::Number::Number {
             $left  = Math::GMPz::Rmpz_init_set_ui(0);
         }
 
-        my ($item, $cmp);
         my $middle = Math::GMPz::Rmpz_init();
 
         while (Math::GMPz::Rmpz_cmp($left, $right) <= 0) {
@@ -13572,8 +13619,8 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add($middle, $left, $right);
             Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
 
-            $item = bless \Math::GMPz::Rmpz_init_set($middle);
-            $cmp  = CORE::int($block->run($item)) || return $item;
+            my $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            my $cmp  = CORE::int($block->run($item)) || return $item;
 
             if ($cmp > 0) {
                 Math::GMPz::Rmpz_sub_ui($right, $middle, 1);
@@ -13600,7 +13647,6 @@ package Sidef::Types::Number::Number {
             $left  = Math::GMPz::Rmpz_init_set_ui(0);
         }
 
-        my ($item, $cmp);
         my $middle = Math::GMPz::Rmpz_init();
 
         while (1) {
@@ -13608,8 +13654,8 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add($middle, $left, $right);
             Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
 
-            $item = bless \Math::GMPz::Rmpz_init_set($middle);
-            $cmp  = CORE::int($block->run($item)) || return $item;
+            my $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            my $cmp  = CORE::int($block->run($item)) || return $item;
 
             if ($cmp < 0) {
                 Math::GMPz::Rmpz_add_ui($left, $middle, 1);
@@ -13642,7 +13688,6 @@ package Sidef::Types::Number::Number {
             $left  = Math::GMPz::Rmpz_init_set_ui(0);
         }
 
-        my ($item, $cmp);
         my $middle = Math::GMPz::Rmpz_init();
 
         while (1) {
@@ -13650,8 +13695,8 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add($middle, $left, $right);
             Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
 
-            $item = bless \Math::GMPz::Rmpz_init_set($middle);
-            $cmp  = CORE::int($block->run($item)) || return $item;
+            my $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            my $cmp  = CORE::int($block->run($item)) || return $item;
 
             if ($cmp < 0) {
                 Math::GMPz::Rmpz_add_ui($left, $middle, 1);
