@@ -96,6 +96,14 @@ Aliases: I<capture>
 
 =cut
 
+=head2 compose
+
+Block.compose() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 do
 
 Block.do() -> I<Obj>

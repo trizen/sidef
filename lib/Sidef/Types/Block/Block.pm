@@ -18,10 +18,10 @@ package Sidef::Types::Block::Block {
 
         my @vars = map {
                 (defined($_->{type}) ? (Sidef::normalize_type($_->{type}) . ' ') : '')
-              . ($_->{slurpy} ? ($_->{array} ? '*' : ':') : '')
+              . ($_->{slurpy}        ? ($_->{array} ? '*' : ':')                 : '')
               . Sidef::normalize_type($_->{name})
               . (defined($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
-              . ($_->{has_value} ? ' = nil' : '')
+              . ($_->{has_value}       ? ' = nil'                                      : '')
         } @{$self->{vars}};
 
         (
@@ -291,8 +291,8 @@ package Sidef::Types::Block::Block {
                 $_->_name . '(' . join(
                     ', ',
                     map {
-                            (exists($_->{slurpy}) ? '*' : '')
-                          . (exists($_->{type}) ? (Sidef::normalize_type($_->{type}) . ' ') : '')
+                            (exists($_->{slurpy}) ? '*'                                       : '')
+                          . (exists($_->{type})   ? (Sidef::normalize_type($_->{type}) . ' ') : '')
                           . $_->{name}
                           . (exists($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
                     } @{$_->{vars}}
@@ -371,8 +371,22 @@ package Sidef::Types::Block::Block {
 
     *cap = \&capture;
 
+    sub compose {
+        my ($block1, $block2) = @_;
+        __PACKAGE__->new(
+            code => sub {
+                $block1->call($block2->call(@_));
+            }
+        );
+    }
+
     sub repeat {
         my ($block, $num) = @_;
+
+        if (ref($num) eq __PACKAGE__) {
+            goto &compose;
+        }
+
         $num->times($block);
     }
 
