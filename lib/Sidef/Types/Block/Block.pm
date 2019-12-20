@@ -685,6 +685,7 @@ package Sidef::Types::Block::Block {
         *{__PACKAGE__ . '::' . '<<'} = \&for;
         *{__PACKAGE__ . '::' . '>>'} = \&map;
         *{__PACKAGE__ . '::' . '&'}  = \&grep;
+        *{__PACKAGE__ . '::' . '∘'}  = \&compose;
     }
 }
 

@@ -62,6 +62,16 @@ Aliases: I<map>
 
 =cut
 
+=head2 ∘
+
+I<Obj> B<∘> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<compose>
+
+=cut
+
 =head2 array_identity
 
 Block.array_identity() -> I<Obj>
@@ -93,14 +103,6 @@ Block.cap() -> I<Obj>
 Return the
 
 Aliases: I<capture>
-
-=cut
-
-=head2 compose
-
-Block.compose() -> I<Obj>
-
-Return the
 
 =cut
 
