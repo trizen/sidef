@@ -1602,6 +1602,16 @@ Aliases: I<rscalar_operator>
 
 =cut
 
+=head2 run_length
+
+Array.run_length() -> I<Obj>
+
+Return the
+
+Aliases: I<run_length_by>
+
+=cut
+
 =head2 sadd
 
 Array.sadd() -> I<Obj>

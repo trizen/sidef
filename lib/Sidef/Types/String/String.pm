@@ -696,7 +696,7 @@ package Sidef::Types::String::String {
     sub numbers {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-                                        [map { Sidef::Types::Number::Number->new($_) }
+                                        [map  { Sidef::Types::Number::Number->new($_) }
                                          grep { Scalar::Util::looks_like_number($_) } CORE::split(' ', $$self)
                                         ]
                                        );
@@ -707,7 +707,7 @@ package Sidef::Types::String::String {
     sub integers {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-                                        [map { Sidef::Types::Number::Number->new($_)->int }
+                                        [map  { Sidef::Types::Number::Number->new($_)->int }
                                          grep { Scalar::Util::looks_like_number($_) } CORE::split(' ', $$self)
                                         ]
                                        );

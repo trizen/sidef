@@ -46,7 +46,7 @@ package Sidef::Types::Regex::Match {
         else {
             $hash{pos} = CORE::int($hash{pos} // 0);
             $hash{pos} = 0 if ($hash{pos} < 0);
-            @captures = substr($hash{string}, $hash{pos}) =~ $hash{regex}{regex};
+            @captures  = substr($hash{string}, $hash{pos}) =~ $hash{regex}{regex};
 
             $hash{matched}   = (@captures != 0);
             $hash{match_pos} = $hash{matched} ? [$-[0] + $hash{pos}, $+[0] + $hash{pos}] : [];

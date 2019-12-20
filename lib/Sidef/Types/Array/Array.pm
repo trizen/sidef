@@ -1713,6 +1713,39 @@ package Sidef::Types::Array::Array {
 
     *stack_by = \&stack;
 
+    sub run_length {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        @$self || return bless [];
+
+        my @result     = bless [$self->[0], 1];
+        my $prev_value = $block->run($self->[0]);
+
+        foreach my $i (1 .. $#{$self}) {
+
+            my $item       = $self->[$i];
+            my $curr_value = $block->run($item);
+
+            if ($curr_value eq $prev_value) {
+                ++$result[-1][1];
+            }
+            else {
+                CORE::push(@result, bless [$item, 1]);
+            }
+
+            $prev_value = $curr_value;
+        }
+
+        foreach my $pair (@result) {
+            $pair->[1] = Sidef::Types::Number::Number->_set_uint($pair->[1]);
+        }
+
+        bless \@result;
+    }
+
+    *run_length_by = \&run_length;
+
     sub match {
         my ($self, $regex) = @_;
 
@@ -2395,7 +2428,7 @@ package Sidef::Types::Array::Array {
             return (
                     $len > 0
                     ? bless([map { $self->[CORE::rand($len)] } 1 .. $amount], ref($self))
-                    : bless([], ref($self))
+                    : bless([],                                               ref($self))
                    );
         }
 
