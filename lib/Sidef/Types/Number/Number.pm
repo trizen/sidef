@@ -9368,6 +9368,9 @@ package Sidef::Types::Number::Number {
             $max = 11465;
         }
 
+        require Memoize;
+        Memoize::memoize('_prime_count');
+
         my $k = 0;
 
         while (1) {
@@ -9386,6 +9389,8 @@ package Sidef::Types::Number::Number {
                 last;
             }
         }
+
+        Memoize::unmemoize('_prime_count');
 
         while (!Math::Prime::Util::GMP::is_semiprime($k)) {
             --$k;
@@ -13810,6 +13815,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . 'δ'}   = \&kronecker_delta;
         *{__PACKAGE__ . '::' . '=~='} = \&approx_eq;
         *{__PACKAGE__ . '::' . '≅'}   = \&approx_eq;
+        *{__PACKAGE__ . '::' . '<~>'} = \&approx_cmp;
     }
 }
 

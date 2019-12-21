@@ -228,6 +228,21 @@ Aliases: I<cmp>
 
 =cut
 
+=head2 approx_cmp
+
+    approx_cmp(a, b)
+    approx_cmp(a, b, k)
+
+Approximate comparison of C<a> and C<b>.
+
+Equivalent with:
+
+    a.round(k) <=> b.round(k)
+
+When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
+
+=cut
+
 =head2 ==
 
     a == b
@@ -561,21 +576,6 @@ Return the
 Number.all_prime() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 approx_cmp
-
-    approx_cmp(a, b)
-    approx_cmp(a, b, k)
-
-Approximate comparison of C<a> and C<b>.
-
-Equivalent with:
-
-    a.round(k) <=> b.round(k)
-
-When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
 
 =cut
 
