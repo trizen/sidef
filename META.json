@@ -39,6 +39,7 @@
             "Algorithm::Combinatorics" : "0",
             "Algorithm::Loops" : "0",
             "Cwd" : "0",
+            "Devel::Peek" : "0",
             "Encode" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
@@ -66,7 +67,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "3.85"
+         "version" : "3.90"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -229,6 +230,6 @@
          "url" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "3.85",
+   "version" : "3.90",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

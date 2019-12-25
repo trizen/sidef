@@ -39,6 +39,7 @@ my $builder = Module::Build->new(
                  'parent'                   => 0,
                  'Memoize'                  => 0,
                  'Cwd'                      => 0,
+                 'Devel::Peek'              => 0,
                  'File::Spec'               => 0,
                  'File::Path'               => 0,
                  'File::Copy'               => 0,

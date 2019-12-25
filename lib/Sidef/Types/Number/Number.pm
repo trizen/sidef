@@ -13603,6 +13603,8 @@ package Sidef::Types::Number::Number {
         return undef;
     }
 
+    *bsearch_solve = \&bsearch_inverse;
+
     sub bsearch {
         my ($left, $right, $block) = @_;
 
