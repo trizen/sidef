@@ -12556,10 +12556,19 @@ package Sidef::Types::Number::Number {
     }
 
     sub is_powerful {
-        my ($n) = @_;
+        my ($n, $k) = @_;
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE;
+            $k <= 1 and return Sidef::Types::Bool::Bool::TRUE;
+        }
+        else {
+            $k = 2;
+        }
 
         Math::GMPz::Rmpz_divisible_2exp_p($n, 1)
           and !Math::GMPz::Rmpz_divisible_2exp_p($n, 2)
@@ -12575,7 +12584,7 @@ package Sidef::Types::Number::Number {
         ++$factors{$_} for Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($n, 10));
 
         foreach my $e (values %factors) {
-            $e == 1 and return Sidef::Types::Bool::Bool::FALSE;
+            $e < $k and return Sidef::Types::Bool::Bool::FALSE;
         }
 
         return Sidef::Types::Bool::Bool::TRUE;
