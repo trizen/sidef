@@ -605,7 +605,7 @@ package Sidef::Types::Number::Number {
                 goto &Math::GMPz::Rmpz_get_ui;
             }
 
-            state $t = Math::GMPz::Rmpz_init_set_str(join('', ~0), 10);
+            state $t = Math::GMPz::Rmpz_init_set_str_nobless(join('', ~0), 10);
 
             if (Math::GMPz::Rmpz_sgn($x) >= 0 and Math::GMPz::Rmpz_cmp($x, $t) <= 0) {
                 return Math::GMPz::Rmpz_get_str($x, 10);
@@ -6614,7 +6614,7 @@ package Sidef::Types::Number::Number {
 
         if (Math::Prime::Util::GMP::is_prob_prime($ystr)) {
             my $n = Math::Prime::Util::GMP::sqrtmod($xstr, $ystr) // goto &nan;
-            return ($n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n));
+            return (($n < ULONG_MAX) ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n));
         }
 
         my %factors;
