@@ -55,9 +55,9 @@ say 10.of { |i| y(fib)(i) }     #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 define ℯ = Num.e
 define τ = Num.tau
 
-func Γ(t, r=50) {
-    t < r ? (__FUNC__(t + 1) / t)
-           : (sqrt(τ*t) * pow(t/ℯ + 1/(12*ℯ*t), t) / t)
+func Γ(x, r=50) {
+    x < r ? (__FUNC__(x+1, r) / x)
+          : (sqrt(τ*x) * pow(x/ℯ + 1/(12*ℯ*x), x) / x)
 }
 
 for i in (1..10) {
