@@ -10222,35 +10222,32 @@ package Sidef::Types::Number::Number {
     sub lpf {
         my ($n) = @_;
 
-        my $z = _any2mpz($$n) // goto &nan;
-        Math::GMPz::Rmpz_sgn($z) >= 0 or goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_sgn($n) >= 0 or goto &nan;
 
-        if (Math::GMPz::Rmpz_cmp_ui($z, 1) <= 0) {
-            return bless \$z;
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0) {
+            return bless \$n;
         }
 
         foreach my $p (2, 3, 5) {
-            if (Math::GMPz::Rmpz_divisible_ui_p($z, $p)) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
                 return __PACKAGE__->_set_uint($p);
             }
         }
 
-        if (Math::GMPz::Rmpz_fits_ulong_p($z)) {
-            my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_ui($z));
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_ui($n));
             return __PACKAGE__->_set_uint($f[0]);
         }
 
-        state %cache;
-
-        my $size = Math::GMPz::Rmpz_sizeinbase($z, 2);
+        my $size = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
         foreach my $j (2 .. 8) {
 
-            my $k       = ($cache{$j} //= __PACKAGE__->_set_uint(10**$j));
-            my $factors = $_[0]->trial_factor($k);
+            my (undef, $f) = _native_trial_factor($n, 10**$j);
 
-            if (@$factors > 1) {
-                return $factors->[0];
+            if (defined($f)) {
+                return __PACKAGE__->_set_uint($f);
             }
 
             last if (($j >= 5) && ($size <= 100));    # 30 digits
@@ -10258,8 +10255,7 @@ package Sidef::Types::Number::Number {
             last if (($j >= 7) && ($size <= 150));    # 45 digits
         }
 
-        my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($z, 10));
-
+        my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($n, 10));
         __PACKAGE__->_set_str('int', $f[0]);
     }
 
@@ -10323,6 +10319,56 @@ package Sidef::Types::Number::Number {
 
     *factors_exp = \&factor_exp;
 
+    sub _native_trial_factor {
+        my ($n, $k) = @_;
+
+        # n is a positive > 1 Math::GMPz object
+        # k is an unsigned integer
+
+        state %cache;
+
+        # Clear the cache when there are too many values cached
+        if (scalar(keys(%cache)) > 100) {
+            Math::GMPz::Rmpz_clear($_) for values(%cache);
+            undef %cache;
+        }
+
+        my $B = (
+            $cache{$k} //= do {
+                my $t = Math::GMPz::Rmpz_init_nobless();
+                Math::GMPz::Rmpz_primorial_ui($t, $k);
+                $t;
+            }
+        );
+
+        state $g = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_gcd($g, $n, $B);
+
+        if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+
+            my %factor;
+            my $t    = Math::GMPz::Rmpz_init_set($n);
+            my $gstr = Math::GMPz::Rmpz_get_str($g, 10);
+
+            foreach my $f (
+                           ($HAS_PRIME_UTIL and $gstr < ULONG_MAX)
+                           ? Math::Prime::Util::factor($gstr)
+                           : Math::Prime::Util::GMP::factor("$gstr")
+              ) {
+                Math::GMPz::Rmpz_set_ui($g, $f);
+                $factor{$f} = Math::GMPz::Rmpz_remove($t, $t, $g);
+            }
+
+            my @factors =
+              map { ($_) x $factor{$_} }
+              sort { $a <=> $b } keys %factor;
+
+            return ($t, @factors);
+        }
+
+        return ($n);
+    }
+
     sub trial_factor {
         my ($n, $k) = @_;
 
@@ -10348,45 +10394,28 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Array::Array->new(bless \$n) if $k <= 0;
         return Sidef::Types::Array::Array->new(ONE)       if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
-        state %cache;
+        my ($r, @factors) = _native_trial_factor($n, $k);
 
-        # Clear the cache when there are too many values cached
-        if (scalar(keys(%cache)) > 100) {
-            Math::GMPz::Rmpz_clear($_) for values(%cache);
-            undef %cache;
+        @factors
+          || return Sidef::Types::Array::Array->new(bless \$n);
+
+        my %count;
+        my @uniq_factors;
+
+        foreach my $f (@factors) {
+            if (!$count{$f}++) {
+                push @uniq_factors, $f;
+            }
         }
 
-        my $B = (
-            $cache{$k} //= do {
-                my $t = Math::GMPz::Rmpz_init_nobless();
-                Math::GMPz::Rmpz_primorial_ui($t, $k);
-                $t;
-            }
-        );
+        my @return =
+          map { (Sidef::Types::Number::Number->_set_uint($_)) x $count{$_} } @uniq_factors;
 
-        my $g = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_gcd($g, $n, $B);
-
-        if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
-
-            my %factor;
-            my $t = Math::GMPz::Rmpz_init_set($n);
-
-            foreach my $f (Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($g, 10))) {
-                Math::GMPz::Rmpz_set_ui($g, $f);
-                $factor{$f} = Math::GMPz::Rmpz_remove($t, $t, $g);
-            }
-
-            my @return = map { (Sidef::Types::Number::Number->_set_uint($_)) x $factor{$_} } sort { $a <=> $b } keys %factor;
-
-            if (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0) {
-                push @return, bless \$t;
-            }
-
-            return Sidef::Types::Array::Array->new(\@return);
+        if (Math::GMPz::Rmpz_cmp_ui($r, 1) > 0) {
+            push @return, bless \$r;
         }
 
-        return Sidef::Types::Array::Array->new(bless \$n);
+        return Sidef::Types::Array::Array->new(\@return);
     }
 
     sub prho_factor {
@@ -10615,7 +10644,7 @@ package Sidef::Types::Number::Number {
     sub divisors {
         my ($n, $k) = @_;
 
-        $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
 
         if (defined($k)) {
             _valid(\$k);
@@ -10628,9 +10657,8 @@ package Sidef::Types::Number::Number {
 
                 my @factors;
 
-                if (($k <= 1e6 or $k == 1e7 or $k == 1e8) and $n > $k) {
-                    my $f = $_[0]->trial_factor($_[1]);
-                    @factors = map { Math::GMPz::Rmpz_get_ui($$_) } grep { $$_ <= $k } @$f;
+                if (($k <= 1e6 or $k == 1e7 or $k == 1e8) and Math::GMPz::Rmpz_cmp_ui($n, $k) > 0) {
+                    (undef, @factors) = _native_trial_factor($n, $k);
                 }
                 else {
                     @factors = grep { $_ - 1 < $k } Math::Prime::Util::GMP::factor($n);
@@ -11107,6 +11135,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @{$r{$n}}]);
     }
 
+    *inverse_phi       = \&inverse_totient;
     *inverse_euler_phi = \&inverse_totient;
 
     sub inverse_totient_len {
@@ -12242,9 +12271,9 @@ package Sidef::Types::Number::Number {
         # p+1 | N+1 for every p|N, then N must have an odd number ≥ 5 of prime factors.
         # See: https://www.sciencedirect.com/science/article/pii/S0022314X14002108
 
-        if (Math::Prime::Util::GMP::is_pseudoprime($nstr, 2)) {
-            return Sidef::Types::Bool::Bool::FALSE;
-        }
+        # if (Math::Prime::Util::GMP::is_pseudoprime($nstr, 2)) {
+        #     return Sidef::Types::Bool::Bool::FALSE;     # no counter-example is known
+        # }
 
         state $np1 = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_add_ui($np1, $n, 1);
@@ -12263,15 +12292,11 @@ package Sidef::Types::Number::Number {
             elsif ($size > 40) { $trial_limit = 1e4 }
 #>>>
 
-            state %cache;
-            $cache{$trial_limit} //= __PACKAGE__->_set_uint($trial_limit);
-
-            my @trial_factors = @{$_[0]->trial_factor($cache{$trial_limit})};
-            pop @trial_factors;
+            my ($r, @factors) = _native_trial_factor($n, $trial_limit);
 
             my %seen;
-            foreach my $p (@trial_factors) {
-                my $q = Math::GMPz::Rmpz_get_ui($$p) + 1;
+            foreach my $p (@factors) {
+                my $q = $p + 1;
 
                 if ($seen{$q}++) {    # not squarefree
                     return Sidef::Types::Bool::Bool::FALSE;
@@ -12279,6 +12304,10 @@ package Sidef::Types::Number::Number {
 
                 Math::GMPz::Rmpz_divisible_ui_p($np1, $q)
                   || return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+                return Sidef::Types::Bool::Bool::TRUE;
             }
         }
 
