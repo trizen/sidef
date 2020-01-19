@@ -10346,24 +10346,22 @@ package Sidef::Types::Number::Number {
 
         if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
 
-            my %factor;
             my $t    = Math::GMPz::Rmpz_init_set($n);
             my $gstr = Math::GMPz::Rmpz_get_str($g, 10);
 
-            foreach my $f (
+            my @factors = (
                            ($HAS_PRIME_UTIL and $gstr < ULONG_MAX)
                            ? Math::Prime::Util::factor($gstr)
                            : Math::Prime::Util::GMP::factor("$gstr")
-              ) {
+                          );
+
+            my @return;
+            foreach my $f (@factors) {
                 Math::GMPz::Rmpz_set_ui($g, $f);
-                $factor{$f} = Math::GMPz::Rmpz_remove($t, $t, $g);
+                push @return, ($f) x Math::GMPz::Rmpz_remove($t, $t, $g);
             }
 
-            my @factors =
-              map { ($_) x $factor{$_} }
-              sort { $a <=> $b } keys %factor;
-
-            return ($t, @factors);
+            return ($t, @return);
         }
 
         return ($n);
