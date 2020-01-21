@@ -68,7 +68,7 @@ I<Obj> B<-> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<sub>
+Aliases: I<sub>, I<diff>
 
 =cut
 
@@ -208,7 +208,7 @@ I<Obj> B<∋> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<contain>, I<include>, I<contains>, I<includes>
+Aliases: I<has>, I<contain>, I<include>, I<contains>, I<includes>
 
 =cut
 
@@ -663,14 +663,6 @@ Aliases: I<determinant>
 =head2 det_bareiss
 
 Array.det_bareiss() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 diff
-
-Array.diff() -> I<Obj>
 
 Return the
 

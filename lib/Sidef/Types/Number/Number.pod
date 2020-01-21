@@ -488,6 +488,16 @@ Absolute value of C<n>.
 
 =cut
 
+=head2 abundancy
+
+Number.abundancy() -> I<Obj>
+
+Return the
+
+Aliases: I<abundancy_index>
+
+=cut
+
 =head2 acmp
 
 Number.acmp() -> I<Obj>
@@ -1876,6 +1886,16 @@ Return the
 
 =cut
 
+=head2 inverse_phi
+
+Number.inverse_phi() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_totient>, I<inverse_euler_phi>
+
+=cut
+
 =head2 inverse_polygonal
 
 Number.inverse_polygonal() -> I<Obj>
@@ -1891,16 +1911,6 @@ Aliases: I<polygonal_inverse>
 Number.inverse_sigma() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 inverse_totient
-
-Number.inverse_totient() -> I<Obj>
-
-Return the
-
-Aliases: I<inverse_euler_phi>
 
 =cut
 

@@ -53,10 +53,12 @@ assert_eq((w - x | y ^ y).sort, [])
 assert_eq((w - x | y | x - y).sort, [3, 5, 6, 7])
 
 assert_eq(Bag(1,2,3) & 3, Bag(3))
-assert_eq([2,3,3]    & Bag(1,2,3), Bag(2,3))
-assert_eq([2,3,3]    | Bag(1,2,3), Bag(1,2,3,3))
-assert_eq([2,3,3]    ^ Bag(1,2,3), Bag(1,3))
-assert_eq([1,2,3,3]  - Bag(2,3),   Bag(1,3))
+
+# Array `op` Bag -> Array
+assert_eq([2,3,3]    & Bag(1,2,3), [2,3])
+assert_eq([2,3,3]    | Bag(1,2,3), [1,2,3,3])
+assert_eq([2,3,3]    ^ Bag(1,2,3), [1,3])
+assert_eq([1,2,3,3]  - Bag(2,3),   [1,3])
 
 x << x
 

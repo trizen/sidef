@@ -10112,8 +10112,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        if (    Math::GMPz::Rmpz_probab_prime_p($r, 0)
-            and Math::Prime::Util::GMP::is_prob_prime(Math::GMPz::Rmpz_get_str($r, 10))) {
+        if (Math::Prime::Util::GMP::is_prob_prime(Math::GMPz::Rmpz_get_str($r, 10))) {
             Math::GMPz::Rmpz_add_ui($r, $r, 1);
         }
 
@@ -12104,6 +12103,13 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    sub abundancy_index {
+        my ($n) = @_;
+        $n->sigma->div($n);
+    }
+
+    *abundancy = \&abundancy_index;
 
     sub sopfr {    # https://oeis.org/A001414
         my ($n) = @_;

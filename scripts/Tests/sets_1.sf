@@ -56,13 +56,16 @@ assert_eq(Set(1,2,3) & 3, Set(3))
 assert_eq(Set(1,2,3) & [2,3,3], Set(2,3))
 
 assert_eq(Set(1,2,3) & 3, Set(3))
-assert_eq([2,3,3]    & Set(1,2,3), Set(2,3))
-assert_eq([2,3,3]    | Set(1,2,3), Set(1,2,3))
-assert_eq([2,3,3]    ^ Set(1,2,3), Set(1))
-assert_eq([1,2,3,3]  - Set(2,3),   Set(1))
+
+# Array `op` Set -> Array
+assert_eq([2,3,3]    & Set(1,2,3), [2,3])
+assert_eq([2,3,3]    | Set(1,2,3), [1,2,3,3])
+assert_eq([2,3,3]    ^ Set(1,2,3), [1,3])
+assert_eq([1,2,3,3]  - Set(2,3),   [1,3])
 
 x << x
 
 say x
 assert_eq(x, x)
 #assert_eq(Set(Set(5, 4, x), 2, 3), Set(3, Set(4,x,5), 2))
+assert_eq([[5, 4, x].sort, 2, 3].sort, [3, [4,x,5].sort, 2].sort)
