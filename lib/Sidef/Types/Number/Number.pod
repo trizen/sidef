@@ -3464,6 +3464,14 @@ Return the
 
 =cut
 
+=head2 primitive_part
+
+Number.primitive_part() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 primorial
 
 Number.primorial() -> I<Obj>

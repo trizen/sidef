@@ -11041,9 +11041,37 @@ package Sidef::Types::Number::Number {
     }
 
     sub mangoldt {
-        my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ZERO);
-        $n eq '1' and return ZERO;
-        (($n < ULONG_MAX) ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n))->log;
+        $_[0]->exp_mangoldt->log;
+    }
+
+    sub primitive_part {
+        my ($n, $f) = @_;
+        $f // return $n->exp_mangoldt;
+        my $z = _any2mpz($$n) // goto &nan;
+
+        my $u = Math::GMPz::Rmpz_init_set_ui(1);
+        my $v = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $d (@{$n->squarefree_divisors}) {
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_divexact($t, $z, $$d);
+
+            my $r = $f->run(bless \$t);
+            my $m = Math::Prime::Util::GMP::moebius($$d);
+
+            if (ref($$r) eq 'Math::GMPz' and ref($u) eq 'Math::GMPz' and ref($v) eq 'Math::GMPz') {
+                ($m == 1)
+                  ? Math::GMPz::Rmpz_mul($u, $u, $$r)
+                  : Math::GMPz::Rmpz_mul($v, $v, $$r);
+            }
+            else {
+                ($m == 1)
+                  ? do { $u = __mul__($u, $$r) }
+                  : do { $v = __mul__($v, $$r) };
+            }
+        }
+
+        (bless \$u)->div(bless \$v);
     }
 
     sub totient {
