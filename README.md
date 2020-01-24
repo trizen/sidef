@@ -39,7 +39,7 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 
 ## EXAMPLES
 
-### The [Y combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed_point_combinators_in_lambda_calculus):
+### The [Y combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed-point_combinators_in_lambda_calculus):
 ```ruby
 var y = ->(f) {->(g) {g(g)}(->(g) { f(->(*args) {g(g)(args...)})})}
 
