@@ -299,11 +299,6 @@ package Sidef::Types::String::String {
         Sidef::Types::Number::Number->new($$self, 8);
     }
 
-    sub num {
-        my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self, 10);
-    }
-
     sub hex {
         my ($self) = @_;
         Sidef::Types::Number::Number->new($$self, 16);
@@ -1553,6 +1548,7 @@ package Sidef::Types::String::String {
         Sidef::Types::Number::Number->new($$self);
     }
 
+    *num  = \&to_num;
     *to_n = \&to_num;
 
     {

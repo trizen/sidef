@@ -10,4 +10,10 @@ assert_eq(180154659, hex.hex);
 assert_eq(     4009, oct.oct);
 assert_eq(      345, bin.bin);
 
+assert_eq("0.9054054".num, Num("0.9054054"))
+assert_eq("0.9054054".num, 4527027/5000000)
+
+assert_eq(%n(0.518518), [259259/500000])
+assert_eq(0.518518, 259259/500000)
+
 say "** Test passed!";
