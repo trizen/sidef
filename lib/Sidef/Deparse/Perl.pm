@@ -1457,7 +1457,9 @@ HEADER
                   . "my \$a$refaddr = do{$args[0]};"
                   . "my \$b$refaddr = do{$args[1]};"
                   . ($obj->{act} eq 'assert_ne' ? qq{!(\$a$refaddr eq \$b$refaddr)} : qq{\$a$refaddr eq \$b$refaddr})
-                  . qq~ or CORE::die((do{$args[2]} // ('$obj->{act}('.~
+                  . qq~ or CORE::die((~
+                  . (defined($args[2]) ? "do{$args[2]}" : "undef")
+                  . qq~// ('$obj->{act}('.~
                   . qq~join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr)) . ')'))~
                   . qq~." failed at \Q$obj->{file}\E line $obj->{line}\\n")}~;
             }

@@ -3431,6 +3431,8 @@ package Sidef::Parser {
                 redo;
             }
 
+            my $obj;
+
             # Ternary operator
             if (%struct && /\G\?/gc) {
                 $self->parse_whitespace(code => $opt{code});
@@ -3446,7 +3448,7 @@ package Sidef::Parser {
                 /\G:/gc
                   || $self->fatal_error(
                                         code   => $_,
-                                        pos    => pos($_) - 1,
+                                        pos    => pos($_),
                                         error  => "invalid usage of the ternary operator",
                                         reason => "expected ':'",
                                        );
@@ -3459,20 +3461,18 @@ package Sidef::Parser {
                              : $self->parse_obj(code => $opt{code})
                             );
 
-                my $tern = bless(
-                                 {
-                                  cond  => scalar {$self->{class} => [pop @{$struct{$self->{class}}}]},
-                                  true  => $true,
-                                  false => $false
-                                 },
-                                 'Sidef::Types::Bool::Ternary'
-                                );
-
-                push @{$struct{$self->{class}}}, {self => $tern};
-                redo MAIN;
+                $obj = bless(
+                             {
+                              cond  => scalar {$self->{class} => [pop @{$struct{$self->{class}}}]},
+                              true  => $true,
+                              false => $false
+                             },
+                             'Sidef::Types::Bool::Ternary'
+                            );
             }
-
-            my $obj = $self->parse_obj(code => $opt{code});
+            else {
+                $obj = $self->parse_obj(code => $opt{code});
+            }
 
             if (defined $obj) {
                 push @{$struct{$self->{class}}}, {self => $obj};
