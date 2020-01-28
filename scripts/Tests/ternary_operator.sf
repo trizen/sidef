@@ -74,4 +74,29 @@ assert_eq(t ? 2
 assert_eq(f ? 2
             : 5, 5)
 
+assert_eq(f || t ? 2 : 5, 2)
+assert_eq(t || f ? 2 : 5, 2)
+
+assert_eq(t && f ? 2 : 5, 5)
+assert_eq(f && t ? 2 : 5, 5)
+
+assert_eq(t && t ? 2 : 5 + 11, 13)
+assert_eq(t || f ? 2 : 5 + 11, 13)
+assert_eq(f || t ? 2 : 5 + 11, 13)
+
+assert_eq(t && f ? 2 : 5 + 11, 16)
+assert_eq(f && t ? 2 : 5 + 11, 16)
+assert_eq(f && f ? 2 : 5 + 11, 16)
+
+assert_eq(3 == 3 ? 2 : 5 + 11, 13)
+assert_eq(3 == 4 ? 2 : 5 + 11, 16)
+
+assert_eq(3 == 4
+    ? 2
+    : 5 + 11, 16)
+
+assert_eq(3 == 3
+    ? 2
+    : 5 + 11, 13)
+
 say "** Test passed!"
