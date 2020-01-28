@@ -11049,8 +11049,7 @@ package Sidef::Types::Number::Number {
         $f // return $n->exp_mangoldt;
         my $z = _any2mpz($$n) // goto &nan;
 
-        my $u = Math::GMPz::Rmpz_init_set_ui(1);
-        my $v = Math::GMPz::Rmpz_init_set_ui(1);
+        my (@u, @v);
 
         foreach my $d (@{$n->squarefree_divisors}) {
             my $t = Math::GMPz::Rmpz_init();
@@ -11059,19 +11058,13 @@ package Sidef::Types::Number::Number {
             my $r = $f->run(bless \$t);
             my $m = Math::Prime::Util::GMP::moebius($$d);
 
-            if (ref($$r) eq 'Math::GMPz' and ref($u) eq 'Math::GMPz' and ref($v) eq 'Math::GMPz') {
-                ($m == 1)
-                  ? Math::GMPz::Rmpz_mul($u, $u, $$r)
-                  : Math::GMPz::Rmpz_mul($v, $v, $$r);
-            }
-            else {
-                ($m == 1)
-                  ? do { $u = __mul__($u, $$r) }
-                  : do { $v = __mul__($v, $$r) };
-            }
+            ($m == 1) ? push(@u, $$r) : push(@v, $$r);
         }
 
-        (bless \$u)->div(bless \$v);
+        my $u = @u ? _binsplit(\@u, \&__mul__) : $ONE;
+        my $v = @v ? _binsplit(\@v, \&__mul__) : $ONE;
+
+        bless \__div__($u, $v);
     }
 
     sub totient {

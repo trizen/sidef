@@ -896,6 +896,8 @@ String.num() -> I<Obj>
 
 Return the
 
+Aliases: I<to_n>, I<to_num>
+
 =cut
 
 =head2 nums
@@ -1157,16 +1159,6 @@ String.to_i() -> I<Obj>
 Return the
 
 Aliases: I<to_int>
-
-=cut
-
-=head2 to_n
-
-String.to_n() -> I<Obj>
-
-Return the
-
-Aliases: I<to_num>
 
 =cut
 
