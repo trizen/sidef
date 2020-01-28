@@ -55,14 +55,16 @@ if (defined $args{v}) {
     exit 0;
 }
 
-# Warnings
+# Warnings stack backtrace
 if (defined $args{w}) {
     $SIG{__WARN__} = sub {
         require Carp;
         Carp::cluck(@_);
     };
 }
-elsif (defined $args{W}) {
+
+# Fatal warnings stack backtrace
+if (defined $args{W}) {
     $SIG{__DIE__} = $SIG{__WARN__} = sub {
         require Carp;
         Carp::confess(@_);

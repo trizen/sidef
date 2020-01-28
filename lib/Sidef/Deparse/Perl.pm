@@ -102,6 +102,14 @@ local \$| = 1;   # autoflush
 
 HEADER
 
+        if (defined $opts{opt}{w}) {
+            $opts{header} .= '$SIG{__WARN__} = sub { require Carp; Carp::cluck(@_) };';
+        }
+
+        if (defined $opts{opt}{W}) {
+            $opts{header} .= '$SIG{__DIE__} = $SIG{__WARN__} = sub { require Carp; Carp::confess(@_) };';
+        }
+
         if (exists $opts{opt}{P}) {
             my $precision = abs(int($opts{opt}{P}));
             $opts{header} .= "BEGIN { \$Sidef::Types::Number::Number::PREC = 4*$precision; }";

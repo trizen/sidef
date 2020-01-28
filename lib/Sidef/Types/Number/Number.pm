@@ -9330,7 +9330,7 @@ package Sidef::Types::Number::Number {
         my $primes = Math::Prime::Util::GMP::primes($s);
 
         foreach my $p (@$primes) {
-            $count += _prime_count(int($n / $p)) - ++$t + 1;
+            $count += _prime_count(CORE::int($n / $p)) - ++$t + 1;
         }
 
         return $count;
