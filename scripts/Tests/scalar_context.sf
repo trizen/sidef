@@ -1,0 +1,35 @@
+#!/usr/bin/ruby
+
+# Test scalar context (provided by the unary + operator).
+
+var Date = require('Time::Piece')
+
+var d = Date.strptime("2020-02-02", "%Y-%m-%d")
+var a = [d.add(Date.ONE_DAY)]
+var b = +d.add(Date.ONE_DAY)
+
+assert_eq(a, [0, 0, 0, 3, 1, 120, 1, 33, 0])
+assert_eq(b.strftime("%Y-%m-%d"), "2020-02-03")
+
+var palindates = Enumerator({ |f|
+    loop {
+        f(d) if d.strftime("%Y%m%d").is_palindrome
+        d = +d.add(Date.ONE_DAY)
+    }
+})
+
+assert_eq(palindates.first(2).map { .strftime("%Y-%m-%d") }, ["2020-02-02", "2021-12-02"])
+
+do {
+    func foo(n) {
+        (n, n+1, n+2)
+    }
+
+    var a =  foo(42)    # first element
+    var b = +foo(42)    # last element
+
+    assert_eq(a, 42)
+    assert_eq(b, 44)
+}
+
+say "** Test passed!"

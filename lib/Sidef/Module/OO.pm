@@ -29,12 +29,14 @@ package Sidef::Module::OO {
                    : ()
         );
 
+        my $multi_values = wantarray;
+
         my @results = do {
             local *UNIVERSAL::AUTOLOAD;
-            $self->{module}->$method(@args);
+            $multi_values ? ($self->{module}->$method(@args)) : (scalar $self->{module}->$method(@args));
         };
 
-        my $multi_values = wantarray // return;
+        $multi_values // return;
 
         if (@results > 1) {
             @results = map { Sidef::Perl::Perl->to_sidef($_) } @results;

@@ -24,13 +24,15 @@ package Sidef::Module::Func {
                     : ()
                    );
 
+        my $multi_values = wantarray;
+
         my @results = do {
             local *UNIVERSAL::AUTOLOAD;
             no strict 'refs';
-            ($self->{module} . '::' . $func)->(@args);
+            $multi_values ? (($self->{module} . '::' . $func)->(@args)) : scalar(($self->{module} . '::' . $func)->(@args));
         };
 
-        my $multi_values = wantarray // return;
+        $multi_values // return;
 
         if (@results > 1) {
             @results = map { Sidef::Perl::Perl->to_sidef($_) } @results;

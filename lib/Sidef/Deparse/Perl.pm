@@ -1680,7 +1680,7 @@ HEADER
                         }
 
                         if ($method eq '+') {
-                            $code = $self->deparse_args(@{$call->{arg}});
+                            $code = 'scalar' . $self->deparse_args(@{$call->{arg}});
                             next;
                         }
 

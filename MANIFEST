@@ -929,6 +929,7 @@ scripts/Tests/run_length_encoding.sf
 scripts/Tests/run_length_encoding_2.sf
 scripts/Tests/run_length_encoding_3.sf
 scripts/Tests/same_fringe.sf
+scripts/Tests/scalar_context.sf
 scripts/Tests/script.sf
 scripts/Tests/selection_sort.sf
 scripts/Tests/set_any_all.sf
