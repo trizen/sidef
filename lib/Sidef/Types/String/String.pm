@@ -1138,6 +1138,7 @@ package Sidef::Types::String::String {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *has      = \&contains;
     *contain  = \&contains;
     *include  = \&contains;
     *includes = \&contains;
