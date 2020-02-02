@@ -263,15 +263,21 @@ package Sidef::Types::Range::Range {
         $n > 0 or return $self;
 
         my @values;
-        my $iter = $self->iter;
+        my $count = 0;
+        my $iter  = $self->iter;
 
         for (; ;) {
             my $value = $iter->run() // last;
-            push @values, $value;
-            if (@values == $n) {
-                my @copy = @values;
+
+            if (++$count > $n) {
                 shift @values;
-                $block->run(@copy);
+                --$count;
+            }
+
+            push @values, $value;
+
+            if ($count == $n) {
+                $block->run(@values);
             }
         }
 
@@ -285,15 +291,19 @@ package Sidef::Types::Range::Range {
         $n > 0 or return $self;
 
         my @values;
-        my $iter = $self->iter;
+        my $count = 0;
+        my $iter  = $self->iter;
 
         for (; ;) {
             my $value = $iter->run() // do {
                 $block->run(@values) if @values;
                 return $self;
             };
+
             push @values, $value;
-            if (@values == $n) {
+
+            if (++$count == $n) {
+                $count = 0;
                 $block->run(splice(@values));
             }
         }

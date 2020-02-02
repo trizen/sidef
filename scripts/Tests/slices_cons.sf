@@ -29,6 +29,34 @@ do {
 do {
     var arr1 = []
     var arr2 = []
+    r.each_slice(5, {|*a|
+        arr1 << a
+    })
+    a.each_slice(5, {|*a|
+        arr2 << a
+    })
+    assert_eq(arr1, arr2)
+    assert_eq(arr1, [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
+}
+
+do {
+    var arr1 = []
+    var arr2 = []
+    r.each_slice(3, {|*a|
+        arr1 << a
+        break if (a == [4,5,6])
+    })
+    a.each_slice(3, {|*a|
+        arr2 << a
+        break if (a == [4,5,6])
+    })
+    assert_eq(arr1, arr2)
+    assert_eq(arr1, [[1, 2, 3], [4, 5, 6]])
+}
+
+do {
+    var arr1 = []
+    var arr2 = []
     r.each_cons(3, {|*a|
         next if (a == [4,5,6])
         arr1 << a
@@ -39,6 +67,21 @@ do {
     })
     assert_eq(arr1, arr2)
     assert_eq(arr1, [[1, 2, 3], [2, 3, 4], [3, 4, 5], [5, 6, 7], [6, 7, 8], [7, 8, 9], [8, 9, 10]])
+}
+
+do {
+    var arr1 = []
+    var arr2 = []
+    r.each_cons(3, {|*a|
+        arr1 << a
+        break if (a == [4,5,6])
+    })
+    a.each_cons(3, {|*a|
+        arr2 << a
+        break if (a == [4,5,6])
+    })
+    assert_eq(arr1, arr2)
+    assert_eq(arr1, [[1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5, 6]])
 }
 
 do {

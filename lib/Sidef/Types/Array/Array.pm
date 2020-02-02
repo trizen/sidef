@@ -1398,13 +1398,18 @@ package Sidef::Types::Array::Array {
         $n = CORE::int($n);
 
         my @values;
+        my $count = 0;
 
         foreach my $item (@$self) {
-            CORE::push(@values, $item);
-            if (@values == $n) {
-                my @copy = @values;
+            if (++$count > $n) {
                 CORE::shift(@values);
-                $block->run(@copy);
+                --$count;
+            }
+
+            CORE::push(@values, $item);
+
+            if ($count == $n) {
+                $block->run(@values);
             }
         }
 
@@ -1420,13 +1425,18 @@ package Sidef::Types::Array::Array {
 
         my @result;
         my @values;
+        my $count = 0;
 
         foreach my $item (@$self) {
-            CORE::push(@values, $item);
-            if (@values == $n) {
-                my @copy = @values;
+            if (++$count > $n) {
                 CORE::shift(@values);
-                CORE::push(@result, $block->run(@copy));
+                --$count;
+            }
+
+            CORE::push(@values, $item);
+
+            if ($count == $n) {
+                CORE::push(@result, $block->run(@values));
             }
         }
 
