@@ -1356,14 +1356,9 @@ package Sidef::Types::Array::Array {
 
         $n = CORE::int($n);
 
-        my $end = @$self;
-        for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            $block->run(@$self[$i - ($n - 1) .. $i]);
-        }
-
-        my $mod = $end % $n;
-        if ($mod != 0) {
-            $block->run(@$self[$end - $mod .. $end - 1]);
+        my @copy = @$self;
+        while (my @slice = CORE::splice(@copy, 0, $n)) {
+            $block->run(@slice);
         }
 
         $self;
@@ -1397,48 +1392,20 @@ package Sidef::Types::Array::Array {
         bless [map { bless($_) } @new];
     }
 
-    sub slices {
-        my ($self, $n) = @_;
-
-        $n = CORE::int($n);
-
-        $n <= 0
-          && return bless([]);
-
-        my @slices;
-        my $end = @$self;
-        for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            CORE::push(@slices, bless([@$self[$i - ($n - 1) .. $i]]));
-        }
-
-        my $mod = $end % $n;
-        if ($mod != 0) {
-            CORE::push(@slices, bless([@$self[$end - $mod .. $end - 1]]));
-        }
-
-        bless \@slices;
-    }
-
-    sub cons {
-        my ($self, $n) = @_;
-
-        $n = CORE::int($n);
-
-        my @array;
-        foreach my $i ($n - 1 .. $#$self) {
-            CORE::push(@array, bless([@$self[$i - $n + 1 .. $i]]));
-        }
-
-        bless \@array;
-    }
-
     sub each_cons {
         my ($self, $n, $block) = @_;
 
         $n = CORE::int($n);
 
-        foreach my $i ($n - 1 .. $#$self) {
-            $block->run(@$self[$i - $n + 1 .. $i]);
+        my @values;
+
+        foreach my $item (@$self) {
+            CORE::push(@values, $item);
+            if (@values == $n) {
+                my @copy = @values;
+                CORE::shift(@values);
+                $block->run(@copy);
+            }
         }
 
         $self;
@@ -1451,32 +1418,41 @@ package Sidef::Types::Array::Array {
 
         $n = CORE::int($n);
 
-        my @array;
-        foreach my $i ($n - 1 .. $#$self) {
-            CORE::push(@array, $block->run(@$self[$i - $n + 1 .. $i]));
+        my @result;
+        my @values;
+
+        foreach my $item (@$self) {
+            CORE::push(@values, $item);
+            if (@values == $n) {
+                my @copy = @values;
+                CORE::shift(@values);
+                CORE::push(@result, $block->run(@copy));
+            }
         }
 
-        bless \@array;
+        bless \@result;
     }
+
+    *cons = \&map_cons;
 
     sub map_slice {
         my ($self, $n, $block) = @_;
 
+        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
         $n = CORE::int($n);
 
-        my @array;
-        my $end = @$self;
-        for (my $i = $n - 1 ; $i < $end ; $i += $n) {
-            CORE::push(@array, $block->run(@$self[$i - ($n - 1) .. $i]));
+        my @result;
+        my @copy = @$self;
+
+        while (my @slice = CORE::splice(@copy, 0, $n)) {
+            CORE::push(@result, $block->run(@slice));
         }
 
-        my $mod = $end % $n;
-        if ($mod != 0) {
-            CORE::push(@array, $block->run(@$self[$end - $mod .. $end - 1]));
-        }
-
-        bless \@array;
+        bless \@result;
     }
+
+    *slices = \&map_slice;
 
     sub each_index {
         my ($self, $block) = @_;

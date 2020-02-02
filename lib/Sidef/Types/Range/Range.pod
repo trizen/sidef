@@ -133,6 +133,16 @@ Return the
 
 =cut
 
+=head2 cons
+
+Range.cons() -> I<Obj>
+
+Return the
+
+Aliases: I<map_cons>
+
+=cut
+
 =head2 contain
 
 Range.contain() -> I<Obj>
@@ -162,6 +172,22 @@ Return the
 =head2 cross_operator
 
 Range.cross_operator() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each_cons
+
+Range.each_cons() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 each_slice
+
+Range.each_slice() -> I<Obj>
 
 Return the
 
@@ -382,6 +408,16 @@ Return the
 Range.shuffle() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 slices
+
+Range.slices() -> I<Obj>
+
+Return the
+
+Aliases: I<map_slice>
 
 =cut
 

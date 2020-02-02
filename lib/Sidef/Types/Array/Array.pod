@@ -520,6 +520,8 @@ Array.cons() -> I<Obj>
 
 Return the
 
+Aliases: I<map_cons>
+
 =cut
 
 =head2 contains_all
@@ -1202,14 +1204,6 @@ Return the
 
 =cut
 
-=head2 map_cons
-
-Array.map_cons() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 map_kv
 
 Array.map_kv() -> I<Obj>
@@ -1237,14 +1231,6 @@ Array.map_reduce() -> I<Obj>
 Return the
 
 Aliases: I<reduce_map>
-
-=cut
-
-=head2 map_slice
-
-Array.map_slice() -> I<Obj>
-
-Return the
 
 =cut
 
@@ -1697,6 +1683,8 @@ Return the
 Array.slices() -> I<Obj>
 
 Return the
+
+Aliases: I<map_slice>
 
 =cut
 

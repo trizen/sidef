@@ -1,0 +1,73 @@
+#!/usr/bin/ruby
+
+# Tests for Array/Range `each_slice`, `map_slice`, `each_cons` and `map_cons`.
+
+var r = 1..10
+var a = @r
+
+assert_eq(a.slices(3), [[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]])
+assert_eq(a.cons(3), [[1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5, 6], [5, 6, 7], [6, 7, 8], [7, 8, 9], [8, 9, 10]])
+
+assert_eq(a.slices(4), r.slices(4))
+assert_eq(a.cons(4), r.cons(4))
+
+do {
+    var arr1 = []
+    var arr2 = []
+    r.each_slice(3, {|*a|
+        next if (a == [4,5,6])
+        arr1 << a
+    })
+    a.each_slice(3, {|*a|
+        next if (a == [4,5,6])
+        arr2 << a
+    })
+    assert_eq(arr1, arr2)
+    assert_eq(arr1, [[1, 2, 3], [7, 8, 9], [10]])
+}
+
+do {
+    var arr1 = []
+    var arr2 = []
+    r.each_cons(3, {|*a|
+        next if (a == [4,5,6])
+        arr1 << a
+    })
+    a.each_cons(3, {|*a|
+        next if (a == [4,5,6])
+        arr2 << a
+    })
+    assert_eq(arr1, arr2)
+    assert_eq(arr1, [[1, 2, 3], [2, 3, 4], [3, 4, 5], [5, 6, 7], [6, 7, 8], [7, 8, 9], [8, 9, 10]])
+}
+
+do {
+    var arr1 = r.map_cons(3, {|*a|
+        next if (a == [4,5,6])
+        a
+    })
+    var arr2 = a.map_cons(3, {|*a|
+        next if (a == [4,5,6])
+        a
+    })
+    assert_eq(arr1, arr2)
+    assert_eq(arr1, [[1, 2, 3], [2, 3, 4], [3, 4, 5], [5, 6, 7], [6, 7, 8], [7, 8, 9], [8, 9, 10]])
+}
+
+do {
+    var arr1 = r.map_cons(3, {|*a|
+        next if (a == [4,5,6])
+        a.sum
+    })
+    var arr2 = a.map_cons(3, {|*a|
+        next if (a == [4,5,6])
+        a.sum
+    })
+    assert_eq(arr1, arr2)
+    assert_eq(arr1, [6, 9, 12, 18, 21, 24, 27])
+}
+
+assert_eq(r, 1..10)
+assert_eq(a, [1,2,3,4,5,6,7,8,9,10])
+
+say "** Test passed!"
