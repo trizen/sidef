@@ -28,10 +28,8 @@ lib/Sidef/Sys/Sig.pm
 lib/Sidef/Sys/Sig.pod
 lib/Sidef/Sys/Sys.pm
 lib/Sidef/Sys/Sys.pod
-lib/Sidef/Time/Gmtime.pm
-lib/Sidef/Time/Gmtime.pod
-lib/Sidef/Time/Localtime.pm
-lib/Sidef/Time/Localtime.pod
+lib/Sidef/Time/Date.pm
+lib/Sidef/Time/Date.pod
 lib/Sidef/Time/Time.pm
 lib/Sidef/Time/Time.pod
 lib/Sidef/Types/Array/Array.pm
@@ -709,6 +707,7 @@ scripts/Tests/cyclic_dclone.sf
 scripts/Tests/cyclic_references_eq_cmp.sf
 scripts/Tests/data_digging.sf
 scripts/Tests/data_handle.sf
+scripts/Tests/date_time.sf
 scripts/Tests/dec_2016_changes.sf
 scripts/Tests/def_primitive_type.sf
 scripts/Tests/def_primitive_type_2.sf

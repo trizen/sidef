@@ -30,11 +30,13 @@ Return the
 
 =cut
 
-=head2 gmtime
+=head2 gmt
 
-Time.gmtime() -> I<Obj>
+Time.gmt() -> I<Obj>
 
 Return the
+
+Aliases: I<gmtime>
 
 =cut
 

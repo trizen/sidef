@@ -4,19 +4,19 @@
 ## https://rosettacode.org/wiki/Cheryl%27s_Birthday
 #
 
-struct Date(day, month)
+struct date(day, month)
 
 var dates = [
-    Date(15, "May"),
-    Date(16, "May"),
-    Date(19, "May"),
-    Date(17, "June"),
-    Date(18, "June"),
-    Date(14, "July"),
-    Date(16, "July"),
-    Date(14, "August"),
-    Date(15, "August"),
-    Date(17, "August")
+    date(15, "May"),
+    date(16, "May"),
+    date(19, "May"),
+    date(17, "June"),
+    date(18, "June"),
+    date(14, "July"),
+    date(16, "July"),
+    date(14, "August"),
+    date(15, "August"),
+    date(17, "August")
 ]
 
 var filtered = dates.grep {

@@ -1,0 +1,459 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Time::Date
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+var obj = Date(...)
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+       * Sidef::Object::Object
+
+=head1 METHODS
+
+=head2 !=
+
+I<Obj> B<!=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>, I<add_seconds>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sub>, I<subtract>
+
+=cut
+
+=head2 <
+
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <=
+
+I<Obj> B<E<lt>=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<le>
+
+=cut
+
+=head2 <=>
+
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 >=
+
+I<Obj> B<E<gt>=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ge>
+
+=cut
+
+=head2 add_days
+
+Date.add_days() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 add_months
+
+Date.add_months() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 add_years
+
+Date.add_years() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 call
+
+Date.call() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 date
+
+Date.date() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 day
+
+Date.day() -> I<Obj>
+
+Return the
+
+Aliases: I<mday>, I<month_day>
+
+=cut
+
+=head2 dmy
+
+Date.dmy() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Date.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 epoch
+
+Date.epoch() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 format
+
+Date.format() -> I<Obj>
+
+Return the
+
+Aliases: I<strftime>
+
+=cut
+
+=head2 fullmonth
+
+Date.fullmonth() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gmt
+
+Date.gmt() -> I<Obj>
+
+Return the
+
+Aliases: I<gmtime>
+
+=cut
+
+=head2 hour
+
+Date.hour() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 isdst
+
+Date.isdst() -> I<Obj>
+
+Return the
+
+Aliases: I<daylight_savings>
+
+=cut
+
+=head2 julian_day
+
+Date.julian_day() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 local
+
+Date.local() -> I<Obj>
+
+Return the
+
+Aliases: I<localtime>
+
+=cut
+
+=head2 mdy
+
+Date.mdy() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 min
+
+Date.min() -> I<Obj>
+
+Return the
+
+Aliases: I<minute>
+
+=cut
+
+=head2 mon
+
+Date.mon() -> I<Obj>
+
+Return the
+
+Aliases: I<month>
+
+=cut
+
+=head2 monname
+
+Date.monname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 month_last_day
+
+Date.month_last_day() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 now
+
+Date.now() -> I<Obj>
+
+Return the
+
+Aliases: I<today>
+
+=cut
+
+=head2 parse
+
+Date.parse() -> I<Obj>
+
+Return the
+
+Aliases: I<strptime>
+
+=cut
+
+=head2 sec
+
+Date.sec() -> I<Obj>
+
+Return the
+
+Aliases: I<second>
+
+=cut
+
+=head2 time
+
+Date.time() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_s
+
+Date.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<cdate>, I<ctime>, I<to_str>
+
+=cut
+
+=head2 truncate_to_day
+
+Date.truncate_to_day() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 truncate_to_hour
+
+Date.truncate_to_hour() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 truncate_to_minute
+
+Date.truncate_to_minute() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 truncate_to_month
+
+Date.truncate_to_month() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 truncate_to_quarter
+
+Date.truncate_to_quarter() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 truncate_to_second
+
+Date.truncate_to_second() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 truncate_to_year
+
+Date.truncate_to_year() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 wday
+
+Date.wday() -> I<Obj>
+
+Return the
+
+Aliases: I<week_day>
+
+=cut
+
+=head2 wdayname
+
+Date.wdayname() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 week
+
+Date.week() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 yday
+
+Date.yday() -> I<Obj>
+
+Return the
+
+Aliases: I<year_day>
+
+=cut
+
+=head2 year
+
+Date.year() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ymd
+
+Date.ymd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 yy
+
+Date.yy() -> I<Obj>
+
+Return the
+
+=cut

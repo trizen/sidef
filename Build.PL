@@ -53,6 +53,7 @@ my $builder = Module::Build->new(
                  'Fcntl'                    => 0,
                  'Encode'                   => 0,
                  'Scalar::Util'             => 0,
+                 'Time::Piece'              => 0,
                  'Time::HiRes'              => 0,
                  'Getopt::Std'              => 0,
                  'Term::ReadLine'           => 0,

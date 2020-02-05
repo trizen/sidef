@@ -82,6 +82,9 @@ package Sidef::Deparse::Perl {
                   Sidef::Sys::Sys                         Sidef::Sys::Sys
                   Sidef::Perl::Perl                       Sidef::Perl::Perl
                   Sidef::Math::Math                       Sidef::Math::Math
+
+                  Sidef::Time::Time                       Sidef::Time::Time
+                  Sidef::Time::Date                       Sidef::Time::Date
                   )
             },
 
@@ -1376,9 +1379,6 @@ HEADER
                 #local \$Sidef::PARSER->{ref_vars_refs} = \$Sidef::EVALS{$refaddr}{ref_vars_refs};
                 \$Sidef::PARSER->parse_script(code => do{my\$o=~ . $self->deparse_args($obj->{expr}) . qq~;\\"\$o"});
             })}~;
-        }
-        elsif ($ref eq 'Sidef::Time::Time') {
-            $code = $ref . '->new';
         }
         elsif ($ref eq 'Sidef::Types::Number::Complex') {
             my ($real, $imag) = $obj->reals;

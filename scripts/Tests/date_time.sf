@@ -1,0 +1,61 @@
+#!/usr/bin/ruby
+
+# Tests for the "Date" built-in type.
+
+var palindates = Enumerator({ |f|
+    var d = Date.strptime("2020-02-02", "%Y-%m-%d")
+    loop {
+        f(d) if d.strftime("%Y%m%d").is_palindrome
+        d = d.add_days(1)
+    }
+})
+
+var dates = palindates.first(3)
+
+assert_eq(
+    dates.map { .strftime("%Y-%m-%d") },
+    ["2020-02-02", "2021-12-02", "2030-03-02"]
+)
+
+assert_eq(dates.sort, dates)
+assert_eq(dates.flip.sort, dates)
+
+dates.cons(2, {|a,b|
+    assert(a < b)
+    assert(a <= b)
+
+    assert_ne(a, b)
+
+    assert(b > a)
+    assert(b >= a)
+})
+
+dates.flip.cons(2, {|a,b|
+    assert(a > b)
+    assert(a >= b)
+
+    assert_ne(a, b)
+
+    assert(b < a)
+    assert(b <= a)
+})
+
+assert(dates[0] == dates[0])
+assert(dates[-1] == dates[-1])
+assert(dates[0] != dates[-1])
+assert(dates[-1] != dates[0])
+
+assert_ne(!(dates[0] != dates[-1]))
+assert_ne(!(dates[-1] != dates[0]))
+
+assert(!(dates[0] == dates[-1]))
+assert(!(dates[-1] == dates[0]))
+
+assert_eq(dates[0].add_days(2).ymd, "2020-02-04")
+assert_eq(dates[0].add_months(2).ymd, "2020-04-02")
+assert_eq(dates[0].add_years(2).ymd, "2022-02-02")
+
+assert_eq(dates[0].add_days(2) - dates[0], 2*86400)
+assert_eq(dates[0].add_days(2) - 2*86400 -> ymd, "2020-02-02")
+
+say "** Test passed!"

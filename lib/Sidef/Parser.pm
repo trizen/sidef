@@ -93,6 +93,7 @@ package Sidef::Parser {
                      | Perl\b                         (?{ state $x = bless({}, 'Sidef::Perl::Perl') })
                      | Math\b                         (?{ state $x = bless({}, 'Sidef::Math::Math') })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new })
+                     | Date\b                         (?{ state $x = Sidef::Time::Date->new })
                      | \$\.                           (?{ state $x = bless({name => '$.'}, 'Sidef::Variable::Magic') })
                      | \$\?                           (?{ state $x = bless({name => '$?'}, 'Sidef::Variable::Magic') })
                      | \$\$                           (?{ state $x = bless({name => '$$'}, 'Sidef::Variable::Magic') })
@@ -215,6 +216,7 @@ package Sidef::Parser {
                   Sig
                   Regex Regexp
                   Time
+                  Date
                   Perl
                   Sidef
                   Object

@@ -12,21 +12,24 @@ package Sidef::Time::Time {
         my (undef, $sec) = @_;
 
         if (defined $sec) {
-            if (ref($sec)) {
-                $sec = CORE::int($sec);
-            }
+            $sec = CORE::int($sec) if ref($sec);
         }
         else {
             $sec = time;
         }
 
-        bless \$sec, __PACKAGE__;
+        bless {sec => $sec,};
     }
 
     *call = \&new;
 
     sub get_value {
-        ${$_[0]} // CORE::time;
+
+        if (ref($_[0]) ne __PACKAGE__) {
+            return CORE::time;
+        }
+
+        $_[0]->{sec} // CORE::time;
     }
 
     sub time {
@@ -51,15 +54,17 @@ package Sidef::Time::Time {
 
     sub localtime {
         my ($self) = @_;
-        Sidef::Time::Localtime->new($self->get_value);
+        Sidef::Time::Date->localtime($self->get_value);
     }
 
     *local = \&localtime;
 
     sub gmtime {
         my ($self) = @_;
-        Sidef::Time::Gmtime->new($self->get_value);
+        Sidef::Time::Date->gmtime($self->get_value);
     }
+
+    *gmt = \&gmtime;
 
     sub dump {
         my ($self) = @_;
@@ -72,7 +77,6 @@ package Sidef::Time::Time {
     }
 
     *to_s = \&to_str;
-
 };
 
 1;

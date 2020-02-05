@@ -7,4 +7,4 @@
 var time = Time.local;
 say time.ctime;
 say time.strftime("%Y-%m-%d");
-say time.strftime("%A, %B %d, %Y");
+say time.strftime("%A, %B %d, %Y");

@@ -48,10 +48,8 @@ provides:
     file: lib/Sidef/Sys/Sig.pm
   Sidef::Sys::Sys:
     file: lib/Sidef/Sys/Sys.pm
-  Sidef::Time::Gmtime:
-    file: lib/Sidef/Time/Gmtime.pm
-  Sidef::Time::Localtime:
-    file: lib/Sidef/Time/Localtime.pm
+  Sidef::Time::Date:
+    file: lib/Sidef/Time/Date.pm
   Sidef::Time::Time:
     file: lib/Sidef/Time/Time.pm
   Sidef::Types::Array::Array:
@@ -147,6 +145,7 @@ requires:
   Socket: '0'
   Term::ReadLine: '0'
   Time::HiRes: '0'
+  Time::Piece: '0'
   parent: '0'
   perl: v5.18.0
   utf8: '0'

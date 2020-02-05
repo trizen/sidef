@@ -17,9 +17,9 @@ var mons = [
 
 var t = Time.local
 
-var day  = (t.day);
-var mon  = (t.mon + 1);
-var year = (t.year + 1900);
+var day  = t.day;
+var mon  = t.mon;
+var year = t.year;
 
 if (year % 400 == 0 || (year % 4 == 0 && (year % 100 != 0))) {
     mons[1] = 29

@@ -2,11 +2,11 @@
 
 # Test scalar context (provided by the unary + operator).
 
-var Date = require('Time::Piece')
+var TimePiece = require('Time::Piece')
 
-var d = Date.strptime("2020-02-02", "%Y-%m-%d")
-var a = [d.add(Date.ONE_DAY)]
-var b = +d.add(Date.ONE_DAY)
+var d = TimePiece.strptime("2020-02-02", "%Y-%m-%d")
+var a = [d.add(TimePiece.ONE_DAY)]
+var b = +d.add(TimePiece.ONE_DAY)
 
 assert_eq(a, [0, 0, 0, 3, 1, 120, 1, 33, 0])
 assert_eq(b.strftime("%Y-%m-%d"), "2020-02-03")
@@ -14,7 +14,7 @@ assert_eq(b.strftime("%Y-%m-%d"), "2020-02-03")
 var palindates = Enumerator({ |f|
     loop {
         f(d) if d.strftime("%Y%m%d").is_palindrome
-        d = +d.add(Date.ONE_DAY)
+        d = +d.add(TimePiece.ONE_DAY)
     }
 })
 

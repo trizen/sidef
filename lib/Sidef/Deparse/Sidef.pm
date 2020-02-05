@@ -64,6 +64,7 @@ package Sidef::Deparse::Sidef {
 
                   Sidef::Perl::Perl                       Perl
                   Sidef::Time::Time                       Time
+                  Sidef::Time::Date                       Date
                   Sidef::Sys::Sig                         Sig
                   Sidef::Sys::Sys                         Sys
                   Sidef::Meta::Unimplemented              ...
