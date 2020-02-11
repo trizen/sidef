@@ -12615,6 +12615,9 @@ package Sidef::Types::Number::Number {
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
 
+        Math::GMPz::Rmpz_cmp_ui($n, 1) >= 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
         if (defined($k)) {
             _valid(\$k);
             $k = _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE;

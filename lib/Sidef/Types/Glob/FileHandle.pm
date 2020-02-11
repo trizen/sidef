@@ -29,6 +29,8 @@ package Sidef::Types::Glob::FileHandle {
         $_[0]{parent};
     }
 
+    *file = \&parent;
+
     sub is_on_tty {
         (-t $_[0]{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -274,27 +276,26 @@ package Sidef::Types::Glob::FileHandle {
 
     sub tell {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(tell($self->{fh}));
+        Sidef::Types::Number::Number->new(CORE::tell($self->{fh}));
     }
 
     sub seek {
         my ($self, $pos, $whence) = @_;
-        seek($self->{fh}, $pos, $whence,)
+        CORE::seek($self->{fh}, $pos, $whence)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub sysseek {
         my ($self, $pos, $whence) = @_;
-
-        sysseek($self->{fh}, $pos, $whence,)
+        CORE::sysseek($self->{fh}, $pos, $whence)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub fileno {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(fileno($self->{fh}));
+        Sidef::Types::Number::Number->new(CORE::fileno($self->{fh}));
     }
 
     sub lock {

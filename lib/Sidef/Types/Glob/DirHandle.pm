@@ -32,6 +32,8 @@ package Sidef::Types::Glob::DirHandle {
         $_[0]{dir};
     }
 
+    *parent = \&dir;
+
     sub entries {
         my ($self) = @_;
 
