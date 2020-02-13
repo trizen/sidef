@@ -1634,7 +1634,11 @@ package Sidef::Types::Array::Array {
             CORE::push(@{$hash{$block->run($item)}}, $item);
         }
 
-        Sidef::Types::Hash::Hash->new(map { $_ => bless($hash{$_}) } CORE::keys(%hash));
+        foreach my $value (CORE::values(%hash)) {
+            bless $value;
+        }
+
+        Sidef::Types::Hash::Hash->new(\%hash);
     }
 
     *group_by = \&group;
@@ -1764,7 +1768,7 @@ package Sidef::Types::Array::Array {
             @freq{@{$r->{items}}} = ($n) x scalar(@{$r->{items}});
         }
 
-        Sidef::Types::Hash::Hash->new(%freq);
+        Sidef::Types::Hash::Hash->new(\%freq);
     }
 
     sub freq {
@@ -1779,11 +1783,11 @@ package Sidef::Types::Array::Array {
             $hash{$item}++;
         }
 
-        foreach my $key (CORE::keys %hash) {
+        foreach my $key (CORE::keys(%hash)) {
             $hash{$key} = Sidef::Types::Number::Number->_set_uint($hash{$key});
         }
 
-        Sidef::Types::Hash::Hash->new(%hash);
+        Sidef::Types::Hash::Hash->new(\%hash);
     }
 
     sub first_by {
@@ -2653,7 +2657,7 @@ package Sidef::Types::Array::Array {
             $table{$word} = $item;
         }
 
-        Sidef::Types::Hash::Hash->new(%table);
+        Sidef::Types::Hash::Hash->new(\%table);
     }
 
     *abbreviations = \&abbrev;

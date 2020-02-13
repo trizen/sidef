@@ -96,7 +96,7 @@ package Sidef::Types::Regex::Match {
     sub named_captures {
         my ($self) = @_;
 
-        my $hash = Sidef::Types::Hash::Hash->new();
+        my $hash = Sidef::Types::Hash::Hash->new;
         while (my ($key, $value) = each %{$self->{named_captures}}) {
             $hash->{$key} = Sidef::Types::String::String->new($value);
         }

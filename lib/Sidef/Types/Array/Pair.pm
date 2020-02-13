@@ -68,14 +68,14 @@ package Sidef::Types::Array::Pair {
 
     sub to_hash {
         my ($self) = @_;
-        Sidef::Types::Hash::Hash->new(@{$self});
+        Sidef::Types::Hash::Hash->new(@$self);
     }
 
     *to_h = \&to_hash;
 
     sub to_array {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(@{$self});
+        Sidef::Types::Array::Array->new(@$self);
     }
 
     *to_a = \&to_array;

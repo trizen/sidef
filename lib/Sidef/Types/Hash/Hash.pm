@@ -15,8 +15,12 @@ package Sidef::Types::Hash::Hash {
     use Sidef::Types::Block::Block;
 
     sub new {
-        my (undef, %pairs) = @_;
-        bless \%pairs;
+        (@_ == 2 && ref($_[1]) eq 'HASH')
+          ? bless($_[1])
+          : do {
+            shift(@_);
+            bless {@_};
+          };
     }
 
     *call = \&new;
