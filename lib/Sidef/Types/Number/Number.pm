@@ -12262,6 +12262,17 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_cyclic {     # OEIS: A003277
+        my ($x) = @_;
+
+        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+        $x = _big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE;
+
+        (Math::Prime::Util::GMP::gcd(Math::Prime::Util::GMP::totient($x), $x) == 1)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_carmichael {    # OEIS: A002997
         my ($x) = @_;
         __is_int__($$x)
