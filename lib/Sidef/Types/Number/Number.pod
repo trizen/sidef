@@ -1436,6 +1436,16 @@ Aliases: I<primes_each>
 
 =cut
 
+=head2 each_squarefree
+
+Number.each_squarefree() -> I<Obj>
+
+Return the
+
+Aliases: I<squarefree_each>
+
+=cut
+
 =head2 ecm_factor
 
 Number.ecm_factor() -> I<Obj>
@@ -3919,6 +3929,14 @@ Return the
 =head2 square_divisors
 
 Number.square_divisors() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 squarefree
+
+Number.squarefree() -> I<Obj>
 
 Return the
 

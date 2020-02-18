@@ -781,6 +781,73 @@ package Sidef::Types::Number::Number {
     }
 
     #
+    ## Generic each
+    #
+
+    sub _generic_each {
+        my ($from, $to, $block, $step_function, $buffer_callback) = @_;
+
+        # `from` and `to` are Math::GMPz objects
+        # `block` is a Sidef callback block
+        # `step_function` is a Perl subroutine to compute the step given the initial current value
+        # `buffer_callback` is a Perl subroutine that returns an ARRAY ref with the values in the given range
+
+        if (Math::GMPz::Rmpz_cmp($from, $to) > 0) {
+            return ZERO;
+        }
+
+        my @buffer;
+        my $done  = 0;
+        my $count = 0;
+
+        for (; ;) {
+
+            if (!@buffer) {
+
+                last if $done;
+
+                my $step = $step_function->($from);
+
+                if ($step <= 0) {
+                    $step = 1e6;
+                }
+
+                my $upto = $from + $step;
+
+                if ($upto >= $to) {
+                    $done = 1;
+                    $upto = $to;
+                }
+
+                ## say ":: Sieving ($from, $upto) with step = $step";
+                @buffer = @{$buffer_callback->($from, $upto)};
+                $from   = $upto + 1;
+                @buffer || next;
+            }
+
+            my $number = shift(@buffer);
+
+            if ($number < ULONG_MAX) {
+                $number = __PACKAGE__->_set_uint($number);
+            }
+
+            #elsif (ref($number) eq 'Math::GMPz') {
+            ## already a Math::GMPz object
+            #$number = bless \$number;
+            #    $number = bless \$number;
+            #}
+            else {
+                $number = bless \Math::GMPz::Rmpz_init_set_str("$number", 10);
+            }
+
+            ++$count;
+            $block->run($number);
+        }
+
+        __PACKAGE__->_set_uint($count);
+    }
+
+    #
     ## Internal conversion methods
     #
 
@@ -10046,56 +10113,24 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_set_ui($from, 2);
         }
 
-        if (Math::GMPz::Rmpz_cmp($from, $to) > 0) {
-            return ZERO;
-        }
-
-        my @buffer;
-
-        my $size  = 2e3;
-        my $done  = 0;
-        my $count = 0;
-
-        for (; ;) {
-
-            if (!@buffer) {
-
-                last if $done;
+#<<<
+        _generic_each(
+            $from, $to, $block,
+            sub {
+                my ($from) = @_;
 
                 my $t    = Math::GMPz::Rmpz_get_d($from);
-                my $step = _nth_prime_lower($t + CORE::log($t) * $size) - _nth_prime_lower($t);
+                my $step = _nth_prime_lower($t + CORE::log($t) * 2e3) - _nth_prime_lower($t);
 
                 if ($step <= 0 or $step > 1e6) {
                     $step = 1e6;
                 }
 
-                my $upto = $from + $step;
-
-                if ($upto >= $to) {
-                    $done = 1;
-                    $upto = $to;
-                }
-
-                ##say ":: Sieving ($from, $upto) with step = $step";
-                @buffer = Math::Prime::Util::GMP::sieve_primes($from, $upto);
-                $from   = $upto + 1;
-                @buffer || next;
-            }
-
-            my $prime = shift(@buffer);
-
-            if ($prime < ULONG_MAX) {
-                $prime = __PACKAGE__->_set_uint($prime);
-            }
-            else {
-                $prime = bless \Math::GMPz::Rmpz_init_set_str("$prime", 10);
-            }
-
-            ++$count;
-            $block->run($prime);
-        }
-
-        __PACKAGE__->_set_uint($count);
+                $step;
+            },
+            sub { Math::Prime::Util::GMP::primes($_[0], $_[1]) }
+        );
+#>>>
     }
 
     *each_prime = \&primes_each;
@@ -12301,6 +12336,85 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    sub _squarefree_sieve {
+        my ($from, $to) = @_;
+
+        my @squarefree;
+
+#<<<
+        if ($HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($from)) {
+            Math::Prime::Util::forsquarefree(sub {
+                push @squarefree, "$_";
+            }, $from, $to);
+        }
+        else {
+            for (my $t = Math::GMPz::Rmpz_init_set($from) ; Math::GMPz::Rmpz_cmp($t, $to) <= 0 ; Math::GMPz::Rmpz_add_ui($t, $t, 1)) {
+                my $s = Math::GMPz::Rmpz_get_str($t, 10);
+                if (Math::Prime::Util::GMP::moebius($s)) {
+                    push @squarefree, $s;
+                }
+            }
+        }
+#>>>
+
+        return \@squarefree;
+    }
+
+    sub squarefree {
+        my ($from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            $from = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return Sidef::Types::Array::Array->new);
+            $to   = Math::GMPz::Rmpz_init_set(_any2mpz($$to)   // return Sidef::Types::Array::Array->new);
+        }
+        else {
+            $to   = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return Sidef::Types::Array::Array->new);
+            $from = Math::GMPz::Rmpz_init_set_ui(1);
+        }
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            Math::GMPz::Rmpz_set_ui($from, 1);
+        }
+
+        if (Math::GMPz::Rmpz_sgn($to) < 0) {
+            Math::GMPz::Rmpz_set_ui($to, 0);
+        }
+
+#<<<
+        my @squarefree = map {
+                ($_ < ULONG_MAX)
+                    ? __PACKAGE__->_set_uint($_)
+                    : __PACKAGE__->_set_str('int', $_)
+        } @{_squarefree_sieve($from, $to)};
+#>>>
+
+        Sidef::Types::Array::Array->new(\@squarefree);
+    }
+
+    sub squarefree_each {
+        my ($from, $to, $block) = @_;
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return undef);
+            $to   = Math::GMPz::Rmpz_init_set(_any2mpz($$to)   // return undef);
+        }
+        else {
+            $block = $to;
+            $to    = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return undef);
+            $from  = Math::GMPz::Rmpz_init_set_ui(1);
+        }
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            Math::GMPz::Rmpz_set_ui($from, 1);
+        }
+
+        _generic_each($from, $to, $block, sub { 1e4 }, sub { _squarefree_sieve($_[0], $_[1]) });
+    }
+
+    *each_squarefree = \&squarefree_each;
 
     sub is_squarefree {
         my ($n) = @_;
