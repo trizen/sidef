@@ -1426,6 +1426,16 @@ Return the
 
 =cut
 
+=head2 each_prime
+
+Number.each_prime() -> I<Obj>
+
+Return the
+
+Aliases: I<primes_each>
+
+=cut
+
 =head2 ecm_factor
 
 Number.ecm_factor() -> I<Obj>

@@ -8518,6 +8518,11 @@ package Sidef::Types::Number::Number {
         return ($point->[0], $point->[1]);
     }
 
+    sub _nth_prime_lower {
+        my ($n) = @_;
+        CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n)) - 1));
+    }
+
     sub _prime_count_range {
         my ($x, $y) = @_;
 
@@ -8528,13 +8533,12 @@ package Sidef::Types::Number::Number {
             return 0;
         }
 
-        my $nth_prime_lower = sub {
-            my ($n) = @_;
-            CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n)) - 1));
-        };
-
         my $count = 0;
-        my $step  = $nth_prime_lower->($y + CORE::log($y) * 2e3) - $nth_prime_lower->($y);
+        my $step  = _nth_prime_lower($y + CORE::log($y) * 2e3) - _nth_prime_lower($y);
+
+        if ($step <= 0 or $step > 1e8) {
+            $step = 1e6;
+        }
 
         for (my $i = $x - 1 ; $i <= $y ; $i += $step) {
 
@@ -8554,7 +8558,7 @@ package Sidef::Types::Number::Number {
 
         state $primepi_lookup = {
 
-            # Number of primes bellow 10^n
+            # Number of primes below 10^n
             # OEIS: https://oeis.org/A006880
             "10"                           => "4",
             "100"                          => "25",
@@ -10023,6 +10027,78 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    sub primes_each {
+        my ($from, $to, $block) = @_;
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return undef);
+            $to   = Math::GMPz::Rmpz_init_set(_any2mpz($$to)   // return undef);
+        }
+        else {
+            $block = $to;
+            $to    = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return undef);
+            $from  = Math::GMPz::Rmpz_init_set_ui(2);
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($from, 1) <= 0) {
+            Math::GMPz::Rmpz_set_ui($from, 2);
+        }
+
+        if (Math::GMPz::Rmpz_cmp($from, $to) > 0) {
+            return ZERO;
+        }
+
+        my @buffer;
+
+        my $size  = 2e3;
+        my $done  = 0;
+        my $count = 0;
+
+        for (; ;) {
+
+            if (!@buffer) {
+
+                last if $done;
+
+                my $t    = Math::GMPz::Rmpz_get_d($from);
+                my $step = _nth_prime_lower($t + CORE::log($t) * $size) - _nth_prime_lower($t);
+
+                if ($step <= 0 or $step > 1e6) {
+                    $step = 1e6;
+                }
+
+                my $upto = $from + $step;
+
+                if ($upto >= $to) {
+                    $done = 1;
+                    $upto = $to;
+                }
+
+                ##say ":: Sieving ($from, $upto) with step = $step";
+                @buffer = Math::Prime::Util::GMP::sieve_primes($from, $upto);
+                $from   = $upto + 1;
+                @buffer || next;
+            }
+
+            my $prime = shift(@buffer);
+
+            if ($prime < ULONG_MAX) {
+                $prime = __PACKAGE__->_set_uint($prime);
+            }
+            else {
+                $prime = bless \Math::GMPz::Rmpz_init_set_str("$prime", 10);
+            }
+
+            ++$count;
+            $block->run($prime);
+        }
+
+        __PACKAGE__->_set_uint($count);
+    }
+
+    *each_prime = \&primes_each;
 
     sub primes {
         my ($x, $y) = @_;

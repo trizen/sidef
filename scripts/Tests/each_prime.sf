@@ -1,0 +1,108 @@
+#!/usr/bin/ruby
+
+# Tests for `each_prime(from, to, { ... })`
+
+10.times {
+    var from = 1e5.irand
+    var to   = 1e5.irand
+
+    say "#{from} - #{to}"
+
+    var P = gather {
+        var pi = each_prime(from, to, {|p|
+            take(p)
+        })
+        assert_eq(pi, prime_count(from, to))
+    }
+
+    assert_eq(P, primes(from, to))
+}
+
+assert_eq(
+    gather {
+        1e4.primes_each {|p|
+            take(p)
+        }
+    },
+    1e4.primes
+)
+
+assert_eq(
+    gather {
+        var pi = primes_each(-10, 100, {|p|
+            take(p)
+        })
+        assert_eq(pi, 25)
+    },
+    100.primes
+)
+
+assert_eq(
+    gather {
+        var pi = primes_each(-100, {|p|
+            take(p)
+        })
+        assert_eq(pi, 0)
+    },
+    []
+)
+
+assert_eq(
+    gather {
+        primes_each(503, 503, {|p|
+            take(p)
+        })
+    },
+    [503]
+)
+
+assert_eq(
+    gather {
+        var pi = primes_each(503+1, 503, {|p|
+            take(p)
+        })
+        assert_eq(pi, 0)
+    },
+    []
+)
+
+assert_eq(
+    gather {
+        primes_each(503-1, 503, {|p|
+            take(p)
+        })
+    },
+    [503]
+)
+
+assert_eq(
+    gather {
+        var pi = primes_each(503-1, 503+1, {|p|
+            take(p)
+        })
+        assert_eq(pi, 1)
+    },
+    [503]
+)
+
+assert_eq(
+    gather {
+        var pi = primes_each(503*863, 503*863, {|p|
+            take(p)
+        })
+        assert_eq(pi, 0)
+    },
+    []
+)
+
+assert_eq(
+    gather {
+        var pi = primes_each(1e7.prev_prime + 1, 1e7.next_prime - 1, {|p|
+            take(p)
+        })
+        assert_eq(pi, 0)
+    },
+    []
+)
+
+say "** Test passed!"
