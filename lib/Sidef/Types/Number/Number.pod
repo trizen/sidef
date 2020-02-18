@@ -3298,6 +3298,14 @@ Return the
 
 =cut
 
+=head2 powerful_count
+
+Number.powerful_count() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 pp1_factor
 
 Number.pp1_factor() -> I<Obj>

@@ -12745,6 +12745,50 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@powerful);
     }
 
+    sub powerful_count {    # count of k-powerful numbers <= n
+        my ($n, $k) = @_;
+
+        $n = _any2mpz($$n) // return ZERO;
+        Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // return ZERO;
+        }
+        else {
+            $k = 2;
+        }
+
+        my $t     = Math::GMPz::Rmpz_init();
+        my $count = Math::GMPz::Rmpz_init_set_ui(0);
+
+        sub {
+            my ($m, $r) = @_;
+
+            Math::GMPz::Rmpz_tdiv_q($t, $n, $m);
+            Math::GMPz::Rmpz_root($t, $t, $r);
+
+            if ($r <= $k) {
+                Math::GMPz::Rmpz_add($count, $count, $t);
+                return;
+            }
+
+            foreach my $v (1 .. $t) {
+
+                if ($r > $k) {
+                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1 or next;
+                    Math::Prime::Util::GMP::moebius($v) == 0 and next;
+                }
+
+                Math::GMPz::Rmpz_ui_pow_ui($t, $v, $r);
+                __SUB__->($m * $t, $r - 1);
+            }
+          }
+          ->(Math::GMPz::Rmpz_init_set_ui(1), 2 * $k - 1);
+
+        bless \$count;
+    }
+
     sub is_powerful {
         my ($n, $k) = @_;
 
