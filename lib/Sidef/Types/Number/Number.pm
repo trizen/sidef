@@ -12696,13 +12696,62 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub powerful {    # k-powerful numbers <= n
+        my ($n, $k) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $k = 2;
+        }
+
+        my @powerful;
+        my $t = Math::GMPz::Rmpz_init();
+
+        sub {
+            my ($m, $r) = @_;
+
+            if ($r < $k) {
+                push @powerful, $m;
+                return;
+            }
+
+            Math::GMPz::Rmpz_tdiv_q($t, $n, $m);
+            Math::GMPz::Rmpz_root($t, $t, $r);
+
+            foreach my $v (1 .. $t) {
+
+                if ($r > $k) {
+                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1 or next;
+                    Math::Prime::Util::GMP::moebius($v) == 0 and next;
+                }
+
+                Math::GMPz::Rmpz_ui_pow_ui($t, $v, $r);
+                __SUB__->($m * $t, $r - 1);
+            }
+          }
+          ->(Math::GMPz::Rmpz_init_set_ui(1), 2 * $k - 1);
+
+        @powerful = sort { Math::GMPz::Rmpz_cmp($a, $b) } @powerful;
+        @powerful = map  { bless \$_ } @powerful;
+
+        Sidef::Types::Array::Array->new(\@powerful);
+    }
+
     sub is_powerful {
         my ($n, $k) = @_;
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        Math::GMPz::Rmpz_cmp_ui($n, 1) >= 0
+        Math::GMPz::Rmpz_sgn($n) > 0
           or return Sidef::Types::Bool::Bool::FALSE;
 
         if (defined($k)) {

@@ -3290,6 +3290,14 @@ Aliases: I<hammingweight>
 
 =cut
 
+=head2 powerful
+
+Number.powerful() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 pp1_factor
 
 Number.pp1_factor() -> I<Obj>

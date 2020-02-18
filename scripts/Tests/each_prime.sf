@@ -77,6 +77,33 @@ assert_eq(
 
 assert_eq(
     gather {
+        primes_each(503, 503-1, {|p|
+            take(p)
+        })
+    },
+    []
+)
+
+assert_eq(
+    gather {
+        primes_each(503.prev_prime, 503-1, {|p|
+            take(p)
+        })
+    },
+    [499]
+)
+
+assert_eq(
+    gather {
+        primes_each(503.prev_prime + 1, 503-1, {|p|
+            take(p)
+        })
+    },
+    []
+)
+
+assert_eq(
+    gather {
         var pi = primes_each(503-1, 503+1, {|p|
             take(p)
         })
@@ -103,6 +130,16 @@ assert_eq(
         assert_eq(pi, 0)
     },
     []
+)
+
+assert_eq(
+    gather {
+        var pi = primes_each(1e20, 1e20 + 1000, {|p|
+            take(p)
+        })
+        assert_eq(pi, prime_count(1e20, 1e20 + 1000))
+    },
+    primes(1e20, 1e20 + 1000)
 )
 
 say "** Test passed!"
