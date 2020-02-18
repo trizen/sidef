@@ -1884,7 +1884,7 @@ package Sidef::Parser {
                     $obj->{catch} = $self->parse_block(code => $opt{code}, with_vars => 1);
                 }
                 else {
-                    $self->backtrack_whitespace();
+                    $self->backtrack_whitespace(code => $opt{code});
                 }
 
                 return $obj;

@@ -51,6 +51,7 @@ package Sidef::Types::Hash::Hash {
             $addr{$refaddr};
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Hash::Hash::get_value = $sub;
         $sub->($_[0]);
     }
@@ -148,6 +149,8 @@ package Sidef::Types::Hash::Hash {
         };
 
         no strict 'refs';
+        no warnings 'redefine';
+
         local *{__PACKAGE__ . '::' . 'eq'} = $sub;
         local *{__PACKAGE__ . '::' . '=='} = $sub;
         $sub->($self, $hash);
@@ -516,6 +519,7 @@ package Sidef::Types::Hash::Hash {
             $addr{$refaddr};
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Hash::Hash::as_tree = $sub;
         $sub->($_[0], $root);
     }
@@ -694,6 +698,7 @@ package Sidef::Types::Hash::Hash {
             $str;
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Hash::Hash::dump = $sub;
         $sub->($_[0]);
     }

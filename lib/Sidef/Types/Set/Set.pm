@@ -50,6 +50,7 @@ package Sidef::Types::Set::Set {
             $addr{$refaddr};
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Set::Set::get_value = $sub;
         $sub->($_[0]);
     }
@@ -481,6 +482,7 @@ package Sidef::Types::Set::Set {
               . ')';
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Set::Set::dump = $sub;
         $sub->($_[0]);
     }

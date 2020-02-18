@@ -54,6 +54,7 @@ package Sidef::Types::Array::Array {
             $addr{$refaddr};
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Array::Array::get_value = $sub;
         $sub->($_[0]);
     }
@@ -865,6 +866,8 @@ package Sidef::Types::Array::Array {
         };
 
         no strict 'refs';
+        no warnings 'redefine';
+
         local *Sidef::Types::Array::Array::cmp = $sub;
         local *{'Sidef::Types::Array::Array::<=>'} = $sub;
         $sub->($self, $array);
@@ -936,6 +939,8 @@ package Sidef::Types::Array::Array {
         };
 
         no strict 'refs';
+        no warnings 'redefine';
+
         local *Sidef::Types::Array::Array::eq = $sub;
         local *{'Sidef::Types::Array::Array::=='} = $sub;
         $sub->($self, $array);
@@ -1240,6 +1245,7 @@ package Sidef::Types::Array::Array {
             @flat;
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Array::Array::flatten = $sub;
         $sub->($_[0]);
     }
@@ -1731,6 +1737,7 @@ package Sidef::Types::Array::Array {
             Sidef::Types::Bool::Bool::FALSE;
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Array::Array::match = $sub;
         $sub->($_[0]);
     }
@@ -3692,6 +3699,7 @@ package Sidef::Types::Array::Array {
               . CORE::join(', ', map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : ($_ // 'nil') } @$obj) . ']';
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Array::Array::dump = $sub;
         $sub->($_[0]);
     }

@@ -310,6 +310,7 @@ package Sidef::Object::Object {
             $str;
         };
 
+        no warnings 'redefine';
         local *Sidef::Object::Object::dump = $sub;
         $sub->($_[0]);
     }

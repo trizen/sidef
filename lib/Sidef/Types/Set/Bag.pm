@@ -59,6 +59,7 @@ package Sidef::Types::Set::Bag {
             $addr{$refaddr};
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Set::Bag::get_value = $sub;
         $sub->($_[0]);
     }
@@ -900,6 +901,8 @@ package Sidef::Types::Set::Bag {
         };
 
         no strict 'refs';
+        no warnings 'redefine';
+
         local *{__PACKAGE__ . '::' . 'eq'} = $sub;
         local *{__PACKAGE__ . '::' . '=='} = $sub;
         $sub->($self, $hash);
@@ -935,6 +938,7 @@ package Sidef::Types::Set::Bag {
               . ')';
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Set::Bag::dump = $sub;
         $sub->($_[0]);
     }

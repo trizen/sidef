@@ -44,6 +44,7 @@ package Sidef::Types::Array::Pair {
             $addr{$refaddr};
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Array::Pair::get_value = $sub;
         $sub->($_[0]);
     }
@@ -100,6 +101,7 @@ package Sidef::Types::Array::Pair {
               . join(', ', map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : ($_ // 'nil') } @$obj) . ')';
         };
 
+        no warnings 'redefine';
         local *Sidef::Types::Array::Pair::dump = $sub;
         $sub->($_[0]);
     }
