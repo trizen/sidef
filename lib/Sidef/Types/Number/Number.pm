@@ -12374,7 +12374,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+        # my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
 
         # No Lucas-Carmichael number is known that is also a Carmichael number or a Fermat base-2 pseudoprime.
         # However, it is conjectured that infinitely many such numbers exist.
@@ -12390,7 +12390,9 @@ package Sidef::Types::Number::Number {
         state $np1 = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_add_ui($np1, $n, 1);
 
-        my $size = Math::GMPz::Rmpz_sizeinbase($n, 10);
+        my $omega     = 0;
+        my $remainder = $n;
+        my $size      = Math::GMPz::Rmpz_sizeinbase($n, 10);
 
         # Check the Lucas-Korselt criterion: p+1 | n+1, for small p|n.
         if ($size > 30) {
@@ -12405,6 +12407,8 @@ package Sidef::Types::Number::Number {
 #>>>
 
             my ($r, @factors) = _native_trial_factor($n, $trial_limit);
+
+            $omega += scalar(@factors);
 
             my %seen;
             foreach my $p (@factors) {
@@ -12421,11 +12425,15 @@ package Sidef::Types::Number::Number {
             if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
                 return Sidef::Types::Bool::Bool::TRUE;
             }
+
+            $remainder = $r;
         }
 
-        my @factors = Math::Prime::Util::GMP::factor($nstr);
+        my @factors = Math::Prime::Util::GMP::factor($remainder);
 
-        scalar(@factors) >= 3
+        $omega += scalar(@factors);
+
+        $omega >= 3
           or return Sidef::Types::Bool::Bool::FALSE;
 
         my %seen;
