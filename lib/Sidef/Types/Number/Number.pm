@@ -27,15 +27,19 @@ package Sidef::Types::Number::Number {
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
 
-    state $ONE  = Math::GMPz::Rmpz_init_set_ui(1);
-    state $ZERO = Math::GMPz::Rmpz_init_set_ui(0);
     state $MONE = Math::GMPz::Rmpz_init_set_si(-1);
+    state $ZERO = Math::GMPz::Rmpz_init_set_ui(0);
+    state $ONE  = Math::GMPz::Rmpz_init_set_ui(1);
+    state $TWO  = Math::GMPz::Rmpz_init_set_ui(2);
+    state $FOUR = Math::GMPz::Rmpz_init_set_ui(4);
+    state $TEN  = Math::GMPz::Rmpz_init_set_ui(10);
 
     state $HAS_PRIME_UTIL = eval { require Math::Prime::Util; 1 };
 
 #<<<
     use constant {
           ONE  => bless(\$ONE),
+          TWO  => bless(\$TWO),
           ZERO => bless(\$ZERO),
           MONE => bless(\$MONE),
     };
@@ -830,12 +834,6 @@ package Sidef::Types::Number::Number {
             if ($number < ULONG_MAX) {
                 $number = __PACKAGE__->_set_uint($number);
             }
-
-            #elsif (ref($number) eq 'Math::GMPz') {
-            ## already a Math::GMPz object
-            #$number = bless \$number;
-            #    $number = bless \$number;
-            #}
             else {
                 $number = bless \Math::GMPz::Rmpz_init_set_str("$number", 10);
             }
@@ -1340,38 +1338,9 @@ package Sidef::Types::Number::Number {
         };
     }
 
-    sub _zero {
-        state $zero = Math::GMPz::Rmpz_init_set_ui(0);
-    }
-
-    sub zero {
-        state $zero = do {
-            my $r = Math::GMPz::Rmpz_init_set_ui(0);
-            bless \$r;
-        };
-    }
-
-    sub _one {
-        state $one = Math::GMPz::Rmpz_init_set_ui(1);
-    }
-
-    sub one {
-        state $one = do {
-            my $r = Math::GMPz::Rmpz_init_set_ui(1);
-            bless \$r;
-        };
-    }
-
-    sub _mone {
-        state $mone = Math::GMPz::Rmpz_init_set_si(-1);
-    }
-
-    sub mone {
-        state $mone = do {
-            my $r = Math::GMPz::Rmpz_init_set_si(-1);
-            bless \$r;
-        };
-    }
+    *zero = \&ZERO;
+    *one  = \&ONE;
+    *mone = \&MONE;
 
     sub __add__ {
         my ($x, $y) = @_;
@@ -2201,7 +2170,7 @@ package Sidef::Types::Number::Number {
 
             # 1^Inf = 1 ; (-1)^Inf = 1
             if (Math::GMPz::Rmpz_cmpabs_ui($x, 1) == 0) {
-                return Math::GMPz::Rmpz_init_set_ui(1);
+                return $ONE;
             }
 
             goto &_inf;
@@ -2214,7 +2183,7 @@ package Sidef::Types::Number::Number {
                 goto &_nan;
             }
 
-            return Math::GMPz::Rmpz_init_set_ui(0);
+            return $ZERO;
         }
         elsif ($y % 2 == 0 and Math::GMPz::Rmpz_sgn($x) < 0) {
             goto &_nan;
@@ -2933,14 +2902,12 @@ package Sidef::Types::Number::Number {
 
     sub exp2 {
         my ($x) = @_;
-        state $base = Math::GMPz::Rmpz_init_set_ui(2);
-        bless \__pow__($base, $$x);
+        bless \__pow__($TWO, $$x);
     }
 
     sub exp10 {
         my ($x) = @_;
-        state $base = Math::GMPz::Rmpz_init_set_ui(10);
-        bless \__pow__($base, $$x);
+        bless \__pow__($TEN, $$x);
     }
 
     #
@@ -6084,8 +6051,7 @@ package Sidef::Types::Number::Number {
             }
         }
         else {
-            state $ten = Math::GMPz::Rmpz_init_set_ui(10);
-            $k = $ten;
+            $k = $TEN;
         }
 
         my $t = Math::GMPz::Rmpz_init();
@@ -7915,8 +7881,6 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y, \$z);
 
-        state $four = Math::GMPz::Rmpz_init_set_ui(4);
-
         $x = $$x;
         $y = $$y;
         $z = $$z;
@@ -7926,7 +7890,7 @@ package Sidef::Types::Number::Number {
         #
 
         my $u = __mul__($y,              $y);       # b^2
-        my $t = __mul__(__mul__($x, $z), $four);    # 4ac
+        my $t = __mul__(__mul__($x, $z), $FOUR);    # 4ac
         my $s = __sqrt__(_any2mpfr_mpc(__sub__($u, $t)));    # sqrt(b^2 - 4ac)
 
         my $n1 = __sub__($s, $y);                            #   sqrt(b^2 - 4ac) - b
@@ -10100,17 +10064,17 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return undef);
-            $to   = Math::GMPz::Rmpz_init_set(_any2mpz($$to)   // return undef);
+            $from = _any2mpz($$from) // return undef;
+            $to   = _any2mpz($$to)   // return undef;
         }
         else {
             $block = $to;
-            $to    = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return undef);
-            $from  = Math::GMPz::Rmpz_init_set_ui(2);
+            $to    = _any2mpz($$from) // return undef;
+            $from  = $TWO;
         }
 
         if (Math::GMPz::Rmpz_cmp_ui($from, 1) <= 0) {
-            Math::GMPz::Rmpz_set_ui($from, 2);
+            $from = $TWO;
         }
 
 #<<<
@@ -10993,7 +10957,7 @@ package Sidef::Types::Number::Number {
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
 
-        my @d = (Math::GMPz::Rmpz_init_set_ui(1));
+        my @d = ($ONE);
         foreach my $p (grep { $factors{$_} > 1 } keys %factors) {
 
             my $e = $factors{$p};
@@ -11029,7 +10993,7 @@ package Sidef::Types::Number::Number {
         my %factors;
         ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
 
-        my @d = (Math::GMPz::Rmpz_init_set_ui(1));
+        my @d = ($ONE);
         foreach my $p (grep { $factors{$_} % 2 == 0 } keys %factors) {
 
             my $e = $factors{$p};
@@ -12366,20 +12330,20 @@ package Sidef::Types::Number::Number {
 
         if (defined($to)) {
             _valid(\$to);
-            $from = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return Sidef::Types::Array::Array->new);
-            $to   = Math::GMPz::Rmpz_init_set(_any2mpz($$to)   // return Sidef::Types::Array::Array->new);
+            $from = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $to   = _any2mpz($$to)   // return Sidef::Types::Array::Array->new;
         }
         else {
-            $to   = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return Sidef::Types::Array::Array->new);
-            $from = Math::GMPz::Rmpz_init_set_ui(1);
+            $to   = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $from = $ONE;
         }
 
         if (Math::GMPz::Rmpz_sgn($from) <= 0) {
-            Math::GMPz::Rmpz_set_ui($from, 1);
+            $from = $ONE;
         }
 
         if (Math::GMPz::Rmpz_sgn($to) < 0) {
-            Math::GMPz::Rmpz_set_ui($to, 0);
+            $to = $ZERO;
         }
 
 #<<<
@@ -12398,17 +12362,17 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return undef);
-            $to   = Math::GMPz::Rmpz_init_set(_any2mpz($$to)   // return undef);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = Math::GMPz::Rmpz_init_set(_any2mpz($$from) // return undef);
-            $from  = Math::GMPz::Rmpz_init_set_ui(1);
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
         }
 
         if (Math::GMPz::Rmpz_sgn($from) <= 0) {
-            Math::GMPz::Rmpz_set_ui($from, 1);
+            $from = $ONE;
         }
 
         _generic_each($from, $to, $block, sub { 1e4 }, sub { _squarefree_sieve($_[0], $_[1]) });
@@ -12859,7 +12823,7 @@ package Sidef::Types::Number::Number {
                 __SUB__->($m * $t, $r - 1);
             }
           }
-          ->(Math::GMPz::Rmpz_init_set_ui(1), 2 * $k - 1);
+          ->($ONE, 2 * $k - 1);
 
         @powerful = sort { Math::GMPz::Rmpz_cmp($a, $b) } @powerful;
         @powerful = map  { bless \$_ } @powerful;
@@ -12906,7 +12870,7 @@ package Sidef::Types::Number::Number {
                 __SUB__->($m * $t, $r - 1);
             }
           }
-          ->(Math::GMPz::Rmpz_init_set_ui(1), 2 * $k - 1);
+          ->($ONE, 2 * $k - 1);
 
         bless \$count;
     }
@@ -13025,10 +12989,7 @@ package Sidef::Types::Number::Number {
 
     sub next_pow2 {
         my ($x) = @_;
-
-        state $two = bless \Math::GMPz::Rmpz_init_set_ui(2);
-
-        @_ = ($x, $two);
+        @_ = ($x, TWO);
         goto &next_pow;
     }
 
