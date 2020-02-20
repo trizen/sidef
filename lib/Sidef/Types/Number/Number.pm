@@ -10717,6 +10717,7 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
 
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Array::Array->new();
 
         if (defined($k)) {
             _valid(\$k);
