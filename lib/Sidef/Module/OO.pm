@@ -38,12 +38,13 @@ package Sidef::Module::OO {
 
         $multi_values // return;
 
+        @results = map { Sidef::Perl::Perl->to_sidef($_) } @results;
+
         if (@results > 1) {
-            @results = map { Sidef::Perl::Perl->to_sidef($_) } @results;
             return ($multi_values ? @results : Sidef::Types::Array::Array->new(\@results));
         }
 
-        Sidef::Perl::Perl->to_sidef($results[0]);
+        $results[0];
     }
 }
 

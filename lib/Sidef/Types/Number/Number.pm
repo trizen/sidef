@@ -9464,6 +9464,9 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 3234846615) == 1 or return 0;
         }
 
+        # Native integer -- return early
+        Math::GMPz::Rmpz_fits_ulong_p($n) && return 1;
+
         # Size of n in base-2
         my $size = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
