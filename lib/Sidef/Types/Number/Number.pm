@@ -7403,58 +7403,248 @@ package Sidef::Types::Number::Number {
     *LucasV  = \&lucasv;
     *lucas_V = \&lucasv;
 
+    sub __lucasUVmod__ {
+        my ($P, $Q, $n, $m) = @_;
+
+        my $U1 = Math::GMPz::Rmpz_init_set_ui(1);
+
+        my ($V1, $V2) = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set($P));
+        my ($Q1, $Q2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1));
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_scan1($n, 0);
+
+        Math::GMPz::Rmpz_div_2exp($t, $n, $s + 1);
+
+        foreach my $bit (split(//, Math::GMPz::Rmpz_get_str($t, 2))) {
+
+            Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+            Math::GMPz::Rmpz_mod($Q1, $Q1, $m);
+
+            if ($bit) {
+                Math::GMPz::Rmpz_mul($Q2, $Q1, $Q);
+                Math::GMPz::Rmpz_mul($U1, $U1, $V2);
+                Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+
+                Math::GMPz::Rmpz_powm_ui($V2, $V2, 2, $m);
+                Math::GMPz::Rmpz_submul($V1, $Q1, $P);
+                Math::GMPz::Rmpz_submul_ui($V2, $Q2, 2);
+
+                Math::GMPz::Rmpz_mod($V1, $V1, $m);
+                Math::GMPz::Rmpz_mod($U1, $U1, $m);
+            }
+            else {
+                Math::GMPz::Rmpz_set($Q2, $Q1);
+                Math::GMPz::Rmpz_mul($U1, $U1, $V1);
+                Math::GMPz::Rmpz_mul($V2, $V2, $V1);
+                Math::GMPz::Rmpz_sub($U1, $U1, $Q1);
+
+                Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $m);
+                Math::GMPz::Rmpz_submul($V2, $Q1, $P);
+                Math::GMPz::Rmpz_submul_ui($V1, $Q2, 2);
+
+                Math::GMPz::Rmpz_mod($V2, $V2, $m);
+                Math::GMPz::Rmpz_mod($U1, $U1, $m);
+            }
+        }
+
+        Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+        Math::GMPz::Rmpz_mul($Q2, $Q1, $Q);
+        Math::GMPz::Rmpz_mul($U1, $U1, $V1);
+        Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+        Math::GMPz::Rmpz_sub($U1, $U1, $Q1);
+        Math::GMPz::Rmpz_submul($V1, $Q1, $P);
+        Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+
+        for (1 .. $s) {
+            Math::GMPz::Rmpz_mul($U1, $U1, $V1);
+            Math::GMPz::Rmpz_mod($U1, $U1, $m);
+            Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $m);
+            Math::GMPz::Rmpz_submul_ui($V1, $Q1, 2);
+            Math::GMPz::Rmpz_powm_ui($Q1, $Q1, 2, $m);
+        }
+
+        Math::GMPz::Rmpz_mod($U1, $U1, $m);
+        Math::GMPz::Rmpz_mod($V1, $V1, $m);
+
+        return ($U1, $V1);
+    }
+
+    sub __lucasVmod__ {
+        my ($P, $Q, $n, $m) = @_;
+
+        my ($V1, $V2) = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set($P));
+        my ($Q1, $Q2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1));
+
+        foreach my $bit (split(//, Math::GMPz::Rmpz_get_str($n, 2))) {
+
+            Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+            Math::GMPz::Rmpz_mod($Q1, $Q1, $m);
+
+            if ($bit) {
+                Math::GMPz::Rmpz_mul($Q2, $Q1, $Q);
+                Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+                Math::GMPz::Rmpz_powm_ui($V2, $V2, 2, $m);
+                Math::GMPz::Rmpz_submul($V1, $P, $Q1);
+                Math::GMPz::Rmpz_submul_ui($V2, $Q2, 2);
+                Math::GMPz::Rmpz_mod($V1, $V1, $m);
+            }
+            else {
+                Math::GMPz::Rmpz_set($Q2, $Q1);
+                Math::GMPz::Rmpz_mul($V2, $V2, $V1);
+                Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $m);
+                Math::GMPz::Rmpz_submul($V2, $P, $Q1);
+                Math::GMPz::Rmpz_submul_ui($V1, $Q2, 2);
+                Math::GMPz::Rmpz_mod($V2, $V2, $m);
+            }
+        }
+
+        Math::GMPz::Rmpz_mod($V1, $V1, $m);
+
+        return ($V1, $V2);
+    }
+
+    state $LUCAS_PQ_LIMIT = int(sqrt(ULONG_MAX >> 2));
+
+    sub _modular_lucas_UV {
+        my ($P, $Q, $n, $m) = @_;
+
+        if (    Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0
+            and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) {
+            my ($U, $V);
+            eval { ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($m, $P, $Q, $n) };
+            defined($U) && defined($V) && return (map { _str2obj($_) } ($U, $V));
+        }
+
+        state $D = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_mul($D, $P, $P);
+        Math::GMPz::Rmpz_submul_ui($D, $Q, 4);
+
+        # When `gcd(P*P - 4*Q, m) = 1`, we can use a faster algorithm
+        if (Math::GMPz::Rmpz_invert($D, $D, $m)) {
+
+            my ($V1, $V2) = __lucasVmod__($P, $Q, $n, $m);
+
+            Math::GMPz::Rmpz_mul_2exp($V2, $V2, 1);
+            Math::GMPz::Rmpz_submul($V2, $V1, $P);
+            Math::GMPz::Rmpz_mul($V2, $V2, $D);
+            Math::GMPz::Rmpz_mod($V2, $V2, $m);
+
+            return ($V2, $V1);
+        }
+
+        __lucasUVmod__($P, $Q, $n, $m);
+    }
+
+    sub _modular_lucas_U {
+        my ($P, $Q, $n, $m) = @_;
+
+        if (    Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0
+            and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) {
+            my ($U, $V);
+            eval { ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($m, $P, $Q, $n) };
+            defined($U) && return _str2obj($U);
+        }
+
+        state $D = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_mul($D, $P, $P);
+        Math::GMPz::Rmpz_submul_ui($D, $Q, 4);
+
+        # When `gcd(P*P - 4*Q, m) = 1`, we can use a faster algorithm
+        if (Math::GMPz::Rmpz_invert($D, $D, $m)) {
+
+            my ($V1, $V2) = __lucasVmod__($P, $Q, $n, $m);
+
+            Math::GMPz::Rmpz_mul_2exp($V2, $V2, 1);
+            Math::GMPz::Rmpz_submul($V2, $V1, $P);
+            Math::GMPz::Rmpz_mul($V2, $V2, $D);
+            Math::GMPz::Rmpz_mod($V2, $V2, $m);
+
+            return $V2;
+        }
+
+        (__lucasUVmod__($P, $Q, $n, $m))[0];
+    }
+
+    sub _modular_lucas_V {
+        my ($P, $Q, $n, $m) = @_;
+
+        if (    Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0
+            and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) {
+            my ($U, $V);
+            eval { ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($m, $P, $Q, $n) };
+            defined($V) && return _str2obj($V);
+        }
+
+        (__lucasVmod__($P, $Q, $n, $m))[0];
+    }
+
     sub lucasumod {
-        my ($p, $q, $n, $m) = @_;
+        my ($P, $Q, $n, $m) = @_;
 
-        _valid(\$q, \$n, \$m);
+        _valid(\$Q, \$n, \$m);
 
-        $p = _big2istr($p)  // goto &nan;
-        $q = _big2istr($q)  // goto &nan;
-        $n = _big2uistr($n) // goto &nan;
-        $m = _big2pistr($m) // goto &nan;
+        $P = _any2mpz($$P) // goto &nan;
+        $Q = _any2mpz($$Q) // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
 
-        my ($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
+        # undefined for m=0
+        Math::GMPz::Rmpz_sgn($m) || goto &nan;
 
-        ($U < ULONG_MAX) ? __PACKAGE__->_set_uint($U) : __PACKAGE__->_set_str('int', $U);
+        # U_0(P, Q) = 0
+        Math::GMPz::Rmpz_sgn($n) || return ZERO;
+
+        # undefined for n < 0
+        Math::GMPz::Rmpz_sgn($n) < 0 && goto &nan;
+
+        bless \_modular_lucas_U($P, $Q, $n, $m);
     }
 
     *LucasUmod = \&lucasumod;
     *lucasUmod = \&lucasumod;
 
     sub lucasvmod {
-        my ($p, $q, $n, $m) = @_;
+        my ($P, $Q, $n, $m) = @_;
 
-        _valid(\$q, \$n, \$m);
+        _valid(\$Q, \$n, \$m);
 
-        $p = _big2istr($p)  // goto &nan;
-        $q = _big2istr($q)  // goto &nan;
-        $n = _big2uistr($n) // goto &nan;
-        $m = _big2pistr($m) // goto &nan;
+        $P = _any2mpz($$P) // goto &nan;
+        $Q = _any2mpz($$Q) // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
 
-        my ($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
+        # undefined for m=0
+        Math::GMPz::Rmpz_sgn($m) || goto &nan;
 
-        ($V < ULONG_MAX) ? __PACKAGE__->_set_uint($V) : __PACKAGE__->_set_str('int', $V);
+        # undefined for n < 0
+        Math::GMPz::Rmpz_sgn($n) < 0 && goto &nan;
+
+        bless \_modular_lucas_V($P, $Q, $n, $m);
     }
 
     *LucasVmod = \&lucasvmod;
     *lucasVmod = \&lucasvmod;
 
     sub lucasuvmod {
-        my ($p, $q, $n, $m) = @_;
+        my ($P, $Q, $n, $m) = @_;
 
-        _valid(\$q, \$n, \$m);
+        _valid(\$Q, \$n, \$m);
 
-        $p = _big2istr($p)  // goto &nan;
-        $q = _big2istr($q)  // goto &nan;
-        $n = _big2uistr($n) // goto &nan;
-        $m = _big2pistr($m) // goto &nan;
+        $P = _any2mpz($$P) // goto &nan;
+        $Q = _any2mpz($$Q) // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
 
-        my ($U, $V, $Qk) = Math::Prime::Util::GMP::lucas_sequence($m, $p, $q, $n);
+        # undefined for m=0
+        Math::GMPz::Rmpz_sgn($m) || return (nan(), nan());
 
-        $U = ($U < ULONG_MAX) ? __PACKAGE__->_set_uint($U) : __PACKAGE__->_set_str('int', $U);
-        $V = ($V < ULONG_MAX) ? __PACKAGE__->_set_uint($V) : __PACKAGE__->_set_str('int', $V);
+        # undefined for n < 0
+        Math::GMPz::Rmpz_sgn($n) < 0 && return (nan(), nan());
 
-        ($U, $V);
+        my ($U, $V) = _modular_lucas_UV($P, $Q, $n, $m);
+
+        ((bless \$U), (bless \$V));
     }
 
     *LucasUVmod = \&lucasuvmod;
