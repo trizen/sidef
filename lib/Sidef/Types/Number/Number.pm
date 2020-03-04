@@ -7411,6 +7411,9 @@ package Sidef::Types::Number::Number {
         my ($V1, $V2) = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set($P));
         my ($Q1, $Q2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1));
 
+        Math::GMPz::Rmpz_sgn($n) == 0
+          and return (Math::GMPz::Rmpz_init_set_ui(0), Math::GMPz::Rmpz_init_set_ui(2));
+
         my $t = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_scan1($n, 0);
 

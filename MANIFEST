@@ -141,6 +141,7 @@ scripts/Expensive/benford_s_law.sf
 scripts/Expensive/binary_multiplier.sf
 scripts/Expensive/calendar.sf
 scripts/Expensive/calendar_all_uppercase.sf
+scripts/Expensive/chebyshev_factorization_method.sf
 scripts/Expensive/closed_form_fibonacci.sf
 scripts/Expensive/coin_change.sf
 scripts/Expensive/concurrent_computing.sf
@@ -806,6 +807,7 @@ scripts/Tests/longest_common_prefix.sf
 scripts/Tests/longest_common_subsequence.sf
 scripts/Tests/longest_common_subsequence_2.sf
 scripts/Tests/loops.sf
+scripts/Tests/lucas_sequences.sf
 scripts/Tests/luhn_test_of_credit_card_numbers.sf
 scripts/Tests/lvalues.sf
 scripts/Tests/lwp_module.sf
