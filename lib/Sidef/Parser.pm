@@ -1194,7 +1194,7 @@ package Sidef::Parser {
             # "has" class attributes
             if (exists($self->{current_class}) and /\Ghas\b\h*/gc) {
 
-                local $self->{allow_class_variable} = 1;
+                local $self->{allow_class_variable} = 0;
 
                 my $vars = $self->parse_init_vars(
                                                   code    => $opt{code},

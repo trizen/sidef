@@ -1,0 +1,69 @@
+#!/usr/bin/ruby
+
+class Friend(name) {
+    method hi {
+        "Hello, #{name}!"
+    }
+}
+
+class Example(a) {
+    has t = sqrt(a)
+
+    has v = try {   Friend("Agent #{a}") } catch { 'undefined' }
+    has u = try { NotDefined("foo #{a}") } catch { 'undefined' }
+
+    has w = Friend("Actor #{a + 1}")
+
+    method foo {
+        self.bar
+    }
+
+    method bar {
+        log(t)
+    }
+
+    method baz(tmp = sqrt(2)) {
+        tmp + 1
+    }
+
+    method qux(z = t) {
+        z + 1
+    }
+
+    method zoo(r = self.t) {
+        r - 1
+    }
+
+    method zzz(f = self.bar) {
+        f + 1
+    }
+
+    method friend {
+        v.name
+    }
+}
+
+var obj = Example(99)
+
+assert_eq(obj.t, 99.sqrt)
+assert_eq(obj.bar, 99.sqrt.log)
+assert_eq(obj.baz, 2.sqrt + 1)
+assert_eq(obj.qux, 99.sqrt + 1)
+assert_eq(obj.zoo, 99.sqrt - 1)
+assert_eq(obj.zzz, 99.sqrt.log + 1)
+
+assert_eq(obj.friend, "Agent 99")
+assert_eq(obj.v.hi, "Hello, Agent 99!")
+assert_eq(obj.w.hi, "Hello, Actor 100!")
+
+obj.t = 1234
+
+assert_eq(obj.v.hi, "Hello, Agent 99!")
+assert_eq(Example(7).v.hi, "Hello, Agent 7!")
+
+assert_eq(obj.v.hi, "Hello, Agent 99!")
+assert_eq(obj.w.hi, "Hello, Actor 100!")
+
+assert_eq(obj.u, 'undefined')
+
+say "** Test passed!"
