@@ -13,6 +13,15 @@ class Example(a) {
     has u = try { NotDefined("foo #{a}") } catch { 'undefined' }
 
     has w = Friend("Actor #{a + 1}")
+    has y = t+1
+
+    has b = 0
+    has c = 0
+
+    method init {
+        b      = (y + self.t - 1)
+        self.c = (t + self.y + 1)
+    }
 
     method foo {
         self.bar
@@ -46,17 +55,25 @@ class Example(a) {
 var obj = Example(99)
 
 assert_eq(obj.t, 99.sqrt)
+assert_eq(obj.y, 1 + 99.sqrt)
 assert_eq(obj.bar, 99.sqrt.log)
 assert_eq(obj.baz, 2.sqrt + 1)
 assert_eq(obj.qux, 99.sqrt + 1)
 assert_eq(obj.zoo, 99.sqrt - 1)
 assert_eq(obj.zzz, 99.sqrt.log + 1)
 
+assert_eq(obj.b, obj.t + obj.y - 1)
+assert_eq(obj.c, obj.t + obj.y + 1)
+
 assert_eq(obj.friend, "Agent 99")
 assert_eq(obj.v.hi, "Hello, Agent 99!")
 assert_eq(obj.w.hi, "Hello, Actor 100!")
 
+assert_eq(obj.t, 99.sqrt)
+
 obj.t = 1234
+
+assert_eq(obj.t, 1234)
 
 assert_eq(obj.v.hi, "Hello, Agent 99!")
 assert_eq(Example(7).v.hi, "Hello, Agent 7!")

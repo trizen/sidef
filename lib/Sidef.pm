@@ -405,6 +405,11 @@ package Sidef {
 
 };
 
+use utf8;
+use 5.016;
+
+our $AUTOLOAD;
+
 #
 ## UNIVERSAL methods
 #
@@ -444,7 +449,7 @@ package Sidef {
     my $from   = Sidef::normalize_method($caller[3]);
     $from = $from eq '.' ? 'main()' : "$from()";
 
-    my $table   = \%{$self . '::'};
+    my $table   = do { no strict 'refs'; \%{$self . '::'} };
     my @methods = grep { !ref($table->{$_}) and defined(&{$table->{$_}}) } keys(%$table);
 
     my $method = Sidef::normalize_method($AUTOLOAD);
