@@ -5934,6 +5934,14 @@ package Sidef::Types::Number::Number {
         Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($$x) // return undef), 16));
     }
 
+    sub bits {
+        my ($x) = @_;
+        $x = _any2mpz($$x) // return Sidef::Types::Array::Array->new;
+        my $bin = Math::GMPz::Rmpz_get_str($x, 2);
+        $bin = substr($bin, 1) if substr($bin, 0, 1) eq '-';
+        Sidef::Types::Array::Array->new([map { $_ ? ONE : ZERO } split(//, $bin)]);
+    }
+
     my %DIGITS_36;
     @DIGITS_36{0 .. 9, 'a' .. 'z'} = (0 .. 35);
 

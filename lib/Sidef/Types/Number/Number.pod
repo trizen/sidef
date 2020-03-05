@@ -919,6 +919,14 @@ Aliases: I<getbit>, I<testbit>
 
 =cut
 
+=head2 bits
+
+Number.bits() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bit_scan0
 
     n.bit_scan0
