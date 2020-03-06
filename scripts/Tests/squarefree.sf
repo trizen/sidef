@@ -1,0 +1,85 @@
+#!/usr/bin/ruby
+
+# Tests for squarefree related functions.
+
+assert_eq(
+    squarefree(2**64 - 100, 2**64 - 1),
+    range(2**64 - 100, 2**64 - 1).grep{.is_squarefree}
+)
+
+assert_eq(
+    squarefree(2**64 - 50, 2**64 + 1),
+    range(2**64 - 50, 2**64 + 1).grep{.is_squarefree}
+)
+
+assert_eq(
+    squarefree(2**65 - 100, 2**65 - 1),
+    range(2**65 - 100, 2**65 - 1).grep{.is_squarefree}
+)
+
+assert_eq(
+    squarefree(2**63 - 100, 2**63 - 1),
+    range(2**63 - 100, 2**63 - 1).grep{.is_squarefree}
+)
+
+assert_eq(
+    squarefree(2**32 - 100, 2**32 - 1),
+    range(2**32 - 100, 2**32 - 1).grep{.is_squarefree}
+)
+
+assert_eq(
+    squarefree(2**31 - 100, 2**31 - 1),
+    range(2**31 - 100, 2**31 - 1).grep{.is_squarefree}
+)
+
+assert_eq(
+    squarefree(100),
+    1..100 -> grep{.is_squarefree}
+)
+
+assert_eq(
+    gather {
+        each_squarefree(2**64 - 100, 2**64 - 1, {|k|
+            take(k)
+        }),
+    },
+    squarefree(2**64 - 100, 2**64 - 1),
+)
+
+assert_eq(
+    gather {
+        each_squarefree(2**64 - 100, 2**64 - 50, {|k|
+            take(k)
+        }),
+    },
+    range(2**64 - 100, 2**64 - 50).grep{.is_squarefree}
+)
+
+assert_eq(
+    gather {
+        each_squarefree(2**64 - 100, 2**64 - 49, {|k|
+            take(k)
+        }),
+    },
+    range(2**64 - 100, 2**64 - 49).grep{.is_squarefree}
+)
+
+assert_eq(
+    gather {
+        each_squarefree(2**64 - 100, 2**64 - 50, {|k|
+            take(k)
+        })
+    },
+    squarefree(2**64 - 100, 2**64 - 50),
+)
+
+assert_eq(
+    gather {
+        each_squarefree(2**64 - 50, 2**64 + 1, {|k|
+            take(k)
+        }),
+    },
+    range(2**64 - 50, 2**64 + 1).grep{.is_squarefree}
+)
+
+say "** Test passed!"

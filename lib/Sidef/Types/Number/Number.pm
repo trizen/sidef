@@ -12512,10 +12512,21 @@ package Sidef::Types::Number::Number {
         my @squarefree;
 
 #<<<
-        if ($HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($from)) {
-            Math::Prime::Util::forsquarefree(sub {
-                push @squarefree, "$_";
-            }, $from, $to);
+        if (0 and $HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+            Math::Prime::Util::forsquarefree(sub {   # XXX: leaks memory in MPU 0.73
+                push @squarefree, $_;
+            }, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+        }
+        elsif ($HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+
+            $from = Math::GMPz::Rmpz_get_ui($from);
+            $to   = Math::GMPz::Rmpz_get_ui($to);
+
+            my @mu = Math::Prime::Util::moebius($from, $to);
+            for (my $i = -1; $from < $to; ++$from) {
+                push(@squarefree, $from) if $mu[++$i];
+            }
+            push(@squarefree, $to) if $mu[-1];
         }
         else {
             for (my $t = Math::GMPz::Rmpz_init_set($from) ; Math::GMPz::Rmpz_cmp($t, $to) <= 0 ; Math::GMPz::Rmpz_add_ui($t, $t, 1)) {
