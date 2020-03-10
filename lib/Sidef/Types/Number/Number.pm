@@ -6707,11 +6707,11 @@ package Sidef::Types::Number::Number {
 
             ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_set_ui($t, $p)
-              : Math::GMPz::Rmpz_set_str($t, "$p", 10);
+              : Math::GMPz::Rmpz_set_str($t, $p, 10);
 
             ($s < ULONG_MAX)
               ? Math::GMPz::Rmpz_set_ui($w, $s)
-              : Math::GMPz::Rmpz_set_str($w, "$s", 10);
+              : Math::GMPz::Rmpz_set_str($w, $s, 10);
 
             # v = p^k
             Math::GMPz::Rmpz_pow_ui($v, $t, $factors{"$p"});
@@ -6738,7 +6738,7 @@ package Sidef::Types::Number::Number {
 
         ($n < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($t, $n)
-          : Math::GMPz::Rmpz_set_str($t, "$n", 10);
+          : Math::GMPz::Rmpz_set_str($t, $n, 10);
 
         # Check that t^2 = m (mod y)
         Math::GMPz::Rmpz_powm_ui($u, $t, 2, $y);
@@ -6988,14 +6988,14 @@ package Sidef::Types::Number::Number {
 
         ($phi_k < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($r, $phi_k)
-          : Math::GMPz::Rmpz_set_str($r, "$phi_k", 10);
+          : Math::GMPz::Rmpz_set_str($r, $phi_k, 10);
 
         if ($phi_r < ULONG_MAX) {
             Math::GMPz::Rmpz_divexact_ui($r, $r, $phi_r);
         }
         else {
             my $t = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_set_str($t, "$phi_r", 10);
+            Math::GMPz::Rmpz_set_str($t, $phi_r, 10);
             Math::GMPz::Rmpz_divexact($r, $r, $t);
         }
 
@@ -9479,7 +9479,7 @@ package Sidef::Types::Number::Number {
                   : next;
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, $f);
+                Math::GMPz::Rmpz_set_str($t, $f, 10);
             }
             Math::GMPz::Rmpz_remove($r, $r, $t);
         }
@@ -9951,7 +9951,7 @@ package Sidef::Types::Number::Number {
 
             ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_set_ui($v, $p)
-              : Math::GMPz::Rmpz_set_str($v, "$p", 10);
+              : Math::GMPz::Rmpz_set_str($v, $p, 10);
 
             Math::GMPz::Rmpz_sub_ui($v, $v, 1);
             Math::GMPz::Rmpz_divisible_p($t, $v)
@@ -10010,7 +10010,7 @@ package Sidef::Types::Number::Number {
 
         ($U < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($t, $U)
-          : Math::GMPz::Rmpz_set_str($t, "$U", 10);
+          : Math::GMPz::Rmpz_set_str($t, $U, 10);
 
         Math::GMPz::Rmpz_add_ui($t, $t, 1);
         Math::GMPz::Rmpz_cmp($t, $n) ? Sidef::Types::Bool::Bool::FALSE : Sidef::Types::Bool::Bool::TRUE;
@@ -10100,7 +10100,7 @@ package Sidef::Types::Number::Number {
 
             ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_set_ui($v, $p)
-              : Math::GMPz::Rmpz_set_str($v, "$p", 10);
+              : Math::GMPz::Rmpz_set_str($v, $p, 10);
 
             # Check Korselt's criterion for Carmichael numbers:
             #   p-1 | n-1, for all p|n.
@@ -10450,7 +10450,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_divexact_ui($u, $n, $p);
                 }
                 else {
-                    Math::GMPz::Rmpz_set_str($u, "$p", 10);
+                    Math::GMPz::Rmpz_set_str($u, $p, 10);
                     Math::GMPz::Rmpz_divexact($u, $n, $u);
                 }
 
@@ -11012,7 +11012,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
                 }
                 else {
-                    Math::GMPz::Rmpz_set_str($pp, "$p", 10);
+                    Math::GMPz::Rmpz_set_str($pp, $p, 10);
                     Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
                 }
             }
@@ -11105,7 +11105,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
                 }
                 else {
-                    Math::GMPz::Rmpz_set_str($pp, "$p", 10);
+                    Math::GMPz::Rmpz_set_str($pp, $p, 10);
                     Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
                 }
             }
@@ -11714,7 +11714,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
                 }
                 else {
-                    Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                    Math::GMPz::Rmpz_set_str($t, $p, 10);
                     Math::GMPz::Rmpz_pow_ui($t, $t, $k) if ($k > 1);
                 }
 
@@ -11728,7 +11728,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k * ($e - 1));
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
                 Math::GMPz::Rmpz_set($u, $t);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $k * $e);
                 Math::GMPz::Rmpz_pow_ui($u, $u, $k * ($e - 1));
@@ -11917,7 +11917,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $k * $e);
             }
 
@@ -11962,7 +11962,7 @@ package Sidef::Types::Number::Number {
                   : Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k);
             }
             else {
-                Math::GMPz::Rmpz_set_str($u, "$p", 10);
+                Math::GMPz::Rmpz_set_str($u, $p, 10);
                 Math::GMPz::Rmpz_pow_ui($u, $u, $k) if ($k > 1);
             }
 
@@ -12007,7 +12007,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $k * $e);
             }
 
@@ -12065,7 +12065,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $k);
             }
 
@@ -12118,7 +12118,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $k);
             }
 
@@ -12179,7 +12179,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($u, $p, 2 * $k);
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
                 Math::GMPz::Rmpz_pow_ui($u, $t, 2 * $k);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $e * $k);
             }
@@ -12243,7 +12243,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e * $k);
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $e * $k);
             }
 
@@ -12285,7 +12285,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $k);
             }
 
@@ -12338,7 +12338,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
             }
             else {
-                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $k);
             }
 
@@ -12397,7 +12397,7 @@ package Sidef::Types::Number::Number {
 
         state $s = Math::GMPz::Rmpz_init_nobless();
 
-        Math::GMPz::Rmpz_set_str($s, "$sigma", 10);
+        Math::GMPz::Rmpz_set_str($s, $sigma, 10);
         Math::GMPz::Rmpz_div_2exp($s, $s, 1);
 
         (Math::GMPz::Rmpz_cmp($s, $n) > 0)
@@ -12742,7 +12742,7 @@ package Sidef::Types::Number::Number {
 
             ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_set_ui($t, $p)
-              : Math::GMPz::Rmpz_set_str($t, "$p", 10);
+              : Math::GMPz::Rmpz_set_str($t, $p, 10);
 
             Math::GMPz::Rmpz_add_ui($t, $t, 1);
 
@@ -13410,7 +13410,7 @@ package Sidef::Types::Number::Number {
 
             ($divisor < ULONG_MAX)
               ? Math::GMPz::Rmpz_set_ui($u, $divisor)
-              : Math::GMPz::Rmpz_set_str($u, "$divisor", 10);
+              : Math::GMPz::Rmpz_set_str($u, $divisor, 10);
 
             Math::GMPz::Rmpz_divexact($v, $t, $u);
             Math::GMPz::Rmpz_addmul_ui($v, $u, 2);
