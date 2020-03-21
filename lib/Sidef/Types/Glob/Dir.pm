@@ -7,6 +7,7 @@ package Sidef::Types::Glob::Dir {
       Sidef::Types::Glob::File
       );
 
+    require Encode;
     require File::Spec;
 
     sub new {
@@ -53,7 +54,7 @@ package Sidef::Types::Glob::Dir {
 
     sub cwd {
         state $x = require Cwd;
-        __PACKAGE__->new(Cwd::getcwd());
+        __PACKAGE__->new(Encode::decode_utf8(Cwd::getcwd()));
     }
 
     sub pwd {
@@ -62,7 +63,8 @@ package Sidef::Types::Glob::Dir {
 
     sub up {
         my ($self) = @_;
-        __PACKAGE__->new(File::Spec->catdir(ref($self) ? $$self : (), File::Spec->updir));
+        __PACKAGE__->new(
+                    Encode::decode_utf8(File::Spec->catdir(ref($self) ? Encode::encode_utf8($$self) : (), File::Spec->updir)));
     }
 
     sub split {

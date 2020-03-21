@@ -7,7 +7,9 @@ package Sidef::Types::Glob::File {
       Sidef::Types::String::String
       );
 
+    require Encode;
     require File::Spec;
+
     use Sidef::Types::Number::Number;
 
     sub new {
@@ -291,7 +293,11 @@ package Sidef::Types::Glob::File {
     sub abs_name {
         my $class = ref($_[0]) || shift(@_);
         my ($self, $base) = @_;
-        $class->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
+        $class->new(
+                    Encode::decode_utf8(
+                          File::Spec->rel2abs(Encode::encode_utf8("$self"), defined($base) ? Encode::encode_utf8("$base") : ())
+                    )
+                   );
     }
 
     *abs     = \&abs_name;
@@ -301,7 +307,11 @@ package Sidef::Types::Glob::File {
     sub rel_name {
         my $class = ref($_[0]) || shift(@_);
         my ($self, $base) = @_;
-        $class->new(File::Spec->rel2abs("$self", defined($base) ? "$base" : ()));
+        $class->new(
+                    Encode::decode_utf8(
+                          File::Spec->rel2abs(Encode::encode_utf8("$self"), defined($base) ? Encode::encode_utf8("$base") : ())
+                    )
+                   );
     }
 
     *rel     = \&rel_name;
@@ -313,7 +323,7 @@ package Sidef::Types::Glob::File {
         my ($self) = @_;
 
         state $x = require Cwd;
-        $class->new(Cwd::abs_path("$self"));
+        $class->new(Encode::decode_utf8(Cwd::abs_path("$self")));
     }
 
     *realpath = \&abs_path;
