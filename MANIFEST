@@ -108,7 +108,6 @@ scripts/ackermann_function.sf
 scripts/add_a_variable_to_a_class_instance_at_runtime.sf
 scripts/aks_test_for_primes.sf
 scripts/align_columns.sf
-scripts/Applications/any2mp3.sf
 scripts/Applications/fdf.sf
 'scripts/Applications/Gift match/giftmatch.sf'
 'scripts/Applications/Gift match/input.txt'
