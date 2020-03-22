@@ -9466,22 +9466,18 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         _valid(\$y);
-        my $r = Math::GMPz::Rmpz_init_set(_any2mpz($$x) // goto &nan);
 
-        my %factors;
-        @factors{Math::Prime::Util::GMP::factor(_big2uistr($y) // goto &nan)} = ();
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
 
-        my $t = Math::GMPz::Rmpz_init();
-        foreach my $f (keys %factors) {
-            if ($f < ULONG_MAX) {
-                Math::GMPz::Rmpz_divisible_ui_p($r, $f)
-                  ? Math::GMPz::Rmpz_set_ui($t, $f)
-                  : next;
-            }
-            else {
-                Math::GMPz::Rmpz_set_str($t, $f, 10);
-            }
-            Math::GMPz::Rmpz_remove($r, $r, $t);
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        my $g = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_gcd($g, $r, $y);
+
+        while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+            Math::GMPz::Rmpz_remove($r, $r, $g);
+            Math::GMPz::Rmpz_gcd($g, $r, $y);
         }
 
         bless \$r;
