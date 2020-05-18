@@ -10,7 +10,8 @@ package Sidef::Types::Number::Mod {
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
       q{0+}   => sub { (@_) = ($_[0]); goto &__numify__ },
-      q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ };
+      q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ },
+      q{${}}  => sub { $_[0]{n} };
 
     sub new {
         my (undef, $n, $m) = @_;
