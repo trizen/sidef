@@ -32,6 +32,10 @@ package Sidef::Types::Number::Mod {
 
     *lift = \&to_n;
 
+    sub modulus {
+        $_[0]->{m};
+    }
+
     sub __boolify__ {
         $_[0]->{n};
     }
@@ -98,6 +102,41 @@ package Sidef::Types::Number::Mod {
         __PACKAGE__->new($x->{n}->powmod($y->to_n, $x->{m}), $x->{m});
     }
 
+    sub factorial {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{n}->factorialmod($x->{m}), $x->{m});
+    }
+
+    sub lucas {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{n}->lucasmod($x->{m}), $x->{m});
+    }
+
+    sub lucasu {
+        my ($x, $P, $Q) = @_;
+        __PACKAGE__->new(Sidef::Types::Number::Number::lucasUmod($P, $Q, $x->{n}, $x->{m}), $x->{m});
+    }
+
+    *lucasU  = \&lucasu;
+    *LucasU  = \&lucasu;
+    *lucas_U = \&lucasu;
+
+    sub lucasv {
+        my ($x, $P, $Q) = @_;
+        __PACKAGE__->new(Sidef::Types::Number::Number::lucasVmod($P, $Q, $x->{n}, $x->{m}), $x->{m});
+    }
+
+    *lucasV  = \&lucasv;
+    *LucasV  = \&lucasv;
+    *lucas_V = \&lucasv;
+
+    sub fibonacci {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{n}->fibmod($x->{m}), $x->{m});
+    }
+
+    *fib = \&fibonacci;
+
     {
         no strict 'refs';
 
@@ -120,7 +159,6 @@ package Sidef::Types::Number::Mod {
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '+'}   = \&add;
         *{__PACKAGE__ . '::' . '-'}   = \&sub;
-        *{__PACKAGE__ . '::' . '%'}   = \&mod;
         *{__PACKAGE__ . '::' . '**'}  = \&pow;
         *{__PACKAGE__ . '::' . '++'}  = \&inc;
         *{__PACKAGE__ . '::' . '--'}  = \&dec;
@@ -136,6 +174,7 @@ package Sidef::Types::Number::Mod {
         *{__PACKAGE__ . '::' . '≥'}   = \&ge;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
+        *{__PACKAGE__ . '::' . '!'}   = \&factorial;
     }
 }
 
