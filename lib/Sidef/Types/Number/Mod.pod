@@ -18,7 +18,7 @@ var obj = Mod(...)
 
 Inherits methods from:
 
-       * Sidef::Object::Object
+       * Sidef::Types::Number::Number
 
 =head1 METHODS
 

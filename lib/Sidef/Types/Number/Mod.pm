@@ -3,7 +3,9 @@ package Sidef::Types::Number::Mod {
     use utf8;
     use 5.016;
 
-    use parent qw(Sidef::Object::Object);
+    use parent qw(
+      Sidef::Types::Number::Number
+      );
 
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
