@@ -181,6 +181,9 @@
       "Sidef::Types::Number::Complex" : {
          "file" : "lib/Sidef/Types/Number/Complex.pm"
       },
+      "Sidef::Types::Number::Mod" : {
+         "file" : "lib/Sidef/Types/Number/Mod.pm"
+      },
       "Sidef::Types::Number::Number" : {
          "file" : "lib/Sidef/Types/Number/Number.pm"
       },

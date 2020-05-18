@@ -16,7 +16,9 @@ package Sidef::Types::Number::Mod {
         $n = Sidef::Types::Number::Number->new($n) if ref($n) ne 'Sidef::Types::Number::Number';
         $m = Sidef::Types::Number::Number->new($m) if ref($m) ne 'Sidef::Types::Number::Number';
 
-        $n = $n->mod($m);
+        if ($n->ge($m)) {
+            $n = $n->mod($m);
+        }
 
         bless {n => $n, m => $m};
     }
@@ -72,7 +74,6 @@ package Sidef::Types::Number::Mod {
     sub chinese {
         my (@values) = @_;
 
-        my $lcm = Sidef::Types::Number::Number::ONE;
         my $crt = __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE);
 
         foreach my $mod (@values) {
