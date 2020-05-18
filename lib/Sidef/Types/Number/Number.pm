@@ -70,6 +70,10 @@ package Sidef::Types::Number::Number {
 
         my $ref = ref($num);
 
+        if ($ref eq 'Sidef::Types::Number::Mod') {
+            $num = $num->to_n;
+        }
+
         # Number with base
         if (defined($base)) {
 
@@ -713,7 +717,7 @@ package Sidef::Types::Number::Number {
     sub _big2istr {
         my ($x) = @_;
 
-        $x = $$x                            if ref($x) eq __PACKAGE__;
+        $x = $$x                            if index(ref($x), 'Sidef::') == 0;
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
 
         return Math::GMPz::Rmpz_get_si($x)
@@ -726,7 +730,7 @@ package Sidef::Types::Number::Number {
     sub _big2uistr {
         my ($x) = @_;
 
-        $x = $$x                            if ref($x) eq __PACKAGE__;
+        $x = $$x                            if index(ref($x), 'Sidef::') == 0;
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
 
         return Math::GMPz::Rmpz_get_ui($x)
@@ -740,7 +744,7 @@ package Sidef::Types::Number::Number {
     sub _big2pistr {
         my ($x) = @_;
 
-        $x = $$x                            if ref($x) eq __PACKAGE__;
+        $x = $$x                            if index(ref($x), 'Sidef::') == 0;
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
 
         if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
@@ -1215,12 +1219,22 @@ package Sidef::Types::Number::Number {
     #
 
     sub pi {
+
+        if (ref($_[0])) {
+            return $_[0]->prime_count;
+        }
+
         my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
         bless \$pi;
     }
 
     sub tau {
+
+        if (ref($_[0])) {
+            return $_[0]->sigma0;
+        }
+
         my $tau = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_const_pi($tau, $ROUND);
         Math::MPFR::Rmpfr_mul_2ui($tau, $tau, 1, $ROUND);
@@ -1260,7 +1274,7 @@ package Sidef::Types::Number::Number {
             $c;
         };
 
-        if (ref($x) eq __PACKAGE__) {
+        if (ref($x)) {
             bless \__mul__($i, $$x);
         }
         else {
@@ -1277,7 +1291,7 @@ package Sidef::Types::Number::Number {
 
     sub phi {
 
-        if (ref($_[0]) eq __PACKAGE__) {
+        if (ref($_[0])) {
             return $_[0]->euler_phi;
         }
 
