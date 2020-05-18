@@ -29,6 +29,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Regex::Regex          Regex
                   Sidef::DataTypes::String::String        String
                   Sidef::DataTypes::Number::Number        Number
+                  Sidef::DataTypes::Number::Mod           Mod
                   Sidef::DataTypes::Number::Complex       Complex
                   Sidef::DataTypes::Range::Range          Range
                   Sidef::DataTypes::Range::RangeNumber    RangeNum

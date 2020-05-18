@@ -9477,7 +9477,7 @@ package Sidef::Types::Number::Number {
 
         while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
             Math::GMPz::Rmpz_remove($r, $r, $g);
-            Math::GMPz::Rmpz_gcd($g, $r, $y);
+            Math::GMPz::Rmpz_gcd($g, $r, $g);
         }
 
         bless \$r;
@@ -12786,7 +12786,7 @@ package Sidef::Types::Number::Number {
             }
         );
 
-        my $g = Math::GMPz::Rmpz_init();
+        state $g = Math::GMPz::Rmpz_init_nobless();
         my $t = Math::GMPz::Rmpz_init_set($n);
 
         Math::GMPz::Rmpz_gcd($g, $t, $B);
@@ -12794,7 +12794,7 @@ package Sidef::Types::Number::Number {
         while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
             Math::GMPz::Rmpz_remove($t, $t, $g);
             return Sidef::Types::Bool::Bool::TRUE if Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
-            Math::GMPz::Rmpz_gcd($g, $t, $B);
+            Math::GMPz::Rmpz_gcd($g, $t, $g);
         }
 
         return Sidef::Types::Bool::Bool::FALSE;
@@ -12815,7 +12815,7 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($k) <= 0;
         return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
-        my $g = Math::GMPz::Rmpz_init();
+        state $g = Math::GMPz::Rmpz_init_nobless();
         my $t = Math::GMPz::Rmpz_init_set($n);
 
         Math::GMPz::Rmpz_gcd($g, $t, $k);
@@ -12823,7 +12823,7 @@ package Sidef::Types::Number::Number {
         while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
             Math::GMPz::Rmpz_remove($t, $t, $g);
             return Sidef::Types::Bool::Bool::TRUE if Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
-            Math::GMPz::Rmpz_gcd($g, $t, $k);
+            Math::GMPz::Rmpz_gcd($g, $t, $g);
         }
 
         return Sidef::Types::Bool::Bool::FALSE;
