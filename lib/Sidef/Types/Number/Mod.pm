@@ -16,9 +16,7 @@ package Sidef::Types::Number::Mod {
         $n = Sidef::Types::Number::Number->new($n) if ref($n) ne 'Sidef::Types::Number::Number';
         $m = Sidef::Types::Number::Number->new($m) if ref($m) ne 'Sidef::Types::Number::Number';
 
-        if ($n->ge($m)) {
-            $n = $n->mod($m);
-        }
+        $n = $n->mod($m);
 
         bless {n => $n, m => $m};
     }
