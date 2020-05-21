@@ -386,7 +386,7 @@ Number.μ() -> I<Obj>
 
 Return the
 
-Aliases: I<mobius>, I<möbius>, I<moebius>
+Aliases: I<mu>, I<mobius>, I<möbius>, I<moebius>
 
 =cut
 

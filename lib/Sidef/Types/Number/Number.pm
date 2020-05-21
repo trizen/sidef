@@ -73,6 +73,9 @@ package Sidef::Types::Number::Number {
         if ($ref eq 'Sidef::Types::Number::Mod') {
             $num = $num->to_n;
         }
+        elsif ($ref eq 'Sidef::Types::Bool::Bool') {
+            $num = $num->get_value;
+        }
 
         # Number with base
         if (defined($base)) {
@@ -8333,6 +8336,7 @@ package Sidef::Types::Number::Number {
         $m ? ($m == 1) ? ONE : MONE : ZERO;
     }
 
+    *mu      = \&moebius;
     *mobius  = \&moebius;
     *möbius  = \&moebius;
     *Möbius  = \&moebius;
