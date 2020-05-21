@@ -9342,11 +9342,18 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        (__is_int__($$x) && __is_int__($$y))
-          || return Sidef::Types::Bool::Bool::FALSE;
+        $x = $$x;
+        $y = $$y;
 
-        $x = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
-        $y = _any2mpz($$y) // return Sidef::Types::Bool::Bool::FALSE;
+        if (ref($x) ne 'Math::GMPz') {
+            __is_int__($x) || return Sidef::Types::Bool::Bool::FALSE;
+            $x = _any2mpz($x) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (ref($y) ne 'Math::GMPz') {
+            __is_int__($y) || return Sidef::Types::Bool::Bool::FALSE;
+            $y = _any2mpz($y) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_gcd($t, $x, $y);
@@ -9883,6 +9890,7 @@ package Sidef::Types::Number::Number {
     sub is_euler_pseudoprime {
         my ($n, @bases) = @_;
         _valid(\(@bases));
+
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_euler_pseudoprime(
             _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
@@ -9898,6 +9906,7 @@ package Sidef::Types::Number::Number {
     sub is_strong_fermat_pseudoprime {
         my ($n, @bases) = @_;
         _valid(\(@bases));
+
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_strong_pseudoprime(
             _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
@@ -12612,9 +12621,13 @@ package Sidef::Types::Number::Number {
 
     sub is_squarefree {
         my ($n) = @_;
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
 
-        my $z = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        my $z = $$n;
+
+        if (ref($z) ne 'Math::GMPz') {
+            __is_int__($z) || return Sidef::Types::Bool::Bool::FALSE;
+            $z = _any2mpz($z) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         if (Math::GMPz::Rmpz_sizeinbase($z, 2) > 100) {
             state $lim = __PACKAGE__->_set_uint(1e6);
@@ -12668,8 +12681,12 @@ package Sidef::Types::Number::Number {
     sub is_lucas_carmichael {    # OEIS: A006972
         my ($n) = @_;
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         # Small or even
         Math::GMPz::Rmpz_cmp_ui($n, 399) < 0 and return Sidef::Types::Bool::Bool::FALSE;
@@ -12779,10 +12796,18 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
 
         _valid(\$k);
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
 
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
-        $k = _any2ui($$k)  // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+        $k = $$k;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (ref($k) ne 'Math::GMPz') {
+            $k = _any2ui($k) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
@@ -12823,11 +12848,18 @@ package Sidef::Types::Number::Number {
 
         _valid(\$k);
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        __is_int__($$k) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+        $k = $$k;
 
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
-        $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (ref($k) ne 'Math::GMPz') {
+            __is_int__($k) || return Sidef::Types::Bool::Bool::FALSE;
+            $k = _any2mpz($k) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($k) <= 0;
@@ -12912,17 +12944,6 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
-    sub is_square {
-        my ($x) = @_;
-        __is_int__($$x)
-          && Math::GMPz::Rmpz_perfect_square_p(_any2mpz($$x))
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    *is_sqr            = \&is_square;
-    *is_perfect_square = \&is_square;
-
     sub __is_power__ {
         my ($n, $k) = @_;
 
@@ -12958,11 +12979,33 @@ package Sidef::Types::Number::Number {
         !!Math::GMPz::Rmpz_root($t, $n, $k);
     }
 
+    sub is_square {
+        my ($n) = @_;
+
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Math::GMPz::Rmpz_perfect_square_p($n)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *is_sqr            = \&is_square;
+    *is_perfect_square = \&is_square;
+
     sub is_cube {
         my ($n) = @_;
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         __is_power__($n, 3)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -12972,8 +13015,12 @@ package Sidef::Types::Number::Number {
     sub is_power {
         my ($n, $k) = @_;
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         if (defined $k) {
             _valid(\$k);
@@ -12998,9 +13045,17 @@ package Sidef::Types::Number::Number {
     sub is_power_of {
         my ($n, $k) = @_;
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
-        $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+        $k = $$k;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (ref($k) ne 'Math::GMPz') {
+            $k = _any2mpz($k) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         my $e = __ilog__($n, $k) // return Sidef::Types::Bool::Bool::FALSE;
 
@@ -13108,8 +13163,12 @@ package Sidef::Types::Number::Number {
     sub is_powerful {
         my ($n, $k) = @_;
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return Sidef::Types::Bool::Bool::FALSE;
@@ -13272,10 +13331,17 @@ package Sidef::Types::Number::Number {
 
         _valid(\$k);
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+        $k = $$k;
 
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
-        $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (ref($k) ne 'Math::GMPz') {
+            $k = _any2mpz($k) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         __is_polygonal__($n, $k)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -13287,10 +13353,17 @@ package Sidef::Types::Number::Number {
 
         _valid(\$k);
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+        $k = $$k;
 
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
-        $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (ref($k) ne 'Math::GMPz') {
+            $k = _any2mpz($k) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         __is_polygonal__($n, $k, 1)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -13557,8 +13630,12 @@ package Sidef::Types::Number::Number {
     sub is_palindrome {
         my ($n, $k) = @_;
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         if (defined($k)) {
             _valid(\$k);
