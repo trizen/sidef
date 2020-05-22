@@ -6769,25 +6769,49 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y, \$z);
 
-        $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2mpz($$y) // (goto &nan);
-        $z = _any2mpz($$z) // (goto &nan);
+        $x = $$x;
+        $y = $$y;
+        $z = $$z;
 
-        Math::GMPz::Rmpz_sgn($z) || goto &nan;
+        if (   (ref($x) eq 'Math::GMPz' || __is_int__($x))
+            && (ref($y) eq 'Math::GMPz' || __is_int__($y))
+            && (ref($z) eq 'Math::GMPz' || __is_int__($z))) {
 
-        if (Math::GMPz::Rmpz_sgn($y) < 0) {
-            my $t = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_gcd($t, $x, $z);
-            Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or goto &nan;
+            $x = _any2mpz($x) // (goto &nan);
+            $y = _any2mpz($y) // (goto &nan);
+            $z = _any2mpz($z) // (goto &nan);
+
+            Math::GMPz::Rmpz_sgn($z) || goto &nan;
+
+            if (Math::GMPz::Rmpz_sgn($y) < 0) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_gcd($t, $x, $z);
+                Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or goto &nan;
+            }
+
+            my $r = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_fits_ulong_p($y)
+              ? Math::GMPz::Rmpz_powm_ui($r, $x, Math::GMPz::Rmpz_get_ui($y), $z)
+              : Math::GMPz::Rmpz_powm($r, $x, $y, $z);
+
+            return bless \$r;
         }
 
-        my $r = Math::GMPz::Rmpz_init();
+        $x = _any2mpq($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $z = _any2mpz($z) // goto &nan;
 
-        Math::GMPz::Rmpz_fits_ulong_p($y)
-          ? Math::GMPz::Rmpz_powm_ui($r, $x, Math::GMPz::Rmpz_get_ui($y), $z)
-          : Math::GMPz::Rmpz_powm($r, $x, $y, $z);
+        my $num = Math::GMPz::Rmpz_init();
+        my $den = Math::GMPz::Rmpz_init();
 
-        bless \$r;
+        Math::GMPq::Rmpq_get_num($num, $x);
+        Math::GMPq::Rmpq_get_den($den, $x);
+
+        my $numpow = (bless \$num)->powmod((bless \$y), (bless \$z));
+        my $denpow = (bless \$den)->powmod((bless \$y), (bless \$z));
+
+        $numpow->mul($denpow->invmod(bless \$z))->mod(bless \$z);
     }
 
     *expmod = \&modpow;
