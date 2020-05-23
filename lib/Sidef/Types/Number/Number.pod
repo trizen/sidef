@@ -3240,6 +3240,16 @@ Return the
 
 =cut
 
+=head2 pi_k
+
+Number.pi_k() -> I<Obj>
+
+Return the
+
+Aliases: I<k_prime_count>, I<almost_primepi>, I<almost_prime_count>
+
+=cut
+
 =head2 pm1_factor
 
 Number.pm1_factor() -> I<Obj>
