@@ -8902,8 +8902,31 @@ package Sidef::Types::Number::Number {
 
         return 0 if ($y < $x);
 
-        if ($x eq '2' and defined(my $value = $primepi_lookup->{$y})) {
-            return $value;
+        my $table_len = 100003;
+
+        state $pi_table = do {
+            my @pi;
+
+            my $k     = 0;
+            my $count = 0;
+
+            foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $table_len)) {
+                splice(@pi, $k, $p - $k + 1, ($count) x ($p - $k + 1));
+                $k = $p;
+                ++$count;
+            }
+
+            \@pi;
+        };
+
+        if ($x eq '2') {
+            if (defined(my $value = $primepi_lookup->{$y})) {
+                return $value;
+            }
+
+            if ($y <= $table_len) {
+                return $pi_table->[$y];
+            }
         }
 
         # Support for arbitrary large integers (slow for wide ranges)
