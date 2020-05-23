@@ -10160,6 +10160,67 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_almost_prime {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+        else {
+            $k = 1;
+        }
+
+        if ($k == 0) {
+            return $n->is_one;
+        }
+        elsif ($k == 1) {
+            return $n->is_prime;
+        }
+        elsif ($k == 2) {
+            return $n->is_semiprime;
+        }
+
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my $omega     = 0;
+        my $remainder = $n;
+        my $size      = Math::GMPz::Rmpz_sizeinbase($n, 10);
+
+        if ($size > 30) {
+
+            my $trial_limit = 1e3;
+
+#<<<
+               if ($size > 60) { $trial_limit = 1e6 }
+            elsif ($size > 50) { $trial_limit = 1e5 }
+            elsif ($size > 40) { $trial_limit = 1e4 }
+#>>>
+
+            my ($r, @factors) = _native_trial_factor($n, $trial_limit);
+
+            $omega += scalar(@factors);
+            $remainder = $r;
+        }
+
+        if ($omega > $k) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my @factors = Math::Prime::Util::GMP::factor($remainder);
+
+        $omega += scalar(@factors);
+
+        ($omega == $k)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_prob_prime {
         my ($n) = @_;
         _primality_pretest($$n)

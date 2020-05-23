@@ -2050,6 +2050,14 @@ Return the
 
 =cut
 
+=head2 is_almost_prime
+
+Number.is_almost_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_between
 
 Number.is_between() -> I<Obj>
