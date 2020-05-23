@@ -20,6 +20,29 @@ package Sidef::Optimizer {
                   BACKTICK_DT => 'Sidef::DataTypes::Glob::Backtick',
                  };
 
+    my %dt_table = (
+        qw(
+          Sidef::DataTypes::Bool::Bool            Sidef::Types::Bool::Bool
+          Sidef::DataTypes::Array::Array          Sidef::Types::Array::Array
+          Sidef::DataTypes::Array::Pair           Sidef::Types::Array::Pair
+          Sidef::DataTypes::Array::Matrix         Sidef::Types::Array::Matrix
+          Sidef::DataTypes::Hash::Hash            Sidef::Types::Hash::Hash
+          Sidef::DataTypes::Set::Set              Sidef::Types::Set::Set
+          Sidef::DataTypes::Set::Bag              Sidef::Types::Set::Bag
+          Sidef::DataTypes::Regex::Regex          Sidef::Types::Regex::Regex
+          Sidef::DataTypes::String::String        Sidef::Types::String::String
+          Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number
+          Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
+          Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
+          Sidef::DataTypes::Range::RangeString    Sidef::Types::Range::RangeString
+          Sidef::DataTypes::Glob::Backtick        Sidef::Types::Glob::Backtick
+          Sidef::DataTypes::Glob::Socket          Sidef::Types::Glob::Socket
+          Sidef::DataTypes::Glob::Pipe            Sidef::Types::Glob::Pipe
+          Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
+          Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
+          )
+    );
+
     my %cache;
     {
 
@@ -36,49 +59,20 @@ package Sidef::Optimizer {
             } @names;
         }
 
-        my %table = (
-            qw(
-              Sidef::DataTypes::Bool::Bool            Sidef::Types::Bool::Bool
-              Sidef::DataTypes::Array::Array          Sidef::Types::Array::Array
-              Sidef::DataTypes::Array::Pair           Sidef::Types::Array::Pair
-              Sidef::DataTypes::Array::Matrix         Sidef::Types::Array::Matrix
-              Sidef::DataTypes::Hash::Hash            Sidef::Types::Hash::Hash
-              Sidef::DataTypes::Set::Set              Sidef::Types::Set::Set
-              Sidef::DataTypes::Set::Bag              Sidef::Types::Set::Bag
-              Sidef::DataTypes::Regex::Regex          Sidef::Types::Regex::Regex
-              Sidef::DataTypes::String::String        Sidef::Types::String::String
-              Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number
-              Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
-              Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
-              Sidef::DataTypes::Range::RangeString    Sidef::Types::Range::RangeString
-              Sidef::DataTypes::Glob::Backtick        Sidef::Types::Glob::Backtick
-              Sidef::DataTypes::Glob::Socket          Sidef::Types::Glob::Socket
-              Sidef::DataTypes::Glob::Pipe            Sidef::Types::Glob::Pipe
-              Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
-              Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
-              )
-        );
-
-        my %seen;
-
         sub dtypes {
             my ($type, @names) = @_;
 
-            exists($table{$type}) || die "[ERROR] Non-existent data type: $type";
+            exists($dt_table{$type}) || die "[ERROR] Non-existent data type: $type";
 
-            my $package = $table{$type};
+            my $package = $dt_table{$type};
             my $module  = ($cache{$package} //= (($package =~ s{::}{/}gr) . '.pm'));
-            exists($INC{$module}) || require($module);
 
-            if (not $seen{$type}++) {
-                no strict 'refs';
-                push @{$type . '::' . 'ISA'}, $package;
-            }
+            exists($INC{$module}) || require($module);
 
             map {
                 $cache{$type, $_} //= do {
-                    defined(my $method = UNIVERSAL::can($type, $_))
-                      or die "[ERROR] Invalid method $type: $_";
+                    defined(my $method = UNIVERSAL::can($package, $_))
+                      or die "[ERROR] Invalid method $package: $_";
                     $method;
                 }
             } @names;
@@ -1058,6 +1052,9 @@ package Sidef::Optimizer {
                                 }
 
                                 if ($ok) {
+                                    if (exists $dt_table{$ref_obj}) {
+                                        $obj->{self} = $dt_table{$ref_obj};
+                                    }
                                     $obj->{self} = $obj->{self}->$code(@args);
                                     $ref_obj     = ref($obj->{self});
                                     $optimized   = 1;
