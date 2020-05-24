@@ -6817,6 +6817,54 @@ package Sidef::Types::Number::Number {
     *expmod = \&modpow;
     *powmod = \&modpow;
 
+    sub complex_powmod {
+        my ($x, $y, $n, $m) = @_;
+
+        _valid(\$y, \$n, \$m);
+
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        my $c0 = Math::GMPz::Rmpz_init_set_ui(1);
+        my $c1 = Math::GMPz::Rmpz_init_set_ui(0);
+
+        $x = Math::GMPz::Rmpz_init_set($x);
+        $y = Math::GMPz::Rmpz_init_set($y);
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        foreach my $k (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
+
+            if (Math::GMPz::Rmpz_tstbit($n, $k)) {
+                Math::GMPz::Rmpz_set($t, $c0);
+
+                Math::GMPz::Rmpz_mul($c0, $c0, $x);
+                Math::GMPz::Rmpz_submul($c0, $c1, $y);
+
+                Math::GMPz::Rmpz_mul($c1, $c1, $x);
+                Math::GMPz::Rmpz_addmul($c1, $t, $y);
+
+                Math::GMPz::Rmpz_mod($c0, $c0, $m);
+                Math::GMPz::Rmpz_mod($c1, $c1, $m);
+            }
+
+            Math::GMPz::Rmpz_mul($t, $x, $y);
+            Math::GMPz::Rmpz_mul_2exp($t, $t, 1);
+
+            Math::GMPz::Rmpz_powm_ui($x, $x, 2, $m);
+            Math::GMPz::Rmpz_powm_ui($y, $y, 2, $m);
+
+            Math::GMPz::Rmpz_sub($x, $x, $y);
+            Math::GMPz::Rmpz_mod($y, $t, $m);
+        }
+
+        ((bless \$c0), (bless \$c1));
+    }
+
+    *cpowmod = \&complex_powmod;
+
     sub modinv {
         my ($x, $y) = @_;
 

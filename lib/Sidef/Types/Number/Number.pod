@@ -1250,6 +1250,16 @@ Return the
 
 =cut
 
+=head2 cpowmod
+
+Number.cpowmod() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_powmod>
+
+=cut
+
 =head2 csc
 
 Number.csc() -> I<Obj>
