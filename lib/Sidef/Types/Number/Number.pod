@@ -1368,6 +1368,14 @@ Return the
 
 =cut
 
+=head2 digits2num
+
+Number.digits2num() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 digits_sum
 
 Number.digits_sum() -> I<Obj>
@@ -4253,6 +4261,14 @@ Number.udivisors() -> I<Obj>
 Return the
 
 Aliases: I<unitary_divisors>
+
+=cut
+
+=head2 uphi
+
+Number.uphi() -> I<Obj>
+
+Return the
 
 =cut
 

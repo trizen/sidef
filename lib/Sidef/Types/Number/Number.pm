@@ -6001,7 +6001,8 @@ package Sidef::Types::Number::Number {
         }
 #>>>
 
-        # Subquadratic algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
+        # Subquadratic algorithm from "Modern Computer Arithmetic"
+        #                                   by Richard P. Brent and Paul Zimmermann
         if (Math::GMPz::Rmpz_fits_ulong_p($k)) {
 
             # Find r such that B^(2r - 2) <= A < B^(2r)
@@ -6055,6 +6056,38 @@ package Sidef::Types::Number::Number {
         }
 
         Sidef::Types::Array::Array->new(\@digits);
+    }
+
+    sub digits2num {
+        my ($base, @L) = @_;
+
+        # Algorithm from "Modern Computer Arithmetic"
+        #                    by Richard P. Brent and Paul Zimmermann
+
+        @L || return ZERO;
+
+        _valid(\$base);
+        _valid(\(@L));
+
+        $base = $$base;
+        @L    = map { $$_ } @L;
+
+        my ($B, $k) = ($base, scalar(@L));
+
+        while ($k > 1) {
+
+            my @T;
+            for (0 .. ($k >> 1) - 1) {
+                push(@T, __add__($L[2 * $_], __mul__($B, $L[2 * $_ + 1])));
+            }
+
+            push(@T, $L[-1]) if ($k & 1);
+            @L = @T;
+            $B = __mul__($B, $B);
+            $k = ($k >> 1) + ($k & 1);
+        }
+
+        bless \($L[0]);
     }
 
     sub digit {
@@ -6137,7 +6170,8 @@ package Sidef::Types::Number::Number {
         }
 #>>>
 
-        # Subquadratic algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
+        # Subquadratic algorithm from "Modern Computer Arithmetic"
+        #                                 by Richard P. Brent and Paul Zimmermann
         if (Math::GMPz::Rmpz_fits_ulong_p($k)) {
 
             # Find r such that B^(2r - 2) <= A < B^(2r)
@@ -12568,6 +12602,36 @@ package Sidef::Types::Number::Number {
             }
 
             Math::GMPz::Rmpz_add_ui($t, $t, 1);
+            Math::GMPz::Rmpz_mul($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
+    sub uphi {
+        my ($n) = @_;
+
+        # Multiplicative with:
+        #   uphi(p^e) = p^e - 1
+
+        my %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
+        exists($factors{'0'}) and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        while (my ($p, $e) = each %factors) {
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $e);
+            }
+
+            Math::GMPz::Rmpz_sub_ui($t, $t, 1);
             Math::GMPz::Rmpz_mul($s, $s, $t);
         }
 

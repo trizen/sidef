@@ -1139,29 +1139,13 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::all_composite(@$self);
     }
 
-    sub digits2num {    # Algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
+    sub digits2num {
         my ($self, $base) = @_;
 
         state $ten = Sidef::Types::Number::Number->_set_uint(10);
         $base //= $ten;
 
-        my @L = @$self;
-        my ($B, $k) = ($base, scalar(@L));
-
-        while ($k > 1) {
-
-            my @T;
-            for (0 .. ($k >> 1) - 1) {
-                CORE::push(@T, $L[2 * $_]->add($B->mul($L[2 * $_ + 1])));
-            }
-
-            CORE::push(@T, $L[-1]) if ($k & 1);
-            @L = @T;
-            $B = $B->mul($B);
-            $k = ($k >> 1) + ($k & 1);
-        }
-
-        $L[0] // Sidef::Types::Number::Number::ZERO;
+        Sidef::Types::Number::Number::digits2num($base, @$self);
     }
 
     sub cfrac2num {
