@@ -97,6 +97,11 @@ package Sidef::Types::Number::Mod {
         __PACKAGE__->new($x->{n}->sqrtmod($x->{m}), $x->{m});
     }
 
+    sub znorder {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{n}->znorder($x->{m}), $x->{m});
+    }
+
     sub pow {
         my ($x, $y) = @_;
         __PACKAGE__->new($x->{n}->powmod($y->to_n, $x->{m}), $x->{m});
