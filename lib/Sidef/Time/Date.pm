@@ -126,6 +126,19 @@ package Sidef::Time::Date {
 
     *parse = \&strptime;
 
+    sub valid_date {
+        my ($self, $string, $format) = @_;
+
+        $format = "$format";
+        $string = "$string";
+
+        eval { Time::Piece->strptime($string, $format)->strftime($format) eq $string }
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *valid = \&valid_date;
+
     sub add_seconds {
         my ($self, $sec) = @_;
         bless {time => scalar $self->{time}->add(CORE::int($sec))};

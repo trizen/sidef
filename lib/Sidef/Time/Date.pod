@@ -398,6 +398,16 @@ Return the
 
 =cut
 
+=head2 valid
+
+Date.valid() -> I<Obj>
+
+Return the
+
+Aliases: I<valid_date>
+
+=cut
+
 =head2 wday
 
 Date.wday() -> I<Obj>
