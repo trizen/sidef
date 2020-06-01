@@ -8569,7 +8569,15 @@ package Sidef::Types::Number::Number {
             return ($r >= 0 ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_int($r));
         }
 
-        my $lookup_size = 2 * CORE::int($y**(2 / 3));
+        my $lookup_size = CORE::int($y**(2 / 3));
+
+        if ($y > 1e10) {
+            $lookup_size >>= 1;
+        }
+
+        if ($y > 1e11) {
+            $lookup_size >>= 1;
+        }
 
         state @mertens_lookup;
 
@@ -8587,8 +8595,13 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        use integer;
+
         my $mertens = sub {
             my ($n) = @_;
+
+            # Algorithm based on the recursive identity:
+            #   M(n) = 1 - Sum_{k=2..n} M(floor(n/k))
 
             if ($n <= $lookup_size) {
                 return $mertens_lookup[$n];
@@ -8598,25 +8611,30 @@ package Sidef::Types::Number::Number {
                 return $mertens_table->{$n};
             }
 
-            my $s = CORE::int(CORE::sqrt($n));
-            my $M = 1;
+            # Using Dana Jacobsen's (++) optimizations from Math::Prime::Util::PP.
+            my $s  = CORE::int(CORE::sqrt($n));
+            my $ns = $n / ($s + 1);
 
-            foreach my $k (2 .. CORE::int($n / ($s + 1))) {
-                $M -= __SUB__->(CORE::int($n / $k));
+            my ($nk, $nk1) = ($n, $n >> 1);
+            my $M = 1 - ($nk - $nk1);
+
+            foreach my $k (2 .. $ns) {
+                ($nk, $nk1) = ($nk1, $n / ($k + 1));
+                $M -= ($nk <= $lookup_size) ? $mertens_lookup[$nk] : __SUB__->($nk);
+                $M -= $mertens_lookup[$k] * ($nk - $nk1);
             }
 
-            foreach my $k (1 .. $s) {
-                $M -= $mertens_lookup[$k] * (CORE::int($n / $k) - CORE::int($n / ($k + 1)));
+            if ($s > $ns) {
+                $M -= $mertens_lookup[$s] * ($n / $s - $ns);
             }
 
             $mertens_table->{$n} = $M;
         };
 
-        my $value = (
-                     ($x == 1)
-                     ? $mertens->($y)
-                     : ($mertens->($y) - $mertens->($x) + Math::Prime::Util::GMP::moebius($x))
-                    );
+        my $value =
+          ($x == 1)
+          ? $mertens->($y)
+          : ($mertens->($y) - $mertens->($x) + Math::Prime::Util::GMP::moebius($x));
 
         ($value > LONG_MIN and $value < ULONG_MAX)
           ? __PACKAGE__->_set_int($value)
