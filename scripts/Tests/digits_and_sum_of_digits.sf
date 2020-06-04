@@ -29,4 +29,27 @@ for a in (1..20, 90..100) {
     }
 }
 
+assert_eq([5040, 1234].digits2num(10), 1234*10 + 5040)
+assert_eq(10.digits2num([5040, 1234]), 1234*10 + 5040)
+
+assert_eq(
+    20.of {|k| 2.digits2num(0..k) },
+    20.of {|n| 2**(n+1) * (n-1) + 2 }
+)
+
+assert_eq(
+    20.of {|k| 2.digits2num(1..k) },
+    20.of {|n| 2**n * (n-1) + 1 }
+)
+
+assert_eq(
+    20.of {|k| 10.digits2num(0..k) },
+    20.of {|n| ((9*n - 1) * 10**n + 1) * 10 / 81 }
+)
+
+assert_eq(
+    20.of {|k| 10.digits2num(1..k) },
+    20.of {|n| (10**n * (9*n - 1) + 1)/81 }
+)
+
 say "** Test passed!"

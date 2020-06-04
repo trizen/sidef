@@ -1145,7 +1145,7 @@ package Sidef::Types::Array::Array {
         state $ten = Sidef::Types::Number::Number->_set_uint(10);
         $base //= $ten;
 
-        Sidef::Types::Number::Number::digits2num($base, @$self);
+        Sidef::Types::Number::Number::digits2num($base, $self);
     }
 
     sub cfrac2num {

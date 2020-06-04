@@ -1374,6 +1374,8 @@ Number.digits2num() -> I<Obj>
 
 Return the
 
+Aliases: I<from_digits>
+
 =cut
 
 =head2 digits_sum

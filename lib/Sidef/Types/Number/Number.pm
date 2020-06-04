@@ -5280,6 +5280,8 @@ package Sidef::Types::Number::Number {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *is_divisible = \&is_div;
+
     sub divides {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -6059,36 +6061,93 @@ package Sidef::Types::Number::Number {
     }
 
     sub digits2num {
-        my ($base, @L) = @_;
+        my ($base, $D) = @_;
 
         # Algorithm from "Modern Computer Arithmetic"
         #                    by Richard P. Brent and Paul Zimmermann
 
-        @L || return ZERO;
+        my @digits = @$D;
+        @digits || return ZERO;
 
         _valid(\$base);
-        _valid(\(@L));
+        _valid(\(@digits));
 
-        $base = $$base;
-        @L    = map { $$_ } @L;
+        $base   = $$base;
+        @digits = map { $$_ } @digits;
 
-        my ($B, $k) = ($base, scalar(@L));
+        my $all_mpz = ref($base) eq 'Math::GMPz';
 
-        while ($k > 1) {
+        if ($all_mpz) {
+            foreach my $digit (@digits) {
+                if (ref($digit) ne 'Math::GMPz') {
+                    $all_mpz = 0;
+                    last;
+                }
+            }
+        }
+
+        my $L = \@digits;
+
+        if ($all_mpz and Math::GMPz::Rmpz_cmp_ui($base, 2) >= 0) {
+
+            if (Math::GMPz::Rmpz_cmp_ui($base, 62) <= 0) {    # return faster for base in 2..62
+
+                my $str      = '';
+                my $optimize = 1;
+                my $B        = Math::GMPz::Rmpz_get_ui($base);
+
+                foreach my $digit (CORE::reverse(@digits)) {
+                    if (Math::GMPz::Rmpz_cmp_ui($digit, $B) < 0 and Math::GMPz::Rmpz_sgn($digit) >= 0) {
+                        $str .= Math::GMPz::Rmpz_get_str($digit, $B);
+                    }
+                    else {
+                        $optimize = 0;
+                        last;
+                    }
+                }
+
+                if ($optimize) {
+                    return bless \Math::GMPz::Rmpz_init_set_str($str, $B);
+                }
+            }
+
+            my $B = Math::GMPz::Rmpz_init_set($base);
+
+            for (my $k = scalar(@digits) ; $k > 1 ; $k = ($k >> 1) + ($k & 1)) {
+
+                my @T;
+                for (0 .. ($k >> 1) - 1) {
+                    my $t = Math::GMPz::Rmpz_init_set($L->[2 * $_]);
+                    Math::GMPz::Rmpz_addmul($t, $L->[2 * $_ + 1], $B);
+                    push(@T, $t);
+                }
+
+                push(@T, $L->[-1]) if ($k & 1);
+                $L = \@T;
+                Math::GMPz::Rmpz_mul($B, $B, $B);
+            }
+
+            return bless \($L->[0]);
+        }
+
+        my $B = $base;
+
+        for (my $k = scalar(@digits) ; $k > 1 ; $k = ($k >> 1) + ($k & 1)) {
 
             my @T;
             for (0 .. ($k >> 1) - 1) {
-                push(@T, __add__($L[2 * $_], __mul__($B, $L[2 * $_ + 1])));
+                push(@T, __add__($L->[2 * $_], __mul__($B, $L->[2 * $_ + 1])));
             }
 
-            push(@T, $L[-1]) if ($k & 1);
-            @L = @T;
+            push(@T, $L->[-1]) if ($k & 1);
+            $L = \@T;
             $B = __mul__($B, $B);
-            $k = ($k >> 1) + ($k & 1);
         }
 
-        bless \($L[0]);
+        bless \($L->[0]);
     }
+
+    *from_digits = \&digits2num;
 
     sub digit {
         my ($n, $i, $k) = @_;
