@@ -2648,9 +2648,10 @@ package Sidef::Types::Number::Number {
 
             $y = Math::GMPz::Rmpz_get_ui($y) if ref($y);
 
+            # NOTE: size is always exact for base = 2.
             my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || return) - 1;
 
-            if ($e > 0) {
+            if ($y != 2 and $e > 0) {
                 state $t = Math::GMPz::Rmpz_init_nobless();
                 Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
                 Math::GMPz::Rmpz_cmp($t, $x) > 0 and --$e;
@@ -13894,6 +13895,14 @@ package Sidef::Types::Number::Number {
 
         if (ref($k) ne 'Math::GMPz') {
             $k = _any2mpz($k) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($k, 2) == 0) {
+            return (
+                    (Math::GMPz::Rmpz_popcount($n) == 1)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
         }
 
         my $e = __ilog__($n, $k) // return Sidef::Types::Bool::Bool::FALSE;
