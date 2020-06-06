@@ -1,0 +1,76 @@
+#!/usr/bin/ruby
+
+# Tests for numeric palindromic-related methods.
+
+func my_next_palindrome(n,b) {
+    n + n.is_palindrome(b) .. Inf -> first { .is_palindrome(b) }
+}
+
+for k in (1..100) {
+    var b = irand(2, 100)
+    assert_eq(next_palindrome(k, b), my_next_palindrome(k, b), "next_palindrome(#{k}, #{b})")
+}
+
+for b in (2..10) {
+    with (0) { |k|
+        var arr = gather {
+            100.times {
+                take(k)
+                k = next_palindrome(k, b)
+            }
+        }
+        assert_eq(arr, 100.by { .is_palindrome(b) })
+    }
+}
+
+assert_eq(next_palindrome(10),    11);
+assert_eq(next_palindrome(11),    22);
+assert_eq(next_palindrome(12),    22);
+assert_eq(next_palindrome(110),   111);
+assert_eq(next_palindrome(111),   121);
+assert_eq(next_palindrome(112),   121);
+assert_eq(next_palindrome(120),   121);
+assert_eq(next_palindrome(121),   131);
+assert_eq(next_palindrome(1234),  1331);
+assert_eq(next_palindrome(12345), 12421);
+
+assert_eq(next_palindrome(8887),  8888);
+assert_eq(next_palindrome(8888),  8998);
+assert_eq(next_palindrome(8889),  8998);
+assert_eq(next_palindrome(88887), 88888);
+assert_eq(next_palindrome(88888), 88988);
+assert_eq(next_palindrome(88889), 88988);
+assert_eq(next_palindrome(9998),  9999);
+assert_eq(next_palindrome(99998), 99999);
+assert_eq(next_palindrome(9999),  10001);
+assert_eq(next_palindrome(99999), 100001);
+
+assert_eq(next_palindrome(12311), 12321);
+assert_eq(next_palindrome(1321),  1331);
+assert_eq(next_palindrome(1331),  1441);
+assert_eq(next_palindrome(13530), 13531);
+assert_eq(next_palindrome(13520), 13531);
+assert_eq(next_palindrome(13521), 13531);
+assert_eq(next_palindrome(13530), 13531);
+assert_eq(next_palindrome(13531), 13631);
+assert_eq(next_palindrome(13540), 13631);
+assert_eq(next_palindrome(13532), 13631);
+
+assert_eq(next_palindrome(1234, 2), 1241);
+assert_eq(next_palindrome(1234, 3), 1249);
+assert_eq(next_palindrome(1234, 4), 1265);
+assert_eq(next_palindrome(1234, 5), 1246);
+assert_eq(next_palindrome(1234, 6), 1253);
+
+assert_eq(next_palindrome(12345, 2), 12483);
+assert_eq(next_palindrome(12345, 3), 12382);
+assert_eq(next_palindrome(12345, 4), 12355);
+assert_eq(next_palindrome(12345, 5), 12348);
+assert_eq(next_palindrome(12345, 6), 12439);
+
+assert_eq(next_palindrome(2**65), 36893488155188439863)
+assert_eq(next_palindrome(2**67), 147573952595259375741)
+assert_eq(next_palindrome(2**65, 100), 36893488151588348936)
+assert_eq(next_palindrome(2**67, 100), 147573952595239574701)
+
+say "** Test passed!"

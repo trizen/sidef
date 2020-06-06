@@ -36,6 +36,18 @@ package Sidef::Types::Number::Number {
 
     state $HAS_PRIME_UTIL = eval { require Math::Prime::Util; 1 };
 
+    my %DIGITS_36;
+    @DIGITS_36{0 .. 9, 'a' .. 'z'} = (0 .. 35);
+
+    my %DIGITS_62;
+    @DIGITS_62{0 .. 9, 'A' .. 'Z', 'a' .. 'z'} = (0 .. 61);
+
+    my %FROM_DIGITS_36;
+    @FROM_DIGITS_36{0 .. 35} = (0 .. 9, 'a' .. 'z');
+
+    my %FROM_DIGITS_62;
+    @FROM_DIGITS_62{0 .. 61} = (0 .. 9, 'A' .. 'Z', 'a' .. 'z');
+
 #<<<
     use constant {
           ONE  => bless(\$ONE),
@@ -5962,12 +5974,6 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([map { $_ ? ONE : ZERO } split(//, $bin)]);
     }
 
-    my %DIGITS_36;
-    @DIGITS_36{0 .. 9, 'a' .. 'z'} = (0 .. 35);
-
-    my %DIGITS_62;
-    @DIGITS_62{0 .. 9, 'A' .. 'Z', 'a' .. 'z'} = (0 .. 61);
-
     sub digits {
         my ($n, $k) = @_;
 
@@ -6061,6 +6067,60 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@digits);
     }
 
+    sub __digits2num__ {
+        my ($base, $digits) = @_;
+
+        # $base is a native integer
+        # $digits is a non-empty array of native integers < base (msd first)
+
+        if ($base <= 10) {
+            return Math::GMPz::Rmpz_init_set_str(join('', @$digits), $base);
+        }
+
+        if ($base <= 36) {
+            return Math::GMPz::Rmpz_init_set_str(join('', map { $FROM_DIGITS_36{$_} } @$digits), $base);
+        }
+
+        if ($base <= 62) {
+            return Math::GMPz::Rmpz_init_set_str(join('', map { $FROM_DIGITS_62{$_} } @$digits), $base);
+        }
+
+        my @D   = CORE::reverse(@$digits);
+        my $len = scalar(@D);
+
+        if (CORE::log($base) * $len < CORE::log(ULONG_MAX)) {
+            my $r = 0;
+            my $B = 1;
+
+            foreach my $d (@D) {
+                $r += $B * $d;
+                $B *= $base;
+            }
+
+            return ${__PACKAGE__->_set_uint($r)};
+        }
+
+        my @d = map { Math::GMPz::Rmpz_init_set_ui($_) } @D;
+        my $B = Math::GMPz::Rmpz_init_set_ui($base);
+        my $L = \@d;
+
+        for (my $k = $len ; $k > 1 ; $k = ($k >> 1) + ($k & 1)) {
+
+            my @T;
+            for (0 .. ($k >> 1) - 1) {
+                my $t = $L->[2 * $_];
+                Math::GMPz::Rmpz_addmul($t, $L->[2 * $_ + 1], $B);
+                push(@T, $t);
+            }
+
+            push(@T, $L->[-1]) if ($k & 1);
+            $L = \@T;
+            Math::GMPz::Rmpz_mul($B, $B, $B);
+        }
+
+        $L->[0];
+    }
+
     sub digits2num {
         my ($base, $D) = @_;
 
@@ -6090,6 +6150,8 @@ package Sidef::Types::Number::Number {
         my $L = \@digits;
 
         if ($all_mpz and Math::GMPz::Rmpz_cmp_ui($base, 2) >= 0) {
+
+            # TODO: use `__digits2num__` when possible.
 
             if (Math::GMPz::Rmpz_cmp_ui($base, 62) <= 0) {    # return faster for base in 2..62
 
@@ -14517,6 +14579,93 @@ package Sidef::Types::Number::Number {
     }
 
     *is_palindromic = \&is_palindrome;
+
+    sub next_palindrome {
+        my ($n, $base) = @_;
+
+        if (defined($base)) {
+            _valid(\$base);
+            $base = _any2ui($$base) // goto &nan;
+        }
+        else {
+            $base //= 10;
+        }
+
+        $base <= 1 and goto &nan;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        my @d;
+
+        if ($base <= 10) {
+            @d = split(//, scalar CORE::reverse Math::GMPz::Rmpz_get_str($n, $base));
+        }
+        elsif ($base <= 36) {
+            @d = map { $DIGITS_36{$_} } split(//, scalar CORE::reverse Math::GMPz::Rmpz_get_str($n, $base));
+        }
+        elsif ($base <= 62) {
+            @d = map { $DIGITS_62{$_} } split(//, scalar CORE::reverse Math::GMPz::Rmpz_get_str($n, $base));
+        }
+        else {
+            @d = map { Math::GMPz::Rmpz_get_ui($$_) } @{$_[0]->digits($_[1])};
+        }
+
+        my $l = $#d;
+        my $i = ((scalar(@d) + 1) >> 1) - 1;
+
+        my $is_palindrome = 1;
+
+        foreach my $j (0 .. $i) {
+            if ($d[$j] != $d[$l - $j]) {
+                $is_palindrome = 0;
+                last;
+            }
+        }
+
+        if (!$is_palindrome) {
+            my @copy = @d;
+
+            foreach my $i (0 .. $i) {
+                $d[$i] = $d[$l - $i];
+            }
+
+            my $is_greater = 1;
+
+            foreach my $j (0 .. $i) {
+                my $cmp = $d[$i - $j] <=> $copy[$i - $j];
+
+                if ($cmp > 0) {
+                    last;
+                }
+                if ($cmp < 0) {
+                    $is_greater = 0;
+                    last;
+                }
+            }
+
+            if ($is_greater) {
+                return bless \__digits2num__($base, \@d);
+            }
+        }
+
+        while ($i >= 0 and $d[$i] == $base - 1) {
+            $d[$i] = 0;
+            $d[$l - $i] = 0;
+            $i--;
+        }
+
+        if ($i >= 0) {
+            $d[$i]++;
+            $d[$l - $i] = $d[$i];
+        }
+        else {
+            @d     = (0) x (scalar(@d) + 1);
+            $d[0]  = 1;
+            $d[-1] = 1;
+        }
+
+        bless \__digits2num__($base, \@d);
+    }
 
     sub reverse {
         my ($n, $k) = @_;
