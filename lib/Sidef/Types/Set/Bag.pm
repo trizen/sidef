@@ -450,8 +450,8 @@ package Sidef::Types::Set::Bag {
             my @pairs = $block->run($elem->{value}, Sidef::Types::Number::Number->_set_uint($elem->{count}));
 
             while (@pairs) {
-                my $k = shift(@pairs);
-                my $v = CORE::int(shift(@pairs));
+                my $k = CORE::shift(@pairs);
+                my $v = CORE::int(CORE::shift(@pairs));
 
                 if ($v > 0) {
                     $new{$serialize->($k)} = {value => $k, count => $v};

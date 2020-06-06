@@ -1440,10 +1440,12 @@ HEADER
                   and die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
                   . " $obj->{file} line $obj->{line} (expected 1 or 2 arguments)\n";
 
+                my $msg = $args[1] // 'undef';
+
                 # Generate code
                 $code =
                     qq~do{my \$a$refaddr = do{$args[0]}; ~
-                  . qq~\$a$refaddr or CORE::die((do{$args[1]} // "$obj->{act}(\$a$refaddr)") . " failed ~
+                  . qq~\$a$refaddr or CORE::die((do{$msg} // "$obj->{act}(\$a$refaddr)") . " failed ~
                   . qq~at \Q$obj->{file}\E line $obj->{line}\\n")}~;
             }
             elsif ($obj->{act} eq 'assert_eq' or $obj->{act} eq 'assert_ne') {

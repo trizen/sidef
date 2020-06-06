@@ -7802,7 +7802,7 @@ package Sidef::Types::Number::Number {
         return ($V1, $V2);
     }
 
-    state $LUCAS_PQ_LIMIT = int(sqrt(ULONG_MAX >> 2));
+    state $LUCAS_PQ_LIMIT = CORE::int(CORE::sqrt(ULONG_MAX >> 2));
 
     sub _modular_lucas_UV {
         my ($P, $Q, $n, $m) = @_;
