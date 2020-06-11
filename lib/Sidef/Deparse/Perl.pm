@@ -1196,11 +1196,8 @@ HEADER
 
                 $code =
                     'Sidef::Types::Block::Block::_iterate(sub { '
-                  . 'my ($item) = @_; '
-                  . 'local @_ = '
-                  . ($multi ? '@{('      : '') . '$item'
-                  . ($multi ? ')->to_a}' : '')
-                  . "; $vars; $code }, $expr)"
+                  . ($multi ? 'local @_ = @{$_[0]->to_a};' : '')
+                  . "$vars; $code }, $expr)"
                   . (@loops ? ' // last' : '');
             }
         }
