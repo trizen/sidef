@@ -684,6 +684,8 @@ Array.digits2num() -> I<Obj>
 
 Return the
 
+Aliases: I<from_digits>
+
 =cut
 
 =head2 each_2d

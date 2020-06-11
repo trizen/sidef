@@ -1141,12 +1141,12 @@ package Sidef::Types::Array::Array {
 
     sub digits2num {
         my ($self, $base) = @_;
-
         state $ten = Sidef::Types::Number::Number->_set_uint(10);
         $base //= $ten;
-
         Sidef::Types::Number::Number::digits2num($base, $self);
     }
+
+    *from_digits = \&digits2num;
 
     sub cfrac2num {
         my ($self) = @_;

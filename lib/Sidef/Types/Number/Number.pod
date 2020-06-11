@@ -3116,6 +3116,14 @@ Return the
 
 =cut
 
+=head2 next_palindrome
+
+Number.next_palindrome() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 next_pow
 
 Number.next_pow() -> I<Obj>
