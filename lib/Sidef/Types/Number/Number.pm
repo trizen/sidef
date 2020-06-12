@@ -6973,14 +6973,125 @@ package Sidef::Types::Number::Number {
     *expmod = \&modpow;
     *powmod = \&modpow;
 
+    sub complex_mod {
+        my ($x, $y, $m) = @_;
+        _valid(\$y, \$m);
+        ((bless \__mod__($$x, $$m)), (bless \__mod__($$y, $$m)));
+    }
+
+    *cmod = \&complex_mod;
+
+    sub complex_add {
+        my ($x_re, $x_im, $y_re, $y_im) = @_;
+
+        $x_im //= ZERO;
+        $y_re //= ZERO;
+        $y_im //= ZERO;
+
+        _valid(\$x_im, \$y_re, \$y_im);
+        ((bless \__add__($$x_re, $$y_re)), (bless \__add__($$x_im, $$y_im)));
+    }
+
+    *cadd = \&complex_add;
+
+    sub complex_sub {
+        my ($x_re, $x_im, $y_re, $y_im) = @_;
+
+        $x_im //= ZERO;
+        $y_re //= ZERO;
+        $y_im //= ZERO;
+
+        _valid(\$x_im, \$y_re, \$y_im);
+        ((bless \__sub__($$x_re, $$y_re)), (bless \__sub__($$x_im, $$y_im)));
+    }
+
+    *csub = \&complex_sub;
+
+    sub complex_mul {
+        my ($x_re, $x_im, $y_re, $y_im) = @_;
+
+        # (a + b*i) * (x + y*i) = (a*x - b*y) + (a*y + b*x)*i
+
+        $x_im //= ZERO;
+        $y_re //= ZERO;
+        $y_im //= ZERO;
+
+        _valid(\$x_im, \$y_re, \$y_im);
+
+#<<<
+        (
+            (bless \__sub__(__mul__($$x_re, $$y_re), __mul__($$x_im, $$y_im))),
+            (bless \__add__(__mul__($$x_re, $$y_im), __mul__($$x_im, $$y_re))),
+        );
+#>>>
+    }
+
+    *cmul = \&complex_mul;
+
+    sub complex_div {
+        my ($x_re, $x_im, $y_re, $y_im) = @_;
+
+        # (a + b*i) / (x + y*i) = (a*x + b*y)/(x^2 + y^2) + (b*x - a*y)/(x^2 + y^2)*i
+
+        $x_im //= ZERO;
+        $y_re //= ZERO;
+        $y_im //= ZERO;
+
+        _valid(\$x_im, \$y_re, \$y_im);
+
+        my $den = __add__(__mul__($$y_re, $$y_re), __mul__($$y_im, $$y_im));
+
+#<<<
+        (
+            (bless \__div__(__add__(__mul__($$x_re, $$y_re), __mul__($$x_im, $$y_im)), $den)),
+            (bless \__div__(__sub__(__mul__($$x_im, $$y_re), __mul__($$x_re, $$y_im)), $den)),
+        );
+#>>>
+    }
+
+    *cdiv = \&complex_div;
+
+    sub complex_invmod {
+        my ($x, $y, $m) = @_;
+
+        _valid(\$y, \$m);
+
+        $x = _any2mpz($$x) // return (nan(), nan());
+        $y = _any2mpz($$y) // return (nan(), nan());
+        $m = _any2mpz($$m) // return (nan(), nan());
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_mul($t, $x, $x);
+        Math::GMPz::Rmpz_addmul($t, $y, $y);
+
+        if (Math::GMPz::Rmpz_invert($t, $t, $m)) {
+
+            my $c0 = Math::GMPz::Rmpz_init();
+            my $c1 = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_mul($c0, $x, $t);
+            Math::GMPz::Rmpz_mul($c1, $y, $t);
+            Math::GMPz::Rmpz_neg($c1, $c1);
+            Math::GMPz::Rmpz_mod($c0, $c0, $m);
+            Math::GMPz::Rmpz_mod($c1, $c1, $m);
+
+            return ((bless \$c0), (bless \$c1));
+        }
+
+        return (nan(), nan());    # no inverse
+    }
+
+    *cinvmod = \&complex_invmod;
+
     sub complex_pow {
         my ($x, $y, $n) = @_;
 
         _valid(\$y, \$n);
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2mpz($$y) // goto &nan;
-        $n = _any2mpz($$n) // goto &nan;
+        $x = _any2mpz($$x) // return (nan(), nan());
+        $y = _any2mpz($$y) // return (nan(), nan());
+        $n = _any2mpz($$n) // return (nan(), nan());
 
         my $c0 = Math::GMPz::Rmpz_init_set_ui(1);
         my $c1 = Math::GMPz::Rmpz_init_set_ui(0);
@@ -7020,10 +7131,10 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y, \$n, \$m);
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2mpz($$y) // goto &nan;
-        $n = _any2mpz($$n) // goto &nan;
-        $m = _any2mpz($$m) // goto &nan;
+        $x = _any2mpz($$x) // return (nan(), nan());
+        $y = _any2mpz($$y) // return (nan(), nan());
+        $n = _any2mpz($$n) // return (nan(), nan());
+        $m = _any2mpz($$m) // return (nan(), nan());
 
         my $c0 = Math::GMPz::Rmpz_init_set_ui(1);
         my $c1 = Math::GMPz::Rmpz_init_set_ui(0);

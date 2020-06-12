@@ -1021,6 +1021,16 @@ Aliases: I<first>
 
 =cut
 
+=head2 cadd
+
+Number.cadd() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_add>
+
+=cut
+
 =head2 catalan
 
     n.catalan
@@ -1037,6 +1047,16 @@ If two arguments are provided, it returns the C<C(n,k)> entry in Catalan's trian
     n.cbrt
 
 Cube root of C<n>.
+
+=cut
+
+=head2 cdiv
+
+Number.cdiv() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_div>
 
 =cut
 
@@ -1116,6 +1136,16 @@ Example:
 
 =cut
 
+=head2 cinvmod
+
+Number.cinvmod() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_invmod>
+
+=cut
+
 =head2 circular_permutations
 
 Number.circular_permutations() -> I<Obj>
@@ -1137,6 +1167,26 @@ Return the
 Number.clearbit() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 cmod
+
+Number.cmod() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_mod>
+
+=cut
+
+=head2 cmul
+
+Number.cmul() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_mul>
 
 =cut
 
@@ -1283,6 +1333,16 @@ Return the
 Number.csch() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 csub
+
+Number.csub() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_sub>
 
 =cut
 

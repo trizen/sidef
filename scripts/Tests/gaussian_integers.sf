@@ -1,0 +1,51 @@
+#!/usr/bin/ruby
+
+var r = (-2 .. 2)
+
+for a in (r), b in (r), c in (r), d in (r) {
+
+    assert_eq([Complex(a,b) + Complex(c,d) -> reals], [cadd(a,b,c,d)])
+    assert_eq([Complex(a,b) - Complex(c,d) -> reals], [csub(a,b,c,d)])
+    assert_eq([Complex(a,b) * Complex(c,d) -> reals], [cmul(a,b,c,d)])
+
+    if (c*c + d*d != 0) {
+        assert_eq([Complex(a,b) / Complex(c,d) -> reals], [cdiv(a,b,c,d)].map{.float})
+    }
+}
+
+for a in (r), b in (r) {
+
+    var n = irand(0, 100)
+    var m = irand(100, 1000)
+
+    assert_eq([Complex(a,b)**n -> reals], [cpow(a,b,n)])
+    assert_eq([Complex(a,b)**n -> reals].map { .mod(m) } , [cpowmod(a,b,n,m)])
+}
+
+func gaussian_sum(n) {
+
+    var total = [0, 0]
+
+    for k in (1..n) {
+        total = [cadd(total..., cdiv(cpow(0, 1, k-1), k))]
+    }
+
+    [cmul(total..., n!)]
+}
+
+var arr = 10.of(gaussian_sum)
+
+assert_eq(arr.map{.head}, [0, 1, 2, 4, 16, 104, 624, 3648, 29184, 302976])
+assert_eq(arr.map{.tail}, [0, 0, 1, 3, 6, 30, 300, 2100, 11760, 105840])
+
+do {
+    var m = 10001
+    var a = 43
+    var b = 97
+
+    assert_eq([cdiv(1, 0, a, b)], [a / (a*a + b*b), -b / (a*a + b*b)])
+    assert_eq([a * invmod(a*a + b*b, m), -b * invmod(a*a + b*b, m)].map{.mod(m)}, [complex_invmod(a, b, m)])
+    assert_eq([cmod(cmul(a, b, complex_invmod(a, b, m)), m)], [1, 0])
+}
+
+say "** Test passed!"
