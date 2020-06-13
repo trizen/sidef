@@ -7,7 +7,7 @@ Sidef - The Sidef programming language.
 
 =head1 DESCRIPTION
 
-Sidef is a modern, high-level, general-purpose programming language, inspired by Ruby, Perl 6 and Go.
+Sidef is a modern, high-level, general-purpose programming language, inspired by Ruby, Raku and Go.
 
 
                 **   **         ****   *           *********   *********
@@ -42,8 +42,6 @@ The main features of Sidef include:
 =item * keyword arguments
 
 =item * regular expressions
-
-=item * runtime metaprogramming
 
 =item * support for using Perl modules
 

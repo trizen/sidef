@@ -1,7 +1,7 @@
 The Sidef Programming Language
 =======
 
-Sidef is a modern, high-level, general-purpose programming language, inspired by Ruby, Perl 6 and Julia.
+Sidef is a modern, high-level, general-purpose programming language, inspired by Ruby, Raku and Julia.
 
 ```
             **   **         ****   *           *********   *********
@@ -26,7 +26,6 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
     * lexical closures
     * keyword arguments
     * regular expressions
-    * runtime metaprogramming
     * support for using Perl modules
     * optional dynamic type checking
     * big integers, rationals, floats and complex numbers

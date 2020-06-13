@@ -1,14 +1,29 @@
 TODO list for Sidef
 
-Classes:
-    * Implement roles (from Perl 6) and add the `does` trait for classes
-      (http://doc.perl6.org/language/objects#Roles)
+New built-in classes:
+    * Add the `Poly()` class for representing a polynomial.
+        - See: "Math::Polynomial" on CPAN.
+        - https://metacpan.org/pod/Math::Polynomial
 
-Method/functions:
+    * Add the `PolyMod()` class for representing a modular polynomial.
+        - See: "Math::Polynomial::ModInt" on CPAN.
+        - https://metacpan.org/pod/Math::Polynomial::ModInt
+
+    * Add the `Seq()` class for representing a sequence.
+        - Take a block for computing the terms, based on the previous terms of the sequence.
+        - Maybe allow array-like indexing.
+        - Internal caching of terms.
+        - See: https://docs.raku.org/type/Seq.html
+
+Classes:
+    * Implement roles (from Raku) and add the `does` trait for classes.
+        - See: https://docs.raku.org/language/objects#Roles
+
+Methods / functions:
     * Implement the `is exported` trait for functions and classes (maybe)
 
 Internal:
-    * Switch to subroutine `signatures` (as soon as this feature becomes stable).
+    * Switch to subroutine `signatures` (as soon as this feature becomes stable). (maybe)
 
 Performance:
     * Add dynamic cache inside all the immutable built-in objects (except IO-related) that take only one argument (the self-object), such that calling the same method again on
@@ -22,7 +37,7 @@ Speculations:
     * Bootstrap Sidef by writing a code generator in Sidef that generates Perl code.
     * Rewrite all core libraries in Sidef.
 
-Changes:
+Incompatible changes (maybe):
     * Change the ternary operator `bool ? (true) : (false)` to `bool ?? (true) !! (false)`.
     * Allow `?` at the end of (boolean) methods and rename `.is_PROPERTY` to `.PROPERTY?`. (e.g.: `n.is_prime` would become `n.prime?`)
     * Allow `:` at the end of a method call, followed by an argument. (e.g.: `a.push: 42` would be equivalent with `a.push(42)`)
