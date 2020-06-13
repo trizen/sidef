@@ -9,9 +9,9 @@ package Sidef::Types::Number::Gauss {
 
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
-      q{0+}   => sub { (@_) = ($_[0]); goto &__numify__ },
       q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ },
-      q{${}}  => sub {  Sidef::Types::Number::Complex->new($_[0]->{re}, $_[0]->{im}) };
+      q{0+}   => \&to_n,
+      q{${}}  => \&to_n;
 
     sub new {
         my (undef, $real, $imag) = @_;
@@ -36,7 +36,7 @@ package Sidef::Types::Number::Gauss {
     }
 
     sub to_n {
-        $_[0];
+        Sidef::Types::Number::Complex->new($_[0]->{re}, $_[0]->{im});
     }
 
     sub re {
@@ -50,6 +50,10 @@ package Sidef::Types::Number::Gauss {
     }
 
     *imag = \&im;
+
+    sub reals {
+        ($_[0]->{re}, $_[0]->{im});
+    }
 
     sub __boolify__ {
         $_[0]->{re};
@@ -126,6 +130,11 @@ package Sidef::Types::Number::Gauss {
         my ($x, $y) = @_;
         _valid(\$y);
         __PACKAGE__->new(Sidef::Types::Number::Number::complex_div($x->{re}, $x->{im}, $y->{re}, $y->{im}));
+    }
+
+    sub float {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{re}->float, $x->{im}->float);
     }
 
     sub floor {
@@ -220,7 +229,7 @@ package Sidef::Types::Number::Gauss {
 
     *lsft = \&shift_left;
 
-    sub shift_right {       # x / 2^n
+    sub shift_right {    # x / 2^n
         my ($x, $n) = @_;
         $x->div(Sidef::Types::Number::Number::TWO->pow($n));
     }
@@ -234,7 +243,8 @@ package Sidef::Types::Number::Gauss {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
                 _valid(\$y);
-                (Sidef::Types::Number::Number::complex_cmp($x->{re}, $x->{im}, $y->{re}, $y->{im}) // return undef)->$method(Sidef::Types::Number::Number::ZERO);
+                (Sidef::Types::Number::Number::complex_cmp($x->{re}, $x->{im}, $y->{re}, $y->{im}) // return undef)
+                  ->$method(Sidef::Types::Number::Number::ZERO);
             };
         }
 
@@ -242,10 +252,7 @@ package Sidef::Types::Number::Gauss {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
                 _valid(\$y);
-                __PACKAGE__->new(
-                    $x->{re}->$method($y->{re}),
-                    $x->{im}->$method($y->{im}),
-                );
+                __PACKAGE__->new($x->{re}->$method($y->{re}), $x->{im}->$method($y->{im}),);
             };
         }
 
@@ -263,8 +270,8 @@ package Sidef::Types::Number::Gauss {
         *{__PACKAGE__ . '::' . '&'}   = \&and;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
-        *{__PACKAGE__ . '::' . '<<'}   = \&lsft;
-        *{__PACKAGE__ . '::' . '>>'}   = \&rsft;
+        *{__PACKAGE__ . '::' . '<<'}  = \&lsft;
+        *{__PACKAGE__ . '::' . '>>'}  = \&rsft;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '<='}  = \&le;
         *{__PACKAGE__ . '::' . '≤'}   = \&le;

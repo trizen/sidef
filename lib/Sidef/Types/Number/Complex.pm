@@ -19,6 +19,12 @@ package Sidef::Types::Number::Complex {
     sub new {
         my (undef, $real, $imag) = @_;
 
+        $real //= Sidef::Types::Number::Number::ZERO;
+        $imag //= Sidef::Types::Number::Number::ZERO;
+
+        Sidef::Types::Number::Number::_valid(\$real) if ref($real);
+        Sidef::Types::Number::Number::_valid(\$imag) if ref($imag);
+
         if (ref($real) eq 'Sidef::Types::Number::Number') {
             $real = $$real;
         }

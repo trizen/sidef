@@ -7139,6 +7139,8 @@ package Sidef::Types::Number::Number {
             $neg = 1;
         }
 
+        # TODO: add optimization for bases = {1, -1, i, -i}.
+
         state $t = Math::GMPz::Rmpz_init_nobless();
 
         foreach my $k (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
@@ -7191,6 +7193,8 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_abs($n, $n);
             $neg = 1;
         }
+
+        # TODO: add optimization for bases = {1, -1, i, -i}.
 
         foreach my $k (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
 

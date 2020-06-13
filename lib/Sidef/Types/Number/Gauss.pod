@@ -254,6 +254,14 @@ Return the
 
 =cut
 
+=head2 float
+
+Gauss.float() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 floor
 
 Gauss.floor() -> I<Obj>
@@ -337,6 +345,14 @@ Gauss.re() -> I<Obj>
 Return the
 
 Aliases: I<real>
+
+=cut
+
+=head2 reals
+
+Gauss.reals() -> I<Obj>
+
+Return the
 
 =cut
 

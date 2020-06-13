@@ -13,6 +13,14 @@ package Sidef::Types::Number::Mod {
       q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ },
       q{${}}  => sub { $_[0]{n} };
 
+    sub _valid {
+        foreach (@_) {
+            if (!UNIVERSAL::isa($$_, 'Sidef::Types::Number::Number')) {
+                $$_ = $$_->to_n;
+            }
+        }
+    }
+
     sub new {
         my (undef, $n, $m) = @_;
 
@@ -58,7 +66,8 @@ package Sidef::Types::Number::Mod {
 
     sub div {
         my ($x, $y) = @_;
-        __PACKAGE__->new($x->{n}->mul($y->to_n->invmod($x->{m})), $x->{m});
+        _valid(\$y);
+        __PACKAGE__->new($x->{n}->mul($y->invmod($x->{m})), $x->{m});
     }
 
     sub inv {
@@ -104,7 +113,8 @@ package Sidef::Types::Number::Mod {
 
     sub pow {
         my ($x, $y) = @_;
-        __PACKAGE__->new($x->{n}->powmod($y->to_n, $x->{m}), $x->{m});
+        _valid(\$y);
+        __PACKAGE__->new($x->{n}->powmod($y, $x->{m}), $x->{m});
     }
 
     sub factorial {
@@ -149,7 +159,7 @@ package Sidef::Types::Number::Mod {
 
     *lsft = \&shift_left;
 
-    sub shift_right {       # x / 2^n
+    sub shift_right {    # x / 2^n
         my ($x, $n) = @_;
         $x->div(Sidef::Types::Number::Number::TWO->powmod($n, $x->{m}));
     }
@@ -162,14 +172,16 @@ package Sidef::Types::Number::Mod {
         foreach my $method (qw(eq ne lt le gt ge cmp)) {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
-                $x->{n}->$method($y->to_n->mod($x->{m}));
+                _valid(\$y);
+                $x->{n}->$method($y->mod($x->{m}));
             };
         }
 
         foreach my $method (qw(mul add sub xor or and)) {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
-                __PACKAGE__->new($x->{n}->$method($y->to_n->mod($x->{m})), $x->{m});
+                _valid(\$y);
+                __PACKAGE__->new($x->{n}->$method($y->mod($x->{m})), $x->{m});
             };
         }
 
@@ -186,8 +198,8 @@ package Sidef::Types::Number::Mod {
         *{__PACKAGE__ . '::' . '&'}   = \&and;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
-        *{__PACKAGE__ . '::' . '<<'}   = \&lsft;
-        *{__PACKAGE__ . '::' . '>>'}   = \&rsft;
+        *{__PACKAGE__ . '::' . '<<'}  = \&lsft;
+        *{__PACKAGE__ . '::' . '>>'}  = \&rsft;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '<='}  = \&le;
         *{__PACKAGE__ . '::' . '≤'}   = \&le;
