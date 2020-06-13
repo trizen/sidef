@@ -457,7 +457,7 @@ package Sidef::Optimizer {
             (
              map { [$_, [table(NUMBER), table(NUMBER)]] }
                methods(NUMBER, qw(
-                   modpow
+                   powmod
                    range
                    )
                )

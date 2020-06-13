@@ -73,6 +73,7 @@ lib/Sidef/Types/Null/Null.pod
 lib/Sidef/Types/Number/Complex.pm
 lib/Sidef/Types/Number/Complex.pod
 lib/Sidef/Types/Number/Gauss.pm
+lib/Sidef/Types/Number/Gauss.pod
 lib/Sidef/Types/Number/Mod.pm
 lib/Sidef/Types/Number/Mod.pod
 lib/Sidef/Types/Number/Number.pm

@@ -1136,6 +1136,16 @@ Example:
 
 =cut
 
+=head2 cinv
+
+Number.cinv() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_inv>
+
+=cut
+
 =head2 cinvmod
 
 Number.cinvmod() -> I<Obj>
@@ -1217,6 +1227,14 @@ Return the
 =head2 complex
 
 Number.complex() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 complex_cmp
+
+Number.complex_cmp() -> I<Obj>
 
 Return the
 
@@ -1634,7 +1652,7 @@ Number.expmod() -> I<Obj>
 
 Return the
 
-Aliases: I<modpow>, I<powmod>
+Aliases: I<powmod>
 
 =cut
 

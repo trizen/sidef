@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Number::Mod
+Sidef::Types::Number::Gauss
 
 =head1 DESCRIPTION
 
@@ -11,7 +11,7 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Mod(...)
+var obj = Gauss(...)
 
 
 =head1 INHERITS
@@ -22,16 +22,6 @@ Inherits methods from:
 
 =head1 METHODS
 
-=head2 !
-
-I<Obj> B<!> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<factorial>
-
-=cut
-
 =head2 !=
 
 I<Obj> B<!=> I<Obj> -> I<Obj>
@@ -39,6 +29,16 @@ I<Obj> B<!=> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<ne>
+
+=cut
+
+=head2 %
+
+I<Obj> B<%> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mod>
 
 =cut
 
@@ -222,63 +222,83 @@ Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
-=head2 chinese
+=head2 abs
 
-Mod.chinese() -> I<Obj>
+Gauss.abs() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 fib
+=head2 ceil
 
-Mod.fib() -> I<Obj>
+Gauss.ceil() -> I<Obj>
 
 Return the
 
-Aliases: I<fibonacci>
+=cut
+
+=head2 conj
+
+Gauss.conj() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Gauss.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Gauss.floor() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iabs
+
+Gauss.iabs() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 im
+
+Gauss.im() -> I<Obj>
+
+Return the
+
+Aliases: I<imag>
 
 =cut
 
 =head2 inv
 
-Mod.inv() -> I<Obj>
+Gauss.inv() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 lucas
+=head2 invmod
 
-Mod.lucas() -> I<Obj>
+Gauss.invmod() -> I<Obj>
 
 Return the
 
 =cut
 
-=head2 lucas_U
+=head2 neg
 
-Mod.lucas_U() -> I<Obj>
-
-Return the
-
-Aliases: I<lucasu>, I<lucasU>
-
-=cut
-
-=head2 lucas_V
-
-Mod.lucas_V() -> I<Obj>
-
-Return the
-
-Aliases: I<lucasv>, I<lucasV>
-
-=cut
-
-=head2 modulus
-
-Mod.modulus() -> I<Obj>
+Gauss.neg() -> I<Obj>
 
 Return the
 
@@ -286,7 +306,7 @@ Return the
 
 =head2 new
 
-Mod.new() -> I<Obj>
+Gauss.new() -> I<Obj>
 
 Return the
 
@@ -294,9 +314,35 @@ Aliases: I<call>
 
 =cut
 
-=head2 sqrt
+=head2 norm
 
-Mod.sqrt() -> I<Obj>
+Gauss.norm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 powmod
+
+Gauss.powmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 re
+
+Gauss.re() -> I<Obj>
+
+Return the
+
+Aliases: I<real>
+
+=cut
+
+=head2 sgn
+
+Gauss.sgn() -> I<Obj>
 
 Return the
 
@@ -304,27 +350,15 @@ Return the
 
 =head2 to_n
 
-Mod.to_n() -> I<Obj>
+Gauss.to_n() -> I<Obj>
 
 Return the
-
-Aliases: I<lift>
 
 =cut
 
 =head2 to_s
 
-Mod.to_s() -> I<Obj>
-
-Return the
-
-Aliases: I<dump>
-
-=cut
-
-=head2 znorder
-
-Mod.znorder() -> I<Obj>
+Gauss.to_s() -> I<Obj>
 
 Return the
 
