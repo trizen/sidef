@@ -43,9 +43,51 @@ do {
     var a = 43
     var b = 97
 
+    assert_eq(Gauss(1,0) / Gauss(a, b), Gauss(a,b).inv)
+    assert_eq(Mod(Gauss(a, b), m).inv * Gauss(a,b), Mod(Gauss(1,0), m))
+    assert_eq(Mod(Gauss(a, b), m).inv * Gauss(a,b) -> lift, Gauss(1,0))
+    assert_eq(Mod(Gauss(a, b), m)**(-1) * Gauss(a,b) -> lift, Gauss(1,0))
+
     assert_eq([cdiv(1, 0, a, b)], [a / (a*a + b*b), -b / (a*a + b*b)])
     assert_eq([a * invmod(a*a + b*b, m), -b * invmod(a*a + b*b, m)].map{.mod(m)}, [complex_invmod(a, b, m)])
     assert_eq([cmod(cmul(a, b, complex_invmod(a, b, m)), m)], [1, 0])
 }
+
+assert_eq(Gauss(4,5) <=> Gauss(3,4), 1)
+
+assert(Gauss(4,5) >  Gauss(3,4))
+assert(Gauss(4,5) >  Gauss(4,4))
+assert(Gauss(4,5) >= Gauss(3,4))
+assert(Gauss(3,4) >= Gauss(3,4))
+assert(Gauss(3,4) <= Gauss(3,4))
+
+assert(!(Gauss(3,4) > Gauss(3,5)))
+assert(!(Gauss(3,4) > Gauss(4,5)))
+assert(!(Gauss(3,4) < Gauss(3,4)))
+assert(!(Gauss(3,4) < Gauss(3,1)))
+assert(!(Gauss(3,4) < Gauss(2,1)))
+
+for a in (r), b in (r) {
+    var y = irand(2, 100)
+    var x = Gauss(a,b)
+    assert_eq(x - floor(x/y)*y, x % y)
+}
+
+func gaussian_sum_2(n) {
+
+    var i     = Gauss(0, 1)
+    var total = Gauss(0)
+
+    for k in (1..n) {
+        total += (i**(k-1) / k)
+    }
+
+    total * n!
+}
+
+assert_eq(
+    10.of(gaussian_sum_2),
+    [Gauss(0, 0), Gauss(1, 0), Gauss(2, 1), Gauss(4, 3), Gauss(16, 6), Gauss(104, 30), Gauss(624, 300), Gauss(3648, 2100), Gauss(29184, 11760), Gauss(302976, 105840)]
+)
 
 say "** Test passed!"

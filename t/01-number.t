@@ -424,7 +424,7 @@ $x = $o->new('49/4');
 like($x->ceil(), re '13');
 
 ##############################################################################
-# root(), log(), modpow() and modinv()
+# root(), log(), powmod() and modinv()
 
 $x = $o->new(2)->pow($o->new(32));
 $y = $o->new(4);
@@ -433,8 +433,8 @@ $z = $o->new(3);
 like($x->root($y), re '256');
 is(ref($x->root($y)), $o);
 
-like($x->modpow($y, $z), re '1');
-is(ref($x->modpow($y, $z)), $o);
+like($x->powmod($y, $z), re '1');
+is(ref($x->powmod($y, $z)), $o);
 
 $x = $o->new(8);
 $y = $o->new(5033);

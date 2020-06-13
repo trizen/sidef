@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+# Tests for the built-in `Mod(n,m)` class.
+
+do {
+    var a = Mod(13, 19)
+
+    assert_eq(a, Mod(13, 19))
+    a += 15    # Mod(9, 19)
+    assert_eq(a, Mod(9, 19))
+    a *= 99    # Mod(17, 19)
+    assert_eq(a, Mod(17, 19))
+    a /= 17    # Mod(1, 19)
+    assert_eq(a, Mod(1, 19))
+    assert(a == 1)
+
+    a -= 43    # Mod(15, 19)
+    assert_eq(a, Mod(15, 19))
+
+    assert_eq(a**42, Mod(11, 19))       # Mod(11, 19)
+    assert_eq(a**(-1), Mod(14, 19))     # Mod(14, 19)
+    assert_eq(sqrt(a+1), Mod(4, 19))    # Mod(4, 19)
+
+    assert_eq(chinese(Mod(43, 19), Mod(13, 41)), Mod(423, 779))   # Mod(423, 779)
+}
+
+say "** Test passed!"

@@ -16,8 +16,8 @@ package Sidef::Types::Number::Mod {
     sub new {
         my (undef, $n, $m) = @_;
 
-        $n = Sidef::Types::Number::Number->new($n) if ref($n) ne 'Sidef::Types::Number::Number';
-        $m = Sidef::Types::Number::Number->new($m) if ref($m) ne 'Sidef::Types::Number::Number';
+        $n = Sidef::Types::Number::Number->new($n) if !UNIVERSAL::isa($n, 'Sidef::Types::Number::Number');
+        $m = Sidef::Types::Number::Number->new($m) if !UNIVERSAL::isa($m, 'Sidef::Types::Number::Number');
 
         $n = $n->mod($m);
 
@@ -142,6 +142,20 @@ package Sidef::Types::Number::Mod {
 
     *fib = \&fibonacci;
 
+    sub shift_left {    # x * 2^n
+        my ($x, $n) = @_;
+        $x->mul(Sidef::Types::Number::Number::TWO->powmod($n, $x->{m}));
+    }
+
+    *lsft = \&shift_left;
+
+    sub shift_right {       # x / 2^n
+        my ($x, $n) = @_;
+        $x->div(Sidef::Types::Number::Number::TWO->powmod($n, $x->{m}));
+    }
+
+    *rsft = \&shift_right;
+
     {
         no strict 'refs';
 
@@ -172,6 +186,8 @@ package Sidef::Types::Number::Mod {
         *{__PACKAGE__ . '::' . '&'}   = \&and;
         *{__PACKAGE__ . '::' . '|'}   = \&or;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
+        *{__PACKAGE__ . '::' . '<<'}   = \&lsft;
+        *{__PACKAGE__ . '::' . '>>'}   = \&rsft;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '<='}  = \&le;
         *{__PACKAGE__ . '::' . '≤'}   = \&le;

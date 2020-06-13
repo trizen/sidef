@@ -71,6 +71,7 @@ package Sidef::Parser {
                      | Str(?:ing)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::String::String') })
                      | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
                      | Mod\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Mod') })
+                     | Gauss\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Gauss') })
                      | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
                      | NaN\b                          (?{ state $x = Sidef::Types::Number::Number->nan })
                      | Infi\b                         (?{ state $x = Sidef::Types::Number::Complex->new(0, Sidef::Types::Number::Number->inf) })
@@ -204,6 +205,7 @@ package Sidef::Parser {
                   Str String
                   Num Number
                   Mod
+                  Gauss
                   Range
                   RangeStr RangeString
                   RangeNum RangeNumber

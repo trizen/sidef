@@ -6920,7 +6920,7 @@ package Sidef::Types::Number::Number {
         bless \$t;
     }
 
-    sub modpow {
+    sub powmod {
         my ($x, $y, $z) = @_;
 
         _valid(\$y, \$z);
@@ -6970,8 +6970,22 @@ package Sidef::Types::Number::Number {
         $numpow->mul($denpow->invmod(bless \$z))->mod(bless \$z);
     }
 
-    *expmod = \&modpow;
-    *powmod = \&modpow;
+    *expmod = \&powmod;
+
+    sub complex_cmp {
+        my ($x_re, $x_im, $y_re, $y_im) = @_;
+
+        $x_im //= ZERO;
+        $y_re //= ZERO;
+        $y_im //= ZERO;
+
+        _valid(\$x_im, \$y_re, \$y_im);
+
+        my $cmp = ((__cmp__($$x_re, $$y_re) // return undef)
+            or  (__cmp__($$x_im, $$y_im) // return undef));
+
+        ($cmp ? ($cmp == 1 ? ONE : MONE) : ZERO);
+    }
 
     sub complex_mod {
         my ($x, $y, $m) = @_;
@@ -7051,6 +7065,24 @@ package Sidef::Types::Number::Number {
 
     *cdiv = \&complex_div;
 
+    sub complex_inv {
+        my ($re, $im) = @_;
+
+        $im //= ZERO;
+        _valid(\$im);
+
+        my $den = __add__(__mul__($$re, $$re), __mul__($$im, $$im));
+
+#<<<
+        (
+            (bless \__div__(        $$re,  $den)),
+            (bless \__div__(__neg__($$im), $den)),
+        );
+#>>>
+    }
+
+    *cinv = \&complex_inv;
+
     sub complex_invmod {
         my ($x, $y, $m) = @_;
 
@@ -7099,6 +7131,14 @@ package Sidef::Types::Number::Number {
         $x = Math::GMPz::Rmpz_init_set($x);
         $y = Math::GMPz::Rmpz_init_set($y);
 
+        # TODO: Add support for negative exponents.
+        my $neg = 0;
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+            $n = Math::GMPz::Rmpz_init_set($n);
+            Math::GMPz::Rmpz_abs($n, $n);
+            $neg = 1;
+        }
+
         state $t = Math::GMPz::Rmpz_init_nobless();
 
         foreach my $k (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
@@ -7143,6 +7183,14 @@ package Sidef::Types::Number::Number {
         $y = Math::GMPz::Rmpz_init_set($y);
 
         state $t = Math::GMPz::Rmpz_init_nobless();
+
+        # TODO: Add support for negative exponents.
+        my $neg = 0;
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+            $n = Math::GMPz::Rmpz_init_set($n);
+            Math::GMPz::Rmpz_abs($n, $n);
+            $neg = 1;
+        }
 
         foreach my $k (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
 
