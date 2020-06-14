@@ -1240,6 +1240,14 @@ Return the
 
 =cut
 
+=head2 complex_ipow
+
+Number.complex_ipow() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 composite
 
 Number.composite() -> I<Obj>
@@ -2063,8 +2071,6 @@ Return the
 Number.invmod() -> I<Obj>
 
 Return the
-
-Aliases: I<modinv>
 
 =cut
 

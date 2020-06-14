@@ -295,7 +295,7 @@ package Sidef::Optimizer {
                    roundf
                    binomial
                    subfactorial
-                   modinv
+                   invmod
                    isub
                    iadd
                    imul

@@ -364,6 +364,14 @@ Return the
 
 =cut
 
+=head2 to_c
+
+Gauss.to_c() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_n
 
 Gauss.to_n() -> I<Obj>

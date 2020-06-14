@@ -424,7 +424,7 @@ $x = $o->new('49/4');
 like($x->ceil(), re '13');
 
 ##############################################################################
-# root(), log(), powmod() and modinv()
+# root(), log(), powmod() and invmod()
 
 $x = $o->new(2)->pow($o->new(32));
 $y = $o->new(4);
@@ -440,8 +440,8 @@ $x = $o->new(8);
 $y = $o->new(5033);
 $z = $o->new(4404);
 
-is($x->modinv($y),      $z);
-is(ref($x->modinv($y)), $o);
+is($x->invmod($y),      $z);
+is(ref($x->invmod($y)), $o);
 
 # square root with exact result
 $x = $o->new('1.44');

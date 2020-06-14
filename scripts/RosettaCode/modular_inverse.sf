@@ -15,4 +15,4 @@ func invmod(a, n) {
 var n = invmod(42, 2017)
 
 say n
-assert_eq(42.modinv(2017), n)
+assert_eq(42.invmod(2017), n)

@@ -7294,7 +7294,7 @@ package Sidef::Types::Number::Number {
 
     *cpowmod = \&complex_powmod;
 
-    sub modinv {
+    sub invmod {
         my ($x, $y) = @_;
 
         _valid(\$y);
@@ -7306,8 +7306,6 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_invert($r, $x, $y) || (goto &nan);
         bless \$r;
     }
-
-    *invmod = \&modinv;
 
     sub divmod {
         my ($x, $y) = @_;
