@@ -7182,6 +7182,13 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $n = _any2mpz($$n) // return (nan(), nan());
 
+        my $neg = 0;
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+            $n = Math::GMPz::Rmpz_init_set($n);
+            Math::GMPz::Rmpz_abs($n, $n);
+            $neg = 1;
+        }
+
         my $c0 = $ONE;
         my $c1 = $ZERO;
 
@@ -7202,7 +7209,9 @@ package Sidef::Types::Number::Number {
         }
 #>>>
 
-        ((bless \$c0), (bless \$c1));
+        my ($r1, $r2) = ((bless \$c0), (bless \$c1));
+        ($r1, $r2) = complex_inv($r1, $r2) if $neg;
+        ($r1, $r2);
     }
 
     *cpow = \&complex_pow;

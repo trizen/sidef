@@ -136,4 +136,15 @@ assert_eq(Gauss(43, 97)**(-5), (Gauss(43,97)**5).inv)
 assert_eq(Gauss(43, 97)**(-5), (Gauss(43,97).inv)**5)
 assert_eq(Gauss(43, 97)**(-5), (Gauss(43,97)**(-1))**5)
 
+assert_eq(Mod(Gauss(43, 97), 1234567)**(-5),  Mod(Gauss(43, 97), 1234567)**5 -> inv)
+assert_eq(Mod(Gauss(43, 97), 1234567)**(-5), (Mod(Gauss(43, 97), 1234567)->inv)**5)
+
+assert_eq(Mod(Gauss(43, 97), 1234567)**(-1234),  Mod(Gauss(43, 97), 1234567)**1234 -> inv)
+assert_eq(Mod(Gauss(43, 97), 1234567)**(-1234), (Mod(Gauss(43, 97), 1234567)->inv)**1234)
+assert_eq(Mod(Gauss(3,4), 1234567)**1234 -> lift, powmod(Gauss(3,4), 1234, 1234567))
+assert_eq(Mod(Gauss(3,4), 1234567)**-1234 -> lift, powmod(Gauss(3,4), -1234, 1234567))
+
+assert_eq(Gauss(3/5,11/4)**(-27), Gauss(3/5,11/4)**27 -> inv)
+assert_eq(Gauss(3/5,11/4)**(-27), Gauss(3/5,11/4).inv**27)
+
 say "** Test passed!"
