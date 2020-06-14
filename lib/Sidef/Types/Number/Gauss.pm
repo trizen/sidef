@@ -10,8 +10,8 @@ package Sidef::Types::Number::Gauss {
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
       q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ },
-      q{0+}   => \&to_n,
-      q{${}}  => \&to_n;
+      q{0+}   => \&to_c,
+      q{${}}  => \&to_c;
 
     sub new {
         my (undef, $real, $imag) = @_;
@@ -35,8 +35,12 @@ package Sidef::Types::Number::Gauss {
         }
     }
 
-    sub to_n {
+    sub to_c {
         Sidef::Types::Number::Complex->new($_[0]->{re}, $_[0]->{im});
+    }
+
+    sub to_n {
+        $_[0];
     }
 
     sub re {

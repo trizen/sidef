@@ -6981,8 +6981,12 @@ package Sidef::Types::Number::Number {
 
         _valid(\$x_im, \$y_re, \$y_im);
 
-        my $cmp = ((__cmp__($$x_re, $$y_re) // return undef)
-            or  (__cmp__($$x_im, $$y_im) // return undef));
+#<<<
+        my $cmp = (
+               (__cmp__($$x_re, $$y_re) // return undef)
+            || (__cmp__($$x_im, $$y_im) // return undef)
+        );
+#>>>
 
         ($cmp ? ($cmp == 1 ? ONE : MONE) : ZERO);
     }
@@ -7116,7 +7120,7 @@ package Sidef::Types::Number::Number {
 
     *cinvmod = \&complex_invmod;
 
-    sub complex_pow {
+    sub complex_ipow {
         my ($x, $y, $n) = @_;
 
         _valid(\$y, \$n);
@@ -7131,15 +7135,12 @@ package Sidef::Types::Number::Number {
         $x = Math::GMPz::Rmpz_init_set($x);
         $y = Math::GMPz::Rmpz_init_set($y);
 
-        # TODO: Add support for negative exponents.
         my $neg = 0;
         if (Math::GMPz::Rmpz_sgn($n) < 0) {
             $n = Math::GMPz::Rmpz_init_set($n);
             Math::GMPz::Rmpz_abs($n, $n);
             $neg = 1;
         }
-
-        # TODO: add optimization for bases = {1, -1, i, -i}.
 
         state $t = Math::GMPz::Rmpz_init_nobless();
 
@@ -7162,6 +7163,44 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_submul($x, $y, $y);
             Math::GMPz::Rmpz_set($y, $t);
         }
+
+        my ($r1, $r2) = ((bless \$c0), (bless \$c1));
+        ($r1, $r2) = complex_inv($r1, $r2) if $neg;
+        ($r1, $r2);
+    }
+
+    sub complex_pow {
+        my ($x, $y, $n) = @_;
+
+        _valid(\$y, \$n);
+
+        if (__is_int__($$x) and __is_int__($$y)) {
+            return complex_ipow($x, $y, $n);
+        }
+
+        $x = $$x;
+        $y = $$y;
+        $n = _any2mpz($$n) // return (nan(), nan());
+
+        my $c0 = $ONE;
+        my $c1 = $ZERO;
+
+#<<<
+        foreach my $k (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
+
+            if (Math::GMPz::Rmpz_tstbit($n, $k)) {
+                ($c0, $c1) = (
+                    __sub__(__mul__($c0, $x), __mul__($c1, $y)),
+                    __add__(__mul__($c0, $y), __mul__($c1, $x)),
+                );
+            }
+
+            ($x, $y) = (
+                __sub__(__mul__($x, $x), __mul__($y, $y)),
+                __mul__(__mul__($x, $y), $TWO),
+            );
+        }
+#>>>
 
         ((bless \$c0), (bless \$c1));
     }
@@ -7186,15 +7225,35 @@ package Sidef::Types::Number::Number {
 
         state $t = Math::GMPz::Rmpz_init_nobless();
 
-        # TODO: Add support for negative exponents.
-        my $neg = 0;
+        # Handle negative exponent
         if (Math::GMPz::Rmpz_sgn($n) < 0) {
+
             $n = Math::GMPz::Rmpz_init_set($n);
             Math::GMPz::Rmpz_abs($n, $n);
-            $neg = 1;
-        }
 
-        # TODO: add optimization for bases = {1, -1, i, -i}.
+            my $t = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_mul($t, $x, $x);
+            Math::GMPz::Rmpz_addmul($t, $y, $y);
+
+            if (Math::GMPz::Rmpz_invert($t, $t, $m)) {
+
+                Math::GMPz::Rmpz_mul($c0, $x, $t);
+                Math::GMPz::Rmpz_mul($c1, $y, $t);
+                Math::GMPz::Rmpz_neg($c1, $c1);
+                Math::GMPz::Rmpz_mod($c0, $c0, $m);
+                Math::GMPz::Rmpz_mod($c1, $c1, $m);
+
+                Math::GMPz::Rmpz_set($x, $c0);
+                Math::GMPz::Rmpz_set($y, $c1);
+
+                Math::GMPz::Rmpz_set_ui($c0, 1);
+                Math::GMPz::Rmpz_set_ui($c1, 0);
+            }
+            else {    # no inverse exists
+                return (nan(), nan());
+            }
+        }
 
         foreach my $k (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
 

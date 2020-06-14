@@ -53,7 +53,17 @@ do {
     assert_eq([cmod(cmul(a, b, complex_invmod(a, b, m)), m)], [1, 0])
 }
 
+assert(Gauss(3,4) == Gauss(3,4))
+assert(!(Gauss(3,4) == Gauss(3,3)))
+assert(!(Gauss(3,3) == Gauss(3,4)))
+
+assert(Gauss(3,3) != Gauss(3,4))
+assert(Gauss(3,4) != Gauss(3,3))
+assert(!(Gauss(3,4) != Gauss(3,4)))
+
 assert_eq(Gauss(4,5) <=> Gauss(3,4), 1)
+assert_eq(Gauss(3,4) <=> Gauss(3,4), 0)
+assert_eq(Gauss(3,4) <=> Gauss(3,5), -1)
 
 assert(Gauss(4,5) >  Gauss(3,4))
 assert(Gauss(4,5) >  Gauss(4,4))
@@ -66,6 +76,8 @@ assert(!(Gauss(3,4) > Gauss(4,5)))
 assert(!(Gauss(3,4) < Gauss(3,4)))
 assert(!(Gauss(3,4) < Gauss(3,1)))
 assert(!(Gauss(3,4) < Gauss(2,1)))
+assert(!(Gauss(3,4) <= Gauss(3,3)))
+assert(!(Gauss(2,1) >= Gauss(2,2)))
 
 for a in (r), b in (r) {
     var y = irand(2, 100)
@@ -89,5 +101,39 @@ assert_eq(
     10.of(gaussian_sum_2),
     [Gauss(0, 0), Gauss(1, 0), Gauss(2, 1), Gauss(4, 3), Gauss(16, 6), Gauss(104, 30), Gauss(624, 300), Gauss(3648, 2100), Gauss(29184, 11760), Gauss(302976, 105840)]
 )
+
+assert_eq(powmod(Gauss(3,4), 1000, 1e6), Gauss(585313, 426784))
+assert_eq([Mod(Gauss(3,4), 1e6)**1000 -> lift.reals], [585313, 426784])
+assert_eq(Mod(Gauss(3,4), 1e6)**1000, Mod(Gauss(585313, 426784), 1e6))
+assert(Mod(Gauss(3,4), 1e6)**1000 == Mod(Gauss(585313, 426784), 1e6))
+
+assert_eq(Mod(43, 97).to_n, 43)
+assert_eq(Gauss(3,4).to_n, Gauss(3,4))
+assert_eq(Gauss(3,4).to_c, 3+4i)
+
+assert_eq(Gauss(42).invmod(2017), Gauss(1969, 0))
+assert_eq(Gauss(3,4).invmod(2017), Gauss(1291, 968))
+assert_eq(Gauss(91,23).invmod(2017), Gauss(590, 405))
+assert_eq(Gauss(43, 99).invmod(2017), Gauss(1709,1272))
+assert_eq(Gauss(43, 99).invmod(1234567), Gauss(1019551, 667302))
+
+assert_eq(Mod(Gauss(42), 2017).inv, Mod(Gauss(1969, 0), 2017))
+assert_eq(Mod(Gauss(3,4), 2017)**(-1), Mod(Gauss(1291, 968), 2017))
+assert_eq(Mod(Gauss(91,23), 2017)**(-1), Mod(Gauss(590, 405), 2017))
+assert_eq(Mod(Gauss(43, 99), 2017).inv, Mod(Gauss(1709,1272), 2017))
+assert_eq(Mod(Gauss(43, 99), 1234567)**(-2), Mod(Gauss(1019551, 667302)**2, 1234567))
+assert_eq(Mod(Gauss(43, 99), 1234567)**(-5), Mod(Gauss(1019551, 667302)**5, 1234567))
+
+assert_eq(powmod(Gauss(43, 99), -4, 1234567), invmod(Gauss(43, 99)**4 % 1234567, 1234567))
+assert_eq(powmod(Gauss(43, 99), -5, 1234567), invmod(Gauss(43, 99)**5 % 1234567, 1234567))
+assert_eq(powmod(Gauss(43, 99), -5, 1234567), invmod(Gauss(43, 99)**5, 1234567))
+
+assert_eq(powmod(Gauss(43, 99), -4, 1234567), invmod(powmod(Gauss(43, 99), 4, 1234567), 1234567))
+assert_eq(powmod(Gauss(43, 99), -5, 1234567), invmod(powmod(Gauss(43, 99), 5, 1234567), 1234567))
+
+assert_eq(Gauss(43, 97)**(-5), (Gauss(43,97)**5)**(-1))
+assert_eq(Gauss(43, 97)**(-5), (Gauss(43,97)**5).inv)
+assert_eq(Gauss(43, 97)**(-5), (Gauss(43,97).inv)**5)
+assert_eq(Gauss(43, 97)**(-5), (Gauss(43,97)**(-1))**5)
 
 say "** Test passed!"

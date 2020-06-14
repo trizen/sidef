@@ -67,7 +67,7 @@ package Sidef::Types::Number::Mod {
     sub div {
         my ($x, $y) = @_;
         _valid(\$y);
-        __PACKAGE__->new($x->{n}->mul($y->invmod($x->{m})), $x->{m});
+        __PACKAGE__->new($x->{n}->mul($y->to_n->invmod($x->{m})), $x->{m});
     }
 
     sub inv {
@@ -114,7 +114,7 @@ package Sidef::Types::Number::Mod {
     sub pow {
         my ($x, $y) = @_;
         _valid(\$y);
-        __PACKAGE__->new($x->{n}->powmod($y, $x->{m}), $x->{m});
+        __PACKAGE__->new($x->{n}->powmod($y->to_n, $x->{m}), $x->{m});
     }
 
     sub factorial {
@@ -173,7 +173,7 @@ package Sidef::Types::Number::Mod {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
                 _valid(\$y);
-                $x->{n}->$method($y->mod($x->{m}));
+                $x->{n}->$method($y->to_n->mod($x->{m}));
             };
         }
 
@@ -181,7 +181,7 @@ package Sidef::Types::Number::Mod {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
                 _valid(\$y);
-                __PACKAGE__->new($x->{n}->$method($y->mod($x->{m})), $x->{m});
+                __PACKAGE__->new($x->{n}->$method($y->to_n->mod($x->{m})), $x->{m});
             };
         }
 
