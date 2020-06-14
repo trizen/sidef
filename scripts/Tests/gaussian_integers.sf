@@ -125,7 +125,7 @@ assert_eq(Mod(Gauss(43, 99), 1234567)**(-2), Mod(Gauss(1019551, 667302)**2, 1234
 assert_eq(Mod(Gauss(43, 99), 1234567)**(-5), Mod(Gauss(1019551, 667302)**5, 1234567))
 
 assert_eq(powmod(Gauss(43, 99), -4, 1234567), invmod(Gauss(43, 99)**4 % 1234567, 1234567))
-assert_eq(powmod(Gauss(43, 99), -5, 1234567), invmod(Gauss(43, 99)**5 % 1234567, 1234567))
+assert_eq(powmod(Gauss(43, 99), -5, 1234567), invmod(Gauss(43, 99)**5 % Gauss(1234567), 1234567))
 assert_eq(powmod(Gauss(43, 99), -5, 1234567), invmod(Gauss(43, 99)**5, 1234567))
 
 assert_eq(powmod(Gauss(43, 99), -4, 1234567), invmod(powmod(Gauss(43, 99), 4, 1234567), 1234567))
@@ -151,5 +151,45 @@ assert_eq(Complex(Gauss(3,4), Gauss(17,19)), -16+21i)
 assert_eq(Complex(Mod(13, 97), Mod(43, 97)), 13+43i)
 assert_eq(Gauss(Mod(13, 97), Mod(43, 97)), Gauss(Mod(13, 97), Mod(43, 97)))
 assert_eq(Mod(Gauss(3, 4), 97)*1234, Mod(Gauss(16, 86), 97))
+
+
+var params = [
+    [3, 4, 5, 6],
+    [3, 4, 5, -2],
+    [3,-11, 7, 23],
+    [-9, -4, -1, -4],
+    [0, -4, 1, 1],
+    [0, -1, 13, 12],
+    [5, 1, 7, 1],
+    [1, 3, 0, 1],
+]
+
+params.each_2d {|a,b,c,d|
+
+    var m = (2**64 + 1)
+
+    for n in (-274176, 274176) {
+
+        var x = powmod(Gauss(a*d, b*c), n, m)
+        var y = powmod(b*d, -n, m)
+
+        var r1 = (x * y)%m
+        var r2 = powmod(Gauss(a/b, c/d), n, m)
+        var r3 = Mod(Gauss(a/b, c/d), m)**n
+
+        say "Gauss(#{a}/#{b}, #{c}/#{d})^#{n} == #{r1} (mod m)"
+
+        assert_eq(r1, r2)
+        assert_eq(r3.lift, r1)
+
+        assert(r1 == r2)
+        assert(r1 == r3.lift)
+
+        if (r1 != Gauss(1,0)) {
+            assert_eq(gcd(r1.re-1, m), 274177)
+            assert_eq(gcd(r2.re-1, m), 274177)
+        }
+    }
+}
 
 say "** Test passed!"
