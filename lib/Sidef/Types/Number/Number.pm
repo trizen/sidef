@@ -7310,8 +7310,8 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_get_num($C, $y);
         Math::GMPq::Rmpq_get_den($D, $y);
 
-        my $t = Math::GMPz::Rmpz_init();
-        my $u = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_mul($u, $B, $D);
 
@@ -7329,10 +7329,13 @@ package Sidef::Types::Number::Number {
 
         my ($re, $im) = complex_powmod((bless \$A), (bless \$B), (bless \$n), (bless \$m));
 
-        ($re, $im) = complex_mul($re, $im, (bless \$u));
-        ($re, $im) = complex_mod($re, $im, (bless \$m));
+        Math::GMPz::Rmpz_mul($A, $$re, $u);
+        Math::GMPz::Rmpz_mul($B, $$im, $u);
 
-        return ($re, $im);
+        Math::GMPz::Rmpz_mod($A, $A, $m);
+        Math::GMPz::Rmpz_mod($B, $B, $m);
+
+        return ((bless \$A), (bless \$B));
     }
 
     *cpowmod = \&complex_powmod;
