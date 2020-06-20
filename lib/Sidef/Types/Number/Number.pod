@@ -4018,6 +4018,14 @@ Return the
 
 =cut
 
+=head2 smooth_count
+
+Number.smooth_count() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 solve_pell
 
 Number.solve_pell() -> I<Obj>

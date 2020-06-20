@@ -13989,6 +13989,45 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub smooth_count {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto ZERO;
+        $k = _any2ui($$k)  // goto ZERO;
+
+        if ($k < 2) {
+            return ZERO;
+        }
+
+        my $count = sub {
+            my ($n, $p) = @_;
+
+            if ($p == 2) {
+                return Math::GMPz::Rmpz_sizeinbase($n, 2);
+            }
+
+            my $t = Math::GMPz::Rmpz_init();
+            my $q = Math::Prime::Util::GMP::prev_prime($p);
+
+            my $count = 0;
+
+            foreach my $k (0 .. Math::Prime::Util::GMP::logint($n, $p)) {
+
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+                Math::GMPz::Rmpz_tdiv_q($t, $n, $t);
+
+                $count += __SUB__->($t, $q);
+            }
+
+            $count;
+          }
+          ->($n, Math::Prime::Util::GMP::prev_prime($k + 1));
+
+        __PACKAGE__->_set_uint($count);
+    }
+
     sub is_smooth {
         my ($n, $k) = @_;
 
