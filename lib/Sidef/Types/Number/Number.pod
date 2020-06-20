@@ -2632,6 +2632,14 @@ Return the
 
 =cut
 
+=head2 is_safe_prime
+
+Number.is_safe_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_semiprime
 
 Number.is_semiprime() -> I<Obj>

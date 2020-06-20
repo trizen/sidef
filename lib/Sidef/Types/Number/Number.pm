@@ -10873,6 +10873,26 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_safe_prime {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        (_primality_pretest($n) && Math::GMPz::Rmpz_odd_p($n))
+          || return Sidef::Types::Bool::Bool::FALSE;
+
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($t, $n, 1);
+        Math::GMPz::Rmpz_div_2exp($t, $t, 1);
+
+        _primality_pretest($t)
+          || return Sidef::Types::Bool::Bool::FALSE;
+
+        (Math::Prime::Util::GMP::is_prob_prime($t) && Math::Prime::Util::GMP::is_prob_prime($n))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_almost_prime {
         my ($n, $k) = @_;
 
