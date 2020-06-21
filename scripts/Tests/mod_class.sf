@@ -22,6 +22,35 @@ do {
     assert_eq(sqrt(a+1), Mod(4, 19))    # Mod(4, 19)
 
     assert_eq(chinese(Mod(43, 19), Mod(13, 41)), Mod(423, 779))   # Mod(423, 779)
+
+    with (1e10.irand, 1e10.irand) {|n, m|
+        assert_eq(
+            Mod(Matrix([1,1],[1,0]), m)**n,
+            Mod(Matrix(
+                [fibmod(n+1, m), fibmod(n, m)]
+                [fibmod(n, m), fibmod(n-1, m)]), m)
+        )
+    }
+
+    var m = random_prime(1e5)
+
+    var x = 9
+    var y = 10
+
+    var A = Matrix.build(x, y, { 1e7.irand })
+    var B = Matrix.build(x, y, { 1e7.irand })
+
+    assert_eq(Mod(A, m) + B, Mod((A + B)%m, m))
+    assert_eq(Mod(A, m) - B, Mod((A - B)%m, m))
+    assert_eq(Mod(A, m) * B, Mod((A * B)%m, m))
+    assert_eq(Mod(A, m) & B, Mod((A%m & B%m), m))
+    assert_eq(Mod(A, m) | B, Mod((A%m | B%m), m))
+    assert_eq(Mod(A, m) ^ B, Mod((A%m ^ B%m), m))
+
+    assert_eq(Mod(A, m) + Mod(B, m), Mod((A + B)%m, m))
+    assert_eq(Mod(A, m) & Mod(B, m), Mod((A%m & B%m), m))
+
+    #assert_eq(Mod(A, m) / B, Mod(A * B.invmod(m) % m, m))        # not implemented yet
 }
 
 say "** Test passed!"

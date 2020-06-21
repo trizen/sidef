@@ -13,19 +13,11 @@ package Sidef::Types::Number::Mod {
       q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ },
       q{${}}  => sub { $_[0]{n} };
 
-    sub _valid {
-        foreach (@_) {
-            if (!UNIVERSAL::isa($$_, 'Sidef::Types::Number::Number')) {
-                $$_ = $$_->to_n;
-            }
-        }
-    }
-
     sub new {
         my (undef, $n, $m) = @_;
 
-        $n = Sidef::Types::Number::Number->new($n) if !UNIVERSAL::isa($n, 'Sidef::Types::Number::Number');
-        $m = Sidef::Types::Number::Number->new($m) if !UNIVERSAL::isa($m, 'Sidef::Types::Number::Number');
+        #$n = Sidef::Types::Number::Number->new($n) if !UNIVERSAL::isa($n, 'Sidef::Types::Number::Number');
+        #$m = Sidef::Types::Number::Number->new($m) if !UNIVERSAL::isa($m, 'Sidef::Types::Number::Number');
 
         $n = $n->mod($m);
 
@@ -66,8 +58,12 @@ package Sidef::Types::Number::Mod {
 
     sub div {
         my ($x, $y) = @_;
-        _valid(\$y);
-        __PACKAGE__->new($x->{n}->mul($y->to_n->invmod($x->{m})), $x->{m});
+
+        if (ref($y) ne __PACKAGE__) {
+            $y = __PACKAGE__->new($y, $x->{m});
+        }
+
+        __PACKAGE__->new($x->{n}->mul($y->{n}->invmod($x->{m})), $x->{m});
     }
 
     sub inv {
@@ -113,8 +109,7 @@ package Sidef::Types::Number::Mod {
 
     sub pow {
         my ($x, $y) = @_;
-        _valid(\$y);
-        __PACKAGE__->new($x->{n}->powmod($y->to_n, $x->{m}), $x->{m});
+        __PACKAGE__->new($x->{n}->powmod($y, $x->{m}), $x->{m});
     }
 
     sub factorial {
@@ -172,16 +167,24 @@ package Sidef::Types::Number::Mod {
         foreach my $method (qw(eq ne lt le gt ge cmp)) {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
-                _valid(\$y);
-                $x->{n}->$method($y->to_n->mod($x->{m}));
+
+                if (ref($y) ne __PACKAGE__) {
+                    $y = __PACKAGE__->new($y, $x->{m});
+                }
+
+                $x->{n}->$method($y->{n});
             };
         }
 
         foreach my $method (qw(mul add sub xor or and)) {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
-                _valid(\$y);
-                __PACKAGE__->new($x->{n}->$method($y->to_n->mod($x->{m})), $x->{m});
+
+                if (ref($y) ne __PACKAGE__) {
+                    $y = __PACKAGE__->new($y, $x->{m});
+                }
+
+                __PACKAGE__->new($x->{n}->$method($y->{n}), $x->{m});
             };
         }
 
