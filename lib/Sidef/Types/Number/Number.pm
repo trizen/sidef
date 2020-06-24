@@ -10798,8 +10798,6 @@ package Sidef::Types::Number::Number {
             push(@checks, 1e7) if ($size > 20_000);
             push(@checks, 1e8) if ($size > 30_000);
 
-            my $prev;
-
             foreach my $k (@checks) {
 
                 #~ say "Checking factors < $k";
@@ -10808,7 +10806,6 @@ package Sidef::Types::Number::Number {
                     $cache{$k} //= do {
                         my $z = Math::GMPz::Rmpz_init_nobless();
                         Math::GMPz::Rmpz_primorial_ui($z, $k);
-                        Math::GMPz::Rmpz_divexact($z, $z, $prev) if defined($prev);
                         $z;
                     }
                 );
@@ -10819,8 +10816,6 @@ package Sidef::Types::Number::Number {
                     ## say "Composite with a factor < $k";
                     return 0;
                 }
-
-                $prev = $primorial;
             }
         }
 
@@ -10883,7 +10878,7 @@ package Sidef::Types::Number::Number {
             $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        (_primality_pretest($n) && Math::GMPz::Rmpz_odd_p($n))
+        (Math::GMPz::Rmpz_odd_p($n) && _primality_pretest($n))
           || return Sidef::Types::Bool::Bool::FALSE;
 
         my $t = Math::GMPz::Rmpz_init();
@@ -10893,7 +10888,7 @@ package Sidef::Types::Number::Number {
         _primality_pretest($t)
           || return Sidef::Types::Bool::Bool::FALSE;
 
-        (Math::Prime::Util::GMP::is_prob_prime($t) && Math::Prime::Util::GMP::is_prob_prime($n))
+        (Math::Prime::Util::GMP::is_prob_prime($t) && Math::Prime::Util::GMP::is_strong_pseudoprime($n, 2))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
