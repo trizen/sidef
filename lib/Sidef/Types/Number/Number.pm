@@ -10876,7 +10876,12 @@ package Sidef::Types::Number::Number {
     sub is_safe_prime {
         my ($n) = @_;
 
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         (_primality_pretest($n) && Math::GMPz::Rmpz_odd_p($n))
           || return Sidef::Types::Bool::Bool::FALSE;
@@ -10923,7 +10928,13 @@ package Sidef::Types::Number::Number {
 
         my $omega     = 0;
         my $remainder = $n;
-        my $size      = Math::GMPz::Rmpz_sizeinbase($n, 10);
+        my $size      = Math::GMPz::Rmpz_sizeinbase($n, 2);
+
+        if ($k >= $size) {    # the smallest k-almost prime is 2^k
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        $size = 1 + CORE::int($size / 3.322);
 
         if ($size > 30) {
 
