@@ -1236,7 +1236,7 @@ package Sidef::Types::Number::Number {
     sub pi {
 
         if (ref($_[0])) {
-            return $_[0]->prime_count;
+            return $_[0]->prime_count($_[1]);
         }
 
         my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
