@@ -8727,42 +8727,35 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto &nan;
         $p = _any2ui($$p)  // goto &nan;
 
-        my $native_n = 0;
-
-        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            ($native_n, $n) = (1, Math::GMPz::Rmpz_get_ui($n));
-        }
-
         my @B = _bernoulli_numbers($p);
 
         my $z = Math::GMPz::Rmpz_init();
-        my $u = Math::GMPz::Rmpz_init();
         my $q = Math::GMPq::Rmpq_init();
+        my $u = Math::GMPz::Rmpz_init_set_ui(1);
 
         my $sum = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_ui($sum, 0, 1);
 
+        # Sum_{k=1..n} k^p = 1/(p+1) * Sum_{j=0..p} binomial(p+1, j) * n^(p-j+1) * bernoulli(j)
+        #                  = 1/(p+1) * Sum_{j=0..p} binomial(p+1, p-j) * n^(j+1) * bernoulli(p-j)
+
         foreach my $j (0 .. $p) {
 
-            $j % 2 == 0 or $j == 1 or next;
+            Math::GMPz::Rmpz_mul($u, $u, $n);
 
-            Math::GMPz::Rmpz_bin_uiui($z, $p + 1, $j);    # z = binomial(p+1, j)
+            # Skip when bernoulli(p-j) == 0
+            ($p - $j) % 2 == 0 or ($p - $j) == 1 or next;
 
-#<<<
-            $native_n
-              ? Math::GMPz::Rmpz_ui_pow_ui($u, $n, $p + 1 - $j)     # u = n^(p+1 - j)
-              : Math::GMPz::Rmpz_pow_ui(   $u, $n, $p + 1 - $j);    # ==//==
-#>>>
+            Math::GMPz::Rmpz_bin_uiui($z, $p + 1, $p - $j);
 
-            Math::GMPz::Rmpz_mul($z, $z, $u);             # z = z * u
-            Math::GMPq::Rmpq_mul_z($q, $j <= 1 ? $B[$j] : $B[($j >> 1) + 1], $z);
-            Math::GMPq::Rmpq_neg($q, $q) if ($j == 1);
+            Math::GMPz::Rmpz_mul($z, $z, $u);
+            Math::GMPq::Rmpq_mul_z($q, ($p - $j) <= 1 ? $B[$p - $j] : $B[(($p - $j) >> 1) + 1], $z);
+            Math::GMPq::Rmpq_neg($q, $q) if ($p - $j == 1);
             Math::GMPq::Rmpq_add($sum, $sum, $q);
         }
 
         Math::GMPq::Rmpq_get_num($z, $sum);
         Math::GMPz::Rmpz_divexact_ui($z, $z, $p + 1);
-
         bless \$z;
     }
 
