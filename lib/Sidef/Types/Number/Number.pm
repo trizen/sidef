@@ -8731,11 +8731,12 @@ package Sidef::Types::Number::Number {
             return bless \$n;
         }
 
-        if ($p == 1) {
+        if ($p == 1 or $p == 3) {
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_add_ui($r, $n, 1);
             Math::GMPz::Rmpz_mul($r, $r, $n);
             Math::GMPz::Rmpz_div_2exp($r, $r, 1);
+            Math::GMPz::Rmpz_mul($r, $r, $r) if ($p == 3);
             return bless \$r;
         }
 
