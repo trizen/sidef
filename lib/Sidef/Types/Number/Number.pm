@@ -8765,16 +8765,14 @@ package Sidef::Types::Number::Number {
             Math::GMPq::Rmpq_add($sum, $sum, $q);
         }
 
-        # sum += (1/2) * (p+1) * n^p
+        # sum += (1/2) * n^p * (2*n + p + 1)
         Math::GMPz::Rmpz_mul($u, $u, $n);
-        Math::GMPz::Rmpz_mul_ui($z, $u, $p + 1);
+        Math::GMPz::Rmpz_mul_2exp($z, $n, 1);
+        Math::GMPz::Rmpz_add_ui($z, $z, $p + 1);
+        Math::GMPz::Rmpz_mul($u, $u, $z);
         Math::GMPq::Rmpq_set_ui($q, 1, 2);
-        Math::GMPq::Rmpq_mul_z($q, $q, $z);
+        Math::GMPq::Rmpq_mul_z($q, $q, $u);
         Math::GMPq::Rmpq_add($sum, $sum, $q);
-
-        # sum += n^(p+1)
-        Math::GMPz::Rmpz_mul($u, $u, $n);
-        Math::GMPq::Rmpq_add_z($sum, $sum, $u);
 
         # z = sum/(p+1)
         Math::GMPq::Rmpq_get_num($z, $sum);
