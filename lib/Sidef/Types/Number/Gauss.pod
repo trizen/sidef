@@ -270,6 +270,22 @@ Return the
 
 =cut
 
+=head2 gcd
+
+Gauss.gcd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gcd_norm
+
+Gauss.gcd_norm() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 iabs
 
 Gauss.iabs() -> I<Obj>
@@ -299,6 +315,46 @@ Return the
 =head2 invmod
 
 Gauss.invmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_imag
+
+Gauss.is_imag() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_mone
+
+Gauss.is_mone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_one
+
+Gauss.is_one() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_real
+
+Gauss.is_real() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_zero
+
+Gauss.is_zero() -> I<Obj>
 
 Return the
 
@@ -351,6 +407,14 @@ Aliases: I<real>
 =head2 reals
 
 Gauss.reals() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 round
+
+Gauss.round() -> I<Obj>
 
 Return the
 

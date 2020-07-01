@@ -151,6 +151,11 @@ package Sidef::Types::Number::Gauss {
         __PACKAGE__->new($x->{re}->ceil, $x->{im}->ceil);
     }
 
+    sub round {
+        my ($x, $r) = @_;
+        __PACKAGE__->new($x->{re}->round($r), $x->{im}->round($r));
+    }
+
     sub mod {
         my ($x, $y) = @_;
 
@@ -170,6 +175,67 @@ package Sidef::Types::Number::Gauss {
     sub inc {
         my ($x) = @_;
         __PACKAGE__->new(Sidef::Types::Number::Number::complex_add($x->{re}, $x->{im}, Sidef::Types::Number::Number::ONE));
+    }
+
+    sub is_zero {
+        my ($x) = @_;
+        my $bool = $x->{re}->is_zero;
+        $bool || return $bool;
+        $x->{im}->is_zero;
+    }
+
+    sub is_one {
+        my ($x) = @_;
+        my $bool = $x->{im}->is_zero;
+        $bool || return $bool;
+        $x->{re}->is_one;
+    }
+
+    sub is_mone {
+        my ($x) = @_;
+        my $bool = $x->{im}->is_zero;
+        $bool || return $bool;
+        $x->{re}->is_mone;
+    }
+
+    sub is_real {
+        my ($x) = @_;
+        $x->{im}->is_zero;
+    }
+
+    sub is_imag {
+        my ($x) = @_;
+        my $bool = $x->{im}->is_zero;
+        $bool && return $bool->not;
+        $x->{re}->is_zero;
+    }
+
+    sub gcd {
+        my ($n, $k) = @_;
+        _valid(\$k);
+
+        my $norm_n = $n->norm;
+        my $norm_k = $k->norm;
+
+        if ($norm_n->gt($norm_k)) {
+            ($n, $k) = ($k, $n);
+        }
+
+        until ($k->is_zero) {
+
+            my $q = $n->div($k)->round;
+            my $r = $n->sub($q->mul($k));
+
+            ($n, $k) = ($k, $r);
+        }
+
+        $n;
+    }
+
+    sub gcd_norm {
+        my ($n, $k) = @_;
+        _valid(\$k);
+        $n->norm->gcd($k->norm);
     }
 
     sub invmod {
