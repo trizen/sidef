@@ -320,6 +320,14 @@ Return the
 
 =cut
 
+=head2 is_coprime
+
+Gauss.is_coprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_imag
 
 Gauss.is_imag() -> I<Obj>

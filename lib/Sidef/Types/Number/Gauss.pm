@@ -238,6 +238,12 @@ package Sidef::Types::Number::Gauss {
         $n->norm->gcd($k->norm);
     }
 
+    sub is_coprime {
+        my ($n, $k) = @_;
+        _valid(\$k);
+        $n->norm->gcd($k->norm)->is_one;
+    }
+
     sub invmod {
         my ($x, $m) = @_;
         __PACKAGE__->new(Sidef::Types::Number::Number::complex_invmod($x->{re}, $x->{im}, $m));
