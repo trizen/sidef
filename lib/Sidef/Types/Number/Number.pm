@@ -14062,9 +14062,7 @@ package Sidef::Types::Number::Number {
             $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        if (ref($k) ne 'Math::GMPz') {
-            $k = _any2ui($k) // return Sidef::Types::Bool::Bool::FALSE;
-        }
+        $k = _any2ui($k) // return Sidef::Types::Bool::Bool::FALSE;
 
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
@@ -14098,6 +14096,49 @@ package Sidef::Types::Number::Number {
         }
 
         return Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_rough {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = $$n;
+        $k = $$k;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        $k = (_any2ui($k) // return Sidef::Types::Bool::Bool::FALSE) - 1;
+
+        return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
+        return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
+        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+
+        state %cache;
+
+        # Clear the cache when there are too many values cached
+        if (scalar(keys(%cache)) > 100) {
+            Math::GMPz::Rmpz_clear($_) for values(%cache);
+            undef %cache;
+        }
+
+        my $B = (
+            $cache{$k} //= do {
+                my $t = Math::GMPz::Rmpz_init_nobless();
+                Math::GMPz::Rmpz_primorial_ui($t, $k);
+                $t;
+            }
+        );
+
+        state $g = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_gcd($g, $n, $B);
+
+        (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0)
+          ? return Sidef::Types::Bool::Bool::FALSE
+          : return Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub is_smooth_over_prod {
