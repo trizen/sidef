@@ -14457,8 +14457,44 @@ package Sidef::Types::Number::Number {
               and return Sidef::Types::Bool::Bool::FALSE;
         }
 
+        if (Math::Prime::Util::GMP::is_power($n) >= $k) {
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_root($t, $n, 2 * $k + 1);
+
+        my $trial_limit = 1e6;
+        if (Math::GMPz::Rmpz_fits_ulong_p($t)) {
+            $trial_limit = Math::GMPz::Rmpz_get_ui($t);
+            $trial_limit = 10**(1 + CORE::int(CORE::log($trial_limit) / CORE::log(10)));
+            $trial_limit = 1e2 if ($trial_limit < 1e2);
+            $trial_limit = 1e6 if ($trial_limit > 1e6);
+        }
+
+        my ($rem, @f) = _native_trial_factor($n, $trial_limit);
+
         my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($n, 10));
+        ++$factors{$_} for @f;
+
+        foreach my $e (values %factors) {
+            $e < $k and return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) {
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        if (Math::Prime::Util::GMP::is_power($rem) >= $k) {
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($t, $trial_limit) < 0) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        undef %factors;
+        ++$factors{$_} for Math::Prime::Util::GMP::factor($rem);
 
         foreach my $e (values %factors) {
             $e < $k and return Sidef::Types::Bool::Bool::FALSE;
