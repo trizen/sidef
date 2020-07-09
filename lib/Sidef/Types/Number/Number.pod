@@ -1001,6 +1001,22 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<n
 
 =cut
 
+=head2 bsearch_max
+
+Number.bsearch_max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bsearch_min
+
+Number.bsearch_min() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bsearch_solve
 
 Number.bsearch_solve() -> I<Obj>

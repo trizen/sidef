@@ -15786,6 +15786,77 @@ package Sidef::Types::Number::Number {
         bless \$middle;
     }
 
+    sub bsearch_min {
+        my ($left, $right, $block) = @_;
+
+        if (defined($block)) {
+            _valid(\$right);
+            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left)  // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right) // return undef);
+        }
+        else {
+            $block = $right;
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
+            $left  = Math::GMPz::Rmpz_init_set_ui(0);
+        }
+
+        my $middle = Math::GMPz::Rmpz_init();
+
+        while (Math::GMPz::Rmpz_cmp($left, $right) < 0) {
+
+            Math::GMPz::Rmpz_add($middle, $left, $right);
+            Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
+
+            my $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            my $cmp  = CORE::int($block->run($item));
+
+            if ($cmp < 0) {
+                Math::GMPz::Rmpz_add_ui($left, $middle, 1);
+            }
+            else {
+                Math::GMPz::Rmpz_set($right, $middle);
+            }
+        }
+
+        bless \$left;
+    }
+
+    sub bsearch_max {
+        my ($left, $right, $block) = @_;
+
+        if (defined($block)) {
+            _valid(\$right);
+            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left)  // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right) // return undef);
+        }
+        else {
+            $block = $right;
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
+            $left  = Math::GMPz::Rmpz_init_set_ui(0);
+        }
+
+        my $middle = Math::GMPz::Rmpz_init();
+
+        while (Math::GMPz::Rmpz_cmp($left, $right) < 0) {
+
+            Math::GMPz::Rmpz_add($middle, $left, $right);
+            Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
+            Math::GMPz::Rmpz_add_ui($middle, $middle, 1);
+
+            my $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            my $cmp  = CORE::int($block->run($item));
+
+            if ($cmp > 0) {
+                Math::GMPz::Rmpz_sub_ui($right, $middle, 1);
+            }
+            else {
+                Math::GMPz::Rmpz_set($left, $middle);
+            }
+        }
+
+        bless \$right;
+    }
+
     sub commify {
         my ($self) = @_;
 

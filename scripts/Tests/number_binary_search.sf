@@ -34,4 +34,54 @@ assert_eq(20..100 -> bsearch { |n| n! <=> 30! }, 30)
 assert_eq(42..100 -> bsearch_le { |n| exp(n) <=> 10**28 }, 64)   # i.e.: exp(64) <= 10^28
 assert_eq(42..100 -> bsearch_ge { |n| exp(n) <=> 10**28 }, 65)   # i.e.: exp(65) >= 10^28
 
+for k in (1..100) {
+    var t = bsearch_min(1, irand(1e4,1e5), {|p|
+        pi(p) <=> k
+    })
+
+    assert_eq(pi(t), k)
+    assert(pi(t-1) < k)
+
+    var u = bsearch_max(1, irand(1e4,1e5), {|p|
+        pi(p) <=> k
+    })
+
+    assert_eq(pi(u), k)
+    assert(pi(u+1) > k)
+}
+
+for k in (1..100) {
+
+    var q = prime(k)
+    var t = bsearch_min(1, irand(1e4,1e5), {|p|
+        prime(p) <=> q
+    })
+
+    assert_eq(prime(t), q)
+
+    var u = bsearch_max(1, irand(1e4,1e5), {|p|
+        prime(p) <=> q
+    })
+
+    assert_eq(prime(u), q)
+}
+
+for k in (2..100) {
+    var t = bsearch_min(1, irand(1e4,1e5), {|p|
+        prime(p) <=> k
+    })
+
+    assert(prime(t) >= k, "prime(#{t}) >= #{k}")
+    assert(prime(t+1) > k, "prime(#{t}+1) > #{k}")
+    assert(prime(t-1) < k, "prime(#{t}-1) < #{k}")
+
+    var u = bsearch_max(1, irand(1e4,1e5), {|p|
+        prime(p) <=> k
+    })
+
+    assert(prime(u) <= k, "prime(#{t}) <= #{k}")
+    assert(prime(u+1) > k, "prime(#{t}) > #{k}")
+    assert(prime(u-1) < k, "prime(#{t}) < #{k}")
+}
+
 say "** Test passed!"
