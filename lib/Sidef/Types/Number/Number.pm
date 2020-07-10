@@ -12134,6 +12134,65 @@ package Sidef::Types::Number::Number {
 
     *dconv = \&dirichlet_convolution;
 
+    sub dirichlet_hyperbola {
+        my ($n, $f, $g, $F, $G) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
+
+        $f //= Sidef::Types::Block::Block->new(code => sub { ONE });
+        $g //= Sidef::Types::Block::Block->new(code => sub { ONE });
+
+        $F //= Sidef::Types::Block::Block->new(code => sub { $_[0] });
+        $G //= Sidef::Types::Block::Block->new(code => sub { $_[0] });
+
+        my $s = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sqrt($s, $n);
+
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        my $t = bless \Math::GMPz::Rmpz_init_set_ui(0);
+        my $u = bless \Math::GMPz::Rmpz_init_set_ui(0);
+
+        Math::GMPz::Rmpz_fits_slong_p($s) || goto &nan;
+
+        foreach my $k (1 .. Math::GMPz::Rmpz_get_ui($s)) {
+
+            Math::GMPz::Rmpz_set_ui($$t, $k);
+            Math::GMPz::Rmpz_tdiv_q_ui($$u, $n, $k);
+
+            my $f_r = $f->run($t);
+            my $g_r = $g->run($t);
+            my $F_r = $F->run($u);
+            my $G_r = $G->run($u);
+
+            $f_r = $f_r->to_i if ref($f_r) ne __PACKAGE__;
+            $g_r = $g_r->to_i if ref($g_r) ne __PACKAGE__;
+            $F_r = $F_r->to_i if ref($F_r) ne __PACKAGE__;
+            $G_r = $G_r->to_i if ref($G_r) ne __PACKAGE__;
+
+            $f_r = $$f_r;
+            $g_r = $$g_r;
+            $F_r = $$F_r;
+            $G_r = $$G_r;
+
+            if (    ref($f_r) eq 'Math::GMPz'
+                and ref($g_r) eq 'Math::GMPz'
+                and ref($F_r) eq 'Math::GMPz'
+                and ref($G_r) eq 'Math::GMPz'
+                and ref($sum) eq 'Math::GMPz') {
+                Math::GMPz::Rmpz_addmul($sum, $f_r, $G_r);
+                Math::GMPz::Rmpz_addmul($sum, $g_r, $F_r);
+            }
+            else {
+                $sum = __add__($sum, __add__(__mul__($f_r, $G_r), __mul__($g_r, $F_r)));
+            }
+        }
+
+        $sum = __sub__($sum, __mul__(${$F->(bless \$s)->to_i}, ${$G->(bless \$s)->to_i}));
+        bless \$sum;
+    }
+
     # Divisors d of n, such that d <= k, with k = n when `k` is not specified
     sub divisors {
         my ($n, $k) = @_;

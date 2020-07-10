@@ -1490,6 +1490,14 @@ Aliases: I<sum_digits>, I<sumdigits>
 
 =cut
 
+=head2 dirichlet_hyperbola
+
+Number.dirichlet_hyperbola() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 divides
 
 Number.divides() -> I<Obj>
