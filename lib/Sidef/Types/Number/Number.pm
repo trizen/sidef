@@ -14344,6 +14344,36 @@ package Sidef::Types::Number::Number {
     *is_pow           = \&is_power;
     *is_perfect_power = \&is_power;
 
+    sub power_count {    # OEIS: A069623
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            return $n->iroot($k);
+        }
+
+        $n = _any2mpz($$n) // return ZERO;
+        Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
+
+        # a(n) = n - Sum_{k=1..floor(log_2(n))} μ(k) * (floor(n^(1/k)) - 1).
+
+        my $r = Math::GMPz::Rmpz_init_set_ui(0);
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        foreach my $k (1 .. __ilog__($n, 2)) {
+            my $mu = Math::Prime::Util::GMP::moebius($k) || next;
+            Math::GMPz::Rmpz_root($t, $n, $k);
+            Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+            ($mu == 1)
+              ? Math::GMPz::Rmpz_add($r, $r, $t)
+              : Math::GMPz::Rmpz_sub($r, $r, $t);
+        }
+
+        Math::GMPz::Rmpz_sub($r, $n, $r);
+        bless \$r;
+    }
+
+    *perfect_power_count = \&power_count;
+
     sub is_power_of {
         my ($n, $k) = @_;
 

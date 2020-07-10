@@ -3480,6 +3480,16 @@ Aliases: I<hammingweight>
 
 =cut
 
+=head2 power_count
+
+Number.power_count() -> I<Obj>
+
+Return the
+
+Aliases: I<perfect_power_count>
+
+=cut
+
 =head2 powerful
 
 Number.powerful() -> I<Obj>
