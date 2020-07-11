@@ -12166,10 +12166,10 @@ package Sidef::Types::Number::Number {
             my $F_r = $F->run($u);
             my $G_r = $G->run($u);
 
-            $f_r = $f_r->to_i if ref($f_r) ne __PACKAGE__;
-            $g_r = $g_r->to_i if ref($g_r) ne __PACKAGE__;
-            $F_r = $F_r->to_i if ref($F_r) ne __PACKAGE__;
-            $G_r = $G_r->to_i if ref($G_r) ne __PACKAGE__;
+            $f_r = $f_r->to_n if ref($f_r) ne __PACKAGE__;
+            $g_r = $g_r->to_n if ref($g_r) ne __PACKAGE__;
+            $F_r = $F_r->to_n if ref($F_r) ne __PACKAGE__;
+            $G_r = $G_r->to_n if ref($G_r) ne __PACKAGE__;
 
             $f_r = $$f_r;
             $g_r = $$g_r;
@@ -12189,7 +12189,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        $sum = __sub__($sum, __mul__(${$F->(bless \$s)->to_i}, ${$G->(bless \$s)->to_i}));
+        $sum = __sub__($sum, __mul__(${$F->(bless \$s)->to_n}, ${$G->(bless \$s)->to_n}));
         bless \$sum;
     }
 
