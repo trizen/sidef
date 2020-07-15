@@ -8738,9 +8738,31 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
+        state $z = Math::GMPz::Rmpz_init_nobless();
+
+        if ($p == 2) {    # n*(n+1)*(2*n+1)/6
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_add_ui($z, $n, 1);
+            Math::GMPz::Rmpz_mul($r, $z, $n);
+            Math::GMPz::Rmpz_mul_2exp($z, $z, 1);
+            Math::GMPz::Rmpz_sub_ui($z, $z, 1);
+            Math::GMPz::Rmpz_mul($r, $r, $z);
+            Math::GMPz::Rmpz_divexact_ui($r, $r, 6);
+            return bless \$r;
+        }
+
+        # When p >= n, sum the powers directly.
+        if (Math::GMPz::Rmpz_cmp_ui($n, $p) <= 0) {
+            my $r = Math::GMPz::Rmpz_init_set_ui(0);
+            foreach my $k (1 .. Math::GMPz::Rmpz_get_ui($n)) {
+                Math::GMPz::Rmpz_ui_pow_ui($z, $k, $p);
+                Math::GMPz::Rmpz_add($r, $r, $z);
+            }
+            return bless \$r;
+        }
+
         my @B = _bernoulli_numbers($p);
 
-        my $z = Math::GMPz::Rmpz_init();
         my $q = Math::GMPq::Rmpq_init();
         my $u = Math::GMPz::Rmpz_init_set_ui(1);
 
@@ -8774,9 +8796,9 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_add($sum, $sum, $q);
 
         # z = sum/(p+1)
-        Math::GMPq::Rmpq_get_num($z, $sum);
-        Math::GMPz::Rmpz_divexact_ui($z, $z, $p + 1);
-        bless \$z;
+        Math::GMPq::Rmpq_get_num($u, $sum);
+        Math::GMPz::Rmpz_divexact_ui($u, $u, $p + 1);
+        bless \$u;
     }
 
     *faulhaber    = \&faulhaber_sum;
