@@ -2250,6 +2250,8 @@ package Sidef::Types::Array::Array {
         bless \@acc, ref($self);
     }
 
+    *acc_by = \&accumulate_by;
+
     sub accumulate {
         my ($self, $block) = @_;
 
@@ -2271,6 +2273,28 @@ package Sidef::Types::Array::Array {
 
         bless \@acc, ref($self);
     }
+
+    *acc = \&accumulate;
+
+    sub differences {
+        my ($self, $n) = @_;
+
+        if (defined($n)) {
+            $n = CORE::int($n);
+        }
+        else {
+            $n = 1;
+        }
+
+        foreach my $i (1 .. $n) {
+            $self = $self->map_cons(2, Sidef::Types::Block::Block->new(code => sub { $_[1]->sub($_[0]) }));
+        }
+
+        $self;
+    }
+
+    *diffs           = \&differences;
+    *nth_differences = \&differences;
 
     sub reduce {
         my ($self, $obj, $initial) = @_;
