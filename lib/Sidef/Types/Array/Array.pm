@@ -2286,8 +2286,10 @@ package Sidef::Types::Array::Array {
             $n = 1;
         }
 
+        state $block = Sidef::Types::Block::Block->new(code => sub { $_[1]->sub($_[0]) });
+
         foreach my $i (1 .. $n) {
-            $self = $self->map_cons(2, Sidef::Types::Block::Block->new(code => sub { $_[1]->sub($_[0]) }));
+            $self = $self->map_cons(2, $block);
         }
 
         $self;

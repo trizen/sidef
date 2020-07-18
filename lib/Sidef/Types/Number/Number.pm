@@ -1244,6 +1244,8 @@ package Sidef::Types::Number::Number {
         bless \$pi;
     }
 
+    *π = \&pi;
+
     sub tau {
 
         if (ref($_[0])) {
@@ -1255,6 +1257,8 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_mul_2ui($tau, $tau, 1, $ROUND);
         bless \$tau;
     }
+
+    *τ = \&tau;
 
     sub ln2 {
         my $ln2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -1268,6 +1272,7 @@ package Sidef::Types::Number::Number {
         bless \$euler;
     }
 
+    *γ           = \&EulerGamma;
     *Y           = \&EulerGamma;
     *euler_gamma = \&EulerGamma;
 
@@ -1318,6 +1323,8 @@ package Sidef::Types::Number::Number {
 
         bless \$phi;
     }
+
+    *ϕ = \&phi;
 
     sub _nan {
         state $nan = do {
@@ -3831,6 +3838,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *Γ = \&gamma;
+
     sub lngamma {
         my ($x) = @_;
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -3855,6 +3864,8 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_digamma($r, _any2mpfr($$x), $ROUND);
         bless \$r;
     }
+
+    *Ψ = \&digamma;
 
     #
     ## beta(x, y) = gamma(x)*gamma(y) / gamma(x+y)
@@ -3925,6 +3936,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *η = \&eta;
+
     sub zeta {
         my ($x) = @_;
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -3939,6 +3952,8 @@ package Sidef::Types::Number::Number {
         }
         bless \$r;
     }
+
+    *ζ = \&zeta;
 
     sub _secant_numbers {
         my ($n) = @_;
@@ -5400,12 +5415,16 @@ package Sidef::Types::Number::Number {
         bless \$sum;
     }
 
+    *Σ = \&sum;
+
     sub prod {
         my (@vals) = @_;
         @vals || return ONE;
         _valid(\(@vals));
         bless \_binsplit([map { $$_ } @vals], \&__mul__);
     }
+
+    *Π = \&prod;
 
     sub max {
         my (@vals) = @_;
@@ -8916,6 +8935,7 @@ package Sidef::Types::Number::Number {
         $m ? ($m == 1) ? ONE : MONE : ZERO;
     }
 
+    *μ       = \&moebius;
     *mu      = \&moebius;
     *mobius  = \&moebius;
     *möbius  = \&moebius;
@@ -10406,6 +10426,7 @@ package Sidef::Types::Number::Number {
         __eq__($$x, $$y) ? ONE : ZERO;
     }
 
+    *δ              = \&kronecker_delta;
     *KroneckerDelta = \&kronecker_delta;
 
     sub is_coprime {
@@ -13114,6 +13135,7 @@ package Sidef::Types::Number::Number {
         bless \$sum;
     }
 
+    *Ω                  = \&big_omega;
     *Omega              = \&big_omega;
     *bigomega           = \&big_omega;
     *prime_power_sigma0 = \&big_omega;
@@ -13165,6 +13187,7 @@ package Sidef::Types::Number::Number {
         bless \$sum;
     }
 
+    *ω                   = \&omega;
     *prime_sigma0        = \&omega;
     *prime_power_usigma0 = \&omega;
 
@@ -13692,6 +13715,8 @@ package Sidef::Types::Number::Number {
         my $s = Math::Prime::Util::GMP::sigma($n, $k);
         ($s < ULONG_MAX) ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
     }
+
+    *σ = \&sigma;
 
     sub is_abundant {
         my ($n) = @_;
@@ -16051,17 +16076,6 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . '~'}   = \&not;
         *{__PACKAGE__ . '::' . ':'}   = \&pair;
         *{__PACKAGE__ . '::' . '//'}  = \&idiv;
-        *{__PACKAGE__ . '::' . 'γ'}   = \&EulerGamma;
-        *{__PACKAGE__ . '::' . 'Γ'}   = \&gamma;
-        *{__PACKAGE__ . '::' . 'Ψ'}   = \&digamma;
-        *{__PACKAGE__ . '::' . 'ϕ'}   = \&euler_totient;
-        *{__PACKAGE__ . '::' . 'σ'}   = \&sigma;
-        *{__PACKAGE__ . '::' . 'Ω'}   = \&big_omega;
-        *{__PACKAGE__ . '::' . 'ω'}   = \&omega;
-        *{__PACKAGE__ . '::' . 'ζ'}   = \&zeta;
-        *{__PACKAGE__ . '::' . 'η'}   = \&eta;
-        *{__PACKAGE__ . '::' . 'μ'}   = \&moebius;
-        *{__PACKAGE__ . '::' . 'δ'}   = \&kronecker_delta;
         *{__PACKAGE__ . '::' . '=~='} = \&approx_eq;
         *{__PACKAGE__ . '::' . '≅'}   = \&approx_eq;
         *{__PACKAGE__ . '::' . '<~>'} = \&approx_cmp;

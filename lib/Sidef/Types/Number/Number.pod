@@ -390,6 +390,36 @@ Aliases: I<mu>, I<mobius>, I<möbius>, I<moebius>
 
 =cut
 
+=head2 Π
+
+Number.Π() -> I<Obj>
+
+Return the
+
+Aliases: I<prod>
+
+=cut
+
+=head2 π
+
+Number.π() -> I<Obj>
+
+Return the
+
+Aliases: I<pi>
+
+=cut
+
+=head2 Σ
+
+Number.Σ() -> I<Obj>
+
+Return the
+
+Aliases: I<sum>
+
+=cut
+
 =head2 σ
 
 Number.σ() -> I<Obj>
@@ -400,13 +430,23 @@ Aliases: I<sigma>
 
 =cut
 
+=head2 τ
+
+Number.τ() -> I<Obj>
+
+Return the
+
+Aliases: I<tau>
+
+=cut
+
 =head2 ϕ
 
 Number.ϕ() -> I<Obj>
 
 Return the
 
-Aliases: I<totient>, I<euler_phi>, I<eulerphi>, I<euler_totient>
+Aliases: I<phi>
 
 =cut
 
@@ -3394,22 +3434,6 @@ Return the
 
 =cut
 
-=head2 phi
-
-Number.phi() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 pi
-
-Number.pi() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 pi_k
 
 Number.pi_k() -> I<Obj>
@@ -3733,14 +3757,6 @@ Return the
 =head2 primorial_inflation
 
 Number.primorial_inflation() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 prod
-
-Number.prod() -> I<Obj>
 
 Return the
 
@@ -4292,14 +4308,6 @@ Return the
 
 =cut
 
-=head2 sum
-
-Number.sum() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 superfactorial
 
 Number.superfactorial() -> I<Obj>
@@ -4327,14 +4335,6 @@ Return the
 =head2 tanh
 
 Number.tanh() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 tau
-
-Number.tau() -> I<Obj>
 
 Return the
 
@@ -4375,6 +4375,16 @@ Number.to_s() -> I<Obj>
 Return the
 
 Aliases: I<to_str>
+
+=cut
+
+=head2 totient
+
+Number.totient() -> I<Obj>
+
+Return the
+
+Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
 
 =cut
 
