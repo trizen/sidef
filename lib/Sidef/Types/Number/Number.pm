@@ -14128,31 +14128,66 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto ZERO;
         $k = _any2ui($$k)  // goto ZERO;
 
-        if ($k < 2) {
+        if ($k < 2 or Math::GMPz::Rmpz_sgn($n) <= 0) {
             return ZERO;
         }
 
-        my $count = sub {
-            my ($n, $p) = @_;
+        if (Math::GMPz::Rmpz_cmp_ui($n, $k) <= 0) {
+            return bless \$n;
+        }
 
-            if ($p == 2) {
-                return Math::GMPz::Rmpz_sizeinbase($n, 2);
+        my $count = sub {
+            my ($n, $k) = @_;
+
+            if (!ref($n) or Math::GMPz::Rmpz_fits_slong_p($n)) {
+
+                if (ref($n)) {
+                    $k == 2 and return Math::GMPz::Rmpz_sizeinbase($n, 2);
+                    $n = Math::GMPz::Rmpz_get_ui($n);
+                }
+
+                if ($k == 2) {
+                    return 1 + Math::Prime::Util::GMP::logint($n, 2);
+                }
+
+                use integer;
+
+                my $q   = Math::Prime::Util::GMP::prev_prime($k);
+                my $sum = 0;
+
+                for (my $t = 1 ; ; $t *= $k) {
+                    my $r = $n / $t;
+                    if ($r <= $q) {
+                        $sum += $r;
+                        last;
+                    }
+                    $sum += __SUB__->($r, $q);
+                }
+
+                return $sum;
+            }
+
+            my $sum = Math::GMPz::Rmpz_sizeinbase($n, 2);
+
+            if ($k == 2) {
+                return $sum;
             }
 
             my $t = Math::GMPz::Rmpz_init();
-            my $q = Math::Prime::Util::GMP::prev_prime($p);
 
-            my $count = 0;
+            for (my $p = 3 ; $p <= $k ; $p = Math::Prime::Util::GMP::next_prime($p)) {
 
-            foreach my $k (0 .. Math::Prime::Util::GMP::logint($n, $p)) {
+                Math::GMPz::Rmpz_tdiv_q_ui($t, $n, $p);
 
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
-                Math::GMPz::Rmpz_tdiv_q($t, $n, $t);
-
-                $count += __SUB__->($t, $q);
+                if (Math::GMPz::Rmpz_cmp_ui($t, $p) <= 0) {
+                    $sum += Math::GMPz::Rmpz_get_ui($t);
+                }
+                else {
+                    $sum += __SUB__->($t, $p);
+                }
             }
 
-            $count;
+            $sum;
           }
           ->($n, Math::Prime::Util::GMP::prev_prime($k + 1));
 

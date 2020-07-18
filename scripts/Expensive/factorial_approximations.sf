@@ -3,7 +3,7 @@
 define ℯ = Num.e
 define π = Num.pi
 define τ = Num.tau
-define γ = Num.Y
+define γ = Num.EulerGamma
 define ϕ = Num.phi
 
 # Unknown
