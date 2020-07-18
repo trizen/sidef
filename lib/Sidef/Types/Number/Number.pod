@@ -440,9 +440,9 @@ Aliases: I<tau>
 
 =cut
 
-=head2 ϕ
+=head2 φ
 
-Number.ϕ() -> I<Obj>
+Number.φ() -> I<Obj>
 
 Return the
 

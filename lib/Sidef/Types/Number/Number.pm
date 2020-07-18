@@ -1324,7 +1324,7 @@ package Sidef::Types::Number::Number {
         bless \$phi;
     }
 
-    *ϕ = \&phi;
+    *φ = \&phi;
 
     sub _nan {
         state $nan = do {
