@@ -14291,9 +14291,8 @@ package Sidef::Types::Number::Number {
                         $u += ($HAS_PRIME_UTIL ? Math::Prime::Util::prime_count($q, $p - 1) : _prime_count($q, $p - 1));
                         last;
                     }
-                    else {
-                        $u += $v;
-                    }
+
+                    $u += $v;
                 }
 
                 return ($t - $u);
@@ -14332,8 +14331,12 @@ package Sidef::Types::Number::Number {
                                            );
                     last;
                 }
+
+                if (ref($v)) {
+                    Math::GMPz::Rmpz_add($u, $u, $v);
+                }
                 else {
-                    $u += $v;
+                    Math::GMPz::Rmpz_add_ui($u, $u, $v);
                 }
             }
 
