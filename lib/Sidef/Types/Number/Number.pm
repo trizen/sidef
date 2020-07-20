@@ -11671,6 +11671,11 @@ package Sidef::Types::Number::Number {
         ($p < ULONG_MAX) ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
     }
 
+    sub next_twin_prime {
+        my $p = Math::Prime::Util::GMP::next_twin_prime(&_big2uistr // goto &nan) || goto &nan;
+        ($p < ULONG_MAX) ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
+    }
+
     sub next_composite {
         my ($n) = @_;
         $n = _any2mpz($$n) // goto &nan;

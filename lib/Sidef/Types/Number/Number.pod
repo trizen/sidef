@@ -3324,6 +3324,14 @@ Return the
 
 =cut
 
+=head2 next_twin_prime
+
+Number.next_twin_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ninf
 
 Number.ninf() -> I<Obj>
