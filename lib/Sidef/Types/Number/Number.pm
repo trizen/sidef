@@ -10622,6 +10622,12 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_str('int', $prime // goto &nan);
     }
 
+    sub random_safe_prime {
+        my ($bits) = @_;
+        my $prime = Math::Prime::Util::GMP::random_safe_prime(_big2uistr($bits) // (goto &nan));
+        __PACKAGE__->_set_str('int', $prime // goto &nan);
+    }
+
     sub random_bytes {
         Sidef::Types::Array::Array->new(
                                         [map { __PACKAGE__->_set_uint(ord($_)) }
