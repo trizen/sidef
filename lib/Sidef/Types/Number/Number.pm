@@ -8995,7 +8995,7 @@ package Sidef::Types::Number::Number {
                        );
             }
 
-            if ($HAS_PRIME_UTIL and $Math::Prime::Util::VERSION > 0.73) {
+            if ($HAS_PRIME_UTIL) {
                 return __PACKAGE__->_set_str('int', $mertens_table->{$y} = Math::Prime::Util::mertens($y));
             }
         }
