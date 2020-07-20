@@ -9021,7 +9021,7 @@ package Sidef::Types::Number::Number {
             return ($r >= 0 ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_int($r));
         }
 
-        my $lookup_size = CORE::int($y**(2 / 3));
+        my $lookup_size = Math::Prime::Util::GMP::rootint($y, 3)**2;
 
         if ($y > 1e10) {
             $lookup_size >>= 1;
@@ -9064,7 +9064,7 @@ package Sidef::Types::Number::Number {
             }
 
             # Using Dana Jacobsen's (++) optimizations from Math::Prime::Util::PP.
-            my $s  = CORE::int(CORE::sqrt($n));
+            my $s  = Math::Prime::Util::GMP::sqrtint($n);
             my $ns = $n / ($s + 1);
 
             my ($nk, $nk1) = ($n, $n >> 1);
