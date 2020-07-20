@@ -352,6 +352,14 @@ Return the
 
 =cut
 
+=head2 is_prime
+
+Gauss.is_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_real
 
 Gauss.is_real() -> I<Obj>

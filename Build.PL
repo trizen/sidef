@@ -57,7 +57,7 @@ my $builder = Module::Build->new(
                  'Time::HiRes'              => 0,
                  'Getopt::Std'              => 0,
                  'Term::ReadLine'           => 0,
-                 'Math::Prime::Util::GMP'   => 0.44,
+                 'Math::Prime::Util::GMP'   => 0.52,
                  'Algorithm::Combinatorics' => 0,
                  'Algorithm::Loops'         => 0,
                 },

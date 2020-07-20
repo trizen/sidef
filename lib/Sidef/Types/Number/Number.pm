@@ -8995,7 +8995,7 @@ package Sidef::Types::Number::Number {
                        );
             }
 
-            if ($HAS_PRIME_UTIL) {
+            if ($HAS_PRIME_UTIL and $Math::Prime::Util::VERSION > 0.73) {
                 return __PACKAGE__->_set_str('int', $mertens_table->{$y} = Math::Prime::Util::mertens($y));
             }
         }
@@ -9028,7 +9028,7 @@ package Sidef::Types::Number::Number {
             return ($r >= 0 ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_int($r));
         }
 
-        my $lookup_size = Math::Prime::Util::GMP::rootint($y, 3)**2;
+        my $lookup_size = 2 * Math::Prime::Util::GMP::rootint($y, 3)**2;
 
         if ($y > 1e10) {
             $lookup_size >>= 1;
@@ -10927,6 +10927,34 @@ package Sidef::Types::Number::Number {
         my ($n) = @_;
         _primality_pretest($$n)
           && Math::Prime::Util::GMP::is_prime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_gaussian_prime {
+        my ($x, $y) = @_;
+
+        if (defined($y)) {
+            _valid(\$y);
+        }
+        else {
+            $y = ZERO;
+        }
+
+        $x = $$x;
+        $y = $$y;
+
+        if (ref($x) ne 'Math::GMPz') {
+            __is_int__($x) || return Sidef::Types::Bool::Bool::FALSE;
+            $x = _any2mpz($x) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (ref($y) ne 'Math::GMPz') {
+            __is_int__($y) || return Sidef::Types::Bool::Bool::FALSE;
+            $y = _any2mpz($y) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Math::Prime::Util::GMP::is_gaussian_prime($x, $y)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }

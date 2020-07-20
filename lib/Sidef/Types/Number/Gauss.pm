@@ -177,6 +177,11 @@ package Sidef::Types::Number::Gauss {
         __PACKAGE__->new(Sidef::Types::Number::Number::complex_add($x->{re}, $x->{im}, Sidef::Types::Number::Number::ONE));
     }
 
+    sub is_prime {
+        my ($x) = @_;
+        Sidef::Types::Number::Number::is_gaussian_prime($x->{re}, $x->{im});
+    }
+
     sub is_zero {
         my ($x) = @_;
         my $bool = $x->{re}->is_zero;

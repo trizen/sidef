@@ -22,7 +22,7 @@ WriteMakefile
                    'Math::GMPz' => '0.39',
                    'Math::MPC' => 0,
                    'Math::MPFR' => '3.36',
-                   'Math::Prime::Util::GMP' => '0.44',
+                   'Math::Prime::Util::GMP' => '0.52',
                    'Memoize' => 0,
                    'Scalar::Util' => 0,
                    'Socket' => 0,

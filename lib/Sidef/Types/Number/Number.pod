@@ -2380,6 +2380,14 @@ Return the
 
 =cut
 
+=head2 is_gaussian_prime
+
+Number.is_gaussian_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_imag
 
 Number.is_imag() -> I<Obj>
