@@ -8985,12 +8985,19 @@ package Sidef::Types::Number::Number {
             "10000000000000000000000" => "-2061910120",
         };
 
-        if ($x eq '1' and defined(my $value = $mertens_table->{$y})) {
-            return (
-                    ($value > LONG_MIN and $value < ULONG_MAX)
-                    ? __PACKAGE__->_set_int($value)
-                    : __PACKAGE__->_set_str('int', $value)
-                   );
+        if ($x eq '1') {
+
+            if (defined(my $value = $mertens_table->{$y})) {
+                return (
+                        ($value > LONG_MIN and $value < ULONG_MAX)
+                        ? __PACKAGE__->_set_int($value)
+                        : __PACKAGE__->_set_str('int', $value)
+                       );
+            }
+
+            if ($HAS_PRIME_UTIL) {
+                return __PACKAGE__->_set_str('int', $mertens_table->{$y} = Math::Prime::Util::mertens($y));
+            }
         }
 
         # Support for large integers (slow for wide ranges)
@@ -9005,7 +9012,7 @@ package Sidef::Types::Number::Number {
                 $sum += Math::Prime::Util::GMP::moebius(Math::GMPz::Rmpz_get_str($x, 10));
             }
 
-            return __PACKAGE__->_set_int($sum);
+            return __PACKAGE__->_set_str('int', $sum);
         }
 
         return ZERO if ($y < $x);
