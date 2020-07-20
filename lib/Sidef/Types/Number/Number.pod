@@ -3958,6 +3958,14 @@ Return the
 
 =cut
 
+=head2 rough_count
+
+Number.rough_count() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 round
 
 Number.round() -> I<Obj>

@@ -14191,7 +14191,7 @@ package Sidef::Types::Number::Number {
           }
           ->($n, Math::Prime::Util::GMP::prev_prime($k + 1));
 
-        __PACKAGE__->_set_uint($count);
+        ($count < ULONG_MAX) ? __PACKAGE__->_set_uint($count) : __PACKAGE__->_set_str('int', $count);
     }
 
     sub is_smooth {
@@ -14241,6 +14241,111 @@ package Sidef::Types::Number::Number {
         }
 
         return Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub rough_count {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto ZERO;
+        $k = _any2ui($$k)  // goto ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO;
+        }
+
+        if ($k <= 2) {
+            return bless \$n;
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, $k) < 0) {
+            return TWO if (Math::GMPz::Rmpz_cmp_ui($n, $k) == 0);
+            return ONE;
+        }
+
+        my $count = sub {
+            my ($n, $p) = @_;
+
+            if (!ref($n) or Math::GMPz::Rmpz_fits_slong_p($n)) {
+
+                $n = Math::GMPz::Rmpz_get_ui($n) if ref($n);
+
+                use integer;
+
+                if ($p * $p > $n) {
+                    return 1;
+                }
+
+                $p == 2 and return ($n >> 1);
+                $p == 3 and return do { my $t = $n / 3; $t - ($t >> 1) };
+
+                my $u = 0;
+                my $t = $n / $p;
+
+                for (my $q = 2 ; $q < $p ; $q = Math::Prime::Util::GMP::next_prime($q)) {
+
+                    my $v = __SUB__->($t, $q);
+
+                    if ($v == 1) {
+                        $u += ($HAS_PRIME_UTIL ? Math::Prime::Util::prime_count($q, $p - 1) : _prime_count($q, $p - 1));
+                        last;
+                    }
+                    else {
+                        $u += $v;
+                    }
+                }
+
+                return ($t - $u);
+            }
+
+            if (Math::GMPz::Rmpz_cmp_ui($n, $p * $p) < 0) {
+                return 1;
+            }
+
+            if ($p == 2) {
+                return ($n >> 1);
+            }
+
+            if ($p == 3) {
+                my $t = $n / 3;
+                return ($t - ($t >> 1));
+            }
+
+            my $u = Math::GMPz::Rmpz_init_set_ui(0);
+            my $t = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_tdiv_q_ui($t, $n, $p);
+
+            for (my $q = 2 ; $q < $p ; $q = Math::Prime::Util::GMP::next_prime($q)) {
+
+                my $v = __SUB__->($t, $q);
+
+                if ($v == 1) {
+                    Math::GMPz::Rmpz_add_ui(
+                                            $u, $u,
+                                            (
+                                             $HAS_PRIME_UTIL
+                                             ? Math::Prime::Util::prime_count($q, $p - 1)
+                                             : _prime_count($q, $p - 1)
+                                            )
+                                           );
+                    last;
+                }
+                else {
+                    $u += $v;
+                }
+            }
+
+            $t - $u;
+          }
+          ->($n * $k, $k);
+
+        if (ref($count)) {
+            return bless \$count;
+        }
+
+        ($count < ULONG_MAX) ? __PACKAGE__->_set_uint($count) : __PACKAGE__->_set_str('int', $count);
     }
 
     sub is_rough {
