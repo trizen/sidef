@@ -1538,11 +1538,13 @@ Aliases: I<sum_digits>, I<sumdigits>
 
 =cut
 
-=head2 dirichlet_hyperbola
+=head2 dirichlet_sum
 
-Number.dirichlet_hyperbola() -> I<Obj>
+Number.dirichlet_sum() -> I<Obj>
 
 Return the
+
+Aliases: I<dirichlet_hyperbola>
 
 =cut
 
@@ -4351,6 +4353,14 @@ Return the
 =head2 superfactorial
 
 Number.superfactorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 superprimorial
+
+Number.superprimorial() -> I<Obj>
 
 Return the
 

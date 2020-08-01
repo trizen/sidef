@@ -7634,7 +7634,27 @@ package Sidef::Types::Number::Number {
 
     *left_factorial = \&factorial_sum;
 
-    sub superfactorial {
+    sub superprimorial {    # A006939
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // goto &nan;
+
+        $n || return ONE;
+
+        my @terms;
+        my $k = 1;
+
+        foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, ${$_[0]->nth_prime})) {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_ui_pow_ui($z, $p, $n - $k + 1);
+            push @terms, $z;
+            ++$k;
+        }
+
+        bless \_binsplit(\@terms, \&__mul__);
+    }
+
+    sub superfactorial {    # A000178
         my ($n) = @_;
 
         $n = _any2ui($$n) // goto &nan;
@@ -12296,6 +12316,8 @@ package Sidef::Types::Number::Number {
         $sum = __sub__($sum, __mul__(${$F->(bless \$s)->to_n}, ${$G->(bless \$s)->to_n}));
         bless \$sum;
     }
+
+    *dirichlet_sum = \&dirichlet_hyperbola;
 
     # Divisors d of n, such that d <= k, with k = n when `k` is not specified
     sub divisors {
