@@ -10985,7 +10985,9 @@ package Sidef::Types::Number::Number {
         _primality_pretest($t)
           || return Sidef::Types::Bool::Bool::FALSE;
 
-        (Math::Prime::Util::GMP::is_prob_prime($t) && Math::Prime::Util::GMP::is_strong_pseudoprime($n, 2))
+        (   Math::Prime::Util::GMP::is_strong_pseudoprime($t, 2)
+         && Math::Prime::Util::GMP::is_strong_pseudoprime($n, 2)
+         && Math::Prime::Util::GMP::is_strong_lucas_pseudoprime($t))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
