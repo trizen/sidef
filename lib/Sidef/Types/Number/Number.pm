@@ -11719,11 +11719,24 @@ package Sidef::Types::Number::Number {
         ($z < ULONG_MAX) ? __PACKAGE__->_set_uint($z) : __PACKAGE__->_set_str('int', $z);
     }
 
-    sub rad {
+    sub rad {    # A007947
         my %f;
         @f{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
         exists($f{'0'}) and return ONE;
         my $r = Math::Prime::Util::GMP::vecprod(CORE::keys %f);
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+    }
+
+    sub core {    # A007913
+        my ($n) = @_;
+
+        # Multiplicative with:
+        #   a(p^k) = p^(k mod 2)
+
+        my %f;
+        ++$f{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
+        exists($f{'0'}) and return ONE;
+        my $r = Math::Prime::Util::GMP::vecprod(grep { $f{$_} % 2 } CORE::keys %f);
         ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 

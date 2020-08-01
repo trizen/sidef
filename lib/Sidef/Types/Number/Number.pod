@@ -1350,6 +1350,14 @@ Return the
 
 =cut
 
+=head2 core
+
+Number.core() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 cos
 
 Number.cos() -> I<Obj>
