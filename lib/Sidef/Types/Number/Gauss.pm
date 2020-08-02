@@ -36,6 +36,12 @@ package Sidef::Types::Number::Gauss {
     }
 
     sub i {
+        my ($x) = @_;
+
+        if (ref($x) eq __PACKAGE__) {    # (a+bi)*i = -b + a*i
+            return __PACKAGE__->new($x->{im}->neg, $x->{re});
+        }
+
         __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE);
     }
 
