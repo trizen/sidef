@@ -35,6 +35,10 @@ package Sidef::Types::Number::Gauss {
         }
     }
 
+    sub i {
+        __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE);
+    }
+
     sub to_c {
         Sidef::Types::Number::Complex->new($_[0]->{re}, $_[0]->{im});
     }

@@ -286,6 +286,14 @@ Return the
 
 =cut
 
+=head2 i
+
+Gauss.i() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 iabs
 
 Gauss.iabs() -> I<Obj>

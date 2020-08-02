@@ -1498,6 +1498,15 @@ package Sidef::Types::Number::Number {
 
     sub add {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Gauss') {
+            return $y->add($x);
+        }
+
+        if (ref($y) eq 'Sidef::Types::Number::Mod') {
+            return $y->add($x);
+        }
+
         _valid(\$y);
         bless \__add__($$x, $$y);
     }
@@ -1639,6 +1648,15 @@ package Sidef::Types::Number::Number {
 
     sub sub {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Gauss') {
+            return ref($y)->new($x)->sub($y);
+        }
+
+        if (ref($y) eq 'Sidef::Types::Number::Mod') {
+            return ref($y)->new($x, $y->{m})->sub($y);
+        }
+
         _valid(\$y);
         bless \__sub__($$x, $$y);
     }
@@ -1763,6 +1781,15 @@ package Sidef::Types::Number::Number {
 
     sub mul {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Gauss') {
+            return $y->mul($x);
+        }
+
+        if (ref($y) eq 'Sidef::Types::Number::Mod') {
+            return $y->mul($x);
+        }
+
         _valid(\$y);
         bless \__mul__($$x, $$y);
     }
@@ -1925,6 +1952,15 @@ package Sidef::Types::Number::Number {
 
     sub div {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Gauss') {
+            return ref($y)->new($x)->div($y);
+        }
+
+        if (ref($y) eq 'Sidef::Types::Number::Mod') {
+            return ref($y)->new($x, $y->{m})->div($y);
+        }
+
         _valid(\$y);
         bless \__div__($$x, $$y);
     }
@@ -9829,7 +9865,7 @@ package Sidef::Types::Number::Number {
             $k = _any2ui($$k) // return ZERO;
         }
         else {
-            $k = 1;
+            $k = 2;
         }
 
         if ($k == 0) {
@@ -11020,7 +11056,7 @@ package Sidef::Types::Number::Number {
             $k = _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE;
         }
         else {
-            $k = 1;
+            $k = 2;
         }
 
         if ($k == 0) {

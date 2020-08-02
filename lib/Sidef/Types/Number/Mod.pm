@@ -66,6 +66,11 @@ package Sidef::Types::Number::Mod {
         __PACKAGE__->new($x->{n}->mul($y->{n}->invmod($x->{m})), $x->{m});
     }
 
+    sub neg {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{n}->neg, $x->{m});
+    }
+
     sub inv {
         my ($x) = @_;
         __PACKAGE__->new($x->{n}->invmod($x->{m}), $x->{m});
