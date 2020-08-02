@@ -109,7 +109,7 @@ package Sidef::Types::Number::Mod {
 
     sub znorder {
         my ($x) = @_;
-        __PACKAGE__->new($x->{n}->znorder($x->{m}), $x->{m});
+        $x->{n}->znorder($x->{m});
     }
 
     sub pow {
