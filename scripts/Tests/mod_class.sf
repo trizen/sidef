@@ -50,6 +50,11 @@ do {
     assert_eq(Mod(A, m) + Mod(B, m), Mod((A + B)%m, m))
     assert_eq(Mod(A, m) & Mod(B, m), Mod((A%m & B%m), m))
 
+    assert_eq((3 + Mod(4, 5)), Mod(2, 5))
+    assert_eq((3 - Mod(4, 5)), Mod(4, 5))
+    assert_eq((3 * Mod(4, 5)), Mod(2, 5))
+    assert_eq((3 / Mod(4, 5)), Mod(2, 5))
+
     #assert_eq(Mod(A, m) / B, Mod(A * B.invmod(m) % m, m))        # not implemented yet
 }
 
