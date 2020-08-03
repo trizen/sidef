@@ -14323,11 +14323,15 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         my $B = _cached_primorial($k);
-
         state $g = Math::GMPz::Rmpz_init_nobless();
-        my $t = Math::GMPz::Rmpz_init_set($n);
 
-        Math::GMPz::Rmpz_gcd($g, $t, $B);
+        Math::GMPz::Rmpz_gcd($g, $n, $B);
+
+        if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my $t = Math::GMPz::Rmpz_init_set($n);
 
         while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
             Math::GMPz::Rmpz_remove($t, $t, $g);
@@ -14357,7 +14361,6 @@ package Sidef::Types::Number::Number {
         return ONE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         my $B = _cached_primorial($k);
-
         state $g = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_gcd($g, $n, $B);
@@ -14538,9 +14541,14 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         state $g = Math::GMPz::Rmpz_init_nobless();
-        my $t = Math::GMPz::Rmpz_init_set($n);
 
-        Math::GMPz::Rmpz_gcd($g, $t, $k);
+        Math::GMPz::Rmpz_gcd($g, $n, $k);
+
+        if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my $t = Math::GMPz::Rmpz_init_set($n);
 
         while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
             Math::GMPz::Rmpz_remove($t, $t, $g);
@@ -14588,15 +14596,23 @@ package Sidef::Types::Number::Number {
 
         my $B = _cached_primorial($k);
 
-        my $g = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $g = Math::GMPz::Rmpz_init_nobless();
+
         Math::GMPz::Rmpz_gcd($g, $n, $B);
 
         if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
-            Math::GMPz::Rmpz_divexact($g, $n, $g);
-            return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($g, 1) == 0;
-            return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_perfect_power_p($g);
-            Math::GMPz::Rmpz_gcd($g, $g, $B);
+
+            return Sidef::Types::Bool::Bool::TRUE if Math::GMPz::Rmpz_cmp($g, $n) == 0;
+
+            Math::GMPz::Rmpz_divexact($t, $n, $g);
+            Math::GMPz::Rmpz_gcd($g, $t, $g);
+
+            # Divisible by a small square
             return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_cmp_ui($g, 1) > 0;
+
+            # k-rough part is a perfect power
+            return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_perfect_power_p($t);
         }
 
         return Sidef::Types::Bool::Bool::TRUE;
