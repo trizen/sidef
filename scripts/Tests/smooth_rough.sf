@@ -20,6 +20,24 @@ func my_is_smooth(n,k) {
     }
 }
 
+func my_smooth_part(n,k) {
+
+    return 0 if (n <= 0)
+
+    n.factor.grep { |p|
+        p <= k
+    }.prod
+}
+
+func my_rough_part(n,k) {
+
+    return 0 if (n <= 0)
+
+    n.factor.grep { |p|
+        p >= k
+    }.prod
+}
+
 say "=> Smooth testing...";
 
 assert_eq(
@@ -27,11 +45,78 @@ assert_eq(
     13.of {|n| 13.of {|k| [n,k, my_is_smooth(n,k)] } },
 )
 
-say "=> Rough testing...";
+say "=> Smooth over prod testing...";
+
 assert_eq(
-    13.of {|n| 13.of {|k| [n,k, is_rough(n,k)] } },
-    13.of {|n| 13.of {|k| [n,k, my_is_rough(n,k)] } },
+    20.of {|n| 20.of {|k| [n,k, is_smooth_over_prod(n.fib, k.primorial)] } },
+    20.of {|n| 20.of {|k| [n,k, my_is_smooth(n.fib, k)] } },
 )
+
+say "=> Rough testing...";
+
+assert_eq(
+    20.of {|n| 20.of {|k| [n,k, is_rough(n,k)] } },
+    20.of {|n| 20.of {|k| [n,k, my_is_rough(n,k)] } },
+)
+
+say "=> Smooth part...";
+
+assert_eq(
+    20.of {|n| 20.of {|k| [n,k, smooth_part(n,k)] } },
+    20.of {|n| 20.of {|k| [n,k, my_smooth_part(n,k)] } },
+)
+
+say "=> Smooth part <=> make_coprime...";
+
+assert_eq(make_coprime(0, 1), 0)
+assert_eq(make_coprime(0, 2), 0)
+assert_eq(make_coprime(0, 3), 0)
+
+assert_eq(make_coprime(-42, 6), -7)
+assert_eq(make_coprime(-42, -6), -7)
+
+assert_eq(
+    20.of {|n| 20.of {|k| [n,k, smooth_part(n+1,k)] } },
+    20.of {|n| 20.of {|k| [n,k, (n+1) / make_coprime(n+1, k.primorial)] } },
+)
+
+say "=> Rough part...";
+
+assert_eq(
+    20.of {|n| 20.of {|k| [n,k, rough_part(n,k)] } },
+    20.of {|n| 20.of {|k| [n,k, my_rough_part(n,k)] } },
+)
+
+say "=> Rough part <=> make_coprime...";
+
+assert_eq(
+    20.of {|n| 20.of {|k| [n,k, rough_part(n,k+1)] } },
+    20.of {|n| 20.of {|k| [n,k, make_coprime(n, k.primorial)] } },
+)
+
+do {
+    var n = [17, 17, 19, 23, 23, 29, 47, 53, 59].prod
+    var D = n.divisors
+
+    assert_eq(n.rough_part(47), D.last_by { .is_rough(47) })
+    assert_eq(n.rough_part(46), D.last_by { .is_rough(46) })
+    assert_eq(n.rough_part(48), D.last_by { .is_rough(48) })
+
+    assert_eq(n.smooth_part(47), D.last_by { .is_smooth(47) })
+    assert_eq(n.smooth_part(46), D.last_by { .is_smooth(46) })
+    assert_eq(n.smooth_part(48), D.last_by { .is_smooth(48) })
+
+    assert_eq(rough_part(43*97, 101), 1)
+    assert_eq(rough_part(43*97*43*43*97, 97), 97**2)
+    assert_eq(rough_part(43*97*43*43*97, 98), 1)
+
+    assert_eq(smooth_part(43*97, 23), 1)
+    assert_eq(smooth_part(43*97*43*97*43, 43), 43**3)
+    assert_eq(smooth_part(43*97*43*97*43, 41), 1)
+
+    assert_eq((n*17*19*23).smooth_part(19), 17**3 * 19**2)
+    assert_eq((n*17*19*23).smooth_part(18), 17**3)
+}
 
 do {
   var n = 1377276413364943226363244108454842276965894752197358387200000; # 97

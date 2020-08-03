@@ -4000,6 +4000,14 @@ Return the
 
 =cut
 
+=head2 rough_part
+
+Number.rough_part() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 round
 
 Number.round() -> I<Obj>

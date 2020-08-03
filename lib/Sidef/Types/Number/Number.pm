@@ -10636,17 +10636,21 @@ package Sidef::Types::Number::Number {
     *remdiv = \&remove;
 
     sub make_coprime {
-        my ($x, $y) = @_;
+        my ($n, $k) = @_;
 
-        _valid(\$y);
+        _valid(\$k);
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2mpz($$y) // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
 
-        my $r = Math::GMPz::Rmpz_init_set($x);
+        if (Math::GMPz::Rmpz_sgn($n) == 0) {
+            return bless \$n;
+        }
+
+        my $r = Math::GMPz::Rmpz_init_set($n);
         my $g = Math::GMPz::Rmpz_init();
 
-        Math::GMPz::Rmpz_gcd($g, $r, $y);
+        Math::GMPz::Rmpz_gcd($g, $r, $k);
 
         while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
             Math::GMPz::Rmpz_remove($r, $r, $g);
@@ -14327,7 +14331,7 @@ package Sidef::Types::Number::Number {
         }
 
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
-        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0;
+        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
         return Sidef::Types::Bool::Bool::FALSE if $k <= 1;
 
         my $B = _cached_primorial($k);
@@ -14365,7 +14369,7 @@ package Sidef::Types::Number::Number {
         $k = _any2ui($k) // goto &nan;
 
         return ZERO if Math::GMPz::Rmpz_sgn($n) <= 0;
-        return ZERO if $k <= 0;
+        return ONE  if $k <= 1;
         return ONE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         my $B = _cached_primorial($k);
@@ -14386,6 +14390,46 @@ package Sidef::Types::Number::Number {
         }
 
         Math::GMPz::Rmpz_divexact($t, $n, $t);
+        bless \$t;
+    }
+
+    sub rough_part {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = $$n;
+        $k = $$k;
+
+        if (ref($n) ne 'Math::GMPz') {
+            $n = _any2mpz($n) // goto &nan;
+        }
+
+        $k = _any2ui($k) // goto &nan;
+
+        --$k;
+
+        return ZERO        if Math::GMPz::Rmpz_sgn($n) <= 0;
+        return (bless \$n) if $k <= 1;
+        return ONE         if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+
+        my $B = _cached_primorial($k);
+
+        state $g = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_gcd($g, $n, $B);
+
+        if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0) {
+            return bless \$n;
+        }
+
+        my $t = Math::GMPz::Rmpz_init_set($n);
+
+        while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+            Math::GMPz::Rmpz_remove($t, $t, $g);
+            return ONE if Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
+            Math::GMPz::Rmpz_gcd($g, $t, $g);
+        }
+
         bless \$t;
     }
 
@@ -14520,7 +14564,7 @@ package Sidef::Types::Number::Number {
 
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Bool::Bool::TRUE  if $k <= 1;
-        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0;
+        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         my $B = _cached_primorial($k);
 
