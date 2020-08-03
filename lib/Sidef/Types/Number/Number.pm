@@ -6904,10 +6904,19 @@ package Sidef::Types::Number::Number {
         my %f;
         ++$f{$_} for Math::Prime::Util::GMP::factor($n);
 
-        my @factors =
-          map { ($_ < ULONG_MAX) ? Math::GMPz::Rmpz_init_set_ui($_) : Math::GMPz::Rmpz_init_set_str($_, 10) } keys %f;
+#<<<
+        my @factors = map {
+            ($_ < ULONG_MAX)
+                ? Math::GMPz::Rmpz_init_set_ui($_)
+                : Math::GMPz::Rmpz_init_set_str($_, 10)
+        } keys %f;
+#>>>
 
         for (my $k = 2 ; ; $k = Math::Prime::Util::GMP::next_prime($k)) {
+
+            # For the least coprime non-residue modulo n. (OEIS: A306493)
+            # Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, $k) == 1 or next;
+
             foreach my $p (@factors) {
                 if (Math::GMPz::Rmpz_cmp_ui($p, $k) > 0 and Math::GMPz::Rmpz_ui_kronecker($k, $p) == -1) {
                     return __PACKAGE__->_set_uint($k);

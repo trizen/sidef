@@ -3798,6 +3798,16 @@ Aliases: I<dedekind_psi>
 
 =cut
 
+=head2 qnr
+
+Number.qnr() -> I<Obj>
+
+Return the
+
+Aliases: I<quadratic_nonresidue>
+
+=cut
+
 =head2 qs_factor
 
 Number.qs_factor() -> I<Obj>
