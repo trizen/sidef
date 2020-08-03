@@ -6867,6 +6867,57 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub quadratic_nonresidue {
+        my ($n) = @_;
+
+        # Least quadratic non-residue of n. (OEIS: A020649)
+        # Inspired by Dana Jacobsen's code from Math::Prime::Util::PP.
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, 2) <= 0) {
+            return bless \$n;
+        }
+
+        if (Math::GMPz::Rmpz_ui_kronecker(2, $n) == -1) {
+            return TWO;
+        }
+
+        if (_primality_pretest($n) && Math::Prime::Util::GMP::is_prob_prime($n)) {
+            for (my $k = 3 ; ; $k = Math::Prime::Util::GMP::next_prime($k)) {
+                if (Math::GMPz::Rmpz_ui_kronecker($k, $n) == -1) {
+                    return __PACKAGE__->_set_uint($k);
+                }
+            }
+        }
+
+        if (Math::GMPz::Rmpz_even_p($n)) {
+            return TWO if Math::GMPz::Rmpz_scan1($n, 0) >= 2;
+        }
+
+        foreach my $k (3, 5, 11, 13, 19) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($n, $k)) {
+                return TWO;
+            }
+        }
+
+        my %f;
+        ++$f{$_} for Math::Prime::Util::GMP::factor($n);
+
+        my @factors =
+          map { ($_ < ULONG_MAX) ? Math::GMPz::Rmpz_init_set_ui($_) : Math::GMPz::Rmpz_init_set_str($_, 10) } keys %f;
+
+        for (my $k = 2 ; ; $k = Math::Prime::Util::GMP::next_prime($k)) {
+            foreach my $p (@factors) {
+                if (Math::GMPz::Rmpz_cmp_ui($p, $k) > 0 and Math::GMPz::Rmpz_ui_kronecker($k, $p) == -1) {
+                    return __PACKAGE__->_set_uint($k);
+                }
+            }
+        }
+    }
+
+    *qnr = \&quadratic_nonresidue;
+
     sub sqrtmod {
         my ($x, $y) = @_;
         _valid(\$y);

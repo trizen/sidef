@@ -903,6 +903,7 @@ scripts/Tests/prefix_methods.sf
 scripts/Tests/prefix_unary_operators.sf
 scripts/Tests/problem_of_apollonius.sf
 scripts/Tests/pythagorean_means.sf
+scripts/Tests/quadratic_nonresidue.sf
 scripts/Tests/quicksort.sf
 scripts/Tests/quoted_strings.sf
 scripts/Tests/rand_pick.sf
