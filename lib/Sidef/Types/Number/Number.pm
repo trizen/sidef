@@ -11972,6 +11972,10 @@ package Sidef::Types::Number::Number {
             undef %cache;
         }
 
+        if ($k > 2 and !($HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($k) : Math::Prime::Util::GMP::is_prob_prime($k))) {
+            $k = ($HAS_PRIME_UTIL ? Math::Prime::Util::prev_prime($k) : Math::Prime::Util::GMP::prev_prime($k));
+        }
+
         $cache{$k} //= do {
             my $t = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_primorial_ui($t, $k);
@@ -14316,15 +14320,19 @@ package Sidef::Types::Number::Number {
             $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        $k = _any2ui($k) // return Sidef::Types::Bool::Bool::FALSE;
+        $k = _any2ui($k);
+
+        if (!defined($k) or $k > 1e8) {
+            return $_[0]->gpf->le($_[1]);
+        }
 
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
         return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         my $B = _cached_primorial($k);
-        state $g = Math::GMPz::Rmpz_init_nobless();
 
+        state $g = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_gcd($g, $n, $B);
 
         if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0) {
@@ -14361,8 +14369,8 @@ package Sidef::Types::Number::Number {
         return ONE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         my $B = _cached_primorial($k);
-        state $g = Math::GMPz::Rmpz_init_nobless();
 
+        state $g = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_gcd($g, $n, $B);
 
         if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0) {
@@ -14502,7 +14510,13 @@ package Sidef::Types::Number::Number {
             $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        $k = (_any2ui($k) // return Sidef::Types::Bool::Bool::FALSE) - 1;
+        $k = _any2ui($k);
+
+        if (!defined($k) or $k > 1e8) {
+            return $_[0]->lpf->ge($_[1]);
+        }
+
+        --$k;
 
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
