@@ -7929,8 +7929,6 @@ package Sidef::Types::Number::Number {
         ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
         return ZERO if exists($factors{'0'});
 
-        state %cache;
-
         my $prod = Math::GMPz::Rmpz_init_set_ui(1);
         my $tmp  = Math::GMPz::Rmpz_init();
 
@@ -7938,14 +7936,9 @@ package Sidef::Types::Number::Number {
 
             ($p < ULONG_MAX) || goto &nan;
 
-            my $primorial = ($p <= 1e5)
-              ? (
-                $cache{$p} //= do {
-                    my $z = Math::GMPz::Rmpz_init_nobless();
-                    Math::GMPz::Rmpz_primorial_ui($z, $p);
-                    $z;
-                }
-              )
+            my $primorial =
+              ($p <= 1e5)
+              ? _cached_primorial($p, 1e4)
               : do {
                 Math::GMPz::Rmpz_primorial_ui($tmp, $p);
                 $tmp;
@@ -10915,7 +10908,6 @@ package Sidef::Types::Number::Number {
         # When n is large enough, try to find a small factor (up to 10^8)
         if ($size > 15_000) {
 
-            state %cache;
             state $g = Math::GMPz::Rmpz_init_nobless();
 
             my @checks = (1e4, 1e6);
@@ -10927,14 +10919,7 @@ package Sidef::Types::Number::Number {
 
                 #~ say "Checking factors < $k";
 
-                my $primorial = (
-                    $cache{$k} //= do {
-                        my $z = Math::GMPz::Rmpz_init_nobless();
-                        Math::GMPz::Rmpz_primorial_ui($z, $k);
-                        $z;
-                    }
-                );
-
+                my $primorial = _cached_primorial($k);
                 Math::GMPz::Rmpz_gcd($g, $primorial, $n);
 
                 if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
@@ -11974,27 +11959,33 @@ package Sidef::Types::Number::Number {
 
     *factors_exp = \&factor_exp;
 
+    sub _cached_primorial {
+        my ($k, $limit) = @_;
+
+        $limit //= 100;
+
+        state %cache;
+
+        # Clear the cache when there are too many values cached
+        if (scalar(keys(%cache)) > $limit) {
+            Math::GMPz::Rmpz_clear($_) for values(%cache);
+            undef %cache;
+        }
+
+        $cache{$k} //= do {
+            my $t = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_primorial_ui($t, $k);
+            $t;
+        };
+    }
+
     sub _native_trial_factor {
         my ($n, $k) = @_;
 
         # n is a positive > 1 Math::GMPz object
         # k is an unsigned integer
 
-        state %cache;
-
-        # Clear the cache when there are too many values cached
-        if (scalar(keys(%cache)) > 100) {
-            Math::GMPz::Rmpz_clear($_) for values(%cache);
-            undef %cache;
-        }
-
-        my $B = (
-            $cache{$k} //= do {
-                my $t = Math::GMPz::Rmpz_init_nobless();
-                Math::GMPz::Rmpz_primorial_ui($t, $k);
-                $t;
-            }
-        );
+        my $B = _cached_primorial($k);
 
         state $g = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_gcd($g, $n, $B);
@@ -14331,21 +14322,7 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
         return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
-        state %cache;
-
-        # Clear the cache when there are too many values cached
-        if (scalar(keys(%cache)) > 100) {
-            Math::GMPz::Rmpz_clear($_) for values(%cache);
-            undef %cache;
-        }
-
-        my $B = (
-            $cache{$k} //= do {
-                my $t = Math::GMPz::Rmpz_init_nobless();
-                Math::GMPz::Rmpz_primorial_ui($t, $k);
-                $t;
-            }
-        );
+        my $B = _cached_primorial($k);
 
         state $g = Math::GMPz::Rmpz_init_nobless();
         my $t = Math::GMPz::Rmpz_init_set($n);
@@ -14488,21 +14465,7 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
         return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
-        state %cache;
-
-        # Clear the cache when there are too many values cached
-        if (scalar(keys(%cache)) > 100) {
-            Math::GMPz::Rmpz_clear($_) for values(%cache);
-            undef %cache;
-        }
-
-        my $B = (
-            $cache{$k} //= do {
-                my $t = Math::GMPz::Rmpz_init_nobless();
-                Math::GMPz::Rmpz_primorial_ui($t, $k);
-                $t;
-            }
-        );
+        my $B = _cached_primorial($k);
 
         state $g = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_gcd($g, $n, $B);
@@ -14583,21 +14546,7 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_perfect_power_p($n);
 
-        state %cache;
-
-        # Clear the cache when there are too many values cached
-        if (scalar(keys(%cache)) > 100) {
-            Math::GMPz::Rmpz_clear($_) for values(%cache);
-            undef %cache;
-        }
-
-        my $B = (
-            $cache{$k} //= do {
-                my $t = Math::GMPz::Rmpz_init_nobless();
-                Math::GMPz::Rmpz_primorial_ui($t, $k);
-                $t;
-            }
-        );
+        my $B = _cached_primorial($k);
 
         my $g = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_gcd($g, $n, $B);
