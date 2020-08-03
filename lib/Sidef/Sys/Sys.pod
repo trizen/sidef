@@ -280,11 +280,13 @@ Return the
 
 =cut
 
-=head2 nanosleep
+=head2 nano_sleep
 
-Sys.nanosleep() -> I<Obj>
+Sys.nano_sleep() -> I<Obj>
 
 Return the
+
+Aliases: I<nanosleep>
 
 =cut
 
@@ -304,11 +306,13 @@ Return the
 
 =cut
 
-=head2 osname
+=head2 os
 
-Sys.osname() -> I<Obj>
+Sys.os() -> I<Obj>
 
 Return the
+
+Aliases: I<osname>
 
 =cut
 
@@ -516,6 +520,8 @@ Sys.ualarm() -> I<Obj>
 
 Return the
 
+Aliases: I<micro_alarm>
+
 =cut
 
 =head2 umask
@@ -549,6 +555,8 @@ Aliases: I<getlogin>
 Sys.usleep() -> I<Obj>
 
 Return the
+
+Aliases: I<micro_sleep>
 
 =cut
 

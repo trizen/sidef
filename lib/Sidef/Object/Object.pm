@@ -390,15 +390,10 @@ package Sidef::Object::Object {
             Sidef::Types::Array::Pair->new($_[0], $_[1]);
         };
 
-        # TODO: v4.0: the following 2 methods should create an Array with 2 elements
-        # Pair (2-Array) method: Fullwidth Colon; U+FF1A
+        # Pair method: Fullwidth Colon; U+FF1A
         *{__PACKAGE__ . '::' . '：'} = sub {
             Sidef::Types::Array::Pair->new($_[0], $_[1]);
         };
-
-        # Pair (2-Array) method: Broken bar; U+A6
-        # Easier to type than U+FF1A, but uglier
-        *{__PACKAGE__ . '::' . '¦'} = \&{__PACKAGE__ . '::' . '：'};
 
         # NamedParam method: Triple Colon Operator; U+2AF6
         *{__PACKAGE__ . '::' . '⫶'} = sub {

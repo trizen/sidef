@@ -46,6 +46,8 @@ package Sidef::Sys::Sys {
         (Time::HiRes::ualarm($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *micro_alarm = \&ualarm;
+
     sub sleep {
         my ($self, $sec) = @_;
 
@@ -60,6 +62,8 @@ package Sidef::Sys::Sys {
         (Time::HiRes::nanosleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *nano_sleep = \&nanosleep;
+
     sub usleep {
         my ($self, $sec) = @_;
 
@@ -67,10 +71,14 @@ package Sidef::Sys::Sys {
         (Time::HiRes::usleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *micro_sleep = \&usleep;
+
     sub osname {
         my ($self) = @_;
         Sidef::Types::String::String->new($^O);
     }
+
+    *os = \&osname;
 
     sub user {
         my ($self) = @_;
