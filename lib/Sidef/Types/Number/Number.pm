@@ -14338,6 +14338,46 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub smooth_part {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = $$n;
+        $k = $$k;
+
+        if (ref($n) ne 'Math::GMPz') {
+            $n = _any2mpz($n) // goto &nan;
+        }
+
+        $k = _any2ui($k) // goto &nan;
+
+        return ZERO if Math::GMPz::Rmpz_sgn($n) <= 0;
+        return ZERO if $k <= 0;
+        return ONE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+
+        my $B = _cached_primorial($k);
+
+        state $g = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_gcd($g, $n, $B);
+
+        if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0) {
+            return ONE;
+        }
+
+        my $t = Math::GMPz::Rmpz_init_set($n);
+
+        while (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+            Math::GMPz::Rmpz_remove($t, $t, $g);
+            return (bless \$n) if Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
+            Math::GMPz::Rmpz_gcd($g, $t, $g);
+        }
+
+        Math::GMPz::Rmpz_divexact($t, $n, $t);
+        bless \$t;
+    }
+
     sub rough_count {
         my ($n, $k) = @_;
 

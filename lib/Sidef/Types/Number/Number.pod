@@ -4126,6 +4126,14 @@ Return the
 
 =cut
 
+=head2 smooth_part
+
+Number.smooth_part() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 solve_pell
 
 Number.solve_pell() -> I<Obj>
