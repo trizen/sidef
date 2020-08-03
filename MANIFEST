@@ -961,6 +961,7 @@ scripts/Tests/slurpy_const.sf
 scripts/Tests/slurpy_define.sf
 scripts/Tests/slurpy_static.sf
 scripts/Tests/smart_match_operator.sf
+scripts/Tests/smooth_rough.sf
 scripts/Tests/sort_disjoint_sublist.sf
 scripts/Tests/sort_with_custom_cmp.sf
 scripts/Tests/soundex.sf

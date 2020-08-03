@@ -14327,8 +14327,8 @@ package Sidef::Types::Number::Number {
         }
 
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
-        return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
-        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0;
+        return Sidef::Types::Bool::Bool::FALSE if $k <= 1;
 
         my $B = _cached_primorial($k);
 
@@ -14519,8 +14519,8 @@ package Sidef::Types::Number::Number {
         --$k;
 
         return Sidef::Types::Bool::Bool::FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
-        return Sidef::Types::Bool::Bool::FALSE if $k <= 0;
-        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+        return Sidef::Types::Bool::Bool::TRUE  if $k <= 1;
+        return Sidef::Types::Bool::Bool::TRUE  if Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0;
 
         my $B = _cached_primorial($k);
 

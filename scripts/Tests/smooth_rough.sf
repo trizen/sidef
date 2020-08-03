@@ -1,0 +1,80 @@
+#!/usr/bin/ruby
+
+# Tests for rough and smooth Number methods.
+
+func my_is_rough(n,k) {
+
+    return false if (n <= 0)    # must be a positive integer
+
+    n.factor.all {|p|
+        p >= k
+    }
+}
+
+func my_is_smooth(n,k) {
+
+    return false if (n <= 0)    # must be a positive integer
+
+    n.factor.all {|p|
+        p <= k
+    }
+}
+
+say "=> Smooth testing...";
+
+assert_eq(
+    13.of {|n| 13.of {|k| [n,k, is_smooth(n,k)] } },
+    13.of {|n| 13.of {|k| [n,k, my_is_smooth(n,k)] } },
+)
+
+say "=> Rough testing...";
+assert_eq(
+    13.of {|n| 13.of {|k| [n,k, is_rough(n,k)] } },
+    13.of {|n| 13.of {|k| [n,k, my_is_rough(n,k)] } },
+)
+
+do {
+  var n = 1377276413364943226363244108454842276965894752197358387200000; # 97
+
+  assert(!is_smooth(n,23))
+  assert(!is_smooth(n,96))
+  assert(is_smooth(n,97))
+  assert(is_smooth(n,98))
+}
+
+do {
+  var n = 172864518041328651521584134678230948270774322090771071422829; # 2081
+
+  assert(is_smooth(n, 4073))
+  assert(is_rough(n, 2080))
+  assert(is_rough(n, 2081))
+  assert(!is_rough(n, 2082))
+}
+
+do {
+    for k in (2..10) {
+
+        var a = (10+k).by { .is_smooth(k) }
+        var b = (10+k).by { my_is_smooth(_, k) }
+
+        assert_eq(a,b)
+
+        var count = a.tail.smooth_count(k)
+        assert_eq(a.len, count)
+    }
+}
+
+do {
+    for k in (2..10) {
+
+        var a = (100+k).by { .is_rough(k) }
+        var b = (100+k).by { my_is_rough(_, k) }
+
+        assert_eq(a,b)
+
+        var count = a.tail.rough_count(k)
+        assert_eq(a.len, count)
+    }
+}
+
+say "** Test passed!"
