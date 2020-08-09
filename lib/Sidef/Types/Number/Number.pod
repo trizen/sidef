@@ -2262,11 +2262,13 @@ Return the
 
 =cut
 
-=head2 is_bruckman_lucas_pseudoprime
+=head2 is_bruckman_lucas_psp
 
-Number.is_bruckman_lucas_pseudoprime() -> I<Obj>
+Number.is_bruckman_lucas_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_bruckman_lucas_pseudoprime>
 
 =cut
 
@@ -2278,11 +2280,13 @@ Return the
 
 =cut
 
-=head2 is_chebyshev_pseudoprime
+=head2 is_chebyshev
 
-Number.is_chebyshev_pseudoprime() -> I<Obj>
+Number.is_chebyshev() -> I<Obj>
 
 Return the
+
+Aliases: I<is_chebyshev_psp>, I<is_chebyshev_pseudoprime>
 
 =cut
 
@@ -2350,11 +2354,13 @@ Return the
 
 =cut
 
-=head2 is_euler_pseudoprime
+=head2 is_euler_psp
 
-Number.is_euler_pseudoprime() -> I<Obj>
+Number.is_euler_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_euler_pseudoprime>
 
 =cut
 
@@ -2366,19 +2372,23 @@ Return the
 
 =cut
 
-=head2 is_fibonacci_pseudoprime
+=head2 is_fib_psp
 
-Number.is_fibonacci_pseudoprime() -> I<Obj>
+Number.is_fib_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_fibonacci_psp>, I<is_fibonacci_pseudoprime>
 
 =cut
 
-=head2 is_frobenius_pseudoprime
+=head2 is_frobenius_psp
 
-Number.is_frobenius_pseudoprime() -> I<Obj>
+Number.is_frobenius_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_frobenius_pseudoprime>
 
 =cut
 
@@ -2422,13 +2432,13 @@ Return the
 
 =cut
 
-=head2 is_khashin_pseudoprime
+=head2 is_khashin_psp
 
-Number.is_khashin_pseudoprime() -> I<Obj>
+Number.is_khashin_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_frobenius_khashin_pseudoprime>
+Aliases: I<is_khashin_pseudoprime>, I<is_frobenius_khashin_psp>, I<is_frobenius_khashin_pseudoprime>
 
 =cut
 
@@ -2440,11 +2450,13 @@ Return the
 
 =cut
 
-=head2 is_lucas_pseudoprime
+=head2 is_lucas_psp
 
-Number.is_lucas_pseudoprime() -> I<Obj>
+Number.is_lucas_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_lucas_pseudoprime>
 
 =cut
 
@@ -2536,37 +2548,43 @@ Aliases: I<is_palindromic>
 
 =cut
 
-=head2 is_pell_lucas_pseudoprime
+=head2 is_pell_lucas_psp
 
-Number.is_pell_lucas_pseudoprime() -> I<Obj>
+Number.is_pell_lucas_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_pell_lucas_pseudoprime>
 
 =cut
 
-=head2 is_pell_pseudoprime
+=head2 is_pell_psp
 
-Number.is_pell_pseudoprime() -> I<Obj>
+Number.is_pell_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_pell_pseudoprime>
 
 =cut
 
-=head2 is_perrin_pseudoprime
+=head2 is_perrin_psp
 
-Number.is_perrin_pseudoprime() -> I<Obj>
+Number.is_perrin_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_perrin_pseudoprime>
 
 =cut
 
-=head2 is_plumb_pseudoprime
+=head2 is_plumb_psp
 
-Number.is_plumb_pseudoprime() -> I<Obj>
+Number.is_plumb_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_euler_plumb_pseudoprime>
+Aliases: I<is_euler_plumb_psp>, I<is_plumb_pseudoprime>, I<is_euler_plumb_pseudoprime>
 
 =cut
 
@@ -2672,13 +2690,13 @@ Aliases: I<is_provable_prime>
 
 =cut
 
-=head2 is_pseudoprime
+=head2 is_psp
 
-Number.is_pseudoprime() -> I<Obj>
+Number.is_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_fermat_pseudoprime>
+Aliases: I<is_fermat_psp>, I<is_pseudoprime>, I<is_fermat_pseudoprime>
 
 =cut
 
@@ -2774,55 +2792,63 @@ Aliases: I<is_squarefree>
 
 =cut
 
-=head2 is_stronger_lucas_pseudoprime
+=head2 is_stronger_lucas_psp
 
-Number.is_stronger_lucas_pseudoprime() -> I<Obj>
+Number.is_stronger_lucas_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_extra_strong_lucas_pseudoprime>
+Aliases: I<is_extra_strong_lucas_psp>, I<is_stronger_lucas_pseudoprime>, I<is_extra_strong_lucas_pseudoprime>
 
 =cut
 
-=head2 is_strong_fibonacci_pseudoprime
+=head2 is_strong_fib
 
-Number.is_strong_fibonacci_pseudoprime() -> I<Obj>
+Number.is_strong_fib() -> I<Obj>
 
 Return the
+
+Aliases: I<is_strong_fib_psp>, I<is_strong_fibonacci>, I<is_strong_fibonacci_psp>, I<is_strong_fibonacci_pseudoprime>
 
 =cut
 
-=head2 is_strongish_lucas_pseudoprime
+=head2 is_strongish_lucas_psp
 
-Number.is_strongish_lucas_pseudoprime() -> I<Obj>
+Number.is_strongish_lucas_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_strongish_lucas_pseudoprime>
 
 =cut
 
-=head2 is_strong_lucas_pseudoprime
+=head2 is_strong_lucas_psp
 
-Number.is_strong_lucas_pseudoprime() -> I<Obj>
+Number.is_strong_lucas_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_strong_lucas_pseudoprime>
 
 =cut
 
-=head2 is_strong_pseudoprime
+=head2 is_strong_psp
 
-Number.is_strong_pseudoprime() -> I<Obj>
+Number.is_strong_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_strong_fermat_pseudoprime>
+Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<is_strong_fermat_pseudoprime>
 
 =cut
 
-=head2 is_super_pseudoprime
+=head2 is_super_psp
 
-Number.is_super_pseudoprime() -> I<Obj>
+Number.is_super_psp() -> I<Obj>
 
 Return the
+
+Aliases: I<is_super_pseudoprime>
 
 =cut
 
@@ -2842,13 +2868,13 @@ Return the
 
 =cut
 
-=head2 is_underwood_pseudoprime
+=head2 is_underwood_psp
 
-Number.is_underwood_pseudoprime() -> I<Obj>
+Number.is_underwood_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_frobenius_underwood_pseudoprime>
+Aliases: I<is_underwood_pseudoprime>, I<is_frobenius_underwood_psp>, I<is_frobenius_underwood_pseudoprime>
 
 =cut
 

@@ -8908,7 +8908,6 @@ package Sidef::Types::Number::Number {
             ($p - $j) % 2 == 0 or next;
 
             Math::GMPz::Rmpz_bin_uiui($z, $p + 1, $p - $j);
-
             Math::GMPz::Rmpz_mul($z, $z, $u);
             Math::GMPq::Rmpq_mul_z($q, $B[(($p - $j) >> 1) + 1], $z);
             Math::GMPq::Rmpq_add($sum, $sum, $q);
@@ -11218,7 +11217,7 @@ package Sidef::Types::Number::Number {
 
         __is_int__($$n)
           && Math::Prime::Util::GMP::miller_rabin_random(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
-                                                         _any2ui($$k) // 20,)
+                                                         _any2ui($$k) // 20)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -11239,6 +11238,8 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_psp         = \&is_fermat_pseudoprime;
+    *is_fermat_psp  = \&is_fermat_pseudoprime;
     *is_pseudoprime = \&is_fermat_pseudoprime;
 
     sub is_super_pseudoprime {
@@ -11273,6 +11274,8 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
+    *is_super_psp = \&is_super_pseudoprime;
+
     sub is_euler_pseudoprime {
         my ($n, @bases) = @_;
         _valid(\(@bases));
@@ -11288,6 +11291,8 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    *is_euler_psp = \&is_euler_pseudoprime;
 
     sub is_strong_fermat_pseudoprime {
         my ($n, @bases) = @_;
@@ -11305,6 +11310,9 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *miller_rabin          = \&is_strong_fermat_pseudoprime;
+    *is_strong_psp         = \&is_strong_fermat_pseudoprime;
+    *is_strong_fermat_psp  = \&is_strong_fermat_pseudoprime;
     *is_strong_pseudoprime = \&is_strong_fermat_pseudoprime;
 
     sub is_chebyshev_pseudoprime {    # OEIS: A175530
@@ -11376,6 +11384,9 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
+    *is_chebyshev     = \&is_chebyshev_pseudoprime;
+    *is_chebyshev_psp = \&is_chebyshev_pseudoprime;
+
     sub is_bruckman_lucas_pseudoprime {    # OEIS: A005845 (composites)
         my ($n) = @_;
 
@@ -11388,7 +11399,9 @@ package Sidef::Types::Number::Number {
         $V eq '1' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_pell_lucas_pseudoprime {        # OEIS: A270342 (primes + composites), A270345 (composites)
+    *is_bruckman_lucas_psp = \&is_bruckman_lucas_pseudoprime;
+
+    sub is_pell_lucas_pseudoprime {    # OEIS: A270342 (primes + composites), A270345 (composites)
         my ($n) = @_;
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
@@ -11400,7 +11413,9 @@ package Sidef::Types::Number::Number {
         $V eq '2' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_pell_pseudoprime {              # OEIS: A099011 (odd composites)
+    *is_pell_lucas_psp = \&is_pell_lucas_pseudoprime;
+
+    sub is_pell_pseudoprime {    # OEIS: A099011 (odd composites)
         my ($n) = @_;
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
@@ -11425,6 +11440,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp($t, $n) ? Sidef::Types::Bool::Bool::FALSE : Sidef::Types::Bool::Bool::TRUE;
     }
 
+    *is_pell_psp = \&is_pell_pseudoprime;
+
     sub is_fibonacci_pseudoprime {    # OEIS: A081264 (odd composites)
         my ($n) = @_;
 
@@ -11437,6 +11454,9 @@ package Sidef::Types::Number::Number {
         my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 1, -1, $n - Math::GMPz::Rmpz_ui_kronecker(5, $n));
         $U eq '0' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    *is_fib_psp       = \&is_fibonacci_pseudoprime;
+    *is_fibonacci_psp = \&is_fibonacci_pseudoprime;
 
     sub is_strong_fibonacci_pseudoprime {
         my ($n) = @_;
@@ -11533,6 +11553,11 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
+    *is_strong_fib           = \&is_strong_fibonacci_pseudoprime;
+    *is_strong_fibonacci     = \&is_strong_fibonacci_pseudoprime;
+    *is_strong_fib_psp       = \&is_strong_fibonacci_pseudoprime;
+    *is_strong_fibonacci_psp = \&is_strong_fibonacci_pseudoprime;
+
     sub is_lucas_pseudoprime {
         my ($n) = @_;
         __is_int__($$n)
@@ -11541,6 +11566,8 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_lucas_psp = \&is_lucas_pseudoprime;
+
     sub is_strong_lucas_pseudoprime {
         my ($n) = @_;
         __is_int__($$n)
@@ -11548,6 +11575,8 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    *is_strong_lucas_psp = \&is_strong_lucas_pseudoprime;
 
     sub is_stronger_lucas_pseudoprime {
         my ($n) = @_;
@@ -11558,6 +11587,8 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_stronger_lucas_psp             = \&is_stronger_lucas_pseudoprime;
+    *is_extra_strong_lucas_psp         = \&is_stronger_lucas_pseudoprime;
     *is_extra_strong_lucas_pseudoprime = \&is_stronger_lucas_pseudoprime;
 
     sub is_strongish_lucas_pseudoprime {
@@ -11569,6 +11600,8 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_strongish_lucas_psp = \&is_strongish_lucas_pseudoprime;
+
     sub is_plumb_pseudoprime {
         my ($n) = @_;
         __is_int__($$n)
@@ -11577,6 +11610,8 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_plumb_psp               = \&is_plumb_pseudoprime;
+    *is_euler_plumb_psp         = \&is_plumb_pseudoprime;
     *is_euler_plumb_pseudoprime = \&is_plumb_pseudoprime;
 
     sub is_perrin_pseudoprime {
@@ -11586,6 +11621,8 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    *is_perrin_psp = \&is_perrin_pseudoprime;
 
     sub is_frobenius_pseudoprime {
         my ($n, $k, $m) = @_;
@@ -11602,6 +11639,8 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_frobenius_psp = \&is_frobenius_pseudoprime;
+
     sub is_frobenius_underwood_pseudoprime {
         my ($n) = @_;
         __is_int__($$n)
@@ -11611,7 +11650,9 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    *is_underwood_pseudoprime = \&is_frobenius_underwood_pseudoprime;
+    *is_underwood_psp           = \&is_frobenius_underwood_pseudoprime;
+    *is_underwood_pseudoprime   = \&is_frobenius_underwood_pseudoprime;
+    *is_frobenius_underwood_psp = \&is_frobenius_underwood_pseudoprime;
 
     sub is_frobenius_khashin_pseudoprime {
         my ($n) = @_;
@@ -11622,7 +11663,9 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    *is_khashin_pseudoprime = \&is_frobenius_khashin_pseudoprime;
+    *is_khashin_psp           = \&is_frobenius_khashin_pseudoprime;
+    *is_khashin_pseudoprime   = \&is_frobenius_khashin_pseudoprime;
+    *is_frobenius_khashin_psp = \&is_frobenius_khashin_pseudoprime;
 
     sub is_nminus1_prime {
         my ($x) = @_;
@@ -12034,10 +12077,6 @@ package Sidef::Types::Number::Number {
         if (scalar(keys(%cache)) > $limit) {
             Math::GMPz::Rmpz_clear($_) for values(%cache);
             undef %cache;
-        }
-
-        if ($k > 2 and !($HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($k) : Math::Prime::Util::GMP::is_prob_prime($k))) {
-            $k = ($HAS_PRIME_UTIL ? Math::Prime::Util::prev_prime($k) : Math::Prime::Util::GMP::prev_prime($k));
         }
 
         $cache{$k} //= do {
