@@ -2538,6 +2538,16 @@ Return the
 
 =cut
 
+=head2 is_over_psp
+
+Number.is_over_psp() -> I<Obj>
+
+Return the
+
+Aliases: I<is_over_pseudoprime>, I<is_overpseudoprime>
+
+=cut
+
 =head2 is_palindrome
 
 Number.is_palindrome() -> I<Obj>
@@ -2848,7 +2858,7 @@ Number.is_super_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_super_pseudoprime>
+Aliases: I<is_super_pseudoprime>, I<is_superpseudoprime>
 
 =cut
 

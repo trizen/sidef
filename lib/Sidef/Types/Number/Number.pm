@@ -11247,7 +11247,9 @@ package Sidef::Types::Number::Number {
         _valid(\(@bases));
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        my $z = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = _big2uistr($z) // return Sidef::Types::Bool::Bool::FALSE;
 
         Math::Prime::Util::GMP::is_pseudoprime(
             $n,
@@ -11257,24 +11259,144 @@ package Sidef::Types::Number::Number {
             }
         ) || return Sidef::Types::Bool::Bool::FALSE;
 
-        # Using Thomas Ordowski's criterion from A050217.
-        my @factors =
-          map { ($_ < ULONG_MAX) ? ($_ - 1) : (Math::GMPz::Rmpz_init_set_str("$_", 10) - 1) }
-          Math::Prime::Util::GMP::factor($n);
+        @bases = (2) if !@bases;
 
-        my $gcd = Math::Prime::Util::GMP::gcd(@factors);
+        my $check_conditions = sub {
+            my ($factors) = @_;
+
+            # Using Thomas Ordowski's criterion from A050217.
+
+            my $gcd = Math::Prime::Util::GMP::gcd(
+                map {
+                        ($_ < ULONG_MAX)
+                      ? ($_ - 1)
+                      : (Math::GMPz::Rmpz_init_set_str("$_", 10) - 1)
+                  } @$factors
+            );
+
+            foreach my $base (@bases) {
+                Math::Prime::Util::GMP::powmod($base, $gcd, $n) eq '1'
+                  or return;
+            }
+
+            return 1;
+        };
+
+        if (!Math::GMPz::Rmpz_fits_ulong_p($z)) {
+            foreach my $trial_limit (1e4, 1e6) {
+
+                my ($rem, @factors) = _native_trial_factor($z, $trial_limit);
+
+                @factors || next;
+                $check_conditions->(\@factors)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+
+                if (Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+
+                foreach my $base (@bases) {
+                    Math::Prime::Util::GMP::powmod($base, $rem, $n) eq $base
+                      or return Sidef::Types::Bool::Bool::FALSE;
+                }
+            }
+        }
+
+        my @factors = Math::Prime::Util::GMP::factor($n);
+
+        $check_conditions->(\@factors)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *is_super_psp        = \&is_super_pseudoprime;
+    *is_superpseudoprime = \&is_super_pseudoprime;
+
+    # A141232 for b = 2;
+    # A141350 for b = 3;
+    # A140658 for b = 2,3;
+
+    sub is_over_pseudoprime {
+        my ($n, @bases) = @_;
+        _valid(\(@bases));
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        my $z = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = _big2uistr($z) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::Prime::Util::GMP::is_strong_pseudoprime(
+            $n,
+            do {
+                @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
+                @bases ? (@bases) : (2);
+            }
+        ) || return Sidef::Types::Bool::Bool::FALSE;
 
         @bases = (2) if !@bases;
 
-        foreach my $base (@bases) {
-            Math::Prime::Util::GMP::powmod($base, $gcd, $n) eq '1'
-              or return Sidef::Types::Bool::Bool::FALSE;
+        my $check_conditions = sub {
+            my ($factors) = @_;
+
+            my $gcd = Math::Prime::Util::GMP::gcd(
+                map {
+                        ($_ < ULONG_MAX)
+                      ? ($_ - 1)
+                      : (Math::GMPz::Rmpz_init_set_str("$_", 10) - 1)
+                  } @$factors
+            );
+
+            foreach my $base (@bases) {
+                Math::Prime::Util::GMP::powmod($base, $gcd, $n) eq '1'
+                  or return;
+            }
+
+            my %znorder;
+
+            foreach my $p (@$factors) {
+                foreach my $base (@bases) {
+                    my $zn = Math::Prime::Util::GMP::znorder($base, $p);
+                    if (exists $znorder{$base}) {
+                        $znorder{$base} eq $zn or return;
+                    }
+                    else {
+                        $znorder{$base} = $zn;
+                    }
+                }
+            }
+
+            return 1;
+        };
+
+        if (!Math::GMPz::Rmpz_fits_ulong_p($z)) {
+            foreach my $trial_limit (1e4, 1e6) {
+
+                my ($rem, @factors) = _native_trial_factor($z, $trial_limit);
+
+                @factors || next;
+                $check_conditions->(\@factors)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+
+                if (Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+
+                foreach my $base (@bases) {
+                    Math::Prime::Util::GMP::powmod($base, $rem, $n) eq $base
+                      or return Sidef::Types::Bool::Bool::FALSE;
+                }
+            }
         }
 
-        return Sidef::Types::Bool::Bool::TRUE;
+        my @factors = Math::Prime::Util::GMP::factor($n);
+
+        $check_conditions->(\@factors)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    *is_super_psp = \&is_super_pseudoprime;
+    *is_over_psp        = \&is_over_pseudoprime;
+    *is_overpseudoprime = \&is_over_pseudoprime;
 
     sub is_euler_pseudoprime {
         my ($n, @bases) = @_;
