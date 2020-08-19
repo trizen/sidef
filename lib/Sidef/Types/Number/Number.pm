@@ -11211,6 +11211,11 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::TRUE;
     }
 
+    sub is_odd_composite {
+        my ($n) = @_;
+        $n->is_odd && $n->is_composite;
+    }
+
     sub miller_rabin_random {
         my ($n, $k) = @_;
         _valid(\$k);
@@ -11509,19 +11514,68 @@ package Sidef::Types::Number::Number {
     *is_chebyshev     = \&is_chebyshev_pseudoprime;
     *is_chebyshev_psp = \&is_chebyshev_pseudoprime;
 
-    sub is_bruckman_lucas_pseudoprime {    # OEIS: A005845 (composites)
-        my ($n) = @_;
+    sub is_lucasU_pseudoprime {    # true if U_n(P,Q) == 0 mod n
+        my ($n, $P, $Q) = @_;
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        $P = defined($P) ? do { _valid(\$P); _any2ui($$P) // return Sidef::Types::Bool::Bool::FALSE } : +1;
+        $Q = defined($Q) ? do { _valid(\$Q); _any2si($$Q) // return Sidef::Types::Bool::Bool::FALSE } : -1;
+
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
 
-        my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 1, -1, $n);
-        $V eq '1' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
+        my $D = $P * $P - 4 * $Q;
+
+        Math::Prime::Util::GMP::is_square($D)
+          && return Sidef::Types::Bool::Bool::FALSE;
+
+        my $k =
+          ($D < 0)
+          ? Math::GMPz::Rmpz_si_kronecker($D, $n)
+          : Math::GMPz::Rmpz_ui_kronecker($D, $n);
+
+        $k || return Sidef::Types::Bool::Bool::FALSE;
+
+        my ($U, $V) = eval { Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $n - $k) };
+
+        defined($U) and ($U eq '0')
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    *is_bruckman_lucas_psp = \&is_bruckman_lucas_pseudoprime;
+    *is_lucasu_psp            = \&is_lucasU_pseudoprime;
+    *is_lucasU_psp            = \&is_lucasU_pseudoprime;
+    *is_fib_psp               = \&is_lucasU_pseudoprime;
+    *is_fibonacci_psp         = \&is_lucasU_pseudoprime;
+    *is_fibonacci_pseudoprime = \&is_lucasU_pseudoprime;
+
+    sub is_lucasV_pseudoprime {    # true if V_n(P,Q) == P mod n
+        my ($n, $P, $Q) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        $P = defined($P) ? do { _valid(\$P); _any2ui($$P) // return Sidef::Types::Bool::Bool::FALSE } : +1;
+        $Q = defined($Q) ? do { _valid(\$Q); _any2si($$Q) // return Sidef::Types::Bool::Bool::FALSE } : -1;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        my ($U, $V) = eval { Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $n) };
+
+        (defined($V) and $V eq "$P")
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *is_lucasv_psp                 = \&is_lucasV_pseudoprime;
+    *is_lucasV_psp                 = \&is_lucasV_pseudoprime;
+    *is_bruckman_lucas_psp         = \&is_lucasV_pseudoprime;
+    *is_bruckman_lucas_pseudoprime = \&is_lucasV_pseudoprime;
 
     sub is_pell_lucas_pseudoprime {    # OEIS: A270342 (primes + composites), A270345 (composites)
         my ($n) = @_;
@@ -11529,7 +11583,8 @@ package Sidef::Types::Number::Number {
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        Math::GMPz::Rmpz_cmp_ui($n, 2) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_cmp_ui($n, 2) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
 
         my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 2, -1, $n);
         $V eq '2' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
@@ -11563,22 +11618,6 @@ package Sidef::Types::Number::Number {
     }
 
     *is_pell_psp = \&is_pell_pseudoprime;
-
-    sub is_fibonacci_pseudoprime {    # OEIS: A081264 (odd composites)
-        my ($n) = @_;
-
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
-
-        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0 or return Sidef::Types::Bool::Bool::FALSE;
-        Math::GMPz::Rmpz_divisible_ui_p($n, 5) and return Sidef::Types::Bool::Bool::FALSE;
-
-        my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 1, -1, $n - Math::GMPz::Rmpz_ui_kronecker(5, $n));
-        $U eq '0' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    *is_fib_psp       = \&is_fibonacci_pseudoprime;
-    *is_fibonacci_psp = \&is_fibonacci_pseudoprime;
 
     sub is_strong_fibonacci_pseudoprime {
         my ($n) = @_;
@@ -11681,7 +11720,12 @@ package Sidef::Types::Number::Number {
     *is_strong_fibonacci_psp = \&is_strong_fibonacci_pseudoprime;
 
     sub is_lucas_pseudoprime {
-        my ($n) = @_;
+        my ($n, $P, $Q) = @_;
+
+        if (defined($P) or defined($Q)) {
+            return $n->is_lucas_u_pseudoprime($P, $Q);
+        }
+
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_lucas_pseudoprime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE

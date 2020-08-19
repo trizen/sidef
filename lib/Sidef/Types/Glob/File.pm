@@ -455,6 +455,7 @@ package Sidef::Types::Glob::File {
         ref($_[0]) || shift(@_);
         my ($self, $mode, $fh_ref, $err_ref) = @_;
 
+        $mode //= '<:utf8';
         $mode = "$mode" if (ref $mode);
 
         my $success = CORE::open(my $fh, $mode, ref($self) eq __PACKAGE__ ? $$self : "$self");

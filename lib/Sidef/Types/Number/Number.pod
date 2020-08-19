@@ -2262,16 +2262,6 @@ Return the
 
 =cut
 
-=head2 is_bruckman_lucas_psp
-
-Number.is_bruckman_lucas_psp() -> I<Obj>
-
-Return the
-
-Aliases: I<is_bruckman_lucas_pseudoprime>
-
-=cut
-
 =head2 is_carmichael
 
 Number.is_carmichael() -> I<Obj>
@@ -2378,7 +2368,7 @@ Number.is_fib_psp() -> I<Obj>
 
 Return the
 
-Aliases: I<is_fibonacci_psp>, I<is_fibonacci_pseudoprime>
+Aliases: I<is_lucasu_psp>, I<is_lucasU_psp>, I<is_fibonacci_psp>, I<is_lucasU_pseudoprime>, I<is_fibonacci_pseudoprime>
 
 =cut
 
@@ -2460,6 +2450,16 @@ Aliases: I<is_lucas_pseudoprime>
 
 =cut
 
+=head2 is_lucasv_psp
+
+Number.is_lucasv_psp() -> I<Obj>
+
+Return the
+
+Aliases: I<is_lucasV_psp>, I<is_bruckman_lucas_psp>, I<is_lucasV_pseudoprime>, I<is_bruckman_lucas_pseudoprime>
+
+=cut
+
 =head2 is_mersenne_prime
 
 Number.is_mersenne_prime() -> I<Obj>
@@ -2525,6 +2525,14 @@ Aliases: I<is_nplus1_prime>
 =head2 is_odd
 
 Number.is_odd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_odd_composite
+
+Number.is_odd_composite() -> I<Obj>
 
 Return the
 
