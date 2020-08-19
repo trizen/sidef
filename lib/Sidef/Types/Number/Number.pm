@@ -11723,7 +11723,7 @@ package Sidef::Types::Number::Number {
         my ($n, $P, $Q) = @_;
 
         if (defined($P) or defined($Q)) {
-            return $n->is_lucas_u_pseudoprime($P, $Q);
+            return $n->is_lucasU_pseudoprime($P, $Q);
         }
 
         __is_int__($$n)
