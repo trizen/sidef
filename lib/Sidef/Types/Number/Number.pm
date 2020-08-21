@@ -11271,13 +11271,15 @@ package Sidef::Types::Number::Number {
 
             # Using Thomas Ordowski's criterion from A050217.
 
+#<<<
             my $gcd = Math::Prime::Util::GMP::gcd(
                 map {
-                        ($_ < ULONG_MAX)
-                      ? ($_ - 1)
-                      : (Math::GMPz::Rmpz_init_set_str("$_", 10) - 1)
-                  } @$factors
+                    ($_ < ~0)
+                        ? ($_ - 1)
+                        : Math::Prime::Util::GMP::subint($_, 1)
+                } @$factors
             );
+#>>>
 
             foreach my $base (@bases) {
                 Math::Prime::Util::GMP::powmod($base, $gcd, $n) eq '1'
@@ -11343,13 +11345,15 @@ package Sidef::Types::Number::Number {
         my $check_conditions = sub {
             my ($factors) = @_;
 
+#<<<
             my $gcd = Math::Prime::Util::GMP::gcd(
                 map {
-                        ($_ < ULONG_MAX)
-                      ? ($_ - 1)
-                      : (Math::GMPz::Rmpz_init_set_str("$_", 10) - 1)
-                  } @$factors
+                    ($_ < ~0)
+                        ? ($_ - 1)
+                        : Math::Prime::Util::GMP::subint($_, 1)
+                } @$factors
             );
+#>>>
 
             foreach my $base (@bases) {
                 Math::Prime::Util::GMP::powmod($base, $gcd, $n) eq '1'
