@@ -466,7 +466,7 @@ Number.Ω() -> I<Obj>
 
 Return the
 
-Aliases: I<big_omega>, I<bigomega>, I<prime_power_sigma0>
+Aliases: I<bigomega>, I<prime_power_sigma0>
 
 =cut
 

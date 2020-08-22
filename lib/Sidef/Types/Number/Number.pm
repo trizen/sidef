@@ -772,6 +772,89 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_get_str($x, 10);
     }
 
+    # Prime factorization in [p,k] form, where k is the multiplicity of p.
+    sub _factor_exp {
+        my ($n) = @_;    # n is a unsigned native integer or a string
+
+        if ($HAS_PRIME_UTIL and $n < ULONG_MAX) {
+            return Math::Prime::Util::factor_exp($n);
+        }
+
+        (my @factors = Math::Prime::Util::GMP::factor($n)) || return;
+
+        my $prev_value = shift(@factors);
+        my @factor_exp = [$prev_value, 1];
+
+        foreach my $curr_value (@factors) {
+            if ($curr_value eq $prev_value) {
+                ++$factor_exp[-1][1];
+            }
+            else {
+                CORE::push(@factor_exp, [$curr_value, 1]);
+            }
+            $prev_value = $curr_value;
+        }
+
+        @factor_exp;
+    }
+
+    sub _cached_primorial {
+        my ($k, $limit) = @_;
+
+        state %cache;
+
+        if (exists $cache{$k}) {
+            return $cache{$k};
+        }
+
+        $limit //= 100;
+
+        # Clear the cache when there are too many values cached
+        if (scalar(keys(%cache)) > $limit) {
+            Math::GMPz::Rmpz_clear($_) for values(%cache);
+            undef %cache;
+        }
+
+        $cache{$k} //= do {
+            my $t = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_primorial_ui($t, $k);
+            $t;
+        };
+    }
+
+    sub _native_trial_factor {
+        my ($n, $k) = @_;
+
+        # n is a positive > 1 Math::GMPz object
+        # k is an unsigned integer
+
+        my $B = _cached_primorial($k);
+
+        state $g = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_gcd($g, $n, $B);
+
+        if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+
+            my $t = Math::GMPz::Rmpz_init_set($n);
+
+            my @factors = (
+                           ($HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($g))
+                           ? Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($g))
+                           : Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($g, 10))
+                          );
+
+            my @return;
+            foreach my $f (@factors) {
+                Math::GMPz::Rmpz_set_ui($g, $f);
+                push @return, ($f) x Math::GMPz::Rmpz_remove($t, $t, $g);
+            }
+
+            return ($t, @return);
+        }
+
+        return ($n);
+    }
+
     #
     ## Binary splitting
     #
@@ -6901,15 +6984,14 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my %f;
-        ++$f{$_} for Math::Prime::Util::GMP::factor($n);
+        my @factors = _factor_exp(Math::GMPz::Rmpz_get_str($n, 10));
 
 #<<<
-        my @factors = map {
+        @factors = map {
             ($_ < ULONG_MAX)
                 ? Math::GMPz::Rmpz_init_set_ui($_)
                 : Math::GMPz::Rmpz_init_set_str($_, 10)
-        } keys %f;
+        } map { $_->[0] } @factors;
 #>>>
 
         for (my $k = 2 ; ; $k = Math::Prime::Util::GMP::next_prime($k)) {
@@ -6944,9 +7026,6 @@ package Sidef::Types::Number::Number {
             return (($n < ULONG_MAX) ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n));
         }
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor($ystr);
-
         my @congruences;
 
         my $t = Math::GMPz::Rmpz_init();
@@ -6957,11 +7036,10 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_mod($m, $x, $y);
 
-        foreach my $p (keys %factors) {
+        foreach my $pe (_factor_exp($ystr)) {
+            my ($p, $e) = @$pe;
 
             if ($p eq '2') {
-                my $e = $factors{$p};
-
                 if ($e == 1) {
                     push @congruences, [(Math::GMPz::Rmpz_odd_p($m) ? 1 : 0), 2];
                     next;
@@ -7000,7 +7078,7 @@ package Sidef::Types::Number::Number {
               : Math::GMPz::Rmpz_set_str($w, $s, 10);
 
             # v = p^k
-            Math::GMPz::Rmpz_pow_ui($v, $t, $factors{"$p"});
+            Math::GMPz::Rmpz_pow_ui($v, $t, $e);
 
             # t = p^(k-1)
             Math::GMPz::Rmpz_divexact($t, $v, $t);
@@ -7985,15 +8063,17 @@ package Sidef::Types::Number::Number {
             return $t1->div($t2);
         }
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
-        return ZERO if exists($factors{'0'});
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $prod = Math::GMPz::Rmpz_init_set_ui(1);
         my $tmp  = Math::GMPz::Rmpz_init();
 
-        while (my ($p, $e) = each %factors) {
+        foreach my $pe (@factor_exp) {
 
+            my ($p, $e) = @$pe;
             ($p < ULONG_MAX) || goto &nan;
 
             my $primorial =
@@ -8024,10 +8104,10 @@ package Sidef::Types::Number::Number {
 
         Math::GMPq::Rmpq_set_ui($prod, 1, 1);
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
+        $n = _big2uistr($n) // goto &nan;
 
-        while (my ($p, $e) = each %factors) {
+        foreach my $pe (_factor_exp($n)) {
+            my ($p, $e) = @$pe;
 
             my $q = ($p <= 2) ? 1 : Math::Prime::Util::GMP::prev_prime($p);
 
@@ -9288,20 +9368,19 @@ package Sidef::Types::Number::Number {
 
         my $x_is_mpz = ref($x) eq 'Math::GMPz';
 
-        my %factors;
-        @factors{Math::Prime::Util::GMP::factor($n)} = ();
+        my @factor_exp = _factor_exp($n);
 
         # Special case for x = 1: cyclotomic(n, 1) is the greatest common divisor of the prime factors of n.
         if ($x_is_mpz ? (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0) : __eq__($x, 1)) {
-            return __PACKAGE__->_set_uint(Math::Prime::Util::GMP::gcd(keys %factors));
+            return __PACKAGE__->_set_uint(Math::Prime::Util::GMP::gcd(map { $_->[0] } @factor_exp));
         }
 
         # Generate the squarefree divisors of n, along
         # with the number of prime factors of each divisor
         my @sd;
-        foreach my $p (keys %factors) {
-            push @sd, map { [$_->[0] * $p, $_->[1] + 1] } @sd;
-            push @sd, [$p, 1];
+        foreach my $pe (@factor_exp) {
+            push @sd, map { [$_->[0] * $pe->[0], $_->[1] + 1] } @sd;
+            push @sd, [$pe->[0], 1];
         }
 
         push @sd, [1, 0];
@@ -11154,7 +11233,11 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        my @factors = Math::Prime::Util::GMP::factor($remainder);
+        my @factors = (
+                       ($HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($remainder))
+                       ? Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($remainder))
+                       : Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($remainder, 10))
+                      );
 
         $omega += scalar(@factors);
 
@@ -11309,7 +11392,11 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my @factors = Math::Prime::Util::GMP::factor($n);
+        my @factors = (
+                       ($HAS_PRIME_UTIL and $n < ULONG_MAX)
+                       ? Math::Prime::Util::factor($n)
+                       : Math::Prime::Util::GMP::factor($n)
+                      );
 
         $check_conditions->(\@factors)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -11397,7 +11484,11 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my @factors = Math::Prime::Util::GMP::factor($n);
+        my @factors = (
+                       ($HAS_PRIME_UTIL and $n < ULONG_MAX)
+                       ? Math::Prime::Util::factor($n)
+                       : Math::Prime::Util::GMP::factor($n)
+                      );
 
         $check_conditions->(\@factors)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -11486,7 +11577,11 @@ package Sidef::Types::Number::Number {
         #       n == {+1,-1} (mod p+1)
         # for each prime p|n.
 
-        my @factors = Math::Prime::Util::GMP::factor($nstr);
+        my @factors = (
+                       ($HAS_PRIME_UTIL and $nstr < ULONG_MAX)
+                       ? Math::Prime::Util::factor($nstr)
+                       : Math::Prime::Util::GMP::factor($nstr)
+                      );
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
@@ -11676,7 +11771,11 @@ package Sidef::Types::Number::Number {
         #     2) 2(p + 1) | (n − 1) or 2(p + 1) | (n − p)
         # for each prime p|n.
 
-        my @factors = Math::Prime::Util::GMP::factor($nstr);
+        my @factors = (
+                       ($HAS_PRIME_UTIL and $nstr < ULONG_MAX)
+                       ? Math::Prime::Util::factor($nstr)
+                       : Math::Prime::Util::GMP::factor($nstr)
+                      );
 
         state $nm1 = Math::GMPz::Rmpz_init_nobless();
         state $u   = Math::GMPz::Rmpz_init_nobless();
@@ -12038,10 +12137,12 @@ package Sidef::Types::Number::Number {
     }
 
     sub rad {    # A007947
-        my %f;
-        @f{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
-        exists($f{'0'}) and return ZERO;
-        my $r = Math::Prime::Util::GMP::vecprod(CORE::keys %f);
+        my $n = &_big2uistr // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $r = Math::Prime::Util::GMP::vecprod(map { $_->[0] } @factor_exp);
         ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
@@ -12050,10 +12151,12 @@ package Sidef::Types::Number::Number {
         # Multiplicative with:
         #   a(p^k) = p^(k mod 2)
 
-        my %f;
-        ++$f{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
-        exists($f{'0'}) and return ZERO;
-        my $r = Math::Prime::Util::GMP::vecprod(grep { $f{$_} % 2 } CORE::keys %f);
+        my $n = &_big2uistr // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $r = Math::Prime::Util::GMP::vecprod(map { $_->[0] } grep { $_->[1] % 2 } @factor_exp);
         ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
@@ -12078,10 +12181,10 @@ package Sidef::Types::Number::Number {
 
             return $d if ($s eq '0' or $s eq '1');
 
-            my %factors;
-            ++$factors{$_} for Math::Prime::Util::GMP::factor($s);
+            my @factor_exp = _factor_exp($n);
 
-            while (my ($p, $k) = each %factors) {
+            foreach my $pk (@factor_exp) {
+                my ($p, $k) = @$pk;
 
                 # a(n) = Sum_{p^k|n} (n*k)/p
 
@@ -12153,7 +12256,8 @@ package Sidef::Types::Number::Number {
         }
 
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_ui($n));
+            $n = Math::GMPz::Rmpz_get_ui($n);
+            my @f = ($HAS_PRIME_UTIL ? Math::Prime::Util::factor($n) : Math::Prime::Util::GMP::factor($n));
             return __PACKAGE__->_set_uint($f[0]);
         }
 
@@ -12179,32 +12283,42 @@ package Sidef::Types::Number::Number {
     sub gpf {
         my ($n) = @_;
 
-        my $z = _any2mpz($$n) // goto &nan;
-        Math::GMPz::Rmpz_sgn($z) >= 0 or goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_sgn($n) >= 0 or goto &nan;
 
-        if (Math::GMPz::Rmpz_cmp_ui($z, 1) <= 0) {
-            return bless \$z;
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0) {
+            return bless \$n;
         }
 
-        my $nstr = (
-                      Math::GMPz::Rmpz_fits_ulong_p($z)
-                    ? Math::GMPz::Rmpz_get_ui($z)
-                    : Math::GMPz::Rmpz_get_str($z, 10)
-                   );
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n);
+            my @f = ($HAS_PRIME_UTIL ? Math::Prime::Util::factor($n) : Math::Prime::Util::GMP::factor($n));
+            return __PACKAGE__->_set_uint($f[-1]);
+        }
 
-        my @f = Math::Prime::Util::GMP::factor($nstr);
-
+        my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($n, 10));
         __PACKAGE__->_set_str('int', $f[-1]);
     }
 
     sub factor {
+
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
+        my @factors;
+
+        if ($HAS_PRIME_UTIL and $n < ULONG_MAX) {
+            @factors = Math::Prime::Util::factor($n);
+        }
+        else {
+            @factors = Math::Prime::Util::GMP::factor($n);
+        }
+
         Sidef::Types::Array::Array->new(
             [
              map {
                  ($_ < ULONG_MAX)
                    ? __PACKAGE__->_set_uint($_)
                    : __PACKAGE__->_set_str('int', $_)
-             } Math::Prime::Util::GMP::factor(&_big2pistr // return Sidef::Types::Array::Array->new())
+               } @factors
             ]
         );
     }
@@ -12213,82 +12327,25 @@ package Sidef::Types::Number::Number {
 
     sub factor_exp {
 
-        my %count;
-        ++$count{$_} for Math::Prime::Util::GMP::factor(&_big2pistr // return Sidef::Types::Array::Array->new());
+        my $n          = &_big2pistr // return Sidef::Types::Array::Array->new();
+        my @factor_exp = _factor_exp($n);
 
         my @pairs;
-        foreach my $factor (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } keys(%count)) {
-            push @pairs,
-              Sidef::Types::Array::Array->new(
-                                              [
-                                               (
-                                                ($factor < ULONG_MAX)
-                                                ? __PACKAGE__->_set_uint($factor)
-                                                : __PACKAGE__->_set_str('int', $factor)
-                                               ),
-                                               __PACKAGE__->_set_uint($count{$factor})
-                                              ]
-                                             );
+
+        foreach my $pk (@factor_exp) {
+
+            my ($p, $k) = @$pk;
+
+            $p = ($p < ULONG_MAX) ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
+            $k = __PACKAGE__->_set_uint($k);
+
+            push @pairs, bless([$p, $k], 'Sidef::Types::Array::Array');
         }
 
         Sidef::Types::Array::Array->new(\@pairs);
     }
 
     *factors_exp = \&factor_exp;
-
-    sub _cached_primorial {
-        my ($k, $limit) = @_;
-
-        $limit //= 100;
-
-        state %cache;
-
-        # Clear the cache when there are too many values cached
-        if (scalar(keys(%cache)) > $limit) {
-            Math::GMPz::Rmpz_clear($_) for values(%cache);
-            undef %cache;
-        }
-
-        $cache{$k} //= do {
-            my $t = Math::GMPz::Rmpz_init_nobless();
-            Math::GMPz::Rmpz_primorial_ui($t, $k);
-            $t;
-        };
-    }
-
-    sub _native_trial_factor {
-        my ($n, $k) = @_;
-
-        # n is a positive > 1 Math::GMPz object
-        # k is an unsigned integer
-
-        my $B = _cached_primorial($k);
-
-        state $g = Math::GMPz::Rmpz_init_nobless();
-        Math::GMPz::Rmpz_gcd($g, $n, $B);
-
-        if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
-
-            my $t    = Math::GMPz::Rmpz_init_set($n);
-            my $gstr = Math::GMPz::Rmpz_get_str($g, 10);
-
-            my @factors = (
-                           ($HAS_PRIME_UTIL and $gstr < ULONG_MAX)
-                           ? Math::Prime::Util::factor($gstr)
-                           : Math::Prime::Util::GMP::factor("$gstr")
-                          );
-
-            my @return;
-            foreach my $f (@factors) {
-                Math::GMPz::Rmpz_set_ui($g, $f);
-                push @return, ($f) x Math::GMPz::Rmpz_remove($t, $t, $g);
-            }
-
-            return ($t, @return);
-        }
-
-        return ($n);
-    }
 
     sub trial_factor {
         my ($n, $k) = @_;
@@ -12689,11 +12746,9 @@ package Sidef::Types::Number::Number {
     sub udivisors {
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
-
         my @d;
-        while (my ($p, $e) = each %factors) {
+        foreach my $pe (_factor_exp($n)) {
+            my ($p, $e) = @$pe;
 
             my $pp;
 
@@ -12746,15 +12801,13 @@ package Sidef::Types::Number::Number {
     *unitary_divisors = \&udivisors;
 
     sub prime_power_divisors {
+
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
-
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
-
         my $u = Math::GMPz::Rmpz_init();
 
         my @d;
-        while (my ($p, $e) = each %factors) {
+        foreach my $pe (_factor_exp($n)) {
+            my ($p, $e) = @$pe;
 
             my $t = (
                      ($p < ULONG_MAX)
@@ -12782,11 +12835,9 @@ package Sidef::Types::Number::Number {
     sub prime_power_udivisors {
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
-
         my @d;
-        while (my ($p, $e) = each %factors) {
+        foreach my $pe (_factor_exp($n)) {
+            my ($p, $e) = @$pe;
 
             my $pp;
 
@@ -12829,13 +12880,14 @@ package Sidef::Types::Number::Number {
     *unitary_prime_power_divisors = \&prime_power_udivisors;
 
     sub squarefree_divisors {
-        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
-        my %factors;
-        @factors{Math::Prime::Util::GMP::factor($n)} = ();
+        my $n          = &_big2pistr // return Sidef::Types::Array::Array->new();
+        my @factor_exp = _factor_exp($n);
 
         my @d;
-        foreach my $p (keys %factors) {
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
 
             $p = (
                   $p < ULONG_MAX
@@ -12865,13 +12917,12 @@ package Sidef::Types::Number::Number {
     sub square_divisors {
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
+        my @factor_exp = _factor_exp($n);
 
         my @d = ($ONE);
-        foreach my $p (grep { $factors{$_} > 1 } keys %factors) {
+        foreach my $pe (grep { $_->[1] > 1 } @factor_exp) {
 
-            my $e = $factors{$p};
+            my ($p, $e) = @$pe;
 
             $p = (
                   $p < ULONG_MAX
@@ -12901,13 +12952,9 @@ package Sidef::Types::Number::Number {
     sub square_udivisors {
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
-
         my @d = ($ONE);
-        foreach my $p (grep { $factors{$_} % 2 == 0 } keys %factors) {
-
-            my $e = $factors{$p};
+        foreach my $pe (grep { $_->[1] % 2 == 0 } _factor_exp($n)) {
+            my ($p, $e) = @$pe;
 
             my $pp = (
                       ($p < ULONG_MAX)
@@ -12943,11 +12990,9 @@ package Sidef::Types::Number::Number {
     sub squarefree_udivisors {
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
-
         my @d;
-        foreach my $p (grep { $factors{$_} == 1 } keys %factors) {
+        foreach my $pe (grep { $_->[1] == 1 } _factor_exp($n)) {
+            my $p = $pe->[0];
 
             $p = (
                   ($p < ULONG_MAX)
@@ -12980,17 +13025,10 @@ package Sidef::Types::Number::Number {
     sub prime_divisors {
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
-        my %factors;
-        @factors{Math::Prime::Util::GMP::factor($n)} = ();
-
         my @d;
-        foreach my $p (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } keys %factors) {
-            push @d,
-              (
-                ($p < ULONG_MAX)
-                ? __PACKAGE__->_set_uint($p)
-                : __PACKAGE__->_set_str('int', $p)
-              );
+        foreach my $pk (_factor_exp($n)) {
+            my $p = $pk->[0];
+            push @d, (($p < ULONG_MAX) ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p));
         }
 
         Sidef::Types::Array::Array->new(\@d);
@@ -12999,19 +13037,12 @@ package Sidef::Types::Number::Number {
     sub prime_udivisors {
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
-
-        my @factors = grep { $factors{$_} == 1 } keys %factors;
-
         my @d;
-        foreach my $p (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } @factors) {
-            push @d,
-              (
-                ($p < ULONG_MAX)
-                ? __PACKAGE__->_set_uint($p)
-                : __PACKAGE__->_set_str('int', $p)
-              );
+        foreach my $pk (_factor_exp($n)) {
+            if ($pk->[1] == 1) {
+                my $p = $pk->[0];
+                push @d, (($p < ULONG_MAX) ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p));
+            }
         }
 
         Sidef::Types::Array::Array->new(\@d);
@@ -13202,11 +13233,7 @@ package Sidef::Types::Number::Number {
                         push @D, ($mpz_cache{$d} //= Math::GMPz::Rmpz_init_set_str("$d", 10));
                     }
 
-                    $factor_cache{$d} //= do {
-                        my %factors;
-                        @factors{Math::Prime::Util::GMP::factor($D[-1] - 1)} = ();
-                        [keys %factors];
-                    };
+                    $factor_cache{$d} //= [map { $_->[0] } _factor_exp($D[-1] - 1)];
                 }
             }
 
@@ -13403,17 +13430,19 @@ package Sidef::Types::Number::Number {
 
         return $n->usigma0 if ($k == 0);
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
+        $n = _big2uistr($n) // goto &nan;
 
-        exists($factors{'0'}) and return ZERO;
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
 
         my $r = Math::GMPz::Rmpz_init_set_ui(1);
 
-        while (my ($p, $e) = each %factors) {
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
 
             if ($e == 1) {
                 if ($p < ULONG_MAX) {
@@ -13464,7 +13493,7 @@ package Sidef::Types::Number::Number {
 
     *Liouville = \&liouville;
 
-    sub big_omega {
+    sub bigomega {
         my ($n, $m) = @_;
 
         if (defined($m)) {
@@ -13475,10 +13504,11 @@ package Sidef::Types::Number::Number {
             $m = 0;
         }
 
-        my $nstr = _big2uistr($n) // goto &nan;
-        $nstr eq '0' and return ZERO;
+        $n = _big2uistr($n) // goto &nan;
+        $n eq '0' and return ZERO;
 
-        my @factors = Math::Prime::Util::GMP::factor($nstr);
+        my @factors =
+          (($HAS_PRIME_UTIL and $n < ULONG_MAX) ? Math::Prime::Util::factor($n) : Math::Prime::Util::GMP::factor($n));
 
         if ($m == 0) {
             return __PACKAGE__->_set_uint(scalar @factors);
@@ -13492,7 +13522,7 @@ package Sidef::Types::Number::Number {
 
         my $t  = Math::GMPz::Rmpz_init();
         my $u  = Math::GMPz::Rmpz_init();
-        my $nm = Math::GMPz::Rmpz_init_set_str($nstr, 10);
+        my $nm = Math::GMPz::Rmpz_init_set_str($n, 10);
 
         Math::GMPz::Rmpz_pow_ui($nm, $nm, $m) if $m > 1;
 
@@ -13521,10 +13551,9 @@ package Sidef::Types::Number::Number {
         bless \$sum;
     }
 
-    *Ω                  = \&big_omega;
-    *Omega              = \&big_omega;
-    *bigomega           = \&big_omega;
-    *prime_power_sigma0 = \&big_omega;
+    *Ω                  = \&bigomega;
+    *Omega              = \&bigomega;
+    *prime_power_sigma0 = \&bigomega;
 
     sub omega {
         my ($n, $m) = @_;
@@ -13537,26 +13566,27 @@ package Sidef::Types::Number::Number {
             $m = 0;
         }
 
-        my $nstr = _big2uistr($n) // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
 
-        my %factors;
-        @factors{Math::Prime::Util::GMP::factor($nstr)} = ();
-        exists($factors{'0'}) and return ZERO;
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         if ($m == 0) {
-            return __PACKAGE__->_set_uint(scalar keys %factors);
+            return __PACKAGE__->_set_uint(scalar @factor_exp);
         }
 
         # omega_m(n) = n^m * Sum_{p|n} 1/p^m
 
         my $t  = Math::GMPz::Rmpz_init();
-        my $nm = Math::GMPz::Rmpz_init_set_str($nstr, 10);
+        my $nm = Math::GMPz::Rmpz_init_set_str($n, 10);
 
         Math::GMPz::Rmpz_pow_ui($nm, $nm, $m) if $m > 1;
 
         my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
-        foreach my $p (keys %factors) {
+        foreach my $pe (@factor_exp) {
+
+            my $p = $pe->[0];
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $m);
@@ -13582,12 +13612,13 @@ package Sidef::Types::Number::Number {
         # Identity:
         #   usigma0(n) = 2^omega(n)
 
-        my %factors;
-        @factors{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
-        exists($factors{'0'}) and return ZERO;
+        my $n = &_big2uistr // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_setbit($r, scalar keys %factors);
+        Math::GMPz::Rmpz_setbit($r, scalar @factor_exp);
         bless \$r;
     }
 
@@ -13612,14 +13643,17 @@ package Sidef::Types::Number::Number {
             goto &usigma0;
         }
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(1);
 
-        while (my ($p, $e) = each %factors) {
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
@@ -13637,19 +13671,21 @@ package Sidef::Types::Number::Number {
     }
 
     sub uphi {
-        my ($n) = @_;
 
         # Multiplicative with:
         #   uphi(p^e) = p^e - 1
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        my $n = &_big2uistr // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(1);
 
-        while (my ($p, $e) = each %factors) {
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
@@ -13684,15 +13720,18 @@ package Sidef::Types::Number::Number {
             goto &prime_power_sigma0;
         }
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(0);
 
-        while (my ($p, $e) = each %factors) {
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
 
             if ($p < ULONG_MAX) {
                 ($k == 1)
@@ -13732,14 +13771,17 @@ package Sidef::Types::Number::Number {
             goto &prime_power_usigma0;
         }
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(0);
 
-        while (my ($p, $e) = each %factors) {
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
@@ -13761,13 +13803,13 @@ package Sidef::Types::Number::Number {
         #   a(p, k)   = 2
         #   a(p^e, k) = 1       # for e > 1
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
+        my $n = &_big2uistr // goto &nan;
 
-        exists($factors{'0'}) and return ZERO;
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_setbit($r, scalar grep { $factors{$_} == 1 } keys %factors);
+        Math::GMPz::Rmpz_setbit($r, scalar grep { $_->[1] == 1 } @factor_exp);
         bless \$r;
     }
 
@@ -13790,14 +13832,17 @@ package Sidef::Types::Number::Number {
             goto &squarefree_usigma0;
         }
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(1);
 
-        foreach my $p (grep { $factors{$_} == 1 } keys %factors) {
+        foreach my $pe (grep { $_->[1] == 1 } @factor_exp) {
+
+            my $p = $pe->[0];
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
@@ -13834,14 +13879,17 @@ package Sidef::Types::Number::Number {
             goto &usigma0;
         }
 
-        my %factors;
-        @factors{Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan)} = ();
-        exists($factors{'0'}) and return ZERO;
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(1);
 
-        foreach my $p (keys %factors) {
+        foreach my $pe (@factor_exp) {
+
+            my $p = $pe->[0];
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
@@ -13863,11 +13911,12 @@ package Sidef::Types::Number::Number {
         # Multiplicative with:
         #   a(p^e) = floor(e/2) + 1
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        my $n = &_big2uistr // goto &nan;
 
-        my $r = Math::Prime::Util::GMP::vecprod(map { ($_ >> 1) + 1 } values %factors);
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $r = Math::Prime::Util::GMP::vecprod(map { ($_->[1] >> 1) + 1 } @factor_exp);
         ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
@@ -13890,17 +13939,19 @@ package Sidef::Types::Number::Number {
             goto &square_sigma0;
         }
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(1);
 
-        foreach my $p (grep { $factors{$_} > 1 } keys %factors) {
+        foreach my $pe (grep { $_->[1] > 1 } @factor_exp) {
 
-            my $e = $factors{$p};
+            my ($p, $e) = @$pe;
+
             $e += 2 - ($e % 2);
 
             if ($p < ULONG_MAX) {
@@ -13929,12 +13980,13 @@ package Sidef::Types::Number::Number {
         #   a(p^e) = 2          # for even e
         #   a(p^e) = 1          # for odd e
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        my $n = &_big2uistr // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_setbit($r, scalar grep { $_ % 2 == 0 } values %factors);
+        Math::GMPz::Rmpz_setbit($r, scalar grep { $_->[1] % 2 == 0 } @factor_exp);
         return bless \$r;
     }
 
@@ -13957,16 +14009,17 @@ package Sidef::Types::Number::Number {
             goto &square_usigma0;
         }
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(1);
 
-        foreach my $p (grep { $factors{$_} % 2 == 0 } keys %factors) {
+        foreach my $pe (grep { $_->[1] % 2 == 0 } @factor_exp) {
 
-            my $e = $factors{$p};
+            my ($p, $e) = @$pe;
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e * $k);
@@ -14001,14 +14054,17 @@ package Sidef::Types::Number::Number {
             goto &prime_sigma0;
         }
 
-        my %factors;
-        @factors{Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan)} = ();
-        exists($factors{'0'}) and return ZERO;
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(0);
 
-        foreach my $p (keys %factors) {
+        foreach my $pe (@factor_exp) {
+
+            my $p = $pe->[0];
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
@@ -14026,11 +14082,12 @@ package Sidef::Types::Number::Number {
 
     sub prime_usigma0 {
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        my $n = &_big2uistr // goto &nan;
 
-        __PACKAGE__->_set_uint(scalar grep { $factors{$_} == 1 } keys %factors);
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        __PACKAGE__->_set_uint(scalar grep { $_->[1] == 1 } @factor_exp);
     }
 
     sub prime_usigma {
@@ -14052,16 +14109,17 @@ package Sidef::Types::Number::Number {
             goto &prime_usigma0;
         }
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan);
-        exists($factors{'0'}) and return ZERO;
+        $n = _big2uistr($n) // goto &nan;
 
-        my @factors = grep { $factors{$_} == 1 } keys %factors;
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
         my $t = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(0);
 
-        foreach my $p (@factors) {
+        foreach my $pe (grep { $_->[1] == 1 } @factor_exp) {
+
+            my $p = $pe->[0];
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
@@ -14144,8 +14202,9 @@ package Sidef::Types::Number::Number {
     *abundancy = \&abundancy_index;
 
     sub sopfr {    # https://oeis.org/A001414
-        my ($n) = @_;
-        my $s = Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::factor(_big2uistr($n) // goto &nan));
+        my $n = &_big2uistr // goto &nan;
+        my $s = Math::Prime::Util::GMP::vecsum(
+                    ($HAS_PRIME_UTIL and $n < ULONG_MAX) ? Math::Prime::Util::factor($n) : Math::Prime::Util::GMP::factor($n));
         ($s < ULONG_MAX) ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
     }
 
@@ -14154,14 +14213,15 @@ package Sidef::Types::Number::Number {
 
         $n = _big2pistr($n) // return Sidef::Types::Array::Array->new;
 
-        my %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor($n);
+        my @factor_exp = _factor_exp($n);
 
         my @array;
-        foreach my $key (sort { (CORE::length($a) <=> CORE::length($b)) || ($a cmp $b) } keys %factors) {
+        foreach my $pk (@factor_exp) {
 
-            my $p = ($key < ULONG_MAX) ? __PACKAGE__->_set_uint($key) : __PACKAGE__->_set_str('int', $key);
-            my $k = __PACKAGE__->_set_uint($factors{$key});
+            my ($p, $k) = @$pk;
+
+            $p = ($p < ULONG_MAX) ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
+            $k = __PACKAGE__->_set_uint($k);
 
             push @array, $block->run($p, $k);
         }
@@ -14462,24 +14522,26 @@ package Sidef::Types::Number::Number {
             $remainder = $r;
         }
 
-        my @factors = (
-                       ($HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($remainder))
-                       ? Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($remainder))
-                       : Math::Prime::Util::GMP::factor($remainder)
-                      );
+        #my @factors = (
+        #               ($HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($remainder))
+        #               ? Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($remainder))
+        #               : Math::Prime::Util::GMP::factor($remainder)
+        #              );
+
+        my @factors = _factor_exp(Math::GMPz::Rmpz_get_str($remainder, 10));
 
         $omega += scalar(@factors);
 
         $omega >= 3
           or return Sidef::Types::Bool::Bool::FALSE;
 
-        my %seen;
         state $pp1 = Math::GMPz::Rmpz_init_nobless();
 
         # Check the Lucas-Korselt criterion: p+1 | n+1, for all p|n.
-        foreach my $p (@factors) {
+        foreach my $pe (@factors) {
+            my ($p, $e) = @$pe;
 
-            if ($seen{$p}++) {    # not squarefree
+            if ($e > 1) {    # not squarefree
                 return Sidef::Types::Bool::Bool::FALSE;
             }
 
@@ -15263,11 +15325,10 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        undef %factors;
-        ++$factors{$_} for Math::Prime::Util::GMP::factor($rem);
+        my @factor_exp = _factor_exp(Math::GMPz::Rmpz_get_str($rem, 10));
 
-        foreach my $e (values %factors) {
-            $e < $k and return Sidef::Types::Bool::Bool::FALSE;
+        foreach my $pe (@factor_exp) {
+            $pe->[1] < $k and return Sidef::Types::Bool::Bool::FALSE;
         }
 
         return Sidef::Types::Bool::Bool::TRUE;
