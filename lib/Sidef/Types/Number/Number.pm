@@ -12181,9 +12181,7 @@ package Sidef::Types::Number::Number {
 
             return $d if ($s eq '0' or $s eq '1');
 
-            my @factor_exp = _factor_exp($n);
-
-            foreach my $pk (@factor_exp) {
+            foreach my $pk (_factor_exp($s)) {
                 my ($p, $k) = @$pk;
 
                 # a(n) = Sum_{p^k|n} (n*k)/p
@@ -12327,12 +12325,10 @@ package Sidef::Types::Number::Number {
 
     sub factor_exp {
 
-        my $n          = &_big2pistr // return Sidef::Types::Array::Array->new();
-        my @factor_exp = _factor_exp($n);
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my @pairs;
-
-        foreach my $pk (@factor_exp) {
+        foreach my $pk (_factor_exp($n)) {
 
             my ($p, $k) = @$pk;
 
@@ -12881,11 +12877,10 @@ package Sidef::Types::Number::Number {
 
     sub squarefree_divisors {
 
-        my $n          = &_big2pistr // return Sidef::Types::Array::Array->new();
-        my @factor_exp = _factor_exp($n);
+        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
         my @d;
-        foreach my $pe (@factor_exp) {
+        foreach my $pe (_factor_exp($n)) {
 
             my ($p, $e) = @$pe;
 
@@ -12917,10 +12912,8 @@ package Sidef::Types::Number::Number {
     sub square_divisors {
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
 
-        my @factor_exp = _factor_exp($n);
-
         my @d = ($ONE);
-        foreach my $pe (grep { $_->[1] > 1 } @factor_exp) {
+        foreach my $pe (grep { $_->[1] > 1 } _factor_exp($n)) {
 
             my ($p, $e) = @$pe;
 
@@ -14213,10 +14206,8 @@ package Sidef::Types::Number::Number {
 
         $n = _big2pistr($n) // return Sidef::Types::Array::Array->new;
 
-        my @factor_exp = _factor_exp($n);
-
         my @array;
-        foreach my $pk (@factor_exp) {
+        foreach my $pk (_factor_exp($n)) {
 
             my ($p, $k) = @$pk;
 
@@ -15325,9 +15316,7 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        my @factor_exp = _factor_exp(Math::GMPz::Rmpz_get_str($rem, 10));
-
-        foreach my $pe (@factor_exp) {
+        foreach my $pe (_factor_exp(Math::GMPz::Rmpz_get_str($rem, 10))) {
             $pe->[1] < $k and return Sidef::Types::Bool::Bool::FALSE;
         }
 
