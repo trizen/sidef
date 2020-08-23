@@ -780,9 +780,9 @@ package Sidef::Types::Number::Number {
             return Math::Prime::Util::factor_exp($n);
         }
 
-        (my @factors = Math::Prime::Util::GMP::factor($n)) || return;
+        my @factors = Math::Prime::Util::GMP::factor($n);
 
-        my $prev_value = shift(@factors);
+        my $prev_value = shift(@factors) // return;
         my @factor_exp = [$prev_value, 1];
 
         foreach my $curr_value (@factors) {
@@ -14512,12 +14512,6 @@ package Sidef::Types::Number::Number {
 
             $remainder = $r;
         }
-
-        #my @factors = (
-        #               ($HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($remainder))
-        #               ? Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($remainder))
-        #               : Math::Prime::Util::GMP::factor($remainder)
-        #              );
 
         my @factors = _factor_exp(Math::GMPz::Rmpz_get_str($remainder, 10));
 
