@@ -14494,6 +14494,61 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_imprimitive_carmichael {    # OEIS: A328935
+        my ($n) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_cmp_ui($n, 294409) >= 0 or return Sidef::Types::Bool::Bool::FALSE;
+
+        if ($HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($n)) {
+
+            $n = Math::GMPz::Rmpz_get_ui($n);
+            Math::Prime::Util::is_carmichael($n) || return Sidef::Types::Bool::Bool::FALSE;
+            my @factors = map { $_ - 1 } Math::Prime::Util::factor($n);
+
+            my $gcd = Math::Prime::Util::gcd(@factors);
+            my $lcm = Math::Prime::Util::lcm(@factors);
+
+            return (
+                    (($gcd * $gcd) > $lcm)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        Math::Prime::Util::GMP::is_carmichael($n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        my @factors = map { $$_ } @{(bless \$n)->miller_factor};
+        my @primes;
+
+        foreach my $k (@factors) {
+            if (Math::Prime::Util::GMP::is_prob_prime($k)) {
+                push @primes, $k;
+            }
+            else {
+                push @primes, Math::Prime::Util::GMP::factor($k);
+            }
+        }
+
+        @factors = map { Math::Prime::Util::GMP::subint($_, 1) } @primes;
+
+        my $gcd = Math::Prime::Util::GMP::gcd(@factors);
+        my $lcm = Math::Prime::Util::GMP::lcm(@factors);
+
+        state $x = Math::GMPz::Rmpz_init_nobless();
+        state $y = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_str($x, $gcd, 10);
+        Math::GMPz::Rmpz_set_str($y, $lcm, 10);
+
+        Math::GMPz::Rmpz_mul($x, $x, $x);
+
+        (Math::GMPz::Rmpz_cmp($x, $y) > 0)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_lucas_carmichael {    # OEIS: A006972
         my ($n) = @_;
 

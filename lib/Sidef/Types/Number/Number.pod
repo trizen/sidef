@@ -2406,6 +2406,14 @@ Return the
 
 =cut
 
+=head2 is_imprimitive_carmichael
+
+Number.is_imprimitive_carmichael() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_inf
 
 Number.is_inf() -> I<Obj>
@@ -3247,6 +3255,16 @@ Number.mfac() -> I<Obj>
 Return the
 
 Aliases: I<mfactorial>, I<multi_factorial>
+
+=cut
+
+=head2 miller_factor
+
+Number.miller_factor() -> I<Obj>
+
+Return the
+
+Aliases: I<miller_rabin_factor>
 
 =cut
 
