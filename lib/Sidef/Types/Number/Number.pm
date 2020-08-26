@@ -12490,6 +12490,63 @@ package Sidef::Types::Number::Number {
         );
     }
 
+    sub miller_factor {
+        my ($n, $tries) = @_;
+
+        _valid(\$tries) if defined($tries);
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+
+        my $D = $n - 1;
+        my $s = Math::GMPz::Rmpz_scan1($D, 0);
+        my $r = $s - 1;
+        my $d = $D >> $s;
+
+        if (defined($tries)) {
+            $tries = _any2ui($$tries) // 100;
+        }
+        else {
+            $tries = 100;
+            if ($s > 20 and $tries > 10) {
+                $tries = 10;
+            }
+        }
+
+        my $x = Math::GMPz::Rmpz_init();
+        my $g = Math::GMPz::Rmpz_init();
+
+        for (1 .. $tries) {
+
+            my $p = ($HAS_PRIME_UTIL ? Math::Prime::Util::random_prime(1e7) : Math::Prime::Util::GMP::random_prime(1e7));
+            Math::GMPz::Rmpz_powm($x, Math::GMPz::Rmpz_init_set_ui($p), $d, $n);
+
+            foreach my $k (0 .. $r) {
+
+                last if (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0);
+                last if (Math::GMPz::Rmpz_cmp($x, $D) == 0);
+
+                foreach my $i (1, -1) {
+                    Math::GMPz::Rmpz_gcd($g, $x + $i, $n);
+                    if (    Math::GMPz::Rmpz_cmp_ui($g, 1) > 0
+                        and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
+                        Math::GMPz::Rmpz_divexact($x, $n, $g);
+
+                        my @g_factors = Math::GMPz::Rmpz_probab_prime_p($g, 5) ? (bless \$g) : @{__SUB__->(bless \$g)};
+                        my @x_factors = Math::GMPz::Rmpz_probab_prime_p($x, 5) ? (bless \$x) : @{__SUB__->(bless \$x)};
+
+                        return Sidef::Types::Array::Array->new(
+                                                           [sort { Math::GMPz::Rmpz_cmp($$a, $$b) } (@g_factors, @x_factors)]);
+                    }
+                }
+
+                Math::GMPz::Rmpz_powm_ui($x, $x, 2, $n);
+            }
+        }
+
+        Sidef::Types::Array::Array->new([bless(\$n)]);
+    }
+
+    *miller_rabin_factor = \&miller_factor;
+
     sub fermat_factor {
         my ($n, $k) = @_;
         _valid(\$k) if defined($k);
@@ -14419,20 +14476,20 @@ package Sidef::Types::Number::Number {
     }
 
     sub is_cyclic {     # OEIS: A003277
-        my ($x) = @_;
+        my ($n) = @_;
 
-        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
-        $x = _big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE;
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        (Math::Prime::Util::GMP::gcd(Math::Prime::Util::GMP::totient($x), $x) == 1)
+        (Math::Prime::Util::GMP::gcd(Math::Prime::Util::GMP::totient($n), $n) == 1)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub is_carmichael {    # OEIS: A002997
-        my ($x) = @_;
-        __is_int__($$x)
-          && Math::Prime::Util::GMP::is_carmichael(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
+        my ($n) = @_;
+        __is_int__($$n)
+          && Math::Prime::Util::GMP::is_carmichael(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
