@@ -12490,33 +12490,40 @@ package Sidef::Types::Number::Number {
         );
     }
 
-    sub miller_factor {
+    sub _miller_factor {
         my ($n, $tries) = @_;
 
-        _valid(\$tries) if defined($tries);
-        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        # $n is a Math::GMPz object holding a positive value
+        # $tries is a positive native integer or `undef`
 
-        my $D = $n - 1;
-        my $s = Math::GMPz::Rmpz_scan1($D, 0);
+        if ($HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($n));
+        }
+
+        my $D = Math::GMPz::Rmpz_init();    # n-1
+        Math::GMPz::Rmpz_sub_ui($D, $n, 1);
+
+        my $s = Math::GMPz::Rmpz_scan1($D, 0) || return ($n);
         my $r = $s - 1;
-        my $d = $D >> $s;
 
-        if (defined($tries)) {
-            $tries = _any2ui($$tries) // 100;
-        }
-        else {
-            $tries = 100;
-            if ($s > 20 and $tries > 10) {
-                $tries = 10;
-            }
-        }
+        my $d = Math::GMPz::Rmpz_init();    # D >> s
+        Math::GMPz::Rmpz_div_2exp($d, $D, $s);
+
+        $tries //= 1 + CORE::int(200 / $s);
 
         my $x = Math::GMPz::Rmpz_init();
         my $g = Math::GMPz::Rmpz_init();
 
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
         for (1 .. $tries) {
 
-            my $p = ($HAS_PRIME_UTIL ? Math::Prime::Util::random_prime(1e7) : Math::Prime::Util::GMP::random_prime(1e7));
+            my $p = (
+                     $HAS_PRIME_UTIL
+                     ? Math::Prime::Util::random_prime(1e7)
+                     : Math::Prime::Util::GMP::random_prime(1e7)
+                    );
+
             Math::GMPz::Rmpz_powm($x, Math::GMPz::Rmpz_init_set_ui($p), $d, $n);
 
             foreach my $k (0 .. $r) {
@@ -12525,16 +12532,21 @@ package Sidef::Types::Number::Number {
                 last if (Math::GMPz::Rmpz_cmp($x, $D) == 0);
 
                 foreach my $i (1, -1) {
-                    Math::GMPz::Rmpz_gcd($g, $x + $i, $n);
-                    if (    Math::GMPz::Rmpz_cmp_ui($g, 1) > 0
-                        and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
+
+                    ($i < 0)
+                      ? Math::GMPz::Rmpz_sub_ui($t, $x, -$i)
+                      : Math::GMPz::Rmpz_add_ui($t, $x, +$i);
+
+                    Math::GMPz::Rmpz_gcd($g, $t, $n);
+
+                    if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
+
                         Math::GMPz::Rmpz_divexact($x, $n, $g);
 
-                        my @g_factors = Math::GMPz::Rmpz_probab_prime_p($g, 5) ? (bless \$g) : @{__SUB__->(bless \$g)};
-                        my @x_factors = Math::GMPz::Rmpz_probab_prime_p($x, 5) ? (bless \$x) : @{__SUB__->(bless \$x)};
+                        my @g_factors = (Math::GMPz::Rmpz_probab_prime_p($g, 5) ? $g : __SUB__->($g));
+                        my @x_factors = (Math::GMPz::Rmpz_probab_prime_p($x, 5) ? $x : __SUB__->($x));
 
-                        return Sidef::Types::Array::Array->new(
-                                                           [sort { Math::GMPz::Rmpz_cmp($$a, $$b) } (@g_factors, @x_factors)]);
+                        return (@g_factors, @x_factors);
                     }
                 }
 
@@ -12542,10 +12554,124 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        Sidef::Types::Array::Array->new([bless(\$n)]);
+        return ($n);
+    }
+
+    sub miller_factor {
+        my ($n, $tries) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Array::Array->new();
+
+        if (defined($tries)) {
+            _valid(\$tries);
+            $tries = _any2ui($$tries) // undef;
+        }
+
+        my @factors = map { ref($_) ? $_ : Math::GMPz::Rmpz_init_set_ui($_) } _miller_factor($n, $tries);
+        @factors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @factors;
+        @factors = map  { bless \$_ } @factors;
+
+        Sidef::Types::Array::Array->new(\@factors);
     }
 
     *miller_rabin_factor = \&miller_factor;
+
+    sub _lucas_factor {
+        my ($n, $j, $tries) = @_;
+
+        # $n is a Math::GMPz object holding a positive value
+        # $j is a signed native integer or `undef`
+        # $tries is an unsigned native integer or `undef`
+
+        if ($HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($n));
+        }
+
+        $j //= 1;
+
+        my $D = Math::GMPz::Rmpz_init();    # n + j
+
+        ($j < 0)
+          ? Math::GMPz::Rmpz_sub_ui($D, $n, -$j)
+          : Math::GMPz::Rmpz_add_ui($D, $n, +$j);
+
+        my $s = Math::GMPz::Rmpz_scan1($D, 0) || return ($n);
+        my $r = $s;
+
+        my $d = Math::GMPz::Rmpz_init();    # D >> s
+        Math::GMPz::Rmpz_div_2exp($d, $D, $s);
+
+        $tries //= 1 + CORE::int(100 / $s);
+
+        my $x = Math::GMPz::Rmpz_init();
+        my $g = Math::GMPz::Rmpz_init();
+
+        my $PQ_limit = 1e6;
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1e6) <= 0) {
+            $PQ_limit = Math::GMPz::Rmpz_get_ui($n) - 1;
+        }
+
+        foreach my $i (1 .. $tries) {
+
+            my $P = 1 + CORE::int(CORE::rand($PQ_limit));
+            my $Q = 1 + CORE::int(CORE::rand($PQ_limit));
+
+            $Q *= -1 if (CORE::rand(1) < 0.5);
+
+            next if Math::Prime::Util::GMP::is_square($P * $P - 4 * $Q);
+
+            Math::GMPz::Rmpz_set($x, $d);
+
+            foreach my $k (0 .. $r) {
+
+                my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $x);
+
+                foreach my $t ($U, $V, Math::Prime::Util::GMP::subint($V, $P)) {
+                    Math::GMPz::Rmpz_set_str($g, $t, 10);
+                    Math::GMPz::Rmpz_gcd($g, $g, $n);
+                    if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
+                        Math::GMPz::Rmpz_divexact($x, $n, $g);
+#<<<
+                        my @g_factors = (Math::GMPz::Rmpz_probab_prime_p($g, 5) ? $g : __SUB__->($g, [-1, +1]->[CORE::int(CORE::rand(2))]));
+                        my @x_factors = (Math::GMPz::Rmpz_probab_prime_p($x, 5) ? $x : __SUB__->($x, [-1, +1]->[CORE::int(CORE::rand(2))]));
+#>>>
+                        return (@g_factors, @x_factors);
+                    }
+                }
+
+                Math::GMPz::Rmpz_mul_2exp($x, $x, 1);
+            }
+        }
+
+        return ($n);
+    }
+
+    sub lucas_factor {
+        my ($n, $j, $tries) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Array::Array->new();
+
+        if (defined($j)) {
+            _valid(\$j);
+            $j = _any2si($$j) // undef;
+        }
+
+        if (defined($tries)) {
+            _valid(\$tries);
+            $tries = _any2ui($$tries) // undef;
+        }
+
+        my @factors = map { ref($_) ? $_ : Math::GMPz::Rmpz_init_set_ui($_) } _lucas_factor($n, $tries);
+        @factors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @factors;
+        @factors = map  { bless \$_ } @factors;
+
+        Sidef::Types::Array::Array->new(\@factors);
+    }
+
+    *lucas_miller_factor = \&lucas_factor;
 
     sub fermat_factor {
         my ($n, $k) = @_;
@@ -14519,7 +14645,7 @@ package Sidef::Types::Number::Number {
 
         Math::Prime::Util::GMP::is_carmichael($n) || return Sidef::Types::Bool::Bool::FALSE;
 
-        my @factors = map { $$_ } @{(bless \$n)->miller_factor};
+        my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($n);
         my @primes;
 
         foreach my $k (@factors) {

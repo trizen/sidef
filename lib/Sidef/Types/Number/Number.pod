@@ -3156,6 +3156,16 @@ Return the
 
 =cut
 
+=head2 lucas_factor
+
+Number.lucas_factor() -> I<Obj>
+
+Return the
+
+Aliases: I<lucas_miller_factor>
+
+=cut
+
 =head2 lucas_mod
 
 Number.lucas_mod() -> I<Obj>
