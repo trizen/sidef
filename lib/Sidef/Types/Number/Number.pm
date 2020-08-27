@@ -12514,8 +12514,6 @@ package Sidef::Types::Number::Number {
         my $x = Math::GMPz::Rmpz_init();
         my $g = Math::GMPz::Rmpz_init();
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-
         for (1 .. $tries) {
 
             my $p = (
@@ -12524,7 +12522,8 @@ package Sidef::Types::Number::Number {
                      : Math::Prime::Util::GMP::random_prime(1e7)
                     );
 
-            Math::GMPz::Rmpz_powm($x, Math::GMPz::Rmpz_init_set_ui($p), $d, $n);
+            Math::GMPz::Rmpz_set_ui($g, $p);
+            Math::GMPz::Rmpz_powm($x, $g, $d, $n);
 
             foreach my $k (0 .. $r) {
 
@@ -12534,10 +12533,10 @@ package Sidef::Types::Number::Number {
                 foreach my $i (1, -1) {
 
                     ($i < 0)
-                      ? Math::GMPz::Rmpz_sub_ui($t, $x, -$i)
-                      : Math::GMPz::Rmpz_add_ui($t, $x, +$i);
+                      ? Math::GMPz::Rmpz_sub_ui($g, $x, -$i)
+                      : Math::GMPz::Rmpz_add_ui($g, $x, +$i);
 
-                    Math::GMPz::Rmpz_gcd($g, $t, $n);
+                    Math::GMPz::Rmpz_gcd($g, $g, $n);
 
                     if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
 
@@ -12620,7 +12619,14 @@ package Sidef::Types::Number::Number {
 
             $Q *= -1 if (CORE::rand(1) < 0.5);
 
-            next if Math::Prime::Util::GMP::is_square($P * $P - 4 * $Q);
+            my $delta = $P * $P - 4 * $Q;
+
+            if ($HAS_PRIME_UTIL) {
+                next if Math::Prime::Util::is_square($delta);
+            }
+            else {
+                next if Math::Prime::Util::GMP::is_square($delta);
+            }
 
             Math::GMPz::Rmpz_set($x, $d);
 
@@ -14751,20 +14757,20 @@ package Sidef::Types::Number::Number {
             $remainder = $r;
         }
 
-        my @factors = _factor_exp(Math::GMPz::Rmpz_get_str($remainder, 10));
+        my @factors = map { Math::Prime::Util::GMP::factor($_) } _lucas_factor($remainder);
 
         $omega += scalar(@factors);
 
         $omega >= 3
           or return Sidef::Types::Bool::Bool::FALSE;
 
+        my %seen;
         state $pp1 = Math::GMPz::Rmpz_init_nobless();
 
         # Check the Lucas-Korselt criterion: p+1 | n+1, for all p|n.
-        foreach my $pe (@factors) {
-            my ($p, $e) = @$pe;
+        foreach my $p (@factors) {
 
-            if ($e > 1) {    # not squarefree
+            if ($seen{$p}++) {    # not squarefree
                 return Sidef::Types::Bool::Bool::FALSE;
             }
 
