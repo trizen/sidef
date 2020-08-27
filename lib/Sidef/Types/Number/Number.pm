@@ -11373,7 +11373,7 @@ package Sidef::Types::Number::Number {
         };
 
         if (!Math::GMPz::Rmpz_fits_ulong_p($z)) {
-            foreach my $trial_limit (1e4, 1e6) {
+            foreach my $trial_limit (1e4) {
 
                 my ($rem, @factors) = _native_trial_factor($z, $trial_limit);
 
@@ -11392,11 +11392,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my @factors = (
-                       ($HAS_PRIME_UTIL and $n < ULONG_MAX)
-                       ? Math::Prime::Util::factor($n)
-                       : Math::Prime::Util::GMP::factor($n)
-                      );
+        my @factors = map { Math::Prime::Util::GMP::factor($_) } _miller_factor($z);
 
         $check_conditions->(\@factors)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -11465,7 +11461,7 @@ package Sidef::Types::Number::Number {
         };
 
         if (!Math::GMPz::Rmpz_fits_ulong_p($z)) {
-            foreach my $trial_limit (1e4, 1e6) {
+            foreach my $trial_limit (1e4) {
 
                 my ($rem, @factors) = _native_trial_factor($z, $trial_limit);
 
@@ -11484,11 +11480,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my @factors = (
-                       ($HAS_PRIME_UTIL and $n < ULONG_MAX)
-                       ? Math::Prime::Util::factor($n)
-                       : Math::Prime::Util::GMP::factor($n)
-                      );
+        my @factors = map { Math::Prime::Util::GMP::factor($_) } _miller_factor($z);
 
         $check_conditions->(\@factors)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -14651,19 +14643,9 @@ package Sidef::Types::Number::Number {
 
         Math::Prime::Util::GMP::is_carmichael($n) || return Sidef::Types::Bool::Bool::FALSE;
 
-        my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($n);
-        my @primes;
-
-        foreach my $k (@factors) {
-            if (Math::Prime::Util::GMP::is_prob_prime($k)) {
-                push @primes, $k;
-            }
-            else {
-                push @primes, Math::Prime::Util::GMP::factor($k);
-            }
-        }
-
-        @factors = map { Math::Prime::Util::GMP::subint($_, 1) } @primes;
+        my @factors =
+          map { Math::Prime::Util::GMP::subint($_, 1) }
+          map { Math::Prime::Util::GMP::factor($_) } _miller_factor($n);
 
         my $gcd = Math::Prime::Util::GMP::gcd(@factors);
         my $lcm = Math::Prime::Util::GMP::lcm(@factors);
