@@ -11372,7 +11372,7 @@ package Sidef::Types::Number::Number {
             return 1;
         };
 
-        my @factors = _miller_factor($z);
+        my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($z);
 
         if (scalar(@factors) > 1 and !Math::GMPz::Rmpz_fits_ulong_p($z)) {
 
@@ -11463,7 +11463,7 @@ package Sidef::Types::Number::Number {
             return 1;
         };
 
-        my @factors = _miller_factor($z);
+        my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($z);
 
         if (scalar(@factors) > 1 and !Math::GMPz::Rmpz_fits_ulong_p($z)) {
 
