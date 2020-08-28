@@ -11372,27 +11372,30 @@ package Sidef::Types::Number::Number {
             return 1;
         };
 
-        if (!Math::GMPz::Rmpz_fits_ulong_p($z)) {
-            foreach my $trial_limit (1e4) {
+        my @factors = _miller_factor($z);
 
-                my ($rem, @factors) = _native_trial_factor($z, $trial_limit);
+        if (scalar(@factors) > 1 and !Math::GMPz::Rmpz_fits_ulong_p($z)) {
 
-                @factors || next;
-                $check_conditions->(\@factors)
+            my @primes = grep { Math::Prime::Util::GMP::is_prob_prime($_) } @factors;
+
+            if (@primes) {
+                $check_conditions->(\@primes)
                   || return Sidef::Types::Bool::Bool::FALSE;
+            }
 
-                if (Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) {
-                    return Sidef::Types::Bool::Bool::TRUE;
-                }
+            if (scalar(@primes) == scalar(@factors)) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
 
-                foreach my $base (@bases) {
-                    Math::Prime::Util::GMP::powmod($base, $rem, $n) eq $base
+            foreach my $base (@bases) {
+                foreach my $factor (@factors) {
+                    Math::Prime::Util::GMP::powmod($base, $factor, $n) eq $base
                       or return Sidef::Types::Bool::Bool::FALSE;
                 }
             }
         }
 
-        my @factors = map { Math::Prime::Util::GMP::factor($_) } _miller_factor($z);
+        @factors = map { Math::Prime::Util::GMP::factor($_) } @factors;
 
         $check_conditions->(\@factors)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -11460,27 +11463,30 @@ package Sidef::Types::Number::Number {
             return 1;
         };
 
-        if (!Math::GMPz::Rmpz_fits_ulong_p($z)) {
-            foreach my $trial_limit (1e4) {
+        my @factors = _miller_factor($z);
 
-                my ($rem, @factors) = _native_trial_factor($z, $trial_limit);
+        if (scalar(@factors) > 1 and !Math::GMPz::Rmpz_fits_ulong_p($z)) {
 
-                @factors || next;
-                $check_conditions->(\@factors)
+            my @primes = grep { Math::Prime::Util::GMP::is_prob_prime($_) } @factors;
+
+            if (@primes) {
+                $check_conditions->(\@primes)
                   || return Sidef::Types::Bool::Bool::FALSE;
+            }
 
-                if (Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) {
-                    return Sidef::Types::Bool::Bool::TRUE;
-                }
+            if (scalar(@primes) == scalar(@factors)) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
 
-                foreach my $base (@bases) {
-                    Math::Prime::Util::GMP::powmod($base, $rem, $n) eq $base
+            foreach my $base (@bases) {
+                foreach my $factor (@factors) {
+                    Math::Prime::Util::GMP::powmod($base, $factor, $n) eq $base
                       or return Sidef::Types::Bool::Bool::FALSE;
                 }
             }
         }
 
-        my @factors = map { Math::Prime::Util::GMP::factor($_) } _miller_factor($z);
+        @factors = map { Math::Prime::Util::GMP::factor($_) } @factors;
 
         $check_conditions->(\@factors)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -14710,10 +14716,9 @@ package Sidef::Types::Number::Number {
             my $size        = Math::GMPz::Rmpz_sizeinbase($n, 10);
 
 #<<<
-            if    ($size > 70) { $trial_limit = 1e7 }
-            elsif ($size > 60) { $trial_limit = 1e6 }
-            elsif ($size > 50) { $trial_limit = 1e5 }
-            elsif ($size > 30) { $trial_limit = 1e4 }
+               if ($size > 65) { $trial_limit = 1e6 }
+            elsif ($size > 55) { $trial_limit = 1e5 }
+            elsif ($size > 35) { $trial_limit = 1e4 }
 #>>>
 
             my ($r, @factors) = _native_trial_factor($n, $trial_limit);
