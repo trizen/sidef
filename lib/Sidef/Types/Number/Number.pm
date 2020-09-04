@@ -835,7 +835,7 @@ package Sidef::Types::Number::Number {
 
         if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
 
-            my $t = Math::GMPz::Rmpz_init_set($n);
+            my $r = Math::GMPz::Rmpz_init_set($n);
 
             my @factors = (
                            ($HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($g))
@@ -843,13 +843,13 @@ package Sidef::Types::Number::Number {
                            : Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($g, 10))
                           );
 
-            my @return;
+            my @prime_factors;
             foreach my $f (@factors) {
                 Math::GMPz::Rmpz_set_ui($g, $f);
-                push @return, ($f) x Math::GMPz::Rmpz_remove($t, $t, $g);
+                push @prime_factors, ($f) x Math::GMPz::Rmpz_remove($r, $r, $g);
             }
 
-            return ($t, @return);
+            return ($r, @prime_factors);
         }
 
         return ($n);
@@ -871,6 +871,7 @@ package Sidef::Types::Number::Number {
             @factors || last;
             push @prime_factors, @factors;
             $n = $r;
+            last if Math::GMPz::Rmpz_fits_ulong_p($n);
         }
 
         return ($n, @prime_factors);
@@ -11235,18 +11236,19 @@ package Sidef::Types::Number::Number {
         $size = 1 + CORE::int($size / 3.322);
 
         if ($size > 30) {
-
-            my $trial_limit = 1e3;
-
-#<<<
-               if ($size > 60) { $trial_limit = 1e6 }
-            elsif ($size > 50) { $trial_limit = 1e5 }
-            elsif ($size > 40) { $trial_limit = 1e4 }
-#>>>
-
-            my ($r, @factors) = _native_trial_factor($n, $trial_limit);
+            my ($r, @factors) = _adaptive_trial_factor($n);
 
             $omega += scalar(@factors);
+
+            if ($omega == $k) {
+                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+                else {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+            }
+
             $remainder = $r;
         }
 
