@@ -855,6 +855,27 @@ package Sidef::Types::Number::Number {
         return ($n);
     }
 
+    sub _adaptive_trial_factor {
+        my ($n) = @_;
+
+        my @limits = (5e4);
+        my $size   = Math::GMPz::Rmpz_sizeinbase($n, 10);
+
+        if ($size > 55) { push @limits, 5e5 }
+        if ($size > 65) { push @limits, 5e6 }
+
+        my @prime_factors;
+
+        foreach my $trial_limit (@limits) {
+            my ($r, @factors) = _native_trial_factor($n, $trial_limit);
+            @factors || last;
+            push @prime_factors, @factors;
+            $n = $r;
+        }
+
+        return ($n, @prime_factors);
+    }
+
     #
     ## Binary splitting
     #
@@ -11374,7 +11395,7 @@ package Sidef::Types::Number::Number {
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($z);
 
-        if (scalar(@factors) > 1 and !Math::GMPz::Rmpz_fits_ulong_p($z)) {
+        if (scalar(@factors) > 1) {
 
             my @primes = grep { Math::Prime::Util::GMP::is_prob_prime($_) } @factors;
 
@@ -11465,7 +11486,7 @@ package Sidef::Types::Number::Number {
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($z);
 
-        if (scalar(@factors) > 1 and !Math::GMPz::Rmpz_fits_ulong_p($z)) {
+        if (scalar(@factors) > 1) {
 
             my @primes = grep { Math::Prime::Util::GMP::is_prob_prime($_) } @factors;
 
@@ -14683,7 +14704,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 399) < 0 and return Sidef::Types::Bool::Bool::FALSE;
         Math::GMPz::Rmpz_odd_p($n) or return Sidef::Types::Bool::Bool::FALSE;
 
-        # Divisible by small square
+        # Divisible by a small square
         foreach my $p (3, 5, 7, 11) {
             if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
                 return Sidef::Types::Bool::Bool::FALSE;
@@ -14704,76 +14725,81 @@ package Sidef::Types::Number::Number {
         # }
 
         state $np1 = Math::GMPz::Rmpz_init_nobless();
+        state $pp1 = Math::GMPz::Rmpz_init_nobless();
+
         Math::GMPz::Rmpz_add_ui($np1, $n, 1);
+
+        my $check_conditions = sub {
+            my ($factors) = @_;
+
+            my %seen;
+            foreach my $p (@$factors) {
+
+                # Check the Lucas-Korselt criterion: p+1 | n+1, for all p|n.
+                if ($p < ULONG_MAX) {
+                    Math::GMPz::Rmpz_divisible_ui_p($np1, $p + 1) || return;
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($pp1, $p, 10);
+                    Math::GMPz::Rmpz_add_ui($pp1, $pp1, 1);
+                    Math::GMPz::Rmpz_divisible_p($np1, $pp1) || return;
+                }
+
+                if ($seen{$p}++) {    # not squarefree
+                    return;
+                }
+            }
+
+            return 1;
+        };
 
         my $omega     = 0;
         my $remainder = $n;
 
-        # Check the Lucas-Korselt criterion: p+1 | n+1, for small p|n.
         if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
 
-            my $trial_limit = 1e3;
-            my $size        = Math::GMPz::Rmpz_sizeinbase($n, 10);
+            my ($r, @factors) = _adaptive_trial_factor($n);
 
-#<<<
-               if ($size > 65) { $trial_limit = 1e6 }
-            elsif ($size > 55) { $trial_limit = 1e5 }
-            elsif ($size > 35) { $trial_limit = 1e4 }
-#>>>
+            if (@factors) {
 
-            my ($r, @factors) = _native_trial_factor($n, $trial_limit);
+                $check_conditions->(\@factors)
+                  || return Sidef::Types::Bool::Bool::FALSE;
 
-            $omega += scalar(@factors);
-
-            my %seen;
-            foreach my $p (@factors) {
-                my $pp1 = $p + 1;
-
-                if ($seen{$p}++) {    # not squarefree
-                    return Sidef::Types::Bool::Bool::FALSE;
+                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+                    return Sidef::Types::Bool::Bool::TRUE;
                 }
 
-                Math::GMPz::Rmpz_divisible_ui_p($np1, $pp1)
+                $omega += scalar(@factors);
+                $remainder = $r;
+            }
+        }
+
+        my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _lucas_factor($remainder);
+
+        if (scalar(@factors) > 1) {
+
+            my @primes = grep { Math::Prime::Util::GMP::is_prob_prime($_) } @factors;
+
+            if (@primes) {
+                $check_conditions->(\@primes)
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
 
-            if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+            if (scalar(@primes) == scalar(@factors)) {
                 return Sidef::Types::Bool::Bool::TRUE;
             }
-
-            $remainder = $r;
         }
 
-        my @factors = map { Math::Prime::Util::GMP::factor($_) } _lucas_factor($remainder);
+        @factors = map { Math::Prime::Util::GMP::factor($_) } @factors;
 
         $omega += scalar(@factors);
 
         $omega >= 3
           or return Sidef::Types::Bool::Bool::FALSE;
 
-        my %seen;
-        state $pp1 = Math::GMPz::Rmpz_init_nobless();
-
-        # Check the Lucas-Korselt criterion: p+1 | n+1, for all p|n.
-        foreach my $p (@factors) {
-
-            if ($seen{$p}++) {    # not squarefree
-                return Sidef::Types::Bool::Bool::FALSE;
-            }
-
-            if ($p < ULONG_MAX) {
-                Math::GMPz::Rmpz_divisible_ui_p($np1, $p + 1)
-                  || return Sidef::Types::Bool::Bool::FALSE;
-            }
-            else {
-                Math::GMPz::Rmpz_set_str($pp1, $p, 10);
-                Math::GMPz::Rmpz_add_ui($pp1, $pp1, 1);
-                Math::GMPz::Rmpz_divisible_p($np1, $pp1)
-                  || return Sidef::Types::Bool::Bool::FALSE;
-            }
-        }
-
-        return Sidef::Types::Bool::Bool::TRUE;
+        $check_conditions->(\@factors)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub is_fundamental {
