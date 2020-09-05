@@ -594,6 +594,14 @@ Inverse hyperbolic cosecant of C<n>.
 
 =cut
 
+=head2 addmod
+
+Number.addmod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 agm
 
     agm(a, b)
@@ -3318,6 +3326,14 @@ Return the
 
 =cut
 
+=head2 mulmod
+
+Number.mulmod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 multinomial
 
 Number.multinomial() -> I<Obj>
@@ -4435,6 +4451,14 @@ Return the
 =head2 subfactorial
 
 Number.subfactorial() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 submod
+
+Number.submod() -> I<Obj>
 
 Return the
 

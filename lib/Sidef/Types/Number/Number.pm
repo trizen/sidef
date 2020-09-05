@@ -2070,6 +2070,53 @@ package Sidef::Types::Number::Number {
         bless \__div__($$x, $$y);
     }
 
+    # Modular operations
+
+    sub addmod {
+        my ($x, $y, $m) = @_;
+
+        _valid(\$y, \$m);
+
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add($r, $x, $y);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        bless \$r;
+    }
+
+    sub submod {
+        my ($x, $y, $m) = @_;
+
+        _valid(\$y, \$m);
+
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub($r, $x, $y);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        bless \$r;
+    }
+
+    sub mulmod {
+        my ($x, $y, $m) = @_;
+
+        _valid(\$y, \$m);
+
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $x, $y);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        bless \$r;
+    }
+
     #
     ## Integer operations
     #
@@ -7567,7 +7614,28 @@ package Sidef::Types::Number::Number {
     }
 
     sub divmod {
-        my ($x, $y) = @_;
+        my ($x, $y, $m) = @_;
+
+        if (defined($m)) {    # modular division
+
+            _valid(\$y, \$m);
+
+            $x = _any2mpz($$x) // goto &nan;
+            $y = _any2mpz($$y) // goto &nan;
+            $m = _any2mpz($$m) // goto &nan;
+
+            my $r = Math::GMPz::Rmpz_init();
+
+            if (Math::GMPz::Rmpz_invert($r, $y, $m)) {
+                Math::GMPz::Rmpz_mul($r, $r, $x);
+                Math::GMPz::Rmpz_mod($r, $r, $m);
+            }
+            else {
+                goto &nan;
+            }
+
+            return bless \$r;
+        }
 
         _valid(\$y);
 
@@ -8880,8 +8948,8 @@ package Sidef::Types::Number::Number {
         ## (-b ± sqrt(b^2 - 4ac)) / (2a)
         #
 
-        my $u = __mul__($y,              $y);       # b^2
-        my $t = __mul__(__mul__($x, $z), $FOUR);    # 4ac
+        my $u = __mul__($y,              $y);                # b^2
+        my $t = __mul__(__mul__($x, $z), $FOUR);             # 4ac
         my $s = __sqrt__(_any2mpfr_mpc(__sub__($u, $t)));    # sqrt(b^2 - 4ac)
 
         my $n1 = __sub__($s, $y);                            #   sqrt(b^2 - 4ac) - b
@@ -8915,8 +8983,8 @@ package Sidef::Types::Number::Number {
         my $u = Math::GMPz::Rmpz_init();
         my $t = Math::GMPz::Rmpz_init();
 
-        Math::GMPz::Rmpz_mul($t, $y, $y);    # b^2
-        Math::GMPz::Rmpz_mul($u, $x, $z);    # ac
+        Math::GMPz::Rmpz_mul($t, $y, $y);        # b^2
+        Math::GMPz::Rmpz_mul($u, $x, $z);        # ac
         Math::GMPz::Rmpz_mul_2exp($u, $u, 2);    # 4ac
 
         Math::GMPz::Rmpz_sub($t, $t, $u);        # b^2 - 4ac
@@ -10837,7 +10905,7 @@ package Sidef::Types::Number::Number {
 
     sub random_safe_prime {
         my ($bits) = @_;
-        my $prime = Math::Prime::Util::GMP::random_safe_prime(_big2uistr($bits) // (goto &nan));
+        my $prime  = Math::Prime::Util::GMP::random_safe_prime(_big2uistr($bits) // (goto &nan));
         __PACKAGE__->_set_str('int', $prime // goto &nan);
     }
 
@@ -11324,11 +11392,17 @@ package Sidef::Types::Number::Number {
 
     sub miller_rabin_random {
         my ($n, $k) = @_;
-        _valid(\$k);
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // 1;
+        }
+        else {
+            $k = 1;
+        }
 
         __is_int__($$n)
-          && Math::Prime::Util::GMP::miller_rabin_random(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
-                                                         _any2ui($$k) // 20)
+          && Math::Prime::Util::GMP::miller_rabin_random(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE), $k)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -12773,9 +12847,9 @@ package Sidef::Types::Number::Number {
                    ? __PACKAGE__->_set_uint($_)
                    : __PACKAGE__->_set_str('int', $_)
              } Math::Prime::Util::GMP::ecm_factor(
-                 _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                 (defined($B1)     ? _big2uistr($B1)     // () : ()),    # B1
-                 (defined($curves) ? _big2uistr($curves) // () : ()),    # number of curves
+                                                    _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
+                                                    (defined($B1)     ? _big2uistr($B1)     // () : ()),    # B1
+                                                    (defined($curves) ? _big2uistr($curves) // () : ()),    # number of curves
                                                  )
             ]
         );
