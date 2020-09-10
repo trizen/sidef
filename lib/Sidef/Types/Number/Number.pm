@@ -11260,7 +11260,7 @@ package Sidef::Types::Number::Number {
 
         (   Math::Prime::Util::GMP::is_strong_pseudoprime($t, 2)
          && Math::Prime::Util::GMP::is_strong_pseudoprime($n, 2)
-         && Math::Prime::Util::GMP::is_strong_lucas_pseudoprime($t))
+         && Math::Prime::Util::GMP::is_extra_strong_lucas_pseudoprime($t))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -11450,7 +11450,6 @@ package Sidef::Types::Number::Number {
             my ($factors) = @_;
 
             # Using Thomas Ordowski's criterion from A050217.
-
 #<<<
             my $gcd = Math::Prime::Util::GMP::gcd(
                 map {
@@ -14715,8 +14714,110 @@ package Sidef::Types::Number::Number {
 
     sub is_carmichael {    # OEIS: A002997
         my ($n) = @_;
-        __is_int__($$n)
-          && Math::Prime::Util::GMP::is_carmichael(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
+
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        # Small or even
+        Math::GMPz::Rmpz_cmp_ui($n, 561) < 0 and return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_odd_p($n) or return Sidef::Types::Bool::Bool::FALSE;
+
+        # If small enough, Math::Prime::Util::GMP::is_carmichael() is slighly faster.
+        # If large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
+        if (Math::GMPz::Rmpz_fits_ulong_p($n) or Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
+            return (
+                    Math::Prime::Util::GMP::is_carmichael(Math::GMPz::Rmpz_get_str($n, 10))
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        # Divisible by a small square
+        foreach my $p (3, 5, 7, 11) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        state $nm1 = Math::GMPz::Rmpz_init_nobless();
+        state $pm1 = Math::GMPz::Rmpz_init_nobless();
+
+        # Must be a Fermat pseudoprime to base 2.
+        Math::GMPz::Rmpz_sub_ui($nm1, $n, 1);
+        Math::GMPz::Rmpz_powm($pm1, $TWO, $nm1, $n);
+        Math::GMPz::Rmpz_cmp_ui($pm1, 1) == 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        my $check_conditions = sub {
+            my ($factors) = @_;
+
+            my %seen;
+            foreach my $p (@$factors) {
+
+                # Check the Korselt criterion: p-1 | n-1, for all prime p|n.
+                if ($p < ULONG_MAX) {
+                    Math::GMPz::Rmpz_divisible_ui_p($nm1, $p - 1) || return;
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($pm1, $p, 10);
+                    Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
+                    Math::GMPz::Rmpz_divisible_p($nm1, $pm1) || return;
+                }
+
+                if ($seen{$p}++) {    # not squarefree
+                    return;
+                }
+            }
+
+            return 1;
+        };
+
+        my $omega     = 0;
+        my $remainder = $n;
+
+        if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
+
+            my ($r, @factors) = _adaptive_trial_factor($n);
+
+            if (@factors) {
+
+                $check_conditions->(\@factors)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+
+                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+
+                $omega += scalar(@factors);
+                $remainder = $r;
+            }
+        }
+
+        my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($remainder);
+
+        if (scalar(@factors) > 1) {
+
+            my @primes = grep { Math::Prime::Util::GMP::is_prob_prime($_) } @factors;
+
+            if (@primes) {
+                $check_conditions->(\@primes)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if (scalar(@primes) == scalar(@factors)) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+        }
+
+        @factors = map { Math::Prime::Util::GMP::factor($_) } @factors;
+
+        $omega += scalar(@factors);
+
+        ($omega >= 3 and $check_conditions->(\@factors))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -14724,8 +14825,13 @@ package Sidef::Types::Number::Number {
     sub is_imprimitive_carmichael {    # OEIS: A328935
         my ($n) = @_;
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
         Math::GMPz::Rmpz_cmp_ui($n, 294409) >= 0 or return Sidef::Types::Bool::Bool::FALSE;
 
         if ($HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($n)) {
@@ -14744,7 +14850,7 @@ package Sidef::Types::Number::Number {
                    );
         }
 
-        Math::Prime::Util::GMP::is_carmichael($n) || return Sidef::Types::Bool::Bool::FALSE;
+        (bless \$n)->is_carmichael() || return Sidef::Types::Bool::Bool::FALSE;
 
         my @factors =
           map { Math::Prime::Util::GMP::subint($_, 1) }
@@ -14811,7 +14917,7 @@ package Sidef::Types::Number::Number {
             my %seen;
             foreach my $p (@$factors) {
 
-                # Check the Lucas-Korselt criterion: p+1 | n+1, for all p|n.
+                # Check the Lucas-Korselt criterion: p+1 | n+1, for all prime p|n.
                 if ($p < ULONG_MAX) {
                     Math::GMPz::Rmpz_divisible_ui_p($np1, $p + 1) || return;
                 }
@@ -14870,10 +14976,7 @@ package Sidef::Types::Number::Number {
 
         $omega += scalar(@factors);
 
-        $omega >= 3
-          or return Sidef::Types::Bool::Bool::FALSE;
-
-        $check_conditions->(\@factors)
+        ($omega >= 3 and $check_conditions->(\@factors))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
