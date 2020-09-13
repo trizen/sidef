@@ -126,6 +126,7 @@ recommends:
   File::Find: '0'
   MIME::Base64: '0'
   Math::Prime::Util: '0.73'
+  Term::ReadLine::Gnu: '0'
 requires:
   Algorithm::Combinatorics: '0'
   Algorithm::Loops: '0'

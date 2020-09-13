@@ -70,6 +70,7 @@ my $builder = Module::Build->new(
                    'Data::Dump'           => 0,    # `sidef -D`
                    'Data::Dump::Filtered' => 0,    # Block.ffork()
                    'Math::Prime::Util'    => 0.73, # used in some Number methods, if available
+                   'Term::ReadLine::Gnu'  => 0,    # better STDIN support (+history)
                   },
 
     add_to_cleanup     => ['Sidef-*'],
