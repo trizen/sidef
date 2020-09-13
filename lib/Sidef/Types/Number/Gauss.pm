@@ -259,6 +259,11 @@ package Sidef::Types::Number::Gauss {
         $n->norm->gcd($k->norm)->is_one;
     }
 
+    sub ratmod {
+        my ($x, $m) = @_;
+        __PACKAGE__->new($x->{re}->ratmod($m), $x->{im}->ratmod($m));
+    }
+
     sub invmod {
         my ($x, $m) = @_;
         __PACKAGE__->new(Sidef::Types::Number::Number::complex_invmod($x->{re}, $x->{im}, $m));
