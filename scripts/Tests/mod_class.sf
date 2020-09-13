@@ -21,6 +21,28 @@ do {
     assert_eq(a**(-1), Mod(14, 19))     # Mod(14, 19)
     assert_eq(sqrt(a+1), Mod(4, 19))    # Mod(4, 19)
 
+    assert_eq(Mod(3/4, 4171)**1234, Mod(2138, 4171))
+    assert_eq(Mod(3/4, 4171)**(-1234), Mod(2304, 4171))
+
+    assert_eq(powmod(3/4, 1234, 4171), 2138)
+    assert_eq(powmod(43/97, -129,  57 * 123), 3970)
+    assert_eq(powmod(3/4, -1234, 4171), 2304)
+
+    assert_eq(Mod(3/4, 4171)**(1234), Mod(2138, 4171))
+    assert_eq(Mod(43/97, 57 * 123)**(-129), Mod(3970, 57*123))
+    assert_eq(Mod(3/4, 4171)**(-1234), Mod(2304, 4171))
+
+    assert_eq(powmod(43/97, 127, 43),     0)
+    assert_eq(powmod(43/97, 127, 43 * 2), 43)
+    assert(powmod(43/97, 127, 97 * 3) -> is_nan)
+
+    assert_eq(Mod(43/97, 43)**127,     0)
+    assert_eq(Mod(43/97, 43 * 2)**127, 43)
+    assert(Mod(43/97, 97 * 3)**128 -> lift.is_nan)
+
+    assert_eq(Mod(182398124/123124124, 4171)**(-3), Mod(1970, 4171))
+    assert_eq(Mod(182398124/123124124, 4171)**(-5), Mod(3635, 4171))
+
     assert_eq(chinese(Mod(43, 19), Mod(13, 41)), Mod(423, 779))   # Mod(423, 779)
 
     with (1e10.irand, 1e10.irand) {|n, m|

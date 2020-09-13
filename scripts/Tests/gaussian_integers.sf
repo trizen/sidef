@@ -153,6 +153,9 @@ assert_eq(Gauss(Mod(13, 97), Mod(43, 97)), Gauss(Mod(13, 97), Mod(43, 97)))
 assert_eq(Mod(Gauss(3, 4), 97)*1234, Mod(Gauss(16, 86), 97))
 assert_eq(Mod(Gauss(3/4, 5/6), 1234567)**10 * Mod(Gauss(3/4, 5/6), 1234567)**-10, Mod(Gauss(1,0), 1234567))
 
+assert_eq((Mod(Gauss(43/3, 97/5), 127)**(-11) * Mod(Gauss(43/3, 97/5), 127))**+9, Mod(Gauss(52, 73), 127))
+assert_eq((Mod(Gauss(43/3, 97/5), 127)**(-11) * Mod(Gauss(43/3, 97/5), 127))**-9, Mod(Gauss(81, 89), 127))
+
 assert_eq((3 + Gauss(4, 5)), Gauss(7, 5))
 assert_eq((3 - Gauss(4, 5)), Gauss(-1, -5))
 assert_eq((3 * Gauss(4, 5)), Gauss(12, 15))

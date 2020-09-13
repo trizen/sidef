@@ -7180,47 +7180,55 @@ package Sidef::Types::Number::Number {
         bless \$t;
     }
 
-    sub powmod {
-        my ($x, $y, $z) = @_;
+    sub _modular_rational {
+        my ($n, $m) = @_;
 
-        _valid(\$y, \$z);
-
-        $x = $$x;
-        $y = _any2mpz($$y) // goto &nan;
-        $z = _any2mpz($$z) // goto &nan;
-
-        if (ref($x) eq 'Math::GMPz' || __is_int__($x)) {
-
-            $x = _any2mpz($x) // goto &nan;
-            Math::GMPz::Rmpz_sgn($z) || goto &nan;
-
-            if (Math::GMPz::Rmpz_sgn($y) < 0) {
-                my $t = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_gcd($t, $x, $z);
-                Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or goto &nan;
-            }
-
-            my $r = Math::GMPz::Rmpz_init();
-
-            Math::GMPz::Rmpz_fits_ulong_p($y)
-              ? Math::GMPz::Rmpz_powm_ui($r, $x, Math::GMPz::Rmpz_get_ui($y), $z)
-              : Math::GMPz::Rmpz_powm($r, $x, $y, $z);
-
-            return bless \$r;
+        if (ref($n) ne 'Math::GMPq') {
+            $n = _any2mpq($n) // return;
         }
 
-        $x = _any2mpq($x) // goto &nan;
+        state $z = Math::GMPz::Rmpz_init_nobless();
 
-        my $num = Math::GMPz::Rmpz_init();
-        my $den = Math::GMPz::Rmpz_init();
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPq::Rmpq_get_den($z, $n);
+        Math::GMPz::Rmpz_invert($t, $z, $m) or return;
+        Math::GMPq::Rmpq_get_num($z, $n);
+        Math::GMPz::Rmpz_mul($t, $t, $z);
 
-        Math::GMPq::Rmpq_get_num($num, $x);
-        Math::GMPq::Rmpq_get_den($den, $x);
+        return $t;
+    }
 
-        my $numpow = (bless \$num)->powmod((bless \$y), (bless \$z));
-        my $denpow = (bless \$den)->powmod((bless \$y), (bless \$z));
+    sub powmod {
+        my ($n, $k, $m) = @_;
 
-        $numpow->mul($denpow->invmod(bless \$z))->mod(bless \$z);
+        _valid(\$k, \$m);
+
+        $n = $$n;
+        $k = _any2mpz($$k) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) || goto &nan;
+
+        if (ref($n) ne 'Math::GMPz') {
+            if (__is_int__($n)) {
+                $n = _any2mpz($n) // goto &nan;
+            }
+            else {
+                $n = _modular_rational($n, $m) // goto &nan;
+            }
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+
+        if (Math::GMPz::Rmpz_sgn($k) < 0) {
+            Math::GMPz::Rmpz_invert($r, $n, $m) or goto &nan;
+        }
+
+        Math::GMPz::Rmpz_fits_ulong_p($k)
+          ? Math::GMPz::Rmpz_powm_ui($r, $n, Math::GMPz::Rmpz_get_ui($k), $m)
+          : Math::GMPz::Rmpz_powm($r, $n, $k, $m);
+
+        bless \$r;
     }
 
     *expmod = \&powmod;
@@ -7480,122 +7488,100 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // return (nan(), nan());
         $m = _any2mpz($$m) // return (nan(), nan());
 
-        if (   (ref($x) eq 'Math::GMPz' || __is_int__($x))
-            && (ref($y) eq 'Math::GMPz' || __is_int__($y))) {
+        Math::GMPz::Rmpz_sgn($m) || return (nan(), nan());
 
-            $x = _any2mpz($x) // return (nan(), nan());
-            $y = _any2mpz($y) // return (nan(), nan());
-
-            my $c0 = Math::GMPz::Rmpz_init_set_ui(1);
-            my $c1 = Math::GMPz::Rmpz_init_set_ui(0);
-
-            $x = Math::GMPz::Rmpz_init_set($x);
-            $y = Math::GMPz::Rmpz_init_set($y);
-
-            state $t = Math::GMPz::Rmpz_init_nobless();
-
-            # Handle negative exponent
-            if (Math::GMPz::Rmpz_sgn($n) < 0) {
-
-                $n = Math::GMPz::Rmpz_init_set($n);
-                Math::GMPz::Rmpz_abs($n, $n);
-
-                my $t = Math::GMPz::Rmpz_init();
-
-                Math::GMPz::Rmpz_mul($t, $x, $x);
-                Math::GMPz::Rmpz_addmul($t, $y, $y);
-
-                if (Math::GMPz::Rmpz_invert($t, $t, $m)) {
-
-                    Math::GMPz::Rmpz_mul($c0, $x, $t);
-                    Math::GMPz::Rmpz_mul($c1, $y, $t);
-                    Math::GMPz::Rmpz_neg($c1, $c1);
-                    Math::GMPz::Rmpz_mod($c0, $c0, $m);
-                    Math::GMPz::Rmpz_mod($c1, $c1, $m);
-
-                    Math::GMPz::Rmpz_set($x, $c0);
-                    Math::GMPz::Rmpz_set($y, $c1);
-
-                    Math::GMPz::Rmpz_set_ui($c0, 1);
-                    Math::GMPz::Rmpz_set_ui($c1, 0);
-                }
-                else {    # no inverse exists
-                    return (nan(), nan());
-                }
-            }
-
-            foreach my $k (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
-
-                if (Math::GMPz::Rmpz_tstbit($n, $k)) {
-                    Math::GMPz::Rmpz_set($t, $c0);
-
-                    Math::GMPz::Rmpz_mul($c0, $c0, $x);
-                    Math::GMPz::Rmpz_submul($c0, $c1, $y);
-
-                    Math::GMPz::Rmpz_mul($c1, $c1, $x);
-                    Math::GMPz::Rmpz_addmul($c1, $t, $y);
-
-                    Math::GMPz::Rmpz_mod($c0, $c0, $m);
-                    Math::GMPz::Rmpz_mod($c1, $c1, $m);
-                }
-
-                Math::GMPz::Rmpz_mul($t, $x, $y);
-                Math::GMPz::Rmpz_mul_2exp($t, $t, 1);
-
-                Math::GMPz::Rmpz_powm_ui($x, $x, 2, $m);
-                Math::GMPz::Rmpz_powm_ui($y, $y, 2, $m);
-
-                Math::GMPz::Rmpz_sub($x, $x, $y);
-                Math::GMPz::Rmpz_mod($y, $t, $m);
-            }
-
-            return ((bless \$c0), (bless \$c1));
-        }
-
-        # Handle fractional x = a/b, y = c/d:
+        # Identities for fractional x = a/b, y = c/d:
         #   ((a/b) + (c/d)*i)^n = ((a*d + b*c*i) / (b*d))^n
         #                       = (a*d + b*c*i)^n * (b*d)^(-n)
 
-        $x = _any2mpq($x) // return (nan(), nan());
-        $y = _any2mpq($y) // return (nan(), nan());
+        # We use:
+        #   ((a/b) + (c/d)*i)^n mod m = (a*invmod(b,m) + c*invmod(d, m)*i)^n mod m
 
-        my $A = Math::GMPz::Rmpz_init();
-        my $B = Math::GMPz::Rmpz_init();
-        my $C = Math::GMPz::Rmpz_init();
-        my $D = Math::GMPz::Rmpz_init();
+        if (ref($x) ne 'Math::GMPz') {
+            if (__is_int__($x)) {
+                $x = _any2mpz($x) // return (nan(), nan());
+            }
+            else {
+                $x = _modular_rational($x, $m) // return (nan(), nan());
+            }
+        }
 
-        Math::GMPq::Rmpq_get_num($A, $x);
-        Math::GMPq::Rmpq_get_den($B, $x);
+        if (ref($y) ne 'Math::GMPz') {
+            if (__is_int__($y)) {
+                $y = _any2mpz($y) // return (nan(), nan());
+            }
+            else {
+                $y = _modular_rational($y, $m) // return (nan(), nan());
+            }
+        }
 
-        Math::GMPq::Rmpq_get_num($C, $y);
-        Math::GMPq::Rmpq_get_den($D, $y);
+        $x = _any2mpz($x) // return (nan(), nan());
+        $y = _any2mpz($y) // return (nan(), nan());
+
+        my $c0 = Math::GMPz::Rmpz_init_set_ui(1);
+        my $c1 = Math::GMPz::Rmpz_init_set_ui(0);
+
+        $x = Math::GMPz::Rmpz_init_set($x);
+        $y = Math::GMPz::Rmpz_init_set($y);
 
         state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
 
-        Math::GMPz::Rmpz_mul($u, $B, $D);
+        # Handle negative exponent
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
 
-        if (Math::GMPz::Rmpz_invert($t, $u, $m)) {
-            Math::GMPz::Rmpz_powm($u, $u, __neg__($n), $m);    # u = (b*d)^(-n) (mod m)
+            $n = Math::GMPz::Rmpz_init_set($n);
+            Math::GMPz::Rmpz_abs($n, $n);
+
+            my $t = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_mul($t, $x, $x);
+            Math::GMPz::Rmpz_addmul($t, $y, $y);
+
+            if (Math::GMPz::Rmpz_invert($t, $t, $m)) {
+
+                Math::GMPz::Rmpz_mul($c0, $x, $t);
+                Math::GMPz::Rmpz_mul($c1, $y, $t);
+                Math::GMPz::Rmpz_neg($c1, $c1);
+                Math::GMPz::Rmpz_mod($c0, $c0, $m);
+                Math::GMPz::Rmpz_mod($c1, $c1, $m);
+
+                Math::GMPz::Rmpz_set($x, $c0);
+                Math::GMPz::Rmpz_set($y, $c1);
+
+                Math::GMPz::Rmpz_set_ui($c0, 1);
+                Math::GMPz::Rmpz_set_ui($c1, 0);
+            }
+            else {    # no inverse exists
+                return (nan(), nan());
+            }
         }
-        else {                                                 # no inverse exists
-            return (nan(), nan());
+
+        foreach my $k (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
+
+            if (Math::GMPz::Rmpz_tstbit($n, $k)) {
+                Math::GMPz::Rmpz_set($t, $c0);
+
+                Math::GMPz::Rmpz_mul($c0, $c0, $x);
+                Math::GMPz::Rmpz_submul($c0, $c1, $y);
+
+                Math::GMPz::Rmpz_mul($c1, $c1, $x);
+                Math::GMPz::Rmpz_addmul($c1, $t, $y);
+
+                Math::GMPz::Rmpz_mod($c0, $c0, $m);
+                Math::GMPz::Rmpz_mod($c1, $c1, $m);
+            }
+
+            Math::GMPz::Rmpz_mul($t, $x, $y);
+            Math::GMPz::Rmpz_mul_2exp($t, $t, 1);
+
+            Math::GMPz::Rmpz_powm_ui($x, $x, 2, $m);
+            Math::GMPz::Rmpz_powm_ui($y, $y, 2, $m);
+
+            Math::GMPz::Rmpz_sub($x, $x, $y);
+            Math::GMPz::Rmpz_mod($y, $t, $m);
         }
 
-        # Compute: (a*d + b*c*i)^n
-
-        Math::GMPz::Rmpz_mul($A, $A, $D);                      # A*D
-        Math::GMPz::Rmpz_mul($B, $B, $C);                      # B*C
-
-        my ($re, $im) = complex_powmod((bless \$A), (bless \$B), (bless \$n), (bless \$m));
-
-        Math::GMPz::Rmpz_mul($A, $$re, $u);
-        Math::GMPz::Rmpz_mul($B, $$im, $u);
-
-        Math::GMPz::Rmpz_mod($A, $A, $m);
-        Math::GMPz::Rmpz_mod($B, $B, $m);
-
-        return ((bless \$A), (bless \$B));
+        ((bless \$c0), (bless \$c1));
     }
 
     *cpowmod = \&complex_powmod;
