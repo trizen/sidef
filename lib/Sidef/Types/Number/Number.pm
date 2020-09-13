@@ -7198,6 +7198,27 @@ package Sidef::Types::Number::Number {
         return $t;
     }
 
+    sub ratmod {
+        my ($n, $m) = @_;
+
+        _valid(\$m);
+
+        $n = $$n;
+        $m = _any2mpz($$m) // goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init();
+
+        if (ref($n) eq 'Math::GMPz') {
+            Math::GMPz::Rmpz_mod($r, $n, $m);
+        }
+        else {
+            $r = _modular_rational($n, $m) // goto &nan;
+            Math::GMPz::Rmpz_mod($r, $r, $m);
+        }
+
+        bless \$r;
+    }
+
     sub powmod {
         my ($n, $k, $m) = @_;
 
