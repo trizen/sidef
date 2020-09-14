@@ -9,7 +9,6 @@ WriteMakefile
                    'Algorithm::Combinatorics' => 0,
                    'Algorithm::Loops' => 0,
                    'Cwd' => 0,
-                   'Devel::Peek' => 0,
                    'Encode' => 0,
                    'Fcntl' => 0,
                    'File::Basename' => 0,
