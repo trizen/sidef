@@ -334,6 +334,63 @@ package Sidef::Types::Number::Number {
     ## Misc internal functions
     #
 
+    # Convert a given pair (real, imag) into an MPC object
+    sub _reals2mpc {
+        my ($re, $im) = @_;
+
+        my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+
+        $re = _str2obj($re);
+        $im = _str2obj($im);
+
+        my $sig = join(' ', ref($re), ref($im));
+
+        if ($sig eq q{Math::MPFR Math::MPFR}) {
+            Math::MPC::Rmpc_set_fr_fr($r, $re, $im, $ROUND);
+        }
+        elsif ($sig eq q{Math::GMPz Math::GMPz}) {
+            Math::MPC::Rmpc_set_z_z($r, $re, $im, $ROUND);
+        }
+        elsif ($sig eq q{Math::GMPz Math::MPFR}) {
+            Math::MPC::Rmpc_set_z_fr($r, $re, $im, $ROUND);
+        }
+        elsif ($sig eq q{Math::MPFR Math::GMPz}) {
+            Math::MPC::Rmpc_set_fr_z($r, $re, $im, $ROUND);
+        }
+        elsif ($sig eq q{Math::GMPz Math::GMPq}) {
+            Math::MPC::Rmpc_set_z_q($r, $re, $im, $ROUND);
+        }
+        elsif ($sig eq q{Math::GMPq Math::GMPz}) {
+            Math::MPC::Rmpc_set_q_z($r, $re, $im, $ROUND);
+        }
+        elsif ($sig eq q{Math::GMPq Math::GMPq}) {
+            Math::MPC::Rmpc_set_q_q($r, $re, $im, $ROUND);
+        }
+        elsif ($sig eq q{Math::GMPq Math::MPFR}) {
+            Math::MPC::Rmpc_set_q_fr($r, $re, $im, $ROUND);
+        }
+        elsif ($sig eq q{Math::MPFR Math::GMPq}) {
+            Math::MPC::Rmpc_set_fr_q($r, $re, $im, $ROUND);
+        }
+        elsif (ref($re) eq 'Math::MPC') {
+            Math::MPC::Rmpc_set($r, _any2mpc($im), $ROUND);
+            Math::MPC::Rmpc_mul_i($r, $r, 1, $ROUND);
+            Math::MPC::Rmpc_add($r, $r, $re, $ROUND);
+        }
+        elsif (ref($im) eq 'Math::MPC') {
+            Math::MPC::Rmpc_set($r, $im, $ROUND);
+            Math::MPC::Rmpc_mul_i($r, $r, 1, $ROUND);
+            Math::MPC::Rmpc_add($r, $r, _any2mpc($re), $ROUND);
+        }
+        else {    # this should never happen
+            $re = _any2mpfr($re);
+            $im = _any2mpfr($im);
+            Math::MPC::Rmpc_set_fr_fr($r, $re, $im, $ROUND);
+        }
+
+        return $r;
+    }
+
     # Converts a string into an mpq object
     sub _str2obj {
         my ($s) = @_;
@@ -381,7 +438,16 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        # Complex number
+        # Complex number of form: "(3 4)"
+        if (substr($s, 0, 1) eq '(' and substr($s, -1) eq ')') {
+            my ($re, $im) = split(' ', substr($s, 1, -1));
+
+            if (defined($re) and defined($im)) {
+                return _reals2mpc($re, $im);
+            }
+        }
+
+        # Complex number of form: "3+4i"
         if (substr($s, -1) eq 'i') {
 
             if ($s eq 'i' or $s eq '+i') {
@@ -413,33 +479,7 @@ package Sidef::Types::Number::Number {
             }
 
             if (defined($re) and defined($im)) {
-
-                my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-
-                $re = _str2obj($re);
-                $im = _str2obj($im);
-
-                my $sig = join(' ', ref($re), ref($im));
-
-                if ($sig eq q{Math::MPFR Math::MPFR}) {
-                    Math::MPC::Rmpc_set_fr_fr($r, $re, $im, $ROUND);
-                }
-                elsif ($sig eq q{Math::GMPz Math::GMPz}) {
-                    Math::MPC::Rmpc_set_z_z($r, $re, $im, $ROUND);
-                }
-                elsif ($sig eq q{Math::GMPz Math::MPFR}) {
-                    Math::MPC::Rmpc_set_z_fr($r, $re, $im, $ROUND);
-                }
-                elsif ($sig eq q{Math::MPFR Math::GMPz}) {
-                    Math::MPC::Rmpc_set_fr_z($r, $re, $im, $ROUND);
-                }
-                else {    # this should never happen
-                    $re = _any2mpfr($re);
-                    $im = _any2mpfr($im);
-                    Math::MPC::Rmpc_set_fr_fr($r, $re, $im, $ROUND);
-                }
-
-                return $r;
+                return _reals2mpc($re, $im);
             }
         }
 
