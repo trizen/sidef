@@ -14708,13 +14708,21 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_cyclic {     # OEIS: A003277
+    sub is_practical {    # OEIS: A005153
+        my ($x) = @_;
+        __is_int__($$x)
+          && Math::Prime::Util::GMP::is_practical(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_cyclic {       # OEIS: A003277
         my ($n) = @_;
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
         $n = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        (Math::Prime::Util::GMP::gcd(Math::Prime::Util::GMP::totient($n), $n) == 1)
+        (Math::Prime::Util::GMP::gcd(Math::Prime::Util::GMP::totient($n), $n) eq '1')
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }

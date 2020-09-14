@@ -2674,6 +2674,14 @@ Return the
 
 =cut
 
+=head2 is_practical
+
+Number.is_practical() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_prime
 
 Number.is_prime() -> I<Obj>
