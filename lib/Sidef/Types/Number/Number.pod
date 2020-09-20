@@ -1780,6 +1780,8 @@ Number.factorial_power() -> I<Obj>
 
 Return the
 
+Aliases: I<factorial_valuation>
+
 =cut
 
 =head2 factorial_sum

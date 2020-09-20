@@ -6608,6 +6608,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *factorial_valuation = \&factorial_power;
+
     sub length {
         my ($x, $y) = @_;
 
@@ -9250,7 +9252,16 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new(\@array);
         }
 
-        my $m = Math::Prime::Util::GMP::moebius(_big2istr($n) // goto &nan);
+        $n = _any2mpz($$n) // goto &nan;
+
+        my $m;
+        if ($HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_slong_p($n)) {
+            $m = Math::Prime::Util::moebius(Math::GMPz::Rmpz_get_si($n));
+        }
+        else {
+            $m = Math::Prime::Util::GMP::moebius(Math::GMPz::Rmpz_get_str($n, 10));
+        }
+
         $m ? ($m == 1) ? ONE : MONE : ZERO;
     }
 
@@ -15591,7 +15602,7 @@ package Sidef::Types::Number::Number {
         state $t = Math::GMPz::Rmpz_init_nobless();
 
         foreach my $k (1 .. __ilog__($n, 2)) {
-            my $mu = Math::Prime::Util::GMP::moebius($k) || next;
+            my $mu = ($HAS_PRIME_UTIL ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k)) || next;
             Math::GMPz::Rmpz_root($t, $n, $k);
             Math::GMPz::Rmpz_sub_ui($t, $t, 1);
             ($mu == 1)
@@ -15671,8 +15682,8 @@ package Sidef::Types::Number::Number {
             foreach my $v (1 .. $t) {
 
                 if ($r > $k) {
-                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1 or next;
-                    Math::Prime::Util::GMP::moebius($v) == 0 and next;
+                    ($HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
+                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                         or next;
                 }
 
                 Math::GMPz::Rmpz_ui_pow_ui($t, $v, $r);
@@ -15718,8 +15729,8 @@ package Sidef::Types::Number::Number {
             foreach my $v (1 .. $t) {
 
                 if ($r > $k) {
-                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1 or next;
-                    Math::Prime::Util::GMP::moebius($v) == 0 and next;
+                    ($HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
+                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                         or next;
                 }
 
                 Math::GMPz::Rmpz_ui_pow_ui($t, $v, $r);
