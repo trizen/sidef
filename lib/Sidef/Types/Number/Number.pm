@@ -15195,12 +15195,12 @@ package Sidef::Types::Number::Number {
                 }
 
                 if ($k == 2) {
-                    return 1 + Math::Prime::Util::GMP::logint($n, 2);
+                    return 1 + ($HAS_PRIME_UTIL ? Math::Prime::Util::logint($n, 2) : Math::Prime::Util::GMP::logint($n, 2));
                 }
 
                 use integer;
 
-                my $q   = Math::Prime::Util::GMP::prev_prime($k);
+                my $q   = ($HAS_PRIME_UTIL ? Math::Prime::Util::prev_prime($k) : Math::Prime::Util::GMP::prev_prime($k));
                 my $sum = 0;
 
                 for (my $t = 1 ; ; $t *= $k) {
@@ -15223,7 +15223,9 @@ package Sidef::Types::Number::Number {
 
             my $t = Math::GMPz::Rmpz_init();
 
-            for (my $p = 3 ; $p <= $k ; $p = Math::Prime::Util::GMP::next_prime($p)) {
+            for (my $p = 3 ;
+                 $p <= $k ;
+                 $p = ($HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
 
                 Math::GMPz::Rmpz_tdiv_q_ui($t, $n, $p);
 
@@ -15282,7 +15284,9 @@ package Sidef::Types::Number::Number {
                 my $u = 0;
                 my $t = $n / $p;
 
-                for (my $q = 2 ; $q < $p ; $q = Math::Prime::Util::GMP::next_prime($q)) {
+                for (my $q = 2 ;
+                     $q < $p ;
+                     $q = ($HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($q) : Math::Prime::Util::GMP::next_prime($q))) {
 
                     my $v = __SUB__->($t, $q);
 
@@ -15315,7 +15319,9 @@ package Sidef::Types::Number::Number {
 
             Math::GMPz::Rmpz_tdiv_q_ui($t, $n, $p);
 
-            for (my $q = 2 ; $q < $p ; $q = Math::Prime::Util::GMP::next_prime($q)) {
+            for (my $q = 2 ;
+                 $q < $p ;
+                 $q = ($HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($q) : Math::Prime::Util::GMP::next_prime($q))) {
 
                 my $v = __SUB__->($t, $q);
 
