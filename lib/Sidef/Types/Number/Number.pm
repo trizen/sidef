@@ -11,11 +11,6 @@ package Sidef::Types::Number::Number {
     use List::Util qw();
     use Math::Prime::Util::GMP qw();
 
-    use constant {
-                  ULONG_MAX => Math::GMPq::_ulong_max(),
-                  LONG_MIN  => Math::GMPq::_long_min(),
-                 };
-
     our ($ROUND, $PREC);
 
     BEGIN {
@@ -53,6 +48,9 @@ package Sidef::Types::Number::Number {
           TWO  => bless(\$TWO),
           ZERO => bless(\$ZERO),
           MONE => bless(\$MONE),
+
+          ULONG_MAX => Math::GMPq::_ulong_max(),
+          LONG_MIN  => Math::GMPq::_long_min(),
 
           HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 },
     };
@@ -14784,12 +14782,22 @@ package Sidef::Types::Number::Number {
         }
 
         # Small or even
-        Math::GMPz::Rmpz_cmp_ui($n, 561) < 0 and return Sidef::Types::Bool::Bool::FALSE;
-        Math::GMPz::Rmpz_odd_p($n) or return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_odd_p($n)            or return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_cmp_ui($n, 561) >= 0 or return Sidef::Types::Bool::Bool::FALSE;
 
-        # If small enough, Math::Prime::Util::GMP::is_carmichael() is slighly faster.
-        # If large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
-        if (Math::GMPz::Rmpz_fits_ulong_p($n) or Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
+        # If n is a native integer, Math::Prime::Util::is_carmichael() is slighly faster.
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return (
+                    (
+                     HAS_PRIME_UTIL ? Math::Prime::Util::is_carmichael(Math::GMPz::Rmpz_get_ui($n))
+                     : Math::Prime::Util::GMP::is_carmichael(Math::GMPz::Rmpz_get_ui($n))
+                    ) ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
+        if (Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
             return (
                     Math::Prime::Util::GMP::is_carmichael(Math::GMPz::Rmpz_get_str($n, 10))
                     ? Sidef::Types::Bool::Bool::TRUE
@@ -14944,8 +14952,8 @@ package Sidef::Types::Number::Number {
         }
 
         # Small or even
-        Math::GMPz::Rmpz_cmp_ui($n, 399) < 0 and return Sidef::Types::Bool::Bool::FALSE;
-        Math::GMPz::Rmpz_odd_p($n) or return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_odd_p($n)            or return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_cmp_ui($n, 399) >= 0 or return Sidef::Types::Bool::Bool::FALSE;
 
         # Divisible by a small square
         foreach my $p (3, 5, 7, 11) {
