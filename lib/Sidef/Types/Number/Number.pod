@@ -4266,6 +4266,14 @@ Return the
 
 =cut
 
+=head2 sopf
+
+Number.sopf() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sopfr
 
 Number.sopfr() -> I<Obj>

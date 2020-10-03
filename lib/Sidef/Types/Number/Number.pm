@@ -14528,10 +14528,19 @@ package Sidef::Types::Number::Number {
 
     *abundancy = \&abundancy_index;
 
-    sub sopfr {    # https://oeis.org/A001414
+    sub sopf {    # OEIS: A008472
+        my $n = &_big2uistr // goto &nan;
+        my $s = Math::Prime::Util::GMP::vecsum(map { $_->[0] } _factor_exp($n));
+        ($s < ULONG_MAX) ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
+    }
+
+    sub sopfr {    # OEIS: A001414
         my $n = &_big2uistr // goto &nan;
         my $s = Math::Prime::Util::GMP::vecsum(
-                     (HAS_PRIME_UTIL and $n < ULONG_MAX) ? Math::Prime::Util::factor($n) : Math::Prime::Util::GMP::factor($n));
+                                               (HAS_PRIME_UTIL and $n < ULONG_MAX)
+                                               ? Math::Prime::Util::factor($n)
+                                               : Math::Prime::Util::GMP::factor($n)
+                                              );
         ($s < ULONG_MAX) ? __PACKAGE__->_set_uint($s) : __PACKAGE__->_set_str('int', $s);
     }
 
