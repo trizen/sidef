@@ -12745,6 +12745,7 @@ package Sidef::Types::Number::Number {
 
         my $d = Math::GMPz::Rmpz_init();    # D >> s
         Math::GMPz::Rmpz_div_2exp($d, $D, $s);
+        $d = Math::GMPz::Rmpz_get_str($d, 10);
 
         $tries //= 1 + CORE::int(100 / $s);
 
@@ -12773,15 +12774,19 @@ package Sidef::Types::Number::Number {
                 next if Math::Prime::Util::GMP::is_square($delta);
             }
 
-            Math::GMPz::Rmpz_set($x, $d);
+            my ($U1, $V1, $Q1) =
+              map { Math::GMPz::Rmpz_init_set_str($_, 10) } Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $d);
 
-            foreach my $k (0 .. $r) {
+            for my $k (1 .. $r) {
 
-                my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $x);
-
-                foreach my $t ($U, $V, Math::Prime::Util::GMP::subint($V, $P)) {
-                    Math::GMPz::Rmpz_set_str($g, $t, 10);
-                    Math::GMPz::Rmpz_gcd($g, $g, $n);
+                foreach my $t ($U1, $V1, $P) {
+                    if (ref($t)) {
+                        Math::GMPz::Rmpz_gcd($g, $t, $n);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_sub_ui($g, $V1, $t);
+                        Math::GMPz::Rmpz_gcd($g, $g, $n);
+                    }
                     if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
                         Math::GMPz::Rmpz_divexact($x, $n, $g);
 #<<<
@@ -12792,7 +12797,11 @@ package Sidef::Types::Number::Number {
                     }
                 }
 
-                Math::GMPz::Rmpz_mul_2exp($x, $x, 1);
+                Math::GMPz::Rmpz_mul($U1, $U1, $V1);
+                Math::GMPz::Rmpz_mod($U1, $U1, $n);
+                Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $n);
+                Math::GMPz::Rmpz_submul_ui($V1, $Q1, 2);
+                Math::GMPz::Rmpz_powm_ui($Q1, $Q1, 2, $n);
             }
         }
 
