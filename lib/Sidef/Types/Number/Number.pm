@@ -12844,7 +12844,7 @@ package Sidef::Types::Number::Number {
             $tries = _any2ui($$tries) // undef;
         }
 
-        my @factors = map { ref($_) ? $_ : Math::GMPz::Rmpz_init_set_ui($_) } _lucas_factor($n, $tries);
+        my @factors = map { ref($_) ? $_ : Math::GMPz::Rmpz_init_set_ui($_) } _lucas_factor($n, $j, $tries);
         @factors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @factors;
         @factors = map  { bless \$_ } @factors;
 
