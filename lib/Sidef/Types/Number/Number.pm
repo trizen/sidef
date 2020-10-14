@@ -133,7 +133,7 @@ package Sidef::Types::Number::Number {
             return bless \_str2obj($num);
         }
 
-        # Special objects
+        # Already a __PACKAGE__ object
         if ($ref eq __PACKAGE__) {
             return $num;
         }
@@ -12698,6 +12698,15 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        my @holf_factors = Math::Prime::Util::GMP::holf_factor(Math::GMPz::Rmpz_get_str($n, 10), 10_000);
+
+        if (scalar(@holf_factors) > 1) {
+            return (
+                    map { Math::GMPz::Rmpz_probab_prime_p($_, 5) ? $_ : __SUB__->($_) }
+                    map { Math::GMPz::Rmpz_init_set_str($_, 10) } @holf_factors
+                   );
+        }
+
         return ($n);
     }
 
@@ -12758,6 +12767,8 @@ package Sidef::Types::Number::Number {
             $PQ_limit = Math::GMPz::Rmpz_get_ui($n) - 1;
         }
 
+        my $N = Math::GMPz::Rmpz_get_str($n, 10);
+
         foreach my $i (1 .. $tries) {
 
             my $P = 1 + CORE::int(CORE::rand($PQ_limit));
@@ -12767,15 +12778,15 @@ package Sidef::Types::Number::Number {
 
             my $delta = $P * $P - 4 * $Q;
 
-            if (HAS_PRIME_UTIL) {
-                next if Math::Prime::Util::is_square($delta);
-            }
-            else {
-                next if Math::Prime::Util::GMP::is_square($delta);
-            }
+            next
+              if (
+                  HAS_PRIME_UTIL
+                  ? Math::Prime::Util::is_square($delta)
+                  : Math::Prime::Util::GMP::is_square($delta)
+                 );
 
             my ($U1, $V1, $Q1) =
-              map { Math::GMPz::Rmpz_init_set_str($_, 10) } Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $d);
+              map { Math::GMPz::Rmpz_init_set_str($_, 10) } Math::Prime::Util::GMP::lucas_sequence($N, $P, $Q, $d);
 
             for my $k (1 .. $r) {
 
@@ -12803,6 +12814,15 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_submul_ui($V1, $Q1, 2);
                 Math::GMPz::Rmpz_powm_ui($Q1, $Q1, 2, $n);
             }
+        }
+
+        my @holf_factors = Math::Prime::Util::GMP::holf_factor($N, 10_000);
+
+        if (scalar(@holf_factors) > 1) {
+            return (
+                    map { Math::GMPz::Rmpz_probab_prime_p($_, 5) ? $_ : __SUB__->($_, [-1, +1]->[CORE::int(CORE::rand(2))]) }
+                    map { Math::GMPz::Rmpz_init_set_str($_, 10) } @holf_factors
+                   );
         }
 
         return ($n);
