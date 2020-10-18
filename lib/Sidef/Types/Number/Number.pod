@@ -3522,7 +3522,7 @@ Number.partitions() -> I<Obj>
 
 Return the
 
-Aliases: I<number_of_partitions>
+Aliases: I<partition_number>
 
 =cut
 

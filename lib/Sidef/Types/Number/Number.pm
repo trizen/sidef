@@ -6258,11 +6258,21 @@ package Sidef::Types::Number::Number {
         #                                   by Richard P. Brent and Paul Zimmermann
         if (Math::GMPz::Rmpz_fits_ulong_p($k)) {
 
-            # Find r such that B^(2r - 2) <= A < B^(2r)
-            my $r = (__ilog__($n, $k) >> 1) + 1;
-
             my $A = $n;
             my $B = Math::GMPz::Rmpz_get_ui($k);
+
+            # When B < 2^32, use Math::Prime::Util::GMP::todigits().
+            if ($B <= 4294967295) {
+                return
+                  Sidef::Types::Array::Array->new(
+                                       [map { __PACKAGE__->_set_uint($_) }
+                                          CORE::reverse(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B))
+                                       ]
+                  );
+            }
+
+            # Find r such that B^(2r - 2) <= A < B^(2r)
+            my $r = (__ilog__($n, $k) >> 1) + 1;
 
             state $Q = Math::GMPz::Rmpz_init_nobless();
             state $R = Math::GMPz::Rmpz_init_nobless();
@@ -14647,7 +14657,7 @@ package Sidef::Types::Number::Number {
         ($n < ULONG_MAX) ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
-    *number_of_partitions = \&partitions;
+    *partition_number = \&partitions;
 
     sub is_primitive_root {
         my ($x, $y) = @_;
