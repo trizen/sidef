@@ -3466,6 +3466,14 @@ Return the
 
 =cut
 
+=head2 n_primes
+
+Number.n_primes() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nu
 
 Number.nu() -> I<Obj>

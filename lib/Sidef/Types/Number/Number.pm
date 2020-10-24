@@ -6254,8 +6254,7 @@ package Sidef::Types::Number::Number {
         }
 #>>>
 
-        # Subquadratic algorithm from "Modern Computer Arithmetic"
-        #                                   by Richard P. Brent and Paul Zimmermann
+        # Subquadratic Algorithm 1.26 FastIntegerOutput from "Modern Computer Arithmetic v0.5.9"
         if (Math::GMPz::Rmpz_fits_ulong_p($k)) {
 
             my $A = $n;
@@ -6378,9 +6377,6 @@ package Sidef::Types::Number::Number {
     sub digits2num {
         my ($base, $D) = @_;
 
-        # Algorithm from "Modern Computer Arithmetic"
-        #                    by Richard P. Brent and Paul Zimmermann
-
         my @digits = @$D;
         @digits || return ZERO;
 
@@ -6428,6 +6424,7 @@ package Sidef::Types::Number::Number {
 
             my $B = Math::GMPz::Rmpz_init_set($base);
 
+            # Subquadratic Algorithm 1.25 FastIntegerInput from "Modern Computer Arithmetic v0.5.9"
             for (my $k = scalar(@digits) ; $k > 1 ; $k = ($k >> 1) + ($k & 1)) {
 
                 my @T;
@@ -6447,6 +6444,7 @@ package Sidef::Types::Number::Number {
 
         my $B = $base;
 
+        # Subquadratic Algorithm 1.25 FastIntegerInput from "Modern Computer Arithmetic v0.5.9"
         for (my $k = scalar(@digits) ; $k > 1 ; $k = ($k >> 1) + ($k & 1)) {
 
             my @T;
@@ -6544,8 +6542,7 @@ package Sidef::Types::Number::Number {
         }
 #>>>
 
-        # Subquadratic algorithm from "Modern Computer Arithmetic"
-        #                                 by Richard P. Brent and Paul Zimmermann
+        # Subquadratic Algorithm 1.26 FastIntegerOutput from "Modern Computer Arithmetic v0.5.9"
         if (Math::GMPz::Rmpz_fits_ulong_p($k)) {
 
             # Find r such that B^(2r - 2) <= A < B^(2r)
@@ -12197,6 +12194,47 @@ package Sidef::Types::Number::Number {
              : Math::Prime::Util::GMP::sieve_primes(2, (_big2uistr($x) // 0), 0)
             ]
         );
+    }
+
+    sub n_primes {
+        my ($n, $start) = @_;
+
+        if (defined($start)) {
+            _valid(\$start);
+            $start = _big2uistr($start) // 0;
+        }
+        else {
+            $start = 2;
+        }
+
+        $n = _any2ui($$n) // return Sidef::Types::Array::Array->new;
+
+        my @primes;
+
+        if (HAS_PRIME_UTIL and $start < (ULONG_MAX >> 1)) {
+            for (my $it = Math::Prime::Util::prime_iterator($start) ; $n > 0 ; --$n) {
+                push @primes, __PACKAGE__->_set_uint($it->());
+            }
+            return Sidef::Types::Array::Array->new(\@primes);
+        }
+
+        if (Math::Prime::Util::GMP::is_prob_prime($start)) {
+            ## ok
+        }
+        else {
+            $start = Math::Prime::Util::GMP::next_prime($start);
+        }
+
+        for (my $p = $start ; $n > 0 ; --$n, ($p = Math::Prime::Util::GMP::next_prime($p))) {
+            push @primes,
+              (
+                ($p < ULONG_MAX)
+                ? __PACKAGE__->_set_uint($p)
+                : __PACKAGE__->_set_str('int', $p)
+              );
+        }
+
+        Sidef::Types::Array::Array->new(\@primes);
     }
 
     sub pn_primes {
