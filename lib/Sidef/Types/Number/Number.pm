@@ -10118,7 +10118,8 @@ package Sidef::Types::Number::Number {
                );
     }
 
-    *primepi = \&prime_count;
+    *primepi      = \&prime_count;
+    *count_primes = \&prime_count;
 
     sub prime_count_lower {
         my $prime_pi = Math::Prime::Util::GMP::prime_count_lower(&_big2uistr // return ZERO) // 0;
@@ -12236,6 +12237,8 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Array::Array->new(\@primes);
     }
+
+    *nprimes = \&n_primes;
 
     sub pn_primes {
         my ($x, $y) = @_;

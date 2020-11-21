@@ -13,12 +13,12 @@ package Sidef::Parser {
         my %options = (
             line          => 1,
             inc           => [],
-            class         => 'main',           # a.k.a. namespace
+            class         => 'main',    # a.k.a. namespace
             vars          => {'main' => []},
             ref_vars_refs => {'main' => []},
             EOT           => [],
 
-            postfix_ops => {                   # postfix operators
+            postfix_ops => {            # postfix operators
                              '--'  => 1,
                              '++'  => 1,
                              '...' => 1,
@@ -1092,7 +1092,7 @@ package Sidef::Parser {
                 my $obj = (
                     $double_quoted
                     ? do {
-                        state $str = Sidef::Types::String::String->new;                                # load the string module
+                        state $str = Sidef::Types::String::String->new;    # load the string module
                         Sidef::Types::String::String::apply_escapes($package->$method($string), $self);
                       }
                     : $package->$method($string =~ s{\\\\}{\\}gr)
@@ -2505,17 +2505,17 @@ package Sidef::Parser {
             }
 
             if (exists($self->{current_function})) {
-                /\G__FUNC__\b/gc && return $self->{current_function};
+                /\G__FUNC__\b/gc      && return $self->{current_function};
                 /\G__FUNC_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_function}{name});
             }
 
             if (exists($self->{current_class})) {
-                /\G__CLASS__\b/gc && return $self->{current_class};
+                /\G__CLASS__\b/gc      && return $self->{current_class};
                 /\G__CLASS_NAME__\b/gc && return Sidef::Types::String::String->new($self->{class_name});
             }
 
             if (exists($self->{current_method})) {
-                /\G__METHOD__\b/gc && return $self->{current_method};
+                /\G__METHOD__\b/gc      && return $self->{current_method};
                 /\G__METHOD_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_method}{name});
             }
 
@@ -2774,7 +2774,7 @@ package Sidef::Parser {
             my $count = scalar(@{$self->{vars}{$class_name}});
 
             unshift @{$self->{ref_vars_refs}{$class_name}}, @{$ref};
-            unshift @{$self->{vars}{$class_name}}, [];
+            unshift @{$self->{vars}{$class_name}},          [];
 
             $self->{vars}{$class_name} = $self->{vars}{$class_name}[0];
 

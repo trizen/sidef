@@ -59,7 +59,7 @@ package Sidef::Types::Set::Set {
         my ($A, $B) = @_;
 
         ref($A) eq ref($B)
-          ? bless({%$A, %$B}, ref($A))
+          ? bless({%$A, %$B},                    ref($A))
           : bless({%$A, $serialize->($B) => $B}, ref($A));
     }
 

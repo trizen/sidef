@@ -414,7 +414,7 @@ package Sidef::Types::Array::Array {
 
         foreach my $i (@indices) {
             $i = CORE::int($i);
-            $i = $end if ($i > $end);
+            $i = $end          if ($i > $end);
             $i = $end + $i + 1 if ($i < 0);
             CORE::push(@parts, bless [@{$self}[$prev_i .. $i]]);
             $prev_i = $i + 1;
@@ -3061,9 +3061,9 @@ package Sidef::Types::Array::Array {
         Math::GMPz::Rmpz_fac_ui($f, scalar(@arr));    # f = factorial(len)
 
         while (my $len = scalar(@arr)) {
-            Math::GMPz::Rmpz_divexact_ui($f, $f, $len);                              # f = f/len
-            Math::GMPz::Rmpz_divmod($q, $n, $n, $f);                                 # q = n//f ;; n = n%f
-            Math::GMPz::Rmpz_mod_ui($q, $q, $len);                                   # q = q%len
+            Math::GMPz::Rmpz_divexact_ui($f, $f, $len);    # f = f/len
+            Math::GMPz::Rmpz_divmod($q, $n, $n, $f);       # q = n//f ;; n = n%f
+            Math::GMPz::Rmpz_mod_ui($q, $q, $len);         # q = q%len
             CORE::push(@perm, CORE::splice(@arr, Math::GMPz::Rmpz_get_ui($q), 1));
         }
 

@@ -3472,6 +3472,8 @@ Number.n_primes() -> I<Obj>
 
 Return the
 
+Aliases: I<nprimes>
+
 =cut
 
 =head2 nu
@@ -3728,7 +3730,7 @@ Number.primepi() -> I<Obj>
 
 Return the
 
-Aliases: I<prime_count>
+Aliases: I<prime_count>, I<count_primes>
 
 =cut
 
