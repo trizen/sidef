@@ -36,16 +36,16 @@ package Sidef::Object::Object {
         my ($obj1, $obj2, $swapped) = @_;
 
         # Optimization for identical objects
-        if (
-            CORE::ref($obj1) eq CORE::ref($obj2)
-            and (
-                   (CORE::ref($obj1) eq 'Sidef::Types::Number::Number')
-                 ? (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz')
-                 : 1
-                )
-            and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)
-          ) {
-            return 0;
+        if (CORE::ref($obj1) eq CORE::ref($obj2)) {
+            if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
+                if (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz') {
+                    @_ = ($$obj1, $$obj2);
+                    goto &Math::GMPz::Rmpz_cmp;
+                }
+            }
+            elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+                return 0;
+            }
         }
 
         if ($swapped) {
@@ -69,16 +69,15 @@ package Sidef::Object::Object {
         my ($obj1, $obj2) = @_;
 
         # Optimization for identical objects
-        if (
-            CORE::ref($obj1) eq CORE::ref($obj2)
-            and (
-                   (CORE::ref($obj1) eq 'Sidef::Types::Number::Number')
-                 ? (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz')
-                 : 1
-                )
-            and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)
-          ) {
-            return 1;
+        if (CORE::ref($obj1) eq CORE::ref($obj2)) {
+            if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
+                if (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz') {
+                    return !Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
+                }
+            }
+            elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+                return 1;
+            }
         }
 
 #<<<
