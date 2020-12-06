@@ -1658,8 +1658,8 @@ HEADER
                             'do{my$cmp='
                           . $code . 'cmp'
                           . $self->deparse_args(@{$call->{arg}})
-                          . ';ref($cmp) ? $cmp : (($cmp<0) ? Sidef::Types::Number::Number::MONE : '
-                          . '($cmp>0) ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO)}';
+                          . ';ref($cmp) ? $cmp : defined($cmp) ? (($cmp<0) ? Sidef::Types::Number::Number::MONE : '
+                          . '($cmp>0) ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO) : undef}';
                         next;
                     }
 

@@ -2526,7 +2526,7 @@ Number.is_nm1_prime() -> I<Obj>
 
 Return the
 
-Aliases: I<is_nminus1_prime>
+Aliases: I<is_pm1_prime>, I<is_nminus1_prime>
 
 =cut
 
@@ -2536,7 +2536,7 @@ Number.is_np1_prime() -> I<Obj>
 
 Return the
 
-Aliases: I<is_nplus1_prime>
+Aliases: I<is_pp1_prime>, I<is_nplus1_prime>
 
 =cut
 

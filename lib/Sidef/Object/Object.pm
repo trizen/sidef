@@ -35,10 +35,16 @@ package Sidef::Object::Object {
       q{cmp} => sub {
         my ($obj1, $obj2, $swapped) = @_;
 
-        # Support for cyclic references
-        if (    CORE::ref($obj1) eq CORE::ref($obj2)
-            and CORE::ref($obj1) ne 'Sidef::Types::Number::Number'
-            and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+        # Optimization for identical objects
+        if (
+            CORE::ref($obj1) eq CORE::ref($obj2)
+            and (
+                   (CORE::ref($obj1) eq 'Sidef::Types::Number::Number')
+                 ? (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz')
+                 : 1
+                )
+            and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)
+          ) {
             return 0;
         }
 
@@ -62,10 +68,16 @@ package Sidef::Object::Object {
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
-        # Support for cyclic references
-        if (    CORE::ref($obj1) eq CORE::ref($obj2)
-            and CORE::ref($obj1) ne 'Sidef::Types::Number::Number'
-            and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+        # Optimization for identical objects
+        if (
+            CORE::ref($obj1) eq CORE::ref($obj2)
+            and (
+                   (CORE::ref($obj1) eq 'Sidef::Types::Number::Number')
+                 ? (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz')
+                 : 1
+                )
+            and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)
+          ) {
             return 1;
         }
 

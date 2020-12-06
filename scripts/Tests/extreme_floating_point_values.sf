@@ -40,4 +40,60 @@ assert_eq(        NaN < 0 , nil)
 assert_eq(       NaN == 0 , false)
 assert_eq(    0.0 == -0.0 , true)
 
+assert_eq(42 <=> 42, 0)
+assert_eq(42 <=> 42.rat, 0)
+assert_eq(42.rat <=> 42, 0)
+assert_eq(42 <=> (41+1), 0)
+assert_eq(42 <=> (42-1), 1)
+assert_eq(42 <=> (42+1), -1)
+
+assert(!defined(43 <=> NaN))
+assert(!defined(NaN <=> 99))
+assert(!defined(NaN <=> NaN))
+
+with (NaN) {|x|
+
+    assert(!defined(x <=> x))
+    assert(!defined(x <=> 1))
+    assert(!defined(x <=> 0))
+    assert(!defined(0 <=> x))
+    assert(!defined(1 <=> x))
+
+    assert(!(x == x))
+    assert(x != x)
+    assert(x != 42)
+    assert(42 != x)
+    assert(!(x == 42))
+    assert(!(42 == x))
+}
+
+with (Complex(NaN, NaN)) { |x|
+
+    assert(!defined(x <=> x))
+    assert(!defined(x <=> 0))
+    assert(!defined(1 <=> x))
+    assert(!defined(0 <=> x))
+    assert(!defined(x <=> Complex(0, 0)))
+    assert(!defined(Complex(0, 0) <=> x))
+
+    assert(!(x == x))
+    assert(x != x)
+    assert(x != 11)
+    assert(11 != x)
+    assert(!(12 == x))
+    assert(!(x == 13))
+}
+
+assert(22 == 22)
+assert(!(22 != 22))
+assert(!(22 == (22+1)))
+assert(22 != (22+1))
+assert(22 != (22-1))
+
+assert(!(43 == NaN))
+assert(!(NaN == NaN))
+assert(NaN != NaN)
+assert(NaN != 43)
+assert(21 != NaN)
+
 say "** Test passed!";

@@ -12102,6 +12102,7 @@ package Sidef::Types::Number::Number {
     }
 
     *is_nm1_prime = \&is_nminus1_prime;
+    *is_pm1_prime = \&is_nminus1_prime;
 
     sub is_nplus1_prime {
         my ($x) = @_;
@@ -12116,6 +12117,7 @@ package Sidef::Types::Number::Number {
     }
 
     *is_np1_prime = \&is_nplus1_prime;
+    *is_pp1_prime = \&is_nplus1_prime;
 
     sub is_ecpp_prime {
         my ($x) = @_;
