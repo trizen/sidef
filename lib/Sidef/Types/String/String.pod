@@ -526,6 +526,38 @@ Return the
 
 =cut
 
+=head2 extract_bracketed
+
+String.extract_bracketed() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 extract_codeblock
+
+String.extract_codeblock() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 extract_delimited
+
+String.extract_delimited() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 extract_quotelike
+
+String.extract_quotelike() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fc
 
 String.fc() -> I<Obj>

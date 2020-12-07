@@ -338,6 +338,34 @@ package Sidef::Types::String::String {
         bless \Digest::SHA::sha512_hex(${$_[0]});
     }
 
+    sub extract_bracketed {
+        my ($self, $brackets) = @_;
+        state $x = require Text::Balanced;
+        my @results = Text::Balanced::extract_bracketed($$self, "$brackets");
+        map { bless \$_ } @results;
+    }
+
+    sub extract_delimited {
+        my ($self, $delim) = @_;
+        state $x = require Text::Balanced;
+        my @results = Text::Balanced::extract_delimited($$self, "$delim");
+        map { bless \$_ } @results;
+    }
+
+    sub extract_codeblock {
+        my ($self, $delim) = @_;
+        state $x = require Text::Balanced;
+        my @results = Text::Balanced::extract_codeblock($$self, "$delim");
+        map { bless \$_ } @results;
+    }
+
+    sub extract_quotelike {
+        my ($self) = @_;
+        state $x = require Text::Balanced;
+        my @results = Text::Balanced::extract_quotelike($$self);
+        map { bless \$_ } @results;
+    }
+
     sub substr {
         my ($self, $offs, $len) = @_;
         bless \(
