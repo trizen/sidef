@@ -70,6 +70,8 @@ my $builder = Module::Build->new(
                    'Data::Dump::Filtered' => 0,    # Block.ffork()
                    'Math::Prime::Util'    => 0.73, # used in some Number methods, if available
                    'Term::ReadLine::Gnu'  => 0,    # better STDIN support (+history)
+                   'Text::Balanced'       => 0,    # Str.extract_bracketed(), Str.extract_delimited()
+                   'Text::ParseWords'     => 0,    # Str.parse_quotewords()
                   },
 
     add_to_cleanup     => ['Sidef-*'],

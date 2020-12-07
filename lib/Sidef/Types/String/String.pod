@@ -558,6 +558,14 @@ Return the
 
 =cut
 
+=head2 extract_tagged
+
+String.extract_tagged() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fc
 
 String.fc() -> I<Obj>
@@ -985,6 +993,14 @@ Return the
 =head2 pack
 
 String.pack() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 parse_quotewords
+
+String.parse_quotewords() -> I<Obj>
 
 Return the
 
