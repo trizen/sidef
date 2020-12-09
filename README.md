@@ -64,7 +64,7 @@ for i in (1..10) {
 }
 ```
 
-### ASCII generation of the [Sierpinksi triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle):
+### ASCII generation of the [Sierpinski triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle):
 ```ruby
 func sierpinski_triangle(n) {
     var triangle = ['*']
