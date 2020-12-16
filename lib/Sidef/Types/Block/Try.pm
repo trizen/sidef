@@ -11,8 +11,7 @@ package Sidef::Types::Block::Try {
         my ($self, $block) = @_;
 
         my $error = 0;
-        local $SIG{__WARN__} = sub { $self->{type} = 'warning'; $self->{msg} = $_[0]; $error = 1 };
-        local $SIG{__DIE__}  = sub { $self->{type} = 'error';   $self->{msg} = $_[0]; $error = 1 };
+        local $SIG{__DIE__} = sub { $self->{msg} = $_[0]; $error = 1 };
 
         $self->{val} = [eval { $block->run }];
 
@@ -29,8 +28,8 @@ package Sidef::Types::Block::Try {
         my @ret;
 
         if (defined($block) and $self->{catch}) {
-            @ret = $block->run(Sidef::Types::String::String->new($self->{type}),
-                               Sidef::Types::String::String->new($self->{msg} =~ s/^\[.*?\]\h*//r)->chomp);
+            chomp(my $msg = $self->{msg});
+            @ret = $block->run(Sidef::Types::String::String->new($msg));
         }
         else {
             @ret = @{$self->{val}};
