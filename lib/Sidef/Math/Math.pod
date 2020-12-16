@@ -32,6 +32,14 @@ Aliases: I<arithmetic_mean>
 
 =cut
 
+=head2 binsplit
+
+Math.binsplit() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 chinese
 
 Math.chinese() -> I<Obj>

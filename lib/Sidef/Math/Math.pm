@@ -13,35 +13,9 @@ package Sidef::Math::Math {
         bless {}, __PACKAGE__;
     }
 
-    sub _binsplit {    # not used anymore, but let's keep it around anyway
-        my ($arr, $method) = @_;
-
-        my $sub = sub {
-            my ($s, $n, $m) = @_;
-
-            $n == $m
-              ? $s->[$n]
-              : __SUB__->($s, $n, ($n + $m) >> 1)->$method(__SUB__->($s, (($n + $m) >> 1) + 1, $m));
-        };
-
-        my $end = $#$arr;
-
-        if ($end < 0) {
-            return undef;
-        }
-
-        if ($end <= 1e5) {
-            return $sub->($arr, 0, $end);
-        }
-
-        my @partial;
-
-        while (@$arr) {
-            my @head = splice(@$arr, 0, 1e5);
-            push @partial, $sub->(\@head, 0, $#head);
-        }
-
-        __SUB__->(\@partial, $method);
+    sub binsplit {
+        my ($self, $block, @list) = @_;
+        Sidef::Types::Number::Number::_binsplit(\@list, $block);
     }
 
     sub gcd {
