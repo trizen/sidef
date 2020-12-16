@@ -13517,7 +13517,7 @@ package Sidef::Types::Number::Number {
         }
 
 #<<<
-        if (HAS_PRIME_UTIL) {
+        if (0 and HAS_PRIME_UTIL) {     # MPU 0.73 leaks memory
             return Sidef::Types::Array::Array->new([
                 map {
                     ref($_) eq 'Math::GMPz'
