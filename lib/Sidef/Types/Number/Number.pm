@@ -13517,7 +13517,7 @@ package Sidef::Types::Number::Number {
         }
 
 #<<<
-        if (0 and HAS_PRIME_UTIL) {     # MPU 0.73 leaks memory
+        if (0 and HAS_PRIME_UTIL) {     # XXX: MPU 0.73 leaks memory
             return Sidef::Types::Array::Array->new([
                 map {
                     ref($_) eq 'Math::GMPz'
@@ -13536,27 +13536,28 @@ package Sidef::Types::Number::Number {
 
         my %r = (1 => [$ONE]);
 
-        foreach my $d (Math::Prime::Util::GMP::divisors($nstr)) {
+        foreach my $t (Math::Prime::Util::GMP::divisors($nstr)) {
 
-            my $t  = (($d + 1) < ULONG_MAX) ? $d : Math::GMPz::Rmpz_init_set_str("$d", 10);
-            my $tt = $t + 1;
+            my $d = (($t + 1) < ULONG_MAX) ? $t : Math::GMPz::Rmpz_init_set_str("$t", 10);
+            my $D = $d + 1;
 
-            Math::Prime::Util::GMP::is_prime($tt) || next;
+            Math::Prime::Util::GMP::is_prime($D) || next;
 
             my %temp;
-            foreach my $k (1 .. Math::Prime::Util::GMP::valuation($nstr, $tt) + 1) {
+            foreach my $k (1 .. Math::Prime::Util::GMP::valuation($nstr, $D) + 1) {
 
-                if (ref($tt)) {
-                    Math::GMPz::Rmpz_pow_ui($u, $tt, $k - 1);
-                    Math::GMPz::Rmpz_set($v, $u);
-                    Math::GMPz::Rmpz_mul($v, $v, $tt);
-                    Math::GMPz::Rmpz_mul($u, $u, $t);
+                # u = d * (d+1)^(k-1) = d * D^(k-1)
+                # v = (d+1)^k = D^k = (u/d)*D
+
+                if (ref($D)) {
+                    Math::GMPz::Rmpz_pow_ui($u, $D, $k - 1);
+                    Math::GMPz::Rmpz_mul($v, $u, $D);
+                    Math::GMPz::Rmpz_mul($u, $u, $d);
                 }
                 else {
-                    Math::GMPz::Rmpz_ui_pow_ui($u, $tt, $k - 1);
-                    Math::GMPz::Rmpz_set($v, $u);
-                    Math::GMPz::Rmpz_mul_ui($v, $v, $tt);
-                    Math::GMPz::Rmpz_mul_ui($u, $u, $t);
+                    Math::GMPz::Rmpz_ui_pow_ui($u, $D, $k - 1);
+                    Math::GMPz::Rmpz_mul_ui($v, $u, $D);
+                    Math::GMPz::Rmpz_mul_ui($u, $u, $d);
                 }
 
                 Math::GMPz::Rmpz_divexact($w, $n, $u);
@@ -13599,11 +13600,80 @@ package Sidef::Types::Number::Number {
         $n->inverse_totient->len;
     }
 
+    *inverse_phi_len = \&inverse_totient_len;
+
+    sub inverse_usigma {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return Sidef::Types::Array::Array->new(ZERO) if !Math::GMPz::Rmpz_sgn($n);
+            return Sidef::Types::Array::Array->new;
+        }
+
+        my $u = Math::GMPz::Rmpz_init();
+        my $v = Math::GMPz::Rmpz_init();
+        my $w = Math::GMPz::Rmpz_init();
+
+        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+
+        my %r = (1 => [$ONE]);
+
+        foreach my $t (Math::Prime::Util::GMP::divisors($nstr)) {
+
+            my $d = ($t < ULONG_MAX) ? $t : Math::GMPz::Rmpz_init_set_str("$t", 10);
+            my $D = $d - 1;
+
+            Math::Prime::Util::GMP::is_prime_power($D) || next;
+
+            my %temp;
+            foreach my $k (1 .. Math::Prime::Util::GMP::valuation($nstr, $D) + 1) {
+
+                # v = (d-1)^k = D^k
+                # u = (d-1)^k + 1 = v+1
+
+                ref($D)
+                  ? Math::GMPz::Rmpz_pow_ui($v, $D, $k)
+                  : Math::GMPz::Rmpz_ui_pow_ui($v, $D, $k);
+
+                Math::GMPz::Rmpz_add_ui($u, $v, 1);
+                Math::GMPz::Rmpz_divisible_p($n, $u) || next;
+                Math::GMPz::Rmpz_divexact($w, $n, $u);
+
+                foreach my $f (Math::Prime::Util::GMP::divisors($w)) {
+                    if (exists $r{$f}) {
+                        push @{$temp{$u * $f}}, map { $v * $_ } grep {
+                            Math::GMPz::Rmpz_gcd($w, $v, $_);
+                            Math::GMPz::Rmpz_cmp_ui($w, 1) == 0
+                        } @{$r{$f}};
+                    }
+                }
+            }
+
+            foreach my $i (keys %temp) {
+                push @{$r{$i}}, @{$temp{$i}};
+            }
+        }
+
+        exists($r{$n})
+          || return Sidef::Types::Array::Array->new;
+
+        my %seen;
+        Sidef::Types::Array::Array->new(
+                                        [map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) }
+                                         grep { !$seen{Math::GMPz::Rmpz_get_str($_, 10)}++ } @{$r{$n}}
+                                        ]
+                                       );
+    }
+
     sub inverse_sigma {
         my ($n) = @_;
 
         # Code based on invphi.gp v1.3 by Max Alekseyev.
         # https://home.gwu.edu/~maxal/gpscripts/invphi.gp
+
+        # TODO: accept an optional argument `k >= 0` and solve for sigma_k(x) = n.
 
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
 

@@ -2124,6 +2124,16 @@ Aliases: I<inverse_totient>, I<inverse_euler_phi>
 
 =cut
 
+=head2 inverse_phi_len
+
+Number.inverse_phi_len() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_totient_len>
+
+=cut
+
 =head2 inverse_polygonal
 
 Number.inverse_polygonal() -> I<Obj>
@@ -2142,9 +2152,9 @@ Return the
 
 =cut
 
-=head2 inverse_totient_len
+=head2 inverse_usigma
 
-Number.inverse_totient_len() -> I<Obj>
+Number.inverse_usigma() -> I<Obj>
 
 Return the
 
