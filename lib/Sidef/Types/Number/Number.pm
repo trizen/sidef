@@ -16785,6 +16785,7 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPz: {
+            return $x if ($prec == 0);
             $x = _mpz2mpq($x);
             goto Math_GMPq;
         }

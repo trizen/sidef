@@ -8,7 +8,7 @@ func catch_multi {
     f.abcdefg
     (true, :a, :b, f)
   } catch {
-      |_, msg|
+      |msg|
     (false, :a, :b, :catch_branch, msg)
   }
 }
@@ -18,7 +18,7 @@ func try_multi {
     var f = :try_branch
     (true, :a, :b, f)
   } catch {
-      |_, msg|
+      |msg|
     (false, :a, :b, :catch_branch, msg)
   }
 }

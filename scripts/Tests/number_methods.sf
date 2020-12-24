@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+# Tests for some Number methods.
+
+assert_eq(inverse_usigma(120), 1..120 -> grep { .usigma == 120 })
+assert_eq(inverse_usigma(5040).len, 38)
+assert_eq(inverse_usigma(5040).map { .usigma }.uniq, [5040])
+
+assert_eq(inverse_sigma(120), 1..120 -> grep { .sigma == 120 })
+assert_eq(inverse_sigma(5040).len, 33)
+assert_eq(inverse_sigma(5040).map{.sigma}.uniq, [5040])
+
+assert_eq(inverse_phi(120), [143, 155, 175, 183, 225, 231, 244, 248, 286, 308, 310, 350, 366, 372, 396, 450, 462])
+assert_eq(inverse_phi(5040).len, 93)
+assert_eq(inverse_phi(5040).map{ .phi }.uniq, [5040])
+
+assert_eq(20.of { .omega },  20.of { .factor_exp.len })
+assert_eq(20.of { .Omega },  20.of { .factor.len })
+
+assert_eq(20.of { .tau },       20.of { .divisors.len })
+assert_eq(20.of { .sigma },     20.of { .divisors.sum })
+assert_eq(20.of { .sigma(2) },  20.of { .divisors.sum { _*_ } })
+
+assert_eq(20.of { .phi },    20.of {|n| 1..n -> count_by { |k| is_coprime(n,k) } })
+assert_eq(20.of { .usigma }, 20.of { _ ? .factor_map { |p,e| p**e + 1 }.prod : 0 })
+assert_eq(20.of { .uphi },   20.of { _ ? .factor_map { |p,e| p**e - 1 }.prod : 0 })
+
+assert_eq(1..100 -> grep { .is_smooth(5) }, 1..100 -> grep { .gpf <= 5 })
+assert_eq(2..100 -> grep { .is_rough(5)  }, 2..100 -> grep { .lpf >= 5 })
+
+say "** Tests passed!"

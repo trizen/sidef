@@ -873,6 +873,7 @@ scripts/Tests/next_composite.sf
 scripts/Tests/non_continuous_seq.sf
 scripts/Tests/nth_prime.sf
 scripts/Tests/number_binary_search.sf
+scripts/Tests/number_methods.sf
 scripts/Tests/object_copy.sf
 scripts/Tests/object_methods_reflection.sf
 scripts/Tests/objects_init.sf
