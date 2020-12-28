@@ -52,9 +52,7 @@ package Sidef::Types::Number::Gauss {
         Sidef::Types::Number::Complex->new($_[0]->{re}, $_[0]->{im});
     }
 
-    sub to_n {
-        $_[0];
-    }
+    *to_n = \&to_c;
 
     sub re {
         $_[0]->{re};

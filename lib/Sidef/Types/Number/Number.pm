@@ -81,7 +81,9 @@ package Sidef::Types::Number::Number {
 
         my $ref = ref($num);
 
-        if ($ref eq 'Sidef::Types::Number::Mod') {
+        if (   $ref eq 'Sidef::Types::Number::Mod'
+            or $ref eq 'Sidef::Types::Number::Gauss'
+            or $ref eq 'Sidef::Types::Number::Quadratic') {
             $num = $num->to_n;
         }
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
@@ -1641,11 +1643,12 @@ package Sidef::Types::Number::Number {
     sub add {
         my ($x, $y) = @_;
 
-        if (ref($y) eq 'Sidef::Types::Number::Gauss') {
-            return $y->add($x);
-        }
+        if (
+               ref($y) eq 'Sidef::Types::Number::Gauss'
+            or ref($y) eq 'Sidef::Types::Number::Quadratic'
+            or ref($y) eq ref($y) eq 'Sidef::Types::Number::Mod'
 
-        if (ref($y) eq 'Sidef::Types::Number::Mod') {
+          ) {
             return $y->add($x);
         }
 
@@ -1799,6 +1802,10 @@ package Sidef::Types::Number::Number {
             return ref($y)->new($x, $y->{m})->sub($y);
         }
 
+        if (ref($y) eq 'Sidef::Types::Number::Quadratic') {
+            return ref($y)->new($x, ZERO, $y->{w})->sub($y);
+        }
+
         _valid(\$y);
         bless \__sub__($$x, $$y);
     }
@@ -1924,11 +1931,9 @@ package Sidef::Types::Number::Number {
     sub mul {
         my ($x, $y) = @_;
 
-        if (ref($y) eq 'Sidef::Types::Number::Gauss') {
-            return $y->mul($x);
-        }
-
-        if (ref($y) eq 'Sidef::Types::Number::Mod') {
+        if (   ref($y) eq 'Sidef::Types::Number::Gauss'
+            or ref($y) eq 'Sidef::Types::Number::Quadratic'
+            or ref($y) eq 'Sidef::Types::Number::Mod') {
             return $y->mul($x);
         }
 
@@ -2101,6 +2106,10 @@ package Sidef::Types::Number::Number {
 
         if (ref($y) eq 'Sidef::Types::Number::Mod') {
             return ref($y)->new($x, $y->{m})->div($y);
+        }
+
+        if (ref($y) eq 'Sidef::Types::Number::Quadratic') {
+            return ref($y)->new($x, ZERO, $y->{w})->div($y);
         }
 
         _valid(\$y);

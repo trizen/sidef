@@ -428,11 +428,13 @@ Return the
 
 =cut
 
-=head2 to_n
+=head2 to_c
 
-Quadratic.to_n() -> I<Obj>
+Quadratic.to_c() -> I<Obj>
 
 Return the
+
+Aliases: I<to_n>
 
 =cut
 

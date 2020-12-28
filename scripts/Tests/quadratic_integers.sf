@@ -105,7 +105,6 @@ do {
     assert_eq(a/b -> to_n.round(-30), a.to_n/b.to_n -> round(-30))
 }
 
-
 func Gaussian(a,b=0) {
     Quadratic(a, b, -1)
 }
@@ -114,12 +113,12 @@ var r = (-2 .. 2)
 
 for a in (r), b in (r), c in (r), d in (r) {
 
-    assert_eq([Complex(a,b) + Complex(c,d) -> reals], [cadd(a,b,c,d)])
-    assert_eq([Complex(a,b) - Complex(c,d) -> reals], [csub(a,b,c,d)])
-    assert_eq([Complex(a,b) * Complex(c,d) -> reals], [cmul(a,b,c,d)])
+    assert_eq([Gaussian(a,b) + Gaussian(c,d) -> reals], [cadd(a,b,c,d)])
+    assert_eq([Gaussian(a,b) - Gaussian(c,d) -> reals], [csub(a,b,c,d)])
+    assert_eq([Gaussian(a,b) * Gaussian(c,d) -> reals], [cmul(a,b,c,d)])
 
     if (c*c + d*d != 0) {
-        assert_eq([Complex(a,b) / Complex(c,d) -> reals], [cdiv(a,b,c,d)].map{.float})
+        assert_eq([Gaussian(a,b) / Gaussian(c,d) -> reals], [cdiv(a,b,c,d)])
     }
 }
 
@@ -128,8 +127,8 @@ for a in (r), b in (r) {
     var n = irand(0, 100)
     var m = irand(100, 1000)
 
-    assert_eq([Complex(a,b)**n -> reals], [cpow(a,b,n)])
-    assert_eq([Complex(a,b)**n -> reals].map { .mod(m) } , [cpowmod(a,b,n,m)])
+    assert_eq([Gaussian(a,b)**n -> reals], [cpow(a,b,n)])
+    assert_eq([Gaussian(a,b)**n -> reals].map { .mod(m) } , [cpowmod(a,b,n,m)])
 }
 
 func gaussian_sum(n) {
@@ -257,8 +256,8 @@ assert_eq(Mod(Gaussian(3,4), 1234567)**-1234 -> lift, powmod(Gaussian(3,4), -123
 assert_eq(Gaussian(3/5,11/4)**(-27), Gaussian(3/5,11/4)**27 -> inv)
 assert_eq(Gaussian(3/5,11/4)**(-27), Gaussian(3/5,11/4).inv**27)
 
-assert_eq(Complex(Gaussian(3,4), Gaussian(17,19)), -16+21i)
-assert_eq(Complex(Mod(13, 97), Mod(43, 97)), 13+43i)
+assert_eq(Gaussian(Gaussian(3,4), Gaussian(17,19)).to_n.to_n, -16+21i)
+assert_eq(Gaussian(Mod(13, 97), Mod(43, 97)).to_n.to_n, 13+43i)
 assert_eq(Gaussian(Mod(13, 97), Mod(43, 97)), Gaussian(Mod(13, 97), Mod(43, 97)))
 assert_eq(Mod(Gaussian(3, 4), 97)*1234, Mod(Gaussian(16, 86), 97))
 assert_eq(Mod(Gaussian(3/4, 5/6), 1234567)**10 * Mod(Gaussian(3/4, 5/6), 1234567)**-10, Mod(Gaussian(1,0), 1234567))
@@ -266,10 +265,10 @@ assert_eq(Mod(Gaussian(3/4, 5/6), 1234567)**10 * Mod(Gaussian(3/4, 5/6), 1234567
 assert_eq((Mod(Gaussian(43/3, 97/5), 127)**(-11) * Mod(Gaussian(43/3, 97/5), 127))**+9, Mod(Gaussian(52, 73), 127))
 assert_eq((Mod(Gaussian(43/3, 97/5), 127)**(-11) * Mod(Gaussian(43/3, 97/5), 127))**-9, Mod(Gaussian(81, 89), 127))
 
-assert_eq((3 + Gaussian(4, 5)), Gaussian(7, 5).to_n)
-assert_eq((3 - Gaussian(4, 5)), Gaussian(-1, -5).to_n)
-assert_eq((3 * Gaussian(4, 5)), Gaussian(12, 15).to_n)
-assert_eq((3 / Gaussian(4, 5)), Gaussian(12/41, -15/41).to_n)
+assert_eq((3 + Gaussian(4, 5)), Gaussian(7, 5))
+assert_eq((3 - Gaussian(4, 5)), Gaussian(-1, -5))
+assert_eq((3 * Gaussian(4, 5)), Gaussian(12, 15))
+assert_eq((3 / Gaussian(4, 5)), Gaussian(12/41, -15/41))
 
 var params = [
     [3, 4, 5, 6],

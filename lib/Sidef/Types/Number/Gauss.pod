@@ -466,13 +466,7 @@ Gauss.to_c() -> I<Obj>
 
 Return the
 
-=cut
-
-=head2 to_n
-
-Gauss.to_n() -> I<Obj>
-
-Return the
+Aliases: I<to_n>
 
 =cut
 

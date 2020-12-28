@@ -108,7 +108,7 @@ assert_eq(Mod(Gauss(3,4), 1e6)**1000, Mod(Gauss(585313, 426784), 1e6))
 assert(Mod(Gauss(3,4), 1e6)**1000 == Mod(Gauss(585313, 426784), 1e6))
 
 assert_eq(Mod(43, 97).to_n, 43)
-assert_eq(Gauss(3,4).to_n, Gauss(3,4))
+assert_eq(Gauss(3,4).to_n, 3+4i)
 assert_eq(Gauss(3,4).to_c, 3+4i)
 
 assert_eq(Gauss(42).invmod(2017), Gauss(1969, 0))
