@@ -268,8 +268,6 @@ package Sidef::Types::Number::Quadratic {
     sub pow {
         my ($x, $n) = @_;
 
-        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO, $x->{w});
-
         my $negative_power = 0;
 
         if ($n->is_neg) {
@@ -277,14 +275,20 @@ package Sidef::Types::Number::Quadratic {
             $negative_power = 1;
         }
 
+        my ($X, $Y) = (Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO);
+        my ($A, $B, $w) = ($x->{a}, $x->{b}, $x->{w});
+
         foreach my $bit (reverse split(//, $n->as_bin)) {
 
             if ($bit) {
-                $c = $c->mul($x);
+                ($X, $Y) = ($A->mul($X)->add($B->mul($Y)->mul($w)), $A->mul($Y)->add($B->mul($X)));
             }
 
-            $x = $x->mul($x);
+            my $t = $A->mul($B);
+            ($A, $B) = ($A->sqr->add($B->sqr->mul($w)), $t->add($t));
         }
+
+        my $c = __PACKAGE__->new($X, $Y, $w);
 
         if ($negative_power) {
             $c = $c->inv;
@@ -298,8 +302,6 @@ package Sidef::Types::Number::Quadratic {
 
         $x = $x->ratmod($m);
 
-        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO, $x->{w});
-
         my $negative_power = 0;
 
         if ($n->is_neg) {
@@ -307,16 +309,20 @@ package Sidef::Types::Number::Quadratic {
             $negative_power = 1;
         }
 
+        my ($X, $Y) = (Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO);
+        my ($A, $B, $w) = ($x->{a}, $x->{b}, $x->{w});
+
         foreach my $bit (reverse split(//, $n->as_bin)) {
 
             if ($bit) {
-                $c = $c->mul($x);
-                $c = $c->mod($m);
+                ($X, $Y) = ($A->mul($X)->add($B->mul($Y)->mul($w))->mod($m), $A->mul($Y)->add($B->mul($X))->mod($m));
             }
 
-            $x = $x->mul($x);
-            $x = $x->mod($m);
+            my $t = $A->mul($B);
+            ($A, $B) = ($A->sqr->add($B->sqr->mul($w))->mod($m), $t->add($t)->mod($m));
         }
+
+        my $c = __PACKAGE__->new($X, $Y, $w);
 
         if ($negative_power) {
             $c = $c->invmod($m);
