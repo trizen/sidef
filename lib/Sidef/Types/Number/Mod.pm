@@ -89,14 +89,26 @@ package Sidef::Types::Number::Mod {
     sub chinese {
         my (@values) = @_;
 
-        my $crt = __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE);
+#<<<
+        my $crt = __PACKAGE__->new(
+            Sidef::Types::Number::Number::ZERO,
+            Sidef::Types::Number::Number::ONE
+        );
+#>>>
 
         foreach my $mod (@values) {
 
             ref($mod) eq __PACKAGE__ or next;
 
-            $crt = __PACKAGE__->new(Sidef::Math::Math->chinese([$crt->{n}, $crt->{m}], [$mod->{n}, $mod->{m}]),
-                                    Sidef::Types::Number::Number::lcm($crt->{m}, $mod->{m}));
+#<<<
+            $crt = __PACKAGE__->new(
+                Sidef::Math::Math->chinese(
+                    [$crt->{n}, $crt->{m}],
+                    [$mod->{n}, $mod->{m}]
+                ),
+                Sidef::Types::Number::Number::lcm($crt->{m}, $mod->{m})
+            );
+#>>>
         }
 
         $crt;

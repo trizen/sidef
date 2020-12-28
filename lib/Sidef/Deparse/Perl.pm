@@ -58,6 +58,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number
                   Sidef::DataTypes::Number::Mod           Sidef::Types::Number::Mod
                   Sidef::DataTypes::Number::Gauss         Sidef::Types::Number::Gauss
+                  Sidef::DataTypes::Number::Quadratic     Sidef::Types::Number::Quadratic
                   Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
                   Sidef::DataTypes::Range::Range          Sidef::Types::Range::Range
                   Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber

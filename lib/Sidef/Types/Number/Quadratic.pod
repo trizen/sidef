@@ -1,0 +1,455 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Quadratic
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+var obj = Quadratic(...)
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+       * Sidef::Types::Number::Number
+
+=head1 METHODS
+
+=head2 !=
+
+I<Obj> B<!=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 %
+
+I<Obj> B<%> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mod>
+
+=cut
+
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<and>
+
+=cut
+
+=head2 *
+
+I<Obj> B<*> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 **
+
+I<Obj> B<**> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<pow>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>
+
+=cut
+
+=head2 ++
+
+I<Obj> B<++> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<inc>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 --
+
+I<Obj> B<--> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<dec>
+
+=cut
+
+=head2 /
+
+I<Obj> B</> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<÷>, I<div>
+
+=cut
+
+=head2 <
+
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <<
+
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lsft>, I<shift_left>
+
+=cut
+
+=head2 <=>
+
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 >>
+
+I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<rsft>, I<shift_right>
+
+=cut
+
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
+=head2 a
+
+Quadratic.a() -> I<Obj>
+
+Return the
+
+Aliases: I<real>
+
+=cut
+
+=head2 abs
+
+Quadratic.abs() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 b
+
+Quadratic.b() -> I<Obj>
+
+Return the
+
+Aliases: I<imag>
+
+=cut
+
+=head2 ceil
+
+Quadratic.ceil() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 conj
+
+Quadratic.conj() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Quadratic.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 float
+
+Quadratic.float() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Quadratic.floor() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 inv
+
+Quadratic.inv() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 invmod
+
+Quadratic.invmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_coprime
+
+Quadratic.is_coprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_imag
+
+Quadratic.is_imag() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_mone
+
+Quadratic.is_mone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_one
+
+Quadratic.is_one() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_real
+
+Quadratic.is_real() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_zero
+
+Quadratic.is_zero() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 neg
+
+Quadratic.neg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Quadratic.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 norm
+
+Quadratic.norm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 powmod
+
+Quadratic.powmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ratmod
+
+Quadratic.ratmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 reals
+
+Quadratic.reals() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 round
+
+Quadratic.round() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sgn
+
+Quadratic.sgn() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sqr
+
+Quadratic.sqr() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_n
+
+Quadratic.to_n() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_s
+
+Quadratic.to_s() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 w
+
+Quadratic.w() -> I<Obj>
+
+Return the
+
+Aliases: I<order>
+
+=cut
