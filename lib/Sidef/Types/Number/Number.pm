@@ -837,6 +837,24 @@ package Sidef::Types::Number::Number {
         @factor_exp;
     }
 
+    # All positive divisors of n.
+    sub _divisors {
+        my ($n) = @_;
+
+        if (HAS_PRIME_UTIL) {
+            if (ref($n) eq 'Math::GMPz') {
+                if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                    return Math::Prime::Util::divisors(Math::GMPz::Rmpz_get_ui($n));
+                }
+            }
+            elsif ($n < ULONG_MAX) {
+                return Math::Prime::Util::divisors($n);
+            }
+        }
+
+        Math::Prime::Util::GMP::divisors((ref($n) eq 'Math::GMPz') ? Math::GMPz::Rmpz_get_str($n, 10) : $n);
+    }
+
     sub _cached_primorial {
         my ($k, $limit) = @_;
 
@@ -13021,7 +13039,7 @@ package Sidef::Types::Number::Number {
         my @terms;
         my $result = ZERO;
 
-        foreach my $d (Math::Prime::Util::GMP::divisors(Math::GMPz::Rmpz_get_str($n, 10))) {
+        foreach my $d (_divisors($n)) {
 
             my $t =
               ($d < ULONG_MAX)
@@ -13151,6 +13169,11 @@ package Sidef::Types::Number::Number {
             }
 
             return Sidef::Types::Array::Array->new([grep { $$_ <= $k } @{$_[0]->divisors}]);
+        }
+
+        if (HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return Sidef::Types::Array::Array->new(
+                                [map { __PACKAGE__->_set_uint($_) } Math::Prime::Util::divisors(Math::GMPz::Rmpz_get_ui($n))]);
         }
 
         Sidef::Types::Array::Array->new(
@@ -13545,7 +13568,7 @@ package Sidef::Types::Number::Number {
 
         my %r = (1 => [$ONE]);
 
-        foreach my $t (Math::Prime::Util::GMP::divisors($nstr)) {
+        foreach my $t (_divisors($nstr)) {
 
             my $d = (($t + 1) < ULONG_MAX) ? $t : Math::GMPz::Rmpz_init_set_str("$t", 10);
             my $D = $d + 1;
@@ -13571,7 +13594,7 @@ package Sidef::Types::Number::Number {
 
                 Math::GMPz::Rmpz_divexact($w, $n, $u);
 
-                foreach my $f (Math::Prime::Util::GMP::divisors($w)) {
+                foreach my $f (_divisors($w)) {
                     if (exists $r{$f}) {
                         push @{$temp{$u * $f}}, map { $v * $_ } @{$r{$f}};
                     }
@@ -13629,7 +13652,7 @@ package Sidef::Types::Number::Number {
 
         my %r = (1 => [$ONE]);
 
-        foreach my $t (Math::Prime::Util::GMP::divisors($nstr)) {
+        foreach my $t (_divisors($nstr)) {
 
             my $d = ($t < ULONG_MAX) ? $t : Math::GMPz::Rmpz_init_set_str("$t", 10);
             my $D = $d - 1;
@@ -13650,7 +13673,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_divisible_p($n, $u) || next;
                 Math::GMPz::Rmpz_divexact($w, $n, $u);
 
-                foreach my $f (Math::Prime::Util::GMP::divisors($w)) {
+                foreach my $f (_divisors($w)) {
                     if (exists $r{$f}) {
                         push @{$temp{$u * $f}}, map { $v * $_ } grep {
                             Math::GMPz::Rmpz_gcd($w, $v, $_);
@@ -13709,7 +13732,7 @@ package Sidef::Types::Number::Number {
             }
 
             my (@R, @D);
-            $divisor_cache{$n} //= [Math::Prime::Util::GMP::divisors($n)];
+            $divisor_cache{$n} //= [_divisors($n)];
 
             foreach my $d (@{$divisor_cache{$n}}) {
                 if ($d >= $m) {
@@ -14730,7 +14753,7 @@ package Sidef::Types::Number::Number {
         $n = _big2pistr($n) // return Sidef::Types::Array::Array->new;
 
         my @array;
-        foreach my $divisor (Math::Prime::Util::GMP::divisors($n)) {
+        foreach my $divisor (_divisors($n)) {
             push @array,
               $block->run(
                           ($divisor < ULONG_MAX)
@@ -16282,7 +16305,7 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_mul_2exp($t, $n, 1);
 
-        my @divisors = Math::Prime::Util::GMP::divisors(Math::GMPz::Rmpz_get_str($t, 10));
+        my @divisors = _divisors(Math::GMPz::Rmpz_get_str($t, 10));
 
         shift @divisors;
         pop @divisors;
