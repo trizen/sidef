@@ -13676,55 +13676,42 @@ package Sidef::Types::Number::Number {
         my $v = Math::GMPz::Rmpz_init();
         my $w = Math::GMPz::Rmpz_init();
 
-        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+        my %R = (1 => [$ONE]);
 
-        my %r = (1 => [$ONE]);
+        foreach my $d (_divisors($n)) {
 
-        foreach my $t (_divisors($nstr)) {
+            Math::Prime::Util::GMP::is_prime_power(Math::Prime::Util::subint($d, 1)) || next;
 
-            my $d = ($t < ULONG_MAX) ? $t : Math::GMPz::Rmpz_init_set_str("$t", 10);
-            my $D = $d - 1;
+            # v = (d-1) = D
+            # u = (d-1) + 1 = d
 
-            Math::Prime::Util::GMP::is_prime_power($D) || next;
+            ($d < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($u, $d)
+              : Math::GMPz::Rmpz_set_str($u, $d, 10);
+
+            Math::GMPz::Rmpz_sub_ui($v, $u, 1);
+            Math::GMPz::Rmpz_divexact($w, $n, $u);
 
             my %temp;
-            foreach my $k (1 .. Math::Prime::Util::GMP::valuation($nstr, $D) + 1) {
 
-                # v = (d-1)^k = D^k
-                # u = (d-1)^k + 1 = v+1
-
-                ref($D)
-                  ? Math::GMPz::Rmpz_pow_ui($v, $D, $k)
-                  : Math::GMPz::Rmpz_ui_pow_ui($v, $D, $k);
-
-                Math::GMPz::Rmpz_add_ui($u, $v, 1);
-                Math::GMPz::Rmpz_divisible_p($n, $u) || next;
-                Math::GMPz::Rmpz_divexact($w, $n, $u);
-
-                foreach my $f (_divisors($w)) {
-                    if (exists $r{$f}) {
-                        push @{$temp{$u * $f}}, map { $v * $_ } grep {
-                            Math::GMPz::Rmpz_gcd($w, $v, $_);
-                            Math::GMPz::Rmpz_cmp_ui($w, 1) == 0
-                        } @{$r{$f}};
-                    }
+            foreach my $f (_divisors($w)) {
+                if (exists $R{$f}) {
+                    push @{$temp{$u * $f}}, map { $v * $_ } grep {
+                        Math::GMPz::Rmpz_gcd($w, $v, $_);
+                        Math::GMPz::Rmpz_cmp_ui($w, 1) == 0
+                    } @{$R{$f}};
                 }
             }
 
-            foreach my $i (keys %temp) {
-                push @{$r{$i}}, @{$temp{$i}};
+            while (my ($key, $value) = each %temp) {
+                push @{$R{$key}}, @$value;
             }
         }
 
-        exists($r{$n})
+        exists($R{$n})
           || return Sidef::Types::Array::Array->new;
 
-        my %seen;
-        Sidef::Types::Array::Array->new(
-                                        [map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) }
-                                         grep { !$seen{Math::GMPz::Rmpz_get_str($_, 10)}++ } @{$r{$n}}
-                                        ]
-                                       );
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @{$R{$n}}]);
     }
 
     sub _cook_sigma {
