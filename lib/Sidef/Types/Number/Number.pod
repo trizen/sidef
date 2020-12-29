@@ -2120,7 +2120,7 @@ Number.inverse_phi() -> I<Obj>
 
 Return the
 
-Aliases: I<inverse_totient>, I<inverse_euler_phi>
+Aliases: I<inverse_totient>
 
 =cut
 
