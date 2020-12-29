@@ -7,12 +7,19 @@ assert_eq(inverse_usigma(5040).len, 38)
 assert_eq(inverse_usigma(5040).map { .usigma }.uniq, [5040])
 
 assert_eq(inverse_sigma(120), 1..120 -> grep { .sigma == 120 })
+assert_eq(inverse_sigma(240), 1..240 -> grep { .sigma == 240 })
 assert_eq(inverse_sigma(5040).len, 33)
 assert_eq(inverse_sigma(5040).map{.sigma}.uniq, [5040])
+
+assert_eq(inverse_sigma(22100, 2), [120, 130, 141])
 
 assert_eq(inverse_phi(120), [143, 155, 175, 183, 225, 231, 244, 248, 286, 308, 310, 350, 366, 372, 396, 450, 462])
 assert_eq(inverse_phi(5040).len, 93)
 assert_eq(inverse_phi(5040).map{ .phi }.uniq, [5040])
+
+assert_eq(inverse_psi(240), 1..240 -> grep { .psi == 240 })
+assert_eq(inverse_psi(5040).len, 38)
+assert_eq(inverse_psi(5040).map{.psi}.uniq, [5040])
 
 assert_eq(20.of { .omega },  20.of { .factor_exp.len })
 assert_eq(20.of { .Omega },  20.of { .factor.len })

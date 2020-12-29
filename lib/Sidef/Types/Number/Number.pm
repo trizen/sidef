@@ -13536,7 +13536,7 @@ package Sidef::Types::Number::Number {
     *euler_totient = \&totient;
 
     sub _dynamic_preimage {
-        my ($N, $L) = @_;
+        my ($N, $L, %opt) = @_;
 
         my %R = (1 => [$ONE]);
         my $u = Math::GMPz::Rmpz_init();
@@ -13554,13 +13554,26 @@ package Sidef::Types::Number::Number {
 
                         ($d < ULONG_MAX)
                           ? Math::GMPz::Rmpz_mul_ui($u, $x, $d)
-                          : do { Math::GMPz::Rmpz_set_str($u, $d, 10); Math::GMPz::Rmpz_mul($u, $u, $x) };
+                          : do {
+                            Math::GMPz::Rmpz_set_str($u, $d, 10);
+                            Math::GMPz::Rmpz_mul($u, $u, $x);
+                          };
 
-                        push @{$t{Math::GMPz::Rmpz_get_str($u, 10)}}, map {
+                        my $key  = Math::GMPz::Rmpz_get_str($u, 10);
+                        my @list = @{$R{$d}};
+
+                        if ($opt{unitary}) {
+                            @list = grep {
+                                Math::GMPz::Rmpz_gcd($u, $y, $_);
+                                Math::GMPz::Rmpz_cmp_ui($u, 1) == 0;
+                            } @list;
+                        }
+
+                        push @{$t{$key}}, map {
                             my $w = Math::GMPz::Rmpz_init();
                             Math::GMPz::Rmpz_mul($w, $y, $_);
                             $w;
-                        } @{$R{$d}};
+                        } @list;
                     }
                 }
             }
@@ -13574,7 +13587,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub _cook_euler_phi {
-        my ($N, $k) = @_;
+        my ($N) = @_;
 
         my $p = Math::GMPz::Rmpz_init();
         my $v = Math::GMPz::Rmpz_init();
@@ -13718,6 +13731,30 @@ package Sidef::Types::Number::Number {
 
     *inverse_phi_len = \&inverse_totient_len;
 
+    sub _cook_usigma {
+        my ($N) = @_;
+
+        my %L;
+
+        foreach my $d (_divisors($N)) {
+
+            Math::Prime::Util::GMP::is_prime_power(Math::Prime::Util::subint($d, 1)) || next;
+
+            my $u = Math::GMPz::Rmpz_init();
+            my $v = Math::GMPz::Rmpz_init();
+
+            ($d < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($u, $d)
+              : Math::GMPz::Rmpz_set_str($u, $d, 10);
+
+            Math::GMPz::Rmpz_sub_ui($v, $u, 1);
+
+            push @{$L{$v}}, [$u, $v];
+        }
+
+        [values %L];
+    }
+
     sub inverse_usigma {
         my ($n) = @_;
 
@@ -13728,55 +13765,17 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new;
         }
 
-        my $u = Math::GMPz::Rmpz_init();
-        my $v = Math::GMPz::Rmpz_init();
-        my $w = Math::GMPz::Rmpz_init();
-
-        my %R = (1 => [$ONE]);
-
-        foreach my $d (_divisors($n)) {
-
-            Math::Prime::Util::GMP::is_prime_power(Math::Prime::Util::subint($d, 1)) || next;
-
-            # v = (d-1) = D
-            # u = (d-1) + 1 = d
-
-            ($d < ULONG_MAX)
-              ? Math::GMPz::Rmpz_set_ui($u, $d)
-              : Math::GMPz::Rmpz_set_str($u, $d, 10);
-
-            Math::GMPz::Rmpz_sub_ui($v, $u, 1);
-            Math::GMPz::Rmpz_divexact($w, $n, $u);
-
-            my %temp;
-
-            foreach my $f (_divisors($w)) {
-                if (exists $R{$f}) {
-                    push @{$temp{$u * $f}}, map { $v * $_ } grep {
-                        Math::GMPz::Rmpz_gcd($w, $v, $_);
-                        Math::GMPz::Rmpz_cmp_ui($w, 1) == 0
-                    } @{$R{$f}};
-                }
-            }
-
-            while (my ($key, $value) = each %temp) {
-                push @{$R{$key}}, @$value;
-            }
-        }
-
-        exists($R{$n})
-          || return Sidef::Types::Array::Array->new;
-
-        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @{$R{$n}}]);
+        my $result = _dynamic_preimage($n, _cook_usigma($n), unitary => 1);
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
     }
 
     sub _cook_sigma {
         my ($N, $k) = @_;
 
         my $q = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init();
         my $v = Math::GMPz::Rmpz_init();
-        my $s = Math::GMPz::Rmpz_init();
 
         my %L;
 
