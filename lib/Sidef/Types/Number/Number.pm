@@ -13573,7 +13573,7 @@ package Sidef::Types::Number::Number {
         $R{$N} // [];
     }
 
-    sub _cook_phi {
+    sub _cook_euler_phi {
         my ($N, $k) = @_;
 
         my $p = Math::GMPz::Rmpz_init();
@@ -13637,11 +13637,67 @@ package Sidef::Types::Number::Number {
         }
 #>>>
 
-        my $result = _dynamic_preimage($n, _cook_phi($n));
+        my $result = _dynamic_preimage($n, _cook_euler_phi($n));
         Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
     }
 
     *inverse_phi = \&inverse_totient;
+
+    sub _cook_dedekind_psi {
+        my ($N, $k) = @_;
+
+        my $p = Math::GMPz::Rmpz_init();
+        my $v = Math::GMPz::Rmpz_init();
+
+        my %L;
+
+        foreach my $d (_divisors($N)) {
+
+            Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::subint($d, 1)) || next;
+
+            ($d < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($p, $d)
+              : Math::GMPz::Rmpz_set_str($p, $d, 10);
+
+            Math::GMPz::Rmpz_sub_ui($p, $p, 1);
+
+            my $t = Math::GMPz::Rmpz_remove($v, $N, $p);
+
+            push @{$L{$p}}, map {
+
+                # [(p+1)*p^(k-1), p^k]
+
+                my $x = Math::GMPz::Rmpz_init();
+                my $y = Math::GMPz::Rmpz_init();
+
+                Math::GMPz::Rmpz_pow_ui($v, $p, $_ - 1);
+                Math::GMPz::Rmpz_pow_ui($y, $p, $_);
+
+                Math::GMPz::Rmpz_add_ui($x, $p, 1);
+                Math::GMPz::Rmpz_mul($x, $x, $v);
+
+                [$x, $y]
+            } 1 .. $t + 1;
+        }
+
+        [values %L];
+    }
+
+    sub inverse_dedekind_psi {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return Sidef::Types::Array::Array->new(ZERO) if !Math::GMPz::Rmpz_sgn($n);
+            return Sidef::Types::Array::Array->new;
+        }
+
+        my $result = _dynamic_preimage($n, _cook_dedekind_psi($n));
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
+    }
+
+    *inverse_psi = \&inverse_dedekind_psi;
 
     sub inverse_totient_len {
         my ($n) = @_;

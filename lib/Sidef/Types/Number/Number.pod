@@ -2144,6 +2144,16 @@ Aliases: I<polygonal_inverse>
 
 =cut
 
+=head2 inverse_psi
+
+Number.inverse_psi() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_dedekind_psi>
+
+=cut
+
 =head2 inverse_sigma
 
 Number.inverse_sigma() -> I<Obj>
