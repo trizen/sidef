@@ -13769,6 +13769,44 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
     }
 
+    sub _cook_uphi {
+        my ($N) = @_;
+
+        my %L;
+
+        foreach my $d (_divisors($N)) {
+
+            Math::Prime::Util::GMP::is_prime_power(Math::Prime::Util::addint($d, 1)) || next;
+
+            my $u = Math::GMPz::Rmpz_init();
+            my $v = Math::GMPz::Rmpz_init();
+
+            ($d < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($u, $d)
+              : Math::GMPz::Rmpz_set_str($u, $d, 10);
+
+            Math::GMPz::Rmpz_add_ui($v, $u, 1);
+
+            push @{$L{$v}}, [$u, $v];
+        }
+
+        [values %L];
+    }
+
+    sub inverse_uphi {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return Sidef::Types::Array::Array->new(ZERO) if !Math::GMPz::Rmpz_sgn($n);
+            return Sidef::Types::Array::Array->new;
+        }
+
+        my $result = _dynamic_preimage($n, _cook_uphi($n), unitary => 1);
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
+    }
+
     sub _cook_sigma {
         my ($N, $k) = @_;
 

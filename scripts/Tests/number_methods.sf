@@ -21,6 +21,10 @@ assert_eq(inverse_psi(240), 1..240 -> grep { .psi == 240 })
 assert_eq(inverse_psi(5040).len, 38)
 assert_eq(inverse_psi(5040).map{.psi}.uniq, [5040])
 
+assert_eq(inverse_uphi(120), [121, 143, 144, 155, 164, 183, 220, 231, 240, 242, 286, 310, 366, 462])
+assert_eq(inverse_uphi(5040).len, 90)
+assert_eq(inverse_uphi(5040).map{.uphi}.uniq, [5040])
+
 assert_eq(20.of { .omega },  20.of { .factor_exp.len })
 assert_eq(20.of { .Omega },  20.of { .factor.len })
 

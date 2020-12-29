@@ -2162,6 +2162,14 @@ Return the
 
 =cut
 
+=head2 inverse_uphi
+
+Number.inverse_uphi() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 inverse_usigma
 
 Number.inverse_usigma() -> I<Obj>
