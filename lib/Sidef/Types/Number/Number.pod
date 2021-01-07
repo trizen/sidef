@@ -1902,6 +1902,14 @@ Return the
 
 =cut
 
+=head2 flt_factor
+
+Number.flt_factor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 gcd
 
 Number.gcd() -> I<Obj>

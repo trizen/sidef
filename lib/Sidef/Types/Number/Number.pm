@@ -12975,6 +12975,56 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([bless(\$n)]);
     }
 
+    # "Fermat's Little Theorem" factorization method
+    sub flt_factor {
+        my ($n, $k) = @_;
+        _valid(\$k) if defined($k);
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+
+        if (defined($k)) {
+            $k = _any2ui($$k) // 1e4;
+        }
+        else {
+            $k = 1e4;
+        }
+
+        state $z = Math::GMPz::Rmpz_init_nobless();
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_powm($z, $TWO, $n, $n);
+
+        # Cannot factor Fermat pseudoprimes
+        if (Math::GMPz::Rmpz_cmp_ui($z, 2) == 0) {
+            return Sidef::Types::Array::Array->new([bless \$n]);
+        }
+
+        for (my $j = 1 ; $j <= $k ; $j += 2) {
+
+            Math::GMPz::Rmpz_powm_ui($t, $TWO, $j, $n);
+            Math::GMPz::Rmpz_sub($t, $z, $t);
+            Math::GMPz::Rmpz_gcd($t, $t, $n);
+
+            if (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0) {
+
+                if (Math::GMPz::Rmpz_cmp($t, $n) == 0) {
+                    return Sidef::Types::Array::Array->new([bless \$n]);
+                }
+
+                my $x = Math::GMPz::Rmpz_init();
+                my $y = Math::GMPz::Rmpz_init();
+
+                Math::GMPz::Rmpz_set($y, $t);
+                Math::GMPz::Rmpz_divexact($x, $n, $t);
+
+                my @f = map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } ($x, $y);
+                return Sidef::Types::Array::Array->new(\@f);
+            }
+        }
+
+        Sidef::Types::Array::Array->new([bless(\$n)]);
+    }
+
     sub squfof_factor {
         my ($n, $k) = @_;
         _valid(\$k) if defined($k);
