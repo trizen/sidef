@@ -55,17 +55,7 @@ package Sidef::Object::Enumerator {
     sub each {
         my ($self, $block) = @_;
 
-        $self->{block}->run(
-            Sidef::Types::Block::Block->new(
-                code => sub {
-                    @_
-                      ? @_ == 1
-                          ? $block->run($_[0])
-                          : do { $block->run($_) for @_ }
-                      : ();
-                },
-            )
-        );
+        $self->{block}->run($block);
 
         $self;
     }
