@@ -79,6 +79,31 @@ package Sidef::Math::Math {
         $n->div($sum);
     }
 
+    sub smooth_numbers {
+        my ($self, @primes) = @_;
+
+        my @s = map { [Sidef::Types::Number::Number::ONE] } @primes;
+
+        Sidef::Object::Enumerator->new(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    my ($callback) = @_;
+
+                    while (1) {
+                        my $n = Sidef::Types::Number::Number::min(map { $_->[0] } @s);
+
+                        for my $i (0 .. $#primes) {
+                            shift(@{$s[$i]}) if $s[$i][0]->eq($n);
+                            push(@{$s[$i]}, $n->mul($primes[$i]));
+                        }
+
+                        $callback->run($n);
+                    }
+                }
+            )
+        );
+    }
+
     sub chinese {
         my ($self, @arrs) = @_;
 

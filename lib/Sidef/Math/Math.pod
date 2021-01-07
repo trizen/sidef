@@ -138,6 +138,14 @@ Return the
 
 =cut
 
+=head2 smooth_numbers
+
+Math.smooth_numbers() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sum
 
 Math.sum() -> I<Obj>
