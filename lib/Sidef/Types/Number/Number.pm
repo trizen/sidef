@@ -6650,13 +6650,7 @@ package Sidef::Types::Number::Number {
 
         my $neg = ((Math::GMPz::Rmpz_sgn($x) || return ONE) < 0) ? 1 : 0;
 
-        if (defined($y)) {
-            _valid(\$y);
-            $y = _any2mpz($$y) // return undef;
-        }
-        else {
-            $y = 10;
-        }
+        $y = defined($y) ? do { _valid(\$y); _any2mpz($$y) // return undef } : 10;
 
         if ($neg) {
             $x = Math::GMPz::Rmpz_init_set($x);
@@ -7837,14 +7831,7 @@ package Sidef::Types::Number::Number {
     sub bit_scan0 {
         my ($n, $k) = @_;
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // return undef;
-        }
-        else {
-            $k = 0;
-        }
-
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return undef } : 0;
         $n = _any2mpz($$n) // return undef;
 
         __PACKAGE__->_set_uint(Math::GMPz::Rmpz_scan0($n, $k));
@@ -7853,14 +7840,7 @@ package Sidef::Types::Number::Number {
     sub bit_scan1 {
         my ($n, $k) = @_;
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // return undef;
-        }
-        else {
-            $k = 0;
-        }
-
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return undef } : 0;
         $n = _any2mpz($$n) // return undef;
 
         __PACKAGE__->_set_uint(Math::GMPz::Rmpz_scan1($n, $k));
@@ -9273,6 +9253,8 @@ package Sidef::Types::Number::Number {
 
         if (defined($k)) {
 
+            _valid(\$k);
+
             $n = _big2istr($n) // return Sidef::Types::Array::Array->new;
             $k = _big2istr($k) // return Sidef::Types::Array::Array->new;
 
@@ -10167,13 +10149,7 @@ package Sidef::Types::Number::Number {
 
         my $v = _big2uistr($n) // return ZERO;
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // return ZERO;
-        }
-        else {
-            $k = 2;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return ZERO } : 2;
 
         if ($k == 0) {
             return ONE;
@@ -11354,13 +11330,7 @@ package Sidef::Types::Number::Number {
     sub is_almost_prime {
         my ($n, $k) = @_;
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE;
-        }
-        else {
-            $k = 2;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE } : 2;
 
         if ($k == 0) {
             return $n->is_one;
@@ -11479,13 +11449,7 @@ package Sidef::Types::Number::Number {
     sub miller_rabin_random {
         my ($n, $k) = @_;
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // 1;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // 1 } : 1;
 
         __is_int__($$n)
           && Math::Prime::Util::GMP::miller_rabin_random(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE), $k)
@@ -12229,15 +12193,8 @@ package Sidef::Types::Number::Number {
     sub n_primes {
         my ($n, $start) = @_;
 
-        if (defined($start)) {
-            _valid(\$start);
-            $start = _big2uistr($start) // 0;
-        }
-        else {
-            $start = 2;
-        }
-
-        $n = _any2ui($$n) // return Sidef::Types::Array::Array->new;
+        $start = defined($start) ? do { _valid(\$start); _big2uistr($start) // 0 } : 2;
+        $n     = _any2ui($$n) // return Sidef::Types::Array::Array->new;
 
         my @primes;
 
@@ -12935,16 +12892,9 @@ package Sidef::Types::Number::Number {
 
     sub fermat_factor {
         my ($n, $k) = @_;
-        _valid(\$k) if defined($k);
 
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
-
-        if (defined($k)) {
-            $k = _any2ui($$k) // 1e4;
-        }
-        else {
-            $k = 1e4;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // 1e4 } : 1e4;
 
         my $p = Math::GMPz::Rmpz_init();    # p = floor(sqrt(n))
         my $q = Math::GMPz::Rmpz_init();    # q = p^2 - n
@@ -12977,45 +12927,51 @@ package Sidef::Types::Number::Number {
 
     # "Fermat's Little Theorem" factorization method
     sub flt_factor {
-        my ($n, $k) = @_;
-        _valid(\$k) if defined($k);
+        my ($n, $base, $reps) = @_;
 
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
 
-        if (defined($k)) {
-            $k = _any2ui($$k) // 1e4;
-        }
-        else {
-            $k = 1e4;
-        }
+        $base = defined($base) ? do { _valid(\$base); _any2ui($$base) // 2 }   : 2;
+        $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) // 1e4 } : 1e4;
 
         state $z = Math::GMPz::Rmpz_init_nobless();
         state $t = Math::GMPz::Rmpz_init_nobless();
+        state $g = Math::GMPz::Rmpz_init_nobless();
 
-        Math::GMPz::Rmpz_powm($z, $TWO, $n, $n);
+        Math::GMPz::Rmpz_set_ui($z, $base);
+        Math::GMPz::Rmpz_set_ui($t, $base);
+
+        Math::GMPz::Rmpz_powm($z, $z, $n, $n);
 
         # Cannot factor Fermat pseudoprimes
-        if (Math::GMPz::Rmpz_cmp_ui($z, 2) == 0) {
+        if (Math::GMPz::Rmpz_cmp_ui($z, $base) == 0) {
             return Sidef::Types::Array::Array->new([bless \$n]);
         }
 
-        for (my $j = 1 ; $j <= $k ; $j += 2) {
+        my $multiplier = $base * $base;
 
-            Math::GMPz::Rmpz_powm_ui($t, $TWO, $j, $n);
-            Math::GMPz::Rmpz_sub($t, $z, $t);
-            Math::GMPz::Rmpz_gcd($t, $t, $n);
+        if ($multiplier > ULONG_MAX) {
+            return Sidef::Types::Array::Array->new([bless \$n]);
+        }
 
-            if (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0) {
+        for (my $j = 1 ; $j <= $reps ; $j += 1) {
 
-                if (Math::GMPz::Rmpz_cmp($t, $n) == 0) {
+            Math::GMPz::Rmpz_mul_ui($t, $t, $multiplier);
+            Math::GMPz::Rmpz_mod($t, $t, $n) if ($j % 10 == 0);
+            Math::GMPz::Rmpz_sub($g, $z, $t);
+            Math::GMPz::Rmpz_gcd($g, $g, $n);
+
+            if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+
+                if (Math::GMPz::Rmpz_cmp($g, $n) == 0) {
                     return Sidef::Types::Array::Array->new([bless \$n]);
                 }
 
                 my $x = Math::GMPz::Rmpz_init();
                 my $y = Math::GMPz::Rmpz_init();
 
-                Math::GMPz::Rmpz_set($y, $t);
-                Math::GMPz::Rmpz_divexact($x, $n, $t);
+                Math::GMPz::Rmpz_set($y, $g);
+                Math::GMPz::Rmpz_divexact($x, $n, $g);
 
                 my @f = map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } ($x, $y);
                 return Sidef::Types::Array::Array->new(\@f);
@@ -13916,13 +13872,7 @@ package Sidef::Types::Number::Number {
         # Algorithm "invsigma" from invphi.gp ver. 2.1 by Max Alekseyev.
 
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
-
-        if (defined($k)) {
-            $k = _any2ui($$k) // return Sidef::Types::Array::Array->new;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return Sidef::Types::Array::Array->new } : 1;
 
         if (Math::GMPz::Rmpz_sgn($n) <= 0) {
             return Sidef::Types::Array::Array->new(ZERO) if !Math::GMPz::Rmpz_sgn($n);
@@ -13953,13 +13903,7 @@ package Sidef::Types::Number::Number {
         # Multiplicative with:
         #   a(p^e, k) = p^(k*e) + p^(k*e - k)
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         return $n->usigma0 if ($k == 0);
 
@@ -14029,13 +13973,7 @@ package Sidef::Types::Number::Number {
     sub bigomega {
         my ($n, $m) = @_;
 
-        if (defined($m)) {
-            _valid(\$m);
-            $m = _any2ui($$m) // goto &nan;
-        }
-        else {
-            $m = 0;
-        }
+        $m = defined($m) ? do { _valid(\$m); _any2ui($$m) // goto &nan } : 0;
 
         $n = _big2uistr($n) // goto &nan;
         $n eq '0' and return ZERO;
@@ -14091,14 +14029,7 @@ package Sidef::Types::Number::Number {
     sub omega {
         my ($n, $m) = @_;
 
-        if (defined($m)) {
-            _valid(\$m);
-            $m = _any2ui($$m) // goto &nan;
-        }
-        else {
-            $m = 0;
-        }
-
+        $m = defined($m) ? do { _valid(\$m); _any2ui($$m) // goto &nan } : 0;
         $n = _big2uistr($n) // goto &nan;
 
         my @factor_exp = _factor_exp($n);
@@ -14164,13 +14095,7 @@ package Sidef::Types::Number::Number {
         # Multiplicative with:
         #   usigma(p^e, k) = p^(k*e) + 1
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         if ($k == 0) {
             goto &usigma0;
@@ -14241,13 +14166,7 @@ package Sidef::Types::Number::Number {
         # Additive with:
         #   a(p^e, k) = (p^(k*(e+1)) - p^k) / (p^k - 1)
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         if ($k == 0) {
             goto &prime_power_sigma0;
@@ -14292,13 +14211,7 @@ package Sidef::Types::Number::Number {
         # Additive with:
         #   a(p^e, k) = p^(e*k)
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         if ($k == 0) {
             goto &prime_power_usigma0;
@@ -14353,13 +14266,7 @@ package Sidef::Types::Number::Number {
         #   a(p, k)   = p^k + 1
         #   a(p^e, k) = 1        # for e > 1
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         if ($k == 0) {
             goto &squarefree_usigma0;
@@ -14400,13 +14307,7 @@ package Sidef::Types::Number::Number {
         # Multiplicative with:
         #   a(p^e, k) = p^k + 1
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         if ($k == 0) {
             goto &usigma0;
@@ -14460,13 +14361,7 @@ package Sidef::Types::Number::Number {
         #   a(p^e, k) = (p^((e+2)*k) - 1)/(p^(2*k) - 1)   # for even e
         #   a(p^e, k) = (p^((e+1)*k) - 1)/(p^(2*k) - 1)   # for odd e
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         if ($k == 0) {
             goto &square_sigma0;
@@ -14530,13 +14425,7 @@ package Sidef::Types::Number::Number {
         #   a(p^e) = p^(k*e) + 1        # for even e
         #   a(p^e) = 1                  # for odd e
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         if ($k == 0) {
             goto &square_usigma0;
@@ -14575,13 +14464,7 @@ package Sidef::Types::Number::Number {
         # Additive with:
         #   a(p^e, k) = p^k
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         if ($k == 0) {
             goto &prime_sigma0;
@@ -14630,13 +14513,7 @@ package Sidef::Types::Number::Number {
         #   a(p,   k) = p^k
         #   a(p^e, k) = 0 for e>1
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         if ($k == 0) {
             goto &prime_usigma0;
@@ -14678,13 +14555,7 @@ package Sidef::Types::Number::Number {
     sub sigma {
         my ($n, $k) = @_;
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // goto &nan;
-        }
-        else {
-            $k = 1;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         $n = _big2uistr($n) // (goto &nan);
         $n eq '0' and return ZERO;
@@ -15887,13 +15758,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($n) > 0
           or return Sidef::Types::Array::Array->new;
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // return Sidef::Types::Array::Array->new;
-        }
-        else {
-            $k = 2;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return Sidef::Types::Array::Array->new } : 2;
 
         my @powerful;
         my $t = Math::GMPz::Rmpz_init();
@@ -15934,13 +15799,7 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // return ZERO;
         Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
-        if (defined($k)) {
-            _valid(\$k);
-            $k = _any2ui($$k) // return ZERO;
-        }
-        else {
-            $k = 2;
-        }
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return ZERO } : 2;
 
         my $t     = Math::GMPz::Rmpz_init();
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
@@ -16514,14 +16373,7 @@ package Sidef::Types::Number::Number {
     sub next_palindrome {
         my ($n, $base) = @_;
 
-        if (defined($base)) {
-            _valid(\$base);
-            $base = _any2ui($$base) // goto &nan;
-        }
-        else {
-            $base //= 10;
-        }
-
+        $base = defined($base) ? do { _valid(\$base); _any2ui($$base) // goto &nan } : 10;
         $base <= 1 and goto &nan;
 
         $n = _any2mpz($$n) // goto &nan;
