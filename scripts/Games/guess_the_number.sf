@@ -1,12 +1,14 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Guess_the_number
+## https://rosettacode.org/wiki/Guess_the_number
 #
 
-var n = 10.rand(1).int;
-print 'Guess the number: ';
-while (n != read(Number).int) {
-    print 'Wrong! Guess again: '
-};
-say 'Well guessed!';
+var n = irand(1, 10)
+var msg = 'Guess the number: '
+
+while (n != read(msg, Number)) {
+    msg = 'Wrong! Guess again: '
+}
+
+say 'Well guessed!'
