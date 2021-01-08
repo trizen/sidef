@@ -1501,7 +1501,7 @@ package Sidef::Parser {
 
                     ($name, $class_name) = $self->get_name_and_class($1);
 
-                    if (exists($self->{built_in_classes}{$name})) {
+                    if (exists($self->{built_in_classes}{$name}) and /\G(?=[{<])/) {
 
                         my ($obj) = $self->parse_expr(code => \$name);
 

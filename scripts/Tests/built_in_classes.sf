@@ -13,7 +13,7 @@ class String << Custom {
     method in_red {
         "#f00 --#{self}--"
     }
-};
+}
 
 "hello".in_red.contains("#f00")     || "error -1".die;
 "hello".in_blue.contains("in_blue") || "error 0".die;
@@ -44,5 +44,23 @@ class String {
 "hello".in_yellow.contains("#ff0") || "error 2".die;
 "hello".in_green.contains("#0f0")  || "error 3".die;
 
-# All OK!
-say "** Test passed!";
+class String(a,b) {
+
+    method to_s {
+        "String(#{a.dump}, #{b.dump})"
+    }
+
+    method in_blue {
+        "#{self} in blue"
+    }
+}
+
+do {
+    var obj1 = String("foo")                 # calls the String class
+    var obj2 = main::String("foo", "bar")    # calls the user-defined class with two parameters
+
+    assert_eq(obj1, "foo")
+    assert_eq(obj2.in_blue, %q<String("foo", "bar") in blue>)
+}
+
+say "** Test passed!"

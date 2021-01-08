@@ -39,4 +39,20 @@ assert_eq(20.of { .uphi },   20.of { _ ? .factor_map { |p,e| p**e - 1 }.prod : 0
 assert_eq(1..100 -> grep { .is_smooth(5) }, 1..100 -> grep { .gpf <= 5 })
 assert_eq(2..100 -> grep { .is_rough(5)  }, 2..100 -> grep { .lpf >= 5 })
 
+do {
+    var a = Math.smooth_numbers(2,3,5,7)    # 7-smooth numbers
+    var b = Math.smooth_numbers(2,5,7)      # 7-smooth numbers not divisible by 3
+
+    assert_eq(a.first(30), 30.by { .is_smooth(7) })
+    assert_eq(b.first(30), 30.by {!.is_div(3) && .is_smooth(7) })
+
+    # Iteration is also supported
+    a.each {|k|
+        if (k > 1e5) {
+            assert_eq(k, 100352)
+            break
+        }
+    }
+}
+
 say "** Tests passed!"
