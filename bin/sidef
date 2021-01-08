@@ -4,18 +4,20 @@ use utf8;
 use 5.016;
 
 BEGIN {    # support for running sidef locally from everywhere
-    require File::Spec;
-    require File::Basename;
-    unshift @INC,
-      File::Spec->catdir(
-                         File::Basename::dirname(
-                                                   File::Spec->file_name_is_absolute(__FILE__)
-                                                 ? __FILE__
-                                                 : File::Spec->rel2abs(__FILE__)
-                                                ),
-                         File::Spec->updir,
-                         'lib'
-                        );
+    if (-w __FILE__) {
+        require File::Spec;
+        require File::Basename;
+        unshift @INC,
+          File::Spec->catdir(
+                             File::Basename::dirname(
+                                                       File::Spec->file_name_is_absolute(__FILE__)
+                                                     ? __FILE__
+                                                     : File::Spec->rel2abs(__FILE__)
+                                                    ),
+                             File::Spec->updir,
+                             'lib'
+                            );
+    }
 }
 
 binmode STDIN,  ":utf8";
@@ -550,7 +552,7 @@ EOT
                 or $@ =~ /invalid module declaration/i
                 or $@ =~ /unexpected end-of-statement/i
                 or (
-                      $@ =~ /unbalanced/ || $@ =~ /string terminator/
+                      $@    =~ /unbalanced/ || $@ =~ /string terminator/
                     ? $line =~ /\R\R\z/
                     : $line =~ /\R\z/
                    )
