@@ -182,6 +182,8 @@ else {
 
         if (defined($args{R}) and $args{R} eq 'Perl') {
 
+            require File::Basename;
+
             my $header =
                 "\nuse lib (" . q{"}
               . quotemeta(File::Basename::dirname($INC{"Sidef.pm"})) . q{"}
@@ -292,8 +294,8 @@ sub read_script {
 
 sub help_interactive {
 
-    require File::Basename;
     require File::Spec;
+    require File::Basename;
 
     require Encode;
     require Term::ReadLine;
@@ -363,7 +365,9 @@ HELP
 }
 
 sub code_interactive {
+
     require Encode;
+    require File::Spec;
     require Term::ReadLine;
 
     my $term = Term::ReadLine->new("$name $version -- interactive mode");
@@ -657,7 +661,9 @@ sub dump_ast {
 sub compile_to_perl {
     my (%opt) = @_;
 
+    require File::Spec;
     require File::Basename;
+
     my $path = File::Spec->catdir(File::Basename::dirname($INC{'Sidef.pm'}), 'Sidef');
 
     my $package_content = <<"HEAD";
