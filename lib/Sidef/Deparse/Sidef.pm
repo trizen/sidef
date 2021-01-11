@@ -343,7 +343,12 @@ package Sidef::Deparse::Sidef {
                 my $name = $self->_dump_class_name($obj);
 
                 $code .= "class " . $name;
-                $code .= '(' . $self->_dump_vars(@{$obj->{vars}}) . ')';
+
+                my $class_vars = $self->_dump_vars(@{$obj->{vars}});
+
+                if (length($class_vars)) {
+                    $code .= '(' . $class_vars . ')';
+                }
 
                 if (exists $obj->{inherit}) {
 
