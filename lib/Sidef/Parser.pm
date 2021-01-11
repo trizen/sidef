@@ -1610,7 +1610,7 @@ package Sidef::Parser {
                                     # Detect inheritance from the same class
                                     if (refaddr($obj) == refaddr($class->{obj})) {
                                         $self->fatal_error(
-                                                           error => "Inheriting from the same class does is not allowed",
+                                                           error => "Inheriting from the same class is not allowed",
                                                            code  => $_,
                                                            pos   => pos($_) - length($name) - 1,
                                                           );
@@ -1630,7 +1630,7 @@ package Sidef::Parser {
                             }
                             elsif (exists $self->{built_in_classes}{$name}) {
                                 $self->fatal_error(
-                                                   error  => "Inheriting from built-in classes is not allowed",
+                                                   error  => "Inheriting from built-in classes is not supported",
                                                    reason => "`$name` is a built-in class",
                                                    code   => $_,
                                                    pos    => pos($_) - length($name) - 1,

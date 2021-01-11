@@ -433,7 +433,7 @@ package Sidef::Types::Array::Matrix {
         my ($A, $pow, $mod) = @_;
 
         if ($pow->is_neg) {
-            $A   = $A->inv;     # TODO: implement invmod
+            $A   = $A->invmod($mod);
             $pow = $pow->abs;
         }
 
@@ -559,6 +559,20 @@ package Sidef::Types::Array::Matrix {
 
     *inv     = \&invert;
     *inverse = \&invert;
+
+    sub invmod {
+        my ($self, $mod) = @_;
+
+        my $A = $self->inv;
+
+        foreach my $row (@$A) {
+            foreach my $i (0 .. $#{$row}) {
+                $row->[$i] = $row->[$i]->ratmod($mod);
+            }
+        }
+
+        return $A;
+    }
 
     sub determinant {
         my ($self) = @_;
