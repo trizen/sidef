@@ -1499,7 +1499,7 @@ package Sidef::Parser {
 
                 if ($type eq 'class' and /\G($self->{var_name_re})\h*/gco) {
 
-                    ($name, $class_name) = $self->get_name_and_class($1);
+                    $name = $1;
 
                     if (exists($self->{built_in_classes}{$name}) and /\G(?=[{<])/) {
 
@@ -1509,6 +1509,9 @@ package Sidef::Parser {
                             $name         = '';
                             $built_in_obj = $obj;
                         }
+                    }
+                    else {
+                        ($name, $class_name) = $self->get_name_and_class($1);
                     }
                 }
 

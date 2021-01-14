@@ -63,4 +63,86 @@ do {
     assert_eq(obj2.in_blue, %q<String("foo", "bar") in blue>)
 }
 
+module Test1 {
+    class Number() {
+        method foo {
+            "test1"
+        }
+    }
+
+    var obj = Test1::Number()
+    assert_eq(obj.foo, "test1")
+}
+
+module Test2 {
+    class Test2::Number {
+        method bar {
+            "test2"
+        }
+    }
+
+    var obj = Test2::Number()
+    assert_eq(obj.bar, "test2")
+}
+
+class main::Number {
+    method baz {
+        "test3"
+    }
+    method sqrt {
+        "sqrt method"
+    }
+}
+
+do {
+    var obj = main::Number()
+    assert_eq(obj.baz, "test3")
+    assert_eq(obj.sqrt, "sqrt method")
+    assert_eq(25.sqrt, 5)
+}
+
+class Number {
+    method baz {
+        "test4"
+    }
+}
+
+module Test5 {
+    class Number() {
+        method baz {
+            "test5"
+        }
+    }
+
+    var obj = Test5::Number()
+    assert_eq(obj.baz, "test5")
+}
+
+assert_eq(42.baz, "test4")
+
+class Test::Number {
+    method foo {
+        "in foo"
+    }
+}
+
+do {
+    var obj = Test::Number()
+    assert_eq(obj.foo, "in foo")
+}
+
+module Test {
+    class Number() {
+        method bar {
+            "in bar"
+        }
+    }
+}
+
+do {
+    var obj = Test::Number()
+    assert_eq(obj.foo, "in foo")
+    assert_eq(obj.bar, "in bar")
+}
+
 say "** Test passed!"
