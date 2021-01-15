@@ -6,7 +6,7 @@ package Sidef::Types::Range::RangeNumber {
     use parent qw(
       Sidef::Types::Range::Range
       Sidef::Object::Object
-      );
+    );
 
     use overload q{""} => sub {
         my ($self) = @_;
@@ -82,7 +82,7 @@ package Sidef::Types::Range::RangeNumber {
                         code => sub {
                             --$repetitions >= 0 or return undef;
 
-                            if ($from <= 8192 and $from >= 0) {
+                            if ($from < 8192 and $from >= 0) {
                                 my $obj = ($cache[$from] //=
                                            bless(\Math::GMPz::Rmpz_init_set_ui($from), 'Sidef::Types::Number::Number'));
                                 $from += $step;

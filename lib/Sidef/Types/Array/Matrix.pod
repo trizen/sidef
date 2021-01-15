@@ -278,6 +278,14 @@ Aliases: I<invert>, I<inverse>
 
 =cut
 
+=head2 invmod
+
+Matrix.invmod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_square
 
 Matrix.is_square() -> I<Obj>

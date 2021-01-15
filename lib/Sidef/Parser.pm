@@ -337,7 +337,7 @@ package Sidef::Parser {
                   !! !
                   : ： ⫶
                   « » ~
-                  );
+                );
 
                 qr{
                     (?(DEFINE)
@@ -393,7 +393,7 @@ package Sidef::Parser {
                   ~
             },
             %opts,
-                      );
+        );
 
         $options{ref_vars} = $options{vars};
         $options{file_name}   //= '-';
@@ -2188,13 +2188,14 @@ package Sidef::Parser {
             }
 
             # Binary, hexadecimal and octal numbers
-            if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|[0-9_]+\b)/gc) {
+            if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|o[0-7_]*|[0-7_]+)\b/gc) {
                 my $num = $1 =~ tr/_//dr;
                 return
                   Sidef::Types::Number::Number->new(
-                                                      $num =~ /^b/ ? (substr($num, 1), 2)
-                                                    : $num =~ /^x/ ? (substr($num, 1), 16)
-                                                    :                ($num, 8)
+                                                      $num =~ /^b/ ? (substr($num, 1) || 0, 2)
+                                                    : $num =~ /^o/ ? (substr($num, 1) || 0, 8)
+                                                    : $num =~ /^x/ ? (substr($num, 1) || 0, 16)
+                                                    :                ($num            || 0, 8)
                                                    );
             }
 

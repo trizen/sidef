@@ -199,7 +199,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub _set_uint {
-        ($_[1] <= 8192)
+        ($_[1] < 8192)
           ? ($cache[$_[1]] //= bless \Math::GMPz::Rmpz_init_set_ui($_[1]))
           : do {
             if (Math::GMPz::get_refcnt($$MPZ) > 1) {
@@ -11693,7 +11693,7 @@ package Sidef::Types::Number::Number {
         my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
 
         # V_n(P,1) == P (mod n) for any integer P.
-        foreach my $i (1 .. 10) {     # test with random values of P
+        foreach my $i (1 .. 10) {    # test with random values of P
 
             my $P = CORE::int(CORE::rand(1e6)) + 11;
             my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($nstr, $P, 1, $nstr);
@@ -14009,12 +14009,12 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_pow_ui($u, $u, $m);       # u = p^m
             }
 
-            Math::GMPz::Rmpz_pow_ui($t, $u, $k);           # t = (p^m)^k = p^(m*k)
-            Math::GMPz::Rmpz_sub_ui($u, $u, 1);            # u = p^m - 1
-            Math::GMPz::Rmpz_mul($u, $u, $t);              # u = (p^m - 1) * p^(m*k)
-            Math::GMPz::Rmpz_sub_ui($t, $t, 1);            # t = p^(m*k) - 1
-            Math::GMPz::Rmpz_mul($t, $t, $nm);             # t = n^m * (p^(m*k) - 1)
-            Math::GMPz::Rmpz_divexact($t, $t, $u);         # t = (n^m * (p^(m*k) - 1)) / ((p^m - 1) * p^(m*k))
+            Math::GMPz::Rmpz_pow_ui($t, $u, $k);      # t = (p^m)^k = p^(m*k)
+            Math::GMPz::Rmpz_sub_ui($u, $u, 1);       # u = p^m - 1
+            Math::GMPz::Rmpz_mul($u, $u, $t);         # u = (p^m - 1) * p^(m*k)
+            Math::GMPz::Rmpz_sub_ui($t, $t, 1);       # t = p^(m*k) - 1
+            Math::GMPz::Rmpz_mul($t, $t, $nm);        # t = n^m * (p^(m*k) - 1)
+            Math::GMPz::Rmpz_divexact($t, $t, $u);    # t = (n^m * (p^(m*k) - 1)) / ((p^m - 1) * p^(m*k))
 
             Math::GMPz::Rmpz_add($sum, $sum, $t);
         }
