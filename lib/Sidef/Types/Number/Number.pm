@@ -13544,6 +13544,8 @@ package Sidef::Types::Number::Number {
     sub _dynamic_preimage {
         my ($N, $L, %opt) = @_;
 
+        # Based on invphi.gp ver. 2.1 by Max Alekseyev.
+
         my %R = (1 => [$ONE]);
         my $u = Math::GMPz::Rmpz_init();
 
@@ -13590,6 +13592,45 @@ package Sidef::Types::Number::Number {
         }
 
         $R{$N} // [];
+    }
+
+    sub _dynamic_length {
+        my ($N, $L) = @_;
+
+        # Based on invphi.gp ver. 2.1 by Max Alekseyev.
+
+        my %R = (1 => 1);
+        my $u = Math::GMPz::Rmpz_init();
+
+        foreach my $l (@$L) {
+            my %t;
+
+            foreach my $pair (@$l) {
+
+                my $x = $pair->[0];
+                Math::GMPz::Rmpz_divexact($u, $N, $x);
+
+                foreach my $d (_divisors($u)) {
+                    if (exists $R{$d}) {
+
+                        ($d < ULONG_MAX)
+                          ? Math::GMPz::Rmpz_mul_ui($u, $x, $d)
+                          : do {
+                            Math::GMPz::Rmpz_set_str($u, $d, 10);
+                            Math::GMPz::Rmpz_mul($u, $u, $x);
+                          };
+
+                        $t{Math::GMPz::Rmpz_get_str($u, 10)} += $R{$d};
+                    }
+                }
+            }
+
+            while (my ($key, $value) = each %t) {
+                $R{$key} += $value;
+            }
+        }
+
+        $R{$N} // 0;
     }
 
     sub _cook_euler_phi {
@@ -13662,6 +13703,30 @@ package Sidef::Types::Number::Number {
 
     *inverse_phi = \&inverse_totient;
 
+    sub inverse_totient_len {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ONE if !Math::GMPz::Rmpz_sgn($n);
+            return ZERO;
+        }
+
+        my $r;
+
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $r = scalar Math::Prime::Util::inverse_totient(Math::GMPz::Rmpz_get_ui($n));
+        }
+        else {
+            $r = _dynamic_length($n, _cook_euler_phi($n));
+        }
+
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+    }
+
+    *inverse_phi_len = \&inverse_totient_len;
+
     sub _cook_dedekind_psi {
         my ($N, $k) = @_;
 
@@ -13718,24 +13783,21 @@ package Sidef::Types::Number::Number {
 
     *inverse_psi = \&inverse_dedekind_psi;
 
-    sub inverse_totient_len {
+    sub inverse_dedekind_psi_len {
         my ($n) = @_;
 
-        my $z = _any2mpz($$n) // return ZERO;
+        $n = _any2mpz($$n) // return ZERO;
 
-        if (Math::GMPz::Rmpz_sgn($z) <= 0) {
-            return ONE if !Math::GMPz::Rmpz_sgn($z);
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ONE if !Math::GMPz::Rmpz_sgn($n);
             return ZERO;
         }
 
-        if (HAS_PRIME_UTIL) {
-            return Sidef::Types::Number::Number->_set_uint(scalar Math::Prime::Util::inverse_totient($z));
-        }
-
-        $n->inverse_totient->len;
+        my $r = _dynamic_length($n, _cook_dedekind_psi($n));
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
-    *inverse_phi_len = \&inverse_totient_len;
+    *inverse_psi_len = \&inverse_dedekind_psi_len;
 
     sub _cook_usigma {
         my ($N) = @_;
@@ -13816,6 +13878,8 @@ package Sidef::Types::Number::Number {
     sub _cook_sigma {
         my ($N, $k) = @_;
 
+        # Based on invphi.gp ver. 2.1 by Max Alekseyev.
+
         my $q = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init();
@@ -13879,12 +13943,23 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new;
         }
 
-        if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
-            return Sidef::Types::Array::Array->new(ONE);
-        }
-
         my $result = _dynamic_preimage($n, _cook_sigma($n, $k));
         Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
+    }
+
+    sub inverse_sigma_len {
+        my ($n, $k) = @_;
+
+        $n = _any2mpz($$n) // return ZERO;
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return ZERO } : 1;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ONE if !Math::GMPz::Rmpz_sgn($n);
+            return ZERO;
+        }
+
+        my $r = _dynamic_length($n, _cook_sigma($n, $k));
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
     sub jordan_totient {

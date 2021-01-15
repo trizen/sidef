@@ -39,6 +39,15 @@ assert_eq(20.of { .uphi },   20.of { _ ? .factor_map { |p,e| p**e - 1 }.prod : 0
 assert_eq(1..100 -> grep { .is_smooth(5) }, 1..100 -> grep { .gpf <= 5 })
 assert_eq(2..100 -> grep { .is_rough(5)  }, 2..100 -> grep { .lpf >= 5 })
 
+assert_eq(50.of { .inverse_phi.len }, 50.of { .inverse_phi_len })
+assert_eq(50.of { .inverse_psi.len }, 50.of { .inverse_psi_len })
+assert_eq(50.of { .inverse_sigma.len }, 50.of { .inverse_sigma_len })
+assert_eq(50.of { .inverse_sigma(2).len }, 50.of { .inverse_sigma_len(2) })
+
+assert_eq(inverse_phi(2**64).len, inverse_phi_len(2**64))
+assert_eq(inverse_psi(2**64).len, inverse_psi_len(2**64))
+assert_eq(inverse_sigma(2**64).len, inverse_sigma_len(2**64))
+
 do {
     var a = Math.smooth_numbers(2,3,5,7)    # 7-smooth numbers
     var b = Math.smooth_numbers(2,5,7)      # 7-smooth numbers not divisible by 3
