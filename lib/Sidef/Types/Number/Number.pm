@@ -13844,7 +13844,7 @@ package Sidef::Types::Number::Number {
 
         foreach my $d (_divisors($N)) {
 
-            Math::Prime::Util::GMP::is_prime_power(Math::Prime::Util::addint($d, 1)) || next;
+            Math::Prime::Util::GMP::is_prime_power(Math::Prime::Util::GMP::addint($d, 1)) || next;
 
             my $u = Math::GMPz::Rmpz_init();
             my $v = Math::GMPz::Rmpz_init();
