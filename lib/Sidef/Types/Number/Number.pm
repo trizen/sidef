@@ -1664,7 +1664,7 @@ package Sidef::Types::Number::Number {
         if (
                ref($y) eq 'Sidef::Types::Number::Gauss'
             or ref($y) eq 'Sidef::Types::Number::Quadratic'
-            or ref($y) eq ref($y) eq 'Sidef::Types::Number::Mod'
+            or ref($y) eq 'Sidef::Types::Number::Mod'
 
           ) {
             return $y->add($x);
