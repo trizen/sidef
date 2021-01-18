@@ -3,7 +3,7 @@
 const dirs = Hash("-" => [1,0], "|" => [0,1], "/" => [1,1])
  
 func cuboid(nx, ny, nz) {
-  say("cuboid %d %d %d:" % [nx, ny, nz])
+  say("cuboid %d %d %d:" % (nx, ny, nz))
   var(x, y, z) = (8*nx, 2*ny, 4*nz)
   var area = []
   var line = func(n, sx, sy, c) {
