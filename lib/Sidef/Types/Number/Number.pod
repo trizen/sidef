@@ -176,7 +176,11 @@ Aliases: I<÷>, I<div>
 
     a // b
 
-Integer division of C<a> and C<b>.
+Integer floor-division of C<a> and C<b>.
+
+Equivalent with:
+
+    floor(a/b)
 
 Aliases: I<idiv>
 
@@ -210,9 +214,9 @@ Aliases: I<lt>
 
     a << b
 
-Bitwise left-shift, equivalent with (assuming C<a> and C<b> are integers):
+Left shift C<a> by C<b> bits, which is equivalent with (assuming C<a> and C<b> are integers):
 
-    int(a * 2**b)
+    floor(a * 2**b)
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -267,9 +271,9 @@ Aliases: I<gt>
 
     a >> b
 
-Bitwise right-shift, equivalent with (assuming C<a> and C<b> are integers):
+Right shift C<a> by C<b> bits, which is equivalent with (assuming C<a> and C<b> are integers):
 
-    int(a / 2**b)
+    floor(a / 2**b)
 
 Aliases: I<rsft>, I<shift_right>
 

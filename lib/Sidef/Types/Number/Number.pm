@@ -2248,7 +2248,7 @@ package Sidef::Types::Number::Number {
         };
 
         my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_tdiv_q($r, $x, $y);
+        Math::GMPz::Rmpz_div($r, $x, $y);
         bless \$r;
     }
 
@@ -2750,7 +2750,7 @@ package Sidef::Types::Number::Number {
 
         if ($y < 0) {
             Math::GMPz::Rmpz_sgn($r) || goto &inf;    # 0^(-y) = Inf
-            Math::GMPz::Rmpz_tdiv_q($r, $ONE, $r);
+            Math::GMPz::Rmpz_div($r, $ONE, $r);
         }
 
         bless \$r;
@@ -5994,13 +5994,13 @@ package Sidef::Types::Number::Number {
             # z = floor((n - y*y) / z)
             Math::GMPz::Rmpz_mul($t, $y, $y);       # t = y*y
             Math::GMPz::Rmpz_sub($t, $d, $t);       # t = d-t
-            Math::GMPz::Rmpz_tdiv_q($z, $t, $z);    # z = floor(t/z)
+            Math::GMPz::Rmpz_div($z, $t, $z);       # z = floor(t/z)
 
             Math::GMPz::Rmpz_sgn($z) || return (undef, undef);
 
             # t = floor((x + y) / z)
             Math::GMPz::Rmpz_add($t, $x, $y);       # t = x+y
-            Math::GMPz::Rmpz_tdiv_q($t, $t, $z);    # t = floor(t/z)
+            Math::GMPz::Rmpz_div($t, $t, $z);       # t = floor(t/z)
 
             Math::GMPz::Rmpz_addmul($f1, $f2, $t);
             ($f1, $f2) = ($f2, $f1);
@@ -6091,7 +6091,7 @@ package Sidef::Types::Number::Number {
 
             # t = floor((x + y) / z)
             Math::GMPz::Rmpz_add($t, $x, $y);         # t = x+y
-            Math::GMPz::Rmpz_tdiv_q($t, $t, $z);      # t = floor(t/z)
+            Math::GMPz::Rmpz_div($t, $t, $z);         # t = floor(t/z)
 
             $r = $t;
             push @cfrac, bless \$t;
@@ -6529,7 +6529,7 @@ package Sidef::Types::Number::Number {
         }
 
         Math::GMPz::Rmpz_pow_ui($t, $k, $i);
-        Math::GMPz::Rmpz_tdiv_q($u, $u, $t);
+        Math::GMPz::Rmpz_div($u, $u, $t);
         Math::GMPz::Rmpz_mod($u, $u, $k);
 
         bless \$u;
@@ -9495,11 +9495,11 @@ package Sidef::Types::Number::Number {
 
         foreach my $k (1 .. $sqrt) {
             if ($k * $k < ULONG_MAX) {
-                Math::GMPz::Rmpz_tdiv_q_ui($t, $n, $k * $k);
+                Math::GMPz::Rmpz_div_ui($t, $n, $k * $k);
             }
             else {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $k, 2);
-                Math::GMPz::Rmpz_tdiv_q($t, $n, $t);
+                Math::GMPz::Rmpz_div($t, $n, $t);
             }
             $L += Math::GMPz::Rmpz_get_si(${mertens($t)});    # most of the time is spent here
         }
@@ -9632,8 +9632,8 @@ package Sidef::Types::Number::Number {
 
             if ($m) {
                 Math::GMPz::Rmpz_set($t, $z);
-                Math::GMPz::Rmpz_tdiv_q($t, $t, $k);
-                Math::GMPz::Rmpz_tdiv_q($t, $t, $k);
+                Math::GMPz::Rmpz_div($t, $t, $k);
+                Math::GMPz::Rmpz_div($t, $t, $k);
                 ($m == -1)
                   ? Math::GMPz::Rmpz_sub($c, $c, $t)
                   : Math::GMPz::Rmpz_add($c, $c, $t);
@@ -10371,7 +10371,7 @@ package Sidef::Types::Number::Number {
         sub {
             my ($m, $p, $r) = @_;
 
-            Math::GMPz::Rmpz_tdiv_q($t, $n, $m);
+            Math::GMPz::Rmpz_div($t, $n, $m);
 
             if ($r == 2) {
                 my $j = _prime_count($p) - 2;
@@ -10382,7 +10382,7 @@ package Sidef::Types::Number::Number {
                     ++$j;
 
                     Math::GMPz::Rmpz_mul_ui($t, $m, $r);
-                    Math::GMPz::Rmpz_tdiv_q($t, $n, $t);
+                    Math::GMPz::Rmpz_div($t, $n, $t);
 
                     my $pi = _prime_count(Math::GMPz::Rmpz_get_str($t, 10));
 
@@ -13088,7 +13088,7 @@ package Sidef::Types::Number::Number {
         foreach my $k (1 .. Math::GMPz::Rmpz_get_ui($s)) {
 
             Math::GMPz::Rmpz_set_ui($$t, $k);
-            Math::GMPz::Rmpz_tdiv_q_ui($$u, $n, $k);
+            Math::GMPz::Rmpz_div_ui($$u, $n, $k);
 
             my $f_r = $f->run($t);
             my $g_r = $g->run($t);
@@ -15397,7 +15397,7 @@ package Sidef::Types::Number::Number {
                  $p <= $k ;
                  $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
 
-                Math::GMPz::Rmpz_tdiv_q_ui($t, $n, $p);
+                Math::GMPz::Rmpz_div_ui($t, $n, $p);
 
                 if (Math::GMPz::Rmpz_cmp_ui($t, $p) <= 0) {
                     $sum += Math::GMPz::Rmpz_get_ui($t);
@@ -15487,7 +15487,7 @@ package Sidef::Types::Number::Number {
             my $u = Math::GMPz::Rmpz_init_set_ui(0);
             my $t = Math::GMPz::Rmpz_init();
 
-            Math::GMPz::Rmpz_tdiv_q_ui($t, $n, $p);
+            Math::GMPz::Rmpz_div_ui($t, $n, $p);
 
             for (my $q = 2 ;
                  $q < $p ;
@@ -15846,7 +15846,7 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            Math::GMPz::Rmpz_tdiv_q($t, $n, $m);
+            Math::GMPz::Rmpz_div($t, $n, $m);
             Math::GMPz::Rmpz_root($t, $t, $r);
 
             foreach my $v (1 .. $t) {
@@ -15882,7 +15882,7 @@ package Sidef::Types::Number::Number {
         sub {
             my ($m, $r) = @_;
 
-            Math::GMPz::Rmpz_tdiv_q($t, $n, $m);
+            Math::GMPz::Rmpz_div($t, $n, $m);
             Math::GMPz::Rmpz_root($t, $t, $r);
 
             if ($r <= $k) {
