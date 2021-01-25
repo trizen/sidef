@@ -7135,6 +7135,87 @@ package Sidef::Types::Number::Number {
 
     *qnr = \&quadratic_nonresidue;
 
+    sub _sqrtmod {    # sqrt(n) modulo a prime power p^e
+        my ($n_, $p_, $e) = @_;
+
+        my $p  = Math::GMPz::Rmpz_init();
+        my $pp = Math::GMPz::Rmpz_init();
+        my $n  = Math::GMPz::Rmpz_init();
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+        my $v = Math::GMPz::Rmpz_init();
+
+        ($n_ < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($n, $n_)
+          : Math::GMPz::Rmpz_set_str($n, $n_, 10);
+
+        ($p_ < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $p_)
+          : Math::GMPz::Rmpz_set_str($p, $p_, 10);
+
+        # t = p^(k-1)
+        Math::GMPz::Rmpz_pow_ui($t, $p, $e - 1);
+
+        # pp = p^k
+        Math::GMPz::Rmpz_mul($pp, $t, $p);
+
+        # n %= p^k
+        Math::GMPz::Rmpz_mod($n, $n, $pp);
+
+        if (Math::GMPz::Rmpz_sgn($n) == 0) {
+            return [0, Math::GMPz::Rmpz_get_str($pp, 10)];
+        }
+
+        if ($p_ eq '2') {
+
+            if ($e == 1) {
+                return [(Math::GMPz::Rmpz_odd_p($n) ? 1 : 0), 2];
+            }
+
+            if ($e == 2) {
+                return [(Math::GMPz::Rmpz_congruent_ui_p($n, 1, 4) ? 1 : 0), 4];
+            }
+
+            #~ Math::GMPz::Rmpz_congruent_ui_p($n, 1, 8) or return;
+
+            my $r = _sqrtmod(Math::GMPz::Rmpz_get_str($n, 10), $p_, $e - 1) // return;
+
+            # u = (((r^2 - n) / 2^(e-1))%2) * 2^(e-2) + r
+            Math::GMPz::Rmpz_set_str($t, $r->[0], 10);
+            Math::GMPz::Rmpz_mul($u, $t, $t);
+            Math::GMPz::Rmpz_sub($u, $u, $n);
+            Math::GMPz::Rmpz_div_2exp($u, $u, $e - 1);
+            Math::GMPz::Rmpz_mod_ui($u, $u, 2);
+            Math::GMPz::Rmpz_mul_2exp($u, $u, $e - 2);
+            Math::GMPz::Rmpz_add($u, $u, $t);
+
+            return [Math::GMPz::Rmpz_get_str($u, 10), Math::GMPz::Rmpz_get_str($pp, 10)];
+        }
+
+        my $s = Math::Prime::Util::GMP::sqrtmod($n_, $p_) // return;
+
+        state $w = Math::GMPz::Rmpz_init_nobless();
+
+        ($s < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($w, $s)
+          : Math::GMPz::Rmpz_set_str($w, $s, 10);
+
+        # u = (p^k - 2*(p^(k-1)) + 1) / 2
+        Math::GMPz::Rmpz_mul_2exp($u, $t, 1);
+        Math::GMPz::Rmpz_sub($u, $pp, $u);
+        Math::GMPz::Rmpz_add_ui($u, $u, 1);
+        Math::GMPz::Rmpz_div_2exp($u, $u, 1);
+
+        # sqrtmod(a, p^k) = (powmod(sqrtmod(a, p), p^(k-1), p^k) * powmod(a, u, p^k)) % p^k
+        Math::GMPz::Rmpz_powm($w, $w, $t, $pp);
+        Math::GMPz::Rmpz_powm($u, $n, $u, $pp);
+        Math::GMPz::Rmpz_mul($w, $w, $u);
+        Math::GMPz::Rmpz_mod($w, $w, $pp);
+
+        return [Math::GMPz::Rmpz_get_str($w, 10), Math::GMPz::Rmpz_get_str($pp, 10)];
+    }
+
     sub sqrtmod {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -7147,94 +7228,43 @@ package Sidef::Types::Number::Number {
         my $xstr = Math::GMPz::Rmpz_get_str($x, 10);
         my $ystr = Math::GMPz::Rmpz_get_str($y, 10);
 
+        my $n = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_mod($n, $x, $y);
+
+        if (Math::GMPz::Rmpz_sgn($n) == 0) {
+            return ZERO;
+        }
+
+        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+
         if (Math::Prime::Util::GMP::is_prob_prime($ystr)) {
-            my $n = Math::Prime::Util::GMP::sqrtmod($xstr, $ystr) // goto &nan;
+            my $n = Math::Prime::Util::GMP::sqrtmod($nstr, $ystr) // goto &nan;
             return (($n < ULONG_MAX) ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n));
         }
 
-        my @congruences;
-
-        my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init();
         my $v = Math::GMPz::Rmpz_init();
-        my $w = Math::GMPz::Rmpz_init();
-        my $m = Math::GMPz::Rmpz_init();
 
-        Math::GMPz::Rmpz_mod($m, $x, $y);
+        my @congruences;
 
         foreach my $pe (_factor_exp($ystr)) {
             my ($p, $e) = @$pe;
-
-            if ($p eq '2') {
-                if ($e == 1) {
-                    push @congruences, [(Math::GMPz::Rmpz_odd_p($m) ? 1 : 0), 2];
-                    next;
-                }
-
-                if ($e == 2) {
-                    push @congruences, [(Math::GMPz::Rmpz_congruent_ui_p($m, 1, 4) ? 1 : 0), 4];
-                    next;
-                }
-
-                Math::GMPz::Rmpz_congruent_ui_p($m, 1, 8) or goto &nan;
-                Math::GMPz::Rmpz_ui_pow_ui($v, 2, $e - 1);
-
-                my $r = ${(bless \$m)->sqrtmod(bless \$v)};
-
-                Math::GMPz::Rmpz_mul($t, $r, $r);
-                Math::GMPz::Rmpz_sub($t, $t, $m);
-                Math::GMPz::Rmpz_div_2exp($t, $t, $e - 1);
-                Math::GMPz::Rmpz_mod_ui($t, $t, 2);
-
-                Math::GMPz::Rmpz_mul_2exp($t, $t, $e - 2);
-                Math::GMPz::Rmpz_add($t, $t, $r);
-
-                push @congruences, [Math::GMPz::Rmpz_get_str($t, 10), Math::GMPz::Rmpz_get_str($v, 10)];
-                next;
-            }
-
-            my $s = Math::Prime::Util::GMP::sqrtmod($xstr, $p) // goto &nan;
-
-            ($p < ULONG_MAX)
-              ? Math::GMPz::Rmpz_set_ui($t, $p)
-              : Math::GMPz::Rmpz_set_str($t, $p, 10);
-
-            ($s < ULONG_MAX)
-              ? Math::GMPz::Rmpz_set_ui($w, $s)
-              : Math::GMPz::Rmpz_set_str($w, $s, 10);
-
-            # v = p^k
-            Math::GMPz::Rmpz_pow_ui($v, $t, $e);
-
-            # t = p^(k-1)
-            Math::GMPz::Rmpz_divexact($t, $v, $t);
-
-            # u = (p^k - 2*(p^(k-1)) + 1) / 2
-            Math::GMPz::Rmpz_mul_2exp($u, $t, 1);
-            Math::GMPz::Rmpz_sub($u, $v, $u);
-            Math::GMPz::Rmpz_add_ui($u, $u, 1);
-            Math::GMPz::Rmpz_div_2exp($u, $u, 1);
-
-            # sqrtmod(a, p^k) = (powmod(sqrtmod(a, p), p^(k-1), p^k) * powmod(a, u, p^k)) % p^k
-            Math::GMPz::Rmpz_powm($w, $w, $t, $v);
-            Math::GMPz::Rmpz_powm($u, $m, $u, $v);
-            Math::GMPz::Rmpz_mul($w, $w, $u);
-            Math::GMPz::Rmpz_mod($w, $w, $v);
-
-            push @congruences, [Math::GMPz::Rmpz_get_str($w, 10), Math::GMPz::Rmpz_get_str($v, 10)];
+            my $pair = _sqrtmod($nstr, $p, $e) // goto &nan;
+            push @congruences, $pair;
         }
 
-        my $n = Math::Prime::Util::GMP::chinese(@congruences) // goto &nan;
+        my $r = Math::Prime::Util::GMP::chinese(@congruences) // goto &nan;
 
-        ($n < ULONG_MAX)
-          ? Math::GMPz::Rmpz_set_ui($t, $n)
-          : Math::GMPz::Rmpz_set_str($t, $n, 10);
+        ($r < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($v, $r)
+          : Math::GMPz::Rmpz_set_str($v, $r, 10);
 
-        # Check that t^2 = m (mod y)
-        Math::GMPz::Rmpz_powm_ui($u, $t, 2, $y);
-        Math::GMPz::Rmpz_cmp($u, $m) == 0 or goto &nan;
+        # Check that v^2 = m (mod y)
+        Math::GMPz::Rmpz_powm_ui($u, $v, 2, $y);
+        Math::GMPz::Rmpz_cmp($u, $n) == 0 or goto &nan;
 
-        bless \$t;
+        bless \$v;
     }
 
     sub _modular_rational {
@@ -10706,18 +10736,8 @@ package Sidef::Types::Number::Number {
     sub legendre {
         my ($x, $y) = @_;
         _valid(\$y);
-
-        my $sym = Math::GMPz::Rmpz_legendre(_any2mpz($$x) // (goto &nan), _any2mpz($$y) // (goto &nan));
-
-        if (!$sym) {
-            ZERO;
-        }
-        elsif ($sym == 1) {
-            ONE;
-        }
-        else {
-            MONE;
-        }
+        my $s = Math::GMPz::Rmpz_legendre(_any2mpz($$x) // (goto &nan), _any2mpz($$y) // (goto &nan));
+        $s ? (($s == 1) ? ONE : MONE) : ZERO;
     }
 
     *Legendre = \&legendre;
@@ -10725,18 +10745,8 @@ package Sidef::Types::Number::Number {
     sub jacobi {
         my ($x, $y) = @_;
         _valid(\$y);
-
-        my $sym = Math::GMPz::Rmpz_jacobi(_any2mpz($$x) // (goto &nan), _any2mpz($$y) // (goto &nan));
-
-        if (!$sym) {
-            ZERO;
-        }
-        elsif ($sym == 1) {
-            ONE;
-        }
-        else {
-            MONE;
-        }
+        my $s = Math::GMPz::Rmpz_jacobi(_any2mpz($$x) // (goto &nan), _any2mpz($$y) // (goto &nan));
+        $s ? (($s == 1) ? ONE : MONE) : ZERO;
     }
 
     *Jacobi = \&jacobi;
@@ -10744,18 +10754,8 @@ package Sidef::Types::Number::Number {
     sub kronecker {
         my ($x, $y) = @_;
         _valid(\$y);
-
-        my $sym = Math::GMPz::Rmpz_kronecker(_any2mpz($$x) // (goto &nan), _any2mpz($$y) // (goto &nan));
-
-        if (!$sym) {
-            ZERO;
-        }
-        elsif ($sym == 1) {
-            ONE;
-        }
-        else {
-            MONE;
-        }
+        my $s = Math::GMPz::Rmpz_kronecker(_any2mpz($$x) // (goto &nan), _any2mpz($$y) // (goto &nan));
+        $s ? (($s == 1) ? ONE : MONE) : ZERO;
     }
 
     *Kronecker = \&kronecker;

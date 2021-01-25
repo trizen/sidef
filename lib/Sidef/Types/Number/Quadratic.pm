@@ -8,7 +8,7 @@ package Sidef::Types::Number::Quadratic {
 
     use parent qw(
       Sidef::Types::Number::Number
-      );
+    );
 
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
@@ -230,18 +230,6 @@ package Sidef::Types::Number::Quadratic {
         my $bool = $x->{b}->is_zero;
         $bool || return $bool;
         $x->{a}->is_mone;
-    }
-
-    sub is_real {
-        my ($x) = @_;
-        $x->{b}->is_zero;
-    }
-
-    sub is_imag {
-        my ($x) = @_;
-        my $bool = $x->{b}->is_zero;
-        $bool && return $bool->not;
-        $x->{a}->is_zero;
     }
 
     sub is_coprime {

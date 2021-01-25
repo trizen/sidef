@@ -31,7 +31,7 @@ loop {
             operators.each { |operator|
                 var o = operator.split;
                 var str = (format % (n[0],o[0],n[1],o[1],n[2],o[2],n[3]));
-                eval(str) == 24 && say str;
+                Sidef.new.execute_code(str) == 24 && say str;
             }
         }
     }
