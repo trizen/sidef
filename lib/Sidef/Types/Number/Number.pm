@@ -11260,6 +11260,15 @@ package Sidef::Types::Number::Number {
 
     sub is_prime {
         my ($n) = @_;
+
+        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+            return (
+                    Math::Prime::Util::is_prime(Math::GMPz::Rmpz_get_ui($$n))
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         _primality_pretest($$n)
           && Math::Prime::Util::GMP::is_prime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -11389,6 +11398,15 @@ package Sidef::Types::Number::Number {
 
     sub is_prob_prime {
         my ($n) = @_;
+
+        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+            return (
+                    Math::Prime::Util::is_prob_prime(Math::GMPz::Rmpz_get_ui($$n))
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         _primality_pretest($$n)
           && Math::Prime::Util::GMP::is_prob_prime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
