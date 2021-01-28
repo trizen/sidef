@@ -7138,6 +7138,8 @@ package Sidef::Types::Number::Number {
     sub _sqrtmod {    # sqrt(n) modulo a prime power p^e
         my ($n_, $p_, $e) = @_;
 
+        # FIXME: fails to find a solution for some inputs, like sqrtmod(17640, 48465)
+
         my $p  = Math::GMPz::Rmpz_init();
         my $pp = Math::GMPz::Rmpz_init();
         my $n  = Math::GMPz::Rmpz_init();
@@ -7225,18 +7227,20 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_sgn($y) <= 0 and goto &nan;
 
-        my $xstr = Math::GMPz::Rmpz_get_str($x, 10);
-        my $ystr = Math::GMPz::Rmpz_get_str($y, 10);
-
         my $n = Math::GMPz::Rmpz_init();
-
         Math::GMPz::Rmpz_mod($n, $x, $y);
 
         if (Math::GMPz::Rmpz_sgn($n) == 0) {
             return ZERO;
         }
 
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
+            return __PACKAGE__->_set_uint(Math::Prime::Util::sqrtmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($y))
+                                          // goto &nan);
+        }
+
         my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+        my $ystr = Math::GMPz::Rmpz_get_str($y, 10);
 
         if (Math::Prime::Util::GMP::is_prob_prime($ystr)) {
             my $n = Math::Prime::Util::GMP::sqrtmod($nstr, $ystr) // goto &nan;
