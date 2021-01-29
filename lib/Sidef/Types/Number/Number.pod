@@ -2508,6 +2508,14 @@ Aliases: I<is_khashin_pseudoprime>, I<is_frobenius_khashin_psp>, I<is_frobenius_
 
 =cut
 
+=head2 is_lucas
+
+Number.is_lucas() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 is_lucas_carmichael
 
 Number.is_lucas_carmichael() -> I<Obj>

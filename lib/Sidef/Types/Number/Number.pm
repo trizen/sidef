@@ -14937,7 +14937,40 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_cyclic {       # OEIS: A003277
+    sub is_lucas {        # OEIS: A102460
+        my ($n) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) >= 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 2) <= 0
+          and return Sidef::Types::Bool::Bool::TRUE;
+
+        state $log_phi = do {
+            my $t = Math::MPFR::Rmpfr_init2_nobless(64);
+            my $r = ${__PACKAGE__->phi};
+            Math::MPFR::Rmpfr_log($t, $r, $ROUND);
+            $t;
+        };
+
+        my $f = _any2mpfr($n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::MPFR::Rmpfr_log($f, $f, $ROUND);
+        Math::MPFR::Rmpfr_div($f, $f, $log_phi, $ROUND);
+        Math::MPFR::Rmpfr_round($f, $f);
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_lucnum_ui($t, Math::MPFR::Rmpfr_get_ui($f, $ROUND));
+
+        (Math::GMPz::Rmpz_cmp($t, $n) == 0)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_cyclic {    # OEIS: A003277
         my ($n) = @_;
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;

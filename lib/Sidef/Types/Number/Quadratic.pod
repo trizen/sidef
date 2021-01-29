@@ -314,14 +314,6 @@ Return the
 
 =cut
 
-=head2 is_imag
-
-Quadratic.is_imag() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 is_mone
 
 Quadratic.is_mone() -> I<Obj>
@@ -333,14 +325,6 @@ Return the
 =head2 is_one
 
 Quadratic.is_one() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 is_real
-
-Quadratic.is_real() -> I<Obj>
 
 Return the
 
