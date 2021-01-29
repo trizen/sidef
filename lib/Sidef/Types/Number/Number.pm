@@ -13579,18 +13579,24 @@ package Sidef::Types::Number::Number {
         }
 
         # Otherwise, select the divisors of N/d from the divisors of N
-        my %seen;
+        my @divisors;
 
-        map {
-            ($_ < ULONG_MAX)
-              ? Math::GMPz::Rmpz_gcd_ui($u, $d, $_)
-              : do {
-                Math::GMPz::Rmpz_set_str($u, $_, 10);
+        foreach my $k (@$D) {
+
+            if ($k < ULONG_MAX) {
+                Math::GMPz::Rmpz_gcd_ui($u, $d, $k);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($u, $k, 10);
                 Math::GMPz::Rmpz_gcd($u, $u, $d);
-              };
-            my $v = Math::Prime::Util::GMP::divint($_, Math::GMPz::Rmpz_get_str($u, 10));
-            exists($seen{$v}) ? () : do { $seen{$v} = 1; $v };
-        } @$D;
+            }
+
+            if (Math::GMPz::Rmpz_cmp($u, $d) == 0) {
+                push @divisors, Math::Prime::Util::GMP::divint($k, Math::GMPz::Rmpz_get_str($u, 10));
+            }
+        }
+
+        return @divisors;
     }
 
     sub _dynamic_preimage {
