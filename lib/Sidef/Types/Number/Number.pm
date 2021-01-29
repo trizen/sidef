@@ -13571,11 +13571,28 @@ package Sidef::Types::Number::Number {
             foreach my $pair (@$l) {
                 my ($x, $y) = @$pair;
 
-                my $xstr = Math::GMPz::Rmpz_get_str($x, 10);
+                Math::GMPz::Rmpz_divexact($u, $N, $x);
 
-                my %seen;
-                foreach my $d (grep { !$seen{$_}++ }
-                               map { Math::Prime::Util::GMP::divint($_, Math::Prime::Util::GMP::gcd($xstr, $_)) } @$D) {
+                my @div;
+
+                if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($u)) {
+                    @div = Math::Prime::Util::divisors(Math::GMPz::Rmpz_get_ui($u));
+                }
+                else {
+                    my %seen;
+                    @div = grep { !$seen{$_}++ }
+                      map {
+                        ($_ < ULONG_MAX)
+                          ? Math::GMPz::Rmpz_gcd_ui($u, $x, $_)
+                          : do {
+                            Math::GMPz::Rmpz_set_str($u, $_, 10);
+                            Math::GMPz::Rmpz_gcd($u, $u, $x);
+                          };
+                        Math::Prime::Util::GMP::divint($_, Math::GMPz::Rmpz_get_str($u, 10));
+                      } @$D;
+                }
+
+                foreach my $d (@div) {
                     if (exists $R{$d}) {
 
                         ($d < ULONG_MAX)
@@ -13625,12 +13642,29 @@ package Sidef::Types::Number::Number {
 
             foreach my $pair (@$l) {
 
-                my $x    = $pair->[0];
-                my $xstr = Math::GMPz::Rmpz_get_str($x, 10);
+                my $x = $pair->[0];
+                Math::GMPz::Rmpz_divexact($u, $N, $x);
 
-                my %seen;
-                foreach my $d (grep { !$seen{$_}++ }
-                               map { Math::Prime::Util::GMP::divint($_, Math::Prime::Util::GMP::gcd($xstr, $_)) } @$D) {
+                my @div;
+
+                if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($u)) {
+                    @div = Math::Prime::Util::divisors(Math::GMPz::Rmpz_get_ui($u));
+                }
+                else {
+                    my %seen;
+                    @div = grep { !$seen{$_}++ }
+                      map {
+                        ($_ < ULONG_MAX)
+                          ? Math::GMPz::Rmpz_gcd_ui($u, $x, $_)
+                          : do {
+                            Math::GMPz::Rmpz_set_str($u, $_, 10);
+                            Math::GMPz::Rmpz_gcd($u, $u, $x);
+                          };
+                        Math::Prime::Util::GMP::divint($_, Math::GMPz::Rmpz_get_str($u, 10));
+                      } @$D;
+                }
+
+                foreach my $d (@div) {
                     if (exists $R{$d}) {
 
                         ($d < ULONG_MAX)
