@@ -13557,6 +13557,42 @@ package Sidef::Types::Number::Number {
     *euler_phi     = \&totient;
     *euler_totient = \&totient;
 
+    sub _n_over_d_divisors {
+        my ($N, $d, $u, $D) = @_;
+
+        # N = a positive integer
+        # d = a divisor of N
+        # u = temporary Math::GMPz object
+        # D = array ref with divisors of N
+
+        Math::GMPz::Rmpz_divexact($u, $N, $d);
+
+        # When u = N/d is a native integer, call Math::Prime::Util::divisors().
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($u)) {
+            return Math::Prime::Util::divisors(Math::GMPz::Rmpz_get_ui($u));
+        }
+
+        # When N has too many divisors, it's faster
+        # to simply compute the divisors of u = N/d
+        if (scalar(@$D) > 1e4) {
+            return _divisors($u);
+        }
+
+        # Otherwise, select the divisors of N/d from the divisors of N
+        my %seen;
+
+        map {
+            ($_ < ULONG_MAX)
+              ? Math::GMPz::Rmpz_gcd_ui($u, $d, $_)
+              : do {
+                Math::GMPz::Rmpz_set_str($u, $_, 10);
+                Math::GMPz::Rmpz_gcd($u, $u, $d);
+              };
+            my $v = Math::Prime::Util::GMP::divint($_, Math::GMPz::Rmpz_get_str($u, 10));
+            exists($seen{$v}) ? () : do { $seen{$v} = 1; $v };
+        } @$D;
+    }
+
     sub _dynamic_preimage {
         my ($N, $L, $D, %opt) = @_;
 
@@ -13571,28 +13607,7 @@ package Sidef::Types::Number::Number {
             foreach my $pair (@$l) {
                 my ($x, $y) = @$pair;
 
-                Math::GMPz::Rmpz_divexact($u, $N, $x);
-
-                my @div;
-
-                if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($u)) {
-                    @div = Math::Prime::Util::divisors(Math::GMPz::Rmpz_get_ui($u));
-                }
-                else {
-                    my %seen;
-                    @div = grep { !$seen{$_}++ }
-                      map {
-                        ($_ < ULONG_MAX)
-                          ? Math::GMPz::Rmpz_gcd_ui($u, $x, $_)
-                          : do {
-                            Math::GMPz::Rmpz_set_str($u, $_, 10);
-                            Math::GMPz::Rmpz_gcd($u, $u, $x);
-                          };
-                        Math::Prime::Util::GMP::divint($_, Math::GMPz::Rmpz_get_str($u, 10));
-                      } @$D;
-                }
-
-                foreach my $d (@div) {
+                foreach my $d (_n_over_d_divisors($N, $x, $u, $D)) {
                     if (exists $R{$d}) {
 
                         ($d < ULONG_MAX)
@@ -13643,28 +13658,8 @@ package Sidef::Types::Number::Number {
             foreach my $pair (@$l) {
 
                 my $x = $pair->[0];
-                Math::GMPz::Rmpz_divexact($u, $N, $x);
 
-                my @div;
-
-                if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($u)) {
-                    @div = Math::Prime::Util::divisors(Math::GMPz::Rmpz_get_ui($u));
-                }
-                else {
-                    my %seen;
-                    @div = grep { !$seen{$_}++ }
-                      map {
-                        ($_ < ULONG_MAX)
-                          ? Math::GMPz::Rmpz_gcd_ui($u, $x, $_)
-                          : do {
-                            Math::GMPz::Rmpz_set_str($u, $_, 10);
-                            Math::GMPz::Rmpz_gcd($u, $u, $x);
-                          };
-                        Math::Prime::Util::GMP::divint($_, Math::GMPz::Rmpz_get_str($u, 10));
-                      } @$D;
-                }
-
-                foreach my $d (@div) {
+                foreach my $d (_n_over_d_divisors($N, $x, $u, $D)) {
                     if (exists $R{$d}) {
 
                         ($d < ULONG_MAX)
