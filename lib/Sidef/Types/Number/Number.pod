@@ -2430,6 +2430,16 @@ Return the
 
 =cut
 
+=head2 is_fib
+
+Number.is_fib() -> I<Obj>
+
+Return the
+
+Aliases: I<is_fibonacci>
+
+=cut
+
 =head2 is_fib_psp
 
 Number.is_fib_psp() -> I<Obj>

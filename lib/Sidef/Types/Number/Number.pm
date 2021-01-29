@@ -14937,7 +14937,33 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_lucas {        # OEIS: A102460
+    sub is_fibonacci {    # OEIS: A010056
+        my ($n) = @_;
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        # 5*n^2 +/- 4 must be a perfect square
+
+        Math::GMPz::Rmpz_mul($t, $n, $n);
+        Math::GMPz::Rmpz_mul_ui($t, $t, 5);
+
+        Math::GMPz::Rmpz_sub_ui($t, $t, 4);
+        Math::GMPz::Rmpz_perfect_square_p($t)
+          && return Sidef::Types::Bool::Bool::TRUE;
+
+        Math::GMPz::Rmpz_add_ui($t, $t, 8);
+        Math::GMPz::Rmpz_perfect_square_p($t)
+          && return Sidef::Types::Bool::Bool::TRUE;
+
+        Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *is_fib = \&is_fibonacci;
+
+    sub is_lucas {    # OEIS: A102460
         my ($n) = @_;
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
