@@ -64,21 +64,24 @@ do {
     }
 }
 
-assert_eq(sqrtmod(10, 13), 6)
-assert_eq(sqrtmod(10, 13**2), 32)
-assert_eq(sqrtmod(10, 13**3), 1046)
-assert_eq(sqrtmod(10, 13**4), 9834)
-assert_eq(sqrtmod(44, 43*97), 4000)
-assert_eq(sqrtmod(938, 1771), 1204)
-assert_eq(sqrtmod(1313, 3808), 2977)
-assert_eq(sqrtmod(544, 800), 512)
-assert_eq(sqrtmod(436, 1752), 1618)
-
-assert_eq(sqrtmod(289, 992), 417)
-assert_eq(sqrtmod(841, 905), 391)
-assert_eq(sqrtmod(441, 920), 761)
-assert_eq(sqrtmod(993, 2048), 369)
-
-assert_eq(sqrtmod(13**18 * 5**7 - 1, 13**18 * 5**7), 8152180589260066051764557)
+for a,m in (
+[
+    [10, 13],
+    [10, 13**2],
+    [10, 13**3],
+    [10, 13**4],
+    [44, 43*97],
+    [938, 1771],
+    [1313, 3808],
+    [544, 800],
+    [436, 1752],
+    [289, 992],
+    [841, 905],
+    [441, 920],
+    [993, 2048],
+    [13**18 * 5**7 - 1, 13**18 * 5**7]
+]) {
+    assert_eq(Mod(sqrtmod(a, m), m)**2, a, "sqrtmod(#{a}, #{m})")
+}
 
 say "** Tests passed!"

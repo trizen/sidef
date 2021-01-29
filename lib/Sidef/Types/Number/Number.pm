@@ -13558,7 +13558,7 @@ package Sidef::Types::Number::Number {
     *euler_totient = \&totient;
 
     sub _dynamic_preimage {
-        my ($N, $L, %opt) = @_;
+        my ($N, $L, $D, %opt) = @_;
 
         # Based on invphi.gp ver. 2.1 by Max Alekseyev.
 
@@ -13571,9 +13571,11 @@ package Sidef::Types::Number::Number {
             foreach my $pair (@$l) {
                 my ($x, $y) = @$pair;
 
-                Math::GMPz::Rmpz_divexact($u, $N, $x);
+                my $xstr = Math::GMPz::Rmpz_get_str($x, 10);
 
-                foreach my $d (_divisors($u)) {
+                my %seen;
+                foreach my $d (grep { !$seen{$_}++ }
+                               map { Math::Prime::Util::GMP::divint($_, Math::Prime::Util::GMP::gcd($xstr, $_)) } @$D) {
                     if (exists $R{$d}) {
 
                         ($d < ULONG_MAX)
@@ -13611,7 +13613,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub _dynamic_length {
-        my ($N, $L) = @_;
+        my ($N, $L, $D) = @_;
 
         # Based on invphi.gp ver. 2.1 by Max Alekseyev.
 
@@ -13623,10 +13625,12 @@ package Sidef::Types::Number::Number {
 
             foreach my $pair (@$l) {
 
-                my $x = $pair->[0];
-                Math::GMPz::Rmpz_divexact($u, $N, $x);
+                my $x    = $pair->[0];
+                my $xstr = Math::GMPz::Rmpz_get_str($x, 10);
 
-                foreach my $d (_divisors($u)) {
+                my %seen;
+                foreach my $d (grep { !$seen{$_}++ }
+                               map { Math::Prime::Util::GMP::divint($_, Math::Prime::Util::GMP::gcd($xstr, $_)) } @$D) {
                     if (exists $R{$d}) {
 
                         ($d < ULONG_MAX)
@@ -13656,8 +13660,9 @@ package Sidef::Types::Number::Number {
         my $v = Math::GMPz::Rmpz_init();
 
         my %L;
+        my @D = _divisors($N);
 
-        foreach my $d (_divisors($N)) {
+        foreach my $d (@D) {
 
             Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::addint($d, 1)) || next;
 
@@ -13686,7 +13691,7 @@ package Sidef::Types::Number::Number {
             } 1 .. $t + 1;
         }
 
-        [values %L];
+        ([values %L], \@D);
     }
 
     sub inverse_totient {
@@ -13750,8 +13755,9 @@ package Sidef::Types::Number::Number {
         my $v = Math::GMPz::Rmpz_init();
 
         my %L;
+        my @D = _divisors($N);
 
-        foreach my $d (_divisors($N)) {
+        foreach my $d (@D) {
 
             Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::subint($d, 1)) || next;
 
@@ -13780,7 +13786,7 @@ package Sidef::Types::Number::Number {
             } 1 .. $t + 1;
         }
 
-        [values %L];
+        ([values %L], \@D);
     }
 
     sub inverse_dedekind_psi {
@@ -13819,8 +13825,9 @@ package Sidef::Types::Number::Number {
         my ($N) = @_;
 
         my %L;
+        my @D = _divisors($N);
 
-        foreach my $d (_divisors($N)) {
+        foreach my $d (@D) {
 
             Math::Prime::Util::GMP::is_prime_power(Math::Prime::Util::GMP::subint($d, 1)) || next;
 
@@ -13836,7 +13843,7 @@ package Sidef::Types::Number::Number {
             push @{$L{$v}}, [$u, $v];
         }
 
-        [values %L];
+        ([values %L], \@D);
     }
 
     sub inverse_usigma {
@@ -13857,8 +13864,9 @@ package Sidef::Types::Number::Number {
         my ($N) = @_;
 
         my %L;
+        my @D = _divisors($N);
 
-        foreach my $d (_divisors($N)) {
+        foreach my $d (@D) {
 
             Math::Prime::Util::GMP::is_prime_power(Math::Prime::Util::GMP::addint($d, 1)) || next;
 
@@ -13874,7 +13882,7 @@ package Sidef::Types::Number::Number {
             push @{$L{$v}}, [$u, $v];
         }
 
-        [values %L];
+        ([values %L], \@D);
     }
 
     sub inverse_uphi {
@@ -13902,8 +13910,9 @@ package Sidef::Types::Number::Number {
         my $v = Math::GMPz::Rmpz_init();
 
         my %L;
+        my @D = _divisors($N);
 
-        foreach my $d (_divisors($N)) {
+        foreach my $d (@D) {
 
             next if ($d == 1);
 
@@ -13943,7 +13952,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        [values %L];
+        ([values %L], \@D);
     }
 
     sub inverse_sigma {
