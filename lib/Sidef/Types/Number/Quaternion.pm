@@ -38,6 +38,9 @@ package Sidef::Types::Number::Quaternion {
         $_[0]->{a};
     }
 
+    *re   = \&a;
+    *real = \&a;
+
     sub b {
         $_[0]->{b};
     }

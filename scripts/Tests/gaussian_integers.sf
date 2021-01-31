@@ -220,4 +220,9 @@ do {
     assert_eq([reals(a-b)], [reals(Quadratic(reals(a),-1) - Quadratic(reals(b),-1))])
 }
 
+assert_eq(  # OEIS: A006495
+    with (Gauss(1, 2)) {|g| 20.of { g**_ -> real } },
+    [1, 1, -3, -11, -7, 41, 117, 29, -527, -1199, 237, 6469, 11753, -8839, -76443, -108691, 164833, 873121, 922077, -2521451]
+)
+
 say "** Test passed!"

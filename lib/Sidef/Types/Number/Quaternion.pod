@@ -228,6 +228,8 @@ Quaternion.a() -> I<Obj>
 
 Return the
 
+Aliases: I<re>, I<real>
+
 =cut
 
 =head2 abs

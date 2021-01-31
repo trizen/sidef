@@ -36,12 +36,14 @@ package Sidef::Types::Number::Quadratic {
         $_[0]->{a};
     }
 
+    *re   = \&a;
     *real = \&a;
 
     sub b {
         $_[0]->{b};
     }
 
+    *im   = \&b;
     *imag = \&b;
 
     sub w {

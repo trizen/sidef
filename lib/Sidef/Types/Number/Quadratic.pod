@@ -228,7 +228,7 @@ Quadratic.a() -> I<Obj>
 
 Return the
 
-Aliases: I<real>
+Aliases: I<re>, I<real>
 
 =cut
 
@@ -246,7 +246,7 @@ Quadratic.b() -> I<Obj>
 
 Return the
 
-Aliases: I<imag>
+Aliases: I<im>, I<imag>
 
 =cut
 
