@@ -9629,9 +9629,7 @@ package Sidef::Types::Number::Number {
                                : Math::Prime::Util::GMP::moebius(1, $s)
                   ) {
                     ++$k;
-                    if ($m) {
-                        $count += $m * CORE::int($n / ($k * $k));
-                    }
+                    $count += $m * CORE::int($n / ($k * $k)) if $m;
                 }
 
                 return (
@@ -9642,12 +9640,26 @@ package Sidef::Types::Number::Number {
             }
 
             # Linear counting up to sqrt(n)
-            my ($count, $m) = 0;
-            foreach my $k (1 .. $s) {
-                if ($m = Math::Prime::Util::GMP::moebius($k)) {
-                    $count += $m * CORE::int($n / ($k * $k));
+
+            my $count = 0;
+
+            if (HAS_PRIME_UTIL) {
+                Math::Prime::Util::forsquarefree(
+                    sub {
+                        $count += ((scalar(@_) & 1) ? -1 : 1) * CORE::int($n / ($_ * $_));
+                    },
+                    $s
+                                                );
+            }
+            else {
+                my $m;
+                foreach my $k (1 .. $s) {
+                    if ($m = Math::Prime::Util::GMP::moebius($k)) {
+                        $count += $m * CORE::int($n / ($k * $k));
+                    }
                 }
             }
+
             return (
                     ($count < ULONG_MAX)
                     ? __PACKAGE__->_set_uint($count)
