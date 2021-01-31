@@ -1,5 +1,7 @@
 #!/usr/bin/ruby
 
+# Tests for the "Gauss" class.
+
 var r = (-2 .. 2)
 
 for a in (r), b in (r), c in (r), d in (r) {

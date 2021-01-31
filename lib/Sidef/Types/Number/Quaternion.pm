@@ -1,7 +1,7 @@
-package Sidef::Types::Number::Gauss {
+package Sidef::Types::Number::Quaternion {
 
     # Reference:
-    #   https://en.wikipedia.org/wiki/Gaussian_integer
+    #   https://en.wikipedia.org/wiki/Quaternion
 
     use utf8;
     use 5.016;
@@ -13,53 +13,45 @@ package Sidef::Types::Number::Gauss {
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
       q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ },
-      q{0+}   => \&to_c,
-      q{${}}  => \&to_c;
+      q{0+}   => \&to_n,
+      q{${}}  => \&to_n;
 
     sub new {
-        my (undef, $real, $imag) = @_;
+        my (undef, $a, $b, $c, $d) = @_;
 
-        $real //= Sidef::Types::Number::Number::ZERO;
-        $imag //= Sidef::Types::Number::Number::ZERO;
+        $a //= Sidef::Types::Number::Number::ZERO;
+        $b //= Sidef::Types::Number::Number::ZERO;
+        $c //= Sidef::Types::Number::Number::ZERO;
+        $d //= Sidef::Types::Number::Number::ZERO;
 
-        $real = Sidef::Types::Number::Number->new($real) if !UNIVERSAL::isa($real, 'Sidef::Types::Number::Number');
-        $imag = Sidef::Types::Number::Number->new($imag) if !UNIVERSAL::isa($imag, 'Sidef::Types::Number::Number');
+        $a = Sidef::Types::Number::Number->new($a) if !UNIVERSAL::isa($a, 'Sidef::Types::Number::Number');
+        $b = Sidef::Types::Number::Number->new($b) if !UNIVERSAL::isa($b, 'Sidef::Types::Number::Number');
+        $c = Sidef::Types::Number::Number->new($c) if !UNIVERSAL::isa($c, 'Sidef::Types::Number::Number');
+        $d = Sidef::Types::Number::Number->new($d) if !UNIVERSAL::isa($d, 'Sidef::Types::Number::Number');
 
-        bless {a => $real, b => $imag};
+        bless {a => $a, b => $b, c => $c, d => $d};
     }
 
     *call = \&new;
 
-    sub i {
-        my ($x) = @_;
-
-        if (ref($x) eq __PACKAGE__) {    # (a+bi)*i = -b + a*i
-            return __PACKAGE__->new($x->{b}->neg, $x->{a});
-        }
-
-        __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE);
-    }
-
-    sub to_c {
-        Sidef::Types::Number::Complex->new($_[0]->{a}, $_[0]->{b});
-    }
-
-    *to_n = \&to_c;
-
-    sub re {
+    sub a {
         $_[0]->{a};
     }
 
-    *real = \&re;
-
-    sub im {
+    sub b {
         $_[0]->{b};
     }
 
-    *imag = \&im;
+    sub c {
+        $_[0]->{c};
+    }
+
+    sub d {
+        $_[0]->{d};
+    }
 
     sub reals {
-        ($_[0]->{a}, $_[0]->{b});
+        ($_[0]->{a}, $_[0]->{b}, $_[0]->{c}, $_[0]->{d});
     }
 
     sub parts {
@@ -76,7 +68,7 @@ package Sidef::Types::Number::Gauss {
 
     sub __stringify__ {
         my ($x) = @_;
-        'Gauss(' . join(', ', $x->{a}->dump, $x->{b}->dump) . ')';
+        'Quaternion(' . join(', ', $x->{a}->dump, $x->{b}->dump, $x->{c}->dump, $x->{d}->dump) . ')';
     }
 
     sub to_s {
@@ -89,19 +81,31 @@ package Sidef::Types::Number::Gauss {
         Sidef::Types::String::String->new($x->__stringify__);
     }
 
-    sub abs {
+    sub to_gauss {
         my ($x) = @_;
-        $x->{a}->sqr->add($x->{b}->sqr)->sqrt;
+#<<<
+        Sidef::Types::Number::Gauss->new(
+            Sidef::Types::Number::Gauss->new($x->{a}, $x->{b}),
+            Sidef::Types::Number::Gauss->new($x->{c}, $x->{d}),
+        );
+#>>>
     }
 
-    sub iabs {
+    sub to_n {
         my ($x) = @_;
-        $x->{a}->sqr->add($x->{b}->sqr)->isqrt;
+        $x->to_gauss->to_n;
     }
+
+    *to_c = \&to_n;
 
     sub norm {
         my ($x) = @_;
-        $x->{a}->sqr->add($x->{b}->sqr);
+        $x->{a}->sqr->add($x->{b}->sqr)->add($x->{c}->sqr)->add($x->{d}->sqr);
+    }
+
+    sub abs {
+        my ($x) = @_;
+        $x->norm->sqrt;
     }
 
     sub sgn {
@@ -111,63 +115,95 @@ package Sidef::Types::Number::Gauss {
 
     sub neg {
         my ($x) = @_;
-        __PACKAGE__->new($x->{a}->neg, $x->{b}->neg);
+#<<<
+        __PACKAGE__->new(
+            $x->{a}->neg,
+            $x->{b}->neg,
+            $x->{c}->neg,
+            $x->{d}->neg,
+        );
+#>>>
     }
 
     sub conj {
         my ($x) = @_;
-        __PACKAGE__->new($x->{a}, $x->{b}->neg);
+#<<<
+        __PACKAGE__->new(
+            $x->{a},
+            $x->{b}->neg,
+            $x->{c}->neg,
+            $x->{d}->neg,
+        );
+#>>>
+    }
+
+    sub sqr {
+        my ($x) = @_;
+        $x->mul($x);
     }
 
     sub add {
         my ($x, $y) = @_;
 
+#<<<
         if (ref($y) eq __PACKAGE__) {
-            return __PACKAGE__->new($x->{a}->add($y->{a}), $x->{b}->add($y->{b}));
+            return __PACKAGE__->new(
+                $x->{a}->add($y->{a}),
+                $x->{b}->add($y->{b}),
+                $x->{c}->add($y->{c}),
+                $x->{d}->add($y->{d}),
+            );
         }
+#>>>
 
-        __PACKAGE__->new($x->{a}->add($y), $x->{b});
+        __PACKAGE__->new($x->{a}->add($y), $x->{b}, $x->{c}, $x->{d});
     }
 
     sub sub {
         my ($x, $y) = @_;
 
+#<<<
         if (ref($y) eq __PACKAGE__) {
-            return __PACKAGE__->new($x->{a}->sub($y->{a}), $x->{b}->sub($y->{b}));
+            return __PACKAGE__->new(
+                $x->{a}->sub($y->{a}),
+                $x->{b}->sub($y->{b}),
+                $x->{c}->sub($y->{c}),
+                $x->{d}->sub($y->{d}),
+            );
         }
+#>>>
 
-        __PACKAGE__->new($x->{a}->sub($y), $x->{b});
+        __PACKAGE__->new($x->{a}->sub($y), $x->{b}, $x->{c}, $x->{d});
     }
 
     sub mul {
         my ($x, $y) = @_;
 
         if (ref($y) eq __PACKAGE__) {
-            return
-              __PACKAGE__->new($x->{a}->mul($y->{a})->sub($x->{b}->mul($y->{b})),
-                               $x->{a}->mul($y->{b})->add($x->{b}->mul($y->{a})));
+            return __PACKAGE__->new(
+
+                # Quaternion(a,b,c,d) * Quaternion(a',b',c',d') = Quaternion(
+                #   a*a' - b*b' - c*c' - d*d',
+                #   a*b' + b*a' + c*d' - d*c',
+                #   a*c' - b*d' + c*a' + d*b',
+                #   a*d' + b*c' - c*b' + d*a',
+                #)
+
+                $x->{a}->mul($y->{a})->sub($x->{b}->mul($y->{b}))->sub($x->{c}->mul($y->{c}))->sub($x->{d}->mul($y->{d})),
+                $x->{a}->mul($y->{b})->add($x->{b}->mul($y->{a}))->add($x->{c}->mul($y->{d}))->sub($x->{d}->mul($y->{c})),
+                $x->{a}->mul($y->{c})->sub($x->{b}->mul($y->{d}))->add($x->{c}->mul($y->{a}))->add($x->{d}->mul($y->{b})),
+                $x->{a}->mul($y->{d})->add($x->{b}->mul($y->{c}))->sub($x->{c}->mul($y->{b}))->add($x->{d}->mul($y->{a})),
+            );
         }
 
-        __PACKAGE__->new($x->{a}->mul($y), $x->{b}->mul($y));
-    }
-
-    sub sqr {
-        my ($x) = @_;
-        my $t = $x->{a}->mul($x->{b});
-        __PACKAGE__->new($x->{a}->sqr->sub($x->{b}->sqr), $t->add($t));
-    }
-
-    sub inv {
-        my ($x) = @_;
-        my $t = $x->{a}->sqr->add($x->{b}->sqr);
-        __PACKAGE__->new($x->{a}->div($t), $x->{b}->neg->div($t),);
-    }
-
-    sub invmod {
-        my ($x, $m) = @_;
-        $x->ratmod($m);
-        my $t = $x->{a}->sqr->add($x->{b}->sqr)->invmod($m);
-        __PACKAGE__->new($x->{a}->mul($t)->mod($m), $x->{b}->neg->mul($t)->mod($m),);
+#<<<
+        __PACKAGE__->new(
+            $x->{a}->mul($y),
+            $x->{b}->mul($y),
+            $x->{c}->mul($y),
+            $x->{d}->mul($y),
+        );
+#>>>
     }
 
     sub div {
@@ -177,38 +213,84 @@ package Sidef::Types::Number::Gauss {
 
     sub float {
         my ($x) = @_;
-        __PACKAGE__->new($x->{a}->float, $x->{b}->float);
+#<<<
+        __PACKAGE__->new(
+            $x->{a}->float,
+            $x->{b}->float,
+            $x->{c}->float,
+            $x->{d}->float,
+        );
+#>>>
     }
 
     sub floor {
         my ($x) = @_;
-        __PACKAGE__->new($x->{a}->floor, $x->{b}->floor);
+#<<<
+        __PACKAGE__->new(
+            $x->{a}->floor,
+            $x->{b}->floor,
+            $x->{c}->floor,
+            $x->{d}->floor,
+        );
+#>>>
     }
 
     sub ceil {
         my ($x) = @_;
-        __PACKAGE__->new($x->{a}->ceil, $x->{b}->ceil);
+#<<<
+        __PACKAGE__->new(
+            $x->{a}->ceil,
+            $x->{b}->ceil,
+            $x->{c}->ceil,
+            $x->{d}->ceil,
+        );
+#>>>
     }
 
     sub round {
         my ($x, $r) = @_;
-        __PACKAGE__->new($x->{a}->round($r), $x->{b}->round($r));
+#<<<
+        __PACKAGE__->new(
+            $x->{a}->round($r),
+            $x->{b}->round($r),
+            $x->{c}->round($r),
+            $x->{d}->round($r),
+        );
+#>>>
+    }
+
+    sub ratmod {
+        my ($x, $m) = @_;
+#<<<
+        __PACKAGE__->new(
+            $x->{a}->ratmod($m),
+            $x->{b}->ratmod($m),
+            $x->{c}->ratmod($m),
+            $x->{d}->ratmod($m),
+        );
+#>>>
     }
 
     sub mod {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return __PACKAGE__->new($x->{a}->mod($y), $x->{b}->mod($y),);
+            return __PACKAGE__->new($x->{a}->mod($y), $x->{b}->mod($y), $x->{c}->mod($y), $x->{d}->mod($y));
         }
 
         # mod(a, b) = a - b * floor(a/b)
         $x->sub($y->mul($x->div($y)->floor));
     }
 
-    sub is_prime {
+    sub inv {
         my ($x) = @_;
-        Sidef::Types::Number::Number::is_gaussian_prime($x->{a}, $x->{b});
+        $x->conj->mul($x->{a}->sqr->add($x->{b}->sqr)->add($x->{c}->sqr)->add($x->{d}->sqr)->inv);
+    }
+
+    sub invmod {
+        my ($x, $m) = @_;
+        $x = $x->ratmod($m);
+        $x->conj->mul($x->{a}->sqr->add($x->{b}->sqr)->add($x->{c}->sqr)->add($x->{d}->sqr)->invmod($m))->mod($m);
     }
 
     sub is_zero {
@@ -232,64 +314,20 @@ package Sidef::Types::Number::Gauss {
         $x->{a}->is_mone;
     }
 
-    sub is_real {
-        my ($x) = @_;
-        $x->{b}->is_zero;
-    }
-
-    sub is_imag {
-        my ($x) = @_;
-        my $bool = $x->{b}->is_zero;
-        $bool && return $bool->not;
-        $x->{a}->is_zero;
-    }
-
-    sub gcd {
-        my ($n, $k) = @_;
-
-        my $norm_n = $n->norm;
-        my $norm_k = $k->norm;
-
-        if ($norm_n->gt($norm_k)) {
-            ($n, $k) = ($k, $n);
-        }
-
-        until ($k->is_zero) {
-
-            last if ($n->is_nan or $k->is_nan);
-
-            my $q = $n->div($k)->round;
-            my $r = $n->sub($q->mul($k));
-
-            ($n, $k) = ($k, $r);
-        }
-
-        $n;
-    }
-
-    sub gcd_norm {
-        my ($n, $k) = @_;
-        $n->norm->gcd($k->norm);
-    }
-
     sub is_coprime {
         my ($n, $k) = @_;
+        _valid(\$k);
         $n->norm->gcd($k->norm)->is_one;
-    }
-
-    sub ratmod {
-        my ($x, $m) = @_;
-        __PACKAGE__->new($x->{a}->ratmod($m), $x->{b}->ratmod($m));
     }
 
     sub inc {
         my ($x) = @_;
-        __PACKAGE__->new($x->{a}->inc, $x->{b});
+        __PACKAGE__->new($x->{a}->inc, $x->{b}, $x->{c}, $x->{d});
     }
 
     sub dec {
         my ($x) = @_;
-        __PACKAGE__->new($x->{a}->dec, $x->{b});
+        __PACKAGE__->new($x->{a}->dec, $x->{b}, $x->{c}, $x->{d});
     }
 
     sub pow {
@@ -310,7 +348,7 @@ package Sidef::Types::Number::Gauss {
             # x *= x
 
             $c = $c->mul($x) if $bit;
-            $x = $x->sqr;
+            $x = $x->mul($x);
         }
 
         if ($negative_power) {
@@ -340,7 +378,7 @@ package Sidef::Types::Number::Gauss {
             # x = (x*x)%m
 
             $c = $c->mul($x)->mod($m) if $bit;
-            $x = $x->sqr->mod($m);
+            $x = $x->mul($x)->mod($m);
         }
 
         if ($negative_power) {
@@ -356,7 +394,11 @@ package Sidef::Types::Number::Gauss {
         if (ref($y) eq __PACKAGE__) {
             my $cmp = $x->{a}->cmp($y->{a}) // return undef;
             $cmp && return $cmp;
-            return $x->{b}->cmp($y->{b});
+            $cmp = $x->{b}->cmp($y->{b}) // return undef;
+            $cmp && return $cmp;
+            $cmp = $x->{c}->cmp($y->{c}) // return undef;
+            $cmp && return $cmp;
+            return $x->{d}->cmp($y->{d});
         }
 
         my $cmp = $x->{a}->cmp($y) // return undef;
@@ -368,12 +410,16 @@ package Sidef::Types::Number::Gauss {
         my ($x, $y) = @_;
 
         if (ref($y) eq __PACKAGE__) {
-            my $bool = $x->{a}->eq($y->{a});
+            my $bool = $x->{a}->eq($y->{a}) // return undef;
             $bool || return $bool;
-            return $x->{b}->eq($y->{b});
+            $bool = $x->{b}->eq($y->{b}) // return undef;
+            $bool || return $bool;
+            $bool = $x->{c}->eq($y->{c}) // return undef;
+            $bool || return $bool;
+            return $x->{d}->eq($y->{d});
         }
 
-        my $bool = $x->{a}->eq($y);
+        my $bool = $x->{a}->eq($y) // return undef;
         $bool || return $bool;
         $x->{b}->is_zero;
     }
@@ -384,7 +430,11 @@ package Sidef::Types::Number::Gauss {
         if (ref($y) eq __PACKAGE__) {
             my $bool = $x->{a}->ne($y->{a});
             $bool && return $bool;
-            return $x->{b}->ne($y->{b});
+            $bool = $x->{b}->ne($y->{b});
+            $bool && return $bool;
+            $bool = $x->{c}->ne($y->{c});
+            $bool && return $bool;
+            return ($x->{d}->ne($y->{d}));
         }
 
         my $bool = $x->{a}->ne($y);
@@ -420,11 +470,18 @@ package Sidef::Types::Number::Gauss {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
 
+#<<<
                 if (ref($y) eq __PACKAGE__) {
-                    return __PACKAGE__->new($x->{a}->$method($y->{a}), $x->{b}->$method($y->{b}));
+                    return __PACKAGE__->new(
+                        $x->{a}->$method($y->{a}),
+                        $x->{b}->$method($y->{b}),
+                        $x->{c}->$method($y->{c}),
+                        $x->{d}->$method($y->{d}),
+                    );
                 }
+#>>>
 
-                return __PACKAGE__->new($x->{a}->$method($y), $x->{b});
+                return __PACKAGE__->new($x->{a}->$method($y), $x->{b}, $x->{c}, $x->{d});
             };
         }
 

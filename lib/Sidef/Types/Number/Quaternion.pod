@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Number::Gauss
+Sidef::Types::Number::Quaternion
 
 =head1 DESCRIPTION
 
@@ -11,7 +11,7 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Gauss(...)
+var obj = Quaternion(...)
 
 
 =head1 INHERITS
@@ -222,9 +222,33 @@ Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
+=head2 a
+
+Quaternion.a() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 abs
 
-Gauss.abs() -> I<Obj>
+Quaternion.abs() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 b
+
+Quaternion.b() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 c
+
+Quaternion.c() -> I<Obj>
 
 Return the
 
@@ -232,7 +256,7 @@ Return the
 
 =head2 ceil
 
-Gauss.ceil() -> I<Obj>
+Quaternion.ceil() -> I<Obj>
 
 Return the
 
@@ -240,7 +264,15 @@ Return the
 
 =head2 conj
 
-Gauss.conj() -> I<Obj>
+Quaternion.conj() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 d
+
+Quaternion.d() -> I<Obj>
 
 Return the
 
@@ -248,7 +280,7 @@ Return the
 
 =head2 dump
 
-Gauss.dump() -> I<Obj>
+Quaternion.dump() -> I<Obj>
 
 Return the
 
@@ -256,7 +288,7 @@ Return the
 
 =head2 float
 
-Gauss.float() -> I<Obj>
+Quaternion.float() -> I<Obj>
 
 Return the
 
@@ -264,57 +296,15 @@ Return the
 
 =head2 floor
 
-Gauss.floor() -> I<Obj>
+Quaternion.floor() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 gcd
-
-Gauss.gcd() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 gcd_norm
-
-Gauss.gcd_norm() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 i
-
-Gauss.i() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 iabs
-
-Gauss.iabs() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 im
-
-Gauss.im() -> I<Obj>
-
-Return the
-
-Aliases: I<imag>
 
 =cut
 
 =head2 inv
 
-Gauss.inv() -> I<Obj>
+Quaternion.inv() -> I<Obj>
 
 Return the
 
@@ -322,7 +312,7 @@ Return the
 
 =head2 invmod
 
-Gauss.invmod() -> I<Obj>
+Quaternion.invmod() -> I<Obj>
 
 Return the
 
@@ -330,15 +320,7 @@ Return the
 
 =head2 is_coprime
 
-Gauss.is_coprime() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 is_imag
-
-Gauss.is_imag() -> I<Obj>
+Quaternion.is_coprime() -> I<Obj>
 
 Return the
 
@@ -346,7 +328,7 @@ Return the
 
 =head2 is_mone
 
-Gauss.is_mone() -> I<Obj>
+Quaternion.is_mone() -> I<Obj>
 
 Return the
 
@@ -354,23 +336,7 @@ Return the
 
 =head2 is_one
 
-Gauss.is_one() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 is_prime
-
-Gauss.is_prime() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 is_real
-
-Gauss.is_real() -> I<Obj>
+Quaternion.is_one() -> I<Obj>
 
 Return the
 
@@ -378,7 +344,7 @@ Return the
 
 =head2 is_zero
 
-Gauss.is_zero() -> I<Obj>
+Quaternion.is_zero() -> I<Obj>
 
 Return the
 
@@ -386,7 +352,7 @@ Return the
 
 =head2 neg
 
-Gauss.neg() -> I<Obj>
+Quaternion.neg() -> I<Obj>
 
 Return the
 
@@ -394,7 +360,7 @@ Return the
 
 =head2 new
 
-Gauss.new() -> I<Obj>
+Quaternion.new() -> I<Obj>
 
 Return the
 
@@ -404,7 +370,7 @@ Aliases: I<call>
 
 =head2 norm
 
-Gauss.norm() -> I<Obj>
+Quaternion.norm() -> I<Obj>
 
 Return the
 
@@ -412,7 +378,7 @@ Return the
 
 =head2 parts
 
-Gauss.parts() -> I<Obj>
+Quaternion.parts() -> I<Obj>
 
 Return the
 
@@ -420,7 +386,7 @@ Return the
 
 =head2 powmod
 
-Gauss.powmod() -> I<Obj>
+Quaternion.powmod() -> I<Obj>
 
 Return the
 
@@ -428,25 +394,15 @@ Return the
 
 =head2 ratmod
 
-Gauss.ratmod() -> I<Obj>
+Quaternion.ratmod() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 re
-
-Gauss.re() -> I<Obj>
-
-Return the
-
-Aliases: I<real>
 
 =cut
 
 =head2 reals
 
-Gauss.reals() -> I<Obj>
+Quaternion.reals() -> I<Obj>
 
 Return the
 
@@ -454,7 +410,7 @@ Return the
 
 =head2 round
 
-Gauss.round() -> I<Obj>
+Quaternion.round() -> I<Obj>
 
 Return the
 
@@ -462,7 +418,7 @@ Return the
 
 =head2 sgn
 
-Gauss.sgn() -> I<Obj>
+Quaternion.sgn() -> I<Obj>
 
 Return the
 
@@ -470,7 +426,7 @@ Return the
 
 =head2 sqr
 
-Gauss.sqr() -> I<Obj>
+Quaternion.sqr() -> I<Obj>
 
 Return the
 
@@ -478,7 +434,7 @@ Return the
 
 =head2 to_c
 
-Gauss.to_c() -> I<Obj>
+Quaternion.to_c() -> I<Obj>
 
 Return the
 
@@ -486,9 +442,17 @@ Aliases: I<to_n>
 
 =cut
 
+=head2 to_gauss
+
+Quaternion.to_gauss() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 to_s
 
-Gauss.to_s() -> I<Obj>
+Quaternion.to_s() -> I<Obj>
 
 Return the
 

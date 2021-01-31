@@ -364,6 +364,14 @@ Return the
 
 =cut
 
+=head2 parts
+
+Quadratic.parts() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 powmod
 
 Quadratic.powmod() -> I<Obj>

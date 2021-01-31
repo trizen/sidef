@@ -80,6 +80,8 @@ lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Number/Quadratic.pm
 lib/Sidef/Types/Number/Quadratic.pod
+lib/Sidef/Types/Number/Quaternion.pm
+lib/Sidef/Types/Number/Quaternion.pod
 lib/Sidef/Types/Range/Range.pm
 lib/Sidef/Types/Range/Range.pod
 lib/Sidef/Types/Range/RangeNumber.pm
@@ -908,6 +910,7 @@ scripts/Tests/problem_of_apollonius.sf
 scripts/Tests/pythagorean_means.sf
 scripts/Tests/quadratic_integers.sf
 scripts/Tests/quadratic_nonresidue.sf
+scripts/Tests/quaternion_integers.sf
 scripts/Tests/quicksort.sf
 scripts/Tests/quoted_strings.sf
 scripts/Tests/rand_pick.sf

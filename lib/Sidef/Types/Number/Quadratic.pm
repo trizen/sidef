@@ -54,6 +54,10 @@ package Sidef::Types::Number::Quadratic {
         ($_[0]->{a}, $_[0]->{b});
     }
 
+    sub parts {
+        Sidef::Types::Array::Array->new($_[0]->{a}, $_[0]->{b}, $_[0]->{w});
+    }
+
     sub __boolify__ {
         $_[0]->{a};
     }
@@ -111,7 +115,8 @@ package Sidef::Types::Number::Quadratic {
 
     sub sqr {
         my ($x) = @_;
-        $x->mul($x);
+        my $t = $x->{a}->mul($x->{b});
+        __PACKAGE__->new($x->{a}->sqr->add($x->{b}->sqr->mul($x->{w})), $t->add($t), $x->{w});
     }
 
     sub add {
@@ -234,7 +239,6 @@ package Sidef::Types::Number::Quadratic {
 
     sub is_coprime {
         my ($n, $k) = @_;
-        _valid(\$k);
         $n->norm->gcd($k->norm)->is_one;
     }
 
@@ -263,20 +267,16 @@ package Sidef::Types::Number::Quadratic {
             $negative_power = 1;
         }
 
-        my ($X, $Y) = (Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO);
-        my ($A, $B, $w) = ($x->{a}, $x->{b}, $x->{w});
+        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO, $x->{w});
 
         foreach my $bit (reverse split(//, $n->as_bin)) {
 
-            if ($bit) {
-                ($X, $Y) = ($A->mul($X)->add($B->mul($Y)->mul($w)), $A->mul($Y)->add($B->mul($X)));
-            }
+            # c *= x if bit
+            # x *= x
 
-            my $t = $A->mul($B);
-            ($A, $B) = ($A->sqr->add($B->sqr->mul($w)), $t->add($t));
+            $c = $c->mul($x) if $bit;
+            $x = $x->sqr;
         }
-
-        my $c = __PACKAGE__->new($X, $Y, $w);
 
         if ($negative_power) {
             $c = $c->inv;
@@ -297,20 +297,16 @@ package Sidef::Types::Number::Quadratic {
             $negative_power = 1;
         }
 
-        my ($X, $Y) = (Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO);
-        my ($A, $B, $w) = ($x->{a}, $x->{b}, $x->{w});
+        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO, $x->{w});
 
         foreach my $bit (reverse split(//, $n->as_bin)) {
 
-            if ($bit) {
-                ($X, $Y) = ($A->mul($X)->add($B->mul($Y)->mul($w))->mod($m), $A->mul($Y)->add($B->mul($X))->mod($m));
-            }
+            # c = (c*x)%m if bit
+            # x = (x*x)%m
 
-            my $t = $A->mul($B);
-            ($A, $B) = ($A->sqr->add($B->sqr->mul($w))->mod($m), $t->add($t)->mod($m));
+            $c = $c->mul($x)->mod($m) if $bit;
+            $x = $x->sqr->mod($m);
         }
-
-        my $c = __PACKAGE__->new($X, $Y, $w);
 
         if ($negative_power) {
             $c = $c->invmod($m);
@@ -359,7 +355,7 @@ package Sidef::Types::Number::Quadratic {
             $bool && return $bool;
             $bool = $x->{b}->ne($y->{b});
             $bool && return $bool;
-            return ($x->{w}->new($y->{w}));
+            return ($x->{w}->ne($y->{w}));
         }
 
         my $bool = $x->{a}->ne($y);

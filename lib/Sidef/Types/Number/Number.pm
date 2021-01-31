@@ -83,7 +83,8 @@ package Sidef::Types::Number::Number {
 
         if (   $ref eq 'Sidef::Types::Number::Mod'
             or $ref eq 'Sidef::Types::Number::Gauss'
-            or $ref eq 'Sidef::Types::Number::Quadratic') {
+            or $ref eq 'Sidef::Types::Number::Quadratic'
+            or $ref eq 'Sidef::Types::Number::Quaternion') {
             $num = $num->to_n;
         }
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
@@ -1347,9 +1348,6 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
-    *conjug    = \&conj;
-    *conjugate = \&conj;
-
     sub real {
         my ($x) = @_;
 
@@ -1383,6 +1381,10 @@ package Sidef::Types::Number::Number {
 
     sub reals {
         ($_[0]->real, $_[0]->imag);
+    }
+
+    sub parts {
+        Sidef::Types::Array::Array->new($_[0]->reals);
     }
 
     #
@@ -1655,12 +1657,10 @@ package Sidef::Types::Number::Number {
     sub add {
         my ($x, $y) = @_;
 
-        if (
-               ref($y) eq 'Sidef::Types::Number::Gauss'
+        if (   ref($y) eq 'Sidef::Types::Number::Mod'
+            or ref($y) eq 'Sidef::Types::Number::Gauss'
             or ref($y) eq 'Sidef::Types::Number::Quadratic'
-            or ref($y) eq 'Sidef::Types::Number::Mod'
-
-          ) {
+            or ref($y) eq 'Sidef::Types::Number::Quaternion') {
             return $y->add($x);
         }
 
@@ -1806,16 +1806,20 @@ package Sidef::Types::Number::Number {
     sub sub {
         my ($x, $y) = @_;
 
-        if (ref($y) eq 'Sidef::Types::Number::Gauss') {
-            return ref($y)->new($x)->sub($y);
-        }
-
         if (ref($y) eq 'Sidef::Types::Number::Mod') {
             return ref($y)->new($x, $y->{m})->sub($y);
         }
 
+        if (ref($y) eq 'Sidef::Types::Number::Gauss') {
+            return ref($y)->new($x)->sub($y);
+        }
+
         if (ref($y) eq 'Sidef::Types::Number::Quadratic') {
             return ref($y)->new($x, ZERO, $y->{w})->sub($y);
+        }
+
+        if (ref($y) eq 'Sidef::Types::Number::Quaternion') {
+            return ref($y)->new($x)->sub($y);
         }
 
         _valid(\$y);
@@ -1943,9 +1947,10 @@ package Sidef::Types::Number::Number {
     sub mul {
         my ($x, $y) = @_;
 
-        if (   ref($y) eq 'Sidef::Types::Number::Gauss'
+        if (   ref($y) eq 'Sidef::Types::Number::Mod'
+            or ref($y) eq 'Sidef::Types::Number::Gauss'
             or ref($y) eq 'Sidef::Types::Number::Quadratic'
-            or ref($y) eq 'Sidef::Types::Number::Mod') {
+            or ref($y) eq 'Sidef::Types::Number::Quaternion') {
             return $y->mul($x);
         }
 
@@ -2112,16 +2117,20 @@ package Sidef::Types::Number::Number {
     sub div {
         my ($x, $y) = @_;
 
-        if (ref($y) eq 'Sidef::Types::Number::Gauss') {
-            return ref($y)->new($x)->div($y);
-        }
-
         if (ref($y) eq 'Sidef::Types::Number::Mod') {
             return ref($y)->new($x, $y->{m})->div($y);
         }
 
+        if (ref($y) eq 'Sidef::Types::Number::Gauss') {
+            return ref($y)->new($x)->div($y);
+        }
+
         if (ref($y) eq 'Sidef::Types::Number::Quadratic') {
             return ref($y)->new($x, ZERO, $y->{w})->div($y);
+        }
+
+        if (ref($y) eq 'Sidef::Types::Number::Quaternion') {
+            return ref($y)->new($x)->div($y);
         }
 
         _valid(\$y);

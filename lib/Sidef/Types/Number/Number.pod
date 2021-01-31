@@ -1340,8 +1340,6 @@ Number.conj() -> I<Obj>
 
 Return the
 
-Aliases: I<conjug>, I<conjugate>
-
 =cut
 
 =head2 consecutive_lcm
@@ -3609,6 +3607,14 @@ Number.partitions() -> I<Obj>
 Return the
 
 Aliases: I<partition_number>
+
+=cut
+
+=head2 parts
+
+Number.parts() -> I<Obj>
+
+Return the
 
 =cut
 
