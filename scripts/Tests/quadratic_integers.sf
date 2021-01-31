@@ -312,4 +312,69 @@ params.each_2d {|a,b,c,d|
     }
 }
 
+func is_gaussian_quadratic_pseudoprime(n) {
+
+    return false if (n <= 1)
+    return true  if (n <= 3)
+
+    static x = Quadratic(1, -1, -2)
+
+    given (n%8) {
+        when ([1,3]) {
+            var t = x.powmod(n-1, n)
+            (t.a==1 && t.b==0)
+        }
+        when ([5, 7]) {
+            var t = x.powmod(n+1, n)
+            (t.a==3 && t.b==0)
+        }
+        else {
+            false
+        }
+    }
+}
+
+assert([88561,107185,162401,221761,226801,334153,410041,665281,825265,1569457,1615681,2727649].all(is_gaussian_quadratic_pseudoprime))
+assert([80375707,154287451,267559627,326266051,478614067,573183451,643767931,2433943891,4297753027].all(is_gaussian_quadratic_pseudoprime))
+
+func is_quadratic_pseudoprime (n, r=2) {
+
+    return false if (n <= 1)
+    return true  if (n <= 3)
+
+    return true if (r <= 0)
+
+    var x = Quadratic(r, 1, r+2).powmod(n, n)
+
+    x.a == r || return false
+
+    var y = Quadratic(r, -1, r+2).powmod(n, n)
+
+    y.a == r || return false
+
+    (x.b + y.b == n) && __FUNC__(n, r-1)
+}
+
+assert(is_quadratic_pseudoprime(43))
+assert(is_quadratic_pseudoprime(97))
+
+with (Quadratic(1, 1, 2)) {|q|
+    assert_eq(15.of { q.pow(_).a }, [1, 1, 3, 7, 17, 41, 99, 239, 577, 1393, 3363, 8119, 19601, 47321, 114243])      # A001333
+    assert_eq(15.of { q.pow(_).b }, [0, 1, 2, 5, 12, 29, 70, 169, 408, 985, 2378, 5741, 13860, 33461, 80782])        # A000129
+}
+
+with (Quadratic(1, 1, 3)) {|q|
+    assert_eq(15.of { q.pow(_).a }, [1, 1, 4, 10, 28, 76, 208, 568, 1552, 4240, 11584, 31648, 86464, 236224, 645376]) # A026150
+    assert_eq(15.of { q.pow(_).b }, [0, 1, 2, 6, 16, 44, 120, 328, 896, 2448, 6688, 18272, 49920, 136384, 372608])    # A002605
+}
+
+var n = (274177-1)
+var m = (2**64 + 1)
+
+with (Quadratic(3, 4, 2)) {|q|
+    var r = q.powmod(n, m)
+    assert_eq(gcd(r.a-1, m), 274177)
+    assert_eq(gcd(r.b, m), 274177)
+}
+
 say "** Test passed!"

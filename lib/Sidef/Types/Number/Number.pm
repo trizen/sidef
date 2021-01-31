@@ -13580,6 +13580,7 @@ package Sidef::Types::Number::Number {
 
         # Otherwise, select the divisors of N/d from the divisors of N
         my @divisors;
+        my $d_str = Math::GMPz::Rmpz_get_str($d, 10);
 
         foreach my $k (@$D) {
 
@@ -13592,7 +13593,7 @@ package Sidef::Types::Number::Number {
             }
 
             if (Math::GMPz::Rmpz_cmp($u, $d) == 0) {
-                push @divisors, Math::Prime::Util::GMP::divint($k, Math::GMPz::Rmpz_get_str($u, 10));
+                push @divisors, Math::Prime::Util::GMP::divint($k, $d_str);
             }
         }
 

@@ -64,7 +64,7 @@ package Sidef::Types::Number::Quadratic {
 
     sub __stringify__ {
         my ($x) = @_;
-        '(' . join(', ', $x->{a}->dump, $x->{b}->dump, $x->{w}->dump) . ')';
+        'Quadratic(' . join(', ', $x->{a}->dump, $x->{b}->dump, $x->{w}->dump) . ')';
     }
 
     sub to_s {
@@ -74,7 +74,7 @@ package Sidef::Types::Number::Quadratic {
 
     sub dump {
         my ($x) = @_;
-        Sidef::Types::String::String->new('Quadratic' . $x->__stringify__);
+        Sidef::Types::String::String->new($x->__stringify__);
     }
 
     sub to_n {

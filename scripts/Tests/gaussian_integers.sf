@@ -203,4 +203,19 @@ params.each_2d {|a,b,c,d|
     }
 }
 
+do {
+    var a = Gauss(3,4)**10
+    var b = Gauss(3,4).powmod(97, 1234)
+
+    assert_eq([a.reals], [reals(Gauss(3,4)**10)])
+    assert_eq([b.reals], [reals(Gauss(3,4).powmod(97, 1234))])
+    assert_eq([reals(a+b)], [reals(Gauss(reals(a)) + Gauss(reals(b)))])
+    assert_eq([reals(a-b)], [reals(Gauss(reals(a)) - Gauss(reals(b)))])
+
+    assert_eq([a.reals], [reals(Quadratic(3,4,-1)**10)])
+    assert_eq([b.reals], [reals(Quadratic(3,4,-1).powmod(97, 1234))])
+    assert_eq([reals(a+b)], [reals(Quadratic(reals(a),-1) + Quadratic(reals(b),-1))])
+    assert_eq([reals(a-b)], [reals(Quadratic(reals(a),-1) - Quadratic(reals(b),-1))])
+}
+
 say "** Test passed!"
