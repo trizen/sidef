@@ -3910,13 +3910,13 @@ Return the
 
 =cut
 
-=head2 primes_sum
+=head2 prime_sum
 
-Number.primes_sum() -> I<Obj>
+Number.prime_sum() -> I<Obj>
 
 Return the
 
-Aliases: I<sum_primes>
+Aliases: I<primes_sum>, I<sum_primes>
 
 =cut
 

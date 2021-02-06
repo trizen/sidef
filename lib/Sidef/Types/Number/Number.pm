@@ -12297,6 +12297,7 @@ package Sidef::Types::Number::Number {
         ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', "$r");
     }
 
+    *prime_sum  = \&sum_primes;
     *primes_sum = \&sum_primes;
 
     sub prev_prime {
@@ -13672,6 +13673,57 @@ package Sidef::Types::Number::Number {
         $R{$N} // [];
     }
 
+    sub _dynamic_length_bigint {
+        my ($N, $L, $D) = @_;
+
+        # Based on invphi.gp ver. 2.1 by Max Alekseyev.
+
+        my %R = (1 => Math::GMPz::Rmpz_init_set_ui(1));
+        my $u = Math::GMPz::Rmpz_init();
+
+        foreach my $l (@$L) {
+            my %t;
+
+            foreach my $pair (@$l) {
+
+                my $x = $pair->[0];
+
+                foreach my $d (_n_over_d_divisors($N, $x, $u, $D)) {
+                    if (exists $R{$d}) {
+
+                        ($d < ULONG_MAX)
+                          ? Math::GMPz::Rmpz_mul_ui($u, $x, $d)
+                          : do {
+                            Math::GMPz::Rmpz_set_str($u, $d, 10);
+                            Math::GMPz::Rmpz_mul($u, $u, $x);
+                          };
+
+                        my $key = Math::GMPz::Rmpz_get_str($u, 10);
+
+                        if (!exists $t{$key}) {
+                            $t{$key} = Math::GMPz::Rmpz_init_set_ui(0);
+                        }
+
+                        Math::GMPz::Rmpz_add($t{$key}, $t{$key}, $R{$d});
+                    }
+                }
+            }
+
+            while (my ($key, $value) = each %t) {
+                if (!exists $R{$key}) {
+                    $R{$key} = Math::GMPz::Rmpz_init_set_ui(0);
+                }
+                Math::GMPz::Rmpz_add($R{$key}, $R{$key}, $value);
+            }
+        }
+
+        if (exists $R{$N}) {
+            return Math::GMPz::Rmpz_get_str($R{$N}, 10);
+        }
+
+        return 0;
+    }
+
     sub _dynamic_length {
         my ($N, $L, $D) = @_;
 
@@ -13707,7 +13759,9 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        $R{$N} // 0;
+        my $r = $R{$N} // 0;
+        ($r < ~0) || goto &_dynamic_length_bigint;
+        return $r;
     }
 
     sub _cook_euler_phi {
