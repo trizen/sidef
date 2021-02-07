@@ -110,11 +110,17 @@ is(lucasVmod(-4, 4, 50, 1000), lucasV(4, 4, 50) % 1000)
 is(lucasVmod( 4, 4, 50, 1001), lucasV( 4, 4, 50) % 1001)
 is(lucasVmod(-4, 4, 50, 1001), lucasV(-4, 4, 50) % 1001)
 
+is(lucasUmod( 4, 4, 50, 1001), lucasU( 4, 4, 50) % 1001)
+is(lucasUmod(-4, 4, 50, 1001), lucasU(-4, 4, 50) % 1001)
+
 is(lucasVmod( 4, -4, 50, 1000), 624)
 is(lucasVmod(-4, -4, 50, 1000), 624)
 
 is(lucasVmod( 4, -4, 50, 1000), lucasV( 4, -4, 50) % 1000)
 is(lucasVmod(-4, -4, 50, 1000), lucasV(-4, -4, 50) % 1000)
+
+is(lucasVmod(3, -4, 50, 1000), lucasV(3, -4, 50) % 1000)
+is(lucasUmod(3, -4, 50, 1000), lucasU(3, -4, 50) % 1000)
 
 is(fibmod(1234, 987654), fibonacci(1234) % 987654)
 is(lucasmod(1234, 987654), lucas(1234) % 987654)
@@ -142,5 +148,30 @@ is(lucasVmod(2**95 + 1, 2**75 - 1, 98765, 1234), 29)
 
 is([lucasUVmod(2**95 + 1, 2**75 - 1, 1234, 98765)], [35621, 3022])
 is([lucasUVmod(2**95 + 1, 2**75 - 1, 98765, 1234)], [477, 29])
+
+func pisano_period_pp(P, Q, p, k=1) {
+    (p - kronecker(P*P - 4*Q, p)).divisors.first_by {|d| lucasUmod(P, Q, d, p) == 0 } * p**(k-1)
+}
+
+func pisano_period(n, P=1, Q=-1) {
+
+    return 0 if (n <= 0)
+    return 1 if (n == 1)
+
+    var d = n.factor_map {|p,k| pisano_period_pp(P, Q, p, k) }.lcm
+
+    3.times {|k|
+        var t = d<<k
+        if ((lucasUmod(P, Q, t, n) == 0) && (lucasUmod(P, Q, t+1, n) == 1)) {
+            return t
+        }
+    }
+
+    die "Error for n = #{n} with P = #{P} and Q = #{Q}"
+}
+
+{|n| pisano_period(n, 1, -1) }.map(1..30)       # Periods of Fibonacci numbers
+{|n| pisano_period(n, 2, -1) }.map(1..30)       # Periods of Pell numbers
+{|n| pisano_period(n, 3, -1) }.map(1..30)       # Periods of 3-Fibonacci numbers
 
 say "** Test passed!"
