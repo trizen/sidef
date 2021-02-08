@@ -826,6 +826,12 @@ package Sidef::Parser {
                 $ref_type = $obj;
             }
 
+            my ($subset);
+            if (ref($ref_type) eq 'Sidef::Variable::Subset') {
+                $subset = $ref_type;
+                undef $ref_type;
+            }
+
             my ($var_name, $class_name) = $self->get_name_and_class($name);
 
             if ($opt{type} eq 'del') {
@@ -849,7 +855,6 @@ package Sidef::Parser {
                                   );
             }
 
-            my ($subset);
             if (defined($end_delim) and m{\G<<?\h*}gc) {
                 my ($subset_name) = /\G($self->{var_name_re})/goc;
 

@@ -23,32 +23,36 @@ class Example(Number size) {
     }
 }
 
-subset Special < Example { .size == 42 }
+do {
+    subset Special < Example { .size == 42 }
 
-func bar(x < Special) {
-    x.display
+    func bar(x < Special) {
+        x.display
+    }
+
+    var wrong = Example(3)
+    var correct = Example(42)
+
+    bar(correct)
+    failtest(func{ bar(wrong) }, 'bar(wrong)')
 }
-
-var wrong = Example(3)
-var correct = Example(42)
-
-bar(correct)
-failtest(func{ bar(wrong) }, 'bar(wrong)')
 
 #
 ## Union subset
 #
 
-subset Union < Number,String;
+do {
+    subset Union < Number,String;
 
-func concat(x < Union, y < Union) {
-    x + y
+    func concat(x < Union, y < Union) {
+        x + y
+    }
+
+    say concat(1, 2)
+    say concat("a", "b")
+
+    failtest(func { concat([1], [2]) }, 'concat([],[])')
 }
-
-say concat(1, 2)
-say concat("a", "b")
-
-failtest(func { concat([1], [2]) }, 'concat([],[])')
 
 #
 ## Multiple subetting
@@ -419,4 +423,22 @@ do {
     failtest({ foo(-43.5) }, "foo(-43.5)")
     failtest({ foo("string") }, "foo('string')")
     assert_eq(foo(97), "97 -- ok")
+}
+
+do {
+    subset NonEmptyString < String { .len > 0 };
+
+    func bar(s < NonEmptyString) {
+        ["bar", s]
+    }
+
+    func foo(NonEmptyString s) {
+        ["foo", s]
+    }
+
+    assert_eq(bar("hi"), ["bar", "hi"])
+    assert_eq(foo("hi"), ["foo", "hi"])
+
+    assert_eq((try { bar("") } \\ 'bar("") error'), 'bar("") error')
+    assert_eq((try { foo("") } \\ 'foo("") error'), 'foo("") error')
 }
