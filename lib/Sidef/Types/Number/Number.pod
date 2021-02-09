@@ -4464,6 +4464,14 @@ Return the
 
 =cut
 
+=head2 squarefree_sum
+
+Number.squarefree_sum() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 squarefree_udivisors
 
 Number.squarefree_udivisors() -> I<Obj>

@@ -7178,7 +7178,7 @@ package Sidef::Types::Number::Number {
             return [0, Math::GMPz::Rmpz_get_str($pp, 10)];
         }
 
-        if ($p_ eq '2') {
+        if (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0) {
 
             if ($e == 1) {
                 return [(Math::GMPz::Rmpz_odd_p($n) ? 1 : 0), 2];
@@ -9631,6 +9631,71 @@ package Sidef::Types::Number::Number {
 
     *cyclotomic = \&cyclotomic_polynomial;
 
+    sub squarefree_sum {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return ZERO;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_sqrt($t, $n);
+        Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
+
+        my $s   = Math::GMPz::Rmpz_get_ui($t);
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        if (HAS_PRIME_UTIL) {
+            Math::Prime::Util::forsquarefree(
+                sub {
+
+                    # u = faulhaber(floor(n/k^2), 1)
+                    Math::GMPz::Rmpz_div_ui($t, $n, $_);
+                    Math::GMPz::Rmpz_div_ui($t, $t, $_);
+                    Math::GMPz::Rmpz_mul($u, $t, $t);
+                    Math::GMPz::Rmpz_add($u, $u, $t);
+                    Math::GMPz::Rmpz_div_2exp($u, $u, 1);
+
+                    # u *= k^2
+                    Math::GMPz::Rmpz_mul_ui($u, $u, $_);
+                    Math::GMPz::Rmpz_mul_ui($u, $u, $_);
+
+                    (scalar(@_) & 1)
+                      ? Math::GMPz::Rmpz_sub($sum, $sum, $u)
+                      : Math::GMPz::Rmpz_add($sum, $sum, $u);
+                },
+                $s
+                                            );
+        }
+        else {
+            my $m;
+            for (my $k = 1 ; $k <= $s ; ++$k) {
+                if ($m = Math::Prime::Util::GMP::moebius($k)) {
+
+                    # u = faulhaber(floor(n/k^2), 1)
+                    Math::GMPz::Rmpz_div_ui($t, $n, $k);
+                    Math::GMPz::Rmpz_div_ui($t, $t, $k);
+                    Math::GMPz::Rmpz_mul($u, $t, $t);
+                    Math::GMPz::Rmpz_add($u, $u, $t);
+                    Math::GMPz::Rmpz_div_2exp($u, $u, 1);
+
+                    # u *= k^2
+                    Math::GMPz::Rmpz_mul_ui($u, $u, $k);
+                    Math::GMPz::Rmpz_mul_ui($u, $u, $k);
+
+                    ($m == 1)
+                      ? Math::GMPz::Rmpz_add($sum, $sum, $u)
+                      : Math::GMPz::Rmpz_sub($sum, $sum, $u);
+                }
+            }
+        }
+
+        return bless \$sum;
+    }
+
     sub squarefree_count {
         my ($from, $to) = @_;
 
@@ -9639,13 +9704,20 @@ package Sidef::Types::Number::Number {
             return $to->squarefree_count->sub($from->dec->squarefree_count);
         }
 
-        (my $n = __numify__($$from)) <= 0 && return ZERO;
+        my $n = _any2mpz($$from) // return ZERO;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+            or return ZERO;
 
         # Optimization for native integers
-        if ($n < ULONG_MAX) {
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
 
-            $n = CORE::int($n);
-            my $s = CORE::int(CORE::sqrt($n));
+            my $s = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_sqrt($s, $n);
+
+            $s = Math::GMPz::Rmpz_get_ui($s);
+            $n = Math::GMPz::Rmpz_get_ui($n);
 
             # Using moebius(1, sqrt(n)) for values of n <= 2^40
             if ($n <= (1 << 40)) {
@@ -9699,22 +9771,35 @@ package Sidef::Types::Number::Number {
         # Implementation for large values of n
         my $c = Math::GMPz::Rmpz_init_set_ui(0);
         my $t = Math::GMPz::Rmpz_init();
-        my $z = _any2mpz($$from) // return ZERO;
-
         my $s = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_sqrt($s, $z);
 
-        for (my $k = Math::GMPz::Rmpz_init_set_ui(1) ; Math::GMPz::Rmpz_cmp($k, $s) <= 0 ; Math::GMPz::Rmpz_add_ui($k, $k, 1))
-        {
-            my $m = Math::Prime::Util::GMP::moebius(Math::GMPz::Rmpz_get_str($k, 10));
+        Math::GMPz::Rmpz_sqrt($s, $n);
+        Math::GMPz::Rmpz_fits_ulong_p($s) || goto &nan;    # too large
 
-            if ($m) {
-                Math::GMPz::Rmpz_set($t, $z);
-                Math::GMPz::Rmpz_div($t, $t, $k);
-                Math::GMPz::Rmpz_div($t, $t, $k);
-                ($m == -1)
-                  ? Math::GMPz::Rmpz_sub($c, $c, $t)
-                  : Math::GMPz::Rmpz_add($c, $c, $t);
+        $s = Math::GMPz::Rmpz_get_ui($s);
+
+        if (HAS_PRIME_UTIL) {
+            Math::Prime::Util::forsquarefree(
+                sub {
+                    Math::GMPz::Rmpz_div_ui($t, $n, $_);
+                    Math::GMPz::Rmpz_div_ui($t, $t, $_);
+                    (scalar(@_) & 1)
+                      ? Math::GMPz::Rmpz_sub($c, $c, $t)
+                      : Math::GMPz::Rmpz_add($c, $c, $t);
+                },
+                $s
+                                            );
+        }
+        else {
+            my $m;
+            for (my $k = 1 ; $k <= $s ; ++$k) {
+                if ($m = Math::Prime::Util::GMP::moebius($k)) {
+                    Math::GMPz::Rmpz_div_ui($t, $n, $k);
+                    Math::GMPz::Rmpz_div_ui($t, $t, $k);
+                    ($m == 1)
+                      ? Math::GMPz::Rmpz_add($c, $c, $t)
+                      : Math::GMPz::Rmpz_sub($c, $c, $t);
+                }
             }
         }
 

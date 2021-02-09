@@ -84,4 +84,10 @@ for a,m in (
     assert_eq(Mod(sqrtmod(a, m), m)**2, a, "sqrtmod(#{a}, #{m})")
 }
 
+assert_eq(squarefree_sum(1e6), 303961062910)
+assert_eq(squarefree_sum(1e7), 30396557311887)
+
+assert_eq(squarefree_count(1e9), 607927124)
+assert_eq(squarefree_count(1e10), 6079270942)
+
 say "** Tests passed!"
