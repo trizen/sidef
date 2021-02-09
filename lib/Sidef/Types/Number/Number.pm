@@ -8474,7 +8474,7 @@ package Sidef::Types::Number::Number {
         if (    Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0
             and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) {
             my ($U, $V);
-            if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
                 eval {
                     ($U, $V) =
                       Math::Prime::Util::lucas_sequence(Math::GMPz::Rmpz_get_ui($m), Math::GMPz::Rmpz_get_si($P),
@@ -8511,10 +8511,9 @@ package Sidef::Types::Number::Number {
         my ($P, $Q, $n, $m) = @_;
 
         if (    Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0
-            and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0
-            and $P * $P - $Q * 4 != 0) {
+            and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) {
             my ($U, $V);
-            if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
                 eval {
                     ($U, $V) =
                       Math::Prime::Util::lucas_sequence(Math::GMPz::Rmpz_get_ui($m), Math::GMPz::Rmpz_get_si($P),
@@ -8551,10 +8550,9 @@ package Sidef::Types::Number::Number {
         my ($P, $Q, $n, $m) = @_;
 
         if (    Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0
-            and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0
-            and $P * $P - $Q * 4 != 0) {
+            and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) {
             my ($U, $V);
-            if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
                 eval {
                     ($U, $V) =
                       Math::Prime::Util::lucas_sequence(Math::GMPz::Rmpz_get_ui($m), Math::GMPz::Rmpz_get_si($P),
@@ -9707,7 +9705,7 @@ package Sidef::Types::Number::Number {
         my $n = _any2mpz($$from) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
-            or return ZERO;
+          or return ZERO;
 
         # Optimization for native integers
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
@@ -9771,12 +9769,11 @@ package Sidef::Types::Number::Number {
         # Implementation for large values of n
         my $c = Math::GMPz::Rmpz_init_set_ui(0);
         my $t = Math::GMPz::Rmpz_init();
-        my $s = Math::GMPz::Rmpz_init();
 
-        Math::GMPz::Rmpz_sqrt($s, $n);
-        Math::GMPz::Rmpz_fits_ulong_p($s) || goto &nan;    # too large
+        Math::GMPz::Rmpz_sqrt($t, $n);
+        Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
 
-        $s = Math::GMPz::Rmpz_get_ui($s);
+        my $s = Math::GMPz::Rmpz_get_ui($t);
 
         if (HAS_PRIME_UTIL) {
             Math::Prime::Util::forsquarefree(
