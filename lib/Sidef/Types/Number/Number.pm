@@ -12383,7 +12383,7 @@ package Sidef::Types::Number::Number {
 
                 $step;
             },
-            sub { Math::Prime::Util::GMP::primes($_[0], $_[1]) }
+            sub { [Math::Prime::Util::GMP::sieve_primes($_[0], $_[1])] }
         );
 #>>>
     }
@@ -15155,11 +15155,12 @@ package Sidef::Types::Number::Number {
             push(@squarefree, $to) if $mu[-1];
         }
         else {
-            for (my $t = Math::GMPz::Rmpz_init_set($from) ; Math::GMPz::Rmpz_cmp($t, $to) <= 0 ; Math::GMPz::Rmpz_add_ui($t, $t, 1)) {
-                my $s = Math::GMPz::Rmpz_get_str($t, 10);
-                if (Math::Prime::Util::GMP::moebius($s)) {
-                    push @squarefree, $s;
-                }
+
+            my $t  = Math::GMPz::Rmpz_init_set($from);
+            my @mu = Math::Prime::Util::GMP::moebius($from, $to);
+
+            for (my $i = -1; ; Math::GMPz::Rmpz_add_ui($t, $t, 1)) {
+                push(@squarefree, Math::GMPz::Rmpz_get_str($t, 10)) if ($mu[++$i] // last);
             }
         }
 #>>>
