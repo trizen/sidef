@@ -11938,7 +11938,7 @@ package Sidef::Types::Number::Number {
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
 
-        $P = defined($P) ? do { _valid(\$P); _any2ui($$P) // return Sidef::Types::Bool::Bool::FALSE } : +1;
+        $P = defined($P) ? do { _valid(\$P); _any2si($$P) // return Sidef::Types::Bool::Bool::FALSE } : +1;
         $Q = defined($Q) ? do { _valid(\$Q); _any2si($$Q) // return Sidef::Types::Bool::Bool::FALSE } : -1;
 
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
@@ -11976,7 +11976,7 @@ package Sidef::Types::Number::Number {
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
 
-        $P = defined($P) ? do { _valid(\$P); _any2ui($$P) // return Sidef::Types::Bool::Bool::FALSE } : +1;
+        $P = defined($P) ? do { _valid(\$P); _any2si($$P) // return Sidef::Types::Bool::Bool::FALSE } : +1;
         $Q = defined($Q) ? do { _valid(\$Q); _any2si($$Q) // return Sidef::Types::Bool::Bool::FALSE } : -1;
 
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
@@ -11986,7 +11986,7 @@ package Sidef::Types::Number::Number {
 
         my ($U, $V) = eval { Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $n) };
 
-        (defined($V) and $V eq "$P")
+        (defined($V) and $V eq join('', $P % $n))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
