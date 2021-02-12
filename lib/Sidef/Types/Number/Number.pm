@@ -13834,6 +13834,8 @@ package Sidef::Types::Number::Number {
         my %R = (1 => [$ONE]);
         my $u = Math::GMPz::Rmpz_init();
 
+        my $unitary = $opt{unitary};
+
         foreach my $l (@$L) {
             my %t;
 
@@ -13853,7 +13855,7 @@ package Sidef::Types::Number::Number {
                         my $key  = Math::GMPz::Rmpz_get_str($u, 10);
                         my @list = @{$R{$d}};
 
-                        if ($opt{unitary}) {
+                        if ($unitary) {
                             @list = grep {
                                 Math::GMPz::Rmpz_gcd($u, $y, $_);
                                 Math::GMPz::Rmpz_cmp_ui($u, 1) == 0;
@@ -13877,7 +13879,70 @@ package Sidef::Types::Number::Number {
         $R{$N} // [];
     }
 
-    sub _dynamic_length_bigint {
+    sub _dynamic_preimage_minmax {
+        my ($N, $L, $D, %opt) = @_;
+
+        # Based on invphi.gp ver. 2.1 by Max Alekseyev.
+
+        my %R = (1 => $ONE);
+
+        my $u = Math::GMPz::Rmpz_init();
+        my $w = Math::GMPz::Rmpz_init();
+
+        my $min = $opt{min};
+
+        foreach my $l (@$L) {
+            my %t;
+
+            foreach my $pair (@$l) {
+                my ($x, $y) = @$pair;
+
+                foreach my $d (_n_over_d_divisors($N, $x, $u, $D)) {
+                    if (exists $R{$d}) {
+
+                        ($d < ULONG_MAX)
+                          ? Math::GMPz::Rmpz_mul_ui($u, $x, $d)
+                          : do {
+                            Math::GMPz::Rmpz_set_str($u, $d, 10);
+                            Math::GMPz::Rmpz_mul($u, $u, $x);
+                          };
+
+                        my $key = Math::GMPz::Rmpz_get_str($u, 10);
+
+                        Math::GMPz::Rmpz_mul($w, $y, $R{$d});
+
+                        if (
+                            !exists($t{$key})
+                            or (
+                                $min
+                                ? (Math::GMPz::Rmpz_cmp($w, $t{$key}) < 0)
+                                : (Math::GMPz::Rmpz_cmp($w, $t{$key}) > 0)
+                               )
+                          ) {
+                            $t{$key} = Math::GMPz::Rmpz_init_set($w);
+                        }
+                    }
+                }
+            }
+
+            while (my ($key, $value) = each %t) {
+                if (
+                    !exists($R{$key})
+                    or (
+                        $min
+                        ? (Math::GMPz::Rmpz_cmp($value, $R{$key}) < 0)
+                        : (Math::GMPz::Rmpz_cmp($value, $R{$key}) > 0)
+                       )
+                  ) {
+                    $R{$key} = $value;
+                }
+            }
+        }
+
+        $R{$N};
+    }
+
+    sub _dynamic_preimage_len_bigint {
         my ($N, $L, $D) = @_;
 
         # Based on invphi.gp ver. 2.1 by Max Alekseyev.
@@ -13928,7 +13993,7 @@ package Sidef::Types::Number::Number {
         return 0;
     }
 
-    sub _dynamic_length {
+    sub _dynamic_preimage_len {
         my ($N, $L, $D) = @_;
 
         # Based on invphi.gp ver. 2.1 by Max Alekseyev.
@@ -13964,7 +14029,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $r = $R{$N} // 0;
-        ($r < ~0) || goto &_dynamic_length_bigint;
+        ($r < ~0) || goto &_dynamic_preimage_len_bigint;
         return $r;
     }
 
@@ -14055,13 +14120,45 @@ package Sidef::Types::Number::Number {
             $r = scalar Math::Prime::Util::inverse_totient(Math::GMPz::Rmpz_get_ui($n));
         }
         else {
-            $r = _dynamic_length($n, _cook_euler_phi($n));
+            $r = _dynamic_preimage_len($n, _cook_euler_phi($n));
         }
 
         ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
     *inverse_phi_len = \&inverse_totient_len;
+
+    sub inverse_euler_phi_min {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return undef;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO if !Math::GMPz::Rmpz_sgn($n);
+            return undef;
+        }
+
+        my $r = _dynamic_preimage_minmax($n, _cook_euler_phi($n), min => 1) // return undef;
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+    }
+
+    *inverse_phi_min = \&inverse_euler_phi_min;
+
+    sub inverse_euler_phi_max {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return undef;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO if !Math::GMPz::Rmpz_sgn($n);
+            return undef;
+        }
+
+        my $r = _dynamic_preimage_minmax($n, _cook_euler_phi($n), min => 0) // return undef;
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+    }
+
+    *inverse_phi_max = \&inverse_euler_phi_max;
 
     sub _cook_dedekind_psi {
         my ($N, $k) = @_;
@@ -14130,11 +14227,43 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        my $r = _dynamic_length($n, _cook_dedekind_psi($n));
+        my $r = _dynamic_preimage_len($n, _cook_dedekind_psi($n));
         ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
     *inverse_psi_len = \&inverse_dedekind_psi_len;
+
+    sub inverse_dedekind_psi_min {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return undef;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO if !Math::GMPz::Rmpz_sgn($n);
+            return undef;
+        }
+
+        my $r = _dynamic_preimage_minmax($n, _cook_dedekind_psi($n), min => 1) // return undef;
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+    }
+
+    *inverse_psi_min = \&inverse_dedekind_psi_min;
+
+    sub inverse_dedekind_psi_max {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return undef;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO if !Math::GMPz::Rmpz_sgn($n);
+            return undef;
+        }
+
+        my $r = _dynamic_preimage_minmax($n, _cook_dedekind_psi($n), min => 0) // return undef;
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+    }
+
+    *inverse_psi_max = \&inverse_dedekind_psi_max;
 
     sub _cook_usigma {
         my ($N) = @_;
@@ -14298,7 +14427,37 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        my $r = _dynamic_length($n, _cook_sigma($n, $k));
+        my $r = _dynamic_preimage_len($n, _cook_sigma($n, $k));
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+    }
+
+    sub inverse_sigma_min {
+        my ($n, $k) = @_;
+
+        $n = _any2mpz($$n) // return undef;
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return undef } : 1;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO if !Math::GMPz::Rmpz_sgn($n);
+            return undef;
+        }
+
+        my $r = _dynamic_preimage_minmax($n, _cook_sigma($n, $k), min => 1) // return undef;
+        ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+    }
+
+    sub inverse_sigma_max {
+        my ($n, $k) = @_;
+
+        $n = _any2mpz($$n) // return undef;
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return undef } : 1;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO if !Math::GMPz::Rmpz_sgn($n);
+            return undef;
+        }
+
+        my $r = _dynamic_preimage_minmax($n, _cook_sigma($n, $k), min => 0) // return undef;
         ($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 

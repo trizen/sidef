@@ -2144,6 +2144,26 @@ Aliases: I<inverse_totient_len>
 
 =cut
 
+=head2 inverse_phi_max
+
+Number.inverse_phi_max() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_euler_phi_max>
+
+=cut
+
+=head2 inverse_phi_min
+
+Number.inverse_phi_min() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_euler_phi_min>
+
+=cut
+
 =head2 inverse_polygonal
 
 Number.inverse_polygonal() -> I<Obj>
@@ -2174,6 +2194,26 @@ Aliases: I<inverse_dedekind_psi_len>
 
 =cut
 
+=head2 inverse_psi_max
+
+Number.inverse_psi_max() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_dedekind_psi_max>
+
+=cut
+
+=head2 inverse_psi_min
+
+Number.inverse_psi_min() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_dedekind_psi_min>
+
+=cut
+
 =head2 inverse_sigma
 
 Number.inverse_sigma() -> I<Obj>
@@ -2185,6 +2225,22 @@ Return the
 =head2 inverse_sigma_len
 
 Number.inverse_sigma_len() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 inverse_sigma_max
+
+Number.inverse_sigma_max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 inverse_sigma_min
+
+Number.inverse_sigma_min() -> I<Obj>
 
 Return the
 

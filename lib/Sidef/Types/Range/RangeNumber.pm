@@ -190,6 +190,8 @@ package Sidef::Types::Range::RangeNumber {
         $n->inc->mul($z->mul($n)->add($x->mul($two)))->div($two);
     }
 
+    *Σ = \&sum;
+
     sub avg_by {
         my ($self, $block) = @_;
         $self->sum_by($block)->div($self->len);
@@ -226,6 +228,8 @@ package Sidef::Types::Range::RangeNumber {
 
         Sidef::Types::Number::Number::prod($self->to_list);
     }
+
+    *Π = \&prod;
 
     sub lcm_by {
         my ($self, $block) = @_;

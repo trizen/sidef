@@ -23,6 +23,26 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 Π
+
+RangeNumber.Π() -> I<Obj>
+
+Return the
+
+Aliases: I<prod>
+
+=cut
+
+=head2 Σ
+
+RangeNumber.Σ() -> I<Obj>
+
+Return the
+
+Aliases: I<sum>
+
+=cut
+
 =head2 avg
 
 RangeNumber.avg() -> I<Obj>
@@ -121,25 +141,9 @@ Return the
 
 =cut
 
-=head2 prod
-
-RangeNumber.prod() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 prod_by
 
 RangeNumber.prod_by() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 sum
-
-RangeNumber.sum() -> I<Obj>
 
 Return the
 

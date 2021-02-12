@@ -41,12 +41,37 @@ assert_eq(2..100 -> grep { .is_rough(5)  }, 2..100 -> grep { .lpf >= 5 })
 
 assert_eq(50.of { .inverse_phi.len }, 50.of { .inverse_phi_len })
 assert_eq(50.of { .inverse_psi.len }, 50.of { .inverse_psi_len })
+
+assert_eq(50.of { .inverse_phi.max }, 50.of { .inverse_phi_max })
+assert_eq(50.of { .inverse_psi.max }, 50.of { .inverse_psi_max })
+
+assert_eq(50.of { .inverse_phi.min }, 50.of { .inverse_phi_min })
+assert_eq(50.of { .inverse_psi.min }, 50.of { .inverse_psi_min })
+
+assert_eq(50.of { .inverse_sigma.max }, 50.of { .inverse_sigma_max })
+assert_eq(50.of { .inverse_sigma.min }, 50.of { .inverse_sigma_min })
+
 assert_eq(50.of { .inverse_sigma.len }, 50.of { .inverse_sigma_len })
 assert_eq(50.of { .inverse_sigma(2).len }, 50.of { .inverse_sigma_len(2) })
+
+assert_eq(50.of { .inverse_sigma(2).max }, 50.of { .inverse_sigma_max(2) })
+assert_eq(50.of { .inverse_sigma(2).min }, 50.of { .inverse_sigma_min(2) })
 
 assert_eq(inverse_phi(2**64).len, inverse_phi_len(2**64))
 assert_eq(inverse_psi(2**64).len, inverse_psi_len(2**64))
 assert_eq(inverse_sigma(2**64).len, inverse_sigma_len(2**64))
+
+assert_eq(inverse_phi(2**64).max, inverse_phi_max(2**64))
+assert_eq(inverse_phi(2**64).min, inverse_phi_min(2**64))
+
+assert_eq(inverse_psi(2**64).max, inverse_psi_max(2**64))
+assert_eq(inverse_psi(2**64).min, inverse_psi_min(2**64))
+
+assert_eq(inverse_sigma(2**64).max, inverse_sigma_max(2**64))
+assert_eq(inverse_sigma(2**64).min, inverse_sigma_min(2**64))
+
+assert_eq(50.of { .sigma(2) }.sort.uniq.grep { _ <= 50 }, 0..50 -> grep { defined(.inverse_sigma_min(2)) })
+assert_eq(50.of { .sigma(2) }.sort.uniq.grep { _ <= 50 }, 0..50 -> grep { defined(.inverse_sigma_max(2)) })
 
 do {
     var a = Math.smooth_numbers(2,3,5,7)    # 7-smooth numbers

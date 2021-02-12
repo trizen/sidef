@@ -653,10 +653,14 @@ package Sidef::Types::Block::Block {
         $range->sum_by($self);
     }
 
+    *Σ = \&sum;
+
     sub prod {
         my ($self, $range) = @_;
         $range->prod_by($self);
     }
+
+    *Π = \&prod;
 
     sub cache {
         my ($self) = @_;
