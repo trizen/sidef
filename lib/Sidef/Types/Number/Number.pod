@@ -3142,6 +3142,14 @@ Aliases: I<legendrep>, I<legendreP>, I<legendre_polynomial>
 
 =cut
 
+=head2 legendre_phi
+
+Number.legendre_phi() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 len
 
 Number.len() -> I<Obj>

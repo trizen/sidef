@@ -16003,6 +16003,11 @@ package Sidef::Types::Number::Number {
             return ONE;
         }
 
+        if (HAS_PRIME_UTIL) {
+            my $r = Math::Prime::Util::legendre_phi(Math::GMPz::Rmpz_get_str($n, 10), Math::Prime::Util::prime_count($k - 1));
+            return (($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r));
+        }
+
         my $count = sub {
             my ($n, $p) = @_;
 
@@ -16092,6 +16097,25 @@ package Sidef::Types::Number::Number {
         }
 
         ($count < ULONG_MAX) ? __PACKAGE__->_set_uint($count) : __PACKAGE__->_set_str('int', $count);
+    }
+
+    sub legendre_phi {
+        my ($n, $k) = @_;
+        _valid(\$k);
+
+        if (HAS_PRIME_UTIL) {
+
+            $n = _any2mpz($$n) // goto &nan;
+            $k = _any2ui($$k)  // goto &nan;
+
+            Math::GMPz::Rmpz_sgn($n) > 0
+              or return ZERO;
+
+            my $r = Math::Prime::Util::legendre_phi(Math::GMPz::Rmpz_get_str($n, 10), $k);
+            return (($r < ULONG_MAX) ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r));
+        }
+
+        $n->rough_count($k->inc->nth_prime);
     }
 
     sub smooth_part {
