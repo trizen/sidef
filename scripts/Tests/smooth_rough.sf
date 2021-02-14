@@ -136,6 +136,15 @@ do {
   assert(!is_rough(n, 2082))
 }
 
+assert_eq(rough_count(2**128 + 1, 7), 90741964512250256923566561981804856389)
+assert_eq(rough_count(2**128, 11), 77778826724785934505914195984404162619)
+
+assert_eq(rough_count(2**64 - 100, 11), 4216398645419326060)
+assert_eq(rough_count(2**64, 11), 4216398645419326083)
+assert_eq(rough_count(2**64 + 1, 11), 4216398645419326084)
+assert_eq(rough_count(2**64, 12), 3833089677653932802)
+assert_eq(rough_count(2**64, 5),  6148914691236517205)
+
 do {
     for k in (2..10) {
 

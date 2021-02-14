@@ -939,28 +939,11 @@ package Sidef::Types::Number::Number {
     sub _binsplit {
         my ($arr, $func) = @_;
 
-        my $sub = sub {
-            my ($s, $n, $m) = @_;
-
-            $n == $m
-              ? $s->[$n]
-              : $func->(__SUB__->($s, $n, ($n + $m) >> 1), __SUB__->($s, (($n + $m) >> 1) + 1, $m));
-        };
-
-        my $end = $#$arr;
-
-        if ($end <= 1e5) {
-            return $sub->($arr, 0, $end);
+        while ($#$arr > 0) {
+            push(@$arr, $func->(shift(@$arr), shift(@$arr)));
         }
 
-        my @partial;
-
-        while (@$arr) {
-            my @head = splice(@$arr, 0, 1e5);
-            push @partial, $sub->(\@head, 0, $#head);
-        }
-
-        __SUB__->(\@partial, $func);
+        $arr->[0];
     }
 
     #
