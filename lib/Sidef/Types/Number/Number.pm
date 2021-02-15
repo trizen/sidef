@@ -15274,7 +15274,239 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub _squarefree_sieve {
+    sub _sieve_almost_primes {
+        my ($from, $to, $k) = @_;
+
+        return [1] if ($k == 0 and $to >= 1 and $from <= 1);
+        return []  if ($k == 0);
+
+        my @almost_primes;
+
+        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+#<<<
+            Math::Prime::Util::foralmostprimes(sub {    # XXX: available in MPU > 0.73
+                push @almost_primes, $_;
+            }, $k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+#>>>
+        }
+        elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+
+            my $A = Math::GMPz::Rmpz_get_ui($from);
+            my $B = Math::GMPz::Rmpz_get_ui($to);
+
+            $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::powint(2, $k));
+
+            sub {
+                my ($m, $p, $k) = @_;
+
+                my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
+
+                if ($k == 1) {
+
+                    my $t = Math::Prime::Util::GMP::divint($A, $m);
+
+                    ++$t    if ($t * $m < $A);
+                    $t = $p if ($p > $t);
+
+#<<<
+                    Math::Prime::Util::forprimes(sub {
+                        push @almost_primes, $m * $_;
+                    }, $t, Math::Prime::Util::GMP::divint($B, $m));
+#>>>
+
+                    return;
+                }
+
+                # TODO: more optimizations when A and B are close to each other
+
+                while ($p <= $s) {
+
+                    my $t = $m * $p;
+                    my $u = Math::Prime::Util::GMP::divint($A, $t);
+
+                    ++$u if ($t * $u < $A);
+
+                    # Optimization for tight ranges
+                    if ($u > Math::Prime::Util::GMP::divint($B, $t)) {
+                        $p = Math::Prime::Util::next_prime($p);
+                        next;
+                    }
+
+                    __SUB__->($t, $p, $k - 1);
+                    $p = Math::Prime::Util::next_prime($p);
+                }
+              }
+              ->(1, 2, $k);
+
+            @almost_primes = sort { $a <=> $b } @almost_primes;
+        }
+        else {
+
+            my $A = Math::GMPz::Rmpz_init_set($from);
+            my $B = Math::GMPz::Rmpz_init_set($to);
+
+            my $t = Math::GMPz::Rmpz_init_set_ui(1);
+            my $x = Math::GMPz::Rmpz_init();
+
+            # t = ipow(2, k)
+            Math::GMPz::Rmpz_setbit($t, $k);
+
+            # A = max(A, t)
+            if (Math::GMPz::Rmpz_cmp($t, $A) > 0) {
+                Math::GMPz::Rmpz_set($A, $t);
+            }
+
+            sub {
+                my ($m, $p, $k) = @_;
+
+                my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
+
+                if ($k == 1) {
+
+                    if (Math::GMPz::Rmpz_divisible_p($A, $m)) {
+                        Math::GMPz::Rmpz_divexact($t, $A, $m);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_div($t, $A, $m);
+                        Math::GMPz::Rmpz_add_ui($t, $t, 1);
+                    }
+
+                    # t = max(t, p)
+                    if (Math::GMPz::Rmpz_cmp_ui($t, $p) < 0) {
+                        Math::GMPz::Rmpz_set_ui($t, $p);
+                    }
+
+                    Math::GMPz::Rmpz_div($x, $B, $m);
+
+                    foreach my $q (Math::Prime::Util::GMP::sieve_primes($t, $x)) {
+
+                        if ($q < ULONG_MAX) {
+                            Math::GMPz::Rmpz_mul_ui($x, $m, $q);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set_str($x, $q, 10);
+                            Math::GMPz::Rmpz_mul($x, $x, $m);
+                        }
+
+                        push @almost_primes,
+                          (
+                              Math::GMPz::Rmpz_fits_ulong_p($x)
+                            ? Math::GMPz::Rmpz_get_ui($x)
+                            : Math::GMPz::Rmpz_init_set($x)
+                          );
+                    }
+
+                    return;
+                }
+
+                # TODO: more optimizations when A and B are close to each other
+
+                while ($p <= $s) {
+
+                    my $u = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul_ui($u, $m, $p);
+
+                    if (Math::GMPz::Rmpz_divisible_p($A, $u)) {
+                        Math::GMPz::Rmpz_divexact($t, $A, $u);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_div($t, $A, $u);
+                        Math::GMPz::Rmpz_add_ui($t, $t, 1);
+                    }
+
+                    Math::GMPz::Rmpz_div($x, $B, $u);
+
+                    # Optimization for tight ranges
+                    if (Math::GMPz::Rmpz_cmp($t, $x) > 0) {
+                        $p = (
+                              HAS_PRIME_UTIL
+                              ? Math::Prime::Util::next_prime($p)
+                              : Math::Prime::Util::GMP::next_prime($p)
+                             );
+                        next;
+                    }
+
+                    __SUB__->($u, $p, $k - 1);
+                    $p = (
+                          HAS_PRIME_UTIL
+                          ? Math::Prime::Util::next_prime($p)
+                          : Math::Prime::Util::GMP::next_prime($p)
+                         );
+                }
+              }
+              ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
+
+            @almost_primes = sort { $a <=> $b } @almost_primes;
+        }
+
+        return \@almost_primes;
+    }
+
+    sub almost_primes {
+        my ($k, $from, $to) = @_;
+
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $to   = _any2mpz($$to)   // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $to   = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $from = $ONE;
+        }
+
+        $k = _any2ui($$k) // return Sidef::Types::Array::Array->new;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($to) < 0) {
+            $to = $ZERO;
+        }
+
+#<<<
+        my @almost_primes = map {
+            ref($_) ? $_ : (
+                ($_ < ULONG_MAX)
+                    ? __PACKAGE__->_set_uint($_)
+                    : __PACKAGE__->_set_str('int', $_))
+        } @{_sieve_almost_primes($from, $to, $k)};
+#>>>
+
+        Sidef::Types::Array::Array->new(\@almost_primes);
+    }
+
+    sub almost_primes_each {
+        my ($k, $from, $to, $block) = @_;
+
+        _valid(\$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        _generic_each($from, $to, $block, sub { 5e6 }, sub { _sieve_almost_primes($_[0], $_[1], $k) });
+    }
+
+    *each_almost_prime = \&almost_primes_each;
+
+    sub _sieve_squarefree {
         my ($from, $to) = @_;
 
         my @squarefree;
@@ -15336,7 +15568,7 @@ package Sidef::Types::Number::Number {
                 ($_ < ULONG_MAX)
                     ? __PACKAGE__->_set_uint($_)
                     : __PACKAGE__->_set_str('int', $_)
-        } @{_squarefree_sieve($from, $to)};
+        } @{_sieve_squarefree($from, $to)};
 #>>>
 
         Sidef::Types::Array::Array->new(\@squarefree);
@@ -15360,7 +15592,7 @@ package Sidef::Types::Number::Number {
             $from = $ONE;
         }
 
-        _generic_each($from, $to, $block, sub { 1e4 }, sub { _squarefree_sieve($_[0], $_[1]) });
+        _generic_each($from, $to, $block, sub { 1e4 }, sub { _sieve_squarefree($_[0], $_[1]) });
     }
 
     *each_squarefree = \&squarefree_each;

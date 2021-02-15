@@ -641,6 +641,14 @@ Return the
 
 =cut
 
+=head2 almost_primes
+
+Number.almost_primes() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 approx_ge
 
     approx_ge(a, b)
@@ -1631,6 +1639,16 @@ Return the
 Number.e() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 each_almost_prime
+
+Number.each_almost_prime() -> I<Obj>
+
+Return the
+
+Aliases: I<almost_primes_each>
 
 =cut
 

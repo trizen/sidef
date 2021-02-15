@@ -115,4 +115,16 @@ assert_eq(squarefree_sum(1e7), 30396557311887)
 assert_eq(squarefree_count(1e9), 607927124)
 assert_eq(squarefree_count(1e10), 6079270942)
 
+for k in (0..10) {
+
+    assert_eq(almost_primes(k, 1000), 1..1000 -> grep { .is_almost_prime(k) })
+    assert_eq(gather { almost_primes_each(k, 1000, { take(_) }) }, almost_primes(k, 1000))
+
+    var from = 1000.irand
+    var upto = from+1000.irand
+
+    assert_eq(almost_primes(k, from, upto), from..upto -> grep { .is_almost_prime(k) })
+    assert_eq(gather { almost_primes_each(k, from, upto, { take(_) }) }, almost_primes(k, from, upto))
+}
+
 say "** Tests passed!"
