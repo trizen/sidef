@@ -127,4 +127,15 @@ for k in (0..10) {
     assert_eq(gather { almost_primes_each(k, from, upto, { take(_) }) }, almost_primes(k, from, upto))
 }
 
+for k in (1..12) {
+    var n = k.pn_primorial
+
+    #say "Testing: #{k} -> #{n}"
+
+    var from = n-100
+    var upto = n+100
+
+    assert_eq(almost_primes(k, from, upto), from..upto -> grep{ .is_almost_prime(k) })
+}
+
 say "** Tests passed!"

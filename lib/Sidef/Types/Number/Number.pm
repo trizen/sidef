@@ -11529,6 +11529,9 @@ package Sidef::Types::Number::Number {
             $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
         my $omega     = 0;
         my $remainder = $n;
         my $size      = Math::GMPz::Rmpz_sizeinbase($n, 2);
@@ -15357,8 +15360,6 @@ package Sidef::Types::Number::Number {
             sub {
                 my ($m, $p, $k) = @_;
 
-                my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
-
                 if ($k == 1) {
 
                     my $t = Math::Prime::Util::GMP::divint($A, $m);
@@ -15376,6 +15377,8 @@ package Sidef::Types::Number::Number {
                 }
 
                 # TODO: more optimizations when A and B are close to each other
+
+                my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
                 while ($p <= $s) {
 
@@ -15417,8 +15420,6 @@ package Sidef::Types::Number::Number {
             sub {
                 my ($m, $p, $k) = @_;
 
-                my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
-
                 if ($k == 1) {
 
                     Math::GMPz::Rmpz_cdiv_q($t, $A, $m);
@@ -15453,6 +15454,8 @@ package Sidef::Types::Number::Number {
 
                 # TODO: more optimizations when A and B are close to each other
 
+                my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
+
                 while ($p <= $s) {
 
                     my $u = Math::GMPz::Rmpz_init();
@@ -15463,20 +15466,12 @@ package Sidef::Types::Number::Number {
 
                     # Optimization for tight ranges
                     if (Math::GMPz::Rmpz_cmp($t, $x) > 0) {
-                        $p = (
-                              HAS_PRIME_UTIL
-                              ? Math::Prime::Util::next_prime($p)
-                              : Math::Prime::Util::GMP::next_prime($p)
-                             );
+                        $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
                         next;
                     }
 
                     __SUB__->($u, $p, $k - 1);
-                    $p = (
-                          HAS_PRIME_UTIL
-                          ? Math::Prime::Util::next_prime($p)
-                          : Math::Prime::Util::GMP::next_prime($p)
-                         );
+                    $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
                 }
               }
               ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
@@ -15514,7 +15509,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my @almost_primes = map {
-            ref($_) ? $_ : (
+            ref($_) ? (bless \$_) : (
                 ($_ < ULONG_MAX)
                     ? __PACKAGE__->_set_uint($_)
                     : __PACKAGE__->_set_str('int', $_))
