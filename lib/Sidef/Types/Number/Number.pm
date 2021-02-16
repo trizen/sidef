@@ -993,7 +993,10 @@ package Sidef::Types::Number::Number {
 
             my $number = shift(@buffer);
 
-            if ($number < ULONG_MAX) {
+            if (ref($number) eq 'Math::GMPz') {
+                $number = bless(\$number);
+            }
+            elsif ($number < ULONG_MAX) {
                 $number = __PACKAGE__->_set_uint($number);
             }
             else {
@@ -15341,6 +15344,22 @@ package Sidef::Types::Number::Number {
         return [1] if ($k == 0 and $to >= 1 and $from <= 1);
         return []  if ($k == 0);
 
+        if ($k == 1) {
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+                return Math::Prime::Util::primes(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+            }
+            return [Math::Prime::Util::GMP::sieve_primes($from, $to)];
+        }
+
+        if ($k == 2) {
+            if (HAS_PRIME_UTIL) {
+                if (Math::GMPz::Rmpz_fits_ulong_p($to)) {
+                    return Math::Prime::Util::semi_primes(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+                }
+                return Math::Prime::Util::semi_primes($from, $to);
+            }
+        }
+
         my @almost_primes;
 
         if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
@@ -15358,23 +15377,16 @@ package Sidef::Types::Number::Number {
             $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::powint(2, $k));
 
             sub {
-                my ($m, $p, $k) = @_;
-
-                if ($k == 1) {
-
-                    my $t = Math::Prime::Util::GMP::divint($A, $m);
-
-                    ++$t    if ($t * $m < $A);
-                    $t = $p if ($p > $t);
+                my ($m, $p, $k, $u, $v) = @_;
 
 #<<<
+                if ($k == 1) {
                     Math::Prime::Util::forprimes(sub {
                         push @almost_primes, $m * $_;
-                    }, $t, Math::Prime::Util::GMP::divint($B, $m));
-#>>>
-
+                    }, $u, $v);
                     return;
                 }
+#>>>
 
                 # TODO: more optimizations when A and B are close to each other
 
@@ -15383,17 +15395,26 @@ package Sidef::Types::Number::Number {
                 while ($p <= $s) {
 
                     my $t = $m * $p;
-                    my $u = Math::Prime::Util::GMP::divint($A, $t);
+                    my $u =
+                      defined(&Math::Prime::Util::divint)
+                      ? Math::Prime::Util::divint($A, $t)
+                      : Math::Prime::Util::GMP::divint($A, $t);
+                    my $v =
+                      defined(&Math::Prime::Util::divint)
+                      ? Math::Prime::Util::divint($B, $t)
+                      : Math::Prime::Util::GMP::divint($B, $t);
 
                     ++$u if ($t * $u < $A);
 
                     # Optimization for tight ranges
-                    if ($u > Math::Prime::Util::GMP::divint($B, $t)) {
+                    if ($u > $v) {
                         $p = Math::Prime::Util::next_prime($p);
                         next;
                     }
 
-                    __SUB__->($t, $p, $k - 1);
+                    $u = $p if ($k == 2 and $p > $u);
+
+                    __SUB__->($t, $p, $k - 1, ($k == 2) ? ($u, $v) : ());
                     $p = Math::Prime::Util::next_prime($p);
                 }
               }
@@ -15418,20 +15439,11 @@ package Sidef::Types::Number::Number {
             }
 
             sub {
-                my ($m, $p, $k) = @_;
+                my ($m, $p, $k, $u, $v) = @_;
 
                 if ($k == 1) {
 
-                    Math::GMPz::Rmpz_cdiv_q($t, $A, $m);
-
-                    # t = max(t, p)
-                    if (Math::GMPz::Rmpz_cmp_ui($t, $p) < 0) {
-                        Math::GMPz::Rmpz_set_ui($t, $p);
-                    }
-
-                    Math::GMPz::Rmpz_div($x, $B, $m);
-
-                    foreach my $q (Math::Prime::Util::GMP::sieve_primes($t, $x)) {
+                    foreach my $q (Math::Prime::Util::GMP::sieve_primes($u, $v)) {
 
                         if ($q < ULONG_MAX) {
                             Math::GMPz::Rmpz_mul_ui($x, $m, $q);
@@ -15470,7 +15482,13 @@ package Sidef::Types::Number::Number {
                         next;
                     }
 
-                    __SUB__->($u, $p, $k - 1);
+                    # t = max(t, p)
+                    if ($k == 2 and Math::GMPz::Rmpz_cmp_ui($t, $p) < 0) {
+                        Math::GMPz::Rmpz_set_ui($t, $p);
+                    }
+
+                    __SUB__->($u, $p, $k - 1,
+                              ($k == 2) ? (Math::GMPz::Rmpz_get_str($t, 10), Math::GMPz::Rmpz_get_str($x, 10)) : ());
                     $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
                 }
               }
