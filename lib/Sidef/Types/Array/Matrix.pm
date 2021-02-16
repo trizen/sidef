@@ -37,7 +37,7 @@ package Sidef::Types::Array::Matrix {
         my ($self) = @_;
         my $rows = $#{$self};
         $rows < 0 and return ((Sidef::Types::Number::Number::ZERO) x 2);
-        (Sidef::Types::Number::Number->_set_uint($rows + 1), Sidef::Types::Number::Number->_set_uint($#{$self->[0]} + 1));
+        (Sidef::Types::Number::Number::_set_int($rows + 1), Sidef::Types::Number::Number::_set_int($#{$self->[0]} + 1));
     }
 
     sub build {
@@ -55,10 +55,10 @@ package Sidef::Types::Array::Matrix {
 #<<<
         bless [
             map {
-                my $i = Sidef::Types::Number::Number->_set_uint($_);
+                my $i = Sidef::Types::Number::Number::_set_int($_);
                 bless([map {
                     $block->run(
-                        $i, Sidef::Types::Number::Number->_set_uint($_)
+                        $i, Sidef::Types::Number::Number::_set_int($_)
                     );
                 } 0 .. $m-1], 'Sidef::Types::Array::Array')
             } 0 .. $n-1
@@ -779,7 +779,7 @@ package Sidef::Types::Array::Matrix {
     sub column_count {
         my ($A) = @_;
         @$A || return Sidef::Types::Number::Number::ZERO;
-        Sidef::Types::Number::Number->_set_uint(scalar @{$A->[0]});
+        Sidef::Types::Number::Number::_set_int(scalar @{$A->[0]});
     }
 
     *column_len  = \&column_count;
@@ -790,7 +790,7 @@ package Sidef::Types::Array::Matrix {
 
     sub row_count {
         my ($A) = @_;
-        Sidef::Types::Number::Number->_set_uint(scalar @$A);
+        Sidef::Types::Number::Number::_set_int(scalar @$A);
     }
 
     *row_len  = \&row_count;

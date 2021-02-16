@@ -5,7 +5,7 @@ package Sidef::Math::Math {
 
     use parent qw(
       Sidef::Object::Object
-      );
+    );
 
     use Sidef::Types::Number::Number;
 
@@ -54,7 +54,7 @@ package Sidef::Math::Math {
         my ($self, @list) = @_;
 
         my $sum = Sidef::Types::Number::Number::sum(@list);
-        my $n   = Sidef::Types::Number::Number->_set_uint(scalar(@list));
+        my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
 
         $sum->div($n);
     }
@@ -65,7 +65,7 @@ package Sidef::Math::Math {
         my ($self, @list) = @_;
 
         my $prod = Sidef::Types::Number::Number::prod(@list);
-        my $n    = Sidef::Types::Number::Number->_set_uint(scalar(@list));
+        my $n    = Sidef::Types::Number::Number::_set_int(scalar(@list));
 
         $prod->root($n);
     }
@@ -74,7 +74,7 @@ package Sidef::Math::Math {
         my ($self, @list) = @_;
 
         my $sum = Sidef::Types::Number::Number::sum(map { $_->inv } @list);
-        my $n   = Sidef::Types::Number::Number->_set_uint(scalar(@list));
+        my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
 
         $n->div($sum);
     }
@@ -121,18 +121,13 @@ package Sidef::Math::Math {
         }
 
         my $res = eval { Math::Prime::Util::GMP::chinese(@pairs) } // return Sidef::Types::Number::Number->nan;
-
-        if ($res < Sidef::Types::Number::Number::ULONG_MAX and $res >= 0) {
-            return Sidef::Types::Number::Number->_set_uint($res);
-        }
-
-        Sidef::Types::Number::Number->_set_str('int', $res);
+        Sidef::Types::Number::Number::_set_int($res);
     }
 
     sub range_sum {
         my ($self, $from, $to, $step) = @_;
         $step //= Sidef::Types::Number::Number::ONE;
-        state $two = Sidef::Types::Number::Number->_set_uint(2);
+        state $two = Sidef::Types::Number::Number::_set_int(2);
         ($from->add($to))->mul($to->sub($from)->div($step)->add(Sidef::Types::Number::Number::ONE))->div($two);
     }
 
@@ -152,7 +147,7 @@ package Sidef::Math::Math {
         my $sum  = $to->sub($from)->abs;
         my $dist = $num->sub($to)->abs;
 
-        state $hundred = Sidef::Types::Number::Number->_set_uint(100);
+        state $hundred = Sidef::Types::Number::Number::_set_int(100);
         ($sum->sub($dist))->div($sum)->mul($hundred);
     }
 }

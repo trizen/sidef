@@ -127,6 +127,15 @@ for k in (0..10) {
     assert_eq(gather { almost_primes_each(k, from, upto, { take(_) }) }, almost_primes(k, from, upto))
 }
 
+with (2**65) {|n|
+
+    assert_eq(1.almost_primes(n, n+100), range(n, n+100).grep{.is_prime})
+    assert_eq(gather { 1.almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).grep{.is_almost_prime(1)})
+
+    assert_eq(2.almost_primes(n, n+100), range(n, n+100).grep{.is_semiprime})
+    assert_eq(gather { 2.almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).grep{.is_almost_prime(2)})
+}
+
 for k in (1..12) {
     var n = k.pn_primorial
 

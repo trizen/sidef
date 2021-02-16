@@ -4,7 +4,7 @@ package Sidef::Sys::Sys {
     use 5.016;
     use parent qw(
       Sidef::Object::Object
-      );
+    );
 
     use Sidef::Types::Bool::Bool;
 
@@ -224,7 +224,7 @@ package Sidef::Sys::Sys {
 
     sub refaddr {
         my ($self, $obj) = @_;
-        Sidef::Types::Number::Number->_set_uint(Scalar::Util::refaddr($obj));
+        Sidef::Types::Number::Number::_set_int(Scalar::Util::refaddr($obj));
     }
 
     sub reftype {
@@ -254,7 +254,7 @@ package Sidef::Sys::Sys {
 
     sub system {
         my ($self, @args) = @_;
-        Sidef::Types::Number::Number->_set_int(scalar CORE::system(@args));
+        Sidef::Types::Number::Number::_set_int(scalar CORE::system(@args));
     }
 
     *run = \&system;

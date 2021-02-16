@@ -5,7 +5,7 @@ package Sidef::Types::Set::Bag {
 
     use parent qw(
       Sidef::Types::Set::Set
-      );
+    );
 
     use overload
       q{bool} => sub { scalar(CORE::keys(%{$_[0]})) },
@@ -447,7 +447,7 @@ package Sidef::Types::Set::Bag {
         foreach my $key (CORE::keys(%$self)) {
 
             my $elem  = $self->{$key};
-            my @pairs = $block->run($elem->{value}, Sidef::Types::Number::Number->_set_uint($elem->{count}));
+            my @pairs = $block->run($elem->{value}, Sidef::Types::Number::Number::_set_int($elem->{count}));
 
             while (@pairs) {
                 my $k = CORE::shift(@pairs);
@@ -526,7 +526,7 @@ package Sidef::Types::Set::Bag {
             my $elem  = $self->{$key};
             my $value = $elem->{value};
 
-            if ($block->run($value, Sidef::Types::Number::Number->_set_uint($elem->{count}))) {
+            if ($block->run($value, Sidef::Types::Number::Number::_set_int($elem->{count}))) {
                 $new{$key} = {
                               value => $value,
                               count => $elem->{count},
@@ -547,7 +547,7 @@ package Sidef::Types::Set::Bag {
             }
         }
 
-        Sidef::Types::Number::Number->_set_uint($count);
+        Sidef::Types::Number::Number::_set_int($count);
     }
 
     sub count {
@@ -559,7 +559,7 @@ package Sidef::Types::Set::Bag {
 
         my $key = $serialize->($obj);
         if (CORE::exists($self->{$key})) {
-            return Sidef::Types::Number::Number->_set_uint($self->{$key}{count});
+            return Sidef::Types::Number::Number::_set_int($self->{$key}{count});
         }
 
         return Sidef::Types::Number::Number::ZERO;
@@ -605,7 +605,7 @@ package Sidef::Types::Set::Bag {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
             map {
-                Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number->_set_uint($_->{count})])
+                Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})])
             } CORE::values(%$self)
         );
     }
@@ -618,7 +618,7 @@ package Sidef::Types::Set::Bag {
 
         Sidef::Types::Array::Array->new(
             map {
-                Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number->_set_uint($_->{count})])
+                Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})])
               } @top
         );
     }
@@ -651,7 +651,7 @@ package Sidef::Types::Set::Bag {
         Sidef::Types::Block::Block->new(
             code => sub {
                 my $elem = $values[$i++] // return undef;
-                Sidef::Types::Array::Array->new([$elem->{value}, Sidef::Types::Number::Number->_set_uint($elem->{count})]);
+                Sidef::Types::Array::Array->new([$elem->{value}, Sidef::Types::Number::Number::_set_int($elem->{count})]);
             }
         );
     }
@@ -686,7 +686,7 @@ package Sidef::Types::Set::Bag {
         my ($self, $block) = @_;
 
         foreach my $elem (CORE::values(%$self)) {
-            $block->run($elem->{value}, Sidef::Types::Number::Number->_set_uint($elem->{count}));
+            $block->run($elem->{value}, Sidef::Types::Number::Number::_set_int($elem->{count}));
         }
 
         $self;
@@ -700,7 +700,7 @@ package Sidef::Types::Set::Bag {
             $len += $elem->{count};
         }
 
-        Sidef::Types::Number::Number->_set_uint($len);
+        Sidef::Types::Number::Number::_set_int($len);
     }
 
     *len  = \&length;
@@ -708,7 +708,7 @@ package Sidef::Types::Set::Bag {
 
     sub elems {
         my ($self) = @_;
-        Sidef::Types::Number::Number->_set_uint(scalar CORE::keys(%$self));
+        Sidef::Types::Number::Number::_set_int(scalar CORE::keys(%$self));
     }
 
     *keys_len = \&elems;
@@ -817,7 +817,7 @@ package Sidef::Types::Set::Bag {
 
     sub values {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number->_set_uint($_->{count}) } CORE::values(%$self)]);
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number::_set_int($_->{count}) } CORE::values(%$self)]);
     }
 
     sub pairs {
@@ -825,7 +825,7 @@ package Sidef::Types::Set::Bag {
         Sidef::Types::Array::Array->new(
             [
              map {
-                 Sidef::Types::Array::Pair->new($_->{value}, Sidef::Types::Number::Number->_set_uint($_->{count}))
+                 Sidef::Types::Array::Pair->new($_->{value}, Sidef::Types::Number::Number::_set_int($_->{count}))
              } CORE::values(%$self)
             ]
         );

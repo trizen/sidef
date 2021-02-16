@@ -5,7 +5,7 @@ package Sidef::Types::Glob::File {
 
     use parent qw(
       Sidef::Types::String::String
-      );
+    );
 
     require Encode;
     require File::Spec;
@@ -37,7 +37,7 @@ package Sidef::Types::Glob::File {
         foreach my $name (@Fcntl::EXPORT, @Fcntl::EXPORT_OK) {
             ($name =~ /^[A-Z]/ and defined(&{'Fcntl::' . $name})) or next;
             *{__PACKAGE__ . '::' . $name} = sub {
-                $cache{$name} //= Sidef::Types::Number::Number->_set_uint(&{'Fcntl::' . $name});
+                $cache{$name} //= Sidef::Types::Number::Number::_set_int(&{'Fcntl::' . $name});
             };
         }
     }
@@ -592,7 +592,7 @@ package Sidef::Types::Glob::File {
               : (Sidef::Types::Bool::Bool::FALSE);
         }
         else {
-            Sidef::Types::Number::Number->_set_uint(CORE::unlink(@args));
+            Sidef::Types::Number::Number::_set_int(CORE::unlink(@args));
         }
     }
 
@@ -615,7 +615,7 @@ package Sidef::Types::Glob::File {
                 ++$count;
             }
 
-            Sidef::Types::Number::Number->_set_uint($count);
+            Sidef::Types::Number::Number::_set_int($count);
         }
     }
 

@@ -6,7 +6,7 @@ package Sidef::Types::Range::RangeString {
     use parent qw(
       Sidef::Types::Range::Range
       Sidef::Object::Object
-      );
+    );
 
     use overload q{""} => sub {
         my ($self) = @_;
@@ -27,7 +27,7 @@ package Sidef::Types::Range::RangeString {
 
         if (not defined $to) {
             $to   = $from;
-            $from = Sidef::Types::Number::Number->_set_uint(CORE::ord("a"));
+            $from = Sidef::Types::Number::Number::_set_int(CORE::ord("a"));
         }
 
         bless {
@@ -54,7 +54,7 @@ package Sidef::Types::Range::RangeString {
         }
         else {
             $to   = $from;
-            $from = Sidef::Types::Number::Number->_set_uint(CORE::ord("a"));
+            $from = Sidef::Types::Number::Number::_set_int(CORE::ord("a"));
         }
 
         bless {

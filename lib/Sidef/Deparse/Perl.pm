@@ -151,9 +151,9 @@ HEADER
     }
 
     sub make_constant {
-        my ($self, $ref, $new_method, $name, @args) = @_;
+        my ($self, $ref, $new_method, $name, %opt) = @_;
 
-        my $rel_name  = $name . join('_', map { refaddr(\$_) } @args);
+        my $rel_name  = $name . join('_', map { refaddr(\$_) } @{$opt{args}});
         my $full_name = $self->{environment_name} . '::' . $rel_name;
 
         if (not $self->{_has_constant}) {
@@ -161,7 +161,7 @@ HEADER
             $self->{before} .= "use constant {";
         }
 
-        $self->{before} .= "$rel_name => $ref\->$new_method(" . join(',', @args) . "),";
+        $self->{before} .= "$rel_name => $ref" . ($opt{sub} ? '::' : '->') . "$new_method(" . join(',', @{$opt{args}}) . "),";
         "($full_name)";
     }
 
@@ -1098,24 +1098,16 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my ($type, $content) = $obj->_dump;
 
-            if (    $type eq 'int'
-                and CORE::int($content) eq $content
-                and $content >= 0
-                and $content < Sidef::Types::Number::Number::ULONG_MAX) {
-                $code = $self->make_constant($ref, '_set_uint', "Number$refaddr", "'${content}'");
-            }
-            elsif (    $type eq 'int'
-                   and CORE::int($content) eq $content
-                   and $content < 0
-                   and $content > Sidef::Types::Number::Number::LONG_MIN) {
-                $code = $self->make_constant($ref, '_set_int', "Number$refaddr", "'${content}'");
+            if ($type eq 'int') {
+                $code = $self->make_constant($ref, '_set_int', "Number$refaddr", args => ["'${content}'"], sub => 1);
             }
             else {
-                $code = $self->make_constant($ref, '_set_str', "Number$refaddr", "'${type}'", "'${content}'");
+                $code =
+                  $self->make_constant($ref, '_set_str', "Number$refaddr", args => ["'${type}'", "'${content}'"], sub => 1);
             }
         }
         elsif ($ref eq 'Sidef::Types::String::String') {
-            $code = $self->make_constant($ref, 'new', "String$refaddr", $self->_dump_string(${$obj}));
+            $code = $self->make_constant($ref, 'new', "String$refaddr", args => [$self->_dump_string(${$obj})]);
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code = $self->_dump_array('Sidef::Types::Array::Array', $obj);
@@ -1132,8 +1124,8 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Regex::Regex') {
             $code =
               $self->make_constant($ref, 'new', "Regex$refaddr",
-                                   $self->_dump_string("$obj->{raw}"),
-                                   $self->_dump_string($obj->{flags} . ($obj->{global} ? 'g' : '')));
+                 args => [$self->_dump_string("$obj->{raw}"), $self->_dump_string($obj->{flags} . ($obj->{global} ? 'g' : ''))]
+              );
         }
         elsif ($ref eq 'Sidef::Types::Block::If') {
             $code = 'do{';
@@ -1341,22 +1333,22 @@ HEADER
             }
         }
         elsif ($ref eq 'Sidef::Meta::Glob::STDIN') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDIN$refaddr", '\*STDIN');
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDIN$refaddr", args => ['\*STDIN']);
         }
         elsif ($ref eq 'Sidef::Meta::Glob::STDOUT') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDOUT$refaddr", '\*STDOUT');
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDOUT$refaddr", args => ['\*STDOUT']);
         }
         elsif ($ref eq 'Sidef::Meta::Glob::STDERR') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDERR$refaddr", '\*STDERR');
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "STDERR$refaddr", args => ['\*STDERR']);
         }
         elsif ($ref eq 'Sidef::Meta::Glob::ARGF') {
-            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "ARGF$refaddr", '\*ARGV');
+            $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new', "ARGF$refaddr", args => ['\*ARGV']);
         }
         elsif ($ref eq 'Sidef::Meta::Glob::DATA') {
             require Encode;
             my $data = $self->_dump_string(Encode::encode_utf8(${$obj->{data}}));
             $code = $self->make_constant('Sidef::Types::Glob::FileHandle', 'new',
-                                         "DATA$refaddr",                   qq{do{open my \$fh, '<:utf8', \\$data; \$fh}});
+                                         "DATA$refaddr", args => [qq{do{open my \$fh, '<:utf8', \\$data; \$fh}}]);
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
             $code = $obj->{name};
@@ -1394,32 +1386,34 @@ HEADER
               $ref . '->new(' . join(',', map { defined($_) ? $self->deparse_expr({self => $_}) : 'undef' } @{$obj}) . ')';
         }
         elsif ($ref eq 'Sidef::Types::Null::Null') {
-            $code = $self->make_constant($ref, 'new', "Null$refaddr");
+            $code = $self->make_constant($ref, 'new', "Null$refaddr", args => []);
         }
         elsif ($ref eq 'Sidef::Module::OO') {
-            $code = $self->make_constant($ref, '__NEW__', "MOD_OO$refaddr", $self->_dump_string($obj->{module}));
+            $code = $self->make_constant($ref, '__NEW__', "MOD_OO$refaddr", args => [$self->_dump_string($obj->{module})]);
         }
         elsif ($ref eq 'Sidef::Module::Func') {
-            $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", $self->_dump_string($obj->{module}));
+            $code = $self->make_constant($ref, '__NEW__', "MOD_F$refaddr", args => [$self->_dump_string($obj->{module})]);
         }
         elsif ($ref eq 'Sidef::Types::Range::RangeNumber' or $ref eq 'Sidef::Types::Range::RangeString') {
             $code = $self->make_constant(
                 $ref, 'new',
                 "Range$refaddr",
-                map {
-                    my ($type, $content) = $obj->{$_}->_dump;
-                    'Sidef::Types::Number::Number->_set_str(' . "'${type}', '${content}'" . ')'
-                } ('from', 'to', 'step')
+                args => [
+                    map {
+                        my ($type, $content) = $obj->{$_}->_dump;
+                        'Sidef::Types::Number::Number::_set_str(' . "'${type}', '${content}'" . ')'
+                    } ('from', 'to', 'step')
+                ]
             );
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
-            $code = $self->make_constant($ref, 'new', "Backtick$refaddr", $self->_dump_string(${$obj}));
+            $code = $self->make_constant($ref, 'new', "Backtick$refaddr", args => [$self->_dump_string(${$obj})]);
         }
         elsif ($ref eq 'Sidef::Types::Glob::File') {
-            $code = $self->make_constant($ref, 'new', "File$refaddr", $self->_dump_string(${$obj}));
+            $code = $self->make_constant($ref, 'new', "File$refaddr", args => [$self->_dump_string(${$obj})]);
         }
         elsif ($ref eq 'Sidef::Types::Glob::Dir') {
-            $code = $self->make_constant($ref, 'new', "Dir$refaddr", $self->_dump_string(${$obj}));
+            $code = $self->make_constant($ref, 'new', "Dir$refaddr", args => [$self->_dump_string(${$obj})]);
         }
         elsif ($ref eq 'Sidef::Meta::Module') {
             ## local $self->{depth} = -999_999_999;
@@ -1477,7 +1471,7 @@ HEADER
               . qq~(Sidef::Types::Bool::Bool::FALSE) : (Sidef::Types::Bool::Bool::TRUE))~;
         }
         elsif ($ref eq 'Sidef::Types::Glob::Pipe') {
-            $code = $self->make_constant($ref, 'new', "Pipe$refaddr", map { $self->_dump_string($_) } @{$obj});
+            $code = $self->make_constant($ref, 'new', "Pipe$refaddr", args => [map { $self->_dump_string($_) } @{$obj}]);
         }
         elsif ($ref eq 'Sidef::Parser') {
             $code = '$Sidef::PARSER';

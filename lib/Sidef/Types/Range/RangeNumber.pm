@@ -184,7 +184,7 @@ package Sidef::Types::Range::RangeNumber {
             return Sidef::Types::Number::Number::ZERO;
         }
 
-        state $two = Sidef::Types::Number::Number->_set_uint(2);
+        state $two = Sidef::Types::Number::Number::_set_int(2);
 
         $n = $n->floor;
         $n->inc->mul($z->mul($n)->add($x->mul($two)))->div($two);

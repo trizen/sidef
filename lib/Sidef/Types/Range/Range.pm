@@ -537,7 +537,7 @@ package Sidef::Types::Range::Range {
             ++$count if $arg->run($iter->run() // last);
         }
 
-        Sidef::Types::Number::Number->_set_uint($count);
+        Sidef::Types::Number::Number::_set_int($count);
     }
 
     sub count {

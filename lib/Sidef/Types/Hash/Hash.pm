@@ -103,7 +103,7 @@ package Sidef::Types::Hash::Hash {
 
     sub length {
         my ($self) = @_;
-        Sidef::Types::Number::Number->_set_uint(scalar CORE::keys(%$self));
+        Sidef::Types::Number::Number::_set_int(scalar CORE::keys(%$self));
     }
 
     *len  = \&length;
@@ -308,7 +308,7 @@ package Sidef::Types::Hash::Hash {
             }
         }
 
-        Sidef::Types::Number::Number->_set_uint($count);
+        Sidef::Types::Number::Number::_set_int($count);
     }
 
     sub count {

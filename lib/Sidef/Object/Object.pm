@@ -126,7 +126,7 @@ package Sidef::Object::Object {
 
     sub object_id {
         my ($self) = @_;
-        Sidef::Types::Number::Number->_set_uint(Scalar::Util::refaddr($self));
+        Sidef::Types::Number::Number::_set_int(Scalar::Util::refaddr($self));
     }
 
     *refaddr = \&object_id;

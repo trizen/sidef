@@ -5,7 +5,7 @@ package Sidef::Types::Set::Set {
 
     use parent qw(
       Sidef::Types::Hash::Hash
-      );
+    );
 
     use overload
       q{bool} => sub { scalar(CORE::keys(%{$_[0]})) },
@@ -59,7 +59,7 @@ package Sidef::Types::Set::Set {
         my ($A, $B) = @_;
 
         ref($A) eq ref($B)
-          ? bless({%$A, %$B},                    ref($A))
+          ? bless({%$A, %$B}, ref($A))
           : bless({%$A, $serialize->($B) => $B}, ref($A));
     }
 
@@ -228,7 +228,7 @@ package Sidef::Types::Set::Set {
             }
         }
 
-        Sidef::Types::Number::Number->_set_uint($count);
+        Sidef::Types::Number::Number::_set_int($count);
     }
 
     sub count {

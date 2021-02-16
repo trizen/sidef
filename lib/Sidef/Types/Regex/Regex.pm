@@ -141,7 +141,7 @@ package Sidef::Types::Regex::Regex {
             while ((my $m = $self->match($obj))->{matched}) {
                 $lpos = $cpos;
                 last if ($lpos == ($cpos = $self->{pos}));
-                CORE::push(@matches, $block->run(Sidef::Types::Number::Number->_set_uint($i++), $m));
+                CORE::push(@matches, $block->run(Sidef::Types::Number::Number::_set_int($i++), $m));
             }
         }
         else {

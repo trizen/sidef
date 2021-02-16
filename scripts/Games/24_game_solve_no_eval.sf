@@ -43,7 +43,7 @@ var blocks = op.map { |a| op.map { |b| op.map { |c| formats.map { |format|
 }}}}.flatten;
 
 loop {
-    var input = Sys.scanln("Enter four integers or 'q' to exit: ");
+    var input = Sys.scanln("Enter four integers or 'q' to exit: ") \\ break;
     input == 'q' && break;
 
     input ~~ /^\h*[1-9]\h+[1-9]\h+[1-9]\h+[1-9]\h*$/ || (

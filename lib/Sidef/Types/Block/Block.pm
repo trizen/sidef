@@ -429,14 +429,11 @@ package Sidef::Types::Block::Block {
         if ($ref eq 'Sidef::Types::Number::Number') {
             my ($type, $str) = $obj->_dump();
 
-            if ($type eq 'int' and $str >= 0 and $str < Sidef::Types::Number::Number::ULONG_MAX) {
-                return scalar {dump => ($ref . "->_set_uint('${str}')")};
-            }
-            elsif ($type eq 'int' and $str < 0 and $str > Sidef::Types::Number::Number::LONG_MIN) {
-                return scalar {dump => ($ref . "->_set_int('${str}')")};
+            if ($type eq 'int') {
+                return scalar {dump => ($ref . "::_set_int('${str}')")};
             }
 
-            return scalar {dump => ($ref . "->_set_str('${type}', '${str}')")};
+            return scalar {dump => ($ref . "::_set_str('${type}', '${str}')")};
         }
 
         if ($ref eq 'Sidef::Module::OO' or $ref eq 'Sidef::Module::Func') {

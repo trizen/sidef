@@ -12,7 +12,7 @@ package Sidef::Types::Regex::Match {
 
     use parent qw(
       Sidef::Object::Object
-      );
+    );
 
     use Sidef::Types::Bool::Bool;
 
@@ -77,7 +77,7 @@ package Sidef::Types::Regex::Match {
     sub pos {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-                    [@{$self->{_cached_pos} //= [map { Sidef::Types::Number::Number->_set_uint($_) } @{$self->{match_pos}}]}]);
+                     [@{$self->{_cached_pos} //= [map { Sidef::Types::Number::Number::_set_int($_) } @{$self->{match_pos}}]}]);
     }
 
     *match_pos = \&pos;
