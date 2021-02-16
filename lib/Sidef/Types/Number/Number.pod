@@ -4246,14 +4246,6 @@ Return the
 
 =cut
 
-=head2 ratmod
-
-Number.ratmod() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 re
 
 Number.re() -> I<Obj>

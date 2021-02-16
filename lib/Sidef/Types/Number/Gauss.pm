@@ -165,7 +165,7 @@ package Sidef::Types::Number::Gauss {
 
     sub invmod {
         my ($x, $m) = @_;
-        $x->ratmod($m);
+        $x->mod($m);
         my $t = $x->{a}->sqr->add($x->{b}->sqr)->invmod($m);
         __PACKAGE__->new($x->{a}->mul($t)->mod($m), $x->{b}->neg->mul($t)->mod($m),);
     }
@@ -277,11 +277,6 @@ package Sidef::Types::Number::Gauss {
         $n->norm->gcd($k->norm)->is_one;
     }
 
-    sub ratmod {
-        my ($x, $m) = @_;
-        __PACKAGE__->new($x->{a}->ratmod($m), $x->{b}->ratmod($m));
-    }
-
     sub inc {
         my ($x) = @_;
         __PACKAGE__->new($x->{a}->inc, $x->{b});
@@ -323,7 +318,7 @@ package Sidef::Types::Number::Gauss {
     sub powmod {
         my ($x, $n, $m) = @_;
 
-        $x = $x->ratmod($m);
+        $x = $x->mod($m);
 
         my $negative_power = 0;
 

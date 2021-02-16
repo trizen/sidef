@@ -79,9 +79,9 @@ do {
 
     assert_eq(Mod(A, m) / B, Mod(A * B.invmod(m), m))
 
-    assert_eq(A.inv.flat.map{.ratmod(m)}, A.invmod(m).flat)
-    assert_eq(B.inv.flat.map{.ratmod(m)}, B.powmod(-1, m).flat)
-    assert_eq(B.inv**2 -> flat.map{.ratmod(m)}, B.powmod(-2, m).flat)
+    assert_eq(A.inv.flat.map{.mod(m)}, A.invmod(m).flat)
+    assert_eq(B.inv.flat.map{.mod(m)}, B.powmod(-1, m).flat)
+    assert_eq(B.inv**2 -> flat.map{.mod(m)}, B.powmod(-2, m).flat)
 }
 
 say "** Test passed!"

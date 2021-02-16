@@ -426,14 +426,6 @@ Return the
 
 =cut
 
-=head2 ratmod
-
-Gauss.ratmod() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 re
 
 Gauss.re() -> I<Obj>

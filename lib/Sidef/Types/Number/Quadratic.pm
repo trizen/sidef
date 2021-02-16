@@ -212,7 +212,7 @@ package Sidef::Types::Number::Quadratic {
     sub invmod {
         my ($x, $m) = @_;
 
-        $x = $x->ratmod($m);
+        $x = $x->mod($m);
         my $t = $x->{a}->sqr->sub($x->{b}->sqr->mul($x->{w}))->invmod($m);
 
         __PACKAGE__->new($x->{a}->mul($t)->mod($m), $x->{b}->mul($t)->neg->mod($m), $x->{w});
@@ -242,11 +242,6 @@ package Sidef::Types::Number::Quadratic {
     sub is_coprime {
         my ($n, $k) = @_;
         $n->norm->gcd($k->norm)->is_one;
-    }
-
-    sub ratmod {
-        my ($x, $m) = @_;
-        __PACKAGE__->new($x->{a}->ratmod($m), $x->{b}->ratmod($m), $x->{w});
     }
 
     sub inc {
@@ -290,7 +285,7 @@ package Sidef::Types::Number::Quadratic {
     sub powmod {
         my ($x, $n, $m) = @_;
 
-        $x = $x->ratmod($m);
+        $x = $x->mod($m);
 
         my $negative_power = 0;
 

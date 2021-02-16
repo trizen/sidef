@@ -6873,8 +6873,12 @@ package Sidef::Types::Number::Number {
         #
       Math_GMPq__Math_GMPq: {
 
-            Math::GMPq::Rmpq_sgn($y)
-              || goto &_nan;
+            Math::GMPq::Rmpq_sgn($y) || goto &_nan;
+
+            if (Math::GMPq::Rmpq_integer_p($y)) {
+                $y = _mpq2mpz($y);
+                goto Math_GMPq__Math_GMPz;
+            }
 
             my $quo = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_div($quo, $x, $y);
@@ -6894,25 +6898,10 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPq__Math_GMPz: {
-
-            Math::GMPz::Rmpz_sgn($y)
-              || goto &_nan;
-
-            my $quo = Math::GMPq::Rmpq_init();
-            Math::GMPq::Rmpq_div_z($quo, $x, $y);
-
-            # Floor
-            Math::GMPq::Rmpq_integer_p($quo) || do {
-                my $z = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_set_q($z, $quo);
-                Math::GMPz::Rmpz_sub_ui($z, $z, 1) if Math::GMPq::Rmpq_sgn($quo) < 0;
-                Math::GMPq::Rmpq_set_z($quo, $z);
-            };
-
-            Math::GMPq::Rmpq_mul_z($quo, $quo, $y);
-            Math::GMPq::Rmpq_sub($quo, $x, $quo);
-
-            return $quo;
+            Math::GMPz::Rmpz_sgn($y) || goto &_nan;
+            my $r = _modular_rational($x, $y) // goto &_nan;
+            Math::GMPz::Rmpz_mod($r, $r, $y);
+            return $r;
         }
 
       Math_GMPq__Math_MPFR: {
@@ -7334,27 +7323,6 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_mul($t, $t, $z);
 
         return $t;
-    }
-
-    sub ratmod {
-        my ($n, $m) = @_;
-
-        _valid(\$m);
-
-        $n = $$n;
-        $m = _any2mpz($$m) // goto &nan;
-
-        my $r = Math::GMPz::Rmpz_init();
-
-        if (ref($n) eq 'Math::GMPz') {
-            Math::GMPz::Rmpz_mod($r, $n, $m);
-        }
-        else {
-            $r = _modular_rational($n, $m) // goto &nan;
-            Math::GMPz::Rmpz_mod($r, $r, $m);
-        }
-
-        bless \$r;
     }
 
     sub powmod {

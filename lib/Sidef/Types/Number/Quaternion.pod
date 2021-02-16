@@ -394,14 +394,6 @@ Return the
 
 =cut
 
-=head2 ratmod
-
-Quaternion.ratmod() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 reals
 
 Quaternion.reals() -> I<Obj>

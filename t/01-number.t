@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 166;
+use Test::More tests => 168;
 
 use Sidef;
 
@@ -219,7 +219,7 @@ my $o = 'Sidef::Types::Number::Number';
       12  -691/2730
       20  -174611/330
       22  854513/138
-      );
+    );
 
     #
     ## bernfrac()
@@ -309,7 +309,12 @@ like(($x->div($y))->as_rat, re '21/25');
 
 $x = $o->new('7/4');
 $y = $o->new('1');
-like(($x->mod($y))->as_rat, re '3/4');
+like(($x->mod($y))->as_rat, re '0');
+
+$x = $o->new('43/99');
+$y = $o->new('13');
+like($x->mod($y)->as_rat,      re '7');
+like($x->mod($y->rat)->as_rat, re '7');
 
 $x = $o->new('7/4');
 $y = $o->new('5/13');

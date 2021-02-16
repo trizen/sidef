@@ -225,4 +225,48 @@ assert_eq(  # OEIS: A006495
     [1, 1, -3, -11, -7, 41, 117, 29, -527, -1199, 237, 6469, 11753, -8839, -76443, -108691, 164833, 873121, 922077, -2521451]
 )
 
+do {
+    func lucasUVmod(P, Q, n, m) {
+
+        var D = (P*P - 4*Q)
+
+        var a = Quadratic(P, +1, D)/2
+        var b = Quadratic(P, -1, D)/2
+
+        var x = Mod(a, m)**n
+        var y = Mod(b, m)**n
+
+        ((x-y).lift.b, (x+y).lift.a)
+    }
+
+    var P = 43
+    var Q = -11
+    var n = 10000000
+    var m = 1e9+1
+
+    assert_eq([lucasUVmod(P, Q, n, m)], [::lucasUVmod(P, Q, n, m)])
+}
+
+do {
+    func lucasUVmod(P, Q, n, m) {
+
+        var D = (P*P - 4*Q)
+
+        var a = Quadratic(Mod(P, m), +1, D)/2
+        var b = Quadratic(Mod(P, m), -1, D)/2
+
+        var x = a**n
+        var y = b**n
+
+        ((x-y).b.lift, (x+y).a.lift)
+    }
+
+    var P = 97
+    var Q = 11
+    var n = 10000
+    var m = 1e9-1
+
+    assert_eq([lucasUVmod(P, Q, n, m)], [::lucasUVmod(P, Q, n, m)])
+}
+
 say "** Test passed!"

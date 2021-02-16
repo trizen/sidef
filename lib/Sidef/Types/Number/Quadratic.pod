@@ -380,14 +380,6 @@ Return the
 
 =cut
 
-=head2 ratmod
-
-Quadratic.ratmod() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 reals
 
 Quadratic.reals() -> I<Obj>

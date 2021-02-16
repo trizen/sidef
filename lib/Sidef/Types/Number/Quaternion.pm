@@ -262,18 +262,6 @@ package Sidef::Types::Number::Quaternion {
 #>>>
     }
 
-    sub ratmod {
-        my ($x, $m) = @_;
-#<<<
-        __PACKAGE__->new(
-            $x->{a}->ratmod($m),
-            $x->{b}->ratmod($m),
-            $x->{c}->ratmod($m),
-            $x->{d}->ratmod($m),
-        );
-#>>>
-    }
-
     sub mod {
         my ($x, $y) = @_;
 
@@ -292,7 +280,7 @@ package Sidef::Types::Number::Quaternion {
 
     sub invmod {
         my ($x, $m) = @_;
-        $x = $x->ratmod($m);
+        $x = $x->mod($m);
         $x->conj->mul($x->{a}->sqr->add($x->{b}->sqr)->add($x->{c}->sqr)->add($x->{d}->sqr)->invmod($m))->mod($m);
     }
 
@@ -364,7 +352,7 @@ package Sidef::Types::Number::Quaternion {
     sub powmod {
         my ($x, $n, $m) = @_;
 
-        $x = $x->ratmod($m);
+        $x = $x->mod($m);
 
         my $negative_power = 0;
 

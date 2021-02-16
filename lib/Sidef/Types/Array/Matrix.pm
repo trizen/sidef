@@ -567,7 +567,7 @@ package Sidef::Types::Array::Matrix {
 
         foreach my $row (@$A) {
             foreach my $i (0 .. $#{$row}) {
-                $row->[$i] = $row->[$i]->ratmod($mod);
+                $row->[$i] = $row->[$i]->mod($mod);
             }
         }
 
