@@ -2066,6 +2066,22 @@ Return the
 
 =cut
 
+=head2 idiv_ceil
+
+Number.idiv_ceil() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 idiv_trunc
+
+Number.idiv_trunc() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 ilog
 
 Number.ilog() -> I<Obj>

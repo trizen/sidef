@@ -2238,6 +2238,64 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *idiv_floor = \&idiv;
+
+    sub idiv_ceil {
+        my ($x, $y) = @_;
+
+        _valid(\$y);
+
+        $x = _any2mpz($$x) // (goto &nan);
+        $y = _any2mpz($$y) // (goto &nan);
+
+        # Detect division by zero
+        Math::GMPz::Rmpz_sgn($y) || do {
+            my $sign = Math::GMPz::Rmpz_sgn($x);
+
+            if ($sign == 0) {    # 0/0
+                goto &nan;
+            }
+            elsif ($sign > 0) {    # x/0 where: x > 0
+                goto &inf;
+            }
+            else {                 # x/0 where: x < 0
+                goto &ninf;
+            }
+        };
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_cdiv_q($r, $x, $y);
+        bless \$r;
+    }
+
+    sub idiv_trunc {
+        my ($x, $y) = @_;
+
+        _valid(\$y);
+
+        $x = _any2mpz($$x) // (goto &nan);
+        $y = _any2mpz($$y) // (goto &nan);
+
+        # Detect division by zero
+        Math::GMPz::Rmpz_sgn($y) || do {
+            my $sign = Math::GMPz::Rmpz_sgn($x);
+
+            if ($sign == 0) {    # 0/0
+                goto &nan;
+            }
+            elsif ($sign > 0) {    # x/0 where: x > 0
+                goto &inf;
+            }
+            else {                 # x/0 where: x < 0
+                goto &ninf;
+            }
+        };
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_tdiv_q($r, $x, $y);
+        bless \$r;
+    }
+
     sub __neg__ {
         my ($x) = @_;
 
@@ -15345,7 +15403,7 @@ package Sidef::Types::Number::Number {
             my $A = Math::GMPz::Rmpz_init_set($from);
             my $B = Math::GMPz::Rmpz_init_set($to);
 
-            my $t = Math::GMPz::Rmpz_init_set_ui(1);
+            my $t = Math::GMPz::Rmpz_init_set_ui(0);
             my $x = Math::GMPz::Rmpz_init();
 
             # t = ipow(2, k)
@@ -15363,13 +15421,7 @@ package Sidef::Types::Number::Number {
 
                 if ($k == 1) {
 
-                    if (Math::GMPz::Rmpz_divisible_p($A, $m)) {
-                        Math::GMPz::Rmpz_divexact($t, $A, $m);
-                    }
-                    else {
-                        Math::GMPz::Rmpz_div($t, $A, $m);
-                        Math::GMPz::Rmpz_add_ui($t, $t, 1);
-                    }
+                    Math::GMPz::Rmpz_cdiv_q($t, $A, $m);
 
                     # t = max(t, p)
                     if (Math::GMPz::Rmpz_cmp_ui($t, $p) < 0) {
@@ -15404,16 +15456,9 @@ package Sidef::Types::Number::Number {
                 while ($p <= $s) {
 
                     my $u = Math::GMPz::Rmpz_init();
+
                     Math::GMPz::Rmpz_mul_ui($u, $m, $p);
-
-                    if (Math::GMPz::Rmpz_divisible_p($A, $u)) {
-                        Math::GMPz::Rmpz_divexact($t, $A, $u);
-                    }
-                    else {
-                        Math::GMPz::Rmpz_div($t, $A, $u);
-                        Math::GMPz::Rmpz_add_ui($t, $t, 1);
-                    }
-
+                    Math::GMPz::Rmpz_cdiv_q($t, $A, $u);
                     Math::GMPz::Rmpz_div($x, $B, $u);
 
                     # Optimization for tight ranges
