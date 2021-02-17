@@ -6873,12 +6873,12 @@ package Sidef::Types::Number::Number {
         #
       Math_GMPq__Math_GMPq: {
 
-            Math::GMPq::Rmpq_sgn($y) || goto &_nan;
-
             if (Math::GMPq::Rmpq_integer_p($y)) {
                 $y = _mpq2mpz($y);
                 goto Math_GMPq__Math_GMPz;
             }
+
+            Math::GMPq::Rmpq_sgn($y) || goto &_nan;
 
             my $quo = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_div($quo, $x, $y);
@@ -15174,6 +15174,114 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub _sieve_powerful {
+        my ($from, $to, $k) = @_;
+
+        my @powerful;
+
+        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+            ## TODO
+        }
+        else {
+            my $t = Math::GMPz::Rmpz_init();
+
+            sub {
+                my ($m, $r) = @_;
+
+                if ($r < $k) {
+                    push @powerful, (Math::GMPz::Rmpz_fits_ulong_p($m) ? Math::GMPz::Rmpz_get_ui($m) : $m);
+                    return;
+                }
+
+                Math::GMPz::Rmpz_div($t, $to, $m);
+                Math::GMPz::Rmpz_root($t, $t, $r);
+
+                foreach my $v (1 .. $t) {
+
+                    if ($r > $k) {
+                        (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
+                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                        or next;
+                    }
+
+                    Math::GMPz::Rmpz_ui_pow_ui($t, $v, $r);
+                    Math::GMPz::Rmpz_mul($t, $t, $m);
+
+                    if ($r <= $k and Math::GMPz::Rmpz_cmp($t, $from) < 0) {
+                        next;
+                    }
+
+                    __SUB__->(Math::GMPz::Rmpz_init_set($t), $r - 1);
+                }
+              }
+              ->($ONE, 2 * $k - 1);
+
+            @powerful = sort { $a <=> $b } @powerful;
+        }
+
+        return \@powerful;
+    }
+
+    # Array of k-powerful numbers in the range [from, to]
+    sub powerful {
+        my ($k, $from, $to) = @_;
+
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $to   = _any2mpz($$to)   // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $to   = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $from = $ONE;
+        }
+
+        $k = _any2ui($$k) // return Sidef::Types::Array::Array->new;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($to) < 0) {
+            $to = $ZERO;
+        }
+
+#<<<
+        my @powerful = map {
+            ref($_) ? (bless \$_) : _set_int($_)
+        } @{_sieve_powerful($from, $to, $k)};
+#>>>
+
+        Sidef::Types::Array::Array->new(\@powerful);
+    }
+
+    sub powerful_each {
+        my ($k, $from, $to, $block) = @_;
+
+        _valid(\$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        my $step_value = $TEN**(5 * $k);    # TODO: improve this value
+        _generic_each($from, $to, $block, sub { $step_value }, sub { _sieve_powerful($_[0], $_[1], $k) });
+    }
+
     sub _sieve_almost_primes {
         my ($from, $to, $k) = @_;
 
@@ -16506,49 +16614,6 @@ package Sidef::Types::Number::Number {
         (Math::GMPz::Rmpz_cmp($t, $n) == 0)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    sub powerful {    # k-powerful numbers <= n
-        my ($n, $k) = @_;
-
-        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
-
-        Math::GMPz::Rmpz_sgn($n) > 0
-          or return Sidef::Types::Array::Array->new;
-
-        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return Sidef::Types::Array::Array->new } : 2;
-
-        my @powerful;
-        my $t = Math::GMPz::Rmpz_init();
-
-        sub {
-            my ($m, $r) = @_;
-
-            if ($r < $k) {
-                push @powerful, $m;
-                return;
-            }
-
-            Math::GMPz::Rmpz_div($t, $n, $m);
-            Math::GMPz::Rmpz_root($t, $t, $r);
-
-            foreach my $v (1 .. $t) {
-
-                if ($r > $k) {
-                    (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
-                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                        or next;
-                }
-
-                Math::GMPz::Rmpz_ui_pow_ui($t, $v, $r);
-                __SUB__->($m * $t, $r - 1);
-            }
-          }
-          ->($ONE, 2 * $k - 1);
-
-        @powerful = sort { Math::GMPz::Rmpz_cmp($a, $b) } @powerful;
-        @powerful = map  { bless \$_ } @powerful;
-
-        Sidef::Types::Array::Array->new(\@powerful);
     }
 
     sub powerful_count {    # count of k-powerful numbers <= n

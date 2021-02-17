@@ -3852,6 +3852,14 @@ Return the
 
 =cut
 
+=head2 powerful_each
+
+Number.powerful_each() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 pp1_factor
 
 Number.pp1_factor() -> I<Obj>
