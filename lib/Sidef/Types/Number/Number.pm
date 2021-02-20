@@ -12489,8 +12489,21 @@ package Sidef::Types::Number::Number {
     sub znorder {
         my ($x, $y) = @_;
         _valid(\$y);
-        my $z = Math::Prime::Util::GMP::znorder(_big2uistr($x) // (goto &nan), _big2uistr($y) // (goto &nan)) // goto &nan;
-        _set_int($z);
+
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
+
+        my $r;
+
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_slong_p($x) and Math::GMPz::Rmpz_fits_slong_p($y)) {
+            $r = Math::Prime::Util::znorder(Math::GMPz::Rmpz_get_si($x), Math::GMPz::Rmpz_get_si($y)) // goto &nan;
+        }
+        else {
+            $r = Math::Prime::Util::GMP::znorder(Math::GMPz::Rmpz_get_str($x, 10), Math::GMPz::Rmpz_get_str($y, 10))
+              // goto &nan;
+        }
+
+        _set_int($r);
     }
 
     sub znprimroot {
