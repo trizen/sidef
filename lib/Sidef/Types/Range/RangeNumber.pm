@@ -323,6 +323,27 @@ package Sidef::Types::Range::RangeNumber {
         $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_prime }));
     }
 
+    sub each_prime {
+        my ($self, $block) = @_;
+
+        if ($self->{step}->abs->is_one) {
+
+            my $left  = Sidef::Types::Number::Number->new($self->{from});
+            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+            if ($self->{step}->is_neg) {
+                ## reversed range -- use fallback code
+            }
+            else {
+                $left->each_prime($right, $block);
+                return $self;
+            }
+        }
+
+        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_prime }))->each($block);
+        return $self;
+    }
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new("$self");

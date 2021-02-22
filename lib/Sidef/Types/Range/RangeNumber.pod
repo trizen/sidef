@@ -83,6 +83,14 @@ Return the
 
 =cut
 
+=head2 each_prime
+
+RangeNumber.each_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 gcd
 
 RangeNumber.gcd() -> I<Obj>
