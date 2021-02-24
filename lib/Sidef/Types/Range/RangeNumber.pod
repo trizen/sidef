@@ -107,6 +107,14 @@ Return the
 
 =cut
 
+=head2 each_semiprime
+
+RangeNumber.each_semiprime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 each_squarefree
 
 RangeNumber.each_squarefree() -> I<Obj>
