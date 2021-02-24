@@ -355,6 +355,24 @@ package Sidef::Types::Range::RangeNumber {
         return $self;
     }
 
+    sub each_powerful {
+        my ($self, $k, $block) = @_;
+
+        $k = Sidef::Types::Number::Number->new($k);
+
+        if ($self->{step}->is_one) {
+
+            my $left  = Sidef::Types::Number::Number->new($self->{from});
+            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+            Sidef::Types::Number::Number::each_powerful($k, $left, $right, $block);
+            return $self;
+        }
+
+        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_powerful($k) }))->each($block);
+        return $self;
+    }
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new("$self");
