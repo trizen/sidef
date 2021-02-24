@@ -1652,6 +1652,16 @@ Aliases: I<almost_primes_each>
 
 =cut
 
+=head2 each_powerful
+
+Number.each_powerful() -> I<Obj>
+
+Return the
+
+Aliases: I<powerful_each>
+
+=cut
+
 =head2 each_prime
 
 Number.each_prime() -> I<Obj>
@@ -3847,14 +3857,6 @@ Return the
 =head2 powerful_count
 
 Number.powerful_count() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 powerful_each
-
-Number.powerful_each() -> I<Obj>
 
 Return the
 

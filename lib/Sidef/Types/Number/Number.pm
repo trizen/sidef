@@ -15291,9 +15291,11 @@ package Sidef::Types::Number::Number {
             $from = $ONE;
         }
 
-        my $step_value = $TEN**(5 * $k);    # TODO: improve this value
+        my $step_value = $TEN**(6 * $k);    # TODO: improve this value
         _generic_each($from, $to, $block, sub { $step_value }, sub { _sieve_powerful($_[0], $_[1], $k) });
     }
+
+    *each_powerful = \&powerful_each;
 
     sub _sieve_almost_primes {
         my ($from, $to, $k) = @_;
