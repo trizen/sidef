@@ -147,4 +147,72 @@ for k in (1..12) {
     assert_eq(almost_primes(k, from, upto), from..upto -> grep{ .is_almost_prime(k) })
 }
 
+# RangeNumber k-almost primes
+
+assert_eq(
+    gather { 10..100 -> each_almost_prime(2, {|k| take(k) }) },
+    2.almost_primes(10, 100)
+)
+
+assert_eq(
+    gather { 10..100 -> each_almost_prime(3, {|k| take(k) }) },
+    3.almost_primes(10, 100)
+)
+
+assert_eq(
+    gather { 10..100 `by` 3 -> each_almost_prime(3, {|k| take(k) }) },
+    10..100 `by` 3 -> grep { .is_almost_prime(3) }
+)
+
+assert_eq(
+    gather { 10..100 `by` 3 -> each_almost_prime(2, {|k| take(k) }) },
+    10..100 `by` 3 -> grep { .is_almost_prime(2) }
+)
+
+# RangeNumber k-powerful numbers
+
+assert_eq(
+    gather { 10..1000 -> each_powerful(2, {|k| take(k) }) },
+    2.powerful(10, 1000)
+)
+
+assert_eq(
+    gather { 10..1000 -> each_powerful(3, {|k| take(k) }) },
+    3.powerful(10, 1000)
+)
+
+assert_eq(
+    gather { 10..1000 `by` 3 -> each_powerful(3, {|k| take(k) }) },
+    10..1000 `by` 3 -> grep { .is_powerful(3) }
+)
+
+assert_eq(
+    gather { 10..1000 `by` 3 -> each_powerful(2, {|k| take(k) }) },
+    10..1000 `by` 3 -> grep { .is_powerful(2) }
+)
+
+# RangeNumber squarefree numbers
+
+assert_eq(
+    gather { 10..100 -> each_squarefree {|k| take(k) } },
+    squarefree(10, 100)
+)
+
+assert_eq(
+    gather { 10..100 `by` 3 -> each_squarefree {|k| take(k) } },
+    10..100 `by` 3 -> grep { .is_squarefree }
+)
+
+# RangeNumber prime numbers
+
+assert_eq(
+    gather { 10..100 -> each_prime {|k| take(k) } },
+    primes(10, 100)
+)
+
+assert_eq(
+    gather { 10..100 `by` 3 -> each_prime {|k| take(k) } },
+    10..100 `by` 3 -> grep { .is_prime }
+)
+
 say "** Tests passed!"
