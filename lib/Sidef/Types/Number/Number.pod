@@ -1672,6 +1672,16 @@ Aliases: I<primes_each>
 
 =cut
 
+=head2 each_semiprime
+
+Number.each_semiprime() -> I<Obj>
+
+Return the
+
+Aliases: I<semiprimes_each>
+
+=cut
+
 =head2 each_squarefree
 
 Number.each_squarefree() -> I<Obj>
@@ -4379,6 +4389,14 @@ Aliases: I<nth_semiprime>
 =head2 semiprime_count
 
 Number.semiprime_count() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 semiprimes
+
+Number.semiprimes() -> I<Obj>
 
 Return the
 

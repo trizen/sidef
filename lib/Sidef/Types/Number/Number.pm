@@ -15520,6 +15520,59 @@ package Sidef::Types::Number::Number {
 
     *each_almost_prime = \&almost_primes_each;
 
+    sub semiprimes {
+        my ($from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $to   = _any2mpz($$to)   // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $to   = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $from = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($to) < 0) {
+            $to = $ZERO;
+        }
+
+#<<<
+        my @semiprimes = map {
+            ref($_) ? (bless \$_) : _set_int($_)
+        } @{_sieve_almost_primes($from, $to, 2)};
+#>>>
+
+        Sidef::Types::Array::Array->new(\@semiprimes);
+    }
+
+    sub semiprimes_each {
+        my ($from, $to, $block) = @_;
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        _generic_each($from, $to, $block, sub { 5e6 }, sub { _sieve_almost_primes($_[0], $_[1], 2) });
+    }
+
+    *each_semiprime = \&semiprimes_each;
+
     sub _sieve_squarefree {
         my ($from, $to) = @_;
 
