@@ -235,4 +235,17 @@ assert_eq(2.almost_primes(50, 106).len, 2.almost_primepi(50, 106))
 assert_eq(3.almost_primes(50, 106).len, 3.almost_primepi(50, 106))
 assert_eq(3.almost_primes(49, 105).len, 3.almost_primepi(49, 105))
 
+assert_eq(2.powerful(50, 100).len, 2.powerful_count(50, 100))
+assert_eq(2.powerful(10, 106).len, 2.powerful_count(10, 106))
+assert_eq(2.powerful(50, 106).len, 2.powerful_count(50, 106))
+assert_eq(3.powerful(50, 106).len, 3.powerful_count(50, 106))
+assert_eq(3.powerful(49, 105).len, 3.powerful_count(49, 105))
+
+assert_eq(2.powerful(1e6-2e3, 1e6), range(1e6-2e3, 1e6).grep{.is_powerful})
+assert_eq(2.powerful(1e6-1e4, 1e6), range(1e6-1e4, 1e6).grep{.is_powerful})
+
+assert_eq(2.powerful(1e6-2e3, 1e6).len, 2.powerful_count(1e6-2e3, 1e6))
+assert_eq(2.powerful(1e6-1e4, 1e6).len, 2.powerful_count(1e6-1e4, 1e6))
+assert_eq(3.powerful(1e6-1e5, 1e6).len, 3.powerful_count(1e6-1e5, 1e6))
+
 say "** Tests passed!"

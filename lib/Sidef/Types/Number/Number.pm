@@ -15272,7 +15272,16 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_div($t, $to, $m);
                 Math::GMPz::Rmpz_root($t, $t, $r);
 
-                foreach my $v (1 .. $t) {
+                my $lo = 1;
+                my $hi = Math::GMPz::Rmpz_get_ui($t);
+
+                if ($r <= $k and Math::GMPz::Rmpz_cmp($from, $m) > 0) {
+                    Math::GMPz::Rmpz_cdiv_q($t, $from, $m);
+                    Math::GMPz::Rmpz_root($t, $t, $r);
+                    $lo = Math::GMPz::Rmpz_get_ui($t);
+                }
+
+                foreach my $v ($lo .. $hi) {
 
                     if ($r > $k) {
                         (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
@@ -16747,13 +16756,20 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub powerful_count {    # count of k-powerful numbers <= n
-        my ($n, $k) = @_;
+    sub powerful_count {    # count of k-powerful numbers
+        my ($k, $from, $to) = @_;
 
-        $n = _any2mpz($$n) // return ZERO;
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            return $k->powerful_count($to)->sub($k->powerful_count($from->dec));
+        }
+
+        my $n = _any2mpz($$from) // return ZERO;
         Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
-        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return ZERO } : 2;
+        $k = _any2ui($$k) // return ZERO;
 
         my $t     = Math::GMPz::Rmpz_init();
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
