@@ -227,4 +227,12 @@ assert_eq(
     10..100 `by` 3 -> grep { .is_semiprime }
 )
 
+# Counting methods
+
+assert_eq(2.almost_primes(50, 100).len, 2.almost_primepi(50, 100))
+assert_eq(2.almost_primes(10, 106).len, 2.almost_primepi(10, 106))
+assert_eq(2.almost_primes(50, 106).len, 2.almost_primepi(50, 106))
+assert_eq(3.almost_primes(50, 106).len, 3.almost_primepi(50, 106))
+assert_eq(3.almost_primes(49, 105).len, 3.almost_primepi(49, 105))
+
 say "** Tests passed!"

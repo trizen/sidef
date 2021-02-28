@@ -10331,20 +10331,25 @@ package Sidef::Types::Number::Number {
     *primepi_upper = \&prime_count_upper;
 
     sub almost_prime_count {
-        my ($n, $k) = @_;
+        my ($k, $from, $to) = @_;
 
-        my $v = _big2uistr($n) // return ZERO;
+        _valid(\$from);
 
-        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return ZERO } : 2;
+        if (defined($to)) {
+            _valid(\$to);
+            return $k->almost_prime_count($to)->sub($k->almost_prime_count($from->dec));
+        }
+
+        $k = _any2ui($$k) // return ZERO;
 
         if ($k == 0) {
             return ONE;
         }
         elsif ($k == 1) {
-            return $_[0]->prime_count;
+            return $_[1]->prime_count;
         }
         elsif ($k == 2) {
-            return $_[0]->semiprime_count;
+            return $_[1]->semiprime_count;
         }
 
         state $pi_k_lookup = {
@@ -10545,6 +10550,8 @@ package Sidef::Types::Number::Number {
                   },
         };
 
+        my $v = _big2uistr($from) // return ZERO;
+
         if (exists($pi_k_lookup->{$k}) and defined(my $count = $pi_k_lookup->{$k}{$v})) {
             return _set_int($count);
         }
@@ -10552,7 +10559,7 @@ package Sidef::Types::Number::Number {
         state $t = Math::GMPz::Rmpz_init_nobless();
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
-        $n = _any2mpz($$n) // return ZERO;
+        my $n = _any2mpz($$from) // return ZERO;
 
         sub {
             my ($m, $p, $r) = @_;
