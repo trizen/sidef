@@ -6289,6 +6289,62 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([map { $_ ? ONE : ZERO } split(//, $bin)]);
     }
 
+    sub expnorm {
+        my ($n, $base) = @_;
+
+        $n = _any2mpfr_mpc($$n) // goto &nan;
+
+        if (defined($base)) {
+            _valid(\$base);
+            $base = _any2ui($$base) // goto &nan;
+            $base > 1 or goto &nan;
+        }
+        else {
+            $base = 10;
+        }
+
+        my $log = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPFR::Rmpfr_set_ui($log, $base, $ROUND);
+        Math::MPFR::Rmpfr_log($log, $log, $ROUND);
+
+        if (ref($n) eq 'Math::MPFR') {
+
+            my $exp = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+            Math::MPFR::Rmpfr_div($exp, $n, $log, $ROUND);
+            Math::MPFR::Rmpfr_floor($exp, $exp);
+            Math::MPFR::Rmpfr_add_ui($exp, $exp, 1, $ROUND);
+            Math::MPFR::Rmpfr_mul($exp, $exp, $log, $ROUND);
+            Math::MPFR::Rmpfr_sub($exp, $n, $exp, $ROUND);
+            Math::MPFR::Rmpfr_exp($exp, $exp, $ROUND);
+
+            return bless \$exp;
+        }
+
+        my $exp = Math::MPC::Rmpc_init2(CORE::int($PREC));
+
+        Math::MPC::Rmpc_div_fr($exp, $n, $log, $ROUND);
+
+        my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPC::RMPC_RE($real, $exp);
+        Math::MPC::RMPC_IM($imag, $exp);
+
+        Math::MPFR::Rmpfr_floor($real, $real);
+        Math::MPFR::Rmpfr_floor($imag, $imag);
+
+        Math::MPC::Rmpc_set_fr_fr($exp, $real, $imag, $ROUND);
+
+        Math::MPC::Rmpc_add_ui($exp, $exp, 1, $ROUND);
+        Math::MPC::Rmpc_mul_fr($exp, $exp, $log, $ROUND);
+        Math::MPC::Rmpc_sub($exp, $n, $exp, $ROUND);
+        Math::MPC::Rmpc_exp($exp, $exp, $ROUND);
+
+        bless \$exp;
+    }
+
     sub digits {
         my ($n, $k) = @_;
 

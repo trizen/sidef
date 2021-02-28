@@ -1786,6 +1786,14 @@ Aliases: I<powmod>
 
 =cut
 
+=head2 expnorm
+
+Number.expnorm() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 factor
 
 Number.factor() -> I<Obj>

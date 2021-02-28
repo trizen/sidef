@@ -39,8 +39,7 @@ package Sidef::Object::Object {
         if (CORE::ref($obj1) eq CORE::ref($obj2)) {
             if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
                 if (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz') {
-                    @_ = ($$obj1, $$obj2);
-                    goto &Math::GMPz::Rmpz_cmp;
+                    return Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
                 }
             }
             elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
