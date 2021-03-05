@@ -27,4 +27,18 @@ do {
     assert_eq(arr, {.is_composite}.first(20))
 }
 
+assert_eq(composite_count(1, 100), composite_count(100))
+assert_eq(composite_count(0, 100), 74)
+assert_eq(composite_count(0, 101), 74)
+assert_eq(composite_count(3, 100), 74)
+assert_eq(composite_count(4, 100), 74)
+assert_eq(composite_count(4, 101), 74)
+assert_eq(composite_count(5, 100), 73)
+assert_eq(composite_count(6, 100), 73)
+assert_eq(composite_count(6, 101), 73)
+assert_eq(composite_count(7, 101), 72)
+
+assert_eq(composite_count(123, 1234), 123..1234 -> count { .is_composite })
+assert_eq(composite_count(1234, 12345), 1234..12345 -> count { .is_composite })
+
 say "** Test passed!"

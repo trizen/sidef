@@ -10835,15 +10835,27 @@ package Sidef::Types::Number::Number {
     *prime = \&nth_prime;
 
     sub composite_count {
-        my ($n) = @_;
-        $n->sub($n->prime_count)->dec;    # n - pi(n) - 1
+        my ($from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return $to->composite_count->sub($from->dec->composite_count);
+        }
+
+        my $n = _any2mpz($$from) // goto &nan;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 3) >= 0
+          or return ZERO;
+
+        my $pi = _set_int(_prime_count(Math::GMPz::Rmpz_get_str($n, 10)));
+        bless \__dec__(__sub__($n, $$pi));    # n - pi(n) - 1
     }
 
     sub nth_composite {
         my ($n) = @_;
         $n = _any2ui($$n) // goto &nan;
 
-        return ONE         if ($n == 0);    # not composite, but...
+        return ONE         if ($n == 0);      # not composite, but...
         return _set_int(4) if ($n == 1);
 
         # Lower and upper bounds from A002808 (for n >= 4).

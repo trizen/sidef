@@ -222,11 +222,31 @@ Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
+=head2 a
+
+Gauss.a() -> I<Obj>
+
+Return the
+
+Aliases: I<re>, I<real>
+
+=cut
+
 =head2 abs
 
 Gauss.abs() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 b
+
+Gauss.b() -> I<Obj>
+
+Return the
+
+Aliases: I<im>, I<imag>
 
 =cut
 
@@ -299,16 +319,6 @@ Return the
 Gauss.iabs() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 im
-
-Gauss.im() -> I<Obj>
-
-Return the
-
-Aliases: I<imag>
 
 =cut
 
@@ -423,16 +433,6 @@ Return the
 Gauss.powmod() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 re
-
-Gauss.re() -> I<Obj>
-
-Return the
-
-Aliases: I<real>
 
 =cut
 

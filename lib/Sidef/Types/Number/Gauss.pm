@@ -50,12 +50,14 @@ package Sidef::Types::Number::Gauss {
         $_[0]->{a};
     }
 
+    *a    = \&re;
     *real = \&re;
 
     sub im {
         $_[0]->{b};
     }
 
+    *b    = \&im;
     *imag = \&im;
 
     sub reals {
