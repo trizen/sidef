@@ -12466,6 +12466,30 @@ package Sidef::Types::Number::Number {
 
     *nprimes = \&n_primes;
 
+    sub n_composites {
+        my ($n, $start) = @_;
+
+        $n = _any2ui($$n) // return Sidef::Types::Array::Array->new;
+
+        if (defined($start)) {
+            _valid(\$start);
+            $start = $start->dec->next_composite;
+        }
+        else {
+            $start = _set_int(4);
+        }
+
+        my @composites;
+
+        for (my $c = $start ; $n > 0 ; --$n, ($c = $c->next_composite)) {
+            push @composites, $c;
+        }
+
+        Sidef::Types::Array::Array->new(\@composites);
+    }
+
+    *ncomposites = \&n_composites;
+
     sub pn_primes {
         my ($x, $y) = @_;
 

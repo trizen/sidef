@@ -3560,6 +3560,16 @@ Return the
 
 =cut
 
+=head2 n_composites
+
+Number.n_composites() -> I<Obj>
+
+Return the
+
+Aliases: I<ncomposites>
+
+=cut
+
 =head2 nd
 
 Number.nd() -> I<Obj>

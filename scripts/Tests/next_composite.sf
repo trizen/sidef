@@ -41,4 +41,8 @@ assert_eq(composite_count(7, 101), 72)
 assert_eq(composite_count(123, 1234), 123..1234 -> count { .is_composite })
 assert_eq(composite_count(1234, 12345), 1234..12345 -> count { .is_composite })
 
+assert_eq(n_composites(10),    [4, 6, 8, 9, 10, 12, 14, 15, 16, 18])
+assert_eq(n_composites(5, 50), [50, 51, 52, 54, 55])
+assert_eq(n_composites(5, 53), [54, 55, 56, 57, 58])
+
 say "** Test passed!"
