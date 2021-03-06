@@ -4592,6 +4592,14 @@ Return the
 
 =cut
 
+=head2 squarefree_omega_numbers
+
+Number.squarefree_omega_numbers() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 squarefree_sigma
 
 Number.squarefree_sigma() -> I<Obj>
