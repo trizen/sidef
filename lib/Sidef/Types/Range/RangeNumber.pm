@@ -341,6 +341,24 @@ package Sidef::Types::Range::RangeNumber {
         $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_squarefree }));
     }
 
+    sub semiprimes {
+        my ($self) = @_;
+
+        if ($self->{step}->abs->is_one) {
+
+            my $left  = Sidef::Types::Number::Number->new($self->{from});
+            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+            if ($self->{step}->is_neg) {
+                return Sidef::Types::Number::Number::semiprimes($right, $left)->flip;
+            }
+
+            return Sidef::Types::Number::Number::semiprimes($left, $right);
+        }
+
+        $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_semiprime }));
+    }
+
     sub each_prime {
         my ($self, $block) = @_;
 

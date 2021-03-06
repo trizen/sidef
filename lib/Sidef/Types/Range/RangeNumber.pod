@@ -189,6 +189,14 @@ Return the
 
 =cut
 
+=head2 semiprimes
+
+RangeNumber.semiprimes() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 squarefree
 
 RangeNumber.squarefree() -> I<Obj>
