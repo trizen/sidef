@@ -10844,7 +10844,7 @@ package Sidef::Types::Number::Number {
 
         my $n = _any2mpz($$from) // goto &nan;
 
-        Math::GMPz::Rmpz_cmp_ui($n, 3) >= 0
+        Math::GMPz::Rmpz_cmp_ui($n, 4) >= 0
           or return ZERO;
 
         my $pi = _set_int(_prime_count(Math::GMPz::Rmpz_get_str($n, 10)));
