@@ -1692,6 +1692,16 @@ Aliases: I<squarefree_each>
 
 =cut
 
+=head2 each_squarefree_almost_prime
+
+Number.each_squarefree_almost_prime() -> I<Obj>
+
+Return the
+
+Aliases: I<squarefree_almost_primes_each>
+
+=cut
+
 =head2 ecm_factor
 
 Number.ecm_factor() -> I<Obj>

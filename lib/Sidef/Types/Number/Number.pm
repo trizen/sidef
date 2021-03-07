@@ -15527,7 +15527,7 @@ package Sidef::Types::Number::Number {
             my $x = Math::GMPz::Rmpz_init();
 
             if ($squarefree) {
-                Math::GMPz::Rmpz_set_str(Math::Prime::Util::GMP::pn_primorial($k), 10);
+                Math::GMPz::Rmpz_set_str($t, Math::Prime::Util::GMP::pn_primorial($k), 10);
             }
             else {
                 Math::GMPz::Rmpz_setbit($t, $k);    # t = ipow(2, k)
@@ -15699,6 +15699,33 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Array::Array->new(\@squarefree_almost_primes);
     }
+
+    sub squarefree_almost_primes_each {
+        my ($k, $from, $to, $block) = @_;
+
+        _valid(\$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        _generic_each($from, $to, $block, sub { 1e7 }, sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1) });
+    }
+
+    *each_squarefree_almost_prime = \&squarefree_almost_primes_each;
 
     sub semiprimes {
         my ($from, $to) = @_;
