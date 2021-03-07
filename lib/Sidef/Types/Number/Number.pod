@@ -4574,6 +4574,14 @@ Return the
 
 =cut
 
+=head2 squarefree_almost_primes
+
+Number.squarefree_almost_primes() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 square_free_count
 
 Number.square_free_count() -> I<Obj>
@@ -4587,14 +4595,6 @@ Aliases: I<squarefree_count>
 =head2 squarefree_divisors
 
 Number.squarefree_divisors() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 squarefree_omega_numbers
-
-Number.squarefree_omega_numbers() -> I<Obj>
 
 Return the
 

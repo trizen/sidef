@@ -15406,7 +15406,7 @@ package Sidef::Types::Number::Number {
     *each_powerful = \&powerful_each;
 
     sub _sieve_almost_primes {
-        my ($from, $to, $k) = @_;
+        my ($from, $to, $k, %opt) = @_;
 
         return [1] if ($k == 0 and $to >= 1 and $from <= 1);
         return []  if ($k == 0);
@@ -15418,21 +15418,35 @@ package Sidef::Types::Number::Number {
             return [Math::Prime::Util::GMP::sieve_primes($from, $to)];
         }
 
+        my $squarefree = $opt{squarefree};
+
         if ($k == 2) {
             if (HAS_PRIME_UTIL) {
                 if (Math::GMPz::Rmpz_fits_ulong_p($to)) {
-                    return Math::Prime::Util::semi_primes(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+                    my $arr = Math::Prime::Util::semi_primes(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+                    $arr = [grep { Math::Prime::Util::is_square_free($_) } @$arr] if $squarefree;
+                    return $arr;
                 }
-                return Math::Prime::Util::semi_primes($from, $to);
+                my $arr = Math::Prime::Util::semi_primes($from, $to);
+                $arr = [grep { Math::Prime::Util::is_square_free($_) } @$arr] if $squarefree;
+                return $arr;
             }
         }
 
         my @almost_primes;
 
+        # TODO: optimization when A and B are close to each other.
+        # Idea: if A-B < sqrt(B), then just iterate over the range A..B and grep the k-almost primes.
+
         if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 #<<<
             Math::Prime::Util::foralmostprimes(sub {    # XXX: available in MPU > 0.73
-                push @almost_primes, $_;
+                if ($squarefree) {
+                    push(@almost_primes, $_) if Math::Prime::Util::is_square_free($_);
+                }
+                else {
+                    push(@almost_primes, $_);
+                }
             }, $k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
 #>>>
         }
@@ -15441,25 +15455,40 @@ package Sidef::Types::Number::Number {
             my $A = Math::GMPz::Rmpz_get_ui($from);
             my $B = Math::GMPz::Rmpz_get_ui($to);
 
-            $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::powint(2, $k));
+            if ($squarefree) {
+                $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
+            }
+            else {
+                $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::powint(2, $k));
+            }
 
             sub {
                 my ($m, $p, $k, $u, $v) = @_;
 
 #<<<
                 if ($k == 1) {
-                    Math::Prime::Util::forprimes(sub {
-                        push @almost_primes, $m * $_;
-                    }, $u, $v);
+                    if ($squarefree) {
+                        Math::Prime::Util::forprimes(sub {
+                            push(@almost_primes, $m * $_) if ($m % $_);
+                        }, $u, $v);
+                    }
+                    else {
+                        Math::Prime::Util::forprimes(sub {
+                            push(@almost_primes, $m * $_);
+                        }, $u, $v);
+                    }
                     return;
                 }
 #>>>
 
-                # TODO: more optimizations when A and B are close to each other
-
                 my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
                 while ($p <= $s) {
+
+                    if ($squarefree and $m % $p == 0) {
+                        $p = Math::Prime::Util::next_prime($p);
+                        next;
+                    }
 
                     my $t = $m * $p;
                     my $u =
@@ -15497,8 +15526,12 @@ package Sidef::Types::Number::Number {
             my $t = Math::GMPz::Rmpz_init_set_ui(0);
             my $x = Math::GMPz::Rmpz_init();
 
-            # t = ipow(2, k)
-            Math::GMPz::Rmpz_setbit($t, $k);
+            if ($squarefree) {
+                Math::GMPz::Rmpz_set_str(Math::Prime::Util::GMP::pn_primorial($k), 10);
+            }
+            else {
+                Math::GMPz::Rmpz_setbit($t, $k);    # t = ipow(2, k)
+            }
 
             # A = max(A, t)
             if (Math::GMPz::Rmpz_cmp($t, $A) > 0) {
@@ -15513,10 +15546,12 @@ package Sidef::Types::Number::Number {
                     foreach my $q (Math::Prime::Util::GMP::sieve_primes($u, $v)) {
 
                         if ($q < ULONG_MAX) {
+                            $squarefree and Math::GMPz::Rmpz_divisible_ui_p($m, $q) and next;
                             Math::GMPz::Rmpz_mul_ui($x, $m, $q);
                         }
                         else {
                             Math::GMPz::Rmpz_set_str($x, $q, 10);
+                            $squarefree and Math::GMPz::Rmpz_divisible_p($m, $x) and next;
                             Math::GMPz::Rmpz_mul($x, $x, $m);
                         }
 
@@ -15531,11 +15566,14 @@ package Sidef::Types::Number::Number {
                     return;
                 }
 
-                # TODO: more optimizations when A and B are close to each other
-
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
                 while ($p <= $s) {
+
+                    if ($squarefree and Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
+                        $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
+                        next;
+                    }
 
                     my $u = Math::GMPz::Rmpz_init();
 
@@ -15628,175 +15666,7 @@ package Sidef::Types::Number::Number {
 
     *each_almost_prime = \&almost_primes_each;
 
-    sub _sieve_squarefree_omega_numbers {
-        my ($from, $to, $k) = @_;
-
-        return [1] if ($k == 0 and $to >= 1 and $from <= 1);
-        return []  if ($k == 0);
-
-        if ($k == 1) {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-                return Math::Prime::Util::primes(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
-            }
-            return [Math::Prime::Util::GMP::sieve_primes($from, $to)];
-        }
-
-        if ($k == 2) {
-            if (HAS_PRIME_UTIL) {
-                if (Math::GMPz::Rmpz_fits_ulong_p($to)) {
-                    return [grep { Math::Prime::Util::is_square_free($_) }
-                            @{Math::Prime::Util::semi_primes(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to))}];
-                }
-                return [grep { Math::Prime::Util::is_square_free($_) } @{Math::Prime::Util::semi_primes($from, $to)}];
-            }
-        }
-
-        my @squarefree_omega_numbers;
-
-        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-#<<<
-            Math::Prime::Util::foralmostprimes(sub {    # XXX: available in MPU > 0.73
-                push(@squarefree_omega_numbers, $_) if Math::Prime::Util::is_square_free($_);
-            }, $k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
-#>>>
-        }
-        elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-
-            my $A = Math::GMPz::Rmpz_get_ui($from);
-            my $B = Math::GMPz::Rmpz_get_ui($to);
-
-            $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
-
-            sub {
-                my ($m, $p, $k, $u, $v) = @_;
-
-#<<<
-                if ($k == 1) {
-                    Math::Prime::Util::forprimes(sub {
-                        push(@squarefree_omega_numbers, $m * $_) if ($m%$_);
-                    }, $u, $v);
-                    return;
-                }
-#>>>
-
-                my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
-
-                while ($p <= $s) {
-
-                    if ($m % $p == 0) {
-                        $p = Math::Prime::Util::next_prime($p);
-                        next;
-                    }
-
-                    my $t = $m * $p;
-                    my $u =
-                      defined(&Math::Prime::Util::divint)
-                      ? Math::Prime::Util::divint($A, $t)
-                      : Math::Prime::Util::GMP::divint($A, $t);
-                    my $v =
-                      defined(&Math::Prime::Util::divint)
-                      ? Math::Prime::Util::divint($B, $t)
-                      : Math::Prime::Util::GMP::divint($B, $t);
-
-                    ++$u if ($t * $u < $A);
-
-                    # Optimization for tight ranges
-                    if ($u > $v) {
-                        $p = Math::Prime::Util::next_prime($p);
-                        next;
-                    }
-
-                    $u = $p if ($k == 2 and $p > $u);
-
-                    __SUB__->($t, $p, $k - 1, ($k == 2) ? ($u, $v) : ());
-                    $p = Math::Prime::Util::next_prime($p);
-                }
-              }
-              ->(1, 2, $k);
-
-            @squarefree_omega_numbers = sort { $a <=> $b } @squarefree_omega_numbers;
-        }
-        else {
-
-            my $A = Math::GMPz::Rmpz_init_set($from);
-            my $B = Math::GMPz::Rmpz_init_set($to);
-
-            my $x = Math::GMPz::Rmpz_init();
-            my $t = Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::pn_primorial($k), 10);
-
-            # A = max(A, t)
-            if (Math::GMPz::Rmpz_cmp($t, $A) > 0) {
-                Math::GMPz::Rmpz_set($A, $t);
-            }
-
-            sub {
-                my ($m, $p, $k, $u, $v) = @_;
-
-                if ($k == 1) {
-
-                    foreach my $q (Math::Prime::Util::GMP::sieve_primes($u, $v)) {
-
-                        if ($q < ULONG_MAX) {
-                            Math::GMPz::Rmpz_divisible_ui_p($m, $q) && next;
-                            Math::GMPz::Rmpz_mul_ui($x, $m, $q);
-                        }
-                        else {
-                            Math::GMPz::Rmpz_set_str($x, $q, 10);
-                            Math::GMPz::Rmpz_divisible_p($m, $x) && next;
-                            Math::GMPz::Rmpz_mul($x, $x, $m);
-                        }
-
-                        push @squarefree_omega_numbers,
-                          (
-                              Math::GMPz::Rmpz_fits_ulong_p($x)
-                            ? Math::GMPz::Rmpz_get_ui($x)
-                            : Math::GMPz::Rmpz_init_set($x)
-                          );
-                    }
-
-                    return;
-                }
-
-                my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
-
-                while ($p <= $s) {
-
-                    if (Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
-                        $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
-                        next;
-                    }
-
-                    my $u = Math::GMPz::Rmpz_init();
-
-                    Math::GMPz::Rmpz_mul_ui($u, $m, $p);
-                    Math::GMPz::Rmpz_cdiv_q($t, $A, $u);
-                    Math::GMPz::Rmpz_div($x, $B, $u);
-
-                    # Optimization for tight ranges
-                    if (Math::GMPz::Rmpz_cmp($t, $x) > 0) {
-                        $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
-                        next;
-                    }
-
-                    # t = max(t, p)
-                    if ($k == 2 and Math::GMPz::Rmpz_cmp_ui($t, $p) < 0) {
-                        Math::GMPz::Rmpz_set_ui($t, $p);
-                    }
-
-                    __SUB__->($u, $p, $k - 1,
-                              ($k == 2) ? (Math::GMPz::Rmpz_get_str($t, 10), Math::GMPz::Rmpz_get_str($x, 10)) : ());
-                    $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
-                }
-              }
-              ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
-
-            @squarefree_omega_numbers = sort { $a <=> $b } @squarefree_omega_numbers;
-        }
-
-        return \@squarefree_omega_numbers;
-    }
-
-    sub squarefree_omega_numbers {
+    sub squarefree_almost_primes {
         my ($k, $from, $to) = @_;
 
         _valid(\$from);
@@ -15822,12 +15692,12 @@ package Sidef::Types::Number::Number {
         }
 
 #<<<
-        my @squarefree_omega_numbers = map {
+        my @squarefree_almost_primes = map {
             ref($_) ? (bless \$_) : _set_int($_)
-        } @{_sieve_squarefree_omega_numbers($from, $to, $k)};
+        } @{_sieve_almost_primes($from, $to, $k, squarefree => 1)};
 #>>>
 
-        Sidef::Types::Array::Array->new(\@squarefree_omega_numbers);
+        Sidef::Types::Array::Array->new(\@squarefree_almost_primes);
     }
 
     sub semiprimes {

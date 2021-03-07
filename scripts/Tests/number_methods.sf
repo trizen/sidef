@@ -119,25 +119,25 @@ for k in (0..10) {
 
     assert_eq(k.almost_primes(1000), 1..1000 -> grep { .is_almost_prime(k) })
     assert_eq(gather { k.almost_primes_each(1000, { take(_) }) }, k.almost_primes(1000))
-    assert_eq(k.squarefree_omega_numbers(1000), k.almost_primes(1, 1000).grep{.is_squarefree})
+    assert_eq(k.squarefree_almost_primes(1000), k.almost_primes(1, 1000).grep{.is_squarefree})
 
     var from = 1000.irand
     var upto = from+1000.irand
 
     assert_eq(k.almost_primes(from, upto), from..upto -> grep { .is_almost_prime(k) })
     assert_eq(gather { k.almost_primes_each(from, upto, { take(_) }) }, k.almost_primes(from, upto))
-    assert_eq(k.squarefree_omega_numbers(from, upto), k.almost_primes(from, upto).grep{.is_squarefree})
+    assert_eq(k.squarefree_almost_primes(from, upto), k.almost_primes(from, upto).grep{.is_squarefree})
 }
 
 if (Number.HAS_PRIME_UTIL) {
     with (2**65) {|n|
 
         assert_eq(1.almost_primes(n, n+100), range(n, n+100).grep{.is_prime})
-        assert_eq(1.squarefree_omega_numbers(n, n+100), range(n, n+100).grep{.is_prime})
+        assert_eq(1.squarefree_almost_primes(n, n+100), range(n, n+100).grep{.is_prime})
         assert_eq(gather { 1.almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).grep{.is_almost_prime(1)})
 
         assert_eq(2.almost_primes(n, n+100), range(n, n+100).grep{.is_semiprime})
-        assert_eq(2.squarefree_omega_numbers(n, n+100), range(n, n+100).grep{.is_squarefree && .is_semiprime})
+        assert_eq(2.squarefree_almost_primes(n, n+100), range(n, n+100).grep{.is_squarefree && .is_semiprime})
         assert_eq(gather { 2.almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).grep{.is_almost_prime(2)})
     }
 }
