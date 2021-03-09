@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 key
 
-Pair.key() -> I<Obj>
+    Pair.key()
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<first>
 
 =head2 new
 
-Pair.new() -> I<Obj>
+    Pair.new()
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<call>
 
 =head2 swap
 
-Pair.swap() -> I<Obj>
+    Pair.swap()
 
 Return the
 
@@ -52,7 +52,7 @@ Return the
 
 =head2 to_a
 
-Pair.to_a() -> I<Obj>
+    Pair.to_a()
 
 Return the
 
@@ -62,7 +62,7 @@ Aliases: I<to_array>
 
 =head2 to_h
 
-Pair.to_h() -> I<Obj>
+    Pair.to_h()
 
 Return the
 
@@ -72,7 +72,7 @@ Aliases: I<to_hash>
 
 =head2 to_s
 
-Pair.to_s() -> I<Obj>
+    Pair.to_s()
 
 Return the
 
@@ -82,7 +82,7 @@ Aliases: I<dump>, I<to_str>
 
 =head2 value
 
-Pair.value() -> I<Obj>
+    Pair.value()
 
 Return the
 

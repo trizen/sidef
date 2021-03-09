@@ -316,7 +316,7 @@ Aliases: I<catalan_G>
 
 =head2 Y
 
-Number.Y() -> I<Obj>
+    Number.Y()
 
 Return the
 
@@ -326,7 +326,7 @@ Aliases: I<γ>, I<euler_gamma>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    I<Obj> B<|> I<Obj>
 
 Return the
 
@@ -336,7 +336,7 @@ Aliases: I<or>
 
 =head2 ~
 
-I<Obj> B<~> I<Obj> -> I<Obj>
+    I<Obj> B<~> I<Obj>
 
 Return the
 
@@ -346,7 +346,7 @@ Aliases: I<not>
 
 =head2 Γ
 
-Number.Γ() -> I<Obj>
+    Number.Γ()
 
 Return the
 
@@ -356,7 +356,7 @@ Aliases: I<gamma>
 
 =head2 δ
 
-Number.δ(b) -> I<Obj>
+    δ(a,b)
 
 The Kronecker delta function, which returns 1 iff `a==b` and 0 otherwise.
 
@@ -366,7 +366,7 @@ Aliases: I<kronecker_delta>
 
 =head2 ζ
 
-Number.ζ() -> I<Obj>
+    Number.ζ()
 
 Return the
 
@@ -376,7 +376,7 @@ Aliases: I<zeta>
 
 =head2 η
 
-Number.η() -> I<Obj>
+    Number.η()
 
 Return the
 
@@ -386,7 +386,7 @@ Aliases: I<eta>
 
 =head2 μ
 
-Number.μ() -> I<Obj>
+    Number.μ()
 
 Return the
 
@@ -396,7 +396,8 @@ Aliases: I<mu>, I<mobius>, I<möbius>, I<moebius>
 
 =head2 Π
 
-Number.Π(...) -> I<Obj>
+    Π(...)
+    prod(...)
 
 Return the product of a given list of numbers.
 
@@ -406,10 +407,11 @@ Aliases: I<prod>
 
 =head2 π
 
-Number.π() -> I<Obj>
-Number.π(m) -> I<Obj>
+    π(n)
+    π(a,b)
+    Num.π
 
-Return the PI numerical value:
+Returns the PI numerical value:
 
     say Num.pi      #=> 3.1415...
 
@@ -418,7 +420,7 @@ When applied on a Number object (as C<n.pi> or C<pi(n)>), it returns the number 
     say 100.pi      #=> number of primes <= 100
     say pi(100)     #=> 25
 
-When an additional argument is given, it returns the number of primes in the range n..m:
+When an additional argument is given, it returns the number of primes in the range a..b:
 
     say pi(50, 100)     # number of primes in the range 50..100
 
@@ -428,7 +430,8 @@ Aliases: I<pi>
 
 =head2 Σ
 
-Number.Σ(...) -> I<Obj>
+    Σ(...)
+    sum(...)
 
 Return the sum of a given list of numbers.
 
@@ -438,7 +441,7 @@ Aliases: I<sum>
 
 =head2 σ
 
-Number.σ() -> I<Obj>
+    Number.σ()
 
 Return the
 
@@ -448,7 +451,7 @@ Aliases: I<sigma>
 
 =head2 τ
 
-Number.τ() -> I<Obj>
+    Number.τ()
 
 Return the
 
@@ -458,7 +461,7 @@ Aliases: I<tau>
 
 =head2 φ
 
-Number.φ() -> I<Obj>
+    Number.φ()
 
 Return the
 
@@ -468,7 +471,7 @@ Aliases: I<phi>
 
 =head2 Ψ
 
-Number.Ψ() -> I<Obj>
+    Number.Ψ()
 
 Return the
 
@@ -478,7 +481,7 @@ Aliases: I<digamma>
 
 =head2 Ω
 
-Number.Ω() -> I<Obj>
+    Number.Ω()
 
 Return the
 
@@ -488,7 +491,7 @@ Aliases: I<bigomega>, I<prime_power_sigma0>
 
 =head2 ω
 
-Number.ω() -> I<Obj>
+    Number.ω()
 
 Return the
 
@@ -498,7 +501,7 @@ Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
 
 =head2 ≅
 
-I<Obj> B<≅> I<Obj> -> I<Obj>
+    I<Obj> B<≅> I<Obj>
 
 Return the
 
@@ -508,7 +511,7 @@ Aliases: I<=~=>, I<approx_eq>
 
 =head2 ≠
 
-I<Obj> B<≠> I<Obj> -> I<Obj>
+    I<Obj> B<≠> I<Obj>
 
 Return the
 
@@ -518,7 +521,7 @@ Aliases: I<!=>, I<ne>
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    I<Obj> B<≤> I<Obj>
 
 Return the
 
@@ -528,7 +531,7 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    I<Obj> B<≥> I<Obj>
 
 Return the
 
@@ -546,7 +549,7 @@ Absolute value of C<n>.
 
 =head2 abundancy
 
-Number.abundancy() -> I<Obj>
+    Number.abundancy()
 
 Return the
 
@@ -556,7 +559,7 @@ Aliases: I<abundancy_index>
 
 =head2 acmp
 
-Number.acmp() -> I<Obj>
+    Number.acmp()
 
 Return the
 
@@ -612,7 +615,7 @@ Inverse hyperbolic cosecant of C<n>.
 
 =head2 addmod
 
-Number.addmod(b, m) -> I<Number>
+    addmod(a, b, m)
 
 Returns C<(a+b) % m>.
 
@@ -643,7 +646,7 @@ Aliases: I<airy>
 
 =head2 all_composite
 
-Number.all_composite(...) -> I<Obj>
+    all_composite(...)
 
 Returns true if all the given values are composite positive integers, by checking first for small factors, then running a B-PSW primality test.
 
@@ -651,7 +654,7 @@ Returns true if all the given values are composite positive integers, by checkin
 
 =head2 all_prime
 
-Number.all_prime(...) -> I<Obj>
+    all_prime(...)
 
 Returns true if all the given values are prime numbers.
 
@@ -661,8 +664,8 @@ This is done by first running a primality pre-test on all values and returning e
 
 =head2 almost_primes
 
-k.almost_primes(n) -> I<Obj>
-k.almost_primes(a,b) -> I<Obj>
+k.almost_primes(n)
+k.almost_primes(a,b)
 
 Return an array with the k-almost primes <= n, or in the range a..b.
 
@@ -1005,7 +1008,7 @@ Aliases: I<getbit>, I<testbit>
 
 =head2 bits
 
-Number.bits() -> I<Obj>
+    n.bits()
 
 Returns the binary digits of n.
 
@@ -1097,7 +1100,8 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<n
 
 =head2 bsearch_max
 
-Number.bsearch_max(b, {...}) -> I<Obj>
+    bsearch_max(n, {...})
+    bsearch_max(a,b, {...})
 
 Binary search, returning the minimum integer value in the range a..b that satisifes the given comparison function.
 
@@ -1113,7 +1117,8 @@ where:
 
 =head2 bsearch_min
 
-Number.bsearch_min(b, {...}) -> I<Obj>
+    bsearch_min(n, {...})
+    bsearch_min(a,b, {...})
 
 Binary search, returning the minimum integer value in the range a..b that satisifes the given comparison function.
 
@@ -1129,7 +1134,8 @@ where:
 
 =head2 bsearch_solve
 
-Number.bsearch_solve() -> I<Obj>
+    bsearch_solve(n, {...})
+    bsearch_solve(a,b, {...})
 
 It computes the inverse of any continuous function, given the range that includes the inverse value.
 
@@ -1156,7 +1162,7 @@ Aliases: I<bsearch_inverse>
 
 =head2 by
 
-Number.by() -> I<Obj>
+    Number.by()
 
 Return the
 
@@ -1166,7 +1172,7 @@ Aliases: I<first>
 
 =head2 cadd
 
-Number.cadd() -> I<Obj>
+    Number.cadd()
 
 Return the
 
@@ -1195,7 +1201,7 @@ Cube root of C<n>.
 
 =head2 cdiv
 
-Number.cdiv() -> I<Obj>
+    Number.cdiv()
 
 Return the
 
@@ -1281,7 +1287,7 @@ Example:
 
 =head2 cinv
 
-Number.cinv() -> I<Obj>
+    Number.cinv()
 
 Return the
 
@@ -1291,7 +1297,7 @@ Aliases: I<complex_inv>
 
 =head2 cinvmod
 
-Number.cinvmod() -> I<Obj>
+    Number.cinvmod()
 
 Return the
 
@@ -1301,7 +1307,7 @@ Aliases: I<complex_invmod>
 
 =head2 circular_permutations
 
-Number.circular_permutations() -> I<Obj>
+    Number.circular_permutations()
 
 Return the
 
@@ -1309,7 +1315,7 @@ Return the
 
 =head2 cis
 
-Number.cis() -> I<Obj>
+    Number.cis()
 
 Return the
 
@@ -1317,7 +1323,7 @@ Return the
 
 =head2 clearbit
 
-Number.clearbit() -> I<Obj>
+    Number.clearbit()
 
 Return the
 
@@ -1325,7 +1331,7 @@ Return the
 
 =head2 cmod
 
-Number.cmod() -> I<Obj>
+    Number.cmod()
 
 Return the
 
@@ -1335,7 +1341,7 @@ Aliases: I<complex_mod>
 
 =head2 cmul
 
-Number.cmul() -> I<Obj>
+    Number.cmul()
 
 Return the
 
@@ -1345,7 +1351,7 @@ Aliases: I<complex_mul>
 
 =head2 combinations
 
-Number.combinations() -> I<Obj>
+    Number.combinations()
 
 Return the
 
@@ -1353,7 +1359,7 @@ Return the
 
 =head2 combinations_with_repetition
 
-Number.combinations_with_repetition() -> I<Obj>
+    Number.combinations_with_repetition()
 
 Return the
 
@@ -1361,7 +1367,7 @@ Return the
 
 =head2 commify
 
-Number.commify() -> I<Obj>
+    Number.commify()
 
 Return the
 
@@ -1369,7 +1375,7 @@ Return the
 
 =head2 complex
 
-Number.complex() -> I<Obj>
+    Number.complex()
 
 Return the
 
@@ -1377,7 +1383,7 @@ Return the
 
 =head2 complex_cmp
 
-Number.complex_cmp() -> I<Obj>
+    Number.complex_cmp()
 
 Return the
 
@@ -1385,7 +1391,7 @@ Return the
 
 =head2 complex_ipow
 
-Number.complex_ipow() -> I<Obj>
+    Number.complex_ipow()
 
 Return the
 
@@ -1393,7 +1399,7 @@ Return the
 
 =head2 composite
 
-Number.composite() -> I<Obj>
+    n.composite()
 
 Return the n-th composite number (OEIS: A002808).
 
@@ -1407,8 +1413,8 @@ Aliases: I<nth_composite>
 
 =head2 composite_count
 
-composite_count(n) -> I<Obj>
-composite_count(a,b) -> I<Obj>
+composite_count(n)
+composite_count(a,b)
 
 Returns the number of composite numbers <= n, or in the range a..b.
 
@@ -1421,7 +1427,7 @@ Example:
 
 =head2 conj
 
-Number.conj() -> I<Obj>
+    Number.conj()
 
 Return the
 
@@ -1429,7 +1435,7 @@ Return the
 
 =head2 consecutive_lcm
 
-Number.consecutive_lcm() -> I<Obj>
+    Number.consecutive_lcm()
 
 Return the
 
@@ -1439,7 +1445,7 @@ Aliases: I<consecutive_integer_lcm>
 
 =head2 convergents
 
-Number.convergents() -> I<Obj>
+    Number.convergents()
 
 Return the
 
@@ -1447,7 +1453,7 @@ Return the
 
 =head2 core
 
-Number.core() -> I<Obj>
+    n.core()
 
 Squarefree part of n.
 
@@ -1461,7 +1467,7 @@ Similar to PARI/GP `core(n)` function.
 
 =head2 cos
 
-Number.cos() -> I<Obj>
+    Number.cos()
 
 Return the
 
@@ -1469,7 +1475,7 @@ Return the
 
 =head2 cosh
 
-Number.cosh() -> I<Obj>
+    Number.cosh()
 
 Return the
 
@@ -1477,7 +1483,7 @@ Return the
 
 =head2 cot
 
-Number.cot() -> I<Obj>
+    Number.cot()
 
 Return the
 
@@ -1485,7 +1491,7 @@ Return the
 
 =head2 coth
 
-Number.coth() -> I<Obj>
+    Number.coth()
 
 Return the
 
@@ -1493,7 +1499,7 @@ Return the
 
 =head2 cpow
 
-Number.cpow() -> I<Obj>
+    Number.cpow()
 
 Return the
 
@@ -1503,7 +1509,7 @@ Aliases: I<complex_pow>
 
 =head2 cpowmod
 
-Number.cpowmod() -> I<Obj>
+    Number.cpowmod()
 
 Return the
 
@@ -1513,7 +1519,7 @@ Aliases: I<complex_powmod>
 
 =head2 csc
 
-Number.csc() -> I<Obj>
+    Number.csc()
 
 Return the
 
@@ -1521,7 +1527,7 @@ Return the
 
 =head2 csch
 
-Number.csch() -> I<Obj>
+    Number.csch()
 
 Return the
 
@@ -1529,7 +1535,7 @@ Return the
 
 =head2 csub
 
-Number.csub() -> I<Obj>
+    Number.csub()
 
 Return the
 
@@ -1539,7 +1545,7 @@ Aliases: I<complex_sub>
 
 =head2 cyclotomic
 
-Number.cyclotomic() -> I<Obj>
+    Number.cyclotomic()
 
 Return the
 
@@ -1549,7 +1555,7 @@ Aliases: I<cyclotomic_polynomial>
 
 =head2 dconv
 
-Number.dconv(f,g) -> I<Obj>
+    n.dconv(f,g)
 
 Return the Dirichlet convolution of f and g.
 
@@ -1563,7 +1569,7 @@ Aliases: I<dirichlet_convolution>
 
 =head2 de
 
-Number.de() -> I<Obj>
+    Number.de()
 
 Return the
 
@@ -1573,7 +1579,7 @@ Aliases: I<denominator>
 
 =head2 defs
 
-Number.defs() -> I<Obj>
+    Number.defs()
 
 Return the
 
@@ -1581,7 +1587,7 @@ Return the
 
 =head2 deg2rad
 
-Number.deg2rad() -> I<Obj>
+    Number.deg2rad()
 
 Return the
 
@@ -1589,7 +1595,7 @@ Return the
 
 =head2 derangements
 
-Number.derangements() -> I<Obj>
+    Number.derangements()
 
 Return the
 
@@ -1599,7 +1605,7 @@ Aliases: I<complete_permutations>
 
 =head2 derivative
 
-Number.derivative() -> I<Obj>
+    Number.derivative()
 
 Return the
 
@@ -1609,7 +1615,7 @@ Aliases: I<arithmetic_derivative>
 
 =head2 digit
 
-Number.digit() -> I<Obj>
+    Number.digit()
 
 Return the
 
@@ -1617,7 +1623,7 @@ Return the
 
 =head2 digits
 
-Number.digits() -> I<Obj>
+    Number.digits()
 
 Return the
 
@@ -1625,7 +1631,7 @@ Return the
 
 =head2 digits2num
 
-Number.digits2num(digits...) -> I<Obj>
+    base.digits2num(digits...)
 
 Convert a list of digits to a number in the self base.
 
@@ -1641,7 +1647,7 @@ Aliases: I<from_digits>
 
 =head2 digits_sum
 
-Number.digits_sum() -> I<Obj>
+    Number.digits_sum()
 
 Return the
 
@@ -1651,7 +1657,7 @@ Aliases: I<sum_digits>, I<sumdigits>
 
 =head2 dirichlet_sum
 
-Number.dirichlet_sum(f, g, F, G) -> I<Obj>
+    n.dirichlet_sum(f, g, F, G)
 
 The method computes the following sum in O(sqrt(n)) steps:
 
@@ -1674,7 +1680,7 @@ Aliases: I<dirichlet_hyperbola>
 
 =head2 divides
 
-Number.divides() -> I<Obj>
+    Number.divides()
 
 Return the
 
@@ -1682,7 +1688,7 @@ Return the
 
 =head2 divisor_map
 
-Number.divisor_map() -> I<Obj>
+    Number.divisor_map()
 
 Return the
 
@@ -1690,7 +1696,7 @@ Return the
 
 =head2 divisor_prod
 
-Number.divisor_prod() -> I<Obj>
+    Number.divisor_prod()
 
 Return the
 
@@ -1700,7 +1706,7 @@ Aliases: I<divisors_prod>
 
 =head2 divisors
 
-Number.divisors() -> I<Obj>
+    Number.divisors()
 
 Return the
 
@@ -1708,7 +1714,7 @@ Return the
 
 =head2 divisor_sum
 
-Number.divisor_sum() -> I<Obj>
+    Number.divisor_sum()
 
 Return the
 
@@ -1718,7 +1724,8 @@ Aliases: I<divisors_sum>
 
 =head2 divmod
 
-Number.divmod(b, m) -> I<Obj>
+    divmod(a, b)
+    divmod(a, b, m)
 
 Returns C<(a/b) % m>.
 
@@ -1736,7 +1743,7 @@ Example:
 
 =head2 downto
 
-Number.downto() -> I<Obj>
+    Number.downto()
 
 Return the
 
@@ -1744,7 +1751,7 @@ Return the
 
 =head2 dump
 
-Number.dump() -> I<Obj>
+    Number.dump()
 
 Return the
 
@@ -1752,7 +1759,7 @@ Return the
 
 =head2 e
 
-Number.e() -> I<Obj>
+    Number.e()
 
 Return the
 
@@ -1760,8 +1767,8 @@ Return the
 
 =head2 each_almost_prime
 
-k.each_almost_prime(n, {...}) -> I<Obj>
-k.each_almost_prime(a,b, {...}) -> I<Obj>
+k.each_almost_prime(n, {...})
+k.each_almost_prime(a,b, {...})
 
 Iterates over the k-almost prime numbers <= n, or in the range a..b.
 
@@ -1776,7 +1783,7 @@ Aliases: I<almost_primes_each>
 
 =head2 each_powerful
 
-Number.each_powerful() -> I<Obj>
+    Number.each_powerful()
 
 Return the
 
@@ -1786,7 +1793,8 @@ Aliases: I<powerful_each>
 
 =head2 each_prime
 
-Number.each_prime(upto, {...}) -> I<Obj>
+    n.each_prime {...}
+    each_prime(a,b,{...})
 
 It efficiently iterates over the primes in the given range, using a segmented prime sieve.
 
@@ -1810,7 +1818,7 @@ Aliases: I<primes_each>
 
 =head2 each_semiprime
 
-Number.each_semiprime() -> I<Obj>
+    Number.each_semiprime()
 
 Return the
 
@@ -1820,8 +1828,8 @@ Aliases: I<semiprimes_each>
 
 =head2 each_squarefree
 
-Number.each_squarefree({...}) -> I<Obj>
-Number.each_squarefree(upto, {...}) -> I<Obj>
+    n.each_squarefree {...}
+    each_squarefree(a,b,{...})
 
 Iterates over the squarefree numbers in a given range.
 
@@ -1843,8 +1851,8 @@ Aliases: I<squarefree_each>
 
 =head2 each_squarefree_almost_prime
 
-k.each_squarefree_almost_prime(n, {...}) -> I<Obj>
-k.each_squarefree_almost_prime(a,b,{...}) -> I<Obj>
+k.each_squarefree_almost_prime(n, {...})
+k.each_squarefree_almost_prime(a,b,{...})
 
 Iterates over the squarefree k-almost primes <= n, or in the range a..b.
 
@@ -1862,9 +1870,9 @@ Aliases: I<squarefree_almost_primes_each>
 
 =head2 ecm_factor
 
-Number.ecm_factor() -> I<Obj>
-Number.ecm_factor(B) -> I<Obj>
-Number.ecm_factor(B,reps) -> I<Obj>
+    n.ecm_factor()
+    n.ecm_factor(B)
+    n.ecm_factor(B,reps)
 
 Hendrik Lenstra's elliptic curve factorization method (ECM).
 
@@ -1872,7 +1880,7 @@ Hendrik Lenstra's elliptic curve factorization method (ECM).
 
 =head2 ei
 
-Number.ei() -> I<Obj>
+    Number.ei()
 
 Return the
 
@@ -1882,7 +1890,7 @@ Aliases: I<eint>
 
 =head2 erf
 
-Number.erf() -> I<Obj>
+    Number.erf()
 
 Return the
 
@@ -1890,7 +1898,7 @@ Return the
 
 =head2 erfc
 
-Number.erfc() -> I<Obj>
+    Number.erfc()
 
 Return the
 
@@ -1898,7 +1906,7 @@ Return the
 
 =head2 euler
 
-Number.euler() -> I<Obj>
+    Number.euler()
 
 Return the
 
@@ -1908,7 +1916,7 @@ Aliases: I<euler_number>
 
 =head2 euler_polynomial
 
-Number.euler_polynomial() -> I<Obj>
+    Number.euler_polynomial()
 
 Return the
 
@@ -1916,7 +1924,7 @@ Return the
 
 =head2 exp
 
-Number.exp() -> I<Obj>
+    Number.exp()
 
 Return the
 
@@ -1924,7 +1932,7 @@ Return the
 
 =head2 exp10
 
-Number.exp10() -> I<Obj>
+    Number.exp10()
 
 Return the
 
@@ -1932,7 +1940,7 @@ Return the
 
 =head2 exp2
 
-Number.exp2() -> I<Obj>
+    Number.exp2()
 
 Return the
 
@@ -1940,7 +1948,7 @@ Return the
 
 =head2 exp_mangoldt
 
-Number.exp_mangoldt() -> I<Obj>
+    Number.exp_mangoldt()
 
 Return the
 
@@ -1948,7 +1956,7 @@ Return the
 
 =head2 expmod
 
-Number.expmod() -> I<Obj>
+    Number.expmod()
 
 Return the
 
@@ -1958,7 +1966,7 @@ Aliases: I<powmod>
 
 =head2 expnorm
 
-Number.expnorm() -> I<Obj>
+    Number.expnorm()
 
 Return the
 
@@ -1966,7 +1974,7 @@ Return the
 
 =head2 factor
 
-Number.factor() -> I<Obj>
+    Number.factor()
 
 Return the
 
@@ -1976,7 +1984,7 @@ Aliases: I<factors>
 
 =head2 factor_exp
 
-Number.factor_exp() -> I<Obj>
+    Number.factor_exp()
 
 Return the
 
@@ -1986,7 +1994,7 @@ Aliases: I<factors_exp>
 
 =head2 factorialmod
 
-Number.factorialmod() -> I<Obj>
+    Number.factorialmod()
 
 Return the
 
@@ -1994,7 +2002,7 @@ Return the
 
 =head2 factorial_power
 
-Number.factorial_power() -> I<Obj>
+    Number.factorial_power()
 
 Return the
 
@@ -2004,7 +2012,7 @@ Aliases: I<factorial_valuation>
 
 =head2 factorial_sum
 
-Number.factorial_sum() -> I<Obj>
+    n.factorial_sum()
 
 Left factorial of `n`.
 
@@ -2014,7 +2022,7 @@ Aliases: I<left_factorial>
 
 =head2 factor_map
 
-Number.factor_map() -> I<Obj>
+    Number.factor_map()
 
 Return the
 
@@ -2022,7 +2030,7 @@ Return the
 
 =head2 factor_prod
 
-Number.factor_prod() -> I<Obj>
+    Number.factor_prod()
 
 Return the
 
@@ -2032,7 +2040,7 @@ Aliases: I<factors_prod>
 
 =head2 factor_sum
 
-Number.factor_sum() -> I<Obj>
+    Number.factor_sum()
 
 Return the
 
@@ -2042,7 +2050,7 @@ Aliases: I<factors_sum>
 
 =head2 falling_factorial
 
-Number.falling_factorial() -> I<Obj>
+    Number.falling_factorial()
 
 Return the
 
@@ -2050,7 +2058,7 @@ Return the
 
 =head2 faulhaber
 
-Number.faulhaber() -> I<Obj>
+    Number.faulhaber()
 
 Return the
 
@@ -2060,7 +2068,7 @@ Aliases: I<faulhaber_sum>
 
 =head2 faulhaber_polynomial
 
-Number.faulhaber_polynomial(x) -> I<Obj>
+    faulhaber_polynomial(n,x)
 
 Computes the n-th Faulhaber polynomials evaluated on x.
 
@@ -2072,7 +2080,7 @@ Defined in terms of the Bernoulli polynomials, as:
 
 =head2 fermat_factor
 
-Number.fermat_factor(k=1e4) -> I<Obj>
+    n.fermat_factor(k=1e4)
 
 Tries to factorize a given number using Fermat's factorization method (using at most `k` iterations).
 
@@ -2082,7 +2090,7 @@ Works for odd composite non-power numbers `n` that have two divisors close to `s
 
 =head2 fib
 
-Number.fib() -> I<Obj>
+    Number.fib()
 
 Return the
 
@@ -2092,7 +2100,7 @@ Aliases: I<fibonacci>
 
 =head2 fibmod
 
-Number.fibmod() -> I<Obj>
+    Number.fibmod()
 
 Return the
 
@@ -2102,7 +2110,7 @@ Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
 =head2 flip
 
-Number.flip(base=10) -> I<Obj>
+    n.flip(base=10)
 
 Returns the reversal of `n` in base `b`. When `b` is not given, it defaults to base 10.
 
@@ -2117,7 +2125,7 @@ Aliases: I<reverse>
 
 =head2 flipbit
 
-Number.flipbit() -> I<Obj>
+    Number.flipbit()
 
 Return the
 
@@ -2125,7 +2133,7 @@ Return the
 
 =head2 floor
 
-Number.floor() -> I<Obj>
+    Number.floor()
 
 Return the
 
@@ -2133,7 +2141,7 @@ Return the
 
 =head2 flt_factor
 
-Number.flt_factor(base=2, tries=1e4) -> I<Array>
+    n.flt_factor(base=2, tries=1e4)
 
 Tries to find a factor of `n`, using a new factorization method, inspired by Fermat's Little Theorem (FLT).
 
@@ -2147,7 +2155,7 @@ Example (try with base 3 and give up after 10^6 iterations):
 
 =head2 gcd
 
-Number.gcd() -> I<Obj>
+    Number.gcd()
 
 Return the
 
@@ -2155,7 +2163,7 @@ Return the
 
 =head2 gcdext
 
-Number.gcdext() -> I<Obj>
+    Number.gcdext()
 
 Return the
 
@@ -2163,7 +2171,7 @@ Return the
 
 =head2 geometric_sum
 
-Number.geometric_sum() -> I<Obj>
+    Number.geometric_sum()
 
 Return the
 
@@ -2171,7 +2179,7 @@ Return the
 
 =head2 gpf
 
-Number.gpf() -> I<Obj>
+    n.gpf()
 
 Return the greatest prime factor of n.
 
@@ -2188,7 +2196,7 @@ Example:
 
 =head2 hamdist
 
-Number.hamdist() -> I<Obj>
+    Number.hamdist()
 
 Return the
 
@@ -2196,7 +2204,7 @@ Return the
 
 =head2 harm
 
-Number.harm() -> I<Obj>
+    Number.harm()
 
 Return the
 
@@ -2206,7 +2214,7 @@ Aliases: I<harmfrac>, I<harmonic>, I<harmonic_number>
 
 =head2 harmreal
 
-Number.harmreal() -> I<Obj>
+    Number.harmreal()
 
 Return the
 
@@ -2214,7 +2222,7 @@ Return the
 
 =head2 hermite_H
 
-Number.hermite_H() -> I<Obj>
+    Number.hermite_H()
 
 Return the
 
@@ -2224,7 +2232,7 @@ Aliases: I<hermiteH>, I<hermite_polynomial_H>, I<hermite_polynomialH>
 
 =head2 hermite_He
 
-Number.hermite_He() -> I<Obj>
+    Number.hermite_He()
 
 Return the
 
@@ -2234,7 +2242,7 @@ Aliases: I<hermiteHe>, I<hermite_polynomial_He>, I<hermite_polynomialHe>
 
 =head2 holf_factor
 
-Number.holf_factor(reps) -> I<Obj>
+    n.holf_factor(reps)
 
 Hart's OLF method (variant of Fermat's method).
 
@@ -2242,7 +2250,7 @@ Hart's OLF method (variant of Fermat's method).
 
 =head2 hyperfactorial
 
-Number.hyperfactorial() -> I<Obj>
+    Number.hyperfactorial()
 
 Return the
 
@@ -2250,7 +2258,7 @@ Return the
 
 =head2 hyperfactorial_ln
 
-Number.hyperfactorial_ln() -> I<Obj>
+    Number.hyperfactorial_ln()
 
 Return the
 
@@ -2260,7 +2268,7 @@ Aliases: I<lnhyperfactorial>, I<hyperfactorial_log>
 
 =head2 hypot
 
-Number.hypot() -> I<Obj>
+    Number.hypot()
 
 Return the
 
@@ -2268,7 +2276,7 @@ Return the
 
 =head2 i
 
-Number.i() -> I<Obj>
+    Number.i()
 
 Return the
 
@@ -2276,7 +2284,7 @@ Return the
 
 =head2 iadd
 
-Number.iadd() -> I<Obj>
+    Number.iadd()
 
 Return the
 
@@ -2284,7 +2292,7 @@ Return the
 
 =head2 icbrt
 
-Number.icbrt() -> I<Obj>
+    Number.icbrt()
 
 Return the
 
@@ -2292,7 +2300,7 @@ Return the
 
 =head2 idiv_ceil
 
-Number.idiv_ceil() -> I<Obj>
+    Number.idiv_ceil()
 
 Return the
 
@@ -2300,7 +2308,7 @@ Return the
 
 =head2 idiv_trunc
 
-Number.idiv_trunc() -> I<Obj>
+    Number.idiv_trunc()
 
 Return the
 
@@ -2308,7 +2316,7 @@ Return the
 
 =head2 ilog
 
-Number.ilog() -> I<Obj>
+    Number.ilog()
 
 Return the
 
@@ -2316,7 +2324,7 @@ Return the
 
 =head2 ilog10
 
-Number.ilog10() -> I<Obj>
+    Number.ilog10()
 
 Return the
 
@@ -2324,7 +2332,7 @@ Return the
 
 =head2 ilog2
 
-Number.ilog2() -> I<Obj>
+    Number.ilog2()
 
 Return the
 
@@ -2332,7 +2340,7 @@ Return the
 
 =head2 im
 
-Number.im() -> I<Obj>
+    Number.im()
 
 Return the
 
@@ -2342,7 +2350,7 @@ Aliases: I<imag>, I<imaginary>
 
 =head2 imod
 
-Number.imod() -> I<Obj>
+    Number.imod()
 
 Return the
 
@@ -2350,7 +2358,7 @@ Return the
 
 =head2 imul
 
-Number.imul() -> I<Obj>
+    Number.imul()
 
 Return the
 
@@ -2358,7 +2366,7 @@ Return the
 
 =head2 inf
 
-Number.inf() -> I<Obj>
+    Number.inf()
 
 Return the
 
@@ -2366,7 +2374,7 @@ Return the
 
 =head2 int
 
-Number.int() -> I<Obj>
+    Number.int()
 
 Return the
 
@@ -2376,7 +2384,7 @@ Aliases: I<to_i>, I<to_int>, I<trunc>
 
 =head2 inv
 
-Number.inv() -> I<Obj>
+    Number.inv()
 
 Return the
 
@@ -2384,7 +2392,7 @@ Return the
 
 =head2 inverse_phi
 
-Number.inverse_phi() -> I<Obj>
+    n.inverse_phi()
 
 Returns all the solutions `x` to the Euler totient function: phi(x) = n.
 
@@ -2394,7 +2402,7 @@ Aliases: I<inverse_totient>
 
 =head2 inverse_phi_len
 
-Number.inverse_phi_len() -> I<Obj>
+    n.inverse_phi_len()
 
 Return the number of solutions to the Euler totient function: phi(x) = n.
 
@@ -2408,7 +2416,7 @@ Aliases: I<inverse_totient_len>
 
 =head2 inverse_phi_max
 
-Number.inverse_phi_max() -> I<Obj>
+    n.inverse_phi_max()
 
 Returns the largest solution x to the Euler totient function: phi(x) = n.
 
@@ -2424,7 +2432,7 @@ Aliases: I<inverse_euler_phi_max>
 
 =head2 inverse_phi_min
 
-Number.inverse_phi_min() -> I<Obj>
+    n.inverse_phi_min()
 
 Returns the smallest solution x to the Euler totient function: phi(x) = n.
 
@@ -2440,7 +2448,7 @@ Aliases: I<inverse_euler_phi_min>
 
 =head2 inverse_polygonal
 
-Number.inverse_polygonal() -> I<Array>
+    n.inverse_polygonal()
 
 Returns an array of pairs [r,k] such that `polygonal(r,k) = n`.
 
@@ -2454,7 +2462,7 @@ Aliases: I<polygonal_inverse>
 
 =head2 inverse_psi
 
-Number.inverse_psi() -> I<Obj>
+    n.inverse_psi()
 
 Returns all the solutions `x` to the Dedekin psi function: psi(x) = n.
 
@@ -2468,7 +2476,7 @@ Aliases: I<inverse_dedekind_psi>
 
 =head2 inverse_psi_len
 
-Number.inverse_psi_len() -> I<Number>
+    n.inverse_psi_len()
 
 Returns the number of solutions to Dedekind's psi function: psi(x) = n.
 
@@ -2480,7 +2488,7 @@ Aliases: I<inverse_dedekind_psi_len>
 
 =head2 inverse_psi_max
 
-Number.inverse_psi_max() -> I<Number>
+    n.inverse_psi_max()
 
 Returns the largest solution x to the Dedekind psi function: psi(x) = n.
 
@@ -2496,7 +2504,7 @@ Aliases: I<inverse_dedekind_psi_max>
 
 =head2 inverse_psi_min
 
-Number.inverse_psi_min() -> I<Number>
+    n.inverse_psi_min()
 
 Returns the smallest solution x to the Dedekind psi function: psi(x) = n.
 
@@ -2512,7 +2520,7 @@ Aliases: I<inverse_dedekind_psi_min>
 
 =head2 inverse_sigma
 
-Number.inverse_sigma(k=1) -> I<Obj>
+    n.inverse_sigma(k=1)
 
 The method returns all the numbers `m` for which `sigma(m,k) = n`, where `n` is given.
 
@@ -2529,7 +2537,7 @@ Also works with arbitrary large integers:
 
 =head2 inverse_sigma_len
 
-Number.inverse_sigma_len(k=1) -> I<Obj>
+    n.inverse_sigma_len(k=1)
 
 Returns the number of solutions to the sigma sum of divisors function: sigma_k(x) = n.
 
@@ -2539,7 +2547,7 @@ Equivalent to `n.inverse_sigma(k).len`, but much faster.
 
 =head2 inverse_sigma_max
 
-Number.inverse_sigma_max() -> I<Obj>
+    n.inverse_sigma_max()
 
 Return the
 
@@ -2547,7 +2555,7 @@ Return the
 
 =head2 inverse_sigma_min
 
-Number.inverse_sigma_min() -> I<Obj>
+    n.inverse_sigma_min()
 
 Return the
 
@@ -2555,7 +2563,7 @@ Return the
 
 =head2 inverse_uphi
 
-Number.inverse_uphi() -> I<Array>
+    n.inverse_uphi()
 
 Returns an array with all the solutions `x` to `uphi(x) = n`.
 
@@ -2567,7 +2575,7 @@ Example:
 
 =head2 inverse_usigma
 
-Number.inverse_usigma() -> I<Array>
+    n.inverse_usigma()
 
 Returns an array with all the possible solutions for `x` in usigma(x) = n.
 
@@ -2581,15 +2589,15 @@ Example:
 
 =head2 invmod
 
-Number.invmod() -> I<Obj>
+    n.invmod(m)
 
-Return the
+Return the modular inverse of n modulo m.
 
 =cut
 
 =head2 ipolygonal_root
 
-Number.ipolygonal_root() -> I<Obj>
+    Number.ipolygonal_root()
 
 Return the
 
@@ -2597,7 +2605,7 @@ Return the
 
 =head2 ipolygonal_root2
 
-Number.ipolygonal_root2() -> I<Obj>
+    Number.ipolygonal_root2()
 
 Return the
 
@@ -2605,7 +2613,7 @@ Return the
 
 =head2 ipow
 
-Number.ipow() -> I<Obj>
+    Number.ipow()
 
 Return the
 
@@ -2613,7 +2621,7 @@ Return the
 
 =head2 ipow10
 
-Number.ipow10() -> I<Obj>
+    Number.ipow10()
 
 Return the
 
@@ -2621,7 +2629,7 @@ Return the
 
 =head2 ipow2
 
-Number.ipow2() -> I<Obj>
+    Number.ipow2()
 
 Return the
 
@@ -2629,7 +2637,7 @@ Return the
 
 =head2 iquadratic_formula
 
-Number.iquadratic_formula() -> I<Obj>
+    Number.iquadratic_formula()
 
 Return the
 
@@ -2639,7 +2647,7 @@ Aliases: I<integer_quadratic_formula>
 
 =head2 irand
 
-Number.irand() -> I<Obj>
+    Number.irand()
 
 Return the
 
@@ -2647,7 +2655,7 @@ Return the
 
 =head2 iroot
 
-Number.iroot() -> I<Obj>
+    Number.iroot()
 
 Return the
 
@@ -2655,7 +2663,7 @@ Return the
 
 =head2 irootrem
 
-Number.irootrem() -> I<Obj>
+    Number.irootrem()
 
 Return the
 
@@ -2663,7 +2671,7 @@ Return the
 
 =head2 is_abundant
 
-Number.is_abundant() -> I<Obj>
+    n.is_abundant()
 
 Returns true when sigma(n) > 2*n.
 
@@ -2671,7 +2679,7 @@ Returns true when sigma(n) > 2*n.
 
 =head2 is_aks_prime
 
-Number.is_aks_prime() -> I<Obj>
+    n.is_aks_prime()
 
 Return true if `n` passes the Agrawal-Kayal-Saxena (AKS) primality test.
 
@@ -2679,7 +2687,7 @@ Return true if `n` passes the Agrawal-Kayal-Saxena (AKS) primality test.
 
 =head2 is_almost_prime
 
-Number.is_almost_prime(k) -> I<Obj>
+    n.is_almost_prime(k)
 
 Return true if `n` is a k-almost prime (i.e.: true iff `n` is the product of `k` not necessarily distinct primes).
 
@@ -2695,7 +2703,7 @@ Example:
 
 =head2 is_between
 
-Number.is_between(min, max) -> I<Obj>
+    n.is_between(min, max)
 
 Returns a true value when `n >= min` and `n <= max`.
 
@@ -2703,23 +2711,23 @@ Returns a true value when `n >= min` and `n <= max`.
 
 =head2 is_bpsw_prime
 
-Number.is_bpsw_prime() -> I<Obj>
+    n.is_bpsw_prime()
 
-Return true if `n` passes the B-PSW primality test (extra-strong variant).
+Returns true if `n` passes the B-PSW primality test (extra-strong variant).
 
 =cut
 
 =head2 is_carmichael
 
-Number.is_carmichael() -> I<Obj>
+    n.is_carmichael()
 
-Return the
+Returns true if is a Carmichael number.
 
 =cut
 
 =head2 is_chebyshev
 
-Number.is_chebyshev() -> I<Obj>
+    n.is_chebyshev()
 
 Returns true if `n` is an odd composite Chebyshev pseudoprime, as defined by OEIS A175530.
 
@@ -2729,7 +2737,7 @@ Aliases: I<is_chebyshev_psp>, I<is_chebyshev_pseudoprime>
 
 =head2 is_complex
 
-Number.is_complex() -> I<Obj>
+    Number.is_complex()
 
 Return the
 
@@ -2737,7 +2745,7 @@ Return the
 
 =head2 is_composite
 
-Number.is_composite() -> I<Obj>
+    n.is_composite()
 
 Returns true if `n` is a positive > 1 composite number.
 
@@ -2745,7 +2753,7 @@ Returns true if `n` is a positive > 1 composite number.
 
 =head2 is_congruent
 
-Number.is_congruent(a,m) -> I<Obj>
+    n.is_congruent(a,m)
 
 Returns true when n is congruent to a modulo m.
 
@@ -2762,7 +2770,7 @@ Also defined for rationals, floats and complex numbers:
 
 =head2 is_coprime
 
-Number.is_coprime() -> I<Obj>
+    Number.is_coprime()
 
 Return the
 
@@ -2770,7 +2778,7 @@ Return the
 
 =head2 is_cube
 
-Number.is_cube() -> I<Obj>
+    n.is_cube()
 
 Return true if n is a cube number (if it can be written as b^3, for some integer b).
 
@@ -2778,7 +2786,7 @@ Return true if n is a cube number (if it can be written as b^3, for some integer
 
 =head2 is_cyclic
 
-Number.is_cyclic() -> I<Obj>
+    n.is_cyclic()
 
 Returns true when `gcd(phi(n), n) = 1`, where `phi(n)` is the Euler totient function.
 
@@ -2790,7 +2798,7 @@ Example:
 
 =head2 is_ecpp_prime
 
-Number.is_ecpp_prime() -> I<Obj>
+    n.is_ecpp_prime()
 
 Return true if `n` can be proved prime using the Elliptic Curve Primality Proving algorithm.
 
@@ -2798,7 +2806,7 @@ Return true if `n` can be proved prime using the Elliptic Curve Primality Provin
 
 =head2 iseed
 
-Number.iseed() -> I<Obj>
+    Number.iseed()
 
 Return the
 
@@ -2806,7 +2814,7 @@ Return the
 
 =head2 is_euler_psp
 
-Number.is_euler_psp(bases...) -> I<Obj>
+    n.is_euler_psp(bases...)
 
 Return true if `n` is an Euler-Jacobi pseudoprime, given a list of bases.
 
@@ -2816,7 +2824,7 @@ Aliases: I<is_euler_pseudoprime>
 
 =head2 is_even
 
-Number.is_even() -> I<Obj>
+    Number.is_even()
 
 Return the
 
@@ -2824,7 +2832,7 @@ Return the
 
 =head2 is_fib
 
-Number.is_fib() -> I<Obj>
+    n.is_fib()
 
 Returns true if n is a Fibonacci number. False otherwise.
 
@@ -2834,7 +2842,7 @@ Aliases: I<is_fibonacci>
 
 =head2 is_fib_psp
 
-Number.is_fib_psp(P=1, Q=-1) -> I<Obj>
+    n.is_fib_psp(P=1, Q=-1)
 
 Returns true if `n` passes the Lucas test to the `U`, using the parameters `P` and `Q`.
 
@@ -2849,7 +2857,7 @@ Aliases: I<is_lucasu_psp>, I<is_lucasU_psp>, I<is_fibonacci_psp>, I<is_lucasU_ps
 
 =head2 is_frobenius_psp
 
-Number.is_frobenius_psp(a,b) -> I<Obj>
+    n.is_frobenius_psp(a,b)
 
 Return true if `n` is a Frobenius probable prime with respect to the polynomial `x^2 - ax + b`.
 
@@ -2859,7 +2867,7 @@ Aliases: I<is_frobenius_pseudoprime>
 
 =head2 is_fundamental
 
-Number.is_fundamental() -> I<Obj>
+    n.is_fundamental()
 
 Return the
 
@@ -2867,7 +2875,7 @@ Return the
 
 =head2 is_gaussian_prime
 
-Number.is_gaussian_prime(b) -> I<Obj>
+    is_gaussian_prime(a,b)
 
 Returns true if a+b*i is a Gaussian prime.
 
@@ -2882,7 +2890,7 @@ Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
 =head2 is_imag
 
-Number.is_imag() -> I<Obj>
+    Number.is_imag()
 
 Return the
 
@@ -2890,7 +2898,7 @@ Return the
 
 =head2 is_imprimitive_carmichael
 
-Number.is_imprimitive_carmichael() -> I<Obj>
+    n.is_imprimitive_carmichael()
 
 Returns true if `n` is an imprimitive Carmichael numbers, as defined by OEIS: A328935.
 
@@ -2904,7 +2912,7 @@ The method efficiently tries to factorize large Carmichael numbers, using the `m
 
 =head2 is_inf
 
-Number.is_inf() -> I<Obj>
+    Number.is_inf()
 
 Return the
 
@@ -2912,7 +2920,7 @@ Return the
 
 =head2 is_int
 
-Number.is_int() -> I<Obj>
+    Number.is_int()
 
 Return the
 
@@ -2920,7 +2928,7 @@ Return the
 
 =head2 is_khashin_psp
 
-Number.is_khashin_psp() -> I<Obj>
+    n.is_khashin_psp()
 
 Return true if `n` passes the Frobenius test of Sergey Khashin.
 
@@ -2930,7 +2938,7 @@ Aliases: I<is_khashin_pseudoprime>, I<is_frobenius_khashin_psp>, I<is_frobenius_
 
 =head2 is_lucas
 
-Number.is_lucas() -> I<Obj>
+    n.is_lucas()
 
 Returns true if n is a Lucas number. False otherwise.
 
@@ -2938,7 +2946,7 @@ Returns true if n is a Lucas number. False otherwise.
 
 =head2 is_lucas_carmichael
 
-Number.is_lucas_carmichael() -> I<Obj>
+    n.is_lucas_carmichael()
 
 Returns true if `n` is a Lucas-Carmichael number.
 
@@ -2950,7 +2958,7 @@ Example:
 
 =head2 is_lucas_psp
 
-Number.is_lucas_psp() -> I<Obj>
+    n.is_lucas_psp()
 
 Return true if `n` is a Lucas pseudoprime.
 
@@ -2960,7 +2968,7 @@ Aliases: I<is_lucas_pseudoprime>
 
 =head2 is_lucasv_psp
 
-Number.is_lucasv_psp(P=1, Q=-1) -> I<Obj>
+    n.is_lucasv_psp(P=1, Q=-1)
 
 Returns true if `n` passes the Lucas test to the `V` sequence, using the paramters `P` and `Q`.
 
@@ -2975,7 +2983,7 @@ Aliases: I<is_lucasV_psp>, I<is_bruckman_lucas_psp>, I<is_lucasV_pseudoprime>, I
 
 =head2 is_mersenne_prime
 
-Number.is_mersenne_prime() -> I<Obj>
+    Number.is_mersenne_prime()
 
 Return the
 
@@ -2983,7 +2991,7 @@ Return the
 
 =head2 is_mone
 
-Number.is_mone() -> I<Obj>
+    Number.is_mone()
 
 Return the
 
@@ -2991,7 +2999,7 @@ Return the
 
 =head2 is_nan
 
-Number.is_nan() -> I<Obj>
+    Number.is_nan()
 
 Return the
 
@@ -2999,7 +3007,7 @@ Return the
 
 =head2 is_neg
 
-Number.is_neg() -> I<Obj>
+    Number.is_neg()
 
 Return the
 
@@ -3009,7 +3017,7 @@ Aliases: I<is_negative>
 
 =head2 is_ninf
 
-Number.is_ninf() -> I<Obj>
+    Number.is_ninf()
 
 Return the
 
@@ -3017,7 +3025,7 @@ Return the
 
 =head2 is_nm1_prime
 
-Number.is_nm1_prime() -> I<Obj>
+    n.is_nm1_prime()
 
 Return true if `n` can be proved prime using the factorization of `n-1`.
 
@@ -3027,7 +3035,7 @@ Aliases: I<is_pm1_prime>, I<is_nminus1_prime>
 
 =head2 is_np1_prime
 
-Number.is_np1_prime() -> I<Obj>
+    n.is_np1_prime()
 
 Return true if `n` can be proved prime using the factorization of `n+1`.
 
@@ -3037,7 +3045,7 @@ Aliases: I<is_pp1_prime>, I<is_nplus1_prime>
 
 =head2 is_odd
 
-Number.is_odd() -> I<Obj>
+    Number.is_odd()
 
 Return the
 
@@ -3045,7 +3053,7 @@ Return the
 
 =head2 is_odd_composite
 
-Number.is_odd_composite() -> I<Obj>
+    Number.is_odd_composite()
 
 Return the
 
@@ -3053,7 +3061,7 @@ Return the
 
 =head2 is_one
 
-Number.is_one() -> I<Obj>
+    Number.is_one()
 
 Return the
 
@@ -3061,7 +3069,7 @@ Return the
 
 =head2 is_over_psp
 
-Number.is_over_psp() -> I<Obj>
+    n.is_over_psp()
 
 Returns true if `n` is an overpseudoprime to base `b`. Multiple bases can also be provided.
 
@@ -3078,7 +3086,7 @@ Aliases: I<is_over_pseudoprime>, I<is_overpseudoprime>
 
 =head2 is_palindrome
 
-Number.is_palindrome() -> I<Obj>
+    n.is_palindrome()
 
 Returns true if the given number `n` is palindromic in the given base `b`. When no base is given, it defaults to 10.
 
@@ -3093,7 +3101,7 @@ Aliases: I<is_palindromic>
 
 =head2 is_pell_lucas_psp
 
-Number.is_pell_lucas_psp() -> I<Obj>
+    n.is_pell_lucas_psp()
 
 It returns true if `V_n(2, -1) = 2 (mod n)`.
 
@@ -3109,7 +3117,7 @@ Aliases: I<is_pell_lucas_pseudoprime>
 
 =head2 is_pell_psp
 
-Number.is_pell_psp() -> I<Obj>
+    n.is_pell_psp()
 
 These are odd numbers that satisfy:
 
@@ -3125,7 +3133,7 @@ Aliases: I<is_pell_pseudoprime>
 
 =head2 is_perrin_psp
 
-Number.is_perrin_psp() -> I<Obj>
+    Number.is_perrin_psp()
 
 Return the
 
@@ -3135,7 +3143,7 @@ Aliases: I<is_perrin_pseudoprime>
 
 =head2 is_plumb_psp
 
-Number.is_plumb_psp() -> I<Obj>
+    n.is_plumb_psp()
 
 Return true if `n` passes Colin Plumb's Euler Criterion primality test.
 
@@ -3145,7 +3153,7 @@ Aliases: I<is_euler_plumb_psp>, I<is_plumb_pseudoprime>, I<is_euler_plumb_pseudo
 
 =head2 is_polygonal
 
-Number.is_polygonal() -> I<Obj>
+    Number.is_polygonal()
 
 Return the
 
@@ -3153,7 +3161,7 @@ Return the
 
 =head2 is_polygonal2
 
-Number.is_polygonal2() -> I<Obj>
+    Number.is_polygonal2()
 
 Return the
 
@@ -3161,7 +3169,7 @@ Return the
 
 =head2 is_pos
 
-Number.is_pos() -> I<Obj>
+    Number.is_pos()
 
 Return the
 
@@ -3171,7 +3179,7 @@ Aliases: I<is_positive>
 
 =head2 is_pow
 
-Number.is_pow() -> I<Obj>
+    Number.is_pow()
 
 Return the
 
@@ -3181,7 +3189,7 @@ Aliases: I<is_power>, I<is_perfect_power>
 
 =head2 is_powerful
 
-Number.is_powerful(k=2) -> I<Obj>
+    n.is_powerful(k=2)
 
 Returns true when all the exponents in the prime-power factorization of n are >= k.
 
@@ -3189,7 +3197,7 @@ Returns true when all the exponents in the prime-power factorization of n are >=
 
 =head2 is_power_of
 
-Number.is_power_of(b) -> I<Obj>
+    n.is_power_of(b)
 
 Return true if n is a power of b, such that n = b^k for some k >= 0:
 
@@ -3204,7 +3212,7 @@ Example:
 
 =head2 is_practical
 
-Number.is_practical() -> I<Number>
+    n.is_practical()
 
 Returns true if n is a practical number (OEIS: A005153).
 
@@ -3216,7 +3224,7 @@ Example:
 
 =head2 is_prime
 
-Number.is_prime() -> I<Obj>
+    Number.is_prime()
 
 Return the
 
@@ -3224,7 +3232,7 @@ Return the
 
 =head2 is_prime_power
 
-Number.is_prime_power() -> I<Obj>
+    Number.is_prime_power()
 
 Return the
 
@@ -3232,7 +3240,7 @@ Return the
 
 =head2 is_primitive_root
 
-Number.is_primitive_root() -> I<Obj>
+    Number.is_primitive_root()
 
 Return the
 
@@ -3240,7 +3248,7 @@ Return the
 
 =head2 is_prob_prime
 
-Number.is_prob_prime() -> I<Obj>
+    Number.is_prob_prime()
 
 Return the
 
@@ -3248,7 +3256,7 @@ Return the
 
 =head2 is_prob_squarefree
 
-Number.is_prob_squarefree(k) -> I<Obj>
+    n.is_prob_squarefree(k)
 
 Returns true iff `n` is not a power and is not divisible by a square <= k.
 
@@ -3256,7 +3264,7 @@ Returns true iff `n` is not a power and is not divisible by a square <= k.
 
 =head2 is_prov_prime
 
-Number.is_prov_prime() -> I<Obj>
+    Number.is_prov_prime()
 
 Return the
 
@@ -3266,7 +3274,7 @@ Aliases: I<is_provable_prime>
 
 =head2 is_psp
 
-Number.is_psp(bases...) -> I<Obj>
+    n.is_psp(bases...)
 
 Returns true if `n` is a Fermat pseudoprime to the provided bases.
 
@@ -3276,7 +3284,7 @@ Aliases: I<is_fermat_psp>, I<is_pseudoprime>, I<is_fermat_pseudoprime>
 
 =head2 isqrt
 
-Number.isqrt() -> I<Obj>
+    Number.isqrt()
 
 Return the
 
@@ -3284,7 +3292,7 @@ Return the
 
 =head2 isqrtrem
 
-Number.isqrtrem() -> I<Obj>
+    Number.isqrtrem()
 
 Return the
 
@@ -3292,7 +3300,7 @@ Return the
 
 =head2 is_rat
 
-Number.is_rat() -> I<Obj>
+    Number.is_rat()
 
 Return the
 
@@ -3300,7 +3308,7 @@ Return the
 
 =head2 is_real
 
-Number.is_real() -> I<Obj>
+    Number.is_real()
 
 Return the
 
@@ -3308,7 +3316,7 @@ Return the
 
 =head2 is_rough
 
-Number.is_rough(k) -> I<Obj>
+    n.is_rough(k)
 
 Returns true if all prime factors of n are >= k.
 
@@ -3324,7 +3332,7 @@ Example:
 
 =head2 is_safe_prime
 
-Number.is_safe_prime() -> I<Obj>
+    n.is_safe_prime()
 
 It returns true if both `n` and `(n-1)/2` are prime.
 
@@ -3336,7 +3344,7 @@ Example:
 
 =head2 is_semiprime
 
-Number.is_semiprime() -> I<Obj>
+    Number.is_semiprime()
 
 Return the
 
@@ -3344,7 +3352,7 @@ Return the
 
 =head2 is_smooth
 
-Number.is_smooth(k) -> I<Obj>
+    n.is_smooth(k)
 
 Returns true if n is k-smooth.
 
@@ -3352,7 +3360,7 @@ Returns true if n is k-smooth.
 
 =head2 is_smooth_over_prod
 
-Number.is_smooth_over_prod() -> I<Obj>
+    n.is_smooth_over_prod(k)
 
 Returns true when `n` is smooth over the prime factors of `k`.
 
@@ -3360,7 +3368,7 @@ Returns true when `n` is smooth over the prime factors of `k`.
 
 =head2 is_sqr
 
-Number.is_sqr() -> I<Obj>
+    Number.is_sqr()
 
 Return the
 
@@ -3370,7 +3378,7 @@ Aliases: I<is_square>, I<is_perfect_square>
 
 =head2 is_square_free
 
-Number.is_square_free() -> I<Obj>
+    Number.is_square_free()
 
 Return the
 
@@ -3380,7 +3388,7 @@ Aliases: I<is_squarefree>
 
 =head2 is_stronger_lucas_psp
 
-Number.is_stronger_lucas_psp() -> I<Obj>
+    n.is_stronger_lucas_psp()
 
 Return true if `n` is an extra-strong Lucas pseudoprime.
 
@@ -3390,7 +3398,7 @@ Aliases: I<is_extra_strong_lucas_psp>, I<is_stronger_lucas_pseudoprime>, I<is_ex
 
 =head2 is_strong_fib
 
-Number.is_strong_fib() -> I<Obj>
+    n.is_strong_fib()
 
 Teturns true if `n` is a strong Fibonacci pseudoprime, satisfying:
 
@@ -3416,7 +3424,7 @@ Aliases: I<is_strong_fib_psp>, I<is_strong_fibonacci>, I<is_strong_fibonacci_psp
 
 =head2 is_strongish_lucas_psp
 
-Number.is_strongish_lucas_psp() -> I<Obj>
+    n.is_strongish_lucas_psp()
 
 Return true if `n` is almost an extra-strong Lucas pseudoprime.
 
@@ -3426,7 +3434,7 @@ Aliases: I<is_strongish_lucas_pseudoprime>
 
 =head2 is_strong_lucas_psp
 
-Number.is_strong_lucas_psp() -> I<Obj>
+    n.is_strong_lucas_psp()
 
 Return true if `n` is a strong Lucas pseudoprime.
 
@@ -3436,7 +3444,7 @@ Aliases: I<is_strong_lucas_pseudoprime>
 
 =head2 is_strong_psp
 
-Number.is_strong_psp(bases...) -> I<Obj>
+    n.is_strong_psp(bases...)
 
 Return true if `n` is a strong pseudoprime.
 
@@ -3446,7 +3454,7 @@ Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<i
 
 =head2 is_super_psp
 
-Number.is_super_psp(bases...) -> I<Obj>
+    n.is_super_psp(bases...)
 
 It returns true if the given value of n is a super-pseudoprime to the given bases. When no base is given, the base 2 is used (which represents the Super-Poulet numbers: A050217)
 
@@ -3467,7 +3475,7 @@ Aliases: I<is_super_pseudoprime>, I<is_superpseudoprime>
 
 =head2 is_totient
 
-Number.is_totient() -> I<Obj>
+    Number.is_totient()
 
 Return the
 
@@ -3475,7 +3483,7 @@ Return the
 
 =head2 isub
 
-Number.isub() -> I<Obj>
+    Number.isub()
 
 Return the
 
@@ -3483,7 +3491,7 @@ Return the
 
 =head2 is_underwood_psp
 
-Number.is_underwood_psp() -> I<Obj>
+    n.is_underwood_psp()
 
 Return true if `n` passes the efficient Frobenius test of Paul Underwood.
 
@@ -3493,7 +3501,7 @@ Aliases: I<is_underwood_pseudoprime>, I<is_frobenius_underwood_psp>, I<is_froben
 
 =head2 is_zero
 
-Number.is_zero() -> I<Obj>
+    Number.is_zero()
 
 Return the
 
@@ -3501,7 +3509,7 @@ Return the
 
 =head2 jacobi
 
-Number.jacobi() -> I<Obj>
+    Number.jacobi()
 
 Return the
 
@@ -3509,7 +3517,7 @@ Return the
 
 =head2 jordan_totient
 
-Number.jordan_totient() -> I<Obj>
+    Number.jordan_totient()
 
 Return the
 
@@ -3517,7 +3525,7 @@ Return the
 
 =head2 kronecker
 
-Number.kronecker() -> I<Obj>
+    Number.kronecker()
 
 Return the
 
@@ -3525,7 +3533,7 @@ Return the
 
 =head2 laguerre
 
-Number.laguerre() -> I<Obj>
+    Number.laguerre()
 
 Return the
 
@@ -3549,7 +3557,7 @@ Alias: I<carmichael_lambda>.
 
 =head2 lambert_w
 
-Number.lambert_w() -> I<Obj>
+    Number.lambert_w()
 
 Return the
 
@@ -3557,7 +3565,7 @@ Return the
 
 =head2 lcm
 
-Number.lcm() -> I<Obj>
+    Number.lcm()
 
 Return the
 
@@ -3565,7 +3573,7 @@ Return the
 
 =head2 legendre
 
-Number.legendre() -> I<Obj>
+    Number.legendre()
 
 Return the
 
@@ -3573,7 +3581,7 @@ Return the
 
 =head2 legendre_P
 
-Number.legendre_P() -> I<Obj>
+    Number.legendre_P()
 
 Return the
 
@@ -3583,7 +3591,7 @@ Aliases: I<legendrep>, I<legendreP>, I<legendre_polynomial>
 
 =head2 legendre_phi
 
-Number.legendre_phi() -> I<Obj>
+    n.legendre_phi(k)
 
 Returns the count of numbers <= `n` that are not divisible by the first `k` primes.
 
@@ -3595,7 +3603,7 @@ Equivalent with:
 
 =head2 len
 
-Number.len() -> I<Obj>
+    Number.len()
 
 Return the
 
@@ -3605,7 +3613,7 @@ Aliases: I<size>, I<length>
 
 =head2 lgamma
 
-Number.lgamma() -> I<Obj>
+    Number.lgamma()
 
 Return the
 
@@ -3615,7 +3623,7 @@ Aliases: I<gamma_abs_log>
 
 =head2 lgrt
 
-Number.lgrt() -> I<Obj>
+    Number.lgrt()
 
 Return the
 
@@ -3623,7 +3631,7 @@ Return the
 
 =head2 li
 
-Number.li() -> I<Obj>
+    Number.li()
 
 Return the
 
@@ -3631,7 +3639,7 @@ Return the
 
 =head2 li2
 
-Number.li2() -> I<Obj>
+    Number.li2()
 
 Return the
 
@@ -3639,7 +3647,7 @@ Return the
 
 =head2 liouville
 
-Number.liouville() -> I<Obj>
+    Number.liouville()
 
 Return the
 
@@ -3647,7 +3655,7 @@ Return the
 
 =head2 liouville_sum
 
-Number.liouville_sum() -> I<Obj>
+    n.liouville_sum()
 
 Computes partial sums of the Liouville lambda function.
 
@@ -3660,7 +3668,7 @@ Example:
 
 =head2 ln
 
-Number.ln() -> I<Obj>
+    Number.ln()
 
 Return the
 
@@ -3668,7 +3676,7 @@ Return the
 
 =head2 ln2
 
-Number.ln2() -> I<Obj>
+    Number.ln2()
 
 Return the
 
@@ -3676,7 +3684,7 @@ Return the
 
 =head2 lnbern
 
-Number.lnbern() -> I<Obj>
+    Number.lnbern()
 
 Return the
 
@@ -3686,7 +3694,7 @@ Aliases: I<bern_log>, I<lnbernreal>, I<bernoulli_log>
 
 =head2 lngamma
 
-Number.lngamma() -> I<Obj>
+    Number.lngamma()
 
 Return the
 
@@ -3696,7 +3704,7 @@ Aliases: I<gamma_log>
 
 =head2 lnsuperfactorial
 
-Number.lnsuperfactorial() -> I<Obj>
+    Number.lnsuperfactorial()
 
 Return the
 
@@ -3706,7 +3714,7 @@ Aliases: I<superfactorial_ln>, I<superfactorial_log>
 
 =head2 log
 
-Number.log() -> I<Obj>
+    Number.log()
 
 Return the
 
@@ -3714,7 +3722,7 @@ Return the
 
 =head2 log10
 
-Number.log10() -> I<Obj>
+    Number.log10()
 
 Return the
 
@@ -3722,7 +3730,7 @@ Return the
 
 =head2 log2
 
-Number.log2() -> I<Obj>
+    Number.log2()
 
 Return the
 
@@ -3730,7 +3738,7 @@ Return the
 
 =head2 logarithmic_derivative
 
-Number.logarithmic_derivative() -> I<Obj>
+    Number.logarithmic_derivative()
 
 Return the
 
@@ -3738,7 +3746,7 @@ Return the
 
 =head2 lpf
 
-Number.lpf() -> I<Obj>
+    n.lpf()
 
 Returns the least prime factor of n.
 
@@ -3755,7 +3763,7 @@ Example:
 
 =head2 lsb
 
-Number.lsb() -> I<Obj>
+    Number.lsb()
 
 Return the
 
@@ -3763,7 +3771,7 @@ Return the
 
 =head2 lucas
 
-Number.lucas() -> I<Obj>
+    Number.lucas()
 
 Return the
 
@@ -3771,7 +3779,7 @@ Return the
 
 =head2 lucas_factor
 
-Number.lucas_factor(j=1, tries=100) -> I<Obj>
+    n.lucas_factor(j=1, tries=100)
 
 Effective in factoring Carmichael numbers, Fermat pseudoprimes, Lucas pseudoprimes and Lucas-Carmichael numbers.
 
@@ -3785,7 +3793,7 @@ Aliases: I<lucas_miller_factor>
 
 =head2 lucas_mod
 
-Number.lucas_mod() -> I<Obj>
+    Number.lucas_mod()
 
 Return the
 
@@ -3795,7 +3803,7 @@ Aliases: I<lucasmod>
 
 =head2 lucas_U
 
-Number.lucas_U() -> I<Obj>
+    Number.lucas_U()
 
 Return the
 
@@ -3815,7 +3823,7 @@ Aliases: I<lucasUmod>
 
 =head2 lucasuvmod
 
-Number.lucasuvmod() -> I<Obj>
+    Number.lucasuvmod()
 
 Return the
 
@@ -3825,7 +3833,7 @@ Aliases: I<lucasUVmod>
 
 =head2 lucas_V
 
-Number.lucas_V() -> I<Obj>
+    Number.lucas_V()
 
 Return the
 
@@ -3835,7 +3843,7 @@ Aliases: I<lucasv>, I<lucasV>
 
 =head2 lucasvmod
 
-lucasvmod(P,Q,n,m) -> I<Obj>
+lucasvmod(P,Q,n,m)
 
 Lucas V_n(P,Q) (mod m) function.
 
@@ -3845,7 +3853,7 @@ Aliases: I<lucasVmod>
 
 =head2 make_coprime
 
-Number.make_coprime() -> I<Obj>
+    Number.make_coprime()
 
 Return the
 
@@ -3853,7 +3861,7 @@ Return the
 
 =head2 mangoldt
 
-Number.mangoldt() -> I<Obj>
+    Number.mangoldt()
 
 Return the
 
@@ -3861,7 +3869,7 @@ Return the
 
 =head2 max
 
-Number.max() -> I<Obj>
+    Number.max()
 
 Return the
 
@@ -3869,8 +3877,8 @@ Return the
 
 =head2 mertens
 
-mertens(n) -> I<Obj>
-mertens(a,b) -> I<Obj>
+mertens(n)
+mertens(a,b)
 
 Return the Mertens functions, which is defined as the partial sums of the Moebius function:
 
@@ -3889,7 +3897,7 @@ Example:
 
 =head2 mfac
 
-Number.mfac() -> I<Obj>
+    Number.mfac()
 
 Return the
 
@@ -3899,7 +3907,7 @@ Aliases: I<mfactorial>, I<multi_factorial>
 
 =head2 miller_factor
 
-Number.miller_factor(tries=100) -> I<Obj>
+    n.miller_factor(tries=100)
 
 Effective in factoring Carmichael numbers and Fermat pseudoprimes.
 
@@ -3915,7 +3923,7 @@ Aliases: I<miller_rabin_factor>
 
 =head2 miller_rabin_random
 
-Number.miller_rabin_random(k) -> I<Obj>
+    n.miller_rabin_random(k)
 
 Return true if `n` passes the Miller-Rabin primality test with `k` random bases.
 
@@ -3923,7 +3931,7 @@ Return true if `n` passes the Miller-Rabin primality test with `k` random bases.
 
 =head2 min
 
-Number.min() -> I<Obj>
+    Number.min()
 
 Return the
 
@@ -3931,7 +3939,7 @@ Return the
 
 =head2 mone
 
-Number.mone() -> I<Obj>
+    Number.mone()
 
 Return the
 
@@ -3939,7 +3947,7 @@ Return the
 
 =head2 motzkin
 
-Number.motzkin() -> I<Obj>
+    n.motzkin()
 
 Return the n-th Motzkin number. (OEIS: A001006)
 
@@ -3951,7 +3959,7 @@ Example:
 
 =head2 msb
 
-Number.msb() -> I<Obj>
+    Number.msb()
 
 Return the
 
@@ -3959,7 +3967,7 @@ Return the
 
 =head2 mulmod
 
-Number.mulmod(b,m) -> I<Obj>
+    mulmod(a,b,m)
 
 Returns C<(a*b) % m>.
 
@@ -3971,7 +3979,7 @@ Example:
 
 =head2 multinomial
 
-Number.multinomial() -> I<Obj>
+    Number.multinomial()
 
 Return the
 
@@ -3979,7 +3987,7 @@ Return the
 
 =head2 nan
 
-Number.nan() -> I<Obj>
+    Number.nan()
 
 Return the
 
@@ -3987,7 +3995,7 @@ Return the
 
 =head2 n_composites
 
-Number.n_composites(start=4) -> I<Obj>
+    n_composites(n, start=4)
 
 Returns n consecutive composite numbers starting from `start`.
 
@@ -4002,10 +4010,10 @@ Aliases: I<ncomposites>
 
 =head2 nd
 
-Number.st({...}) -> I<Obj>
-Number.nd({...}) -> I<Obj>
-Number.rd({...}) -> I<Obj>
-Number.th({...}) -> I<Obj>
+    n.st({...})
+    n.nd({...})
+    n.rd({...})
+    n.th({...})
 
 It returns the n-th value for which the provided block evaluates to a true value, starting couting from 0.
 
@@ -4025,7 +4033,7 @@ Aliases: I<rd>, I<st>, I<th>
 
 =head2 neg
 
-Number.neg() -> I<Obj>
+    Number.neg()
 
 Return the
 
@@ -4033,7 +4041,7 @@ Return the
 
 =head2 new
 
-Number.new() -> I<Obj>
+    Number.new()
 
 Return the
 
@@ -4043,7 +4051,7 @@ Aliases: I<call>
 
 =head2 next_composite
 
-Number.next_composite() -> I<Obj>
+    n.next_composite()
 
 Given a non-negative integer `n`, it returns the next composite number after `n`.
 
@@ -4051,7 +4059,7 @@ Given a non-negative integer `n`, it returns the next composite number after `n`
 
 =head2 next_palindrome
 
-Number.next_palindrome(b=10) -> I<Obj>
+    n.next_palindrome(b=10)
 
 Efficiently returns the next palindrome in base-b greater than n.
 
@@ -4066,7 +4074,7 @@ Example:
 
 =head2 next_pow
 
-Number.next_pow() -> I<Obj>
+    Number.next_pow()
 
 Return the
 
@@ -4076,7 +4084,7 @@ Aliases: I<next_power>
 
 =head2 next_pow2
 
-Number.next_pow2() -> I<Obj>
+    Number.next_pow2()
 
 Return the
 
@@ -4086,7 +4094,7 @@ Aliases: I<next_power2>
 
 =head2 next_prime
 
-Number.next_prime() -> I<Obj>
+    Number.next_prime()
 
 Return the
 
@@ -4094,7 +4102,7 @@ Return the
 
 =head2 next_twin_prime
 
-Number.next_twin_prime() -> I<Obj>
+    n.next_twin_prime()
 
 Returns next twin prime number larger than n.
 
@@ -4104,7 +4112,7 @@ Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
 =head2 ninf
 
-Number.ninf() -> I<Obj>
+    Number.ninf()
 
 Return the
 
@@ -4112,7 +4120,7 @@ Return the
 
 =head2 nok
 
-Number.nok() -> I<Obj>
+    Number.nok()
 
 Return the
 
@@ -4122,7 +4130,7 @@ Aliases: I<binomial>
 
 =head2 norm
 
-Number.norm() -> I<Obj>
+    Number.norm()
 
 Return the
 
@@ -4130,7 +4138,7 @@ Return the
 
 =head2 n_primes
 
-Number.n_primes(start=2) -> I<Obj>
+    n_primes(n, start=2)
 
 It returns an array containing `n` consecutive primes that are `>= start` (if omitted, then start = 2).
 
@@ -4149,7 +4157,7 @@ Aliases: I<nprimes>
 
 =head2 nu
 
-Number.nu() -> I<Obj>
+    Number.nu()
 
 Return the
 
@@ -4159,7 +4167,7 @@ Aliases: I<numerator>
 
 =head2 nude
 
-Number.nude() -> I<Obj>
+    Number.nude()
 
 Return the
 
@@ -4167,7 +4175,7 @@ Return the
 
 =head2 num2perm
 
-Number.num2perm() -> I<Obj>
+    Number.num2perm()
 
 Return the
 
@@ -4175,7 +4183,7 @@ Return the
 
 =head2 numify
 
-Number.numify() -> I<Obj>
+    n.numify()
 
 Returns a raw native number representation for the self-number.
 
@@ -4198,7 +4206,7 @@ Although this may or may not be actually faster.
 
 =head2 of
 
-Number.of() -> I<Obj>
+    Number.of()
 
 Return the
 
@@ -4206,7 +4214,7 @@ Return the
 
 =head2 one
 
-Number.one() -> I<Obj>
+    Number.one()
 
 Return the
 
@@ -4214,7 +4222,7 @@ Return the
 
 =head2 partitions
 
-Number.partitions() -> I<Obj>
+    Number.partitions()
 
 Return the
 
@@ -4224,7 +4232,7 @@ Aliases: I<partition_number>
 
 =head2 parts
 
-Number.parts() -> I<Obj>
+    Number.parts()
 
 Return the
 
@@ -4232,7 +4240,7 @@ Return the
 
 =head2 pbrent_factor
 
-Number.pbrent_factor(reps) -> I<Obj>
+    n.pbrent_factor(reps)
 
 Pollard-Brent rho factorization method.
 
@@ -4240,7 +4248,7 @@ Pollard-Brent rho factorization method.
 
 =head2 perfect_power
 
-Number.perfect_power() -> I<Obj>
+    Number.perfect_power()
 
 Return the
 
@@ -4248,7 +4256,7 @@ Return the
 
 =head2 perfect_root
 
-Number.perfect_root() -> I<Obj>
+    Number.perfect_root()
 
 Return the
 
@@ -4256,7 +4264,7 @@ Return the
 
 =head2 permutations
 
-Number.permutations() -> I<Obj>
+    Number.permutations()
 
 Return the
 
@@ -4264,7 +4272,7 @@ Return the
 
 =head2 pi_k
 
-Number.pi_k() -> I<Obj>
+    Number.pi_k()
 
 Return the
 
@@ -4274,7 +4282,7 @@ Aliases: I<k_prime_count>, I<almost_primepi>, I<almost_prime_count>
 
 =head2 pm1_factor
 
-Number.pm1_factor(B) -> I<Obj>
+    n.pm1_factor(B)
 
 Pollard p-1 factorization method.
 
@@ -4284,10 +4292,10 @@ Aliases: I<pminus1_factor>
 
 =head2 pn_primes
 
-Number.pn_primes() -> I<Obj>
-Number.pn_primes(m) -> I<Obj>
+    pn_primes(n)
+    pn_primes(a,b)
 
-Returns the first n prime numbers.
+Returns the first n prime numbers, or the primes in the range prime(a)..prime(b).
 
 Example:
 
@@ -4298,7 +4306,7 @@ Example:
 
 =head2 pn_primorial
 
-Number.pn_primorial() -> I<Obj>
+    Number.pn_primorial()
 
 Return the
 
@@ -4306,7 +4314,7 @@ Return the
 
 =head2 polygonal
 
-Number.polygonal() -> I<Obj>
+    Number.polygonal()
 
 Return the
 
@@ -4314,7 +4322,7 @@ Return the
 
 =head2 polygonal_root
 
-Number.polygonal_root() -> I<Obj>
+    Number.polygonal_root()
 
 Return the
 
@@ -4322,7 +4330,7 @@ Return the
 
 =head2 polygonal_root2
 
-Number.polygonal_root2() -> I<Obj>
+    Number.polygonal_root2()
 
 Return the
 
@@ -4330,7 +4338,7 @@ Return the
 
 =head2 polymod
 
-Number.polymod() -> I<Obj>
+    Number.polymod()
 
 Return the
 
@@ -4338,7 +4346,7 @@ Return the
 
 =head2 popcount
 
-Number.popcount() -> I<Obj>
+    Number.popcount()
 
 Return the
 
@@ -4348,7 +4356,7 @@ Aliases: I<hammingweight>
 
 =head2 power_count
 
-Number.power_count() -> I<Obj>
+    n.power_count()
 
 Returns the number of perfect powers <= n.
 
@@ -4363,8 +4371,8 @@ Aliases: I<perfect_power_count>
 
 =head2 powerful
 
-k.powerful(n) -> I<Obj>
-k.powerful(a,b) -> I<Obj>
+k.powerful(n)
+k.powerful(a,b)
 
 It efficiently generates all the k-powerful numbers <= n, or in the range a..b.
 
@@ -4377,8 +4385,8 @@ Example:
 
 =head2 powerful_count
 
-k.powerful_count(n) -> I<Obj>
-k.powerful_count(a,b) -> I<Obj>
+k.powerful_count(n)
+k.powerful_count(a,b)
 
 It efficiently counts the number of k-powerful numbers <= n, or in the range a..b;
 
@@ -4389,7 +4397,7 @@ It efficiently counts the number of k-powerful numbers <= n, or in the range a..
 
 =head2 pp1_factor
 
-Number.pp1_factor(B) -> I<Obj>
+    n.pp1_factor(B)
 
 Williams' p+1 factorization method.
 
@@ -4399,7 +4407,7 @@ Aliases: I<pplus1_factor>
 
 =head2 prev_prime
 
-Number.prev_prime() -> I<Obj>
+    Number.prev_prime()
 
 Return the
 
@@ -4407,7 +4415,7 @@ Return the
 
 =head2 prho_factor
 
-Number.prho_factor(reps) -> I<Obj>
+    n.prho_factor(reps)
 
 Pollard rho factorization method.
 
@@ -4415,7 +4423,7 @@ Pollard rho factorization method.
 
 =head2 primality_pretest
 
-Number.primality_pretest() -> I<Obj>
+    n.primality_pretest()
 
 The method returns true when `n` passes the internal primality pretest (when n is large enough and it has no small factors).
 
@@ -4423,7 +4431,7 @@ The method returns true when `n` passes the internal primality pretest (when n i
 
 =head2 prime
 
-Number.prime() -> I<Obj>
+    Number.prime()
 
 Return the
 
@@ -4433,7 +4441,7 @@ Aliases: I<nth_prime>
 
 =head2 prime_divisors
 
-Number.prime_divisors() -> I<Obj>
+    n.prime_divisors()
 
 Returns the unique prime factors of `n`.
 
@@ -4441,7 +4449,7 @@ Returns the unique prime factors of `n`.
 
 =head2 primepi
 
-Number.primepi() -> I<Obj>
+    Number.primepi()
 
 Return the
 
@@ -4451,7 +4459,7 @@ Aliases: I<prime_count>, I<count_primes>
 
 =head2 primepi_lower
 
-Number.primepi_lower() -> I<Obj>
+    n.primepi_lower()
 
 Lower bound for prime_count(n).
 
@@ -4461,7 +4469,7 @@ Aliases: I<prime_count_lower>
 
 =head2 primepi_upper
 
-Number.primepi_upper() -> I<Obj>
+    n.primepi_upper()
 
 Upper bound for prime_count(n).
 
@@ -4471,7 +4479,7 @@ Aliases: I<prime_count_upper>
 
 =head2 prime_power
 
-Number.prime_power() -> I<Obj>
+    Number.prime_power()
 
 Return the
 
@@ -4479,8 +4487,8 @@ Return the
 
 =head2 prime_power_count
 
-prime_power_count(n) -> I<Obj>
-prime_power_count(a,b) -> I<Obj>
+prime_power_count(n)
+prime_power_count(a,b)
 
 Returns the number of prime powers <= n, or in the range a..b.
 
@@ -4493,7 +4501,7 @@ Example:
 
 =head2 prime_power_divisors
 
-Number.prime_power_divisors() -> I<Obj>
+    n.prime_power_divisors()
 
 Return the prime power divisors of n.
 
@@ -4509,7 +4517,7 @@ Equivalent with:
 
 =head2 prime_power_sigma
 
-Number.prime_power_sigma() -> I<Obj>
+    Number.prime_power_sigma()
 
 Return the
 
@@ -4517,7 +4525,7 @@ Return the
 
 =head2 prime_power_udivisors
 
-Number.prime_power_udivisors() -> I<Obj>
+    n.prime_power_udivisors()
 
 Return the unitary prime power divisors of n.
 
@@ -4537,7 +4545,7 @@ Aliases: I<prime_power_unitary_divisors>, I<unitary_prime_power_divisors>
 
 =head2 prime_power_usigma
 
-Number.prime_power_usigma() -> I<Obj>
+    Number.prime_power_usigma()
 
 Return the
 
@@ -4545,7 +4553,7 @@ Return the
 
 =head2 prime_root
 
-Number.prime_root() -> I<Obj>
+    Number.prime_root()
 
 Return the
 
@@ -4553,7 +4561,7 @@ Return the
 
 =head2 primes
 
-Number.primes() -> I<Obj>
+    Number.primes()
 
 Return the
 
@@ -4561,7 +4569,7 @@ Return the
 
 =head2 prime_sigma
 
-Number.prime_sigma() -> I<Obj>
+    Number.prime_sigma()
 
 Return the
 
@@ -4569,7 +4577,7 @@ Return the
 
 =head2 prime_sum
 
-Number.prime_sum() -> I<Obj>
+    Number.prime_sum()
 
 Return the
 
@@ -4579,7 +4587,7 @@ Aliases: I<primes_sum>, I<sum_primes>
 
 =head2 prime_udivisors
 
-Number.prime_udivisors() -> I<Obj>
+    n.prime_udivisors()
 
 Returns the unique unitary prime factors of `n`.
 
@@ -4589,7 +4597,7 @@ Aliases: I<prime_unitary_divisors>, I<unitary_prime_divisors>
 
 =head2 prime_usigma
 
-Number.prime_usigma() -> I<Obj>
+    Number.prime_usigma()
 
 Return the
 
@@ -4597,7 +4605,7 @@ Return the
 
 =head2 prime_usigma0
 
-Number.prime_usigma0() -> I<Obj>
+    Number.prime_usigma0()
 
 Return the
 
@@ -4605,7 +4613,7 @@ Return the
 
 =head2 primitive_part
 
-Number.primitive_part(f) -> I<Obj>
+    n.primitive_part(f)
 
 Returns the primitive part of `f(n)`, for n > 0, such that:
 
@@ -4625,7 +4633,7 @@ Example:
 
 =head2 primorial
 
-Number.primorial() -> I<Obj>
+    Number.primorial()
 
 Return the
 
@@ -4633,7 +4641,7 @@ Return the
 
 =head2 primorial_deflation
 
-Number.primorial_deflation() -> I<Obj>
+    n.primorial_deflation()
 
 Primorial deflation of n, satisfying:
 
@@ -4647,7 +4655,7 @@ Defined as:
 
 =head2 primorial_inflation
 
-Number.primorial_inflation() -> I<Obj>
+    n.primorial_inflation()
 
 Primorial inflation of n: fully multiplicative with a(p) = primorial(p).
 
@@ -4663,7 +4671,7 @@ The  method also accepts `n` to be a fraction, which is computed as:
 
 =head2 psi
 
-Number.psi(k=1) -> I<Obj>
+    n.psi(k=1)
 
 Dedekind psi function.
 
@@ -4678,7 +4686,7 @@ Aliases: I<dedekind_psi>
 
 =head2 qnr
 
-Number.qnr() -> I<Obj>
+    n.qnr()
 
 Returns the least quadratic non-residue of n.
 
@@ -4693,7 +4701,7 @@ Aliases: I<quadratic_nonresidue>
 
 =head2 qs_factor
 
-Number.qs_factor() -> I<Obj>
+    n.qs_factor()
 
 Pomerance's Quadratic Sieve factorization method (SIMPQS).
 
@@ -4701,7 +4709,7 @@ Pomerance's Quadratic Sieve factorization method (SIMPQS).
 
 =head2 quadratic_formula
 
-Number.quadratic_formula() -> I<Obj>
+    Number.quadratic_formula()
 
 Return the
 
@@ -4709,7 +4717,7 @@ Return the
 
 =head2 rad
 
-Number.rad() -> I<Obj>
+    Number.rad()
 
 Return the
 
@@ -4717,7 +4725,7 @@ Return the
 
 =head2 rad2deg
 
-Number.rad2deg() -> I<Obj>
+    Number.rad2deg()
 
 Return the
 
@@ -4725,7 +4733,7 @@ Return the
 
 =head2 ramanujan_sum
 
-Number.ramanujan_sum() -> I<Obj>
+    Number.ramanujan_sum()
 
 Return the
 
@@ -4733,7 +4741,7 @@ Return the
 
 =head2 ramanujan_tau
 
-Number.ramanujan_tau() -> I<Obj>
+    Number.ramanujan_tau()
 
 Return the
 
@@ -4741,7 +4749,7 @@ Return the
 
 =head2 rand
 
-Number.rand() -> I<Obj>
+    Number.rand()
 
 Return the
 
@@ -4749,7 +4757,7 @@ Return the
 
 =head2 random_bytes
 
-Number.random_bytes() -> I<Obj>
+    Number.random_bytes()
 
 Return the
 
@@ -4757,7 +4765,7 @@ Return the
 
 =head2 random_maurer_nbit_prime
 
-Number.random_maurer_nbit_prime() -> I<Obj>
+    n.random_maurer_nbit_prime()
 
 Generate a random k-bit Marurer prime.
 
@@ -4767,7 +4775,7 @@ Aliases: I<random_nbit_maurer_prime>
 
 =head2 random_nbit_prime
 
-Number.random_nbit_prime() -> I<Obj>
+    Number.random_nbit_prime()
 
 Return the
 
@@ -4775,7 +4783,7 @@ Return the
 
 =head2 random_nbit_strong_prime
 
-Number.random_nbit_strong_prime() -> I<Obj>
+    n.random_nbit_strong_prime()
 
 Generate a random k-bit strong prime number.
 
@@ -4785,7 +4793,7 @@ Aliases: I<random_strong_nbit_prime>
 
 =head2 random_ndigit_prime
 
-Number.random_ndigit_prime() -> I<Obj>
+    Number.random_ndigit_prime()
 
 Return the
 
@@ -4793,7 +4801,7 @@ Return the
 
 =head2 random_prime
 
-Number.random_prime() -> I<Obj>
+    Number.random_prime()
 
 Return the
 
@@ -4801,7 +4809,7 @@ Return the
 
 =head2 random_safe_prime
 
-Number.random_safe_prime() -> I<Obj>
+    n.random_safe_prime()
 
 Returns a random n-bit safe-prime.
 
@@ -4815,7 +4823,7 @@ Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
 =head2 random_string
 
-Number.random_string() -> I<Obj>
+    Number.random_string()
 
 Return the
 
@@ -4823,7 +4831,7 @@ Return the
 
 =head2 range
 
-Number.range() -> I<Obj>
+    Number.range()
 
 Return the
 
@@ -4831,7 +4839,7 @@ Return the
 
 =head2 rat
 
-Number.rat() -> I<Obj>
+    Number.rat()
 
 Return the
 
@@ -4841,7 +4849,7 @@ Aliases: I<to_r>, I<to_rat>
 
 =head2 rat_approx
 
-Number.rat_approx() -> I<Obj>
+    Number.rat_approx()
 
 Return the
 
@@ -4849,7 +4857,7 @@ Return the
 
 =head2 re
 
-Number.re() -> I<Obj>
+    Number.re()
 
 Return the
 
@@ -4859,7 +4867,7 @@ Aliases: I<real>
 
 =head2 reals
 
-Number.reals() -> I<Obj>
+    Number.reals()
 
 Return the
 
@@ -4867,7 +4875,7 @@ Return the
 
 =head2 remdiv
 
-Number.remdiv() -> I<Obj>
+    Number.remdiv()
 
 Return the
 
@@ -4877,7 +4885,7 @@ Aliases: I<remove>
 
 =head2 rising_factorial
 
-Number.rising_factorial() -> I<Obj>
+    Number.rising_factorial()
 
 Return the
 
@@ -4885,7 +4893,7 @@ Return the
 
 =head2 root
 
-Number.root() -> I<Obj>
+    Number.root()
 
 Return the
 
@@ -4893,7 +4901,7 @@ Return the
 
 =head2 rough_count
 
-Number.rough_count() -> I<Obj>
+    n.rough_count()
 
 It efficiently counts the number of k-rough <= n.
 
@@ -4910,7 +4918,7 @@ Also works with arbitarily large n:
 
 =head2 rough_part
 
-Number.rough_part(k) -> I<Obj>
+    n.rough_part(k)
 
 It returns the k-rough part of n that contains all the prime factors p|n such that p >= k.
 
@@ -4922,7 +4930,7 @@ Example:
 
 =head2 round
 
-Number.round() -> I<Obj>
+    Number.round()
 
 Return the
 
@@ -4932,7 +4940,7 @@ Aliases: I<roundf>
 
 =head2 run
 
-Number.run() -> I<Obj>
+    Number.run()
 
 Return the
 
@@ -4940,7 +4948,7 @@ Return the
 
 =head2 sec
 
-Number.sec() -> I<Obj>
+    Number.sec()
 
 Return the
 
@@ -4948,7 +4956,7 @@ Return the
 
 =head2 secant_number
 
-Number.secant_number() -> I<Obj>
+    Number.secant_number()
 
 Return the
 
@@ -4956,7 +4964,7 @@ Return the
 
 =head2 sech
 
-Number.sech() -> I<Obj>
+    Number.sech()
 
 Return the
 
@@ -4964,7 +4972,7 @@ Return the
 
 =head2 seed
 
-Number.seed() -> I<Obj>
+    Number.seed()
 
 Return the
 
@@ -4972,7 +4980,7 @@ Return the
 
 =head2 semiprime
 
-Number.semiprime() -> I<Obj>
+    n.semiprime()
 
 Returns the n-th semiprime number.
 
@@ -4986,7 +4994,7 @@ Aliases: I<nth_semiprime>
 
 =head2 semiprime_count
 
-Number.semiprime_count() -> I<Obj>
+    n.semiprime_count()
 
 Counts the number of semiprimes <= n. (see: A072000)
 
@@ -4998,7 +5006,7 @@ Example:
 
 =head2 semiprimes
 
-Number.semiprimes() -> I<Obj>
+    Number.semiprimes()
 
 Return the
 
@@ -5006,7 +5014,7 @@ Return the
 
 =head2 setbit
 
-Number.setbit() -> I<Obj>
+    Number.setbit()
 
 Return the
 
@@ -5014,7 +5022,7 @@ Return the
 
 =head2 sgn
 
-Number.sgn() -> I<Obj>
+    Number.sgn()
 
 Return the
 
@@ -5024,7 +5032,7 @@ Aliases: I<sign>
 
 =head2 sigma0
 
-Number.sigma0() -> I<Obj>
+    Number.sigma0()
 
 Return the
 
@@ -5032,7 +5040,7 @@ Return the
 
 =head2 sin
 
-Number.sin() -> I<Obj>
+    Number.sin()
 
 Return the
 
@@ -5040,7 +5048,7 @@ Return the
 
 =head2 sin_cos
 
-Number.sin_cos() -> I<Obj>
+    Number.sin_cos()
 
 Return the
 
@@ -5048,7 +5056,7 @@ Return the
 
 =head2 sinh
 
-Number.sinh() -> I<Obj>
+    Number.sinh()
 
 Return the
 
@@ -5056,19 +5064,19 @@ Return the
 
 =head2 smooth_count
 
-Number.smooth_count() -> I<Obj>
+    n.smooth_count(k)
 
 Returns the number of k-smooth numbers <= n.
 
 Example:
 
-    say 30.of { smooth_count(10**_, 13) }   #=> A106629
+    say 30.of {|n| smooth_count(10**n, 13) }   #=> A106629
 
 =cut
 
 =head2 smooth_part
 
-Number.smooth_part(k) -> I<Obj>
+    n.smooth_part(k)
 
 It efficiently returns the largest divisor of n that is k-smooth.
 
@@ -5080,7 +5088,7 @@ Example:
 
 =head2 solve_pell
 
-Number.solve_pell() -> I<Obj>
+    Number.solve_pell()
 
 Return the
 
@@ -5088,7 +5096,7 @@ Return the
 
 =head2 sopf
 
-Number.sopf() -> I<Number>
+    n.sopf()
 
 Returns the sum of the distinct primes dividing n.
 
@@ -5100,7 +5108,7 @@ Example:
 
 =head2 sopfr
 
-Number.sopfr() -> I<Obj>
+    Number.sopfr()
 
 Return the
 
@@ -5108,7 +5116,7 @@ Return the
 
 =head2 sqr
 
-Number.sqr() -> I<Obj>
+    Number.sqr()
 
 Return the
 
@@ -5116,7 +5124,7 @@ Return the
 
 =head2 sqrt
 
-Number.sqrt() -> I<Obj>
+    Number.sqrt()
 
 Return the
 
@@ -5124,7 +5132,7 @@ Return the
 
 =head2 sqrt_cfrac
 
-Number.sqrt_cfrac() -> I<Obj>
+    Number.sqrt_cfrac()
 
 Return the
 
@@ -5132,7 +5140,7 @@ Return the
 
 =head2 sqrt_cfrac_period
 
-Number.sqrt_cfrac_period() -> I<Obj>
+    Number.sqrt_cfrac_period()
 
 Return the
 
@@ -5140,7 +5148,7 @@ Return the
 
 =head2 sqrt_cfrac_period_len
 
-Number.sqrt_cfrac_period_len() -> I<Obj>
+    n.sqrt_cfrac_period_len()
 
 Return the length of the period of continued fraction for square root of n. (OEIS: A003285)
 
@@ -5148,7 +5156,7 @@ Return the length of the period of continued fraction for square root of n. (OEI
 
 =head2 sqrtmod
 
-Number.sqrtmod() -> I<Obj>
+    Number.sqrtmod()
 
 Return the
 
@@ -5156,7 +5164,7 @@ Return the
 
 =head2 square_divisors
 
-Number.square_divisors() -> I<Obj>
+    n.square_divisors()
 
 Return the square divisors of n.
 
@@ -5172,8 +5180,8 @@ Equivalent with:
 
 =head2 squarefree
 
-squarefree(n) -> I<Obj>
-squarefree(a,b) -> I<Obj>
+squarefree(n)
+squarefree(a,b)
 
 Returns an array with the squarefree numbers <= n, or in the range a..b.
 
@@ -5189,8 +5197,8 @@ Example:
 
 =head2 squarefree_almost_primes
 
-k.squarefree_almost_primes(n) -> I<Obj>
-k.squarefree_almost_primes(a,b) -> I<Obj>
+k.squarefree_almost_primes(n)
+k.squarefree_almost_primes(a,b)
 
 Returns an array with the squarefree k-almost primes <= n, or in the range a..b.
 
@@ -5206,7 +5214,7 @@ Example:
 
 =head2 square_free_count
 
-Number.square_free_count() -> I<Obj>
+    Number.square_free_count()
 
 Return the
 
@@ -5216,7 +5224,7 @@ Aliases: I<squarefree_count>
 
 =head2 squarefree_divisors
 
-Number.squarefree_divisors() -> I<Obj>
+    Number.squarefree_divisors()
 
 Return the
 
@@ -5224,7 +5232,7 @@ Return the
 
 =head2 squarefree_sigma
 
-Number.squarefree_sigma() -> I<Obj>
+    Number.squarefree_sigma()
 
 Return the
 
@@ -5232,7 +5240,7 @@ Return the
 
 =head2 squarefree_sum
 
-Number.squarefree_sum() -> I<Obj>
+    n.squarefree_sum()
 
 Returns the sum of squarefree numbers <= n. (OEIS: A066779)
 
@@ -5245,7 +5253,7 @@ Example:
 
 =head2 squarefree_udivisors
 
-Number.squarefree_udivisors() -> I<Obj>
+    Number.squarefree_udivisors()
 
 Return the
 
@@ -5255,7 +5263,7 @@ Aliases: I<squarefree_unitary_divisors>, I<unitary_squarefree_divisors>
 
 =head2 squarefree_usigma
 
-Number.squarefree_usigma() -> I<Obj>
+    Number.squarefree_usigma()
 
 Return the
 
@@ -5263,7 +5271,7 @@ Return the
 
 =head2 squarefree_usigma0
 
-Number.squarefree_usigma0() -> I<Obj>
+    Number.squarefree_usigma0()
 
 Return the
 
@@ -5271,7 +5279,7 @@ Return the
 
 =head2 square_sigma
 
-Number.square_sigma() -> I<Obj>
+    Number.square_sigma()
 
 Return the
 
@@ -5279,7 +5287,7 @@ Return the
 
 =head2 square_sigma0
 
-Number.square_sigma0() -> I<Obj>
+    Number.square_sigma0()
 
 Return the
 
@@ -5287,7 +5295,7 @@ Return the
 
 =head2 square_udivisors
 
-Number.square_udivisors() -> I<Obj>
+    Number.square_udivisors()
 
 Return the
 
@@ -5297,7 +5305,7 @@ Aliases: I<square_unitary_divisors>, I<unitary_square_divisors>
 
 =head2 square_usigma
 
-Number.square_usigma() -> I<Obj>
+    Number.square_usigma()
 
 Return the
 
@@ -5305,7 +5313,7 @@ Return the
 
 =head2 square_usigma0
 
-Number.square_usigma0() -> I<Obj>
+    Number.square_usigma0()
 
 Return the
 
@@ -5313,7 +5321,7 @@ Return the
 
 =head2 squfof_factor
 
-Number.squfof_factor(reps) -> I<Obj>
+    n.squfof_factor(reps)
 
 Shanks' SQUFOF method.
 
@@ -5321,7 +5329,7 @@ Shanks' SQUFOF method.
 
 =head2 stirling
 
-Number.stirling() -> I<Obj>
+    Number.stirling()
 
 Return the
 
@@ -5331,7 +5339,7 @@ Aliases: I<stirling1>
 
 =head2 stirling2
 
-Number.stirling2() -> I<Obj>
+    Number.stirling2()
 
 Return the
 
@@ -5339,7 +5347,7 @@ Return the
 
 =head2 stirling3
 
-Number.stirling3() -> I<Obj>
+    Number.stirling3()
 
 Return the
 
@@ -5347,7 +5355,7 @@ Return the
 
 =head2 subfactorial
 
-Number.subfactorial() -> I<Obj>
+    Number.subfactorial()
 
 Return the
 
@@ -5355,7 +5363,7 @@ Return the
 
 =head2 submod
 
-Number.submod() -> I<Obj>
+    Number.submod()
 
 Return the
 
@@ -5363,7 +5371,7 @@ Return the
 
 =head2 subsets
 
-Number.subsets() -> I<Obj>
+    Number.subsets()
 
 Return the
 
@@ -5371,7 +5379,7 @@ Return the
 
 =head2 superfactorial
 
-Number.superfactorial() -> I<Obj>
+    Number.superfactorial()
 
 Return the
 
@@ -5379,7 +5387,7 @@ Return the
 
 =head2 superprimorial
 
-Number.superprimorial() -> I<Obj>
+    n.superprimorial()
 
 Returns the product of first n primorials.
 
@@ -5391,7 +5399,7 @@ Example:
 
 =head2 tan
 
-Number.tan() -> I<Obj>
+    Number.tan()
 
 Return the
 
@@ -5399,7 +5407,7 @@ Return the
 
 =head2 tangent_number
 
-Number.tangent_number() -> I<Obj>
+    Number.tangent_number()
 
 Return the
 
@@ -5407,7 +5415,7 @@ Return the
 
 =head2 tanh
 
-Number.tanh() -> I<Obj>
+    Number.tanh()
 
 Return the
 
@@ -5415,7 +5423,7 @@ Return the
 
 =head2 times
 
-Number.times() -> I<Obj>
+    Number.times()
 
 Return the
 
@@ -5423,7 +5431,7 @@ Return the
 
 =head2 to_f
 
-Number.to_f() -> I<Obj>
+    Number.to_f()
 
 Return the
 
@@ -5433,7 +5441,7 @@ Aliases: I<float>, I<to_float>
 
 =head2 to_n
 
-Number.to_n() -> I<Obj>
+    Number.to_n()
 
 Return the
 
@@ -5443,7 +5451,7 @@ Aliases: I<to_num>
 
 =head2 to_s
 
-Number.to_s() -> I<Obj>
+    Number.to_s()
 
 Return the
 
@@ -5453,7 +5461,7 @@ Aliases: I<to_str>
 
 =head2 totient
 
-Number.totient() -> I<Obj>
+    Number.totient()
 
 Return the
 
@@ -5463,7 +5471,7 @@ Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
 
 =head2 trial_factor
 
-Number.trial_factor(limit) -> I<Obj>
+    n.trial_factor(limit)
 
 Trial division.
 
@@ -5471,7 +5479,7 @@ Trial division.
 
 =head2 tuples
 
-Number.tuples() -> I<Obj>
+    Number.tuples()
 
 Return the
 
@@ -5481,7 +5489,7 @@ Aliases: I<variations>
 
 =head2 tuples_with_repetition
 
-Number.tuples_with_repetition() -> I<Obj>
+    Number.tuples_with_repetition()
 
 Return the
 
@@ -5491,7 +5499,7 @@ Aliases: I<variations_with_repetition>
 
 =head2 udivisors
 
-Number.udivisors() -> I<Obj>
+    n.udivisors()
 
 Return the
 
@@ -5501,7 +5509,7 @@ Aliases: I<unitary_divisors>
 
 =head2 uphi
 
-Number.uphi() -> I<Obj>
+    n.uphi()
 
 The unitary totient function. (OEIS: A047994)
 
@@ -5509,7 +5517,7 @@ The unitary totient function. (OEIS: A047994)
 
 =head2 usigma
 
-Number.usigma() -> I<Obj>
+    Number.usigma()
 
 Return the
 
@@ -5517,7 +5525,7 @@ Return the
 
 =head2 usigma0
 
-Number.usigma0() -> I<Obj>
+    Number.usigma0()
 
 Return the
 
@@ -5527,7 +5535,7 @@ Aliases: I<squarefree_sigma0>
 
 =head2 valuation
 
-Number.valuation() -> I<Obj>
+    Number.valuation()
 
 Return the
 
@@ -5535,7 +5543,7 @@ Return the
 
 =head2 zero
 
-Number.zero() -> I<Obj>
+    Number.zero()
 
 Return the
 
@@ -5543,7 +5551,7 @@ Return the
 
 =head2 znorder
 
-Number.znorder() -> I<Obj>
+    Number.znorder()
 
 Return the
 
@@ -5551,7 +5559,7 @@ Return the
 
 =head2 znprimroot
 
-Number.znprimroot() -> I<Obj>
+    Number.znprimroot()
 
 Return the
 

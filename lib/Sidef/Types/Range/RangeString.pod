@@ -25,7 +25,7 @@ Inherits methods from:
 
 =head2 call
 
-RangeString.call() -> I<Obj>
+    RangeString.call()
 
 Return the
 
@@ -33,7 +33,7 @@ Return the
 
 =head2 contain
 
-RangeString.contain() -> I<Obj>
+    RangeString.contain()
 
 Return the
 
@@ -43,7 +43,7 @@ Aliases: I<include>, I<contains>, I<includes>
 
 =head2 from
 
-RangeString.from() -> I<Obj>
+    RangeString.from()
 
 Return the
 
@@ -51,7 +51,7 @@ Return the
 
 =head2 iter
 
-RangeString.iter() -> I<Obj>
+    RangeString.iter()
 
 Return the
 
@@ -59,7 +59,7 @@ Return the
 
 =head2 max
 
-RangeString.max() -> I<Obj>
+    RangeString.max()
 
 Return the
 
@@ -67,7 +67,7 @@ Return the
 
 =head2 min
 
-RangeString.min() -> I<Obj>
+    RangeString.min()
 
 Return the
 
@@ -75,7 +75,7 @@ Return the
 
 =head2 new
 
-RangeString.new() -> I<Obj>
+    RangeString.new()
 
 Return the
 
@@ -83,7 +83,7 @@ Return the
 
 =head2 pick
 
-RangeString.pick() -> I<Obj>
+    RangeString.pick()
 
 Return the
 
@@ -91,7 +91,7 @@ Return the
 
 =head2 rand
 
-RangeString.rand() -> I<Obj>
+    RangeString.rand()
 
 Return the
 
@@ -101,7 +101,7 @@ Aliases: I<sample>
 
 =head2 to
 
-RangeString.to() -> I<Obj>
+    RangeString.to()
 
 Return the
 
@@ -109,7 +109,7 @@ Return the
 
 =head2 to_s
 
-RangeString.to_s() -> I<Obj>
+    RangeString.to_s()
 
 Return the
 

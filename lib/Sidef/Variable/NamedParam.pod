@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 dump
 
-NamedParam.dump() -> I<Obj>
+    NamedParam.dump()
 
 Return the
 
@@ -32,7 +32,7 @@ Return the
 
 =head2 name
 
-NamedParam.name() -> I<Obj>
+    NamedParam.name()
 
 Return the
 
@@ -40,7 +40,7 @@ Return the
 
 =head2 new
 
-NamedParam.new() -> I<Obj>
+    NamedParam.new()
 
 Return the
 
@@ -50,7 +50,7 @@ Aliases: I<call>
 
 =head2 value
 
-NamedParam.value() -> I<Obj>
+    NamedParam.value()
 
 Return the
 

@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 `
 
-I<Obj> B<`> I<Obj> -> I<Obj>
+    I<Obj> B<`> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<run>, I<exec>, I<execute>
 
 =head2 call
 
-Backtick.call() -> I<Obj>
+    Backtick.call()
 
 Return the
 
@@ -42,7 +42,7 @@ Return the
 
 =head2 to_s
 
-Backtick.to_s() -> I<Obj>
+    Backtick.to_s()
 
 Return the
 

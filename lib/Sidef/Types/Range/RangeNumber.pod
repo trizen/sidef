@@ -25,7 +25,7 @@ Inherits methods from:
 
 =head2 Π
 
-RangeNumber.Π() -> I<Obj>
+    RangeNumber.Π()
 
 Return the
 
@@ -35,7 +35,7 @@ Aliases: I<prod>
 
 =head2 Σ
 
-RangeNumber.Σ() -> I<Obj>
+    RangeNumber.Σ()
 
 Return the
 
@@ -45,7 +45,7 @@ Aliases: I<sum>
 
 =head2 avg
 
-RangeNumber.avg() -> I<Obj>
+    RangeNumber.avg()
 
 Return the
 
@@ -53,7 +53,7 @@ Return the
 
 =head2 avg_by
 
-RangeNumber.avg_by() -> I<Obj>
+    RangeNumber.avg_by()
 
 Return the
 
@@ -61,7 +61,7 @@ Return the
 
 =head2 bsearch
 
-RangeNumber.bsearch() -> I<Obj>
+    RangeNumber.bsearch()
 
 Return the
 
@@ -69,7 +69,7 @@ Return the
 
 =head2 bsearch_ge
 
-RangeNumber.bsearch_ge() -> I<Obj>
+    RangeNumber.bsearch_ge()
 
 Return the
 
@@ -77,7 +77,7 @@ Return the
 
 =head2 bsearch_le
 
-RangeNumber.bsearch_le() -> I<Obj>
+    RangeNumber.bsearch_le()
 
 Return the
 
@@ -85,7 +85,7 @@ Return the
 
 =head2 each_almost_prime
 
-RangeNumber.each_almost_prime() -> I<Obj>
+    RangeNumber.each_almost_prime()
 
 Return the
 
@@ -93,7 +93,7 @@ Return the
 
 =head2 each_powerful
 
-RangeNumber.each_powerful() -> I<Obj>
+    RangeNumber.each_powerful()
 
 Return the
 
@@ -101,7 +101,7 @@ Return the
 
 =head2 each_prime
 
-RangeNumber.each_prime() -> I<Obj>
+    RangeNumber.each_prime()
 
 Return the
 
@@ -109,7 +109,7 @@ Return the
 
 =head2 each_semiprime
 
-RangeNumber.each_semiprime() -> I<Obj>
+    RangeNumber.each_semiprime()
 
 Return the
 
@@ -117,7 +117,7 @@ Return the
 
 =head2 each_squarefree
 
-RangeNumber.each_squarefree() -> I<Obj>
+    RangeNumber.each_squarefree()
 
 Return the
 
@@ -125,7 +125,7 @@ Return the
 
 =head2 each_squarefree_almost_prime
 
-RangeNumber.each_squarefree_almost_prime() -> I<Obj>
+    RangeNumber.each_squarefree_almost_prime()
 
 Return the
 
@@ -133,7 +133,7 @@ Return the
 
 =head2 gcd
 
-RangeNumber.gcd() -> I<Obj>
+    RangeNumber.gcd()
 
 Return the
 
@@ -141,7 +141,7 @@ Return the
 
 =head2 gcd_by
 
-RangeNumber.gcd_by() -> I<Obj>
+    RangeNumber.gcd_by()
 
 Return the
 
@@ -149,7 +149,7 @@ Return the
 
 =head2 iter
 
-RangeNumber.iter() -> I<Obj>
+    RangeNumber.iter()
 
 Return the
 
@@ -157,7 +157,7 @@ Return the
 
 =head2 lcm
 
-RangeNumber.lcm() -> I<Obj>
+    RangeNumber.lcm()
 
 Return the
 
@@ -165,7 +165,7 @@ Return the
 
 =head2 lcm_by
 
-RangeNumber.lcm_by() -> I<Obj>
+    RangeNumber.lcm_by()
 
 Return the
 
@@ -173,7 +173,7 @@ Return the
 
 =head2 new
 
-RangeNumber.new() -> I<Obj>
+    RangeNumber.new()
 
 Return the
 
@@ -183,7 +183,7 @@ Aliases: I<call>
 
 =head2 primes
 
-RangeNumber.primes() -> I<Obj>
+    RangeNumber.primes()
 
 Return the
 
@@ -191,7 +191,7 @@ Return the
 
 =head2 prod_by
 
-RangeNumber.prod_by() -> I<Obj>
+    RangeNumber.prod_by()
 
 Return the
 
@@ -199,7 +199,7 @@ Return the
 
 =head2 semiprimes
 
-RangeNumber.semiprimes() -> I<Obj>
+    RangeNumber.semiprimes()
 
 Return the
 
@@ -207,7 +207,7 @@ Return the
 
 =head2 squarefree
 
-RangeNumber.squarefree() -> I<Obj>
+    RangeNumber.squarefree()
 
 Return the
 
@@ -215,7 +215,7 @@ Return the
 
 =head2 sum_by
 
-RangeNumber.sum_by() -> I<Obj>
+    RangeNumber.sum_by()
 
 Return the
 
@@ -223,7 +223,7 @@ Return the
 
 =head2 to_s
 
-RangeNumber.to_s() -> I<Obj>
+    RangeNumber.to_s()
 
 Return the
 

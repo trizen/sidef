@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    I<Obj> B<&> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<and>, I<intersection>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    I<Obj> B<+> I<Obj>
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<merge>, I<concat>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    I<Obj> B<-> I<Obj>
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<sub>, I<diff>, I<difference>
 
 =head2 ...
 
-I<Obj> B<...> I<Obj> -> I<Obj>
+    I<Obj> B<...> I<Obj>
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<to_list>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    I<Obj> B<==> I<Obj>
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<eq>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    I<Obj> B<^> I<Obj>
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    I<Obj> B<|> I<Obj>
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<or>, I<union>
 
 =head2 ≠
 
-I<Obj> B<≠> I<Obj> -> I<Obj>
+    I<Obj> B<≠> I<Obj>
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<!=>, I<ne>
 
 =head2 append
 
-Hash.append() -> I<Obj>
+    Hash.append()
 
 Return the
 
@@ -112,7 +112,7 @@ Return the
 
 =head2 as_tree
 
-Hash.as_tree() -> I<Obj>
+    Hash.as_tree()
 
 Return the
 
@@ -120,7 +120,7 @@ Return the
 
 =head2 clear
 
-Hash.clear() -> I<Obj>
+    Hash.clear()
 
 Return the
 
@@ -128,7 +128,7 @@ Return the
 
 =head2 collect
 
-Hash.collect() -> I<Obj>
+    Hash.collect()
 
 Return the
 
@@ -138,7 +138,7 @@ Aliases: I<collect_kv>
 
 =head2 count
 
-Hash.count() -> I<Obj>
+    Hash.count()
 
 Return the
 
@@ -146,7 +146,7 @@ Return the
 
 =head2 count_by
 
-Hash.count_by() -> I<Obj>
+    Hash.count_by()
 
 Return the
 
@@ -154,7 +154,7 @@ Return the
 
 =head2 delete
 
-Hash.delete() -> I<Obj>
+    Hash.delete()
 
 Return the
 
@@ -164,7 +164,7 @@ Aliases: I<remove>
 
 =head2 delete_if
 
-Hash.delete_if() -> I<Obj>
+    Hash.delete_if()
 
 Return the
 
@@ -172,7 +172,7 @@ Return the
 
 =head2 dig
 
-Hash.dig() -> I<Obj>
+    Hash.dig()
 
 Return the
 
@@ -180,7 +180,7 @@ Return the
 
 =head2 each
 
-Hash.each() -> I<Obj>
+    Hash.each()
 
 Return the
 
@@ -190,7 +190,7 @@ Aliases: I<each_kv>, I<each_pair>
 
 =head2 each_k
 
-Hash.each_k() -> I<Obj>
+    Hash.each_k()
 
 Return the
 
@@ -200,7 +200,7 @@ Aliases: I<each_key>
 
 =head2 each_v
 
-Hash.each_v() -> I<Obj>
+    Hash.each_v()
 
 Return the
 
@@ -210,7 +210,7 @@ Aliases: I<each_value>
 
 =head2 fetch
 
-Hash.fetch() -> I<Obj>
+    Hash.fetch()
 
 Return the
 
@@ -218,7 +218,7 @@ Return the
 
 =head2 flip
 
-Hash.flip() -> I<Obj>
+    Hash.flip()
 
 Return the
 
@@ -228,7 +228,7 @@ Aliases: I<invert>, I<reverse>
 
 =head2 get_pair
 
-Hash.get_pair() -> I<Obj>
+    Hash.get_pair()
 
 Return the
 
@@ -236,7 +236,7 @@ Return the
 
 =head2 get_pairs
 
-Hash.get_pairs() -> I<Obj>
+    Hash.get_pairs()
 
 Return the
 
@@ -244,7 +244,7 @@ Return the
 
 =head2 grep
 
-Hash.grep() -> I<Obj>
+    Hash.grep()
 
 Return the
 
@@ -254,7 +254,7 @@ Aliases: I<grep_kv>, I<select>
 
 =head2 grep_v
 
-Hash.grep_v() -> I<Obj>
+    Hash.grep_v()
 
 Return the
 
@@ -264,7 +264,7 @@ Aliases: I<grep_val>
 
 =head2 has
 
-Hash.has() -> I<Obj>
+    Hash.has()
 
 Return the
 
@@ -274,7 +274,7 @@ Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, 
 
 =head2 is_empty
 
-Hash.is_empty() -> I<Obj>
+    Hash.is_empty()
 
 Return the
 
@@ -282,7 +282,7 @@ Return the
 
 =head2 item
 
-Hash.item() -> I<Obj>
+    Hash.item()
 
 Return the
 
@@ -290,7 +290,7 @@ Return the
 
 =head2 items
 
-Hash.items() -> I<Obj>
+    Hash.items()
 
 Return the
 
@@ -298,7 +298,7 @@ Return the
 
 =head2 keys
 
-Hash.keys() -> I<Obj>
+    Hash.keys()
 
 Return the
 
@@ -306,7 +306,7 @@ Return the
 
 =head2 kv
 
-Hash.kv() -> I<Obj>
+    Hash.kv()
 
 Return the
 
@@ -316,7 +316,7 @@ Aliases: I<to_a>, I<pairs>, I<to_array>
 
 =head2 len
 
-Hash.len() -> I<Obj>
+    Hash.len()
 
 Return the
 
@@ -326,7 +326,7 @@ Aliases: I<size>, I<length>
 
 =head2 lsel
 
-Hash.lsel() -> I<Obj>
+    Hash.lsel()
 
 Return the
 
@@ -336,7 +336,7 @@ Aliases: I<linsel>, I<linear_selection>
 
 =head2 map
 
-Hash.map() -> I<Obj>
+    Hash.map()
 
 Return the
 
@@ -346,7 +346,7 @@ Aliases: I<map_kv>
 
 =head2 map_v
 
-Hash.map_v() -> I<Obj>
+    Hash.map_v()
 
 Return the
 
@@ -356,7 +356,7 @@ Aliases: I<map_val>
 
 =head2 max_by
 
-Hash.max_by() -> I<Obj>
+    Hash.max_by()
 
 Return the
 
@@ -364,7 +364,7 @@ Return the
 
 =head2 merge_values
 
-Hash.merge_values() -> I<Obj>
+    Hash.merge_values()
 
 Return the
 
@@ -372,7 +372,7 @@ Return the
 
 =head2 min_by
 
-Hash.min_by() -> I<Obj>
+    Hash.min_by()
 
 Return the
 
@@ -380,7 +380,7 @@ Return the
 
 =head2 new
 
-Hash.new() -> I<Obj>
+    Hash.new()
 
 Return the
 
@@ -390,7 +390,7 @@ Aliases: I<call>
 
 =head2 same_keys
 
-Hash.same_keys() -> I<Obj>
+    Hash.same_keys()
 
 Return the
 
@@ -398,7 +398,7 @@ Return the
 
 =head2 set_keys
 
-Hash.set_keys() -> I<Obj>
+    Hash.set_keys()
 
 Return the
 
@@ -406,7 +406,7 @@ Return the
 
 =head2 slice
 
-Hash.slice() -> I<Obj>
+    Hash.slice()
 
 Return the
 
@@ -414,7 +414,7 @@ Return the
 
 =head2 sort
 
-Hash.sort() -> I<Obj>
+    Hash.sort()
 
 Return the
 
@@ -422,7 +422,7 @@ Return the
 
 =head2 sort_by
 
-Hash.sort_by() -> I<Obj>
+    Hash.sort_by()
 
 Return the
 
@@ -430,7 +430,7 @@ Return the
 
 =head2 to_bag
 
-Hash.to_bag() -> I<Obj>
+    Hash.to_bag()
 
 Return the
 
@@ -438,7 +438,7 @@ Return the
 
 =head2 to_s
 
-Hash.to_s() -> I<Obj>
+    Hash.to_s()
 
 Return the
 
@@ -448,7 +448,7 @@ Aliases: I<dump>, I<to_str>
 
 =head2 to_set
 
-Hash.to_set() -> I<Obj>
+    Hash.to_set()
 
 Return the
 
@@ -456,7 +456,7 @@ Return the
 
 =head2 values
 
-Hash.values() -> I<Obj>
+    Hash.values()
 
 Return the
 

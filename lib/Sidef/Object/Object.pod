@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 !~
 
-I<Obj> B<!~> I<Obj> -> I<Obj>
+    I<Obj> B<!~> I<Obj>
 
 Return the
 
@@ -32,7 +32,7 @@ Return the
 
 =head2 &&
 
-I<Obj> B<&&> I<Obj> -> I<Obj>
+    I<Obj> B<&&> I<Obj>
 
 Return the
 
@@ -40,7 +40,7 @@ Return the
 
 =head2 :
 
-I<Obj> B<:> I<Obj> -> I<Obj>
+    I<Obj> B<:> I<Obj>
 
 Return the
 
@@ -48,7 +48,7 @@ Return the
 
 =head2 \\
 
-I<Obj> B<\\> I<Obj> -> I<Obj>
+    I<Obj> B<\\> I<Obj>
 
 Return the
 
@@ -56,7 +56,7 @@ Return the
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    I<Obj> B<^> I<Obj>
 
 Return the
 
@@ -64,7 +64,7 @@ Return the
 
 =head2 |>
 
-I<Obj> B<|E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<|E<gt>> I<Obj>
 
 Return the
 
@@ -72,7 +72,7 @@ Return the
 
 =head2 ||
 
-I<Obj> B<||> I<Obj> -> I<Obj>
+    I<Obj> B<||> I<Obj>
 
 Return the
 
@@ -80,7 +80,7 @@ Return the
 
 =head2 ~~
 
-I<Obj> B<~~> I<Obj> -> I<Obj>
+    I<Obj> B<~~> I<Obj>
 
 Return the
 
@@ -88,7 +88,7 @@ Return the
 
 =head2 ⫶
 
-I<Obj> B<⫶> I<Obj> -> I<Obj>
+    I<Obj> B<⫶> I<Obj>
 
 Return the
 
@@ -96,7 +96,7 @@ Return the
 
 =head2 ：
 
-I<Obj> B<：> I<Obj> -> I<Obj>
+    I<Obj> B<：> I<Obj>
 
 Return the
 
@@ -104,7 +104,7 @@ Return the
 
 =head2 alias_method
 
-Object.alias_method() -> I<Obj>
+    Object.alias_method()
 
 Return the
 
@@ -112,7 +112,7 @@ Return the
 
 =head2 bless
 
-Object.bless() -> I<Obj>
+    Object.bless()
 
 Return the
 
@@ -120,7 +120,7 @@ Return the
 
 =head2 class
 
-Object.class() -> I<Obj>
+    Object.class()
 
 Return the
 
@@ -128,7 +128,7 @@ Return the
 
 =head2 clone
 
-Object.clone() -> I<Obj>
+    Object.clone()
 
 Return the
 
@@ -136,7 +136,7 @@ Return the
 
 =head2 dclone
 
-Object.dclone() -> I<Obj>
+    Object.dclone()
 
 Return the
 
@@ -146,7 +146,7 @@ Aliases: I<deep_clone>
 
 =head2 def_method
 
-Object.def_method() -> I<Obj>
+    Object.def_method()
 
 Return the
 
@@ -154,7 +154,7 @@ Return the
 
 =head2 dump
 
-Object.dump() -> I<Obj>
+    Object.dump()
 
 Return the
 
@@ -162,7 +162,7 @@ Return the
 
 =head2 interpolate
 
-Object.interpolate() -> I<Obj>
+    Object.interpolate()
 
 Return the
 
@@ -170,7 +170,7 @@ Return the
 
 =head2 is_a
 
-Object.is_a() -> I<Obj>
+    Object.is_a()
 
 Return the
 
@@ -180,7 +180,7 @@ Aliases: I<is_an>, I<kind_of>
 
 =head2 is_object
 
-Object.is_object() -> I<Obj>
+    Object.is_object()
 
 Return the
 
@@ -188,7 +188,7 @@ Return the
 
 =head2 is_typename
 
-Object.is_typename() -> I<Obj>
+    Object.is_typename()
 
 Return the
 
@@ -196,7 +196,7 @@ Return the
 
 =head2 lazy
 
-Object.lazy() -> I<Obj>
+    Object.lazy()
 
 Return the
 
@@ -204,7 +204,7 @@ Return the
 
 =head2 method
 
-Object.method() -> I<Obj>
+    Object.method()
 
 Return the
 
@@ -212,7 +212,7 @@ Return the
 
 =head2 methods
 
-Object.methods() -> I<Obj>
+    Object.methods()
 
 Return the
 
@@ -220,7 +220,7 @@ Return the
 
 =head2 new
 
-Object.new() -> I<Obj>
+    Object.new()
 
 Return the
 
@@ -228,7 +228,7 @@ Return the
 
 =head2 parent_classes
 
-Object.parent_classes() -> I<Obj>
+    Object.parent_classes()
 
 Return the
 
@@ -236,7 +236,7 @@ Return the
 
 =head2 print
 
-Object.print() -> I<Obj>
+    Object.print()
 
 Return the
 
@@ -244,7 +244,7 @@ Return the
 
 =head2 ref
 
-Object.ref() -> I<Obj>
+    Object.ref()
 
 Return the
 
@@ -252,7 +252,7 @@ Return the
 
 =head2 refaddr
 
-Object.refaddr() -> I<Obj>
+    Object.refaddr()
 
 Return the
 
@@ -262,7 +262,7 @@ Aliases: I<object_id>
 
 =head2 reftype
 
-Object.reftype() -> I<Obj>
+    Object.reftype()
 
 Return the
 
@@ -272,7 +272,7 @@ Aliases: I<object_type>
 
 =head2 respond_to
 
-Object.respond_to() -> I<Obj>
+    Object.respond_to()
 
 Return the
 
@@ -280,7 +280,7 @@ Return the
 
 =head2 say
 
-Object.say() -> I<Obj>
+    Object.say()
 
 Return the
 
@@ -290,7 +290,7 @@ Aliases: I<println>
 
 =head2 undef_method
 
-Object.undef_method() -> I<Obj>
+    Object.undef_method()
 
 Return the
 

@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 !=
 
-I<Obj> B<!=> I<Obj> -> I<Obj>
+    I<Obj> B<!=> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<ne>
 
 =head2 %
 
-I<Obj> B<%> I<Obj> -> I<Obj>
+    I<Obj> B<%> I<Obj>
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<mod>
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    I<Obj> B<&> I<Obj>
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<and>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    I<Obj> B<*> I<Obj>
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<mul>
 
 =head2 **
 
-I<Obj> B<**> I<Obj> -> I<Obj>
+    I<Obj> B<**> I<Obj>
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<pow>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    I<Obj> B<+> I<Obj>
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<add>
 
 =head2 ++
 
-I<Obj> B<++> I<Obj> -> I<Obj>
+    I<Obj> B<++> I<Obj>
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<inc>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    I<Obj> B<-> I<Obj>
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<sub>
 
 =head2 --
 
-I<Obj> B<--> I<Obj> -> I<Obj>
+    I<Obj> B<--> I<Obj>
 
 Return the
 
@@ -114,7 +114,7 @@ Aliases: I<dec>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    I<Obj> B</> I<Obj>
 
 Return the
 
@@ -124,7 +124,7 @@ Aliases: I<÷>, I<div>
 
 =head2 <
 
-I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>> I<Obj>
 
 Return the
 
@@ -134,7 +134,7 @@ Aliases: I<lt>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>E<lt>> I<Obj>
 
 Return the
 
@@ -144,7 +144,7 @@ Aliases: I<lsft>, I<shift_left>
 
 =head2 <=>
 
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>=E<gt>> I<Obj>
 
 Return the
 
@@ -154,7 +154,7 @@ Aliases: I<cmp>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    I<Obj> B<==> I<Obj>
 
 Return the
 
@@ -164,7 +164,7 @@ Aliases: I<eq>
 
 =head2 >
 
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<gt>> I<Obj>
 
 Return the
 
@@ -174,7 +174,7 @@ Aliases: I<gt>
 
 =head2 >>
 
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<gt>E<gt>> I<Obj>
 
 Return the
 
@@ -184,7 +184,7 @@ Aliases: I<rsft>, I<shift_right>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    I<Obj> B<^> I<Obj>
 
 Return the
 
@@ -194,7 +194,7 @@ Aliases: I<xor>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    I<Obj> B<|> I<Obj>
 
 Return the
 
@@ -204,7 +204,7 @@ Aliases: I<or>
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    I<Obj> B<≤> I<Obj>
 
 Return the
 
@@ -214,7 +214,7 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    I<Obj> B<≥> I<Obj>
 
 Return the
 
@@ -224,7 +224,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 a
 
-Quadratic.a() -> I<Obj>
+    Quadratic.a()
 
 Return the
 
@@ -234,7 +234,7 @@ Aliases: I<re>, I<real>
 
 =head2 abs
 
-Quadratic.abs() -> I<Obj>
+    Quadratic.abs()
 
 Return the
 
@@ -242,7 +242,7 @@ Return the
 
 =head2 b
 
-Quadratic.b() -> I<Obj>
+    Quadratic.b()
 
 Return the
 
@@ -252,7 +252,7 @@ Aliases: I<im>, I<imag>
 
 =head2 ceil
 
-Quadratic.ceil() -> I<Obj>
+    Quadratic.ceil()
 
 Return the
 
@@ -260,7 +260,7 @@ Return the
 
 =head2 conj
 
-Quadratic.conj() -> I<Obj>
+    Quadratic.conj()
 
 Return the
 
@@ -268,7 +268,7 @@ Return the
 
 =head2 dump
 
-Quadratic.dump() -> I<Obj>
+    Quadratic.dump()
 
 Return the
 
@@ -276,7 +276,7 @@ Return the
 
 =head2 float
 
-Quadratic.float() -> I<Obj>
+    Quadratic.float()
 
 Return the
 
@@ -284,7 +284,7 @@ Return the
 
 =head2 floor
 
-Quadratic.floor() -> I<Obj>
+    Quadratic.floor()
 
 Return the
 
@@ -292,7 +292,7 @@ Return the
 
 =head2 inv
 
-Quadratic.inv() -> I<Obj>
+    Quadratic.inv()
 
 Return the
 
@@ -300,7 +300,7 @@ Return the
 
 =head2 invmod
 
-Quadratic.invmod() -> I<Obj>
+    Quadratic.invmod()
 
 Return the
 
@@ -308,7 +308,7 @@ Return the
 
 =head2 is_coprime
 
-Quadratic.is_coprime() -> I<Obj>
+    Quadratic.is_coprime()
 
 Return the
 
@@ -316,7 +316,7 @@ Return the
 
 =head2 is_mone
 
-Quadratic.is_mone() -> I<Obj>
+    Quadratic.is_mone()
 
 Return the
 
@@ -324,7 +324,7 @@ Return the
 
 =head2 is_one
 
-Quadratic.is_one() -> I<Obj>
+    Quadratic.is_one()
 
 Return the
 
@@ -332,7 +332,7 @@ Return the
 
 =head2 is_zero
 
-Quadratic.is_zero() -> I<Obj>
+    Quadratic.is_zero()
 
 Return the
 
@@ -340,7 +340,7 @@ Return the
 
 =head2 neg
 
-Quadratic.neg() -> I<Obj>
+    Quadratic.neg()
 
 Return the
 
@@ -348,7 +348,7 @@ Return the
 
 =head2 new
 
-Quadratic.new() -> I<Obj>
+    Quadratic.new()
 
 Return the
 
@@ -358,7 +358,7 @@ Aliases: I<call>
 
 =head2 norm
 
-Quadratic.norm() -> I<Obj>
+    Quadratic.norm()
 
 Return the
 
@@ -366,7 +366,7 @@ Return the
 
 =head2 parts
 
-Quadratic.parts() -> I<Obj>
+    Quadratic.parts()
 
 Return the
 
@@ -374,7 +374,7 @@ Return the
 
 =head2 powmod
 
-Quadratic.powmod() -> I<Obj>
+    Quadratic.powmod()
 
 Return the
 
@@ -382,7 +382,7 @@ Return the
 
 =head2 reals
 
-Quadratic.reals() -> I<Obj>
+    Quadratic.reals()
 
 Return the
 
@@ -390,7 +390,7 @@ Return the
 
 =head2 round
 
-Quadratic.round() -> I<Obj>
+    Quadratic.round()
 
 Return the
 
@@ -398,7 +398,7 @@ Return the
 
 =head2 sgn
 
-Quadratic.sgn() -> I<Obj>
+    Quadratic.sgn()
 
 Return the
 
@@ -406,7 +406,7 @@ Return the
 
 =head2 sqr
 
-Quadratic.sqr() -> I<Obj>
+    Quadratic.sqr()
 
 Return the
 
@@ -414,7 +414,7 @@ Return the
 
 =head2 to_c
 
-Quadratic.to_c() -> I<Obj>
+    Quadratic.to_c()
 
 Return the
 
@@ -424,7 +424,7 @@ Aliases: I<to_n>
 
 =head2 to_s
 
-Quadratic.to_s() -> I<Obj>
+    Quadratic.to_s()
 
 Return the
 
@@ -432,7 +432,7 @@ Return the
 
 =head2 w
 
-Quadratic.w() -> I<Obj>
+    Quadratic.w()
 
 Return the
 

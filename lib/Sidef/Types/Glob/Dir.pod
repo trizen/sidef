@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    I<Obj> B<+> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<concat>, I<catfile>
 
 =head2 chdir
 
-Dir.chdir() -> I<Obj>
+    Dir.chdir()
 
 Return the
 
@@ -42,7 +42,7 @@ Return the
 
 =head2 chroot
 
-Dir.chroot() -> I<Obj>
+    Dir.chroot()
 
 Return the
 
@@ -50,7 +50,7 @@ Return the
 
 =head2 cwd
 
-Dir.cwd() -> I<Obj>
+    Dir.cwd()
 
 Return the
 
@@ -58,7 +58,7 @@ Return the
 
 =head2 delete
 
-Dir.delete() -> I<Obj>
+    Dir.delete()
 
 Return the
 
@@ -68,7 +68,7 @@ Aliases: I<remove>, I<unlink>
 
 =head2 dump
 
-Dir.dump() -> I<Obj>
+    Dir.dump()
 
 Return the
 
@@ -76,7 +76,7 @@ Return the
 
 =head2 home
 
-Dir.home() -> I<Obj>
+    Dir.home()
 
 Return the
 
@@ -84,7 +84,7 @@ Return the
 
 =head2 is_empty
 
-Dir.is_empty() -> I<Obj>
+    Dir.is_empty()
 
 Return the
 
@@ -92,7 +92,7 @@ Return the
 
 =head2 make
 
-Dir.make() -> I<Obj>
+    Dir.make()
 
 Return the
 
@@ -102,7 +102,7 @@ Aliases: I<mkdir>, I<create>
 
 =head2 mkpath
 
-Dir.mkpath() -> I<Obj>
+    Dir.mkpath()
 
 Return the
 
@@ -112,7 +112,7 @@ Aliases: I<mktree>, I<make_path>, I<make_tree>, I<create_tree>
 
 =head2 new
 
-Dir.new() -> I<Obj>
+    Dir.new()
 
 Return the
 
@@ -122,7 +122,7 @@ Aliases: I<call>
 
 =head2 open
 
-Dir.open() -> I<Obj>
+    Dir.open()
 
 Return the
 
@@ -132,7 +132,7 @@ Aliases: I<open_r>
 
 =head2 open_rw
 
-Dir.open_rw() -> I<Obj>
+    Dir.open_rw()
 
 Return the
 
@@ -140,7 +140,7 @@ Return the
 
 =head2 open_w
 
-Dir.open_w() -> I<Obj>
+    Dir.open_w()
 
 Return the
 
@@ -148,7 +148,7 @@ Return the
 
 =head2 parent
 
-Dir.parent() -> I<Obj>
+    Dir.parent()
 
 Return the
 
@@ -156,7 +156,7 @@ Return the
 
 =head2 pwd
 
-Dir.pwd() -> I<Obj>
+    Dir.pwd()
 
 Return the
 
@@ -164,7 +164,7 @@ Return the
 
 =head2 remove_tree
 
-Dir.remove_tree() -> I<Obj>
+    Dir.remove_tree()
 
 Return the
 
@@ -172,7 +172,7 @@ Return the
 
 =head2 root
 
-Dir.root() -> I<Obj>
+    Dir.root()
 
 Return the
 
@@ -180,7 +180,7 @@ Return the
 
 =head2 split
 
-Dir.split() -> I<Obj>
+    Dir.split()
 
 Return the
 
@@ -188,7 +188,7 @@ Return the
 
 =head2 tmp
 
-Dir.tmp() -> I<Obj>
+    Dir.tmp()
 
 Return the
 
@@ -198,7 +198,7 @@ Aliases: I<temp>
 
 =head2 to_dir
 
-Dir.to_dir() -> I<Obj>
+    Dir.to_dir()
 
 Return the
 
@@ -206,7 +206,7 @@ Return the
 
 =head2 to_s
 
-Dir.to_s() -> I<Obj>
+    Dir.to_s()
 
 Return the
 
@@ -216,7 +216,7 @@ Aliases: I<to_str>
 
 =head2 up
 
-Dir.up() -> I<Obj>
+    Dir.up()
 
 Return the
 

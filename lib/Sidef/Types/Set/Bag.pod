@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    I<Obj> B<&> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<∩>, I<and>, I<intersection>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    I<Obj> B<+> I<Obj>
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<concat>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    I<Obj> B<-> I<Obj>
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
 =head2 ...
 
-I<Obj> B<...> I<Obj> -> I<Obj>
+    I<Obj> B<...> I<Obj>
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<to_list>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>E<lt>> I<Obj>
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<add>, I<push>, I<append>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    I<Obj> B<^> I<Obj>
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    I<Obj> B<|> I<Obj>
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<∪>, I<or>, I<union>
 
 =head2 ∋
 
-I<Obj> B<∋> I<Obj> -> I<Obj>
+    I<Obj> B<∋> I<Obj>
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<con
 
 =head2 ∌
 
-I<Obj> B<∌> I<Obj> -> I<Obj>
+    I<Obj> B<∌> I<Obj>
 
 Return the
 
@@ -112,7 +112,7 @@ Return the
 
 =head2 ≠
 
-I<Obj> B<≠> I<Obj> -> I<Obj>
+    I<Obj> B<≠> I<Obj>
 
 Return the
 
@@ -122,7 +122,7 @@ Aliases: I<!=>, I<ne>
 
 =head2 ≡
 
-I<Obj> B<≡> I<Obj> -> I<Obj>
+    I<Obj> B<≡> I<Obj>
 
 Return the
 
@@ -132,7 +132,7 @@ Aliases: I<==>, I<eq>
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    I<Obj> B<≤> I<Obj>
 
 Return the
 
@@ -142,7 +142,7 @@ Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    I<Obj> B<≥> I<Obj>
 
 Return the
 
@@ -152,7 +152,7 @@ Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
 =head2 add_kv
 
-Bag.add_kv() -> I<Obj>
+    Bag.add_kv()
 
 Return the
 
@@ -162,7 +162,7 @@ Aliases: I<push_kv>, I<add_pair>, I<append_kv>, I<push_pair>, I<append_pair>
 
 =head2 add_kvs
 
-Bag.add_kvs() -> I<Obj>
+    Bag.add_kvs()
 
 Return the
 
@@ -172,7 +172,7 @@ Aliases: I<push_kvs>, I<add_pairs>, I<append_kvs>, I<push_pairs>, I<append_pairs
 
 =head2 clone
 
-Bag.clone() -> I<Obj>
+    Bag.clone()
 
 Return the
 
@@ -180,7 +180,7 @@ Return the
 
 =head2 collect
 
-Bag.collect() -> I<Obj>
+    Bag.collect()
 
 Return the
 
@@ -188,7 +188,7 @@ Return the
 
 =head2 contains_all
 
-Bag.contains_all() -> I<Obj>
+    Bag.contains_all()
 
 Return the
 
@@ -196,7 +196,7 @@ Return the
 
 =head2 count_by
 
-Bag.count_by() -> I<Obj>
+    Bag.count_by()
 
 Return the
 
@@ -204,7 +204,7 @@ Return the
 
 =head2 delete
 
-Bag.delete() -> I<Obj>
+    Bag.delete()
 
 Return the
 
@@ -214,7 +214,7 @@ Aliases: I<remove>, I<discard>
 
 =head2 delete_all
 
-Bag.delete_all() -> I<Obj>
+    Bag.delete_all()
 
 Return the
 
@@ -224,7 +224,7 @@ Aliases: I<remove_all>, I<discard_all>
 
 =head2 delete_first_if
 
-Bag.delete_first_if() -> I<Obj>
+    Bag.delete_first_if()
 
 Return the
 
@@ -232,7 +232,7 @@ Return the
 
 =head2 delete_if
 
-Bag.delete_if() -> I<Obj>
+    Bag.delete_if()
 
 Return the
 
@@ -240,7 +240,7 @@ Return the
 
 =head2 delete_key
 
-Bag.delete_key() -> I<Obj>
+    Bag.delete_key()
 
 Return the
 
@@ -250,7 +250,7 @@ Aliases: I<remove_key>, I<discard_key>
 
 =head2 dump
 
-Bag.dump() -> I<Obj>
+    Bag.dump()
 
 Return the
 
@@ -258,7 +258,7 @@ Return the
 
 =head2 each
 
-Bag.each() -> I<Obj>
+    Bag.each()
 
 Return the
 
@@ -266,7 +266,7 @@ Return the
 
 =head2 each_2d
 
-Bag.each_2d() -> I<Obj>
+    Bag.each_2d()
 
 Return the
 
@@ -274,7 +274,7 @@ Return the
 
 =head2 each_kv
 
-Bag.each_kv() -> I<Obj>
+    Bag.each_kv()
 
 Return the
 
@@ -282,7 +282,7 @@ Return the
 
 =head2 elems
 
-Bag.elems() -> I<Obj>
+    Bag.elems()
 
 Return the
 
@@ -292,7 +292,7 @@ Aliases: I<keys_len>
 
 =head2 freq
 
-Bag.freq() -> I<Obj>
+    Bag.freq()
 
 Return the
 
@@ -300,7 +300,7 @@ Return the
 
 =head2 get
 
-Bag.get() -> I<Obj>
+    Bag.get()
 
 Return the
 
@@ -310,7 +310,7 @@ Aliases: I<count>
 
 =head2 grep
 
-Bag.grep() -> I<Obj>
+    Bag.grep()
 
 Return the
 
@@ -320,7 +320,7 @@ Aliases: I<select>
 
 =head2 grep_2d
 
-Bag.grep_2d() -> I<Obj>
+    Bag.grep_2d()
 
 Return the
 
@@ -328,7 +328,7 @@ Return the
 
 =head2 grep_kv
 
-Bag.grep_kv() -> I<Obj>
+    Bag.grep_kv()
 
 Return the
 
@@ -336,7 +336,7 @@ Return the
 
 =head2 iter
 
-Bag.iter() -> I<Obj>
+    Bag.iter()
 
 Return the
 
@@ -344,7 +344,7 @@ Return the
 
 =head2 join
 
-Bag.join() -> I<Obj>
+    Bag.join()
 
 Return the
 
@@ -352,7 +352,7 @@ Return the
 
 =head2 keys
 
-Bag.keys() -> I<Obj>
+    Bag.keys()
 
 Return the
 
@@ -360,7 +360,7 @@ Return the
 
 =head2 kv
 
-Bag.kv() -> I<Obj>
+    Bag.kv()
 
 Return the
 
@@ -370,7 +370,7 @@ Aliases: I<pairs>
 
 =head2 len
 
-Bag.len() -> I<Obj>
+    Bag.len()
 
 Return the
 
@@ -380,7 +380,7 @@ Aliases: I<size>, I<length>
 
 =head2 map
 
-Bag.map() -> I<Obj>
+    Bag.map()
 
 Return the
 
@@ -388,7 +388,7 @@ Return the
 
 =head2 map_2d
 
-Bag.map_2d() -> I<Obj>
+    Bag.map_2d()
 
 Return the
 
@@ -396,7 +396,7 @@ Return the
 
 =head2 map_kv
 
-Bag.map_kv() -> I<Obj>
+    Bag.map_kv()
 
 Return the
 
@@ -404,7 +404,7 @@ Return the
 
 =head2 max
 
-Bag.max() -> I<Obj>
+    Bag.max()
 
 Return the
 
@@ -412,7 +412,7 @@ Return the
 
 =head2 max_by
 
-Bag.max_by() -> I<Obj>
+    Bag.max_by()
 
 Return the
 
@@ -420,7 +420,7 @@ Return the
 
 =head2 min
 
-Bag.min() -> I<Obj>
+    Bag.min()
 
 Return the
 
@@ -428,7 +428,7 @@ Return the
 
 =head2 min_by
 
-Bag.min_by() -> I<Obj>
+    Bag.min_by()
 
 Return the
 
@@ -436,7 +436,7 @@ Return the
 
 =head2 new
 
-Bag.new() -> I<Obj>
+    Bag.new()
 
 Return the
 
@@ -446,7 +446,7 @@ Aliases: I<call>
 
 =head2 pop
 
-Bag.pop() -> I<Obj>
+    Bag.pop()
 
 Return the
 
@@ -454,7 +454,7 @@ Return the
 
 =head2 set_kv
 
-Bag.set_kv() -> I<Obj>
+    Bag.set_kv()
 
 Return the
 
@@ -464,7 +464,7 @@ Aliases: I<update_kv>, I<update_pair>, I<replace_pair>
 
 =head2 set_kvs
 
-Bag.set_kvs() -> I<Obj>
+    Bag.set_kvs()
 
 Return the
 
@@ -474,7 +474,7 @@ Aliases: I<update_kvs>, I<update_pairs>, I<replace_pairs>
 
 =head2 shift
 
-Bag.shift() -> I<Obj>
+    Bag.shift()
 
 Return the
 
@@ -482,7 +482,7 @@ Return the
 
 =head2 sort
 
-Bag.sort() -> I<Obj>
+    Bag.sort()
 
 Return the
 
@@ -490,7 +490,7 @@ Return the
 
 =head2 sort_by
 
-Bag.sort_by() -> I<Obj>
+    Bag.sort_by()
 
 Return the
 
@@ -498,7 +498,7 @@ Return the
 
 =head2 to_a
 
-Bag.to_a() -> I<Obj>
+    Bag.to_a()
 
 Return the
 
@@ -508,7 +508,7 @@ Aliases: I<expand>, I<to_array>
 
 =head2 to_bag
 
-Bag.to_bag() -> I<Obj>
+    Bag.to_bag()
 
 Return the
 
@@ -516,7 +516,7 @@ Return the
 
 =head2 top
 
-Bag.top() -> I<Obj>
+    Bag.top()
 
 Return the
 
@@ -526,7 +526,7 @@ Aliases: I<most_common>
 
 =head2 to_set
 
-Bag.to_set() -> I<Obj>
+    Bag.to_set()
 
 Return the
 
@@ -534,7 +534,7 @@ Return the
 
 =head2 uniq
 
-Bag.uniq() -> I<Obj>
+    Bag.uniq()
 
 Return the
 
@@ -544,7 +544,7 @@ Aliases: I<unique>
 
 =head2 values
 
-Bag.values() -> I<Obj>
+    Bag.values()
 
 Return the
 

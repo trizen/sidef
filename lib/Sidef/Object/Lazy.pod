@@ -17,7 +17,7 @@ var obj = Lazy(...)
 
 =head2 each
 
-Lazy.each() -> I<Obj>
+    Lazy.each()
 
 Return the
 
@@ -25,7 +25,7 @@ Return the
 
 =head2 first
 
-Lazy.first() -> I<Obj>
+    Lazy.first()
 
 Return the
 
@@ -33,7 +33,7 @@ Return the
 
 =head2 first_by
 
-Lazy.first_by() -> I<Obj>
+    Lazy.first_by()
 
 Return the
 
@@ -41,7 +41,7 @@ Return the
 
 =head2 grep
 
-Lazy.grep() -> I<Obj>
+    Lazy.grep()
 
 Return the
 
@@ -51,7 +51,7 @@ Aliases: I<select>
 
 =head2 iter
 
-Lazy.iter() -> I<Obj>
+    Lazy.iter()
 
 Return the
 
@@ -59,7 +59,7 @@ Return the
 
 =head2 lazy
 
-Lazy.lazy() -> I<Obj>
+    Lazy.lazy()
 
 Return the
 
@@ -67,7 +67,7 @@ Return the
 
 =head2 map
 
-Lazy.map() -> I<Obj>
+    Lazy.map()
 
 Return the
 
@@ -77,7 +77,7 @@ Aliases: I<collect>
 
 =head2 new
 
-Lazy.new() -> I<Obj>
+    Lazy.new()
 
 Return the
 
@@ -85,7 +85,7 @@ Return the
 
 =head2 nth
 
-Lazy.nth() -> I<Obj>
+    Lazy.nth()
 
 Return the
 
@@ -93,7 +93,7 @@ Return the
 
 =head2 to_a
 
-Lazy.to_a() -> I<Obj>
+    Lazy.to_a()
 
 Return the
 

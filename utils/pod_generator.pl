@@ -188,14 +188,14 @@ sub process_file {
 
 \=head2 $orig_name
 
-$parts[-1].$sub() -> I<Obj>
+    $parts[-1].$sub()
 
 Return the
 __POD__
 
 \=head2 $orig_name
 
-I<Obj> B<$sub> I<Obj> -> I<Obj>
+    I<Obj> B<$sub> I<Obj>
 
 Return the
 __POD2__

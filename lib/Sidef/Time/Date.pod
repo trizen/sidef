@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 !=
 
-I<Obj> B<!=> I<Obj> -> I<Obj>
+    I<Obj> B<!=> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<ne>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    I<Obj> B<+> I<Obj>
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<add>, I<add_seconds>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    I<Obj> B<-> I<Obj>
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<sub>, I<subtract>
 
 =head2 <
 
-I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>> I<Obj>
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<lt>
 
 =head2 <=
 
-I<Obj> B<E<lt>=> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>=> I<Obj>
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<le>
 
 =head2 <=>
 
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>=E<gt>> I<Obj>
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<cmp>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    I<Obj> B<==> I<Obj>
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<eq>
 
 =head2 >
 
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<gt>> I<Obj>
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<gt>
 
 =head2 >=
 
-I<Obj> B<E<gt>=> I<Obj> -> I<Obj>
+    I<Obj> B<E<gt>=> I<Obj>
 
 Return the
 
@@ -114,7 +114,7 @@ Aliases: I<ge>
 
 =head2 add_days
 
-Date.add_days() -> I<Obj>
+    Date.add_days()
 
 Return the
 
@@ -122,7 +122,7 @@ Return the
 
 =head2 add_months
 
-Date.add_months() -> I<Obj>
+    Date.add_months()
 
 Return the
 
@@ -130,7 +130,7 @@ Return the
 
 =head2 add_years
 
-Date.add_years() -> I<Obj>
+    Date.add_years()
 
 Return the
 
@@ -138,7 +138,7 @@ Return the
 
 =head2 call
 
-Date.call() -> I<Obj>
+    Date.call()
 
 Return the
 
@@ -146,7 +146,7 @@ Return the
 
 =head2 date
 
-Date.date() -> I<Obj>
+    Date.date()
 
 Return the
 
@@ -154,7 +154,7 @@ Return the
 
 =head2 day
 
-Date.day() -> I<Obj>
+    Date.day()
 
 Return the
 
@@ -164,7 +164,7 @@ Aliases: I<mday>, I<month_day>
 
 =head2 dmy
 
-Date.dmy() -> I<Obj>
+    Date.dmy()
 
 Return the
 
@@ -172,7 +172,7 @@ Return the
 
 =head2 dump
 
-Date.dump() -> I<Obj>
+    Date.dump()
 
 Return the
 
@@ -180,7 +180,7 @@ Return the
 
 =head2 epoch
 
-Date.epoch() -> I<Obj>
+    Date.epoch()
 
 Return the
 
@@ -188,7 +188,7 @@ Return the
 
 =head2 format
 
-Date.format() -> I<Obj>
+    Date.format()
 
 Return the
 
@@ -198,7 +198,7 @@ Aliases: I<strftime>
 
 =head2 fullmonth
 
-Date.fullmonth() -> I<Obj>
+    Date.fullmonth()
 
 Return the
 
@@ -206,7 +206,7 @@ Return the
 
 =head2 gmt
 
-Date.gmt() -> I<Obj>
+    Date.gmt()
 
 Return the
 
@@ -216,7 +216,7 @@ Aliases: I<gmtime>
 
 =head2 hour
 
-Date.hour() -> I<Obj>
+    Date.hour()
 
 Return the
 
@@ -224,7 +224,7 @@ Return the
 
 =head2 isdst
 
-Date.isdst() -> I<Obj>
+    Date.isdst()
 
 Return the
 
@@ -234,7 +234,7 @@ Aliases: I<daylight_savings>
 
 =head2 julian_day
 
-Date.julian_day() -> I<Obj>
+    Date.julian_day()
 
 Return the
 
@@ -242,7 +242,7 @@ Return the
 
 =head2 local
 
-Date.local() -> I<Obj>
+    Date.local()
 
 Return the
 
@@ -252,7 +252,7 @@ Aliases: I<localtime>
 
 =head2 mdy
 
-Date.mdy() -> I<Obj>
+    Date.mdy()
 
 Return the
 
@@ -260,7 +260,7 @@ Return the
 
 =head2 min
 
-Date.min() -> I<Obj>
+    Date.min()
 
 Return the
 
@@ -270,7 +270,7 @@ Aliases: I<minute>
 
 =head2 mon
 
-Date.mon() -> I<Obj>
+    Date.mon()
 
 Return the
 
@@ -280,7 +280,7 @@ Aliases: I<month>
 
 =head2 monname
 
-Date.monname() -> I<Obj>
+    Date.monname()
 
 Return the
 
@@ -288,7 +288,7 @@ Return the
 
 =head2 month_last_day
 
-Date.month_last_day() -> I<Obj>
+    Date.month_last_day()
 
 Return the
 
@@ -296,7 +296,7 @@ Return the
 
 =head2 now
 
-Date.now() -> I<Obj>
+    Date.now()
 
 Return the
 
@@ -306,7 +306,7 @@ Aliases: I<today>
 
 =head2 parse
 
-Date.parse() -> I<Obj>
+    Date.parse()
 
 Return the
 
@@ -316,7 +316,7 @@ Aliases: I<strptime>
 
 =head2 sec
 
-Date.sec() -> I<Obj>
+    Date.sec()
 
 Return the
 
@@ -326,7 +326,7 @@ Aliases: I<second>
 
 =head2 time
 
-Date.time() -> I<Obj>
+    Date.time()
 
 Return the
 
@@ -334,7 +334,7 @@ Return the
 
 =head2 to_s
 
-Date.to_s() -> I<Obj>
+    Date.to_s()
 
 Return the
 
@@ -344,7 +344,7 @@ Aliases: I<cdate>, I<ctime>, I<to_str>
 
 =head2 truncate_to_day
 
-Date.truncate_to_day() -> I<Obj>
+    Date.truncate_to_day()
 
 Return the
 
@@ -352,7 +352,7 @@ Return the
 
 =head2 truncate_to_hour
 
-Date.truncate_to_hour() -> I<Obj>
+    Date.truncate_to_hour()
 
 Return the
 
@@ -360,7 +360,7 @@ Return the
 
 =head2 truncate_to_minute
 
-Date.truncate_to_minute() -> I<Obj>
+    Date.truncate_to_minute()
 
 Return the
 
@@ -368,7 +368,7 @@ Return the
 
 =head2 truncate_to_month
 
-Date.truncate_to_month() -> I<Obj>
+    Date.truncate_to_month()
 
 Return the
 
@@ -376,7 +376,7 @@ Return the
 
 =head2 truncate_to_quarter
 
-Date.truncate_to_quarter() -> I<Obj>
+    Date.truncate_to_quarter()
 
 Return the
 
@@ -384,7 +384,7 @@ Return the
 
 =head2 truncate_to_second
 
-Date.truncate_to_second() -> I<Obj>
+    Date.truncate_to_second()
 
 Return the
 
@@ -392,7 +392,7 @@ Return the
 
 =head2 truncate_to_year
 
-Date.truncate_to_year() -> I<Obj>
+    Date.truncate_to_year()
 
 Return the
 
@@ -400,7 +400,7 @@ Return the
 
 =head2 valid
 
-Date.valid() -> I<Obj>
+    Date.valid()
 
 Return the
 
@@ -410,7 +410,7 @@ Aliases: I<valid_date>
 
 =head2 wday
 
-Date.wday() -> I<Obj>
+    Date.wday()
 
 Return the
 
@@ -420,7 +420,7 @@ Aliases: I<week_day>
 
 =head2 wdayname
 
-Date.wdayname() -> I<Obj>
+    Date.wdayname()
 
 Return the
 
@@ -428,7 +428,7 @@ Return the
 
 =head2 week
 
-Date.week() -> I<Obj>
+    Date.week()
 
 Return the
 
@@ -436,7 +436,7 @@ Return the
 
 =head2 yday
 
-Date.yday() -> I<Obj>
+    Date.yday()
 
 Return the
 
@@ -446,7 +446,7 @@ Aliases: I<year_day>
 
 =head2 year
 
-Date.year() -> I<Obj>
+    Date.year()
 
 Return the
 
@@ -454,7 +454,7 @@ Return the
 
 =head2 ymd
 
-Date.ymd() -> I<Obj>
+    Date.ymd()
 
 Return the
 
@@ -462,7 +462,7 @@ Return the
 
 =head2 yy
 
-Date.yy() -> I<Obj>
+    Date.yy()
 
 Return the
 

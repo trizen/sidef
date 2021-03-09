@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 accept
 
-SocketHandle.accept() -> I<Obj>
+    SocketHandle.accept()
 
 Return the
 
@@ -32,7 +32,7 @@ Return the
 
 =head2 bind
 
-SocketHandle.bind() -> I<Obj>
+    SocketHandle.bind()
 
 Return the
 
@@ -40,7 +40,7 @@ Return the
 
 =head2 connect
 
-SocketHandle.connect() -> I<Obj>
+    SocketHandle.connect()
 
 Return the
 
@@ -48,7 +48,7 @@ Return the
 
 =head2 getpeername
 
-SocketHandle.getpeername() -> I<Obj>
+    SocketHandle.getpeername()
 
 Return the
 
@@ -56,7 +56,7 @@ Return the
 
 =head2 getsockname
 
-SocketHandle.getsockname() -> I<Obj>
+    SocketHandle.getsockname()
 
 Return the
 
@@ -64,7 +64,7 @@ Return the
 
 =head2 getsockopt
 
-SocketHandle.getsockopt() -> I<Obj>
+    SocketHandle.getsockopt()
 
 Return the
 
@@ -72,7 +72,7 @@ Return the
 
 =head2 listen
 
-SocketHandle.listen() -> I<Obj>
+    SocketHandle.listen()
 
 Return the
 
@@ -80,7 +80,7 @@ Return the
 
 =head2 new
 
-SocketHandle.new() -> I<Obj>
+    SocketHandle.new()
 
 Return the
 
@@ -90,7 +90,7 @@ Aliases: I<call>
 
 =head2 recv
 
-SocketHandle.recv() -> I<Obj>
+    SocketHandle.recv()
 
 Return the
 
@@ -98,7 +98,7 @@ Return the
 
 =head2 send
 
-SocketHandle.send() -> I<Obj>
+    SocketHandle.send()
 
 Return the
 
@@ -106,7 +106,7 @@ Return the
 
 =head2 setsockopt
 
-SocketHandle.setsockopt() -> I<Obj>
+    SocketHandle.setsockopt()
 
 Return the
 
@@ -114,7 +114,7 @@ Return the
 
 =head2 shutdown
 
-SocketHandle.shutdown() -> I<Obj>
+    SocketHandle.shutdown()
 
 Return the
 

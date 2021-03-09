@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 avg
 
-Math.avg() -> I<Obj>
+    Math.avg()
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<arithmetic_mean>
 
 =head2 binsplit
 
-Math.binsplit() -> I<Obj>
+    Math.binsplit()
 
 Return the
 
@@ -42,7 +42,7 @@ Return the
 
 =head2 chinese
 
-Math.chinese() -> I<Obj>
+    Math.chinese()
 
 Return the
 
@@ -50,7 +50,7 @@ Return the
 
 =head2 gcd
 
-Math.gcd() -> I<Obj>
+    Math.gcd()
 
 Return the
 
@@ -58,7 +58,7 @@ Return the
 
 =head2 geometric_mean
 
-Math.geometric_mean() -> I<Obj>
+    Math.geometric_mean()
 
 Return the
 
@@ -66,7 +66,7 @@ Return the
 
 =head2 harmonic_mean
 
-Math.harmonic_mean() -> I<Obj>
+    Math.harmonic_mean()
 
 Return the
 
@@ -74,7 +74,7 @@ Return the
 
 =head2 lcm
 
-Math.lcm() -> I<Obj>
+    Math.lcm()
 
 Return the
 
@@ -82,7 +82,7 @@ Return the
 
 =head2 map
 
-Math.map() -> I<Obj>
+    Math.map()
 
 Return the
 
@@ -90,7 +90,7 @@ Return the
 
 =head2 max
 
-Math.max() -> I<Obj>
+    Math.max()
 
 Return the
 
@@ -98,7 +98,7 @@ Return the
 
 =head2 min
 
-Math.min() -> I<Obj>
+    Math.min()
 
 Return the
 
@@ -106,7 +106,7 @@ Return the
 
 =head2 num2percent
 
-Math.num2percent() -> I<Obj>
+    Math.num2percent()
 
 Return the
 
@@ -114,7 +114,7 @@ Return the
 
 =head2 prod
 
-Math.prod() -> I<Obj>
+    Math.prod()
 
 Return the
 
@@ -124,7 +124,7 @@ Aliases: I<product>
 
 =head2 range_map
 
-Math.range_map() -> I<Obj>
+    Math.range_map()
 
 Return the
 
@@ -132,7 +132,7 @@ Return the
 
 =head2 range_sum
 
-Math.range_sum() -> I<Obj>
+    Math.range_sum()
 
 Return the
 
@@ -140,7 +140,7 @@ Return the
 
 =head2 smooth_numbers
 
-Math.smooth_numbers() -> I<Obj>
+    Math.smooth_numbers()
 
 Return the
 
@@ -148,7 +148,7 @@ Return the
 
 =head2 sum
 
-Math.sum() -> I<Obj>
+    Math.sum()
 
 Return the
 

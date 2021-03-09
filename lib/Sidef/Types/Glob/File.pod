@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 abs
 
-File.abs() -> I<Obj>
+    File.abs()
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<abs_name>, I<absname>, I<rel2abs>
 
 =head2 abs_path
 
-File.abs_path() -> I<Obj>
+    File.abs_path()
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<realpath>
 
 =head2 access_time_days_diff
 
-File.access_time_days_diff() -> I<Obj>
+    File.access_time_days_diff()
 
 Return the
 
@@ -52,7 +52,7 @@ Return the
 
 =head2 append
 
-File.append() -> I<Obj>
+    File.append()
 
 Return the
 
@@ -60,7 +60,7 @@ Return the
 
 =head2 base
 
-File.base() -> I<Obj>
+    File.base()
 
 Return the
 
@@ -70,7 +70,7 @@ Aliases: I<base_name>, I<basename>
 
 =head2 change_time_days_diff
 
-File.change_time_days_diff() -> I<Obj>
+    File.change_time_days_diff()
 
 Return the
 
@@ -78,7 +78,7 @@ Return the
 
 =head2 chmod
 
-File.chmod() -> I<Obj>
+    File.chmod()
 
 Return the
 
@@ -86,7 +86,7 @@ Return the
 
 =head2 chown
 
-File.chown() -> I<Obj>
+    File.chown()
 
 Return the
 
@@ -94,7 +94,7 @@ Return the
 
 =head2 compare
 
-File.compare() -> I<Obj>
+    File.compare()
 
 Return the
 
@@ -102,7 +102,7 @@ Return the
 
 =head2 cp
 
-File.cp() -> I<Obj>
+    File.cp()
 
 Return the
 
@@ -112,7 +112,7 @@ Aliases: I<copy>
 
 =head2 delete
 
-File.delete() -> I<Obj>
+    File.delete()
 
 Return the
 
@@ -122,7 +122,7 @@ Aliases: I<remove>
 
 =head2 dir
 
-File.dir() -> I<Obj>
+    File.dir()
 
 Return the
 
@@ -132,7 +132,7 @@ Aliases: I<dir_name>, I<dirname>
 
 =head2 dump
 
-File.dump() -> I<Obj>
+    File.dump()
 
 Return the
 
@@ -140,7 +140,7 @@ Return the
 
 =head2 edit
 
-File.edit() -> I<Obj>
+    File.edit()
 
 Return the
 
@@ -148,7 +148,7 @@ Return the
 
 =head2 exists
 
-File.exists() -> I<Obj>
+    File.exists()
 
 Return the
 
@@ -156,7 +156,7 @@ Return the
 
 =head2 has_setgid_bit
 
-File.has_setgid_bit() -> I<Obj>
+    File.has_setgid_bit()
 
 Return the
 
@@ -164,7 +164,7 @@ Return the
 
 =head2 has_setuid_bit
 
-File.has_setuid_bit() -> I<Obj>
+    File.has_setuid_bit()
 
 Return the
 
@@ -172,7 +172,7 @@ Return the
 
 =head2 has_sticky_bit
 
-File.has_sticky_bit() -> I<Obj>
+    File.has_sticky_bit()
 
 Return the
 
@@ -180,7 +180,7 @@ Return the
 
 =head2 is_abs
 
-File.is_abs() -> I<Obj>
+    File.is_abs()
 
 Return the
 
@@ -190,7 +190,7 @@ Aliases: I<is_absolute>
 
 =head2 is_binary
 
-File.is_binary() -> I<Obj>
+    File.is_binary()
 
 Return the
 
@@ -198,7 +198,7 @@ Return the
 
 =head2 is_block
 
-File.is_block() -> I<Obj>
+    File.is_block()
 
 Return the
 
@@ -206,7 +206,7 @@ Return the
 
 =head2 is_char_device
 
-File.is_char_device() -> I<Obj>
+    File.is_char_device()
 
 Return the
 
@@ -214,7 +214,7 @@ Return the
 
 =head2 is_dir
 
-File.is_dir() -> I<Obj>
+    File.is_dir()
 
 Return the
 
@@ -224,7 +224,7 @@ Aliases: I<is_directory>
 
 =head2 is_empty
 
-File.is_empty() -> I<Obj>
+    File.is_empty()
 
 Return the
 
@@ -232,7 +232,7 @@ Return the
 
 =head2 is_executable
 
-File.is_executable() -> I<Obj>
+    File.is_executable()
 
 Return the
 
@@ -240,7 +240,7 @@ Return the
 
 =head2 is_file
 
-File.is_file() -> I<Obj>
+    File.is_file()
 
 Return the
 
@@ -248,7 +248,7 @@ Return the
 
 =head2 is_link
 
-File.is_link() -> I<Obj>
+    File.is_link()
 
 Return the
 
@@ -256,7 +256,7 @@ Return the
 
 =head2 is_owned
 
-File.is_owned() -> I<Obj>
+    File.is_owned()
 
 Return the
 
@@ -264,7 +264,7 @@ Return the
 
 =head2 is_readable
 
-File.is_readable() -> I<Obj>
+    File.is_readable()
 
 Return the
 
@@ -272,7 +272,7 @@ Return the
 
 =head2 is_real_executable
 
-File.is_real_executable() -> I<Obj>
+    File.is_real_executable()
 
 Return the
 
@@ -280,7 +280,7 @@ Return the
 
 =head2 is_real_owned
 
-File.is_real_owned() -> I<Obj>
+    File.is_real_owned()
 
 Return the
 
@@ -288,7 +288,7 @@ Return the
 
 =head2 is_real_readable
 
-File.is_real_readable() -> I<Obj>
+    File.is_real_readable()
 
 Return the
 
@@ -296,7 +296,7 @@ Return the
 
 =head2 is_real_writeable
 
-File.is_real_writeable() -> I<Obj>
+    File.is_real_writeable()
 
 Return the
 
@@ -304,7 +304,7 @@ Return the
 
 =head2 is_socket
 
-File.is_socket() -> I<Obj>
+    File.is_socket()
 
 Return the
 
@@ -312,7 +312,7 @@ Return the
 
 =head2 is_text
 
-File.is_text() -> I<Obj>
+    File.is_text()
 
 Return the
 
@@ -320,7 +320,7 @@ Return the
 
 =head2 is_writeable
 
-File.is_writeable() -> I<Obj>
+    File.is_writeable()
 
 Return the
 
@@ -328,7 +328,7 @@ Return the
 
 =head2 lstat
 
-File.lstat() -> I<Obj>
+    File.lstat()
 
 Return the
 
@@ -336,7 +336,7 @@ Return the
 
 =head2 make
 
-File.make() -> I<Obj>
+    File.make()
 
 Return the
 
@@ -346,7 +346,7 @@ Aliases: I<touch>, I<create>, I<mkfile>
 
 =head2 md5
 
-File.md5() -> I<Obj>
+    File.md5()
 
 Return the
 
@@ -354,7 +354,7 @@ Return the
 
 =head2 modification_time_days_diff
 
-File.modification_time_days_diff() -> I<Obj>
+    File.modification_time_days_diff()
 
 Return the
 
@@ -362,7 +362,7 @@ Return the
 
 =head2 mv
 
-File.mv() -> I<Obj>
+    File.mv()
 
 Return the
 
@@ -372,7 +372,7 @@ Aliases: I<move>
 
 =head2 name
 
-File.name() -> I<Obj>
+    File.name()
 
 Return the
 
@@ -380,7 +380,7 @@ Return the
 
 =head2 new
 
-File.new() -> I<Obj>
+    File.new()
 
 Return the
 
@@ -390,7 +390,7 @@ Aliases: I<call>
 
 =head2 open
 
-File.open() -> I<Obj>
+    File.open()
 
 Return the
 
@@ -398,7 +398,7 @@ Return the
 
 =head2 open_a
 
-File.open_a() -> I<Obj>
+    File.open_a()
 
 Return the
 
@@ -408,7 +408,7 @@ Aliases: I<open_append>
 
 =head2 opendir
 
-File.opendir() -> I<Obj>
+    File.opendir()
 
 Return the
 
@@ -416,7 +416,7 @@ Return the
 
 =head2 open_r
 
-File.open_r() -> I<Obj>
+    File.open_r()
 
 Return the
 
@@ -426,7 +426,7 @@ Aliases: I<open_read>
 
 =head2 open_rw
 
-File.open_rw() -> I<Obj>
+    File.open_rw()
 
 Return the
 
@@ -436,7 +436,7 @@ Aliases: I<open_read_write>
 
 =head2 open_w
 
-File.open_w() -> I<Obj>
+    File.open_w()
 
 Return the
 
@@ -446,7 +446,7 @@ Aliases: I<open_write>
 
 =head2 read
 
-File.read() -> I<Obj>
+    File.read()
 
 Return the
 
@@ -454,7 +454,7 @@ Return the
 
 =head2 read_link
 
-File.read_link() -> I<Obj>
+    File.read_link()
 
 Return the
 
@@ -464,7 +464,7 @@ Aliases: I<readlink>
 
 =head2 rel
 
-File.rel() -> I<Obj>
+    File.rel()
 
 Return the
 
@@ -474,7 +474,7 @@ Aliases: I<abs2rel>, I<rel_name>, I<relname>
 
 =head2 rename
 
-File.rename() -> I<Obj>
+    File.rename()
 
 Return the
 
@@ -482,7 +482,7 @@ Return the
 
 =head2 sha1
 
-File.sha1() -> I<Obj>
+    File.sha1()
 
 Return the
 
@@ -490,7 +490,7 @@ Return the
 
 =head2 sha256
 
-File.sha256() -> I<Obj>
+    File.sha256()
 
 Return the
 
@@ -498,7 +498,7 @@ Return the
 
 =head2 sha512
 
-File.sha512() -> I<Obj>
+    File.sha512()
 
 Return the
 
@@ -506,7 +506,7 @@ Return the
 
 =head2 size
 
-File.size() -> I<Obj>
+    File.size()
 
 Return the
 
@@ -514,7 +514,7 @@ Return the
 
 =head2 split
 
-File.split() -> I<Obj>
+    File.split()
 
 Return the
 
@@ -522,7 +522,7 @@ Return the
 
 =head2 splitpath
 
-File.splitpath() -> I<Obj>
+    File.splitpath()
 
 Return the
 
@@ -530,7 +530,7 @@ Return the
 
 =head2 stat
 
-File.stat() -> I<Obj>
+    File.stat()
 
 Return the
 
@@ -538,7 +538,7 @@ Return the
 
 =head2 sysopen
 
-File.sysopen() -> I<Obj>
+    File.sysopen()
 
 Return the
 
@@ -546,7 +546,7 @@ Return the
 
 =head2 to_file
 
-File.to_file() -> I<Obj>
+    File.to_file()
 
 Return the
 
@@ -554,7 +554,7 @@ Return the
 
 =head2 to_s
 
-File.to_s() -> I<Obj>
+    File.to_s()
 
 Return the
 
@@ -564,7 +564,7 @@ Aliases: I<to_str>
 
 =head2 truncate
 
-File.truncate() -> I<Obj>
+    File.truncate()
 
 Return the
 
@@ -572,7 +572,7 @@ Return the
 
 =head2 unlink
 
-File.unlink() -> I<Obj>
+    File.unlink()
 
 Return the
 
@@ -580,7 +580,7 @@ Return the
 
 =head2 utime
 
-File.utime() -> I<Obj>
+    File.utime()
 
 Return the
 
@@ -588,7 +588,7 @@ Return the
 
 =head2 write
 
-File.write() -> I<Obj>
+    File.write()
 
 Return the
 

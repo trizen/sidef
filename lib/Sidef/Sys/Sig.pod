@@ -17,7 +17,7 @@ var obj = Sig(...)
 
 =head2 new
 
-Sig.new() -> I<Obj>
+    Sig.new()
 
 Return the
 

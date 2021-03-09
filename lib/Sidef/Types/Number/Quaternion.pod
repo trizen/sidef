@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 !=
 
-I<Obj> B<!=> I<Obj> -> I<Obj>
+    I<Obj> B<!=> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<ne>
 
 =head2 %
 
-I<Obj> B<%> I<Obj> -> I<Obj>
+    I<Obj> B<%> I<Obj>
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<mod>
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    I<Obj> B<&> I<Obj>
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<and>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    I<Obj> B<*> I<Obj>
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<mul>
 
 =head2 **
 
-I<Obj> B<**> I<Obj> -> I<Obj>
+    I<Obj> B<**> I<Obj>
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<pow>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    I<Obj> B<+> I<Obj>
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<add>
 
 =head2 ++
 
-I<Obj> B<++> I<Obj> -> I<Obj>
+    I<Obj> B<++> I<Obj>
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<inc>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    I<Obj> B<-> I<Obj>
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<sub>
 
 =head2 --
 
-I<Obj> B<--> I<Obj> -> I<Obj>
+    I<Obj> B<--> I<Obj>
 
 Return the
 
@@ -114,7 +114,7 @@ Aliases: I<dec>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    I<Obj> B</> I<Obj>
 
 Return the
 
@@ -124,7 +124,7 @@ Aliases: I<÷>, I<div>
 
 =head2 <
 
-I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>> I<Obj>
 
 Return the
 
@@ -134,7 +134,7 @@ Aliases: I<lt>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>E<lt>> I<Obj>
 
 Return the
 
@@ -144,7 +144,7 @@ Aliases: I<lsft>, I<shift_left>
 
 =head2 <=>
 
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>=E<gt>> I<Obj>
 
 Return the
 
@@ -154,7 +154,7 @@ Aliases: I<cmp>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    I<Obj> B<==> I<Obj>
 
 Return the
 
@@ -164,7 +164,7 @@ Aliases: I<eq>
 
 =head2 >
 
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<gt>> I<Obj>
 
 Return the
 
@@ -174,7 +174,7 @@ Aliases: I<gt>
 
 =head2 >>
 
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<gt>E<gt>> I<Obj>
 
 Return the
 
@@ -184,7 +184,7 @@ Aliases: I<rsft>, I<shift_right>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    I<Obj> B<^> I<Obj>
 
 Return the
 
@@ -194,7 +194,7 @@ Aliases: I<xor>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    I<Obj> B<|> I<Obj>
 
 Return the
 
@@ -204,7 +204,7 @@ Aliases: I<or>
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    I<Obj> B<≤> I<Obj>
 
 Return the
 
@@ -214,7 +214,7 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    I<Obj> B<≥> I<Obj>
 
 Return the
 
@@ -224,7 +224,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 a
 
-Quaternion.a() -> I<Obj>
+    Quaternion.a()
 
 Return the
 
@@ -234,7 +234,7 @@ Aliases: I<re>, I<real>
 
 =head2 abs
 
-Quaternion.abs() -> I<Obj>
+    Quaternion.abs()
 
 Return the
 
@@ -242,7 +242,7 @@ Return the
 
 =head2 b
 
-Quaternion.b() -> I<Obj>
+    Quaternion.b()
 
 Return the
 
@@ -250,7 +250,7 @@ Return the
 
 =head2 c
 
-Quaternion.c() -> I<Obj>
+    Quaternion.c()
 
 Return the
 
@@ -258,7 +258,7 @@ Return the
 
 =head2 ceil
 
-Quaternion.ceil() -> I<Obj>
+    Quaternion.ceil()
 
 Return the
 
@@ -266,7 +266,7 @@ Return the
 
 =head2 conj
 
-Quaternion.conj() -> I<Obj>
+    Quaternion.conj()
 
 Return the
 
@@ -274,7 +274,7 @@ Return the
 
 =head2 d
 
-Quaternion.d() -> I<Obj>
+    Quaternion.d()
 
 Return the
 
@@ -282,7 +282,7 @@ Return the
 
 =head2 dump
 
-Quaternion.dump() -> I<Obj>
+    Quaternion.dump()
 
 Return the
 
@@ -290,7 +290,7 @@ Return the
 
 =head2 float
 
-Quaternion.float() -> I<Obj>
+    Quaternion.float()
 
 Return the
 
@@ -298,7 +298,7 @@ Return the
 
 =head2 floor
 
-Quaternion.floor() -> I<Obj>
+    Quaternion.floor()
 
 Return the
 
@@ -306,7 +306,7 @@ Return the
 
 =head2 inv
 
-Quaternion.inv() -> I<Obj>
+    Quaternion.inv()
 
 Return the
 
@@ -314,7 +314,7 @@ Return the
 
 =head2 invmod
 
-Quaternion.invmod() -> I<Obj>
+    Quaternion.invmod()
 
 Return the
 
@@ -322,7 +322,7 @@ Return the
 
 =head2 is_coprime
 
-Quaternion.is_coprime() -> I<Obj>
+    Quaternion.is_coprime()
 
 Return the
 
@@ -330,7 +330,7 @@ Return the
 
 =head2 is_mone
 
-Quaternion.is_mone() -> I<Obj>
+    Quaternion.is_mone()
 
 Return the
 
@@ -338,7 +338,7 @@ Return the
 
 =head2 is_one
 
-Quaternion.is_one() -> I<Obj>
+    Quaternion.is_one()
 
 Return the
 
@@ -346,7 +346,7 @@ Return the
 
 =head2 is_zero
 
-Quaternion.is_zero() -> I<Obj>
+    Quaternion.is_zero()
 
 Return the
 
@@ -354,7 +354,7 @@ Return the
 
 =head2 neg
 
-Quaternion.neg() -> I<Obj>
+    Quaternion.neg()
 
 Return the
 
@@ -362,7 +362,7 @@ Return the
 
 =head2 new
 
-Quaternion.new() -> I<Obj>
+    Quaternion.new()
 
 Return the
 
@@ -372,7 +372,7 @@ Aliases: I<call>
 
 =head2 norm
 
-Quaternion.norm() -> I<Obj>
+    Quaternion.norm()
 
 Return the
 
@@ -380,7 +380,7 @@ Return the
 
 =head2 parts
 
-Quaternion.parts() -> I<Obj>
+    Quaternion.parts()
 
 Return the
 
@@ -388,7 +388,7 @@ Return the
 
 =head2 powmod
 
-Quaternion.powmod() -> I<Obj>
+    Quaternion.powmod()
 
 Return the
 
@@ -396,7 +396,7 @@ Return the
 
 =head2 reals
 
-Quaternion.reals() -> I<Obj>
+    Quaternion.reals()
 
 Return the
 
@@ -404,7 +404,7 @@ Return the
 
 =head2 round
 
-Quaternion.round() -> I<Obj>
+    Quaternion.round()
 
 Return the
 
@@ -412,7 +412,7 @@ Return the
 
 =head2 sgn
 
-Quaternion.sgn() -> I<Obj>
+    Quaternion.sgn()
 
 Return the
 
@@ -420,7 +420,7 @@ Return the
 
 =head2 sqr
 
-Quaternion.sqr() -> I<Obj>
+    Quaternion.sqr()
 
 Return the
 
@@ -428,7 +428,7 @@ Return the
 
 =head2 to_c
 
-Quaternion.to_c() -> I<Obj>
+    Quaternion.to_c()
 
 Return the
 
@@ -438,7 +438,7 @@ Aliases: I<to_n>
 
 =head2 to_gauss
 
-Quaternion.to_gauss() -> I<Obj>
+    Quaternion.to_gauss()
 
 Return the
 
@@ -446,7 +446,7 @@ Return the
 
 =head2 to_s
 
-Quaternion.to_s() -> I<Obj>
+    Quaternion.to_s()
 
 Return the
 

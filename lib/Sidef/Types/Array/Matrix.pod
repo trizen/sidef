@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 %
 
-I<Obj> B<%> I<Obj> -> I<Obj>
+    I<Obj> B<%> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<mod>
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    I<Obj> B<&> I<Obj>
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<and>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    I<Obj> B<*> I<Obj>
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<mul>
 
 =head2 **
 
-I<Obj> B<**> I<Obj> -> I<Obj>
+    I<Obj> B<**> I<Obj>
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<pow>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    I<Obj> B<+> I<Obj>
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<add>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    I<Obj> B<-> I<Obj>
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<sub>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    I<Obj> B</> I<Obj>
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<÷>, I<div>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    I<Obj> B<^> I<Obj>
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<xor>
 
 =head2 I
 
-Matrix.I() -> I<Obj>
+    Matrix.I()
 
 Return the
 
@@ -114,7 +114,7 @@ Aliases: I<identity>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    I<Obj> B<|> I<Obj>
 
 Return the
 
@@ -124,7 +124,7 @@ Aliases: I<or>
 
 =head2 abs
 
-Matrix.abs() -> I<Obj>
+    Matrix.abs()
 
 Return the
 
@@ -132,7 +132,7 @@ Return the
 
 =head2 anti_diagonal
 
-Matrix.anti_diagonal() -> I<Obj>
+    Matrix.anti_diagonal()
 
 Return the
 
@@ -140,7 +140,7 @@ Return the
 
 =head2 build
 
-Matrix.build() -> I<Obj>
+    Matrix.build()
 
 Return the
 
@@ -148,7 +148,7 @@ Return the
 
 =head2 ceil
 
-Matrix.ceil() -> I<Obj>
+    Matrix.ceil()
 
 Return the
 
@@ -156,7 +156,7 @@ Return the
 
 =head2 col
 
-Matrix.col() -> I<Obj>
+    Matrix.col()
 
 Return the
 
@@ -166,7 +166,7 @@ Aliases: I<column>, I<get_column>
 
 =head2 col_len
 
-Matrix.col_len() -> I<Obj>
+    Matrix.col_len()
 
 Return the
 
@@ -176,7 +176,7 @@ Aliases: I<col_size>, I<col_count>, I<column_len>, I<column_size>, I<column_coun
 
 =head2 cols
 
-Matrix.cols() -> I<Obj>
+    Matrix.cols()
 
 Return the
 
@@ -186,7 +186,7 @@ Aliases: I<columns>, I<from_cols>, I<from_columns>
 
 =head2 col_vector
 
-Matrix.col_vector() -> I<Obj>
+    Matrix.col_vector()
 
 Return the
 
@@ -196,7 +196,7 @@ Aliases: I<column_vector>
 
 =head2 concat
 
-Matrix.concat() -> I<Obj>
+    Matrix.concat()
 
 Return the
 
@@ -204,7 +204,7 @@ Return the
 
 =head2 det
 
-Matrix.det() -> I<Obj>
+    Matrix.det()
 
 Return the
 
@@ -214,7 +214,7 @@ Aliases: I<determinant>
 
 =head2 det_bareiss
 
-Matrix.det_bareiss() -> I<Obj>
+    Matrix.det_bareiss()
 
 Return the
 
@@ -222,7 +222,7 @@ Return the
 
 =head2 diagonal
 
-Matrix.diagonal() -> I<Obj>
+    Matrix.diagonal()
 
 Return the
 
@@ -230,7 +230,7 @@ Return the
 
 =head2 flip
 
-Matrix.flip() -> I<Obj>
+    Matrix.flip()
 
 Return the
 
@@ -238,7 +238,7 @@ Return the
 
 =head2 floor
 
-Matrix.floor() -> I<Obj>
+    Matrix.floor()
 
 Return the
 
@@ -246,7 +246,7 @@ Return the
 
 =head2 gauss_jordan_invert
 
-Matrix.gauss_jordan_invert() -> I<Obj>
+    Matrix.gauss_jordan_invert()
 
 Return the
 
@@ -254,7 +254,7 @@ Return the
 
 =head2 gauss_jordan_solve
 
-Matrix.gauss_jordan_solve() -> I<Obj>
+    Matrix.gauss_jordan_solve()
 
 Return the
 
@@ -262,7 +262,7 @@ Return the
 
 =head2 horizontal_flip
 
-Matrix.horizontal_flip() -> I<Obj>
+    Matrix.horizontal_flip()
 
 Return the
 
@@ -270,7 +270,7 @@ Return the
 
 =head2 inv
 
-Matrix.inv() -> I<Obj>
+    Matrix.inv()
 
 Return the
 
@@ -280,7 +280,7 @@ Aliases: I<invert>, I<inverse>
 
 =head2 invmod
 
-Matrix.invmod() -> I<Obj>
+    Matrix.invmod()
 
 Return the
 
@@ -288,7 +288,7 @@ Return the
 
 =head2 is_square
 
-Matrix.is_square() -> I<Obj>
+    Matrix.is_square()
 
 Return the
 
@@ -296,7 +296,7 @@ Return the
 
 =head2 neg
 
-Matrix.neg() -> I<Obj>
+    Matrix.neg()
 
 Return the
 
@@ -304,7 +304,7 @@ Return the
 
 =head2 new
 
-Matrix.new() -> I<Obj>
+    Matrix.new()
 
 Return the
 
@@ -314,7 +314,7 @@ Aliases: I<call>
 
 =head2 powmod
 
-Matrix.powmod() -> I<Obj>
+    Matrix.powmod()
 
 Return the
 
@@ -322,7 +322,7 @@ Return the
 
 =head2 prod
 
-Matrix.prod() -> I<Obj>
+    Matrix.prod()
 
 Return the
 
@@ -332,7 +332,7 @@ Aliases: I<prod_by>
 
 =head2 rand
 
-Matrix.rand() -> I<Obj>
+    Matrix.rand()
 
 Return the
 
@@ -340,7 +340,7 @@ Return the
 
 =head2 row
 
-Matrix.row() -> I<Obj>
+    Matrix.row()
 
 Return the
 
@@ -350,7 +350,7 @@ Aliases: I<get_row>
 
 =head2 row_len
 
-Matrix.row_len() -> I<Obj>
+    Matrix.row_len()
 
 Return the
 
@@ -360,7 +360,7 @@ Aliases: I<row_size>, I<row_count>
 
 =head2 rows
 
-Matrix.rows() -> I<Obj>
+    Matrix.rows()
 
 Return the
 
@@ -370,7 +370,7 @@ Aliases: I<from_rows>
 
 =head2 row_vector
 
-Matrix.row_vector() -> I<Obj>
+    Matrix.row_vector()
 
 Return the
 
@@ -378,7 +378,7 @@ Return the
 
 =head2 rref
 
-Matrix.rref() -> I<Obj>
+    Matrix.rref()
 
 Return the
 
@@ -388,7 +388,7 @@ Aliases: I<reduced_row_echelon_form>
 
 =head2 scalar
 
-Matrix.scalar() -> I<Obj>
+    Matrix.scalar()
 
 Return the
 
@@ -396,7 +396,7 @@ Return the
 
 =head2 set_col
 
-Matrix.set_col() -> I<Obj>
+    Matrix.set_col()
 
 Return the
 
@@ -406,7 +406,7 @@ Aliases: I<set_column>
 
 =head2 set_row
 
-Matrix.set_row() -> I<Obj>
+    Matrix.set_row()
 
 Return the
 
@@ -414,7 +414,7 @@ Return the
 
 =head2 size
 
-Matrix.size() -> I<Obj>
+    Matrix.size()
 
 Return the
 
@@ -422,7 +422,7 @@ Return the
 
 =head2 solve
 
-Matrix.solve() -> I<Obj>
+    Matrix.solve()
 
 Return the
 
@@ -430,7 +430,7 @@ Return the
 
 =head2 sum
 
-Matrix.sum() -> I<Obj>
+    Matrix.sum()
 
 Return the
 
@@ -440,7 +440,7 @@ Aliases: I<sum_by>
 
 =head2 t
 
-Matrix.t() -> I<Obj>
+    Matrix.t()
 
 Return the
 
@@ -450,7 +450,7 @@ Aliases: I<not>, I<transpose>
 
 =head2 to_a
 
-Matrix.to_a() -> I<Obj>
+    Matrix.to_a()
 
 Return the
 
@@ -460,7 +460,7 @@ Aliases: I<to_array>
 
 =head2 to_s
 
-Matrix.to_s() -> I<Obj>
+    Matrix.to_s()
 
 Return the
 
@@ -470,7 +470,7 @@ Aliases: I<dump>, I<to_str>
 
 =head2 vec_cols
 
-Matrix.vec_cols() -> I<Obj>
+    Matrix.vec_cols()
 
 Return the
 
@@ -480,7 +480,7 @@ Aliases: I<vec_columns>, I<vector_columns>
 
 =head2 vec_rows
 
-Matrix.vec_rows() -> I<Obj>
+    Matrix.vec_rows()
 
 Return the
 
@@ -490,7 +490,7 @@ Aliases: I<vector_rows>
 
 =head2 vertical_flip
 
-Matrix.vertical_flip() -> I<Obj>
+    Matrix.vertical_flip()
 
 Return the
 
@@ -498,7 +498,7 @@ Return the
 
 =head2 zero
 
-Matrix.zero() -> I<Obj>
+    Matrix.zero()
 
 Return the
 

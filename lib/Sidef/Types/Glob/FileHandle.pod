@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 «
 
-I<Obj> B<«> I<Obj> -> I<Obj>
+    I<Obj> B<«> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<E<lt>E<lt>>, I<write_from>
 
 =head2 »
 
-I<Obj> B<»> I<Obj> -> I<Obj>
+    I<Obj> B<»> I<Obj>
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<E<gt>E<gt>>, I<read_to>
 
 =head2 autoflush
 
-FileHandle.autoflush() -> I<Obj>
+    FileHandle.autoflush()
 
 Return the
 
@@ -52,7 +52,7 @@ Return the
 
 =head2 binmode
 
-FileHandle.binmode() -> I<Obj>
+    FileHandle.binmode()
 
 Return the
 
@@ -60,7 +60,7 @@ Return the
 
 =head2 call
 
-FileHandle.call() -> I<Obj>
+    FileHandle.call()
 
 Return the
 
@@ -68,7 +68,7 @@ Return the
 
 =head2 char
 
-FileHandle.char() -> I<Obj>
+    FileHandle.char()
 
 Return the
 
@@ -78,7 +78,7 @@ Aliases: I<getc>, I<read_char>
 
 =head2 chars
 
-FileHandle.chars() -> I<Obj>
+    FileHandle.chars()
 
 Return the
 
@@ -86,7 +86,7 @@ Return the
 
 =head2 close
 
-FileHandle.close() -> I<Obj>
+    FileHandle.close()
 
 Return the
 
@@ -94,7 +94,7 @@ Return the
 
 =head2 cp
 
-FileHandle.cp() -> I<Obj>
+    FileHandle.cp()
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<copy>
 
 =head2 each
 
-FileHandle.each() -> I<Obj>
+    FileHandle.each()
 
 Return the
 
@@ -114,7 +114,7 @@ Aliases: I<each_line>
 
 =head2 each_char
 
-FileHandle.each_char() -> I<Obj>
+    FileHandle.each_char()
 
 Return the
 
@@ -122,7 +122,7 @@ Return the
 
 =head2 eof
 
-FileHandle.eof() -> I<Obj>
+    FileHandle.eof()
 
 Return the
 
@@ -130,7 +130,7 @@ Return the
 
 =head2 fcntl
 
-FileHandle.fcntl() -> I<Obj>
+    FileHandle.fcntl()
 
 Return the
 
@@ -138,7 +138,7 @@ Return the
 
 =head2 file
 
-FileHandle.file() -> I<Obj>
+    FileHandle.file()
 
 Return the
 
@@ -148,7 +148,7 @@ Aliases: I<parent>
 
 =head2 fileno
 
-FileHandle.fileno() -> I<Obj>
+    FileHandle.fileno()
 
 Return the
 
@@ -156,7 +156,7 @@ Return the
 
 =head2 flock
 
-FileHandle.flock() -> I<Obj>
+    FileHandle.flock()
 
 Return the
 
@@ -164,7 +164,7 @@ Return the
 
 =head2 get
 
-FileHandle.get() -> I<Obj>
+    FileHandle.get()
 
 Return the
 
@@ -174,7 +174,7 @@ Aliases: I<line>, I<readln>, I<read_line>, I<readline>
 
 =head2 grep
 
-FileHandle.grep() -> I<Obj>
+    FileHandle.grep()
 
 Return the
 
@@ -184,7 +184,7 @@ Aliases: I<select>
 
 =head2 isatty
 
-FileHandle.isatty() -> I<Obj>
+    FileHandle.isatty()
 
 Return the
 
@@ -194,7 +194,7 @@ Aliases: I<is_on_tty>
 
 =head2 iter
 
-FileHandle.iter() -> I<Obj>
+    FileHandle.iter()
 
 Return the
 
@@ -202,7 +202,7 @@ Return the
 
 =head2 lines
 
-FileHandle.lines() -> I<Obj>
+    FileHandle.lines()
 
 Return the
 
@@ -212,7 +212,7 @@ Aliases: I<read_lines>, I<readlines>
 
 =head2 lock
 
-FileHandle.lock() -> I<Obj>
+    FileHandle.lock()
 
 Return the
 
@@ -220,7 +220,7 @@ Return the
 
 =head2 lstat
 
-FileHandle.lstat() -> I<Obj>
+    FileHandle.lstat()
 
 Return the
 
@@ -228,7 +228,7 @@ Return the
 
 =head2 map
 
-FileHandle.map() -> I<Obj>
+    FileHandle.map()
 
 Return the
 
@@ -238,7 +238,7 @@ Aliases: I<collect>
 
 =head2 print
 
-FileHandle.print() -> I<Obj>
+    FileHandle.print()
 
 Return the
 
@@ -248,7 +248,7 @@ Aliases: I<spurt>, I<write>
 
 =head2 printf
 
-FileHandle.printf() -> I<Obj>
+    FileHandle.printf()
 
 Return the
 
@@ -256,7 +256,7 @@ Return the
 
 =head2 read
 
-FileHandle.read() -> I<Obj>
+    FileHandle.read()
 
 Return the
 
@@ -264,7 +264,7 @@ Return the
 
 =head2 say
 
-FileHandle.say() -> I<Obj>
+    FileHandle.say()
 
 Return the
 
@@ -274,7 +274,7 @@ Aliases: I<println>
 
 =head2 seek
 
-FileHandle.seek() -> I<Obj>
+    FileHandle.seek()
 
 Return the
 
@@ -282,7 +282,7 @@ Return the
 
 =head2 slurp
 
-FileHandle.slurp() -> I<Obj>
+    FileHandle.slurp()
 
 Return the
 
@@ -290,7 +290,7 @@ Return the
 
 =head2 stat
 
-FileHandle.stat() -> I<Obj>
+    FileHandle.stat()
 
 Return the
 
@@ -298,7 +298,7 @@ Return the
 
 =head2 stderr
 
-FileHandle.stderr() -> I<Obj>
+    FileHandle.stderr()
 
 Return the
 
@@ -306,7 +306,7 @@ Return the
 
 =head2 stdin
 
-FileHandle.stdin() -> I<Obj>
+    FileHandle.stdin()
 
 Return the
 
@@ -314,7 +314,7 @@ Return the
 
 =head2 stdout
 
-FileHandle.stdout() -> I<Obj>
+    FileHandle.stdout()
 
 Return the
 
@@ -322,7 +322,7 @@ Return the
 
 =head2 sysread
 
-FileHandle.sysread() -> I<Obj>
+    FileHandle.sysread()
 
 Return the
 
@@ -330,7 +330,7 @@ Return the
 
 =head2 sysseek
 
-FileHandle.sysseek() -> I<Obj>
+    FileHandle.sysseek()
 
 Return the
 
@@ -338,7 +338,7 @@ Return the
 
 =head2 syswrite
 
-FileHandle.syswrite() -> I<Obj>
+    FileHandle.syswrite()
 
 Return the
 
@@ -346,7 +346,7 @@ Return the
 
 =head2 tell
 
-FileHandle.tell() -> I<Obj>
+    FileHandle.tell()
 
 Return the
 
@@ -354,7 +354,7 @@ Return the
 
 =head2 truncate
 
-FileHandle.truncate() -> I<Obj>
+    FileHandle.truncate()
 
 Return the
 
@@ -362,7 +362,7 @@ Return the
 
 =head2 unlock
 
-FileHandle.unlock() -> I<Obj>
+    FileHandle.unlock()
 
 Return the
 
@@ -370,7 +370,7 @@ Return the
 
 =head2 words
 
-FileHandle.words() -> I<Obj>
+    FileHandle.words()
 
 Return the
 

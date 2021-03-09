@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    I<Obj> B<&> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<grep>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    I<Obj> B<*> I<Obj>
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<repeat>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>E<lt>> I<Obj>
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<for>, I<each>, I<foreach>
 
 =head2 >>
 
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<gt>E<gt>> I<Obj>
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<map>
 
 =head2 Π
 
-Block.Π() -> I<Obj>
+    Block.Π()
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<prod>
 
 =head2 Σ
 
-Block.Σ() -> I<Obj>
+    Block.Σ()
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<sum>
 
 =head2 ∘
 
-I<Obj> B<∘> I<Obj> -> I<Obj>
+    I<Obj> B<∘> I<Obj>
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<compose>
 
 =head2 array_identity
 
-Block.array_identity() -> I<Obj>
+    Block.array_identity()
 
 Return the
 
@@ -102,7 +102,7 @@ Return the
 
 =head2 cache
 
-Block.cache() -> I<Obj>
+    Block.cache()
 
 Return the
 
@@ -110,7 +110,7 @@ Return the
 
 =head2 call
 
-Block.call() -> I<Obj>
+    Block.call()
 
 Return the
 
@@ -118,7 +118,7 @@ Return the
 
 =head2 cap
 
-Block.cap() -> I<Obj>
+    Block.cap()
 
 Return the
 
@@ -128,7 +128,7 @@ Aliases: I<capture>
 
 =head2 do
 
-Block.do() -> I<Obj>
+    Block.do()
 
 Return the
 
@@ -138,7 +138,7 @@ Aliases: I<run>
 
 =head2 exec
 
-Block.exec() -> I<Obj>
+    Block.exec()
 
 Return the
 
@@ -146,7 +146,7 @@ Return the
 
 =head2 ffork
 
-Block.ffork() -> I<Obj>
+    Block.ffork()
 
 Return the
 
@@ -156,7 +156,7 @@ Aliases: I<start>
 
 =head2 first
 
-Block.first() -> I<Obj>
+    Block.first()
 
 Return the
 
@@ -164,7 +164,7 @@ Return the
 
 =head2 fork
 
-Block.fork() -> I<Obj>
+    Block.fork()
 
 Return the
 
@@ -172,7 +172,7 @@ Return the
 
 =head2 identity
 
-Block.identity() -> I<Obj>
+    Block.identity()
 
 Return the
 
@@ -180,7 +180,7 @@ Return the
 
 =head2 if
 
-Block.if() -> I<Obj>
+    Block.if()
 
 Return the
 
@@ -188,7 +188,7 @@ Return the
 
 =head2 is_identity
 
-Block.is_identity() -> I<Obj>
+    Block.is_identity()
 
 Return the
 
@@ -196,7 +196,7 @@ Return the
 
 =head2 list_identity
 
-Block.list_identity() -> I<Obj>
+    Block.list_identity()
 
 Return the
 
@@ -204,7 +204,7 @@ Return the
 
 =head2 loop
 
-Block.loop() -> I<Obj>
+    Block.loop()
 
 Return the
 
@@ -212,7 +212,7 @@ Return the
 
 =head2 new
 
-Block.new() -> I<Obj>
+    Block.new()
 
 Return the
 
@@ -220,7 +220,7 @@ Return the
 
 =head2 nth
 
-Block.nth() -> I<Obj>
+    Block.nth()
 
 Return the
 
@@ -228,7 +228,7 @@ Return the
 
 =head2 null_identity
 
-Block.null_identity() -> I<Obj>
+    Block.null_identity()
 
 Return the
 
@@ -236,7 +236,7 @@ Return the
 
 =head2 thr
 
-Block.thr() -> I<Obj>
+    Block.thr()
 
 Return the
 
@@ -246,7 +246,7 @@ Aliases: I<thread>
 
 =head2 to_s
 
-Block.to_s() -> I<Obj>
+    Block.to_s()
 
 Return the
 
@@ -256,7 +256,7 @@ Aliases: I<dump>, I<to_str>
 
 =head2 uncache
 
-Block.uncache() -> I<Obj>
+    Block.uncache()
 
 Return the
 
@@ -264,7 +264,7 @@ Return the
 
 =head2 while
 
-Block.while() -> I<Obj>
+    Block.while()
 
 Return the
 

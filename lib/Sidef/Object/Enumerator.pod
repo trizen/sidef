@@ -17,7 +17,7 @@ var obj = Enumerator(...)
 
 =head2 each
 
-Enumerator.each() -> I<Obj>
+    Enumerator.each()
 
 Return the
 
@@ -25,7 +25,7 @@ Return the
 
 =head2 first
 
-Enumerator.first() -> I<Obj>
+    Enumerator.first()
 
 Return the
 
@@ -33,7 +33,7 @@ Return the
 
 =head2 grep
 
-Enumerator.grep() -> I<Obj>
+    Enumerator.grep()
 
 Return the
 
@@ -43,7 +43,7 @@ Aliases: I<select>
 
 =head2 len
 
-Enumerator.len() -> I<Obj>
+    Enumerator.len()
 
 Return the
 
@@ -53,7 +53,7 @@ Aliases: I<size>, I<length>
 
 =head2 map
 
-Enumerator.map() -> I<Obj>
+    Enumerator.map()
 
 Return the
 
@@ -63,7 +63,7 @@ Aliases: I<collect>
 
 =head2 new
 
-Enumerator.new() -> I<Obj>
+    Enumerator.new()
 
 Return the
 
@@ -73,7 +73,7 @@ Aliases: I<call>
 
 =head2 to_a
 
-Enumerator.to_a() -> I<Obj>
+    Enumerator.to_a()
 
 Return the
 

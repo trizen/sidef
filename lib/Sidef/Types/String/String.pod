@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 %
 
-I<Obj> B<%> I<Obj> -> I<Obj>
+    I<Obj> B<%> I<Obj>
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<sprintf>
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    I<Obj> B<&> I<Obj>
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<and>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    I<Obj> B<*> I<Obj>
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<mul>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    I<Obj> B<+> I<Obj>
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<add>, I<append>, I<concat>
 
 =head2 ++
 
-I<Obj> B<++> I<Obj> -> I<Obj>
+    I<Obj> B<++> I<Obj>
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<inc>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    I<Obj> B<-> I<Obj>
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<diff>
 
 =head2 ..
 
-I<Obj> B<..> I<Obj> -> I<Obj>
+    I<Obj> B<..> I<Obj>
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<to>, I<upto>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    I<Obj> B</> I<Obj>
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<÷>, I<div>
 
 =head2 <
 
-I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>> I<Obj>
 
 Return the
 
@@ -114,7 +114,7 @@ Aliases: I<lt>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>E<lt>> I<Obj>
 
 Return the
 
@@ -124,7 +124,7 @@ Aliases: I<drop_left>, I<shift_left>
 
 =head2 <=>
 
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<lt>=E<gt>> I<Obj>
 
 Return the
 
@@ -134,7 +134,7 @@ Aliases: I<cmp>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    I<Obj> B<==> I<Obj>
 
 Return the
 
@@ -144,7 +144,7 @@ Aliases: I<eq>
 
 =head2 =~
 
-I<Obj> B<=~> I<Obj> -> I<Obj>
+    I<Obj> B<=~> I<Obj>
 
 Return the
 
@@ -154,7 +154,7 @@ Aliases: I<match>
 
 =head2 >
 
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<gt>> I<Obj>
 
 Return the
 
@@ -164,7 +164,7 @@ Aliases: I<gt>
 
 =head2 >>
 
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+    I<Obj> B<E<gt>E<gt>> I<Obj>
 
 Return the
 
@@ -174,7 +174,7 @@ Aliases: I<drop_right>, I<shift_right>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    I<Obj> B<^> I<Obj>
 
 Return the
 
@@ -184,7 +184,7 @@ Aliases: I<xor>
 
 =head2 |
 
-I<Obj> B<|> I<Obj> -> I<Obj>
+    I<Obj> B<|> I<Obj>
 
 Return the
 
@@ -194,7 +194,7 @@ Aliases: I<or>
 
 =head2 ~
 
-I<Obj> B<~> I<Obj> -> I<Obj>
+    I<Obj> B<~> I<Obj>
 
 Return the
 
@@ -204,7 +204,7 @@ Aliases: I<not>
 
 =head2 ≠
 
-I<Obj> B<≠> I<Obj> -> I<Obj>
+    I<Obj> B<≠> I<Obj>
 
 Return the
 
@@ -214,7 +214,7 @@ Aliases: I<!=>, I<ne>
 
 =head2 ≤
 
-I<Obj> B<≤> I<Obj> -> I<Obj>
+    I<Obj> B<≤> I<Obj>
 
 Return the
 
@@ -224,7 +224,7 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-I<Obj> B<≥> I<Obj> -> I<Obj>
+    I<Obj> B<≥> I<Obj>
 
 Return the
 
@@ -234,7 +234,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 apply_escapes
 
-String.apply_escapes() -> I<Obj>
+    String.apply_escapes()
 
 Return the
 
@@ -242,7 +242,7 @@ Return the
 
 =head2 backtick
 
-String.backtick() -> I<Obj>
+    String.backtick()
 
 Return the
 
@@ -250,7 +250,7 @@ Return the
 
 =head2 base64_decode
 
-String.base64_decode() -> I<Obj>
+    String.base64_decode()
 
 Return the
 
@@ -260,7 +260,7 @@ Aliases: I<decode_base64>
 
 =head2 base64_encode
 
-String.base64_encode() -> I<Obj>
+    String.base64_encode()
 
 Return the
 
@@ -270,7 +270,7 @@ Aliases: I<encode_base64>
 
 =head2 begins_with
 
-String.begins_with() -> I<Obj>
+    String.begins_with()
 
 Return the
 
@@ -280,7 +280,7 @@ Aliases: I<starts_with>
 
 =head2 bin
 
-String.bin() -> I<Obj>
+    String.bin()
 
 Return the
 
@@ -288,7 +288,7 @@ Return the
 
 =head2 bytes
 
-String.bytes() -> I<Obj>
+    String.bytes()
 
 Return the
 
@@ -296,7 +296,7 @@ Return the
 
 =head2 bytes_len
 
-String.bytes_len() -> I<Obj>
+    String.bytes_len()
 
 Return the
 
@@ -306,7 +306,7 @@ Aliases: I<bytes_length>
 
 =head2 center
 
-String.center() -> I<Obj>
+    String.center()
 
 Return the
 
@@ -314,7 +314,7 @@ Return the
 
 =head2 char
 
-String.char() -> I<Obj>
+    String.char()
 
 Return the
 
@@ -324,7 +324,7 @@ Aliases: I<char_at>
 
 =head2 chars
 
-String.chars() -> I<Obj>
+    String.chars()
 
 Return the
 
@@ -332,7 +332,7 @@ Return the
 
 =head2 chomp
 
-String.chomp() -> I<Obj>
+    String.chomp()
 
 Return the
 
@@ -340,7 +340,7 @@ Return the
 
 =head2 chop
 
-String.chop() -> I<Obj>
+    String.chop()
 
 Return the
 
@@ -348,7 +348,7 @@ Return the
 
 =head2 clear
 
-String.clear() -> I<Obj>
+    String.clear()
 
 Return the
 
@@ -356,7 +356,7 @@ Return the
 
 =head2 collect
 
-String.collect() -> I<Obj>
+    String.collect()
 
 Return the
 
@@ -366,7 +366,7 @@ Aliases: I<find_all>, I<findall>
 
 =head2 count
 
-String.count() -> I<Obj>
+    String.count()
 
 Return the
 
@@ -374,7 +374,7 @@ Return the
 
 =head2 crypt
 
-String.crypt() -> I<Obj>
+    String.crypt()
 
 Return the
 
@@ -382,7 +382,7 @@ Return the
 
 =head2 decode
 
-String.decode() -> I<Obj>
+    String.decode()
 
 Return the
 
@@ -390,7 +390,7 @@ Return the
 
 =head2 decode_utf8
 
-String.decode_utf8() -> I<Obj>
+    String.decode_utf8()
 
 Return the
 
@@ -398,7 +398,7 @@ Return the
 
 =head2 die
 
-String.die() -> I<Obj>
+    String.die()
 
 Return the
 
@@ -406,7 +406,7 @@ Return the
 
 =head2 digits
 
-String.digits() -> I<Obj>
+    String.digits()
 
 Return the
 
@@ -414,7 +414,7 @@ Return the
 
 =head2 downto
 
-String.downto() -> I<Obj>
+    String.downto()
 
 Return the
 
@@ -422,7 +422,7 @@ Return the
 
 =head2 dump
 
-String.dump() -> I<Obj>
+    String.dump()
 
 Return the
 
@@ -432,7 +432,7 @@ Aliases: I<inspect>
 
 =head2 each
 
-String.each() -> I<Obj>
+    String.each()
 
 Return the
 
@@ -442,7 +442,7 @@ Aliases: I<each_char>
 
 =head2 each_byte
 
-String.each_byte() -> I<Obj>
+    String.each_byte()
 
 Return the
 
@@ -450,7 +450,7 @@ Return the
 
 =head2 each_graph
 
-String.each_graph() -> I<Obj>
+    String.each_graph()
 
 Return the
 
@@ -460,7 +460,7 @@ Aliases: I<each_grapheme>
 
 =head2 each_line
 
-String.each_line() -> I<Obj>
+    String.each_line()
 
 Return the
 
@@ -468,7 +468,7 @@ Return the
 
 =head2 each_num
 
-String.each_num() -> I<Obj>
+    String.each_num()
 
 Return the
 
@@ -478,7 +478,7 @@ Aliases: I<each_number>
 
 =head2 each_word
 
-String.each_word() -> I<Obj>
+    String.each_word()
 
 Return the
 
@@ -486,7 +486,7 @@ Return the
 
 =head2 encode
 
-String.encode() -> I<Obj>
+    String.encode()
 
 Return the
 
@@ -494,7 +494,7 @@ Return the
 
 =head2 encode_utf8
 
-String.encode_utf8() -> I<Obj>
+    String.encode_utf8()
 
 Return the
 
@@ -502,7 +502,7 @@ Return the
 
 =head2 ends_with
 
-String.ends_with() -> I<Obj>
+    String.ends_with()
 
 Return the
 
@@ -510,7 +510,7 @@ Return the
 
 =head2 escape
 
-String.escape() -> I<Obj>
+    String.escape()
 
 Return the
 
@@ -520,7 +520,7 @@ Aliases: I<quotemeta>
 
 =head2 esub
 
-String.esub() -> I<Obj>
+    String.esub()
 
 Return the
 
@@ -528,7 +528,7 @@ Return the
 
 =head2 extract_bracketed
 
-String.extract_bracketed() -> I<Obj>
+    String.extract_bracketed()
 
 Return the
 
@@ -536,7 +536,7 @@ Return the
 
 =head2 extract_codeblock
 
-String.extract_codeblock() -> I<Obj>
+    String.extract_codeblock()
 
 Return the
 
@@ -544,7 +544,7 @@ Return the
 
 =head2 extract_delimited
 
-String.extract_delimited() -> I<Obj>
+    String.extract_delimited()
 
 Return the
 
@@ -552,7 +552,7 @@ Return the
 
 =head2 extract_quotelike
 
-String.extract_quotelike() -> I<Obj>
+    String.extract_quotelike()
 
 Return the
 
@@ -560,7 +560,7 @@ Return the
 
 =head2 extract_tagged
 
-String.extract_tagged() -> I<Obj>
+    String.extract_tagged()
 
 Return the
 
@@ -568,7 +568,7 @@ Return the
 
 =head2 fc
 
-String.fc() -> I<Obj>
+    String.fc()
 
 Return the
 
@@ -578,7 +578,7 @@ Aliases: I<foldcase>
 
 =head2 first
 
-String.first() -> I<Obj>
+    String.first()
 
 Return the
 
@@ -586,7 +586,7 @@ Return the
 
 =head2 flip
 
-String.flip() -> I<Obj>
+    String.flip()
 
 Return the
 
@@ -596,7 +596,7 @@ Aliases: I<reverse>
 
 =head2 format
 
-String.format() -> I<Obj>
+    String.format()
 
 Return the
 
@@ -604,7 +604,7 @@ Return the
 
 =head2 frequire
 
-String.frequire() -> I<Obj>
+    String.frequire()
 
 Return the
 
@@ -612,7 +612,7 @@ Return the
 
 =head2 ft
 
-String.ft() -> I<Obj>
+    String.ft()
 
 Return the
 
@@ -622,7 +622,7 @@ Aliases: I<slice>
 
 =head2 gesub
 
-String.gesub() -> I<Obj>
+    String.gesub()
 
 Return the
 
@@ -630,7 +630,7 @@ Return the
 
 =head2 glob
 
-String.glob() -> I<Obj>
+    String.glob()
 
 Return the
 
@@ -638,7 +638,7 @@ Return the
 
 =head2 gmatch
 
-String.gmatch() -> I<Obj>
+    String.gmatch()
 
 Return the
 
@@ -646,7 +646,7 @@ Return the
 
 =head2 graphs
 
-String.graphs() -> I<Obj>
+    String.graphs()
 
 Return the
 
@@ -656,7 +656,7 @@ Aliases: I<graphemes>
 
 =head2 graphs_len
 
-String.graphs_len() -> I<Obj>
+    String.graphs_len()
 
 Return the
 
@@ -666,7 +666,7 @@ Aliases: I<graphs_length>
 
 =head2 gsub
 
-String.gsub() -> I<Obj>
+    String.gsub()
 
 Return the
 
@@ -676,7 +676,7 @@ Aliases: I<replace_all>
 
 =head2 has
 
-String.has() -> I<Obj>
+    String.has()
 
 Return the
 
@@ -686,7 +686,7 @@ Aliases: I<contain>, I<include>, I<contains>, I<includes>
 
 =head2 hex
 
-String.hex() -> I<Obj>
+    String.hex()
 
 Return the
 
@@ -694,7 +694,7 @@ Return the
 
 =head2 index
 
-String.index() -> I<Obj>
+    String.index()
 
 Return the
 
@@ -702,7 +702,7 @@ Return the
 
 =head2 insert
 
-String.insert() -> I<Obj>
+    String.insert()
 
 Return the
 
@@ -710,7 +710,7 @@ Return the
 
 =head2 ints
 
-String.ints() -> I<Obj>
+    String.ints()
 
 Return the
 
@@ -720,7 +720,7 @@ Aliases: I<integers>
 
 =head2 is_alnum
 
-String.is_alnum() -> I<Obj>
+    String.is_alnum()
 
 Return the
 
@@ -730,7 +730,7 @@ Aliases: I<is_alphanum>
 
 =head2 is_alpha
 
-String.is_alpha() -> I<Obj>
+    String.is_alpha()
 
 Return the
 
@@ -738,7 +738,7 @@ Return the
 
 =head2 is_ascii
 
-String.is_ascii() -> I<Obj>
+    String.is_ascii()
 
 Return the
 
@@ -746,7 +746,7 @@ Return the
 
 =head2 is_digit
 
-String.is_digit() -> I<Obj>
+    String.is_digit()
 
 Return the
 
@@ -754,7 +754,7 @@ Return the
 
 =head2 is_empty
 
-String.is_empty() -> I<Obj>
+    String.is_empty()
 
 Return the
 
@@ -762,7 +762,7 @@ Return the
 
 =head2 is_lc
 
-String.is_lc() -> I<Obj>
+    String.is_lc()
 
 Return the
 
@@ -772,7 +772,7 @@ Aliases: I<is_lowercase>
 
 =head2 is_numeric
 
-String.is_numeric() -> I<Obj>
+    String.is_numeric()
 
 Return the
 
@@ -782,7 +782,7 @@ Aliases: I<looks_like_number>
 
 =head2 is_palindrome
 
-String.is_palindrome() -> I<Obj>
+    String.is_palindrome()
 
 Return the
 
@@ -790,7 +790,7 @@ Return the
 
 =head2 is_punct
 
-String.is_punct() -> I<Obj>
+    String.is_punct()
 
 Return the
 
@@ -800,7 +800,7 @@ Aliases: I<is_punctuation>
 
 =head2 is_space
 
-String.is_space() -> I<Obj>
+    String.is_space()
 
 Return the
 
@@ -808,7 +808,7 @@ Return the
 
 =head2 is_uc
 
-String.is_uc() -> I<Obj>
+    String.is_uc()
 
 Return the
 
@@ -818,7 +818,7 @@ Aliases: I<is_uppercase>
 
 =head2 is_word
 
-String.is_word() -> I<Obj>
+    String.is_word()
 
 Return the
 
@@ -826,7 +826,7 @@ Return the
 
 =head2 iter
 
-String.iter() -> I<Obj>
+    String.iter()
 
 Return the
 
@@ -834,7 +834,7 @@ Return the
 
 =head2 jaro_distance
 
-String.jaro_distance() -> I<Obj>
+    String.jaro_distance()
 
 Return the
 
@@ -842,7 +842,7 @@ Return the
 
 =head2 join
 
-String.join() -> I<Obj>
+    String.join()
 
 Return the
 
@@ -850,7 +850,7 @@ Return the
 
 =head2 last
 
-String.last() -> I<Obj>
+    String.last()
 
 Return the
 
@@ -858,7 +858,7 @@ Return the
 
 =head2 lc
 
-String.lc() -> I<Obj>
+    String.lc()
 
 Return the
 
@@ -868,7 +868,7 @@ Aliases: I<lower>, I<downcase>
 
 =head2 lcfirst
 
-String.lcfirst() -> I<Obj>
+    String.lcfirst()
 
 Return the
 
@@ -876,7 +876,7 @@ Return the
 
 =head2 len
 
-String.len() -> I<Obj>
+    String.len()
 
 Return the
 
@@ -886,7 +886,7 @@ Aliases: I<size>, I<length>, I<chars_len>, I<chars_length>
 
 =head2 lev
 
-String.lev() -> I<Obj>
+    String.lev()
 
 Return the
 
@@ -896,7 +896,7 @@ Aliases: I<leven>, I<levenshtein>
 
 =head2 lines
 
-String.lines() -> I<Obj>
+    String.lines()
 
 Return the
 
@@ -904,7 +904,7 @@ Return the
 
 =head2 ltrim
 
-String.ltrim() -> I<Obj>
+    String.ltrim()
 
 Return the
 
@@ -914,7 +914,7 @@ Aliases: I<lstrip>, I<trim_beg>, I<strip_beg>, I<trim_left>, I<strip_left>
 
 =head2 md5
 
-String.md5() -> I<Obj>
+    String.md5()
 
 Return the
 
@@ -922,7 +922,7 @@ Return the
 
 =head2 new
 
-String.new() -> I<Obj>
+    String.new()
 
 Return the
 
@@ -932,7 +932,7 @@ Aliases: I<call>
 
 =head2 num
 
-String.num() -> I<Obj>
+    String.num()
 
 Return the
 
@@ -942,7 +942,7 @@ Aliases: I<to_n>, I<to_num>
 
 =head2 nums
 
-String.nums() -> I<Obj>
+    String.nums()
 
 Return the
 
@@ -952,7 +952,7 @@ Aliases: I<numbers>
 
 =head2 oct
 
-String.oct() -> I<Obj>
+    String.oct()
 
 Return the
 
@@ -960,7 +960,7 @@ Return the
 
 =head2 open
 
-String.open() -> I<Obj>
+    String.open()
 
 Return the
 
@@ -968,7 +968,7 @@ Return the
 
 =head2 open_r
 
-String.open_r() -> I<Obj>
+    String.open_r()
 
 Return the
 
@@ -976,7 +976,7 @@ Return the
 
 =head2 ord
 
-String.ord() -> I<Obj>
+    String.ord()
 
 Return the
 
@@ -984,7 +984,7 @@ Return the
 
 =head2 overlaps
 
-String.overlaps() -> I<Obj>
+    String.overlaps()
 
 Return the
 
@@ -992,7 +992,7 @@ Return the
 
 =head2 pack
 
-String.pack() -> I<Obj>
+    String.pack()
 
 Return the
 
@@ -1000,7 +1000,7 @@ Return the
 
 =head2 parse_quotewords
 
-String.parse_quotewords() -> I<Obj>
+    String.parse_quotewords()
 
 Return the
 
@@ -1008,7 +1008,7 @@ Return the
 
 =head2 pipe
 
-String.pipe() -> I<Obj>
+    String.pipe()
 
 Return the
 
@@ -1016,7 +1016,7 @@ Return the
 
 =head2 pop
 
-String.pop() -> I<Obj>
+    String.pop()
 
 Return the
 
@@ -1024,7 +1024,7 @@ Return the
 
 =head2 prepend
 
-String.prepend() -> I<Obj>
+    String.prepend()
 
 Return the
 
@@ -1032,7 +1032,7 @@ Return the
 
 =head2 printf
 
-String.printf() -> I<Obj>
+    String.printf()
 
 Return the
 
@@ -1040,7 +1040,7 @@ Return the
 
 =head2 printlnf
 
-String.printlnf() -> I<Obj>
+    String.printlnf()
 
 Return the
 
@@ -1048,7 +1048,7 @@ Return the
 
 =head2 range
 
-String.range() -> I<Obj>
+    String.range()
 
 Return the
 
@@ -1056,7 +1056,7 @@ Return the
 
 =head2 repeat
 
-String.repeat() -> I<Obj>
+    String.repeat()
 
 Return the
 
@@ -1064,7 +1064,7 @@ Return the
 
 =head2 require
 
-String.require() -> I<Obj>
+    String.require()
 
 Return the
 
@@ -1072,7 +1072,7 @@ Return the
 
 =head2 rindex
 
-String.rindex() -> I<Obj>
+    String.rindex()
 
 Return the
 
@@ -1080,7 +1080,7 @@ Return the
 
 =head2 rotate
 
-String.rotate() -> I<Obj>
+    String.rotate()
 
 Return the
 
@@ -1088,7 +1088,7 @@ Return the
 
 =head2 rtrim
 
-String.rtrim() -> I<Obj>
+    String.rtrim()
 
 Return the
 
@@ -1098,7 +1098,7 @@ Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
 
 =head2 run
 
-String.run() -> I<Obj>
+    String.run()
 
 Return the
 
@@ -1106,7 +1106,7 @@ Return the
 
 =head2 scan
 
-String.scan() -> I<Obj>
+    String.scan()
 
 Return the
 
@@ -1114,7 +1114,7 @@ Return the
 
 =head2 sha1
 
-String.sha1() -> I<Obj>
+    String.sha1()
 
 Return the
 
@@ -1122,7 +1122,7 @@ Return the
 
 =head2 sha256
 
-String.sha256() -> I<Obj>
+    String.sha256()
 
 Return the
 
@@ -1130,7 +1130,7 @@ Return the
 
 =head2 sha512
 
-String.sha512() -> I<Obj>
+    String.sha512()
 
 Return the
 
@@ -1138,7 +1138,7 @@ Return the
 
 =head2 sort
 
-String.sort() -> I<Obj>
+    String.sort()
 
 Return the
 
@@ -1146,7 +1146,7 @@ Return the
 
 =head2 split
 
-String.split() -> I<Obj>
+    String.split()
 
 Return the
 
@@ -1154,7 +1154,7 @@ Return the
 
 =head2 sprintlnf
 
-String.sprintlnf() -> I<Obj>
+    String.sprintlnf()
 
 Return the
 
@@ -1162,7 +1162,7 @@ Return the
 
 =head2 sub
 
-String.sub() -> I<Obj>
+    String.sub()
 
 Return the
 
@@ -1172,7 +1172,7 @@ Aliases: I<replace>
 
 =head2 substr
 
-String.substr() -> I<Obj>
+    String.substr()
 
 Return the
 
@@ -1182,7 +1182,7 @@ Aliases: I<substring>
 
 =head2 tc
 
-String.tc() -> I<Obj>
+    String.tc()
 
 Return the
 
@@ -1192,7 +1192,7 @@ Aliases: I<ucfirst>, I<titlecase>
 
 =head2 tclc
 
-String.tclc() -> I<Obj>
+    String.tclc()
 
 Return the
 
@@ -1202,7 +1202,7 @@ Aliases: I<capitalize>
 
 =head2 to_i
 
-String.to_i() -> I<Obj>
+    String.to_i()
 
 Return the
 
@@ -1212,7 +1212,7 @@ Aliases: I<to_int>
 
 =head2 to_s
 
-String.to_s() -> I<Obj>
+    String.to_s()
 
 Return the
 
@@ -1222,7 +1222,7 @@ Aliases: I<to_str>
 
 =head2 tr
 
-String.tr() -> I<Obj>
+    String.tr()
 
 Return the
 
@@ -1232,7 +1232,7 @@ Aliases: I<translit>
 
 =head2 trans
 
-String.trans() -> I<Obj>
+    String.trans()
 
 Return the
 
@@ -1240,7 +1240,7 @@ Return the
 
 =head2 trim
 
-String.trim() -> I<Obj>
+    String.trim()
 
 Return the
 
@@ -1250,7 +1250,7 @@ Aliases: I<strip>
 
 =head2 uc
 
-String.uc() -> I<Obj>
+    String.uc()
 
 Return the
 
@@ -1260,7 +1260,7 @@ Aliases: I<upper>, I<upcase>
 
 =head2 unescape
 
-String.unescape() -> I<Obj>
+    String.unescape()
 
 Return the
 
@@ -1268,7 +1268,7 @@ Return the
 
 =head2 unpack
 
-String.unpack() -> I<Obj>
+    String.unpack()
 
 Return the
 
@@ -1276,7 +1276,7 @@ Return the
 
 =head2 warn
 
-String.warn() -> I<Obj>
+    String.warn()
 
 Return the
 
@@ -1284,7 +1284,7 @@ Return the
 
 =head2 wc
 
-String.wc() -> I<Obj>
+    String.wc()
 
 Return the
 
@@ -1294,7 +1294,7 @@ Aliases: I<wordcase>
 
 =head2 words
 
-String.words() -> I<Obj>
+    String.words()
 
 Return the
 

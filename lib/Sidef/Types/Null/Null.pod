@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 new
 
-Null.new() -> I<Obj>
+    Null.new()
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<call>
 
 =head2 to_s
 
-Null.to_s() -> I<Obj>
+    Null.to_s()
 
 Return the
 

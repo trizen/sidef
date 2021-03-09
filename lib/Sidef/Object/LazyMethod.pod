@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 method
 
-LazyMethod.method() -> I<Obj>
+    LazyMethod.method()
 
 Return the
 
@@ -32,7 +32,7 @@ Return the
 
 =head2 new
 
-LazyMethod.new() -> I<Obj>
+    LazyMethod.new()
 
 Return the
 
