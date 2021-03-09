@@ -2547,7 +2547,7 @@ Equivalent to `n.inverse_sigma(k).len`, but much faster.
 
 =head2 inverse_sigma_max
 
-    n.inverse_sigma_max()
+    Number.inverse_sigma_max()
 
 Return the
 
@@ -2555,7 +2555,7 @@ Return the
 
 =head2 inverse_sigma_min
 
-    n.inverse_sigma_min()
+    Number.inverse_sigma_min()
 
 Return the
 
@@ -2867,7 +2867,7 @@ Aliases: I<is_frobenius_pseudoprime>
 
 =head2 is_fundamental
 
-    n.is_fundamental()
+    Number.is_fundamental()
 
 Return the
 
@@ -4994,9 +4994,10 @@ Aliases: I<nth_semiprime>
 
 =head2 semiprime_count
 
-    n.semiprime_count()
+    semiprime_count(n)
+    semiprime_count(a,b)
 
-Counts the number of semiprimes <= n. (see: A072000)
+Counts the number of semiprimes <= n (OEIS: A072000), or in the range a..b.
 
 Example:
 
@@ -5499,7 +5500,7 @@ Aliases: I<variations_with_repetition>
 
 =head2 udivisors
 
-    n.udivisors()
+    Number.udivisors()
 
 Return the
 

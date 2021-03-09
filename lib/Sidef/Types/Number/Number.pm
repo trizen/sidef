@@ -11274,10 +11274,15 @@ package Sidef::Types::Number::Number {
     }
 
     sub semiprime_count {
-        my ($n) = @_;
-        $n = _big2uistr($n) // return ZERO;
-        my $count = _semiprime_count($n);
-        _set_int($count);
+        my ($from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return $to->semiprime_count->sub($from->dec->semiprime_count);
+        }
+
+        my $n = _big2uistr($from) // return ZERO;
+        _set_int(_semiprime_count($n));
     }
 
     sub nth_semiprime {
