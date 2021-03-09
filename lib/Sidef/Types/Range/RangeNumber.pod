@@ -123,6 +123,14 @@ Return the
 
 =cut
 
+=head2 each_squarefree_almost_prime
+
+RangeNumber.each_squarefree_almost_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 gcd
 
 RangeNumber.gcd() -> I<Obj>

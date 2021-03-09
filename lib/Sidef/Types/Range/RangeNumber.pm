@@ -443,6 +443,25 @@ package Sidef::Types::Range::RangeNumber {
         return $self;
     }
 
+    sub each_squarefree_almost_prime {
+        my ($self, $k, $block) = @_;
+
+        $k = Sidef::Types::Number::Number->new($k);
+
+        if ($self->{step}->is_one) {
+
+            my $left  = Sidef::Types::Number::Number->new($self->{from});
+            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+            Sidef::Types::Number::Number::each_squarefree_almost_prime($k, $left, $right, $block);
+            return $self;
+        }
+
+        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_squarefree && $_[0]->is_almost_prime($k) }))
+          ->each($block);
+        return $self;
+    }
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new("$self");

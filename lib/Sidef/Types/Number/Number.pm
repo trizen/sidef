@@ -994,7 +994,7 @@ package Sidef::Types::Number::Number {
                     $upto = $to;
                 }
 
-                ## say ":: Sieving ($from, $upto) with step = $step";
+                #~ say ":: Sieving ($from, $upto) with step = $step";
                 @buffer = @{$buffer_callback->($from, $upto)};
                 $from   = $upto + 1;
                 @buffer || next;
@@ -9933,6 +9933,18 @@ package Sidef::Types::Number::Number {
         CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n)) - 1));
     }
 
+    sub _nth_almost_prime_lower {
+        my ($n, $k) = @_;
+
+        my $factorial_km1 = 1;
+
+        for my $j (2 .. $k - 1) {
+            $factorial_km1 *= $j;
+        }
+
+        CORE::int(($n * CORE::log($n)) / ((CORE::log(CORE::log($n))**($k - 1)) / $factorial_km1));
+    }
+
     sub _prime_count_range {
         my ($x, $y) = @_;
 
@@ -15657,11 +15669,25 @@ package Sidef::Types::Number::Number {
 
         $k = _any2ui($$k) // return ZERO;
 
-        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
-            $from = $ONE;
+        if (Math::GMPz::Rmpz_cmp_ui($from, $k) <= 0 and $k > 0) {
+            $from = Math::GMPz::Rmpz_init_set_ui(0);
+            Math::GMPz::Rmpz_setbit($from, $k);    # from = 2**k
         }
 
-        _generic_each($from, $to, $block, sub { 5e6 }, sub { _sieve_almost_primes($_[0], $_[1], $k) });
+#<<<
+        _generic_each($from, $to, $block, sub {
+                my ($from) = @_;
+
+                my $t    = Math::GMPz::Rmpz_get_d($from);
+                my $step = ($k > 0) ? (_nth_almost_prime_lower($t + CORE::log($t) * 2e4, $k) - _nth_almost_prime_lower($t, $k)) : 0;
+
+                if ($step <= 0 or $step > 1e9) {
+                    $step = 100_000_000 * $k;
+                }
+
+                $step;
+            }, sub { _sieve_almost_primes($_[0], $_[1], $k) });
+#>>>
     }
 
     *each_almost_prime = \&almost_primes_each;
@@ -15722,7 +15748,13 @@ package Sidef::Types::Number::Number {
             $from = $ONE;
         }
 
-        _generic_each($from, $to, $block, sub { 1e7 }, sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1) });
+        my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e7;
+
+        if ($step > ULONG_MAX) {
+            $step = Math::GMPz::Rmpz_init_set_str($step, 10);
+        }
+
+        _generic_each($from, $to, $block, sub { $step }, sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1) });
     }
 
     *each_squarefree_almost_prime = \&squarefree_almost_primes_each;

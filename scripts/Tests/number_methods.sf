@@ -169,13 +169,28 @@ assert_eq(
 )
 
 assert_eq(
+    gather { 10..100 -> each_squarefree_almost_prime(2, {|k| take(k) }) },
+    2.squarefree_almost_primes(10, 100)
+)
+
+assert_eq(
     gather { 10..100 -> each_almost_prime(3, {|k| take(k) }) },
     3.almost_primes(10, 100)
 )
 
 assert_eq(
+    gather { 10..100 -> each_squarefree_almost_prime(3, {|k| take(k) }) },
+    3.squarefree_almost_primes(10, 100)
+)
+
+assert_eq(
     gather { 10..100 `by` 3 -> each_almost_prime(3, {|k| take(k) }) },
     10..100 `by` 3 -> grep { .is_almost_prime(3) }
+)
+
+assert_eq(
+    gather { 10..200 `by` 3 -> each_squarefree_almost_prime(3, {|k| take(k) }) },
+    10..200 `by` 3 -> grep { .is_almost_prime(3) && .is_squarefree }
 )
 
 assert_eq(
