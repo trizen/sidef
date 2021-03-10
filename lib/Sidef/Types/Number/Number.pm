@@ -13436,6 +13436,7 @@ package Sidef::Types::Number::Number {
             my $t = Math::GMPz::Rmpz_init();
             my $u = Math::GMPz::Rmpz_init();
             my $v = Math::GMPz::Rmpz_init();
+            my $w = Math::GMPz::Rmpz_init();
 
             my $T = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -13444,24 +13445,22 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_div($t, $B, $A);
                 Math::GMPz::Rmpz_div($u, $B, $t);
 
-                my $z = $u + 1;
-
                 # v = u*(u+1)/2
                 Math::GMPz::Rmpz_add_ui($v, $u, 1);
                 Math::GMPz::Rmpz_mul($v, $v, $u);
                 Math::GMPz::Rmpz_div_2exp($v, $v, 1);
 
-                # u = (a-1)*a/2
-                Math::GMPz::Rmpz_sub_ui($u, $A, 1);
-                Math::GMPz::Rmpz_mul($u, $u, $A);
-                Math::GMPz::Rmpz_div_2exp($u, $u, 1);
+                # w = (a-1)*a/2
+                Math::GMPz::Rmpz_sub_ui($w, $A, 1);
+                Math::GMPz::Rmpz_mul($w, $w, $A);
+                Math::GMPz::Rmpz_div_2exp($w, $w, 1);
 
-                # T += t*(v - u)
-                Math::GMPz::Rmpz_sub($v, $v, $u);
+                # T += t*(v - w)
+                Math::GMPz::Rmpz_sub($v, $v, $w);
                 Math::GMPz::Rmpz_mul($v, $v, $t);
                 Math::GMPz::Rmpz_add($T, $T, $v);
 
-                $A = $z;
+                Math::GMPz::Rmpz_add_ui($A, $u, 1);
             }
 
             return $T;
