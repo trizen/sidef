@@ -13384,6 +13384,102 @@ package Sidef::Types::Number::Number {
 
     *dirichlet_sum = \&dirichlet_hyperbola;
 
+    sub sum_of_remainders {
+        my ($n, $v) = @_;
+
+        # a(n,v) = Sum_{k=1..n} v % k
+
+        _valid(\$v);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $v = _any2mpz($$v) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO;
+        }
+
+        my $S = sub {
+            my ($n) = @_;
+
+            my $t = Math::GMPz::Rmpz_init();
+            my $u = Math::GMPz::Rmpz_init();
+            my $T = Math::GMPz::Rmpz_init_set_ui(0);
+
+            my $s = Math::Prime::Util::GMP::sqrtint($n);
+
+            foreach my $k (1 .. $s) {
+
+                # T += faulhaber(idiv(n,k), 1) + k*idiv(n,k)
+                Math::GMPz::Rmpz_div_ui($t, $n, $k);
+                Math::GMPz::Rmpz_add_ui($u, $t, 1);
+                Math::GMPz::Rmpz_mul($u, $u, $t);
+                Math::GMPz::Rmpz_div_2exp($u, $u, 1);
+                Math::GMPz::Rmpz_mul_ui($t, $t, $k);
+                Math::GMPz::Rmpz_add($u, $u, $t);
+                Math::GMPz::Rmpz_add($T, $T, $u);
+            }
+
+            # T -= faulhaber(s, 1)*s
+            Math::GMPz::Rmpz_set_str($u, $s, 10);
+            Math::GMPz::Rmpz_add_ui($t, $u, 1);
+            Math::GMPz::Rmpz_mul($t, $t, $u);
+            Math::GMPz::Rmpz_div_2exp($t, $t, 1);
+            Math::GMPz::Rmpz_mul($t, $t, $u);
+            Math::GMPz::Rmpz_sub($T, $T, $t);
+
+            return $T;
+        };
+
+        my $G = sub {
+            my ($A, $B) = @_;
+
+            my $t = Math::GMPz::Rmpz_init();
+            my $u = Math::GMPz::Rmpz_init();
+            my $v = Math::GMPz::Rmpz_init();
+
+            my $T = Math::GMPz::Rmpz_init_set_ui(0);
+
+            while (Math::GMPz::Rmpz_cmp($A, $B) <= 0) {
+
+                Math::GMPz::Rmpz_div($t, $B, $A);
+                Math::GMPz::Rmpz_div($u, $B, $t);
+
+                my $z = $u + 1;
+
+                # v = u*(u+1)/2
+                Math::GMPz::Rmpz_add_ui($v, $u, 1);
+                Math::GMPz::Rmpz_mul($v, $v, $u);
+                Math::GMPz::Rmpz_div_2exp($v, $v, 1);
+
+                # u = (a-1)*a/2
+                Math::GMPz::Rmpz_sub_ui($u, $A, 1);
+                Math::GMPz::Rmpz_mul($u, $u, $A);
+                Math::GMPz::Rmpz_div_2exp($u, $u, 1);
+
+                # T += t*(v - u)
+                Math::GMPz::Rmpz_sub($v, $v, $u);
+                Math::GMPz::Rmpz_mul($v, $v, $t);
+                Math::GMPz::Rmpz_add($T, $T, $v);
+
+                $A = $z;
+            }
+
+            return $T;
+        };
+
+        # a(n,v) = n*v - S(v) + G(n+1, v)
+
+        my $x = $S->($v);
+        my $y = $G->($n + 1, $v);
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $n, $v);
+        Math::GMPz::Rmpz_add($r, $r, $y);
+        Math::GMPz::Rmpz_sub($r, $r, $x);
+
+        bless \$r;
+    }
+
     # Divisors d of n, such that d <= k, with k = n when `k` is not specified
     sub divisors {
         my ($n, $k) = @_;
