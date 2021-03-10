@@ -15622,6 +15622,149 @@ package Sidef::Types::Number::Number {
         return \@almost_primes;
     }
 
+    sub almost_prime_divisors {
+        my ($n, $k) = @_;
+
+        if (!defined($k)) {
+            my @list;
+
+            foreach my $k (0 .. $n->bigomega) {
+                push @list, $n->almost_prime_divisors(_set_int($k));
+            }
+
+            return Sidef::Types::Array::Array->new(\@list);
+        }
+
+        _valid(\$k);
+
+        $k = _any2ui($$k) // return Sidef::Types::Array::Array->new;
+        my $z = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        if ($k == 0) {
+            return Sidef::Types::Array::Array->new($ONE);
+        }
+
+        my @list;
+
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($z)) {
+
+            $z = Math::GMPz::Rmpz_get_ui($z);
+
+            my @factor_exp = Math::Prime::Util::factor_exp($z);
+            my %valuations = map { @$_ } @factor_exp;
+            my @factors    = map { $_->[0] } @factor_exp;
+
+            if ($k == 1) {
+                return Sidef::Types::Array::Array->new([map { _set_int($_) } @factors]);
+            }
+
+            sub {
+                my ($m, $p, $k) = @_;
+
+                my $L =
+                  defined(&Math::Prime::Util::divint)
+                  ? Math::Prime::Util::divint($z, $m)
+                  : Math::Prime::Util::GMP::divint($z, $m);
+
+                if ($k == 1) {
+
+                    foreach my $q (@factors) {
+
+                        $q < $p and next;
+                        $q > $L and last;
+
+                        Math::Prime::Util::valuation($m, $q) < $valuations{$q} or next;
+
+                        push @list, $m * $q;
+                    }
+
+                    return;
+                }
+
+                my $s = Math::Prime::Util::rootint($L, $k);
+
+                foreach my $q (@factors) {
+
+                    $q < $p and next;
+                    $q > $s and last;
+
+                    Math::Prime::Util::valuation($m, $q) < $valuations{$q} or next;
+
+                    __SUB__->($m * $q, $q, $k - 1);
+                }
+              }
+              ->(1, $factors[0], $k);
+
+            return Sidef::Types::Array::Array->new([map { _set_int($_) } sort { $a <=> $b } @list]);
+        }
+
+        my @factor_exp = _factor_exp(Math::GMPz::Rmpz_get_str($z, 10));
+        my %valuations = map { @$_ } @factor_exp;
+        my @factors    = map { ($_ < ULONG_MAX) ? $_ : ${_set_int($_)} } map { $_->[0] } @factor_exp;
+
+        if ($k == 1) {
+            return Sidef::Types::Array::Array->new([map { _set_int($_) } @factors]);
+        }
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        sub {
+            my ($m, $p, $k) = @_;
+
+            Math::GMPz::Rmpz_div($t, $z, $m);
+
+            if ($k == 1) {
+
+                my $L =
+                    Math::GMPz::Rmpz_fits_ulong_p($t)
+                  ? Math::GMPz::Rmpz_get_ui($t)
+                  : Math::GMPz::Rmpz_init_set($t);
+
+                foreach my $q (@factors) {
+
+                    $q < $p and next;
+                    $q > $L and last;
+
+                    my $v = ref($q) ? Math::GMPz::Rmpz_remove($t, $m, $q) : do {
+                        Math::GMPz::Rmpz_set_ui($t, $q);
+                        Math::GMPz::Rmpz_remove($t, $m, $t);
+                    };
+
+                    $v < $valuations{$q} or next;
+
+                    push @list, $m * $q;
+                }
+
+                return;
+            }
+
+            Math::GMPz::Rmpz_root($t, $t, $k);
+
+            my $s =
+                Math::GMPz::Rmpz_fits_ulong_p($t)
+              ? Math::GMPz::Rmpz_get_ui($t)
+              : Math::GMPz::Rmpz_init_set($t);
+
+            foreach my $q (@factors) {
+
+                $q < $p and next;
+                $q > $s and last;
+
+                my $v = ref($q) ? Math::GMPz::Rmpz_remove($t, $m, $q) : do {
+                    Math::GMPz::Rmpz_set_ui($t, $q);
+                    Math::GMPz::Rmpz_remove($t, $m, $t);
+                };
+
+                $v < $valuations{$q} or next;
+
+                __SUB__->($m * $q, $q, $k - 1);
+            }
+          }
+          ->(Math::GMPz::Rmpz_init_set_ui(1), $factors[0], $k);
+
+        Sidef::Types::Array::Array->new([map { _set_int($_) } sort { $a <=> $b } @list]);
+    }
+
     sub almost_primes {
         my ($k, $from, $to) = @_;
 

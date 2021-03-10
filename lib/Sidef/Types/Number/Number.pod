@@ -663,6 +663,23 @@ This is done by first running a primality pre-test on all values and returning e
 
 =cut
 
+=head2 almost_prime_divisors
+
+    n.almost_prime_divisors
+    n.almost_prime_divisors(k)
+
+Returns the k-almost prime divisors of n.
+
+Example:
+
+    say 5040.almost_prime_divisors(7)   #=> [720, 1008, 1680, 2520]
+
+When C<k> is omitted, an array of arrays with the k-almost prime divisors of n, for each k in the range C<0..bigomega(n)>, is returned:
+
+    say 120.almost_prime_divisors       #=> [[1], [2, 3, 5], [4, 6, 10, 15], [8, 12, 20, 30], [24, 40, 60], [120]]
+
+=cut
+
 =head2 almost_primes
 
     k.almost_primes(n)
