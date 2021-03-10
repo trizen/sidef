@@ -367,9 +367,10 @@ Aliases: I<kronecker_delta>
 
 =head2 ζ
 
-    Number.ζ()
+    ζ(s)
+    zeta(s)
 
-Return the
+The Riemann Zeta function.
 
 Aliases: I<zeta>
 
@@ -387,9 +388,11 @@ Aliases: I<eta>
 
 =head2 μ
 
-    Number.μ()
+    μ(n)
+    mu(n)
+    moebius(n)
 
-Return the
+The Möbius function: μ(n).
 
 Aliases: I<mu>, I<mobius>, I<möbius>, I<moebius>
 
@@ -421,7 +424,7 @@ When applied on a Number object (as C<n.pi> or C<pi(n)>), it returns the number 
     say 100.pi      #=> number of primes <= 100
     say pi(100)     #=> 25
 
-When an additional argument is given, it returns the number of primes in the range a..b:
+When an additional argument is given, it returns the number of primes in the range C<a..b>:
 
     say pi(50, 100)     # number of primes in the range 50..100
 
@@ -442,9 +445,10 @@ Aliases: I<sum>
 
 =head2 σ
 
-    Number.σ()
+    σ(n,k=1)
+    sigma(n,k=1)
 
-Return the
+Returns the sum of the positive divisors of n, each raised to the power k.
 
 Aliases: I<sigma>
 
@@ -482,9 +486,14 @@ Aliases: I<digamma>
 
 =head2 Ω
 
-    Number.Ω()
+    Ω(n,k=0)
+    bigomega(n,k=0)
 
-Return the
+For k = 0, it returns the number of prime factors of n (counted with multiplicity).
+
+In general, is equivalent with:
+
+    n.prime_power_divisors.sum {|d| n**k / d**k }
 
 Aliases: I<bigomega>, I<prime_power_sigma0>
 
@@ -492,9 +501,14 @@ Aliases: I<bigomega>, I<prime_power_sigma0>
 
 =head2 ω
 
-    Number.ω()
+    ω(n,k=0)
+    omega(n,k=0)
 
-Return the
+For k = 0, it returns the number of distinct prime factors of n.
+
+In general, is equivalent with:
+
+    n.prime_divisors.sum {|d| n**k / d**k }
 
 Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
 
@@ -685,7 +699,7 @@ When C<k> is omitted, an array of arrays with the k-almost prime divisors of n, 
     k.almost_primes(n)
     k.almost_primes(a,b)
 
-Return an array with the k-almost primes <= n, or in the range a..b.
+Return an array with the k-almost primes <= n, or in the range C<a..b>.
 
 Example:
 
@@ -1121,7 +1135,7 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<n
     bsearch_max(n, {...})
     bsearch_max(a,b, {...})
 
-Binary search, returning the minimum integer value in the range a..b that satisifes the given comparison function.
+Binary search, returning the minimum integer value in the range C<a..b> that satisifes the given comparison function.
 
 Example:
 
@@ -1138,7 +1152,7 @@ where:
     bsearch_min(n, {...})
     bsearch_min(a,b, {...})
 
-Binary search, returning the minimum integer value in the range a..b that satisifes the given comparison function.
+Binary search, returning the minimum integer value in the range C<a..b> that satisifes the given comparison function.
 
 Example:
 
@@ -1434,7 +1448,7 @@ Aliases: I<nth_composite>
     composite_count(n)
     composite_count(a,b)
 
-Returns the number of composite numbers <= n, or in the range a..b.
+Returns the number of composite numbers <= n, or in the range C<a..b>.
 
 Example:
 
@@ -1706,17 +1720,25 @@ Return the
 
 =head2 divisor_map
 
-    Number.divisor_map()
+    n.divisor_map {|d| ... }
 
-Return the
+Maps the divisors of n to the given block.
+
+Example:
+
+    say 24.divisor_map {|d| 1/d }  #=> [1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/12, 1/24]
 
 =cut
 
 =head2 divisor_prod
 
-    Number.divisor_prod()
+    n.divisor_prod {|d| ... }
 
-Return the
+Product of the mapping of the positive divisors of n.
+
+Equivalent with:
+
+    n.divisor_map {|d| ... }.prod
 
 Aliases: I<divisors_prod>
 
@@ -1724,17 +1746,30 @@ Aliases: I<divisors_prod>
 
 =head2 divisors
 
-    Number.divisors()
+    n.divisors(k=n)
 
-Return the
+Return an array with the positive divisors of n <= k.
+
+Example:
+
+    say 120.divisors        #=> [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120]
+    say 120.divisors(13)    #=> [1, 2, 3, 4, 5, 6, 8, 10, 12]
 
 =cut
 
 =head2 divisor_sum
 
-    Number.divisor_sum()
+    n.divisor_sum {|d| ... }
 
-Return the
+Sum of the mapping of the positive divisors of n.
+
+Example:
+
+    say 5040.divisor_sum {|d| euler_phi(d)**2 } #=> 2217854
+
+Equivalent with:
+
+    n.divisor_map {|d| ... }.sum
 
 Aliases: I<divisors_sum>
 
@@ -1788,7 +1823,7 @@ Return the
     k.each_almost_prime(n, {...})
     k.each_almost_prime(a,b, {...})
 
-Iterates over the k-almost prime numbers <= n, or in the range a..b.
+Iterates over the k-almost prime numbers <= n, or in the range C<a..b>.
 
 Example:
 
@@ -1872,7 +1907,7 @@ Aliases: I<squarefree_each>
     k.each_squarefree_almost_prime(n, {...})
     k.each_squarefree_almost_prime(a,b,{...})
 
-Iterates over the squarefree k-almost primes <= n, or in the range a..b.
+Iterates over the squarefree k-almost primes <= n, or in the range C<a..b>.
 
 Example:
 
@@ -1966,9 +2001,9 @@ Return the
 
 =head2 exp_mangoldt
 
-    Number.exp_mangoldt()
+    exp_mangoldt(n)
 
-Return the
+Returns exp(Λ(n)); the exponential of the Mangoldt function.
 
 =cut
 
@@ -1992,9 +2027,13 @@ Return the
 
 =head2 factor
 
-    Number.factor()
+    n.factor()
 
-Return the
+Returns an array with the prime factors of n.
+
+Example:
+
+    say 180.factor  #=> [2, 2, 3, 3, 5]
 
 Aliases: I<factors>
 
@@ -2002,9 +2041,13 @@ Aliases: I<factors>
 
 =head2 factor_exp
 
-    Number.factor_exp()
+    n.factor_exp()
 
-Return the
+Returns an array of pairs C<[p,k]> factors C<p^k> of n.
+
+Example:
+
+    say 180.factor_exp  #=> [[2, 2], [3, 2], [5, 1]]
 
 Aliases: I<factors_exp>
 
@@ -2040,17 +2083,29 @@ Aliases: I<left_factorial>
 
 =head2 factor_map
 
-    Number.factor_map()
+    n.factor_map {|p,k| ... }
 
-Return the
+Maps the prime-power factorization C<(p,k)> of n to the given block.
+
+Example:
+
+    say 5040.factor_map  {|p,k| p**k }  #=> [16, 9, 5, 7]
 
 =cut
 
 =head2 factor_prod
 
-    Number.factor_prod()
+    n.factor_prod {|p,k| ... }
 
-Return the
+Product of the mapping of the prime-power factorization of n.
+
+Example:
+
+    say 5040.factor_prod {|p,k| (p-1) * p**(k-1) }  #=> 1152
+
+Equivalent with:
+
+    n.factor_map {|p,k| ... }.prod
 
 Aliases: I<factors_prod>
 
@@ -2058,9 +2113,13 @@ Aliases: I<factors_prod>
 
 =head2 factor_sum
 
-    Number.factor_sum()
+    n.factor_sum {|p,k| ... }
 
-Return the
+Sum of the mapping of the prime-power factorization of n.
+
+Equivalent with:
+
+    n.factor_map {|p,k| ... }.sum
 
 Aliases: I<factors_sum>
 
@@ -2466,7 +2525,7 @@ Aliases: I<inverse_euler_phi_min>
 
 =head2 inverse_polygonal
 
-    n.inverse_polygonal()
+    polygonal_inverse(n)
 
 Returns an array of pairs C<[r,k]> such that C<polygonal(r,k) = n>.
 
@@ -2681,9 +2740,13 @@ Return the
 
 =head2 irootrem
 
-    Number.irootrem()
+    n.irootrem(k)
 
-Return the
+Returns a list with the integer k-th root of n and k-th root remainder of n.
+
+Equivalent with:
+
+    (n.iroot(k), n - n.iroot(k)**k)
 
 =cut
 
@@ -3152,9 +3215,9 @@ Aliases: I<is_pell_pseudoprime>
 
 =head2 is_perrin_psp
 
-    Number.is_perrin_psp()
+    n.is_perrin_psp()
 
-Return the
+Returns true if C<n> passes the Perrin primality test.
 
 Aliases: I<is_perrin_pseudoprime>
 
@@ -3198,9 +3261,18 @@ Aliases: I<is_positive>
 
 =head2 is_pow
 
-    Number.is_pow()
+    n.is_power
+    n.is_power(k)
 
-Return the
+When k is omitted, it true if n is a perfect power.
+
+When k is given, it returns true if n can be expressed as C<n = b^k> for some b >= 1.
+
+Example:
+
+    say 225.is_power          # true: 225 == 15**2
+    say 100.is_power(2)       # true: 100 is square (10**2)
+    say 125.is_power(3)       # true: 125 is a cube ( 5**3)
 
 Aliases: I<is_power>, I<is_perfect_power>
 
@@ -3253,23 +3325,23 @@ Return the
 
     Number.is_prime_power()
 
-Return the
+Returns true if n is a power of some prime.
 
 =cut
 
 =head2 is_primitive_root
 
-    Number.is_primitive_root()
+    n.is_primitive_root(m)
 
-Return the
+Returns true if n is a primitive root modulo m.
 
 =cut
 
 =head2 is_prob_prime
 
-    Number.is_prob_prime()
+    is_prob_prime(n)
 
-Return the
+Returns true if n is probably prime. The method does some trial division, then it performs a B-PSW test.
 
 =cut
 
@@ -3283,9 +3355,9 @@ Returns true iff C<n> is not a power and is not divisible by a square <= k.
 
 =head2 is_prov_prime
 
-    Number.is_prov_prime()
+    is_prov_prime(n)
 
-Return the
+Returns true if n is provable prime.
 
 Aliases: I<is_provable_prime>
 
@@ -3311,9 +3383,13 @@ Return the
 
 =head2 isqrtrem
 
-    Number.isqrtrem()
+    n.isqrtrem()
 
-Return the
+Returns a list with the integer square root of n and the square root remainder of n.
+
+Equivalent with:
+
+    (n.isqrt, n - n.isqrt**2)
 
 =cut
 
@@ -3363,9 +3439,9 @@ Example:
 
 =head2 is_semiprime
 
-    Number.is_semiprime()
+    n.is_semiprime
 
-Return the
+Returns true if n has exactly two prime factors (not necessarily distinct).
 
 =cut
 
@@ -3373,7 +3449,7 @@ Return the
 
     n.is_smooth(k)
 
-Returns true if n is k-smooth.
+Returns true if all the prime factors of C<n> are <= k. False otherwise.
 
 =cut
 
@@ -3397,9 +3473,9 @@ Aliases: I<is_square>, I<is_perfect_square>
 
 =head2 is_square_free
 
-    Number.is_square_free()
+    n.is_square_free()
 
-Return the
+Returns true if the prime factorization of n does not include duplicated factors (i.e.: n is not divisible by a square).
 
 Aliases: I<is_squarefree>
 
@@ -3536,9 +3612,9 @@ Return the
 
 =head2 jordan_totient
 
-    Number.jordan_totient()
+    jordan_totient(n,k)
 
-Return the
+Jordan's totient C<J_k(n)>, which is a generalization of Euler's totient function.
 
 =cut
 
@@ -3566,7 +3642,7 @@ Aliases: I<laguerreL>, I<laguerre_polynomial>
 
 Carmichael lambda function: C<λ(n)>, defined as the smallest positive integer C<m> such that:
 
-    aᵐ ≡ 1 (mod n)
+    powmod(a, m, n) == 1
 
 for every integer C<a> between C<1> and C<n> that is coprime to C<n>.
 
@@ -3644,15 +3720,24 @@ Aliases: I<gamma_abs_log>
 
     Number.lgrt()
 
-Return the
+Returns the "logarithm-root" of n, such that C<lgrt(n) ** lgrt(n) == n>.
+
+Example:
+
+    say lgrt(100)       #=> 3.59728502354041750549765225178229
+    say lgrt(-100)      #=> 3.70202936660214594290193962952737+1.34823128471151901327831464969872i
 
 =cut
 
 =head2 li
 
-    Number.li()
+    li(x)
 
-Return the
+Returns the logarithmic integral of x.
+
+Example:
+
+    say 100.li  # prints: 30.12614158...
 
 =cut
 
@@ -3666,9 +3751,13 @@ Return the
 
 =head2 liouville
 
-    Number.liouville()
+    liouville(n)
 
-Return the
+The Liouville function.
+
+Equivalent to:
+
+    (-1)**omega(n)
 
 =cut
 
@@ -3782,9 +3871,13 @@ Example:
 
 =head2 lsb
 
-    Number.lsb()
+    lsb(n)
 
-Return the
+Returns the least significant bit of n.
+
+Example:
+
+    say 0b110010101111000000.lsb    # 6
 
 =cut
 
@@ -3916,9 +4009,15 @@ Example:
 
 =head2 mfac
 
-    Number.mfac()
+    mfac(n,k)
+    mfactorial(n,k)
 
-Return the
+The generalized multi-factorial of n.
+
+Example:
+
+    say 15.of { .mfac(2) }    # double-factorials (OEIS: A006882)
+    say 15.of { .mfac(3) }    # triple-factorials (OEIS: A007661)
 
 Aliases: I<mfactorial>, I<multi_factorial>
 
@@ -3978,9 +4077,13 @@ Example:
 
 =head2 msb
 
-    Number.msb()
+    msb(n)
 
-Return the
+Returns the most significant bit of n.
+
+Example:
+
+    say 0b110010101111000000.msb    # 17
 
 =cut
 
@@ -4241,9 +4344,9 @@ Return the
 
 =head2 partitions
 
-    Number.partitions()
+    partitions(n)
 
-Return the
+Returns the number of partitions of n.
 
 Aliases: I<partition_number>
 
@@ -4325,9 +4428,9 @@ Example:
 
 =head2 pn_primorial
 
-    Number.pn_primorial()
+    pn_primorial(n)
 
-Return the
+Return the product of the first n primes.
 
 =cut
 
@@ -4393,7 +4496,7 @@ Aliases: I<perfect_power_count>
     k.powerful(n)
     k.powerful(a,b)
 
-It efficiently generates all the k-powerful numbers <= n, or in the range a..b.
+It efficiently generates all the k-powerful numbers <= n, or in the range C<a..b>.
 
 Example:
 
@@ -4407,7 +4510,7 @@ Example:
     k.powerful_count(n)
     k.powerful_count(a,b)
 
-It efficiently counts the number of k-powerful numbers <= n, or in the range a..b;
+It efficiently counts the number of k-powerful numbers <= n, or in the range C<a..b>;
 
     say 2.powerful_count(100)       #=> number of 2-powerful numbers <= 100
     say 2.powerful_count(50, 100)   #=> number of 2-powerful numbers in the range 50..100
@@ -4426,9 +4529,9 @@ Aliases: I<pplus1_factor>
 
 =head2 prev_prime
 
-    Number.prev_prime()
+    n.prev_prime()
 
-Return the
+Returns the previous prime smaller than n.
 
 =cut
 
@@ -4450,9 +4553,14 @@ The method returns true when C<n> passes the internal primality pretest (when n 
 
 =head2 prime
 
-    Number.prime()
+    prime(n)
 
-Return the
+Returns the n-th prime number.
+
+Example:
+
+    say prime(100)      #  100th prime: 541
+    say prime(1000)     # 1000th prime: 7919
 
 Aliases: I<nth_prime>
 
@@ -4460,7 +4568,7 @@ Aliases: I<nth_prime>
 
 =head2 prime_divisors
 
-    n.prime_divisors()
+    prime_divisors(n)
 
 Returns the unique prime factors of C<n>.
 
@@ -4468,9 +4576,10 @@ Returns the unique prime factors of C<n>.
 
 =head2 primepi
 
-    Number.primepi()
+    primepi(n)
+    primepi(a,b)
 
-Return the
+Returns the number of primes <= n, or in the range C<a..b>.
 
 Aliases: I<prime_count>, I<count_primes>
 
@@ -4498,9 +4607,14 @@ Aliases: I<prime_count_upper>
 
 =head2 prime_power
 
-    Number.prime_power()
+    n.prime_power()
 
-Return the
+Returns the exponent C<k> if C<n> is a power of the form C<n = p^k> for some prime C<p>. Returns 1 otherwise.
+
+Example:
+
+    say prime_power(15)     #=> 1
+    say prime_power(43**5)  #=> 5
 
 =cut
 
@@ -4509,7 +4623,7 @@ Return the
     prime_power_count(n)
     prime_power_count(a,b)
 
-Returns the number of prime powers <= n, or in the range a..b.
+Returns the number of prime powers <= n, or in the range C<a..b>.
 
 Example:
 
@@ -4536,15 +4650,24 @@ Equivalent with:
 
 =head2 prime_power_sigma
 
-    Number.prime_power_sigma()
+    n.prime_power_sigma(k=1)
 
-Return the
+Sum of the prime power divisors of n, each divisor raised to power k.
+
+Example:
+
+    say prime_power_sigma(10!)      #=> 667
+    say prime_power_sigma(10!, 2)   #=> 95459
+
+Equivalent with:
+
+    n.prime_power_divisors.sum {|d| d**k }
 
 =cut
 
 =head2 prime_power_udivisors
 
-    n.prime_power_udivisors()
+    prime_power_udivisors(n)
 
 Return the unitary prime power divisors of n.
 
@@ -4564,41 +4687,62 @@ Aliases: I<prime_power_unitary_divisors>, I<unitary_prime_power_divisors>
 
 =head2 prime_power_usigma
 
-    Number.prime_power_usigma()
+    Number.prime_power_usigma(k=1)
 
-Return the
+Sum of the unitary prime power divisors of n, each divisor raised to power C<k>.
+
+Example:
+
+    say prime_power_usigma(10!)     #=> 369     (== 7 + 25 + 81 + 256)
+    say prime_power_usigma(10!, 2)  #=> 72771   (== 7^2 + 25^2 + 81^2 + 256^2)
+
+Equivalent with:
+
+    n.factor_map {|p,e| p**(e * k) }.sum
 
 =cut
 
 =head2 prime_root
 
-    Number.prime_root()
+    n.prime_root()
 
-Return the
+Returns the prime C<p> if n can be expressed as C<n = p^k> for some prime number C<p> and integer C<k>. Returns C<n> otherwise.
+
+Example:
+
+    say prime_root(15)      #=> 15
+    say prime_root(43**5)   #=> 43
 
 =cut
 
 =head2 primes
 
-    Number.primes()
+    primes(n)
+    primes(a,b)
 
-Return the
+Returns an array with the prime numbers <= n, or in the range C<a..b>.
 
 =cut
 
 =head2 prime_sigma
 
-    Number.prime_sigma()
+    n.prime_sigma(k=1)
 
-Return the
+Sum of the unique prime divisors of n, each divisor raised to power k.
+
+Example:
+
+    say prime_sigma(100!)       #=> 1060
+    say prime_sigma(100!, 2)    #=> 65796
 
 =cut
 
 =head2 prime_sum
 
-    Number.prime_sum()
+    prime_sum(n)
+    prime_sum(a,b)
 
-Return the
+Sum of the prime numbers <= n, or in the range C<a..b>.
 
 Aliases: I<primes_sum>, I<sum_primes>
 
@@ -4616,17 +4760,22 @@ Aliases: I<prime_unitary_divisors>, I<unitary_prime_divisors>
 
 =head2 prime_usigma
 
-    Number.prime_usigma()
+    n.prime_usigma(k=1)
 
-Return the
+Sum of the unique unitary prime divisors of n, each divisor raised to power k.
+
+Example:
+
+    say prime_usigma(100!)      #=> 732
+    say prime_usigma(100!, 2)   #=> 55330
 
 =cut
 
 =head2 prime_usigma0
 
-    Number.prime_usigma0()
+    prime_usigma0(n)
 
-Return the
+The number of unique unitary prime divisors of n.
 
 =cut
 
@@ -4691,6 +4840,7 @@ The method also accepts C<n> to be a fraction, which is computed as:
 =head2 psi
 
     n.psi(k=1)
+    dedekind_psi(n,k=1)
 
 Dedekind psi function.
 
@@ -4760,9 +4910,9 @@ Return the
 
 =head2 ramanujan_tau
 
-    Number.ramanujan_tau()
+    ramanujan_tau(n)
 
-Return the
+Ramanujan's tau function.
 
 =cut
 
@@ -4794,9 +4944,13 @@ Aliases: I<random_nbit_maurer_prime>
 
 =head2 random_nbit_prime
 
-    Number.random_nbit_prime()
+    random_nbit_prime(n)
 
-Return the
+Returns a random n-bit prime.
+
+Example:
+
+    say random_nbit_prime(100)      # 100-bit random prime
 
 =cut
 
@@ -4812,17 +4966,27 @@ Aliases: I<random_strong_nbit_prime>
 
 =head2 random_ndigit_prime
 
-    Number.random_ndigit_prime()
+    random_ndigit_prime(n)
 
-Return the
+Returns a random n-digit prime.
+
+Example:
+
+    say random_ndigit_prime(100)    # 100-digit random prime
 
 =cut
 
 =head2 random_prime
 
-    Number.random_prime()
+    random_prime(n)
+    random_prime(a,b)
 
-Return the
+Returns a random prime <= n, or in the range C<a..b>.
+
+Example:
+
+    say random_prime(100)         # random prime in range [2, 100]
+    say random_prime(100, 1000)   # random prime in range [100, 1000]
 
 =cut
 
@@ -4834,7 +4998,7 @@ Returns a random n-bit safe-prime.
 
 Example:
 
-    say random_safe_prime(512)   #=> 512-bit prime
+    say random_safe_prime(512)   #=> 512-bit safe prime
 
 Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
@@ -5016,7 +5180,7 @@ Aliases: I<nth_semiprime>
     semiprime_count(n)
     semiprime_count(a,b)
 
-Counts the number of semiprimes <= n (OEIS: A072000), or in the range a..b.
+Counts the number of semiprimes <= n (OEIS: A072000), or in the range C<a..b>.
 
 Example:
 
@@ -5042,9 +5206,13 @@ Return the
 
 =head2 sgn
 
-    Number.sgn()
+    sgn(x)
 
-Return the
+Returns the sign of x.
+
+Defined as:
+
+    x / abs(x)
 
 Aliases: I<sign>
 
@@ -5052,9 +5220,10 @@ Aliases: I<sign>
 
 =head2 sigma0
 
-    Number.sigma0()
+    tau(n)
+    sigma0(n)
 
-Return the
+Returns the number of positive divisors of n.
 
 =cut
 
@@ -5184,7 +5353,7 @@ Return the
 
 =head2 square_divisors
 
-    n.square_divisors()
+    square_divisors(n)
 
 Return the square divisors of n.
 
@@ -5203,7 +5372,7 @@ Equivalent with:
     squarefree(n)
     squarefree(a,b)
 
-Returns an array with the squarefree numbers <= n, or in the range a..b.
+Returns an array with the squarefree numbers <= n, or in the range C<a..b>.
 
 Example:
 
@@ -5220,7 +5389,7 @@ Example:
     k.squarefree_almost_primes(n)
     k.squarefree_almost_primes(a,b)
 
-Returns an array with the squarefree k-almost primes <= n, or in the range a..b.
+Returns an array with the squarefree k-almost primes <= n, or in the range C<a..b>.
 
 Example:
 
@@ -5234,9 +5403,18 @@ Example:
 
 =head2 square_free_count
 
-    Number.square_free_count()
+    square_free_count(n)
+    square_free_count(a,b)
 
-Return the
+Returns the number of squarefree integers <= n, or in the range C<a..b>.
+
+Example:
+
+    # The number of square-free integers between 10^5 and 10^6
+    say square_free_count(10**5, 10**6) # 547132
+
+    # The number of square-free integers <= 2^40
+    say square_free_count(2**40)        # 668422917419
 
 Aliases: I<squarefree_count>
 
@@ -5246,15 +5424,24 @@ Aliases: I<squarefree_count>
 
     Number.squarefree_divisors()
 
-Return the
+Returns the square-free divisors of n.
+
+Example:
+
+    say squarefree_divisors(120)  #=> [1, 2, 3, 5, 6, 10, 15, 30]
 
 =cut
 
 =head2 squarefree_sigma
 
-    Number.squarefree_sigma()
+    squarefree_sigma(n,k=1)
 
-Return the
+Sum of the square free divisors of C<n>, each divisor raised to power C<k>.
+
+Example:
+
+    say squarefree_sigma(5040)      #=> 576
+    say squarefree_sigma(5040, 2)   #=> 65000
 
 =cut
 
@@ -5283,17 +5470,26 @@ Aliases: I<squarefree_unitary_divisors>, I<unitary_squarefree_divisors>
 
 =head2 squarefree_usigma
 
-    Number.squarefree_usigma()
+    squarefree_usigma(n, k=1)
 
-Return the
+Sum of the unitary squarefree divisors of n, each divisor raised to power k.
+
+Example:
+
+    say squarefree_usigma(5040)     #=> 48
+    say squarefree_usigma(5040, 2)  #=> 1300
 
 =cut
 
 =head2 squarefree_usigma0
 
-    Number.squarefree_usigma0()
+    squarefree_usigma0(n)
 
-Return the
+Returns the number of unitary squarefree divisors of n.
+
+Example:
+
+    say squarefree_usigma0(5040)    #=> 4
 
 =cut
 
@@ -5301,23 +5497,36 @@ Return the
 
     Number.square_sigma()
 
-Return the
+Sum of the square divisors of C<n>, each divisors raised to the power C<k>.
+
+Example:
+
+    say 5040.square_sigma       #=> 210
+    say 5040.square_sigma(2)    #=> 22386
+
+Equivalent with:
+
+    n.square_divisors.sum {|d| d**k }
 
 =cut
 
 =head2 square_sigma0
 
-    Number.square_sigma0()
+    square_sigma0(n)
 
-Return the
+Returns the number of square divisors of C<n>.
 
 =cut
 
 =head2 square_udivisors
 
-    Number.square_udivisors()
+    square_udivisors(n)
 
-Return the
+Returns the unitary square divisors of C<n>, such that each divisors C<d> is a square and C<gcd(n/d, d) = 1>.
+
+Example:
+
+    say 5040.square_udivisors   #=> [1, 9, 16, 144]
 
 Aliases: I<square_unitary_divisors>, I<unitary_square_divisors>
 
@@ -5325,9 +5534,18 @@ Aliases: I<square_unitary_divisors>, I<unitary_square_divisors>
 
 =head2 square_usigma
 
-    Number.square_usigma()
+    n.square_usigma(k=1)
 
-Return the
+Sum of the unitary square divisors of C<n>, each divisors raised to power C<k>.
+
+Example:
+
+    say square_usigma(5040)     #=> 170
+    say square_usigma(5040, 2)  #=> 21074
+
+Equivalent with:
+
+    n.square_udivisors.sum {|d| d**k }
 
 =cut
 
@@ -5349,9 +5567,9 @@ Shanks' SQUFOF method.
 
 =head2 stirling
 
-    Number.stirling()
+    stirling(n,k)
 
-Return the
+Stirling numbers of the first kind.
 
 Aliases: I<stirling1>
 
@@ -5359,17 +5577,17 @@ Aliases: I<stirling1>
 
 =head2 stirling2
 
-    Number.stirling2()
+    stirling2(n,k)
 
-Return the
+Stirling numbers of the second kind.
 
 =cut
 
 =head2 stirling3
 
-    Number.stirling3()
+    stirling3(n,k)
 
-Return the
+Stirling numbers of the third kind (also known as Lah numbers).
 
 =cut
 
@@ -5485,9 +5703,10 @@ Aliases: I<to_str>
 
 =head2 totient
 
-    Number.totient()
+    phi(n)
+    totient(n)
 
-Return the
+Euler's totient function.
 
 Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
 
@@ -5549,9 +5768,15 @@ Return the
 
 =head2 usigma0
 
-    Number.usigma0()
+    usigma0(n)
 
-Return the
+Returns the number of squarefree divisors of n.
+
+Equivalently, the number of unitary divisor of n.
+
+Example:
+
+    say usigma0(5040)   #=> 16
 
 Aliases: I<squarefree_sigma0>
 
@@ -5559,9 +5784,13 @@ Aliases: I<squarefree_sigma0>
 
 =head2 valuation
 
-    Number.valuation()
+    n.valuation(k)
 
-Return the
+Returns the number of times n is divisible by k.
+
+Example:
+
+    say valuation(2**32, 4)     # prints: 16
 
 =cut
 
@@ -5575,16 +5804,18 @@ Return the
 
 =head2 znorder
 
-    Number.znorder()
+    znorder(a,m)
 
-Return the
+The smallest positive integer k such that C<powmod(a, k, n) == 1>.
+
+Return C<NaN> if C<a> is not coprime to C<m>.
 
 =cut
 
 =head2 znprimroot
 
-    Number.znprimroot()
+    znprimroot(n)
 
-Return the
+The smallest primitive root of (Z/nZ)^*.
 
 =cut
