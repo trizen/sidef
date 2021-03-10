@@ -15641,7 +15641,7 @@ package Sidef::Types::Number::Number {
         my $z = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
 
         if ($k == 0) {
-            return Sidef::Types::Array::Array->new($ONE);
+            return Sidef::Types::Array::Array->new([ONE]);
         }
 
         my @list;
