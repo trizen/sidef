@@ -17,7 +17,7 @@ var obj = Range(...)
 
 =head2 *
 
-    I<Obj> B<*> I<Obj>
+    a * b
 
 Return the
 
@@ -27,7 +27,7 @@ Aliases: I<mul>
 
 =head2 +
 
-    I<Obj> B<+> I<Obj>
+    a + b
 
 Return the
 
@@ -37,7 +37,7 @@ Aliases: I<add>
 
 =head2 -
 
-    I<Obj> B<-> I<Obj>
+    a - b
 
 Return the
 
@@ -47,7 +47,7 @@ Aliases: I<sub>
 
 =head2 ...
 
-    I<Obj> B<...> I<Obj>
+    a ... b
 
 Return the
 
@@ -57,7 +57,7 @@ Aliases: I<to_list>
 
 =head2 /
 
-    I<Obj> B</> I<Obj>
+    a / b
 
 Return the
 
@@ -67,7 +67,7 @@ Aliases: I<÷>, I<div>
 
 =head2 ==
 
-    I<Obj> B<==> I<Obj>
+    a == b
 
 Return the
 
@@ -77,7 +77,7 @@ Aliases: I<eq>
 
 =head2 ≠
 
-    I<Obj> B<≠> I<Obj>
+    a ≠ b
 
 Return the
 

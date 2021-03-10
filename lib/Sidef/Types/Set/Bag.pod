@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 &
 
-    I<Obj> B<&> I<Obj>
+    a & b
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<∩>, I<and>, I<intersection>
 
 =head2 +
 
-    I<Obj> B<+> I<Obj>
+    a + b
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<concat>
 
 =head2 -
 
-    I<Obj> B<-> I<Obj>
+    a - b
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
 =head2 ...
 
-    I<Obj> B<...> I<Obj>
+    a ... b
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<to_list>
 
 =head2 <<
 
-    I<Obj> B<E<lt>E<lt>> I<Obj>
+    a << b
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<add>, I<push>, I<append>
 
 =head2 ^
 
-    I<Obj> B<^> I<Obj>
+    a ^ b
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =head2 |
 
-    I<Obj> B<|> I<Obj>
+    a | b
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<∪>, I<or>, I<union>
 
 =head2 ∋
 
-    I<Obj> B<∋> I<Obj>
+    a ∋ b
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<con
 
 =head2 ∌
 
-    I<Obj> B<∌> I<Obj>
+    a ∌ b
 
 Return the
 
@@ -112,7 +112,7 @@ Return the
 
 =head2 ≠
 
-    I<Obj> B<≠> I<Obj>
+    a ≠ b
 
 Return the
 
@@ -122,7 +122,7 @@ Aliases: I<!=>, I<ne>
 
 =head2 ≡
 
-    I<Obj> B<≡> I<Obj>
+    a ≡ b
 
 Return the
 
@@ -132,7 +132,7 @@ Aliases: I<==>, I<eq>
 
 =head2 ≤
 
-    I<Obj> B<≤> I<Obj>
+    a ≤ b
 
 Return the
 
@@ -142,7 +142,7 @@ Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
 =head2 ≥
 
-    I<Obj> B<≥> I<Obj>
+    a ≥ b
 
 Return the
 

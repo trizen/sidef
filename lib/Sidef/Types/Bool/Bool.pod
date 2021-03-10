@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 &
 
-    I<Obj> B<&> I<Obj>
+    a & b
 
 Return the
 
@@ -32,7 +32,7 @@ Return the
 
 =head2 ^
 
-    I<Obj> B<^> I<Obj>
+    a ^ b
 
 Return the
 
@@ -40,7 +40,7 @@ Return the
 
 =head2 |
 
-    I<Obj> B<|> I<Obj>
+    a | b
 
 Return the
 

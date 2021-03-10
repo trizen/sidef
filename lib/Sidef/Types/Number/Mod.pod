@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 !
 
-    I<Obj> B<!> I<Obj>
+    a ! b
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<factorial>
 
 =head2 !=
 
-    I<Obj> B<!=> I<Obj>
+    a != b
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<ne>
 
 =head2 &
 
-    I<Obj> B<&> I<Obj>
+    a & b
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<and>
 
 =head2 *
 
-    I<Obj> B<*> I<Obj>
+    a * b
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<mul>
 
 =head2 **
 
-    I<Obj> B<**> I<Obj>
+    a ** b
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<pow>
 
 =head2 +
 
-    I<Obj> B<+> I<Obj>
+    a + b
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<add>
 
 =head2 ++
 
-    I<Obj> B<++> I<Obj>
+    a ++ b
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<inc>
 
 =head2 -
 
-    I<Obj> B<-> I<Obj>
+    a - b
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<sub>
 
 =head2 --
 
-    I<Obj> B<--> I<Obj>
+    a -- b
 
 Return the
 
@@ -114,7 +114,7 @@ Aliases: I<dec>
 
 =head2 /
 
-    I<Obj> B</> I<Obj>
+    a / b
 
 Return the
 
@@ -124,7 +124,7 @@ Aliases: I<÷>, I<div>
 
 =head2 <
 
-    I<Obj> B<E<lt>> I<Obj>
+    a < b
 
 Return the
 
@@ -134,7 +134,7 @@ Aliases: I<lt>
 
 =head2 <<
 
-    I<Obj> B<E<lt>E<lt>> I<Obj>
+    a << b
 
 Return the
 
@@ -144,7 +144,7 @@ Aliases: I<lsft>, I<shift_left>
 
 =head2 <=>
 
-    I<Obj> B<E<lt>=E<gt>> I<Obj>
+    a <=> b
 
 Return the
 
@@ -154,7 +154,7 @@ Aliases: I<cmp>
 
 =head2 ==
 
-    I<Obj> B<==> I<Obj>
+    a == b
 
 Return the
 
@@ -164,7 +164,7 @@ Aliases: I<eq>
 
 =head2 >
 
-    I<Obj> B<E<gt>> I<Obj>
+    a > b
 
 Return the
 
@@ -174,7 +174,7 @@ Aliases: I<gt>
 
 =head2 >>
 
-    I<Obj> B<E<gt>E<gt>> I<Obj>
+    a >> b
 
 Return the
 
@@ -184,7 +184,7 @@ Aliases: I<rsft>, I<shift_right>
 
 =head2 ^
 
-    I<Obj> B<^> I<Obj>
+    a ^ b
 
 Return the
 
@@ -194,7 +194,7 @@ Aliases: I<xor>
 
 =head2 |
 
-    I<Obj> B<|> I<Obj>
+    a | b
 
 Return the
 
@@ -204,7 +204,7 @@ Aliases: I<or>
 
 =head2 ≤
 
-    I<Obj> B<≤> I<Obj>
+    a ≤ b
 
 Return the
 
@@ -214,7 +214,7 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-    I<Obj> B<≥> I<Obj>
+    a ≥ b
 
 Return the
 

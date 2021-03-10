@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 &
 
-    I<Obj> B<&> I<Obj>
+    a & b
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<and>
 
 =head2 *
 
-    I<Obj> B<*> I<Obj>
+    a * b
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<mul>
 
 =head2 **
 
-    I<Obj> B<**> I<Obj>
+    a ** b
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<mpow>, I<matrix_pow>
 
 =head2 +
 
-    I<Obj> B<+> I<Obj>
+    a + b
 
 Return the
 
@@ -64,7 +64,7 @@ Aliases: I<add>, I<concat>
 
 =head2 -
 
-    I<Obj> B<-> I<Obj>
+    a - b
 
 Return the
 
@@ -74,7 +74,7 @@ Aliases: I<sub>, I<diff>
 
 =head2 ...
 
-    I<Obj> B<...> I<Obj>
+    a ... b
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<to_list>
 
 =head2 /
 
-    I<Obj> B</> I<Obj>
+    a / b
 
 Return the
 
@@ -94,7 +94,7 @@ Aliases: I<÷>, I<div>
 
 =head2 <
 
-    I<Obj> B<E<lt>> I<Obj>
+    a < b
 
 Return the
 
@@ -104,7 +104,7 @@ Aliases: I<lt>
 
 =head2 <=>
 
-    I<Obj> B<E<lt>=E<gt>> I<Obj>
+    a <=> b
 
 Return the
 
@@ -114,7 +114,7 @@ Aliases: I<cmp>
 
 =head2 ==
 
-    I<Obj> B<==> I<Obj>
+    a == b
 
 Return the
 
@@ -124,7 +124,7 @@ Aliases: I<eq>
 
 =head2 >
 
-    I<Obj> B<E<gt>> I<Obj>
+    a > b
 
 Return the
 
@@ -134,7 +134,7 @@ Aliases: I<gt>
 
 =head2 ^
 
-    I<Obj> B<^> I<Obj>
+    a ^ b
 
 Return the
 
@@ -144,7 +144,7 @@ Aliases: I<xor>
 
 =head2 |
 
-    I<Obj> B<|> I<Obj>
+    a | b
 
 Return the
 
@@ -154,7 +154,7 @@ Aliases: I<or>
 
 =head2 |>>
 
-    I<Obj> B<|E<gt>E<gt>> I<Obj>
+    a |>> b
 
 Return the
 
@@ -164,7 +164,7 @@ Aliases: I<pipeline_map_op>
 
 =head2 |X>
 
-    Array.|XE<gt>()
+    Array.|X>()
 
 Return the
 
@@ -174,7 +174,7 @@ Aliases: I<pipeline_cross_op>
 
 =head2 |Z>
 
-    Array.|ZE<gt>()
+    Array.|Z>()
 
 Return the
 
@@ -184,7 +184,7 @@ Aliases: I<pipeline_zip_op>
 
 =head2 «
 
-    I<Obj> B<«> I<Obj>
+    a « b
 
 Return the
 
@@ -194,7 +194,7 @@ Aliases: I<E<lt>E<lt>>, I<push>, I<append>
 
 =head2 »
 
-    I<Obj> B<»> I<Obj>
+    a » b
 
 Return the
 
@@ -204,7 +204,7 @@ Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
 
 =head2 ∋
 
-    I<Obj> B<∋> I<Obj>
+    a ∋ b
 
 Return the
 
@@ -214,7 +214,7 @@ Aliases: I<has>, I<contain>, I<include>, I<contains>, I<includes>
 
 =head2 ∌
 
-    I<Obj> B<∌> I<Obj>
+    a ∌ b
 
 Return the
 
@@ -222,7 +222,7 @@ Return the
 
 =head2 ≠
 
-    I<Obj> B<≠> I<Obj>
+    a ≠ b
 
 Return the
 
@@ -232,7 +232,7 @@ Aliases: I<!=>, I<ne>
 
 =head2 ≤
 
-    I<Obj> B<≤> I<Obj>
+    a ≤ b
 
 Return the
 
@@ -242,7 +242,7 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-    I<Obj> B<≥> I<Obj>
+    a ≥ b
 
 Return the
 

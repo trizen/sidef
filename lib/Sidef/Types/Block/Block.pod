@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 &
 
-    I<Obj> B<&> I<Obj>
+    a & b
 
 Return the
 
@@ -34,7 +34,7 @@ Aliases: I<grep>
 
 =head2 *
 
-    I<Obj> B<*> I<Obj>
+    a * b
 
 Return the
 
@@ -44,7 +44,7 @@ Aliases: I<repeat>
 
 =head2 <<
 
-    I<Obj> B<E<lt>E<lt>> I<Obj>
+    a << b
 
 Return the
 
@@ -54,7 +54,7 @@ Aliases: I<for>, I<each>, I<foreach>
 
 =head2 >>
 
-    I<Obj> B<E<gt>E<gt>> I<Obj>
+    a >> b
 
 Return the
 
@@ -84,7 +84,7 @@ Aliases: I<sum>
 
 =head2 ∘
 
-    I<Obj> B<∘> I<Obj>
+    a ∘ b
 
 Return the
 

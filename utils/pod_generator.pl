@@ -182,7 +182,7 @@ sub process_file {
         my $orig_name = $sub;
         my $is_method = lc($sub) ne uc($sub);
 
-        $sub =~ s{([<>])}{E<$esc{$1}>}g;
+        #$sub =~ s{([<>])}{E<$esc{$1}>}g;
 
         my $doc = $is_method ? <<"__POD__" : <<"__POD2__";
 
@@ -195,7 +195,7 @@ __POD__
 
 \=head2 $orig_name
 
-    I<Obj> B<$sub> I<Obj>
+    a $sub b
 
 Return the
 __POD2__
