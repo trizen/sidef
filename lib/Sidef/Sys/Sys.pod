@@ -26,7 +26,7 @@ Inherits methods from:
 
     Sys.alarm()
 
-Return the
+Returns the
 
 =cut
 
@@ -34,7 +34,7 @@ Return the
 
     Sys.bless()
 
-Return the
+Returns the
 
 =cut
 
@@ -42,7 +42,7 @@ Return the
 
     Sys.class_name()
 
-Return the
+Returns the
 
 =cut
 
@@ -50,7 +50,7 @@ Return the
 
     Sys.defined()
 
-Return the
+Returns the
 
 =cut
 
@@ -58,7 +58,7 @@ Return the
 
     Sys.die()
 
-Return the
+Returns the
 
 Aliases: I<raise>
 
@@ -68,7 +68,7 @@ Aliases: I<raise>
 
     Sys.eval()
 
-Return the
+Returns the
 
 =cut
 
@@ -76,7 +76,7 @@ Return the
 
     Sys.exec()
 
-Return the
+Returns the
 
 =cut
 
@@ -84,7 +84,7 @@ Return the
 
     Sys.exit()
 
-Return the
+Returns the
 
 =cut
 
@@ -92,7 +92,7 @@ Return the
 
     Sys.fork()
 
-Return the
+Returns the
 
 =cut
 
@@ -100,7 +100,7 @@ Return the
 
     Sys.getgrent()
 
-Return the
+Returns the
 
 =cut
 
@@ -108,7 +108,7 @@ Return the
 
     Sys.getgrgid()
 
-Return the
+Returns the
 
 =cut
 
@@ -116,7 +116,7 @@ Return the
 
     Sys.getgrnam()
 
-Return the
+Returns the
 
 =cut
 
@@ -124,7 +124,7 @@ Return the
 
     Sys.gethostbyaddr()
 
-Return the
+Returns the
 
 =cut
 
@@ -132,7 +132,7 @@ Return the
 
     Sys.gethostbyname()
 
-Return the
+Returns the
 
 =cut
 
@@ -140,7 +140,7 @@ Return the
 
     Sys.gethostent()
 
-Return the
+Returns the
 
 =cut
 
@@ -148,7 +148,7 @@ Return the
 
     Sys.getnetbyaddr()
 
-Return the
+Returns the
 
 =cut
 
@@ -156,7 +156,7 @@ Return the
 
     Sys.getnetbyname()
 
-Return the
+Returns the
 
 =cut
 
@@ -164,7 +164,7 @@ Return the
 
     Sys.getnetent()
 
-Return the
+Returns the
 
 =cut
 
@@ -172,7 +172,7 @@ Return the
 
     Sys.getpgrp()
 
-Return the
+Returns the
 
 =cut
 
@@ -180,7 +180,7 @@ Return the
 
     Sys.getppid()
 
-Return the
+Returns the
 
 =cut
 
@@ -188,7 +188,7 @@ Return the
 
     Sys.getpriority()
 
-Return the
+Returns the
 
 =cut
 
@@ -196,7 +196,7 @@ Return the
 
     Sys.getprotobyname()
 
-Return the
+Returns the
 
 =cut
 
@@ -204,7 +204,7 @@ Return the
 
     Sys.getprotobynumber()
 
-Return the
+Returns the
 
 =cut
 
@@ -212,7 +212,7 @@ Return the
 
     Sys.getprotoent()
 
-Return the
+Returns the
 
 =cut
 
@@ -220,7 +220,7 @@ Return the
 
     Sys.getpwent()
 
-Return the
+Returns the
 
 =cut
 
@@ -228,7 +228,7 @@ Return the
 
     Sys.getpwnam()
 
-Return the
+Returns the
 
 =cut
 
@@ -236,7 +236,7 @@ Return the
 
     Sys.getpwuid()
 
-Return the
+Returns the
 
 =cut
 
@@ -244,7 +244,7 @@ Return the
 
     Sys.getservbyname()
 
-Return the
+Returns the
 
 =cut
 
@@ -252,7 +252,7 @@ Return the
 
     Sys.getservbyport()
 
-Return the
+Returns the
 
 =cut
 
@@ -260,7 +260,7 @@ Return the
 
     Sys.getservent()
 
-Return the
+Returns the
 
 =cut
 
@@ -268,7 +268,7 @@ Return the
 
     Sys.isweak()
 
-Return the
+Returns the
 
 =cut
 
@@ -276,7 +276,7 @@ Return the
 
     Sys.kill()
 
-Return the
+Returns the
 
 =cut
 
@@ -284,7 +284,7 @@ Return the
 
     Sys.nano_sleep()
 
-Return the
+Returns the
 
 Aliases: I<nanosleep>
 
@@ -294,7 +294,7 @@ Aliases: I<nanosleep>
 
     Sys.open()
 
-Return the
+Returns the
 
 =cut
 
@@ -302,7 +302,7 @@ Return the
 
     Sys.opendir()
 
-Return the
+Returns the
 
 =cut
 
@@ -310,7 +310,7 @@ Return the
 
     Sys.os()
 
-Return the
+Returns the
 
 Aliases: I<osname>
 
@@ -320,7 +320,7 @@ Aliases: I<osname>
 
     Sys.print()
 
-Return the
+Returns the
 
 =cut
 
@@ -328,7 +328,7 @@ Return the
 
     Sys.printf()
 
-Return the
+Returns the
 
 =cut
 
@@ -336,7 +336,7 @@ Return the
 
     Sys.printh()
 
-Return the
+Returns the
 
 =cut
 
@@ -344,7 +344,7 @@ Return the
 
     Sys.read()
 
-Return the
+Returns the
 
 =cut
 
@@ -352,7 +352,7 @@ Return the
 
     Sys.readln()
 
-Return the
+Returns the
 
 Aliases: I<scanln>
 
@@ -362,7 +362,7 @@ Aliases: I<scanln>
 
     Sys.ref()
 
-Return the
+Returns the
 
 =cut
 
@@ -370,7 +370,7 @@ Return the
 
     Sys.refaddr()
 
-Return the
+Returns the
 
 =cut
 
@@ -378,7 +378,7 @@ Return the
 
     Sys.reftype()
 
-Return the
+Returns the
 
 =cut
 
@@ -386,7 +386,7 @@ Return the
 
     Sys.run()
 
-Return the
+Returns the
 
 Aliases: I<system>
 
@@ -396,7 +396,7 @@ Aliases: I<system>
 
     Sys.say()
 
-Return the
+Returns the
 
 Aliases: I<println>
 
@@ -406,7 +406,7 @@ Aliases: I<println>
 
     Sys.select()
 
-Return the
+Returns the
 
 =cut
 
@@ -414,7 +414,7 @@ Return the
 
     Sys.setgrent()
 
-Return the
+Returns the
 
 =cut
 
@@ -422,7 +422,7 @@ Return the
 
     Sys.sethostent()
 
-Return the
+Returns the
 
 =cut
 
@@ -430,7 +430,7 @@ Return the
 
     Sys.setnetent()
 
-Return the
+Returns the
 
 =cut
 
@@ -438,7 +438,7 @@ Return the
 
     Sys.setpgrp()
 
-Return the
+Returns the
 
 =cut
 
@@ -446,7 +446,7 @@ Return the
 
     Sys.setpriority()
 
-Return the
+Returns the
 
 =cut
 
@@ -454,7 +454,7 @@ Return the
 
     Sys.setprotoent()
 
-Return the
+Returns the
 
 =cut
 
@@ -462,7 +462,7 @@ Return the
 
     Sys.setpwent()
 
-Return the
+Returns the
 
 =cut
 
@@ -470,7 +470,7 @@ Return the
 
     Sys.setservent()
 
-Return the
+Returns the
 
 =cut
 
@@ -478,7 +478,7 @@ Return the
 
     Sys.sidef()
 
-Return the
+Returns the
 
 =cut
 
@@ -486,7 +486,7 @@ Return the
 
     Sys.sleep()
 
-Return the
+Returns the
 
 =cut
 
@@ -494,7 +494,7 @@ Return the
 
     Sys.stderr()
 
-Return the
+Returns the
 
 =cut
 
@@ -502,7 +502,7 @@ Return the
 
     Sys.stdin()
 
-Return the
+Returns the
 
 =cut
 
@@ -510,7 +510,7 @@ Return the
 
     Sys.stdout()
 
-Return the
+Returns the
 
 =cut
 
@@ -518,7 +518,7 @@ Return the
 
     Sys.ualarm()
 
-Return the
+Returns the
 
 Aliases: I<micro_alarm>
 
@@ -528,7 +528,7 @@ Aliases: I<micro_alarm>
 
     Sys.umask()
 
-Return the
+Returns the
 
 =cut
 
@@ -536,7 +536,7 @@ Return the
 
     Sys.unweaken()
 
-Return the
+Returns the
 
 =cut
 
@@ -544,7 +544,7 @@ Return the
 
     Sys.user()
 
-Return the
+Returns the
 
 Aliases: I<getlogin>
 
@@ -554,7 +554,7 @@ Aliases: I<getlogin>
 
     Sys.usleep()
 
-Return the
+Returns the
 
 Aliases: I<micro_sleep>
 
@@ -564,7 +564,7 @@ Aliases: I<micro_sleep>
 
     Sys.wait()
 
-Return the
+Returns the
 
 =cut
 
@@ -572,7 +572,7 @@ Return the
 
     Sys.warn()
 
-Return the
+Returns the
 
 =cut
 
@@ -580,6 +580,6 @@ Return the
 
     Sys.weaken()
 
-Return the
+Returns the
 
 =cut

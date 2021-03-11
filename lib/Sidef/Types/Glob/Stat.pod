@@ -26,7 +26,7 @@ Inherits methods from:
 
     Stat.all()
 
-Return the
+Returns the
 
 =cut
 
@@ -34,7 +34,7 @@ Return the
 
     Stat.atime()
 
-Return the
+Returns the
 
 =cut
 
@@ -42,7 +42,7 @@ Return the
 
     Stat.blksize()
 
-Return the
+Returns the
 
 =cut
 
@@ -50,7 +50,7 @@ Return the
 
     Stat.blocks()
 
-Return the
+Returns the
 
 =cut
 
@@ -58,7 +58,7 @@ Return the
 
     Stat.ctime()
 
-Return the
+Returns the
 
 =cut
 
@@ -66,7 +66,7 @@ Return the
 
     Stat.dev()
 
-Return the
+Returns the
 
 =cut
 
@@ -74,7 +74,7 @@ Return the
 
     Stat.gid()
 
-Return the
+Returns the
 
 =cut
 
@@ -82,7 +82,7 @@ Return the
 
     Stat.ino()
 
-Return the
+Returns the
 
 =cut
 
@@ -90,7 +90,7 @@ Return the
 
     Stat.lstat()
 
-Return the
+Returns the
 
 =cut
 
@@ -98,7 +98,7 @@ Return the
 
     Stat.mode()
 
-Return the
+Returns the
 
 =cut
 
@@ -106,7 +106,7 @@ Return the
 
     Stat.mtime()
 
-Return the
+Returns the
 
 =cut
 
@@ -114,7 +114,7 @@ Return the
 
     Stat.nlink()
 
-Return the
+Returns the
 
 =cut
 
@@ -122,7 +122,7 @@ Return the
 
     Stat.parent()
 
-Return the
+Returns the
 
 =cut
 
@@ -130,7 +130,7 @@ Return the
 
     Stat.rdev()
 
-Return the
+Returns the
 
 =cut
 
@@ -138,7 +138,7 @@ Return the
 
     Stat.size()
 
-Return the
+Returns the
 
 =cut
 
@@ -146,7 +146,7 @@ Return the
 
     Stat.stat()
 
-Return the
+Returns the
 
 =cut
 
@@ -154,6 +154,6 @@ Return the
 
     Stat.uid()
 
-Return the
+Returns the
 
 =cut

@@ -26,7 +26,7 @@ Inherits methods from:
 
     a & b
 
-Return the
+Returns the
 
 Aliases: I<∩>, I<and>, I<intersection>
 
@@ -36,7 +36,7 @@ Aliases: I<∩>, I<and>, I<intersection>
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<concat>
 
@@ -46,7 +46,7 @@ Aliases: I<concat>
 
     a - b
 
-Return the
+Returns the
 
 Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
@@ -56,7 +56,7 @@ Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
     a ... b
 
-Return the
+Returns the
 
 Aliases: I<to_list>
 
@@ -66,7 +66,7 @@ Aliases: I<to_list>
 
     a << b
 
-Return the
+Returns the
 
 Aliases: I<add>, I<push>, I<append>
 
@@ -76,7 +76,7 @@ Aliases: I<add>, I<push>, I<append>
 
     a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
@@ -86,7 +86,7 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
     a | b
 
-Return the
+Returns the
 
 Aliases: I<∪>, I<or>, I<union>
 
@@ -96,7 +96,7 @@ Aliases: I<∪>, I<or>, I<union>
 
     a ∋ b
 
-Return the
+Returns the
 
 Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
@@ -106,7 +106,7 @@ Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<con
 
     a ∌ b
 
-Return the
+Returns the
 
 =cut
 
@@ -114,7 +114,7 @@ Return the
 
     a ≠ b
 
-Return the
+Returns the
 
 Aliases: I<!=>, I<ne>
 
@@ -124,7 +124,7 @@ Aliases: I<!=>, I<ne>
 
     a ≡ b
 
-Return the
+Returns the
 
 Aliases: I<==>, I<eq>
 
@@ -134,7 +134,7 @@ Aliases: I<==>, I<eq>
 
     a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
@@ -144,7 +144,7 @@ Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
     a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
@@ -154,7 +154,7 @@ Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
     Bag.add_kv()
 
-Return the
+Returns the
 
 Aliases: I<push_kv>, I<add_pair>, I<append_kv>, I<push_pair>, I<append_pair>
 
@@ -164,7 +164,7 @@ Aliases: I<push_kv>, I<add_pair>, I<append_kv>, I<push_pair>, I<append_pair>
 
     Bag.add_kvs()
 
-Return the
+Returns the
 
 Aliases: I<push_kvs>, I<add_pairs>, I<append_kvs>, I<push_pairs>, I<append_pairs>
 
@@ -174,7 +174,7 @@ Aliases: I<push_kvs>, I<add_pairs>, I<append_kvs>, I<push_pairs>, I<append_pairs
 
     Bag.clone()
 
-Return the
+Returns the
 
 =cut
 
@@ -182,7 +182,7 @@ Return the
 
     Bag.collect()
 
-Return the
+Returns the
 
 =cut
 
@@ -190,7 +190,7 @@ Return the
 
     Bag.contains_all()
 
-Return the
+Returns the
 
 =cut
 
@@ -198,7 +198,7 @@ Return the
 
     Bag.count_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -206,7 +206,7 @@ Return the
 
     Bag.delete()
 
-Return the
+Returns the
 
 Aliases: I<remove>, I<discard>
 
@@ -216,7 +216,7 @@ Aliases: I<remove>, I<discard>
 
     Bag.delete_all()
 
-Return the
+Returns the
 
 Aliases: I<remove_all>, I<discard_all>
 
@@ -226,7 +226,7 @@ Aliases: I<remove_all>, I<discard_all>
 
     Bag.delete_first_if()
 
-Return the
+Returns the
 
 =cut
 
@@ -234,7 +234,7 @@ Return the
 
     Bag.delete_if()
 
-Return the
+Returns the
 
 =cut
 
@@ -242,7 +242,7 @@ Return the
 
     Bag.delete_key()
 
-Return the
+Returns the
 
 Aliases: I<remove_key>, I<discard_key>
 
@@ -252,7 +252,7 @@ Aliases: I<remove_key>, I<discard_key>
 
     Bag.dump()
 
-Return the
+Returns the
 
 =cut
 
@@ -260,7 +260,7 @@ Return the
 
     Bag.each()
 
-Return the
+Returns the
 
 =cut
 
@@ -268,7 +268,7 @@ Return the
 
     Bag.each_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -276,7 +276,7 @@ Return the
 
     Bag.each_kv()
 
-Return the
+Returns the
 
 =cut
 
@@ -284,7 +284,7 @@ Return the
 
     Bag.elems()
 
-Return the
+Returns the
 
 Aliases: I<keys_len>
 
@@ -294,7 +294,7 @@ Aliases: I<keys_len>
 
     Bag.freq()
 
-Return the
+Returns the
 
 =cut
 
@@ -302,7 +302,7 @@ Return the
 
     Bag.get()
 
-Return the
+Returns the
 
 Aliases: I<count>
 
@@ -312,7 +312,7 @@ Aliases: I<count>
 
     Bag.grep()
 
-Return the
+Returns the
 
 Aliases: I<select>
 
@@ -322,7 +322,7 @@ Aliases: I<select>
 
     Bag.grep_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -330,7 +330,7 @@ Return the
 
     Bag.grep_kv()
 
-Return the
+Returns the
 
 =cut
 
@@ -338,7 +338,7 @@ Return the
 
     Bag.iter()
 
-Return the
+Returns the
 
 =cut
 
@@ -346,7 +346,7 @@ Return the
 
     Bag.join()
 
-Return the
+Returns the
 
 =cut
 
@@ -354,7 +354,7 @@ Return the
 
     Bag.keys()
 
-Return the
+Returns the
 
 =cut
 
@@ -362,7 +362,7 @@ Return the
 
     Bag.kv()
 
-Return the
+Returns the
 
 Aliases: I<pairs>
 
@@ -372,7 +372,7 @@ Aliases: I<pairs>
 
     Bag.len()
 
-Return the
+Returns the
 
 Aliases: I<size>, I<length>
 
@@ -382,7 +382,7 @@ Aliases: I<size>, I<length>
 
     Bag.map()
 
-Return the
+Returns the
 
 =cut
 
@@ -390,7 +390,7 @@ Return the
 
     Bag.map_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -398,7 +398,7 @@ Return the
 
     Bag.map_kv()
 
-Return the
+Returns the
 
 =cut
 
@@ -406,7 +406,7 @@ Return the
 
     Bag.max()
 
-Return the
+Returns the
 
 =cut
 
@@ -414,7 +414,7 @@ Return the
 
     Bag.max_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -422,7 +422,7 @@ Return the
 
     Bag.min()
 
-Return the
+Returns the
 
 =cut
 
@@ -430,7 +430,7 @@ Return the
 
     Bag.min_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -438,7 +438,7 @@ Return the
 
     Bag.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -448,7 +448,7 @@ Aliases: I<call>
 
     Bag.pop()
 
-Return the
+Returns the
 
 =cut
 
@@ -456,7 +456,7 @@ Return the
 
     Bag.set_kv()
 
-Return the
+Returns the
 
 Aliases: I<update_kv>, I<update_pair>, I<replace_pair>
 
@@ -466,7 +466,7 @@ Aliases: I<update_kv>, I<update_pair>, I<replace_pair>
 
     Bag.set_kvs()
 
-Return the
+Returns the
 
 Aliases: I<update_kvs>, I<update_pairs>, I<replace_pairs>
 
@@ -476,7 +476,7 @@ Aliases: I<update_kvs>, I<update_pairs>, I<replace_pairs>
 
     Bag.shift()
 
-Return the
+Returns the
 
 =cut
 
@@ -484,7 +484,7 @@ Return the
 
     Bag.sort()
 
-Return the
+Returns the
 
 =cut
 
@@ -492,7 +492,7 @@ Return the
 
     Bag.sort_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -500,7 +500,7 @@ Return the
 
     Bag.to_a()
 
-Return the
+Returns the
 
 Aliases: I<expand>, I<to_array>
 
@@ -510,7 +510,7 @@ Aliases: I<expand>, I<to_array>
 
     Bag.to_bag()
 
-Return the
+Returns the
 
 =cut
 
@@ -518,7 +518,7 @@ Return the
 
     Bag.top()
 
-Return the
+Returns the
 
 Aliases: I<most_common>
 
@@ -528,7 +528,7 @@ Aliases: I<most_common>
 
     Bag.to_set()
 
-Return the
+Returns the
 
 =cut
 
@@ -536,7 +536,7 @@ Return the
 
     Bag.uniq()
 
-Return the
+Returns the
 
 Aliases: I<unique>
 
@@ -546,6 +546,6 @@ Aliases: I<unique>
 
     Bag.values()
 
-Return the
+Returns the
 
 =cut

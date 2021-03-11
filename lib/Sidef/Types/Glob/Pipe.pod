@@ -26,7 +26,7 @@ Inherits methods from:
 
     Pipe.command()
 
-Return the
+Returns the
 
 =cut
 
@@ -34,7 +34,7 @@ Return the
 
     Pipe.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -44,7 +44,7 @@ Aliases: I<call>
 
     Pipe.open()
 
-Return the
+Returns the
 
 =cut
 
@@ -52,7 +52,7 @@ Return the
 
     Pipe.open_r()
 
-Return the
+Returns the
 
 Aliases: I<open_read>
 
@@ -62,7 +62,7 @@ Aliases: I<open_read>
 
     Pipe.open_w()
 
-Return the
+Returns the
 
 Aliases: I<open_write>
 
@@ -72,7 +72,7 @@ Aliases: I<open_write>
 
     Pipe.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 

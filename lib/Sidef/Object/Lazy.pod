@@ -19,7 +19,7 @@ var obj = Lazy(...)
 
     Lazy.each()
 
-Return the
+Returns the
 
 =cut
 
@@ -27,7 +27,7 @@ Return the
 
     Lazy.first()
 
-Return the
+Returns the
 
 =cut
 
@@ -35,7 +35,7 @@ Return the
 
     Lazy.first_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -43,7 +43,7 @@ Return the
 
     Lazy.grep()
 
-Return the
+Returns the
 
 Aliases: I<select>
 
@@ -53,7 +53,7 @@ Aliases: I<select>
 
     Lazy.iter()
 
-Return the
+Returns the
 
 =cut
 
@@ -61,7 +61,7 @@ Return the
 
     Lazy.lazy()
 
-Return the
+Returns the
 
 =cut
 
@@ -69,7 +69,7 @@ Return the
 
     Lazy.map()
 
-Return the
+Returns the
 
 Aliases: I<collect>
 
@@ -79,7 +79,7 @@ Aliases: I<collect>
 
     Lazy.new()
 
-Return the
+Returns the
 
 =cut
 
@@ -87,7 +87,7 @@ Return the
 
     Lazy.nth()
 
-Return the
+Returns the
 
 =cut
 
@@ -95,6 +95,6 @@ Return the
 
     Lazy.to_a()
 
-Return the
+Returns the
 
 =cut

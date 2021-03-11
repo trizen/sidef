@@ -19,7 +19,7 @@ var obj = Try(...)
 
     Try.catch()
 
-Return the
+Returns the
 
 =cut
 
@@ -27,6 +27,6 @@ Return the
 
     Try.try()
 
-Return the
+Returns the
 
 =cut

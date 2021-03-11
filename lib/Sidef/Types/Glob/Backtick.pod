@@ -26,7 +26,7 @@ Inherits methods from:
 
     a ` b
 
-Return the
+Returns the
 
 Aliases: I<run>, I<exec>, I<execute>
 
@@ -36,7 +36,7 @@ Aliases: I<run>, I<exec>, I<execute>
 
     Backtick.call()
 
-Return the
+Returns the
 
 =cut
 
@@ -44,7 +44,7 @@ Return the
 
     Backtick.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 

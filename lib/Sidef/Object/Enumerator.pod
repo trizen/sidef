@@ -19,7 +19,7 @@ var obj = Enumerator(...)
 
     Enumerator.each()
 
-Return the
+Returns the
 
 =cut
 
@@ -27,7 +27,7 @@ Return the
 
     Enumerator.first()
 
-Return the
+Returns the
 
 =cut
 
@@ -35,7 +35,7 @@ Return the
 
     Enumerator.grep()
 
-Return the
+Returns the
 
 Aliases: I<select>
 
@@ -45,7 +45,7 @@ Aliases: I<select>
 
     Enumerator.len()
 
-Return the
+Returns the
 
 Aliases: I<size>, I<length>
 
@@ -55,7 +55,7 @@ Aliases: I<size>, I<length>
 
     Enumerator.map()
 
-Return the
+Returns the
 
 Aliases: I<collect>
 
@@ -65,7 +65,7 @@ Aliases: I<collect>
 
     Enumerator.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -75,6 +75,6 @@ Aliases: I<call>
 
     Enumerator.to_a()
 
-Return the
+Returns the
 
 =cut

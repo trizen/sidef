@@ -26,7 +26,7 @@ Inherits methods from:
 
     a & b
 
-Return the
+Returns the
 
 Aliases: I<∩>, I<and>, I<intersection>
 
@@ -36,7 +36,7 @@ Aliases: I<∩>, I<and>, I<intersection>
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<concat>
 
@@ -46,7 +46,7 @@ Aliases: I<concat>
 
     a - b
 
-Return the
+Returns the
 
 Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
@@ -56,7 +56,7 @@ Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
     a ... b
 
-Return the
+Returns the
 
 Aliases: I<to_list>
 
@@ -66,7 +66,7 @@ Aliases: I<to_list>
 
     a << b
 
-Return the
+Returns the
 
 Aliases: I<add>, I<push>, I<append>
 
@@ -76,7 +76,7 @@ Aliases: I<add>, I<push>, I<append>
 
     a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
@@ -86,7 +86,7 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
     a | b
 
-Return the
+Returns the
 
 Aliases: I<∪>, I<or>, I<union>
 
@@ -96,7 +96,7 @@ Aliases: I<∪>, I<or>, I<union>
 
     a ∋ b
 
-Return the
+Returns the
 
 Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
@@ -106,7 +106,7 @@ Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<con
 
     a ∌ b
 
-Return the
+Returns the
 
 =cut
 
@@ -114,7 +114,7 @@ Return the
 
     a ≡ b
 
-Return the
+Returns the
 
 =cut
 
@@ -122,7 +122,7 @@ Return the
 
     a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
@@ -132,7 +132,7 @@ Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
     a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
@@ -142,7 +142,7 @@ Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
     Set.all()
 
-Return the
+Returns the
 
 =cut
 
@@ -150,7 +150,7 @@ Return the
 
     Set.any()
 
-Return the
+Returns the
 
 =cut
 
@@ -158,7 +158,7 @@ Return the
 
     Set.collect()
 
-Return the
+Returns the
 
 =cut
 
@@ -166,7 +166,7 @@ Return the
 
     Set.contains_all()
 
-Return the
+Returns the
 
 =cut
 
@@ -174,7 +174,7 @@ Return the
 
     Set.count()
 
-Return the
+Returns the
 
 =cut
 
@@ -182,7 +182,7 @@ Return the
 
     Set.count_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -190,7 +190,7 @@ Return the
 
     Set.delete()
 
-Return the
+Returns the
 
 Aliases: I<remove>, I<discard>
 
@@ -200,7 +200,7 @@ Aliases: I<remove>, I<discard>
 
     Set.delete_first_if()
 
-Return the
+Returns the
 
 =cut
 
@@ -208,7 +208,7 @@ Return the
 
     Set.delete_if()
 
-Return the
+Returns the
 
 =cut
 
@@ -216,7 +216,7 @@ Return the
 
     Set.dump()
 
-Return the
+Returns the
 
 =cut
 
@@ -224,7 +224,7 @@ Return the
 
     Set.each()
 
-Return the
+Returns the
 
 =cut
 
@@ -232,7 +232,7 @@ Return the
 
     Set.each_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -240,7 +240,7 @@ Return the
 
     Set.grep()
 
-Return the
+Returns the
 
 Aliases: I<select>
 
@@ -250,7 +250,7 @@ Aliases: I<select>
 
     Set.grep_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -258,7 +258,7 @@ Return the
 
     Set.iter()
 
-Return the
+Returns the
 
 =cut
 
@@ -266,7 +266,7 @@ Return the
 
     Set.join()
 
-Return the
+Returns the
 
 =cut
 
@@ -274,7 +274,7 @@ Return the
 
     Set.map()
 
-Return the
+Returns the
 
 =cut
 
@@ -282,7 +282,7 @@ Return the
 
     Set.map_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -290,7 +290,7 @@ Return the
 
     Set.max()
 
-Return the
+Returns the
 
 =cut
 
@@ -298,7 +298,7 @@ Return the
 
     Set.max_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -306,7 +306,7 @@ Return the
 
     Set.min()
 
-Return the
+Returns the
 
 =cut
 
@@ -314,7 +314,7 @@ Return the
 
     Set.min_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -322,7 +322,7 @@ Return the
 
     Set.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -332,7 +332,7 @@ Aliases: I<call>
 
     Set.none()
 
-Return the
+Returns the
 
 =cut
 
@@ -340,7 +340,7 @@ Return the
 
     Set.pop()
 
-Return the
+Returns the
 
 =cut
 
@@ -348,7 +348,7 @@ Return the
 
     Set.prod()
 
-Return the
+Returns the
 
 Aliases: I<prod_by>
 
@@ -358,7 +358,7 @@ Aliases: I<prod_by>
 
     Set.prod_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -366,7 +366,7 @@ Return the
 
     Set.shift()
 
-Return the
+Returns the
 
 =cut
 
@@ -374,7 +374,7 @@ Return the
 
     Set.sort()
 
-Return the
+Returns the
 
 =cut
 
@@ -382,7 +382,7 @@ Return the
 
     Set.sort_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -390,7 +390,7 @@ Return the
 
     Set.sum()
 
-Return the
+Returns the
 
 Aliases: I<sum_by>
 
@@ -400,7 +400,7 @@ Aliases: I<sum_by>
 
     Set.sum_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -408,7 +408,7 @@ Return the
 
     Set.to_a()
 
-Return the
+Returns the
 
 Aliases: I<values>, I<to_array>
 
@@ -418,7 +418,7 @@ Aliases: I<values>, I<to_array>
 
     Set.to_bag()
 
-Return the
+Returns the
 
 =cut
 
@@ -426,6 +426,6 @@ Return the
 
     Set.to_set()
 
-Return the
+Returns the
 
 =cut

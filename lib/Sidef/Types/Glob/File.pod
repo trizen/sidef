@@ -26,7 +26,7 @@ Inherits methods from:
 
     File.abs()
 
-Return the
+Returns the
 
 Aliases: I<abs_name>, I<absname>, I<rel2abs>
 
@@ -36,7 +36,7 @@ Aliases: I<abs_name>, I<absname>, I<rel2abs>
 
     File.abs_path()
 
-Return the
+Returns the
 
 Aliases: I<realpath>
 
@@ -46,7 +46,7 @@ Aliases: I<realpath>
 
     File.access_time_days_diff()
 
-Return the
+Returns the
 
 =cut
 
@@ -54,7 +54,7 @@ Return the
 
     File.append()
 
-Return the
+Returns the
 
 =cut
 
@@ -62,7 +62,7 @@ Return the
 
     File.base()
 
-Return the
+Returns the
 
 Aliases: I<base_name>, I<basename>
 
@@ -72,7 +72,7 @@ Aliases: I<base_name>, I<basename>
 
     File.change_time_days_diff()
 
-Return the
+Returns the
 
 =cut
 
@@ -80,7 +80,7 @@ Return the
 
     File.chmod()
 
-Return the
+Returns the
 
 =cut
 
@@ -88,7 +88,7 @@ Return the
 
     File.chown()
 
-Return the
+Returns the
 
 =cut
 
@@ -96,7 +96,7 @@ Return the
 
     File.compare()
 
-Return the
+Returns the
 
 =cut
 
@@ -104,7 +104,7 @@ Return the
 
     File.cp()
 
-Return the
+Returns the
 
 Aliases: I<copy>
 
@@ -114,7 +114,7 @@ Aliases: I<copy>
 
     File.delete()
 
-Return the
+Returns the
 
 Aliases: I<remove>
 
@@ -124,7 +124,7 @@ Aliases: I<remove>
 
     File.dir()
 
-Return the
+Returns the
 
 Aliases: I<dir_name>, I<dirname>
 
@@ -134,7 +134,7 @@ Aliases: I<dir_name>, I<dirname>
 
     File.dump()
 
-Return the
+Returns the
 
 =cut
 
@@ -142,7 +142,7 @@ Return the
 
     File.edit()
 
-Return the
+Returns the
 
 =cut
 
@@ -150,7 +150,7 @@ Return the
 
     File.exists()
 
-Return the
+Returns the
 
 =cut
 
@@ -158,7 +158,7 @@ Return the
 
     File.has_setgid_bit()
 
-Return the
+Returns the
 
 =cut
 
@@ -166,7 +166,7 @@ Return the
 
     File.has_setuid_bit()
 
-Return the
+Returns the
 
 =cut
 
@@ -174,7 +174,7 @@ Return the
 
     File.has_sticky_bit()
 
-Return the
+Returns the
 
 =cut
 
@@ -182,7 +182,7 @@ Return the
 
     File.is_abs()
 
-Return the
+Returns the
 
 Aliases: I<is_absolute>
 
@@ -192,7 +192,7 @@ Aliases: I<is_absolute>
 
     File.is_binary()
 
-Return the
+Returns the
 
 =cut
 
@@ -200,7 +200,7 @@ Return the
 
     File.is_block()
 
-Return the
+Returns the
 
 =cut
 
@@ -208,7 +208,7 @@ Return the
 
     File.is_char_device()
 
-Return the
+Returns the
 
 =cut
 
@@ -216,7 +216,7 @@ Return the
 
     File.is_dir()
 
-Return the
+Returns the
 
 Aliases: I<is_directory>
 
@@ -226,7 +226,7 @@ Aliases: I<is_directory>
 
     File.is_empty()
 
-Return the
+Returns the
 
 =cut
 
@@ -234,7 +234,7 @@ Return the
 
     File.is_executable()
 
-Return the
+Returns the
 
 =cut
 
@@ -242,7 +242,7 @@ Return the
 
     File.is_file()
 
-Return the
+Returns the
 
 =cut
 
@@ -250,7 +250,7 @@ Return the
 
     File.is_link()
 
-Return the
+Returns the
 
 =cut
 
@@ -258,7 +258,7 @@ Return the
 
     File.is_owned()
 
-Return the
+Returns the
 
 =cut
 
@@ -266,7 +266,7 @@ Return the
 
     File.is_readable()
 
-Return the
+Returns the
 
 =cut
 
@@ -274,7 +274,7 @@ Return the
 
     File.is_real_executable()
 
-Return the
+Returns the
 
 =cut
 
@@ -282,7 +282,7 @@ Return the
 
     File.is_real_owned()
 
-Return the
+Returns the
 
 =cut
 
@@ -290,7 +290,7 @@ Return the
 
     File.is_real_readable()
 
-Return the
+Returns the
 
 =cut
 
@@ -298,7 +298,7 @@ Return the
 
     File.is_real_writeable()
 
-Return the
+Returns the
 
 =cut
 
@@ -306,7 +306,7 @@ Return the
 
     File.is_socket()
 
-Return the
+Returns the
 
 =cut
 
@@ -314,7 +314,7 @@ Return the
 
     File.is_text()
 
-Return the
+Returns the
 
 =cut
 
@@ -322,7 +322,7 @@ Return the
 
     File.is_writeable()
 
-Return the
+Returns the
 
 =cut
 
@@ -330,7 +330,7 @@ Return the
 
     File.lstat()
 
-Return the
+Returns the
 
 =cut
 
@@ -338,7 +338,7 @@ Return the
 
     File.make()
 
-Return the
+Returns the
 
 Aliases: I<touch>, I<create>, I<mkfile>
 
@@ -348,7 +348,7 @@ Aliases: I<touch>, I<create>, I<mkfile>
 
     File.md5()
 
-Return the
+Returns the
 
 =cut
 
@@ -356,7 +356,7 @@ Return the
 
     File.modification_time_days_diff()
 
-Return the
+Returns the
 
 =cut
 
@@ -364,7 +364,7 @@ Return the
 
     File.mv()
 
-Return the
+Returns the
 
 Aliases: I<move>
 
@@ -374,7 +374,7 @@ Aliases: I<move>
 
     File.name()
 
-Return the
+Returns the
 
 =cut
 
@@ -382,7 +382,7 @@ Return the
 
     File.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -392,7 +392,7 @@ Aliases: I<call>
 
     File.open()
 
-Return the
+Returns the
 
 =cut
 
@@ -400,7 +400,7 @@ Return the
 
     File.open_a()
 
-Return the
+Returns the
 
 Aliases: I<open_append>
 
@@ -410,7 +410,7 @@ Aliases: I<open_append>
 
     File.opendir()
 
-Return the
+Returns the
 
 =cut
 
@@ -418,7 +418,7 @@ Return the
 
     File.open_r()
 
-Return the
+Returns the
 
 Aliases: I<open_read>
 
@@ -428,7 +428,7 @@ Aliases: I<open_read>
 
     File.open_rw()
 
-Return the
+Returns the
 
 Aliases: I<open_read_write>
 
@@ -438,7 +438,7 @@ Aliases: I<open_read_write>
 
     File.open_w()
 
-Return the
+Returns the
 
 Aliases: I<open_write>
 
@@ -448,7 +448,7 @@ Aliases: I<open_write>
 
     File.read()
 
-Return the
+Returns the
 
 =cut
 
@@ -456,7 +456,7 @@ Return the
 
     File.read_link()
 
-Return the
+Returns the
 
 Aliases: I<readlink>
 
@@ -466,7 +466,7 @@ Aliases: I<readlink>
 
     File.rel()
 
-Return the
+Returns the
 
 Aliases: I<abs2rel>, I<rel_name>, I<relname>
 
@@ -476,7 +476,7 @@ Aliases: I<abs2rel>, I<rel_name>, I<relname>
 
     File.rename()
 
-Return the
+Returns the
 
 =cut
 
@@ -484,7 +484,7 @@ Return the
 
     File.sha1()
 
-Return the
+Returns the
 
 =cut
 
@@ -492,7 +492,7 @@ Return the
 
     File.sha256()
 
-Return the
+Returns the
 
 =cut
 
@@ -500,7 +500,7 @@ Return the
 
     File.sha512()
 
-Return the
+Returns the
 
 =cut
 
@@ -508,7 +508,7 @@ Return the
 
     File.size()
 
-Return the
+Returns the
 
 =cut
 
@@ -516,7 +516,7 @@ Return the
 
     File.split()
 
-Return the
+Returns the
 
 =cut
 
@@ -524,7 +524,7 @@ Return the
 
     File.splitpath()
 
-Return the
+Returns the
 
 =cut
 
@@ -532,7 +532,7 @@ Return the
 
     File.stat()
 
-Return the
+Returns the
 
 =cut
 
@@ -540,7 +540,7 @@ Return the
 
     File.sysopen()
 
-Return the
+Returns the
 
 =cut
 
@@ -548,7 +548,7 @@ Return the
 
     File.to_file()
 
-Return the
+Returns the
 
 =cut
 
@@ -556,7 +556,7 @@ Return the
 
     File.to_s()
 
-Return the
+Returns the
 
 Aliases: I<to_str>
 
@@ -566,7 +566,7 @@ Aliases: I<to_str>
 
     File.truncate()
 
-Return the
+Returns the
 
 =cut
 
@@ -574,7 +574,7 @@ Return the
 
     File.unlink()
 
-Return the
+Returns the
 
 =cut
 
@@ -582,7 +582,7 @@ Return the
 
     File.utime()
 
-Return the
+Returns the
 
 =cut
 
@@ -590,6 +590,6 @@ Return the
 
     File.write()
 
-Return the
+Returns the
 
 =cut

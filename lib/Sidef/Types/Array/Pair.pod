@@ -26,7 +26,7 @@ Inherits methods from:
 
     Pair.key()
 
-Return the
+Returns the
 
 Aliases: I<first>
 
@@ -36,7 +36,7 @@ Aliases: I<first>
 
     Pair.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -46,7 +46,7 @@ Aliases: I<call>
 
     Pair.swap()
 
-Return the
+Returns the
 
 =cut
 
@@ -54,7 +54,7 @@ Return the
 
     Pair.to_a()
 
-Return the
+Returns the
 
 Aliases: I<to_array>
 
@@ -64,7 +64,7 @@ Aliases: I<to_array>
 
     Pair.to_h()
 
-Return the
+Returns the
 
 Aliases: I<to_hash>
 
@@ -74,7 +74,7 @@ Aliases: I<to_hash>
 
     Pair.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 
@@ -84,7 +84,7 @@ Aliases: I<dump>, I<to_str>
 
     Pair.value()
 
-Return the
+Returns the
 
 Aliases: I<second>
 

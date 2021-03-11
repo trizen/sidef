@@ -26,7 +26,7 @@ Inherits methods from:
 
     a ... b
 
-Return the
+Returns the
 
 =cut
 
@@ -34,7 +34,7 @@ Return the
 
     Match.cap()
 
-Return the
+Returns the
 
 Aliases: I<to_a>, I<caps>, I<to_array>, I<captures>
 
@@ -44,7 +44,7 @@ Aliases: I<to_a>, I<caps>, I<to_array>, I<captures>
 
     Match.dump()
 
-Return the
+Returns the
 
 =cut
 
@@ -52,7 +52,7 @@ Return the
 
     Match.join()
 
-Return the
+Returns the
 
 =cut
 
@@ -60,7 +60,7 @@ Return the
 
     Match.ncap()
 
-Return the
+Returns the
 
 Aliases: I<ncaps>, I<named_captures>
 
@@ -70,7 +70,7 @@ Aliases: I<ncaps>, I<named_captures>
 
     Match.pos()
 
-Return the
+Returns the
 
 Aliases: I<match_pos>
 
@@ -80,7 +80,7 @@ Aliases: I<match_pos>
 
     Match.regex()
 
-Return the
+Returns the
 
 =cut
 
@@ -88,7 +88,7 @@ Return the
 
     Match.string()
 
-Return the
+Returns the
 
 =cut
 
@@ -96,7 +96,7 @@ Return the
 
     Match.to_bool()
 
-Return the
+Returns the
 
 Aliases: I<matched>, I<is_successful>
 
@@ -106,7 +106,7 @@ Aliases: I<matched>, I<is_successful>
 
     Match.to_s()
 
-Return the
+Returns the
 
 Aliases: I<to_str>
 

@@ -26,7 +26,7 @@ Inherits methods from:
 
     Time.dump()
 
-Return the
+Returns the
 
 =cut
 
@@ -34,7 +34,7 @@ Return the
 
     Time.gmt()
 
-Return the
+Returns the
 
 Aliases: I<gmtime>
 
@@ -44,7 +44,7 @@ Aliases: I<gmtime>
 
     Time.local()
 
-Return the
+Returns the
 
 Aliases: I<localtime>
 
@@ -54,7 +54,7 @@ Aliases: I<localtime>
 
     Time.micro()
 
-Return the
+Returns the
 
 Aliases: I<micro_sec>, I<micro_seconds>
 
@@ -64,7 +64,7 @@ Aliases: I<micro_sec>, I<micro_seconds>
 
     Time.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -74,7 +74,7 @@ Aliases: I<call>
 
     Time.now()
 
-Return the
+Returns the
 
 =cut
 
@@ -82,7 +82,7 @@ Return the
 
     Time.sec()
 
-Return the
+Returns the
 
 Aliases: I<time>
 
@@ -92,7 +92,7 @@ Aliases: I<time>
 
     Time.to_s()
 
-Return the
+Returns the
 
 Aliases: I<to_str>
 

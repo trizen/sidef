@@ -26,7 +26,7 @@ Inherits methods from:
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<concat>, I<catfile>
 
@@ -36,7 +36,7 @@ Aliases: I<concat>, I<catfile>
 
     Dir.chdir()
 
-Return the
+Returns the
 
 =cut
 
@@ -44,7 +44,7 @@ Return the
 
     Dir.chroot()
 
-Return the
+Returns the
 
 =cut
 
@@ -52,7 +52,7 @@ Return the
 
     Dir.cwd()
 
-Return the
+Returns the
 
 =cut
 
@@ -60,7 +60,7 @@ Return the
 
     Dir.delete()
 
-Return the
+Returns the
 
 Aliases: I<remove>, I<unlink>
 
@@ -70,7 +70,7 @@ Aliases: I<remove>, I<unlink>
 
     Dir.dump()
 
-Return the
+Returns the
 
 =cut
 
@@ -78,7 +78,7 @@ Return the
 
     Dir.home()
 
-Return the
+Returns the
 
 =cut
 
@@ -86,7 +86,7 @@ Return the
 
     Dir.is_empty()
 
-Return the
+Returns the
 
 =cut
 
@@ -94,7 +94,7 @@ Return the
 
     Dir.make()
 
-Return the
+Returns the
 
 Aliases: I<mkdir>, I<create>
 
@@ -104,7 +104,7 @@ Aliases: I<mkdir>, I<create>
 
     Dir.mkpath()
 
-Return the
+Returns the
 
 Aliases: I<mktree>, I<make_path>, I<make_tree>, I<create_tree>
 
@@ -114,7 +114,7 @@ Aliases: I<mktree>, I<make_path>, I<make_tree>, I<create_tree>
 
     Dir.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -124,7 +124,7 @@ Aliases: I<call>
 
     Dir.open()
 
-Return the
+Returns the
 
 Aliases: I<open_r>
 
@@ -134,7 +134,7 @@ Aliases: I<open_r>
 
     Dir.open_rw()
 
-Return the
+Returns the
 
 =cut
 
@@ -142,7 +142,7 @@ Return the
 
     Dir.open_w()
 
-Return the
+Returns the
 
 =cut
 
@@ -150,7 +150,7 @@ Return the
 
     Dir.parent()
 
-Return the
+Returns the
 
 =cut
 
@@ -158,7 +158,7 @@ Return the
 
     Dir.pwd()
 
-Return the
+Returns the
 
 =cut
 
@@ -166,7 +166,7 @@ Return the
 
     Dir.remove_tree()
 
-Return the
+Returns the
 
 =cut
 
@@ -174,7 +174,7 @@ Return the
 
     Dir.root()
 
-Return the
+Returns the
 
 =cut
 
@@ -182,7 +182,7 @@ Return the
 
     Dir.split()
 
-Return the
+Returns the
 
 =cut
 
@@ -190,7 +190,7 @@ Return the
 
     Dir.tmp()
 
-Return the
+Returns the
 
 Aliases: I<temp>
 
@@ -200,7 +200,7 @@ Aliases: I<temp>
 
     Dir.to_dir()
 
-Return the
+Returns the
 
 =cut
 
@@ -208,7 +208,7 @@ Return the
 
     Dir.to_s()
 
-Return the
+Returns the
 
 Aliases: I<to_str>
 
@@ -218,6 +218,6 @@ Aliases: I<to_str>
 
     Dir.up()
 
-Return the
+Returns the
 
 =cut

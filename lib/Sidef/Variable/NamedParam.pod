@@ -26,7 +26,7 @@ Inherits methods from:
 
     NamedParam.dump()
 
-Return the
+Returns the
 
 =cut
 
@@ -34,7 +34,7 @@ Return the
 
     NamedParam.name()
 
-Return the
+Returns the
 
 =cut
 
@@ -42,7 +42,7 @@ Return the
 
     NamedParam.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -52,6 +52,6 @@ Aliases: I<call>
 
     NamedParam.value()
 
-Return the
+Returns the
 
 =cut

@@ -26,7 +26,7 @@ Inherits methods from:
 
     a & b
 
-Return the
+Returns the
 
 Aliases: I<and>, I<intersection>
 
@@ -36,7 +36,7 @@ Aliases: I<and>, I<intersection>
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<merge>, I<concat>
 
@@ -46,7 +46,7 @@ Aliases: I<merge>, I<concat>
 
     a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>, I<diff>, I<difference>
 
@@ -56,7 +56,7 @@ Aliases: I<sub>, I<diff>, I<difference>
 
     a ... b
 
-Return the
+Returns the
 
 Aliases: I<to_list>
 
@@ -66,7 +66,7 @@ Aliases: I<to_list>
 
     a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -76,7 +76,7 @@ Aliases: I<eq>
 
     a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
@@ -86,7 +86,7 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
     a | b
 
-Return the
+Returns the
 
 Aliases: I<or>, I<union>
 
@@ -96,7 +96,7 @@ Aliases: I<or>, I<union>
 
     a ≠ b
 
-Return the
+Returns the
 
 Aliases: I<!=>, I<ne>
 
@@ -106,7 +106,7 @@ Aliases: I<!=>, I<ne>
 
     Hash.append()
 
-Return the
+Returns the
 
 =cut
 
@@ -114,7 +114,7 @@ Return the
 
     Hash.as_tree()
 
-Return the
+Returns the
 
 =cut
 
@@ -122,7 +122,7 @@ Return the
 
     Hash.clear()
 
-Return the
+Returns the
 
 =cut
 
@@ -130,7 +130,7 @@ Return the
 
     Hash.collect()
 
-Return the
+Returns the
 
 Aliases: I<collect_kv>
 
@@ -140,7 +140,7 @@ Aliases: I<collect_kv>
 
     Hash.count()
 
-Return the
+Returns the
 
 =cut
 
@@ -148,7 +148,7 @@ Return the
 
     Hash.count_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -156,7 +156,7 @@ Return the
 
     Hash.delete()
 
-Return the
+Returns the
 
 Aliases: I<remove>
 
@@ -166,7 +166,7 @@ Aliases: I<remove>
 
     Hash.delete_if()
 
-Return the
+Returns the
 
 =cut
 
@@ -174,7 +174,7 @@ Return the
 
     Hash.dig()
 
-Return the
+Returns the
 
 =cut
 
@@ -182,7 +182,7 @@ Return the
 
     Hash.each()
 
-Return the
+Returns the
 
 Aliases: I<each_kv>, I<each_pair>
 
@@ -192,7 +192,7 @@ Aliases: I<each_kv>, I<each_pair>
 
     Hash.each_k()
 
-Return the
+Returns the
 
 Aliases: I<each_key>
 
@@ -202,7 +202,7 @@ Aliases: I<each_key>
 
     Hash.each_v()
 
-Return the
+Returns the
 
 Aliases: I<each_value>
 
@@ -212,7 +212,7 @@ Aliases: I<each_value>
 
     Hash.fetch()
 
-Return the
+Returns the
 
 =cut
 
@@ -220,7 +220,7 @@ Return the
 
     Hash.flip()
 
-Return the
+Returns the
 
 Aliases: I<invert>, I<reverse>
 
@@ -230,7 +230,7 @@ Aliases: I<invert>, I<reverse>
 
     Hash.get_pair()
 
-Return the
+Returns the
 
 =cut
 
@@ -238,7 +238,7 @@ Return the
 
     Hash.get_pairs()
 
-Return the
+Returns the
 
 =cut
 
@@ -246,7 +246,7 @@ Return the
 
     Hash.grep()
 
-Return the
+Returns the
 
 Aliases: I<grep_kv>, I<select>
 
@@ -256,7 +256,7 @@ Aliases: I<grep_kv>, I<select>
 
     Hash.grep_v()
 
-Return the
+Returns the
 
 Aliases: I<grep_val>
 
@@ -266,7 +266,7 @@ Aliases: I<grep_val>
 
     Hash.has()
 
-Return the
+Returns the
 
 Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
@@ -276,7 +276,7 @@ Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, 
 
     Hash.is_empty()
 
-Return the
+Returns the
 
 =cut
 
@@ -284,7 +284,7 @@ Return the
 
     Hash.item()
 
-Return the
+Returns the
 
 =cut
 
@@ -292,7 +292,7 @@ Return the
 
     Hash.items()
 
-Return the
+Returns the
 
 =cut
 
@@ -300,7 +300,7 @@ Return the
 
     Hash.keys()
 
-Return the
+Returns the
 
 =cut
 
@@ -308,7 +308,7 @@ Return the
 
     Hash.kv()
 
-Return the
+Returns the
 
 Aliases: I<to_a>, I<pairs>, I<to_array>
 
@@ -318,7 +318,7 @@ Aliases: I<to_a>, I<pairs>, I<to_array>
 
     Hash.len()
 
-Return the
+Returns the
 
 Aliases: I<size>, I<length>
 
@@ -328,7 +328,7 @@ Aliases: I<size>, I<length>
 
     Hash.lsel()
 
-Return the
+Returns the
 
 Aliases: I<linsel>, I<linear_selection>
 
@@ -338,7 +338,7 @@ Aliases: I<linsel>, I<linear_selection>
 
     Hash.map()
 
-Return the
+Returns the
 
 Aliases: I<map_kv>
 
@@ -348,7 +348,7 @@ Aliases: I<map_kv>
 
     Hash.map_v()
 
-Return the
+Returns the
 
 Aliases: I<map_val>
 
@@ -358,7 +358,7 @@ Aliases: I<map_val>
 
     Hash.max_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -366,7 +366,7 @@ Return the
 
     Hash.merge_values()
 
-Return the
+Returns the
 
 =cut
 
@@ -374,7 +374,7 @@ Return the
 
     Hash.min_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -382,7 +382,7 @@ Return the
 
     Hash.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -392,7 +392,7 @@ Aliases: I<call>
 
     Hash.same_keys()
 
-Return the
+Returns the
 
 =cut
 
@@ -400,7 +400,7 @@ Return the
 
     Hash.set_keys()
 
-Return the
+Returns the
 
 =cut
 
@@ -408,7 +408,7 @@ Return the
 
     Hash.slice()
 
-Return the
+Returns the
 
 =cut
 
@@ -416,7 +416,7 @@ Return the
 
     Hash.sort()
 
-Return the
+Returns the
 
 =cut
 
@@ -424,7 +424,7 @@ Return the
 
     Hash.sort_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -432,7 +432,7 @@ Return the
 
     Hash.to_bag()
 
-Return the
+Returns the
 
 =cut
 
@@ -440,7 +440,7 @@ Return the
 
     Hash.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 
@@ -450,7 +450,7 @@ Aliases: I<dump>, I<to_str>
 
     Hash.to_set()
 
-Return the
+Returns the
 
 =cut
 
@@ -458,6 +458,6 @@ Return the
 
     Hash.values()
 
-Return the
+Returns the
 
 =cut

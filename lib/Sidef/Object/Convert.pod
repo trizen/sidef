@@ -19,7 +19,7 @@ var obj = Convert(...)
 
     Convert.to_a()
 
-Return the
+Returns the
 
 Aliases: I<to_array>
 
@@ -29,7 +29,7 @@ Aliases: I<to_array>
 
     Convert.to_b()
 
-Return the
+Returns the
 
 Aliases: I<to_bool>
 
@@ -39,7 +39,7 @@ Aliases: I<to_bool>
 
     Convert.to_bag()
 
-Return the
+Returns the
 
 =cut
 
@@ -47,7 +47,7 @@ Return the
 
     Convert.to_caller()
 
-Return the
+Returns the
 
 =cut
 
@@ -55,7 +55,7 @@ Return the
 
     Convert.to_dir()
 
-Return the
+Returns the
 
 =cut
 
@@ -63,7 +63,7 @@ Return the
 
     Convert.to_f()
 
-Return the
+Returns the
 
 Aliases: I<to_float>
 
@@ -73,7 +73,7 @@ Aliases: I<to_float>
 
     Convert.to_fcaller()
 
-Return the
+Returns the
 
 =cut
 
@@ -81,7 +81,7 @@ Return the
 
     Convert.to_file()
 
-Return the
+Returns the
 
 =cut
 
@@ -89,7 +89,7 @@ Return the
 
     Convert.to_i()
 
-Return the
+Returns the
 
 Aliases: I<to_int>
 
@@ -99,7 +99,7 @@ Aliases: I<to_int>
 
     Convert.to_m()
 
-Return the
+Returns the
 
 Aliases: I<to_matrix>
 
@@ -109,7 +109,7 @@ Aliases: I<to_matrix>
 
     Convert.to_n()
 
-Return the
+Returns the
 
 Aliases: I<to_num>
 
@@ -119,7 +119,7 @@ Aliases: I<to_num>
 
     Convert.to_r()
 
-Return the
+Returns the
 
 Aliases: I<to_rat>
 
@@ -129,7 +129,7 @@ Aliases: I<to_rat>
 
     Convert.to_re()
 
-Return the
+Returns the
 
 Aliases: I<to_regex>
 
@@ -139,7 +139,7 @@ Aliases: I<to_regex>
 
     Convert.to_s()
 
-Return the
+Returns the
 
 Aliases: I<to_str>
 
@@ -149,7 +149,7 @@ Aliases: I<to_str>
 
     Convert.to_set()
 
-Return the
+Returns the
 
 =cut
 
@@ -157,7 +157,7 @@ Return the
 
     Convert.to_type()
 
-Return the
+Returns the
 
 =cut
 
@@ -165,7 +165,7 @@ Return the
 
     Convert.to_v()
 
-Return the
+Returns the
 
 Aliases: I<to_vector>
 

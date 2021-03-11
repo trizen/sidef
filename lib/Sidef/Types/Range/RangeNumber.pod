@@ -27,7 +27,7 @@ Inherits methods from:
 
     RangeNumber.Π()
 
-Return the
+Returns the
 
 Aliases: I<prod>
 
@@ -37,7 +37,7 @@ Aliases: I<prod>
 
     RangeNumber.Σ()
 
-Return the
+Returns the
 
 Aliases: I<sum>
 
@@ -47,7 +47,7 @@ Aliases: I<sum>
 
     RangeNumber.avg()
 
-Return the
+Returns the
 
 =cut
 
@@ -55,7 +55,7 @@ Return the
 
     RangeNumber.avg_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -63,7 +63,7 @@ Return the
 
     RangeNumber.bsearch()
 
-Return the
+Returns the
 
 =cut
 
@@ -71,7 +71,7 @@ Return the
 
     RangeNumber.bsearch_ge()
 
-Return the
+Returns the
 
 =cut
 
@@ -79,7 +79,7 @@ Return the
 
     RangeNumber.bsearch_le()
 
-Return the
+Returns the
 
 =cut
 
@@ -87,7 +87,7 @@ Return the
 
     RangeNumber.each_almost_prime()
 
-Return the
+Returns the
 
 =cut
 
@@ -95,7 +95,7 @@ Return the
 
     RangeNumber.each_powerful()
 
-Return the
+Returns the
 
 =cut
 
@@ -103,7 +103,7 @@ Return the
 
     RangeNumber.each_prime()
 
-Return the
+Returns the
 
 =cut
 
@@ -111,7 +111,7 @@ Return the
 
     RangeNumber.each_semiprime()
 
-Return the
+Returns the
 
 =cut
 
@@ -119,7 +119,7 @@ Return the
 
     RangeNumber.each_squarefree()
 
-Return the
+Returns the
 
 =cut
 
@@ -127,7 +127,7 @@ Return the
 
     RangeNumber.each_squarefree_almost_prime()
 
-Return the
+Returns the
 
 =cut
 
@@ -135,7 +135,7 @@ Return the
 
     RangeNumber.gcd()
 
-Return the
+Returns the
 
 =cut
 
@@ -143,7 +143,7 @@ Return the
 
     RangeNumber.gcd_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -151,7 +151,7 @@ Return the
 
     RangeNumber.iter()
 
-Return the
+Returns the
 
 =cut
 
@@ -159,7 +159,7 @@ Return the
 
     RangeNumber.lcm()
 
-Return the
+Returns the
 
 =cut
 
@@ -167,7 +167,7 @@ Return the
 
     RangeNumber.lcm_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -175,7 +175,7 @@ Return the
 
     RangeNumber.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -185,7 +185,7 @@ Aliases: I<call>
 
     RangeNumber.primes()
 
-Return the
+Returns the
 
 =cut
 
@@ -193,7 +193,7 @@ Return the
 
     RangeNumber.prod_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -201,7 +201,7 @@ Return the
 
     RangeNumber.semiprimes()
 
-Return the
+Returns the
 
 =cut
 
@@ -209,7 +209,7 @@ Return the
 
     RangeNumber.squarefree()
 
-Return the
+Returns the
 
 =cut
 
@@ -217,7 +217,7 @@ Return the
 
     RangeNumber.sum_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -225,7 +225,7 @@ Return the
 
     RangeNumber.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 

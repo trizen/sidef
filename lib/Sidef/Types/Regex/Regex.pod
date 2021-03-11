@@ -26,7 +26,7 @@ Inherits methods from:
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<add>, I<concat>
 
@@ -36,7 +36,7 @@ Aliases: I<add>, I<concat>
 
     a < b
 
-Return the
+Returns the
 
 Aliases: I<lt>
 
@@ -46,7 +46,7 @@ Aliases: I<lt>
 
     a <=> b
 
-Return the
+Returns the
 
 Aliases: I<cmp>
 
@@ -56,7 +56,7 @@ Aliases: I<cmp>
 
     a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -66,7 +66,7 @@ Aliases: I<eq>
 
     a =~ b
 
-Return the
+Returns the
 
 Aliases: I<run>, I<match>
 
@@ -76,7 +76,7 @@ Aliases: I<run>, I<match>
 
     a > b
 
-Return the
+Returns the
 
 Aliases: I<gt>
 
@@ -86,7 +86,7 @@ Aliases: I<gt>
 
     a | b
 
-Return the
+Returns the
 
 Aliases: I<union>
 
@@ -96,7 +96,7 @@ Aliases: I<union>
 
     a ≠ b
 
-Return the
+Returns the
 
 Aliases: I<!=>, I<ne>
 
@@ -106,7 +106,7 @@ Aliases: I<!=>, I<ne>
 
     a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -116,7 +116,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -126,7 +126,7 @@ Aliases: I<E<gt>=>, I<ge>
 
     Regex.call()
 
-Return the
+Returns the
 
 =cut
 
@@ -134,7 +134,7 @@ Return the
 
     Regex.gmatch()
 
-Return the
+Returns the
 
 Aliases: I<global_match>
 
@@ -144,7 +144,7 @@ Aliases: I<global_match>
 
     Regex.gmatches()
 
-Return the
+Returns the
 
 Aliases: I<all_matches>, I<map_matches>, I<global_matches>, I<repeated_match>
 
@@ -154,7 +154,7 @@ Aliases: I<all_matches>, I<map_matches>, I<global_matches>, I<repeated_match>
 
     Regex.to_re()
 
-Return the
+Returns the
 
 Aliases: I<to_regex>
 
@@ -164,7 +164,7 @@ Aliases: I<to_regex>
 
     Regex.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 

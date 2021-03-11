@@ -26,7 +26,7 @@ Inherits methods from:
 
     a & b
 
-Return the
+Returns the
 
 Aliases: I<and>
 
@@ -36,7 +36,7 @@ Aliases: I<and>
 
     a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -46,7 +46,7 @@ Aliases: I<mul>
 
     a ** b
 
-Return the
+Returns the
 
 Aliases: I<mpow>, I<matrix_pow>
 
@@ -56,7 +56,7 @@ Aliases: I<mpow>, I<matrix_pow>
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<add>, I<concat>
 
@@ -66,7 +66,7 @@ Aliases: I<add>, I<concat>
 
     a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>, I<diff>
 
@@ -76,7 +76,7 @@ Aliases: I<sub>, I<diff>
 
     a ... b
 
-Return the
+Returns the
 
 Aliases: I<to_list>
 
@@ -86,7 +86,7 @@ Aliases: I<to_list>
 
     a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -96,7 +96,7 @@ Aliases: I<÷>, I<div>
 
     a < b
 
-Return the
+Returns the
 
 Aliases: I<lt>
 
@@ -106,7 +106,7 @@ Aliases: I<lt>
 
     a <=> b
 
-Return the
+Returns the
 
 Aliases: I<cmp>
 
@@ -116,7 +116,7 @@ Aliases: I<cmp>
 
     a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -126,7 +126,7 @@ Aliases: I<eq>
 
     a > b
 
-Return the
+Returns the
 
 Aliases: I<gt>
 
@@ -136,7 +136,7 @@ Aliases: I<gt>
 
     a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>
 
@@ -146,7 +146,7 @@ Aliases: I<xor>
 
     a | b
 
-Return the
+Returns the
 
 Aliases: I<or>
 
@@ -156,7 +156,7 @@ Aliases: I<or>
 
     a |>> b
 
-Return the
+Returns the
 
 Aliases: I<pipeline_map_op>
 
@@ -166,7 +166,7 @@ Aliases: I<pipeline_map_op>
 
     Array.|X>()
 
-Return the
+Returns the
 
 Aliases: I<pipeline_cross_op>
 
@@ -176,7 +176,7 @@ Aliases: I<pipeline_cross_op>
 
     Array.|Z>()
 
-Return the
+Returns the
 
 Aliases: I<pipeline_zip_op>
 
@@ -186,7 +186,7 @@ Aliases: I<pipeline_zip_op>
 
     a « b
 
-Return the
+Returns the
 
 Aliases: I<E<lt>E<lt>>, I<push>, I<append>
 
@@ -196,7 +196,7 @@ Aliases: I<E<lt>E<lt>>, I<push>, I<append>
 
     a » b
 
-Return the
+Returns the
 
 Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
 
@@ -206,7 +206,7 @@ Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
 
     a ∋ b
 
-Return the
+Returns the
 
 Aliases: I<has>, I<contain>, I<include>, I<contains>, I<includes>
 
@@ -216,7 +216,7 @@ Aliases: I<has>, I<contain>, I<include>, I<contains>, I<includes>
 
     a ∌ b
 
-Return the
+Returns the
 
 =cut
 
@@ -224,7 +224,7 @@ Return the
 
     a ≠ b
 
-Return the
+Returns the
 
 Aliases: I<!=>, I<ne>
 
@@ -234,7 +234,7 @@ Aliases: I<!=>, I<ne>
 
     a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -244,7 +244,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -254,7 +254,7 @@ Aliases: I<E<gt>=>, I<ge>
 
     Array.abbrev()
 
-Return the
+Returns the
 
 Aliases: I<abbreviations>
 
@@ -264,7 +264,7 @@ Aliases: I<abbreviations>
 
     Array.acc()
 
-Return the
+Returns the
 
 Aliases: I<accumulate>
 
@@ -274,7 +274,7 @@ Aliases: I<accumulate>
 
     Array.acc_by()
 
-Return the
+Returns the
 
 Aliases: I<accumulate_by>
 
@@ -284,7 +284,7 @@ Aliases: I<accumulate_by>
 
     Array.all()
 
-Return the
+Returns the
 
 =cut
 
@@ -292,7 +292,7 @@ Return the
 
     Array.all_composite()
 
-Return the
+Returns the
 
 =cut
 
@@ -300,7 +300,7 @@ Return the
 
     Array.all_prime()
 
-Return the
+Returns the
 
 =cut
 
@@ -308,7 +308,7 @@ Return the
 
     Array.any()
 
-Return the
+Returns the
 
 =cut
 
@@ -316,7 +316,7 @@ Return the
 
     Array.avg()
 
-Return the
+Returns the
 
 =cut
 
@@ -324,7 +324,7 @@ Return the
 
     Array.avg_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -332,7 +332,7 @@ Return the
 
     Array.bindex()
 
-Return the
+Returns the
 
 Aliases: I<bsearch_index>
 
@@ -342,7 +342,7 @@ Aliases: I<bsearch_index>
 
     Array.bindex_by()
 
-Return the
+Returns the
 
 Aliases: I<bsearch_index_by>
 
@@ -352,7 +352,7 @@ Aliases: I<bsearch_index_by>
 
     Array.bindex_ge()
 
-Return the
+Returns the
 
 =cut
 
@@ -360,7 +360,7 @@ Return the
 
     Array.bindex_ge_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -368,7 +368,7 @@ Return the
 
     Array.bindex_le()
 
-Return the
+Returns the
 
 =cut
 
@@ -376,7 +376,7 @@ Return the
 
     Array.bindex_le_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -384,7 +384,7 @@ Return the
 
     Array.binsert()
 
-Return the
+Returns the
 
 =cut
 
@@ -392,7 +392,7 @@ Return the
 
     Array.bsearch()
 
-Return the
+Returns the
 
 Aliases: I<bsearch_by>
 
@@ -402,7 +402,7 @@ Aliases: I<bsearch_by>
 
     Array.bsearch_ge()
 
-Return the
+Returns the
 
 Aliases: I<bsearch_ge_by>
 
@@ -412,7 +412,7 @@ Aliases: I<bsearch_ge_by>
 
     Array.bsearch_le()
 
-Return the
+Returns the
 
 Aliases: I<bsearch_le_by>
 
@@ -422,7 +422,7 @@ Aliases: I<bsearch_le_by>
 
     Array.bshuffle()
 
-Return the
+Returns the
 
 Aliases: I<best_shuffle>
 
@@ -432,7 +432,7 @@ Aliases: I<best_shuffle>
 
     Array.cartesian()
 
-Return the
+Returns the
 
 =cut
 
@@ -440,7 +440,7 @@ Return the
 
     Array.cfrac2num()
 
-Return the
+Returns the
 
 =cut
 
@@ -448,7 +448,7 @@ Return the
 
     Array.change_to()
 
-Return the
+Returns the
 
 =cut
 
@@ -456,7 +456,7 @@ Return the
 
     Array.chrs()
 
-Return the
+Returns the
 
 Aliases: I<decode>, I<join_bytes>
 
@@ -466,7 +466,7 @@ Aliases: I<decode>, I<join_bytes>
 
     Array.circular_permutations()
 
-Return the
+Returns the
 
 =cut
 
@@ -474,7 +474,7 @@ Return the
 
     Array.clear()
 
-Return the
+Returns the
 
 =cut
 
@@ -482,7 +482,7 @@ Return the
 
     Array.collapse()
 
-Return the
+Returns the
 
 =cut
 
@@ -490,7 +490,7 @@ Return the
 
     Array.combinations()
 
-Return the
+Returns the
 
 =cut
 
@@ -498,7 +498,7 @@ Return the
 
     Array.combinations_with_repetition()
 
-Return the
+Returns the
 
 =cut
 
@@ -506,7 +506,7 @@ Return the
 
     Array.combine()
 
-Return the
+Returns the
 
 =cut
 
@@ -514,7 +514,7 @@ Return the
 
     Array.compact()
 
-Return the
+Returns the
 
 =cut
 
@@ -522,7 +522,7 @@ Return the
 
     Array.cons()
 
-Return the
+Returns the
 
 Aliases: I<map_cons>
 
@@ -532,7 +532,7 @@ Aliases: I<map_cons>
 
     Array.contains_all()
 
-Return the
+Returns the
 
 =cut
 
@@ -540,7 +540,7 @@ Return the
 
     Array.contains_any()
 
-Return the
+Returns the
 
 =cut
 
@@ -548,7 +548,7 @@ Return the
 
     Array.contains_type()
 
-Return the
+Returns the
 
 =cut
 
@@ -556,7 +556,7 @@ Return the
 
     Array.count()
 
-Return the
+Returns the
 
 =cut
 
@@ -564,7 +564,7 @@ Return the
 
     Array.count_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -572,7 +572,7 @@ Return the
 
     Array.cross_op()
 
-Return the
+Returns the
 
 Aliases: I<cross_operator>
 
@@ -582,7 +582,7 @@ Aliases: I<cross_operator>
 
     Array.defined()
 
-Return the
+Returns the
 
 =cut
 
@@ -590,7 +590,7 @@ Return the
 
     Array.delete()
 
-Return the
+Returns the
 
 Aliases: I<remove>
 
@@ -600,7 +600,7 @@ Aliases: I<remove>
 
     Array.delete_by()
 
-Return the
+Returns the
 
 Aliases: I<delete_if>, I<remove_by>, I<remove_if>
 
@@ -610,7 +610,7 @@ Aliases: I<delete_if>, I<remove_by>, I<remove_if>
 
     Array.delete_first()
 
-Return the
+Returns the
 
 Aliases: I<remove_first>
 
@@ -620,7 +620,7 @@ Aliases: I<remove_first>
 
     Array.delete_first_by()
 
-Return the
+Returns the
 
 Aliases: I<delete_first_if>, I<remove_first_by>, I<remove_first_if>
 
@@ -630,7 +630,7 @@ Aliases: I<delete_first_if>, I<remove_first_by>, I<remove_first_if>
 
     Array.delete_last()
 
-Return the
+Returns the
 
 Aliases: I<remove_last>
 
@@ -640,7 +640,7 @@ Aliases: I<remove_last>
 
     Array.delete_last_by()
 
-Return the
+Returns the
 
 Aliases: I<delete_last_if>, I<remove_last_by>, I<remove_last_if>
 
@@ -650,7 +650,7 @@ Aliases: I<delete_last_if>, I<remove_last_by>, I<remove_last_if>
 
     Array.derangements()
 
-Return the
+Returns the
 
 Aliases: I<complete_permutations>
 
@@ -660,7 +660,7 @@ Aliases: I<complete_permutations>
 
     Array.det()
 
-Return the
+Returns the
 
 Aliases: I<determinant>
 
@@ -670,7 +670,7 @@ Aliases: I<determinant>
 
     Array.det_bareiss()
 
-Return the
+Returns the
 
 =cut
 
@@ -678,7 +678,7 @@ Return the
 
     Array.diffs()
 
-Return the
+Returns the
 
 Aliases: I<differences>, I<nth_differences>
 
@@ -688,7 +688,7 @@ Aliases: I<differences>, I<nth_differences>
 
     Array.dig()
 
-Return the
+Returns the
 
 =cut
 
@@ -696,7 +696,7 @@ Return the
 
     Array.digits2num()
 
-Return the
+Returns the
 
 Aliases: I<from_digits>
 
@@ -706,7 +706,7 @@ Aliases: I<from_digits>
 
     Array.each_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -714,7 +714,7 @@ Return the
 
     Array.each_cons()
 
-Return the
+Returns the
 
 =cut
 
@@ -722,7 +722,7 @@ Return the
 
     Array.each_k()
 
-Return the
+Returns the
 
 Aliases: I<each_key>, I<each_index>
 
@@ -732,7 +732,7 @@ Aliases: I<each_key>, I<each_index>
 
     Array.each_kv()
 
-Return the
+Returns the
 
 =cut
 
@@ -740,7 +740,7 @@ Return the
 
     Array.each_slice()
 
-Return the
+Returns the
 
 =cut
 
@@ -748,7 +748,7 @@ Return the
 
     Array.end()
 
-Return the
+Returns the
 
 Aliases: I<offset>
 
@@ -758,7 +758,7 @@ Aliases: I<offset>
 
     Array.exists()
 
-Return the
+Returns the
 
 Aliases: I<has_index>
 
@@ -768,7 +768,7 @@ Aliases: I<has_index>
 
     Array.expand()
 
-Return the
+Returns the
 
 Aliases: I<expand_by>
 
@@ -778,7 +778,7 @@ Aliases: I<expand_by>
 
     Array.extract_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -786,7 +786,7 @@ Return the
 
     Array.extract_first_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -794,7 +794,7 @@ Return the
 
     Array.extract_last_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -802,7 +802,7 @@ Return the
 
     Array.fetch()
 
-Return the
+Returns the
 
 =cut
 
@@ -810,7 +810,7 @@ Return the
 
     Array.find()
 
-Return the
+Returns the
 
 Aliases: I<first_by>
 
@@ -820,7 +820,7 @@ Aliases: I<first_by>
 
     Array.flat()
 
-Return the
+Returns the
 
 Aliases: I<flatten>
 
@@ -830,7 +830,7 @@ Aliases: I<flatten>
 
     Array.flat_map()
 
-Return the
+Returns the
 
 =cut
 
@@ -838,7 +838,7 @@ Return the
 
     Array.flip()
 
-Return the
+Returns the
 
 Aliases: I<reverse>
 
@@ -848,7 +848,7 @@ Aliases: I<reverse>
 
     Array.for()
 
-Return the
+Returns the
 
 Aliases: I<each>, I<foreach>
 
@@ -858,7 +858,7 @@ Aliases: I<each>, I<foreach>
 
     Array.freq()
 
-Return the
+Returns the
 
 =cut
 
@@ -866,7 +866,7 @@ Return the
 
     Array.freq_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -874,7 +874,7 @@ Return the
 
     Array.ft()
 
-Return the
+Returns the
 
 Aliases: I<slice>
 
@@ -884,7 +884,7 @@ Aliases: I<slice>
 
     Array.gauss_jordan_invert()
 
-Return the
+Returns the
 
 =cut
 
@@ -892,7 +892,7 @@ Return the
 
     Array.gauss_jordan_solve()
 
-Return the
+Returns the
 
 =cut
 
@@ -900,7 +900,7 @@ Return the
 
     Array.gcd()
 
-Return the
+Returns the
 
 =cut
 
@@ -908,7 +908,7 @@ Return the
 
     Array.gcd_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -916,7 +916,7 @@ Return the
 
     Array.getopt()
 
-Return the
+Returns the
 
 =cut
 
@@ -924,7 +924,7 @@ Return the
 
     Array.grep()
 
-Return the
+Returns the
 
 Aliases: I<select>
 
@@ -934,7 +934,7 @@ Aliases: I<select>
 
     Array.grep_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -942,7 +942,7 @@ Return the
 
     Array.grep_kv()
 
-Return the
+Returns the
 
 Aliases: I<select_kv>
 
@@ -952,7 +952,7 @@ Aliases: I<select_kv>
 
     Array.group()
 
-Return the
+Returns the
 
 Aliases: I<group_by>
 
@@ -962,7 +962,7 @@ Aliases: I<group_by>
 
     Array.head()
 
-Return the
+Returns the
 
 Aliases: I<first>
 
@@ -972,7 +972,7 @@ Aliases: I<first>
 
     Array.index()
 
-Return the
+Returns the
 
 Aliases: I<index_by>, I<first_index>, I<first_index_by>
 
@@ -982,7 +982,7 @@ Aliases: I<index_by>, I<first_index>, I<first_index_by>
 
     Array.inject()
 
-Return the
+Returns the
 
 Aliases: I<reduce>
 
@@ -992,7 +992,7 @@ Aliases: I<reduce>
 
     Array.insert()
 
-Return the
+Returns the
 
 =cut
 
@@ -1000,7 +1000,7 @@ Return the
 
     Array.inv()
 
-Return the
+Returns the
 
 Aliases: I<invert>, I<inverse>
 
@@ -1010,7 +1010,7 @@ Aliases: I<invert>, I<inverse>
 
     Array.is_empty()
 
-Return the
+Returns the
 
 =cut
 
@@ -1018,7 +1018,7 @@ Return the
 
     Array.item()
 
-Return the
+Returns the
 
 =cut
 
@@ -1026,7 +1026,7 @@ Return the
 
     Array.items()
 
-Return the
+Returns the
 
 =cut
 
@@ -1034,7 +1034,7 @@ Return the
 
     Array.iter()
 
-Return the
+Returns the
 
 =cut
 
@@ -1042,7 +1042,7 @@ Return the
 
     Array.jaro_distance()
 
-Return the
+Returns the
 
 =cut
 
@@ -1050,7 +1050,7 @@ Return the
 
     Array.join()
 
-Return the
+Returns the
 
 =cut
 
@@ -1058,7 +1058,7 @@ Return the
 
     Array.join_insert()
 
-Return the
+Returns the
 
 =cut
 
@@ -1066,7 +1066,7 @@ Return the
 
     Array.keys()
 
-Return the
+Returns the
 
 Aliases: I<indices>
 
@@ -1076,7 +1076,7 @@ Aliases: I<indices>
 
     Array.keys_by()
 
-Return the
+Returns the
 
 Aliases: I<indices_by>
 
@@ -1086,7 +1086,7 @@ Aliases: I<indices_by>
 
     Array.keys_of()
 
-Return the
+Returns the
 
 Aliases: I<indices_of>
 
@@ -1096,7 +1096,7 @@ Aliases: I<indices_of>
 
     Array.kv()
 
-Return the
+Returns the
 
 Aliases: I<pairs>, I<zip_indices>
 
@@ -1106,7 +1106,7 @@ Aliases: I<pairs>, I<zip_indices>
 
     Array.last()
 
-Return the
+Returns the
 
 Aliases: I<tail>
 
@@ -1116,7 +1116,7 @@ Aliases: I<tail>
 
     Array.last_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1124,7 +1124,7 @@ Return the
 
     Array.last_uniq()
 
-Return the
+Returns the
 
 Aliases: I<last_unique>
 
@@ -1134,7 +1134,7 @@ Aliases: I<last_unique>
 
     Array.last_uniq_by()
 
-Return the
+Returns the
 
 Aliases: I<last_unique_by>
 
@@ -1144,7 +1144,7 @@ Aliases: I<last_unique_by>
 
     Array.lcm()
 
-Return the
+Returns the
 
 =cut
 
@@ -1152,7 +1152,7 @@ Return the
 
     Array.lcm_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1160,7 +1160,7 @@ Return the
 
     Array.len()
 
-Return the
+Returns the
 
 Aliases: I<size>, I<length>
 
@@ -1170,7 +1170,7 @@ Aliases: I<size>, I<length>
 
     Array.lev()
 
-Return the
+Returns the
 
 Aliases: I<leven>, I<levenshtein>
 
@@ -1180,7 +1180,7 @@ Aliases: I<leven>, I<levenshtein>
 
     Array.madd()
 
-Return the
+Returns the
 
 Aliases: I<matrix_add>
 
@@ -1190,7 +1190,7 @@ Aliases: I<matrix_add>
 
     Array.make()
 
-Return the
+Returns the
 
 =cut
 
@@ -1198,7 +1198,7 @@ Return the
 
     Array.make_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1206,7 +1206,7 @@ Return the
 
     Array.map()
 
-Return the
+Returns the
 
 Aliases: I<collect>
 
@@ -1216,7 +1216,7 @@ Aliases: I<collect>
 
     Array.map_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -1224,7 +1224,7 @@ Return the
 
     Array.map_kv()
 
-Return the
+Returns the
 
 Aliases: I<collect_kv>
 
@@ -1234,7 +1234,7 @@ Aliases: I<collect_kv>
 
     Array.map_op()
 
-Return the
+Returns the
 
 Aliases: I<map_operator>
 
@@ -1244,7 +1244,7 @@ Aliases: I<map_operator>
 
     Array.map_reduce()
 
-Return the
+Returns the
 
 Aliases: I<reduce_map>
 
@@ -1254,7 +1254,7 @@ Aliases: I<reduce_map>
 
     Array.match()
 
-Return the
+Returns the
 
 =cut
 
@@ -1262,7 +1262,7 @@ Return the
 
     Array.max()
 
-Return the
+Returns the
 
 =cut
 
@@ -1270,7 +1270,7 @@ Return the
 
     Array.max_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1278,7 +1278,7 @@ Return the
 
     Array.mdiv()
 
-Return the
+Returns the
 
 Aliases: I<matrix_div>
 
@@ -1288,7 +1288,7 @@ Aliases: I<matrix_div>
 
     Array.min()
 
-Return the
+Returns the
 
 =cut
 
@@ -1296,7 +1296,7 @@ Return the
 
     Array.min_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1304,7 +1304,7 @@ Return the
 
     Array.minmax()
 
-Return the
+Returns the
 
 =cut
 
@@ -1312,7 +1312,7 @@ Return the
 
     Array.mmul()
 
-Return the
+Returns the
 
 Aliases: I<matrix_mul>
 
@@ -1322,7 +1322,7 @@ Aliases: I<matrix_mul>
 
     Array.msolve()
 
-Return the
+Returns the
 
 Aliases: I<matrix_solve>
 
@@ -1332,7 +1332,7 @@ Aliases: I<matrix_solve>
 
     Array.msub()
 
-Return the
+Returns the
 
 Aliases: I<matrix_sub>
 
@@ -1342,7 +1342,7 @@ Aliases: I<matrix_sub>
 
     Array.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -1352,7 +1352,7 @@ Aliases: I<call>
 
     Array.next_permutation()
 
-Return the
+Returns the
 
 =cut
 
@@ -1360,7 +1360,7 @@ Return the
 
     Array.none()
 
-Return the
+Returns the
 
 =cut
 
@@ -1368,7 +1368,7 @@ Return the
 
     Array.nth_perm()
 
-Return the
+Returns the
 
 Aliases: I<nth_permutation>
 
@@ -1378,7 +1378,7 @@ Aliases: I<nth_permutation>
 
     Array.pack()
 
-Return the
+Returns the
 
 =cut
 
@@ -1386,7 +1386,7 @@ Return the
 
     Array.pair_map()
 
-Return the
+Returns the
 
 Aliases: I<pairmap>
 
@@ -1396,7 +1396,7 @@ Aliases: I<pairmap>
 
     Array.pam_op()
 
-Return the
+Returns the
 
 Aliases: I<pam_operator>
 
@@ -1406,7 +1406,7 @@ Aliases: I<pam_operator>
 
     Array.part()
 
-Return the
+Returns the
 
 Aliases: I<partition>
 
@@ -1416,7 +1416,7 @@ Aliases: I<partition>
 
     Array.partitions()
 
-Return the
+Returns the
 
 =cut
 
@@ -1424,7 +1424,7 @@ Return the
 
     Array.perm2num()
 
-Return the
+Returns the
 
 =cut
 
@@ -1432,7 +1432,7 @@ Return the
 
     Array.permutations()
 
-Return the
+Returns the
 
 =cut
 
@@ -1440,7 +1440,7 @@ Return the
 
     Array.pick()
 
-Return the
+Returns the
 
 =cut
 
@@ -1448,7 +1448,7 @@ Return the
 
     Array.pop_at()
 
-Return the
+Returns the
 
 Aliases: I<delete_at>, I<delete_index>
 
@@ -1458,7 +1458,7 @@ Aliases: I<delete_at>, I<delete_index>
 
     Array.pop_rand()
 
-Return the
+Returns the
 
 =cut
 
@@ -1466,7 +1466,7 @@ Return the
 
     Array.pop_while()
 
-Return the
+Returns the
 
 =cut
 
@@ -1474,7 +1474,7 @@ Return the
 
     Array.prepend()
 
-Return the
+Returns the
 
 Aliases: I<unshift>
 
@@ -1484,7 +1484,7 @@ Aliases: I<unshift>
 
     Array.prod()
 
-Return the
+Returns the
 
 =cut
 
@@ -1492,7 +1492,7 @@ Return the
 
     Array.prod_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -1500,7 +1500,7 @@ Return the
 
     Array.prod_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1508,7 +1508,7 @@ Return the
 
     Array.prod_kv()
 
-Return the
+Returns the
 
 =cut
 
@@ -1516,7 +1516,7 @@ Return the
 
     Array.rand()
 
-Return the
+Returns the
 
 Aliases: I<sample>
 
@@ -1526,7 +1526,7 @@ Aliases: I<sample>
 
     Array.range()
 
-Return the
+Returns the
 
 =cut
 
@@ -1534,7 +1534,7 @@ Return the
 
     Array.recmap()
 
-Return the
+Returns the
 
 =cut
 
@@ -1542,7 +1542,7 @@ Return the
 
     Array.reduce_op()
 
-Return the
+Returns the
 
 Aliases: I<reduce_operator>
 
@@ -1552,7 +1552,7 @@ Aliases: I<reduce_operator>
 
     Array.resize()
 
-Return the
+Returns the
 
 Aliases: I<resize_to>
 
@@ -1562,7 +1562,7 @@ Aliases: I<resize_to>
 
     Array.rindex()
 
-Return the
+Returns the
 
 Aliases: I<rindex_by>, I<last_index>, I<last_index_by>
 
@@ -1572,7 +1572,7 @@ Aliases: I<rindex_by>, I<last_index>, I<last_index_by>
 
     Array.rotate()
 
-Return the
+Returns the
 
 =cut
 
@@ -1580,7 +1580,7 @@ Return the
 
     Array.rref()
 
-Return the
+Returns the
 
 Aliases: I<reduced_row_echelon_form>
 
@@ -1590,7 +1590,7 @@ Aliases: I<reduced_row_echelon_form>
 
     Array.rscalar_op()
 
-Return the
+Returns the
 
 Aliases: I<rscalar_operator>
 
@@ -1600,7 +1600,7 @@ Aliases: I<rscalar_operator>
 
     Array.run_length()
 
-Return the
+Returns the
 
 Aliases: I<run_length_by>
 
@@ -1610,7 +1610,7 @@ Aliases: I<run_length_by>
 
     Array.sadd()
 
-Return the
+Returns the
 
 Aliases: I<scalar_add>
 
@@ -1620,7 +1620,7 @@ Aliases: I<scalar_add>
 
     Array.scalar_op()
 
-Return the
+Returns the
 
 Aliases: I<scalar_operator>
 
@@ -1630,7 +1630,7 @@ Aliases: I<scalar_operator>
 
     Array.sdiv()
 
-Return the
+Returns the
 
 Aliases: I<scalar_div>
 
@@ -1640,7 +1640,7 @@ Aliases: I<scalar_div>
 
     Array.segment()
 
-Return the
+Returns the
 
 =cut
 
@@ -1648,7 +1648,7 @@ Return the
 
     Array.segment_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1656,7 +1656,7 @@ Return the
 
     Array.shift()
 
-Return the
+Returns the
 
 Aliases: I<drop_left>, I<drop_first>
 
@@ -1666,7 +1666,7 @@ Aliases: I<drop_left>, I<drop_first>
 
     Array.shift_while()
 
-Return the
+Returns the
 
 =cut
 
@@ -1674,7 +1674,7 @@ Return the
 
     Array.shuffle()
 
-Return the
+Returns the
 
 =cut
 
@@ -1682,7 +1682,7 @@ Return the
 
     Array.slice_after()
 
-Return the
+Returns the
 
 =cut
 
@@ -1690,7 +1690,7 @@ Return the
 
     Array.slice_before()
 
-Return the
+Returns the
 
 =cut
 
@@ -1698,7 +1698,7 @@ Return the
 
     Array.slices()
 
-Return the
+Returns the
 
 Aliases: I<map_slice>
 
@@ -1708,7 +1708,7 @@ Aliases: I<map_slice>
 
     Array.smul()
 
-Return the
+Returns the
 
 Aliases: I<scalar_mul>
 
@@ -1718,7 +1718,7 @@ Aliases: I<scalar_mul>
 
     Array.sort()
 
-Return the
+Returns the
 
 =cut
 
@@ -1726,7 +1726,7 @@ Return the
 
     Array.sort_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1734,7 +1734,7 @@ Return the
 
     Array.splice()
 
-Return the
+Returns the
 
 =cut
 
@@ -1742,7 +1742,7 @@ Return the
 
     Array.split()
 
-Return the
+Returns the
 
 =cut
 
@@ -1750,7 +1750,7 @@ Return the
 
     Array.split_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1758,7 +1758,7 @@ Return the
 
     Array.ssub()
 
-Return the
+Returns the
 
 Aliases: I<scalar_sub>
 
@@ -1768,7 +1768,7 @@ Aliases: I<scalar_sub>
 
     Array.stack()
 
-Return the
+Returns the
 
 Aliases: I<stack_by>
 
@@ -1778,7 +1778,7 @@ Aliases: I<stack_by>
 
     Array.subsets()
 
-Return the
+Returns the
 
 =cut
 
@@ -1786,7 +1786,7 @@ Return the
 
     Array.sum()
 
-Return the
+Returns the
 
 =cut
 
@@ -1794,7 +1794,7 @@ Return the
 
     Array.sum_2d()
 
-Return the
+Returns the
 
 =cut
 
@@ -1802,7 +1802,7 @@ Return the
 
     Array.sum_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1810,7 +1810,7 @@ Return the
 
     Array.sum_kv()
 
-Return the
+Returns the
 
 =cut
 
@@ -1818,7 +1818,7 @@ Return the
 
     Array.swap()
 
-Return the
+Returns the
 
 =cut
 
@@ -1826,7 +1826,7 @@ Return the
 
     Array.take_left()
 
-Return the
+Returns the
 
 =cut
 
@@ -1834,7 +1834,7 @@ Return the
 
     Array.take_right()
 
-Return the
+Returns the
 
 =cut
 
@@ -1842,7 +1842,7 @@ Return the
 
     Array.to_a()
 
-Return the
+Returns the
 
 Aliases: I<to_array>
 
@@ -1852,7 +1852,7 @@ Aliases: I<to_array>
 
     Array.to_bag()
 
-Return the
+Returns the
 
 =cut
 
@@ -1860,7 +1860,7 @@ Return the
 
     Array.to_h()
 
-Return the
+Returns the
 
 Aliases: I<to_hash>
 
@@ -1870,7 +1870,7 @@ Aliases: I<to_hash>
 
     Array.to_m()
 
-Return the
+Returns the
 
 Aliases: I<to_matrix>
 
@@ -1880,7 +1880,7 @@ Aliases: I<to_matrix>
 
     Array.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 
@@ -1890,7 +1890,7 @@ Aliases: I<dump>, I<to_str>
 
     Array.to_set()
 
-Return the
+Returns the
 
 =cut
 
@@ -1898,7 +1898,7 @@ Return the
 
     Array.to_v()
 
-Return the
+Returns the
 
 Aliases: I<to_vector>
 
@@ -1908,7 +1908,7 @@ Aliases: I<to_vector>
 
     Array.tuples()
 
-Return the
+Returns the
 
 Aliases: I<variations>
 
@@ -1918,7 +1918,7 @@ Aliases: I<variations>
 
     Array.tuples_with_repetition()
 
-Return the
+Returns the
 
 Aliases: I<variations_with_repetition>
 
@@ -1928,7 +1928,7 @@ Aliases: I<variations_with_repetition>
 
     Array.uniq()
 
-Return the
+Returns the
 
 Aliases: I<unique>, I<distinct>
 
@@ -1938,7 +1938,7 @@ Aliases: I<unique>, I<distinct>
 
     Array.uniq_by()
 
-Return the
+Returns the
 
 Aliases: I<unique_by>
 
@@ -1948,7 +1948,7 @@ Aliases: I<unique_by>
 
     Array.uniq_permutations()
 
-Return the
+Returns the
 
 Aliases: I<unique_permutations>
 
@@ -1958,7 +1958,7 @@ Aliases: I<unique_permutations>
 
     Array.uniq_prefs()
 
-Return the
+Returns the
 
 Aliases: I<unique_prefixes>
 
@@ -1968,7 +1968,7 @@ Aliases: I<unique_prefixes>
 
     Array.unroll_op()
 
-Return the
+Returns the
 
 Aliases: I<unroll_operator>
 
@@ -1978,7 +1978,7 @@ Aliases: I<unroll_operator>
 
     Array.unzip_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1986,7 +1986,7 @@ Return the
 
     Array.weighted_shuffle_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -1994,7 +1994,7 @@ Return the
 
     Array.wise_op()
 
-Return the
+Returns the
 
 Aliases: I<wise_operator>
 
@@ -2004,7 +2004,7 @@ Aliases: I<wise_operator>
 
     Array.zip()
 
-Return the
+Returns the
 
 Aliases: I<transpose>
 
@@ -2014,7 +2014,7 @@ Aliases: I<transpose>
 
     Array.zip_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -2022,7 +2022,7 @@ Return the
 
     Array.zip_op()
 
-Return the
+Returns the
 
 Aliases: I<zip_operator>
 

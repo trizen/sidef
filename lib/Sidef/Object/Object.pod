@@ -26,7 +26,7 @@ Inherits methods from:
 
     a !~ b
 
-Return the
+Returns the
 
 =cut
 
@@ -34,7 +34,7 @@ Return the
 
     a && b
 
-Return the
+Returns the
 
 =cut
 
@@ -42,7 +42,7 @@ Return the
 
     a : b
 
-Return the
+Returns the
 
 =cut
 
@@ -50,7 +50,7 @@ Return the
 
     a \\ b
 
-Return the
+Returns the
 
 =cut
 
@@ -58,7 +58,7 @@ Return the
 
     a ^ b
 
-Return the
+Returns the
 
 =cut
 
@@ -66,7 +66,7 @@ Return the
 
     a |> b
 
-Return the
+Returns the
 
 =cut
 
@@ -74,7 +74,7 @@ Return the
 
     a || b
 
-Return the
+Returns the
 
 =cut
 
@@ -82,7 +82,7 @@ Return the
 
     a ~~ b
 
-Return the
+Returns the
 
 =cut
 
@@ -90,7 +90,7 @@ Return the
 
     a ⫶ b
 
-Return the
+Returns the
 
 =cut
 
@@ -98,7 +98,7 @@ Return the
 
     a ： b
 
-Return the
+Returns the
 
 =cut
 
@@ -106,7 +106,7 @@ Return the
 
     Object.alias_method()
 
-Return the
+Returns the
 
 =cut
 
@@ -114,7 +114,7 @@ Return the
 
     Object.bless()
 
-Return the
+Returns the
 
 =cut
 
@@ -122,7 +122,7 @@ Return the
 
     Object.class()
 
-Return the
+Returns the
 
 =cut
 
@@ -130,7 +130,7 @@ Return the
 
     Object.clone()
 
-Return the
+Returns the
 
 =cut
 
@@ -138,7 +138,7 @@ Return the
 
     Object.dclone()
 
-Return the
+Returns the
 
 Aliases: I<deep_clone>
 
@@ -148,7 +148,7 @@ Aliases: I<deep_clone>
 
     Object.def_method()
 
-Return the
+Returns the
 
 =cut
 
@@ -156,7 +156,7 @@ Return the
 
     Object.dump()
 
-Return the
+Returns the
 
 =cut
 
@@ -164,7 +164,7 @@ Return the
 
     Object.interpolate()
 
-Return the
+Returns the
 
 =cut
 
@@ -172,7 +172,7 @@ Return the
 
     Object.is_a()
 
-Return the
+Returns the
 
 Aliases: I<is_an>, I<kind_of>
 
@@ -182,7 +182,7 @@ Aliases: I<is_an>, I<kind_of>
 
     Object.is_object()
 
-Return the
+Returns the
 
 =cut
 
@@ -190,7 +190,7 @@ Return the
 
     Object.is_typename()
 
-Return the
+Returns the
 
 =cut
 
@@ -198,7 +198,7 @@ Return the
 
     Object.lazy()
 
-Return the
+Returns the
 
 =cut
 
@@ -206,7 +206,7 @@ Return the
 
     Object.method()
 
-Return the
+Returns the
 
 =cut
 
@@ -214,7 +214,7 @@ Return the
 
     Object.methods()
 
-Return the
+Returns the
 
 =cut
 
@@ -222,7 +222,7 @@ Return the
 
     Object.new()
 
-Return the
+Returns the
 
 =cut
 
@@ -230,7 +230,7 @@ Return the
 
     Object.parent_classes()
 
-Return the
+Returns the
 
 =cut
 
@@ -238,7 +238,7 @@ Return the
 
     Object.print()
 
-Return the
+Returns the
 
 =cut
 
@@ -246,7 +246,7 @@ Return the
 
     Object.ref()
 
-Return the
+Returns the
 
 =cut
 
@@ -254,7 +254,7 @@ Return the
 
     Object.refaddr()
 
-Return the
+Returns the
 
 Aliases: I<object_id>
 
@@ -264,7 +264,7 @@ Aliases: I<object_id>
 
     Object.reftype()
 
-Return the
+Returns the
 
 Aliases: I<object_type>
 
@@ -274,7 +274,7 @@ Aliases: I<object_type>
 
     Object.respond_to()
 
-Return the
+Returns the
 
 =cut
 
@@ -282,7 +282,7 @@ Return the
 
     Object.say()
 
-Return the
+Returns the
 
 Aliases: I<println>
 
@@ -292,6 +292,6 @@ Aliases: I<println>
 
     Object.undef_method()
 
-Return the
+Returns the
 
 =cut

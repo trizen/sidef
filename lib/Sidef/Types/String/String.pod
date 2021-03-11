@@ -26,7 +26,7 @@ Inherits methods from:
 
     a % b
 
-Return the
+Returns the
 
 Aliases: I<sprintf>
 
@@ -36,7 +36,7 @@ Aliases: I<sprintf>
 
     a & b
 
-Return the
+Returns the
 
 Aliases: I<and>
 
@@ -46,7 +46,7 @@ Aliases: I<and>
 
     a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -56,7 +56,7 @@ Aliases: I<mul>
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<add>, I<append>, I<concat>
 
@@ -66,7 +66,7 @@ Aliases: I<add>, I<append>, I<concat>
 
     a ++ b
 
-Return the
+Returns the
 
 Aliases: I<inc>
 
@@ -76,7 +76,7 @@ Aliases: I<inc>
 
     a - b
 
-Return the
+Returns the
 
 Aliases: I<diff>
 
@@ -86,7 +86,7 @@ Aliases: I<diff>
 
     a .. b
 
-Return the
+Returns the
 
 Aliases: I<to>, I<upto>
 
@@ -96,7 +96,7 @@ Aliases: I<to>, I<upto>
 
     a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -106,7 +106,7 @@ Aliases: I<÷>, I<div>
 
     a < b
 
-Return the
+Returns the
 
 Aliases: I<lt>
 
@@ -116,7 +116,7 @@ Aliases: I<lt>
 
     a << b
 
-Return the
+Returns the
 
 Aliases: I<drop_left>, I<shift_left>
 
@@ -126,7 +126,7 @@ Aliases: I<drop_left>, I<shift_left>
 
     a <=> b
 
-Return the
+Returns the
 
 Aliases: I<cmp>
 
@@ -136,7 +136,7 @@ Aliases: I<cmp>
 
     a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -146,7 +146,7 @@ Aliases: I<eq>
 
     a =~ b
 
-Return the
+Returns the
 
 Aliases: I<match>
 
@@ -156,7 +156,7 @@ Aliases: I<match>
 
     a > b
 
-Return the
+Returns the
 
 Aliases: I<gt>
 
@@ -166,7 +166,7 @@ Aliases: I<gt>
 
     a >> b
 
-Return the
+Returns the
 
 Aliases: I<drop_right>, I<shift_right>
 
@@ -176,7 +176,7 @@ Aliases: I<drop_right>, I<shift_right>
 
     a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>
 
@@ -186,7 +186,7 @@ Aliases: I<xor>
 
     a | b
 
-Return the
+Returns the
 
 Aliases: I<or>
 
@@ -196,7 +196,7 @@ Aliases: I<or>
 
     a ~ b
 
-Return the
+Returns the
 
 Aliases: I<not>
 
@@ -206,7 +206,7 @@ Aliases: I<not>
 
     a ≠ b
 
-Return the
+Returns the
 
 Aliases: I<!=>, I<ne>
 
@@ -216,7 +216,7 @@ Aliases: I<!=>, I<ne>
 
     a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -226,7 +226,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -236,7 +236,7 @@ Aliases: I<E<gt>=>, I<ge>
 
     String.apply_escapes()
 
-Return the
+Returns the
 
 =cut
 
@@ -244,7 +244,7 @@ Return the
 
     String.backtick()
 
-Return the
+Returns the
 
 =cut
 
@@ -252,7 +252,7 @@ Return the
 
     String.base64_decode()
 
-Return the
+Returns the
 
 Aliases: I<decode_base64>
 
@@ -262,7 +262,7 @@ Aliases: I<decode_base64>
 
     String.base64_encode()
 
-Return the
+Returns the
 
 Aliases: I<encode_base64>
 
@@ -272,7 +272,7 @@ Aliases: I<encode_base64>
 
     String.begins_with()
 
-Return the
+Returns the
 
 Aliases: I<starts_with>
 
@@ -282,7 +282,7 @@ Aliases: I<starts_with>
 
     String.bin()
 
-Return the
+Returns the
 
 =cut
 
@@ -290,7 +290,7 @@ Return the
 
     String.bytes()
 
-Return the
+Returns the
 
 =cut
 
@@ -298,7 +298,7 @@ Return the
 
     String.bytes_len()
 
-Return the
+Returns the
 
 Aliases: I<bytes_length>
 
@@ -308,7 +308,7 @@ Aliases: I<bytes_length>
 
     String.center()
 
-Return the
+Returns the
 
 =cut
 
@@ -316,7 +316,7 @@ Return the
 
     String.char()
 
-Return the
+Returns the
 
 Aliases: I<char_at>
 
@@ -326,7 +326,7 @@ Aliases: I<char_at>
 
     String.chars()
 
-Return the
+Returns the
 
 =cut
 
@@ -334,7 +334,7 @@ Return the
 
     String.chomp()
 
-Return the
+Returns the
 
 =cut
 
@@ -342,7 +342,7 @@ Return the
 
     String.chop()
 
-Return the
+Returns the
 
 =cut
 
@@ -350,7 +350,7 @@ Return the
 
     String.clear()
 
-Return the
+Returns the
 
 =cut
 
@@ -358,7 +358,7 @@ Return the
 
     String.collect()
 
-Return the
+Returns the
 
 Aliases: I<find_all>, I<findall>
 
@@ -368,7 +368,7 @@ Aliases: I<find_all>, I<findall>
 
     String.count()
 
-Return the
+Returns the
 
 =cut
 
@@ -376,7 +376,7 @@ Return the
 
     String.crypt()
 
-Return the
+Returns the
 
 =cut
 
@@ -384,7 +384,7 @@ Return the
 
     String.decode()
 
-Return the
+Returns the
 
 =cut
 
@@ -392,7 +392,7 @@ Return the
 
     String.decode_utf8()
 
-Return the
+Returns the
 
 =cut
 
@@ -400,7 +400,7 @@ Return the
 
     String.die()
 
-Return the
+Returns the
 
 =cut
 
@@ -408,7 +408,7 @@ Return the
 
     String.digits()
 
-Return the
+Returns the
 
 =cut
 
@@ -416,7 +416,7 @@ Return the
 
     String.downto()
 
-Return the
+Returns the
 
 =cut
 
@@ -424,7 +424,7 @@ Return the
 
     String.dump()
 
-Return the
+Returns the
 
 Aliases: I<inspect>
 
@@ -434,7 +434,7 @@ Aliases: I<inspect>
 
     String.each()
 
-Return the
+Returns the
 
 Aliases: I<each_char>
 
@@ -444,7 +444,7 @@ Aliases: I<each_char>
 
     String.each_byte()
 
-Return the
+Returns the
 
 =cut
 
@@ -452,7 +452,7 @@ Return the
 
     String.each_graph()
 
-Return the
+Returns the
 
 Aliases: I<each_grapheme>
 
@@ -462,7 +462,7 @@ Aliases: I<each_grapheme>
 
     String.each_line()
 
-Return the
+Returns the
 
 =cut
 
@@ -470,7 +470,7 @@ Return the
 
     String.each_num()
 
-Return the
+Returns the
 
 Aliases: I<each_number>
 
@@ -480,7 +480,7 @@ Aliases: I<each_number>
 
     String.each_word()
 
-Return the
+Returns the
 
 =cut
 
@@ -488,7 +488,7 @@ Return the
 
     String.encode()
 
-Return the
+Returns the
 
 =cut
 
@@ -496,7 +496,7 @@ Return the
 
     String.encode_utf8()
 
-Return the
+Returns the
 
 =cut
 
@@ -504,7 +504,7 @@ Return the
 
     String.ends_with()
 
-Return the
+Returns the
 
 =cut
 
@@ -512,7 +512,7 @@ Return the
 
     String.escape()
 
-Return the
+Returns the
 
 Aliases: I<quotemeta>
 
@@ -522,7 +522,7 @@ Aliases: I<quotemeta>
 
     String.esub()
 
-Return the
+Returns the
 
 =cut
 
@@ -530,7 +530,7 @@ Return the
 
     String.extract_bracketed()
 
-Return the
+Returns the
 
 =cut
 
@@ -538,7 +538,7 @@ Return the
 
     String.extract_codeblock()
 
-Return the
+Returns the
 
 =cut
 
@@ -546,7 +546,7 @@ Return the
 
     String.extract_delimited()
 
-Return the
+Returns the
 
 =cut
 
@@ -554,7 +554,7 @@ Return the
 
     String.extract_quotelike()
 
-Return the
+Returns the
 
 =cut
 
@@ -562,7 +562,7 @@ Return the
 
     String.extract_tagged()
 
-Return the
+Returns the
 
 =cut
 
@@ -570,7 +570,7 @@ Return the
 
     String.fc()
 
-Return the
+Returns the
 
 Aliases: I<foldcase>
 
@@ -580,7 +580,7 @@ Aliases: I<foldcase>
 
     String.first()
 
-Return the
+Returns the
 
 =cut
 
@@ -588,7 +588,7 @@ Return the
 
     String.flip()
 
-Return the
+Returns the
 
 Aliases: I<reverse>
 
@@ -598,7 +598,7 @@ Aliases: I<reverse>
 
     String.format()
 
-Return the
+Returns the
 
 =cut
 
@@ -606,7 +606,7 @@ Return the
 
     String.frequire()
 
-Return the
+Returns the
 
 =cut
 
@@ -614,7 +614,7 @@ Return the
 
     String.ft()
 
-Return the
+Returns the
 
 Aliases: I<slice>
 
@@ -624,7 +624,7 @@ Aliases: I<slice>
 
     String.gesub()
 
-Return the
+Returns the
 
 =cut
 
@@ -632,7 +632,7 @@ Return the
 
     String.glob()
 
-Return the
+Returns the
 
 =cut
 
@@ -640,7 +640,7 @@ Return the
 
     String.gmatch()
 
-Return the
+Returns the
 
 =cut
 
@@ -648,7 +648,7 @@ Return the
 
     String.graphs()
 
-Return the
+Returns the
 
 Aliases: I<graphemes>
 
@@ -658,7 +658,7 @@ Aliases: I<graphemes>
 
     String.graphs_len()
 
-Return the
+Returns the
 
 Aliases: I<graphs_length>
 
@@ -668,7 +668,7 @@ Aliases: I<graphs_length>
 
     String.gsub()
 
-Return the
+Returns the
 
 Aliases: I<replace_all>
 
@@ -678,7 +678,7 @@ Aliases: I<replace_all>
 
     String.has()
 
-Return the
+Returns the
 
 Aliases: I<contain>, I<include>, I<contains>, I<includes>
 
@@ -688,7 +688,7 @@ Aliases: I<contain>, I<include>, I<contains>, I<includes>
 
     String.hex()
 
-Return the
+Returns the
 
 =cut
 
@@ -696,7 +696,7 @@ Return the
 
     String.index()
 
-Return the
+Returns the
 
 =cut
 
@@ -704,7 +704,7 @@ Return the
 
     String.insert()
 
-Return the
+Returns the
 
 =cut
 
@@ -712,7 +712,7 @@ Return the
 
     String.ints()
 
-Return the
+Returns the
 
 Aliases: I<integers>
 
@@ -722,7 +722,7 @@ Aliases: I<integers>
 
     String.is_alnum()
 
-Return the
+Returns the
 
 Aliases: I<is_alphanum>
 
@@ -732,7 +732,7 @@ Aliases: I<is_alphanum>
 
     String.is_alpha()
 
-Return the
+Returns the
 
 =cut
 
@@ -740,7 +740,7 @@ Return the
 
     String.is_ascii()
 
-Return the
+Returns the
 
 =cut
 
@@ -748,7 +748,7 @@ Return the
 
     String.is_digit()
 
-Return the
+Returns the
 
 =cut
 
@@ -756,7 +756,7 @@ Return the
 
     String.is_empty()
 
-Return the
+Returns the
 
 =cut
 
@@ -764,7 +764,7 @@ Return the
 
     String.is_lc()
 
-Return the
+Returns the
 
 Aliases: I<is_lowercase>
 
@@ -774,7 +774,7 @@ Aliases: I<is_lowercase>
 
     String.is_numeric()
 
-Return the
+Returns the
 
 Aliases: I<looks_like_number>
 
@@ -784,7 +784,7 @@ Aliases: I<looks_like_number>
 
     String.is_palindrome()
 
-Return the
+Returns the
 
 =cut
 
@@ -792,7 +792,7 @@ Return the
 
     String.is_punct()
 
-Return the
+Returns the
 
 Aliases: I<is_punctuation>
 
@@ -802,7 +802,7 @@ Aliases: I<is_punctuation>
 
     String.is_space()
 
-Return the
+Returns the
 
 =cut
 
@@ -810,7 +810,7 @@ Return the
 
     String.is_uc()
 
-Return the
+Returns the
 
 Aliases: I<is_uppercase>
 
@@ -820,7 +820,7 @@ Aliases: I<is_uppercase>
 
     String.is_word()
 
-Return the
+Returns the
 
 =cut
 
@@ -828,7 +828,7 @@ Return the
 
     String.iter()
 
-Return the
+Returns the
 
 =cut
 
@@ -836,7 +836,7 @@ Return the
 
     String.jaro_distance()
 
-Return the
+Returns the
 
 =cut
 
@@ -844,7 +844,7 @@ Return the
 
     String.join()
 
-Return the
+Returns the
 
 =cut
 
@@ -852,7 +852,7 @@ Return the
 
     String.last()
 
-Return the
+Returns the
 
 =cut
 
@@ -860,7 +860,7 @@ Return the
 
     String.lc()
 
-Return the
+Returns the
 
 Aliases: I<lower>, I<downcase>
 
@@ -870,7 +870,7 @@ Aliases: I<lower>, I<downcase>
 
     String.lcfirst()
 
-Return the
+Returns the
 
 =cut
 
@@ -878,7 +878,7 @@ Return the
 
     String.len()
 
-Return the
+Returns the
 
 Aliases: I<size>, I<length>, I<chars_len>, I<chars_length>
 
@@ -888,7 +888,7 @@ Aliases: I<size>, I<length>, I<chars_len>, I<chars_length>
 
     String.lev()
 
-Return the
+Returns the
 
 Aliases: I<leven>, I<levenshtein>
 
@@ -898,7 +898,7 @@ Aliases: I<leven>, I<levenshtein>
 
     String.lines()
 
-Return the
+Returns the
 
 =cut
 
@@ -906,7 +906,7 @@ Return the
 
     String.ltrim()
 
-Return the
+Returns the
 
 Aliases: I<lstrip>, I<trim_beg>, I<strip_beg>, I<trim_left>, I<strip_left>
 
@@ -916,7 +916,7 @@ Aliases: I<lstrip>, I<trim_beg>, I<strip_beg>, I<trim_left>, I<strip_left>
 
     String.md5()
 
-Return the
+Returns the
 
 =cut
 
@@ -924,7 +924,7 @@ Return the
 
     String.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -934,7 +934,7 @@ Aliases: I<call>
 
     String.num()
 
-Return the
+Returns the
 
 Aliases: I<to_n>, I<to_num>
 
@@ -944,7 +944,7 @@ Aliases: I<to_n>, I<to_num>
 
     String.nums()
 
-Return the
+Returns the
 
 Aliases: I<numbers>
 
@@ -954,7 +954,7 @@ Aliases: I<numbers>
 
     String.oct()
 
-Return the
+Returns the
 
 =cut
 
@@ -962,7 +962,7 @@ Return the
 
     String.open()
 
-Return the
+Returns the
 
 =cut
 
@@ -970,7 +970,7 @@ Return the
 
     String.open_r()
 
-Return the
+Returns the
 
 =cut
 
@@ -978,7 +978,7 @@ Return the
 
     String.ord()
 
-Return the
+Returns the
 
 =cut
 
@@ -986,7 +986,7 @@ Return the
 
     String.overlaps()
 
-Return the
+Returns the
 
 =cut
 
@@ -994,7 +994,7 @@ Return the
 
     String.pack()
 
-Return the
+Returns the
 
 =cut
 
@@ -1002,7 +1002,7 @@ Return the
 
     String.parse_quotewords()
 
-Return the
+Returns the
 
 =cut
 
@@ -1010,7 +1010,7 @@ Return the
 
     String.pipe()
 
-Return the
+Returns the
 
 =cut
 
@@ -1018,7 +1018,7 @@ Return the
 
     String.pop()
 
-Return the
+Returns the
 
 =cut
 
@@ -1026,7 +1026,7 @@ Return the
 
     String.prepend()
 
-Return the
+Returns the
 
 =cut
 
@@ -1034,7 +1034,7 @@ Return the
 
     String.printf()
 
-Return the
+Returns the
 
 =cut
 
@@ -1042,7 +1042,7 @@ Return the
 
     String.printlnf()
 
-Return the
+Returns the
 
 =cut
 
@@ -1050,7 +1050,7 @@ Return the
 
     String.range()
 
-Return the
+Returns the
 
 =cut
 
@@ -1058,7 +1058,7 @@ Return the
 
     String.repeat()
 
-Return the
+Returns the
 
 =cut
 
@@ -1066,7 +1066,7 @@ Return the
 
     String.require()
 
-Return the
+Returns the
 
 =cut
 
@@ -1074,7 +1074,7 @@ Return the
 
     String.rindex()
 
-Return the
+Returns the
 
 =cut
 
@@ -1082,7 +1082,7 @@ Return the
 
     String.rotate()
 
-Return the
+Returns the
 
 =cut
 
@@ -1090,7 +1090,7 @@ Return the
 
     String.rtrim()
 
-Return the
+Returns the
 
 Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
 
@@ -1100,7 +1100,7 @@ Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
 
     String.run()
 
-Return the
+Returns the
 
 =cut
 
@@ -1108,7 +1108,7 @@ Return the
 
     String.scan()
 
-Return the
+Returns the
 
 =cut
 
@@ -1116,7 +1116,7 @@ Return the
 
     String.sha1()
 
-Return the
+Returns the
 
 =cut
 
@@ -1124,7 +1124,7 @@ Return the
 
     String.sha256()
 
-Return the
+Returns the
 
 =cut
 
@@ -1132,7 +1132,7 @@ Return the
 
     String.sha512()
 
-Return the
+Returns the
 
 =cut
 
@@ -1140,7 +1140,7 @@ Return the
 
     String.sort()
 
-Return the
+Returns the
 
 =cut
 
@@ -1148,7 +1148,7 @@ Return the
 
     String.split()
 
-Return the
+Returns the
 
 =cut
 
@@ -1156,7 +1156,7 @@ Return the
 
     String.sprintlnf()
 
-Return the
+Returns the
 
 =cut
 
@@ -1164,7 +1164,7 @@ Return the
 
     String.sub()
 
-Return the
+Returns the
 
 Aliases: I<replace>
 
@@ -1174,7 +1174,7 @@ Aliases: I<replace>
 
     String.substr()
 
-Return the
+Returns the
 
 Aliases: I<substring>
 
@@ -1184,7 +1184,7 @@ Aliases: I<substring>
 
     String.tc()
 
-Return the
+Returns the
 
 Aliases: I<ucfirst>, I<titlecase>
 
@@ -1194,7 +1194,7 @@ Aliases: I<ucfirst>, I<titlecase>
 
     String.tclc()
 
-Return the
+Returns the
 
 Aliases: I<capitalize>
 
@@ -1204,7 +1204,7 @@ Aliases: I<capitalize>
 
     String.to_i()
 
-Return the
+Returns the
 
 Aliases: I<to_int>
 
@@ -1214,7 +1214,7 @@ Aliases: I<to_int>
 
     String.to_s()
 
-Return the
+Returns the
 
 Aliases: I<to_str>
 
@@ -1224,7 +1224,7 @@ Aliases: I<to_str>
 
     String.tr()
 
-Return the
+Returns the
 
 Aliases: I<translit>
 
@@ -1234,7 +1234,7 @@ Aliases: I<translit>
 
     String.trans()
 
-Return the
+Returns the
 
 =cut
 
@@ -1242,7 +1242,7 @@ Return the
 
     String.trim()
 
-Return the
+Returns the
 
 Aliases: I<strip>
 
@@ -1252,7 +1252,7 @@ Aliases: I<strip>
 
     String.uc()
 
-Return the
+Returns the
 
 Aliases: I<upper>, I<upcase>
 
@@ -1262,7 +1262,7 @@ Aliases: I<upper>, I<upcase>
 
     String.unescape()
 
-Return the
+Returns the
 
 =cut
 
@@ -1270,7 +1270,7 @@ Return the
 
     String.unpack()
 
-Return the
+Returns the
 
 =cut
 
@@ -1278,7 +1278,7 @@ Return the
 
     String.warn()
 
-Return the
+Returns the
 
 =cut
 
@@ -1286,7 +1286,7 @@ Return the
 
     String.wc()
 
-Return the
+Returns the
 
 Aliases: I<wordcase>
 
@@ -1296,6 +1296,6 @@ Aliases: I<wordcase>
 
     String.words()
 
-Return the
+Returns the
 
 =cut

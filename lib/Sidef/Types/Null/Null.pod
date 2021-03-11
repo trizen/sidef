@@ -26,7 +26,7 @@ Inherits methods from:
 
     Null.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -36,7 +36,7 @@ Aliases: I<call>
 
     Null.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 

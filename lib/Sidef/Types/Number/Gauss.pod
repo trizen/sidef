@@ -26,7 +26,7 @@ Inherits methods from:
 
     a != b
 
-Return the
+Returns the
 
 Aliases: I<ne>
 
@@ -36,7 +36,7 @@ Aliases: I<ne>
 
     a % b
 
-Return the
+Returns the
 
 Aliases: I<mod>
 
@@ -46,7 +46,7 @@ Aliases: I<mod>
 
     a & b
 
-Return the
+Returns the
 
 Aliases: I<and>
 
@@ -56,7 +56,7 @@ Aliases: I<and>
 
     a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -66,7 +66,7 @@ Aliases: I<mul>
 
     a ** b
 
-Return the
+Returns the
 
 Aliases: I<pow>
 
@@ -76,7 +76,7 @@ Aliases: I<pow>
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<add>
 
@@ -86,7 +86,7 @@ Aliases: I<add>
 
     a ++ b
 
-Return the
+Returns the
 
 Aliases: I<inc>
 
@@ -96,7 +96,7 @@ Aliases: I<inc>
 
     a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>
 
@@ -106,7 +106,7 @@ Aliases: I<sub>
 
     a -- b
 
-Return the
+Returns the
 
 Aliases: I<dec>
 
@@ -116,7 +116,7 @@ Aliases: I<dec>
 
     a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -126,7 +126,7 @@ Aliases: I<÷>, I<div>
 
     a < b
 
-Return the
+Returns the
 
 Aliases: I<lt>
 
@@ -136,7 +136,7 @@ Aliases: I<lt>
 
     a << b
 
-Return the
+Returns the
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -146,7 +146,7 @@ Aliases: I<lsft>, I<shift_left>
 
     a <=> b
 
-Return the
+Returns the
 
 Aliases: I<cmp>
 
@@ -156,7 +156,7 @@ Aliases: I<cmp>
 
     a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -166,7 +166,7 @@ Aliases: I<eq>
 
     a > b
 
-Return the
+Returns the
 
 Aliases: I<gt>
 
@@ -176,7 +176,7 @@ Aliases: I<gt>
 
     a >> b
 
-Return the
+Returns the
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -186,7 +186,7 @@ Aliases: I<rsft>, I<shift_right>
 
     a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>
 
@@ -196,7 +196,7 @@ Aliases: I<xor>
 
     a | b
 
-Return the
+Returns the
 
 Aliases: I<or>
 
@@ -206,7 +206,7 @@ Aliases: I<or>
 
     a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -216,7 +216,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -226,7 +226,7 @@ Aliases: I<E<gt>=>, I<ge>
 
     Gauss.a()
 
-Return the
+Returns the
 
 Aliases: I<re>, I<real>
 
@@ -236,7 +236,7 @@ Aliases: I<re>, I<real>
 
     Gauss.abs()
 
-Return the
+Returns the
 
 =cut
 
@@ -244,7 +244,7 @@ Return the
 
     Gauss.b()
 
-Return the
+Returns the
 
 Aliases: I<im>, I<imag>
 
@@ -254,7 +254,7 @@ Aliases: I<im>, I<imag>
 
     Gauss.ceil()
 
-Return the
+Returns the
 
 =cut
 
@@ -262,7 +262,7 @@ Return the
 
     Gauss.conj()
 
-Return the
+Returns the
 
 =cut
 
@@ -270,7 +270,7 @@ Return the
 
     Gauss.dump()
 
-Return the
+Returns the
 
 =cut
 
@@ -278,7 +278,7 @@ Return the
 
     Gauss.float()
 
-Return the
+Returns the
 
 =cut
 
@@ -286,7 +286,7 @@ Return the
 
     Gauss.floor()
 
-Return the
+Returns the
 
 =cut
 
@@ -294,7 +294,7 @@ Return the
 
     Gauss.gcd()
 
-Return the
+Returns the
 
 =cut
 
@@ -302,7 +302,7 @@ Return the
 
     Gauss.gcd_norm()
 
-Return the
+Returns the
 
 =cut
 
@@ -310,7 +310,7 @@ Return the
 
     Gauss.i()
 
-Return the
+Returns the
 
 =cut
 
@@ -318,7 +318,7 @@ Return the
 
     Gauss.iabs()
 
-Return the
+Returns the
 
 =cut
 
@@ -326,7 +326,7 @@ Return the
 
     Gauss.inv()
 
-Return the
+Returns the
 
 =cut
 
@@ -334,7 +334,7 @@ Return the
 
     Gauss.invmod()
 
-Return the
+Returns the
 
 =cut
 
@@ -342,7 +342,7 @@ Return the
 
     Gauss.is_coprime()
 
-Return the
+Returns the
 
 =cut
 
@@ -350,7 +350,7 @@ Return the
 
     Gauss.is_imag()
 
-Return the
+Returns the
 
 =cut
 
@@ -358,7 +358,7 @@ Return the
 
     Gauss.is_mone()
 
-Return the
+Returns the
 
 =cut
 
@@ -366,7 +366,7 @@ Return the
 
     Gauss.is_one()
 
-Return the
+Returns the
 
 =cut
 
@@ -374,7 +374,7 @@ Return the
 
     Gauss.is_prime()
 
-Return the
+Returns the
 
 =cut
 
@@ -382,7 +382,7 @@ Return the
 
     Gauss.is_real()
 
-Return the
+Returns the
 
 =cut
 
@@ -390,7 +390,7 @@ Return the
 
     Gauss.is_zero()
 
-Return the
+Returns the
 
 =cut
 
@@ -398,7 +398,7 @@ Return the
 
     Gauss.neg()
 
-Return the
+Returns the
 
 =cut
 
@@ -406,7 +406,7 @@ Return the
 
     Gauss.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -416,7 +416,7 @@ Aliases: I<call>
 
     Gauss.norm()
 
-Return the
+Returns the
 
 =cut
 
@@ -424,7 +424,7 @@ Return the
 
     Gauss.parts()
 
-Return the
+Returns the
 
 =cut
 
@@ -432,7 +432,7 @@ Return the
 
     Gauss.powmod()
 
-Return the
+Returns the
 
 =cut
 
@@ -440,7 +440,7 @@ Return the
 
     Gauss.reals()
 
-Return the
+Returns the
 
 =cut
 
@@ -448,7 +448,7 @@ Return the
 
     Gauss.round()
 
-Return the
+Returns the
 
 =cut
 
@@ -456,7 +456,7 @@ Return the
 
     Gauss.sgn()
 
-Return the
+Returns the
 
 =cut
 
@@ -464,7 +464,7 @@ Return the
 
     Gauss.sqr()
 
-Return the
+Returns the
 
 =cut
 
@@ -472,7 +472,7 @@ Return the
 
     Gauss.to_c()
 
-Return the
+Returns the
 
 Aliases: I<to_n>
 
@@ -482,6 +482,6 @@ Aliases: I<to_n>
 
     Gauss.to_s()
 
-Return the
+Returns the
 
 =cut

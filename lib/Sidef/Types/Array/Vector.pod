@@ -26,7 +26,7 @@ Inherits methods from:
 
     a & b
 
-Return the
+Returns the
 
 Aliases: I<and>
 
@@ -36,7 +36,7 @@ Aliases: I<and>
 
     a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -46,7 +46,7 @@ Aliases: I<mul>
 
     a ** b
 
-Return the
+Returns the
 
 Aliases: I<pow>
 
@@ -56,7 +56,7 @@ Aliases: I<pow>
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<add>
 
@@ -66,7 +66,7 @@ Aliases: I<add>
 
     a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>
 
@@ -76,7 +76,7 @@ Aliases: I<sub>
 
     a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -86,7 +86,7 @@ Aliases: I<÷>, I<div>
 
     a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>
 
@@ -96,7 +96,7 @@ Aliases: I<xor>
 
     a | b
 
-Return the
+Returns the
 
 Aliases: I<or>
 
@@ -106,7 +106,7 @@ Aliases: I<or>
 
     Vector.abs()
 
-Return the
+Returns the
 
 =cut
 
@@ -114,7 +114,7 @@ Return the
 
     Vector.atan2()
 
-Return the
+Returns the
 
 =cut
 
@@ -122,7 +122,7 @@ Return the
 
     Vector.ceil()
 
-Return the
+Returns the
 
 =cut
 
@@ -130,7 +130,7 @@ Return the
 
     Vector.chebyshev_dist()
 
-Return the
+Returns the
 
 =cut
 
@@ -138,7 +138,7 @@ Return the
 
     Vector.dist()
 
-Return the
+Returns the
 
 =cut
 
@@ -146,7 +146,7 @@ Return the
 
     Vector.dist_norm()
 
-Return the
+Returns the
 
 =cut
 
@@ -154,7 +154,7 @@ Return the
 
     Vector.floor()
 
-Return the
+Returns the
 
 =cut
 
@@ -162,7 +162,7 @@ Return the
 
     Vector.manhattan_dist()
 
-Return the
+Returns the
 
 =cut
 
@@ -170,7 +170,7 @@ Return the
 
     Vector.manhattan_norm()
 
-Return the
+Returns the
 
 =cut
 
@@ -178,7 +178,7 @@ Return the
 
     Vector.neg()
 
-Return the
+Returns the
 
 =cut
 
@@ -186,7 +186,7 @@ Return the
 
     Vector.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -196,7 +196,7 @@ Aliases: I<call>
 
     Vector.norm()
 
-Return the
+Returns the
 
 =cut
 
@@ -204,7 +204,7 @@ Return the
 
     Vector.round()
 
-Return the
+Returns the
 
 =cut
 
@@ -212,7 +212,7 @@ Return the
 
     Vector.to_a()
 
-Return the
+Returns the
 
 Aliases: I<to_array>
 
@@ -222,7 +222,7 @@ Aliases: I<to_array>
 
     Vector.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 
@@ -232,6 +232,6 @@ Aliases: I<dump>, I<to_str>
 
     Vector.zero()
 
-Return the
+Returns the
 
 =cut

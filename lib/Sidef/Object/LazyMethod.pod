@@ -26,7 +26,7 @@ Inherits methods from:
 
     LazyMethod.method()
 
-Return the
+Returns the
 
 =cut
 
@@ -34,6 +34,6 @@ Return the
 
     LazyMethod.new()
 
-Return the
+Returns the
 
 =cut

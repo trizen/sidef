@@ -26,7 +26,7 @@ Inherits methods from:
 
     a & b
 
-Return the
+Returns the
 
 Aliases: I<grep>
 
@@ -36,7 +36,7 @@ Aliases: I<grep>
 
     a * b
 
-Return the
+Returns the
 
 Aliases: I<repeat>
 
@@ -46,7 +46,7 @@ Aliases: I<repeat>
 
     a << b
 
-Return the
+Returns the
 
 Aliases: I<for>, I<each>, I<foreach>
 
@@ -56,7 +56,7 @@ Aliases: I<for>, I<each>, I<foreach>
 
     a >> b
 
-Return the
+Returns the
 
 Aliases: I<map>
 
@@ -66,7 +66,7 @@ Aliases: I<map>
 
     Block.Π()
 
-Return the
+Returns the
 
 Aliases: I<prod>
 
@@ -76,7 +76,7 @@ Aliases: I<prod>
 
     Block.Σ()
 
-Return the
+Returns the
 
 Aliases: I<sum>
 
@@ -86,7 +86,7 @@ Aliases: I<sum>
 
     a ∘ b
 
-Return the
+Returns the
 
 Aliases: I<compose>
 
@@ -96,7 +96,7 @@ Aliases: I<compose>
 
     Block.array_identity()
 
-Return the
+Returns the
 
 =cut
 
@@ -104,7 +104,7 @@ Return the
 
     Block.cache()
 
-Return the
+Returns the
 
 =cut
 
@@ -112,7 +112,7 @@ Return the
 
     Block.call()
 
-Return the
+Returns the
 
 =cut
 
@@ -120,7 +120,7 @@ Return the
 
     Block.cap()
 
-Return the
+Returns the
 
 Aliases: I<capture>
 
@@ -130,7 +130,7 @@ Aliases: I<capture>
 
     Block.do()
 
-Return the
+Returns the
 
 Aliases: I<run>
 
@@ -140,7 +140,7 @@ Aliases: I<run>
 
     Block.exec()
 
-Return the
+Returns the
 
 =cut
 
@@ -148,7 +148,7 @@ Return the
 
     Block.ffork()
 
-Return the
+Returns the
 
 Aliases: I<start>
 
@@ -158,7 +158,7 @@ Aliases: I<start>
 
     Block.first()
 
-Return the
+Returns the
 
 =cut
 
@@ -166,7 +166,7 @@ Return the
 
     Block.fork()
 
-Return the
+Returns the
 
 =cut
 
@@ -174,7 +174,7 @@ Return the
 
     Block.identity()
 
-Return the
+Returns the
 
 =cut
 
@@ -182,7 +182,7 @@ Return the
 
     Block.if()
 
-Return the
+Returns the
 
 =cut
 
@@ -190,7 +190,7 @@ Return the
 
     Block.is_identity()
 
-Return the
+Returns the
 
 =cut
 
@@ -198,7 +198,7 @@ Return the
 
     Block.list_identity()
 
-Return the
+Returns the
 
 =cut
 
@@ -206,7 +206,7 @@ Return the
 
     Block.loop()
 
-Return the
+Returns the
 
 =cut
 
@@ -214,7 +214,7 @@ Return the
 
     Block.new()
 
-Return the
+Returns the
 
 =cut
 
@@ -222,7 +222,7 @@ Return the
 
     Block.nth()
 
-Return the
+Returns the
 
 =cut
 
@@ -230,7 +230,7 @@ Return the
 
     Block.null_identity()
 
-Return the
+Returns the
 
 =cut
 
@@ -238,7 +238,7 @@ Return the
 
     Block.thr()
 
-Return the
+Returns the
 
 Aliases: I<thread>
 
@@ -248,7 +248,7 @@ Aliases: I<thread>
 
     Block.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>, I<to_str>
 
@@ -258,7 +258,7 @@ Aliases: I<dump>, I<to_str>
 
     Block.uncache()
 
-Return the
+Returns the
 
 =cut
 
@@ -266,6 +266,6 @@ Return the
 
     Block.while()
 
-Return the
+Returns the
 
 =cut

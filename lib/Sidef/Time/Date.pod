@@ -26,7 +26,7 @@ Inherits methods from:
 
     a != b
 
-Return the
+Returns the
 
 Aliases: I<ne>
 
@@ -36,7 +36,7 @@ Aliases: I<ne>
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<add>, I<add_seconds>
 
@@ -46,7 +46,7 @@ Aliases: I<add>, I<add_seconds>
 
     a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>, I<subtract>
 
@@ -56,7 +56,7 @@ Aliases: I<sub>, I<subtract>
 
     a < b
 
-Return the
+Returns the
 
 Aliases: I<lt>
 
@@ -66,7 +66,7 @@ Aliases: I<lt>
 
     a <= b
 
-Return the
+Returns the
 
 Aliases: I<le>
 
@@ -76,7 +76,7 @@ Aliases: I<le>
 
     a <=> b
 
-Return the
+Returns the
 
 Aliases: I<cmp>
 
@@ -86,7 +86,7 @@ Aliases: I<cmp>
 
     a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -96,7 +96,7 @@ Aliases: I<eq>
 
     a > b
 
-Return the
+Returns the
 
 Aliases: I<gt>
 
@@ -106,7 +106,7 @@ Aliases: I<gt>
 
     a >= b
 
-Return the
+Returns the
 
 Aliases: I<ge>
 
@@ -116,7 +116,7 @@ Aliases: I<ge>
 
     Date.add_days()
 
-Return the
+Returns the
 
 =cut
 
@@ -124,7 +124,7 @@ Return the
 
     Date.add_months()
 
-Return the
+Returns the
 
 =cut
 
@@ -132,7 +132,7 @@ Return the
 
     Date.add_years()
 
-Return the
+Returns the
 
 =cut
 
@@ -140,7 +140,7 @@ Return the
 
     Date.call()
 
-Return the
+Returns the
 
 =cut
 
@@ -148,7 +148,7 @@ Return the
 
     Date.date()
 
-Return the
+Returns the
 
 =cut
 
@@ -156,7 +156,7 @@ Return the
 
     Date.day()
 
-Return the
+Returns the
 
 Aliases: I<mday>, I<month_day>
 
@@ -166,7 +166,7 @@ Aliases: I<mday>, I<month_day>
 
     Date.dmy()
 
-Return the
+Returns the
 
 =cut
 
@@ -174,7 +174,7 @@ Return the
 
     Date.dump()
 
-Return the
+Returns the
 
 =cut
 
@@ -182,7 +182,7 @@ Return the
 
     Date.epoch()
 
-Return the
+Returns the
 
 =cut
 
@@ -190,7 +190,7 @@ Return the
 
     Date.format()
 
-Return the
+Returns the
 
 Aliases: I<strftime>
 
@@ -200,7 +200,7 @@ Aliases: I<strftime>
 
     Date.fullmonth()
 
-Return the
+Returns the
 
 =cut
 
@@ -208,7 +208,7 @@ Return the
 
     Date.gmt()
 
-Return the
+Returns the
 
 Aliases: I<gmtime>
 
@@ -218,7 +218,7 @@ Aliases: I<gmtime>
 
     Date.hour()
 
-Return the
+Returns the
 
 =cut
 
@@ -226,7 +226,7 @@ Return the
 
     Date.isdst()
 
-Return the
+Returns the
 
 Aliases: I<daylight_savings>
 
@@ -236,7 +236,7 @@ Aliases: I<daylight_savings>
 
     Date.julian_day()
 
-Return the
+Returns the
 
 =cut
 
@@ -244,7 +244,7 @@ Return the
 
     Date.local()
 
-Return the
+Returns the
 
 Aliases: I<localtime>
 
@@ -254,7 +254,7 @@ Aliases: I<localtime>
 
     Date.mdy()
 
-Return the
+Returns the
 
 =cut
 
@@ -262,7 +262,7 @@ Return the
 
     Date.min()
 
-Return the
+Returns the
 
 Aliases: I<minute>
 
@@ -272,7 +272,7 @@ Aliases: I<minute>
 
     Date.mon()
 
-Return the
+Returns the
 
 Aliases: I<month>
 
@@ -282,7 +282,7 @@ Aliases: I<month>
 
     Date.monname()
 
-Return the
+Returns the
 
 =cut
 
@@ -290,7 +290,7 @@ Return the
 
     Date.month_last_day()
 
-Return the
+Returns the
 
 =cut
 
@@ -298,7 +298,7 @@ Return the
 
     Date.now()
 
-Return the
+Returns the
 
 Aliases: I<today>
 
@@ -308,7 +308,7 @@ Aliases: I<today>
 
     Date.parse()
 
-Return the
+Returns the
 
 Aliases: I<strptime>
 
@@ -318,7 +318,7 @@ Aliases: I<strptime>
 
     Date.sec()
 
-Return the
+Returns the
 
 Aliases: I<second>
 
@@ -328,7 +328,7 @@ Aliases: I<second>
 
     Date.time()
 
-Return the
+Returns the
 
 =cut
 
@@ -336,7 +336,7 @@ Return the
 
     Date.to_s()
 
-Return the
+Returns the
 
 Aliases: I<cdate>, I<ctime>, I<to_str>
 
@@ -346,7 +346,7 @@ Aliases: I<cdate>, I<ctime>, I<to_str>
 
     Date.truncate_to_day()
 
-Return the
+Returns the
 
 =cut
 
@@ -354,7 +354,7 @@ Return the
 
     Date.truncate_to_hour()
 
-Return the
+Returns the
 
 =cut
 
@@ -362,7 +362,7 @@ Return the
 
     Date.truncate_to_minute()
 
-Return the
+Returns the
 
 =cut
 
@@ -370,7 +370,7 @@ Return the
 
     Date.truncate_to_month()
 
-Return the
+Returns the
 
 =cut
 
@@ -378,7 +378,7 @@ Return the
 
     Date.truncate_to_quarter()
 
-Return the
+Returns the
 
 =cut
 
@@ -386,7 +386,7 @@ Return the
 
     Date.truncate_to_second()
 
-Return the
+Returns the
 
 =cut
 
@@ -394,7 +394,7 @@ Return the
 
     Date.truncate_to_year()
 
-Return the
+Returns the
 
 =cut
 
@@ -402,7 +402,7 @@ Return the
 
     Date.valid()
 
-Return the
+Returns the
 
 Aliases: I<valid_date>
 
@@ -412,7 +412,7 @@ Aliases: I<valid_date>
 
     Date.wday()
 
-Return the
+Returns the
 
 Aliases: I<week_day>
 
@@ -422,7 +422,7 @@ Aliases: I<week_day>
 
     Date.wdayname()
 
-Return the
+Returns the
 
 =cut
 
@@ -430,7 +430,7 @@ Return the
 
     Date.week()
 
-Return the
+Returns the
 
 =cut
 
@@ -438,7 +438,7 @@ Return the
 
     Date.yday()
 
-Return the
+Returns the
 
 Aliases: I<year_day>
 
@@ -448,7 +448,7 @@ Aliases: I<year_day>
 
     Date.year()
 
-Return the
+Returns the
 
 =cut
 
@@ -456,7 +456,7 @@ Return the
 
     Date.ymd()
 
-Return the
+Returns the
 
 =cut
 
@@ -464,6 +464,6 @@ Return the
 
     Date.yy()
 
-Return the
+Returns the
 
 =cut

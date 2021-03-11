@@ -26,7 +26,7 @@ Inherits methods from:
 
     Socket.getaddrinfo()
 
-Return the
+Returns the
 
 =cut
 
@@ -34,7 +34,7 @@ Return the
 
     Socket.gethostbyaddr()
 
-Return the
+Returns the
 
 =cut
 
@@ -42,7 +42,7 @@ Return the
 
     Socket.gethostbyname()
 
-Return the
+Returns the
 
 =cut
 
@@ -50,7 +50,7 @@ Return the
 
     Socket.gethostent()
 
-Return the
+Returns the
 
 =cut
 
@@ -58,7 +58,7 @@ Return the
 
     Socket.getnameinfo()
 
-Return the
+Returns the
 
 =cut
 
@@ -66,7 +66,7 @@ Return the
 
     Socket.getnetbyaddr()
 
-Return the
+Returns the
 
 =cut
 
@@ -74,7 +74,7 @@ Return the
 
     Socket.getnetbyname()
 
-Return the
+Returns the
 
 =cut
 
@@ -82,7 +82,7 @@ Return the
 
     Socket.getnetent()
 
-Return the
+Returns the
 
 =cut
 
@@ -90,7 +90,7 @@ Return the
 
     Socket.getprotobyname()
 
-Return the
+Returns the
 
 =cut
 
@@ -98,7 +98,7 @@ Return the
 
     Socket.getprotobynumber()
 
-Return the
+Returns the
 
 =cut
 
@@ -106,7 +106,7 @@ Return the
 
     Socket.getprotoent()
 
-Return the
+Returns the
 
 =cut
 
@@ -114,7 +114,7 @@ Return the
 
     Socket.getservbyname()
 
-Return the
+Returns the
 
 =cut
 
@@ -122,7 +122,7 @@ Return the
 
     Socket.getservbyport()
 
-Return the
+Returns the
 
 =cut
 
@@ -130,7 +130,7 @@ Return the
 
     Socket.getservent()
 
-Return the
+Returns the
 
 =cut
 
@@ -138,7 +138,7 @@ Return the
 
     Socket.inet_aton()
 
-Return the
+Returns the
 
 =cut
 
@@ -146,7 +146,7 @@ Return the
 
     Socket.inet_ntoa()
 
-Return the
+Returns the
 
 =cut
 
@@ -154,7 +154,7 @@ Return the
 
     Socket.inet_ntop()
 
-Return the
+Returns the
 
 =cut
 
@@ -162,7 +162,7 @@ Return the
 
     Socket.inet_pton()
 
-Return the
+Returns the
 
 =cut
 
@@ -170,7 +170,7 @@ Return the
 
     Socket.new()
 
-Return the
+Returns the
 
 =cut
 
@@ -178,7 +178,7 @@ Return the
 
     Socket.open()
 
-Return the
+Returns the
 
 =cut
 
@@ -186,7 +186,7 @@ Return the
 
     Socket.pack_ip_mreq()
 
-Return the
+Returns the
 
 =cut
 
@@ -194,7 +194,7 @@ Return the
 
     Socket.pack_ip_mreq_source()
 
-Return the
+Returns the
 
 =cut
 
@@ -202,7 +202,7 @@ Return the
 
     Socket.pack_ipv6_mreq()
 
-Return the
+Returns the
 
 =cut
 
@@ -210,7 +210,7 @@ Return the
 
     Socket.pack_sockaddr_in()
 
-Return the
+Returns the
 
 =cut
 
@@ -218,7 +218,7 @@ Return the
 
     Socket.pack_sockaddr_in6()
 
-Return the
+Returns the
 
 =cut
 
@@ -226,7 +226,7 @@ Return the
 
     Socket.pack_sockaddr_un()
 
-Return the
+Returns the
 
 =cut
 
@@ -234,7 +234,7 @@ Return the
 
     Socket.sethostent()
 
-Return the
+Returns the
 
 =cut
 
@@ -242,7 +242,7 @@ Return the
 
     Socket.setnetent()
 
-Return the
+Returns the
 
 =cut
 
@@ -250,7 +250,7 @@ Return the
 
     Socket.setprotoent()
 
-Return the
+Returns the
 
 =cut
 
@@ -258,7 +258,7 @@ Return the
 
     Socket.setservent()
 
-Return the
+Returns the
 
 =cut
 
@@ -266,7 +266,7 @@ Return the
 
     Socket.sockaddr_family()
 
-Return the
+Returns the
 
 =cut
 
@@ -274,7 +274,7 @@ Return the
 
     Socket.sockaddr_in()
 
-Return the
+Returns the
 
 =cut
 
@@ -282,7 +282,7 @@ Return the
 
     Socket.sockaddr_in6()
 
-Return the
+Returns the
 
 =cut
 
@@ -290,7 +290,7 @@ Return the
 
     Socket.sockaddr_un()
 
-Return the
+Returns the
 
 =cut
 
@@ -298,7 +298,7 @@ Return the
 
     Socket.socketpair()
 
-Return the
+Returns the
 
 =cut
 
@@ -306,7 +306,7 @@ Return the
 
     Socket.unpack_ip_mreq()
 
-Return the
+Returns the
 
 =cut
 
@@ -314,7 +314,7 @@ Return the
 
     Socket.unpack_ip_mreq_source()
 
-Return the
+Returns the
 
 =cut
 
@@ -322,7 +322,7 @@ Return the
 
     Socket.unpack_ipv6_mreq()
 
-Return the
+Returns the
 
 =cut
 
@@ -330,7 +330,7 @@ Return the
 
     Socket.unpack_sockaddr_in()
 
-Return the
+Returns the
 
 =cut
 
@@ -338,7 +338,7 @@ Return the
 
     Socket.unpack_sockaddr_in6()
 
-Return the
+Returns the
 
 =cut
 
@@ -346,6 +346,6 @@ Return the
 
     Socket.unpack_sockaddr_un()
 
-Return the
+Returns the
 
 =cut

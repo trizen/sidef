@@ -26,7 +26,7 @@ Inherits methods from:
 
     Math.avg()
 
-Return the
+Returns the
 
 Aliases: I<arithmetic_mean>
 
@@ -36,7 +36,7 @@ Aliases: I<arithmetic_mean>
 
     Math.binsplit()
 
-Return the
+Returns the
 
 =cut
 
@@ -44,7 +44,7 @@ Return the
 
     Math.chinese()
 
-Return the
+Returns the
 
 =cut
 
@@ -52,7 +52,7 @@ Return the
 
     Math.gcd()
 
-Return the
+Returns the
 
 =cut
 
@@ -60,7 +60,7 @@ Return the
 
     Math.geometric_mean()
 
-Return the
+Returns the
 
 =cut
 
@@ -68,7 +68,7 @@ Return the
 
     Math.harmonic_mean()
 
-Return the
+Returns the
 
 =cut
 
@@ -76,7 +76,7 @@ Return the
 
     Math.lcm()
 
-Return the
+Returns the
 
 =cut
 
@@ -84,7 +84,7 @@ Return the
 
     Math.map()
 
-Return the
+Returns the
 
 =cut
 
@@ -92,7 +92,7 @@ Return the
 
     Math.max()
 
-Return the
+Returns the
 
 =cut
 
@@ -100,7 +100,7 @@ Return the
 
     Math.min()
 
-Return the
+Returns the
 
 =cut
 
@@ -108,7 +108,7 @@ Return the
 
     Math.num2percent()
 
-Return the
+Returns the
 
 =cut
 
@@ -116,7 +116,7 @@ Return the
 
     Math.prod()
 
-Return the
+Returns the
 
 Aliases: I<product>
 
@@ -126,7 +126,7 @@ Aliases: I<product>
 
     Math.range_map()
 
-Return the
+Returns the
 
 =cut
 
@@ -134,7 +134,7 @@ Return the
 
     Math.range_sum()
 
-Return the
+Returns the
 
 =cut
 
@@ -142,7 +142,7 @@ Return the
 
     Math.smooth_numbers()
 
-Return the
+Returns the
 
 =cut
 
@@ -150,6 +150,6 @@ Return the
 
     Math.sum()
 
-Return the
+Returns the
 
 =cut

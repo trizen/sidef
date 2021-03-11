@@ -19,7 +19,7 @@ var obj = Fork(...)
 
     Fork.get()
 
-Return the
+Returns the
 
 Aliases: I<join>, I<wait>
 
@@ -29,7 +29,7 @@ Aliases: I<join>, I<wait>
 
     Fork.kill()
 
-Return the
+Returns the
 
 =cut
 
@@ -37,6 +37,6 @@ Return the
 
     Fork.new()
 
-Return the
+Returns the
 
 =cut

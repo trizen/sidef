@@ -19,6 +19,6 @@ var obj = Sig(...)
 
     Sig.new()
 
-Return the
+Returns the
 
 =cut

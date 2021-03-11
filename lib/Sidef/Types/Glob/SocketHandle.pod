@@ -26,7 +26,7 @@ Inherits methods from:
 
     SocketHandle.accept()
 
-Return the
+Returns the
 
 =cut
 
@@ -34,7 +34,7 @@ Return the
 
     SocketHandle.bind()
 
-Return the
+Returns the
 
 =cut
 
@@ -42,7 +42,7 @@ Return the
 
     SocketHandle.connect()
 
-Return the
+Returns the
 
 =cut
 
@@ -50,7 +50,7 @@ Return the
 
     SocketHandle.getpeername()
 
-Return the
+Returns the
 
 =cut
 
@@ -58,7 +58,7 @@ Return the
 
     SocketHandle.getsockname()
 
-Return the
+Returns the
 
 =cut
 
@@ -66,7 +66,7 @@ Return the
 
     SocketHandle.getsockopt()
 
-Return the
+Returns the
 
 =cut
 
@@ -74,7 +74,7 @@ Return the
 
     SocketHandle.listen()
 
-Return the
+Returns the
 
 =cut
 
@@ -82,7 +82,7 @@ Return the
 
     SocketHandle.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -92,7 +92,7 @@ Aliases: I<call>
 
     SocketHandle.recv()
 
-Return the
+Returns the
 
 =cut
 
@@ -100,7 +100,7 @@ Return the
 
     SocketHandle.send()
 
-Return the
+Returns the
 
 =cut
 
@@ -108,7 +108,7 @@ Return the
 
     SocketHandle.setsockopt()
 
-Return the
+Returns the
 
 =cut
 
@@ -116,6 +116,6 @@ Return the
 
     SocketHandle.shutdown()
 
-Return the
+Returns the
 
 =cut

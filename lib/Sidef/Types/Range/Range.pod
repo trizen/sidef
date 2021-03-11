@@ -19,7 +19,7 @@ var obj = Range(...)
 
     a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -29,7 +29,7 @@ Aliases: I<mul>
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<add>
 
@@ -39,7 +39,7 @@ Aliases: I<add>
 
     a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>
 
@@ -49,7 +49,7 @@ Aliases: I<sub>
 
     a ... b
 
-Return the
+Returns the
 
 Aliases: I<to_list>
 
@@ -59,7 +59,7 @@ Aliases: I<to_list>
 
     a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -69,7 +69,7 @@ Aliases: I<÷>, I<div>
 
     a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -79,7 +79,7 @@ Aliases: I<eq>
 
     a ≠ b
 
-Return the
+Returns the
 
 Aliases: I<!=>, I<ne>
 
@@ -89,7 +89,7 @@ Aliases: I<!=>, I<ne>
 
     Range.accumulate()
 
-Return the
+Returns the
 
 =cut
 
@@ -97,7 +97,7 @@ Return the
 
     Range.accumulate_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -105,7 +105,7 @@ Return the
 
     Range.all()
 
-Return the
+Returns the
 
 =cut
 
@@ -113,7 +113,7 @@ Return the
 
     Range.any()
 
-Return the
+Returns the
 
 =cut
 
@@ -121,7 +121,7 @@ Return the
 
     Range.bounds()
 
-Return the
+Returns the
 
 =cut
 
@@ -129,7 +129,7 @@ Return the
 
     Range.by()
 
-Return the
+Returns the
 
 =cut
 
@@ -137,7 +137,7 @@ Return the
 
     Range.cons()
 
-Return the
+Returns the
 
 Aliases: I<map_cons>
 
@@ -147,7 +147,7 @@ Aliases: I<map_cons>
 
     Range.contain()
 
-Return the
+Returns the
 
 Aliases: I<include>, I<contains>, I<includes>
 
@@ -157,7 +157,7 @@ Aliases: I<include>, I<contains>, I<includes>
 
     Range.count()
 
-Return the
+Returns the
 
 =cut
 
@@ -165,7 +165,7 @@ Return the
 
     Range.count_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -173,7 +173,7 @@ Return the
 
     Range.cross_operator()
 
-Return the
+Returns the
 
 =cut
 
@@ -181,7 +181,7 @@ Return the
 
     Range.each_cons()
 
-Return the
+Returns the
 
 =cut
 
@@ -189,7 +189,7 @@ Return the
 
     Range.each_slice()
 
-Return the
+Returns the
 
 =cut
 
@@ -197,7 +197,7 @@ Return the
 
     Range.first_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -205,7 +205,7 @@ Return the
 
     Range.flip()
 
-Return the
+Returns the
 
 Aliases: I<reverse>
 
@@ -215,7 +215,7 @@ Aliases: I<reverse>
 
     Range.for()
 
-Return the
+Returns the
 
 Aliases: I<each>, I<foreach>
 
@@ -225,7 +225,7 @@ Aliases: I<each>, I<foreach>
 
     Range.from()
 
-Return the
+Returns the
 
 =cut
 
@@ -233,7 +233,7 @@ Return the
 
     Range.grep()
 
-Return the
+Returns the
 
 Aliases: I<select>
 
@@ -243,7 +243,7 @@ Aliases: I<select>
 
     Range.head()
 
-Return the
+Returns the
 
 Aliases: I<first>
 
@@ -253,7 +253,7 @@ Aliases: I<first>
 
     Range.join()
 
-Return the
+Returns the
 
 =cut
 
@@ -261,7 +261,7 @@ Return the
 
     Range.kv()
 
-Return the
+Returns the
 
 Aliases: I<pairs>, I<zip_indices>
 
@@ -271,7 +271,7 @@ Aliases: I<pairs>, I<zip_indices>
 
     Range.last()
 
-Return the
+Returns the
 
 Aliases: I<tail>
 
@@ -281,7 +281,7 @@ Aliases: I<tail>
 
     Range.last_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -289,7 +289,7 @@ Return the
 
     Range.len()
 
-Return the
+Returns the
 
 Aliases: I<length>
 
@@ -299,7 +299,7 @@ Aliases: I<length>
 
     Range.map()
 
-Return the
+Returns the
 
 =cut
 
@@ -307,7 +307,7 @@ Return the
 
     Range.map_operator()
 
-Return the
+Returns the
 
 =cut
 
@@ -315,7 +315,7 @@ Return the
 
     Range.max()
 
-Return the
+Returns the
 
 =cut
 
@@ -323,7 +323,7 @@ Return the
 
     Range.max_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -331,7 +331,7 @@ Return the
 
     Range.min()
 
-Return the
+Returns the
 
 =cut
 
@@ -339,7 +339,7 @@ Return the
 
     Range.min_by()
 
-Return the
+Returns the
 
 =cut
 
@@ -347,7 +347,7 @@ Return the
 
     Range.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -357,7 +357,7 @@ Aliases: I<call>
 
     Range.none()
 
-Return the
+Returns the
 
 =cut
 
@@ -365,7 +365,7 @@ Return the
 
     Range.pam_operator()
 
-Return the
+Returns the
 
 =cut
 
@@ -373,7 +373,7 @@ Return the
 
     Range.pick()
 
-Return the
+Returns the
 
 =cut
 
@@ -381,7 +381,7 @@ Return the
 
     Range.rand()
 
-Return the
+Returns the
 
 Aliases: I<sample>
 
@@ -391,7 +391,7 @@ Aliases: I<sample>
 
     Range.reduce()
 
-Return the
+Returns the
 
 =cut
 
@@ -399,7 +399,7 @@ Return the
 
     Range.reduce_operator()
 
-Return the
+Returns the
 
 =cut
 
@@ -407,7 +407,7 @@ Return the
 
     Range.shuffle()
 
-Return the
+Returns the
 
 =cut
 
@@ -415,7 +415,7 @@ Return the
 
     Range.slices()
 
-Return the
+Returns the
 
 Aliases: I<map_slice>
 
@@ -425,7 +425,7 @@ Aliases: I<map_slice>
 
     Range.step()
 
-Return the
+Returns the
 
 =cut
 
@@ -433,7 +433,7 @@ Return the
 
     Range.to()
 
-Return the
+Returns the
 
 =cut
 
@@ -441,7 +441,7 @@ Return the
 
     Range.to_a()
 
-Return the
+Returns the
 
 Aliases: I<to_array>
 
@@ -451,7 +451,7 @@ Aliases: I<to_array>
 
     Range.to_v()
 
-Return the
+Returns the
 
 Aliases: I<to_vec>, I<to_vector>
 
@@ -461,7 +461,7 @@ Aliases: I<to_vec>, I<to_vector>
 
     Range.unroll_operator()
 
-Return the
+Returns the
 
 =cut
 
@@ -469,6 +469,6 @@ Return the
 
     Range.zip_operator()
 
-Return the
+Returns the
 
 =cut

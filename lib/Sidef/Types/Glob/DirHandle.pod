@@ -26,7 +26,7 @@ Inherits methods from:
 
     DirHandle.call()
 
-Return the
+Returns the
 
 =cut
 
@@ -34,7 +34,7 @@ Return the
 
     DirHandle.chdir()
 
-Return the
+Returns the
 
 =cut
 
@@ -42,7 +42,7 @@ Return the
 
     DirHandle.close()
 
-Return the
+Returns the
 
 =cut
 
@@ -50,7 +50,7 @@ Return the
 
     DirHandle.dir()
 
-Return the
+Returns the
 
 Aliases: I<parent>
 
@@ -60,7 +60,7 @@ Aliases: I<parent>
 
     DirHandle.dirs()
 
-Return the
+Returns the
 
 =cut
 
@@ -68,7 +68,7 @@ Return the
 
     DirHandle.each()
 
-Return the
+Returns the
 
 =cut
 
@@ -76,7 +76,7 @@ Return the
 
     DirHandle.entries()
 
-Return the
+Returns the
 
 =cut
 
@@ -84,7 +84,7 @@ Return the
 
     DirHandle.files()
 
-Return the
+Returns the
 
 =cut
 
@@ -92,7 +92,7 @@ Return the
 
     DirHandle.iter()
 
-Return the
+Returns the
 
 =cut
 
@@ -100,7 +100,7 @@ Return the
 
     DirHandle.lstat()
 
-Return the
+Returns the
 
 =cut
 
@@ -108,7 +108,7 @@ Return the
 
     DirHandle.read()
 
-Return the
+Returns the
 
 =cut
 
@@ -116,7 +116,7 @@ Return the
 
     DirHandle.rewind()
 
-Return the
+Returns the
 
 =cut
 
@@ -124,7 +124,7 @@ Return the
 
     DirHandle.seek()
 
-Return the
+Returns the
 
 =cut
 
@@ -132,7 +132,7 @@ Return the
 
     DirHandle.stat()
 
-Return the
+Returns the
 
 =cut
 
@@ -140,6 +140,6 @@ Return the
 
     DirHandle.tell()
 
-Return the
+Returns the
 
 =cut

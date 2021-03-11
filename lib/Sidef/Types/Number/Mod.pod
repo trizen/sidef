@@ -26,7 +26,7 @@ Inherits methods from:
 
     a ! b
 
-Return the
+Returns the
 
 Aliases: I<factorial>
 
@@ -36,7 +36,7 @@ Aliases: I<factorial>
 
     a != b
 
-Return the
+Returns the
 
 Aliases: I<ne>
 
@@ -46,7 +46,7 @@ Aliases: I<ne>
 
     a & b
 
-Return the
+Returns the
 
 Aliases: I<and>
 
@@ -56,7 +56,7 @@ Aliases: I<and>
 
     a * b
 
-Return the
+Returns the
 
 Aliases: I<mul>
 
@@ -66,7 +66,7 @@ Aliases: I<mul>
 
     a ** b
 
-Return the
+Returns the
 
 Aliases: I<pow>
 
@@ -76,7 +76,7 @@ Aliases: I<pow>
 
     a + b
 
-Return the
+Returns the
 
 Aliases: I<add>
 
@@ -86,7 +86,7 @@ Aliases: I<add>
 
     a ++ b
 
-Return the
+Returns the
 
 Aliases: I<inc>
 
@@ -96,7 +96,7 @@ Aliases: I<inc>
 
     a - b
 
-Return the
+Returns the
 
 Aliases: I<sub>
 
@@ -106,7 +106,7 @@ Aliases: I<sub>
 
     a -- b
 
-Return the
+Returns the
 
 Aliases: I<dec>
 
@@ -116,7 +116,7 @@ Aliases: I<dec>
 
     a / b
 
-Return the
+Returns the
 
 Aliases: I<÷>, I<div>
 
@@ -126,7 +126,7 @@ Aliases: I<÷>, I<div>
 
     a < b
 
-Return the
+Returns the
 
 Aliases: I<lt>
 
@@ -136,7 +136,7 @@ Aliases: I<lt>
 
     a << b
 
-Return the
+Returns the
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -146,7 +146,7 @@ Aliases: I<lsft>, I<shift_left>
 
     a <=> b
 
-Return the
+Returns the
 
 Aliases: I<cmp>
 
@@ -156,7 +156,7 @@ Aliases: I<cmp>
 
     a == b
 
-Return the
+Returns the
 
 Aliases: I<eq>
 
@@ -166,7 +166,7 @@ Aliases: I<eq>
 
     a > b
 
-Return the
+Returns the
 
 Aliases: I<gt>
 
@@ -176,7 +176,7 @@ Aliases: I<gt>
 
     a >> b
 
-Return the
+Returns the
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -186,7 +186,7 @@ Aliases: I<rsft>, I<shift_right>
 
     a ^ b
 
-Return the
+Returns the
 
 Aliases: I<xor>
 
@@ -196,7 +196,7 @@ Aliases: I<xor>
 
     a | b
 
-Return the
+Returns the
 
 Aliases: I<or>
 
@@ -206,7 +206,7 @@ Aliases: I<or>
 
     a ≤ b
 
-Return the
+Returns the
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -216,7 +216,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Return the
+Returns the
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -226,7 +226,7 @@ Aliases: I<E<gt>=>, I<ge>
 
     Mod.chinese()
 
-Return the
+Returns the
 
 =cut
 
@@ -234,7 +234,7 @@ Return the
 
     Mod.fib()
 
-Return the
+Returns the
 
 Aliases: I<fibonacci>
 
@@ -244,7 +244,7 @@ Aliases: I<fibonacci>
 
     Mod.inv()
 
-Return the
+Returns the
 
 =cut
 
@@ -252,7 +252,7 @@ Return the
 
     Mod.lucas()
 
-Return the
+Returns the
 
 =cut
 
@@ -260,7 +260,7 @@ Return the
 
     Mod.lucas_U()
 
-Return the
+Returns the
 
 Aliases: I<lucasu>, I<lucasU>
 
@@ -270,7 +270,7 @@ Aliases: I<lucasu>, I<lucasU>
 
     Mod.lucas_V()
 
-Return the
+Returns the
 
 Aliases: I<lucasv>, I<lucasV>
 
@@ -280,7 +280,7 @@ Aliases: I<lucasv>, I<lucasV>
 
     Mod.modulus()
 
-Return the
+Returns the
 
 =cut
 
@@ -288,7 +288,7 @@ Return the
 
     Mod.neg()
 
-Return the
+Returns the
 
 =cut
 
@@ -296,7 +296,7 @@ Return the
 
     Mod.new()
 
-Return the
+Returns the
 
 Aliases: I<call>
 
@@ -306,7 +306,7 @@ Aliases: I<call>
 
     Mod.sqrt()
 
-Return the
+Returns the
 
 =cut
 
@@ -314,7 +314,7 @@ Return the
 
     Mod.to_n()
 
-Return the
+Returns the
 
 Aliases: I<lift>
 
@@ -324,7 +324,7 @@ Aliases: I<lift>
 
     Mod.to_s()
 
-Return the
+Returns the
 
 Aliases: I<dump>
 
@@ -334,6 +334,6 @@ Aliases: I<dump>
 
     Mod.znorder()
 
-Return the
+Returns the
 
 =cut
