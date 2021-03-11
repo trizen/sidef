@@ -190,14 +190,14 @@ sub process_file {
 
     $parts[-1].$sub()
 
-Return the
+Returns the
 __POD__
 
 \=head2 $orig_name
 
     a $sub b
 
-Return the
+Returns the
 __POD2__
 
         if (@{$value->{aliases}}) {
@@ -245,7 +245,7 @@ __POD2__
 
         if ($alias // exists($pod_data->{$value->{name}})) {
             my $doc = $pod_data->{$alias // $value->{name}};
-            if (not $doc =~ /^Return the$/m) {
+            if (not $doc =~ /^Returns? the$/m) {
                 $subs{$key}{doc} = $doc;
             }
         }

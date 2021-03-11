@@ -6677,6 +6677,11 @@ package Sidef::Types::Number::Number {
             my $A = $n;
             my $B = Math::GMPz::Rmpz_get_ui($k);
 
+            # When B < 2^32, use Math::Prime::Util::GMP::todigits().
+            if ($B <= 4294967295) {
+                return _set_int(Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B)));
+            }
+
             state $Q = Math::GMPz::Rmpz_init_nobless();
             state $R = Math::GMPz::Rmpz_init_nobless();
 
