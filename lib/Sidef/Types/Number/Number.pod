@@ -5619,16 +5619,16 @@ Return the
 
 =cut
 
-=head2 sum_of_remainders
+=head2 sum_remainders
 
-    sum_of_remainders(n, v)
+    sum_remainders(n, v)
 
 Returns the following sum: C<Sum_{k=1..n} v % k>, computed in C<O(sqrt(v))> steps.
 
 Example:
 
-    say 20.of {|n| sum_of_remainders(n, n) }        #=> A004125
-    say 20.of {|n| sum_of_remainders(n, n.prime) }  #=> A099726
+    say 20.of {|n| sum_remainders(n, n) }        #=> A004125
+    say 20.of {|n| sum_remainders(n, n.prime) }  #=> A099726
 
 =cut
 

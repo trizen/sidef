@@ -13384,7 +13384,7 @@ package Sidef::Types::Number::Number {
 
     *dirichlet_sum = \&dirichlet_hyperbola;
 
-    sub sum_of_remainders {
+    sub sum_remainders {
         my ($n, $v) = @_;
 
         # a(n,v) = Sum_{k=1..n} v % k
@@ -13398,7 +13398,9 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        my $S = sub {
+        # TODO: maybe add optimization for when n < sqrt(v)
+
+        my $S = sub {    # Sum_{k=1..n} sigma(k) = Sum_{k=1..n} k*floor(n/k)
             my ($n) = @_;
 
             my $t = Math::GMPz::Rmpz_init();
@@ -13430,7 +13432,7 @@ package Sidef::Types::Number::Number {
             return $T;
         };
 
-        my $G = sub {
+        my $G = sub {    # Sum_{k=A..B} k*floor(B/k)
             my ($A, $B) = @_;
 
             my $t = Math::GMPz::Rmpz_init();
