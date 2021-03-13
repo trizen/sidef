@@ -6679,7 +6679,8 @@ package Sidef::Types::Number::Number {
 
             # When B < 2^32, use Math::Prime::Util::GMP::todigits().
             if ($B <= 4294967295) {
-                return _set_int(Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B)));
+                return _set_int(
+                       Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B)));
             }
 
             state $Q = Math::GMPz::Rmpz_init_nobless();
@@ -15602,18 +15603,19 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                while ($p <= $s) {
+                foreach my $p (@{Math::Prime::Util::primes($p, $s)}) {
 
                     if ($squarefree and $m % $p == 0) {
-                        $p = Math::Prime::Util::next_prime($p);
                         next;
                     }
 
                     my $t = $m * $p;
+
                     my $u =
                       defined(&Math::Prime::Util::divint)
                       ? Math::Prime::Util::divint($A, $t)
                       : Math::Prime::Util::GMP::divint($A, $t);
+
                     my $v =
                       defined(&Math::Prime::Util::divint)
                       ? Math::Prime::Util::divint($B, $t)
@@ -15623,14 +15625,12 @@ package Sidef::Types::Number::Number {
 
                     # Optimization for tight ranges
                     if ($u > $v) {
-                        $p = Math::Prime::Util::next_prime($p);
                         next;
                     }
 
                     $u = $p if ($k == 2 and $p > $u);
 
                     __SUB__->($t, $p, $k - 1, ($k == 2) ? ($u, $v) : ());
-                    $p = Math::Prime::Util::next_prime($p);
                 }
               }
               ->(1, 2, $k);
@@ -15687,10 +15687,13 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                while ($p <= $s) {
+                foreach my $p (
+                               HAS_PRIME_UTIL
+                               ? @{Math::Prime::Util::primes($p, $s)}
+                               : Math::Prime::Util::GMP::sieve_primes($p, $s)
+                  ) {
 
                     if ($squarefree and Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
-                        $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
                         next;
                     }
 
@@ -15702,7 +15705,6 @@ package Sidef::Types::Number::Number {
 
                     # Optimization for tight ranges
                     if (Math::GMPz::Rmpz_cmp($t, $x) > 0) {
-                        $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
                         next;
                     }
 
@@ -15711,9 +15713,11 @@ package Sidef::Types::Number::Number {
                         Math::GMPz::Rmpz_set_ui($t, $p);
                     }
 
-                    __SUB__->($u, $p, $k - 1,
-                              ($k == 2) ? (Math::GMPz::Rmpz_get_str($t, 10), Math::GMPz::Rmpz_get_str($x, 10)) : ());
-                    $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
+                    __SUB__->(
+                              $u, $p, $k - 1, ($k == 2)
+                              ? (Math::GMPz::Rmpz_get_str($t, 10), Math::GMPz::Rmpz_get_str($x, 10))
+                              : ()
+                             );
                 }
               }
               ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
