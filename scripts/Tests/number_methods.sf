@@ -118,18 +118,22 @@ assert_eq(squarefree_count(1e10), 6079270942)
 for k in (0..10) {
 
     assert_eq(k.almost_primes(1000), 1..1000 -> grep { .is_almost_prime(k) })
+    assert_eq(k.omega_primes(1000), 1..1000 -> grep { .is_omega_prime(k) })
     assert_eq(k.squarefree_almost_primes(1000), k.almost_primes(1, 1000).grep{.is_squarefree})
 
     assert_eq(gather { k.almost_primes_each(1000, { take(_) }) }, k.almost_primes(1000))
+    assert_eq(gather { k.omega_primes_each(1000, { take(_) }) }, k.omega_primes(1000))
     assert_eq(gather { k.squarefree_almost_primes_each(1000, { take(_) }) }, k.squarefree_almost_primes(1000))
 
     var from = 1000.irand
     var upto = from+1000.irand
 
     assert_eq(k.almost_primes(from, upto), from..upto -> grep { .is_almost_prime(k) })
+    assert_eq(k.omega_primes(from, upto), from..upto -> grep { .is_omega_prime(k) })
     assert_eq(k.squarefree_almost_primes(from, upto), k.almost_primes(from, upto).grep{.is_squarefree})
 
     assert_eq(gather { k.almost_primes_each(from, upto, { take(_) }) }, k.almost_primes(from, upto))
+    assert_eq(gather { k.omega_primes_each(from, upto, { take(_) }) }, k.omega_primes(from, upto))
     assert_eq(gather { k.squarefree_almost_primes_each(from, upto, { take(_) }) }, k.squarefree_almost_primes(from, upto))
 }
 
@@ -158,7 +162,9 @@ for k in (1..12) {
     var from = n-100
     var upto = n+100
 
-    assert_eq(almost_primes(k, from, upto), from..upto -> grep{ .is_almost_prime(k) })
+    assert_eq(k.almost_primes(from, upto), from..upto -> grep{ .is_almost_prime(k) })
+    assert_eq(k.squarefree_almost_primes(from, upto), from..upto -> grep{ .is_squarefree && .is_almost_prime(k) })
+    assert_eq(k.omega_primes(from, upto), from..upto -> grep{ .is_omega_prime(k) })
 }
 
 # RangeNumber k-almost primes
@@ -179,6 +185,11 @@ assert_eq(
 )
 
 assert_eq(
+    gather { 10..100 -> each_omega_prime(3, {|k| take(k) }) },
+    3.omega_primes(10, 100)
+)
+
+assert_eq(
     gather { 10..100 -> each_squarefree_almost_prime(3, {|k| take(k) }) },
     3.squarefree_almost_primes(10, 100)
 )
@@ -186,6 +197,11 @@ assert_eq(
 assert_eq(
     gather { 10..100 `by` 3 -> each_almost_prime(3, {|k| take(k) }) },
     10..100 `by` 3 -> grep { .is_almost_prime(3) }
+)
+
+assert_eq(
+    gather { 10..100 `by` 3 -> each_omega_prime(3, {|k| take(k) }) },
+    10..100 `by` 3 -> grep { .is_omega_prime(3) }
 )
 
 assert_eq(
@@ -313,5 +329,12 @@ do {
         assert_eq(gather { k.omega_primes_each(v[0], v[-1], { take(_) }) }, v)
     }
 }
+
+assert_eq(12.omega_primes(1e13), [7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
+assert_eq(12.squarefree_almost_primes(1e13), [7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
+
+assert_eq(65.almost_primes(2**65 - 1e12, 2**65 + 1e12), [36893488147419103232])
+assert_eq(16.omega_primes(16.pn_primorial - 100, 16.pn_primorial + 100), [32589158477190044730])
+assert_eq(16.squarefree_almost_primes(16.pn_primorial - 100, 16.pn_primorial + 100), [32589158477190044730])
 
 say "** Tests passed!"

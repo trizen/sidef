@@ -15570,8 +15570,9 @@ package Sidef::Types::Number::Number {
         # Idea: if A-B < sqrt(B), then just iterate over the range A..B and grep the k-omega primes.
 
         if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-            return Math::Prime::Util::omega_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to))
-              ;    # XXX: available in MPU > 0.73
+            return Math::Prime::Util::omega_primes(    # XXX: available in MPU > 0.73
+                                               $k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to)
+            );
         }
         elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
@@ -15803,7 +15804,7 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                foreach my $p (@{Math::Prime::Util::primes($p, $s)}) {
+                for (; $p <= $s ; $p = Math::Prime::Util::next_prime($p)) {
 
                     if ($squarefree and $m % $p == 0) {
                         next;
@@ -15887,11 +15888,9 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                foreach my $p (
-                               HAS_PRIME_UTIL
-                               ? @{Math::Prime::Util::primes($p, $s)}
-                               : Math::Prime::Util::GMP::sieve_primes($p, $s)
-                  ) {
+                for (;
+                     $p <= $s ;
+                     $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
 
                     if ($squarefree and Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
                         next;
