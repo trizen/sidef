@@ -11585,6 +11585,39 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_omega_prime {
+        my ($n, $k) = @_;
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE } : 2;
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return (    # XXX: available in MPU > 0.73
+                Math::Prime::Util::is_omega_prime($k, Math::GMPz::Rmpz_get_ui($n))
+                ? Sidef::Types::Bool::Bool::TRUE
+                : Sidef::Types::Bool::Bool::FALSE
+            );
+        }
+
+        my @factors = _factor_exp(
+                                    Math::GMPz::Rmpz_fits_ulong_p($n)
+                                  ? Math::GMPz::Rmpz_get_ui($n)
+                                  : Math::GMPz::Rmpz_get_str($n, 10)
+                                 );
+
+        (scalar(@factors) == $k)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_prob_prime {
         my ($n) = @_;
 

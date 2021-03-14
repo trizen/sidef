@@ -3502,6 +3502,14 @@ Returns true when C<n> is an odd composite integer.
 
 =cut
 
+=head2 is_omega_prime
+
+    Number.is_omega_prime()
+
+Returns the
+
+=cut
+
 =head2 is_one
 
     n.is_one
