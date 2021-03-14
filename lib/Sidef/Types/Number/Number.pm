@@ -15526,7 +15526,7 @@ package Sidef::Types::Number::Number {
     *each_powerful = \&powerful_each;
 
     sub _sieve_omega_primes {
-        my ($from, $to, $k, %opt) = @_;
+        my ($from, $to, $k) = @_;
 
         return [1] if ($k == 0 and $to >= 1 and $from <= 1);
         return []  if ($k == 0);
@@ -15552,7 +15552,7 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                foreach my $p (@{Math::Prime::Util::primes($p, $s)}) {
+                for (; $p <= $s ; $p = Math::Prime::Util::next_prime($p)) {
 
                     if ($m % $p == 0) {
                         next;
@@ -15592,11 +15592,9 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                foreach my $p (
-                               HAS_PRIME_UTIL
-                               ? @{Math::Prime::Util::primes($p, $s)}
-                               : Math::Prime::Util::GMP::sieve_primes($p, $s)
-                  ) {
+                for (;
+                     $p <= $s ;
+                     $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
 
                     if (Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
                         next;
@@ -15660,6 +15658,39 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Array::Array->new(\@omega_primes);
     }
+
+    sub omega_primes_each {
+        my ($k, $from, $to, $block) = @_;
+
+        _valid(\$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e4;
+
+        if ($step > ULONG_MAX) {
+            $step = Math::GMPz::Rmpz_init_set_str($step, 1e10);
+        }
+
+        _generic_each($from, $to, $block, sub { $step }, sub { _sieve_omega_primes($_[0], $_[1], $k) });
+    }
+
+    *each_omega_prime = \&omega_primes_each;
 
     sub _sieve_almost_primes {
         my ($from, $to, $k, %opt) = @_;
@@ -16141,7 +16172,7 @@ package Sidef::Types::Number::Number {
         my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e7;
 
         if ($step > ULONG_MAX) {
-            $step = Math::GMPz::Rmpz_init_set_str($step, 10);
+            $step = Math::GMPz::Rmpz_init_set_str($step, 1e10);
         }
 
         _generic_each($from, $to, $block, sub { $step }, sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1) });
