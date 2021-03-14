@@ -2016,9 +2016,17 @@ Aliases: I<almost_primes_each>
 
 =head2 each_omega_prime
 
-    Number.each_omega_prime()
+    k.omega_primes_each(n, { ... })
+    k.omega_primes_each(a, b, { ... })
 
-Returns the
+Iterates over the k-omega primes <= n, or in the range C<a..b>.
+
+k-omega primes are numbers C<n> such that C<omega(n) == k>.
+
+Example:
+
+    1.omega_primes_each(100, {|n| say n })          # iterate over prime powers <= 100
+    2.omega_primes_each(50, 100, {|n| say n })      # iterate over 2-omega primes in range 50..100
 
 Aliases: I<omega_primes_each>
 
@@ -3113,11 +3121,11 @@ Return true if C<n> passes the Agrawal-Kayal-Saxena (AKS) primality test.
 
 =head2 is_almost_prime
 
-    n.is_almost_prime(k)
+    n.is_almost_prime(k=2)
 
 Return true if C<n> is a k-almost prime (i.e.: true iff C<n> is the product of C<k> not necessarily distinct primes).
 
-Equivalently, k-almost primes are numbers n such that bigomega(n) == k.
+Equivalently, k-almost primes are numbers n such that C<bigomega(n) == k>.
 
 Example:
 
@@ -3504,9 +3512,16 @@ Returns true when C<n> is an odd composite integer.
 
 =head2 is_omega_prime
 
-    Number.is_omega_prime()
+    n.is_omega_prime(k=2)
 
-Returns the
+Return true if C<n> is a k-omega prime (i.e.: true if C<n> is divisible by exactly C<k> different primes).
+
+Equivalently, k-omega primes are numbers n such that C<omega(n) == k>.
+
+Example:
+
+    say 20.by { .is_omega_prime(1) }   # prime powers
+    say 20.by { .is_omega_prime(2) }   # numbers n such that omega(n) == 2
 
 =cut
 
@@ -4788,9 +4803,17 @@ Example:
 
 =head2 omega_primes
 
-    Number.omega_primes()
+    k.omega_primes(n)
+    k.omega_primes(a,b)
 
-Returns the
+Returns an array with k-omega primes <= n, or in the range C<a..b>.
+
+k-omega primes are numbers C<n> such that C<omega(n) == k>.
+
+Example:
+
+    say 1.omega_primes(100)         # prime powers <= 100
+    say 2.omega_primes(50, 100)     # 2-omega primes in range 50..100
 
 =cut
 
@@ -4881,7 +4904,7 @@ Example:
     say 5.almost_prime_count(1e7)           #=> 1349779
     say 5.almost_prime_count(1e6, 1e7)      #=> 1225314
 
-Aliases: I<k_prime_count>, I<almost_primepi>, I<almost_prime_count>
+Aliases: I<almost_primepi>, I<almost_prime_count>
 
 =cut
 

@@ -10623,7 +10623,6 @@ package Sidef::Types::Number::Number {
 
     *pi_k           = \&almost_prime_count;
     *almost_primepi = \&almost_prime_count;
-    *k_prime_count  = \&almost_prime_count;
 
     sub prime_power_count {
         my ($x, $y) = @_;
