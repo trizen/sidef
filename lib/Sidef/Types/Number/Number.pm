@@ -15525,6 +15525,142 @@ package Sidef::Types::Number::Number {
 
     *each_powerful = \&powerful_each;
 
+    sub _sieve_omega_primes {
+        my ($from, $to, $k, %opt) = @_;
+
+        return [1] if ($k == 0 and $to >= 1 and $from <= 1);
+        return []  if ($k == 0);
+
+        my @omega_primes;
+
+        # TODO: optimization when A and B are close to each other.
+        # Idea: if A-B < sqrt(B), then just iterate over the range A..B and grep the k-omega primes.
+
+        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+            return Math::Prime::Util::omega_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to))
+              ;    # XXX: available in MPU > 0.73
+        }
+        elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+
+            my $A = Math::GMPz::Rmpz_get_ui($from);
+            my $B = Math::GMPz::Rmpz_get_ui($to);
+
+            $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
+
+            sub {
+                my ($m, $p, $k) = @_;
+
+                my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
+
+                foreach my $p (@{Math::Prime::Util::primes($p, $s)}) {
+
+                    if ($m % $p == 0) {
+                        next;
+                    }
+
+                    for (my $t = $m * $p ; $t - 1 < $B ; $t *= $p) {
+                        if ($k == 1) {
+                            push(@omega_primes, $t) if ($t >= $A);
+                        }
+                        else {
+                            __SUB__->($t, $p, $k - 1) if ($t * $p - 1 < $B);
+                        }
+                    }
+                }
+              }
+              ->(1, 2, $k);
+
+            @omega_primes = sort { $a <=> $b } @omega_primes;
+        }
+        else {
+
+            my $A = Math::GMPz::Rmpz_init_set($from);
+            my $B = Math::GMPz::Rmpz_init_set($to);
+
+            my $t = Math::GMPz::Rmpz_init_set_ui(0);
+            my $x = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_set_str($t, Math::Prime::Util::GMP::pn_primorial($k), 10);
+
+            # A = max(A, t)
+            if (Math::GMPz::Rmpz_cmp($t, $A) > 0) {
+                Math::GMPz::Rmpz_set($A, $t);
+            }
+
+            sub {
+                my ($m, $p, $k) = @_;
+
+                my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
+
+                foreach my $p (
+                               HAS_PRIME_UTIL
+                               ? @{Math::Prime::Util::primes($p, $s)}
+                               : Math::Prime::Util::GMP::sieve_primes($p, $s)
+                  ) {
+
+                    if (Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
+                        next;
+                    }
+
+                    for (my $t = $m * $p ; Math::GMPz::Rmpz_cmp($t, $B) <= 0 ; $t *= $p) {
+                        if ($k == 1) {
+                            if (Math::GMPz::Rmpz_cmp($t, $A) >= 0) {
+                                if (Math::GMPz::Rmpz_fits_ulong_p($t)) {
+                                    push @omega_primes, Math::GMPz::Rmpz_get_ui($t);
+                                }
+                                else {
+                                    push @omega_primes, $t;
+                                }
+                            }
+                        }
+                        else {
+                            __SUB__->($t, $p, $k - 1) if (Math::GMPz::Rmpz_cmp($t * $p, $B) <= 0);
+                        }
+                    }
+                }
+              }
+              ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
+
+            @omega_primes = sort { $a <=> $b } @omega_primes;
+        }
+
+        return \@omega_primes;
+    }
+
+    sub omega_primes {
+        my ($k, $from, $to) = @_;
+
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $to   = _any2mpz($$to)   // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $to   = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $from = $ONE;
+        }
+
+        $k = _any2ui($$k) // return Sidef::Types::Array::Array->new;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($to) < 0) {
+            $to = $ZERO;
+        }
+
+#<<<
+        my @omega_primes = map {
+            ref($_) ? (bless \$_) : _set_int($_)
+        } @{_sieve_omega_primes($from, $to, $k)};
+#>>>
+
+        Sidef::Types::Array::Array->new(\@omega_primes);
+    }
+
     sub _sieve_almost_primes {
         my ($from, $to, $k, %opt) = @_;
 

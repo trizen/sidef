@@ -4768,6 +4768,14 @@ Example:
 
 =cut
 
+=head2 omega_primes
+
+    Number.omega_primes()
+
+Returns the
+
+=cut
+
 =head2 one
 
     Num.one
