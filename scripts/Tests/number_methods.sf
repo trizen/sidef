@@ -274,6 +274,19 @@ assert_eq(
 
 # Counting methods
 
+for k in (1..4) {
+
+    var n = irand(50, 100)
+
+    assert_eq(k.omega_prime_count(n), 1..n -> count { .is_omega_prime(k) })
+    assert_eq(k.almost_prime_count(n), 1..n -> count { .is_almost_prime(k) })
+
+    n = irand(100, 1000)
+
+    assert_eq(k.omega_prime_count(n), k.omega_primes(n).len)
+    assert_eq(k.almost_prime_count(n), k.almost_primes(n).len)
+}
+
 assert_eq(2.almost_primes(50, 100).len, 2.almost_primepi(50, 100))
 assert_eq(2.almost_primes(10, 106).len, 2.almost_primepi(10, 106))
 assert_eq(2.almost_primes(50, 106).len, 2.almost_primepi(50, 106))

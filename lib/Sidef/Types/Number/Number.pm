@@ -10219,6 +10219,83 @@ package Sidef::Types::Number::Number {
             "9708737864077"    => "336330446255",
             "97656250000"      => "4025476060",
             "9900990099009"    => "342757310840",
+
+            # Number of primes <= 2^n.
+            # OEIS: https://oeis.org/A007053
+            "262144"                       => "23000",
+            "524288"                       => "43390",
+            "1048576"                      => "82025",
+            "2097152"                      => "155611",
+            "4194304"                      => "295947",
+            "8388608"                      => "564163",
+            "16777216"                     => "1077871",
+            "33554432"                     => "2063689",
+            "67108864"                     => "3957809",
+            "134217728"                    => "7603553",
+            "268435456"                    => "14630843",
+            "536870912"                    => "28192750",
+            "1073741824"                   => "54400028",
+            "2147483648"                   => "105097565",
+            "4294967296"                   => "203280221",
+            "8589934592"                   => "393615806",
+            "17179869184"                  => "762939111",
+            "34359738368"                  => "1480206279",
+            "68719476736"                  => "2874398515",
+            "137438953472"                 => "5586502348",
+            "274877906944"                 => "10866266172",
+            "549755813888"                 => "21151907950",
+            "1099511627776"                => "41203088796",
+            "2199023255552"                => "80316571436",
+            "4398046511104"                => "156661034233",
+            "8796093022208"                => "305761713237",
+            "17592186044416"               => "597116381732",
+            "35184372088832"               => "1166746786182",
+            "70368744177664"               => "2280998753949",
+            "140737488355328"              => "4461632979717",
+            "281474976710656"              => "8731188863470",
+            "562949953421312"              => "17094432576778",
+            "1125899906842624"             => "33483379603407",
+            "2251799813685248"             => "65612899915304",
+            "4503599627370496"             => "128625503610475",
+            "9007199254740992"             => "252252704148404",
+            "18014398509481984"            => "494890204904784",
+            "36028797018963968"            => "971269945245201",
+            "72057594037927936"            => "1906879381028850",
+            "144115188075855872"           => "3745011184713964",
+            "288230376151711744"           => "7357400267843990",
+            "576460752303423488"           => "14458792895301660",
+            "1152921504606846976"          => "28423094496953330",
+            "2305843009213693952"          => "55890484045084135",
+            "4611686018427387904"          => "109932807585469973",
+            "9223372036854775808"          => "216289611853439384",
+            "18446744073709551616"         => "425656284035217743",
+            "36893488147419103232"         => "837903145466607212",
+            "73786976294838206464"         => "1649819700464785589",
+            "147573952589676412928"        => "3249254387052557215",
+            "295147905179352825856"        => "6400771597544937806",
+            "590295810358705651712"        => "12611864618760352880",
+            "1180591620717411303424"       => "24855455363362685793",
+            "2361183241434822606848"       => "48995571600129458363",
+            "4722366482869645213696"       => "96601075195075186855",
+            "9444732965739290427392"       => "190499823401327905601",
+            "18889465931478580854784"      => "375744164937699609596",
+            "37778931862957161709568"      => "741263521140740113483",
+            "75557863725914323419136"      => "1462626667154509638735",
+            "151115727451828646838272"     => "2886507381056867953916",
+            "302231454903657293676544"     => "5697549648954257752872",
+            "604462909807314587353088"     => "11248065615133675809379",
+            "1208925819614629174706176"    => "22209558889635384205844",
+            "2417851639229258349412352"    => "43860397052947409356492",
+            "4835703278458516698824704"    => "86631124695994360074872",
+            "9671406556917033397649408"    => "171136408646923240987028",
+            "19342813113834066795298816"   => "338124238545210097236684",
+            "38685626227668133590597632"   => "668150111666935905701562",
+            "77371252455336267181195264"   => "1320486952377516565496055",
+            "154742504910672534362390528"  => "2610087356951889016077639",
+            "309485009821345068724781056"  => "5159830247726102115466054",
+            "618970019642690137449562112"  => "10201730804263125133012340",
+            "1237940039285380274899124224" => "20172933541156002700963336",
+            "2475880078570760549798248448" => "39895115987049029184882256",
         };
 
         if (defined($y)) {
@@ -10582,7 +10659,7 @@ package Sidef::Types::Number::Number {
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
         sub {
-            my ($m, $p, $k) = @_;
+            my ($m, $p, $k, $j) = @_;
 
             Math::GMPz::Rmpz_div($t, $n, $m);
 
@@ -10590,13 +10667,19 @@ package Sidef::Types::Number::Number {
 
                 Math::GMPz::Rmpz_sqrt($t, $t);
 
-                my $j = _prime_count($p) - 2;
+                my $s = Math::GMPz::Rmpz_get_str($t, 10);
 
-                foreach my $r (Math::Prime::Util::GMP::sieve_primes($p, Math::GMPz::Rmpz_get_str($t, 10))) {
+                for (
+                     my $q = $p ;
+                     $q <= $s ;
+                     $q = (
+                           HAS_PRIME_UTIL
+                           ? Math::Prime::Util::next_prime($q)
+                           : Math::Prime::Util::GMP::next_prime($q)
+                          )
+                  ) {
 
-                    ++$j;
-
-                    Math::GMPz::Rmpz_mul_ui($t, $m, $r);
+                    Math::GMPz::Rmpz_mul_ui($t, $m, $q);
                     Math::GMPz::Rmpz_div($t, $n, $t);
 
                     my $pi = _prime_count(Math::GMPz::Rmpz_get_str($t, 10));
@@ -10609,6 +10692,8 @@ package Sidef::Types::Number::Number {
                         Math::GMPz::Rmpz_sub_ui($t, $t, $j);
                         Math::GMPz::Rmpz_add($count, $count, $t);
                     }
+
+                    ++$j;
                 }
 
                 return;
@@ -10617,10 +10702,10 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_root($t, $t, $k);
 
             foreach my $q (Math::Prime::Util::GMP::sieve_primes($p, Math::GMPz::Rmpz_get_str($t, 10))) {
-                __SUB__->($m * $q, $q, $k - 1);
+                __SUB__->($m * $q, $q, $k - 1, $j++);
             }
           }
-          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
+          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
 
         bless \$count;
     }
@@ -10659,7 +10744,7 @@ package Sidef::Types::Number::Number {
         my $n = _any2mpz($$from) // return ZERO;
 
         sub {
-            my ($m, $p, $k, $s) = @_;
+            my ($m, $p, $k, $j, $s) = @_;
 
             $s //= do {
                 Math::GMPz::Rmpz_div($t, $n, $m);
@@ -10673,9 +10758,15 @@ package Sidef::Types::Number::Number {
                     return;
                 }
 
-                my $j = _prime_count($p) - 1;
-
-                foreach my $q (Math::Prime::Util::GMP::sieve_primes($p, $s)) {
+                for (
+                     my $q = $p ;
+                     $q <= $s ;
+                     $q = (
+                           HAS_PRIME_UTIL
+                           ? Math::Prime::Util::next_prime($q)
+                           : Math::Prime::Util::GMP::next_prime($q)
+                          )
+                  ) {
 
                     ++$j;
 
@@ -10705,10 +10796,15 @@ package Sidef::Types::Number::Number {
                             Math::GMPz::Rmpz_add($count, $count, $t);
                         }
 
-                        for (my $r = $q ;
-                            $r <= $w ;
-                            $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($r) : Math::Prime::Util::GMP::next_prime($r)))
-                        {
+                        for (
+                             my $r = $q ;
+                             $r <= $w ;
+                             $r = (
+                                   HAS_PRIME_UTIL
+                                   ? Math::Prime::Util::next_prime($r)
+                                   : Math::Prime::Util::GMP::next_prime($r)
+                                  )
+                          ) {
 
                             Math::GMPz::Rmpz_mul_ui($u, $v, $r);
                             Math::GMPz::Rmpz_mul_ui($u, $u, $r);
@@ -10733,26 +10829,32 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            for (;
+            for (
+                 ;
                  $p <= $s ;
-                 $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
+                 $p = (
+                       HAS_PRIME_UTIL
+                       ? Math::Prime::Util::next_prime($p)
+                       : Math::Prime::Util::GMP::next_prime($p)
+                      )
+              ) {
 
-                if (Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
-                    next;
+                if (!Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
+
+                    for (my $w = $m * $p ; Math::GMPz::Rmpz_cmp($w, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($w, $w, $p)) {
+
+                        Math::GMPz::Rmpz_div($t, $n, $w);
+                        Math::GMPz::Rmpz_root($t, $t, $k - 1);
+
+                        my $s = Math::GMPz::Rmpz_get_ui($t);
+                        last if ($s < $p);
+                        __SUB__->($w, $p, $k - 1, $j, $s);
+                    }
                 }
-
-                for (my $w = $m * $p ; Math::GMPz::Rmpz_cmp($w, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($w, $w, $p)) {
-
-                    Math::GMPz::Rmpz_div($t, $n, $w);
-                    Math::GMPz::Rmpz_root($t, $t, $k - 1);
-
-                    my $s = Math::GMPz::Rmpz_get_ui($t);
-                    last if ($s < $p);
-                    __SUB__->($w, $p, $k - 1, $s);
-                }
+                ++$j;
             }
           }
-          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
+          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
 
         bless \$count;
     }
@@ -11401,15 +11503,15 @@ package Sidef::Types::Number::Number {
             return Math::Prime::Util::semiprime_count($n);
         }
 
-        my $pi2 = 0;
-        my $t   = 0;
-        my $s   = Math::Prime::Util::GMP::sqrtint($n);
+        my $t = 0;
+        my $s = Math::Prime::Util::GMP::sqrtint($n);
 
+        my $count = 0;
         foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $s)) {
-            $pi2 += _prime_count(CORE::int($n / $p)) - ++$t + 1;
+            $count += _prime_count(CORE::int($n / $p)) - ++$t + 1;
         }
 
-        return $pi2;
+        return $count;
     }
 
     sub semiprime_count {
@@ -15776,9 +15878,15 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                for (;
+                for (
+                     ;
                      $p <= $s ;
-                     $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
+                     $p = (
+                           HAS_PRIME_UTIL
+                           ? Math::Prime::Util::next_prime($p)
+                           : Math::Prime::Util::GMP::next_prime($p)
+                          )
+                  ) {
 
                     if (Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
                         next;
@@ -16038,9 +16146,15 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                for (;
+                for (
+                     ;
                      $p <= $s ;
-                     $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
+                     $p = (
+                           HAS_PRIME_UTIL
+                           ? Math::Prime::Util::next_prime($p)
+                           : Math::Prime::Util::GMP::next_prime($p)
+                          )
+                  ) {
 
                     if ($squarefree and Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
                         next;
@@ -17083,9 +17197,15 @@ package Sidef::Types::Number::Number {
 
             my $t = Math::GMPz::Rmpz_init();
 
-            for (my $p = 3 ;
+            for (
+                 my $p = 3 ;
                  $p <= $k ;
-                 $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
+                 $p = (
+                       HAS_PRIME_UTIL
+                       ? Math::Prime::Util::next_prime($p)
+                       : Math::Prime::Util::GMP::next_prime($p)
+                      )
+              ) {
 
                 Math::GMPz::Rmpz_div_ui($t, $n, $p);
 
@@ -17149,9 +17269,15 @@ package Sidef::Types::Number::Number {
                 my $u = 0;
                 my $t = $n / $p;
 
-                for (my $q = 2 ;
+                for (
+                     my $q = 2 ;
                      $q < $p ;
-                     $q = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($q) : Math::Prime::Util::GMP::next_prime($q))) {
+                     $q = (
+                           HAS_PRIME_UTIL
+                           ? Math::Prime::Util::next_prime($q)
+                           : Math::Prime::Util::GMP::next_prime($q)
+                          )
+                  ) {
 
                     my $v = __SUB__->($t, $q);
 
@@ -17184,9 +17310,15 @@ package Sidef::Types::Number::Number {
 
             Math::GMPz::Rmpz_div_ui($t, $n, $p);
 
-            for (my $q = 2 ;
+            for (
+                 my $q = 2 ;
                  $q < $p ;
-                 $q = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($q) : Math::Prime::Util::GMP::next_prime($q))) {
+                 $q = (
+                       HAS_PRIME_UTIL
+                       ? Math::Prime::Util::next_prime($q)
+                       : Math::Prime::Util::GMP::next_prime($q)
+                      )
+              ) {
 
                 my $v = __SUB__->($t, $q);
 
