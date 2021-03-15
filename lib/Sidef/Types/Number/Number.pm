@@ -10577,21 +10577,23 @@ package Sidef::Types::Number::Number {
         }
 
         state $t = Math::GMPz::Rmpz_init_nobless();
+
+        my $n     = _any2mpz($$from) // return ZERO;
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
-        my $n = _any2mpz($$from) // return ZERO;
-
         sub {
-            my ($m, $p, $r) = @_;
+            my ($m, $p, $k) = @_;
 
             Math::GMPz::Rmpz_div($t, $n, $m);
 
-            if ($r == 2) {
-                my $j = _prime_count($p) - 2;
+            if ($k == 2) {
 
                 Math::GMPz::Rmpz_sqrt($t, $t);
 
+                my $j = _prime_count($p) - 2;
+
                 foreach my $r (Math::Prime::Util::GMP::sieve_primes($p, Math::GMPz::Rmpz_get_str($t, 10))) {
+
                     ++$j;
 
                     Math::GMPz::Rmpz_mul_ui($t, $m, $r);
@@ -10612,19 +10614,145 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            Math::GMPz::Rmpz_root($t, $t, $r);
+            Math::GMPz::Rmpz_root($t, $t, $k);
 
             foreach my $q (Math::Prime::Util::GMP::sieve_primes($p, Math::GMPz::Rmpz_get_str($t, 10))) {
-                __SUB__->($m * $q, $q, $r - 1);
+                __SUB__->($m * $q, $q, $k - 1);
             }
           }
           ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
 
-        _set_int($count);
+        bless \$count;
     }
 
     *pi_k           = \&almost_prime_count;
     *almost_primepi = \&almost_prime_count;
+
+    sub omega_prime_count {
+        my ($k, $from, $to) = @_;
+
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->omega_prime_count($to)->sub($k->omega_prime_count($from->dec));
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if ($k == 0) {
+            return ONE;
+        }
+        elsif ($k == 1) {
+            return $_[1]->prime_power_count;
+        }
+
+        my $v = _big2uistr($from) // return ZERO;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $v = Math::GMPz::Rmpz_init_nobless();
+
+        my $count = Math::GMPz::Rmpz_init_set_ui(0);
+
+        my $n = _any2mpz($$from) // return ZERO;
+
+        sub {
+            my ($m, $p, $k) = @_;
+
+            Math::GMPz::Rmpz_div($t, $n, $m);
+
+            if ($k == 2) {
+
+                Math::GMPz::Rmpz_sqrt($t, $t);
+
+                if (Math::GMPz::Rmpz_cmp_ui($t, $p) < 0) {
+                    return;
+                }
+
+                my $j = _prime_count($p) - 1;
+                my $s = Math::GMPz::Rmpz_get_str($t, 10);
+
+                foreach my $q (Math::Prime::Util::GMP::sieve_primes($p, Math::GMPz::Rmpz_get_str($t, 10))) {
+
+                    ++$j;
+
+                    if (Math::GMPz::Rmpz_divisible_ui_p($m, $q)) {
+                        next;
+                    }
+
+                    for (Math::GMPz::Rmpz_mul_ui($v, $m, $q) ;
+                         Math::GMPz::Rmpz_cmp($v, $n) <= 0 ;
+                         Math::GMPz::Rmpz_mul_ui($v, $v, $q)) {
+
+                        Math::GMPz::Rmpz_div($t, $n, $v);
+
+                        if (Math::GMPz::Rmpz_cmp_ui($t, $q) <= 0) {
+                            last;
+                        }
+
+                        my $w  = Math::GMPz::Rmpz_get_str($t, 10);
+                        my $pi = _prime_count($w);
+
+                        if ($pi < ULONG_MAX) {
+                            Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set_str($t, "$pi", 10);
+                            Math::GMPz::Rmpz_sub_ui($t, $t, $j);
+                            Math::GMPz::Rmpz_add($count, $count, $t);
+                        }
+
+                        for (my $r = $q ;
+                            $r <= $w ;
+                            $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($r) : Math::Prime::Util::GMP::next_prime($r)))
+                        {
+
+                            Math::GMPz::Rmpz_mul_ui($u, $v, $r);
+                            Math::GMPz::Rmpz_mul_ui($u, $u, $r);
+
+                            if (Math::GMPz::Rmpz_cmp($u, $n) > 0) {
+                                last;
+                            }
+
+                            if (Math::GMPz::Rmpz_divisible_ui_p($v, $r)) {
+                                next;
+                            }
+
+                            my $i = 0;
+                            for (; Math::GMPz::Rmpz_cmp($u, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($u, $u, $r)) {
+                                ++$i;
+                            }
+                            Math::GMPz::Rmpz_add_ui($count, $count, $i);
+                        }
+                    }
+                }
+
+                return;
+            }
+
+            Math::GMPz::Rmpz_root($t, $t, $k);
+
+            my $s = Math::GMPz::Rmpz_get_str($t, 10);
+
+            for (;
+                 $p <= $s ;
+                 $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
+
+                if (Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
+                    next;
+                }
+
+                for (my $w = $m * $p ; Math::GMPz::Rmpz_cmp($w, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($w, $w, $p)) {
+                    __SUB__->($w, $p, $k - 1);
+                }
+            }
+          }
+          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
+
+        bless \$count;
+    }
 
     sub prime_power_count {
         my ($x, $y) = @_;
@@ -11592,6 +11720,14 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
 
         $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE } : 2;
+
+        if ($k == 0) {
+            return $n->is_one;
+        }
+        elsif ($k == 1) {
+            return $n->is_prime_power;
+        }
+
         $n = $$n;
 
         if (ref($n) ne 'Math::GMPz') {

@@ -4801,6 +4801,14 @@ Example:
 
 =cut
 
+=head2 omega_prime_count
+
+    Number.omega_prime_count()
+
+Returns the
+
+=cut
+
 =head2 omega_primes
 
     k.omega_primes(n)

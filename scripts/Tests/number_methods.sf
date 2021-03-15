@@ -280,18 +280,35 @@ assert_eq(2.almost_primes(50, 106).len, 2.almost_primepi(50, 106))
 assert_eq(3.almost_primes(50, 106).len, 3.almost_primepi(50, 106))
 assert_eq(3.almost_primes(49, 105).len, 3.almost_primepi(49, 105))
 
+assert_eq(2.omega_primes(50, 100).len, 2.omega_prime_count(50, 100))
+assert_eq(2.omega_primes(10, 106).len, 2.omega_prime_count(10, 106))
+assert_eq(2.omega_primes(50, 106).len, 2.omega_prime_count(50, 106))
+assert_eq(3.omega_primes(50, 106).len, 3.omega_prime_count(50, 106))
+assert_eq(3.omega_primes(49, 105).len, 3.omega_prime_count(49, 105))
+
+assert_eq(1.omega_primes(49, 105), range(49, 105).grep { .is_omega_prime(1) })
+assert_eq(2.omega_primes(49, 105), range(49, 105).grep { .is_omega_prime(2) })
+assert_eq(3.omega_primes(49, 105), range(49, 105).grep { .is_omega_prime(3) })
+
 assert_eq(2.powerful(50, 100).len, 2.powerful_count(50, 100))
 assert_eq(2.powerful(10, 106).len, 2.powerful_count(10, 106))
 assert_eq(2.powerful(50, 106).len, 2.powerful_count(50, 106))
 assert_eq(3.powerful(50, 106).len, 3.powerful_count(50, 106))
 assert_eq(3.powerful(49, 105).len, 3.powerful_count(49, 105))
 
-assert_eq(2.powerful(1e6-2e3, 1e6), range(1e6-2e3, 1e6).grep{.is_powerful})
-assert_eq(2.powerful(1e6-1e4, 1e6), range(1e6-1e4, 1e6).grep{.is_powerful})
+for k in (1..7) {
+    assert_eq(k.omega_prime_count(1e6-2e3, 1e6), k.omega_primes(1e6-2e3, 1e6).len)
+    assert_eq(k.omega_prime_count(1e6-1e4, 1e6), k.omega_primes(1e6-1e4, 1e6).len)
 
-assert_eq(2.powerful(1e6-2e3, 1e6).len, 2.powerful_count(1e6-2e3, 1e6))
-assert_eq(2.powerful(1e6-1e4, 1e6).len, 2.powerful_count(1e6-1e4, 1e6))
-assert_eq(3.powerful(1e6-1e5, 1e6).len, 3.powerful_count(1e6-1e5, 1e6))
+    if (k <= 2) {
+        assert_eq(k.powerful(1e6-2e3, 1e6), range(1e6-2e3, 1e6).grep{.is_powerful(k)})
+        assert_eq(k.powerful(1e6-1e4, 1e6), range(1e6-1e4, 1e6).grep{.is_powerful(k)})
+    }
+
+    assert_eq(k.powerful(1e6-2e3, 1e6).len, k.powerful_count(1e6-2e3, 1e6))
+    assert_eq(k.powerful(1e6-1e4, 1e6).len, k.powerful_count(1e6-1e4, 1e6))
+    assert_eq(k.powerful(1e6-1e5, 1e6).len, k.powerful_count(1e6-1e5, 1e6))
+}
 
 # Almost prime divisors
 
