@@ -10659,22 +10659,23 @@ package Sidef::Types::Number::Number {
         my $n = _any2mpz($$from) // return ZERO;
 
         sub {
-            my ($m, $p, $k) = @_;
+            my ($m, $p, $k, $s) = @_;
 
-            Math::GMPz::Rmpz_div($t, $n, $m);
+            $s //= do {
+                Math::GMPz::Rmpz_div($t, $n, $m);
+                Math::GMPz::Rmpz_root($t, $t, $k);
+                Math::GMPz::Rmpz_get_ui($t);
+            };
 
             if ($k == 2) {
 
-                Math::GMPz::Rmpz_sqrt($t, $t);
-
-                if (Math::GMPz::Rmpz_cmp_ui($t, $p) < 0) {
+                if ($s < $p) {
                     return;
                 }
 
                 my $j = _prime_count($p) - 1;
-                my $s = Math::GMPz::Rmpz_get_str($t, 10);
 
-                foreach my $q (Math::Prime::Util::GMP::sieve_primes($p, Math::GMPz::Rmpz_get_str($t, 10))) {
+                foreach my $q (Math::Prime::Util::GMP::sieve_primes($p, $s)) {
 
                     ++$j;
 
@@ -10732,10 +10733,6 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            Math::GMPz::Rmpz_root($t, $t, $k);
-
-            my $s = Math::GMPz::Rmpz_get_str($t, 10);
-
             for (;
                  $p <= $s ;
                  $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
@@ -10745,7 +10742,13 @@ package Sidef::Types::Number::Number {
                 }
 
                 for (my $w = $m * $p ; Math::GMPz::Rmpz_cmp($w, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($w, $w, $p)) {
-                    __SUB__->($w, $p, $k - 1);
+
+                    Math::GMPz::Rmpz_div($t, $n, $w);
+                    Math::GMPz::Rmpz_root($t, $t, $k - 1);
+
+                    my $s = Math::GMPz::Rmpz_get_ui($t);
+                    last if ($s < $p);
+                    __SUB__->($w, $p, $k - 1, $s);
                 }
             }
           }

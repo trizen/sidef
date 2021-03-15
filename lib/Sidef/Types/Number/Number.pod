@@ -4803,9 +4803,15 @@ Example:
 
 =head2 omega_prime_count
 
-    Number.omega_prime_count()
+    k.omega_prime_count(n)
+    k.omega_prime_count(a,b)
 
-Returns the
+Returns the number of k-omega primes <= n, or in the range C<a..b>.
+
+Example:
+
+    say 1.omega_prime_count(100)            # number prime powers <= 100
+    say 2.omega_prime_count(50, 100)        # number of 2-omega primes in range 50..100
 
 =cut
 
