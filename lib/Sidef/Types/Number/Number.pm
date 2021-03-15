@@ -9744,6 +9744,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($to)) {
             _valid(\$to);
+            return ZERO if $to->lt($from);
             return $to->squarefree_count->sub($from->dec->squarefree_count);
         }
 
@@ -10355,6 +10356,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($to)) {
             _valid(\$to);
+            return ZERO if $to->lt($from);
             return $k->almost_prime_count($to)->sub($k->almost_prime_count($from->dec));
         }
 
@@ -10856,6 +10858,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($to)) {
             _valid(\$to);
+            return ZERO if $to->lt($from);
             return $to->composite_count->sub($from->dec->composite_count);
         }
 
@@ -11283,6 +11286,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($to)) {
             _valid(\$to);
+            return ZERO if $to->lt($from);
             return $to->semiprime_count->sub($from->dec->semiprime_count);
         }
 
@@ -15714,7 +15718,7 @@ package Sidef::Types::Number::Number {
             $from = $ONE;
         }
 
-        my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e4;
+        my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e7;
 
         if ($step > ULONG_MAX) {
             $step = Math::GMPz::Rmpz_init_set_str($step, 1e10);
@@ -17382,6 +17386,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($to)) {
             _valid(\$to);
+            return ZERO if $to->lt($from);
             return $k->powerful_count($to)->sub($k->powerful_count($from->dec));
         }
 
