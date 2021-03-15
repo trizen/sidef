@@ -10738,15 +10738,14 @@ package Sidef::Types::Number::Number {
             return $_[1]->prime_count;
         }
 
-        my $v = _big2uistr($from) // return ZERO;
-
         state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
-        state $v = Math::GMPz::Rmpz_init_nobless();
-
-        my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
         my $n = _any2mpz($$from) // return ZERO;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return ZERO;
+
+        my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
         sub {
             my ($m, $p, $k, $j) = @_;
@@ -10835,15 +10834,16 @@ package Sidef::Types::Number::Number {
             return $_[1]->prime_power_count;
         }
 
-        my $v = _big2uistr($from) // return ZERO;
-
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
         state $v = Math::GMPz::Rmpz_init_nobless();
 
-        my $count = Math::GMPz::Rmpz_init_set_ui(0);
-
         my $n = _any2mpz($$from) // return ZERO;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return ZERO;
+
+        my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
         sub {
             my ($m, $p, $k, $j, $s) = @_;
