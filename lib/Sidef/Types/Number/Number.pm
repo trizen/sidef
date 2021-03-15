@@ -10405,8 +10405,7 @@ package Sidef::Types::Number::Number {
 
         return ZERO if ($y < $x);
 
-        my $count = _prime_count($x, $y);
-        _set_int($count);
+        _set_int(_prime_count($x, $y));
     }
 
     *primepi      = \&prime_count;
@@ -10661,13 +10660,13 @@ package Sidef::Types::Number::Number {
         sub {
             my ($m, $p, $k, $j) = @_;
 
-            Math::GMPz::Rmpz_div($t, $n, $m);
+            my $s = do {
+                Math::GMPz::Rmpz_div($t, $n, $m);
+                Math::GMPz::Rmpz_root($t, $t, $k);
+                Math::GMPz::Rmpz_get_ui($t);
+            };
 
             if ($k == 2) {
-
-                Math::GMPz::Rmpz_sqrt($t, $t);
-
-                my $s = Math::GMPz::Rmpz_get_str($t, 10);
 
                 for (
                      my $q = $p ;
@@ -10699,9 +10698,15 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            Math::GMPz::Rmpz_root($t, $t, $k);
-
-            foreach my $q (Math::Prime::Util::GMP::sieve_primes($p, Math::GMPz::Rmpz_get_str($t, 10))) {
+            for (
+                 my $q = $p ;
+                 $q <= $s ;
+                 $q = (
+                       HAS_PRIME_UTIL
+                       ? Math::Prime::Util::next_prime($q)
+                       : Math::Prime::Util::GMP::next_prime($q)
+                      )
+              ) {
                 __SUB__->($m * $q, $q, $k - 1, $j++);
             }
           }
@@ -10712,6 +10717,103 @@ package Sidef::Types::Number::Number {
 
     *pi_k           = \&almost_prime_count;
     *almost_primepi = \&almost_prime_count;
+
+    sub squarefree_almost_prime_count {
+        my ($k, $from, $to) = @_;
+
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->squarefree_almost_prime_count($to)->sub($k->squarefree_almost_prime_count($from->dec));
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if ($k == 0) {
+            return ONE;
+        }
+        elsif ($k == 1) {
+            return $_[1]->prime_count;
+        }
+
+        my $v = _big2uistr($from) // return ZERO;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $v = Math::GMPz::Rmpz_init_nobless();
+
+        my $count = Math::GMPz::Rmpz_init_set_ui(0);
+
+        my $n = _any2mpz($$from) // return ZERO;
+
+        sub {
+            my ($m, $p, $k, $j) = @_;
+
+            my $s = do {
+                Math::GMPz::Rmpz_div($t, $n, $m);
+                Math::GMPz::Rmpz_root($t, $t, $k);
+                Math::GMPz::Rmpz_get_ui($t);
+            };
+
+            if ($k == 2) {
+
+                for (
+                     my $q = $p ;
+                     $q <= $s ;
+                     $q = (
+                           HAS_PRIME_UTIL
+                           ? Math::Prime::Util::next_prime($q)
+                           : Math::Prime::Util::GMP::next_prime($q)
+                          )
+                  ) {
+
+                    ++$j;
+
+                    if (!Math::GMPz::Rmpz_divisible_ui_p($m, $q)) {
+
+                        Math::GMPz::Rmpz_mul_ui($t, $m, $q);
+                        Math::GMPz::Rmpz_div($t, $n, $t);
+
+                        my $pi = _prime_count(Math::GMPz::Rmpz_get_str($t, 10));
+
+                        if ($pi < ULONG_MAX) {
+                            Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set_str($t, "$pi", 10);
+                            Math::GMPz::Rmpz_sub_ui($t, $t, $j);
+                            Math::GMPz::Rmpz_add($count, $count, $t);
+                        }
+                    }
+                }
+
+                return;
+            }
+
+            for (
+                 ;
+                 $p <= $s ;
+                 $p = (
+                       HAS_PRIME_UTIL
+                       ? Math::Prime::Util::next_prime($p)
+                       : Math::Prime::Util::GMP::next_prime($p)
+                      )
+              ) {
+                if (!Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
+                    __SUB__->($m * $p, $p, $k - 1, $j);
+                }
+                ++$j;
+            }
+          }
+          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
+
+        bless \$count;
+    }
+
+    *squarefree_pi_k           = \&squarefree_almost_prime_count;
+    *squarefree_almost_primepi = \&squarefree_almost_prime_count;
 
     sub omega_prime_count {
         my ($k, $from, $to) = @_;
@@ -12828,8 +12930,7 @@ package Sidef::Types::Number::Number {
             return _set_int("$r");
         }
 
-        my $r = Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::sieve_primes($x, $y));
-        _set_int($r);
+        _set_int(Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::sieve_primes($x, $y)));
     }
 
     *prime_sum  = \&sum_primes;
@@ -16146,15 +16247,7 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                for (
-                     ;
-                     $p <= $s ;
-                     $p = (
-                           HAS_PRIME_UTIL
-                           ? Math::Prime::Util::next_prime($p)
-                           : Math::Prime::Util::GMP::next_prime($p)
-                          )
-                  ) {
+                foreach my $p (Math::Prime::Util::GMP::sieve_primes($p, $s)) {
 
                     if ($squarefree and Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
                         next;

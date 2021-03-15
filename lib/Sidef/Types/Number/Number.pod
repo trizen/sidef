@@ -4915,8 +4915,8 @@ Returns the number of k-almost primes <= n, or in the range C<a..b>.
 
 Example:
 
-    say 5.almost_prime_count(1e7)           #=> 1349779
-    say 5.almost_prime_count(1e6, 1e7)      #=> 1225314
+    say 1.almost_prime_count(100)           # count of primes <= 100
+    say 2.almost_prime_count(50, 100)       # count of semiprimes in range 50..100
 
 Aliases: I<almost_primepi>, I<almost_prime_count>
 
@@ -6075,6 +6075,22 @@ Returns the square-free divisors of n.
 Example:
 
     say squarefree_divisors(120)  #=> [1, 2, 3, 5, 6, 10, 15, 30]
+
+=cut
+
+=head2 squarefree_pi_k
+
+    k.squarefree_almost_prime_count(n)
+    k.squarefree_almost_prime_count(a,b)
+
+Returns the number of squarefree k-almost primes <= n, or in the range C<a..b>.
+
+Example:
+
+    say 1.squarefree_almost_prime_count(1000)          # count of primes <= 1000
+    say 2.squarefree_almost_prime_count(50, 1000)      # count of squarefree semiprimes in range 50..1000
+
+Aliases: I<squarefree_almost_primepi>, I<squarefree_almost_prime_count>
 
 =cut
 

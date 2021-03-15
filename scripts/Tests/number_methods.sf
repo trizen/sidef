@@ -280,11 +280,13 @@ for k in (1..4) {
 
     assert_eq(k.omega_prime_count(n), 1..n -> count { .is_omega_prime(k) })
     assert_eq(k.almost_prime_count(n), 1..n -> count { .is_almost_prime(k) })
+    assert_eq(k.squarefree_almost_prime_count(n), 1..n -> count { .is_squarefree && .is_almost_prime(k) })
 
     n = irand(100, 1000)
 
     assert_eq(k.omega_prime_count(n), k.omega_primes(n).len)
     assert_eq(k.almost_prime_count(n), k.almost_primes(n).len)
+    assert_eq(k.squarefree_almost_prime_count(n), k.squarefree_almost_primes(n).len)
 }
 
 assert_eq(2.almost_primes(50, 100).len, 2.almost_primepi(50, 100))
@@ -299,9 +301,20 @@ assert_eq(2.omega_primes(50, 106).len, 2.omega_prime_count(50, 106))
 assert_eq(3.omega_primes(50, 106).len, 3.omega_prime_count(50, 106))
 assert_eq(3.omega_primes(49, 105).len, 3.omega_prime_count(49, 105))
 
-assert_eq(1.omega_primes(49, 105), range(49, 105).grep { .is_omega_prime(1) })
-assert_eq(2.omega_primes(49, 105), range(49, 105).grep { .is_omega_prime(2) })
-assert_eq(3.omega_primes(49, 105), range(49, 105).grep { .is_omega_prime(3) })
+assert_eq(2.squarefree_almost_primes(50, 100).len, 2.squarefree_almost_prime_count(50, 100))
+assert_eq(2.squarefree_almost_primes(10, 106).len, 2.squarefree_almost_prime_count(10, 106))
+assert_eq(2.squarefree_almost_primes(50, 106).len, 2.squarefree_almost_prime_count(50, 106))
+assert_eq(3.squarefree_almost_primes(50, 106).len, 3.squarefree_almost_prime_count(50, 106))
+assert_eq(3.squarefree_almost_primes(49, 105).len, 3.squarefree_almost_prime_count(49, 105))
+
+for k in (1..4) {
+
+    var a = irand(50, 100)
+    var b = irand(a, 150)
+
+    assert_eq(k.omega_primes(a,b), range(a,b).grep { .is_omega_prime(k) })
+    assert_eq(k.squarefree_almost_primes(a,b), range(a,b).grep { .is_squarefree && .is_almost_prime(k) })
+}
 
 assert_eq(2.powerful(50, 100).len, 2.powerful_count(50, 100))
 assert_eq(2.powerful(10, 106).len, 2.powerful_count(10, 106))
