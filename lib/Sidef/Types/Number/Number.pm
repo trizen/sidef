@@ -11741,6 +11741,14 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($n) > 0
           or return Sidef::Types::Bool::Bool::FALSE;
 
+        state @pn_primorial;
+        $pn_primorial[$k] //= Math::GMPz::Rmpz_init_set_str_nobless(Math::Prime::Util::GMP::pn_primorial($k), 10);
+
+        # The smallest k-omega prime is primorial(p_k)
+        if (Math::GMPz::Rmpz_cmp($n, $pn_primorial[$k]) < 0) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
         if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (    # XXX: available in MPU > 0.73
                 Math::Prime::Util::is_omega_prime($k, Math::GMPz::Rmpz_get_ui($n))
