@@ -10953,6 +10953,7 @@ package Sidef::Types::Number::Number {
                         __SUB__->($w, $p, $k - 1, $j, $s);
                     }
                 }
+
                 ++$j;
             }
           }
@@ -16018,6 +16019,85 @@ package Sidef::Types::Number::Number {
         return \@omega_primes;
     }
 
+    sub omega_prime_divisors {
+        my ($n, $k) = @_;
+
+        if (!defined($k)) {
+            my @list;
+
+            foreach my $k (0 .. $n->omega) {
+                push @list, $n->omega_prime_divisors(_set_int($k));
+            }
+
+            return Sidef::Types::Array::Array->new(\@list);
+        }
+
+        _valid(\$k);
+
+        $k = _any2ui($$k) // return Sidef::Types::Array::Array->new;
+        my $z = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        if ($k == 0) {
+            return Sidef::Types::Array::Array->new([ONE]);
+        }
+
+        if ($k == 1) {
+            return $_[0]->prime_power_divisors;
+        }
+
+        my @factor_exp = _factor_exp(Math::GMPz::Rmpz_get_str($z, 10));
+
+        if ($k > scalar(@factor_exp)) {
+            return Sidef::Types::Array::Array->new();
+        }
+
+        my %valuations = map { @$_ } @factor_exp;
+        my @factors    = map { ($_ < ULONG_MAX) ? $_ : ${_set_int($_)} } map { $_->[0] } @factor_exp;
+
+        my $t = Math::GMPz::Rmpz_init();
+
+        my @list;
+
+        sub {
+            my ($m, $p, $k) = @_;
+
+            Math::GMPz::Rmpz_div($t, $z, $m);
+            Math::GMPz::Rmpz_root($t, $t, $k);
+
+            my $s =
+                Math::GMPz::Rmpz_fits_ulong_p($t)
+              ? Math::GMPz::Rmpz_get_ui($t)
+              : Math::GMPz::Rmpz_init_set($t);
+
+            foreach my $q (@factors) {
+
+                $q < $p and next;
+                $q > $s and last;
+
+                if (ref($q) ? Math::GMPz::Rmpz_divisible_p($m, $q) : Math::GMPz::Rmpz_divisible_ui_p($m, $q)) {
+                    next;
+                }
+
+                my $v = $m * $q;
+
+                foreach my $j (1 .. $valuations{$q}) {
+
+                    if ($k == 1) {
+                        push @list, $v;
+                    }
+                    else {
+                        __SUB__->($v, $q, $k - 1);
+                    }
+
+                    $v *= $q;
+                }
+            }
+          }
+          ->(Math::GMPz::Rmpz_init_set_ui(1), $factors[0], $k);
+
+        Sidef::Types::Array::Array->new([map { _set_int($_) } sort { $a <=> $b } @list]);
+    }
+
     sub omega_primes {
         my ($k, $from, $to) = @_;
 
@@ -16306,60 +16386,6 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new([ONE]);
         }
 
-        my @list;
-
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($z)) {
-
-            $z = Math::GMPz::Rmpz_get_ui($z);
-
-            my @factor_exp = Math::Prime::Util::factor_exp($z);
-            my %valuations = map { @$_ } @factor_exp;
-            my @factors    = map { $_->[0] } @factor_exp;
-
-            if ($k == 1) {
-                return Sidef::Types::Array::Array->new([map { _set_int($_) } @factors]);
-            }
-
-            sub {
-                my ($m, $p, $k) = @_;
-
-                my $L =
-                  defined(&Math::Prime::Util::divint)
-                  ? Math::Prime::Util::divint($z, $m)
-                  : Math::Prime::Util::GMP::divint($z, $m);
-
-                if ($k == 1) {
-
-                    foreach my $q (@factors) {
-
-                        $q < $p and next;
-                        $q > $L and last;
-
-                        Math::Prime::Util::valuation($m, $q) < $valuations{$q} or next;
-
-                        push @list, $m * $q;
-                    }
-
-                    return;
-                }
-
-                my $s = Math::Prime::Util::rootint($L, $k);
-
-                foreach my $q (@factors) {
-
-                    $q < $p and next;
-                    $q > $s and last;
-
-                    Math::Prime::Util::valuation($m, $q) < $valuations{$q} or next;
-
-                    __SUB__->($m * $q, $q, $k - 1);
-                }
-              }
-              ->(1, $factors[0], $k);
-
-            return Sidef::Types::Array::Array->new([map { _set_int($_) } sort { $a <=> $b } @list]);
-        }
-
         my @factor_exp = _factor_exp(Math::GMPz::Rmpz_get_str($z, 10));
         my %valuations = map { @$_ } @factor_exp;
         my @factors    = map { ($_ < ULONG_MAX) ? $_ : ${_set_int($_)} } map { $_->[0] } @factor_exp;
@@ -16368,7 +16394,19 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new([map { _set_int($_) } @factors]);
         }
 
+        my $bigomega = 0;
+
+        foreach my $pp (@factor_exp) {
+            $bigomega += $pp->[1];
+        }
+
+        if ($k > $bigomega) {
+            return Sidef::Types::Array::Array->new();
+        }
+
         my $t = Math::GMPz::Rmpz_init();
+
+        my @list;
 
         sub {
             my ($m, $p, $k) = @_;

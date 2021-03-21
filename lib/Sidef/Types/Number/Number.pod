@@ -4815,6 +4815,23 @@ Example:
 
 =cut
 
+=head2 omega_prime_divisors
+
+    n.omega_prime_divisors
+    n.omega_prime_divisors(k)
+
+Returns the k-omega prime divisors of n.
+
+Example:
+
+    say 5040.omega_prime_divisors(4)    #=> [210, 420, 630, 840, 1260, 1680, 2520, 5040]
+
+When C<k> is omitted, an array of arrays with the k-omega prime divisors of n, for each k in the range C<0..omega(n)>, is returned:
+
+    say 120.omega_prime_divisors        #=> [[1], [2, 3, 4, 5, 8], [6, 10, 12, 15, 20, 24, 40], [30, 60, 120]]
+
+=cut
+
 =head2 omega_primes
 
     k.omega_primes(n)

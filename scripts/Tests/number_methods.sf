@@ -339,11 +339,13 @@ for k in (1..7) {
 # Almost prime divisors
 
 assert_eq(5040.almost_prime_divisors.flat.sort, 5040.divisors)
+assert_eq(5040.omega_prime_divisors.flat.sort, 5040.divisors)
 
 with (10!) {|n|
     var divisors = n.divisors
     for k in (0 .. (1+n.bigomega)) {
         assert_eq(n.almost_prime_divisors(k), divisors.grep { .is_almost_prime(k) })
+        assert_eq(n.omega_prime_divisors(k), divisors.grep { .is_omega_prime(k) })
     }
 }
 
@@ -354,6 +356,7 @@ with (21!) {|n|
     assert_eq(almost_prime_divisors(n, 37), n.divisors.grep { .is_almost_prime(37) })
     assert_eq(almost_prime_divisors(n, n.bigomega), [n])
     assert_eq(almost_prime_divisors(n, n.bigomega+1), [])
+    assert_eq(omega_prime_divisors(n, n.omega+1), [])
 }
 
 do {
