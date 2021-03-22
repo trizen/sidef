@@ -15942,20 +15942,20 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                for (; $p <= $s ; $p = Math::Prime::Util::next_prime($p)) {
+                while ($p <= $s) {
 
-                    if ($m % $p == 0) {
-                        next;
-                    }
+                    my $r = Math::Prime::Util::next_prime($p);
 
                     for (my $t = $m * $p ; $t - 1 < $B ; $t *= $p) {
                         if ($k == 1) {
                             push(@omega_primes, $t) if ($t >= $A);
                         }
                         else {
-                            __SUB__->($t, $p, $k - 1) if ($t * $p - 1 < $B);
+                            __SUB__->($t, $r, $k - 1) if ($t * $r - 1 < $B);
                         }
                     }
+
+                    $p = $r;
                 }
               }
               ->(1, 2, $k);
@@ -15982,19 +15982,13 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                for (
-                     ;
-                     $p <= $s ;
-                     $p = (
-                           HAS_PRIME_UTIL
-                           ? Math::Prime::Util::next_prime($p)
-                           : Math::Prime::Util::GMP::next_prime($p)
-                          )
-                  ) {
+                while ($p <= $s) {
 
-                    if (Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
-                        next;
-                    }
+                    my $r = (
+                             HAS_PRIME_UTIL
+                             ? Math::Prime::Util::next_prime($p)
+                             : Math::Prime::Util::GMP::next_prime($p)
+                            );
 
                     for (my $t = $m * $p ; Math::GMPz::Rmpz_cmp($t, $B) <= 0 ; $t *= $p) {
                         if ($k == 1) {
@@ -16008,9 +16002,11 @@ package Sidef::Types::Number::Number {
                             }
                         }
                         else {
-                            __SUB__->($t, $p, $k - 1) if (Math::GMPz::Rmpz_cmp($t * $p, $B) <= 0);
+                            __SUB__->($t, $r, $k - 1) if (Math::GMPz::Rmpz_cmp($t * $r, $B) <= 0);
                         }
                     }
+
+                    $p = $r;
                 }
               }
               ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
