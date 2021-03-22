@@ -7335,7 +7335,9 @@ package Sidef::Types::Number::Number {
         }
 
         if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
-            return _set_int(Math::Prime::Util::sqrtmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($y)) // goto &nan);
+            if (defined(my $r = Math::Prime::Util::sqrtmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($y)))) {
+                return _set_int($r);
+            }
         }
 
         my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
@@ -16157,7 +16159,7 @@ package Sidef::Types::Number::Number {
         my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e7;
 
         if ($step > ULONG_MAX) {
-            $step = Math::GMPz::Rmpz_init_set_str($step, 1e10);
+            $step = Math::GMPz::Rmpz_init_set_str($step, 10);
         }
 
         _generic_each($from, $to, $block, sub { $step }, sub { _sieve_omega_primes($_[0], $_[1], $k) });
