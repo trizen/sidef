@@ -16601,7 +16601,7 @@ package Sidef::Types::Number::Number {
         my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e7;
 
         if ($step > ULONG_MAX) {
-            $step = Math::GMPz::Rmpz_init_set_str($step, 1e10);
+            $step = Math::GMPz::Rmpz_init_set_str($step, 10);
         }
 
         _generic_each($from, $to, $block, sub { $step }, sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1) });
