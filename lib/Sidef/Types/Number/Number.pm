@@ -10858,33 +10858,21 @@ package Sidef::Types::Number::Number {
 
             if ($k == 2) {
 
-                if ($s < $p) {
-                    return;
-                }
+                for (; $p <= $s ; ++$j) {
 
-                for (
-                     my $q = $p ;
-                     $q <= $s ;
-                     $q = (
-                           HAS_PRIME_UTIL
-                           ? Math::Prime::Util::next_prime($q)
-                           : Math::Prime::Util::GMP::next_prime($q)
-                          )
-                  ) {
+                    my $r = (
+                             HAS_PRIME_UTIL
+                             ? Math::Prime::Util::next_prime($p)
+                             : Math::Prime::Util::GMP::next_prime($p)
+                            );
 
-                    ++$j;
-
-                    if (Math::GMPz::Rmpz_divisible_ui_p($m, $q)) {
-                        next;
-                    }
-
-                    for (Math::GMPz::Rmpz_mul_ui($v, $m, $q) ;
+                    for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ;
                          Math::GMPz::Rmpz_cmp($v, $n) <= 0 ;
-                         Math::GMPz::Rmpz_mul_ui($v, $v, $q)) {
+                         Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
 
                         Math::GMPz::Rmpz_div($t, $n, $v);
 
-                        if (Math::GMPz::Rmpz_cmp_ui($t, $q) <= 0) {
+                        if (Math::GMPz::Rmpz_cmp_ui($t, $r) < 0) {
                             last;
                         }
 
@@ -10901,65 +10889,58 @@ package Sidef::Types::Number::Number {
                         }
 
                         for (
-                             my $r = $q ;
-                             $r <= $w ;
-                             $r = (
-                                   HAS_PRIME_UTIL
-                                   ? Math::Prime::Util::next_prime($r)
-                                   : Math::Prime::Util::GMP::next_prime($r)
-                                  )
+                             my $r2 = $r ;
+                             $r2 <= $w ;
+                             $r2 = (
+                                    HAS_PRIME_UTIL
+                                    ? Math::Prime::Util::next_prime($r2)
+                                    : Math::Prime::Util::GMP::next_prime($r2)
+                                   )
                           ) {
 
-                            Math::GMPz::Rmpz_mul_ui($u, $v, $r);
-                            Math::GMPz::Rmpz_mul_ui($u, $u, $r);
+                            Math::GMPz::Rmpz_mul_ui($u, $v, $r2);
+                            Math::GMPz::Rmpz_mul_ui($u, $u, $r2);
 
                             if (Math::GMPz::Rmpz_cmp($u, $n) > 0) {
                                 last;
                             }
 
-                            if (Math::GMPz::Rmpz_divisible_ui_p($v, $r)) {
-                                next;
-                            }
-
                             my $i = 0;
-                            for (; Math::GMPz::Rmpz_cmp($u, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($u, $u, $r)) {
+                            for (; Math::GMPz::Rmpz_cmp($u, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($u, $u, $r2)) {
                                 ++$i;
                             }
                             Math::GMPz::Rmpz_add_ui($count, $count, $i);
                         }
                     }
+
+                    $p = $r;
                 }
 
                 return;
             }
 
-            for (
-                 ;
-                 $p <= $s ;
-                 $p = (
-                       HAS_PRIME_UTIL
-                       ? Math::Prime::Util::next_prime($p)
-                       : Math::Prime::Util::GMP::next_prime($p)
-                      )
-              ) {
+            for (; $p <= $s ; ++$j) {
 
-                if (!Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
+                my $r = (
+                         HAS_PRIME_UTIL
+                         ? Math::Prime::Util::next_prime($p)
+                         : Math::Prime::Util::GMP::next_prime($p)
+                        );
 
-                    for (my $w = $m * $p ; Math::GMPz::Rmpz_cmp($w, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($w, $w, $p)) {
+                for (my $w = $m * $p ; Math::GMPz::Rmpz_cmp($w, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($w, $w, $p)) {
 
-                        Math::GMPz::Rmpz_div($t, $n, $w);
-                        Math::GMPz::Rmpz_root($t, $t, $k - 1);
+                    Math::GMPz::Rmpz_div($t, $n, $w);
+                    Math::GMPz::Rmpz_root($t, $t, $k - 1);
 
-                        my $s = Math::GMPz::Rmpz_get_ui($t);
-                        last if ($s < $p);
-                        __SUB__->($w, $p, $k - 1, $j, $s);
-                    }
+                    my $s = Math::GMPz::Rmpz_get_ui($t);
+                    last if ($r > $s);
+                    __SUB__->($w, $r, $k - 1, $j + 1, $s);
                 }
 
-                ++$j;
+                $p = $r;
             }
           }
-          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
+          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 1);
 
         bless \$count;
     }
