@@ -10761,54 +10761,46 @@ package Sidef::Types::Number::Number {
             if ($k == 2) {
 
                 for (
-                     my $q = $p ;
-                     $q <= $s ;
-                     $q = (
+                     ;
+                     $p <= $s ;
+                     $p = (
                            HAS_PRIME_UTIL
-                           ? Math::Prime::Util::next_prime($q)
-                           : Math::Prime::Util::GMP::next_prime($q)
+                           ? Math::Prime::Util::next_prime($p)
+                           : Math::Prime::Util::GMP::next_prime($p)
                           )
                   ) {
 
-                    ++$j;
+                    Math::GMPz::Rmpz_mul_ui($t, $m, $p);
+                    Math::GMPz::Rmpz_div($t, $n, $t);
 
-                    if (!Math::GMPz::Rmpz_divisible_ui_p($m, $q)) {
+                    my $pi = _prime_count(Math::GMPz::Rmpz_get_str($t, 10));
 
-                        Math::GMPz::Rmpz_mul_ui($t, $m, $q);
-                        Math::GMPz::Rmpz_div($t, $n, $t);
-
-                        my $pi = _prime_count(Math::GMPz::Rmpz_get_str($t, 10));
-
-                        if ($pi < ULONG_MAX) {
-                            Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
-                        }
-                        else {
-                            Math::GMPz::Rmpz_set_str($t, "$pi", 10);
-                            Math::GMPz::Rmpz_sub_ui($t, $t, $j);
-                            Math::GMPz::Rmpz_add($count, $count, $t);
-                        }
+                    if ($pi < ULONG_MAX) {
+                        Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
                     }
+                    else {
+                        Math::GMPz::Rmpz_set_str($t, "$pi", 10);
+                        Math::GMPz::Rmpz_sub_ui($t, $t, $j);
+                        Math::GMPz::Rmpz_add($count, $count, $t);
+                    }
+
+                    ++$j;
                 }
 
                 return;
             }
 
-            for (
-                 ;
-                 $p <= $s ;
-                 $p = (
-                       HAS_PRIME_UTIL
-                       ? Math::Prime::Util::next_prime($p)
-                       : Math::Prime::Util::GMP::next_prime($p)
-                      )
-              ) {
-                if (!Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
-                    __SUB__->($m * $p, $p, $k - 1, $j);
-                }
-                ++$j;
+            for (; $p <= $s ; ++$j) {
+                my $r = (
+                         HAS_PRIME_UTIL
+                         ? Math::Prime::Util::next_prime($p)
+                         : Math::Prime::Util::GMP::next_prime($p)
+                        );
+                __SUB__->($m * $p, $r, $k - 1, $j + 1);
+                $p = $r;
             }
           }
-          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
+          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 1);
 
         bless \$count;
     }
@@ -16177,19 +16169,7 @@ package Sidef::Types::Number::Number {
         # TODO: optimization when A and B are close to each other.
         # Idea: if A-B < sqrt(B), then just iterate over the range A..B and grep the k-almost primes.
 
-        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-#<<<
-            Math::Prime::Util::foralmostprimes(sub {    # XXX: available in MPU > 0.73
-                if ($squarefree) {
-                    push(@almost_primes, $_) if Math::Prime::Util::is_square_free($_);
-                }
-                else {
-                    push(@almost_primes, $_);
-                }
-            }, $k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
-#>>>
-        }
-        elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
             my $A = Math::GMPz::Rmpz_get_ui($from);
             my $B = Math::GMPz::Rmpz_get_ui($to);
@@ -16206,28 +16186,18 @@ package Sidef::Types::Number::Number {
 
 #<<<
                 if ($k == 1) {
-                    if ($squarefree) {
-                        Math::Prime::Util::forprimes(sub {
-                            push(@almost_primes, $m * $_) if ($m % $_);
-                        }, $u, $v);
-                    }
-                    else {
-                        Math::Prime::Util::forprimes(sub {
-                            push(@almost_primes, $m * $_);
-                        }, $u, $v);
-                    }
+                    Math::Prime::Util::forprimes(sub {
+                        push(@almost_primes, $m * $_);
+                    }, $u, $v);
                     return;
                 }
 #>>>
 
                 my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                for (; $p <= $s ; $p = Math::Prime::Util::next_prime($p)) {
+                while ($p <= $s) {
 
-                    if ($squarefree and $m % $p == 0) {
-                        next;
-                    }
-
+                    my $r = Math::Prime::Util::next_prime($p);
                     my $t = $m * $p;
 
                     my $u =
@@ -16242,14 +16212,13 @@ package Sidef::Types::Number::Number {
 
                     ++$u if ($t * $u < $A);
 
-                    # Optimization for tight ranges
-                    if ($u > $v) {
-                        next;
+                    if (!($u > $v)) {
+                        $p = $r if $squarefree;
+                        $u = $p if ($k == 2 and $p > $u);
+                        __SUB__->($t, $p, $k - 1, ($k == 2) ? ($u, $v) : ());
                     }
 
-                    $u = $p if ($k == 2 and $p > $u);
-
-                    __SUB__->($t, $p, $k - 1, ($k == 2) ? ($u, $v) : ());
+                    $p = $r;
                 }
               }
               ->(1, 2, $k);
@@ -16284,12 +16253,10 @@ package Sidef::Types::Number::Number {
                     foreach my $q (Math::Prime::Util::GMP::sieve_primes($u, $v)) {
 
                         if ($q < ULONG_MAX) {
-                            $squarefree and Math::GMPz::Rmpz_divisible_ui_p($m, $q) and next;
                             Math::GMPz::Rmpz_mul_ui($x, $m, $q);
                         }
                         else {
                             Math::GMPz::Rmpz_set_str($x, $q, 10);
-                            $squarefree and Math::GMPz::Rmpz_divisible_p($m, $x) and next;
                             Math::GMPz::Rmpz_mul($x, $x, $m);
                         }
 
@@ -16306,33 +16273,37 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
-                foreach my $p (Math::Prime::Util::GMP::sieve_primes($p, $s)) {
+                while ($p <= $s) {
 
-                    if ($squarefree and Math::GMPz::Rmpz_divisible_ui_p($m, $p)) {
-                        next;
-                    }
-
+                    my $r = (
+                             HAS_PRIME_UTIL
+                             ? Math::Prime::Util::next_prime($p)
+                             : Math::Prime::Util::GMP::next_prime($p)
+                            );
                     my $u = Math::GMPz::Rmpz_init();
 
                     Math::GMPz::Rmpz_mul_ui($u, $m, $p);
                     Math::GMPz::Rmpz_cdiv_q($t, $A, $u);
                     Math::GMPz::Rmpz_div($x, $B, $u);
 
-                    # Optimization for tight ranges
-                    if (Math::GMPz::Rmpz_cmp($t, $x) > 0) {
-                        next;
+                    if (!(Math::GMPz::Rmpz_cmp($t, $x) > 0)) {
+
+                        $p = $r if $squarefree;
+
+                        # t = max(t, p)
+                        if ($k == 2 and Math::GMPz::Rmpz_cmp_ui($t, $p) < 0) {
+                            Math::GMPz::Rmpz_set_ui($t, $p);
+                        }
+
+                        __SUB__->(
+                                  $u, $p, $k - 1,
+                                  ($k == 2)
+                                  ? (Math::GMPz::Rmpz_get_str($t, 10), Math::GMPz::Rmpz_get_str($x, 10))
+                                  : ()
+                                 );
                     }
 
-                    # t = max(t, p)
-                    if ($k == 2 and Math::GMPz::Rmpz_cmp_ui($t, $p) < 0) {
-                        Math::GMPz::Rmpz_set_ui($t, $p);
-                    }
-
-                    __SUB__->(
-                              $u, $p, $k - 1, ($k == 2)
-                              ? (Math::GMPz::Rmpz_get_str($t, 10), Math::GMPz::Rmpz_get_str($x, 10))
-                              : ()
-                             );
+                    $p = $r;
                 }
               }
               ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
