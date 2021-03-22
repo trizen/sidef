@@ -16022,49 +16022,49 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new();
         }
 
-        my %valuations = map { @$_ } @factor_exp;
-        my @factors    = map { ($_ < ULONG_MAX) ? $_ : ${_set_int($_)} } map { $_->[0] } @factor_exp;
+        my %valuations  = map { @$_ } @factor_exp;
+        my @factors     = map { ($_ < ULONG_MAX) ? $_ : ${_set_int($_)} } map { $_->[0] } @factor_exp;
+        my $factors_end = $#factors;
 
         my $t = Math::GMPz::Rmpz_init();
 
         my @list;
 
         sub {
-            my ($m, $p, $k) = @_;
+            my ($m, $k, $i) = @_;
 
             Math::GMPz::Rmpz_div($t, $z, $m);
             Math::GMPz::Rmpz_root($t, $t, $k);
 
-            my $s =
+            my $L =
                 Math::GMPz::Rmpz_fits_ulong_p($t)
               ? Math::GMPz::Rmpz_get_ui($t)
               : Math::GMPz::Rmpz_init_set($t);
 
-            foreach my $q (@factors) {
+            foreach my $j ($i .. $factors_end) {
 
-                $q < $p and next;
-                $q > $s and last;
+                my $q = $factors[$j];
 
-                if (ref($q) ? Math::GMPz::Rmpz_divisible_p($m, $q) : Math::GMPz::Rmpz_divisible_ui_p($m, $q)) {
-                    next;
+                if (($k > 1 and $j == $factors_end) or ($q > $L)) {
+                    last;
                 }
 
                 my $v = $m * $q;
 
-                foreach my $j (1 .. $valuations{$q}) {
+                foreach (1 .. $valuations{$q}) {
 
                     if ($k == 1) {
                         push @list, $v;
                     }
                     else {
-                        __SUB__->($v, $q, $k - 1);
+                        __SUB__->($v, $k - 1, $j + 1);
                     }
 
                     $v *= $q;
                 }
             }
           }
-          ->(Math::GMPz::Rmpz_init_set_ui(1), $factors[0], $k);
+          ->(Math::GMPz::Rmpz_init_set_ui(1), $k, 0);
 
         Sidef::Types::Array::Array->new([map { _set_int($_) } sort { $a <=> $b } @list]);
     }
@@ -16336,9 +16336,10 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new([ONE]);
         }
 
-        my @factor_exp = _factor_exp(Math::GMPz::Rmpz_get_str($z, 10));
-        my %valuations = map { @$_ } @factor_exp;
-        my @factors    = map { ($_ < ULONG_MAX) ? $_ : ${_set_int($_)} } map { $_->[0] } @factor_exp;
+        my @factor_exp  = _factor_exp(Math::GMPz::Rmpz_get_str($z, 10));
+        my %valuations  = map { @$_ } @factor_exp;
+        my @factors     = map { ($_ < ULONG_MAX) ? $_ : ${_set_int($_)} } map { $_->[0] } @factor_exp;
+        my $factors_end = $#factors;
 
         if ($k == 1) {
             return Sidef::Types::Array::Array->new([map { _set_int($_) } @factors]);
@@ -16359,7 +16360,7 @@ package Sidef::Types::Number::Number {
         my @list;
 
         sub {
-            my ($m, $p, $k) = @_;
+            my ($m, $k, $i) = @_;
 
             Math::GMPz::Rmpz_div($t, $z, $m);
 
@@ -16370,9 +16371,9 @@ package Sidef::Types::Number::Number {
                   ? Math::GMPz::Rmpz_get_ui($t)
                   : Math::GMPz::Rmpz_init_set($t);
 
-                foreach my $q (@factors) {
+                foreach my $j ($i .. $factors_end) {
 
-                    $q < $p and next;
+                    my $q = $factors[$j];
                     $q > $L and last;
 
                     my $v = ref($q) ? Math::GMPz::Rmpz_remove($t, $m, $q) : do {
@@ -16380,9 +16381,9 @@ package Sidef::Types::Number::Number {
                         Math::GMPz::Rmpz_remove($t, $m, $t);
                     };
 
-                    $v < $valuations{$q} or next;
-
-                    push @list, $m * $q;
+                    if ($v < $valuations{$q}) {
+                        push @list, $m * $q;
+                    }
                 }
 
                 return;
@@ -16390,27 +16391,27 @@ package Sidef::Types::Number::Number {
 
             Math::GMPz::Rmpz_root($t, $t, $k);
 
-            my $s =
+            my $L =
                 Math::GMPz::Rmpz_fits_ulong_p($t)
               ? Math::GMPz::Rmpz_get_ui($t)
               : Math::GMPz::Rmpz_init_set($t);
 
-            foreach my $q (@factors) {
+            foreach my $j ($i .. $factors_end) {
 
-                $q < $p and next;
-                $q > $s and last;
+                my $q = $factors[$j];
+                $q > $L and last;
 
                 my $v = ref($q) ? Math::GMPz::Rmpz_remove($t, $m, $q) : do {
                     Math::GMPz::Rmpz_set_ui($t, $q);
                     Math::GMPz::Rmpz_remove($t, $m, $t);
                 };
 
-                $v < $valuations{$q} or next;
-
-                __SUB__->($m * $q, $q, $k - 1);
+                if ($v < $valuations{$q}) {
+                    __SUB__->($m * $q, $k - 1, $j);
+                }
             }
           }
-          ->(Math::GMPz::Rmpz_init_set_ui(1), $factors[0], $k);
+          ->(Math::GMPz::Rmpz_init_set_ui(1), $k, 0);
 
         Sidef::Types::Array::Array->new([map { _set_int($_) } sort { $a <=> $b } @list]);
     }
