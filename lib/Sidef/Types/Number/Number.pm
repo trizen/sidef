@@ -2296,6 +2296,37 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub idiv_round {
+        my ($x, $y) = @_;
+
+        _valid(\$y);
+
+        $x = _any2mpz($$x) // (goto &nan);
+        $y = _any2mpz($$y) // (goto &nan);
+
+        # Detect division by zero
+        Math::GMPz::Rmpz_sgn($y) || do {
+            my $sign = Math::GMPz::Rmpz_sgn($x);
+
+            if ($sign == 0) {    # 0/0
+                goto &nan;
+            }
+            elsif ($sign > 0) {    # x/0 where: x > 0
+                goto &inf;
+            }
+            else {                 # x/0 where: x < 0
+                goto &ninf;
+            }
+        };
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set($r, $y);
+        Math::GMPz::Rmpz_addmul_ui($r, $x, 2);
+        Math::GMPz::Rmpz_div($r, $r, $y);
+        Math::GMPz::Rmpz_div_2exp($r, $r, 1);
+        bless \$r;
+    }
+
     sub __neg__ {
         my ($x) = @_;
 
@@ -13848,6 +13879,8 @@ package Sidef::Types::Number::Number {
 
         bless \$r;
     }
+
+    *sum_of_remainders = \&sum_remainders;
 
     # Divisors d of n, such that d <= k, with k = n when `k` is not specified
     sub divisors {

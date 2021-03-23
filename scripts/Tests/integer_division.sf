@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+# Tests for the idiv* methods.
+
+for a in (-10..10), b in (-10..10) {
+
+    next if (b == 0)
+
+    assert_eq(round(a/b), idiv_round(a,b), "#{a}/#{b}") if !(a/b + 0.5 -> is_int)
+    assert_eq(ceil(a/b),  idiv_ceil(a,b),  "#{a}/#{b}")
+    assert_eq(floor(a/b), idiv_floor(a,b), "#{a}/#{b}")
+    assert_eq(trunc(a/b), idiv_trunc(a,b), "#{a}/#{b}")
+
+    assert_eq(floor(a/b + 1/2), idiv_round(a,b), "#{a}/#{b}")
+}
+
+say "** Test passed!"

@@ -182,7 +182,7 @@ Aliases: I<÷>, I<div>
 
 Integer floor-division of C<a> and C<b>.
 
-Equivalent with:
+When C<a> and C<b> are integers, this is equivalent with:
 
     floor(a/b)
 
@@ -2683,9 +2683,21 @@ Integer cube root of n.
 
 Integer division of integers C<a> and C<b>, rounded towards +Infinity.
 
-Equivalent with:
+When C<a> and C<b> are integers, this is equivalent with:
 
     ceil(a/b)
+
+=cut
+
+=head2 idiv_round
+
+    idiv_round(a,b)
+
+Integer division of integers C<a> and C<b>, rounded towards nearest integer.
+
+When C<a> and C<b> are integers, this is equivalent with:
+
+    floor(a/b + 1/2)
 
 =cut
 
@@ -2695,7 +2707,7 @@ Equivalent with:
 
 Integer division of integers C<a> and C<b>, rounded towards 0.
 
-Equivalent with:
+When C<a> and C<b> are integers, this is equivalent with:
 
     trunc(a/b)
 
