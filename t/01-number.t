@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 168;
+use Test::More tests => 167;
 
 use Sidef;
 
@@ -306,10 +306,6 @@ like(($x->mul($y))->as_rat, re '3/7');
 $x = $o->new('3/5');
 $y = $o->new('5/7');
 like(($x->div($y))->as_rat, re '21/25');
-
-$x = $o->new('7/4');
-$y = $o->new('1');
-like(($x->mod($y))->as_rat, re '0');
 
 $x = $o->new('43/99');
 $y = $o->new('13');
