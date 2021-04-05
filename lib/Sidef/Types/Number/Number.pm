@@ -8204,8 +8204,18 @@ package Sidef::Types::Number::Number {
         my ($n, $m) = @_;
         _valid(\$m);
 
-        my $r = Math::Prime::Util::GMP::factorialmod(_big2uistr($n) // (goto &nan), _big2uistr($m) // (goto &nan))
-          // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        my $r;
+
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n) and Math::GMPz::Rmpz_fits_ulong_p($m)) {
+            $r = Math::Prime::Util::factorialmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($m)) // goto &nan;
+        }
+        else {
+            $r = Math::Prime::Util::GMP::factorialmod(_big2uistr($n) // (goto &nan), _big2uistr($m) // (goto &nan))
+              // goto &nan;
+        }
 
         _set_int($r);
     }
