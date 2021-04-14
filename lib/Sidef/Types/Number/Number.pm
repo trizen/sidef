@@ -12283,7 +12283,7 @@ package Sidef::Types::Number::Number {
         my ($n, @bases) = @_;
         _valid(\(@bases));
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        if (0 and HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
             return (
                 Math::Prime::Util::is_strong_pseudoprime(
                     Math::GMPz::Rmpz_get_ui($$n),
