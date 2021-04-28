@@ -95,7 +95,7 @@ assert_eq(
 )
 
 do {
-    var n = [17, 17, 19, 23, 23, 29, 47, 53, 59].prod
+    var n = %n[17, 17, 19, 23, 23, 29, 47, 53, 59].prod
     var D = n.divisors
 
     assert_eq(n.rough_part(47), D.last_by { .is_rough(47) })

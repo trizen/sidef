@@ -13,7 +13,7 @@ assert_eq(inverse_sigma(5040).map{.sigma}.uniq, [5040])
 
 assert_eq(inverse_sigma(22100, 2), [120, 130, 141])
 
-assert_eq(inverse_phi(120), [143, 155, 175, 183, 225, 231, 244, 248, 286, 308, 310, 350, 366, 372, 396, 450, 462])
+assert_eq(inverse_phi(120), %n[143, 155, 175, 183, 225, 231, 244, 248, 286, 308, 310, 350, 366, 372, 396, 450, 462])
 assert_eq(inverse_phi(5040).len, 93)
 assert_eq(inverse_phi(5040).map{ .phi }.uniq, [5040])
 
@@ -21,7 +21,7 @@ assert_eq(inverse_psi(240), 1..240 -> grep { .psi == 240 })
 assert_eq(inverse_psi(5040).len, 38)
 assert_eq(inverse_psi(5040).map{.psi}.uniq, [5040])
 
-assert_eq(inverse_uphi(120), [121, 143, 144, 155, 164, 183, 220, 231, 240, 242, 286, 310, 366, 462])
+assert_eq(inverse_uphi(120), %n[121, 143, 144, 155, 164, 183, 220, 231, 240, 242, 286, 310, 366, 462])
 assert_eq(inverse_uphi(5040).len, 90)
 assert_eq(inverse_uphi(5040).map{.uphi}.uniq, [5040])
 
@@ -376,11 +376,11 @@ do {
     }
 }
 
-assert_eq(12.omega_primes(1e13), [7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
-assert_eq(12.squarefree_almost_primes(1e13), [7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
+assert_eq(12.omega_primes(1e13), %n[7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
+assert_eq(12.squarefree_almost_primes(1e13), %n[7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
 
-assert_eq(65.almost_primes(2**65 - 1e12, 2**65 + 1e12), [36893488147419103232])
-assert_eq(16.omega_primes(16.pn_primorial - 100, 16.pn_primorial + 100), [32589158477190044730])
-assert_eq(16.squarefree_almost_primes(16.pn_primorial - 100, 16.pn_primorial + 100), [32589158477190044730])
+assert_eq(65.almost_primes(2**65 - 1e12, 2**65 + 1e12), %n[36893488147419103232])
+assert_eq(16.omega_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
+assert_eq(16.squarefree_almost_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
 
 say "** Tests passed!"
