@@ -17268,12 +17268,18 @@ package Sidef::Types::Number::Number {
     }
 
     sub smooth_count {
-        my ($n, $k) = @_;
+        my ($k, $from, $to) = @_;
 
-        _valid(\$k);
+        _valid(\$from);
 
-        $n = _any2mpz($$n) // goto ZERO;
-        $k = _any2ui($$k)  // goto ZERO;
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->smooth_count($to)->sub($k->smooth_count($from->dec));
+        }
+
+        my $n = _any2mpz($$from) // return ZERO;
+        $k = _any2ui($$k)  // return ZERO;
 
         if ($k < 2 or Math::GMPz::Rmpz_sgn($n) <= 0) {
             return ZERO;
@@ -17350,12 +17356,18 @@ package Sidef::Types::Number::Number {
     }
 
     sub rough_count {
-        my ($n, $k) = @_;
+        my ($k, $from, $to) = @_;
 
-        _valid(\$k);
+        _valid(\$from);
 
-        $n = _any2mpz($$n) // goto ZERO;
-        $k = _any2ui($$k)  // goto ZERO;
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->rough_count($to)->sub($k->rough_count($from->dec));
+        }
+
+        my $n = _any2mpz($$from) // return ZERO;
+        $k = _any2ui($$k)  // return ZERO;
 
         if (Math::GMPz::Rmpz_sgn($n) <= 0) {
             return ZERO;

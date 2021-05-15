@@ -4110,7 +4110,7 @@ Returns the count of numbers <= C<n> that are not divisible by the first C<k> pr
 
 Equivalent with:
 
-    rough_count(n, prime(k+1))
+    prime(k+1).rough_count(n)
 
 =cut
 
@@ -5711,18 +5711,19 @@ The k-th root of n, defined as:
 
 =head2 rough_count
 
-    n.rough_count(k)
+    k.rough_count(n)
+    k.rough_count(a,b)
 
-It efficiently counts the number of k-rough <= n.
+Returns the number of k-rough numbers <= n, or in the range C<a..b>.
 
 Example:
 
-    say rough_count(1e6, 97)    #=> 122005
-    say rough_count(1e9, 23)    #=> 171024023
+    say 97.rough_count(1e6)    #=> 122005
+    say 23.rough_count(1e9)    #=> 171024023
 
 Also works with arbitarily large n:
 
-    say rough_count(1e34, 43)   #=> 1450936704022016442012254601096989
+    say 43.rough_count(1e34)   #=> 1450936704022016442012254601096989
 
 =cut
 
@@ -5899,13 +5900,14 @@ Hyperbolic sine function.
 
 =head2 smooth_count
 
-    n.smooth_count(k)
+    k.smooth_count(n)
+    k.smooth_count(a,b)
 
-Returns the number of k-smooth numbers <= n.
+Returns the number of k-smooth numbers <= n, or in the range C<a..b>.
 
 Example:
 
-    say 30.of {|n| smooth_count(10**n, 13) }   #=> A106629
+    say 30.of {|n| 13.smooth_count(10**n) }   #=> A106629
 
 =cut
 
