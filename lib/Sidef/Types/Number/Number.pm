@@ -9235,6 +9235,13 @@ package Sidef::Types::Number::Number {
         bless \__div__(__sub__(__pow__($r, __add__($n, $ONE)), $ONE), __sub__($r, $ONE));
     }
 
+    sub faulhaber_range {
+        my ($from, $to, $k) = @_;
+        _valid(\$to, \$k);
+        return ZERO if $to->lt($from);
+        return $to->faulhaber_sum($k)->sub($from->dec->faulhaber_sum($k));
+    }
+
     sub faulhaber_sum {
         my ($n, $p) = @_;
 
@@ -17279,7 +17286,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $n = _any2mpz($$from) // return ZERO;
-        $k = _any2ui($$k)  // return ZERO;
+        $k = _any2ui($$k) // return ZERO;
 
         if ($k < 2 or Math::GMPz::Rmpz_sgn($n) <= 0) {
             return ZERO;
@@ -17367,7 +17374,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $n = _any2mpz($$from) // return ZERO;
-        $k = _any2ui($$k)  // return ZERO;
+        $k = _any2ui($$k) // return ZERO;
 
         if (Math::GMPz::Rmpz_sgn($n) <= 0) {
             return ZERO;

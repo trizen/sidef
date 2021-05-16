@@ -2415,6 +2415,20 @@ Defined in terms of the Bernoulli polynomials, as:
 
 =cut
 
+=head2 faulhaber_range
+
+    faulhaber_range(a, b, k)
+
+Sum of powers: C<a^k + (a+1)^k + (a+2)^k + ... + b^k>, using Faulhaber's summation formula.
+
+The value for C<k> must be a non-negative native integer.
+
+Example:
+
+    faulhaber_range(50, 100, 2)   # 50^2 + 51^2 + ... + 100^2 = 297925
+
+=cut
+
 =head2 fermat_factor
 
     n.fermat_factor(k=1e4)
