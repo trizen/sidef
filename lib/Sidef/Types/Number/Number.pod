@@ -1003,7 +1003,7 @@ Aliases: I<bell_number>
     bernoulli(n)
     bernoulli(n, x)
 
-Returns the n-th Bernoulli number. When an additional argument is provided, it returns the n-th Bernoulli polynomial.
+Returns the n-th Bernoulli number. When an additional argument is provided, it returns the n-th Bernoulli polynomial evaluated at C<x>.
 
 Example:
 
@@ -1173,7 +1173,7 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<n
     bsearch_max(n, {...})
     bsearch_max(a,b, {...})
 
-Binary search, returning the minimum integer value in the range C<a..b> that satisifes the given comparison function.
+Binary search, returning the largest integer value in the range C<a..b> that satisifes the given comparison function.
 
 Example:
 
@@ -1190,7 +1190,7 @@ where:
     bsearch_min(n, {...})
     bsearch_min(a,b, {...})
 
-Binary search, returning the minimum integer value in the range C<a..b> that satisifes the given comparison function.
+Binary search, returning the smallest integer value in the range C<a..b> that satisifes the given comparison function.
 
 Example:
 
@@ -2407,7 +2407,7 @@ Aliases: I<faulhaber_sum>
 
     faulhaber_polynomial(n,x)
 
-Computes the n-th Faulhaber polynomials evaluated on x.
+Computes the n-th Faulhaber polynomials evaluated at C<x>.
 
 Defined in terms of the Bernoulli polynomials, as:
 
@@ -6564,7 +6564,7 @@ Returns the number 0.
 
     znorder(a,m)
 
-The smallest positive integer k such that C<powmod(a, k, n) == 1>.
+The smallest positive integer k such that C<powmod(a, k, m) == 1>.
 
 Return C<NaN> if C<a> is not coprime to C<m>.
 

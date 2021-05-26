@@ -6250,14 +6250,6 @@ package Sidef::Types::Number::Number {
 
         my @cfrac = @{$x->as_cfrac($n)};
 
-        if (defined($n)) {
-            $n = _any2ui($$n) // 0;
-            $n = @cfrac if $n > @cfrac;
-        }
-        else {
-            $n = @cfrac;
-        }
-
         my ($n1, $n2) = ($ZERO, $ONE);
         my ($d1, $d2) = ($ONE,  $ZERO);
 
