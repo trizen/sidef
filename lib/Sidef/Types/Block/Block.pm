@@ -391,8 +391,8 @@ package Sidef::Types::Block::Block {
     }
 
     sub exec {
-        my ($self) = @_;
-        $self->run;
+        my ($self, @args) = @_;
+        $self->run(@args);
         $self;
     }
 
