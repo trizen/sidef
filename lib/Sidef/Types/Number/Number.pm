@@ -4655,7 +4655,17 @@ package Sidef::Types::Number::Number {
     *bernoulli_log = \&lnbernreal;
 
     sub harmfrac {
-        my ($n) = @_;
+        my ($n, $k) = @_;
+
+        # Formula in terms of the Harmonic numbers, due to Conway and Guy (1996),
+        # for computing the Harmonic numbers of the k-th order.
+        if (defined($k)) {
+
+            my $km1   = $k->dec;
+            my $npkm1 = $n->add($km1);
+
+            return $npkm1->binomial($km1)->mul($npkm1->harmfrac->sub($km1->harmfrac));
+        }
 
         $n = _any2ui($$n) // goto &nan;
         $n || return ZERO();
@@ -4673,12 +4683,22 @@ package Sidef::Types::Number::Number {
     *harmonic_number = \&harmfrac;
 
     sub harmreal {
-        my ($x) = @_;
+        my ($n, $k) = @_;
 
-        $x = _any2mpfr($$x);
+        # Formula in terms of the Harmonic numbers, due to Conway and Guy (1996),
+        # for computing the Harmonic numbers of the k-th order.
+        if (defined($k)) {
+
+            my $km1   = $k->dec;
+            my $npkm1 = $n->add($km1);
+
+            return $npkm1->binomial($km1)->mul($npkm1->harmreal->sub($km1->harmreal));
+        }
+
+        $n = _any2mpfr($$n);
 
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        Math::MPFR::Rmpfr_add_ui($r, $x, 1, $ROUND);
+        Math::MPFR::Rmpfr_add_ui($r, $n, 1, $ROUND);
         Math::MPFR::Rmpfr_digamma($r, $r, $ROUND);
 
         my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));

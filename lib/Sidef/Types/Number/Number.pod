@@ -2585,8 +2585,11 @@ Returns the Hamming distance (number of bit-positions where the bits differ) bet
 =head2 harm
 
     harmonic(n)
+    harmonic(n, k)
 
 Returns the n-th Harmonic number C<H_n>. The harmonic numbers are the sum of reciprocals of the first C<n> natural numbers: C<1 + 1/2 + 1/3 + ... + 1/n>.
+
+When an additional argument is given, it returns the n-th Harmonic number of the k-th order.
 
 Aliases: I<harmfrac>, I<harmonic>, I<harmonic_number>
 
@@ -2595,12 +2598,15 @@ Aliases: I<harmfrac>, I<harmonic>, I<harmonic_number>
 =head2 harmreal
 
     harmreal(n)
+    harmreal(n, k)
 
 Returns the n-th Harmonic number C<H_n> as a floating-point value, defined as:
 
     harmreal(n) = digamma(n+1) + γ
 
 where C<γ> is the Euler-Mascheroni constant.
+
+When an additional argument is given, it returns the n-th Harmonic number of the k-th order.
 
 =cut
 
