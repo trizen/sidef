@@ -11269,7 +11269,7 @@ package Sidef::Types::Number::Number {
                       : _prime_count($k)
                      );
 
-            my $cmp = ($k <=> ($pi + 1 + $n));
+            my $cmp = ($k - $pi - 1) <=> $n;
 
             if ($cmp > 0) {
                 $max = $k - 1;
@@ -12085,7 +12085,7 @@ package Sidef::Types::Number::Number {
         my ($n, @bases) = @_;
         _valid(\(@bases));
 
-        if (0 and HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
             return (
                 Math::Prime::Util::is_pseudoprime(
                     Math::GMPz::Rmpz_get_ui($$n),
@@ -12284,6 +12284,20 @@ package Sidef::Types::Number::Number {
         my ($n, @bases) = @_;
         _valid(\(@bases));
 
+        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+            return (
+                Math::Prime::Util::is_euler_pseudoprime(
+                    Math::GMPz::Rmpz_get_ui($$n),
+                    do {
+                        @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
+                        @bases ? (@bases) : (2);
+                    }
+                  )
+                ? Sidef::Types::Bool::Bool::TRUE
+                : Sidef::Types::Bool::Bool::FALSE
+            );
+        }
+
         __is_int__($$n)
           && Math::Prime::Util::GMP::is_euler_pseudoprime(
             _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
@@ -12302,7 +12316,7 @@ package Sidef::Types::Number::Number {
         my ($n, @bases) = @_;
         _valid(\(@bases));
 
-        if (0 and HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
             return (
                 Math::Prime::Util::is_strong_pseudoprime(
                     Math::GMPz::Rmpz_get_ui($$n),

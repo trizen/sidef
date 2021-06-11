@@ -27,6 +27,19 @@ do {
     assert_eq(arr, {.is_composite}.first(20))
 }
 
+assert_eq(
+    1..composite_count(100) -> map{.composite},
+    1..100 -> grep { .is_composite }
+)
+
+with (123456789) {|n|
+    assert_eq(composite_count(composite(n)), n)
+    assert_eq(composite(composite_count(n)), n)
+
+    assert_eq(composite_count(composite(n.flip)), n.flip)
+    assert_eq(composite(composite_count(n.flip)), n.flip)
+}
+
 assert_eq(composite_count(1, 100), composite_count(100))
 assert_eq(composite_count(0, 100), 74)
 assert_eq(composite_count(0, 101), 74)
