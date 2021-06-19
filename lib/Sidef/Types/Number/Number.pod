@@ -6027,6 +6027,19 @@ Example:
 
 =cut
 
+=head2 sqrt_cfrac_period_each
+
+    n.sqrt_cfrac_period_each { ... }
+    n.sqrt_cfrac_period_each({ ... }, max_iter)
+
+Iterate over the period of the expansion of the continued fraction for square root of n.
+
+Example:
+
+    28.sqrt_cfrac_period_each {|r| say r }
+
+=cut
+
 =head2 sqrt_cfrac_period_len
 
     n.sqrt_cfrac_period_len

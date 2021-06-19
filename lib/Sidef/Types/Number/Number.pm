@@ -6122,22 +6122,20 @@ package Sidef::Types::Number::Number {
         return (undef, undef);
     }
 
-    sub sqrt_cfrac {
-        my ($n, $max) = @_;
+    sub sqrt_cfrac_period_each {
+        my ($n, $block, $max) = @_;
 
-        $n   = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        $n   = _any2mpz($$n) // return ZERO;
         $max = defined($max) ? CORE::int($max) : (0 + 'inf');
 
         Math::GMPz::Rmpz_sgn($n) < 0
-          and return Sidef::Types::Array::Array->new();
+          and return ZERO;
 
         my $x = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_sqrt($x, $n);
 
-        my @cfrac = (bless \$x);
-
         Math::GMPz::Rmpz_perfect_square_p($n)
-          and return Sidef::Types::Array::Array->new(\@cfrac);
+          and return ZERO;
 
         # Optimization for native integers
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
@@ -6145,24 +6143,27 @@ package Sidef::Types::Number::Number {
             $n = Math::GMPz::Rmpz_get_ui($n);
             $x = Math::GMPz::Rmpz_get_ui($x);
 
-            my @cfrac = _set_int($x);
-
             my $y = $x;
             my $z = 1;
             my $r = $x + $x;
 
-            for (my $count = 0 ; $count < $max ; ++$count) {
+            my $count = 0;
+
+            for (; $count < $max ; ++$count) {
 
                 $y = $r * $z - $y;
                 $z = CORE::int(($n - $y * $y) / $z);
                 $r = CORE::int(($x + $y) / $z);
 
-                push @cfrac, _set_int($r);
+                $block->run(_set_int($r));
 
-                last if $z == 1;
+                if ($z == 1) {
+                    ++$count;
+                    last;
+                }
             }
 
-            return Sidef::Types::Array::Array->new(\@cfrac);
+            return _set_int($count);
         }
 
         my $y = Math::GMPz::Rmpz_init_set($x);
@@ -6171,7 +6172,8 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_add($r, $x, $x);    # r = x+x
 
-        for (my $count = 0 ; $count < $max ; ++$count) {
+        my $count = 0;
+        for (; $count < $max ; ++$count) {
 
             my $t = Math::GMPz::Rmpz_init();
 
@@ -6189,19 +6191,37 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_div($t, $t, $z);         # t = floor(t/z)
 
             $r = $t;
-            push @cfrac, bless \$t;
+            $block->run(bless \$t);
 
-            last if Math::GMPz::Rmpz_cmp_ui($z, 1) == 0;
+            if (Math::GMPz::Rmpz_cmp_ui($z, 1) == 0) {
+                ++$count;
+                last;
+            }
         }
 
-        Sidef::Types::Array::Array->new(\@cfrac);
+        return _set_int($count);
+    }
+
+    sub sqrt_cfrac {
+        my ($n, $max) = @_;
+        $n->sqrt_cfrac_period($max)->unshift($n->isqrt);
     }
 
     sub sqrt_cfrac_period {
-        my ($n) = @_;
-        my @arr = @{$n->sqrt_cfrac};
-        CORE::shift(@arr);
-        Sidef::Types::Array::Array->new(\@arr);
+        my ($n, $max) = @_;
+
+        my @cfrac;
+
+        $n->sqrt_cfrac_period_each(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    push @cfrac, $_[0];
+                }
+            ),
+            $max
+                                  );
+
+        Sidef::Types::Array::Array->new(\@cfrac);
     }
 
     sub sqrt_cfrac_period_len {
