@@ -12944,7 +12944,8 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@primes);
     }
 
-    *nprimes = \&n_primes;
+    *nprimes     = \&n_primes;
+    *next_primes = \&n_primes;
 
     sub n_composites {
         my ($n, $start) = @_;
@@ -12968,7 +12969,8 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@composites);
     }
 
-    *ncomposites = \&n_composites;
+    *ncomposites     = \&n_composites;
+    *next_composites = \&n_composites;
 
     sub pn_primes {
         my ($x, $y) = @_;

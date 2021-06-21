@@ -4588,7 +4588,7 @@ Example:
     say n_composites(10)        #=> [4, 6, 8, 9, 10, 12, 14, 15, 16, 18]
     say n_composites(5, 50)     #=> [50, 51, 52, 54, 55]
 
-Aliases: I<ncomposites>
+Aliases: I<ncomposites>, I<next_composites>
 
 =cut
 
@@ -4751,7 +4751,7 @@ The value for C<start> can be any arbitary large integer:
 
     say n_primes(10, 2**128 + 1)    # first 10 primes > 2^128
 
-Aliases: I<nprimes>
+Aliases: I<nprimes>, I<next_primes>
 
 =cut
 
