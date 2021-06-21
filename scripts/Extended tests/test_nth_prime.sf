@@ -1,0 +1,57 @@
+#!/usr/bin/ruby
+
+require('ntheory')
+
+#irand(1234)
+
+for n in (1..100) {
+    var k = irand(1e7)
+
+    say "Testing k=#{k}"
+
+    var p = k.nth_prime
+    var q = %S<ntheory>.nth_prime(k)
+
+    if (p != q) {
+        die "Error for k=#{k}"
+    }
+}
+
+for n in (1..10) {
+    var k = 10**n
+
+    say "Testing k=#{k}"
+
+    var p = k.nth_prime
+    var q = %S<ntheory>.nth_prime(k)
+
+    if (p != q) {
+        die "Error for k=#{k}"
+    }
+}
+
+for n in (1..10) {
+    var k = (10**n + irand(1e5))
+
+    say "Testing k=#{k}"
+
+    var p = k.nth_prime
+    var q = %S<ntheory>.nth_prime(k)
+
+    if (p != q) {
+        die "Error for k=#{k}"
+    }
+}
+
+for n in (1..8) {
+    var k = abs(10**n - irand(1e3))
+
+    say "Testing k=#{k}"
+
+    var p = k.nth_prime
+    var q = %S<ntheory>.nth_prime(k)
+
+    if (p != q) {
+        die "Error for k=#{k}"
+    }
+}

@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+for n in (1..100) {
+
+    var step = (irand(-100, 100) / irand(1, 100))
+    var from = (irand(-1e3, 1e3) / irand(1, 1e2))
+    var to   = (irand(-1e4, 1e4) / irand(1, 1e2))
+
+    step += 1 if (step.is_zero)
+
+    say "Testing sum(#{from.as_rat}, #{to.as_rat}, #{step.as_rat}): #{sum(from .. to `by` step).as_rat}"
+
+    if (sum(from .. to `by` step) != sum(from .. to `by` step, { _ })) {
+        die "!!!!!!!!!!! error for sum(#{from.as_frac}, #{to.as_frac}, #{step.as_frac})"
+    }
+}

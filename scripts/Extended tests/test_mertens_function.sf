@@ -1,0 +1,52 @@
+#!/usr/bin/ruby
+
+assert_eq(mertens(1e9-1), -222)
+assert_eq(mertens(1e9),   -222)
+assert_eq(mertens(1e9+1), -223)
+assert_eq(mertens(1e9+2), -224)
+assert_eq(mertens(1e9+3), -225)
+assert_eq(mertens(1e9+4), -225)
+assert_eq(mertens(1e9+5), -226)
+
+#~ func my_mertens(a, b) {
+    #~ moebius(a, b).sum
+#~ }
+
+require('ntheory')
+
+func my_mertens(a, b) {
+    return 0 if (b < a)
+    %S(ntheory).mertens(b) - %S(ntheory).mertens(a) + moebius(a)
+}
+
+assert_eq(mertens(11717, 388912), my_mertens(11717, 388912))
+
+for n in (1..1000) {
+    say "Testing: mertens(#{n})"
+    assert_eq(mertens(n), my_mertens(0, n))
+}
+
+for n in (1..100) {
+    say "Testing: mertens(#{1e6+n})"
+    assert_eq(mertens(1e6+n), my_mertens(0, 1e6+n))
+}
+
+for n in (1..100) {
+    say "Testing: mertens(#{1e7-n})"
+    assert_eq(mertens(1e7-n), my_mertens(0, 1e7-n))
+}
+
+for n in (1..100) {
+    say "Testing: mertens(#{1e7+n})"
+    assert_eq(mertens(1e7+n), my_mertens(0, 1e7+n))
+}
+
+for n in (1..1000) {
+
+    var k = 1e4.irand
+    var m = 1e6.irand
+
+    say "Testing: #{k} (#{k.is_square_free}) and #{m} (#{m.is_square_free})"
+
+    assert_eq(mertens(k, m), my_mertens(k, m))
+}

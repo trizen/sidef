@@ -1,0 +1,20 @@
+#!/usr/bin/ruby
+
+func f(n) {
+
+    var pi = n.pi
+    var prime = n.prime
+
+    say "Testing: n = #{n} : #{n.prime_lower} <= #{prime} <= #{n.prime_upper}"
+
+    assert(n.prime_count_lower <= pi)
+    assert(n.prime_count_upper >= pi)
+
+    assert(n.nth_prime_lower <= prime)
+    assert(n.nth_prime_upper >= prime)
+}
+
+for k in (1..100) {
+    f(1e9.irand)
+    f(k)
+}

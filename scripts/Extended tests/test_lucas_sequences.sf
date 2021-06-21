@@ -1,0 +1,49 @@
+#!/usr/bin/ruby
+
+say "=> Testing Lucas U"
+
+for n in (0..1000) {
+    var m = 1e6.irand
+    var p = irand(-1e6, 1e6)
+    var q = irand(-1e6, 1e6)
+
+    say "Testing: lucasUmod(#{p}, #{q}, #{n}, #{m})"
+
+    var U = lucasU(p, q, n)
+    var Um = lucasUmod(p, q, n, m)
+
+    assert_eq(U % m, Um)
+}
+
+say '=> Testing Lucas V'
+
+for n in (0..1000) {
+    var m = 1e6.irand
+    var p = irand(-1e6, 1e6)
+    var q = irand(-1e6, 1e6)
+
+    say "Testing: lucasVmod(#{p}, #{q}, #{n}, #{m})"
+
+    var V = lucasV(p, q, n)
+    var Vm = lucasVmod(p, q, n, m)
+
+    assert_eq(V % m, Vm)
+}
+
+say '=> Testing Lucas UV'
+
+for n in (0..1000) {
+    var m = 1e6.irand
+    var p = irand(-1e6, 1e6)
+    var q = irand(-1e6, 1e6)
+
+    say "Testing: lucasUVmod(#{p}, #{q}, #{n}, #{m})"
+
+    var U = lucasU(p, q, n)
+    var V = lucasV(p, q, n)
+
+    var (Um, Vm) = lucasUVmod(p, q, n, m)
+
+    assert_eq(U % m, Um)
+    assert_eq(V % m, Vm)
+}

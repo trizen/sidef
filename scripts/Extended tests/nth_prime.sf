@@ -1,0 +1,31 @@
+#!/usr/bin/ruby
+
+require('ntheory')
+
+var table = []
+
+for n in (1..16) {
+    var t1 = Time.micro
+    var res = (n * 10**6 -> nth_prime)
+    var t2 = Time.micro
+
+    if (res != %S<ntheory>.nth_prime(n * 1e6)) {
+        die "error for: #{n * 1e6}: #{res}"
+    }
+
+    table << [t2-t1, n, res]
+}
+
+table.sort_by { _[0] }.each { .join(' ').say }
+
+__END__
+0.00643 9 160481183
+0.00798 1 15485863
+0.01468 5 86028121
+0.01474 8 141650939
+0.01999 4 67867967
+0.02065 7 122949823
+0.02128 2 32452843
+0.03049 6 104395301
+0.03076 3 49979687
+0.05664 10 179424673

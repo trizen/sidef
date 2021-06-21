@@ -186,6 +186,20 @@ scripts/Expensive/thiele_interpolation_formula.sf
 scripts/Expensive/zebra_puzzle.sf
 scripts/Expensive/zhang_suen_thinning_algorithm.sf
 scripts/extend_your_language.sf
+'scripts/Extended tests/nth_prime.sf'
+'scripts/Extended tests/test_digits2num.pl'
+'scripts/Extended tests/test_inverse_sigma.sf'
+'scripts/Extended tests/test_lucas_carmichael_negative.sf'
+'scripts/Extended tests/test_lucas_carmichael_positive.sf'
+'scripts/Extended tests/test_lucas_sequences.sf'
+'scripts/Extended tests/test_mertens_function.sf'
+'scripts/Extended tests/test_nth_prime.sf'
+'scripts/Extended tests/test_prime_bounds.sf'
+'scripts/Extended tests/test_prime_count.sf'
+'scripts/Extended tests/test_prime_power_count.sf'
+'scripts/Extended tests/test_range_sum.sf'
+'scripts/Extended tests/test_sqrtmod.pl'
+'scripts/Extended tests/test_sumdigits.pl'
 scripts/fast_fourier_transform.sf
 scripts/faulhaber_s_formula.sf
 scripts/fibonacci_sequence.sf

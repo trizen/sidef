@@ -1,0 +1,23 @@
+#!/usr/bin/ruby
+
+require('ntheory')
+
+#irand(1234)
+
+for n in (1..100) {
+    var k = irand(1e7)
+    var t = irand(1e6)
+
+    if (t < k) {
+        (t, k) = (k, t)
+    }
+
+    var p = k.prime_count(t)
+    var q = %S<ntheory>.prime_count(k, t)
+
+    say "Testing pi(#{k}, #{t}) = #{p}"
+
+    if (p != q) {
+        die "Error for k=#{k} t=#{t} -> got #{p} instead of #{q}"
+    }
+}
