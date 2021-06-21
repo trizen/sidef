@@ -10022,6 +10022,11 @@ package Sidef::Types::Number::Number {
         CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n)) - 1));
     }
 
+    sub _nth_prime_upper {
+        my ($n) = @_;
+        CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n))));
+    }
+
     sub _nth_almost_prime_lower {
         my ($n, $k) = @_;
 
@@ -10494,18 +10499,96 @@ package Sidef::Types::Number::Number {
     *count_primes = \&prime_count;
 
     sub prime_count_lower {
-        my $prime_pi = Math::Prime::Util::GMP::prime_count_lower(&_big2uistr // return ZERO) // 0;
-        _set_int($prime_pi);
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO;
+        }
+
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return _set_int(Math::Prime::Util::prime_count_lower(Math::GMPz::Rmpz_get_ui($n)));
+        }
+
+        _set_int(Math::Prime::Util::GMP::prime_count_lower(Math::GMPz::Rmpz_get_str($n, 10)));
     }
 
     *primepi_lower = \&prime_count_lower;
 
     sub prime_count_upper {
-        my $prime_pi = Math::Prime::Util::GMP::prime_count_upper(&_big2uistr // return ZERO) // 0;
-        _set_int($prime_pi);
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO;
+        }
+
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return _set_int(Math::Prime::Util::prime_count_upper(Math::GMPz::Rmpz_get_ui($n)));
+        }
+
+        _set_int(Math::Prime::Util::GMP::prime_count_upper(Math::GMPz::Rmpz_get_str($n, 10)));
     }
 
     *primepi_upper = \&prime_count_upper;
+
+    sub _nth_prime_lower_bound {
+        my ($n) = @_;
+        my $log_n = $n->log;
+        $n->mul($log_n->add($log_n->log)->dec);
+    }
+
+    sub _nth_prime_upper_bound {
+        my ($n) = @_;
+        my $log_n = $n->log;
+        $n->mul($log_n->add($log_n->log));
+    }
+
+    sub nth_prime_lower {
+        my ($n) = @_;
+
+        my $z = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_cmp_ui($z, 10) <= 0) {
+            return $n->nth_prime;
+        }
+
+        bsearch_min(
+            $n->_nth_prime_lower_bound,
+            $n->_nth_prime_upper_bound,
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $_[0]->prime_count_upper->cmp($n);
+                }
+            )
+        );
+    }
+
+    *prime_lower = \&nth_prime_lower;
+
+    sub nth_prime_upper {
+        my ($n) = @_;
+
+        my $z = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_cmp_ui($z, 10) <= 0) {
+            return $n->nth_prime;
+        }
+
+        bsearch_max(
+            $n->_nth_prime_lower_bound,
+            $n->_nth_prime_upper_bound,
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $_[0]->prime_count_lower->cmp($n);
+                }
+            )
+        );
+    }
+
+    *prime_upper = \&nth_prime_upper;
 
     sub almost_prime_count {
         my ($k, $from, $to) = @_;

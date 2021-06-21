@@ -5169,6 +5169,16 @@ Returns the unique prime factors of C<n>.
 
 =cut
 
+=head2 prime_lower
+
+    n.prime_lower
+
+Lower bound for the n-th prime.
+
+Aliases: I<nth_prime_lower>
+
+=cut
+
 =head2 primepi
 
     primepi(n)
@@ -5345,11 +5355,21 @@ Aliases: I<primes_sum>, I<sum_primes>
 
 =head2 prime_udivisors
 
-    n.prime_udivisors()
+    n.prime_udivisors
 
 Returns the unique unitary prime factors of C<n>.
 
 Aliases: I<prime_unitary_divisors>, I<unitary_prime_divisors>
+
+=cut
+
+=head2 prime_upper
+
+    n.prime_upper
+
+Upper bound for the n-th prime.
+
+Aliases: I<nth_prime_upper>
 
 =cut
 
