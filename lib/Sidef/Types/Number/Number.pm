@@ -7301,6 +7301,10 @@ package Sidef::Types::Number::Number {
     sub _sqrtmod {    # sqrt(n) modulo a prime power p^e
         my ($n_, $p_, $e) = @_;
 
+        if ($e == 1) {
+            return [Math::Prime::Util::GMP::sqrtmod($n_, $p_) // (return), $p_];
+        }
+
         my $p  = Math::GMPz::Rmpz_init();
         my $pp = Math::GMPz::Rmpz_init();
         my $n  = Math::GMPz::Rmpz_init();
@@ -7401,8 +7405,6 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        # FIXME: fails to find a solution for some inputs, like sqrtmod(17640, 48465)
-
         my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
         my $ystr = Math::GMPz::Rmpz_get_str($y, 10);
 
@@ -7410,6 +7412,10 @@ package Sidef::Types::Number::Number {
             return _set_int(Math::Prime::Util::GMP::sqrtmod($nstr, $ystr) // goto &nan);
         }
 
+        # Workaround: find all the solutions and return the smallest one
+        return (_set_int($n)->sqrtmod_all(_set_int($y))->first // goto &nan);
+
+        # The code below fails to find a solution for: sqrtmod(17640, 48465)
         my $u = Math::GMPz::Rmpz_init();
         my $v = Math::GMPz::Rmpz_init();
 
@@ -7498,8 +7504,9 @@ package Sidef::Types::Number::Number {
                 } __SUB__->($Aj, $p, $k - 2);
             }
 
-            #my $q = Math::GMPz::Rmpz_init_set_str((_sqrtmod($A, $p, $k) // return)->[0], 10);
-            my $q = ${_set_int($A)->sqrtmod(_set_int($pk)) // return};
+            my $q = Math::GMPz::Rmpz_init_set_str((_sqrtmod($A, $p, $k) // return)->[0], 10);
+
+            #my $q = ${_set_int($A)->sqrtmod(_set_int($pk)) // return};
 
             ref($q) eq 'Math::GMPz' or return;
 
