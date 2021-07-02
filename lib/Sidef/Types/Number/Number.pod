@@ -6081,6 +6081,18 @@ Example:
 
 =cut
 
+=head2 sqrtmod_all
+
+    sqrtmod_all(a, n)
+
+Given two integers C<a> and C<n>, return a sorted array of all modular square roots of C<a> mod C<|n|>. If no square root exists, an empty array is returned.
+
+Example:
+
+    say sqrtmod_all(4095, 8469)     #=> [1110, 1713, 3933, 4536, 6756, 7359]
+
+=cut
+
 =head2 square_divisors
 
     square_divisors(n)

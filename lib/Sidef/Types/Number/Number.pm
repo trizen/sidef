@@ -7301,8 +7301,6 @@ package Sidef::Types::Number::Number {
     sub _sqrtmod {    # sqrt(n) modulo a prime power p^e
         my ($n_, $p_, $e) = @_;
 
-        # FIXME: fails to find a solution for some inputs, like sqrtmod(17640, 48465)
-
         my $p  = Math::GMPz::Rmpz_init();
         my $pp = Math::GMPz::Rmpz_init();
         my $n  = Math::GMPz::Rmpz_init();
@@ -7342,9 +7340,9 @@ package Sidef::Types::Number::Number {
                 return [(Math::GMPz::Rmpz_congruent_ui_p($n, 1, 4) ? 1 : 0), 4];
             }
 
-            #~ Math::GMPz::Rmpz_congruent_ui_p($n, 1, 8) or return;
+            Math::GMPz::Rmpz_congruent_ui_p($n, 1, 8) or return;
 
-            my $r = _sqrtmod(Math::GMPz::Rmpz_get_str($n, 10), $p_, $e - 1) // return;
+            my $r = __SUB__->(Math::GMPz::Rmpz_get_str($n, 10), $p_, $e - 1) // return;
 
             # u = (((r^2 - n) / 2^(e-1))%2) * 2^(e-2) + r
             Math::GMPz::Rmpz_set_str($t, $r->[0], 10);
@@ -7403,6 +7401,8 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        # FIXME: fails to find a solution for some inputs, like sqrtmod(17640, 48465)
+
         my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
         my $ystr = Math::GMPz::Rmpz_get_str($y, 10);
 
@@ -7432,6 +7432,123 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp($u, $n) == 0 or goto &nan;
 
         bless \$v;
+    }
+
+    sub sqrtmod_all {
+        my ($A, $N) = @_;
+
+        # Based on algorithm by Hugo van der Sanden:
+        #   https://github.com/danaj/Math-Prime-Util/pull/55
+
+        _valid(\$N);
+
+        $A = _any2mpz($$A) // return Sidef::Types::Array::Array->new;
+        $N = _any2mpz($$N) // return Sidef::Types::Array::Array->new;
+
+        # Copy objects for modification
+        $A = Math::GMPz::Rmpz_init_set($A);
+        $N = Math::GMPz::Rmpz_init_set($N);
+
+        # Make n positive when < 0
+        if (Math::GMPz::Rmpz_sgn($N) < 0) {
+            Math::GMPz::Rmpz_abs($N, $N);
+        }
+
+        # return [] if (n <= 0)
+        if (Math::GMPz::Rmpz_sgn($N) <= 0) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+        # return [0] if (n == 1)
+        if (Math::GMPz::Rmpz_cmp_ui($N, 1) == 0) {
+            return Sidef::Types::Array::Array->new([ZERO]);
+        }
+
+        Math::GMPz::Rmpz_mod($A, $A, $N);    # a %= n
+
+        my $sqrtmod_pk = sub {
+            my ($A, $p, $k) = @_;
+
+            my $pk = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_pow_ui($pk, $p, $k);
+
+            if (Math::GMPz::Rmpz_divisible_p($A, $p)) {
+
+                if (Math::GMPz::Rmpz_divisible_p($A, $pk)) {
+                    my $low = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_pow_ui($low, $p, $k >> 1);
+                    my $high = ($k & 1) ? ($low * $p) : $low;
+                    return map { $high * $_ } 0 .. $low - 1;
+                }
+
+                my $A2 = Math::GMPz::Rmpz_init();
+
+                Math::GMPz::Rmpz_divexact($A2, $A, $p);
+                Math::GMPz::Rmpz_divisible_p($A2, $p) || return;
+
+                my $pj = Math::GMPz::Rmpz_init();
+                my $Aj = Math::GMPz::Rmpz_init();
+
+                Math::GMPz::Rmpz_divexact($pj, $pk, $p);
+                Math::GMPz::Rmpz_divexact($Aj, $A2, $p);
+
+                return map {
+                    my $q = $_;
+                    map { $q * $p + $_ * $pj } 0 .. $p - 1
+                } __SUB__->($Aj, $p, $k - 2);
+            }
+
+            #my $q = Math::GMPz::Rmpz_init_set_str((_sqrtmod($A, $p, $k) // return)->[0], 10);
+            my $q = ${_set_int($A)->sqrtmod(_set_int($pk)) // return};
+
+            ref($q) eq 'Math::GMPz' or return;
+
+            return ($q, $pk - $q) if ($p != 2);
+            return ($q)           if ($k == 1);
+            return ($q, $pk - $q) if ($k == 2);
+
+            my $pj = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_divexact($pj, $pk, $p);
+
+            my $q2 = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_mul($q2, $q, $pj - 1);
+            Math::GMPz::Rmpz_mod($q2, $q2, $pk);
+
+            return ($q, $pk - $q, $q2, $pk - $q2);
+        };
+
+        my @congruences;
+
+        foreach my $pe (_factor_exp($N)) {
+            my ($p, $k) = @$pe;
+
+            $p =
+              ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_init_set_ui($p)
+              : Math::GMPz::Rmpz_init_set_str($p, 10);
+
+            my $pk = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_pow_ui($pk, $p, $k);
+
+            push @congruences, [map { [$_, $pk] } $sqrtmod_pk->($A, $p, $k)];
+        }
+
+        my @roots;
+
+        require Algorithm::Loops;
+        my $iter = Algorithm::Loops::NestedLoops([map { [@$_] } @congruences]);
+
+        while (my @arr = $iter->()) {
+            push @roots, Math::Prime::Util::GMP::chinese(@arr);
+        }
+
+        @roots = map  { Math::GMPz::Rmpz_init_set_str($_, 10) } @roots;
+        @roots = grep { ($_ * $_) % $N == $A } @roots;
+        @roots = sort { Math::GMPz::Rmpz_cmp($a, $b) } @roots;
+        @roots = map  { bless \$_ } @roots;
+
+        return Sidef::Types::Array::Array->new(\@roots);
     }
 
     sub _modular_rational {
