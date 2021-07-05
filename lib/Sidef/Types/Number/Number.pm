@@ -7544,7 +7544,7 @@ package Sidef::Types::Number::Number {
         my @roots;
 
         require Algorithm::Loops;
-        my $iter = Algorithm::Loops::NestedLoops([map { [@$_] } @congruences]);
+        my $iter = Algorithm::Loops::NestedLoops(\@congruences);
 
         while (my @arr = $iter->()) {
             push @roots, Math::Prime::Util::GMP::chinese(@arr);

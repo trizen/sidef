@@ -130,6 +130,20 @@ package Sidef::Object::Lazy {
 
     *select = \&grep;
 
+    sub while {
+        my ($self, $block) = @_;
+
+        my @arr;
+
+        $self->_xs(
+            sub {
+                $block->run(@_) ? do { push(@arr, @_); 0 } : 1;
+            }
+        );
+
+        Sidef::Types::Array::Array->new(\@arr);
+    }
+
     sub map {
         my ($self, $block) = @_;
         __PACKAGE__->new(

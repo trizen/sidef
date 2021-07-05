@@ -98,3 +98,11 @@ Returns the
 Returns the
 
 =cut
+
+=head2 while
+
+    Lazy.while()
+
+Returns the
+
+=cut
