@@ -7302,7 +7302,8 @@ package Sidef::Types::Number::Number {
         my ($n_, $p_, $e) = @_;
 
         if ($e == 1) {
-            return [Math::Prime::Util::GMP::sqrtmod($n_, $p_) // (return), $p_];
+            my $r = Math::Prime::Util::GMP::sqrtmod($n_, $p_) // return;
+            return $r;
         }
 
         my $p  = Math::GMPz::Rmpz_init();
@@ -7331,17 +7332,17 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_mod($n, $n, $pp);
 
         if (Math::GMPz::Rmpz_sgn($n) == 0) {
-            return [0, Math::GMPz::Rmpz_get_str($pp, 10)];
+            return 0;
         }
 
         if (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0) {
 
             if ($e == 1) {
-                return [(Math::GMPz::Rmpz_odd_p($n) ? 1 : 0), 2];
+                return (Math::GMPz::Rmpz_odd_p($n) ? 1 : 0);
             }
 
             if ($e == 2) {
-                return [(Math::GMPz::Rmpz_congruent_ui_p($n, 1, 4) ? 1 : 0), 4];
+                return (Math::GMPz::Rmpz_congruent_ui_p($n, 1, 4) ? 1 : 0);
             }
 
             Math::GMPz::Rmpz_congruent_ui_p($n, 1, 8) or return;
@@ -7349,7 +7350,7 @@ package Sidef::Types::Number::Number {
             my $r = __SUB__->(Math::GMPz::Rmpz_get_str($n, 10), $p_, $e - 1) // return;
 
             # u = (((r^2 - n) / 2^(e-1))%2) * 2^(e-2) + r
-            Math::GMPz::Rmpz_set_str($t, $r->[0], 10);
+            Math::GMPz::Rmpz_set_str($t, $r, 10);
             Math::GMPz::Rmpz_mul($u, $t, $t);
             Math::GMPz::Rmpz_sub($u, $u, $n);
             Math::GMPz::Rmpz_div_2exp($u, $u, $e - 1);
@@ -7357,7 +7358,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mul_2exp($u, $u, $e - 2);
             Math::GMPz::Rmpz_add($u, $u, $t);
 
-            return [Math::GMPz::Rmpz_get_str($u, 10), Math::GMPz::Rmpz_get_str($pp, 10)];
+            return Math::GMPz::Rmpz_get_str($u, 10);
         }
 
         my $s = Math::Prime::Util::GMP::sqrtmod($n_, $p_) // return;
@@ -7380,7 +7381,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_mul($w, $w, $u);
         Math::GMPz::Rmpz_mod($w, $w, $pp);
 
-        return [Math::GMPz::Rmpz_get_str($w, 10), Math::GMPz::Rmpz_get_str($pp, 10)];
+        return Math::GMPz::Rmpz_get_str($w, 10);
     }
 
     sub sqrtmod {
@@ -7423,8 +7424,9 @@ package Sidef::Types::Number::Number {
 
         foreach my $pe (_factor_exp($ystr)) {
             my ($p, $e) = @$pe;
-            my $pair = _sqrtmod($nstr, $p, $e) // goto &nan;
-            push @congruences, $pair;
+            (my @roots = _sqrtmod($nstr, $p, $e)) || goto &nan;
+            my $pk = Math::Prime::Util::GMP::powint($p, $e);
+            push @congruences, map { [$_, $pk] } @roots;
         }
 
         my $r = Math::Prime::Util::GMP::chinese(@congruences) // goto &nan;
@@ -7504,7 +7506,8 @@ package Sidef::Types::Number::Number {
                 } __SUB__->($Aj, $p, $k - 2);
             }
 
-            my $q = Math::GMPz::Rmpz_init_set_str((_sqrtmod($A, $p, $k) // return)->[0], 10);
+            (my @pk_roots = _sqrtmod($A, $p, $k)) || return;
+            my $q = Math::GMPz::Rmpz_init_set_str(@pk_roots[0], 10);
 
             #my $q = ${_set_int($A)->sqrtmod(_set_int($pk)) // return};
 
