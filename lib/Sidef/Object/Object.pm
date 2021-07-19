@@ -535,7 +535,7 @@ package Sidef::Object::Object {
 
                 # Hash ~~ Hash
                 if (CORE::ref($first) eq CORE::ref($second)) {
-                    return $second->eq($first->keys);
+                    return $second->eq($first);
                 }
 
                 # Hash ~~ Regex
