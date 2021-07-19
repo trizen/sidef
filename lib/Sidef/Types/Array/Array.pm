@@ -3310,6 +3310,19 @@ package Sidef::Types::Array::Array {
     sub cartesian {
         my ($self, $block) = @_;
 
+        if (!defined($block) and Sidef::Types::Number::Number::HAS_PRIME_UTIL) {
+            my @result;
+
+            Math::Prime::Util::forsetproduct(
+                sub {
+                    push @result, bless [@_];    # don't bless \@_
+                },
+                map { [@$_] } @$self
+                                            );
+
+            return bless \@result;
+        }
+
         require Algorithm::Loops;
 
         my $iter = Algorithm::Loops::NestedLoops([map { [@$_] } @$self]);
