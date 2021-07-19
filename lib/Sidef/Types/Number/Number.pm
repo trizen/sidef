@@ -8935,6 +8935,10 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
+        if (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x))) {
+            return _set_int(Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::lucasv(2*$x, 1, $n), 2));
+        }
+
         my $t = __add__($x, $x);
         my ($u, $v) = ($ONE, $x);
 
@@ -8973,6 +8977,10 @@ package Sidef::Types::Number::Number {
         }
 
         $x = $$x;
+
+        if (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x))) {
+            return _set_int(Math::Prime::Util::GMP::lucasu(2*$x, 1, $n+1));
+        }
 
         my $t = __add__($x, $x);
         my ($u, $v) = ($ONE, $t);
