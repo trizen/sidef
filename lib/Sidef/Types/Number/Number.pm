@@ -15371,8 +15371,15 @@ package Sidef::Types::Number::Number {
     *DedekindPsi = \&dedekind_psi;
 
     sub carmichael_lambda {
-        my $n = Math::Prime::Util::GMP::carmichael_lambda(&_big2uistr // goto &nan);
-        _set_int($n);
+        my ($n) = @_;
+
+        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+            my $r = Math::Prime::Util::carmichael_lambda(Math::GMPz::Rmpz_get_ui($$n));
+            return _set_int($r);
+        }
+
+        my $r = Math::Prime::Util::GMP::carmichael_lambda(&_big2uistr // goto &nan);
+        _set_int($r);
     }
 
     *lambda           = \&carmichael_lambda;
