@@ -1,13 +1,13 @@
 #!/usr/bin/ruby
 
-var now = Time.micro
+var t0 = Time.micro
 
 DATA.each {|line|
     var n = line.to_i
     assert(n.is_lucas_carmichael, n)
 }
 
-say Time.micro-now
+say Time.micro-t0
 
 # 4.69978s
 # 4.7166s
