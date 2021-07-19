@@ -2504,15 +2504,12 @@ package Sidef::Types::Number::Number {
         }
 
       Math_MPC: {
-            state $three_inv = do {
-                my $r = Math::MPC::Rmpc_init2_nobless(CORE::int($PREC));
-                Math::MPC::Rmpc_set_ui($r, 3, $ROUND);
-                Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
-                $r;
-            };
+            my $three_inv = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            Math::MPFR::Rmpfr_set_ui($three_inv, 3, $ROUND);
+            Math::MPFR::Rmpfr_ui_div($three_inv, 1, $three_inv, $ROUND);
 
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_pow($r, $x, $three_inv, $ROUND);
+            Math::MPC::Rmpc_pow_fr($r, $x, $three_inv, $ROUND);
             return $r;
         }
     }
