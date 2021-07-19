@@ -7544,9 +7544,12 @@ package Sidef::Types::Number::Number {
         my @roots;
 
         if (HAS_PRIME_UTIL) {
-            Math::Prime::Util::forsetproduct(sub {
-                push @roots, Math::Prime::Util::GMP::chinese(@_);
-            }, @congruences);
+            Math::Prime::Util::forsetproduct(
+                sub {
+                    push @roots, Math::Prime::Util::GMP::chinese(@_);
+                },
+                @congruences
+                                            );
         }
         else {
             require Algorithm::Loops;
@@ -8205,7 +8208,7 @@ package Sidef::Types::Number::Number {
 
     *RamanujanSum = \&ramanujan_sum;
 
-    sub subfactorial {
+    sub subfactorial {    # OEIS: A000166
         my ($x, $y) = @_;
 
         my $m = _any2ui($$x) // goto &nan;
@@ -8221,8 +8224,10 @@ package Sidef::Types::Number::Number {
 
         if ($n >= 40000) {
 
-            my $tau  = 6.28318530717958647692528676655900576839433879875;
-            my $prec = 4 + CORE::int(($n * CORE::log($n) + CORE::log($tau * $n) / 2 - $n) / CORE::log(2));
+            state $logtau = CORE::log(6.28318530717958647692528676655900576839433879875);
+
+            my $logn = CORE::log($n);
+            my $prec = 4 + CORE::int(($n * $logn + ($logn + $logtau) / 2 - $n) / CORE::log(2));
 
             Math::GMPz::Rmpz_fac_ui($z, $n);
 
@@ -18672,7 +18677,7 @@ package Sidef::Types::Number::Number {
         }
 
         Math::GMPz::Rmpz_sgn($n) >= 0
-            or return Sidef::Types::Bool::Bool::FALSE;
+          or return Sidef::Types::Bool::Bool::FALSE;
 
         # Optimization for bases <= 62
         if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
@@ -18711,7 +18716,7 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto &nan;
 
         Math::GMPz::Rmpz_sgn($n) >= 0
-            or goto &nan;
+          or goto &nan;
 
         my @d;
 
