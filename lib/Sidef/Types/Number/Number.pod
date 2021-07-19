@@ -1554,6 +1554,15 @@ Example:
 
 =cut
 
+=head2 composites
+
+    composites(n)
+    composites(a,b)
+
+Returns an array with the composite numbers <= n, or in the range C<a..b>.
+
+=cut
+
 =head2 conj
 
     conj(x)
@@ -2011,6 +2020,29 @@ Example:
     11.almost_primes_each(1e6, 1e7, {|n| say n })   # iterate over 11-almost primes in the range [1e6, 1e7]
 
 Aliases: I<almost_primes_each>
+
+=cut
+
+=head2 each_composite
+
+    n.each_composite { ... }
+    each_composite(a,b, { ... })
+
+Iterate over the composite numbers <= n, or in the given range C<a..b>.
+
+Example:
+
+    # Iterate over the composite integers between 100 and 200
+    each_composite(100, 200, {|c|
+        say c
+    })
+
+    # Iterate over the composite integers <= 100
+    100.each_composite {|c|
+        say c
+    }
+
+Aliases: I<composites_each>
 
 =cut
 

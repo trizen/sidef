@@ -375,6 +375,22 @@ package Sidef::Types::Range::RangeNumber {
         return $self;
     }
 
+    sub each_composite {
+        my ($self, $block) = @_;
+
+        if ($self->{step}->is_one) {
+
+            my $left  = Sidef::Types::Number::Number->new($self->{from});
+            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+            Sidef::Types::Number::Number::each_composite($left, $right, $block);
+            return $self;
+        }
+
+        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_composite }))->each($block);
+        return $self;
+    }
+
     sub each_semiprime {
         my ($self, $block) = @_;
 

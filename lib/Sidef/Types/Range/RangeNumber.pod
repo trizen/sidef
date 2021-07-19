@@ -91,6 +91,14 @@ Returns the
 
 =cut
 
+=head2 each_composite
+
+    RangeNumber.each_composite()
+
+Returns the
+
+=cut
+
 =head2 each_omega_prime
 
     RangeNumber.each_omega_prime()

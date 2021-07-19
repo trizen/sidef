@@ -256,8 +256,30 @@ assert_eq(
 )
 
 assert_eq(
+    gather { 1..100 -> each_prime {|k| take(k) } },
+    primes(100)
+)
+
+assert_eq(
     gather { 10..100 `by` 3 -> each_prime {|k| take(k) } },
     10..100 `by` 3 -> grep { .is_prime }
+)
+
+# RangeNumber composite numbers
+
+assert_eq(
+    gather { 10..100 -> each_composite {|k| take(k) } },
+    composites(10, 100)
+)
+
+assert_eq(
+    gather { 1..100 -> each_composite {|k| take(k) } },
+    composites(100)
+)
+
+assert_eq(
+    gather { 10..100 `by` 3 -> each_composite {|k| take(k) } },
+    10..100 `by` 3 -> grep { .is_composite }
 )
 
 # RangeNumber semiprime numbers

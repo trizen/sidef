@@ -13192,6 +13192,46 @@ package Sidef::Types::Number::Number {
 
     *each_prime = \&primes_each;
 
+    sub composites_each {
+        my ($from, $to, $block) = @_;
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return undef;
+            $to   = _any2mpz($$to)   // return undef;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return undef;
+            $from  = $TWO + $TWO;
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($from, 1) <= 0) {
+            $from = $TWO + $TWO;
+        }
+
+        _generic_each(
+            $from, $to, $block,
+            sub {
+                5e6;
+            },
+            sub {
+                my ($from, $to) = @_;
+
+                my @list;
+                for (my $k = $from ; $k <= $to ; $k += 1) {
+                    if (!Math::Prime::Util::GMP::is_prob_prime($k)) {
+                        push @list, $k;
+                    }
+                }
+
+                \@list;
+            }
+        );
+    }
+
+    *each_composite = \&composites_each;
+
     sub primes {
         my ($x, $y) = @_;
 
@@ -13205,6 +13245,30 @@ package Sidef::Types::Number::Number {
              : Math::Prime::Util::GMP::sieve_primes(2, (_big2uistr($x) // 0), 0)
             ]
         );
+    }
+
+    sub composites {
+        my ($x, $y) = @_;
+
+        if (defined($y)) {
+            _valid(\$y);
+            $x = ${$x->ceil->int};
+            $y = ${$y->int};
+        }
+        else {
+            $y = ${$x->int};
+            $x = 4;
+        }
+
+        my @list;
+        for (my $k = $x ; $k <= $y ; ++$k) {
+            if (!Math::Prime::Util::GMP::is_prob_prime($k)) {
+                push @list, $k;
+            }
+        }
+
+        @list = map { _set_int($_) } @list;
+        Sidef::Types::Array::Array->new(\@list);
     }
 
     sub n_primes {
