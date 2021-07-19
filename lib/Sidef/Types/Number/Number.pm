@@ -8936,17 +8936,29 @@ package Sidef::Types::Number::Number {
         $x = $$x;
 
         if (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x))) {
-            return _set_int(Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::lucasv(2*$x, 1, $n), 2));
+            return _set_int(Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::lucasv(2 * $x, 1, $n), 2));
         }
 
-        my $t = __add__($x, $x);
-        my ($u, $v) = ($ONE, $x);
+        if (0) {
+            my $t = __add__($x, $x);
+            my ($u, $v) = ($ONE, $x);
 
-        foreach my $i (2 .. $n) {
-            ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+            foreach my $i (2 .. $n) {
+                ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+            }
+
+            return bless \$v;
         }
 
-        bless \$v;
+        # T_n(x) = 1/2 * ((x - sqrt(x^2 - 1))^n + (x + sqrt(x^2 - 1))^n)
+
+        my $e = _set_int($n);
+        my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, bless \__dec__(__mul__($x, $x)));
+
+        my $r1 = ((bless \$x)->sub($Q))->pow($e);
+        my $r2 = $r1->conj;
+
+        ($r1->add($r2))->div(TWO)->a;
     }
 
     *chebyshevT  = \&chebyshevt;
@@ -8979,18 +8991,30 @@ package Sidef::Types::Number::Number {
         $x = $$x;
 
         if (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x))) {
-            return _set_int(Math::Prime::Util::GMP::lucasu(2*$x, 1, $n+1));
+            return _set_int(Math::Prime::Util::GMP::lucasu(2 * $x, 1, $n + 1));
         }
 
-        my $t = __add__($x, $x);
-        my ($u, $v) = ($ONE, $t);
+        if (0) {
+            my $t = __add__($x, $x);
+            my ($u, $v) = ($ONE, $t);
 
-        foreach my $i (2 .. $n) {
-            ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+            foreach my $i (2 .. $n) {
+                ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+            }
+
+            $v = __neg__($v) if $negative;
+            return bless \$v;
         }
 
-        $v = __neg__($v) if $negative;
-        bless \$v;
+        # U_n(x) = ((x + sqrt(x^2 - 1))^(n+1) - (x - sqrt(x^2 - 1))^(n+1)) / (2 * sqrt(x^2 - 1))
+
+        my $e = _set_int($n + 1);
+        my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, bless \__dec__(__mul__($x, $x)));
+
+        my $r1 = ((bless \$x)->add($Q))->pow($e);
+        my $r2 = $r1->conj;
+
+        ($r1->sub($r2))->div($Q->add($Q))->a;
     }
 
     *ChebyshevU  = \&chebyshevu;
