@@ -2793,8 +2793,8 @@ package Sidef::Types::Number::Number {
         }
 
       Math_MPC__Math_GMPq: {
-            $y = _mpq2mpc($y);
-            goto Math_MPC__Math_MPC;
+            $y = _mpq2mpfr($y);
+            goto Math_MPC__Math_MPFR;
         }
     }
 
