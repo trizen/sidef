@@ -7543,11 +7543,18 @@ package Sidef::Types::Number::Number {
 
         my @roots;
 
-        require Algorithm::Loops;
-        my $iter = Algorithm::Loops::NestedLoops(\@congruences);
+        if (HAS_PRIME_UTIL) {
+            Math::Prime::Util::forsetproduct(sub {
+                push @roots, Math::Prime::Util::GMP::chinese(@_);
+            }, @congruences);
+        }
+        else {
+            require Algorithm::Loops;
+            my $iter = Algorithm::Loops::NestedLoops(\@congruences);
 
-        while (my @arr = $iter->()) {
-            push @roots, Math::Prime::Util::GMP::chinese(@arr);
+            while (my @arr = $iter->()) {
+                push @roots, Math::Prime::Util::GMP::chinese(@arr);
+            }
         }
 
         @roots = map  { Math::GMPz::Rmpz_init_set_str($_, 10) } @roots;
