@@ -18664,6 +18664,9 @@ package Sidef::Types::Number::Number {
             $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
+        Math::GMPz::Rmpz_sgn($n) >= 0
+            or return Sidef::Types::Bool::Bool::FALSE;
+
         # Optimization for bases <= 62
         if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
 
@@ -18699,6 +18702,9 @@ package Sidef::Types::Number::Number {
         $base <= 1 and goto &nan;
 
         $n = _any2mpz($$n) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($n) >= 0
+            or goto &nan;
 
         my @d;
 
