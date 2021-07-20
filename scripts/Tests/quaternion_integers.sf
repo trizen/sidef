@@ -53,6 +53,9 @@ do {
     var a = Quaternion(3,4,5,6)
     var b = Quaternion(9,13,17,23)
 
+    assert(!a.is_coprime(b))
+    assert_eq(gcd(a.norm, b.norm), 2)
+
     assert_eq(a/b * b, a)
     assert_eq(a*b / b, a)
 

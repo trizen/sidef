@@ -307,7 +307,6 @@ package Sidef::Types::Number::Quaternion {
 
     sub is_coprime {
         my ($n, $k) = @_;
-        _valid(\$k);
         $n->norm->gcd($k->norm)->is_one;
     }
 
