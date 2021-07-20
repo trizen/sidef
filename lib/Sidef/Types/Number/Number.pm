@@ -13213,14 +13213,25 @@ package Sidef::Types::Number::Number {
         _generic_each(
             $from, $to, $block,
             sub {
-                5e6;
+                1e5;
             },
             sub {
                 my ($from, $to) = @_;
 
+                if (ref($to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+                    $to   = Math::GMPz::Rmpz_get_ui($to);
+                    $from = Math::GMPz::Rmpz_get_ui($from) if (ref($from) eq 'Math::GMPz');
+                }
+
                 my @list;
-                for (my $k = $from ; $k <= $to ; $k += 1) {
-                    if (!Math::Prime::Util::GMP::is_prob_prime($k)) {
+
+                if (HAS_PRIME_UTIL and ref($to) eq '') {
+                    Math::Prime::Util::forcomposites(sub { push @list, $_ }, $from, $to);
+                    return \@list;
+                }
+
+                for (my $k = $from ; $k <= $to ; ++$k) {
+                    if (!(HAS_PRIME_UTIL ? Math::Prime::Util::is_prob_prime($k) : Math::Prime::Util::GMP::is_prob_prime($k))) {
                         push @list, $k;
                     }
                 }
@@ -13248,26 +13259,55 @@ package Sidef::Types::Number::Number {
     }
 
     sub composites {
-        my ($x, $y) = @_;
+        my ($from, $to) = @_;
 
-        if (defined($y)) {
-            _valid(\$y);
-            $x = ${$x->ceil->int};
-            $y = ${$y->int};
+        if (defined($to)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $to   = _any2mpz($$to)   // return Sidef::Types::Array::Array->new;
         }
         else {
-            $y = ${$x->int};
-            $x = 4;
+            $to   = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $from = 4;
+        }
+
+        if (ref($from) and Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = 4;
+        }
+
+        if (ref($to) and Math::GMPz::Rmpz_sgn($to) < 0) {
+            $to = 0;
+        }
+
+        if ($from > $to) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+        if (ref($to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+            $to   = Math::GMPz::Rmpz_get_ui($to);
+            $from = Math::GMPz::Rmpz_get_ui($from) if (ref($from) eq 'Math::GMPz');
         }
 
         my @list;
-        for (my $k = $x ; $k <= $y ; ++$k) {
-            if (!Math::Prime::Util::GMP::is_prob_prime($k)) {
-                push @list, $k;
+
+        if (HAS_PRIME_UTIL and ref($to) eq '') {
+            Math::Prime::Util::forcomposites(
+                sub {
+                    push @list, $_;
+                },
+                $from,
+                $to
+                                            );
+        }
+        else {
+            for (my $k = $from ; $k <= $to ; ++$k) {
+                if (!(HAS_PRIME_UTIL ? Math::Prime::Util::is_prob_prime($k) : Math::Prime::Util::GMP::is_prob_prime($k))) {
+                    push @list, $k;
+                }
             }
         }
 
-        @list = map { _set_int($_) } @list;
+        @list = map { ref($_) ? (bless \$_) : (bless \Math::GMPz::Rmpz_init_set_ui($_)) } @list;
         Sidef::Types::Array::Array->new(\@list);
     }
 
@@ -13699,8 +13739,7 @@ package Sidef::Types::Number::Number {
                                         [map { _set_int($_) }
                                            Math::Prime::Util::GMP::prho_factor(
                                                                   _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),
-                                           )
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),)
                                         ]
                                        );
     }
@@ -13712,8 +13751,7 @@ package Sidef::Types::Number::Number {
                                         [map { _set_int($_) }
                                            Math::Prime::Util::GMP::pbrent_factor(
                                                                   _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),
-                                           )
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),)
                                         ]
                                        );
     }
@@ -13744,8 +13782,7 @@ package Sidef::Types::Number::Number {
                                         [map { _set_int($_) }
                                            Math::Prime::Util::GMP::pplus1_factor(
                                                                   _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($B1) ? _big2uistr($B1) // () : ()),
-                                           )
+                                                                  (defined($B1) ? _big2uistr($B1) // () : ()),)
                                         ]
                                        );
     }
@@ -13759,8 +13796,7 @@ package Sidef::Types::Number::Number {
                                         [map { _set_int($_) }
                                            Math::Prime::Util::GMP::holf_factor(
                                                                   _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),
-                                           )
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),)
                                         ]
                                        );
     }
@@ -14081,8 +14117,7 @@ package Sidef::Types::Number::Number {
                                         [map { _set_int($_) }
                                            Math::Prime::Util::GMP::squfof_factor(
                                                                   _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),
-                                           )
+                                                                  (defined($k) ? _big2uistr($k) // () : ()),)
                                         ]
                                        );
     }

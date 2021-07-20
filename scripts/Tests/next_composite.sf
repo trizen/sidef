@@ -1,5 +1,7 @@
 #!/usr/bin/ruby
 
+# Tests for composite-related methods.
+
 do {
     var p = (2**127 - 1)
 
@@ -57,5 +59,46 @@ assert_eq(composite_count(1234, 12345), 1234..12345 -> count { .is_composite })
 assert_eq(n_composites(10),    [4, 6, 8, 9, 10, 12, 14, 15, 16, 18])
 assert_eq(n_composites(5, 50), [50, 51, 52, 54, 55])
 assert_eq(n_composites(5, 53), [54, 55, 56, 57, 58])
+
+do {
+    var ranges = [
+
+        [1, 10],
+        [2, 10],
+        [3, 10],
+        [4, 10],
+        [5, 10],
+
+        [2**128, 2**128 + 100],
+        [2**64 - 10, 2**64 + 10],
+        [2**64 - 10, 2**64 - 1],
+        [2**32 - 10, 2**32 + 10],
+        [2**32 - 10, 2**32 - 1],
+    ]
+
+    for from, to in (ranges) {
+
+        var C = composites(from, to)
+
+        assert_eq(
+            from..to -> grep { .is_composite },
+            C
+        )
+
+        assert_eq(
+            gather { each_composite(from, to, { take(_) }) },
+            C
+        )
+
+        assert_eq(
+            gather {
+                for(var k = next_composite(from-1); k <= to; k.next_composite!) {
+                    take(k)
+                }
+            },
+            C
+        )
+    }
+}
 
 say "** Test passed!"

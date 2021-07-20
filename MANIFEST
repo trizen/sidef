@@ -1100,6 +1100,7 @@ utils/Experiments/regexp_grammars_parser.pl
 utils/find_class_typos.pl
 utils/find_invalid_types.pl
 utils/find_undefined_methods.pl
+utils/gource-video.sh
 utils/grep_errors.sh
 utils/pod_generator.pl
 utils/sidef2bin.sh
