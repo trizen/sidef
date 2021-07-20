@@ -200,6 +200,14 @@ Returns the
 
 =cut
 
+=head2 not
+
+    Vector.not()
+
+Returns the
+
+=cut
+
 =head2 round
 
     Vector.round()

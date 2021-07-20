@@ -9,11 +9,17 @@ package Sidef::Types::Array::Vector {
 
     require List::Util;
 
-    my %vector_like = (
-                       'Sidef::Types::Array::Array'  => 1,
-                       'Sidef::Types::Array::Pair'   => 1,
-                       'Sidef::Types::Array::Vector' => 1,
-                      );
+    sub _is_vector {
+        my ($self) = @_;
+
+        my $ref = ref($self);
+
+        if ($ref eq __PACKAGE__ or $ref eq 'Sidef::Types::Array::Array') {
+            return 1;
+        }
+
+        $ref and UNIVERSAL::isa($self, 'Sidef::Types::Array::Array');
+    }
 
     sub new {
         my (undef, @vals) = @_;
@@ -32,14 +38,19 @@ package Sidef::Types::Array::Vector {
         bless($v1->scalar_operator('neg'));
     }
 
-    sub abs {
-        my ($v) = @_;
-        Sidef::Types::Number::Number::sum(map { $_->mul($_) } @$v)->sqrt;
+    sub not {
+        my ($v1) = @_;
+        bless($v1->scalar_operator('not'));
     }
 
     sub norm {
         my ($v) = @_;
         Sidef::Types::Number::Number::sum(map { $_->mul($_) } @$v);
+    }
+
+    sub abs {
+        my ($v) = @_;
+        $v->norm->sqrt;
     }
 
     sub manhattan_norm {
@@ -93,7 +104,7 @@ package Sidef::Types::Array::Vector {
     sub add {
         my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($v2)}) {
+        if (_is_vector($v2)) {
             return bless($v1->wise_operator('+', $v2));
         }
 
@@ -103,7 +114,7 @@ package Sidef::Types::Array::Vector {
     sub sub {
         my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($v2)}) {
+        if (_is_vector($v2)) {
             return bless($v1->wise_operator('-', $v2));
         }
 
@@ -113,7 +124,7 @@ package Sidef::Types::Array::Vector {
     sub div {
         my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($v2)}) {
+        if (_is_vector($v2)) {
             return $v1->mul($v2->scalar_operator('inv'));
         }
 
@@ -123,7 +134,7 @@ package Sidef::Types::Array::Vector {
     sub mul {
         my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($v2)}) {
+        if (_is_vector($v2)) {
             return $v1->wise_operator('*', $v2)->sum;
         }
 
@@ -133,8 +144,7 @@ package Sidef::Types::Array::Vector {
     sub pow {
         my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($v2)}) {
-
+        if (_is_vector($v2)) {
             my @matrix;
             foreach my $x (@$v1) {
 
@@ -155,7 +165,7 @@ package Sidef::Types::Array::Vector {
     sub and {
         my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($v2)}) {
+        if (_is_vector($v2)) {
             return bless($v1->wise_operator('&', $v2));
         }
 
@@ -165,7 +175,7 @@ package Sidef::Types::Array::Vector {
     sub or {
         my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($v2)}) {
+        if (_is_vector($v2)) {
             return bless($v1->wise_operator('|', $v2));
         }
 
@@ -175,7 +185,7 @@ package Sidef::Types::Array::Vector {
     sub xor {
         my ($v1, $v2) = @_;
 
-        if (exists $vector_like{ref($v2)}) {
+        if (_is_vector($v2)) {
             return bless($v1->wise_operator('^', $v2));
         }
 

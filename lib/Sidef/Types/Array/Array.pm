@@ -294,17 +294,13 @@ package Sidef::Types::Array::Array {
             my ($obj1, $obj2) = @_;
 
             my $refaddr1 = Scalar::Util::refaddr($obj1);
-            my $refaddr2 = Scalar::Util::refaddr($obj2);
 
             exists($addr{$refaddr1})
               && return $addr{$refaddr1};
 
-            exists($addr{$refaddr2})
-              && return $addr{$refaddr2};
-
             my @array;
 
-            $addr{$refaddr2} = $addr{$refaddr1} = bless(\@array, ref($obj1));
+            $addr{$refaddr1} = bless(\@array, ref($obj1));
 
             for my $i (0 .. $#{$obj1}) {
                 if (ref($obj1->[$i]) eq __PACKAGE__ or UNIVERSAL::isa($obj1->[$i], __PACKAGE__)) {

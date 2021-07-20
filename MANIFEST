@@ -1033,6 +1033,7 @@ scripts/Tests/url_encoding_decoding.sf
 scripts/Tests/var_ref.sf
 scripts/Tests/var_scoping.sf
 scripts/Tests/variable_references.sf
+scripts/Tests/vector.sf
 scripts/Tests/vigenere_cipher.sf
 scripts/Tests/while_loop.sf
 scripts/Tests/wireworld.sf

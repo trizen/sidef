@@ -203,7 +203,7 @@ do {
     assert_ne(z4, z5)
 
     assert_eq(z4[1], z4)
-    assert_eq(z5[1], z5)
+    assert_eq(z5[1], c[1].map_kv{|k,v| v+a[k] })
 
     assert_ne(z4[1], z5)
     assert_ne(z5[1], z4)

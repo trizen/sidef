@@ -1,0 +1,65 @@
+#!/usr/bin/ruby
+
+var x = Vec(1,2)
+var y = Vec(3,4)
+
+assert_eq(concat(x,y), [1,2,3,4])
+
+var w = Vec(3,4,5,7)
+var t = Vec(6,5,1,2)
+
+assert_eq(~w, w.map { ~_ })
+assert_eq(-w, w.map { -_ })
+
+assert_eq(w * 3, w.map { _ * 3 })
+assert_eq(w / 3, w.map { _ / 3 })
+assert_eq(w + 3, w.map { _ + 3 })
+assert_eq(w - 3, w.map { _ - 3 })
+
+assert_eq(w - t, w »-« t)
+assert_eq(w + t, w »+« t)
+assert_eq(w & t, w »&« t)
+assert_eq(w | t, w »|« t)
+assert_eq(w ^ t, w »^« t)
+
+assert_eq(w * t, w »*« t -> sum)
+assert_eq(w / t, w »/« t -> sum)
+
+assert_eq(w**3, w.map { _**3 })
+assert_eq(w.norm, w.map { _**2 }.sum)
+assert_eq(w.abs, w.map { _**2 }.sum.sqrt)
+
+assert_eq(w.manhattan_norm, w.map { .abs }.sum)
+assert_eq(w.manhattan_dist(t), w »-« t -> map { .abs }.sum)
+assert_eq(w.chebyshev_dist(t), w »-« t -> map { .abs }.max)
+
+assert_eq(w.dist_norm(t), w »-« t -> map { _**2 }.sum)
+assert_eq(w.dist(t), w »-« t -> map { _**2 }.sum.sqrt)
+
+assert_eq(w.atan2(t), t - ((t * (w / w.abs)) * (w / w.abs)) -> abs.atan2(t * (w / w.abs)))
+
+assert_eq(w**t, Matrix(
+  [729, 243, 3, 9],
+  [4096, 1024, 4, 16],
+  [15625, 3125, 5, 25],
+  [117649, 16807, 7, 49]
+))
+
+assert_eq(w**x, Matrix(
+  [3, 9],
+  [4, 16],
+  [5, 25],
+  [7, 49]
+))
+
+assert_eq(x**w, Matrix(
+  [1, 1, 1, 1],
+  [8, 16, 32, 128]
+))
+
+assert_eq(Vec(3,4) + Pair(5,3), [8, 7])
+assert_eq(Vec(3,4) + [5,3], [8, 7])
+assert_eq(Vec(3,4) + Vec(5,3), [8, 7])
+assert_eq(Vec(3,4) + %v[5,3], [8, 7])
+
+say "** Test passed!"
