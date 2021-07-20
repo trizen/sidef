@@ -83,6 +83,14 @@ Returns the
 
 =cut
 
+=head2 composites
+
+    RangeNumber.composites()
+
+Returns the
+
+=cut
+
 =head2 each_almost_prime
 
     RangeNumber.each_almost_prime()

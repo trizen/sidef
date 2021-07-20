@@ -323,6 +323,24 @@ package Sidef::Types::Range::RangeNumber {
         $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_prime }));
     }
 
+    sub composites {
+        my ($self) = @_;
+
+        if ($self->{step}->abs->is_one) {
+
+            my $left  = Sidef::Types::Number::Number->new($self->{from});
+            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+            if ($self->{step}->is_neg) {
+                return Sidef::Types::Number::Number::composites($right, $left)->flip;
+            }
+
+            return Sidef::Types::Number::Number::composites($left, $right);
+        }
+
+        $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_composite }));
+    }
+
     sub squarefree {
         my ($self) = @_;
 
