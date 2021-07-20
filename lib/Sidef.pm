@@ -321,7 +321,7 @@ package Sidef {
 
     sub normalize_method {
         my ($type, $method) = ($_[0] =~ /^(.*[^:])::(.*)$/);
-        normalize_type($type) . ".$method";
+        normalize_type($type) . '#' . $method;
     }
 
     sub jaro {
@@ -447,7 +447,7 @@ our $AUTOLOAD;
 
     my @caller = caller(1);
     my $from   = Sidef::normalize_method($caller[3]);
-    $from = $from eq '.' ? 'main()' : "$from()";
+    $from = $from eq '#' ? 'main()' : "$from()";
 
     my $table   = do { no strict 'refs'; \%{$self . '::'} };
     my @methods = grep { !ref($table->{$_}) and defined(&{$table->{$_}}) } keys(%$table);
