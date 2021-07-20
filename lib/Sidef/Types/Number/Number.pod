@@ -4865,20 +4865,6 @@ Example:
 
 =cut
 
-=head2 omega_prime_count
-
-    k.omega_prime_count(n)
-    k.omega_prime_count(a,b)
-
-Returns the number of k-omega primes <= n, or in the range C<a..b>.
-
-Example:
-
-    say 1.omega_prime_count(100)            # number prime powers <= 100
-    say 2.omega_prime_count(50, 100)        # number of 2-omega primes in range 50..100
-
-=cut
-
 =head2 omega_prime_divisors
 
     n.omega_prime_divisors
@@ -4893,6 +4879,22 @@ Example:
 When C<k> is omitted, an array of arrays with the k-omega prime divisors of n, for each k in the range C<0..omega(n)>, is returned:
 
     say 120.omega_prime_divisors        #=> [[1], [2, 3, 4, 5, 8], [6, 10, 12, 15, 20, 24, 40], [30, 60, 120]]
+
+=cut
+
+=head2 omega_prime_count
+
+    k.omega_prime_count(n)
+    k.omega_prime_count(a,b)
+
+Returns the number of k-omega primes <= n, or in the range C<a..b>.
+
+Example:
+
+    say 1.omega_prime_count(100)            # number prime powers <= 100
+    say 2.omega_prime_count(50, 100)        # number of 2-omega primes in range 50..100
+
+Aliases: I<omega_primepi>
 
 =cut
 

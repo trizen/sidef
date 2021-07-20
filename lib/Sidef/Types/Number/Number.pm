@@ -11264,6 +11264,8 @@ package Sidef::Types::Number::Number {
         bless \$count;
     }
 
+    *omega_primepi = \&omega_prime_count;
+
     sub prime_power_count {
         my ($x, $y) = @_;
 
