@@ -6723,8 +6723,15 @@ package Sidef::Types::Number::Number {
 #<<<
         if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
             $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
+
             return _set_int(scalar Math::GMPz::Rmpz_popcount($n)) if ($k == 2);
-            return _set_int(List::Util::sum(map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($n, $k))));
+
+            if (Math::GMPz::Rmpz_sizeinbase($n, $k) <= 1e6) {
+                return _set_int(List::Util::sum(map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($n, $k))));
+            }
+            else {
+                $k = Math::GMPz::Rmpz_init_set_ui($k);
+            }
         }
 #>>>
 
@@ -6738,7 +6745,7 @@ package Sidef::Types::Number::Number {
             my $B = Math::GMPz::Rmpz_get_ui($k);
 
             # When B < 2^32, use Math::Prime::Util::GMP::todigits().
-            if ($B <= 4294967295) {
+            if ($B <= 4294967295 and Math::GMPz::Rmpz_sizeinbase($n, 62) <= 1e6) {
                 return _set_int(
                        Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B)));
             }
