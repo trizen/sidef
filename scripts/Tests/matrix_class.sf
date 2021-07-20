@@ -77,4 +77,33 @@ assert_eq(B.solve([-3, 43, 9]), [-1003/230, -3659/230, 132/23])
 assert_eq(A.transpose, [[2, 1, 3], [-3, -2, -4], [1, -2, 1]])
 assert_eq(C.transpose, [[2, 3, 1, 5], [-1, 2, 3, -2], [5, 2, 3, -3], [1, -6, -1, 3]])
 
+do {
+    var a = Matrix(
+        [1.5,3.9],
+        [5.8, 3.2],
+    )
+
+    assert_eq(
+        a.ceil,
+        Matrix(
+            [2, 4],
+            [6, 4],
+        )
+    )
+
+    assert_eq(
+        a.floor,
+        Matrix(
+            [1,3],
+            [5,3],
+        )
+    )
+
+    assert_eq(a.sum, 14.4)
+    assert_eq(a.prod, 108.576)
+
+    assert_eq(a.sum { _**2 }, 61.34)
+    assert_eq(a.prod { _**2 }, 108.576**2)
+}
+
 say "** Test passed!"

@@ -341,22 +341,12 @@ package Sidef::Types::Array::Matrix {
 
     sub floor {
         my ($self) = @_;
-
-        bless [
-            map {
-                bless [map { $_->floor } @$_], 'Sidef::Types::Array::Array'
-              } @$self
-        ];
+        bless($self->scalar_operator('floor'));
     }
 
     sub ceil {
         my ($self) = @_;
-
-        bless [
-            map {
-                bless [map { $_->ceil } @$_], 'Sidef::Types::Array::Array'
-              } @$self
-        ];
+        bless($self->scalar_operator('ceil'));
     }
 
     sub mod {
