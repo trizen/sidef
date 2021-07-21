@@ -1,0 +1,44 @@
+#!/usr/bin/ruby
+
+# Tests for the Chebyshev polynomials: U_n(x) and T_n(x)
+
+assert_eq(  # OEIS: A115066
+    10.of { chebyshevT(_, _) },
+    %n[1, 1, 7, 99, 1921, 47525, 1431431, 50843527, 2081028097, 96450076809],
+)
+
+assert_eq(  # OEIS: A323118
+    10.of { chebyshevU(_, _) },
+    %n[1, 2, 15, 204, 3905, 96030, 2883167, 102213944, 4178507265, 193501094490],
+)
+
+assert_eq(  # OEIS: A066771
+    10.of { chebyshevT(_, 3/5) }.map{.nu},
+    %n[1, 3, -7, -117, -527, -237, 11753, 76443, 164833, -922077],
+)
+
+assert_eq(  # OEIS: A097690
+    10.of { chebyshevU(_, _/2) },
+    %n[1, 1, 3, 21, 209, 2640, 40391, 726103, 15003009, 350382231],
+)
+
+assert_eq(  # OEIS: A188599
+    10.of { chebyshevU(_, 3/5) }.map{.nu},
+    %n[1, 6, 11, -84, -779, -2574, 4031, 88536, 430441, 369246],
+)
+
+var m = 12345
+
+for n in (-10 .. 10), x in (-10 .. 10), f1,f2 in ([
+    [Number.method(:chebyshevU), Number.method(:chebyshevUmod)],
+    [Number.method(:chebyshevT), Number.method(:chebyshevTmod)]
+]) {
+    [[x, x/7], [m, 2*m]].cartesian {|x, m|
+        assert_eq(
+            f1(n, x)%m,
+            f2(n, x, m),
+        )
+    }
+}
+
+say "** Test passed!"

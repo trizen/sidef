@@ -7511,7 +7511,7 @@ package Sidef::Types::Number::Number {
             }
 
             (my @pk_roots = _sqrtmod($A, $p, $k)) || return;
-            my $q = Math::GMPz::Rmpz_init_set_str(@pk_roots[0], 10);
+            my $q = Math::GMPz::Rmpz_init_set_str($pk_roots[0], 10);
 
             #my $q = ${_set_int($A)->sqrtmod(_set_int($pk)) // return};
 
@@ -8970,7 +8970,6 @@ package Sidef::Types::Number::Number {
 
     *chebyshevT  = \&chebyshevt;
     *ChebyshevT  = \&chebyshevt;
-    *chebyshev_T = \&chebyshevt;
 
     #
     ## Chebyshev polynomials: U_n(x)
@@ -8998,7 +8997,9 @@ package Sidef::Types::Number::Number {
         $x = $$x;
 
         if (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x))) {
-            return _set_int(Math::Prime::Util::GMP::lucasu(2 * $x, 1, $n + 1));
+            my $r = _set_int(Math::Prime::Util::GMP::lucasu(2 * $x, 1, $n + 1));
+            $r = $r->neg if $negative;
+            return $r;
         }
 
         if (0) {
@@ -9021,12 +9022,92 @@ package Sidef::Types::Number::Number {
         my $r1 = ((bless \$x)->add($Q))->pow($e);
         my $r2 = $r1->conj;
 
-        ($r1->sub($r2))->div($Q->add($Q))->a;
+        my $r = ($r1->sub($r2))->div($Q->add($Q))->a;
+        $r = $r->neg if $negative;
+        $r;
     }
 
     *ChebyshevU  = \&chebyshevu;
     *chebyshevU  = \&chebyshevu;
-    *chebyshev_U = \&chebyshevu;
+
+    #
+    ## Modular Chebyshev polynomials: T_n(x) mod m
+    #
+
+    sub chebyshevTmod {
+        my ($n, $x, $m) = @_;
+
+        _valid(\$x, \$m);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $x = $$x;
+        $m = _any2mpz($$m) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+            $n = Math::GMPz::Rmpz_init_set($n);    # copy
+            Math::GMPz::Rmpz_abs($n, $n);
+        }
+
+        if (Math::GMPz::Rmpz_odd_p($m) and (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x)))) {
+            return _set_int(2 * $x)->lucasVmod(_set_int(1), (bless \$n), (bless \$m))->divmod(TWO, (bless \$m));
+        }
+
+        # T_n(x) = 1/2 * ((x - sqrt(x^2 - 1))^n + (x + sqrt(x^2 - 1))^n)
+
+        my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, bless \__dec__(__mul__($x, $x)));
+
+        my $r1 = ((bless \$x)->sub($Q))->powmod((bless \$n), (bless \$m));
+        my $r2 = $r1->conj;
+
+        ($r1->add($r2))->div(TWO)->a->mod(bless \$m);
+    }
+
+    #
+    ## Modular Chebyshev polynomials: U_n(x) mod m
+    #
+
+    sub chebyshevUmod {
+        my ($n, $x, $m) = @_;
+
+        _valid(\$x, \$m);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $x = $$x;
+        $m = _any2mpz($$m) // goto &nan;
+
+        my $negative = 0;
+
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+
+            if (Math::GMPz::Rmpz_cmp_si($n, -1) == 0) {
+                return ((ZERO)->mod(bless \$m));
+            }
+
+            if (Math::GMPz::Rmpz_cmp_si($n, -2) == 0) {
+                return ((MONE)->mod(bless \$m));
+            }
+
+            $n        = -$n - 2;
+            $negative = 1;
+        }
+
+        if (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x))) {
+            my $r = _set_int(2 * $x)->lucasUmod(_set_int(1), (bless \$n)->inc, (bless \$m));
+            $r = $r->neg->mod(bless \$m) if $negative;
+            return $r;
+        }
+
+        # U_n(x) = ((x + sqrt(x^2 - 1))^(n+1) - (x - sqrt(x^2 - 1))^(n+1)) / (2 * sqrt(x^2 - 1))
+
+        my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, bless \__dec__(__mul__($x, $x)));
+
+        my $r1 = ((bless \$x)->add($Q))->powmod((bless \$n)->inc, (bless \$m));
+        my $r2 = $r1->conj;
+
+        my $r = ($r1->sub($r2))->div($Q->add($Q))->a;
+        $r = $r->neg if $negative;
+        $r->mod(bless \$m);
+    }
 
     #
     ## Legendre polynomials: P_n(x)

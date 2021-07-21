@@ -705,6 +705,7 @@ scripts/Tests/cartesian.sf
 scripts/Tests/catalan_numbers.sf
 scripts/Tests/catalan_numbers_2.sf
 scripts/Tests/chebyshev_coefficients_test.sf
+scripts/Tests/chebyshev_polynomials.sf
 scripts/Tests/class_attr_inheritance.sf
 scripts/Tests/class_attributes.sf
 scripts/Tests/class_field_inheritance.sf

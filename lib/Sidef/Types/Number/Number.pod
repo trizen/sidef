@@ -1319,7 +1319,7 @@ Aliases: I<as_cfrac>
 
 =cut
 
-=head2 chebyshev_T
+=head2 chebyshevT
 
     chebyshevT(n, x)
 
@@ -1331,11 +1331,19 @@ Defined as:
     T(1, x) = x
     T(n, x) = 2*x*T(n-1, x) - T(n-2, x)
 
-Aliases: I<chebyshevt>, I<chebyshevT>
+Aliases: I<chebyshevt>
 
 =cut
 
-=head2 chebyshev_U
+=head2 chebyshevTmod
+
+    chebyshevTmod(n, x, m)
+
+Compute the modular Chebyshev polynomials of the first kind: C<T_n(x) mod m>, where C<n> and C<m> must be integers (arbitrarily large).
+
+=cut
+
+=head2 chebyshevU
 
     chebyshevU(n, x)
 
@@ -1347,7 +1355,15 @@ Defined as:
     U(1, x) = 2*x
     U(n, x) = 2*x*U(n-1, x) - U(n-2, x)
 
-Aliases: I<chebyshevu>, I<chebyshevU>
+Aliases: I<chebyshevu>
+
+=cut
+
+=head2 chebyshevUmod
+
+    chebyshevUmod(n, x, m)
+
+Compute the modular Chebyshev polynomials of the second kind: C<U_n(x) mod m>, where C<n> and C<m> must be integers (arbitrarily large).
 
 =cut
 
