@@ -1423,8 +1423,7 @@ package Sidef::Types::Number::Number {
         bless \$catalan;
     }
 
-    *C         = \&CatalanG;
-    *catalan_G = \&CatalanG;
+    *C = \&CatalanG;
 
     sub i {
         my ($x) = @_;
@@ -8628,9 +8627,8 @@ package Sidef::Types::Number::Number {
         _set_int(Math::Prime::Util::GMP::lucasu($p, $q, $n));
     }
 
-    *lucasU  = \&lucasu;
-    *LucasU  = \&lucasu;
-    *lucas_U = \&lucasu;
+    *lucasU = \&lucasu;
+    *LucasU = \&lucasu;
 
     sub lucasv {
         my ($p, $q, $n) = @_;
@@ -8644,9 +8642,8 @@ package Sidef::Types::Number::Number {
         _set_int(Math::Prime::Util::GMP::lucasv($p, $q, $n));
     }
 
-    *lucasV  = \&lucasv;
-    *LucasV  = \&lucasv;
-    *lucas_V = \&lucasv;
+    *lucasV = \&lucasv;
+    *LucasV = \&lucasv;
 
     sub __lucasUVmod__ {
         my ($P, $Q, $n, $m) = @_;
@@ -8968,8 +8965,8 @@ package Sidef::Types::Number::Number {
         ($r1->add($r2))->div(TWO)->a;
     }
 
-    *chebyshevT  = \&chebyshevt;
-    *ChebyshevT  = \&chebyshevt;
+    *chebyshevT = \&chebyshevt;
+    *ChebyshevT = \&chebyshevt;
 
     #
     ## Chebyshev polynomials: U_n(x)
@@ -9027,8 +9024,8 @@ package Sidef::Types::Number::Number {
         $r;
     }
 
-    *ChebyshevU  = \&chebyshevu;
-    *chebyshevU  = \&chebyshevu;
+    *ChebyshevU = \&chebyshevu;
+    *chebyshevU = \&chebyshevu;
 
     #
     ## Modular Chebyshev polynomials: T_n(x) mod m
@@ -9143,10 +9140,9 @@ package Sidef::Types::Number::Number {
         bless \__div__($sum, $t);
     }
 
-    *LegendreP  = \&legendre_polynomial;
-    *legendrep  = \&legendre_polynomial;
-    *legendreP  = \&legendre_polynomial;
-    *legendre_P = \&legendre_polynomial;
+    *LegendreP = \&legendre_polynomial;
+    *legendrep = \&legendre_polynomial;
+    *legendreP = \&legendre_polynomial;
 
     #
     ## The physicists' Hermite polynomials H_n(x)
@@ -9186,10 +9182,8 @@ package Sidef::Types::Number::Number {
         bless \__mul__($sum, $v);
     }
 
-    *HermiteH             = \&hermiteH;
-    *hermite_H            = \&hermiteH;
-    *hermite_polynomialH  = \&hermiteH;
-    *hermite_polynomial_H = \&hermiteH;
+    *HermiteH            = \&hermiteH;
+    *hermite_polynomialH = \&hermiteH;
 
     #
     ## The probabilists' Hermite polynomials He_n(x)
@@ -9231,10 +9225,8 @@ package Sidef::Types::Number::Number {
         bless \__mul__($sum, $v);
     }
 
-    *HermiteHe             = \&hermiteHe;
-    *hermite_He            = \&hermiteHe;
-    *hermite_polynomialHe  = \&hermiteHe;
-    *hermite_polynomial_He = \&hermiteHe;
+    *HermiteHe            = \&hermiteHe;
+    *hermite_polynomialHe = \&hermiteHe;
 
     #
     ## Laguerre polynomials: L_n(x)
@@ -9267,7 +9259,6 @@ package Sidef::Types::Number::Number {
     *laguerre            = \&laguerreL;
     *Laguerre            = \&laguerreL;
     *LaguerreL           = \&laguerreL;
-    *Laguerre_L          = \&laguerreL;
     *laguerre_polynomial = \&laguerreL;
 
     sub fibonaccimod {

@@ -5,7 +5,7 @@ package Sidef::Types::Number::Mod {
 
     use parent qw(
       Sidef::Types::Number::Number
-      );
+    );
 
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
@@ -144,18 +144,16 @@ package Sidef::Types::Number::Mod {
         __PACKAGE__->new(Sidef::Types::Number::Number::lucasUmod($P, $Q, $x->{n}, $x->{m}), $x->{m});
     }
 
-    *lucasU  = \&lucasu;
-    *LucasU  = \&lucasu;
-    *lucas_U = \&lucasu;
+    *lucasU = \&lucasu;
+    *LucasU = \&lucasu;
 
     sub lucasv {
         my ($x, $P, $Q) = @_;
         __PACKAGE__->new(Sidef::Types::Number::Number::lucasVmod($P, $Q, $x->{n}, $x->{m}), $x->{m});
     }
 
-    *lucasV  = \&lucasv;
-    *LucasV  = \&lucasv;
-    *lucas_V = \&lucasv;
+    *lucasV = \&lucasv;
+    *LucasV = \&lucasv;
 
     sub fibonacci {
         my ($x) = @_;

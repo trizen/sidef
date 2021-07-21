@@ -256,23 +256,23 @@ Returns the
 
 =cut
 
-=head2 lucas_U
+=head2 lucasu
 
-    Mod.lucas_U()
+    Mod.lucasu()
 
 Returns the
 
-Aliases: I<lucasu>, I<lucasU>
+Aliases: I<lucasU>
 
 =cut
 
-=head2 lucas_V
+=head2 lucasv
 
-    Mod.lucas_V()
+    Mod.lucasv()
 
 Returns the
 
-Aliases: I<lucasv>, I<lucasV>
+Aliases: I<lucasV>
 
 =cut
 

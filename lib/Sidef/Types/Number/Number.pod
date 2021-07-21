@@ -2658,23 +2658,23 @@ When an additional argument is given, it returns the n-th Harmonic number of the
 
 =cut
 
-=head2 hermite_H
+=head2 hermiteH
 
-    hermite_H(n,x)
+    hermiteH(n, x)
 
 Physicists' Hermite polynomials: C<H_n(x)>.
 
-Aliases: I<hermiteH>, I<hermite_polynomial_H>, I<hermite_polynomialH>
+Aliases: I<hermite_polynomialH>
 
 =cut
 
-=head2 hermite_He
+=head2 hermiteHe
 
-    hermite_He(n,x)
+    hermiteHe(n, x)
 
 Probabilists' Hermite polynomials: C<He_n(x)>.
 
-Aliases: I<hermiteHe>, I<hermite_polynomial_He>, I<hermite_polynomialHe>
+Aliases: I<hermite_polynomialHe>
 
 =cut
 
@@ -4160,13 +4160,13 @@ Returns the Legendre symbol: C<(a|p)>.
 
 =cut
 
-=head2 legendre_P
+=head2 legendreP
 
-    legendre_P(n,x)
+    legendreP(n,x)
 
 Legendre polynomials: C<P_n(x)>.
 
-Aliases: I<legendrep>, I<legendreP>, I<legendre_polynomial>
+Aliases: I<legendrep>, I<legendre_polynomial>
 
 =cut
 
@@ -4405,33 +4405,31 @@ Aliases: I<lucasmod>
 
 =cut
 
-=head2 lucas_U
+=head2 lucasU
 
-    lucasU(P,Q,n)
+    lucasU(P, Q, n)
 
 The Lucas C<U_n(P, Q)> function.
-
-Example:
 
     say 20.of{|n| lucasU(1, -1, n) }    # the Fibonacci numbers
     say 20.of{|n| lucasU(2, -1, n) }    # the Pell numbers
     say 20.of{|n| lucasU(1, -2, n) }    # the Jacobsthal numbers
 
-Aliases: I<lucasu>, I<lucasU>
+Aliases: I<lucasu>
 
 =cut
 
-=head2 lucasumod
+=head2 lucasUmod
 
     lucasUmod(P,Q,n,m)
 
 Efficiently compute the Lucas C<U_n(P, Q)> function modulo m.
 
-Aliases: I<lucasUmod>
+Aliases: I<lucasumod>
 
 =cut
 
-=head2 lucasuvmod
+=head2 lucasUVmod
 
     lucasUVmod(P,Q,n,m)
 
@@ -4441,13 +4439,13 @@ Equivalent with:
 
     (lucasUmod(P,Q,n,m), lucasVmod(P,Q,n,m))
 
-Aliases: I<lucasUVmod>
+Aliases: I<lucasuvmod>
 
 =cut
 
-=head2 lucas_V
+=head2 lucasV
 
-    lucasV(P,Q,n)
+    lucasV(P, Q, n)
 
 The Lucas C<V_n(P, Q)> function.
 
@@ -4455,7 +4453,7 @@ The Lucas C<V_n(P, Q)> function.
     say 20.of{|n| lucasV(2, -1, n) }    # the Pell-Lucas numbers
     say 20.of{|n| lucasV(1, -2, n) }    # the Jacobsthal-Lucas numbers
 
-Aliases: I<lucasv>, I<lucasV>
+Aliases: I<lucasv>
 
 =cut
 
