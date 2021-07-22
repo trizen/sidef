@@ -428,8 +428,22 @@ sub code_interactive {
 
     require Time::HiRes;
 
-    print qq{$name $version on $^O\n};
-    print qq{Type "help", "copyright" or "license" for more information.\n};
+print <<"EOT" if 0;
+            **   **         ****   *           *********   *********
+          * * ** * *        ****   **          ** ** **    ** ** **
+           **   **          ****   ***         *********   *  *  *
+  **        **        **    ****   *  *        ******      ******
+* * *     * * *     * * *   ****   ** **       ** **       ** **
+ **        **        **     ****   ******      ******      *  *
+       **   **              ****   *  *  *     *********   ***
+     * * ** * *             ****   ** ** **    ** ** **    **
+      **   **               ****   *********   *********   *
+EOT
+
+print <<"EOT";
+Sidef version $version, running on \u$^O, using Perl $^V.
+Type "help", "copyright" or "license" for more information.
+EOT
 
     my $valid_lines = '';
     my ($vars, $ref_vars_refs);
