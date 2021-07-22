@@ -13287,7 +13287,7 @@ package Sidef::Types::Number::Number {
             $from  = $TWO + $TWO;
         }
 
-        if (Math::GMPz::Rmpz_cmp_ui($from, 1) <= 0) {
+        if (Math::GMPz::Rmpz_cmp_ui($from, 3) <= 0) {
             $from = $TWO + $TWO;
         }
 
@@ -13299,7 +13299,7 @@ package Sidef::Types::Number::Number {
             sub {
                 my ($from, $to) = @_;
 
-                if (ref($to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+                if (ref($to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($to)) {
                     $to   = Math::GMPz::Rmpz_get_ui($to);
                     $from = Math::GMPz::Rmpz_get_ui($from) if (ref($from) eq 'Math::GMPz');
                 }
@@ -13312,7 +13312,7 @@ package Sidef::Types::Number::Number {
                 }
 
                 for (my $k = $from ; $k <= $to ; ++$k) {
-                    if (!(HAS_PRIME_UTIL ? Math::Prime::Util::is_prob_prime($k) : Math::Prime::Util::GMP::is_prob_prime($k))) {
+                    if (!Math::Prime::Util::GMP::is_prob_prime($k)) {
                         push @list, $k;
                     }
                 }
@@ -13352,7 +13352,7 @@ package Sidef::Types::Number::Number {
             $from = 4;
         }
 
-        if (ref($from) and Math::GMPz::Rmpz_sgn($from) <= 0) {
+        if (ref($from) and Math::GMPz::Rmpz_cmp_ui($from, 3) <= 0) {
             $from = 4;
         }
 
@@ -13364,7 +13364,7 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new;
         }
 
-        if (ref($to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+        if (ref($to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($to)) {
             $to   = Math::GMPz::Rmpz_get_ui($to);
             $from = Math::GMPz::Rmpz_get_ui($from) if (ref($from) eq 'Math::GMPz');
         }
@@ -13382,7 +13382,7 @@ package Sidef::Types::Number::Number {
         }
         else {
             for (my $k = $from ; $k <= $to ; ++$k) {
-                if (!(HAS_PRIME_UTIL ? Math::Prime::Util::is_prob_prime($k) : Math::Prime::Util::GMP::is_prob_prime($k))) {
+                if (!Math::Prime::Util::GMP::is_prob_prime($k)) {
                     push @list, $k;
                 }
             }
