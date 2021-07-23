@@ -8224,7 +8224,7 @@ package Sidef::Types::Number::Number {
 
         return ZERO if ($k < 0);
         return ONE  if ($n == 0);
-        goto &nan   if ($n < 0);
+        return ZERO if ($n < 0);
 
         my $z = Math::GMPz::Rmpz_init();
 

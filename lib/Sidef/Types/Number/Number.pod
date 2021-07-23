@@ -5893,7 +5893,7 @@ Returns the n-th semiprime number.
 
 Example:
 
-    say 10.of {|k| nth_semiprime(10**k) }
+    say 10.of {|k| semiprime(10**k) }    #=> OEIS: A114125
 
 Aliases: I<nth_semiprime>
 
@@ -6015,7 +6015,7 @@ Example:
 
     solve_pell(d, k=1)
 
-Find the smallest pair of integer solutions C<(x,y)> to the Pell equation: C<x^2 - d*y^2 = k>.
+Find the smallest pair of integers C<(x,y)> that satisfy the Pell equation: C<x^2 - d*y^2 = k>.
 
 Example:
 
@@ -6405,7 +6405,12 @@ Stirling numbers of the third kind (also known as Lah numbers).
 
     subfactorial(n,k=0)
 
-Number of derangements of a set with n elements with k fixed points. Also known as the rencontres numbers.
+Number of derangements of a set with n elements having exactly k fixed points. Also known as the rencontres numbers.
+
+Example:
+
+    say 20.of { .subfactorial }        #=> A000166
+    say 20.of { .subfactorial(2) }     #=> A000387
 
 =cut
 
@@ -6425,6 +6430,7 @@ Example:
 
     n.subsets
     n.subsets(k)
+    n.subsets { ... }
     n.subsets(k, { ... })
 
 Returns an array with the subsets of the integers in the range C<0..n-1>, or iterates over the k-subsets when a block is given.
@@ -6434,7 +6440,7 @@ Example:
     say 5.subsets           # all k-subsets of 0..4
     say 5.subsets(2)        # all 2-subsets of 0..4
 
-    5.subsets({|*a| say a })        # iterate over all k-subsets of 0..4
+    5.subsets {|*a| say a }         # iterate over all k-subsets of 0..4
     5.subsets(2, {|*a| say a })     # iterate over all 2-subsets of 0..4
 
 =cut
