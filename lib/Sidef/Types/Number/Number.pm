@@ -19005,6 +19005,15 @@ package Sidef::Types::Number::Number {
 
     *flip = \&reverse;
 
+    sub rotate {
+        my ($n, $k, $base) = @_;
+
+        _valid(\$k);
+        _valid(\$base) if defined($base);
+
+        $n->digits($base)->rotate($k->neg)->digits2num($base);
+    }
+
     sub shift_left {
         my ($x, $y) = @_;
 

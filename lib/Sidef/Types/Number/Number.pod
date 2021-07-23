@@ -5797,6 +5797,19 @@ The k-th root of n, defined as:
 
 =cut
 
+=head2 rotate
+
+    rotate(n, k, b=10)
+
+Rotate the digits of C<n> to the left when C<k> is positive or to the right otherwise, in a given base C<b>, or base 10 when no base is given.
+
+Example:
+
+    say rotate(12345, 2)         #=> 34512
+    say rotate(12345, -1)        #=> 51234
+
+=cut
+
 =head2 rough_count
 
     k.rough_count(n)
