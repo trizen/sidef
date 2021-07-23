@@ -126,21 +126,12 @@ package Sidef {
             return ($self->{dbm_driver} = 'gdbm');
         }
 
-        ($self->{dbm_driver} = undef);
+        $self->{dbm_driver} = 'sdbm';
     }
 
     sub _init_db {
         my ($self, $hash, $db_file) = @_;
-
-        if ($self->{dbm_driver} eq 'gdbm') {
-            require GDBM_File;
-            tie %$hash, 'GDBM_File', $db_file, &GDBM_File::GDBM_WRCREAT, 0640;
-        }
-        elsif ($self->{dbm_driver} eq 'bdbm') {
-            require DB_File;
-            require Fcntl;
-            tie %$hash, 'DB_File', $db_file, &Fcntl::O_CREAT | &Fcntl::O_RDWR, 0640, $DB_File::DB_HASH;
-        }
+        dbmopen(%$hash, $db_file, 0640);
     }
 
     sub _init_time_db {
@@ -172,6 +163,7 @@ package Sidef {
           if not exists($self->{$lang}{_time_hash});
 
         if (exists($self->{$lang}{_time_hash}{$md5})) {
+
             $self->_init_code_db($lang)
               if not exists($self->{$lang}{_code_hash});
 
@@ -231,7 +223,7 @@ package Sidef {
         if (
             $self->{opt}{s}
             ##and length($$code) > 1024
-            and (defined($self->{dbm_driver}) or $self->has_dbm_driver)
+            and $self->has_dbm_driver
           ) {
 
             my $db_dir = ($self->{$lang}{db_dir} //= File::Spec->catdir($self->get_sidef_vdir(), $lang));
