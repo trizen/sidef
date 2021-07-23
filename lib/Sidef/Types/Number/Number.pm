@@ -820,7 +820,16 @@ package Sidef::Types::Number::Number {
 
     # Prime factorization in [p,k] form, where k is the multiplicity of p.
     sub _factor_exp {
-        my ($n) = @_;    # n is a unsigned native integer or a string
+        my ($n) = @_;
+
+        if (ref($n) eq 'Math::GMPz') {
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                $n = Math::GMPz::Rmpz_get_ui($n);
+            }
+            else {
+                $n = Math::GMPz::Rmpz_get_str($n, 10);
+            }
+        }
 
         if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
             return Math::Prime::Util::factor_exp($n);
@@ -844,7 +853,23 @@ package Sidef::Types::Number::Number {
         @factor_exp;
     }
 
-    # All positive divisors of n.
+    sub _factor {
+        my ($n) = @_;
+
+        if (ref($n) eq 'Math::GMPz') {
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                $n = Math::GMPz::Rmpz_get_ui($n);
+            }
+            else {
+                $n = Math::GMPz::Rmpz_get_str($n, 10);
+            }
+        }
+
+        (HAS_PRIME_UTIL and $n < ULONG_MAX)
+          ? Math::Prime::Util::factor($n)
+          : Math::Prime::Util::GMP::factor($n);
+    }
+
     sub _divisors {
         my ($n) = @_;
 
@@ -952,13 +977,9 @@ package Sidef::Types::Number::Number {
 
             my $r = Math::GMPz::Rmpz_init_set($n);
 
-            my @factors = (
-                           (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($g))
-                           ? Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($g))
-                           : Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($g, 10))
-                          );
-
+            my @factors = _factor(Math::GMPz::Rmpz_get_str($g, 10));
             my @prime_factors;
+
             foreach my $f (@factors) {
                 Math::GMPz::Rmpz_set_ui($g, $f);
                 push @prime_factors, ($f) x Math::GMPz::Rmpz_remove($r, $r, $g);
@@ -7331,7 +7352,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my @factors = _factor_exp(Math::GMPz::Rmpz_get_str($n, 10));
+        my @factors = _factor_exp($n);
 
 #<<<
         @factors = map {
@@ -12342,11 +12363,7 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        my @factors = (
-                       (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($remainder))
-                       ? Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($remainder))
-                       : Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($remainder, 10))
-                      );
+        my @factors = _factor($remainder);
 
         $omega += scalar(@factors);
 
@@ -12393,11 +12410,7 @@ package Sidef::Types::Number::Number {
             );
         }
 
-        my @factors = _factor_exp(
-                                    Math::GMPz::Rmpz_fits_ulong_p($n)
-                                  ? Math::GMPz::Rmpz_get_ui($n)
-                                  : Math::GMPz::Rmpz_get_str($n, 10)
-                                 );
+        my @factors = _factor_exp($n);
 
         (scalar(@factors) == $k)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -12575,7 +12588,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        @factors = map { Math::Prime::Util::GMP::factor($_) } @factors;
+        @factors = map { _factor($_) } @factors;
 
         $check_conditions->(\@factors)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -12666,7 +12679,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        @factors = map { Math::Prime::Util::GMP::factor($_) } @factors;
+        @factors = map { _factor($_) } @factors;
 
         $check_conditions->(\@factors)
           ? Sidef::Types::Bool::Bool::TRUE
@@ -12783,11 +12796,7 @@ package Sidef::Types::Number::Number {
         #       n == {+1,-1} (mod p+1)
         # for each prime p|n.
 
-        my @factors = (
-                       (HAS_PRIME_UTIL and $nstr < ULONG_MAX)
-                       ? Math::Prime::Util::factor($nstr)
-                       : Math::Prime::Util::GMP::factor($nstr)
-                      );
+        my @factors = _factor($nstr);
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
@@ -12977,11 +12986,7 @@ package Sidef::Types::Number::Number {
         #     2) 2(p + 1) | (n − 1) or 2(p + 1) | (n − p)
         # for each prime p|n.
 
-        my @factors = (
-                       (HAS_PRIME_UTIL and $nstr < ULONG_MAX)
-                       ? Math::Prime::Util::factor($nstr)
-                       : Math::Prime::Util::GMP::factor($nstr)
-                      );
+        my @factors = _factor($nstr);
 
         state $nm1 = Math::GMPz::Rmpz_init_nobless();
         state $u   = Math::GMPz::Rmpz_init_nobless();
@@ -13684,8 +13689,7 @@ package Sidef::Types::Number::Number {
         }
 
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            $n = Math::GMPz::Rmpz_get_ui($n);
-            my @f = (HAS_PRIME_UTIL ? Math::Prime::Util::factor($n) : Math::Prime::Util::GMP::factor($n));
+            my @f = _factor(Math::GMPz::Rmpz_get_ui($n));
             return _set_int($f[0]);
         }
 
@@ -13718,13 +13722,7 @@ package Sidef::Types::Number::Number {
             return bless \$n;
         }
 
-        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            $n = Math::GMPz::Rmpz_get_ui($n);
-            my @f = (HAS_PRIME_UTIL ? Math::Prime::Util::factor($n) : Math::Prime::Util::GMP::factor($n));
-            return _set_int($f[-1]);
-        }
-
-        my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($n, 10));
+        my @f = _factor($n);
         _set_int($f[-1]);
     }
 
@@ -14439,7 +14437,7 @@ package Sidef::Types::Number::Number {
                     (undef, @factors) = _primorial_trial_factor($n, $k);
                 }
                 else {
-                    @factors = grep { $_ - 1 < $k } Math::Prime::Util::GMP::factor($n);
+                    @factors = grep { $_ - 1 < $k } _factor($n);
                 }
 
                 @factors || return Sidef::Types::Array::Array->new([ONE]);
@@ -15618,8 +15616,7 @@ package Sidef::Types::Number::Number {
         $n = _big2uistr($n) // goto &nan;
         $n eq '0' and return ZERO;
 
-        my @factors =
-          ((HAS_PRIME_UTIL and $n < ULONG_MAX) ? Math::Prime::Util::factor($n) : Math::Prime::Util::GMP::factor($n));
+        my @factors = _factor($n);
 
         if ($m == 0) {
             return _set_int(scalar @factors);
@@ -16253,11 +16250,7 @@ package Sidef::Types::Number::Number {
 
     sub sopfr {    # OEIS: A001414
         my $n = &_big2uistr // goto &nan;
-        my $s = Math::Prime::Util::GMP::vecsum(
-                                               (HAS_PRIME_UTIL and $n < ULONG_MAX)
-                                               ? Math::Prime::Util::factor($n)
-                                               : Math::Prime::Util::GMP::factor($n)
-                                              );
+        my $s = Math::Prime::Util::GMP::vecsum(_factor($n));
         _set_int($s);
     }
 
@@ -16587,7 +16580,7 @@ package Sidef::Types::Number::Number {
             return $_[0]->prime_power_divisors;
         }
 
-        my @factor_exp = _factor_exp(Math::GMPz::Rmpz_get_str($z, 10));
+        my @factor_exp = _factor_exp($z);
 
         if ($k > scalar(@factor_exp)) {
             return Sidef::Types::Array::Array->new();
@@ -16903,7 +16896,7 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new([ONE]);
         }
 
-        my @factor_exp  = _factor_exp(Math::GMPz::Rmpz_get_str($z, 10));
+        my @factor_exp  = _factor_exp($z);
         my %valuations  = map { @$_ } @factor_exp;
         my @factors     = map { ($_ < ULONG_MAX) ? $_ : ${_set_int($_)} } map { $_->[0] } @factor_exp;
         my $factors_end = $#factors;
@@ -17496,7 +17489,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        @factors = map { Math::Prime::Util::GMP::factor($_) } @factors;
+        @factors = map { _factor($_) } @factors;
 
         $omega += scalar(@factors);
 
@@ -17537,7 +17530,7 @@ package Sidef::Types::Number::Number {
 
         my @factors =
           map { Math::Prime::Util::GMP::subint($_, 1) }
-          map { Math::Prime::Util::GMP::factor($_) } _miller_factor($n);
+          map { _factor($_) } _miller_factor($n);
 
         my $gcd = Math::Prime::Util::GMP::gcd(@factors);
         my $lcm = Math::Prime::Util::GMP::lcm(@factors);
@@ -17655,7 +17648,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        @factors = map { Math::Prime::Util::GMP::factor($_) } @factors;
+        @factors = map { _factor($_) } @factors;
 
         $omega += scalar(@factors);
 
@@ -18405,7 +18398,7 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        foreach my $pe (_factor_exp(Math::GMPz::Rmpz_get_str($rem, 10))) {
+        foreach my $pe (_factor_exp($rem)) {
             $pe->[1] < $k and return Sidef::Types::Bool::Bool::FALSE;
         }
 
