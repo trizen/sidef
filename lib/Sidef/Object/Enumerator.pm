@@ -37,6 +37,27 @@ package Sidef::Object::Enumerator {
       RETURN: Sidef::Types::Array::Array->new(\@arr);
     }
 
+    sub while {
+        my ($self, $block) = @_;
+
+        my @arr;
+
+        $self->{block}->run(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    if ($block->run(@_)) {
+                        push @arr, @_;
+                    }
+                    else {
+                        goto RETURN;
+                    }
+                }
+            )
+        );
+
+      RETURN: Sidef::Types::Array::Array->new(\@arr);
+    }
+
     sub to_a {
         my ($self) = @_;
 
@@ -54,9 +75,7 @@ package Sidef::Object::Enumerator {
 
     sub each {
         my ($self, $block) = @_;
-
         $self->{block}->run($block);
-
         $self;
     }
 
@@ -112,19 +131,21 @@ package Sidef::Object::Enumerator {
     *len  = \&length;    # alias
     *size = \&length;
 
-    #
-    ## AUTOLOAD
-    #
+#<<<
+    #~ #
+    #~ ## AUTOLOAD
+    #~ #
 
-    sub DESTROY { }
+    #~ sub DESTROY { }
 
-    our $AUTOLOAD;
+    #~ our $AUTOLOAD;
 
-    sub AUTOLOAD {
-        my ($self, @arg) = @_;
-        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        $self->to_a->$method(@arg);
-    }
+    #~ sub AUTOLOAD {
+        #~ my ($self, @arg) = @_;
+        #~ my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
+        #~ $self->to_a->$method(@arg);
+    #~ }
+#>>>
 };
 
 1

@@ -78,3 +78,11 @@ Aliases: I<call>
 Returns the
 
 =cut
+
+=head2 while
+
+    Enumerator.while()
+
+Returns the
+
+=cut

@@ -436,6 +436,7 @@ scripts/RosettaCode/intersection_of_two_lines.sf
 scripts/RosettaCode/kaprekar_numbers.sf
 scripts/RosettaCode/knapsack_problem_continuous.sf
 scripts/RosettaCode/knight_s_tour.sf
+scripts/RosettaCode/kolakoski_sequence.sf
 scripts/RosettaCode/largest_int_from_concatenated_ints.sf
 scripts/RosettaCode/last_sunday_of_each_month.sf
 scripts/RosettaCode/left_factorials.sf
@@ -611,6 +612,7 @@ scripts/RosettaCode/sorting_algorithms_stooge_sort.sf
 scripts/RosettaCode/sorting_algorithms_strand_sort.sf
 scripts/RosettaCode/spiral_matrix.sf
 scripts/RosettaCode/split_repchar_string.sf
+scripts/RosettaCode/square_but_not_cube.sf
 scripts/RosettaCode/stable_marriage_problem.sf
 scripts/RosettaCode/stack.sf
 scripts/RosettaCode/stack_1.sf
