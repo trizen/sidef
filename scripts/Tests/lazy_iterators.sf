@@ -53,3 +53,8 @@ assert_eq(ok, true)
 assert_eq(^Inf -> lazy.map { polygonal(_, 3) }.first_by { |n|
     n.sigma0 > 10
 }, 120)
+
+assert_eq(
+    ^Inf -> lazy.map { _**2 + 1 }.grep { .is_prime }.while { _ < 1000 },
+    1..1000.isqrt -> map { _**2 + 1}.grep { .is_prime }
+)

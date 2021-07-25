@@ -62,4 +62,14 @@ var fib = Enumerator({ |yield|
 
 assert_eq(fib.first(10), [0, 1, 1, 2, 3, 5, 8, 13, 21, 34])
 
+var palindromes = Enumerator({|f|
+    var n = 1
+    loop { f(n); n.next_palindrome! }
+})
+
+assert_eq(
+    palindromes.while { _ < 100 },
+    1..100 -> grep { .is_palindrome }
+)
+
 say "** Test passed!"
