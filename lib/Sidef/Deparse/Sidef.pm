@@ -34,6 +34,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Number::Quadratic     Quadratic
                   Sidef::DataTypes::Number::Quaternion    Quaternion
                   Sidef::DataTypes::Number::Complex       Complex
+                  Sidef::DataTypes::Number::Polynomial    Polynomial
                   Sidef::DataTypes::Range::Range          Range
                   Sidef::DataTypes::Range::RangeNumber    RangeNum
                   Sidef::DataTypes::Range::RangeString    RangeStr

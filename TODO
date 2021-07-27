@@ -1,10 +1,6 @@
 TODO list for Sidef
 
 New built-in classes:
-    * Add the `Poly()` class for representing a polynomial.
-        - See: "Math::Polynomial" on CPAN.
-        - https://metacpan.org/pod/Math::Polynomial
-
     * Add the `PolyMod()` class for representing a modular polynomial.
         - See: "Math::Polynomial::ModInt" on CPAN.
         - https://metacpan.org/pod/Math::Polynomial::ModInt

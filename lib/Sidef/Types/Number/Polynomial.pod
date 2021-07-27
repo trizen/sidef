@@ -1,0 +1,295 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Polynomial
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+var obj = Polynomial(...)
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+       * Sidef::Types::Number::Number
+
+=head1 METHODS
+
+=head2 !=
+
+    a != b
+
+Returns the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 %
+
+    a % b
+
+Returns the
+
+Aliases: I<mod>
+
+=cut
+
+=head2 *
+
+    a * b
+
+Returns the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 **
+
+    a ** b
+
+Returns the
+
+Aliases: I<pow>
+
+=cut
+
+=head2 +
+
+    a + b
+
+Returns the
+
+Aliases: I<add>
+
+=cut
+
+=head2 ++
+
+    a ++ b
+
+Returns the
+
+Aliases: I<inc>
+
+=cut
+
+=head2 -
+
+    a - b
+
+Returns the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 --
+
+    a -- b
+
+Returns the
+
+Aliases: I<dec>
+
+=cut
+
+=head2 /
+
+    a / b
+
+Returns the
+
+Aliases: I<÷>, I<div>
+
+=cut
+
+=head2 <
+
+    a < b
+
+Returns the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <=>
+
+    a <=> b
+
+Returns the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+    a == b
+
+Returns the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+    a > b
+
+Returns the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 ≤
+
+    a ≤ b
+
+Returns the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+    a ≥ b
+
+Returns the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
+=head2 ceil
+
+    Polynomial.ceil()
+
+Returns the
+
+=cut
+
+=head2 dump
+
+    Polynomial.dump()
+
+Returns the
+
+=cut
+
+=head2 float
+
+    Polynomial.float()
+
+Returns the
+
+=cut
+
+=head2 floor
+
+    Polynomial.floor()
+
+Returns the
+
+=cut
+
+=head2 inv
+
+    Polynomial.inv()
+
+Returns the
+
+=cut
+
+=head2 invmod
+
+    Polynomial.invmod()
+
+Returns the
+
+=cut
+
+=head2 is_mone
+
+    Polynomial.is_mone()
+
+Returns the
+
+=cut
+
+=head2 is_one
+
+    Polynomial.is_one()
+
+Returns the
+
+=cut
+
+=head2 is_zero
+
+    Polynomial.is_zero()
+
+Returns the
+
+=cut
+
+=head2 neg
+
+    Polynomial.neg()
+
+Returns the
+
+=cut
+
+=head2 new
+
+    Polynomial.new()
+
+Returns the
+
+Aliases: I<call>
+
+=cut
+
+=head2 powmod
+
+    Polynomial.powmod()
+
+Returns the
+
+=cut
+
+=head2 round
+
+    Polynomial.round()
+
+Returns the
+
+=cut
+
+=head2 sqr
+
+    Polynomial.sqr()
+
+Returns the
+
+=cut
+
+=head2 to_s
+
+    Polynomial.to_s()
+
+Returns the
+
+=cut
