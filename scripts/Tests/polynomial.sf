@@ -23,6 +23,20 @@ assert_eq(
     "1/21*x^21 + 1/2*x^20 + 5/3*x^19 - 19/2*x^17 + 1292/21*x^15 - 323*x^13 + 41990/33*x^11 - 223193/63*x^9 + 6460*x^7 - 68723/10*x^5 + 219335/63*x^3 - 174611/330*x"
 )
 
+assert(Poly() == 0)
+assert_eq(Poly(), 0)
+assert_eq(Poly(0 => 0), 0)
+
+assert(Poly() != 1)
+assert_ne(Poly(), 1)
+
+assert_eq(Poly(), Poly())
+assert_eq(Poly(0), Poly(0))
+assert_eq(Poly(0 => 0), Poly(0 => 0))
+
+assert_ne(Poly(), Poly(1))
+assert_ne(Poly(1), Poly())
+
 with (Poly([1,2,3,4])) {|p|
 
     assert_eq(

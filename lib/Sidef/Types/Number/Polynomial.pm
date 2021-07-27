@@ -395,6 +395,10 @@ package Sidef::Types::Number::Polynomial {
             return Sidef::Types::Bool::Bool::TRUE;
         }
 
+        if (!scalar(keys(%$x))) {
+            return $y->is_zero;
+        }
+
         (exists($x->{0}) and $x->{0}->eq($y))
           || return Sidef::Types::Bool::Bool::FALSE;
 

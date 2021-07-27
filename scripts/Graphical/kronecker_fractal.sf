@@ -4,7 +4,7 @@
 ## https://rosettacode.org/wiki/Kronecker_product_based_fractals
 #
 
-func kronecker_product (a, b) { a ~X b -> map { _[0] ~X* _[1] } }
+func kronecker_product (a, b) { [a,b].cartesian.map_2d {|a,b| a ~X* b } }
 
 func kronecker_fractal(pattern, order=4) {
     var kronecker = pattern
@@ -19,8 +19,13 @@ require("Imager")
 
 var pat = kronecker_fractal(shape, order)
 var img = %O<Imager>.new(xsize => pat[0].len, ysize => pat.len)
-for x,y in (^pat[0].len ~X ^pat.len) {
-    img.setpixel(x => x, y => y, color => (pat[y][x] ? <255 255 32> : <16 16 16>))
+
+var c1 = %n<255 255 32>
+var c2 = %n<16 16 16>
+
+for y in (^pat.len), x in (^pat[0].len) {
+    img.setpixel(x => x, y => y, color => (pat[y][x] ? c1 : c2))
 }
+
 
 img.write(file => "kronecker_fractal.png")
