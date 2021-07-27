@@ -109,6 +109,12 @@ package Sidef::Types::Number::Polynomial {
         Sidef::Types::String::String->new($x->__dump__);
     }
 
+    sub eval {
+        my ($x, $value) = @_;
+        Sidef::Types::Array::Array->new(
+                       [map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}) } keys %$x])->reduce('+');
+    }
+
     sub neg {
         my ($x) = @_;
         __PACKAGE__->new(map { $_ => $x->{$_}->neg } keys %$x);

@@ -188,6 +188,14 @@ Returns the
 
 =cut
 
+=head2 eval
+
+    Polynomial.eval()
+
+Returns the
+
+=cut
+
 =head2 float
 
     Polynomial.float()
