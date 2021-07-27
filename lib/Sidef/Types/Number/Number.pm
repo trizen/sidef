@@ -5827,13 +5827,25 @@ package Sidef::Types::Number::Number {
 
     sub sum {
         my (@vals) = @_;
+
         @vals || return ZERO;
-        _valid(\(@vals));
+
+        my @unknown;
+        my @numbers;
+
+        foreach my $value (@vals) {
+            if (ref($value) eq __PACKAGE__) {
+                push @numbers, $value;
+            }
+            else {
+                push @unknown, $value;
+            }
+        }
 
         my @left;
         my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
-        foreach my $n (@vals) {
+        foreach my $n (@numbers) {
             if (ref($$n) eq 'Math::GMPz') {
                 Math::GMPz::Rmpz_add($sum, $sum, $$n);
             }
@@ -5846,16 +5858,41 @@ package Sidef::Types::Number::Number {
             $sum = __add__($sum, _binsplit(\@left, \&__add__));
         }
 
-        bless \$sum;
+        my $r = bless \$sum;
+
+        foreach my $value (@unknown) {
+            $r = $r->add($value);
+        }
+
+        $r;
     }
 
     *Σ = \&sum;
 
     sub prod {
         my (@vals) = @_;
+
         @vals || return ONE;
-        _valid(\(@vals));
-        bless \_binsplit([map { $$_ } @vals], \&__mul__);
+
+        my @numbers;
+        my @unknown;
+
+        foreach my $value (@vals) {
+            if (ref($value) eq __PACKAGE__) {
+                push @numbers, $value;
+            }
+            else {
+                push @unknown, $value;
+            }
+        }
+
+        my $r = (@numbers ? (bless \_binsplit([map { $$_ } @numbers], \&__mul__)) : ONE);
+
+        foreach my $value (@unknown) {
+            $r = $r->mul($value);
+        }
+
+        return $r;
     }
 
     *Π = \&prod;

@@ -9,6 +9,42 @@ var a = [1,2,3,4,5]
 assert_eq(a.prod, 120)
 assert_eq(a.sum,  15)
 
+assert_eq(
+    [1,2,Quadratic(3,4,5),3/4].sum,
+    Quadratic(27/4, 4, 5),
+)
+
+assert_eq(
+    [Gauss(3,4),Gauss(9,11)].sum,
+    Gauss(12, 15),
+)
+
+assert_eq(
+    [Quadratic(5,6,2), 2].prod,
+    Quadratic(10, 12, 2)
+)
+
+assert_eq(
+    [Quadratic(5,6,2), 3/4].prod,
+    Quadratic(15/4, 9/2, 2)
+)
+
+assert_eq(
+    [Poly(1,2,3,4), Gauss(3,4), Quadratic(9,5,2), Mod(43, 97)].sum,
+    Polynomial(0 => Gauss(Quadratic(Mod(55, 97), 5, 2), 4), 1 => 2, 3 => 4)
+)
+
+assert_eq(
+    [Poly(1,2,3,4), Gauss(3,4), Quadratic(9,5,2), Mod(43, 97)].prod,
+    Polynomial(1 => Gauss(Quadratic(Mod(91, 97), Mod(29, 97), 2), Quadratic(Mod(89, 97), Mod(71, 97), 2)), 3 => Gauss(Quadratic(Mod(85, 97), Mod(58, 97), 2), Quadratic(Mod(81, 97), Mod(45, 97), 2)))
+)
+
+assert_eq([3/4].sum, 3/4)
+assert_eq([3/4].prod, 3/4)
+
+assert_eq([Quadratic(5,2,7)].prod, Quadratic(5,2,7))
+assert_eq([Quadratic(5,2,7)].sum, Quadratic(5,2,7))
+
 assert_eq(a.sum  { _*_ }, 55)
 assert_eq(a.prod { _*_ }, 14400)
 

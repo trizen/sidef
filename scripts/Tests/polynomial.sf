@@ -5,7 +5,7 @@
 func faulhaber_formula(p) {
     (p+1).of { |j|
         Poly(p - j + 1) * bernoulli(j) * binomial(p+1, j)
-    }.reduce('+') / (p+1)
+    }.sum / (p+1)
 }
 
 assert_eq(

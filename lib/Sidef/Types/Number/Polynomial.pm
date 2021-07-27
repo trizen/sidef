@@ -14,7 +14,9 @@ package Sidef::Types::Number::Polynomial {
 
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
-      q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ };
+      q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ },
+      q{${}}  => sub { \$_[0] },
+      q{0+}   => sub { $_[0] };
 
     sub new {
         my (undef, @args) = @_;
