@@ -22,7 +22,6 @@ package Sidef::Object::Enumerator {
         $self->{block}->run(
             Sidef::Types::Block::Block->new(
                 code => sub {
-
                     if (defined($block) ? $block->run(@_) : 1) {
                         if (($count += @_) >= $n) {
                             if ($count > $n) {
@@ -115,6 +114,24 @@ package Sidef::Object::Enumerator {
     }
 
     *select = \&grep;
+
+    sub count {
+        my ($self, $block) = @_;
+
+        my $count = 0;
+
+        $self->{block}->run(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    ++$count if $block->run(@_);
+                },
+            )
+        );
+
+        Sidef::Types::Number::Number::_set_int($count);
+    }
+
+    *count_by = \&count;
 
     sub length {
         my ($self) = @_;

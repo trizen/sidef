@@ -72,4 +72,18 @@ assert_eq(
     1..100 -> grep { .is_palindrome }
 )
 
+do {
+    var e = Enumerator({|f| ^Inf -> each {|n| f(n**2 + 1) } })
+
+    assert_eq(
+        e.first(10),
+        ^10 -> map { _*_ + 1 }
+    )
+
+    assert_eq(
+        e.first(10, {.is_prime}),
+        ^Inf -> lazy.map { _*_ + 1 }.grep{.is_prime}.first(10)
+    )
+}
+
 say "** Test passed!"

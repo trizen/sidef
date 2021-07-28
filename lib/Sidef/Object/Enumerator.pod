@@ -15,6 +15,16 @@ var obj = Enumerator(...)
 
 =head1 METHODS
 
+=head2 count
+
+    Enumerator.count()
+
+Returns the
+
+Aliases: I<count_by>
+
+=cut
+
 =head2 each
 
     Enumerator.each()
