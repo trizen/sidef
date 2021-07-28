@@ -58,8 +58,10 @@ my $builder = Module::Build->new(
                  'Getopt::Std'              => 0,
                  'Term::ReadLine'           => 0,
                  'Math::Prime::Util::GMP'   => 0.52,
-                 'Algorithm::Combinatorics' => 0,
-                 'Algorithm::Loops'         => 0,
+                 'Algorithm::Combinatorics' => 0,           # used in some Array methods
+                 'Algorithm::Loops'         => 0,           # used in Array#cartesian() and Number#sqrtmod_all()
+                 'Data::Dump'               => 0,           # used for `sidef -D`
+                 'Data::Dump::Filtered'     => 0,           # used in Block#ffork()
                 },
 
     recommends => {
@@ -67,8 +69,6 @@ my $builder = Module::Build->new(
                    'Digest::MD5'          => 0,    # File.md5(), Str.md5()
                    'Digest::SHA'          => 0,    # File.sha*(), Str.sha*()
                    'MIME::Base64'         => 0,    # Str.encode_base64(), Str.decode_base64()
-                   'Data::Dump'           => 0,    # `sidef -D`
-                   'Data::Dump::Filtered' => 0,    # Block.ffork()
                    'Math::Prime::Util'    => 0.73, # used in some Number methods, if available
                    'Term::ReadLine::Gnu'  => 0,    # better STDIN support (+history)
                    'Text::Balanced'       => 0,    # Str.extract_bracketed(), Str.extract_delimited()
