@@ -12041,8 +12041,27 @@ package Sidef::Types::Number::Number {
 
     sub is_semiprime {
         my ($x) = @_;
-        __is_int__($$x)
-          && Math::Prime::Util::GMP::is_semiprime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
+
+        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+
+        my $s = &_big2uistr // return Sidef::Types::Bool::Bool::FALSE;
+        my $k = Math::Prime::Util::GMP::is_prime_power($s);
+
+        if ($k == 2) {
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        if ($k >= 1) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        $k = Math::Prime::Util::GMP::is_power($s);
+
+        if ($k >= 2) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Math::Prime::Util::GMP::is_semiprime($s)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
