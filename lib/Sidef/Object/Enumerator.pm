@@ -12,7 +12,7 @@ package Sidef::Object::Enumerator {
     *call = \&new;
 
     sub first {
-        my ($self, $n) = @_;
+        my ($self, $n, $block) = @_;
 
         $n = CORE::int($n);
 
@@ -22,14 +22,17 @@ package Sidef::Object::Enumerator {
         $self->{block}->run(
             Sidef::Types::Block::Block->new(
                 code => sub {
-                    if (($count += @_) >= $n) {
-                        if ($count > $n) {
-                            splice(@_, $n - $count);
+
+                    if (defined($block) ? $block->run(@_) : 1) {
+                        if (($count += @_) >= $n) {
+                            if ($count > $n) {
+                                splice(@_, $n - $count);
+                            }
+                            push @arr, @_;
+                            goto RETURN;
                         }
                         push @arr, @_;
-                        goto RETURN;
                     }
-                    push @arr, @_;
                 }
             )
         );
