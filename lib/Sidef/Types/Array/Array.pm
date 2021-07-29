@@ -2723,7 +2723,7 @@ package Sidef::Types::Array::Array {
     *unique_prefixes = \&uniq_prefs;
 
     sub contains {
-        my ($self, $obj) = @_;
+        my ($self, $obj, @extra) = @_;
 
         if (ref($obj) eq 'Sidef::Types::Block::Block') {
             foreach my $item (@$self) {
@@ -2735,9 +2735,23 @@ package Sidef::Types::Array::Array {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
-        foreach my $item (@$self) {
-            if ($item eq $obj) {
-                return (Sidef::Types::Bool::Bool::TRUE);
+        foreach my $i (0 .. $#{$self}) {
+            if ($self->[$i] eq $obj) {
+
+                my $ok = 1;
+                my $j  = $i;
+
+                foreach my $obj (@extra) {
+                    if ($self->[++$j] eq $obj) {
+                        ## ok
+                    }
+                    else {
+                        $ok = 0;
+                        last;
+                    }
+                }
+
+                $ok && return (Sidef::Types::Bool::Bool::TRUE);
             }
         }
 
