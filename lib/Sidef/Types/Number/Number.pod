@@ -2571,6 +2571,18 @@ Example (try with base 3 and give up after 10^6 iterations):
 
 =cut
 
+=head2 fusc
+
+    fusc(n)
+
+Returns the n-th term in Stern's diatomic series (or Stern-Brocot sequence).
+
+Example:
+
+    say 30.of { .fusc }     #=> OEIS: A002487
+
+=cut
+
 =head2 gcd
 
     gcd(...)
@@ -3369,7 +3381,7 @@ Returns true if C<n> passes the Lucas test to the C<U>, using the parameters C<P
 Example:
 
     say 10.by { .is_composite && .is_lucasU_psp }               # Fibonacci pseudoprimes
-    say 10.by { .is_odd_composite && .is_lucasU_psp(2, -1) }    #=> A327651
+    say 10.by { .is_odd_composite && .is_lucasU_psp(2, -1) }    #=> OEIS: A327651
 
 Aliases: I<is_lucasu_psp>, I<is_lucasU_psp>, I<is_fibonacci_psp>, I<is_lucasU_pseudoprime>, I<is_fibonacci_pseudoprime>
 
@@ -3502,7 +3514,7 @@ Returns true if C<n> passes the Lucas test to the C<V> sequence, using the param
 Example:
 
     say 10.by { .is_composite && .is_lucasV_psp }               # Bruckman-Lucas pseudoprimes
-    say 10.by { .is_odd_composite && .is_lucasV_psp(2, -1) }    #=> A330276
+    say 10.by { .is_odd_composite && .is_lucasV_psp(2, -1) }    #=> OEIS: A330276
 
 Aliases: I<is_lucasV_psp>, I<is_bruckman_lucas_psp>, I<is_lucasV_pseudoprime>, I<is_bruckman_lucas_pseudoprime>
 
@@ -3653,9 +3665,9 @@ It returns true if C<V_n(2, -1) = 2 (mod n)>.
 
 Example:
 
-    say 20.by { .is_pell_lucas_pseudoprime }                                 #=> A270342
-    say 20.by { .is_pell_lucas_pseudoprime && .is_composite }                #=> A335668
-    say 20.by { .is_pell_lucas_pseudoprime && .is_composite && .is_odd }     #=> A330276
+    say 20.by { .is_pell_lucas_pseudoprime }                               #=> OEIS: A270342
+    say 20.by { .is_pell_lucas_pseudoprime && .is_composite }              #=> OEIS: A335668
+    say 20.by { .is_pell_lucas_pseudoprime && .is_composite && .is_odd }   #=> OEIS: A330276
 
 Aliases: I<is_pell_lucas_pseudoprime>
 
@@ -3895,11 +3907,11 @@ Returns true if all prime factors of n are >= k.
 
 Example:
 
-    say 30.by { .is_rough(3) }  #=> A005408
-    say 30.by { .is_rough(5) }  #=> A007310
-    say 30.by { .is_rough(7) }  #=> A007775
+    say 30.by { .is_rough(3) }  #=> OEIS: A005408
+    say 30.by { .is_rough(5) }  #=> OEIS: A007310
+    say 30.by { .is_rough(7) }  #=> OEIS: A007775
     # ...
-    say 30.by { .is_rough(23) } #=> A166063
+    say 30.by { .is_rough(23) } #=> OEIS: A166063
 
 =cut
 
@@ -3911,7 +3923,7 @@ It returns true if both C<n> and C<(n-1)/2> are prime.
 
 Example:
 
-    say 30.by { .is_safe_prime }    #=> A005385
+    say 30.by { .is_safe_prime }    #=> OEIS: A005385
 
 =cut
 
@@ -6008,7 +6020,7 @@ Returns the number of k-smooth numbers <= n, or in the range C<a..b>.
 
 Example:
 
-    say 30.of {|n| 13.smooth_count(10**n) }   #=> A106629
+    say 30.of {|n| 13.smooth_count(10**n) }   #=> OEIS: A106629
 
 =cut
 
@@ -6422,8 +6434,8 @@ Number of derangements of a set with n elements having exactly k fixed points. A
 
 Example:
 
-    say 20.of { .subfactorial }        #=> A000166
-    say 20.of { .subfactorial(2) }     #=> A000387
+    say 20.of { .subfactorial }        #=> OEIS: A000166
+    say 20.of { .subfactorial(2) }     #=> OEIS: A000387
 
 =cut
 
@@ -6466,8 +6478,8 @@ Returns the following sum: C<Sum_{k=1..n} v % k>, computed in C<O(sqrt(v))> step
 
 Example:
 
-    say 20.of {|n| sum_remainders(n, n) }        #=> A004125
-    say 20.of {|n| sum_remainders(n, n.prime) }  #=> A099726
+    say 20.of {|n| sum_remainders(n, n) }        #=> OEIS: A004125
+    say 20.of {|n| sum_remainders(n, n.prime) }  #=> OEIS: A099726
 
 =cut
 

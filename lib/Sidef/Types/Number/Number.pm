@@ -3162,6 +3162,34 @@ package Sidef::Types::Number::Number {
         _set_int(Math::GMPz::Rmpz_scan1($n, 0));
     }
 
+    sub fusc {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_sgn($n) >= 0 or goto &nan;
+
+        if (Math::GMPz::Rmpz_even_p($n)) {
+            $n = Math::GMPz::Rmpz_init_set($n);    # copy
+            Math::GMPz::Rmpz_remove($n, $n, $TWO);
+        }
+
+        state $x = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_set_ui($x, 1);
+
+        my $y = Math::GMPz::Rmpz_init_set_ui(0);
+
+        foreach my $i (0 .. Math::GMPz::Rmpz_sizeinbase($n, 2) - 1) {
+            if (Math::GMPz::Rmpz_tstbit($n, $i)) {
+                Math::GMPz::Rmpz_add($y, $y, $x);
+            }
+            else {
+                Math::GMPz::Rmpz_add($x, $x, $y);
+            }
+        }
+
+        bless \$y;
+    }
+
     sub __lgrt__ {
         my ($c) = @_;
 
