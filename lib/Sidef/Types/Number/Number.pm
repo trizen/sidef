@@ -3173,6 +3173,20 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_remove($n, $n, $TWO);
         }
 
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n);
+
+            my ($x, $y) = (1, 0);
+
+            for (; $n > 0 ; $n >>= 1) {
+                ($n & 1)
+                  ? ($y += $x)
+                  : ($x += $y);
+            }
+
+            return _set_int($y);
+        }
+
         state $x = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_set_ui($x, 1);
 
