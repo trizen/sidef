@@ -201,7 +201,7 @@ package Sidef::Types::Number::Number {
 
     sub _set_int {
         if (ref($_[0]) eq 'Math::GMPz') {
-            return bless \(my $o = $_[0]);
+            return bless \Math::GMPz::Rmpz_init_set($_[0]);
         }
         ($_[0] < ULONG_MAX and $_[0] > LONG_MIN)
           ? (
@@ -11841,6 +11841,233 @@ package Sidef::Types::Number::Number {
 
     *δ              = \&kronecker_delta;
     *KroneckerDelta = \&kronecker_delta;
+
+    sub sum_of_squares_count {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 2;
+        }
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+        $sgn < 0  and return ZERO;
+        $sgn == 0 and return ONE;
+
+        if ($k <= 0) {
+            return ZERO;
+        }
+
+        if ($k == 1) {
+            return TWO if Math::GMPz::Rmpz_perfect_square_p($n);
+            return ZERO;
+        }
+
+        state %cache;
+
+        if (scalar(keys(%cache)) > 1e6) {
+            undef %cache;
+        }
+
+        my $result = sub {
+            my ($n, $k) = @_;
+
+            my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+            $sgn < 0  and return 0;
+            $sgn == 0 and return 1;
+
+            return 0 if ($k <= 0);
+
+            if ($k == 1) {
+                return 2 if Math::GMPz::Rmpz_perfect_square_p($n);
+                return 0;
+            }
+
+            # r_3(4*n) = r_3(n)
+            if ($k == 3 and Math::GMPz::Rmpz_divisible_ui_p($n, 4)) {
+                $n = Math::GMPz::Rmpz_init_set($n);    # copy
+                Math::GMPz::Rmpz_div_2exp($n, $n, 2);
+            }
+
+            my $t = Math::GMPz::Rmpz_init_set($n);
+            my $v = Math::GMPz::Rmpz_remove($t, $t, $TWO);
+
+            if ($k == 2) {    # OEIS: A004018
+                Math::GMPz::Rmpz_congruent_ui_p($t, 3, 4) && return 0;
+
+                my $count = Math::GMPz::Rmpz_init_set_ui(4);
+
+                foreach my $pp (_factor_exp($t)) {
+                    my ($p, $e) = @$pp;
+
+                    my $r = ($p < ULONG_MAX) ? ($p % 4) : Math::Prime::Util::GMP::modint($p, 4);
+
+                    if ($r == 3) {
+                        $e % 2 == 0 or return 0;
+                    }
+
+                    if ($r == 1) {
+                        Math::GMPz::Rmpz_mul_ui($count, $count, $e + 1);
+                    }
+                }
+
+                return $count;
+            }
+
+            if ($k == 3) {    # OEIS: A005875
+
+                ((($v & 1) == 1) || !Math::GMPz::Rmpz_congruent_ui_p($t, 7, 8)) || return 0;
+
+                if (HAS_PRIME_UTIL and Math::Prime::Util::is_square_free($n)) {
+                    my $count = 0;
+
+                    if (Math::GMPz::Rmpz_congruent_ui_p($n, 3, 8)) {
+                        $count = eval { Math::Prime::Util::GMP::lshiftint(Math::Prime::Util::hclassno($n), 1) };
+                    }
+                    else {
+                        $count = eval { Math::Prime::Util::hclassno(4 * $n) };
+                    }
+
+                    if (defined($count)) {
+                        return ${_set_int($count)};
+                    }
+                }
+            }
+
+            if ($k == 4) {    # OEIS: A000118
+                my $count =
+                  Math::Prime::Util::GMP::lshiftint(Math::Prime::Util::GMP::sigma(($v >= 1) ? ($t << 1) : $t), 3);
+                return ${_set_int($count)};
+            }
+
+            if ($k == 6) {    # OEIS: A000141
+
+                # A000141: a(n) = 4( Sum_{ d|n, d == 3 mod 4} d^2 - Sum_{ d|n, d == 1 mod 4} d^2 )
+                #              + 16( Sum_{ d|n, n/d == 1 mod 4} d^2 - Sum_{ d|n, n/d == 3 mod 4} d^2 )
+
+                # a(n) = 16*A050470(n) - 4*A002173(n).
+
+                # Multiplicative formulas by Jianing Song, where Chi = A101455:
+                #   A050470: Multiplicative with a(p^e) = ((p^2)^(e+1) - Chi(p)^(e+1))/(p^2 - Chi(p)).
+                #   A002173: Multiplicative with a(p^e) = ((p^2*Chi(p))^(e+1) - 1)/(p^2*Chi(p) - 1).
+
+                my $prod1 = Math::GMPz::Rmpz_init_set_ui(1);
+                my $prod2 = Math::GMPz::Rmpz_init_set_ui(1);
+
+                my $p1 = Math::GMPz::Rmpz_init();
+                my $p2 = Math::GMPz::Rmpz_init();
+
+                my $u1 = Math::GMPz::Rmpz_init();
+                my $u2 = Math::GMPz::Rmpz_init();
+
+                foreach my $pp (_factor_exp($t)) {
+                    my ($p, $e) = @$pp;
+
+                    ($p < ULONG_MAX)
+                      ? Math::GMPz::Rmpz_set_ui($p1, $p)
+                      : Math::GMPz::Rmpz_set_str($p1, $p, 10);
+
+                    Math::GMPz::Rmpz_pow_ui($u1, $p1, 2 * ($e + 1));
+                    Math::GMPz::Rmpz_set($u2, $u1);
+
+                    my $congr1_4 = Math::GMPz::Rmpz_congruent_ui_p($p1, 1, 4);
+
+                    if ($congr1_4 or $e % 2 == 1) {
+                        Math::GMPz::Rmpz_sub_ui($u1, $u1, 1);
+                        Math::GMPz::Rmpz_sub_ui($u2, $u2, 1);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_add_ui($u1, $u1, 1);
+                        Math::GMPz::Rmpz_neg($u2, $u2);
+                        Math::GMPz::Rmpz_sub_ui($u2, $u2, 1);
+                    }
+
+                    Math::GMPz::Rmpz_mul($p1, $p1, $p1);
+                    Math::GMPz::Rmpz_set($p2, $p1);
+
+                    if ($congr1_4) {
+                        Math::GMPz::Rmpz_sub_ui($p1, $p1, 1);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_add_ui($p1, $p1, 1);
+                        Math::GMPz::Rmpz_neg($p2, $p2);
+                    }
+
+                    Math::GMPz::Rmpz_sub_ui($p2, $p2, 1);
+
+                    Math::GMPz::Rmpz_divexact($u1, $u1, $p1);
+                    Math::GMPz::Rmpz_divexact($u2, $u2, $p2);
+
+                    Math::GMPz::Rmpz_mul($prod1, $prod1, $u1);
+                    Math::GMPz::Rmpz_mul($prod2, $prod2, $u2);
+                }
+
+                Math::GMPz::Rmpz_mul_2exp($prod1, $prod1, 4 + 2 * $v);
+                Math::GMPz::Rmpz_mul_2exp($prod2, $prod2, 2);
+                Math::GMPz::Rmpz_sub($prod1, $prod1, $prod2);
+
+                return $prod1;
+            }
+
+            if ($k == 8) {    # OEIS: A000143
+
+                # A138503: a(n) is multiplicative with a(2^e) = -(8^(e+1) - 15) / 7, a(p^e) = ((p^3)^(e+1) - 1) / (p^3 - 1).
+                # A138503: Let n = 2^k * m, with m odd, then a(n) = -(8^(k+1) - 15)/7 * sigma_3(m).
+                # r_8(n) = 16 * (-1)^n * -A138503(n)
+
+                my $prod = Math::GMPz::Rmpz_init_set_ui(16);
+
+                if ($v > 0) {
+                    my $s = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_ui_pow_ui($s, 8, $v + 1);
+                    Math::GMPz::Rmpz_sub_ui($s, $s, 15);
+                    Math::GMPz::Rmpz_divexact_ui($s, $s, 7);
+                    Math::GMPz::Rmpz_mul($prod, $prod, $s);
+                }
+
+                my $count = Math::Prime::Util::GMP::mulint($prod, Math::Prime::Util::GMP::sigma($t, 3));
+                return ${_set_int($count)};
+            }
+
+            # TODO: add efficient formula for k = 10
+            # TODO: r_10(n) = 4/5 * (A050456(n) + 16*A050468(n) + 8*A030212(n))
+
+            my $key = "$n $k";
+
+            if (exists $cache{$key}) {
+                return $cache{$key};
+            }
+
+            my $count = 0;
+
+            my $upto      = Math::Prime::Util::GMP::sqrtint($n);
+            my $is_square = Math::GMPz::Rmpz_perfect_square_p($n);
+
+            foreach my $v (0 .. $upto) {
+                if ($k > 2) {
+                    my $u = __SUB__->($n - $v * $v, $k - 1);
+                    $count += (($v == 0) ? 1 : 2) * $u;
+                }
+                elsif (Math::GMPz::Rmpz_perfect_square_p($n - $v * $v)) {
+                    $count += (($v == 0) ? 1 : 2) * (($is_square and $v == $upto) ? 1 : 2);
+                }
+            }
+
+            $cache{$key} = $count;
+          }
+          ->($n, $k);
+
+        _set_int($result);
+    }
+
+    *squares_r = \&sum_of_squares_count;
 
     sub is_coprime {
         my ($x, $y) = @_;

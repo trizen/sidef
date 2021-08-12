@@ -11,14 +11,9 @@
 func chebyshev_factorization(n, B = n.ilog2**2, a = 3) {
     var x = a
     var G = B*B
-    var i = invmod(2, n)
 
-    func chebyshevTmod(a, x) {
-        (lucasVmod(2*x, 1, a, n) * i) % n
-    }
-
-    for (var p = 2; p <= B; p.next_prime!) {
-        x = chebyshevTmod(p**G.ilog(p), x)      # T_k(x) (mod n)
+    B.each_prime {|p|
+        x = chebyshevTmod(ipow(p, G.ilog(p)), x, n)      # T_k(x) (mod n)
         var g = gcd(x-1, n)
         return g if (g > 1)
     }

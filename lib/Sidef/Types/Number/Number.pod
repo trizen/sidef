@@ -6353,6 +6353,22 @@ Returns the number of square divisors of C<n>.
 
 =cut
 
+=head2 squares_r
+
+    squares_r(n, k=2)
+
+Sum of squares function C<r_k(n)>: returns the number of ways or representing C<n> as a sum of C<k> squares.
+
+Example:
+
+    say 30.of { .squares_r(2) }     # OEIS: A004018
+    say 30.of { .squares_r(3) }     # OEIS: A005875
+    say 30.of { .squares_r(4) }     # OEIS: A000118
+
+Aliases: I<sum_of_squares_count>
+
+=cut
+
 =head2 square_udivisors
 
     square_udivisors(n)

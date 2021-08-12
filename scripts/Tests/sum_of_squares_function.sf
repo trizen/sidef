@@ -1,0 +1,53 @@
+#!/usr/bin/ruby
+
+# Tests for the sum of squares function: r_k(n).
+# https://en.wikipedia.org/wiki/Sum_of_squares_function
+
+func r(n, k=2) is cached {
+
+    return 1 if (n == 0)
+    return 0 if (k <= 0)
+
+    return (n.is_square ? 2 : 0) if (k == 1)
+
+    #~ if (k == 2) {
+        #~ return sum_of_squares_count(n, k)
+    #~ }
+
+    #~ if (k == 3) {
+        #~ return sum_of_squares_count(n, k) if n.is_squarefree
+    #~ }
+
+    #~ if ((k == 4) || (k == 8)) {
+        #~ return sum_of_squares_count(n, k)
+    #~ }
+
+    var count = 0
+
+    for a in (0 ..  n.isqrt) {
+        if (k > 2) {
+            count += (a.is_zero ? 1 : 2)*__FUNC__(n - a.sqr, k-1)
+        }
+        elsif (n - a.sqr -> is_square) {
+            count += (a.is_zero ? 1 : 2)*(n - a.sqr -> is_zero ? 1 : 2)
+        }
+    }
+
+    return count
+}
+
+for k in (0..20) {
+    #say ("k = #{k}: ", 15.of { r(_, k) })
+
+    assert_eq(
+        30.of { r(_, k) },
+        30.of { sum_of_squares_count(_, k) },
+    )
+
+    with (irand(30, 100)) {|n|
+        say ("r_#{k}(#{n}) = ", r(n, k))
+        assert_eq(r(n, k), sum_of_squares_count(n, k))
+    }
+}
+
+say "** Test passed!"
