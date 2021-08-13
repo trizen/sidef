@@ -2544,6 +2544,13 @@ package Sidef::Types::Number::Number {
         bless \__mul__($$x, $$x);
     }
 
+    *square = \&sqr;
+
+    sub cube {
+        my ($x) = @_;
+        bless \__pow__($$x, 3);
+    }
+
     sub __sqrt__ {
         my ($x) = @_;
 

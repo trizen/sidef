@@ -1711,6 +1711,14 @@ Aliases: I<complex_sub>
 
 =cut
 
+=head2 cube
+
+    cube(x)
+
+Returns the cube of C<x>. Equivalent with C<x**3>.
+
+=cut
+
 =head2 cyclotomic
 
     cyclotomic(n,x)
@@ -6080,6 +6088,8 @@ Example:
     sqr(x)
 
 Returns the square of C<x>. Equivalent with C<x*x>.
+
+Aliases: I<square>
 
 =cut
 
