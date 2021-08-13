@@ -11898,7 +11898,7 @@ package Sidef::Types::Number::Number {
             }
 
             # r_3(4*n) = r_3(n)
-            if ($k == 3 and Math::GMPz::Rmpz_divisible_ui_p($n, 4)) {
+            if ($k == 3 and Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
                 $n = Math::GMPz::Rmpz_init_set($n);    # copy
                 Math::GMPz::Rmpz_div_2exp($n, $n, 2);
             }
@@ -11943,7 +11943,7 @@ package Sidef::Types::Number::Number {
                     }
 
                     if (defined($count)) {
-                        return ${_set_int($count)};
+                        return Math::GMPz::Rmpz_init_set_str("$count", 10);
                     }
                 }
             }
@@ -11951,7 +11951,7 @@ package Sidef::Types::Number::Number {
             if ($k == 4) {    # OEIS: A000118
                 my $count =
                   Math::Prime::Util::GMP::lshiftint(Math::Prime::Util::GMP::sigma(($v >= 1) ? ($t << 1) : $t), 3);
-                return ${_set_int($count)};
+                return Math::GMPz::Rmpz_init_set_str($count, 10);
             }
 
             if ($k == 6) {    # OEIS: A000141
@@ -12040,7 +12040,7 @@ package Sidef::Types::Number::Number {
                 }
 
                 my $count = Math::Prime::Util::GMP::mulint($prod, Math::Prime::Util::GMP::sigma($t, 3));
-                return ${_set_int($count)};
+                return Math::GMPz::Rmpz_init_set_str($count, 10);
             }
 
             if ($k == 10) {    # OEIS: A000144
@@ -12129,12 +12129,13 @@ package Sidef::Types::Number::Number {
 
                         my $congr3_4 = Math::GMPz::Rmpz_congruent_ui_p($p2, 3, 4);
 
-                        if ($e % 2 == 1 and $congr3_4) {
-                            $cache{$key} = $ZERO;
-                            return $ZERO;
-                        }
-
                         if ($congr3_4) {
+
+                            if ($e % 2 == 1) {
+                                $cache{$key} = $ZERO;
+                                return $ZERO;
+                            }
+
                             Math::GMPz::Rmpz_pow_ui($p2, $p2, 2 * $e);
                             Math::GMPz::Rmpz_mul($prod3, $prod3, $p2);
                             next;
@@ -12142,8 +12143,8 @@ package Sidef::Types::Number::Number {
 
                         # Here, we have: p == 1 (mod 4)
 
-                        my $s1 = (($e - 1 == 0) ? 1 : ($e - 1 < 0 ? 0 : __SUB__->([$p, $e - 1])));
-                        my $s2 = (($e - 2 == 0) ? 1 : ($e - 2 < 0 ? 0 : __SUB__->([$p, $e - 2])));
+                        my $s1 = (($e - 1 == 0) ? 1 : (($e - 1 < 0) ? 0 : __SUB__->([$p, $e - 1])));
+                        my $s2 = (($e - 2 == 0) ? 1 : (($e - 2 < 0) ? 0 : __SUB__->([$p, $e - 2])));
 
                         my $x = $sum_of_squares_solution->($p2) * $s1;
                         my $y = 0;
@@ -12229,19 +12230,18 @@ package Sidef::Types::Number::Number {
                 return $cache{$key};
             }
 
-            my $count = 0;
+            my $count = Math::GMPz::Rmpz_init_set_ui(0);
+            my $tmp   = Math::GMPz::Rmpz_init_set($n);
 
-            my $upto      = Math::Prime::Util::GMP::sqrtint($n);
-            my $is_square = Math::GMPz::Rmpz_perfect_square_p($n);
+            foreach my $v (0 .. Math::Prime::Util::GMP::sqrtint($n)) {
 
-            foreach my $v (0 .. $upto) {
-                if ($k > 2) {
-                    my $u = __SUB__->($n - $v * $v, $k - 1);
-                    $count += (($v == 0) ? 1 : 2) * $u;
-                }
-                elsif (Math::GMPz::Rmpz_perfect_square_p($n - $v * $v)) {
-                    $count += (($v == 0) ? 1 : 2) * (($is_square and $v == $upto) ? 1 : 2);
-                }
+                my $u = __SUB__->($tmp, $k - 1);
+
+                ref($u)
+                  ? Math::GMPz::Rmpz_addmul_ui($count, $u, (($v == 0) ? 1 : 2))
+                  : Math::GMPz::Rmpz_add_ui($count, $count, $u * (($v == 0) ? 1 : 2));
+
+                Math::GMPz::Rmpz_sub_ui($tmp, $tmp, 2 * $v + 1);
             }
 
             $cache{$key} = $count;
@@ -17100,7 +17100,7 @@ package Sidef::Types::Number::Number {
         }
 
         my %valuations  = map { @$_ } @factor_exp;
-        my @factors     = map { ($_ < ULONG_MAX) ? $_ : ${_set_int($_)} } map { $_->[0] } @factor_exp;
+        my @factors     = map { ($_ < ULONG_MAX) ? $_ : Math::GMPz::Rmpz_init_set_str("$_", 10) } map { $_->[0] } @factor_exp;
         my $factors_end = $#factors;
 
         my $t = Math::GMPz::Rmpz_init();
@@ -17411,7 +17411,7 @@ package Sidef::Types::Number::Number {
 
         my @factor_exp  = _factor_exp($z);
         my %valuations  = map { @$_ } @factor_exp;
-        my @factors     = map { ($_ < ULONG_MAX) ? $_ : ${_set_int($_)} } map { $_->[0] } @factor_exp;
+        my @factors     = map { ($_ < ULONG_MAX) ? $_ : Math::GMPz::Rmpz_init_set_str("$_", 10) } map { $_->[0] } @factor_exp;
         my $factors_end = $#factors;
 
         if ($k == 1) {
