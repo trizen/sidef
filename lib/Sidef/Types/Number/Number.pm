@@ -12043,8 +12043,185 @@ package Sidef::Types::Number::Number {
                 return ${_set_int($count)};
             }
 
-            # TODO: add efficient formula for k = 10
-            # TODO: r_10(n) = 4/5 * (A050456(n) + 16*A050468(n) + 8*A030212(n))
+            if ($k == 10) {    # OEIS: A000144
+
+                # Efficient formula for k = 10, due to Michael Somos:
+                # r_10(n) = 4/5 * (A050456(n) + 16*A050468(n) + 8*A030212(n))
+
+                # A050456 is multiplicative with:
+                #   a(2^e) = 1
+                #   a(p^e) = ((p^4)^(e+1) - 1) / (p^4 - 1)  if p == 1 (mod 4)
+                #   a(p^e) = (1 - (-p^4)^(e+1)) / (1 + p^4) if p == 3 (mod 4)
+
+                # A050468 is multiplicative with:
+                #   a(2^e) = 16^e
+                #   a(p^e) = ((p^4)^(e+1) - 1) / (p^4 - 1)          if p == 1 (mod 4)
+                #   a(p^e) = ((p^4)^(e+1) - (-1)^(e+1)) / (p^4 + 1) if p == 3 (mod 4)
+
+                # A030212 is multiplicative with:
+                #   a(2^e) = (-4)^e
+                #   a(p^e) = p^(2*e) * (1 + (-1)^e)/2             if p == 3 (mod 4)
+                #   a(p^e) = a(p) * a(p^(e-1)) - p^4 * a(p^(e-2)) if p == 1 (mod 4)
+                # where a(p) = 2 * Re( (x + i*y)^4 ) and p = x^2 + y^2 with even x.
+
+                my $sum_of_squares_solution = sub {
+                    my ($p) = @_;    # p is congruent to 1 mod 4
+
+                    # a(p) = 2 * Re( (x + i*y)^4 ) and p = x^2 + y^2.
+
+                    # ref($p) eq 'Math::GMPz' or die "error";
+
+                    my $u = $p;
+                    my $s = Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::sqrtmod(-1, $u), 10);
+                    my $q = $u;
+
+                    while ($s * $s > $u) {
+                        ($s, $q) = ($q % $s, $s);
+                    }
+
+                    my ($x, $y) = ($s, $q % $s);
+
+                    # ($x*$x + $y*$y == $p)
+                    #    or die "Error: $x^2 + $y^2 != $p";
+
+                    my ($re, $im) = _set_int($x)->complex_ipow(_set_int($y), _set_int(4));
+                    ${$re->add($re)};
+                };
+
+                my $prod1 = Math::GMPz::Rmpz_init_set_ui(1);
+                my $prod2 = Math::GMPz::Rmpz_init_set_ui(1);
+
+                my $p1 = Math::GMPz::Rmpz_init();
+
+                my $u1 = Math::GMPz::Rmpz_init();
+                my $u2 = Math::GMPz::Rmpz_init();
+
+                my @factors = _factor_exp($t);
+
+                my $chi_4 = sub {
+                    my (@f) = @_;
+
+                    if (scalar(@f) == 0) {
+                        return $ONE;
+                    }
+
+                    my $key = join('*', map { join('^', @$_) } @f);
+
+                    if (exists $cache{$key}) {
+                        return $cache{$key};
+                    }
+
+                    if (scalar(@f) == 1 and $f[0][1] == 1) {
+                        Math::GMPz::Rmpz_set_str($p1, $f[0][0], 10);
+                        Math::GMPz::Rmpz_congruent_ui_p($p1, 1, 4) || return $ZERO;
+                        return $sum_of_squares_solution->($p1);
+                    }
+
+                    my $p2    = Math::GMPz::Rmpz_init();
+                    my $prod3 = Math::GMPz::Rmpz_init_set_ui(1);
+
+                    foreach my $pp (@f) {
+                        my ($p, $e) = @$pp;
+
+                        ($p < ULONG_MAX)
+                          ? Math::GMPz::Rmpz_set_ui($p2, $p)
+                          : Math::GMPz::Rmpz_set_str($p2, $p, 10);
+
+                        my $congr3_4 = Math::GMPz::Rmpz_congruent_ui_p($p2, 3, 4);
+
+                        if ($e % 2 == 1 and $congr3_4) {
+                            $cache{$key} = $ZERO;
+                            return $ZERO;
+                        }
+
+                        if ($congr3_4) {
+                            Math::GMPz::Rmpz_pow_ui($p2, $p2, 2 * $e);
+                            Math::GMPz::Rmpz_mul($prod3, $prod3, $p2);
+                            next;
+                        }
+
+                        # Here, we have: p == 1 (mod 4)
+
+                        my $s1 = (($e - 1 == 0) ? 1 : ($e - 1 < 0 ? 0 : __SUB__->([$p, $e - 1])));
+                        my $s2 = (($e - 2 == 0) ? 1 : ($e - 2 < 0 ? 0 : __SUB__->([$p, $e - 2])));
+
+                        my $x = $sum_of_squares_solution->($p2) * $s1;
+                        my $y = 0;
+
+                        if ($e - 2 >= 0) {
+                            Math::GMPz::Rmpz_pow_ui($p2, $p2, 4);
+                            $y = $p2 * $s2;
+                        }
+
+                        Math::GMPz::Rmpz_mul($prod3, $prod3, $x - $y);
+                    }
+
+                    $cache{$key} = $prod3;
+                  }
+                  ->(@factors);
+
+                my $prod3 = Math::GMPz::Rmpz_init_set($chi_4);
+
+                if ($v >= 1) {
+                    Math::GMPz::Rmpz_mul_2exp($prod3, $prod3, 2 * $v);
+                    Math::GMPz::Rmpz_neg($prod3, $prod3) if ($v % 2 == 1);
+                }
+
+                foreach my $pp (@factors) {
+                    my ($p, $e) = @$pp;
+
+                    ($p < ULONG_MAX)
+                      ? Math::GMPz::Rmpz_set_ui($p1, $p)
+                      : Math::GMPz::Rmpz_set_str($p1, $p, 10);
+
+                    Math::GMPz::Rmpz_pow_ui($u1, $p1, 4 * ($e + 1));
+
+                    my $congr1_4 = Math::GMPz::Rmpz_congruent_ui_p($p1, 1, 4);
+
+                    Math::GMPz::Rmpz_pow_ui($p1, $p1, 4);
+
+                    if ($congr1_4) {
+                        Math::GMPz::Rmpz_sub_ui($p1, $p1, 1);
+                        Math::GMPz::Rmpz_divexact($u1, $u1, $p1);
+                        Math::GMPz::Rmpz_mul($prod1, $prod1, $u1);
+                        Math::GMPz::Rmpz_mul($prod2, $prod2, $u1);
+                        next;
+                    }
+
+                    # Here, we have: p == 3 (mod 4)
+
+                    Math::GMPz::Rmpz_set($u2, $u1);
+                    Math::GMPz::Rmpz_add_ui($p1, $p1, 1);
+
+                    if ($e % 2 == 1) {
+                        Math::GMPz::Rmpz_neg($u1, $u1);
+                        Math::GMPz::Rmpz_sub_ui($u2, $u2, 1);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_add_ui($u2, $u2, 1);
+                    }
+
+                    Math::GMPz::Rmpz_add_ui($u1, $u1, 1);
+                    Math::GMPz::Rmpz_divexact($u1, $u1, $p1);
+                    Math::GMPz::Rmpz_divexact($u2, $u2, $p1);
+
+                    Math::GMPz::Rmpz_mul($prod1, $prod1, $u1);
+                    Math::GMPz::Rmpz_mul($prod2, $prod2, $u2);
+                }
+
+                Math::GMPz::Rmpz_mul_2exp($prod2, $prod2, 4 * $v) if ($v > 0);
+
+                Math::GMPz::Rmpz_mul_2exp($prod2, $prod2, 4);
+                Math::GMPz::Rmpz_mul_2exp($prod3, $prod3, 3);
+
+                Math::GMPz::Rmpz_add($prod1, $prod1, $prod2);
+                Math::GMPz::Rmpz_add($prod1, $prod1, $prod3);
+
+                Math::GMPz::Rmpz_mul_2exp($prod1, $prod1, 2);
+                Math::GMPz::Rmpz_divexact_ui($prod1, $prod1, 5);
+
+                return $prod1;
+            }
 
             my $key = "$n $k";
 
