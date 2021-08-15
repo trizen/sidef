@@ -493,6 +493,7 @@ scripts/RosettaCode/modular_inverse.sf
 scripts/RosettaCode/most_frequent_k_chars_distance.sf
 scripts/RosettaCode/move_to_front_algorithm_1.sf
 scripts/RosettaCode/move_to_front_algorithm_2.sf
+scripts/RosettaCode/MRG32k3a.sf
 scripts/RosettaCode/multifactorial.sf
 scripts/RosettaCode/multiple_distinct_objects.sf
 scripts/RosettaCode/multiplication_tables.sf
@@ -512,6 +513,7 @@ scripts/RosettaCode/pangram_checker.sf
 scripts/RosettaCode/partial_function_application.sf
 scripts/RosettaCode/pascal_s_triangle.sf
 scripts/RosettaCode/pascal_s_triangle_puzzle.sf
+scripts/RosettaCode/PCG32.sf
 scripts/RosettaCode/perfect_shuffle.sf
 scripts/RosettaCode/perlin_noise.sf
 scripts/RosettaCode/permutations_by_swapping.sf
@@ -614,6 +616,7 @@ scripts/RosettaCode/sorting_algorithms_stooge_sort.sf
 scripts/RosettaCode/sorting_algorithms_strand_sort.sf
 scripts/RosettaCode/spiral_matrix.sf
 scripts/RosettaCode/split_repchar_string.sf
+scripts/RosettaCode/Splitmix64.sf
 scripts/RosettaCode/square_but_not_cube.sf
 scripts/RosettaCode/stable_marriage_problem.sf
 scripts/RosettaCode/stack.sf
@@ -645,6 +648,7 @@ scripts/RosettaCode/walk_a_dir_non_recursively.sf
 scripts/RosettaCode/water_collected_between_towers.sf
 scripts/RosettaCode/word_break_problem.sf
 scripts/RosettaCode/word_wrap.sf
+scripts/RosettaCode/Xorshift_star.sf
 scripts/RosettaCode/zeckendorf_number_representation.sf
 scripts/RosettaCode/zig-zag_matrix.sf
 scripts/rsa_code.sf

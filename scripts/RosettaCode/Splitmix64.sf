@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+# https://rosettacode.org/wiki/Pseudo-random_numbers/Splitmix64
+
+class Splitmix64(state) {
+
+    define (
+        mask64 = (2**64 - 1)
+    )
+
+    method next_int {
+        var n = (state = ((state + 0x9e3779b97f4a7c15) & mask64))
+        n = ((n ^ (n >> 30)) * 0xbf58476d1ce4e5b9 & mask64)
+        n = ((n ^ (n >> 27)) * 0x94d049bb133111eb & mask64)
+        (n ^ (n >> 31)) & mask64
+    }
+
+    method next_float {
+        self.next_int / (mask64+1) -> float
+    }
+}
+
+say 'Seed: 1234567, first 5 values:'
+var rng = Splitmix64(1234567)
+var arr = 5.of { rng.next_int }
+assert_eq(arr, [6457827717110365317, 3203168211198807973, 9817491932198370423, 4593380528125082431, 16408922859458223821])
+say arr
