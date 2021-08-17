@@ -5154,6 +5154,29 @@ Aliases: I<perfect_power_count>
 
 =cut
 
+=head2 power_divisors
+
+    power_divisors(n)
+    power_divisors(n, k)
+
+Returns the power divisors of n.
+
+Example:
+
+    say 5040.power_divisors    #=> [1, 4, 8, 9, 16, 36, 144]
+
+Equivalent with:
+
+    n.divisors.grep { .is_power }
+
+When an additional argument is given, it returns the k-th power divisors of n.
+
+Equivalent with:
+
+    n.divisors.grep { .is_power(k) }
+
+=cut
+
 =head2 powerful
 
     k.powerful(n)
