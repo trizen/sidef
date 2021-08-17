@@ -5171,6 +5171,11 @@ Equivalent with:
 
 When an additional argument is given, it returns the k-th power divisors of n.
 
+Example:
+
+    say 10!.power_divisors(3)  #=> [1, 8, 27, 64, 216, 1728]
+    say 10!.power_divisors(4)  #=> [1, 16, 81, 256, 1296, 20736]
+
 Equivalent with:
 
     n.divisors.grep { .is_power(k) }
@@ -5200,6 +5205,36 @@ It efficiently counts the number of k-powerful numbers <= n, or in the range C<a
 
     say 2.powerful_count(100)       #=> number of 2-powerful numbers <= 100
     say 2.powerful_count(50, 100)   #=> number of 2-powerful numbers in the range 50..100
+
+=cut
+
+=head2 power_udivisors
+
+    power_udivisors(n)
+    power_udivisors(n,k)
+
+Returns the unitary power divisors of C<n>, such that each divisors C<d> is a perfect power and C<gcd(n/d, d) = 1>.
+
+Example:
+
+    say 15!.power_udivisors         #=> [1, 49, 125, 729, 2048, 35721, 91125]
+
+Equivalent with:
+
+    n.udivisors.grep { .is_power }
+
+When an additional argument is given, it returns the unitary k-th power divisors of C<n>.
+
+Example:
+
+    say 15!.power_udivisors(2)      #=> [1, 49, 729, 35721]
+    say 15!.power_udivisors(3)      #=> [1, 125, 729, 91125]
+
+Equivalent with:
+
+    n.udivisors.grep { .is_power(k) }
+
+Aliases: I<power_unitary_divisors>, I<unitary_power_divisors>
 
 =cut
 

@@ -15207,6 +15207,10 @@ package Sidef::Types::Number::Number {
         my @factor_exp = _factor_exp($n);
         my $max_k      = List::Util::max(map { $_->[1] } @factor_exp);
 
+        if (!defined($max_k) or $max_k == 1) {
+            return Sidef::Types::Array::Array->new([ONE]);
+        }
+
         foreach my $k (2 .. $max_k) {
             push @lists, $func->($k, \@factor_exp);
         }
@@ -15218,39 +15222,71 @@ package Sidef::Types::Number::Number {
         $_[0]->power_divisors(TWO);
     }
 
-    sub square_udivisors {
-        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
+    sub power_udivisors {
+        my ($n, $k) = @_;
 
-        my @d = ($ONE);
-        foreach my $pe (grep { $_->[1] % 2 == 0 } _factor_exp($n)) {
-            my ($p, $e) = @$pe;
+        my $func = sub {
+            my ($k, $factor_exp) = @_;
 
-            my $pp = (
-                      ($p < ULONG_MAX)
-                      ? Math::GMPz::Rmpz_init_set_ui($p)
-                      : Math::GMPz::Rmpz_init_set_str("$p", 10)
-                     );
+            my @d = ($ONE);
+            foreach my $pe (grep { $_->[1] % $k == 0 } @$factor_exp) {
+                my ($p, $e) = @$pe;
 
-            if ($e == 2) {
-                Math::GMPz::Rmpz_mul($pp, $pp, $pp);
+                my $pp = (
+                          ($p < ULONG_MAX)
+                          ? Math::GMPz::Rmpz_init_set_ui($p)
+                          : Math::GMPz::Rmpz_init_set_str("$p", 10)
+                         );
+
+                if ($e == 2) {
+                    Math::GMPz::Rmpz_mul($pp, $pp, $pp);
+                }
+                else {
+                    Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
+                }
+
+                my @t;
+                foreach my $d (@d) {
+                    my $z = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($z, $pp, $d);
+                    push @t, $z;
+                }
+                push @d, @t;
             }
-            else {
-                Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
-            }
 
-            my @t;
-            foreach my $d (@d) {
-                my $z = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_mul($z, $pp, $d);
-                push @t, $z;
-            }
-            push @d, @t;
+            @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+            @d = map  { bless \$_ } @d;
+
+            Sidef::Types::Array::Array->new(\@d);
+        };
+
+        $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
+
+        if (defined($k)) {
+            $k = _any2ui($$k) // return Sidef::Types::Array::Array->new();
+            return $func->($k, [_factor_exp($n)]);
         }
 
-        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
-        @d = map  { bless \$_ } @d;
+        my @lists;
+        my @factor_exp = _factor_exp($n);
+        my $max_k      = List::Util::max(map { $_->[1] } @factor_exp);
 
-        Sidef::Types::Array::Array->new(\@d);
+        if (!defined($max_k) or $max_k == 1) {
+            return Sidef::Types::Array::Array->new([ONE]);
+        }
+
+        foreach my $k (2 .. $max_k) {
+            push @lists, $func->($k, \@factor_exp);
+        }
+
+        Sidef::Types::Array::Array->new([map { @$_ } @lists])->sort->uniq;
+    }
+
+    *unitary_power_divisors = \&power_udivisors;
+    *power_unitary_divisors = \&power_udivisors;
+
+    sub square_udivisors {
+        $_[0]->power_udivisors(TWO);
     }
 
     *unitary_square_divisors = \&square_udivisors;
