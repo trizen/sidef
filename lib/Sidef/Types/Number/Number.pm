@@ -10312,7 +10312,7 @@ package Sidef::Types::Number::Number {
 
         # Implementation for large values of n
         my $c = Math::GMPz::Rmpz_init_set_ui(0);
-        my $t = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_sqrt($t, $n);
         Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
@@ -10348,6 +10348,70 @@ package Sidef::Types::Number::Number {
     }
 
     *square_free_count = \&squarefree_count;
+
+    sub powerfree_count {
+        my ($k, $from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->powerfree_count($to)->sub($k->powerfree_count($from->dec));
+        }
+
+        _valid(\$from);
+
+        my $n = _any2mpz($$from) // return ZERO;
+        $k = _any2ui($$k) // return ZERO;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return ZERO;
+
+        if ($k == 0) {
+            return ONE if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0);
+            return ZERO;
+        }
+
+        return ONE if ($k == 1);
+
+        if ($k == 2) {
+            return ((bless \$n)->squarefree_count);
+        }
+
+        my $c = Math::GMPz::Rmpz_init_set_ui(0);
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_root($t, $n, $k);
+        Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
+
+        my $s = Math::GMPz::Rmpz_get_ui($t);
+
+        if (HAS_PRIME_UTIL) {
+            Math::Prime::Util::forsquarefree(
+                sub {
+                    Math::GMPz::Rmpz_ui_pow_ui($t, $_, $k);
+                    Math::GMPz::Rmpz_div($t, $n, $t);
+                    (scalar(@_) & 1)
+                      ? Math::GMPz::Rmpz_sub($c, $c, $t)
+                      : Math::GMPz::Rmpz_add($c, $c, $t);
+                },
+                $s
+                                            );
+        }
+        else {
+            my $m;
+            for (my $v = 1 ; $v <= $s ; ++$v) {
+                if ($m = Math::Prime::Util::GMP::moebius($v)) {
+                    Math::GMPz::Rmpz_ui_pow_ui($t, $v, $k);
+                    Math::GMPz::Rmpz_div($t, $n, $t);
+                    ($m == 1)
+                      ? Math::GMPz::Rmpz_add($c, $c, $t)
+                      : Math::GMPz::Rmpz_sub($c, $c, $t);
+                }
+            }
+        }
+
+        bless \$c;
+    }
 
     sub _prime_count_checkpoint {
         my ($n, $i) = @_;

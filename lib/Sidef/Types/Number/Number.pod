@@ -5182,6 +5182,18 @@ Equivalent with:
 
 =cut
 
+=head2 powerfree_count
+
+    k.powerfree_count(n)
+    k.powerfree_count(a,b)
+
+It efficiently counts the number of k-powerfree numbers <= n, or in the range C<a..b>;
+
+    say 3.powerfree_count(100)       #=> count of cubefree numbers <= 100
+    say 3.powerfree_count(50, 100)   #=> count of cubefree numbers in the range 50..100
+
+=cut
+
 =head2 powerful
 
     k.powerful(n)
@@ -5203,8 +5215,8 @@ Example:
 
 It efficiently counts the number of k-powerful numbers <= n, or in the range C<a..b>;
 
-    say 2.powerful_count(100)       #=> number of 2-powerful numbers <= 100
-    say 2.powerful_count(50, 100)   #=> number of 2-powerful numbers in the range 50..100
+    say 2.powerful_count(100)       #=> count of 2-powerful numbers <= 100
+    say 2.powerful_count(50, 100)   #=> count of 2-powerful numbers in the range 50..100
 
 =cut
 
