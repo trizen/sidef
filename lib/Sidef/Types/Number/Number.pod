@@ -5213,6 +5213,18 @@ Returns the k-powerfree part of C<n>.
 
 =cut
 
+=head2 powerfree_part_sum
+
+    k.powerfree_part_sum(n)
+    k.powerfree_part_sum(a,b)
+
+Returns the sum of the k-powerfree parts of integers <= n or in the range C<a..b>:
+
+    say 2.powerfree_part_sum(100)            # sum of squarefree part of n for n <= 100
+    say 3.powerfree_part_sum(50, 100)        # sum of cubefree part of n for n in the range 50..100
+
+=cut
+
 =head2 powerfree_sum
 
     k.powerfree_sum(n)

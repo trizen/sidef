@@ -14200,6 +14200,94 @@ package Sidef::Types::Number::Number {
         (TWO)->powerfree_part($_[0]);
     }
 
+    sub powerfree_part_sum {
+        my ($k, $from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->powerfree_part_sum($to)->sub($k->powerfree_part_sum($from->dec));
+        }
+
+        _valid(\$from);
+
+        my $n = _any2mpz($$from) // return ZERO;
+        $k = _any2ui($$k) // return ZERO;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return ZERO;
+
+        return ZERO if ($k == 0);
+        return ONE  if ($k == 1);
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $w = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_root($t, $n, $k);
+        Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
+
+        my $s   = Math::GMPz::Rmpz_get_ui($t);
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        if (HAS_PRIME_UTIL) {
+            Math::Prime::Util::forfactored(
+                sub {
+
+                    # u = faulhaber(floor(n/v^k), 1)
+                    Math::GMPz::Rmpz_ui_pow_ui($w, $_, $k);
+                    Math::GMPz::Rmpz_div($t, $n, $w);
+                    Math::GMPz::Rmpz_mul($u, $t, $t);
+                    Math::GMPz::Rmpz_add($u, $u, $t);
+                    Math::GMPz::Rmpz_div_2exp($u, $u, 1);
+
+                    Math::GMPz::Rmpz_set_ui($w, 1);
+
+                    my $prev = 1;
+                    foreach my $p (@_) {
+                        next if ($p == $prev);
+                        Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+                        Math::GMPz::Rmpz_ui_sub($t, 1, $t);
+                        Math::GMPz::Rmpz_mul($w, $w, $t);
+                        $prev = $p;
+                    }
+
+                    Math::GMPz::Rmpz_mul($u, $u, $w);
+                    Math::GMPz::Rmpz_add($sum, $sum, $u);
+                },
+                $s
+                                          );
+        }
+        else {
+            my $m;
+            for (my $v = 1 ; $v <= $s ; ++$v) {
+
+                # u = faulhaber(floor(n/v^k), 1)
+                Math::GMPz::Rmpz_ui_pow_ui($w, $v, $k);
+                Math::GMPz::Rmpz_div($t, $n, $w);
+                Math::GMPz::Rmpz_mul($u, $t, $t);
+                Math::GMPz::Rmpz_add($u, $u, $t);
+                Math::GMPz::Rmpz_div_2exp($u, $u, 1);
+
+                Math::GMPz::Rmpz_set_ui($w, 1);
+
+                my $prev = 1;
+                foreach my $p (_factor($v)) {
+                    next if ($p == $prev);
+                    Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+                    Math::GMPz::Rmpz_ui_sub($t, 1, $t);
+                    Math::GMPz::Rmpz_mul($w, $w, $t);
+                    $prev = $p;
+                }
+
+                Math::GMPz::Rmpz_mul($u, $u, $w);
+                Math::GMPz::Rmpz_add($sum, $sum, $u);
+            }
+        }
+
+        return bless \$sum;
+    }
+
     sub arithmetic_derivative {
         my ($x) = @_;
 
