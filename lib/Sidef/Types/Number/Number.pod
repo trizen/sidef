@@ -3772,6 +3772,14 @@ Aliases: I<is_power>, I<is_perfect_power>
 
 =cut
 
+=head2 is_powerfree
+
+    n.is_powerfree(k=2)
+
+Returns true when all the exponents in the prime-power factorization of n are < k.
+
+=cut
+
 =head2 is_powerful
 
     n.is_powerful(k=2)

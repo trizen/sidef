@@ -10366,12 +10366,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
 
-        if ($k == 0) {
-            return ONE if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0);
-            return ZERO;
-        }
-
-        return ONE if ($k == 1);
+        return ZERO if ($k == 0);
+        return ONE  if ($k == 1);
 
         if ($k == 2) {
             return ((bless \$n)->squarefree_count);
@@ -17930,6 +17926,61 @@ package Sidef::Types::Number::Number {
     }
 
     *is_square_free = \&is_squarefree;
+
+    sub is_powerfree {
+        my ($n, $k) = @_;
+
+        if (!defined($k)) {    # default to k = 2
+            return $n->is_squarefree;
+        }
+
+        _valid(\$k);
+
+        $n = $$n;
+        $k = _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::FALSE if ($k == 0);
+
+        if ($k == 1) {
+            return Sidef::Types::Bool::Bool::TRUE if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0);
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        # Optimization for large n
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) > 100) {
+            my ($rem, @f) = _primorial_trial_factor($n, 1e6);
+
+            my %factors;
+            ++$factors{$_} for @f;
+
+            foreach my $e (values %factors) {
+                $e < $k
+                  or return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if (Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+
+            $n = $rem;
+        }
+
+        foreach my $pp (_factor_exp($n)) {
+            $pp->[1] < $k
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
 
     sub is_totient {    # OEIS: A002202
         my ($x) = @_;
