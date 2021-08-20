@@ -5202,6 +5202,17 @@ It efficiently counts the number of k-powerfree numbers <= n, or in the range C<
 
 =cut
 
+=head2 powerfree_part
+
+    k.powerfree_part(n)
+
+Returns the k-powerfree part of C<n>.
+
+    say 30.of { 2.powerfree_part(_) }       # squarefree part (OEIS: A007913)
+    say 30.of { 3.powerfree_part(_) }       # cubefree part (OEIS: A050985)
+
+=cut
+
 =head2 powerfree_sum
 
     k.powerfree_sum(n)

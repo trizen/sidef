@@ -14170,18 +14170,34 @@ package Sidef::Types::Number::Number {
         _set_int($r);
     }
 
-    sub core {    # A007913
+    sub powerfree_part {
+        my ($k, $n) = @_;
 
         # Multiplicative with:
-        #   a(p^k) = p^(k mod 2)
+        #   a(p^e, k) = p^(e mod k)
 
-        my $n = &_big2uistr // goto &nan;
+        _valid(\$n);
+
+        $k = _any2ui($$k)   // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
+
+        $k <= 0 and goto &nan;
 
         my @factor_exp = _factor_exp($n);
         @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
-        my $r = Math::Prime::Util::GMP::vecprod(map { $_->[0] } grep { $_->[1] % 2 } @factor_exp);
+        my $r = Math::Prime::Util::GMP::vecprod(
+            map {
+                ($_->[1] == 1)
+                  ? $_->[0]
+                  : Math::Prime::Util::GMP::powint($_->[0], $_->[1])
+              } grep { $_->[1] } map { [$_->[0], $_->[1] % $k] } @factor_exp
+        );
         _set_int($r);
+    }
+
+    sub core {    # A007913
+        (TWO)->powerfree_part($_[0]);
     }
 
     sub arithmetic_derivative {
