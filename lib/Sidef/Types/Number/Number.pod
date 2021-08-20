@@ -5195,10 +5195,22 @@ Equivalent with:
     k.powerfree_count(n)
     k.powerfree_count(a,b)
 
-It efficiently counts the number of k-powerfree numbers <= n, or in the range C<a..b>;
+It efficiently counts the number of k-powerfree numbers <= n, or in the range C<a..b>:
 
     say 3.powerfree_count(100)       #=> count of cubefree numbers <= 100
     say 3.powerfree_count(50, 100)   #=> count of cubefree numbers in the range 50..100
+
+=cut
+
+=head2 powerfree_sum
+
+    k.powerfree_sum(n)
+    k.powerfree_sum(a,b)
+
+Returns the sum of k-powerfree numbers <= n or in the range C<a..b>:
+
+    say 2.powerfree_sum(100)            # sum of squarefree numbers <= 100
+    say 3.powerfree_sum(50, 100)        # sum of cubefree numbers in the range 50..100
 
 =cut
 
@@ -6367,8 +6379,9 @@ Example:
 =head2 squarefree_sum
 
     squarefree_sum(n)
+    squarefree_sum(a,b)
 
-Returns the sum of squarefree numbers <= n. (OEIS: A066779)
+Returns the sum of squarefree numbers <= n or in the range C<a..b>. (OEIS: A066779)
 
 Example:
 

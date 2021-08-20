@@ -10180,18 +10180,31 @@ package Sidef::Types::Number::Number {
 
     *cyclotomic = \&cyclotomic_polynomial;
 
-    sub squarefree_sum {
-        my ($n) = @_;
+    sub powerfree_sum {
+        my ($k, $from, $to) = @_;
 
-        $n = _any2mpz($$n) // return ZERO;
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->powerfree_sum($to)->sub($k->powerfree_sum($from->dec));
+        }
+
+        _valid(\$from);
+
+        my $n = _any2mpz($$from) // return ZERO;
+        $k = _any2ui($$k) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
 
-        my $t = Math::GMPz::Rmpz_init();
-        my $u = Math::GMPz::Rmpz_init();
+        return ZERO if ($k == 0);
+        return ONE  if ($k == 1);
 
-        Math::GMPz::Rmpz_sqrt($t, $n);
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $w = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_root($t, $n, $k);
         Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
 
         my $s   = Math::GMPz::Rmpz_get_ui($t);
@@ -10201,16 +10214,15 @@ package Sidef::Types::Number::Number {
             Math::Prime::Util::forsquarefree(
                 sub {
 
-                    # u = faulhaber(floor(n/k^2), 1)
-                    Math::GMPz::Rmpz_div_ui($t, $n, $_);
-                    Math::GMPz::Rmpz_div_ui($t, $t, $_);
+                    # u = faulhaber(floor(n/v^k), 1)
+                    Math::GMPz::Rmpz_ui_pow_ui($w, $_, $k);
+                    Math::GMPz::Rmpz_div($t, $n, $w);
                     Math::GMPz::Rmpz_mul($u, $t, $t);
                     Math::GMPz::Rmpz_add($u, $u, $t);
                     Math::GMPz::Rmpz_div_2exp($u, $u, 1);
 
-                    # u *= k^2
-                    Math::GMPz::Rmpz_mul_ui($u, $u, $_);
-                    Math::GMPz::Rmpz_mul_ui($u, $u, $_);
+                    # u *= v^k
+                    Math::GMPz::Rmpz_mul($u, $u, $w);
 
                     (scalar(@_) & 1)
                       ? Math::GMPz::Rmpz_sub($sum, $sum, $u)
@@ -10221,19 +10233,18 @@ package Sidef::Types::Number::Number {
         }
         else {
             my $m;
-            for (my $k = 1 ; $k <= $s ; ++$k) {
-                if ($m = Math::Prime::Util::GMP::moebius($k)) {
+            for (my $v = 1 ; $v <= $s ; ++$v) {
+                if ($m = Math::Prime::Util::GMP::moebius($v)) {
 
-                    # u = faulhaber(floor(n/k^2), 1)
-                    Math::GMPz::Rmpz_div_ui($t, $n, $k);
-                    Math::GMPz::Rmpz_div_ui($t, $t, $k);
+                    # u = faulhaber(floor(n/v^k), 1)
+                    Math::GMPz::Rmpz_ui_pow_ui($w, $v, $k);
+                    Math::GMPz::Rmpz_div($t, $n, $w);
                     Math::GMPz::Rmpz_mul($u, $t, $t);
                     Math::GMPz::Rmpz_add($u, $u, $t);
                     Math::GMPz::Rmpz_div_2exp($u, $u, 1);
 
-                    # u *= k^2
-                    Math::GMPz::Rmpz_mul_ui($u, $u, $k);
-                    Math::GMPz::Rmpz_mul_ui($u, $u, $k);
+                    # u *= v^k
+                    Math::GMPz::Rmpz_mul($u, $u, $w);
 
                     ($m == 1)
                       ? Math::GMPz::Rmpz_add($sum, $sum, $u)
@@ -10243,6 +10254,11 @@ package Sidef::Types::Number::Number {
         }
 
         return bless \$sum;
+    }
+
+    sub squarefree_sum {
+        my ($from, $to) = @_;
+        (TWO)->powerfree_sum($from, $to);
     }
 
     sub squarefree_count {
