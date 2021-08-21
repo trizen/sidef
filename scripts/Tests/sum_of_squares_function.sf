@@ -3,6 +3,14 @@
 # Tests for the sum of squares function: r_k(n).
 # https://en.wikipedia.org/wiki/Sum_of_squares_function
 
+func r_3(n) {   # n must be squarefree
+
+    return 0 if n.is_congruent(7, 8)
+
+    return 24*hclassno(-n) if n.is_congruent(3, 8)
+    return 12*hclassno(-4*n)
+}
+
 func r(n, k=2) is cached {
 
     return 1 if (n == 0)
@@ -49,5 +57,14 @@ for k in (0..20) {
         assert_eq(r(n, k), sum_of_squares_count(n, k))
     }
 }
+
+1000.each_squarefree {|n|
+    assert_eq(squares_r(n,3), r_3(n))
+}
+
+assert_eq(
+    100.of { 12*hclassno(_) },  # A259825
+    [-1, 0, 0, 4, 6, 0, 0, 12, 12, 0, 0, 12, 16, 0, 0, 24, 18, 0, 0, 12, 24, 0, 0, 36, 24, 0, 0, 16, 24, 0, 0, 36, 36, 0, 0, 24, 30, 0, 0, 48, 24, 0, 0, 12, 48, 0, 0, 60, 40, 0, 0, 24, 24, 0, 0, 48, 48, 0, 0, 36, 48, 0, 0, 60, 42, 0, 0, 12, 48, 0, 0, 84, 36, 0, 0, 28, 48, 0, 0, 60, 72, 0, 0, 36, 48, 0, 0, 72, 24, 0, 0, 24, 72, 0, 0, 96, 72, 0, 0, 36]
+)
 
 say "** Test passed!"

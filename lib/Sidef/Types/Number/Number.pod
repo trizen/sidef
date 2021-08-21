@@ -2678,6 +2678,20 @@ When an additional argument is given, it returns the n-th Harmonic number of the
 
 =cut
 
+=head2 hclassno
+
+    hclassno(n)
+
+Returns the Hurwitz-Kronecker class number.
+
+Example:
+
+    say 30.of { .hclassno.nu }      # OEIS: A058305
+    say 30.of { .hclassno.de }      # OEIS: A058306
+    say 30.of { 12 * .hclassno }    # OEIS: A259825
+
+=cut
+
 =head2 hermiteH
 
     hermiteH(n, x)
