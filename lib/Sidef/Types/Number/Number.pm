@@ -10261,22 +10261,28 @@ package Sidef::Types::Number::Number {
         (TWO)->powerfree_sum($from, $to);
     }
 
-    sub squarefree_count {
-        my ($from, $to) = @_;
+    sub powerfree_count {
+        my ($k, $from, $to) = @_;
 
         if (defined($to)) {
             _valid(\$to);
             return ZERO if $to->lt($from);
-            return $to->squarefree_count->sub($from->dec->squarefree_count);
+            return $k->powerfree_count($to)->sub($k->powerfree_count($from->dec));
         }
 
+        _valid(\$from);
+
         my $n = _any2mpz($$from) // return ZERO;
+        $k = _any2ui($$k) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
 
+        return ZERO if ($k == 0);
+        return ONE  if ($k == 1);
+
         # Optimization for native integers
-        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+        if ($k == 2 and Math::GMPz::Rmpz_fits_ulong_p($n)) {
 
             my $s = Math::GMPz::Rmpz_init();
 
@@ -10326,69 +10332,6 @@ package Sidef::Types::Number::Number {
             return _set_int($count);
         }
 
-        # Implementation for large values of n
-        my $c = Math::GMPz::Rmpz_init_set_ui(0);
-        state $t = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_sqrt($t, $n);
-        Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
-
-        my $s = Math::GMPz::Rmpz_get_ui($t);
-
-        if (HAS_PRIME_UTIL) {
-            Math::Prime::Util::forsquarefree(
-                sub {
-                    Math::GMPz::Rmpz_div_ui($t, $n, $_);
-                    Math::GMPz::Rmpz_div_ui($t, $t, $_);
-                    (scalar(@_) & 1)
-                      ? Math::GMPz::Rmpz_sub($c, $c, $t)
-                      : Math::GMPz::Rmpz_add($c, $c, $t);
-                },
-                $s
-                                            );
-        }
-        else {
-            my $m;
-            for (my $k = 1 ; $k <= $s ; ++$k) {
-                if ($m = Math::Prime::Util::GMP::moebius($k)) {
-                    Math::GMPz::Rmpz_div_ui($t, $n, $k);
-                    Math::GMPz::Rmpz_div_ui($t, $t, $k);
-                    ($m == 1)
-                      ? Math::GMPz::Rmpz_add($c, $c, $t)
-                      : Math::GMPz::Rmpz_sub($c, $c, $t);
-                }
-            }
-        }
-
-        bless \$c;
-    }
-
-    *square_free_count = \&squarefree_count;
-
-    sub powerfree_count {
-        my ($k, $from, $to) = @_;
-
-        if (defined($to)) {
-            _valid(\$to);
-            return ZERO if $to->lt($from);
-            return $k->powerfree_count($to)->sub($k->powerfree_count($from->dec));
-        }
-
-        _valid(\$from);
-
-        my $n = _any2mpz($$from) // return ZERO;
-        $k = _any2ui($$k) // return ZERO;
-
-        Math::GMPz::Rmpz_sgn($n) > 0
-          or return ZERO;
-
-        return ZERO if ($k == 0);
-        return ONE  if ($k == 1);
-
-        if ($k == 2) {
-            return ((bless \$n)->squarefree_count);
-        }
-
         my $c = Math::GMPz::Rmpz_init_set_ui(0);
         state $t = Math::GMPz::Rmpz_init_nobless();
 
@@ -10424,6 +10367,13 @@ package Sidef::Types::Number::Number {
 
         bless \$c;
     }
+
+    sub squarefree_count {
+        my ($from, $to) = @_;
+        (TWO)->powerfree_count($from, $to);
+    }
+
+    *square_free_count = \&squarefree_count;
 
     sub _prime_count_checkpoint {
         my ($n, $i) = @_;
