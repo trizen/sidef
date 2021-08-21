@@ -14167,8 +14167,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
 
-        return ZERO if ($k == 0);
-        return ONE  if ($k == 1);
+        return ZERO        if ($k == 0);
+        return (bless \$n) if ($k == 1);
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
@@ -18014,7 +18014,7 @@ package Sidef::Types::Number::Number {
             $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
@@ -18023,6 +18023,10 @@ package Sidef::Types::Number::Number {
         if ($k == 1) {
             return Sidef::Types::Bool::Bool::TRUE if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0);
             return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if ($k == 2) {
+            return ((bless \$n)->is_squarefree);
         }
 
         # Optimization for large n
