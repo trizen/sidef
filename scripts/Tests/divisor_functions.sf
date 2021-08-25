@@ -61,4 +61,7 @@ for n in (0..50) {
     assert_eq(n.power_udivisors(3), D2.grep { .is_power(3) })
 }
 
+assert_eq(5040.sigma(-1), 5040.divisors.sum {|d| d**(-1) })
+assert_eq( 10!.sigma(-2),  10!.divisors.sum {|d| d**(-2) })
+
 say "** Test passed!"

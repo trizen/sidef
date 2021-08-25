@@ -17040,12 +17040,17 @@ package Sidef::Types::Number::Number {
     sub sigma {
         my ($n, $k) = @_;
 
-        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+        $k = defined($k) ? do { _valid(\$k); _any2si($$k) // goto &nan } : 1;
 
         $n = _big2uistr($n) // (goto &nan);
         $n eq '0' and return ZERO;
 
-        my $s = Math::Prime::Util::GMP::sigma($n, $k);
+        my $s = Math::Prime::Util::GMP::sigma($n, CORE::abs($k));
+
+        if ($k < 0) {    # Sum_{d|n} 1/d^k = sigma_k(n)/n^k
+            return _set_int($s)->div(_set_int(Math::Prime::Util::GMP::powint($n, CORE::abs($k))));
+        }
+
         _set_int($s);
     }
 

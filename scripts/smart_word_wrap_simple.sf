@@ -4,13 +4,12 @@
 # License: GPLv3
 # Date: 15th October 2013
 # Translated to Sidef in 17 June 2015
-# http://trizenx.blogspot.com
-# Email: <echo dHJpemVueEBnbWFpbC5jb20K | base64 -d>
+# https://trizenx.blogspot.com
 
 # Smart word wrap algorithm
-# See: http://en.wikipedia.org/wiki/Word_wrap#Minimum_raggedness
+# See: https://en.wikipedia.org/wiki/Word_wrap#Minimum_raggedness
 
-# Review: http://trizenx.blogspot.ro/2013/11/smart-word-wrap.html
+# Review: https://trizenx.blogspot.ro/2013/11/smart-word-wrap.html
 
 class SmartWordWrap(WIDTH=80) {
     method prepare_words(array) {
