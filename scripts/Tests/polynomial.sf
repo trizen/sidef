@@ -164,4 +164,31 @@ assert_eq(
     12345.faulhaber(20)
 )
 
+func cyclotomic(n) is cached {
+    var x = Poly(n, 1)-1
+    var y = n.divisors.grep { _ < n }.prod {|d| __FUNC__(d) }
+    x / y
+}
+
+assert_eq(cyclotomic(0), 0)
+assert_eq(cyclotomic(1).to_s, 'x - 1')
+assert_eq(cyclotomic(2).to_s, 'x + 1')
+assert_eq(cyclotomic(3).to_s, 'x^2 + x + 1')
+assert_eq(cyclotomic(4).to_s, 'x^2 + 1')
+assert_eq(cyclotomic(12).to_s, 'x^4 - x^2 + 1')
+assert_eq(cyclotomic(13).to_s, 'x^12 + x^11 + x^10 + x^9 + x^8 + x^7 + x^6 + x^5 + x^4 + x^3 + x^2 + x + 1')
+assert_eq(cyclotomic(24).to_s, 'x^8 - x^4 + 1')
+assert_eq(cyclotomic(30).to_s, 'x^8 + x^7 - x^5 - x^4 - x^3 + x + 1')
+
+assert_eq(Poly(3 => 1) / Poly(2 => 1), Poly(1 => 1))
+assert_eq(Poly(5 => 1) / Poly(2 => 1), Poly(3 => 1))
+
+assert_eq(Poly([3,4,5]) % Poly([12,3,14]), Poly(1 => 13/4, 0 => 3/2))
+assert_eq(Poly([10, 42]) / Poly([12]), Poly(1 => 5/6, 0 => 7/2))
+
+assert_eq(
+    Poly([15,2,3,-4,1,2,-3,-1,2,3]) % Poly([-1,2,3,1,2,-3,9]) -> to_s,
+    '1061*x^5 + 1126*x^4 + 591*x^3 + 613*x^2 + 17*x + 2982'
+)
+
 say "** Test passed!"

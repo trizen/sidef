@@ -180,6 +180,30 @@ Returns the
 
 =cut
 
+=head2 coeff
+
+    Polynomial.coeff()
+
+Returns the
+
+=cut
+
+=head2 coeffs
+
+    Polynomial.coeffs()
+
+Returns the
+
+=cut
+
+=head2 divmod
+
+    Polynomial.divmod()
+
+Returns the
+
+=cut
+
 =head2 dump
 
     Polynomial.dump()
@@ -249,6 +273,16 @@ Returns the
     Polynomial.is_zero()
 
 Returns the
+
+=cut
+
+=head2 keys
+
+    Polynomial.keys()
+
+Returns the
+
+Aliases: I<exponents>
 
 =cut
 

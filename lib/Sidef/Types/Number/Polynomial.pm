@@ -57,7 +57,7 @@ package Sidef::Types::Number::Polynomial {
 
     sub __dump__ {
         my ($x) = @_;
-        'Polynomial(' . join(", ", map { join(' => ', $_, $x->{$_}->dump) } sort { $a <=> $b } keys %$x) . ')';
+        'Polynomial(' . join(", ", map { join(' => ', $_, $x->{$_}->dump) } sort { $a <=> $b } CORE::keys %$x) . ')';
     }
 
     sub __boolify__ {
@@ -69,7 +69,7 @@ package Sidef::Types::Number::Polynomial {
         my ($x) = @_;
 
         my $str  = '';
-        my @keys = sort { $b <=> $a } keys %$x;
+        my @keys = sort { $b <=> $a } CORE::keys %$x;
 
         foreach my $key (@keys) {
 
@@ -114,12 +114,35 @@ package Sidef::Types::Number::Polynomial {
     sub eval {
         my ($x, $value) = @_;
         Sidef::Types::Array::Array->new(
-                       [map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}) } keys %$x])->reduce('+');
+                 [map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}) } CORE::keys %$x])->reduce('+');
+    }
+
+    sub keys {
+        my ($x) = @_;
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number::_set_int($_) } CORE::keys(%$x));
+    }
+
+    *exponents = \&keys;
+
+    sub coeff {
+        my ($x, $key) = @_;
+        $x->{$key} // Sidef::Types::Number::Number::ZERO;
+    }
+
+    sub coeffs {
+        my ($x) = @_;
+        Sidef::Types::Array::Array->new(
+            [
+             map {
+                 Sidef::Types::Array::Array->new([Sidef::Types::Number::Number::_set_int($_), $x->{$_}])
+             } CORE::keys(%$x)
+            ]
+        );
     }
 
     sub neg {
         my ($x) = @_;
-        __PACKAGE__->new(map { $_ => $x->{$_}->neg } keys %$x);
+        __PACKAGE__->new(map { $_ => $x->{$_}->neg } CORE::keys %$x);
     }
 
     sub add {
@@ -127,15 +150,15 @@ package Sidef::Types::Number::Polynomial {
 
         if (ref($y) eq __PACKAGE__) {
             return
-              __PACKAGE__->new((map { $_ => (exists($y->{$_}) ? $x->{$_}->add($y->{$_}) : $x->{$_}) } keys %$x),
-                               (map { exists($x->{$_}) ? () : ($_ => $y->{$_}) } keys %$y),);
+              __PACKAGE__->new((map { $_ => (exists($y->{$_}) ? $x->{$_}->add($y->{$_}) : $x->{$_}) } CORE::keys %$x),
+                               (map { exists($x->{$_}) ? () : ($_ => $y->{$_}) } CORE::keys %$y),);
         }
 
         if (not exists $x->{0}) {
             return __PACKAGE__->new(0 => $y, %$x);
         }
 
-        __PACKAGE__->new(map { $_ => (($_ == 0) ? $x->{$_}->add($y) : $x->{$_}) } keys(%$x));
+        __PACKAGE__->new(map { $_ => (($_ == 0) ? $x->{$_}->add($y) : $x->{$_}) } CORE::keys(%$x));
     }
 
     sub sub {
@@ -143,15 +166,15 @@ package Sidef::Types::Number::Polynomial {
 
         if (ref($y) eq __PACKAGE__) {
             return
-              __PACKAGE__->new((map { $_ => (exists($y->{$_}) ? $x->{$_}->sub($y->{$_}) : $x->{$_}) } keys %$x),
-                               (map { exists($x->{$_}) ? () : ($_ => $y->{$_}->neg) } keys %$y),);
+              __PACKAGE__->new((map { $_ => (exists($y->{$_}) ? $x->{$_}->sub($y->{$_}) : $x->{$_}) } CORE::keys %$x),
+                               (map { exists($x->{$_}) ? () : ($_ => $y->{$_}->neg) } CORE::keys %$y),);
         }
 
         if (not exists $x->{0}) {
             return __PACKAGE__->new(0 => $y->neg, %$x);
         }
 
-        __PACKAGE__->new(map { $_ => (($_ == 0) ? $x->{$_}->sub($y) : $x->{$_}) } keys(%$x));
+        __PACKAGE__->new(map { $_ => (($_ == 0) ? $x->{$_}->sub($y) : $x->{$_}) } CORE::keys(%$x));
     }
 
     sub mul {
@@ -159,8 +182,8 @@ package Sidef::Types::Number::Polynomial {
 
         if (ref($y) eq __PACKAGE__) {
 
-            my @keys_x = keys %$x;
-            my @keys_y = keys %$y;
+            my @keys_x = CORE::keys %$x;
+            my @keys_y = CORE::keys %$y;
 
             my %poly;
             foreach my $key_x (@keys_x) {
@@ -181,7 +204,7 @@ package Sidef::Types::Number::Polynomial {
             return __PACKAGE__->new(%poly);
         }
 
-        __PACKAGE__->new(map { $_ => $x->{$_}->mul($y) } keys %$x);
+        __PACKAGE__->new(map { $_ => $x->{$_}->mul($y) } CORE::keys %$x);
     }
 
     sub sqr {
@@ -189,43 +212,82 @@ package Sidef::Types::Number::Polynomial {
         $x->mul($x);
     }
 
+    sub divmod {
+        my ($x, $y) = @_;
+
+        my @keys_x = sort { $b <=> $a } CORE::keys %$x;
+        my @keys_y = sort { $b <=> $a } CORE::keys %$y;
+
+        my $key_y = shift @keys_y;
+        my $yc    = $y->{$key_y};
+
+        my $quot = __PACKAGE__->new();
+
+        while (1) {
+            my $key_x = $keys_x[0];
+            my $xc    = $x->{$key_x};
+
+            my $t = __PACKAGE__->new($key_x - $key_y, $xc->div($yc));
+
+            $quot = $quot->add($t);
+
+            $x      = $x->sub($t->mul($y));
+            @keys_x = sort { $b <=> $a } CORE::keys %$x;
+            (@keys_x and $keys_x[0] >= $key_y) or last;
+        }
+
+        return ($quot, $x);
+    }
+
     sub div {
         my ($x, $y) = @_;
 
-        # TODO: implement division by another polynomial (???)
+        if (ref($y) eq __PACKAGE__) {
+
+            my ($quot, $rem) = $x->divmod($y);
+
+            if ($rem->is_zero) {
+                return $quot;
+            }
+
+            # TODO: implement division by another polynomial when the remainder != 0
+        }
 
         $x->mul($y->inv);
     }
 
     sub float {
         my ($x) = @_;
-        __PACKAGE__->new(map { $_ => $x->{$_}->float } keys %$x);
+        __PACKAGE__->new(map { $_ => $x->{$_}->float } CORE::keys %$x);
     }
 
     sub floor {
         my ($x) = @_;
-        __PACKAGE__->new(map { $_ => $x->{$_}->floor } keys %$x);
+        __PACKAGE__->new(map { $_ => $x->{$_}->floor } CORE::keys %$x);
     }
 
     sub ceil {
         my ($x) = @_;
-        __PACKAGE__->new(map { $_ => $x->{$_}->ceil } keys %$x);
+        __PACKAGE__->new(map { $_ => $x->{$_}->ceil } CORE::keys %$x);
     }
 
     sub round {
         my ($x, $r) = @_;
-        __PACKAGE__->new(map { $_ => $x->{$_}->round($r) } keys %$x);
+        __PACKAGE__->new(map { $_ => $x->{$_}->round($r) } CORE::keys %$x);
     }
 
     sub mod {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return __PACKAGE__->new(map { $_ => $x->{$_}->mod($y) } keys %$x);
+            return __PACKAGE__->new(map { $_ => $x->{$_}->mod($y) } CORE::keys %$x);
         }
 
         # mod(a, b) = a - b * floor(a/b)
-        $x->sub($y->mul($x->div($y)->floor));
+        # $x->sub($y->mul($x->div($y)->floor));
+
+        my ($quot, $rem) = $x->divmod($y);
+        return $rem;
     }
 
     sub inv {
@@ -330,8 +392,8 @@ package Sidef::Types::Number::Polynomial {
 
         if (ref($y) eq __PACKAGE__) {
 
-            my @keys_x = grep { !$x->{$_}->is_zero } sort { $a <=> $b } keys %$x;
-            my @keys_y = grep { !$y->{$_}->is_zero } sort { $a <=> $b } keys %$y;
+            my @keys_x = grep { !$x->{$_}->is_zero } sort { $a <=> $b } CORE::keys %$x;
+            my @keys_y = grep { !$y->{$_}->is_zero } sort { $a <=> $b } CORE::keys %$y;
 
             scalar(@keys_x) == scalar(@keys_y)
               or return Sidef::Types::Number::Number::_set_int(scalar(@keys_x) <=> scalar(@keys_y));
@@ -358,7 +420,7 @@ package Sidef::Types::Number::Polynomial {
 
         exists($x->{0}) || return undef;
 
-        foreach my $key (keys(%$x)) {
+        foreach my $key (CORE::keys(%$x)) {
             ($key == 0 or $x->{$key}->is_zero)
               or return undef;
         }
@@ -371,7 +433,7 @@ package Sidef::Types::Number::Polynomial {
 
         if (ref($y) eq __PACKAGE__) {
 
-            foreach my $key (keys %$x) {
+            foreach my $key (CORE::keys %$x) {
                 if (exists $y->{$key}) {
                     $x->{$key}->eq($y->{$key})
                       or return Sidef::Types::Bool::Bool::FALSE;
@@ -382,7 +444,7 @@ package Sidef::Types::Number::Polynomial {
                 }
             }
 
-            foreach my $key (keys %$y) {
+            foreach my $key (CORE::keys %$y) {
                 if (exists $x->{$key}) {
                     ## ok
                 }
@@ -395,14 +457,14 @@ package Sidef::Types::Number::Polynomial {
             return Sidef::Types::Bool::Bool::TRUE;
         }
 
-        if (!scalar(keys(%$x))) {
+        if (!scalar(CORE::keys(%$x))) {
             return $y->is_zero;
         }
 
         (exists($x->{0}) and $x->{0}->eq($y))
           || return Sidef::Types::Bool::Bool::FALSE;
 
-        foreach my $key (keys(%$x)) {
+        foreach my $key (CORE::keys(%$x)) {
             ($key == 0 or $x->{$key}->is_zero)
               or return Sidef::Types::Bool::Bool::FALSE;
         }
