@@ -72,6 +72,8 @@ lib/Sidef/Types/Null/Null.pm
 lib/Sidef/Types/Null/Null.pod
 lib/Sidef/Types/Number/Complex.pm
 lib/Sidef/Types/Number/Complex.pod
+lib/Sidef/Types/Number/Fraction.pm
+lib/Sidef/Types/Number/Fraction.pod
 lib/Sidef/Types/Number/Gauss.pm
 lib/Sidef/Types/Number/Gauss.pod
 lib/Sidef/Types/Number/Mod.pm
@@ -779,6 +781,7 @@ scripts/Tests/for_in_with_user_objects.sf
 scripts/Tests/for_two_vars.sf
 scripts/Tests/for_var_in_array.sf
 scripts/Tests/forward_difference.sf
+scripts/Tests/fraction_class.sf
 scripts/Tests/func_scoping.sf
 scripts/Tests/function_composition.sf
 scripts/Tests/functional_modules.sf

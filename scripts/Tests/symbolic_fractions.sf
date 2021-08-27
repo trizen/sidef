@@ -1,17 +1,17 @@
 #!/usr/bin/ruby
 
 #
-## A very basic Fraction() class, implementing a few symbolic relations.
+## A very basic MyFraction() class, implementing a few symbolic relations.
 #
 
-class Fraction(num, den) {
+class MyFraction(num, den) {
 
     method +(Number o) {
-        self + Fraction(o, 1)
+        self + MyFraction(o, 1)
     }
 
-    method +(Fraction o) {
-        Fraction(
+    method +(MyFraction o) {
+        MyFraction(
             num*o.den + o.num*den,
             den*o.den
         )
@@ -21,27 +21,27 @@ class Fraction(num, den) {
         self + -o
     }
 
-    method -(Fraction o) {
+    method -(MyFraction o) {
         self + -o
     }
 
     method *(Number o) {
-        Fraction(num*o, den)
+        MyFraction(num*o, den)
     }
 
-    method *(Fraction o) {
-        Fraction(num*o.num, den*o.den)
+    method *(MyFraction o) {
+        MyFraction(num*o.num, den*o.den)
     }
 
     method /(Number o) {
-        Fraction(
+        MyFraction(
             num,
             den * o
         )
     }
 
-    method /(Fraction o) {
-        Fraction(
+    method /(MyFraction o) {
+        MyFraction(
             num * o.den,
             den * o.num,
         )
@@ -50,62 +50,62 @@ class Fraction(num, den) {
     method **(Number o) {
         if (o < 0) {
             var a = o.abs
-            Fraction(den**a, num**a)
+            MyFraction(den**a, num**a)
         }
         else {
-            Fraction(num**o, den**o)
+            MyFraction(num**o, den**o)
         }
     }
 
     method neg {
-        Fraction(-num, den)
+        MyFraction(-num, den)
     }
 
     method to_s {
-        "Fraction(#{num}, #{den})"
+        "MyFraction(#{num}, #{den})"
     }
 }
 
 class Number {
-    method +(Fraction o) {
+    method +(MyFraction o) {
         o + self
     }
 
-    method -(Fraction o) {
+    method -(MyFraction o) {
         -o + self
     }
 
-    method *(Fraction o) {
+    method *(MyFraction o) {
         o * self
     }
 
-    method /(Fraction o) {
+    method /(MyFraction o) {
         o**(-1) * self
     }
 }
 
-var r = 42+Fraction(3,4)
+var r = 42+MyFraction(3,4)
 
 assert_eq(r.num, 171)
 assert_eq(r.den, 4)
 assert_eq(42 + 3/4, r.num/r.den)
 
-r = 42*Fraction(3, 4)
+r = 42*MyFraction(3, 4)
 assert_eq(r.num, 42*3)
 assert_eq(r.den, 4)
 
-r = 1/Fraction(3,4)
+r = 1/MyFraction(3,4)
 assert_eq(r.num, 4)
 assert_eq(r.den, 3)
 
-r = 12-Fraction(3, 4)
+r = 12-MyFraction(3, 4)
 assert_eq(r.num, 45)
 assert_eq(r.den, 4)
 
 #
 ## sum(f(n)) = e, as n->oo.
 #
-func f((0)) { Fraction(1, 1) }
+func f((0)) { MyFraction(1, 1) }
 func f(n)   { f(n-1) / n     }
 
 assert_eq(f(10).den, 10!)
@@ -116,10 +116,10 @@ func den(n) { (2*n + 1)**2 }
 #
 ## sum(num(n)/den(n)) = Catalan's constant, as n->oo.
 #
-var sum
+var sum = MyFraction(0, 1)
+
 for i in (0 .. 5) {
-    var f = Fraction(num(i), den(i))
-    defined(sum) ? (sum += f) : (sum = f)
+    sum += MyFraction(num(i), den(i))
     say sum
 }
 

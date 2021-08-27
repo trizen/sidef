@@ -62,6 +62,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Number::Quaternion    Sidef::Types::Number::Quaternion
                   Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
                   Sidef::DataTypes::Number::Polynomial    Sidef::Types::Number::Polynomial
+                  Sidef::DataTypes::Number::Fraction      Sidef::Types::Number::Fraction
                   Sidef::DataTypes::Range::Range          Sidef::Types::Range::Range
                   Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
                   Sidef::DataTypes::Range::RangeString    Sidef::Types::Range::RangeString

@@ -1715,6 +1715,7 @@ package Sidef::Types::Number::Number {
 
         if (   $ref eq 'Sidef::Types::Number::Mod'
             or $ref eq 'Sidef::Types::Number::Gauss'
+            or $ref eq 'Sidef::Types::Number::Fraction'
             or $ref eq 'Sidef::Types::Number::Quadratic'
             or $ref eq 'Sidef::Types::Number::Quaternion'
             or $ref eq 'Sidef::Types::Number::Polynomial') {
@@ -1869,16 +1870,14 @@ package Sidef::Types::Number::Number {
             return $ref->new($x, $y->{m})->sub($y);
         }
 
-        if ($ref eq 'Sidef::Types::Number::Gauss') {
+        if (   $ref eq 'Sidef::Types::Number::Gauss'
+            or $ref eq 'Sidef::Types::Number::Quaternion'
+            or $ref eq 'Sidef::Types::Number::Fraction') {
             return $ref->new($x)->sub($y);
         }
 
         if ($ref eq 'Sidef::Types::Number::Quadratic') {
             return $ref->new($x, ZERO, $y->{w})->sub($y);
-        }
-
-        if ($ref eq 'Sidef::Types::Number::Quaternion') {
-            return $ref->new($x)->sub($y);
         }
 
         if ($ref eq 'Sidef::Types::Number::Polynomial') {
@@ -2014,6 +2013,7 @@ package Sidef::Types::Number::Number {
 
         if (   $ref eq 'Sidef::Types::Number::Mod'
             or $ref eq 'Sidef::Types::Number::Gauss'
+            or $ref eq 'Sidef::Types::Number::Fraction'
             or $ref eq 'Sidef::Types::Number::Quadratic'
             or $ref eq 'Sidef::Types::Number::Quaternion'
             or $ref eq 'Sidef::Types::Number::Polynomial'
@@ -2190,20 +2190,18 @@ package Sidef::Types::Number::Number {
             return $ref->new($x, $y->{m})->div($y);
         }
 
-        if ($ref eq 'Sidef::Types::Number::Gauss') {
-            return $ref->new($x)->div($y);
-        }
-
         if ($ref eq 'Sidef::Types::Number::Quadratic') {
             return $ref->new($x, ZERO, $y->{w})->div($y);
         }
 
-        if ($ref eq 'Sidef::Types::Number::Quaternion') {
+        if (   $ref eq 'Sidef::Types::Number::Gauss'
+            or $ref eq 'Sidef::Types::Number::Fraction'
+            or $ref eq 'Sidef::Types::Number::Quaternion') {
             return $ref->new($x)->div($y);
         }
 
         if ($ref eq 'Sidef::Types::Number::Polynomial') {
-            return $ref->new($x)->div($y);
+            return $ref->new(0 => $x)->div($y);
         }
 
         _valid(\$y);

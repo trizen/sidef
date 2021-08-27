@@ -1,0 +1,117 @@
+#!/usr/bin/ruby
+
+# Tests for the Fraction class.
+
+do {
+    var r = 42+Fraction(3,4)
+    assert_eq(r.nu, 171)
+    assert_eq(r.de, 4)
+    assert_eq(42 + 3/4, r.nu/r.de)
+}
+
+do {
+    var r = 42*Fraction(3, 4)
+    assert_eq(r.nu, 42*3)
+    assert_eq(r.de, 4)
+}
+
+do {
+    var r = 1/Fraction(3,4)
+    assert_eq(r.nu, 4)
+    assert_eq(r.de, 3)
+}
+
+do {
+    var r = 12-Fraction(3, 4)
+    assert_eq(r.nu, 45)
+    assert_eq(r.de, 4)
+}
+
+do {
+    #
+    ## sum(f(n)) = e, as n->oo.
+    #
+    func f((0)) { Fraction(1, 1) }
+    func f(n)   { f(n-1) / n     }
+
+    assert_eq(f(10).de, 10!)
+
+    func nu(n) {      (-1)**n }
+    func de(n) { (2*n + 1)**2 }
+
+    #
+    ## sum(nu(n)/de(n)) = Catalan's constant, as n->oo.
+    #
+
+    var sum = Fraction()
+    for i in (0 .. 5) {
+        sum += Fraction(nu(i), de(i))
+    }
+
+    assert_eq(sum.nu, 98607816)
+    assert_eq(sum.de, 108056025)
+}
+
+do {
+    func num(n) { n**0 }
+    func den(n) { n**2 }
+
+    var from = 1
+    var to   = 10
+
+    var sum = Fraction()
+    for i in (from .. to) {
+        sum += Fraction(num(i), den(i))
+    }
+
+    assert_eq(sum, Fraction(20407635072000, 13168189440000))
+}
+
+assert(Fraction(Poly([3,4]), Poly([9,12,13])) <= Fraction(Poly([4,5])))
+
+assert_eq(Fraction(3,6), Fraction(5,10))
+assert_ne(Fraction(3,5), Fraction(5,10))
+
+assert(!(Fraction(3,5) == Fraction(5,10)))
+assert(Fraction(3,5) != Fraction(5,10))
+
+assert(Fraction(3,5) > Fraction(5,10))
+assert(Fraction(3,7) < Fraction(5,10))
+
+assert(Fraction(3,5) >= Fraction(5,10))
+assert(Fraction(3,7) <= Fraction(5,10))
+
+assert(Fraction(3,6) <= Fraction(5,10))
+assert(Fraction(3,6) >= Fraction(5,10))
+
+assert_eq(Fraction(40, 60), Fraction(2, 3))
+assert_eq(Fraction(40, 60), 2/3)
+
+assert_ne(Fraction(3,5), 3/4)
+
+assert(Fraction(3,5) > 3/6)
+assert(Fraction(3,7) < 3/6)
+
+assert_eq(Fraction(3,7) <=> 3/6, -1)
+assert_eq(Fraction(3,6) <=> 3/6, 0)
+assert_eq(Fraction(3,5) <=> 3/6, 1)
+
+assert_eq(Fraction(3,4) << 10, (3/4) * 2**10)
+assert_eq(Fraction(3,4) >> 10, (3/4) / 2**10)
+
+assert_eq(Fraction(3,4).inc, 3/4 + 1)
+assert_eq(Fraction(3,4).dec, 3/4 - 1)
+
+assert_eq(Fraction(15,9).floor, floor(15/9))
+assert_eq(Fraction(15,9).ceil, ceil(15/9))
+assert_eq(Fraction(15,9).round, round(15/9))
+assert_eq(Fraction(15,9).int, int(15/9))
+assert_eq(Fraction(15,9).trunc, trunc(15/9))
+
+assert_eq(Fraction(215/7,9).floor, floor((215/7)/9))
+assert_eq(Fraction(188/7,9).ceil, ceil((188/7)/9))
+assert_eq(Fraction(160/7,9).floor, floor((160/7)/9))
+assert_eq(Fraction(160/7,9).ceil, ceil((160/7)/9))
+assert_eq(Fraction(160/7,9).round, round((160/7)/9))
+
+say "** Test passed!"

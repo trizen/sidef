@@ -55,6 +55,20 @@ package Sidef::Types::Number::Polynomial {
 
     *call = \&new;
 
+    sub to_n {
+        my ($x) = @_;
+
+        my $d = scalar keys(%$x);
+
+        return Sidef::Types::Number::Number::ZERO if ($d == 0);
+
+        if ($d == 1 and exists $x->{0}) {
+            return $x->{0};
+        }
+
+        return $x;
+    }
+
     sub __dump__ {
         my ($x) = @_;
         'Polynomial(' . join(", ", map { join(' => ', $_, $x->{$_}->dump) } sort { $a <=> $b } CORE::keys %$x) . ')';
@@ -119,7 +133,7 @@ package Sidef::Types::Number::Polynomial {
 
     sub keys {
         my ($x) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number::_set_int($_) } CORE::keys(%$x));
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number::_set_int($_) } sort { $a <=> $b } CORE::keys(%$x));
     }
 
     *exponents = \&keys;
@@ -135,7 +149,7 @@ package Sidef::Types::Number::Polynomial {
             [
              map {
                  Sidef::Types::Array::Array->new([Sidef::Types::Number::Number::_set_int($_), $x->{$_}])
-             } CORE::keys(%$x)
+             } sort { $a <=> $b } CORE::keys(%$x)
             ]
         );
     }
@@ -151,7 +165,7 @@ package Sidef::Types::Number::Polynomial {
         if (ref($y) eq __PACKAGE__) {
             return
               __PACKAGE__->new((map { $_ => (exists($y->{$_}) ? $x->{$_}->add($y->{$_}) : $x->{$_}) } CORE::keys %$x),
-                               (map { exists($x->{$_}) ? () : ($_ => $y->{$_}) } CORE::keys %$y),);
+                               (map { exists($x->{$_}) ? () : ($_ => $y->{$_}) } CORE::keys %$y));
         }
 
         if (not exists $x->{0}) {
@@ -215,8 +229,16 @@ package Sidef::Types::Number::Polynomial {
     sub divmod {
         my ($x, $y) = @_;
 
+        # TODO: optimize this method for better performance.
+
         my @keys_x = sort { $b <=> $a } CORE::keys %$x;
         my @keys_y = sort { $b <=> $a } CORE::keys %$y;
+
+        @keys_x
+          || return (__PACKAGE__->new(), __PACKAGE__->new());
+
+        @keys_y
+          || return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf()), __PACKAGE__->new());
 
         my $key_y = shift @keys_y;
         my $yc    = $y->{$key_y};
@@ -239,6 +261,23 @@ package Sidef::Types::Number::Polynomial {
         return ($quot, $x);
     }
 
+    sub idiv {
+        my ($x, $y) = @_;
+
+        if (ref($y) ne __PACKAGE__) {
+            $y = __PACKAGE__->new(0 => $y);
+        }
+
+        my ($quot, $rem) = $x->divmod($y);
+        return $quot;
+    }
+
+    # Probably not right?
+    *idiv_ceil  = \&idiv;
+    *idiv_trunc = \&idiv;
+    *idiv_round = \&idiv;
+    *idiv_floor = \&idiv;
+
     sub div {
         my ($x, $y) = @_;
 
@@ -250,7 +289,11 @@ package Sidef::Types::Number::Polynomial {
                 return $quot;
             }
 
-            # TODO: implement division by another polynomial when the remainder != 0
+            return Sidef::Types::Number::Fraction->new($quot->mul($y)->add($rem), $y);
+        }
+
+        if ($y->is_zero) {
+            return __PACKAGE__->new(0 => Sidef::Types::Number::Number::inf());
         }
 
         $x->mul($y->inv);
@@ -279,22 +322,21 @@ package Sidef::Types::Number::Polynomial {
     sub mod {
         my ($x, $y) = @_;
 
-        if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return __PACKAGE__->new(map { $_ => $x->{$_}->mod($y) } CORE::keys %$x);
+        if (ref($y) eq __PACKAGE__) {
+
+            # mod(a, b) = a - b * floor(a/b)
+            # return $x->sub($y->mul($x->div($y)->floor));
+
+            my ($quot, $rem) = $x->divmod($y);
+            return $rem;
         }
 
-        # mod(a, b) = a - b * floor(a/b)
-        # $x->sub($y->mul($x->div($y)->floor));
-
-        my ($quot, $rem) = $x->divmod($y);
-        return $rem;
+        __PACKAGE__->new(map { $_ => Sidef::Types::Number::Mod->new($x->{$_}, $y) } CORE::keys %$x);
     }
 
     sub inv {
         my ($x) = @_;
-
-        # TODO: implement
-        ...;
+        Sidef::Types::Number::Fraction->new(Sidef::Types::Number::Number::ONE, $x);
     }
 
     sub invmod {
@@ -381,7 +423,7 @@ package Sidef::Types::Number::Polynomial {
         }
 
         if ($negative_power) {
-            $c = $c->invmod($m);
+            $c = $c->inv;
         }
 
         return $c;

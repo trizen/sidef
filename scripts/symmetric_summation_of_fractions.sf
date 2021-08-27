@@ -1,9 +1,9 @@
 #!/usr/bin/ruby
 
-class Fraction(num, den) {
+class MyFraction(num, den) {
 
-    method +(Fraction arg) {
-        Fraction(
+    method +(MyFraction arg) {
+        MyFraction(
             self.num*arg.den + arg.num*self.den,
             self.den*arg.den
         )
@@ -20,9 +20,8 @@ func den(n) { n**2 }
 var from = 1
 var to   = 10
 
-var sum
+var sum = MyFraction(0, 1)
 for i in (from .. to) {
-    var f = Fraction(num(i), den(i))
-    defined(sum) ? (sum += f) : (sum = f)
+    sum += MyFraction(num(i), den(i))
     say sum
 }

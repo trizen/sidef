@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Number::Polynomial
+Sidef::Types::Number::Fraction
 
 =head1 DESCRIPTION
 
@@ -11,7 +11,7 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Polynomial(...)
+var obj = Fraction(...)
 
 
 =head1 INHERITS
@@ -32,13 +32,13 @@ Aliases: I<ne>
 
 =cut
 
-=head2 %
+=head2 &
 
-    a % b
+    a & b
 
 Returns the
 
-Aliases: I<mod>
+Aliases: I<and>
 
 =cut
 
@@ -122,6 +122,16 @@ Aliases: I<lt>
 
 =cut
 
+=head2 <<
+
+    a << b
+
+Returns the
+
+Aliases: I<lsft>
+
+=cut
+
 =head2 <=>
 
     a <=> b
@@ -152,6 +162,36 @@ Aliases: I<gt>
 
 =cut
 
+=head2 >>
+
+    a >> b
+
+Returns the
+
+Aliases: I<rsft>
+
+=cut
+
+=head2 ^
+
+    a ^ b
+
+Returns the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 |
+
+    a | b
+
+Returns the
+
+Aliases: I<or>
+
+=cut
+
 =head2 ≤
 
     a ≤ b
@@ -174,131 +214,33 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 ceil
 
-    Polynomial.ceil()
+    Fraction.ceil()
 
 Returns the
 
 =cut
 
-=head2 coeff
+=head2 de
 
-    Polynomial.coeff()
-
-Returns the
-
-=cut
-
-=head2 coeffs
-
-    Polynomial.coeffs()
+    Fraction.de()
 
 Returns the
 
-=cut
-
-=head2 divmod
-
-    Polynomial.divmod()
-
-Returns the
-
-=cut
-
-=head2 dump
-
-    Polynomial.dump()
-
-Returns the
-
-=cut
-
-=head2 eval
-
-    Polynomial.eval()
-
-Returns the
-
-=cut
-
-=head2 float
-
-    Polynomial.float()
-
-Returns the
+Aliases: I<denominator>
 
 =cut
 
 =head2 floor
 
-    Polynomial.floor()
+    Fraction.floor()
 
 Returns the
-
-=cut
-
-=head2 idiv
-
-    Polynomial.idiv()
-
-Returns the
-
-Aliases: I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
-
-=cut
-
-=head2 inv
-
-    Polynomial.inv()
-
-Returns the
-
-=cut
-
-=head2 invmod
-
-    Polynomial.invmod()
-
-Returns the
-
-=cut
-
-=head2 is_mone
-
-    Polynomial.is_mone()
-
-Returns the
-
-=cut
-
-=head2 is_one
-
-    Polynomial.is_one()
-
-Returns the
-
-=cut
-
-=head2 is_zero
-
-    Polynomial.is_zero()
-
-Returns the
-
-=cut
-
-=head2 keys
-
-    Polynomial.keys()
-
-Returns the
-
-Aliases: I<exponents>
 
 =cut
 
 =head2 neg
 
-    Polynomial.neg()
+    Fraction.neg()
 
 Returns the
 
@@ -306,7 +248,7 @@ Returns the
 
 =head2 new
 
-    Polynomial.new()
+    Fraction.new()
 
 Returns the
 
@@ -314,9 +256,19 @@ Aliases: I<call>
 
 =cut
 
-=head2 powmod
+=head2 nu
 
-    Polynomial.powmod()
+    Fraction.nu()
+
+Returns the
+
+Aliases: I<numerator>
+
+=cut
+
+=head2 nude
+
+    Fraction.nude()
 
 Returns the
 
@@ -324,15 +276,7 @@ Returns the
 
 =head2 round
 
-    Polynomial.round()
-
-Returns the
-
-=cut
-
-=head2 sqr
-
-    Polynomial.sqr()
+    Fraction.round()
 
 Returns the
 
@@ -340,15 +284,27 @@ Returns the
 
 =head2 to_n
 
-    Polynomial.to_n()
+    Fraction.to_n()
 
 Returns the
+
+Aliases: I<lift>
 
 =cut
 
 =head2 to_s
 
-    Polynomial.to_s()
+    Fraction.to_s()
+
+Returns the
+
+Aliases: I<dump>
+
+=cut
+
+=head2 trunc
+
+    Fraction.trunc()
 
 Returns the
 
