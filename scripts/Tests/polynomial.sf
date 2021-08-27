@@ -170,6 +170,11 @@ func cyclotomic(n) is cached {
     x / y
 }
 
+assert_eq(cyclotomic(0), 0.cyclotomic)
+assert_eq(cyclotomic(1), 1.cyclotomic)
+assert_eq(cyclotomic(19), 19.cyclotomic)
+assert_eq(cyclotomic(42), 42.cyclotomic)
+
 assert_eq(cyclotomic(0), 0)
 assert_eq(cyclotomic(1).to_s, 'x - 1')
 assert_eq(cyclotomic(2).to_s, 'x + 1')

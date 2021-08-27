@@ -82,6 +82,21 @@ package Sidef::Types::Number::Fraction {
         __PACKAGE__->new($x->{a}->add($x->{b}), $x->{b},);
     }
 
+    sub is_zero {
+        my ($x) = @_;
+        $x->eq(Sidef::Types::Number::Number::ZERO);
+    }
+
+    sub is_one {
+        my ($x) = @_;
+        $x->eq(Sidef::Types::Number::Number::ONE);
+    }
+
+    sub is_mone {
+        my ($x) = @_;
+        $x->eq(Sidef::Types::Number::Number::MONE);
+    }
+
     sub add {
         my ($x, $y) = @_;
 
@@ -190,10 +205,7 @@ package Sidef::Types::Number::Fraction {
         my ($x, $y) = @_;
 
         if (ref($y) ne __PACKAGE__) {
-            return __PACKAGE__->new(
-                Sidef::Types::Number::Mod->new($x->{a}, $y),
-                Sidef::Types::Number::Mod->new($x->{b}, $y),
-            );
+            return __PACKAGE__->new(Sidef::Types::Number::Mod->new($x->{a}, $y), Sidef::Types::Number::Mod->new($x->{b}, $y),);
         }
 
         $x->sub($y->mul($x->div($y)->floor));

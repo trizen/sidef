@@ -32,6 +32,16 @@ Aliases: I<ne>
 
 =cut
 
+=head2 %
+
+    a % b
+
+Returns the
+
+Aliases: I<mod>
+
+=cut
+
 =head2 &
 
     a & b
@@ -233,6 +243,30 @@ Aliases: I<denominator>
 =head2 floor
 
     Fraction.floor()
+
+Returns the
+
+=cut
+
+=head2 is_mone
+
+    Fraction.is_mone()
+
+Returns the
+
+=cut
+
+=head2 is_one
+
+    Fraction.is_one()
+
+Returns the
+
+=cut
+
+=head2 is_zero
+
+    Fraction.is_zero()
 
 Returns the
 

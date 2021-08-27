@@ -4536,6 +4536,11 @@ package Sidef::Types::Number::Number {
         ## B_n(x) = Sum_{k=0..n} binomial(n, k) * bernoulli(n-k) * x^k
         #
 
+        if (!defined($x)) {
+
+            # TODO: return a Polynomial object
+        }
+
         _valid(\$x);
 
         $n = _any2ui($$n) // goto &nan;
@@ -4592,6 +4597,11 @@ package Sidef::Types::Number::Number {
     sub faulhaber_polynomial {
         my ($n, $x) = @_;
 
+        if (!defined($x)) {
+
+            # TODO: return a Polynomial object
+        }
+
         _valid(\$x);
 
         $n = $n->inc;
@@ -4606,6 +4616,11 @@ package Sidef::Types::Number::Number {
         #
         ## E_n(x) = Sum_{k=0..n} binomial(n, n-k) * euler_number(n-k) / 2^(n-k) * (x - 1/2)^k
         #
+
+        if (!defined($x)) {
+
+            # TODO: return a Polynomial object
+        }
 
         $n = _any2ui($$n) // goto &nan;
         $x = $$x;
@@ -9104,6 +9119,11 @@ package Sidef::Types::Number::Number {
     sub chebyshevt {
         my ($n, $x) = @_;
 
+        if (!defined($x)) {
+
+            # TODO: return a Polynomial object
+        }
+
         _valid(\$x);
 
         $n = _any2si($$n) // goto &nan;
@@ -9149,6 +9169,11 @@ package Sidef::Types::Number::Number {
 
     sub chebyshevu {
         my ($n, $x) = @_;
+
+        if (!defined($x)) {
+
+            # TODO: return a Polynomial object
+        }
 
         _valid(\$x);
 
@@ -9288,6 +9313,11 @@ package Sidef::Types::Number::Number {
     sub legendre_polynomial {
         my ($n, $x) = @_;
 
+        if (!defined($x)) {
+
+            # TODO: return a Polynomial object
+        }
+
         _valid(\$x);
 
         $n = _any2ui($$n) // goto &nan;
@@ -9325,6 +9355,11 @@ package Sidef::Types::Number::Number {
 
     sub hermiteH {
         my ($n, $x) = @_;
+
+        if (!defined($x)) {
+
+            # TODO: return a Polynomial object
+        }
 
         _valid(\$x);
 
@@ -9366,6 +9401,11 @@ package Sidef::Types::Number::Number {
 
     sub hermiteHe {
         my ($n, $x) = @_;
+
+        if (!defined($x)) {
+
+            # TODO: return a Polynomial object
+        }
 
         _valid(\$x);
 
@@ -9409,6 +9449,11 @@ package Sidef::Types::Number::Number {
 
     sub laguerreL {
         my ($n, $x) = @_;
+
+        if (!defined($x)) {
+
+            # TODO: return a Polynomial object
+        }
 
         _valid(\$x);
 
@@ -10126,9 +10171,50 @@ package Sidef::Types::Number::Number {
     sub cyclotomic_polynomial {
         my ($n, $x) = @_;
 
-        _valid(\$x);
-
         $n = _any2ui($$n) // goto &nan;
+
+        if (!defined($x)) {
+
+            if ($n == 0) {
+                return Sidef::Types::Number::Polynomial->new();
+            }
+
+            my %cache;
+
+            my $r = sub {
+                my ($k) = @_;
+
+                # Based on algorithm from Math::Polynomial::Cyclotomic
+
+                if (exists $cache{$k}) {
+                    return $cache{$k};
+                }
+
+                my $t = Sidef::Types::Number::Polynomial->new($k => ONE)->dec;
+
+                if ($k == 1) {
+                    return $t;
+                }
+
+                my @d = _divisors($k);
+                my $m = $d[-2];
+
+                my $prod = Sidef::Types::Number::Polynomial->new($m => ONE)->dec;
+
+                foreach my $i (1 .. $#d - 2) {
+                    if ($m % $d[$i]) {
+                        $prod = $prod->mul($cache{$d[$i]} // __SUB__->($d[$i]));
+                    }
+                }
+
+                $cache{$k} = $t->div($prod);
+              }
+              ->($n);
+
+            return $r;
+        }
+
+        _valid(\$x);
         $x = $$x;
 
         return ONE if ($n == 0);

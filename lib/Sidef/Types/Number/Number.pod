@@ -1721,9 +1721,16 @@ Returns the cube of C<x>. Equivalent with C<x**3>.
 
 =head2 cyclotomic
 
+    cyclotomic(n)
     cyclotomic(n,x)
 
 Returns the n-th Cyclotomic polynomial evaluated at C<x>.
+
+    say cyclotomic(12, 10)      #=> 9901
+
+When C<x> is omited, it returns a symbolic Polynomial object.
+
+    say cyclotomic(12)          #=> x^4 - x^2 + 1
 
 Aliases: I<cyclotomic_polynomial>
 
