@@ -64,6 +64,20 @@ do {
     assert(!a.contains('b', 'd', 'e', 'f'))
     assert(!a.contains('a', 'c'))
     assert(!a.contains('d', 'f'))
+
+    assert(['a',nil,'c'].contains(nil, 'c'))
+    assert(['a','b',nil].contains('a','b', nil))
+    assert(['a','b',nil].contains('b', nil))
+    assert(['a','b',nil].contains(nil))
+
+    assert(!['a',nil,'c'].contains(nil, 'd'))
+    assert(!['a','b',nil].contains('a', 'b', nil, 'c'))
+    assert(!['a','b',nil].contains('b', nil, 'c'))
+    assert(!['a','b',nil].contains(nil, 'c'))
+    assert(!['a','b',nil].contains('b', nil, nil, nil))
+
+    assert(!a.contains('e', 'f', 'g'))
+    assert(!a.contains('e', 'f', nil))
 }
 
 say "** Test passed!"

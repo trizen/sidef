@@ -2735,14 +2735,16 @@ package Sidef::Types::Array::Array {
             return (Sidef::Types::Bool::Bool::FALSE);
         }
 
-        foreach my $i (0 .. $#{$self}) {
+        my $end = $#$self;
+
+        foreach my $i (0 .. $end) {
             if ($self->[$i] eq $obj) {
 
                 my $ok = 1;
                 my $j  = $i;
 
                 foreach my $obj (@extra) {
-                    if ($self->[++$j] eq $obj) {
+                    if (++$j <= $end and $self->[$j] eq $obj) {
                         ## ok
                     }
                     else {
