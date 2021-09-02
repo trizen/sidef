@@ -24,6 +24,11 @@ package Sidef::Types::Number::Fraction {
 
     *call = \&new;
 
+    sub eval {
+        my ($x, $v) = @_;
+        $x->{a}->eval($v)->div($x->{b}->eval($v));
+    }
+
     sub to_n {
         my ($x) = @_;
         my $r = $x->{a}->to_n->div($x->{b}->to_n);
@@ -116,7 +121,7 @@ package Sidef::Types::Number::Fraction {
         my ($x, $y) = @_;
 
         if (ref($y) eq __PACKAGE__) {
-            return __PACKAGE__->new($x->{a}->mul($y->{a}), $x->{b}->mul($y->{b}),);
+            return __PACKAGE__->new($x->{a}->mul($y->{a}), $x->{b}->mul($y->{b}));
         }
 
         __PACKAGE__->new($x->{a}->mul($y), $x->{b});
@@ -126,7 +131,7 @@ package Sidef::Types::Number::Fraction {
         my ($x, $y) = @_;
 
         if (ref($y) eq __PACKAGE__) {
-            return __PACKAGE__->new($x->{a}->mul($y->{b}), $x->{b}->mul($y->{a}),);
+            return __PACKAGE__->new($x->{a}->mul($y->{b}), $x->{b}->mul($y->{a}));
         }
 
         __PACKAGE__->new($x->{a}, $x->{b}->mul($y));
@@ -137,7 +142,7 @@ package Sidef::Types::Number::Fraction {
 
         if ($n->is_neg) {
             my $abs_n = $n->neg;
-            return __PACKAGE__->new($x->{b}->pow($abs_n), $x->{a}->pow($abs_n),);
+            return __PACKAGE__->new($x->{b}->pow($abs_n), $x->{a}->pow($abs_n));
         }
 
         __PACKAGE__->new($x->{a}->pow($n), $x->{b}->pow($n));

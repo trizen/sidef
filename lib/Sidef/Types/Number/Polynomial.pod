@@ -112,6 +112,16 @@ Aliases: I<÷>, I<div>
 
 =cut
 
+=head2 //
+
+    a // b
+
+Returns the
+
+Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
+
+=cut
+
 =head2 <
 
     a < b
@@ -236,16 +246,6 @@ Returns the
 
 =cut
 
-=head2 idiv
-
-    Polynomial.idiv()
-
-Returns the
-
-Aliases: I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
-
-=cut
-
 =head2 inv
 
     Polynomial.inv()
@@ -341,6 +341,14 @@ Returns the
 =head2 to_n
 
     Polynomial.to_n()
+
+Returns the
+
+=cut
+
+=head2 to_poly
+
+    Polynomial.to_poly()
 
 Returns the
 

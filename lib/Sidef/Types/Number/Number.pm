@@ -1294,6 +1294,15 @@ package Sidef::Types::Number::Number {
     *to_f     = \&float;
     *to_float = \&float;
 
+    sub to_poly {
+        my ($x) = @_;
+        Sidef::Types::Number::Polynomial->new(0 => $x);
+    }
+
+    sub eval {
+        $_[0];
+    }
+
     sub complex {
         my ($x, $y) = @_;
 
@@ -4536,15 +4545,18 @@ package Sidef::Types::Number::Number {
         ## B_n(x) = Sum_{k=0..n} binomial(n, k) * bernoulli(n-k) * x^k
         #
 
-        if (!defined($x)) {
+        my $polynomial = 0;
 
-            # TODO: return a Polynomial object
+        if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
+            _valid(\$x);
+            $x = $$x;
+        }
+        else {
+            $polynomial = 1;
+            $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
         }
 
-        _valid(\$x);
-
         $n = _any2ui($$n) // goto &nan;
-        $x = $$x;
 
         my @B = _bernoulli_numbers($n);
 
@@ -4561,10 +4573,17 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_bin_uiui($z, $n, $k);
             Math::GMPq::Rmpq_mul_z($q, $u <= 1 ? $B[$u] : $B[($u >> 1) + 1], $z);
 
-            push @terms, __mul__($k ? __pow__($x, $k) : $ONE, $q);
+            if ($polynomial) {
+                push @terms, $x->pow(_set_int($k))->mul(bless \$q);
+            }
+            else {
+                push @terms, __mul__(($k ? __pow__($x, $k) : $ONE), $q);
+            }
         }
 
-        bless \_binsplit([CORE::reverse(@terms)], \&__add__);
+        $polynomial
+          ? _binsplit([CORE::reverse @terms], \&Sidef::Types::Number::Polynomial::add)
+          : (bless \_binsplit([CORE::reverse @terms], \&__add__));
     }
 
     sub bernfrac {
@@ -4597,12 +4616,12 @@ package Sidef::Types::Number::Number {
     sub faulhaber_polynomial {
         my ($n, $x) = @_;
 
-        if (!defined($x)) {
-
-            # TODO: return a Polynomial object
+        if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
+            _valid(\$x);
         }
-
-        _valid(\$x);
+        else {
+            $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
+        }
 
         $n = $n->inc;
         $x = $x->inc;
@@ -4617,31 +4636,48 @@ package Sidef::Types::Number::Number {
         ## E_n(x) = Sum_{k=0..n} binomial(n, n-k) * euler_number(n-k) / 2^(n-k) * (x - 1/2)^k
         #
 
-        if (!defined($x)) {
+        my $polynomial = 0;
 
-            # TODO: return a Polynomial object
+        if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
+            _valid(\$x);
+            $x = $$x;
+            $x = __dec__(__add__($x, $x));    # x = 2*x - 1
+        }
+        else {
+            $polynomial = 1;
+            $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
+            $x = $x->add($x)->dec;
         }
 
         $n = _any2ui($$n) // goto &nan;
-        $x = $$x;
 
         my @S = _secant_numbers($n >> 1);
 
         my $u = $n + 1;
         my $z = Math::GMPz::Rmpz_init();
 
-        $x = __dec__(__add__($x, $x));    # x = 2*x - 1
-
         my @terms;
 
         foreach my $k (0 .. $n) {
-            --$u & 1 and next;            # E_n = 0 for all odd n
+            --$u & 1 and next;    # E_n = 0 for all odd n
 
             Math::GMPz::Rmpz_bin_uiui($z, $n, $u);
             Math::GMPz::Rmpz_mul($z, $z, $S[$u >> 1]);
             Math::GMPz::Rmpz_neg($z, $z) if (($u >> 1) & 1);
 
-            push @terms, ($k ? __mul__(__pow__($x, $k), $z) : Math::GMPz::Rmpz_init_set($z));
+            if ($polynomial) {
+                push @terms, $x->pow(_set_int($k))->mul(bless \$z);
+            }
+            else {
+                push @terms, ($k ? __mul__(__pow__($x, $k), $z) : Math::GMPz::Rmpz_init_set($z));
+            }
+        }
+
+        if ($polynomial) {
+            my $sum = _binsplit(\@terms, \&Sidef::Types::Number::Polynomial::add);
+            Math::GMPz::Rmpz_set_ui($z, 0);
+            Math::GMPz::Rmpz_setbit($z, $n);
+            return $sum->div(bless \$z);
         }
 
         my $sum = _binsplit(\@terms, \&__add__);
@@ -9119,45 +9155,34 @@ package Sidef::Types::Number::Number {
     sub chebyshevt {
         my ($n, $x) = @_;
 
-        if (!defined($x)) {
-
-            # TODO: return a Polynomial object
-        }
-
-        _valid(\$x);
-
         $n = _any2si($$n) // goto &nan;
-
         $n = -$n if $n < 0;
         $n == 0 and return ONE;
-        $n == 1 and return $x;
 
-        $x = $$x;
-
-        if (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x))) {
-            return _set_int(Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::lucasv(2 * $x, 1, $n), 2));
+        if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
+            _valid(\$x);
+        }
+        else {
+            $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
         }
 
-        if (0) {
-            my $t = __add__($x, $x);
-            my ($u, $v) = ($ONE, $x);
+        $n == 1 and return $x;
 
-            foreach my $i (2 .. $n) {
-                ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+        if (ref($x) eq __PACKAGE__) {
+            if (ref($$x) eq 'Math::GMPz' or (__is_rat__($$x) and __is_int__($$x))) {
+                return _set_int(Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::lucasv(2 * $$x, 1, $n), 2));
             }
-
-            return bless \$v;
         }
 
         # T_n(x) = 1/2 * ((x - sqrt(x^2 - 1))^n + (x + sqrt(x^2 - 1))^n)
 
         my $e = _set_int($n);
-        my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, bless \__dec__(__mul__($x, $x)));
+        my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, $x->mul($x)->dec);
 
-        my $r1 = ((bless \$x)->sub($Q))->pow($e);
+        my $r1 = $Q->neg->add($x)->pow($e);
         my $r2 = $r1->conj;
 
-        ($r1->add($r2))->div(TWO)->a;
+        $r1->add($r2)->div(TWO)->a;
     }
 
     *chebyshevT = \&chebyshevt;
@@ -9169,13 +9194,6 @@ package Sidef::Types::Number::Number {
 
     sub chebyshevu {
         my ($n, $x) = @_;
-
-        if (!defined($x)) {
-
-            # TODO: return a Polynomial object
-        }
-
-        _valid(\$x);
 
         $n = _any2si($$n) // goto &nan;
         $n == 0 and return ONE;
@@ -9191,35 +9209,30 @@ package Sidef::Types::Number::Number {
             $negative = 1;
         }
 
-        $x = $$x;
-
-        if (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x))) {
-            my $r = _set_int(Math::Prime::Util::GMP::lucasu(2 * $x, 1, $n + 1));
-            $r = $r->neg if $negative;
-            return $r;
+        if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
+            _valid(\$x);
+        }
+        else {
+            $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
         }
 
-        if (0) {
-            my $t = __add__($x, $x);
-            my ($u, $v) = ($ONE, $t);
-
-            foreach my $i (2 .. $n) {
-                ($u, $v) = ($v, __sub__(__mul__($t, $v), $u));
+        if (ref($x) eq __PACKAGE__) {
+            if (ref($$x) eq 'Math::GMPz' or (__is_rat__($$x) and __is_int__($$x))) {
+                my $r = _set_int(Math::Prime::Util::GMP::lucasu(2 * $$x, 1, $n + 1));
+                $r = $r->neg if $negative;
+                return $r;
             }
-
-            $v = __neg__($v) if $negative;
-            return bless \$v;
         }
 
         # U_n(x) = ((x + sqrt(x^2 - 1))^(n+1) - (x - sqrt(x^2 - 1))^(n+1)) / (2 * sqrt(x^2 - 1))
 
         my $e = _set_int($n + 1);
-        my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, bless \__dec__(__mul__($x, $x)));
+        my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, $x->mul($x)->dec);
 
-        my $r1 = ((bless \$x)->add($Q))->pow($e);
+        my $r1 = $Q->add($x)->pow($e);
         my $r2 = $r1->conj;
 
-        my $r = ($r1->sub($r2))->div($Q->add($Q))->a;
+        my $r = $r1->sub($r2)->div($Q->add($Q))->a;
         $r = $r->neg if $negative;
         $r;
     }
@@ -9313,35 +9326,54 @@ package Sidef::Types::Number::Number {
     sub legendre_polynomial {
         my ($n, $x) = @_;
 
-        if (!defined($x)) {
+        my $polynomial = 0;
 
-            # TODO: return a Polynomial object
+        if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
+            _valid(\$x);
         }
-
-        _valid(\$x);
+        else {
+            $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
+            $polynomial = 1;
+        }
 
         $n = _any2ui($$n) // goto &nan;
 
         $n == 0 && return ONE;
         $n == 1 && return $x;
 
-        my $x1 = __dec__($$x);
-        my $x2 = __inc__($$x);
+        my ($x1, $x2) = ($x->dec, $x->inc);
+
+        if (!$polynomial) {
+            $x1 = $$x1;
+            $x2 = $$x2;
+        }
 
         my $t = Math::GMPz::Rmpz_init();
 
         my @terms;
         foreach my $k (0 .. $n) {
+
             Math::GMPz::Rmpz_bin_uiui($t, $n, $k);
             Math::GMPz::Rmpz_mul($t, $t, $t);
-            push @terms, __mul__(__mul__(__pow__($x1, $n - $k), __pow__($x2, $k)), $t);
+
+            if ($polynomial) {
+                push @terms, $x1->pow(_set_int($n - $k))->mul($x2->pow(_set_int($k)))->mul(bless \$t);
+            }
+            else {
+                push @terms, __mul__(__mul__(__pow__($x1, $n - $k), __pow__($x2, $k)), $t);
+            }
+        }
+
+        if ($polynomial) {
+            my $sum = _binsplit(\@terms, \&Sidef::Types::Number::Polynomial::add);
+            Math::GMPz::Rmpz_set_ui($t, 0);
+            Math::GMPz::Rmpz_setbit($t, $n);
+            return $sum->div(bless \$t);
         }
 
         my $sum = _binsplit(\@terms, \&__add__);
-
         Math::GMPz::Rmpz_set_ui($t, 0);
         Math::GMPz::Rmpz_setbit($t, $n);
-
         bless \__div__($sum, $t);
     }
 
@@ -9356,18 +9388,21 @@ package Sidef::Types::Number::Number {
     sub hermiteH {
         my ($n, $x) = @_;
 
-        if (!defined($x)) {
+        my $polynomial = 0;
 
-            # TODO: return a Polynomial object
+        if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
+            _valid(\$x);
         }
-
-        _valid(\$x);
+        else {
+            $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
+            $polynomial = 1;
+        }
 
         $n = _any2ui($$n) // goto &nan;
 
         $n == 0 && return ONE;
-        $x = __add__($$x, $$x);
-        $n == 1 && return bless \$x;
+        $x = $x->add($x);
+        $n == 1 && return $x;
 
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init_set_ui(1);
@@ -9377,18 +9412,30 @@ package Sidef::Types::Number::Number {
 
         my @terms;
         foreach my $m (0 .. $n >> 1) {
+
             Math::GMPz::Rmpz_mul($t, $v, $u);
             Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
 
-            push @terms, __div__(__pow__($x, $n - ($m << 1)), $t);
+            if ($polynomial) {
+                push @terms, $x->pow(_set_int($n - ($m << 1)))->div(bless \$t);
+            }
+            else {
+                push @terms, __div__(__pow__($$x, $n - ($m << 1)), $t);
+            }
 
             my $d = ($n - ($m << 1)) * ($n - ($m << 1) - 1);
             Math::GMPz::Rmpz_divexact_ui($v, $v, $d) if $d;
             Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
         }
 
-        my $sum = _binsplit(\@terms, \&__add__);
         Math::GMPz::Rmpz_fac_ui($v, $n);
+
+        if ($polynomial) {
+            my $sum = _binsplit(\@terms, \&Sidef::Types::Number::Polynomial::add);
+            return $sum->mul(bless \$v);
+        }
+
+        my $sum = _binsplit(\@terms, \&__add__);
         bless \__mul__($sum, $v);
     }
 
@@ -9402,19 +9449,20 @@ package Sidef::Types::Number::Number {
     sub hermiteHe {
         my ($n, $x) = @_;
 
-        if (!defined($x)) {
+        my $polynomial = 0;
 
-            # TODO: return a Polynomial object
+        if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
+            _valid(\$x);
         }
-
-        _valid(\$x);
+        else {
+            $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
+            $polynomial = 1;
+        }
 
         $n = _any2ui($$n) // goto &nan;
 
         $n == 0 && return ONE;
         $n == 1 && return $x;
-
-        $x = $$x;
 
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init_set_ui(1);
@@ -9424,19 +9472,31 @@ package Sidef::Types::Number::Number {
 
         my @terms;
         foreach my $m (0 .. $n >> 1) {
+
             Math::GMPz::Rmpz_mul($t, $v, $u);
             Math::GMPz::Rmpz_mul_2exp($t, $t, $m);
             Math::GMPz::Rmpz_neg($t, $t) if ($m & 1);
 
-            push @terms, __div__(__pow__($x, $n - ($m << 1)), $t);
+            if ($polynomial) {
+                push @terms, $x->pow(_set_int($n - ($m << 1)))->div(bless \$t);
+            }
+            else {
+                push @terms, __div__(__pow__($$x, $n - ($m << 1)), $t);
+            }
 
             my $d = ($n - ($m << 1)) * ($n - ($m << 1) - 1);
             Math::GMPz::Rmpz_divexact_ui($v, $v, $d) if $d;
             Math::GMPz::Rmpz_mul_ui($u, $u, $m + 1);
         }
 
-        my $sum = _binsplit(\@terms, \&__add__);
         Math::GMPz::Rmpz_fac_ui($v, $n);
+
+        if ($polynomial) {
+            my $sum = _binsplit(\@terms, \&Sidef::Types::Number::Polynomial::add);
+            return $sum->mul(bless \$v);
+        }
+
+        my $sum = _binsplit(\@terms, \&__add__);
         bless \__mul__($sum, $v);
     }
 
@@ -9450,30 +9510,41 @@ package Sidef::Types::Number::Number {
     sub laguerreL {
         my ($n, $x) = @_;
 
-        if (!defined($x)) {
+        my $polynomial = 0;
 
-            # TODO: return a Polynomial object
+        if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
+            _valid(\$x);
         }
-
-        _valid(\$x);
+        else {
+            $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
+            $polynomial = 1;
+        }
 
         $n = _any2ui($$n) // goto &nan;
         $n || return ONE;
-
-        $x = $$x;
 
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init_set_ui(1);
 
         my @terms;
         foreach my $k (0 .. $n) {
+
             Math::GMPz::Rmpz_bin_uiui($t, $n, $k);
             Math::GMPz::Rmpz_neg($t, $t) if ($k & 1);
-            push @terms, __div__(__mul__(__pow__($x, $k), $t), $u);
+
+            if ($polynomial) {
+                push @terms, $x->pow(_set_int($k))->mul(bless \$t)->div(bless \$u);
+            }
+            else {
+                push @terms, __div__(__mul__(__pow__($$x, $k), $t), $u);
+            }
+
             Math::GMPz::Rmpz_mul_ui($u, $u, $k + 1);
         }
 
-        bless \_binsplit(\@terms, \&__add__);
+        $polynomial
+          ? _binsplit(\@terms, \&Sidef::Types::Number::Polynomial::add)
+          : (bless \_binsplit(\@terms, \&__add__));
     }
 
     *laguerre            = \&laguerreL;
@@ -10217,7 +10288,7 @@ package Sidef::Types::Number::Number {
         _valid(\$x);
         $x = $$x;
 
-        return ONE if ($n == 0);
+        return ZERO if ($n == 0);
 
         return bless(\__dec__($x)) if ($n == 1);
         return bless(\__inc__($x)) if ($n == 2);

@@ -24,11 +24,15 @@
 #    a(10^14) = 3204942420923
 #    a(10^15) = 29844572385358
 
+require('ntheory')
+
 func my_pp_count(a, b) {
 
     if (b < a) {
         return 0
     }
+
+    return (%S<ntheory>.prime_power_count(b) - %S<ntheory>.prime_power_count(a-1))
 
     if (a == 2) {
         return sum(1..b.ilog2, {|k|

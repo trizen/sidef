@@ -1016,9 +1016,12 @@ Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
 =head2 bernoulli_polynomial
 
+    bernoulli_polynomial(n)
     bernoulli_polynomial(n, x)
 
 Returns the n-th Bernoulli polynomial: C<B_n(x)>.
+
+When C<x> is ommited, a Polynomial object is returned.
 
 =cut
 
@@ -1321,6 +1324,7 @@ Aliases: I<as_cfrac>
 
 =head2 chebyshevT
 
+    chebyshevT(n)
     chebyshevT(n, x)
 
 Compute the Chebyshev polynomials of the first kind: C<T_n(x)>, where C<n> must be a native integer.
@@ -1330,6 +1334,8 @@ Defined as:
     T(0, x) = 1
     T(1, x) = x
     T(n, x) = 2*x*T(n-1, x) - T(n-2, x)
+
+When C<x> is ommited, a Polynomial object is returned.
 
 Aliases: I<chebyshevt>
 
@@ -1345,6 +1351,7 @@ Compute the modular Chebyshev polynomials of the first kind: C<T_n(x) mod m>, wh
 
 =head2 chebyshevU
 
+    chebyshevU(n)
     chebyshevU(n, x)
 
 Compute the Chebyshev polynomials of the second kind: C<U_n(x)>, where C<n> must be a native integer.
@@ -1354,6 +1361,8 @@ Defined as:
     U(0, x) = 1
     U(1, x) = 2*x
     U(n, x) = 2*x*U(n-1, x) - U(n-2, x)
+
+When C<x> is ommited, a Polynomial object is returned.
 
 Aliases: I<chebyshevu>
 
@@ -1728,7 +1737,7 @@ Returns the n-th Cyclotomic polynomial evaluated at C<x>.
 
     say cyclotomic(12, 10)      #=> 9901
 
-When C<x> is omited, it returns a symbolic Polynomial object.
+When C<x> is ommited, a Polynomial object is returned:
 
     say cyclotomic(12)          #=> x^4 - x^2 + 1
 
@@ -2247,9 +2256,20 @@ Aliases: I<euler_number>
 
 =head2 euler_polynomial
 
+    euler_polynomial(n)
     euler_polynomial(n, x)
 
 Returns the n-th Euler polynomial evaluated at C<x>.
+
+When C<x> is ommited, a Polynomial object is returned.
+
+=cut
+
+=head2 eval
+
+    eval(x,v)
+
+Returns back C<x>.
 
 =cut
 
@@ -2468,13 +2488,16 @@ Aliases: I<faulhaber_sum>
 
 =head2 faulhaber_polynomial
 
-    faulhaber_polynomial(n,x)
+    faulhaber_polynomial(n)
+    faulhaber_polynomial(n, x)
 
 Computes the n-th Faulhaber polynomials evaluated at C<x>.
 
 Defined in terms of the Bernoulli polynomials, as:
 
     faulhaber_polynomial(n,x) = (bernoulli_polynomial(n+1,x+1) - bernoulli_polynomial(n+1, 1))/(n+1)
+
+When C<x> is ommited, a Polynomial object is returned.
 
 =cut
 
@@ -2701,9 +2724,12 @@ Example:
 
 =head2 hermiteH
 
+    hermiteH(n)
     hermiteH(n, x)
 
 Physicists' Hermite polynomials: C<H_n(x)>.
+
+When C<x> is ommited, a Polynomial object is returned.
 
 Aliases: I<hermite_polynomialH>
 
@@ -2711,9 +2737,12 @@ Aliases: I<hermite_polynomialH>
 
 =head2 hermiteHe
 
+    hermiteHe(n)
     hermiteHe(n, x)
 
 Probabilists' Hermite polynomials: C<He_n(x)>.
+
+When C<x> is ommited, a Polynomial object is returned.
 
 Aliases: I<hermite_polynomialHe>
 
@@ -4156,9 +4185,12 @@ Returns the Kronecker symbol: C<(a|n)>.
 
 =head2 laguerre
 
-    laguerre(n,x)
+    laguerre(n)
+    laguerre(n, x)
 
 Laguerre polynomials: C<L_n(x)>.
+
+When C<x> is ommited, a Polynomial object is returned.
 
 Aliases: I<laguerreL>, I<laguerre_polynomial>
 
@@ -4211,9 +4243,12 @@ Returns the Legendre symbol: C<(a|p)>.
 
 =head2 legendreP
 
+    legendreP(n)
     legendreP(n,x)
 
 Legendre polynomials: C<P_n(x)>.
+
+When C<x> is ommited, a Polynomial object is returned.
 
 Aliases: I<legendrep>, I<legendre_polynomial>
 
@@ -6724,11 +6759,19 @@ Aliases: I<to_num>
 
 =cut
 
+=head2 to_poly
+
+    x.to_poly
+
+Converts C<x> to a Polynomial object.
+
+=cut
+
 =head2 to_s
 
-    x.to_s()
+    x.to_s
 
-Converts C<x> to a string.
+Converts C<x> to a String object.
 
 Aliases: I<to_str>
 

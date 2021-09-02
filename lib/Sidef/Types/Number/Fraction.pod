@@ -240,6 +240,14 @@ Aliases: I<denominator>
 
 =cut
 
+=head2 eval
+
+    Fraction.eval()
+
+Returns the
+
+=cut
+
 =head2 floor
 
     Fraction.floor()

@@ -55,6 +55,10 @@ package Sidef::Types::Number::Polynomial {
 
     *call = \&new;
 
+    sub to_poly {
+        $_[0];
+    }
+
     sub to_n {
         my ($x) = @_;
 
@@ -95,7 +99,7 @@ package Sidef::Types::Number::Polynomial {
                 $str =~ s/ \+ \z/ - /;
             }
 
-            if ($c_str =~ /[+-]/) {
+            if ($c_str =~ /[+-]/ and $c_str !~ /^\w+\(.*\)\z/) {
                 $c_str = "($c_str)";
             }
 
@@ -127,6 +131,7 @@ package Sidef::Types::Number::Polynomial {
 
     sub eval {
         my ($x, $value) = @_;
+        CORE::keys(%$x) || return Sidef::Types::Number::Number::ZERO;
         Sidef::Types::Array::Array->new(
                  [map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}) } CORE::keys %$x])->reduce('+');
     }
@@ -530,6 +535,7 @@ package Sidef::Types::Number::Polynomial {
         }
 
         *{__PACKAGE__ . '::' . '/'}   = \&div;
+        *{__PACKAGE__ . '::' . '//'}  = \&idiv;
         *{__PACKAGE__ . '::' . '÷'}   = \&div;
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '%'}   = \&mod;

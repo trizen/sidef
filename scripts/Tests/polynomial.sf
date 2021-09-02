@@ -223,12 +223,33 @@ with (Poly(1 => 1)) {|x|
     assert_eq(p.powmod(+6, 97).eval(42), Mod(85, 97))
     assert_eq([p.powmod(-6, 97).nude].map { .kind_of(Polynomial) ? .eval(42) : _ }.reduce('/'), 1/577294259220123291015625)
 
+    assert_eq(Polynomial(0 => 123, 1 => 4/3, 2 => 4, 3 => 3), Poly([3,4,4/3,123]))
+
     var a = Poly([11,1,0,3,5])
     var b = Poly([3,0,14])
 
     assert_eq(a/b, Fraction(11*x**4 + x**3 + 3*x + 5, 3*x**2 + 14))
     assert_eq(floor(a/b), idiv(a,b))
     assert_eq(floor(Fraction(a,b)), (11/3)*x**2 + (1/3)*x - 154/9)
+}
+
+for n in (0..10) {
+    var x = irand(50, 100)
+
+    assert_eq(chebyshevT(n).eval(x), chebyshevT(n, x))
+    assert_eq(chebyshevU(n).eval(x).eval(x), chebyshevU(n, x))               # TODO: fix me
+
+    assert_eq(bernoulli_polynomial(n).eval(x), bernoulli_polynomial(n, x))
+    assert_eq(faulhaber_polynomial(n).eval(x), faulhaber_polynomial(n, x))
+    assert_eq(euler_polynomial(n).eval(x), euler_polynomial(n, x))
+
+    assert_eq(legendre_polynomial(n).eval(x), legendre_polynomial(n, x))
+
+    assert_eq(hermiteH(n).eval(x), hermiteH(n, x))
+    assert_eq(hermiteHe(n).eval(x), hermiteHe(n, x))
+    assert_eq(laguerreL(n).eval(x), laguerreL(n, x))
+
+    assert_eq(cyclotomic_polynomial(n).eval(x), cyclotomic_polynomial(n, x))
 }
 
 say "** Test passed!"
