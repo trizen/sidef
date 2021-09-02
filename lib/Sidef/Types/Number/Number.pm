@@ -5933,7 +5933,7 @@ package Sidef::Types::Number::Number {
 
         foreach my $value (@vals) {
             if (ref($value) eq __PACKAGE__) {
-                push @numbers, $value;
+                push @numbers, $$value;
             }
             else {
                 push @unknown, $value;
@@ -5944,11 +5944,11 @@ package Sidef::Types::Number::Number {
         my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
         foreach my $n (@numbers) {
-            if (ref($$n) eq 'Math::GMPz') {
-                Math::GMPz::Rmpz_add($sum, $sum, $$n);
+            if (ref($n) eq 'Math::GMPz') {
+                Math::GMPz::Rmpz_add($sum, $sum, $n);
             }
             else {
-                push @left, $$n;
+                push @left, $n;
             }
         }
 
@@ -5977,14 +5977,14 @@ package Sidef::Types::Number::Number {
 
         foreach my $value (@vals) {
             if (ref($value) eq __PACKAGE__) {
-                push @numbers, $value;
+                push @numbers, $$value;
             }
             else {
                 push @unknown, $value;
             }
         }
 
-        my $r = (@numbers ? (bless \_binsplit([map { $$_ } @numbers], \&__mul__)) : ONE);
+        my $r = (@numbers ? (bless \_binsplit(\@numbers, \&__mul__)) : ONE);
 
         foreach my $value (@unknown) {
             $r = $r->mul($value);
