@@ -12240,7 +12240,7 @@ package Sidef::Types::Number::Number {
 
                         if (Math::GMPz::Rmpz_congruent_ui_p($n, 3, 8)) {
                             $count = eval {
-                                Math::Prime::Util::GMP::lshiftint(Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($n)), 1);
+                                Math::Prime::Util::GMP::mulint(Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($n)), 2);
                             };
                         }
                         else {
@@ -12274,7 +12274,7 @@ package Sidef::Types::Number::Number {
 
             if ($k == 4) {    # OEIS: A000118
                 my $count =
-                  Math::Prime::Util::GMP::lshiftint(Math::Prime::Util::GMP::sigma(($v >= 1) ? ($t << 1) : $t), 3);
+                  Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::sigma(($v >= 1) ? ($t << 1) : $t), 8);
                 return Math::GMPz::Rmpz_init_set_str($count, 10);
             }
 
