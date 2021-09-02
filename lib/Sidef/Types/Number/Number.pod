@@ -1021,7 +1021,7 @@ Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
 Returns the n-th Bernoulli polynomial: C<B_n(x)>.
 
-When C<x> is ommited, a Polynomial object is returned.
+When C<x> is omitted, a Polynomial object is returned.
 
 =cut
 
@@ -1335,7 +1335,7 @@ Defined as:
     T(1, x) = x
     T(n, x) = 2*x*T(n-1, x) - T(n-2, x)
 
-When C<x> is ommited, a Polynomial object is returned.
+When C<x> is omitted, a Polynomial object is returned.
 
 Aliases: I<chebyshevt>
 
@@ -1362,7 +1362,7 @@ Defined as:
     U(1, x) = 2*x
     U(n, x) = 2*x*U(n-1, x) - U(n-2, x)
 
-When C<x> is ommited, a Polynomial object is returned.
+When C<x> is omitted, a Polynomial object is returned.
 
 Aliases: I<chebyshevu>
 
@@ -1737,7 +1737,7 @@ Returns the n-th Cyclotomic polynomial evaluated at C<x>.
 
     say cyclotomic(12, 10)      #=> 9901
 
-When C<x> is ommited, a Polynomial object is returned:
+When C<x> is omitted, a Polynomial object is returned:
 
     say cyclotomic(12)          #=> x^4 - x^2 + 1
 
@@ -2261,7 +2261,7 @@ Aliases: I<euler_number>
 
 Returns the n-th Euler polynomial evaluated at C<x>.
 
-When C<x> is ommited, a Polynomial object is returned.
+When C<x> is omitted, a Polynomial object is returned.
 
 =cut
 
@@ -2497,7 +2497,7 @@ Defined in terms of the Bernoulli polynomials, as:
 
     faulhaber_polynomial(n,x) = (bernoulli_polynomial(n+1,x+1) - bernoulli_polynomial(n+1, 1))/(n+1)
 
-When C<x> is ommited, a Polynomial object is returned.
+When C<x> is omitted, a Polynomial object is returned.
 
 =cut
 
@@ -2729,7 +2729,7 @@ Example:
 
 Physicists' Hermite polynomials: C<H_n(x)>.
 
-When C<x> is ommited, a Polynomial object is returned.
+When C<x> is omitted, a Polynomial object is returned.
 
 Aliases: I<hermite_polynomialH>
 
@@ -2742,7 +2742,7 @@ Aliases: I<hermite_polynomialH>
 
 Probabilists' Hermite polynomials: C<He_n(x)>.
 
-When C<x> is ommited, a Polynomial object is returned.
+When C<x> is omitted, a Polynomial object is returned.
 
 Aliases: I<hermite_polynomialHe>
 
@@ -4190,7 +4190,7 @@ Returns the Kronecker symbol: C<(a|n)>.
 
 Laguerre polynomials: C<L_n(x)>.
 
-When C<x> is ommited, a Polynomial object is returned.
+When C<x> is omitted, a Polynomial object is returned.
 
 Aliases: I<laguerreL>, I<laguerre_polynomial>
 
@@ -4248,7 +4248,7 @@ Returns the Legendre symbol: C<(a|p)>.
 
 Legendre polynomials: C<P_n(x)>.
 
-When C<x> is ommited, a Polynomial object is returned.
+When C<x> is omitted, a Polynomial object is returned.
 
 Aliases: I<legendrep>, I<legendre_polynomial>
 
