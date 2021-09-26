@@ -472,4 +472,22 @@ do {
     assert_eq(a(100), 990246417437806351190277754425603307809612897254870471251275960965725797918060784184076057065314451820651920841907304582494680760348836023974638203217830928705082772363290340579154282010420824995000)
 }
 
+do {
+    var a = Quadratic(3,4,5)
+    var b = Quadratic(7,11,43)
+
+    assert_eq(a + b, Quadratic(a.a + b, a.b, a.w))
+    assert_eq(a - b, Quadratic(a.a - b, a.b, a.w))
+    assert_eq(a * b, Quadratic(a.a * b, a.b * b, a.w))
+    assert_eq(a / b, Quadratic(a.a / b, a.b / b, a.w))
+    assert_eq(a ^ b, Quadratic(a.a ^ b, a.b, a.w))
+    assert_eq(a | b, Quadratic(a.a | b, a.b, a.w))
+    assert_eq(a & b, Quadratic(a.a & b, a.b, a.w))
+
+    assert_eq(a <=> b, -1)
+    assert_eq(b <=> a, +1)
+
+    assert_eq(a.to_n <=> b.to_n, -1)
+}
+
 say "** Test passed!"

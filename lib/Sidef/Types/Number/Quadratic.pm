@@ -126,7 +126,7 @@ package Sidef::Types::Number::Quadratic {
 
         # (x + y√d) + (z + w√d) = (x + z) + (y + w)√d
 
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($y) eq __PACKAGE__ and $x->{w} eq $y->{w}) {
             return __PACKAGE__->new($x->{a}->add($y->{a}), $x->{b}->add($y->{b}), $x->{w});
         }
 
@@ -136,7 +136,7 @@ package Sidef::Types::Number::Quadratic {
     sub sub {
         my ($x, $y) = @_;
 
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($y) eq __PACKAGE__ and $x->{w} eq $y->{w}) {
             return __PACKAGE__->new($x->{a}->sub($y->{a}), $x->{b}->sub($y->{b}), $x->{w});
         }
 
@@ -148,7 +148,7 @@ package Sidef::Types::Number::Quadratic {
 
         # (x + y√d) (z + w√d) = (xz+ ywd) + (xw + yz)√d
 
-        if (ref($y) eq __PACKAGE__) {
+        if (ref($y) eq __PACKAGE__ and $x->{w} eq $y->{w}) {
             return __PACKAGE__->new(
 
                 # Quadratic(a*a' + b*b'*w, a*b' + b*a', w)
@@ -388,7 +388,7 @@ package Sidef::Types::Number::Quadratic {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
 
-                if (ref($y) eq __PACKAGE__) {
+                if (ref($y) eq __PACKAGE__ and $x->{w} eq $y->{w}) {
                     return __PACKAGE__->new($x->{a}->$method($y->{a}), $x->{b}->$method($y->{b}), $x->{w});
                 }
 

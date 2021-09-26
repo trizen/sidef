@@ -3257,7 +3257,7 @@ Equivalent with:
 
     n.is_abs_euler_psp
 
-Returns true if C<n> is an absolute Euler pseudoprime.
+Returns true if C<n> is an absolute Euler pseudoprime: p-1 | (n-1)/2 for every p|n, where C<n> is a squarefree composite integer.
 
     say 10.by { .is_abs_euler_psp }     #=> OEIS: A033181
 
