@@ -12244,9 +12244,11 @@ package Sidef::Types::Number::Number {
                             };
                         }
                         else {
-                            my $t = $n << 2;
+                            my $t = $n << 2;    # n is a Math::GMPz object
                             $count =
-                              ($t < ULONG_MAX) ? eval { Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($t)) } : undef;
+                              ($t < ULONG_MAX)
+                              ? eval { Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($t)) }
+                              : undef;
                         }
 
                         if (defined($count)) {
@@ -13844,7 +13846,7 @@ package Sidef::Types::Number::Number {
               : Math::GMPz::Rmpz_set_str($v, $p, 10);
 
             # Check Korselt's criterion for Carmichael numbers:
-            #   p-1 | n-1, for all p|n.
+            #   p-1 | n-1, for each p|n.
 
             Math::GMPz::Rmpz_sub_ui($u, $v, 1);
             Math::GMPz::Rmpz_divisible_p($nm1, $u) || return Sidef::Types::Bool::Bool::FALSE;
@@ -18479,18 +18481,31 @@ package Sidef::Types::Number::Number {
                    );
         }
 
-        # Divisible by a small square
-        foreach my $p (3, 5, 7, 11) {
-            if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
-                return Sidef::Types::Bool::Bool::FALSE;
-            }
-        }
-
         state $nm1 = Math::GMPz::Rmpz_init_nobless();
         state $pm1 = Math::GMPz::Rmpz_init_nobless();
 
-        # Must be a Fermat pseudoprime to base 2.
         Math::GMPz::Rmpz_sub_ui($nm1, $n, 1);
+
+        # Divisible by a small square
+        foreach my $p (3, 5, 7, 11, 13, 17, 19) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
+
+                if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+
+                Math::GMPz::Rmpz_divisible_ui_p($nm1, $p - 1)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+            else {
+                Math::GMPz::Rmpz_set_ui($pm1, $p);
+                Math::GMPz::Rmpz_powm($pm1, $pm1, $nm1, $n);
+                Math::GMPz::Rmpz_cmp_ui($pm1, 1) == 0
+                  or return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        # Must be a Fermat pseudoprime to base 2.
         Math::GMPz::Rmpz_powm($pm1, $TWO, $nm1, $n);
         Math::GMPz::Rmpz_cmp_ui($pm1, 1) == 0
           or return Sidef::Types::Bool::Bool::FALSE;
@@ -18501,7 +18516,7 @@ package Sidef::Types::Number::Number {
             my %seen;
             foreach my $p (@$factors) {
 
-                # Check the Korselt criterion: p-1 | n-1, for all prime p|n.
+                # Check the Korselt criterion: p-1 | n-1, for each prime p|n.
                 if ($p < ULONG_MAX) {
                     Math::GMPz::Rmpz_divisible_ui_p($nm1, $p - 1) || return;
                 }
@@ -18629,10 +18644,21 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_odd_p($n)            or return Sidef::Types::Bool::Bool::FALSE;
         Math::GMPz::Rmpz_cmp_ui($n, 399) >= 0 or return Sidef::Types::Bool::Bool::FALSE;
 
+        state $np1 = Math::GMPz::Rmpz_init_nobless();
+        state $pp1 = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_add_ui($np1, $n, 1);
+
         # Divisible by a small square
         foreach my $p (3, 5, 7, 11) {
-            if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
-                return Sidef::Types::Bool::Bool::FALSE;
+            if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
+
+                if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+
+                Math::GMPz::Rmpz_divisible_ui_p($np1, $p + 1)
+                  || return Sidef::Types::Bool::Bool::FALSE;
             }
         }
 
@@ -18649,18 +18675,13 @@ package Sidef::Types::Number::Number {
         #     return Sidef::Types::Bool::Bool::FALSE;     # no counter-example is known
         # }
 
-        state $np1 = Math::GMPz::Rmpz_init_nobless();
-        state $pp1 = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_add_ui($np1, $n, 1);
-
         my $check_conditions = sub {
             my ($factors) = @_;
 
             my %seen;
             foreach my $p (@$factors) {
 
-                # Check the Lucas-Korselt criterion: p+1 | n+1, for all prime p|n.
+                # Check the Lucas-Korselt criterion: p+1 | n+1, for each prime p|n.
                 if ($p < ULONG_MAX) {
                     Math::GMPz::Rmpz_divisible_ui_p($np1, $p + 1) || return;
                 }
@@ -18723,6 +18744,141 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    sub is_absolute_euler_psp {    # OEIS: A033181
+        my ($n) = @_;
+
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        # Small or even
+        Math::GMPz::Rmpz_odd_p($n)             or return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_cmp_ui($n, 1729) >= 0 or return Sidef::Types::Bool::Bool::FALSE;
+
+        state $nm1   = Math::GMPz::Rmpz_init_nobless();
+        state $nm1d2 = Math::GMPz::Rmpz_init_nobless();
+        state $pm1   = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_sub_ui($nm1, $n, 1);
+        Math::GMPz::Rmpz_div_2exp($nm1d2, $nm1, 1);
+
+        # Divisible by a small square
+        foreach my $p (3, 5, 7, 11, 13, 17, 19) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
+
+                if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+
+                Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p - 1)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+            else {
+                Math::GMPz::Rmpz_set_ui($pm1, $p);
+                Math::GMPz::Rmpz_powm($pm1, $pm1, $nm1d2, $n);
+                Math::GMPz::Rmpz_cmp_ui($pm1, 1) == 0
+                  or Math::GMPz::Rmpz_cmp($pm1, $nm1) == 0
+                  or return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        # If n is a native integer, check if it is a Carmichael number
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            (
+             HAS_PRIME_UTIL
+             ? Math::Prime::Util::is_carmichael(Math::GMPz::Rmpz_get_ui($n))
+             : Math::Prime::Util::GMP::is_carmichael(Math::GMPz::Rmpz_get_ui($n))
+            )
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+
+        # Must be a Fermat pseudoprime to base 2.
+        Math::Prime::Util::GMP::is_pseudoprime($nstr, 2)
+          || return Sidef::Types::Bool::Bool::FALSE;
+
+        # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
+        if (Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
+            Math::Prime::Util::GMP::is_carmichael($nstr)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my $check_conditions = sub {
+            my ($factors) = @_;
+
+            my %seen;
+            foreach my $p (@$factors) {
+
+                # Check the criterion for absolute Euler pseudoprimes: p-1 | (n-1)/2, for each prime p|n.
+                if ($p < ULONG_MAX) {
+                    Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p - 1) || return;
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($pm1, $p, 10);
+                    Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
+                    Math::GMPz::Rmpz_divisible_p($nm1d2, $pm1) || return;
+                }
+
+                if ($seen{$p}++) {    # not squarefree
+                    return;
+                }
+            }
+
+            return 1;
+        };
+
+        my $omega     = 0;
+        my $remainder = $n;
+
+        if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
+
+            my ($r, @factors) = _adaptive_trial_factor($n);
+
+            if (@factors) {
+
+                $check_conditions->(\@factors)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+
+                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+
+                $omega += scalar(@factors);
+                $remainder = $r;
+            }
+        }
+
+        my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($remainder);
+
+        if (scalar(@factors) > 1) {
+
+            my @primes = grep { _is_prob_prime($_) } @factors;
+
+            if (@primes) {
+                $check_conditions->(\@primes)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if (scalar(@primes) == scalar(@factors)) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+        }
+
+        @factors = map { _factor($_) } @factors;
+
+        $omega += scalar(@factors);
+
+        ($omega >= 3 and $check_conditions->(\@factors))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *is_abs_euler_psp = \&is_absolute_euler_psp;
 
     sub is_fundamental {
         my ($x) = @_;

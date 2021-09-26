@@ -3253,9 +3253,21 @@ Equivalent with:
 
 =cut
 
+=head2 is_abs_euler_psp
+
+    n.is_abs_euler_psp
+
+Returns true if C<n> is an absolute Euler pseudoprime.
+
+    say 10.by { .is_abs_euler_psp }     #=> OEIS: A033181
+
+Aliases: I<is_absolute_euler_psp>
+
+=cut
+
 =head2 is_abundant
 
-    n.is_abundant()
+    n.is_abundant
 
 Returns true when sigma(n) > 2*n.
 
@@ -3263,7 +3275,7 @@ Returns true when sigma(n) > 2*n.
 
 =head2 is_aks_prime
 
-    n.is_aks_prime()
+    n.is_aks_prime
 
 Return true if C<n> passes the Agrawal-Kayal-Saxena (AKS) primality test.
 
