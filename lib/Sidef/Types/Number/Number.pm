@@ -6344,6 +6344,45 @@ package Sidef::Types::Number::Number {
         return (undef, undef);
     }
 
+    sub solve_lcg {
+        my ($n, $r, $m) = @_;
+
+        # Solve: n*x == r (mod m)
+
+        _valid(\$r, \$m);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $r = _any2mpz($$r) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) || goto &nan;
+
+        my $g = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_gcd($g, $n, $m);
+
+        if (Math::GMPz::Rmpz_cmp_ui($g, 1) != 0) {
+
+            # No solution exists if `r` is NOT divisible by `gcd(n,m)`
+            Math::GMPz::Rmpz_divisible_p($r, $g) || goto &nan;
+
+            $n = Math::GMPz::Rmpz_init_set($n);
+            $r = Math::GMPz::Rmpz_init_set($r);
+            $m = Math::GMPz::Rmpz_init_set($m);
+
+            Math::GMPz::Rmpz_divexact($n, $n, $g);
+            Math::GMPz::Rmpz_divexact($r, $r, $g);
+            Math::GMPz::Rmpz_divexact($m, $m, $g);
+        }
+
+        Math::GMPz::Rmpz_invert($g, $n, $m);
+        Math::GMPz::Rmpz_mul($g, $g, $r);
+        Math::GMPz::Rmpz_mod($g, $g, $m);
+
+        bless \$g;
+    }
+
+    *solve_linear_congruence = \&solve_lcg;
+
     sub sqrt_cfrac_period_each {
         my ($n, $block, $max) = @_;
 

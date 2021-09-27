@@ -2466,7 +2466,7 @@ For negative values of C<k>, falling factorial is defined as:
 
     falling_factorial(n, -k) = 1/falling_factorial(n + k, k)
 
-When the denominator is zero, NaN is returned.
+When the denominator is zero, C<NaN> is returned.
 
 =cut
 
@@ -5938,7 +5938,7 @@ Example:
     say rat_approx(3.14).as_frac        #=> 22/7
     say rat_approx(zeta(-5)).as_frac    #=> -1/252
 
-Returns NaN when C<x> is not a real number.
+Returns C<NaN> when C<x> is not a real number.
 
 =cut
 
@@ -6222,6 +6222,24 @@ It efficiently returns the largest divisor of n that is k-smooth.
 Example:
 
     say 20.of {|n| smooth_part(n!, 3) }     #=> OEIS: A118381
+
+=cut
+
+=head2 solve_lcg
+
+    solve_lcg(n, r, m)
+
+Return the smallest solution for C<x> to the following linear congruence:
+
+    n*x == r (mod m)
+
+Example:
+
+    say solve_lcg(143, 44, 231)     #=> 10
+
+Return C<NaN> when no solution exists (i.e.: when C<r> is not divisbile by C<gcd(n, m)>).
+
+Aliases: I<solve_linear_congruence>
 
 =cut
 
