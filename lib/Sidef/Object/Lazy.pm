@@ -56,6 +56,7 @@ package Sidef::Object::Lazy {
                     $count  = 0;
                     $result = $result->$method(CORE::splice(@list));
                 }
+                0;    # keep looping
             }
         );
 
@@ -77,7 +78,7 @@ package Sidef::Object::Lazy {
                 else {
                     $result = $_[0];
                 }
-                0;
+                0;    # keep looping
             }
         );
 
@@ -100,7 +101,7 @@ package Sidef::Object::Lazy {
                 else {
                     $result = $_[0];
                 }
-                0;
+                0;    # keep looping
             }
         );
         return $result;

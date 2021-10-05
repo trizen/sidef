@@ -209,4 +209,67 @@ do {
     }
 }
 
+do {
+
+    var a = 50
+    var b = 1e6
+    var k = 5
+
+    var arr = gather {
+
+        # Count methods
+        take smooth_count(a..b, k)
+        take rough_count(a..b, k)
+        take powerfree_count(a..b, k)
+        take powerful_count(a..b, k)
+        take omega_prime_count(a..b, k)
+        take almost_prime_count(a..b, k)
+        take squarefree_almost_prime_count(a..b, k)
+        take squarefree_count(a..b)
+        take semiprime_count(a..b)
+        take composite_count(a..b)
+        take prime_count(a..b)
+
+        # Sum methods
+        take powerfree_sum(a..b, k)
+        take prime_sum(a..b)
+        take squarefree_sum(a..b)
+    }
+
+    assert_eq(arr, [484, 333316, 964340, 61, 42492, 124463, 18387, 607895, 210018, 921468, 78483, 482193363512, 37550401695, 303961062170])
+}
+
+do {
+
+    var a = 50
+    var b = 100
+    var k = 2
+
+    var arr = gather {
+        take omega_primes(a..b, k)
+        take almost_primes(a..b, k)
+        take squarefree_almost_primes(a..b, k)
+        take primes(a..b)
+        take semiprimes(a..b)
+        take squarefree(a..b)
+        take composites(a..b)
+        take powerful(a..b, k)
+    }
+
+    var check = [
+        a..b -> grep { .is_omega_prime(k) },
+        a..b -> grep { .is_almost_prime(k) },
+        a..b -> grep { .is_almost_prime(k) && .is_squarefree }
+        a..b -> grep { .is_prime },
+        a..b -> grep { .is_semiprime },
+        a..b -> grep { .is_squarefree },
+        a..b -> grep { .is_composite },
+        a..b -> grep { .is_powerful(k) }
+    ]
+
+    [arr, check].zip {|a,b|
+        assert_eq(a,b)
+    }
+}
+
 say "** Test passed!"
