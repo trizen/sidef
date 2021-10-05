@@ -107,7 +107,7 @@ do {
 }
 
 assert_eq(
-    1..100 `by` 2 -> composites,
+    1..100 `by` 2 -> composites.to_a,
     composites(1, 100).grep { .is_odd }
 )
 

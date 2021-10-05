@@ -1,0 +1,212 @@
+#!/usr/bin/ruby
+
+# Tests for some RangeNumber methods.
+
+do {
+
+    var methods1 = [
+                           :(
+                            each_name  => 'each_squarefree',
+                            arr_name   => 'squarefree',
+                            count_name => 'squarefree_count',
+                            sum_name   => 'squarefree_sum',
+                            predicate  => func(n) { n.is_squarefree },
+                           ),
+                           :(
+                            each_name  => 'each_semiprime',
+                            arr_name   => 'semiprimes',
+                            count_name => 'semiprime_count',
+                            predicate  => func(n) { n.is_semiprime },
+                           ),
+                           :(
+                            each_name  => 'each_composite',
+                            arr_name   => 'composites',
+                            count_name => 'composite_count',
+                            predicate  => func(n) { n.is_composite },
+                           ),
+                           :(
+                            each_name  => 'each_prime',
+                            arr_name   => 'primes',
+                            count_name => 'prime_count',
+                            sum_name   => 'prime_sum',
+                            predicate  => func(n) { n.is_prime },
+                           ),
+                    ]
+
+    var methods2 = [
+                :(
+                 arr_name   => 'squarefree_almost_primes',
+                 each_name  => 'each_squarefree_almost_prime',
+                 count_name => 'squarefree_almost_prime_count',
+                 predicate  => func(k) { func(n) { n.is_squarefree && n.is_almost_prime(k) } },
+                ),
+                :(
+                 arr_name   => 'omega_primes',
+                 each_name  => 'each_omega_prime',
+                 count_name => 'omega_prime_count',
+                 predicate  => func(k) { func(n) { n.is_omega_prime(k) } },
+                ),
+                :(
+                 arr_name   => 'almost_primes',
+                 each_name  => 'each_almost_prime',
+                 count_name => 'almost_prime_count',
+                 predicate  => func(k) { func(n) { n.is_almost_prime(k) } },
+                ),
+                :(
+                 arr_name   => 'powerful',
+                 each_name  => 'each_powerful',
+                 count_name => 'powerful_count',
+                 predicate  => func(k) { func(n) { n.is_powerful(k) } },
+                ),
+                :(
+                 count_name => 'powerfree_count',
+                 sum_name   => 'powerfree_sum',
+                 predicate  => func(k) { func (n) { n.is_powerfree(k) } },
+                ),
+                :(
+                 count_name => 'smooth_count',
+                 predicate  => func(k) { func(n) { n.is_smooth(k) } },
+                ),
+                :(
+                 count_name => 'rough_count',
+                 predicate  => func(k) { func (n) { n.is_rough(k) } },
+                ),
+            ]
+
+    var a = irand(50, 100)
+    var b = (a + 200.irand)
+    var r = [2,3].rand
+    var k = [2,3].rand
+
+    say ":: Testing range: #{a} .. #{b} with r = #{r} and k = #{k}"
+
+    var range1 = (a..b)
+    var range2 = (a..b -> flip)
+    var range3 = (a..b `by` r)
+    var range4 = (a..b `by` r -> flip)
+
+    methods1.each {|m|
+
+        for name in (%w(arr_name count_name sum_name)) {
+            m.has(name) || next
+
+            var value1 = RangeNumber.method(m{name})(range1)
+            var value2 = RangeNumber.method(m{name})(range2)
+            var value3 = RangeNumber.method(m{name})(range3)
+            var value4 = RangeNumber.method(m{name})(range4)
+
+            assert_eq(
+                Number.method(m{name})(a, b),
+                value1
+            )
+
+            var check_value1 = (range1 -> grep(m{:predicate}))
+            var check_value2 = (range2 -> grep(m{:predicate}))
+            var check_value3 = (range3 -> grep(m{:predicate}))
+            var check_value4 = (range4 -> grep(m{:predicate}))
+
+            if (name == :arr_name) {
+                assert_eq(value1.to_a, check_value1)
+                assert_eq(value2.to_a, check_value2)
+                assert_eq(value3.to_a, check_value3)
+                assert_eq(value4.to_a, check_value4)
+            }
+
+            if (name == :count_name) {
+                assert_eq(value1, check_value1.len)
+                assert_eq(value2, check_value2.len)
+                assert_eq(value3, check_value3.len)
+                assert_eq(value4, check_value4.len)
+            }
+
+            if (name == :sum_name) {
+                assert_eq(value1, check_value1.sum)
+                assert_eq(value2, check_value2.sum)
+                assert_eq(value3, check_value3.sum)
+                assert_eq(value4, check_value4.sum)
+            }
+        }
+
+        if (m.has(:each_name)) {
+
+            var value1 = gather { RangeNumber.method(m{:each_name})(range1, {|n| take(n) }) }
+            var value2 = gather { RangeNumber.method(m{:each_name})(range2, {|n| take(n) }) }
+            var value3 = gather { RangeNumber.method(m{:each_name})(range3, {|n| take(n) }) }
+            var value4 = gather { RangeNumber.method(m{:each_name})(range4, {|n| take(n) }) }
+
+            assert_eq(
+                value1,
+                gather { Number.method(m{:each_name})(a, b, {|n| take(n) }) }
+            )
+
+            assert_eq(value1, range1.grep(m{:predicate}))
+            assert_eq(value2, range2.grep(m{:predicate}))
+            assert_eq(value3, range3.grep(m{:predicate}))
+            assert_eq(value4, range4.grep(m{:predicate}))
+        }
+    }
+
+    methods2.each {|m|
+
+        for name in (%w(arr_name count_name sum_name)) {
+
+            m.has(name) || next
+
+            var value1 = RangeNumber.method(m{name})(range1, k)
+            var value2 = RangeNumber.method(m{name})(range2, k)
+            var value3 = RangeNumber.method(m{name})(range3, k)
+            var value4 = RangeNumber.method(m{name})(range4, k)
+
+            assert_eq(
+                Number.method(m{name})(k, a, b),
+                value1
+            )
+
+            var check_value1 = (range1 -> grep(m{:predicate}(k)))
+            var check_value2 = (range2 -> grep(m{:predicate}(k)))
+            var check_value3 = (range3 -> grep(m{:predicate}(k)))
+            var check_value4 = (range4 -> grep(m{:predicate}(k)))
+
+            if (name == :arr_name) {
+                assert_eq(value1.to_a, check_value1)
+                assert_eq(value2.to_a, check_value2)
+                assert_eq(value3.to_a, check_value3)
+                assert_eq(value4.to_a, check_value4)
+            }
+
+            if (name == :count_name) {
+                assert_eq(value1, check_value1.len)
+                assert_eq(value2, check_value2.len)
+                assert_eq(value3, check_value3.len)
+                assert_eq(value4, check_value4.len)
+            }
+
+            if (name == :sum_name) {
+                assert_eq(value1, check_value1.sum)
+                assert_eq(value2, check_value2.sum)
+                assert_eq(value3, check_value3.sum)
+                assert_eq(value4, check_value4.sum)
+            }
+        }
+
+        if (m.has(:each_name)) {
+
+            var value1 = gather { RangeNumber.method(m{:each_name})(range1, k, {|n| take(n) }) }
+            var value2 = gather { RangeNumber.method(m{:each_name})(range2, k, {|n| take(n) }) }
+            var value3 = gather { RangeNumber.method(m{:each_name})(range3, k, {|n| take(n) }) }
+            var value4 = gather { RangeNumber.method(m{:each_name})(range4, k, {|n| take(n) }) }
+
+            assert_eq(
+                value1,
+                gather { Number.method(m{:each_name})(k, a, b, {|n| take(n) }) }
+            )
+
+            assert_eq(value1, range1.grep(m{:predicate}(k)))
+            assert_eq(value2, range2.grep(m{:predicate}(k)))
+            assert_eq(value3, range3.grep(m{:predicate}(k)))
+            assert_eq(value4, range4.grep(m{:predicate}(k)))
+        }
+    }
+}
+
+say "** Test passed!"

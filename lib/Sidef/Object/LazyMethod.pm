@@ -5,7 +5,7 @@ package Sidef::Object::LazyMethod {
 
     use parent qw(
       Sidef::Object::Object
-      );
+    );
 
     our $AUTOLOAD;
 
@@ -58,6 +58,7 @@ package Sidef::Object::LazyMethod {
 
             my $code = UNIVERSAL::can($obj, $method);
             @_ = (@{$call->{args}}, @args);
+            $code // die "[ERROR] Can't call an undefined method for <<$obj>>!";
             goto $code;
         }
 

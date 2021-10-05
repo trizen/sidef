@@ -480,4 +480,15 @@ assert_eq(65.almost_primes(2**65 - 1e12, 2**65 + 1e12), %n[36893488147419103232]
 assert_eq(16.omega_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
 assert_eq(16.squarefree_almost_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
 
+# Solve linear congruence
+for a in (1..10), b in (1..10), c in (1..10) {
+
+    var x = solve_lcg(a,b,c)
+
+    if (!x.is_nan) {
+        assert_eq(a*x % c, b % c)
+        assert(is_congruent(a*x, b, c), [a,b,c])
+    }
+}
+
 say "** Tests passed!"

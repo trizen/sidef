@@ -305,144 +305,8 @@ package Sidef::Types::Range::RangeNumber {
         $self->to_a->bsearch_ge($block);
     }
 
-    sub primes {
-        my ($self) = @_;
-
-        if ($self->{step}->abs->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            if ($self->{step}->is_neg) {
-                return Sidef::Types::Number::Number::primes($right, $left)->flip;
-            }
-
-            return Sidef::Types::Number::Number::primes($left, $right);
-        }
-
-        $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_prime }));
-    }
-
-    sub composites {
-        my ($self) = @_;
-
-        if ($self->{step}->abs->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            if ($self->{step}->is_neg) {
-                return Sidef::Types::Number::Number::composites($right, $left)->flip;
-            }
-
-            return Sidef::Types::Number::Number::composites($left, $right);
-        }
-
-        $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_composite }));
-    }
-
-    sub squarefree {
-        my ($self) = @_;
-
-        if ($self->{step}->abs->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            if ($self->{step}->is_neg) {
-                return Sidef::Types::Number::Number::squarefree($right, $left)->flip;
-            }
-
-            return Sidef::Types::Number::Number::squarefree($left, $right);
-        }
-
-        $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_squarefree }));
-    }
-
-    sub semiprimes {
-        my ($self) = @_;
-
-        if ($self->{step}->abs->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            if ($self->{step}->is_neg) {
-                return Sidef::Types::Number::Number::semiprimes($right, $left)->flip;
-            }
-
-            return Sidef::Types::Number::Number::semiprimes($left, $right);
-        }
-
-        $self->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_semiprime }));
-    }
-
-    sub each_prime {
-        my ($self, $block) = @_;
-
-        if ($self->{step}->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            Sidef::Types::Number::Number::each_prime($left, $right, $block);
-            return $self;
-        }
-
-        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_prime }))->each($block);
-        return $self;
-    }
-
-    sub each_composite {
-        my ($self, $block) = @_;
-
-        if ($self->{step}->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            Sidef::Types::Number::Number::each_composite($left, $right, $block);
-            return $self;
-        }
-
-        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_composite }))->each($block);
-        return $self;
-    }
-
-    sub each_semiprime {
-        my ($self, $block) = @_;
-
-        if ($self->{step}->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            Sidef::Types::Number::Number::each_semiprime($left, $right, $block);
-            return $self;
-        }
-
-        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_semiprime }))->each($block);
-        return $self;
-    }
-
-    sub each_squarefree {
-        my ($self, $block) = @_;
-
-        if ($self->{step}->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            Sidef::Types::Number::Number::each_squarefree($left, $right, $block);
-            return $self;
-        }
-
-        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_squarefree }))->each($block);
-        return $self;
-    }
-
-    sub each_powerful {
-        my ($self, $k, $block) = @_;
+    sub faulhaber_sum {
+        my ($self, $k) = @_;
 
         $k = Sidef::Types::Number::Number->new($k);
 
@@ -451,68 +315,13 @@ package Sidef::Types::Range::RangeNumber {
             my $left  = Sidef::Types::Number::Number->new($self->{from});
             my $right = Sidef::Types::Number::Number->new($self->{to});
 
-            Sidef::Types::Number::Number::each_powerful($k, $left, $right, $block);
-            return $self;
+            return Sidef::Types::Number::Number::faulhaber_range($left, $right, $k);
         }
 
-        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_powerful($k) }))->each($block);
-        return $self;
+        $self->lazy->map(Sidef::Types::Block::Block->new(code => sub { $_[0]->ipow($k) }))->sum;
     }
 
-    sub each_almost_prime {
-        my ($self, $k, $block) = @_;
-
-        $k = Sidef::Types::Number::Number->new($k);
-
-        if ($self->{step}->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            Sidef::Types::Number::Number::each_almost_prime($k, $left, $right, $block);
-            return $self;
-        }
-
-        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_almost_prime($k) }))->each($block);
-        return $self;
-    }
-
-    sub each_omega_prime {
-        my ($self, $k, $block) = @_;
-
-        $k = Sidef::Types::Number::Number->new($k);
-
-        if ($self->{step}->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            Sidef::Types::Number::Number::each_omega_prime($k, $left, $right, $block);
-            return $self;
-        }
-
-        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_omega_prime($k) }))->each($block);
-        return $self;
-    }
-
-    sub each_squarefree_almost_prime {
-        my ($self, $k, $block) = @_;
-
-        $k = Sidef::Types::Number::Number->new($k);
-
-        if ($self->{step}->is_one) {
-
-            my $left  = Sidef::Types::Number::Number->new($self->{from});
-            my $right = Sidef::Types::Number::Number->new($self->{to});
-
-            Sidef::Types::Number::Number::each_squarefree_almost_prime($k, $left, $right, $block);
-            return $self;
-        }
-
-        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_squarefree && $_[0]->is_almost_prime($k) }))
-          ->each($block);
-        return $self;
-    }
+    *faulhaber = \&faulhaber_sum;
 
     sub dump {
         my ($self) = @_;
@@ -521,6 +330,285 @@ package Sidef::Types::Range::RangeNumber {
 
     *to_s   = \&dump;
     *to_str = \&dump;
+
+    {
+        no strict 'refs';
+
+        {
+            my @methods = (
+                           {
+                            each_name  => 'each_squarefree',
+                            arr_name   => 'squarefree',
+                            count_name => 'squarefree_count',
+                            sum_name   => 'squarefree_sum',
+                            predicate  => sub { $_[0]->is_squarefree },
+                           },
+                           {
+                            each_name  => 'each_semiprime',
+                            arr_name   => 'semiprimes',
+                            count_name => 'semiprime_count',
+                            predicate  => sub { $_[0]->is_semiprime },
+                           },
+                           {
+                            each_name  => 'each_composite',
+                            arr_name   => 'composites',
+                            count_name => 'composite_count',
+                            predicate  => sub { $_[0]->is_composite },
+                           },
+                           {
+                            each_name  => 'each_prime',
+                            arr_name   => 'primes',
+                            count_name => 'prime_count',
+                            sum_name   => 'prime_sum',
+                            predicate  => sub { $_[0]->is_prime },
+                           },
+                          );
+
+            foreach my $method (@methods) {
+
+                # Each
+                if (defined($method->{each_name})) {
+                    *{__PACKAGE__ . '::' . $method->{each_name}} = sub {
+                        my ($self, $block) = @_;
+
+                        if ($self->{step}->is_one) {
+
+                            my $left  = Sidef::Types::Number::Number->new($self->{from});
+                            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+                            &{'Sidef::Types::Number::Number::' . $method->{each_name}}($left, $right, $block);
+                            return $self;
+                        }
+
+                        $self->lazy->grep(Sidef::Types::Block::Block->new(code => $method->{predicate}))->each($block);
+                        return $self;
+                    };
+                }
+
+                # Array
+                if (defined($method->{arr_name})) {
+                    *{__PACKAGE__ . '::' . $method->{arr_name}} = sub {
+                        my ($self) = @_;
+
+                        if ($self->{step}->abs->is_one) {
+
+                            my $left  = Sidef::Types::Number::Number->new($self->{from});
+                            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+                            if ($self->{step}->is_neg) {
+                                return &{'Sidef::Types::Number::Number::' . $method->{arr_name}}($right, $left)->flip;
+                            }
+
+                            return &{'Sidef::Types::Number::Number::' . $method->{arr_name}}($left, $right);
+                        }
+
+                        $self->lazy->grep(Sidef::Types::Block::Block->new(code => $method->{predicate}));
+                    };
+                }
+
+                # Sum
+                if (defined($method->{sum_name})) {
+                    *{__PACKAGE__ . '::' . $method->{sum_name}} = sub {
+                        my ($self) = @_;
+
+                        if ($self->{step}->abs->is_one) {
+
+                            my $left  = Sidef::Types::Number::Number->new($self->{from});
+                            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+                            if ($self->{step}->is_neg) {
+                                ($right, $left) = ($left, $right);
+                            }
+
+                            return &{'Sidef::Types::Number::Number::' . $method->{sum_name}}($left, $right);
+                        }
+
+                        $self->lazy->grep(Sidef::Types::Block::Block->new(code => $method->{predicate}))->sum;
+                    };
+                }
+
+                # Count
+                if (defined($method->{count_name})) {
+                    *{__PACKAGE__ . '::' . $method->{count_name}} = sub {
+                        my ($self) = @_;
+
+                        if ($self->{step}->abs->is_one) {
+
+                            my $left  = Sidef::Types::Number::Number->new($self->{from});
+                            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+                            if ($self->{step}->is_neg) {
+                                ($right, $left) = ($left, $right);
+                            }
+
+                            return &{'Sidef::Types::Number::Number::' . $method->{count_name}}($left, $right);
+                        }
+
+                        $self->count_by(Sidef::Types::Block::Block->new(code => $method->{predicate}));
+                    };
+                }
+            }
+        }
+
+        {
+            my @methods = (
+                {
+                 arr_name   => 'squarefree_almost_primes',
+                 each_name  => 'each_squarefree_almost_prime',
+                 count_name => 'squarefree_almost_prime_count',
+                 predicate  => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_squarefree && $_[0]->is_almost_prime($k) };
+                 },
+                },
+                {
+                 arr_name   => 'omega_primes',
+                 each_name  => 'each_omega_prime',
+                 count_name => 'omega_prime_count',
+                 predicate  => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_omega_prime($k) };
+                 },
+                },
+                {
+                 arr_name   => 'almost_primes',
+                 each_name  => 'each_almost_prime',
+                 count_name => 'almost_prime_count',
+                 predicate  => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_almost_prime($k) };
+                 },
+                },
+                {
+                 arr_name   => 'powerful',
+                 each_name  => 'each_powerful',
+                 count_name => 'powerful_count',
+                 predicate  => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_powerful($k) };
+                 },
+                },
+                {
+                 count_name => 'powerfree_count',
+                 sum_name   => 'powerfree_sum',
+                 predicate  => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_powerfree($k) };
+                 },
+                },
+                {
+                 count_name => 'smooth_count',
+                 predicate  => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_smooth($k) };
+                 },
+                },
+                {
+                 count_name => 'rough_count',
+                 predicate  => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_rough($k) };
+                 },
+                },
+            );
+
+            foreach my $method (@methods) {
+
+                # Each
+                if (defined($method->{each_name})) {
+                    *{__PACKAGE__ . '::' . $method->{each_name}} = sub {
+                        my ($self, $k, $block) = @_;
+
+                        $k = Sidef::Types::Number::Number->new($k);
+
+                        if ($self->{step}->is_one) {
+
+                            my $left  = Sidef::Types::Number::Number->new($self->{from});
+                            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+                            &{'Sidef::Types::Number::Number::' . $method->{each_name}}($k, $left, $right, $block);
+                            return $self;
+                        }
+
+                        $self->lazy->grep(Sidef::Types::Block::Block->new(code => $method->{predicate}->($k)))->each($block);
+                        return $self;
+                    };
+                }
+
+                # Array
+                if (defined($method->{arr_name})) {
+                    *{__PACKAGE__ . '::' . $method->{arr_name}} = sub {
+                        my ($self, $k) = @_;
+
+                        $k = Sidef::Types::Number::Number->new($k);
+
+                        if ($self->{step}->abs->is_one) {
+
+                            my $left  = Sidef::Types::Number::Number->new($self->{from});
+                            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+                            if ($self->{step}->is_neg) {
+                                return &{'Sidef::Types::Number::Number::' . $method->{arr_name}}($k, $right, $left)->flip;
+                            }
+
+                            return &{'Sidef::Types::Number::Number::' . $method->{arr_name}}($k, $left, $right);
+                        }
+
+                        $self->lazy->grep(Sidef::Types::Block::Block->new(code => $method->{predicate}->($k)));
+                    };
+                }
+
+                # Sum
+                if (defined($method->{sum_name})) {
+                    *{__PACKAGE__ . '::' . $method->{sum_name}} = sub {
+                        my ($self, $k) = @_;
+
+                        $k = Sidef::Types::Number::Number->new($k);
+
+                        if ($self->{step}->abs->is_one) {
+
+                            my $left  = Sidef::Types::Number::Number->new($self->{from});
+                            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+                            if ($self->{step}->is_neg) {
+                                ($right, $left) = ($left, $right);
+                            }
+
+                            return &{'Sidef::Types::Number::Number::' . $method->{sum_name}}($k, $left, $right);
+                        }
+
+                        $self->lazy->grep(Sidef::Types::Block::Block->new(code => $method->{predicate}->($k)))->sum;
+                    };
+                }
+
+                # Count
+                if (defined($method->{count_name})) {
+
+                    *{__PACKAGE__ . '::' . $method->{count_name}} = sub {
+                        my ($self, $k) = @_;
+
+                        $k = Sidef::Types::Number::Number->new($k);
+
+                        if ($self->{step}->abs->is_one) {
+
+                            my $left  = Sidef::Types::Number::Number->new($self->{from});
+                            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+                            if ($self->{step}->is_neg) {
+                                ($right, $left) = ($left, $right);
+                            }
+
+                            return &{'Sidef::Types::Number::Number::' . $method->{count_name}}($k, $left, $right);
+                        }
+
+                        $self->count_by(Sidef::Types::Block::Block->new(code => $method->{predicate}->($k)));
+                    };
+
+                }
+            }
+        }
+
+    }
 }
 
 1;

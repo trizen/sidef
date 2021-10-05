@@ -41,6 +41,107 @@ package Sidef::Object::Lazy {
         $self;
     }
 
+    sub _fast_reduce {
+        my ($self, $method, $result, $callback) = @_;
+
+        my @list;
+        my $count = 0;
+        my $index = 0;
+
+        $self->_xs(
+            sub {
+                CORE::push(@list, $callback->($index++, @_));
+
+                if (++$count > 1e5) {
+                    $count  = 0;
+                    $result = $result->$method(CORE::splice(@list));
+                }
+            }
+        );
+
+        if (@list) {
+            $result = $result->$method(CORE::splice(@list));
+        }
+
+        $result;
+    }
+
+    sub reduce_by {
+        my ($self, $block, $result) = @_;
+
+        $self->_xs(
+            sub {
+                if (defined($result)) {
+                    $result = $block->run($result, @_);
+                }
+                else {
+                    $result = $_[0];
+                }
+                0;
+            }
+        );
+
+        return $result;
+    }
+
+    sub reduce {
+        my ($self, $operator, $result) = @_;
+
+        if (ref($operator) eq 'Sidef::Types::Block::Block') {
+            goto &reduce_by;
+        }
+
+        $operator = "$operator";
+        $self->_xs(
+            sub {
+                if (defined($result)) {
+                    $result = $result->$operator(@_);
+                }
+                else {
+                    $result = $_[0];
+                }
+                0;
+            }
+        );
+        return $result;
+    }
+
+    sub sum {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_fast_reduce('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
+    }
+
+    *sum_by = \&sum;
+
+    sub prod {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_fast_reduce('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
+    }
+
+    *prod_by = \&prod;
+
+    sub sum_kv {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_fast_reduce(
+            'sum',
+            Sidef::Types::Number::Number::ZERO,
+            sub {
+                $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]);
+            }
+        );
+    }
+
+    sub prod_kv {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_fast_reduce('prod',
+                            Sidef::Types::Number::Number::ONE,
+                            sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
+    }
+
     sub iter {
         my ($self) = @_;
 

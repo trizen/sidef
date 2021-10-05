@@ -8493,7 +8493,7 @@ package Sidef::Types::Number::Number {
 
         my $z = Math::GMPz::Rmpz_init();
 
-        if ($n >= 40000) {
+        if ($n >= 30000) {
 
             state $logtau = CORE::log(6.28318530717958647692528676655900576839433879875);
 
@@ -14347,25 +14347,25 @@ package Sidef::Types::Number::Number {
     }
 
     sub sum_primes {
-        my ($x, $y) = @_;
+        my ($from, $to) = @_;
 
-        if (defined($y)) {
-            _valid(\$y);
-            $x = _big2istr($x) // return ZERO;
-            $x = 2 if $x < 2;
-            $y = _big2uistr($y) // return ZERO;
+        if (defined($to)) {
+            _valid(\$to);
+            $from = _big2istr($from) // return ZERO;
+            $from = 2 if $from < 2;
+            $to   = _big2uistr($to) // return ZERO;
         }
         else {
-            $y = _big2uistr($x) // return ZERO;
-            $x = 2;
+            $to   = _big2uistr($from) // return ZERO;
+            $from = 2;
         }
 
         if (HAS_PRIME_UTIL) {
-            my $r = Math::Prime::Util::sum_primes($x, $y);
+            my $r = Math::Prime::Util::sum_primes($from, $to);
             return _set_int("$r");
         }
 
-        _set_int(Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::sieve_primes($x, $y)));
+        _set_int(Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::sieve_primes($from, $to)));
     }
 
     *prime_sum  = \&sum_primes;
