@@ -91,6 +91,58 @@ Returns the
 
 =cut
 
+=head2 prod
+
+    Lazy.prod()
+
+Returns the
+
+Aliases: I<prod_by>
+
+=cut
+
+=head2 prod_kv
+
+    Lazy.prod_kv()
+
+Returns the
+
+=cut
+
+=head2 reduce
+
+    Lazy.reduce()
+
+Returns the
+
+=cut
+
+=head2 reduce_by
+
+    Lazy.reduce_by()
+
+Returns the
+
+=cut
+
+=head2 sum
+
+    Lazy.sum()
+
+Returns the
+
+Aliases: I<sum_by>
+
+=cut
+
+=head2 sum_kv
+
+    Lazy.sum_kv()
+
+Returns the
+
+=cut
+
 =head2 to_a
 
     Lazy.to_a()

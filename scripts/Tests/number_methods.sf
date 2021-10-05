@@ -491,4 +491,14 @@ for a in (1..10), b in (1..10), c in (1..10) {
     }
 }
 
+do {
+
+    var n = 5040
+    var D = n.divisors
+
+    for k in (0..4) {
+        assert_eq(k.powerfree_divisors(n), D.grep{ .is_powerfree(k) })
+    }
+}
+
 say "** Tests passed!"

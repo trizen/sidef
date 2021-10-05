@@ -15594,30 +15594,46 @@ package Sidef::Types::Number::Number {
     *prime_power_unitary_divisors = \&prime_power_udivisors;
     *unitary_prime_power_divisors = \&prime_power_udivisors;
 
-    sub squarefree_divisors {
+    sub powerfree_divisors {
+        my ($k, $n) = @_;
 
-        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
+        _valid(\$n);
+
+        my $n = _big2pistr($$n) // return Sidef::Types::Array::Array->new();
+        my $k = _any2ui($$k) || return Sidef::Types::Array::Array->new();
+
+        if ($k == 1) {
+            return Sidef::Types::Array::Array->new([ONE]);
+        }
 
         my @d;
         foreach my $pe (_factor_exp($n)) {
 
             my ($p, $e) = @$pe;
 
-            $p = (
-                  $p < ULONG_MAX
-                  ? Math::GMPz::Rmpz_init_set_ui($p)
-                  : Math::GMPz::Rmpz_init_set_str("$p", 10)
-                 );
+            $p =
+              ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_init_set_ui($p)
+              : Math::GMPz::Rmpz_init_set_str("$p", 10);
+
+            if ($k <= $e) {
+                $e = $k - 1;
+            }
 
             my @t;
-            foreach my $d (@d) {
-                my $t = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_mul($t, $d, $p);
-                push @t, $t;
+            my $r = Math::GMPz::Rmpz_init_set_ui(1);
+
+            foreach my $i (1 .. $e) {
+                Math::GMPz::Rmpz_mul($r, $r, $p);
+                foreach my $d (@d) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $r, $d);
+                    push @t, $t;
+                }
+                push @t, Math::GMPz::Rmpz_init_set($r);
             }
 
             push @d, @t;
-            push @d, $p;
         }
 
         @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
@@ -15626,6 +15642,10 @@ package Sidef::Types::Number::Number {
         unshift @d, ONE;
 
         Sidef::Types::Array::Array->new(\@d);
+    }
+
+    sub squarefree_divisors {
+        (TWO)->powerfree_divisors($_[0]);
     }
 
     sub power_divisors {

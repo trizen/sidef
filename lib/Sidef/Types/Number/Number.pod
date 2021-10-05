@@ -5270,6 +5270,17 @@ It efficiently counts the number of k-powerfree numbers <= n, or in the range C<
 
 =cut
 
+=head2 powerfree_divisors
+
+    k.powerfree_divisors(n)
+
+Returns an array with the k-powerfree divisors of n.
+
+    say 2.powerfree_divisors(5040)      # squarefree divisors of 5040
+    say 3.powerfree_divisors(5040)      # cubefree divisors of 5040
+
+=cut
+
 =head2 powerfree_part
 
     k.powerfree_part(n)

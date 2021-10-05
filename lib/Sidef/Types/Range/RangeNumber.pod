@@ -43,6 +43,22 @@ Aliases: I<sum>
 
 =cut
 
+=head2 almost_prime_count
+
+    RangeNumber.almost_prime_count()
+
+Returns the
+
+=cut
+
+=head2 almost_primes
+
+    RangeNumber.almost_primes()
+
+Returns the
+
+=cut
+
 =head2 avg
 
     RangeNumber.avg()
@@ -78,6 +94,14 @@ Returns the
 =head2 bsearch_le
 
     RangeNumber.bsearch_le()
+
+Returns the
+
+=cut
+
+=head2 composite_count
+
+    RangeNumber.composite_count()
 
 Returns the
 
@@ -155,6 +179,16 @@ Returns the
 
 =cut
 
+=head2 faulhaber
+
+    RangeNumber.faulhaber()
+
+Returns the
+
+Aliases: I<faulhaber_sum>
+
+=cut
+
 =head2 gcd
 
     RangeNumber.gcd()
@@ -205,9 +239,73 @@ Aliases: I<call>
 
 =cut
 
+=head2 omega_prime_count
+
+    RangeNumber.omega_prime_count()
+
+Returns the
+
+=cut
+
+=head2 omega_primes
+
+    RangeNumber.omega_primes()
+
+Returns the
+
+=cut
+
+=head2 powerfree_count
+
+    RangeNumber.powerfree_count()
+
+Returns the
+
+=cut
+
+=head2 powerfree_sum
+
+    RangeNumber.powerfree_sum()
+
+Returns the
+
+=cut
+
+=head2 powerful
+
+    RangeNumber.powerful()
+
+Returns the
+
+=cut
+
+=head2 powerful_count
+
+    RangeNumber.powerful_count()
+
+Returns the
+
+=cut
+
+=head2 prime_count
+
+    RangeNumber.prime_count()
+
+Returns the
+
+=cut
+
 =head2 primes
 
     RangeNumber.primes()
+
+Returns the
+
+=cut
+
+=head2 prime_sum
+
+    RangeNumber.prime_sum()
 
 Returns the
 
@@ -221,6 +319,22 @@ Returns the
 
 =cut
 
+=head2 rough_count
+
+    RangeNumber.rough_count()
+
+Returns the
+
+=cut
+
+=head2 semiprime_count
+
+    RangeNumber.semiprime_count()
+
+Returns the
+
+=cut
+
 =head2 semiprimes
 
     RangeNumber.semiprimes()
@@ -229,9 +343,49 @@ Returns the
 
 =cut
 
+=head2 smooth_count
+
+    RangeNumber.smooth_count()
+
+Returns the
+
+=cut
+
 =head2 squarefree
 
     RangeNumber.squarefree()
+
+Returns the
+
+=cut
+
+=head2 squarefree_almost_prime_count
+
+    RangeNumber.squarefree_almost_prime_count()
+
+Returns the
+
+=cut
+
+=head2 squarefree_almost_primes
+
+    RangeNumber.squarefree_almost_primes()
+
+Returns the
+
+=cut
+
+=head2 squarefree_count
+
+    RangeNumber.squarefree_count()
+
+Returns the
+
+=cut
+
+=head2 squarefree_sum
+
+    RangeNumber.squarefree_sum()
 
 Returns the
 
