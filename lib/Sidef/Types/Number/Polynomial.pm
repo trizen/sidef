@@ -129,6 +129,19 @@ package Sidef::Types::Number::Polynomial {
         Sidef::Types::String::String->new($x->__dump__);
     }
 
+    sub degree {
+        my ($x) = @_;
+        my $degree = 0;
+        foreach my $key (CORE::keys(%$x)) {
+            if ($key > $degree) {
+                if (!$x->{$key}->is_zero) {
+                    $degree = $key;
+                }
+            }
+        }
+        Sidef::Types::Number::Number::_set_int($degree);
+    }
+
     sub eval {
         my ($x, $value) = @_;
         CORE::keys(%$x) || return Sidef::Types::Number::Number::ZERO;

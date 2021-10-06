@@ -206,6 +206,14 @@ Returns the
 
 =cut
 
+=head2 degree
+
+    Polynomial.degree()
+
+Returns the
+
+=cut
+
 =head2 divmod
 
     Polynomial.divmod()
