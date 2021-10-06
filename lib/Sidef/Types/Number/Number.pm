@@ -12861,10 +12861,21 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
 
         __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+        $x = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
 
-        my $s = &_big2uistr // return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_sgn($x) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
 
-        Math::Prime::Util::GMP::is_semiprime($s)
+        my $result;
+
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($x)) {
+            $result = Math::Prime::Util::is_semiprime(Math::GMPz::Rmpz_get_ui($x));
+        }
+        else {
+            $result = Math::Prime::Util::GMP::is_semiprime(Math::GMPz::Rmpz_get_str($x, 10));
+        }
+
+        $result
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
