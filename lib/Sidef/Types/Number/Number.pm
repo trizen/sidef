@@ -15535,19 +15535,18 @@ package Sidef::Types::Number::Number {
         foreach my $pe (_factor_exp($n)) {
             my ($p, $e) = @$pe;
 
-            my $t = (
-                     ($p < ULONG_MAX)
-                     ? Math::GMPz::Rmpz_init_set_ui($p)
-                     : Math::GMPz::Rmpz_init_set_str("$p", 10)
-                    );
+            $p =
+              ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_init_set_ui($p)
+              : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
-            push @d, $t;
+            push @d, $p;
             next if ($e == 1);
 
-            Math::GMPz::Rmpz_set($u, $t);
+            Math::GMPz::Rmpz_set($u, $p);
 
             foreach my $i (2 .. $e) {
-                Math::GMPz::Rmpz_mul($u, $u, $t);
+                Math::GMPz::Rmpz_mul($u, $u, $p);
                 push @d, Math::GMPz::Rmpz_init_set($u);
             }
         }
@@ -15617,9 +15616,10 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new([ONE]);
         }
 
+        my $r = Math::GMPz::Rmpz_init();
+
         my @d;
         foreach my $pe (_factor_exp($n)) {
-
             my ($p, $e) = @$pe;
 
             $p =
@@ -15631,17 +15631,17 @@ package Sidef::Types::Number::Number {
                 $e = $k - 1;
             }
 
-            my @t;
-            my $r = Math::GMPz::Rmpz_init_set_ui(1);
+            Math::GMPz::Rmpz_set($r, $p);
 
+            my @t;
             foreach my $i (1 .. $e) {
-                Math::GMPz::Rmpz_mul($r, $r, $p);
                 foreach my $d (@d) {
                     my $t = Math::GMPz::Rmpz_init();
                     Math::GMPz::Rmpz_mul($t, $r, $d);
                     push @t, $t;
                 }
                 push @t, Math::GMPz::Rmpz_init_set($r);
+                Math::GMPz::Rmpz_mul($r, $r, $p) if ($i < $e);
             }
 
             push @d, @t;

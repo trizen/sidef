@@ -236,7 +236,7 @@ Returns the
 
 Returns the
 
-Aliases: I<denominator>
+Aliases: I<den>, I<denominator>
 
 =cut
 
@@ -304,7 +304,7 @@ Aliases: I<call>
 
 Returns the
 
-Aliases: I<numerator>
+Aliases: I<num>, I<numerator>
 
 =cut
 

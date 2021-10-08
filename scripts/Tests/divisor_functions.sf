@@ -64,4 +64,14 @@ for n in (0..50) {
 assert_eq(5040.sigma(-1), 5040.divisors.sum {|d| d**(-1) })
 assert_eq( 10!.sigma(-2),  10!.divisors.sum {|d| d**(-2) })
 
+do {
+
+    var n = 5040
+    var D = n.divisors
+
+    for k in (0..4) {
+        assert_eq(k.powerfree_divisors(n), D.grep{ .is_powerfree(k) })
+    }
+}
+
 say "** Test passed!"

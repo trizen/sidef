@@ -60,12 +60,14 @@ package Sidef::Types::Number::Fraction {
         $_[0]->{a};
     }
 
+    *num       = \&nu;
     *numerator = \&nu;
 
     sub de {
         $_[0]->{b};
     }
 
+    *den         = \&de;
     *denominator = \&de;
 
     sub nude {
