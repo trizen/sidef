@@ -582,7 +582,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Returns true if C<a> is greather than or equal to C<b>.
+Returns true if C<a> is greater than or equal to C<b>.
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -1091,7 +1091,7 @@ Example:
 
     say 1234.bits       #=> [1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0]
 
-Equilvalent with:
+Equivalent with:
 
     n.digits(2).flip
 
@@ -1176,7 +1176,7 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<n
     bsearch_max(n, {...})
     bsearch_max(a,b, {...})
 
-Binary search, returning the largest integer value in the range C<a..b> that satisifes the given comparison function.
+Binary search, returning the largest integer value in the range C<a..b> that satisfies the given comparison function.
 
 Example:
 
@@ -1193,7 +1193,7 @@ where:
     bsearch_min(n, {...})
     bsearch_min(a,b, {...})
 
-Binary search, returning the smallest integer value in the range C<a..b> that satisifes the given comparison function.
+Binary search, returning the smallest integer value in the range C<a..b> that satisfies the given comparison function.
 
 Example:
 
@@ -1712,7 +1712,7 @@ Hyperbolic cosecant function.
 
     csub(a,b,x,y)
 
-Complex arithmetic subtration, defined as:
+Complex arithmetic subtraction, defined as:
 
     csub(a,b,x,y)   #=> (a-x, b-y)
 
@@ -2139,7 +2139,7 @@ Example:
         say p
     }
 
-It's consirably faster than using the C<next_prime(n)> method.
+It's considerably faster than using the C<next_prime(n)> method.
 
 Aliases: I<primes_each>
 
@@ -2601,7 +2601,7 @@ Example:
 
 Tries to find a factor of C<n>, using a new factorization method, inspired by Fermat's Little Theorem (FLT).
 
-The method is particularily effective for numbers that have factors closed to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
+The method is particularly effective for numbers that have factors closed to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
 
 Example (try with base 3 and give up after 10^6 iterations):
 
@@ -3579,7 +3579,7 @@ Aliases: I<is_lucas_pseudoprime>
 
     n.is_lucasv_psp(P=1, Q=-1)
 
-Returns true if C<n> passes the Lucas test to the C<V> sequence, using the paramters C<P> and C<Q>.
+Returns true if C<n> passes the Lucas test to the C<V> sequence, using the parameters C<P> and C<Q>.
 
 Example:
 
@@ -4602,7 +4602,7 @@ When an additional argument is given, the returned result is:
 
 Example:
 
-    say mertens(100000)     # equilvanet with: (1..100000 -> sum { .moebius })
+    say mertens(100000)     # equivalent with: (1..100000 -> sum { .moebius })
     say mertens(21, 123)    # equivalent with: (21..123 -> sum { .moebius })
 
 =cut
@@ -4741,7 +4741,7 @@ Aliases: I<ncomposites>, I<next_composites>
     n.rd({...})
     n.th({...})
 
-It returns the n-th value for which the provided block evaluates to a true value, starting couting from 0.
+It returns the n-th value for which the provided block evaluates to a true value, starting counting from 0.
 
 Example:
 
@@ -4889,7 +4889,7 @@ Example:
     say n_primes(10)        #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
     say n_primes(10, 1000)  #=> [1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061]
 
-The value for C<start> can be any arbitary large integer:
+The value for C<start> can be any arbitrarily large integer:
 
     say n_primes(10, 2**128 + 1)    # first 10 primes > 2^128
 
@@ -6034,7 +6034,7 @@ Example:
     say 97.rough_count(1e6)    #=> 122005
     say 23.rough_count(1e9)    #=> 171024023
 
-Also works with arbitarily large n:
+Also works with arbitrarily large n:
 
     say 43.rough_count(1e34)   #=> 1450936704022016442012254601096989
 
@@ -6248,7 +6248,7 @@ Example:
 
     say solve_lcg(143, 44, 231)     #=> 10
 
-Return C<NaN> when no solution exists (i.e.: when C<r> is not divisbile by C<gcd(n, m)>).
+Return C<NaN> when no solution exists (i.e.: when C<r> is not divisible by C<gcd(n, m)>).
 
 Aliases: I<solve_linear_congruence>
 
@@ -6680,7 +6680,7 @@ Example:
 
     submod(a,b,m)
 
-Modular intger subtraction: C<(a-b)%m>.
+Modular integer subtraction: C<(a-b)%m>.
 
 Example:
 

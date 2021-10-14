@@ -229,6 +229,14 @@ Returns the
 
 =cut
 
+=head2 mertens
+
+    RangeNumber.mertens()
+
+Returns the
+
+=cut
+
 =head2 new
 
     RangeNumber.new()

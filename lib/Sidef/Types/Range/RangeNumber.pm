@@ -323,6 +323,21 @@ package Sidef::Types::Range::RangeNumber {
 
     *faulhaber = \&faulhaber_sum;
 
+    sub mertens {
+        my ($self) = @_;
+
+        if ($self->{step}->is_one) {
+
+            my $left  = Sidef::Types::Number::Number->new($self->{from});
+            my $right = Sidef::Types::Number::Number->new($self->{to});
+
+            return Sidef::Types::Number::Number::mertens($left, $right);
+        }
+
+        $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_squarefree }))
+          ->map(Sidef::Types::Block::Block->new(code => sub { $_[0]->moebius }))->sum;
+    }
+
     sub dump {
         my ($self) = @_;
         Sidef::Types::String::String->new("$self");

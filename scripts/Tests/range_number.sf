@@ -272,4 +272,10 @@ do {
     }
 }
 
+assert_eq(faulhaber_range(1e5, 1e10, 5), faulhaber(1e5..1e10, 5))
+assert_eq(sum(50..1e3 `by` 5, { _**3 }), faulhaber(50..1e3 `by` 5, 3))
+
+assert_eq(mertens(1e5, 1e8), mertens(1e5..1e8))
+assert_eq(sum(50..1e3 `by` 5, { .moebius }), mertens(50..1e3 `by` 5))
+
 say "** Test passed!"
