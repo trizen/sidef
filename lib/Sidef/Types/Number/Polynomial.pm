@@ -172,6 +172,23 @@ package Sidef::Types::Number::Polynomial {
         );
     }
 
+    sub binomial {
+        my ($n, $k) = @_;
+
+        my $k_int = CORE::int($k);
+        my @terms;
+
+        foreach my $i (0 .. $k_int - 1) {
+            push @terms, $n;
+            $n = $n->dec;
+        }
+
+        @terms || return __PACKAGE__->new(0 => Sidef::Types::Number::Number::ONE);
+
+        my $prod = Sidef::Types::Number::Number::_binsplit(\@terms, \&Sidef::Types::Number::Polynomial::mul);
+        $prod->div($k->factorial);
+    }
+
     sub neg {
         my ($x) = @_;
         __PACKAGE__->new(map { $_ => $x->{$_}->neg } CORE::keys %$x);

@@ -231,6 +231,12 @@ with (Poly(1 => 1)) {|x|
     assert_eq(a/b, Fraction(11*x**4 + x**3 + 3*x + 5, 3*x**2 + 14))
     assert_eq(floor(a/b), idiv(a,b))
     assert_eq(floor(Fraction(a,b)), (11/3)*x**2 + (1/3)*x - 154/9)
+
+    assert_eq(binomial(x, 0), Polynomial(0 => 1))
+    assert_eq(binomial(x, 1), Polynomial(1 => 1))
+    assert_eq(binomial(x, 2), Polynomial(1 => -1/2, 2 => 1/2))
+    assert_eq(binomial(x, 3), Polynomial(1 => 1/3, 2 => -1/2, 3 => 1/6))
+    assert_eq(binomial(x, 10), Polynomial(1 => -1/10, 2 => 7129/25200, 3 => -1303/4032, 4 => 4523/22680, 5 => -19/256, 6 => 3013/172800, 7 => -1/384, 8 => 29/120960, 9 => -1/80640, 10 => 1/3628800))
 }
 
 for n in (0..10) {

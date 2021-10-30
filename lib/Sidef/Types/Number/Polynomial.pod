@@ -182,6 +182,14 @@ Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
+=head2 binomial
+
+    Polynomial.binomial()
+
+Returns the
+
+=cut
+
 =head2 ceil
 
     Polynomial.ceil()
