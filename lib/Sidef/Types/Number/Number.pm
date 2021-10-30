@@ -940,7 +940,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        (HAS_PRIME_UTIL and $n < (ULONG_MAX - 1000))
+        (HAS_PRIME_UTIL and $n < (ULONG_MAX - 2000))
           ? Math::Prime::Util::next_prime($n)
           : Math::Prime::Util::GMP::next_prime($n);
     }
@@ -10122,7 +10122,7 @@ package Sidef::Types::Number::Number {
         }
 
         # Support for large integers (slow for wide ranges)
-        if ($y >= ULONG_MAX) {
+        if ($y >= ~0) {
 
             $x = Math::GMPz::Rmpz_init_set_str("$x", 10);
             $y = Math::GMPz::Rmpz_init_set_str("$y", 10);
@@ -11063,7 +11063,7 @@ package Sidef::Types::Number::Number {
         }
 
         # Support for arbitrary large integers (slow for wide ranges)
-        if ($y >= ULONG_MAX and !HAS_PRIME_UTIL) {
+        if ($y >= ~0 and !HAS_PRIME_UTIL) {
             my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
             return $prime_count;
         }
@@ -14499,6 +14499,8 @@ package Sidef::Types::Number::Number {
     sub core {    # A007913
         (TWO)->powerfree_part($_[0]);
     }
+
+    *squarefree_part = \&core;
 
     sub powerfree_part_sum {
         my ($k, $from, $to) = @_;

@@ -1630,6 +1630,8 @@ Example:
 
 Equivalent to PARI/GP C<core(n)> function.
 
+Aliases: I<squarefree_part>
+
 =cut
 
 =head2 cos
