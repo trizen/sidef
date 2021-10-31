@@ -928,6 +928,23 @@ package Sidef::Types::Number::Number {
           : Math::Prime::Util::GMP::is_prob_prime($n);
     }
 
+    sub _is_squarefree {
+        my ($n) = @_;
+
+        if (ref($n) eq 'Math::GMPz') {
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                $n = Math::GMPz::Rmpz_get_ui($n);
+            }
+            else {
+                $n = Math::GMPz::Rmpz_get_str($n, 10);
+            }
+        }
+
+        (HAS_PRIME_UTIL and $n < ULONG_MAX)
+          ? Math::Prime::Util::is_square_free($n)
+          : (Math::Prime::Util::GMP::moebius($n) != 0);
+    }
+
     sub _next_prime {
         my ($n) = @_;
 
@@ -12272,7 +12289,7 @@ package Sidef::Types::Number::Number {
 
                 ((($v & 1) == 1) || !Math::GMPz::Rmpz_congruent_ui_p($t, 7, 8)) || return 0;
 
-                if ((bless \$n)->is_squarefree) {
+                if (_is_squarefree($n)) {
 
                     if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
                         my $count = 0;
@@ -14408,6 +14425,7 @@ package Sidef::Types::Number::Number {
 
     sub next_composite {
         my ($n) = @_;
+
         $n = _any2mpz($$n) // goto &nan;
 
         Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
@@ -14429,6 +14447,34 @@ package Sidef::Types::Number::Number {
         }
 
         if (_is_prob_prime($r)) {
+            Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        }
+
+        bless \$r;
+    }
+
+    sub next_squarefree {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
+        $sgn < 0  and goto &nan;
+        $sgn == 0 and return ONE;
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_slong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) + 1;
+            while (!_is_squarefree($n)) {
+                ++$n;
+            }
+            return _set_int($n);
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add_ui($r, $n, 1);
+
+        while (!(bless(\$r)->is_squarefree)) {
             Math::GMPz::Rmpz_add_ui($r, $r, 1);
         }
 
@@ -18359,15 +18405,7 @@ package Sidef::Types::Number::Number {
 
         $z = _big2uistr($z) // return Sidef::Types::Bool::Bool::FALSE;
 
-        if (HAS_PRIME_UTIL and $z < ULONG_MAX) {
-            return (
-                    Math::Prime::Util::is_square_free($z)
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
-        }
-
-        Math::Prime::Util::GMP::moebius($z)
+        _is_squarefree($z)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }

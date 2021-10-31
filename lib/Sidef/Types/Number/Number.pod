@@ -4837,6 +4837,14 @@ Returns the next prime larger than C<n>.
 
 =cut
 
+=head2 next_squarefree
+
+    n.next_squarefree
+
+Returns the next squarefree integer larger than C<n>.
+
+=cut
+
 =head2 next_twin_prime
 
     n.next_twin_prime
