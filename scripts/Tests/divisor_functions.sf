@@ -74,7 +74,7 @@ do {
     }
 }
 
-do {
+do {    # bi-unitary divisors
     func udivs(n) {
         n.divisors.grep {|x| gcd(x, n/x) == 1 }
     }
@@ -133,7 +133,7 @@ do {
     )
 }
 
-do {
+do {    # non-unitary divisors
     assert_eq(
         30.of { .nusigma },
         30.of {|n| n.divisors.grep {|d| gcd(d, n/d) != 1 }.sum }
@@ -147,6 +147,94 @@ do {
     assert_eq(
         30.of { .nusigma(0) },
         30.of {|n| n.divisors.count {|d| gcd(d, n/d) != 1 } }
+    )
+}
+
+do {    # infinitary divisors
+
+    func isidiv(d, n) {
+
+        if (n % d != 0) {
+            return false
+        }
+
+        n.prime_divisors.each {|p|
+
+            var n2 = valuation(n, p).digits(2)
+            var d2 = valuation(d, p).digits(2)
+
+            for j in (0 .. d2.end) {
+                if ((n2[j] == 0) && (d2[j] != 0)) {
+                    return false
+                }
+            }
+        }
+
+        return true;
+    }
+
+    func idivisors(n) {
+        n.divisors.grep{ isidiv(_, n) }
+    }
+
+    func a(n, k=1) {
+
+        return 0 if (n == 0)
+
+        n.factor_prod {|p,e|
+
+            #~ e.digits(2).map_kv {|r,v|
+                #~ (p**(2**r * (v+1) * k) - 1) / (p**(k * 2**r) - 1)
+            #~ }.prod
+
+            var prod = 1
+            var r = 0
+
+            do {
+                if (e%2 == 1) {
+                    #prod *= ((p**(2**(r+1) * k) - 1) / (p**(k * 2**r) - 1))
+                    prod *= (p**(k * 2**r) + 1)
+                }
+                ++r
+            } while (e >>= 1)
+
+            prod
+        }
+    }
+
+    assert_eq(
+        30.of { a(_+1) },
+        30.of { idivisors(_+1).sum }
+    )
+
+    assert_eq(
+        30.of { a(_+1, 2) },
+        30.of { idivisors(_+1).sum { _**2 } }
+    )
+
+    assert_eq(
+        30.of { a(_+1, 3) },
+        30.of { idivisors(_+1).sum { _**3 } }
+    )
+
+    assert_eq(
+        30.of { .isigma0 },
+        30.of { idivisors(_).len }
+    )
+
+    assert_eq(
+        30.of { .isigma },
+        30.of { a(_) },
+    )
+
+    assert_eq(
+        30.of { .isigma(2) },
+        30.of { a(_, 2) },
+    )
+
+    assert_eq(
+        30.of { .isigma(3) },
+        30.of { a(_, 3) },
     )
 }
 

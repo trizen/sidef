@@ -16968,6 +16968,79 @@ package Sidef::Types::Number::Number {
 
     *biusigma = \&bsigma;
 
+    sub isigma0 {    # A037445: count of infinitary divisors (or i-divisors) of n
+        my ($n) = @_;
+
+        # Multiplicative with:
+        #   a(p^e) = 2^hammingweight(e)
+
+        my $n = &_big2uistr // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $r = Math::Prime::Util::GMP::vecprod(
+            map {
+                1 << (
+                      HAS_PRIME_UTIL
+                      ? Math::Prime::Util::hammingweight($_->[1])
+                      : Math::Prime::Util::GMP::hammingweight($_->[1])
+                     )
+              } @factor_exp
+        );
+
+        _set_int($r);
+    }
+
+    sub isigma {    # A049417: sum of infinitary divisors of n
+        my ($n, $k) = @_;
+
+        # Multiplicative with:
+        #   If e = Sum_{k >= 0} d_k 2^k (binary representation of e), then
+        #   isigma(p^e, r) = Product_{k >= 0} (p^(r*2^k*{d_k+1}) - 1)/(p^(r*2^k) - 1)
+
+        # Simplified formula, where d_k is odd in the binary representation of e (ignore even d_k):
+        #   isigma(p^e, r) = Product_{k >= 0} (p^(r * 2^k) + 1)
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+        if ($k == 0) {
+            goto &isigma0;
+        }
+
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
+
+            Math::GMPz::Rmpz_set_ui($t, 1);
+
+            ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($t, $p)
+              : Math::GMPz::Rmpz_set_str($t, $p, 10);
+
+            my $r = 0;
+            do {
+                if ($e % 2 == 1) {
+                    Math::GMPz::Rmpz_pow_ui($u, $t, (1 << $r) * $k);
+                    Math::GMPz::Rmpz_add_ui($u, $u, 1);
+                    Math::GMPz::Rmpz_mul($s, $s, $u);
+                }
+                ++$r;
+            } while ($e >>= 1);
+        }
+
+        bless \$s;
+    }
+
     sub uphi {
 
         # Multiplicative with:

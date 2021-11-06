@@ -3516,6 +3516,26 @@ Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
 =cut
 
+=head2 isigma
+
+    isigma(n, k=1)
+
+Returns the sum of the infinitary divisors of n, each divisor raised to power k.
+
+    say 20.of { .isigma }       #=> OEIS: A049417
+
+=cut
+
+=head2 isigma0
+
+    isigma0(n)
+
+Returns the count of the infinitary divisors of n.
+
+    say 20.of { .isigma0 }      #=> OEIS: A037445
+
+=cut
+
 =head2 is_imag
 
     x.is_imag
