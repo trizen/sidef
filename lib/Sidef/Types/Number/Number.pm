@@ -16888,6 +16888,16 @@ package Sidef::Types::Number::Number {
         bless \$s;
     }
 
+    sub nusigma0 {   # A048105: count of non-unitary divisors of n
+        my ($n, $k) = @_;
+        $n->sigma0->sub($n->usigma0);
+    }
+
+    sub nusigma {   # A048146: sum of non-unitary of divisors of n
+        my ($n, $k) = @_;
+        $n->sigma($k)->sub($n->usigma($k));
+    }
+
     sub uphi {
 
         # Multiplicative with:

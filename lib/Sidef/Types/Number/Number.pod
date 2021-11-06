@@ -4972,6 +4972,26 @@ Although this may or may not be actually faster.
 
 =cut
 
+=head2 nusigma
+
+    nusigma(n, k=1)
+
+Returns the sum of non-unitary divisors of n, each divisor raised to power k.
+
+    say 30.of { .nusigma }     #=> OEIS: A048146
+
+=cut
+
+=head2 nusigma0
+
+    nusigma0(n)
+
+Returns the count of non-unitary divisors of n.
+
+    say 30.of { .nusigma0 }    #=> OEIS: A048105
+
+=cut
+
 =head2 of
 
     n.of {|k| ... }
