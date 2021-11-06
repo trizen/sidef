@@ -4907,6 +4907,26 @@ Returns the negative infinity special value (C<-Inf>).
 
 =cut
 
+=head2 nisigma
+
+    nisigma(n, k=1)
+
+Returns the sum of the non-infinitary divisors of n, each divisor raised to power k.
+
+    say 30.of { .nisigma }      #=> OEIS: A348271
+
+=cut
+
+=head2 nisigma0
+
+    nisigma0(n)
+
+Returns the count of the non-infinitary divisors of n.
+
+    say 30.of { .nisigma0 }     #=> OEIS: A348341
+
+=cut
+
 =head2 nok
 
     nok(n,k)

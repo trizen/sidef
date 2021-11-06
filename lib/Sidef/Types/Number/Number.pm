@@ -16888,12 +16888,22 @@ package Sidef::Types::Number::Number {
         bless \$s;
     }
 
-    sub nusigma0 {    # A048105: count of non-unitary divisors of n
+    sub nisigma0 {    # A348341: count non-infinitary divisors of n
+        my ($n) = @_;
+        $n->sigma0->sub($n->isigma0);
+    }
+
+    sub nisigma {     # A348271: sum of non-infinitary divisors of n
         my ($n, $k) = @_;
+        $n->sigma($k)->sub($n->isigma($k));
+    }
+
+    sub nusigma0 {    # A048105: count of non-unitary divisors of n
+        my ($n) = @_;
         $n->sigma0->sub($n->usigma0);
     }
 
-    sub nusigma {     # A048146: sum of non-unitary of divisors of n
+    sub nusigma {     # A048146: sum of non-unitary divisors of n
         my ($n, $k) = @_;
         $n->sigma($k)->sub($n->usigma($k));
     }
