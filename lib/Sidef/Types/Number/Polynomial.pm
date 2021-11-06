@@ -331,7 +331,7 @@ package Sidef::Types::Number::Polynomial {
             return __PACKAGE__->new(0 => Sidef::Types::Number::Number::inf());
         }
 
-        $x->mul($y->inv);
+        __PACKAGE__->new(map { $_ => $x->{$_}->div($y) } CORE::keys %$x);
     }
 
     sub float {

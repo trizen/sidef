@@ -2282,13 +2282,21 @@ package Sidef::Types::Array::Array {
             $n = 1;
         }
 
-        state $block = Sidef::Types::Block::Block->new(code => sub { $_[1]->sub($_[0]) });
+        my @diffs = @$self;
 
         foreach my $i (1 .. $n) {
-            $self = $self->map_cons(2, $block);
+            my @tmp;
+            my $prev = shift(@diffs);
+
+            while (@diffs) {
+                my $curr = shift(@diffs);
+                CORE::push(@tmp, $curr->sub($prev));
+                $prev = $curr;
+            }
+            @diffs = @tmp;
         }
 
-        $self;
+        bless \@diffs, ref($self);
     }
 
     *diffs           = \&differences;
@@ -2302,6 +2310,8 @@ package Sidef::Types::Array::Array {
         my $poly    = Sidef::Types::Number::Polynomial->new();
         my $x       = Sidef::Types::Number::Polynomial->new(1 => Sidef::Types::Number::Number::ONE)->sub($offset);
         my $is_zero = Sidef::Types::Block::Block->new(code => sub { $_[0]->is_zero });
+
+        @$self || return $poly;
 
         for (my $k = 0 ; ; ++$k) {
             $poly = $poly->add($x->binomial(Sidef::Types::Number::Number::_set_int($k))->mul($self->[0]));

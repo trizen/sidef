@@ -258,4 +258,17 @@ for n in (0..10) {
     assert_eq(cyclotomic_polynomial(n).eval(x), cyclotomic_polynomial(n, x))
 }
 
+do {
+    assert_eq(20.of { _**2 }.solve_seq, Poly(2 => 1))
+    assert_eq(20.of { .faulhaber(2) }.solve_seq, Polynomial(1 => 1/6, 2 => 1/2, 3 => 1/3))
+
+    assert_eq(20.of { (_+10)**3 }.solve_seq, Polynomial(0 => 1000, 1 => 300, 2 => 30, 3 => 1))
+    assert_eq(20.of { (_+10)**3 }.solve_seq(10), Poly(3 => 1))
+
+    assert_eq([].solve_seq, Poly(0 => 0))
+    assert_eq([0].solve_seq, Poly(0 => 0))
+    assert_eq([1].solve_seq, Poly(0 => 1))
+    assert_eq([2].solve_seq, Poly(0 => 2))
+}
+
 say "** Test passed!"
