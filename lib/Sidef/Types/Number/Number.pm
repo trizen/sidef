@@ -16888,15 +16888,85 @@ package Sidef::Types::Number::Number {
         bless \$s;
     }
 
-    sub nusigma0 {   # A048105: count of non-unitary divisors of n
+    sub nusigma0 {    # A048105: count of non-unitary divisors of n
         my ($n, $k) = @_;
         $n->sigma0->sub($n->usigma0);
     }
 
-    sub nusigma {   # A048146: sum of non-unitary of divisors of n
+    sub nusigma {     # A048146: sum of non-unitary of divisors of n
         my ($n, $k) = @_;
         $n->sigma($k)->sub($n->usigma($k));
     }
+
+    sub bsigma0 {     # A286324: count of bi-unitary divisors of n.
+
+        # Multiplicative with:
+        #   a(p^e) = e + (e mod 2)
+
+        my $n = &_big2uistr // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $r = Math::Prime::Util::GMP::vecprod(map { $_->[1] + ($_->[1] % 2) } @factor_exp);
+        _set_int($r);
+    }
+
+    *biusigma0 = \&bsigma0;
+
+    sub bsigma {    # A188999: Bi-unitary sigma: sum of the bi-unitary divisors of n
+        my ($n, $k) = @_;
+
+        # Multiplicative with:
+        #   bsigma(p^e, k) = (p^(k*(e+1)) - 1)/(p^k - 1)                   if e is odd
+        #   bsigma(p^e, k) = (p^(k*(e+1)) - 1)/(p^k - 1) - p^(k*(e/2))     if e is even
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+        if ($k == 0) {
+            goto &bsigma0;
+        }
+
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k);
+                Math::GMPz::Rmpz_pow_ui($t, $u, $e + 1);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
+                Math::GMPz::Rmpz_pow_ui($u, $t, $k);
+                Math::GMPz::Rmpz_pow_ui($t, $u, $e + 1);
+            }
+
+            Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+            Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            Math::GMPz::Rmpz_divexact($t, $t, $u);
+
+            if ($e % 2 == 0) {
+                Math::GMPz::Rmpz_add_ui($u, $u, 1);
+                Math::GMPz::Rmpz_pow_ui($u, $u, $e >> 1);
+                Math::GMPz::Rmpz_sub($t, $t, $u);
+            }
+
+            Math::GMPz::Rmpz_mul($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
+    *biusigma = \&bsigma;
 
     sub uphi {
 

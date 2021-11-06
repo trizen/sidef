@@ -74,4 +74,80 @@ do {
     }
 }
 
+do {
+    func udivs(n) {
+        n.divisors.grep {|x| gcd(x, n/x) == 1 }
+    }
+
+    func gcud(n, m) {
+        udivs(n) & udivs(m) -> max
+    }
+
+    func biudivs(n) {
+        n.divisors.grep {|x| gcud(x,n/x) == 1 }
+    }
+
+    func a(n,k=1) {
+        biudivs(n).sum { _**k }
+    }
+
+    func g(n, k=1) {
+        n.factor_prod {|p,e|
+            (p**(k*(e + 1)) - 1)/(p**k - 1) - (e.is_even ? p**(k*(e/2)) : 0)
+        }
+    }
+
+    assert_eq(
+        20.of { bsigma(_+1, 1) },
+        20.of { g(_+1) }
+    )
+
+    assert_eq(
+        20.of { bsigma(_+1, 2) },
+        20.of { g(_+1, 2) }
+    )
+
+    assert_eq(
+        20.of { bsigma(_+1, 3) },
+        20.of { g(_+1, 3) }
+    )
+
+    assert_eq(
+        20.of { .bsigma },
+        20.of { a(_) },
+    )
+
+    assert_eq(
+        20.of { .bsigma(2) },
+        20.of { a(_, 2) },
+    )
+
+    assert_eq(
+        20.of { .bsigma(3) },
+        20.of { a(_, 3) },
+    )
+
+    assert_eq(
+        20.of  { a(_, 0) }
+        20.of  { .bsigma(0) }
+    )
+}
+
+do {
+    assert_eq(
+        30.of { .nusigma },
+        30.of {|n| n.divisors.grep {|d| gcd(d, n/d) != 1 }.sum }
+    )
+
+    assert_eq(
+        10.of { .nusigma(0) },
+        10.of { .nusigma0 },
+    )
+
+    assert_eq(
+        30.of { .nusigma(0) },
+        30.of {|n| n.divisors.count {|d| gcd(d, n/d) != 1 } }
+    )
+}
+
 say "** Test passed!"

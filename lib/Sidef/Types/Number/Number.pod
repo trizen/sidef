@@ -1233,6 +1233,30 @@ Aliases: I<bsearch_inverse>
 
 =cut
 
+=head2 bsigma
+
+    bsigma(n, k=1)
+
+Returns the sum of the bi-unitary divisors of n, each divisor raised to power k.
+
+    say 20.of { .bsigma }   #=> OEIS: A188999
+
+Aliases: I<biusigma>
+
+=cut
+
+=head2 bsigma0
+
+    bsigma0(n)
+
+Returns the count of the bi-unitary divisors of n.
+
+    say 20.of { .bsigma0 }  #=> OEIS: A286324
+
+Aliases: I<biusigma0>
+
+=cut
+
 =head2 by
 
     n.by { ... }
@@ -4976,7 +5000,7 @@ Although this may or may not be actually faster.
 
     nusigma(n, k=1)
 
-Returns the sum of non-unitary divisors of n, each divisor raised to power k.
+Returns the sum of the non-unitary divisors of n, each divisor raised to power k.
 
     say 30.of { .nusigma }     #=> OEIS: A048146
 
@@ -4986,7 +5010,7 @@ Returns the sum of non-unitary divisors of n, each divisor raised to power k.
 
     nusigma0(n)
 
-Returns the count of non-unitary divisors of n.
+Returns the count of the non-unitary divisors of n.
 
     say 30.of { .nusigma0 }    #=> OEIS: A048105
 
@@ -6923,7 +6947,7 @@ The unitary totient function. (OEIS: A047994)
 
 =head2 usigma
 
-    n.usigma(k=1)
+    usigma(n, k=1)
 
 Returns the sum of the unitary divisors of C<n>, each divisor raised to the power C<k>.
 
