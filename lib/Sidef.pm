@@ -104,6 +104,14 @@ package Sidef {
                                 '.config',
                                 'sidef'
                                );
+
+        if (not -d $self->{sidef_config_dir}) {
+            require File::Path;
+            File::Path::make_path($self->{sidef_config_dir})
+                or warn "[WARNING] Can't create directory <<$self->{sidef_config_dir}>>: $!";
+        }
+
+        return $self->{sidef_config_dir};
     }
 
     sub get_sidef_vdir {
