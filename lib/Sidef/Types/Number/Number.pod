@@ -4785,6 +4785,24 @@ Returns the Not-a-Number special value (C<NaN>).
 
 =cut
 
+=head2 nbsigma
+
+    nbsigma(n, k=1)
+
+Returns the sum of the non-bi-unitary divisors of n, each divisor raised to the k-th power.
+
+    say 30.of { .nbsigma }      #=> OEIS: A319072
+
+=cut
+
+=head2 nbsigma0
+
+    nbsigma0(n)
+
+Returns the count of the non-bi-unitary divisors of n.
+
+=cut
+
 =head2 n_composites
 
     n_composites(n, start=4)

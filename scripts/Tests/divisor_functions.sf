@@ -101,38 +101,53 @@ do {    # bi-unitary divisors
     }
 
     assert_eq(
-        20.of { bsigma(_, 1) },
-        20.of { g(_) }
+        30.of { bsigma(_, 1) },
+        30.of { g(_) }
     )
 
     assert_eq(
-        20.of { bsigma(_, 2) },
-        20.of { g(_, 2) }
+        30.of { bsigma(_, 2) },
+        30.of { g(_, 2) }
     )
 
     assert_eq(
-        20.of { bsigma(_, 3) },
-        20.of { g(_, 3) }
+        30.of { bsigma(_, 3) },
+        30.of { g(_, 3) }
     )
 
     assert_eq(
-        20.of { .bsigma },
-        20.of { a(_) },
+        30.of { .bsigma },
+        30.of { a(_) },
     )
 
     assert_eq(
-        20.of { .bsigma(2) },
-        20.of { a(_, 2) },
+        30.of { .bsigma(2) },
+        30.of { a(_, 2) },
     )
 
     assert_eq(
-        20.of { .bsigma(3) },
-        20.of { a(_, 3) },
+        30.of { .bsigma(3) },
+        30.of { a(_, 3) },
     )
 
     assert_eq(
-        20.of  { a(_, 0) }
-        20.of  { .bsigma(0) }
+        30.of  { a(_, 0) }
+        30.of  { .bsigma(0) }
+    )
+
+    assert_eq(
+        30.of  { .divisors - biudivs(_) -> sum }
+        30.of  { .nbsigma }
+    )
+
+    assert_eq(
+        30.of  { .divisors - biudivs(_) -> sum { _**2 } }
+        30.of  { .nbsigma(2) }
+    )
+
+    assert_eq(
+        30.of  { .divisors - biudivs(_) -> len }
+        30.of  { .nbsigma0 }
     )
 }
 
@@ -239,6 +254,21 @@ do {    # infinitary divisors
         30.of { .isigma(3) },
         30.of { a(_, 3) },
     )
+
+    assert_eq(
+        30.of { divisors(_) - idivisors(_) -> sum },
+        30.of { .nisigma },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - idivisors(_) -> len },
+        30.of { .nisigma0 },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - idivisors(_) -> sum { _**2 } },
+        30.of { .nisigma(2) },
+    )
 }
 
 do {    # A051377: exponential divisors
@@ -310,6 +340,21 @@ do {    # A051377: exponential divisors
     assert_eq(
         30.of { f(_, 3) },
         30.of { .esigma(3) },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - ediv(_) -> sum },
+        30.of { .nesigma },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - ediv(_) -> sum { _**2 } },
+        30.of { .nesigma(2) },
+    )
+
+    assert_eq(
+        30.of { divisors(_) - ediv(_) -> len },
+        30.of { .nesigma0 },
     )
 }
 

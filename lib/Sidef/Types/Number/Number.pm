@@ -16978,7 +16978,17 @@ package Sidef::Types::Number::Number {
 
     *biusigma = \&bsigma;
 
-    sub isigma0 {    # A037445: count of infinitary divisors (or i-divisors) of n
+    sub nbsigma0 {    # Axxxxxx: count of non-bi-unitary divisors of n
+        my ($n) = @_;
+        $n->sigma0->sub($n->bsigma0);
+    }
+
+    sub nbsigma {     # A319072: sum of non-bi-unitary divisors of n.
+        my ($n, $k) = @_;
+        $n->sigma($k)->sub($n->bsigma($k));
+    }
+
+    sub isigma0 {     # A037445: count of infinitary divisors (or i-divisors) of n
         my ($n) = @_;
 
         # Multiplicative with:
