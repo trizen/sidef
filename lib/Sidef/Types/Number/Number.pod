@@ -2263,6 +2263,26 @@ The complementary error function.
 
 =cut
 
+=head2 esigma
+
+    esigma(n, k=1)
+
+Returns the sum of the exponential divisors (or e-divisors) of n.
+
+    say 20.of { .esigma }       #=> OEIS: A051377
+
+=cut
+
+=head2 esigma0
+
+    esigma0(n)
+
+Returns the count of the exponential divisors (or e-divisors) of n.
+
+    say 20.of { .esigma0 }      #=> OEIS: A049419
+
+=cut
+
 =head2 euler
 
     euler(n)

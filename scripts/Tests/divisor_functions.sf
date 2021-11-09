@@ -92,24 +92,27 @@ do {    # bi-unitary divisors
     }
 
     func g(n, k=1) {
+
+        return 0 if (n == 0)
+
         n.factor_prod {|p,e|
             (p**(k*(e + 1)) - 1)/(p**k - 1) - (e.is_even ? p**(k*(e/2)) : 0)
         }
     }
 
     assert_eq(
-        20.of { bsigma(_+1, 1) },
-        20.of { g(_+1) }
+        20.of { bsigma(_, 1) },
+        20.of { g(_) }
     )
 
     assert_eq(
-        20.of { bsigma(_+1, 2) },
-        20.of { g(_+1, 2) }
+        20.of { bsigma(_, 2) },
+        20.of { g(_, 2) }
     )
 
     assert_eq(
-        20.of { bsigma(_+1, 3) },
-        20.of { g(_+1, 3) }
+        20.of { bsigma(_, 3) },
+        20.of { g(_, 3) }
     )
 
     assert_eq(
@@ -235,6 +238,78 @@ do {    # infinitary divisors
     assert_eq(
         30.of { .isigma(3) },
         30.of { a(_, 3) },
+    )
+}
+
+do {    # A051377: exponential divisors
+
+    func ediv(n) {
+
+        return [1] if (n == 1)
+
+        var f = n.factor_exp
+        var D = f.map{.tail.divisors}
+
+        var L = []
+
+        D.map {|d| @(^d.len) }.cartesian {|*a|
+            L << f.prod_kv {|j,pp|
+                pp[0]**D[j][a[j]]
+            }
+        }
+
+        L
+    }
+
+    func f(n, k=1) {
+
+        return 0 if (n == 0)
+
+        # Multiplicative with:
+        #   a(p^e) = Sum_{d|e} p^d
+
+        n.factor_map {|p,e|
+            e.divisors.sum {|d| p**(k*d) }
+        }.prod
+    }
+
+    assert_eq(ediv(7!).sum, f(7!))
+    assert_eq(ediv(8!).sum { _**2 }, f(8!, 2))
+    assert_eq(ediv(9!).sum { _**3 }, f(9!, 3))
+
+    assert_eq(
+        30.of { ediv(_).sum },
+        30.of { .esigma(1) }
+    )
+
+    assert_eq(
+        30.of { ediv(_).sum { _**3 } },
+        30.of { .esigma(3) }
+    )
+
+    assert_eq(
+        30.of { ediv(_).len },
+        30.of { .esigma(0) }
+    )
+
+    assert_eq(
+        30.of { ediv(_).len },
+        30.of { .esigma0 }
+    )
+
+    assert_eq(
+        30.of { f(_) },
+        30.of { .esigma }
+    )
+
+    assert_eq(
+        30.of { f(_, 2) },
+        30.of { .esigma(2) },
+    )
+
+    assert_eq(
+        30.of { f(_, 3) },
+        30.of { .esigma(3) },
     )
 }
 

@@ -17051,6 +17051,80 @@ package Sidef::Types::Number::Number {
         bless \$s;
     }
 
+    sub esigma0 {    # A049419: count of exponential divisors (or e-divisors) of n.
+        my ($n) = @_;
+
+        # Multiplicative with:
+        #   a(p^e) = tau(e)
+
+        my $n = &_big2uistr // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $r = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $pp (@factor_exp) {
+            if ($pp->[1] > 1) {
+                my $t = (
+                         HAS_PRIME_UTIL
+                         ? Math::Prime::Util::divisor_sum($pp->[1], 0)
+                         : Math::Prime::Util::GMP::sigma($pp->[1], 0)
+                        );
+                Math::GMPz::Rmpz_mul_ui($r, $r, $t);
+            }
+        }
+
+        bless \$r;
+    }
+
+    sub esigma {    # A051377: sum of exponential divisors (or e-divisors) of n
+        my ($n, $k) = @_;
+
+        # Multiplicative with:
+        #   a(p^e) = Sum_{d|e} p^d
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+        if ($k == 0) {
+            goto &esigma0;
+        }
+
+        $n = _big2uistr($n) // goto &nan;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+        my $w = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
+
+            Math::GMPz::Rmpz_set_ui($t, 1);
+
+            ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($t, $p)
+              : Math::GMPz::Rmpz_set_str($t, $p, 10);
+
+            my @e_divisors = ($e > 1) ? _divisors($e) : (1);
+
+            Math::GMPz::Rmpz_set_ui($u, 0);
+
+            foreach my $d (@e_divisors) {
+                Math::GMPz::Rmpz_pow_ui($w, $t, $k * $d);
+                Math::GMPz::Rmpz_add($u, $u, $w);
+            }
+
+            Math::GMPz::Rmpz_mul($s, $s, $u);
+        }
+
+        bless \$s;
+    }
+
     sub uphi {
 
         # Multiplicative with:
