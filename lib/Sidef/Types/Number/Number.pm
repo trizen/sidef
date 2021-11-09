@@ -17125,6 +17125,16 @@ package Sidef::Types::Number::Number {
         bless \$s;
     }
 
+    sub nesigma0 {    # A160097: count of non-exponential divisors of n
+        my ($n) = @_;
+        $n->sigma0->sub($n->esigma0);
+    }
+
+    sub nesigma {     # A160135: sum of non-exponential divisors of n
+        my ($n, $k) = @_;
+        $n->sigma($k)->sub($n->esigma($k));
+    }
+
     sub uphi {
 
         # Multiplicative with:

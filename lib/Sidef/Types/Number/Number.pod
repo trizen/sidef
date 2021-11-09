@@ -1237,7 +1237,7 @@ Aliases: I<bsearch_inverse>
 
     bsigma(n, k=1)
 
-Returns the sum of the bi-unitary divisors of n, each divisor raised to power k.
+Returns the sum of the bi-unitary divisors of n, each divisor raised to the k-th power.
 
     say 20.of { .bsigma }   #=> OEIS: A188999
 
@@ -2267,7 +2267,7 @@ The complementary error function.
 
     esigma(n, k=1)
 
-Returns the sum of the exponential divisors (or e-divisors) of n.
+Returns the sum of the exponential divisors (or e-divisors) of n, each divisor raised to k-th power.
 
     say 20.of { .esigma }       #=> OEIS: A051377
 
@@ -3540,7 +3540,7 @@ Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
     isigma(n, k=1)
 
-Returns the sum of the infinitary divisors of n, each divisor raised to power k.
+Returns the sum of the infinitary divisors of n, each divisor raised to the k-th power.
 
     say 20.of { .isigma }       #=> OEIS: A049417
 
@@ -4831,6 +4831,26 @@ Negates the sign of <Cx> (equivalent with: C<-x>).
 
 =cut
 
+=head2 nesigma
+
+    nesigma(n, k=1)
+
+Returns the sum of the non-exponential divisors of n, each divisor raised to the k-th power.
+
+    say 30.of { .nesigma }      #=> OEIS: A160135
+
+=cut
+
+=head2 nesigma0
+
+    nesigma0(n)
+
+Returns the count of the non-exponential divisors of n.
+
+    say 30.of { .nesigma0 }     #=> OEIS: A160097
+
+=cut
+
 =head2 new
 
     Number(string, base=10)
@@ -4931,7 +4951,7 @@ Returns the negative infinity special value (C<-Inf>).
 
     nisigma(n, k=1)
 
-Returns the sum of the non-infinitary divisors of n, each divisor raised to power k.
+Returns the sum of the non-infinitary divisors of n, each divisor raised to the k-th power.
 
     say 30.of { .nisigma }      #=> OEIS: A348271
 
@@ -5060,7 +5080,7 @@ Although this may or may not be actually faster.
 
     nusigma(n, k=1)
 
-Returns the sum of the non-unitary divisors of n, each divisor raised to power k.
+Returns the sum of the non-unitary divisors of n, each divisor raised to the k-th power.
 
     say 30.of { .nusigma }     #=> OEIS: A048146
 
@@ -5631,7 +5651,7 @@ Equivalent with:
 
     n.prime_power_sigma(k=1)
 
-Sum of the prime power divisors of n, each divisor raised to power k.
+Sum of the prime power divisors of n, each divisor raised to the k-th power.
 
 Example:
 
@@ -5707,7 +5727,7 @@ Returns an array with the prime numbers <= n, or in the range C<a..b>.
 
     n.prime_sigma(k=1)
 
-Sum of the unique prime divisors of n, each divisor raised to power k.
+Sum of the unique prime divisors of n, each divisor raised to the k-th power.
 
 Example:
 
@@ -5751,7 +5771,7 @@ Aliases: I<nth_prime_upper>
 
     n.prime_usigma(k=1)
 
-Sum of the unique unitary prime divisors of n, each divisor raised to power k.
+Sum of the unique unitary prime divisors of n, each divisor raised to the k-th power.
 
 Example:
 
@@ -6642,7 +6662,7 @@ Aliases: I<squarefree_unitary_divisors>, I<unitary_squarefree_divisors>
 
     n.squarefree_usigma(k=1)
 
-Sum of the unitary squarefree divisors of n, each divisor raised to power k.
+Sum of the unitary squarefree divisors of n, each divisor raised to the k-th power.
 
 Example:
 
