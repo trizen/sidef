@@ -15840,28 +15840,43 @@ package Sidef::Types::Number::Number {
     *unitary_square_divisors = \&square_udivisors;
     *square_unitary_divisors = \&square_udivisors;
 
-    sub squarefree_udivisors {
-        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
+    sub powerfree_udivisors {
+        my ($k, $n) = @_;
+
+        _valid(\$n);
+
+        my $n = _big2pistr($$n) // return Sidef::Types::Array::Array->new();
+        my $k = _any2ui($$k) || return Sidef::Types::Array::Array->new();
+
+        if ($k == 1) {
+            return Sidef::Types::Array::Array->new([ONE]);
+        }
 
         my @d;
-        foreach my $pe (grep { $_->[1] == 1 } _factor_exp($n)) {
-            my $p = $pe->[0];
+        foreach my $pe (_factor_exp($n)) {
+            my ($p, $e) = @$pe;
 
-            $p = (
-                  ($p < ULONG_MAX)
-                  ? Math::GMPz::Rmpz_init_set_ui($p)
-                  : Math::GMPz::Rmpz_init_set_str("$p", 10)
-                 );
+            $e < $k or next;
 
-            my @t;
-            foreach my $d (@d) {
-                my $t = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_mul($t, $d, $p);
-                push @t, $t;
+            my $r = Math::GMPz::Rmpz_init();
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($r, $p, $e);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($r, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($r, $r, $e);
             }
 
-            push @d, @t;
-            push @d, $p;
+            my @tmp = ($r);
+
+            foreach my $d (@d) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($t, $d, $r);
+                push @tmp, $t;
+            }
+
+            push @d, @tmp;
         }
 
         @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
@@ -15870,6 +15885,13 @@ package Sidef::Types::Number::Number {
         unshift @d, ONE;
 
         Sidef::Types::Array::Array->new(\@d);
+    }
+
+    *unitary_powerfree_divisors = \&powerfree_udivisors;
+    *powerfree_unitary_divisors = \&powerfree_udivisors;
+
+    sub squarefree_udivisors {
+        (TWO)->powerfree_udivisors($_[0]);
     }
 
     *unitary_squarefree_divisors = \&squarefree_udivisors;

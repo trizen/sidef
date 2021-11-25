@@ -94,7 +94,7 @@ package Sidef::Deparse::Perl {
                   )
             },
 
-            reassign_ops => {map (("$_=" => $_), qw(+ - % * // / & | ^ ** && || << >> ÷))},
+            reassign_ops => {map { ("$_=", $_) } qw(+ - % * // / & | ^ ** && || << >> ÷)},
 
             inc_dec_ops => {
                             '++' => 'inc',

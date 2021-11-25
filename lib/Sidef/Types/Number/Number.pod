@@ -5468,6 +5468,24 @@ Returns the sum of k-powerfree numbers <= n or in the range C<a..b>:
 
 =cut
 
+=head2 powerfree_udivisors
+
+    k.powerfree_udivisors(n)
+
+Returns an array with the k-powerfree unitary divisors of n.
+
+    say 2.powerfree_udivisors(5040)      # squarefree unitary divisors of 5040
+    say 3.powerfree_udivisors(5040)      # cubefree unitary divisors of 5040
+
+Equivalent with (but much faster):
+
+    n.udivisors.grep { .is_powerfree(k) }
+    k.powerfree_divisors(n).grep {|d| gcd(n/d, d) == 1 }
+
+Aliases: I<powerfree_unitary_divisors>, I<unitary_powerfree_divisors>
+
+=cut
+
 =head2 powerful
 
     k.powerful(n)
