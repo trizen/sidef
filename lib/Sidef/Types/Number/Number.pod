@@ -5486,6 +5486,31 @@ Aliases: I<powerfree_unitary_divisors>, I<unitary_powerfree_divisors>
 
 =cut
 
+=head2 powerfree_usigma
+
+    k.powerfree_usigma(n, j=1)
+
+Returns the sum of the k-powerfree unitary divisors of n, each divisors raised to the power j.
+
+    say 20.of { 2.powerfree_usigma(_) }        # OEIS: A092261
+    say 20.of { 2.powerfree_usigma(_, 2) }     # OEIS: A091306
+
+Equivalent with (but much faster):
+
+    n.udivisors.grep { .is_powerfree(k) }.sum {|d| d**j }
+
+=cut
+
+=head2 powerfree_usigma0
+
+    k.powerfree_usigma0(n)
+
+Returns the number of the k-powerfree unitary divisors of n.
+
+    say 20.of { 2.powerfree_usigma0(_) }       # OEIS: A056671
+
+=cut
+
 =head2 powerful
 
     k.powerful(n)

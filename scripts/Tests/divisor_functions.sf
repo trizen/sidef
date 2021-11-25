@@ -24,7 +24,17 @@ for k in (0..5) {
     }
 }
 
-with (10!) {|n|
+var h2 = Hash(
+    powerfree_udivisors => 'powerfree_usigma',
+)
+
+for k in (0..5), j in (0..5) {
+    h2.each {|a,b|
+        assert_eq(k.(a)(n).sum {|d| d**j }, k.(b)(n,j), "#{a} != #{b} for n=#{n}, k=#{k}, j=#{j}")
+    }
+}
+
+with (irand(5, 10)!) {|n|
     var D = n.divisors
     assert_eq(n.power_divisors,    D.grep{.is_power})
     assert_eq(n.power_divisors(1), D.grep{.is_power(1)})
@@ -35,7 +45,7 @@ with (10!) {|n|
     assert_eq(n.power_divisors(9), D.grep{.is_power(9)})
 }
 
-with (21!) {|n|
+with (irand(10, 21)!) {|n|
     var D = n.udivisors
     assert_eq(n.power_udivisors,    D.grep{.is_power})
     assert_eq(n.power_udivisors(1), D.grep{.is_power(1)})
@@ -44,6 +54,17 @@ with (21!) {|n|
     assert_eq(n.power_udivisors(4), D.grep{.is_power(4)})
     assert_eq(n.power_udivisors(5), D.grep{.is_power(5)})
     assert_eq(n.power_udivisors(9), D.grep{.is_power(9)})
+}
+
+with (irand(10, 21)!) {|n|
+    var D = n.udivisors
+    assert_eq(1.powerfree_udivisors(n), D.grep{.is_powerfree(1)})
+    assert_eq(2.powerfree_udivisors(n), D.grep{.is_powerfree(2)})
+    assert_eq(3.powerfree_udivisors(n), D.grep{.is_powerfree(3)})
+    assert_eq(4.powerfree_udivisors(n), D.grep{.is_powerfree(4)})
+    assert_eq(5.powerfree_udivisors(n), D.grep{.is_powerfree(5)})
+    assert_eq(6.powerfree_udivisors(n), D.grep{.is_powerfree(6)})
+    assert_eq(7.powerfree_udivisors(n), D.grep{.is_powerfree(7)})
 }
 
 for n in (0..50) {
@@ -59,6 +80,13 @@ for n in (0..50) {
     assert_eq(n.power_udivisors(1), D2.grep { .is_power(1) })
     assert_eq(n.power_udivisors(2), D2.grep { .is_power(2) })
     assert_eq(n.power_udivisors(3), D2.grep { .is_power(3) })
+
+    assert_eq(0.powerfree_udivisors(n), D2.grep { .is_powerfree(0) })
+    assert_eq(1.powerfree_udivisors(n), D2.grep { .is_powerfree(1) })
+    assert_eq(2.powerfree_udivisors(n), D2.grep { .is_powerfree(2) })
+    assert_eq(3.powerfree_udivisors(n), D2.grep { .is_powerfree(3) })
+    assert_eq(4.powerfree_udivisors(n), D2.grep { .is_powerfree(4) })
+    assert_eq(5.powerfree_udivisors(n), D2.grep { .is_powerfree(5) })
 }
 
 assert_eq(5040.sigma(-1), 5040.divisors.sum {|d| d**(-1) })

@@ -15714,6 +15714,8 @@ package Sidef::Types::Number::Number {
             my ($k, $factor_exp) = @_;
 
             my @d = ($ONE);
+            my $r = Math::GMPz::Rmpz_init();
+
             foreach my $pe (grep { $_->[1] >= $k } @$factor_exp) {
 
                 my ($p, $e) = @$pe;
@@ -15726,10 +15728,12 @@ package Sidef::Types::Number::Number {
 
                 my @t;
                 for (my $i = $k ; $i <= $e ; $i += $k) {
+
+                    Math::GMPz::Rmpz_pow_ui($r, $p, $i);
+
                     foreach my $d (@d) {
                         my $z = Math::GMPz::Rmpz_init();
-                        Math::GMPz::Rmpz_pow_ui($z, $p, $i);
-                        Math::GMPz::Rmpz_mul($z, $z, $d);
+                        Math::GMPz::Rmpz_mul($z, $r, $d);
                         push @t, $z;
                     }
                 }
@@ -17435,6 +17439,71 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_sub_ui($u, $u, 1);
 
             Math::GMPz::Rmpz_divexact($t, $t, $u);
+            Math::GMPz::Rmpz_mul($s, $s, $t);
+        }
+
+        bless \$s;
+    }
+
+    sub powerfree_usigma0 {
+        my ($k, $n) = @_;
+
+        # Multiplicative with:
+        #   a(p^e) = 2          # for e < k
+        #   a(p^e) = 1          # for e >= k
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k)   // goto &nan } : 1;
+        $n = defined($n) ? do { _valid(\$n); _big2uistr($n) // goto &nan } : (goto &nan);
+
+        $k > 0 or return ZERO;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_setbit($r, scalar grep { $_->[1] < $k } @factor_exp);
+        bless \$r;
+    }
+
+    sub powerfree_usigma {
+        my ($k, $n, $j) = @_;
+
+        # Multiplicative with:
+        #   a(p^e) = p^(e*j) + 1      # for e < k
+        #   a(p^e) = 1                # for e >= k
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+        $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+
+        $k > 0 or return ZERO;
+
+        if ($j == 0) {
+            goto &powerfree_usigma0;
+        }
+
+        $n = defined($n) ? do { _valid(\$n); _big2uistr($n) // goto &nan } : (goto &nan);
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
+
+            $e < $k or next;
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e * $j);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $e * $j);
+            }
+
+            Math::GMPz::Rmpz_add_ui($t, $t, 1);
             Math::GMPz::Rmpz_mul($s, $s, $t);
         }
 
