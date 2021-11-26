@@ -12677,7 +12677,7 @@ package Sidef::Types::Number::Number {
 
             foreach my $z (@terms) {
                 Math::GMPz::Rmpz_gcd($r, $r, $z);
-                Math::GMPz::Rmpz_cmp_ui($r, 1) || last;
+                last if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0);
             }
 
             return bless \$r;
@@ -12690,6 +12690,39 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_gcd($r, $x, $y);
         bless \$r;
+    }
+
+    sub gcud {    # greatest common unitary divisor (OEIS: A165430)
+        my (@vals) = @_;
+        _valid(\(@vals));
+
+        @vals || return ZERO;    # By convention, gcd of an empty set is 0.
+        @vals == 1 and return $vals[0];
+
+        my @terms = map { _any2mpz($$_) // goto &nan } @vals;
+        my $g     = Math::GMPz::Rmpz_init_set($terms[0]);
+
+        foreach my $i (1 .. $#terms) {
+            Math::GMPz::Rmpz_gcd($g, $g, $terms[$i]);
+            if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0) {
+                return bless \$g;
+            }
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        foreach my $n (@terms) {
+            next if (Math::GMPz::Rmpz_sgn($n) == 0);
+            while (1) {
+                Math::GMPz::Rmpz_divexact($t, $n, $g);
+                Math::GMPz::Rmpz_gcd($t, $t, $g);
+                last if (Math::GMPz::Rmpz_cmp_ui($t, 1) == 0);
+                Math::GMPz::Rmpz_divexact($g, $g, $t);
+            }
+            last if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0);
+        }
+
+        bless \$g;
     }
 
     sub gcdext {
@@ -15616,7 +15649,7 @@ package Sidef::Types::Number::Number {
 
     *exponential_divisors = \&edivisors;
 
-    sub idivisors {
+    sub idivisors {    # OEIS: A077609
         my ($n) = @_;
 
         $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();

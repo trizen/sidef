@@ -912,6 +912,22 @@ Returns the
 
 =cut
 
+=head2 gcud
+
+    Array.gcud()
+
+Returns the
+
+=cut
+
+=head2 gcud_by
+
+    Array.gcud_by()
+
+Returns the
+
+=cut
+
 =head2 getopt
 
     Array.getopt()

@@ -1099,6 +1099,12 @@ package Sidef::Types::Array::Array {
         $self->_reduce_by('gcd', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
     }
 
+    sub gcud_by {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        $self->_reduce_by('gcud', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
+    }
+
     sub gcd {
         my ($self, $block) = @_;
 
@@ -1107,6 +1113,16 @@ package Sidef::Types::Array::Array {
         }
 
         Sidef::Types::Number::Number::gcd(@$self);
+    }
+
+    sub gcud {
+        my ($self, $block) = @_;
+
+        if (defined($block)) {
+            goto &gcud_by;
+        }
+
+        Sidef::Types::Number::Number::gcud(@$self);
     }
 
     sub lcm_by {

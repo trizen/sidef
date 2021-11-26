@@ -2543,7 +2543,7 @@ Returns the n-th term in Stern's diatomic series (or Stern-Brocot sequence).
 
     gcd(...)
 
-The greatest common divisor of a list of integers.
+Returns the greatest common divisor of a list of integers.
 
 =cut
 
@@ -2556,6 +2556,14 @@ The extended greatest common divisor of C<a> and C<b>, returning C<(u, v, d)>, w
     u*a + v*b = d.
 
 The value of C<d> is always non-negative.
+
+=cut
+
+=head2 gcud
+
+    gcud(...)
+
+Returns the greatest common unitary divisor of a list of integers.
 
 =cut
 
@@ -2747,7 +2755,7 @@ When C<a> and C<b> are integers, this is equivalent with:
 
 Returns an array with the infinitary divisors (or i-divisors) of n.
 
-    say 36.idivisors        #=> [1, 4, 9, 36]
+    say 96.idivisors        #=> [1, 2, 3, 6, 16, 32, 48, 96]
 
 Aliases: I<infinitary_divisors>
 

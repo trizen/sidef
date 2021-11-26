@@ -106,14 +106,6 @@ do {
 }
 
 do {    # bi-unitary divisors
-    func udivs(n) {
-        n.divisors.grep {|x| gcd(x, n/x) == 1 }
-    }
-
-    func gcud(n, m) {
-        udivs(n) & udivs(m) -> max
-    }
-
     func biudivs(n) {
         n.divisors.grep {|x| gcud(x,n/x) == 1 }
     }
@@ -200,31 +192,6 @@ do {    # non-unitary divisors
 }
 
 do {    # infinitary divisors
-
-    func isidiv(d, n) {
-
-        if (n % d != 0) {
-            return false
-        }
-
-        n.prime_divisors.each {|p|
-
-            var n2 = valuation(n, p).digits(2)
-            var d2 = valuation(d, p).digits(2)
-
-            for j in (0 .. d2.end) {
-                if ((n2[j] == 0) && (d2[j] != 0)) {
-                    return false
-                }
-            }
-        }
-
-        return true;
-    }
-
-    func idivisors(n) {
-        n.divisors.grep{ isidiv(_, n) }
-    }
 
     func a(n, k=1) {
 
