@@ -15518,7 +15518,9 @@ package Sidef::Types::Number::Number {
     }
 
     sub udivisors {
-        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
+        my ($n) = @_;
+
+        $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
 
         my @d;
         foreach my $pe (_factor_exp($n)) {
@@ -15573,6 +15575,46 @@ package Sidef::Types::Number::Number {
     }
 
     *unitary_divisors = \&udivisors;
+
+    sub edivisors {    # OEIS: A322791
+        my ($n) = @_;
+
+        $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
+
+        my @d = (Math::GMPz::Rmpz_init_set_ui(1));
+        my $r = Math::GMPz::Rmpz_init();
+
+        foreach my $pe (_factor_exp($n)) {
+            my ($p, $e) = @$pe;
+
+            my @t;
+            foreach my $k (_divisors($e)) {
+
+                if ($p < ULONG_MAX) {
+                    Math::GMPz::Rmpz_ui_pow_ui($r, $p, $k);
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($r, $p, 10);
+                    Math::GMPz::Rmpz_pow_ui($r, $r, $k) if ($k > 1);
+                }
+
+                foreach my $u (@d) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @t, $t;
+                }
+            }
+
+            @d = @t;
+        }
+
+        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+        @d = map  { bless \$_ } @d;
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
+    *exponential_divisors = \&edivisors;
 
     sub prime_power_divisors {
 
