@@ -15616,6 +15616,49 @@ package Sidef::Types::Number::Number {
 
     *exponential_divisors = \&edivisors;
 
+    sub idivisors {
+        my ($n) = @_;
+
+        $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
+
+        my @d = ($ONE);
+        my $r = Math::GMPz::Rmpz_init();
+
+        foreach my $pe (_factor_exp($n)) {
+            my ($p, $e) = @$pe;
+
+            $p =
+              ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_init_set_ui($p)
+              : Math::GMPz::Rmpz_init_set_str($p, 10);
+
+            my @t;
+            Math::GMPz::Rmpz_set($r, $p);
+
+            foreach my $k (1 .. $e) {
+
+                if (($e & $k) == $k) {
+                    foreach my $u (@d) {
+                        my $t = Math::GMPz::Rmpz_init();
+                        Math::GMPz::Rmpz_mul($t, $u, $r);
+                        push @t, $t;
+                    }
+                }
+
+                Math::GMPz::Rmpz_mul($r, $r, $p) if ($k < $e);
+            }
+
+            push @d, @t;
+        }
+
+        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+        @d = map  { bless \$_ } @d;
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
+    *infinitary_divisors = \&idivisors;
+
     sub prime_power_divisors {
 
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();

@@ -2125,7 +2125,7 @@ Hendrik Lenstra's elliptic curve factorization method (ECM).
 
     edivisors(n)
 
-Returns the exponential divisors (or e-divisors) of n.
+Returns an array with the exponential divisors (or e-divisors) of n.
 
     say edivisors(5040)     #=> [210, 420, 630, 1260, 1680, 5040]
 
@@ -2738,6 +2738,18 @@ Integer division of integers C<a> and C<b>, rounded towards +Infinity.
 When C<a> and C<b> are integers, this is equivalent with:
 
     ceil(a/b)
+
+=cut
+
+=head2 idivisors
+
+    idivisors(n)
+
+Returns an array with the infinitary divisors (or i-divisors) of n.
+
+    say 36.idivisors        #=> [1, 4, 9, 36]
+
+Aliases: I<infinitary_divisors>
 
 =cut
 

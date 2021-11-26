@@ -18,6 +18,7 @@ var h = Hash(
     squarefree_udivisors => 'squarefree_usigma',
 
     edivisors => 'esigma',
+    idivisors => 'isigma',
 )
 
 for k in (0..5) {
