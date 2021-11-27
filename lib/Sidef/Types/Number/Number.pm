@@ -15915,7 +15915,7 @@ package Sidef::Types::Number::Number {
         _valid(\$n);
 
         $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
-        $k = _any2ui($$k)   // return Sidef::Types::Array::Array->new();
+        $k = _any2ui($$k) || return Sidef::Types::Array::Array->new();
 
         $power_divisors_func->($k, [_factor_exp($n)]);
     }
@@ -15987,7 +15987,7 @@ package Sidef::Types::Number::Number {
         _valid(\$n);
 
         $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
-        $k = _any2ui($$k)   // return Sidef::Types::Array::Array->new();
+        $k = _any2ui($$k) || return Sidef::Types::Array::Array->new();
 
         return $power_udivisors_func->($k, [_factor_exp($n)]);
     }
@@ -17564,34 +17564,42 @@ package Sidef::Types::Number::Number {
         bless \$s;
     }
 
-    sub square_sigma0 {
+    sub power_sigma0 {
+        my ($k, $n) = @_;
 
         # Multiplicative with:
-        #   a(p^e) = floor(e/2) + 1
+        #   a(p^e) = floor(e/k) + 1
 
-        my $n = &_big2uistr // goto &nan;
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k)   // goto &nan } : 1;
+        $n = defined($n) ? do { _valid(\$n); _big2uistr($n) // goto &nan } : (goto &nan);
+
+        $k > 0 or return ZERO;
 
         my @factor_exp = _factor_exp($n);
         @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
-        my $r = Math::Prime::Util::GMP::vecprod(map { ($_->[1] >> 1) + 1 } @factor_exp);
-        _set_int($r);
+        _set_int(
+                 Math::Prime::Util::GMP::vecprod(map  { Math::Prime::Util::GMP::divint($_->[1], $k) + 1 }
+                                                 grep { $_->[1] >= $k } @factor_exp)
+                );
     }
 
-    sub square_sigma {
-        my ($n, $k) = @_;
+    sub power_sigma {
+        my ($k, $n, $j) = @_;
 
         # Multiplicative with:
-        #   a(p^e, k) = (p^((e+2)*k) - 1)/(p^(2*k) - 1)   # for even e
-        #   a(p^e, k) = (p^((e+1)*k) - 1)/(p^(2*k) - 1)   # for odd e
+        #   a(p^e) = (p^(j*k*(1+floor(e/k))) - 1) / (p^(j*k) - 1)
 
         $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+        $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
 
-        if ($k == 0) {
-            goto &square_sigma0;
+        $k > 0 or return ZERO;
+
+        if ($j == 0) {
+            goto &power_sigma0;
         }
 
-        $n = _big2uistr($n) // goto &nan;
+        $n = defined($n) ? do { _valid(\$n); _big2uistr($n) // goto &nan } : (goto &nan);
 
         my @factor_exp = _factor_exp($n);
         @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
@@ -17600,30 +17608,37 @@ package Sidef::Types::Number::Number {
         my $u = Math::GMPz::Rmpz_init();
         my $s = Math::GMPz::Rmpz_init_set_ui(1);
 
-        foreach my $pe (grep { $_->[1] > 1 } @factor_exp) {
+        foreach my $pe (@factor_exp) {
 
             my ($p, $e) = @$pe;
 
-            $e += 2 - ($e % 2);
+            next if ($e < $k);
 
             if ($p < ULONG_MAX) {
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e * $k);
-                Math::GMPz::Rmpz_ui_pow_ui($u, $p, 2 * $k);
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $j);
             }
             else {
                 Math::GMPz::Rmpz_set_str($t, $p, 10);
-                Math::GMPz::Rmpz_pow_ui($u, $t, 2 * $k);
-                Math::GMPz::Rmpz_pow_ui($t, $t, $e * $k);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $k * $j);
             }
 
+            Math::GMPz::Rmpz_pow_ui($u, $t, 1 + Math::Prime::Util::GMP::divint($e, $k));
             Math::GMPz::Rmpz_sub_ui($t, $t, 1);
             Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            Math::GMPz::Rmpz_divexact($u, $u, $t);
 
-            Math::GMPz::Rmpz_divexact($t, $t, $u);
-            Math::GMPz::Rmpz_mul($s, $s, $t);
+            Math::GMPz::Rmpz_mul($s, $s, $u);
         }
 
         bless \$s;
+    }
+
+    sub square_sigma0 {
+        (TWO)->power_sigma0($_[0]);
+    }
+
+    sub square_sigma {
+        (TWO)->power_sigma($_[0], $_[1]);
     }
 
     sub powerfree_usigma0 {

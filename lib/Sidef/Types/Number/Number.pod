@@ -5166,8 +5166,8 @@ Aliases: I<perfect_power_count>
 
 Return an array with the k-th power divisors of n.
 
-    say 10!.power_divisors(3)  #=> [1, 8, 27, 64, 216, 1728]
-    say 10!.power_divisors(4)  #=> [1, 16, 81, 256, 1296, 20736]
+    say 3.power_divisors(10!)       #=> [1, 8, 27, 64, 216, 1728]
+    say 4.power_divisors(10!)       #=> [1, 16, 81, 256, 1296, 20736]
 
 Equivalent with:
 
@@ -5300,14 +5300,39 @@ It efficiently counts the number of k-powerful numbers <= n, or in the range C<a
 
 =cut
 
+=head2 power_sigma
+
+    k.power_sigma(n, j=1)
+
+Returns the sum of the k-th power divisors of n, each divisor raised to the power j.
+
+    say 30.of { 2.power_sigma(_) }        # OEIS: A035316
+    say 30.of { 3.power_sigma(_) }        # OEIS: A113061
+
+Equivalent with (but much faster):
+
+    n.divisors.grep { .is_power(k) }.sum {|d| d**j }
+
+=cut
+
+=head2 power_sigma0
+
+    k.power_sigma0(n)
+
+Returns the number of the k-th power divisors of n.
+
+    say 30.of { 2.power_sigma0(_) }       # OEIS: A046951
+
+=cut
+
 =head2 power_udivisors
 
     k.power_udivisors(n)
 
 Returns an array with the k-th power unitary divisors of C<n>.
 
-    say 15!.power_udivisors(2)      #=> [1, 49, 729, 35721]
-    say 15!.power_udivisors(3)      #=> [1, 125, 729, 91125]
+    say 2.power_udivisors(15!)      #=> [1, 49, 729, 35721]
+    say 3.power_udivisors(15!)      #=> [1, 125, 729, 91125]
 
 Equivalent with:
 
