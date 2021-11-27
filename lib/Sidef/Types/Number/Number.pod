@@ -3735,23 +3735,6 @@ Aliases: I<is_positive>
 
 =cut
 
-=head2 is_pow
-
-    n.is_power
-    n.is_power(k)
-
-When k is omitted, it true if n is a perfect power.
-
-When k is given, it returns true if n can be expressed as C<n = b^k> for some b >= 1.
-
-    say 225.is_power          # true: 225 == 15**2
-    say 100.is_power(2)       # true: 100 is square (10**2)
-    say 125.is_power(3)       # true: 125 is a cube ( 5**3)
-
-Aliases: I<is_power>, I<is_perfect_power>
-
-=cut
-
 =head2 is_powerfree
 
     n.is_powerfree(k=2)
@@ -3780,6 +3763,23 @@ Example:
 
     say 1000.range.grep { .is_power_of(2) }     # powers of 2
     say 1000.range.grep { .is_power_of(5) }     # powers of 5
+
+=cut
+
+=head2 is_pow
+
+    n.is_power
+    n.is_power(k)
+
+When k is omitted, it true if n is a perfect power.
+
+When k is given, it returns true if n can be expressed as C<n = b^k> for some b >= 1.
+
+    say 225.is_power          # true: 225 == 15**2
+    say 100.is_power(2)       # true: 100 is square (10**2)
+    say 125.is_power(3)       # true: 125 is a cube ( 5**3)
+
+Aliases: I<is_power>, I<is_perfect_power>
 
 =cut
 
@@ -5162,18 +5162,9 @@ Aliases: I<perfect_power_count>
 
 =head2 power_divisors
 
-    power_divisors(n)
-    power_divisors(n, k)
+    k.power_divisors(n)
 
-Returns the power divisors of n.
-
-    say 5040.power_divisors    #=> [1, 4, 8, 9, 16, 36, 144]
-
-Equivalent with:
-
-    n.divisors.grep { .is_power }
-
-When an additional argument is given, it returns the k-th power divisors of n.
+Return an array with the k-th power divisors of n.
 
     say 10!.power_divisors(3)  #=> [1, 8, 27, 64, 216, 1728]
     say 10!.power_divisors(4)  #=> [1, 16, 81, 256, 1296, 20736]
@@ -5264,7 +5255,7 @@ Aliases: I<powerfree_unitary_divisors>, I<unitary_powerfree_divisors>
 
     k.powerfree_usigma(n, j=1)
 
-Returns the sum of the k-powerfree unitary divisors of n, each divisors raised to the power j.
+Returns the sum of the k-powerfree unitary divisors of n, each divisor raised to the power j.
 
     say 20.of { 2.powerfree_usigma(_) }        # OEIS: A092261
     say 20.of { 2.powerfree_usigma(_, 2) }     # OEIS: A091306
@@ -5311,18 +5302,9 @@ It efficiently counts the number of k-powerful numbers <= n, or in the range C<a
 
 =head2 power_udivisors
 
-    power_udivisors(n)
-    power_udivisors(n,k)
+    k.power_udivisors(n)
 
-Returns the unitary power divisors of C<n>, such that each divisors C<d> is a perfect power and C<gcd(n/d, d) = 1>.
-
-    say 15!.power_udivisors         #=> [1, 49, 125, 729, 2048, 35721, 91125]
-
-Equivalent with:
-
-    n.udivisors.grep { .is_power }
-
-When an additional argument is given, it returns the unitary k-th power divisors of C<n>.
+Returns an array with the k-th power unitary divisors of C<n>.
 
     say 15!.power_udivisors(2)      #=> [1, 49, 729, 35721]
     say 15!.power_udivisors(3)      #=> [1, 125, 729, 91125]
@@ -5342,6 +5324,38 @@ Aliases: I<power_unitary_divisors>, I<unitary_power_divisors>
 Williams' p+1 factorization method.
 
 Aliases: I<pplus1_factor>
+
+=cut
+
+=head2 pp_divisors
+
+    pp_divisors(n)
+
+Returns an array with the perfect power divisors of C<n>.
+
+    say 5040.pp_divisors        #=> [1, 4, 8, 9, 16, 36, 144]
+
+Equivalent with:
+
+    n.divisors.grep { .is_perfect_power }
+
+Aliases: I<perfect_power_divisors>
+
+=cut
+
+=head2 pp_udivisors
+
+    pp_udivisors(n)
+
+Returns an array with the perfect power unitary divisors of C<n>, such that each divisor C<d> is a perfect power and C<gcd(n/d, d) = 1>.
+
+    say 15!.pp_udivisors        #=> [1, 49, 125, 729, 2048, 35721, 91125]
+
+Equivalent with:
+
+    n.udivisors.grep { .is_perfect_power }
+
+Aliases: I<perfect_power_udivisors>, I<perfect_power_unitary_divisors>
 
 =cut
 
@@ -6338,7 +6352,7 @@ Aliases: I<squarefree_count>
 
     squarefree_divisors(n)
 
-Returns the square-free divisors of n.
+Returns an array with the square-free divisors of n.
 
     say squarefree_divisors(120)  #=> [1, 2, 3, 5, 6, 10, 15, 30]
 
@@ -6418,7 +6432,7 @@ Returns the number of unitary squarefree divisors of n.
 
     n.square_sigma(k=1)
 
-Sum of the square divisors of C<n>, each divisors raised to the power C<k>.
+Sum of the square divisors of C<n>, each divisor raised to the power C<k>.
 
     say 5040.square_sigma       #=> 210
     say 5040.square_sigma(2)    #=> 22386
@@ -6455,7 +6469,7 @@ Aliases: I<sum_of_squares_count>
 
     square_udivisors(n)
 
-Returns the unitary square divisors of C<n>, such that each divisors C<d> is a square and C<gcd(n/d, d) = 1>.
+Returns the unitary square divisors of C<n>, such that each divisor C<d> is a square and C<gcd(n/d, d) = 1>.
 
     say 5040.square_udivisors   #=> [1, 9, 16, 144]
 
@@ -6467,7 +6481,7 @@ Aliases: I<square_unitary_divisors>, I<unitary_square_divisors>
 
     n.square_usigma(k=1)
 
-Sum of the unitary square divisors of C<n>, each divisors raised to power C<k>.
+Sum of the unitary square divisors of C<n>, each divisor raised to power C<k>.
 
     say square_usigma(5040)     #=> 170
     say square_usigma(5040, 2)  #=> 21074

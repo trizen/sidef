@@ -40,24 +40,24 @@ for k in (0..5), j in (0..5) {
 
 with (irand(5, 10)!) {|n|
     var D = n.divisors
-    assert_eq(n.power_divisors,    D.grep{.is_power})
-    assert_eq(n.power_divisors(1), D.grep{.is_power(1)})
-    assert_eq(n.power_divisors(2), D.grep{.is_power(2)})
-    assert_eq(n.power_divisors(3), D.grep{.is_power(3)})
-    assert_eq(n.power_divisors(4), D.grep{.is_power(4)})
-    assert_eq(n.power_divisors(5), D.grep{.is_power(5)})
-    assert_eq(n.power_divisors(9), D.grep{.is_power(9)})
+    assert_eq(n.perfect_power_divisors,    D.grep{.is_power})
+    assert_eq(1.power_divisors(n), D.grep{.is_power(1)})
+    assert_eq(2.power_divisors(n), D.grep{.is_power(2)})
+    assert_eq(3.power_divisors(n), D.grep{.is_power(3)})
+    assert_eq(4.power_divisors(n), D.grep{.is_power(4)})
+    assert_eq(5.power_divisors(n), D.grep{.is_power(5)})
+    assert_eq(9.power_divisors(n), D.grep{.is_power(9)})
 }
 
 with (irand(10, 21)!) {|n|
     var D = n.udivisors
-    assert_eq(n.power_udivisors,    D.grep{.is_power})
-    assert_eq(n.power_udivisors(1), D.grep{.is_power(1)})
-    assert_eq(n.power_udivisors(2), D.grep{.is_power(2)})
-    assert_eq(n.power_udivisors(3), D.grep{.is_power(3)})
-    assert_eq(n.power_udivisors(4), D.grep{.is_power(4)})
-    assert_eq(n.power_udivisors(5), D.grep{.is_power(5)})
-    assert_eq(n.power_udivisors(9), D.grep{.is_power(9)})
+    assert_eq(n.pp_udivisors,       D.grep{.is_power})
+    assert_eq(1.power_udivisors(n), D.grep{.is_power(1)})
+    assert_eq(2.power_udivisors(n), D.grep{.is_power(2)})
+    assert_eq(3.power_udivisors(n), D.grep{.is_power(3)})
+    assert_eq(4.power_udivisors(n), D.grep{.is_power(4)})
+    assert_eq(5.power_udivisors(n), D.grep{.is_power(5)})
+    assert_eq(9.power_udivisors(n), D.grep{.is_power(9)})
 }
 
 with (irand(10, 21)!) {|n|
@@ -75,15 +75,15 @@ for n in (0..50) {
     var D1 = n.divisors
     var D2 = n.udivisors
 
-    assert_eq(n.power_divisors,    D1.grep { .is_power })
-    assert_eq(n.power_divisors(1), D1.grep { .is_power(1) })
-    assert_eq(n.power_divisors(2), D1.grep { .is_power(2) })
-    assert_eq(n.power_divisors(3), D1.grep { .is_power(3) })
+    assert_eq(n.pp_divisors,       D1.grep { .is_power })
+    assert_eq(1.power_divisors(n), D1.grep { .is_power(1) })
+    assert_eq(2.power_divisors(n), D1.grep { .is_power(2) })
+    assert_eq(3.power_divisors(n), D1.grep { .is_power(3) })
 
-    assert_eq(n.power_udivisors,    D2.grep { .is_power })
-    assert_eq(n.power_udivisors(1), D2.grep { .is_power(1) })
-    assert_eq(n.power_udivisors(2), D2.grep { .is_power(2) })
-    assert_eq(n.power_udivisors(3), D2.grep { .is_power(3) })
+    assert_eq(n.pp_udivisors,       D2.grep { .is_power })
+    assert_eq(1.power_udivisors(n), D2.grep { .is_power(1) })
+    assert_eq(2.power_udivisors(n), D2.grep { .is_power(2) })
+    assert_eq(3.power_udivisors(n), D2.grep { .is_power(3) })
 
     assert_eq(0.powerfree_udivisors(n), D2.grep { .is_powerfree(0) })
     assert_eq(1.powerfree_udivisors(n), D2.grep { .is_powerfree(1) })
