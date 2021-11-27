@@ -15692,6 +15692,54 @@ package Sidef::Types::Number::Number {
 
     *infinitary_divisors = \&idivisors;
 
+    sub biudivisors {    # OEIS: A222266
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Array::Array->new();
+
+        my @d = ($ONE);
+        my $r = Math::GMPz::Rmpz_init();
+        my $w = Math::GMPz::Rmpz_init();
+
+        foreach my $pe (_factor_exp($n)) {
+            my ($p, $e) = @$pe;
+
+            $p =
+              ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_init_set_ui($p)
+              : Math::GMPz::Rmpz_init_set_str($p, 10);
+
+            my @t;
+            Math::GMPz::Rmpz_set($r, $p);
+
+            foreach my $k (1 .. $e) {
+
+                Math::GMPz::Rmpz_divexact($w, $n, $r);
+
+                if ((bless \$w)->gcud(bless \$r)->is_one) {
+                    foreach my $u (@d) {
+                        my $t = Math::GMPz::Rmpz_init();
+                        Math::GMPz::Rmpz_mul($t, $u, $r);
+                        push @t, $t;
+                    }
+                }
+
+                Math::GMPz::Rmpz_mul($r, $r, $p) if ($k < $e);
+            }
+
+            push @d, @t;
+        }
+
+        @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+        @d = map  { bless \$_ } @d;
+
+        Sidef::Types::Array::Array->new(\@d);
+    }
+
+    *bdivisors           = \&biudivisors;
+    *bi_unitary_divisors = \&biudivisors;
+
     sub prime_power_divisors {
 
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();

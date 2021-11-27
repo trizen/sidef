@@ -963,6 +963,22 @@ Aliases: I<in_base>
 
 =cut
 
+=head2 bdivisors
+
+    bdivisors(n)
+
+Returns an array with the bi-unitary divisors of n.
+
+    say 48.bdivisors    #=> [1, 2, 3, 6, 8, 16, 24, 48]
+
+These are divisors C<d> of C<n> that satisfy:
+
+    gcud(n/d, d) = 1
+
+Aliases: I<biudivisors>, I<bi_unitary_divisors>
+
+=cut
+
 =head2 bell
 
     n.bell
@@ -6694,11 +6710,13 @@ Aliases: I<variations_with_repetition>
 
     udivisors(n)
 
-Returns the unitary divisors of C<n>.
-
-These are the divisors C<d> of C<n> such that C<gcd(n/d, d) = 1>.
+Returns an array with the unitary divisors of n.
 
     say 120.udivisors   #=> [1, 3, 5, 8, 15, 24, 40, 120]
+
+These are divisors C<d> of C<n> that satisfy:
+
+    gcd(n/d, d) = 1
 
 Aliases: I<unitary_divisors>
 

@@ -10,3 +10,16 @@ for (12..15) {     |x|
         assert_eq(gcd(x, y), [x,y].gcd)
     }
 }
+
+assert_eq(gcud(2), 2)
+assert_eq(gcud(10, 20), 5)
+assert_eq(gcud(9!, 5040), 35)
+assert_eq(gcud(9!, 5040, 120), 5)
+assert_eq(gcud(9!, 5040, 0, 120), 5)
+assert_eq(gcud(9!, 5040, 1234), 1)
+assert_eq(gcud(9!, 5040, 1234, 9999), 1)
+
+assert_eq([].gcud, 0)
+assert_eq([10, 20].gcud, 5)
+assert_eq([9!, 5040, 120].gcud { _ }, 5)
+assert_eq([9!, 5040, 120].gcud { _**2 }, 25)

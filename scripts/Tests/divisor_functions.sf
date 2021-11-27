@@ -19,6 +19,7 @@ var h = Hash(
 
     edivisors => 'esigma',
     idivisors => 'isigma',
+    bdivisors => 'bsigma',
 )
 
 for k in (0..5) {
@@ -107,6 +108,7 @@ do {
 
 do {    # bi-unitary divisors
     func biudivs(n) {
+        #return n.bdivisors
         n.divisors.grep {|x| gcud(x,n/x) == 1 }
     }
 
@@ -273,6 +275,7 @@ do {    # A051377: exponential divisors
 
     func ediv(n) {
 
+        #return n.edivisors
         return [1] if (n == 1)
 
         var f = n.factor_exp
