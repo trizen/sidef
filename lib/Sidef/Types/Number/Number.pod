@@ -5221,6 +5221,31 @@ Returns the sum of the k-powerfree parts of integers <= n or in the range C<a..b
 
 =cut
 
+=head2 powerfree_sigma
+
+    k.powerfree_sigma(n, j=1)
+
+Returns the sum of the k-powerfree divisors of n, each divisor raised to the power j.
+
+    say 30.of { 2.powerfree_sigma(_) }        # OEIS: A048250
+    say 30.of { 3.powerfree_sigma(_) }        # OEIS: A073185
+
+Equivalent with (but much faster):
+
+    n.divisors.grep { .is_powerfree(k) }.sum {|d| d**j }
+
+=cut
+
+=head2 powerfree_sigma0
+
+    k.powerfree_sigma0(n)
+
+Returns the number of the k-powerfree divisors of n.
+
+    say 30.of { 3.powerfree_sigma0(_) }       # OEIS: A073184
+
+=cut
+
 =head2 powerfree_sum
 
     k.powerfree_sum(n)

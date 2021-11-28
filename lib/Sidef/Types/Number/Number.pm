@@ -17468,100 +17468,17 @@ package Sidef::Types::Number::Number {
     }
 
     sub squarefree_usigma0 {
-
-        # Multiplicative with:
-        #   a(p, k)   = 2
-        #   a(p^e, k) = 1       # for e > 1
-
-        my $n = &_big2uistr // goto &nan;
-
-        my @factor_exp = _factor_exp($n);
-        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
-
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_setbit($r, scalar grep { $_->[1] == 1 } @factor_exp);
-        bless \$r;
+        (TWO)->powerfree_usigma0($_[0]);
     }
 
     sub squarefree_usigma {
-        my ($n, $k) = @_;
-
-        # Multiplicative with:
-        #   a(p, k)   = p^k + 1
-        #   a(p^e, k) = 1        # for e > 1
-
-        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
-
-        if ($k == 0) {
-            goto &squarefree_usigma0;
-        }
-
-        $n = _big2uistr($n) // goto &nan;
-
-        my @factor_exp = _factor_exp($n);
-        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
-
-        my $t = Math::GMPz::Rmpz_init();
-        my $s = Math::GMPz::Rmpz_init_set_ui(1);
-
-        foreach my $pe (grep { $_->[1] == 1 } @factor_exp) {
-
-            my $p = $pe->[0];
-
-            if ($p < ULONG_MAX) {
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
-            }
-            else {
-                Math::GMPz::Rmpz_set_str($t, $p, 10);
-                Math::GMPz::Rmpz_pow_ui($t, $t, $k);
-            }
-
-            Math::GMPz::Rmpz_add_ui($t, $t, 1);
-            Math::GMPz::Rmpz_mul($s, $s, $t);
-        }
-
-        bless \$s;
+        (TWO)->powerfree_usigma($_[0], $_[1]);
     }
 
     *squarefree_sigma0 = \&usigma0;
 
     sub squarefree_sigma {
-        my ($n, $k) = @_;
-
-        # Multiplicative with:
-        #   a(p^e, k) = p^k + 1
-
-        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
-
-        if ($k == 0) {
-            goto &usigma0;
-        }
-
-        $n = _big2uistr($n) // goto &nan;
-
-        my @factor_exp = _factor_exp($n);
-        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
-
-        my $t = Math::GMPz::Rmpz_init();
-        my $s = Math::GMPz::Rmpz_init_set_ui(1);
-
-        foreach my $pe (@factor_exp) {
-
-            my $p = $pe->[0];
-
-            if ($p < ULONG_MAX) {
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
-            }
-            else {
-                Math::GMPz::Rmpz_set_str($t, $p, 10);
-                Math::GMPz::Rmpz_pow_ui($t, $t, $k);
-            }
-
-            Math::GMPz::Rmpz_add_ui($t, $t, 1);
-            Math::GMPz::Rmpz_mul($s, $s, $t);
-        }
-
-        bless \$s;
+        (TWO)->powerfree_sigma($_[0], $_[1]);
     }
 
     sub power_sigma0 {
@@ -17639,6 +17556,72 @@ package Sidef::Types::Number::Number {
 
     sub square_sigma {
         (TWO)->power_sigma($_[0], $_[1]);
+    }
+
+    sub powerfree_sigma0 {
+        my ($k, $n) = @_;
+
+        # Multiplicative with:
+        #   a(p^e) = min(e, k-1) + 1
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k)   // goto &nan } : 1;
+        $n = defined($n) ? do { _valid(\$n); _big2uistr($n) // goto &nan } : (goto &nan);
+
+        $k > 0 or return ZERO;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        _set_int(Math::Prime::Util::GMP::vecprod(map { ($_->[1] < $k) ? ($_->[1] + 1) : $k } @factor_exp));
+    }
+
+    sub powerfree_sigma {
+        my ($k, $n, $j) = @_;
+
+        # Multiplicative with:
+        #   a(p^e) = (p^(j*(e+1)) - 1)/(p^j - 1), where e = min(e, k-1)
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+        $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+
+        $k > 0 or return ZERO;
+
+        if ($j == 0) {
+            goto &powerfree_sigma0;
+        }
+
+        $n = defined($n) ? do { _valid(\$n); _big2uistr($n) // goto &nan } : (goto &nan);
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
+
+            $e = $k - 1 if ($e >= $k);
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $j);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $j);
+            }
+
+            Math::GMPz::Rmpz_pow_ui($u, $t, $e + 1);
+            Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+            Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            Math::GMPz::Rmpz_divexact($u, $u, $t);
+
+            Math::GMPz::Rmpz_mul($s, $s, $u);
+        }
+
+        bless \$s;
     }
 
     sub powerfree_usigma0 {
