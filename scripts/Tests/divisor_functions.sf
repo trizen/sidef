@@ -30,7 +30,7 @@ for k in (0..5) {
 
 var h2 = Hash(
     power_divisors => 'power_sigma',
-    #power_udivisors => 'power_usigma',
+    power_udivisors => 'power_usigma',
 
     powerfree_divisors => 'powerfree_sigma',
     powerfree_udivisors => 'powerfree_usigma',

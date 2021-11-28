@@ -17505,7 +17505,7 @@ package Sidef::Types::Number::Number {
         my ($k, $n, $j) = @_;
 
         # Multiplicative with:
-        #   a(p^e) = (p^(j*k*(1+floor(e/k))) - 1) / (p^(j*k) - 1)
+        #   a(p^e) = (p^(j*k*(1+floor(e/k))) - 1) / (p^(j*k) - 1), where e >= k.
 
         $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
         $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
@@ -17556,6 +17556,69 @@ package Sidef::Types::Number::Number {
 
     sub square_sigma {
         (TWO)->power_sigma($_[0], $_[1]);
+    }
+
+    sub power_usigma0 {
+        my ($k, $n) = @_;
+
+        # Multiplicative with:
+        #   a(p^e) = 2             if e == 0 (mod k)
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k)   // goto &nan } : 1;
+        $n = defined($n) ? do { _valid(\$n); _big2uistr($n) // goto &nan } : (goto &nan);
+
+        $k > 0 or return ZERO;
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_setbit($r, scalar grep { $_->[1] % $k == 0 } @factor_exp);
+        bless \$r;
+    }
+
+    sub power_usigma {
+        my ($k, $n, $j) = @_;
+
+        # Multiplicative with:
+        #   a(p^e) = p^(e*j) + 1, where e == 0 (mod k).
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+        $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+
+        $k > 0 or return ZERO;
+
+        if ($j == 0) {
+            goto &power_usigma0;
+        }
+
+        $n = defined($n) ? do { _valid(\$n); _big2uistr($n) // goto &nan } : (goto &nan);
+
+        my @factor_exp = _factor_exp($n);
+        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $s = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $pe (@factor_exp) {
+
+            my ($p, $e) = @$pe;
+
+            $e % $k == 0 or next;
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e * $j);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, $p, 10);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $e * $j);
+            }
+
+            Math::GMPz::Rmpz_add_ui($t, $t, 1);
+            Math::GMPz::Rmpz_mul($s, $s, $t);
+        }
+
+        bless \$s;
     }
 
     sub powerfree_sigma0 {

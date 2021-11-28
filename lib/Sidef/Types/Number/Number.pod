@@ -5367,6 +5367,28 @@ Aliases: I<power_unitary_divisors>, I<unitary_power_divisors>
 
 =cut
 
+=head2 power_usigma
+
+    k.power_usigma(n, j=1)
+
+Returns the sum of the k-th power unitary divisors of n, each divisor raised to the power j.
+
+Equivalent with (but much faster):
+
+    n.udivisors.grep { .is_power(k) }.sum {|d| d**j }
+
+=cut
+
+=head2 power_usigma0
+
+    k.power_usigma0(n)
+
+Returns the number of the k-th power unitary divisors of n.
+
+    say 30.of { 2.power_usigma0(_) }       # OEIS: A056624
+
+=cut
+
 =head2 pp1_factor
 
     n.pp1_factor(B)
