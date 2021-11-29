@@ -16989,9 +16989,12 @@ package Sidef::Types::Number::Number {
         bless \$sum;
     }
 
-    *Ω                  = \&bigomega;
-    *Omega              = \&bigomega;
-    *prime_power_sigma0 = \&bigomega;
+    *Ω     = \&bigomega;
+    *Omega = \&bigomega;
+
+    sub prime_power_sigma0 {
+        $_[0]->bigomega;
+    }
 
     sub omega {
         my ($n, $m) = @_;
@@ -17034,9 +17037,15 @@ package Sidef::Types::Number::Number {
         bless \$sum;
     }
 
-    *ω                   = \&omega;
-    *prime_sigma0        = \&omega;
-    *prime_power_usigma0 = \&omega;
+    *ω = \&omega;
+
+    sub prime_sigma0 {
+        $_[0]->omega;
+    }
+
+    sub prime_power_usigma0 {
+        $_[0]->omega;
+    }
 
     sub usigma0 {
 
@@ -17621,6 +17630,14 @@ package Sidef::Types::Number::Number {
         bless \$s;
     }
 
+    sub square_usigma0 {
+        (TWO)->power_usigma0($_[0]);
+    }
+
+    sub square_usigma {
+        (TWO)->power_usigma($_[0], $_[1]);
+    }
+
     sub powerfree_sigma0 {
         my ($k, $n) = @_;
 
@@ -17743,62 +17760,6 @@ package Sidef::Types::Number::Number {
             else {
                 Math::GMPz::Rmpz_set_str($t, $p, 10);
                 Math::GMPz::Rmpz_pow_ui($t, $t, $e * $j);
-            }
-
-            Math::GMPz::Rmpz_add_ui($t, $t, 1);
-            Math::GMPz::Rmpz_mul($s, $s, $t);
-        }
-
-        bless \$s;
-    }
-
-    sub square_usigma0 {
-
-        # Multiplicative with:
-        #   a(p^e) = 2          # for even e
-        #   a(p^e) = 1          # for odd e
-
-        my $n = &_big2uistr // goto &nan;
-
-        my @factor_exp = _factor_exp($n);
-        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
-
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_setbit($r, scalar grep { $_->[1] % 2 == 0 } @factor_exp);
-        return bless \$r;
-    }
-
-    sub square_usigma {
-        my ($n, $k) = @_;
-
-        # Multiplicative with:
-        #   a(p^e) = p^(k*e) + 1        # for even e
-        #   a(p^e) = 1                  # for odd e
-
-        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
-
-        if ($k == 0) {
-            goto &square_usigma0;
-        }
-
-        $n = _big2uistr($n) // goto &nan;
-
-        my @factor_exp = _factor_exp($n);
-        @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
-
-        my $t = Math::GMPz::Rmpz_init();
-        my $s = Math::GMPz::Rmpz_init_set_ui(1);
-
-        foreach my $pe (grep { $_->[1] % 2 == 0 } @factor_exp) {
-
-            my ($p, $e) = @$pe;
-
-            if ($p < ULONG_MAX) {
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e * $k);
-            }
-            else {
-                Math::GMPz::Rmpz_set_str($t, $p, 10);
-                Math::GMPz::Rmpz_pow_ui($t, $t, $e * $k);
             }
 
             Math::GMPz::Rmpz_add_ui($t, $t, 1);

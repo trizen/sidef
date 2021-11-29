@@ -525,7 +525,7 @@ In general, is equivalent with:
 
     n.prime_power_divisors.sum {|d| n**k / d**k }
 
-Aliases: I<bigomega>, I<prime_power_sigma0>
+Aliases: I<bigomega>
 
 =cut
 
@@ -540,7 +540,7 @@ In general, is equivalent with:
 
     n.prime_divisors.sum {|d| n**k / d**k }
 
-Aliases: I<omega>, I<prime_sigma0>, I<prime_power_usigma0>
+Aliases: I<omega>
 
 =cut
 
@@ -5569,6 +5569,18 @@ Equivalent with:
 
 =cut
 
+=head2 prime_power_sigma0
+
+    prime_power_sigma0(n)
+
+Returns the number of prime power divisors of n.
+
+Equivalent with:
+
+    bigomega(n)
+
+=cut
+
 =head2 prime_power_udivisors
 
     prime_power_udivisors(n)
@@ -5591,7 +5603,7 @@ Aliases: I<prime_power_unitary_divisors>, I<unitary_prime_power_divisors>
 
     Number.prime_power_usigma(k=1)
 
-Sum of the unitary prime power divisors of n, each divisor raised to power C<k>.
+Returns the sum of the unitary prime power divisors of n, each divisor raised to power C<k>.
 
     say prime_power_usigma(10!)     #=> 369     (== 7 + 25 + 81 + 256)
     say prime_power_usigma(10!, 2)  #=> 72771   (== 7^2 + 25^2 + 81^2 + 256^2)
@@ -5599,6 +5611,18 @@ Sum of the unitary prime power divisors of n, each divisor raised to power C<k>.
 Equivalent with:
 
     n.factor_map {|p,e| p**(e * k) }.sum
+
+=cut
+
+=head2 prime_power_usigma0
+
+    prime_power_usigma0(n)
+
+Returns the number of unitary prime power divisors of n.
+
+Equivalent with:
+
+    omega(n)
 
 =cut
 
@@ -5630,6 +5654,18 @@ Sum of the unique prime divisors of n, each divisor raised to the k-th power.
 
     say prime_sigma(100!)       #=> 1060
     say prime_sigma(100!, 2)    #=> 65796
+
+=cut
+
+=head2 prime_sigma0
+
+    prime_sigma0(n)
+
+Returns the number of prime divisors of n.
+
+Equivalent with:
+
+    omega(n)
 
 =cut
 

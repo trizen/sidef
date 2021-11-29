@@ -428,7 +428,7 @@ sub code_interactive {
 
     require Time::HiRes;
 
-print <<"EOT" if 0;
+    print <<"EOT" if 0;
             **   **         ****   *           *********   *********
           * * ** * *        ****   **          ** ** **    ** ** **
            **   **          ****   ***         *********   *  *  *
@@ -440,8 +440,8 @@ print <<"EOT" if 0;
       **   **               ****   *********   *********   *
 EOT
 
-print <<"EOT";
-Sidef version $version, running on \u$^O, using Perl $^V.
+    print <<"EOT";
+Sidef $version, running on \u$^O, using Perl $^V.
 Type "help", "copyright" or "license" for more information.
 EOT
 

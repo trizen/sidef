@@ -25,6 +25,7 @@ var h = Hash(
 for k in (0..5) {
     h.each {|a,b|
         assert_eq(n.(a).sum {|d| d**k }, n.(b)(k), "#{a} != #{b} for n=#{n} and k=#{k}")
+        assert_eq(n.(a).len, n.(b+'0'), "#{a}.len != #{b+'0'} for n=#{n}")
     }
 }
 
@@ -39,6 +40,7 @@ var h2 = Hash(
 for k in (0..5), j in (0..5) {
     h2.each {|a,b|
         assert_eq(k.(a)(n).sum {|d| d**j }, k.(b)(n,j), "#{a} != #{b} for n=#{n}, k=#{k}, j=#{j}")
+        assert_eq(k.(a)(n).len, k.(b+'0')(n), "#{a}.len != #{b+'0'} for n=#{n}, k=#{k}")
     }
 }
 
