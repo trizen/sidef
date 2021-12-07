@@ -19870,7 +19870,7 @@ package Sidef::Types::Number::Number {
     sub legendre_phi {
         my ($n, $k) = @_;
         _valid(\$k);
-        $n->rough_count($k->inc->nth_prime);
+        $k->inc->nth_prime->rough_count($n);
     }
 
     sub smooth_part {
