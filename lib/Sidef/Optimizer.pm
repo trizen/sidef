@@ -109,118 +109,118 @@ package Sidef::Optimizer {
 
             # String.method(String)
             (
-             map { [$_, [table(STRING)]] }
-               methods(STRING, qw(
-                   to
-                   downto
+                map { [$_, [table(STRING)]] } methods(
+                    STRING, qw(
+                      to
+                      downto
 
-                   concat
-                   prepend
+                      concat
+                      prepend
 
-                   gt lt le ge cmp
+                      gt lt le ge cmp
 
-                   xor and or
-                   eq ne
+                      xor and or
+                      eq ne
 
-                   index
-                   crypt
+                      index
+                      crypt
 
-                   levenshtein
-                   jaro_distance
-                   contains
-                   overlaps
-                   begins_with
-                   ends_with
-                   count
-                   range
+                      levenshtein
+                      jaro_distance
+                      contains
+                      overlaps
+                      begins_with
+                      ends_with
+                      count
+                      range
 
-                   sprintf
-                   sprintlnf
+                      sprintf
+                      sprintlnf
 
-                   encode
-                   decode
-                   )
-               )
+                      encode
+                      decode
+                      )
+                )
             ),
 
             # String.method()
             (
-             map { [$_, []] }
-               methods(STRING, qw(
-                   lc uc fc tc wc tclc lcfirst
+                map { [$_, []] } methods(
+                    STRING, qw(
+                      lc uc fc tc wc tclc lcfirst
 
-                   pop
-                   chop
-                   chomp
+                      pop
+                      chop
+                      chomp
 
-                   chars_len
-                   bytes_len
-                   graphs_len
+                      chars_len
+                      bytes_len
+                      graphs_len
 
-                   pipe
-                   chars
-                   bytes
-                   lines
-                   words
-                   backtick
-                   graphemes
+                      pipe
+                      chars
+                      bytes
+                      lines
+                      words
+                      backtick
+                      graphemes
 
-                   ord
-                   oct
-                   hex
-                   bin
-                   num
-                   not
+                      ord
+                      oct
+                      hex
+                      bin
+                      num
+                      not
 
-                   first
-                   last
+                      first
+                      last
 
-                   repeat
-                   reverse
-                   clear
-                   sort
-                   split
+                      repeat
+                      reverse
+                      clear
+                      sort
+                      split
 
-                   is_empty
-                   is_palindrome
+                      is_empty
+                      is_palindrome
 
-                   trim
-                   trim_beg
-                   trim_end
+                      trim
+                      trim_beg
+                      trim_end
 
-                   encode_utf8
-                   decode_utf8
+                      encode_utf8
+                      decode_utf8
 
-                   sprintf
-                   sprintlnf
+                      sprintf
+                      sprintlnf
 
-                   dump to_s
-                   apply_escapes
-                   unescape
-                   quotemeta
-                   looks_like_number
-                   )
-               )
+                      dump to_s
+                      apply_escapes
+                      unescape
+                      quotemeta
+                      looks_like_number
+                      )
+                )
             ),
 
             # String.method(Number)
             (
-             map { [$_, [table(NUMBER)]] }
-               methods(STRING, qw(
-                   eq ne
+                map { [$_, [table(NUMBER)]] } methods(
+                    STRING, qw(
+                      eq ne
 
-                   mul
-                   div
-                   repeat
-                   char
+                      mul
+                      div
+                      repeat
+                      char
 
-                   sprintf
-                   sprintlnf
+                      sprintf
+                      sprintlnf
 
-                   shift_left
-                   shift_right
-                   )
-               )
+                      shift_left
+                      shift_right
+                      )
+                )
             ),
 
             # String.method(String | Number | Regex)
@@ -228,41 +228,41 @@ package Sidef::Optimizer {
 
             # String.method(String, String)
             (
-             map { [$_, [table(STRING), table(STRING)]] }
-               methods(STRING, qw(
-                   tr
-                   )
-               )
+                map { [$_, [table(STRING), table(STRING)]] } methods(
+                    STRING, qw(
+                      tr
+                      )
+                )
             ),
 
             # String.method(String, String, String)
             (
-             map { [$_, [table(STRING), table(STRING), table(STRING)]] }
-               methods(STRING, qw(
-                   tr
-                   )
-               )
+                map { [$_, [table(STRING), table(STRING), table(STRING)]] } methods(
+                    STRING, qw(
+                      tr
+                      )
+                )
             ),
 
             # String.method(String, Number)
             (
-             map { [$_, [table(STRING), table(NUMBER)]] }
-               methods(STRING, qw(
-                   index
-                   contains
-                   sprintf
-                   sprintlnf
-                   )
-               )
+                map { [$_, [table(STRING), table(NUMBER)]] } methods(
+                    STRING, qw(
+                      index
+                      contains
+                      sprintf
+                      sprintlnf
+                      )
+                )
             ),
 
             # String.method(String, Bool)
             (
-             map { [$_, [table(STRING), table(BOOL)]] }
-               methods(STRING, qw(
-                   range
-                   )
-               )
+                map { [$_, [table(STRING), table(BOOL)]] } methods(
+                    STRING, qw(
+                      range
+                      )
+                )
             ),
 
         ),
@@ -271,342 +271,342 @@ package Sidef::Optimizer {
 
             # Number.method(Number)
             (
-             map { [$_, [table(NUMBER)]] }
-               methods(NUMBER, qw(
-                   + - / * % %% **
+                map { [$_, [table(NUMBER)]] } methods(
+                    NUMBER, qw(
+                      + - / * % %% **
 
-                   lt gt le ge cmp
-                   eq ne
-                   and or xor
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
 
-                   sigma
-                   usigma
+                      sigma
+                      usigma
 
-                   prime_sigma
-                   prime_usigma
+                      prime_sigma
+                      prime_usigma
 
-                   is_power
+                      is_power
 
-                   complex
-                   root iroot
-                   log
-                   next_pow
-                   max min
-                   roundf
-                   binomial
-                   subfactorial
-                   invmod
-                   isub
-                   iadd
-                   imul
-                   idiv
-                   ipow
-                   imod
-                   range
-                   to xto
-                   downto xdownto
+                      complex
+                      root iroot
+                      log
+                      next_pow
+                      max min
+                      roundf
+                      binomial
+                      subfactorial
+                      invmod
+                      isub
+                      iadd
+                      imul
+                      idiv
+                      ipow
+                      imod
+                      range
+                      to xto
+                      downto xdownto
 
-                   shift_right
-                   shift_left
-                   )
-               )
+                      shift_right
+                      shift_left
+                      )
+                )
             ),
 
             # Number.method()
             (
-             map { [$_, []] }
-               methods(NUMBER, qw(
-                   inc dec not
+                map { [$_, []] } methods(
+                    NUMBER, qw(
+                      inc dec not
 
-                   factorial
-                   subfactorial
-                   superfactorial
-                   hyperfactorial
-                   lnsuperfactorial
-                   lnhyperfactorial
-                   sqrt isqrt
-                   next_pow2
-                   abs int rat float complex
-                   norm conj sqr
+                      factorial
+                      subfactorial
+                      superfactorial
+                      hyperfactorial
+                      lnsuperfactorial
+                      lnhyperfactorial
+                      sqrt isqrt
+                      next_pow2
+                      abs int rat float complex
+                      norm conj sqr
 
-                   zeta
-                   eta
-                   beta
-                   gamma
-                   Ai
-                   Li
-                   Li2
-                   Ei
+                      zeta
+                      eta
+                      beta
+                      gamma
+                      Ai
+                      Li
+                      Li2
+                      Ei
 
-                   sigma
-                   sigma0
+                      sigma
+                      sigma0
 
-                   usigma
-                   usigma0
+                      usigma
+                      usigma0
 
-                   prime_sigma
-                   prime_usigma
+                      prime_sigma
+                      prime_usigma
 
-                   divisors
-                   udivisors
+                      divisors
+                      udivisors
 
-                   factor
-                   factor_exp
+                      factor
+                      factor_exp
 
-                   exp
-                   exp2
-                   exp10
+                      exp
+                      exp2
+                      exp10
 
-                   cos sin
+                      cos sin
 
-                   ln
-                   log
-                   log2
-                   log10
+                      ln
+                      log
+                      log2
+                      log10
 
-                   sin
-                   asin
-                   sinh
-                   asinh
+                      sin
+                      asin
+                      sinh
+                      asinh
 
-                   cos
-                   acos
-                   cosh
-                   acosh
+                      cos
+                      acos
+                      cosh
+                      acosh
 
-                   tan
-                   atan
-                   tanh
-                   atanh
+                      tan
+                      atan
+                      tanh
+                      atanh
 
-                   cot
-                   acot
-                   coth
-                   acoth
+                      cot
+                      acot
+                      coth
+                      acoth
 
-                   sec
-                   sech
-                   asec
-                   asech
+                      sec
+                      sech
+                      asec
+                      asech
 
-                   csc
-                   csch
-                   acsc
-                   acsch
+                      csc
+                      csch
+                      acsc
+                      acsch
 
-                   cot
-                   acot
-                   coth
-                   acoth
+                      cot
+                      acot
+                      coth
+                      acoth
 
-                   inf
-                   neg
-                   sign
-                   nan
-                   chr
+                      inf
+                      neg
+                      sign
+                      nan
+                      chr
 
-                   i pi tau
-                   e ln2 phi
-                   EulerGamma
-                   CatalanG
+                      i pi tau
+                      e ln2 phi
+                      EulerGamma
+                      CatalanG
 
-                   is_zero
-                   is_one
-                   is_nan
-                   is_pos
-                   is_neg
-                   is_even
-                   is_odd
-                   is_inf
-                   is_ninf
-                   is_int
+                      is_zero
+                      is_one
+                      is_nan
+                      is_pos
+                      is_neg
+                      is_even
+                      is_odd
+                      is_inf
+                      is_ninf
+                      is_int
 
-                   is_prime
-                   is_square
-                   is_power
+                      is_prime
+                      is_square
+                      is_power
 
-                   sgn
-                   ceil
-                   floor
-                   length
+                      sgn
+                      ceil
+                      floor
+                      length
 
-                   ilog
-                   ilog2
-                   ilog10
+                      ilog
+                      ilog2
+                      ilog10
 
-                   isqrt
+                      isqrt
 
-                   numerator
-                   denominator
+                      numerator
+                      denominator
 
-                   digits
+                      digits
 
-                   as_bin
-                   as_oct
-                   as_hex
-                   as_rat
-                   as_frac
+                      as_bin
+                      as_oct
+                      as_hex
+                      as_rat
+                      as_frac
 
-                   dump
-                   commify
-                   )
-               )
+                      dump
+                      commify
+                      )
+                )
             ),
 
             # Number.method(Number, Number)
             (
-             map { [$_, [table(NUMBER), table(NUMBER)]] }
-               methods(NUMBER, qw(
-                   powmod
-                   range
-                   )
-               )
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    NUMBER, qw(
+                      powmod
+                      range
+                      )
+                )
             ),
         ),
 
         (BOOL) => build_tree(
             (
-             map { [$_, []] }
-               methods(BOOL, qw(
-                   not
-                   is_true
-                   true
-                   false
-                   to_bool
-                   dump
-                   )
-               )
+                map { [$_, []] } methods(
+                    BOOL, qw(
+                      not
+                      is_true
+                      true
+                      false
+                      to_bool
+                      dump
+                      )
+                )
             ),
         ),
 
         (ARRAY) => build_tree(
             (
-             map { [$_, []] }
-               methods(ARRAY, qw(
-                   first
-                   last
+                map { [$_, []] } methods(
+                    ARRAY, qw(
+                      first
+                      last
 
-                   freq
-                   len end
-                   is_empty
-                   min max
+                      freq
+                      len end
+                      is_empty
+                      min max
 
-                   sum
-                   prod
+                      sum
+                      prod
 
-                   zip
-                   cartesian
-                   permutations
-                   derangements
-                   circular_permutations
+                      zip
+                      cartesian
+                      permutations
+                      derangements
+                      circular_permutations
 
-                   sort
-                   reverse
+                      sort
+                      reverse
 
-                   unique
-                   last_unique
-                   flatten
+                      unique
+                      last_unique
+                      flatten
 
-                   to_s
-                   dump
-                   )
-               )
+                      to_s
+                      dump
+                      )
+                )
             ),
 
             (
-             map { [$_, [table(NUMBER)]] }
-               methods(ARRAY, qw(
-                   count
-                   index
-                   rindex
-                   exists
-                   defined
-                   contains
+                map { [$_, [table(NUMBER)]] } methods(
+                    ARRAY, qw(
+                      count
+                      index
+                      rindex
+                      exists
+                      defined
+                      contains
 
-                   subsets
-                   partitions
-                   variations
-                   variations_with_repetition
-                   combinations
-                   combinations_with_repetition
+                      subsets
+                      partitions
+                      variations
+                      variations_with_repetition
+                      combinations
+                      combinations_with_repetition
 
-                   nth_permutation
+                      nth_permutation
 
-                   div
-                   mul
+                      div
+                      mul
 
-                   rotate
+                      rotate
 
-                   first
-                   last
-                   item
-                   ft
+                      first
+                      last
+                      item
+                      ft
 
-                   sum
-                   prod
+                      sum
+                      prod
 
-                   take_right
-                   take_left
-                   )
-               )
+                      take_right
+                      take_left
+                      )
+                )
             ),
 
             (
-             map { [$_, [table(ARRAY)]] }
-               methods(ARRAY, qw(
-                   and
-                   or
-                   xor
-                   concat
+                map { [$_, [table(ARRAY)]] } methods(
+                    ARRAY, qw(
+                      and
+                      or
+                      xor
+                      concat
 
-                   eq ne
-                   contains_type
-                   contains_any
-                   contains_all
-                   )
-               )
+                      eq ne
+                      contains_type
+                      contains_any
+                      contains_all
+                      )
+                )
             ),
 
             (
-             map { [$_, [table(STRING)]] }
-               methods(ARRAY, qw(
-                   pack
-                   join
-                   index
-                   rindex
-                   count
-                   contains
-                   contains_type
-                   reduce
-                   reduce_operator
-                   )
-               )
+                map { [$_, [table(STRING)]] } methods(
+                    ARRAY, qw(
+                      pack
+                      join
+                      index
+                      rindex
+                      count
+                      contains
+                      contains_type
+                      reduce
+                      reduce_operator
+                      )
+                )
             ),
 
             (map { [$_, [table('')]] } methods(ARRAY, qw(reduce_operator))),
-                             ),
+        ),
 
         (RANGENUM) => build_tree(
 
             # RangeNum.method(Number)
             (
-             map { [$_, [table(NUMBER)]] }
-               methods(RANGENUM, qw(
-                   from to by
-                   sum add sub mul div
-                   )
-               )
+                map { [$_, [table(NUMBER)]] } methods(
+                    RANGENUM, qw(
+                      from to by
+                      sum add sub mul div
+                      )
+                )
             ),
 
             # RangeNum.method()
             (
-             map { [$_, []] }
-               methods(RANGENUM, qw(
-                   first last reverse
-                   min max step
-                   sum length
-                   )
-               )
+                map { [$_, []] } methods(
+                    RANGENUM, qw(
+                      first last reverse
+                      min max step
+                      sum length
+                      )
+                )
             ),
         ),
 
@@ -614,47 +614,47 @@ package Sidef::Optimizer {
 
             # Number.method()
             (
-             map { [$_, []] }
-               dtypes(NUMBER_DT, qw(
-                   pi
-                   tau
-                   ln2
-                   EulerGamma
-                   CatalanG
-                   e i
-                   phi
-                   nan
-                   inf
-                   ninf
-                   )
-               )
+                map { [$_, []] } dtypes(
+                    NUMBER_DT, qw(
+                      pi
+                      tau
+                      ln2
+                      EulerGamma
+                      CatalanG
+                      e i
+                      phi
+                      nan
+                      inf
+                      ninf
+                      )
+                )
             ),
 
             # Number.method(STRING|NUMBER)
             (
-             map { [$_, [table(STRING, NUMBER)]] }
-               dtypes(NUMBER_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(STRING, NUMBER)]] } dtypes(
+                    NUMBER_DT, qw(
+                      new
+                      )
+                )
             ),
 
             # Number.method(NUMBER, NUMBER)
             (
-             map { [$_, [table(NUMBER), table(NUMBER)]] }
-               dtypes(NUMBER_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(NUMBER), table(NUMBER)]] } dtypes(
+                    NUMBER_DT, qw(
+                      new
+                      )
+                )
             ),
 
             # Number.method(STRING, NUMBER)
             (
-             map { [$_, [table(STRING), table(NUMBER)]] }
-               dtypes(NUMBER_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(STRING), table(NUMBER)]] } dtypes(
+                    NUMBER_DT, qw(
+                      new
+                      )
+                )
             ),
         ),
 
@@ -662,11 +662,11 @@ package Sidef::Optimizer {
 
             # String.method(STRING|NUMBER)
             (
-             map { [$_, [table(STRING, NUMBER)]] }
-               dtypes(STRING_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(STRING, NUMBER)]] } dtypes(
+                    STRING_DT, qw(
+                      new
+                      )
+                )
             ),
         ),
 
@@ -674,11 +674,11 @@ package Sidef::Optimizer {
 
             # Regex.method(STRING)
             (
-             map { [$_, [table(STRING)]] }
-               dtypes(REGEX_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(STRING)]] } dtypes(
+                    REGEX_DT, qw(
+                      new
+                      )
+                )
             ),
         ),
 
@@ -686,11 +686,11 @@ package Sidef::Optimizer {
 
             # File.method(STRING)
             (
-             map { [$_, [table(STRING)]] }
-               dtypes(FILE_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(STRING)]] } dtypes(
+                    FILE_DT, qw(
+                      new
+                      )
+                )
             ),
         ),
 
@@ -698,11 +698,11 @@ package Sidef::Optimizer {
 
             # Dir.method(STRING)
             (
-             map { [$_, [table(STRING)]] }
-               dtypes(DIR_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(STRING)]] } dtypes(
+                    DIR_DT, qw(
+                      new
+                      )
+                )
             ),
         ),
 
@@ -710,20 +710,20 @@ package Sidef::Optimizer {
 
             # RangeNum.method(NUMBER, NUMBER)
             (
-             map { [$_, [table(NUMBER), table(NUMBER)]] }
-               dtypes(RANGENUM_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(NUMBER), table(NUMBER)]] } dtypes(
+                    RANGENUM_DT, qw(
+                      new
+                      )
+                )
             ),
 
             # RangeNum.method(NUMBER, NUMBER, NUMBER)
             (
-             map { [$_, [table(NUMBER), table(NUMBER), table(NUMBER)]] }
-               dtypes(RANGENUM_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(NUMBER), table(NUMBER), table(NUMBER)]] } dtypes(
+                    RANGENUM_DT, qw(
+                      new
+                      )
+                )
             ),
         ),
 
@@ -731,33 +731,33 @@ package Sidef::Optimizer {
 
             # Complex.method()
             (
-             map { [$_, []] }
-               dtypes(COMPLEX_DT, qw(
-                   i
-                   e
-                   pi
-                   phi
-                   new
-                   )
-               )
+                map { [$_, []] } dtypes(
+                    COMPLEX_DT, qw(
+                      i
+                      e
+                      pi
+                      phi
+                      new
+                      )
+                )
             ),
 
             # Complex.method(STRING|NUMBER)
             (
-             map { [$_, [table(STRING, NUMBER)]] }
-               dtypes(COMPLEX_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(STRING, NUMBER)]] } dtypes(
+                    COMPLEX_DT, qw(
+                      new
+                      )
+                )
             ),
 
             # Complex.method(NUMBER|STRING, NUMBER|STRING)
             (
-             map { [$_, [table(STRING, NUMBER), table(STRING, NUMBER)]] }
-               dtypes(COMPLEX_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(STRING, NUMBER), table(STRING, NUMBER)]] } dtypes(
+                    COMPLEX_DT, qw(
+                      new
+                      )
+                )
             ),
         ),
 
@@ -765,11 +765,11 @@ package Sidef::Optimizer {
 
             # Backtick.method(STRING)
             (
-             map { [$_, [table(STRING)]] }
-               dtypes(BACKTICK_DT, qw(
-                   new
-                   )
-               )
+                map { [$_, [table(STRING)]] } dtypes(
+                    BACKTICK_DT, qw(
+                      new
+                      )
+                )
             ),
         ),
     );
@@ -1084,6 +1084,15 @@ package Sidef::Optimizer {
                 else {
                     splice(@{$obj->{call}}, 0, $count);
                 }
+            }
+        }
+
+        # Concept for converting small RangeNumber objects into arrays
+        # (disabled for now, as it breaks some code)
+        if (0 and ref($obj->{self}) eq RANGENUM) {
+            state $range_len_limit = Sidef::Types::Number::Number::_set_int(100);
+            if ($obj->{self}->len->le($range_len_limit)) {
+                $obj->{self} = $obj->{self}->to_a;
             }
         }
 
