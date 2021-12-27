@@ -52,12 +52,13 @@ package Sidef::Types::Glob::FileHandle {
     sub autoflush {
         my ($self, $bool) = @_;
         select((select($self->{fh}), $| = $bool ? 1 : 0)[0]);
-        $bool;
+        $self;
     }
 
     sub binmode {
         my ($self, $encoding) = @_;
         CORE::binmode($self->{fh}, "$encoding");
+        $self;
     }
 
     sub syswrite {
