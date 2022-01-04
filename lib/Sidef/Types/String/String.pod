@@ -692,6 +692,26 @@ Returns the
 
 =cut
 
+=head2 hex2ascii
+
+    String.hex2ascii()
+
+Returns the
+
+Aliases: I<unhexlify>
+
+=cut
+
+=head2 hexlify
+
+    String.hexlify()
+
+Returns the
+
+Aliases: I<ascii2hex>
+
+=cut
+
 =head2 index
 
     String.index()

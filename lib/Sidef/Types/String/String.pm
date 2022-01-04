@@ -304,6 +304,22 @@ package Sidef::Types::String::String {
         Sidef::Types::Number::Number->new($$self, 16);
     }
 
+    sub hexlify {
+        my ($self) = @_;
+        my $r = CORE::unpack("H*", $$self);
+        bless \$r;
+    }
+
+    *ascii2hex = \&hexlify;
+
+    sub unhexlify {
+        my ($self) = @_;
+        my $r = CORE::pack("H*", $$self);
+        bless \$r;
+    }
+
+    *hex2ascii = \&unhexlify;
+
     sub decode_base64 {
         state $x = require MIME::Base64;
         bless \MIME::Base64::decode_base64(${$_[0]});
@@ -1003,10 +1019,8 @@ package Sidef::Types::String::String {
         }
 
         my $tries = (
-                     CORE::join(
-                                '|', map { CORE::quotemeta($_) }
-                                  sort { length($b) <=> length($a) } CORE::keys(%map)
-                               )
+                     CORE::join('|', map { CORE::quotemeta($_) }
+                                  sort { length($b) <=> length($a) } CORE::keys(%map))
                     );
 
         $self->new($$self =~ s{($tries)}{$map{$1}}gr);
