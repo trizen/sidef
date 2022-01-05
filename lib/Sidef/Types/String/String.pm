@@ -320,6 +320,18 @@ package Sidef::Types::String::String {
 
     *hex2ascii = \&unhexlify;
 
+    sub ascii2bin {
+        my ($self) = @_;
+        my $r = CORE::unpack("B*", $$self);
+        bless \$r;
+    }
+
+    sub bin2ascii {
+        my ($self) = @_;
+        my $r = CORE::pack("B*", $$self);
+        bless \$r;
+    }
+
     sub decode_base64 {
         state $x = require MIME::Base64;
         bless \MIME::Base64::decode_base64(${$_[0]});

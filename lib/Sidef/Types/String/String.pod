@@ -240,6 +240,14 @@ Returns the
 
 =cut
 
+=head2 ascii2bin
+
+    String.ascii2bin()
+
+Returns the
+
+=cut
+
 =head2 backtick
 
     String.backtick()
@@ -281,6 +289,14 @@ Aliases: I<starts_with>
 =head2 bin
 
     String.bin()
+
+Returns the
+
+=cut
+
+=head2 bin2ascii
+
+    String.bin2ascii()
 
 Returns the
 

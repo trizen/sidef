@@ -179,7 +179,7 @@ Output:
 
 ### LICENSE AND COPYRIGHT
 
-* Copyright (C) 2013-2021 Daniel Șuteu, Ioana Fălcușan
+* Copyright (C) 2013-2022 Daniel Șuteu, Ioana Fălcușan
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the *Artistic License (2.0)*. You may obtain a copy
