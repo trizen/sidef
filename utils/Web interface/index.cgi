@@ -5,14 +5,14 @@
 use utf8;
 use 5.018;
 use strict;
-use autodie;
+#use autodie;
 
 use CGI qw(:standard -utf8);
-use CGI::Carp qw(fatalsToBrowser);
+#use CGI::Carp qw(fatalsToBrowser);
 use Capture::Tiny qw(capture);
 
 # Path where Sidef exists (when not installed)
-use lib qw(/home/swampyx/Other/Programare/Sidef/lib);
+#use lib qw(/home/user/Sidef/lib);
 
 # Limit the size of Sidef scripts to 500KB
 $CGI::POST_MAX = 1024 * 500;
@@ -20,15 +20,20 @@ $CGI::POST_MAX = 1024 * 500;
 use Sidef;
 
 binmode(STDOUT, ':utf8');
-print header(-charset => 'UTF-8'),
+print header(
+             -charset                 => 'UTF-8',
+             'Referrer-Policy'        => 'no-referrer',
+             'X-Frame-Options'        => 'DENY',
+             'X-Xss-Protection'       => '1; mode=block',
+             'X-Content-Type-Options' => 'nosniff',
+            ),
   start_html(
-             -lang   => 'en',
-             -title  => 'Sidef Programming Language',
-             -author => 'Daniel Șuteu',
-             -base   => 'true',
-             -meta   => {
-                       'keywords'  => 'sidef programming language web interface',
-                       'copyright' => 'Copyright © 2015-2016 Daniel "Trizen" Șuteu'
+             -lang  => 'en',
+             -title => 'Sidef Programming Language',
+             -base  => 'true',
+             -meta  => {
+                       'keywords' => 'sidef programming language web interface',
+                       'viewport' => 'width=device-width, initial-scale=1.0',
                       },
              -style  => [{-src => 'css/main.css'}],
              -script => [
