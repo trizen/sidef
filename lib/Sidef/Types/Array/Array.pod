@@ -26,7 +26,9 @@ Inherits methods from:
 
     a & b
 
-Returns the
+Returns the intersection of two arrays.
+
+    <a a a b c> & <a x y a c>    #=> ["a", "a", "c"]
 
 Aliases: I<and>
 
@@ -34,9 +36,11 @@ Aliases: I<and>
 
 =head2 *
 
-    a * b
+    a * n
 
-Returns the
+Repeats the content of array C<a> n times, returning a new array.
+
+    <a b> * 2   #=> ["a", "b", "a", "b"]
 
 Aliases: I<mul>
 
@@ -44,9 +48,9 @@ Aliases: I<mul>
 
 =head2 **
 
-    a ** b
+    a ** n
 
-Returns the
+Matrix exponentiation, excpecting array C<a> to be a 2D array.
 
 Aliases: I<mpow>, I<matrix_pow>
 
@@ -56,7 +60,9 @@ Aliases: I<mpow>, I<matrix_pow>
 
     a + b
 
-Returns the
+Array concatenation, returning a new array.
+
+    <a b> + <c d>    #=> ["a", "b", "c", "d"]
 
 Aliases: I<add>, I<concat>
 
@@ -66,7 +72,9 @@ Aliases: I<add>, I<concat>
 
     a - b
 
-Returns the
+Array difference: removes any element from array C<a> that exists inside array C<b>, returning a new array.
+
+    <a a a b c> - <a x y a c>       #=> ["a", "b"]
 
 Aliases: I<sub>, I<diff>
 
@@ -74,9 +82,11 @@ Aliases: I<sub>, I<diff>
 
 =head2 ...
 
-    a ... b
+    a...
 
-Returns the
+Converts array C<a> into a list.
+
+    var (a,b,c) = <1 2 3>...
 
 Aliases: I<to_list>
 
@@ -84,9 +94,14 @@ Aliases: I<to_list>
 
 =head2 /
 
-    a / b
+    a / n
 
-Returns the
+Divides the array C<a> into C<n> segments.
+
+If the division is not exact, the remaining incomplete segment is added to the end of the returned array.
+
+    <a b c d>   / 2     #=> [["a", "b"], ["c", "d"]]
+    <a b c d e> / 2     #=> [["a", "b"], ["c", "d"], ["e"]]
 
 Aliases: I<÷>, I<div>
 
@@ -96,7 +111,7 @@ Aliases: I<÷>, I<div>
 
     a < b
 
-Returns the
+Less-than array comparison, done term-by-term, returning C<true> or C<false>.
 
 Aliases: I<lt>
 
@@ -106,7 +121,11 @@ Aliases: I<lt>
 
     a <=> b
 
-Returns the
+Array comparison, done term-by-term, returning:
+
+     1 when a > b
+     0 when a == b
+    -1 when a < b
 
 Aliases: I<cmp>
 
@@ -116,7 +135,7 @@ Aliases: I<cmp>
 
     a == b
 
-Returns the
+Returns true if C<a> and C<b> are equal to each other.
 
 Aliases: I<eq>
 
@@ -126,7 +145,7 @@ Aliases: I<eq>
 
     a > b
 
-Returns the
+Greater-than array comparison, done term-by-term, returning C<true> or C<false>.
 
 Aliases: I<gt>
 
@@ -136,7 +155,9 @@ Aliases: I<gt>
 
     a ^ b
 
-Returns the
+Returns the set difference of two arrays.
+
+    <a a a b c> ^ <a x y a c>   #=> ["a", "b", "x", "y"]
 
 Aliases: I<xor>
 
@@ -146,7 +167,9 @@ Aliases: I<xor>
 
     a | b
 
-Returns the
+Returns the union of two arrays.
+
+    <a a a b c> | <a x y a c>   #=> ["a", "a", "a", "b", "c", "x", "y"]
 
 Aliases: I<or>
 

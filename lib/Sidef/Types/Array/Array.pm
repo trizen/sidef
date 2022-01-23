@@ -374,8 +374,13 @@ package Sidef::Types::Array::Array {
 
         my @obj = @$self;
 
+        $num = CORE::int($num);
+        $num > 0 or return undef;
+
         my @array;
-        my $len = CORE::int(scalar(@obj) / CORE::int($num));
+        my $len = CORE::int(scalar(@obj) / $num);
+
+        $len || return undef;
 
         my $i   = 1;
         my $pos = $len;
