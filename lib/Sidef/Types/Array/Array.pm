@@ -3094,7 +3094,11 @@ package Sidef::Types::Array::Array {
         my @perm;
         my @arr = @$self;
 
-        $n = Sidef::Types::Number::Number->new($n)->int;
+        if (ref($n) ne 'Sidef::Types::Number::Number') {
+            $n = Sidef::Types::Number::Number->new($n);
+        }
+
+        $n = $n->int;
         $n = ref($$n) eq 'Math::GMPz' ? Math::GMPz::Rmpz_init_set($$n) : return undef;
 
         my $sgn = Math::GMPz::Rmpz_sgn($n);
@@ -3123,6 +3127,13 @@ package Sidef::Types::Array::Array {
     }
 
     *nth_perm = \&nth_permutation;
+
+    sub random_permutation {
+        my ($self) = @_;
+        $self->nth_permutation($self->len->factorial->irand);
+    }
+
+    *rand_perm = \&random_permutation;
 
     sub next_permutation {
         my ($self) = @_;

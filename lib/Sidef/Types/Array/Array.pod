@@ -1538,6 +1538,16 @@ Aliases: I<sample>
 
 =cut
 
+=head2 rand_perm
+
+    Array.rand_perm()
+
+Returns the
+
+Aliases: I<random_permutation>
+
+=cut
+
 =head2 range
 
     Array.range()
