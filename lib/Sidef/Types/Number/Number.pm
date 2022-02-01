@@ -818,6 +818,34 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_get_str($x, 10);
     }
 
+    sub _factor {
+        my ($n) = @_;
+
+        if (ref($n) eq 'Math::GMPz') {
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                $n = Math::GMPz::Rmpz_get_ui($n);
+            }
+            else {
+                $n = Math::GMPz::Rmpz_get_str($n, 10);
+            }
+        }
+
+        my @factors;
+
+        if (length($n) > 2000) {
+            ($n, @factors) = _adaptive_trial_factor($n);
+        }
+
+        (
+         @factors,
+         (
+          (HAS_PRIME_UTIL and $n < ULONG_MAX)
+          ? Math::Prime::Util::factor($n)
+          : Math::Prime::Util::GMP::factor($n)
+         )
+        );
+    }
+
     # Prime factorization in [p,k] form, where k is the multiplicity of p.
     sub _factor_exp {
         my ($n) = @_;
@@ -835,7 +863,7 @@ package Sidef::Types::Number::Number {
             return Math::Prime::Util::factor_exp($n);
         }
 
-        my @factors = Math::Prime::Util::GMP::factor($n);
+        my @factors = _factor($n);
 
         my $prev_value = shift(@factors) // return;
         my @factor_exp = [$prev_value, 1];
@@ -851,23 +879,6 @@ package Sidef::Types::Number::Number {
         }
 
         @factor_exp;
-    }
-
-    sub _factor {
-        my ($n) = @_;
-
-        if (ref($n) eq 'Math::GMPz') {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                $n = Math::GMPz::Rmpz_get_ui($n);
-            }
-            else {
-                $n = Math::GMPz::Rmpz_get_str($n, 10);
-            }
-        }
-
-        (HAS_PRIME_UTIL and $n < ULONG_MAX)
-          ? Math::Prime::Util::factor($n)
-          : Math::Prime::Util::GMP::factor($n);
     }
 
     sub _divisors {
@@ -1009,25 +1020,66 @@ package Sidef::Types::Number::Number {
     }
 
     sub _adaptive_trial_factor {
-        my ($n) = @_;
+        my ($n, $L, $R) = @_;
 
-        my @limits = (5e4);
-        my $size   = Math::GMPz::Rmpz_sizeinbase($n, 10);
+        $L //= 5e4;
+        $R //= 5e6;
 
-        if ($size > 55) { push @limits, 5e5 }
-        if ($size > 65) { push @limits, 5e6 }
-
-        my @prime_factors;
-
-        foreach my $trial_limit (@limits) {
-            my ($r, @factors) = _primorial_trial_factor($n, $trial_limit);
-            @factors || last;
-            push @prime_factors, @factors;
-            $n = $r;
-            last if Math::GMPz::Rmpz_fits_ulong_p($n);
+        if (ref($n) eq 'Math::GMPz') {
+            $n = Math::GMPz::Rmpz_init_set($n);    # copy
+        }
+        else {
+            $n = Math::GMPz::Rmpz_init_set_str($n, 10);
         }
 
-        return ($n, @prime_factors);
+        my @factors;
+
+        my $P = _cached_primorial($L);
+
+        my $g = Math::GMPz::Rmpz_init();
+        my $t = Math::GMPz::Rmpz_init();
+
+        my $F = 2;
+
+        while (1) {
+
+            Math::GMPz::Rmpz_gcd($g, $P, $n);
+
+            # Early stop when n seems to no longer have small factors
+            if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0) {
+                last;
+            }
+
+            # Factorize n over primes in P
+            foreach my $p (Math::Prime::Util::GMP::sieve_primes($F, $L)) {
+                if (Math::GMPz::Rmpz_divisible_ui_p($g, $p)) {
+
+                    Math::GMPz::Rmpz_set_ui($t, $p);
+                    my $valuation = Math::GMPz::Rmpz_remove($n, $n, $t);
+                    push @factors, ($p) x $valuation;
+
+                    # Stop the loop early when no more primes divide `u` (optional)
+                    Math::GMPz::Rmpz_divexact_ui($g, $g, $p);
+                    last if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0);
+                }
+            }
+
+            # Early stop when n has been fully factored
+            if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+                last;
+            }
+
+            # Early stop when the trial range has been exhausted
+            if ($L > $R) {
+                last;
+            }
+
+            $F = $L;
+            $L <<= 1;
+            $P = _cached_primorial($L);
+        }
+
+        return ($n, @factors);
     }
 
     #
@@ -14782,7 +14834,7 @@ package Sidef::Types::Number::Number {
             last if (($j >= 7) && ($size <= 150));    # 45 digits
         }
 
-        my @f = Math::Prime::Util::GMP::factor(Math::GMPz::Rmpz_get_str($n, 10));
+        my @f = _factor($n);
         _set_int($f[0]);
     }
 
@@ -14801,18 +14853,8 @@ package Sidef::Types::Number::Number {
     }
 
     sub factor {
-
         my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
-        my @factors;
-
-        if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-            @factors = Math::Prime::Util::factor($n);
-        }
-        else {
-            @factors = Math::Prime::Util::GMP::factor($n);
-        }
-
-        Sidef::Types::Array::Array->new([map { _set_int($_) } @factors]);
+        Sidef::Types::Array::Array->new([map { _set_int($_) } _factor($n)]);
     }
 
     *factors = \&factor;

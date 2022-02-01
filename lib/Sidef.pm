@@ -88,6 +88,7 @@ package Sidef {
 
     sub get_sidef_config_dir {
         my ($self) = @_;
+
         $self->{sidef_config_dir} //= $ENV{SIDEF_CONFIG_DIR}
           || File::Spec->catdir(
                                 $ENV{XDG_CONFIG_DIR}
@@ -107,8 +108,8 @@ package Sidef {
 
         if (not -d $self->{sidef_config_dir}) {
             require File::Path;
-            File::Path::make_path($self->{sidef_config_dir})
-                or warn "[WARNING] Can't create directory <<$self->{sidef_config_dir}>>: $!";
+            eval { File::Path::make_path($self->{sidef_config_dir}) }
+              or warn "[WARNING] Can't create directory <<$self->{sidef_config_dir}>>: $!";
         }
 
         return $self->{sidef_config_dir};
