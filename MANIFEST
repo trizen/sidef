@@ -1031,6 +1031,7 @@ scripts/Tests/ternary_operator.sf
 scripts/Tests/token_recursive.sf
 scripts/Tests/top_rank_per_group.sf
 scripts/Tests/topological_sort.sf
+scripts/Tests/trial_division.sf
 scripts/Tests/triangle_path.sf
 scripts/Tests/tribonacci_closed_form.sf
 scripts/Tests/trigonometric_functions.sf

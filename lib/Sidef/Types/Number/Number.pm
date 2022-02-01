@@ -833,7 +833,18 @@ package Sidef::Types::Number::Number {
         my @factors;
 
         if (length($n) > 2000) {
+
             ($n, @factors) = _adaptive_trial_factor($n);
+
+            if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+                    return @factors;
+                }
+                $n = Math::GMPz::Rmpz_get_ui($n);
+            }
+            else {
+                $n = Math::GMPz::Rmpz_get_str($n, 10);
+            }
         }
 
         (
@@ -1023,7 +1034,7 @@ package Sidef::Types::Number::Number {
         my ($n, $L, $R) = @_;
 
         $L //= 5e4;
-        $R //= 5e6;
+        $R //= 1e6;
 
         if (ref($n) eq 'Math::GMPz') {
             $n = Math::GMPz::Rmpz_init_set($n);    # copy
@@ -1070,7 +1081,7 @@ package Sidef::Types::Number::Number {
             }
 
             # Early stop when the trial range has been exhausted
-            if ($L > $R) {
+            if ($L >= $R) {
                 last;
             }
 
