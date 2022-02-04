@@ -832,7 +832,7 @@ package Sidef::Types::Number::Number {
 
         my @factors;
 
-        if (length($n) > 2000) {
+        if (length($n) > 500) {
 
             ($n, @factors) = _adaptive_trial_factor($n);
 
@@ -1031,8 +1031,9 @@ package Sidef::Types::Number::Number {
     }
 
     sub _adaptive_trial_factor {
-        my ($n, $L, $R) = @_;
+        my ($n, $F, $L, $R) = @_;
 
+        $F //= 2;
         $L //= 5e4;
         $R //= 1e6;
 
@@ -1047,10 +1048,8 @@ package Sidef::Types::Number::Number {
 
         my $P = _cached_primorial($L);
 
-        my $g = Math::GMPz::Rmpz_init();
-        my $t = Math::GMPz::Rmpz_init();
-
-        my $F = 2;
+        state $g = Math::GMPz::Rmpz_init_nobless();
+        state $t = Math::GMPz::Rmpz_init_nobless();
 
         while (1) {
 
@@ -1061,27 +1060,24 @@ package Sidef::Types::Number::Number {
                 last;
             }
 
-            # Factorize n over primes in P
-            foreach my $p (Math::Prime::Util::GMP::sieve_primes($F, $L)) {
+            foreach my $p (
+                           HAS_PRIME_UTIL
+                           ? @{Math::Prime::Util::primes($F, $L)}
+                           : Math::Prime::Util::GMP::sieve_primes($F, $L)
+              ) {
                 if (Math::GMPz::Rmpz_divisible_ui_p($g, $p)) {
 
                     Math::GMPz::Rmpz_set_ui($t, $p);
-                    my $valuation = Math::GMPz::Rmpz_remove($n, $n, $t);
-                    push @factors, ($p) x $valuation;
+                    push @factors, ($p) x Math::GMPz::Rmpz_remove($n, $n, $t);
 
-                    # Stop the loop early when no more primes divide `u` (optional)
+                    # Stop the loop early when no more primes divide `g` (optional)
                     Math::GMPz::Rmpz_divexact_ui($g, $g, $p);
                     last if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0);
                 }
             }
 
-            # Early stop when n has been fully factored
-            if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
-                last;
-            }
-
-            # Early stop when the trial range has been exhausted
-            if ($L >= $R) {
+            # Early stop when n has been fully factored or the trial range has been exhausted
+            if ($L >= $R or Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
                 last;
             }
 
@@ -15111,7 +15107,11 @@ package Sidef::Types::Number::Number {
             return Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($n));
         }
 
-        $j //= 1;
+        if (!defined($j)) {
+            my @factors = __SUB__->($n, 1);
+            @factors = map { _is_prob_prime($_) ? $_ : __SUB__->($_, -1) } @factors;
+            return @factors;
+        }
 
         my $D = Math::GMPz::Rmpz_init();    # n + j
 
@@ -15170,10 +15170,10 @@ package Sidef::Types::Number::Number {
                     }
                     if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
                         Math::GMPz::Rmpz_divexact($x, $n, $g);
-#<<<
-                        my @g_factors = (_is_prob_prime($g) ? $g : __SUB__->($g, [-1, +1]->[CORE::int(CORE::rand(2))]));
-                        my @x_factors = (_is_prob_prime($x) ? $x : __SUB__->($x, [-1, +1]->[CORE::int(CORE::rand(2))]));
-#>>>
+
+                        my @g_factors = (_is_prob_prime($g) ? $g : __SUB__->($g, $j));
+                        my @x_factors = (_is_prob_prime($x) ? $x : __SUB__->($x, $j));
+
                         return (@g_factors, @x_factors);
                     }
                 }
@@ -15190,7 +15190,7 @@ package Sidef::Types::Number::Number {
 
         if (scalar(@holf_factors) > 1) {
             return (
-                    map { _is_prob_prime($_) ? $_ : __SUB__->($_, [-1, +1]->[CORE::int(CORE::rand(2))]) }
+                    map { _is_prob_prime($_) ? $_ : __SUB__->($_, $j) }
                     map { Math::GMPz::Rmpz_init_set_str($_, 10) } @holf_factors
                    );
         }
