@@ -14890,12 +14890,10 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
 
         if (!defined($k)) {
-            return
-              Sidef::Types::Array::Array->new(
-                            [map { _set_int($_) }
-                               Math::Prime::Util::GMP::trial_factor(_big2pistr($n) // (return Sidef::Types::Array::Array->new))
-                            ]
-              );
+            $n = _big2pistr($n) // (return Sidef::Types::Array::Array->new);
+            my ($rem, @factors) = _adaptive_trial_factor($n);
+            return Sidef::Types::Array::Array->new(
+                                     [map { _set_int($_) } (@factors, ((Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) ? () : $rem))]);
         }
 
         _valid(\$k);
