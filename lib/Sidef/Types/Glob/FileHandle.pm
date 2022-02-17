@@ -5,7 +5,7 @@ package Sidef::Types::Glob::FileHandle {
 
     use parent qw(
       Sidef::Object::Object
-      );
+    );
 
     use Sidef::Types::Bool::Bool;
 
@@ -62,8 +62,12 @@ package Sidef::Types::Glob::FileHandle {
     }
 
     sub syswrite {
-        my ($self, @args) = @_;
-        (CORE::syswrite $self->{fh}, @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+        my ($self, $scalar, $length, $offset) = @_;
+        (
+           defined($offset) ? (CORE::syswrite $self->{fh}, $scalar, $length, $offset)
+         : defined($length) ? (CORE::syswrite $self->{fh}, $scalar, $length)
+         :                    (CORE::syswrite $self->{fh}, $scalar)
+        ) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub print {
