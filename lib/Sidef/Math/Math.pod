@@ -24,9 +24,11 @@ Inherits methods from:
 
 =head2 avg
 
-    Math.avg()
+    Math.avg(list...)
 
-Returns the
+Returns the arithmetic mean of a list of numbers.
+
+    say Math.arithmetic_mean(42, 50, 99, 147)       #=> 84.5
 
 Aliases: I<arithmetic_mean>
 
@@ -34,105 +36,133 @@ Aliases: I<arithmetic_mean>
 
 =head2 batch_gcd
 
-    Math.batch_gcd()
+    Math.batch_gcd(list...)
 
-Returns the
+Efficiently computes the batch-gcd of a list of integers.
+
+    say Math.batch_gcd(1909,2923,291,205,989,62,451,1943,1079,2419)
+
+Output:
+
+    [1909, 1, 1, 41, 23, 1, 41, 1, 83, 41]
 
 =cut
 
 =head2 batch_invmod
 
-    Math.batch_invmod()
+    Math.batch_invmod(array, n)
 
-Returns the
+Efficiently computes the modular multiplicative inverses of a list of integers, modulo C<n>.
+
+    say Math.batch_invmod([33, 42, 99, 103], 2017)      #=> [489, 1969, 163, 235]
 
 =cut
 
 =head2 binsplit
 
-    Math.binsplit()
+    Math.binsplit(block, list...)
 
-Returns the
+Binary splitting algorithm.
+
+        var arr = [1,2,3,4,5,6,7]
+
+        # Sum of a list using binary splitting
+        say Math.binsplit({|a,b| a + b }, arr...)
+
+        # Product of a list using binary splitting
+        say Math.binsplit({|a,b| a * b }, arr...)
 
 =cut
 
 =head2 chinese
 
-    Math.chinese()
+    Math.chinese(pairs...)
 
-Returns the
+Returns the solution for C<x> in C<x ≡ a_k (mod m_k)>, using the Chinese Remainder Theorem (CRT), given a list of pairs C<[a_k,m_k]>:
+
+    say Math.chinese([14,643], [254,419], [87,733])     #=> 87041638
 
 =cut
 
 =head2 gcd
 
-    Math.gcd()
+    Math.gcd(list...)
 
-Returns the
+Returns the greast common multiple (GCD) of a list of integers.
 
 =cut
 
 =head2 geometric_mean
 
-    Math.geometric_mean()
+    Math.geometric_mean(list...)
 
-Returns the
+Returns the geometric mean of a list of numbers.
+
+    say Math.geometric_mean(42, 50, 99, 147)        #=> 74.352051512093712...
 
 =cut
 
 =head2 harmonic_mean
 
-    Math.harmonic_mean()
+    Math.harmonic_mean(list...)
 
-Returns the
+Returns the harmonic mean of a list of numbers.
+
+    say Math.harmonic_mean(42, 50, 99, 147)         #=> 65.883471411109602...
 
 =cut
 
 =head2 lcm
 
-    Math.lcm()
+    Math.lcm(list...)
 
-Returns the
+Returns the least common multiple (LCM) of a list of integers.
 
 =cut
 
 =head2 map
 
-    Math.map()
+    Math.map(value, in_min, in_max, out_min, out_max)
 
-Returns the
+Return a given value mapped from a given range to another given range.
+
+    # Map 25 from 1..100, to 1..10
+    say Math.map(25, 1, 100, 1, 10)     #=> 3.181818181...
 
 =cut
 
 =head2 max
 
-    Math.max()
+    Math.max(list...)
 
-Returns the
+Returns the largest numerical value from a list of numbers.
 
 =cut
 
 =head2 min
 
-    Math.min()
+    Math.min(list...)
 
-Returns the
+Returns the smallest numerical value from a list of numbers.
 
 =cut
 
 =head2 num2percent
 
-    Math.num2percent()
+    Math.num2percent(num, min, max)
 
-Returns the
+Returns a given value as a percentage, given C<min> and C<max> of the value range.
+
+    # Map the value 25 as a percentage, from a range 1..400
+    say Math.num2percent(25, 1, 400)        #=> 6.01503759398...
 
 =cut
 
 =head2 prod
 
-    Math.prod()
+    Math.prod(list...)
 
-Returns the
+Returns the product of a list of numbers.
 
 Aliases: I<product>
 
@@ -140,48 +170,73 @@ Aliases: I<product>
 
 =head2 product_tree
 
-    Math.product_tree()
+    product_tree(list...)
 
-Returns the
+Return the product-tree of a list of integers.
+
+    say Math.product_tree(10,20,30,40,50,60)
 
 =cut
 
 =head2 range_map
 
-    Math.range_map()
+    Math.range_map(amount, from, to)
 
-Returns the
+Returns a RangeNumber object with the C<amount> value mapped between the values C<from> and C<to>.
+
+    say Math.range_map(10, 2, 5)    #=> RangeNum(2, 5, 3/10)
 
 =cut
 
 =head2 range_sum
 
-    Math.range_sum()
+    Math.range_sum(from, to, step)
 
-Returns the
+Returns the sum of a given range and an optional given step.
+
+    say Math.range_sum(1, 10)      #=> 55
+    say Math.range_sum(1, 10, 2)   #=> 30.25
 
 =cut
 
 =head2 remainders
 
-    Math.remainders()
+    Math.remainders(n, array)
 
-Returns the
+Efficiently returns the remainders of C<n> when divided by each integer from the given array.
+
+    say Math.remainders(8675309, [11,13,17,19,23])      #=> [5, 6, 5, 4, 8]
 
 =cut
 
 =head2 smooth_numbers
 
-    Math.smooth_numbers()
+    Math.smooth_numbers(primes...)
 
-Returns the
+It returns an Enumerator object, which generates smooth numbers using the given list of primes.
+
+Example:
+
+        var a = Math.smooth_numbers(2,3,5,7)    # 7-smooth numbers
+        var b = Math.smooth_numbers(2,5,7)      # 7-smooth numbers not divisible by 3
+
+        say a.first(30)
+        say b.first(30)
+
+        # Iteration is also supported
+        a.each {|k|
+            if (k > 1e5) {
+                say k           #=> 100352
+                break
+            }
+        }
 
 =cut
 
 =head2 sum
 
-    Math.sum()
+    Math.sum(list...)
 
-Returns the
+Returns the sum of a list of numbers.
 
 =cut
