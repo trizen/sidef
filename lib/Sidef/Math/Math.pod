@@ -32,6 +32,22 @@ Aliases: I<arithmetic_mean>
 
 =cut
 
+=head2 batch_gcd
+
+    Math.batch_gcd()
+
+Returns the
+
+=cut
+
+=head2 batch_invmod
+
+    Math.batch_invmod()
+
+Returns the
+
+=cut
+
 =head2 binsplit
 
     Math.binsplit()
@@ -122,6 +138,14 @@ Aliases: I<product>
 
 =cut
 
+=head2 product_tree
+
+    Math.product_tree()
+
+Returns the
+
+=cut
+
 =head2 range_map
 
     Math.range_map()
@@ -133,6 +157,14 @@ Returns the
 =head2 range_sum
 
     Math.range_sum()
+
+Returns the
+
+=cut
+
+=head2 remainders
+
+    Math.remainders()
 
 Returns the
 

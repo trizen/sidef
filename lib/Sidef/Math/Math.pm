@@ -7,6 +7,7 @@ package Sidef::Math::Math {
       Sidef::Object::Object
     );
 
+    require List::Util;
     use Sidef::Types::Number::Number;
 
     sub new {
@@ -77,6 +78,80 @@ package Sidef::Math::Math {
         my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
 
         $n->div($sum);
+    }
+
+    sub product_tree {
+        my ($self, @list) = @_;
+
+        # Algorithm from: https://facthacks.cr.yp.to/product.html
+
+        my @result = Sidef::Types::Array::Array->new([@list]);
+
+        while (scalar(@list) > 1) {
+            @list =
+              map { Sidef::Types::Number::Number::prod(@list[($_ << 1) .. List::Util::min($#list, (($_ + 1) << 1) - 1)]) }
+              0 .. (((scalar(@list) + 1) >> 1) - 1);
+
+            push @result, Sidef::Types::Array::Array->new([@list]);
+        }
+
+        Sidef::Types::Array::Array->new(\@result);
+    }
+
+    sub remainders {
+        my ($self, $n, $arr) = @_;
+
+        # Algorithm from: https://facthacks.cr.yp.to/remainder.html
+
+        my @result = ($n);
+
+        foreach my $t (@{$self->product_tree(@$arr)->flip}) {
+            @result = map { $result[$_ >> 1]->mod($t->[$_]) } 0 .. $#{$t};
+        }
+
+        Sidef::Types::Array::Array->new(\@result);
+    }
+
+    sub batch_gcd {
+        my ($self, @X) = @_;
+
+        # Algorithm from: https://facthacks.cr.yp.to/batchgcd.html
+
+        my $prods = $self->product_tree(@X);
+        my @R     = @{pop(@$prods) // return Sidef::Types::Array::Array->new()};
+
+        while (@$prods) {
+            @X = @{pop(@$prods)};
+            @R = map { $R[$_ >> 1]->mod($X[$_]->sqr) } 0 .. $#X;
+        }
+
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number::gcd($R[$_]->idiv($X[$_]), $X[$_]) } 0 .. $#R]);
+    }
+
+    sub batch_invmod {
+        my ($self, $x, $n) = @_;
+
+        # Algorithm 2.11 MultipleInversion from Modern Computer Arithmetic
+
+        @$x || return Sidef::Types::Array::Array->new;
+
+        my $k = $#{$x};
+        my @z = ($x->[0]);
+
+        foreach my $i (1 .. $k) {
+            $z[$i] = ($z[$i - 1]->mulmod($x->[$i], $n));
+        }
+
+        my @y;
+        my $q = $z[$k]->invmod($n);
+
+        for (my $i = $k ; $i >= 1 ; --$i) {
+            $y[$i] = $q->mulmod($z[$i - 1], $n);
+            $q = $q->mulmod($x->[$i], $n);
+        }
+
+        $y[0] = $q;
+        Sidef::Types::Array::Array->new(\@y);
     }
 
     sub smooth_numbers {
