@@ -11,8 +11,19 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Set(...)
+    var a = Set(1,2,3,4)
+    var b = Set(2,3,5)
 
+    say (a ^ b)     #=> Set(1, 4, 5)
+    say (a - b)     #=> Set(1, 4)
+    say (a | b)     #=> Set(1, 2, 3, 4, 5)
+    say (a & b)     #=> Set(2, 3)
+
+    say a.has(2)    #=> true
+    say a.len       #=> 4
+
+    say b.map  {|n| n**2 }  #=> Set(4, 9, 25)
+    say b.grep {.is_odd}    #=> Set(3, 5)
 
 =head1 INHERITS
 

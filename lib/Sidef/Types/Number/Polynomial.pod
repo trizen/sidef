@@ -11,8 +11,9 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Polynomial(...)
-
+    var a = Polynomial(5)                   # monomial: x^5
+    var b = Polynomial([1,2,3,4])           # x^3 + 2*x^2 + 3*x + 4
+    var c = Polynomial(5 => 3, 2 => 10)     # 3*x^5 + 10*x^2
 
 =head1 INHERITS
 

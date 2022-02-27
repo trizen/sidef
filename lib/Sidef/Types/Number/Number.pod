@@ -3147,7 +3147,7 @@ Returns a list of integer solutions C<(x_1, x_2)> to the quadratic equation: C<a
 
 Example:
 
-    say [iquadratic_formula(13, -42, -34)]  #=> [-3, -1]
+    say [iquadratic_formula(13, -42, -34)]  #=> [3, -1]
 
 Aliases: I<integer_quadratic_formula>
 

@@ -11,8 +11,14 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Quadratic(...)
+    var x = Quadratic(3, 4, 5)  # represents: 3 + 4*sqrt(5)
+    var y = Quadratic(6, 1, 2)  # represents: 6 + sqrt(2)
 
+    say x**10       #=> (29578174649, 13203129720, 5)
+    say y**10       #=> (253025888, 176008128, 2)
+
+    say x.powmod(100, 97)   #=> (83, 42, 5)
+    say y.powmod(100, 97)   #=> (83, 39, 2)
 
 =head1 INHERITS
 

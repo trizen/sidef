@@ -11,8 +11,13 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Gauss(...)
+    var a = Gauss(17,19)
+    var b = Gauss(43,97)
 
+    say a+b     #=> (60, 116)
+    say a-b     #=> (-26, -78)
+    say a*b     #=> (-1112, 2466)
+    say a/b     #=> (99/433, -32/433)
 
 =head1 INHERITS
 

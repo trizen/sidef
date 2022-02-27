@@ -11,8 +11,13 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Mod(...)
+    var a = Mod(13, 19)
 
+    a += 15         # Mod(9, 19)
+    a *= 99         # Mod(17, 19)
+    a /= 17         # Mod(1, 19)
+
+    say a           # Mod(1, 19)
 
 =head1 INHERITS
 

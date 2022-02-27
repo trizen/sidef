@@ -11,8 +11,11 @@ This class implements ...
 
 =head1 SYNOPSIS
 
-var obj = Fraction(...)
+    var a = Fraction(3, 4)
+    var b = Fraction(5, 7)
 
+    say a*b     #=> Fraction(15, 28)
+    say a+b     #=> Fraction(41, 28)
 
 =head1 INHERITS
 

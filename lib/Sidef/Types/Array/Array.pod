@@ -789,9 +789,11 @@ Aliases: I<has_index>
 
 =head2 expand
 
-    Array.expand()
+    arr.expand { ... }
 
-Returns the
+Recursively expand an array, given a block of code.
+
+    say [1,[2,[3,4]],5].expand { _ }    #=> [1, 5, 2, 3, 4]
 
 Aliases: I<expand_by>
 
@@ -1581,9 +1583,14 @@ Returns the
 
 =head2 recmap
 
-    Array.recmap()
+    a.recmap { ... }
 
-Returns the
+Recursively map the value of an array, given a block of code.
+
+    # Generate all the 5-smooth numbers <= 20
+    var (a, k, L) = ([1], 5, 20)
+    k.primes.each {|p| a.recmap! {|n| n*p <= L ? [n*p] : () } }
+    say a.sort    #=> [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20]
 
 =cut
 
