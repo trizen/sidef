@@ -7078,17 +7078,17 @@ package Sidef::Types::Number::Number {
         # Subquadratic Algorithm 1.26 FastIntegerOutput from "Modern Computer Arithmetic v0.5.9"
         if (Math::GMPz::Rmpz_fits_ulong_p($k)) {
 
-            # Find r such that B^(2r - 2) <= A < B^(2r)
-            my $r = (__ilog__($n, $k) >> 1) + 1;
-
             my $A = $n;
             my $B = Math::GMPz::Rmpz_get_ui($k);
 
             # When B < 2^32, use Math::Prime::Util::GMP::todigits().
-            if ($B <= 4294967295 and Math::GMPz::Rmpz_sizeinbase($n, 62) <= 1e6) {
+            if ($B <= 4294967295 and Math::GMPz::Rmpz_sizeinbase($n, 62) <= 2e6) {
                 return _set_int(
                        Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B)));
             }
+
+            # Find r such that B^(2r - 2) <= A < B^(2r)
+            my $r = (__ilog__($n, $k) >> 1) + 1;
 
             state $Q = Math::GMPz::Rmpz_init_nobless();
             state $R = Math::GMPz::Rmpz_init_nobless();
@@ -9877,9 +9877,13 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y, \$z);
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2mpz($$y) // goto &nan;
-        $z = _any2mpz($$z) // goto &nan;
+        $x = _any2mpz($$x) // return (&nan, &nan);
+        $y = _any2mpz($$y) // return (&nan, &nan);
+        $z = _any2mpz($$z) // return (&nan, &nan);
+
+        if (Math::GMPz::Rmpz_sgn($x) == 0) {    # detect division by zero
+            return (&nan, &nan);
+        }
 
         #
         ## floor((-b ± isqrt(b^2 - 4ac)) / (2a))
@@ -9891,8 +9895,12 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_mul($t, $y, $y);        # b^2
         Math::GMPz::Rmpz_mul($u, $x, $z);        # ac
         Math::GMPz::Rmpz_mul_2exp($u, $u, 2);    # 4ac
-
         Math::GMPz::Rmpz_sub($t, $t, $u);        # b^2 - 4ac
+
+        if (Math::GMPz::Rmpz_sgn($t) < 0) {      # t is negative: no real solution
+            return (&nan, &nan);
+        }
+
         Math::GMPz::Rmpz_sqrt($t, $t);           # isqrt(b^2 - 4ac)
 
         Math::GMPz::Rmpz_sub($u, $t, $y);        #   sqrt(b^2 - 4ac) - b
