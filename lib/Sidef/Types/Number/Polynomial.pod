@@ -279,6 +279,14 @@ Returns the
 
 =cut
 
+=head2 is_inf
+
+    Polynomial.is_inf()
+
+Returns the
+
+=cut
+
 =head2 is_mone
 
     Polynomial.is_mone()
@@ -287,9 +295,33 @@ Returns the
 
 =cut
 
+=head2 is_nan
+
+    Polynomial.is_nan()
+
+Returns the
+
+=cut
+
+=head2 is_ninf
+
+    Polynomial.is_ninf()
+
+Returns the
+
+=cut
+
 =head2 is_one
 
     Polynomial.is_one()
+
+Returns the
+
+=cut
+
+=head2 is_real
+
+    Polynomial.is_real()
 
 Returns the
 
@@ -331,11 +363,29 @@ Aliases: I<call>
 
 =cut
 
+=head2 norm
+
+    Polynomial.norm()
+
+Returns the
+
+=cut
+
 =head2 powmod
 
     Polynomial.powmod()
 
 Returns the
+
+=cut
+
+=head2 re
+
+    Polynomial.re()
+
+Returns the
+
+Aliases: I<real>
 
 =cut
 

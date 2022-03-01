@@ -920,6 +920,7 @@ scripts/Tests/palindrome_detection_recursive.sf
 scripts/Tests/palindromic_numbers.sf
 scripts/Tests/pascal_matrix_generation.sf
 scripts/Tests/pcg.sf
+scripts/Tests/pell_factorization.sf
 scripts/Tests/perfect_root_power.sf
 scripts/Tests/perl_eval.sf
 scripts/Tests/permutations.sf

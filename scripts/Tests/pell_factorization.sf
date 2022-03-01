@@ -1,0 +1,81 @@
+#!/usr/bin/ruby
+
+func pell_factorization(n) {
+
+    var nr = n.real
+
+    return nil if nr.is_square
+
+    var x = nr.isqrt
+    var y = x
+    var z = 1
+    var r = 2*x
+    var w = r
+
+    var (e1, e2) = (1, 0)
+    var (f1, f2) = (0, 1)
+
+    var factor = 0
+
+    func check_factor(f) {
+        var g = gcd(f, nr)
+
+        if (g.is_between(2, nr-1)) {
+            say "Found factor: #{g}"
+            factor = g
+            return true
+        }
+
+        return false
+    }
+
+    var iterations = 0
+
+    loop {
+
+        ++iterations
+
+        y = (r*z - y)
+        z = ((n - y*y) / z)
+        r = round((x + y) / z)
+
+        var A = (e2 + x*f2)%nr
+        var B = f2
+
+        for x in ([A]), m in (%w(norm)) {
+
+            var u = x.(m).isqrt
+            var v = (u*u)%nr
+
+            if (v > w) {
+                v = (nr - v)
+            }
+
+            if (v.is_square) {
+
+                if (check_factor(u - v.isqrt) || check_factor(u + v.isqrt)) {
+                    say "Iterations: #{iterations}"
+                    say [y, z, r]
+                    say [A, B]
+                    return (factor, iterations)
+                }
+            }
+        }
+
+        (e1, e2) = (e2, (r*e2 + e1) % nr)
+        (f1, f2) = (f2, (r*f2 + f1) % nr)
+    }
+
+    return nil
+}
+
+var a = 154455735559
+var b = 714776612525591030642920478002897517762683782688778831832231679528353554741510151157715073082498828179126095812264905796598676911304663924284766926329804254753040306984873610649861747970991061151658764994305774324935877821111398039896031788439992473400659758874175339834799864895560401784859360881943022755299555909676109337857225599450353468169312513586295757802284927683020709154218391835326324673119516762641639000981368972520570795744135608237273571948441114134205778182767051977139165201958963732048411516141076580558083642527736431755235449750494058144941049675762576832890737078392038152263753
+
+for k,v in ([[a, 195], [b, 2]]), n in ([k, Gauss(k), Quadratic(k), Quaternion(k), Poly([k])]) {
+    var (factor, iter) = pell_factorization(n)
+    assert_eq(iter, v)
+    assert_eq(k % factor, 0)
+    assert(factor < k)
+    assert_eq(gcd(k, factor), factor)
+}

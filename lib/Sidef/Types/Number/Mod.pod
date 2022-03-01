@@ -253,6 +253,78 @@ Returns the
 
 =cut
 
+=head2 is_inf
+
+    Mod.is_inf()
+
+Returns the
+
+=cut
+
+=head2 is_mone
+
+    Mod.is_mone()
+
+Returns the
+
+=cut
+
+=head2 is_nan
+
+    Mod.is_nan()
+
+Returns the
+
+=cut
+
+=head2 is_neg
+
+    Mod.is_neg()
+
+Returns the
+
+=cut
+
+=head2 is_ninf
+
+    Mod.is_ninf()
+
+Returns the
+
+=cut
+
+=head2 is_one
+
+    Mod.is_one()
+
+Returns the
+
+=cut
+
+=head2 is_pos
+
+    Mod.is_pos()
+
+Returns the
+
+=cut
+
+=head2 is_real
+
+    Mod.is_real()
+
+Returns the
+
+=cut
+
+=head2 is_zero
+
+    Mod.is_zero()
+
+Returns the
+
+=cut
+
 =head2 lucas
 
     Mod.lucas()
@@ -304,6 +376,24 @@ Returns the
 Returns the
 
 Aliases: I<call>
+
+=cut
+
+=head2 norm
+
+    Mod.norm()
+
+Returns the
+
+=cut
+
+=head2 re
+
+    Mod.re()
+
+Returns the
+
+Aliases: I<real>
 
 =cut
 

@@ -24,6 +24,22 @@ package Sidef::Types::Number::Fraction {
 
     *call = \&new;
 
+    sub is_nan {
+        my ($x) = @_;
+        if ($x->{a}->is_zero and $x->{b}->is_zero) {
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+        $x->{a}->is_nan or $x->{b}->is_nan;
+    }
+
+    sub is_real {
+        my ($x) = @_;
+        if ($x->{a}->is_zero and $x->{b}->is_zero) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+        $x->{a}->is_real and $x->{b}->is_real;
+    }
+
     sub eval {
         my ($x, $v) = @_;
         $x->{a}->eval($v)->div($x->{b}->eval($v));

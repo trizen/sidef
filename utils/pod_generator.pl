@@ -255,7 +255,8 @@ __POD2__
 
     my $header = $pod_data->{__HEADER__};
 
-    if (not defined($header) or $header =~ /^This class implements \.\.\.$/m) {
+    #if (not defined($header) or $header =~ /^This class implements \.\.\.$/m) {
+    if (not defined($header)) {
         $header = <<"HEADER";
 
 \=encoding utf8

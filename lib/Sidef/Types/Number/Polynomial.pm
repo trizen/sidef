@@ -45,7 +45,7 @@ package Sidef::Types::Number::Polynomial {
             $value // next;
             $value = Sidef::Types::Number::Number->new($value) if !UNIVERSAL::isa($value, 'Sidef::Types::Number::Number');
 
-            if (!$value->is_zero) {
+            unless ($value->is_zero) {
                 $coeff{"$key"} = $value;
             }
         }
@@ -61,7 +61,6 @@ package Sidef::Types::Number::Polynomial {
 
     sub to_n {
         my ($x) = @_;
-
         my $d = scalar keys(%$x);
 
         return Sidef::Types::Number::Number::ZERO if ($d == 0);
@@ -70,7 +69,63 @@ package Sidef::Types::Number::Polynomial {
             return $x->{0};
         }
 
-        return $x;
+        ## return Sidef::Types::Number::Number::ZERO;
+        return $x;    # maybe we should return zero?
+    }
+
+    sub real {
+        my ($x) = @_;
+
+        if (exists $x->{0}) {
+            return $x->{0};
+        }
+
+        return Sidef::Types::Number::Number::ZERO;
+    }
+
+    *re = \&real;
+
+    sub is_real {
+        my ($x) = @_;
+        my $d = scalar keys(%$x);
+
+        ($d == 0 or ($d == 1 and exists($x->{0}) and $x->{0}->is_real))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_nan {
+        my ($x) = @_;
+        foreach my $key (keys %$x) {
+            if ($x->{$key}->is_nan) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+        }
+        Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_inf {
+        my ($x) = @_;
+        foreach my $key (keys %$x) {
+            if ($x->{$key}->is_inf) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+        }
+        Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_ninf {
+        my ($x) = @_;
+        foreach my $key (keys %$x) {
+            if ($x->{$key}->is_ninf) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+        }
+        Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub norm {
+        $_[0]->real->norm;
     }
 
     sub __dump__ {
@@ -283,12 +338,18 @@ package Sidef::Types::Number::Polynomial {
         while (1) {
             my $key_x = $keys_x[0];
             my $xc    = $x->{$key_x};
+            my $q     = $xc->div($yc);
 
-            my $t = __PACKAGE__->new($key_x - $key_y, $xc->div($yc));
+            # When the result of division is NaN, the loop never stops
+            if ($q->is_nan) {
+                return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::nan()), __PACKAGE__->new());
+            }
+
+            my $t = __PACKAGE__->new($key_x - $key_y, $q);
 
             $quot = $quot->add($t);
+            $x    = $x->sub($t->mul($y));
 
-            $x      = $x->sub($t->mul($y));
             @keys_x = sort { $b <=> $a } CORE::keys %$x;
             (@keys_x and $keys_x[0] >= $key_y) or last;
         }

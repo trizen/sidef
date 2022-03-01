@@ -19,7 +19,15 @@ package Sidef::Types::Number::Mod {
         #$n = Sidef::Types::Number::Number->new($n) if !UNIVERSAL::isa($n, 'Sidef::Types::Number::Number');
         #$m = Sidef::Types::Number::Number->new($m) if !UNIVERSAL::isa($m, 'Sidef::Types::Number::Number');
 
+        if (ref($n) eq __PACKAGE__) {
+            $n = $n->real->mod($m);
+        }
+
         $n = $n->mod($m);
+
+        if (ref($n) eq __PACKAGE__) {
+            return $n;
+        }
 
         bless {n => $n, m => $m};
     }
@@ -31,6 +39,55 @@ package Sidef::Types::Number::Mod {
     }
 
     *lift = \&to_n;
+
+    sub is_zero {
+        my ($x) = @_;
+        $x->eq(Sidef::Types::Number::Number::ZERO);
+    }
+
+    sub is_one {
+        my ($x) = @_;
+        $x->eq(Sidef::Types::Number::Number::ONE);
+    }
+
+    sub is_mone {
+        my ($x) = @_;
+        $x->eq(Sidef::Types::Number::Number::MONE);
+    }
+
+    sub is_neg {
+        $_[0]->{n}->is_neg;
+    }
+
+    sub is_pos {
+        $_[0]->{n}->is_pos;
+    }
+
+    sub is_nan {
+        $_[0]->{n}->is_nan;
+    }
+
+    sub is_inf {
+        $_[0]->{n}->is_inf;
+    }
+
+    sub is_ninf {
+        $_[0]->{n}->is_ninf;
+    }
+
+    sub is_real {
+        $_[0]->{n}->is_real;
+    }
+
+    sub real {
+        $_[0]->{n}->is_zero ? $_[0]->{m} : $_[0]->{n};
+    }
+
+    *re = \&real;
+
+    sub norm {
+        $_[0]->real->norm;
+    }
 
     sub modulus {
         $_[0]->{m};

@@ -267,9 +267,25 @@ Returns the
 
 =cut
 
+=head2 is_nan
+
+    Fraction.is_nan()
+
+Returns the
+
+=cut
+
 =head2 is_one
 
     Fraction.is_one()
+
+Returns the
+
+=cut
+
+=head2 is_real
+
+    Fraction.is_real()
 
 Returns the
 

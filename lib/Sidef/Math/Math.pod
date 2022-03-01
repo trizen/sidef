@@ -7,12 +7,12 @@ Sidef::Math::Math
 
 =head1 DESCRIPTION
 
-This class implements ...
+The C<Math> class implements several useful mathematical functions.
 
 =head1 SYNOPSIS
 
-var obj = Math(...)
-
+    say Math.lcm(3,4,5)
+    say Math.avg(1,2,3,4)
 
 =head1 INHERITS
 
@@ -28,7 +28,7 @@ Inherits methods from:
 
 Returns the arithmetic mean of a list of numbers.
 
-    say Math.arithmetic_mean(42, 50, 99, 147)       #=> 84.5
+    say Math.avg(42, 50, 99, 147)       #=> 84.5
 
 Aliases: I<arithmetic_mean>
 
@@ -170,7 +170,7 @@ Aliases: I<product>
 
 =head2 product_tree
 
-    product_tree(list...)
+    Math.product_tree(list...)
 
 Return the product-tree of a list of integers.
 
