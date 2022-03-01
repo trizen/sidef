@@ -785,3 +785,240 @@ FOOT
     print {$out_fh} $package_content;
     print {$out_fh} $opt{code};
 }
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+                **   **         ****   *           *********   *********
+              * * ** * *        ****   **          ** ** **    ** ** **
+               **   **          ****   ***         *********   *  *  *
+      **        **        **    ****   *  *        ******      ******
+    * * *     * * *     * * *   ****   ** **       ** **       ** **
+     **        **        **     ****   ******      ******      *  *
+           **   **              ****   *  *  *     *********   ***
+         * * ** * *             ****   ** ** **    ** ** **    **
+          **   **               ****   *********   *********   *
+
+=cut
+
+=head1 SYNOPSIS
+
+Usage: sidef [switches] [--] [programfile] [arguments]
+
+  -c            compile the code into a Perl program
+  -C            check syntax only
+  -D            dump the syntax tree of a program
+  -E program    one line of program
+  -H            interactive help
+  -i            interactive mode
+  -k            keep track of potential unsafe parser interpretations
+  -M mode       set the rounding mode of floating-point numbers
+                valid modes: [near], zero, inf, +inf, -inf
+  -o file       file where to dump the output
+  -O level      perform code optimizations before execution
+                valid levels: [0], 1, 2
+  -P int        set the precision of floating-point numbers (default: 48)
+  -r            parse and deparse a Sidef program
+  -R lang       parse and deparse a Sidef program into a given language
+                valid values: sidef, perl
+  -s            save compiled code in a database to reduce boot-time
+  -t            treat all command-line arguments as scripts
+  -v            print version number and exit
+  -w            enable warnings with stack backtrace
+  -W            make warnings fatal (with stack backtrace)
+
+Run 'sidef -i' for interactive mode.
+
+=head1 HELLO WORLD
+
+A Sidef script can be written in any text editor and, by convention, it has the C<.sf> extension.
+
+The content of a simple I<Hello World> program looks like this:
+
+    say "Hello, 世界"
+
+If we save the content in a new file called C<hello.sf>, we can execute the code by running:
+
+    sidef hello.sf
+
+=head1 ONE LINE OF PROGRAM
+
+The C<-E code> command will execute the code specified as a command-line argument:
+
+    sidef -E "say 'hello world'"
+
+Outputs:
+
+    hello world
+
+=head1 ITERACTIVE MODE
+
+The interactive mode (a.k.a. REPL) is available by simply executing the C<sidef> command, or by specifying the C<-i> command-line switch:
+
+    $ sidef -i
+    Sidef 3.99, running on Linux, using Perl v5.34.0.
+    Type "help", "copyright" or "license" for more information.
+    >> n = 41
+    => 41
+    >> n**2 + n - 1
+    => 1721
+    >>
+
+=head1 OPTIMIZATION
+
+The C<-O level> command-line option controls the level of optimization before the execution begins.
+
+Currently, there are three level of optimization available:
+
+    0 -- Does nothing. (default)
+    1 -- Does constant folding on the AST. (recommended)
+    2 -- Does constant folding, after which it deparses the AST into Sidef code, parses the code again and does more constant folding on the new AST.
+
+In the end, the code is translated to Perl and is ready to be executed. In the translation process, several other optimizations are also performed.
+
+=head1 PARSER WARNINGS
+
+Sidef provides the C<-k> option which will keep track of all the possible unsafe parser interpretations.
+
+For example, if we declare the following function, but we misspell its name when we call it, Sidef will interpret it as a method call, which is probably not what we want:
+
+    func foo(n) { say n }
+    fo(42)                   # will get interpreted as `42.fo`
+
+When the command-line option C<-k> is specified, the following warning is produced:
+
+    [INFO] `fo` is parsed as a prefix method-call at script.sf line 2
+
+=head1 DEPARSING
+
+Deparsing is the reverse process of parsing, which translates the AST back into code. Currently, Sidef supports deparsing into two languages with the C<-R lang> command-line switch:
+
+=over 4
+
+=item -R perl
+
+Deparses the AST into valid Perl code.
+
+=item -R sidef
+
+Deparses the AST into valid Sidef code.
+
+=back
+
+Example:
+
+    sidef -Rperl script.sf | perl
+
+The C<-Rsidef> switch (or simply C<-r>) is useful for verifying how the code is parsed:
+
+    sidef -r -E '1 + 2/3'
+
+outputs:
+
+    (1)->+((2)->/(3));
+
+=head1 DUMPING THE AST
+
+The C<-D> command-line option dumps the abstract syntax tree (AST) of a given Sidef program:
+
+    sidef -D script.sf      # will dump the AST of script.sf
+
+=head1 PRECOMPILATION
+
+Sidef supports experimental precompilation by saving compiled code inside a database, which is updated automatically and sanitized periodically.
+
+This method reduces significantly the boot-time of very large Sidef scripts, and it works as following:
+
+=over 4
+
+=item * it checks the database with the MD5 of the code
+
+=item * if the MD5 exists inside the database, it returns the executable code
+
+=back
+
+otherwise:
+
+=over 4
+
+=item * parses the code and generates the executable code
+
+=item * stores the executable code inside the database with the MD5 of the code
+
+=back
+
+Next time when the same code is executed, Sidef will simply retrieve the executable code from the database, without generating it again:
+
+    sidef -s script.sf             # may load slow the first time
+    sidef -s script.sf             # will load much faster the second time
+
+=head1 COMPILATION
+
+A Sidef script can be compiled to a stand-alone Perl program by using the C<-c> command-line option:
+
+    sidef -o out.pl -c script.sf
+
+The above command will compile the file C<script.sf> into the Perl script C<out.pl>, which will include the entire implementation code of Sidef.
+
+Currently, Sidef code that contains C<eval()> cannot be compiled correctly to Perl, as it requires some parse-time information for run-time evaluation, which is lost in the compilation process.
+
+=head1 WWW
+
+You can find more info about Sidef, by clicking on the following links:
+
+=over 2
+
+=item * Github: L<https://github.com/trizen/sidef>
+
+=item * Gitbook: L<https://trizen.gitbook.io/sidef-lang/>
+
+=item * Tutorial: L<https://github.com/trizen/sidef/wiki>
+
+=item * RosettaCode: L<https://rosettacode.org/wiki/Sidef>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2013-2022 Daniel Șuteu, Ioana Fălcușan
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the B<Artistic License (2.0)>. You may obtain a copy
+of the full license at:
+
+L<https://www.perlfoundation.org/artistic-license-20.html>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

@@ -132,7 +132,7 @@ You can find more info about Sidef, by clicking on the following links:
 
 =over 2
 
-=item * Gitbook: L<https://trizen.gitbooks.io/sidef-lang/content/>
+=item * Gitbook: L<https://trizen.gitbook.io/sidef-lang/>
 
 =item * Tutorial: L<https://github.com/trizen/sidef/wiki>
 
