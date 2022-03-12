@@ -235,7 +235,7 @@ sub output_usage {
                     '-P int'     => 'set the precision of floating-point numbers (default: ' . int($Sidef::Types::Number::Number::PREC / 4) . ')',
                     '-M mode'    => ['set the rounding mode of floating-point numbers',
                                      'valid modes: [near], zero, inf, +inf, -inf'],
-                    '-k'         => 'keep track of potential unsafe parser interpretations',
+                    '-k'         => 'keep track of potentially incorrect parser interpretations',
                     '-E program' => 'one line of program',
                     '-H'         => 'interactive help',
                     '-s'         => 'save compiled code in a database to reduce boot-time',
@@ -814,7 +814,7 @@ Usage: sidef [switches] [--] [programfile] [arguments]
   -E program    one line of program
   -H            interactive help
   -i            interactive mode
-  -k            keep track of potential unsafe parser interpretations
+  -k            keep track of potentially incorrect parser interpretations
   -M mode       set the rounding mode of floating-point numbers
                 valid modes: [near], zero, inf, +inf, -inf
   -o file       file where to dump the output
@@ -881,7 +881,7 @@ In the end, the code is translated to Perl and is ready to be executed. In the t
 
 =head1 PARSER WARNINGS
 
-Sidef provides the C<-k> option which will keep track of all the possible unsafe parser interpretations.
+Sidef provides the C<-k> option which will keep track of all the possible incorrect parser interpretations.
 
 For example, if we declare the following function, but we misspell its name when we call it, Sidef will interpret it as a method call, which is probably not what we want:
 

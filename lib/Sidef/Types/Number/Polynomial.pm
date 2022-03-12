@@ -24,6 +24,10 @@ package Sidef::Types::Number::Polynomial {
         if (scalar(@args) == 1) {
             my $value = $args[0];
 
+            if (ref($_[0]) eq __PACKAGE__) {
+                return $_[0]->eval($value);
+            }
+
             if (UNIVERSAL::isa($value, 'Sidef::Types::Array::Array')) {
                 my $end = $#{$value};
                 return __PACKAGE__->new(map { ($end - $_) => $value->[$_] } 0 .. $end);
