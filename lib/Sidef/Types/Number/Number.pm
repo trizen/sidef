@@ -6556,7 +6556,7 @@ package Sidef::Types::Number::Number {
                 }
             ),
             $max
-                                  );
+        );
 
         Sidef::Types::Array::Array->new(\@cfrac);
     }
@@ -7896,7 +7896,7 @@ package Sidef::Types::Number::Number {
                     push @roots, Math::Prime::Util::GMP::chinese(@_);
                 },
                 @congruences
-                                            );
+            );
         }
         else {
             require Algorithm::Loops;
@@ -9293,11 +9293,9 @@ package Sidef::Types::Number::Number {
 
         my $e = _set_int($n);
         my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, $x->mul($x)->dec);
+        my $r = $Q->neg->add($x)->pow($e);
 
-        my $r1 = $Q->neg->add($x)->pow($e);
-        my $r2 = $r1->conj;
-
-        $r1->add($r2)->div(TWO)->a;
+        $r->a;
     }
 
     *chebyshevT = \&chebyshevt;
@@ -9344,10 +9342,7 @@ package Sidef::Types::Number::Number {
         my $e = _set_int($n + 1);
         my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, $x->mul($x)->dec);
 
-        my $r1 = $Q->add($x)->pow($e);
-        my $r2 = $r1->conj;
-
-        my $r = $r1->sub($r2)->div($Q->add($Q))->a;
+        my $r = $Q->add($x)->pow($e)->b;
         $r = $r->neg if $negative;
         $r;
     }
@@ -9380,11 +9375,9 @@ package Sidef::Types::Number::Number {
         # T_n(x) = 1/2 * ((x - sqrt(x^2 - 1))^n + (x + sqrt(x^2 - 1))^n)
 
         my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, bless \__dec__(__mul__($x, $x)));
+        my $r = ((bless \$x)->sub($Q))->powmod((bless \$n), (bless \$m));
 
-        my $r1 = ((bless \$x)->sub($Q))->powmod((bless \$n), (bless \$m));
-        my $r2 = $r1->conj;
-
-        ($r1->add($r2))->div(TWO)->a->mod(bless \$m);
+        $r->a->mod(bless \$m);
     }
 
     #
@@ -9426,10 +9419,7 @@ package Sidef::Types::Number::Number {
 
         my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, bless \__dec__(__mul__($x, $x)));
 
-        my $r1 = ((bless \$x)->add($Q))->powmod((bless \$n)->inc, (bless \$m));
-        my $r2 = $r1->conj;
-
-        my $r = ($r1->sub($r2))->div($Q->add($Q))->a;
+        my $r = ((bless \$x)->add($Q))->powmod((bless \$n)->inc, (bless \$m))->b;
         $r = $r->neg if $negative;
         $r->mod(bless \$m);
     }
@@ -10192,7 +10182,7 @@ package Sidef::Types::Number::Number {
             "100000000000000000000"   => "461113106",
             "1000000000000000000000"  => "3395895277",
             "10000000000000000000000" => "-2061910120",
-        };
+                               };
 
         if ($x eq '1') {
 
@@ -10333,7 +10323,7 @@ package Sidef::Types::Number::Number {
             '100000000000000000'   => '-271676470',
             '1000000000000000000'  => '-618117940',
             '10000000000000000000' => '-810056106',
-        };
+                                 };
 
         if (defined(my $value = $liouville_table->{$n})) {
             return _set_int($value);
@@ -10507,7 +10497,7 @@ package Sidef::Types::Number::Number {
                       : Math::GMPz::Rmpz_add($sum, $sum, $u);
                 },
                 $s
-                                            );
+            );
         }
         else {
             my $m;
@@ -10596,7 +10586,7 @@ package Sidef::Types::Number::Number {
                         $count += ((scalar(@_) & 1) ? -1 : 1) * CORE::int($n / ($_ * $_));
                     },
                     $s
-                                                );
+                );
             }
             else {
                 my $m;
@@ -10628,7 +10618,7 @@ package Sidef::Types::Number::Number {
                       : Math::GMPz::Rmpz_add($c, $c, $t);
                 },
                 $s
-                                            );
+            );
         }
         else {
             my $m;
@@ -11107,7 +11097,7 @@ package Sidef::Types::Number::Number {
             "618970019642690137449562112"  => "10201730804263125133012340",
             "1237940039285380274899124224" => "20172933541156002700963336",
             "2475880078570760549798248448" => "39895115987049029184882256",
-        };
+                                };
 
         if (defined($y)) {
             $x = 2 if ($x < 2);
@@ -11987,7 +11977,7 @@ package Sidef::Types::Number::Number {
             "75557863725914323419136"  => "4207073961494759547984247",
             "151115727451828646838272" => "8520834035044766488749161",
             "302231454903657293676544" => "17254990129969542495182251",
-        };
+                                  };
 
         if (exists($nth_prime_lookup->{$n})) {
             my $p = $nth_prime_lookup->{$n};
@@ -13054,7 +13044,7 @@ package Sidef::Types::Number::Number {
             "36028797018963968"  => "3726284941841117",
             "72057594037927936"  => "7352535573376770",
             "144115188075855872" => "14510848832845041",
-        };
+                           };
 
         if (defined(my $value = $pi2_table->{$n})) {
             return $value;
@@ -13410,9 +13400,9 @@ package Sidef::Types::Number::Number {
 
         if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (    # XXX: available in MPU > 0.73
-                Math::Prime::Util::is_omega_prime($k, Math::GMPz::Rmpz_get_ui($n))
-                ? Sidef::Types::Bool::Bool::TRUE
-                : Sidef::Types::Bool::Bool::FALSE
+               Math::Prime::Util::is_omega_prime($k, Math::GMPz::Rmpz_get_ui($n))
+               ? Sidef::Types::Bool::Bool::TRUE
+               : Sidef::Types::Bool::Bool::FALSE
             );
         }
 
@@ -14392,7 +14382,7 @@ package Sidef::Types::Number::Number {
                 },
                 $from,
                 $to
-                                            );
+            );
         }
         else {
             for (my $k = $from ; $k <= $to ; ++$k) {
@@ -14632,13 +14622,9 @@ package Sidef::Types::Number::Number {
         my @factor_exp = _factor_exp($n);
         @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
 
-        my $r = Math::Prime::Util::GMP::vecprod(
-            map {
-                ($_->[1] == 1)
-                  ? $_->[0]
-                  : Math::Prime::Util::GMP::powint($_->[0], $_->[1])
-              } grep { $_->[1] } map { [$_->[0], $_->[1] % $k] } @factor_exp
-        );
+        my $r =
+          Math::Prime::Util::GMP::vecprod(map { ($_->[1] == 1) ? $_->[0] : Math::Prime::Util::GMP::powint($_->[0], $_->[1]) }
+                                          grep { $_->[1] } map { [$_->[0], $_->[1] % $k] } @factor_exp);
         _set_int($r);
     }
 
@@ -14704,7 +14690,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_add($sum, $sum, $u);
                 },
                 $s
-                                          );
+            );
         }
         else {
             my $m;
@@ -18206,8 +18192,8 @@ package Sidef::Types::Number::Number {
 
         if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
             return Math::Prime::Util::omega_primes(    # XXX: available in MPU > 0.73
-                                               $k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to)
-            );
+                                                    $k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to)
+                                                  );
         }
         elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 

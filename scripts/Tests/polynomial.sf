@@ -243,7 +243,7 @@ for n in (0..10) {
     var x = irand(50, 100)
 
     assert_eq(chebyshevT(n).eval(x), chebyshevT(n, x))
-    assert_eq(chebyshevU(n).eval(x).eval(x), chebyshevU(n, x))               # TODO: fix me
+    assert_eq(chebyshevU(n).eval(x), chebyshevU(n, x))
 
     assert_eq(bernoulli_polynomial(n).eval(x), bernoulli_polynomial(n, x))
     assert_eq(faulhaber_polynomial(n).eval(x), faulhaber_polynomial(n, x))
