@@ -6395,6 +6395,14 @@ Given two integers C<a> and C<n>, return a sorted array of all modular square ro
 
 =cut
 
+=head2 sqrtQ
+
+    sqrtQ(n)
+
+Returns a Quadratic object, representing C<sqrt(n)>.
+
+=cut
+
 =head2 square_divisors
 
     square_divisors(n)

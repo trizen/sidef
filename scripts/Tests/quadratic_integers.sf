@@ -413,7 +413,8 @@ assert_eq(  # OEIS: A006495
 )
 
 do {  # OEIS: A066408
-    var ω = Quadratic(-1, 1, -3)/2
+    #var ω = Quadratic(-1, 1, -3)/2
+    var ω = (-1/2 + sqrtQ(-3)/2)
     assert(%n[2, 5, 7, 11, 17, 19, 79, 163, 193, 239, 317, 353, 659, 709, 1049, 1103].all {|n|
         (1 - ω)**n - 1 -> norm.is_prime
     })

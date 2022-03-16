@@ -2665,6 +2665,11 @@ package Sidef::Types::Number::Number {
         bless \__sqrt__(_any2mpfr_mpc($$x));
     }
 
+    sub sqrtQ {
+        my ($x) = @_;
+        Sidef::Types::Number::Quadratic->new(ZERO, ONE, $x);
+    }
+
     sub __cbrt__ {
         my ($x) = @_;
 
