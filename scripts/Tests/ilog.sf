@@ -34,7 +34,7 @@ assert_eq(gather {
 
 assert_eq(gather {
     var x = 0
-    { take(x.next_pow2!) } * 5
+    { take(x.next_pow!(2)) } * 5
 }, [1, 2, 4, 8, 16])
 
 assert_eq(2**4096     -> next_pow(2), 2**4097)
@@ -44,5 +44,33 @@ assert_eq(2**4096 + 1 -> next_pow(2), 2**4097)
 assert_eq(3**2000     -> next_pow(3), 3**2001)
 assert_eq(3**2000 - 1 -> next_pow(3), 3**2000)
 assert_eq(3**2000 + 1 -> next_pow(3), 3**2001)
+
+assert_eq(
+    @(1..10).map_reduce{|a| a.next_pow(2) },
+    0..9 -> map {|n| 2**n }
+)
+
+assert_eq(99**4096     -> prev_pow(99), 99**4095)
+assert_eq(99**4096 - 1 -> prev_pow(99), 99**4095)
+assert_eq(99**4096 + 1 -> prev_pow(99), 99**4096)
+
+assert_eq(102**2000     -> prev_pow(102), 102**1999)
+assert_eq(102**2000 - 1 -> prev_pow(102), 102**1999)
+assert_eq(102**2000 + 1 -> prev_pow(102), 102**2000)
+
+assert_eq(
+    @(3..10).map_reduce{|a| a.next_pow(3) }.map { .prev_pow(3) },
+    0..7 -> map {|n| 3**n },
+)
+
+assert_eq(4.prev_pow(3), 3)
+assert_eq(3.prev_pow(3), 1)
+assert_eq(2.prev_pow(3), 1)
+assert(1.prev_pow(3).is_nan)
+
+assert_eq(0.next_pow(3), 1)
+assert_eq(1.next_pow(3), 3)
+assert_eq(2.next_pow(3), 3)
+assert_eq(3.next_pow(3), 9)
 
 say "** Test passed!"

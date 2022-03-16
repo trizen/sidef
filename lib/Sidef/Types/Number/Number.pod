@@ -4723,27 +4723,16 @@ Efficiently returns the next palindrome in base-b greater than n.
 
     n.next_pow(b)
 
-Returns the perfect power after C<n>, with base C<b>.
+Returns the next perfect power greater than C<n>, with base C<b>.
+
+    say 63.next_pow(2)      #=> 64
+    say 64.next_pow(2)      #=> 128
 
 Equivalent with:
 
     b**(1+ilog(n,b))
 
 Aliases: I<next_power>
-
-=cut
-
-=head2 next_pow2
-
-    n.next_pow2
-
-Returns the next power of 2 larger than C<n>.
-
-Equivalent with:
-
-    n.next_pow(2)
-
-Aliases: I<next_power2>
 
 =cut
 
@@ -5428,6 +5417,19 @@ Equivalent with:
     n.udivisors.grep { .is_perfect_power }
 
 Aliases: I<perfect_power_udivisors>, I<perfect_power_unitary_divisors>
+
+=cut
+
+=head2 prev_pow
+
+    n.prev_pow(b)
+
+Returns the previous perfect power smaller than C<n>, with base C<b>. Returns NaN when C<n> is <= 1.
+
+    say 65.prev_pow(2)      #=> 64
+    say 64.prev_pow(2)      #=> 32
+
+Aliases: I<prev_power>
 
 =cut
 

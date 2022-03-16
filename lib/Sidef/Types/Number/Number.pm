@@ -20423,13 +20423,37 @@ package Sidef::Types::Number::Number {
 
     *next_power = \&next_pow;
 
-    sub next_pow2 {
-        my ($x) = @_;
-        @_ = ($x, TWO);
-        goto &next_pow;
+    sub prev_pow {
+        my ($x, $y) = @_;
+
+        _valid(\$y);
+
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($x) <= 0 and goto &nan;
+
+        my $log = (__ilog__($x, $y) // goto &nan);
+
+        my $r = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_fits_ulong_p($y)
+          ? Math::GMPz::Rmpz_ui_pow_ui($r, Math::GMPz::Rmpz_get_ui($y), $log)
+          : Math::GMPz::Rmpz_pow_ui($r, $y, $log);
+
+        if (Math::GMPz::Rmpz_cmp($r, $x) == 0) {
+
+            if ($log == 0) {
+                goto &nan;
+            }
+
+            Math::GMPz::Rmpz_divexact($r, $r, $y);
+        }
+
+        bless \$r;
     }
 
-    *next_power2 = \&next_pow2;
+    *prev_power = \&prev_pow;
 
     #
     ## Is a polygonal number?

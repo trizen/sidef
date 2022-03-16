@@ -291,6 +291,7 @@ package Sidef::Optimizer {
                       root iroot
                       log
                       next_pow
+                      prev_pow
                       max min
                       roundf
                       binomial
@@ -325,7 +326,6 @@ package Sidef::Optimizer {
                       lnsuperfactorial
                       lnhyperfactorial
                       sqrt isqrt
-                      next_pow2
                       abs int rat float complex
                       norm conj sqr
 
