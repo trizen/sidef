@@ -70,6 +70,10 @@ package Sidef::Types::Number::Number {
     sub new {
         my (undef, $num, $base) = @_;
 
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0];
+        }
+
         if (ref($base)) {
             if (ref($base) eq __PACKAGE__) {
                 $base = _any2ui($$base) // 0;

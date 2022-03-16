@@ -19,6 +19,11 @@ package Sidef::Types::Number::Quaternion {
     sub new {
         my (undef, $a, $b, $c, $d) = @_;
 
+        # Handle evaluation of polynomials
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0]->eval($a);
+        }
+
         $a //= Sidef::Types::Number::Number::ZERO;
         $b //= Sidef::Types::Number::Number::ZERO;
         $c //= Sidef::Types::Number::Number::ZERO;
@@ -33,6 +38,11 @@ package Sidef::Types::Number::Quaternion {
     }
 
     *call = \&new;
+
+    sub eval {
+        my ($x, $v) = @_;
+        __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v), $x->{c}->eval($v), $x->{d}->eval($v),);
+    }
 
     sub a {
         $_[0]->{a};
@@ -196,7 +206,7 @@ package Sidef::Types::Number::Quaternion {
                 $x->{a}->mul($y->{b})->add($x->{b}->mul($y->{a}))->add($x->{c}->mul($y->{d}))->sub($x->{d}->mul($y->{c})),
                 $x->{a}->mul($y->{c})->sub($x->{b}->mul($y->{d}))->add($x->{c}->mul($y->{a}))->add($x->{d}->mul($y->{b})),
                 $x->{a}->mul($y->{d})->add($x->{b}->mul($y->{c}))->sub($x->{c}->mul($y->{b}))->add($x->{d}->mul($y->{a})),
-            );
+                                   );
         }
 
 #<<<

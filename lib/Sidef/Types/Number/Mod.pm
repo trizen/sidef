@@ -16,6 +16,11 @@ package Sidef::Types::Number::Mod {
     sub new {
         my (undef, $n, $m) = @_;
 
+        # Handle evaluation of polynomials
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0]->eval($n);
+        }
+
         #$n = Sidef::Types::Number::Number->new($n) if !UNIVERSAL::isa($n, 'Sidef::Types::Number::Number');
         #$m = Sidef::Types::Number::Number->new($m) if !UNIVERSAL::isa($m, 'Sidef::Types::Number::Number');
 
@@ -39,6 +44,11 @@ package Sidef::Types::Number::Mod {
     }
 
     *lift = \&to_n;
+
+    sub eval {
+        my ($x, $v) = @_;
+        $x->{n}->eval($v)->mod($x->{m});
+    }
 
     sub is_zero {
         my ($x) = @_;

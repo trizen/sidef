@@ -279,6 +279,14 @@ Returns the
 
 =cut
 
+=head2 eval
+
+    Gauss.eval()
+
+Returns the
+
+=cut
+
 =head2 float
 
     Gauss.float()

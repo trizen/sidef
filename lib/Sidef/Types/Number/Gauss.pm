@@ -19,6 +19,11 @@ package Sidef::Types::Number::Gauss {
     sub new {
         my (undef, $real, $imag) = @_;
 
+        # Handle evaluation of polynomials
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0]->eval($real);
+        }
+
         $real //= Sidef::Types::Number::Number::ZERO;
         $imag //= Sidef::Types::Number::Number::ZERO;
 
@@ -29,6 +34,11 @@ package Sidef::Types::Number::Gauss {
     }
 
     *call = \&new;
+
+    sub eval {
+        my ($x, $v) = @_;
+        __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v));
+    }
 
     sub i {
         my ($x) = @_;

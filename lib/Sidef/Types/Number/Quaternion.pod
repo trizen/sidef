@@ -294,6 +294,14 @@ Returns the
 
 =cut
 
+=head2 eval
+
+    Quaternion.eval()
+
+Returns the
+
+=cut
+
 =head2 float
 
     Quaternion.float()

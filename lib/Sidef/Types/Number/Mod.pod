@@ -235,6 +235,14 @@ Returns the
 
 =cut
 
+=head2 eval
+
+    Mod.eval()
+
+Returns the
+
+=cut
+
 =head2 fib
 
     Mod.fib()

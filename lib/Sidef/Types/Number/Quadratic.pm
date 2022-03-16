@@ -19,6 +19,11 @@ package Sidef::Types::Number::Quadratic {
     sub new {
         my (undef, $x, $y, $w) = @_;
 
+        # Handle evaluation of polynomials
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0]->eval($x);
+        }
+
         $x //= Sidef::Types::Number::Number::ZERO;
         $y //= Sidef::Types::Number::Number::ZERO;
         $w //= Sidef::Types::Number::Number::ONE;
@@ -31,6 +36,11 @@ package Sidef::Types::Number::Quadratic {
     }
 
     *call = \&new;
+
+    sub eval {
+        my ($x, $v) = @_;
+        __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v), $x->{w}->eval($v),);
+    }
 
     sub a {
         $_[0]->{a};
@@ -156,7 +166,7 @@ package Sidef::Types::Number::Quadratic {
                 $x->{a}->mul($y->{a})->add($x->{b}->mul($y->{b})->mul($x->{w})),
                 $x->{a}->mul($y->{b})->add($x->{b}->mul($y->{a})),
                 $x->{w},
-            );
+                                   );
         }
 
         __PACKAGE__->new($x->{a}->mul($y), $x->{b}->mul($y), $x->{w});

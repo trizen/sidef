@@ -16,6 +16,11 @@ package Sidef::Types::Number::Fraction {
     sub new {
         my (undef, $n, $m) = @_;
 
+        # Handle evaluation of polynomials
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0]->eval($n);
+        }
+
         $n //= Sidef::Types::Number::Number::ZERO;
         $m //= Sidef::Types::Number::Number::ONE;
 

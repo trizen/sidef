@@ -280,6 +280,14 @@ Returns the
 
 =cut
 
+=head2 eval
+
+    Quadratic.eval()
+
+Returns the
+
+=cut
+
 =head2 float
 
     Quadratic.float()

@@ -223,11 +223,9 @@ package Sidef::Types::Number::Polynomial {
     sub coeffs {
         my ($x) = @_;
         Sidef::Types::Array::Array->new(
-            [
-             map {
-                 Sidef::Types::Array::Array->new([Sidef::Types::Number::Number::_set_int($_), $x->{$_}])
-             } sort { $a <=> $b } CORE::keys(%$x)
-            ]
+                               [map { Sidef::Types::Array::Array->new([Sidef::Types::Number::Number::_set_int($_), $x->{$_}]) }
+                                sort { $a <=> $b } CORE::keys(%$x)
+                               ]
         );
     }
 
@@ -441,9 +439,7 @@ package Sidef::Types::Number::Polynomial {
 
     sub invmod {
         my ($x, $m) = @_;
-
-        # TODO: implement
-        ...;
+        $x->powmod(Sidef::Types::Number::Number::MONE, $m);
     }
 
     sub is_zero {
