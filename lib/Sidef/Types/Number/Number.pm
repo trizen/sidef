@@ -18197,7 +18197,7 @@ package Sidef::Types::Number::Number {
         my @omega_primes;
 
         # TODO: optimization when A and B are close to each other.
-        # Idea: if A-B < sqrt(B), then just iterate over the range A..B and grep the k-omega primes.
+        # Idea: if |A-B| < sqrt(B), then just iterate over the range A..B and grep the k-omega primes.
 
         if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
             return Math::Prime::Util::omega_primes(    # XXX: available in MPU > 0.73
@@ -18464,7 +18464,7 @@ package Sidef::Types::Number::Number {
         my @almost_primes;
 
         # TODO: optimization when A and B are close to each other.
-        # Idea: if A-B < sqrt(B), then just iterate over the range A..B and grep the k-almost primes.
+        # Idea: if |A-B| < sqrt(B), then just iterate over the range A..B and grep the k-almost primes.
 
         if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 

@@ -1122,6 +1122,7 @@ utils/gource-video.sh
 utils/grep_errors.sh
 utils/pod_generator.pl
 utils/sidef2bin.sh
+utils/sidef2exe.txt
 utils/test_deparser.pl
 utils/test_parser.pl
 'utils/Web interface/css/main.css'
