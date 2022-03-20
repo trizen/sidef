@@ -411,6 +411,14 @@ Returns the
 
 =cut
 
+=head2 binsplit
+
+    Array.binsplit()
+
+Returns the
+
+=cut
+
 =head2 bsearch
 
     Array.bsearch()

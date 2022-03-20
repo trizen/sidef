@@ -2343,6 +2343,11 @@ package Sidef::Types::Array::Array {
         $poly;
     }
 
+    sub binsplit {
+        my ($self, $block) = @_;
+        Sidef::Math::Math->binsplit($block, @$self);
+    }
+
     sub reduce {
         my ($self, $obj, $initial) = @_;
 
@@ -3390,7 +3395,7 @@ package Sidef::Types::Array::Array {
                     push @result, bless [@_];    # don't bless \@_
                 },
                 map { [@$_] } @$self
-                                            );
+            );
 
             return bless \@result;
         }
