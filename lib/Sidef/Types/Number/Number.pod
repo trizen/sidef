@@ -1957,6 +1957,16 @@ When three arguments are given, it does integer modular division: C<(a/b) % m>.
 
 =cut
 
+=head2 dop_factor
+
+    dop_factor(n)
+
+Difference of Powers (DoP) factorization method, trying to find algebraic factors of C<n>.
+
+    say dop_factor(2**120 + 1)
+
+=cut
+
 =head2 downto
 
     a.downto(b, step=1)

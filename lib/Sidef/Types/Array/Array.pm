@@ -2345,7 +2345,7 @@ package Sidef::Types::Array::Array {
 
     sub binsplit {
         my ($self, $block) = @_;
-        Sidef::Math::Math->binsplit($block, @$self);
+        Sidef::Types::Number::Number::_binsplit([@$self], $block);
     }
 
     sub reduce {

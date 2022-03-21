@@ -15259,6 +15259,145 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([bless(\$n)]);
     }
 
+    # Congruence of powers factorization method (TODO)
+    #~ sub cop_factor {
+
+    #~ }
+
+    # Difference of powers factorization method
+    sub dop_factor {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        $n = Math::GMPz::Rmpz_init_set($n);    # copy
+
+        my %seen_divisor;
+        my @diff_powers_params;
+
+        #
+        ## Difference of powers factorization method
+        #
+
+        my $diff_powers = sub {
+            my ($r1, $e1, $r2, $e2) = @_;
+
+            my @factors;
+
+            my @d1 = _divisors($e1);
+            my @d2 = _divisors($e2);
+
+            state $x = Math::GMPz::Rmpz_init_nobless();
+            state $y = Math::GMPz::Rmpz_init_nobless();
+            state $g = Math::GMPz::Rmpz_init_nobless();
+
+            foreach my $d1 (@d1) {
+                Math::GMPz::Rmpz_pow_ui($x, $r1, $d1);
+                foreach my $d2 (@d2) {
+                    Math::GMPz::Rmpz_pow_ui($y, $r2, $d2);
+                    foreach my $j (1, -1) {
+
+                        ($j == 1)
+                          ? Math::GMPz::Rmpz_sub($g, $x, $y)
+                          : Math::GMPz::Rmpz_add($g, $x, $y);
+
+                        Math::GMPz::Rmpz_gcd($g, $g, $n);
+
+                        if (    Math::GMPz::Rmpz_cmp_ui($g, 1) > 0
+                            and Math::GMPz::Rmpz_cmp($g, $n) < 0
+                            and !$seen_divisor{Math::GMPz::Rmpz_get_str($g, 10)}++) {
+                            push @factors, Math::GMPz::Rmpz_init_set($g);
+                        }
+                    }
+                }
+            }
+
+            @factors;
+        };
+
+        my $diff_power_check = sub {
+            my ($r1, $e1) = @_;
+
+            # u = r1^e1
+            state $u = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_pow_ui($u, $r1, $e1);
+
+            # dx = abs(u - n)
+            state $dx = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_sub($dx, $u, $n);
+            Math::GMPz::Rmpz_abs($dx, $dx);
+
+            if (Math::GMPz::Rmpz_perfect_power_p($dx)) {
+
+                my $e2 = Math::Prime::Util::GMP::is_power(Math::GMPz::Rmpz_get_str($dx, 10)) || 1;
+                my $r2 = Math::GMPz::Rmpz_init();
+
+                Math::GMPz::Rmpz_root($r2, $dx, $e2);
+                push @diff_powers_params, [$r1, $e1, $r2, $e2];
+            }
+        };
+
+        my $n_log2 = Math::GMPz::Rmpz_sizeinbase($n, 2);
+
+        # Sum and difference of powers of the form a^k ± b^k, where a and b are small.
+        if (0) {
+            foreach my $k (CORE::reverse(2 .. $n_log2)) {
+
+                my $t  = __ilog__($n, $k);
+                my $r1 = Math::GMPz::Rmpz_init_set_ui($k);
+
+                $diff_power_check->($r1, $t);        # sum of powers
+                $diff_power_check->($r1, $t + 1);    # difference of powers
+            }
+        }
+
+        # Sum and difference of powers of the form a^k ± b^k, where a and b are large.
+        foreach my $e1 (CORE::reverse(2 .. $n_log2)) {
+
+            my $t = Math::GMPz::Rmpz_init();
+            my $u = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_root($t, $n, $e1);
+            Math::GMPz::Rmpz_add_ui($u, $t, 1);
+
+            $diff_power_check->($t, $e1);    # sum of powers
+            $diff_power_check->($u, $e1);    # difference of powers
+        }
+
+        my @divisors;
+
+        foreach my $args (@diff_powers_params) {
+            push @divisors, $diff_powers->(@$args);
+        }
+
+        @divisors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @divisors;
+
+        my @factors;
+        state $g = Math::GMPz::Rmpz_init_nobless();
+
+        foreach my $d (@divisors) {
+
+            Math::GMPz::Rmpz_gcd($g, $n, $d);
+
+            if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
+                my $valuation = Math::GMPz::Rmpz_remove($n, $n, $g);
+                push(@factors, (Math::GMPz::Rmpz_init_set($g)) x $valuation);
+            }
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) > 0) {
+            push @factors, $n;
+        }
+
+        @factors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @factors;
+        @factors = map  { _set_int($_) } @factors;
+
+        Sidef::Types::Array::Array->new(\@factors);
+    }
+
     # "Fermat's Little Theorem" factorization method
     sub flt_factor {
         my ($n, $base, $reps) = @_;

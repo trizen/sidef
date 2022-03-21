@@ -204,8 +204,8 @@ package Sidef::Types::Number::Polynomial {
     sub eval {
         my ($x, $value) = @_;
         CORE::keys(%$x) || return Sidef::Types::Number::Number::ZERO;
-        Sidef::Types::Array::Array->new(
-                 [map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}) } CORE::keys %$x])->reduce('+');
+        Sidef::Types::Number::Number::sum(map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}) }
+                                          CORE::keys %$x);
     }
 
     sub keys {

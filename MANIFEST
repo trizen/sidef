@@ -750,6 +750,7 @@ scripts/Tests/def_primitive_type.sf
 scripts/Tests/def_primitive_type_2.sf
 scripts/Tests/default_param_values.sf
 scripts/Tests/default_var_values.sf
+scripts/Tests/difference_of_powers_factorization.sf
 scripts/Tests/digits_and_sum_of_digits.sf
 scripts/Tests/divisor_functions.sf
 scripts/Tests/draw_grid_of_squares_multi.sf
