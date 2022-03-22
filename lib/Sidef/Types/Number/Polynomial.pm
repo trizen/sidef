@@ -1,6 +1,6 @@
 package Sidef::Types::Number::Polynomial {
 
-    # Reference:
+    # References:
     #   https://en.wikipedia.org/wiki/Polynomial
     #   https://metacpan.org/pod/Math::Polynomial
     #   https://metacpan.org/pod/Math::Polynomial::Cyclotomic
@@ -439,7 +439,7 @@ package Sidef::Types::Number::Polynomial {
 
     sub invmod {
         my ($x, $m) = @_;
-        $x->powmod(Sidef::Types::Number::Number::MONE, $m);
+        $x->mod($m)->inv;
     }
 
     sub is_zero {

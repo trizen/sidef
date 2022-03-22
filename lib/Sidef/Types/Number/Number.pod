@@ -1598,6 +1598,18 @@ Returns an array with the continued fraction convergents for a given real number
 
 =cut
 
+=head2 cop_factor
+
+    cop_factor(n, reps=n.ilog2)
+
+Congruence of Powers (CoP) factorization method, trying to find algebraic factors of C<n>.
+
+    say cop_factor((5**48 + 1)*(3**120 + 1))
+
+An additional argument can be given to limit the number of iterations.
+
+=cut
+
 =head2 core
 
     core(n)
@@ -1959,11 +1971,13 @@ When three arguments are given, it does integer modular division: C<(a/b) % m>.
 
 =head2 dop_factor
 
-    dop_factor(n)
+    dop_factor(n, reps=n.ilog2)
 
 Difference of Powers (DoP) factorization method, trying to find algebraic factors of C<n>.
 
     say dop_factor(2**120 + 1)
+
+An additional argument can be given to limit the number of iterations.
 
 =cut
 

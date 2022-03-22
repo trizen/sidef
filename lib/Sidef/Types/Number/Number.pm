@@ -15259,16 +15259,158 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([bless(\$n)]);
     }
 
-    # Congruence of powers factorization method (TODO)
-    #~ sub cop_factor {
+    # Congruence of powers factorization method
+    sub cop_factor {
+        my ($n, $upto) = @_;
 
-    #~ }
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        if (defined($upto)) {
+            _valid(\$upto);
+            $upto = _any2ui($$upto);
+        }
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        $n = Math::GMPz::Rmpz_init_set($n);    # copy
+
+        my %seen_divisor;
+
+        my $congr_powers = sub {
+            my ($r1, $e1, $r2, $e2) = @_;
+
+            my @d1 = _divisors($e1);
+            my @d2 = _divisors($e2);
+
+            @d1 = map {
+                my $x = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_pow_ui($x, $r1, $_);
+                $x;
+            } @d1;
+
+            @d2 = map {
+                my $y = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_pow_ui($y, $r2, $_);
+                $y;
+            } @d2;
+
+            state $g = Math::GMPz::Rmpz_init_nobless();
+
+            my @factors;
+
+            foreach my $x (@d1) {
+                foreach my $y (@d2) {
+                    foreach my $j (-1, 1) {
+
+                        ($j == 1)
+                          ? Math::GMPz::Rmpz_sub($g, $x, $y)
+                          : Math::GMPz::Rmpz_add($g, $x, $y);
+
+                        Math::GMPz::Rmpz_gcd($g, $g, $n);
+
+                        if (    Math::GMPz::Rmpz_cmp_ui($g, 1) > 0
+                            and Math::GMPz::Rmpz_cmp($g, $n) < 0
+                            and !$seen_divisor{Math::GMPz::Rmpz_get_str($g, 10)}++) {
+                            push @factors, Math::GMPz::Rmpz_init_set($g);
+                        }
+                    }
+                }
+            }
+
+            @factors;
+        };
+
+        my @congr_powers_params;
+
+        my $process = sub {
+            my ($root, $e) = @_;
+
+            for my $j (1, 0) {
+
+                my $k = Math::GMPz::Rmpz_init();
+                my $u = Math::GMPz::Rmpz_init();
+
+                Math::GMPz::Rmpz_add_ui($k, $root, $j);
+                Math::GMPz::Rmpz_powm_ui($u, $k, $e, $n);
+
+                foreach my $z ($u, $n - $u) {
+
+                    if (Math::GMPz::Rmpz_perfect_power_p($z)) {
+
+                        my $t = Math::Prime::Util::GMP::is_power(Math::GMPz::Rmpz_get_str($z, 10)) || 1;
+                        my $r = Math::GMPz::Rmpz_init();
+
+                        Math::GMPz::Rmpz_root($r, $z, $t);
+
+                        push @congr_powers_params, [$r, $t, $k, $e];
+                    }
+                }
+            }
+        };
+
+        my $n_log2 = Math::GMPz::Rmpz_sizeinbase($n, 2);
+
+        if (defined($upto) and $n_log2 > $upto) {
+            $n_log2 = $upto;
+        }
+
+        my @range = reverse(2 .. $n_log2);
+
+        for my $e (@range) {
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_root($r, $n, $e);
+            $process->($r, $e);
+        }
+
+        for my $r (@range) {
+            my $e = __ilog__($n, $r);
+            $process->(Math::GMPz::Rmpz_init_set_ui($r), $e);
+        }
+
+        my %seen_param;
+        @congr_powers_params = grep { !$seen_param{join(' ', @$_)}++ } @congr_powers_params;
+
+        my @divisors;
+
+        foreach my $args (@congr_powers_params) {
+            push @divisors, $congr_powers->(@$args);
+        }
+
+        @divisors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @divisors;
+
+        my @factors;
+        state $g = Math::GMPz::Rmpz_init_nobless();
+
+        foreach my $d (@divisors) {
+
+            Math::GMPz::Rmpz_gcd($g, $n, $d);
+
+            if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
+                my $valuation = Math::GMPz::Rmpz_remove($n, $n, $g);
+                push(@factors, (Math::GMPz::Rmpz_init_set($g)) x $valuation);
+            }
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) > 0) {
+            push @factors, $n;
+        }
+
+        @factors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @factors;
+        @factors = map  { _set_int($_) } @factors;
+
+        Sidef::Types::Array::Array->new(\@factors);
+    }
 
     # Difference of powers factorization method
     sub dop_factor {
-        my ($n) = @_;
+        my ($n, $upto) = @_;
 
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        if (defined($upto)) {
+            $upto = _any2ui($$upto);
+        }
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new;
@@ -15285,19 +15427,27 @@ package Sidef::Types::Number::Number {
         my $diff_powers = sub {
             my ($r1, $e1, $r2, $e2) = @_;
 
-            my @factors;
-
             my @d1 = _divisors($e1);
             my @d2 = _divisors($e2);
 
-            state $x = Math::GMPz::Rmpz_init_nobless();
-            state $y = Math::GMPz::Rmpz_init_nobless();
+            @d1 = map {
+                my $x = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_pow_ui($x, $r1, $_);
+                $x;
+            } @d1;
+
+            @d2 = map {
+                my $y = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_pow_ui($y, $r2, $_);
+                $y;
+            } @d2;
+
             state $g = Math::GMPz::Rmpz_init_nobless();
 
-            foreach my $d1 (@d1) {
-                Math::GMPz::Rmpz_pow_ui($x, $r1, $d1);
-                foreach my $d2 (@d2) {
-                    Math::GMPz::Rmpz_pow_ui($y, $r2, $d2);
+            my @factors;
+
+            foreach my $x (@d1) {
+                foreach my $y (@d2) {
                     foreach my $j (1, -1) {
 
                         ($j == 1)
@@ -15342,9 +15492,15 @@ package Sidef::Types::Number::Number {
 
         my $n_log2 = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
+        if (defined($upto) and $n_log2 > $upto) {
+            $n_log2 = $upto;
+        }
+
+        my @range = CORE::reverse(2 .. $n_log2);
+
         # Sum and difference of powers of the form a^k ± b^k, where a and b are small.
         if (0) {
-            foreach my $k (CORE::reverse(2 .. $n_log2)) {
+            foreach my $k (@range) {
 
                 my $t  = __ilog__($n, $k);
                 my $r1 = Math::GMPz::Rmpz_init_set_ui($k);
@@ -15355,7 +15511,7 @@ package Sidef::Types::Number::Number {
         }
 
         # Sum and difference of powers of the form a^k ± b^k, where a and b are large.
-        foreach my $e1 (CORE::reverse(2 .. $n_log2)) {
+        foreach my $e1 (@range) {
 
             my $t = Math::GMPz::Rmpz_init();
             my $u = Math::GMPz::Rmpz_init();
