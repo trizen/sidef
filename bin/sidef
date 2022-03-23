@@ -479,10 +479,10 @@ EOT
                 say "  ***   last result computed in $tΔ seconds";
                 redo MAINLOOP;
             }
-            elsif ($line =~ /^#\h*load\h+(.+)/) {
+            elsif ($line =~ /^#+\h*load\h+(.+)/) {
+                my $file = unpack('A*', $1);
                 $init_sidef->();
                 $sidef->execute_code('');
-                my $file = unpack('A*', $1);
                 open my $fh, '<:utf8', $file or do {
                     warn "Can't open file <<$file>> for read: $!\n";
                     redo MAINLOOP;
@@ -490,7 +490,7 @@ EOT
                 $line = do { local $/; <$fh> };
                 close $fh;
             }
-            elsif ($line =~ /^#\h*save\h+(.+)/) {
+            elsif ($line =~ /^#+\h*save\h+(.+)/) {
                 my $file = unpack('A*', $1);
                 open my $fh, '>:utf8', $file or do {
                     warn "Can't open file <<$file>> for write: $!\n";
@@ -866,6 +866,30 @@ The interactive mode (a.k.a. REPL) is available by simply executing the C<sidef>
     >> n**2 + n - 1
     => 1721
     >>
+
+=head1 SPECIAL REPL COMMANDS
+
+The REPL supports the following special commands:
+
+=over 4
+
+=item * Display the duration it took to execute the previous command:
+
+    >> ##
+
+=item * Save the code from the REPL inside a file:
+
+    >> # save filename.sf
+
+=item * Load a Sidef file inside the REPL:
+
+    >> # load filename.sf
+
+=item * Close the REPL:
+
+    >> quit
+
+=back
 
 =head1 OPTIMIZATION
 
