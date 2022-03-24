@@ -465,6 +465,14 @@ Returns the
 
 =cut
 
+=head2 while
+
+    Range.while()
+
+Returns the
+
+=cut
+
 =head2 zip_operator
 
     Range.zip_operator()

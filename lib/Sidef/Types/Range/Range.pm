@@ -219,10 +219,8 @@ package Sidef::Types::Range::Range {
                              $asc ? $from
                            : $to
              )->div($step)->int->mul($step)->eq(
-                                                $value->sub(
-                                                              $asc ? $from
-                                                            : $to
-                                                           )
+                                                $value->sub(  $asc ? $from
+                                                            : $to)
                                                )
                )
           ) ? (Sidef::Types::Bool::Bool::TRUE)
@@ -255,6 +253,18 @@ package Sidef::Types::Range::Range {
 
     *for     = \&each;
     *foreach = \&each;
+
+    sub while {
+        my ($self, $block) = @_;
+
+        my $iter = $self->iter;
+
+        for (; ;) {
+            $block->run($iter->run() // last) || last;
+        }
+
+        $self;
+    }
 
     sub each_cons {
         my ($self, $n, $block) = @_;
