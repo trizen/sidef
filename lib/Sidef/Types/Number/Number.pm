@@ -12701,6 +12701,34 @@ package Sidef::Types::Number::Number {
 
     *squares_r = \&sum_of_squares_count;
 
+    sub is_ntf {
+        my ($x, $y) = @_;
+
+        $x = $$x;
+
+        if (ref($x) ne 'Math::GMPz') {
+            __is_int__($x) || return Sidef::Types::Bool::Bool::FALSE;
+            $x = _any2mpz($x) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Math::GMPz::Rmpz_cmp_ui($x, 1) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        _valid(\$y);
+        $y = $$y;
+
+        if (ref($y) ne 'Math::GMPz') {
+            __is_int__($y) || return Sidef::Types::Bool::Bool::FALSE;
+            $y = _any2mpz($y) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        (Math::GMPz::Rmpz_cmp($x, $y) < 0 and Math::GMPz::Rmpz_divisible_p($y, $x))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *is_nontrivial_factor = \&is_ntf;
+
     sub is_coprime {
         my ($x, $y) = @_;
 

@@ -3612,6 +3612,20 @@ Aliases: I<is_pp1_prime>, I<is_nplus1_prime>
 
 =cut
 
+=head2 is_ntf
+
+    g.is_ntf(n)
+
+Returns true if C<g> is a non-trivial integer factor of C<n>.
+
+Equivalent with (assuming C<g> and C<n> are both integers):
+
+    g.divides(n) && g.is_between(2, n-1)
+
+Aliases: I<is_nontrivial_factor>
+
+=cut
+
 =head2 is_odd
 
     n.is_odd
