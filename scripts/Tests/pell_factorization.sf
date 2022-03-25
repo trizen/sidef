@@ -20,7 +20,7 @@ func pell_factorization(n) {
     func check_factor(f) {
         var g = gcd(f, nr)
 
-        if (g.is_between(2, nr-1)) {
+        if (g.is_ntf(nr)) {
             say "Found factor: #{g}"
             factor = g
             return true
@@ -81,6 +81,6 @@ for v,k in (nums), n in ([k, Gauss(k), Quadratic(k), Quaternion(k), Poly([k])]) 
     var (factor, iter) = pell_factorization(n)
     assert_eq(iter, v)
     assert_eq(k % factor, 0)
-    assert(factor.is_between(2, k-1))
+    assert(factor.is_ntf(k))
     assert_eq(gcd(k, factor), factor)
 }

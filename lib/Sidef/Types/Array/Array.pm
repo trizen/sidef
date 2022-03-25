@@ -43,7 +43,7 @@ package Sidef::Types::Array::Array {
             $addr{$refaddr} = \@array;
 
             foreach my $item (@$obj) {
-                if (index(ref($item), 'Sidef::') == 0) {
+                if (CORE::index(ref($item), 'Sidef::') == 0) {
                     CORE::push(@array, $item->get_value);
                 }
                 else {
