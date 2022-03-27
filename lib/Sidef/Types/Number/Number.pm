@@ -11145,15 +11145,15 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        # Support for arbitrary large integers (slow for wide ranges)
-        if ($y >= ~0 and !HAS_PRIME_UTIL) {
-            my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
-            return $prime_count;
-        }
-
         if (HAS_PRIME_UTIL) {
             my $prime_count = Math::Prime::Util::prime_count("$x", "$y");
             return "$prime_count";
+        }
+        elsif ($y >= ~0) {
+
+            # Support for arbitrary large integers (slow for wide ranges)
+            my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
+            return $prime_count;
         }
 
         my ($x_n, $x_pi);
