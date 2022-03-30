@@ -229,6 +229,22 @@ package Sidef::Types::Number::Mod {
 
     *fib = \&fibonacci;
 
+    sub chebyshevu {
+        my ($x, $n) = @_;
+        __PACKAGE__->new(Sidef::Types::Number::Number::chebyshevUmod($n, $x->{n}, $x->{m}), $x->{m});
+    }
+
+    *ChebyshevU = \&chebyshevu;
+    *chebyshevU = \&chebyshevu;
+
+    sub chebyshevt {
+        my ($x, $n) = @_;
+        __PACKAGE__->new(Sidef::Types::Number::Number::chebyshevTmod($n, $x->{n}, $x->{m}), $x->{m});
+    }
+
+    *chebyshevT = \&chebyshevt;
+    *ChebyshevT = \&chebyshevt;
+
     sub shift_left {    # x * 2^n
         my ($x, $n) = @_;
         $x->mul(Sidef::Types::Number::Number::TWO->powmod($n, $x->{m}));

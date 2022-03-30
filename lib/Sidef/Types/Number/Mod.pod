@@ -227,6 +227,26 @@ Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
+=head2 chebyshevt
+
+    Mod.chebyshevt()
+
+Returns the
+
+Aliases: I<chebyshevT>
+
+=cut
+
+=head2 chebyshevu
+
+    Mod.chebyshevu()
+
+Returns the
+
+Aliases: I<chebyshevU>
+
+=cut
+
 =head2 chinese
 
     Mod.chinese()

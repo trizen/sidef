@@ -9279,6 +9279,10 @@ package Sidef::Types::Number::Number {
     sub chebyshevt {
         my ($n, $x) = @_;
 
+        if (ref($n) ne __PACKAGE__) {
+            goto &nan;
+        }
+
         $n = _any2si($$n) // goto &nan;
         $n = -$n if $n < 0;
         $n == 0 and return ONE;
@@ -9316,6 +9320,10 @@ package Sidef::Types::Number::Number {
 
     sub chebyshevu {
         my ($n, $x) = @_;
+
+        if (ref($n) ne __PACKAGE__) {
+            goto &nan;
+        }
 
         $n = _any2si($$n) // goto &nan;
         $n == 0 and return ONE;
@@ -9368,6 +9376,10 @@ package Sidef::Types::Number::Number {
 
         _valid(\$x, \$m);
 
+        if (ref($n) ne __PACKAGE__ or ref($m) ne __PACKAGE__) {
+            goto &nan;
+        }
+
         $n = _any2mpz($$n) // goto &nan;
         $x = $$x;
         $m = _any2mpz($$m) // goto &nan;
@@ -9398,6 +9410,10 @@ package Sidef::Types::Number::Number {
 
         _valid(\$x, \$m);
 
+        if (ref($n) ne __PACKAGE__ or ref($m) ne __PACKAGE__) {
+            goto &nan;
+        }
+
         $n = _any2mpz($$n) // goto &nan;
         $x = $$x;
         $m = _any2mpz($$m) // goto &nan;
@@ -9427,8 +9443,8 @@ package Sidef::Types::Number::Number {
         # U_n(x) = ((x + sqrt(x^2 - 1))^(n+1) - (x - sqrt(x^2 - 1))^(n+1)) / (2 * sqrt(x^2 - 1))
 
         my $Q = Sidef::Types::Number::Quadratic->new(ZERO, ONE, bless \__dec__(__mul__($x, $x)));
-
         my $r = ((bless \$x)->add($Q))->powmod((bless \$n)->inc, (bless \$m))->b;
+
         $r = $r->neg if $negative;
         $r->mod(bless \$m);
     }
