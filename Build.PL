@@ -23,6 +23,7 @@ my $builder = Module::Build->new(
                        'Test::More' => 0,
                       },
 
+    sign              => 1,
     dynamic_config    => 0,
     extra_manify_args => { utf8 => 1 },
 

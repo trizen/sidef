@@ -13263,8 +13263,17 @@ package Sidef::Types::Number::Number {
               || return Sidef::Types::Bool::Bool::FALSE;
         }
 
+        my @strs;
+
         foreach my $n (@vals) {
-            _is_prob_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
+            my $str = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
+            Math::Prime::Util::GMP::is_euler_plumb_pseudoprime($str)
+              || return Sidef::Types::Bool::Bool::FALSE;
+            push @strs, $str;
+        }
+
+        foreach my $n (@strs) {
+            _is_prob_prime($n)
               || return Sidef::Types::Bool::Bool::FALSE;
         }
 
