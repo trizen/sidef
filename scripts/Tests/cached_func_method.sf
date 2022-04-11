@@ -47,6 +47,7 @@ do {
     arr = []
 
     foo.cache
+    foo.cache
     foo(42)
     foo(42)
     assert_eq(arr, %n[42])

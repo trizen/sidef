@@ -662,21 +662,26 @@ package Sidef::Types::Block::Block {
     sub cache {
         my ($self) = @_;
         require Memoize;
-        $self->{code} = Memoize::memoize($self->{code});
+        $self->{is_cached} && return $self;
+        $self->{code}      = Memoize::memoize($self->{code});
+        $self->{is_cached} = 1;
         $self;
     }
 
     sub uncache {
         my ($self) = @_;
         require Memoize;
+        $self->{is_cached} || return $self;
         if (defined(my $uncached = eval { Memoize::unmemoize($self->{code}) })) {
-            $self->{code} = $uncached;
+            $self->{code}      = $uncached;
+            $self->{is_cached} = 0;
         }
         $self;
     }
 
     sub flush_cache {
         my ($self) = @_;
+        $self->{is_cached} || return $self;
         eval { Memoize::flush_cache($self->{code}) };
         $self;
     }
