@@ -32,14 +32,32 @@ do {
     foo.cache
     foo(42)
     foo(42)
-    assert_eq(arr, [42])
+    assert_eq(arr, %n[42])
     foo.uncache
     foo(42)
-    assert_eq(arr, [42, 42])
+    assert_eq(arr, %n[42, 42])
     foo.uncache
     foo(42)
-    assert_eq(arr, [42, 42, 42])
+    assert_eq(arr, %n[42, 42, 42])
     bar.uncache
     bar(99)
-    assert_eq(arr, [42, 42, 42, 99])
+    bar(99)
+    assert_eq(arr, %n[42, 42, 42, 99, 99])
+
+    arr = []
+
+    foo.cache
+    foo(42)
+    foo(42)
+    assert_eq(arr, %n[42])
+    foo.flush_cache
+    foo(42)
+    assert_eq(arr, %n[42, 42])
+    foo(42)
+    assert_eq(arr, %n[42, 42])
+    bar.flush_cache
+    bar(99)
+    assert_eq(arr, %n[42, 42, 99])
+    bar(99)
+    assert_eq(arr, %n[42, 42, 99, 99])
 }

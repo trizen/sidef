@@ -162,6 +162,14 @@ Returns the
 
 =cut
 
+=head2 flush_cache
+
+    Block.flush_cache()
+
+Returns the
+
+=cut
+
 =head2 fork
 
     Block.fork()

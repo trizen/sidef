@@ -675,6 +675,12 @@ package Sidef::Types::Block::Block {
         $self;
     }
 
+    sub flush_cache {
+        my ($self) = @_;
+        eval { Memoize::flush_cache($self->{code}) };
+        $self;
+    }
+
     sub dump {
         Sidef::Types::String::String->new("$_[0]");
     }
