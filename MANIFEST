@@ -1104,6 +1104,7 @@ t/oo_inheritance.t
 t/pod.t
 t/smart_word_wrap.t
 TODO
+TUTORIAL.md
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
 utils/Concepts/sidef_concept.jl
