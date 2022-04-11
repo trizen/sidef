@@ -15,8 +15,8 @@ package Sidef::Types::Number::Polynomial {
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
       q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ },
-      q{${}}  => sub { \$_[0] },
-      q{0+}   => sub { $_[0] };
+      q{${}}  => \&to_n,
+      q{0+}   => \&to_n;
 
     sub new {
         my (undef, @args) = @_;
@@ -73,8 +73,7 @@ package Sidef::Types::Number::Polynomial {
             return $x->{0};
         }
 
-        ## return Sidef::Types::Number::Number::ZERO;
-        return $x;    # maybe we should return zero?
+        return Sidef::Types::Number::Number::nan();
     }
 
     sub real {
