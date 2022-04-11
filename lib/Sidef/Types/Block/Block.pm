@@ -454,7 +454,7 @@ package Sidef::Types::Block::Block {
                         bless({ module => $module }, "$ref");
                     }
                 }
-                       };
+            };
 
             return $code;
         }
@@ -572,7 +572,7 @@ package Sidef::Types::Block::Block {
                 push @array, $self->run(@_);
             },
             @objs
-                );
+        );
 
         Sidef::Types::Array::Array->new(\@array);
     }
@@ -589,7 +589,7 @@ package Sidef::Types::Block::Block {
                 }
             },
             @objs
-                );
+        );
 
         Sidef::Types::Array::Array->new(\@array);
     }
@@ -612,7 +612,7 @@ package Sidef::Types::Block::Block {
                 }
             },
             $range
-                );
+        );
 
         defined($n)
           ? Sidef::Types::Array::Array->new(\@array)
@@ -640,7 +640,7 @@ package Sidef::Types::Block::Block {
                 }
             },
             $range
-                );
+        );
 
         return $nth;
     }
@@ -669,7 +669,9 @@ package Sidef::Types::Block::Block {
     sub uncache {
         my ($self) = @_;
         require Memoize;
-        $self->{code} = Memoize::unmemoize($self->{code});
+        if (defined(my $uncached = eval { Memoize::unmemoize($self->{code}) })) {
+            $self->{code} = $uncached;
+        }
         $self;
     }
 

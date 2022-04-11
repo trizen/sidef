@@ -20,3 +20,26 @@ class Fib {
 var fib = Fib();
 say fib.nth(120);
 say fib+120;
+
+do {
+    # Tests for Block.cache and Block.uncache
+
+    var arr = []
+
+    func foo(n) { arr << n }
+    func bar(n) { arr << n }
+
+    foo.cache
+    foo(42)
+    foo(42)
+    assert_eq(arr, [42])
+    foo.uncache
+    foo(42)
+    assert_eq(arr, [42, 42])
+    foo.uncache
+    foo(42)
+    assert_eq(arr, [42, 42, 42])
+    bar.uncache
+    bar(99)
+    assert_eq(arr, [42, 42, 42, 99])
+}
