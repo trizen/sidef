@@ -91,3 +91,11 @@ do {
     assert_eq(t{:mul}(), 20)
     assert_eq(t{:sub}(), -1)
 }
+
+do {
+    var add1 = 1.method(:add)
+
+    assert_eq(add1(41), 42)
+    assert_eq([1,2,3].map { add1(_) }, [2,3,4])
+    assert_eq([1,2,3].map(add1), [2,3,4])
+}

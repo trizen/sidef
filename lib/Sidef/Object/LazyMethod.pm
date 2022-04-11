@@ -50,7 +50,7 @@ package Sidef::Object::LazyMethod {
         my $call   = $self->{calls}[-1];
         my $method = $call->{method};
 
-        if ($want eq 'call') {
+        if ($want eq 'call' or $want eq 'run') {
 
             if (ref($obj)) {
                 return $obj->$method(@{$call->{args}}, @args);
