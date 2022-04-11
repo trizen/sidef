@@ -172,10 +172,10 @@ Output:
 
 ### AVAILABILITY
 
-* **CPAN**: [https://metacpan.org/release/Sidef](https://metacpan.org/release/Sidef)
-* **PKGS**: [https://pkgs.org/download/perl-Sidef](https://pkgs.org/download/perl-Sidef)
-* **Arch Linux**: [https://aur.archlinux.org/packages/sidef/](https://aur.archlinux.org/packages/sidef/)
-* **Slackware**: [https://slackbuilds.org/repository/14.2/perl/perl-Sidef/](https://slackbuilds.org/repository/14.2/perl/perl-Sidef/)
+* **CPAN**: https://metacpan.org/release/Sidef
+* **PKGS**: https://pkgs.org/download/perl-Sidef
+* **Arch Linux**: https://aur.archlinux.org/packages/sidef/
+* **Slackware**: https://slackbuilds.org/repository/15.0/perl/perl-Sidef/
 
 ### LICENSE AND COPYRIGHT
 
