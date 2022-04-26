@@ -688,10 +688,7 @@ HEADER
 
                     # Memoize the method/function (when "is cached" trait is specified)
                     if ($obj->{cached}) {
-                        $self->top_add("require Memoize;");
-                        $code =
-                            "do{$code;"
-                          . "\$${alphaname}$refaddr\->{code}=Memoize::memoize(\$${alphaname}${refaddr}->{code});\$${alphaname}$refaddr}";
+                        $code = "do{$code;" . "\$${alphaname}$refaddr\->cache;\$${alphaname}$refaddr}";
                     }
 
                     if ($obj->{type} eq 'func' and !$obj->{parent}) {

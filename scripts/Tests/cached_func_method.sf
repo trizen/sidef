@@ -62,3 +62,31 @@ do {
     bar(99)
     assert_eq(arr, %n[42, 42, 99, 99])
 }
+
+do {
+    var arr = []
+
+    func f(n) is cached {
+        arr << n
+        return n+1
+    }
+
+    f(12)
+    assert_eq(arr, %n[12])
+    f(12)
+    assert_eq(arr, %n[12])
+
+    f.uncache
+
+    f(12)
+    assert_eq(arr, %n[12, 12])
+    f(12)
+    assert_eq(arr, %n[12, 12, 12])
+
+    f.cache
+
+    f(12)
+    assert_eq(arr, %n[12, 12, 12, 12])
+    f(12)
+    assert_eq(arr, %n[12, 12, 12, 12])
+}

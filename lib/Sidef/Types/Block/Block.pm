@@ -661,8 +661,8 @@ package Sidef::Types::Block::Block {
 
     sub cache {
         my ($self) = @_;
-        require Memoize;
         $self->{is_cached} && return $self;
+        state $x = require Memoize;
         $self->{code}      = Memoize::memoize($self->{code});
         $self->{is_cached} = 1;
         $self;
@@ -670,8 +670,8 @@ package Sidef::Types::Block::Block {
 
     sub uncache {
         my ($self) = @_;
-        require Memoize;
         $self->{is_cached} || return $self;
+        state $x = require Memoize;
         if (defined(my $uncached = eval { Memoize::unmemoize($self->{code}) })) {
             $self->{code}      = $uncached;
             $self->{is_cached} = 0;
@@ -682,6 +682,7 @@ package Sidef::Types::Block::Block {
     sub flush_cache {
         my ($self) = @_;
         $self->{is_cached} || return $self;
+        state $x = require Memoize;
         eval { Memoize::flush_cache($self->{code}) };
         $self;
     }
