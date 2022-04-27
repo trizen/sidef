@@ -132,6 +132,8 @@ You can find more info about Sidef, by clicking on the following links:
 
 =over 2
 
+=item * GitHub: L<https://github.com/trizen/sidef>
+
 =item * Gitbook: L<https://trizen.gitbook.io/sidef-lang/>
 
 =item * Tutorial: L<https://notabug.org/trizen/sidef/wiki>
