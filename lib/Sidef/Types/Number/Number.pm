@@ -8356,7 +8356,11 @@ package Sidef::Types::Number::Number {
 
             my $r = Math::GMPz::Rmpz_init();
 
-            if (Math::GMPz::Rmpz_invert($r, $y, $m)) {
+            if (Math::GMPz::Rmpz_divisible_p($x, $y) and Math::GMPz::Rmpz_sgn($y)) {
+               Math::GMPz::Rmpz_divexact($r, $x, $y);
+               Math::GMPz::Rmpz_mod($r, $r, $m);
+            }
+            elsif (Math::GMPz::Rmpz_invert($r, $y, $m)) {
                 Math::GMPz::Rmpz_mul($r, $r, $x);
                 Math::GMPz::Rmpz_mod($r, $r, $m);
             }
