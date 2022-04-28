@@ -17,4 +17,12 @@ assert_eq(binomialmod(1e10, 1e4, next_prime(2**64)), binomial(1e10, 1e4) % next_
 assert_eq(binomialmod(1e10, 1e3, (2**127 + 1)), binomial(1e10, 1e3) % (2**127 + 1))
 assert_eq(binomialmod(1e10, 1e3, (2**127 - 1)), binomial(1e10, 1e3) % (2**127 - 1))
 
+var upto = 10
+for n in (-upto .. upto), k in (-upto .. upto), m in (-upto .. upto) {
+    if (m != 0) {
+        #say "Testing: binomial(#{n}, #{k}, #{m})"
+        assert_eq(binomialmod(n, k, m), binomial(n, k) % m)
+    }
+}
+
 say "** Test passed!"

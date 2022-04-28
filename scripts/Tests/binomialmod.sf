@@ -55,6 +55,7 @@ assert_eq(binomialmod(1234567, 1e3, factorial(20)),      binomial(1234567, 1e3) 
 assert_eq(binomialmod(1234567, 1e4, factorial(20)),      binomial(1234567, 1e4) % factorial(20));
 
 assert_eq(binomialmod(-10, -10, -10), binomial(-10, -10) % -10)
+assert_eq(binomialmod(-50, 4, -50), binomial(-50, 4) % -50)
 
 #~ assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) + 1), binomial(1e6, 1e3) % (ipow(2, 128) + 1));
 #~ assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) - 1), binomial(1e6, 1e3) % (ipow(2, 128) - 1));
@@ -63,10 +64,3 @@ assert_eq(binomialmod(-10, -10, -10), binomial(-10, -10) % -10)
 #~ assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) - 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) - 1)**2));
 
 say("binomial(10^10, 10^5) mod 13! = ", binomialmod(1e10, 1e5, factorial(13)));
-
-__END__
-for n in (-50..50), k in (-50..50), m in (-50..50) {
-    next if (m == 0)
-    say "Testing: binomial(#{n}, #{k}, #{m})"
-    assert_eq(binomialmod(n, k, m), binomial(n, k) % m)
-}

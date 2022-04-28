@@ -10117,14 +10117,9 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
 
-        if ($y >= 0 and Math::GMPz::Rmpz_fits_ulong_p($x)) {
-            Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($x), $y);
-        }
-        else {
-            $y < 0
-              ? Math::GMPz::Rmpz_bin_si($r, $x, $y)
-              : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
-        }
+        $y < 0
+          ? Math::GMPz::Rmpz_bin_si($r, $x, $y)
+          : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
 
         bless \$r;
     }
@@ -10188,6 +10183,87 @@ package Sidef::Types::Number::Number {
             return $r;
         };
 
+        my $factorial_valuation = sub {
+            my ($n, $p) = @_;
+
+            my $count = 0;
+            my $ppow  = $p;
+
+            while ($ppow <= $n) {
+                $count += Math::Prime::Util::GMP::divint($n, $ppow);
+                $ppow  *= $p;
+            }
+
+            return $count;
+        };
+
+        my $small_k_binomialmod = sub {
+            my ($n, $k, $m) = @_;
+
+            $n = Math::GMPz::Rmpz_init_set_str($n, 10) if !ref($n);
+            $m = Math::GMPz::Rmpz_init_set_str($m, 10) if !ref($m);
+
+            #~ say "Small k: ($n, $k, $m)";
+
+            if ($k <= 1e6) {
+                my $bin = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_bin_ui($bin, $n, $k);
+                Math::GMPz::Rmpz_mod($bin, $bin, $m);
+                return $bin;
+            }
+
+            my $t   = Math::GMPz::Rmpz_init();
+            my $u   = Math::GMPz::Rmpz_init();
+            my $bin = Math::GMPz::Rmpz_init_set_ui(1);
+
+            my %kp;
+
+            for (my $i = $n - $k + 1 ; Math::GMPz::Rmpz_cmp($i, $n) <= 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1)) {
+
+                Math::GMPz::Rmpz_set($t, $i);
+                my (undef, @factors) = _primorial_trial_factor($i, $k);
+
+                foreach my $p (List::Util::uniq(@factors)) {
+
+                    next if ((my $e = ($kp{$p} //= $factorial_valuation->($k, $p))) == 0);
+
+                    Math::GMPz::Rmpz_set_ui($u, $p);
+                    my $v = Math::GMPz::Rmpz_remove($t, $t, $u);
+
+                    if ($v >= $e) {
+
+                        if ($v > $e) {
+                            Math::GMPz::Rmpz_pow_ui($u, $u, $v - $e) if ($v - $e > 1);
+                            Math::GMPz::Rmpz_mul($t, $t, $u);
+                        }
+
+                        $kp{$p} = 0;
+                    }
+                    else {
+                        $kp{$p} -= $v;
+                    }
+                }
+
+                Math::GMPz::Rmpz_mul($bin, $bin, $t);
+                Math::GMPz::Rmpz_mod($bin, $bin, $m);
+            }
+
+            return $bin;
+        };
+
+        my $is_small_k = sub {
+            my ($n, $k, $m) = @_;
+
+            $n > 1e6 or return;
+            $k < 1e7 or return;
+
+            my $sqrt_m   = Math::Prime::Util::GMP::sqrtint($m);
+            my $sqrt_n   = Math::Prime::Util::GMP::sqrtint($n);
+            my $m_over_n = Math::Prime::Util::GMP::divint($m, $n);
+
+            ($k < $sqrt_m and $k < $m_over_n) or $sqrt_n > $k;
+        };
+
         my $lucas_theorem = sub {    # p is prime
             my ($n, $k, $p) = @_;
 
@@ -10202,7 +10278,6 @@ package Sidef::Types::Number::Number {
                 push @kd, $kp;
 
                 if ($kp > $np) { return 0 }
-                if ($np == 0)  { return 0 }
 
                 $n = Math::Prime::Util::GMP::divint($n, $p);
                 $k = Math::Prime::Util::GMP::divint($k, $p);
@@ -10216,17 +10291,9 @@ package Sidef::Types::Number::Number {
 
                 #~ say "Lucas theorem: ($np, $kp, $p)";
 
-                # TODO: better optimization for inputs like: binomialmod(1e10, 1e5, 2**127 - 1)
-                # When both n and p are large, but k is small, use a faster method.
-
-                my $sqrt_p    = Math::Prime::Util::GMP::sqrtint($p);
-                my $p_over_np = Math::Prime::Util::GMP::divint($p, $np);
-
-                if ($np < ULONG_MAX and $kp < ULONG_MAX and $k < $sqrt_p and $k < $p_over_np) {
+                if ($is_small_k->($np, $kp, $p)) {
                     ## say "Optimization: ($np, $kp, $p)";
-                    my $bin = Math::GMPz::Rmpz_init();
-                    Math::GMPz::Rmpz_bin_uiui($bin, $np, $kp);
-                    Math::GMPz::Rmpz_mod($bin, $bin, Math::GMPz::Rmpz_init_set_str($p, 10));
+                    my $bin = $small_k_binomialmod->($np, $kp, $p);
                     $r = Math::Prime::Util::GMP::mulmod($r, $bin, $p);
                     next;
                 }
@@ -10256,6 +10323,11 @@ package Sidef::Types::Number::Number {
             # k < 0
             if (Math::GMPz::Rmpz_sgn($k) < 0) {
                 $k = $n - $k;
+            }
+
+            # k < n-k < 0
+            if (Math::GMPz::Rmpz_sgn($k) < 0) {
+                return 0;
             }
 
             # n < 0
@@ -10333,14 +10405,9 @@ package Sidef::Types::Number::Number {
                     next;
                 }
 
-                my $sqrt_pq   = Math::Prime::Util::GMP::sqrtint($pq);
-                my $pq_over_n = Math::Prime::Util::GMP::divint($pq, $n);
-
-                if ($n < ULONG_MAX and $k < ULONG_MAX and $k < $sqrt_pq and $k < $pq_over_n) {
+                if ($is_small_k->($n, $k, $pq)) {
                     ## say "Optimization prime power: ($n, $k, $p, $pq)";
-                    my $bin = Math::GMPz::Rmpz_init();
-                    Math::GMPz::Rmpz_bin_uiui($bin, $n, $k);
-                    Math::GMPz::Rmpz_mod($bin, $bin, Math::GMPz::Rmpz_init_set_str($pq, 10));
+                    my $bin = $small_k_binomialmod->($n, $k, $pq);
                     push @F, [$bin, $pq];
                     next;
                 }
