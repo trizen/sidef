@@ -8357,8 +8357,8 @@ package Sidef::Types::Number::Number {
             my $r = Math::GMPz::Rmpz_init();
 
             if (Math::GMPz::Rmpz_divisible_p($x, $y) and Math::GMPz::Rmpz_sgn($y)) {
-               Math::GMPz::Rmpz_divexact($r, $x, $y);
-               Math::GMPz::Rmpz_mod($r, $r, $m);
+                Math::GMPz::Rmpz_divexact($r, $x, $y);
+                Math::GMPz::Rmpz_mod($r, $r, $m);
             }
             elsif (Math::GMPz::Rmpz_invert($r, $y, $m)) {
                 Math::GMPz::Rmpz_mul($r, $r, $x);
@@ -10130,6 +10130,263 @@ package Sidef::Types::Number::Number {
     }
 
     *nok = \&binomial;
+
+    sub binomialmod {
+        my ($n, $k, $m) = @_;
+
+        _valid(\$k, \$m);
+
+        $n = _any2mpz($$n) // (goto &nan);
+        $k = _any2mpz($$k) // (goto &nan);
+        $m = _any2mpz($$m) // (goto &nan);
+
+        Math::GMPz::Rmpz_sgn($m) || goto &nan;
+
+        my $factorial_without_prime = sub {
+            my ($n, $p, $pk, $from, $count, $res) = @_;
+
+            return 1 if ($n <= 1);
+
+            if ($p > $n) {
+                return (
+                        (HAS_PRIME_UTIL and $pk < ULONG_MAX)
+                        ? Math::Prime::Util::factorialmod($n, $pk)
+                        : Math::Prime::Util::GMP::factorialmod($n, $pk)
+                       );
+            }
+
+            if ($$from == $n) {
+                return $$res;
+            }
+
+            if ($$from > $n) {
+                $$from  = 0;
+                $$count = 0;
+                $$res   = 1;
+            }
+
+            my $r = $$res;
+            my $t = $$count;
+
+            foreach my $v ($$from + 1 .. $n) {
+                if (++$t == $p) {
+                    $t = 0;
+                }
+                else {
+                    $r = (
+                          HAS_PRIME_UTIL
+                          ? Math::Prime::Util::mulmod($r, $v, $pk)
+                          : Math::Prime::Util::GMP::mulmod($r, $v, $pk)
+                         );
+                }
+            }
+
+            $$res   = $r;
+            $$count = $t;
+            $$from  = $n;
+
+            return $r;
+        };
+
+        my $lucas_theorem = sub {    # p is prime
+            my ($n, $k, $p) = @_;
+
+            my $r = 1;
+
+            while ($k) {
+
+                my $np = Math::Prime::Util::GMP::modint($n, $p);
+                my $kp = Math::Prime::Util::GMP::modint($k, $p);
+
+                if ($kp > $np) { return 0 }
+
+                my $rp = Math::Prime::Util::GMP::subint($np, $kp);
+
+                my $x = Math::Prime::Util::GMP::factorialmod($np, $p);
+                my $y = Math::Prime::Util::GMP::factorialmod($kp, $p);
+                my $z = Math::Prime::Util::GMP::factorialmod($rp, $p);
+
+                $y = Math::Prime::Util::GMP::mulmod($y, $z, $p);
+                $x = Math::Prime::Util::GMP::divmod($x, $y, $p);
+                $r = Math::Prime::Util::GMP::mulmod($r, $x, $p);
+
+                $n = Math::Prime::Util::GMP::divint($n, $p);
+                $k = Math::Prime::Util::GMP::divint($k, $p);
+            }
+
+            return $r;
+        };
+
+        my $modular_binomial = sub {
+            my ($n, $k, $m) = @_;
+
+            # Translation of binomod.gp v1.5 by Max Alekseyev, with some minor optimizations.
+
+            # m == 1
+            if (Math::GMPz::Rmpz_cmp_ui($m, 1) == 0) {
+                return 0;
+            }
+
+            # k < 0
+            if (Math::GMPz::Rmpz_sgn($k) < 0) {
+                $k = $n - $k;
+            }
+
+            # n < 0
+            if (Math::GMPz::Rmpz_sgn($n) < 0) {
+                my $x = Math::GMPz::Rmpz_even_p($k) ? 1 : -1;
+                $x = Math::Prime::Util::GMP::mulint($x, __SUB__->(-$n + $k - 1, $k, $m));
+                return Math::Prime::Util::GMP::modint($x, $m);
+            }
+
+            # k > n
+            if (Math::GMPz::Rmpz_cmp($k, $n) > 0) {
+                return 0;
+            }
+
+            # k == 0 or k == n
+            if (Math::GMPz::Rmpz_sgn($k) == 0 or Math::GMPz::Rmpz_cmp($k, $n) == 0) {
+                return Math::Prime::Util::GMP::modint(1, $m);
+            }
+
+            # k == 1 or k == n-1
+            if (Math::GMPz::Rmpz_cmp_ui($k, 1) == 0 or $k == $n - 1) {
+                return Math::Prime::Util::GMP::modint($n, $m);
+            }
+
+            my @F;
+
+            foreach my $pp (_factor_exp(Math::Prime::Util::GMP::absint($m))) {
+                my ($p, $q) = @$pp;
+
+                if ($q == 1) {
+                    if (HAS_PRIME_UTIL and $n < ULONG_MAX and $p < ULONG_MAX) {
+                        push @F, [Math::Prime::Util::binomialmod($n, $k, $p), $p];
+                    }
+                    else {
+                        push @F, [$lucas_theorem->($n, $k, $p), $p];
+                    }
+                    next;
+                }
+
+                my $d = __ilog__($n, $p) + 1;
+
+                my (@np, @kp);
+
+                do {
+                    my $pi = 1;
+                    foreach my $i (0 .. $d) {
+                        push @np, Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::divint($n, $pi), $p);
+                        push @kp, Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::divint($k, $pi), $p);
+                        $pi = Math::Prime::Util::GMP::mulint($pi, $p);
+                    }
+                };
+
+                my @e;
+
+                foreach my $i (0 .. $d) {
+                    $e[$i] = ($np[$i] < ($kp[$i] + (($i > 0) ? $e[$i - 1] : 0))) ? 1 : 0;
+                }
+
+                for (my $i = $d - 1 ; $i >= 0 ; --$i) {
+                    $e[$i] += $e[$i + 1];
+                }
+
+                if ($e[0] >= $q) {
+                    push @F, [0, Math::Prime::Util::GMP::powint($p, $q)];
+                    next;
+                }
+
+                my $rq = $q - $e[0];
+
+                my $pq  = Math::Prime::Util::GMP::powint($p, $q);
+                my $prq = Math::Prime::Util::GMP::powint($p, $rq);
+
+                if (HAS_PRIME_UTIL and $n < ULONG_MAX and $pq < ULONG_MAX) {
+                    push @F, [Math::Prime::Util::binomialmod($n, $k, $pq), $pq];
+                    next;
+                }
+
+                my (@N, @K, @R);
+
+                do {
+                    my $pi = 1;
+                    my $r  = Math::Prime::Util::GMP::subint($n, $k);
+                    foreach my $i (0 .. $d) {
+                        push @N, Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::divint($n, $pi), $prq);
+                        push @K, Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::divint($k, $pi), $prq);
+                        push @R, Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::divint($r, $pi), $prq);
+                        $pi = Math::Prime::Util::GMP::mulint($pi, $p);
+                    }
+                };
+
+                my @NKR = (
+                           sort { $a->[3] <=> $b->[3] }
+                           map  { [$N[$_], $K[$_], $R[$_], $N[$_] + $K[$_] + $R[$_]] } 0 .. $#N
+                          );
+
+                @N = map { $_->[0] } @NKR;
+                @K = map { $_->[1] } @NKR;
+                @R = map { $_->[2] } @NKR;
+
+                my @acc  = (1);
+                my $nfac = 1;
+
+                if ($prq < ULONG_MAX and $p < $n) {
+                    my $count = 0;
+                    foreach my $k (1 .. List::Util::min(List::Util::max(@N, @K, @R), 1e3)) {
+                        if (++$count == $p) {
+                            $count = 0;
+                        }
+                        else {
+                            $nfac = (
+                                     HAS_PRIME_UTIL
+                                     ? Math::Prime::Util::mulmod($nfac, $k, $prq)
+                                     : Math::Prime::Util::GMP::mulmod($nfac, $k, $prq)
+                                    );
+                        }
+                        push @acc, $nfac;
+                    }
+                }
+
+                my $v = Math::Prime::Util::GMP::powmod($p, $e[0], $pq);
+
+                do {
+                    my $from  = 0;
+                    my $count = 0;
+                    my $res   = 1;
+
+                    foreach my $j (0 .. $d) {
+
+                        my @pairs;
+                        my ($x, $y, $z);
+
+                        ($x = $acc[$N[$j]]) // push(@pairs, [\$x, $N[$j]]);
+                        ($y = $acc[$K[$j]]) // push(@pairs, [\$y, $K[$j]]);
+                        ($z = $acc[$R[$j]]) // push(@pairs, [\$z, $R[$j]]);
+
+                        foreach my $pair (sort { $a->[1] <=> $b->[1] } @pairs) {
+                            ${$pair->[0]} = $factorial_without_prime->($pair->[1], $p, $prq, \$from, \$count, \$res);
+                        }
+
+                        $y = Math::Prime::Util::GMP::mulmod($y, $z, $pq);
+                        $x = Math::Prime::Util::GMP::divmod($x, $y, $pq);
+                        $v = Math::Prime::Util::GMP::mulmod($v, $x, $pq);
+                    }
+                };
+
+                if (($p > 2 or $rq < 3) and $q <= scalar(@e)) {
+                    $v = Math::Prime::Util::GMP::mulmod($v, Math::Prime::Util::GMP::powint(-1, $e[$rq - 1]), $pq);
+                }
+
+                push @F, [$v, $pq];
+            }
+
+            Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::chinese(@F), $m);
+        };
+
+        _set_int($modular_binomial->($n, $k, $m));
+    }
 
     sub moebius {
         my ($n, $k) = @_;

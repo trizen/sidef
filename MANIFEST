@@ -190,6 +190,7 @@ scripts/Expensive/thiele_interpolation_formula.sf
 scripts/Expensive/zebra_puzzle.sf
 scripts/Expensive/zhang_suen_thinning_algorithm.sf
 scripts/extend_your_language.sf
+'scripts/Extended tests/binomialmod.sf'
 'scripts/Extended tests/digits2num.pl'
 'scripts/Extended tests/inverse_sigma.sf'
 'scripts/Extended tests/is_carmichael.sf'
@@ -700,6 +701,7 @@ scripts/Tests/beadsort.sf
 scripts/Tests/best_shuffle.sf
 scripts/Tests/binary_search.sf
 scripts/Tests/binary_search_recursive.sf
+scripts/Tests/binomialmod.sf
 scripts/Tests/bitonic_sorter.sf
 scripts/Tests/block_identities.sf
 scripts/Tests/block_return.sf

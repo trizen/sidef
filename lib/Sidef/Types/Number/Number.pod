@@ -1051,6 +1051,20 @@ Defined as:
 
 =cut
 
+=head2 binomialmod
+
+    binomialmod(n, k, m)
+
+Returns the binomial coefficient binomial(n,k) modulo m, computed efficiently.
+
+    say binomialmod(1e10, 1e5, 20!)     #=> 286953611424480000
+
+Equivalent with (but much faster):
+
+    binomial(n,k) % m
+
+=cut
+
 =head2 bit
 
     n.bit(k)
@@ -2350,7 +2364,11 @@ Aliases: I<factors_exp>
 
     factorialmod(n,m)
 
-Factorial of n modulo m (faster than C<n! % m>).
+Returns the factorial of n modulo m.
+
+Equivalent with (but much faster):
+
+    factorial(n) % m
 
 =cut
 

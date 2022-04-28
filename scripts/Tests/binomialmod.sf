@@ -1,0 +1,72 @@
+#!/usr/bin/ruby
+
+# Tests for the binomial(n,k,m) function.
+
+assert_eq(binomialmod(10, 2, 43), 2);
+assert_eq(binomialmod(10, 8, 43), 2);
+
+assert_eq(binomialmod(10, 2, 24), 21);
+assert_eq(binomialmod(10, 8, 24), 21);
+
+assert_eq(binomialmod(100, 42, -127), binomial(100, 42) % -127);
+
+assert_eq(binomialmod(12,    5,   100000),     792);
+assert_eq(binomialmod(16,    4,   100000),     1820);
+assert_eq(binomialmod(100,   50,  139),        71);
+assert_eq(binomialmod(1000,  10,  1243),       848);
+assert_eq(binomialmod(124,   42,  1234567),    395154);
+assert_eq(binomialmod(1e9,   1e4, 1234567),    833120);
+assert_eq(binomialmod(1e10,  1e5, 1234567),    589372);
+
+assert_eq(binomialmod(1e10,  1e5, 4233330243), 3403056024);
+assert_eq(binomialmod(-1e10, 1e5, 4233330243), 2865877173);
+
+assert_eq(binomialmod(1e10, 1e4, factorial(13)), 1845043200);
+assert_eq(binomialmod(1e10, 1e5, factorial(13)), 1556755200);
+assert_eq(binomialmod(1e10, 1e6, factorial(13)), 5748019200);
+
+assert_eq(binomialmod(-1e10, 1e3 - 9, factorial(13)), 1195084800);
+assert_eq(binomialmod(-1e10, 1e4 - 1, factorial(13)), 2075673600);
+
+assert_eq(binomialmod(-1e10, 1e4, factorial(13)), 4151347200);
+assert_eq(binomialmod(-1e10, 1e5, factorial(13)), 1037836800);
+assert_eq(binomialmod(-1e10, 1e6, factorial(13)), 2075673600);
+
+assert_eq(binomialmod(3, 1, 9),  binomial(3, 1) % 9);
+assert_eq(binomialmod(4, 1, 16), binomial(4, 1) % 16);
+
+assert_eq(binomialmod(1e9,  1e5, 43 * 97 * 503),         585492);
+assert_eq(binomialmod(1e9,  1e6, 5041689707),            15262431);
+assert_eq(binomialmod(1e7,  1e5, 43**2 * 97**3 * 13**4), 1778017500428);
+assert_eq(binomialmod(1e7,  1e5, 42**2 * 97**3 * 13**4), 10015143223176);
+assert_eq(binomialmod(1e9,  1e5, 12345678910),           4517333900);
+assert_eq(binomialmod(1e9,  1e6, 13**2 * 5**6),          2598375);
+assert_eq(binomialmod(1e10, 1e5, 1234567),               589372);
+
+assert_eq(binomialmod(1e5,     1e3, 43),                 binomial(1e5,     1e3) % 43);
+assert_eq(binomialmod(1e5,     1e3, 43 * 97),            binomial(1e5,     1e3) % (43 * 97));
+assert_eq(binomialmod(1e5,     1e3, 43 * 97 * 43),       binomial(1e5,     1e3) % (43 * 97 * 43));
+assert_eq(binomialmod(1e5,     1e3, 43 * 97 * (5**5)),   binomial(1e5,     1e3) % (43 * 97 * (5**5)));
+assert_eq(binomialmod(1e5,     1e3, next_prime(1e4)**2), binomial(1e5,     1e3) % next_prime(1e4)**2);
+assert_eq(binomialmod(1e5,     1e3, next_prime(1e4)),    binomial(1e5,     1e3) % next_prime(1e4));
+assert_eq(binomialmod(1e6,     1e3, next_prime(1e5)),    binomial(1e6,     1e3) % next_prime(1e5));
+assert_eq(binomialmod(1e6,     1e3, next_prime(1e7)),    binomial(1e6,     1e3) % next_prime(1e7));
+assert_eq(binomialmod(1234567, 1e3, factorial(20)),      binomial(1234567, 1e3) % factorial(20));
+assert_eq(binomialmod(1234567, 1e4, factorial(20)),      binomial(1234567, 1e4) % factorial(20));
+
+assert_eq(binomialmod(-10, -10, -10), binomial(-10, -10) % -10)
+
+#~ assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) + 1), binomial(1e6, 1e3) % (ipow(2, 128) + 1));
+#~ assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) - 1), binomial(1e6, 1e3) % (ipow(2, 128) - 1));
+
+#~ assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) + 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) + 1)**2));
+#~ assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) - 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) - 1)**2));
+
+say("binomial(10^10, 10^5) mod 13! = ", binomialmod(1e10, 1e5, factorial(13)));
+
+__END__
+for n in (-50..50), k in (-50..50), m in (-50..50) {
+    next if (m == 0)
+    say "Testing: binomial(#{n}, #{k}, #{m})"
+    assert_eq(binomialmod(n, k, m), binomial(n, k) % m)
+}
