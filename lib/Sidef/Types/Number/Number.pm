@@ -8790,9 +8790,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add_ui($r, $r, CORE::abs($y));
         }
 
-        Math::GMPz::Rmpz_fits_ulong_p($r)
-          ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), CORE::abs($y))
-          : Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
+        Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
 
         Math::GMPz::Rmpz_sgn($r) || do {
             $y < 0
@@ -8834,9 +8832,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_sub_ui($r, $r, CORE::abs($y));
         }
 
-        Math::GMPz::Rmpz_fits_ulong_p($r)
-          ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), CORE::abs($y))
-          : Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
+        Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
 
         Math::GMPz::Rmpz_sgn($r) || do {
             $y < 0
@@ -10059,14 +10055,9 @@ package Sidef::Types::Number::Number {
               ? Math::GMPz::Rmpz_sub_ui($sum, $sum, -$k)
               : Math::GMPz::Rmpz_add_ui($sum, $sum, $k);
 
-            if ($k >= 0 and Math::GMPz::Rmpz_fits_ulong_p($sum)) {
-                Math::GMPz::Rmpz_bin_uiui($bin, Math::GMPz::Rmpz_get_ui($sum), $k);
-            }
-            else {
-                $k < 0
-                  ? Math::GMPz::Rmpz_bin_si($bin, $sum, $k)
-                  : Math::GMPz::Rmpz_bin_ui($bin, $sum, $k);
-            }
+            $k < 0
+              ? Math::GMPz::Rmpz_bin_si($bin, $sum, $k)
+              : Math::GMPz::Rmpz_bin_ui($bin, $sum, $k);
 
             Math::GMPz::Rmpz_mul($prod, $prod, $bin);
         }
