@@ -8,4 +8,13 @@ assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) - 1), binomial(1e6, 1e3) % (ipow(2,
 assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) + 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) + 1)**2));
 assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) - 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) - 1)**2));
 
+assert_eq(binomialmod(1e10, 1e4, prev_prime(2**64)**2), binomial(1e10, 1e4) % prev_prime(2**64)**2)
+assert_eq(binomialmod(1e10, 1e4, next_prime(2**64)**2), binomial(1e10, 1e4) % next_prime(2**64)**2)
+
+assert_eq(binomialmod(1e10, 1e4, prev_prime(2**64)), binomial(1e10, 1e4) % prev_prime(2**64))
+assert_eq(binomialmod(1e10, 1e4, next_prime(2**64)), binomial(1e10, 1e4) % next_prime(2**64))
+
+assert_eq(binomialmod(1e10, 1e3, (2**127 + 1)), binomial(1e10, 1e3) % (2**127 + 1))
+assert_eq(binomialmod(1e10, 1e3, (2**127 - 1)), binomial(1e10, 1e3) % (2**127 - 1))
+
 say "** Test passed!"

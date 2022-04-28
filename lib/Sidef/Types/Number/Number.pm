@@ -10192,15 +10192,44 @@ package Sidef::Types::Number::Number {
             my ($n, $k, $p) = @_;
 
             my $r = 1;
+            my (@nd, @kd);
 
             while ($k) {
-
                 my $np = Math::Prime::Util::GMP::modint($n, $p);
                 my $kp = Math::Prime::Util::GMP::modint($k, $p);
 
-                if ($kp > $np) { return 0 }
+                push @nd, $np;
+                push @kd, $kp;
 
+                if ($kp > $np) { return 0 }
+                if ($np == 0)  { return 0 }
+
+                $n = Math::Prime::Util::GMP::divint($n, $p);
+                $k = Math::Prime::Util::GMP::divint($k, $p);
+            }
+
+            foreach my $i (0 .. $#nd) {
+
+                my $np = $nd[$i];
+                my $kp = $kd[$i];
                 my $rp = Math::Prime::Util::GMP::subint($np, $kp);
+
+                #~ say "Lucas theorem: ($np, $kp, $p)";
+
+                # TODO: better optimization for inputs like: binomialmod(1e10, 1e5, 2**127 - 1)
+                # When both n and p are large, but k is small, use a faster method.
+
+                my $sqrt_p    = Math::Prime::Util::GMP::sqrtint($p);
+                my $p_over_np = Math::Prime::Util::GMP::divint($p, $np);
+
+                if ($np < ULONG_MAX and $kp < ULONG_MAX and $k < $sqrt_p and $k < $p_over_np) {
+                    ## say "Optimization: ($np, $kp, $p)";
+                    my $bin = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_bin_uiui($bin, $np, $kp);
+                    Math::GMPz::Rmpz_mod($bin, $bin, Math::GMPz::Rmpz_init_set_str($p, 10));
+                    $r = Math::Prime::Util::GMP::mulmod($r, $bin, $p);
+                    next;
+                }
 
                 my $x = Math::Prime::Util::GMP::factorialmod($np, $p);
                 my $y = Math::Prime::Util::GMP::factorialmod($kp, $p);
@@ -10209,9 +10238,6 @@ package Sidef::Types::Number::Number {
                 $y = Math::Prime::Util::GMP::mulmod($y, $z, $p);
                 $x = Math::Prime::Util::GMP::divmod($x, $y, $p);
                 $r = Math::Prime::Util::GMP::mulmod($r, $x, $p);
-
-                $n = Math::Prime::Util::GMP::divint($n, $p);
-                $k = Math::Prime::Util::GMP::divint($k, $p);
             }
 
             return $r;
@@ -10307,6 +10333,18 @@ package Sidef::Types::Number::Number {
                     next;
                 }
 
+                my $sqrt_pq   = Math::Prime::Util::GMP::sqrtint($pq);
+                my $pq_over_n = Math::Prime::Util::GMP::divint($pq, $n);
+
+                if ($n < ULONG_MAX and $k < ULONG_MAX and $k < $sqrt_pq and $k < $pq_over_n) {
+                    ## say "Optimization prime power: ($n, $k, $p, $pq)";
+                    my $bin = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_bin_uiui($bin, $n, $k);
+                    Math::GMPz::Rmpz_mod($bin, $bin, Math::GMPz::Rmpz_init_set_str($pq, 10));
+                    push @F, [$bin, $pq];
+                    next;
+                }
+
                 my (@N, @K, @R);
 
                 do {
@@ -10376,7 +10414,7 @@ package Sidef::Types::Number::Number {
                 };
 
                 if (($p > 2 or $rq < 3) and $q <= scalar(@e)) {
-                    $v = Math::Prime::Util::GMP::mulmod($v, Math::Prime::Util::GMP::powint(-1, $e[$rq - 1]), $pq);
+                    $v = Math::Prime::Util::GMP::mulmod($v, (($e[$rq - 1] % 2 == 0) ? 1 : -1), $pq);
                 }
 
                 push @F, [$v, $pq];
