@@ -10245,14 +10245,19 @@ package Sidef::Types::Number::Number {
         my $is_small_k = sub {
             my ($n, $k, $m) = @_;
 
+            my $new_k = Math::Prime::Util::GMP::subint($n, $k);
+
+            if ($new_k > 0 and $new_k < $k) {
+                $k = $new_k;
+            }
+
             $n > 1e6 or return;
             $k < 1e7 or return;
 
             my $sqrt_m   = Math::Prime::Util::GMP::sqrtint($m);
-            my $sqrt_n   = Math::Prime::Util::GMP::sqrtint($n);
             my $m_over_n = Math::Prime::Util::GMP::divint($m, $n);
 
-            ($k < $sqrt_m and $k < $m_over_n) or $sqrt_n > $k;
+            $k < $sqrt_m and $k < $m_over_n;
         };
 
         my $lucas_theorem = sub {    # p is prime
@@ -10341,6 +10346,11 @@ package Sidef::Types::Number::Number {
             # k == 1 or k == n-1
             if (Math::GMPz::Rmpz_cmp_ui($k, 1) == 0 or $k == $n - 1) {
                 return Math::Prime::Util::GMP::modint($n, $m);
+            }
+
+            # n-k > 0 and n-k < k
+            if (Math::GMPz::Rmpz_cmp($n - $k, $k) < 0) {
+                $k = $n - $k;
             }
 
             my @F;
