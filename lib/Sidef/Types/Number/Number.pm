@@ -10245,14 +10245,15 @@ package Sidef::Types::Number::Number {
         my $is_small_k = sub {
             my ($n, $k, $m) = @_;
 
+            $n >= 1e6 or return;
+
             my $new_k = Math::Prime::Util::GMP::subint($n, $k);
 
             if ($new_k > 0 and $new_k < $k) {
                 $k = $new_k;
             }
 
-            $n > 1e6 or return;
-            $k < 1e7 or return;
+            $k <= 1e7 or return;
 
             my $sqrt_m   = Math::Prime::Util::GMP::sqrtint($m);
             my $m_over_n = Math::Prime::Util::GMP::divint($m, $n);
@@ -10353,6 +10354,11 @@ package Sidef::Types::Number::Number {
                 $k = $n - $k;
             }
 
+            # k <= 10^4
+            if (Math::GMPz::Rmpz_cmp_ui($k, 1e4) <= 0) {
+                return Math::Prime::Util::GMP::modint($small_k_binomialmod->($n, $k, $m), $m);
+            }
+
             my @F;
 
             foreach my $pp (_factor_exp(Math::Prime::Util::GMP::absint($m))) {
@@ -10401,8 +10407,10 @@ package Sidef::Types::Number::Number {
                 my $pq  = Math::Prime::Util::GMP::powint($p, $q);
                 my $prq = Math::Prime::Util::GMP::powint($p, $rq);
 
-                if (HAS_PRIME_UTIL and $n < ULONG_MAX and $pq < ULONG_MAX) {
-                    push @F, [Math::Prime::Util::binomialmod($n, $k, $pq), $pq];
+                if ($pq >= 1e7 and $n >= 1e7 and $k <= 1e6) {
+                    ## say "Binomial($n, $k, $pq) with p = $p";
+                    my $bin = $small_k_binomialmod->($n, $k, $pq);
+                    push @F, [$bin, $pq];
                     next;
                 }
 
@@ -10410,6 +10418,11 @@ package Sidef::Types::Number::Number {
                     ## say "Optimization prime power: ($n, $k, $p, $pq)";
                     my $bin = $small_k_binomialmod->($n, $k, $pq);
                     push @F, [$bin, $pq];
+                    next;
+                }
+
+                if (HAS_PRIME_UTIL and $n < ULONG_MAX and $pq < ULONG_MAX) {
+                    push @F, [Math::Prime::Util::binomialmod($n, $k, $pq), $pq];
                     next;
                 }
 
@@ -10472,6 +10485,7 @@ package Sidef::Types::Number::Number {
                         ($z = $acc[$R[$j]]) // push(@pairs, [\$z, $R[$j]]);
 
                         foreach my $pair (sort { $a->[1] <=> $b->[1] } @pairs) {
+                            ## say "Factorial($pair->[1]) mod $prq with p = $p";
                             ${$pair->[0]} = $factorial_without_prime->($pair->[1], $p, $prq, \$from, \$count, \$res);
                         }
 

@@ -28,6 +28,10 @@ assert_eq(binomialmod(1e10, 1e10 - 1e5, (2**127 + 1)), binomial(1e10, 1e5) % (2*
 assert_eq(binomialmod(1e10, 1e10 - 1e5, (2**127 + 1)**2), binomial(1e10, 1e5) % (2**127 + 1)**2)
 
 assert_eq(binomialmod(1e10, 1e5, (2**127 - 1)**2), binomial(1e10, 1e5) % (2**127 - 1)**2)
+assert_eq(binomialmod(1e10, 1e4, (2**128 - 1)**2), binomial(1e10, 1e4) % (2**128 - 1)**2)
+assert_eq(binomialmod( 1e7, 1e5, (2**128 - 1)**2), binomial(1e7, 1e5) % (2**128 - 1)**2)
+
+assert_eq(binomialmod(4294967291 + 1, 1e5, 4294967291**2), binomial(4294967291 + 1, 1e5) % 4294967291**2)
 
 var upto = 10
 for n in (-upto .. upto), k in (-upto .. upto), m in (-upto .. upto) {
