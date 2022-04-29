@@ -10247,6 +10247,10 @@ package Sidef::Types::Number::Number {
 
             $n >= 1e6 or return;
 
+            if ($m >= 1e7 and $n >= 1e7 and $k <= 1e6) {
+                return 1;
+            }
+
             my $new_k = Math::Prime::Util::GMP::subint($n, $k);
 
             if ($new_k > 0 and $new_k < $k) {
@@ -10406,13 +10410,6 @@ package Sidef::Types::Number::Number {
 
                 my $pq  = Math::Prime::Util::GMP::powint($p, $q);
                 my $prq = Math::Prime::Util::GMP::powint($p, $rq);
-
-                if ($pq >= 1e7 and $n >= 1e7 and $k <= 1e6) {
-                    ## say "Binomial($n, $k, $pq) with p = $p";
-                    my $bin = $small_k_binomialmod->($n, $k, $pq);
-                    push @F, [$bin, $pq];
-                    next;
-                }
 
                 if ($is_small_k->($n, $k, $pq)) {
                     ## say "Optimization prime power: ($n, $k, $p, $pq)";
