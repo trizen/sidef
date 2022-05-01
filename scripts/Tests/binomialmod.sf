@@ -43,6 +43,9 @@ assert_eq(binomialmod(1e9,  1e5, 12345678910),           4517333900);
 assert_eq(binomialmod(1e9,  1e6, 13**2 * 5**6),          2598375);
 assert_eq(binomialmod(1e10, 1e5, 1234567),               589372);
 
+assert_eq(binomialmod(1000000000000000000, 1000000000, 20!), 180214963568640000)
+assert_eq(binomialmod(1000000000000000000, 1000000000, 30!), 126214634277812103596052480000000)
+
 assert_eq(binomialmod(1e5,     1e3, 43),                 binomial(1e5,     1e3) % 43);
 assert_eq(binomialmod(1e5,     1e3, 43 * 97),            binomial(1e5,     1e3) % (43 * 97));
 assert_eq(binomialmod(1e5,     1e3, 43 * 97 * 43),       binomial(1e5,     1e3) % (43 * 97 * 43));

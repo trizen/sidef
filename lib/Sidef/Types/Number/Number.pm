@@ -10247,6 +10247,8 @@ package Sidef::Types::Number::Number {
 
             $n >= 1e6 or return;
 
+            ## say "Small k check: binomial($n, $k, $m)";
+
             if ($m >= 1e7 and $n >= 1e7 and $k <= 1e6) {
                 return 1;
             }

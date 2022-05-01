@@ -696,22 +696,22 @@ package Sidef::Types::String::String {
     *findall  = \&collect;
     *find_all = \&collect;
 
+    sub slices {
+        my ($self, $n) = @_;
+        Sidef::Types::Array::Array->new([map { bless \$_ } unpack '(a' . CORE::int($n) . ')*', $$self]);
+    }
+
     sub split {
         my ($self, $sep, $size) = @_;
 
         $size = defined($size) ? CORE::int($size) : 0;
 
         if (!defined($sep)) {
-            return
-              Sidef::Types::Array::Array->new(
-                                              [map { bless \$_ }
-                                                 split(' ', $$self, $size)
-                                              ]
-                                             );
+            return Sidef::Types::Array::Array->new([map { bless \$_ } split(' ', $$self, $size)]);
         }
 
         if (ref($sep) eq 'Sidef::Types::Number::Number') {
-            return Sidef::Types::Array::Array->new([map { bless \$_ } unpack '(a' . CORE::int($sep) . ')*', $$self]);
+            return $self->slices($sep);
         }
 
         $sep = _string_or_regex($sep);
@@ -803,11 +803,9 @@ package Sidef::Types::String::String {
         my $string = $$self;
         require bytes;
         Sidef::Types::Array::Array->new(
-            [
-             map {
-                 Sidef::Types::Number::Number::_set_int(CORE::ord(bytes::substr($string, $_, 1)))
-               } 0 .. bytes::length($string) - 1
-            ]
+                                      [map { Sidef::Types::Number::Number::_set_int(CORE::ord(bytes::substr($string, $_, 1))) }
+                                         0 .. bytes::length($string) - 1
+                                      ]
         );
     }
 

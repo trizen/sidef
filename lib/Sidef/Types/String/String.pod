@@ -1172,6 +1172,14 @@ Returns the
 
 =cut
 
+=head2 slices
+
+    String.slices()
+
+Returns the
+
+=cut
+
 =head2 sort
 
     String.sort()
