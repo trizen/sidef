@@ -13996,7 +13996,6 @@ package Sidef::Types::Number::Number {
         @bases = (2) if !@bases;
 
         my $check_conditions = sub {
-            my ($factors) = @_;
 
             # Using Thomas Ordowski's criterion from A050217.
 #<<<
@@ -14005,7 +14004,7 @@ package Sidef::Types::Number::Number {
                     ($_ < ~0)
                         ? ($_ - 1)
                         : Math::Prime::Util::GMP::subint($_, 1)
-                } @$factors
+                } @_
             );
 #>>>
 
@@ -14021,28 +14020,36 @@ package Sidef::Types::Number::Number {
 
         if (scalar(@factors) > 1) {
 
-            my @primes = grep { _is_prob_prime($_) } @factors;
+            my @primes;
+            my @composites;
 
-            if (@primes) {
-                $check_conditions->(\@primes)
-                  || return Sidef::Types::Bool::Bool::FALSE;
-            }
+            foreach my $f (@factors) {
 
-            if (scalar(@primes) == scalar(@factors)) {
-                return Sidef::Types::Bool::Bool::TRUE;
-            }
+                if (_is_prob_prime($f)) {
+                    push @primes, $f;
+                }
+                else {
+                    push @composites, $f;
+                }
 
-            foreach my $base (@bases) {
-                foreach my $factor (@factors) {
-                    Math::Prime::Util::GMP::powmod($base, $factor, $n) eq $base
+                foreach my $base (@bases) {
+                    Math::Prime::Util::GMP::powmod($base, $f, $n) eq $base
                       or return Sidef::Types::Bool::Bool::FALSE;
                 }
             }
+
+            if (@primes) {
+                $check_conditions->(@primes)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            @composites
+              || return Sidef::Types::Bool::Bool::TRUE;
         }
 
         @factors = map { _factor($_) } @factors;
 
-        $check_conditions->(\@factors)
+        $check_conditions->(@factors)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -14074,7 +14081,6 @@ package Sidef::Types::Number::Number {
         @bases = (2) if !@bases;
 
         my $check_conditions = sub {
-            my ($factors) = @_;
 
 #<<<
             my $gcd = Math::Prime::Util::GMP::gcd(
@@ -14082,7 +14088,7 @@ package Sidef::Types::Number::Number {
                     ($_ < ~0)
                         ? ($_ - 1)
                         : Math::Prime::Util::GMP::subint($_, 1)
-                } @$factors
+                } @_
             );
 #>>>
 
@@ -14093,7 +14099,7 @@ package Sidef::Types::Number::Number {
 
             my %znorder;
 
-            foreach my $p (@$factors) {
+            foreach my $p (@_) {
                 foreach my $base (@bases) {
                     my $zn = Math::Prime::Util::GMP::znorder($base, $p);
                     if (exists $znorder{$base}) {
@@ -14112,28 +14118,36 @@ package Sidef::Types::Number::Number {
 
         if (scalar(@factors) > 1) {
 
-            my @primes = grep { _is_prob_prime($_) } @factors;
+            my @primes;
+            my @composites;
 
-            if (@primes) {
-                $check_conditions->(\@primes)
-                  || return Sidef::Types::Bool::Bool::FALSE;
-            }
+            foreach my $f (@factors) {
 
-            if (scalar(@primes) == scalar(@factors)) {
-                return Sidef::Types::Bool::Bool::TRUE;
-            }
+                if (_is_prob_prime($f)) {
+                    push @primes, $f;
+                }
+                else {
+                    push @composites, $f;
+                }
 
-            foreach my $base (@bases) {
-                foreach my $factor (@factors) {
-                    Math::Prime::Util::GMP::powmod($base, $factor, $n) eq $base
+                foreach my $base (@bases) {
+                    Math::Prime::Util::GMP::powmod($base, $f, $n) eq $base
                       or return Sidef::Types::Bool::Bool::FALSE;
                 }
             }
+
+            if (@primes) {
+                $check_conditions->(@primes)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            @composites
+              || return Sidef::Types::Bool::Bool::TRUE;
         }
 
         @factors = map { _factor($_) } @factors;
 
-        $check_conditions->(\@factors)
+        $check_conditions->(@factors)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -19920,10 +19934,11 @@ package Sidef::Types::Number::Number {
 
         # If n is a native integer, Math::Prime::Util::is_carmichael() is slighly faster.
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            my $nstr = Math::GMPz::Rmpz_get_ui($n);
             return (
                     (
-                     HAS_PRIME_UTIL ? Math::Prime::Util::is_carmichael(Math::GMPz::Rmpz_get_ui($n))
-                     : Math::Prime::Util::GMP::is_carmichael(Math::GMPz::Rmpz_get_ui($n))
+                     HAS_PRIME_UTIL ? Math::Prime::Util::is_carmichael($nstr)
+                     : Math::Prime::Util::GMP::is_carmichael($nstr)
                     ) ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -19931,8 +19946,9 @@ package Sidef::Types::Number::Number {
 
         # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
         if (Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
+            my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
             return (
-                    Math::Prime::Util::GMP::is_carmichael(Math::GMPz::Rmpz_get_str($n, 10))
+                    Math::Prime::Util::GMP::is_carmichael($nstr)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -19968,10 +19984,13 @@ package Sidef::Types::Number::Number {
           or return Sidef::Types::Bool::Bool::FALSE;
 
         my $check_conditions = sub {
-            my ($factors) = @_;
 
             my %seen;
-            foreach my $p (@$factors) {
+            foreach my $p (@_) {
+
+                if ($seen{$p}++) {    # not squarefree
+                    return;
+                }
 
                 # Check the Korselt criterion: p-1 | n-1, for each prime p|n.
                 if ($p < ULONG_MAX) {
@@ -19981,10 +20000,6 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_set_str($pm1, $p, 10);
                     Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
                     Math::GMPz::Rmpz_divisible_p($nm1, $pm1) || return;
-                }
-
-                if ($seen{$p}++) {    # not squarefree
-                    return;
                 }
             }
 
@@ -20000,7 +20015,7 @@ package Sidef::Types::Number::Number {
 
             if (@factors) {
 
-                $check_conditions->(\@factors)
+                $check_conditions->(@factors)
                   || return Sidef::Types::Bool::Bool::FALSE;
 
                 if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
@@ -20016,23 +20031,36 @@ package Sidef::Types::Number::Number {
 
         if (scalar(@factors) > 1) {
 
-            my @primes = grep { _is_prob_prime($_) } @factors;
+            my %seen;
+            my @composites;
 
-            if (@primes) {
-                $check_conditions->(\@primes)
-                  || return Sidef::Types::Bool::Bool::FALSE;
+            foreach my $f (@factors) {
+
+                if ($seen{$f}++) {    # not squarefree
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+
+                if (_is_prob_prime($f)) {
+                    $check_conditions->($f)
+                      || return Sidef::Types::Bool::Bool::FALSE;
+                    ++$omega;
+                }
+                else {
+                    push @composites, $f;
+                }
             }
 
-            if (scalar(@primes) == scalar(@factors)) {
-                return Sidef::Types::Bool::Bool::TRUE;
-            }
+            @composites
+              || return Sidef::Types::Bool::Bool::TRUE;
+
+            @factors = @composites;
         }
 
         @factors = map { _factor($_) } @factors;
 
         $omega += scalar(@factors);
 
-        ($omega >= 3 and $check_conditions->(\@factors))
+        ($omega >= 3 and $check_conditions->(@factors))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -20107,7 +20135,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_add_ui($np1, $n, 1);
 
         # Divisible by a small square
-        foreach my $p (3, 5, 7, 11) {
+        foreach my $p (3, 5, 7, 11, 13, 17, 19) {
             if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
 
                 if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
@@ -20133,10 +20161,13 @@ package Sidef::Types::Number::Number {
         # }
 
         my $check_conditions = sub {
-            my ($factors) = @_;
 
             my %seen;
-            foreach my $p (@$factors) {
+            foreach my $p (@_) {
+
+                if ($seen{$p}++) {    # not squarefree
+                    return;
+                }
 
                 # Check the Lucas-Korselt criterion: p+1 | n+1, for each prime p|n.
                 if ($p < ULONG_MAX) {
@@ -20146,10 +20177,6 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_set_str($pp1, $p, 10);
                     Math::GMPz::Rmpz_add_ui($pp1, $pp1, 1);
                     Math::GMPz::Rmpz_divisible_p($np1, $pp1) || return;
-                }
-
-                if ($seen{$p}++) {    # not squarefree
-                    return;
                 }
             }
 
@@ -20165,7 +20192,7 @@ package Sidef::Types::Number::Number {
 
             if (@factors) {
 
-                $check_conditions->(\@factors)
+                $check_conditions->(@factors)
                   || return Sidef::Types::Bool::Bool::FALSE;
 
                 if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
@@ -20181,23 +20208,36 @@ package Sidef::Types::Number::Number {
 
         if (scalar(@factors) > 1) {
 
-            my @primes = grep { _is_prob_prime($_) } @factors;
+            my %seen;
+            my @composites;
 
-            if (@primes) {
-                $check_conditions->(\@primes)
-                  || return Sidef::Types::Bool::Bool::FALSE;
+            foreach my $f (@factors) {
+
+                if ($seen{$f}++) {    # not squarefree
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+
+                if (_is_prob_prime($f)) {
+                    $check_conditions->($f)
+                      || return Sidef::Types::Bool::Bool::FALSE;
+                    ++$omega;
+                }
+                else {
+                    push @composites, $f;
+                }
             }
 
-            if (scalar(@primes) == scalar(@factors)) {
-                return Sidef::Types::Bool::Bool::TRUE;
-            }
+            @composites
+              || return Sidef::Types::Bool::Bool::TRUE;
+
+            @factors = @composites;
         }
 
         @factors = map { _factor($_) } @factors;
 
         $omega += scalar(@factors);
 
-        ($omega >= 3 and $check_conditions->(\@factors))
+        ($omega >= 3 and $check_conditions->(@factors))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -20243,21 +20283,25 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        my $nstr;
+
         # If n is a native integer, check if it is a Carmichael number
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $nstr = Math::GMPz::Rmpz_get_ui($n);
             (
              HAS_PRIME_UTIL
-             ? Math::Prime::Util::is_carmichael(Math::GMPz::Rmpz_get_ui($n))
-             : Math::Prime::Util::GMP::is_carmichael(Math::GMPz::Rmpz_get_ui($n))
+             ? Math::Prime::Util::is_carmichael($nstr)
+             : Math::Prime::Util::GMP::is_carmichael($nstr)
             )
               || return Sidef::Types::Bool::Bool::FALSE;
         }
+        else {
+            $nstr = Math::GMPz::Rmpz_get_str($n, 10);
 
-        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
-
-        # Must be a Fermat pseudoprime to base 2.
-        Math::Prime::Util::GMP::is_pseudoprime($nstr, 2)
-          || return Sidef::Types::Bool::Bool::FALSE;
+            # Must be an Euler pseudoprime to base 2.
+            Math::Prime::Util::GMP::is_euler_pseudoprime($nstr, 2)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
         if (Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
@@ -20266,10 +20310,13 @@ package Sidef::Types::Number::Number {
         }
 
         my $check_conditions = sub {
-            my ($factors) = @_;
 
             my %seen;
-            foreach my $p (@$factors) {
+            foreach my $p (@_) {
+
+                if ($seen{$p}++) {    # not squarefree
+                    return;
+                }
 
                 # Check the criterion for absolute Euler pseudoprimes: p-1 | (n-1)/2, for each prime p|n.
                 if ($p < ULONG_MAX) {
@@ -20279,10 +20326,6 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_set_str($pm1, $p, 10);
                     Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
                     Math::GMPz::Rmpz_divisible_p($nm1d2, $pm1) || return;
-                }
-
-                if ($seen{$p}++) {    # not squarefree
-                    return;
                 }
             }
 
@@ -20298,7 +20341,7 @@ package Sidef::Types::Number::Number {
 
             if (@factors) {
 
-                $check_conditions->(\@factors)
+                $check_conditions->(@factors)
                   || return Sidef::Types::Bool::Bool::FALSE;
 
                 if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
@@ -20314,23 +20357,36 @@ package Sidef::Types::Number::Number {
 
         if (scalar(@factors) > 1) {
 
-            my @primes = grep { _is_prob_prime($_) } @factors;
+            my %seen;
+            my @composites;
 
-            if (@primes) {
-                $check_conditions->(\@primes)
-                  || return Sidef::Types::Bool::Bool::FALSE;
+            foreach my $f (@factors) {
+
+                if ($seen{$f}++) {    # not squarefree
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+
+                if (_is_prob_prime($f)) {
+                    $check_conditions->($f)
+                      || return Sidef::Types::Bool::Bool::FALSE;
+                    ++$omega;
+                }
+                else {
+                    push @composites, $f;
+                }
             }
 
-            if (scalar(@primes) == scalar(@factors)) {
-                return Sidef::Types::Bool::Bool::TRUE;
-            }
+            @composites
+              || return Sidef::Types::Bool::Bool::TRUE;
+
+            @factors = @composites;
         }
 
         @factors = map { _factor($_) } @factors;
 
         $omega += scalar(@factors);
 
-        ($omega >= 3 and $check_conditions->(\@factors))
+        ($omega >= 3 and $check_conditions->(@factors))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
