@@ -135,7 +135,9 @@ package Sidef {
             return ($self->{dbm_driver} = 'gdbm');
         }
 
-        $self->{dbm_driver} = 'sdbm';
+        warn "No supported database driver was found...\n";
+        warn "Please install DB_File or GDBM_File in order to use this functionality.\n";
+        return;
     }
 
     sub _init_db {
