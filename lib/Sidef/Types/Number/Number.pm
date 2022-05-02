@@ -10320,7 +10320,7 @@ package Sidef::Types::Number::Number {
                 my $z = Math::Prime::Util::GMP::factorialmod($rp, $p);
 
                 $y = Math::Prime::Util::GMP::mulmod($y, $z, $p);
-                $x = Math::Prime::Util::GMP::divmod($x, $y, $p);
+                $x = Math::Prime::Util::GMP::divmod($x, $y, $p) if ($y ne '1');
                 $r = Math::Prime::Util::GMP::mulmod($r, $x, $p);
             }
 
@@ -10503,7 +10503,7 @@ package Sidef::Types::Number::Number {
                         }
 
                         $y = Math::Prime::Util::GMP::mulmod($y, $z, $pq);
-                        $x = Math::Prime::Util::GMP::divmod($x, $y, $pq);
+                        $x = Math::Prime::Util::GMP::divmod($x, $y, $pq) if ($y ne '1');
                         $v = Math::Prime::Util::GMP::mulmod($v, $x, $pq);
                     }
                 };
@@ -20283,11 +20283,9 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my $nstr;
-
         # If n is a native integer, check if it is a Carmichael number
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            $nstr = Math::GMPz::Rmpz_get_ui($n);
+            my $nstr = Math::GMPz::Rmpz_get_ui($n);
             (
              HAS_PRIME_UTIL
              ? Math::Prime::Util::is_carmichael($nstr)
@@ -20296,17 +20294,17 @@ package Sidef::Types::Number::Number {
               || return Sidef::Types::Bool::Bool::FALSE;
         }
         else {
-            $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+            my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
 
             # Must be an Euler pseudoprime to base 2.
             Math::Prime::Util::GMP::is_euler_pseudoprime($nstr, 2)
               || return Sidef::Types::Bool::Bool::FALSE;
-        }
 
-        # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
-        if (Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
-            Math::Prime::Util::GMP::is_carmichael($nstr)
-              || return Sidef::Types::Bool::Bool::FALSE;
+            # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
+            if (Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
+                Math::Prime::Util::GMP::is_carmichael($nstr)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
         }
 
         my $check_conditions = sub {
