@@ -223,6 +223,14 @@ Returns the
 
 =cut
 
+=head2 derivative
+
+    Polynomial.derivative()
+
+Returns the
+
+=cut
+
 =head2 divmod
 
     Polynomial.divmod()

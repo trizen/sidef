@@ -40,7 +40,7 @@ package Sidef::Types::Number::Polynomial {
             return __PACKAGE__->new(0 => $value);
         }
 
-        my %coeff;
+        my %poly;
 
         while (@args) {
             my ($key, $value) = splice(@args, 0, 2);
@@ -50,11 +50,11 @@ package Sidef::Types::Number::Polynomial {
             $value = Sidef::Types::Number::Number->new($value) if !UNIVERSAL::isa($value, 'Sidef::Types::Number::Number');
 
             unless ($value->is_zero) {
-                $coeff{"$key"} = $value;
+                $poly{"$key"} = $value;
             }
         }
 
-        bless \%coeff;
+        bless \%poly;
     }
 
     *call = \&new;
@@ -200,6 +200,11 @@ package Sidef::Types::Number::Polynomial {
             }
         }
         Sidef::Types::Number::Number::_set_int($degree);
+    }
+
+    sub derivative {
+        my ($x) = @_;
+        __PACKAGE__->new(map { ($_ - 1, $x->{$_}->mul(Sidef::Types::Number::Number::_set_int($_))) } CORE::keys(%$x));
     }
 
     sub eval {

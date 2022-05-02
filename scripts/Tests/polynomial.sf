@@ -305,7 +305,7 @@ assert_eq(Mod(chebyshevT(42), 97)(15/13), chebyshevTmod(42, 15/13, 97))
 
 do {
 
-    func derivative(f) {
+    func my_derivative(f) {
         Poly(f.coeffs.map_2d{|e,k| [e-1, k*e] }.flat...)
     }
 
@@ -322,7 +322,9 @@ do {
 
     for c in (coeffs) {
         var poly = Poly(c.flip)
-        var derv = derivative(poly)
+        var derv = my_derivative(poly)
+
+        assert_eq(derv, poly.derivative)
 
         var d = { derv.coeff(_) }.map(0..derv.degree)
 
