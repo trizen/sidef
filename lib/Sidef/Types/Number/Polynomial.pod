@@ -427,4 +427,6 @@ Returns the
 
 Returns the
 
+Aliases: I<stringify>
+
 =cut

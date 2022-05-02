@@ -6013,7 +6013,7 @@ package Sidef::Types::Number::Number {
 
         @vals || return ZERO;
 
-        my @unknown;
+        my @extra;
         my @numbers;
 
         foreach my $value (@vals) {
@@ -6021,11 +6021,17 @@ package Sidef::Types::Number::Number {
                 push @numbers, $$value;
             }
             else {
-                push @unknown, $value;
+                if (UNIVERSAL::isa($value, 'Sidef::Types::Number::Number')) {
+                    push @extra, $value;
+                }
+                else {
+                    _valid(\$value);
+                    push @numbers, $$value;
+                }
             }
         }
 
-        my @left;
+        my @non_mpz;
         my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
         foreach my $n (@numbers) {
@@ -6033,18 +6039,18 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_add($sum, $sum, $n);
             }
             else {
-                push @left, $n;
+                push @non_mpz, $n;
             }
         }
 
-        if (@left) {
-            $sum = __add__($sum, _binsplit(\@left, \&__add__));
+        if (@non_mpz) {
+            $sum = __add__($sum, _binsplit(\@non_mpz, \&__add__));
         }
 
         my $r = bless \$sum;
 
-        foreach my $value (@unknown) {
-            $r = $r->add($value);
+        if (@extra) {
+            $r = $r->add(_binsplit(\@extra, sub { $_[0]->add($_[1]) }));
         }
 
         $r;
@@ -6065,14 +6071,22 @@ package Sidef::Types::Number::Number {
                 push @numbers, $$value;
             }
             else {
-                push @unknown, $value;
+                if (UNIVERSAL::isa($value, 'Sidef::Types::Number::Number')) {
+                    push @unknown, $value;
+                }
+                else {
+                    _valid(\$value);
+                    push @numbers, $$value;
+
+                    #push @numbers, Sidef::Types::Number::Number->new($value);
+                }
             }
         }
 
         my $r = (@numbers ? (bless \_binsplit(\@numbers, \&__mul__)) : ONE);
 
-        foreach my $value (@unknown) {
-            $r = $r->mul($value);
+        if (@unknown) {
+            $r = $r->mul(_binsplit(\@unknown, sub { $_[0]->mul($_[1]) }));
         }
 
         return $r;
