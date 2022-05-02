@@ -1611,8 +1611,8 @@ package Sidef::Types::String::String {
     *to_i = \&to_int;
 
     sub to_num {
-        my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self);
+        my ($self, $base) = @_;
+        Sidef::Types::Number::Number->new($$self, (defined($base) ? $base : ()));
     }
 
     *num  = \&to_num;

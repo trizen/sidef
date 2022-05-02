@@ -10316,7 +10316,7 @@ package Sidef::Types::Number::Number {
         my $modular_binomial = sub {
             my ($n, $k, $m) = @_;
 
-            # Translation of binomod.gp v1.5 by Max Alekseyev, with some minor optimizations.
+            # Translation of binomod.gp v1.5 by Max Alekseyev, with some extra optimizations.
 
             # m == 1
             if (Math::GMPz::Rmpz_cmp_ui($m, 1) == 0) {

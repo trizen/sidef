@@ -182,6 +182,8 @@ package Sidef::Types::Number::Polynomial {
         Sidef::Types::String::String->new($x->__stringify__);
     }
 
+    *stringify = \&to_s;
+
     sub dump {
         my ($x) = @_;
         Sidef::Types::String::String->new($x->__dump__);
