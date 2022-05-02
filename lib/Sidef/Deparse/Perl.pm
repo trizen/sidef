@@ -473,6 +473,7 @@ HEADER
                     '{name=>'
                   . $self->_dump_string($_->{name})
                   . (exists($_->{slurpy})    ? (',slurpy=>' . $_->{slurpy})                       : '')
+                  . (exists($_->{array})     ? (',array=>' . $_->{array})                         : '')
                   . (exists($_->{ref_type})  ? (',type=>' . $self->_dump_reftype($_->{ref_type})) : '')
                   . (exists($_->{subset})    ? (',subset=>' . $self->_dump_reftype($_->{subset})) : '')
                   . (exists($_->{has_value}) ? (',has_value=>1')                                  : '')
