@@ -10038,14 +10038,14 @@ package Sidef::Types::Number::Number {
         @$S || return $S;
 
         my $two_a = 2 * $x;
-        my $neg_b = -$y;
+        my $neg_b = __neg__($y);
 
         my @solutions;
 
         foreach my $k (@$S) {
-            foreach my $u ($neg_b + $$k, $neg_b - $$k) {
+            foreach my $u (__add__($neg_b, $$k), __sub__($neg_b, $$k)) {
                 my $r = __mod__(__div__($u, $two_a), $m);
-                if (__cmp__(__mod__($x * $r * $r + $y * $r + $z, $m), 0) == 0) {
+                if (__cmp__(__mod__($x * ($r * $r) + $y * $r + $z, $m), 0) == 0) {
                     push @solutions, (bless \$r);
                 }
             }

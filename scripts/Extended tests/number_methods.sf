@@ -1,0 +1,44 @@
+#!/usr/bin/ruby
+
+# Tests for some Number methods.
+
+for k in (1..7) {
+    assert_eq(k.omega_prime_count(1e6-2e3, 1e6), k.omega_primes(1e6-2e3, 1e6).len)
+    assert_eq(k.omega_prime_count(1e6-1e4, 1e6), k.omega_primes(1e6-1e4, 1e6).len)
+
+    if (k <= 2) {
+        assert_eq(k.powerful(1e6-2e3, 1e6), range(1e6-2e3, 1e6).grep{.is_powerful(k)})
+        assert_eq(k.powerful(1e6-1e4, 1e6), range(1e6-1e4, 1e6).grep{.is_powerful(k)})
+    }
+
+    assert_eq(k.powerful(1e6-2e3, 1e6).len, k.powerful_count(1e6-2e3, 1e6))
+    assert_eq(k.powerful(1e6-1e4, 1e6).len, k.powerful_count(1e6-1e4, 1e6))
+    assert_eq(k.powerful(1e6-1e5, 1e6).len, k.powerful_count(1e6-1e5, 1e6))
+}
+
+with (10!) {|n|
+    var divisors = n.divisors
+    for k in (0 .. (1+n.bigomega)) {
+        assert_eq(n.almost_prime_divisors(k), divisors.grep { .is_almost_prime(k) })
+        assert_eq(n.omega_prime_divisors(k), divisors.grep { .is_omega_prime(k) })
+    }
+}
+
+with (21!) {|n|
+    assert_eq(almost_prime_divisors(n, 0), [1])
+    assert_eq(almost_prime_divisors(n, 1), n.prime_divisors)
+    assert_eq(almost_prime_divisors(n, 2), n.prime_divisors.combinations_with_repetition(2).map{.prod}.sort.grep {|d| d `divides` n })
+    assert_eq(almost_prime_divisors(n, 37), n.divisors.grep { .is_almost_prime(37) })
+    assert_eq(almost_prime_divisors(n, n.bigomega), [n])
+    assert_eq(almost_prime_divisors(n, n.bigomega+1), [])
+    assert_eq(omega_prime_divisors(n, n.omega+1), [])
+}
+
+assert_eq(12.omega_primes(1e13), %n[7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
+assert_eq(12.squarefree_almost_primes(1e13), %n[7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
+
+assert_eq(65.almost_primes(2**65 - 1e12, 2**65 + 1e12), %n[36893488147419103232])
+assert_eq(16.omega_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
+assert_eq(16.squarefree_almost_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
+
+say ":: Test passed!"

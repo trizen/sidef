@@ -1,0 +1,76 @@
+#!/usr/bin/ruby
+
+# Tests for some multiplicative functions and their inverses.
+
+assert_eq(inverse_usigma(120), 1..120 -> grep { .usigma == 120 })
+assert_eq(inverse_usigma(5040).len, 38)
+assert_eq(inverse_usigma(5040).map { .usigma }.uniq, [5040])
+
+assert_eq(inverse_sigma(120), 1..120 -> grep { .sigma == 120 })
+assert_eq(inverse_sigma(240), 1..240 -> grep { .sigma == 240 })
+assert_eq(inverse_sigma(5040).len, 33)
+assert_eq(inverse_sigma(5040).map{.sigma}.uniq, [5040])
+
+assert_eq(inverse_sigma(22100, 2), [120, 130, 141])
+
+assert_eq(inverse_phi(120), %n[143, 155, 175, 183, 225, 231, 244, 248, 286, 308, 310, 350, 366, 372, 396, 450, 462])
+assert_eq(inverse_phi(5040).len, 93)
+assert_eq(inverse_phi(5040).map{ .phi }.uniq, [5040])
+
+assert_eq(inverse_psi(240), 1..240 -> grep { .psi == 240 })
+assert_eq(inverse_psi(5040).len, 38)
+assert_eq(inverse_psi(5040).map{.psi}.uniq, [5040])
+
+assert_eq(inverse_uphi(120), %n[121, 143, 144, 155, 164, 183, 220, 231, 240, 242, 286, 310, 366, 462])
+assert_eq(inverse_uphi(5040).len, 90)
+assert_eq(inverse_uphi(5040).map{.uphi}.uniq, [5040])
+
+assert_eq(20.of { .omega },  20.of { .factor_exp.len })
+assert_eq(20.of { .Omega },  20.of { .factor.len })
+
+assert_eq(20.of { .tau },       20.of { .divisors.len })
+assert_eq(20.of { .sigma },     20.of { .divisors.sum })
+assert_eq(20.of { .sigma(2) },  20.of { .divisors.sum { _*_ } })
+
+assert_eq(20.of { .phi },    20.of {|n| 1..n -> count_by { |k| is_coprime(n,k) } })
+assert_eq(20.of { .usigma }, 20.of { _ ? .factor_map { |p,e| p**e + 1 }.prod : 0 })
+assert_eq(20.of { .uphi },   20.of { _ ? .factor_map { |p,e| p**e - 1 }.prod : 0 })
+
+assert_eq(1..100 -> grep { .is_smooth(5) }, 1..100 -> grep { .gpf <= 5 })
+assert_eq(2..100 -> grep { .is_rough(5)  }, 2..100 -> grep { .lpf >= 5 })
+
+assert_eq(50.of { .inverse_phi.len }, 50.of { .inverse_phi_len })
+assert_eq(50.of { .inverse_psi.len }, 50.of { .inverse_psi_len })
+
+assert_eq(50.of { .inverse_phi.max }, 50.of { .inverse_phi_max })
+assert_eq(50.of { .inverse_psi.max }, 50.of { .inverse_psi_max })
+
+assert_eq(50.of { .inverse_phi.min }, 50.of { .inverse_phi_min })
+assert_eq(50.of { .inverse_psi.min }, 50.of { .inverse_psi_min })
+
+assert_eq(50.of { .inverse_sigma.max }, 50.of { .inverse_sigma_max })
+assert_eq(50.of { .inverse_sigma.min }, 50.of { .inverse_sigma_min })
+
+assert_eq(50.of { .inverse_sigma.len }, 50.of { .inverse_sigma_len })
+assert_eq(50.of { .inverse_sigma(2).len }, 50.of { .inverse_sigma_len(2) })
+
+assert_eq(50.of { .inverse_sigma(2).max }, 50.of { .inverse_sigma_max(2) })
+assert_eq(50.of { .inverse_sigma(2).min }, 50.of { .inverse_sigma_min(2) })
+
+assert_eq(inverse_phi(2**64).len, inverse_phi_len(2**64))
+assert_eq(inverse_psi(2**64).len, inverse_psi_len(2**64))
+assert_eq(inverse_sigma(2**64).len, inverse_sigma_len(2**64))
+
+assert_eq(inverse_phi(2**64).max, inverse_phi_max(2**64))
+assert_eq(inverse_phi(2**64).min, inverse_phi_min(2**64))
+
+assert_eq(inverse_psi(2**64).max, inverse_psi_max(2**64))
+assert_eq(inverse_psi(2**64).min, inverse_psi_min(2**64))
+
+assert_eq(inverse_sigma(2**64).max, inverse_sigma_max(2**64))
+assert_eq(inverse_sigma(2**64).min, inverse_sigma_min(2**64))
+
+assert_eq(50.of { .sigma(2) }.sort.uniq.grep { _ <= 50 }, 0..50 -> grep { defined(.inverse_sigma_min(2)) })
+assert_eq(50.of { .sigma(2) }.sort.uniq.grep { _ <= 50 }, 0..50 -> grep { defined(.inverse_sigma_max(2)) })
+
+say "** Tests passed!"

@@ -202,6 +202,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/mertens_function.sf'
 'scripts/Extended tests/nth_prime.sf'
 'scripts/Extended tests/nth_prime_near_powers_of_10.sf'
+'scripts/Extended tests/number_methods.sf'
 'scripts/Extended tests/prime_bounds.sf'
 'scripts/Extended tests/prime_count.sf'
 'scripts/Extended tests/prime_power_count.sf'
@@ -873,6 +874,7 @@ scripts/Tests/method_aliases.sf
 scripts/Tests/method_expressions.sf
 scripts/Tests/miller_rabin_primality_test.sf
 scripts/Tests/mod_class.sf
+scripts/Tests/modular_quadratic_formula.sf
 scripts/Tests/Module/Bar.sm
 scripts/Tests/Module/Fact.sm
 scripts/Tests/Module/Fib.sm
@@ -901,6 +903,7 @@ scripts/Tests/multiple_dispatch_builtin_class.sf
 scripts/Tests/multiple_dispatch_inheritance_1.sf
 scripts/Tests/multiple_dispatch_inheritance_2.sf
 scripts/Tests/multiple_dispatch_inheritance_3.sf
+scripts/Tests/multiplicative_functions.sf
 scripts/Tests/multisplit.sf
 scripts/Tests/named_block_arguments.sf
 scripts/Tests/named_parameters.sf
@@ -939,6 +942,7 @@ scripts/Tests/polynomial.sf
 scripts/Tests/polynomial_regression.sf
 scripts/Tests/postfix_exclamation_mark.sf
 scripts/Tests/power_numbers.sf
+scripts/Tests/powerfree_numbers.sf
 scripts/Tests/prefix_colon_hash.sf
 scripts/Tests/prefix_methods.sf
 scripts/Tests/prefix_unary_operators.sf
@@ -1007,6 +1011,7 @@ scripts/Tests/slurpy_define.sf
 scripts/Tests/slurpy_static.sf
 scripts/Tests/smart_match_operator.sf
 scripts/Tests/smooth_rough.sf
+scripts/Tests/solve_lcg.sf
 scripts/Tests/sort_disjoint_sublist.sf
 scripts/Tests/sort_with_custom_cmp.sf
 scripts/Tests/soundex.sf

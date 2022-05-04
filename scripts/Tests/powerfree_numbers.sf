@@ -1,0 +1,80 @@
+#!/usr/bin/ruby
+
+# Tests for methods related to powerfree numbers.
+
+do {
+    func f(n, r) {
+        n.factor_prod {|p|
+            1 - p**r
+        }
+    }
+
+    func powerfree_part_sum(n, r=2) {
+        sum(1..n.iroot(r), {|k|
+            f(k, r) * faulhaber(idiv(n, k**r), 1)
+        })
+    }
+
+    for k in (1..10) {
+        assert_eq(
+            100.of { powerfree_part_sum(_, k) },
+            100.of { k.powerfree_part_sum(_) }
+        )
+
+        assert_eq(
+            100.of { k.powerfree_part_sum(_) },
+            100.of { k.powerfree_part(_) }.acc,
+        )
+
+        assert_eq(
+            100.of { k.powerfree_part(_) },
+            100.of { .is_zero ? 0 : .factor_prod {|p,e| p**(e % k) } },
+        )
+    }
+}
+
+do {
+    func powerfree_sum(n, k=2) {
+        var sum = 0
+        n.iroot(k).each_squarefree {|v|
+            sum += (moebius(v) * v**k * faulhaber(idiv(n, v**k), 1))
+        }
+        return sum
+    }
+
+    for k in (2..10) {
+        assert_eq(
+            100.of { powerfree_sum(_, k) },
+            100.of { k.powerfree_sum(_) }
+        )
+
+        assert_eq(
+            100.of { k.powerfree_sum(_) },
+            100.of { (.is_powerfree(k) ? 1 : 0) * _ }.acc,
+        )
+    }
+}
+
+do {
+    func powerfree_count(n, k=2) {
+        var sum = 0
+        n.iroot(k).each_squarefree {|v|
+            sum += (moebius(v) * idiv(n, v**k))
+        }
+        return sum
+    }
+
+    for k in (1..10) {
+        assert_eq(
+            100.of { powerfree_count(_, k) },
+            100.of { k.powerfree_count(_) }
+        )
+
+        assert_eq(
+            100.of { k.powerfree_count(_) },
+            100.of { .is_powerfree(k) ? 1 : 0 }.acc,
+        )
+    }
+}
+
+say ":: Test passed!"

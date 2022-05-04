@@ -171,4 +171,20 @@ do {
     }
 }
 
+do {
+    var a = Math.smooth_numbers(2,3,5,7)    # 7-smooth numbers
+    var b = Math.smooth_numbers(2,5,7)      # 7-smooth numbers not divisible by 3
+
+    assert_eq(a.first(30), 30.by { .is_smooth(7) })
+    assert_eq(b.first(30), 30.by {!.is_div(3) && .is_smooth(7) })
+
+    # Iteration is also supported
+    a.each {|k|
+        if (k > 1e5) {
+            assert_eq(k, 100352)
+            break
+        }
+    }
+}
+
 say "** Test passed!"

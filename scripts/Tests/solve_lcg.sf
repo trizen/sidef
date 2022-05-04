@@ -1,0 +1,14 @@
+#!/usr/bin/ruby
+
+# Solve linear congruence
+for a in (1..10), b in (1..10), c in (1..10) {
+
+    var x = solve_lcg(a,b,c)
+
+    if (!x.is_nan) {
+        assert_eq(a*x % c, b % c)
+        assert(is_congruent(a*x, b, c), [a,b,c])
+    }
+}
+
+say ":: Test passed!"

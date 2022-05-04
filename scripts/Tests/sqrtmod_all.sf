@@ -114,4 +114,25 @@ for n in (0..33), a in (^n) {
     )
 }
 
+for a,m in (
+[
+    [10, 13],
+    [10, 13**2],
+    [10, 13**3],
+    [10, 13**4],
+    [44, 43*97],
+    [938, 1771],
+    [1313, 3808],
+    [544, 800],
+    [436, 1752],
+    [289, 992],
+    [841, 905],
+    [441, 920],
+    [993, 2048],
+    [13**18 * 5**7 - 1, 13**18 * 5**7]
+]) {
+    assert_eq(Mod(sqrtmod(a, m), m)**2, a, "sqrtmod(#{a}, #{m}) = #{sqrtmod(a, m)}, which is incorrect")
+    sqrtmod_all(a,m).each {|r| assert_eq(Mod(r, m)**2, a, "sqrtmod_all(#{a}, #{m}) = #{r}, which is incorrect") }
+}
+
 say "** Test passed!"
