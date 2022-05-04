@@ -3488,7 +3488,13 @@ package Sidef::Types::Number::Number {
     }
 
     sub exp {
-        my ($x) = @_;
+        my ($x, $y) = @_;
+
+        if (defined($y)) {
+            _valid(\$y);
+            return bless \__pow__(_any2mpfr_mpc($$x), _any2mpfr_mpc($$y));
+        }
+
         bless \__exp__(_any2mpfr_mpc($$x));
     }
 

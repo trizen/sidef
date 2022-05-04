@@ -2282,8 +2282,11 @@ Returns back C<x>.
 =head2 exp
 
     exp(x)
+    exp(b, x)
 
 Exponential function: C<e^x>.
+
+When two arguments are given, it does floating-point exponentiation: C<b^x>.
 
 =cut
 
