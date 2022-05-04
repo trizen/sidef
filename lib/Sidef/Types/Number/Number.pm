@@ -7936,6 +7936,42 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Array::Array->new(\@roots);
     }
 
+    sub difference_of_squares {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        # No solutions when n == 2 (mod 4). See: A016825.
+        if (Math::GMPz::Rmpz_congruent_ui_p($n, 2, 4)) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+        my $D = $_[0]->divisors($_[0]->isqrt);
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+
+        my @solutions;
+
+        foreach my $d (@$D) {
+
+            Math::GMPz::Rmpz_divexact($t, $n, $$d);
+            Math::GMPz::Rmpz_add($u, $$d, $t);
+            Math::GMPz::Rmpz_even_p($u) || next;
+
+            my $x = Math::GMPz::Rmpz_init();
+            my $y = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_sub($y, $t, $$d);
+            Math::GMPz::Rmpz_div_2exp($x, $u, 1);
+            Math::GMPz::Rmpz_div_2exp($y, $y, 1);
+
+            unshift @solutions, Sidef::Types::Array::Array->new([(bless \$x), (bless \$y)]);
+        }
+
+        Sidef::Types::Array::Array->new(\@solutions);
+    }
+
     sub _modular_rational {
         my ($n, $m) = @_;
 

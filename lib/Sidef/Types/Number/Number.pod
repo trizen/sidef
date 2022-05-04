@@ -1817,6 +1817,16 @@ Aliases: I<arithmetic_derivative>
 
 =cut
 
+=head2 difference_of_squares
+
+    difference_of_squares(n)
+
+Returns an array of C<[a,b]> pairs with all the possible solutions to the equation: C<a^2 - b^2 = n>.
+
+    say difference_of_squares(48)   #=> [[7, 1], [8, 4], [13, 11]]
+
+=cut
+
 =head2 digit
 
     n.digit(k, b=10)
