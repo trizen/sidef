@@ -6077,8 +6077,6 @@ package Sidef::Types::Number::Number {
                 else {
                     _valid(\$value);
                     push @numbers, $$value;
-
-                    #push @numbers, Sidef::Types::Number::Number->new($value);
                 }
             }
         }

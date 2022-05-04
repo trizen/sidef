@@ -88,7 +88,21 @@ Returns the solution for C<x> in C<x ≡ a_k (mod m_k)>, using the Chinese Remai
 
     Math.gcd(list...)
 
-Returns the greast common multiple (GCD) of a list of integers.
+Returns the greatest common divisor (GCD) of a list of integers.
+
+=cut
+
+=head2 gcd_factors
+
+    Math.gcd_factors(n, array)
+
+Given an integer and a list of numbers, it tries to find factors of n, checking each gcd(n, array[0]), gcd(n, array[1]), etc.
+
+    var n = 43*43*97*503
+    var a = [19*43*97, 1, 13*41*43*101]
+    say Math.gcd_factors(n, a)          #=> [43, 97, 503]
+
+When no factors are found, an empty list is returned. The returned list contains no duplicates.
 
 =cut
 
