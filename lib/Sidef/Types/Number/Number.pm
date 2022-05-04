@@ -10004,6 +10004,56 @@ package Sidef::Types::Number::Number {
 
     *integer_quadratic_formula = \&iquadratic_formula;
 
+    sub modular_quadratic_formula {
+        my ($x, $y, $z, $m) = @_;
+
+        $x //= ZERO;
+        $y //= ZERO;
+        $z //= ZERO;
+        $m // return Sidef::Types::Array::Array->new;
+
+        _valid(\$y, \$z, \$m);
+
+        $x = _any2mpq($$x) // return Sidef::Types::Array::Array->new;
+        $y = _any2mpq($$y) // return Sidef::Types::Array::Array->new;
+        $z = _any2mpq($$z) // return Sidef::Types::Array::Array->new;
+        $m = _any2mpz($$m) // return Sidef::Types::Array::Array->new;
+
+        # x must not be zero
+        Math::GMPq::Rmpq_sgn($x)
+          || return Sidef::Types::Array::Array->new;
+
+        my $four_m = 4 * $m;
+
+        # D = b^2 - 4*a*c
+        my $D = __mod__($y * $y - 4 * $x * $z, $four_m);
+
+        # The discriminant must be an integer
+        (ref($D) eq 'Math::GMPz' or Math::GMPq::Rmpq_integer_p($D))
+          || return Sidef::Types::Array::Array->new;
+
+        # Find all the solutions k to: k^2 == D (mod 4*m)
+        my $S = _set_int($D)->sqrtmod_all(_set_int($four_m));
+
+        @$S || return $S;
+
+        my $two_a = 2 * $x;
+        my $neg_b = -$y;
+
+        my @solutions;
+
+        foreach my $k (@$S) {
+            foreach my $u ($neg_b + $$k, $neg_b - $$k) {
+                my $r = __mod__(__div__($u, $two_a), $m);
+                if (__cmp__(__mod__($x * $r * $r + $y * $r + $z, $m), 0) == 0) {
+                    push @solutions, (bless \$r);
+                }
+            }
+        }
+
+        Sidef::Types::Array::Array->new(\@solutions)->sort->uniq;
+    }
+
     sub geometric_sum {
         my ($n, $r) = @_;
         _valid(\$r);

@@ -4636,6 +4636,22 @@ Returns the smallest value from a list of numbers.
 
 =cut
 
+=head2 modular_quadratic_formula
+
+    modular_quadratic_formula(a,b,c,m)
+
+Returns an array with all the positive solutions for C<x> to the following quadratic modular equation:
+
+    a*x^2 + b*x + c == 0 (mod m)
+
+where a,b,c are rational values and m is a positive integer.
+
+Example:
+
+    say modular_quadratic_formula(3,4,5,124)  #=> [47, 55, 109, 117]
+
+=cut
+
 =head2 mone
 
     Num.mone
