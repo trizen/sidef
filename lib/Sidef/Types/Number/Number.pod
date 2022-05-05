@@ -2635,6 +2635,25 @@ Returns the n-th term in Stern's diatomic series (or Stern-Brocot sequence).
 
 =cut
 
+=head2 gaussian_divisors
+
+    gaussian_divisors(n)
+
+Returns an array with all the Gaussian divisors of C<n>.
+
+Example:
+
+    say gaussian_divisors(65)
+
+Output:
+
+    [Gauss(-8, -1), Gauss(-8, 1), Gauss(-7, -4), Gauss(-7, 4),
+     Gauss(-4, -7), Gauss(-4, 7), Gauss(-1, -8), Gauss(-1, 8),
+     Gauss( 1, -8), Gauss( 1, 8), Gauss( 4, -7), Gauss( 4, 7),
+     Gauss( 7, -4), Gauss( 7, 4), Gauss( 8, -1), Gauss( 8, 1)]
+
+=cut
+
 =head2 gcd
 
     gcd(...)
