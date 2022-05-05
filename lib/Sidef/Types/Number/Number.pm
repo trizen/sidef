@@ -6716,6 +6716,36 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([map { $_ ? ONE : ZERO } split(//, $bin)]);
     }
 
+    sub digital_root {
+        my ($n, $base) = @_;
+
+        # Formula:
+        #   digital_root(n,b) = n - (b-1)*floor((n-1)/(b-1))
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        if (defined($base)) {
+            _valid(\$base);
+            $base = _any2mpz($$base) // goto &nan;
+            Math::GMPz::Rmpz_cmp_ui($base, 1) > 0 or goto &nan;
+        }
+        else {
+            $base = $TEN;
+        }
+
+        Math::GMPz::Rmpz_sgn($n) || return ZERO;
+
+        my $r = Math::GMPz::Rmpz_init();
+        my $t = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_sub_ui($r, $n,    1);
+        Math::GMPz::Rmpz_sub_ui($t, $base, 1);
+        Math::GMPz::Rmpz_mod($r, $r, $t);
+        Math::GMPz::Rmpz_add_ui($r, $r, 1);
+
+        bless \$r;
+    }
+
     sub expnorm {
         my ($n, $base) = @_;
 

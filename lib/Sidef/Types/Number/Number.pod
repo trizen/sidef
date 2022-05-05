@@ -1851,6 +1851,21 @@ It also supports negative indices:
 
 =cut
 
+=head2 digital_root
+
+    digital_root(n, b=10)
+
+Returns the digital root of C<n>, with respect to base C<b>.
+
+    say 30.of { .digital_root }               #=> OEIS: A010888
+    say 30.of { .digital_root(.isqrt+1) }     #=> OEIS: A122197
+
+Also known as "repeated digital sum".
+
+Both C<n> and C<b> can be arbitrary large, as long as b > 1.
+
+=cut
+
 =head2 digits
 
     n.digits(b=10)
