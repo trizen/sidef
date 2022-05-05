@@ -4335,12 +4335,21 @@ Equivalent to:
 
 =head2 liouville_sum
 
-    n.liouville_sum
+    liouville_sum(n)
+    liouville_sum(a,b)
 
-Computes partial sums of the Liouville lambda function.
+Computes partial sums of the Liouville lambda function:
 
-    say liouville_sum(10**9)    #=> -25216
-    say liouville_sum(10**10)   #=> -116026
+    Sum_{k=1..n} liouville(k)
+
+When an additional argument is given, the returned result is:
+
+    Sum_{k=a..b} liouville(k)
+
+Example:
+
+    say liouville_sum(10**9)           #=> -25216
+    say liouville_sum(10**9, 10**10)   #=> -90809
 
 =cut
 

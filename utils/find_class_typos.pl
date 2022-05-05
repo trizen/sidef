@@ -45,7 +45,12 @@ find {
         }
 
         while ($content =~ /\b(Sidef(::\w+)+)/g) {
-            push @{$invokants{$1}}, $_;
+            my $name = $1;
+            push @{$invokants{$name}}, $_;
+
+            if ($name =~ /^(.+)::/) {  # handle function calls
+                push @{$invokants{$1}}, $_;
+            }
         }
     },
 

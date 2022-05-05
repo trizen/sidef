@@ -10945,9 +10945,15 @@ package Sidef::Types::Number::Number {
     }
 
     sub liouville_sum {
-        my ($n) = @_;
+        my ($from, $to) = @_;
 
-        $n = _any2mpz($$n) // goto &nan;
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $to->liouville_sum->sub($from->dec->liouville_sum);
+        }
+
+        my $n = _any2mpz($$from) // goto &nan;
         Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
         state $liouville_table = {
