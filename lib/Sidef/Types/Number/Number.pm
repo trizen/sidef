@@ -16321,10 +16321,31 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        # TODO: maybe add optimization for when n < sqrt(v)
-
         my $S = sub {    # Sum_{k=1..n} sigma(k) = Sum_{k=1..n} k*floor(n/k)
             my ($n) = @_;
+
+            if (Math::GMPz::Rmpz_sgn($n) < 0) {
+
+                # Support for negative n:
+                #   S(-n) = n*(n+1)/2 + S(n-1)
+
+                # Based on the formula:
+                # Sum_{k=1..n} -k*floor(n/-k) = Sum_{k=1..n} k*ceiling(n/k)
+                #                             = n*(n+1)/2 + Sum_{k=1..n-1} sigma(k).
+
+                $n = Math::GMPz::Rmpz_init_set($n);
+                Math::GMPz::Rmpz_abs($n, $n);
+
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_add_ui($t, $n, 1);
+                Math::GMPz::Rmpz_mul($t, $t, $n);
+                Math::GMPz::Rmpz_div_2exp($t, $t, 1);
+                Math::GMPz::Rmpz_sub_ui($n, $n, 1);
+
+                my $r = __SUB__->($n);
+                Math::GMPz::Rmpz_add($t, $t, $r);
+                return $t;
+            }
 
             my $t = Math::GMPz::Rmpz_init();
             my $u = Math::GMPz::Rmpz_init();
@@ -16357,6 +16378,33 @@ package Sidef::Types::Number::Number {
 
         my $G = sub {    # Sum_{k=A..B} k*floor(B/k)
             my ($A, $B) = @_;
+
+            if (Math::GMPz::Rmpz_sgn($B) < 0) {
+
+                # Support for negative B:
+                #   G(a,-b) = T(b) - T(a-1) + G(a, b-1)
+                # where T(n) = n*(n+1)/2
+
+                $B = Math::GMPz::Rmpz_init_set($B);
+                Math::GMPz::Rmpz_abs($B, $B);
+
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_add_ui($t, $B, 1);
+                Math::GMPz::Rmpz_mul($t, $t, $B);
+                Math::GMPz::Rmpz_div_2exp($t, $t, 1);
+
+                my $t2 = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_sub_ui($t2, $A, 1);
+                Math::GMPz::Rmpz_mul($t2, $t2, $A);
+                Math::GMPz::Rmpz_div_2exp($t2, $t2, 1);
+
+                Math::GMPz::Rmpz_sub($t, $t, $t2);
+                Math::GMPz::Rmpz_sub_ui($B, $B, 1);
+
+                my $r = __SUB__->($A, $B);
+                Math::GMPz::Rmpz_add($t, $t, $r);
+                return $t;
+            }
 
             my $t = Math::GMPz::Rmpz_init();
             my $u = Math::GMPz::Rmpz_init();
@@ -16391,15 +16439,50 @@ package Sidef::Types::Number::Number {
             return $T;
         };
 
+        # Optimization when n < sqrt(v)
+        if (Math::GMPz::Rmpz_cmpabs($n * $n, $v) <= 0 and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+
+            my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+            $n = Math::GMPz::Rmpz_get_ui($n);
+
+            if (Math::GMPz::Rmpz_fits_ulong_p($v)) {
+                $v = Math::GMPz::Rmpz_get_ui($v);
+                foreach my $k (1 .. $n) {
+                    Math::GMPz::Rmpz_add_ui($sum, $sum, $v % $k);
+                }
+            }
+            else {
+                my $t = Math::GMPz::Rmpz_init();
+                foreach my $k (1 .. $n) {
+                    Math::GMPz::Rmpz_add_ui($sum, $sum, Math::GMPz::Rmpz_mod_ui($t, $v, $k));
+                }
+            }
+
+            return bless \$sum;
+        }
+
         # a(n,v) = n*v - S(v) + G(n+1, v)
 
         my $x = $S->($v);
         my $y = $G->($n + 1, $v);
 
+        my $negative = 0;
+
+        if (Math::GMPz::Rmpz_sgn($v) < 0) {
+            $v = Math::GMPz::Rmpz_init_set($v);
+            Math::GMPz::Rmpz_abs($v, $v);
+            $negative = 1;
+        }
+
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mul($r, $n, $v);
         Math::GMPz::Rmpz_add($r, $r, $y);
         Math::GMPz::Rmpz_sub($r, $r, $x);
+
+        if ($negative) {
+            Math::GMPz::Rmpz_neg($r, $r);
+        }
 
         bless \$r;
     }

@@ -4640,7 +4640,7 @@ Returns the smallest value from a list of numbers.
 
     modular_quadratic_formula(a,b,c,m)
 
-Returns an array with all the positive solutions for C<x> to the following quadratic modular equation:
+Returns an array with all the positive solutions for C<x> to the following modular quadratic equation:
 
     a*x^2 + b*x + c == 0 (mod m)
 
@@ -6811,6 +6811,8 @@ Returns the following sum: C<Sum_{k=1..n} v % k>, computed in C<O(sqrt(v))> step
 
     say 20.of {|n| sum_remainders(n, n) }        #=> OEIS: A004125
     say 20.of {|n| sum_remainders(n, n.prime) }  #=> OEIS: A099726
+
+Negative values of C<v> are also supported.
 
 =cut
 

@@ -1,0 +1,73 @@
+#!/usr/bin/ruby
+
+# Tests for the Number `sum_remainders(n,v)` method.
+
+func T(n) {     # Sum_{k=1..n} k = n-th triangular number
+    n.faulhaber(1)
+}
+
+func S(n) {     # A024916(n) = Sum_{k=1..n} sigma(k) = Sum_{k=1..n} k*floor(n/k)
+    #with (n.isqrt) { |s| sum(1..s, {|k| T(idiv(n,k)) + k*idiv(n,k) }) - T(s)*s }
+
+    if (n < 0) {
+        return (T(n.abs) + __FUNC__(n.abs-1))
+    }
+
+    n.dirichlet_sum({1}, {_}, {_}, {.faulhaber(1)})
+}
+
+func g(a,b) {   # g(a,b) = Sum_{k=a..b} k*floor(b/k)
+
+    if (b < 0) {
+        return (T(b.abs) - T(a-1)  + __FUNC__(a, b.abs-1))
+    }
+
+    var total = 0
+    while (a <= b) {
+        var t = idiv(b, a)
+        var u = idiv(b, t)
+        total += t*(T(u) - T(a-1))
+        a = u+1
+    }
+    return total
+}
+
+func my_sum_remainders(n, v) {     # sub-linear formula
+    sgn(v) * (n*v.abs - S(v) + g(n+1, v))
+}
+
+assert_eq(
+    {|n| sum_remainders(n,   n.prime) }.map(1..20)        #=> A099726
+    %n[0, 1, 3, 5, 7, 7, 14, 18, 28, 30, 31, 26, 38, 45, 63, 71, 93, 75, 96, 115]
+)
+
+assert_eq(
+    {|n| sum_remainders(n-1, n.sigma) }.map(1..20)        #=> A340976
+    %n[0, 0, 0, 2, 2, 2, 7, 8, 18, 11, 16, 27, 30, 30, 40, 47, 46, 75, 60, 72],
+)
+
+# Positive v
+assert_eq(
+    20.of {|n| 20.of {|v| sum(1..n, {|k| v % k }) } },
+    20.of {|n| 20.of {|v| sum_remainders(n,v) } }
+)
+
+# Positive v
+assert_eq(
+    20.of {|n| 20.of {|v| my_sum_remainders(n,v) } },
+    20.of {|n| 20.of {|v| sum_remainders(n,v) } }
+)
+
+# Negative v
+assert_eq(
+    20.of {|n| 20.of {|v| sum(1..n, {|k| -v % k }) } },
+    20.of {|n| 20.of {|v| sum_remainders(n,-v) } }
+)
+
+# Negative v
+assert_eq(
+    20.of {|n| 20.of {|v| my_sum_remainders(n, -v) } },
+    20.of {|n| 20.of {|v| sum_remainders(n,-v) } }
+)
+
+say ":: Test passed!"
