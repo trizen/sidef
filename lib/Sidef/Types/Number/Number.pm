@@ -7671,7 +7671,7 @@ package Sidef::Types::Number::Number {
         @factors = map {
             ($_ < ULONG_MAX)
                 ? Math::GMPz::Rmpz_init_set_ui($_)
-                : Math::GMPz::Rmpz_init_set_str($_, 10)
+                : Math::GMPz::Rmpz_init_set_str("$_", 10)
         } map { $_->[0] } @factors;
 #>>>
 
@@ -7924,7 +7924,7 @@ package Sidef::Types::Number::Number {
             $p =
               ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_init_set_ui($p)
-              : Math::GMPz::Rmpz_init_set_str($p, 10);
+              : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
             my $pk = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_pow_ui($pk, $p, $k);
@@ -7993,6 +7993,131 @@ package Sidef::Types::Number::Number {
         }
 
         Sidef::Types::Array::Array->new(\@solutions);
+    }
+
+    *diff_of_squares = \&difference_of_squares;
+
+    sub sum_of_squares {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        Math::GMPz::Rmpz_sgn($n) >= 0
+          or return Sidef::Types::Array::Array->new;
+
+        if (Math::GMPz::Rmpz_sgn($n) == 0) {
+            return Sidef::Types::Array::Array->new(Sidef::Types::Array::Array->new([ZERO, ZERO]));
+        }
+
+        my $sum_of_two_squares_solutions = sub {
+            my ($n) = @_;
+
+            my $prod1 = Math::GMPz::Rmpz_init_set_ui(1);    # p == 1 (mod 4)
+            my $prod2 = Math::GMPz::Rmpz_init_set_ui(1);    # p == 3 (mod 4)
+
+            my @prime_powers;
+
+            foreach my $pp (_factor_exp($n)) {
+                my ($p, $e) = @$pp;
+
+                $p =
+                  ($p < ULONG_MAX)
+                  ? Math::GMPz::Rmpz_init_set_ui($p)
+                  : Math::GMPz::Rmpz_init_set_str("$p", 10);
+
+                if (Math::GMPz::Rmpz_congruent_ui_p($p, 3, 4)) {    # p = 3 (mod 4)
+                    $e % 2 == 0 or return;                          # power must be even
+                    Math::GMPz::Rmpz_mul($prod2, $prod2, $p**($e >> 1));
+                }
+                elsif (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0) {       # p = 2
+                    if ($e % 2 == 0) {                              # power is even
+                        Math::GMPz::Rmpz_mul($prod2, $prod2, $p**($e >> 1));
+                    }
+                    else {                                          # power is odd
+                        Math::GMPz::Rmpz_mul_2exp($prod1, $prod1, 1);
+                        Math::GMPz::Rmpz_mul($prod2, $prod2, $p**(($e - 1) >> 1));
+                        push @prime_powers, [$p, 1];
+                    }
+                }
+                else {                                              # p = 1 (mod 4)
+                    Math::GMPz::Rmpz_mul($prod1, $prod1, $p**$e);
+                    push @prime_powers, [$p, $e];
+                }
+            }
+
+            Math::GMPz::Rmpz_cmp_ui($prod1, 1) == 0
+              and return [0, $prod2];
+
+            Math::GMPz::Rmpz_cmp_ui($prod1, 2) == 0
+              and return [$prod2, $prod2];
+
+            my @square_roots = map { $$_ } @{MONE->sqrtmod_all(_set_int($prod1))};
+
+            if (!@square_roots) {
+                die "Error in sqrtmod_all(-1, $prod1): failed to find any solutions!";
+            }
+
+            my @solutions;
+
+            foreach my $r (@square_roots) {
+
+                my $s = Math::GMPz::Rmpz_init_set($r);
+                my $q = Math::GMPz::Rmpz_init_set($prod1);
+
+                my $t = Math::GMPz::Rmpz_init();
+
+                while (1) {
+
+                    # While s^2 > prod1
+                    Math::GMPz::Rmpz_mul($t, $s, $s);
+                    Math::GMPz::Rmpz_cmp($t, $prod1) > 0 or last;
+
+                    Math::GMPz::Rmpz_set($t, $s);
+                    Math::GMPz::Rmpz_mod($s, $q, $s);
+                    Math::GMPz::Rmpz_set($q, $t);
+                }
+
+                Math::GMPz::Rmpz_mod($q, $q, $s);
+                Math::GMPz::Rmpz_mul($s, $s, $prod2);
+                Math::GMPz::Rmpz_mul($q, $q, $prod2);
+
+                push @solutions, [$s, $q];
+            }
+
+            # TODO: use the identity:
+            #   (a^2 + b^2)*(c^2 + d^2) = (a*c - b*d)^2 + (a*d + b*c)^2
+
+            foreach my $pe (@prime_powers) {
+                my ($p, $e) = @$pe;
+
+                for (my $i = $e % 2 ; $i < $e ; $i += 2) {
+
+                    my $sq = $p**(($e - $i) >> 1);
+                    my $pp = $p**($e - $i);
+
+                    push @solutions, map {
+                        [map { $_ * $sq * $prod2 } @$_]
+                    } __SUB__->($prod1 / $pp);
+                }
+            }
+
+            # Return only the unique solutions
+            my %seen;
+            grep { !$seen{ref($_->[0]) ? Math::GMPz::Rmpz_get_str($_->[0], 10) : $_->[0]}++ } @solutions;
+        };
+
+        my @solutions = $sum_of_two_squares_solutions->($n);
+
+        @solutions = sort { $a->[0] <=> $b->[0] }
+          map { ($_->[0] > $_->[1]) ? [$_->[1], $_->[0]] : $_ } @solutions;
+
+        Sidef::Types::Array::Array->new(
+            [
+             map {
+                 Sidef::Types::Array::Array->new([map { _set_int($_) } @$_])
+               } @solutions
+            ]
+        );
     }
 
     sub _modular_rational {
@@ -16663,7 +16788,7 @@ package Sidef::Types::Number::Number {
             $p =
               ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_init_set_ui($p)
-              : Math::GMPz::Rmpz_init_set_str($p, 10);
+              : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
             my @t;
             Math::GMPz::Rmpz_set($r, $p);
@@ -16708,7 +16833,7 @@ package Sidef::Types::Number::Number {
             $p =
               ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_init_set_ui($p)
-              : Math::GMPz::Rmpz_init_set_str($p, 10);
+              : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
             my @t;
             Math::GMPz::Rmpz_set($r, $p);
@@ -16886,7 +17011,7 @@ package Sidef::Types::Number::Number {
             $p =
               ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_init_set_ui($p)
-              : Math::GMPz::Rmpz_init_set_str($p, 10);
+              : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
             my @t;
             for (my $i = $k ; $i <= $e ; $i += $k) {
@@ -19371,7 +19496,7 @@ package Sidef::Types::Number::Number {
         my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e7;
 
         if ($step > ULONG_MAX) {
-            $step = Math::GMPz::Rmpz_init_set_str($step, 10);
+            $step = Math::GMPz::Rmpz_init_set_str("$step", 10);
         }
 
         _generic_each($from, $to, $block, sub { $step }, sub { _sieve_omega_primes($_[0], $_[1], $k) });
@@ -19789,7 +19914,7 @@ package Sidef::Types::Number::Number {
         my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e7;
 
         if ($step > ULONG_MAX) {
-            $step = Math::GMPz::Rmpz_init_set_str($step, 10);
+            $step = Math::GMPz::Rmpz_init_set_str("$step", 10);
         }
 
         _generic_each($from, $to, $block, sub { $step }, sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1) });

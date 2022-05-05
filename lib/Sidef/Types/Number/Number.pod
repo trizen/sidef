@@ -6803,6 +6803,24 @@ Returns an array with the subsets of the integers in the range C<0..n-1>, or ite
 
 =cut
 
+=head2 sum_of_squares
+
+    sum_of_squares(n)
+
+Returns an array of C<[a,b]> pairs containing all the positive solutions to the equation:
+
+    n = a^2 + b^2
+
+Example:
+
+    say sum_of_squares(99025)
+
+Output:
+
+    [[41, 312], [48, 311], [95, 300], [104, 297], [183, 256], [220, 225]]
+
+=cut
+
 =head2 sum_remainders
 
     sum_remainders(n, v)
