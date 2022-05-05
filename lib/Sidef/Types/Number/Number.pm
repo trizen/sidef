@@ -8180,28 +8180,6 @@ package Sidef::Types::Number::Number {
         );
     }
 
-    sub gaussian_divisors {
-        my ($n) = @_;
-
-        my @D;
-        my $S = $n->sum_of_squares;
-
-        foreach my $pair (@$S) {
-            my ($x, $y) = @$pair;
-
-            foreach my $ij ([1, -1], [-1, -1], [-1, 1], [1, 1]) {
-
-                my $new_x = ($ij->[0] == 1) ? $x : $x->neg;
-                my $new_y = ($ij->[1] == 1) ? $y : $y->neg;
-
-                push @D, Sidef::Types::Number::Gauss->new($new_x, $new_y);
-                push @D, Sidef::Types::Number::Gauss->new($new_y, $new_x);
-            }
-        }
-
-        Sidef::Types::Array::Array->new(\@D)->sort->uniq;
-    }
-
     sub _modular_rational {
         my ($n, $m) = @_;
 

@@ -114,24 +114,4 @@ assert_eq(
     1..200 -> map {|n| square_partition_count(n) }
 )
 
-for n in (1..100) {
-    var D = n.gaussian_divisors
-    var gn = Gauss(n)
-
-    assert(D.all {|d| assert_eq(gn % d, 0) })
-    assert_eq(D.len, squares_r(n))
-    assert_eq(D, D.map {|d| n/d }.sort)
-}
-
-with (5*5*97*9) {|n|
-    var D = n.gaussian_divisors
-    assert(D.all {|d| assert_eq(Gauss(n) % d, 0) })
-    assert_eq(D, D.map{|d| n/d }.sort)
-}
-
-assert_eq(
-    100.of {|n| Gauss(n).norm.gaussian_divisors.len },      # OEIS: A046109
-    %n[1, 4, 4, 4, 4, 12, 4, 4, 4, 4, 12, 4, 4, 12, 4, 12, 4, 12, 4, 4, 12, 4, 4, 4, 4, 20, 12, 4, 4, 12, 12, 4, 4, 4, 12, 12, 4, 12, 4, 12, 12, 12, 4, 4, 4, 12, 4, 4, 4, 4, 20, 12, 12, 12, 4, 12, 4, 4, 12, 4, 12, 12, 4, 4, 4, 36, 4, 4, 12, 4, 12, 4, 4, 12, 12, 20, 4, 4, 12, 4, 12, 4, 12, 4, 4, 36, 4, 12, 4, 12, 12, 12, 4, 4, 4, 12, 4, 12, 4, 4]
-)
-
 say "** Test passed!"
