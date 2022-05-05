@@ -6832,9 +6832,24 @@ package Sidef::Types::Number::Number {
             my @digits = map { _set_int($_) } sub {
                 my ($A, $r) = @_;
 
-                if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
-                    return Math::GMPz::Rmpz_get_ui($A);
+                # Cut the recursion early
+                if (Math::GMPz::Rmpz_fits_ulong_p($A)) {
+                    my $v = Math::GMPz::Rmpz_get_ui($A);
+                    my ($m, @digits);
+                    while ($v) {
+                        ($v, $m) = (
+                                    HAS_PRIME_UTIL
+                                    ? Math::Prime::Util::divrem($v, $B)
+                                    : Math::Prime::Util::GMP::divrem($v, $B)
+                                   );
+                        push @digits, $m;
+                    }
+                    return @digits;
                 }
+
+                #~ if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
+                #~ return Math::GMPz::Rmpz_get_ui($A);
+                #~ }
 
                 my $t = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_ui_pow_ui($t, $B, 2 * ($r - 1));    # can this be optimized away?
@@ -7123,9 +7138,24 @@ package Sidef::Types::Number::Number {
             my $total = sub {
                 my ($A, $r) = @_;
 
-                if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
-                    return Math::GMPz::Rmpz_get_ui($A);
+                # Cut the recursion early
+                if (Math::GMPz::Rmpz_fits_ulong_p($A)) {
+                    my $v = Math::GMPz::Rmpz_get_ui($A);
+                    my ($sum, $m) = (0);
+                    while ($v) {
+                        ($v, $m) = (
+                                    HAS_PRIME_UTIL
+                                    ? Math::Prime::Util::divrem($v, $B)
+                                    : Math::Prime::Util::GMP::divrem($v, $B)
+                                   );
+                        $sum += $m;
+                    }
+                    return $sum;
                 }
+
+                #~ if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
+                #~ return Math::GMPz::Rmpz_get_ui($A);
+                #~ }
 
                 my $w = ($r + 1) >> 1;
                 my $t = Math::GMPz::Rmpz_init();
