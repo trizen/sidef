@@ -15348,8 +15348,8 @@ package Sidef::Types::Number::Number {
 
         my $r;
 
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_slong_p($x) and Math::GMPz::Rmpz_fits_slong_p($y)) {
-            $r = Math::Prime::Util::znorder(Math::GMPz::Rmpz_get_si($x), Math::GMPz::Rmpz_get_si($y)) // goto &nan;
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($x) and Math::GMPz::Rmpz_fits_ulong_p($y)) {
+            $r = Math::Prime::Util::znorder(Math::GMPz::Rmpz_get_ui($x), Math::GMPz::Rmpz_get_ui($y)) // goto &nan;
         }
         else {
             $r = Math::Prime::Util::GMP::znorder(Math::GMPz::Rmpz_get_str($x, 10), Math::GMPz::Rmpz_get_str($y, 10))
