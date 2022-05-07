@@ -14323,16 +14323,16 @@ package Sidef::Types::Number::Number {
 
             foreach my $f (@factors) {
 
+                foreach my $base (@bases) {
+                    Math::Prime::Util::GMP::powmod($base, $f, $n) eq $base
+                      or return Sidef::Types::Bool::Bool::FALSE;
+                }
+
                 if (_is_prob_prime($f)) {
                     push @primes, $f;
                 }
                 else {
                     push @composites, $f;
-                }
-
-                foreach my $base (@bases) {
-                    Math::Prime::Util::GMP::powmod($base, $f, $n) eq $base
-                      or return Sidef::Types::Bool::Bool::FALSE;
                 }
             }
 
@@ -14399,7 +14399,10 @@ package Sidef::Types::Number::Number {
 
             foreach my $p (@_) {
                 foreach my $base (@bases) {
-                    my $zn = Math::Prime::Util::GMP::znorder($base, $p);
+                    my $zn =
+                      (HAS_PRIME_UTIL and $p < ULONG_MAX and $base < ULONG_MAX)
+                      ? Math::Prime::Util::znorder($base, $p)
+                      : Math::Prime::Util::GMP::znorder($base, $p);
                     if (exists $znorder{$base}) {
                         $znorder{$base} eq $zn or return;
                     }
@@ -14421,16 +14424,16 @@ package Sidef::Types::Number::Number {
 
             foreach my $f (@factors) {
 
+                foreach my $base (@bases) {
+                    Math::Prime::Util::GMP::powmod($base, $f, $n) eq $base
+                      or return Sidef::Types::Bool::Bool::FALSE;
+                }
+
                 if (_is_prob_prime($f)) {
                     push @primes, $f;
                 }
                 else {
                     push @composites, $f;
-                }
-
-                foreach my $base (@bases) {
-                    Math::Prime::Util::GMP::powmod($base, $f, $n) eq $base
-                      or return Sidef::Types::Bool::Bool::FALSE;
                 }
             }
 
