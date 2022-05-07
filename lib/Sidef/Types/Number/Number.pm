@@ -14336,7 +14336,7 @@ package Sidef::Types::Number::Number {
                 }
             }
 
-            if (@primes) {
+            if (scalar(@primes) > 1) {
                 $check_conditions->(@primes)
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
@@ -14399,10 +14399,21 @@ package Sidef::Types::Number::Number {
 
             foreach my $p (@_) {
                 foreach my $base (@bases) {
+
+                    if (exists $znorder{$base}) {
+                        if (HAS_PRIME_UTIL and $p < ULONG_MAX and $base < ULONG_MAX) {
+                            Math::Prime::Util::powmod($base, $znorder{$base}, $p) == 1 or return;
+                        }
+                        else {
+                            Math::Prime::Util::GMP::powmod($base, $znorder{$base}, $p) eq '1' or return;
+                        }
+                    }
+
                     my $zn =
                       (HAS_PRIME_UTIL and $p < ULONG_MAX and $base < ULONG_MAX)
                       ? Math::Prime::Util::znorder($base, $p)
                       : Math::Prime::Util::GMP::znorder($base, $p);
+
                     if (exists $znorder{$base}) {
                         $znorder{$base} eq $zn or return;
                     }
@@ -14437,7 +14448,7 @@ package Sidef::Types::Number::Number {
                 }
             }
 
-            if (@primes) {
+            if (scalar(@primes) > 1) {
                 $check_conditions->(@primes)
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
