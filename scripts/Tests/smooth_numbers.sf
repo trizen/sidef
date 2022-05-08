@@ -85,4 +85,8 @@ assert_eq(
     Math.smooth_numbers(next_prime(2**16), next_prime(2**64), next_prime(2**65)).while { _ <= 2**130 }
 )
 
+for n in (0..20) {
+    assert_eq(n.smooth_numbers([2,3,5]), 1..n->grep{.is_smooth(5)})
+}
+
 say "** Test passed!"

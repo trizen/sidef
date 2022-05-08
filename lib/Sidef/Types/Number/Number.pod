@@ -1771,6 +1771,18 @@ Aliases: I<cyclotomic_polynomial>
 
 =cut
 
+=head2 cyclotomicmod
+
+    cyclotomicmod(n, x, m)
+
+Returns the n-th Cyclotomic polynomial evaluated at C<x>, computed modulo C<m>.
+
+    say cyclotomicmod(30!, 5040, 2**128 + 1)
+
+It returns NaN when C<moebius(d) = -1> and C<gcd(n/d, m) != 1>, for some C<d|n>.
+
+=cut
+
 =head2 dconv
 
     n.dconv(f,g)

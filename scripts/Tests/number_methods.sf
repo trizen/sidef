@@ -306,4 +306,23 @@ do {
     }
 }
 
+do {
+    var m = (2**16 + 1)
+
+    for n in (-1 .. 10), x in (-10 .. 10) {
+        assert_eq(Str(cyclotomic(n, x) % m), Str(cyclotomicmod(n, x, m)))
+    }
+
+    assert_eq(cyclotomicmod(2**127 - 1, 2, 2**127 - 1), 1)
+    assert_eq(cyclotomicmod(2**127 - 1, 2*3*5, 2**127 - 1), 1)
+    assert_eq(cyclotomicmod(2**127 - 1, 2**127 - 1, 2**127 - 1), 1)
+
+    assert_eq(cyclotomicmod(7!, 5040, 2**128 + 1), 235744758223530422383203401596174491694)
+    assert_eq(cyclotomicmod(30!, 5040, 2**128 + 1), 40675970320518606495224484019728682382)
+
+    assert_eq(cyclotomicmod(2**128 - 1, 5040, 2**128 + 1), 258216496104743231120502200247009922076)
+    assert_eq(cyclotomicmod(5040*5704689200685129054721, 2**256 + 1, 2**64 + 1), 1)
+    assert_eq(cyclotomicmod(5040*5704689200685129054721, next_prime(2**64), prev_prime(2**64)), 385968771661381427)
+}
+
 say "** Tests passed!"
