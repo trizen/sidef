@@ -1744,6 +1744,16 @@ Returns the cube of C<x>. Equivalent with C<x**3>.
 
 =cut
 
+=head2 cubic_formula
+
+    cubic_formula(a, b, c, d)
+
+Returns a list of (complex) solutions C<(x_1, x_2, x_3)> to the cubic equation:
+
+    a*x^3 + b*x^2 + c*x + d = 0
+
+=cut
+
 =head2 cyclotomic
 
     cyclotomic(n)

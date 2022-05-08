@@ -26,7 +26,6 @@ package Sidef::Types::Number::Number {
     state $ZERO = Math::GMPz::Rmpz_init_set_ui(0);
     state $ONE  = Math::GMPz::Rmpz_init_set_ui(1);
     state $TWO  = Math::GMPz::Rmpz_init_set_ui(2);
-    state $FOUR = Math::GMPz::Rmpz_init_set_ui(4);
     state $TEN  = Math::GMPz::Rmpz_init_set_ui(10);
 
     my %DIGITS_36;
@@ -10158,30 +10157,32 @@ package Sidef::Types::Number::Number {
     *Bellmod = \&bellmod;
 
     sub quadratic_formula {
-        my ($x, $y, $z) = @_;
+        my ($A, $B, $C) = @_;
 
-        $x //= ZERO;
-        $y //= ZERO;
-        $z //= ZERO;
+        $A //= ZERO;
+        $B //= ZERO;
+        $C //= ZERO;
 
-        _valid(\$y, \$z);
+        _valid(\$B, \$C);
 
-        $x = $$x;
-        $y = $$y;
-        $z = $$z;
+        $A = $$A;
+        $B = $$B;
+        $C = $$C;
+
+        state $FOUR = ${_set_int(4)};
 
         #
         ## (-b ± sqrt(b^2 - 4ac)) / (2a)
         #
 
-        my $u = __mul__($y,              $y);                # b^2
-        my $t = __mul__(__mul__($x, $z), $FOUR);             # 4ac
+        my $u = __mul__($B,              $B);                # b^2
+        my $t = __mul__(__mul__($A, $C), $FOUR);             # 4ac
         my $s = __sqrt__(_any2mpfr_mpc(__sub__($u, $t)));    # sqrt(b^2 - 4ac)
 
-        my $n1 = __sub__($s, $y);                            #   sqrt(b^2 - 4ac) - b
-        my $n2 = __neg__(__add__($s, $y));                   # -(sqrt(b^2 - 4ac) + b)
+        my $n1 = __sub__($s, $B);                            #   sqrt(b^2 - 4ac) - b
+        my $n2 = __neg__(__add__($s, $B));                   # -(sqrt(b^2 - 4ac) + b)
 
-        my $d = __add__($x, $x);                             # 2a
+        my $d = __add__($A, $A);                             # 2a
 
         my $x1 = __div__($n1, $d);                           # solution 1
         my $x2 = __div__($n2, $d);                           # solution 2
@@ -10189,20 +10190,68 @@ package Sidef::Types::Number::Number {
         ((bless \$x1), (bless \$x2));
     }
 
+    sub cubic_formula {
+        my ($A, $B, $C, $D) = @_;
+
+        $A //= ZERO;
+        $B //= ZERO;
+        $C //= ZERO;
+        $D //= ZERO;
+
+        _valid(\$B, \$C, \$D);
+
+        $A = $$A;
+        $B = $$B;
+        $C = $$C;
+        $D = $$D;
+
+        state $THREE   = ${_set_int(3)};
+        state $FOUR    = ${_set_int(4)};
+        state $NINE    = ${_set_int(9)};
+        state $TWSEVEN = ${_set_int(27)};
+
+        my $A3    = __mul__($A, $THREE);
+        my $AC    = __mul__($A, $C);
+        my $BB    = __mul__($B, $B);       # b^2
+        my $D0    = __sub__($BB, __mul__($AC, $THREE));
+        my $Bp3   = __mul__($BB, $B);      # b^3
+        my $ABC9  = __mul__(__mul__($AC,             $B), $NINE);
+        my $AAD27 = __mul__(__mul__(__mul__($A, $A), $D), $TWSEVEN);
+        my $D1    = __add__(__sub__(__add__($Bp3, $Bp3), $ABC9), $AAD27);
+
+        my $W     = __sqrt__(_any2mpfr_mpc(__sub__(__mul__($D1, $D1), __mul__(__pow__($D0, 3), $FOUR))));
+        my $M     = __cbrt__(_any2mpfr_mpc(__div__(__sub__($D1, ((__sgn__($D0) || -1) == 1) ? $W : __neg__($W)), $TWO)));
+
+        my @roots;
+
+        my $R = $ONE;
+        my $z = __div__(__sub__(__sqrt__(_mpz2mpc(-$THREE)), $ONE), $TWO);
+
+        foreach my $k (0 .. 2) {
+            my $t = __mul__($M, $R);
+            my $x = __neg__(__div__(__add__(__add__($B, $t), __div__($D0, $t)), $A3));
+            push @roots, $x;
+            $R = __mul__($R, $z) if ($k < 2);
+        }
+
+        @roots = map { bless \$_ } @roots;
+        return @roots;
+    }
+
     sub iquadratic_formula {
-        my ($x, $y, $z) = @_;
+        my ($A, $B, $C) = @_;
 
-        $x //= ZERO;
-        $y //= ZERO;
-        $z //= ZERO;
+        $A //= ZERO;
+        $B //= ZERO;
+        $C //= ZERO;
 
-        _valid(\$y, \$z);
+        _valid(\$B, \$C);
 
-        $x = _any2mpz($$x) // return (&nan, &nan);
-        $y = _any2mpz($$y) // return (&nan, &nan);
-        $z = _any2mpz($$z) // return (&nan, &nan);
+        $A = _any2mpz($$A) // return (&nan, &nan);
+        $B = _any2mpz($$B) // return (&nan, &nan);
+        $C = _any2mpz($$C) // return (&nan, &nan);
 
-        if (Math::GMPz::Rmpz_sgn($x) == 0) {    # detect division by zero
+        if (Math::GMPz::Rmpz_sgn($A) == 0) {    # detect division by zero
             return (&nan, &nan);
         }
 
@@ -10213,8 +10262,8 @@ package Sidef::Types::Number::Number {
         my $u = Math::GMPz::Rmpz_init();
         my $t = Math::GMPz::Rmpz_init();
 
-        Math::GMPz::Rmpz_mul($t, $y, $y);        # b^2
-        Math::GMPz::Rmpz_mul($u, $x, $z);        # ac
+        Math::GMPz::Rmpz_mul($t, $B, $B);        # b^2
+        Math::GMPz::Rmpz_mul($u, $A, $C);        # ac
         Math::GMPz::Rmpz_mul_2exp($u, $u, 2);    # 4ac
         Math::GMPz::Rmpz_sub($t, $t, $u);        # b^2 - 4ac
 
@@ -10224,12 +10273,12 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_sqrt($t, $t);           # isqrt(b^2 - 4ac)
 
-        Math::GMPz::Rmpz_sub($u, $t, $y);        #   sqrt(b^2 - 4ac) - b
-        Math::GMPz::Rmpz_add($t, $t, $y);        #   sqrt(b^2 - 4ac) + b
+        Math::GMPz::Rmpz_sub($u, $t, $B);        #   sqrt(b^2 - 4ac) - b
+        Math::GMPz::Rmpz_add($t, $t, $B);        #   sqrt(b^2 - 4ac) + b
         Math::GMPz::Rmpz_neg($t, $t);            # -(sqrt(b^2 - 4ac) + b)
 
-        Math::GMPz::Rmpz_div($u, $u, $x);
-        Math::GMPz::Rmpz_div($t, $t, $x);
+        Math::GMPz::Rmpz_div($u, $u, $A);
+        Math::GMPz::Rmpz_div($t, $t, $A);
 
         Math::GMPz::Rmpz_div_2exp($u, $u, 1);
         Math::GMPz::Rmpz_div_2exp($t, $t, 1);
