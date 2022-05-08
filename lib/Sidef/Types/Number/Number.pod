@@ -6410,6 +6410,25 @@ Returns the number of k-smooth numbers <= n, or in the range C<a..b>.
 
 =cut
 
+=head2 smooth_numbers
+
+    smooth_numbers(limit, [p1,p2,...])
+    smooth_numbers(limit, [p1,p2,...], {|n,p| ... })
+
+Returns an array containing all the smooth numbers that factorize over the given array of primes.
+
+    say smooth_numbers(100, [2,3,5])    # 5-smooth numbers <= 100
+
+An optional block can be provided, which is called with two arguments, C<n> and C<p>, where C<p> is the current prime and C<n> is a smooth number that is a multiple of C<p>. If the block returns true, then the number C<n> will be included in the returned array.
+
+    # 5-smooth numbers <= 100 that are squarefree
+    say smooth_numbers(100, [2,3,5], {|n,p| n.valuation(p) < 2 })
+
+    # 5-smooth numbers <= 100 that are cubefree
+    say smooth_numbers(100, [2,3,5], {|n,p| n.valuation(p) < 3 })
+
+=cut
+
 =head2 smooth_part
 
     n.smooth_part(k)

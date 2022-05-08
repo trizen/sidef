@@ -1010,6 +1010,7 @@ scripts/Tests/slurpy_const.sf
 scripts/Tests/slurpy_define.sf
 scripts/Tests/slurpy_static.sf
 scripts/Tests/smart_match_operator.sf
+scripts/Tests/smooth_numbers.sf
 scripts/Tests/smooth_rough.sf
 scripts/Tests/solve_lcg.sf
 scripts/Tests/sort_disjoint_sublist.sf

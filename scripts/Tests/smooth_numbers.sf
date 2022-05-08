@@ -1,0 +1,88 @@
+#!/usr/bin/ruby
+
+# Tests for the generation of smooth numbers.
+
+assert_eq(
+    smooth_numbers(2**64 - 10, [2]),
+    0..63 -> map { 2**_ }
+)
+
+assert_eq(
+    smooth_numbers(2**64 + 10, [2]),
+    0..64 -> map { 2**_ }
+)
+
+assert_eq(
+    smooth_numbers(2**64 - 10, [2,3]),
+    smooth_numbers(2**64 - 10, [2,3], {true}),
+)
+
+assert_eq(
+    smooth_numbers(2**65, [2,3]),
+    smooth_numbers(2**65, [2,3], {true}),
+)
+
+assert_eq(
+    smooth_numbers(2**65, [2, 3], {|n,p| n.valuation(p) < 3 }),
+    [1, 2, 3, 4, 6, 9, 12, 18, 36]
+)
+
+assert_eq(
+    smooth_numbers(2**40, [3,5], {|n,p| valuation(n,p) < 3 }),
+    [1, 3, 5, 9, 15, 25, 45, 75, 225],
+)
+
+assert_eq(
+    smooth_numbers(2**80, [3,5], {|n,p| valuation(n,p) < 3 }),
+    [1, 3, 5, 9, 15, 25, 45, 75, 225],
+)
+
+assert_eq(
+    smooth_numbers(2**64 - 103, [2,3]),
+    Math.smooth_numbers(2,3).while { _ <= (2**64 - 103) }
+)
+
+assert_eq(
+    smooth_numbers(2**65, [2,3]),
+    Math.smooth_numbers(2,3).while { _ <= 2**65 }
+)
+
+assert_eq(
+    smooth_numbers(2**65 - 1, [2,3]),
+    Math.smooth_numbers(2,3).while { _ < 2**65 }
+)
+
+assert_eq(
+    smooth_numbers(999, [2,3,5]),
+    Math.smooth_numbers(2,3,5).while { _ <= 999 }
+)
+
+assert_eq(
+    smooth_numbers(1000, [2,3,5], {|n,p| n.valuation(p) < 4 }),
+    1..1000 -> grep { .is_smooth(5) && .is_powerfree(4) }
+)
+
+assert_eq(
+    smooth_numbers(1000, [2,3,5], {|n,p| n.valuation(p) < 3 }),
+    1..1000 -> grep { .is_smooth(5) && .is_powerfree(3) }
+)
+
+assert_eq(
+    smooth_numbers(2**130, [next_prime(2**64), next_prime(2**65)]),
+    Math.smooth_numbers(next_prime(2**64), next_prime(2**65)).while { _ <= 2**130 }
+)
+
+assert_eq(
+    smooth_numbers(2**130, [next_prime(2**64), next_prime(2**65)], {|n,p| n.valuation(p) < 2 }),
+    Math.smooth_numbers(next_prime(2**64), next_prime(2**65)).while { _ <= 2**130 }.grep {
+        (.valuation(next_prime(2**64)) < 2) &&
+        (.valuation(next_prime(2**65)) < 2)
+    }
+)
+
+assert_eq(
+    smooth_numbers(2**130, [next_prime(2**16), next_prime(2**64), next_prime(2**65)]),
+    Math.smooth_numbers(next_prime(2**16), next_prime(2**64), next_prime(2**65)).while { _ <= 2**130 }
+)
+
+say "** Test passed!"

@@ -10219,8 +10219,8 @@ package Sidef::Types::Number::Number {
         my $AAD27 = __mul__(__mul__(__mul__($A, $A), $D), $TWSEVEN);
         my $D1    = __add__(__sub__(__add__($Bp3, $Bp3), $ABC9), $AAD27);
 
-        my $W     = __sqrt__(_any2mpfr_mpc(__sub__(__mul__($D1, $D1), __mul__(__pow__($D0, 3), $FOUR))));
-        my $M     = __cbrt__(_any2mpfr_mpc(__div__(__sub__($D1, ((__sgn__($D0) || -1) == 1) ? $W : __neg__($W)), $TWO)));
+        my $W = __sqrt__(_any2mpfr_mpc(__sub__(__mul__($D1, $D1), __mul__(__pow__($D0, 3), $FOUR))));
+        my $M = __cbrt__(_any2mpfr_mpc(__div__(__sub__($D1, ((__sgn__($D0) || -1) == 1) ? $W : __neg__($W)), $TWO)));
 
         my @roots;
 
@@ -15275,6 +15275,71 @@ package Sidef::Types::Number::Number {
 
         @list = map { ref($_) ? (bless \$_) : (bless \Math::GMPz::Rmpz_init_set_ui($_)) } @list;
         Sidef::Types::Array::Array->new(\@list);
+    }
+
+    sub smooth_numbers {
+        my ($n, $primes, $block) = @_;
+
+        my @primes = @$primes;
+        @primes || return Sidef::Types::Array::Array->new();
+
+        _valid(\(@primes));
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return Sidef::Types::Array::Array->new();
+
+        @primes = map { Math::GMPz::Rmpz_fits_ulong_p($_) ? Math::GMPz::Rmpz_get_ui($_) : $_ } map { _any2mpz($$_) } @primes;
+
+        # Optimization when n is a native integer
+        if (Math::GMPz::Rmpz_fits_ulong_p($n) and Math::GMPz::Rmpz_get_ui($n) < ULONG_MAX) {
+
+            $n = Math::GMPz::Rmpz_get_ui($n);
+
+            my @h = (1);
+            foreach my $p (@primes) {
+                my $p_obj = _set_int($p);
+                foreach my $k (@h) {
+                    my $t = $k * $p;
+                    if (($t <= $n and $t < ULONG_MAX) and (defined($block) ? $block->(_set_int($t), $p_obj) : 1)) {
+                        push @h, $t;
+                    }
+                }
+            }
+
+            @h = sort { $a <=> $b } @h;
+            @h = map  { bless \Math::GMPz::Rmpz_init_set_ui($_) } @h;
+            return Sidef::Types::Array::Array->new(\@h);
+        }
+
+        my @h = (1);
+
+        foreach my $p (@primes) {
+            my $p_obj = _set_int($p);
+
+            foreach my $k (@h) {
+                my $t = $p * $k;
+
+                if (!ref($t) and !($t < ULONG_MAX)) {
+                    $t = Math::GMPz::Rmpz_init_set_ui($k);
+
+                    ref($p)
+                      ? Math::GMPz::Rmpz_mul($t, $t, $p)
+                      : Math::GMPz::Rmpz_mul_ui($t, $t, $p);
+                }
+
+                if (    (ref($t) ? (Math::GMPz::Rmpz_cmp($t, $n) <= 0) : (Math::GMPz::Rmpz_cmp_ui($n, $t) >= 0))
+                    and (defined($block) ? $block->(_set_int($t), $p_obj) : 1)) {
+                    push @h, $t;
+                }
+            }
+        }
+
+        @h = sort { $a <=> $b } @h;
+        @h = map  { ref($_) ? $_ : Math::GMPz::Rmpz_init_set_ui($_) } @h;
+        @h = map  { bless \$_ } @h;
+
+        return Sidef::Types::Array::Array->new(\@h);
     }
 
     sub n_primes {
