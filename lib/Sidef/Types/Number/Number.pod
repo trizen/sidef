@@ -989,6 +989,18 @@ Aliases: I<bell_number>
 
 =cut
 
+=head2 bellmod
+
+    bellmod(n, m)
+
+Returns the n-th Bell number modulo m.
+
+For large n > 1000, this is faster than:
+
+    bell(n) % m
+
+=cut
+
 =head2 bern
 
     n.bern

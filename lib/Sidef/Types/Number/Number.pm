@@ -10107,6 +10107,56 @@ package Sidef::Types::Number::Number {
     *bell_number = \&bell;
     *Bell        = \&bell;
 
+    sub bellmod {
+        my ($n, $m) = @_;
+
+        # TODO: find a faster method.
+
+        _valid(\$m);
+
+        $n = _any2ui($$n)  // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) || goto &nan;
+
+        # For small n, it's faster to just use bell(n) % m
+        if ($n < 1000) {
+            return $_[0]->bell->mod($_[1]);
+        }
+
+        my @acc;
+
+        my $t    = Math::GMPz::Rmpz_init();
+        my $bell = Math::GMPz::Rmpz_init_set_ui(1);
+
+        my $native_m = 0;
+
+        if (Math::GMPz::Rmpz_fits_ulong_p($m)) {
+            $m        = Math::GMPz::Rmpz_get_ui($m);
+            $native_m = 1;
+        }
+
+        foreach my $k (1 .. $n) {
+
+            Math::GMPz::Rmpz_set($t, $bell);
+
+            foreach my $item (@acc) {
+                Math::GMPz::Rmpz_add($t, $t, $item);
+                $native_m
+                  ? Math::GMPz::Rmpz_mod_ui($t, $t, $m)
+                  : Math::GMPz::Rmpz_mod($t, $t, $m);
+                Math::GMPz::Rmpz_set($item, $t);
+            }
+
+            unshift @acc, Math::GMPz::Rmpz_init_set($bell);
+            $bell = Math::GMPz::Rmpz_init_set($acc[-1]);
+        }
+
+        bless \$bell;
+    }
+
+    *Bellmod = \&bellmod;
+
     sub quadratic_formula {
         my ($x, $y, $z) = @_;
 
