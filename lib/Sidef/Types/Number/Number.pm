@@ -1334,7 +1334,7 @@ package Sidef::Types::Number::Number {
                 substr($im, 0, 1, '');
             }
 
-            $im = '' if $im eq '1';
+            #$im = '' if $im eq '1';
             return ($re eq '0' ? $sign eq '+' ? "${im}i" : "$sign${im}i" : "$re$sign${im}i");
         }
     }

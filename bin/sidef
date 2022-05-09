@@ -465,6 +465,8 @@ EOT
 
     my $tΔ = 0;
 
+    my @values;
+
   MAINLOOP: {
         my $line = '';
 
@@ -535,6 +537,8 @@ EOT
         $vars          = $copy_hash->($sidef->{parser}{vars});
         $ref_vars_refs = $copy_hash->($sidef->{parser}{ref_vars_refs});
 
+        $line =~ s{#([1-9][0-9]*)\b}{($1 <= scalar(@values)) ? $values[$1-1]->{value} : "#$1"}ge;
+
         my $ccode = eval { $sidef->compile_code($line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
 
         if ($@) {
@@ -550,6 +554,7 @@ EOT
                 $sidef->execute_code('');    # warm-up
                 undef $vars;
                 undef $ref_vars_refs;
+                @values = ();
                 redo;
             }
 
@@ -622,7 +627,13 @@ EOT
             );
             $dump = "($dump)" if @results > 1;
 
-            say "=> $dump";
+            push @values,
+              {
+                type  => ((scalar(@results) == 1) ? 'scalar' : 'list'),
+                value => $dump,
+              };
+
+            say "#" . scalar(@values) . " = $dump";
         }
         redo;
     }
@@ -877,6 +888,12 @@ The REPL supports the following special commands:
 
     >> ##
 
+=item * Refer to a previous output value, using the C<#n> syntax:
+
+    >> 3+4
+    #1 = 7
+    >> sqrt(#1)
+
 =item * Save the code from the REPL inside a file:
 
     >> # save filename.sf
@@ -884,6 +901,10 @@ The REPL supports the following special commands:
 =item * Load a Sidef file inside the REPL:
 
     >> # load filename.sf
+
+=item * Reset the REPL:
+
+    >> reset
 
 =item * Close the REPL:
 
