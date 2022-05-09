@@ -51,7 +51,8 @@ package Sidef::Types::Number::Number {
           ULONG_MAX => Math::GMPq::_ulong_max(),
           LONG_MIN  => Math::GMPq::_long_min(),
 
-          HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 },
+          # Check if we have a recent enough version of Math::Prime::Util
+          HAS_PRIME_UTIL => eval { require Math::Prime::Util; defined(&Math::Prime::Util::is_perfect_power); },
     };
 #>>>
 
@@ -14378,7 +14379,7 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (    # XXX: available in MPU > 0.73
                Math::Prime::Util::is_omega_prime($k, Math::GMPz::Rmpz_get_ui($n))
                ? Sidef::Types::Bool::Bool::TRUE
@@ -17961,7 +17962,7 @@ package Sidef::Types::Number::Number {
         }
 
 #<<<
-        if (0 and HAS_PRIME_UTIL) {     # XXX: MPU 0.73 leaks memory
+        if (HAS_PRIME_UTIL) {     # XXX: MPU 0.73 leaks memory
             return Sidef::Types::Array::Array->new([
                 map {
                     ref($_) eq 'Math::GMPz'
@@ -19641,7 +19642,7 @@ package Sidef::Types::Number::Number {
         # TODO: optimization when A and B are close to each other.
         # Idea: if |A-B| < sqrt(B), then just iterate over the range A..B and grep the k-omega primes.
 
-        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
             return Math::Prime::Util::omega_primes(    # XXX: available in MPU > 0.73
                                                     $k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to)
                                                   );
@@ -20352,7 +20353,7 @@ package Sidef::Types::Number::Number {
         my @squarefree;
 
 #<<<
-        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
             Math::Prime::Util::forsquarefree(sub {   # XXX: leaks memory in MPU 0.73
                 push @squarefree, $_;
             }, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
