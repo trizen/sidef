@@ -353,6 +353,11 @@ package Sidef::Types::Number::Polynomial {
                 return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::nan()), __PACKAGE__->new());
             }
 
+            # Stop when the degree is < 0
+            if ($key_x < $key_y) {
+                last;
+            }
+
             my $t = __PACKAGE__->new($key_x - $key_y, $q);
 
             $quot = $quot->add($t);

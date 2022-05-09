@@ -5,6 +5,8 @@
 do {
     var a = Mod(13, 19)
 
+    assert_eq(23 % Mod(9,97), 23%9)
+
     assert_eq(a, Mod(13, 19))
     a += 15    # Mod(9, 19)
     assert_eq(a, Mod(9, 19))

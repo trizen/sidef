@@ -269,4 +269,8 @@ do {
     assert_eq([lucasUVmod(P, Q, n, m)], [::lucasUVmod(P, Q, n, m)])
 }
 
+do {
+    assert_eq(43 % Gauss(13, 24), Gauss(43,0) % Gauss(13, 24))
+}
+
 say "** Test passed!"

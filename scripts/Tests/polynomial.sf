@@ -347,4 +347,14 @@ do {
     )
 }
 
+do {
+    assert_eq([divmod(Poly([32]), Poly([99, 42]))], [0, 32])
+    assert_eq([divmod(Poly([32, 19]), Poly([99, 42]))], [32/99, 179/33])
+    assert_eq([divmod(Poly([32, 19]), Poly([99, 42, 127]))], [0, Poly([32, 19])])
+    assert_eq(Poly([32, 19]) % Poly([99, 42, 127]), Poly([32, 19]))
+    assert_eq(Poly([32, 19]) % Poly([99, 42]), 179/33)
+    assert_eq(32 % Poly([99, 42]), 32)
+    assert_eq(Poly([32]) % Poly([99, 42]), 32)
+}
+
 say "** Test passed!"

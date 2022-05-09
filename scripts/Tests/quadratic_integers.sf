@@ -491,4 +491,8 @@ do {
     assert_eq(a.to_n <=> b.to_n, -1)
 }
 
+do {
+    assert_eq(43 % Quadratic(97, 120, 19), Quadratic(43, 0, 19) % Quadratic(97, 120, 19))
+}
+
 say "** Test passed!"

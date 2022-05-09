@@ -114,4 +114,7 @@ assert_eq(Fraction(160/7,9).floor, floor((160/7)/9))
 assert_eq(Fraction(160/7,9).ceil, ceil((160/7)/9))
 assert_eq(Fraction(160/7,9).round, round((160/7)/9))
 
+assert_eq(43 % Fraction(29, 13), Fraction(43, 1) % Fraction(29, 13))
+assert_eq(19 % Fraction(7,15), 19 % 7/15)
+
 say "** Test passed!"

@@ -7641,6 +7641,23 @@ package Sidef::Types::Number::Number {
 
     sub mod {
         my ($x, $y) = @_;
+
+        my $ref = ref($y);
+
+        if (   $ref eq 'Sidef::Types::Number::Gauss'
+            or $ref eq 'Sidef::Types::Number::Quaternion'
+            or $ref eq 'Sidef::Types::Number::Fraction') {
+            return $ref->new($x)->mod($y);
+        }
+
+        if ($ref eq 'Sidef::Types::Number::Quadratic') {
+            return $ref->new($x, ZERO, $y->{w})->mod($y);
+        }
+
+        if ($ref eq 'Sidef::Types::Number::Polynomial') {
+            return $ref->new(0 => $x)->mod($y);
+        }
+
         _valid(\$y);
         bless \__mod__($$x, $$y);
     }
