@@ -277,9 +277,17 @@ do {
 
     for a,b,c in (tests) {
         var roots = [quadratic_formula(a,b,c)]
+        var rootsQ = [quadratic_formulaQ(a,b,c)]
+
         assert_eq(roots.len, 2)
+        assert_eq(rootsQ.len, 2)
+
         assert(roots.all {|x|
             a*x**2 + b*x + c -> round(-30) =~= 0
+        })
+
+        assert(rootsQ.all {|x|
+            assert_eq(a*x**2 + b*x + c, 0)
         })
     }
 }

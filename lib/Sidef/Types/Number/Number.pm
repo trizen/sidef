@@ -10190,6 +10190,36 @@ package Sidef::Types::Number::Number {
         ((bless \$x1), (bless \$x2));
     }
 
+    sub quadratic_formulaQ {
+        my ($A, $B, $C) = @_;
+
+        $A //= ZERO;
+        $B //= ZERO;
+        $C //= ZERO;
+
+        _valid(\$B, \$C);
+
+        state $FOUR = _set_int(4);
+
+        #
+        ## (-b ± sqrt(b^2 - 4ac)) / (2a)
+        #
+
+        my $u = $B->mul($B);                                                     # b^2
+        my $t = $A->mul($C)->mul($FOUR);                                         # 4ac
+        my $s = Sidef::Types::Number::Quadratic->new(ZERO, ONE, $u->sub($t));    # sqrt(b^2 - 4ac)
+
+        my $n1 = $s->sub($B);                                                    #   sqrt(b^2 - 4ac) - b
+        my $n2 = $s->add($B)->neg;                                               # -(sqrt(b^2 - 4ac) + b)
+
+        my $d = $A->add($A);                                                     # 2a
+
+        my $x1 = $n1->div($d);                                                   # solution 1
+        my $x2 = $n2->div($d);                                                   # solution 2
+
+        ($x1, $x2);
+    }
+
     sub cubic_formula {
         my ($A, $B, $C, $D) = @_;
 

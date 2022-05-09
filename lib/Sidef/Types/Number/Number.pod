@@ -5997,6 +5997,20 @@ Example:
 
 =cut
 
+=head2 quadratic_formulaQ
+
+    quadratic_formulaQ(a,b,c)
+
+Returns a list of Quadratic objects, which are solutions C<(x_1, x_2)> to the quadratic equation: C<a*x^2 + b*x + c = 0>.
+
+    say [quadratic_formulaQ(3,4,5)]
+
+Outputs:
+
+    [Quadratic(-2/3, 1/6, -44), Quadratic(-2/3, -1/6, -44)]
+
+=cut
+
 =head2 rad
 
     rad(n)
