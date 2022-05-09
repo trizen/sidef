@@ -11214,10 +11214,6 @@ package Sidef::Types::Number::Number {
             return $r;
         }
 
-        # TODO: fix the output for (when we do 0^(-1)):
-        #   cyclotomic(10, -1)      # should be 5
-        #   cyclotomic(26, -1)      # should be 13
-
         _valid(\$x);
         $x = $$x;
 
@@ -11228,12 +11224,22 @@ package Sidef::Types::Number::Number {
 
         my $x_is_mpz = ref($x) eq 'Math::GMPz';
 
-        my @factor_exp = _factor_exp($n);
-
-        # Special case for x = 1: cyclotomic(n, 1) is the greatest common divisor of the prime factors of n.
+        # Special case for x = 1: cyclotomic(n, 1) is A020500.
         if ($x_is_mpz ? (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0) : __eq__($x, 1)) {
-            return _set_int(Math::Prime::Util::GMP::gcd(map { $_->[0] } @factor_exp));
+            my $k = Math::Prime::Util::GMP::is_prime_power($n) || return ONE;
+            my $p = Math::Prime::Util::GMP::rootint($n, $k);
+            return _set_int($p);
         }
+
+        # Special case for x = -1: cyclotomic(n, -1) is A020513.
+        if ($x_is_mpz ? (Math::GMPz::Rmpz_cmp_si($x, -1) == 0) : __eq__($x, -1)) {
+            ($n % 2 == 0) || return ONE;
+            my $k = Math::Prime::Util::GMP::is_prime_power($n >> 1) || return ONE;
+            my $p = Math::Prime::Util::GMP::rootint($n >> 1, $k);
+            return _set_int($p);
+        }
+
+        my @factor_exp = _factor_exp($n);
 
         # Generate the squarefree divisors of n, along
         # with the number of prime factors of each divisor
@@ -11299,12 +11305,23 @@ package Sidef::Types::Number::Number {
         return bless(\__dec__($x))->mod($M) if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0);
         return bless(\__inc__($x))->mod($M) if (Math::GMPz::Rmpz_cmp_ui($n, 2) == 0);
 
-        my @factor_exp = _factor_exp($n);
-
-        # Special case for x = 1: cyclotomic(n, 1) is the greatest common divisor of the prime factors of n.
+        # Special case for x = 1: cyclotomic(n, 1) is A020500.
         if (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0) {
-            return _set_int(Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::gcd(map { $_->[0] } @factor_exp), $m));
+            my $k = Math::Prime::Util::GMP::is_prime_power($n) || return ONE;
+            my $p = Math::Prime::Util::GMP::rootint($n, $k);
+            return _set_int(Math::Prime::Util::GMP::modint($p, $m));
         }
+
+        # Special case for x = -1: cyclotomic(n, -1) is A020513.
+        if (Math::GMPz::Rmpz_cmp_si($x, -1) == 0) {
+            Math::GMPz::Rmpz_even_p($n) || return ONE;
+            my $o = $n >> 1;
+            my $k = Math::Prime::Util::GMP::is_prime_power($o) || return ONE;
+            my $p = Math::Prime::Util::GMP::rootint($o, $k);
+            return _set_int(Math::Prime::Util::GMP::modint($p, $m));
+        }
+
+        my @factor_exp = _factor_exp($n);
 
         # Generate the squarefree divisors of n, along
         # with the number of prime factors of each divisor
