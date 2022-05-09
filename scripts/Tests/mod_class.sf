@@ -6,6 +6,7 @@ do {
     var a = Mod(13, 19)
 
     assert_eq(23 % Mod(9,97), 23%9)
+    assert_eq(cyclotomic(Mod(-23, 863*503), 43), cyclotomicmod(43, -23, 863*503))
 
     assert_eq(a, Mod(13, 19))
     a += 15    # Mod(9, 19)

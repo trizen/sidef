@@ -9552,9 +9552,7 @@ package Sidef::Types::Number::Number {
     sub chebyshevt {
         my ($n, $x) = @_;
 
-        if (ref($n) ne __PACKAGE__) {
-            goto &nan;
-        }
+        _valid(\$n);
 
         $n = _any2si($$n) // goto &nan;
         $n = -$n if $n < 0;
@@ -9594,9 +9592,7 @@ package Sidef::Types::Number::Number {
     sub chebyshevu {
         my ($n, $x) = @_;
 
-        if (ref($n) ne __PACKAGE__) {
-            goto &nan;
-        }
+        _valid(\$n);
 
         $n = _any2si($$n) // goto &nan;
         $n == 0 and return ONE;
@@ -9647,11 +9643,7 @@ package Sidef::Types::Number::Number {
     sub chebyshevTmod {
         my ($n, $x, $m) = @_;
 
-        _valid(\$x, \$m);
-
-        if (ref($n) ne __PACKAGE__ or ref($m) ne __PACKAGE__) {
-            goto &nan;
-        }
+        _valid(\$n, \$x, \$m);
 
         $n = _any2mpz($$n) // goto &nan;
         $x = $$x;
@@ -9682,10 +9674,6 @@ package Sidef::Types::Number::Number {
         my ($n, $x, $m) = @_;
 
         _valid(\$x, \$m);
-
-        if (ref($n) ne __PACKAGE__ or ref($m) ne __PACKAGE__) {
-            goto &nan;
-        }
 
         $n = _any2mpz($$n) // goto &nan;
         $x = $$x;
@@ -11219,6 +11207,8 @@ package Sidef::Types::Number::Number {
     sub cyclotomic_polynomial {
         my ($n, $x) = @_;
 
+        _valid(\$n);
+
         $n = _any2ui($$n) // goto &nan;
 
         if (!defined($x)) {
@@ -11325,7 +11315,7 @@ package Sidef::Types::Number::Number {
     sub cyclotomicmod {
         my ($n, $x, $m) = @_;
 
-        _valid(\$x, \$m);
+        _valid(\$n, \$x, \$m);
 
         my $M = $m;
 

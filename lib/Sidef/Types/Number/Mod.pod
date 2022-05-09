@@ -255,6 +255,14 @@ Returns the
 
 =cut
 
+=head2 cyclotomic
+
+    Mod.cyclotomic()
+
+Returns the
+
+=cut
+
 =head2 eval
 
     Mod.eval()

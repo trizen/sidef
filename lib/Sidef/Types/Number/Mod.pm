@@ -245,6 +245,11 @@ package Sidef::Types::Number::Mod {
     *chebyshevT = \&chebyshevt;
     *ChebyshevT = \&chebyshevt;
 
+    sub cyclotomic {
+        my ($x, $n) = @_;
+        __PACKAGE__->new(Sidef::Types::Number::Number::cyclotomicmod($n, $x->{n}, $x->{m}), $x->{m});
+    }
+
     sub shift_left {    # x * 2^n
         my ($x, $n) = @_;
         $x->mul(Sidef::Types::Number::Number::TWO->powmod($n, $x->{m}));
