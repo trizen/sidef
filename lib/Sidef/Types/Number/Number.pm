@@ -14324,6 +14324,14 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return (          # XXX: available in MPU > 0.73
+               Math::Prime::Util::is_almost_prime($k, Math::GMPz::Rmpz_get_ui($n))
+               ? Sidef::Types::Bool::Bool::TRUE
+               : Sidef::Types::Bool::Bool::FALSE
+            );
+        }
+
         $size = 1 + CORE::int($size / 3.322);
 
         if ($size > 30) {
