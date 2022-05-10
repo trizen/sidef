@@ -36,6 +36,10 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 * Tutorial: https://notabug.org/trizen/sidef/wiki
 * RosettaCode: https://rosettacode.org/wiki/Sidef
 
+### Q&A
+
+Need help with Sidef? Feel free to ask questions here: https://github.com/trizen/sidef/discussions/categories/q-a
+
 ## EXAMPLES
 
 ### The [Y combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed-point_combinators_in_lambda_calculus):
