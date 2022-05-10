@@ -19729,7 +19729,9 @@ package Sidef::Types::Number::Number {
         # TODO: optimization when A and B are close to each other.
         # Idea: if |A-B| < sqrt(B), then just iterate over the range A..B and grep the k-omega primes.
 
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+
+            # XXX: Out of memory for: omega_primes(12, 1e13)
             return Math::Prime::Util::omega_primes(    # XXX: available in MPU > 0.73
                                                     $k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to)
                                                   );
