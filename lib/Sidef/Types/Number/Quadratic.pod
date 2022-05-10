@@ -426,6 +426,14 @@ Returns the
 
 =cut
 
+=head2 stringify
+
+    Quadratic.stringify()
+
+Returns the
+
+=cut
+
 =head2 to_c
 
     Quadratic.to_c()

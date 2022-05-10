@@ -343,6 +343,14 @@ Returns the
 
 =cut
 
+=head2 stringify
+
+    Fraction.stringify()
+
+Returns the
+
+=cut
+
 =head2 to_n
 
     Fraction.to_n()

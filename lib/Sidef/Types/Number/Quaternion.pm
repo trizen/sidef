@@ -104,6 +104,11 @@ package Sidef::Types::Number::Quaternion {
 #>>>
     }
 
+    sub stringify {
+        my ($x) = @_;
+        $x->to_gauss->stringify;
+    }
+
     sub to_n {
         my ($x) = @_;
         $x->to_gauss->to_n;

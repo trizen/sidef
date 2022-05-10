@@ -83,6 +83,12 @@ package Sidef::Types::Number::Quadratic {
         'Quadratic(' . join(', ', $x->{a}->dump, $x->{b}->dump, $x->{w}->dump) . ')';
     }
 
+    sub stringify {
+        my ($x) = @_;
+        Sidef::Types::String::String->new(
+                       join(' + ', $x->{a}->stringify, join('', '(', $x->{b}->stringify, ')*sqrt(', $x->{w}->stringify, ')')));
+    }
+
     sub to_s {
         my ($x) = @_;
         Sidef::Types::String::String->new($x->__stringify__);
@@ -95,7 +101,13 @@ package Sidef::Types::Number::Quadratic {
 
     sub to_n {
         my ($x) = @_;
-        $x->{a}->add($x->{b}->mul($x->{w}->sqrt));
+        my $r = $x->{a}->add($x->{b}->mul($x->{w}->sqrt));
+
+        if (ref($r) ne 'Sidef::Types::Number::Number') {
+            return $r->to_n;
+        }
+
+        return $r;
     }
 
     *to_c = \&to_n;

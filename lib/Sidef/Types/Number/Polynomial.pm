@@ -70,7 +70,7 @@ package Sidef::Types::Number::Polynomial {
         return Sidef::Types::Number::Number::ZERO if ($d == 0);
 
         if ($d == 1 and exists $x->{0}) {
-            return $x->{0};
+            return $x->{0}->to_n;
         }
 
         return Sidef::Types::Number::Number::nan();

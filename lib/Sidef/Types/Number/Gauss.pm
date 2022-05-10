@@ -101,6 +101,11 @@ package Sidef::Types::Number::Gauss {
         Sidef::Types::String::String->new($x->__stringify__);
     }
 
+    sub stringify {
+        my ($x) = @_;
+        Sidef::Types::String::String->new(join(' + ', $x->{a}->stringify, join('', '(', $x->{b}->stringify, ')*1i')));
+    }
+
     sub abs {
         my ($x) = @_;
         $x->{a}->sqr->add($x->{b}->sqr)->sqrt;

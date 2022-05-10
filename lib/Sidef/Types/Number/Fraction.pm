@@ -29,6 +29,12 @@ package Sidef::Types::Number::Fraction {
 
     *call = \&new;
 
+    sub stringify {
+        my ($x) = @_;
+        Sidef::Types::String::String->new(
+                                    join('/', join('', '(', $x->{a}->stringify, ')'), join('', '(', $x->{b}->stringify, ')')));
+    }
+
     sub is_nan {
         my ($x) = @_;
         if ($x->{a}->is_zero and $x->{b}->is_zero) {
@@ -54,8 +60,8 @@ package Sidef::Types::Number::Fraction {
         my ($x) = @_;
         my $r = $x->{a}->to_n->div($x->{b}->to_n);
 
-        if (ref($r) eq __PACKAGE__) {    # probably should die here?
-            return Sidef::Types::Number::Number->new($x->{a})->div(Sidef::Types::Number::Number->new($x->{b}));
+        if (ref($r) ne 'Sidef::Types::Number::Number') {
+            return $r->to_n;
         }
 
         return $r;

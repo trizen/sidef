@@ -493,6 +493,7 @@ do {
 
 do {
     assert_eq(43 % Quadratic(97, 120, 19), Quadratic(43, 0, 19) % Quadratic(97, 120, 19))
+    assert_eq(Str(Quadratic(Quadratic(3,5),4).to_n), "12")
 }
 
 say "** Test passed!"

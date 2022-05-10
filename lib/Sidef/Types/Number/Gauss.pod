@@ -481,6 +481,14 @@ Returns the
 
 =cut
 
+=head2 stringify
+
+    Gauss.stringify()
+
+Returns the
+
+=cut
+
 =head2 to_c
 
     Gauss.to_c()

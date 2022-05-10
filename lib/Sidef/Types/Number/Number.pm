@@ -6680,6 +6680,8 @@ package Sidef::Types::Number::Number {
                                          );
     }
 
+    *stringify = \&dump;
+
     sub to_str {
         my ($x) = @_;
         Sidef::Types::String::String->new(__stringify__($$x));

@@ -440,6 +440,14 @@ Returns the
 
 =cut
 
+=head2 stringify
+
+    Quaternion.stringify()
+
+Returns the
+
+=cut
+
 =head2 to_c
 
     Quaternion.to_c()
