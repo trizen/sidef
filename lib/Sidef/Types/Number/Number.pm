@@ -16312,6 +16312,9 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
         $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // 1e4 } : 1e4;
 
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Array::Array->new();
+
         my $p = Math::GMPz::Rmpz_init();    # p = floor(sqrt(n))
         my $q = Math::GMPz::Rmpz_init();    # q = p^2 - n
 
@@ -16642,6 +16645,9 @@ package Sidef::Types::Number::Number {
 
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
 
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Array::Array->new;
+
         $base = defined($base) ? do { _valid(\$base); _any2ui($$base) // 2 }   : 2;
         $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) // 1e4 } : 1e4;
 
@@ -16686,6 +16692,70 @@ package Sidef::Types::Number::Number {
 
                 my @f = map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } ($x, $y);
                 return Sidef::Types::Array::Array->new(\@f);
+            }
+        }
+
+        Sidef::Types::Array::Array->new([bless(\$n)]);
+    }
+
+    sub mbe_factor {
+        my ($n, $reps) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) // 10 } : 10;
+
+        state $state = Math::GMPz::zgmp_randinit_mt_nobless();
+        Math::GMPz::zgmp_randseed_ui($state, CORE::int(CORE::rand(1e9)));
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $g = Math::GMPz::Rmpz_init_nobless();
+
+        state $A = Math::GMPz::Rmpz_init_nobless();
+        state $B = Math::GMPz::Rmpz_init_nobless();
+        state $C = Math::GMPz::Rmpz_init_nobless();
+
+        foreach my $k (1 .. $reps) {
+
+            # Deterministic version
+            # Math::GMPz::Rmpz_div_ui($t, $n, $k+1);
+
+            # Randomized version
+            Math::GMPz::Rmpz_urandomm($t, $state, $n, 1);
+
+            Math::GMPz::Rmpz_set($A, $t);
+            Math::GMPz::Rmpz_set($B, $t);
+            Math::GMPz::Rmpz_set_ui($C, 1);
+
+            foreach my $i (0 .. Math::GMPz::Rmpz_sizeinbase($B, 2) - 1) {
+
+                if (Math::GMPz::Rmpz_tstbit($B, $i)) {
+
+                    Math::GMPz::Rmpz_powm($C, $A, $C, $n);
+                    Math::GMPz::Rmpz_sub_ui($g, $C, 1);
+                    Math::GMPz::Rmpz_gcd($g, $g, $n);
+
+                    if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+
+                        if (Math::GMPz::Rmpz_cmp($g, $n) == 0) {
+                            return Sidef::Types::Array::Array->new([bless \$n]);
+                        }
+
+                        my $x = Math::GMPz::Rmpz_init();
+                        my $y = Math::GMPz::Rmpz_init();
+
+                        Math::GMPz::Rmpz_set($y, $g);
+                        Math::GMPz::Rmpz_divexact($x, $n, $g);
+
+                        my @f = map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } ($x, $y);
+                        return Sidef::Types::Array::Array->new(\@f);
+                    }
+                }
+
+                Math::GMPz::Rmpz_powm($A, $A, $A, $n);
             }
         }
 
@@ -17337,8 +17407,8 @@ package Sidef::Types::Number::Number {
 
         _valid(\$n);
 
-        my $n = _big2pistr($$n) // return Sidef::Types::Array::Array->new();
-        my $k = _any2ui($$k) || return Sidef::Types::Array::Array->new();
+        $n = _big2pistr($$n) // return Sidef::Types::Array::Array->new();
+        $k = _any2ui($$k) || return Sidef::Types::Array::Array->new();
 
         if ($k == 1) {
             return Sidef::Types::Array::Array->new([ONE]);
@@ -17544,8 +17614,8 @@ package Sidef::Types::Number::Number {
 
         _valid(\$n);
 
-        my $n = _big2pistr($$n) // return Sidef::Types::Array::Array->new();
-        my $k = _any2ui($$k) || return Sidef::Types::Array::Array->new();
+        $n = _big2pistr($$n) // return Sidef::Types::Array::Array->new();
+        $k = _any2ui($$k) || return Sidef::Types::Array::Array->new();
 
         if ($k == 1) {
             return Sidef::Types::Array::Array->new([ONE]);
@@ -18724,7 +18794,7 @@ package Sidef::Types::Number::Number {
         # Multiplicative with:
         #   a(p^e) = 2^hammingweight(e)
 
-        my $n = &_big2uistr // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
 
         my @factor_exp = _factor_exp($n);
         @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;
@@ -18797,7 +18867,7 @@ package Sidef::Types::Number::Number {
         # Multiplicative with:
         #   a(p^e) = tau(e)
 
-        my $n = &_big2uistr // goto &nan;
+        $n = _big2uistr($n) // goto &nan;
 
         my @factor_exp = _factor_exp($n);
         @factor_exp and $factor_exp[0][0] eq '0' and return ZERO;

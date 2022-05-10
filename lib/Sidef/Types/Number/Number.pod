@@ -1626,7 +1626,7 @@ Returns an array with the continued fraction convergents for a given real number
 
 =head2 cop_factor
 
-    cop_factor(n, reps=n.ilog2)
+    cop_factor(n, tries=n.ilog2)
 
 Congruence of Powers (CoP) factorization method, trying to find algebraic factors of C<n>.
 
@@ -2046,7 +2046,7 @@ When three arguments are given, it does integer modular division: C<(a/b) % m>.
 
 =head2 dop_factor
 
-    dop_factor(n, reps=n.ilog2)
+    dop_factor(n, tries=n.ilog2)
 
 Difference of Powers (DoP) factorization method, trying to find algebraic factors of C<n>.
 
@@ -2230,9 +2230,9 @@ Aliases: I<squarefree_almost_primes_each>
 
 =head2 ecm_factor
 
-    n.ecm_factor()
-    n.ecm_factor(B)
-    n.ecm_factor(B,reps)
+    n.ecm_factor
+    n.ecm_factor(B1)
+    n.ecm_factor(B1, curves)
 
 Hendrik Lenstra's elliptic curve factorization method (ECM).
 
@@ -2649,7 +2649,7 @@ Round C<x> towards -Infinity.
 
 Tries to find a factor of C<n>, using a new factorization method, inspired by Fermat's Little Theorem (FLT).
 
-The method is particularly effective for numbers that have factors closed to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
+This method is particularly effective for numbers that have factors closed to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
 
 Example (try with base 3 and give up after 10^6 iterations):
 
@@ -2804,7 +2804,8 @@ Aliases: I<hermite_polynomialHe>
 
 =head2 holf_factor
 
-    n.holf_factor(reps)
+    n.holf_factor
+    n.holf_factor(tries)
 
 Hart's OLF method (variant of Fermat's method).
 
@@ -2814,7 +2815,7 @@ The product of the factors, will give back C<n>. However, some factors may be co
 
 =head2 hyperfactorial
 
-    Number.hyperfactorial()
+    hyperfactorial(n)
 
 Hyperfactorial of C<n>, defined as C<Prod_{k=1..n} k^k>.
 
@@ -4628,6 +4629,24 @@ Returns the maximum value from a list of numbers.
 
 =cut
 
+=head2 mbe_factor
+
+    n.mbe_factor(tries=10)
+
+Tries to find a factor of C<n>, by using the "Modular Binary Exponentiation" factorization method (randomized version).
+
+This method is particularly effective for numbers that contain a prime factor C<p> such that C<p-1> is sufficiently smooth.
+
+The running time of the method, is: C<O(tries * log(n)^2)>.
+
+Example:
+
+    say mbe_factor(2**64 + 1, 1)   #=> [274177, 67280421310721]
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
+=cut
+
 =head2 mertens
 
     mertens(n)
@@ -5155,7 +5174,8 @@ Returns an array with the real and imaginary parts of C<x>.
 
 =head2 pbrent_factor
 
-    n.pbrent_factor(reps)
+    n.pbrent_factor
+    n.pbrent_factor(tries)
 
 Pollard-Brent rho factorization method.
 
@@ -5209,6 +5229,7 @@ Aliases: I<almost_primepi>, I<almost_prime_count>
 
 =head2 pm1_factor
 
+    n.pm1_factor
     n.pm1_factor(B)
 
 Pollard p-1 factorization method.
@@ -5608,7 +5629,8 @@ Returns the previous prime smaller than n.
 
 =head2 prho_factor
 
-    n.prho_factor(reps)
+    n.prho_factor
+    n.prho_factor(tries)
 
 Pollard rho factorization method.
 
@@ -6822,7 +6844,8 @@ Returns the number of unitary square divisors of C<n>.
 
 =head2 squfof_factor
 
-    n.squfof_factor(reps)
+    n.squfof_factor
+    n.squfof_factor(tries)
 
 Shanks' SQUFOF method.
 
