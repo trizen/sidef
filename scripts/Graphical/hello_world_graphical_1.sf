@@ -4,16 +4,16 @@
 ## http://rosettacode.org/wiki/Hello_world/Graphical
 #
 
-require('Gtk2') -> init;
+Perl.eval("use Gtk3 '-init'")
  
-var gtk2   = 'Gtk2'.to_caller;
-var window = 'Gtk2::Window'.to_caller.new;
-var label  = 'Gtk2::Label'.to_caller.new('Goodbye, World!');
+var gtk3   = 'Gtk3'.to_caller;
+var window = 'Gtk3::Window'.to_caller.new;
+var label  = 'Gtk3::Label'.to_caller.new('Goodbye, World!');
  
 window.set_title('Goodbye, World!');
-window.signal_connect(destroy => func(_) { gtk2.main_quit });
+window.signal_connect(destroy => func(_) { gtk3.main_quit });
  
 window.add(label);
 window.show_all;
  
-gtk2.main;
+gtk3.main;

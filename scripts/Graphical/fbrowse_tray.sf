@@ -1,19 +1,19 @@
 #!/usr/bin/ruby
 
 #
-## A file-browser through a Gtk2 tray status icon.
+## A file-browser through a Gtk3 tray status icon.
 #
 
 # Translation of:
 #   https://github.com/trizen/fbrowse-tray
 
-require('Gtk2') -> init
+Perl.eval('use Gtk3 "-init"')
 require('File::MimeInfo')
 
 const pkgname = 'fbrowse-tray'
 const version = 0.07
 
-const ICON_THEME = %O<Gtk2::IconTheme>.get_default
+const ICON_THEME = %S<Gtk3::IconTheme>.get_default
 
 var (
     FILE_MANAGER = (ENV{:FILEMANAGER} || 'pcmanfm'),
@@ -39,14 +39,14 @@ func open_file(file) {
 func add_header(menu, dir) {
 
     # Append 'Open directory'
-    var open_dir = %O<Gtk2::ImageMenuItem>.new("Open directory")
-    open_dir.set_image(%O<Gtk2::Image>.new_from_icon_name('folder-open', ICON_SIZE));
+    var open_dir = %O<Gtk3::ImageMenuItem>.new("Open directory")
+    open_dir.set_image(%O<Gtk3::Image>.new_from_icon_name('folder-open', ICON_SIZE));
     open_dir.signal_connect(activate => { open_file(dir) })
     menu.append(open_dir)
 
     # Add 'Open in terminal'
-    var open_term = %O<Gtk2::ImageMenuItem>.new("Open in terminal")
-    open_term.set_image(%O<Gtk2::Image>.new_from_icon_name('utilities-terminal', ICON_SIZE))
+    var open_term = %O<Gtk3::ImageMenuItem>.new("Open in terminal")
+    open_term.set_image(%O<Gtk3::Image>.new_from_icon_name('utilities-terminal', ICON_SIZE))
     open_term.signal_connect('activate' => { Sys.run("cd #{dir.escape}; #{TERMINAL} &") })
     menu.append(open_term)
 
@@ -57,13 +57,13 @@ func add_header(menu, dir) {
 func create_submenu(item, dir) {
 
     # Create a new menu
-    var menu = %O<Gtk2::Menu>.new
+    var menu = %O<Gtk3::Menu>.new
 
     # Add 'Browse here...'
     add_header(menu, dir)
 
     # Append an horizontal separator
-    menu.append(%O<Gtk2::SeparatorMenuItem>.new)
+    menu.append(%O<Gtk3::SeparatorMenuItem>.new)
 
     # Add the dir content in this new menu
     add_content(menu, dir)
@@ -83,13 +83,13 @@ func create_submenu(item, dir) {
 func append_dir(submenu, dirname, dir) {
 
     # Create the dir submenu
-    var dirmenu = %O<Gtk2::Menu>.new
+    var dirmenu = %O<Gtk3::Menu>.new
 
     # Create a new menu item
-    var item = %O<Gtk2::ImageMenuItem>.new(dirname)
+    var item = %O<Gtk3::ImageMenuItem>.new(dirname)
 
     # Set icon
-    item.set_image(%O<Gtk2::Image>.new_from_icon_name('inode-directory', ICON_SIZE))
+    item.set_image(%O<Gtk3::Image>.new_from_icon_name('folder', ICON_SIZE))
 
     # Set a signal
     item.signal_connect(activate => { create_submenu(item, dir); dirmenu.destroy })
@@ -170,13 +170,13 @@ func file_actions(obj, event, file) {
     }
 
     # Right-click menu
-    var menu = %O<Gtk2::Menu>.new
+    var menu = %O<Gtk3::Menu>.new
 
     # Open
-    var open = %O<Gtk2::ImageMenuItem>.new('Open')
+    var open = %O<Gtk3::ImageMenuItem>.new('Open')
 
     # Set icon
-    open.set_image(%O<Gtk2::Image>.new_from_icon_name('gtk-open', ICON_SIZE))
+    open.set_image(%O<Gtk3::Image>.new_from_icon_name('gtk-open', ICON_SIZE))
 
     # Set a signal (activates on click)
     open.signal_connect(activate => { open_file(file) })
@@ -185,10 +185,10 @@ func file_actions(obj, event, file) {
     menu.append(open)
 
     # Delete
-    var delete = %O<Gtk2::ImageMenuItem>.new('Delete')
+    var delete = %O<Gtk3::ImageMenuItem>.new('Delete')
 
     # Set icon
-    delete.set_image(%O<Gtk2::Image>.new_from_icon_name('gtk-delete', ICON_SIZE))
+    delete.set_image(%O<Gtk3::Image>.new_from_icon_name('gtk-delete', ICON_SIZE))
 
     # Set a signal (activates on click)
     delete.signal_connect(activate => { File.delete(file) && obj.destroy })
@@ -209,10 +209,10 @@ func file_actions(obj, event, file) {
 func append_file(submenu, filename, file) {
 
     # Create a new menu item
-    var item = %O<Gtk2::ImageMenuItem>.new(filename)
+    var item = %O<Gtk3::ImageMenuItem>.new(filename)
 
     # Set icon
-    item.set_image(%O<Gtk2::Image>.new_from_icon_name(file_icon(filename, file), ICON_SIZE))
+    item.set_image(%O<Gtk3::Image>.new_from_icon_name(file_icon(filename, file), ICON_SIZE))
 
     # Set tooltip
     TOOLTIP_PATH && item.set_property('tooltip_text', file)
@@ -295,7 +295,7 @@ add_content = func(submenu, dir) {
 # Create the main menu and populate it with the content of $dir
 func create_main_menu(icon, dir, event) {
 
-    var menu = %O<Gtk2::Menu>.new
+    var menu = %O<Gtk3::Menu>.new
 
     if (event.button == 1) {
         add_content(menu, dir)
@@ -303,20 +303,20 @@ func create_main_menu(icon, dir, event) {
     elsif (event.button == 3) {
 
         # Create a new menu item
-        var exit = %O<Gtk2::ImageMenuItem>.new('Quit')
+        var exit = %O<Gtk3::ImageMenuItem>.new('Quit')
 
         # Set icon
-        exit.set_image(%O<Gtk2::Image>.new_from_icon_name('exit', ICON_SIZE))
+        exit.set_image(%O<Gtk3::Image>.new_from_icon_name('application-exit', ICON_SIZE))
 
         # Set a signal (activates on click)
-        exit.signal_connect(activate => { %O<Gtk2>.main_quit })
+        exit.signal_connect(activate => { %O<Gtk3>.main_quit })
 
         # Append the item to the menu
         menu.append(exit)
     }
 
     menu.show_all
-    menu.popup(nil, nil, { %S<Gtk2::StatusIcon>.position_menu(menu, 0, 0, icon) }, [1, 1], 0, 0)
+    menu.popup(nil, nil, { %S<Gtk3::StatusIcon>.position_menu(menu, 0, 0, icon) }, [1, 1], 0, 0)
 
     return true
 }
@@ -371,8 +371,8 @@ ARGV.getopt!(
 var dir = Dir(ARGV.shift)
 dir.exists || usage(2)
 
-var icon = %O<Gtk2::StatusIcon>.new
+var icon = %O<Gtk3::StatusIcon>.new
 icon.set_from_icon_name(STATUS_ICON)
 icon.set_visible(true)
 icon.signal_connect('button-release-event' => func(_, event) { create_main_menu(icon, dir, event) })
-%O<Gtk2>.main
+%O<Gtk3>.main

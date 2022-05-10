@@ -142,6 +142,10 @@ You can find more info about Sidef, by clicking on the following links:
 
 =back
 
+=head1 QUESTIONS & ANSWERS
+
+Need help with Sidef? Feel free to ask questions here: L<https://github.com/trizen/sidef/discussions/categories/q-a>
+
 =head1 LICENSE AND COPYRIGHT
 
 Copyright (C) 2013-2022 Daniel Șuteu, Ioana Fălcușan
