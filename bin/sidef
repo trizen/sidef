@@ -100,6 +100,7 @@ if (defined $args{t}) {
     local $args{c} = 0;
     my @argv = splice(@ARGV);
 
+    my @fails;
     require Encode;
     while (defined(my $script_name = shift @argv)) {
 
@@ -117,6 +118,7 @@ if (defined $args{t}) {
         my $slept = 0;
         if ($@) {
             warn "[ERROR] Can't parse the script `$script_name`: $@";
+            push @fails, $script_name;
             sleep 2;
             $slept = 1;
         }
@@ -135,8 +137,17 @@ if (defined $args{t}) {
 
         if (not($slept) and $@) {
             warn "[ERROR] Error encountered on script `$script_name`: $@";
+            push @fails, $script_name;
             sleep(2) if @argv;
         }
+    }
+
+    if (@fails) {
+        say "\n";
+        say "-" x 80;
+        say ":: The following scripts failed";
+        say "-" x 80;
+        say "$_" for @fails;
     }
 }
 
