@@ -4471,6 +4471,16 @@ Aliases: I<superfactorial_ln>, I<superfactorial_log>
 
 =cut
 
+=head2 lnsuperprimorial
+
+    lnsuperprimorial(n)
+
+Natural logarithm of C<superprimorial(n)>.
+
+Aliases: I<superprimorial_ln>, I<superprimorial_log>
+
+=cut
+
 =head2 log
 
     log(x)

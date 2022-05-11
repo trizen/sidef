@@ -8915,6 +8915,31 @@ package Sidef::Types::Number::Number {
         bless \_binsplit(\@terms, \&__mul__);
     }
 
+    sub lnsuperprimorial {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // goto &nan;
+
+        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPFR::Rmpfr_set_ui($r, 0, $ROUND);
+
+        my $k = 1;
+        foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, ${$_[0]->nth_prime})) {
+            Math::MPFR::Rmpfr_set_ui($t, $p, $ROUND);
+            Math::MPFR::Rmpfr_log($t, $t, $ROUND);
+            Math::MPFR::Rmpfr_mul_ui($t, $t, $n - $k + 1, $ROUND);
+            Math::MPFR::Rmpfr_add($r, $r, $t, $ROUND);
+            ++$k;
+        }
+
+        bless \$r;
+    }
+
+    *superprimorial_ln  = \&lnsuperprimorial;
+    *superprimorial_log = \&lnsuperprimorial;
+
     sub superfactorial {    # A000178
         my ($n) = @_;
 

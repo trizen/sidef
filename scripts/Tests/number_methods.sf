@@ -402,4 +402,10 @@ do {
     {|n| assert_eq(trial_factor(n).prod, n||1) }.each(0..30)
 }
 
+do {
+    assert_eq(20.of {.lnsuperprimorial} ~Z=~= 20.of{.superprimorial.ln} -> uniq, [true])
+    assert_eq(20.of {.lnsuperfactorial} ~Z=~= 20.of{.superfactorial.ln} -> uniq, [true])
+    assert_eq(20.of {.lnhyperfactorial} ~Z=~= 20.of{.hyperfactorial.ln} -> uniq, [true])
+}
+
 say "** Tests passed!"
