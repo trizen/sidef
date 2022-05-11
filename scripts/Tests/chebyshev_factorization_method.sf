@@ -1,0 +1,33 @@
+#!/usr/bin/ruby
+
+# A simple factorization method, using the Chebyshev T_n(x) polynomials, based on the identity:
+#   T_{m n}(x) = T_m(T_n(x))
+
+# where:
+#   T_n(x) = (1/2) * V_n(2x, 1)
+
+# where V_n(P, Q) is the Lucas V sequence.
+
+var tests = [
+    [257221 * 470783,               1000, 3],
+    [1124075136413 * 3556516507813, 4000, 3],
+    [7553377229 * 588103349,         800, 3],
+    [333732865481 * 1632480277613,  3000, 3],
+
+    [15597344393 * 12388291753,   3000, 3],
+    [43759958467 * 59037829639,   3200, 3],
+    [112601635303 * 83979783007,   700, 3],
+    [228640480273 * 224774973299, 2000, 3],
+
+    [5140059121 * 8382882743,     2500, 2],
+    [18114813019 * 17402508649,   6000, 2],
+    [533091092393 * 440050095029,  300, 2],
+]
+
+for n,B,x in tests {
+    var f = chebyshev_factor(n,B,x)
+    assert_eq(f.prod, n)
+    assert_eq(f.len, 2)
+}
+
+say "** Test passed!"

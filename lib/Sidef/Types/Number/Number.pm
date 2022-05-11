@@ -16072,6 +16072,116 @@ package Sidef::Types::Number::Number {
 
     *pp1_factor = \&pplus1_factor;
 
+    sub chebyshev_factor {
+        my ($n, $B, $x) = @_;
+
+        # The Chebyshev factorization method, taking
+        # advantage of the smoothness of p-1 or p+1.
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        $B = defined($B) ? do { _valid(\$B); _any2ui($$B) // 1e5 } : 1e5;
+        $x =
+          defined($x)
+          ? do { _valid(\$x); Math::GMPz::Rmpz_init_set(_any2mpz($$x) // $TWO) }
+          : Math::GMPz::Rmpz_init_set_ui(CORE::int(CORE::rand(1e9)));
+
+        my $i = Math::GMPz::Rmpz_init_set_ui(2);
+
+        # Try to compute invmod(2, n)
+        # If n is even, return faster
+        Math::GMPz::Rmpz_invert($i, $i, $n)
+          || return Sidef::Types::Array::Array->new([_set_int(2), (($n == 2) ? () : _set_int($n >> 1))]);
+
+        state $V1 = Math::GMPz::Rmpz_init_nobless();
+        state $V2 = Math::GMPz::Rmpz_init_nobless();
+        state $Q1 = Math::GMPz::Rmpz_init_nobless();
+        state $Q2 = Math::GMPz::Rmpz_init_nobless();
+
+        my $chebyshevTmod = sub {
+            my ($v, $x) = @_;
+
+            Math::GMPz::Rmpz_mul_2exp($x, $x, 1);
+
+            Math::GMPz::Rmpz_set_ui($V1, 2);
+            Math::GMPz::Rmpz_set($V2, $x);
+            Math::GMPz::Rmpz_set_ui($Q1, 1);
+            Math::GMPz::Rmpz_set_ui($Q2, 1);
+
+            my @bits;
+            while ($v) {
+                unshift @bits, $v & 1;
+                $v >>= 1;
+            }
+
+            foreach my $bit (@bits) {
+
+                Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+                Math::GMPz::Rmpz_mod($Q1, $Q1, $n);
+
+                if ($bit) {
+                    Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+                    Math::GMPz::Rmpz_powm_ui($V2, $V2, 2, $n);
+                    Math::GMPz::Rmpz_submul($V1, $Q1, $x);
+                    Math::GMPz::Rmpz_submul_ui($V2, $Q2, 2);
+                    Math::GMPz::Rmpz_mod($V1, $V1, $n);
+                }
+                else {
+                    Math::GMPz::Rmpz_set($Q2, $Q1);
+                    Math::GMPz::Rmpz_mul($V2, $V2, $V1);
+                    Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $n);
+                    Math::GMPz::Rmpz_submul($V2, $Q1, $x);
+                    Math::GMPz::Rmpz_submul_ui($V1, $Q2, 2);
+                    Math::GMPz::Rmpz_mod($V2, $V2, $n);
+                }
+            }
+
+            Math::GMPz::Rmpz_mul($x, $V1, $i);
+            Math::GMPz::Rmpz_mod($x, $x, $n);
+        };
+
+        my $g     = Math::GMPz::Rmpz_init();
+        my $lnB   = CORE::log($B);
+        my $sqrtB = Math::Prime::Util::GMP::sqrtint($B);
+
+        foreach my $p (
+                       HAS_PRIME_UTIL
+                       ? @{Math::Prime::Util::primes($sqrtB)}
+                       : Math::Prime::Util::GMP::sieve_primes(2, $sqrtB)
+          ) {
+            $chebyshevTmod->($p**CORE::int($lnB / CORE::log($p)), $x);
+        }
+
+        for (my $p = _next_prime($sqrtB) ; $p <= $B ; $p = _next_prime($p)) {
+
+            $chebyshevTmod->($p, $x);    # T_k(x) (mod n)
+
+            Math::GMPz::Rmpz_sub_ui($g, $x, 1);
+            Math::GMPz::Rmpz_gcd($g, $g, $n);
+
+            if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+
+                if (Math::GMPz::Rmpz_cmp($g, $n) == 0) {
+                    return Sidef::Types::Array::Array->new([bless \$n]);
+                }
+
+                my $x = Math::GMPz::Rmpz_init();
+                my $y = Math::GMPz::Rmpz_init();
+
+                Math::GMPz::Rmpz_set($y, $g);
+                Math::GMPz::Rmpz_divexact($x, $n, $g);
+
+                my @f = map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } ($x, $y);
+                return Sidef::Types::Array::Array->new(\@f);
+            }
+        }
+
+        Sidef::Types::Array::Array->new([bless(\$n)]);
+    }
+
     sub holf_factor {
         my ($n, $k) = @_;
         _valid(\$k) if defined($k);

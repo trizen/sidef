@@ -1348,6 +1348,28 @@ Aliases: I<as_cfrac>
 
 =cut
 
+=head2 chebyshev_factor
+
+    n.chebyshev_factor
+    n.chebyshev_factor(B)
+    n.chebyshev_factor(B,x)
+
+Integer factorization method, based on Chebyshev polynomials, which have the following nesting property:
+
+    T_{m n}(x) = T_m(T_n(x))
+
+which are efficiently computed using the Lucas V function C<V_n(P,Q)>:
+
+    T_n(x) = (1/2) * V_n(2x, 1)
+
+This method is particularly effective for numbers that have a prime factor C<p> such that C<p-1> or C<p+1> is B-smooth.
+
+    say chebyshev_factor(1124075136413 * 3556516507813, 4000, 3)
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
+=cut
+
 =head2 chebyshevT
 
     chebyshevT(n)
