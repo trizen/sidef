@@ -10664,7 +10664,8 @@ package Sidef::Types::Number::Number {
 
             #~ say "Small k: ($n, $k, $m)";
 
-            if ($k <= ((ULONG_MAX < 1e10) ? 1e4 : 1e6)) {
+            if ($k <= 1e6) {
+                # This is fast only with recent versions of GMP
                 my $bin = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_bin_ui($bin, $n, $k);
                 Math::GMPz::Rmpz_mod($bin, $bin, $m);
