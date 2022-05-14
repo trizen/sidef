@@ -7941,6 +7941,11 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_mod($A, $A, $N);    # a %= n
 
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($N)) {
+            my @arr = Math::Prime::Util::allsqrtmod(Math::GMPz::Rmpz_get_ui($A), Math::GMPz::Rmpz_get_ui($N));
+            return Sidef::Types::Array::Array->new([map { _set_int($_) } @arr]);
+        }
+
         my $sqrtmod_pk = sub {
             my ($A, $p, $k) = @_;
 
