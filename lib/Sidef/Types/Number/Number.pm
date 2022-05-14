@@ -8089,20 +8089,15 @@ package Sidef::Types::Number::Number {
         }
 
         my $sum_of_two_squares_solutions = sub {
-            my ($n) = @_;
+            my ($factor_exp) = @_;
 
             my $prod1 = Math::GMPz::Rmpz_init_set_ui(1);    # p == 1 (mod 4)
             my $prod2 = Math::GMPz::Rmpz_init_set_ui(1);    # p == 3 (mod 4)
 
-            my @prime_powers;
+            my @prod1_factor_exp;
 
-            foreach my $pp (_factor_exp($n)) {
+            foreach my $pp (@$factor_exp) {
                 my ($p, $e) = @$pp;
-
-                $p =
-                  ($p < ULONG_MAX)
-                  ? Math::GMPz::Rmpz_init_set_ui($p)
-                  : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
                 if (Math::GMPz::Rmpz_congruent_ui_p($p, 3, 4)) {    # p = 3 (mod 4)
                     $e % 2 == 0 or return;                          # power must be even
@@ -8115,12 +8110,12 @@ package Sidef::Types::Number::Number {
                     else {                                          # power is odd
                         Math::GMPz::Rmpz_mul_2exp($prod1, $prod1, 1);
                         Math::GMPz::Rmpz_mul($prod2, $prod2, $p**(($e - 1) >> 1));
-                        push @prime_powers, [$p, 1];
+                        push @prod1_factor_exp, [$p, 1];
                     }
                 }
                 else {                                              # p = 1 (mod 4)
                     Math::GMPz::Rmpz_mul($prod1, $prod1, $p**$e);
-                    push @prime_powers, [$p, $e];
+                    push @prod1_factor_exp, [$p, $e];
                 }
             }
 
@@ -8166,17 +8161,26 @@ package Sidef::Types::Number::Number {
             # TODO: use the identity:
             #   (a^2 + b^2)*(c^2 + d^2) = (a*c - b*d)^2 + (a*d + b*c)^2
 
-            foreach my $pe (@prime_powers) {
+            foreach my $pe (@prod1_factor_exp) {
                 my ($p, $e) = @$pe;
 
                 for (my $i = $e % 2 ; $i < $e ; $i += 2) {
 
+                    my @factor_exp;
+                    foreach my $pp (@prod1_factor_exp) {
+                        if (Math::GMPz::Rmpz_cmp($pp->[0], $p) == 0) {
+                            push(@factor_exp, [$p, $i]) if ($i > 0);
+                        }
+                        else {
+                            push @factor_exp, $pp;
+                        }
+                    }
+
                     my $sq = $p**(($e - $i) >> 1);
-                    my $pp = $p**($e - $i);
 
                     push @solutions, map {
                         [map { $_ * $sq * $prod2 } @$_]
-                    } __SUB__->($prod1 / $pp);
+                    } __SUB__->(\@factor_exp);
                 }
             }
 
@@ -8185,7 +8189,15 @@ package Sidef::Types::Number::Number {
             grep { !$seen{ref($_->[0]) ? Math::GMPz::Rmpz_get_str($_->[0], 10) : $_->[0]}++ } @solutions;
         };
 
-        my @solutions = $sum_of_two_squares_solutions->($n);
+        my @factor_exp = map {
+            my ($p, $e) = @$_;
+            $p =
+              ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_init_set_ui($p)
+              : Math::GMPz::Rmpz_init_set_str("$p", 10);
+            [$p, $e]
+        } _factor_exp($n);
+        my @solutions = $sum_of_two_squares_solutions->(\@factor_exp);
 
         @solutions = sort { $a->[0] <=> $b->[0] }
           map { ($_->[0] > $_->[1]) ? [$_->[1], $_->[0]] : $_ } @solutions;
@@ -10665,6 +10677,7 @@ package Sidef::Types::Number::Number {
             #~ say "Small k: ($n, $k, $m)";
 
             if ($k <= 1e6) {
+
                 # This is fast only with recent versions of GMP
                 my $bin = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_bin_ui($bin, $n, $k);
