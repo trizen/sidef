@@ -51,10 +51,10 @@ package Sidef::Types::Number::Number {
           ULONG_MAX => Math::GMPq::_ulong_max(),
           LONG_MIN  => Math::GMPq::_long_min(),
 
-          HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 },
+          HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 } // 0,
 
           # Check if we have a recent enough version of Math::Prime::Util
-          HAS_NEW_PRIME_UTIL => eval { require Math::Prime::Util; defined(&Math::Prime::Util::is_perfect_power); },
+          HAS_NEW_PRIME_UTIL => eval { require Math::Prime::Util; defined(&Math::Prime::Util::is_perfect_power); } // 0,
     };
 #>>>
 
@@ -7771,9 +7771,10 @@ package Sidef::Types::Number::Number {
         my ($n_, $p_, $e) = @_;
 
         if ($e == 1) {
-            my $r = Math::Prime::Util::GMP::sqrtmod($n_, $p_) // return;
-            return $r;
+            return Math::Prime::Util::GMP::sqrtmod($n_, $p_);
         }
+
+        # NOTE: Cannot change `my` to `state`, because of recursion
 
         my $p  = Math::GMPz::Rmpz_init();
         my $pp = Math::GMPz::Rmpz_init();
@@ -7781,15 +7782,24 @@ package Sidef::Types::Number::Number {
 
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init();
-        my $v = Math::GMPz::Rmpz_init();
 
-        ($n_ < ULONG_MAX)
-          ? Math::GMPz::Rmpz_set_ui($n, $n_)
-          : Math::GMPz::Rmpz_set_str($n, $n_, 10);
+        if (ref($n_)) {
+            Math::GMPz::Rmpz_set($n, $n_);
+        }
+        else {
+            ($n_ < ULONG_MAX and $n_ > 0)
+              ? Math::GMPz::Rmpz_set_ui($n, $n_)
+              : Math::GMPz::Rmpz_set_str($n, "$n_", 10);
+        }
 
-        ($p_ < ULONG_MAX)
-          ? Math::GMPz::Rmpz_set_ui($p, $p_)
-          : Math::GMPz::Rmpz_set_str($p, $p_, 10);
+        if (ref($p_)) {
+            Math::GMPz::Rmpz_set($p, $p_);
+        }
+        else {
+            ($p_ < ULONG_MAX and $p_ > 0)
+              ? Math::GMPz::Rmpz_set_ui($p, $p_)
+              : Math::GMPz::Rmpz_set_str($p, "$p_", 10);
+        }
 
         # t = p^(k-1)
         Math::GMPz::Rmpz_pow_ui($t, $p, $e - 1);
@@ -7802,6 +7812,12 @@ package Sidef::Types::Number::Number {
 
         if (Math::GMPz::Rmpz_sgn($n) == 0) {
             return 0;
+        }
+
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($pp)) {
+            if (defined(my $r = Math::Prime::Util::sqrtmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($pp)))) {
+                return $r;
+            }
         }
 
         if (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0) {
@@ -7869,7 +7885,7 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
             if (defined(my $r = Math::Prime::Util::sqrtmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($y)))) {
                 return _set_int($r);
             }
@@ -7893,9 +7909,9 @@ package Sidef::Types::Number::Number {
 
         foreach my $pe (_factor_exp($ystr)) {
             my ($p, $e) = @$pe;
-            (my @roots = _sqrtmod($nstr, $p, $e)) || goto &nan;
-            my $pk = Math::Prime::Util::GMP::powint($p, $e);
-            push @congruences, map { [$_, $pk] } @roots;
+            my $root = _sqrtmod($nstr, $p, $e) // goto &nan;
+            my $pk   = Math::Prime::Util::GMP::powint($p, $e);
+            push @congruences, [$root, $pk];
         }
 
         my $r = Math::Prime::Util::GMP::chinese(@congruences) // goto &nan;
@@ -7980,8 +7996,8 @@ package Sidef::Types::Number::Number {
                 } __SUB__->($Aj, $p, $k - 2);
             }
 
-            (my @pk_roots = _sqrtmod($A, $p, $k)) || return;
-            my $q = Math::GMPz::Rmpz_init_set_str($pk_roots[0], 10);
+            my $pk_root = _sqrtmod($A, $p, $k) // return;
+            my $q       = Math::GMPz::Rmpz_init_set_str($pk_root, 10);
 
             #my $q = ${_set_int($A)->sqrtmod(_set_int($pk)) // return};
 
@@ -8095,6 +8111,8 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new(Sidef::Types::Array::Array->new([ZERO, ZERO]));
         }
 
+        my %sqrtmod_cache;
+
         my $sum_of_two_squares_solutions = sub {
             my ($factor_exp) = @_;
 
@@ -8132,17 +8150,43 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_cmp_ui($prod1, 2) == 0
               and return [$prod2, $prod2];
 
-            my @square_roots = map { $$_ } @{MONE->sqrtmod_all(_set_int($prod1))};
+            # Using sqrtmod_all() -- not very efficient
+            # my @square_roots = map { $$_ } @{MONE->sqrtmod_all(_set_int($prod1))};
 
-            if (!@square_roots) {
-                die "Error in sqrtmod_all(-1, $prod1): failed to find any solutions!";
+            my @congruences;
+
+            foreach my $pe (@prod1_factor_exp) {
+                my ($p, $e) = @$pe;
+                my $pp  = $p**$e;
+                my $key = Math::GMPz::Rmpz_get_str($pp, 10);
+                my $r   = ($sqrtmod_cache{$key} //= Math::GMPz::Rmpz_init_set_str(_sqrtmod($pp - 1, $p, $e), 10));
+                push @congruences, [[$r, $pp], [$pp - $r, $pp]];
+            }
+
+            my @square_roots;
+
+            if (HAS_PRIME_UTIL) {
+                Math::Prime::Util::forsetproduct(
+                    sub {
+                        push @square_roots, Math::Prime::Util::GMP::chinese(@_);
+                    },
+                    @congruences
+                );
+            }
+            else {
+                require Algorithm::Loops;
+                my $iter = Algorithm::Loops::NestedLoops(\@congruences);
+
+                while (my @arr = $iter->()) {
+                    push @square_roots, Math::Prime::Util::GMP::chinese(@arr);
+                }
             }
 
             my @solutions;
 
             foreach my $r (@square_roots) {
 
-                my $s = Math::GMPz::Rmpz_init_set($r);
+                my $s = Math::GMPz::Rmpz_init_set_str($r, 10);
                 my $q = Math::GMPz::Rmpz_init_set($prod1);
 
                 my $t = Math::GMPz::Rmpz_init();
@@ -8183,10 +8227,12 @@ package Sidef::Types::Number::Number {
                         }
                     }
 
-                    my $sq = $p**(($e - $i) >> 1);
+                    my $sq = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_pow_ui($sq, $p, ($e - $i) >> 1);
+                    Math::GMPz::Rmpz_mul($sq, $sq, $prod2);
 
                     push @solutions, map {
-                        [map { $_ * $sq * $prod2 } @$_]
+                        [map { $_ * $sq } @$_]
                     } __SUB__->(\@factor_exp);
                 }
             }
@@ -11473,12 +11519,6 @@ package Sidef::Types::Number::Number {
             my @sd;
             foreach my $pe (@factor_exp) {
                 my ($p) = @$pe;
-
-                $p =
-                  ($p < ULONG_MAX)
-                  ? Math::GMPz::Rmpz_init_set_ui($p)
-                  : Math::GMPz::Rmpz_init_set_str("$p", 10);
-
                 push @sd, map { [$_->[0] * $p, $_->[1] + 1] } @sd;
                 push @sd, [$p, 1];
             }
