@@ -8,6 +8,26 @@ assert_eq(squarefree_sum(1e7), 30396557311887)
 assert_eq(squarefree_count(1e9), 607927124)
 assert_eq(squarefree_count(1e10), 6079270942)
 
+assert_eq(
+    semiprimes(100),
+    1..100 -> grep { .is_semiprime },
+)
+
+assert_eq(
+    semiprimes(50, 100),
+    50..100 -> grep { .is_semiprime },
+)
+
+assert_eq(
+    prime_powers(100),
+    1..100 -> grep { .is_prime_power },
+)
+
+assert_eq(
+    prime_powers(50, 100),
+    50..100 -> grep { .is_prime_power },
+)
+
 for k in (0..10) {
 
     assert_eq(k.almost_primes(1000), 1..1000 -> grep { .is_almost_prime(k) })

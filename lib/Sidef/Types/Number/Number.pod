@@ -2214,6 +2214,20 @@ Aliases: I<primes_each>
 
 =cut
 
+=head2 each_prime_power
+
+    n.each_prime_power { ... }
+    each_prime_power(a,b, { ... })
+
+Iterate over prime powers <= n, or in the range C<a..b>:
+
+    100.each_prime_power {|k| say k }         # iterate over prime powers <= 100
+    each_prime_power(50, 100, {|k| say k })   # iterate over prime powers in the range [50, 100]
+
+Aliases: I<prime_powers_each>
+
+=cut
+
 =head2 each_semiprime
 
     n.each_semiprime { ... }
@@ -5789,7 +5803,7 @@ Returns the number of prime powers <= n, or in the range C<a..b>.
 
 =head2 prime_power_divisors
 
-    n.prime_power_divisors()
+    n.prime_power_divisors
 
 Returns the prime power divisors of n.
 
@@ -5798,6 +5812,18 @@ Returns the prime power divisors of n.
 Equivalent with:
 
     n.divisors.grep{.is_prime_power}
+
+=cut
+
+=head2 prime_powers
+
+    prime_powers(n)
+    prime_powers(a,b)
+
+Returns an array with the prime powers <= n, or in the range C<a..b>.
+
+    say prime_powers(100)          # prime powers <= 100
+    say prime_powers(50, 100)      # prime powers in the range [50, 100]
 
 =cut
 

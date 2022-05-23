@@ -20287,6 +20287,10 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@omega_primes);
     }
 
+    sub prime_powers {
+        (ONE)->omega_primes(@_);
+    }
+
     sub omega_primes_each {
         my ($k, $from, $to, $block) = @_;
 
@@ -20319,6 +20323,12 @@ package Sidef::Types::Number::Number {
     }
 
     *each_omega_prime = \&omega_primes_each;
+
+    sub prime_powers_each {
+        (ONE)->omega_primes_each(@_);
+    }
+
+    *each_prime_power = \&prime_powers_each;
 
     sub _sieve_almost_primes {
         my ($from, $to, $k, %opt) = @_;
