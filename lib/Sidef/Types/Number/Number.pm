@@ -14332,16 +14332,18 @@ package Sidef::Types::Number::Number {
     sub is_prime {
         my ($n) = @_;
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (
-                    Math::Prime::Util::is_prime(Math::GMPz::Rmpz_get_ui($$n))
+                    Math::Prime::Util::is_prime(Math::GMPz::Rmpz_get_ui($n))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
 
-        _primality_pretest($$n)
-          && Math::Prime::Util::GMP::is_prime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
+        _primality_pretest($n)
+          && Math::Prime::Util::GMP::is_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -14522,24 +14524,37 @@ package Sidef::Types::Number::Number {
     sub is_prob_prime {
         my ($n) = @_;
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (
-                    Math::Prime::Util::is_prob_prime(Math::GMPz::Rmpz_get_ui($$n))
+                    Math::Prime::Util::is_prob_prime(Math::GMPz::Rmpz_get_ui($n))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
 
-        _primality_pretest($$n)
-          && Math::Prime::Util::GMP::is_prob_prime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
+        _primality_pretest($n)
+          && Math::Prime::Util::GMP::is_prob_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub is_prov_prime {
         my ($n) = @_;
-        _primality_pretest($$n)
-          && Math::Prime::Util::GMP::is_provable_prime(&_big2uistr // return Sidef::Types::Bool::Bool::FALSE)
+
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return (
+                    Math::Prime::Util::is_prime(Math::GMPz::Rmpz_get_ui($n))
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        _primality_pretest($n)
+          && Math::Prime::Util::GMP::is_provable_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -14548,16 +14563,18 @@ package Sidef::Types::Number::Number {
 
     sub is_bpsw_prime {
         my ($n) = @_;
-        _primality_pretest($$n)
-          && Math::Prime::Util::GMP::is_bpsw_prime(&_big2uistr // (return Sidef::Types::Bool::Bool::FALSE))
+        $n = $$n;
+        _primality_pretest($n)
+          && Math::Prime::Util::GMP::is_bpsw_prime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub is_aks_prime {
         my ($n) = @_;
-        _primality_pretest($$n)
-          && Math::Prime::Util::GMP::is_aks_prime(&_big2uistr // (return Sidef::Types::Bool::Bool::FALSE))
+        $n = $$n;
+        _primality_pretest($n)
+          && Math::Prime::Util::GMP::is_aks_prime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -14596,10 +14613,12 @@ package Sidef::Types::Number::Number {
         my ($n, @bases) = @_;
         _valid(\(@bases));
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (
                 Math::Prime::Util::is_pseudoprime(
-                    Math::GMPz::Rmpz_get_ui($$n),
+                    Math::GMPz::Rmpz_get_ui($n),
                     do {
                         @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
                         @bases ? (@bases) : (2);
@@ -14610,7 +14629,7 @@ package Sidef::Types::Number::Number {
             );
         }
 
-        __is_int__($$n)
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_pseudoprime(
             _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
             do {
@@ -14823,10 +14842,12 @@ package Sidef::Types::Number::Number {
         my ($n, @bases) = @_;
         _valid(\(@bases));
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (
                 Math::Prime::Util::is_euler_pseudoprime(
-                    Math::GMPz::Rmpz_get_ui($$n),
+                    Math::GMPz::Rmpz_get_ui($n),
                     do {
                         @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
                         @bases ? (@bases) : (2);
@@ -14837,7 +14858,7 @@ package Sidef::Types::Number::Number {
             );
         }
 
-        __is_int__($$n)
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_euler_pseudoprime(
             _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
             do {
@@ -14855,10 +14876,12 @@ package Sidef::Types::Number::Number {
         my ($n, @bases) = @_;
         _valid(\(@bases));
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (
                 Math::Prime::Util::is_strong_pseudoprime(
-                    Math::GMPz::Rmpz_get_ui($$n),
+                    Math::GMPz::Rmpz_get_ui($n),
                     do {
                         @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
                         @bases ? (@bases) : (2);
@@ -14869,7 +14892,7 @@ package Sidef::Types::Number::Number {
             );
         }
 
-        __is_int__($$n)
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_strong_pseudoprime(
             _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
             do {
@@ -15170,15 +15193,17 @@ package Sidef::Types::Number::Number {
             return $n->is_lucasU_pseudoprime($P, $Q);
         }
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (
-                    Math::Prime::Util::is_lucas_pseudoprime(Math::GMPz::Rmpz_get_ui($$n))
+                    Math::Prime::Util::is_lucas_pseudoprime(Math::GMPz::Rmpz_get_ui($n))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
 
-        __is_int__($$n)
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_lucas_pseudoprime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
@@ -15189,15 +15214,17 @@ package Sidef::Types::Number::Number {
     sub is_strong_lucas_pseudoprime {
         my ($n) = @_;
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (
-                    Math::Prime::Util::is_strong_lucas_pseudoprime(Math::GMPz::Rmpz_get_ui($$n))
+                    Math::Prime::Util::is_strong_lucas_pseudoprime(Math::GMPz::Rmpz_get_ui($n))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
 
-        __is_int__($$n)
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_strong_lucas_pseudoprime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
@@ -15208,15 +15235,17 @@ package Sidef::Types::Number::Number {
     sub is_stronger_lucas_pseudoprime {
         my ($n) = @_;
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (
-                    Math::Prime::Util::is_extra_strong_lucas_pseudoprime(Math::GMPz::Rmpz_get_ui($$n))
+                    Math::Prime::Util::is_extra_strong_lucas_pseudoprime(Math::GMPz::Rmpz_get_ui($n))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
 
-        __is_int__($$n)
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_extra_strong_lucas_pseudoprime(_big2uistr($n)
                                                                        // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
@@ -15230,15 +15259,17 @@ package Sidef::Types::Number::Number {
     sub is_strongish_lucas_pseudoprime {
         my ($n) = @_;
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (
-                    Math::Prime::Util::is_almost_extra_strong_lucas_pseudoprime(Math::GMPz::Rmpz_get_ui($$n))
+                    Math::Prime::Util::is_almost_extra_strong_lucas_pseudoprime(Math::GMPz::Rmpz_get_ui($n))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
 
-        __is_int__($$n)
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_almost_extra_strong_lucas_pseudoprime(_big2uistr($n)
                                                                               // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
@@ -15249,7 +15280,8 @@ package Sidef::Types::Number::Number {
 
     sub is_plumb_pseudoprime {
         my ($n) = @_;
-        __is_int__($$n)
+        $n = $$n;
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_euler_plumb_pseudoprime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
@@ -15261,7 +15293,8 @@ package Sidef::Types::Number::Number {
 
     sub is_perrin_pseudoprime {
         my ($n) = @_;
-        __is_int__($$n)
+        $n = $$n;
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_perrin_pseudoprime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
@@ -15274,7 +15307,9 @@ package Sidef::Types::Number::Number {
 
         _valid(\$k, \$m) if defined($k);
 
-        __is_int__($$n)
+        $n = $$n;
+
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_frobenius_pseudoprime(
                                                               _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
                                                               (defined($k) ? _big2istr($k) // () : ()),
@@ -15288,7 +15323,10 @@ package Sidef::Types::Number::Number {
 
     sub is_frobenius_underwood_pseudoprime {
         my ($n) = @_;
-        __is_int__($$n)
+
+        $n = $$n;
+
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_frobenius_underwood_pseudoprime(_big2uistr($n)
                                                                         // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
@@ -15301,7 +15339,8 @@ package Sidef::Types::Number::Number {
 
     sub is_frobenius_khashin_pseudoprime {
         my ($n) = @_;
-        __is_int__($$n)
+        $n = $$n;
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_frobenius_khashin_pseudoprime(_big2uistr($n)
                                                                       // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
@@ -15313,13 +15352,13 @@ package Sidef::Types::Number::Number {
     *is_frobenius_khashin_psp = \&is_frobenius_khashin_pseudoprime;
 
     sub is_nminus1_prime {
-        my ($x) = @_;
+        my ($n) = @_;
 
-        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
-        $x = _big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE;
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        _is_prob_prime($x)
-          && Math::Prime::Util::GMP::is_nminus1_prime($x)
+        _is_prob_prime($n)
+          && Math::Prime::Util::GMP::is_nminus1_prime($n)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -15328,13 +15367,13 @@ package Sidef::Types::Number::Number {
     *is_pm1_prime = \&is_nminus1_prime;
 
     sub is_nplus1_prime {
-        my ($x) = @_;
+        my ($n) = @_;
 
-        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
-        $x = _big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE;
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        _is_prob_prime($x)
-          && Math::Prime::Util::GMP::is_nplus1_prime($x)
+        _is_prob_prime($n)
+          && Math::Prime::Util::GMP::is_nplus1_prime($n)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -15343,13 +15382,13 @@ package Sidef::Types::Number::Number {
     *is_pp1_prime = \&is_nplus1_prime;
 
     sub is_ecpp_prime {
-        my ($x) = @_;
+        my ($n) = @_;
 
-        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
-        $x = _big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE;
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        _is_prob_prime($x)
-          && Math::Prime::Util::GMP::is_ecpp_prime($x)
+        _is_prob_prime($n)
+          && Math::Prime::Util::GMP::is_ecpp_prime($n)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -15357,15 +15396,17 @@ package Sidef::Types::Number::Number {
     sub is_mersenne_prime {
         my ($n) = @_;
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return (
-                    Math::Prime::Util::is_mersenne_prime(Math::GMPz::Rmpz_get_ui($$n))
+                    Math::Prime::Util::is_mersenne_prime(Math::GMPz::Rmpz_get_ui($n))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
 
-        __is_int__($$n)
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_mersenne_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
@@ -19687,6 +19728,7 @@ package Sidef::Types::Number::Number {
     sub is_abundant {
         my ($n) = @_;
 
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
         Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Bool::Bool::FALSE;
 
@@ -22127,18 +22169,78 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
-    sub is_prime_power {
+    sub is_perfect {
         my ($n) = @_;
 
-        if (HAS_PRIME_UTIL and ref($$n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($$n)) {
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        if (Math::GMPz::Rmpz_odd_p($n)) {    # odd case
+
+            # Reference:
+            #   https://en.wikipedia.org/wiki/Perfect_number#Odd_perfect_numbers
+
+            Math::GMPz::Rmpz_sizeinbase($n, 10) > 1500
+              or return Sidef::Types::Bool::Bool::FALSE;
+
+            Math::GMPz::Rmpz_divisible_ui_p($n, 105)
+              and return Sidef::Types::Bool::Bool::FALSE;
+
+                 Math::GMPz::Rmpz_congruent_ui_p($n, 1, 12)
+              or Math::GMPz::Rmpz_congruent_ui_p($n, 117, 468)
+              or Math::GMPz::Rmpz_congruent_ui_p($n, 81,  324)
+              or return Sidef::Types::Bool::Bool::FALSE;
+
+            my $t = Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::sigma("$n"), 10);
+
             return (
-                    Math::Prime::Util::is_prime_power(Math::GMPz::Rmpz_get_ui($$n))
+                    (Math::GMPz::Rmpz_cmp($t, 2 * $n) == 0)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
 
-        __is_int__($$n)
+        # Here n is even
+        state $m = Math::GMPz::Rmpz_init_nobless();
+
+        my $v     = Math::GMPz::Rmpz_remove($m, $n, $TWO);
+        my $scan0 = Math::GMPz::Rmpz_scan0($m, 0);
+
+        $scan0 == $v + 1
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        # n must have the form: 2^(k-1)*(2^k - 1)
+        $scan0 == Math::GMPz::Rmpz_popcount($m)
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        (
+         HAS_PRIME_UTIL ? Math::Prime::Util::is_mersenne_prime($v + 1)
+         : Math::Prime::Util::GMP::is_mersenne_prime($v + 1)
+          ) ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_prime_power {
+        my ($n) = @_;
+
+        $n = $$n;
+
+        if (HAS_PRIME_UTIL and ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return (
+                    Math::Prime::Util::is_prime_power(Math::GMPz::Rmpz_get_ui($n))
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        __is_int__($n)
           && Math::Prime::Util::GMP::is_prime_power(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;

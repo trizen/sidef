@@ -3836,6 +3836,14 @@ Aliases: I<is_pell_pseudoprime>
 
 =cut
 
+=head2 is_perfect
+
+    n.is_perfect
+
+Returns true if C<n> is a perfect number (i.e.: sigma(n) == 2*n).
+
+=cut
+
 =head2 is_perrin_psp
 
     n.is_perrin_psp
