@@ -11445,6 +11445,99 @@ package Sidef::Types::Number::Number {
         bless \$prod;
     }
 
+    sub cyclotomic_factor {
+        my ($n, @bases) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        if (@bases) {
+            _valid(\(@bases));
+            @bases = grep { defined($_) } map { _any2mpz($$_) } @bases;
+        }
+        else {
+            @bases = map { ${_set_int($_)} } (2 .. __ilog__($n, 2));
+        }
+
+        my $cyclotomicmod = sub {
+            my ($n, $x, $m) = @_;
+
+            my @factor_exp = _factor_exp($n);
+
+            # Generate the squarefree divisors of n, along
+            # with the number of prime factors of each divisor
+            my @sd;
+            foreach my $pe (@factor_exp) {
+                my ($p) = @$pe;
+
+                $p =
+                  ($p < ULONG_MAX)
+                  ? Math::GMPz::Rmpz_init_set_ui($p)
+                  : Math::GMPz::Rmpz_init_set_str("$p", 10);
+
+                push @sd, map { [$_->[0] * $p, $_->[1] + 1] } @sd;
+                push @sd, [$p, 1];
+            }
+
+            push @sd, [$ONE, 0];
+
+            my $prod = Math::GMPz::Rmpz_init_set_ui(1);
+
+            foreach my $pair (@sd) {
+                my ($d, $c) = @$pair;
+
+                my $base = Math::GMPz::Rmpz_init();
+                my $exp  = CORE::int($n / $d);
+
+                Math::GMPz::Rmpz_powm_ui($base, $x, $exp, $m);    # x^(n/d) mod m
+                Math::GMPz::Rmpz_sub_ui($base, $base, 1);
+
+                if ($c % 2 == 1) {
+                    Math::GMPz::Rmpz_invert($base, $base, $m) || return $base;
+                }
+
+                Math::GMPz::Rmpz_mul($prod, $prod, $base);
+                Math::GMPz::Rmpz_mod($prod, $prod, $m);
+            }
+
+            $prod;
+        };
+
+        $n = Math::GMPz::Rmpz_init_set($n);    # copy
+
+        my @factors;
+        state $g = Math::GMPz::Rmpz_init_nobless();
+
+      OUTER: foreach my $x (@bases) {
+            my $limit = 1 + __ilog__($n, $x);
+
+            foreach my $k (3 .. $limit) {
+                my $c = $cyclotomicmod->($k, $x, $n);
+
+                Math::GMPz::Rmpz_gcd($g, $n, $c);
+                if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
+
+                    my $valuation = Math::GMPz::Rmpz_remove($n, $n, $g);
+                    push(@factors, (Math::GMPz::Rmpz_init_set($g)) x $valuation);
+
+                    if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0 or _is_prob_prime($n)) {
+                        last OUTER;
+                    }
+                }
+            }
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) > 0) {
+            push @factors, $n;
+        }
+
+        @factors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @factors;
+        @factors = map  { bless \$_ } @factors;
+        Sidef::Types::Array::Array->new(\@factors);
+    }
+
     sub powerfree_sum {
         my ($k, $from, $to) = @_;
 

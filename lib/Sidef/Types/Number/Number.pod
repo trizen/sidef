@@ -1793,6 +1793,22 @@ Aliases: I<cyclotomic_polynomial>
 
 =cut
 
+=head2 cyclotomic_factor
+
+    cyclotomic_factor(n)
+    cyclotomic_factor(n, bases...)
+
+Factorization method, based on cyclotomic polynomials, trying to find algebraic factors of C<n>.
+
+    say cyclotomic_factor(2**120 + 1)
+    say cyclotomic_factor((10**258 - 1)/9 - 10**(258/2) - 1, 10)
+
+An optional list of bases can be given to restrict the search only to the given bases.
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
+=cut
+
 =head2 cyclotomicmod
 
     cyclotomicmod(n, x, m)
