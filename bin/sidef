@@ -622,20 +622,10 @@ EOT
 
             $tΔ = eval { Time::HiRes::tv_interval($t0) };
 
-            use overload;
+            # use overload;
+            # overload::StrVal($_) ? "$_" : $_->dump;
 
-            my $dump = join(
-                ', ',
-                map {
-                        ref($_)
-                      ? overload::StrVal($_)
-                          ? "$_"
-                          : UNIVERSAL::can($_, 'dump') ? $_->dump
-                        : $_
-                      : defined($_) ? $_
-                      : 'nil'
-                  } @results
-            );
+            my $dump = join(', ', map { ref($_) ? UNIVERSAL::can($_, 'dump') ? $_->dump : $_ : ($_ // 'nil') } @results);
             $dump = "($dump)" if @results > 1;
 
             push @values,
