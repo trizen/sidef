@@ -31,6 +31,12 @@ do {
                             sum_name   => 'prime_sum',
                             predicate  => func(n) { n.is_prime },
                            ),
+                           :(
+                            each_name  => 'each_prime_power',
+                            arr_name   => 'prime_powers',
+                            count_name => 'prime_power_count',
+                            predicate  => func(n) { n.is_prime_power },
+                           ),
                     ]
 
     var methods2 = [

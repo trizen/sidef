@@ -377,6 +377,12 @@ package Sidef::Types::Range::RangeNumber {
                             sum_name   => 'prime_sum',
                             predicate  => sub { $_[0]->is_prime },
                            },
+                           {
+                            each_name  => 'each_prime_power',
+                            arr_name   => 'prime_powers',
+                            count_name => 'prime_power_count',
+                            predicate  => sub { $_[0]->is_prime_power },
+                           },
                           );
 
             foreach my $method (@methods) {

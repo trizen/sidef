@@ -155,6 +155,14 @@ Returns the
 
 =cut
 
+=head2 each_prime_power
+
+    RangeNumber.each_prime_power()
+
+Returns the
+
+=cut
+
 =head2 each_semiprime
 
     RangeNumber.each_semiprime()
@@ -298,6 +306,22 @@ Returns the
 =head2 prime_count
 
     RangeNumber.prime_count()
+
+Returns the
+
+=cut
+
+=head2 prime_power_count
+
+    RangeNumber.prime_power_count()
+
+Returns the
+
+=cut
+
+=head2 prime_powers
+
+    RangeNumber.prime_powers()
 
 Returns the
 
