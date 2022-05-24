@@ -12735,7 +12735,11 @@ package Sidef::Types::Number::Number {
 
             if ($k == 2) {
 
-                for (my $q = $p ; $q <= $s ; $q = _next_prime($q)) {
+                foreach my $q (
+                               HAS_PRIME_UTIL
+                               ? @{Math::Prime::Util::primes($p, $s)}
+                               : Math::Prime::Util::GMP::sieve_primes($p, $s)
+                  ) {
 
                     Math::GMPz::Rmpz_mul_ui($t, $m, $q);
                     Math::GMPz::Rmpz_div($t, $n, $t);
@@ -12809,9 +12813,13 @@ package Sidef::Types::Number::Number {
 
             if ($k == 2) {
 
-                for (; $p <= $s ; $p = _next_prime($p)) {
+                foreach my $q (
+                               HAS_PRIME_UTIL
+                               ? @{Math::Prime::Util::primes($p, $s)}
+                               : Math::Prime::Util::GMP::sieve_primes($p, $s)
+                  ) {
 
-                    Math::GMPz::Rmpz_mul_ui($t, $m, $p);
+                    Math::GMPz::Rmpz_mul_ui($t, $m, $q);
                     Math::GMPz::Rmpz_div($t, $n, $t);
 
                     my $pi = _prime_count(Math::GMPz::Rmpz_get_str($t, 10));
@@ -13208,7 +13216,11 @@ package Sidef::Types::Number::Number {
 
                 $to = $upper_approx if ($to > $upper_approx);
 
-                my @primes = Math::Prime::Util::GMP::sieve_primes($from, $to);
+                my @primes = (
+                              HAS_PRIME_UTIL
+                              ? @{Math::Prime::Util::primes($from, $to)}
+                              : Math::Prime::Util::GMP::sieve_primes($from, $to)
+                             );
 
                 $count += @primes;
 
@@ -15644,12 +15656,11 @@ package Sidef::Types::Number::Number {
         _valid(\$y) if defined($y);
 
         Sidef::Types::Array::Array->new(
-            [map { _set_int($_) }
-
-               defined($y)
-             ? Math::Prime::Util::GMP::sieve_primes((_big2uistr($x) // 0), (_big2uistr($y) // 0), 0)
-             : Math::Prime::Util::GMP::sieve_primes(2, (_big2uistr($x) // 0), 0)
-            ]
+                                       [map { _set_int($_) }
+                                          defined($y)
+                                        ? Math::Prime::Util::GMP::sieve_primes((_big2uistr($x) // 0), (_big2uistr($y) // 0), 0)
+                                        : Math::Prime::Util::GMP::sieve_primes(2, (_big2uistr($x) // 0), 0)
+                                       ]
         );
     }
 
@@ -20564,13 +20575,17 @@ package Sidef::Types::Number::Number {
 
                 if ($k == 1) {
 
-                    foreach my $q (Math::Prime::Util::GMP::sieve_primes($u, $v)) {
+                    foreach my $q (
+                                   HAS_PRIME_UTIL
+                                   ? @{Math::Prime::Util::primes($u, $v)}
+                                   : Math::Prime::Util::GMP::sieve_primes($u, $v)
+                      ) {
 
                         if ($q < ULONG_MAX) {
                             Math::GMPz::Rmpz_mul_ui($x, $m, $q);
                         }
                         else {
-                            Math::GMPz::Rmpz_set_str($x, $q, 10);
+                            Math::GMPz::Rmpz_set_str($x, "$q", 10);
                             Math::GMPz::Rmpz_mul($x, $x, $m);
                         }
 
