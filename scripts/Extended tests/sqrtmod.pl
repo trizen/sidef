@@ -1,9 +1,11 @@
 #!/usr/bin/perl
 
 use 5.014;
-use ntheory qw(sqrtmod);
 
+use ntheory qw(sqrtmod);
 use Math::AnyNum qw(irand);
+
+use lib qw(../../lib);
 use Math::Sidef;
 
 foreach my $k (2 .. 10000) {

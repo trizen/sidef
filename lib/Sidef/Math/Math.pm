@@ -157,6 +157,9 @@ package Sidef::Math::Math {
     sub gcd_factors {
         my ($self, $n, $arr) = @_;
 
+        $n->is_pos
+          || return Sidef::Types::Array::Array->new;
+
         my $orig_n = $n;
 
         my @factors;
@@ -174,11 +177,12 @@ package Sidef::Math::Math {
                 $new_g->is_ntf($n) || next;
             }
 
-            push @factors, $new_g;
+            my $v = $n->valuation($new_g);
             $n = $n->remove($new_g);
+            push @factors, ($new_g) x CORE::int($v);
         }
 
-        if ($n->is_ntf($orig_n)) {
+        if (!$n->is_one) {
             push @factors, $n;
         }
 

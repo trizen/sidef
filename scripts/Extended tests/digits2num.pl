@@ -5,6 +5,8 @@ use strict;
 use warnings;
 
 use ntheory qw(:all);
+
+use lib qw(../../lib);
 use Math::Sidef qw(digits digits2num);
 
 foreach my $B(2..1000) {

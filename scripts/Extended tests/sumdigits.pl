@@ -1,8 +1,11 @@
 #!/usr/bin/perl
 
 use 5.014;
+
 use Math::AnyNum qw(sumdigits digits irand ipow);
 use ntheory qw(todigits vecsum);
+
+use lib qw(../../lib);
 use Math::Sidef;
 
 foreach my $n (2 .. 1000) {
