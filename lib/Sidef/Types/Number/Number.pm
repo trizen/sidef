@@ -17092,6 +17092,93 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([bless(\$n)]);
     }
 
+    sub pell_factor {
+        my ($n, $reps) = @_;
+
+        # Simple version of the continued-fraction factorization method.
+        # Efficient for numbers that have factors relatively close to sqrt(n)
+
+        $n    = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) // 1e5 } : 1e5;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        if (Math::GMPz::Rmpz_perfect_square_p($n)) {
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_sqrt($t, $n);
+            return Sidef::Types::Array::Array->new([(bless \$t), (bless \$t)]);
+        }
+
+        my $x = Math::GMPz::Rmpz_init();
+        my $y = Math::GMPz::Rmpz_init();
+        my $z = Math::GMPz::Rmpz_init_set_ui(1);
+
+        my $t = Math::GMPz::Rmpz_init();
+        my $w = Math::GMPz::Rmpz_init();
+        my $r = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_sqrt($x, $n);
+        Math::GMPz::Rmpz_set($y, $x);
+
+        Math::GMPz::Rmpz_add($w, $x, $x);
+        Math::GMPz::Rmpz_set($r, $w);
+
+        my $f2 = Math::GMPz::Rmpz_init_set($x);
+        my $f1 = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach (1 .. $reps) {
+
+            # y = r*z - y
+            Math::GMPz::Rmpz_mul($t, $r, $z);
+            Math::GMPz::Rmpz_sub($y, $t, $y);
+
+            # z = (n - y*y) / z
+            Math::GMPz::Rmpz_mul($t, $y, $y);
+            Math::GMPz::Rmpz_sub($t, $n, $t);
+            Math::GMPz::Rmpz_divexact($z, $t, $z);
+
+            # r = (x + y) / z
+            Math::GMPz::Rmpz_add($t, $x, $y);
+            Math::GMPz::Rmpz_div($r, $t, $z);
+
+            # f1 = (f1 + r*f2) % n
+            Math::GMPz::Rmpz_addmul($f1, $f2, $r);
+            Math::GMPz::Rmpz_mod($f1, $f1, $n);
+
+            # swap f1 with f2
+            ($f1, $f2) = ($f2, $f1);
+
+            if (Math::GMPz::Rmpz_perfect_square_p($z)) {
+
+                my $g = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_sqrt($g, $z);
+                Math::GMPz::Rmpz_sub($g, $f1, $g);
+                Math::GMPz::Rmpz_gcd($g, $g, $n);
+
+                if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+
+                    if (Math::GMPz::Rmpz_cmp($g, $n) == 0) {
+                        return Sidef::Types::Array::Array->new([bless \$n]);
+                    }
+
+                    my $x = Math::GMPz::Rmpz_init();
+                    my $y = Math::GMPz::Rmpz_init();
+
+                    Math::GMPz::Rmpz_set($y, $g);
+                    Math::GMPz::Rmpz_divexact($x, $n, $g);
+
+                    my @f = map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } ($x, $y);
+                    return Sidef::Types::Array::Array->new(\@f);
+                }
+            }
+
+            last if (Math::GMPz::Rmpz_cmp_ui($z, 1) == 0);
+        }
+
+        Sidef::Types::Array::Array->new([bless(\$n)]);
+    }
+
     sub mbe_factor {
         my ($n, $reps) = @_;
 

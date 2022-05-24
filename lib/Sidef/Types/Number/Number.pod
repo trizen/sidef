@@ -5253,6 +5253,20 @@ The product of the factors, will give back C<n>. However, some factors may be co
 
 =cut
 
+=head2 pell_factor
+
+    pell_factor(n, tries=1e5)
+
+Pell factorization method, trying to find a factor of C<n>.
+
+This method is particularly effective for numbers that have factors close to C<sqrt(n)>.
+
+    say pell_factor(10**120 - 1)
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
+=cut
+
 =head2 perfect_power
 
     n.perfect_power
