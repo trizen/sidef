@@ -6949,8 +6949,7 @@ Returns the number of unitary square divisors of C<n>.
 
 =head2 squfof_factor
 
-    n.squfof_factor
-    n.squfof_factor(tries)
+    n.squfof_factor(tries=1e4)
 
 Shanks' SQUFOF method.
 

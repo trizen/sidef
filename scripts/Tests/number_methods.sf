@@ -440,28 +440,35 @@ do {
 }
 
 do {
-    var n = (10**120 - 10**40)
-
     func verify_factors(f,n) {
         assert_eq(f.prod, n)
         assert(f.len >= 2)
         assert(f.all { n % _ == 0})
     }
 
-    verify_factors(n.factor { .squfof_factor }, n)
-    verify_factors(n.factor { .trial_factor }, n)
-    verify_factors(n.factor { .pell_factor }, n)
-    verify_factors(n.factor { .flt_factor }, n)
-    verify_factors(n.factor { .holf_factor }, n)
-    verify_factors(n.factor { .mbe_factor }, n)
-    verify_factors(n.factor { .fermat_factor }, n)
-    verify_factors(n.factor { .cyclotomic_factor }, n)
-    verify_factors(n.factor { .chebyshev_factor(1e4) }, n)
-    verify_factors(n.factor { .ecm_factor }, n)
-    verify_factors(n.factor { .pm1_factor(1e5) }, n)
-    verify_factors(n.factor { .pp1_factor(1e5) }, n)
-    verify_factors(n.factor { .dop_factor }, n)
-    verify_factors(n.factor { .cop_factor }, n)
+    for n in ([10**120 - 10**40, 2**128 - 1]) {
+
+        verify_factors(n.factor { .squfof_factor(1e4) }, n)
+        verify_factors(n.factor { .trial_factor }, n)
+        verify_factors(n.factor { .pell_factor }, n)
+        verify_factors(n.factor { .flt_factor }, n)
+        verify_factors(n.factor { .holf_factor }, n)
+        verify_factors(n.factor { .mbe_factor }, n)
+        verify_factors(n.factor { .fermat_factor }, n)
+        verify_factors(n.factor { .cyclotomic_factor }, n)
+        verify_factors(n.factor { .chebyshev_factor(1e4) }, n)
+        verify_factors(n.factor { .ecm_factor }, n)
+        verify_factors(n.factor { .pm1_factor(1e4) }, n)
+        verify_factors(n.factor { .pp1_factor(1e4) }, n)
+
+        verify_factors(n.dop_factor, n)
+        verify_factors(n.cop_factor, n)
+
+        if (n.is_odd) {
+            verify_factors(n.factor { .miller_factor }, n)
+            verify_factors(n.factor { .lucas_factor }, n)
+        }
+    }
 
     with (58571442634534443082821160508299574798027946748324125518533225605795841) {|n|
         verify_factors(miller_factor(n), n)

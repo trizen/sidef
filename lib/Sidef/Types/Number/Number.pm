@@ -16248,8 +16248,10 @@ package Sidef::Types::Number::Number {
                 Sidef::Types::Block::Block->new(
                     code => sub {
                         my ($n) = @_;
-                        my $factors = $n->is_prime ? Sidef::Types::Array::Array->new() : do { $cache{"$n"} //= $block->run($n) };
-                        $factors->first(MONE)->concat($factors->last(MONE));
+                        $n->is_prime ? Sidef::Types::Array::Array->new() : do {
+                            my $factors = do { $cache{"$n"} //= $block->run($n) };
+                            $factors->first(-1)->concat($factors->last(-1));
+                        };
                     }
                 )
             )->uniq;
@@ -17286,7 +17288,7 @@ package Sidef::Types::Number::Number {
                                         [map { _set_int($_) }
                                            Math::Prime::Util::GMP::squfof_factor(
                                                                   _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),)
+                                                                  (defined($k) ? _big2uistr($k) // 1e4 : 1e4))
                                         ]
                                        );
     }
