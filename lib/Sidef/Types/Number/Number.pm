@@ -16240,15 +16240,32 @@ package Sidef::Types::Number::Number {
     }
 
     sub factor {
-        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
+        my ($n, $block) = @_;
+
+        if (defined($block)) {
+            my %cache;
+            my $f = Sidef::Types::Array::Array->new([$n])->recmap(
+                Sidef::Types::Block::Block->new(
+                    code => sub {
+                        my ($n) = @_;
+                        my $factors = $n->is_prime ? Sidef::Types::Array::Array->new() : do { $cache{"$n"} //= $block->run($n) };
+                        $factors->first(MONE)->concat($factors->last(MONE));
+                    }
+                )
+            )->uniq;
+            return Sidef::Math::Math->gcd_factors($n, $f);
+        }
+
+        $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
         Sidef::Types::Array::Array->new([map { _set_int($_) } _factor($n)]);
     }
 
     *factors = \&factor;
 
     sub factor_exp {
+        my ($n) = @_;
 
-        my $n = &_big2pistr // return Sidef::Types::Array::Array->new();
+        $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
 
         my @pairs;
         foreach my $pk (_factor_exp($n)) {
@@ -16484,7 +16501,7 @@ package Sidef::Types::Number::Number {
                                         [map { _set_int($_) }
                                            Math::Prime::Util::GMP::holf_factor(
                                                                   _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),)
+                                                                  (defined($k) ? _big2uistr($k) // 1e4 : 1e4))
                                         ]
                                        );
     }
@@ -16495,8 +16512,8 @@ package Sidef::Types::Number::Number {
         # $n is a Math::GMPz object holding a positive value
         # $tries is a positive native integer or `undef`
 
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            return Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($n));
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return _factor(Math::GMPz::Rmpz_get_ui($n));
         }
 
         my $D = Math::GMPz::Rmpz_init();    # n-1
@@ -16591,8 +16608,8 @@ package Sidef::Types::Number::Number {
         # $j is a signed native integer or `undef`
         # $tries is an unsigned native integer or `undef`
 
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            return Math::Prime::Util::factor(Math::GMPz::Rmpz_get_ui($n));
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return _factor(Math::GMPz::Rmpz_get_ui($n));
         }
 
         if (!defined($j)) {
@@ -17110,7 +17127,7 @@ package Sidef::Types::Number::Number {
         # Efficient for numbers that have factors relatively close to sqrt(n)
 
         $n    = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
-        $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) // 1e5 } : 1e5;
+        $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) // 1e4 } : 1e4;
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new;
@@ -17138,7 +17155,7 @@ package Sidef::Types::Number::Number {
         my $f2 = Math::GMPz::Rmpz_init_set($x);
         my $f1 = Math::GMPz::Rmpz_init_set_ui(1);
 
-        foreach (1 .. $reps) {
+        foreach my $k (1 .. $reps) {
 
             # y = r*z - y
             Math::GMPz::Rmpz_mul($t, $r, $z);
@@ -17151,7 +17168,15 @@ package Sidef::Types::Number::Number {
 
             # r = (x + y) / z
             Math::GMPz::Rmpz_add($t, $x, $y);
-            Math::GMPz::Rmpz_div($r, $t, $z);
+
+            # Floor division: floor((x+y)/z)
+            # Math::GMPz::Rmpz_div($r, $t, $z);
+
+            # Round (x+y)/z to nearest integer
+            Math::GMPz::Rmpz_set($r, $z);
+            Math::GMPz::Rmpz_addmul_ui($r, $t, 2);
+            Math::GMPz::Rmpz_div($r, $r, $z);
+            Math::GMPz::Rmpz_div_2exp($r, $r, 1);
 
             # f1 = (f1 + r*f2) % n
             Math::GMPz::Rmpz_addmul($f1, $f2, $r);

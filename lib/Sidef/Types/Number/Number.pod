@@ -2459,10 +2459,20 @@ Complex numbers are also supported:
 =head2 factor
 
     factor(n)
+    factor(n, { ... })
 
 Returns an array with the prime factors of C<n>, where C<n> is a positive integer, such that C<n.factor.prod == n>.
 
     say 180.factor  #=> [2, 2, 3, 3, 5]
+
+An optional block can be provided, to use a specific factorization method:
+
+    say factor(10**120 - 10**40, {|k| k.ecm_factor })
+    say factor(10**120 - 10**40, {|k| k.fermat_factor })
+
+The block is expected to return an array with zero or more (not necessarily prime) factors of C<k>.
+
+The block is called recursively for each new composite factor found, until no new factors are found.
 
 Aliases: I<factors>
 
@@ -2856,8 +2866,7 @@ Aliases: I<hermite_polynomialHe>
 
 =head2 holf_factor
 
-    n.holf_factor
-    n.holf_factor(tries)
+    n.holf_factor(tries=1e4)
 
 Hart's OLF method (variant of Fermat's method).
 
@@ -5255,13 +5264,13 @@ The product of the factors, will give back C<n>. However, some factors may be co
 
 =head2 pell_factor
 
-    pell_factor(n, tries=1e5)
+    pell_factor(n, tries=1e4)
 
 Pell factorization method, trying to find a factor of C<n>.
 
 This method is particularly effective for numbers that have factors close to C<sqrt(n)>.
 
-    say pell_factor(10**120 - 1)
+    say pell_factor(10**120 - 10**40)
 
 The product of the factors, will give back C<n>. However, some factors may be composite.
 
