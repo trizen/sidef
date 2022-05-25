@@ -58,6 +58,8 @@ package Sidef::Types::Number::Number {
     };
 #>>>
 
+    state $LUCAS_PQ_LIMIT = CORE::int(CORE::sqrt(ULONG_MAX >> 2));
+
     use parent qw(Sidef::Object::Object);
 
     use overload
@@ -9464,8 +9466,6 @@ package Sidef::Types::Number::Number {
         return ($V1, $V2);
     }
 
-    state $LUCAS_PQ_LIMIT = CORE::int(CORE::sqrt(ULONG_MAX >> 2));
-
     sub _modular_lucas_UV {
         my ($P, $Q, $n, $m) = @_;
 
@@ -16638,7 +16638,7 @@ package Sidef::Types::Number::Number {
         my $x = Math::GMPz::Rmpz_init();
         my $g = Math::GMPz::Rmpz_init();
 
-        my $PQ_limit = 1e6;
+        my $PQ_limit = $LUCAS_PQ_LIMIT;
 
         if (Math::GMPz::Rmpz_cmp_ui($n, 1e6) <= 0) {
             $PQ_limit = Math::GMPz::Rmpz_get_ui($n) - 1;
