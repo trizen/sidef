@@ -6393,13 +6393,25 @@ Also works with arbitrarily large n:
 
 =cut
 
+=head2 rough_divisors
+
+    k.rough_divisors(n)
+
+Returns an array with the divisors of n that are k-rough.
+
+Equivalent with (but more efficient):
+
+    n.divisors.grep { .is_rough(k) }
+
+=cut
+
 =head2 rough_part
 
-    n.rough_part(k)
+    k.rough_part(n)
 
 It returns the k-rough part of n that contains all the prime factors p|n such that p >= k.
 
-    say 15.of {|n| rough_part(n!, 3) }      #=> OEIS: A049606
+    say 15.of {|n| 3.rough_part(n!) }      #=> OEIS: A049606
 
 =cut
 
@@ -6563,6 +6575,18 @@ Returns the number of k-smooth numbers <= n, or in the range C<a..b>.
 
 =cut
 
+=head2 smooth_divisors
+
+    k.smooth_divisors(n)
+
+Returns an array with the divisors of n that are k-smooth.
+
+Equivalent with (but more efficient):
+
+    n.divisors.grep { .is_smooth(k) }
+
+=cut
+
 =head2 smooth_numbers
 
     smooth_numbers(limit, [p1,p2,...])
@@ -6584,11 +6608,11 @@ An optional block can be provided, which is called with two arguments, C<n> and 
 
 =head2 smooth_part
 
-    n.smooth_part(k)
+    k.smooth_part(n)
 
 It efficiently returns the largest divisor of n that is k-smooth.
 
-    say 20.of {|n| smooth_part(n!, 3) }     #=> OEIS: A118381
+    say 20.of {|n| 3.smooth_part(n!) }     #=> OEIS: A118381
 
 =cut
 
@@ -7025,7 +7049,7 @@ Returns an array with the subsets of the integers in the range C<0..n-1>, or ite
 
     sum_of_squares(n)
 
-Returns an array of C<[a,b]> pairs containing all the positive solutions to the equation:
+Returns an array of C<[a,b]> pairs, with a <= b, containing all the positive solutions to the equation:
 
     n = a^2 + b^2
 

@@ -62,7 +62,7 @@ assert_eq(
 say "=> Smooth part...";
 
 assert_eq(
-    20.of {|n| 20.of {|k| [n,k, smooth_part(n,k)] } },
+    20.of {|n| 20.of {|k| [n,k, k.smooth_part(n)] } },
     20.of {|n| 20.of {|k| [n,k, my_smooth_part(n,k)] } },
 )
 
@@ -76,21 +76,21 @@ assert_eq(make_coprime(-42, 6), -7)
 assert_eq(make_coprime(-42, -6), -7)
 
 assert_eq(
-    20.of {|n| 20.of {|k| [n,k, smooth_part(n+1,k)] } },
+    20.of {|n| 20.of {|k| [n,k, k.smooth_part(n+1)] } },
     20.of {|n| 20.of {|k| [n,k, (n+1) / make_coprime(n+1, k.primorial)] } },
 )
 
 say "=> Rough part...";
 
 assert_eq(
-    20.of {|n| 20.of {|k| [n,k, rough_part(n,k)] } },
+    20.of {|n| 20.of {|k| [n,k, k.rough_part(n)] } },
     20.of {|n| 20.of {|k| [n,k, my_rough_part(n,k)] } },
 )
 
 say "=> Rough part <=> make_coprime...";
 
 assert_eq(
-    20.of {|n| 20.of {|k| [n,k, rough_part(n,k+1)] } },
+    20.of {|n| 20.of {|k| [n,k, (k+1).rough_part(n)] } },
     20.of {|n| 20.of {|k| [n,k, make_coprime(n, k.primorial)] } },
 )
 
@@ -98,24 +98,24 @@ do {
     var n = %n[17, 17, 19, 23, 23, 29, 47, 53, 59].prod
     var D = n.divisors
 
-    assert_eq(n.rough_part(47), D.last_by { .is_rough(47) })
-    assert_eq(n.rough_part(46), D.last_by { .is_rough(46) })
-    assert_eq(n.rough_part(48), D.last_by { .is_rough(48) })
+    assert_eq(47.rough_part(n), D.last_by { .is_rough(47) })
+    assert_eq(46.rough_part(n), D.last_by { .is_rough(46) })
+    assert_eq(48.rough_part(n), D.last_by { .is_rough(48) })
 
-    assert_eq(n.smooth_part(47), D.last_by { .is_smooth(47) })
-    assert_eq(n.smooth_part(46), D.last_by { .is_smooth(46) })
-    assert_eq(n.smooth_part(48), D.last_by { .is_smooth(48) })
+    assert_eq(47.smooth_part(n), D.last_by { .is_smooth(47) })
+    assert_eq(46.smooth_part(n), D.last_by { .is_smooth(46) })
+    assert_eq(48.smooth_part(n), D.last_by { .is_smooth(48) })
 
-    assert_eq(rough_part(43*97, 101), 1)
-    assert_eq(rough_part(43*97*43*43*97, 97), 97**2)
-    assert_eq(rough_part(43*97*43*43*97, 98), 1)
+    assert_eq(101.rough_part(43*97), 1)
+    assert_eq(97.rough_part(43*97*43*43*97), 97**2)
+    assert_eq(98.rough_part(43*97*43*43*97), 1)
 
-    assert_eq(smooth_part(43*97, 23), 1)
-    assert_eq(smooth_part(43*97*43*97*43, 43), 43**3)
-    assert_eq(smooth_part(43*97*43*97*43, 41), 1)
+    assert_eq(23.smooth_part(43*97), 1)
+    assert_eq(43.smooth_part(43*97*43*97*43), 43**3)
+    assert_eq(41.smooth_part(43*97*43*97*43), 1)
 
-    assert_eq((n*17*19*23).smooth_part(19), 17**3 * 19**2)
-    assert_eq((n*17*19*23).smooth_part(18), 17**3)
+    assert_eq(19.smooth_part(n*17*19*23), 17**3 * 19**2)
+    assert_eq(17.smooth_part(n*17*19*23), 17**3)
 }
 
 do {
@@ -185,6 +185,21 @@ do {
             break
         }
     }
+}
+
+do {
+    var n = 10!
+    var D = n.divisors
+
+    assert_eq(3.smooth_divisors(n), D.grep{.is_smooth(3)})
+    assert_eq(5.smooth_divisors(n), D.grep{.is_smooth(5)})
+    assert_eq(5.rough_divisors(n), D.grep{.is_rough(5)})
+    assert_eq(3.rough_divisors(n), D.grep{.is_rough(3)})
+
+    7.of {|k| 7.of {|n|
+        assert_eq(k.smooth_divisors(n), n.divisors.grep{.is_smooth(k)})
+        assert_eq(k.rough_divisors(n), n.divisors.grep{.is_rough(k)})
+    }}
 }
 
 say "** Test passed!"

@@ -22027,9 +22027,9 @@ package Sidef::Types::Number::Number {
     }
 
     sub smooth_part {
-        my ($n, $k) = @_;
+        my ($k, $n) = @_;
 
-        _valid(\$k);
+        _valid(\$n);
 
         $n = $$n;
         $k = $$k;
@@ -22065,10 +22065,15 @@ package Sidef::Types::Number::Number {
         bless \$t;
     }
 
-    sub rough_part {
-        my ($n, $k) = @_;
+    sub smooth_divisors {
+        my ($k, $n) = @_;
+        $k->smooth_part($n)->divisors;
+    }
 
-        _valid(\$k);
+    sub rough_part {
+        my ($k, $n) = @_;
+
+        _valid(\$n);
 
         $n = $$n;
         $k = $$k;
@@ -22103,6 +22108,11 @@ package Sidef::Types::Number::Number {
         }
 
         bless \$t;
+    }
+
+    sub rough_divisors {
+        my ($k, $n) = @_;
+        $k->rough_part($n)->divisors;
     }
 
     sub is_prob_squarefree {
