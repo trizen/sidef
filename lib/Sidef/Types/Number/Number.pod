@@ -4959,7 +4959,7 @@ Aliases: I<call>
 
     n.next_composite
 
-Given a non-negative integer C<n>, it returns the next composite number after C<n>.
+Given a non-negative integer C<n>, returns the next composite number greater than C<n>.
 
 =cut
 
@@ -4998,6 +4998,14 @@ Aliases: I<next_power>
     n.next_prime
 
 Returns the next prime larger than C<n>.
+
+=cut
+
+=head2 next_prime_power
+
+    n.next_prime_power
+
+Given a non-negative integer C<n>, returns the next prime power (C<p^k> with k >= 1) greater than C<n>.
 
 =cut
 

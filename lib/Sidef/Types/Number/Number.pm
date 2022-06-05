@@ -15929,6 +15929,33 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub next_prime_power {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
+        Math::GMPz::Rmpz_cmp_ui($n, 2) < 0 and return _set_int(2);
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_slong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) + 1;
+            while (!(HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($n) : Math::Prime::Util::GMP::is_prime_power($n))) {
+                ++$n;
+            }
+            return _set_int($n);
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add_ui($r, $n, 1);
+
+        while (!Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($r, 10))) {
+            Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        }
+
+        bless \$r;
+    }
+
     sub next_squarefree {
         my ($n) = @_;
 
@@ -16195,7 +16222,7 @@ package Sidef::Types::Number::Number {
             return bless \$n;
         }
 
-        foreach my $p (2, 3, 5) {
+        foreach my $p (2, 3, 5, 7) {
             if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
                 return _set_int($p);
             }
