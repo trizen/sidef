@@ -6,9 +6,9 @@ package Sidef::Types::Number::Number {
     use Math::MPFR qw();
     use Math::GMPq qw();
     use Math::GMPz qw();
-    use Math::MPC qw();
+    use Math::MPC  qw();
 
-    use List::Util qw();
+    use List::Util             qw();
     use Math::Prime::Util::GMP qw();
 
     our ($ROUND, $PREC);
@@ -7160,7 +7160,7 @@ package Sidef::Types::Number::Number {
             my $B = Math::GMPz::Rmpz_get_ui($k);
 
             # When B < 2^32, use Math::Prime::Util::GMP::todigits().
-            if ($B <= 4294967295 and Math::GMPz::Rmpz_sizeinbase($n, 62) <= 2e6) {
+            if ($B <= 4294967295 and Math::GMPz::Rmpz_sizeinbase($n, 62) <= 1e6) {
                 return _set_int(
                        Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B)));
             }
@@ -17431,7 +17431,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        $sum = __sub__($sum, __mul__(${$F->(bless \$s)->to_n}, ${$G->(bless \$s)->to_n}));
+        $sum = __sub__($sum, __mul__(${$F->run(_set_int($s))->to_n}, ${$G->run(_set_int($s))->to_n}));
         bless \$sum;
     }
 
@@ -23680,6 +23680,8 @@ package Sidef::Types::Number::Number {
             Math::MPFR::Rmpfr_set_ui($left, 0, $ROUND);
         }
 
+        my $prev;
+
         while (1) {
 
             Math::MPFR::Rmpfr_add($middle, $left, $right, $ROUND);
@@ -23701,6 +23703,13 @@ package Sidef::Types::Number::Number {
             if (Math::MPFR::Rmpfr_cmp($left, $right) >= 0) {
                 last;
             }
+
+            # Prevent infinite looping
+            if (defined($prev) and Math::MPFR::Rmpfr_cmp($prev, $item) == 0) {
+                return $value;
+            }
+
+            $prev = $item;
         }
 
         return undef;

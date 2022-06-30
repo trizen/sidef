@@ -177,14 +177,14 @@ package Sidef::Types::Number::Gauss {
     sub inv {
         my ($x) = @_;
         my $t = $x->{a}->sqr->add($x->{b}->sqr);
-        __PACKAGE__->new($x->{a}->div($t), $x->{b}->neg->div($t),);
+        __PACKAGE__->new($x->{a}->div($t), $x->{b}->neg->div($t));
     }
 
     sub invmod {
         my ($x, $m) = @_;
         $x->mod($m);
         my $t = $x->{a}->sqr->add($x->{b}->sqr)->invmod($m);
-        __PACKAGE__->new($x->{a}->mul($t)->mod($m), $x->{b}->neg->mul($t)->mod($m),);
+        __PACKAGE__->new($x->{a}->mul($t)->mod($m), $x->{b}->neg->mul($t)->mod($m));
     }
 
     sub div {
@@ -216,7 +216,7 @@ package Sidef::Types::Number::Gauss {
         my ($x, $y) = @_;
 
         if (ref($y) eq 'Sidef::Types::Number::Number') {
-            return __PACKAGE__->new($x->{a}->mod($y), $x->{b}->mod($y),);
+            return __PACKAGE__->new($x->{a}->mod($y), $x->{b}->mod($y));
         }
 
         # mod(a, b) = a - b * floor(a/b)

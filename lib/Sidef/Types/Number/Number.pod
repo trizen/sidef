@@ -7030,7 +7030,7 @@ Number of derangements of a set with n elements having exactly k fixed points. A
 
     submod(a,b,m)
 
-Modular integer subtraction: C<(a-b)%m>.
+Modular integer subtraction: C<(a-b) % m>.
 
     say submod(43, 97, 127)     #=> (43-97)%127
 

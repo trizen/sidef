@@ -116,6 +116,7 @@ do {
 
     assert_eq(19.smooth_part(n*17*19*23), 17**3 * 19**2)
     assert_eq(17.smooth_part(n*17*19*23), 17**3)
+    assert_eq(18.smooth_part(n*17*19*23), 17**3)
 }
 
 do {
