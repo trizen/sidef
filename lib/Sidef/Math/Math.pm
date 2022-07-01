@@ -170,37 +170,7 @@ package Sidef::Math::Math {
 
     sub gcd_factors {
         my ($self, $n, $arr) = @_;
-
-        $n->is_pos
-          || return Sidef::Types::Array::Array->new;
-
-        my $orig_n = $n;
-
-        my @factors;
-        my $G = Sidef::Types::Array::Array->new([grep { $_->is_ntf($n) } map { $n->gcd($_) } @$arr])->sort->uniq;
-
-        foreach my $g (@$G) {
-
-            my $new_g = $g;
-
-            if ($new_g->divides($n)) {
-                ## ok
-            }
-            else {
-                $new_g = $n->gcd($g);
-                $new_g->is_ntf($n) || next;
-            }
-
-            my $v = $n->valuation($new_g);
-            $n = $n->remove($new_g);
-            push @factors, ($new_g) x CORE::int($v);
-        }
-
-        if (!$n->is_one) {
-            push @factors, $n;
-        }
-
-        Sidef::Types::Array::Array->new(\@factors)->sort;
+        Sidef::Types::Number::Number::gcd_factors($n, $arr);
     }
 
     sub smooth_numbers {

@@ -16266,6 +16266,55 @@ package Sidef::Types::Number::Number {
         _set_int($f[-1]);
     }
 
+    sub gcd_factors {
+        my ($n, $arr) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        my $z = Math::GMPz::Rmpz_init_set($n);    # copy
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        my @gcds;
+        my %seen;
+
+        foreach my $k (@$arr) {
+            _valid(\$k);
+            my $m = _any2mpz($$k) // next;
+            Math::GMPz::Rmpz_gcd($t, $z, $m);
+            Math::GMPz::Rmpz_cmp_ui($t, 1) > 0 or next;
+            Math::GMPz::Rmpz_cmp($t, $z) < 0   or next;
+            if (!$seen{Math::GMPz::Rmpz_get_str($t, 10)}++) {
+                push @gcds, Math::GMPz::Rmpz_init_set($t);
+            }
+        }
+
+        @gcds = sort { Math::GMPz::Rmpz_cmp($a, $b) } @gcds;
+
+        my @factors;
+
+        foreach my $g (@gcds) {
+
+            Math::GMPz::Rmpz_gcd($t, $g, $z);
+            Math::GMPz::Rmpz_cmp_ui($t, 1) > 0 or next;
+            Math::GMPz::Rmpz_cmp($t, $z) < 0   or next;
+
+            my $v = Math::GMPz::Rmpz_remove($z, $z, $t);
+            push(@factors, (Math::GMPz::Rmpz_init_set($t)) x $v);
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($z, 1) > 0) {
+            push @factors, $z;
+        }
+
+        @factors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @factors;
+        @factors = map  { bless \$_ } @factors;
+
+        Sidef::Types::Array::Array->new(\@factors);
+    }
+
     sub factor {
         my ($n, $block) = @_;
 
@@ -16282,7 +16331,7 @@ package Sidef::Types::Number::Number {
                     }
                 )
             )->uniq;
-            return Sidef::Math::Math->gcd_factors($n, $f);
+            return $n->gcd_factors($f);
         }
 
         $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
