@@ -58,6 +58,17 @@ Efficiently computes the modular multiplicative inverses of a list of integers, 
 
 =cut
 
+=head2 binary_exp
+
+    Math.binary_exp(c, x, n, {|a,b| ... })
+
+Generic implementation of the binary exponentiation algorithm, using the binary expansion of C<n>.
+
+    say Math.binary_exp(1, 3, 43, {|a,b| a * b })  #=> 3^43
+    say Math.binary_exp(0, 3, 43, {|a,b| a + b })  #=> 3*43
+
+=cut
+
 =head2 binsplit
 
     Math.binsplit(block, list...)

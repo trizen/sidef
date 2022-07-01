@@ -19,6 +19,20 @@ package Sidef::Math::Math {
         Sidef::Types::Number::Number::_binsplit(\@list, $block);
     }
 
+    sub binary_exp {
+        my ($self, $r, $x, $n, $block) = @_;
+
+        ($n->is_int && not $n->is_neg)
+          || return Sidef::Types::Number::Number->nan;
+
+        foreach my $bit (CORE::reverse(split(//, $n->as_bin))) {
+            $r = $block->run($x, $r) if $bit;
+            $x = $block->run($x, $x);
+        }
+
+        return $r;
+    }
+
     sub gcd {
         my ($self, @list) = @_;
         Sidef::Types::Number::Number::gcd(@list);

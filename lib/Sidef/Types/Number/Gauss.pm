@@ -307,6 +307,8 @@ package Sidef::Types::Number::Gauss {
     sub pow {
         my ($x, $n) = @_;
 
+        $n->is_int || return $x->to_n->pow($n);
+
         my $negative_power = 0;
 
         if ($n->is_neg) {
