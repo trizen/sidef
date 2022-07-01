@@ -16332,7 +16332,7 @@ package Sidef::Types::Number::Number {
         my $z = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
 
         Math::GMPz::Rmpz_sgn($z) > 0
-            or return Sidef::Types::Array::Array->new;
+          or return Sidef::Types::Array::Array->new;
 
         # Factorize directly if it is small enough
         if (Math::GMPz::Rmpz_fits_ulong_p($z)) {
@@ -16927,8 +16927,6 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new;
 
-        $n = Math::GMPz::Rmpz_init_set($n);    # copy
-
         my %seen_divisor;
 
         my $congr_powers = sub {
@@ -17032,29 +17030,7 @@ package Sidef::Types::Number::Number {
             push @divisors, $congr_powers->(@$args);
         }
 
-        @divisors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @divisors;
-
-        my @factors;
-        state $g = Math::GMPz::Rmpz_init_nobless();
-
-        foreach my $d (@divisors) {
-
-            Math::GMPz::Rmpz_gcd($g, $n, $d);
-
-            if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
-                my $valuation = Math::GMPz::Rmpz_remove($n, $n, $g);
-                push(@factors, (Math::GMPz::Rmpz_init_set($g)) x $valuation);
-            }
-        }
-
-        if (Math::GMPz::Rmpz_cmp_ui($n, 1) > 0) {
-            push @factors, $n;
-        }
-
-        @factors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @factors;
-        @factors = map  { _set_int($_) } @factors;
-
-        Sidef::Types::Array::Array->new(\@factors);
+        (bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([map { bless \$_ } @divisors]));
     }
 
     # Difference of powers factorization method
@@ -17069,8 +17045,6 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new;
-
-        $n = Math::GMPz::Rmpz_init_set($n);    # copy
 
         my %seen_divisor;
         my @diff_powers_params;
@@ -17184,29 +17158,7 @@ package Sidef::Types::Number::Number {
             push @divisors, $diff_powers->(@$args);
         }
 
-        @divisors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @divisors;
-
-        my @factors;
-        state $g = Math::GMPz::Rmpz_init_nobless();
-
-        foreach my $d (@divisors) {
-
-            Math::GMPz::Rmpz_gcd($g, $n, $d);
-
-            if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
-                my $valuation = Math::GMPz::Rmpz_remove($n, $n, $g);
-                push(@factors, (Math::GMPz::Rmpz_init_set($g)) x $valuation);
-            }
-        }
-
-        if (Math::GMPz::Rmpz_cmp_ui($n, 1) > 0) {
-            push @factors, $n;
-        }
-
-        @factors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @factors;
-        @factors = map  { _set_int($_) } @factors;
-
-        Sidef::Types::Array::Array->new(\@factors);
+        (bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([map { bless \$_ } @divisors]));
     }
 
     # "Fermat's Little Theorem" factorization method
