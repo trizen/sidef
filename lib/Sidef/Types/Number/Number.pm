@@ -16278,15 +16278,17 @@ package Sidef::Types::Number::Number {
         state $t = Math::GMPz::Rmpz_init_nobless();
 
         my @gcds;
-        my %seen;
+        my %seen_k;
+        my %seen_gcd;
 
         foreach my $k (@$arr) {
             _valid(\$k);
             my $m = _any2mpz($$k) // next;
+            next if $seen_k{Math::GMPz::Rmpz_get_str($m, 10)}++;
             Math::GMPz::Rmpz_gcd($t, $z, $m);
             Math::GMPz::Rmpz_cmp_ui($t, 1) > 0 or next;
             Math::GMPz::Rmpz_cmp($t, $z) < 0   or next;
-            if (!$seen{Math::GMPz::Rmpz_get_str($t, 10)}++) {
+            if (!$seen_gcd{Math::GMPz::Rmpz_get_str($t, 10)}++) {
                 push @gcds, Math::GMPz::Rmpz_init_set($t);
             }
         }
@@ -16314,6 +16316,73 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Array::Array->new(\@factors);
     }
+
+    *gcd_factor = \&gcd_factor;
+
+    sub special_factors {
+        my ($n, $m) = @_;
+
+        if (defined($m)) {
+            _valid(\$m);
+        }
+        else {
+            $m //= ONE;
+        }
+
+        my $z = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        Math::GMPz::Rmpz_sgn($z) > 0
+            or return Sidef::Types::Array::Array->new;
+
+        # Factorize directly if it is small enough
+        if (Math::GMPz::Rmpz_fits_ulong_p($z)) {
+            return Sidef::Types::Array::Array->new([map { _set_int($_) } _factor(Math::GMPz::Rmpz_get_ui($z))]);
+        }
+
+        my @factors;
+
+        my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))) });
+        my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e3))) });
+        my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(1e3))) });
+        my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor($m->mul(_set_int(1e3))) });
+
+        my $pm1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) });
+        my $pp1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(1e4))) });
+        my $chebyshev_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(1e4))) });
+
+        push @factors, @{$n->trial_factor($m->mul(_set_int(1e6)))->first(-1)};
+
+        # Special methods that depdend on the special form of n
+        push @factors, @{$n->cop_factor($m->mul(_set_int(100)))->first(-1)};
+        push @factors, @{$n->dop_factor($m->mul(_set_int(200)))->first(-1)};
+
+        push @factors, @{$n->miller_factor($m->mul(_set_int(10)))->first(-1)};
+        push @factors, @{$n->lucas_factor($m->mul(_set_int(5)))->first(-1)};
+
+        push @factors, @{$n->fermat_factor($m->mul(_set_int(1e3)))->first(-1)};
+        push @factors, @{$n->holf_factor($m->mul(_set_int(1e3)))->first(-1)};
+        push @factors, @{$n->pell_factor($m->mul(_set_int(1e3)))->first(-1)};
+
+        @factors = @{$n->gcd_factors(Sidef::Types::Array::Array->new([@factors]))};
+
+        # Special methods that can find extra special factors, recursively
+        @factors = map { @{$_->factor($fermat_block)} } @factors;
+        @factors = map { @{$_->factor($holf_block)} } @factors;
+        @factors = map { @{$_->factor($pell_block)} } @factors;
+        @factors = map { @{$_->factor($FLT_block)} } @factors;
+
+        @factors = map { @{$_->factor($pm1_block)} } @factors;
+        @factors = map { @{$_->factor($pp1_block)} } @factors;
+        @factors = map { @{$_->factor($chebyshev_block)} } @factors;
+
+        @factors = map {
+            ($_->is_prime ? $_ : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(10))))})
+        } @factors;
+
+        $n->gcd_factors(Sidef::Types::Array::Array->new([@factors]));
+    }
+
+    *special_factor = \&special_factors;
 
     sub factor {
         my ($n, $block) = @_;
@@ -16473,7 +16542,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new;
 
-        $B = defined($B) ? do { _valid(\$B); _any2ui($$B) // 1e5 } : 1e5;
+        $B = defined($B) ? do { _valid(\$B); _any2ui($$B) || 1e5 } : 1e5;
         $x =
           defined($x)
           ? do { _valid(\$x); Math::GMPz::Rmpz_init_set(_any2mpz($$x) // $TWO) }
@@ -16924,11 +16993,12 @@ package Sidef::Types::Number::Number {
                     if (Math::GMPz::Rmpz_perfect_power_p($z)) {
 
                         my $t = Math::Prime::Util::GMP::is_power(Math::GMPz::Rmpz_get_str($z, 10)) || 1;
-                        my $r = Math::GMPz::Rmpz_init();
 
-                        Math::GMPz::Rmpz_root($r, $z, $t);
-
-                        push @congr_powers_params, [$r, $t, $k, $e];
+                        if ($t > 1) {
+                            my $r = Math::GMPz::Rmpz_init();
+                            Math::GMPz::Rmpz_root($r, $z, $t);
+                            push @congr_powers_params, [$r, $t, $k, $e];
+                        }
                     }
                 }
             }

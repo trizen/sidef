@@ -6689,6 +6689,24 @@ Sum of primes dividing n (with repetition).
 
 =cut
 
+=head2 special_factor
+
+    special_factor(n, tries=1)
+
+Tries to find special factors of C<n>, using various special-factorization methods, including trial division, p-1 method, p+1 method, HOLF method, Fermat method, Pell method, Miller-Rabin method and the Lucas-Miller method.
+
+An additional optional argument can be given to increase the number of tries by the given factor. For example, C<tries = 2> will double the number of tries.
+
+The method returns an array with the factors of C<n>:
+
+    say special_factor((3**120 + 1) * (5**240 - 1))
+
+The product of the factors, will give back C<n>. However, some factors may be composite.
+
+Aliases: I<special_factors>
+
+=cut
+
 =head2 sqr
 
     sqr(x)
