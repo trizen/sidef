@@ -11662,9 +11662,13 @@ package Sidef::Types::Number::Number {
     }
 
     sub _native_squarefree_count {
-        my ($n, $s) = @_;
+        my ($n) = @_;
 
-        $s //= CORE::int(CORE::sqrt($n));
+        if (HAS_NEW_PRIME_UTIL) {
+            return Math::Prime::Util::powerfree_count($n, 2);
+        }
+
+        my $s = CORE::int(CORE::sqrt($n));
 
         # Using moebius(1, sqrt(n)) for values of n <= 2^40
         if ($n <= (1 << 40)) {
@@ -11729,15 +11733,12 @@ package Sidef::Types::Number::Number {
 
         # Optimization for native integers
         if ($k == 2 and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-
-            my $s = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_sqrt($s, $n);
-
-            $s = Math::GMPz::Rmpz_get_ui($s);
-            $n = Math::GMPz::Rmpz_get_ui($n);
-
-            my $count = _native_squarefree_count($n, $s);
+            my $count = _native_squarefree_count(Math::GMPz::Rmpz_get_ui($n));
             return _set_int($count);
+        }
+
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return _set_int(Math::Prime::Util::powerfree_count(Math::GMPz::Rmpz_get_ui($n), $k));
         }
 
         my $c = Math::GMPz::Rmpz_init_set_ui(0);
@@ -13290,7 +13291,9 @@ package Sidef::Types::Number::Number {
             $max = 8;
         }
 
-        my $k = 0;
+        my $k      = 0;
+        my $sqrt_n = CORE::int(CORE::sqrt($n));
+        my $composite_count;
 
         while (1) {
             $k = ($min + $max) >> 1;
@@ -13301,7 +13304,13 @@ package Sidef::Types::Number::Number {
                       : _prime_count($k)
                      );
 
-            my $cmp = ($k - $pi - 1) <=> $n;
+            $composite_count = ($k - $pi - 1);
+
+            if (CORE::abs($composite_count - $n) <= $sqrt_n) {
+                last;
+            }
+
+            my $cmp = $composite_count <=> $n;
 
             if ($cmp > 0) {
                 $max = $k - 1;
@@ -13316,6 +13325,14 @@ package Sidef::Types::Number::Number {
 
         if (_is_prob_prime($k)) {
             --$k;
+        }
+
+        while ($composite_count != $n) {
+            my $cmp = ($n <=> $composite_count);
+            do {
+                $k += $cmp;
+            } while _is_prob_prime($k);
+            $composite_count += $cmp;
         }
 
         _set_int($k);
@@ -13340,12 +13357,12 @@ package Sidef::Types::Number::Number {
         #   https://mathoverflow.net/questions/66701/bounds-on-squarefree-numbers
 
         if ($n >= 144) {
-            $min = $zeta2 * $n - 5 * $sqrt_n;
-            $max = $zeta2 * $n + 5 * $sqrt_n;
+            $min = CORE::int($zeta2 * $n - 5 * $sqrt_n);
+            $max = CORE::int($zeta2 * $n + 5 * $sqrt_n);
         }
         elsif ($n >= 268293) {
-            $min = $zeta2 * $n - 0.058377 * $sqrt_n;
-            $max = $zeta2 * $n + 0.058377 * $sqrt_n;
+            $min = CORE::int($zeta2 * $n - 0.058377 * $sqrt_n);
+            $max = CORE::int($zeta2 * $n + 0.058377 * $sqrt_n);
         }
 
         my $k = 0;
@@ -13360,7 +13377,7 @@ package Sidef::Types::Number::Number {
                                  : _native_squarefree_count($k)
                                 );
 
-            if (CORE::abs($squarefree_count - $n) <= 1e6) {
+            if (CORE::abs($squarefree_count - $n) <= $sqrt_n) {
                 last;
             }
 
