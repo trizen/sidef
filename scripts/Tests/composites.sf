@@ -112,7 +112,7 @@ assert_eq(
 )
 
 for n in (1..8) {
-    for k in (2..14 -> map{|b| b**n }) {
+    for k in (2..15 -> map{|b| b**n }) {
         var t = nth_composite(k)
         assert(t.is_composite)
         assert_eq(t.composite_count, k)

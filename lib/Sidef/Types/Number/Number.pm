@@ -13356,13 +13356,13 @@ package Sidef::Types::Number::Number {
         # Bounds on squarefree numbers:
         #   https://mathoverflow.net/questions/66701/bounds-on-squarefree-numbers
 
-        if ($n >= 144) {
-            $min = CORE::int($zeta2 * $n - 5 * $sqrt_n);
-            $max = CORE::int($zeta2 * $n + 5 * $sqrt_n);
-        }
-        elsif ($n >= 268293) {
+        if ($n >= 268293) {
             $min = CORE::int($zeta2 * $n - 0.058377 * $sqrt_n);
             $max = CORE::int($zeta2 * $n + 0.058377 * $sqrt_n);
+        }
+        elsif ($n >= 144) {
+            $min = CORE::int($zeta2 * $n - 5 * $sqrt_n);
+            $max = CORE::int($zeta2 * $n + 5 * $sqrt_n);
         }
 
         my $k = 0;
