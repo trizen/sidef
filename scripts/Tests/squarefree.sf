@@ -123,4 +123,24 @@ assert_eq(next_squarefree(2**128 - 2), 2**128 - 1)
 
 assert_eq(next_squarefree(2**64 + 3), 2**64 + 5)
 
+assert_eq(43.square_free_count, 29)
+assert_eq(square_free_count(-10, 43), 29)
+assert_eq(square_free_count(2, 43), 28)
+assert_eq(square_free_count(4, 43), 26)
+assert_eq(square_free_count(1e6), 607926)
+assert_eq(square_free_count(1e5, 1e6), 547132)
+assert_eq(square_free_count(1e5 - 2, 1e6 - 3), 547133)
+assert_eq(square_free_count(1e5 - 1, 1e6 - 3), 547132)
+assert_eq(square_free_count(1e5 - 2, 1e6 - 1), 547133)
+
+for n in (1..8) {
+    for k in (2..14 -> map{|b| b**n }) {
+        var t = nth_squarefree(k)
+        assert(t.is_squarefree)
+        assert_eq(t.squarefree_count, k)
+    }
+}
+
+assert_eq(3000.of{.nth_squarefree}.ft(1), 3000.dec.by{.is_squarefree})
+
 say "** Test passed!"

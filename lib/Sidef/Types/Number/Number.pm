@@ -11661,6 +11661,52 @@ package Sidef::Types::Number::Number {
         (TWO)->powerfree_sum($from, $to);
     }
 
+    sub _native_squarefree_count {
+        my ($n, $s) = @_;
+
+        $s //= CORE::int(CORE::sqrt($n));
+
+        # Using moebius(1, sqrt(n)) for values of n <= 2^40
+        if ($n <= (1 << 40)) {
+
+            my ($count, $k) = (0, 0);
+
+            foreach my $m (
+                           HAS_PRIME_UTIL
+                           ? Math::Prime::Util::moebius(1, $s)
+                           : Math::Prime::Util::GMP::moebius(1, $s)
+              ) {
+                ++$k;
+                $count += $m * CORE::int($n / ($k * $k)) if $m;
+            }
+
+            return $count;
+        }
+
+        # Linear counting up to sqrt(n)
+
+        my $count = 0;
+
+        if (HAS_NEW_PRIME_UTIL) {
+            Math::Prime::Util::forsquarefree(
+                sub {
+                    $count += ((scalar(@_) & 1) ? -1 : 1) * CORE::int($n / ($_ * $_));
+                },
+                $s
+            );
+        }
+        else {
+            my $m;
+            foreach my $k (1 .. $s) {
+                if ($m = Math::Prime::Util::GMP::moebius($k)) {
+                    $count += $m * CORE::int($n / ($k * $k));
+                }
+            }
+        }
+
+        return $count;
+    }
+
     sub powerfree_count {
         my ($k, $from, $to) = @_;
 
@@ -11685,50 +11731,12 @@ package Sidef::Types::Number::Number {
         if ($k == 2 and Math::GMPz::Rmpz_fits_ulong_p($n)) {
 
             my $s = Math::GMPz::Rmpz_init();
-
             Math::GMPz::Rmpz_sqrt($s, $n);
 
             $s = Math::GMPz::Rmpz_get_ui($s);
             $n = Math::GMPz::Rmpz_get_ui($n);
 
-            # Using moebius(1, sqrt(n)) for values of n <= 2^40
-            if ($n <= (1 << 40)) {
-
-                my ($count, $k) = (0, 0);
-
-                foreach my $m (
-                               HAS_PRIME_UTIL
-                               ? Math::Prime::Util::moebius(1, $s)
-                               : Math::Prime::Util::GMP::moebius(1, $s)
-                  ) {
-                    ++$k;
-                    $count += $m * CORE::int($n / ($k * $k)) if $m;
-                }
-
-                return _set_int($count);
-            }
-
-            # Linear counting up to sqrt(n)
-
-            my $count = 0;
-
-            if (HAS_NEW_PRIME_UTIL) {
-                Math::Prime::Util::forsquarefree(
-                    sub {
-                        $count += ((scalar(@_) & 1) ? -1 : 1) * CORE::int($n / ($_ * $_));
-                    },
-                    $s
-                );
-            }
-            else {
-                my $m;
-                foreach my $k (1 .. $s) {
-                    if ($m = Math::Prime::Util::GMP::moebius($k)) {
-                        $count += $m * CORE::int($n / ($k * $k));
-                    }
-                }
-            }
-
+            my $count = _native_squarefree_count($n, $s);
             return _set_int($count);
         }
 
@@ -13314,6 +13322,75 @@ package Sidef::Types::Number::Number {
     }
 
     *composite = \&nth_composite;
+
+    sub nth_squarefree {
+        my ($n) = @_;
+        $n = _any2ui($$n) // goto &nan;
+
+        return ZERO if ($n == 0);    # not squarefree, but...
+        return ONE  if ($n == 1);
+
+        my $min = 1;
+        my $max = 231;
+
+        my $zeta2  = 1.64493406684823;
+        my $sqrt_n = CORE::sqrt($n);
+
+        # Bounds on squarefree numbers:
+        #   https://mathoverflow.net/questions/66701/bounds-on-squarefree-numbers
+
+        if ($n >= 144) {
+            $min = $zeta2 * $n - 5 * $sqrt_n;
+            $max = $zeta2 * $n + 5 * $sqrt_n;
+        }
+        elsif ($n >= 268293) {
+            $min = $zeta2 * $n - 0.058377 * $sqrt_n;
+            $max = $zeta2 * $n + 0.058377 * $sqrt_n;
+        }
+
+        my $k = 0;
+        my $squarefree_count;
+
+        while (1) {
+            $k = ($min + $max) >> 1;
+
+            $squarefree_count = (
+                                 HAS_NEW_PRIME_UTIL
+                                 ? Math::Prime::Util::powerfree_count($k, 2)
+                                 : _native_squarefree_count($k)
+                                );
+
+            if (CORE::abs($squarefree_count - $n) <= 1e6) {
+                last;
+            }
+
+            my $cmp = $squarefree_count <=> $n;
+
+            if ($cmp > 0) {
+                $max = $k - 1;
+            }
+            elsif ($cmp < 0) {
+                $min = $k + 1;
+            }
+            else {
+                last;
+            }
+        }
+
+        while (!_is_squarefree($k)) {
+            --$k;
+        }
+
+        while ($squarefree_count != $n) {
+            my $cmp = ($n <=> $squarefree_count);
+            do {
+                $k += $cmp;
+            } while !_is_squarefree($k);
+            $squarefree_count += $cmp;
+        }
+
+        _set_int($k);
+    }
 
     sub legendre {
         my ($x, $y) = @_;

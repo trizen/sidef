@@ -737,6 +737,7 @@ scripts/Tests/cnp.sf
 scripts/Tests/code_interpolation.sf
 scripts/Tests/combs_and_perms.sf
 scripts/Tests/complex_numbers.sf
+scripts/Tests/composites.sf
 scripts/Tests/congruence_of_powers_factorization.sf
 scripts/Tests/const_tests.sf
 scripts/Tests/constant_folding.sf
@@ -912,7 +913,6 @@ scripts/Tests/named_parameters.sf
 scripts/Tests/names_to_numbers.sf
 scripts/Tests/nested_classes.sf
 scripts/Tests/nested_evals.sf
-scripts/Tests/next_composite.sf
 scripts/Tests/non_continuous_seq.sf
 scripts/Tests/nth_prime.sf
 scripts/Tests/number_binary_search.sf
@@ -1021,7 +1021,6 @@ scripts/Tests/soundex.sf
 scripts/Tests/special_methods.sf
 scripts/Tests/split_collapse.sf
 scripts/Tests/sqrtmod_all.sf
-scripts/Tests/square_free_count.sf
 scripts/Tests/squarefree.sf
 scripts/Tests/static_const_lazy_init.sf
 scripts/Tests/string_encodings.sf
