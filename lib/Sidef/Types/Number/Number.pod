@@ -5898,6 +5898,16 @@ Equivalent with:
 
 =cut
 
+=head2 prime_power_lower
+
+    prime_power_lower(n)
+
+Lower bound for the n-th prime power.
+
+Aliases: I<nth_prime_power_lower>
+
+=cut
+
 =head2 prime_powers
 
     prime_powers(n)
@@ -5952,6 +5962,16 @@ This method is equivalent with:
     n.factor_map {|p,k| p**k }.sort
 
 Aliases: I<prime_power_unitary_divisors>, I<unitary_prime_power_divisors>
+
+=cut
+
+=head2 prime_power_upper
+
+    prime_power_upper(n)
+
+Upper bound for the n-th prime power.
+
+Aliases: I<nth_prime_power_upper>
 
 =cut
 

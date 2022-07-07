@@ -12411,6 +12411,50 @@ package Sidef::Types::Number::Number {
 
     *prime_upper = \&nth_prime_upper;
 
+    sub nth_prime_power_lower {
+        my ($n) = @_;
+
+        my $z = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($z) <= 0) {
+            return ZERO;
+        }
+
+        bsearch_min(
+            $n,
+            $n->nth_prime_upper,
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $_[0]->prime_power_count_upper->cmp($n);
+                }
+            )
+        );
+    }
+
+    *prime_power_lower = \&nth_prime_power_lower;
+
+    sub nth_prime_power_upper {
+        my ($n) = @_;
+
+        my $z = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($z) <= 0) {
+            return ZERO;
+        }
+
+        bsearch_max(
+            $n,
+            $n->nth_prime_upper,
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $_[0]->prime_power_count_lower->cmp($n);
+                }
+            )
+        );
+    }
+
+    *prime_power_upper = \&nth_prime_power_upper;
+
     sub almost_prime_count {
         my ($k, $from, $to) = @_;
 
