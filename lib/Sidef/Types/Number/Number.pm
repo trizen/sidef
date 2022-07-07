@@ -12365,6 +12365,74 @@ package Sidef::Types::Number::Number {
         $n->sub($n->prime_count_lower)->dec;
     }
 
+    sub _nth_composite_lower_bound {
+        my ($n) = @_;
+
+        # n + n/log(n) + n/(log(n)**2)
+        my $log_n = $n->log;
+        $n->add($n->div($log_n))->add($n->div($log_n->mul($log_n)));
+    }
+
+    sub _nth_composite_upper_bound {
+        my ($n) = @_;
+
+        # n + n/log(n) + (3*n)/(log(n)**2))
+        my $log_n = $n->log;
+        $n->add($n->div($log_n))->add($n->mul(_set_int(3))->div($log_n->mul($log_n)));
+    }
+
+    sub nth_composite_lower {
+        my ($n) = @_;
+
+        my $z = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($z) <= 0) {
+            return ZERO;
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($z, 3) <= 0) {
+            return _set_int(4);
+        }
+
+        bsearch_min(
+            $n->_nth_composite_lower_bound,
+            $n->_nth_composite_upper_bound,
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $_[0]->composite_count_upper->cmp($n);
+                }
+            )
+        );
+    }
+
+    *composite_lower = \&nth_composite_lower;
+
+    sub nth_composite_upper {
+        my ($n) = @_;
+
+        my $z = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($z) < 0) {
+            return ZERO;
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($z, 3) <= 0) {
+            return _set_int(8);
+        }
+
+        bsearch_max(
+            $n->_nth_composite_lower_bound,
+            $n->_nth_composite_upper_bound,
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $_[0]->composite_count_lower->cmp($n);
+                }
+            )
+        );
+    }
+
+    *composite_upper = \&nth_composite_upper;
+
     sub _nth_prime_lower_bound {
         my ($n) = @_;
         my $log_n = $n->log;
@@ -13277,14 +13345,17 @@ package Sidef::Types::Number::Number {
         my $min = CORE::int($n + $n / CORE::log($n) + $n / (CORE::log($n)**2));
         my $max = CORE::int($n + $n / CORE::log($n) + (3 * $n) / (CORE::log($n)**2));
 
-        # Better bounds for the n-th composite number
-        #~ my $min = _set_int($n)->nth_composite_lower;
-        #~ my $max = _set_int($n)->nth_composite_upper;
+        if ($n > 1e6) {
 
-        #~ Math::GMPz::Rmpz_fits_ulong_p($max) || goto &nan;
+            # Better bounds for the n-th composite number
+            $min = ${_set_int($n)->nth_composite_lower};
+            $max = ${_set_int($n)->nth_composite_upper};
 
-        #~ $min = Math::GMPz::Rmpz_get_ui($min);
-        #~ $max = Math::GMPz::Rmpz_get_ui($max);
+            Math::GMPz::Rmpz_fits_ulong_p($max) || goto &nan;
+
+            $min = Math::GMPz::Rmpz_get_ui($min);
+            $max = Math::GMPz::Rmpz_get_ui($max);
+        }
 
         if ($n < 4) {
             $min = 4;
