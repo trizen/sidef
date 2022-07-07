@@ -5111,11 +5111,23 @@ Aliases: I<nprimes>, I<next_primes>
 
 =cut
 
+=head2 nth_powerfree
+
+    nth_powerfree(n, k=2)
+
+Returns the n-th k-powerfree number.
+
+    say nth_powerfree(1e14, 2)  #=> 164493406685659
+    say nth_powerfree(1e14, 3)  #=> 120205690315927
+    say nth_powerfree(1e14, 4)  #=> 108232323371116
+
+=cut
+
 =head2 nth_squarefree
 
     nth_squarefree(n)
 
-Returns the n-th squarefree integer (OEIS: A005117).
+Returns the n-th squarefree number. (OEIS: A005117)
 
     say nth_squarefree(1e14)    #=> 164493406685659
 

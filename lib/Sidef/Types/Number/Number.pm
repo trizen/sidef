@@ -13344,7 +13344,13 @@ package Sidef::Types::Number::Number {
 
     sub nth_squarefree {
         my ($n) = @_;
-        $n = _any2ui($$n) // goto &nan;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        Math::GMPz::Rmpz_fits_slong_p($n)
+          or return _set_int($n)->nth_powerfree(_set_int(2));
+
+        $n = _any2ui($n) // goto &nan;
 
         return ZERO if ($n == 0);    # not squarefree, but...
         return ONE  if ($n == 1);
@@ -13412,6 +13418,99 @@ package Sidef::Types::Number::Number {
         }
 
         _set_int($k);
+    }
+
+    sub nth_powerfree {
+        my ($n, $k) = @_;
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 2;
+        $n = _any2mpz($$n) // goto &nan;
+
+        $k >= 2 or goto &nan;
+        Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
+
+        return ZERO if (Math::GMPz::Rmpz_sgn($n) == 0);         # not k-powerfree, but...
+        return ONE  if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0);
+
+        if ($k == 2 and Math::GMPz::Rmpz_fits_slong_p($n)) {
+            return ((bless \$n)->nth_squarefree);
+        }
+
+        my $min = Math::GMPz::Rmpz_init_set_ui(1);
+        my $max = Math::GMPz::Rmpz_init_set_ui(231);
+
+        # Bounds on squarefree numbers:
+        #   https://mathoverflow.net/questions/66701/bounds-on-squarefree-numbers
+
+        if ($n >= 144) {
+            my $f = Math::MPFR::Rmpfr_init2(256);
+            Math::MPFR::Rmpfr_zeta_ui($f, $k, $ROUND);
+            Math::MPFR::Rmpfr_mul_z($f, $f, $n, $ROUND);
+
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_root($r, $n, $k);
+            Math::GMPz::Rmpz_mul_ui($r, $r, 5);
+
+            my $t = Math::MPFR::Rmpfr_init2(256);
+            Math::MPFR::Rmpfr_sub_z($t, $f, $r, $ROUND);
+            $min = _any2mpz($t) // goto &nan;
+            Math::MPFR::Rmpfr_add_z($t, $f, $r, $ROUND);
+            $max = _any2mpz($t) // goto &nan;
+        }
+
+        my $k_obj = _set_int($k);
+        my $v     = Math::GMPz::Rmpz_init();
+        my $count = Math::GMPz::Rmpz_init();
+
+        my $min_delta = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_root($min_delta, $min, $k);
+
+        while (1) {
+            Math::GMPz::Rmpz_add($v, $min, $max);
+            Math::GMPz::Rmpz_div_2exp($v, $v, 1);
+
+            $count =
+              (HAS_NEW_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
+              ? Math::GMPz::Rmpz_init_set_ui(Math::Prime::Util::powerfree_count(Math::GMPz::Rmpz_get_ui($v), $k))
+              : ${$k_obj->powerfree_count(bless \$v)};
+
+            if (Math::GMPz::Rmpz_cmp(CORE::abs($count - $n), $min_delta) <= 0) {
+                last;
+            }
+
+            my $cmp = Math::GMPz::Rmpz_cmp($count, $n);
+
+            if ($cmp > 0) {
+                $max = $v - 1;
+            }
+            elsif ($cmp < 0) {
+                $min = $v + 1;
+            }
+            else {
+                last;
+            }
+        }
+
+        until ((bless \$v)->is_powerfree($k_obj)) {
+            Math::GMPz::Rmpz_sub_ui($v, $v, 1);
+        }
+
+        while (1) {
+            my $cmp = Math::GMPz::Rmpz_cmp($n, $count) || last;
+            do {
+                ($cmp > 0)
+                  ? Math::GMPz::Rmpz_add_ui($v, $v, 1)
+                  : Math::GMPz::Rmpz_sub_ui($v, $v, 1);
+              }
+              until (
+                     (HAS_NEW_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
+                     ? Math::Prime::Util::is_powerfree(Math::GMPz::Rmpz_get_ui($v), $k)
+                     : (bless \$v)->is_powerfree($k_obj)
+                    );
+            $count += $cmp;
+        }
+
+        bless \$v;
     }
 
     sub legendre {
@@ -21299,6 +21398,14 @@ package Sidef::Types::Number::Number {
         if ($k == 1) {
             return Sidef::Types::Bool::Bool::TRUE if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0);
             return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return (
+                    Math::Prime::Util::is_powerfree(Math::GMPz::Rmpz_get_ui($n), $k)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
         }
 
         if ($k == 2) {
