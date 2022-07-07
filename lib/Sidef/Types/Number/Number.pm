@@ -12307,6 +12307,54 @@ package Sidef::Types::Number::Number {
 
     *primepi_upper = \&prime_count_upper;
 
+    sub prime_power_count_lower {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO;
+        }
+
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return _set_int(Math::Prime::Util::prime_power_count_lower(Math::GMPz::Rmpz_get_ui($n)));
+        }
+
+        my $t     = Math::GMPz::Rmpz_init();
+        my $count = Math::GMPz::Rmpz_init_set_ui(0);
+
+        foreach my $k (1 .. __ilog__($n, 2)) {
+            Math::GMPz::Rmpz_root($t, $n, $k);
+            Math::GMPz::Rmpz_add($count, $count, ${(bless \$t)->prime_count_lower});
+        }
+
+        bless \$count;
+    }
+
+    sub prime_power_count_upper {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO;
+        }
+
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return _set_int(Math::Prime::Util::prime_power_count_upper(Math::GMPz::Rmpz_get_ui($n)));
+        }
+
+        my $t     = Math::GMPz::Rmpz_init();
+        my $count = Math::GMPz::Rmpz_init_set_ui(0);
+
+        foreach my $k (1 .. __ilog__($n, 2)) {
+            Math::GMPz::Rmpz_root($t, $n, $k);
+            Math::GMPz::Rmpz_add($count, $count, ${(bless \$t)->prime_count_upper});
+        }
+
+        bless \$count;
+    }
+
     sub _nth_prime_lower_bound {
         my ($n) = @_;
         my $log_n = $n->log;
@@ -13355,12 +13403,10 @@ package Sidef::Types::Number::Number {
             $max = _any2mpz($t) // goto &nan;
         }
 
-        my $k_obj = _set_int($k);
-        my $v     = Math::GMPz::Rmpz_init();
-        my $count = Math::GMPz::Rmpz_init();
-
+        my $k_obj     = _set_int($k);
+        my $v         = Math::GMPz::Rmpz_init();
+        my $count     = Math::GMPz::Rmpz_init();
         my $min_delta = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_root($min_delta, $min, $k);
 
         while (1) {
             Math::GMPz::Rmpz_add($v, $min, $max);
@@ -13370,6 +13416,8 @@ package Sidef::Types::Number::Number {
               (HAS_NEW_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
               ? Math::GMPz::Rmpz_init_set_ui(Math::Prime::Util::powerfree_count(Math::GMPz::Rmpz_get_ui($v), $k))
               : ${$k_obj->powerfree_count(bless \$v)};
+
+            Math::GMPz::Rmpz_root($min_delta, $v, $k);
 
             if (Math::GMPz::Rmpz_cmp(CORE::abs($count - $n), $min_delta) <= 0) {
                 last;

@@ -5829,7 +5829,7 @@ Aliases: I<prime_count>, I<count_primes>
 
     n.primepi_lower
 
-Lower bound for prime_count(n).
+Lower bound for C<prime_count(n)>.
 
 Aliases: I<prime_count_lower>
 
@@ -5839,7 +5839,7 @@ Aliases: I<prime_count_lower>
 
     n.primepi_upper
 
-Upper bound for prime_count(n).
+Upper bound for C<prime_count(n)>.
 
 Aliases: I<prime_count_upper>
 
@@ -5865,6 +5865,22 @@ Returns the number of prime powers <= n, or in the range C<a..b>.
 
     say prime_power_count(1e15)     # number of prime powers <= 10^15
     say prime_power_count(1e6, 1e8) # number of prime powers in [10^6, 10^8]
+
+=cut
+
+=head2 prime_power_count_lower
+
+    prime_power_count_lower(n)
+
+Lower bound for C<prime_power_count(n)>.
+
+=cut
+
+=head2 prime_power_count_upper
+
+    prime_power_count_upper(n)
+
+Upper bound for C<prime_power_count(n)>.
 
 =cut
 
