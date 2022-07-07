@@ -13291,12 +13291,14 @@ package Sidef::Types::Number::Number {
             $max = 8;
         }
 
-        my $k      = 0;
-        my $sqrt_n = CORE::int(CORE::sqrt($n));
-        my $composite_count;
+        my $k = 0;
+        my $count;
 
         while (1) {
             $k = ($min + $max) >> 1;
+
+            # Make sure k does not overflow; otherwise return NaN
+            goto &nan if ($k > ULONG_MAX or $k <= 0);
 
             my $pi = (
                       HAS_PRIME_UTIL
@@ -13304,13 +13306,13 @@ package Sidef::Types::Number::Number {
                       : _prime_count($k)
                      );
 
-            $composite_count = ($k - $pi - 1);
+            $count = ($k - $pi - 1);
 
-            if (CORE::abs($composite_count - $n) <= $sqrt_n) {
+            if (CORE::abs($count - $n) <= CORE::int(CORE::sqrt($k))) {
                 last;
             }
 
-            my $cmp = $composite_count <=> $n;
+            my $cmp = $count <=> $n;
 
             if ($cmp > 0) {
                 $max = $k - 1;
@@ -13327,12 +13329,12 @@ package Sidef::Types::Number::Number {
             --$k;
         }
 
-        while ($composite_count != $n) {
-            my $cmp = ($n <=> $composite_count);
+        while ($count != $n) {
+            my $cmp = ($n <=> $count);
             do {
                 $k += $cmp;
             } while _is_prob_prime($k);
-            $composite_count += $cmp;
+            $count += $cmp;
         }
 
         _set_int($k);
@@ -13366,22 +13368,25 @@ package Sidef::Types::Number::Number {
         }
 
         my $k = 0;
-        my $squarefree_count;
+        my $count;
 
         while (1) {
             $k = ($min + $max) >> 1;
 
-            $squarefree_count = (
-                                 HAS_NEW_PRIME_UTIL
-                                 ? Math::Prime::Util::powerfree_count($k, 2)
-                                 : _native_squarefree_count($k)
-                                );
+            # Make sure k does not overflow; otherwise return NaN
+            goto &nan if ($k > ULONG_MAX or $k <= 0);
 
-            if (CORE::abs($squarefree_count - $n) <= $sqrt_n) {
+            $count = (
+                      HAS_NEW_PRIME_UTIL
+                      ? Math::Prime::Util::powerfree_count($k, 2)
+                      : _native_squarefree_count($k)
+                     );
+
+            if (CORE::abs($count - $n) <= CORE::int(CORE::sqrt($k))) {
                 last;
             }
 
-            my $cmp = $squarefree_count <=> $n;
+            my $cmp = $count <=> $n;
 
             if ($cmp > 0) {
                 $max = $k - 1;
@@ -13398,12 +13403,12 @@ package Sidef::Types::Number::Number {
             --$k;
         }
 
-        while ($squarefree_count != $n) {
-            my $cmp = ($n <=> $squarefree_count);
+        while ($count != $n) {
+            my $cmp = ($n <=> $count);
             do {
                 $k += $cmp;
             } while !_is_squarefree($k);
-            $squarefree_count += $cmp;
+            $count += $cmp;
         }
 
         _set_int($k);
