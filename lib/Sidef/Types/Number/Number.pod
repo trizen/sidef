@@ -1609,6 +1609,22 @@ Returns the number of composite numbers <= n, or in the range C<a..b>.
 
 =cut
 
+=head2 composite_count_lower
+
+    composite_count_lower(n)
+
+Lower bound for C<composite_count(n)>.
+
+=cut
+
+=head2 composite_count_upper
+
+    composite_count_upper(n)
+
+Upper bound for C<composite_count(n)>.
+
+=cut
+
 =head2 composites
 
     composites(n)

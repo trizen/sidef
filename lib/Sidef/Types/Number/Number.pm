@@ -12355,6 +12355,16 @@ package Sidef::Types::Number::Number {
         bless \$count;
     }
 
+    sub composite_count_lower {
+        my ($n) = @_;
+        $n->sub($n->prime_count_upper)->dec;
+    }
+
+    sub composite_count_upper {
+        my ($n) = @_;
+        $n->sub($n->prime_count_lower)->dec;
+    }
+
     sub _nth_prime_lower_bound {
         my ($n) = @_;
         my $log_n = $n->log;
@@ -13266,6 +13276,15 @@ package Sidef::Types::Number::Number {
         # Lower and upper bounds from A002808 (for n >= 4).
         my $min = CORE::int($n + $n / CORE::log($n) + $n / (CORE::log($n)**2));
         my $max = CORE::int($n + $n / CORE::log($n) + (3 * $n) / (CORE::log($n)**2));
+
+        # Better bounds for the n-th composite number
+        #~ my $min = _set_int($n)->nth_composite_lower;
+        #~ my $max = _set_int($n)->nth_composite_upper;
+
+        #~ Math::GMPz::Rmpz_fits_ulong_p($max) || goto &nan;
+
+        #~ $min = Math::GMPz::Rmpz_get_ui($min);
+        #~ $max = Math::GMPz::Rmpz_get_ui($max);
 
         if ($n < 4) {
             $min = 4;
