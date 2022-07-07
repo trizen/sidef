@@ -11784,102 +11784,6 @@ package Sidef::Types::Number::Number {
 
     *square_free_count = \&squarefree_count;
 
-    sub _prime_count_checkpoint {
-        my ($n, $i) = @_;
-
-        $i //= 0;
-
-#<<<
-        state $checkpoints = [
-            [999999999999989, 29844570422669], [ 99999999999973, 3204941750802 ], [  9999999999971, 346065536839  ], [  2760727302517, 100000000000  ],
-            [  2474799787573, 90000000000   ], [  2190026988349, 80000000000   ], [  1906555030411, 70000000000   ], [  1624571841097, 60000000000   ],
-            [  1344326694119, 50000000000   ], [  1066173339601, 40000000000   ], [   999999999989, 37607912018   ], [   928037044463, 35000000000   ],
-            [   790645490053, 30000000000   ], [   654124187867, 25000000000   ], [   518649879439, 20000000000   ], [   384489816343, 15000000000   ],
-            [   252097800623, 10000000000   ], [   225898512559, 9000000000    ], [   200000000507, 8007105083    ], [   173862636221, 7000000000    ],
-            [   148059109201, 6000000000    ], [   122430513841, 5000000000    ], [    99999999977, 4118054813    ], [    97011687217, 4000000000    ],
-            [    71856445751, 3000000000    ], [    49999999967, 2119654578    ], [    47055833459, 2000000000    ], [    44999999971, 1916268743    ],
-            [    39999999979, 1711955433    ], [    34999999999, 1506589876    ], [    29999999993, 1300005926    ], [    24999999991, 1091987405    ],
-            [    22801763489, 1000000000    ], [    21999999977, 966358351     ], [    20999999981, 924324489     ], [    20422213579, 900000000     ],
-            [    19999999967, 882206716     ], [    18999999959, 840000027     ], [    18054236957, 800000000     ], [    17999999989, 797703398     ],
-            [    16999999999, 755305935     ], [    15999999991, 712799821     ], [    15699342107, 700000000     ], [    14999999969, 670180516     ],
-            [    13999999991, 627440336     ], [    13359555403, 600000000     ], [    12999999959, 584570200     ], [    11999999983, 541555851     ],
-            [    11037271757, 500000000     ], [    10999999999, 498388617     ], [     9999999967, 455052511     ], [     9899999987, 450708777     ],
-            [     9883692017, 450000000     ], [     9699999997, 442014876     ], [     9499999979, 433311792     ], [     9299999999, 424603409     ],
-            [     8999999993, 411523195     ], [     8736028057, 400000000     ], [     8699999953, 398425675     ], [     8499999941, 389682427     ],
-            [     8299999993, 380930729     ], [     7999999957, 367783654     ], [     7594955549, 350000000     ], [     7499999999, 345826612     ],
-            [     7299999979, 337024801     ], [     6999999989, 323804352     ], [     6699999991, 310558733     ], [     6499999993, 301711468     ],
-            [     6461335109, 300000000     ], [     6399999959, 297285198     ], [     6299999977, 292856421     ], [     5999999989, 279545368     ],
-            [     5699999999, 266206294     ], [     5499999997, 257294520     ], [     5336500537, 250000000     ], [     5299999967, 248370960     ],
-            [     5199999977, 243902342     ], [     4999999937, 234954223     ], [     4899999983, 230475545     ], [     4699999987, 221504167     ],
-            [     4499999989, 212514323     ], [     4299999973, 203507248     ], [     4222234741, 200000000     ], [     4199999929, 198996103     ],
-            [     4000000483, 189961831     ], [     3999999979, 189961812     ], [     3899999989, 185436625     ], [     3799999979, 180906194     ],
-            [     3699999991, 176369517     ], [     3499999991, 167279333     ], [     3399999971, 162725196     ], [     3299999959, 158165829     ],
-            [     3099999953, 149028641     ], [     2999999929, 144449537     ], [     2899999957, 139864011     ], [     2799999973, 135270258     ],
-            [     2699999989, 130670192     ], [     2599999991, 126062167     ], [     2499999977, 121443371     ], [     2399999983, 116818447     ],
-            [     2199999973, 107540122     ], [     2038074743, 100000000     ], [     1999999973, 98222287      ], [     1899999979, 93547928      ],
-            [     1799999977, 88862422      ], [     1699999997, 84163019      ], [     1599999983, 79451833      ], [     1499999957, 74726528      ],
-            [     1399999987, 69985473      ], [     1299999983, 65228333      ], [     1199999993, 60454705      ], [     1099999997, 55662470      ],
-            [      999999937, 50847534      ], [      982451653, 50000000      ], [      949999993, 48431471      ], [      899999963, 46009215      ],
-            [      849999977, 43581966      ], [      799999999, 41146179      ], [      749999989, 38703181      ], [      699999953, 36252931      ],
-            [      649999993, 33793395      ], [      599999971, 31324703      ], [      549999959, 28845356      ], [      499999993, 26355867      ],
-            [      449999993, 23853038      ], [      399999959, 21336326      ], [      373587883, 20000000      ], [      369999979, 19818405      ],
-            [      359999989, 19311288      ], [      349999999, 18803526      ], [      329999987, 17785475      ], [      299999977, 16252325      ],
-            [      289999999, 15739663      ], [      269999993, 14711384      ], [      249999991, 13679318      ], [      229999981, 12642573      ],
-            [      199999991, 11078937      ], [      189999989, 10555473      ], [      179424673, 10000000      ], [      169999967, 9503083       ],
-            [      159999997, 8974458       ], [      149999957, 8444396       ], [      139999991, 7912199       ], [      119999987, 6841648       ],
-            [       99999989, 5761455       ], [       94999951, 5489749       ], [       89999999, 5216954       ], [       86028121, 5000000       ],
-            [       84999979, 4943731       ], [       79999987, 4669382       ], [       74999959, 4394304       ], [       69999989, 4118064       ],
-            [       64999981, 3840554       ], [       59999999, 3562115       ], [       54999943, 3282200       ], [       49999991, 3001134       ],
-            [       44999971, 2718160       ], [       39999983, 2433654       ], [       34999969, 2146775       ], [       32452843, 2000000       ],
-            [       29999999, 1857859       ], [       24999983, 1565927       ], [       19999999, 1270607       ], [       18999997, 1211050       ],
-            [       17999987, 1151367       ], [       16999999, 1091314       ], [       15999989, 1031130       ], [       15485863, 1000000       ],
-            [       14999981, 970704        ], [       13999981, 910077        ], [       12999997, 849252        ], [       11999989, 788060        ],
-            [       10999997, 726517        ], [        9999991, 664579        ], [        8999993, 602489        ], [        7999993, 539777        ],
-            [        7368787, 500000        ], [        6999997, 476648        ], [        5999993, 412849        ], [        4999999, 348513        ],
-            [        3999971, 283146        ], [        3499999, 250150        ], [        2999999, 216816        ], [        2750159, 200000        ],
-            [        2499997, 183072        ], [        1999993, 148933        ], [        1299709, 100000        ], [        1159523, 90000         ],
-            [        1020379, 80000         ], [         999983, 78498         ], [         882377, 70000         ], [         746773, 60000         ],
-            [         611953, 50000         ], [         499979, 41538         ], [         479909, 40000         ], [         350377, 30000         ],
-            [         224737, 20000         ], [         104729, 10000         ], [          99991, 9592          ], [          93179, 9000          ],
-            [          81799, 8000          ], [          70657, 7000          ], [          59359, 6000          ], [          49999, 5133          ],
-            [          48611, 5000          ], [          37813, 4000          ], [          27449, 3000          ], [          17389, 2000          ],
-            [           9973, 1229          ], [           7919, 1000          ], [           4999, 669           ], [            997, 168           ],
-        ];
-#>>>
-
-        state $end = $#{$checkpoints};
-
-        my $left  = 0;
-        my $right = $end;
-
-        my ($middle, $item, $cmp);
-
-        while (1) {
-            $middle = (
-                       HAS_NEW_PRIME_UTIL
-                       ? Math::Prime::Util::divint(Math::Prime::Util::addint($right, $left), 2)
-                       : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($right, $left), 2)
-                      );
-            $item = $checkpoints->[$middle][$i];
-            $cmp  = ($n <=> $item) || last;
-
-            if ($cmp < 0) {
-                $left = $middle + 1;
-                if ($left > $right) {
-                    ++$middle;
-                    last;
-                }
-            }
-            else {
-                $right = $middle - 1;
-                $left > $right && last;
-            }
-        }
-
-        my $point = $checkpoints->[$middle] // return (undef, undef);
-        return ($point->[0], $point->[1]);
-    }
-
     sub _nth_prime_lower {
         my ($n) = @_;
         CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n)) - 1));
@@ -11900,36 +11804,6 @@ package Sidef::Types::Number::Number {
         }
 
         CORE::int(($n * CORE::log($n)) / ((CORE::log(CORE::log($n))**($k - 1)) / $factorial_km1));
-    }
-
-    sub _prime_count_range {
-        my ($x, $y) = @_;
-
-        if ($y <= $x) {
-            if ($x == $y and Math::Prime::Util::GMP::is_prime($x)) {
-                return 1;
-            }
-            return 0;
-        }
-
-        my $count = 0;
-        my $step  = _nth_prime_lower($y + CORE::log($y) * 2e3) - _nth_prime_lower($y);
-
-        if ($step <= 0 or $step > 1e8) {
-            $step = 1e6;
-        }
-
-        for (my $i = $x - 1 ; $i <= $y ; $i += $step) {
-
-            my $from = $i + 1;
-            my $to   = $i + $step;
-
-            $to = $y if $to > $y;
-
-            $count += () = Math::Prime::Util::GMP::sieve_primes($from, $to);
-        }
-
-        return $count;
     }
 
     sub _prime_count {
@@ -12309,6 +12183,7 @@ package Sidef::Types::Number::Number {
         }
 
         return 0 if ($y < $x);
+        return 0 if ($y <= 0);
 
         my $table_len = 100003;
 
@@ -12341,50 +12216,37 @@ package Sidef::Types::Number::Number {
             my $prime_count = Math::Prime::Util::prime_count("$x", "$y");
             return "$prime_count";
         }
-        elsif ($y >= ~0) {
+        elsif ($y >= ~0 or ($y >= 1e7 and Math::Prime::Util::GMP::subint($y, $x) <= 1e6)) {
 
             # Support for arbitrary large integers (slow for wide ranges)
             my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
             return $prime_count;
         }
 
-        my ($x_n, $x_pi);
-        my ($y_n, $y_pi);
+        if ($x > 2) {
+            return Math::Prime::Util::GMP::subint(__SUB__->($y), __SUB__->(Math::Prime::Util::GMP::subint($x, 1)));
+        }
 
-        if ($y >= 1e3) {
+        my $n = $y;
+        my $r = Math::Prime::Util::GMP::sqrtint($n);
+        my @V = map { CORE::int($n / $_) } 1 .. $r;
+        push @V, CORE::reverse(1 .. $V[-1] - 1);
 
-            ($y_n, $y_pi) = _prime_count_checkpoint($y);
+        my %S;
+        @S{@V} = @V;
 
-            if ($x >= 1e3) {
-                ($x_n, $x_pi) = _prime_count_checkpoint($x);
-            }
-            else {
-                $x_n = $x;
-                ($x == 2) ? ($x_pi = 1) : ($x_pi = () = Math::Prime::Util::GMP::sieve_primes(2, $x));
+        foreach my $p (2 .. $r) {
+            if ($S{$p} > $S{$p - 1}) {
+                my $cp = $S{$p - 1};
+                my $p2 = $p * $p;
+                foreach my $v (@V) {
+                    last if ($v < $p2);
+                    $S{$v} -= $S{CORE::int($v / $p)} - $cp;
+                }
             }
         }
 
-        if (defined($x_n) and defined($y_n)) {
-
-            my $d_x = $x - $x_n;
-            my $d_y = $y - $y_n;
-
-            if (($d_x + $d_y) <= ($y - $x)) {
-
-                # Sieve the ranges [x_n, x] and [y_n, y]
-                my $x_count = _prime_count_range(_next_prime($x_n), _prev_prime($x + 1)) + $x_pi;
-                my $y_count = _prime_count_range(_next_prime($y_n), _prev_prime($y + 1)) + $y_pi;
-
-                my $prime_count = $y_count - $x_count;
-                ++$prime_count if ($x == 2 or Math::Prime::Util::GMP::is_prime($x));
-                return $prime_count;
-            }
-        }
-
-        # Sieve the range [x, y]
-        my $prime_count = _prime_count_range(_next_prime($x - 1), _prev_prime($y + 1));
-
-        return $prime_count;
+        return $S{$n} - 1;
     }
 
     sub prime_count {
@@ -13208,42 +13070,65 @@ package Sidef::Types::Number::Number {
                 return _set_int("$p");
             }
 
-            my ($i, $count) = _prime_count_checkpoint($n, 1);
+            my $min = ${_set_int($n)->nth_prime_lower};
+            my $max = ${_set_int($n)->nth_prime_upper};
 
-            if ($count == $n) {
-                return _set_int($i);
+            if (!Math::GMPz::Rmpz_fits_ulong_p($max)) {
+                goto &nan;
             }
 
-            my $nth_prime_lower = sub {
-                my ($n) = @_;
-                CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n)) - 1));
-            };
+            $min = Math::GMPz::Rmpz_get_ui($min);
+            $max = Math::GMPz::Rmpz_get_ui($max);
 
-            my $step         = $nth_prime_lower->($i + CORE::log($n) * 2e3) - $nth_prime_lower->($i);
-            my $upper_approx = CORE::int($n * (CORE::log($n) + CORE::log(CORE::log($n))));
+            my $k = 0;
+            my $count;
 
-            for (my $prev_count = $count ; ; $i += $step) {
+            while (1) {
+                $k = (
+                      HAS_NEW_PRIME_UTIL
+                      ? Math::Prime::Util::divint(Math::Prime::Util::addint($min, $max), 2)
+                      : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
+                     );
 
-                my $from = $i + 1;
-                my $to   = $i + $step;
+                # Make sure k does not overflow; otherwise return NaN
+                goto &nan if ($k > ULONG_MAX or $k <= 0);
 
-                $to = $upper_approx if ($to > $upper_approx);
+                $count = (
+                          HAS_PRIME_UTIL
+                          ? Math::Prime::Util::prime_count($k)
+                          : _prime_count($k)
+                         );
 
-                my @primes = (
-                              HAS_PRIME_UTIL
-                              ? @{Math::Prime::Util::primes($from, $to)}
-                              : Math::Prime::Util::GMP::sieve_primes($from, $to)
-                             );
-
-                $count += @primes;
-
-                if ($count >= $n) {
-                    my $p = $primes[$n - $prev_count - 1];
-                    return _set_int($p);
+                if (CORE::abs($count - $n) <= $k**(2 / 3)) {
+                    last;
                 }
 
-                $prev_count = $count;
+                my $cmp = $count <=> $n;
+
+                if ($cmp > 0) {
+                    $max = $k - 1;
+                }
+                elsif ($cmp < 0) {
+                    $min = $k + 1;
+                }
+                else {
+                    last;
+                }
             }
+
+            until (_is_prob_prime($k)) {
+                --$k;
+            }
+
+            while ($count != $n) {
+                my $cmp = ($n <=> $count);
+                do {
+                    $k += $cmp;
+                } until _is_prob_prime($k);
+                $count += $cmp;
+            }
+
+            return _set_int($k);
         }
 
         state @table;
@@ -13417,7 +13302,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        while (!_is_squarefree($k)) {
+        until (_is_squarefree($k)) {
             --$k;
         }
 
@@ -13425,7 +13310,7 @@ package Sidef::Types::Number::Number {
             my $cmp = ($n <=> $count);
             do {
                 $k += $cmp;
-            } while !_is_squarefree($k);
+            } until _is_squarefree($k);
             $count += $cmp;
         }
 
@@ -14558,6 +14443,8 @@ package Sidef::Types::Number::Number {
                   : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
                  );
 
+            goto &nan if ($k > ULONG_MAX or $k <= 0);
+
             $count = _semiprime_count($k);
 
             if (CORE::abs($count - $n) <= CORE::sqrt($k)) {
@@ -14579,7 +14466,7 @@ package Sidef::Types::Number::Number {
 
         Memoize::unmemoize('_prime_count');
 
-        while (!Math::Prime::Util::GMP::is_semiprime($k)) {
+        until (Math::Prime::Util::GMP::is_semiprime($k)) {
             --$k;
         }
 
@@ -14588,12 +14475,10 @@ package Sidef::Types::Number::Number {
             do {
                 $k += $cmp;
               }
-              while (
-                     !(
-                       HAS_PRIME_UTIL
-                       ? Math::Prime::Util::is_semiprime($k)
-                       : Math::Prime::Util::GMP::is_semiprime($k)
-                      )
+              until (
+                     HAS_PRIME_UTIL
+                     ? Math::Prime::Util::is_semiprime($k)
+                     : Math::Prime::Util::GMP::is_semiprime($k)
                     );
             $count += $cmp;
         }
@@ -16175,7 +16060,7 @@ package Sidef::Types::Number::Number {
         # Optimization for native integers
         if (Math::GMPz::Rmpz_fits_slong_p($n)) {
             $n = Math::GMPz::Rmpz_get_ui($n) + 1;
-            while (!(HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($n) : Math::Prime::Util::GMP::is_prime_power($n))) {
+            until (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($n) : Math::Prime::Util::GMP::is_prime_power($n)) {
                 ++$n;
             }
             return _set_int($n);
@@ -16184,7 +16069,7 @@ package Sidef::Types::Number::Number {
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_add_ui($r, $n, 1);
 
-        while (!Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($r, 10))) {
+        until (Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($r, 10))) {
             Math::GMPz::Rmpz_add_ui($r, $r, 1);
         }
 
@@ -16203,7 +16088,7 @@ package Sidef::Types::Number::Number {
         # Optimization for native integers
         if (Math::GMPz::Rmpz_fits_slong_p($n)) {
             $n = Math::GMPz::Rmpz_get_ui($n) + 1;
-            while (!_is_squarefree($n)) {
+            until (_is_squarefree($n)) {
                 ++$n;
             }
             return _set_int($n);
@@ -16212,7 +16097,7 @@ package Sidef::Types::Number::Number {
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_add_ui($r, $n, 1);
 
-        while (!(bless(\$r)->is_squarefree)) {
+        until (bless(\$r)->is_squarefree) {
             Math::GMPz::Rmpz_add_ui($r, $r, 1);
         }
 
