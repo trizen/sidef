@@ -11855,9 +11855,13 @@ package Sidef::Types::Number::Number {
         my ($middle, $item, $cmp);
 
         while (1) {
-            $middle = (($right + $left) >> 1);
-            $item   = $checkpoints->[$middle][$i];
-            $cmp    = ($n <=> $item) || last;
+            $middle = (
+                       HAS_NEW_PRIME_UTIL
+                       ? Math::Prime::Util::divint(Math::Prime::Util::addint($right, $left), 2)
+                       : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($right, $left), 2)
+                      );
+            $item = $checkpoints->[$middle][$i];
+            $cmp  = ($n <=> $item) || last;
 
             if ($cmp < 0) {
                 $left = $middle + 1;
@@ -13295,7 +13299,11 @@ package Sidef::Types::Number::Number {
         my $count;
 
         while (1) {
-            $k = ($min + $max) >> 1;
+            $k = (
+                  HAS_NEW_PRIME_UTIL
+                  ? Math::Prime::Util::divint(Math::Prime::Util::addint($min, $max), 2)
+                  : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
+                 );
 
             # Make sure k does not overflow; otherwise return NaN
             goto &nan if ($k > ULONG_MAX or $k <= 0);
@@ -13377,7 +13385,11 @@ package Sidef::Types::Number::Number {
         my $count;
 
         while (1) {
-            $k = ($min + $max) >> 1;
+            $k = (
+                  HAS_NEW_PRIME_UTIL
+                  ? Math::Prime::Util::divint(Math::Prime::Util::addint($min, $max), 2)
+                  : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
+                 );
 
             # Make sure k does not overflow; otherwise return NaN
             goto &nan if ($k > ULONG_MAX or $k <= 0);
@@ -14536,13 +14548,23 @@ package Sidef::Types::Number::Number {
         require Memoize;
         Memoize::memoize('_prime_count');
 
-        my $k = 0;
+        my $k     = 0;
+        my $count = 0;
 
         while (1) {
-            $k = ($min + $max) >> 1;
+            $k = (
+                  HAS_NEW_PRIME_UTIL
+                  ? Math::Prime::Util::divint(Math::Prime::Util::addint($min, $max), 2)
+                  : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
+                 );
 
-            my $pi2 = _semiprime_count($k);
-            my $cmp = ($pi2 <=> $n);
+            $count = _semiprime_count($k);
+
+            if (CORE::abs($count - $n) <= CORE::sqrt($k)) {
+                last;
+            }
+
+            my $cmp = ($count <=> $n);
 
             if ($cmp > 0) {
                 $max = $k - 1;
@@ -14559,6 +14581,21 @@ package Sidef::Types::Number::Number {
 
         while (!Math::Prime::Util::GMP::is_semiprime($k)) {
             --$k;
+        }
+
+        while ($count != $n) {
+            my $cmp = ($n <=> $count);
+            do {
+                $k += $cmp;
+              }
+              while (
+                     !(
+                       HAS_PRIME_UTIL
+                       ? Math::Prime::Util::is_semiprime($k)
+                       : Math::Prime::Util::GMP::is_semiprime($k)
+                      )
+                    );
+            $count += $cmp;
         }
 
         _set_int($k);
