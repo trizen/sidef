@@ -516,12 +516,4 @@ do {
     assert_eq(arr, {.is_prime_power}.first(20))
 }
 
-for n in (1..8) {
-    for k in (2..15 -> map{|b| b**n }) {
-        var t = nth_semiprime(k)
-        assert(t.is_semiprime)
-        assert_eq(t.semiprime_count, k)
-    }
-}
-
 say "** Tests passed!"

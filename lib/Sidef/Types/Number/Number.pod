@@ -5159,6 +5159,16 @@ Returns the n-th k-powerfree number.
 
 =cut
 
+=head2 nth_prime_power
+
+    nth_prime_power(n)
+
+Returns the n-th prime power C<p^k> with k >= 1.
+
+    say nth_prime_power(1e12)   #=> 29996212395727
+
+=cut
+
 =head2 nth_squarefree
 
     nth_squarefree(n)

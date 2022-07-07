@@ -12216,7 +12216,7 @@ package Sidef::Types::Number::Number {
             my $prime_count = Math::Prime::Util::prime_count("$x", "$y");
             return "$prime_count";
         }
-        elsif ($y >= ~0 or ($y >= 1e7 and Math::Prime::Util::GMP::subint($y, $x) <= 1e6)) {
+        elsif ($y >= ~0 or ($y >= 1e7 and Math::Prime::Util::GMP::subint($y, $x) <= 1e6) or "$x" / "$y" >= 0.999) {
 
             # Support for arbitrary large integers (slow for wide ranges)
             my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
@@ -13315,6 +13315,94 @@ package Sidef::Types::Number::Number {
     }
 
     *prime = \&nth_prime;
+
+    sub nth_prime_power {
+        my ($n) = @_;
+        $n = _any2ui($$n) // goto &nan;
+
+        return ONE         if ($n == 0);    # not a prime power, but...
+        return _set_int(2) if ($n == 1);
+        return _set_int(3) if ($n == 2);
+
+        # Lower and upper bounds
+        my $min = $n;
+        my $max = _nth_prime_upper($n);
+
+        if ($n > 1e6) {
+
+            # Better bounds for the n-th prime power
+            $min = ${_set_int($n)->nth_prime_power_lower};
+            $max = ${_set_int($n)->nth_prime_power_upper};
+
+            Math::GMPz::Rmpz_fits_ulong_p($max) || goto &nan;
+
+            $min = Math::GMPz::Rmpz_get_ui($min);
+            $max = Math::GMPz::Rmpz_get_ui($max);
+        }
+
+        if (HAS_NEW_PRIME_UTIL) {
+            return _set_int(Math::Prime::Util::nth_prime_power($n));
+        }
+
+        my $k = 0;
+        my $count;
+
+        while (1) {
+            $k = (
+                  HAS_NEW_PRIME_UTIL
+                  ? Math::Prime::Util::divint(Math::Prime::Util::addint($min, $max), 2)
+                  : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
+                 );
+
+            # Make sure k does not overflow; otherwise return NaN
+            goto &nan if ($k > ULONG_MAX or $k <= 0);
+
+            $count = (
+                      HAS_NEW_PRIME_UTIL
+                      ? Math::Prime::Util::prime_power_count($k)
+                      : Math::GMPz::Rmpz_get_ui(${_set_int($k)->prime_power_count})
+                     );
+
+            if (CORE::abs($count - $n) <= CORE::int(CORE::sqrt($k))) {
+                last;
+            }
+
+            my $cmp = $count <=> $n;
+
+            if ($cmp > 0) {
+                $max = $k - 1;
+            }
+            elsif ($cmp < 0) {
+                $min = $k + 1;
+            }
+            else {
+                last;
+            }
+        }
+
+        until (
+               HAS_PRIME_UTIL
+               ? Math::Prime::Util::is_prime_power($k)
+               : Math::Prime::Util::GMP::is_prime_power($k)
+          ) {
+            --$k;
+        }
+
+        while ($count != $n) {
+            my $cmp = ($n <=> $count);
+            do {
+                $k += $cmp;
+              }
+              until (
+                     HAS_PRIME_UTIL
+                     ? Math::Prime::Util::is_prime_power($k)
+                     : Math::Prime::Util::GMP::is_prime_power($k)
+                    );
+            $count += $cmp;
+        }
+
+        _set_int($k);
+    }
 
     sub composite_count {
         my ($from, $to) = @_;
