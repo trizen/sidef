@@ -1,0 +1,18 @@
+#!/usr/bin/ruby
+
+# Tests for the Number `is_omega_prime(n,k)` method.
+
+func A219019(n) {
+    for k in (1..Inf) {
+        var v = (k**n - 1)
+        v.is_omega_prime(n) || next
+        return k
+    }
+}
+
+assert_eq(
+    A219019.map(1..12),
+    %n[3, 4, 7, 8, 16, 11, 79, 44, 81, 91, 1024, 47],
+)
+
+say "** Test passed!"

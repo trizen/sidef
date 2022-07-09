@@ -41,4 +41,20 @@ assert_eq(65.almost_primes(2**65 - 1e12, 2**65 + 1e12), %n[36893488147419103232]
 assert_eq(16.omega_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
 assert_eq(16.squarefree_almost_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
 
+assert(!is_almost_prime(503**72 * (2**64 + 1), 77))
+assert(!is_almost_prime(503**76 * (2**64 + 1), 77))
+assert(!is_almost_prime(503**77 * (2**64 + 1), 77))
+assert(!is_almost_prime(503**78 * (2**64 + 1), 77))
+assert(is_almost_prime(503**75 * (2**64 + 1), 77))
+
+assert(!is_almost_prime(503**74 * (2**128 + 1), 77))
+assert(!is_almost_prime(503**76 * (2**128 + 1), 77))
+assert(!is_almost_prime(503**77 * (2**128 + 1), 77))
+assert(!is_almost_prime(503**78 * (2**128 + 1), 77))
+assert(is_almost_prime(503**75 * (2**128 + 1), 77))
+
+assert(!is_almost_prime(3449**74 * 1e100.random_prime, 76))
+assert(!is_almost_prime(3449**76 * 1e100.random_prime, 76))
+assert(is_almost_prime(3449**75 * 1e100.random_prime, 76))
+
 say ":: Test passed!"

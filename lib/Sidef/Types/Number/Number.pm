@@ -14965,7 +14965,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($n) > 0
           or return Sidef::Types::Bool::Bool::FALSE;
 
-        my $omega     = 0;
+        my $bigomega  = 0;
         my $remainder = $n;
         my $size      = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
@@ -14981,34 +14981,111 @@ package Sidef::Types::Number::Number {
             );
         }
 
-        $size = 1 + CORE::int($size / 3.322);
+        if ($size > 100) {    # greater than 10^30
+            foreach my $j (2 .. 8) {
 
-        if ($size > 30) {
-            my ($r, @factors) = _adaptive_trial_factor($n);
+                my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
 
-            $omega += scalar(@factors);
+                $bigomega  = scalar(@trial_factors);
+                $remainder = $r;
 
-            if ($omega == $k) {
                 if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
-                    return Sidef::Types::Bool::Bool::TRUE;
+                    if ($bigomega == $k) {
+                        return Sidef::Types::Bool::Bool::TRUE;
+                    }
+                    else {
+                        return Sidef::Types::Bool::Bool::FALSE;
+                    }
                 }
-                else {
+
+                my $log = __ilog__($r, _next_prime(10**$j));
+
+                $bigomega + $log + 1 >= $k
+                  or return Sidef::Types::Bool::Bool::FALSE;
+
+                my $r_is_prime = _is_prob_prime($r);
+
+                if ($r_is_prime) {
+                    if ($bigomega + 1 == $k) {
+                        return Sidef::Types::Bool::Bool::TRUE;
+                    }
+                    else {
+                        return Sidef::Types::Bool::Bool::FALSE;
+                    }
+                }
+
+                if ($bigomega + ($r_is_prime ? 1 : 2) > $k) {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
-            }
 
-            $remainder = $r;
+                last if (($j >= 5) && (Math::GMPz::Rmpz_sizeinbase($r, 2) <= 100));    # 30 digits
+                last if (($j >= 6) && (Math::GMPz::Rmpz_sizeinbase($r, 2) <= 133));    # 40 digits
+                last if (($j >= 7) && (Math::GMPz::Rmpz_sizeinbase($r, 2) <= 150));    # 45 digits
+
+                # Try to find special factors
+                if ($j == 8) {
+                    my @special_factors = @{(bless \$r)->special_factors};
+                    my @gcd_factors     = @{
+                        (bless \$n)->gcd_factors(
+                                     Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)])
+                        )
+                    };
+
+                    if (scalar(@gcd_factors) > $k) {
+                        return Sidef::Types::Bool::Bool::FALSE;
+                    }
+
+                    my @composite_factors;
+                    my @prime_factors;
+
+                    foreach my $f (@gcd_factors) {
+                        if (_is_prob_prime($$f)) {
+                            push @prime_factors, $f;
+                        }
+                        elsif (Math::GMPz::Rmpz_sizeinbase($$f, 2) <= 150) {
+                            push @prime_factors, (map { _set_int($_) } _factor($$f));
+                        }
+                        else {
+                            push @composite_factors, $f;
+                        }
+                    }
+
+                    if (scalar(@prime_factors) + 2 * scalar(@composite_factors) > $k) {
+                        return Sidef::Types::Bool::Bool::FALSE;
+                    }
+
+                    my $prod = Sidef::Types::Number::Number::prod(@prime_factors);
+                    my $c    = (bless \$n)->div($prod);
+
+                    $remainder = $$c;
+                    $bigomega  = scalar(@prime_factors);
+
+                    if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
+                        if ($bigomega == $k) {
+                            return Sidef::Types::Bool::Bool::TRUE;
+                        }
+                        else {
+                            return Sidef::Types::Bool::Bool::FALSE;
+                        }
+                    }
+
+                    my $log = __ilog__($remainder, _next_prime(10**$j));
+
+                    $bigomega + $log + 1 >= $k
+                      or return Sidef::Types::Bool::Bool::FALSE;
+                }
+            }
         }
 
-        if ($omega > $k) {
+        if ($bigomega > $k) {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
         my @factors = _factor($remainder);
 
-        $omega += scalar(@factors);
+        $bigomega += scalar(@factors);
 
-        ($omega == $k)
+        ($bigomega == $k)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
