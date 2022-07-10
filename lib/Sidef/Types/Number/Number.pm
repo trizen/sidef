@@ -15025,7 +15025,8 @@ package Sidef::Types::Number::Number {
 
                 # Try to find special factors
                 if ($j == 8) {
-                    my @special_factors = @{(bless \$r)->special_factors};
+
+                    my @special_factors = @{(bless \$n)->special_factors};
                     my @gcd_factors     = @{
                         (bless \$n)->gcd_factors(
                                      Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)])
@@ -15036,8 +15037,8 @@ package Sidef::Types::Number::Number {
                         return Sidef::Types::Bool::Bool::FALSE;
                     }
 
-                    my @composite_factors;
                     my @prime_factors;
+                    my @composite_factors;
 
                     foreach my $f (@gcd_factors) {
                         if (_is_prob_prime($$f)) {
@@ -15074,6 +15075,17 @@ package Sidef::Types::Number::Number {
 
                     $bigomega + $log + 1 >= $k
                       or return Sidef::Types::Bool::Bool::FALSE;
+
+                    foreach my $f (@composite_factors) {
+                        push @prime_factors, _factor($$f);
+                    }
+
+                    if (scalar(@prime_factors) == $k) {
+                        return Sidef::Types::Bool::Bool::TRUE;
+                    }
+                    else {
+                        return Sidef::Types::Bool::Bool::FALSE;
+                    }
                 }
             }
         }
@@ -15176,7 +15188,8 @@ package Sidef::Types::Number::Number {
 
                 # Try to find special factors
                 if ($j == 8) {
-                    my @special_factors = @{(bless \$r)->special_factors};
+
+                    my @special_factors = @{(bless \$n)->special_factors};
                     my @gcd_factors     = @{
                         (bless \$n)->gcd_factors(
                                      Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)])
@@ -15184,6 +15197,7 @@ package Sidef::Types::Number::Number {
                     };
 
                     my @prime_factors;
+                    my @composite_factors;
 
                     foreach my $f (@gcd_factors) {
                         if (_is_prob_prime($$f)) {
@@ -15191,6 +15205,9 @@ package Sidef::Types::Number::Number {
                         }
                         elsif (Math::GMPz::Rmpz_sizeinbase($$f, 2) <= 150) {
                             push @prime_factors, (map { _set_int($_) } _factor($$f));
+                        }
+                        else {
+                            push @composite_factors, $f;
                         }
                     }
 
@@ -15213,6 +15230,19 @@ package Sidef::Types::Number::Number {
 
                     $omega + $log + 1 >= $k
                       or return Sidef::Types::Bool::Bool::FALSE;
+
+                    foreach my $f (@composite_factors) {
+                        push @prime_factors, _factor($$f);
+                    }
+
+                    $omega = scalar(List::Util::uniq(map { ref($_) ? Math::GMPz::Rmpz_get_str($$_, 10) : $_ } @prime_factors));
+
+                    if ($omega == $k) {
+                        return Sidef::Types::Bool::Bool::TRUE;
+                    }
+                    else {
+                        return Sidef::Types::Bool::Bool::FALSE;
+                    }
                 }
             }
         }
