@@ -15,4 +15,11 @@ assert_eq(
     %n[3, 4, 7, 8, 16, 11, 79, 44, 81, 91, 1024, 47],
 )
 
+assert_eq(A219019(14), 389)
+assert_eq(A219019(15), 256)
+assert_eq(A219019(16), 413)
+assert_eq(A219019(18), 373)
+assert_eq(A219019(20), 1000)
+#assert_eq(A219019(21), 4096)
+
 say "** Test passed!"

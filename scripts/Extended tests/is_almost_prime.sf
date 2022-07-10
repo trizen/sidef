@@ -15,6 +15,8 @@ assert_eq(
     %n[2, 3, 3, 43, 7, 41, 23, 643, 17, 557, 251],
 )
 
+#assert_eq(A242786(21), 1151)
+
 func A241793(n) {
     for k in (1..Inf) {
         var b = bigomega(k)*n
@@ -28,6 +30,8 @@ assert_eq(
     A241793.map(1..16),
     %n[3, 34, 5, 15, 17, 55, 79, 5, 53, 23, 337, 13, 601, 79, 241, 41],
 )
+
+assert_eq(A241793(24), 79)
 
 func A280005(n) {
     for(var p = 2; true; p.next_prime!) {
