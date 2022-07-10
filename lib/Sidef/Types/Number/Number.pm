@@ -15027,7 +15027,7 @@ package Sidef::Types::Number::Number {
                 last if (($j >= 8) && ($r_size <= 200));    # 60 digits
 
                 # Try to find special factors
-                if ($j == 9) {
+                if ($j >= 8) {
 
                     my @special_factors = @{(bless \$n)->special_factors};
                     my @gcd_factors     = @{
@@ -15078,6 +15078,10 @@ package Sidef::Types::Number::Number {
 
                     $bigomega + $log + 1 >= $k
                       or return Sidef::Types::Bool::Bool::FALSE;
+
+                    if ($j == 8 and @composite_factors and Math::GMPz::Rmpz_sizeinbase(${$composite_factors[-1]}, 2) >= 200) {
+                        next;
+                    }
 
                     foreach my $f (@composite_factors) {
                         push @prime_factors, _factor($$f);
@@ -15193,7 +15197,7 @@ package Sidef::Types::Number::Number {
                 last if (($j >= 8) && ($r_size <= 200));    # 60 digits
 
                 # Try to find special factors
-                if ($j == 9) {
+                if ($j >= 8) {
 
                     my @special_factors = @{(bless \$n)->special_factors};
                     my @gcd_factors     = @{
@@ -15236,6 +15240,10 @@ package Sidef::Types::Number::Number {
 
                     $omega + $log + 1 >= $k
                       or return Sidef::Types::Bool::Bool::FALSE;
+
+                    if ($j == 8 and @composite_factors and Math::GMPz::Rmpz_sizeinbase(${$composite_factors[-1]}, 2) >= 200) {
+                        next;
+                    }
 
                     foreach my $f (@composite_factors) {
                         push @prime_factors, _factor($$f);
