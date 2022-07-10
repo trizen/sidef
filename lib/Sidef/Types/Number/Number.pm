@@ -14983,7 +14983,7 @@ package Sidef::Types::Number::Number {
         my $remainder = $n;
 
         if ($size > 100) {    # greater than 10^30
-            foreach my $j (2 .. 8) {
+            foreach my $j (5 .. 9) {
 
                 my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
 
@@ -15019,12 +15019,15 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                last if (($j >= 5) && (Math::GMPz::Rmpz_sizeinbase($r, 2) <= 100));    # 30 digits
-                last if (($j >= 6) && (Math::GMPz::Rmpz_sizeinbase($r, 2) <= 133));    # 40 digits
-                last if (($j >= 7) && (Math::GMPz::Rmpz_sizeinbase($r, 2) <= 150));    # 45 digits
+                my $r_size = Math::GMPz::Rmpz_sizeinbase($r, 2);
+
+                last if (($j >= 5) && ($r_size <= 100));    # 30 digits
+                last if (($j >= 6) && ($r_size <= 133));    # 40 digits
+                last if (($j >= 7) && ($r_size <= 150));    # 45 digits
+                last if (($j >= 8) && ($r_size <= 200));    # 60 digits
 
                 # Try to find special factors
-                if ($j == 8) {
+                if ($j == 9) {
 
                     my @special_factors = @{(bless \$n)->special_factors};
                     my @gcd_factors     = @{
@@ -15146,7 +15149,7 @@ package Sidef::Types::Number::Number {
         my $size      = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
         if ($size > 100) {    # greater than 10^30
-            foreach my $j (2 .. 8) {
+            foreach my $j (5 .. 9) {
 
                 my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
 
@@ -15182,12 +15185,15 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                last if (($j >= 5) && (Math::GMPz::Rmpz_sizeinbase($r, 2) <= 100));    # 30 digits
-                last if (($j >= 6) && (Math::GMPz::Rmpz_sizeinbase($r, 2) <= 133));    # 40 digits
-                last if (($j >= 7) && (Math::GMPz::Rmpz_sizeinbase($r, 2) <= 150));    # 45 digits
+                my $r_size = Math::GMPz::Rmpz_sizeinbase($r, 2);
+
+                last if (($j >= 5) && ($r_size <= 100));    # 30 digits
+                last if (($j >= 6) && ($r_size <= 133));    # 40 digits
+                last if (($j >= 7) && ($r_size <= 150));    # 45 digits
+                last if (($j >= 8) && ($r_size <= 200));    # 60 digits
 
                 # Try to find special factors
-                if ($j == 8) {
+                if ($j == 9) {
 
                     my @special_factors = @{(bless \$n)->special_factors};
                     my @gcd_factors     = @{
