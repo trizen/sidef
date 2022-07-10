@@ -16801,9 +16801,14 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($z) > 0
           or return Sidef::Types::Array::Array->new;
 
-        # Factorize directly if it is small enough
+        # Factorize directly when n is a native integer
         if (Math::GMPz::Rmpz_fits_ulong_p($z)) {
             return Sidef::Types::Array::Array->new([map { _set_int($_) } _factor(Math::GMPz::Rmpz_get_ui($z))]);
+        }
+
+        # Factorize directly when n is small enough
+        if (Math::GMPz::Rmpz_sizeinbase($z, 2) <= 110) {
+            return Sidef::Types::Array::Array->new([map { _set_int($_) } _factor(Math::GMPz::Rmpz_get_str($z, 10))]);
         }
 
         my @factors;
@@ -16832,21 +16837,36 @@ package Sidef::Types::Number::Number {
 
         @factors = @{$n->gcd_factors(Sidef::Types::Array::Array->new([@factors]))};
 
+        my @prime_factors;
+        my @composite_factors;
+
+        foreach my $f (@factors) {
+            if (_is_prob_prime($$f)) {
+                push @prime_factors, $f;
+            }
+            elsif (Math::GMPz::Rmpz_sizeinbase($$f, 2) <= 110) {
+                push @prime_factors, (map { _set_int($_) } _factor($$f));
+            }
+            else {
+                push @composite_factors, $f;
+            }
+        }
+
         # Special methods that can find extra special factors, recursively
-        @factors = map { @{$_->factor($fermat_block)} } @factors;
-        @factors = map { @{$_->factor($holf_block)} } @factors;
-        @factors = map { @{$_->factor($pell_block)} } @factors;
-        @factors = map { @{$_->factor($FLT_block)} } @factors;
+        @composite_factors = map { @{$_->factor($fermat_block)} } @composite_factors;
+        @composite_factors = map { @{$_->factor($holf_block)} } @composite_factors;
+        @composite_factors = map { @{$_->factor($pell_block)} } @composite_factors;
+        @composite_factors = map { @{$_->factor($FLT_block)} } @composite_factors;
 
-        @factors = map { @{$_->factor($pm1_block)} } @factors;
-        @factors = map { @{$_->factor($pp1_block)} } @factors;
-        @factors = map { @{$_->factor($chebyshev_block)} } @factors;
+        @composite_factors = map { @{$_->factor($pm1_block)} } @composite_factors;
+        @composite_factors = map { @{$_->factor($pp1_block)} } @composite_factors;
+        @composite_factors = map { @{$_->factor($chebyshev_block)} } @composite_factors;
 
-        @factors = map {
+        @composite_factors = map {
             ($_->is_prime ? $_ : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(10))))})
-        } @factors;
+        } @composite_factors;
 
-        $n->gcd_factors(Sidef::Types::Array::Array->new([@factors]));
+        $n->gcd_factors(Sidef::Types::Array::Array->new([@prime_factors, @composite_factors]));
     }
 
     *special_factor = \&special_factors;
@@ -16860,7 +16880,7 @@ package Sidef::Types::Number::Number {
                 Sidef::Types::Block::Block->new(
                     code => sub {
                         my ($n) = @_;
-                        $n->is_prime ? Sidef::Types::Array::Array->new() : do {
+                        _is_prob_prime($$n) ? Sidef::Types::Array::Array->new() : do {
                             my $factors = do { $cache{"$n"} //= $block->run($n) };
                             $factors->first(-1)->concat($factors->last(-1));
                         };
