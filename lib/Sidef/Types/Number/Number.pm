@@ -16960,6 +16960,7 @@ package Sidef::Types::Number::Number {
         my $pm1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) });
         my $pp1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(1e4))) });
         my $chebyshev_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(1e4))) });
+        my $prho_block      = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))) });
 
         push @factors, @{$n->trial_factor($m->mul(_set_int(1e6)))->first(-1)};
 
@@ -16999,6 +17000,7 @@ package Sidef::Types::Number::Number {
 
         @composite_factors = map { @{$_->factor($pm1_block)} } @composite_factors;
         @composite_factors = map { @{$_->factor($pp1_block)} } @composite_factors;
+        @composite_factors = map { @{$_->factor($prho_block)} } @composite_factors;
         @composite_factors = map { @{$_->factor($chebyshev_block)} } @composite_factors;
 
         @composite_factors = map {
