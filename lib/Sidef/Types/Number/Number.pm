@@ -20964,6 +20964,48 @@ package Sidef::Types::Number::Number {
 
     *each_powerful = \&powerful_each;
 
+    sub nth_powerful {
+        my ($n, $k) = @_;
+
+        my $k_obj = $k;
+        my $n_obj = $n;
+
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_sgn($n) > 0 or do {
+            return ZERO if (Math::GMPz::Rmpz_sgn($n) == 0);    # not k-powerful, but...
+            goto &nan;
+        };
+
+        if (defined($k)) {
+            $k = _any2ui($$k) // goto &nan;
+            $k >= 2 or goto &nan;
+        }
+        else {
+            $k     = 2;
+            $k_obj = TWO;
+        }
+
+        my $min = Math::GMPz::Rmpz_init_set_ui(1);
+        my $max = Math::GMPz::Rmpz_init_set($n);
+
+        Math::GMPz::Rmpz_mul($max, $max, $n);
+
+        while (Math::GMPz::Rmpz_cmp(${$k_obj->powerful_count(bless \$max)}, $n) < 0) {
+            Math::GMPz::Rmpz_set($min, $max);
+            Math::GMPz::Rmpz_mul_ui($max, $max, $k);
+        }
+
+        bsearch_min(
+            (bless \$min),
+            (bless \$max),
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $k_obj->powerful_count($_[0])->cmp($n_obj);
+                }
+            )
+        );
+    }
+
     sub _sieve_omega_primes {
         my ($from, $to, $k) = @_;
 

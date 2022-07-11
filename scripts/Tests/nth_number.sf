@@ -6,25 +6,39 @@ assert_eq(300.of{.nth_semiprime}.ft(1), 300.dec.by{.is_semiprime})
 assert_eq(300.of{.nth_prime_power}.ft(1), 300.dec.by{.is_prime_power})
 assert_eq(300.of{.nth_prime}.ft(1), 300.dec.by{.is_prime})
 
-for n in (1..8) {
-    for k in (2..14 -> map{|b| b**n }) {
-        do {
-            var t = nth_semiprime(k)
-            assert(t.is_semiprime)
-            assert_eq(t.semiprime_count, k)
-        }
+for n in (1..8), k in (2..14 -> map{|b| b**n }) {
+    do {
+        var t = nth_semiprime(k)
+        assert(t.is_semiprime)
+        assert_eq(t.semiprime_count, k)
+    }
 
-        do {
-            var t = nth_prime_power(k)
-            assert(t.is_prime_power)
-            assert_eq(t.prime_power_count, k)
-        }
+    do {
+        var t = nth_prime_power(k)
+        assert(t.is_prime_power)
+        assert_eq(t.prime_power_count, k)
+    }
 
-        do {
-            var t = nth_prime(k)
-            assert(t.is_prime)
-            assert_eq(t.prime_count, k)
-        }
+    do {
+        var t = nth_prime(k)
+        assert(t.is_prime)
+        assert_eq(t.prime_count, k)
+    }
+}
+
+for j in (2..5), n in (2..5 -> map{|b| b**j }), k in (2..3) {
+    do {
+        var t = nth_powerful(n, k)
+        assert(t.is_powerful(k))
+        assert_eq(k.powerful_count(t), n)
+    }
+}
+
+for j in (2..8), n in (2..15 -> map{|b| b**j }), k in (2..10) {
+    do {
+        var t = nth_powerfree(n, k)
+        assert(t.is_powerfree(k))
+        assert_eq(k.powerfree_count(t), n)
     }
 }
 

@@ -77,12 +77,6 @@ do {
     }
 }
 
-for j in (2..8), n in (2..15 -> map{|b| b**j }), k in (2..10) {
-    var t = nth_powerfree(n, k)
-    assert(t.is_powerfree(k))
-    assert_eq(k.powerfree_count(t), n)
-}
-
 assert_eq(3000.of{.nth_powerfree(2)}.ft(1), 3000.dec.by{.is_powerfree(2)})
 assert_eq(3000.of{.nth_powerfree(3)}.ft(1), 3000.dec.by{.is_powerfree(3)})
 assert_eq(3000.of{.nth_powerfree(4)}.ft(1), 3000.dec.by{.is_powerfree(4)})

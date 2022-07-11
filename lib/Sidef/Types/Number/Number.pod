@@ -5159,6 +5159,17 @@ Returns the n-th k-powerfree number.
 
 =cut
 
+=head2 nth_powerful
+
+    nth_powerful(n, k=2)
+
+Returns the n-th k-powerful number.
+
+    say nth_powerful(1e4, 2)    #=> 23002083
+    say nth_powerful(1e4, 3)    #=> 16720797973
+
+=cut
+
 =head2 nth_prime_power
 
     nth_prime_power(n)
