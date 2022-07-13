@@ -234,6 +234,19 @@ Efficiently returns the remainders of C<n> when divided by each integer from the
 
 =cut
 
+=head2 seq
+
+    Math.seq(a, b, c, ..., {|arr| ... })
+
+Returns an Enumerator object which generates an infinite sequence specified by the initial terms and the given block.
+
+Example:
+
+    say Math.seq(2, { .last.next_prime }).first(30)     # prime numbers
+    say Math.seq(1, 1, { .last(2).sum }).first(30)      # Fibonacci numbers
+
+=cut
+
 =head2 smooth_numbers
 
     Math.smooth_numbers(primes...)

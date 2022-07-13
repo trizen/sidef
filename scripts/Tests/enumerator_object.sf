@@ -86,4 +86,46 @@ do {
     )
 }
 
+assert_eq(
+    Math.seq(1, 1, 1, {|a|
+        a.last(3).sum
+    }).nth(10, { .is_prime }),
+    3311233
+)
+
+assert_eq(
+    Math.seq(1, {|a|
+        a.last(3).sum
+    }).first(20),
+    %n[1, 1, 2, 4, 7, 13, 24, 44, 81, 149, 274, 504, 927, 1705, 3136, 5768, 10609, 19513, 35890, 66012]
+)
+
+assert_eq(
+    Math.seq(1, {|a|
+        a.last(3).sum
+    }).nth(10),
+    149
+)
+
+assert_eq(
+    Math.seq(1, 1, 1, {|a|
+        a.last(3).sum
+    }).while { _ < 1e4 },
+    %n[1, 1, 1, 3, 5, 9, 17, 31, 57, 105, 193, 355, 653, 1201, 2209, 4063, 7473]
+)
+
+assert_eq(
+    Math.seq(1, 1, {|a|
+        a.last(3).sum
+    }).first(16),
+    %n[1, 1, 2, 4, 7, 13, 24, 44, 81, 149, 274, 504, 927, 1705, 3136, 5768]
+)
+
+assert_eq(
+    Math.seq(1, {|a|
+        a.last.next_almost_prime(10)
+    }).while { _ < 1e4 }.ft(1),
+    10.almost_primes(1e4)
+)
+
 say "** Test passed!"

@@ -23,20 +23,40 @@ package Sidef::Object::Enumerator {
             Sidef::Types::Block::Block->new(
                 code => sub {
                     if (defined($block) ? $block->run(@_) : 1) {
-                        if (($count += @_) >= $n) {
-                            if ($count > $n) {
-                                splice(@_, $n - $count);
-                            }
-                            push @arr, @_;
+                        push @arr, @_;
+                        if (++$count >= $n) {
                             goto RETURN;
                         }
-                        push @arr, @_;
                     }
                 }
             )
         );
 
       RETURN: Sidef::Types::Array::Array->new(\@arr);
+    }
+
+    sub nth {
+        my ($self, $n, $block) = @_;
+
+        $n = CORE::int($n);
+
+        my @arr;
+        my $count = 0;
+
+        $self->{block}->run(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    if (defined($block) ? $block->run(@_) : 1) {
+                        if (++$count >= $n) {
+                            push @arr, @_;
+                            goto RETURN;
+                        }
+                    }
+                }
+            )
+        );
+
+      RETURN: $arr[0];
     }
 
     sub while {
@@ -140,7 +160,7 @@ package Sidef::Object::Enumerator {
         $self->{block}->run(
             Sidef::Types::Block::Block->new(
                 code => sub {
-                    $count += @_;
+                    ++$count;
                 },
             )
         );

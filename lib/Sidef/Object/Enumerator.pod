@@ -81,6 +81,17 @@ Aliases: I<call>
 
 =cut
 
+=head2 nth
+
+    e.nth(n)
+    e.nth(n, {...})
+
+Returns the n-th term.
+
+An optional block can be given to filter out terms, counting only the terms for which the block returns a true value.
+
+=cut
+
 =head2 to_a
 
     Enumerator.to_a()

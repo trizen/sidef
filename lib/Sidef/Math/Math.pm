@@ -198,6 +198,32 @@ package Sidef::Math::Math {
         );
     }
 
+    sub seq {
+        my ($self, @args) = @_;
+        my $block = pop(@args);
+
+        my @seq   = (@args);
+        my $array = Sidef::Types::Array::Array->new(\@seq);
+
+        Sidef::Object::Enumerator->new(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    my ($callback) = @_;
+
+                    foreach my $n (@seq) {
+                        $callback->run($n);
+                    }
+
+                    while (1) {
+                        my $r = $block->run($array);
+                        push @seq, $r;
+                        $callback->run($r);
+                    }
+                }
+            )
+        );
+    }
+
     sub chinese {
         my ($self, @arrs) = @_;
 
