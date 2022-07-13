@@ -5005,6 +5005,14 @@ Aliases: I<call>
 
 =cut
 
+=head2 next_almost_prime
+
+    n.next_almost_prime(k=2)
+
+Returns the next k-almost prime greater than C<n>.
+
+=cut
+
 =head2 next_composite
 
     n.next_composite
@@ -5017,7 +5025,7 @@ Given a non-negative integer C<n>, returns the next composite number greater tha
 
     n.next_palindrome(b=10)
 
-Efficiently returns the next palindrome in base-b greater than n.
+Efficiently returns the next palindrome in base-b greater than C<n>.
 
     # Iterate over the base-10 palindromic numbers < 10^6
     for (var n = 0; n < 1e6; n = n.next_palindrome) {

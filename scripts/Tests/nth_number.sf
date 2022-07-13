@@ -27,6 +27,15 @@ for k in (1..5) {
         },
         k.powerful(1e4)
     ) if (k > 1)
+
+    assert_eq(
+        gather {
+            for (var m = next_almost_prime(0, k); m <= 1e3; m.next_almost_prime!(k)) {
+                take(m)
+            }
+        },
+        k.almost_primes(1e3)
+    )
 }
 
 assert_eq(nth_almost_prime( 3, 100),  2852213850513516153367582212096)

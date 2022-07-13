@@ -21934,6 +21934,28 @@ package Sidef::Types::Number::Number {
         $k_obj->almost_primes((bless \$min), (bless \$v))->last;
     }
 
+    sub next_almost_prime {
+        my ($n, $k) = @_;
+
+        my $k_obj;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k_obj = $k;
+            $k = _any2ui($$k) || goto &nan;
+        }
+        else {
+            $k_obj = TWO;
+            $k = 2;
+        }
+
+        if ($k == 1) {
+            return $n->next_prime;
+        }
+
+        $k_obj->almost_prime_count($n)->inc->nth_almost_prime($k_obj);
+    }
+
     sub squarefree_almost_primes {
         my ($k, $from, $to) = @_;
 
