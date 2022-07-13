@@ -5083,6 +5083,14 @@ Given a non-negative integer C<n>, returns the next prime power (C<p^k> with k >
 
 =cut
 
+=head2 next_semiprime
+
+    n.next_semiprime
+
+Returns the next semiprime greater than C<n>.
+
+=cut
+
 =head2 next_squarefree
 
     n.next_squarefree

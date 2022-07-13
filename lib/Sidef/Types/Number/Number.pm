@@ -14929,6 +14929,33 @@ package Sidef::Types::Number::Number {
 
     *semiprime = \&nth_semiprime;
 
+    sub next_semiprime {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
+        Math::GMPz::Rmpz_cmp_ui($n, 4) < 0 and return _set_int(4);
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_slong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) + 1;
+            until (HAS_PRIME_UTIL ? Math::Prime::Util::is_semiprime($n) : Math::Prime::Util::GMP::is_semiprime($n)) {
+                ++$n;
+            }
+            return _set_int($n);
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add_ui($r, $n, 1);
+
+        until (Math::Prime::Util::GMP::is_semiprime(Math::GMPz::Rmpz_get_str($r, 10))) {
+            Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        }
+
+        bless \$r;
+    }
+
     sub _primality_pretest {
         my ($n) = @_;
 
@@ -21942,15 +21969,18 @@ package Sidef::Types::Number::Number {
         if (defined($k)) {
             _valid(\$k);
             $k_obj = $k;
-            $k = _any2ui($$k) || goto &nan;
+            $k     = _any2ui($$k) || goto &nan;
         }
         else {
             $k_obj = TWO;
-            $k = 2;
+            $k     = 2;
         }
 
         if ($k == 1) {
             return $n->next_prime;
+        }
+        elsif ($k == 2) {
+            return $n->next_semiprime;
         }
 
         $k_obj->almost_prime_count($n)->inc->nth_almost_prime($k_obj);
