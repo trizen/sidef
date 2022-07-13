@@ -5043,6 +5043,14 @@ Aliases: I<next_power>
 
 =cut
 
+=head2 next_powerfree
+
+    n.next_powerfree(k=2)
+
+Returns the next k-powerfree number greater than C<n>.
+
+=cut
+
 =head2 next_prime
 
     n.next_prime
@@ -5063,7 +5071,7 @@ Given a non-negative integer C<n>, returns the next prime power (C<p^k> with k >
 
     n.next_squarefree
 
-Returns the next squarefree integer larger than C<n>.
+Returns the next squarefree number greater than C<n>.
 
 =cut
 

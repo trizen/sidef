@@ -13827,7 +13827,9 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        until ((bless \$v)->is_powerfree($k_obj)) {
+        my $v_obj = bless \$v;
+
+        until ($v_obj->is_powerfree($k_obj)) {
             Math::GMPz::Rmpz_sub_ui($v, $v, 1);
         }
 
@@ -13841,12 +13843,12 @@ package Sidef::Types::Number::Number {
               until (
                      (HAS_NEW_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
                      ? Math::Prime::Util::is_powerfree(Math::GMPz::Rmpz_get_ui($v), $k)
-                     : (bless \$v)->is_powerfree($k_obj)
+                     : $v_obj->is_powerfree($k_obj)
                     );
             $count += $cmp;
         }
 
-        bless \$v;
+        $v_obj;
     }
 
     sub legendre {
@@ -16752,11 +16754,57 @@ package Sidef::Types::Number::Number {
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_add_ui($r, $n, 1);
 
-        until (bless(\$r)->is_squarefree) {
+        my $r_obj = bless \$r;
+
+        until ($r_obj->is_squarefree) {
             Math::GMPz::Rmpz_add_ui($r, $r, 1);
         }
 
-        bless \$r;
+        $r_obj;
+    }
+
+    sub next_powerfree {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+            $k >= 2 or goto &nan;
+        }
+        else {
+            $k = 2;
+        }
+
+        if ($k == 2) {
+            return $n->next_squarefree;
+        }
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
+        $sgn < 0  and goto &nan;
+        $sgn == 0 and return ONE;
+
+        # Optimization for native integers
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_slong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) + 1;
+            until (Math::Prime::Util::is_powerfree($n, $k)) {
+                ++$n;
+            }
+            return _set_int($n);
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add_ui($r, $n, 1);
+
+        my $k_obj = _set_int($k);
+        my $r_obj = bless(\$r);
+
+        until ($r_obj->is_powerfree($k_obj)) {
+            Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        }
+
+        $r_obj;
     }
 
     sub znorder {

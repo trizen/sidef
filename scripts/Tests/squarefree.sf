@@ -93,12 +93,32 @@ assert_eq(
 
 assert_eq(
     gather {
-        for (var k = next_squarefree(2**64 - 11); k <= (2**64 + 100); k.next_squarefree!) {
+        for (var k = next_powerfree(0,3); k <= 100; k.next_powerfree!(3)) {
             take(k)
         }
     },
-    squarefree(2**64 - 10 .. (2**64 + 100))
+    1..100 -> grep { .is_powerfree(3) }
 )
+
+for n in (31, 32, 63, 64) {
+    assert_eq(
+        gather {
+            for (var k = next_squarefree(2**n - 11); k <= (2**n + 100); k.next_squarefree!) {
+                take(k)
+            }
+        },
+        squarefree(range(2**n - 10, 2**n + 100))
+    )
+
+    assert_eq(
+        gather {
+            for (var k = next_powerfree(2**n - 11, 3); k <= (2**n + 100); k.next_powerfree!(3)) {
+                take(k)
+            }
+        },
+        range(2**n - 10, 2**n + 100).grep { .is_powerfree(3) }
+    )
+}
 
 assert_eq(
     10.of { .next_squarefree },
@@ -111,6 +131,10 @@ assert(next_squarefree(-50).is_nan)
 assert_eq(next_squarefree(2**64), 2**64 + 1)
 assert_eq(next_squarefree(2**32), 2**32 + 1)
 assert_eq(next_squarefree(2**16), 2**16 + 1)
+
+assert_eq(next_powerfree(2**64, 3), 2**64 + 1)
+assert_eq(next_powerfree(2**32, 3), 2**32 + 1)
+assert_eq(next_powerfree(2**16, 3), 2**16 + 1)
 
 assert_eq(next_squarefree(2**16 - 1), 2**16 + 1)
 assert_eq(next_squarefree(2**32 - 1), 2**32 + 1)

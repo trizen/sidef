@@ -7,6 +7,11 @@ assert_eq(300.of{.nth_prime_power}.ft(1), 300.dec.by{.is_prime_power})
 assert_eq(300.of{.nth_prime}.ft(1), 300.dec.by{.is_prime})
 
 for n in (1 .. (Number.HAS_PRIME_UTIL ? 8 : 5)), k in (2..14 -> map{|b| b**n }) {
+
+    if (Number(Number.ULONG_MAX) < 2**32) {
+        n < 8 || next
+    }
+
     do {
         var t = nth_semiprime(k)
         assert(t.is_semiprime)
