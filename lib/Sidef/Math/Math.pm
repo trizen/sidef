@@ -214,8 +214,11 @@ package Sidef::Math::Math {
                         $callback->run($n);
                     }
 
+                    my $index = scalar(@seq);
+
                     while (1) {
-                        my $r = $block->run($array);
+                        ++$index;
+                        my $r = $block->run($array, Sidef::Types::Number::Number::_set_int($index));
                         push @seq, $r;
                         $callback->run($r);
                     }

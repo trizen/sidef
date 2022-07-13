@@ -236,7 +236,7 @@ Efficiently returns the remainders of C<n> when divided by each integer from the
 
 =head2 seq
 
-    Math.seq(a, b, c, ..., {|arr| ... })
+    Math.seq(x, y, z, ..., {|a,n| ... })
 
 Returns an Enumerator object which generates an infinite sequence specified by the initial terms and the given block.
 

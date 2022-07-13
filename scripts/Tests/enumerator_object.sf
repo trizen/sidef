@@ -128,4 +128,19 @@ assert_eq(
     10.almost_primes(1e4)
 )
 
+assert_eq(
+    Math.seq(1, 1, {|a,n| a.tail + n*subfactorial(n-1) }).first(10),
+    %n[1, 1, 4, 12, 57, 321, 2176, 17008, 150505, 1485465]
+)
+
+assert_eq(
+    Math.seq(0, {|a,n| a.tail*n + ((-1)**n * (n-1)!) }).first(10),
+    %n[0, 1, 1, 10, 26, 276, 1212, 14736, 92304, 1285920]
+)
+
+assert_eq(
+     Math.seq(0,0,2, {|a| a[-1] + a[-2] + a[-3] }).while { _ <= 1e4 },
+     %n[0, 0, 2, 2, 4, 8, 14, 26, 48, 88, 162, 298, 548, 1008, 1854, 3410, 6272]
+)
+
 say "** Test passed!"
