@@ -44,6 +44,16 @@ assert_eq(nth_almost_prime( 2, 124),  31901471898837980949691369446728269824)
 assert_eq(nth_almost_prime( 2,  50),  1688849860263936)
 assert_eq(nth_almost_prime(50, 100),  26145293629707231405869503610880)
 
+assert_eq(next_semiprime(2**64 - 10), 2**64 + 1)
+assert_eq(next_semiprime(2**63 - 10), 9223372036854775817)
+
+for j in (15, 20), k in (1..10) {
+    var n = irand(10**j)
+    var t = next_almost_prime(n, k)
+    assert(t.is_almost_prime(k))
+    assert_eq(range(n+1, t).grep {.is_almost_prime(k)}, [t])
+}
+
 for n in (1 .. (Number.HAS_PRIME_UTIL ? 8 : 5)), k in (2..14 -> map{|b| b**n }) {
 
     if (Number(Number.ULONG_MAX) < 2**32) {
