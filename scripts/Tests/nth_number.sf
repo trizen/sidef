@@ -18,6 +18,15 @@ for k in (1..5) {
         20.of { nth_almost_prime(_, k) }.ft(1),
         19.by { .is_almost_prime(k) }
     )
+
+    assert_eq(
+        gather {
+            for (var m = 1; m <= 1e4; m.next_powerful!(k)) {
+                take(m)
+            }
+        },
+        k.powerful(1e4)
+    ) if (k > 1)
 }
 
 assert_eq(nth_almost_prime( 3, 100),  2852213850513516153367582212096)

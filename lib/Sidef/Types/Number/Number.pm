@@ -21241,6 +21241,19 @@ package Sidef::Types::Number::Number {
         $k_obj->powerful((bless \$min), (bless \$v))->last;
     }
 
+    sub next_powerful {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+        }
+        else {
+            $k = TWO;
+        }
+
+        $k->powerful_count($n)->inc->nth_powerful($k);
+    }
+
     sub _sieve_omega_primes {
         my ($from, $to, $k) = @_;
 

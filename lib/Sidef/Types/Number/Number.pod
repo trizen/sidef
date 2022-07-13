@@ -5051,6 +5051,14 @@ Returns the next k-powerfree number greater than C<n>.
 
 =cut
 
+=head2 next_powerful
+
+    n.next_powerful(k=2)
+
+Returns the next k-powerful number greater than C<n>.
+
+=cut
+
 =head2 next_prime
 
     n.next_prime
