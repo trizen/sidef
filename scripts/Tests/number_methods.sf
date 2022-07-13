@@ -516,4 +516,17 @@ do {
     assert_eq(arr, {.is_prime_power}.first(20))
 }
 
+assert_eq(prime_count(619, 619), 1)
+assert_eq(prime_count(620, 620), 0)
+assert_eq(prime_count(620, 621), 0)
+assert_eq(prime_count(619, 621), 1)
+assert_eq(prime_count(620, 621), 0)
+assert_eq(prime_count(620, 630), 0)
+assert_eq(prime_count(620, 631), 1)
+assert_eq(prime_count(619, 631), 2)
+
+assert_eq(prime_count(2**127 - 1, 2**127 - 1), 1)
+assert_eq(3.almost_prime_count(82654, 7158821), 1736362)
+assert_eq(4.almost_prime_count(83925, 4376019), 872251)
+
 say "** Tests passed!"
