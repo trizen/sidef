@@ -13648,10 +13648,10 @@ package Sidef::Types::Number::Number {
             my $cmp = Math::GMPz::Rmpz_cmp($count, $n);
 
             if ($cmp > 0) {
-                $max = $v - 1;
+                Math::GMPz::Rmpz_sub_ui($max, $v, 1);
             }
             elsif ($cmp < 0) {
-                $min = $v + 1;
+                Math::GMPz::Rmpz_add_ui($min, $v, 1);
             }
             else {
                 last;
@@ -20995,15 +20995,33 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mul_ui($max, $max, $k);
         }
 
-        bsearch_min(
-            (bless \$min),
-            (bless \$max),
-            Sidef::Types::Block::Block->new(
-                code => sub {
-                    $k_obj->powerful_count($_[0])->cmp($n_obj);
-                }
-            )
-        );
+        my $k_obj = _set_int($k);
+        my $v     = Math::GMPz::Rmpz_init();
+        my $count = Math::GMPz::Rmpz_init();
+
+        while (1) {
+            Math::GMPz::Rmpz_add($v, $min, $max);
+            Math::GMPz::Rmpz_div_2exp($v, $v, 1);
+
+            $count =
+              (HAS_NEW_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
+              ? Math::GMPz::Rmpz_init_set_ui(Math::Prime::Util::powerful_count(Math::GMPz::Rmpz_get_ui($v), $k))
+              : ${$k_obj->powerful_count(bless \$v)};
+
+            my $cmp = Math::GMPz::Rmpz_cmp($count, $n);
+
+            if ($cmp > 0) {
+                Math::GMPz::Rmpz_sub_ui($max, $v, 1);
+            }
+            elsif ($cmp < 0) {
+                Math::GMPz::Rmpz_add_ui($min, $v, 1);
+            }
+            else {
+                last;
+            }
+        }
+
+        $k_obj->powerful((bless \$min), (bless \$v))->last;
     }
 
     sub _sieve_omega_primes {
