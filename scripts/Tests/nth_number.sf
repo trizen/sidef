@@ -6,6 +6,26 @@ assert_eq(300.of{.nth_semiprime}.ft(1), 300.dec.by{.is_semiprime})
 assert_eq(300.of{.nth_prime_power}.ft(1), 300.dec.by{.is_prime_power})
 assert_eq(300.of{.nth_prime}.ft(1), 300.dec.by{.is_prime})
 
+assert_eq(nth_almost_prime(500, 500), 487939787489518647498841089183363998627293204988294345182353119556829944026571800837287448137330088425304046352764423084811447303871041402011783643791360)
+
+assert_eq(
+    { nth_almost_prime(_, _) }.map(1..29)
+    %n[2, 6, 18, 40, 108, 224, 480, 1296, 2688, 5632, 11520, 25600, 53248, 124416, 258048, 540672, 1105920, 2228224, 4587520, 9830400, 19922944, 40894464, 95551488, 192937984, 396361728, 822083584, 1660944384, 3397386240, 6845104128]
+)
+
+for k in (1..5) {
+    assert_eq(
+        20.of { nth_almost_prime(_, k) }.ft(1),
+        19.by { .is_almost_prime(k) }
+    )
+}
+
+assert_eq(nth_almost_prime( 3, 100),  2852213850513516153367582212096)
+assert_eq(nth_almost_prime( 1, 123),  10633823966279326983230456482242756608)
+assert_eq(nth_almost_prime( 2, 124),  31901471898837980949691369446728269824)
+assert_eq(nth_almost_prime( 2,  50),  1688849860263936)
+assert_eq(nth_almost_prime(50, 100),  26145293629707231405869503610880)
+
 for n in (1 .. (Number.HAS_PRIME_UTIL ? 8 : 5)), k in (2..14 -> map{|b| b**n }) {
 
     if (Number(Number.ULONG_MAX) < 2**32) {
@@ -36,6 +56,12 @@ for j in (2..5), n in (2..5 -> map{|b| b**j }), k in (2..5) {
         var t = nth_powerful(n, k)
         assert(t.is_powerful(k))
         assert_eq(k.powerful_count(t), n)
+    }
+
+    do {
+        var t = nth_almost_prime(n, k)
+        assert(t.is_almost_prime(k))
+        assert_eq(k.almost_prime_count(t), n)
     }
 }
 

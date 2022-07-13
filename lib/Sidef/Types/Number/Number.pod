@@ -3449,7 +3449,7 @@ Return true if C<n> passes the Agrawal-Kayal-Saxena (AKS) primality test.
 
 Return true if C<n> is a k-almost prime (i.e.: true iff C<n> is the product of C<k> not necessarily distinct primes).
 
-Equivalently, k-almost primes are numbers n such that C<bigomega(n) == k>.
+Equivalently, k-almost primes are numbers C<n> such that C<bigomega(n) == k>.
 
     say 20.by { .is_almost_prime(1) }   # primes
     say 20.by { .is_almost_prime(2) }   # semiprimes
@@ -5152,6 +5152,18 @@ The value for C<start> can be any arbitrarily large integer:
     say n_primes(10, 2**128 + 1)    # first 10 primes > 2^128
 
 Aliases: I<nprimes>, I<next_primes>
+
+=cut
+
+=head2 nth_almost_prime
+
+    nth_almost_prime(n, k=2)
+
+Returns the n-th k-almost prime.
+
+    say nth_almost_prime(1e7, 2)   #=> 56168169
+    say nth_almost_prime(1e7, 3)   #=> 41657362
+    say nth_almost_prime(1e7, 4)   #=> 47997635
 
 =cut
 
