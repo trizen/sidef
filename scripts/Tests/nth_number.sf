@@ -14,6 +14,11 @@ assert_eq(
 )
 
 assert_eq(
+    { nth_squarefree_almost_prime(_, _) }.map(1..10)
+    %n[2, 10, 66, 462, 4290, 53130, 903210, 17687670, 406816410, 11125544430]
+)
+
+assert_eq(
     { nth_omega_prime(_, _) }.map(1..10)
     %n[2, 10, 60, 420, 4290, 53130, 903210, 17687670, 406816410, 11125544430]
 )
@@ -22,6 +27,11 @@ for k in (1..5) {
     assert_eq(
         20.of { nth_almost_prime(_, k) }.ft(1),
         19.by { .is_almost_prime(k) }
+    )
+
+    assert_eq(
+        20.of { nth_squarefree_almost_prime(_, k) }.ft(1),
+        19.by { .is_almost_prime(k) && .is_squarefree }
     )
 
     assert_eq(
@@ -45,6 +55,9 @@ assert_eq(nth_almost_prime( 1, 123),  10633823966279326983230456482242756608)
 assert_eq(nth_almost_prime( 2, 124),  31901471898837980949691369446728269824)
 assert_eq(nth_almost_prime( 2,  50),  1688849860263936)
 assert_eq(nth_almost_prime(50, 100),  26145293629707231405869503610880)
+
+assert_eq(nth_squarefree_almost_prime(15, 14), 20483443417467030)
+assert_eq(nth_squarefree_almost_prime(10, 15), 880788066951082290)
 
 assert_eq(nth_omega_prime(15, 14), 20483443417467030)
 assert_eq(nth_omega_prime(10, 15), 880788066951082290)
@@ -95,6 +108,13 @@ for j in (2..5), n in (2..5 -> map{|b| b**j }), k in (2..5) {
         var t = nth_almost_prime(n, k)
         assert(t.is_almost_prime(k))
         assert_eq(k.almost_prime_count(t), n)
+    }
+
+    do {
+        var t = nth_squarefree_almost_prime(n, k)
+        assert(t.is_almost_prime(k))
+        assert(t.is_squarefree)
+        assert_eq(k.squarefree_almost_prime_count(t), n)
     }
 
     do {

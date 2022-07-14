@@ -13277,6 +13277,71 @@ package Sidef::Types::Number::Number {
         $k_obj->omega_primes((bless \$min), (bless \$v))->last;
     }
 
+    sub nth_squarefree_almost_prime {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+            $k >= 1 or goto &nan;
+        }
+        else {
+            $k = 2;
+        }
+
+        if ($k == 1) {
+            return $n->nth_prime;
+        }
+
+        my $k_obj = _set_int($k);
+        my $n_obj = $n;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($n) > 0 or do {
+            return ONE if (Math::GMPz::Rmpz_sgn($n) == 0);    # not k-almost prime, but...
+            goto &nan;
+        };
+
+        state @pn_primorial;
+        $pn_primorial[$k] //= Math::GMPz::Rmpz_init_set_str_nobless(Math::Prime::Util::GMP::pn_primorial($k), 10);
+
+        my $min = Math::GMPz::Rmpz_init();
+        my $max = Math::GMPz::Rmpz_init_set($n);
+
+        Math::GMPz::Rmpz_set($min, $pn_primorial[$k]);
+        Math::GMPz::Rmpz_mul_2exp($max, $min, 1);
+
+        while (Math::GMPz::Rmpz_cmp(${$k_obj->squarefree_almost_prime_count(bless \$max)}, $n) < 0) {
+            Math::GMPz::Rmpz_set($min, $max);
+            Math::GMPz::Rmpz_mul_ui($max, $max, 2);
+        }
+
+        my $v     = Math::GMPz::Rmpz_init();
+        my $count = Math::GMPz::Rmpz_init();
+
+        while (1) {
+            Math::GMPz::Rmpz_add($v, $min, $max);
+            Math::GMPz::Rmpz_div_2exp($v, $v, 1);
+
+            $count = ${$k_obj->squarefree_almost_prime_count(bless \$v)};
+
+            my $cmp = Math::GMPz::Rmpz_cmp($count, $n);
+
+            if ($cmp > 0) {
+                Math::GMPz::Rmpz_sub_ui($max, $v, 1);
+            }
+            elsif ($cmp < 0) {
+                Math::GMPz::Rmpz_add_ui($min, $v, 1);
+            }
+            else {
+                last;
+            }
+        }
+
+        $k_obj->squarefree_almost_primes((bless \$min), (bless \$v))->last;
+    }
+
     sub prime_power_count {
         my ($x, $y) = @_;
 

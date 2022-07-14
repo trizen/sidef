@@ -5246,6 +5246,18 @@ Returns the n-th squarefree number. (OEIS: A005117)
 
 =cut
 
+=head2 nth_squarefree_almost_prime
+
+    nth_squarefree_almost_prime(n, k=2)
+
+Returns the n-th squarefree k-almost prime.
+
+    say nth_squarefree_almost_prime(1e7, 2)     #=> 56173891
+    say nth_squarefree_almost_prime(1e7, 3)     #=> 48108421
+    say nth_squarefree_almost_prime(1e7, 4)     #=> 81556446
+
+=cut
+
 =head2 nu
 
     r.nu
