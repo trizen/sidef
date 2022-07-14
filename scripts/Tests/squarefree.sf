@@ -83,39 +83,24 @@ assert_eq(
 )
 
 assert_eq(
-    gather {
-        for (var k = next_squarefree(0); k <= 100; k.next_squarefree!) {
-            take(k)
-        }
-    },
+    Math.seq(next_squarefree(0), { .tail.next_squarefree }).while { _ <= 100 },
     squarefree(1..100)
 )
 
 assert_eq(
-    gather {
-        for (var k = next_powerfree(0,3); k <= 100; k.next_powerfree!(3)) {
-            take(k)
-        }
-    },
+    Math.seq(next_powerfree(0,3), { .tail.next_powerfree(3) }).while { _ <= 100 },
     1..100 -> grep { .is_powerfree(3) }
 )
 
 for n in (31, 32, 63, 64) {
+
     assert_eq(
-        gather {
-            for (var k = next_squarefree(2**n - 11); k <= (2**n + 100); k.next_squarefree!) {
-                take(k)
-            }
-        },
+        Math.seq(next_squarefree(2**n - 11), { .tail.next_squarefree }).while { _ <= (2**n + 100) },
         squarefree(range(2**n - 10, 2**n + 100))
     )
 
     assert_eq(
-        gather {
-            for (var k = next_powerfree(2**n - 11, 3); k <= (2**n + 100); k.next_powerfree!(3)) {
-                take(k)
-            }
-        },
+        Math.seq(next_powerfree(2**n - 11, 3), { .tail.next_powerfree(3) }).while { _ <= (2**n + 100) },
         range(2**n - 10, 2**n + 100).grep { .is_powerfree(3) }
     )
 }

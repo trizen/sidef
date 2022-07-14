@@ -5191,6 +5191,18 @@ Returns the n-th k-almost prime.
 
 =cut
 
+=head2 nth_omega_prime
+
+    nth_omega_prime(n, k=2)
+
+Returns the n-th k-omega prime.
+
+    say nth_omega_prime(1e7, 2)    #=> 42314023
+    say nth_omega_prime(1e7, 3)    #=> 28013887
+    say nth_omega_prime(1e7, 4)    #=> 39780102
+
+=cut
+
 =head2 nth_powerfree
 
     nth_powerfree(n, k=2)

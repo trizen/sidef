@@ -13,6 +13,11 @@ assert_eq(
     %n[2, 6, 18, 40, 108, 224, 480, 1296, 2688, 5632, 11520, 25600, 53248, 124416, 258048, 540672, 1105920, 2228224, 4587520, 9830400, 19922944, 40894464, 95551488, 192937984, 396361728, 822083584, 1660944384, 3397386240, 6845104128]
 )
 
+assert_eq(
+    { nth_omega_prime(_, _) }.map(1..10)
+    %n[2, 10, 60, 420, 4290, 53130, 903210, 17687670, 406816410, 11125544430]
+)
+
 for k in (1..5) {
     assert_eq(
         20.of { nth_almost_prime(_, k) }.ft(1),
@@ -20,20 +25,17 @@ for k in (1..5) {
     )
 
     assert_eq(
-        gather {
-            for (var m = 1; m <= 1e4; m.next_powerful!(k)) {
-                take(m)
-            }
-        },
+        20.of { nth_omega_prime(_, k) }.ft(1),
+        19.by { .is_omega_prime(k) }
+    )
+
+    assert_eq(
+        Math.seq(1, { .tail.next_powerful(k) }).while { _ <= 1e4 },
         k.powerful(1e4)
     ) if (k > 1)
 
     assert_eq(
-        gather {
-            for (var m = next_almost_prime(0, k); m <= 1e3; m.next_almost_prime!(k)) {
-                take(m)
-            }
-        },
+        Math.seq(next_almost_prime(0, k), { .tail.next_almost_prime(k) }).while { _ <= 1e3 },
         k.almost_primes(1e3)
     )
 }
@@ -43,6 +45,9 @@ assert_eq(nth_almost_prime( 1, 123),  10633823966279326983230456482242756608)
 assert_eq(nth_almost_prime( 2, 124),  31901471898837980949691369446728269824)
 assert_eq(nth_almost_prime( 2,  50),  1688849860263936)
 assert_eq(nth_almost_prime(50, 100),  26145293629707231405869503610880)
+
+assert_eq(nth_omega_prime(15, 14), 20483443417467030)
+assert_eq(nth_omega_prime(10, 15), 880788066951082290)
 
 assert_eq(next_semiprime(2**64 - 10), 2**64 + 1)
 assert_eq(next_semiprime(2**63 - 10), 9223372036854775817)
@@ -90,6 +95,12 @@ for j in (2..5), n in (2..5 -> map{|b| b**j }), k in (2..5) {
         var t = nth_almost_prime(n, k)
         assert(t.is_almost_prime(k))
         assert_eq(k.almost_prime_count(t), n)
+    }
+
+    do {
+        var t = nth_omega_prime(n, k)
+        assert(t.is_omega_prime(k))
+        assert_eq(k.omega_prime_count(t), n)
     }
 }
 

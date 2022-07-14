@@ -96,11 +96,7 @@ do {
         )
 
         assert_eq(
-            gather {
-                for(var k = next_composite(from-1); k <= to; k.next_composite!) {
-                    take(k)
-                }
-            },
+            Math.seq(next_composite(from-1), { .tail.next_composite }).while { _ <= to },
             C
         )
     }
