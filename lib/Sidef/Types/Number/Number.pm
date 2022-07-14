@@ -12933,11 +12933,19 @@ package Sidef::Types::Number::Number {
 
         my $n = _any2mpz($$from) // return ZERO;
 
-        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_set_ui($t, 0);
+        Math::GMPz::Rmpz_setbit($t, $k);
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
+
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n) and Math::Prime::Util::almost_prime_count(10, 1024) == 1)
+        {
             return _set_int(Math::Prime::Util::almost_prime_count($k, Math::GMPz::Rmpz_get_ui($n)));
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
         sub {
@@ -21984,12 +21992,16 @@ package Sidef::Types::Number::Number {
 
         $n = _any2mpz($$n) // goto &nan;
 
-        my $t = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_setbit($t, $k);
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+            goto &nan;
+        }
+
+        my $r = Math::GMPz::Rmpz_init_set_ui(0);
+        Math::GMPz::Rmpz_setbit($r, $k);
 
         # Smallest k-almost prime is 2^k
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
-            return bless \$t;
+        if (Math::GMPz::Rmpz_cmp($n, $r) < 0) {
+            return bless \$r;
         }
 
         if ($k <= 23) {
@@ -22023,7 +22035,6 @@ package Sidef::Types::Number::Number {
                     return _set_int($n);
                 }
 
-                my $r = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_add_ui($r, $n, 1);
 
                 my $r_obj = bless \$r;
