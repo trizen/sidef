@@ -13228,13 +13228,6 @@ package Sidef::Types::Number::Number {
             goto &nan;
         };
 
-        if (HAS_NEW_PRIME_UTIL and $k <= 12) {                # too slow for large k
-            my $r = Math::Prime::Util::nth_omega_prime($k, $n);
-            if ($r) {
-                return _set_int("$r");
-            }
-        }
-
         state @pn_primorial;
         $pn_primorial[$k] //= Math::GMPz::Rmpz_init_set_str_nobless(Math::Prime::Util::GMP::pn_primorial($k), 10);
 
@@ -13247,6 +13240,13 @@ package Sidef::Types::Number::Number {
         while (Math::GMPz::Rmpz_cmp(${$k_obj->omega_prime_count(bless \$max)}, $n) < 0) {
             Math::GMPz::Rmpz_set($min, $max);
             Math::GMPz::Rmpz_mul_ui($max, $max, 2);
+        }
+
+        if (HAS_NEW_PRIME_UTIL and $k <= 12 and Math::GMPz::Rmpz_fits_ulong_p($max)) {    # too slow for large k
+            my $r = Math::Prime::Util::nth_omega_prime($k, $n);
+            if ($r) {
+                return _set_int("$r");
+            }
         }
 
         my $v     = Math::GMPz::Rmpz_init();
@@ -22160,7 +22160,7 @@ package Sidef::Types::Number::Number {
 
                 if ($k == 2) {
                     return
-                      Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::rootint($s, 3),
+                      Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::rootint($s, (HAS_NEW_PRIME_UTIL ? 3 : 2)),
                                                      Math::Prime::Util::GMP::prime_count_upper($s));
                 }
 
