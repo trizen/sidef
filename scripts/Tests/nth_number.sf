@@ -48,6 +48,11 @@ for k in (1..5) {
         Math.seq(next_almost_prime(0, k), { .tail.next_almost_prime(k) }).while { _ <= 1e3 },
         k.almost_primes(1e3)
     )
+
+    assert_eq(
+        Math.seq(next_omega_prime(0, k), { .tail.next_omega_prime(k) }).while { _ <= 1e4 },
+        k.omega_primes(1e4)
+    )
 }
 
 assert_eq(nth_almost_prime( 3, 100),  2852213850513516153367582212096)

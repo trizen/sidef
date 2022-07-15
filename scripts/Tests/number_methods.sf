@@ -542,4 +542,7 @@ with (15.omega_primes(1922334673882737115)) {|a|
     assert_eq(a.len, 365)
 }
 
+assert_eq(next_omega_prime(1e12, 7), 1000000000090)
+assert_eq(next_omega_prime(1e12, 6), 1000000000010)
+
 say "** Tests passed!"

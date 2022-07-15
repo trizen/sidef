@@ -5021,6 +5021,14 @@ Given a non-negative integer C<n>, returns the next composite number greater tha
 
 =cut
 
+=head2 next_omega_prime
+
+    n.next_omega_prime(k=2)
+
+Returns the next k-omega prime greater than C<n>.
+
+=cut
+
 =head2 next_palindrome
 
     n.next_palindrome(b=10)

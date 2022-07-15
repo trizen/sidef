@@ -18,27 +18,11 @@ package Sidef::Types::Number::Number {
         $PREC  = 192;
     }
 
-    our $MPZ = bless \Math::GMPz::Rmpz_init();
-
-    state $round_z = Math::MPFR::MPFR_RNDZ();
-
     state $MONE = Math::GMPz::Rmpz_init_set_si(-1);
     state $ZERO = Math::GMPz::Rmpz_init_set_ui(0);
     state $ONE  = Math::GMPz::Rmpz_init_set_ui(1);
     state $TWO  = Math::GMPz::Rmpz_init_set_ui(2);
     state $TEN  = Math::GMPz::Rmpz_init_set_ui(10);
-
-    my %DIGITS_36;
-    @DIGITS_36{0 .. 9, 'a' .. 'z'} = (0 .. 35);
-
-    my %DIGITS_62;
-    @DIGITS_62{0 .. 9, 'A' .. 'Z', 'a' .. 'z'} = (0 .. 61);
-
-    my %FROM_DIGITS_36;
-    @FROM_DIGITS_36{0 .. 35} = (0 .. 9, 'a' .. 'z');
-
-    my %FROM_DIGITS_62;
-    @FROM_DIGITS_62{0 .. 61} = (0 .. 9, 'A' .. 'Z', 'a' .. 'z');
 
 #<<<
     use constant {
@@ -57,6 +41,22 @@ package Sidef::Types::Number::Number {
           HAS_NEW_PRIME_UTIL => eval { require Math::Prime::Util; defined(&Math::Prime::Util::is_perfect_power); } // 0,
     };
 #>>>
+
+    our $MPZ = bless \Math::GMPz::Rmpz_init();
+
+    state $round_z = Math::MPFR::MPFR_RNDZ();
+
+    my %DIGITS_36;
+    @DIGITS_36{0 .. 9, 'a' .. 'z'} = (0 .. 35);
+
+    my %DIGITS_62;
+    @DIGITS_62{0 .. 9, 'A' .. 'Z', 'a' .. 'z'} = (0 .. 61);
+
+    my %FROM_DIGITS_36;
+    @FROM_DIGITS_36{0 .. 35} = (0 .. 9, 'a' .. 'z');
+
+    my %FROM_DIGITS_62;
+    @FROM_DIGITS_62{0 .. 61} = (0 .. 9, 'A' .. 'Z', 'a' .. 'z');
 
     state $LUCAS_PQ_LIMIT = CORE::int(CORE::sqrt(ULONG_MAX >> 2));
 
@@ -915,6 +915,12 @@ package Sidef::Types::Number::Number {
         (HAS_PRIME_UTIL and $n < ULONG_MAX)
           ? Math::Prime::Util::divisors($n)
           : Math::Prime::Util::GMP::divisors($n);
+    }
+
+    sub _cached_pn_primorial {
+        my ($k) = @_;
+        state @pn_primorial;
+        $pn_primorial[$k] //= Math::GMPz::Rmpz_init_set_str_nobless(Math::Prime::Util::GMP::pn_primorial($k), 10);
     }
 
     sub _cached_primorial {
@@ -13228,13 +13234,10 @@ package Sidef::Types::Number::Number {
             goto &nan;
         };
 
-        state @pn_primorial;
-        $pn_primorial[$k] //= Math::GMPz::Rmpz_init_set_str_nobless(Math::Prime::Util::GMP::pn_primorial($k), 10);
-
         my $min = Math::GMPz::Rmpz_init();
         my $max = Math::GMPz::Rmpz_init_set($n);
 
-        Math::GMPz::Rmpz_set($min, $pn_primorial[$k]);
+        Math::GMPz::Rmpz_set($min, _cached_pn_primorial($k));
         Math::GMPz::Rmpz_mul_2exp($max, $min, 1);
 
         while (Math::GMPz::Rmpz_cmp(${$k_obj->omega_prime_count(bless \$max)}, $n) < 0) {
@@ -13277,6 +13280,63 @@ package Sidef::Types::Number::Number {
         $k_obj->omega_primes((bless \$min), (bless \$v))->last;
     }
 
+    sub next_omega_prime {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) || goto &nan;
+        }
+        else {
+            $k = 2;
+        }
+
+        if ($k == 1) {
+            return $n->next_prime_power;
+        }
+
+        my $n_obj = $n;
+        my $k_obj = _set_int($k);
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+            goto &nan;
+        }
+
+        my $r = Math::GMPz::Rmpz_init_set(_cached_pn_primorial($k));
+
+        # The smallest k-omega prime is primorial(p_k)
+        if (Math::GMPz::Rmpz_cmp($n, $r) < 0) {
+            return bless \$r;
+        }
+
+        # TODO: detect large n with moderately large k
+        if ($k <= 7) {
+
+            # Optimization for native integers
+            if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_slong_p($n)) {
+                $n = Math::GMPz::Rmpz_get_ui($n) + 1;
+                until (Math::Prime::Util::is_omega_prime($k, $n)) {
+                    ++$n;
+                }
+                return _set_int($n);
+            }
+
+            Math::GMPz::Rmpz_add_ui($r, $n, 1);
+
+            my $r_obj = bless \$r;
+
+            until ($r_obj->is_omega_prime($k_obj)) {
+                Math::GMPz::Rmpz_add_ui($r, $r, 1);
+            }
+
+            return $r_obj;
+        }
+
+        $k_obj->omega_prime_count($n_obj)->inc->nth_omega_prime($k_obj);
+    }
+
     sub nth_squarefree_almost_prime {
         my ($n, $k) = @_;
 
@@ -13303,13 +13363,10 @@ package Sidef::Types::Number::Number {
             goto &nan;
         };
 
-        state @pn_primorial;
-        $pn_primorial[$k] //= Math::GMPz::Rmpz_init_set_str_nobless(Math::Prime::Util::GMP::pn_primorial($k), 10);
-
         my $min = Math::GMPz::Rmpz_init();
         my $max = Math::GMPz::Rmpz_init_set($n);
 
-        Math::GMPz::Rmpz_set($min, $pn_primorial[$k]);
+        Math::GMPz::Rmpz_set($min, _cached_pn_primorial($k));
         Math::GMPz::Rmpz_mul_2exp($max, $min, 1);
 
         while (Math::GMPz::Rmpz_cmp(${$k_obj->squarefree_almost_prime_count(bless \$max)}, $n) < 0) {
@@ -15484,11 +15541,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($n) > 0
           or return Sidef::Types::Bool::Bool::FALSE;
 
-        state @pn_primorial;
-        $pn_primorial[$k] //= Math::GMPz::Rmpz_init_set_str_nobless(Math::Prime::Util::GMP::pn_primorial($k), 10);
-
         # The smallest k-omega prime is primorial(p_k)
-        if (Math::GMPz::Rmpz_cmp($n, $pn_primorial[$k]) < 0) {
+        if (Math::GMPz::Rmpz_cmp($n, _cached_pn_primorial($k)) < 0) {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
@@ -21490,10 +21544,10 @@ package Sidef::Types::Number::Number {
             my $A = Math::GMPz::Rmpz_init_set($from);
             my $B = Math::GMPz::Rmpz_init_set($to);
 
-            my $t = Math::GMPz::Rmpz_init_set_ui(0);
+            my $t = Math::GMPz::Rmpz_init();
             my $x = Math::GMPz::Rmpz_init();
 
-            Math::GMPz::Rmpz_set_str($t, Math::Prime::Util::GMP::pn_primorial($k), 10);
+            Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
 
             # A = max(A, t)
             if (Math::GMPz::Rmpz_cmp($t, $A) > 0) {
