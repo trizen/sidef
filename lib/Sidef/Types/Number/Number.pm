@@ -15576,6 +15576,62 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_squarefree_almost_prime {
+        my ($n, $k) = @_;
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE } : 2;
+
+        if ($k == 0) {
+            return $n->is_one;
+        }
+        elsif ($k == 1) {
+            return $n->is_prime;
+        }
+        elsif ($k == 2) {
+            if ($n->is_square) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+            return $n->is_semiprime;
+        }
+
+        my $n_obj = $n;
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n);
+
+            if (HAS_NEW_PRIME_UTIL) {
+                if (Math::Prime::Util::is_almost_prime($k, $n) and Math::Prime::Util::is_square_free($n)) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if (Math::Prime::Util::is_square_free($n) and scalar(Math::Prime::Util::factor($n)) == $k) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) > 100) {
+            $n_obj->is_prob_squarefree(_set_int(1e5)) || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if ($n_obj->is_almost_prime(_set_int($k)) and $n_obj->is_squarefree) {
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        return Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_omega_prime {
         my ($n, $k) = @_;
 

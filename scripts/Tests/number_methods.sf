@@ -545,4 +545,23 @@ with (15.omega_primes(1922334673882737115)) {|a|
 assert_eq(next_omega_prime(1e12, 7), 1000000000090)
 assert_eq(next_omega_prime(1e12, 6), 1000000000010)
 
+assert_eq(
+    10.by { .is_squarefree_almost_prime(2) },
+    10.of { .inc.nth_squarefree_almost_prime(2) },
+)
+
+assert_eq(
+    10.by { .is_squarefree_almost_prime(3) },
+    10.of { .inc.nth_squarefree_almost_prime(3) },
+)
+
+assert(is_squarefree_almost_prime(2**64 + 1, 2))
+assert(!is_squarefree_almost_prime(2**64 + 1, 3))
+assert(is_squarefree_almost_prime((2**64 + 1) * 2, 3))
+assert(!is_squarefree_almost_prime((2**64 + 1) * 4, 3))
+assert(is_squarefree_almost_prime((2**64 + 1) * 503 * 863, 4))
+assert(is_squarefree_almost_prime((2**64 + 1) * 503 * 863 * 1000000007, 5))
+assert(!is_squarefree_almost_prime((2**64 + 1) * 503 * 863 * 1000000007**2, 5))
+assert(!is_squarefree_almost_prime((2**64 + 1) * 503 * 863 * 1000000007**2, 6))
+
 say "** Tests passed!"

@@ -2204,7 +2204,7 @@ Aliases: I<composites_each>
 
 Iterates over the k-omega primes <= n, or in the range C<a..b>.
 
-k-omega primes are numbers C<n> such that C<omega(n) == k>.
+k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
     1.omega_primes_each(100, {|n| say n })          # iterate over prime powers <= 100
     2.omega_primes_each(50, 100, {|n| say n })      # iterate over 2-omega primes in range 50..100
@@ -3449,7 +3449,7 @@ Return true if C<n> passes the Agrawal-Kayal-Saxena (AKS) primality test.
 
 Return true if C<n> is a k-almost prime (i.e.: true iff C<n> is the product of C<k> not necessarily distinct primes).
 
-Equivalently, k-almost primes are numbers C<n> such that C<bigomega(n) == k>.
+Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == k>.
 
     say 20.by { .is_almost_prime(1) }   # primes
     say 20.by { .is_almost_prime(2) }   # semiprimes
@@ -4191,24 +4191,37 @@ Returns true when C<n> is smooth over the prime factors of C<k>.
 
 =cut
 
-=head2 is_sqr
+=head2 is_square
 
-    n.is_sqr
-    is_square(n)
+    n.is_square
 
 Returns true if C<n> is a perfect square integer.
 
-Aliases: I<is_square>, I<is_perfect_square>
+Aliases: I<is_sqr>, I<is_perfect_square>
 
 =cut
 
-=head2 is_square_free
+=head2 is_squarefree
 
-    n.is_square_free
+    n.is_squarefree
 
 Returns true if the prime factorization of n does not include duplicated factors (i.e.: n is not divisible by a square).
 
-Aliases: I<is_squarefree>
+Aliases: I<is_square_free>
+
+=cut
+
+=head2 is_squarefree_almost_prime
+
+    n.is_squarefree_almost_prime(k=2)
+
+Returns true if C<n> is a squarefree k-almost prime (i.e.: true iff C<n> is the product of C<k> distinct primes).
+
+Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == omega(n) == k>.
+
+    say 20.by { .is_squarefree_almost_prime(1) }   # primes
+    say 20.by { .is_squarefree_almost_prime(2) }   # squarefree semiprimes
+    say 20.by { .is_squarefree_almost_prime(3) }   # sphenic numbers
 
 =cut
 
@@ -5400,7 +5413,7 @@ Aliases: I<omega_primepi>
 
 Returns an array with k-omega primes <= n, or in the range C<a..b>.
 
-k-omega primes are numbers C<n> such that C<omega(n) == k>.
+k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
     say 1.omega_primes(100)         # prime powers <= 100
     say 2.omega_primes(50, 100)     # 2-omega primes in range 50..100
