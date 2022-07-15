@@ -112,23 +112,38 @@ assert_eq(
 )
 
 assert_eq(
-    Math.seq(1, {|a| a.last.next_almost_prime(10) }).while { _ < 1e4 }.ft(1),
+    Math.seq({|a| a.last.next_almost_prime(10) }).while { _ < 1e4 },
     10.almost_primes(1e4)
 )
 
 assert_eq(
-    Math.seq(1, {|a| a.last.next_omega_prime(10) }).while { _ < 1e10 }.ft(1),
+    Math.seq({|a| a.last.next_omega_prime(10) }).while { _ < 1e10 },
     10.omega_primes(1e10)
 )
 
 assert_eq(
-    Math.seq(1, {|a| a.last.next_omega_prime(7) }).while { _ < 1e6 }.ft(1),
+    Math.seq({|a| a.last.next_omega_prime(7) }).while { _ < 1e6 },
     7.omega_primes(1e6)
 )
 
 assert_eq(
-    Math.seq(1, {|a| a.last.next_omega_prime(8) }).first(10).ft(1),
-    %n[9699690, 11741730, 13123110, 14804790, 15825810, 16546530, 17160990, 17687670, 18888870],
+    Math.seq({|a| a.last.next_squarefree_almost_prime(10) }).while { _ < 1e10 },
+    10.squarefree_almost_primes(1e10)
+)
+
+assert_eq(
+    Math.seq({|a| a.last.next_squarefree_almost_prime(7) }).while { _ < 1e6 },
+    7.squarefree_almost_primes(1e6)
+)
+
+assert_eq(
+    Math.seq({|a| a.last.next_omega_prime(8) }).first(10),
+    %n[9699690, 11741730, 13123110, 14804790, 15825810, 16546530, 17160990, 17687670, 18888870, 19399380],
+)
+
+assert_eq(
+    Math.seq({|a| a.last.next_squarefree_almost_prime(8) }).first(10),
+    %n[9699690, 11741730, 13123110, 14804790, 15825810, 16546530, 17160990, 17687670, 18888870, 20030010],
 )
 
 assert_eq(

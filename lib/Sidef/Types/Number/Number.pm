@@ -13399,6 +13399,63 @@ package Sidef::Types::Number::Number {
         $k_obj->squarefree_almost_primes((bless \$min), (bless \$v))->last;
     }
 
+    sub next_squarefree_almost_prime {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) || goto &nan;
+        }
+        else {
+            $k = 2;
+        }
+
+        if ($k == 1) {
+            return $n->next_prime;
+        }
+
+        my $n_obj = $n;
+        my $k_obj = _set_int($k);
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+            goto &nan;
+        }
+
+        my $r = Math::GMPz::Rmpz_init_set(_cached_pn_primorial($k));
+
+        # The smallest squarefree k-almost prime is primorial(p_k)
+        if (Math::GMPz::Rmpz_cmp($n, $r) < 0) {
+            return bless \$r;
+        }
+
+        # TODO: detect large n with moderately large k
+        if ($k <= 7) {
+
+            # Optimization for native integers
+            if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_slong_p($n)) {
+                $n = Math::GMPz::Rmpz_get_ui($n) + 1;
+                until (Math::Prime::Util::is_almost_prime($k, $n) and Math::Prime::Util::is_square_free($n)) {
+                    ++$n;
+                }
+                return _set_int($n);
+            }
+
+            Math::GMPz::Rmpz_add_ui($r, $n, 1);
+
+            my $r_obj = bless \$r;
+
+            until ($r_obj->is_almost_prime($k_obj) && $r_obj->is_squarefree) {
+                Math::GMPz::Rmpz_add_ui($r, $r, 1);
+            }
+
+            return $r_obj;
+        }
+
+        $k_obj->squarefree_almost_prime_count($n_obj)->inc->nth_squarefree_almost_prime($k_obj);
+    }
+
     sub prime_power_count {
         my ($x, $y) = @_;
 

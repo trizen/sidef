@@ -5107,6 +5107,14 @@ Returns the next squarefree number greater than C<n>.
 
 =cut
 
+=head2 next_squarefree_almost_prime
+
+    n.next_squarefree_almost_prime(k=2)
+
+Returns the next squarefree k-almost prime greater than C<n>.
+
+=cut
+
 =head2 next_twin_prime
 
     n.next_twin_prime

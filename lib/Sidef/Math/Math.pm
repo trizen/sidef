@@ -216,6 +216,10 @@ package Sidef::Math::Math {
 
                     my $index = scalar(@seq);
 
+                    if (!@seq) {
+                        push @seq, Sidef::Types::Number::Number::ZERO;
+                    }
+
                     while (1) {
                         ++$index;
                         my $r = $block->run($array, Sidef::Types::Number::Number::_set_int($index));
