@@ -18,22 +18,24 @@ assert_eq(binomialmod(1e10, 1e4, next_prime(2**64)**2), binomial(1e10, 1e4) % ne
 assert_eq(binomialmod(1e10, 1e4, prev_prime(2**64)), binomial(1e10, 1e4) % prev_prime(2**64))
 assert_eq(binomialmod(1e10, 1e4, next_prime(2**64)), binomial(1e10, 1e4) % next_prime(2**64))
 
-assert_eq(binomialmod(1e10, 1e3, (2**127 + 1)), binomial(1e10, 1e3) % (2**127 + 1))
-assert_eq(binomialmod(1e10, 1e3, (2**127 - 1)), binomial(1e10, 1e3) % (2**127 - 1))
-assert_eq(binomialmod(1e10, 1e5, (2**127 - 1)), binomial(1e10, 1e5) % (2**127 - 1))
-assert_eq(binomialmod(1e10, 1e5, (2**127 + 1)), binomial(1e10, 1e5) % (2**127 + 1))
+if (Number(Number.ULONG_MAX) > 2**32) {
+    assert_eq(binomialmod(1e10, 1e3, (2**127 + 1)), binomial(1e10, 1e3) % (2**127 + 1))
+    assert_eq(binomialmod(1e10, 1e3, (2**127 - 1)), binomial(1e10, 1e3) % (2**127 - 1))
+    assert_eq(binomialmod(1e10, 1e5, (2**127 - 1)), binomial(1e10, 1e5) % (2**127 - 1))
+    assert_eq(binomialmod(1e10, 1e5, (2**127 + 1)), binomial(1e10, 1e5) % (2**127 + 1))
 
-assert_eq(binomialmod(1e10, 1e10 - 1e5, (2**127 - 1)), binomial(1e10, 1e5) % (2**127 - 1))
-assert_eq(binomialmod(1e10, 1e10 - 1e5, (2**127 + 1)), binomial(1e10, 1e5) % (2**127 + 1))
-assert_eq(binomialmod(1e10, 1e10 - 1e5, (2**127 + 1)**2), binomial(1e10, 1e5) % (2**127 + 1)**2)
+    assert_eq(binomialmod(1e10, 1e10 - 1e5, (2**127 - 1)), binomial(1e10, 1e5) % (2**127 - 1))
+    assert_eq(binomialmod(1e10, 1e10 - 1e5, (2**127 + 1)), binomial(1e10, 1e5) % (2**127 + 1))
+    assert_eq(binomialmod(1e10, 1e10 - 1e5, (2**127 + 1)**2), binomial(1e10, 1e5) % (2**127 + 1)**2)
 
-assert_eq(binomialmod(1e10, 1e5, (2**127 - 1)**2), binomial(1e10, 1e5) % (2**127 - 1)**2)
-assert_eq(binomialmod(1e10, 1e4, (2**128 - 1)**2), binomial(1e10, 1e4) % (2**128 - 1)**2)
-assert_eq(binomialmod( 1e7, 1e5, (2**128 - 1)**2), binomial(1e7, 1e5) % (2**128 - 1)**2)
+    assert_eq(binomialmod(1e10, 1e5, (2**127 - 1)**2), binomial(1e10, 1e5) % (2**127 - 1)**2)
+    assert_eq(binomialmod(1e10, 1e4, (2**128 - 1)**2), binomial(1e10, 1e4) % (2**128 - 1)**2)
+    assert_eq(binomialmod( 1e7, 1e5, (2**128 - 1)**2), binomial(1e7, 1e5) % (2**128 - 1)**2)
 
-assert_eq(binomialmod(4294967291 + 1, 1e5, 4294967291**2), binomial(4294967291 + 1, 1e5) % 4294967291**2)
-assert_eq(binomialmod(2**60 - 99, 1e5, prev_prime(1e9)), binomial(2**60 - 99, 1e5) % prev_prime(1e9))
-assert_eq(binomialmod(2**60 - 99, 1e5, next_prime(2**64)), binomial(2**60 - 99, 1e5) % next_prime(2**64))
+    assert_eq(binomialmod(4294967291 + 1, 1e5, 4294967291**2), binomial(4294967291 + 1, 1e5) % 4294967291**2)
+    assert_eq(binomialmod(2**60 - 99, 1e5, prev_prime(1e9)), binomial(2**60 - 99, 1e5) % prev_prime(1e9))
+    assert_eq(binomialmod(2**60 - 99, 1e5, next_prime(2**64)), binomial(2**60 - 99, 1e5) % next_prime(2**64))
+}
 
 var upto = 10
 for n in (-upto .. upto), k in (-upto .. upto), m in (-upto .. upto) {

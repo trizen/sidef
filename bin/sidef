@@ -871,7 +871,7 @@ Outputs:
 The interactive mode (a.k.a. REPL) is available by simply executing the C<sidef> command, or by specifying the C<-i> command-line switch:
 
     $ sidef -i
-    Sidef 22.05, running on Linux, using Perl v5.34.1.
+    Sidef 22.07, running on Linux, using Perl v5.36.0.
     Type "help", "copyright" or "license" for more information.
     >> n = 41
     #1 = 41
