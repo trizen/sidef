@@ -5,10 +5,6 @@ function clearContents(element) {
 }
 
 $(document).ready(function(){
-    $('textarea').autosize();
-});
-
-$(document).ready(function(){
     var tabby_opts = {tabString:'    '};
     $('textarea').tabby(tabby_opts);
 });

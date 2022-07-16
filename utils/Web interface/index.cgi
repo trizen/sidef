@@ -38,9 +38,8 @@ print header(
              -style  => [{-src => 'css/main.css'}],
              -script => [
                          {
-                          -src => 'js/jquery-2.1.3.min.js',
+                          -src => 'js/jquery-3.6.0.min.js',
                          },
-                         {-src => 'js/jquery.autosize.min.js'},
                          {
                           -src => 'js/tabby.js',
                          },

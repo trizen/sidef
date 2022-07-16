@@ -1145,7 +1145,6 @@ utils/test_parser.pl
 'utils/Web interface/css/main.css'
 'utils/Web interface/index.cgi'
 'utils/Web interface/index.fcgi'
-'utils/Web interface/js/jquery-2.1.3.min.js'
-'utils/Web interface/js/jquery.autosize.min.js'
+'utils/Web interface/js/jquery-3.6.0.min.js'
 'utils/Web interface/js/main.js'
 'utils/Web interface/js/tabby.js'
