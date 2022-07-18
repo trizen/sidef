@@ -354,7 +354,7 @@ Returns the
 
 Returns the
 
-Aliases: I<scanln>
+Aliases: I<scanln>, I<readline>
 
 =cut
 

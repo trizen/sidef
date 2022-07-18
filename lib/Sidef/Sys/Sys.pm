@@ -166,7 +166,8 @@ package Sidef::Sys::Sys {
         $self->read($text, 'Sidef::Types::String::String');
     }
 
-    *readln = \&scanln;
+    *readln   = \&scanln;
+    *readline = \&scanln;
 
     sub read {
         my ($self, $type, $opt_arg) = @_;
