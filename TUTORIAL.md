@@ -404,8 +404,11 @@ RangeStr RangeString
 RangeNum RangeNumber
 Mod
 Complex
+Fraction
 Gauss
 Quadratic
+Quaternion
+Polynomial
 Math
 Pipe
 Ref
@@ -512,7 +515,7 @@ Additionally, any alphanumeric method name can be used as an infix operator, by 
 (Math `sum` (1,2,3))  # means: Math.sum(1,2,3)
 ```
 
-Sidef 3.60 introduced the pipeline operator `|>`, which is defined for any object, except `nil`:
+There is also the pipeline operator `|>`, which is defined for any object, except `nil`:
 
 ```ruby
 25 |> :sqrt |> :say       # means: 25.sqrt.say
@@ -588,9 +591,12 @@ In the current implementation of the language, we have the following built-in cl
     * [Number](https://github.com/trizen/sidef/tree/master/lib/Sidef/Types/Number)
       * [Complex](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Complex.pod)
       * [Number](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Number.pod)
+      * [Fraction](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Fraction.pod)
       * [Gauss](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Gauss.pod)
       * [Mod](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Mod.pod)
       * [Quadratic](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Quadratic.pod)
+      * [Quaternion](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Quaternion.pod)
+      * [Polynomial](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Polynomial.pod)
     * [Range](https://github.com/trizen/sidef/tree/master/lib/Sidef/Types/Range)
       * [Range](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Range/Range.pod)
       * [RangeNumber](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Range/RangeNumber.pod)
@@ -1048,7 +1054,7 @@ Blocks are also used as arguments to many built-in methods as callback blocks:
 [1,2,3].sort {|a,b| b <=> a }  # returns a new array: [3,2,1]
 ```
 
-Starting with version 3.00, Sidef introduced the following Block methods:
+Additionally, the following Block methods are also available:
 
 ```ruby
 say {|n| n**2 }.map(1..5)        #=> [1, 4, 9, 16, 25]
@@ -1065,7 +1071,7 @@ say { .is_odd }.grep([1,2,3,4])  #=> [1, 3]
 Each of those methods accept more than one argument, which can be any object that accepts the `.iter()` method, as in the following example:
 
 ```ruby
-{|n| say n**2 } << (1..3, 100..103, 1000..1003)
+{|n| say n**2 } << (1..3, 101..103, 1001..1003)
 ```
 
 ### Block parameters
@@ -1235,7 +1241,7 @@ func factorial (n) {
    return 1
 }
 
-say factorial(5);     # prints: 120
+say factorial(5)     # prints: 120
 ```
 
 Anonymous recursion can be achieved by using the `__FUNC__` keyword, which refers to the current function:
@@ -1501,29 +1507,29 @@ say concat([41], [42])     # runtime error
 
 ### Multiple dispatch
 
-Starting with version 2.12, Sidef includes multiple dispatch for functions and methods, based on the number of arguments and their types.
+Sidef also includes multiple dispatch for functions and methods, based on the number of arguments and their types:
 
 ```ruby
 func test(String a){
-    say "Got a string: #{a}";
+    say "Got a string: #{a}"
 }
 
 func test(Number n) {
-    say "Got a number: #{n}";
+    say "Got a number: #{n}"
 }
 
 func test(Number n, Array m) {
-    say "Got a number: #{n} and an array: #{m.dump}";
+    say "Got a number: #{n} and an array: #{m.dump}"
 }
 
 func test(String s, Number p) {
-    say "Got a string: #{s} and a number: #{p}";
+    say "Got a string: #{s} and a number: #{p}"
 }
 
-test("hello", 21);
-test("sidef");
-test(12, [1,1]);
-test(42);
+test("hello", 21)
+test("sidef")
+test(12, [1,1])
+test(42)
 ```
 
 Output:
@@ -1536,9 +1542,7 @@ Got a number: 42
 
 ### Functional pattern matching
 
-This is one of the newest and nicest features of Sidef and it's available starting with version 2.12.
-
-The feature looks like this:
+This feature looks like this:
 
 ```ruby
 func fib ((0)) { 0 }
@@ -1769,13 +1773,9 @@ Recursive block:
 ```
 
 Things to remember:
- 1. `run` is used for running a block.
- 2. `call` is used for calling a function.
- 3. `.each{...}` method is used for iteration over arrays.
- 4. `while` is used to run the block as long as the condition is `true`.
- 5. `|x,y,z|` is used to capture the block arguments in variables.
- 6. The keyword `break` will break a loop.
- 7. Any block is an object and can be stored in variables and executed at any time.
+ 1. `|x,y,z|` is used to capture the block arguments in variables.
+ 2. The keyword `next` will skip one interation of the loop.
+ 3. The keyword `break` will break a loop.
 
 ## gather/take
 
@@ -1860,7 +1860,7 @@ For more methods, see: [String.pod](https://github.com/trizen/sidef/blob/master/
 
 ### String quotes
 
-Being a new programming language, Sidef has built-in support for Unicode quotes.
+Being a new programming language, Sidef has built-in support for Unicode quotes:
 
 ```none
 var dstr = „double quoted”
@@ -1879,7 +1879,7 @@ while the single-quoted strings can't do any of this.
 say 'single\tquoted'   # prints the string as it is
 say "double\tquoted"   # replaces '\t' with a tab-character
 
-var name = "string";
+var name = "string"
 say 'single quoted #{name}'     # prints the string as it is
 say "double quoted #{name}"     # prints: "double quoted string"
 ```
@@ -1930,16 +1930,16 @@ print hello('Sidef')    # prints: 'Hello, Sidef!'
 By single-quoting the name of an HERE-document, interpolation will be disabled:
 ```ruby
 {
-    print <<-'EOT';
+    print <<-'EOT'
     Not interpolated: #{1+2}
     EOT
-}.run;     # prints: 'Not interpolated: #{1+2}'
+}.run     # prints: 'Not interpolated: #{1+2}'
 ```
 
 Nested HERE-docs are supported as well:
 
 ```perl
-print(<<'EOF', "- - -\n", <<'EOT' + <<"EOD");
+print(<<'EOF', "- - -\n", <<'EOT' + <<"EOD")
 1 2 3
 EOF
 4 5 6
@@ -1950,11 +1950,19 @@ EOD
 
 # Numbers
 
-In Sidef, numbers play an important role and are treated correspondingly. Starting with version 2.20, the numerical system is implemented with [Math::GMPq](https://metacpan.org/pod/Math::GMPq), [Math::GMPz](https://metacpan.org/pod/Math::GMPz), [Math::MPFR](https://metacpan.org/pod/Math::MPFR), and [Math::MPC](https://metacpan.org/pod/Math::MPC), giving us a really good precision in calculations with an astonishing performance.
+In Sidef, numbers play an important role and are treated correspondingly. The numerical system is implemented with [Math::GMPq](https://metacpan.org/pod/Math::GMPq), [Math::GMPz](https://metacpan.org/pod/Math::GMPz), [Math::MPFR](https://metacpan.org/pod/Math::MPFR), and [Math::MPC](https://metacpan.org/pod/Math::MPC), giving us a really good precision in calculations with an astonishing performance.
 
 ```ruby
 say Number.pi       # prints: 3.1415926535897932384626433832795
 say 2**999          # 535754303593133660474212524530...0214915826312193418602834034688
+```
+
+Additionally, the [Number](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Number.pod) class can be used for constructing new Number objects:
+
+```ruby
+Number("1234.52")         # new decimal number
+Number("10110111", 2)     # new binary number
+Number("deadbeef", 16)    # new hexadecimal number
 ```
 
 ### Integers
@@ -1962,10 +1970,10 @@ say 2**999          # 535754303593133660474212524530...0214915826312193418602834
 Here is `255` written as integer in different bases:
 
 ```ruby
-255;              # decimal
-0xff;             # hexadecimal
-0377;             # octal
-0b1111_1111;      # binary
+255              # decimal
+0xff             # hexadecimal
+0377             # octal
+0b1111_1111      # binary
 ```
 
 ### Decimal literals
@@ -1973,10 +1981,10 @@ Here is `255` written as integer in different bases:
 In Sidef, decimal literals are always represented in rational form, using [Math::GMPz](https://metacpan.org/pod/Math::GMPz) or [Math::GMPq](https://metacpan.org/pod/Math::GMPq).
 
 ```ruby
-1.234;          # 1.234
-.1234;          # 0.1234
-1234e-5;        # 0.01234
-12.34e5;        # 1234000
+1.234          # 1.234
+.1234          # 0.1234
+1234e-5        # 0.01234
+12.34e5        # 1234000
 ```
 
 Example:
@@ -2011,6 +2019,15 @@ A complex number can be created by using either one of the following ways:
 Complex(3,4)     # 3+4i
 ```
 
+Complex numbers are deeply integrated into the language and can be used in combination with all the other Number types (with implicit propagation):
+
+```ruby
+sqrt(-1)        # 1i
+log(-1)         # 3.14159265358979323846264338327950288419716939938i
+4 + sqrt(-1)    # 4+i
+(3+4i)**2       # -7+24i
+```
+
 ### Floating-point precision
 
 The default floating-point precision can be changed with the `-P int` command-line flag passed to `sidef`, which specifies the number of decimals of precision.
@@ -2027,6 +2044,157 @@ It's also possible to dynamically change the floating-point precision at runtime
 say sqrt(2)                     #=> 1.41421356237309504880168872420969807856967187538
 local Num!PREC = 42.numify      # sets the floating-point precision to 42 bits
 say sqrt(2)                     #=> 1.414213562
+```
+
+## Mod
+
+The [Mod](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Mod.pod) class represents a modular operation, similar to PARI/GP's built-in `Mod(a,m)` class.
+
+```ruby
+Mod(3, 4)       # represents 3 mod 4
+```
+
+Example:
+
+```ruby
+var a = Mod(13, 19)
+
+a += 15             # Mod(9, 19)
+a *= 99             # Mod(17, 19)
+a /= 17             # Mod(1, 19)
+
+say a               # Mod(1, 19)
+say (a == 1)        # true
+say (a == 20)       # true
+
+a -= 43             # Mod(15, 19)
+
+say a**42           # Mod(11, 19)
+say a**(-1)         # Mod(14, 19)
+say sqrt(a+1)       # Mod(4, 19)
+
+say chinese(Mod(43, 19), Mod(13, 41))   # Mod(423, 779)
+```
+
+## Fraction
+
+The [Fraction](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Fraction.pod) class represents a generic [fraction](https://en.wikipedia.org/wiki/Fraction):
+
+```ruby
+var a = Fraction(3, 4)
+var b = Fraction(5, 7)
+
+say a*b     #=> Fraction(15, 28)
+say a+b     #=> Fraction(41, 28)
+```
+
+## Gauss
+
+The [Gauss](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Gauss.pod) class provides support for rational [Gaussian numbers](https://en.wikipedia.org/wiki/Gaussian_integer) and various operations on these numbers.
+
+```ruby
+Gauss(3, 4)     # represents 3+4i
+```
+
+Example:
+
+```ruby
+say Gauss(3,4)**100
+say Mod(Gauss(3,4), 1000001)**100   #=> Mod(Gauss(826585, 77265), 1000001)
+
+var a = Gauss(17,19)
+var b = Gauss(43,97)
+
+say a+b     #=> Gauss(60, 116)
+say a-b     #=> Gauss(-26, -78)
+say a*b     #=> Gauss(-1112, 2466)
+say a/b     #=> Gauss(99/433, -32/433)
+```
+
+## Quadratic
+
+The [Quadratic](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Quadratic.pod) class represents a [quadratic integer](https://en.wikipedia.org/wiki/Quadratic_integer) of the form: `a + b*sqrt(w)`.
+
+```ruby
+var x = Quadratic(3, 4, 5)  # represents: 3 + 4*sqrt(5)
+var y = Quadratic(6, 1, 2)  # represents: 6 + sqrt(2)
+
+say x**10       #=> Quadratic(29578174649, 13203129720, 5)
+say y**10       #=> Quadratic(253025888, 176008128, 2)
+
+say x.powmod(100, 97)   #=> Quadratic(83, 42, 5)
+say y.powmod(100, 97)   #=> Quadratic(83, 39, 2)
+```
+
+## Quaternion
+
+The [Quaternion](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Quaternion.pod) class represents a [quaternion number](https://en.wikipedia.org/wiki/Quaternion) of the form `a + b*i + c*j + d*k`, where `a`, `b`, `c`, and `d` are real numbers; and `i`, `j`, and `k` are the basic quaternions.
+
+```ruby
+var a = Quaternion(1,2,3,4)
+var b = Quaternion(5,6,7,8)
+
+say a+b     #=> Quaternion(6, 8, 10, 12)
+say a-b     #=> Quaternion(-4, -4, -4, -4)
+say a*b     #=> Quaternion(-60, 12, 30, 24)
+say b*a     #=> Quaternion(-60, 20, 14, 32)
+say a/b     #=> Quaternion(35/87, 4/87, 0, 8/87)
+
+say a**5                #=> Quaternion(3916, 1112, 1668, 2224)
+say a.powmod(43, 97)    #=> Quaternion(61, 38, 57, 76)
+say a.powmod(-5, 43)    #=> Quaternion(11, 22, 33, 1)
+```
+
+## Polynomial
+
+The [Polynomial](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Polynomial.pod) class implements support for [polynomials](https://en.wikipedia.org/wiki/Polynomial).
+
+```ruby
+say Polynomial(5)                   # monomial: x^5
+say Polynomial([1,2,3,4])           # x^3 + 2*x^2 + 3*x + 4
+say Polynomial(5 => 3, 2 => 10)     # 3*x^5 + 10*x^2
+```
+
+Also aliased as `Poly()`:
+
+```ruby
+var a = Poly([1,2,3])
+var b = Poly([4,5,-6,7])
+
+say a+b     #=> 4*x^3 + 6*x^2 - 4*x + 10
+say a-b     #=> -4*x^3 - 4*x^2 + 8*x - 4
+say a*b     #=> 4*x^5 + 13*x^4 + 16*x^3 + 10*x^2 - 4*x + 21
+
+say 42-a    #=> -x^2 - 2*x + 39
+say 42+b    #=> 4*x^3 + 5*x^2 - 6*x + 49
+say 42*b    #=> 168*x^3 + 210*x^2 - 252*x + 294
+
+say a/42    #=> 1/42*x^2 + 1/21*x + 1/14
+say b/42    #=> 2/21*x^3 + 5/42*x^2 - 1/7*x + 1/6
+```
+
+## Numerical conversions
+
+A numerical string can be converted into a rational number by using the `Number` class:
+
+```ruby
+Number("0.75")          # "0.75" is parsed and stored in rational form as 3/4
+Number("fff/aaa", 36)   # parse a base-36 fraction as 4095/2730
+```
+
+The Number method `as_rat` can be used for getting the rational form of a number:
+
+```ruby
+say 3/4                # 0.75
+say as_rat(3/4)        # 3/4
+say as_rat(1.234, 36)  # h5/dw   (which is 617/500 in base-10)
+```
+
+The `Number.base(b)` method provides conversion from numbers into strings in a given base:
+
+```ruby
+1234.base(13)       # to string in base 13
+1234.base(36)       # to string in base 36
 ```
 
 # Arrays
@@ -2183,7 +2351,7 @@ Internally, the `rscalar_operator` method is called.
 
 ### Entrywise operations
 
-Starting with version 3.06, Sidef introduced the `Array.wise_op()` method, which takes two arbitrary nested arrays and an operator, folding each element (entrywise) with the provided operator, which is also available as `a ~Wop b`:
+The `Array.wise_op()` method takes two arbitrary nested arrays and an operator, folding each element (entrywise) with the provided operator, which is also available as `a ~Wop b`:
 
 ```ruby
 say ([1,2,[3,[4]]] ~W+ [42,43,[44,[45]]])       #=> [43, 45, [47, [49]]]
@@ -2244,7 +2412,7 @@ say scalar_op([1,2,[3,[4]]], '*', 42)  #=> [42, 84, [126, [168]]]
 
 ## Pipeline array operators
 
-Sidef 3.60 introduced three new Array operators: `|>>`, `|Z>` and `|X>`, which can be used in a pipeline-fashion to map the elements of an array, given a list of method names or function objects.
+The Array operators `|>>`, `|Z>` and `|X>` can be used in a pipeline-fashion to map the elements of an array, given a list of method names or function objects.
 
 ### Map pipeline operator
 
@@ -2332,7 +2500,7 @@ say B.solve([1,2,3])  # solve a system of linear equations
 
 ### Matrix iteration
 
-The extended `for-in` loop, introduced in Sidef 2.23, provides built-in iteration over a 2D-array, which is useful in combination with the cross or zip metaoperators:
+The extended `for-in` loop provides built-in iteration over a 2D-array, which is useful in combination with the cross or zip metaoperators:
 
 ```ruby
 for a,b in ([1,2] ~X [3,4]) {
@@ -2356,6 +2524,8 @@ and outputs:
 2 3
 2 4
 ```
+
+The same functionality is also provided by the `.each_2d {|a,b,...| ... }` Array method.
 
 ### Lists
 
@@ -2713,16 +2883,16 @@ struct Person {
 }
 
 # Create a new person
-var john = Person(name: "John Smith", age: 42);
+var john = Person(name: "John Smith", age: 42)
 
 # Change a value
-john.name = "Dr. #{john.name}";
+john.name = "Dr. #{john.name}"
 
 # Increment a value
-john.age++;
+john.age++
 
-say john.name;       #=> Dr. John Smith
-say john.age;        #=> 43
+say john.name       #=> Dr. John Smith
+say john.age        #=> 43
 ```
 
 # Files
@@ -2749,32 +2919,32 @@ File('/tmp/abc.txt').edit { |line|
 Here is a list with the most important methods which verifies some attributes of the file.
 
 ```ruby
-file.exists;       # true if file exists
-file.size;         # size of the file
-file.is_emtpy;     # true if size is zero
-file.is_dir;       # true if file is a directory
-file.is_readable;  # true if file is readable
-file.is_link;      # true if file is a link
-file.is_text;      # true if file is a text-file
+file.exists       # true if file exists
+file.size         # size of the file
+file.is_emtpy     # true if size is zero
+file.is_dir       # true if file is a directory
+file.is_readable  # true if file is readable
+file.is_link      # true if file is a link
+file.is_text      # true if file is a text-file
 ```
 
 Some more information can be achieved by using the `stat` or `lstat` method:
 
 ```ruby
-var info = file.stat;    # or 'lstat'
-say info.atime;
-say info.mtime;
-say info.ctime;
-say info.size;
+var info = file.stat    # or 'lstat'
+say info.atime
+say info.mtime
+say info.ctime
+say info.size
 ```
 
 Information related to the self object file:
 
 ```ruby
-file.name;        # the original name of the file
-file.base;        # the base name of the file
-file.abs;         # the absolute path the file
-file.dir;         # the parent directory of the file
+file.name        # the original name of the file
+file.base        # the base name of the file
+file.abs         # the absolute path the file
+file.dir         # the parent directory of the file
 ```
 
 ### Manipulating files
@@ -2782,13 +2952,13 @@ file.dir;         # the parent directory of the file
 We can also delete and rename files and do other things to files.
 
 ```ruby
-file.rename("new-name.ext");       # rename file
-file.move("new-name.ext");         # rename file safer
-file.copy("new-name.ext");         # copy file
-file.unlink;                       # delete file
-file.touch;                        # create file if it doesn't exists
-file.chmod(0666);                  # change the permissions
-file.utime(atime, mtime);          # change the access and modification times
+file.rename("new-name.ext")       # rename file
+file.move("new-name.ext")         # rename file safer
+file.copy("new-name.ext")         # copy file
+file.unlink                       # delete file
+file.touch                        # create file if it doesn't exists
+file.chmod(0666)                  # change the permissions
+file.utime(atime, mtime)          # change the access and modification times
 ```
 
 ### Open files
@@ -2796,7 +2966,7 @@ file.utime(atime, mtime);          # change the access and modification times
 A `File` object has a main `open` method which is directly bound to Perl's `open` function.
 
 ```ruby
-file.open('<:utf8', \var fh, \var err) ->
+file.open('<:utf8', \var fh, \var err) \
      || die "Can't open file #{file}: #{err}\n"
 ```
 
@@ -3028,17 +3198,17 @@ while (var m = string.gmatch(/(\S+)/)) {
 The smart-match operator (`~~`) take two operands and compare them based on their type and their order.
 
 ```ruby
-"hello" ~~ /^h/;        # true: string matches regex
-"oo" ~~ "foobar";       # false: "oo" doesn't equal "foobar"
-"a" ~~ %w(a b c);       # true: item exists in array
-/^b/ ~~ %w(foo bar);    # true: regex matches an element from array
-/^f/ ~~ Hash(foo => 1); # true: regex matches a key from hash
+"hello" ~~ /^h/        # true: string matches regex
+"oo" ~~ "foobar"       # false: "oo" doesn't equal "foobar"
+"a" ~~ %w(a b c)       # true: item exists in array
+/^b/ ~~ %w(foo bar)    # true: regex matches an element from array
+/^f/ ~~ Hash(foo => 1) # true: regex matches a key from hash
 ```
 
 There is also `!~` which simply flips the Boolean value returned by `~~`.
 
 ```ruby
-/abc/ !~ "abcdef";     # false
+/abc/ !~ "abcdef"     # false
 ```
 
 # Modules
@@ -3276,9 +3446,9 @@ class Example {
         say "this is bar"
     }
     method AUTOLOAD(_, name, *args) {
-        say ("tried to handle unknown method %s" % name);
+        say ("tried to handle unknown method %s" % name)
         if (args.len > 0) {
-            say ("it had arguments: %s" % args.join(', '));
+            say ("it had arguments: %s" % args.join(', '))
         }
     }
 }
@@ -3305,13 +3475,13 @@ func quicksort(arr {.len <= 1}) { arr }
 
 func quicksort(arr) {
 
-    say arr;
-    var p = arr.pop_rand;
+    say arr
+    var p = arr.pop_rand
 
     var forks = [
         quicksort.ffork(arr.grep { _ <= p }),
         quicksort.ffork(arr.grep { _ >  p }),
-    ];
+    ]
 
     forks[0].wait + [p] + forks[1].wait
 }
@@ -3358,7 +3528,7 @@ require('ntheory')
 var nt = %S<ntheory>   # function-oriented module
 
 if (nt.is_prime(43)) {
-    say "43 is prime!";
+    say "43 is prime!"
 }
 
 nt.forprimes({|p| say p }, 0, 100)
@@ -3383,6 +3553,46 @@ window.show_all
 
 gtk3.main
 ```
+
+# Deparsing
+
+Deparsing is the reverse process of parsing, which translates the AST back into code. Currently, Sidef supports deparsing into two languages with the `-R lang` command-line switch:
+
+* `-R perl`
+    - Deparses the AST into valid Perl code.
+* `-R sidef`
+    - Deparses the AST into valid Sidef code.
+
+Example:
+
+```shell
+$ sidef -Rperl script.sf | perl
+```
+
+The `-Rsidef` switch (or simply `-r`) is useful for verifying how the code is parsed.
+
+Example:
+
+```shell
+$ sidef -r -E '1 + 2/3'
+```
+
+Outputs:
+
+```ruby
+(1)->+((2)->/(3));
+```
+
+# Creating an executable
+
+By using the [PAR::Packer](https://metacpan.org/pod/pp) tool, we can create an executable binary from a Sidef script (`script.sf`), by executing the following commands:
+
+```console
+$ sidef -Rperl script.sf > script.pl
+$ pp --execute script.pl
+```
+
+Currently, Sidef code that includes `eval()` cannot be compiled into an executable.
 
 # Inlining Perl code in Sidef
 

@@ -1111,7 +1111,7 @@ package Sidef::Optimizer {
             }
         }
 
-        wantarray ? %opt_struct : $#{$opt_struct{$classes[-1]}} > 0 ? \%opt_struct : $opt_struct{$classes[-1]}[-1];
+        wantarray ? %opt_struct : ($#{$opt_struct{$classes[-1]}} > 0) ? \%opt_struct : $opt_struct{$classes[-1]}[-1];
     }
 };
 
