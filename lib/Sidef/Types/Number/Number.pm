@@ -22717,6 +22717,27 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 2) <= 0
           and return Sidef::Types::Bool::Bool::TRUE;
 
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        if (Math::GMPz::Rmpz_sizeinbase($n, 10) <= 1000) {
+
+            state $lookup = {'3' => undef};
+            state $x      = Math::GMPz::Rmpz_init_set_ui_nobless(1);
+            state $y      = Math::GMPz::Rmpz_init_set_ui_nobless(3);
+
+            while (Math::GMPz::Rmpz_cmp($y, $n) < 0) {
+                Math::GMPz::Rmpz_set($t, $y);
+                Math::GMPz::Rmpz_add($y, $x, $y);
+                Math::GMPz::Rmpz_set($x, $t);
+                undef $lookup->{Math::GMPz::Rmpz_get_str($y, 10)};
+            }
+
+            if (exists $lookup->{Math::GMPz::Rmpz_get_str($n, 10)}) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
         state $log_phi = do {
             my $t = Math::MPFR::Rmpfr_init2_nobless(64);
             my $r = ${__PACKAGE__->phi};
@@ -22730,7 +22751,6 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_div($f, $f, $log_phi, $ROUND);
         Math::MPFR::Rmpfr_round($f, $f);
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_lucnum_ui($t, Math::MPFR::Rmpfr_get_ui($f, $ROUND));
 
         (Math::GMPz::Rmpz_cmp($t, $n) == 0)

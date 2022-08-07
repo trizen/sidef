@@ -4,25 +4,25 @@ Sidef is a modern, high-level, general-purpose programming language, focusing on
 
 # BOOK
 
-The Sidef Programming Language: https://trizen.gitbook.io/sidef-lang/ ([legacy](https://trizen.gitbooks.io/sidef-lang))
+The Sidef Programming Language: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang))
 
 # Installation
 
 Sidef can be installed from the [CPAN](https://metacpan.org/pod/distribution/Sidef/lib/Sidef.pod), by invoking the following command:
 
-```console
+```
 $ cpan Sidef
 ```
 
 If the testing takes a long time, add the `-T` flag to build and install Sidef without testing:
 
-```console
+```
 $ cpan -T Sidef
 ```
 
 When the `cpan` command is not available, try:
 
-```console
+```
 $ perl -MCPAN -e "CPAN::Shell->install(q{Sidef})"
 ```
 
@@ -32,7 +32,7 @@ $ perl -MCPAN -e "CPAN::Shell->install(q{Sidef})"
 
 To install Sidef manually, download the [latest version](https://github.com/trizen/sidef/archive/master.zip), unzip it and follow the installation steps:
 
-```console
+```
 $ perl Build.PL
 # ./Build installdeps
 # ./Build install
@@ -40,7 +40,7 @@ $ perl Build.PL
 
 When [Module::Build](https://metacpan.org/pod/Module::Build) is not installed, try:
 
-```console
+```
 $ perl Makefile.PL
 $ make test
 # make install
@@ -52,7 +52,7 @@ $ make test
 
 Sidef is available on the [AUR](https://aur.archlinux.org/packages/sidef) and can be installed using an AUR helper, like [trizen](https://github.com/trizen/trizen):
 
-```console
+```
 $ trizen -S sidef
 ```
 
@@ -60,7 +60,7 @@ $ trizen -S sidef
 
 On Debian-based distributions, Sidef can be installed from the [CPAN](https://metacpan.org/dist/Sidef), by executing the following commands:
 
-```console
+```
 $ sudo apt install libgmp-dev libmpfr-dev libmpc-dev libc-dev cpanminus
 $ sudo cpanm -n Sidef
 ```
@@ -69,14 +69,14 @@ $ sudo cpanm -n Sidef
 
 It's also possible to install Sidef on Android, by installing [Termux](https://f-droid.org/en/packages/com.termux/) and executing the following commands:
 
-```console
+```
 $ pkg install perl make clang libgmp libmpfr libmpc
 $ cpan -T Sidef
 ```
 
 If the installation succeeded, the `sidef` command should be available:
 
-```console
+```
 $ sidef -h
 ```
 
@@ -84,7 +84,7 @@ $ sidef -h
 
 It is also possible to run Sidef without having to install it. In a Unix-like environment, the following commands can be executed:
 
-```console
+```
 $ wget 'https://github.com/trizen/sidef/archive/master.zip' -O 'master.zip'
 $ unzip 'master.zip'
 $ cd 'sidef-master/bin/'
@@ -94,7 +94,8 @@ $ ./sidef -v
 Those commands will download and unpack the latest version of Sidef and will execute the `bin/sidef` script which will print out the current version of the language.
 
 To execute a Sidef script, run:
-```console
+
+```
 $ ./sidef ../scripts/sierpinski_carpet.sf
 ```
 
@@ -108,7 +109,7 @@ alias sidef="/path/to/bin/sidef"
 
 For packaging Sidef, run:
 
-```console
+```
 $ perl Build.PL --destdir "/my/package/path" --installdirs vendor
 $ ./Build test
 $ ./Build install --install_path script=/usr/bin
@@ -129,7 +130,7 @@ say "Hello, 世界"
 
 If we save the content in a new file called **`hello.sf`**, we can execute the code by running:
 
-```console
+```
 $ sidef hello.sf
 ```
 
@@ -1127,7 +1128,7 @@ d
 
 Output (which shows that `.map{}` is really lazy):
 
-```test
+```
 >> A
 >> B
 >> C
@@ -1218,7 +1219,7 @@ f { say "bar" }         # this does nothing
 
 By executing the above script with the `-r` argument, we will see how the code is parsed:
 
-```console
+```
 $ sidef -r script.sf
 ```
 
@@ -1533,7 +1534,8 @@ test(42)
 ```
 
 Output:
-```text
+
+```
 Got a string: hello and a number: 21
 Got a string: sidef
 Got a number: 12 and an array: [1, 1]
@@ -1862,7 +1864,7 @@ For more methods, see: [String.pod](https://github.com/trizen/sidef/blob/master/
 
 Being a new programming language, Sidef has built-in support for Unicode quotes:
 
-```none
+```
 var dstr = „double quoted”
 var sstr = ‚single quoted’
 ```
@@ -1893,7 +1895,7 @@ A single word can also be quoted by placing `:` in front of it. This feature mak
 
 Sidef also borrow from Ruby some operator-like quotes and implements some new ones:
 
-```none
+```
 var sstr = %q{single {} quoted string}
 var dstr = %Q«double «» quoted string»
 var arr1 = %w(word1 word2)
@@ -2034,7 +2036,7 @@ The default floating-point precision can be changed with the `-P int` command-li
 
 Example:
 
-```console
+```
 $ sidef -P100 script.sf    # executes "script.sf" with 100 decimals of precision
 ```
 
@@ -2518,7 +2520,7 @@ This is equivalent with:
 
 and outputs:
 
-```text
+```
 1 3
 1 4
 2 3
@@ -3565,7 +3567,7 @@ Deparsing is the reverse process of parsing, which translates the AST back into 
 
 Example:
 
-```shell
+```
 $ sidef -Rperl script.sf | perl
 ```
 
@@ -3573,7 +3575,7 @@ The `-Rsidef` switch (or simply `-r`) is useful for verifying how the code is pa
 
 Example:
 
-```shell
+```
 $ sidef -r -E '1 + 2/3'
 ```
 
@@ -3587,7 +3589,7 @@ Outputs:
 
 By using the [PAR::Packer](https://metacpan.org/pod/pp) tool, we can create an executable binary from a Sidef script (`script.sf`), by executing the following commands:
 
-```console
+```
 $ sidef -Rperl script.sf > script.pl
 $ pp --execute script.pl
 ```
@@ -3644,4 +3646,4 @@ say block(28)     # 28-th Fibonacci number
 
 # More examples
 
-For more examples, see: https://github.com/trizen/sidef-scripts
+For more examples, see: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
