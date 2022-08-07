@@ -22717,6 +22717,23 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 2) <= 0
           and return Sidef::Types::Bool::Bool::TRUE;
 
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n);
+
+            state $lookup = {'3' => undef};
+            state $x      = 1;
+            state $y      = 3;
+
+            while ($y < $n) {
+                ($x, $y) = ($y, $x + $y);
+                undef $lookup->{$y};
+            }
+            if (exists $lookup->{$n}) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
         state $t = Math::GMPz::Rmpz_init_nobless();
 
         if (Math::GMPz::Rmpz_sizeinbase($n, 10) <= 1000) {
