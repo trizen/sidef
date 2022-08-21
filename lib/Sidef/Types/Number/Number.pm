@@ -13777,7 +13777,7 @@ package Sidef::Types::Number::Number {
             $max = Math::GMPz::Rmpz_get_ui($max);
         }
 
-        if (HAS_NEW_PRIME_UTIL) {
+        if (HAS_NEW_PRIME_UTIL and $n < 1e11) {
             return _set_int(Math::Prime::Util::nth_prime_power($n));
         }
 
@@ -22708,8 +22708,12 @@ package Sidef::Types::Number::Number {
     sub is_lucas {    # OEIS: A102460
         my ($n) = @_;
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) >= 0
           or return Sidef::Types::Bool::Bool::FALSE;
@@ -22778,10 +22782,63 @@ package Sidef::Types::Number::Number {
     sub is_cyclic {    # OEIS: A003277
         my ($n) = @_;
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
 
-        (Math::Prime::Util::GMP::gcd(Math::Prime::Util::GMP::totient($n), $n) eq '1')
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) || return Sidef::Types::Bool::Bool::FALSE;
+            if ($n <= 3) {    # 1,2,3 are terms
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+            if ($n % 2 == 0) {    # n > 2 cannot be even
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+            if (
+                (
+                 HAS_PRIME_UTIL
+                 ? Math::Prime::Util::gcd(Math::Prime::Util::euler_phi($n), $n)
+                 : Math::Prime::Util::GMP::gcd(Math::Prime::Util::GMP::totient($n), $n)
+                ) == 1
+              ) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) >= 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        if (!Math::GMPz::Rmpz_odd_p($n)) {
+            if (Math::GMPz::Rmpz_cmp_ui($n, 2) == 0) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
+
+        if (Math::GMPz::Rmpz_sizeinbase($n, 10) >= 40) {
+            my ($r, @factors) = _adaptive_trial_factor($n);
+
+            my %seen;
+            foreach my $p (@factors) {
+                if ($seen{$p}++) {    # n must be squarefree
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+                if (Math::Prime::Util::GMP::gcd($nstr, $p - 1) != 1) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+            }
+
+            $nstr = Math::GMPz::Rmpz_get_str($r, 10);
+        }
+
+        (Math::Prime::Util::GMP::gcd($nstr, Math::Prime::Util::GMP::totient($nstr)) eq '1')
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
