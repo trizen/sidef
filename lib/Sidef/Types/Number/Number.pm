@@ -16976,7 +16976,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub sum_primes {
-        my ($from, $to) = @_;
+        my ($from, $to, $k) = @_;
 
         if (defined($to)) {
             _valid(\$to);
@@ -16989,12 +16989,76 @@ package Sidef::Types::Number::Number {
             $from = 2;
         }
 
-        if (HAS_PRIME_UTIL) {
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        if ($k == 0) {
+            return _set_int($from)->prime_count(_set_int($to));
+        }
+
+        if (HAS_PRIME_UTIL and $k == 1) {
             my $r = Math::Prime::Util::sum_primes($from, $to);
             return _set_int("$r");
         }
 
-        _set_int(Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::sieve_primes($from, $to)));
+        if ($from > 2) {
+
+            if ($from / $to >= 0.999) {
+                return
+                  _set_int(
+                           Math::Prime::Util::GMP::vecsum(
+                                map { Math::Prime::Util::GMP::powint($_, $k) } Math::Prime::Util::GMP::sieve_primes($from, $to)
+                           )
+                          );
+            }
+
+            return _set_int(2)->sum_primes(_set_int($to), _set_int($k))
+              ->sub(_set_int(2)->sum_primes(_set_int($from)->dec, _set_int($k)));
+        }
+
+        # Simple implementation of the prime-summation function:
+        #   Sum_{p prime <= n} p^k, for fixed k >= 0.
+
+        my $n = $to;
+
+        $n > ULONG_MAX and goto &nan;
+        $n <= 1 and return ZERO;
+
+        my $r = Math::Prime::Util::GMP::sqrtint($n);
+        my @V = map { CORE::int($n / $_) } 1 .. $r;
+        push @V, CORE::reverse(1 .. $V[-1] - 1);
+
+        my $t = Math::GMPz::Rmpz_init_set_ui(0);
+        my $u = Math::GMPz::Rmpz_init();
+
+        my $t_obj = bless \$t;
+        my $k_obj = _set_int($k);
+
+        my %S;
+        @S{@V} = map {
+            Math::GMPz::Rmpz_set_ui($t, $_);
+            ${$t_obj->faulhaber_sum($k_obj)};
+        } @V;
+
+        foreach my $p (2 .. $r) {
+            if ($S{$p} > $S{$p - 1}) {
+                my $cp = $S{$p - 1};
+                my $p2 = $p * $p;
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+                foreach my $v (@V) {
+                    last if ($v < $p2);
+                    Math::GMPz::Rmpz_sub($u, $S{CORE::int($v / $p)}, $cp);
+                    Math::GMPz::Rmpz_submul($S{$v}, $u, $t);
+                }
+            }
+        }
+
+        _set_int($S{$n} - 1);
     }
 
     *prime_sum  = \&sum_primes;

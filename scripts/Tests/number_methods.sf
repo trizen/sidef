@@ -575,4 +575,29 @@ assert(!is_cyclic(2**256 - 1))
 assert(!is_cyclic(2**256 - 11))
 assert(!is_cyclic(100!))
 
+assert_eq(sum_primes(1e6), 37550402023)
+assert_eq(sum_primes(1, 1e6, 2), 24693298341834533)
+assert_eq(sum_primes(2, 1e6, 3), 18393235410255348281725)
+assert_eq(sum_primes(1e5, 1e6, 4), 14652141801059963090664358346)
+assert_eq(sum_primes(1e4, 1e6, 5), 12174298052688955639420343987695627)
+
+assert_eq(
+    30.of { sum_primes(_) }
+    30.of { .primes.sum }
+)
+
+assert_eq(
+    30.of { sum_primes(1, _, 2) }
+    30.of { .primes.sum{.sqr} }
+)
+
+assert_eq(
+    30.of { sum_primes(1, _, 0) }
+    30.of { .prime_count }
+)
+
+assert_eq(sum_primes(1e8-1000, 1e8, 1), primes(1e8-1000, 1e8).sum)
+assert_eq(sum_primes(1e8-1000, 1e8, 2), primes(1e8-1000, 1e8).sum{.sqr})
+assert_eq(sum_primes(1e8-1000, 1e8, 3), primes(1e8-1000, 1e8).sum{.ipow(3)})
+
 say "** Tests passed!"

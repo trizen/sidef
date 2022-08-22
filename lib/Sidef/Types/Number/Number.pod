@@ -6202,9 +6202,9 @@ Equivalent with:
 =head2 prime_sum
 
     prime_sum(n)
-    prime_sum(a,b)
+    prime_sum(a,b,k=1)
 
-Sum of the prime numbers <= n, or in the range C<a..b>.
+Sum of the prime numbers <= n, or in the range C<a..b>, each prime raised to the k-th power.
 
 Aliases: I<primes_sum>, I<sum_primes>
 
