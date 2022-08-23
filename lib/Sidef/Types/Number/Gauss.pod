@@ -449,6 +449,16 @@ Returns the
 
 =cut
 
+=head2 pretty
+
+    Gauss.pretty()
+
+Returns the
+
+Aliases: I<stringify>
+
+=cut
+
 =head2 reals
 
     Gauss.reals()
@@ -476,14 +486,6 @@ Returns the
 =head2 sqr
 
     Gauss.sqr()
-
-Returns the
-
-=cut
-
-=head2 stringify
-
-    Gauss.stringify()
 
 Returns the
 

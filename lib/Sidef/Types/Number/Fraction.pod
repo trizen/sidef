@@ -243,6 +243,14 @@ Aliases: I<den>, I<denominator>
 
 =cut
 
+=head2 dump
+
+    Fraction.dump()
+
+Returns the
+
+=cut
+
 =head2 eval
 
     Fraction.eval()
@@ -335,17 +343,19 @@ Returns the
 
 =cut
 
-=head2 round
+=head2 pretty
 
-    Fraction.round()
+    Fraction.pretty()
 
 Returns the
 
+Aliases: I<stringify>
+
 =cut
 
-=head2 stringify
+=head2 round
 
-    Fraction.stringify()
+    Fraction.round()
 
 Returns the
 
@@ -366,8 +376,6 @@ Aliases: I<lift>
     Fraction.to_s()
 
 Returns the
-
-Aliases: I<dump>
 
 =cut
 

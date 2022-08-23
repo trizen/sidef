@@ -408,6 +408,16 @@ Returns the
 
 =cut
 
+=head2 pretty
+
+    Quaternion.pretty()
+
+Returns the
+
+Aliases: I<stringify>
+
+=cut
+
 =head2 reals
 
     Quaternion.reals()
@@ -435,14 +445,6 @@ Returns the
 =head2 sqr
 
     Quaternion.sqr()
-
-Returns the
-
-=cut
-
-=head2 stringify
-
-    Quaternion.stringify()
 
 Returns the
 

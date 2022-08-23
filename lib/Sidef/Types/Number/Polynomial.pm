@@ -183,6 +183,7 @@ package Sidef::Types::Number::Polynomial {
     }
 
     *stringify = \&to_s;
+    *pretty    = \&to_s;
 
     sub dump {
         my ($x) = @_;

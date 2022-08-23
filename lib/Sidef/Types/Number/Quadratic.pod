@@ -394,6 +394,16 @@ Returns the
 
 =cut
 
+=head2 pretty
+
+    Quadratic.pretty()
+
+Returns the
+
+Aliases: I<stringify>
+
+=cut
+
 =head2 reals
 
     Quadratic.reals()
@@ -421,14 +431,6 @@ Returns the
 =head2 sqr
 
     Quadratic.sqr()
-
-Returns the
-
-=cut
-
-=head2 stringify
-
-    Quadratic.stringify()
 
 Returns the
 

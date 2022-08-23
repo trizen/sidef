@@ -6691,6 +6691,7 @@ package Sidef::Types::Number::Number {
     }
 
     *stringify = \&dump;
+    *pretty    = \&dump;
 
     sub to_str {
         my ($x) = @_;

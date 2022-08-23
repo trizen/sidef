@@ -435,6 +435,6 @@ Returns the
 
 Returns the
 
-Aliases: I<stringify>
+Aliases: I<pretty>, I<stringify>
 
 =cut
