@@ -691,6 +691,18 @@ Aliases: I<airy>
 
 =cut
 
+=head2 aliquot
+
+    aliquot(n)
+
+Returns the sum of divisors of C<n> that are less than C<n>.
+
+Equivalent with:
+
+    sigma(n) - n
+
+=cut
+
 =head2 all_composite
 
     all_composite(...)

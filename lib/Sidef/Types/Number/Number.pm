@@ -17025,9 +17025,9 @@ package Sidef::Types::Number::Number {
         # Simple implementation of the prime-summation function:
         #   Sum_{p prime <= n} p^k, for fixed k >= 0.
 
-        my $n = $to;
+        my $n = $to + 0;
 
-        $n > ULONG_MAX and goto &nan;
+        $n > ~0 and goto &nan;
         $n <= 1 and return ZERO;
 
         my $r = Math::Prime::Util::GMP::sqrtint($n);
@@ -21325,6 +21325,8 @@ package Sidef::Types::Number::Number {
     sub sigma {
         my ($n, $k) = @_;
 
+        # TODO: optimize the method for native integers.
+
         $k = defined($k) ? do { _valid(\$k); _any2si($$k) // goto &nan } : 1;
 
         $n = _big2uistr($n) // (goto &nan);
@@ -21340,6 +21342,19 @@ package Sidef::Types::Number::Number {
     }
 
     *σ = \&sigma;
+
+    sub aliquot {
+        my ($n) = @_;
+
+        # TODO: optimize the method for native integers.
+
+        $n = _big2uistr($n) // (goto &nan);
+        $n eq '0' and return ZERO;
+
+        my $s = Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::sigma($n), $n);
+
+        _set_int($s);
+    }
 
     sub is_abundant {
         my ($n) = @_;
