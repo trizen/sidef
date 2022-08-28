@@ -21316,23 +21316,41 @@ package Sidef::Types::Number::Number {
     }
 
     sub sigma0 {
-        my $n = &_big2uistr // goto &nan;
-        $n eq '0' and return ZERO;
-        my $s = Math::Prime::Util::GMP::sigma($n, 0);
+        my ($n) = @_;
+
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            $n = _any2mpz($n) // goto &nan;
+        }
+
+        (Math::GMPz::Rmpz_sgn($n) || return ZERO) > 0 or goto &nan;
+
+        my $s =
+          (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n))
+          ? Math::Prime::Util::divisor_sum(Math::GMPz::Rmpz_get_ui($n), 0)
+          : Math::Prime::Util::GMP::sigma($n, 0);
+
         _set_int($s);
     }
 
     sub sigma {
         my ($n, $k) = @_;
 
-        # TODO: optimize the method for native integers.
+        $n = $$n;
+
+        if (ref($n) ne 'Math::GMPz') {
+            $n = _any2mpz($n) // goto &nan;
+        }
+
+        (Math::GMPz::Rmpz_sgn($n) || return ZERO) > 0 or goto &nan;
 
         $k = defined($k) ? do { _valid(\$k); _any2si($$k) // goto &nan } : 1;
 
-        $n = _big2uistr($n) // (goto &nan);
-        $n eq '0' and return ZERO;
-
-        my $s = Math::Prime::Util::GMP::sigma($n, CORE::abs($k));
+        my $s =
+          (HAS_PRIME_UTIL and $k == 1 and Math::GMPz::Rmpz_cmp_ui($n, ULONG_MAX >> 2) <= 0)
+          ? Math::Prime::Util::divisor_sum(Math::GMPz::Rmpz_get_ui($n))
+          : Math::Prime::Util::GMP::sigma($n, CORE::abs($k));
 
         if ($k < 0) {    # Sum_{d|n} 1/d^k = sigma_k(n)/n^k
             return _set_int($s)->div(_set_int(Math::Prime::Util::GMP::powint($n, CORE::abs($k))));
