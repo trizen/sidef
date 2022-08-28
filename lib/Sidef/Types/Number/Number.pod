@@ -1300,6 +1300,18 @@ Aliases: I<complex_add>
 
 =cut
 
+=head2 carmichael
+
+    k.carmichael(n)
+    k.carmichael(a, b)
+
+Returns an array with all the Carmichael numbers <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    say 3.carmichael(10000)              # 3-Carmichael numbers
+    say 4.carmichael(10000, 100000)      # 4-Carmichael numbers in range
+
+=cut
+
 =head2 catalan
 
     n.catalan
@@ -4673,6 +4685,18 @@ Returns the n-th Lucas number.
 
 =cut
 
+=head2 lucas_carmichael
+
+    k.lucas_carmichael(n)
+    k.lucas_carmichael(a, b)
+
+Returns an array with all the Lucas-Carmichael numbers <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    say 3.lucas_carmichael(10000)         # 3-Lucas-Carmichael numbers
+    say 4.lucas_carmichael(10000, 100000) # 4-Lucas-Carmichael numbers in range
+
+=cut
+
 =head2 lucas_factor
 
     n.lucas_factor(j=1, tries=100)
@@ -7090,6 +7114,18 @@ Aliases: I<squarefree_count>
 Returns an array with the square-free divisors of n.
 
     say squarefree_divisors(120)  #=> [1, 2, 3, 5, 6, 10, 15, 30]
+
+=cut
+
+=head2 squarefree_fermat
+
+    k.squarefree_fermat(base, n)
+    k.squarefree_fermat(base, a, b)
+
+Returns an array with all the Fermat pseudoprimes to the given C<base> <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    say 3.squarefree_fermat(2, 10000)         # 3-Fermat psp to base 2
+    say 4.squarefree_fermat(2, 10000, 100000) # 4-Fermat psp to base 2 in range
 
 =cut
 

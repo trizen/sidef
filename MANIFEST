@@ -952,6 +952,7 @@ scripts/Tests/prefix_colon_hash.sf
 scripts/Tests/prefix_methods.sf
 scripts/Tests/prefix_unary_operators.sf
 scripts/Tests/problem_of_apollonius.sf
+scripts/Tests/pseudoprimes.sf
 scripts/Tests/pythagorean_means.sf
 scripts/Tests/quadratic_integers.sf
 scripts/Tests/quadratic_nonresidue.sf
