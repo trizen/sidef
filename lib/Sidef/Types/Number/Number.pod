@@ -1312,6 +1312,20 @@ Returns an array with all the Carmichael numbers <= n or in the range C<a..b> th
 
 =cut
 
+=head2 carmichael_each
+
+    k.carmichael_each(n, { ... })
+    k.carmichael_each(a, b, { ... })
+
+Iterates over the Carmichael <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    3.carmichael_each(1e5, {|n| say n })          # iterate over 3-Carmichael numbers <= 1e5
+    4.carmichael_each(1e5, 1e6, {|n| say n })     # iterate over 4-Carmichael in range 1e4..1e6
+
+Aliases: I<each_carmichael>
+
+=cut
+
 =head2 catalan
 
     n.catalan
@@ -2221,6 +2235,20 @@ Aliases: I<composites_each>
 
 =cut
 
+=head2 each_lucas_carmichael
+
+    k.lucas_carmichael_each(n, { ... })
+    k.lucas_carmichael_each(a, b, { ... })
+
+Iterates over the Lucas-Carmichael <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    3.lucas_carmichael_each(1e5, {|n| say n })          # iterate over 3-Lucas-Carmichael numbers <= 1e5
+    4.lucas_carmichael_each(1e5, 1e6, {|n| say n })     # iterate over 4-Lucas-Carmichael in range 1e4..1e6
+
+Aliases: I<lucas_carmichael_each>
+
+=cut
+
 =head2 each_omega_prime
 
     k.omega_primes_each(n, { ... })
@@ -2337,6 +2365,20 @@ Iterates over the squarefree k-almost primes <= n, or in the range C<a..b>.
     3.squarefree_almost_primes_each(50, 100, { . say })
 
 Aliases: I<squarefree_almost_primes_each>
+
+=cut
+
+=head2 each_squarefree_fermat
+
+    k.squarefree_fermat_each(base, n, { ... })
+    k.squarefree_fermat_each(base, a, b, { ... })
+
+Iterates over the Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    3.squarefree_fermat_each(2, 1e5, {|n| say n })          # iterate over 3-Fermat psp to base 2 <= 1e5
+    4.squarefree_fermat_each(2, 1e5, 1e6, {|n| say n })     # iterate over 4-Fermat psp to base 2 in range 1e4..1e6
+
+Aliases: I<squarefree_fermat_each>
 
 =cut
 

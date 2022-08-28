@@ -22755,6 +22755,163 @@ package Sidef::Types::Number::Number {
 
     *each_squarefree_almost_prime = \&squarefree_almost_primes_each;
 
+    sub carmichael_each {
+        my ($k, $from, $to, $block) = @_;
+
+        _valid(\$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if ($k < 3) {
+            return ZERO;
+        }
+
+        # TODO: tweak the step value for better performance
+        my $step = Math::Prime::Util::GMP::vecprod(($k) x (($k >> 1) + 1), Math::Prime::Util::GMP::pn_primorial($k));
+
+        if ($step < 1e7) {
+            $step = 1e7;
+        }
+
+        if ($k == 4) {
+            $step = 5e7;
+        }
+
+        if ($k > 4 and $step < 1e8) {
+            $step = 1e8;
+        }
+
+        if ($step > ULONG_MAX) {
+            $step = Math::GMPz::Rmpz_init_set_str("$step", 10);
+        }
+
+        _generic_each($from, $to, $block,
+                      sub { $step },
+                      sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1, carmichael => 1) });
+    }
+
+    *each_carmichael = \&carmichael_each;
+
+    sub lucas_carmichael_each {
+        my ($k, $from, $to, $block) = @_;
+
+        _valid(\$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if ($k < 3) {
+            return ZERO;
+        }
+
+        # TODO: tweak the step value for better performance
+        my $step = Math::Prime::Util::GMP::vecprod(($k) x (($k >> 1) + 1), Math::Prime::Util::GMP::pn_primorial($k));
+
+        if ($step < 1e7) {
+            $step = 1e7;
+        }
+
+        if ($k == 4) {
+            $step = 5e7;
+        }
+
+        if ($k > 4 and $step < 1e8) {
+            $step = 1e8;
+        }
+
+        if ($step > ULONG_MAX) {
+            $step = Math::GMPz::Rmpz_init_set_str("$step", 10);
+        }
+
+        _generic_each($from, $to, $block,
+                      sub { $step },
+                      sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1, lucas_carmichael => 1) });
+    }
+
+    *each_lucas_carmichael = \&lucas_carmichael_each;
+
+    sub squarefree_fermat_each {
+        my ($k, $base, $from, $to, $block) = @_;
+
+        _valid(\$base, \$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k    = _any2ui($$k)    // return ZERO;
+        $base = _any2ui($$base) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if ($k < 2) {
+            return ZERO;
+        }
+
+        # TODO: tweak the step value for better performance
+        my $step = Math::Prime::Util::GMP::vecprod(($k) x ($k >> 1), Math::Prime::Util::GMP::pn_primorial($k));
+
+        if ($step < 1e6) {
+            $step = 1e6;
+        }
+
+        if ($k == 4) {
+            $step = 5e6;
+        }
+
+        if ($k > 4 and $step < 1e7) {
+            $step = 1e7;
+        }
+
+        if ($step > ULONG_MAX) {
+            $step = Math::GMPz::Rmpz_init_set_str("$step", 10);
+        }
+
+        _generic_each($from, $to, $block,
+                      sub { $step },
+                      sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1, fermat => $base) });
+    }
+
+    *each_squarefree_fermat = \&squarefree_fermat_each;
+
     sub semiprimes {
         my ($from, $to) = @_;
 
