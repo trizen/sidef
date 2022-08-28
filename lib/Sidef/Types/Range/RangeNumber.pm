@@ -479,7 +479,23 @@ package Sidef::Types::Range::RangeNumber {
                  count_name => 'squarefree_almost_prime_count',
                  predicate  => sub {
                      my ($k) = @_;
-                     sub { $_[0]->is_squarefree && $_[0]->is_almost_prime($k) };
+                     sub { $_[0]->is_squarefree_almost_prime($k) };
+                 },
+                },
+                {
+                 arr_name  => 'carmichael',
+                 each_name => 'each_carmichael',
+                 predicate => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_carmichael && $_[0]->is_almost_prime($k) };
+                 },
+                },
+                {
+                 arr_name  => 'lucas_carmichael',
+                 each_name => 'each_lucas_carmichael',
+                 predicate => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_lucas_carmichael && $_[0]->is_almost_prime($k) };
                  },
                 },
                 {

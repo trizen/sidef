@@ -109,6 +109,26 @@ assert_eq(
 )
 
 assert_eq(
+    gather { 10..1e4 -> each_carmichael(3, {|k| take(k) }) },
+    3.carmichael(10, 1e4)
+)
+
+assert_eq(
+    gather { 10..1e4 -> each_lucas_carmichael(3, {|k| take(k) }) },
+    3.lucas_carmichael(10, 1e4)
+)
+
+assert_eq(
+    gather { 1e6..1e7 -> each_carmichael(5, {|k| take(k) }) },
+    5.carmichael(1e6, 1e7)
+)
+
+assert_eq(
+    gather { 1e6..1e7 -> each_lucas_carmichael(5, {|k| take(k) }) },
+    5.lucas_carmichael(1e6, 1e7)
+)
+
+assert_eq(
     gather { 10..100 -> each_squarefree_almost_prime(3, {|k| take(k) }) },
     3.squarefree_almost_primes(10, 100)
 )
@@ -119,8 +139,18 @@ assert_eq(
 )
 
 assert_eq(
-    gather { 10..100 `by` 3 -> each_omega_prime(3, {|k| take(k) }) },
-    10..100 `by` 3 -> grep { .is_omega_prime(3) }
+    gather { 10..100 `by` 3 -> each_almost_prime(3, {|k| take(k) }) },
+    10..100 `by` 3 -> grep { .is_almost_prime(3) }
+)
+
+assert_eq(
+    gather { 3..2000 `by` 2 -> each_carmichael(3, {|k| take(k) }) },
+    3..2000 `by` 2 -> grep { .is_carmichael && .is_almost_prime(3) }
+)
+
+assert_eq(
+    gather { 3..1000 `by` 2 -> each_lucas_carmichael(3, {|k| take(k) }) },
+    3..1000 `by` 2 -> grep { .is_lucas_carmichael && .is_almost_prime(3) }
 )
 
 assert_eq(

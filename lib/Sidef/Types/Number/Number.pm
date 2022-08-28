@@ -13447,7 +13447,7 @@ package Sidef::Types::Number::Number {
 
             my $r_obj = bless \$r;
 
-            until ($r_obj->is_almost_prime($k_obj) && $r_obj->is_squarefree) {
+            until ($r_obj->is_squarefree_almost_prime($k_obj)) {
                 Math::GMPz::Rmpz_add_ui($r, $r, 1);
             }
 
