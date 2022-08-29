@@ -209,6 +209,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/prime_bounds.sf'
 'scripts/Extended tests/prime_count.sf'
 'scripts/Extended tests/prime_power_count.sf'
+'scripts/Extended tests/pseudoprimes.sf'
 'scripts/Extended tests/range_sum.sf'
 'scripts/Extended tests/sqrtmod.pl'
 'scripts/Extended tests/sumdigits.pl'

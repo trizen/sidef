@@ -16777,15 +16777,38 @@ package Sidef::Types::Number::Number {
     sub primes {
         my ($x, $y) = @_;
 
-        _valid(\$y) if defined($y);
+        if (defined($y)) {
+            _valid(\$y);
+            $x = _any2mpz($$x) // return Sidef::Types::Array::Array->new;
+            $y = _any2mpz($$y) // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $x = _any2mpz($$x) // return Sidef::Types::Array::Array->new;
+            $y = $x;
+            $x = 2;
+        }
 
-        Sidef::Types::Array::Array->new(
-                                       [map { _set_int($_) }
-                                          defined($y)
-                                        ? Math::Prime::Util::GMP::sieve_primes((_big2uistr($x) // 0), (_big2uistr($y) // 0), 0)
-                                        : Math::Prime::Util::GMP::sieve_primes(2, (_big2uistr($x) // 0), 0)
+        if ($x > $y) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
+            if (ref($x)) {
+                $x = (Math::GMPz::Rmpz_sgn($x) <= 0) ? 2 : Math::GMPz::Rmpz_get_ui($x);
+            }
+            $y = Math::GMPz::Rmpz_get_ui($y);
+            return
+              Sidef::Types::Array::Array->new(
+                                       [map { ($_ < 8192) ? _set_int($_) : bless(\(my $o = Math::GMPz::Rmpz_init_set_ui($_))) }
+                                          @{Math::Prime::Util::primes($x, $y)}
                                        ]
-        );
+              );
+        }
+
+        $x = (_big2uistr($x) // 0) if ref($x);
+        $y = (_big2uistr($y) // 0);
+
+        Sidef::Types::Array::Array->new([map { _set_int($_) } Math::Prime::Util::GMP::sieve_primes($x, $y, 0)]);
     }
 
     sub composites {
@@ -22013,7 +22036,17 @@ package Sidef::Types::Number::Number {
             my $B = Math::GMPz::Rmpz_get_ui($to);
 
             if ($squarefree) {
-                $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
+                if ($carmichael or $lucas_carmichael) {
+                    $A = Math::Prime::Util::vecmax(
+                                                   $A,
+                                                   Math::Prime::Util::GMP::divint(
+                                                                                Math::Prime::Util::GMP::pn_primorial($k + 1), 2
+                                                   )
+                                                  );
+                }
+                else {
+                    $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
+                }
             }
             else {
                 $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::powint(2, $k));
@@ -22102,7 +22135,14 @@ package Sidef::Types::Number::Number {
             my $y = Math::GMPz::Rmpz_init();
 
             if ($squarefree) {
-                Math::GMPz::Rmpz_set_str($t, Math::Prime::Util::GMP::pn_primorial($k), 10);
+                if ($carmichael or $lucas_carmichael) {
+                    Math::GMPz::Rmpz_set_str($t,
+                                             Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::pn_primorial($k + 1), 2),
+                                             10);
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($t, Math::Prime::Util::GMP::pn_primorial($k), 10);
+                }
             }
             else {
                 Math::GMPz::Rmpz_setbit($t, $k);    # t = ipow(2, k)
