@@ -6764,19 +6764,17 @@ package Sidef::Types::Number::Number {
 
         $n = _any2mpfr_mpc($$n) // goto &nan;
 
-        if (defined($base)) {
-            _valid(\$base);
-            $base = _any2ui($$base) // goto &nan;
-            $base > 1 or goto &nan;
-        }
-        else {
-            $base = 10;
-        }
-
         my $log = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-        Math::MPFR::Rmpfr_set_ui($log, $base, $ROUND);
-        Math::MPFR::Rmpfr_log($log, $log, $ROUND);
+        if (defined($base)) {
+            _valid(\$base);
+            $base = _any2mpfr($$base) // goto &nan;
+            Math::MPFR::Rmpfr_log($log, $base, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_set_ui($log, 10, $ROUND);
+            Math::MPFR::Rmpfr_log($log, $log, $ROUND);
+        }
 
         if (ref($n) eq 'Math::MPFR') {
 
