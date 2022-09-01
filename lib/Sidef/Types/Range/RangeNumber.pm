@@ -365,6 +365,12 @@ package Sidef::Types::Range::RangeNumber {
                             predicate  => sub { $_[0]->is_semiprime },
                            },
                            {
+                            each_name  => 'each_squarefree_semiprime',
+                            arr_name   => 'squarefree_semiprimes',
+                            count_name => 'squarefree_semiprime_count',
+                            predicate  => sub { $_[0]->is_squarefree_semiprime },
+                           },
+                           {
                             each_name  => 'each_composite',
                             arr_name   => 'composites',
                             count_name => 'composite_count',

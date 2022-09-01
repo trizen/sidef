@@ -2382,6 +2382,20 @@ Aliases: I<squarefree_fermat_psp_each>
 
 =cut
 
+=head2 each_squarefree_semiprime
+
+    n.each_squarefree_semiprime { ... }
+    each_squarefree_semiprime(a,b, { ... })
+
+Iterate over the squarefree semiprimes <= n, or in the range C<a..b>:
+
+    100.each_squarefree_semiprime {|k| say k }         # iterate over squarefree semiprimes <= 100
+    each_squarefree_semiprime(50, 100, {|k| say k })   # iterate over squarefree semiprimes in the range [50, 100]
+
+Aliases: I<squarefree_semiprimes_each>
+
+=cut
+
 =head2 ecm_factor
 
     n.ecm_factor
@@ -4292,6 +4306,14 @@ Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == ome
     say 20.by { .is_squarefree_almost_prime(1) }   # primes
     say 20.by { .is_squarefree_almost_prime(2) }   # squarefree semiprimes
     say 20.by { .is_squarefree_almost_prime(3) }   # sphenic numbers
+
+=cut
+
+=head2 is_squarefree_semiprime
+
+    is_squarefree_semiprime(n)
+
+Returns true if C<n> is a squarefree semiprime (i.e.: C<n = p*q>, where C<p> and C<q> are two distinct primes).
 
 =cut
 
@@ -7186,6 +7208,31 @@ Returns the number of squarefree k-almost primes <= n, or in the range C<a..b>.
     say 2.squarefree_almost_prime_count(50, 1000)      # count of squarefree semiprimes in range 50..1000
 
 Aliases: I<squarefree_almost_primepi>, I<squarefree_almost_prime_count>
+
+=cut
+
+=head2 squarefree_semiprime_count
+
+    squarefree_semiprime_count(n)
+    squarefree_semiprime_count(a,b)
+
+Counts the number of squarefree semiprimes <= n (OEIS: A072613), or in the range C<a..b>.
+
+    say 10.of {|k| squarefree_semiprime_count(10**k) }  # OEIS: A036351
+
+Aliases: I<squarefree_semiprimes_count>
+
+=cut
+
+=head2 squarefree_semiprimes
+
+    squarefree_semiprimes(n)
+    squarefree_semiprimes(a,b)
+
+Returns an array with the squarefree semiprimes <= n, or in the range C<a..b>.
+
+    say squarefree_semiprimes(100)       # squarefree semiprimes <= 100
+    say squarefree_semiprimes(50, 100)   # squarefree semiprimes in the range [50, 100]
 
 =cut
 

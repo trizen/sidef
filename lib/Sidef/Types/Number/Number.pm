@@ -12446,6 +12446,7 @@ package Sidef::Types::Number::Number {
 
     *primepi      = \&prime_count;
     *count_primes = \&prime_count;
+    *primes_count = \&prime_count;
 
     sub prime_count_lower {
         my ($n) = @_;
@@ -13086,6 +13087,12 @@ package Sidef::Types::Number::Number {
 
     *squarefree_pi_k           = \&squarefree_almost_prime_count;
     *squarefree_almost_primepi = \&squarefree_almost_prime_count;
+
+    sub squarefree_semiprime_count {
+        (TWO)->squarefree_almost_prime_count(@_);
+    }
+
+    *squarefree_semiprimes_count = \&squarefree_semiprime_count;
 
     sub omega_prime_count {
         my ($k, $from, $to) = @_;
@@ -15026,6 +15033,14 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub is_squarefree_semiprime {
+        my ($n) = @_;
+        if ($n->is_square) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+        $n->is_semiprime;
+    }
+
     sub _semiprime_count {
         my ($n) = @_;
 
@@ -15116,6 +15131,8 @@ package Sidef::Types::Number::Number {
         my $n = _big2uistr($from) // return ZERO;
         _set_int(_semiprime_count($n));
     }
+
+    *semiprimes_count = \&semiprime_count;
 
     sub nth_semiprime {
         my ($n) = @_;
@@ -22015,12 +22032,11 @@ package Sidef::Types::Number::Number {
         if ($k == 2 and !$fermat) {
             if (HAS_PRIME_UTIL) {
                 if (Math::GMPz::Rmpz_fits_ulong_p($to)) {
-                    my $arr = Math::Prime::Util::semi_primes(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
-                    $arr = [grep { Math::Prime::Util::is_square_free($_) } @$arr] if $squarefree;
-                    return $arr;
+                    $from = Math::GMPz::Rmpz_get_ui($from);
+                    $to   = Math::GMPz::Rmpz_get_ui($to);
                 }
                 my $arr = Math::Prime::Util::semi_primes($from, $to);
-                $arr = [grep { Math::Prime::Util::is_square_free($_) } @$arr] if $squarefree;
+                (@$arr = grep { !Math::Prime::Util::is_square($_) } @$arr) if $squarefree;
                 return $arr;
             }
         }
@@ -22417,6 +22433,10 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@almost_primes);
     }
 
+    sub semiprimes {
+        (TWO)->almost_primes(@_);
+    }
+
     sub carmichael {
         my ($k, $from, $to) = @_;
 
@@ -22564,6 +22584,12 @@ package Sidef::Types::Number::Number {
     }
 
     *each_almost_prime = \&almost_primes_each;
+
+    sub semiprimes_each {
+        (TWO)->almost_primes_each(@_);
+    }
+
+    *each_semiprime = \&semiprimes_each;
 
     sub nth_almost_prime {
         my ($n, $k) = @_;
@@ -22755,6 +22781,10 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@squarefree_almost_primes);
     }
 
+    sub squarefree_semiprimes {
+        (TWO)->squarefree_almost_primes(@_);
+    }
+
     sub squarefree_almost_primes_each {
         my ($k, $from, $to, $block) = @_;
 
@@ -22787,6 +22817,12 @@ package Sidef::Types::Number::Number {
     }
 
     *each_squarefree_almost_prime = \&squarefree_almost_primes_each;
+
+    sub squarefree_semiprimes_each {
+        (TWO)->squarefree_almost_primes_each(@_);
+    }
+
+    *each_squarefree_semiprime = \&squarefree_semiprimes_each;
 
     sub carmichael_each {
         my ($k, $from, $to, $block) = @_;
@@ -22944,59 +22980,6 @@ package Sidef::Types::Number::Number {
     }
 
     *each_squarefree_fermat_psp = \&squarefree_fermat_psp_each;
-
-    sub semiprimes {
-        my ($from, $to) = @_;
-
-        if (defined($to)) {
-            _valid(\$to);
-            $from = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
-            $to   = _any2mpz($$to)   // return Sidef::Types::Array::Array->new;
-        }
-        else {
-            $to   = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
-            $from = $ONE;
-        }
-
-        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
-            $from = $ONE;
-        }
-
-        if (Math::GMPz::Rmpz_sgn($to) < 0) {
-            $to = $ZERO;
-        }
-
-#<<<
-        my @semiprimes = map {
-            ref($_) ? (bless \$_) : _set_int($_)
-        } @{_sieve_almost_primes($from, $to, 2)};
-#>>>
-
-        Sidef::Types::Array::Array->new(\@semiprimes);
-    }
-
-    sub semiprimes_each {
-        my ($from, $to, $block) = @_;
-
-        if (defined($block)) {
-            _valid(\$to);
-            $from = _any2mpz($$from) // return ZERO;
-            $to   = _any2mpz($$to)   // return ZERO;
-        }
-        else {
-            $block = $to;
-            $to    = _any2mpz($$from) // return ZERO;
-            $from  = $ONE;
-        }
-
-        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
-            $from = $ONE;
-        }
-
-        _generic_each($from, $to, $block, sub { 5e6 }, sub { _sieve_almost_primes($_[0], $_[1], 2) });
-    }
-
-    *each_semiprime = \&semiprimes_each;
 
     sub _sieve_squarefree {
         my ($from, $to) = @_;

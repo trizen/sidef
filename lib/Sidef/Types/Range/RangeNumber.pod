@@ -211,6 +211,14 @@ Returns the
 
 =cut
 
+=head2 each_squarefree_semiprime
+
+    RangeNumber.each_squarefree_semiprime()
+
+Returns the
+
+=cut
+
 =head2 faulhaber
 
     RangeNumber.faulhaber()
@@ -442,6 +450,22 @@ Returns the
 =head2 squarefree_count
 
     RangeNumber.squarefree_count()
+
+Returns the
+
+=cut
+
+=head2 squarefree_semiprime_count
+
+    RangeNumber.squarefree_semiprime_count()
+
+Returns the
+
+=cut
+
+=head2 squarefree_semiprimes
+
+    RangeNumber.squarefree_semiprimes()
 
 Returns the
 
