@@ -2235,6 +2235,20 @@ Aliases: I<composites_each>
 
 =cut
 
+=head2 each_fermat_psp
+
+    k.fermat_psp_each(base, n, { ... })
+    k.fermat_psp_each(base, a, b, { ... })
+
+Iterates over the Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    3.fermat_psp_each(2, 1e5, {|n| say n })          # iterate over 3-Fermat psp to base 2 <= 1e5
+    4.fermat_psp_each(2, 1e5, 1e6, {|n| say n })     # iterate over 4-Fermat psp to base 2 in range 1e4..1e6
+
+Aliases: I<fermat_psp_each>
+
+=cut
+
 =head2 each_lucas_carmichael
 
     k.lucas_carmichael_each(n, { ... })
@@ -2373,10 +2387,10 @@ Aliases: I<squarefree_almost_primes_each>
     k.squarefree_fermat_psp_each(base, n, { ... })
     k.squarefree_fermat_psp_each(base, a, b, { ... })
 
-Iterates over the Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
+Iterates over the squarefree Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
 
-    3.squarefree_fermat_psp_each(2, 1e5, {|n| say n })          # iterate over 3-Fermat psp to base 2 <= 1e5
-    4.squarefree_fermat_psp_each(2, 1e5, 1e6, {|n| say n })     # iterate over 4-Fermat psp to base 2 in range 1e4..1e6
+    3.squarefree_fermat_psp_each(2, 1e5, {|n| say n })          # iterate over squarefree 3-Fermat psp to base 2 <= 1e5
+    4.squarefree_fermat_psp_each(2, 1e5, 1e6, {|n| say n })     # iterate over squarefree 4-Fermat psp to base 2 in range 1e4..1e6
 
 Aliases: I<squarefree_fermat_psp_each>
 
@@ -2758,6 +2772,18 @@ Tries to factorize a given number using Fermat's factorization method (using at 
 Works for odd composite non-power numbers C<n> that have two divisors close to C<sqrt(n)>.
 
 The product of the factors, will give back C<n>. However, some factors may be composite.
+
+=cut
+
+=head2 fermat_psp
+
+    k.fermat_psp(base, n)
+    k.fermat_psp(base, a, b)
+
+Returns an array with all the Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have C<k> distinct prime factors.
+
+    say 3.fermat_psp(2, 10000)            # 3-omega Fermat psp to base 2
+    say 4.fermat_psp(2, 10000, 100000)    # 4-omega Fermat psp to base 2 in range
 
 =cut
 
@@ -7190,10 +7216,10 @@ Returns an array with the square-free divisors of n.
     k.squarefree_fermat_psp(base, n)
     k.squarefree_fermat_psp(base, a, b)
 
-Returns an array with all the Fermat pseudoprimes to the given C<base> <= n or in the range C<a..b> that have exactly C<k> prime factors.
+Returns an array with all the squarefree Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have exactly C<k> prime factors.
 
-    say 3.squarefree_fermat_psp(2, 10000)         # 3-Fermat psp to base 2
-    say 4.squarefree_fermat_psp(2, 10000, 100000) # 4-Fermat psp to base 2 in range
+    say 3.squarefree_fermat_psp(2, 10000)           # squarefree 3-Fermat psp to base 2
+    say 4.squarefree_fermat_psp(2, 10000, 100000)   # squarefree 4-Fermat psp to base 2 in range
 
 =cut
 
