@@ -99,6 +99,14 @@ Returns the
 
 =cut
 
+=head2 carmichael
+
+    RangeNumber.carmichael()
+
+Returns the
+
+=cut
+
 =head2 composite_count
 
     RangeNumber.composite_count()
@@ -123,9 +131,25 @@ Returns the
 
 =cut
 
+=head2 each_carmichael
+
+    RangeNumber.each_carmichael()
+
+Returns the
+
+=cut
+
 =head2 each_composite
 
     RangeNumber.each_composite()
+
+Returns the
+
+=cut
+
+=head2 each_lucas_carmichael
+
+    RangeNumber.each_lucas_carmichael()
 
 Returns the
 
@@ -232,6 +256,14 @@ Returns the
 =head2 lcm_by
 
     RangeNumber.lcm_by()
+
+Returns the
+
+=cut
+
+=head2 lucas_carmichael
+
+    RangeNumber.lucas_carmichael()
 
 Returns the
 

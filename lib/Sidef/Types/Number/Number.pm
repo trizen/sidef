@@ -22037,12 +22037,8 @@ package Sidef::Types::Number::Number {
 
             if ($squarefree) {
                 if ($carmichael or $lucas_carmichael) {
-                    $A = Math::Prime::Util::vecmax(
-                                                   $A,
-                                                   Math::Prime::Util::GMP::divint(
-                                                                                Math::Prime::Util::GMP::pn_primorial($k + 1), 2
-                                                   )
-                                                  );
+                    my $m = Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::pn_primorial($k + 1), 2);
+                    $A = Math::Prime::Util::vecmax($A, $m);
                 }
                 else {
                     $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
@@ -22136,9 +22132,8 @@ package Sidef::Types::Number::Number {
 
             if ($squarefree) {
                 if ($carmichael or $lucas_carmichael) {
-                    Math::GMPz::Rmpz_set_str($t,
-                                             Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::pn_primorial($k + 1), 2),
-                                             10);
+                    my $m = Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::pn_primorial($k + 1), 2);
+                    Math::GMPz::Rmpz_set_str($t, $m, 10);
                 }
                 else {
                     Math::GMPz::Rmpz_set_str($t, Math::Prime::Util::GMP::pn_primorial($k), 10);
@@ -22490,7 +22485,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@lucas_carmichael_numbers);
     }
 
-    sub squarefree_fermat {
+    sub squarefree_fermat_psp {
         my ($k, $base, $from, $to) = @_;
 
         _valid(\$base, \$from);
@@ -22897,7 +22892,7 @@ package Sidef::Types::Number::Number {
 
     *each_lucas_carmichael = \&lucas_carmichael_each;
 
-    sub squarefree_fermat_each {
+    sub squarefree_fermat_psp_each {
         my ($k, $base, $from, $to, $block) = @_;
 
         _valid(\$base, \$from);
@@ -22948,7 +22943,7 @@ package Sidef::Types::Number::Number {
                       sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1, fermat => $base) });
     }
 
-    *each_squarefree_fermat = \&squarefree_fermat_each;
+    *each_squarefree_fermat_psp = \&squarefree_fermat_psp_each;
 
     sub semiprimes {
         my ($from, $to) = @_;

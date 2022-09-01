@@ -2368,17 +2368,17 @@ Aliases: I<squarefree_almost_primes_each>
 
 =cut
 
-=head2 each_squarefree_fermat
+=head2 each_squarefree_fermat_psp
 
-    k.squarefree_fermat_each(base, n, { ... })
-    k.squarefree_fermat_each(base, a, b, { ... })
+    k.squarefree_fermat_psp_each(base, n, { ... })
+    k.squarefree_fermat_psp_each(base, a, b, { ... })
 
 Iterates over the Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
 
-    3.squarefree_fermat_each(2, 1e5, {|n| say n })          # iterate over 3-Fermat psp to base 2 <= 1e5
-    4.squarefree_fermat_each(2, 1e5, 1e6, {|n| say n })     # iterate over 4-Fermat psp to base 2 in range 1e4..1e6
+    3.squarefree_fermat_psp_each(2, 1e5, {|n| say n })          # iterate over 3-Fermat psp to base 2 <= 1e5
+    4.squarefree_fermat_psp_each(2, 1e5, 1e6, {|n| say n })     # iterate over 4-Fermat psp to base 2 in range 1e4..1e6
 
-Aliases: I<squarefree_fermat_each>
+Aliases: I<squarefree_fermat_psp_each>
 
 =cut
 
@@ -7163,15 +7163,15 @@ Returns an array with the square-free divisors of n.
 
 =cut
 
-=head2 squarefree_fermat
+=head2 squarefree_fermat_psp
 
-    k.squarefree_fermat(base, n)
-    k.squarefree_fermat(base, a, b)
+    k.squarefree_fermat_psp(base, n)
+    k.squarefree_fermat_psp(base, a, b)
 
 Returns an array with all the Fermat pseudoprimes to the given C<base> <= n or in the range C<a..b> that have exactly C<k> prime factors.
 
-    say 3.squarefree_fermat(2, 10000)         # 3-Fermat psp to base 2
-    say 4.squarefree_fermat(2, 10000, 100000) # 4-Fermat psp to base 2 in range
+    say 3.squarefree_fermat_psp(2, 10000)         # 3-Fermat psp to base 2
+    say 4.squarefree_fermat_psp(2, 10000, 100000) # 4-Fermat psp to base 2 in range
 
 =cut
 
