@@ -21782,6 +21782,7 @@ package Sidef::Types::Number::Number {
 
                 my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $j);
 
+                my $L;
                 for (my $r ; $p <= $s ; $p = $r) {
 
                     $r = _next_prime($p);
@@ -21790,7 +21791,6 @@ package Sidef::Types::Number::Number {
                         $fermat % $p == 0 and next;
                     }
 
-                    my $L;
                     for (my ($pk, $v) = ($p, $m * $p) ; $v - 1 < $B ; ($pk, $v) = ($pk * $p, $v * $p)) {
 
                         if ($fermat) {
@@ -21837,6 +21837,13 @@ package Sidef::Types::Number::Number {
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $j);
                 my $v = Math::GMPz::Rmpz_init();
 
+                my ($L, $pk);
+
+                if ($fermat) {
+                    $L  = Math::GMPz::Rmpz_init();
+                    $pk = Math::GMPz::Rmpz_init();
+                }
+
                 for (my $r ; $p <= $s ; $p = $r) {
 
                     $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : _next_prime($p));
@@ -21845,20 +21852,15 @@ package Sidef::Types::Number::Number {
                         $fermat % $p == 0 and next;
                     }
 
-                    my $pk;
-
                     if ($fermat) {
-                        $pk = Math::GMPz::Rmpz_init_set_ui(1);
+                        Math::GMPz::Rmpz_set_ui($pk, 1);
                     }
 
                     for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ;
                          Math::GMPz::Rmpz_cmp($v, $B) <= 0 ;
                          Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
 
-                        my $L;
-
                         if ($fermat) {
-                            $L = Math::GMPz::Rmpz_init();
                             Math::GMPz::Rmpz_mul_ui($pk, $pk, $p);
 
                             if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($pk)) {
@@ -22334,27 +22336,27 @@ package Sidef::Types::Number::Number {
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
                 my $u = Math::GMPz::Rmpz_init();
 
+                my $L;
+                if ($carmichael || $lucas_carmichael || $fermat) {
+                    $L = Math::GMPz::Rmpz_init();
+                }
+
                 for (my $r ; $p <= $s ; $p = $r) {
 
                     $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : _next_prime($p));
                     Math::GMPz::Rmpz_mul_ui($u, $m, $p);
 
-                    my $L;
-
                     if ($carmichael) {
-                        $L = Math::GMPz::Rmpz_init();
                         Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p - 1);
                         Math::GMPz::Rmpz_gcd($t, $L, $u);
                         Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or next;
                     }
                     elsif ($lucas_carmichael) {
-                        $L = Math::GMPz::Rmpz_init();
                         Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p + 1);
                         Math::GMPz::Rmpz_gcd($t, $L, $u);
                         Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or next;
                     }
                     elsif ($fermat) {
-                        $L = Math::GMPz::Rmpz_init();
                         my $order = (
                                      HAS_PRIME_UTIL
                                      ? Math::Prime::Util::znorder($fermat, $p)
