@@ -17129,6 +17129,35 @@ package Sidef::Types::Number::Number {
         _set_int(Math::Prime::Util::GMP::next_twin_prime(&_big2uistr // goto &nan) || goto &nan);
     }
 
+    sub prev_composite {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 4) <= 0 and goto &nan;
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_slong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) - 1;
+            return _set_int($n) if (($n & 1) == 0);
+            --$n                if _is_prob_prime($n);
+            return _set_int($n);
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($r, $n, 1);
+
+        if (Math::GMPz::Rmpz_even_p($r)) {
+            return bless \$r;
+        }
+
+        if (_is_prob_prime($r)) {
+            Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+        }
+
+        bless \$r;
+    }
+
     sub next_composite {
         my ($n) = @_;
 

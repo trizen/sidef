@@ -161,4 +161,7 @@ assert_eq(
      %n[0, 0, 2, 2, 4, 8, 14, 26, 48, 88, 162, 298, 548, 1008, 1854, 3410, 6272]
 )
 
+assert_eq(Math.seq(100, {.tail.prev_composite}).first(100).grep{.is_int}.flip, composites(100))
+assert_eq(Math.seq(100.prev_prime, {.tail.prev_prime}).first(100).grep{.is_int}.flip, primes(100))
+
 say "** Test passed!"

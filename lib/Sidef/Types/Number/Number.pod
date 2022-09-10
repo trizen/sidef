@@ -6027,6 +6027,14 @@ Aliases: I<perfect_power_udivisors>, I<perfect_power_unitary_divisors>
 
 =cut
 
+=head2 prev_composite
+
+    prev_composite(n)
+
+Returns the previous composite number smaller than C<n>.
+
+=cut
+
 =head2 prev_pow
 
     n.prev_pow(b)
@@ -6044,7 +6052,7 @@ Aliases: I<prev_power>
 
     n.prev_prime
 
-Returns the previous prime smaller than n.
+Returns the previous prime smaller than C<n>.
 
 =cut
 

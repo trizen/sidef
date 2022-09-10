@@ -636,4 +636,8 @@ assert_eq(sum_primes(1e8-1000, 1e8, 1), primes(1e8-1000, 1e8).sum)
 assert_eq(sum_primes(1e8-1000, 1e8, 2), primes(1e8-1000, 1e8).sum{.sqr})
 assert_eq(sum_primes(1e8-1000, 1e8, 3), primes(1e8-1000, 1e8).sum{.ipow(3)})
 
+assert_eq(prev_composite(2**127 + 2), 2**127 + 1)
+assert_eq(prev_composite(2**127 + 1), 2**127)
+assert_eq(prev_composite(2**127), 2**127 - 2)
+
 say "** Tests passed!"
