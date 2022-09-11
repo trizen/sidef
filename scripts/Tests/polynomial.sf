@@ -285,8 +285,8 @@ assert_eq(Quadratic(Poly([3,4,5]), Poly([1,2]), -1)(42), Quadratic(5465, 44, -1)
 
 assert_eq(Quaternion(Poly([3,4,5]), Poly([1,2]))(42), Quaternion(5465, 44))
 assert_eq(Quaternion(Poly([3,4,5]), 155, Poly([1,2]), Poly([4,3]))(42), Quaternion(5465, 155, 44, 171))
-assert_eq(Mod(Quaternion(Poly([3,4,5]), 155, Poly([1,2]), Poly([4,3])), 97)(42), Quaternion(5465 % 97, 155 % 97, 44 % 97, 171 % 97))
-assert_eq((Mod(Quaternion(Poly([3,4,5]), 155, Poly([1,2]), Poly([4,3])), 97)**2)(42), Mod(Quaternion(5465 % 97, 155 % 97, 44 % 97, 171 % 97)**2, 97).lift)
+assert_eq(Mod(Quaternion(Poly([3,4,5]), 155, Poly([1,2]), Poly([4,3])), 97)(42), Mod(Quaternion(5465 % 97, 155 % 97, 44 % 97, 171 % 97), 97))
+assert_eq((Mod(Quaternion(Poly([3,4,5]), 155, Poly([1,2]), Poly([4,3])), 97)**2)(42), Mod(Quaternion(5465 % 97, 155 % 97, 44 % 97, 171 % 97)**2, 97))
 
 assert_eq(Fraction(3,4)(), 3/4)
 assert_eq(Fraction(Poly([3, 2]), Poly([1,2,3]))(42), Poly([3,2])(42) / Poly([1,2,3])(42))
@@ -302,6 +302,9 @@ assert_eq(Mod(chebyshevT(42), 97)(100), chebyshevTmod(42, 100, 97))
 
 assert_eq(Mod(chebyshevT(42), 97)(15/13), chebyshevT(42, 15/13) % 97)
 assert_eq(Mod(chebyshevT(42), 97)(15/13), chebyshevTmod(42, 15/13, 97))
+
+# (x^2 + 2*x + 3)*x^9 + (4*x^2 + 5*x + 6)*x^3 for x = 7
+assert_eq(Poly(3 => Poly([4,5,6]), 9 => Poly([1,2,3])).eval(7), 2663419353)
 
 do {
 

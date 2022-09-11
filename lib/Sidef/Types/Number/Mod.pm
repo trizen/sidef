@@ -47,7 +47,9 @@ package Sidef::Types::Number::Mod {
 
     sub eval {
         my ($x, $v) = @_;
-        $x->{n}->eval($v)->mod($x->{m});
+
+        #$x->{n}->eval($v)->mod($x->{m});
+        __PACKAGE__->new($x->{n}->eval($v), $x->{m});
     }
 
     sub is_zero {

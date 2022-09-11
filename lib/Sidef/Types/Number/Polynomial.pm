@@ -211,8 +211,8 @@ package Sidef::Types::Number::Polynomial {
     sub eval {
         my ($x, $value) = @_;
         CORE::keys(%$x) || return Sidef::Types::Number::Number::ZERO;
-        Sidef::Types::Number::Number::sum(map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}) }
-                                          CORE::keys %$x);
+        Sidef::Types::Number::Number::sum(
+                  map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}->eval($value)) } CORE::keys %$x);
     }
 
     sub keys {
@@ -280,7 +280,7 @@ package Sidef::Types::Number::Polynomial {
         if (ref($y) eq __PACKAGE__) {
             return
               __PACKAGE__->new((map { $_ => (exists($y->{$_}) ? $x->{$_}->sub($y->{$_}) : $x->{$_}) } CORE::keys %$x),
-                               (map { exists($x->{$_}) ? () : ($_ => $y->{$_}->neg) } CORE::keys %$y),);
+                               (map { exists($x->{$_}) ? () : ($_ => $y->{$_}->neg) } CORE::keys %$y));
         }
 
         if (not exists $x->{0}) {
