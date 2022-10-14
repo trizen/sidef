@@ -2426,6 +2426,7 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *fld        = \&idiv;
     *idiv_floor = \&idiv;
 
     sub idiv_ceil {
@@ -2456,6 +2457,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *cld = \&idiv_ceil;
+
     sub idiv_trunc {
         my ($x, $y) = @_;
 
@@ -2483,6 +2486,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_tdiv_q($r, $x, $y);
         bless \$r;
     }
+
+    *trd = \&idiv_trunc;
 
     sub idiv_round {
         my ($x, $y) = @_;
@@ -2514,6 +2519,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_div_2exp($r, $r, 1);
         bless \$r;
     }
+
+    *rdd = \&idiv_round;
 
     sub __neg__ {
         my ($x) = @_;

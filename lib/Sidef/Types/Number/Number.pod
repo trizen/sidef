@@ -186,7 +186,7 @@ When C<a> and C<b> are integers, this is equivalent with:
 
     floor(a/b)
 
-Aliases: I<idiv>
+Aliases: I<fld>, I<idiv>, I<idiv_floor>
 
 =cut
 
@@ -3101,6 +3101,8 @@ When C<a> and C<b> are integers, this is equivalent with:
 
     ceil(a/b)
 
+Aliases: I<cld>
+
 =cut
 
 =head2 idivisors
@@ -3125,6 +3127,8 @@ When C<a> and C<b> are integers, this is equivalent with:
 
     floor(a/b + 1/2)
 
+Aliases: I<rdd>
+
 =cut
 
 =head2 idiv_trunc
@@ -3136,6 +3140,8 @@ Integer division of integers C<a> and C<b>, rounded towards 0.
 When C<a> and C<b> are integers, this is equivalent with:
 
     trunc(a/b)
+
+Aliases: I<trd>
 
 =cut
 
