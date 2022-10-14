@@ -1381,6 +1381,7 @@ package Sidef::Types::Number::Number {
         (ref($$x) eq 'Math::MPFR' || ref($$x) eq 'Math::MPC') ? $x : bless \_any2mpfr_mpc($$x);
     }
 
+    *f        = \&float;
     *to_f     = \&float;
     *to_float = \&float;
 

@@ -7563,7 +7563,7 @@ Call a given block of code C<n> times with k = 0,1,2,...,n-1.
 
 Convert C<x> to a floating-point value number.
 
-Aliases: I<float>, I<to_float>
+Aliases: I<f>, I<float>, I<to_float>
 
 =cut
 
