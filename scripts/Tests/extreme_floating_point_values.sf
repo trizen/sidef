@@ -113,4 +113,14 @@ assert_eq(01234,  668)
 assert_eq(0o1234, 668)
 assert_eq(0x1234, 4660)
 
-say "** Test passed!";
+assert_eq(Sys.ref(*(42f)), "Math::MPFR")
+assert_eq(Sys.ref(*(4.2f)), "Math::MPFR")
+assert_eq(Sys.ref(*(-4.2f)), "Math::MPFR")
+
+assert_eq(42f, 42)
+assert_eq(-42f, -42)
+assert_eq(4.23e45f, float(4.23e45))
+assert_eq(4.2567f, float(4.2567))
+assert_eq(-4.2f, float(-4.2))
+
+say "** Test passed!"

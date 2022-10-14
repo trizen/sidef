@@ -4,7 +4,7 @@ package Sidef::Parser {
     use 5.016;
 
     use Sidef::Types::Bool::Bool;
-    use List::Util qw(first);
+    use List::Util   qw(first);
     use Scalar::Util qw(refaddr);
 
     sub new {
@@ -19,11 +19,11 @@ package Sidef::Parser {
             EOT           => [],
 
             postfix_ops => {            # postfix operators
-                             '--'  => 1,
-                             '++'  => 1,
-                             '...' => 1,
-                             '!'   => 1,
-                             '!!'  => 1,
+               '--'  => 1,
+               '++'  => 1,
+               '...' => 1,
+               '!'   => 1,
+               '!!'  => 1,
                            },
 
             hyper_ops => {
@@ -39,7 +39,7 @@ package Sidef::Parser {
                 unroll  => [1, 'unroll_operator'],
                 reduce  => [0, 'reduce_operator'],
                 lmap    => [0, 'map_operator'],
-            },
+                         },
 
             static_obj_re => qr{\G
                 (?:
@@ -2217,6 +2217,9 @@ package Sidef::Parser {
                 if (/\Gi\b/gc) {    # imaginary
                     return Sidef::Types::Number::Complex->new(0, $num);
                 }
+                elsif (/\Gf\b/gc) {    # floating-point
+                    return Sidef::Types::Number::Number::_set_str('float', $num);
+                }
 
                 return Sidef::Types::Number::Number->new($num);
             }
@@ -2577,11 +2580,11 @@ package Sidef::Parser {
                 if (
                     ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
                     and defined(
-                        my $var = (
-                                 first { $_->{name} eq $name }
+                           my $var = (
+                               first { $_->{name} eq $name }
                                  (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})
-                                  )
-                               )
+                           )
+                    )
                   ) {
                     if (exists $self->{current_method}) {
                         if (defined(my $var = $self->find_var('self', $class))) {
