@@ -1,0 +1,48 @@
+#!/usr/bin/ruby
+
+# Generate the divisors of n! in a given range, using a closure iterator.
+
+# See also:
+#   https://en.wikipedia.org/wiki/Smooth_number
+
+func divisors_of_factorial_iterator (f, low, high) {
+
+    var P = f.primes.map {|p| [p, f.factorial_power(p)]  }
+    var s = P.len.of { [1] }
+
+    func {
+        var n = 0
+        while (n < low) {
+
+            n = s.map{ _[0] }.min
+
+            for k in (^P) {
+                s[k].shift if (s[k][0] == n)
+                var q = P[k][0]
+                break if (n.valuation(q) >= P[k][1])
+                s[k] << n*q
+            }
+        }
+
+        return nil if (n > high)
+        return n
+    }
+}
+
+var n    = 12
+var low  = 10**4
+var high = 10**6
+
+var iter = divisors_of_factorial_iterator(n, low, high)
+
+var sum = 0
+while (iter()) {|v|
+    sum += v
+}
+
+assert_eq(sum, 64006347)
+
+say "Sum of divisors of #{n}! between #{low} and #{high} = #{sum}"
+
+__END__
+Sum of divisors of 12! between 10000 and 1000000 = 64006347

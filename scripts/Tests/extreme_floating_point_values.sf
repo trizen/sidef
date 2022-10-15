@@ -123,4 +123,7 @@ assert_eq(4.23e45f, float(4.23e45))
 assert_eq(4.2567f, float(4.2567))
 assert_eq(-4.2f, float(-4.2))
 
+assert(42.ne(99))
+assert(!(42.ne(42)))
+
 say "** Test passed!"

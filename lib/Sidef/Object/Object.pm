@@ -35,20 +35,40 @@ package Sidef::Object::Object {
       q{cmp} => sub {
         my ($obj1, $obj2, $swapped) = @_;
 
+        if ($swapped) {
+            ($obj1, $obj2) = ($obj2, $obj1);
+        }
+
         # Optimization for identical objects
         if (CORE::ref($obj1) eq CORE::ref($obj2)) {
             if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
-                if (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz') {
+                my $r1 = CORE::ref($$obj1);
+                my $r2 = CORE::ref($$obj2);
+                if ($r1 eq 'Math::GMPz' and $r2 eq 'Math::GMPz') {
                     return Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
+                }
+                elsif ($r1 eq '' and $r2 eq '') {
+                    return ($$obj1 <=> $$obj2);
+                }
+                elsif ($r1 eq 'Math::GMPz' and $r2 eq '') {
+                    return (
+                            ($$obj2 < 0)
+                            ? Math::GMPz::Rmpz_cmp_si($$obj1, $$obj2)
+                            : Math::GMPz::Rmpz_cmp_ui($$obj1, $$obj2)
+                           );
+                }
+                elsif ($r1 eq '' and $r2 eq 'Math::GMPz') {
+                    return
+                      -(
+                        ($$obj1 < 0)
+                        ? Math::GMPz::Rmpz_cmp_si($$obj2, $$obj1)
+                        : Math::GMPz::Rmpz_cmp_ui($$obj2, $$obj1)
+                       );
                 }
             }
             elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
                 return 0;
             }
-        }
-
-        if ($swapped) {
-            ($obj1, $obj2) = ($obj2, $obj1);
         }
 
         if (   CORE::ref($obj1) eq CORE::ref($obj2)
@@ -70,8 +90,29 @@ package Sidef::Object::Object {
         # Optimization for identical objects
         if (CORE::ref($obj1) eq CORE::ref($obj2)) {
             if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
-                if (ref($$obj1) eq 'Math::GMPz' and ref($$obj2) eq 'Math::GMPz') {
+                my $r1 = CORE::ref($$obj1);
+                my $r2 = CORE::ref($$obj2);
+                if ($r1 eq 'Math::GMPz' and $r2 eq 'Math::GMPz') {
                     return !Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
+                }
+                elsif ($r1 eq '' and $r2 eq '') {
+                    return ($$obj1 == $$obj2);
+                }
+                elsif ($r1 eq 'Math::GMPz' and $r2 eq '') {
+                    return
+                      !(
+                        ($$obj2 < 0)
+                        ? Math::GMPz::Rmpz_cmp_si($$obj1, $$obj2)
+                        : Math::GMPz::Rmpz_cmp_ui($$obj1, $$obj2)
+                       );
+                }
+                elsif ($r1 eq '' and $r2 eq 'Math::GMPz') {
+                    return
+                      !(
+                        ($$obj1 < 0)
+                        ? Math::GMPz::Rmpz_cmp_si($$obj2, $$obj1)
+                        : Math::GMPz::Rmpz_cmp_ui($$obj2, $$obj1)
+                       );
                 }
             }
             elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {

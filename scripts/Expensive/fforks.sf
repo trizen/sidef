@@ -20,7 +20,7 @@ do {
 
 do {
     var t = { 'JSON::PP'.frequire }.ffork.wait
-    assert_eq(t.encode_json(Hash(a => 1)), %({"a":"1"}))
+    assert_eq(t.encode_json(Hash(a => 1)), %({"a":1}))
 }
 
 do {

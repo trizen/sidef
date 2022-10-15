@@ -763,6 +763,7 @@ scripts/Tests/default_var_values.sf
 scripts/Tests/difference_of_powers_factorization.sf
 scripts/Tests/digits_and_sum_of_digits.sf
 scripts/Tests/divisor_functions.sf
+scripts/Tests/divisors_of_factorial_in_range_iterator.sf
 scripts/Tests/draw_grid_of_squares_multi.sf
 scripts/Tests/draw_grid_of_squares_multi_2.sf
 scripts/Tests/dump_cyclic_references.sf

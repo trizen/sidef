@@ -7,7 +7,7 @@ package Sidef::Types::Number::Complex {
 
     use parent qw(
       Sidef::Types::Number::Number
-      );
+    );
 
     our ($PREC, $ROUND);
 
@@ -33,6 +33,8 @@ package Sidef::Types::Number::Complex {
               defined($real)
               ? Sidef::Types::Number::Number::_str2obj("$real")
               : ${(Sidef::Types::Number::Number::ZERO)};
+
+            $real = Sidef::Types::Number::Number::_any2mpz($real) if (ref($real) eq '');
         }
 
         if (defined($imag)) {
@@ -43,6 +45,8 @@ package Sidef::Types::Number::Complex {
             else {
                 $imag = Sidef::Types::Number::Number::_str2obj("$imag");
             }
+
+            $imag = Sidef::Types::Number::Number::_any2mpz($imag) if (ref($imag) eq '');
 
             my $c   = Math::MPC::Rmpc_init2($PREC);
             my $sig = join(' ', ref($real), ref($imag));
