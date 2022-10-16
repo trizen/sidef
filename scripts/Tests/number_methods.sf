@@ -640,4 +640,7 @@ assert_eq(prev_composite(2**127 + 2), 2**127 + 1)
 assert_eq(prev_composite(2**127 + 1), 2**127)
 assert_eq(prev_composite(2**127), 2**127 - 2)
 
+assert_eq(prime_count(2**65, 2**65 + 10000), 229)
+assert_eq(prime_power_count(2**65, 2**65 + 10000), 230)
+
 say "** Tests passed!"

@@ -10,8 +10,8 @@ define yellow = "\033[33m"
 
 define chars = [' ', green+'*', yellow+'&', red+'&']
 
-define tree_prob = 0.05
-define burn_prob = 0.0002
+define tree_prob = 0.05f
+define burn_prob = 0.0002f
 
 enum |Empty, Tree, Heating, Burning|
 

@@ -42,22 +42,21 @@ package Sidef::Object::Object {
         # Optimization for identical objects
         if (CORE::ref($obj1) eq CORE::ref($obj2)) {
             if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
-                my $r1 = CORE::ref($$obj1);
-                my $r2 = CORE::ref($$obj2);
-                if ($r1 eq 'Math::GMPz' and $r2 eq 'Math::GMPz') {
+                my $r = join(' ', (CORE::ref($$obj1) || 'Scalar'), (CORE::ref($$obj2) || 'Scalar'));
+                if ($r eq 'Math::GMPz Math::GMPz') {
                     return Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
                 }
-                elsif ($r1 eq '' and $r2 eq '') {
+                elsif ($r eq 'Scalar Scalar') {
                     return ($$obj1 <=> $$obj2);
                 }
-                elsif ($r1 eq 'Math::GMPz' and $r2 eq '') {
+                elsif ($r eq 'Math::GMPz Scalar') {
                     return (
                             ($$obj2 < 0)
                             ? Math::GMPz::Rmpz_cmp_si($$obj1, $$obj2)
                             : Math::GMPz::Rmpz_cmp_ui($$obj1, $$obj2)
                            );
                 }
-                elsif ($r1 eq '' and $r2 eq 'Math::GMPz') {
+                elsif ($r eq 'Scalar Math::GMPz') {
                     return
                       -(
                         ($$obj1 < 0)
@@ -90,15 +89,14 @@ package Sidef::Object::Object {
         # Optimization for identical objects
         if (CORE::ref($obj1) eq CORE::ref($obj2)) {
             if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
-                my $r1 = CORE::ref($$obj1);
-                my $r2 = CORE::ref($$obj2);
-                if ($r1 eq 'Math::GMPz' and $r2 eq 'Math::GMPz') {
+                my $r = join(' ', (CORE::ref($$obj1) || 'Scalar'), (CORE::ref($$obj2) || 'Scalar'));
+                if ($r eq 'Math::GMPz Math::GMPz') {
                     return !Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
                 }
-                elsif ($r1 eq '' and $r2 eq '') {
+                elsif ($r eq 'Scalar Scalar') {
                     return ($$obj1 == $$obj2);
                 }
-                elsif ($r1 eq 'Math::GMPz' and $r2 eq '') {
+                elsif ($r eq 'Math::GMPz Scalar') {
                     return
                       !(
                         ($$obj2 < 0)
@@ -106,7 +104,7 @@ package Sidef::Object::Object {
                         : Math::GMPz::Rmpz_cmp_ui($$obj1, $$obj2)
                        );
                 }
-                elsif ($r1 eq '' and $r2 eq 'Math::GMPz') {
+                elsif ($r eq 'Scalar Math::GMPz') {
                     return
                       !(
                         ($$obj1 < 0)
