@@ -3109,7 +3109,7 @@ package Sidef::Types::Array::Array {
         }
 
         $n = $n->int;
-        $n = ref($$n) eq 'Math::GMPz' ? Math::GMPz::Rmpz_init_set($$n) : return undef;
+        $n = Sidef::Types::Number::Number::_any2mpz($$n) // return undef;
 
         my $sgn = Math::GMPz::Rmpz_sgn($n);
 

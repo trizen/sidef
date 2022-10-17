@@ -647,6 +647,7 @@ package Sidef::Types::Number::Number {
     sub _any2mpq {
         my ($x) = @_;
 
+        ref($x) eq ''           && return _mpz2mpq(_any2mpz($x));
         ref($x) eq 'Math::GMPq' && return $x;
         ref($x) eq 'Math::GMPz' && goto &_mpz2mpq;
 
@@ -8762,14 +8763,24 @@ package Sidef::Types::Number::Number {
 
         foreach my $d (@$D) {
 
-            Math::GMPz::Rmpz_divexact($t, $n, $$d);
-            Math::GMPz::Rmpz_add($u, $$d, $t);
+            if (ref($$d)) {
+                Math::GMPz::Rmpz_divexact($t, $n, $$d);
+                Math::GMPz::Rmpz_add($u, $t, $$d);
+            }
+            else {
+                Math::GMPz::Rmpz_divexact_ui($t, $n, $$d);
+                Math::GMPz::Rmpz_add_ui($u, $t, $$d);
+            }
+
             Math::GMPz::Rmpz_even_p($u) || next;
 
             my $x = Math::GMPz::Rmpz_init();
             my $y = Math::GMPz::Rmpz_init();
 
-            Math::GMPz::Rmpz_sub($y, $t, $$d);
+            ref($$d)
+              ? Math::GMPz::Rmpz_sub($y, $t, $$d)
+              : Math::GMPz::Rmpz_sub_ui($y, $t, $$d);
+
             Math::GMPz::Rmpz_div_2exp($x, $u, 1);
             Math::GMPz::Rmpz_div_2exp($y, $y, 1);
 
@@ -20445,7 +20456,10 @@ package Sidef::Types::Number::Number {
 
         foreach my $d (@{$n->squarefree_divisors}) {
             my $t = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_divexact($t, $z, $$d);
+
+            ref($$d)
+              ? Math::GMPz::Rmpz_divexact($t, $z, $$d)
+              : Math::GMPz::Rmpz_divexact_ui($t, $z, $$d);
 
             my $r = $f->run(bless \$t);
             my $m = Math::Prime::Util::GMP::moebius($$d);
