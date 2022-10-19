@@ -70,7 +70,7 @@ package Sidef::Types::Range::RangeNumber {
                 $step = $$step;
 
                 if (    ref($to) eq 'Sidef::Types::Number::Number'
-                    and ((ref($$to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($$to)) or ref($$to) eq '')
+                    and (ref($$to) eq ''  or (ref($$to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($$to)))
                     and (ref($from) eq '' or Math::GMPz::Rmpz_fits_slong_p($from))
                     and (ref($step) eq '' or Math::GMPz::Rmpz_fits_slong_p($step))) {
 
@@ -83,24 +83,6 @@ package Sidef::Types::Range::RangeNumber {
                             my $obj = $from;
                             $from += $step;
                             bless(\$obj, 'Sidef::Types::Number::Number');
-
-                            #~ if ($from < 8192 and $from >= 0) {
-                            #~ my $obj = ($cache[$from] //=
-                            #~ bless(\Math::GMPz::Rmpz_init_set_ui($from), 'Sidef::Types::Number::Number'));
-                            #~ $from += $step;
-                            #~ return $obj;
-                            #~ }
-
-                            #~ if (Math::GMPz::get_refcnt($$Sidef::Types::Number::Number::MPZ) > 1) {
-                            #~ $Sidef::Types::Number::Number::MPZ =
-                            #~ bless(\Math::GMPz::Rmpz_init_set_si($from), 'Sidef::Types::Number::Number');
-                            #~ }
-                            #~ else {
-                            #~ Math::GMPz::Rmpz_set_si($$Sidef::Types::Number::Number::MPZ, $from);
-                            #~ }
-
-                            #~ $from += $step;
-                            #~ $Sidef::Types::Number::Number::MPZ;
                         },
                     );
                 }
@@ -129,14 +111,11 @@ package Sidef::Types::Range::RangeNumber {
                                 }
                             }
 
-                            # handle overflow
-                            $counter_mpz //= do {
-                                my $t =
-                                  ($prev < 0)
-                                  ? Math::GMPz::Rmpz_init_set_si($prev)
-                                  : Math::GMPz::Rmpz_init_set_ui($prev);
-                                $t;
-                            };
+                            # The code below handles overflow
+                            $counter_mpz //=
+                              ($prev < 0)
+                              ? Math::GMPz::Rmpz_init_set_si($prev)
+                              : Math::GMPz::Rmpz_init_set_ui($prev);
 
                             if (Math::GMPz::get_refcnt($$Sidef::Types::Number::Number::MPZ) > 1) {
                                 $Sidef::Types::Number::Number::MPZ =
@@ -159,13 +138,14 @@ package Sidef::Types::Range::RangeNumber {
                 my $counter_mpz =
                   ref($from) ? Math::GMPz::Rmpz_init_set($from)
                   : (
-                     $from < 0 ? Math::GMPz::Rmpz_init_set_si($from)
+                     ($from < 0) ? Math::GMPz::Rmpz_init_set_si($from)
                      : Math::GMPz::Rmpz_init_set_ui($from)
                     );
 
                 return Sidef::Types::Block::Block->new(
                     code => sub {
                         --$repetitions >= 0 or return undef;
+
                         if (Math::GMPz::get_refcnt($$Sidef::Types::Number::Number::MPZ) > 1) {
                             $Sidef::Types::Number::Number::MPZ =
                               bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
@@ -176,7 +156,7 @@ package Sidef::Types::Range::RangeNumber {
 
                         ref($step) ? Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step)
                           : (
-                             $step < 0 ? Math::GMPz::Rmpz_sub_ui($counter_mpz, $counter_mpz, -$step)
+                             ($step < 0) ? Math::GMPz::Rmpz_sub_ui($counter_mpz, $counter_mpz, -$step)
                              : Math::GMPz::Rmpz_add_ui($counter_mpz, $counter_mpz, $step)
                             );
                         $Sidef::Types::Number::Number::MPZ;
