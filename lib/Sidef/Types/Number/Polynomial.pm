@@ -174,7 +174,7 @@ package Sidef::Types::Number::Polynomial {
         $str =~ s/ \+ \z//;
         $str =~ s/^ \- /-/;
         $str =~ s/^\((.*)\)\z/$1/;
-        $str;
+        $str || '0';
     }
 
     sub to_s {

@@ -334,7 +334,7 @@ do {
         got << d
 
         say "Polynomial : #{'%20s' % c} = #{poly}"
-        say "Derivative : #{'%20s' % d} = #{derv || 0}\n"
+        say "Derivative : #{'%20s' % d} = #{derv}\n"
     }
 
     assert_eq(
@@ -358,6 +358,8 @@ do {
     assert_eq(Poly([32, 19]) % Poly([99, 42]), 179/33)
     assert_eq(32 % Poly([99, 42]), 32)
     assert_eq(Poly([32]) % Poly([99, 42]), 32)
+    assert_eq(Poly().to_s, '0')
+    assert_eq(Poly(1).to_s, 'x')
 }
 
 say "** Test passed!"
