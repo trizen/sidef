@@ -1275,7 +1275,7 @@ package Sidef::Types::Number::Number {
 
     sub __stringify__ {
         my ($x) = @_;
-        goto((ref($x) =~ tr/:/_/rs) || return $x);
+        goto((ref($x) || return $x) =~ tr/:/_/rs);
 
       Math_GMPz: {
             return Math::GMPz::Rmpz_get_str($x, 10);
@@ -1732,14 +1732,19 @@ package Sidef::Types::Number::Number {
             if ($r < ULONG_MAX and $r > LONG_MIN) {
                 return $r;
             }
-            $x = _any2mpz($x);
-            $y = _any2mpz($y);
-            goto Math_GMPz__Math_GMPz;
+            $r =
+              ($x < 0)
+              ? Math::GMPz::Rmpz_init_set_si($x)
+              : Math::GMPz::Rmpz_init_set_ui($x);
+            ($y < 0)
+              ? Math::GMPz::Rmpz_sub_ui($r, $r, -$y)
+              : Math::GMPz::Rmpz_add_ui($r, $r, $y);
+            return $r;
         }
 
       Math_GMPz__Scalar: {
             my $r = Math::GMPz::Rmpz_init();
-            $y < 0
+            ($y < 0)
               ? Math::GMPz::Rmpz_sub_ui($r, $x, -$y)
               : Math::GMPz::Rmpz_add_ui($r, $x, $y);
             return $r;
@@ -1747,7 +1752,7 @@ package Sidef::Types::Number::Number {
 
       Math_GMPq__Scalar: {
             my $r = Math::GMPq::Rmpq_init();
-            $y < 0
+            ($y < 0)
               ? Math::GMPq::Rmpq_set_si($r, $y, 1)
               : Math::GMPq::Rmpq_set_ui($r, $y, 1);
             Math::GMPq::Rmpq_add($r, $r, $x);
@@ -1756,7 +1761,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPFR__Scalar: {
             my $r = Math::MPFR::Rmpfr_init2($PREC);
-            $y < 0
+            ($y < 0)
               ? Math::MPFR::Rmpfr_sub_ui($r, $x, -$y, $ROUND)
               : Math::MPFR::Rmpfr_add_ui($r, $x, $y, $ROUND);
             return $r;
@@ -1764,7 +1769,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPC__Scalar: {
             my $r = Math::MPC::Rmpc_init2($PREC);
-            $y < 0
+            ($y < 0)
               ? Math::MPC::Rmpc_sub_ui($r, $x, -$y, $ROUND)
               : Math::MPC::Rmpc_add_ui($r, $x, $y, $ROUND);
             return $r;
@@ -1931,14 +1936,19 @@ package Sidef::Types::Number::Number {
             if ($r < ULONG_MAX and $r > LONG_MIN) {
                 return $r;
             }
-            $x = _any2mpz($x);
-            $y = _any2mpz($y);
-            goto Math_GMPz__Math_GMPz;
+            $r =
+              ($x < 0)
+              ? Math::GMPz::Rmpz_init_set_si($x)
+              : Math::GMPz::Rmpz_init_set_ui($x);
+            ($y < 0)
+              ? Math::GMPz::Rmpz_add_ui($r, $r, -$y)
+              : Math::GMPz::Rmpz_sub_ui($r, $r, $y);
+            return $r;
         }
 
       Math_GMPz__Scalar: {
             my $r = Math::GMPz::Rmpz_init();
-            $y < 0
+            ($y < 0)
               ? Math::GMPz::Rmpz_add_ui($r, $x, -$y)
               : Math::GMPz::Rmpz_sub_ui($r, $x, $y);
             return $r;
@@ -1946,7 +1956,7 @@ package Sidef::Types::Number::Number {
 
       Math_GMPq__Scalar: {
             my $r = Math::GMPq::Rmpq_init();
-            $y < 0
+            ($y < 0)
               ? Math::GMPq::Rmpq_set_si($r, $y, 1)
               : Math::GMPq::Rmpq_set_ui($r, $y, 1);
             Math::GMPq::Rmpq_sub($r, $x, $r);
@@ -1955,7 +1965,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPFR__Scalar: {
             my $r = Math::MPFR::Rmpfr_init2($PREC);
-            $y < 0
+            ($y < 0)
               ? Math::MPFR::Rmpfr_add_ui($r, $x, -$y, $ROUND)
               : Math::MPFR::Rmpfr_sub_ui($r, $x, $y, $ROUND);
             return $r;
@@ -1963,7 +1973,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPC__Scalar: {
             my $r = Math::MPC::Rmpc_init2($PREC);
-            $y < 0
+            ($y < 0)
               ? Math::MPC::Rmpc_add_ui($r, $x, -$y, $ROUND)
               : Math::MPC::Rmpc_sub_ui($r, $x, $y, $ROUND);
             return $r;
@@ -1971,7 +1981,7 @@ package Sidef::Types::Number::Number {
 
       Scalar__Math_GMPz: {
             my $r = Math::GMPz::Rmpz_init();
-            $x < 0
+            ($x < 0)
               ? do {
                 Math::GMPz::Rmpz_add_ui($r, $y, -$x);
                 Math::GMPz::Rmpz_neg($r, $r);
@@ -1982,7 +1992,7 @@ package Sidef::Types::Number::Number {
 
       Scalar__Math_GMPq: {
             my $r = Math::GMPq::Rmpq_init();
-            $x < 0
+            ($x < 0)
               ? Math::GMPq::Rmpq_set_si($r, $x, 1)
               : Math::GMPq::Rmpq_set_ui($r, $x, 1);
             Math::GMPq::Rmpq_sub($r, $r, $y);
@@ -1991,7 +2001,7 @@ package Sidef::Types::Number::Number {
 
       Scalar__Math_MPFR: {
             my $r = Math::MPFR::Rmpfr_init2($PREC);
-            $x < 0
+            ($x < 0)
               ? Math::MPFR::Rmpfr_si_sub($r, $x, $y, $ROUND)
               : Math::MPFR::Rmpfr_ui_sub($r, $x, $y, $ROUND);
             return $r;
@@ -1999,7 +2009,7 @@ package Sidef::Types::Number::Number {
 
       Scalar__Math_MPC: {
             my $r = Math::MPC::Rmpc_init2($PREC);
-            $x < 0
+            ($x < 0)
               ? do {
                 Math::MPC::Rmpc_add_ui($r, $y, -$x, $ROUND);
                 Math::MPC::Rmpc_neg($r, $r, $ROUND);
@@ -2179,14 +2189,19 @@ package Sidef::Types::Number::Number {
             if ($r < ULONG_MAX and $r > LONG_MIN) {
                 return $r;
             }
-            $x = _any2mpz($x);
-            $y = _any2mpz($y);
-            goto Math_GMPz__Math_GMPz;
+            $r =
+              ($x < 0)
+              ? Math::GMPz::Rmpz_init_set_si($x)
+              : Math::GMPz::Rmpz_init_set_ui($x);
+            ($y < 0)
+              ? Math::GMPz::Rmpz_mul_si($r, $r, $y)
+              : Math::GMPz::Rmpz_mul_ui($r, $r, $y);
+            return $r;
         }
 
       Math_GMPz__Scalar: {
             my $r = Math::GMPz::Rmpz_init();
-            $y < 0
+            ($y < 0)
               ? Math::GMPz::Rmpz_mul_si($r, $x, $y)
               : Math::GMPz::Rmpz_mul_ui($r, $x, $y);
             return $r;
@@ -2194,7 +2209,7 @@ package Sidef::Types::Number::Number {
 
       Math_GMPq__Scalar: {
             my $r = Math::GMPq::Rmpq_init();
-            $y < 0
+            ($y < 0)
               ? Math::GMPq::Rmpq_set_si($r, $y, 1)
               : Math::GMPq::Rmpq_set_ui($r, $y, 1);
             Math::GMPq::Rmpq_mul($r, $r, $x);
@@ -2203,7 +2218,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPFR__Scalar: {
             my $r = Math::MPFR::Rmpfr_init2($PREC);
-            $y < 0
+            ($y < 0)
               ? Math::MPFR::Rmpfr_mul_si($r, $x, $y, $ROUND)
               : Math::MPFR::Rmpfr_mul_ui($r, $x, $y, $ROUND);
             return $r;
@@ -2211,7 +2226,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPC__Scalar: {
             my $r = Math::MPC::Rmpc_init2($PREC);
-            $y < 0
+            ($y < 0)
               ? Math::MPC::Rmpc_mul_si($r, $x, $y, $ROUND)
               : Math::MPC::Rmpc_mul_ui($r, $x, $y, $ROUND);
             return $r;
@@ -2389,8 +2404,7 @@ package Sidef::Types::Number::Number {
                 }
             }
             $x = _any2mpz($x);
-            $y = _any2mpz($y);
-            goto Math_GMPz__Math_GMPz;
+            goto Math_GMPz__Scalar;
         }
 
       Math_GMPz__Scalar: {
@@ -2405,14 +2419,14 @@ package Sidef::Types::Number::Number {
             if (Math::GMPz::Rmpz_divisible_ui_p($x, CORE::abs($y))) {
                 my $r = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_divexact_ui($r, $x, CORE::abs($y));
-                Math::GMPz::Rmpz_neg($r, $r) if $y < 0;
+                Math::GMPz::Rmpz_neg($r, $r) if ($y < 0);
                 return $r;
             }
 
             my $r = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_ui($r, 1, CORE::abs($y));
             Math::GMPq::Rmpq_set_num($r, $x);
-            Math::GMPq::Rmpq_neg($r, $r) if $y < 0;
+            Math::GMPq::Rmpq_neg($r, $r) if ($y < 0);
             Math::GMPq::Rmpq_canonicalize($r);
             return $r;
         }
@@ -2430,11 +2444,11 @@ package Sidef::Types::Number::Number {
             if ($x == 1 or $x == -1) {
                 Math::GMPq::Rmpq_set_z($r, $y);
                 Math::GMPq::Rmpq_inv($r, $r);
-                Math::GMPq::Rmpq_neg($r, $r) if $x < 0;
+                Math::GMPq::Rmpq_neg($r, $r) if ($x < 0);
                 return $r;
             }
 
-            $x < 0
+            ($x < 0)
               ? Math::GMPq::Rmpq_set_si($r, $x, 1)
               : Math::GMPq::Rmpq_set_ui($r, $x, 1);
 
@@ -2460,7 +2474,7 @@ package Sidef::Types::Number::Number {
             };
 
             my $r = Math::GMPq::Rmpq_init();
-            $y < 0
+            ($y < 0)
               ? Math::GMPq::Rmpq_set_si($r, -1, -$y)
               : Math::GMPq::Rmpq_set_ui($r, 1, $y);
             Math::GMPq::Rmpq_mul($r, $r, $x);
@@ -2479,11 +2493,11 @@ package Sidef::Types::Number::Number {
 
             if ($x == 1 or $x == -1) {
                 Math::GMPq::Rmpq_inv($r, $y);
-                Math::GMPq::Rmpq_neg($r, $r) if $x < 0;
+                Math::GMPq::Rmpq_neg($r, $r) if ($x < 0);
                 return $r;
             }
 
-            $x < 0
+            ($x < 0)
               ? Math::GMPq::Rmpq_set_si($r, $x, 1)
               : Math::GMPq::Rmpq_set_ui($r, $x, 1);
 
@@ -2494,7 +2508,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPFR__Scalar: {
             my $r = Math::MPFR::Rmpfr_init2($PREC);
-            $y < 0
+            ($y < 0)
               ? Math::MPFR::Rmpfr_div_si($r, $x, $y, $ROUND)
               : Math::MPFR::Rmpfr_div_ui($r, $x, $y, $ROUND);
             return $r;
@@ -2502,7 +2516,7 @@ package Sidef::Types::Number::Number {
 
       Scalar__Math_MPFR: {
             my $r = Math::MPFR::Rmpfr_init2($PREC);
-            $x < 0
+            ($x < 0)
               ? Math::MPFR::Rmpfr_si_div($r, $x, $y, $ROUND)
               : Math::MPFR::Rmpfr_ui_div($r, $x, $y, $ROUND);
             return $r;
@@ -3187,7 +3201,18 @@ package Sidef::Types::Number::Number {
     sub isqrt {
         my ($x) = @_;
 
-        $x = _any2mpz($$x) // goto &nan;
+        $x = $$x;
+
+        if (_fits_ulong($x)) {
+            return
+              _set_int(
+                       HAS_PRIME_UTIL
+                       ? Math::Prime::Util::sqrtint(_get_ulong($x))
+                       : Math::Prime::Util::GMP::sqrtint(_get_ulong($x))
+                      );
+        }
+
+        $x = _any2mpz($x) // goto &nan;
         Math::GMPz::Rmpz_sgn($x) < 0 and goto &nan;
 
         my $r = Math::GMPz::Rmpz_init();
@@ -3404,7 +3429,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPFR__Scalar: {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            $y < 0
+            ($y < 0)
               ? Math::MPFR::Rmpfr_pow_si($r, $x, $y, $ROUND)
               : Math::MPFR::Rmpfr_pow_ui($r, $x, $y, $ROUND);
             return $r;
@@ -3437,7 +3462,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPC__Scalar: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            $y < 0
+            ($y < 0)
               ? Math::MPC::Rmpc_pow_si($r, $x, $y, $ROUND)
               : Math::MPC::Rmpc_pow_ui($r, $x, $y, $ROUND);
             return $r;
@@ -9889,7 +9914,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
 
         Math::GMPz::Rmpz_sgn($r) || do {
-            $y < 0
+            ($y < 0)
               ? (goto &nan)
               : (return ZERO);
         };
@@ -9931,7 +9956,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
 
         Math::GMPz::Rmpz_sgn($r) || do {
-            $y < 0
+            ($y < 0)
               ? (goto &nan)
               : (return ZERO);
         };
@@ -11363,7 +11388,7 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
 
-        $y < 0
+        ($y < 0)
           ? Math::GMPz::Rmpz_bin_si($r, $x, $y)
           : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
 
@@ -17660,7 +17685,7 @@ package Sidef::Types::Number::Number {
             );
         }
         else {
-            for (my $k = $from ; $k <= $to ; ++$k) {
+            for (my $k = $from ; $k - 1 < $to ; ++$k) {
                 if (!_is_prob_prime($k)) {
                     push @list, $k;
                 }
@@ -26261,7 +26286,7 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
 
-        $y < 0
+        ($y < 0)
           ? Math::GMPz::Rmpz_div_2exp($r, $x, -$y)
           : Math::GMPz::Rmpz_mul_2exp($r, $x, $y);
 
@@ -26280,7 +26305,7 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
 
-        $y < 0
+        ($y < 0)
           ? Math::GMPz::Rmpz_mul_2exp($r, $x, -$y)
           : Math::GMPz::Rmpz_div_2exp($r, $x, $y);
 
