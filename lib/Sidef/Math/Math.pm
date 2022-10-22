@@ -136,8 +136,14 @@ package Sidef::Math::Math {
             $want_array = 0;
         }
 
+        my @init_terms = @$init;
+
+        if ($#init_terms > $#{$ker}) {
+            $#init_terms = $#{$ker};
+        }
+
         my $A = $self->linear_recurrence_matrix($ker);
-        my $B = Sidef::Types::Array::Matrix->column_vector(@$init);
+        my $B = Sidef::Types::Array::Matrix->column_vector(@init_terms);
 
         my $C   = $A->pow($n_min)->mul($B);
         my @seq = @{$C->transpose->row(0)};
