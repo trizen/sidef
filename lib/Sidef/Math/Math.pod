@@ -145,6 +145,26 @@ Returns the least common multiple (LCM) of a list of integers.
 
 =cut
 
+=head2 linear_recurrence
+
+    Math.linear_recurrence(ker, init, n)
+    Math.linear_recurrence(ker, init, from, to)
+
+Returns the n-th term or the terms with indices in the range C<from> .. C<to> (as an Array object), by iterating the linear recurrence with kernel C<ker> starting with initial values C<init>.
+
+    say Math.linear_recurrence([ 1,1], [1,1], 0, 5)    #=> [1, 1, 2, 3, 5, 8]
+    say Math.linear_recurrence([-3,1], [7,2], 0, 5)    #=> [7, 2, 1, -1, 4, -13]
+
+=cut
+
+=head2 linear_recurrence_matrix
+
+    Math.linear_recurrence_matrix(ker)
+
+Returns a Matrix object that represents the given linear recurrence kernel.
+
+=cut
+
 =head2 map
 
     Math.map(value, in_min, in_max, out_min, out_max)
@@ -280,6 +300,8 @@ Attempts to find a minimal linear recurrence that generates the given array of n
     say Math.solve_rec_seq(30.of { .fibonacci })      #=> [1, 1]
     say Math.solve_rec_seq(30.of { .square })         #=> [3, -3, 1]
     say Math.solve_rec_seq(30.of { .faulhaber(2) })   #=> [4, -6, 4, -1]
+
+Aliases: I<find_linear_recurrence>
 
 =cut
 

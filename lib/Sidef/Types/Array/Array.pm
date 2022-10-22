@@ -2373,14 +2373,14 @@ package Sidef::Types::Array::Array {
 
                 my $entry = $B[$i - 1]->mul($B[$i + 1])->sub($B[$i]->sqr)->div($A[$i]->neg);
 
+                if ($entry->is_nan) {
+                    next;
+                }
+
                 if ($all_zero) {
                     $entry->is_zero or do {
                         $all_zero = 0;
                     }
-                }
-
-                if ($entry->is_nan) {
-                    next;
                 }
 
                 $C[$i - 1] = $entry;

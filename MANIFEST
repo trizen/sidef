@@ -867,6 +867,7 @@ scripts/Tests/man_or_boy.sf
 scripts/Tests/man_or_boy_2.sf
 scripts/Tests/man_or_boy_3.sf
 scripts/Tests/man_or_boy_cached.sf
+scripts/Tests/math_functions.sf
 scripts/Tests/matrix_class.sf
 scripts/Tests/matrix_determinant.sf
 scripts/Tests/matrix_multiplication.sf

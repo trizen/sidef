@@ -104,6 +104,57 @@ package Sidef::Math::Math {
         $seq->solve_rec_seq;
     }
 
+    *find_linear_recurrence = \&solve_rec_seq;
+
+    sub linear_recurrence_matrix {
+        my ($self, $ker) = @_;
+
+        my @A;
+        my $end = $#{$ker};
+
+        foreach my $i (0 .. $end - 1) {
+            foreach my $j (0 .. $end) {
+                $A[$i][$j] =
+                  ($i + 1 == $j)
+                  ? Sidef::Types::Number::Number::ONE
+                  : Sidef::Types::Number::Number::ZERO;
+            }
+        }
+
+        my $A = Sidef::Types::Array::Matrix->new(@A);
+        $A->set_row($end, Sidef::Types::Array::Array->new([CORE::reverse(@$ker)]));
+        return $A;
+    }
+
+    sub linear_recurrence {
+        my ($self, $ker, $init, $n_min, $n_max) = @_;
+
+        my $want_array = 1;
+
+        if (!defined($n_max)) {
+            $n_max      = $n_min;
+            $want_array = 0;
+        }
+
+        my $A = $self->linear_recurrence_matrix($ker);
+        my $B = Sidef::Types::Array::Matrix->column_vector(@$init);
+
+        my $C   = $A->pow($n_min)->mul($B);
+        my @seq = @{$C->transpose->row(0)};
+
+        my $result = Sidef::Types::Range::RangeNumber->new($n_min, $n_max)->map(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    CORE::push(@seq, Sidef::Types::Number::Number::sum(map { $ker->[$_]->mul($seq[-$_ - 1]) } 0 .. $#seq));
+                    CORE::shift(@seq);
+                }
+            )
+        );
+
+        $result = $result->[0] if !$want_array;
+        return $result;
+    }
+
     sub product_tree {
         my ($self, @list) = @_;
 
