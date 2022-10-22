@@ -195,9 +195,9 @@ package Sidef::Types::Number::Polynomial {
         my $degree = 0;
         foreach my $key (CORE::keys(%$x)) {
             if ($key > $degree) {
-                if (!$x->{$key}->is_zero) {
+                $x->{$key}->is_zero or do {
                     $degree = $key;
-                }
+                };
             }
         }
         Sidef::Types::Number::Number::_set_int($degree);

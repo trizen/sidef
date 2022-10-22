@@ -2393,11 +2393,15 @@ package Sidef::Types::Array::Array {
                     return Sidef::Types::Array::Array->new;
                 }
 
+                my $degree = CORE::int($poly->degree);
+
                 my @cf = @{$poly->coeffs};
                 my $d  = (CORE::pop(@cf) // [0, Sidef::Types::Number::Number::ZERO])->[1];
                 my $fc = Sidef::Types::Number::Polynomial->new(map { @$_ } @cf)->div($d->neg)->coeffs;
 
-                return Sidef::Types::Array::Array->new([map { $_->[1] } CORE::reverse(@$fc)]);
+                my %lookup = (map { @$_ } @$fc);
+                return Sidef::Types::Array::Array->new(
+                                  [map { $lookup{$_} // Sidef::Types::Number::Number::ZERO } CORE::reverse(0 .. $degree - 1)]);
             }
 
             @A = @B;
