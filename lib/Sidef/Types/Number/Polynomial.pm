@@ -399,7 +399,13 @@ package Sidef::Types::Number::Polynomial {
                 return $quot;
             }
 
-            return Sidef::Types::Number::Fraction->new($quot->mul($y)->add($rem), $y);
+            my $frac = Sidef::Types::Number::Fraction->new($quot->mul($y)->add($rem), $y);
+
+            if ($frac->is_zero) {
+                return Sidef::Types::Number::Polynomial->new();
+            }
+
+            return $frac;
         }
 
         if ($y->is_zero) {

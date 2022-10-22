@@ -94,6 +94,16 @@ package Sidef::Math::Math {
         $n->div($sum);
     }
 
+    sub solve_seq {
+        my ($self, $seq, $offset) = @_;
+        $seq->solve_seq($offset);
+    }
+
+    sub solve_rec_seq {
+        my ($self, $seq) = @_;
+        $seq->solve_rec_seq;
+    }
+
     sub product_tree {
         my ($self, @list) = @_;
 

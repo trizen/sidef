@@ -80,4 +80,21 @@ do {
     assert(!a.contains('e', 'f', nil))
 }
 
+assert_eq(20.of{_}.solve_rec_seq, [2, -1])
+assert_eq(20.of{.fib}.solve_rec_seq, [1, 1])
+assert_eq(20.of{.lucas}.solve_rec_seq, [1, 1])
+
+assert_eq(10.of{.fib(3)}.solve_rec_seq, [1, 1, 1])
+assert_eq(20.of{.fib(3)}.solve_rec_seq, [1, 1, 1])
+assert_eq(10.of{.fib(4)}.solve_rec_seq, [1, 1, 1, 1])
+assert_eq(20.of{.fib(4)}.solve_rec_seq, [1, 1, 1, 1])
+assert_eq(20.of{.fib(5)}.solve_rec_seq, [1, 1, 1, 1, 1])
+assert_eq(20.of{.fib(6)}.solve_rec_seq, [1, 1, 1, 1, 1, 1])
+
+assert_eq(20.of{.faulhaber(1)}.solve_rec_seq, [3, -3, 1])
+assert_eq(20.of{.faulhaber(2)}.solve_rec_seq, [4, -6, 4, -1])
+assert_eq(20.of{.faulhaber(3)}.solve_rec_seq, [5, -10, 10, -5, 1])
+
+assert_eq(20.of{.factorial}.solve_rec_seq, [100, -4050, 86400, -1058400, 7620480, -31752000, 72576000, -81648000, 36288000, -3628800])
+
 say "** Test passed!"

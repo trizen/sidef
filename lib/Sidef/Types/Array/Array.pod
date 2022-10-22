@@ -2023,6 +2023,20 @@ Aliases: I<scalar_mul>
 
 =cut
 
+=head2 solve_rec_seq
+
+    arr.solve_rec_seq
+
+Attempts to find a minimal linear recurrence that generates the given array of numbers:
+
+    say 30.of { .fibonacci }.solve_rec_seq      #=> [1, 1]
+    say 30.of { .square }.solve_rec_seq         #=> [3, -3, 1]
+    say 30.of { .faulhaber(2) }.solve_rec_seq   #=> [4, -6, 4, -1]
+
+Aliases: I<find_linear_recurrence>
+
+=cut
+
 =head2 solve_seq
 
     arr.solve_seq(offset=0)
@@ -2043,9 +2057,18 @@ Example with offset:
 
 =head2 sort
 
-    Array.sort()
+    arr.sort
+    arr.sort {|a,b| ... }
 
-Returns the
+Returns a new sorted array:
+
+    say [3,2,1,4].sort        #=> [1,2,3,4]
+    say ['c','a','b'].sort    #=> ['a','b','c']
+
+An optional comparison block can be given, which is called with two elements C<a> and C<b> and must return C<-1>, C<0> or C<1>, corresponding to how C<a> and C<b> must be ordered in the returned array:
+
+    say [3,2,1,4].sort {|a,b| a <=> b }     #=> [1,2,3,4]
+    say [3,2,1,4].sort {|a,b| b <=> a }     #=> [4,3,2,1]
 
 =cut
 

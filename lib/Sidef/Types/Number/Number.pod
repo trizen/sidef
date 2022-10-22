@@ -1518,6 +1518,20 @@ Euler's formula applied on C<x>, defined as:
 
 =cut
 
+=head2 idiv_ceil
+
+    idiv_ceil(a,b)
+
+Integer division of integers C<a> and C<b>, rounded towards +Infinity.
+
+When C<a> and C<b> are integers, this is equivalent with:
+
+    ceil(a/b)
+
+Aliases: I<cld>
+
+=cut
+
 =head2 clearbit
 
     n.clearbit(k)
@@ -2590,6 +2604,16 @@ Equivalent with:
 
 =cut
 
+=head2 to_f
+
+    x.to_f
+
+Convert C<x> to a floating-point value number.
+
+Aliases: I<f>, I<float>, I<to_float>
+
+=cut
+
 =head2 factor
 
     factor(n)
@@ -3091,20 +3115,6 @@ Integer cube root of n.
 
 =cut
 
-=head2 idiv_ceil
-
-    idiv_ceil(a,b)
-
-Integer division of integers C<a> and C<b>, rounded towards +Infinity.
-
-When C<a> and C<b> are integers, this is equivalent with:
-
-    ceil(a/b)
-
-Aliases: I<cld>
-
-=cut
-
 =head2 idivisors
 
     idivisors(n)
@@ -3114,34 +3124,6 @@ Returns an array with the infinitary divisors (or i-divisors) of n.
     say 96.idivisors        #=> [1, 2, 3, 6, 16, 32, 48, 96]
 
 Aliases: I<infinitary_divisors>
-
-=cut
-
-=head2 idiv_round
-
-    idiv_round(a,b)
-
-Integer division of integers C<a> and C<b>, rounded towards nearest integer.
-
-When C<a> and C<b> are integers, this is equivalent with:
-
-    floor(a/b + 1/2)
-
-Aliases: I<rdd>
-
-=cut
-
-=head2 idiv_trunc
-
-    idiv_trunc(a,b)
-
-Integer division of integers C<a> and C<b>, rounded towards 0.
-
-When C<a> and C<b> are integers, this is equivalent with:
-
-    trunc(a/b)
-
-Aliases: I<trd>
 
 =cut
 
@@ -6688,6 +6670,20 @@ Returns C<NaN> when C<x> is not a real number.
 
 =cut
 
+=head2 idiv_round
+
+    idiv_round(a,b)
+
+Integer division of integers C<a> and C<b>, rounded towards nearest integer.
+
+When C<a> and C<b> are integers, this is equivalent with:
+
+    floor(a/b + 1/2)
+
+Aliases: I<rdd>
+
+=cut
+
 =head2 re
 
     re(z)
@@ -7563,16 +7559,6 @@ Call a given block of code C<n> times with k = 0,1,2,...,n-1.
 
 =cut
 
-=head2 to_f
-
-    x.to_f
-
-Convert C<x> to a floating-point value number.
-
-Aliases: I<f>, I<float>, I<to_float>
-
-=cut
-
 =head2 to_n
 
     x.to_n
@@ -7609,6 +7595,20 @@ Aliases: I<to_str>
 Euler's totient function.
 
 Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
+
+=cut
+
+=head2 idiv_trunc
+
+    idiv_trunc(a,b)
+
+Integer division of integers C<a> and C<b>, rounded towards 0.
+
+When C<a> and C<b> are integers, this is equivalent with:
+
+    trunc(a/b)
+
+Aliases: I<trd>
 
 =cut
 

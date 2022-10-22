@@ -271,6 +271,36 @@ Example:
 
 =cut
 
+=head2 solve_rec_seq
+
+    Math.solve_rec_seq(array)
+
+Attempts to find a minimal linear recurrence that generates the given array of numbers:
+
+    say Math.solve_rec_seq(30.of { .fibonacci })      #=> [1, 1]
+    say Math.solve_rec_seq(30.of { .square })         #=> [3, -3, 1]
+    say Math.solve_rec_seq(30.of { .faulhaber(2) })   #=> [4, -6, 4, -1]
+
+=cut
+
+=head2 solve_seq
+
+    Math.solve_seq(array, offset=0)
+
+Returns a Polynomial object that generates the terms of the given sequence.
+
+Example:
+
+    say Math.solve_seq(20.of { .square })         #=> x^2
+    say Math.solve_seq(20.of { .faulhaber(2) })   #=> 1/3*x^3 + 1/2*x^2 + 1/6*x
+
+Example with offset:
+
+    say Math.solve_seq(20.of { (_+10)**3 })       #=> x^3 + 30*x^2 + 300*x + 1000
+    say Math.solve_seq(20.of { (_+10)**3 }, 10)   #=> x^3
+
+=cut
+
 =head2 sum
 
     Math.sum(list...)
