@@ -248,6 +248,14 @@ Returns the
 
 =cut
 
+=head2 ascii2bits
+
+    String.ascii2bits()
+
+Returns the
+
+=cut
+
 =head2 backtick
 
     String.backtick()

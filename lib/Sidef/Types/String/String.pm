@@ -332,6 +332,15 @@ package Sidef::Types::String::String {
         bless \$r;
     }
 
+    sub ascii2bits {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new(
+                                        [map { $_ ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::ZERO }
+                                           CORE::split(//, scalar CORE::unpack("B*", $$self))
+                                        ]
+                                       );
+    }
+
     sub decode_base64 {
         state $x = require MIME::Base64;
         bless \MIME::Base64::decode_base64(${$_[0]});
