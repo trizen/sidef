@@ -366,6 +366,14 @@ Returns the
 
 =cut
 
+=head2 lift
+
+    Quaternion.lift()
+
+Returns the
+
+=cut
+
 =head2 neg
 
     Quaternion.neg()

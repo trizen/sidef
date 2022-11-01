@@ -142,7 +142,9 @@ package Sidef::Types::Number::Polynomial {
     }
 
     sub __stringify__ {
-        my ($x) = @_;
+        my ($x, $method) = @_;
+
+        $method //= 'to_s';
 
         my $str  = '';
         my @keys = sort { $b <=> $a } CORE::keys %$x;
@@ -151,7 +153,7 @@ package Sidef::Types::Number::Polynomial {
 
             $str .= ' + ';
 
-            my $c_str = ${$x->{$key}->dump};
+            my $c_str = ${$x->{$key}->$method};
 
             if ($c_str =~ s/^-//) {
                 $str =~ s/ \+ \z/ - /;
@@ -183,7 +185,11 @@ package Sidef::Types::Number::Polynomial {
     }
 
     *stringify = \&to_s;
-    *pretty    = \&to_s;
+
+    sub pretty {
+        my ($x) = @_;
+        Sidef::Types::String::String->new($x->__stringify__('pretty'));
+    }
 
     sub dump {
         my ($x) = @_;
@@ -448,6 +454,11 @@ package Sidef::Types::Number::Polynomial {
         }
 
         __PACKAGE__->new(map { $_ => Sidef::Types::Number::Mod->new($x->{$_}, $y) } CORE::keys %$x);
+    }
+
+    sub lift {
+        my ($x) = @_;
+        __PACKAGE__->new(map { $_ => $x->{$_}->lift } CORE::keys %$x);
     }
 
     sub inv {

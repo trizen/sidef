@@ -39,7 +39,12 @@ package Sidef::Types::Number::Quadratic {
 
     sub eval {
         my ($x, $v) = @_;
-        __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v), $x->{w}->eval($v),);
+        __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v), $x->{w}->eval($v));
+    }
+
+    sub lift {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{a}->lift, $x->{b}->lift, $x->{w}->lift);
     }
 
     sub a {

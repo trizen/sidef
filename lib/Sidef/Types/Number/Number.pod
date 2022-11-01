@@ -4609,6 +4609,14 @@ Dilogarithm function, defined as the integral of C<-log(1-t)/t> from 0 to x.
 
 =cut
 
+=head2 lift
+
+    n.lift
+
+Returns the self object.
+
+=cut
+
 =head2 liouville
 
     liouville(n)
@@ -4947,7 +4955,7 @@ Aliases: I<mfactorial>, I<multi_factorial>
 
 Effective in factoring Carmichael numbers and Fermat pseudoprimes.
 
-It returns an array with the factors of C<n>. However, sometimes, not all factors are prime.
+It returns an array with the factors of C<n>:
 
     say miller_factor(58571442634534443082821160508299574798027946748324125518533225605795841)
 

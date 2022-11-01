@@ -307,6 +307,14 @@ Returns the
 
 =cut
 
+=head2 lift
+
+    Fraction.lift()
+
+Returns the
+
+=cut
+
 =head2 neg
 
     Fraction.neg()
@@ -366,8 +374,6 @@ Returns the
     Fraction.to_n()
 
 Returns the
-
-Aliases: I<lift>
 
 =cut
 

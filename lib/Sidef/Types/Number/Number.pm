@@ -1414,6 +1414,10 @@ package Sidef::Types::Number::Number {
         $_[0];
     }
 
+    sub lift {
+        $_[0];
+    }
+
     sub complex {
         my ($x, $y) = @_;
 
@@ -2419,7 +2423,8 @@ package Sidef::Types::Number::Number {
             if (Math::GMPz::Rmpz_divisible_ui_p($x, CORE::abs($y))) {
                 my $r = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_divexact_ui($r, $x, CORE::abs($y));
-                Math::GMPz::Rmpz_neg($r, $r) if ($y < 0);
+                Math::GMPz::Rmpz_neg($r, $r)     if ($y < 0);
+                $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
                 return $r;
             }
 
@@ -2603,6 +2608,7 @@ package Sidef::Types::Number::Number {
             if (Math::GMPz::Rmpz_divisible_p($x, $y)) {
                 my $r = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_divexact($r, $x, $y);
+                $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
                 return $r;
             }
 
@@ -2819,8 +2825,17 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2mpz($$y) // (goto &nan);
+        $x = $$x;
+        $y = $$y;
+
+        if (HAS_NEW_PRIME_UTIL and _fits_ulong($x) and _fits_ulong($y)) {
+            if (my $de = _get_ulong($y)) {
+                return _set_int(Math::Prime::Util::divint(_get_ulong($x), $de));
+            }
+        }
+
+        $x = _any2mpz($x) // (goto &nan);
+        $y = _any2mpz($y) // (goto &nan);
 
         # Detect division by zero
         Math::GMPz::Rmpz_sgn($y) || do {
@@ -2839,6 +2854,7 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_div($r, $x, $y);
+        $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
         bless \$r;
     }
 
@@ -8089,11 +8105,23 @@ package Sidef::Types::Number::Number {
             #$x = _any2mpz($x);
             #$y = _any2mpz($y);
             #goto Math_GMPz__Math_GMPz;
-            my $r = $x % $y;    # TODO: check if this is always correct
-            return $r;
+
+            return $x % $y;    # TODO: make sure this is always correct
         }
 
       Scalar__Math_GMPz: {
+
+            # y is a native integer
+            if (Math::GMPz::Rmpz_fits_ulong_p($y)) {
+                $y = Math::GMPz::Rmpz_get_ui($y) || goto &_nan;
+                return $x % $y;
+            }
+
+            # x is positive and y > x
+            if ($x > 0 and Math::GMPz::Rmpz_cmp_ui($y, $x) > 0) {
+                return $x;
+            }
+
             $x = _any2mpz($x);
             goto Math_GMPz__Math_GMPz;
         }
@@ -14492,8 +14520,8 @@ package Sidef::Types::Number::Number {
                 $k = _prev_prime($k);
             }
 
+            my $cmp = ($n <=> $count);
             while ($count != $n) {
-                my $cmp = ($n <=> $count);
                 $k = ($cmp < 0) ? _prev_prime($k) : _next_prime($k);
                 $count += $cmp;
             }
@@ -14588,11 +14616,9 @@ package Sidef::Types::Number::Number {
             --$k;
         }
 
+        my $cmp = ($n <=> $count);
         while ($count != $n) {
-            my $cmp = ($n <=> $count);
-            do {
-                $k += $cmp;
-              }
+            do { $k += $cmp }
               until (
                      HAS_PRIME_UTIL
                      ? Math::Prime::Util::is_prime_power($k)
@@ -14692,11 +14718,9 @@ package Sidef::Types::Number::Number {
             --$k;
         }
 
+        my $cmp = ($n <=> $count);
         while ($count != $n) {
-            my $cmp = ($n <=> $count);
-            do {
-                $k += $cmp;
-            } while _is_prob_prime($k);
+            do { $k += $cmp } while _is_prob_prime($k);
             $count += $cmp;
         }
 
@@ -14776,11 +14800,9 @@ package Sidef::Types::Number::Number {
             --$k;
         }
 
+        my $cmp = ($n <=> $count);
         while ($count != $n) {
-            my $cmp = ($n <=> $count);
-            do {
-                $k += $cmp;
-            } until _is_squarefree($k);
+            do { $k += $cmp } until _is_squarefree($k);
             $count += $cmp;
         }
 
@@ -14864,8 +14886,8 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_sub_ui($v, $v, 1);
         }
 
-        while (1) {
-            my $cmp = __cmp__($n, $count) || last;
+        my $cmp = __cmp__($n, $count);
+        while ($cmp && __ne__($n, $count)) {
             do {
                 ($cmp > 0)
                   ? Math::GMPz::Rmpz_add_ui($v, $v, 1)
@@ -15982,15 +16004,17 @@ package Sidef::Types::Number::Number {
 
         Memoize::unmemoize('_prime_count');
 
-        until (Math::Prime::Util::GMP::is_semiprime($k)) {
+        until (
+               HAS_PRIME_UTIL
+               ? Math::Prime::Util::is_semiprime($k)
+               : Math::Prime::Util::GMP::is_semiprime($k)
+          ) {
             --$k;
         }
 
+        my $cmp = ($n <=> $count);
         while ($count != $n) {
-            my $cmp = ($n <=> $count);
-            do {
-                $k += $cmp;
-              }
+            do { $k += $cmp }
               until (
                      HAS_PRIME_UTIL
                      ? Math::Prime::Util::is_semiprime($k)

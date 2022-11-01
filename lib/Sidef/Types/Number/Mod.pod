@@ -263,6 +263,14 @@ Returns the
 
 =cut
 
+=head2 dump
+
+    Mod.dump()
+
+Returns the
+
+=cut
+
 =head2 eval
 
     Mod.eval()
@@ -423,6 +431,14 @@ Returns the
 
 =cut
 
+=head2 pretty
+
+    Mod.pretty()
+
+Returns the
+
+=cut
+
 =head2 re
 
     Mod.re()
@@ -456,8 +472,6 @@ Aliases: I<lift>
     Mod.to_s()
 
 Returns the
-
-Aliases: I<dump>
 
 =cut
 

@@ -40,6 +40,11 @@ package Sidef::Types::Number::Gauss {
         __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v));
     }
 
+    sub lift {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{a}->lift, $x->{b}->lift);
+    }
+
     sub i {
         my ($x) = @_;
 

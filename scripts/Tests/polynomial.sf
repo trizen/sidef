@@ -19,7 +19,7 @@ assert_eq(
 )
 
 assert_eq(
-    faulhaber_formula(20).to_s,
+    faulhaber_formula(20).pretty,
     "1/21*x^21 + 1/2*x^20 + 5/3*x^19 - 19/2*x^17 + 1292/21*x^15 - 323*x^13 + 41990/33*x^11 - 223193/63*x^9 + 6460*x^7 - 68723/10*x^5 + 219335/63*x^3 - 174611/330*x"
 )
 
@@ -87,7 +87,7 @@ with (Poly([1,2,3,4])) {|p|
     assert_eq(Poly(3 => 10) + Poly(0 => 42), Poly(0 => +42, 3 => 10))
     assert_eq(Poly(3 => 10) - Poly(0 => 42), Poly(0 => -42, 3 => 10))
 
-    assert_eq(lift(Mod(p, 97)**10) <=> p.powmod(10, 97), 0)
+    assert_eq(Mod(p, 97)**10 <=> p.powmod(10, 97), 0)
     assert_eq(p**3 <=> p**2, 1)
     assert_eq(p**2 <=> p**3, -1)
 
@@ -104,12 +104,12 @@ with (Poly([1,2,3,4])) {|p|
     )
 
     assert_ne(
-        lift(Mod(Poly([1,2,3]), 97)**10),
+        Mod(Poly([1,2,3]), 97)**10,
         Poly([1,2,3]).powmod(11, 97)
     )
 
     assert_eq(
-        lift(Mod(Poly([1,2,3]), 97)**10),
+        Mod(Poly([1,2,3]), 97)**10,
         Poly([1,2,3]).powmod(10, 97)
     )
 }
@@ -214,14 +214,34 @@ with (Poly(1 => 1)) {|x|
     assert_eq(1/p, p.inv)
     assert_eq(2/p, 2*p.inv)
 
-    assert_eq(p.powmod(+5, 97), lift(Mod(p, 97)**+5))
-    assert_eq(p.powmod(-5, 97), lift(Mod(p, 97)**-5))
+    assert_eq(p.powmod(+5, 97), (Mod(p, 97)**+5))
+    assert_eq(p.powmod(-5, 97), (Mod(p, 97)**-5))
+
+    assert_eq(
+        (Mod(p, 97)**+5) -> pretty,
+        'Mod(21, 97)*x^10 + Mod(50, 97)*x^9 + Mod(80, 97)*x^8 + Mod(54, 97)*x^7 + Mod(60, 97)*x^6 + Mod(90, 97)*x^5 + Mod(35, 97)*x^4 + Mod(79, 97)*x^3 + Mod(6, 97)*x^2 + Mod(81, 97)*x + Mod(31, 97)'
+    )
+
+    assert_eq(
+        (Mod(p, 97)**+5) -> lift.pretty,
+        '21*x^10 + 50*x^9 + 80*x^8 + 54*x^7 + 60*x^6 + 90*x^5 + 35*x^4 + 79*x^3 + 6*x^2 + 81*x + 31'
+    )
+
+    assert_eq(
+        Mod(p, 97)**-6 -> pretty,
+        '(1)/(Mod(8, 97)*x^12 + Mod(9, 97)*x^11 + Mod(11, 97)*x^10 + Mod(22, 97)*x^9 + Mod(6, 97)*x^8 + Mod(9, 97)*x^7 + Mod(10, 97)*x^6 + Mod(78, 97)*x^5 + Mod(95, 97)*x^4 + Mod(55, 97)*x^3 + Mod(12, 97)*x^2 + Mod(41, 97)*x + Mod(50, 97))'
+    )
+
+    assert_eq(
+        Mod(p, 97)**-6 -> lift.pretty,
+        '(1)/(8*x^12 + 9*x^11 + 11*x^10 + 22*x^9 + 6*x^8 + 9*x^7 + 10*x^6 + 78*x^5 + 95*x^4 + 55*x^3 + 12*x^2 + 41*x + 50)'
+    )
 
     assert_eq(Mod(p.powmod(+6, 97), 97), Mod(p, 97)**+6)
     assert_eq(Mod(p.powmod(-6, 97), 97), Mod(p, 97)**-6)
 
     assert_eq(p.powmod(+6, 97).eval(42), Mod(85, 97))
-    assert_eq([p.powmod(-6, 97).nude].map { .kind_of(Polynomial) ? .eval(42) : _ }.reduce('/'), 1/577294259220123291015625)
+    assert_eq([p.powmod(-6, 97).nude].map { .eval(42) }.reduce('/'), 1/577294259220123291015625)
 
     assert_eq(Polynomial(0 => 123, 1 => 4/3, 2 => 4, 3 => 3), Poly([3,4,4/3,123]))
 
@@ -360,6 +380,55 @@ do {
     assert_eq(Poly([32]) % Poly([99, 42]), 32)
     assert_eq(Poly().to_s, '0')
     assert_eq(Poly(1).to_s, 'x')
+}
+
+do {
+    var x = Poly(1);
+
+    var t = (Mod(Mod(6, 541)*x + Mod(540, 541), 541)*x  * Mod(Mod(36, 541)*x*x + Mod(529, 541)*x + Mod(1, 541), 541))
+    var m = (x*x + Mod(Mod(535, 541)*x + Mod(1, 541), 541))
+
+    assert_eq(t % m, Mod(357, 541)*x + Mod(103, 541))
+    assert_eq([divmod(t, m)], [Mod(216, 541)*x**2 + Mod(106, 541)*x + Mod(438, 541), Mod(357, 541)*x + Mod(103, 541)])
+}
+
+do {
+    # Algorithm due to Paul Underwood:
+    #   https://mersenneforum.org/showpost.php?p=592064&postcount=1
+
+    func RDPRP(n) {
+
+        if (n==2 || n==3 || n==7) {
+            return true
+        }
+
+        if (n<2 || n.is_even || n.is_div(3) || n.is_div(7) || n.is_square) {
+            return false
+        }
+
+        var k = kronecker(2, n)
+        if (Mod(2, n)**((n-1)/2) != k) {
+            return false
+        }
+
+        var r = 0
+        var t = Mod(4, n)**r
+        while ((kronecker(t.lift - 8, n) != -1) || (gcd((r-1)*(2*r - 1), n-1) > 3)) {
+            ++r
+            t *= 4
+        }
+        var z = Poly(1)
+        Mod(Mod(z, n), z**2 - (t/2 - 2)*z + 1)**((n+1)/2) == k
+    }
+
+    assert(!RDPRP(341))
+    assert(!RDPRP(561))
+    assert(RDPRP(541))
+    assert(!RDPRP(530881))
+    assert(!RDPRP(2**256 + 1))
+    assert(RDPRP(2**127 - 1))
+    assert(!RDPRP(1e100.irand.next_composite))
+    assert(RDPRP(1e100.random_prime))
 }
 
 say "** Test passed!"

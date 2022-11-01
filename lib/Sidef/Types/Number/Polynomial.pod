@@ -353,6 +353,14 @@ Aliases: I<exponents>
 
 =cut
 
+=head2 lift
+
+    Polynomial.lift()
+
+Returns the
+
+=cut
+
 =head2 neg
 
     Polynomial.neg()
@@ -382,6 +390,14 @@ Returns the
 =head2 powmod
 
     Polynomial.powmod()
+
+Returns the
+
+=cut
+
+=head2 pretty
+
+    Polynomial.pretty()
 
 Returns the
 
@@ -435,6 +451,6 @@ Returns the
 
 Returns the
 
-Aliases: I<pretty>, I<stringify>
+Aliases: I<stringify>
 
 =cut

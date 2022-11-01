@@ -352,6 +352,14 @@ Returns the
 
 =cut
 
+=head2 lift
+
+    Quadratic.lift()
+
+Returns the
+
+=cut
+
 =head2 neg
 
     Quadratic.neg()

@@ -407,6 +407,14 @@ Returns the
 
 =cut
 
+=head2 lift
+
+    Gauss.lift()
+
+Returns the
+
+=cut
+
 =head2 neg
 
     Gauss.neg()

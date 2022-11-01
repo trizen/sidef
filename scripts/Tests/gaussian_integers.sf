@@ -271,6 +271,7 @@ do {
 
 do {
     assert_eq(43 % Gauss(13, 24), Gauss(43,0) % Gauss(13, 24))
+    assert_eq(Gauss(Mod(Poly(3,4), 127), 923).lift, Gauss(Polynomial(3 => 4), 923))
 }
 
 say "** Test passed!"
