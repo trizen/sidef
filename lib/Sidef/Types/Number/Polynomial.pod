@@ -183,6 +183,14 @@ Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
+=head2 abs
+
+    Polynomial.abs()
+
+Returns the
+
+=cut
+
 =head2 binomial
 
     Polynomial.binomial()
@@ -271,6 +279,22 @@ Returns the
 
 =cut
 
+=head2 gcd
+
+    Polynomial.gcd()
+
+Returns the
+
+=cut
+
+=head2 gcdext
+
+    Polynomial.gcdext()
+
+Returns the
+
+=cut
+
 =head2 inv
 
     Polynomial.inv()
@@ -353,6 +377,14 @@ Aliases: I<exponents>
 
 =cut
 
+=head2 lcm
+
+    Polynomial.lcm()
+
+Returns the
+
+=cut
+
 =head2 lift
 
     Polynomial.lift()
@@ -416,6 +448,14 @@ Aliases: I<real>
 =head2 round
 
     Polynomial.round()
+
+Returns the
+
+=cut
+
+=head2 sgn
+
+    Polynomial.sgn()
 
 Returns the
 

@@ -376,6 +376,76 @@ package Sidef::Types::Number::Polynomial {
         return ($q, $r);
     }
 
+    sub sgn {
+        my ($x)   = @_;
+        my ($deg) = sort { $b <=> $a } CORE::keys(%$x);
+        $x->{$deg}->sgn;
+    }
+
+    sub abs {
+        my ($x) = @_;
+        $x->mul($x->sgn);
+    }
+
+    sub lcm {
+        my ($x, $y) = @_;
+        $x->mul($y)->abs->div($x->gcd($y));
+    }
+
+    sub gcd {
+        my ($x, $y) = @_;
+
+        # Reference:
+        #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclid's_algorithm
+
+        my $r0 = $x;
+        my $r1 = $y;
+
+        until ($r1->is_zero) {
+            my $r = $r0->mod($r1);
+            ($r0, $r1) = ($r1, $r);
+        }
+
+        return $r0;
+    }
+
+    sub gcdext {
+        my ($x, $y) = @_;
+
+        # Reference:
+        #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#B%C3%A9zout's_identity_and_extended_GCD_algorithm
+
+        if (ref($y) ne __PACKAGE__) {
+            $y = __PACKAGE__->new(0 => $y);
+        }
+
+        my $r0 = $x;
+        my $r1 = $y;
+
+        my $s0 = Sidef::Types::Number::Number::ONE;
+        my $s1 = Sidef::Types::Number::Number::ZERO;
+        my $t0 = Sidef::Types::Number::Number::ZERO;
+        my $t1 = Sidef::Types::Number::Number::ONE;
+
+        my $i = 1;
+        until ($r1->is_zero) {
+            my ($q) = $r0->divmod($r1);
+            ($r0, $r1) = ($r1, $r0->sub($q->mul($r1)));
+            ($s0, $s1) = ($s1, $s0->sub($q->mul($s1)));
+            ($t0, $t1) = ($t1, $t0->sub($q->mul($t1)));
+            ++$i;
+        }
+
+        my $g = $r0;
+        my $u = $s0;
+        my $v = $t0;
+
+        my $a1 = $t1->mul(Sidef::Types::Number::Number::MONE->ipow(Sidef::Types::Number::Number::_set_int($i - 1)));
+        my $b1 = $s1->mul(Sidef::Types::Number::Number::MONE->ipow(Sidef::Types::Number::Number::_set_int($i)));
+
+        return ($g, $u, $v, $a1, $b1);
+    }
+
     sub idiv {
         my ($x, $y) = @_;
 

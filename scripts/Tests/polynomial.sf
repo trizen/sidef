@@ -433,4 +433,21 @@ do {
 
 assert([divmod(Poly([1,2,3,NaN,4,5,6]), Poly([43,1,2]))][0].is_nan)
 
+do {
+    var z = Poly(1)
+
+    var a = (7*z**4 + 21*z**3 + 14*z**2)
+    var b = (3*z**3 - 6*z**2 - 9*z)
+
+    # FIXME: gcd() and lcm() does not much the output of PARI/GP
+    assert_eq(gcd(a, b), Polynomial(1 => 105, 2 => 105))
+    assert_eq(lcm(a, b), Polynomial(2 => -6/5, 3 => -7/5, 5 => 1/5))
+
+    var (g, u, v, a1, b1) = gcdext(a,b)
+    assert_eq(g, gcd(a,b))
+    assert_eq(a1*g, a)
+    assert_eq(b1*g, b)
+    assert_eq(a*u + b*v, g)
+}
+
 say "** Test passed!"
