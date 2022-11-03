@@ -431,4 +431,6 @@ do {
     assert(RDPRP(1e100.random_prime))
 }
 
+assert([divmod(Poly([1,2,3,NaN,4,5,6]), Poly([43,1,2]))][0].is_nan)
+
 say "** Test passed!"

@@ -334,7 +334,8 @@ package Sidef::Types::Number::Polynomial {
     sub divmod {
         my ($x, $y) = @_;
 
-        # TODO: optimize this method for better performance.
+        # Reference:
+        #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclidean_division
 
         my @keys_x = sort { $b <=> $a } CORE::keys %$x;
         my @keys_y = sort { $b <=> $a } CORE::keys %$y;
@@ -345,36 +346,34 @@ package Sidef::Types::Number::Polynomial {
         @keys_y
           || return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf()), __PACKAGE__->new());
 
-        my $key_y = shift @keys_y;
-        my $yc    = $y->{$key_y};
+        my $q = __PACKAGE__->new();
+        my $r = $x;
 
-        my $quot = __PACKAGE__->new();
+        my $d     = $keys_y[0];          # deg(y)
+        my $c     = $y->{$keys_y[0]};    # lc(y)
+        my $deg_r = $keys_x[0];          # deg(r)
 
-        while (1) {
-            my $key_x = $keys_x[0];
-            my $xc    = $x->{$key_x};
-            my $q     = $xc->div($yc);
+        while ($deg_r >= $d) {
+
+            my $lc = $r->{$deg_r};       # lc(r)
+            my $t  = $lc->div($c);       # lc(r)/c
 
             # When the result of division is NaN, the loop never stops
-            if ($q->is_nan) {
+            if ($t->is_nan) {
                 return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::nan()), __PACKAGE__->new());
             }
 
-            # Stop when the degree is < 0
-            if ($key_x < $key_y) {
-                last;
-            }
+            # s := lc(r)/c * x^(deg(r)−d)
+            my $s = __PACKAGE__->new($deg_r - $d, $t);
+            $q = $q->add($s);
+            $r = $r->sub($s->mul($y));
 
-            my $t = __PACKAGE__->new($key_x - $key_y, $q);
-
-            $quot = $quot->add($t);
-            $x    = $x->sub($t->mul($y));
-
-            @keys_x = sort { $b <=> $a } CORE::keys %$x;
-            (@keys_x and $keys_x[0] >= $key_y) or last;
+            # Find deg(r) for the new r
+            my @keys_r = sort { $b <=> $a } CORE::keys(%$r);
+            $deg_r = (@keys_r ? $keys_r[0] : last);
         }
 
-        return ($quot, $x);
+        return ($q, $r);
     }
 
     sub idiv {
