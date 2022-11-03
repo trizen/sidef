@@ -448,6 +448,13 @@ do {
     assert_eq(a1*g, a)
     assert_eq(b1*g, b)
     assert_eq(a*u + b*v, g)
+
+    var t = ((3 - 5*z)*(2 + z))
+    var C = t.coeffs
+
+    assert_eq(t, Poly(C))
+    assert_eq(Poly(C.first(-1)), -7*z + 6)
+    assert_eq(Poly(C.last(-1)), -5*z**2 - 7*z)
 }
 
 say "** Test passed!"

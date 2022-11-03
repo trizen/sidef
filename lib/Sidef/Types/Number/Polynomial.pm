@@ -30,7 +30,12 @@ package Sidef::Types::Number::Polynomial {
 
             if (UNIVERSAL::isa($value, 'Sidef::Types::Array::Array')) {
                 my $end = $#{$value};
-                return __PACKAGE__->new(map { ($end - $_) => $value->[$_] } 0 .. $end);
+                return __PACKAGE__->new(
+                    map {
+                        my $t = $value->[$_];
+                        UNIVERSAL::isa($t, 'Sidef::Types::Array::Array') ? (($t->[0], $t->[1])) : (($end - $_) => $t)
+                      } 0 .. $end
+                );
             }
 
             if (UNIVERSAL::isa($value, 'Sidef::Types::Number::Number')) {    # monomial
