@@ -44,7 +44,7 @@ func orbital_state_vectors(
     speed.mul!(sqrt(2/r - 1/semimajor_axis))
 
     struct Result { position, speed }
-    Result([position,speed].map {|v| [v{:module}[]].map{Num(_)} }...)
+    Result([position,speed].map {|v| [v{:module}[]].map{ Num(_) } }...)
 }
 
 var r = orbital_state_vectors(

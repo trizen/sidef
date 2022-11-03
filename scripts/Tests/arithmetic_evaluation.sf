@@ -36,14 +36,14 @@ func evalArithmeticExp(s) {
 
         while (var match = reMD.match(s)) {
             match[0] ~~ reM
-                ? s.sub!(reMD, operate(match[0], '*').to_s)
-                : s.sub!(reMD, operate(match[0], '/').to_s);
+                ? s.sub!(reMD, operate(match[0], '*').float.to_s)
+                : s.sub!(reMD, operate(match[0], '/').float.to_s);
         }
 
         while (var match = reAS.match(s)) {
             match[0] ~~ reA
-                ? s.sub!(reAS,      add(match[0]).to_s)
-                : s.sub!(reAS, subtract(match[0]).to_s);
+                ? s.sub!(reAS,      add(match[0]).float.to_s)
+                : s.sub!(reAS, subtract(match[0]).float.to_s);
         }
 
         return s;

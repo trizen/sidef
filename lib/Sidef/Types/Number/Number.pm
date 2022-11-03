@@ -1283,7 +1283,7 @@ package Sidef::Types::Number::Number {
 
       Math_GMPq: {
 
-            #~ return Math::GMPq::Rmpq_get_str($x, 10);
+            return Math::GMPq::Rmpq_get_str($x, 10);
 
             Math::GMPq::Rmpq_integer_p($x)
               && return Math::GMPq::Rmpq_get_str($x, 10);
@@ -1371,8 +1371,16 @@ package Sidef::Types::Number::Number {
     }
 
     sub get_value {
-        (@_) = (${$_[0]});
-        goto &__stringify__;
+        my ($x) = @_;
+
+        $x = $$x;
+
+        # Convert fraction to a floating-point value, so it can be passed to Perl modules
+        if (ref($x) eq 'Math::GMPq' and !Math::GMPq::Rmpq_integer_p($x)) {
+            $x = _mpq2mpfr($x);
+        }
+
+        __stringify__($x);
     }
 
     #

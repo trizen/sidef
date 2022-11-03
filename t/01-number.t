@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 167;
+use Test::More tests => 169;
 
 use Sidef;
 
@@ -150,7 +150,8 @@ my $o = 'Sidef::Types::Number::Number';
     like($o->new(2)->sqrt,                qr/^1\.414213562/);
     like($o->new(100)->log,               qr/^4\.605170185/);
     like($o->new(10)->exp,                qr/^22026\.46579/);
-    like($o->new(-4.5)->abs,              qr/^4.5\z/);
+    like($o->new(-4.5)->abs->float,       qr/^4.5\z/);
+    like($o->new(-4.5)->float->abs,       qr/^4.5\z/);
     like($o->new(10)->abs,                qr/^10\z/);
     like($o->new(2.9)->floor,             qr/^2\z/);
     like($o->new(2.5)->floor,             qr/^2\z/);
@@ -283,9 +284,9 @@ ok(!($x->gt($y)));
 ok($x->lt($y));
 ok(!($x->eq($y)));
 
-#$x = $o->new('-124');
-#$y = $o->new('-122');
-#is($x->acmp($y), $o->new(1));
+$x = $o->new('-124');
+$y = $o->new('-122');
+is($x->acmp($y), $o->new(1));
 
 $x = $o->new('-124');
 $y = $o->new('-122');
@@ -360,15 +361,15 @@ is("$x", '8');
 
 $x = $o->new('1/2')->pow($o->new('3'));
 is($x->as_frac->get_value, '1/8');
-is("$x",                   '0.125');
+is("$x",                   '1/8');
 
 $x = $o->new('1/3')->pow($o->new('4'));
 is($x->as_frac->get_value, '1/81');
-like("$x", qr/^0\.0123456790123456790123456790123456790123456790\d*\z/);
+is("$x", '1/81');
 
 $x = $o->new('2/3')->pow($o->new(4));
 is($x->as_frac->get_value, '16/81');
-like("$x", qr/^0\.197530864197530864197530864197530864197530864\d*\z/);
+is("$x", "16/81");
 
 $x = $o->new('2/3')->pow($o->new('5/3'));
 like("$x", qr/^0\.50876188557925/);

@@ -50,16 +50,16 @@ $r = $int1->neg->pow($int2->dec);
 ok($r eq $int1->pow($int2->dec->abs)->inv->neg);
 
 $r = $int2->pow($int1->neg);
-is("$r", "-0.015625");
+is("$r", "-1/64");
 
 $r = $int2->pow($int1->neg->inc);
-is("$r", "0.0625");
+is("$r", "1/16");
 
 #################################################################
 # float + int
 
-my $float1 = $o->new(3.45);
-my $float2 = $o->new(-5.67);
+my $float1 = $o->new(3.45)->float;
+my $float2 = $o->new(-5.67)->float;
 
 $r = $float1->pow($int1);
 is("$r", "41.063625");
