@@ -3300,6 +3300,7 @@ package Sidef::Types::Number::Number {
       Scalar__Scalar: {
             if ($x > 0 and $y >= 0) {
                 if (CORE::log($x) * $y < CORE::log(ULONG_MAX)) {
+                    $x == 1 and return 1;
                     my $r = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::powint($x, $y) : Math::Prime::Util::GMP::powint($x, $y));
                     if ($r < ULONG_MAX and $r > LONG_MIN) {
                         return $r;

@@ -449,6 +449,14 @@ Aliases: I<real>
 
 =cut
 
+=head2 sqr
+
+    Mod.sqr()
+
+Returns the
+
+=cut
+
 =head2 sqrt
 
     Mod.sqrt()
