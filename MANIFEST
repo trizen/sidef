@@ -515,6 +515,7 @@ scripts/RosettaCode/nth.sf
 scripts/RosettaCode/nth_root.sf
 scripts/RosettaCode/orbital_elements.sf
 scripts/RosettaCode/orbital_elements_2.sf
+scripts/RosettaCode/orbital_elements_3.sf
 scripts/RosettaCode/order_disjoint_list_items.sf
 scripts/RosettaCode/ordered_partitions.sf
 scripts/RosettaCode/pangram_checker.sf

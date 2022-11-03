@@ -12,8 +12,7 @@ func orbital_state_vectors(
     argument_of_periapsis,
     true_anomaly
 ) {
-    static vec = frequire('Math::Vector::Real')
-    var (i, j, k) = (vec.V(1,0,0), vec.V(0,1,0), vec.V(0,0,1))
+    var (i, j, k) = (Vec(1,0,0), Vec(0,1,0), Vec(0,0,1))
 
     func muladd(v1, x1, v2, x2) {
         v1.mul(x1).add(v2.mul(x2))
@@ -44,7 +43,7 @@ func orbital_state_vectors(
     speed.mul!(sqrt(2/r - 1/semimajor_axis))
 
     struct Result { position, speed }
-    Result([position,speed].map {|v| [v{:module}[]].map{ Num(_) } }...)
+    Result(position, speed)
 }
 
 var r = orbital_state_vectors(
@@ -59,5 +58,9 @@ var r = orbital_state_vectors(
 say '['+r.position.join(', ')+']'
 say '['+r.speed.join(', ')+']'
 
-assert_eq(r.position, [0.77942284339868, 0.450000034653684, 0])
-assert_eq(r.speed, [-0.552770840960444, 0.957427083179761, 0])
+assert_eq(r.position.round(-15), [0.77942284339868f, 0.450000034653684f, 0])
+assert_eq(r.speed.round(-15), [-0.552770840960444f, 0.957427083179762f, 0])
+
+__END__
+[0.779422843398679832042176328223663037464703527986, 0.450000034653684237432302249506712706822033851071, 0]
+[-0.552770840960443759673279062314259546277084494097, 0.957427083179761535246200368614952095349966503287, 0]

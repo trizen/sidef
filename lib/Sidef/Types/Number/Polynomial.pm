@@ -8,6 +8,8 @@ package Sidef::Types::Number::Polynomial {
     use utf8;
     use 5.016;
 
+    require List::Util;
+
     use parent qw(
       Sidef::Types::Number::Number
     );
@@ -203,15 +205,7 @@ package Sidef::Types::Number::Polynomial {
 
     sub degree {
         my ($x) = @_;
-        my $degree = 0;
-        foreach my $key (CORE::keys(%$x)) {
-            if ($key > $degree) {
-                $x->{$key}->is_zero or do {
-                    $degree = $key;
-                };
-            }
-        }
-        Sidef::Types::Number::Number::_set_int($degree);
+        Sidef::Types::Number::Number::_set_int(List::Util::max(CORE::keys(%$x)) // 0);
     }
 
     sub derivative {
@@ -342,48 +336,41 @@ package Sidef::Types::Number::Polynomial {
         # Reference:
         #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclidean_division
 
-        my @keys_x = sort { $b <=> $a } CORE::keys %$x;
-        my @keys_y = sort { $b <=> $a } CORE::keys %$y;
+        my $deg_r = List::Util::max(CORE::keys(%$x));    # deg(x)
+        $deg_r // return (__PACKAGE__->new(), __PACKAGE__->new());
 
-        @keys_x
-          || return (__PACKAGE__->new(), __PACKAGE__->new());
-
-        @keys_y
-          || return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf()), __PACKAGE__->new());
+        my $deg_y = List::Util::max(CORE::keys(%$y));    # deg(y)
+        $deg_y // return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf()), __PACKAGE__->new());
 
         my $q = __PACKAGE__->new();
         my $r = $x;
+        my $c = $y->{$deg_y};                            # lc(y)
 
-        my $d     = $keys_y[0];          # deg(y)
-        my $c     = $y->{$keys_y[0]};    # lc(y)
-        my $deg_r = $keys_x[0];          # deg(r)
+        while ($deg_r >= $deg_y) {
 
-        while ($deg_r >= $d) {
-
-            my $lc = $r->{$deg_r};       # lc(r)
-            my $t  = $lc->div($c);       # lc(r)/c
+            my $lc = $r->{$deg_r};                       # lc(r)
+            my $t  = $lc->div($c);                       # lc(r)/c
 
             # When the result of division is NaN, the loop never stops
             if ($t->is_nan) {
                 return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::nan()), __PACKAGE__->new());
             }
 
-            # s := lc(r)/c * x^(deg(r)−d)
-            my $s = __PACKAGE__->new($deg_r - $d, $t);
+            # s := lc(r)/c * x^(deg(r)−deg(y))
+            my $s = __PACKAGE__->new($deg_r - $deg_y, $t);
             $q = $q->add($s);
             $r = $r->sub($s->mul($y));
 
             # Find deg(r) for the new r
-            my @keys_r = sort { $b <=> $a } CORE::keys(%$r);
-            $deg_r = (@keys_r ? $keys_r[0] : last);
+            $deg_r = List::Util::max(CORE::keys(%$r)) // last;
         }
 
         return ($q, $r);
     }
 
     sub sgn {
-        my ($x)   = @_;
-        my ($deg) = sort { $b <=> $a } CORE::keys(%$x);
+        my ($x) = @_;
+        my $deg = List::Util::max(CORE::keys(%$x)) // return Sidef::Types::Number::Number::ZERO;
         $x->{$deg}->sgn;
     }
 
@@ -635,8 +622,8 @@ package Sidef::Types::Number::Polynomial {
 
         if (ref($y) eq __PACKAGE__) {
 
-            my @keys_x = grep { !$x->{$_}->is_zero } sort { $a <=> $b } CORE::keys %$x;
-            my @keys_y = grep { !$y->{$_}->is_zero } sort { $a <=> $b } CORE::keys %$y;
+            my @keys_x = sort { $a <=> $b } CORE::keys %$x;
+            my @keys_y = sort { $a <=> $b } CORE::keys %$y;
 
             scalar(@keys_x) == scalar(@keys_y)
               or return Sidef::Types::Number::Number::_set_int(scalar(@keys_x) <=> scalar(@keys_y));
