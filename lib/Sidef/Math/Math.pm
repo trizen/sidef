@@ -161,6 +161,28 @@ package Sidef::Math::Math {
         return $result;
     }
 
+    *linear_rec = \&linear_recurrence;
+
+    sub linear_recurrence_mod {
+        my ($self, $ker, $init, $n, $m) = @_;
+
+        my @init_terms = @$init;
+
+        if ($#init_terms > $#{$ker}) {
+            $#init_terms = $#{$ker};
+        }
+
+        my $A = $self->linear_recurrence_matrix($ker);
+        my $B = Sidef::Types::Array::Matrix->column_vector(@init_terms);
+
+        my $C   = $A->powmod($n, $m)->mul($B);
+        my @seq = @{$C->transpose->row(0)};
+
+        $seq[0]->mod($m);
+    }
+
+    *linear_recmod = \&linear_recurrence_mod;
+
     sub product_tree {
         my ($self, @list) = @_;
 
