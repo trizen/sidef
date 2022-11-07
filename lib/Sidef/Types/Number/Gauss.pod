@@ -229,7 +229,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 a
 
-    Gauss.a()
+    self.a
 
 Returns the
 
@@ -239,7 +239,7 @@ Aliases: I<re>, I<real>
 
 =head2 abs
 
-    Gauss.abs()
+    x.abs
 
 Returns the
 
@@ -247,7 +247,7 @@ Returns the
 
 =head2 b
 
-    Gauss.b()
+    self.b
 
 Returns the
 
@@ -257,7 +257,7 @@ Aliases: I<im>, I<imag>
 
 =head2 ceil
 
-    Gauss.ceil()
+    x.ceil
 
 Returns the
 
@@ -265,7 +265,7 @@ Returns the
 
 =head2 conj
 
-    Gauss.conj()
+    x.conj
 
 Returns the
 
@@ -273,7 +273,7 @@ Returns the
 
 =head2 dump
 
-    Gauss.dump()
+    x.dump
 
 Returns the
 
@@ -281,7 +281,7 @@ Returns the
 
 =head2 eval
 
-    Gauss.eval()
+    x.eval(v)
 
 Returns the
 
@@ -289,7 +289,7 @@ Returns the
 
 =head2 float
 
-    Gauss.float()
+    x.float
 
 Returns the
 
@@ -297,7 +297,7 @@ Returns the
 
 =head2 floor
 
-    Gauss.floor()
+    x.floor
 
 Returns the
 
@@ -305,7 +305,7 @@ Returns the
 
 =head2 gcd
 
-    Gauss.gcd()
+    n.gcd(k)
 
 Returns the
 
@@ -313,7 +313,7 @@ Returns the
 
 =head2 gcd_norm
 
-    Gauss.gcd_norm()
+    n.gcd_norm(k)
 
 Returns the
 
@@ -321,7 +321,7 @@ Returns the
 
 =head2 i
 
-    Gauss.i()
+    x.i
 
 Returns the
 
@@ -329,7 +329,7 @@ Returns the
 
 =head2 iabs
 
-    Gauss.iabs()
+    x.iabs
 
 Returns the
 
@@ -337,7 +337,7 @@ Returns the
 
 =head2 inv
 
-    Gauss.inv()
+    x.inv
 
 Returns the
 
@@ -345,7 +345,7 @@ Returns the
 
 =head2 invmod
 
-    Gauss.invmod()
+    x.invmod(m)
 
 Returns the
 
@@ -353,7 +353,7 @@ Returns the
 
 =head2 is_coprime
 
-    Gauss.is_coprime()
+    n.is_coprime(k)
 
 Returns the
 
@@ -361,7 +361,7 @@ Returns the
 
 =head2 is_imag
 
-    Gauss.is_imag()
+    x.is_imag
 
 Returns the
 
@@ -369,7 +369,7 @@ Returns the
 
 =head2 is_mone
 
-    Gauss.is_mone()
+    x.is_mone
 
 Returns the
 
@@ -377,7 +377,7 @@ Returns the
 
 =head2 is_one
 
-    Gauss.is_one()
+    x.is_one
 
 Returns the
 
@@ -385,7 +385,7 @@ Returns the
 
 =head2 is_prime
 
-    Gauss.is_prime()
+    x.is_prime
 
 Returns the
 
@@ -393,7 +393,7 @@ Returns the
 
 =head2 is_real
 
-    Gauss.is_real()
+    x.is_real
 
 Returns the
 
@@ -401,7 +401,7 @@ Returns the
 
 =head2 is_zero
 
-    Gauss.is_zero()
+    x.is_zero
 
 Returns the
 
@@ -409,7 +409,7 @@ Returns the
 
 =head2 lift
 
-    Gauss.lift()
+    x.lift
 
 Returns the
 
@@ -417,7 +417,7 @@ Returns the
 
 =head2 neg
 
-    Gauss.neg()
+    x.neg
 
 Returns the
 
@@ -425,7 +425,7 @@ Returns the
 
 =head2 new
 
-    Gauss.new()
+    self.new
 
 Returns the
 
@@ -435,7 +435,7 @@ Aliases: I<call>
 
 =head2 norm
 
-    Gauss.norm()
+    x.norm
 
 Returns the
 
@@ -443,7 +443,7 @@ Returns the
 
 =head2 parts
 
-    Gauss.parts()
+    self.parts
 
 Returns the
 
@@ -451,7 +451,7 @@ Returns the
 
 =head2 powmod
 
-    Gauss.powmod()
+    x.powmod(n, m)
 
 Returns the
 
@@ -459,7 +459,7 @@ Returns the
 
 =head2 pretty
 
-    Gauss.pretty()
+    x.pretty
 
 Returns the
 
@@ -469,7 +469,7 @@ Aliases: I<stringify>
 
 =head2 reals
 
-    Gauss.reals()
+    self.reals
 
 Returns the
 
@@ -477,7 +477,7 @@ Returns the
 
 =head2 round
 
-    Gauss.round()
+    x.round(r)
 
 Returns the
 
@@ -485,7 +485,7 @@ Returns the
 
 =head2 sgn
 
-    Gauss.sgn()
+    x.sgn
 
 Returns the
 
@@ -493,7 +493,7 @@ Returns the
 
 =head2 sqr
 
-    Gauss.sqr()
+    x.sqr
 
 Returns the
 
@@ -501,7 +501,7 @@ Returns the
 
 =head2 to_c
 
-    Gauss.to_c()
+    self.to_c
 
 Returns the
 
@@ -511,7 +511,7 @@ Aliases: I<to_n>
 
 =head2 to_s
 
-    Gauss.to_s()
+    x.to_s
 
 Returns the
 

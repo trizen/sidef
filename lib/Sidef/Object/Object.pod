@@ -104,7 +104,7 @@ Returns the
 
 =head2 alias_method
 
-    Object.alias_method()
+    self.alias_method(old, new)
 
 Returns the
 
@@ -112,7 +112,7 @@ Returns the
 
 =head2 bless
 
-    Object.bless()
+    obj.bless(arg)
 
 Returns the
 
@@ -120,7 +120,7 @@ Returns the
 
 =head2 class
 
-    Object.class()
+    obj.class
 
 Returns the
 
@@ -128,7 +128,7 @@ Returns the
 
 =head2 clone
 
-    Object.clone()
+    obj.clone
 
 Returns the
 
@@ -136,7 +136,7 @@ Returns the
 
 =head2 dclone
 
-    Object.dclone()
+    self.dclone
 
 Returns the
 
@@ -146,7 +146,7 @@ Aliases: I<deep_clone>
 
 =head2 def_method
 
-    Object.def_method()
+    self.def_method(name, block)
 
 Returns the
 
@@ -154,7 +154,7 @@ Returns the
 
 =head2 dump
 
-    Object.dump()
+    self.dump
 
 Returns the
 
@@ -162,7 +162,7 @@ Returns the
 
 =head2 interpolate
 
-    Object.interpolate()
+    self.interpolate
 
 Returns the
 
@@ -170,7 +170,7 @@ Returns the
 
 =head2 is_a
 
-    Object.is_a()
+    self.is_a(obj)
 
 Returns the
 
@@ -180,7 +180,7 @@ Aliases: I<is_an>, I<kind_of>
 
 =head2 is_object
 
-    Object.is_object()
+    self.is_object
 
 Returns the
 
@@ -188,7 +188,7 @@ Returns the
 
 =head2 is_typename
 
-    Object.is_typename()
+    self.is_typename
 
 Returns the
 
@@ -196,7 +196,7 @@ Returns the
 
 =head2 lazy
 
-    Object.lazy()
+    self.lazy
 
 Returns the
 
@@ -204,7 +204,7 @@ Returns the
 
 =head2 method
 
-    Object.method()
+    self.method(method, *args)
 
 Returns the
 
@@ -212,7 +212,7 @@ Returns the
 
 =head2 methods
 
-    Object.methods()
+    self.methods(*args)
 
 Returns the
 
@@ -220,7 +220,7 @@ Returns the
 
 =head2 new
 
-    Object.new()
+    self.new
 
 Returns the
 
@@ -228,7 +228,7 @@ Returns the
 
 =head2 parent_classes
 
-    Object.parent_classes()
+    obj.parent_classes
 
 Returns the
 
@@ -236,7 +236,7 @@ Returns the
 
 =head2 print
 
-    Object.print()
+    self.print
 
 Returns the
 
@@ -244,7 +244,7 @@ Returns the
 
 =head2 ref
 
-    Object.ref()
+    obj.ref
 
 Returns the
 
@@ -252,7 +252,7 @@ Returns the
 
 =head2 refaddr
 
-    Object.refaddr()
+    self.refaddr
 
 Returns the
 
@@ -262,7 +262,7 @@ Aliases: I<object_id>
 
 =head2 reftype
 
-    Object.reftype()
+    self.reftype
 
 Returns the
 
@@ -272,7 +272,7 @@ Aliases: I<object_type>
 
 =head2 respond_to
 
-    Object.respond_to()
+    self.respond_to(method)
 
 Returns the
 
@@ -280,7 +280,7 @@ Returns the
 
 =head2 say
 
-    Object.say()
+    self.say
 
 Returns the
 
@@ -290,7 +290,7 @@ Aliases: I<println>
 
 =head2 undef_method
 
-    Object.undef_method()
+    self.undef_method(name)
 
 Returns the
 

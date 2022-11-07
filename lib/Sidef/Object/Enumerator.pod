@@ -17,7 +17,7 @@ var obj = Enumerator(...)
 
 =head2 count
 
-    Enumerator.count()
+    self.count(block)
 
 Returns the
 
@@ -27,7 +27,7 @@ Aliases: I<count_by>
 
 =head2 each
 
-    Enumerator.each()
+    self.each(block)
 
 Returns the
 
@@ -35,7 +35,7 @@ Returns the
 
 =head2 first
 
-    Enumerator.first()
+    self.first(n, block)
 
 Returns the
 
@@ -43,7 +43,7 @@ Returns the
 
 =head2 grep
 
-    Enumerator.grep()
+    self.grep(block)
 
 Returns the
 
@@ -53,7 +53,7 @@ Aliases: I<select>
 
 =head2 len
 
-    Enumerator.len()
+    self.len
 
 Returns the
 
@@ -63,7 +63,7 @@ Aliases: I<size>, I<length>
 
 =head2 map
 
-    Enumerator.map()
+    self.map(block)
 
 Returns the
 
@@ -73,7 +73,7 @@ Aliases: I<collect>
 
 =head2 new
 
-    Enumerator.new()
+    self.new
 
 Returns the
 
@@ -94,7 +94,7 @@ An optional block can be given to filter out terms, counting only the terms for 
 
 =head2 to_a
 
-    Enumerator.to_a()
+    self.to_a
 
 Returns the
 
@@ -102,7 +102,7 @@ Returns the
 
 =head2 while
 
-    Enumerator.while()
+    self.while(block)
 
 Returns the
 

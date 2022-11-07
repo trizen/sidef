@@ -17,7 +17,7 @@ var obj = Try(...)
 
 =head2 catch
 
-    Try.catch()
+    self.catch(block)
 
 Returns the
 
@@ -25,7 +25,7 @@ Returns the
 
 =head2 try
 
-    Try.try()
+    self.try(block)
 
 Returns the
 

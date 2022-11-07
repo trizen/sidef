@@ -87,7 +87,7 @@ Aliases: I<!=>, I<ne>
 
 =head2 accumulate
 
-    Range.accumulate()
+    self.accumulate(arg)
 
 Returns the
 
@@ -95,7 +95,7 @@ Returns the
 
 =head2 accumulate_by
 
-    Range.accumulate_by()
+    self.accumulate_by(arg)
 
 Returns the
 
@@ -103,7 +103,7 @@ Returns the
 
 =head2 all
 
-    Range.all()
+    self.all(block)
 
 Returns the
 
@@ -111,7 +111,7 @@ Returns the
 
 =head2 any
 
-    Range.any()
+    self.any(block)
 
 Returns the
 
@@ -119,7 +119,7 @@ Returns the
 
 =head2 bounds
 
-    Range.bounds()
+    self.bounds
 
 Returns the
 
@@ -127,7 +127,7 @@ Returns the
 
 =head2 by
 
-    Range.by()
+    self.by(step)
 
 Returns the
 
@@ -135,7 +135,7 @@ Returns the
 
 =head2 cons
 
-    Range.cons()
+    self.cons(n, block)
 
 Returns the
 
@@ -145,7 +145,7 @@ Aliases: I<map_cons>
 
 =head2 contain
 
-    Range.contain()
+    self.contain(value)
 
 Returns the
 
@@ -155,7 +155,7 @@ Aliases: I<include>, I<contains>, I<includes>
 
 =head2 count
 
-    Range.count()
+    self.count(arg)
 
 Returns the
 
@@ -163,7 +163,7 @@ Returns the
 
 =head2 count_by
 
-    Range.count_by()
+    self.count_by(arg)
 
 Returns the
 
@@ -171,7 +171,7 @@ Returns the
 
 =head2 cross_operator
 
-    Range.cross_operator()
+    self.cross_operator(*args)
 
 Returns the
 
@@ -179,7 +179,7 @@ Returns the
 
 =head2 each_cons
 
-    Range.each_cons()
+    self.each_cons(n, block)
 
 Returns the
 
@@ -187,7 +187,7 @@ Returns the
 
 =head2 each_slice
 
-    Range.each_slice()
+    self.each_slice(n, block)
 
 Returns the
 
@@ -195,7 +195,7 @@ Returns the
 
 =head2 first_by
 
-    Range.first_by()
+    self.first_by(block)
 
 Returns the
 
@@ -203,7 +203,7 @@ Returns the
 
 =head2 flip
 
-    Range.flip()
+    self.flip
 
 Returns the
 
@@ -213,7 +213,7 @@ Aliases: I<reverse>
 
 =head2 for
 
-    Range.for()
+    self.for(block)
 
 Returns the
 
@@ -223,7 +223,7 @@ Aliases: I<each>, I<foreach>
 
 =head2 from
 
-    Range.from()
+    self.from(from)
 
 Returns the
 
@@ -231,7 +231,7 @@ Returns the
 
 =head2 grep
 
-    Range.grep()
+    self.grep(block)
 
 Returns the
 
@@ -241,7 +241,7 @@ Aliases: I<select>
 
 =head2 head
 
-    Range.head()
+    self.head(num)
 
 Returns the
 
@@ -251,7 +251,7 @@ Aliases: I<first>
 
 =head2 join
 
-    Range.join()
+    self.join(sep)
 
 Returns the
 
@@ -259,7 +259,7 @@ Returns the
 
 =head2 kv
 
-    Range.kv()
+    self.kv
 
 Returns the
 
@@ -269,7 +269,7 @@ Aliases: I<pairs>, I<zip_indices>
 
 =head2 last
 
-    Range.last()
+    self.last(num)
 
 Returns the
 
@@ -279,7 +279,7 @@ Aliases: I<tail>
 
 =head2 last_by
 
-    Range.last_by()
+    self.last_by(block)
 
 Returns the
 
@@ -287,7 +287,7 @@ Returns the
 
 =head2 len
 
-    Range.len()
+    self.len
 
 Returns the
 
@@ -297,7 +297,7 @@ Aliases: I<length>
 
 =head2 map
 
-    Range.map()
+    self.map(block)
 
 Returns the
 
@@ -305,7 +305,7 @@ Returns the
 
 =head2 map_operator
 
-    Range.map_operator()
+    self.map_operator(*args)
 
 Returns the
 
@@ -313,7 +313,7 @@ Returns the
 
 =head2 max
 
-    Range.max()
+    self.max(block)
 
 Returns the
 
@@ -321,7 +321,7 @@ Returns the
 
 =head2 max_by
 
-    Range.max_by()
+    self.max_by(block)
 
 Returns the
 
@@ -329,7 +329,7 @@ Returns the
 
 =head2 min
 
-    Range.min()
+    self.min(block)
 
 Returns the
 
@@ -337,7 +337,7 @@ Returns the
 
 =head2 min_by
 
-    Range.min_by()
+    self.min_by(block)
 
 Returns the
 
@@ -345,7 +345,7 @@ Returns the
 
 =head2 new
 
-    Range.new()
+    self.new
 
 Returns the
 
@@ -355,7 +355,7 @@ Aliases: I<call>
 
 =head2 none
 
-    Range.none()
+    self.none(block)
 
 Returns the
 
@@ -363,7 +363,7 @@ Returns the
 
 =head2 pam_operator
 
-    Range.pam_operator()
+    self.pam_operator(*args)
 
 Returns the
 
@@ -371,7 +371,7 @@ Returns the
 
 =head2 pick
 
-    Range.pick()
+    self.pick(n)
 
 Returns the
 
@@ -379,7 +379,7 @@ Returns the
 
 =head2 rand
 
-    Range.rand()
+    self.rand(n)
 
 Returns the
 
@@ -389,7 +389,7 @@ Aliases: I<sample>
 
 =head2 reduce
 
-    Range.reduce()
+    self.reduce(op, initial)
 
 Returns the
 
@@ -397,7 +397,7 @@ Returns the
 
 =head2 reduce_operator
 
-    Range.reduce_operator()
+    self.reduce_operator(op, initial)
 
 Returns the
 
@@ -405,7 +405,7 @@ Returns the
 
 =head2 shuffle
 
-    Range.shuffle()
+    self.shuffle
 
 Returns the
 
@@ -413,7 +413,7 @@ Returns the
 
 =head2 slices
 
-    Range.slices()
+    self.slices(n, block)
 
 Returns the
 
@@ -423,7 +423,7 @@ Aliases: I<map_slice>
 
 =head2 step
 
-    Range.step()
+    self.step
 
 Returns the
 
@@ -431,7 +431,7 @@ Returns the
 
 =head2 to
 
-    Range.to()
+    self.to(to)
 
 Returns the
 
@@ -439,7 +439,7 @@ Returns the
 
 =head2 to_a
 
-    Range.to_a()
+    self.to_a
 
 Returns the
 
@@ -449,7 +449,7 @@ Aliases: I<to_array>
 
 =head2 to_v
 
-    Range.to_v()
+    self.to_v
 
 Returns the
 
@@ -459,7 +459,7 @@ Aliases: I<to_vec>, I<to_vector>
 
 =head2 unroll_operator
 
-    Range.unroll_operator()
+    self.unroll_operator(*args)
 
 Returns the
 
@@ -467,7 +467,7 @@ Returns the
 
 =head2 while
 
-    Range.while()
+    self.while(block)
 
 Returns the
 
@@ -475,7 +475,7 @@ Returns the
 
 =head2 zip_operator
 
-    Range.zip_operator()
+    self.zip_operator(*args)
 
 Returns the
 

@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 getaddrinfo
 
-    Socket.getaddrinfo()
+    self.getaddrinfo
 
 Returns the
 
@@ -32,7 +32,7 @@ Returns the
 
 =head2 gethostbyaddr
 
-    Socket.gethostbyaddr()
+    self.gethostbyaddr(addr, addrtype)
 
 Returns the
 
@@ -40,7 +40,7 @@ Returns the
 
 =head2 gethostbyname
 
-    Socket.gethostbyname()
+    self.gethostbyname(name)
 
 Returns the
 
@@ -48,7 +48,7 @@ Returns the
 
 =head2 gethostent
 
-    Socket.gethostent()
+    self.gethostent
 
 Returns the
 
@@ -56,7 +56,7 @@ Returns the
 
 =head2 getnameinfo
 
-    Socket.getnameinfo()
+    self.getnameinfo
 
 Returns the
 
@@ -64,7 +64,7 @@ Returns the
 
 =head2 getnetbyaddr
 
-    Socket.getnetbyaddr()
+    self.getnetbyaddr(addr, addrtype)
 
 Returns the
 
@@ -72,7 +72,7 @@ Returns the
 
 =head2 getnetbyname
 
-    Socket.getnetbyname()
+    self.getnetbyname(name)
 
 Returns the
 
@@ -80,7 +80,7 @@ Returns the
 
 =head2 getnetent
 
-    Socket.getnetent()
+    self.getnetent
 
 Returns the
 
@@ -88,7 +88,7 @@ Returns the
 
 =head2 getprotobyname
 
-    Socket.getprotobyname()
+    self.getprotobyname(name)
 
 Returns the
 
@@ -96,7 +96,7 @@ Returns the
 
 =head2 getprotobynumber
 
-    Socket.getprotobynumber()
+    self.getprotobynumber(num)
 
 Returns the
 
@@ -104,7 +104,7 @@ Returns the
 
 =head2 getprotoent
 
-    Socket.getprotoent()
+    self.getprotoent
 
 Returns the
 
@@ -112,7 +112,7 @@ Returns the
 
 =head2 getservbyname
 
-    Socket.getservbyname()
+    self.getservbyname(name, proto)
 
 Returns the
 
@@ -120,7 +120,7 @@ Returns the
 
 =head2 getservbyport
 
-    Socket.getservbyport()
+    self.getservbyport(port, proto)
 
 Returns the
 
@@ -128,7 +128,7 @@ Returns the
 
 =head2 getservent
 
-    Socket.getservent()
+    self.getservent
 
 Returns the
 
@@ -136,7 +136,7 @@ Returns the
 
 =head2 inet_aton
 
-    Socket.inet_aton()
+    self.inet_aton
 
 Returns the
 
@@ -144,7 +144,7 @@ Returns the
 
 =head2 inet_ntoa
 
-    Socket.inet_ntoa()
+    self.inet_ntoa
 
 Returns the
 
@@ -152,7 +152,7 @@ Returns the
 
 =head2 inet_ntop
 
-    Socket.inet_ntop()
+    self.inet_ntop
 
 Returns the
 
@@ -160,7 +160,7 @@ Returns the
 
 =head2 inet_pton
 
-    Socket.inet_pton()
+    self.inet_pton
 
 Returns the
 
@@ -168,7 +168,7 @@ Returns the
 
 =head2 new
 
-    Socket.new()
+    self.new
 
 Returns the
 
@@ -176,7 +176,7 @@ Returns the
 
 =head2 open
 
-    Socket.open()
+    self.open(domain, type, protocol)
 
 Returns the
 
@@ -184,7 +184,7 @@ Returns the
 
 =head2 pack_ip_mreq
 
-    Socket.pack_ip_mreq()
+    self.pack_ip_mreq
 
 Returns the
 
@@ -192,7 +192,7 @@ Returns the
 
 =head2 pack_ip_mreq_source
 
-    Socket.pack_ip_mreq_source()
+    self.pack_ip_mreq_source
 
 Returns the
 
@@ -200,7 +200,7 @@ Returns the
 
 =head2 pack_ipv6_mreq
 
-    Socket.pack_ipv6_mreq()
+    self.pack_ipv6_mreq
 
 Returns the
 
@@ -208,7 +208,7 @@ Returns the
 
 =head2 pack_sockaddr_in
 
-    Socket.pack_sockaddr_in()
+    self.pack_sockaddr_in
 
 Returns the
 
@@ -216,7 +216,7 @@ Returns the
 
 =head2 pack_sockaddr_in6
 
-    Socket.pack_sockaddr_in6()
+    self.pack_sockaddr_in6
 
 Returns the
 
@@ -224,7 +224,7 @@ Returns the
 
 =head2 pack_sockaddr_un
 
-    Socket.pack_sockaddr_un()
+    self.pack_sockaddr_un
 
 Returns the
 
@@ -232,7 +232,7 @@ Returns the
 
 =head2 sethostent
 
-    Socket.sethostent()
+    self.sethostent(stayopen)
 
 Returns the
 
@@ -240,7 +240,7 @@ Returns the
 
 =head2 setnetent
 
-    Socket.setnetent()
+    self.setnetent(stayopen)
 
 Returns the
 
@@ -248,7 +248,7 @@ Returns the
 
 =head2 setprotoent
 
-    Socket.setprotoent()
+    self.setprotoent(stayopen)
 
 Returns the
 
@@ -256,7 +256,7 @@ Returns the
 
 =head2 setservent
 
-    Socket.setservent()
+    self.setservent(stayopen)
 
 Returns the
 
@@ -264,7 +264,7 @@ Returns the
 
 =head2 sockaddr_family
 
-    Socket.sockaddr_family()
+    self.sockaddr_family
 
 Returns the
 
@@ -272,7 +272,7 @@ Returns the
 
 =head2 sockaddr_in
 
-    Socket.sockaddr_in()
+    self.sockaddr_in
 
 Returns the
 
@@ -280,7 +280,7 @@ Returns the
 
 =head2 sockaddr_in6
 
-    Socket.sockaddr_in6()
+    self.sockaddr_in6
 
 Returns the
 
@@ -288,7 +288,7 @@ Returns the
 
 =head2 sockaddr_un
 
-    Socket.sockaddr_un()
+    self.sockaddr_un
 
 Returns the
 
@@ -296,7 +296,7 @@ Returns the
 
 =head2 socketpair
 
-    Socket.socketpair()
+    self.socketpair(socket1, socket2, domain, type, protocol)
 
 Returns the
 
@@ -304,7 +304,7 @@ Returns the
 
 =head2 unpack_ip_mreq
 
-    Socket.unpack_ip_mreq()
+    self.unpack_ip_mreq
 
 Returns the
 
@@ -312,7 +312,7 @@ Returns the
 
 =head2 unpack_ip_mreq_source
 
-    Socket.unpack_ip_mreq_source()
+    self.unpack_ip_mreq_source
 
 Returns the
 
@@ -320,7 +320,7 @@ Returns the
 
 =head2 unpack_ipv6_mreq
 
-    Socket.unpack_ipv6_mreq()
+    self.unpack_ipv6_mreq
 
 Returns the
 
@@ -328,7 +328,7 @@ Returns the
 
 =head2 unpack_sockaddr_in
 
-    Socket.unpack_sockaddr_in()
+    self.unpack_sockaddr_in
 
 Returns the
 
@@ -336,7 +336,7 @@ Returns the
 
 =head2 unpack_sockaddr_in6
 
-    Socket.unpack_sockaddr_in6()
+    self.unpack_sockaddr_in6
 
 Returns the
 
@@ -344,7 +344,7 @@ Returns the
 
 =head2 unpack_sockaddr_un
 
-    Socket.unpack_sockaddr_un()
+    self.unpack_sockaddr_un
 
 Returns the
 

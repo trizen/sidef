@@ -17,7 +17,7 @@ var obj = GetOpt(...)
 
 =head2 new
 
-    GetOpt.new()
+    self.new
 
 Returns the
 

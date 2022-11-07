@@ -230,7 +230,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 a
 
-    Quadratic.a()
+    self.a
 
 Returns the
 
@@ -240,7 +240,7 @@ Aliases: I<re>, I<real>
 
 =head2 abs
 
-    Quadratic.abs()
+    x.abs
 
 Returns the
 
@@ -248,7 +248,7 @@ Returns the
 
 =head2 b
 
-    Quadratic.b()
+    self.b
 
 Returns the
 
@@ -258,7 +258,7 @@ Aliases: I<im>, I<imag>
 
 =head2 ceil
 
-    Quadratic.ceil()
+    x.ceil
 
 Returns the
 
@@ -266,7 +266,7 @@ Returns the
 
 =head2 conj
 
-    Quadratic.conj()
+    x.conj
 
 Returns the
 
@@ -274,7 +274,7 @@ Returns the
 
 =head2 dump
 
-    Quadratic.dump()
+    x.dump
 
 Returns the
 
@@ -282,7 +282,7 @@ Returns the
 
 =head2 eval
 
-    Quadratic.eval()
+    x.eval(v)
 
 Returns the
 
@@ -290,7 +290,7 @@ Returns the
 
 =head2 float
 
-    Quadratic.float()
+    x.float
 
 Returns the
 
@@ -298,7 +298,7 @@ Returns the
 
 =head2 floor
 
-    Quadratic.floor()
+    x.floor
 
 Returns the
 
@@ -306,7 +306,7 @@ Returns the
 
 =head2 inv
 
-    Quadratic.inv()
+    x.inv
 
 Returns the
 
@@ -314,7 +314,7 @@ Returns the
 
 =head2 invmod
 
-    Quadratic.invmod()
+    x.invmod(m)
 
 Returns the
 
@@ -322,7 +322,7 @@ Returns the
 
 =head2 is_coprime
 
-    Quadratic.is_coprime()
+    n.is_coprime(k)
 
 Returns the
 
@@ -330,7 +330,7 @@ Returns the
 
 =head2 is_mone
 
-    Quadratic.is_mone()
+    x.is_mone
 
 Returns the
 
@@ -338,7 +338,7 @@ Returns the
 
 =head2 is_one
 
-    Quadratic.is_one()
+    x.is_one
 
 Returns the
 
@@ -346,7 +346,7 @@ Returns the
 
 =head2 is_zero
 
-    Quadratic.is_zero()
+    x.is_zero
 
 Returns the
 
@@ -354,7 +354,7 @@ Returns the
 
 =head2 lift
 
-    Quadratic.lift()
+    x.lift
 
 Returns the
 
@@ -362,7 +362,7 @@ Returns the
 
 =head2 neg
 
-    Quadratic.neg()
+    x.neg
 
 Returns the
 
@@ -370,7 +370,7 @@ Returns the
 
 =head2 new
 
-    Quadratic.new()
+    self.new
 
 Returns the
 
@@ -380,7 +380,7 @@ Aliases: I<call>
 
 =head2 norm
 
-    Quadratic.norm()
+    x.norm
 
 Returns the
 
@@ -388,7 +388,7 @@ Returns the
 
 =head2 parts
 
-    Quadratic.parts()
+    self.parts
 
 Returns the
 
@@ -396,7 +396,7 @@ Returns the
 
 =head2 powmod
 
-    Quadratic.powmod()
+    x.powmod(n, m)
 
 Returns the
 
@@ -404,7 +404,7 @@ Returns the
 
 =head2 pretty
 
-    Quadratic.pretty()
+    x.pretty
 
 Returns the
 
@@ -414,7 +414,7 @@ Aliases: I<stringify>
 
 =head2 reals
 
-    Quadratic.reals()
+    self.reals
 
 Returns the
 
@@ -422,7 +422,7 @@ Returns the
 
 =head2 round
 
-    Quadratic.round()
+    x.round(r)
 
 Returns the
 
@@ -430,7 +430,7 @@ Returns the
 
 =head2 sgn
 
-    Quadratic.sgn()
+    x.sgn
 
 Returns the
 
@@ -438,7 +438,7 @@ Returns the
 
 =head2 sqr
 
-    Quadratic.sqr()
+    x.sqr
 
 Returns the
 
@@ -446,7 +446,7 @@ Returns the
 
 =head2 to_c
 
-    Quadratic.to_c()
+    x.to_c
 
 Returns the
 
@@ -456,7 +456,7 @@ Aliases: I<to_n>
 
 =head2 to_s
 
-    Quadratic.to_s()
+    x.to_s
 
 Returns the
 
@@ -464,7 +464,7 @@ Returns the
 
 =head2 w
 
-    Quadratic.w()
+    self.w
 
 Returns the
 

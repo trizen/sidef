@@ -234,7 +234,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 apply_escapes
 
-    String.apply_escapes()
+    self.apply_escapes(parser)
 
 Returns the
 
@@ -242,7 +242,7 @@ Returns the
 
 =head2 ascii2bin
 
-    String.ascii2bin()
+    self.ascii2bin
 
 Returns the
 
@@ -250,7 +250,7 @@ Returns the
 
 =head2 ascii2bits
 
-    String.ascii2bits()
+    self.ascii2bits
 
 Returns the
 
@@ -258,7 +258,7 @@ Returns the
 
 =head2 backtick
 
-    String.backtick()
+    self.backtick
 
 Returns the
 
@@ -266,7 +266,7 @@ Returns the
 
 =head2 base64_decode
 
-    String.base64_decode()
+    self.base64_decode
 
 Returns the
 
@@ -276,7 +276,7 @@ Aliases: I<decode_base64>
 
 =head2 base64_encode
 
-    String.base64_encode()
+    self.base64_encode
 
 Returns the
 
@@ -286,7 +286,7 @@ Aliases: I<encode_base64>
 
 =head2 begins_with
 
-    String.begins_with()
+    self.begins_with(string)
 
 Returns the
 
@@ -296,7 +296,7 @@ Aliases: I<starts_with>
 
 =head2 bin
 
-    String.bin()
+    self.bin
 
 Returns the
 
@@ -304,7 +304,7 @@ Returns the
 
 =head2 bin2ascii
 
-    String.bin2ascii()
+    self.bin2ascii
 
 Returns the
 
@@ -312,7 +312,7 @@ Returns the
 
 =head2 bytes
 
-    String.bytes()
+    self.bytes
 
 Returns the
 
@@ -320,7 +320,7 @@ Returns the
 
 =head2 bytes_len
 
-    String.bytes_len()
+    self.bytes_len
 
 Returns the
 
@@ -330,7 +330,7 @@ Aliases: I<bytes_length>
 
 =head2 center
 
-    String.center()
+    self.center(size, char)
 
 Returns the
 
@@ -338,7 +338,7 @@ Returns the
 
 =head2 char
 
-    String.char()
+    self.char(pos)
 
 Returns the
 
@@ -348,7 +348,7 @@ Aliases: I<char_at>
 
 =head2 chars
 
-    String.chars()
+    self.chars
 
 Returns the
 
@@ -356,7 +356,7 @@ Returns the
 
 =head2 chomp
 
-    String.chomp()
+    self.chomp
 
 Returns the
 
@@ -364,7 +364,7 @@ Returns the
 
 =head2 chop
 
-    String.chop()
+    self.chop
 
 Returns the
 
@@ -372,7 +372,7 @@ Returns the
 
 =head2 clear
 
-    String.clear()
+    self.clear
 
 Returns the
 
@@ -380,7 +380,7 @@ Returns the
 
 =head2 collect
 
-    String.collect()
+    self.collect(regex)
 
 Returns the
 
@@ -390,7 +390,7 @@ Aliases: I<find_all>, I<findall>
 
 =head2 count
 
-    String.count()
+    self.count(arg)
 
 Returns the
 
@@ -398,7 +398,7 @@ Returns the
 
 =head2 crypt
 
-    String.crypt()
+    self.crypt(salt)
 
 Returns the
 
@@ -406,7 +406,7 @@ Returns the
 
 =head2 decode
 
-    String.decode()
+    self.decode(enc)
 
 Returns the
 
@@ -414,7 +414,7 @@ Returns the
 
 =head2 decode_utf8
 
-    String.decode_utf8()
+    self.decode_utf8
 
 Returns the
 
@@ -422,7 +422,7 @@ Returns the
 
 =head2 die
 
-    String.die()
+    self.die
 
 Returns the
 
@@ -430,7 +430,7 @@ Returns the
 
 =head2 digits
 
-    String.digits()
+    self.digits
 
 Returns the
 
@@ -438,7 +438,7 @@ Returns the
 
 =head2 downto
 
-    String.downto()
+    from.downto(to, step)
 
 Returns the
 
@@ -446,7 +446,7 @@ Returns the
 
 =head2 dump
 
-    String.dump()
+    self.dump
 
 Returns the
 
@@ -456,7 +456,7 @@ Aliases: I<inspect>
 
 =head2 each
 
-    String.each()
+    self.each(code)
 
 Returns the
 
@@ -466,7 +466,7 @@ Aliases: I<each_char>
 
 =head2 each_byte
 
-    String.each_byte()
+    self.each_byte(code)
 
 Returns the
 
@@ -474,7 +474,7 @@ Returns the
 
 =head2 each_graph
 
-    String.each_graph()
+    self.each_graph(code)
 
 Returns the
 
@@ -484,7 +484,7 @@ Aliases: I<each_grapheme>
 
 =head2 each_line
 
-    String.each_line()
+    self.each_line(code)
 
 Returns the
 
@@ -492,7 +492,7 @@ Returns the
 
 =head2 each_num
 
-    String.each_num()
+    self.each_num(code)
 
 Returns the
 
@@ -502,7 +502,7 @@ Aliases: I<each_number>
 
 =head2 each_word
 
-    String.each_word()
+    self.each_word(code)
 
 Returns the
 
@@ -510,7 +510,7 @@ Returns the
 
 =head2 encode
 
-    String.encode()
+    self.encode(enc)
 
 Returns the
 
@@ -518,7 +518,7 @@ Returns the
 
 =head2 encode_utf8
 
-    String.encode_utf8()
+    self.encode_utf8
 
 Returns the
 
@@ -526,7 +526,7 @@ Returns the
 
 =head2 ends_with
 
-    String.ends_with()
+    self.ends_with(string)
 
 Returns the
 
@@ -534,7 +534,7 @@ Returns the
 
 =head2 escape
 
-    String.escape()
+    self.escape
 
 Returns the
 
@@ -544,7 +544,7 @@ Aliases: I<quotemeta>
 
 =head2 esub
 
-    String.esub()
+    self.esub(regex, code)
 
 Returns the
 
@@ -552,7 +552,7 @@ Returns the
 
 =head2 extract_bracketed
 
-    String.extract_bracketed()
+    self.extract_bracketed(brackets)
 
 Returns the
 
@@ -560,7 +560,7 @@ Returns the
 
 =head2 extract_codeblock
 
-    String.extract_codeblock()
+    self.extract_codeblock(delim)
 
 Returns the
 
@@ -568,7 +568,7 @@ Returns the
 
 =head2 extract_delimited
 
-    String.extract_delimited()
+    self.extract_delimited(delim)
 
 Returns the
 
@@ -576,7 +576,7 @@ Returns the
 
 =head2 extract_quotelike
 
-    String.extract_quotelike()
+    self.extract_quotelike
 
 Returns the
 
@@ -584,7 +584,7 @@ Returns the
 
 =head2 extract_tagged
 
-    String.extract_tagged()
+    self.extract_tagged
 
 Returns the
 
@@ -592,7 +592,7 @@ Returns the
 
 =head2 fc
 
-    String.fc()
+    self.fc
 
 Returns the
 
@@ -602,7 +602,7 @@ Aliases: I<foldcase>
 
 =head2 first
 
-    String.first()
+    self.first(num)
 
 Returns the
 
@@ -610,7 +610,7 @@ Returns the
 
 =head2 flip
 
-    String.flip()
+    self.flip
 
 Returns the
 
@@ -620,7 +620,7 @@ Aliases: I<reverse>
 
 =head2 format
 
-    String.format()
+    self.format
 
 Returns the
 
@@ -628,7 +628,7 @@ Returns the
 
 =head2 frequire
 
-    String.frequire()
+    self.frequire
 
 Returns the
 
@@ -636,7 +636,7 @@ Returns the
 
 =head2 ft
 
-    String.ft()
+    self.ft(from, to)
 
 Returns the
 
@@ -646,7 +646,7 @@ Aliases: I<slice>
 
 =head2 gesub
 
-    String.gesub()
+    self.gesub(regex, code)
 
 Returns the
 
@@ -654,7 +654,7 @@ Returns the
 
 =head2 glob
 
-    String.glob()
+    self.glob
 
 Returns the
 
@@ -662,7 +662,7 @@ Returns the
 
 =head2 gmatch
 
-    String.gmatch()
+    self.gmatch(regex, pos)
 
 Returns the
 
@@ -670,7 +670,7 @@ Returns the
 
 =head2 graphs
 
-    String.graphs()
+    self.graphs
 
 Returns the
 
@@ -680,7 +680,7 @@ Aliases: I<graphemes>
 
 =head2 graphs_len
 
-    String.graphs_len()
+    self.graphs_len
 
 Returns the
 
@@ -690,7 +690,7 @@ Aliases: I<graphs_length>
 
 =head2 gsub
 
-    String.gsub()
+    self.gsub(regex, str)
 
 Returns the
 
@@ -700,7 +700,7 @@ Aliases: I<replace_all>
 
 =head2 has
 
-    String.has()
+    self.has(arg, start_pos)
 
 Returns the
 
@@ -710,7 +710,7 @@ Aliases: I<contain>, I<include>, I<contains>, I<includes>
 
 =head2 hex
 
-    String.hex()
+    self.hex
 
 Returns the
 
@@ -718,7 +718,7 @@ Returns the
 
 =head2 hex2ascii
 
-    String.hex2ascii()
+    self.hex2ascii
 
 Returns the
 
@@ -728,7 +728,7 @@ Aliases: I<unhexlify>
 
 =head2 hexlify
 
-    String.hexlify()
+    self.hexlify
 
 Returns the
 
@@ -738,7 +738,7 @@ Aliases: I<ascii2hex>
 
 =head2 index
 
-    String.index()
+    self.index(substr, pos)
 
 Returns the
 
@@ -746,7 +746,7 @@ Returns the
 
 =head2 insert
 
-    String.insert()
+    self.insert(string, pos, len)
 
 Returns the
 
@@ -754,7 +754,7 @@ Returns the
 
 =head2 ints
 
-    String.ints()
+    self.ints
 
 Returns the
 
@@ -764,7 +764,7 @@ Aliases: I<integers>
 
 =head2 is_alnum
 
-    String.is_alnum()
+    self.is_alnum
 
 Returns the
 
@@ -774,7 +774,7 @@ Aliases: I<is_alphanum>
 
 =head2 is_alpha
 
-    String.is_alpha()
+    self.is_alpha
 
 Returns the
 
@@ -782,7 +782,7 @@ Returns the
 
 =head2 is_ascii
 
-    String.is_ascii()
+    self.is_ascii
 
 Returns the
 
@@ -790,7 +790,7 @@ Returns the
 
 =head2 is_digit
 
-    String.is_digit()
+    self.is_digit
 
 Returns the
 
@@ -798,7 +798,7 @@ Returns the
 
 =head2 is_empty
 
-    String.is_empty()
+    self.is_empty
 
 Returns the
 
@@ -806,7 +806,7 @@ Returns the
 
 =head2 is_lc
 
-    String.is_lc()
+    self.is_lc
 
 Returns the
 
@@ -816,7 +816,7 @@ Aliases: I<is_lowercase>
 
 =head2 is_numeric
 
-    String.is_numeric()
+    self.is_numeric
 
 Returns the
 
@@ -826,7 +826,7 @@ Aliases: I<looks_like_number>
 
 =head2 is_palindrome
 
-    String.is_palindrome()
+    self.is_palindrome
 
 Returns the
 
@@ -834,7 +834,7 @@ Returns the
 
 =head2 is_punct
 
-    String.is_punct()
+    self.is_punct
 
 Returns the
 
@@ -844,7 +844,7 @@ Aliases: I<is_punctuation>
 
 =head2 is_space
 
-    String.is_space()
+    self.is_space
 
 Returns the
 
@@ -852,7 +852,7 @@ Returns the
 
 =head2 is_uc
 
-    String.is_uc()
+    self.is_uc
 
 Returns the
 
@@ -862,7 +862,7 @@ Aliases: I<is_uppercase>
 
 =head2 is_word
 
-    String.is_word()
+    self.is_word
 
 Returns the
 
@@ -870,7 +870,7 @@ Returns the
 
 =head2 iter
 
-    String.iter()
+    self.iter
 
 Returns the
 
@@ -878,7 +878,7 @@ Returns the
 
 =head2 jaro_distance
 
-    String.jaro_distance()
+    s.jaro_distance(t, winkler)
 
 Returns the
 
@@ -886,7 +886,7 @@ Returns the
 
 =head2 join
 
-    String.join()
+    self.join(*rest)
 
 Returns the
 
@@ -894,7 +894,7 @@ Returns the
 
 =head2 last
 
-    String.last()
+    self.last(num)
 
 Returns the
 
@@ -902,7 +902,7 @@ Returns the
 
 =head2 lc
 
-    String.lc()
+    self.lc
 
 Returns the
 
@@ -912,7 +912,7 @@ Aliases: I<lower>, I<downcase>
 
 =head2 lcfirst
 
-    String.lcfirst()
+    self.lcfirst
 
 Returns the
 
@@ -920,7 +920,7 @@ Returns the
 
 =head2 len
 
-    String.len()
+    self.len
 
 Returns the
 
@@ -930,7 +930,7 @@ Aliases: I<size>, I<length>, I<chars_len>, I<chars_length>
 
 =head2 lev
 
-    String.lev()
+    self.lev(arg)
 
 Returns the
 
@@ -940,7 +940,7 @@ Aliases: I<leven>, I<levenshtein>
 
 =head2 lines
 
-    String.lines()
+    self.lines
 
 Returns the
 
@@ -948,7 +948,7 @@ Returns the
 
 =head2 ltrim
 
-    String.ltrim()
+    self.ltrim(arg)
 
 Returns the
 
@@ -958,7 +958,7 @@ Aliases: I<lstrip>, I<trim_beg>, I<strip_beg>, I<trim_left>, I<strip_left>
 
 =head2 md5
 
-    String.md5()
+    self.md5
 
 Returns the
 
@@ -966,7 +966,7 @@ Returns the
 
 =head2 new
 
-    String.new()
+    self.new
 
 Returns the
 
@@ -976,7 +976,7 @@ Aliases: I<call>
 
 =head2 num
 
-    String.num()
+    self.num(base)
 
 Returns the
 
@@ -986,7 +986,7 @@ Aliases: I<to_n>, I<to_num>
 
 =head2 nums
 
-    String.nums()
+    self.nums
 
 Returns the
 
@@ -996,7 +996,7 @@ Aliases: I<numbers>
 
 =head2 oct
 
-    String.oct()
+    self.oct
 
 Returns the
 
@@ -1004,7 +1004,7 @@ Returns the
 
 =head2 open
 
-    String.open()
+    self.open(*rest)
 
 Returns the
 
@@ -1012,7 +1012,7 @@ Returns the
 
 =head2 open_r
 
-    String.open_r()
+    self.open_r(*rest)
 
 Returns the
 
@@ -1020,7 +1020,7 @@ Returns the
 
 =head2 ord
 
-    String.ord()
+    self.ord
 
 Returns the
 
@@ -1028,7 +1028,7 @@ Returns the
 
 =head2 overlaps
 
-    String.overlaps()
+    self.overlaps(arg)
 
 Returns the
 
@@ -1036,7 +1036,7 @@ Returns the
 
 =head2 pack
 
-    String.pack()
+    self.pack(*list)
 
 Returns the
 
@@ -1044,7 +1044,7 @@ Returns the
 
 =head2 parse_quotewords
 
-    String.parse_quotewords()
+    self.parse_quotewords(delim, keep)
 
 Returns the
 
@@ -1052,7 +1052,7 @@ Returns the
 
 =head2 pipe
 
-    String.pipe()
+    self.pipe
 
 Returns the
 
@@ -1060,7 +1060,7 @@ Returns the
 
 =head2 pop
 
-    String.pop()
+    self.pop
 
 Returns the
 
@@ -1068,7 +1068,7 @@ Returns the
 
 =head2 prepend
 
-    String.prepend()
+    self.prepend(string)
 
 Returns the
 
@@ -1076,7 +1076,7 @@ Returns the
 
 =head2 printf
 
-    String.printf()
+    self.printf(*arguments)
 
 Returns the
 
@@ -1084,7 +1084,7 @@ Returns the
 
 =head2 printlnf
 
-    String.printlnf()
+    self.printlnf(*arguments)
 
 Returns the
 
@@ -1092,7 +1092,7 @@ Returns the
 
 =head2 range
 
-    String.range()
+    from.range(to, step)
 
 Returns the
 
@@ -1100,7 +1100,7 @@ Returns the
 
 =head2 repeat
 
-    String.repeat()
+    self.repeat(num)
 
 Returns the
 
@@ -1108,7 +1108,7 @@ Returns the
 
 =head2 require
 
-    String.require()
+    self.require
 
 Returns the
 
@@ -1116,7 +1116,7 @@ Returns the
 
 =head2 rindex
 
-    String.rindex()
+    self.rindex(substr, pos)
 
 Returns the
 
@@ -1124,7 +1124,7 @@ Returns the
 
 =head2 rotate
 
-    String.rotate()
+    self.rotate(n)
 
 Returns the
 
@@ -1132,7 +1132,7 @@ Returns the
 
 =head2 rtrim
 
-    String.rtrim()
+    self.rtrim(arg)
 
 Returns the
 
@@ -1142,7 +1142,7 @@ Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
 
 =head2 run
 
-    String.run()
+    method.run(self, *args)
 
 Returns the
 
@@ -1150,7 +1150,7 @@ Returns the
 
 =head2 scan
 
-    String.scan()
+    self.scan(regex)
 
 Returns the
 
@@ -1158,7 +1158,7 @@ Returns the
 
 =head2 sha1
 
-    String.sha1()
+    self.sha1
 
 Returns the
 
@@ -1166,7 +1166,7 @@ Returns the
 
 =head2 sha256
 
-    String.sha256()
+    self.sha256
 
 Returns the
 
@@ -1174,7 +1174,7 @@ Returns the
 
 =head2 sha512
 
-    String.sha512()
+    self.sha512
 
 Returns the
 
@@ -1182,7 +1182,7 @@ Returns the
 
 =head2 slices
 
-    String.slices()
+    self.slices(n)
 
 Returns the
 
@@ -1190,7 +1190,7 @@ Returns the
 
 =head2 sort
 
-    String.sort()
+    self.sort(block)
 
 Returns the
 
@@ -1198,7 +1198,7 @@ Returns the
 
 =head2 split
 
-    String.split()
+    self.split(sep, size)
 
 Returns the
 
@@ -1206,7 +1206,7 @@ Returns the
 
 =head2 sprintlnf
 
-    String.sprintlnf()
+    self.sprintlnf(*arguments)
 
 Returns the
 
@@ -1214,7 +1214,7 @@ Returns the
 
 =head2 sub
 
-    String.sub()
+    self.sub(regex, str)
 
 Returns the
 
@@ -1224,7 +1224,7 @@ Aliases: I<replace>
 
 =head2 substr
 
-    String.substr()
+    self.substr(offs, len)
 
 Returns the
 
@@ -1234,7 +1234,7 @@ Aliases: I<substring>
 
 =head2 tc
 
-    String.tc()
+    self.tc
 
 Returns the
 
@@ -1244,7 +1244,7 @@ Aliases: I<ucfirst>, I<titlecase>
 
 =head2 tclc
 
-    String.tclc()
+    self.tclc
 
 Returns the
 
@@ -1254,7 +1254,7 @@ Aliases: I<capitalize>
 
 =head2 to_i
 
-    String.to_i()
+    self.to_i
 
 Returns the
 
@@ -1264,7 +1264,7 @@ Aliases: I<to_int>
 
 =head2 to_s
 
-    String.to_s()
+    self.to_s
 
 Returns the
 
@@ -1274,7 +1274,7 @@ Aliases: I<to_str>
 
 =head2 tr
 
-    String.tr()
+    self.tr(orig, repl, modes)
 
 Returns the
 
@@ -1284,7 +1284,7 @@ Aliases: I<translit>
 
 =head2 trans
 
-    String.trans()
+    self.trans(orig, repl)
 
 Returns the
 
@@ -1292,7 +1292,7 @@ Returns the
 
 =head2 trim
 
-    String.trim()
+    self.trim(arg)
 
 Returns the
 
@@ -1302,7 +1302,7 @@ Aliases: I<strip>
 
 =head2 uc
 
-    String.uc()
+    self.uc
 
 Returns the
 
@@ -1312,7 +1312,7 @@ Aliases: I<upper>, I<upcase>
 
 =head2 unescape
 
-    String.unescape()
+    self.unescape
 
 Returns the
 
@@ -1320,7 +1320,7 @@ Returns the
 
 =head2 unpack
 
-    String.unpack()
+    self.unpack(arg)
 
 Returns the
 
@@ -1328,7 +1328,7 @@ Returns the
 
 =head2 warn
 
-    String.warn()
+    self.warn
 
 Returns the
 
@@ -1336,7 +1336,7 @@ Returns the
 
 =head2 wc
 
-    String.wc()
+    self.wc
 
 Returns the
 
@@ -1346,7 +1346,7 @@ Aliases: I<wordcase>
 
 =head2 words
 
-    String.words()
+    self.words
 
 Returns the
 

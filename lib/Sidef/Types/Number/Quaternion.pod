@@ -230,7 +230,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 a
 
-    Quaternion.a()
+    self.a
 
 Returns the
 
@@ -240,7 +240,7 @@ Aliases: I<re>, I<real>
 
 =head2 abs
 
-    Quaternion.abs()
+    x.abs
 
 Returns the
 
@@ -248,7 +248,7 @@ Returns the
 
 =head2 b
 
-    Quaternion.b()
+    self.b
 
 Returns the
 
@@ -256,7 +256,7 @@ Returns the
 
 =head2 c
 
-    Quaternion.c()
+    self.c
 
 Returns the
 
@@ -264,7 +264,7 @@ Returns the
 
 =head2 ceil
 
-    Quaternion.ceil()
+    x.ceil
 
 Returns the
 
@@ -272,7 +272,7 @@ Returns the
 
 =head2 conj
 
-    Quaternion.conj()
+    x.conj
 
 Returns the
 
@@ -280,7 +280,7 @@ Returns the
 
 =head2 d
 
-    Quaternion.d()
+    self.d
 
 Returns the
 
@@ -288,7 +288,7 @@ Returns the
 
 =head2 dump
 
-    Quaternion.dump()
+    x.dump
 
 Returns the
 
@@ -296,7 +296,7 @@ Returns the
 
 =head2 eval
 
-    Quaternion.eval()
+    x.eval(v)
 
 Returns the
 
@@ -304,7 +304,7 @@ Returns the
 
 =head2 float
 
-    Quaternion.float()
+    x.float
 
 Returns the
 
@@ -312,7 +312,7 @@ Returns the
 
 =head2 floor
 
-    Quaternion.floor()
+    x.floor
 
 Returns the
 
@@ -320,7 +320,7 @@ Returns the
 
 =head2 inv
 
-    Quaternion.inv()
+    x.inv
 
 Returns the
 
@@ -328,7 +328,7 @@ Returns the
 
 =head2 invmod
 
-    Quaternion.invmod()
+    x.invmod(m)
 
 Returns the
 
@@ -336,7 +336,7 @@ Returns the
 
 =head2 is_coprime
 
-    Quaternion.is_coprime()
+    n.is_coprime(k)
 
 Returns the
 
@@ -344,7 +344,7 @@ Returns the
 
 =head2 is_mone
 
-    Quaternion.is_mone()
+    x.is_mone
 
 Returns the
 
@@ -352,7 +352,7 @@ Returns the
 
 =head2 is_one
 
-    Quaternion.is_one()
+    x.is_one
 
 Returns the
 
@@ -360,7 +360,7 @@ Returns the
 
 =head2 is_zero
 
-    Quaternion.is_zero()
+    x.is_zero
 
 Returns the
 
@@ -368,7 +368,7 @@ Returns the
 
 =head2 lift
 
-    Quaternion.lift()
+    x.lift
 
 Returns the
 
@@ -376,7 +376,7 @@ Returns the
 
 =head2 neg
 
-    Quaternion.neg()
+    x.neg
 
 Returns the
 
@@ -384,7 +384,7 @@ Returns the
 
 =head2 new
 
-    Quaternion.new()
+    self.new
 
 Returns the
 
@@ -394,7 +394,7 @@ Aliases: I<call>
 
 =head2 norm
 
-    Quaternion.norm()
+    x.norm
 
 Returns the
 
@@ -402,7 +402,7 @@ Returns the
 
 =head2 parts
 
-    Quaternion.parts()
+    self.parts
 
 Returns the
 
@@ -410,7 +410,7 @@ Returns the
 
 =head2 powmod
 
-    Quaternion.powmod()
+    x.powmod(n, m)
 
 Returns the
 
@@ -418,7 +418,7 @@ Returns the
 
 =head2 pretty
 
-    Quaternion.pretty()
+    x.pretty
 
 Returns the
 
@@ -428,7 +428,7 @@ Aliases: I<stringify>
 
 =head2 reals
 
-    Quaternion.reals()
+    self.reals
 
 Returns the
 
@@ -436,7 +436,7 @@ Returns the
 
 =head2 round
 
-    Quaternion.round()
+    x.round(r)
 
 Returns the
 
@@ -444,7 +444,7 @@ Returns the
 
 =head2 sgn
 
-    Quaternion.sgn()
+    x.sgn
 
 Returns the
 
@@ -452,7 +452,7 @@ Returns the
 
 =head2 sqr
 
-    Quaternion.sqr()
+    x.sqr
 
 Returns the
 
@@ -460,7 +460,7 @@ Returns the
 
 =head2 to_c
 
-    Quaternion.to_c()
+    x.to_c
 
 Returns the
 
@@ -470,7 +470,7 @@ Aliases: I<to_n>
 
 =head2 to_gauss
 
-    Quaternion.to_gauss()
+    x.to_gauss
 
 Returns the
 
@@ -478,7 +478,7 @@ Returns the
 
 =head2 to_s
 
-    Quaternion.to_s()
+    x.to_s
 
 Returns the
 

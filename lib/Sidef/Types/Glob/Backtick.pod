@@ -34,7 +34,7 @@ Aliases: I<run>, I<exec>, I<execute>
 
 =head2 call
 
-    Backtick.call()
+    self.call
 
 Returns the
 
@@ -42,7 +42,7 @@ Returns the
 
 =head2 to_s
 
-    Backtick.to_s()
+    self.to_s
 
 Returns the
 

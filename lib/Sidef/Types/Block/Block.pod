@@ -64,7 +64,7 @@ Aliases: I<map>
 
 =head2 Π
 
-    Block.Π()
+    self.Π(range)
 
 Returns the
 
@@ -74,7 +74,7 @@ Aliases: I<prod>
 
 =head2 Σ
 
-    Block.Σ()
+    self.Σ(range)
 
 Returns the
 
@@ -94,7 +94,7 @@ Aliases: I<compose>
 
 =head2 array_identity
 
-    Block.array_identity()
+    self.array_identity
 
 Returns the
 
@@ -102,7 +102,7 @@ Returns the
 
 =head2 cache
 
-    Block.cache()
+    self.cache
 
 Returns the
 
@@ -110,7 +110,7 @@ Returns the
 
 =head2 call
 
-    Block.call()
+    block.call(*args)
 
 Returns the
 
@@ -118,7 +118,7 @@ Returns the
 
 =head2 cap
 
-    Block.cap()
+    self.cap
 
 Returns the
 
@@ -128,7 +128,7 @@ Aliases: I<capture>
 
 =head2 do
 
-    Block.do()
+    self.do
 
 Returns the
 
@@ -138,7 +138,7 @@ Aliases: I<run>
 
 =head2 exec
 
-    Block.exec()
+    self.exec(*args)
 
 Returns the
 
@@ -146,7 +146,7 @@ Returns the
 
 =head2 ffork
 
-    Block.ffork()
+    self.ffork(*args)
 
 Returns the
 
@@ -156,7 +156,7 @@ Aliases: I<start>
 
 =head2 first
 
-    Block.first()
+    self.first(n, range)
 
 Returns the
 
@@ -164,7 +164,7 @@ Returns the
 
 =head2 flush_cache
 
-    Block.flush_cache()
+    self.flush_cache
 
 Returns the
 
@@ -172,7 +172,7 @@ Returns the
 
 =head2 fork
 
-    Block.fork()
+    self.fork(*args)
 
 Returns the
 
@@ -180,7 +180,7 @@ Returns the
 
 =head2 identity
 
-    Block.identity()
+    self.identity
 
 Returns the
 
@@ -188,7 +188,7 @@ Returns the
 
 =head2 if
 
-    Block.if()
+    self.if(bool)
 
 Returns the
 
@@ -196,7 +196,7 @@ Returns the
 
 =head2 is_identity
 
-    Block.is_identity()
+    self.is_identity
 
 Returns the
 
@@ -204,7 +204,7 @@ Returns the
 
 =head2 list_identity
 
-    Block.list_identity()
+    self.list_identity
 
 Returns the
 
@@ -212,7 +212,7 @@ Returns the
 
 =head2 loop
 
-    Block.loop()
+    self.loop
 
 Returns the
 
@@ -220,7 +220,7 @@ Returns the
 
 =head2 new
 
-    Block.new()
+    self.new
 
 Returns the
 
@@ -228,7 +228,7 @@ Returns the
 
 =head2 nth
 
-    Block.nth()
+    self.nth(n, range)
 
 Returns the
 
@@ -236,7 +236,7 @@ Returns the
 
 =head2 null_identity
 
-    Block.null_identity()
+    self.null_identity
 
 Returns the
 
@@ -244,7 +244,7 @@ Returns the
 
 =head2 thr
 
-    Block.thr()
+    self.thr(*args)
 
 Returns the
 
@@ -254,7 +254,7 @@ Aliases: I<thread>
 
 =head2 to_s
 
-    Block.to_s()
+    self.to_s
 
 Returns the
 
@@ -264,7 +264,7 @@ Aliases: I<dump>, I<to_str>
 
 =head2 uncache
 
-    Block.uncache()
+    self.uncache
 
 Returns the
 
@@ -272,7 +272,7 @@ Returns the
 
 =head2 while
 
-    Block.while()
+    self.while(condition)
 
 Returns the
 

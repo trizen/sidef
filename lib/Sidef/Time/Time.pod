@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 dump
 
-    Time.dump()
+    self.dump
 
 Returns the
 
@@ -32,7 +32,7 @@ Returns the
 
 =head2 gmt
 
-    Time.gmt()
+    self.gmt
 
 Returns the
 
@@ -42,7 +42,7 @@ Aliases: I<gmtime>
 
 =head2 local
 
-    Time.local()
+    self.local
 
 Returns the
 
@@ -52,7 +52,7 @@ Aliases: I<localtime>
 
 =head2 micro
 
-    Time.micro()
+    self.micro
 
 Returns the
 
@@ -62,7 +62,7 @@ Aliases: I<micro_sec>, I<micro_seconds>
 
 =head2 new
 
-    Time.new()
+    self.new
 
 Returns the
 
@@ -72,7 +72,7 @@ Aliases: I<call>
 
 =head2 now
 
-    Time.now()
+    self.now
 
 Returns the
 
@@ -80,7 +80,7 @@ Returns the
 
 =head2 sec
 
-    Time.sec()
+    self.sec
 
 Returns the
 
@@ -90,7 +90,7 @@ Aliases: I<time>
 
 =head2 to_s
 
-    Time.to_s()
+    self.to_s
 
 Returns the
 

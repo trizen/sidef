@@ -11,9 +11,9 @@ use feature 'fc';
 use lib qw(.);
 use open IO => ':encoding(UTF-8)';
 
-use File::Find qw(find);
-use List::Util qw(first);
-use File::Basename qw(basename);
+use File::Find            qw(find);
+use List::Util            qw(first);
+use File::Basename        qw(basename);
 use File::Spec::Functions qw(curdir splitdir catfile);
 
 my $dir = shift() // die "usage: $0 sidef/lib\n";
@@ -28,7 +28,7 @@ my %ignored_subs = map { $_ => 1 } qw<
   ISA
   AUTOLOAD
   DESTROY
-  >;
+>;
 
 my %ignored_methods = (
                        'Sidef'                          => [qw(new)],
@@ -45,13 +45,20 @@ my %ignored_methods = (
                        'Sidef::Types::Regex::Regex'     => [qw(new)],
                       );
 
-my %ignored_modules = map { $_ => 1 } qw (
+my %singletons = map { $_ => 1 } qw(
+  Sidef::Sys::Sys
+  Sidef::Sys::Sig
+  Sidef::Math::Math
+  Sidef::Perl::Perl
+);
+
+my %ignored_modules = map { $_ => 1 } qw(
   Sidef
   Sidef::Parser
   Sidef::Optimizer
   Sidef::Deparse::Perl
   Sidef::Deparse::Sidef
-  );
+);
 
 my $name = basename($dir);
 if ($name ne 'lib') {
@@ -94,6 +101,34 @@ sub parse_pod_file {
 
         if ($meth == 0 && $line =~ /^=head1\h+METHODS/) {
             $meth = 1;
+        }
+    }
+    close $fh;
+
+    return \%data;
+}
+
+sub parse_pm_file {
+    my ($file) = @_;
+
+    my %data;
+    open my $fh, '<', $file;
+
+    while (defined(my $line = <$fh>)) {
+        if ($line =~ /^\s*sub\s+(\w+)\s*\{/) {
+            my $name = $1;
+            next if ($name eq 'new');
+            for (1 .. 2) {
+                my $sig_line = scalar <$fh>;
+                if ($sig_line =~ m{^\s*my\s*\((.*?)\)\s*=\s*\@_}) {
+                    my $sig = $1;
+                    $sig =~ s{\$}{}g;
+                    $sig =~ s{\@}{*}g;
+                    $sig =~ s{\%}{:}g;
+                    my @params = split(/\s*,\s*/, $sig);
+                    $data{$name} = \@params;
+                }
+            }
         }
     }
     close $fh;
@@ -171,9 +206,12 @@ sub process_file {
         push @{$subs{$code}{aliases}}, $sub;
     }
 
+    my $signatures = parse_pm_file(join('/', @parts) . '.pm');
+
     while (my ($key, $value) = each %subs) {
 
-        my @sorted = sort_methods_by_length(map { [$_, $_] } @{$value->{aliases}});
+        my @sorted  = sort_methods_by_length(map { [$_, $_] } @{$value->{aliases}});
+        my $sig_key = first { exists($signatures->{$_}) } @sorted;
 
         $value->{name} = shift @sorted;
         @{$value->{aliases}} = @sorted;
@@ -184,11 +222,34 @@ sub process_file {
 
         #$sub =~ s{([<>])}{E<$esc{$1}>}g;
 
+        #my $sig = "$parts[-1].$sub()";
+        my $sig = "self.$sub";
+
+        if (exists $singletons{$module}) {
+            $sig = "$parts[-1].$sub";
+        }
+
+        if (defined($sig_key)) {
+            my @params = @{$signatures->{$sig_key}};
+
+            my $self = shift(@params);
+
+            if (exists($singletons{$module}) or $self eq 'undef') {
+                $self = $parts[-1];
+            }
+
+            $sig = $self . '.' . $orig_name;
+
+            if (@params) {
+                $sig .= '(' . join(', ', @params) . ')';
+            }
+        }
+
         my $doc = $is_method ? <<"__POD__" : <<"__POD2__";
 
 \=head2 $orig_name
 
-    $parts[-1].$sub()
+    $sig
 
 Returns the
 __POD__
@@ -237,10 +298,7 @@ __POD2__
 
         my $alias;
         if (exists $value->{aliases}) {
-            $alias = first {
-                exists($pod_data->{$_})
-            }
-            @{$value->{aliases}};
+            $alias = first { exists($pod_data->{$_}) } @{$value->{aliases}};
         }
 
         if ($alias // exists($pod_data->{$value->{name}})) {

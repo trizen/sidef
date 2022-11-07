@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 abs
 
-    File.abs()
+    self.abs(base)
 
 Returns the
 
@@ -34,7 +34,7 @@ Aliases: I<abs_name>, I<absname>, I<rel2abs>
 
 =head2 abs_path
 
-    File.abs_path()
+    self.abs_path
 
 Returns the
 
@@ -44,7 +44,7 @@ Aliases: I<realpath>
 
 =head2 access_time_days_diff
 
-    File.access_time_days_diff()
+    self.access_time_days_diff
 
 Returns the
 
@@ -52,7 +52,7 @@ Returns the
 
 =head2 append
 
-    File.append()
+    self.append(string, mode)
 
 Returns the
 
@@ -60,7 +60,7 @@ Returns the
 
 =head2 base
 
-    File.base()
+    self.base
 
 Returns the
 
@@ -70,7 +70,7 @@ Aliases: I<base_name>, I<basename>
 
 =head2 change_time_days_diff
 
-    File.change_time_days_diff()
+    self.change_time_days_diff
 
 Returns the
 
@@ -78,7 +78,7 @@ Returns the
 
 =head2 chmod
 
-    File.chmod()
+    self.chmod(permission)
 
 Returns the
 
@@ -86,7 +86,7 @@ Returns the
 
 =head2 chown
 
-    File.chown()
+    self.chown(uid, gid)
 
 Returns the
 
@@ -94,7 +94,7 @@ Returns the
 
 =head2 compare
 
-    File.compare()
+    self.compare(file)
 
 Returns the
 
@@ -102,7 +102,7 @@ Returns the
 
 =head2 cp
 
-    File.cp()
+    self.cp(file)
 
 Returns the
 
@@ -112,7 +112,7 @@ Aliases: I<copy>
 
 =head2 delete
 
-    File.delete()
+    self.delete(*args)
 
 Returns the
 
@@ -122,7 +122,7 @@ Aliases: I<remove>
 
 =head2 dir
 
-    File.dir()
+    self.dir
 
 Returns the
 
@@ -132,7 +132,7 @@ Aliases: I<dir_name>, I<dirname>
 
 =head2 dump
 
-    File.dump()
+    self.dump
 
 Returns the
 
@@ -140,7 +140,7 @@ Returns the
 
 =head2 edit
 
-    File.edit()
+    self.edit(code)
 
 Returns the
 
@@ -148,7 +148,7 @@ Returns the
 
 =head2 exists
 
-    File.exists()
+    self.exists
 
 Returns the
 
@@ -156,7 +156,7 @@ Returns the
 
 =head2 has_setgid_bit
 
-    File.has_setgid_bit()
+    self.has_setgid_bit
 
 Returns the
 
@@ -164,7 +164,7 @@ Returns the
 
 =head2 has_setuid_bit
 
-    File.has_setuid_bit()
+    self.has_setuid_bit
 
 Returns the
 
@@ -172,7 +172,7 @@ Returns the
 
 =head2 has_sticky_bit
 
-    File.has_sticky_bit()
+    self.has_sticky_bit
 
 Returns the
 
@@ -180,7 +180,7 @@ Returns the
 
 =head2 is_abs
 
-    File.is_abs()
+    self.is_abs
 
 Returns the
 
@@ -190,7 +190,7 @@ Aliases: I<is_absolute>
 
 =head2 is_binary
 
-    File.is_binary()
+    self.is_binary
 
 Returns the
 
@@ -198,7 +198,7 @@ Returns the
 
 =head2 is_block
 
-    File.is_block()
+    self.is_block
 
 Returns the
 
@@ -206,7 +206,7 @@ Returns the
 
 =head2 is_char_device
 
-    File.is_char_device()
+    self.is_char_device
 
 Returns the
 
@@ -214,7 +214,7 @@ Returns the
 
 =head2 is_dir
 
-    File.is_dir()
+    self.is_dir
 
 Returns the
 
@@ -224,7 +224,7 @@ Aliases: I<is_directory>
 
 =head2 is_empty
 
-    File.is_empty()
+    self.is_empty
 
 Returns the
 
@@ -232,7 +232,7 @@ Returns the
 
 =head2 is_executable
 
-    File.is_executable()
+    self.is_executable
 
 Returns the
 
@@ -240,7 +240,7 @@ Returns the
 
 =head2 is_file
 
-    File.is_file()
+    self.is_file
 
 Returns the
 
@@ -248,7 +248,7 @@ Returns the
 
 =head2 is_link
 
-    File.is_link()
+    self.is_link
 
 Returns the
 
@@ -256,7 +256,7 @@ Returns the
 
 =head2 is_owned
 
-    File.is_owned()
+    self.is_owned
 
 Returns the
 
@@ -264,7 +264,7 @@ Returns the
 
 =head2 is_readable
 
-    File.is_readable()
+    self.is_readable
 
 Returns the
 
@@ -272,7 +272,7 @@ Returns the
 
 =head2 is_real_executable
 
-    File.is_real_executable()
+    self.is_real_executable
 
 Returns the
 
@@ -280,7 +280,7 @@ Returns the
 
 =head2 is_real_owned
 
-    File.is_real_owned()
+    self.is_real_owned
 
 Returns the
 
@@ -288,7 +288,7 @@ Returns the
 
 =head2 is_real_readable
 
-    File.is_real_readable()
+    self.is_real_readable
 
 Returns the
 
@@ -296,7 +296,7 @@ Returns the
 
 =head2 is_real_writeable
 
-    File.is_real_writeable()
+    self.is_real_writeable
 
 Returns the
 
@@ -304,7 +304,7 @@ Returns the
 
 =head2 is_socket
 
-    File.is_socket()
+    self.is_socket
 
 Returns the
 
@@ -312,7 +312,7 @@ Returns the
 
 =head2 is_text
 
-    File.is_text()
+    self.is_text
 
 Returns the
 
@@ -320,7 +320,7 @@ Returns the
 
 =head2 is_writeable
 
-    File.is_writeable()
+    self.is_writeable
 
 Returns the
 
@@ -328,7 +328,7 @@ Returns the
 
 =head2 lstat
 
-    File.lstat()
+    self.lstat
 
 Returns the
 
@@ -336,7 +336,7 @@ Returns the
 
 =head2 make
 
-    File.make()
+    self.make(*args)
 
 Returns the
 
@@ -346,7 +346,7 @@ Aliases: I<touch>, I<create>, I<mkfile>
 
 =head2 md5
 
-    File.md5()
+    self.md5
 
 Returns the
 
@@ -354,7 +354,7 @@ Returns the
 
 =head2 modification_time_days_diff
 
-    File.modification_time_days_diff()
+    self.modification_time_days_diff
 
 Returns the
 
@@ -362,7 +362,7 @@ Returns the
 
 =head2 mv
 
-    File.mv()
+    self.mv(file)
 
 Returns the
 
@@ -372,7 +372,7 @@ Aliases: I<move>
 
 =head2 name
 
-    File.name()
+    self.name
 
 Returns the
 
@@ -380,7 +380,7 @@ Returns the
 
 =head2 new
 
-    File.new()
+    self.new
 
 Returns the
 
@@ -390,7 +390,7 @@ Aliases: I<call>
 
 =head2 open
 
-    File.open()
+    self.open(mode, fh_ref, err_ref)
 
 Returns the
 
@@ -398,7 +398,7 @@ Returns the
 
 =head2 open_a
 
-    File.open_a()
+    self.open_a(*args)
 
 Returns the
 
@@ -408,7 +408,7 @@ Aliases: I<open_append>
 
 =head2 opendir
 
-    File.opendir()
+    self.opendir(*args)
 
 Returns the
 
@@ -416,7 +416,7 @@ Returns the
 
 =head2 open_r
 
-    File.open_r()
+    self.open_r(*args)
 
 Returns the
 
@@ -426,7 +426,7 @@ Aliases: I<open_read>
 
 =head2 open_rw
 
-    File.open_rw()
+    self.open_rw(*args)
 
 Returns the
 
@@ -436,7 +436,7 @@ Aliases: I<open_read_write>
 
 =head2 open_w
 
-    File.open_w()
+    self.open_w(*args)
 
 Returns the
 
@@ -446,7 +446,7 @@ Aliases: I<open_write>
 
 =head2 read
 
-    File.read()
+    self.read(mode)
 
 Returns the
 
@@ -454,7 +454,7 @@ Returns the
 
 =head2 read_link
 
-    File.read_link()
+    self.read_link
 
 Returns the
 
@@ -464,7 +464,7 @@ Aliases: I<readlink>
 
 =head2 rel
 
-    File.rel()
+    self.rel(base)
 
 Returns the
 
@@ -474,7 +474,7 @@ Aliases: I<abs2rel>, I<rel_name>, I<relname>
 
 =head2 rename
 
-    File.rename()
+    self.rename(file)
 
 Returns the
 
@@ -482,7 +482,7 @@ Returns the
 
 =head2 sha1
 
-    File.sha1()
+    self.sha1
 
 Returns the
 
@@ -490,7 +490,7 @@ Returns the
 
 =head2 sha256
 
-    File.sha256()
+    self.sha256
 
 Returns the
 
@@ -498,7 +498,7 @@ Returns the
 
 =head2 sha512
 
-    File.sha512()
+    self.sha512
 
 Returns the
 
@@ -506,7 +506,7 @@ Returns the
 
 =head2 size
 
-    File.size()
+    self.size
 
 Returns the
 
@@ -514,7 +514,7 @@ Returns the
 
 =head2 split
 
-    File.split()
+    self.split
 
 Returns the
 
@@ -522,7 +522,7 @@ Returns the
 
 =head2 splitpath
 
-    File.splitpath()
+    self.splitpath
 
 Returns the
 
@@ -530,7 +530,7 @@ Returns the
 
 =head2 stat
 
-    File.stat()
+    self.stat
 
 Returns the
 
@@ -538,7 +538,7 @@ Returns the
 
 =head2 sysopen
 
-    File.sysopen()
+    self.sysopen(var_ref, mode, perm)
 
 Returns the
 
@@ -546,7 +546,7 @@ Returns the
 
 =head2 to_file
 
-    File.to_file()
+    self.to_file
 
 Returns the
 
@@ -554,7 +554,7 @@ Returns the
 
 =head2 to_s
 
-    File.to_s()
+    self.to_s
 
 Returns the
 
@@ -564,7 +564,7 @@ Aliases: I<to_str>
 
 =head2 truncate
 
-    File.truncate()
+    self.truncate(length)
 
 Returns the
 
@@ -572,7 +572,7 @@ Returns the
 
 =head2 unlink
 
-    File.unlink()
+    self.unlink(*args)
 
 Returns the
 
@@ -580,7 +580,7 @@ Returns the
 
 =head2 utime
 
-    File.utime()
+    self.utime(atime, mtime)
 
 Returns the
 
@@ -588,7 +588,7 @@ Returns the
 
 =head2 write
 
-    File.write()
+    self.write(string, mode)
 
 Returns the
 

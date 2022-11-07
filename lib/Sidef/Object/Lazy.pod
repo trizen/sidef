@@ -17,7 +17,7 @@ var obj = Lazy(...)
 
 =head2 each
 
-    Lazy.each()
+    self.each(block)
 
 Returns the
 
@@ -25,7 +25,7 @@ Returns the
 
 =head2 first
 
-    Lazy.first()
+    self.first(n)
 
 Returns the
 
@@ -33,7 +33,7 @@ Returns the
 
 =head2 first_by
 
-    Lazy.first_by()
+    self.first_by(block)
 
 Returns the
 
@@ -41,7 +41,7 @@ Returns the
 
 =head2 grep
 
-    Lazy.grep()
+    self.grep(block)
 
 Returns the
 
@@ -51,7 +51,7 @@ Aliases: I<select>
 
 =head2 iter
 
-    Lazy.iter()
+    self.iter
 
 Returns the
 
@@ -59,7 +59,7 @@ Returns the
 
 =head2 lazy
 
-    Lazy.lazy()
+    self.lazy
 
 Returns the
 
@@ -67,7 +67,7 @@ Returns the
 
 =head2 map
 
-    Lazy.map()
+    self.map(block)
 
 Returns the
 
@@ -77,7 +77,7 @@ Aliases: I<collect>
 
 =head2 new
 
-    Lazy.new()
+    self.new
 
 Returns the
 
@@ -85,7 +85,7 @@ Returns the
 
 =head2 nth
 
-    Lazy.nth()
+    self.nth(n)
 
 Returns the
 
@@ -93,7 +93,7 @@ Returns the
 
 =head2 prod
 
-    Lazy.prod()
+    self.prod(block)
 
 Returns the
 
@@ -103,7 +103,7 @@ Aliases: I<prod_by>
 
 =head2 prod_kv
 
-    Lazy.prod_kv()
+    self.prod_kv(block)
 
 Returns the
 
@@ -111,7 +111,7 @@ Returns the
 
 =head2 reduce
 
-    Lazy.reduce()
+    self.reduce(operator, result)
 
 Returns the
 
@@ -119,7 +119,7 @@ Returns the
 
 =head2 reduce_by
 
-    Lazy.reduce_by()
+    self.reduce_by(block, result)
 
 Returns the
 
@@ -127,7 +127,7 @@ Returns the
 
 =head2 sum
 
-    Lazy.sum()
+    self.sum(block)
 
 Returns the
 
@@ -137,7 +137,7 @@ Aliases: I<sum_by>
 
 =head2 sum_kv
 
-    Lazy.sum_kv()
+    self.sum_kv(block)
 
 Returns the
 
@@ -145,7 +145,7 @@ Returns the
 
 =head2 to_a
 
-    Lazy.to_a()
+    self.to_a
 
 Returns the
 
@@ -153,7 +153,7 @@ Returns the
 
 =head2 while
 
-    Lazy.while()
+    self.while(block)
 
 Returns the
 

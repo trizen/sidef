@@ -151,7 +151,7 @@ Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
 =head2 all
 
-    Set.all()
+    self.all(block)
 
 Returns the
 
@@ -159,7 +159,7 @@ Returns the
 
 =head2 any
 
-    Set.any()
+    self.any(block)
 
 Returns the
 
@@ -167,7 +167,7 @@ Returns the
 
 =head2 collect
 
-    Set.collect()
+    self.collect(block)
 
 Returns the
 
@@ -175,7 +175,7 @@ Returns the
 
 =head2 contains_all
 
-    Set.contains_all()
+    self.contains_all(*objects)
 
 Returns the
 
@@ -183,7 +183,7 @@ Returns the
 
 =head2 count
 
-    Set.count()
+    self.count(obj)
 
 Returns the
 
@@ -191,7 +191,7 @@ Returns the
 
 =head2 count_by
 
-    Set.count_by()
+    self.count_by(block)
 
 Returns the
 
@@ -199,7 +199,7 @@ Returns the
 
 =head2 delete
 
-    Set.delete()
+    self.delete(*objects)
 
 Returns the
 
@@ -209,7 +209,7 @@ Aliases: I<remove>, I<discard>
 
 =head2 delete_first_if
 
-    Set.delete_first_if()
+    self.delete_first_if(block)
 
 Returns the
 
@@ -217,7 +217,7 @@ Returns the
 
 =head2 delete_if
 
-    Set.delete_if()
+    self.delete_if(block)
 
 Returns the
 
@@ -225,7 +225,7 @@ Returns the
 
 =head2 dump
 
-    Set.dump()
+    self.dump
 
 Returns the
 
@@ -233,7 +233,7 @@ Returns the
 
 =head2 each
 
-    Set.each()
+    self.each(block)
 
 Returns the
 
@@ -241,7 +241,7 @@ Returns the
 
 =head2 each_2d
 
-    Set.each_2d()
+    self.each_2d(block)
 
 Returns the
 
@@ -249,7 +249,7 @@ Returns the
 
 =head2 grep
 
-    Set.grep()
+    self.grep(block)
 
 Returns the
 
@@ -259,7 +259,7 @@ Aliases: I<select>
 
 =head2 grep_2d
 
-    Set.grep_2d()
+    self.grep_2d(block)
 
 Returns the
 
@@ -267,7 +267,7 @@ Returns the
 
 =head2 iter
 
-    Set.iter()
+    self.iter
 
 Returns the
 
@@ -275,7 +275,7 @@ Returns the
 
 =head2 join
 
-    Set.join()
+    self.join(*rest)
 
 Returns the
 
@@ -283,7 +283,7 @@ Returns the
 
 =head2 map
 
-    Set.map()
+    self.map(block)
 
 Returns the
 
@@ -291,7 +291,7 @@ Returns the
 
 =head2 map_2d
 
-    Set.map_2d()
+    self.map_2d(block)
 
 Returns the
 
@@ -299,7 +299,7 @@ Returns the
 
 =head2 max
 
-    Set.max()
+    self.max
 
 Returns the
 
@@ -307,7 +307,7 @@ Returns the
 
 =head2 max_by
 
-    Set.max_by()
+    self.max_by(block)
 
 Returns the
 
@@ -315,7 +315,7 @@ Returns the
 
 =head2 min
 
-    Set.min()
+    self.min
 
 Returns the
 
@@ -323,7 +323,7 @@ Returns the
 
 =head2 min_by
 
-    Set.min_by()
+    self.min_by(block)
 
 Returns the
 
@@ -331,7 +331,7 @@ Returns the
 
 =head2 new
 
-    Set.new()
+    self.new
 
 Returns the
 
@@ -341,7 +341,7 @@ Aliases: I<call>
 
 =head2 none
 
-    Set.none()
+    self.none(block)
 
 Returns the
 
@@ -349,7 +349,7 @@ Returns the
 
 =head2 pop
 
-    Set.pop()
+    self.pop
 
 Returns the
 
@@ -357,7 +357,7 @@ Returns the
 
 =head2 prod
 
-    Set.prod()
+    self.prod(block)
 
 Returns the
 
@@ -367,7 +367,7 @@ Aliases: I<prod_by>
 
 =head2 prod_2d
 
-    Set.prod_2d()
+    self.prod_2d(block)
 
 Returns the
 
@@ -375,7 +375,7 @@ Returns the
 
 =head2 shift
 
-    Set.shift()
+    self.shift
 
 Returns the
 
@@ -383,7 +383,7 @@ Returns the
 
 =head2 sort
 
-    Set.sort()
+    self.sort(block)
 
 Returns the
 
@@ -391,7 +391,7 @@ Returns the
 
 =head2 sort_by
 
-    Set.sort_by()
+    self.sort_by(block)
 
 Returns the
 
@@ -399,7 +399,7 @@ Returns the
 
 =head2 sum
 
-    Set.sum()
+    self.sum(block)
 
 Returns the
 
@@ -409,7 +409,7 @@ Aliases: I<sum_by>
 
 =head2 sum_2d
 
-    Set.sum_2d()
+    self.sum_2d(block)
 
 Returns the
 
@@ -417,7 +417,7 @@ Returns the
 
 =head2 to_a
 
-    Set.to_a()
+    self.to_a
 
 Returns the
 
@@ -427,7 +427,7 @@ Aliases: I<values>, I<to_array>
 
 =head2 to_bag
 
-    Set.to_bag()
+    self.to_bag
 
 Returns the
 
@@ -435,7 +435,7 @@ Returns the
 
 =head2 to_set
 
-    Set.to_set()
+    self.to_set
 
 Returns the
 

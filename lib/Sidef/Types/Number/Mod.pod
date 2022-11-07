@@ -229,7 +229,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 chebyshevt
 
-    Mod.chebyshevt()
+    x.chebyshevt(n)
 
 Returns the
 
@@ -239,7 +239,7 @@ Aliases: I<chebyshevT>
 
 =head2 chebyshevu
 
-    Mod.chebyshevu()
+    x.chebyshevu(n)
 
 Returns the
 
@@ -249,7 +249,7 @@ Aliases: I<chebyshevU>
 
 =head2 chinese
 
-    Mod.chinese()
+    *values.chinese
 
 Returns the
 
@@ -257,7 +257,7 @@ Returns the
 
 =head2 cyclotomic
 
-    Mod.cyclotomic()
+    x.cyclotomic(n)
 
 Returns the
 
@@ -265,7 +265,7 @@ Returns the
 
 =head2 dump
 
-    Mod.dump()
+    x.dump
 
 Returns the
 
@@ -273,7 +273,7 @@ Returns the
 
 =head2 eval
 
-    Mod.eval()
+    x.eval(v)
 
 Returns the
 
@@ -281,7 +281,7 @@ Returns the
 
 =head2 fib
 
-    Mod.fib()
+    x.fib
 
 Returns the
 
@@ -291,7 +291,7 @@ Aliases: I<fibonacci>
 
 =head2 inv
 
-    Mod.inv()
+    x.inv
 
 Returns the
 
@@ -299,7 +299,7 @@ Returns the
 
 =head2 is_inf
 
-    Mod.is_inf()
+    self.is_inf
 
 Returns the
 
@@ -307,7 +307,7 @@ Returns the
 
 =head2 is_mone
 
-    Mod.is_mone()
+    x.is_mone
 
 Returns the
 
@@ -315,7 +315,7 @@ Returns the
 
 =head2 is_nan
 
-    Mod.is_nan()
+    self.is_nan
 
 Returns the
 
@@ -323,7 +323,7 @@ Returns the
 
 =head2 is_neg
 
-    Mod.is_neg()
+    self.is_neg
 
 Returns the
 
@@ -331,7 +331,7 @@ Returns the
 
 =head2 is_ninf
 
-    Mod.is_ninf()
+    self.is_ninf
 
 Returns the
 
@@ -339,7 +339,7 @@ Returns the
 
 =head2 is_one
 
-    Mod.is_one()
+    x.is_one
 
 Returns the
 
@@ -347,7 +347,7 @@ Returns the
 
 =head2 is_pos
 
-    Mod.is_pos()
+    self.is_pos
 
 Returns the
 
@@ -355,7 +355,7 @@ Returns the
 
 =head2 is_real
 
-    Mod.is_real()
+    self.is_real
 
 Returns the
 
@@ -363,7 +363,7 @@ Returns the
 
 =head2 is_zero
 
-    Mod.is_zero()
+    x.is_zero
 
 Returns the
 
@@ -371,7 +371,7 @@ Returns the
 
 =head2 lucas
 
-    Mod.lucas()
+    x.lucas
 
 Returns the
 
@@ -379,7 +379,7 @@ Returns the
 
 =head2 lucasu
 
-    Mod.lucasu()
+    x.lucasu(P, Q)
 
 Returns the
 
@@ -389,7 +389,7 @@ Aliases: I<lucasU>
 
 =head2 lucasv
 
-    Mod.lucasv()
+    x.lucasv(P, Q)
 
 Returns the
 
@@ -399,7 +399,7 @@ Aliases: I<lucasV>
 
 =head2 modulus
 
-    Mod.modulus()
+    self.modulus
 
 Returns the
 
@@ -407,7 +407,7 @@ Returns the
 
 =head2 neg
 
-    Mod.neg()
+    x.neg
 
 Returns the
 
@@ -415,7 +415,7 @@ Returns the
 
 =head2 new
 
-    Mod.new()
+    self.new
 
 Returns the
 
@@ -425,7 +425,7 @@ Aliases: I<call>
 
 =head2 norm
 
-    Mod.norm()
+    self.norm
 
 Returns the
 
@@ -433,7 +433,7 @@ Returns the
 
 =head2 pretty
 
-    Mod.pretty()
+    x.pretty
 
 Returns the
 
@@ -441,7 +441,7 @@ Returns the
 
 =head2 re
 
-    Mod.re()
+    self.re
 
 Returns the
 
@@ -451,7 +451,7 @@ Aliases: I<real>
 
 =head2 sqr
 
-    Mod.sqr()
+    x.sqr
 
 Returns the
 
@@ -459,7 +459,7 @@ Returns the
 
 =head2 sqrt
 
-    Mod.sqrt()
+    x.sqrt
 
 Returns the
 
@@ -467,7 +467,7 @@ Returns the
 
 =head2 to_n
 
-    Mod.to_n()
+    self.to_n
 
 Returns the
 
@@ -477,7 +477,7 @@ Aliases: I<lift>
 
 =head2 to_s
 
-    Mod.to_s()
+    x.to_s
 
 Returns the
 
@@ -485,7 +485,7 @@ Returns the
 
 =head2 znorder
 
-    Mod.znorder()
+    x.znorder
 
 Returns the
 

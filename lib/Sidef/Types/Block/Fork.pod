@@ -17,7 +17,7 @@ var obj = Fork(...)
 
 =head2 get
 
-    Fork.get()
+    self.get
 
 Returns the
 
@@ -27,7 +27,7 @@ Aliases: I<join>, I<wait>
 
 =head2 kill
 
-    Fork.kill()
+    self.kill(signal)
 
 Returns the
 
@@ -35,7 +35,7 @@ Returns the
 
 =head2 new
 
-    Fork.new()
+    self.new
 
 Returns the
 

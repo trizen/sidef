@@ -17,7 +17,7 @@ var obj = Convert(...)
 
 =head2 to_a
 
-    Convert.to_a()
+    self.to_a
 
 Returns the
 
@@ -27,7 +27,7 @@ Aliases: I<to_array>
 
 =head2 to_b
 
-    Convert.to_b()
+    self.to_b
 
 Returns the
 
@@ -37,7 +37,7 @@ Aliases: I<to_bool>
 
 =head2 to_bag
 
-    Convert.to_bag()
+    self.to_bag
 
 Returns the
 
@@ -45,7 +45,7 @@ Returns the
 
 =head2 to_caller
 
-    Convert.to_caller()
+    self.to_caller
 
 Returns the
 
@@ -53,7 +53,7 @@ Returns the
 
 =head2 to_dir
 
-    Convert.to_dir()
+    self.to_dir
 
 Returns the
 
@@ -61,7 +61,7 @@ Returns the
 
 =head2 to_f
 
-    Convert.to_f()
+    self.to_f
 
 Returns the
 
@@ -71,7 +71,7 @@ Aliases: I<to_float>
 
 =head2 to_fcaller
 
-    Convert.to_fcaller()
+    self.to_fcaller
 
 Returns the
 
@@ -79,7 +79,7 @@ Returns the
 
 =head2 to_file
 
-    Convert.to_file()
+    self.to_file
 
 Returns the
 
@@ -87,7 +87,7 @@ Returns the
 
 =head2 to_i
 
-    Convert.to_i()
+    self.to_i
 
 Returns the
 
@@ -97,7 +97,7 @@ Aliases: I<to_int>
 
 =head2 to_m
 
-    Convert.to_m()
+    self.to_m
 
 Returns the
 
@@ -107,7 +107,7 @@ Aliases: I<to_matrix>
 
 =head2 to_n
 
-    Convert.to_n()
+    self.to_n
 
 Returns the
 
@@ -117,7 +117,7 @@ Aliases: I<to_num>
 
 =head2 to_r
 
-    Convert.to_r()
+    self.to_r
 
 Returns the
 
@@ -127,7 +127,7 @@ Aliases: I<to_rat>
 
 =head2 to_re
 
-    Convert.to_re()
+    self.to_re
 
 Returns the
 
@@ -137,7 +137,7 @@ Aliases: I<to_regex>
 
 =head2 to_s
 
-    Convert.to_s()
+    self.to_s
 
 Returns the
 
@@ -147,7 +147,7 @@ Aliases: I<to_str>
 
 =head2 to_set
 
-    Convert.to_set()
+    self.to_set
 
 Returns the
 
@@ -155,7 +155,7 @@ Returns the
 
 =head2 to_type
 
-    Convert.to_type()
+    self.to_type(obj)
 
 Returns the
 
@@ -163,7 +163,7 @@ Returns the
 
 =head2 to_v
 
-    Convert.to_v()
+    self.to_v
 
 Returns the
 

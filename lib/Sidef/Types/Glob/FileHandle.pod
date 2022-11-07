@@ -44,7 +44,7 @@ Aliases: I<E<gt>E<gt>>, I<read_to>
 
 =head2 autoflush
 
-    FileHandle.autoflush()
+    self.autoflush(bool)
 
 Returns the
 
@@ -52,7 +52,7 @@ Returns the
 
 =head2 binmode
 
-    FileHandle.binmode()
+    self.binmode(encoding)
 
 Returns the
 
@@ -60,7 +60,7 @@ Returns the
 
 =head2 call
 
-    FileHandle.call()
+    self.call
 
 Returns the
 
@@ -68,7 +68,7 @@ Returns the
 
 =head2 char
 
-    FileHandle.char()
+    self.char(var_ref)
 
 Returns the
 
@@ -78,7 +78,7 @@ Aliases: I<getc>, I<read_char>
 
 =head2 chars
 
-    FileHandle.chars()
+    self.chars
 
 Returns the
 
@@ -86,7 +86,7 @@ Returns the
 
 =head2 close
 
-    FileHandle.close()
+    self.close
 
 Returns the
 
@@ -94,7 +94,7 @@ Returns the
 
 =head2 cp
 
-    FileHandle.cp()
+    self.cp(fh)
 
 Returns the
 
@@ -104,7 +104,7 @@ Aliases: I<copy>
 
 =head2 each
 
-    FileHandle.each()
+    self.each(code)
 
 Returns the
 
@@ -114,7 +114,7 @@ Aliases: I<each_line>
 
 =head2 each_char
 
-    FileHandle.each_char()
+    self.each_char(code)
 
 Returns the
 
@@ -122,7 +122,7 @@ Returns the
 
 =head2 eof
 
-    FileHandle.eof()
+    self.eof
 
 Returns the
 
@@ -130,7 +130,7 @@ Returns the
 
 =head2 fcntl
 
-    FileHandle.fcntl()
+    self.fcntl(func, flags)
 
 Returns the
 
@@ -138,7 +138,7 @@ Returns the
 
 =head2 file
 
-    FileHandle.file()
+    self.file
 
 Returns the
 
@@ -148,7 +148,7 @@ Aliases: I<parent>
 
 =head2 fileno
 
-    FileHandle.fileno()
+    self.fileno
 
 Returns the
 
@@ -156,7 +156,7 @@ Returns the
 
 =head2 flock
 
-    FileHandle.flock()
+    self.flock(mode)
 
 Returns the
 
@@ -164,7 +164,7 @@ Returns the
 
 =head2 get
 
-    FileHandle.get()
+    self.get(var_ref)
 
 Returns the
 
@@ -174,7 +174,7 @@ Aliases: I<line>, I<readln>, I<read_line>, I<readline>
 
 =head2 grep
 
-    FileHandle.grep()
+    self.grep(obj)
 
 Returns the
 
@@ -184,7 +184,7 @@ Aliases: I<select>
 
 =head2 isatty
 
-    FileHandle.isatty()
+    self.isatty
 
 Returns the
 
@@ -194,7 +194,7 @@ Aliases: I<is_on_tty>
 
 =head2 iter
 
-    FileHandle.iter()
+    self.iter
 
 Returns the
 
@@ -202,7 +202,7 @@ Returns the
 
 =head2 lines
 
-    FileHandle.lines()
+    self.lines
 
 Returns the
 
@@ -212,7 +212,7 @@ Aliases: I<read_lines>, I<readlines>
 
 =head2 lock
 
-    FileHandle.lock()
+    self.lock
 
 Returns the
 
@@ -220,7 +220,7 @@ Returns the
 
 =head2 lstat
 
-    FileHandle.lstat()
+    self.lstat
 
 Returns the
 
@@ -228,7 +228,7 @@ Returns the
 
 =head2 map
 
-    FileHandle.map()
+    self.map(block)
 
 Returns the
 
@@ -238,7 +238,7 @@ Aliases: I<collect>
 
 =head2 print
 
-    FileHandle.print()
+    self.print(*args)
 
 Returns the
 
@@ -248,7 +248,7 @@ Aliases: I<spurt>, I<write>
 
 =head2 printf
 
-    FileHandle.printf()
+    self.printf(*args)
 
 Returns the
 
@@ -256,7 +256,7 @@ Returns the
 
 =head2 read
 
-    FileHandle.read()
+    self.read(var_ref, length, offset)
 
 Returns the
 
@@ -264,7 +264,7 @@ Returns the
 
 =head2 say
 
-    FileHandle.say()
+    self.say(*args)
 
 Returns the
 
@@ -274,7 +274,7 @@ Aliases: I<println>
 
 =head2 seek
 
-    FileHandle.seek()
+    self.seek(pos, whence)
 
 Returns the
 
@@ -282,7 +282,7 @@ Returns the
 
 =head2 slurp
 
-    FileHandle.slurp()
+    self.slurp
 
 Returns the
 
@@ -290,7 +290,7 @@ Returns the
 
 =head2 stat
 
-    FileHandle.stat()
+    self.stat
 
 Returns the
 
@@ -298,7 +298,7 @@ Returns the
 
 =head2 stderr
 
-    FileHandle.stderr()
+    self.stderr
 
 Returns the
 
@@ -306,7 +306,7 @@ Returns the
 
 =head2 stdin
 
-    FileHandle.stdin()
+    self.stdin
 
 Returns the
 
@@ -314,7 +314,7 @@ Returns the
 
 =head2 stdout
 
-    FileHandle.stdout()
+    self.stdout
 
 Returns the
 
@@ -322,7 +322,7 @@ Returns the
 
 =head2 sysread
 
-    FileHandle.sysread()
+    self.sysread(var_ref, length, offset)
 
 Returns the
 
@@ -330,7 +330,7 @@ Returns the
 
 =head2 sysseek
 
-    FileHandle.sysseek()
+    self.sysseek(pos, whence)
 
 Returns the
 
@@ -338,7 +338,7 @@ Returns the
 
 =head2 syswrite
 
-    FileHandle.syswrite()
+    self.syswrite(scalar, length, offset)
 
 Returns the
 
@@ -346,7 +346,7 @@ Returns the
 
 =head2 tell
 
-    FileHandle.tell()
+    self.tell
 
 Returns the
 
@@ -354,7 +354,7 @@ Returns the
 
 =head2 truncate
 
-    FileHandle.truncate()
+    self.truncate(length)
 
 Returns the
 
@@ -362,7 +362,7 @@ Returns the
 
 =head2 unlock
 
-    FileHandle.unlock()
+    self.unlock
 
 Returns the
 
@@ -370,7 +370,7 @@ Returns the
 
 =head2 words
 
-    FileHandle.words()
+    self.words
 
 Returns the
 

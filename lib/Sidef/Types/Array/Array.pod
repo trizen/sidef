@@ -205,7 +205,7 @@ Aliases: I<pipeline_cross_op>
 
 =head2 |Z>
 
-    Array.|Z>()
+    self.|Z>(*callbacks)
 
 Returns the
 
@@ -310,7 +310,7 @@ Aliases: I<abbreviations>
 
 =head2 acc
 
-    Array.acc()
+    self.acc(block)
 
 Returns the
 
@@ -320,7 +320,7 @@ Aliases: I<accumulate>
 
 =head2 acc_by
 
-    Array.acc_by()
+    self.acc_by(block)
 
 Returns the
 
@@ -330,7 +330,7 @@ Aliases: I<accumulate_by>
 
 =head2 all
 
-    Array.all()
+    self.all(block)
 
 Returns the
 
@@ -338,7 +338,7 @@ Returns the
 
 =head2 all_composite
 
-    Array.all_composite()
+    self.all_composite
 
 Returns the
 
@@ -346,7 +346,7 @@ Returns the
 
 =head2 all_prime
 
-    Array.all_prime()
+    self.all_prime
 
 Returns the
 
@@ -354,7 +354,7 @@ Returns the
 
 =head2 any
 
-    Array.any()
+    self.any(block)
 
 Returns the
 
@@ -412,7 +412,7 @@ Aliases: I<bsearch_index_by>
 
 =head2 bindex_ge
 
-    Array.bindex_ge()
+    self.bindex_ge(obj)
 
 Returns the
 
@@ -420,7 +420,7 @@ Returns the
 
 =head2 bindex_ge_by
 
-    Array.bindex_ge_by()
+    self.bindex_ge_by(obj)
 
 Returns the
 
@@ -428,7 +428,7 @@ Returns the
 
 =head2 bindex_le
 
-    Array.bindex_le()
+    self.bindex_le(obj)
 
 Returns the
 
@@ -436,7 +436,7 @@ Returns the
 
 =head2 bindex_le_by
 
-    Array.bindex_le_by()
+    self.bindex_le_by(obj)
 
 Returns the
 
@@ -468,7 +468,7 @@ Applies the binary splitting algorithm to the self-array, returning the result c
 
 =head2 bsearch
 
-    Array.bsearch()
+    self.bsearch(obj)
 
 Returns the
 
@@ -478,7 +478,7 @@ Aliases: I<bsearch_by>
 
 =head2 bsearch_ge
 
-    Array.bsearch_ge()
+    self.bsearch_ge(obj)
 
 Returns the
 
@@ -488,7 +488,7 @@ Aliases: I<bsearch_ge_by>
 
 =head2 bsearch_le
 
-    Array.bsearch_le()
+    self.bsearch_le(obj)
 
 Returns the
 
@@ -545,7 +545,7 @@ Converts a given continued fraction expansion to a number.
 
 =head2 change_to
 
-    Array.change_to()
+    self.change_to(arg)
 
 Returns the
 
@@ -553,7 +553,7 @@ Returns the
 
 =head2 chrs
 
-    Array.chrs()
+    self.chrs(encoding)
 
 Returns the
 
@@ -563,7 +563,7 @@ Aliases: I<decode>, I<join_bytes>
 
 =head2 circular_permutations
 
-    Array.circular_permutations()
+    self.circular_permutations
 
 Returns the
 
@@ -571,7 +571,7 @@ Returns the
 
 =head2 clear
 
-    Array.clear()
+    self.clear
 
 Returns the
 
@@ -579,7 +579,7 @@ Returns the
 
 =head2 collapse
 
-    Array.collapse()
+    self.collapse(initial)
 
 Returns the
 
@@ -587,7 +587,7 @@ Returns the
 
 =head2 combinations
 
-    Array.combinations()
+    self.combinations
 
 Returns the
 
@@ -595,7 +595,7 @@ Returns the
 
 =head2 combinations_with_repetition
 
-    Array.combinations_with_repetition()
+    self.combinations_with_repetition
 
 Returns the
 
@@ -603,7 +603,7 @@ Returns the
 
 =head2 combine
 
-    Array.combine()
+    self.combine(block)
 
 Returns the
 
@@ -611,7 +611,7 @@ Returns the
 
 =head2 compact
 
-    Array.compact()
+    self.compact
 
 Returns the
 
@@ -631,7 +631,7 @@ Aliases: I<map_cons>
 
 =head2 contains_all
 
-    Array.contains_all()
+    self.contains_all(array)
 
 Returns the
 
@@ -639,7 +639,7 @@ Returns the
 
 =head2 contains_any
 
-    Array.contains_any()
+    self.contains_any(array)
 
 Returns the
 
@@ -647,7 +647,7 @@ Returns the
 
 =head2 contains_type
 
-    Array.contains_type()
+    self.contains_type(obj)
 
 Returns the
 
@@ -655,7 +655,7 @@ Returns the
 
 =head2 count
 
-    Array.count()
+    self.count(obj)
 
 Returns the
 
@@ -663,7 +663,7 @@ Returns the
 
 =head2 count_by
 
-    Array.count_by()
+    self.count_by(block)
 
 Returns the
 
@@ -671,7 +671,7 @@ Returns the
 
 =head2 cross_op
 
-    Array.cross_op()
+    self.cross_op(operator, arg)
 
 Returns the
 
@@ -681,7 +681,7 @@ Aliases: I<cross_operator>
 
 =head2 defined
 
-    Array.defined()
+    self.defined(index)
 
 Returns the
 
@@ -689,7 +689,7 @@ Returns the
 
 =head2 delete
 
-    Array.delete()
+    self.delete(obj)
 
 Returns the
 
@@ -699,7 +699,7 @@ Aliases: I<remove>
 
 =head2 delete_by
 
-    Array.delete_by()
+    self.delete_by(block)
 
 Returns the
 
@@ -709,7 +709,7 @@ Aliases: I<delete_if>, I<remove_by>, I<remove_if>
 
 =head2 delete_first
 
-    Array.delete_first()
+    self.delete_first(obj)
 
 Returns the
 
@@ -719,7 +719,7 @@ Aliases: I<remove_first>
 
 =head2 delete_first_by
 
-    Array.delete_first_by()
+    self.delete_first_by(block)
 
 Returns the
 
@@ -745,7 +745,7 @@ Aliases: I<remove_last>
 
 =head2 delete_last_by
 
-    Array.delete_last_by()
+    self.delete_last_by(block)
 
 Returns the
 
@@ -755,7 +755,7 @@ Aliases: I<delete_last_if>, I<remove_last_by>, I<remove_last_if>
 
 =head2 derangements
 
-    Array.derangements()
+    self.derangements
 
 Returns the
 
@@ -765,7 +765,7 @@ Aliases: I<complete_permutations>
 
 =head2 det
 
-    Array.det()
+    self.det
 
 Returns the
 
@@ -775,7 +775,7 @@ Aliases: I<determinant>
 
 =head2 det_bareiss
 
-    Array.det_bareiss()
+    self.det_bareiss
 
 Returns the
 
@@ -799,7 +799,7 @@ Aliases: I<differences>, I<nth_differences>
 
 =head2 dig
 
-    Array.dig()
+    self.dig(key, *keys)
 
 Returns the
 
@@ -850,7 +850,7 @@ Outputs:
 
 =head2 each_k
 
-    Array.each_k()
+    self.each_k(block)
 
 Returns the
 
@@ -860,7 +860,7 @@ Aliases: I<each_key>, I<each_index>
 
 =head2 each_kv
 
-    Array.each_kv()
+    self.each_kv(block)
 
 Returns the
 
@@ -868,7 +868,7 @@ Returns the
 
 =head2 each_slice
 
-    Array.each_slice()
+    self.each_slice(n, block)
 
 Returns the
 
@@ -876,7 +876,7 @@ Returns the
 
 =head2 end
 
-    Array.end()
+    self.end
 
 Returns the
 
@@ -886,7 +886,7 @@ Aliases: I<offset>
 
 =head2 exists
 
-    Array.exists()
+    self.exists(index)
 
 Returns the
 
@@ -908,7 +908,7 @@ Aliases: I<expand_by>
 
 =head2 extract_by
 
-    Array.extract_by()
+    self.extract_by(block)
 
 Returns the
 
@@ -916,7 +916,7 @@ Returns the
 
 =head2 extract_first_by
 
-    Array.extract_first_by()
+    self.extract_first_by(block)
 
 Returns the
 
@@ -924,7 +924,7 @@ Returns the
 
 =head2 extract_last_by
 
-    Array.extract_last_by()
+    self.extract_last_by(block)
 
 Returns the
 
@@ -944,7 +944,7 @@ Fetches a value at the given index. When the index does not exist, it returns th
 
 =head2 find
 
-    Array.find()
+    self.find(block)
 
 Returns the
 
@@ -954,7 +954,7 @@ Aliases: I<first_by>
 
 =head2 flat
 
-    Array.flat()
+    self.flat
 
 Returns the
 
@@ -974,7 +974,7 @@ Similar to C<.map{}>, but it expects the returned block-value to be an array, wh
 
 =head2 flip
 
-    Array.flip()
+    self.flip
 
 Returns the
 
@@ -984,7 +984,7 @@ Aliases: I<reverse>
 
 =head2 for
 
-    Array.for()
+    self.for(block)
 
 Returns the
 
@@ -1004,7 +1004,7 @@ Returns a frequency Hash for the elements inside the array.
 
 =head2 freq_by
 
-    Array.freq_by()
+    self.freq_by(block)
 
 Returns the
 
@@ -1012,7 +1012,7 @@ Returns the
 
 =head2 ft
 
-    Array.ft()
+    self.ft
 
 Returns the
 
@@ -1022,7 +1022,7 @@ Aliases: I<slice>
 
 =head2 gauss_jordan_invert
 
-    Array.gauss_jordan_invert()
+    self.gauss_jordan_invert
 
 Returns the
 
@@ -1030,7 +1030,7 @@ Returns the
 
 =head2 gauss_jordan_solve
 
-    Array.gauss_jordan_solve()
+    self.gauss_jordan_solve(vector)
 
 Returns the
 
@@ -1038,7 +1038,7 @@ Returns the
 
 =head2 gcd
 
-    Array.gcd()
+    self.gcd(block)
 
 Returns the
 
@@ -1046,7 +1046,7 @@ Returns the
 
 =head2 gcd_by
 
-    Array.gcd_by()
+    self.gcd_by(block)
 
 Returns the
 
@@ -1054,7 +1054,7 @@ Returns the
 
 =head2 gcud
 
-    Array.gcud()
+    self.gcud(block)
 
 Returns the
 
@@ -1062,7 +1062,7 @@ Returns the
 
 =head2 gcud_by
 
-    Array.gcud_by()
+    self.gcud_by(block)
 
 Returns the
 
@@ -1094,7 +1094,7 @@ Parse an array containing (long) command-line arguments, automatically convertin
 
 =head2 grep
 
-    Array.grep()
+    self.grep(block)
 
 Returns the
 
@@ -1114,7 +1114,7 @@ Filtering of a 2D array, given a block of code.
 
 =head2 grep_kv
 
-    Array.grep_kv()
+    self.grep_kv(block)
 
 Returns the
 
@@ -1124,7 +1124,7 @@ Aliases: I<select_kv>
 
 =head2 group
 
-    Array.group()
+    self.group(block)
 
 Returns the
 
@@ -1134,7 +1134,7 @@ Aliases: I<group_by>
 
 =head2 head
 
-    Array.head()
+    self.head(arg)
 
 Returns the
 
@@ -1181,7 +1181,7 @@ Aliases: I<reduce>
 
 =head2 insert
 
-    Array.insert()
+    self.insert(i, *objects)
 
 Returns the
 
@@ -1189,7 +1189,7 @@ Returns the
 
 =head2 inv
 
-    Array.inv()
+    self.inv
 
 Returns the
 
@@ -1199,7 +1199,7 @@ Aliases: I<invert>, I<inverse>
 
 =head2 is_empty
 
-    Array.is_empty()
+    self.is_empty
 
 Returns the
 
@@ -1207,7 +1207,7 @@ Returns the
 
 =head2 item
 
-    Array.item()
+    self.item(index)
 
 Returns the
 
@@ -1215,7 +1215,7 @@ Returns the
 
 =head2 items
 
-    Array.items()
+    self.items(*indices)
 
 Returns the
 
@@ -1223,7 +1223,7 @@ Returns the
 
 =head2 iter
 
-    Array.iter()
+    self.iter
 
 Returns the
 
@@ -1231,7 +1231,7 @@ Returns the
 
 =head2 jaro_distance
 
-    Array.jaro_distance()
+    self.jaro_distance(arg, winkler)
 
 Returns the
 
@@ -1239,7 +1239,7 @@ Returns the
 
 =head2 join
 
-    Array.join()
+    self.join(delim, block)
 
 Returns the
 
@@ -1293,7 +1293,7 @@ Aliases: I<indices_of>
 
 =head2 kv
 
-    Array.kv()
+    self.kv
 
 Returns the
 
@@ -1303,7 +1303,7 @@ Aliases: I<pairs>, I<zip_indices>
 
 =head2 last
 
-    Array.last()
+    self.last(arg)
 
 Returns the
 
@@ -1313,7 +1313,7 @@ Aliases: I<tail>
 
 =head2 last_by
 
-    Array.last_by()
+    self.last_by(block)
 
 Returns the
 
@@ -1321,7 +1321,7 @@ Returns the
 
 =head2 last_uniq
 
-    Array.last_uniq()
+    self.last_uniq
 
 Returns the
 
@@ -1331,7 +1331,7 @@ Aliases: I<last_unique>
 
 =head2 last_uniq_by
 
-    Array.last_uniq_by()
+    self.last_uniq_by(block)
 
 Returns the
 
@@ -1341,7 +1341,7 @@ Aliases: I<last_unique_by>
 
 =head2 lcm
 
-    Array.lcm()
+    self.lcm(block)
 
 Returns the
 
@@ -1349,7 +1349,7 @@ Returns the
 
 =head2 lcm_by
 
-    Array.lcm_by()
+    self.lcm_by(block)
 
 Returns the
 
@@ -1357,7 +1357,7 @@ Returns the
 
 =head2 len
 
-    Array.len()
+    self.len
 
 Returns the
 
@@ -1367,7 +1367,7 @@ Aliases: I<size>, I<length>
 
 =head2 lev
 
-    Array.lev()
+    self.lev(arg)
 
 Returns the
 
@@ -1377,7 +1377,7 @@ Aliases: I<leven>, I<levenshtein>
 
 =head2 madd
 
-    Array.madd()
+    m1.madd(m2)
 
 Returns the
 
@@ -1387,7 +1387,7 @@ Aliases: I<matrix_add>
 
 =head2 make
 
-    Array.make()
+    self.make(size, obj)
 
 Returns the
 
@@ -1395,7 +1395,7 @@ Returns the
 
 =head2 make_by
 
-    Array.make_by()
+    self.make_by(size, block)
 
 Returns the
 
@@ -1403,7 +1403,7 @@ Returns the
 
 =head2 map
 
-    Array.map()
+    self.map(block)
 
 Returns the
 
@@ -1423,7 +1423,7 @@ Mapping of a 2D array, given a block of code.
 
 =head2 map_kv
 
-    Array.map_kv()
+    self.map_kv(block)
 
 Returns the
 
@@ -1433,7 +1433,7 @@ Aliases: I<collect_kv>
 
 =head2 map_op
 
-    Array.map_op()
+    self.map_op(operator, *args)
 
 Returns the
 
@@ -1466,7 +1466,7 @@ Recursively match an array against a regular expression.
 
 =head2 max
 
-    Array.max()
+    self.max
 
 Returns the
 
@@ -1474,7 +1474,7 @@ Returns the
 
 =head2 max_by
 
-    Array.max_by()
+    self.max_by
 
 Returns the
 
@@ -1482,7 +1482,7 @@ Returns the
 
 =head2 mdiv
 
-    Array.mdiv()
+    m1.mdiv(m2)
 
 Returns the
 
@@ -1492,7 +1492,7 @@ Aliases: I<matrix_div>
 
 =head2 min
 
-    Array.min()
+    self.min
 
 Returns the
 
@@ -1500,7 +1500,7 @@ Returns the
 
 =head2 min_by
 
-    Array.min_by()
+    self.min_by
 
 Returns the
 
@@ -1508,7 +1508,7 @@ Returns the
 
 =head2 minmax
 
-    Array.minmax()
+    self.minmax
 
 Returns the
 
@@ -1539,7 +1539,7 @@ Aliases: I<matrix_mul>
 
 =head2 msolve
 
-    Array.msolve()
+    self.msolve(vector)
 
 Returns the
 
@@ -1549,7 +1549,7 @@ Aliases: I<matrix_solve>
 
 =head2 msub
 
-    Array.msub()
+    m1.msub(m2)
 
 Returns the
 
@@ -1559,7 +1559,7 @@ Aliases: I<matrix_sub>
 
 =head2 new
 
-    Array.new()
+    self.new
 
 Returns the
 
@@ -1610,7 +1610,7 @@ Aliases: I<nth_permutation>
 
 =head2 pack
 
-    Array.pack()
+    self.pack(format)
 
 Returns the
 
@@ -1618,7 +1618,7 @@ Returns the
 
 =head2 pair_map
 
-    Array.pair_map()
+    self.pair_map(block)
 
 Returns the
 
@@ -1661,7 +1661,7 @@ Aliases: I<partition>
 
 =head2 partitions
 
-    Array.partitions()
+    self.partitions(k, block)
 
 Returns the
 
@@ -1669,7 +1669,7 @@ Returns the
 
 =head2 perm2num
 
-    Array.perm2num()
+    self.perm2num
 
 Returns the
 
@@ -1677,7 +1677,7 @@ Returns the
 
 =head2 permutations
 
-    Array.permutations()
+    self.permutations
 
 Returns the
 
@@ -1685,7 +1685,7 @@ Returns the
 
 =head2 pick
 
-    Array.pick()
+    self.pick(amount)
 
 Returns the
 
@@ -1693,7 +1693,7 @@ Returns the
 
 =head2 pop_at
 
-    Array.pop_at()
+    self.pop_at(offset)
 
 Returns the
 
@@ -1703,7 +1703,7 @@ Aliases: I<delete_at>, I<delete_index>
 
 =head2 pop_rand
 
-    Array.pop_rand()
+    self.pop_rand
 
 Returns the
 
@@ -1711,7 +1711,7 @@ Returns the
 
 =head2 pop_while
 
-    Array.pop_while()
+    self.pop_while(block)
 
 Returns the
 
@@ -1719,7 +1719,7 @@ Returns the
 
 =head2 prepend
 
-    Array.prepend()
+    self.prepend(*args)
 
 Returns the
 
@@ -1729,7 +1729,7 @@ Aliases: I<unshift>
 
 =head2 prod
 
-    Array.prod()
+    self.prod(arg)
 
 Returns the
 
@@ -1757,7 +1757,7 @@ Product of an array, by mapping each element to the given block.
 
 =head2 prod_kv
 
-    Array.prod_kv()
+    self.prod_kv(block)
 
 Returns the
 
@@ -1765,7 +1765,7 @@ Returns the
 
 =head2 rand
 
-    Array.rand()
+    self.rand(amount)
 
 Returns the
 
@@ -1798,7 +1798,7 @@ Aliases: I<random_permutation>
 
 =head2 range
 
-    Array.range()
+    self.range
 
 Returns the
 
@@ -1819,7 +1819,7 @@ Recursively map the value of an array, given a block of code.
 
 =head2 reduce_op
 
-    Array.reduce_op()
+    self.reduce_op(operator, initial)
 
 Returns the
 
@@ -1845,7 +1845,7 @@ Aliases: I<resize_to>
 
 =head2 rindex
 
-    Array.rindex()
+    self.rindex(obj)
 
 Returns the
 
@@ -1855,7 +1855,7 @@ Aliases: I<rindex_by>, I<last_index>, I<last_index_by>
 
 =head2 rotate
 
-    Array.rotate()
+    self.rotate(num)
 
 Returns the
 
@@ -1863,7 +1863,7 @@ Returns the
 
 =head2 rref
 
-    Array.rref()
+    self.rref
 
 Returns the
 
@@ -1873,7 +1873,7 @@ Aliases: I<reduced_row_echelon_form>
 
 =head2 rscalar_op
 
-    Array.rscalar_op()
+    self.rscalar_op(operator, scalar)
 
 Returns the
 
@@ -1897,7 +1897,7 @@ Aliases: I<run_length_by>
 
 =head2 sadd
 
-    Array.sadd()
+    self.sadd(scalar)
 
 Returns the
 
@@ -1907,7 +1907,7 @@ Aliases: I<scalar_add>
 
 =head2 scalar_op
 
-    Array.scalar_op()
+    self.scalar_op(operator, scalar)
 
 Returns the
 
@@ -1917,7 +1917,7 @@ Aliases: I<scalar_operator>
 
 =head2 sdiv
 
-    Array.sdiv()
+    self.sdiv(scalar)
 
 Returns the
 
@@ -1960,7 +1960,7 @@ Output:
 
 =head2 shift
 
-    Array.shift()
+    self.shift(num)
 
 Returns the
 
@@ -1970,7 +1970,7 @@ Aliases: I<drop_left>, I<drop_first>
 
 =head2 shift_while
 
-    Array.shift_while()
+    self.shift_while(block)
 
 Returns the
 
@@ -1978,7 +1978,7 @@ Returns the
 
 =head2 shuffle
 
-    Array.shuffle()
+    self.shuffle
 
 Returns the
 
@@ -1986,7 +1986,7 @@ Returns the
 
 =head2 slice_after
 
-    Array.slice_after()
+    self.slice_after(block)
 
 Returns the
 
@@ -1994,7 +1994,7 @@ Returns the
 
 =head2 slice_before
 
-    Array.slice_before()
+    self.slice_before(block)
 
 Returns the
 
@@ -2015,7 +2015,7 @@ Aliases: I<map_slice>
 
 =head2 smul
 
-    Array.smul()
+    self.smul(scalar)
 
 Returns the
 
@@ -2086,7 +2086,7 @@ Sort an array by mapping each value to the given block.
 
 =head2 splice
 
-    Array.splice()
+    self.splice(offset, length, *objects)
 
 Returns the
 
@@ -2094,7 +2094,7 @@ Returns the
 
 =head2 split
 
-    Array.split()
+    self.split(obj)
 
 Returns the
 
@@ -2112,7 +2112,7 @@ Splits the given array by the objects at which the given block returns a true va
 
 =head2 ssub
 
-    Array.ssub()
+    self.ssub(scalar)
 
 Returns the
 
@@ -2143,7 +2143,7 @@ Aliases: I<stack_by>
 
 =head2 subsets
 
-    Array.subsets()
+    self.subsets
 
 Returns the
 
@@ -2151,7 +2151,7 @@ Returns the
 
 =head2 sum
 
-    Array.sum()
+    self.sum(arg)
 
 Returns the
 
@@ -2179,7 +2179,7 @@ Sum of an array, by mapping each element to the given block.
 
 =head2 sum_kv
 
-    Array.sum_kv()
+    self.sum_kv(block)
 
 Returns the
 
@@ -2187,7 +2187,7 @@ Returns the
 
 =head2 swap
 
-    Array.swap()
+    self.swap(i, j)
 
 Returns the
 
@@ -2195,7 +2195,7 @@ Returns the
 
 =head2 take_left
 
-    Array.take_left()
+    self.take_left(amount)
 
 Returns the
 
@@ -2203,7 +2203,7 @@ Returns the
 
 =head2 take_right
 
-    Array.take_right()
+    self.take_right(amount)
 
 Returns the
 
@@ -2211,7 +2211,7 @@ Returns the
 
 =head2 to_a
 
-    Array.to_a()
+    self.to_a
 
 Returns the
 
@@ -2221,7 +2221,7 @@ Aliases: I<to_array>
 
 =head2 to_bag
 
-    Array.to_bag()
+    self.to_bag
 
 Returns the
 
@@ -2229,7 +2229,7 @@ Returns the
 
 =head2 to_h
 
-    Array.to_h()
+    self.to_h
 
 Returns the
 
@@ -2239,7 +2239,7 @@ Aliases: I<to_hash>
 
 =head2 to_m
 
-    Array.to_m()
+    self.to_m
 
 Returns the
 
@@ -2249,7 +2249,7 @@ Aliases: I<to_matrix>
 
 =head2 to_s
 
-    Array.to_s()
+    self.to_s
 
 Returns the
 
@@ -2259,7 +2259,7 @@ Aliases: I<dump>, I<to_str>
 
 =head2 to_set
 
-    Array.to_set()
+    self.to_set
 
 Returns the
 
@@ -2267,7 +2267,7 @@ Returns the
 
 =head2 to_v
 
-    Array.to_v()
+    self.to_v
 
 Returns the
 
@@ -2277,7 +2277,7 @@ Aliases: I<to_vector>
 
 =head2 tuples
 
-    Array.tuples()
+    self.tuples
 
 Returns the
 
@@ -2287,7 +2287,7 @@ Aliases: I<variations>
 
 =head2 tuples_with_repetition
 
-    Array.tuples_with_repetition()
+    self.tuples_with_repetition
 
 Returns the
 
@@ -2297,7 +2297,7 @@ Aliases: I<variations_with_repetition>
 
 =head2 uniq
 
-    Array.uniq()
+    self.uniq
 
 Returns the
 
@@ -2307,7 +2307,7 @@ Aliases: I<unique>, I<distinct>
 
 =head2 uniq_by
 
-    Array.uniq_by()
+    self.uniq_by(block)
 
 Returns the
 
@@ -2344,7 +2344,7 @@ Aliases: I<unique_permutations>
 
 =head2 uniq_prefs
 
-    Array.uniq_prefs()
+    self.uniq_prefs(block)
 
 Returns the
 
@@ -2354,7 +2354,7 @@ Aliases: I<unique_prefixes>
 
 =head2 unroll_op
 
-    Array.unroll_op()
+    self.unroll_op(operator, arg)
 
 Returns the
 
@@ -2364,7 +2364,7 @@ Aliases: I<unroll_operator>
 
 =head2 unzip_by
 
-    Array.unzip_by()
+    self.unzip_by(block)
 
 Returns the
 
@@ -2372,7 +2372,7 @@ Returns the
 
 =head2 weighted_shuffle_by
 
-    Array.weighted_shuffle_by()
+    self.weighted_shuffle_by(block)
 
 Returns the
 
@@ -2380,7 +2380,7 @@ Returns the
 
 =head2 wise_op
 
-    Array.wise_op()
+    m1.wise_op(operator, m2)
 
 Returns the
 
@@ -2390,7 +2390,7 @@ Aliases: I<wise_operator>
 
 =head2 zip
 
-    Array.zip()
+    self.zip(block)
 
 Returns the
 
@@ -2400,7 +2400,7 @@ Aliases: I<transpose>
 
 =head2 zip_by
 
-    Array.zip_by()
+    self.zip_by(block)
 
 Returns the
 
@@ -2408,7 +2408,7 @@ Returns the
 
 =head2 zip_op
 
-    Array.zip_op()
+    self.zip_op(operator, arg)
 
 Returns the
 

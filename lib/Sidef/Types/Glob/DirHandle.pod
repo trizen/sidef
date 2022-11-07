@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 call
 
-    DirHandle.call()
+    self.call
 
 Returns the
 
@@ -32,7 +32,7 @@ Returns the
 
 =head2 chdir
 
-    DirHandle.chdir()
+    self.chdir
 
 Returns the
 
@@ -40,7 +40,7 @@ Returns the
 
 =head2 close
 
-    DirHandle.close()
+    self.close
 
 Returns the
 
@@ -48,7 +48,7 @@ Returns the
 
 =head2 dir
 
-    DirHandle.dir()
+    self.dir
 
 Returns the
 
@@ -58,7 +58,7 @@ Aliases: I<parent>
 
 =head2 dirs
 
-    DirHandle.dirs()
+    self.dirs
 
 Returns the
 
@@ -66,7 +66,7 @@ Returns the
 
 =head2 each
 
-    DirHandle.each()
+    self.each(code)
 
 Returns the
 
@@ -74,7 +74,7 @@ Returns the
 
 =head2 entries
 
-    DirHandle.entries()
+    self.entries
 
 Returns the
 
@@ -82,7 +82,7 @@ Returns the
 
 =head2 files
 
-    DirHandle.files()
+    self.files
 
 Returns the
 
@@ -90,7 +90,7 @@ Returns the
 
 =head2 iter
 
-    DirHandle.iter()
+    self.iter
 
 Returns the
 
@@ -98,7 +98,7 @@ Returns the
 
 =head2 lstat
 
-    DirHandle.lstat()
+    self.lstat
 
 Returns the
 
@@ -106,7 +106,7 @@ Returns the
 
 =head2 read
 
-    DirHandle.read()
+    self.read
 
 Returns the
 
@@ -114,7 +114,7 @@ Returns the
 
 =head2 rewind
 
-    DirHandle.rewind()
+    self.rewind
 
 Returns the
 
@@ -122,7 +122,7 @@ Returns the
 
 =head2 seek
 
-    DirHandle.seek()
+    self.seek(pos)
 
 Returns the
 
@@ -130,7 +130,7 @@ Returns the
 
 =head2 stat
 
-    DirHandle.stat()
+    self.stat
 
 Returns the
 
@@ -138,7 +138,7 @@ Returns the
 
 =head2 tell
 
-    DirHandle.tell()
+    self.tell
 
 Returns the
 

@@ -124,7 +124,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 call
 
-    Regex.call()
+    self.call
 
 Returns the
 
@@ -132,7 +132,7 @@ Returns the
 
 =head2 gmatch
 
-    Regex.gmatch()
+    self.gmatch(obj, pos)
 
 Returns the
 
@@ -142,7 +142,7 @@ Aliases: I<global_match>
 
 =head2 gmatches
 
-    Regex.gmatches()
+    self.gmatches(obj, third, fourth)
 
 Returns the
 
@@ -152,7 +152,7 @@ Aliases: I<all_matches>, I<map_matches>, I<global_matches>, I<repeated_match>
 
 =head2 to_re
 
-    Regex.to_re()
+    self.to_re
 
 Returns the
 
@@ -162,7 +162,7 @@ Aliases: I<to_regex>
 
 =head2 to_s
 
-    Regex.to_s()
+    self.to_s
 
 Returns the
 

@@ -104,7 +104,7 @@ Aliases: I<or>
 
 =head2 abs
 
-    Vector.abs()
+    v.abs
 
 Returns the
 
@@ -112,7 +112,7 @@ Returns the
 
 =head2 atan2
 
-    Vector.atan2()
+    v1.atan2(v2)
 
 Returns the
 
@@ -120,7 +120,7 @@ Returns the
 
 =head2 ceil
 
-    Vector.ceil()
+    self.ceil
 
 Returns the
 
@@ -128,7 +128,7 @@ Returns the
 
 =head2 chebyshev_dist
 
-    Vector.chebyshev_dist()
+    v1.chebyshev_dist(v2)
 
 Returns the
 
@@ -136,7 +136,7 @@ Returns the
 
 =head2 dist
 
-    Vector.dist()
+    v1.dist(v2)
 
 Returns the
 
@@ -144,7 +144,7 @@ Returns the
 
 =head2 dist_norm
 
-    Vector.dist_norm()
+    v1.dist_norm(v2)
 
 Returns the
 
@@ -152,7 +152,7 @@ Returns the
 
 =head2 floor
 
-    Vector.floor()
+    self.floor
 
 Returns the
 
@@ -160,7 +160,7 @@ Returns the
 
 =head2 manhattan_dist
 
-    Vector.manhattan_dist()
+    v1.manhattan_dist(v2)
 
 Returns the
 
@@ -168,7 +168,7 @@ Returns the
 
 =head2 manhattan_norm
 
-    Vector.manhattan_norm()
+    v.manhattan_norm
 
 Returns the
 
@@ -176,7 +176,7 @@ Returns the
 
 =head2 neg
 
-    Vector.neg()
+    v1.neg
 
 Returns the
 
@@ -184,7 +184,7 @@ Returns the
 
 =head2 new
 
-    Vector.new()
+    self.new
 
 Returns the
 
@@ -194,7 +194,7 @@ Aliases: I<call>
 
 =head2 norm
 
-    Vector.norm()
+    v.norm
 
 Returns the
 
@@ -202,7 +202,7 @@ Returns the
 
 =head2 not
 
-    Vector.not()
+    v1.not
 
 Returns the
 
@@ -210,7 +210,7 @@ Returns the
 
 =head2 round
 
-    Vector.round()
+    self.round(digits)
 
 Returns the
 
@@ -218,7 +218,7 @@ Returns the
 
 =head2 to_a
 
-    Vector.to_a()
+    v.to_a
 
 Returns the
 
@@ -228,7 +228,7 @@ Aliases: I<to_array>
 
 =head2 to_s
 
-    Vector.to_s()
+    self.to_s
 
 Returns the
 
@@ -238,7 +238,7 @@ Aliases: I<dump>, I<to_str>
 
 =head2 zero
 
-    Vector.zero()
+    Vector.zero(n)
 
 Returns the
 

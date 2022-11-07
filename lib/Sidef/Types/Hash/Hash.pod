@@ -104,7 +104,7 @@ Aliases: I<!=>, I<ne>
 
 =head2 append
 
-    Hash.append()
+    self.append(:pairs)
 
 Returns the
 
@@ -112,7 +112,7 @@ Returns the
 
 =head2 as_tree
 
-    Hash.as_tree()
+    self.as_tree(root)
 
 Returns the
 
@@ -120,7 +120,7 @@ Returns the
 
 =head2 clear
 
-    Hash.clear()
+    self.clear
 
 Returns the
 
@@ -128,7 +128,7 @@ Returns the
 
 =head2 collect
 
-    Hash.collect()
+    self.collect(block)
 
 Returns the
 
@@ -138,7 +138,7 @@ Aliases: I<collect_kv>
 
 =head2 count
 
-    Hash.count()
+    self.count(obj)
 
 Returns the
 
@@ -146,7 +146,7 @@ Returns the
 
 =head2 count_by
 
-    Hash.count_by()
+    self.count_by(block)
 
 Returns the
 
@@ -154,7 +154,7 @@ Returns the
 
 =head2 delete
 
-    Hash.delete()
+    self.delete(*keys)
 
 Returns the
 
@@ -164,7 +164,7 @@ Aliases: I<remove>
 
 =head2 delete_if
 
-    Hash.delete_if()
+    self.delete_if(block)
 
 Returns the
 
@@ -172,7 +172,7 @@ Returns the
 
 =head2 dig
 
-    Hash.dig()
+    self.dig(key, *keys)
 
 Returns the
 
@@ -180,7 +180,7 @@ Returns the
 
 =head2 each
 
-    Hash.each()
+    self.each(obj)
 
 Returns the
 
@@ -190,7 +190,7 @@ Aliases: I<each_kv>, I<each_pair>
 
 =head2 each_k
 
-    Hash.each_k()
+    self.each_k(block)
 
 Returns the
 
@@ -200,7 +200,7 @@ Aliases: I<each_key>
 
 =head2 each_v
 
-    Hash.each_v()
+    self.each_v(block)
 
 Returns the
 
@@ -210,7 +210,7 @@ Aliases: I<each_value>
 
 =head2 fetch
 
-    Hash.fetch()
+    self.fetch(key, default)
 
 Returns the
 
@@ -218,7 +218,7 @@ Returns the
 
 =head2 flip
 
-    Hash.flip()
+    self.flip
 
 Returns the
 
@@ -228,7 +228,7 @@ Aliases: I<invert>, I<reverse>
 
 =head2 get_pair
 
-    Hash.get_pair()
+    self.get_pair(key)
 
 Returns the
 
@@ -236,7 +236,7 @@ Returns the
 
 =head2 get_pairs
 
-    Hash.get_pairs()
+    self.get_pairs(*keys)
 
 Returns the
 
@@ -244,7 +244,7 @@ Returns the
 
 =head2 grep
 
-    Hash.grep()
+    self.grep(block)
 
 Returns the
 
@@ -254,7 +254,7 @@ Aliases: I<grep_kv>, I<select>
 
 =head2 grep_v
 
-    Hash.grep_v()
+    self.grep_v(block)
 
 Returns the
 
@@ -264,7 +264,7 @@ Aliases: I<grep_val>
 
 =head2 has
 
-    Hash.has()
+    self.has(key)
 
 Returns the
 
@@ -274,7 +274,7 @@ Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, 
 
 =head2 is_empty
 
-    Hash.is_empty()
+    self.is_empty
 
 Returns the
 
@@ -282,7 +282,7 @@ Returns the
 
 =head2 item
 
-    Hash.item()
+    self.item(key)
 
 Returns the
 
@@ -290,7 +290,7 @@ Returns the
 
 =head2 items
 
-    Hash.items()
+    self.items(*keys)
 
 Returns the
 
@@ -298,7 +298,7 @@ Returns the
 
 =head2 keys
 
-    Hash.keys()
+    self.keys
 
 Returns the
 
@@ -306,7 +306,7 @@ Returns the
 
 =head2 kv
 
-    Hash.kv()
+    self.kv
 
 Returns the
 
@@ -316,7 +316,7 @@ Aliases: I<to_a>, I<pairs>, I<to_array>
 
 =head2 len
 
-    Hash.len()
+    self.len
 
 Returns the
 
@@ -326,7 +326,7 @@ Aliases: I<size>, I<length>
 
 =head2 lsel
 
-    Hash.lsel()
+    self.lsel(keys)
 
 Returns the
 
@@ -336,7 +336,7 @@ Aliases: I<linsel>, I<linear_selection>
 
 =head2 map
 
-    Hash.map()
+    self.map(block)
 
 Returns the
 
@@ -346,7 +346,7 @@ Aliases: I<map_kv>
 
 =head2 map_v
 
-    Hash.map_v()
+    self.map_v(block)
 
 Returns the
 
@@ -356,7 +356,7 @@ Aliases: I<map_val>
 
 =head2 max_by
 
-    Hash.max_by()
+    self.max_by(block)
 
 Returns the
 
@@ -364,7 +364,7 @@ Returns the
 
 =head2 merge_values
 
-    Hash.merge_values()
+    self.merge_values(obj)
 
 Returns the
 
@@ -372,7 +372,7 @@ Returns the
 
 =head2 min_by
 
-    Hash.min_by()
+    self.min_by(block)
 
 Returns the
 
@@ -380,7 +380,7 @@ Returns the
 
 =head2 new
 
-    Hash.new()
+    self.new
 
 Returns the
 
@@ -390,7 +390,7 @@ Aliases: I<call>
 
 =head2 same_keys
 
-    Hash.same_keys()
+    self.same_keys(obj)
 
 Returns the
 
@@ -398,7 +398,7 @@ Returns the
 
 =head2 set_keys
 
-    Hash.set_keys()
+    self.set_keys(*keys)
 
 Returns the
 
@@ -406,7 +406,7 @@ Returns the
 
 =head2 slice
 
-    Hash.slice()
+    self.slice(*keys)
 
 Returns the
 
@@ -414,7 +414,7 @@ Returns the
 
 =head2 sort
 
-    Hash.sort()
+    self.sort(block)
 
 Returns the
 
@@ -422,7 +422,7 @@ Returns the
 
 =head2 sort_by
 
-    Hash.sort_by()
+    self.sort_by(block)
 
 Returns the
 
@@ -430,7 +430,7 @@ Returns the
 
 =head2 to_bag
 
-    Hash.to_bag()
+    self.to_bag
 
 Returns the
 
@@ -438,7 +438,7 @@ Returns the
 
 =head2 to_s
 
-    Hash.to_s()
+    self.to_s
 
 Returns the
 
@@ -448,7 +448,7 @@ Aliases: I<dump>, I<to_str>
 
 =head2 to_set
 
-    Hash.to_set()
+    self.to_set
 
 Returns the
 
@@ -456,7 +456,7 @@ Returns the
 
 =head2 values
 
-    Hash.values()
+    self.values
 
 Returns the
 

@@ -114,7 +114,7 @@ Aliases: I<ge>
 
 =head2 add_days
 
-    Date.add_days()
+    self.add_days(days)
 
 Returns the
 
@@ -122,7 +122,7 @@ Returns the
 
 =head2 add_months
 
-    Date.add_months()
+    self.add_months(months)
 
 Returns the
 
@@ -130,7 +130,7 @@ Returns the
 
 =head2 add_years
 
-    Date.add_years()
+    self.add_years(years)
 
 Returns the
 
@@ -138,7 +138,7 @@ Returns the
 
 =head2 call
 
-    Date.call()
+    self.call
 
 Returns the
 
@@ -146,7 +146,7 @@ Returns the
 
 =head2 date
 
-    Date.date()
+    self.date
 
 Returns the
 
@@ -154,7 +154,7 @@ Returns the
 
 =head2 day
 
-    Date.day()
+    self.day
 
 Returns the
 
@@ -164,7 +164,7 @@ Aliases: I<mday>, I<month_day>
 
 =head2 dmy
 
-    Date.dmy()
+    self.dmy
 
 Returns the
 
@@ -172,7 +172,7 @@ Returns the
 
 =head2 dump
 
-    Date.dump()
+    self.dump
 
 Returns the
 
@@ -180,7 +180,7 @@ Returns the
 
 =head2 epoch
 
-    Date.epoch()
+    self.epoch
 
 Returns the
 
@@ -188,7 +188,7 @@ Returns the
 
 =head2 format
 
-    Date.format()
+    self.format(format)
 
 Returns the
 
@@ -198,7 +198,7 @@ Aliases: I<strftime>
 
 =head2 fullmonth
 
-    Date.fullmonth()
+    self.fullmonth
 
 Returns the
 
@@ -206,7 +206,7 @@ Returns the
 
 =head2 gmt
 
-    Date.gmt()
+    self.gmt(sec)
 
 Returns the
 
@@ -216,7 +216,7 @@ Aliases: I<gmtime>
 
 =head2 hour
 
-    Date.hour()
+    self.hour
 
 Returns the
 
@@ -224,7 +224,7 @@ Returns the
 
 =head2 isdst
 
-    Date.isdst()
+    self.isdst
 
 Returns the
 
@@ -234,7 +234,7 @@ Aliases: I<daylight_savings>
 
 =head2 julian_day
 
-    Date.julian_day()
+    self.julian_day
 
 Returns the
 
@@ -242,7 +242,7 @@ Returns the
 
 =head2 local
 
-    Date.local()
+    self.local(sec)
 
 Returns the
 
@@ -252,7 +252,7 @@ Aliases: I<localtime>
 
 =head2 mdy
 
-    Date.mdy()
+    self.mdy
 
 Returns the
 
@@ -260,7 +260,7 @@ Returns the
 
 =head2 min
 
-    Date.min()
+    self.min
 
 Returns the
 
@@ -270,7 +270,7 @@ Aliases: I<minute>
 
 =head2 mon
 
-    Date.mon()
+    self.mon
 
 Returns the
 
@@ -280,7 +280,7 @@ Aliases: I<month>
 
 =head2 monname
 
-    Date.monname()
+    self.monname
 
 Returns the
 
@@ -288,7 +288,7 @@ Returns the
 
 =head2 month_last_day
 
-    Date.month_last_day()
+    self.month_last_day
 
 Returns the
 
@@ -296,7 +296,7 @@ Returns the
 
 =head2 now
 
-    Date.now()
+    self.now
 
 Returns the
 
@@ -306,7 +306,7 @@ Aliases: I<today>
 
 =head2 parse
 
-    Date.parse()
+    self.parse(string, format)
 
 Returns the
 
@@ -316,7 +316,7 @@ Aliases: I<strptime>
 
 =head2 sec
 
-    Date.sec()
+    self.sec
 
 Returns the
 
@@ -326,7 +326,7 @@ Aliases: I<second>
 
 =head2 time
 
-    Date.time()
+    self.time
 
 Returns the
 
@@ -334,7 +334,7 @@ Returns the
 
 =head2 to_s
 
-    Date.to_s()
+    self.to_s
 
 Returns the
 
@@ -344,7 +344,7 @@ Aliases: I<cdate>, I<ctime>, I<to_str>
 
 =head2 truncate_to_day
 
-    Date.truncate_to_day()
+    self.truncate_to_day
 
 Returns the
 
@@ -352,7 +352,7 @@ Returns the
 
 =head2 truncate_to_hour
 
-    Date.truncate_to_hour()
+    self.truncate_to_hour
 
 Returns the
 
@@ -360,7 +360,7 @@ Returns the
 
 =head2 truncate_to_minute
 
-    Date.truncate_to_minute()
+    self.truncate_to_minute
 
 Returns the
 
@@ -368,7 +368,7 @@ Returns the
 
 =head2 truncate_to_month
 
-    Date.truncate_to_month()
+    self.truncate_to_month
 
 Returns the
 
@@ -376,7 +376,7 @@ Returns the
 
 =head2 truncate_to_quarter
 
-    Date.truncate_to_quarter()
+    self.truncate_to_quarter
 
 Returns the
 
@@ -384,7 +384,7 @@ Returns the
 
 =head2 truncate_to_second
 
-    Date.truncate_to_second()
+    self.truncate_to_second
 
 Returns the
 
@@ -392,7 +392,7 @@ Returns the
 
 =head2 truncate_to_year
 
-    Date.truncate_to_year()
+    self.truncate_to_year
 
 Returns the
 
@@ -400,7 +400,7 @@ Returns the
 
 =head2 valid
 
-    Date.valid()
+    self.valid(string, format)
 
 Returns the
 
@@ -410,7 +410,7 @@ Aliases: I<valid_date>
 
 =head2 wday
 
-    Date.wday()
+    self.wday
 
 Returns the
 
@@ -420,7 +420,7 @@ Aliases: I<week_day>
 
 =head2 wdayname
 
-    Date.wdayname()
+    self.wdayname
 
 Returns the
 
@@ -428,7 +428,7 @@ Returns the
 
 =head2 week
 
-    Date.week()
+    self.week
 
 Returns the
 
@@ -436,7 +436,7 @@ Returns the
 
 =head2 yday
 
-    Date.yday()
+    self.yday
 
 Returns the
 
@@ -446,7 +446,7 @@ Aliases: I<year_day>
 
 =head2 year
 
-    Date.year()
+    self.year
 
 Returns the
 
@@ -454,7 +454,7 @@ Returns the
 
 =head2 ymd
 
-    Date.ymd()
+    self.ymd
 
 Returns the
 
@@ -462,7 +462,7 @@ Returns the
 
 =head2 yy
 
-    Date.yy()
+    self.yy
 
 Returns the
 

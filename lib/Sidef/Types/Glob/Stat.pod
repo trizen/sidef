@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 all
 
-    Stat.all()
+    self.all
 
 Returns the
 
@@ -32,7 +32,7 @@ Returns the
 
 =head2 atime
 
-    Stat.atime()
+    self.atime
 
 Returns the
 
@@ -40,7 +40,7 @@ Returns the
 
 =head2 blksize
 
-    Stat.blksize()
+    self.blksize
 
 Returns the
 
@@ -48,7 +48,7 @@ Returns the
 
 =head2 blocks
 
-    Stat.blocks()
+    self.blocks
 
 Returns the
 
@@ -56,7 +56,7 @@ Returns the
 
 =head2 ctime
 
-    Stat.ctime()
+    self.ctime
 
 Returns the
 
@@ -64,7 +64,7 @@ Returns the
 
 =head2 dev
 
-    Stat.dev()
+    self.dev
 
 Returns the
 
@@ -72,7 +72,7 @@ Returns the
 
 =head2 gid
 
-    Stat.gid()
+    self.gid
 
 Returns the
 
@@ -80,7 +80,7 @@ Returns the
 
 =head2 ino
 
-    Stat.ino()
+    self.ino
 
 Returns the
 
@@ -88,7 +88,7 @@ Returns the
 
 =head2 lstat
 
-    Stat.lstat()
+    self.lstat(arg, obj)
 
 Returns the
 
@@ -96,7 +96,7 @@ Returns the
 
 =head2 mode
 
-    Stat.mode()
+    self.mode
 
 Returns the
 
@@ -104,7 +104,7 @@ Returns the
 
 =head2 mtime
 
-    Stat.mtime()
+    self.mtime
 
 Returns the
 
@@ -112,7 +112,7 @@ Returns the
 
 =head2 nlink
 
-    Stat.nlink()
+    self.nlink
 
 Returns the
 
@@ -120,7 +120,7 @@ Returns the
 
 =head2 parent
 
-    Stat.parent()
+    self.parent
 
 Returns the
 
@@ -128,7 +128,7 @@ Returns the
 
 =head2 rdev
 
-    Stat.rdev()
+    self.rdev
 
 Returns the
 
@@ -136,7 +136,7 @@ Returns the
 
 =head2 size
 
-    Stat.size()
+    self.size
 
 Returns the
 
@@ -144,7 +144,7 @@ Returns the
 
 =head2 stat
 
-    Stat.stat()
+    self.stat(arg, obj)
 
 Returns the
 
@@ -152,7 +152,7 @@ Returns the
 
 =head2 uid
 
-    Stat.uid()
+    self.uid
 
 Returns the
 

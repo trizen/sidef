@@ -32,7 +32,7 @@ Returns the
 
 =head2 cap
 
-    Match.cap()
+    self.cap
 
 Returns the
 
@@ -42,7 +42,7 @@ Aliases: I<to_a>, I<caps>, I<to_array>, I<captures>
 
 =head2 dump
 
-    Match.dump()
+    self.dump
 
 Returns the
 
@@ -50,7 +50,7 @@ Returns the
 
 =head2 join
 
-    Match.join()
+    self.join(sep)
 
 Returns the
 
@@ -58,7 +58,7 @@ Returns the
 
 =head2 ncap
 
-    Match.ncap()
+    self.ncap
 
 Returns the
 
@@ -68,7 +68,7 @@ Aliases: I<ncaps>, I<named_captures>
 
 =head2 pos
 
-    Match.pos()
+    self.pos
 
 Returns the
 
@@ -78,7 +78,7 @@ Aliases: I<match_pos>
 
 =head2 regex
 
-    Match.regex()
+    self.regex
 
 Returns the
 
@@ -86,7 +86,7 @@ Returns the
 
 =head2 string
 
-    Match.string()
+    self.string
 
 Returns the
 
@@ -94,7 +94,7 @@ Returns the
 
 =head2 to_bool
 
-    Match.to_bool()
+    self.to_bool
 
 Returns the
 
@@ -104,7 +104,7 @@ Aliases: I<matched>, I<is_successful>
 
 =head2 to_s
 
-    Match.to_s()
+    self.to_s
 
 Returns the
 

@@ -185,7 +185,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 abs
 
-    Polynomial.abs()
+    x.abs
 
 Returns the
 
@@ -193,7 +193,7 @@ Returns the
 
 =head2 binomial
 
-    Polynomial.binomial()
+    n.binomial(k)
 
 Returns the
 
@@ -201,7 +201,7 @@ Returns the
 
 =head2 ceil
 
-    Polynomial.ceil()
+    x.ceil
 
 Returns the
 
@@ -209,7 +209,7 @@ Returns the
 
 =head2 coeff
 
-    Polynomial.coeff()
+    x.coeff(key)
 
 Returns the
 
@@ -217,7 +217,7 @@ Returns the
 
 =head2 coeffs
 
-    Polynomial.coeffs()
+    x.coeffs
 
 Returns the
 
@@ -225,7 +225,7 @@ Returns the
 
 =head2 degree
 
-    Polynomial.degree()
+    x.degree
 
 Returns the
 
@@ -233,7 +233,7 @@ Returns the
 
 =head2 derivative
 
-    Polynomial.derivative()
+    x.derivative
 
 Returns the
 
@@ -241,7 +241,7 @@ Returns the
 
 =head2 divmod
 
-    Polynomial.divmod()
+    x.divmod(y)
 
 Returns the
 
@@ -249,7 +249,7 @@ Returns the
 
 =head2 dump
 
-    Polynomial.dump()
+    x.dump
 
 Returns the
 
@@ -257,7 +257,7 @@ Returns the
 
 =head2 eval
 
-    Polynomial.eval()
+    x.eval(value)
 
 Returns the
 
@@ -265,7 +265,7 @@ Returns the
 
 =head2 float
 
-    Polynomial.float()
+    x.float
 
 Returns the
 
@@ -273,7 +273,7 @@ Returns the
 
 =head2 floor
 
-    Polynomial.floor()
+    x.floor
 
 Returns the
 
@@ -281,7 +281,7 @@ Returns the
 
 =head2 gcd
 
-    Polynomial.gcd()
+    x.gcd(y)
 
 Returns the
 
@@ -289,7 +289,7 @@ Returns the
 
 =head2 gcdext
 
-    Polynomial.gcdext()
+    x.gcdext(y)
 
 Returns the
 
@@ -297,7 +297,7 @@ Returns the
 
 =head2 inv
 
-    Polynomial.inv()
+    x.inv
 
 Returns the
 
@@ -305,7 +305,7 @@ Returns the
 
 =head2 invmod
 
-    Polynomial.invmod()
+    x.invmod(m)
 
 Returns the
 
@@ -313,7 +313,7 @@ Returns the
 
 =head2 is_inf
 
-    Polynomial.is_inf()
+    x.is_inf
 
 Returns the
 
@@ -321,7 +321,7 @@ Returns the
 
 =head2 is_mone
 
-    Polynomial.is_mone()
+    x.is_mone
 
 Returns the
 
@@ -329,7 +329,7 @@ Returns the
 
 =head2 is_nan
 
-    Polynomial.is_nan()
+    x.is_nan
 
 Returns the
 
@@ -337,7 +337,7 @@ Returns the
 
 =head2 is_ninf
 
-    Polynomial.is_ninf()
+    x.is_ninf
 
 Returns the
 
@@ -345,7 +345,7 @@ Returns the
 
 =head2 is_one
 
-    Polynomial.is_one()
+    x.is_one
 
 Returns the
 
@@ -353,7 +353,7 @@ Returns the
 
 =head2 is_real
 
-    Polynomial.is_real()
+    x.is_real
 
 Returns the
 
@@ -361,7 +361,7 @@ Returns the
 
 =head2 is_zero
 
-    Polynomial.is_zero()
+    x.is_zero
 
 Returns the
 
@@ -369,7 +369,7 @@ Returns the
 
 =head2 keys
 
-    Polynomial.keys()
+    x.keys
 
 Returns the
 
@@ -379,7 +379,7 @@ Aliases: I<exponents>
 
 =head2 lcm
 
-    Polynomial.lcm()
+    x.lcm(y)
 
 Returns the
 
@@ -387,7 +387,7 @@ Returns the
 
 =head2 lift
 
-    Polynomial.lift()
+    x.lift
 
 Returns the
 
@@ -395,7 +395,7 @@ Returns the
 
 =head2 neg
 
-    Polynomial.neg()
+    x.neg
 
 Returns the
 
@@ -403,7 +403,7 @@ Returns the
 
 =head2 new
 
-    Polynomial.new()
+    self.new
 
 Returns the
 
@@ -413,7 +413,7 @@ Aliases: I<call>
 
 =head2 norm
 
-    Polynomial.norm()
+    self.norm
 
 Returns the
 
@@ -421,7 +421,7 @@ Returns the
 
 =head2 powmod
 
-    Polynomial.powmod()
+    x.powmod(n, m)
 
 Returns the
 
@@ -429,7 +429,7 @@ Returns the
 
 =head2 pretty
 
-    Polynomial.pretty()
+    x.pretty
 
 Returns the
 
@@ -437,7 +437,7 @@ Returns the
 
 =head2 rat
 
-    Polynomial.rat()
+    x.rat
 
 Returns the
 
@@ -445,7 +445,7 @@ Returns the
 
 =head2 rat_approx
 
-    Polynomial.rat_approx()
+    x.rat_approx
 
 Returns the
 
@@ -453,7 +453,7 @@ Returns the
 
 =head2 re
 
-    Polynomial.re()
+    x.re
 
 Returns the
 
@@ -463,7 +463,7 @@ Aliases: I<real>
 
 =head2 round
 
-    Polynomial.round()
+    x.round(r)
 
 Returns the
 
@@ -471,7 +471,7 @@ Returns the
 
 =head2 sgn
 
-    Polynomial.sgn()
+    x.sgn
 
 Returns the
 
@@ -479,7 +479,7 @@ Returns the
 
 =head2 sqr
 
-    Polynomial.sqr()
+    x.sqr
 
 Returns the
 
@@ -487,7 +487,7 @@ Returns the
 
 =head2 to_n
 
-    Polynomial.to_n()
+    x.to_n
 
 Returns the
 
@@ -495,7 +495,7 @@ Returns the
 
 =head2 to_poly
 
-    Polynomial.to_poly()
+    self.to_poly
 
 Returns the
 
@@ -503,7 +503,7 @@ Returns the
 
 =head2 to_s
 
-    Polynomial.to_s()
+    x.to_s
 
 Returns the
 

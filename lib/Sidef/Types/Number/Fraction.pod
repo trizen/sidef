@@ -227,7 +227,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 ceil
 
-    Fraction.ceil()
+    x.ceil
 
 Returns the
 
@@ -235,7 +235,7 @@ Returns the
 
 =head2 de
 
-    Fraction.de()
+    self.de
 
 Returns the
 
@@ -245,7 +245,7 @@ Aliases: I<den>, I<denominator>
 
 =head2 dump
 
-    Fraction.dump()
+    x.dump
 
 Returns the
 
@@ -253,7 +253,7 @@ Returns the
 
 =head2 eval
 
-    Fraction.eval()
+    x.eval(v)
 
 Returns the
 
@@ -261,7 +261,7 @@ Returns the
 
 =head2 floor
 
-    Fraction.floor()
+    x.floor
 
 Returns the
 
@@ -269,7 +269,7 @@ Returns the
 
 =head2 is_mone
 
-    Fraction.is_mone()
+    x.is_mone
 
 Returns the
 
@@ -277,7 +277,7 @@ Returns the
 
 =head2 is_nan
 
-    Fraction.is_nan()
+    x.is_nan
 
 Returns the
 
@@ -285,7 +285,7 @@ Returns the
 
 =head2 is_one
 
-    Fraction.is_one()
+    x.is_one
 
 Returns the
 
@@ -293,7 +293,7 @@ Returns the
 
 =head2 is_real
 
-    Fraction.is_real()
+    x.is_real
 
 Returns the
 
@@ -301,7 +301,7 @@ Returns the
 
 =head2 is_zero
 
-    Fraction.is_zero()
+    x.is_zero
 
 Returns the
 
@@ -309,7 +309,7 @@ Returns the
 
 =head2 lift
 
-    Fraction.lift()
+    x.lift
 
 Returns the
 
@@ -317,7 +317,7 @@ Returns the
 
 =head2 neg
 
-    Fraction.neg()
+    x.neg
 
 Returns the
 
@@ -325,7 +325,7 @@ Returns the
 
 =head2 new
 
-    Fraction.new()
+    self.new
 
 Returns the
 
@@ -335,7 +335,7 @@ Aliases: I<call>
 
 =head2 nu
 
-    Fraction.nu()
+    self.nu
 
 Returns the
 
@@ -345,7 +345,7 @@ Aliases: I<num>, I<numerator>
 
 =head2 nude
 
-    Fraction.nude()
+    self.nude
 
 Returns the
 
@@ -353,7 +353,7 @@ Returns the
 
 =head2 pretty
 
-    Fraction.pretty()
+    x.pretty
 
 Returns the
 
@@ -363,7 +363,7 @@ Aliases: I<stringify>
 
 =head2 round
 
-    Fraction.round()
+    x.round
 
 Returns the
 
@@ -371,7 +371,7 @@ Returns the
 
 =head2 to_n
 
-    Fraction.to_n()
+    x.to_n
 
 Returns the
 
@@ -379,7 +379,7 @@ Returns the
 
 =head2 to_s
 
-    Fraction.to_s()
+    x.to_s
 
 Returns the
 
@@ -387,7 +387,7 @@ Returns the
 
 =head2 trunc
 
-    Fraction.trunc()
+    x.trunc
 
 Returns the
 

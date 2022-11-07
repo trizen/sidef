@@ -34,7 +34,7 @@ Aliases: I<concat>, I<catfile>
 
 =head2 chdir
 
-    Dir.chdir()
+    self.chdir
 
 Returns the
 
@@ -42,7 +42,7 @@ Returns the
 
 =head2 chroot
 
-    Dir.chroot()
+    self.chroot
 
 Returns the
 
@@ -50,7 +50,7 @@ Returns the
 
 =head2 cwd
 
-    Dir.cwd()
+    self.cwd
 
 Returns the
 
@@ -58,7 +58,7 @@ Returns the
 
 =head2 delete
 
-    Dir.delete()
+    self.delete
 
 Returns the
 
@@ -68,7 +68,7 @@ Aliases: I<remove>, I<unlink>
 
 =head2 dump
 
-    Dir.dump()
+    self.dump
 
 Returns the
 
@@ -76,7 +76,7 @@ Returns the
 
 =head2 home
 
-    Dir.home()
+    self.home
 
 Returns the
 
@@ -84,7 +84,7 @@ Returns the
 
 =head2 is_empty
 
-    Dir.is_empty()
+    self.is_empty
 
 Returns the
 
@@ -92,7 +92,7 @@ Returns the
 
 =head2 make
 
-    Dir.make()
+    self.make
 
 Returns the
 
@@ -102,7 +102,7 @@ Aliases: I<mkdir>, I<create>
 
 =head2 mkpath
 
-    Dir.mkpath()
+    self.mkpath
 
 Returns the
 
@@ -112,7 +112,7 @@ Aliases: I<mktree>, I<make_path>, I<make_tree>, I<create_tree>
 
 =head2 new
 
-    Dir.new()
+    self.new
 
 Returns the
 
@@ -122,7 +122,7 @@ Aliases: I<call>
 
 =head2 open
 
-    Dir.open()
+    self.open(fh_ref, err_ref)
 
 Returns the
 
@@ -132,7 +132,7 @@ Aliases: I<open_r>
 
 =head2 open_rw
 
-    Dir.open_rw()
+    self.open_rw
 
 Returns the
 
@@ -140,7 +140,7 @@ Returns the
 
 =head2 open_w
 
-    Dir.open_w()
+    self.open_w
 
 Returns the
 
@@ -148,7 +148,7 @@ Returns the
 
 =head2 parent
 
-    Dir.parent()
+    self.parent
 
 Returns the
 
@@ -156,7 +156,7 @@ Returns the
 
 =head2 pwd
 
-    Dir.pwd()
+    self.pwd
 
 Returns the
 
@@ -164,7 +164,7 @@ Returns the
 
 =head2 remove_tree
 
-    Dir.remove_tree()
+    self.remove_tree
 
 Returns the
 
@@ -172,7 +172,7 @@ Returns the
 
 =head2 root
 
-    Dir.root()
+    self.root
 
 Returns the
 
@@ -180,7 +180,7 @@ Returns the
 
 =head2 split
 
-    Dir.split()
+    self.split
 
 Returns the
 
@@ -188,7 +188,7 @@ Returns the
 
 =head2 tmp
 
-    Dir.tmp()
+    self.tmp
 
 Returns the
 
@@ -198,7 +198,7 @@ Aliases: I<temp>
 
 =head2 to_dir
 
-    Dir.to_dir()
+    self.to_dir
 
 Returns the
 
@@ -206,7 +206,7 @@ Returns the
 
 =head2 to_s
 
-    Dir.to_s()
+    self.to_s
 
 Returns the
 
@@ -216,7 +216,7 @@ Aliases: I<to_str>
 
 =head2 up
 
-    Dir.up()
+    self.up
 
 Returns the
 

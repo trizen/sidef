@@ -17,7 +17,7 @@ var obj = Sig(...)
 
 =head2 new
 
-    Sig.new()
+    Sig.new
 
 Returns the
 

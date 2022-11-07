@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 alarm
 
-    Sys.alarm()
+    Sys.alarm(sec)
 
 Returns the
 
@@ -32,7 +32,7 @@ Returns the
 
 =head2 bless
 
-    Sys.bless()
+    Sys.bless(obj, class)
 
 Returns the
 
@@ -40,7 +40,7 @@ Returns the
 
 =head2 class_name
 
-    Sys.class_name()
+    Sys.class_name(obj)
 
 Returns the
 
@@ -48,7 +48,7 @@ Returns the
 
 =head2 defined
 
-    Sys.defined()
+    Sys.defined(obj)
 
 Returns the
 
@@ -56,7 +56,7 @@ Returns the
 
 =head2 die
 
-    Sys.die()
+    Sys.die(*args)
 
 Returns the
 
@@ -66,7 +66,7 @@ Aliases: I<raise>
 
 =head2 eval
 
-    Sys.eval()
+    Sys.eval(*args)
 
 Returns the
 
@@ -74,7 +74,7 @@ Returns the
 
 =head2 exec
 
-    Sys.exec()
+    Sys.exec(*args)
 
 Returns the
 
@@ -82,7 +82,7 @@ Returns the
 
 =head2 exit
 
-    Sys.exit()
+    Sys.exit(code)
 
 Returns the
 
@@ -90,7 +90,7 @@ Returns the
 
 =head2 fork
 
-    Sys.fork()
+    Sys.fork
 
 Returns the
 
@@ -98,7 +98,7 @@ Returns the
 
 =head2 getgrent
 
-    Sys.getgrent()
+    Sys.getgrent
 
 Returns the
 
@@ -106,7 +106,7 @@ Returns the
 
 =head2 getgrgid
 
-    Sys.getgrgid()
+    Sys.getgrgid(gid)
 
 Returns the
 
@@ -114,7 +114,7 @@ Returns the
 
 =head2 getgrnam
 
-    Sys.getgrnam()
+    Sys.getgrnam(name)
 
 Returns the
 
@@ -122,7 +122,7 @@ Returns the
 
 =head2 gethostbyaddr
 
-    Sys.gethostbyaddr()
+    Sys.gethostbyaddr(addr, addrtype)
 
 Returns the
 
@@ -130,7 +130,7 @@ Returns the
 
 =head2 gethostbyname
 
-    Sys.gethostbyname()
+    Sys.gethostbyname(name)
 
 Returns the
 
@@ -138,7 +138,7 @@ Returns the
 
 =head2 gethostent
 
-    Sys.gethostent()
+    Sys.gethostent
 
 Returns the
 
@@ -146,7 +146,7 @@ Returns the
 
 =head2 getnetbyaddr
 
-    Sys.getnetbyaddr()
+    Sys.getnetbyaddr(addr, addrtype)
 
 Returns the
 
@@ -154,7 +154,7 @@ Returns the
 
 =head2 getnetbyname
 
-    Sys.getnetbyname()
+    Sys.getnetbyname(name)
 
 Returns the
 
@@ -162,7 +162,7 @@ Returns the
 
 =head2 getnetent
 
-    Sys.getnetent()
+    Sys.getnetent
 
 Returns the
 
@@ -170,7 +170,7 @@ Returns the
 
 =head2 getpgrp
 
-    Sys.getpgrp()
+    Sys.getpgrp(pid)
 
 Returns the
 
@@ -178,7 +178,7 @@ Returns the
 
 =head2 getppid
 
-    Sys.getppid()
+    Sys.getppid
 
 Returns the
 
@@ -186,7 +186,7 @@ Returns the
 
 =head2 getpriority
 
-    Sys.getpriority()
+    Sys.getpriority(which, who)
 
 Returns the
 
@@ -194,7 +194,7 @@ Returns the
 
 =head2 getprotobyname
 
-    Sys.getprotobyname()
+    Sys.getprotobyname(name)
 
 Returns the
 
@@ -202,7 +202,7 @@ Returns the
 
 =head2 getprotobynumber
 
-    Sys.getprotobynumber()
+    Sys.getprotobynumber(num)
 
 Returns the
 
@@ -210,7 +210,7 @@ Returns the
 
 =head2 getprotoent
 
-    Sys.getprotoent()
+    Sys.getprotoent
 
 Returns the
 
@@ -218,7 +218,7 @@ Returns the
 
 =head2 getpwent
 
-    Sys.getpwent()
+    Sys.getpwent
 
 Returns the
 
@@ -226,7 +226,7 @@ Returns the
 
 =head2 getpwnam
 
-    Sys.getpwnam()
+    Sys.getpwnam(name)
 
 Returns the
 
@@ -234,7 +234,7 @@ Returns the
 
 =head2 getpwuid
 
-    Sys.getpwuid()
+    Sys.getpwuid(uid)
 
 Returns the
 
@@ -242,7 +242,7 @@ Returns the
 
 =head2 getservbyname
 
-    Sys.getservbyname()
+    Sys.getservbyname(name, proto)
 
 Returns the
 
@@ -250,7 +250,7 @@ Returns the
 
 =head2 getservbyport
 
-    Sys.getservbyport()
+    Sys.getservbyport(port, proto)
 
 Returns the
 
@@ -258,7 +258,7 @@ Returns the
 
 =head2 getservent
 
-    Sys.getservent()
+    Sys.getservent
 
 Returns the
 
@@ -266,7 +266,7 @@ Returns the
 
 =head2 isweak
 
-    Sys.isweak()
+    Sys.isweak(obj)
 
 Returns the
 
@@ -274,7 +274,7 @@ Returns the
 
 =head2 kill
 
-    Sys.kill()
+    Sys.kill(signal, *list)
 
 Returns the
 
@@ -282,7 +282,7 @@ Returns the
 
 =head2 nano_sleep
 
-    Sys.nano_sleep()
+    Sys.nano_sleep(sec)
 
 Returns the
 
@@ -292,7 +292,7 @@ Aliases: I<nanosleep>
 
 =head2 open
 
-    Sys.open()
+    Sys.open(var, mode, filename)
 
 Returns the
 
@@ -300,7 +300,7 @@ Returns the
 
 =head2 opendir
 
-    Sys.opendir()
+    Sys.opendir(var, dirname)
 
 Returns the
 
@@ -308,7 +308,7 @@ Returns the
 
 =head2 os
 
-    Sys.os()
+    Sys.os
 
 Returns the
 
@@ -318,7 +318,7 @@ Aliases: I<osname>
 
 =head2 print
 
-    Sys.print()
+    Sys.print(*args)
 
 Returns the
 
@@ -326,7 +326,7 @@ Returns the
 
 =head2 printf
 
-    Sys.printf()
+    Sys.printf(*args)
 
 Returns the
 
@@ -334,7 +334,7 @@ Returns the
 
 =head2 printh
 
-    Sys.printh()
+    Sys.printh(fh, *args)
 
 Returns the
 
@@ -342,7 +342,7 @@ Returns the
 
 =head2 read
 
-    Sys.read()
+    Sys.read(type, opt_arg)
 
 Returns the
 
@@ -350,7 +350,7 @@ Returns the
 
 =head2 readln
 
-    Sys.readln()
+    Sys.readln(text)
 
 Returns the
 
@@ -360,7 +360,7 @@ Aliases: I<scanln>, I<readline>
 
 =head2 ref
 
-    Sys.ref()
+    Sys.ref(obj)
 
 Returns the
 
@@ -368,7 +368,7 @@ Returns the
 
 =head2 refaddr
 
-    Sys.refaddr()
+    Sys.refaddr(obj)
 
 Returns the
 
@@ -376,7 +376,7 @@ Returns the
 
 =head2 reftype
 
-    Sys.reftype()
+    Sys.reftype(obj)
 
 Returns the
 
@@ -384,7 +384,7 @@ Returns the
 
 =head2 run
 
-    Sys.run()
+    Sys.run(*args)
 
 Returns the
 
@@ -394,7 +394,7 @@ Aliases: I<system>
 
 =head2 say
 
-    Sys.say()
+    Sys.say(*args)
 
 Returns the
 
@@ -404,7 +404,7 @@ Aliases: I<println>
 
 =head2 select
 
-    Sys.select()
+    Sys.select(fh)
 
 Returns the
 
@@ -412,7 +412,7 @@ Returns the
 
 =head2 setgrent
 
-    Sys.setgrent()
+    Sys.setgrent
 
 Returns the
 
@@ -420,7 +420,7 @@ Returns the
 
 =head2 sethostent
 
-    Sys.sethostent()
+    Sys.sethostent(stayopen)
 
 Returns the
 
@@ -428,7 +428,7 @@ Returns the
 
 =head2 setnetent
 
-    Sys.setnetent()
+    Sys.setnetent(stayopen)
 
 Returns the
 
@@ -436,7 +436,7 @@ Returns the
 
 =head2 setpgrp
 
-    Sys.setpgrp()
+    Sys.setpgrp(pid, pgrp)
 
 Returns the
 
@@ -444,7 +444,7 @@ Returns the
 
 =head2 setpriority
 
-    Sys.setpriority()
+    Sys.setpriority(which, who, priority)
 
 Returns the
 
@@ -452,7 +452,7 @@ Returns the
 
 =head2 setprotoent
 
-    Sys.setprotoent()
+    Sys.setprotoent(stayopen)
 
 Returns the
 
@@ -460,7 +460,7 @@ Returns the
 
 =head2 setpwent
 
-    Sys.setpwent()
+    Sys.setpwent
 
 Returns the
 
@@ -468,7 +468,7 @@ Returns the
 
 =head2 setservent
 
-    Sys.setservent()
+    Sys.setservent(stayopen)
 
 Returns the
 
@@ -476,7 +476,7 @@ Returns the
 
 =head2 sidef
 
-    Sys.sidef()
+    Sys.sidef
 
 Returns the
 
@@ -484,7 +484,7 @@ Returns the
 
 =head2 sleep
 
-    Sys.sleep()
+    Sys.sleep(sec)
 
 Returns the
 
@@ -492,7 +492,7 @@ Returns the
 
 =head2 stderr
 
-    Sys.stderr()
+    Sys.stderr
 
 Returns the
 
@@ -500,7 +500,7 @@ Returns the
 
 =head2 stdin
 
-    Sys.stdin()
+    Sys.stdin
 
 Returns the
 
@@ -508,7 +508,7 @@ Returns the
 
 =head2 stdout
 
-    Sys.stdout()
+    Sys.stdout
 
 Returns the
 
@@ -516,7 +516,7 @@ Returns the
 
 =head2 ualarm
 
-    Sys.ualarm()
+    Sys.ualarm(sec)
 
 Returns the
 
@@ -526,7 +526,7 @@ Aliases: I<micro_alarm>
 
 =head2 umask
 
-    Sys.umask()
+    Sys.umask(mode)
 
 Returns the
 
@@ -534,7 +534,7 @@ Returns the
 
 =head2 unweaken
 
-    Sys.unweaken()
+    Sys.unweaken(obj)
 
 Returns the
 
@@ -542,7 +542,7 @@ Returns the
 
 =head2 user
 
-    Sys.user()
+    Sys.user
 
 Returns the
 
@@ -552,7 +552,7 @@ Aliases: I<getlogin>
 
 =head2 usleep
 
-    Sys.usleep()
+    Sys.usleep(sec)
 
 Returns the
 
@@ -562,7 +562,7 @@ Aliases: I<micro_sleep>
 
 =head2 wait
 
-    Sys.wait()
+    Sys.wait
 
 Returns the
 
@@ -570,7 +570,7 @@ Returns the
 
 =head2 warn
 
-    Sys.warn()
+    Sys.warn(*args)
 
 Returns the
 
@@ -578,7 +578,7 @@ Returns the
 
 =head2 weaken
 
-    Sys.weaken()
+    Sys.weaken(obj)
 
 Returns the
 

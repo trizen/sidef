@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 command
 
-    Pipe.command()
+    self.command
 
 Returns the
 
@@ -32,7 +32,7 @@ Returns the
 
 =head2 new
 
-    Pipe.new()
+    self.new
 
 Returns the
 
@@ -42,7 +42,7 @@ Aliases: I<call>
 
 =head2 open
 
-    Pipe.open()
+    self.open(mode, var_ref)
 
 Returns the
 
@@ -50,7 +50,7 @@ Returns the
 
 =head2 open_r
 
-    Pipe.open_r()
+    self.open_r(var_ref)
 
 Returns the
 
@@ -60,7 +60,7 @@ Aliases: I<open_read>
 
 =head2 open_w
 
-    Pipe.open_w()
+    self.open_w(var_ref)
 
 Returns the
 
@@ -70,7 +70,7 @@ Aliases: I<open_write>
 
 =head2 to_s
 
-    Pipe.to_s()
+    self.to_s
 
 Returns the
 

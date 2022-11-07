@@ -6405,7 +6405,7 @@ Example:
 
 =head2 primorial
 
-    Number.primorial()
+    x.primorial
 
 Returns the
 

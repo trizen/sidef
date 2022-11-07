@@ -48,7 +48,7 @@ Returns the
 
 =head2 false
 
-    Bool.false()
+    self.false
 
 Returns the
 
@@ -56,7 +56,7 @@ Returns the
 
 =head2 is_true
 
-    Bool.is_true()
+    self.is_true
 
 Returns the
 
@@ -64,7 +64,7 @@ Returns the
 
 =head2 neg
 
-    Bool.neg()
+    self.neg
 
 Returns the
 
@@ -74,7 +74,7 @@ Aliases: I<not>, I<flip>, I<toggle>, I<is_false>
 
 =head2 new
 
-    Bool.new()
+    self.new
 
 Returns the
 
@@ -84,7 +84,7 @@ Aliases: I<call>
 
 =head2 pick
 
-    Bool.pick()
+    self.pick
 
 Returns the
 
@@ -94,7 +94,7 @@ Aliases: I<rand>
 
 =head2 to_b
 
-    Bool.to_b()
+    self.to_b
 
 Returns the
 
@@ -104,7 +104,7 @@ Aliases: I<to_bool>
 
 =head2 to_s
 
-    Bool.to_s()
+    self.to_s
 
 Returns the
 
@@ -114,7 +114,7 @@ Aliases: I<dump>, I<to_str>
 
 =head2 true
 
-    Bool.true()
+    self.true
 
 Returns the
 

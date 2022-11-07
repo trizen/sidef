@@ -3,7 +3,7 @@ package Sidef::Time::Date {
     use 5.016;
     use parent qw(
       Sidef::Object::Object
-      );
+    );
 
     require Time::Piece;
 
@@ -76,7 +76,6 @@ package Sidef::Time::Date {
     }
 
     sub today {
-        my ($self) = @_;
         __PACKAGE__->new(time);
     }
 

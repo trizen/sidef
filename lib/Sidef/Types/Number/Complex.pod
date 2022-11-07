@@ -24,7 +24,7 @@ Inherits methods from:
 
 =head2 new
 
-    Complex.new()
+    self.new
 
 Returns the
 
