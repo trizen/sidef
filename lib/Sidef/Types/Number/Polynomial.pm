@@ -262,11 +262,6 @@ package Sidef::Types::Number::Polynomial {
         $prod->div($k->factorial);
     }
 
-    sub neg {
-        my ($x) = @_;
-        __PACKAGE__->new(map { $_ => $x->{$_}->neg } CORE::keys %$x);
-    }
-
     sub add {
         my ($x, $y) = @_;
 
@@ -486,9 +481,24 @@ package Sidef::Types::Number::Polynomial {
         __PACKAGE__->new(map { $_ => $x->{$_}->div($y) } CORE::keys %$x);
     }
 
+    sub neg {
+        my ($x) = @_;
+        __PACKAGE__->new(map { $_ => $x->{$_}->neg } CORE::keys %$x);
+    }
+
     sub float {
         my ($x) = @_;
         __PACKAGE__->new(map { $_ => $x->{$_}->float } CORE::keys %$x);
+    }
+
+    sub rat {
+        my ($x) = @_;
+        __PACKAGE__->new(map { $_ => $x->{$_}->rat } CORE::keys %$x);
+    }
+
+    sub rat_approx {
+        my ($x) = @_;
+        __PACKAGE__->new(map { $_ => $x->{$_}->rat_approx } CORE::keys %$x);
     }
 
     sub floor {

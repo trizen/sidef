@@ -435,6 +435,22 @@ Returns the
 
 =cut
 
+=head2 rat
+
+    Polynomial.rat()
+
+Returns the
+
+=cut
+
+=head2 rat_approx
+
+    Polynomial.rat_approx()
+
+Returns the
+
+=cut
+
 =head2 re
 
     Polynomial.re()
