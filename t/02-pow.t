@@ -50,10 +50,10 @@ $r = $int1->neg->pow($int2->dec);
 ok($r eq $int1->pow($int2->dec->abs)->inv->neg);
 
 $r = $int2->pow($int1->neg);
-is("$r", "-1/64");
+is($r->as_rat->get_value, "-1/64");
 
 $r = $int2->pow($int1->neg->inc);
-is("$r", "1/16");
+is($r->as_frac->get_value, "1/16");
 
 #################################################################
 # float + int
@@ -249,7 +249,7 @@ is("$r", "0");
         [-1234.555, -1234.6,   1],
         [-1234.555, -1234.56,  2],
         [-1234.555, -1234.555, 3],
-    );
+                );
 
     foreach my $pair (@tests) {
         my ($n, $expected, $places) = @$pair;

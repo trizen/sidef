@@ -160,7 +160,11 @@ package Sidef::Types::Number::Polynomial {
 
             $str .= ' + ';
 
-            my $c_str = ${$x->{$key}->$method};
+            my $v = $x->{$key};
+            my $c_str =
+              (ref($v) eq 'Sidef::Types::Number::Number' and ref($$v) eq 'Math::GMPq')
+              ? Math::GMPq::Rmpq_get_str($$v, 10)
+              : ${$v->$method};
 
             if ($c_str =~ s/^-//) {
                 $str =~ s/ \+ \z/ - /;

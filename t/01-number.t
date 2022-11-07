@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 169;
+use Test::More tests => 167;
 
 use Sidef;
 
@@ -361,15 +361,19 @@ is("$x", '8');
 
 $x = $o->new('1/2')->pow($o->new('3'));
 is($x->as_frac->get_value, '1/8');
-is("$x",                   '1/8');
+
+#is("$x",                   '1/8');
+is("$x", '0.125');
 
 $x = $o->new('1/3')->pow($o->new('4'));
 is($x->as_frac->get_value, '1/81');
-is("$x", '1/81');
+
+#is("$x", '1/81');
 
 $x = $o->new('2/3')->pow($o->new(4));
 is($x->as_frac->get_value, '16/81');
-is("$x", "16/81");
+
+#is("$x", "16/81");
 
 $x = $o->new('2/3')->pow($o->new('5/3'));
 like("$x", qr/^0\.50876188557925/);

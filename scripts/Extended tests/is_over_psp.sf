@@ -118,3 +118,9 @@ say ("Took: ", Time.micro-t0)
 # 3.72512
 # 4.96837
 # 2.87557 (2022)
+
+__END__
+:: Checking small terms...
+Took: 1.10135
+:: Checking large terms...
+Took: 4.34719
