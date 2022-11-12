@@ -24436,7 +24436,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 561) >= 0 or return Sidef::Types::Bool::Bool::FALSE;
 
         # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
-        if (Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
+        # Incorrect for some inputs: https://github.com/danaj/Math-Prime-Util-GMP/issues/34
+        if (0 and Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
             my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
             return (
                     Math::Prime::Util::GMP::is_carmichael($nstr)
@@ -24451,7 +24452,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sub_ui($nm1, $n, 1);
 
         # Divisible by a small square
-        foreach my $p (3, 5, 7, 11, 13, 17, 19) {
+        foreach my $k (1 .. 7) {
+            my $p = _next_prime(CORE::int(CORE::rand(1e7)));
             if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
 
                 if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
@@ -24755,7 +24757,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_div_2exp($nm1d2, $nm1, 1);
 
         # Divisible by a small square
-        foreach my $p (3, 5, 7, 11, 13, 17, 19) {
+        foreach my $k (1 .. 7) {
+            my $p = _next_prime(CORE::int(CORE::rand(1e7)));
             if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
 
                 if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
@@ -24792,7 +24795,8 @@ package Sidef::Types::Number::Number {
               || return Sidef::Types::Bool::Bool::FALSE;
 
             # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
-            if (Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
+            # Incorrect for some inputs: https://github.com/danaj/Math-Prime-Util-GMP/issues/34
+            if (0 and Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
                 Math::Prime::Util::GMP::is_carmichael($nstr)
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
