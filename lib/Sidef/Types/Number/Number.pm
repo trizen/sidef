@@ -18545,7 +18545,7 @@ package Sidef::Types::Number::Number {
         my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))->inc) });
         my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e3))->inc) });
         my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(1e3))->inc) });
-        my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor($m->mul(_set_int(1e3))->inc) });
+        my $FLT_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(undef, $m->mul(_set_int(1e3))->inc) });
 
         my $pm1_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))->inc) });
         my $pp1_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(1e4))->inc) });
@@ -19102,7 +19102,7 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
 
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
-        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // 1e4 } : 1e4;
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) || return Sidef::Types::Array::Array->new(_set_int($n)) } : 1e4;
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new();
@@ -19393,8 +19393,11 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new;
 
-        $base = defined($base) ? do { _valid(\$base); _any2ui($$base) // 2 }   : 2;
-        $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) // 1e4 } : 1e4;
+        $base = defined($base) ? do { _valid(\$base); _any2ui($$base) // 2 } : 2;
+        $reps =
+          defined($reps)
+          ? do { _valid(\$reps); _any2ui($$reps) || return Sidef::Types::Array::Array->new(_set_int($n)) }
+          : 1e4;
 
         state $z = Math::GMPz::Rmpz_init_nobless();
         state $t = Math::GMPz::Rmpz_init_nobless();
@@ -19449,8 +19452,11 @@ package Sidef::Types::Number::Number {
         # Simple version of the continued-fraction factorization method.
         # Efficient for numbers that have factors relatively close to sqrt(n)
 
-        $n    = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
-        $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) // 1e4 } : 1e4;
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        $reps =
+          defined($reps)
+          ? do { _valid(\$reps); _any2ui($$reps) || return Sidef::Types::Array::Array->new(_set_int($n)) }
+          : 1e4;
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new;
@@ -19546,7 +19552,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new;
 
-        $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) // 10 } : 10;
+        $reps =
+          defined($reps) ? do { _valid(\$reps); _any2ui($$reps) || return Sidef::Types::Array::Array->new(_set_int($n)) } : 10;
 
         state $state = Math::GMPz::zgmp_randinit_mt_nobless();
         Math::GMPz::zgmp_randseed_ui($state, CORE::int(CORE::rand(1e9)));
