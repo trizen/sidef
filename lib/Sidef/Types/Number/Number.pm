@@ -15870,6 +15870,11 @@ package Sidef::Types::Number::Number {
 
         $x = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
 
+        # When n is large enough, is_almost_prime(n,2) is faster
+        if (Math::GMPz::Rmpz_sizeinbase($x, 10) > 40) {
+            return _set_int($x)->is_almost_prime(TWO);
+        }
+
         Math::GMPz::Rmpz_sgn($x) > 0
           or return Sidef::Types::Bool::Bool::FALSE;
 
@@ -16290,7 +16295,7 @@ package Sidef::Types::Number::Number {
         elsif ($k == 1) {
             return $n->is_prime;
         }
-        elsif ($k == 2) {
+        elsif ($k == 2 and _fits_ulong($$n)) {
             return $n->is_semiprime;
         }
 
@@ -16327,9 +16332,9 @@ package Sidef::Types::Number::Number {
                 my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
 
                 $bigomega  = scalar(@trial_factors);
-                $remainder = $r;
+                $remainder = _any2mpz($r);
 
-                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+                if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                     if ($bigomega == $k) {
                         return Sidef::Types::Bool::Bool::TRUE;
                     }
@@ -16338,12 +16343,12 @@ package Sidef::Types::Number::Number {
                     }
                 }
 
-                my $log = __ilog__($r, _next_prime(10**$j));
+                my $log = __ilog__($remainder, _next_prime(10**$j));
 
                 $bigomega + $log + 1 >= $k
                   or return Sidef::Types::Bool::Bool::FALSE;
 
-                my $r_is_prime = _is_prob_prime($r);
+                my $r_is_prime = _is_prob_prime($remainder);
 
                 if ($r_is_prime) {
                     if ($bigomega + 1 == $k) {
@@ -16358,7 +16363,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                my $r_size = Math::GMPz::Rmpz_sizeinbase($r, 2);
+                my $r_size = Math::GMPz::Rmpz_sizeinbase($remainder, 2);
 
                 last if (($j >= 5) && ($r_size <= 100));    # 30 digits
                 last if (($j >= 6) && ($r_size <= 133));    # 40 digits
@@ -16366,7 +16371,7 @@ package Sidef::Types::Number::Number {
                 last if (($j >= 8) && ($r_size <= 200));    # 60 digits
 
                 # Try to find special factors
-                if ($j >= 8) {
+                if (($bigomega == 0 and $j >= 7) or $j >= 8) {
 
                     my @special_factors = @{(bless \$n)->special_factors};
                     my @gcd_factors     = @{
@@ -16386,7 +16391,7 @@ package Sidef::Types::Number::Number {
                         if (_is_prob_prime($$f)) {
                             push @prime_factors, $f;
                         }
-                        elsif (Math::GMPz::Rmpz_sizeinbase($$f, 2) <= 150) {
+                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= 150) {
                             push @prime_factors, (map { _set_int($_) } _factor($$f));
                         }
                         else {
@@ -16401,7 +16406,7 @@ package Sidef::Types::Number::Number {
                     my $prod = Sidef::Types::Number::Number::prod(@prime_factors);
                     my $c    = (bless \$n)->idiv($prod);
 
-                    $remainder = $$c;
+                    $remainder = _any2mpz($$c);
                     $bigomega  = scalar(@prime_factors);
 
                     if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
@@ -16552,9 +16557,9 @@ package Sidef::Types::Number::Number {
                 my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
 
                 $omega     = scalar(List::Util::uniq(@trial_factors));
-                $remainder = $r;
+                $remainder = _any2mpz($r);
 
-                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+                if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                     if ($omega == $k) {
                         return Sidef::Types::Bool::Bool::TRUE;
                     }
@@ -16563,12 +16568,12 @@ package Sidef::Types::Number::Number {
                     }
                 }
 
-                my $log = __ilog__($r, _next_prime(10**$j));
+                my $log = __ilog__($remainder, _next_prime(10**$j));
 
                 $omega + $log + 1 >= $k
                   or return Sidef::Types::Bool::Bool::FALSE;
 
-                my $r_is_prime_power = Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($r, 10));
+                my $r_is_prime_power = Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($remainder, 10));
 
                 if ($r_is_prime_power) {
                     if ($omega + 1 == $k) {
@@ -16583,7 +16588,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                my $r_size = Math::GMPz::Rmpz_sizeinbase($r, 2);
+                my $r_size = Math::GMPz::Rmpz_sizeinbase($remainder, 2);
 
                 last if (($j >= 5) && ($r_size <= 100));    # 30 digits
                 last if (($j >= 6) && ($r_size <= 133));    # 40 digits
@@ -16591,7 +16596,7 @@ package Sidef::Types::Number::Number {
                 last if (($j >= 8) && ($r_size <= 200));    # 60 digits
 
                 # Try to find special factors
-                if ($j >= 8) {
+                if (($omega == 0 and $j >= 7) or $j >= 8) {
 
                     my @special_factors = @{(bless \$n)->special_factors};
                     my @gcd_factors     = @{
@@ -16607,7 +16612,7 @@ package Sidef::Types::Number::Number {
                         if (_is_prob_prime($$f)) {
                             push @prime_factors, $f;
                         }
-                        elsif (Math::GMPz::Rmpz_sizeinbase($$f, 2) <= 150) {
+                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= 150) {
                             push @prime_factors, (map { _set_int($_) } _factor($$f));
                         }
                         else {
@@ -16618,8 +16623,8 @@ package Sidef::Types::Number::Number {
                     my $prod = Sidef::Types::Number::Number::prod(@prime_factors);
                     my $c    = (bless \$n)->idiv($prod);
 
-                    $remainder = $$c;
-                    $omega     = scalar(List::Util::uniq(map { Math::GMPz::Rmpz_get_str($$_, 10) } @prime_factors));
+                    $remainder = _any2mpz($$c);
+                    $omega     = scalar(List::Util::uniq(map { ref($_) ? "$$_" : $_ } @prime_factors));
 
                     if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                         if ($omega == $k) {
@@ -16645,7 +16650,7 @@ package Sidef::Types::Number::Number {
                         push @prime_factors, _factor($$f);
                     }
 
-                    $omega = scalar(List::Util::uniq(map { ref($_) ? Math::GMPz::Rmpz_get_str($$_, 10) : $_ } @prime_factors));
+                    $omega = scalar(List::Util::uniq(map { ref($_) ? "$$_" : $_ } @prime_factors));
 
                     if ($omega == $k) {
                         return Sidef::Types::Bool::Bool::TRUE;
@@ -18512,7 +18517,12 @@ package Sidef::Types::Number::Number {
             _valid(\$m);
         }
         else {
-            $m //= ONE;
+            return
+              $n->gcd_factors(
+                              Sidef::Types::Array::Array->new(
+                                         [map { $_->is_prime ? $_ : @{$_->special_factors(ONE)} } @{$n->special_factors(ZERO)}]
+                              )
+                             );
         }
 
         my $z = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
@@ -18532,28 +18542,29 @@ package Sidef::Types::Number::Number {
 
         my @factors;
 
-        my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))) });
-        my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e3))) });
-        my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(1e3))) });
-        my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor($m->mul(_set_int(1e3))) });
+        my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))->inc) });
+        my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e3))->inc) });
+        my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(1e3))->inc) });
+        my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor($m->mul(_set_int(1e3))->inc) });
 
-        my $pm1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) });
-        my $pp1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(1e4))) });
-        my $chebyshev_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(1e4))) });
-        my $prho_block      = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))) });
+        my $pm1_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))->inc) });
+        my $pp1_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(1e4))->inc) });
+        my $chebyshev_block =
+          Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(1e4))->inc) });
+        my $prho_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))->inc) });
 
-        push @factors, @{$n->trial_factor($m->mul(_set_int(1e6)))->first(-1)};
+        push @factors, @{$n->trial_factor($m->mul(_set_int(1e6))->inc)->first(-1)};
 
         # Special methods that depdend on the special form of n
-        push @factors, @{$n->cop_factor($m->mul(_set_int(100)))->first(-1)};
-        push @factors, @{$n->dop_factor($m->mul(_set_int(200)))->first(-1)};
+        push @factors, @{$n->cop_factor($m->mul(_set_int(100))->inc)->first(-1)};
+        push @factors, @{$n->dop_factor($m->mul(_set_int(200))->inc)->first(-1)};
 
-        push @factors, @{$n->miller_factor($m->mul(_set_int(10)))->first(-1)};
-        push @factors, @{$n->lucas_factor($m->mul(_set_int(5)))->first(-1)};
+        push @factors, @{$n->miller_factor($m->mul(_set_int(10))->inc)->first(-1)};
+        push @factors, @{$n->lucas_factor(ONE, $m->mul(_set_int(5))->inc)->first(-1)};
 
-        push @factors, @{$n->fermat_factor($m->mul(_set_int(1e3)))->first(-1)};
-        push @factors, @{$n->holf_factor($m->mul(_set_int(1e3)))->first(-1)};
-        push @factors, @{$n->pell_factor($m->mul(_set_int(1e3)))->first(-1)};
+        push @factors, @{$n->fermat_factor($m->mul(_set_int(1e3))->inc)->first(-1)};
+        push @factors, @{$n->holf_factor($m->mul(_set_int(1e3))->inc)->first(-1)};
+        push @factors, @{$n->pell_factor($m->mul(_set_int(1e3))->inc)->first(-1)};
 
         @factors = @{$n->gcd_factors(Sidef::Types::Array::Array->new([@factors]))};
 
@@ -18564,8 +18575,8 @@ package Sidef::Types::Number::Number {
             if (_is_prob_prime($$f)) {
                 push @prime_factors, $f;
             }
-            elsif (Math::GMPz::Rmpz_sizeinbase($$f, 2) <= 110) {
-                push @prime_factors, (map { _set_int($_) } _factor($$f));
+            elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= 110) {
+                push @prime_factors, map { _set_int($_) } _factor($$f);
             }
             else {
                 push @composite_factors, $f;
@@ -18686,24 +18697,26 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
         _valid(\$k) if defined($k);
         Sidef::Types::Array::Array->new(
-                                        [map { _set_int($_) }
-                                           Math::Prime::Util::GMP::prho_factor(
-                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),)
-                                        ]
-                                       );
+                                      [map { _set_int($_) }
+                                         Math::Prime::Util::GMP::prho_factor(
+                                           _big2pistr($n) // (return Sidef::Types::Array::Array->new),
+                                           (defined($k) ? (_big2pistr($k) || return Sidef::Types::Array::Array->new($n)) : ()),
+                                         )
+                                      ]
+        );
     }
 
     sub pbrent_factor {
         my ($n, $k) = @_;
         _valid(\$k) if defined($k);
         Sidef::Types::Array::Array->new(
-                                        [map { _set_int($_) }
-                                           Math::Prime::Util::GMP::pbrent_factor(
-                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // () : ()),)
-                                        ]
-                                       );
+                                       [map { _set_int($_) }
+                                          Math::Prime::Util::GMP::pbrent_factor(
+                                            _big2pistr($n) // (return Sidef::Types::Array::Array->new),
+                                            (defined($k) ? (_big2pistr($k) || return Sidef::Types::Array::Array->new($n)) : ())
+                                          )
+                                       ]
+        );
     }
 
     sub pminus1_factor {
@@ -18713,14 +18726,14 @@ package Sidef::Types::Number::Number {
         _valid(\$B2) if defined($B2);
 
         Sidef::Types::Array::Array->new(
-                                        [map { _set_int($_) }
-                                           Math::Prime::Util::GMP::pminus1_factor(
-                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($B1) ? _big2uistr($B1) // () : ()),
-                                                                  (defined($B2) ? _big2uistr($B2) // () : ()),
-                                           )
-                                        ]
-                                       );
+                                    [map { _set_int($_) }
+                                       Math::Prime::Util::GMP::pminus1_factor(
+                                         _big2pistr($n) // (return Sidef::Types::Array::Array->new),
+                                         (defined($B1) ? (_big2pistr($B1) || return Sidef::Types::Array::Array->new($n)) : ()),
+                                         (defined($B2) ? (_big2pistr($B2) || return Sidef::Types::Array::Array->new($n)) : ())
+                                       )
+                                    ]
+        );
     }
 
     *pm1_factor = \&pminus1_factor;
@@ -18729,12 +18742,13 @@ package Sidef::Types::Number::Number {
         my ($n, $B1) = @_;
         _valid(\$B1) if defined($B1);
         Sidef::Types::Array::Array->new(
-                                        [map { _set_int($_) }
-                                           Math::Prime::Util::GMP::pplus1_factor(
-                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($B1) ? _big2uistr($B1) // () : ()),)
-                                        ]
-                                       );
+                                     [map { _set_int($_) }
+                                        Math::Prime::Util::GMP::pplus1_factor(
+                                          _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
+                                          (defined($B1) ? (_big2pistr($B1) || return Sidef::Types::Array::Array->new($n)) : ())
+                                        )
+                                     ]
+        );
     }
 
     *pp1_factor = \&pplus1_factor;
@@ -18750,7 +18764,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new;
 
-        $B = defined($B) ? do { _valid(\$B); _any2ui($$B) || 1e5 } : 1e5;
+        $B = defined($B) ? do { _valid(\$B); _any2ui($$B) || return Sidef::Types::Array::Array->new(_set_int($n)) } : 1e5;
         $x =
           defined($x)
           ? do { _valid(\$x); Math::GMPz::Rmpz_init_set(_any2mpz($$x) // $TWO) }
@@ -18855,12 +18869,13 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
         _valid(\$k) if defined($k);
         Sidef::Types::Array::Array->new(
-                                        [map { _set_int($_) }
-                                           Math::Prime::Util::GMP::holf_factor(
-                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // 1e4 : 1e4))
-                                        ]
-                                       );
+                                      [map { _set_int($_) }
+                                         Math::Prime::Util::GMP::holf_factor(
+                                           _big2pistr($n) // (return Sidef::Types::Array::Array->new),
+                                           (defined($k) ? (_big2pistr($k) || return Sidef::Types::Array::Array->new($n)) : 1e4)
+                                         )
+                                      ]
+        );
     }
 
     sub _miller_factor {
@@ -19591,12 +19606,13 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
         _valid(\$k) if defined($k);
         Sidef::Types::Array::Array->new(
-                                        [map { _set_int($_) }
-                                           Math::Prime::Util::GMP::squfof_factor(
-                                                                  _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                                  (defined($k) ? _big2uistr($k) // 1e4 : 1e4))
-                                        ]
-                                       );
+                                      [map { _set_int($_) }
+                                         Math::Prime::Util::GMP::squfof_factor(
+                                           _big2pistr($n) // (return Sidef::Types::Array::Array->new),
+                                           (defined($k) ? (_big2pistr($k) || return Sidef::Types::Array::Array->new($n)) : 1e4)
+                                         )
+                                      ]
+        );
     }
 
     sub ecm_factor {
@@ -19608,9 +19624,10 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(
             [
              map { _set_int($_) } Math::Prime::Util::GMP::ecm_factor(
-                                                     _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                                                     (defined($B1)     ? _big2uistr($B1)     // () : ()),    # B1
-                                                     (defined($curves) ? _big2uistr($curves) // () : ()),    # number of curves
+                         _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
+                         (defined($B1)     ? (_big2pistr($B1)     || return Sidef::Types::Array::Array->new($n)) : ()),    # B1
+                         (defined($curves) ? (_big2pistr($curves) || return Sidef::Types::Array::Array->new($n)) : ())
+                         ,    # number of curves
                                                                     )
             ]
         );
