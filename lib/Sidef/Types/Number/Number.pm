@@ -18520,7 +18520,7 @@ package Sidef::Types::Number::Number {
             return
               $n->gcd_factors(
                               Sidef::Types::Array::Array->new(
-                                         [map { $_->is_prime ? $_ : @{$_->special_factors(ONE)} } @{$n->special_factors(ZERO)}]
+                                  [map { _is_prob_prime($$_) ? $_ : @{$_->special_factors(ONE)} } @{$n->special_factors(ZERO)}]
                               )
                              );
         }
@@ -18541,30 +18541,22 @@ package Sidef::Types::Number::Number {
         }
 
         my @factors;
+        my $m_is_positive = $m->is_positive;
 
-        my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))->inc) });
-        my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e3))->inc) });
-        my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(1e3))->inc) });
-        my $FLT_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(undef, $m->mul(_set_int(1e3))->inc) });
-
-        my $pm1_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))->inc) });
-        my $pp1_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(1e4))->inc) });
-        my $chebyshev_block =
-          Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(1e4))->inc) });
-        my $prho_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))->inc) });
-
-        push @factors, @{$n->trial_factor($m->mul(_set_int(1e6))->inc)->first(-1)};
+        if ($m_is_positive) {
+            push @factors, @{$n->trial_factor($m->inc->mul(_set_int(1e6)))->first(-1)};
+        }
 
         # Special methods that depdend on the special form of n
-        push @factors, @{$n->cop_factor($m->mul(_set_int(100))->inc)->first(-1)};
-        push @factors, @{$n->dop_factor($m->mul(_set_int(200))->inc)->first(-1)};
+        push(@factors, @{$n->cop_factor($m->inc->mul($n->ilog2->isqrt))->first(-1)}) if $m_is_positive;
+        push(@factors, @{$n->dop_factor($m->inc->mul($n->ilog2->isqrt)->mul(TWO))->first(-1)});
 
-        push @factors, @{$n->miller_factor($m->mul(_set_int(10))->inc)->first(-1)};
-        push @factors, @{$n->lucas_factor(ONE, $m->mul(_set_int(5))->inc)->first(-1)};
+        push(@factors, @{$n->miller_factor($m->inc->mul(_set_int(5)))->first(-1)});
+        push(@factors, @{$n->lucas_factor(ONE, $m->inc->mul(_set_int(2)))->first(-1)});
 
-        push @factors, @{$n->fermat_factor($m->mul(_set_int(1e3))->inc)->first(-1)};
-        push @factors, @{$n->holf_factor($m->mul(_set_int(1e3))->inc)->first(-1)};
-        push @factors, @{$n->pell_factor($m->mul(_set_int(1e3))->inc)->first(-1)};
+        push(@factors, @{$n->fermat_factor($m->inc->mul(_set_int(1e3)))->first(-1)});
+        push(@factors, @{$n->holf_factor($m->inc->mul(_set_int(1e3)))->first(-1)});
+        push(@factors, @{$n->pell_factor($m->inc->mul(_set_int(1e3)))->first(-1)});
 
         @factors = @{$n->gcd_factors(Sidef::Types::Array::Array->new([@factors]))};
 
@@ -18584,19 +18576,38 @@ package Sidef::Types::Number::Number {
         }
 
         # Special methods that can find extra special factors, recursively
-        @composite_factors = map { @{$_->factor($fermat_block)} } @composite_factors;
-        @composite_factors = map { @{$_->factor($holf_block)} } @composite_factors;
-        @composite_factors = map { @{$_->factor($pell_block)} } @composite_factors;
-        @composite_factors = map { @{$_->factor($FLT_block)} } @composite_factors;
+        if ($m_is_positive) {
 
-        @composite_factors = map { @{$_->factor($pm1_block)} } @composite_factors;
-        @composite_factors = map { @{$_->factor($pp1_block)} } @composite_factors;
-        @composite_factors = map { @{$_->factor($prho_block)} } @composite_factors;
-        @composite_factors = map { @{$_->factor($chebyshev_block)} } @composite_factors;
+#<<<
+            my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))->inc) });
+            my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e3))->inc) });
+            my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(1e3))->inc) });
+            my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_next_prime(CORE::int(CORE::rand(1e7)))), $m->mul(_set_int(1e3))->inc) });
 
-        @composite_factors = map {
-            ($_->is_prime ? $_ : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(10))))})
-        } @composite_factors;
+            my $pm1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))->inc) });
+            my $pp1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(1e4))->inc) });
+            my $chebyshev_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(1e4))->inc) });
+            my $prho_block      = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))->inc) });
+#>>>
+
+            @composite_factors = map { @{$_->factor($fermat_block)} } @composite_factors;
+            @composite_factors = map { @{$_->factor($holf_block)} } @composite_factors;
+            @composite_factors = map { @{$_->factor($pell_block)} } @composite_factors;
+            @composite_factors = map { @{$_->factor($FLT_block)} } @composite_factors;
+
+            @composite_factors = map { @{$_->factor($pm1_block)} } @composite_factors;
+            @composite_factors = map { @{$_->factor($pp1_block)} } @composite_factors;
+            @composite_factors = map { @{$_->factor($prho_block)} } @composite_factors;
+            @composite_factors = map { @{$_->factor($chebyshev_block)} } @composite_factors;
+
+            if ($m->ge(TWO)) {    # pretty slow; use it only with m >= 2
+                @composite_factors = map {
+                    (_is_prob_prime($$_)
+                     ? $_
+                     : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(5))))})
+                } @composite_factors;
+            }
+        }
 
         $n->gcd_factors(Sidef::Types::Array::Array->new([@prime_factors, @composite_factors]));
     }
@@ -18961,7 +18972,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($tries)) {
             _valid(\$tries);
-            $tries = _any2ui($$tries) // undef;
+            $tries = _any2ui($$tries) || return Sidef::Types::Array::Array->new(_set_int($n));
         }
 
         my @factors = sort { $$a <=> $$b }
@@ -19087,7 +19098,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($tries)) {
             _valid(\$tries);
-            $tries = _any2ui($$tries) // undef;
+            $tries = _any2ui($$tries) || return Sidef::Types::Array::Array->new(_set_int($n));
         }
 
         my @factors = sort { $$a <=> $$b }
@@ -19144,7 +19155,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($upto)) {
             _valid(\$upto);
-            $upto = _any2ui($$upto);
+            $upto = _any2ui($$upto) || return Sidef::Types::Array::Array->new(_set_int($n));
         }
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
@@ -19263,7 +19274,7 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
 
         if (defined($upto)) {
-            $upto = _any2ui($$upto);
+            $upto = _any2ui($$upto) || return Sidef::Types::Array::Array->new(_set_int($n));
         }
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
