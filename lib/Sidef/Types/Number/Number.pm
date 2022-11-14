@@ -18543,12 +18543,10 @@ package Sidef::Types::Number::Number {
         my @factors;
         my $m_is_positive = $m->is_positive;
 
-        if ($m_is_positive) {
-            push @factors, @{$n->trial_factor($m->inc->mul(_set_int(1e6)))->first(-1)};
-        }
+        push @factors, @{$n->trial_factor($m->inc->mul(_set_int(1e6)))->first(-1)};
 
         # Special methods that depdend on the special form of n
-        push(@factors, @{$n->cop_factor($m->inc->mul($n->ilog2->isqrt))->first(-1)}) if $m_is_positive;
+        push(@factors, @{$n->cop_factor($m->inc->mul($n->ilog2->idiv(TWO)->isqrt))->first(-1)});
         push(@factors, @{$n->dop_factor($m->inc->mul($n->ilog2->isqrt)->mul(TWO))->first(-1)});
 
         push(@factors, @{$n->miller_factor($m->inc->mul(_set_int(5)))->first(-1)});
@@ -18579,15 +18577,15 @@ package Sidef::Types::Number::Number {
         if ($m_is_positive) {
 
 #<<<
-            my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))->inc) });
-            my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e3))->inc) });
-            my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(1e3))->inc) });
-            my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_next_prime(CORE::int(CORE::rand(1e7)))), $m->mul(_set_int(1e3))->inc) });
+            my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))) });
+            my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e3))) });
+            my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(1e3))) });
+            my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_next_prime(CORE::int(CORE::rand(1e7)))), $m->mul(_set_int(1e3))) });
 
-            my $pm1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))->inc) });
-            my $pp1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(1e4))->inc) });
-            my $chebyshev_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(1e4))->inc) });
-            my $prho_block      = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))->inc) });
+            my $pm1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) });
+            my $pp1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(1e4))) });
+            my $chebyshev_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(1e4))) });
+            my $prho_block      = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))) });
 #>>>
 
             @composite_factors = map { @{$_->factor($fermat_block)} } @composite_factors;
@@ -18602,9 +18600,11 @@ package Sidef::Types::Number::Number {
 
             if ($m->ge(TWO)) {    # pretty slow; use it only with m >= 2
                 @composite_factors = map {
-                    (_is_prob_prime($$_)
+                    (
+                     _is_prob_prime($$_)
                      ? $_
-                     : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(5))))})
+                     : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(5))))}
+                    )
                 } @composite_factors;
             }
         }
