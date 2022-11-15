@@ -33,10 +33,26 @@ Builds and returns a new Perl object.
 
 =cut
 
+=head2 numeric_version
+
+    Perl.numeric_version
+
+Returns the version of Perl as a Number object (e.g.: C<5.036>).
+
+=cut
+
 =head2 to_sidef
 
     Perl.to_sidef(perl_structure)
 
 Converts a given a Perl data structure into a Sidef data structure.
+
+=cut
+
+=head2 version
+
+    Perl.version
+
+Returns the version of Perl as String object (e.g.: C<"v5.36.0">).
 
 =cut

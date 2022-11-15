@@ -8,6 +8,14 @@ package Sidef::Perl::Perl {
         bless {}, __PACKAGE__;
     }
 
+    sub numeric_version {
+        Sidef::Types::Number::Number->new($]);
+    }
+
+    sub version {
+        Sidef::Types::String::String->new($^V);
+    }
+
     sub to_sidef {
         my ($self, $data) = @_;
 

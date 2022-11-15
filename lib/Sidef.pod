@@ -126,6 +126,18 @@ Valid values for the backend are: C<'Sidef'>, C<'Perl'>.
 Parses, compiles and executes a given Sidef code and returns
 the result of the last statement.
 
+=head2 version
+
+    Sidef->version
+
+Returns the version of Sidef as a String object.
+
+=head2 numeric_version
+
+    Sidef->numeric_version
+
+Returns the version of Sidef as a Number object.
+
 =head1 WWW
 
 You can find more info about Sidef, by clicking on the following links:

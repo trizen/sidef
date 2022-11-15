@@ -30,6 +30,14 @@ package Sidef {
 
     *call = \&new;
 
+    sub version {
+        Sidef::Types::String::String->new('v' . $VERSION);
+    }
+
+    sub numeric_version {
+        Sidef::Types::Number::Number->new($VERSION =~ s{_}{}rg);
+    }
+
     sub parse_code {
         my ($self, $code) = @_;
 
