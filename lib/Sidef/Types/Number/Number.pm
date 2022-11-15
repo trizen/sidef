@@ -7520,7 +7520,7 @@ package Sidef::Types::Number::Number {
         if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
             $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
             return Sidef::Types::Array::Array->new([
-                map { _set_int($k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_}) }
+                map { bless(\(my $o = ($k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_}))) }
                     split(//, scalar CORE::reverse scalar Math::GMPz::Rmpz_get_str($n, $k))
             ]);
         }
@@ -7536,8 +7536,9 @@ package Sidef::Types::Number::Number {
             if ($B <= 4294967295) {
                 return
                   Sidef::Types::Array::Array->new(
-                    [map { _set_int($_) } CORE::reverse(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B))
-                    ]
+                                       [map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) }
+                                          CORE::reverse(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B))
+                                       ]
                   );
             }
 
@@ -7547,7 +7548,7 @@ package Sidef::Types::Number::Number {
             state $Q = Math::GMPz::Rmpz_init_nobless();
             state $R = Math::GMPz::Rmpz_init_nobless();
 
-            my @digits = map { _set_int($_) } sub {
+            my @digits = map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } sub {
                 my ($A, $r) = @_;
 
                 # Cut the recursion early
@@ -8731,7 +8732,7 @@ package Sidef::Types::Number::Number {
 
         if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($N)) {
             my @arr = Math::Prime::Util::allsqrtmod(Math::GMPz::Rmpz_get_ui($A), Math::GMPz::Rmpz_get_ui($N));
-            return Sidef::Types::Array::Array->new([map { _set_int($_) } @arr]);
+            return Sidef::Types::Array::Array->new([map { bless \$_ } @arr]);
         }
 
         my $sqrtmod_pk = sub {
@@ -15727,7 +15728,7 @@ package Sidef::Types::Number::Number {
     sub num2perm {
         my ($n, $k) = @_;
         _valid(\$k);
-        my @perm = map { _set_int($_) }
+        my @perm = map { bless \$_ }
           Math::Prime::Util::GMP::numtoperm(_big2uistr($n) // (return undef), _big2uistr($k) // (return undef));
         Sidef::Types::Array::Array->new(\@perm);
     }
@@ -15813,7 +15814,7 @@ package Sidef::Types::Number::Number {
 
     sub random_bytes {
         Sidef::Types::Array::Array->new(
-                                        [map { _set_int(ord($_)) }
+                                        [map { bless(\(my $o = ord($_))) }
                                            split(//, Math::Prime::Util::GMP::random_bytes(&_big2uistr // (return undef)))
                                         ]
                                        );
@@ -17697,13 +17698,14 @@ package Sidef::Types::Number::Number {
                 $x = (Math::GMPz::Rmpz_sgn($x) <= 0) ? 2 : Math::GMPz::Rmpz_get_ui($x);
             }
             $y = Math::GMPz::Rmpz_get_ui($y);
-            return Sidef::Types::Array::Array->new([map { _set_int($_) } @{Math::Prime::Util::primes($x, $y)}]);
+            return Sidef::Types::Array::Array->new([map { bless \$_ } @{Math::Prime::Util::primes($x, $y)}]);
         }
 
         $x = (_big2uistr($x) // 0) if ref($x);
         $y = (_big2uistr($y) // 0);
 
-        Sidef::Types::Array::Array->new([map { _set_int($_) } Math::Prime::Util::GMP::sieve_primes($x, $y, 0)]);
+        Sidef::Types::Array::Array->new(
+                      [map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } Math::Prime::Util::GMP::sieve_primes($x, $y, 0)]);
     }
 
     sub composites {
@@ -17741,7 +17743,7 @@ package Sidef::Types::Number::Number {
         if (HAS_PRIME_UTIL and ref($to) eq '') {
             Math::Prime::Util::forcomposites(
                 sub {
-                    push @list, $_;
+                    push(@list, bless(\(my $o = $_)));
                 },
                 $from,
                 $to
@@ -17750,12 +17752,11 @@ package Sidef::Types::Number::Number {
         else {
             for (my $k = $from ; $k - 1 < $to ; ++$k) {
                 if (!_is_prob_prime($k)) {
-                    push @list, $k;
+                    push(@list, ref($k) ? _set_int($k) : (bless(\(my $o = $k))));
                 }
             }
         }
 
-        @list = map { _set_int($_) } @list;
         Sidef::Types::Array::Array->new(\@list);
     }
 
@@ -17771,55 +17772,57 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($n) > 0
           or return Sidef::Types::Array::Array->new();
 
-        @primes = map { Math::GMPz::Rmpz_fits_ulong_p($_) ? Math::GMPz::Rmpz_get_ui($_) : $_ } map { _any2mpz($$_) } @primes;
+        @primes = map { _fits_ulong($$_) ? _get_ulong($$_) : _any2mpz($$_) } @primes;
 
         # Optimization when n is a native integer
         if (Math::GMPz::Rmpz_fits_ulong_p($n) and Math::GMPz::Rmpz_get_ui($n) < ULONG_MAX) {
 
             $n = Math::GMPz::Rmpz_get_ui($n);
 
-            my @h = (1);
+            my @h = (ONE);
             foreach my $p (@primes) {
                 my $p_obj = _set_int($p);
                 foreach my $k (@h) {
-                    my $t = $k * $p;
-                    if (($t <= $n and $t < ULONG_MAX) and (defined($block) ? $block->(_set_int($t), $p_obj) : 1)) {
-                        push @h, $t;
+                    my $t = $$k * $p;
+                    if (($t <= $n and $t < ULONG_MAX)) {
+                        my $t_obj = bless \$t;
+                        if (defined($block) ? $block->($t_obj, $p_obj) : 1) {
+                            push @h, $t_obj;
+                        }
                     }
                 }
             }
 
-            @h = sort { $a <=> $b } @h;
-            @h = map  { _set_int($_) } @h;
+            @h = sort { $$a <=> $$b } @h;
             return Sidef::Types::Array::Array->new(\@h);
         }
 
-        my @h = (1);
+        my @h = (ONE);
 
         foreach my $p (@primes) {
             my $p_obj = _set_int($p);
 
             foreach my $k (@h) {
-                my $t = $p * $k;
+                my $t = $p * $$k;
 
                 if (!ref($t) and !($t < ULONG_MAX)) {
-                    $t = Math::GMPz::Rmpz_init_set_ui($k);
+                    $t = Math::GMPz::Rmpz_init_set_ui($$k);
 
                     ref($p)
                       ? Math::GMPz::Rmpz_mul($t, $t, $p)
                       : Math::GMPz::Rmpz_mul_ui($t, $t, $p);
                 }
 
-                if (    (ref($t) ? (Math::GMPz::Rmpz_cmp($t, $n) <= 0) : (Math::GMPz::Rmpz_cmp_ui($n, $t) >= 0))
-                    and (defined($block) ? $block->(_set_int($t), $p_obj) : 1)) {
-                    push @h, $t;
+                if ((ref($t) ? (Math::GMPz::Rmpz_cmp($t, $n) <= 0) : (Math::GMPz::Rmpz_cmp_ui($n, $t) >= 0))) {
+                    my $t_obj = bless \$t;
+                    if (defined($block) ? $block->($t_obj, $p_obj) : 1) {
+                        push @h, $t_obj;
+                    }
                 }
             }
         }
 
-        @h = sort { $a <=> $b } @h;
-        @h = map  { _set_int($_) } @h;
-
+        @h = sort { $$a <=> $$b } @h;
         return Sidef::Types::Array::Array->new(\@h);
     }
 
@@ -18532,7 +18535,7 @@ package Sidef::Types::Number::Number {
 
         # Factorize directly when n is a native integer
         if (Math::GMPz::Rmpz_fits_ulong_p($z)) {
-            return Sidef::Types::Array::Array->new([map { _set_int($_) } _factor(Math::GMPz::Rmpz_get_ui($z))]);
+            return Sidef::Types::Array::Array->new([map { bless \$_ } _factor(Math::GMPz::Rmpz_get_ui($z))]);
         }
 
         # Factorize directly when n is small enough
@@ -18546,7 +18549,7 @@ package Sidef::Types::Number::Number {
         push @factors, @{$n->trial_factor($m->inc->mul(_set_int(1e6)))->first(-1)};
 
         # Special methods that depdend on the special form of n
-        push(@factors, @{$n->cop_factor($m->inc->mul($n->ilog2->idiv(TWO)->isqrt))->first(-1)});
+        push(@factors, @{$n->cop_factor($m->inc->mul($n->ilog2->isqrt->shift_right(ONE)))->first(-1)});
         push(@factors, @{$n->dop_factor($m->inc->mul($n->ilog2->isqrt)->mul(TWO))->first(-1)});
 
         push(@factors, @{$n->miller_factor($m->inc->mul(_set_int(5)))->first(-1)});
@@ -18667,7 +18670,7 @@ package Sidef::Types::Number::Number {
             $n = _big2pistr($n) // (return Sidef::Types::Array::Array->new);
             my ($rem, @factors) = _adaptive_trial_factor($n);
             return Sidef::Types::Array::Array->new(
-                                     [map { _set_int($_) } (@factors, ((Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) ? () : $rem))]);
+                                        [map { bless \$_ } (@factors, ((Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) ? () : $rem))]);
         }
 
         _valid(\$k);
@@ -18695,7 +18698,7 @@ package Sidef::Types::Number::Number {
         }
 
         my @return =
-          map { (_set_int($_)) x $count{$_} } @uniq_factors;
+          map { ((bless \$_)) x $count{$_} } @uniq_factors;
 
         if (Math::GMPz::Rmpz_cmp_ui($r, 1) > 0) {
             push @return, bless \$r;
@@ -18976,7 +18979,7 @@ package Sidef::Types::Number::Number {
         }
 
         my @factors = sort { $$a <=> $$b }
-          map { _set_int($_) } _miller_factor($n, $tries);
+          map { bless \$_ } _miller_factor($n, $tries);
 
         Sidef::Types::Array::Array->new(\@factors);
     }
@@ -19102,7 +19105,7 @@ package Sidef::Types::Number::Number {
         }
 
         my @factors = sort { $$a <=> $$b }
-          map { _set_int($_) } _lucas_factor($n, $j, $tries);
+          map { bless \$_ } _lucas_factor($n, $j, $tries);
 
         Sidef::Types::Array::Array->new(\@factors);
     }
@@ -19640,14 +19643,13 @@ package Sidef::Types::Number::Number {
         _valid(\$curves) if defined($curves);
 
         Sidef::Types::Array::Array->new(
-            [
-             map { _set_int($_) } Math::Prime::Util::GMP::ecm_factor(
-                         _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
-                         (defined($B1)     ? (_big2pistr($B1)     || return Sidef::Types::Array::Array->new($n)) : ()),    # B1
-                         (defined($curves) ? (_big2pistr($curves) || return Sidef::Types::Array::Array->new($n)) : ())
-                         ,    # number of curves
-                                                                    )
-            ]
+                            [map { _set_int($_) }
+                               Math::Prime::Util::GMP::ecm_factor(
+                                 _big2pistr($n) // (return Sidef::Types::Array::Array->new()),
+                                 (defined($B1)     ? (_big2pistr($B1)     || return Sidef::Types::Array::Array->new($n)) : ()),
+                                 (defined($curves) ? (_big2pistr($curves) || return Sidef::Types::Array::Array->new($n)) : ()),
+                               )
+                            ]
         );
     }
 
@@ -19987,11 +19989,14 @@ package Sidef::Types::Number::Number {
         }
 
         if (HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            return Sidef::Types::Array::Array->new(
-                                              [map { _set_int($_) } Math::Prime::Util::divisors(Math::GMPz::Rmpz_get_ui($n))]);
+            return
+              Sidef::Types::Array::Array->new(
+                [map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } Math::Prime::Util::divisors(Math::GMPz::Rmpz_get_ui($n))
+                ]
+              );
         }
 
-        Sidef::Types::Array::Array->new([map { _set_int($_) } _divisors($n)]);
+        Sidef::Types::Array::Array->new([map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } _divisors($n)]);
     }
 
     sub udivisors {
@@ -22593,7 +22598,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my @powerful = map {
-            ref($_) ? (bless \$_) : _set_int($_)
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
         } @{_sieve_powerful($from, $to, $k)};
 #>>>
 
@@ -22938,7 +22943,7 @@ package Sidef::Types::Number::Number {
           }
           ->(Math::GMPz::Rmpz_init_set_ui(1), $k, 0);
 
-        Sidef::Types::Array::Array->new([map { _set_int($_) } sort { $a <=> $b } @list]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @list]);
     }
 
     sub omega_primes {
@@ -22968,7 +22973,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my @omega_primes = map {
-            ref($_) ? (bless \$_) : _set_int($_)
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
         } @{_sieve_omega_primes($from, $to, $k)};
 #>>>
 
@@ -23007,7 +23012,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my @fermat_pseudoprimes = map {
-            ref($_) ? (bless \$_) : _set_int($_)
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
         } @{_sieve_omega_primes($from, $to, $k, fermat => $base)};
 #>>>
 
@@ -23450,7 +23455,7 @@ package Sidef::Types::Number::Number {
           }
           ->(Math::GMPz::Rmpz_init_set_ui(1), $k, 0);
 
-        Sidef::Types::Array::Array->new([map { _set_int($_) } sort { $a <=> $b } @list]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @list]);
     }
 
     sub almost_primes {
@@ -23480,7 +23485,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my @almost_primes = map {
-            ref($_) ? (bless \$_) : _set_int($_)
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
         } @{_sieve_almost_primes($from, $to, $k)};
 #>>>
 
@@ -23518,7 +23523,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my @carmichael_numbers = map {
-            ref($_) ? (bless \$_) : _set_int($_)
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
         } @{_sieve_almost_primes($from, $to, $k, carmichael => 1, squarefree => 1)};
 #>>>
 
@@ -23552,7 +23557,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my @lucas_carmichael_numbers = map {
-            ref($_) ? (bless \$_) : _set_int($_)
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
         } @{_sieve_almost_primes($from, $to, $k, lucas_carmichael => 1, squarefree => 1)};
 #>>>
 
@@ -23591,7 +23596,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my @fermat_pseudoprimes = map {
-            ref($_) ? (bless \$_) : _set_int($_)
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) :  _set_int($_)
         } @{_sieve_almost_primes($from, $to, $k, fermat => $base, squarefree => 1)};
 #>>>
 
@@ -23828,7 +23833,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my @squarefree_almost_primes = map {
-            ref($_) ? (bless \$_) : _set_int($_)
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
         } @{_sieve_almost_primes($from, $to, $k, squarefree => 1)};
 #>>>
 
@@ -24145,7 +24150,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my @squarefree = map {
-            _set_int($_)
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
         } @{_sieve_squarefree($from, $to)};
 #>>>
 
@@ -26763,7 +26768,7 @@ package Sidef::Types::Number::Number {
         if (ref($obj) eq 'Sidef::Types::Block::Block') {
             my @array;
             for (my $i = 0 ; $i < $x ; ++$i) {
-                push @array, $obj->run(_set_int($i));
+                push @array, $obj->run(bless(\(my $o = $i)));
             }
             return Sidef::Types::Array::Array->new(\@array);
         }
@@ -26806,7 +26811,7 @@ package Sidef::Types::Number::Number {
 
         my @items;
         for (my ($i, $j) = (0, 0) ; $j < $x ; ++$i) {
-            push @items, $block->run(_set_int($i)) // next;
+            push @items, $block->run(bless(\(my $o = $i))) // next;
             ++$j;
         }
 
@@ -26850,7 +26855,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . $name} = sub {
 #<<<
             my ($n, $block) = @_;
-            Sidef::Types::Array::Array->new([map { _set_int($_) } 0 .. __numify__($$n) - 1])->$name($block);
+            Sidef::Types::Array::Array->new([map { bless \$_ } 0 .. __numify__($$n) - 1])->$name($block);
 #>>>
         };
     }
@@ -26870,7 +26875,7 @@ package Sidef::Types::Number::Number {
         *{__PACKAGE__ . '::' . $name} = sub {
 #<<<
             my ($n, $k, $block) = @_;
-            Sidef::Types::Array::Array->new([map { _set_int($_) } 0 .. __numify__($$n) - 1])->$name($k, $block);
+            Sidef::Types::Array::Array->new([map { bless \$_ } 0 .. __numify__($$n) - 1])->$name($k, $block);
 #>>>
         };
     }
