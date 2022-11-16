@@ -42,8 +42,6 @@ package Sidef::Types::Number::Number {
     };
 #>>>
 
-    our $MPZ = bless \Math::GMPz::Rmpz_init();
-
     state $round_z = Math::MPFR::MPFR_RNDZ();
 
     my %DIGITS_36;
@@ -624,7 +622,7 @@ package Sidef::Types::Number::Number {
     sub _any2mpz {
         my ($x) = @_;
 
-        ref($x) eq ''           && return (($x < 0) ? Math::GMPz::Rmpz_init_set_si($x) : Math::GMPz::Rmpz_init_set_ui($x));
+        !ref($x)                && return (($x < 0) ? Math::GMPz::Rmpz_init_set_si($x) : Math::GMPz::Rmpz_init_set_ui($x));
         ref($x) eq 'Math::GMPz' && return $x;
         ref($x) eq 'Math::GMPq' && goto &_mpq2mpz;
 
@@ -6718,13 +6716,13 @@ package Sidef::Types::Number::Number {
         my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
         foreach my $n (@numbers) {
-            if (ref($n) eq 'Math::GMPz') {
-                Math::GMPz::Rmpz_add($sum, $sum, $n);
-            }
-            elsif (ref($n) eq '') {
+            if (!ref($n)) {
                 ($n < 0)
                   ? Math::GMPz::Rmpz_sub_ui($sum, $sum, -$n)
                   : Math::GMPz::Rmpz_add_ui($sum, $sum, $n);
+            }
+            elsif (ref($n) eq 'Math::GMPz') {
+                Math::GMPz::Rmpz_add($sum, $sum, $n);
             }
             else {
                 push @non_mpz, $n;
@@ -26727,6 +26725,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_add_ui($r, $r, 1);
                     Math::GMPz::Rmpz_urandomm($r, $state, $r, 1);
                     Math::GMPz::Rmpz_add($r, $r, $x);
+                    $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
                     return bless \$r;
                 }
 
@@ -26743,7 +26742,8 @@ package Sidef::Types::Number::Number {
                 }
 
                 Math::GMPz::Rmpz_urandomm($x, $state, $x, 1);
-                Math::GMPz::Rmpz_neg($x, $x) if $sgn < 0;
+                Math::GMPz::Rmpz_neg($x, $x)     if $sgn < 0;
+                $x = Math::GMPz::Rmpz_get_si($x) if Math::GMPz::Rmpz_fits_slong_p($x);
                 bless \$x;
             }
 

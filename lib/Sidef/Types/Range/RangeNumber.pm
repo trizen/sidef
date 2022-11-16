@@ -117,49 +117,33 @@ package Sidef::Types::Range::RangeNumber {
                               ? Math::GMPz::Rmpz_init_set_si($prev)
                               : Math::GMPz::Rmpz_init_set_ui($prev);
 
-                            if (Math::GMPz::get_refcnt($$Sidef::Types::Number::Number::MPZ) > 1) {
-                                $Sidef::Types::Number::Number::MPZ =
-                                  bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
-                            }
-                            else {
-                                Math::GMPz::Rmpz_set($$Sidef::Types::Number::Number::MPZ, $counter_mpz);
-                            }
+                            my $value = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
 
-                            ref($step) ? Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step)
-                              : (
-                                 $step < 0 ? Math::GMPz::Rmpz_sub_ui($counter_mpz, $counter_mpz, -$step)
-                                 : Math::GMPz::Rmpz_add_ui($counter_mpz, $counter_mpz, $step)
-                                );
-                            $Sidef::Types::Number::Number::MPZ;
+                            ref($step)      ? Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step)
+                              : ($step < 0) ? Math::GMPz::Rmpz_sub_ui($counter_mpz, $counter_mpz, -$step)
+                              :               Math::GMPz::Rmpz_add_ui($counter_mpz, $counter_mpz, $step);
+
+                            $value;
                         }
                     );
                 }
 
                 my $counter_mpz =
-                  ref($from) ? Math::GMPz::Rmpz_init_set($from)
-                  : (
-                     ($from < 0) ? Math::GMPz::Rmpz_init_set_si($from)
-                     : Math::GMPz::Rmpz_init_set_ui($from)
-                    );
+                    ref($from)  ? Math::GMPz::Rmpz_init_set($from)
+                  : ($from < 0) ? Math::GMPz::Rmpz_init_set_si($from)
+                  :               Math::GMPz::Rmpz_init_set_ui($from);
 
                 return Sidef::Types::Block::Block->new(
                     code => sub {
                         --$repetitions >= 0 or return undef;
 
-                        if (Math::GMPz::get_refcnt($$Sidef::Types::Number::Number::MPZ) > 1) {
-                            $Sidef::Types::Number::Number::MPZ =
-                              bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
-                        }
-                        else {
-                            Math::GMPz::Rmpz_set($$Sidef::Types::Number::Number::MPZ, $counter_mpz);
-                        }
+                        my $value = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
 
-                        ref($step) ? Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step)
-                          : (
-                             ($step < 0) ? Math::GMPz::Rmpz_sub_ui($counter_mpz, $counter_mpz, -$step)
-                             : Math::GMPz::Rmpz_add_ui($counter_mpz, $counter_mpz, $step)
-                            );
-                        $Sidef::Types::Number::Number::MPZ;
+                        ref($step)      ? Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step)
+                          : ($step < 0) ? Math::GMPz::Rmpz_sub_ui($counter_mpz, $counter_mpz, -$step)
+                          :               Math::GMPz::Rmpz_add_ui($counter_mpz, $counter_mpz, $step);
+
+                        $value;
                     },
                 );
             }
