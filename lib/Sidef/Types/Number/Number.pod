@@ -1404,7 +1404,7 @@ This method is particularly effective for numbers that have a prime factor C<p> 
 
     say chebyshev_factor(1124075136413 * 3556516507813, 4000, 3)
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -1744,7 +1744,7 @@ Congruence of Powers (CoP) factorization method, trying to find algebraic factor
 
 An additional argument can be given to limit the number of iterations.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -1893,7 +1893,7 @@ Factorization method, based on cyclotomic polynomials, trying to find algebraic 
 
 An optional list of bases can be given to restrict the search only to the given bases.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2180,7 +2180,7 @@ Difference of Powers (DoP) factorization method, trying to find algebraic factor
 
 An additional argument can be given to limit the number of iterations.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2432,7 +2432,7 @@ Aliases: I<squarefree_semiprimes_each>
 
 Hendrik Lenstra's elliptic curve factorization method (ECM).
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2795,7 +2795,7 @@ Tries to factorize a given number using Fermat's factorization method (using at 
 
 Works for odd composite non-power numbers C<n> that have two divisors close to C<sqrt(n)>.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2887,7 +2887,7 @@ Example (try with base 3 and give up after 10^6 iterations):
 
     say flt_factor(2**64 + 1, 3, 1e6)   #=> [274177, 67280421310721]
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -3054,7 +3054,7 @@ Aliases: I<hermite_polynomialHe>
 
 Hart's OLF method (variant of Fermat's method).
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -4795,7 +4795,7 @@ Effective in factoring Carmichael numbers, Fermat pseudoprimes, Lucas pseudoprim
 
     say lucas_factor(2425361208749736840354501506901183117777758034612345610725789878400467)
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<lucas_miller_factor>
 
@@ -4911,7 +4911,7 @@ Example:
 
     say mbe_factor(2**64 + 1, 1)   #=> [274177, 67280421310721]
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -4959,7 +4959,7 @@ It returns an array with the factors of C<n>:
 
     say miller_factor(58571442634534443082821160508299574798027946748324125518533225605795841)
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<miller_rabin_factor>
 
@@ -5582,7 +5582,7 @@ Returns an array with the real and imaginary parts of C<x>.
 
 Pollard-Brent rho factorization method.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -5596,7 +5596,7 @@ This method is particularly effective for numbers that have factors close to C<s
 
     say pell_factor(10**120 - 10**40)
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -5630,6 +5630,23 @@ Returns an array of arrays with the permutations of the integers in the range C<
 
 =cut
 
+=head2 phi_finder_factor
+
+    n.phi_finder_factor(tries=1e4)
+
+Tries to find a factor of C<n>, using the Phi-finder factorization method due to Kyle Kloster (2010).
+
+This method is particularly effective for semiprimes C<n = p*q> such that C<p> and C<q> are relatively close to each other.
+
+Example:
+
+    say phi_finder_factor(622882096110539)          #=> [23099599, 26965061]
+    say phi_finder_factor(132750061135361, 1e5)     #=> [9369673, 14168057]
+
+The product of the factors will give back C<n>. However, some factors may be composite.
+
+=cut
+
 =head2 pi_k
 
     k.almost_prime_count(n)
@@ -5651,7 +5668,7 @@ Aliases: I<almost_primepi>, I<almost_prime_count>
 
 Pollard p-1 factorization method.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<pminus1_factor>
 
@@ -5985,7 +6002,7 @@ Returns the number of the k-th power unitary divisors of n.
 
 Williams' p+1 factorization method.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<pplus1_factor>
 
@@ -6059,7 +6076,7 @@ Returns the previous prime smaller than C<n>.
 
 Pollard rho factorization method.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -6474,7 +6491,7 @@ Aliases: I<quadratic_nonresidue>
 
 Pomerance's Quadratic Sieve factorization method (SIMPQS).
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -7061,7 +7078,7 @@ The method returns an array with the factors of C<n>:
 
     say special_factor((3**120 + 1) * (5**240 - 1))
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<special_factors>
 
@@ -7414,7 +7431,7 @@ Returns the number of unitary square divisors of C<n>.
 
 Shanks' SQUFOF method.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -7626,7 +7643,7 @@ Aliases: I<trd>
 
 Trial division.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 

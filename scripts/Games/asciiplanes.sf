@@ -9,7 +9,7 @@
 # Created on: 21 August 2012
 # Latest edit on: 10 November 2013
 # Translated to Sidef in 21 September 2014
-# Latest edit on: 26 July 2016
+# Latest edit on: 15 November 2022
 # Website: https://github.com/trizen/asciiplanes
 
 # Find the planes' positions on a grid. (text-based game)
@@ -17,7 +17,12 @@
 var asciitable = (
                    try   { require('Text::ASCIITable') }
                    catch { STDERR.print("Can't load the 'Text::ASCIITable' Perl module...\n"); Sys.exit(2) }
-                 );
+                 )
+
+var ANSI = (
+                try   { frequire('Term::ANSIColor') }
+                catch { nil }
+           )
 
 ## Package variables
 var pkgname = 'asciiplanes';
@@ -30,6 +35,7 @@ var PLANES_NUM = 3;
 var parts = (['head'] + ['hit']*7);
 var plane_chars = ['$', '#', '@'];
 
+var use_colors = defined(ANSI)
 var wrap_plane = false;
 var hit_char   = %q{*};
 var miss_char  = %q{`};
@@ -44,6 +50,7 @@ main:
         --wrap!     : wrap the plane around the play board (default: #{wrap_plane})
         --hit=s     : character used when a plane is hit (default: "#{hit_char}")
         --miss=s    : character used when a plane is missed (default: "#{miss_char}")
+        --colors!   : use ANSI colors (requires Term::ANSIColor) (default: #{use_colors})
 
 help:
         --help      : print this message and exit
@@ -74,6 +81,7 @@ if (!ARGV.is_empty) {
          'hit-char=s'        => func(_,v) { hit_char   = Str(v)  },
          'miss-char=s'       => func(_,v) { miss_char  = Str(v)  },
          'wrap!'             => func(_,v) { wrap_plane = Bool(v) },
+         'colors!'           => func(_,v) { use_colors = Bool(v) },
          'help|h|?'          => func(*_)  { usage() },
          'version|v|V'       => func(*_)  { ver() },
     );
@@ -172,17 +180,27 @@ func assign(change=false, plane=[], data=[]) {
 }
 
 func print_ascii_table {
-    var table = asciitable.new(Hash(headingText => "#{pkgname} #{version}"));
+    var table = asciitable.new(Hash(headingText => "#{pkgname} #{version}"))
 
-    table.setCols(' ', (1..BOARD_SIZE)...);
+    table.setCols(' ', (1..BOARD_SIZE)...)
 
-    var char = 'a';
+    var char = 'a'
     info_board.each { |row|
-        table.addRow([char++, row...]);
-        table.addRowLine();
+        table.addRow([char++, row...])
+        table.addRowLine()
     }
 
-    say table.drawit;
+    var t = table.drawit
+
+    if (defined(ANSI) && use_colors) {
+        t.gsub!(hit_char, ANSI.colored(hit_char, 'bold red'))
+        t.gsub!(miss_char, ANSI.colored(miss_char, 'yellow'))
+        plane_chars.each {|c|
+            t.gsub!(c, ANSI.colored(c, "bold green"))
+        }
+    }
+
+    say t
 }
 
 var count = 0;

@@ -460,6 +460,7 @@ do {
     {|n| assert_eq(dop_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(cop_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(fermat_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(phi_finder_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(pell_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(miller_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(lucas_factor(n).prod, n||1) }.each(0..30)
@@ -503,10 +504,16 @@ do {
         verify_factors(n.cop_factor, n)
 
         if (n.is_odd) {
+        verify_factors(n.factor { .phi_finder_factor }, n)
             verify_factors(n.factor { .miller_factor }, n)
             verify_factors(n.factor { .lucas_factor }, n)
         }
     }
+
+    verify_factors(phi_finder_factor(43*97), 43*97)
+    verify_factors(phi_finder_factor(503*863), 503*863)
+    verify_factors(phi_finder_factor(622882096110539), 622882096110539)
+    verify_factors(phi_finder_factor(132750061135361, 1e5), 132750061135361)
 
     with (58571442634534443082821160508299574798027946748324125518533225605795841) {|n|
         verify_factors(miller_factor(n), n)
