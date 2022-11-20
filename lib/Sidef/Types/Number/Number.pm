@@ -1041,6 +1041,14 @@ package Sidef::Types::Number::Number {
           : Math::Prime::Util::GMP::prev_prime($n);
     }
 
+    sub _random_prime {
+        my ($n) = @_;
+
+        (HAS_PRIME_UTIL and $n < ULONG_MAX)
+          ? Math::Prime::Util::random_prime($n)
+          : Math::Prime::Util::GMP::random_prime($n);
+    }
+
     sub _primorial_trial_factor {
         my ($n, $k) = @_;
 
@@ -18624,7 +18632,7 @@ package Sidef::Types::Number::Number {
             my $phi_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->phi_finder_factor($m->mul(_set_int(1e3))) });
             my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e4))) });
             my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(5e2))) });
-            my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(Math::Prime::Util::GMP::random_prime(1e4)), $m->mul(_set_int(5e2))) });
+            my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_random_prime(1e4)), $m->mul(_set_int(5e2))) });
 
             my $pm1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) });
             my $pp1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(5e4))) });
@@ -18958,12 +18966,7 @@ package Sidef::Types::Number::Number {
 
         for (1 .. $tries) {
 
-            my $p = (
-                     HAS_PRIME_UTIL
-                     ? Math::Prime::Util::random_prime(1e9)
-                     : Math::Prime::Util::GMP::random_prime(1e9)
-                    );
-
+            my $p = _random_prime(ULONG_MAX >> 1);
             Math::GMPz::Rmpz_set_ui($g, $p);
             Math::GMPz::Rmpz_powm($x, $g, $d, $n);
 
@@ -24603,7 +24606,7 @@ package Sidef::Types::Number::Number {
 
         # Divisible by a small square
         foreach my $k (1 .. 7) {
-            my $p = Math::Prime::Util::GMP::random_prime(1e9);
+            my $p = _random_prime(CORE::int(CORE::sqrt(ULONG_MAX)));
             if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
 
                 if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
@@ -24621,7 +24624,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        # Must be a Fermat pseudoprime to base 2.
+        # Must also be a Fermat pseudoprime to base 2
         Math::GMPz::Rmpz_powm($pm1, $TWO, $nm1, $n);
         Math::GMPz::Rmpz_cmp_ui($pm1, 1) == 0
           or return Sidef::Types::Bool::Bool::FALSE;
@@ -24908,7 +24911,7 @@ package Sidef::Types::Number::Number {
 
         # Divisible by a small square
         foreach my $k (1 .. 7) {
-            my $p = Math::Prime::Util::GMP::random_prime(1e9);
+            my $p = _random_prime(CORE::int(CORE::sqrt(ULONG_MAX)));
             if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
 
                 if (Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)) {
@@ -24940,11 +24943,11 @@ package Sidef::Types::Number::Number {
         else {
             my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
 
-            # Must be an Euler pseudoprime to base 2.
+            # Must also be an Euler pseudoprime to base 2
             Math::Prime::Util::GMP::is_euler_pseudoprime($nstr, 2)
               || return Sidef::Types::Bool::Bool::FALSE;
 
-            # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
+            # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test
             # Incorrect for some inputs: https://github.com/danaj/Math-Prime-Util-GMP/issues/34
             if (0 and Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
                 Math::Prime::Util::GMP::is_carmichael($nstr)
