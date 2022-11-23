@@ -54,6 +54,9 @@ for k in (0..10) {
     assert_eq(gather { k.squarefree_strong_fermat_psp_each(2, from, 1e3*upto, { take(_) }) }, k.squarefree_strong_fermat_psp(2, from, 1e3*upto))
     assert_eq(gather { k.squarefree_strong_fermat_psp_each(3, from, 1e3*upto, { take(_) }) }, k.squarefree_strong_fermat_psp(3, from, 1e3*upto))
 
+    assert_eq(gather { k.strong_fermat_psp_each(2, from, 1e2*upto, { take(_) }) }, k.strong_fermat_psp(2, from, 1e2*upto))
+    assert_eq(gather { k.strong_fermat_psp_each(3, from, 1e2*upto, { take(_) }) }, k.strong_fermat_psp(3, from, 1e2*upto))
+
     assert_eq(gather { k.squarefree_fermat_psp_each(2, from, 100*upto, { take(_) }) }, k.squarefree_fermat_psp(2, from, 100*upto))
     assert_eq(gather { k.squarefree_fermat_psp_each(3, from, 100*upto, { take(_) }) }, k.squarefree_fermat_psp(3, from, 100*upto))
 

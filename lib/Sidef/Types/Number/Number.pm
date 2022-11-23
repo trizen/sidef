@@ -24704,6 +24704,59 @@ package Sidef::Types::Number::Number {
 
     *each_fermat_psp = \&fermat_psp_each;
 
+    sub strong_fermat_psp_each {
+        my ($k, $base, $from, $to, $block) = @_;
+
+        _valid(\$base, \$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k    = _any2ui($$k)    // return ZERO;
+        $base = _any2ui($$base) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if ($k < 1) {
+            return ZERO;
+        }
+
+        # TODO: tweak the step value for better performance
+        my $step = Math::Prime::Util::GMP::vecprod(($k) x ($k + 1), Math::Prime::Util::GMP::pn_primorial($k));
+
+        if ($step < 1e6) {
+            $step = '1' . ('0' x 6);
+        }
+
+        if ($k == 4) {
+            $step = '1' . ('0' x 7);
+        }
+
+        if ($k >= 5 and $step < 5e8) {
+            $step = '5' . ('0' x 8);
+        }
+
+        if ($step > ULONG_MAX) {
+            $step = Math::GMPz::Rmpz_init_set_str("$step", 10);
+        }
+
+        _generic_each($from, $to, $block,
+                      sub { $step },
+                      sub { _sieve_omega_primes($_[0], $_[1], $k, fermat => $base, strong => 1) });
+    }
+
+    *each_strong_fermat_psp = \&strong_fermat_psp_each;
+
     sub _sieve_squarefree {
         my ($from, $to) = @_;
 

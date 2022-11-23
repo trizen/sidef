@@ -2282,7 +2282,7 @@ Aliases: I<composites_each>
     k.fermat_psp_each(base, n, { ... })
     k.fermat_psp_each(base, a, b, { ... })
 
-Iterates over the Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
+Iterates over the C<k>-omega Fermat pseudoprimes <= n or in the range C<a..b>.
 
     3.fermat_psp_each(2, 1e5, {|n| say n })          # iterate over 3-Fermat psp to base 2 <= 1e5
     4.fermat_psp_each(2, 1e5, 1e6, {|n| say n })     # iterate over 4-Fermat psp to base 2 in range 1e4..1e6
@@ -2310,9 +2310,9 @@ Aliases: I<lucas_carmichael_each>
     k.omega_primes_each(n, { ... })
     k.omega_primes_each(a, b, { ... })
 
-Iterates over the k-omega primes <= n, or in the range C<a..b>.
+Iterates over the C<k>-omega primes <= n, or in the range C<a..b>.
 
-k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
+C<k>-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
     1.omega_primes_each(100, {|n| say n })          # iterate over prime powers <= 100
     2.omega_primes_each(50, 100, {|n| say n })      # iterate over 2-omega primes in range 50..100
@@ -2463,6 +2463,20 @@ Iterates over the squarefree strong Fermat pseudoprimes <= n or in the range C<a
     4.each_squarefree_strong_fermat_psp(2, 1e7, 1e8, {|n| say n })     # iterate over squarefree strong 4-Fermat psp to base 2 in range 1e7..1e8
 
 Aliases: I<squarefree_strong_fermat_psp_each>
+
+=cut
+
+=head2 each_strong_fermat_psp
+
+    k.each_strong_fermat_psp(base, n, { ... })
+    k.each_strong_fermat_psp(base, a, b, { ... })
+
+Iterates over the C<k>-omega strong Fermat pseudoprimes <= n or in the range C<a..b>.
+
+    3.each_strong_fermat_psp(2, 1e6, {|n| say n })          # iterate over 3-omega strong Fermat psp to base 2 <= 1e6
+    4.each_strong_fermat_psp(2, 1e7, 1e8, {|n| say n })     # iterate over 4-omega strong Fermat psp to base 2 in range 1e7..1e8
+
+Aliases: I<strong_fermat_psp_each>
 
 =cut
 
@@ -2846,7 +2860,7 @@ The product of the factors will give back C<n>. However, some factors may be com
     k.fermat_psp(base, n)
     k.fermat_psp(base, a, b)
 
-Returns an array with all the Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have C<k> distinct prime factors.
+Returns an array with all the C<k>-omega Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b>.
 
     say 3.fermat_psp(2, 10000)            # 3-omega Fermat psp to base 2
     say 4.fermat_psp(2, 10000, 100000)    # 4-omega Fermat psp to base 2 in range
@@ -3990,9 +4004,9 @@ Returns true when C<n> is an odd composite integer.
 
     n.is_omega_prime(k=2)
 
-Return true if C<n> is a k-omega prime (i.e.: true if C<n> is divisible by exactly C<k> different primes).
+Return true if C<n> is a C<k>-omega prime (i.e.: true if C<n> is divisible by exactly C<k> different primes).
 
-Equivalently, k-omega primes are numbers n such that C<omega(n) == k>.
+Equivalently, C<k>-omega primes are numbers n such that C<omega(n) == k>.
 
     say 20.by { .is_omega_prime(1) }   # prime powers
     say 20.by { .is_omega_prime(2) }   # numbers n such that omega(n) == 2
@@ -5206,7 +5220,7 @@ Given a non-negative integer C<n>, returns the next composite number greater tha
 
     n.next_omega_prime(k=2)
 
-Returns the next k-omega prime greater than C<n>.
+Returns the next C<k>-omega prime greater than C<n>.
 
 =cut
 
@@ -5392,7 +5406,7 @@ Returns the n-th k-almost prime.
 
     nth_omega_prime(n, k=2)
 
-Returns the n-th k-omega prime.
+Returns the C<n>-th C<k>-omega prime.
 
     say nth_omega_prime(1e7, 2)    #=> 42314023
     say nth_omega_prime(1e7, 3)    #=> 28013887
@@ -5550,11 +5564,11 @@ Returns an array with n elements mapped to the given block. The block is called 
     n.omega_prime_divisors
     n.omega_prime_divisors(k)
 
-Returns the k-omega prime divisors of n.
+Returns the C<k>-omega prime divisors of n.
 
     say 5040.omega_prime_divisors(4)    #=> [210, 420, 630, 840, 1260, 1680, 2520, 5040]
 
-When C<k> is omitted, an array of arrays with the k-omega prime divisors of n, for each k in the range C<0..omega(n)>, is returned:
+When C<k> is omitted, an array of arrays with the C<k>-omega prime divisors of C<n>, for each C<k> in the range C<0..omega(n)>, is returned:
 
     say 120.omega_prime_divisors        #=> [[1], [2, 3, 4, 5, 8], [6, 10, 12, 15, 20, 24, 40], [30, 60, 120]]
 
@@ -5565,7 +5579,7 @@ When C<k> is omitted, an array of arrays with the k-omega prime divisors of n, f
     k.omega_prime_count(n)
     k.omega_prime_count(a,b)
 
-Returns the number of k-omega primes <= n, or in the range C<a..b>.
+Returns the number of C<k>-omega primes <= n, or in the range C<a..b>.
 
     say 1.omega_prime_count(100)            # number prime powers <= 100
     say 2.omega_prime_count(50, 100)        # number of 2-omega primes in range 50..100
@@ -5579,9 +5593,9 @@ Aliases: I<omega_primepi>
     k.omega_primes(n)
     k.omega_primes(a,b)
 
-Returns an array with k-omega primes <= n, or in the range C<a..b>.
+Returns an array with C<k>-omega primes <= n, or in the range C<a..b>.
 
-k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
+C<k>-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
     say 1.omega_primes(100)         # prime powers <= 100
     say 2.omega_primes(50, 100)     # 2-omega primes in range 50..100
