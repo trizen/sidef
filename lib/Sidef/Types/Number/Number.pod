@@ -2452,6 +2452,20 @@ Aliases: I<squarefree_semiprimes_each>
 
 =cut
 
+=head2 each_squarefree_strong_fermat_psp
+
+    k.each_squarefree_strong_fermat_psp(base, n, { ... })
+    k.each_squarefree_strong_fermat_psp(base, a, b, { ... })
+
+Iterates over the squarefree strong Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    3.each_squarefree_strong_fermat_psp(2, 1e6, {|n| say n })          # iterate over squarefree strong 3-Fermat psp to base 2 <= 1e6
+    4.each_squarefree_strong_fermat_psp(2, 1e7, 1e8, {|n| say n })     # iterate over squarefree strong 4-Fermat psp to base 2 in range 1e7..1e8
+
+Aliases: I<squarefree_strong_fermat_psp_each>
+
+=cut
+
 =head2 ecm_factor
 
     n.ecm_factor
