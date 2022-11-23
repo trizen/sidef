@@ -27,4 +27,84 @@ assert_eq(
     %n[57044715596229144811105]
 )
 
+#~ assert_eq(
+    #~ 11.strong_fermat_psp(2, 24325630440506854886701-1e6, 24325630440506854886701+1e6),
+    #~ %n[24325630440506854886701]
+#~ )
+
+func smallest_psp(k, callback) {
+    var x = pn_primorial(k)
+    var y = 2*x
+
+    loop {
+        var arr = callback(x, y)
+        if (arr) {
+            return arr[0]
+        }
+
+        x = y+1
+        y = 2*x
+    }
+}
+
+assert_eq(  # OEIS: A180065
+    2..7 -> map {|k| smallest_psp(k, {|x,y| k.strong_fermat_psp(2, x, y) }) }
+    %n[2047, 15841, 800605, 293609485, 10761055201, 5478598723585]
+)
+
+assert_eq(  # Squarefree variant of A180065
+    2..10 -> map {|k| smallest_psp(k, {|x,y| k.squarefree_strong_fermat_psp(2, x, y) }) }
+    %n[2047, 15841, 800605, 293609485, 10761055201, 5478598723585, 713808066913201, 90614118359482705, 5993318051893040401]
+)
+
+assert_eq(  # OEIS: A271874
+    2..9 -> map {|k| smallest_psp(k, {|x,y| k.fermat_psp(k, x, y) }) }
+    %n[341, 286, 11305, 2203201, 12306385, 9073150801, 3958035081, 2539184851126]
+)
+
+assert_eq(  # Squarefree variant of A271874
+    2..10 -> map {|k| smallest_psp(k, {|x,y| k.squarefree_fermat_psp(k, x, y) }) }
+    %n[341, 286, 11305, 2203201, 12306385, 9073150801, 3958035081, 2539184851126, 152064312120721]
+)
+
+assert_eq(  # OEIS: A007011
+    2..9 -> map {|k| smallest_psp(k, {|x,y| k.fermat_psp(2, x, y) }) }
+    %n[341, 561, 11305, 825265, 45593065, 370851481, 38504389105, 7550611589521]
+)
+
+assert_eq(  # Squarefree variant of A007011
+    2..9 -> map {|k| smallest_psp(k, {|x,y| k.squarefree_fermat_psp(2, x, y) }) }
+    %n[341, 561, 11305, 825265, 45593065, 370851481, 38504389105, 7550611589521]
+)
+
+assert_eq(  # Strong squarefree variant of A271874
+    2..9 -> map {|k| smallest_psp(k, {|x,y| k.squarefree_strong_fermat_psp(k, x, y) }) }
+    %n[2047, 8911, 129921, 381347461, 333515107081, 37388680793101, 713808066913201, 665242007427361]
+)
+
+assert_eq(  # Strong variant of A271874
+    2..5 -> map {|k| smallest_psp(k, {|x,y| k.strong_fermat_psp(k, x, y) }) }
+    %n[2047, 8911, 129921, 381347461]
+)
+
+assert_eq(  # OEIS: A006931
+    3..9 -> map {|k| smallest_psp(k, {|x,y| k.carmichael(x, y) }) }
+    %n[561, 41041, 825265, 321197185, 5394826801, 232250619601, 9746347772161]
+)
+
+assert_eq(  # OEIS: A216928
+    3..10 -> map {|k| smallest_psp(k, {|x,y| k.lucas_carmichael(x, y) }) }
+    %n[399, 8855, 588455, 139501439, 3512071871, 199195047359, 14563696180319, 989565001538399]
+)
+
+assert_eq(  # OEIS: A356866
+    3..8 -> map {|k| smallest_psp(k, {|x,y| k.carmichael_strong_fermat(2, x, y) }) }
+    %n[15841, 5310721, 440707345, 10761055201, 5478598723585, 713808066913201]
+)
+
+assert_eq(  # Carmichael strong psp variant of A271874
+    3..9 -> map {|k| smallest_psp(k, {|x,y| k.carmichael_strong_fermat(k, x, y) }) }
+    %n[8911, 1773289, 1030401901, 537261042241, 124765760442961, 713808066913201, 665242007427361]
+)
+
 say "** Test passed!"

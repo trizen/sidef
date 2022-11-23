@@ -7515,6 +7515,18 @@ Stirling numbers of the third kind (also known as Lah numbers).
 
 =cut
 
+=head2 strong_fermat_psp
+
+    k.strong_fermat_psp(base, n)
+    k.strong_fermat_psp(base, a, b)
+
+Returns an array with all the strong Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have C<k> distinct prime factors.
+
+    say 3.strong_fermat_psp(2, 1e6)         # 3-omega strong Fermat psp to base 2
+    say 4.strong_fermat_psp(2, 1e6, 1e7)    # 4-omega strong Fermat psp to base 2 in range
+
+=cut
+
 =head2 subfactorial
 
     subfactorial(n,k=0)

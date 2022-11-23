@@ -16797,30 +16797,58 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and _fits_ulong($n)) {
-            return (
-                Math::Prime::Util::is_pseudoprime(
-                    _get_ulong($n),
-                    do {
-                        @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
-                        @bases ? (@bases) : (2);
-                    }
-                  )
-                ? Sidef::Types::Bool::Bool::TRUE
-                : Sidef::Types::Bool::Bool::FALSE
-            );
+        __is_int__($n)
+          || return Sidef::Types::Bool::Bool::FALSE;
+
+        $n = _any2mpz($n);
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
+
+        if (scalar(@bases)) {
+            @bases = map { ref($_) ? (_any2mpz($_) // return Sidef::Types::Bool::Bool::FALSE) : $_ } map { $$_ } @bases;
+        }
+        else {
+            @bases = (2);
         }
 
-        __is_int__($n)
-          && Math::Prime::Util::GMP::is_pseudoprime(
-            _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
-            do {
-                @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
-                @bases ? (@bases) : (2);
+        state $g = Math::GMPz::Rmpz_init_nobless();
+
+        foreach my $base (@bases) {
+            if (ref($base) eq '') {
+                Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, CORE::abs($base)) == 1
+                  or return Sidef::Types::Bool::Bool::FALSE;
             }
-          )
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
+            else {
+                Math::GMPz::Rmpz_gcd($g, $base, $n);
+                Math::GMPz::Rmpz_cmp_ui($g, 1) == 0
+                  or return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        if (    HAS_NEW_PRIME_UTIL
+            and Math::GMPz::Rmpz_fits_ulong_p($n)
+            and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
+            return (
+                    Math::Prime::Util::is_pseudoprime(Math::GMPz::Rmpz_get_ui($n), @bases)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($g, $n, 1);
+
+        foreach my $base (@bases) {
+            ref($base)      ? Math::GMPz::Rmpz_set($t, $base)
+              : ($base < 0) ? Math::GMPz::Rmpz_set_si($t, $base)
+              :               Math::GMPz::Rmpz_set_ui($t, $base);
+            Math::GMPz::Rmpz_powm($t, $t, $g, $n);
+            Math::GMPz::Rmpz_cmp_ui($t, 1) == 0
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
     }
 
     *is_psp         = \&is_fermat_pseudoprime;
@@ -22837,6 +22865,7 @@ package Sidef::Types::Number::Number {
         return []  if ($k == 0);
 
         my $fermat = $opt{fermat};
+        my $strong = $opt{strong};
 
         my @omega_primes;
 
@@ -22857,8 +22886,10 @@ package Sidef::Types::Number::Number {
 
             $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
 
-            sub {
-                my ($m, $lambda, $p, $j) = @_;
+            my $generator = sub {
+                my ($m, $p, $j, %args) = @_;
+
+                my $lambda = $args{lambda};
 
                 my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $j);
 
@@ -22869,6 +22900,13 @@ package Sidef::Types::Number::Number {
 
                     if ($fermat) {
                         $fermat % $p == 0 and next;
+                    }
+
+                    if ($strong) {
+                        my $valuation = Math::Prime::Util::valuation($p - 1, 2);
+                        $valuation > $args{k_exp} or next;
+                        Math::Prime::Util::powmod($fermat, ($p - 1) >> ($valuation - $args{k_exp}), $p) == ($args{congr} % $p)
+                          or next;
                     }
 
                     for (my ($pk, $v) = ($p, $m * $p) ; $v - 1 < $B ; ($pk, $v) = ($pk * $p, $v * $p)) {
@@ -22887,13 +22925,26 @@ package Sidef::Types::Number::Number {
                                 push(@omega_primes, $v);
                             }
                         }
-                        else {
-                            __SUB__->($v, $L, $r, $j - 1) if ($v * $r - 1 < $B);
+                        elsif ($v * $r - 1 < $B) {
+                            __SUB__->($v, $r, $j - 1, %args, (defined($L) ? (lambda => $L) : ()),);
                         }
                     }
                 }
-              }
-              ->(1, 1, 2, $k);
+            };
+
+            if ($strong) {
+
+                # Case where 2^d == 1 (mod p), where d is the odd part of p-1.
+                $generator->(1, 2, $k, lambda => 1, k_exp => 0, congr => 1);
+
+                # Cases where 2^(d * 2^v) == -1 (mod p), for some v >= 0.
+                foreach my $v (0 .. Math::Prime::Util::logint($B, 2)) {
+                    $generator->(1, 2, $k, lambda => 1, k_exp => $v, congr => -1);
+                }
+            }
+            else {
+                $generator->(1, 2, $k, ($fermat ? (lambda => 1) : ()));
+            }
 
             @omega_primes = sort { $a <=> $b } @omega_primes;
         }
@@ -22911,8 +22962,10 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_set($A, $x);
             }
 
-            sub {
-                my ($m, $lambda, $p, $j) = @_;
+            my $generator = sub {
+                my ($m, $p, $j, %args) = @_;
+
+                my $lambda = $args{lambda};
 
                 my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $j);
                 my $v = Math::GMPz::Rmpz_init();
@@ -22929,11 +22982,27 @@ package Sidef::Types::Number::Number {
                     $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : _next_prime($p));
 
                     if ($fermat) {
-                        $fermat % $p == 0 and next;
+                        ($p <= $fermat and $fermat % $p == 0) and next;
+                        Math::GMPz::Rmpz_set_ui($pk, 1);
                     }
 
-                    if ($fermat) {
-                        Math::GMPz::Rmpz_set_ui($pk, 1);
+                    if ($strong) {
+                        my $valuation = (
+                                         HAS_PRIME_UTIL
+                                         ? Math::Prime::Util::valuation($p - 1, 2)
+                                         : Math::Prime::Util::GMP::valuation($p - 1, 2)
+                                        );
+                        $valuation > $args{k_exp} or next;
+                        if (HAS_PRIME_UTIL) {
+                            Math::Prime::Util::powmod($fermat, ($p - 1) >> ($valuation - $args{k_exp}), $p) ==
+                              ($args{congr} % $p)
+                              or next;
+                        }
+                        else {
+                            Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($valuation - $args{k_exp}), $p) ==
+                              ($args{congr} % $p)
+                              or next;
+                        }
                     }
 
                     for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ;
@@ -22977,13 +23046,39 @@ package Sidef::Types::Number::Number {
                         else {
                             Math::GMPz::Rmpz_mul_ui($x, $v, $r);
                             if (Math::GMPz::Rmpz_cmp($x, $B) <= 0) {
-                                __SUB__->($v, $L, $r, $j - 1);
+                                __SUB__->($v, $r, $j - 1, %args, (defined($L) ? (lambda => $L) : ()),);
                             }
                         }
                     }
                 }
-              }
-              ->(Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1), 2, $k);
+            };
+
+            if ($strong) {
+
+                # Case where 2^d == 1 (mod p), where d is the odd part of p-1.
+                $generator->(
+                             Math::GMPz::Rmpz_init_set_ui(1), 2, $k,
+                             lambda => Math::GMPz::Rmpz_init_set_ui(1),
+                             k_exp  => 0,
+                             congr  => 1
+                            );
+
+                # Cases where 2^(d * 2^v) == -1 (mod p), for some v >= 0.
+                foreach my $v (0 .. Math::Prime::Util::GMP::logint($B, 2)) {
+                    $generator->(
+                                 Math::GMPz::Rmpz_init_set_ui(1), 2, $k,
+                                 lambda => Math::GMPz::Rmpz_init_set_ui(1),
+                                 k_exp  => $v,
+                                 congr  => -1
+                                );
+                }
+            }
+            else {
+                $generator->(
+                             Math::GMPz::Rmpz_init_set_ui(1),
+                             2, $k, ($fermat ? (lambda => Math::GMPz::Rmpz_init_set_ui(1)) : ())
+                            );
+            }
 
             @omega_primes = sort { $a <=> $b } @omega_primes;
         }
@@ -23138,6 +23233,45 @@ package Sidef::Types::Number::Number {
         my @fermat_pseudoprimes = map {
             (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
         } @{_sieve_omega_primes($from, $to, $k, fermat => $base)};
+#>>>
+
+        Sidef::Types::Array::Array->new(\@fermat_pseudoprimes);
+    }
+
+    sub strong_fermat_psp {
+        my ($k, $base, $from, $to) = @_;
+
+        _valid(\$base, \$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $to   = _any2mpz($$to)   // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $to   = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $from = $ONE;
+        }
+
+        $base = _any2ui($$base) // return Sidef::Types::Array::Array->new;
+        $k    = _any2ui($$k)    // return Sidef::Types::Array::Array->new;
+
+        if ($base <= 1) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($to) < 0) {
+            $to = $ZERO;
+        }
+
+#<<<
+        my @fermat_pseudoprimes = map {
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
+        } @{_sieve_omega_primes($from, $to, $k, fermat => $base, strong => 1)};
 #>>>
 
         Sidef::Types::Array::Array->new(\@fermat_pseudoprimes);
