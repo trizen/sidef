@@ -7308,6 +7308,18 @@ Sum of the square free divisors of C<n>, each divisor raised to power C<k>.
 
 =cut
 
+=head2 squarefree_strong_fermat_psp
+
+    k.squarefree_strong_fermat_psp(base, n)
+    k.squarefree_strong_fermat_psp(base, a, b)
+
+Returns an array with all the squarefree strong Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have exactly C<k> prime factors.
+
+    say 3.squarefree_strong_fermat_psp(2, 1000000)               # squarefree strong 3-Fermat psp to base 2
+    say 4.squarefree_strong_fermat_psp(2, 10000000, 100000000)   # squarefree strong 4-Fermat psp to base 2 in range
+
+=cut
+
 =head2 squarefree_sum
 
     squarefree_sum(n)
