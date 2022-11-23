@@ -1307,8 +1307,8 @@ Aliases: I<complex_add>
 
 Returns an array with all the Carmichael numbers <= n or in the range C<a..b> that have exactly C<k> prime factors.
 
-    say 3.carmichael(10000)              # 3-Carmichael numbers
-    say 4.carmichael(10000, 100000)      # 4-Carmichael numbers in range
+    say 3.carmichael(1e4)           # 3-Carmichael numbers <= 1e4
+    say 4.carmichael(1e4, 1e6)      # 4-Carmichael numbers in range 1e4..1e6
 
 =cut
 
@@ -1323,6 +1323,20 @@ Iterates over the Carmichael <= n or in the range C<a..b> that have exactly C<k>
     4.carmichael_each(1e5, 1e6, {|n| say n })     # iterate over 4-Carmichael in range 1e4..1e6
 
 Aliases: I<each_carmichael>
+
+=cut
+
+=head2 carmichael_strong_fermat
+
+    k.carmichael_strong_fermat(base, n)
+    k.carmichael_strong_fermat(base, a, b)
+
+Returns an array with all the Carmichael numbers <= n or in the range C<a..b> that are also strong Fermat pseudoprimes to C<base> and have exactly C<k> prime factors.
+
+    say 3.carmichael_strong_fermat(2, 1e7)       # 3-Carmichael strong Fermat pseudoprimes to base 2 <= 1e7
+    say 4.carmichael_strong_fermat(2, 1e7, 1e9)  # 4-Carmichael strong Fermat pseudoprimes to base 2, in range 1e7..1e9
+
+Aliases: I<strong_fermat_carmichael>
 
 =cut
 
@@ -7315,8 +7329,8 @@ Sum of the square free divisors of C<n>, each divisor raised to power C<k>.
 
 Returns an array with all the squarefree strong Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have exactly C<k> prime factors.
 
-    say 3.squarefree_strong_fermat_psp(2, 1000000)               # squarefree strong 3-Fermat psp to base 2
-    say 4.squarefree_strong_fermat_psp(2, 10000000, 100000000)   # squarefree strong 4-Fermat psp to base 2 in range
+    say 3.squarefree_strong_fermat_psp(2, 1e6)        # squarefree strong 3-Fermat psp to base 2 <= 1e6
+    say 4.squarefree_strong_fermat_psp(2, 1e7, 1e8)   # squarefree strong 4-Fermat psp to base 2, in range 1e7..1e8
 
 =cut
 

@@ -23259,7 +23259,15 @@ package Sidef::Types::Number::Number {
                         if ($carmichael) {
                             my $t = $m*$_;
                             if (($t-1) % ($_-1) == 0 and ($t-1) % $lambda == 0) {
-                                push(@almost_primes, $t);
+                                if ($strong) {
+                                    my $valuation = Math::Prime::Util::valuation($_-1, 2);
+                                    if ($valuation > $args{k_exp} and Math::Prime::Util::powmod($fermat, ($_-1) >> ($valuation - $args{k_exp}), $_) == ($args{congr} % $_)) {
+                                        push(@almost_primes, $t);
+                                    }
+                                }
+                                else {
+                                    push(@almost_primes, $t);
+                                }
                             }
                         }
                         elsif ($lucas_carmichael) {
@@ -23272,10 +23280,10 @@ package Sidef::Types::Number::Number {
                             my $t = $m*$_;
                             if (($t-1)%$lambda == 0) {
                                 my $order = Math::Prime::Util::znorder($fermat, $_);
-                                if (defined($order) and ($t-1)%$order == 0) {
+                                if (defined($order) and ($t-1) % $order == 0) {
                                     if ($strong) {
-                                        my $valuation = Math::Prime::Util::valuation($_ - 1, 2);
-                                        if ($valuation > $args{k_exp} and Math::Prime::Util::powmod($fermat, ($_ - 1) >> ($valuation - $args{k_exp}), $_) == ($args{congr} % $_)) {
+                                        my $valuation = Math::Prime::Util::valuation($_-1, 2);
+                                        if ($valuation > $args{k_exp} and Math::Prime::Util::powmod($fermat, ($_-1) >> ($valuation - $args{k_exp}), $_) == ($args{congr} % $_)) {
                                             push(@almost_primes, $t);
                                         }
                                     }
@@ -23298,7 +23306,6 @@ package Sidef::Types::Number::Number {
                 for (my $r ; $p <= $s ; $p = $r) {
 
                     $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : _next_prime($p));
-                    my $t = $m * $p;
 
                     if ($strong and $fermat) {
                         $fermat % $p == 0 and next;
@@ -23307,6 +23314,8 @@ package Sidef::Types::Number::Number {
                         Math::Prime::Util::powmod($fermat, ($p - 1) >> ($valuation - $args{k_exp}), $p) == ($args{congr} % $p)
                           or next;
                     }
+
+                    my $t = $m * $p;
 
                     my $L;
                     if ($carmichael) {
@@ -23439,46 +23448,6 @@ package Sidef::Types::Number::Number {
                         elsif ($fermat) {
                             Math::GMPz::Rmpz_sub_ui($t, $x, 1);
                             Math::GMPz::Rmpz_divisible_p($t, $lambda) or next;
-
-                            if ($strong) {
-                                if ($q < ~0) {
-
-                                    ($q <= $fermat and $fermat % $q == 0) and next;
-
-                                    my $valuation = (
-                                                     HAS_PRIME_UTIL
-                                                     ? Math::Prime::Util::valuation($q - 1, 2)
-                                                     : Math::Prime::Util::GMP::valuation($q - 1, 2)
-                                                    );
-                                    $valuation > $args{k_exp} or next;
-                                    if (HAS_PRIME_UTIL) {
-                                        Math::Prime::Util::powmod($fermat, ($q - 1) >> ($valuation - $args{k_exp}), $q) ==
-                                          ($args{congr} % $q)
-                                          or next;
-                                    }
-                                    else {
-                                        Math::Prime::Util::GMP::powmod($fermat, ($q - 1) >> ($valuation - $args{k_exp}), $q)
-                                          == ($args{congr} % $q)
-                                          or next;
-                                    }
-                                }
-                                else {
-                                    my $valuation =
-                                      Math::Prime::Util::GMP::valuation(Math::Prime::Util::GMP::subint($q, 1), 2);
-                                    $valuation > $args{k_exp} or next;
-                                    my $q_obj = Math::GMPz::Rmpz_init_set_str($q, 10);
-                                    my $qm1   = Math::GMPz::Rmpz_init();
-                                    my $exp   = Math::GMPz::Rmpz_init();
-                                    my $order = Math::GMPz::Rmpz_init();
-                                    Math::GMPz::Rmpz_sub_ui($qm1, $q_obj, 1);
-                                    Math::GMPz::Rmpz_div_2exp($order, $qm1, $valuation - $args{k_exp});
-                                    Math::GMPz::Rmpz_set_ui($exp, $fermat);
-                                    Math::GMPz::Rmpz_powm($exp, $exp, $order, $q_obj);
-                                    Math::GMPz::Rmpz_set_si($qm1, $args{congr});
-                                    Math::GMPz::Rmpz_congruent_p($exp, $qm1, $q_obj) or next;
-                                }
-                            }
-
                             my $order = (
                                          (HAS_PRIME_UTIL and $q < ULONG_MAX)
                                          ? Math::Prime::Util::znorder($fermat, $q)
@@ -23490,6 +23459,42 @@ package Sidef::Types::Number::Number {
                                  Math::GMPz::Rmpz_divisible_p($t, $y);
                              }
                             ) || next;
+                        }
+
+                        if ($strong and $fermat) {
+                            if ($q < ~0) {
+                                ($q <= $fermat and $fermat % $q == 0) and next;
+                                my $valuation = (
+                                                 HAS_PRIME_UTIL
+                                                 ? Math::Prime::Util::valuation($q - 1, 2)
+                                                 : Math::Prime::Util::GMP::valuation($q - 1, 2)
+                                                );
+                                $valuation > $args{k_exp} or next;
+                                if (HAS_PRIME_UTIL) {
+                                    Math::Prime::Util::powmod($fermat, ($q - 1) >> ($valuation - $args{k_exp}), $q) ==
+                                      ($args{congr} % $q)
+                                      or next;
+                                }
+                                else {
+                                    Math::Prime::Util::GMP::powmod($fermat, ($q - 1) >> ($valuation - $args{k_exp}), $q) ==
+                                      ($args{congr} % $q)
+                                      or next;
+                                }
+                            }
+                            else {
+                                my $valuation = Math::Prime::Util::GMP::valuation(Math::Prime::Util::GMP::subint($q, 1), 2);
+                                $valuation > $args{k_exp} or next;
+                                my $q_obj = Math::GMPz::Rmpz_init_set_str($q, 10);
+                                my $qm1   = Math::GMPz::Rmpz_init();
+                                my $exp   = Math::GMPz::Rmpz_init();
+                                my $order = Math::GMPz::Rmpz_init();
+                                Math::GMPz::Rmpz_sub_ui($qm1, $q_obj, 1);
+                                Math::GMPz::Rmpz_div_2exp($order, $qm1, $valuation - $args{k_exp});
+                                Math::GMPz::Rmpz_set_ui($exp, $fermat);
+                                Math::GMPz::Rmpz_powm($exp, $exp, $order, $q_obj);
+                                Math::GMPz::Rmpz_set_si($qm1, $args{congr});
+                                Math::GMPz::Rmpz_congruent_p($exp, $qm1, $q_obj) or next;
+                            }
                         }
 
                         push @almost_primes,
@@ -23514,7 +23519,6 @@ package Sidef::Types::Number::Number {
                 for (my $r ; $p <= $s ; $p = $r) {
 
                     $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : _next_prime($p));
-                    Math::GMPz::Rmpz_mul_ui($u, $m, $p);
 
                     if ($strong and $fermat) {
                         ($p <= $fermat and $fermat % $p == 0) and next;
@@ -23535,6 +23539,8 @@ package Sidef::Types::Number::Number {
                               or next;
                         }
                     }
+
+                    Math::GMPz::Rmpz_mul_ui($u, $m, $p);
 
                     if ($carmichael) {
                         Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p - 1);
@@ -23797,6 +23803,47 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Array::Array->new(\@carmichael_numbers);
     }
+
+    sub strong_fermat_carmichael {
+        my ($k, $base, $from, $to) = @_;
+
+        _valid(\$base, \$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $to   = _any2mpz($$to)   // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $to   = _any2mpz($$from) // return Sidef::Types::Array::Array->new;
+            $from = $ONE;
+        }
+
+        $base = _any2ui($$base) // return Sidef::Types::Array::Array->new;
+        $k    = _any2ui($$k)    // return Sidef::Types::Array::Array->new;
+
+        if ($base <= 1) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($to) < 0) {
+            $to = $ZERO;
+        }
+
+#<<<
+        my @carmichael_numbers = map {
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
+        } @{_sieve_almost_primes($from, $to, $k, fermat => $base, carmichael => 1, squarefree => 1, strong => 1)};
+#>>>
+
+        Sidef::Types::Array::Array->new(\@carmichael_numbers);
+    }
+
+    *carmichael_strong_fermat = \&strong_fermat_carmichael;
 
     sub lucas_carmichael {
         my ($k, $from, $to) = @_;
