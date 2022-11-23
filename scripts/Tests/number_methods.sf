@@ -48,6 +48,9 @@ for k in (0..10) {
     assert_eq(gather { k.carmichael_each(from, 100*upto, { take(_) }) }, k.carmichael(from, 100*upto))
     assert_eq(gather { k.lucas_carmichael_each(from, 100*upto, { take(_) }) }, k.lucas_carmichael(from, 100*upto))
 
+    assert_eq(gather { k.carmichael_strong_fermat_each(2, from, 1e4*upto, { take(_) }) }, k.carmichael_strong_fermat(2, from, 1e4*upto))
+    assert_eq(gather { k.carmichael_strong_fermat_each(3, from, 1e4*upto, { take(_) }) }, k.carmichael_strong_fermat(3, from, 1e4*upto))
+
     assert_eq(gather { k.squarefree_fermat_psp_each(2, from, 100*upto, { take(_) }) }, k.squarefree_fermat_psp(2, from, 100*upto))
     assert_eq(gather { k.squarefree_fermat_psp_each(3, from, 100*upto, { take(_) }) }, k.squarefree_fermat_psp(3, from, 100*upto))
 

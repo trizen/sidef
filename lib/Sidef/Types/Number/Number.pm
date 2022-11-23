@@ -23844,6 +23844,7 @@ package Sidef::Types::Number::Number {
     }
 
     *carmichael_strong_fermat = \&strong_fermat_carmichael;
+    *carmichael_strong_psp    = \&strong_fermat_carmichael;
 
     sub lucas_carmichael {
         my ($k, $from, $to) = @_;
@@ -24267,7 +24268,7 @@ package Sidef::Types::Number::Number {
         my $step = Math::Prime::Util::GMP::vecprod(($k) x (($k >> 1) + 1), Math::Prime::Util::GMP::pn_primorial($k));
 
         if ($step < 1e7) {
-            $step = 1e7;
+            $step = '1' . ('0' x 7);
         }
 
         if ($k == 4) {
@@ -24275,7 +24276,7 @@ package Sidef::Types::Number::Number {
         }
 
         if ($k > 4 and $step < 1e8) {
-            $step = 1e8;
+            $step = '1' . ('0' x 8);
         }
 
         if ($step > ULONG_MAX) {
@@ -24288,6 +24289,69 @@ package Sidef::Types::Number::Number {
     }
 
     *each_carmichael = \&carmichael_each;
+
+    sub carmichael_strong_fermat_each {
+        my ($k, $base, $from, $to, $block) = @_;
+
+        _valid(\$base, \$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k    = _any2ui($$k)    // return ZERO;
+        $base = _any2ui($$base) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if ($k < 3) {
+            return ZERO;
+        }
+
+        # TODO: tweak the step value for better performance
+        my $step = Math::Prime::Util::GMP::vecprod(($k) x ($k + 1), Math::Prime::Util::GMP::pn_primorial($k));
+
+        if ($step < 1e8) {
+            $step = '1' . ('0' x 8);
+        }
+
+        if ($k == 4) {
+            $step = '1' . ('0' x 9);
+        }
+
+        if ($k >= 5 and $step < 1e10) {
+            $step = '1' . ('0' x 10);
+        }
+
+        if ($k >= 6 and $step < 1e11) {
+            $step = '1' . ('0' x 11);
+        }
+
+        if ($step > ULONG_MAX) {
+            $step = Math::GMPz::Rmpz_init_set_str("$step", 10);
+        }
+
+        _generic_each(
+                 $from, $to, $block,
+                 sub { $step },
+                 sub { _sieve_almost_primes($_[0], $_[1], $k, squarefree => 1, carmichael => 1, strong => 1, fermat => $base) }
+                     );
+    }
+
+    *carmichael_strong_psp_each    = \&carmichael_strong_fermat_each;
+    *each_carmichael_strong_psp    = \&carmichael_strong_fermat_each;
+    *each_carmichael_strong_fermat = \&carmichael_strong_fermat_each;
+    *each_strong_fermat_carmichael = \&carmichael_strong_fermat_each;
+    *strong_fermat_carmichael_each = \&carmichael_strong_fermat_each;
 
     sub lucas_carmichael_each {
         my ($k, $from, $to, $block) = @_;
@@ -24327,7 +24391,7 @@ package Sidef::Types::Number::Number {
         }
 
         if ($k > 4 and $step < 1e8) {
-            $step = 1e8;
+            $step = '1' . ('0' x 8);
         }
 
         if ($step > ULONG_MAX) {
@@ -24372,7 +24436,7 @@ package Sidef::Types::Number::Number {
         my $step = Math::Prime::Util::GMP::vecprod(($k + 1) x (($k + 1) >> 1), Math::Prime::Util::GMP::pn_primorial($k));
 
         if ($step < 1e7) {
-            $step = 1e7;
+            $step = '1' . ('0' x 7);
         }
 
         if ($k == 4) {
@@ -24380,7 +24444,7 @@ package Sidef::Types::Number::Number {
         }
 
         if ($k > 4 and $step < 1e7) {
-            $step = 1e7;
+            $step = '1' . ('0' x 7);
         }
 
         if ($step > ULONG_MAX) {
@@ -24425,7 +24489,7 @@ package Sidef::Types::Number::Number {
         my $step = Math::Prime::Util::GMP::vecprod(($k + 1) x (($k + 1) >> 1), Math::Prime::Util::GMP::pn_primorial($k));
 
         if ($step < 1e7) {
-            $step = 1e7;
+            $step = '1' . ('0' x 7);
         }
 
         if ($k == 4) {
@@ -24433,7 +24497,7 @@ package Sidef::Types::Number::Number {
         }
 
         if ($k > 4 and $step < 1e7) {
-            $step = 1e7;
+            $step = '1' . ('0' x 7);
         }
 
         if ($step > ULONG_MAX) {

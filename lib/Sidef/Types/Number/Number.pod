@@ -1320,7 +1320,7 @@ Returns an array with all the Carmichael numbers <= n or in the range C<a..b> th
 Iterates over the Carmichael <= n or in the range C<a..b> that have exactly C<k> prime factors.
 
     3.carmichael_each(1e5, {|n| say n })          # iterate over 3-Carmichael numbers <= 1e5
-    4.carmichael_each(1e5, 1e6, {|n| say n })     # iterate over 4-Carmichael in range 1e4..1e6
+    4.carmichael_each(1e5, 1e6, {|n| say n })     # iterate over 4-Carmichael in range 1e5..1e6
 
 Aliases: I<each_carmichael>
 
@@ -1336,7 +1336,21 @@ Returns an array with all the Carmichael numbers <= n or in the range C<a..b> th
     say 3.carmichael_strong_fermat(2, 1e7)       # 3-Carmichael strong Fermat pseudoprimes to base 2 <= 1e7
     say 4.carmichael_strong_fermat(2, 1e7, 1e9)  # 4-Carmichael strong Fermat pseudoprimes to base 2, in range 1e7..1e9
 
-Aliases: I<strong_fermat_carmichael>
+Aliases: I<strong_fermat_carmichael>, I<carmichael_strong_psp>
+
+=cut
+
+=head2 carmichael_strong_fermat_each
+
+    k.carmichael_strong_fermat_each(base, n, { ... })
+    k.carmichael_strong_fermat_each(base, a, b, { ... })
+
+Iterates over the Carmichael <= n or in the range C<a..b> that are also strong Fermat pseudoprimes to C<base> and have exactly C<k> prime factors.
+
+    3.carmichael_strong_fermat_each(2, 1e7, {|n| say n })          # iterate over 3-Carmichael strong Fermat to base 2 <= 1e7
+    4.carmichael_strong_fermat_each(2, 1e5, 1e9, {|n| say n })     # iterate over 4-Carmichael strong Fermat to base 2 in range 1e5..1e9
+
+Aliases: I<carmichael_strong_psp_each>, I<each_carmichael_strong_psp>, I<each_carmichael_strong_fermat>, I<each_strong_fermat_carmichael>, I<strong_fermat_carmichael_each>
 
 =cut
 
