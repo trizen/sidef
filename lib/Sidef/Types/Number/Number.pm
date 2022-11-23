@@ -20802,14 +20802,23 @@ package Sidef::Types::Number::Number {
 
                         if ($unitary) {
                             @list = grep {
-                                Math::GMPz::Rmpz_gcd($u, $y, $_);
-                                Math::GMPz::Rmpz_cmp_ui($u, 1) == 0;
+                                ref($_)
+                                  ? do {
+                                    Math::GMPz::Rmpz_gcd($u, $y, $_);
+                                    Math::GMPz::Rmpz_cmp_ui($u, 1) == 0;
+                                  }
+                                  : do {
+                                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $y, $_) == 1;
+                                }
                             } @list;
                         }
 
                         push @{$t{$key}}, map {
                             my $w = Math::GMPz::Rmpz_init();
-                            Math::GMPz::Rmpz_mul($w, $y, $_);
+                            ref($_)
+                              ? Math::GMPz::Rmpz_mul($w, $y, $_)
+                              : Math::GMPz::Rmpz_mul_ui($w, $y, $_);
+                            $w = Math::GMPz::Rmpz_get_ui($w) if Math::GMPz::Rmpz_fits_ulong_p($w);
                             $w;
                         } @list;
                     }
@@ -21044,7 +21053,7 @@ package Sidef::Types::Number::Number {
 #>>>
 
         my $result = _dynamic_preimage($n, _cook_euler_phi($n));
-        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @$result]);
     }
 
     *inverse_phi = \&inverse_totient;
@@ -21157,7 +21166,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $result = _dynamic_preimage($n, _cook_dedekind_psi($n));
-        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @$result]);
     }
 
     *inverse_psi = \&inverse_dedekind_psi;
@@ -21246,7 +21255,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $result = _dynamic_preimage($n, _cook_usigma($n), unitary => 1);
-        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @$result]);
     }
 
     sub _cook_uphi {
@@ -21285,7 +21294,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $result = _dynamic_preimage($n, _cook_uphi($n), unitary => 1);
-        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @$result]);
     }
 
     sub _cook_sigma {
@@ -21358,7 +21367,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $result = _dynamic_preimage($n, _cook_sigma($n, $k));
-        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @$result]);
     }
 
     sub inverse_sigma_len {

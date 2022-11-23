@@ -193,6 +193,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/binomialmod.sf'
 'scripts/Extended tests/chebyshev_factorization_method.sf'
 'scripts/Extended tests/digits2num.pl'
+'scripts/Extended tests/inverse_of_multiplicative_functions.sf'
 'scripts/Extended tests/inverse_sigma.sf'
 'scripts/Extended tests/is_almost_prime.sf'
 'scripts/Extended tests/is_carmichael.sf'
