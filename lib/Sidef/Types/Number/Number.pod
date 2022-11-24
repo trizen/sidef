@@ -3763,6 +3763,14 @@ Aliases: I<is_lucasu_psp>, I<is_lucasU_psp>, I<is_fibonacci_psp>, I<is_lucasU_ps
 
 =cut
 
+=head2 is_float
+
+    x.is_float
+
+Returns true if C<x> is stored as a floating-point number.
+
+=cut
+
 =head2 is_frobenius_psp
 
     n.is_frobenius_psp(a,b)

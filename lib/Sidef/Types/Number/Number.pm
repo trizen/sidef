@@ -6479,6 +6479,18 @@ package Sidef::Types::Number::Number {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    sub __is_float__ {
+        my ($x) = @_;
+        ref($x) eq 'Math::MPFR' or ref($x) eq 'Math::MPC';
+    }
+
+    sub is_float {
+        my ($x) = @_;
+        __is_float__($$x)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
     sub __is_real__ {
         my ($x) = @_;
 
