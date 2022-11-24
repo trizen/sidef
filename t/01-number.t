@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 167;
+use Test::More tests => 185;
 
 use Sidef;
 
@@ -17,6 +17,10 @@ sub re($) {
 # general tests
 
 my $o = 'Sidef::Types::Number::Number';
+
+my $zero = $o->new(0);
+my $one  = $o->new(1);
+my $mone = $o->new(-1);
 
 {
     my $x = $o->new(1234);
@@ -168,10 +172,6 @@ my $o = 'Sidef::Types::Number::Number';
     my $x    = $o->new(1227);
     my $pow  = $o->new(42);
     my $bint = $x->ipow($pow);
-
-    my $zero = $o->new(0);
-    my $one  = $o->new(1);
-    my $mone = $o->new(-1);
 
     ok($mone->is_pow($o->new(3)));
     ok(!($mone->is_pow($o->new(2))));
@@ -499,6 +499,38 @@ $x = $o->new('80/8');
 like($x->as_hex(), re 'a');
 like($x->as_bin(), re '1010');
 like($x->as_oct(), re '12');
+
+##############################################################################
+# shift_left(), shift_right()
+
+$x = $o->new(5);
+$y = $o->new(7);
+
+like($x->shift_left($y),          re '640');
+like($x->shift_left($o->new(50)), re '5629499534213120');
+like($x->shift_left($o->new(62)), re '23058430092136939520');
+
+like($zero->shift_left($o->new(5)), re '0');
+like($one->shift_left($o->new(64)), re '18446744073709551616');
+like($one->shift_left($o->new(65)), re '36893488147419103232');
+
+like($mone->shift_left($x), re '-32');
+like($mone->shift_left($y), re '-128');
+
+like($x->shift_left($mone), re '2');
+like($y->shift_left($mone), re '3');
+
+like($x->shift_right($mone), re '10');
+like($y->shift_right($mone), re '14');
+
+like($zero->shift_right($o->new(5)),                   re '0');
+like($y->shift_right($x),                              re '0');
+like($x->shift_right($y),                              re '0');
+like($o->new('12312631237')->shift_right($o->new(10)), re '12024053');
+
+$x = $o->new('12312631237999999999123');
+like($x->shift_right($o->new(9)),  re '24048107886718749998');
+like($x->shift_right($o->new(10)), re '12024053943359374999');
 
 ##############################################################################
 # done

@@ -27061,13 +27061,27 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
+        $x = $$x;
         $y = _any2si($$y) // (goto &nan);
 
         if ($y == 0) {
-            return $x;
+            return bless \$x;
         }
 
-        $x = _any2mpz($$x) // (goto &nan);
+        if ($y >= 0 and _fits_ulong($x)) {
+            $x = _get_ulong($x);
+
+            if ($x == 0) {
+                return bless \$x;
+            }
+
+            if (CORE::log($x) + CORE::log(2) * $y < CORE::log(ULONG_MAX)) {
+                my $r = $x << $y;
+                return bless \$r;
+            }
+        }
+
+        $x = _any2mpz($x) // (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
 
