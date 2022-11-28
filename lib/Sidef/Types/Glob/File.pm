@@ -406,7 +406,7 @@ package Sidef::Types::Glob::File {
         };
 
         local $/;
-        Sidef::Types::String::String->new(<$fh>);
+        Sidef::Types::String::String->new(scalar <$fh>);
     }
 
     sub write {

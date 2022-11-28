@@ -16723,6 +16723,8 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_strong_bpsw_prp = \&is_prob_prime;
+
     sub is_prov_prime {
         my ($n) = @_;
 
@@ -16752,6 +16754,8 @@ package Sidef::Types::Number::Number {
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
+
+    *is_bpsw_prp = \&is_bpsw_prime;
 
     sub is_aks_prime {
         my ($n) = @_;
@@ -16865,6 +16869,7 @@ package Sidef::Types::Number::Number {
 
     *is_psp         = \&is_fermat_pseudoprime;
     *is_fermat_psp  = \&is_fermat_pseudoprime;
+    *is_fermat_prp  = \&is_fermat_pseudoprime;
     *is_pseudoprime = \&is_fermat_pseudoprime;
 
     sub is_super_pseudoprime {
@@ -16940,7 +16945,7 @@ package Sidef::Types::Number::Number {
 
         @factors = map { _factor($_) } @factors;
 
-        $check_conditions->(@factors)
+        (scalar(@factors) > 1 and $check_conditions->(@factors))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -17054,7 +17059,7 @@ package Sidef::Types::Number::Number {
 
         @factors = map { _factor($_) } @factors;
 
-        $check_conditions->(@factors)
+        (scalar(@factors) > 1 and $check_conditions->(@factors))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -17095,6 +17100,7 @@ package Sidef::Types::Number::Number {
     }
 
     *is_euler_psp = \&is_euler_pseudoprime;
+    *is_euler_prp = \&is_euler_pseudoprime;
 
     sub is_strong_fermat_pseudoprime {
         my ($n, @bases) = @_;
@@ -17130,7 +17136,9 @@ package Sidef::Types::Number::Number {
 
     *miller_rabin          = \&is_strong_fermat_pseudoprime;
     *is_strong_psp         = \&is_strong_fermat_pseudoprime;
+    *is_strong_prp         = \&is_strong_fermat_pseudoprime;
     *is_strong_fermat_psp  = \&is_strong_fermat_pseudoprime;
+    *is_strong_fermat_prp  = \&is_strong_fermat_pseudoprime;
     *is_strong_pseudoprime = \&is_strong_fermat_pseudoprime;
 
     sub is_chebyshev_pseudoprime {    # OEIS: A175530
@@ -17240,7 +17248,9 @@ package Sidef::Types::Number::Number {
     *is_lucasu_psp            = \&is_lucasU_pseudoprime;
     *is_lucasU_psp            = \&is_lucasU_pseudoprime;
     *is_fib_psp               = \&is_lucasU_pseudoprime;
+    *is_fib_prp               = \&is_lucasU_pseudoprime;
     *is_fibonacci_psp         = \&is_lucasU_pseudoprime;
+    *is_fibonacci_prp         = \&is_lucasU_pseudoprime;
     *is_fibonacci_pseudoprime = \&is_lucasU_pseudoprime;
 
     sub is_lucasV_pseudoprime {    # true if V_n(P,Q) == P mod n
@@ -17264,8 +17274,11 @@ package Sidef::Types::Number::Number {
     }
 
     *is_lucasv_psp                 = \&is_lucasV_pseudoprime;
+    *is_lucasv_prp                 = \&is_lucasV_pseudoprime;
     *is_lucasV_psp                 = \&is_lucasV_pseudoprime;
+    *is_lucasV_prp                 = \&is_lucasV_pseudoprime;
     *is_bruckman_lucas_psp         = \&is_lucasV_pseudoprime;
+    *is_bruckman_lucas_prp         = \&is_lucasV_pseudoprime;
     *is_bruckman_lucas_pseudoprime = \&is_lucasV_pseudoprime;
 
     sub is_pell_lucas_pseudoprime {    # OEIS: A270342 (primes + composites), A270345 (composites)
@@ -17282,6 +17295,7 @@ package Sidef::Types::Number::Number {
     }
 
     *is_pell_lucas_psp = \&is_pell_lucas_pseudoprime;
+    *is_pell_lucas_prp = \&is_pell_lucas_pseudoprime;
 
     sub is_pell_pseudoprime {    # OEIS: A099011 (odd composites)
         my ($n) = @_;
@@ -17315,6 +17329,7 @@ package Sidef::Types::Number::Number {
     }
 
     *is_pell_psp = \&is_pell_pseudoprime;
+    *is_pell_prp = \&is_pell_pseudoprime;
 
     sub is_strong_fibonacci_pseudoprime {
         my ($n) = @_;
@@ -17439,7 +17454,9 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    *is_lucas_psp = \&is_lucas_pseudoprime;
+    *is_lucas_psp     = \&is_lucas_pseudoprime;
+    *is_lucas_prp     = \&is_lucas_pseudoprime;
+    *is_selfridge_prp = \&is_lucas_pseudoprime;
 
     sub is_strong_lucas_pseudoprime {
         my ($n) = @_;
@@ -17460,7 +17477,9 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    *is_strong_lucas_psp = \&is_strong_lucas_pseudoprime;
+    *is_strong_lucas_psp     = \&is_strong_lucas_pseudoprime;
+    *is_strong_lucas_prp     = \&is_strong_lucas_pseudoprime;
+    *is_strong_selfridge_prp = \&is_strong_lucas_pseudoprime;
 
     sub is_stronger_lucas_pseudoprime {
         my ($n) = @_;
@@ -17483,7 +17502,9 @@ package Sidef::Types::Number::Number {
     }
 
     *is_stronger_lucas_psp             = \&is_stronger_lucas_pseudoprime;
+    *is_stronger_lucas_prp             = \&is_stronger_lucas_pseudoprime;
     *is_extra_strong_lucas_psp         = \&is_stronger_lucas_pseudoprime;
+    *is_extra_strong_lucas_prp         = \&is_stronger_lucas_pseudoprime;
     *is_extra_strong_lucas_pseudoprime = \&is_stronger_lucas_pseudoprime;
 
     sub is_strongish_lucas_pseudoprime {
@@ -17507,6 +17528,7 @@ package Sidef::Types::Number::Number {
     }
 
     *is_strongish_lucas_psp = \&is_strongish_lucas_pseudoprime;
+    *is_strongish_lucas_prp = \&is_strongish_lucas_pseudoprime;
 
     sub is_plumb_pseudoprime {
         my ($n) = @_;
@@ -17518,7 +17540,9 @@ package Sidef::Types::Number::Number {
     }
 
     *is_plumb_psp               = \&is_plumb_pseudoprime;
+    *is_plumb_prp               = \&is_plumb_pseudoprime;
     *is_euler_plumb_psp         = \&is_plumb_pseudoprime;
+    *is_euler_plumb_prp         = \&is_plumb_pseudoprime;
     *is_euler_plumb_pseudoprime = \&is_plumb_pseudoprime;
 
     sub is_perrin_pseudoprime {
@@ -17531,6 +17555,7 @@ package Sidef::Types::Number::Number {
     }
 
     *is_perrin_psp = \&is_perrin_pseudoprime;
+    *is_perrin_prp = \&is_perrin_pseudoprime;
 
     sub is_frobenius_pseudoprime {
         my ($n, $k, $m) = @_;
@@ -17550,6 +17575,7 @@ package Sidef::Types::Number::Number {
     }
 
     *is_frobenius_psp = \&is_frobenius_pseudoprime;
+    *is_frobenius_prp = \&is_frobenius_pseudoprime;
 
     sub is_frobenius_underwood_pseudoprime {
         my ($n) = @_;
@@ -17564,8 +17590,10 @@ package Sidef::Types::Number::Number {
     }
 
     *is_underwood_psp           = \&is_frobenius_underwood_pseudoprime;
+    *is_underwood_prp           = \&is_frobenius_underwood_pseudoprime;
     *is_underwood_pseudoprime   = \&is_frobenius_underwood_pseudoprime;
     *is_frobenius_underwood_psp = \&is_frobenius_underwood_pseudoprime;
+    *is_frobenius_underwood_prp = \&is_frobenius_underwood_pseudoprime;
 
     sub is_frobenius_khashin_pseudoprime {
         my ($n) = @_;
@@ -17578,8 +17606,10 @@ package Sidef::Types::Number::Number {
     }
 
     *is_khashin_psp           = \&is_frobenius_khashin_pseudoprime;
+    *is_khashin_prp           = \&is_frobenius_khashin_pseudoprime;
     *is_khashin_pseudoprime   = \&is_frobenius_khashin_pseudoprime;
     *is_frobenius_khashin_psp = \&is_frobenius_khashin_pseudoprime;
+    *is_frobenius_khashin_prp = \&is_frobenius_khashin_pseudoprime;
 
     sub is_nminus1_prime {
         my ($n) = @_;
@@ -23989,8 +24019,9 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@carmichael_numbers);
     }
 
-    *carmichael_strong_fermat = \&strong_fermat_carmichael;
-    *carmichael_strong_psp    = \&strong_fermat_carmichael;
+    *carmichael_strong_fermat     = \&strong_fermat_carmichael;
+    *carmichael_strong_fermat_psp = \&strong_fermat_carmichael;
+    *carmichael_strong_psp        = \&strong_fermat_carmichael;
 
     sub lucas_carmichael {
         my ($k, $from, $to) = @_;
@@ -24493,11 +24524,12 @@ package Sidef::Types::Number::Number {
                      );
     }
 
-    *carmichael_strong_psp_each    = \&carmichael_strong_fermat_each;
-    *each_carmichael_strong_psp    = \&carmichael_strong_fermat_each;
-    *each_carmichael_strong_fermat = \&carmichael_strong_fermat_each;
-    *each_strong_fermat_carmichael = \&carmichael_strong_fermat_each;
-    *strong_fermat_carmichael_each = \&carmichael_strong_fermat_each;
+    *carmichael_strong_psp_each        = \&carmichael_strong_fermat_each;
+    *each_carmichael_strong_psp        = \&carmichael_strong_fermat_each;
+    *each_carmichael_strong_fermat     = \&carmichael_strong_fermat_each;
+    *each_carmichael_strong_fermat_psp = \&carmichael_strong_fermat_each;
+    *each_strong_fermat_carmichael     = \&carmichael_strong_fermat_each;
+    *strong_fermat_carmichael_each     = \&carmichael_strong_fermat_each;
 
     sub lucas_carmichael_each {
         my ($k, $from, $to, $block) = @_;
