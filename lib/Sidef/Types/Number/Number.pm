@@ -3232,13 +3232,22 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_root($r, $x, $y);
+        $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
         $r;
     }
 
     sub iroot {
         my ($x, $y) = @_;
         _valid(\$y);
-        bless \__iroot__(_any2mpz($$x) // (goto &nan), _any2si($$y) // (goto &nan));
+
+        $x = $$x;
+        $y = _any2si($$y) // (goto &nan);
+
+        if (HAS_PRIME_UTIL and $y >= 1 and _fits_ulong($x)) {
+            return _set_int(Math::Prime::Util::rootint(_get_ulong($x), $y));
+        }
+
+        bless \__iroot__(_any2mpz($x) // (goto &nan), $y);
     }
 
     sub isqrt {
@@ -3246,13 +3255,8 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (_fits_ulong($x)) {
-            return
-              _set_int(
-                       HAS_PRIME_UTIL
-                       ? Math::Prime::Util::sqrtint(_get_ulong($x))
-                       : Math::Prime::Util::GMP::sqrtint(_get_ulong($x))
-                      );
+        if (HAS_PRIME_UTIL and _fits_ulong($x)) {
+            return _set_int(Math::Prime::Util::sqrtint(_get_ulong($x)));
         }
 
         $x = _any2mpz($x) // goto &nan;
