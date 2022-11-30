@@ -5135,16 +5135,16 @@ Returns the count of the non-bi-unitary divisors of n.
 
 =cut
 
-=head2 n_composites
+=head2 next_composites
 
-    n_composites(n, start=4)
+    n.next_composites(start=4)
 
-Returns n consecutive composite numbers starting from C<start>.
+Returns an Array with C<n> consecutive composite numbers starting from C<start>.
 
-    say n_composites(10)        #=> [4, 6, 8, 9, 10, 12, 14, 15, 16, 18]
-    say n_composites(5, 50)     #=> [50, 51, 52, 54, 55]
+    say 5.next_composites        #=> [4, 6, 8, 9, 10]
+    say 5.next_composites(50)    #=> [50, 51, 52, 54, 55]
 
-Aliases: I<ncomposites>, I<next_composites>
+Aliases: I<ncomposites>, I<n_composites>
 
 =cut
 
@@ -5381,20 +5381,20 @@ Returns the normalized value of C<x>: C<abs(x)^2>.
 
 =cut
 
-=head2 n_primes
+=head2 next_primes
 
-    n_primes(n, start=2)
+    n.next_primes(start=2)
 
-Returns an array containing C<n> consecutive primes that are `>= start` (if omitted, then start = 2).
+Returns an Array containing C<n> consecutive primes that are `>= start` (if omitted, then start = 2).
 
-    say n_primes(10)        #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
-    say n_primes(10, 1000)  #=> [1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061]
+    say 10.next_primes        #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+    say 10.next_primes(1000)  #=> [1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061]
 
 The value for C<start> can be any arbitrarily large integer:
 
-    say n_primes(10, 2**128 + 1)    # first 10 primes > 2^128
+    say 10.next_primes(2**128 + 1)    # first 10 primes >= 2^128
 
-Aliases: I<nprimes>, I<next_primes>
+Aliases: I<nprimes>, I<n_primes>
 
 =cut
 
@@ -6109,6 +6109,17 @@ Aliases: I<perfect_power_udivisors>, I<perfect_power_unitary_divisors>
     prev_composite(n)
 
 Returns the previous composite number smaller than C<n>.
+
+=cut
+
+=head2 prev_composites
+
+    n.prev_composites(start)
+
+Returns an Array with C<n> consecutive decreasing composite numbers starting from C<start>.
+
+    say 5.prev_composites(10)   #=> [10, 9, 8, 6, 4]
+    say 5.prev_composites(97)   #=> [96, 95, 94, 93, 92]
 
 =cut
 
