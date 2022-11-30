@@ -17971,6 +17971,24 @@ package Sidef::Types::Number::Number {
     *ncomposites     = \&n_composites;
     *next_composites = \&n_composites;
 
+    sub prev_primes {
+        my ($n, $start) = @_;
+
+        $n = _any2ui($$n) // return Sidef::Types::Array::Array->new;
+
+        _valid(\$start);
+        $start = $start->inc->prev_prime;
+
+        my @primes;
+
+        for (my $c = $start ; $n > 0 ; --$n, ($c = $c->prev_prime)) {
+            last if $c->is_nan;
+            push @primes, $c;
+        }
+
+        Sidef::Types::Array::Array->new(\@primes);
+    }
+
     sub prev_composites {
         my ($n, $start) = @_;
 

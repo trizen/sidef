@@ -6144,6 +6144,16 @@ Returns the previous prime smaller than C<n>.
 
 =cut
 
+=head2 prev_primes
+
+    n.prev_primes(start)
+
+Returns an Array with C<n> consecutive decreasing prime numbers starting from C<start>.
+
+    say 5.prev_primes(100)  #=> [97, 89, 83, 79, 73]
+
+=cut
+
 =head2 prho_factor
 
     n.prho_factor
