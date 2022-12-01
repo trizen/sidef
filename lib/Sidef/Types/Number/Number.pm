@@ -16949,7 +16949,7 @@ package Sidef::Types::Number::Number {
 
         @factors = map { _factor($_) } @factors;
 
-        (scalar(@factors) > 1 and $check_conditions->(@factors))
+        $check_conditions->(@factors)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -17063,7 +17063,7 @@ package Sidef::Types::Number::Number {
 
         @factors = map { _factor($_) } @factors;
 
-        (scalar(@factors) > 1 and $check_conditions->(@factors))
+        $check_conditions->(@factors)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
