@@ -675,9 +675,19 @@ package Sidef::Types::Number::Number {
         (ref($n) eq '') ? ($n >= 0) : (ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n));
     }
 
+    sub _fits_slong {
+        my ($n) = @_;
+        (ref($n) eq '') ? 1 : (ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($n));
+    }
+
     sub _get_ulong {
         my ($n) = @_;
         (ref($n) eq '') ? $n : Math::GMPz::Rmpz_get_ui($n);
+    }
+
+    sub _get_slong {
+        my ($n) = @_;
+        (ref($n) eq '') ? $n : Math::GMPz::Rmpz_get_si($n);
     }
 
     #
@@ -2764,9 +2774,24 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y, \$m);
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2mpz($$y) // goto &nan;
-        $m = _any2mpz($$m) // goto &nan;
+        $x = $$x;
+        $y = $$y;
+        $m = $$m;
+
+        if (HAS_PRIME_UTIL && _fits_ulong($m) && _fits_slong($x) && _fits_slong($y)) {
+            $x = _get_slong($x) if ref($x);
+            $y = _get_slong($y) if ref($y);
+            $m = _get_ulong($m) if ref($m);
+            $m || goto &nan;
+            my $r = Math::Prime::Util::addmod($x, $y, $m);
+            return bless \$r;
+        }
+
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $m = _any2mpz($m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_add($r, $x, $y);
@@ -2779,9 +2804,24 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y, \$m);
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2mpz($$y) // goto &nan;
-        $m = _any2mpz($$m) // goto &nan;
+        $x = $$x;
+        $y = $$y;
+        $m = $$m;
+
+        if (HAS_NEW_PRIME_UTIL && _fits_ulong($m) && _fits_slong($x) && _fits_slong($y)) {
+            $x = _get_slong($x) if ref($x);
+            $y = _get_slong($y) if ref($y);
+            $m = _get_ulong($m) if ref($m);
+            $m || goto &nan;
+            my $r = Math::Prime::Util::submod($x, $y, $m);
+            return bless \$r;
+        }
+
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $m = _any2mpz($m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_sub($r, $x, $y);
@@ -2794,9 +2834,24 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y, \$m);
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2mpz($$y) // goto &nan;
-        $m = _any2mpz($$m) // goto &nan;
+        $x = $$x;
+        $y = $$y;
+        $m = $$m;
+
+        if (HAS_PRIME_UTIL && _fits_ulong($m) && _fits_slong($x) && _fits_slong($y)) {
+            $x = _get_slong($x) if ref($x);
+            $y = _get_slong($y) if ref($y);
+            $m = _get_ulong($m) if ref($m);
+            $m || goto &nan;
+            my $r = Math::Prime::Util::mulmod($x, $y, $m);
+            return bless \$r;
+        }
+
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $m = _any2mpz($m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mul($r, $x, $y);
@@ -3264,6 +3319,7 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_sqrt($r, $x);
+        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
         bless \$r;
     }
 
