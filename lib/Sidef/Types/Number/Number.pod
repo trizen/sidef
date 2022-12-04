@@ -4245,11 +4245,21 @@ Returns true iff C<n> is not a power and is not divisible by a square <= k.
 
 =cut
 
+=head2 is_proth_prime
+
+    n.is_proth_prime(k)
+
+Returns true if C<2^n * k + 1> is prime, using the Proth primality test.
+
+    say 15.by { .is_proth_prime(3) }   # numbers n such that 2^n * 3 + 1 is prime
+
+=cut
+
 =head2 is_prov_prime
 
-    is_prov_prime(n)
+    n.is_prov_prime
 
-Returns true if n is provable prime.
+Returns true if C<n> is definitely a prime.
 
 Aliases: I<is_provable_prime>
 

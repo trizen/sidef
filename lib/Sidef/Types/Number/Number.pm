@@ -17705,6 +17705,43 @@ package Sidef::Types::Number::Number {
     *is_np1_prime = \&is_nplus1_prime;
     *is_pp1_prime = \&is_nplus1_prime;
 
+    sub is_proth_prime {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2ui($$n)  // return undef;
+        $k = _any2mpz($$k) // return Sidef::Types::Bool::Bool::FALSE;
+
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_setbit($t, $n);
+
+        # k must smaller than 2^n
+        my $valid = 1;
+        if (Math::GMPz::Rmpz_cmp($k, $t) >= 0) {
+            $valid = 0;
+        }
+
+        # t = k * 2^n + 1
+        Math::GMPz::Rmpz_mul($t, $t, $k);
+        Math::GMPz::Rmpz_add_ui($t, $t, 1);
+
+        $valid
+          || return ((bless \$t)->is_prime);
+
+        _primality_pretest($t) || return Sidef::Types::Bool::Bool::FALSE;
+
+        my $r = Math::Prime::Util::GMP::is_proth_prime(Math::GMPz::Rmpz_get_str($t, 10));
+
+        if ($r < 0) {
+            return ((bless \$t)->is_prime);
+        }
+
+        ($r >= 1)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub is_ecpp_prime {
         my ($n) = @_;
 
