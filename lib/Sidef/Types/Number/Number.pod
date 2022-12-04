@@ -3872,11 +3872,21 @@ Aliases: I<is_khashin_pseudoprime>, I<is_frobenius_khashin_psp>, I<is_frobenius_
 
 =cut
 
+=head2 is_llr_prime
+
+    n.is_llr_prime(k)
+
+Returns true if C<2^n * k - 1> is prime, using the Lucas-Lehmer-Riesel (LLR) primality test.
+
+    say 15.by { .is_llr_prime(3) }   # numbers n such that 2^n * 3 - 1 is prime
+
+=cut
+
 =head2 is_lucas
 
     n.is_lucas
 
-Returns true if n is a Lucas number. False otherwise.
+Returns true if C<n> is a Lucas number. False otherwise.
 
 =cut
 
