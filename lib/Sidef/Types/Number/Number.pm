@@ -12205,40 +12205,39 @@ package Sidef::Types::Number::Number {
             if ($n == 0) {
                 return Sidef::Types::Number::Polynomial->new();
             }
+            elsif ($n == 1) {
+                return Sidef::Types::Number::Polynomial->new(ONE)->dec;
+            }
 
-            my %cache;
+            my @factor_exp = _factor_exp($n);
 
-            my $r = sub {
-                my ($k) = @_;
+            # Generate the squarefree divisors of n, along
+            # with the number of prime factors of each divisor
+            my @sd;
+            foreach my $pe (@factor_exp) {
+                push @sd, map { [$_->[0] * $pe->[0], $_->[1] + 1] } @sd;
+                push @sd, [$pe->[0], 1];
+            }
 
-                # Based on algorithm from Math::Polynomial::Cyclotomic
+            push @sd, [1, 0];
 
-                if (exists $cache{$k}) {
-                    return $cache{$k};
+            my (@num, @den);
+            foreach my $pair (@sd) {
+                my ($d, $c) = @$pair;
+
+                my $t    = CORE::int($n / $d);
+                my $base = Sidef::Types::Number::Polynomial->new(_set_int($t))->dec;
+
+                if ($c % 2 == 0) {
+                    push @num, $base;
                 }
-
-                my $t = Sidef::Types::Number::Polynomial->new($k => ONE)->dec;
-
-                if ($k == 1) {
-                    return $t;
+                else {
+                    push @den, $base;
                 }
+            }
 
-                my @d = _divisors($k);
-                my $m = $d[-2];
-
-                my $prod = Sidef::Types::Number::Polynomial->new($m => ONE)->dec;
-
-                foreach my $i (1 .. $#d - 2) {
-                    if ($m % $d[$i]) {
-                        $prod = $prod->mul($cache{$d[$i]} // __SUB__->($d[$i]));
-                    }
-                }
-
-                $cache{$k} = $t->div($prod);
-              }
-              ->($n);
-
-            return $r;
+            return _binsplit(\@num, \&Sidef::Types::Number::Polynomial::mul)
+              ->div(_binsplit(\@den, \&Sidef::Types::Number::Polynomial::mul));
         }
 
         _valid(\$x);
@@ -12278,7 +12277,7 @@ package Sidef::Types::Number::Number {
 
         push @sd, [1, 0];
 
-        my @terms;
+        my (@num, @den);
         foreach my $pair (@sd) {
             my ($d, $c) = @$pair;
 
@@ -12292,11 +12291,16 @@ package Sidef::Types::Number::Number {
               }
               : __dec__(__pow__($x, $t));
 
-            unshift @terms, (($c % 2 == 0) ? $base : __inv__($base));
+            if ($c % 2 == 0) {
+                push @num, $base;
+            }
+            else {
+                push @den, $base;
+            }
         }
 
-        @terms || return ONE;
-        bless \_binsplit(\@terms, \&__mul__);
+        (scalar(@num) > 0 and scalar(@den) > 0) || return ONE;
+        bless \__div__(_binsplit(\@num, \&__mul__), _binsplit(\@den, \&__mul__));
     }
 
     *cyclotomic = \&cyclotomic_polynomial;
