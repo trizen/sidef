@@ -26931,6 +26931,35 @@ package Sidef::Types::Number::Number {
     }
 
     #
+    ## n-th k-gonal pyramidal number
+    #
+
+    sub pyramidal {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
+
+        # pyramidal(n, k) = (n*(n+1) * (n*(k-2) - (k-5)))/6
+
+        my $r = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_mul($t, $n, $n);
+        Math::GMPz::Rmpz_add($t, $t, $n);         # t = n*(n+1)
+        Math::GMPz::Rmpz_mul($r, $n, $k);         # r = n*k
+        Math::GMPz::Rmpz_submul_ui($r, $n, 2);    # r = n*(k-2)
+        Math::GMPz::Rmpz_sub($r, $r, $k);         # r = n*(k-2) - k
+        Math::GMPz::Rmpz_add_ui($r, $r, 5);       # r = n*(k-2) - (k-5)
+        Math::GMPz::Rmpz_mul($r, $r, $t);         # r = n*(n+1) * (n*(k-2) - (k-5))
+        Math::GMPz::Rmpz_divexact_ui($r, $r, 6);
+
+        bless \$r;
+    }
+
+    #
     ## Polygonal inverses for a given number
     #
 

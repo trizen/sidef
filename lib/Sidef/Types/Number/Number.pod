@@ -6577,6 +6577,17 @@ Aliases: I<dedekind_psi>
 
 =cut
 
+=head2 pyramidal
+
+    n.pyramidal(k)
+
+Returns the n-th k-gonal pyramidal number.
+
+   say 15.of {|n| pyramidal(n, 3) }  # tetrahedral numbers
+   say 15.of {|n| pyramidal(n, 5) }  # pentagonal pyramidal numbers
+
+=cut
+
 =head2 qnr
 
     qnr(n)
