@@ -426,11 +426,11 @@ Aliases: I<prod>
     π(a,b)
     Num.π
 
-Returns the PI numerical value:
+Returns the C<PI> numerical value:
 
     say Num.pi      #=> 3.1415...
 
-When applied on a Number object (as C<n.pi> or C<pi(n)>), it returns the number of primes <= n:
+When applied on a Number object (as C<n.pi> or C<pi(n)>), it returns the number of primes <= C<n>:
 
     say 100.pi      #=> number of primes <= 100
     say pi(100)     #=> 25
@@ -459,7 +459,7 @@ Aliases: I<sum>
     σ(n,k=1)
     sigma(n,k=1)
 
-Returns the sum of the positive divisors of n, each raised to the power k.
+Returns the sum of the positive divisors of C<n>, each raised to the power C<k>.
 
 Aliases: I<sigma>
 
@@ -473,7 +473,7 @@ Aliases: I<sigma>
     τ(n)
     tau(n)
 
-Returns the TAU constant (2*PI), or the number of positive divisors of n.
+Returns the C<TAU> constant (C<2*PI>), or the number of positive divisors of C<n>.
 
     say Num.tau     #=> 6.283185307179...
     say tau(120)    #=> 16
@@ -490,7 +490,7 @@ Aliases: I<tau>
     φ(n)
     phi(n)
 
-Returns the golden ratio constant PHI, or the Euler totient of n.
+Returns the golden ratio constant C<PHI>, or the Euler totient of C<n>.
 
     say Num.phi       #=> 1.618033988749...
     say phi(180)      #=> 48
@@ -519,7 +519,7 @@ Aliases: I<digamma>
     Ω(n,k=0)
     bigomega(n,k=0)
 
-For k = 0, it returns the number of prime factors of n (counted with multiplicity).
+For C<k = 0>, it returns the number of prime factors of C<n> (counted with multiplicity).
 
 In general, is equivalent with:
 
@@ -534,7 +534,7 @@ Aliases: I<bigomega>
     ω(n,k=0)
     omega(n,k=0)
 
-For k = 0, it returns the number of distinct prime factors of n.
+For C<k = 0>, it returns the number of distinct prime factors of C<n>.
 
 In general, is equivalent with:
 
@@ -596,7 +596,7 @@ The absolute value of C<n>.
 
     abundancy(n)
 
-Returns the abundancy index of n, defined as:
+Returns the abundancy index of C<n>, defined as:
 
     sigma(n)/n
 
@@ -707,7 +707,7 @@ Equivalent with:
 
     all_composite(...)
 
-Returns true if all the given values are composite positive integers, by checking first for small factors, then running a B-PSW primality test.
+Returns true if all the given values are positive composite numbers.
 
 =cut
 
@@ -717,8 +717,6 @@ Returns true if all the given values are composite positive integers, by checkin
 
 Returns true if all the given values are prime numbers.
 
-This is done by first running a primality pre-test on all values and returning early if one of the values is composite with a small factor. Otherwise, we run a B-PSW primality test on each value.
-
 =cut
 
 =head2 almost_prime_divisors
@@ -726,11 +724,11 @@ This is done by first running a primality pre-test on all values and returning e
     n.almost_prime_divisors
     n.almost_prime_divisors(k)
 
-Returns the k-almost prime divisors of n.
+Returns the k-almost prime divisors of C<n>.
 
     say 5040.almost_prime_divisors(7)   #=> [720, 1008, 1680, 2520]
 
-When C<k> is omitted, an array of arrays with the k-almost prime divisors of n, for each k in the range C<0..bigomega(n)>, is returned:
+When C<k> is omitted, an array of arrays with the k-almost prime divisors of C<n>, for each k in the range C<0..bigomega(n)>, is returned:
 
     say 120.almost_prime_divisors       #=> [[1], [2, 3, 5], [4, 6, 10, 15], [8, 12, 20, 30], [24, 40, 60], [120]]
 
@@ -741,7 +739,7 @@ When C<k> is omitted, an array of arrays with the k-almost prime divisors of n, 
     k.almost_primes(n)
     k.almost_primes(a,b)
 
-Return an array with the k-almost primes <= n, or in the range C<a..b>.
+Return an array with the k-almost primes <= C<n>, or in the range C<a..b>.
 
     5.almost_primes(1e6)        # array of 5-almost primes <= 1e6
     5.almost_primes(1e5, 1e6)   # array of 5-almost primes in the range [1e5, 1e6]
@@ -979,7 +977,7 @@ Aliases: I<in_base>
 
     bdivisors(n)
 
-Returns an array with the bi-unitary divisors of n.
+Returns an array with the bi-unitary divisors of C<n>.
 
     say 48.bdivisors    #=> [1, 2, 3, 6, 8, 16, 24, 48]
 
@@ -1005,11 +1003,7 @@ Aliases: I<bell_number>
 
     bellmod(n, m)
 
-Returns the n-th Bell number modulo m.
-
-For large n > 1000, this is faster than:
-
-    bell(n) % m
+Returns the n-th Bell number modulo C<m>.
 
 =cut
 
@@ -1079,7 +1073,7 @@ Defined as:
 
     binomialmod(n, k, m)
 
-Returns the binomial coefficient binomial(n,k) modulo m, computed efficiently.
+Returns the binomial coefficient C<binomial(n,k)> modulo C<m>.
 
     say binomialmod(1e10, 1e5, 20!)     #=> 286953611424480000
 
@@ -1109,7 +1103,7 @@ Aliases: I<getbit>, I<testbit>
 
     n.bits()
 
-Returns the binary digits of n.
+Returns the binary digits of C<n>.
 
 The bits are ordered from the most significant bit to the least significant bit.
 
@@ -1255,7 +1249,7 @@ Aliases: I<bsearch_inverse>
 
     bsigma(n, k=1)
 
-Returns the sum of the bi-unitary divisors of n, each divisor raised to the k-th power.
+Returns the sum of the bi-unitary divisors of C<n>, each divisor raised to the k-th power.
 
     say 20.of { .bsigma }   #=> OEIS: A188999
 
@@ -1267,7 +1261,7 @@ Aliases: I<biusigma>
 
     bsigma0(n)
 
-Returns the count of the bi-unitary divisors of n.
+Returns the count of the bi-unitary divisors of C<n>.
 
     say 20.of { .bsigma0 }  #=> OEIS: A286324
 
@@ -1305,7 +1299,7 @@ Aliases: I<complex_add>
     k.carmichael(n)
     k.carmichael(a, b)
 
-Returns an array with all the Carmichael numbers <= n or in the range C<a..b> that have exactly C<k> prime factors.
+Returns an array with all the Carmichael numbers <= C<n> or in the range C<a..b> that have exactly C<k> prime factors.
 
     say 3.carmichael(1e4)           # 3-Carmichael numbers <= 1e4
     say 4.carmichael(1e4, 1e6)      # 4-Carmichael numbers in range 1e4..1e6
@@ -1317,7 +1311,7 @@ Returns an array with all the Carmichael numbers <= n or in the range C<a..b> th
     k.carmichael_each(n, { ... })
     k.carmichael_each(a, b, { ... })
 
-Iterates over the Carmichael <= n or in the range C<a..b> that have exactly C<k> prime factors.
+Iterates over the Carmichael <= C<n> or in the range C<a..b> that have exactly C<k> prime factors.
 
     3.carmichael_each(1e5, {|n| say n })          # iterate over 3-Carmichael numbers <= 1e5
     4.carmichael_each(1e5, 1e6, {|n| say n })     # iterate over 4-Carmichael in range 1e5..1e6
@@ -1331,7 +1325,7 @@ Aliases: I<each_carmichael>
     k.carmichael_strong_fermat(base, n)
     k.carmichael_strong_fermat(base, a, b)
 
-Returns an array with all the Carmichael numbers <= n or in the range C<a..b> that are also strong Fermat pseudoprimes to C<base> and have exactly C<k> prime factors.
+Returns an array with all the Carmichael numbers <= C<n> or in the range C<a..b> that are also strong Fermat pseudoprimes to C<base> and have exactly C<k> prime factors.
 
     say 3.carmichael_strong_fermat(2, 1e7)       # 3-Carmichael strong Fermat pseudoprimes to base 2 <= 1e7
     say 4.carmichael_strong_fermat(2, 1e7, 1e9)  # 4-Carmichael strong Fermat pseudoprimes to base 2, in range 1e7..1e9
@@ -1345,7 +1339,7 @@ Aliases: I<strong_fermat_carmichael>, I<carmichael_strong_psp>
     k.carmichael_strong_fermat_each(base, n, { ... })
     k.carmichael_strong_fermat_each(base, a, b, { ... })
 
-Iterates over the Carmichael <= n or in the range C<a..b> that are also strong Fermat pseudoprimes to C<base> and have exactly C<k> prime factors.
+Iterates over the Carmichael <= C<n> or in the range C<a..b> that are also strong Fermat pseudoprimes to C<base> and have exactly C<k> prime factors.
 
     3.carmichael_strong_fermat_each(2, 1e7, {|n| say n })          # iterate over 3-Carmichael strong Fermat to base 2 <= 1e7
     4.carmichael_strong_fermat_each(2, 1e5, 1e9, {|n| say n })     # iterate over 4-Carmichael strong Fermat to base 2 in range 1e5..1e9
@@ -1564,7 +1558,7 @@ Aliases: I<cld>
 
     n.clearbit(k)
 
-Set the k-th bit of integer n to 0.
+Set the k-th bit of integer C<n> to C<0>.
 
     say clearbit(0b1001, 0).as_bin  #=> 1000
     say clearbit(0b1100, 2).as_bin  #=> 1000
@@ -1682,7 +1676,7 @@ Aliases: I<nth_composite>
     composite_count(n)
     composite_count(a,b)
 
-Returns the number of composite numbers <= n, or in the range C<a..b>.
+Returns the number of composite numbers <= C<n>, or in the range C<a..b>.
 
     say composite_count(100)          # number of composites <= 100
     say composite_count(50, 100)      # number of composites in the range 50..100
@@ -1720,7 +1714,7 @@ Aliases: I<nth_composite_lower>
     composites(n)
     composites(a,b)
 
-Returns an array with the composite numbers <= n, or in the range C<a..b>.
+Returns an array with the composite numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
@@ -1780,7 +1774,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
     core(n)
 
-Squarefree part of n.
+Squarefree part of C<n>.
 
     say 30.of { .core }     #=> OEIS: A007913
 
@@ -1826,7 +1820,7 @@ Hyperbolic cotangent function.
 
     cpow(a,b,n)
 
-Computes C<(a + b*i)^n>, where a,b are real numbers and n is an integer. Returns the real and imaginary part as a list.
+Computes C<(a + b*i)^n>, where C<a,b> are real numbers and C<n> is an integer. Returns the real and imaginary part as a list.
 
     say [cpow(3, 4, 10)]    #=> [-9653287, 1476984]
 
@@ -1838,7 +1832,7 @@ Aliases: I<complex_pow>
 
     cpowmod(a,b,n,m)
 
-Efficiently computes C<(a + b*i)^n mod m>, where a,b,n,m are all integers. Returns the real and imaginary part as a list.
+Efficiently computes C<(a + b*i)^n mod m>, where C<a,b,n,m> are all integers. Returns the real and imaginary part as a list.
 
     say [complex_powmod(3, 4, 1000, 1e6)]   #=> [585313, 426784]
 
@@ -1941,9 +1935,13 @@ It returns NaN when C<moebius(d) = -1> and C<gcd(n/d, m) != 1>, for some C<d|n>.
 
     n.dconv(f,g)
 
-Returns the Dirichlet convolution of f and g.
+The Dirichlet convolution of functions C<f> and C<g>, defined as:
 
-    say 20.of { .dirichlet_convolution({.moebius}, {_}) }
+    Sum_{d|n} f(d) * g(n/d)
+
+Example:
+
+    say 20.of { .dconv({.moebius}, {_}) }
 
 Aliases: I<dirichlet_convolution>
 
@@ -1966,7 +1964,7 @@ Aliases: I<denominator>
 
     n.defs { ... }
 
-Returns an array with the first n defined values returned by the given block. The block is called with k = 0,1,...
+Returns an array with the first C<n> defined values returned by the given block. The block is called with C<k = 0,1,2,...>
 
     10.defs {|k| k.is_prime ? k+1 : nil }      # array of p+1 for the first 10 primes p
 
@@ -2104,15 +2102,15 @@ Aliases: I<sum_digits>, I<sumdigits>
 
     n.dirichlet_sum(f, g, F, G)
 
-The method computes the following sum in O(sqrt(n)) steps:
+This method computes the following sum in C<O(sqrt(n))> steps:
 
     Sum_{k=1..n} Sum_{d|k} f(d) * g(k/d)
 
-Where C<F> and C<G> are the partial sums of C<f> and C<g>, respectively.
+where C<F> and C<G> are the partial sums of C<f> and C<g>, respectively.
 
-    say dirichlet_hyperbola(1e3,
+    say dirichlet_sum(1e6,
             { .is_squarefree ? 1 : 0 },
-            { _*_ },
+            { .square },
             { .squarefree_count },
             { .faulhaber(2) }
     )
@@ -2136,7 +2134,7 @@ Returns true if C<a> divides C<b>.
 
     n.divisor_map {|d| ... }
 
-Maps the divisors of n to the given block.
+Maps the divisors of C<n> to the given block.
 
     say 24.divisor_map {|d| 1/d }  #=> [1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/12, 1/24]
 
@@ -2146,7 +2144,7 @@ Maps the divisors of n to the given block.
 
     n.divisor_prod {|d| ... }
 
-Product of the mapping of the positive divisors of n.
+Product of the mapping of the positive divisors of C<n>.
 
 Equivalent with:
 
@@ -2160,7 +2158,7 @@ Aliases: I<divisors_prod>
 
     n.divisors(k=n)
 
-Return an array with the positive divisors of n <= k.
+Return an array with the positive divisors of C<n> that are less than or equal to C<k>.
 
     say 120.divisors        #=> [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120]
     say 120.divisors(13)    #=> [1, 2, 3, 4, 5, 6, 8, 10, 12]
@@ -2171,7 +2169,7 @@ Return an array with the positive divisors of n <= k.
 
     n.divisor_sum {|d| ... }
 
-Sum of the mapping of the positive divisors of n.
+Sum of the mapping of the positive divisors of C<n>.
 
     say 5040.divisor_sum {|d| euler_phi(d)**2 } #=> 2217854
 
@@ -2247,7 +2245,7 @@ Returns the I<e> mathematical constant: 2.71828...
     k.each_almost_prime(n, {...})
     k.each_almost_prime(a,b, {...})
 
-Iterates over the k-almost prime numbers <= n, or in the range C<a..b>.
+Iterates over the k-almost prime numbers <= C<n>, or in the range C<a..b>.
 
     11.almost_primes_each(1e7, {|n| say n })        # iterate over 11-almost primes <= 1e6
     11.almost_primes_each(1e6, 1e7, {|n| say n })   # iterate over 11-almost primes in the range [1e6, 1e7]
@@ -2261,7 +2259,7 @@ Aliases: I<almost_primes_each>
     n.each_composite { ... }
     each_composite(a,b, { ... })
 
-Iterate over the composite numbers <= n, or in the given range C<a..b>.
+Iterate over the composite numbers <= C<n>, or in the given range C<a..b>.
 
     # Iterate over the composite integers between 100 and 200
     each_composite(100, 200, {|c|
@@ -2282,7 +2280,7 @@ Aliases: I<composites_each>
     k.fermat_psp_each(base, n, { ... })
     k.fermat_psp_each(base, a, b, { ... })
 
-Iterates over the C<k>-omega Fermat pseudoprimes <= n or in the range C<a..b>.
+Iterates over the C<k>-omega Fermat pseudoprimes <= C<n> or in the range C<a..b>.
 
     3.fermat_psp_each(2, 1e5, {|n| say n })          # iterate over 3-Fermat psp to base 2 <= 1e5
     4.fermat_psp_each(2, 1e5, 1e6, {|n| say n })     # iterate over 4-Fermat psp to base 2 in range 1e4..1e6
@@ -2296,7 +2294,7 @@ Aliases: I<fermat_psp_each>
     k.lucas_carmichael_each(n, { ... })
     k.lucas_carmichael_each(a, b, { ... })
 
-Iterates over the Lucas-Carmichael <= n or in the range C<a..b> that have exactly C<k> prime factors.
+Iterates over the Lucas-Carmichael <= C<n> or in the range C<a..b> that have exactly C<k> prime factors.
 
     3.lucas_carmichael_each(1e5, {|n| say n })          # iterate over 3-Lucas-Carmichael numbers <= 1e5
     4.lucas_carmichael_each(1e5, 1e6, {|n| say n })     # iterate over 4-Lucas-Carmichael in range 1e4..1e6
@@ -2310,7 +2308,7 @@ Aliases: I<lucas_carmichael_each>
     k.omega_primes_each(n, { ... })
     k.omega_primes_each(a, b, { ... })
 
-Iterates over the C<k>-omega primes <= n, or in the range C<a..b>.
+Iterates over the C<k>-omega primes <= C<n>, or in the range C<a..b>.
 
 C<k>-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
@@ -2326,7 +2324,7 @@ Aliases: I<omega_primes_each>
     k.powerful_each(n, { ... })
     k.powerful_each(a, b, { ... })
 
-Iterates over the k-powerful numbers <= n, or in the range C<a..b>.
+Iterates over the k-powerful numbers <= C<n>, or in the range C<a..b>.
 
     2.powerful_each(100, {|n| say n })          # iterate over 2-powerful numbers <= 100
     2.powerful_each(50, 100, {|n| say n })      # iterate over 2-powerful in the range 50..100
@@ -2363,7 +2361,7 @@ Aliases: I<primes_each>
     n.each_prime_power { ... }
     each_prime_power(a,b, { ... })
 
-Iterate over prime powers <= n, or in the range C<a..b>:
+Iterate over prime powers <= C<n>, or in the range C<a..b>:
 
     100.each_prime_power {|k| say k }         # iterate over prime powers <= 100
     each_prime_power(50, 100, {|k| say k })   # iterate over prime powers in the range [50, 100]
@@ -2377,7 +2375,7 @@ Aliases: I<prime_powers_each>
     n.each_semiprime { ... }
     each_semiprime(a,b, { ... })
 
-Iterate over semiprimes <= n, or in the range C<a..b>:
+Iterate over semiprimes <= C<n>, or in the range C<a..b>:
 
     100.each_semiprime {|k| say k }         # iterate over semiprimes <= 100
     each_semiprime(50, 100, {|k| say k })   # iterate over semiprimes in the range [50, 100]
@@ -2412,7 +2410,7 @@ Aliases: I<squarefree_each>
     k.each_squarefree_almost_prime(n, {...})
     k.each_squarefree_almost_prime(a,b,{...})
 
-Iterates over the squarefree k-almost primes <= n, or in the range C<a..b>.
+Iterates over the squarefree k-almost primes <= C<n>, or in the range C<a..b>.
 
     # Iterate over squarefree 3-almost primes <= 100
     3.squarefree_almost_primes_each(100, { .say })
@@ -2429,7 +2427,7 @@ Aliases: I<squarefree_almost_primes_each>
     k.squarefree_fermat_psp_each(base, n, { ... })
     k.squarefree_fermat_psp_each(base, a, b, { ... })
 
-Iterates over the squarefree Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
+Iterates over the squarefree Fermat pseudoprimes <= C<n> or in the range C<a..b> that have exactly C<k> prime factors.
 
     3.squarefree_fermat_psp_each(2, 1e5, {|n| say n })          # iterate over squarefree 3-Fermat psp to base 2 <= 1e5
     4.squarefree_fermat_psp_each(2, 1e5, 1e6, {|n| say n })     # iterate over squarefree 4-Fermat psp to base 2 in range 1e4..1e6
@@ -2443,7 +2441,7 @@ Aliases: I<squarefree_fermat_psp_each>
     n.each_squarefree_semiprime { ... }
     each_squarefree_semiprime(a,b, { ... })
 
-Iterate over the squarefree semiprimes <= n, or in the range C<a..b>:
+Iterate over the squarefree semiprimes <= C<n>, or in the range C<a..b>:
 
     100.each_squarefree_semiprime {|k| say k }         # iterate over squarefree semiprimes <= 100
     each_squarefree_semiprime(50, 100, {|k| say k })   # iterate over squarefree semiprimes in the range [50, 100]
@@ -2457,7 +2455,7 @@ Aliases: I<squarefree_semiprimes_each>
     k.each_squarefree_strong_fermat_psp(base, n, { ... })
     k.each_squarefree_strong_fermat_psp(base, a, b, { ... })
 
-Iterates over the squarefree strong Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
+Iterates over the squarefree strong Fermat pseudoprimes <= C<n> or in the range C<a..b> that have exactly C<k> prime factors.
 
     3.each_squarefree_strong_fermat_psp(2, 1e6, {|n| say n })          # iterate over squarefree strong 3-Fermat psp to base 2 <= 1e6
     4.each_squarefree_strong_fermat_psp(2, 1e7, 1e8, {|n| say n })     # iterate over squarefree strong 4-Fermat psp to base 2 in range 1e7..1e8
@@ -2471,7 +2469,7 @@ Aliases: I<squarefree_strong_fermat_psp_each>
     k.each_strong_fermat_psp(base, n, { ... })
     k.each_strong_fermat_psp(base, a, b, { ... })
 
-Iterates over the C<k>-omega strong Fermat pseudoprimes <= n or in the range C<a..b>.
+Iterates over the C<k>-omega strong Fermat pseudoprimes <= C<n> or in the range C<a..b>.
 
     3.each_strong_fermat_psp(2, 1e6, {|n| say n })          # iterate over 3-omega strong Fermat psp to base 2 <= 1e6
     4.each_strong_fermat_psp(2, 1e7, 1e8, {|n| say n })     # iterate over 4-omega strong Fermat psp to base 2 in range 1e7..1e8
@@ -2496,7 +2494,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
     edivisors(n)
 
-Returns an array with the exponential divisors (or e-divisors) of n.
+Returns an array with the exponential divisors (or e-divisors) of C<n>.
 
     say edivisors(5040)     #=> [210, 420, 630, 1260, 1680, 5040]
 
@@ -2534,7 +2532,7 @@ The complementary error function.
 
     esigma(n, k=1)
 
-Returns the sum of the exponential divisors (or e-divisors) of n, each divisor raised to k-th power.
+Returns the sum of the exponential divisors (or e-divisors) of C<n>, each divisor raised to k-th power.
 
     say 20.of { .esigma }       #=> OEIS: A051377
 
@@ -2544,7 +2542,7 @@ Returns the sum of the exponential divisors (or e-divisors) of n, each divisor r
 
     esigma0(n)
 
-Returns the count of the exponential divisors (or e-divisors) of n.
+Returns the count of the exponential divisors (or e-divisors) of C<n>.
 
     say 20.of { .esigma0 }      #=> OEIS: A049419
 
@@ -2696,7 +2694,7 @@ Aliases: I<factors>
 
     factor_exp(n)
 
-Returns an array of pairs C<[p,k]> factors C<p^k> of n.
+Returns an array of pairs C<[p,k]> factors C<p^k> of C<n>.
 
     say 180.factor_exp  #=> [[2, 2], [3, 2], [5, 1]]
 
@@ -2708,7 +2706,7 @@ Aliases: I<factors_exp>
 
     factorialmod(n,m)
 
-Returns the factorial of n modulo m.
+Returns the factorial of C<n> modulo C<m>.
 
 Equivalent with (but much faster):
 
@@ -2716,17 +2714,17 @@ Equivalent with (but much faster):
 
 =cut
 
-=head2 factorial_power
+=head2 factorial_valuation
 
-    factorial_power(n, p)
+    factorial_valuation(n, p)
 
-Returns the number of times C<p> divides C<n!>, where C<p> is a prime number.
+Returns the number of times C<n!> is divisible by C<p>, where C<p> is a prime number.
 
 Equivalent with (but more efficient):
 
     valuation(n!, p)
 
-Aliases: I<factorial_valuation>
+Aliases: I<factorial_power>
 
 =cut
 
@@ -2750,7 +2748,7 @@ Aliases: I<left_factorial>
 
     n.factor_map {|p,k| ... }
 
-Maps the prime-power factorization C<(p,k)> of n to the given block.
+Maps the prime-power factorization C<(p,k)> of C<n> to the given block.
 
     say 5040.factor_map  {|p,k| p**k }  #=> [16, 9, 5, 7]
 
@@ -2760,7 +2758,7 @@ Maps the prime-power factorization C<(p,k)> of n to the given block.
 
     n.factor_prod {|p,k| ... }
 
-Product of the mapping of the prime-power factorization of n.
+Product of the mapping of the prime-power factorization of C<n>.
 
     say 5040.factor_prod {|p,k| (p-1) * p**(k-1) }  #=> 1152
 
@@ -2776,7 +2774,7 @@ Aliases: I<factors_prod>
 
     n.factor_sum {|p,k| ... }
 
-Sum of the mapping of the prime-power factorization of n.
+Sum of the mapping of the prime-power factorization of C<n>.
 
 Equivalent with:
 
@@ -2860,7 +2858,7 @@ The product of the factors will give back C<n>. However, some factors may be com
     k.fermat_psp(base, n)
     k.fermat_psp(base, a, b)
 
-Returns an array with all the C<k>-omega Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b>.
+Returns an array with all the C<k>-omega Fermat pseudoprimes to the given C<base> that are <= C<n> or in the range C<a..b>.
 
     say 3.fermat_psp(2, 10000)            # 3-omega Fermat psp to base 2
     say 4.fermat_psp(2, 10000, 100000)    # 4-omega Fermat psp to base 2 in range
@@ -2890,7 +2888,7 @@ Aliases: I<fibonacci>
 
     fibmod(n,m)
 
-Efficiently compute the n-th Fibonacci number modulo m.
+Efficiently compute the n-th Fibonacci number modulo C<m>.
 
 Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
@@ -2981,7 +2979,7 @@ The value of C<d> is always non-negative.
 
     gcd_factors(n, [a, b, ...])
 
-Given a positive integer and an array of integers, it tries to find non-trivial factors of n, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
+Given a positive integer and an array of integers, it tries to find non-trivial factors of C<n>, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
 
     var n = 43*43*97*503
     var a = [19*43*97, 1, 13*41*43*101]
@@ -3017,7 +3015,7 @@ Example:
 
     gpf(n)
 
-Returns the greatest prime factor of n.
+Returns the greatest prime factor of C<n>.
 
 Defined with the base-cases:
 
@@ -3167,7 +3165,7 @@ Integer addition: C<a+b>.
 
     icbrt(n)
 
-Integer cube root of n.
+Integer cube root of C<n>.
 
 =cut
 
@@ -3175,7 +3173,7 @@ Integer cube root of n.
 
     idivisors(n)
 
-Returns an array with the infinitary divisors (or i-divisors) of n.
+Returns an array with the infinitary divisors (or i-divisors) of C<n>.
 
     say 96.idivisors        #=> [1, 2, 3, 6, 16, 32, 48, 96]
 
@@ -3469,7 +3467,7 @@ Returns an array with all the possible solutions for C<x> in usigma(x) = n.
 
     n.invmod(m)
 
-Returns the modular inverse of n modulo m.
+Returns the modular inverse of C<n> modulo C<m>.
 
 =cut
 
@@ -3477,7 +3475,7 @@ Returns the modular inverse of n modulo m.
 
     ipolygonal_root(n,k)
 
-First integer k-gonal root of n.
+First integer k-gonal root of C<n>.
 
     say ipolygonal_root(n, 5)                   # integer pentagonal root
     say ipolygonal_root(polygonal(10, 5), 5)    # prints: "10"
@@ -3553,7 +3551,7 @@ If C<a> is greater than C<b>, the returned integer will be in the range C<b..a>.
 
     n.iroot(k)
 
-Integer k-th root of n.
+Integer k-th root of C<n>.
 
 =cut
 
@@ -3561,7 +3559,7 @@ Integer k-th root of n.
 
     n.irootrem(k)
 
-Returns a list with the integer k-th root of n and k-th root remainder of n.
+Returns a list with the integer k-th root of C<n> and k-th root remainder of C<n>.
 
 Equivalent with:
 
@@ -3669,7 +3667,7 @@ Returns true if C<n> is a positive > 1 composite number.
 
     n.is_congruent(a,m)
 
-Returns true when n is congruent to a modulo m.
+Returns true when C<n> is congruent to C<a> modulo C<m>.
 
     say 99923.is_congruent(-2, 5)   #=> true
     say 99923.is_congruent(3, 5)    #=> true
@@ -3692,7 +3690,7 @@ Returns true if C<gcd(a,b) = 1>.
 
     n.is_cube
 
-Return true if n is a cube number (if it can be written as b^3, for some integer b).
+Return true if C<n> is a cube number (i.e.: if it can be written as C<b^3>, for some integer C<b>).
 
 =cut
 
@@ -3744,7 +3742,7 @@ Returns true if C<n> is an integer divisible by 2.
 
     n.is_fib
 
-Returns true if n is a Fibonacci number. False otherwise.
+Returns true if C<n> is a Fibonacci number. False otherwise.
 
 Aliases: I<is_fibonacci>
 
@@ -3806,7 +3804,7 @@ Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
     isigma(n, k=1)
 
-Returns the sum of the infinitary divisors of n, each divisor raised to the k-th power.
+Returns the sum of the infinitary divisors of C<n>, each divisor raised to the k-th power.
 
     say 20.of { .isigma }       #=> OEIS: A049417
 
@@ -3816,7 +3814,7 @@ Returns the sum of the infinitary divisors of n, each divisor raised to the k-th
 
     isigma0(n)
 
-Returns the count of the infinitary divisors of n.
+Returns the count of the infinitary divisors of C<n>.
 
     say 20.of { .isigma0 }      #=> OEIS: A037445
 
@@ -4024,7 +4022,7 @@ Returns true when C<n> is an odd composite integer.
 
 Return true if C<n> is a C<k>-omega prime (i.e.: true if C<n> is divisible by exactly C<k> different primes).
 
-Equivalently, C<k>-omega primes are numbers n such that C<omega(n) == k>.
+Equivalently, C<k>-omega primes are numbers C<n> such that C<omega(n) == k>.
 
     say 20.by { .is_omega_prime(1) }   # prime powers
     say 20.by { .is_omega_prime(2) }   # numbers n such that omega(n) == 2
@@ -4161,7 +4159,10 @@ Aliases: I<is_positive>
 
     n.is_powerfree(k=2)
 
-Returns true when all the exponents in the prime-power factorization of n are < k.
+Returns true when all the exponents in the prime-power factorization of C<n> are less than C<k>.
+
+    say 15.by { .is_powerfree(2) }      # square-free numbers
+    say 15.by { .is_powerfree(3) }      # cube-free numbers
 
 =cut
 
@@ -4169,7 +4170,7 @@ Returns true when all the exponents in the prime-power factorization of n are < 
 
     n.is_powerful(k=2)
 
-Returns true when all the exponents in the prime-power factorization of n are >= k.
+Returns true when all the exponents in the prime-power factorization of C<n> are greater than or equal to C<k>.
 
 =cut
 
@@ -4177,7 +4178,7 @@ Returns true when all the exponents in the prime-power factorization of n are >=
 
     n.is_power_of(b)
 
-Return true if n is a power of b, such that n = b^k for some k >= 0:
+Return true if C<n> is a power of C<b>, such that C<n = b^k> for some C<k> >= C<0>:
 
     n.is_power_of(b)    # true if n == b^k for some k >= 0
 
@@ -4193,13 +4194,13 @@ Example:
     n.is_power
     n.is_power(k)
 
-When k is omitted, it true if n is a perfect power.
-
-When k is given, it returns true if n can be expressed as C<n = b^k> for some b >= 1.
+When C<k> is provided, it returns true if C<n> can be expressed as C<n = b^k> for some integer C<b> >= C<1>.
 
     say 225.is_power          # true: 225 == 15**2
     say 100.is_power(2)       # true: 100 is square (10**2)
     say 125.is_power(3)       # true: 125 is a cube ( 5**3)
+
+When C<k> is omitted, it true if C<n> is a perfect power.
 
 Aliases: I<is_power>, I<is_perfect_power>
 
@@ -4209,7 +4210,7 @@ Aliases: I<is_power>, I<is_perfect_power>
 
     n.is_practical()
 
-Returns true if n is a practical number (OEIS: A005153).
+Returns true if C<n> is a practical number (OEIS: A005153).
 
     say 20.by { .is_practical }
 
@@ -4227,7 +4228,7 @@ Returns true if C<n> is a prime number.
 
     n.is_prime_power
 
-Returns true if n is a power of some prime.
+Returns true if C<n> is a power of some prime.
 
 =cut
 
@@ -4235,7 +4236,7 @@ Returns true if n is a power of some prime.
 
     n.is_primitive_root(m)
 
-Returns true if n is a primitive root modulo m.
+Returns true if C<n> is a primitive root modulo C<m>.
 
 =cut
 
@@ -4243,7 +4244,7 @@ Returns true if n is a primitive root modulo m.
 
     is_prob_prime(n)
 
-Returns true if n is probably prime. The method does some trial division, then it performs a B-PSW test.
+Returns true if C<n> is probably prime. The method does some trial division, then it performs a B-PSW test.
 
 =cut
 
@@ -4251,7 +4252,7 @@ Returns true if n is probably prime. The method does some trial division, then i
 
     n.is_prob_squarefree(k)
 
-Returns true iff C<n> is not a power and is not divisible by a square <= k.
+Returns true iff C<n> is not a power and is not divisible by a square <= C<k>.
 
 =cut
 
@@ -4285,11 +4286,22 @@ Aliases: I<is_fermat_psp>, I<is_pseudoprime>, I<is_fermat_pseudoprime>
 
 =cut
 
+=head2 is_pyramidal
+
+    n.is_pyramidal(k)
+
+Returns true if C<n> is a k-gonal pyramidal number.
+
+    say 15.by { .is_pyramidal(3) }  #=> tetrahedral numbers
+    say 15.by { .is_pyramidal(5) }  #=> pentagonal pyramidal numbers
+
+=cut
+
 =head2 isqrt
 
     n.isqrt
 
-Integer square root of n.
+Integer square root of C<n>.
 
 =cut
 
@@ -4297,7 +4309,7 @@ Integer square root of n.
 
     n.isqrtrem
 
-Returns a list with the integer square root of n and the square root remainder of n.
+Returns a list with the integer square root of C<n> and the square root remainder of C<n>.
 
 Equivalent with:
 
@@ -4329,7 +4341,7 @@ Returns true if C<x> is a real number.
 
     n.is_rough(k)
 
-Returns true if all prime factors of n are >= k.
+Returns true if all prime factors of C<n> are >= C<k>.
 
     say 30.by { .is_rough(3) }  #=> OEIS: A005408
     say 30.by { .is_rough(5) }  #=> OEIS: A007310
@@ -4353,7 +4365,7 @@ It returns true if both C<n> and C<(n-1)/2> are prime.
 
     n.is_semiprime
 
-Returns true if n has exactly two prime factors (not necessarily distinct).
+Returns true if C<n> has exactly two prime factors (not necessarily distinct).
 
 =cut
 
@@ -4361,7 +4373,7 @@ Returns true if n has exactly two prime factors (not necessarily distinct).
 
     n.is_smooth(k)
 
-Returns true if all the prime factors of C<n> are <= k. False otherwise.
+Returns true if all the prime factors of C<n> are <= C<k>. False otherwise.
 
 =cut
 
@@ -4387,7 +4399,7 @@ Aliases: I<is_sqr>, I<is_perfect_square>
 
     n.is_squarefree
 
-Returns true if the prime factorization of n does not include duplicated factors (i.e.: n is not divisible by a square).
+Returns true if the prime factorization of C<n> does not include duplicated factors (i.e.: C<n> is not divisible by a square).
 
 Aliases: I<is_square_free>
 
@@ -4435,7 +4447,7 @@ Teturns true if C<n> is a strong Fibonacci pseudoprime, satisfying:
 
 for Q = -1 and all P.
 
-Odd composite integer n is a strong Fibonacci pseudoprime iff:
+Odd composite integer C<n> is a strong Fibonacci pseudoprime iff:
 
     1) n is a Carmichael number: p-1 | n-1
     2) 2(p + 1) | (n − 1) or 2(p + 1) | (n − p)
@@ -4485,7 +4497,9 @@ Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<i
 
     n.is_super_psp(bases...)
 
-It returns true if the given value of n is a super-pseudoprime to the given bases. When no base is given, the base 2 is used (which represents the Super-Poulet numbers: A050217)
+It returns true if the given value of C<n> is a super-pseudoprime to the given bases.
+
+When no base is given, the base C<2> is used (which represents the Super-Poulet numbers: A050217)
 
     # Super-Poulet numbers (OEIS: A050217)
     say 1e4.range.grep { .is_super_pseudoprime }.grep{ .is_composite }
@@ -4828,7 +4842,7 @@ Return the logarithmic derivative of C<n>, defined as:
 
     lpf(n)
 
-Returns the least prime factor of n.
+Returns the least prime factor of C<n>.
 
 Defined with the base-cases:
 
@@ -4845,7 +4859,7 @@ Example:
 
     lsb(n)
 
-Returns the least significant bit of n.
+Returns the index of the least significant bit of C<n> that is non-zero.
 
     say 0b110010101111000000.lsb    # 6
 
@@ -4855,7 +4869,7 @@ Returns the least significant bit of n.
 
     lucas(n)
 
-Returns the n-th Lucas number.
+Returns the C<n>-th Lucas number.
 
 =cut
 
@@ -4864,7 +4878,7 @@ Returns the n-th Lucas number.
     k.lucas_carmichael(n)
     k.lucas_carmichael(a, b)
 
-Returns an array with all the Lucas-Carmichael numbers <= n or in the range C<a..b> that have exactly C<k> prime factors.
+Returns an array with all the Lucas-Carmichael numbers <= C<n> or in the range C<a..b> that have exactly C<k> prime factors.
 
     say 3.lucas_carmichael(10000)         # 3-Lucas-Carmichael numbers
     say 4.lucas_carmichael(10000, 100000) # 4-Lucas-Carmichael numbers in range
@@ -4889,7 +4903,7 @@ Aliases: I<lucas_miller_factor>
 
     lucasmod(n,m)
 
-Efficiently compute the n-th Lucas number modulo m.
+Efficiently compute the n-th Lucas number modulo C<m>.
 
 Aliases: I<lucasmod>
 
@@ -4913,7 +4927,7 @@ Aliases: I<lucasu>
 
     lucasUmod(P,Q,n,m)
 
-Efficiently compute the Lucas C<U_n(P, Q)> function modulo m.
+Efficiently compute the Lucas C<U_n(P, Q)> function modulo C<m>.
 
 Aliases: I<lucasumod>
 
@@ -4923,7 +4937,7 @@ Aliases: I<lucasumod>
 
     lucasUVmod(P,Q,n,m)
 
-Efficiently compute the Lucas C<U_n(P, Q)> and C<V_n(P,Q)> functions modulo m.
+Efficiently compute the Lucas C<U_n(P, Q)> and C<V_n(P,Q)> functions modulo C<m>.
 
 Equivalent with:
 
@@ -4951,7 +4965,7 @@ Aliases: I<lucasv>
 
     lucasVmod(P,Q,n,m)
 
-Efficiently compute the Lucas C<V_n(P, Q)> function modulo m.
+Efficiently compute the Lucas C<V_n(P, Q)> function modulo C<m>.
 
 Aliases: I<lucasVmod>
 
@@ -4961,7 +4975,7 @@ Aliases: I<lucasVmod>
 
     n.make_coprime(k)
 
-Returns the largest divisor of n that is coprime to k.
+Returns the largest divisor of C<n> that is coprime to C<k>.
 
 =cut
 
@@ -5024,7 +5038,7 @@ Example:
     mfac(n,k)
     mfactorial(n,k)
 
-The generalized multi-factorial of n.
+The generalized multi-factorial of C<n>.
 
     say 15.of { .mfac(2) }    # double-factorials (OEIS: A006882)
     say 15.of { .mfac(3) }    # triple-factorials (OEIS: A007661)
@@ -5073,7 +5087,7 @@ Returns an array with all the positive solutions for C<x> to the following modul
 
     a*x^2 + b*x + c == 0 (mod m)
 
-where a,b,c are rational values and m is a positive integer.
+where C<a,b,c> are rational values and C<m> is a positive integer.
 
 Example:
 
@@ -5103,7 +5117,7 @@ Returns the n-th Motzkin number. (OEIS: A001006)
 
     msb(n)
 
-Returns the most significant bit of n.
+Returns the index of the most significant bit of C<n>.
 
     say 0b110010101111000000.msb    # 17
 
@@ -5141,7 +5155,7 @@ Returns the Not-a-Number special value (C<NaN>).
 
     nbsigma(n, k=1)
 
-Returns the sum of the non-bi-unitary divisors of n, each divisor raised to the k-th power.
+Returns the sum of the non-bi-unitary divisors of C<n>, each divisor raised to the k-th power.
 
     say 30.of { .nbsigma }      #=> OEIS: A319072
 
@@ -5151,7 +5165,7 @@ Returns the sum of the non-bi-unitary divisors of n, each divisor raised to the 
 
     nbsigma0(n)
 
-Returns the count of the non-bi-unitary divisors of n.
+Returns the count of the non-bi-unitary divisors of C<n>.
 
 =cut
 
@@ -5193,7 +5207,7 @@ Aliases: I<rd>, I<st>, I<th>
 
     x.neg
 
-Negates the sign of <Cx> (equivalent with: C<-x>).
+Negates the sign of C<x> (equivalent with: C<-x>).
 
 =cut
 
@@ -5201,7 +5215,7 @@ Negates the sign of <Cx> (equivalent with: C<-x>).
 
     nesigma(n, k=1)
 
-Returns the sum of the non-exponential divisors of n, each divisor raised to the k-th power.
+Returns the sum of the non-exponential divisors of C<n>, each divisor raised to the k-th power.
 
     say 30.of { .nesigma }      #=> OEIS: A160135
 
@@ -5211,7 +5225,7 @@ Returns the sum of the non-exponential divisors of n, each divisor raised to the
 
     nesigma0(n)
 
-Returns the count of the non-exponential divisors of n.
+Returns the count of the non-exponential divisors of C<n>.
 
     say 30.of { .nesigma0 }     #=> OEIS: A160097
 
@@ -5360,7 +5374,7 @@ Returns the negative infinity special value (C<-Inf>).
 
     nisigma(n, k=1)
 
-Returns the sum of the non-infinitary divisors of n, each divisor raised to the k-th power.
+Returns the sum of the non-infinitary divisors of C<n>, each divisor raised to the k-th power.
 
     say 30.of { .nisigma }      #=> OEIS: A348271
 
@@ -5370,7 +5384,7 @@ Returns the sum of the non-infinitary divisors of n, each divisor raised to the 
 
     nisigma0(n)
 
-Returns the count of the non-infinitary divisors of n.
+Returns the count of the non-infinitary divisors of C<n>.
 
     say 30.of { .nisigma0 }     #=> OEIS: A348341
 
@@ -5560,7 +5574,7 @@ Although this may or may not be actually faster.
 
     nusigma(n, k=1)
 
-Returns the sum of the non-unitary divisors of n, each divisor raised to the k-th power.
+Returns the sum of the non-unitary divisors of C<n>, each divisor raised to the k-th power.
 
     say 30.of { .nusigma }     #=> OEIS: A048146
 
@@ -5570,7 +5584,7 @@ Returns the sum of the non-unitary divisors of n, each divisor raised to the k-t
 
     nusigma0(n)
 
-Returns the count of the non-unitary divisors of n.
+Returns the count of the non-unitary divisors of C<n>.
 
     say 30.of { .nusigma0 }    #=> OEIS: A048105
 
@@ -5580,7 +5594,7 @@ Returns the count of the non-unitary divisors of n.
 
     n.of {|k| ... }
 
-Returns an array with n elements mapped to the given block. The block is called with k = 0,1,2...,n-1.
+Returns an array with C<n> elements mapped to the given block. The block is called with C<k = 0,1,2...,n-1>.
 
     say 10.of { _*_ }       #=> first 10 squares
     say 10.of { .fib }      #=> first 10 Fibonacci numbers
@@ -5592,7 +5606,7 @@ Returns an array with n elements mapped to the given block. The block is called 
     n.omega_prime_divisors
     n.omega_prime_divisors(k)
 
-Returns the C<k>-omega prime divisors of n.
+Returns the C<k>-omega prime divisors of C<n>.
 
     say 5040.omega_prime_divisors(4)    #=> [210, 420, 630, 840, 1260, 1680, 2520, 5040]
 
@@ -5607,7 +5621,7 @@ When C<k> is omitted, an array of arrays with the C<k>-omega prime divisors of C
     k.omega_prime_count(n)
     k.omega_prime_count(a,b)
 
-Returns the number of C<k>-omega primes <= n, or in the range C<a..b>.
+Returns the number of C<k>-omega primes <= C<n>, or in the range C<a..b>.
 
     say 1.omega_prime_count(100)            # number prime powers <= 100
     say 2.omega_prime_count(50, 100)        # number of 2-omega primes in range 50..100
@@ -5621,7 +5635,7 @@ Aliases: I<omega_primepi>
     k.omega_primes(n)
     k.omega_primes(a,b)
 
-Returns an array with C<k>-omega primes <= n, or in the range C<a..b>.
+Returns an array with C<k>-omega primes <= C<n>, or in the range C<a..b>.
 
 C<k>-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
@@ -5642,7 +5656,7 @@ Returns the 1 value.
 
     partitions(n)
 
-Returns the number of partitions of n.
+Returns the number of partitions of C<n>.
 
 Aliases: I<partition_number>
 
@@ -5736,7 +5750,7 @@ The product of the factors will give back C<n>. However, some factors may be com
     k.almost_prime_count(n)
     k.almost_prime_count(a,b)
 
-Returns the number of k-almost primes <= n, or in the range C<a..b>.
+Returns the number of k-almost primes <= C<n>, or in the range C<a..b>.
 
     say 1.almost_prime_count(100)           # count of primes <= 100
     say 2.almost_prime_count(50, 100)       # count of semiprimes in range 50..100
@@ -5763,7 +5777,7 @@ Aliases: I<pminus1_factor>
     pn_primes(n)
     pn_primes(a,b)
 
-Returns the first n prime numbers, or the primes in the range prime(a)..prime(b).
+Returns the first C<n> prime numbers, or the primes in the range C<prime(a)..prime(b)>.
 
     say pn_primes(25)        # the first 25 primes
     say pn_primes(100, 110)  # the primes from 100-th prime to 110-th prime (inclusive)
@@ -5774,7 +5788,7 @@ Returns the first n prime numbers, or the primes in the range prime(a)..prime(b)
 
     pn_primorial(n)
 
-Returns the product of the first n primes.
+Returns the product of the first C<n> primes.
 
 =cut
 
@@ -5830,7 +5844,7 @@ Particularly useful for:
 
     n.popcount
 
-Number of 1's in binary representation of n.
+Number of 1's in binary representation of C<n>.
 
 This value is also known as the Hamming weight value.
 
@@ -5842,7 +5856,7 @@ Aliases: I<hammingweight>
 
     n.power_count
 
-Returns the number of perfect powers <= n.
+Returns the number of perfect powers <= C<n>.
 
     say power_count(10**6)      #=> 1111
     say power_count(10**20)     #=> 10004650118
@@ -5855,7 +5869,7 @@ Aliases: I<perfect_power_count>
 
     k.power_divisors(n)
 
-Return an array with the k-th power divisors of n.
+Return an array with the k-th power divisors of C<n>.
 
     say 3.power_divisors(10!)       #=> [1, 8, 27, 64, 216, 1728]
     say 4.power_divisors(10!)       #=> [1, 16, 81, 256, 1296, 20736]
@@ -5871,7 +5885,7 @@ Equivalent with:
     k.powerfree_count(n)
     k.powerfree_count(a,b)
 
-It efficiently counts the number of k-powerfree numbers <= n, or in the range C<a..b>:
+It efficiently counts the number of k-powerfree numbers <= C<n>, or in the range C<a..b>:
 
     say 3.powerfree_count(100)       #=> count of cubefree numbers <= 100
     say 3.powerfree_count(50, 100)   #=> count of cubefree numbers in the range 50..100
@@ -5882,7 +5896,7 @@ It efficiently counts the number of k-powerfree numbers <= n, or in the range C<
 
     k.powerfree_divisors(n)
 
-Returns an array with the k-powerfree divisors of n.
+Returns an array with the k-powerfree divisors of C<n>.
 
     say 2.powerfree_divisors(5040)      # squarefree divisors of 5040
     say 3.powerfree_divisors(5040)      # cubefree divisors of 5040
@@ -5905,7 +5919,7 @@ Returns the k-powerfree part of C<n>.
     k.powerfree_part_sum(n)
     k.powerfree_part_sum(a,b)
 
-Returns the sum of the k-powerfree parts of integers <= n or in the range C<a..b>:
+Returns the sum of the k-powerfree parts of integers <= C<n> or in the range C<a..b>:
 
     say 2.powerfree_part_sum(100)            # sum of squarefree part of n for n <= 100
     say 3.powerfree_part_sum(50, 100)        # sum of cubefree part of n for n in the range 50..100
@@ -5916,7 +5930,7 @@ Returns the sum of the k-powerfree parts of integers <= n or in the range C<a..b
 
     k.powerfree_sigma(n, j=1)
 
-Returns the sum of the k-powerfree divisors of n, each divisor raised to the power j.
+Returns the sum of the k-powerfree divisors of C<n>, each divisor raised to the power C<j>.
 
     say 30.of { 2.powerfree_sigma(_) }        # OEIS: A048250
     say 30.of { 3.powerfree_sigma(_) }        # OEIS: A073185
@@ -5931,7 +5945,7 @@ Equivalent with (but much faster):
 
     k.powerfree_sigma0(n)
 
-Returns the number of the k-powerfree divisors of n.
+Returns the number of the k-powerfree divisors of C<n>.
 
     say 30.of { 3.powerfree_sigma0(_) }       # OEIS: A073184
 
@@ -5942,7 +5956,7 @@ Returns the number of the k-powerfree divisors of n.
     k.powerfree_sum(n)
     k.powerfree_sum(a,b)
 
-Returns the sum of k-powerfree numbers <= n or in the range C<a..b>:
+Returns the sum of k-powerfree numbers <= C<n> or in the range C<a..b>:
 
     say 2.powerfree_sum(100)            # sum of squarefree numbers <= 100
     say 3.powerfree_sum(50, 100)        # sum of cubefree numbers in the range 50..100
@@ -5953,7 +5967,7 @@ Returns the sum of k-powerfree numbers <= n or in the range C<a..b>:
 
     k.powerfree_udivisors(n)
 
-Returns an array with the k-powerfree unitary divisors of n.
+Returns an array with the k-powerfree unitary divisors of C<n>.
 
     say 2.powerfree_udivisors(5040)      # squarefree unitary divisors of 5040
     say 3.powerfree_udivisors(5040)      # cubefree unitary divisors of 5040
@@ -5971,7 +5985,7 @@ Aliases: I<powerfree_unitary_divisors>, I<unitary_powerfree_divisors>
 
     k.powerfree_usigma(n, j=1)
 
-Returns the sum of the k-powerfree unitary divisors of n, each divisor raised to the power j.
+Returns the sum of the k-powerfree unitary divisors of C<n>, each divisor raised to the power C<j>.
 
     say 20.of { 2.powerfree_usigma(_) }        # OEIS: A092261
     say 20.of { 2.powerfree_usigma(_, 2) }     # OEIS: A091306
@@ -5986,7 +6000,7 @@ Equivalent with (but much faster):
 
     k.powerfree_usigma0(n)
 
-Returns the number of the k-powerfree unitary divisors of n.
+Returns the number of the k-powerfree unitary divisors of C<n>.
 
     say 20.of { 2.powerfree_usigma0(_) }       # OEIS: A056671
 
@@ -5997,7 +6011,7 @@ Returns the number of the k-powerfree unitary divisors of n.
     k.powerful(n)
     k.powerful(a,b)
 
-It efficiently generates all the k-powerful numbers <= n, or in the range C<a..b>.
+It efficiently generates all the k-powerful numbers <= C<n>, or in the range C<a..b>.
 
     say 2.powerful(100)          #=> 2-powerful numbers <= 100
     say 2.powerful(50, 100)      #=> 2-powerful numbers in the range 50..100
@@ -6009,7 +6023,7 @@ It efficiently generates all the k-powerful numbers <= n, or in the range C<a..b
     k.powerful_count(n)
     k.powerful_count(a,b)
 
-It efficiently counts the number of k-powerful numbers <= n, or in the range C<a..b>;
+It efficiently counts the number of k-powerful numbers <= C<n>, or in the range C<a..b>;
 
     say 2.powerful_count(100)       #=> count of 2-powerful numbers <= 100
     say 2.powerful_count(50, 100)   #=> count of 2-powerful numbers in the range 50..100
@@ -6020,7 +6034,7 @@ It efficiently counts the number of k-powerful numbers <= n, or in the range C<a
 
     k.power_sigma(n, j=1)
 
-Returns the sum of the k-th power divisors of n, each divisor raised to the power j.
+Returns the sum of the k-th power divisors of C<n>, each divisor raised to the power C<j>.
 
     say 30.of { 2.power_sigma(_) }        # OEIS: A035316
     say 30.of { 3.power_sigma(_) }        # OEIS: A113061
@@ -6035,7 +6049,7 @@ Equivalent with (but much faster):
 
     k.power_sigma0(n)
 
-Returns the number of the k-th power divisors of n.
+Returns the number of the k-th power divisors of C<n>.
 
     say 30.of { 2.power_sigma0(_) }       # OEIS: A046951
 
@@ -6062,7 +6076,7 @@ Aliases: I<power_unitary_divisors>, I<unitary_power_divisors>
 
     k.power_usigma(n, j=1)
 
-Returns the sum of the k-th power unitary divisors of n, each divisor raised to the power j.
+Returns the sum of the k-th power unitary divisors of C<n>, each divisor raised to the power C<j>.
 
 Equivalent with (but much faster):
 
@@ -6074,7 +6088,7 @@ Equivalent with (but much faster):
 
     k.power_usigma0(n)
 
-Returns the number of the k-th power unitary divisors of n.
+Returns the number of the k-th power unitary divisors of C<n>.
 
     say 30.of { 2.power_usigma0(_) }       # OEIS: A056624
 
@@ -6189,7 +6203,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
     n.primality_pretest()
 
-The method returns true when C<n> passes the internal primality pretest (when n is large enough and it has no small factors).
+The method returns true when C<n> passes the internal primality pretest (when C<n> is large enough and it has no small factors).
 
 =cut
 
@@ -6229,7 +6243,7 @@ Aliases: I<nth_prime_lower>
     primepi(n)
     primepi(a,b)
 
-Returns the number of primes <= n, or in the range C<a..b>.
+Returns the number of primes <= C<n>, or in the range C<a..b>.
 
 Aliases: I<prime_count>, I<count_primes>
 
@@ -6271,7 +6285,7 @@ Returns the exponent C<k> if C<n> is a power of the form C<n = p^k> for some pri
     prime_power_count(n)
     prime_power_count(a,b)
 
-Returns the number of prime powers <= n, or in the range C<a..b>.
+Returns the number of prime powers <= C<n>, or in the range C<a..b>.
 
     say prime_power_count(1e15)     # number of prime powers <= 10^15
     say prime_power_count(1e6, 1e8) # number of prime powers in [10^6, 10^8]
@@ -6298,7 +6312,7 @@ Upper bound for C<prime_power_count(n)>.
 
     n.prime_power_divisors
 
-Returns the prime power divisors of n.
+Returns the prime power divisors of C<n>.
 
     say prime_power_divisors(5040)  #=> [2, 3, 4, 5, 7, 8, 9, 16]
 
@@ -6323,7 +6337,7 @@ Aliases: I<nth_prime_power_lower>
     prime_powers(n)
     prime_powers(a,b)
 
-Returns an array with the prime powers <= n, or in the range C<a..b>.
+Returns an array with the prime powers <= C<n>, or in the range C<a..b>.
 
     say prime_powers(100)          # prime powers <= 100
     say prime_powers(50, 100)      # prime powers in the range [50, 100]
@@ -6334,7 +6348,7 @@ Returns an array with the prime powers <= n, or in the range C<a..b>.
 
     n.prime_power_sigma(k=1)
 
-Sum of the prime power divisors of n, each divisor raised to the k-th power.
+Sum of the prime power divisors of C<n>, each divisor raised to the k-th power.
 
     say prime_power_sigma(10!)      #=> 667
     say prime_power_sigma(10!, 2)   #=> 95459
@@ -6349,7 +6363,7 @@ Equivalent with:
 
     prime_power_sigma0(n)
 
-Returns the number of prime power divisors of n.
+Returns the number of prime power divisors of C<n>.
 
 Equivalent with:
 
@@ -6361,7 +6375,7 @@ Equivalent with:
 
     prime_power_udivisors(n)
 
-Returns the unitary prime power divisors of n.
+Returns the unitary prime power divisors of C<n>.
 
     say prime_power_udivisors(10!)  #=> [7, 25, 81, 256]
 
@@ -6389,7 +6403,7 @@ Aliases: I<nth_prime_power_upper>
 
     Number.prime_power_usigma(k=1)
 
-Returns the sum of the unitary prime power divisors of n, each divisor raised to power C<k>.
+Returns the sum of the unitary prime power divisors of C<n>, each divisor raised to power C<k>.
 
     say prime_power_usigma(10!)     #=> 369     (== 7 + 25 + 81 + 256)
     say prime_power_usigma(10!, 2)  #=> 72771   (== 7^2 + 25^2 + 81^2 + 256^2)
@@ -6404,7 +6418,7 @@ Equivalent with:
 
     prime_power_usigma0(n)
 
-Returns the number of unitary prime power divisors of n.
+Returns the number of unitary prime power divisors of C<n>.
 
 Equivalent with:
 
@@ -6416,7 +6430,7 @@ Equivalent with:
 
     n.prime_root
 
-Returns the prime C<p> if n can be expressed as C<n = p^k> for some prime number C<p> and integer C<k>. Returns C<n> otherwise.
+Returns the prime C<p> if C<n> can be expressed as C<n = p^k> for some prime number C<p> and an integer C<k>. Returns C<n> otherwise.
 
     say prime_root(15)      #=> 15
     say prime_root(43**5)   #=> 43
@@ -6428,7 +6442,7 @@ Returns the prime C<p> if n can be expressed as C<n = p^k> for some prime number
     primes(n)
     primes(a,b)
 
-Returns an array with the prime numbers <= n, or in the range C<a..b>.
+Returns an array with the prime numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
@@ -6436,7 +6450,7 @@ Returns an array with the prime numbers <= n, or in the range C<a..b>.
 
     n.prime_sigma(k=1)
 
-Sum of the unique prime divisors of n, each divisor raised to the k-th power.
+Sum of the unique prime divisors of C<n>, each divisor raised to the k-th power.
 
     say prime_sigma(100!)       #=> 1060
     say prime_sigma(100!, 2)    #=> 65796
@@ -6447,7 +6461,7 @@ Sum of the unique prime divisors of n, each divisor raised to the k-th power.
 
     prime_sigma0(n)
 
-Returns the number of prime divisors of n.
+Returns the number of prime divisors of C<n>.
 
 Equivalent with:
 
@@ -6460,7 +6474,7 @@ Equivalent with:
     prime_sum(n)
     prime_sum(a,b,k=1)
 
-Sum of the prime numbers <= n, or in the range C<a..b>, each prime raised to the k-th power.
+Sum of the prime numbers <= C<n>, or in the range C<a..b>, each prime raised to the k-th power.
 
 Aliases: I<primes_sum>, I<sum_primes>
 
@@ -6490,7 +6504,7 @@ Aliases: I<nth_prime_upper>
 
     n.prime_usigma(k=1)
 
-Sum of the unique unitary prime divisors of n, each divisor raised to the k-th power.
+Sum of the unique unitary prime divisors of C<n>, each divisor raised to the k-th power.
 
     say prime_usigma(100!)      #=> 732
     say prime_usigma(100!, 2)   #=> 55330
@@ -6501,7 +6515,7 @@ Sum of the unique unitary prime divisors of n, each divisor raised to the k-th p
 
     prime_usigma0(n)
 
-The number of unique unitary prime divisors of n.
+The number of unique unitary prime divisors of C<n>.
 
 =cut
 
@@ -6509,7 +6523,7 @@ The number of unique unitary prime divisors of n.
 
     n.primitive_part(f)
 
-Returns the primitive part of C<f(n)>, for n > 0, such that:
+Returns the primitive part of C<f(n)>, for C<n> > C<0>, such that:
 
     a(n) = primitive part of f(n)
     f(n) = Product_{d|n} a(d)
@@ -6537,7 +6551,7 @@ Returns the
 
     n.primorial_deflation()
 
-Primorial deflation of n, satisfying:
+Primorial deflation of C<n>, satisfying:
 
     primorial_inflation(primorial_deflation(n)) = n
 
@@ -6551,10 +6565,11 @@ Defined as:
 
     n.primorial_inflation()
 
-Primorial inflation of n: fully multiplicative with a(p) = primorial(p).
+Primorial inflation of C<n>.
 
 Defined as:
 
+    primorial_inflation(n) = n.factor.prod {|p| primorial(p) }
     primorial_inflation(n) = A108951(n)
 
 The method also accepts C<n> to be a fraction, which is computed as:
@@ -6592,7 +6607,7 @@ Returns the n-th k-gonal pyramidal number.
 
     qnr(n)
 
-Returns the least quadratic non-residue of n.
+Returns the least quadratic non-residue of C<n>.
 
     say qnr(17676352761153241)      #=> 37
     say qnr(172138573277896681)     #=> 41
@@ -6747,7 +6762,7 @@ Returns a random n-digit prime.
     random_prime(n)
     random_prime(a,b)
 
-Returns a random prime <= n, or in the range C<a..b>.
+Returns a random prime <= C<n>, or in the range C<a..b>.
 
     say random_prime(100)         # random prime in range [2, 100]
     say random_prime(100, 1000)   # random prime in range [100, 1000]
@@ -6875,7 +6890,7 @@ For negative values of C<k>, rising factorial is defined as:
 
     root(n,k)
 
-The k-th root of n, defined as:
+The k-th root of C<n>, defined as:
 
     n**(1/k)
 
@@ -6897,7 +6912,7 @@ Rotate the digits of C<n> to the left when C<k> is positive or to the right othe
     k.rough_count(n)
     k.rough_count(a,b)
 
-Returns the number of k-rough numbers <= n, or in the range C<a..b>.
+Returns the number of k-rough numbers <= C<n>, or in the range C<a..b>.
 
     say 97.rough_count(1e6)    #=> 122005
     say 23.rough_count(1e9)    #=> 171024023
@@ -6912,7 +6927,7 @@ Also works with arbitrarily large n:
 
     k.rough_divisors(n)
 
-Returns an array with the divisors of n that are k-rough.
+Returns an array with the divisors of C<n> that are k-rough.
 
 Equivalent with (but more efficient):
 
@@ -6924,7 +6939,7 @@ Equivalent with (but more efficient):
 
     k.rough_part(n)
 
-It returns the k-rough part of n that contains all the prime factors p|n such that p >= k.
+It returns the k-rough part of C<n> that contains all the prime factors C<p|n> such that C<p> >= C<k>.
 
     say 15.of {|n| 3.rough_part(n!) }      #=> OEIS: A049606
 
@@ -7003,7 +7018,7 @@ Aliases: I<nth_semiprime>
     semiprime_count(n)
     semiprime_count(a,b)
 
-Counts the number of semiprimes <= n (OEIS: A072000), or in the range C<a..b>.
+Counts the number of semiprimes <= C<n> (OEIS: A072000), or in the range C<a..b>.
 
     say 20.of {|k| semiprime_count(2**k) }
 
@@ -7014,7 +7029,7 @@ Counts the number of semiprimes <= n (OEIS: A072000), or in the range C<a..b>.
     semiprimes(n)
     semiprimes(a,b)
 
-Returns an array with the semiprimes <= n, or in the range C<a..b>.
+Returns an array with the semiprimes <= C<n>, or in the range C<a..b>.
 
     say semiprimes(100)             # semiprimes <= 100
     say semiprimes(50, 100)         # semiprimes in the range [50, 100]
@@ -7051,7 +7066,7 @@ Aliases: I<sign>
     tau(n)
     sigma0(n)
 
-Returns the number of positive divisors of n.
+Returns the number of positive divisors of C<n>.
 
 =cut
 
@@ -7084,7 +7099,7 @@ Hyperbolic sine function.
     k.smooth_count(n)
     k.smooth_count(a,b)
 
-Returns the number of k-smooth numbers <= n, or in the range C<a..b>.
+Returns the number of k-smooth numbers <= C<n>, or in the range C<a..b>.
 
     say 30.of {|n| 13.smooth_count(10**n) }   #=> OEIS: A106629
 
@@ -7094,7 +7109,7 @@ Returns the number of k-smooth numbers <= n, or in the range C<a..b>.
 
     k.smooth_divisors(n)
 
-Returns an array with the divisors of n that are k-smooth.
+Returns an array with the divisors of C<n> that are k-smooth.
 
 Equivalent with (but more efficient):
 
@@ -7125,7 +7140,7 @@ An optional block can be provided, which is called with two arguments, C<n> and 
 
     k.smooth_part(n)
 
-It efficiently returns the largest divisor of n that is k-smooth.
+It efficiently returns the largest divisor of C<n> that is k-smooth.
 
     say 20.of {|n| 3.smooth_part(n!) }     #=> OEIS: A118381
 
@@ -7166,7 +7181,7 @@ Return C<(nil,nil)> when a solution does not exist.
 
     sopf(n)
 
-Sum of the distinct primes dividing n.
+Sum of the distinct primes dividing C<n>.
 
     say 30.of { .sopf }     #=> OEIS: A008472
 
@@ -7176,7 +7191,7 @@ Sum of the distinct primes dividing n.
 
     sopfr(n)
 
-Sum of primes dividing n (with repetition).
+Sum of the primes dividing C<n> (with repetition).
 
     say 30.of { .sopfr }    #=> OEIS: A001414
 
@@ -7223,7 +7238,7 @@ Returns the square root of C<x>. Equivalent with C<x**(1/2)>.
     n.sqrt_cfrac
     n.sqrt_cfrac(k)
 
-Returns the expansion of the continued fraction for square root of n.
+Returns the expansion of the continued fraction for square root of C<n>.
 
 When an additional argument C<k> is specified, it includes only the first C<k> terms from the expansion period.
 
@@ -7237,7 +7252,7 @@ When an additional argument C<k> is specified, it includes only the first C<k> t
 
     n.sqrt_cfrac_period
 
-Returns the period of the expansion of the continued fraction for square root of n.
+Returns the period of the expansion of the continued fraction for square root of C<n>.
 
     say 28.sqrt_cfrac_period        #=> [3, 2, 3, 10]
 
@@ -7248,7 +7263,7 @@ Returns the period of the expansion of the continued fraction for square root of
     n.sqrt_cfrac_period_each { ... }
     n.sqrt_cfrac_period_each({ ... }, max_iter)
 
-Iterate over the period of the expansion of the continued fraction for square root of n.
+Iterate over the period of the expansion of the continued fraction for square root of C<n>.
 
     28.sqrt_cfrac_period_each {|r| say r }
 
@@ -7258,7 +7273,7 @@ Iterate over the period of the expansion of the continued fraction for square ro
 
     n.sqrt_cfrac_period_len
 
-Returns the length of the period of continued fraction for square root of n. (OEIS: A003285)
+Returns the length of the period of continued fraction for square root of C<n>. (OEIS: A003285)
 
 =cut
 
@@ -7295,7 +7310,7 @@ Returns a Quadratic object, representing C<sqrt(n)>.
 
     square_divisors(n)
 
-Returns the square divisors of n.
+Returns the square divisors of C<n>.
 
     say 5040.square_divisors    #=> [1, 4, 9, 16, 36, 144]
 
@@ -7310,7 +7325,7 @@ Equivalent with:
     squarefree(n)
     squarefree(a,b)
 
-Returns an array with the squarefree numbers <= n, or in the range C<a..b>.
+Returns an array with the squarefree numbers <= C<n>, or in the range C<a..b>.
 
     # Squarefree numbers in the interval [100, 200]
     say squarefree(100, 200)
@@ -7325,7 +7340,7 @@ Returns an array with the squarefree numbers <= n, or in the range C<a..b>.
     k.squarefree_almost_primes(n)
     k.squarefree_almost_primes(a,b)
 
-Returns an array with the squarefree k-almost primes <= n, or in the range C<a..b>.
+Returns an array with the squarefree k-almost primes <= C<n>, or in the range C<a..b>.
 
     say 2.squarefree_almost_primes(100)      #=> squarefree semiprimes <= 100
     say 2.squarefree_almost_primes(50, 100)  #=> squarefree semiprimes in the range 50..100
@@ -7340,7 +7355,7 @@ Returns an array with the squarefree k-almost primes <= n, or in the range C<a..
     square_free_count(n)
     square_free_count(a,b)
 
-Returns the number of squarefree integers <= n, or in the range C<a..b>.
+Returns the number of squarefree integers <= C<n>, or in the range C<a..b>.
 
     # The number of square-free integers between 10^5 and 10^6
     say square_free_count(10**5, 10**6) # 547132
@@ -7356,7 +7371,7 @@ Aliases: I<squarefree_count>
 
     squarefree_divisors(n)
 
-Returns an array with the square-free divisors of n.
+Returns an array with the square-free divisors of C<n>.
 
     say squarefree_divisors(120)  #=> [1, 2, 3, 5, 6, 10, 15, 30]
 
@@ -7367,7 +7382,7 @@ Returns an array with the square-free divisors of n.
     k.squarefree_fermat_psp(base, n)
     k.squarefree_fermat_psp(base, a, b)
 
-Returns an array with all the squarefree Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have exactly C<k> prime factors.
+Returns an array with all the squarefree Fermat pseudoprimes to the given C<base> that are <= C<n> or in the range C<a..b> and have exactly C<k> prime factors.
 
     say 3.squarefree_fermat_psp(2, 10000)           # squarefree 3-Fermat psp to base 2
     say 4.squarefree_fermat_psp(2, 10000, 100000)   # squarefree 4-Fermat psp to base 2 in range
@@ -7379,7 +7394,7 @@ Returns an array with all the squarefree Fermat pseudoprimes to the given C<base
     k.squarefree_almost_prime_count(n)
     k.squarefree_almost_prime_count(a,b)
 
-Returns the number of squarefree k-almost primes <= n, or in the range C<a..b>.
+Returns the number of squarefree k-almost primes <= C<n>, or in the range C<a..b>.
 
     say 1.squarefree_almost_prime_count(1000)          # count of primes <= 1000
     say 2.squarefree_almost_prime_count(50, 1000)      # count of squarefree semiprimes in range 50..1000
@@ -7393,7 +7408,7 @@ Aliases: I<squarefree_almost_primepi>, I<squarefree_almost_prime_count>
     squarefree_semiprime_count(n)
     squarefree_semiprime_count(a,b)
 
-Counts the number of squarefree semiprimes <= n (OEIS: A072613), or in the range C<a..b>.
+Counts the number of squarefree semiprimes <= C<n> (OEIS: A072613), or in the range C<a..b>.
 
     say 10.of {|k| squarefree_semiprime_count(10**k) }  # OEIS: A036351
 
@@ -7406,7 +7421,7 @@ Aliases: I<squarefree_semiprimes_count>
     squarefree_semiprimes(n)
     squarefree_semiprimes(a,b)
 
-Returns an array with the squarefree semiprimes <= n, or in the range C<a..b>.
+Returns an array with the squarefree semiprimes <= C<n>, or in the range C<a..b>.
 
     say squarefree_semiprimes(100)       # squarefree semiprimes <= 100
     say squarefree_semiprimes(50, 100)   # squarefree semiprimes in the range [50, 100]
@@ -7429,7 +7444,7 @@ Sum of the square free divisors of C<n>, each divisor raised to power C<k>.
     k.squarefree_strong_fermat_psp(base, n)
     k.squarefree_strong_fermat_psp(base, a, b)
 
-Returns an array with all the squarefree strong Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have exactly C<k> prime factors.
+Returns an array with all the squarefree strong Fermat pseudoprimes to the given C<base> that are <= C<n> or in the range C<a..b> and have exactly C<k> prime factors.
 
     say 3.squarefree_strong_fermat_psp(2, 1e6)        # squarefree strong 3-Fermat psp to base 2 <= 1e6
     say 4.squarefree_strong_fermat_psp(2, 1e7, 1e8)   # squarefree strong 4-Fermat psp to base 2, in range 1e7..1e8
@@ -7441,7 +7456,7 @@ Returns an array with all the squarefree strong Fermat pseudoprimes to the given
     squarefree_sum(n)
     squarefree_sum(a,b)
 
-Returns the sum of squarefree numbers <= n or in the range C<a..b>. (OEIS: A066779)
+Returns the sum of squarefree numbers <= C<n> or in the range C<a..b>. (OEIS: A066779)
 
     say squarefree_sum(1e12)    #=> 303963551353876732927386
     say squarefree_sum(1e13)    #=> 30396355090144154315002969
@@ -7464,7 +7479,7 @@ Aliases: I<squarefree_unitary_divisors>, I<unitary_squarefree_divisors>
 
     n.squarefree_usigma(k=1)
 
-Sum of the unitary squarefree divisors of n, each divisor raised to the k-th power.
+Sum of the unitary squarefree divisors of C<n>, each divisor raised to the k-th power.
 
     say 5040.squarefree_usigma     #=> 48
     say 5040.squarefree_usigma(2)  #=> 1300
@@ -7475,7 +7490,7 @@ Sum of the unitary squarefree divisors of n, each divisor raised to the k-th pow
 
     squarefree_usigma0(n)
 
-Returns the number of unitary squarefree divisors of n.
+Returns the number of unitary squarefree divisors of C<n>.
 
     say squarefree_usigma0(5040)    #=> 4
 
@@ -7594,7 +7609,7 @@ Stirling numbers of the third kind (also known as Lah numbers).
     k.strong_fermat_psp(base, n)
     k.strong_fermat_psp(base, a, b)
 
-Returns an array with all the strong Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have C<k> distinct prime factors.
+Returns an array with all the strong Fermat pseudoprimes to the given C<base> that are <= C<n> or in the range C<a..b> and have C<k> distinct prime factors.
 
     say 3.strong_fermat_psp(2, 1e6)         # 3-omega strong Fermat psp to base 2
     say 4.strong_fermat_psp(2, 1e6, 1e7)    # 4-omega strong Fermat psp to base 2 in range
@@ -7605,7 +7620,7 @@ Returns an array with all the strong Fermat pseudoprimes to the given C<base> th
 
     subfactorial(n,k=0)
 
-Number of derangements of a set with n elements having exactly k fixed points. Also known as the rencontres numbers.
+Number of derangements of a set with C<n> elements having exactly C<k> fixed points. Also known as the rencontres numbers.
 
     say 20.of { .subfactorial }        #=> OEIS: A000166
     say 20.of { .subfactorial(2) }     #=> OEIS: A000387
@@ -7643,7 +7658,7 @@ Returns an array with the subsets of the integers in the range C<0..n-1>, or ite
 
     sum_of_squares(n)
 
-Returns an array of C<[a,b]> pairs, with a <= b, containing all the positive solutions to the equation:
+Returns an array of C<[a,b]> pairs, with C<a> <= C<b>, containing all the positive solutions to the equation:
 
     n = a^2 + b^2
 
@@ -7674,7 +7689,7 @@ Negative values of C<v> are also supported.
 
     superfactorial(n)
 
-Returns the product of first n factorials.
+Returns the product of first C<n> factorials.
 
     say 10.of { .superfactorial }   #=> OEIS: A000178
 
@@ -7684,7 +7699,7 @@ Returns the product of first n factorials.
 
     superprimorial(n)
 
-Returns the product of first n primorials.
+Returns the product of first C<n> primorials.
 
     say 10.of { .superprimorial }   #=> OEIS: A006939
 
@@ -7817,7 +7832,7 @@ Aliases: I<variations_with_repetition>
 
     udivisors(n)
 
-Returns an array with the unitary divisors of n.
+Returns an array with the unitary divisors of C<n>.
 
     say 120.udivisors   #=> [1, 3, 5, 8, 15, 24, 40, 120]
 
@@ -7849,9 +7864,9 @@ Returns the sum of the unitary divisors of C<n>, each divisor raised to the powe
 
     usigma0(n)
 
-Returns the number of unitary divisor of n.
+Returns the number of unitary divisor of C<n>.
 
-Equivalently, the number of squarefree divisors of n.
+Equivalently, the number of squarefree divisors of C<n>.
 
     say usigma0(5040)   #=> 16
 
@@ -7863,7 +7878,7 @@ Aliases: I<squarefree_sigma0>
 
     n.valuation(k)
 
-Returns the number of times n is divisible by k.
+Returns the number of times C<n> is divisible by C<k>.
 
     say valuation(2**32, 4)     # prints: 16
 

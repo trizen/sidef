@@ -57,4 +57,17 @@ assert(!is_almost_prime(3449**74 * 1e100.random_prime, 76))
 assert(!is_almost_prime(3449**76 * 1e100.random_prime, 76))
 assert(is_almost_prime(3449**75 * 1e100.random_prime, 76))
 
+func A358860(n) {
+    for k in (1..Inf) {
+        var t = pyramidal(k, n)
+        if (t.divisors.count {|d| d.is_pyramidal(n) } == n) {
+            return t
+        }
+    }
+}
+
+assert_eq(A358860.map(3..9), %n[56, 140, 4200, 331800, 611520, 8385930, 1071856800])
+assert_eq(A358860(11), 78540000)
+assert_eq(A358860(14), 22241349900)
+
 say ":: Test passed!"

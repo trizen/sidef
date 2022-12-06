@@ -26959,6 +26959,65 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub is_pyramidal {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $r = Math::GMPz::Rmpz_init_nobless();
+
+        # When k = 2, check if n is a triangular number
+        if (Math::GMPz::Rmpz_cmp_ui($k, 2) == 0) {
+            return (
+                    __is_polygonal__($n, Math::GMPz::Rmpz_init_set_ui(3))
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        Math::GMPz::Rmpz_mul_ui($t, $n, 6);
+        Math::GMPz::Rmpz_sub_ui($u, $k, 2);
+        Math::GMPz::Rmpz_div($u, $t, $u);
+
+        # u = floor(((6*n)/(r-2) + floor(n^(1/3)))^(1/3))
+        if (Math::GMPz::Rmpz_cmp_ui($k, 9000) <= 0) {
+            Math::GMPz::Rmpz_root($r, $n, 3);
+            Math::GMPz::Rmpz_add($u, $u, $r);
+            Math::GMPz::Rmpz_root($u, $u, 3);
+        }
+
+        # u = ceil(((6*n)/(r-2))^(1/3))
+        else {
+            my $f = Math::MPFR::Rmpfr_init2(Math::GMPz::Rmpz_sizeinbase($n, 2));
+            Math::MPFR::Rmpfr_set_z($f, $u, $round_z);
+            Math::MPFR::Rmpfr_cbrt($f, $f, $round_z);
+            Math::MPFR::Rmpfr_ceil($f, $f);
+            Math::MPFR::Rmpfr_get_z($u, $f, $round_z);
+        }
+
+        Math::GMPz::Rmpz_mul($t, $u, $u);
+        Math::GMPz::Rmpz_add($t, $t, $u);         # t = n*(n+1)
+        Math::GMPz::Rmpz_mul($r, $u, $k);         # r = n*k
+        Math::GMPz::Rmpz_submul_ui($r, $u, 2);    # r = n*(k-2)
+        Math::GMPz::Rmpz_sub($r, $r, $k);         # r = n*(k-2) - k
+        Math::GMPz::Rmpz_add_ui($r, $r, 5);       # r = n*(k-2) - (k-5)
+        Math::GMPz::Rmpz_mul($r, $r, $t);         # r = n*(n+1) * (n*(k-2) - (k-5))
+        Math::GMPz::Rmpz_divexact_ui($r, $r, 6);
+
+        (Math::GMPz::Rmpz_cmp($r, $n) == 0)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
     #
     ## Polygonal inverses for a given number
     #
