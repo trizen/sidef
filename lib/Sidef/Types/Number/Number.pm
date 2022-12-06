@@ -26995,12 +26995,12 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_root($u, $u, 3);
         }
 
-        # u = ceil(((6*n)/(r-2))^(1/3))
+        # u = round(((6*n)/(r-2))^(1/3))
         else {
             my $f = Math::MPFR::Rmpfr_init2(Math::GMPz::Rmpz_sizeinbase($n, 2));
             Math::MPFR::Rmpfr_set_z($f, $u, $round_z);
             Math::MPFR::Rmpfr_cbrt($f, $f, $round_z);
-            Math::MPFR::Rmpfr_ceil($f, $f);
+            Math::MPFR::Rmpfr_round($f, $f);
             Math::MPFR::Rmpfr_get_z($u, $f, $round_z);
         }
 

@@ -724,6 +724,7 @@ assert_eq(-99761490592 * -99761490592, 9952355005137704510464)
 
 for k in (2..100, 200..210, 1234..1254, 9000..9010, 30_000..30_010, 100_000..100_010) {
     assert_eq(20.of { .pyramidal(k) }.grep { !.is_pyramidal(k) }, [])
+    assert_eq(20.of { 1e6.irand.pyramidal(k) }.grep { !.is_pyramidal(k) }, [])
 }
 
 say "** Tests passed!"
