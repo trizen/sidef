@@ -8363,6 +8363,8 @@ package Sidef::Types::Number::Number {
                 goto Math_GMPz__Math_GMPz;
             }
 
+            $y || goto &_nan;
+
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_mod_ui($r, $x, $y);
             return $r;
@@ -16420,12 +16422,19 @@ package Sidef::Types::Number::Number {
         my $remainder = $n;
 
         if ($size > 100) {    # greater than 10^30
+
+            my $t = Math::GMPz::Rmpz_init();
+
             foreach my $j (5 .. 9) {
 
                 my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
 
                 $bigomega  = scalar(@trial_factors);
                 $remainder = _any2mpz($r);
+
+                if ($bigomega > $k) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
 
                 if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                     if ($bigomega == $k) {
@@ -16436,9 +16445,8 @@ package Sidef::Types::Number::Number {
                     }
                 }
 
-                my $log = __ilog__($remainder, _next_prime(10**$j));
-
-                $bigomega + $log + 1 >= $k
+                Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $bigomega);
+                Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                   or return Sidef::Types::Bool::Bool::FALSE;
 
                 my $r_is_prime = _is_prob_prime($remainder);
@@ -16502,6 +16510,10 @@ package Sidef::Types::Number::Number {
                     $remainder = _any2mpz($$c);
                     $bigomega  = scalar(@prime_factors);
 
+                    if ($bigomega > $k) {
+                        return Sidef::Types::Bool::Bool::FALSE;
+                    }
+
                     if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                         if ($bigomega == $k) {
                             return Sidef::Types::Bool::Bool::TRUE;
@@ -16511,9 +16523,8 @@ package Sidef::Types::Number::Number {
                         }
                     }
 
-                    my $log = __ilog__($remainder, _next_prime(10**$j));
-
-                    $bigomega + $log + 1 >= $k
+                    Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $bigomega);
+                    Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                       or return Sidef::Types::Bool::Bool::FALSE;
 
                     if (    $j == 8
@@ -16645,12 +16656,19 @@ package Sidef::Types::Number::Number {
         my $size      = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
         if ($size > 100) {    # greater than 10^30
+
+            my $t = Math::GMPz::Rmpz_init();
+
             foreach my $j (5 .. 9) {
 
                 my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
 
                 $omega     = scalar(List::Util::uniq(@trial_factors));
                 $remainder = _any2mpz($r);
+
+                if ($omega > $k) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
 
                 if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                     if ($omega == $k) {
@@ -16661,9 +16679,8 @@ package Sidef::Types::Number::Number {
                     }
                 }
 
-                my $log = __ilog__($remainder, _next_prime(10**$j));
-
-                $omega + $log + 1 >= $k
+                Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $omega);
+                Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                   or return Sidef::Types::Bool::Bool::FALSE;
 
                 my $r_is_prime_power = Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($remainder, 10));
@@ -16719,6 +16736,10 @@ package Sidef::Types::Number::Number {
                     $remainder = _any2mpz($$c);
                     $omega     = scalar(List::Util::uniq(map { ref($_) ? "$$_" : $_ } @prime_factors));
 
+                    if ($omega > $k) {
+                        return Sidef::Types::Bool::Bool::FALSE;
+                    }
+
                     if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                         if ($omega == $k) {
                             return Sidef::Types::Bool::Bool::TRUE;
@@ -16728,9 +16749,8 @@ package Sidef::Types::Number::Number {
                         }
                     }
 
-                    my $log = __ilog__($remainder, _next_prime(10**$j));
-
-                    $omega + $log + 1 >= $k
+                    Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $omega);
+                    Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                       or return Sidef::Types::Bool::Bool::FALSE;
 
                     if (    $j == 8
