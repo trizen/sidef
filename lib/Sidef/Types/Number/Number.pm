@@ -18832,8 +18832,7 @@ package Sidef::Types::Number::Number {
         }
 
         my @factors;
-        my $factorized    = 0;
-        my $m_is_positive = $m->is_positive;
+        my $factorized = 0;
 
         my $collect_factors = sub {
             my ($f) = @_;
@@ -18861,7 +18860,7 @@ package Sidef::Types::Number::Number {
 
         $factorized || $collect_factors->($n->trial_factor($m->inc->mul(_set_int(1e6))));
 
-        # Special methods that depdend on the special form of n
+        # Methods that depdend on the special form of n
         $factorized || $collect_factors->($n->fermat_factor($m->inc->mul(_set_int(1e3))));
         $factorized || $collect_factors->($n->holf_factor($m->inc->mul(_set_int(1e4))));
 
@@ -18890,8 +18889,8 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        # Special methods that can find extra special factors, recursively
-        if (@composite_factors and $m_is_positive) {
+        # Methods that can find special factors, recursively
+        if (@composite_factors and $m->is_positive) {
 
 #<<<
             my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))) });
@@ -18904,6 +18903,7 @@ package Sidef::Types::Number::Number {
             my $pp1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(5e4))) });
             my $chebyshev_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(5e3))) });
             my $prho_block      = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))) });
+            my $ecm_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(600)), $m->mul(_set_int(20))) });
 #>>>
 
             @composite_factors = map { @{$_->factor($fermat_block)} } @composite_factors;
@@ -18911,6 +18911,7 @@ package Sidef::Types::Number::Number {
             @composite_factors = map { @{$_->factor($pell_block)} } @composite_factors;
             @composite_factors = map { @{$_->factor($FLT_block)} } @composite_factors;
 
+            @composite_factors = map { @{$_->factor($ecm_block)} } @composite_factors;
             @composite_factors = map { @{$_->factor($pm1_block)} } @composite_factors;
             @composite_factors = map { @{$_->factor($pp1_block)} } @composite_factors;
             @composite_factors = map { @{$_->factor($prho_block)} } @composite_factors;
