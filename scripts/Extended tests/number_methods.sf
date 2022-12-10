@@ -70,4 +70,47 @@ assert_eq(A358860.map(3..9), %n[56, 140, 4200, 331800, 611520, 8385930, 10718568
 assert_eq(A358860(11), 78540000)
 assert_eq(A358860(14), 22241349900)
 
+assert_eq(
+    %n[56, 140, 4200, 331800, 611520, 8385930, 1071856800, 41086892000, 78540000, 38102655397426620, 59089382788800, 22241349900, 2326493030400, 7052419469195100, 886638404171520].map_kv {|k,v|
+        v.divisors.count {|d| d.is_pyramidal(k+3) } == (k+3)
+    },
+    15.of(true)
+)
+
+assert_eq(
+    %n[6, 36, 210, 4560, 6426, 326040, 4232250, 1969110, 296676380, 4798080, 166289760, 73765692000, 712750500, 50561280, 33944067893736, 2139168754800, 4292572951800, 1414764341760, 72461756727360, 180975331456920, 1870768457500800, 5498331930000, 153698278734000].map_kv{ |k,v|
+        v.divisors.count {|d| d.is_polygonal(k+3) } == (k+3)
+    },
+    23.of(true),
+)
+
+func A358861(n) {
+    for k in (1..Inf) {
+        var t = centered_polygonal(k, n)
+        if (t.divisors.count {|d| d.is_centered_polygonal(n) } == n) {
+            return t
+        }
+    }
+}
+
+assert_eq(A358861.map(3..9), %n[64, 925, 2976, 93457, 866272, 11025, 3036880])
+
+assert_eq(
+    %n[64, 925, 2976, 93457, 866272, 11025, 3036880, 18412718645101, 9283470627432, 201580440699781, 92839099743040, 5236660451226975, 66779973961058176].map_kv {|k,v|
+        v.divisors.count {|d| d.is_centered_polygonal(k+3) } == (k+3)
+    },
+    13.of(true)
+)
+
+assert(256.is_centered_polygonal(8) -> not)
+assert_eq(4422094135361.divisors.count { .is_centered_polygonal(16) }, 9)
+assert_eq(1415913990579036.divisors.count { .is_centered_polygonal(17) }, 17)
+
+for k in (8, 9, 10, 16) {
+    assert_eq(
+        30.of{.centered_polygonal(k)},
+        30.by{.is_centered_polygonal(k)},
+    )
+}
+
 say ":: Test passed!"

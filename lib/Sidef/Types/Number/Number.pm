@@ -26975,6 +26975,37 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub is_centered_polygonal {
+        my ($n, $k) = @_;
+
+        # (2*n + 1)^2 = (8*(n-1)/k + 1)
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_sub_ui($t, $n, 1);
+        Math::GMPz::Rmpz_mul_2exp($t, $t, 3);
+        Math::GMPz::Rmpz_divisible_p($t, $k) || return Sidef::Types::Bool::Bool::FALSE;
+
+        if (Math::GMPz::Rmpz_sgn($k) == 0) {
+            Math::GMPz::Rmpz_cmp_ui($n, 1) == 0 and return Sidef::Types::Bool::Bool::TRUE;
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        Math::GMPz::Rmpz_divexact($t, $t, $k);
+        Math::GMPz::Rmpz_add_ui($t, $t, 1);
+        Math::GMPz::Rmpz_perfect_square_p($t) || return Sidef::Types::Bool::Bool::FALSE;
+        Math::GMPz::Rmpz_sqrt($t, $t);
+        Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+        Math::GMPz::Rmpz_even_p($t) || return Sidef::Types::Bool::Bool::FALSE;
+
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
+
     #
     ## n-th k-gonal pyramidal number
     #

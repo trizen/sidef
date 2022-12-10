@@ -3644,6 +3644,17 @@ Returns true if is a Carmichael number.
 
 =cut
 
+=head2 is_centered_polygonal
+
+    n.is_centered_polygonal(k)
+
+Returns true if C<n> is a centered k-gonal number.
+
+    say 15.by { .is_centered_polygonal(3) }  # centered triangular numbers
+    say 15.by { .is_centered_polygonal(6) }  # centered hexagonal numbers
+
+=cut
+
 =head2 is_chebyshev
 
     n.is_chebyshev()
