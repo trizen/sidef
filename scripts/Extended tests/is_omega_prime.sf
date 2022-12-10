@@ -66,6 +66,12 @@ assert_eq(
     15.of(true)
 )
 
+assert_eq(
+    [3, 4, 7, 8, 16, 11, 79, 44, 81, 91, 1024, 47, 12769, 389, 256, 413, 46656, 373].map_kv{|n,k| is_omega_prime(k**(n+1) - 1, n+1) },
+    18.of(true)
+)
+
+assert(is_omega_prime(33577**18 + 1, 18))
 assert(!is_omega_prime((2**64 + 1) * 503**3 * 863**2 * 43 * 97, 3))
 assert(is_omega_prime((2**64 + 1) * 503**3 * 863**2 * 43 * 97, 6))
 assert(is_omega_prime((2**64 + 1) * 503**78, 3))

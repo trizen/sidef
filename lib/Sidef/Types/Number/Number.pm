@@ -16432,10 +16432,6 @@ package Sidef::Types::Number::Number {
                 $bigomega  = scalar(@trial_factors);
                 $remainder = _any2mpz($r);
 
-                if ($bigomega > $k) {
-                    return Sidef::Types::Bool::Bool::FALSE;
-                }
-
                 if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                     if ($bigomega == $k) {
                         return Sidef::Types::Bool::Bool::TRUE;
@@ -16443,6 +16439,10 @@ package Sidef::Types::Number::Number {
                     else {
                         return Sidef::Types::Bool::Bool::FALSE;
                     }
+                }
+
+                if ($bigomega >= $k) {
+                    return Sidef::Types::Bool::Bool::FALSE;
                 }
 
                 Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $bigomega);
@@ -16510,10 +16510,6 @@ package Sidef::Types::Number::Number {
                     $remainder = _any2mpz($$c);
                     $bigomega  = scalar(@prime_factors);
 
-                    if ($bigomega > $k) {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
-
                     if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                         if ($bigomega == $k) {
                             return Sidef::Types::Bool::Bool::TRUE;
@@ -16521,6 +16517,10 @@ package Sidef::Types::Number::Number {
                         else {
                             return Sidef::Types::Bool::Bool::FALSE;
                         }
+                    }
+
+                    if ($bigomega >= $k) {
+                        return Sidef::Types::Bool::Bool::FALSE;
                     }
 
                     Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $bigomega);
@@ -16666,10 +16666,6 @@ package Sidef::Types::Number::Number {
                 $omega     = scalar(List::Util::uniq(@trial_factors));
                 $remainder = _any2mpz($r);
 
-                if ($omega > $k) {
-                    return Sidef::Types::Bool::Bool::FALSE;
-                }
-
                 if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                     if ($omega == $k) {
                         return Sidef::Types::Bool::Bool::TRUE;
@@ -16677,6 +16673,10 @@ package Sidef::Types::Number::Number {
                     else {
                         return Sidef::Types::Bool::Bool::FALSE;
                     }
+                }
+
+                if ($omega >= $k) {
+                    return Sidef::Types::Bool::Bool::FALSE;
                 }
 
                 Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $omega);
@@ -16736,10 +16736,6 @@ package Sidef::Types::Number::Number {
                     $remainder = _any2mpz($$c);
                     $omega     = scalar(List::Util::uniq(map { ref($_) ? "$$_" : $_ } @prime_factors));
 
-                    if ($omega > $k) {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
-
                     if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                         if ($omega == $k) {
                             return Sidef::Types::Bool::Bool::TRUE;
@@ -16747,6 +16743,10 @@ package Sidef::Types::Number::Number {
                         else {
                             return Sidef::Types::Bool::Bool::FALSE;
                         }
+                    }
+
+                    if ($omega >= $k) {
+                        return Sidef::Types::Bool::Bool::FALSE;
                     }
 
                     Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $omega);
@@ -26936,16 +26936,41 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto &nan;
         $k = _any2mpz($$k) // goto &nan;
 
-        # polygonal(n, k) = n * (k*n - k - 2*n + 4) / 2
+        # polygonal(n, k) = n * (n*k - k - 2*n + 4) / 2
 
         my $r = Math::GMPz::Rmpz_init();
 
-        Math::GMPz::Rmpz_mul($r, $n, $k);         # r = n*k
-        Math::GMPz::Rmpz_sub($r, $r, $k);         # r = r-k
-        Math::GMPz::Rmpz_submul_ui($r, $n, 2);    # r = r-2*n
-        Math::GMPz::Rmpz_add_ui($r, $r, 4);       # r = r+4
-        Math::GMPz::Rmpz_mul($r, $r, $n);         # r = r*n
-        Math::GMPz::Rmpz_div_2exp($r, $r, 1);     # r = r/2
+        Math::GMPz::Rmpz_mul($r, $n, $k);         # n*k
+        Math::GMPz::Rmpz_sub($r, $r, $k);         # n*k - k
+        Math::GMPz::Rmpz_submul_ui($r, $n, 2);    # n*k - k - 2*n
+        Math::GMPz::Rmpz_add_ui($r, $r, 4);       # n*k - k - 2*n + 4
+        Math::GMPz::Rmpz_mul($r, $r, $n);         # n*(n*k - k - 2*n + 4)
+        Math::GMPz::Rmpz_div_2exp($r, $r, 1);     # n*(n*k - k - 2*n + 4)/2
+
+        bless \$r;
+    }
+
+    #
+    ## n-th centered k-gonal number
+    #
+
+    sub centered_polygonal {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
+
+        # centered_polygonal(n, k) = k*n*(n+1)/2 + 1
+
+        my $r = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_mul($r, $n, $n);        # n*n
+        Math::GMPz::Rmpz_add($r, $r, $n);        # n*(n+1)
+        Math::GMPz::Rmpz_mul($r, $r, $k);        # k*n*(n+1)
+        Math::GMPz::Rmpz_div_2exp($r, $r, 1);    # k*n*(n+1)/2
+        Math::GMPz::Rmpz_add_ui($r, $r, 1);      # k*n*(n+1)/2 + 1
 
         bless \$r;
     }

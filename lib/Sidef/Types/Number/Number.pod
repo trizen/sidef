@@ -1389,6 +1389,17 @@ Aliases: I<ceiling>
 
 =cut
 
+=head2 centered_polygonal
+
+    n.centered_polygonal(k)
+
+Returns the n-th centered k-gonal number.
+
+   say 15.of {|n| centered_polygonal(n, 3) }  # centered triangular numbers
+   say 15.of {|n| centered_polygonal(n, 6) }  # centered hexagonal numbers
+
+=cut
+
 =head2 cfrac
 
     n.cfrac
