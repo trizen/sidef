@@ -1048,7 +1048,7 @@ package Sidef::Parser {
                 }
             }
 
-            # Embedded comments (http://perlcabal.org/syn/S02.html#Embedded_Comments)
+            # Embedded comments (https://docs.raku.org/language/syntax#Multi-line_/_embedded_comments)
             if (/\G#`(?=[[:punct:]])/gc) {
                 $self->get_quoted_string(code => $opt{code});
                 redo;

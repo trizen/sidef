@@ -27237,9 +27237,9 @@ package Sidef::Types::Number::Number {
     #
 
     sub polygonal_root {
-        my ($x, $y) = @_;
-        _valid(\$y);
-        bless \__polygonal_root__(_any2mpfr_mpc($$x), _any2mpfr_mpc($$y));
+        my ($n, $k) = @_;
+        _valid(\$k);
+        bless \__polygonal_root__(_any2mpfr_mpc($$n), _any2mpfr_mpc($$k));
     }
 
     #
@@ -27247,9 +27247,34 @@ package Sidef::Types::Number::Number {
     #
 
     sub polygonal_root2 {
-        my ($x, $y) = @_;
-        _valid(\$y);
-        bless \__polygonal_root__(_any2mpfr_mpc($$x), _any2mpfr_mpc($$y), 1);
+        my ($n, $k) = @_;
+        _valid(\$k);
+        bless \__polygonal_root__(_any2mpfr_mpc($$n), _any2mpfr_mpc($$k), 1);
+    }
+
+    sub pyramidal_root {
+        my ($n, $k) = @_;
+        _valid(\$k);
+
+        # cubic_formula(-(1/3 - k/6), 1/2, -(k/6 - 5/6), -n)
+
+        $n = $$n;
+        $k = $$k;
+
+        my $k_over_6 = __div__($k, 6);
+
+        my $A = __add__(__div__(-1, 3), $k_over_6);
+        my $B = __div__(1, 2);
+        my $C = __add__(__neg__($k_over_6), __div__(5, 6));
+        my $D = __neg__($n);
+
+        my $root = [(bless \$A)->cubic_formula((bless \$B), (bless \$C), (bless \$D))]->[1];
+
+        if (__is_real__($n) and __cmp__($n, 0) >= 0) {
+            $root = $root->real;
+        }
+
+        $root;
     }
 
     sub is_palindrome {

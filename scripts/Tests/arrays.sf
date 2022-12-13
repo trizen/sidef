@@ -114,4 +114,26 @@ assert_eq(
     %n[0, 0, 0, 0, 0, 702, 0, 0, 0, 0, 0, -1],
 )
 
+assert([false].all -> not)
+assert([false, false].all -> not)
+assert([true].all)
+assert([true, true].all)
+assert([].all)
+assert([true, false].all -> not)
+assert([false, true].all -> not)
+
+assert([true].any)
+assert([true, false].any)
+assert([false, true].any)
+assert([false].any -> not)
+assert([false, false].any -> not)
+assert([].any -> not)
+
+assert([false, true].none -> not)
+assert([true, false].none -> not)
+assert([true].none -> not)
+assert([false].none)
+assert([false, false].none)
+assert([].none)
+
 say "** Test passed!"

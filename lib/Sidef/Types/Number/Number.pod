@@ -6625,6 +6625,16 @@ Returns the n-th k-gonal pyramidal number.
 
 =cut
 
+=head2 pyramidal_root
+
+    n.pyramidal_root(k)
+
+Returns the k-gonal pyramidal root of C<n>. Also defined for complex numbers.
+
+    say pyramidal_root(pyramidal(1234, 3), 3)     #=> 1234
+
+=cut
+
 =head2 qnr
 
     qnr(n)
