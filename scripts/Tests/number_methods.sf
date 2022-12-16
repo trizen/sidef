@@ -733,4 +733,62 @@ for k in (2..100, 200..210, 1234..1254, 9000..9010, 30_000..30_010, 100_000..100
     assert_eq(20.of { 1e6.irand.centered_polygonal(k) }.grep { !.is_centered_polygonal(k) }, [])
 }
 
+with (%n[20, 140, 405, 2856, 25296, 111720, 25984, 5474000, 237600, 223826688, 3852800, 268565760, 1834725376, 175861400000, 335674368, 2863363937280, 4383831556096, 206015846400, 3400704000, 938209120583680, 2981338216980480, 21463949229465600, 45410367307776, 72056803765911552]) {|arr|
+    assert_eq(
+        arr.map_kv {|k,v|
+            var t = v.pyramidal_root(k+3).round(-40)
+            assert(t.is_int)
+            pyramidal(t, k+3)
+        },
+        arr
+    )
+}
+
+with (%n[1, 4, 10, 460, 9010, 772210, 20120860, 1553569960, 85507715710, 14932196985010, 1033664429333260, 197628216951078460, 21266854897681220860, 7423007155473283614010, 3108276166302017120182510, 851452464506763307285599610, 32749388246772812069108696710]) {|arr|
+    assert_eq(
+        arr.map {|v|
+            var t = v.centered_polygonal_root(3)
+            assert(t.is_int)
+            centered_polygonal(t, 3)
+        },
+        arr
+    )
+}
+
+with (%n[64, 925, 2976, 93457, 866272, 11025, 3036880, 18412718645101, 9283470627432, 201580440699781, 92839099743040, 5236660451226975, 66779973961058176]) {|arr|
+    assert_eq(
+        arr.map_kv {|k,v|
+            var t = v.centered_polygonal_root(k+3)
+            assert(t.is_int)
+            centered_polygonal(t, k+3)
+        },
+        arr
+    )
+}
+
+with (%n[28, 16, 176, 4950, 8910, 1408, 346500, 277992, 7542080, 326656, 544320, 120400000, 145213440, 48549888, 4733575168, 536813568, 2149576704, 3057500160, 938539560960, 1358951178240, 36324805836800, 99956555776, 49212503949312, 118747221196800, 59461613912064, 13749193801728, 7526849672380416, 98516240758210560, 4969489493917696, 78673429816934400, 4467570822566903808, 1013309912383488000]) {|arr|
+    assert_eq(
+        arr.map_kv {|k,v|
+            var t = v.polygonal_root(k+3)
+            assert(t.is_int)
+            polygonal(t, k+3)
+        },
+        arr
+    )
+}
+
+for name,f,g in ([
+    [:pyramidal, Num.method(:pyramidal_root), Num.method(:pyramidal)],
+    [:polygonal, Num.method(:polygonal_root), Num.method(:polygonal)]
+    [:central, Num.method(:centered_polygonal_root), Num.method(:centered_polygonal)]
+]) {
+    30.times {
+        for n in (1e8.irand, 1e30.irand) {
+            var k = irand(3, 100)
+            var r = f(n, k)
+            assert((g(r.floor, k) <= n) && (g(r.ceil, k) >= n), "[#{name}] Testing: #{n} #{k}")
+        }
+    }
+}
+
 say "** Tests passed!"

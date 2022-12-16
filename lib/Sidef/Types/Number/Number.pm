@@ -27007,6 +27007,30 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
+    sub centered_polygonal_root {
+        my ($n, $k) = @_;
+        _valid(\$k);
+
+        # r = (sqrt(8*(n-1)/k + 1)-1)/2
+
+        $n = $$n;
+        $k = $$k;
+
+        my $t = __inc__(__div__(__mul__(__dec__($n), 8), $k));
+
+        if (ref($t) eq '' and (HAS_PRIME_UTIL ? Math::Prime::Util::is_square($t) : Math::Prime::Util::GMP::is_square($t))) {
+            $t = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($t) : Math::Prime::Util::GMP::sqrtint($t));
+        }
+        elsif (ref($t) eq 'Math::GMPz' and Math::GMPz::Rmpz_perfect_square_p($t)) {
+            Math::GMPz::Rmpz_sqrt($t, $t);
+        }
+        else {
+            $t = __sqrt__(_any2mpfr_mpc($t));
+        }
+
+        bless \__div__(__dec__($t), 2);
+    }
+
     #
     ## n-th k-gonal pyramidal number
     #

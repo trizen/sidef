@@ -1400,6 +1400,17 @@ Returns the n-th centered k-gonal number.
 
 =cut
 
+=head2 centered_polygonal_root
+
+    n.centered_polygonal_root(k)
+
+Returns the centered k-gonal root of C<n>. Also defined for complex numbers.
+
+    say centered_polygonal_root(n, 3)      # centered triangular root
+    say centered_polygonal_root(n, 5)      # centered pentagonal root
+
+=cut
+
 =head2 cfrac
 
     n.cfrac
