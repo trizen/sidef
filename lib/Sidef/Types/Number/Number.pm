@@ -576,7 +576,14 @@ package Sidef::Types::Number::Number {
     sub _any2mpc {
         my ($x) = @_;
 
-        ref($x) eq ''           && return _mpz2mpc(_any2mpz($x));    # TODO: optimize
+        if (ref($x) eq '') {
+            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            ($x < 0)
+              ? Math::MPC::Rmpc_set_si($r, $x, $ROUND)
+              : Math::MPC::Rmpc_set_ui($r, $x, $ROUND);
+            return $r;
+        }
+
         ref($x) eq 'Math::MPC'  && return $x;
         ref($x) eq 'Math::GMPz' && goto &_mpz2mpc;
         ref($x) eq 'Math::GMPq' && goto &_mpq2mpc;
@@ -590,7 +597,14 @@ package Sidef::Types::Number::Number {
     sub _any2mpfr {
         my ($x) = @_;
 
-        ref($x) eq ''           && return _mpz2mpfr(_any2mpz($x));    # TODO: optimize
+        if (ref($x) eq '') {
+            my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            ($x < 0)
+              ? Math::MPFR::Rmpfr_set_si($r, $x, $ROUND)
+              : Math::MPFR::Rmpfr_set_ui($r, $x, $ROUND);
+            return $r;
+        }
+
         ref($x) eq 'Math::MPFR' && return $x;
         ref($x) eq 'Math::GMPz' && goto &_mpz2mpfr;
         ref($x) eq 'Math::GMPq' && goto &_mpq2mpfr;
