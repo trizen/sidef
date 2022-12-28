@@ -8326,6 +8326,7 @@ package Sidef::Types::Number::Number {
                 return $quo;
             };
             Math::GMPz::Rmpz_mod($r, $r, $y);
+            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
         }
 
@@ -8352,6 +8353,7 @@ package Sidef::Types::Number::Number {
             if (Math::GMPz::Rmpz_fits_ulong_p($y)) {
                 my $r = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_mod_ui($r, $x, Math::GMPz::Rmpz_get_ui($y) || goto &_nan);
+                $r = Math::GMPz::Rmpz_get_ui($r);
                 return $r;
             }
 
@@ -8367,6 +8369,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_add($r, $r, $y);
             }
 
+            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
         }
 
@@ -8381,6 +8384,7 @@ package Sidef::Types::Number::Number {
 
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_mod_ui($r, $x, $y);
+            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
             return $r;
         }
 
@@ -11347,13 +11351,13 @@ package Sidef::Types::Number::Number {
         Math::GMPq::Rmpq_sgn($x)
           || return Sidef::Types::Array::Array->new;
 
-        my $four_m = 4 * $m;
+        my $four_m = __mul__($m, 4);
 
         # D = b^2 - 4*a*c
-        my $D = __mod__($y * $y - 4 * $x * $z, $four_m);
+        my $D = __mod__(__sub__(__mul__($y, $y), __mul__(__mul__($x, $z), 4)), $four_m);
 
         # The discriminant must be an integer
-        (ref($D) eq 'Math::GMPz' or Math::GMPq::Rmpq_integer_p($D))
+        (ref($D) eq '' or ref($D) eq 'Math::GMPz' or (ref($D) eq 'Math::GMPq' and Math::GMPq::Rmpq_integer_p($D)))
           || return Sidef::Types::Array::Array->new;
 
         # Find all the solutions k to: k^2 == D (mod 4*m)
@@ -11361,7 +11365,7 @@ package Sidef::Types::Number::Number {
 
         @$S || return $S;
 
-        my $two_a = 2 * $x;
+        my $two_a = __add__($x, $x);
         my $neg_b = __neg__($y);
 
         my @solutions;
@@ -11369,7 +11373,7 @@ package Sidef::Types::Number::Number {
         foreach my $k (@$S) {
             foreach my $u (__add__($neg_b, $$k), __sub__($neg_b, $$k)) {
                 my $r = __mod__(__div__($u, $two_a), $m);
-                if (__cmp__(__mod__($x * ($r * $r) + $y * $r + $z, $m), 0) == 0) {
+                if (__cmp__(__mod__(__add__(__add__(__mul__($x, __mul__($r, $r)), __mul__($y, $r)), $z), $m), 0) == 0) {
                     push @solutions, (bless \$r);
                 }
             }
@@ -16623,7 +16627,7 @@ package Sidef::Types::Number::Number {
             $n_obj->is_prob_squarefree(_set_int(1e5)) || return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        if ($n_obj->is_almost_prime(_set_int($k)) and $n_obj->is_squarefree) {
+        if ($n_obj->is_omega_prime(_set_int($k)) and $n_obj->is_squarefree) {
             return Sidef::Types::Bool::Bool::TRUE;
         }
 
