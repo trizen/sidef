@@ -8691,7 +8691,7 @@ package Sidef::Types::Number::Number {
             return 0;
         }
 
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($pp)) {
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($pp)) {
             if (defined(my $r = Math::Prime::Util::sqrtmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($pp)))) {
                 return $r;
             }
@@ -8762,7 +8762,7 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
             if (defined(my $r = Math::Prime::Util::sqrtmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($y)))) {
                 return _set_int($r);
             }
@@ -16439,11 +16439,11 @@ package Sidef::Types::Number::Number {
         my $bigomega  = 0;
         my $remainder = $n;
 
-        if ($size > 100) {    # greater than 10^30
+        if ($size >= 64) {
 
             my $t = Math::GMPz::Rmpz_init();
 
-            foreach my $j (5 .. 9) {
+            foreach my $j (2 .. 9) {
 
                 my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
 
@@ -16463,7 +16463,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $bigomega);
+                Math::GMPz::Rmpz_ui_pow_ui($t, 10**$j, $k - $bigomega);
                 Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                   or return Sidef::Types::Bool::Bool::FALSE;
 
@@ -16484,10 +16484,11 @@ package Sidef::Types::Number::Number {
 
                 my $r_size = Math::GMPz::Rmpz_sizeinbase($remainder, 2);
 
-                last if (($j >= 5) && ($r_size <= 100));    # 30 digits
-                last if (($j >= 6) && ($r_size <= 133));    # 40 digits
-                last if (($j >= 7) && ($r_size <= 150));    # 45 digits
-                last if (($j >= 8) && ($r_size <= 200));    # 60 digits
+                last if (($j >= 4) && ($r_size <= 83));     # <= 25 digits
+                last if (($j >= 5) && ($r_size <= 100));    # <= 30 digits
+                last if (($j >= 6) && ($r_size <= 133));    # <= 40 digits
+                last if (($j >= 7) && ($r_size <= 150));    # <= 45 digits
+                last if (($j >= 8) && ($r_size <= 200));    # <= 60 digits
 
                 # Try to find special factors
                 if (($bigomega == 0 and $j >= 7) or $j >= 8) {
@@ -16673,11 +16674,11 @@ package Sidef::Types::Number::Number {
         my $remainder = $n;
         my $size      = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
-        if ($size > 100) {    # greater than 10^30
+        if ($size >= 64) {
 
             my $t = Math::GMPz::Rmpz_init();
 
-            foreach my $j (5 .. 9) {
+            foreach my $j (2 .. 9) {
 
                 my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
 
@@ -16697,7 +16698,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $omega);
+                Math::GMPz::Rmpz_ui_pow_ui($t, 10**$j, $k - $omega);
                 Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                   or return Sidef::Types::Bool::Bool::FALSE;
 
@@ -16718,10 +16719,11 @@ package Sidef::Types::Number::Number {
 
                 my $r_size = Math::GMPz::Rmpz_sizeinbase($remainder, 2);
 
-                last if (($j >= 5) && ($r_size <= 100));    # 30 digits
-                last if (($j >= 6) && ($r_size <= 133));    # 40 digits
-                last if (($j >= 7) && ($r_size <= 150));    # 45 digits
-                last if (($j >= 8) && ($r_size <= 200));    # 60 digits
+                last if (($j >= 4) && ($r_size <= 83));     # <= 25 digits
+                last if (($j >= 5) && ($r_size <= 100));    # <= 30 digits
+                last if (($j >= 6) && ($r_size <= 133));    # <= 40 digits
+                last if (($j >= 7) && ($r_size <= 150));    # <= 45 digits
+                last if (($j >= 8) && ($r_size <= 200));    # <= 60 digits
 
                 # Try to find special factors
                 if (($omega == 0 and $j >= 7) or $j >= 8) {
