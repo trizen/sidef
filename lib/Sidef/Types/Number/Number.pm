@@ -14048,7 +14048,8 @@ package Sidef::Types::Number::Number {
 
         my $n = _any2mpz($$from) // return ZERO;
 
-        # MPU is quite slow for large k. See also: danaj/Math-Prime-Util #72
+        # MPU is quite slow for large k.
+        # https://github.com/danaj/Math-Prime-Util/issues/72
         if (HAS_NEW_PRIME_UTIL and $k < 15 and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return _set_int(Math::Prime::Util::omega_prime_count($k, Math::GMPz::Rmpz_get_ui($n)));
         }
@@ -16429,11 +16430,11 @@ package Sidef::Types::Number::Number {
         }
 
         if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            return (          # XXX: available in MPU > 0.73
-               Math::Prime::Util::is_almost_prime($k, Math::GMPz::Rmpz_get_ui($n))
-               ? Sidef::Types::Bool::Bool::TRUE
-               : Sidef::Types::Bool::Bool::FALSE
-            );
+            return (
+                    Math::Prime::Util::is_almost_prime($k, Math::GMPz::Rmpz_get_ui($n))
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
         }
 
         my $bigomega  = 0;
@@ -16663,11 +16664,11 @@ package Sidef::Types::Number::Number {
         }
 
         if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            return (    # XXX: available in MPU > 0.73
-               Math::Prime::Util::is_omega_prime($k, Math::GMPz::Rmpz_get_ui($n))
-               ? Sidef::Types::Bool::Bool::TRUE
-               : Sidef::Types::Bool::Bool::FALSE
-            );
+            return (
+                    Math::Prime::Util::is_omega_prime($k, Math::GMPz::Rmpz_get_ui($n))
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
         }
 
         my $omega     = 0;
@@ -18920,10 +18921,12 @@ package Sidef::Types::Number::Number {
             my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_random_prime(1e4)), $m->mul(_set_int(5e2))) });
 
             my $pm1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) });
+            my $pm1_small_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(20000)), $m->mul(_set_int(200000))) });
             my $pp1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(5e4))) });
             my $chebyshev_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(5e3))) });
             my $prho_block      = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))) });
-            my $ecm_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(600)), $m->mul(_set_int(20))) });
+            my $ecm_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(2000)), $m->mul(_set_int(10))) });
+            my $ecm_small_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(600)), $m->mul(_set_int(20))) });
 #>>>
 
             @composite_factors = map { @{$_->factor($fermat_block)} } @composite_factors;
@@ -18931,6 +18934,8 @@ package Sidef::Types::Number::Number {
             @composite_factors = map { @{$_->factor($pell_block)} } @composite_factors;
             @composite_factors = map { @{$_->factor($FLT_block)} } @composite_factors;
 
+            @composite_factors = map { @{$_->factor($pm1_small_block)} } @composite_factors;
+            @composite_factors = map { @{$_->factor($ecm_small_block)} } @composite_factors;
             @composite_factors = map { @{$_->factor($ecm_block)} } @composite_factors;
             @composite_factors = map { @{$_->factor($pm1_block)} } @composite_factors;
             @composite_factors = map { @{$_->factor($pp1_block)} } @composite_factors;
@@ -23132,9 +23137,7 @@ package Sidef::Types::Number::Number {
         if (0 and HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
             # XXX: Out of memory for: omega_primes(12, 1e13)
-            return Math::Prime::Util::omega_primes(    # XXX: available in MPU > 0.73
-                                                    $k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to)
-                                                  );
+            return Math::Prime::Util::omega_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
         }
         elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
