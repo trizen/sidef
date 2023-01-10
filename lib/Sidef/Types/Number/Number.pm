@@ -35,6 +35,8 @@ package Sidef::Types::Number::Number {
           ULONG_MAX => Math::GMPq::_ulong_max(),
           LONG_MIN  => Math::GMPq::_long_min(),
 
+          USE_PRIMECOUNT => 0,     # true to use Kim Walisch's primecount for large n
+
           HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 } // 0,
 
           # Check if we have a recent enough version of Math::Prime::Util
@@ -8691,7 +8693,7 @@ package Sidef::Types::Number::Number {
             return 0;
         }
 
-        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($pp)) {
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($pp)) {
             if (defined(my $r = Math::Prime::Util::sqrtmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($pp)))) {
                 return $r;
             }
@@ -8762,7 +8764,7 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
             if (defined(my $r = Math::Prime::Util::sqrtmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($y)))) {
                 return _set_int($r);
             }
@@ -9137,6 +9139,7 @@ package Sidef::Types::Number::Number {
               : Math::GMPz::Rmpz_init_set_str("$p", 10);
             [$p, $e]
         } _factor_exp($n);
+
         my @solutions = $sum_of_two_squares_solutions->(\@factor_exp);
 
         @solutions = sort { $a->[0] <=> $b->[0] }
@@ -13254,6 +13257,30 @@ package Sidef::Types::Number::Number {
 
             if (defined(my $value = $primepi_lookup->{$y})) {
                 return $value;
+            }
+
+            if (USE_PRIMECOUNT and ($y > 1e11 or $y > ULONG_MAX)) {
+                my $count = `primecount $y`;
+
+                if (defined($count)) {
+                    chomp $count;
+                    return $count;
+                }
+            }
+        }
+
+        if (USE_PRIMECOUNT) {
+            my $diff = Math::Prime::Util::GMP::subint($y, $x);
+
+            if ($diff > 1e11 or $diff > ULONG_MAX) {
+
+                my $y_count = `primecount $y`;
+
+                if (defined($y_count)) {
+                    chomp $y_count;
+                    my $x_count = _prime_count(Math::Prime::Util::GMP::subint($x, 1));
+                    return Math::Prime::Util::GMP::subint($y_count, $x_count);
+                }
             }
         }
 
