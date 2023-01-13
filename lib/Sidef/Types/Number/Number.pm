@@ -11555,8 +11555,16 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
 
-        $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2si($$y)  // (goto &nan);
+        $x = $$x;
+        $y = _any2si($$y) // (goto &nan);
+
+        if (ref($x) eq '' and $x <= 1e6 and $x >= 0 and $y >= 0) {
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_bin_uiui($r, $x, $y);
+            return bless \$r;
+        }
+
+        $x = _any2mpz($x) // (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
 
