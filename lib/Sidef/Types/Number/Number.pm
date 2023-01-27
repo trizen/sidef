@@ -969,7 +969,7 @@ package Sidef::Types::Number::Number {
                     say "YAFU: factors do not multiply to n." if $VERBOSE;
                     if (Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
 
-                        say "YAFU: recomputing multiplicities...";
+                        say "YAFU: recomputing multiplicities..." if $VERBOSE;
 
                         my @corrected_factors;
                         foreach my $p (
@@ -21159,8 +21159,43 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        my $r = Math::Prime::Util::GMP::totient(_big2uistr($n) // goto &nan);
-        _set_int($r);
+        $n = _big2uistr($n) // goto &nan;
+
+        if (length($n) < YAFU_CUTOFF) {
+            my $r = Math::Prime::Util::GMP::totient($n);
+            return _set_int($r);
+        }
+
+        my @factor_exp = _factor_exp($n);
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        my $r = Math::GMPz::Rmpz_init_set_ui(1);
+
+        foreach my $pp (@factor_exp) {
+            my ($p, $e) = @$pp;
+
+            # Multiplicative with a(p^e) = (p - 1)*p^(e-1)
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_mul_ui($r, $r, $p - 1);
+                if ($e >= 2) {
+                    Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e - 1);
+                    Math::GMPz::Rmpz_mul($r, $r, $t);
+                }
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+                Math::GMPz::Rmpz_mul($r, $r, $t);
+                if ($e >= 2) {
+                    Math::GMPz::Rmpz_add_ui($t, $t, 1);
+                    Math::GMPz::Rmpz_pow_ui($t, $t, $e - 1);
+                    Math::GMPz::Rmpz_mul($r, $r, $t);
+                }
+            }
+        }
+
+        bless \$r;
     }
 
     *EulerPhi      = \&totient;
