@@ -21166,12 +21166,10 @@ package Sidef::Types::Number::Number {
             return _set_int($r);
         }
 
-        my @factor_exp = _factor_exp($n);
-
         state $t = Math::GMPz::Rmpz_init_nobless();
         my $r = Math::GMPz::Rmpz_init_set_ui(1);
 
-        foreach my $pp (@factor_exp) {
+        foreach my $pp (_factor_exp($n)) {
             my ($p, $e) = @$pp;
 
             # Multiplicative with a(p^e) = (p - 1)*p^(e-1)
@@ -22921,16 +22919,28 @@ package Sidef::Types::Number::Number {
 
         (Math::GMPz::Rmpz_sgn($n) || return ZERO) > 0 or goto &nan;
 
-        my $s =
-          (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n))
-          ? Math::Prime::Util::divisor_sum(Math::GMPz::Rmpz_get_ui($n), 0)
-          : Math::Prime::Util::GMP::sigma($n, 0);
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return _set_int(Math::Prime::Util::divisor_sum(Math::GMPz::Rmpz_get_ui($n), 0));
+        }
 
-        _set_int($s);
+        $n = Math::GMPz::Rmpz_get_str($n, 10);
+
+        if (length($n) < YAFU_CUTOFF) {
+            return _set_int(Math::Prime::Util::GMP::sigma($n, 0));
+        }
+
+        # Multiplicative with a(p^e) = e+1
+        _set_int(Math::Prime::Util::GMP::vecprod(map { $_->[1] + 1 } _factor_exp($n)));
     }
 
     sub sigma {
         my ($n, $k) = @_;
+
+        $k = defined($k) ? do { _valid(\$k); _any2si($$k) // goto &nan } : 1;
+
+        if ($k == 0) {
+            return $n->sigma0;
+        }
 
         $n = $$n;
 
@@ -22940,18 +22950,55 @@ package Sidef::Types::Number::Number {
 
         (Math::GMPz::Rmpz_sgn($n) || return ZERO) > 0 or goto &nan;
 
-        $k = defined($k) ? do { _valid(\$k); _any2si($$k) // goto &nan } : 1;
+        my $r;
 
-        my $s =
-          (HAS_PRIME_UTIL and $k == 1 and Math::GMPz::Rmpz_cmp_ui($n, ULONG_MAX >> 2) <= 0)
-          ? Math::Prime::Util::divisor_sum(Math::GMPz::Rmpz_get_ui($n))
-          : Math::Prime::Util::GMP::sigma($n, CORE::abs($k));
+        $n = Math::GMPz::Rmpz_get_str($n, 10);
 
-        if ($k < 0) {    # Sum_{d|n} 1/d^k = sigma_k(n)/n^k
-            return _set_int($s)->div(_set_int(Math::Prime::Util::GMP::powint($n, CORE::abs($k))));
+        if (HAS_PRIME_UTIL and CORE::abs($k) == 1 and $n < (ULONG_MAX >> 2)) {
+            $r = Math::Prime::Util::divisor_sum($n);
+        }
+        elsif (length($n) < YAFU_CUTOFF) {
+            $r = Math::Prime::Util::GMP::sigma($n, CORE::abs($k));
+        }
+        else {
+
+            # Multiplicative with sigma_k(p^e) = ((p^((e+1)*k))-1)/(p^k-1)
+
+            state $t = Math::GMPz::Rmpz_init_nobless();
+            state $u = Math::GMPz::Rmpz_init_nobless();
+
+            $r = Math::GMPz::Rmpz_init_set_ui(1);
+
+            foreach my $pp (_factor_exp($n)) {
+                my ($p, $e) = @$pp;
+
+                if ($p < ULONG_MAX) {
+
+                    if ($e == 1 and CORE::abs($k) == 1) {    # optimization
+                        Math::GMPz::Rmpz_mul_ui($r, $r, $p + 1);
+                        next;
+                    }
+
+                    Math::GMPz::Rmpz_ui_pow_ui($u, $p, CORE::abs($k));
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($u, "$p", 10);
+                    Math::GMPz::Rmpz_pow_ui($u, $u, CORE::abs($k)) if (CORE::abs($k) != 1);
+                }
+
+                Math::GMPz::Rmpz_pow_ui($t, $u, $e + 1);
+                Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+                Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+                Math::GMPz::Rmpz_divexact($t, $t, $u);
+                Math::GMPz::Rmpz_mul($r, $r, $t);
+            }
         }
 
-        _set_int($s);
+        if ($k < 0) {    # Sum_{d|n} 1/d^k = sigma_k(n)/n^k
+            return _set_int($r)->div(_set_int(Math::Prime::Util::GMP::powint($n, CORE::abs($k))));
+        }
+
+        _set_int($r);
     }
 
     *σ = \&sigma;
