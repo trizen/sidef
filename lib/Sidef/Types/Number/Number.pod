@@ -11,6 +11,34 @@ The C<Number> class implements support for numerical operations, supporting inte
 
 This class also implements many useful mathematical methods, from basic arithmetical operations, to advanced number-theoretic functions, including primality testing and prime factorization methods.
 
+The following class-variables can be changed during runtime:
+
+    Num!PREC           = 192        # precision for floating-point numbers
+    Num!ROUND          = 0          # rounding mode for floating-point numbers
+    Num!VERBOSE        = false      # true to enable verbose/debug mode
+    Num!USE_YAFU       = false      # true to use YAFU for factoring large integers
+    Num!USE_PRIMECOUNT = false      # true to use Kim Walisch's primecount in prime_count(n)
+
+The supported rounding modes for floating-point numbers, are:
+
+    Num!ROUND = 0   # Round to nearest.
+    Num!ROUND = 1   # Round towards zero.
+    Num!ROUND = 2   # Round towards +infinity.
+    Num!ROUND = 3   # Round towards -infinity.
+    Num!ROUND = 4   # Round away from zero. (with MPFR >= 3.0.0)
+    Num!ROUND = 5   # Faithful rounding. (with MPFR >= 4.0.0)
+
+The values can also be modified only in a local scope, by using the C<local> keyword:
+
+    func f(n) {
+        local Num!PREC = 1024
+        # do some work
+    }
+
+In the above example, the C<f(n)> function will use C<1024> bits of precision for floating-point numbers, while outside the function, the default precision will be used.
+
+B<NOTE:> the C<local> scope extends to any other functions or methods that the are called from the local scope.
+
 =head1 SYNOPSIS
 
     var a = Num(string)
@@ -4922,7 +4950,7 @@ Returns an array with all the Lucas-Carmichael numbers <= C<n> or in the range C
 
     n.lucas_factor(j=1, tries=100)
 
-Effective in factoring Carmichael numbers, Fermat pseudoprimes, Lucas pseudoprimes and Lucas-Carmichael numbers.
+A factorization method, using the modular Lucas sequences, which is effective in factoring Carmichael numbers, Fermat pseudoprimes, Lucas pseudoprimes and Lucas-Carmichael numbers.
 
     say lucas_factor(2425361208749736840354501506901183117777758034612345610725789878400467)
 
@@ -5084,13 +5112,9 @@ Aliases: I<mfactorial>, I<multi_factorial>
 
     n.miller_factor(tries=100)
 
-Effective in factoring Carmichael numbers and Fermat pseudoprimes.
+A factorization method, based on the Miller-Rabin primality test. Effective in factoring Carmichael numbers and Fermat pseudoprimes.
 
-It returns an array with the factors of C<n>:
-
-    say miller_factor(58571442634534443082821160508299574798027946748324125518533225605795841)
-
-The product of the factors will give back C<n>. However, some factors may be composite.
+It returns an array with the factors of C<n>. The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<miller_rabin_factor>
 

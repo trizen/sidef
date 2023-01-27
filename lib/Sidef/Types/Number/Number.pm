@@ -11,11 +11,14 @@ package Sidef::Types::Number::Number {
     use List::Util             qw();
     use Math::Prime::Util::GMP qw();
 
-    our ($ROUND, $PREC);
+    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_YAFU, $VERBOSE);
 
     BEGIN {
-        $ROUND = Math::MPFR::MPFR_RNDN();
-        $PREC  = 192;
+        $ROUND          = Math::MPFR::MPFR_RNDN();    # rounding mode for floating-point numbers
+        $PREC           = 192;                        # precision in bits for floating-point numbers
+        $USE_PRIMECOUNT = 0;                          # true to use Kim Walisch's primecount for large n
+        $USE_YAFU       = 0;                          # true to use YAFU for factoring large integers
+        $VERBOSE        = 0;                          # true to enable verbose/debug mode
     }
 
     state $MONE = Math::GMPz::Rmpz_init_set_si(-1);
@@ -35,14 +38,17 @@ package Sidef::Types::Number::Number {
           ULONG_MAX => Math::GMPq::_ulong_max(),
           LONG_MIN  => Math::GMPq::_long_min(),
 
-          USE_PRIMECOUNT => 0,     # true to use Kim Walisch's primecount for large n
-
           HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 } // 0,
 
           # Check if we have a recent enough version of Math::Prime::Util
           HAS_NEW_PRIME_UTIL => eval { require Math::Prime::Util; defined(&Math::Prime::Util::is_perfect_power); } // 0,
     };
 #>>>
+
+    use constant {
+                  YAFU_CUTOFF       => 49,                                        # in decimal digits
+                  PRIMECOUNT_CUTOFF => ((ULONG_MAX < 1e11) ? ULONG_MAX : 1e11),
+                 };
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
 
@@ -904,6 +910,113 @@ package Sidef::Types::Number::Number {
             }
             else {
                 $n = Math::GMPz::Rmpz_get_str($n, 10);
+            }
+        }
+
+        if (length($n) >= YAFU_CUTOFF and $USE_YAFU) {
+
+            if (_is_prob_prime($n)) {
+                return (@factors, $n);
+            }
+
+            say "YAFU: factoring $n" if $VERBOSE;
+
+            my $cwd = Sidef::Types::Glob::Dir->cwd;
+            my $tmp = Sidef::Types::Glob::Dir->tmp;
+
+            $tmp->chdir;
+            my $yafu_output = `yafu $n`;
+            $cwd->chdir;
+
+            # Parse the YAFU output
+            if (defined($yafu_output)) {
+
+                my @yafu_factors;
+                while ($yafu_output =~ /^([PC])\d+\s*=\s*([0-9]+)/gm) {
+                    my ($status, $factor) = ($1, $2);
+
+                    if ($status eq 'P') {
+                        push @yafu_factors, $factor;
+                    }
+                    else {
+                        local $USE_YAFU = 0;
+                        push @yafu_factors, _factor($factor);
+                    }
+                }
+
+                # Make sure all factors are prime
+                my $all_prime = 1;
+                my %seen_factor;
+                foreach my $p (@yafu_factors) {
+                    next if $seen_factor{$p}++;
+                    if (!_is_prob_prime($p)) {
+                        $all_prime = 0;
+                        last;
+                    }
+                }
+
+                # If some factors are not prime, then factor them without using YAFU
+                if (!$all_prime) {
+                    say "YAFU: not all factors are prime." if $VERBOSE;
+                    local $USE_YAFU = 0;
+                    @yafu_factors = map { _factor($_) } @yafu_factors;
+                }
+
+                my $factors_prod = Math::Prime::Util::GMP::vecprod(@yafu_factors);
+
+                # Workaround for when factors do not multiple back to n.
+                if ($factors_prod ne $n) {
+                    say "YAFU: factors do not multiply to n." if $VERBOSE;
+                    if (Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
+
+                        say "YAFU: recomputing multiplicities...";
+
+                        my @corrected_factors;
+                        foreach my $p (
+                            do {
+                                my %seen;
+                                grep { !$seen{$_}++ } @yafu_factors;
+                            }
+                          ) {
+                            my $v = Math::Prime::Util::GMP::valuation($n, $p);
+                            if ($v > 0) {
+                                push(@corrected_factors, ($p) x $v);
+                            }
+                        }
+
+                        @yafu_factors = @corrected_factors;
+                        $factors_prod = Math::Prime::Util::GMP::vecprod(@yafu_factors);
+
+                        if ($factors_prod ne $n and Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
+                            say "YAFU: recursively factoring the remainder." if $VERBOSE;
+                            my $r = Math::Prime::Util::GMP::divint($n, $factors_prod);
+                            local $USE_YAFU = 0;
+                            push @yafu_factors, _factor($r);
+                            $factors_prod = Math::Prime::Util::GMP::mulint($factors_prod, $r);
+                        }
+                    }
+                    else {
+                        say "YAFU: product of factors do not divide n." if $VERBOSE;
+                    }
+                }
+
+                # The prime factors must multiply back to n
+                if ($factors_prod eq $n) {
+                    say "YAFU: successful factorization." if $VERBOSE;
+                    @yafu_factors = map { $_->[0] }
+                      sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
+                      map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @yafu_factors;
+                    return (@factors, @yafu_factors);
+                }
+            }
+        }
+
+        if (HAS_PRIME_UTIL) {
+            if ($VERBOSE) {
+                Math::Prime::Util::prime_set_config(verbose => 1);
+            }
+            else {
+                Math::Prime::Util::prime_set_config(verbose => 0);
             }
         }
 
@@ -13267,7 +13380,7 @@ package Sidef::Types::Number::Number {
                 return $value;
             }
 
-            if (USE_PRIMECOUNT and ($y > 1e11 or $y > ULONG_MAX)) {
+            if ($y > PRIMECOUNT_CUTOFF and $USE_PRIMECOUNT) {
                 my $count = `primecount $y`;
 
                 if (defined($count)) {
@@ -13277,10 +13390,10 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (USE_PRIMECOUNT) {
+        if ($USE_PRIMECOUNT) {
             my $diff = Math::Prime::Util::GMP::subint($y, $x);
 
-            if ($diff > 1e11 or $diff > ULONG_MAX) {
+            if ($diff > PRIMECOUNT_CUTOFF) {
 
                 my $y_count = `primecount $y`;
 
