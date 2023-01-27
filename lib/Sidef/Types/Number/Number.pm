@@ -11,14 +11,15 @@ package Sidef::Types::Number::Number {
     use List::Util             qw();
     use Math::Prime::Util::GMP qw();
 
-    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_YAFU, $VERBOSE);
+    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_YAFU, $VERBOSE, $SPECIAL_FACTORS);
 
     BEGIN {
-        $ROUND          = Math::MPFR::MPFR_RNDN();    # rounding mode for floating-point numbers
-        $PREC           = 192;                        # precision in bits for floating-point numbers
-        $USE_PRIMECOUNT = 0;                          # true to use Kim Walisch's primecount for large n
-        $USE_YAFU       = 0;                          # true to use YAFU for factoring large integers
-        $VERBOSE        = 0;                          # true to enable verbose/debug mode
+        $ROUND           = Math::MPFR::MPFR_RNDN();    # rounding mode for floating-point numbers
+        $PREC            = 192;                        # precision in bits for floating-point numbers
+        $USE_PRIMECOUNT  = 0;                          # true to use Kim Walisch's primecount for large n
+        $USE_YAFU        = 0;                          # true to use YAFU for factoring large integers
+        $VERBOSE         = 0;                          # true to enable verbose/debug mode
+        $SPECIAL_FACTORS = 1;                          # true to check for special factors in `_factor(n)`
     }
 
     state $MONE = Math::GMPz::Rmpz_init_set_si(-1);
@@ -46,9 +47,14 @@ package Sidef::Types::Number::Number {
 #>>>
 
     use constant {
-                  YAFU_CUTOFF       => 49,                                        # in decimal digits
-                  PRIMECOUNT_CUTOFF => ((ULONG_MAX < 1e11) ? ULONG_MAX : 1e11),
-                 };
+
+        YAFU_CUTOFF            => 49,     # in decimal digits
+        SPECIAL_FACTORS_CUTOFF => 49,     # in decimal digits (must be greater than SMALL_NUMBER_BITS)
+        SMALL_NUMBER_BITS      => 110,    # in bits (numbers that can be factorized fast)
+        MEDIUM_NUMBER_BITS     => 150,    # in bits (numbers that can be factorized moderately fast)
+
+        PRIMECOUNT_CUTOFF => ((ULONG_MAX < 1e11) ? ULONG_MAX : 1e11),
+    };
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
 
@@ -913,6 +919,28 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        if (length($n) >= SPECIAL_FACTORS_CUTOFF and $SPECIAL_FACTORS) {
+
+            local $SPECIAL_FACTORS = 0;
+            say "Looking for special factors..." if $VERBOSE;
+
+            my @special_factors;
+            foreach my $p (@{_set_int($n)->special_factors}) {
+                if (_is_prob_prime($$p)) {
+                    push @special_factors, "$$p";
+                }
+                else {
+                    push @special_factors, _factor($$p);
+                }
+            }
+
+            @special_factors = map { $_->[0] }
+              sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
+              map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @special_factors;
+
+            return (@factors, @special_factors);
+        }
+
         if (length($n) >= YAFU_CUTOFF and $USE_YAFU) {
 
             if (_is_prob_prime($n)) {
@@ -922,9 +950,12 @@ package Sidef::Types::Number::Number {
             say "YAFU: factoring $n" if $VERBOSE;
 
             my $cwd = Sidef::Types::Glob::Dir->cwd;
-            my $tmp = Sidef::Types::Glob::Dir->tmp;
 
-            $tmp->chdir;
+            # The directory is deleted when the object goes out of scope.
+            require File::Temp;
+            my $tmp = File::Temp->newdir(CLEANUP => 1);
+
+            chdir($tmp);
             my $yafu_output = `yafu $n`;
             $cwd->chdir;
 
@@ -1202,6 +1233,9 @@ package Sidef::Types::Number::Number {
         if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
 
             my $r = Math::GMPz::Rmpz_init_set($n);
+
+            local $USE_YAFU        = 0;
+            local $SPECIAL_FACTORS = 0;
 
             my @factors = _factor(Math::GMPz::Rmpz_get_str($g, 10));
             my @prime_factors;
@@ -16660,7 +16694,7 @@ package Sidef::Types::Number::Number {
                         if (_is_prob_prime($$f)) {
                             push @prime_factors, $f;
                         }
-                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= 150) {
+                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_BITS) {
                             push @prime_factors, (map { _set_int($_) } _factor($$f));
                         }
                         else {
@@ -16891,7 +16925,7 @@ package Sidef::Types::Number::Number {
                         if (_is_prob_prime($$f)) {
                             push @prime_factors, $f;
                         }
-                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= 150) {
+                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_BITS) {
                             push @prime_factors, (map { _set_int($_) } _factor($$f));
                         }
                         else {
@@ -19057,7 +19091,7 @@ package Sidef::Types::Number::Number {
         }
 
         # Factorize directly when n is small enough
-        if (Math::GMPz::Rmpz_sizeinbase($z, 2) <= 110) {
+        if (Math::GMPz::Rmpz_sizeinbase($z, 2) <= SMALL_NUMBER_BITS) {
             return Sidef::Types::Array::Array->new([map { _set_int($_) } _factor(Math::GMPz::Rmpz_get_str($z, 10))]);
         }
 
@@ -19078,7 +19112,9 @@ package Sidef::Types::Number::Number {
             }
 
             foreach my $factor (@arr, $rem) {
-                if (ref($$factor) eq '' or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= 110 or $is_prob_prime->($$factor)) {
+                if (   ref($$factor) eq ''
+                    or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= SMALL_NUMBER_BITS
+                    or $is_prob_prime->($$factor)) {
                     $factorized ||= 1;
                 }
                 else {
@@ -19112,7 +19148,7 @@ package Sidef::Types::Number::Number {
             if ($is_prob_prime->($$f)) {
                 push @prime_factors, $f;
             }
-            elsif (ref($$f) eq '' or Math::GMPz::Rmpz_sizeinbase($$f, 2) <= 110) {
+            elsif (ref($$f) eq '' or Math::GMPz::Rmpz_sizeinbase($$f, 2) <= SMALL_NUMBER_BITS) {
                 push @prime_factors, map { _set_int($_) } _factor($$f);
             }
             else {
