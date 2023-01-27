@@ -32,7 +32,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
-    Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:tCO:kP:M:s', \%args);
+    Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:tCO:kP:M:sN:', \%args);
 }
 
 # Fix potential case mismatches for -R
@@ -92,6 +92,30 @@ if (defined $args{P}) {
         die "Invalid precision: <<$args{P}>> (expected a positive integer)\n";
     }
     $Sidef::Types::Number::Number::PREC = $args{P} << 2;
+}
+
+# Other Number options
+if (defined $args{N}) {
+    require Sidef::Types::Number::Number;
+    my @options = split(/\s*;\s*/, $args{N});
+    foreach my $option (@options) {
+        if ($option =~ /^\s*(\w+)\s*=\s*(\S+)/) {
+            my ($name, $value) = ($1, $2);
+
+            if ($value eq 'true') {
+                $value = 1;
+            }
+            elsif ($value eq 'false') {
+                $value = 0;
+            }
+
+            no strict 'refs';
+            ${'Sidef::Types::Number::Number::' . $name} = $value;
+        }
+        else {
+            die "Invalid format: <<$option>>!\nExpected: 'NAME1=VALUE1; NAME2=VALUE2;'";
+        }
+    }
 }
 
 # Test mode
@@ -246,6 +270,8 @@ sub output_usage {
                     '-P int'     => 'set the precision of floating-point numbers (default: ' . int($Sidef::Types::Number::Number::PREC / 4) . ')',
                     '-M mode'    => ['set the rounding mode of floating-point numbers',
                                      'valid modes: [near], zero, inf, +inf, -inf'],
+                    '-N options' => ['modify class-variables inside the Number class',
+                                     "valid format: 'VERBOSE=1; USE_YAFU=1; USE_PRIMECOUNT=1'"],
                     '-k'         => 'keep track of potentially incorrect parser interpretations',
                     '-E program' => 'one line of program',
                     '-H'         => 'interactive help',
