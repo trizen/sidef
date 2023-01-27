@@ -18964,6 +18964,67 @@ package Sidef::Types::Number::Number {
 
     *gcd_factor = \&gcd_factor;
 
+    sub fibonacci_factor {
+        my ($n, $upto) = @_;
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        $upto =
+          defined($upto)
+          ? do { _any2ui($$upto) // return Sidef::Types::Array::Array->new(bless \$n) }
+          : (2 * __ilog__($n, 2));
+
+        my @factors;
+        my $g = Math::GMPz::Rmpz_init();
+
+        my ($P, $Q) = (3, 1);
+
+        my $U0 = Math::GMPz::Rmpz_init_set_ui(0);
+        my $U1 = Math::GMPz::Rmpz_init_set_ui(1);
+
+        my $V0 = Math::GMPz::Rmpz_init_set_ui(2);
+        my $V1 = Math::GMPz::Rmpz_init_set_ui($P);
+
+        foreach my $k (2 .. $upto) {
+
+            # my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $k);
+
+            Math::GMPz::Rmpz_set($g, $U1);
+            Math::GMPz::Rmpz_mul_ui($U1, $U1, $P);
+            Math::GMPz::Rmpz_submul_ui($U1, $U0, $Q);
+            Math::GMPz::Rmpz_mod($U1, $U1, $n);
+            Math::GMPz::Rmpz_set($U0, $g);
+
+            Math::GMPz::Rmpz_set($g, $V1);
+            Math::GMPz::Rmpz_mul_ui($V1, $V1, $P);
+            Math::GMPz::Rmpz_submul_ui($V1, $V0, $Q);
+            Math::GMPz::Rmpz_mod($V1, $V1, $n);
+            Math::GMPz::Rmpz_set($V0, $g);
+
+            foreach my $t ($U1, $V1 - $P, $V1, $V1 - 1, $V1 + 1) {
+
+                Math::GMPz::Rmpz_gcd($g, $t, $n);
+
+                if (    Math::GMPz::Rmpz_cmp_ui($g, 1) > 0
+                    and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
+                    my $r = Math::GMPz::Rmpz_init_set($g);
+                    push @factors, bless \$r;
+                }
+            }
+        }
+
+        if (!@factors) {
+            return Sidef::Types::Array::Array->new(bless \$n);
+        }
+
+        (bless \$n)->gcd_factors(Sidef::Types::Array::Array->new(\@factors));
+    }
+
+    *fib_factor = \&fibonacci_factor;
+
     sub special_factors {
         my ($n, $m) = @_;
 
@@ -19040,6 +19101,7 @@ package Sidef::Types::Number::Number {
 
         $factorized || $collect_factors->($n->pell_factor($m->inc->mul(_set_int(5e2))));
         $factorized || $collect_factors->($n->phi_finder_factor($m->inc->mul(_set_int(1e3))));
+        $factorized || $collect_factors->($n->fibonacci_factor);
 
         @factors = @{$n->gcd_factors(Sidef::Types::Array::Array->new([@factors]))};
 
@@ -19955,7 +20017,7 @@ package Sidef::Types::Number::Number {
     sub flt_factor {
         my ($n, $base, $reps) = @_;
 
-        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Array::Array->new;

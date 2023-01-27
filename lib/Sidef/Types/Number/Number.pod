@@ -2934,6 +2934,21 @@ Aliases: I<fibonacci>
 
 =cut
 
+=head2 fib_factor
+
+    n.fib_factor(upto = 2*n.ilog2)
+
+Tries to find special factors of a Fibonacci-like number.
+
+    say fib_factor(480.fib)
+    say fib_factor(480.lucas)
+
+The product of the factors will give back C<n>. However, some factors may be composite.
+
+Aliases: I<fibonacci_factor>
+
+=cut
+
 =head2 fibmod
 
     fibmod(n,m)
