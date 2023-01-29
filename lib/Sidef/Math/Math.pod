@@ -95,6 +95,20 @@ Returns the solution for C<x> in C<x ≡ a_k (mod m_k)>, using the Chinese Remai
 
 =cut
 
+=head2 for
+
+    Math.for(initial, conditionBlock, nextTermBlock)
+
+Returns an Enumerator object, generating a sequence of numbers based on the C<conditionBlock> and C<nextTermBlock> blocks.
+
+    Math.for(1, { _ <= 10 }, { .inc }).each { .say }     # count from 1 to 10
+
+The value of C<conditionBlock> can be C<nil>, which creates an infinite Enumerator object:
+
+    say Math.for(2, nil, { .next_prime }).first(25)      # array of first 25 primes
+
+=cut
+
 =head2 gcd
 
     Math.gcd(list...)

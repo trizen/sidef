@@ -422,6 +422,7 @@ HEADER
             }
         }
 
+        $code .= '();';
         $valid ? $code : '';
     }
 

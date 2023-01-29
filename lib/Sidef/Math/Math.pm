@@ -320,6 +320,34 @@ package Sidef::Math::Math {
         );
     }
 
+    sub for {
+        my ($self, $initial, $condition, $step) = @_;
+
+        my $n = $initial;
+
+        Sidef::Object::Enumerator->new(
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    my ($callback) = @_;
+
+                    if (defined($condition) ? $condition->run($n) : 1) {
+                        $callback->run($n);
+                    }
+
+                    while (1) {
+                        $n = $step->run($n);
+                        if (defined($condition) ? $condition->run($n) : 1) {
+                            $callback->run($n);
+                        }
+                        else {
+                            last;
+                        }
+                    }
+                }
+            )
+        );
+    }
+
     sub chinese {
         my ($self, @arrs) = @_;
 

@@ -53,4 +53,13 @@ assert_eq(
     19!
 )
 
+assert_eq(
+    gather {
+         Math.for(1, { _ <= 10 }, { .inc }).each { take(_) }
+    },
+    @(1..10),
+)
+
+assert_eq(Math.for(2, nil, { .next_prime }).first(25), 25.pn_primes)
+
 say ":: Test passed!"

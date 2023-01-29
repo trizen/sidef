@@ -29,4 +29,17 @@ assert_eq(foo(21), nil);
 assert_eq(foo(1), "func");
 assert_eq(foo(42), "foo");
 
+assert_eq([{}(42)], [])
+assert_eq([->{}()], [])
+assert_eq([func(_n){}(42)], [])
+assert_eq([{|_n| }(42)], [])
+
+assert_eq([{_}(42)], [42])
+assert_eq([->(n){n}(42)], [42])
+assert_eq([func(_){_}(42)], [42])
+assert_eq([{|n| n }(42)], [42])
+
+assert_eq({}(), nil)
+assert_eq({}(42), nil)
+
 say "** Test passed!"

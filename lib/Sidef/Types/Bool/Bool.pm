@@ -21,6 +21,10 @@ package Sidef::Types::Bool::Bool {
 
     *call = \&new;
 
+    sub run {
+        $_[0];
+    }
+
     sub true  { (TRUE) }
     sub false { (FALSE) }
 
