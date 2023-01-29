@@ -321,7 +321,7 @@ package Sidef::Math::Math {
     }
 
     sub for {
-        my ($self, $initial, $condition, $step) = @_;
+        my ($self, $initial, $condition, $next_term) = @_;
 
         my $n = $initial;
 
@@ -333,9 +333,12 @@ package Sidef::Math::Math {
                     if (defined($condition) ? $condition->run($n) : 1) {
                         $callback->run($n);
                     }
+                    else {
+                        return;
+                    }
 
                     while (1) {
-                        $n = $step->run($n);
+                        $n = $next_term->run($n);
                         if (defined($condition) ? $condition->run($n) : 1) {
                             $callback->run($n);
                         }

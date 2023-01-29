@@ -57,7 +57,21 @@ assert_eq(
     gather {
          Math.for(1, { _ <= 10 }, { .inc }).each { take(_) }
     },
-    @(1..10),
+    @(1..10)
+)
+
+assert_eq(
+    gather {
+        assert_eq(Math.for(10, { take([:cond, _]); _ <= 5 }, { take([:next, _]); .inc }).first(10), []),
+    },
+    [[:cond, 10]]
+)
+
+assert_eq(
+    gather {
+        assert_eq(Math.for(9, { take([:cond, _]); _ <= 10 }, { take([:next, _]); .inc }).first(10), [9, 10]),
+    },
+    [[:cond, 9], [:next, 9], [:cond, 10], [:next, 10], [:cond, 11]]
 )
 
 assert_eq(Math.for(2, nil, { .next_prime }).first(25), 25.pn_primes)

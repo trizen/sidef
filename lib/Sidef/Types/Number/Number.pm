@@ -15928,12 +15928,10 @@ package Sidef::Types::Number::Number {
         @vals || return ZERO;    # By convention, gcd of an empty set is 0.
         @vals == 1 and return $vals[0];
 
-        my $r = Math::GMPz::Rmpz_init();
-
         if (@vals > 2) {
-            my @terms = map { _any2mpz($$_) // goto &nan } @vals;
 
-            Math::GMPz::Rmpz_set($r, shift(@terms));
+            my @terms = map { _any2mpz($$_) // goto &nan } @vals;
+            my $r     = Math::GMPz::Rmpz_init_set(shift(@terms));
 
             foreach my $z (@terms) {
                 Math::GMPz::Rmpz_gcd($r, $r, $z);
@@ -15946,9 +15944,18 @@ package Sidef::Types::Number::Number {
 
         my ($x, $y) = @vals;
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2mpz($$y) // goto &nan;
+        $x = $$x;
+        $y = $$y;
 
+        if (HAS_PRIME_UTIL and ref($x) eq '' and ref($y) eq '') {
+            my $g = Math::Prime::Util::gcd($x, $y);
+            return bless \$g;
+        }
+
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_gcd($r, $x, $y);
         $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
         bless \$r;
