@@ -22182,6 +22182,26 @@ package Sidef::Types::Number::Number {
         $_[0]->bigomega;
     }
 
+    sub collatz {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+        $n = Math::GMPz::Rmpz_init_set($n);    # copy
+
+        state $two = Math::GMPz::Rmpz_init_set_ui(2);
+        my $count = Math::GMPz::Rmpz_even_p($n) ? Math::GMPz::Rmpz_remove($n, $n, $two) : 0;
+
+        while (Math::GMPz::Rmpz_cmp_ui($n, 1) > 0) {
+
+            Math::GMPz::Rmpz_mul_ui($n, $n, 3);
+            Math::GMPz::Rmpz_add_ui($n, $n, 1);
+
+            $count += 1 + Math::GMPz::Rmpz_remove($n, $n, $two);
+        }
+
+        _set_int($count);
+    }
+
     sub omega {
         my ($n, $m) = @_;
 

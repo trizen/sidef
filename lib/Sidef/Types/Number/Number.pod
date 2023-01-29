@@ -1640,6 +1640,14 @@ Aliases: I<complex_mul>
 
 =cut
 
+=head2 collatz
+
+    n.collatz
+
+Returns the number of halving and tripling steps to reach C<1> in the C<3x+1> Collatz problem.
+
+=cut
+
 =head2 combinations
 
     n.combinations(k)
