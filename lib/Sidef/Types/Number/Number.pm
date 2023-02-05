@@ -24821,7 +24821,8 @@ package Sidef::Types::Number::Number {
         };
 
         if (HAS_NEW_PRIME_UTIL) {
-            my $r = Math::Prime::Util::nth_almost_prime($k, $n);
+            ## XXX: dies for nth_almost_prime(41, 136192538)
+            my $r = eval { Math::Prime::Util::nth_almost_prime("$k", "$n") };
             if ($r) {                                         # workaround for danaj/Math-Prime-Util #71
                 return _set_int("$r");
             }
