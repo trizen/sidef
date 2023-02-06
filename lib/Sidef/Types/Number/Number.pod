@@ -17,6 +17,7 @@ The following class-variables can be changed during runtime:
     Num!ROUND           = 0          # rounding mode for floating-point numbers
     Num!VERBOSE         = false      # true to enable verbose/debug mode
     Num!USE_YAFU        = false      # true to use YAFU for factoring large integers
+    Num!USE_FACTORDB    = false      # true to use factordb.com for factoring large integers
     Num!USE_PRIMECOUNT  = false      # true to use Kim Walisch's primecount in prime_count(n)
     Num!SPECIAL_FACTORS = true       # true to try to find factors of special form in factor(n)
 

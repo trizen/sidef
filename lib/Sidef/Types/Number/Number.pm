@@ -11,13 +11,14 @@ package Sidef::Types::Number::Number {
     use List::Util             qw();
     use Math::Prime::Util::GMP qw();
 
-    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_YAFU, $VERBOSE, $SPECIAL_FACTORS);
+    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_YAFU, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS);
 
     BEGIN {
         $ROUND           = Math::MPFR::MPFR_RNDN();    # rounding mode for floating-point numbers
         $PREC            = 192;                        # precision in bits for floating-point numbers
         $USE_PRIMECOUNT  = 0;                          # true to use Kim Walisch's primecount for large n
         $USE_YAFU        = 0;                          # true to use YAFU for factoring large integers
+        $USE_FACTORDB    = 0;                          # true to use factordb.com for factoring large integers
         $VERBOSE         = 0;                          # true to enable verbose/debug mode
         $SPECIAL_FACTORS = 1;                          # true to check for special factors in `_factor(n)`
     }
@@ -49,6 +50,7 @@ package Sidef::Types::Number::Number {
     use constant {
 
         YAFU_CUTOFF            => 49,     # in decimal digits
+        FACTORDB_CUTOFF        => 65,     # in decimal digits
         SPECIAL_FACTORS_CUTOFF => 49,     # in decimal digits (must be greater than SMALL_NUMBER_BITS)
         SMALL_NUMBER_BITS      => 110,    # in bits (numbers that can be factorized fast)
         MEDIUM_NUMBER_BITS     => 150,    # in bits (numbers that can be factorized moderately fast)
@@ -949,6 +951,67 @@ package Sidef::Types::Number::Number {
             return (@factors, @special_factors);
         }
 
+        if (length($n) >= FACTORDB_CUTOFF and $USE_FACTORDB) {
+
+            if (_is_prob_prime($n, \%is_prob_prime_cache)) {
+                return (@factors, $n);
+            }
+
+            say "FactorDB: factoring $n" if $VERBOSE;
+
+            require JSON;
+            require HTTP::Tiny;
+
+            my $url      = "http://factordb.com/api?query=$n";
+            my $response = HTTP::Tiny->new->get($url);
+
+            if ($response->{success}) {
+                my $json = $response->{content};
+                my $data = eval { JSON::from_json($json) };
+
+                if (ref($data) eq 'HASH' and exists($data->{factors}) and ref($data->{factors}) eq 'ARRAY') {
+
+                    my @factordb_factors;
+                    my @factor_exp = @{$data->{factors}};
+
+                    foreach my $pp (@factor_exp) {
+                        my ($p, $e) = @$pp;
+
+                        if (_is_prob_prime($p, \%is_prob_prime_cache)) {
+                            push @factordb_factors, ($p) x $e;
+                        }
+                        else {
+                            say "FactorDB: composite factor $p" if $VERBOSE;
+                            local $USE_FACTORDB = 0;
+                            my @arr = _factor($p);
+                            foreach my $i (1 .. $e) {
+                                push @factordb_factors, @arr;
+                            }
+                        }
+                    }
+
+                    my $factors_prod = Math::Prime::Util::GMP::vecprod(@factordb_factors);
+
+                    if ($factors_prod ne $n and Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
+                        say "FactorDB: recursively factoring the remainder." if $VERBOSE;
+                        my $r = Math::Prime::Util::GMP::divint($n, $factors_prod);
+                        local $USE_FACTORDB = 0;
+                        push @factordb_factors, _factor($r);
+                        $factors_prod = Math::Prime::Util::GMP::mulint($factors_prod, $r);
+                    }
+
+                    # The prime factors must multiply back to n
+                    if ($factors_prod eq $n) {
+                        say "FactorDB: successful factorization." if $VERBOSE;
+                        @factordb_factors = map { $_->[0] }
+                          sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
+                          map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @factordb_factors;
+                        return (@factors, @factordb_factors);
+                    }
+                }
+            }
+        }
+
         if (length($n) >= YAFU_CUTOFF and $USE_YAFU) {
 
             if (_is_prob_prime($n, \%is_prob_prime_cache)) {
@@ -1254,6 +1317,7 @@ package Sidef::Types::Number::Number {
             my $r = Math::GMPz::Rmpz_init_set($n);
 
             local $USE_YAFU        = 0;
+            local $USE_FACTORDB    = 0;
             local $SPECIAL_FACTORS = 0;
 
             my @factors = _factor(Math::GMPz::Rmpz_get_str($g, 10));
