@@ -961,17 +961,21 @@ package Sidef::Types::Number::Number {
 
             require HTTP::Tiny;
 
-            my $url      = "http://factordb.com/api?query=$n";
-            my $response = HTTP::Tiny->new->get($url);
+            my $http     = HTTP::Tiny->new;
+            my $response = $http->get("http://factordb.com/api?query=$n");
 
             if ($response->{success}) {
                 my $json = $response->{content};
                 my $data = eval { require JSON::PP; JSON::PP::decode_json($json) };
 
-                if (defined($data) and ref($data) eq 'HASH' and exists($data->{factors}) and ref($data->{factors}) eq 'ARRAY')
-                {
+                if (    defined($data)
+                    and ref($data) eq 'HASH'
+                    and exists($data->{factors})
+                    and ref($data->{factors}) eq 'ARRAY') {
 
                     my @factordb_factors;
+                    my @unknown_factors;
+
                     my @factor_exp = @{$data->{factors}};
 
                     foreach my $pp (@factor_exp) {
@@ -984,9 +988,30 @@ package Sidef::Types::Number::Number {
                             say "FactorDB: composite factor $p" if $VERBOSE;
                             local $USE_FACTORDB = 0;
                             my @arr = _factor($p);
+                            push @unknown_factors, @arr;
                             foreach my $i (1 .. Math::Prime::Util::GMP::valuation($n, $p)) {
                                 push @factordb_factors, @arr;
                             }
+                        }
+                    }
+
+                    if (@unknown_factors) {
+                        say "FactorDB: sending new factors to factordb.com" if $VERBOSE;
+                        my $form_data  = "$n = " . join(' * ', @unknown_factors);
+                        my $report_url = "http://factordb.com/report.php";
+                        my $resp       = $http->post_form($report_url, {msub => $form_data});
+                        if ($resp->{success}) {
+                            if ($VERBOSE) {
+                                if ($resp->{content} =~ /Thank you for your contribution/) {
+                                    say "FactorDB: thank you for your contribution!";
+                                }
+                                else {
+                                    say "FactorDB: sent factors successfully!";
+                                }
+                            }
+                        }
+                        else {
+                            say "FactorDB: failed to send the new factors..." if $VERBOSE;
                         }
                     }
 
@@ -16258,7 +16283,7 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
 
         # When n is large enough, is_almost_prime(n,2) is faster
-        if (Math::GMPz::Rmpz_sizeinbase($x, 10) > 40) {
+        if (Math::GMPz::Rmpz_sizeinbase($x, 2) > MEDIUM_NUMBER_MAX_BITS) {
             return _set_int($x)->is_almost_prime(TWO);
         }
 
