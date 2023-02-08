@@ -49,13 +49,13 @@ package Sidef::Types::Number::Number {
 
     use constant {
 
-        YAFU_CUTOFF            => 49,     # in decimal digits
-        FACTORDB_CUTOFF        => 65,     # in decimal digits
-        SPECIAL_FACTORS_CUTOFF => 49,     # in decimal digits (must be greater than SMALL_NUMBER_BITS)
-        SMALL_NUMBER_BITS      => 110,    # in bits (numbers that can be factorized fast)
-        MEDIUM_NUMBER_BITS     => 150,    # in bits (numbers that can be factorized moderately fast)
+        YAFU_MIN               => 49,     # in decimal digits
+        FACTORDB_MIN           => 65,     # in decimal digits
+        SPECIAL_FACTORS_MIN    => 49,     # in decimal digits (must be greater than SMALL_NUMBER_MAX_BITS)
+        SMALL_NUMBER_MAX_BITS  => 110,    # in bits (numbers that can be factorized fast)
+        MEDIUM_NUMBER_MAX_BITS => 150,    # in bits (numbers that can be factorized moderately fast)
 
-        PRIMECOUNT_CUTOFF => ((ULONG_MAX < 1e11) ? ULONG_MAX : 1e11),
+        PRIMECOUNT_MIN => ((ULONG_MAX < 1e11) ? ULONG_MAX : 1e11),    # absolute value
     };
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
@@ -923,7 +923,7 @@ package Sidef::Types::Number::Number {
 
         my %is_prob_prime_cache;
 
-        if (length($n) >= SPECIAL_FACTORS_CUTOFF and $SPECIAL_FACTORS) {
+        if (length($n) >= SPECIAL_FACTORS_MIN and $SPECIAL_FACTORS) {
 
             local $SPECIAL_FACTORS = 0;
             say "Looking for special factors: $n" if $VERBOSE;
@@ -951,7 +951,7 @@ package Sidef::Types::Number::Number {
             return (@factors, @special_factors);
         }
 
-        if (length($n) >= FACTORDB_CUTOFF and $USE_FACTORDB) {
+        if (length($n) >= FACTORDB_MIN and $USE_FACTORDB) {
 
             if (_is_prob_prime($n, \%is_prob_prime_cache)) {
                 return (@factors, $n);
@@ -959,7 +959,6 @@ package Sidef::Types::Number::Number {
 
             say "FactorDB: factoring $n" if $VERBOSE;
 
-            require JSON;
             require HTTP::Tiny;
 
             my $url      = "http://factordb.com/api?query=$n";
@@ -967,9 +966,10 @@ package Sidef::Types::Number::Number {
 
             if ($response->{success}) {
                 my $json = $response->{content};
-                my $data = eval { JSON::from_json($json) };
+                my $data = eval { require JSON::PP; JSON::PP::decode_json($json) };
 
-                if (ref($data) eq 'HASH' and exists($data->{factors}) and ref($data->{factors}) eq 'ARRAY') {
+                if (defined($data) and ref($data) eq 'HASH' and exists($data->{factors}) and ref($data->{factors}) eq 'ARRAY')
+                {
 
                     my @factordb_factors;
                     my @factor_exp = @{$data->{factors}};
@@ -978,13 +978,13 @@ package Sidef::Types::Number::Number {
                         my ($p, $e) = @$pp;
 
                         if (_is_prob_prime($p, \%is_prob_prime_cache)) {
-                            push @factordb_factors, ($p) x $e;
+                            push @factordb_factors, ($p) x Math::Prime::Util::GMP::valuation($n, $p);
                         }
                         else {
                             say "FactorDB: composite factor $p" if $VERBOSE;
                             local $USE_FACTORDB = 0;
                             my @arr = _factor($p);
-                            foreach my $i (1 .. $e) {
+                            foreach my $i (1 .. Math::Prime::Util::GMP::valuation($n, $p)) {
                                 push @factordb_factors, @arr;
                             }
                         }
@@ -1012,7 +1012,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (length($n) >= YAFU_CUTOFF and $USE_YAFU) {
+        if (length($n) >= YAFU_MIN and $USE_YAFU) {
 
             if (_is_prob_prime($n, \%is_prob_prime_cache)) {
                 return (@factors, $n);
@@ -1104,7 +1104,7 @@ package Sidef::Types::Number::Number {
 
                 # The prime factors must multiply back to n
                 if ($factors_prod eq $n) {
-                    say "YAFU: successful factorization." if $VERBOSE;
+                    say "YAFU: successful factorization: @yafu_factors" if $VERBOSE;
                     @yafu_factors = map { $_->[0] }
                       sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
                       map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @yafu_factors;
@@ -13499,7 +13499,7 @@ package Sidef::Types::Number::Number {
                 return $value;
             }
 
-            if ($y > PRIMECOUNT_CUTOFF and $USE_PRIMECOUNT) {
+            if ($y > PRIMECOUNT_MIN and $USE_PRIMECOUNT) {
                 my $count = `primecount $y`;
 
                 if (defined($count)) {
@@ -13512,7 +13512,7 @@ package Sidef::Types::Number::Number {
         if ($USE_PRIMECOUNT) {
             my $diff = Math::Prime::Util::GMP::subint($y, $x);
 
-            if ($diff > PRIMECOUNT_CUTOFF) {
+            if ($diff > PRIMECOUNT_MIN) {
 
                 my $y_count = `primecount $y`;
 
@@ -16793,7 +16793,7 @@ package Sidef::Types::Number::Number {
                         if (_is_prob_prime($$f, \%is_prob_prime_cache)) {
                             push @prime_factors, $f;
                         }
-                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_BITS) {
+                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_MAX_BITS) {
                             push @prime_factors, (map { _set_int($_) } _factor($$f));
                         }
                         else {
@@ -17025,7 +17025,7 @@ package Sidef::Types::Number::Number {
                         if (_is_prob_prime($$f, \%is_prob_prime_cache)) {
                             push @prime_factors, $f;
                         }
-                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_BITS) {
+                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_MAX_BITS) {
                             push @prime_factors, (map { _set_int($_) } _factor($$f));
                         }
                         else {
@@ -19191,7 +19191,7 @@ package Sidef::Types::Number::Number {
         }
 
         # Factorize directly when n is small enough
-        if (Math::GMPz::Rmpz_sizeinbase($z, 2) <= SMALL_NUMBER_BITS) {
+        if (Math::GMPz::Rmpz_sizeinbase($z, 2) <= SMALL_NUMBER_MAX_BITS) {
             return Sidef::Types::Array::Array->new([map { _set_int($_) } _factor(Math::GMPz::Rmpz_get_str($z, 10))]);
         }
 
@@ -19213,7 +19213,7 @@ package Sidef::Types::Number::Number {
 
             foreach my $factor (@arr, $rem) {
                 if (   ref($$factor) eq ''
-                    or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= SMALL_NUMBER_BITS
+                    or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= SMALL_NUMBER_MAX_BITS
                     or _is_prob_prime($$factor, \%is_prob_prime_cache)) {
                     $factorized ||= 1;
                 }
@@ -19248,7 +19248,7 @@ package Sidef::Types::Number::Number {
             if (_is_prob_prime($$f, \%is_prob_prime_cache)) {
                 push @prime_factors, $f;
             }
-            elsif (ref($$f) eq '' or Math::GMPz::Rmpz_sizeinbase($$f, 2) <= SMALL_NUMBER_BITS) {
+            elsif (ref($$f) eq '' or Math::GMPz::Rmpz_sizeinbase($$f, 2) <= SMALL_NUMBER_MAX_BITS) {
                 push @prime_factors, map { _set_int($_) } _factor($$f);
             }
             else {
@@ -21366,7 +21366,7 @@ package Sidef::Types::Number::Number {
 
         $n = _big2uistr($n) // goto &nan;
 
-        if (length($n) < YAFU_CUTOFF) {
+        if (length($n) < YAFU_MIN) {
             my $r = Math::Prime::Util::GMP::totient($n);
             return _set_int($r);
         }
@@ -23150,7 +23150,7 @@ package Sidef::Types::Number::Number {
 
         $n = Math::GMPz::Rmpz_get_str($n, 10);
 
-        if (length($n) < YAFU_CUTOFF) {
+        if (length($n) < YAFU_MIN) {
             return _set_int(Math::Prime::Util::GMP::sigma($n, 0));
         }
 
@@ -23182,7 +23182,7 @@ package Sidef::Types::Number::Number {
         if (HAS_PRIME_UTIL and CORE::abs($k) == 1 and $n < (ULONG_MAX >> 2)) {
             $r = Math::Prime::Util::divisor_sum($n);
         }
-        elsif (length($n) < YAFU_CUTOFF) {
+        elsif (length($n) < YAFU_MIN) {
             $r = Math::Prime::Util::GMP::sigma($n, CORE::abs($k));
         }
         else {
