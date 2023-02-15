@@ -243,7 +243,7 @@ package Sidef::Types::Number::Number {
 
         my $ref = ref($x);
 
-        if ($ref eq '') {
+        if (!$ref) {
             ('int', $x);
         }
         elsif ($ref eq 'Math::GMPz') {
@@ -592,7 +592,7 @@ package Sidef::Types::Number::Number {
     sub _any2mpc {
         my ($x) = @_;
 
-        if (ref($x) eq '') {
+        if (!ref($x)) {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
             ($x < 0)
               ? Math::MPC::Rmpc_set_si($r, $x, $ROUND)
@@ -613,7 +613,7 @@ package Sidef::Types::Number::Number {
     sub _any2mpfr {
         my ($x) = @_;
 
-        if (ref($x) eq '') {
+        if (!ref($x)) {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             ($x < 0)
               ? Math::MPFR::Rmpfr_set_si($r, $x, $ROUND)
@@ -683,7 +683,7 @@ package Sidef::Types::Number::Number {
     sub _any2mpq {
         my ($x) = @_;
 
-        ref($x) eq ''           && return _mpz2mpq(_any2mpz($x));
+        ref($x) || return _mpz2mpq(_any2mpz($x));
         ref($x) eq 'Math::GMPq' && return $x;
         ref($x) eq 'Math::GMPz' && goto &_mpz2mpq;
 
@@ -702,22 +702,22 @@ package Sidef::Types::Number::Number {
 
     sub _fits_ulong {
         my ($n) = @_;
-        (ref($n) eq '') ? ($n >= 0) : (ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n));
+        (!ref($n)) ? ($n >= 0) : (ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n));
     }
 
     sub _fits_slong {
         my ($n) = @_;
-        (ref($n) eq '') ? 1 : (ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($n));
+        (!ref($n)) ? 1 : (ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($n));
     }
 
     sub _get_ulong {
         my ($n) = @_;
-        (ref($n) eq '') ? $n : Math::GMPz::Rmpz_get_ui($n);
+        (!ref($n)) ? $n : Math::GMPz::Rmpz_get_ui($n);
     }
 
     sub _get_slong {
         my ($n) = @_;
-        (ref($n) eq '') ? $n : Math::GMPz::Rmpz_get_si($n);
+        (!ref($n)) ? $n : Math::GMPz::Rmpz_get_si($n);
     }
 
     #
@@ -840,7 +840,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x if index(ref($x), 'Sidef::') == 0;
 
-        if (ref($x) eq '') {
+        if (!ref($x)) {
             return $x;
         }
 
@@ -858,7 +858,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x if index(ref($x), 'Sidef::') == 0;
 
-        if (ref($x) eq '') {
+        if (!ref($x)) {
             return (($x >= 0) ? $x : undef);
         }
 
@@ -877,7 +877,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x if index(ref($x), 'Sidef::') == 0;
 
-        if (ref($x) eq '') {
+        if (!ref($x)) {
             return (($x > 0) ? $x : undef);
         }
 
@@ -1135,15 +1135,6 @@ package Sidef::Types::Number::Number {
                       map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @yafu_factors;
                     return (@factors, @yafu_factors);
                 }
-            }
-        }
-
-        if (HAS_PRIME_UTIL) {
-            if ($VERBOSE) {
-                Math::Prime::Util::prime_set_config(verbose => 1);
-            }
-            else {
-                Math::Prime::Util::prime_set_config(verbose => 0);
             }
         }
 
@@ -1684,7 +1675,7 @@ package Sidef::Types::Number::Number {
 
     sub int {
         my ($x) = @_;
-        (ref($$x) eq '' or ref($$x) eq 'Math::GMPz') ? $x : bless \(_any2mpz($$x) // (goto &nan));
+        (!ref($$x) or ref($$x) eq 'Math::GMPz') ? $x : bless \(_any2mpz($$x) // (goto &nan));
     }
 
     *trunc  = \&int;
@@ -3139,8 +3130,15 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2mpz($$y) // (goto &nan);
+        $x = $$x;
+        $y = $$y;
+
+        if (!ref($x) and !ref($y)) {
+            return bless \__add__($x, $y);
+        }
+
+        $x = _any2mpz($x) // (goto &nan);
+        $y = _any2mpz($y) // (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_add($r, $x, $y);
@@ -3152,8 +3150,15 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2mpz($$y) // (goto &nan);
+        $x = $$x;
+        $y = $$y;
+
+        if (!ref($x) and !ref($y)) {
+            return bless \__sub__($x, $y);
+        }
+
+        $x = _any2mpz($x) // (goto &nan);
+        $y = _any2mpz($y) // (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_sub($r, $x, $y);
@@ -3165,8 +3170,15 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2mpz($$y) // (goto &nan);
+        $x = $$x;
+        $y = $$y;
+
+        if (!ref($x) and !ref($y)) {
+            return bless \__mul__($x, $y);
+        }
+
+        $x = _any2mpz($x) // (goto &nan);
+        $y = _any2mpz($y) // (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mul($r, $x, $y);
@@ -3181,10 +3193,8 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (HAS_NEW_PRIME_UTIL and _fits_ulong($x) and _fits_ulong($y)) {
-            if (my $de = _get_ulong($y)) {
-                return _set_int(Math::Prime::Util::divint(_get_ulong($x), $de));
-            }
+        if (HAS_NEW_PRIME_UTIL and !ref($x) and !ref($y) and $x > 0 and $y > 0) {
+            return _set_int(Math::Prime::Util::divint($x, $y));
         }
 
         $x = _any2mpz($x) // (goto &nan);
@@ -3239,6 +3249,7 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_cdiv_q($r, $x, $y);
+        $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
         bless \$r;
     }
 
@@ -3269,6 +3280,7 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_tdiv_q($r, $x, $y);
+        $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
         bless \$r;
     }
 
@@ -3302,6 +3314,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_addmul_ui($r, $x, 2);
         Math::GMPz::Rmpz_div($r, $r, $y);
         Math::GMPz::Rmpz_div_2exp($r, $r, 1);
+        $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
         bless \$r;
     }
 
@@ -3569,8 +3582,11 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = _any2si($$y) // (goto &nan);
 
-        if (HAS_PRIME_UTIL and $y >= 1 and _fits_ulong($x)) {
-            return _set_int(Math::Prime::Util::rootint(_get_ulong($x), $y));
+        if (HAS_PRIME_UTIL and $y >= 1 and !ref($x) and $x >= 0) {
+            if ($y == 1) {
+                return bless \$x;
+            }
+            return _set_int(Math::Prime::Util::rootint($x, $y));
         }
 
         bless \__iroot__(_any2mpz($x) // (goto &nan), $y);
@@ -3581,8 +3597,8 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($x)) {
-            return _set_int(Math::Prime::Util::sqrtint(_get_ulong($x)));
+        if (HAS_PRIME_UTIL and !ref($x) and $x >= 0) {
+            return _set_int(Math::Prime::Util::sqrtint($x));
         }
 
         $x = _any2mpz($x) // goto &nan;
@@ -3596,7 +3612,14 @@ package Sidef::Types::Number::Number {
 
     sub icbrt {
         my ($x) = @_;
-        bless \__iroot__(_any2mpz($$x) // (goto &nan), 3);
+
+        $x = $$x;
+
+        if (HAS_PRIME_UTIL and !ref($x) and $x >= 0) {
+            return _set_int(Math::Prime::Util::rootint($x, 3));
+        }
+
+        bless \__iroot__(_any2mpz($x) // (goto &nan), 3);
     }
 
     sub isqrtrem {
@@ -4136,7 +4159,15 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         if (defined($y)) {
             _valid(\$y);
-            _set_int(__ilog__((_any2mpz($$x) // goto &nan), (_any2mpz($$y) // goto &nan)) // goto &nan);
+
+            $x = $$x;
+            $y = $$y;
+
+            if (HAS_PRIME_UTIL and !ref($x) and !ref($y) and $x > 0 and $y > 1) {
+                return _set_int(Math::Prime::Util::logint($x, $y));
+            }
+
+            _set_int(__ilog__((_any2mpz($x) // goto &nan), (_any2mpz($y) // goto &nan)) // goto &nan);
         }
         else {
             bless \(_any2mpz(__log__(_any2mpfr_mpc($$x))) // goto &nan);
@@ -4145,12 +4176,26 @@ package Sidef::Types::Number::Number {
 
     sub ilog2 {
         my ($x) = @_;
-        _set_int(__ilog__((_any2mpz($$x) // goto &nan), 2) // goto &nan);
+
+        $x = $$x;
+
+        if (HAS_PRIME_UTIL and !ref($x) and $x > 0) {
+            return _set_int(Math::Prime::Util::logint($x, 2));
+        }
+
+        _set_int(__ilog__((_any2mpz($x) // goto &nan), 2) // goto &nan);
     }
 
     sub ilog10 {
         my ($x) = @_;
-        _set_int(__ilog__((_any2mpz($$x) // goto &nan), 10) // goto &nan);
+
+        $x = $$x;
+
+        if (HAS_PRIME_UTIL and !ref($x) and $x > 0) {
+            return _set_int(Math::Prime::Util::logint($x, 10));
+        }
+
+        _set_int(__ilog__((_any2mpz($x) // goto &nan), 10) // goto &nan);
     }
 
     sub msb {
@@ -6782,7 +6827,7 @@ package Sidef::Types::Number::Number {
     sub __is_int__ {
         my ($x) = @_;
 
-        ref($x) eq ''           && return 1;
+        ref($x) || return 1;
         ref($x) eq 'Math::GMPz' && return 1;
         ref($x) eq 'Math::GMPq' && return Math::GMPq::Rmpq_integer_p($x);
         ref($x) eq 'Math::MPFR' && return Math::MPFR::Rmpfr_integer_p($x);
@@ -6800,7 +6845,7 @@ package Sidef::Types::Number::Number {
 
     sub __is_rat__ {
         my ($x) = @_;
-        ref($x) eq '' or ref($x) eq 'Math::GMPz' or ref($x) eq 'Math::GMPq';
+        !ref($x) or ref($x) eq 'Math::GMPz' or ref($x) eq 'Math::GMPq';
     }
 
     sub is_rat {
@@ -6825,7 +6870,7 @@ package Sidef::Types::Number::Number {
     sub __is_real__ {
         my ($x) = @_;
 
-        ref($x) eq ''           && return 1;
+        ref($x) || return 1;
         ref($x) eq 'Math::GMPz' && return 1;
         ref($x) eq 'Math::GMPq' && return 1;
         ref($x) eq 'Math::MPFR' && return Math::MPFR::Rmpfr_number_p($x);
@@ -6889,14 +6934,28 @@ package Sidef::Types::Number::Number {
 
     sub is_even {
         my ($x) = @_;
-        (__is_int__($$x) && Math::GMPz::Rmpz_even_p(_any2mpz($$x) // (return Sidef::Types::Bool::Bool::FALSE)))
+
+        $x = $$x;
+
+        if (!ref($x)) {
+            return (($x % 2 == 0) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE));
+        }
+
+        (__is_int__($x) && Math::GMPz::Rmpz_even_p(_any2mpz($x) // (return Sidef::Types::Bool::Bool::FALSE)))
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub is_odd {
         my ($x) = @_;
-        (__is_int__($$x) && Math::GMPz::Rmpz_odd_p(_any2mpz($$x) // (return Sidef::Types::Bool::Bool::FALSE)))
+
+        $x = $$x;
+
+        if (!ref($x)) {
+            return (($x % 2 == 1) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE));
+        }
+
+        (__is_int__($x) && Math::GMPz::Rmpz_odd_p(_any2mpz($x) // (return Sidef::Types::Bool::Bool::FALSE)))
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -6908,6 +6967,15 @@ package Sidef::Types::Number::Number {
         $n = $$n;
         $k = $$k;
         $m = $$m;
+
+        if (!ref($n) and !ref($k) and !ref($m)) {
+            $m || return Sidef::Types::Bool::Bool::FALSE;
+            return (
+                      (($k % $m) == ($n % $m))
+                    ? (Sidef::Types::Bool::Bool::TRUE)
+                    : (Sidef::Types::Bool::Bool::FALSE)
+                   );
+        }
 
         if (ref($n) eq 'Math::GMPz' and ref($k) eq 'Math::GMPz' and ref($m) eq 'Math::GMPz') {
             Math::GMPz::Rmpz_sgn($m) || return Sidef::Types::Bool::Bool::FALSE;
@@ -6952,18 +7020,8 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (ref($x) eq 'Math::GMPz' and ref($y) eq 'Math::GMPz') {
-            return (
-                      (Math::GMPz::Rmpz_divisible_p($y, $x) && Math::GMPz::Rmpz_sgn($x))
-                    ? (Sidef::Types::Bool::Bool::TRUE)
-                    : (Sidef::Types::Bool::Bool::FALSE)
-                   );
-        }
-
-        if (_fits_ulong($x)) {
-            $x = _get_ulong($x);
-            if (_fits_ulong($y)) {
-                $y = _get_ulong($y);
+        if (!ref($x) and $x > 0) {
+            if (!ref($y)) {
                 return (
                           ($y % $x == 0)
                         ? (Sidef::Types::Bool::Bool::TRUE)
@@ -6979,6 +7037,14 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        if (ref($x) eq 'Math::GMPz' and ref($y) eq 'Math::GMPz') {
+            return (
+                      (Math::GMPz::Rmpz_divisible_p($y, $x) && Math::GMPz::Rmpz_sgn($x))
+                    ? (Sidef::Types::Bool::Bool::TRUE)
+                    : (Sidef::Types::Bool::Bool::FALSE)
+                   );
+        }
+
         __eq__(__mod__($y, $x), 0)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
@@ -6987,7 +7053,7 @@ package Sidef::Types::Number::Number {
     sub __is_inf__ {
         my ($x) = @_;
 
-        ref($x) eq ''           && return 0;
+        ref($x) || return 0;
         ref($x) eq 'Math::GMPz' && return 0;
         ref($x) eq 'Math::GMPq' && return 0;
         ref($x) eq 'Math::MPFR' && return (Math::MPFR::Rmpfr_inf_p($x) and Math::MPFR::Rmpfr_sgn($x) > 0);
@@ -7006,7 +7072,7 @@ package Sidef::Types::Number::Number {
     sub __is_ninf__ {
         my ($x) = @_;
 
-        ref($x) eq ''           && return 0;
+        ref($x) || return 0;
         ref($x) eq 'Math::GMPz' && return 0;
         ref($x) eq 'Math::GMPq' && return 0;
         ref($x) eq 'Math::MPFR' && return (Math::MPFR::Rmpfr_inf_p($x) and Math::MPFR::Rmpfr_sgn($x) < 0);
@@ -7027,7 +7093,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        ref($x) eq ''           && return Sidef::Types::Bool::Bool::FALSE;
+        ref($x) || return Sidef::Types::Bool::Bool::FALSE;
         ref($x) eq 'Math::GMPz' && return Sidef::Types::Bool::Bool::FALSE;
         ref($x) eq 'Math::GMPq' && return Sidef::Types::Bool::Bool::FALSE;
         ref($x) eq 'Math::MPFR'
@@ -9820,8 +9886,16 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2mpz($$y) // (goto &nan);
+        $x = $$x;
+        $y = $$y;
+
+        if (HAS_PRIME_UTIL and !ref($x) and !ref($y)) {
+            my $r = Math::Prime::Util::invmod($x, $y) // goto &nan;
+            return bless \$r;
+        }
+
+        $x = _any2mpz($x) // (goto &nan);
+        $y = _any2mpz($y) // (goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_invert($r, $x, $y) || (goto &nan);
@@ -9879,9 +9953,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (_fits_ulong($x) and _fits_ulong($y)) {
-            $x = _get_ulong($x);
-            $y = _get_ulong($y);
+        if ((!ref($x) && $x >= 0) and (!ref($y) && $y >= 0)) {
             my $r = $x & $y;
             return bless \$r;
         }
@@ -9902,9 +9974,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (_fits_ulong($x) and _fits_ulong($y)) {
-            $x = _get_ulong($x);
-            $y = _get_ulong($y);
+        if ((!ref($x) && $x >= 0) and (!ref($y) && $y >= 0)) {
             my $r = $x | $y;
             return bless \$r;
         }
@@ -9925,9 +9995,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (_fits_ulong($x) and _fits_ulong($y)) {
-            $x = _get_ulong($x);
-            $y = _get_ulong($y);
+        if ((!ref($x) && $x >= 0) and (!ref($y) && $y >= 0)) {
             my $r = $x ^ $y;
             return bless \$r;
         }
@@ -11615,7 +11683,7 @@ package Sidef::Types::Number::Number {
         my $D = __mod__(__sub__(__mul__($y, $y), __mul__(__mul__($x, $z), 4)), $four_m);
 
         # The discriminant must be an integer
-        (ref($D) eq '' or ref($D) eq 'Math::GMPz' or (ref($D) eq 'Math::GMPq' and Math::GMPq::Rmpq_integer_p($D)))
+        (!ref($D) or ref($D) eq 'Math::GMPz' or (ref($D) eq 'Math::GMPq' and Math::GMPq::Rmpq_integer_p($D)))
           || return Sidef::Types::Array::Array->new;
 
         # Find all the solutions k to: k^2 == D (mod 4*m)
@@ -11813,7 +11881,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = _any2si($$y) // (goto &nan);
 
-        if (ref($x) eq '' and $x <= 1e6 and $x >= 0 and $y >= 0) {
+        if (!ref($x) and $x <= 1e6 and $x >= 0 and $y >= 0) {
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_bin_uiui($r, $x, $y);
             return bless \$r;
@@ -11909,13 +11977,17 @@ package Sidef::Types::Number::Number {
             $n = Math::GMPz::Rmpz_init_set_str($n, 10) if !ref($n);
             $m = Math::GMPz::Rmpz_init_set_str($m, 10) if !ref($m);
 
-            #~ say "Small k: ($n, $k, $m)";
+            # say "Small k: ($n, $k, $m)";
 
             if ($k <= 1e6) {
-
-                # This is fast only with recent versions of GMP
                 my $bin = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_bin_ui($bin, $n, $k);
+                if (Math::GMPz::Rmpz_fits_ulong_p($n) and Math::GMPz::Rmpz_cmp_ui($n, 1e5) <= 0) {
+                    Math::GMPz::Rmpz_bin_uiui($bin, Math::GMPz::Rmpz_get_ui($n), $k);
+                }
+                else {
+                    # This is fast only with recent versions of GMP
+                    Math::GMPz::Rmpz_bin_ui($bin, $n, $k);
+                }
                 Math::GMPz::Rmpz_mod($bin, $bin, $m);
                 return $bin;
             }
@@ -15364,7 +15436,35 @@ package Sidef::Types::Number::Number {
     sub kronecker {
         my ($x, $y) = @_;
         _valid(\$y);
-        my $s = Math::GMPz::Rmpz_kronecker(_any2mpz($$x) // (goto &nan), _any2mpz($$y) // (goto &nan));
+
+        $x = $$x;
+        $y = $$y;
+
+        my $s;
+
+        if (!ref($x)) {
+            if (HAS_PRIME_UTIL and !ref($y)) {
+                $s = Math::Prime::Util::kronecker($x, $y);
+            }
+            elsif ($x >= 0) {
+                $s = Math::GMPz::Rmpz_ui_kronecker($x, _any2mpz($y) // (goto &nan));
+            }
+            else {
+                $s = Math::GMPz::Rmpz_si_kronecker($x, _any2mpz($y) // (goto &nan));
+            }
+        }
+        elsif (!ref($y)) {
+            if ($y >= 0) {
+                $s = Math::GMPz::Rmpz_kronecker_ui(_any2mpz($x) // (goto &nan), $y);
+            }
+            else {
+                $s = Math::GMPz::Rmpz_kronecker_si(_any2mpz($x) // (goto &nan), $y);
+            }
+        }
+        else {
+            $s = Math::GMPz::Rmpz_kronecker(_any2mpz($x) // (goto &nan), _any2mpz($y) // (goto &nan));
+        }
+
         $s ? (($s == 1) ? ONE : MONE) : ZERO;
     }
 
@@ -16036,7 +16136,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (HAS_PRIME_UTIL and ref($x) eq '' and ref($y) eq '') {
+        if (HAS_PRIME_UTIL and !ref($x) and !ref($y)) {
             my $g = Math::Prime::Util::gcd($x, $y);
             return bless \$g;
         }
@@ -16117,7 +16217,9 @@ package Sidef::Types::Number::Number {
 
         if (@vals > 2) {
             my @terms = map { _any2mpz($$_) // goto &nan } @vals;
-            return bless \_binsplit(\@terms, \&__lcm__);
+            my $r     = _binsplit(\@terms, \&__lcm__);
+            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
+            return bless \$r;
         }
 
         my ($x, $y) = @vals;
@@ -16127,6 +16229,7 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_lcm($r, $x, $y);
+        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
         bless \$r;
     }
 
@@ -16149,8 +16252,18 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2mpz($$y) // goto &nan;
+        $x = $$x;
+        $y = $$y;
+
+        if (HAS_PRIME_UTIL and !ref($x) and !ref($y)) {
+            $y || return ZERO;
+            $y = CORE::abs($y) if ($y < 0);
+            $y == 1 && return ZERO;
+            return _set_int(Math::Prime::Util::valuation($x, $y));
+        }
+
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
 
         Math::GMPz::Rmpz_sgn($y)          || return ZERO;
         Math::GMPz::Rmpz_cmpabs_ui($y, 1) || return ZERO;
@@ -16269,10 +16382,12 @@ package Sidef::Types::Number::Number {
     sub is_semiprime {
         my ($x) = @_;
 
-        __is_int__($$x) || return Sidef::Types::Bool::Bool::FALSE;
+        $x = $$x;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($$x)) {
-            my $result = Math::Prime::Util::is_semiprime(_get_ulong($$x));
+        __is_int__($x) || return Sidef::Types::Bool::Bool::FALSE;
+
+        if (HAS_PRIME_UTIL and (!ref($x) or _fits_ulong($x))) {
+            my $result = Math::Prime::Util::is_semiprime(ref($x) ? _get_ulong($x) : $x);
             return (
                     $result
                     ? Sidef::Types::Bool::Bool::TRUE
@@ -16280,7 +16395,7 @@ package Sidef::Types::Number::Number {
                    );
         }
 
-        $x = _any2mpz($$x) // return Sidef::Types::Bool::Bool::FALSE;
+        $x = _any2mpz($x) // return Sidef::Types::Bool::Bool::FALSE;
 
         # When n is large enough, is_almost_prime(n,2) is faster
         if (Math::GMPz::Rmpz_sizeinbase($x, 2) > MEDIUM_NUMBER_MAX_BITS) {
@@ -16510,7 +16625,7 @@ package Sidef::Types::Number::Number {
     sub _primality_pretest {
         my ($n) = @_;
 
-        if (ref($n) eq '') {
+        if (!ref($n)) {
             $n > 0 or return;
             if ($n % 2 == 0) {
                 return ($n == 2);
@@ -16634,9 +16749,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($n)) {
+        if (HAS_PRIME_UTIL and (!ref($n) or _fits_ulong($n))) {
             return (
-                    Math::Prime::Util::is_prime(_get_ulong($n))
+                    Math::Prime::Util::is_prime(ref($n) ? _get_ulong($n) : $n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -17121,9 +17236,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($n)) {
+        if (HAS_PRIME_UTIL and (!ref($n) or _fits_ulong($n))) {
             return (
-                    Math::Prime::Util::is_prob_prime(_get_ulong($n))
+                    Math::Prime::Util::is_prob_prime(ref($n) ? _get_ulong($n) : $n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -17183,7 +17298,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (ref($n) eq '') {
+        if (!ref($n)) {
             $n > 3 or return Sidef::Types::Bool::Bool::FALSE;
             return (
                     (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($n) : Math::Prime::Util::GMP::is_prob_prime($n))
@@ -17243,7 +17358,7 @@ package Sidef::Types::Number::Number {
         state $g = Math::GMPz::Rmpz_init_nobless();
 
         foreach my $base (@bases) {
-            if (ref($base) eq '') {
+            if (!ref($base)) {
                 Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, CORE::abs($base)) == 1
                   or return Sidef::Types::Bool::Bool::FALSE;
             }
@@ -18233,7 +18348,7 @@ package Sidef::Types::Number::Number {
 
                 my @list;
 
-                if (HAS_PRIME_UTIL and ref($to) eq '') {
+                if (HAS_PRIME_UTIL and !ref($to)) {
                     Math::Prime::Util::forcomposites(sub { push @list, $_ }, $from, $to);
                     return \@list;
                 }
@@ -18316,7 +18431,7 @@ package Sidef::Types::Number::Number {
 
         my @list;
 
-        if (HAS_PRIME_UTIL and ref($to) eq '') {
+        if (HAS_PRIME_UTIL and !ref($to)) {
             Math::Prime::Util::forcomposites(
                 sub {
                     push(@list, bless(\(my $o = $_)));
@@ -18601,7 +18716,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         if (HAS_PRIME_UTIL and _fits_ulong($n)) {
-            return _set_int(Math::Prime::Util::prev_prime(_get_ulong($n)) || goto &nan);
+            return _set_int(Math::Prime::Util::prev_prime(ref($n) ? _get_ulong($n) : $n) || goto &nan);
         }
 
         _set_int(Math::Prime::Util::GMP::prev_prime(_big2uistr($n) // goto &nan) || goto &nan);
@@ -18613,7 +18728,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         if (HAS_PRIME_UTIL and _fits_ulong($n)) {
-            return _set_int(Math::Prime::Util::next_prime(_get_ulong($n)) || goto &nan);
+            return _set_int(Math::Prime::Util::next_prime(ref($n) ? _get_ulong($n) : $n) || goto &nan);
         }
 
         _set_int(Math::Prime::Util::GMP::next_prime(_big2uistr($n) // goto &nan) || goto &nan);
@@ -19237,7 +19352,7 @@ package Sidef::Types::Number::Number {
             }
 
             foreach my $factor (@arr, $rem) {
-                if (   ref($$factor) eq ''
+                if (   !ref($$factor)
                     or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= SMALL_NUMBER_MAX_BITS
                     or _is_prob_prime($$factor, \%is_prob_prime_cache)) {
                     $factorized ||= 1;
@@ -19273,7 +19388,7 @@ package Sidef::Types::Number::Number {
             if (_is_prob_prime($$f, \%is_prob_prime_cache)) {
                 push @prime_factors, $f;
             }
-            elsif (ref($$f) eq '' or Math::GMPz::Rmpz_sizeinbase($$f, 2) <= SMALL_NUMBER_MAX_BITS) {
+            elsif (!ref($$f) or Math::GMPz::Rmpz_sizeinbase($$f, 2) <= SMALL_NUMBER_MAX_BITS) {
                 push @prime_factors, map { _set_int($_) } _factor($$f);
             }
             else {
@@ -27522,7 +27637,7 @@ package Sidef::Types::Number::Number {
 
         my $t = __inc__(__div__(__mul__(__dec__($n), 8), $k));
 
-        if (ref($t) eq '' and (HAS_PRIME_UTIL ? Math::Prime::Util::is_square($t) : Math::Prime::Util::GMP::is_square($t))) {
+        if (!ref($t) and (HAS_PRIME_UTIL ? Math::Prime::Util::is_square($t) : Math::Prime::Util::GMP::is_square($t))) {
             $t = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($t) : Math::Prime::Util::GMP::sqrtint($t));
         }
         elsif (ref($t) eq 'Math::GMPz' and Math::GMPz::Rmpz_perfect_square_p($t)) {
@@ -27992,8 +28107,7 @@ package Sidef::Types::Number::Number {
             return bless \$x;
         }
 
-        if ($y >= 0 and _fits_ulong($x)) {
-            $x = _get_ulong($x);
+        if ($y >= 0 and !ref($x) and $x >= 0) {
 
             if ($x == 0) {
                 return bless \$x;
@@ -28026,8 +28140,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = _any2si($$y) // (goto &nan);
 
-        if ($y >= 0 and _fits_ulong($x)) {
-            $x = _get_ulong($x);
+        if ($y >= 0 and !ref($x) and $x >= 0) {
             my $r = $x >> $y;
             return bless \$r;
         }

@@ -126,4 +126,7 @@ assert_eq(-4.2f, float(-4.2))
 assert(42.ne(99))
 assert(!(42.ne(42)))
 
+assert(!0.divides(42))
+assert(42.divides(0))
+
 say "** Test passed!"
