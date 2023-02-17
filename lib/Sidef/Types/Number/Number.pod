@@ -1991,6 +1991,16 @@ It returns NaN when C<moebius(d) = -1> and C<gcd(n/d, m) != 1>, for some C<d|n>.
 
 =cut
 
+=head2 d
+
+    d(n)
+    tau(n)
+    sigma0(n)
+
+Returns the number of positive divisors of C<n>.
+
+=cut
+
 =head2 dconv
 
     n.dconv(f,g)
@@ -7150,15 +7160,6 @@ Defined as:
     x / abs(x)
 
 Aliases: I<sign>
-
-=cut
-
-=head2 sigma0
-
-    tau(n)
-    sigma0(n)
-
-Returns the number of positive divisors of C<n>.
 
 =cut
 

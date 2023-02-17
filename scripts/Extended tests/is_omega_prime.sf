@@ -2,6 +2,9 @@
 
 # Tests for the Number `is_omega_prime(n,k)` method.
 
+# Timings:
+#   17 feb 2023: 9.713s +/- 0.4
+
 func A219019(n) {
     for k in (1..Inf) {
         var v = (k**n - 1)

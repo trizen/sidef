@@ -15458,7 +15458,8 @@ package Sidef::Types::Number::Number {
         $s ? (($s == 1) ? ONE : MONE) : ZERO;
     }
 
-    *Legendre = \&legendre;
+    *Legendre        = \&legendre;
+    *legendre_symbol = \&legendre;
 
     sub jacobi {
         my ($x, $y) = @_;
@@ -15467,7 +15468,8 @@ package Sidef::Types::Number::Number {
         $s ? (($s == 1) ? ONE : MONE) : ZERO;
     }
 
-    *Jacobi = \&jacobi;
+    *Jacobi        = \&jacobi;
+    *jacobi_symbol = \&jacobi;
 
     sub kronecker {
         my ($x, $y) = @_;
@@ -15504,7 +15506,8 @@ package Sidef::Types::Number::Number {
         $s ? (($s == 1) ? ONE : MONE) : ZERO;
     }
 
-    *Kronecker = \&kronecker;
+    *Kronecker        = \&kronecker;
+    *kronecker_symbol = \&kronecker;
 
     sub kronecker_delta {
         my ($x, $y) = @_;
@@ -16907,14 +16910,19 @@ package Sidef::Types::Number::Number {
         my $bigomega  = 0;
         my $remainder = $n;
 
-        if ($size >= 64) {
+        if ($size >= 32) {
 
             my %is_prob_prime_cache;
             my $t = Math::GMPz::Rmpz_init();
 
+            my @trial_factors;
+
             foreach my $j (2 .. 9) {
 
-                my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
+                my $trial_limit = 10**$j;
+                my ($r, @new_factors) = _primorial_trial_factor($remainder, $trial_limit);
+
+                push @trial_factors, @new_factors;
 
                 $bigomega  = scalar(@trial_factors);
                 $remainder = _any2mpz($r);
@@ -16932,7 +16940,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_ui_pow_ui($t, 10**$j, $k - $bigomega);
+                Math::GMPz::Rmpz_ui_pow_ui($t, $trial_limit + 2, $k - $bigomega);
                 Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                   or return Sidef::Types::Bool::Bool::FALSE;
 
@@ -17011,7 +17019,7 @@ package Sidef::Types::Number::Number {
                         return Sidef::Types::Bool::Bool::FALSE;
                     }
 
-                    Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $bigomega);
+                    Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime($trial_limit), $k - $bigomega);
                     Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                       or return Sidef::Types::Bool::Bool::FALSE;
 
@@ -17143,16 +17151,23 @@ package Sidef::Types::Number::Number {
         my $remainder = $n;
         my $size      = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
-        if ($size >= 64) {
+        if ($size >= 32) {
 
             my %is_prob_prime_cache;
             my $t = Math::GMPz::Rmpz_init();
 
+            my @trial_factors;
+
             foreach my $j (2 .. 9) {
 
-                my ($r, @trial_factors) = _primorial_trial_factor($n, 10**$j);
+                my $trial_limit = 10**$j;
+                my ($r, @new_factors) = _primorial_trial_factor($remainder, $trial_limit);
 
-                $omega     = scalar(List::Util::uniq(@trial_factors));
+                if (@new_factors) {
+                    push @trial_factors, List::Util::uniq(@new_factors);
+                }
+
+                $omega     = scalar(@trial_factors);
                 $remainder = _any2mpz($r);
 
                 if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
@@ -17168,11 +17183,15 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_ui_pow_ui($t, 10**$j, $k - $omega);
+                Math::GMPz::Rmpz_ui_pow_ui($t, $trial_limit + 2, $k - $omega);
                 Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                   or return Sidef::Types::Bool::Bool::FALSE;
 
-                my $r_is_prime_power = Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($remainder, 10));
+                my $r_is_prime_power = (
+                                        (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($remainder))
+                                        ? Math::Prime::Util::is_prime_power(Math::GMPz::Rmpz_get_ui($remainder))
+                                        : Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($remainder, 10))
+                                       );
 
                 if ($r_is_prime_power) {
                     if ($omega + 1 == $k) {
@@ -17239,7 +17258,7 @@ package Sidef::Types::Number::Number {
                         return Sidef::Types::Bool::Bool::FALSE;
                     }
 
-                    Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime(10**$j), $k - $omega);
+                    Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime($trial_limit), $k - $omega);
                     Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                       or return Sidef::Types::Bool::Bool::FALSE;
 
@@ -19516,7 +19535,8 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([map { _set_int($_) } _factor($n)]);
     }
 
-    *factors = \&factor;
+    *factors       = \&factor;
+    *prime_factors = \&factor;
 
     sub factor_exp {
         my ($n) = @_;
@@ -22363,8 +22383,7 @@ package Sidef::Types::Number::Number {
         _set_int($r);
     }
 
-    *lambda           = \&carmichael_lambda;
-    *CarmichaelLambda = \&carmichael_lambda;
+    *lambda = \&carmichael_lambda;
 
     sub liouville {
         my ($n) = @_;
@@ -22380,7 +22399,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
-    *Liouville = \&liouville;
+    *Liouville        = \&liouville;
+    *liouville_lambda = \&liouville;
 
     sub bigomega {
         my ($n, $m) = @_;
@@ -23344,6 +23364,8 @@ package Sidef::Types::Number::Number {
         # Multiplicative with a(p^e) = e+1
         _set_int(Math::Prime::Util::GMP::vecprod(map { $_->[1] + 1 } _factor_exp($n)));
     }
+
+    *d = \&sigma0;
 
     sub sigma {
         my ($n, $k) = @_;

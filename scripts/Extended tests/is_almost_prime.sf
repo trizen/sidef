@@ -2,6 +2,9 @@
 
 # Tests for the Number `is_almost_prime(n,k)` method.
 
+# Timings:
+#   17 feb 2023: 4.385s +/- 0.1
+
 func A242786(n) {
     for (var p = 2; true; p.next_prime!) {
         var v = (p**n + 1)
