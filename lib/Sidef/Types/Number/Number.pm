@@ -1270,6 +1270,17 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        if (length($n) >= YAFU_MIN) {
+            my @factors = _factor($n);
+            my %seen;
+            foreach my $f (@factors) {
+                if ($seen{$f}++) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+            }
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
         (HAS_PRIME_UTIL and $n < ULONG_MAX)
           ? Math::Prime::Util::is_square_free($n)
           : (Math::Prime::Util::GMP::moebius($n) != 0);
@@ -16910,7 +16921,7 @@ package Sidef::Types::Number::Number {
         my $bigomega  = 0;
         my $remainder = $n;
 
-        if ($size >= 32) {
+        if ($size >= 40) {
 
             my %is_prob_prime_cache;
             my $t = Math::GMPz::Rmpz_init();
@@ -17101,7 +17112,7 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        if (Math::GMPz::Rmpz_sizeinbase($n, 2) > 100) {
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) > SMALL_NUMBER_MAX_BITS) {
             $n_obj->is_prob_squarefree(_set_int(1e5)) || return Sidef::Types::Bool::Bool::FALSE;
         }
 
@@ -17151,7 +17162,7 @@ package Sidef::Types::Number::Number {
         my $remainder = $n;
         my $size      = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
-        if ($size >= 32) {
+        if ($size >= 40) {
 
             my %is_prob_prime_cache;
             my $t = Math::GMPz::Rmpz_init();
@@ -25783,9 +25794,12 @@ package Sidef::Types::Number::Number {
             $z = _any2mpz($z) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        if (Math::GMPz::Rmpz_sizeinbase($z, 2) > 100) {
-            state $lim = _set_int(1e6);
-            $n->is_prob_squarefree($lim) || return Sidef::Types::Bool::Bool::FALSE;
+        if (Math::GMPz::Rmpz_sizeinbase($z, 2) > SMALL_NUMBER_MAX_BITS) {
+            state $lim_small = _set_int(1e4);
+            state $lim_large = _set_int(1e6);
+
+            $n->is_prob_squarefree($lim_small) || return Sidef::Types::Bool::Bool::FALSE;
+            $n->is_prob_squarefree($lim_large) || return Sidef::Types::Bool::Bool::FALSE;
         }
 
         $z = _big2uistr($z) // return Sidef::Types::Bool::Bool::FALSE;
@@ -25838,7 +25852,7 @@ package Sidef::Types::Number::Number {
         }
 
         # Optimization for large n
-        if (Math::GMPz::Rmpz_sizeinbase($n, 2) > 100) {
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) > SMALL_NUMBER_MAX_BITS) {
             my ($rem, @f) = _adaptive_trial_factor($n);
 
             my %factors;
