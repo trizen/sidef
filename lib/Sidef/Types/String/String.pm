@@ -1336,6 +1336,24 @@ package Sidef::Types::String::String {
         $self->new(Encode::decode_utf8($$self));
     }
 
+    sub deflate {
+        my ($self) = @_;
+        require IO::Compress::RawDeflate;
+        my $input = $$self;
+        IO::Compress::RawDeflate::rawdeflate(\$input => \my $output)
+          or die "rawdeflate failed: $IO::Compress::RawDeflate::RawDeflateError";
+        bless \$output;
+    }
+
+    sub inflate {
+        my ($self) = @_;
+        require IO::Uncompress::RawInflate;
+        my $input = $$self;
+        IO::Uncompress::RawInflate::rawinflate(\$input => \my $output)
+          or die "rawinflate failed: $IO::Uncompress::RawInflate::RawInflateError";
+        bless \$output;
+    }
+
     sub _require {
         my ($self) = @_;
 

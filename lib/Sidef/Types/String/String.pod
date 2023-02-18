@@ -420,6 +420,14 @@ Returns the
 
 =cut
 
+=head2 deflate
+
+    self.deflate
+
+Returns the
+
+=cut
+
 =head2 die
 
     self.die
@@ -739,6 +747,14 @@ Aliases: I<ascii2hex>
 =head2 index
 
     self.index(substr, pos)
+
+Returns the
+
+=cut
+
+=head2 inflate
+
+    self.inflate
 
 Returns the
 
