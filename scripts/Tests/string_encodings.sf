@@ -23,8 +23,29 @@ ok(str_2.encode('UTF-16').bytes.decode('UTF-16'), str_2);
 
 var str_3 = "møøse";
 ok(str_3.chars.len, 5);
-ok(str_3.bytes.len, 7);
-ok(str_3.bytes.join_bytes, str_3);
+ok(str_3.encode_utf8.bytes.len, 7);
+ok(str_3.encode_utf8.bytes.join_bytes, str_3);
 ok(str_3.encode('UTF-16').bytes.decode('UTF-16'), str_3);
+
+assert_eq("\37\x8B".bytes, [31, 139])
+assert_eq("\37\x8B".chars.map{.ord}, [31, 139])
+assert_eq([unpack("C*", "\37\x8B")], ["31", "139"])
+assert_eq(pack("C*", unpack("C*", "\37\x8B")), "\37\x8B")
+
+do { # non-UTF8 escaped strings
+    var s = "\37\x8B\b\0\xD3A\xF1c\0\3+N\xACTP\xF2H\xCD\xC9\xC9\xD7Q(\xCF/\xCAIQT\xE2\2\0u\21\xC9\xF7\24\0\0\0"
+    var t = ["C*".unpack(s)].map{.to_i.chr}.join
+
+    assert_eq(t, s)
+    assert_eq(t.gunzip, %Q(say "Hello, world!"\n))
+
+    assert_eq(t.bytes, s.bytes)
+    assert_eq(s.gunzip, %Q(say "Hello, world!"\n))
+}
+
+do {
+    var s = "+N\xACTP\xF2H\xCD\xC9\xC9\xD7Q(\xCF/\xCAIQT\xE2\2\0"
+    assert_eq(s.inflate, %Q(say "Hello, world!"\n))
+}
 
 say "** All tests passed!";

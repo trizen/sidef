@@ -214,8 +214,35 @@ HEADER
         $self->_dump_string($self->_get_reftype($obj));
     }
 
-    sub _dump_string {
-        qq{"\Q$_[1]\E"};
+    {
+        my %esc = (
+                   "\a" => "\\a",
+                   "\b" => "\\b",
+                   "\t" => "\\t",
+                   "\n" => "\\n",
+                   "\f" => "\\f",
+                   "\r" => "\\r",
+                   "\e" => "\\e",
+                  );
+
+        sub _dump_string {
+            my ($self, $str) = @_;
+
+            # Function by Gisle Aas, copied from `Data::Dump` (thanks).
+
+            $str =~ s/([\\\"\@\$])/\\$1/g;
+            return qq("$str") if ($str !~ /[^\040-\176]/);    # fast exit
+
+            $str =~ s/([\a\b\t\n\f\r\e])/$esc{$1}/g;
+
+            # no need for 3 digits in escape for these
+            $str =~ s/([\0-\037])(?!\d)/sprintf('\\%o',ord($1))/eg;
+
+            $str =~ s/([\0-\037\177-\377])/sprintf('\\x%02X',ord($1))/eg;
+            $str =~ s/([^\040-\176])/sprintf('\\x{%X}',ord($1))/eg;
+
+            return qq("$str");
+        }
     }
 
     sub _dump_op_call {
