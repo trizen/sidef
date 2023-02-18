@@ -1073,9 +1073,7 @@ package Sidef::Types::Number::Number {
 
                 # Make sure all factors are prime
                 my $all_prime = 1;
-                my %seen_factor;
-                foreach my $p (@yafu_factors) {
-                    next if $seen_factor{$p}++;
+                foreach my $p (List::Util::uniq(@yafu_factors)) {
                     if (!_is_prob_prime($p, \%is_prob_prime_cache)) {
                         $all_prime = 0;
                         last;
@@ -1099,12 +1097,8 @@ package Sidef::Types::Number::Number {
                         say "YAFU: recomputing multiplicities..." if $VERBOSE;
 
                         my @corrected_factors;
-                        foreach my $p (
-                            do {
-                                my %seen;
-                                grep { !$seen{$_}++ } @yafu_factors;
-                            }
-                          ) {
+                        foreach my $p (List::Util::uniq(@yafu_factors)) {
+                            next if ($n eq $p);
                             my $v = Math::Prime::Util::GMP::valuation($n, $p);
                             if ($v > 0) {
                                 push(@corrected_factors, ($p) x $v);
@@ -1275,10 +1269,10 @@ package Sidef::Types::Number::Number {
             my %seen;
             foreach my $f (@factors) {
                 if ($seen{$f}++) {
-                    return Sidef::Types::Bool::Bool::FALSE;
+                    return 0;
                 }
             }
-            return Sidef::Types::Bool::Bool::TRUE;
+            return 1;
         }
 
         (HAS_PRIME_UTIL and $n < ULONG_MAX)
@@ -16981,7 +16975,7 @@ package Sidef::Types::Number::Number {
                 # Try to find special factors
                 if (($bigomega == 0 and $j >= 7) or $j >= 8) {
 
-                    my @special_factors = @{(bless \$n)->special_factors};
+                    my @special_factors = @{(bless \$n)->special_factors(($j <= 8) ? ONE : TWO)};
                     my @gcd_factors     = @{
                         (bless \$n)->gcd_factors(
                                      Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)])
@@ -17036,7 +17030,7 @@ package Sidef::Types::Number::Number {
 
                     if (    $j == 8
                         and @composite_factors
-                        and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 2) >= 200) {
+                        and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > YAFU_MIN) {
                         next;
                     }
 
@@ -17228,7 +17222,7 @@ package Sidef::Types::Number::Number {
                 # Try to find special factors
                 if (($omega == 0 and $j >= 7) or $j >= 8) {
 
-                    my @special_factors = @{(bless \$n)->special_factors};
+                    my @special_factors = @{(bless \$n)->special_factors(($j <= 8) ? ONE : TWO)};
                     my @gcd_factors     = @{
                         (bless \$n)->gcd_factors(
                                      Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)])
@@ -17275,7 +17269,7 @@ package Sidef::Types::Number::Number {
 
                     if (    $j == 8
                         and @composite_factors
-                        and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 2) >= 200) {
+                        and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > YAFU_MIN) {
                         next;
                     }
 
@@ -19595,17 +19589,7 @@ package Sidef::Types::Number::Number {
         @factors
           || return Sidef::Types::Array::Array->new(bless \$n);
 
-        my %count;
-        my @uniq_factors;
-
-        foreach my $f (@factors) {
-            if (!$count{$f}++) {
-                push @uniq_factors, $f;
-            }
-        }
-
-        my @return =
-          map { ((bless \$_)) x $count{$_} } @uniq_factors;
+        my @return = map { bless \$_ } @factors;
 
         if (Math::GMPz::Rmpz_cmp_ui($r, 1) > 0) {
             push @return, bless \$r;
