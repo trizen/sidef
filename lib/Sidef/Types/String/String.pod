@@ -706,6 +706,22 @@ Aliases: I<replace_all>
 
 =cut
 
+=head2 gunzip
+
+    self.gunzip
+
+Returns the
+
+=cut
+
+=head2 gzip
+
+    self.gzip
+
+Returns the
+
+=cut
+
 =head2 has
 
     self.has(arg, start_pos)

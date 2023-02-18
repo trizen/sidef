@@ -1341,7 +1341,7 @@ package Sidef::Types::String::String {
         require IO::Compress::RawDeflate;
         my $input = $$self;
         IO::Compress::RawDeflate::rawdeflate(\$input => \my $output)
-          or die "rawdeflate failed: $IO::Compress::RawDeflate::RawDeflateError";
+          or die "String.deflate failed: $IO::Compress::RawDeflate::RawDeflateError";
         bless \$output;
     }
 
@@ -1350,7 +1350,25 @@ package Sidef::Types::String::String {
         require IO::Uncompress::RawInflate;
         my $input = $$self;
         IO::Uncompress::RawInflate::rawinflate(\$input => \my $output)
-          or die "rawinflate failed: $IO::Uncompress::RawInflate::RawInflateError";
+          or die "String.inflate failed: $IO::Uncompress::RawInflate::RawInflateError";
+        bless \$output;
+    }
+
+    sub gzip {
+        my ($self) = @_;
+        require IO::Compress::Gzip;
+        my $input = $$self;
+        IO::Compress::Gzip::gzip(\$input => \my $output)
+          or die "String.gzip failed: $IO::Compress::Gzip::GzipError";
+        bless \$output;
+    }
+
+    sub gunzip {
+        my ($self) = @_;
+        require IO::Uncompress::Gunzip;
+        my $input = $$self;
+        IO::Uncompress::Gunzip::gunzip(\$input => \my $output)
+          or die "String.gunzip failed: $IO::Uncompress::Gunzip::GunzipError";
         bless \$output;
     }
 
