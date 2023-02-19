@@ -1358,6 +1358,14 @@ Returns the
 
 =cut
 
+=head2 use
+
+    self.use
+
+Returns the
+
+=cut
+
 =head2 warn
 
     self.warn

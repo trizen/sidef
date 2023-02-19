@@ -1312,33 +1312,31 @@ package Sidef::Types::String::String {
 
     sub encode {
         my ($self, $enc) = @_;
-
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::encode("$enc", $$self));
     }
 
     sub decode {
         my ($self, $enc) = @_;
-
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::decode("$enc", $$self));
     }
 
     sub encode_utf8 {
         my ($self) = @_;
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::encode_utf8($$self));
     }
 
     sub decode_utf8 {
         my ($self) = @_;
-        require Encode;
+        state $x = require Encode;
         $self->new(Encode::decode_utf8($$self));
     }
 
     sub deflate {
         my ($self) = @_;
-        require IO::Compress::RawDeflate;
+        state $x = require IO::Compress::RawDeflate;
         my $input = $$self;
         IO::Compress::RawDeflate::rawdeflate(\$input => \my $output)
           or die "String.deflate failed: $IO::Compress::RawDeflate::RawDeflateError";
@@ -1347,7 +1345,7 @@ package Sidef::Types::String::String {
 
     sub inflate {
         my ($self) = @_;
-        require IO::Uncompress::RawInflate;
+        state $x = require IO::Uncompress::RawInflate;
         my $input = $$self;
         IO::Uncompress::RawInflate::rawinflate(\$input => \my $output)
           or die "String.inflate failed: $IO::Uncompress::RawInflate::RawInflateError";
@@ -1356,7 +1354,7 @@ package Sidef::Types::String::String {
 
     sub gzip {
         my ($self) = @_;
-        require IO::Compress::Gzip;
+        state $x = require IO::Compress::Gzip;
         my $input = $$self;
         IO::Compress::Gzip::gzip(\$input => \my $output)
           or die "String.gzip failed: $IO::Compress::Gzip::GzipError";
@@ -1365,7 +1363,7 @@ package Sidef::Types::String::String {
 
     sub gunzip {
         my ($self) = @_;
-        require IO::Uncompress::Gunzip;
+        state $x = require IO::Uncompress::Gunzip;
         my $input = $$self;
         IO::Uncompress::Gunzip::gunzip(\$input => \my $output)
           or die "String.gunzip failed: $IO::Uncompress::Gunzip::GunzipError";
@@ -1393,6 +1391,12 @@ package Sidef::Types::String::String {
     sub frequire {
         my ($self) = @_;
         Sidef::Module::Func->__NEW__($self->_require);
+    }
+
+    sub use {
+        my ($self) = @_;
+        eval("use $$self");
+        $@ ? Sidef::Types::Bool::Bool::FALSE : Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub run {
