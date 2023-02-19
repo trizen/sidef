@@ -352,6 +352,16 @@ Returns the
 
 =cut
 
+=head2 mktemp
+
+    self.mktemp(:opts)
+
+Returns the
+
+Aliases: I<make_tmp>, I<make_temp>
+
+=cut
+
 =head2 modification_time_days_diff
 
     self.modification_time_days_diff

@@ -95,6 +95,16 @@ package Sidef::Types::Glob::File {
           :            Sidef::Types::Number::Number::ZERO;
     }
 
+    sub mktemp {
+        my ($self, %opts) = @_;
+        state $x = require File::Temp;
+        my ($fh, $file) = File::Temp::tempfile(%opts);
+        Sidef::Types::Glob::FileHandle->new($fh, __PACKAGE__->new($file));
+    }
+
+    *make_tmp  = \&mktemp;
+    *make_temp = \&mktemp;
+
     sub exists {
         ref($_[0]) || shift(@_);
         my ($self) = @_;

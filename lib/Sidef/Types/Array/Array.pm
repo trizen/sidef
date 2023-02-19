@@ -3599,11 +3599,7 @@ package Sidef::Types::Array::Array {
         my ($self, $encoding) = @_;
         state $x = require Encode;
         $encoding = defined($encoding) ? "$encoding" : 'UTF-8';
-        Sidef::Types::String::String->new(
-            eval {
-                Encode::decode($encoding, CORE::join('', map { CORE::chr($_) } @$self));
-              } // return
-        );
+        Sidef::Types::String::String->new(eval { Encode::decode($encoding, CORE::pack('C*', @$self)) } // return);
     }
 
     *chrs   = \&join_bytes;

@@ -12,19 +12,24 @@ ok(str.chars.len, 9);
 ok(str.graphs.len, 4);
 ok(str.encode('UTF-16').bytes.decode('UTF-16'), str);
 ok(str.chars.join, str);
-ok(str.bytes.join_bytes, str);
+ok(str.bytes.decode, str);
 ok(str.encode('UTF-8').bytes.decode, str);
 
 var str_2 = "𝔘𝔫𝔦𝔠𝔬𝔡𝔢";
 ok(str_2.chars.len, 7);
 ok(str_2.bytes.len, 28);
-ok(str_2.bytes.join_bytes, str_2);
+ok(str_2.bytes.decode, str_2);
 ok(str_2.encode('UTF-16').bytes.decode('UTF-16'), str_2);
 
 var str_3 = "møøse";
+assert_eq(pack('C*', str_3.bytes...).bytes, str_3.bytes.map{.chr}.join.bytes);
+assert_eq(str_3.encode_utf8.bytes.decode('UTF-8'), str_3);
 ok(str_3.chars.len, 5);
+ok(str_3.bytes.len, 5);
+ok(str_3.bytes.map{.chr}.join, str_3);
+ok(pack('C*', str_3.bytes...), str_3);
 ok(str_3.encode_utf8.bytes.len, 7);
-ok(str_3.encode_utf8.bytes.join_bytes, str_3);
+ok(str_3.encode_utf8.bytes.decode, str_3);
 ok(str_3.encode('UTF-16').bytes.decode('UTF-16'), str_3);
 
 assert_eq("\37\x8B".bytes, [31, 139])
