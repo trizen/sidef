@@ -5,7 +5,7 @@ package Sidef::Types::Glob::Dir {
 
     use parent qw(
       Sidef::Types::Glob::File
-      );
+    );
 
     require Encode;
     require File::Spec;
@@ -51,6 +51,35 @@ package Sidef::Types::Glob::Dir {
     }
 
     *temp = \&tmp;
+
+    sub find {
+        my ($self, $arg) = @_;
+        state $x = require File::Find;
+
+        my @files;
+        my $ref      = ref($arg // '');
+        my $is_block = $ref eq 'Sidef::Types::Block::Block';
+
+        File::Find::find(
+            sub {
+                my $file = Encode::decode_utf8($File::Find::name);
+
+                if (-d $file) {
+                    $file = Sidef::Types::Glob::Dir->new($file);
+                }
+                else {
+                    $file = Sidef::Types::Glob::File->new($file);
+                }
+
+                $is_block ? $arg->run($file) : push(@files, $file);
+            },
+            $$self
+        );
+
+        $is_block ? $self : Sidef::Types::Array::Array->new(\@files);
+    }
+
+    *browse = \&find;
 
     sub cwd {
         state $x = require Cwd;

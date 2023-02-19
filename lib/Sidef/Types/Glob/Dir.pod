@@ -74,6 +74,16 @@ Returns the
 
 =cut
 
+=head2 find
+
+    self.find(arg)
+
+Returns the
+
+Aliases: I<browse>
+
+=cut
+
 =head2 home
 
     self.home
