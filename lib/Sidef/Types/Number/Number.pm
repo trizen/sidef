@@ -1189,6 +1189,12 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        if (length($n) >= YAFU_MIN) {
+            my $t = _set_int($n);
+            my $D = $t->divisors($t);
+            return map { (ref($$_) eq 'Math::GMPz') ? Math::GMPz::Rmpz_get_str($$_, 10) : $$_ } @$D;
+        }
+
         (HAS_PRIME_UTIL and $n < ULONG_MAX)
           ? Math::Prime::Util::divisors($n)
           : Math::Prime::Util::GMP::divisors($n);
@@ -16978,7 +16984,7 @@ package Sidef::Types::Number::Number {
                     my @special_factors = @{(bless \$n)->special_factors(($j <= 8) ? ONE : TWO)};
                     my @gcd_factors     = @{
                         (bless \$n)->gcd_factors(
-                                     Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)])
+                                        Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)])
                         )
                     };
 
@@ -17225,7 +17231,7 @@ package Sidef::Types::Number::Number {
                     my @special_factors = @{(bless \$n)->special_factors(($j <= 8) ? ONE : TWO)};
                     my @gcd_factors     = @{
                         (bless \$n)->gcd_factors(
-                                     Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)])
+                                        Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)])
                         )
                     };
 
@@ -20913,7 +20919,7 @@ package Sidef::Types::Number::Number {
             my @factors;
 
             if (   !Math::GMPz::Rmpz_fits_ulong_p($n)
-                and Math::GMPz::Rmpz_cmp_ui($n, $k) > 0
+                and Math::GMPz::Rmpz_fits_ulong_p($k)
                 and ($k <= 1e6 or $k == 1e7 or $k == 1e8)) {
                 (undef, @factors) = _primorial_trial_factor($n, Math::GMPz::Rmpz_get_ui($k));
             }
@@ -20927,7 +20933,6 @@ package Sidef::Types::Number::Number {
             ++$table{$_} for @factors;
 
             my @d = (Math::GMPz::Rmpz_init_set_ui(1));
-            state $t = Math::GMPz::Rmpz_init_nobless();
 
             foreach my $p (sort { Math::GMPz::Rmpz_cmp($a, $b) } map { Math::GMPz::Rmpz_init_set_str($_, 10) } keys %table) {
 
@@ -20937,7 +20942,8 @@ package Sidef::Types::Number::Number {
                 for my $i (1 .. $table{$p}) {
                     Math::GMPz::Rmpz_mul($r, $r, $p);
                     foreach my $u (@d) {
-                        my $prod = $u * $r;
+                        my $prod = Math::GMPz::Rmpz_init();
+                        Math::GMPz::Rmpz_mul($prod, $u, $r);
                         push(@t, $prod) if (Math::GMPz::Rmpz_cmp($prod, $k) <= 0);
                     }
                 }
@@ -20945,7 +20951,12 @@ package Sidef::Types::Number::Number {
                 push @d, @t;
             }
 
-            return Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @d]);
+            return
+              Sidef::Types::Array::Array->new(
+                                         [map { bless \(Math::GMPz::Rmpz_fits_ulong_p($_) ? Math::GMPz::Rmpz_get_ui($_) : $_) }
+                                          sort { Math::GMPz::Rmpz_cmp($a, $b) } @d
+                                         ]
+              );
         }
 
         if (HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($n)) {

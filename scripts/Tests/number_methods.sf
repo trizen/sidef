@@ -526,6 +526,11 @@ do {
     verify_factors(phi_finder_factor(622882096110539), 622882096110539)
     verify_factors(phi_finder_factor(132750061135361, 1e5), 132750061135361)
 
+    with (283874509653487424333753053009549245120760303237063459589551) {|n|
+        verify_factors(n.phi_finder_factor, n)
+        verify_factors(n.fermat_factor(1e5), n)
+    }
+
     verify_factors(fibonacci_factor(480.fib), 480.fib)
     verify_factors(fibonacci_factor(480.lucas), 480.lucas)
 
