@@ -17112,8 +17112,19 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        if (Math::GMPz::Rmpz_sizeinbase($n, 2) > SMALL_NUMBER_MAX_BITS) {
-            $n_obj->is_prob_squarefree(_set_int(1e5)) || return Sidef::Types::Bool::Bool::FALSE;
+        my $size = Math::GMPz::Rmpz_sizeinbase($n, 2);
+
+        if ($size > MEDIUM_NUMBER_MAX_BITS) {
+            state $limit = _set_int(1e5);
+            $n_obj->is_prob_squarefree($limit) || return Sidef::Types::Bool::Bool::FALSE;
+        }
+        elsif ($size > SMALL_NUMBER_MAX_BITS) {
+            state $limit = _set_int(1e4);
+            $n_obj->is_prob_squarefree($limit) || return Sidef::Types::Bool::Bool::FALSE;
+        }
+        elsif ($size > 64) {
+            state $limit = _set_int(1e2);
+            $n_obj->is_prob_squarefree($limit) || return Sidef::Types::Bool::Bool::FALSE;
         }
 
         if ($n_obj->is_omega_prime(_set_int($k)) and $n_obj->is_squarefree) {
