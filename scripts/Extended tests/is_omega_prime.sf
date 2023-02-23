@@ -4,6 +4,7 @@
 
 # Timings:
 #   17 feb 2023: 9.713s +/- 0.4
+#   23 feb 2023: 8.970
 
 func A219019(n) {
     for k in (1..Inf) {

@@ -24328,85 +24328,118 @@ package Sidef::Types::Number::Number {
 
                 my $lambda = $args{lambda};
 
-#<<<
                 if ($k == 1) {
-                    Math::Prime::Util::forprimes(sub {
-                        if ($carmichael) {
-                            my $t = $m*$_;
-                            if (($t-1) % ($_-1) == 0 and ($t-1) % $lambda == 0) {
+
+                    my $lo = $args{from};
+                    my $hi = $args{upto};
+
+                    $lo > $hi && return;
+
+                    if ($carmichael) {
+
+                        my $L = $args{lambda};
+                        my $t = Math::Prime::Util::invmod($m, $L);
+                        $t > $hi && return;
+                        $t += $L while ($t < $lo);
+
+                        for (my $p = $t ; $p <= $hi ; $p += $L) {
+                            Math::Prime::Util::is_prime($p) || next;
+                            my $n = $m * $p;
+                            if (($n - 1) % ($p - 1) == 0) {
                                 if ($strong) {
-                                    my $valuation = Math::Prime::Util::valuation($_-1, 2);
-                                    if ($valuation > $args{k_exp} and Math::Prime::Util::powmod($fermat, ($_-1) >> ($valuation - $args{k_exp}), $_) == ($args{congr} % $_)) {
-                                        push(@almost_primes, $t);
+#<<<
+                                    my $val = Math::Prime::Util::valuation($p - 1, 2);
+                                    if ($val > $args{k_exp} and Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p)) {
+                                        push(@almost_primes, $n);
                                     }
+#>>>
                                 }
                                 else {
-                                    push(@almost_primes, $t);
+                                    push(@almost_primes, $n);
                                 }
                             }
                         }
-                        elsif ($lucas_carmichael) {
-                            my $t = $m*$_;
-                            if (($t+1) % ($_+1) == 0 and ($t+1) % $lambda == 0) {
-                                push(@almost_primes, $t);
+                    }
+                    elsif ($lucas_carmichael) {
+
+                        my $L = $args{lambda};
+                        my $t = $L - Math::Prime::Util::invmod($m, $L);
+                        $t > $hi && return;
+                        $t += $L while ($t < $lo);
+
+                        for (my $p = $t ; $p <= $hi ; $p += $L) {
+                            Math::Prime::Util::is_prime($p) || next;
+                            my $n = $m * $p;
+                            if (($n + 1) % ($p + 1) == 0) {
+                                push(@almost_primes, $n);
                             }
                         }
-                        elsif ($fermat) {
-                            my $t = $m*$_;
-                            if (($t-1)%$lambda == 0) {
-                                my $order = Math::Prime::Util::znorder($fermat, $_);
-                                if (defined($order) and ($t-1) % $order == 0) {
-                                    if ($strong) {
-                                        my $valuation = Math::Prime::Util::valuation($_-1, 2);
-                                        if ($valuation > $args{k_exp} and Math::Prime::Util::powmod($fermat, ($_-1) >> ($valuation - $args{k_exp}), $_) == ($args{congr} % $_)) {
-                                            push(@almost_primes, $t);
-                                        }
+                    }
+                    elsif ($fermat) {
+
+                        my $L = $args{lambda};
+                        my $t = Math::Prime::Util::invmod($m, $L);
+                        $t > $hi && return;
+                        $t += $L while ($t < $lo);
+
+                        for (my $p = $t ; $p <= $hi ; $p += $L) {
+                            Math::Prime::Util::is_prime($p) || next;
+                            my $n     = $m * $p;
+                            my $order = Math::Prime::Util::znorder($fermat, $p);
+                            if (defined($order) and ($n - 1) % $order == 0) {
+                                if ($strong) {
+#<<<
+                                    my $val = Math::Prime::Util::valuation($p - 1, 2);
+                                    if ($val > $args{k_exp} and Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p)) {
+                                        push(@almost_primes, $n);
                                     }
-                                    else {
-                                        push(@almost_primes, $t);
-                                    }
+#>>>
+                                }
+                                else {
+                                    push(@almost_primes, $n);
                                 }
                             }
                         }
-                        else {
-                            push(@almost_primes, $m * $_);
-                        }
-                    }, $args{from}, $args{upto});
+
+                    }
+                    else {
+                        Math::Prime::Util::forprimes(sub { push(@almost_primes, $m * $_) }, $lo, $hi);
+                    }
+
                     return;
                 }
-#>>>
 
                 my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
 
                 for (my $r ; $p <= $s ; $p = $r) {
 
-                    $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : _next_prime($p));
+                    $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
 
                     if ($strong and $fermat) {
                         $fermat % $p == 0 and next;
-                        my $valuation = Math::Prime::Util::valuation($p - 1, 2);
-                        $valuation > $args{k_exp} or next;
-                        Math::Prime::Util::powmod($fermat, ($p - 1) >> ($valuation - $args{k_exp}), $p) == ($args{congr} % $p)
+                        my $val = Math::Prime::Util::valuation($p - 1, 2);
+                        $val > $args{k_exp} or next;
+                        Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p)
                           or next;
                     }
 
-                    my $t = $m * $p;
-
                     my $L;
                     if ($carmichael) {
+                        Math::Prime::Util::gcd($m, $p - 1) == 1 or next;
                         $L = Math::Prime::Util::lcm($lambda, $p - 1);
-                        Math::Prime::Util::gcd($t, $L) == 1 or next;
                     }
                     elsif ($lucas_carmichael) {
+                        Math::Prime::Util::gcd($m, $p + 1) == 1 or next;
                         $L = Math::Prime::Util::lcm($lambda, $p + 1);
-                        Math::Prime::Util::gcd($t, $L) == 1 or next;
                     }
                     elsif ($fermat) {
                         $fermat % $p == 0 and next;
                         my $order = Math::Prime::Util::znorder($fermat, $p) // next;
+                        Math::Prime::Util::gcd($m, $order) == 1 or next;
                         $L = Math::Prime::Util::lcm($lambda, $order);
-                        Math::Prime::Util::gcd($t, $L) == 1 or next;
                     }
+
+                    my $t = $m * $p;
 
                     my $u = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($A, $t) : Math::Prime::Util::GMP::divint($A, $t));
                     my $v = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($B, $t) : Math::Prime::Util::GMP::divint($B, $t));
@@ -24455,146 +24488,153 @@ package Sidef::Types::Number::Number {
             my $A = Math::GMPz::Rmpz_init_set($from);
             my $B = Math::GMPz::Rmpz_init_set($to);
 
-            my $t = Math::GMPz::Rmpz_init_set_ui(0);
-            my $x = Math::GMPz::Rmpz_init();
-            my $y = Math::GMPz::Rmpz_init();
+            my $u = Math::GMPz::Rmpz_init();
+            my $v = Math::GMPz::Rmpz_init();
 
             if ($squarefree) {
                 if ($carmichael or $lucas_carmichael) {
                     my $m = Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::pn_primorial($k + 1), 2);
-                    Math::GMPz::Rmpz_set_str($t, $m, 10);
+                    Math::GMPz::Rmpz_set_str($u, $m, 10);
                 }
                 else {
-                    Math::GMPz::Rmpz_set_str($t, Math::Prime::Util::GMP::pn_primorial($k), 10);
+                    Math::GMPz::Rmpz_set_str($u, Math::Prime::Util::GMP::pn_primorial($k), 10);
                 }
             }
             else {
-                Math::GMPz::Rmpz_setbit($t, $k);    # t = ipow(2, k)
+                Math::GMPz::Rmpz_set_ui($u, 0);
+                Math::GMPz::Rmpz_setbit($u, $k);    # u = ipow(2, k)
             }
 
-            # A = max(A, t)
-            if (Math::GMPz::Rmpz_cmp($t, $A) > 0) {
-                Math::GMPz::Rmpz_set($A, $t);
+            # A = max(A, u)
+            if (Math::GMPz::Rmpz_cmp($u, $A) > 0) {
+                Math::GMPz::Rmpz_set($A, $u);
             }
 
             my $generator = sub {
-                my ($m, $p, $k, %args) = @_;
+                my ($m, $lo, $k, %args) = @_;
 
                 my $lambda = $args{lambda};
 
                 if ($k == 1) {
 
-                    foreach my $q (
-                                   HAS_PRIME_UTIL
-                                   ? @{Math::Prime::Util::primes($args{from}, $args{upto})}
-                                   : Math::Prime::Util::GMP::sieve_primes($args{from}, $args{upto})
-                      ) {
+                    if ($carmichael || $fermat || $lucas_carmichael) {
 
-                        if ($q < ULONG_MAX) {
-                            Math::GMPz::Rmpz_mul_ui($x, $m, $q);
-                        }
-                        else {
-                            Math::GMPz::Rmpz_set_str($y, "$q", 10);
-                            Math::GMPz::Rmpz_mul($x, $y, $m);
+                        my $lo = $args{from};
+                        my $hi = $args{upto};
+
+                        if ($lo > $hi) {
+                            return;
                         }
 
-                        if ($carmichael) {
-                            Math::GMPz::Rmpz_sub_ui($t, $x, 1);
-                            Math::GMPz::Rmpz_divisible_p($t, $lambda) or next;
-                            (
-                             ($q < ULONG_MAX)
-                             ? Math::GMPz::Rmpz_divisible_ui_p($t, $q - 1)
-                             : do {
-                                 Math::GMPz::Rmpz_sub_ui($y, $y, 1);
-                                 Math::GMPz::Rmpz_divisible_p($t, $y);
-                             }
-                            ) || next;
-                        }
-                        elsif ($lucas_carmichael) {
-                            Math::GMPz::Rmpz_add_ui($t, $x, 1);
-                            Math::GMPz::Rmpz_divisible_p($t, $lambda) or next;
-                            (
-                             ($q < ULONG_MAX) ? Math::GMPz::Rmpz_divisible_ui_p($t, $q + 1) : do {
-                                 Math::GMPz::Rmpz_add_ui($y, $y, 1);
-                                 Math::GMPz::Rmpz_divisible_p($t, $y);
-                             }
-                            ) || next;
-                        }
-                        elsif ($fermat) {
-                            Math::GMPz::Rmpz_sub_ui($t, $x, 1);
-                            Math::GMPz::Rmpz_divisible_p($t, $lambda) or next;
-                            my $order = (
-                                         (HAS_PRIME_UTIL and $q < ULONG_MAX)
-                                         ? Math::Prime::Util::znorder($fermat, $q)
-                                         : Math::Prime::Util::GMP::znorder($fermat, $q)
-                                        ) // next;
-                            (
-                             ($order < ULONG_MAX) ? Math::GMPz::Rmpz_divisible_ui_p($t, $order) : do {
-                                 Math::GMPz::Rmpz_set_str($y, "$order", 10);
-                                 Math::GMPz::Rmpz_divisible_p($t, $y);
-                             }
-                            ) || next;
+                        my $L = $args{lambda};
+
+                        Math::GMPz::Rmpz_invert($v, $m, $L);
+                        Math::GMPz::Rmpz_sub($v, $L, $v) if $lucas_carmichael;
+
+                        if (Math::GMPz::Rmpz_cmp_ui($v, $hi) > 0) {
+                            return;
                         }
 
-                        if ($strong and $fermat) {
-                            if ($q < ~0) {
-                                ($q <= $fermat and $fermat % $q == 0) and next;
-                                my $valuation = (
-                                                 HAS_PRIME_UTIL
-                                                 ? Math::Prime::Util::valuation($q - 1, 2)
-                                                 : Math::Prime::Util::GMP::valuation($q - 1, 2)
-                                                );
-                                $valuation > $args{k_exp} or next;
+                        if (Math::GMPz::Rmpz_fits_ulong_p($L)) {
+                            $L = Math::GMPz::Rmpz_get_ui($L);
+                        }
+
+                        my $t = Math::GMPz::Rmpz_get_ui($v);
+                        $t > $hi && return;
+                        $t += $L while ($t < $lo);
+
+                        for (my $p = $t ; $p <= $hi ; $p += $L) {
+
+                            (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($p) : Math::Prime::Util::GMP::is_prime($p)) || next;
+#<<<
+                            if ($strong and $fermat) {
+                                ($p <= $fermat and $fermat % $p == 0) and next;
+                                my $val = (
+                                           HAS_PRIME_UTIL
+                                           ? Math::Prime::Util::valuation($p - 1, 2)
+                                           : Math::Prime::Util::GMP::valuation($p - 1, 2)
+                                          );
+                                $val > $args{k_exp} or next;
                                 if (HAS_PRIME_UTIL) {
-                                    Math::Prime::Util::powmod($fermat, ($q - 1) >> ($valuation - $args{k_exp}), $q) ==
-                                      ($args{congr} % $q)
-                                      or next;
+                                    Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                                 }
                                 else {
-                                    Math::Prime::Util::GMP::powmod($fermat, ($q - 1) >> ($valuation - $args{k_exp}), $q) ==
-                                      ($args{congr} % $q)
-                                      or next;
+                                    Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                                 }
                             }
-                            else {
-                                my $valuation = Math::Prime::Util::GMP::valuation(Math::Prime::Util::GMP::subint($q, 1), 2);
-                                $valuation > $args{k_exp} or next;
-                                my $q_obj = Math::GMPz::Rmpz_init_set_str($q, 10);
-                                my $qm1   = Math::GMPz::Rmpz_init();
-                                my $exp   = Math::GMPz::Rmpz_init();
-                                my $order = Math::GMPz::Rmpz_init();
-                                Math::GMPz::Rmpz_sub_ui($qm1, $q_obj, 1);
-                                Math::GMPz::Rmpz_div_2exp($order, $qm1, $valuation - $args{k_exp});
-                                Math::GMPz::Rmpz_set_ui($exp, $fermat);
-                                Math::GMPz::Rmpz_powm($exp, $exp, $order, $q_obj);
-                                Math::GMPz::Rmpz_set_si($qm1, $args{congr});
-                                Math::GMPz::Rmpz_congruent_p($exp, $qm1, $q_obj) or next;
+#>>>
+                            Math::GMPz::Rmpz_mul_ui($v, $m, $p);
+
+                            $lucas_carmichael
+                              ? Math::GMPz::Rmpz_add_ui($u, $v, 1)
+                              : Math::GMPz::Rmpz_sub_ui($u, $v, 1);
+
+                            if (
+                                  $lucas_carmichael ? Math::GMPz::Rmpz_divisible_ui_p($u, $p + 1)
+                                : $carmichael       ? Math::GMPz::Rmpz_divisible_ui_p($u, $p - 1)
+                                : $fermat           ? do {
+                                    my $order = (
+                                                 HAS_PRIME_UTIL
+                                                 ? Math::Prime::Util::znorder($fermat, $p)
+                                                 : Math::Prime::Util::GMP::znorder($fermat, $p)
+                                                );
+                                    defined($order) and Math::GMPz::Rmpz_divisible_ui_p($u, $order);
+                                }
+                                : die "bug"
+                              ) {
+                                push @almost_primes,
+                                  (
+                                      Math::GMPz::Rmpz_fits_ulong_p($v)
+                                    ? Math::GMPz::Rmpz_get_ui($v)
+                                    : Math::GMPz::Rmpz_init_set($v)
+                                  );
                             }
                         }
-
-                        push @almost_primes,
-                          (
-                              Math::GMPz::Rmpz_fits_ulong_p($x)
-                            ? Math::GMPz::Rmpz_get_ui($x)
-                            : Math::GMPz::Rmpz_init_set($x)
-                          );
+                    }
+                    else {
+                        foreach my $q (
+                                       HAS_PRIME_UTIL
+                                       ? @{Math::Prime::Util::primes($args{from}, $args{upto})}
+                                       : Math::Prime::Util::GMP::sieve_primes($args{from}, $args{upto})
+                          ) {
+                            Math::GMPz::Rmpz_mul_ui($u, $m, $q);
+                            push @almost_primes,
+                              (
+                                  Math::GMPz::Rmpz_fits_ulong_p($u)
+                                ? Math::GMPz::Rmpz_get_ui($u)
+                                : Math::GMPz::Rmpz_init_set($u)
+                              );
+                        }
                     }
 
                     return;
                 }
 
-                my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($B, $m), $k);
-                my $u = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_tdiv_q($u, $B, $m);
+                Math::GMPz::Rmpz_root($u, $u, $k);
+
+                my $hi = (
+                            Math::GMPz::Rmpz_fits_ulong_p($u)
+                          ? Math::GMPz::Rmpz_get_ui($u)
+                          : Math::GMPz::Rmpz_get_str($u, 10)
+                         );
+
+                if ($lo > $hi) {
+                    return;
+                }
+
+                my $x = Math::GMPz::Rmpz_init();
 
                 my $L;
                 if ($carmichael || $lucas_carmichael || $fermat) {
                     $L = Math::GMPz::Rmpz_init();
                 }
 
-                for (my $r ; $p <= $s ; $p = $r) {
+                for (my ($p, $r) = ($lo) ; $p <= $hi ; $p = $r) {
 
-                    $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : _next_prime($p));
+                    $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
 
+#<<<
                     if ($strong and $fermat) {
                         ($p <= $fermat and $fermat % $p == 0) and next;
                         my $valuation = (
@@ -24604,28 +24644,21 @@ package Sidef::Types::Number::Number {
                                         );
                         $valuation > $args{k_exp} or next;
                         if (HAS_PRIME_UTIL) {
-                            Math::Prime::Util::powmod($fermat, ($p - 1) >> ($valuation - $args{k_exp}), $p) ==
-                              ($args{congr} % $p)
-                              or next;
+                            Math::Prime::Util::powmod($fermat, ($p - 1) >> ($valuation - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                         }
                         else {
-                            Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($valuation - $args{k_exp}), $p) ==
-                              ($args{congr} % $p)
-                              or next;
+                            Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($valuation - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                         }
                     }
-
-                    Math::GMPz::Rmpz_mul_ui($u, $m, $p);
+#>>>
 
                     if ($carmichael) {
+                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $p - 1) == 1 or next;
                         Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p - 1);
-                        Math::GMPz::Rmpz_gcd($t, $L, $u);
-                        Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or next;
                     }
                     elsif ($lucas_carmichael) {
+                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $p + 1) == 1 or next;
                         Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p + 1);
-                        Math::GMPz::Rmpz_gcd($t, $L, $u);
-                        Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or next;
                     }
                     elsif ($fermat) {
                         my $order = (
@@ -24633,32 +24666,32 @@ package Sidef::Types::Number::Number {
                                      ? Math::Prime::Util::znorder($fermat, $p)
                                      : Math::Prime::Util::GMP::znorder($fermat, $p)
                                     ) // next;
+                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $order) == 1 or next;
                         Math::GMPz::Rmpz_lcm_ui($L, $lambda, $order);
-                        Math::GMPz::Rmpz_gcd($t, $L, $u);
-                        Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 or next;
                     }
 
-                    Math::GMPz::Rmpz_cdiv_q($t, $A, $u);
-                    Math::GMPz::Rmpz_div($x, $B, $u);
+                    Math::GMPz::Rmpz_mul_ui($x, $m, $p);
+                    Math::GMPz::Rmpz_cdiv_q($u, $A, $x);
+                    Math::GMPz::Rmpz_div($v, $B, $x);
 
-                    if (!(Math::GMPz::Rmpz_cmp($t, $x) > 0)) {
+                    if (!(Math::GMPz::Rmpz_cmp($u, $v) > 0)) {
 
                         $p = $r if $squarefree;
 
-                        # t = max(t, p)
-                        if ($k == 2 and Math::GMPz::Rmpz_cmp_ui($t, $p) < 0) {
-                            Math::GMPz::Rmpz_set_ui($t, $p);
+                        # u = max(u, p)
+                        if ($k == 2 and Math::GMPz::Rmpz_cmp_ui($u, $p) < 0) {
+                            Math::GMPz::Rmpz_set_ui($u, $p);
                         }
 
                         __SUB__->(
-                                  $u, $p,
+                                  $x, $p,
                                   $k - 1,
                                   %args,
                                   (
                                    ($k == 2)
                                    ? (
-                                      from => Math::GMPz::Rmpz_get_str($t, 10),
-                                      upto => Math::GMPz::Rmpz_get_str($x, 10)
+                                      from => Math::GMPz::Rmpz_get_str($u, 10),
+                                      upto => Math::GMPz::Rmpz_get_str($v, 10)
                                      )
                                    : ()
                                   ),
