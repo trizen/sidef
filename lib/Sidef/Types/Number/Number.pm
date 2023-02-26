@@ -23889,18 +23889,11 @@ package Sidef::Types::Number::Number {
                             }
 #>>>
 
-                            my $z;
-
-                            if ($fermat) {
-                                $z = ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p));
-                            }
-
-                            for (my ($pk, $v) = ($p, $m * $p) ; $v - 1 < $B ; ($pk, $v) = ($pk * $p, $v * $p)) {
+                            for (my $v = $m * $p ; $v - 1 < $B ; $v *= $p) {
                                 $v >= $A or next;
                                 if ($fermat) {
                                     $k == 1 and Math::Prime::Util::is_prime($v) and next;
-                                    Math::Prime::Util::powmod($fermat, $z, $pk) == 1 or last;
-                                    ($v - 1) % $z == 0                               or next;
+                                    Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1 or next;
                                 }
                                 push(@omega_primes, $v);
                             }
@@ -23960,14 +23953,16 @@ package Sidef::Types::Number::Number {
 
                     if ($fermat) {
                         $z = ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p));
+                        Math::Prime::Util::gcd($m, $z) == 1 or next;
+                        $L = Math::Prime::Util::lcm($lambda, $z);
                     }
 
                     for (my ($pk, $v) = ($p, $m * $p) ; $v - 1 < $B ; ($pk, $v) = ($pk * $p, $v * $p)) {
 
                         if ($fermat) {
-                            Math::Prime::Util::gcd($v, $z) == 1              or last;
-                            Math::Prime::Util::powmod($fermat, $z, $pk) == 1 or last;
-                            $L = Math::Prime::Util::lcm($lambda, $z);
+                            if ($pk > $p) {
+                                Math::Prime::Util::powmod($fermat, $z, $pk) == 1 or last;
+                            }
                         }
 
                         if ($v * $r - 1 < $B) {
@@ -24061,37 +24056,17 @@ package Sidef::Types::Number::Number {
                             }
 #>>>
 
-                            my $z;
-
-                            if ($fermat) {
-                                Math::GMPz::Rmpz_set_ui($u, $p);
-                                $z = (
-                                      $znorder{$p} //= (
-                                                        HAS_PRIME_UTIL
-                                                        ? Math::Prime::Util::znorder($fermat, $p)
-                                                        : Math::Prime::Util::GMP::znorder($fermat, $p)
-                                                       )
-                                     );
-                            }
-
-                            for (
-                                 Math::GMPz::Rmpz_mul_ui($v, $m, $p) ;
+                            for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ;
                                  Math::GMPz::Rmpz_cmp($v, $B) <= 0 ;
-                                 do { Math::GMPz::Rmpz_mul_ui($v, $v, $p); Math::GMPz::Rmpz_mul_ui($u, $u, $p); }
-                              ) {
+                                 Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
 
                                 if (Math::GMPz::Rmpz_cmp($v, $A) >= 0) {
 
                                     if ($fermat) {
                                         $k == 1 and _is_prob_prime($v) and next;
-                                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $v, $z) == 1 or last;
-                                        (
-                                         HAS_PRIME_UTIL
-                                         ? Math::Prime::Util::powmod($fermat, $z, $u)
-                                         : Math::Prime::Util::GMP::powmod($fermat, $z, $u)
-                                        ) == 1 or last;
-                                        Math::GMPz::Rmpz_sub_ui($w, $v, 1);
-                                        Math::GMPz::Rmpz_divisible_ui_p($w, $z) || next;
+                                        Math::GMPz::Rmpz_set_ui($w, $fermat);
+                                        Math::GMPz::Rmpz_powm($w, $w, $v - 1, $v);
+                                        Math::GMPz::Rmpz_cmp_ui($w, 1) == 0 or next;
                                     }
 
                                     if ($fermat ? (!$seen{Math::GMPz::Rmpz_get_str($v, 10)}++) : 1) {
@@ -24194,20 +24169,15 @@ package Sidef::Types::Number::Number {
                         next;
                     }
 
+#<<<
                     if ($strong) {
-                        my $val = (
-                                   HAS_PRIME_UTIL
-                                   ? Math::Prime::Util::valuation($p - 1, 2)
-                                   : Math::Prime::Util::GMP::valuation($p - 1, 2)
-                                  );
+                        my $val = (HAS_PRIME_UTIL ? Math::Prime::Util::valuation($p - 1, 2) : Math::Prime::Util::GMP::valuation($p - 1, 2));
                         $val > $args{k_exp} or next;
-                        (
-                         HAS_PRIME_UTIL
-                         ? Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)
-                         : Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)
-                          ) == ($args{congr} % $p)
-                          or next;
+                        (HAS_PRIME_UTIL
+                            ? Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)
+                            : Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)) == ($args{congr} % $p) or next;
                     }
+#>>>
 
                     my $z;
 
@@ -24220,16 +24190,13 @@ package Sidef::Types::Number::Number {
                                                 : Math::Prime::Util::GMP::znorder($fermat, $p)
                                                )
                              );
+                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $z) == 1 or next;
+                        Math::GMPz::Rmpz_lcm_ui($lcm, $lambda, $z);
                     }
 
                     for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ;
                          Math::GMPz::Rmpz_cmp($v, $B) <= 0 ;
                          Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
-
-                        if ($fermat) {
-                            Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $v, $z) == 1 or last;
-                            Math::GMPz::Rmpz_lcm_ui($lcm, $lambda, $z);
-                        }
 
                         __SUB__->($v, $r, $j - 1, %args, (defined($lcm) ? (lambda => $lcm) : ()));
 

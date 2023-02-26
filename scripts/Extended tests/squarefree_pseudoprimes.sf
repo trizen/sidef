@@ -2,6 +2,10 @@
 
 # Tests for the squarefree pseudoprime generators.
 
+# Timings:
+#   27 feb 2023: 3.516s (with MPU)
+#   27 feb 2023: 4.421s (without MPU)
+
 for k in (2..4) {
 
     say "Testing k = #{k}"

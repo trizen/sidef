@@ -2,6 +2,10 @@
 
 # Tests for the Fermat pseudoprime generators.
 
+# Timings:
+#   27 feb 2023: 2.811s (with MPU)
+#   27 feb 2023: 4.539s (without MPU)
+
 for k in (1..4) {
 
     say "Testing k = #{k}"
