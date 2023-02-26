@@ -17428,13 +17428,10 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        __is_int__($n)
-          || return Sidef::Types::Bool::Bool::FALSE;
-
-        $n = _any2mpz($n);
-
-        Math::GMPz::Rmpz_sgn($n) > 0
-          or return Sidef::Types::Bool::Bool::FALSE;
+        if (ref($n)) {
+            __is_int__($n)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         if (scalar(@bases)) {
             @bases = map { ref($_) ? (_any2mpz($_) // return Sidef::Types::Bool::Bool::FALSE) : $_ } map { $$_ } @bases;
@@ -17442,6 +17439,28 @@ package Sidef::Types::Number::Number {
         else {
             @bases = (2);
         }
+
+        if (HAS_PRIME_UTIL and !ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
+            return (
+                    Math::Prime::Util::is_pseudoprime($n, $bases[0])
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+        elsif (    HAS_NEW_PRIME_UTIL
+               and !ref($n)
+               and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
+            return (
+                    Math::Prime::Util::is_pseudoprime($n, @bases)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        $n = _any2mpz($n);
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return Sidef::Types::Bool::Bool::FALSE;
 
         state $g = Math::GMPz::Rmpz_init_nobless();
 
@@ -17455,16 +17474,6 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_cmp_ui($g, 1) == 0
                   or return Sidef::Types::Bool::Bool::FALSE;
             }
-        }
-
-        if (    HAS_NEW_PRIME_UTIL
-            and Math::GMPz::Rmpz_fits_ulong_p($n)
-            and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
-            return (
-                    Math::Prime::Util::is_pseudoprime(Math::GMPz::Rmpz_get_ui($n), @bases)
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
         }
 
         my $t = Math::GMPz::Rmpz_init();
@@ -17725,28 +17734,41 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and _fits_ulong($n)) {
+        if (ref($n)) {
+            __is_int__($n)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (scalar(@bases)) {
+            @bases = map { ref($_) ? (_any2mpz($_) // return Sidef::Types::Bool::Bool::FALSE) : $_ } map { $$_ } @bases;
+        }
+        else {
+            @bases = (2);
+        }
+
+        if (HAS_PRIME_UTIL and !ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
             return (
-                Math::Prime::Util::is_strong_pseudoprime(
-                    _get_ulong($n),
-                    do {
-                        @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
-                        @bases ? (@bases) : (2);
-                    }
-                  )
-                ? Sidef::Types::Bool::Bool::TRUE
-                : Sidef::Types::Bool::Bool::FALSE
-            );
+                    Math::Prime::Util::is_strong_pseudoprime($n, $bases[0])
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+        elsif (HAS_NEW_PRIME_UTIL and !ref($n) and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
+            return (
+                    Math::Prime::Util::is_strong_pseudoprime($n, @bases)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
         }
 
         __is_int__($n)
           && Math::Prime::Util::GMP::is_strong_pseudoprime(
-            _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
-            do {
-                @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
-                @bases ? (@bases) : (2);
-            }
-          )
+                                                           _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
+                                                           (
+                                                            grep { (defined($_) and $_ > 1) || return Sidef::Types::Bool::Bool::FALSE }
+                                                            map { _big2uistr($_) } @bases
+                                                           )
+                                                          )
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -23815,7 +23837,7 @@ package Sidef::Types::Number::Number {
         # TODO: optimization when A and B are close to each other.
         # Idea: if |A-B| < sqrt(B), then just iterate over the range A..B and grep the k-omega primes.
 
-        if (0 and HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+        if (0 and HAS_NEW_PRIME_UTIL and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
             # XXX: Out of memory for: omega_primes(12, 1e13)
             return Math::Prime::Util::omega_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
@@ -23830,7 +23852,14 @@ package Sidef::Types::Number::Number {
             my $generator = sub {
                 my ($m, $lo, $j, %args) = @_;
 
-                my $hi = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $j);
+                my $hi = Math::Prime::Util::rootint(
+                                                    (
+                                                     HAS_NEW_PRIME_UTIL
+                                                     ? Math::Prime::Util::divint($B, $m)
+                                                     : Math::Prime::Util::GMP::divint($B, $m)
+                                                    ),
+                                                    $j
+                                                   );
 
                 if ($lo > $hi) {
                     return;

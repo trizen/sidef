@@ -1,0 +1,49 @@
+#!/usr/bin/ruby
+
+# Tests for the squarefree pseudoprime generators.
+
+for k in (2..4) {
+
+    say "Testing k = #{k}"
+
+    var lo          = k.pn_primorial*4
+    var hi          = lo*100
+    var sqfr_primes = k.squarefree_almost_primes(lo, hi)
+
+    assert_eq(sqfr_primes.len, k.squarefree_almost_prime_count(lo, hi))
+
+    for base in (2..50) {
+
+        var this = sqfr_primes.grep { .is_pseudoprime(base) }
+        var that = k.squarefree_fermat_psp(base, lo, hi)
+
+        this == that ||
+            die "[Fermat psp] Error for k = #{k} and base = #{base} with hi = #{hi}\n#{this} != #{that}"
+
+        this = this.grep { .is_strong_pseudoprime(base) }
+        that = k.squarefree_strong_fermat_psp(base, lo, hi)
+
+        this == that ||
+            die "[Strong Fermat psp] Error for k = #{k} and base = #{base} with hi = #{hi}\n#{this} != #{that}"
+
+        if (k >= 3) {
+            this = sqfr_primes.grep { .is_carmichael }
+            that = k.carmichael(lo, hi)
+
+            this == that ||
+                die "[Carmichael] Error for k = #{k} and base = #{base} with hi = #{hi}\n#{this} != #{that}"
+
+            this = this.grep { .is_strong_pseudoprime(base) }
+            that = k.strong_fermat_carmichael(base, lo, hi)
+
+            this == that ||
+                die "[Strong Fermat Carmichael] Error for k = #{k} and base = #{base} with hi = #{hi}\n#{this} != #{that}"
+
+            this = sqfr_primes.grep { .is_lucas_carmichael }
+            that = k.lucas_carmichael(lo, hi)
+
+            this == that ||
+                die "[Lucas-Carmichael] Error for k = #{k} and base = #{base} with hi = #{hi}\n#{this} != #{that}"
+        }
+    }
+}
