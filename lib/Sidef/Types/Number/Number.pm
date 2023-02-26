@@ -23828,46 +23828,106 @@ package Sidef::Types::Number::Number {
             $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
 
             my $generator = sub {
-                my ($m, $p, $j, %args) = @_;
+                my ($m, $lo, $j, %args) = @_;
 
-                my $lambda = $args{lambda};
+                my $hi = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $j);
 
-                my $s = Math::Prime::Util::rootint(Math::Prime::Util::GMP::divint($B, $m), $j);
+                if ($lo > $hi) {
+                    return;
+                }
 
-                my $L;
-                for (my $r ; $p <= $s ; $p = $r) {
+                if ($j == 1) {
 
-                    $r = _next_prime($p);
+                    my $lambda = $args{lambda};
+
+                    if (!$fermat or $lambda == 1) {
+
+                        for (my $p = Math::Prime::Util::next_prime($lo - 1) ;
+                             $p <= $hi ;
+                             $p = Math::Prime::Util::next_prime($p)) {
+
+                            if ($fermat) {
+                                $fermat % $p == 0 and next;
+                            }
+
+#<<<
+                            if ($strong) {
+                                my $val = Math::Prime::Util::valuation($p - 1, 2);
+                                $val > $args{k_exp} or next;
+                                Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
+                            }
+#>>>
+
+                            for (my ($pk, $v) = ($p, $m * $p) ; $v - 1 < $B ; ($pk, $v) = ($pk * $p, $v * $p)) {
+                                $v >= $A or next;
+                                if ($fermat) {
+                                    $k == 1 and Math::Prime::Util::is_prime($v) and next;
+                                    ($v - 1) % $lambda == 0                                  or next;
+                                    ($v - 1) % Math::Prime::Util::znorder($fermat, $pk) == 0 or next;
+                                }
+                                push(@omega_primes, $v);
+                            }
+                        }
+
+                        return;
+                    }
+
+                    my $t = Math::Prime::Util::invmod($m, $lambda);
+
+                    $t > $hi && return;
+                    $t += $lambda while ($t < $lo);
+
+                    for (my $p = $t ; $p <= $hi ; $p += $lambda) {
+                        if (    Math::Prime::Util::is_prime_power($p)
+                            and Math::Prime::Util::gcd($m,      $p) == 1
+                            and Math::Prime::Util::gcd($fermat, $p) == 1) {
+
+#<<<
+                            if ($strong) {
+                                my $val = Math::Prime::Util::valuation($p - 1, 2);
+                                $val > $args{k_exp} or next;
+                                Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
+                            }
+#>>>
+
+                            my $v = $m * $p;
+                            $v >= $A or next;
+                            $k == 1 and Math::Prime::Util::is_prime($v) and next;
+                            ($v - 1) % $lambda == 0                                 or next;
+                            ($v - 1) % Math::Prime::Util::znorder($fermat, $p) == 0 or next;
+                            push(@omega_primes, $v);
+                        }
+                    }
+
+                    return;
+                }
+
+                for (my ($p, $r, $L) = ($lo) ; $p <= $hi ; $p = $r) {
+
+                    $r = Math::Prime::Util::next_prime($p);
 
                     if ($fermat) {
                         $fermat % $p == 0 and next;
                     }
 
+#<<<
                     if ($strong) {
-                        my $valuation = Math::Prime::Util::valuation($p - 1, 2);
-                        $valuation > $args{k_exp} or next;
-                        Math::Prime::Util::powmod($fermat, ($p - 1) >> ($valuation - $args{k_exp}), $p) == ($args{congr} % $p)
-                          or next;
+                        my $val = Math::Prime::Util::valuation($p - 1, 2);
+                        $val > $args{k_exp} or next;
+                        Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                     }
+#>>>
 
                     for (my ($pk, $v) = ($p, $m * $p) ; $v - 1 < $B ; ($pk, $v) = ($pk * $p, $v * $p)) {
 
                         if ($fermat) {
-                            $L = Math::Prime::Util::lcm($lambda, Math::Prime::Util::znorder($fermat, $pk));
-                            Math::Prime::Util::gcd($L, $v) == 1 or last;
+                            my $z = Math::Prime::Util::znorder($fermat, $pk);
+                            Math::Prime::Util::gcd($v, $z) == 1 or last;
+                            $L = Math::Prime::Util::lcm($args{lambda}, $z);
                         }
 
-                        if ($j == 1) {
-                            if ($v >= $A) {
-                                if ($fermat) {
-                                    $k == 1 and Math::Prime::Util::is_prime($v) and next;
-                                    ($v - 1) % $L == 0 or next;
-                                }
-                                push(@omega_primes, $v);
-                            }
-                        }
-                        elsif ($v * $r - 1 < $B) {
-                            __SUB__->($v, $r, $j - 1, %args, (defined($L) ? (lambda => $L) : ()),);
+                        if ($v * $r - 1 < $B) {
+                            __SUB__->($v, $r, $j - 1, %args, (defined($L) ? (lambda => $L) : ()));
                         }
                     }
                 }
@@ -23888,6 +23948,10 @@ package Sidef::Types::Number::Number {
             }
 
             @omega_primes = sort { $a <=> $b } @omega_primes;
+
+            if ($fermat) {
+                @omega_primes = List::Util::uniq(@omega_primes);
+            }
         }
         else {
 
