@@ -1,0 +1,38 @@
+#!/usr/bin/ruby
+
+# Smallest Carmichael number with n prime factors.
+# https://oeis.org/A006931
+
+# Timings:
+#   27 feb 2023: 6.462s (with MPU)
+#   27 feb 2023: 7.226s (without MPU)
+
+func a(n) {
+    return nil if (n < 2)
+
+    var x = pn_primorial(n+1)>>1
+    var y = 3*x
+
+    loop {
+        #say "Sieving range: #{[x,y]}"
+        var arr = n.carmichael(x,y)
+
+        if (arr.len >= 1) {
+            return arr[0]
+        }
+
+        x = y+1
+        y = 3*x
+    }
+}
+
+var arr = gather {
+    for n in (3..15) {
+        say "a(#{n}) = #{take(a(n))}"
+    }
+}
+
+assert_eq(
+    arr,
+    %n[561, 41041, 825265, 321197185, 5394826801, 232250619601, 9746347772161, 1436697831295441, 60977817398996785, 7156857700403137441, 1791562810662585767521, 87674969936234821377601, 6553130926752006031481761]
+)

@@ -23889,13 +23889,22 @@ package Sidef::Types::Number::Number {
                             }
 #>>>
 
-                            for (my $v = $m * $p ; $v - 1 < $B ; $v *= $p) {
-                                $v >= $A or next;
-                                if ($fermat) {
-                                    $k == 1 and Math::Prime::Util::is_prime($v) and next;
-                                    Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1 or next;
+                            if ($fermat and $m == 1) {
+                                for (my $v = $p * $p ; $v - 1 < $B ; $v *= $p) {
+                                    if ($v >= $A and Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1) {
+                                        push @omega_primes, $v;
+                                    }
                                 }
-                                push(@omega_primes, $v);
+                            }
+                            else {
+                                for (my $v = $m * $p ; $v - 1 < $B ; $v *= $p) {
+                                    if ($v >= $A) {
+                                        if ($fermat) {
+                                            Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1 or next;
+                                        }
+                                        push @omega_primes, $v;
+                                    }
+                                }
                             }
                         }
 
@@ -24002,7 +24011,7 @@ package Sidef::Types::Number::Number {
 
             my $u = Math::GMPz::Rmpz_init();
             my $v = Math::GMPz::Rmpz_init();
-            my $w = Math::GMPz::Rmpz_init();
+            my $w = Math::GMPz::Rmpz_init_set_ui($fermat);
 
             Math::GMPz::Rmpz_set($u, _cached_pn_primorial($k));
 
@@ -24056,28 +24065,49 @@ package Sidef::Types::Number::Number {
                             }
 #>>>
 
-                            for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ;
-                                 Math::GMPz::Rmpz_cmp($v, $B) <= 0 ;
-                                 Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
+                            if ($fermat and Math::GMPz::Rmpz_cmp_ui($m, 1) == 0) {
+                                Math::GMPz::Rmpz_set_ui($v, $p);
+                                for (Math::GMPz::Rmpz_mul_ui($v, $v, $p) ;
+                                     Math::GMPz::Rmpz_cmp($v, $B) <= 0 ;
+                                     Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
 
-                                if (Math::GMPz::Rmpz_cmp($v, $A) >= 0) {
+                                    if (Math::GMPz::Rmpz_cmp($v, $A) >= 0) {
+                                        Math::GMPz::Rmpz_sub_ui($u, $v, 1);
+                                        Math::GMPz::Rmpz_powm($u, $w, $u, $v);
+                                        Math::GMPz::Rmpz_cmp_ui($u, 1) == 0 or next;
 
-                                    if ($fermat) {
-                                        $k == 1 and _is_prob_prime($v) and next;
-                                        Math::GMPz::Rmpz_set_ui($w, $fermat);
-                                        Math::GMPz::Rmpz_powm($w, $w, $v - 1, $v);
-                                        Math::GMPz::Rmpz_cmp_ui($w, 1) == 0 or next;
+                                        my $value =
+                                            Math::GMPz::Rmpz_fits_ulong_p($v)
+                                          ? Math::GMPz::Rmpz_get_ui($v)
+                                          : Math::GMPz::Rmpz_init_set($v);
+
+                                        if (!$seen{$value}++) {
+                                            push @omega_primes, $value;
+                                        }
                                     }
+                                }
+                            }
+                            else {
+                                for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ;
+                                     Math::GMPz::Rmpz_cmp($v, $B) <= 0 ;
+                                     Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
 
-                                    if ($fermat ? (!$seen{Math::GMPz::Rmpz_get_str($v, 10)}++) : 1) {
-                                        push(
-                                             @omega_primes,
-                                             (
-                                                Math::GMPz::Rmpz_fits_ulong_p($v)
-                                              ? Math::GMPz::Rmpz_get_ui($v)
-                                              : Math::GMPz::Rmpz_get_str($v, 10)
-                                             )
-                                            );
+                                    if (Math::GMPz::Rmpz_cmp($v, $A) >= 0) {
+
+                                        if ($fermat) {
+                                            Math::GMPz::Rmpz_sub_ui($u, $v, 1);
+                                            Math::GMPz::Rmpz_powm($u, $w, $u, $v);
+                                            Math::GMPz::Rmpz_cmp_ui($u, 1) == 0 or next;
+                                        }
+
+                                        my $value =
+                                            Math::GMPz::Rmpz_fits_ulong_p($v)
+                                          ? Math::GMPz::Rmpz_get_ui($v)
+                                          : Math::GMPz::Rmpz_init_set($v);
+
+                                        if ($fermat ? (!$seen{$value}++) : 1) {
+                                            push @omega_primes, $value;
+                                        }
                                     }
                                 }
                             }
@@ -24139,11 +24169,14 @@ package Sidef::Types::Number::Number {
                                                           )
                                         );
                                 if (Math::GMPz::Rmpz_divisible_ui_p($u, $z)) {
-                                    if (!$seen{Math::GMPz::Rmpz_get_str($v, 10)}++) {
-                                        push(@omega_primes,
-                                               Math::GMPz::Rmpz_fits_ulong_p($v)
-                                             ? Math::GMPz::Rmpz_get_ui($v)
-                                             : Math::GMPz::Rmpz_init_set($v));
+
+                                    my $value =
+                                        Math::GMPz::Rmpz_fits_ulong_p($v)
+                                      ? Math::GMPz::Rmpz_get_ui($v)
+                                      : Math::GMPz::Rmpz_init_set($v);
+
+                                    if (!$seen{$value}++) {
+                                        push @omega_primes, $value;
                                     }
                                 }
                             }

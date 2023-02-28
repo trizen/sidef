@@ -1,0 +1,38 @@
+#!/usr/bin/ruby
+
+# Smallest Lucas-Carmichael number with n prime factors.
+# https://oeis.org/A216928
+
+# Timings:
+#   27 feb 2023: 5.398s (with MPU)
+#   27 feb 2023: 5.979s (without MPU)
+
+func a(n) {
+    return nil if (n < 2)
+
+    var x = pn_primorial(n+1)>>1
+    var y = 3*x
+
+    loop {
+        #say "Sieving range: #{[x,y]}"
+        var arr = n.lucas_carmichael(x,y)
+
+        if (arr.len >= 1) {
+            return arr[0]
+        }
+
+        x = y+1
+        y = 3*x
+    }
+}
+
+var arr = gather {
+    for n in (3..17) {
+        say "a(#{n}) = #{take(a(n))}"
+    }
+}
+
+assert_eq(
+    arr,
+    %n[399, 8855, 588455, 139501439, 3512071871, 199195047359, 14563696180319, 989565001538399, 20576473996736735, 4049149795181043839, 409810997884396741919, 46852073639840281125599, 6414735508880546179805759, 466807799396932243821123839, 41222773167337486494297521279]
+)

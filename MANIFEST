@@ -191,6 +191,7 @@ scripts/Expensive/zebra_puzzle.sf
 scripts/Expensive/zhang_suen_thinning_algorithm.sf
 scripts/extend_your_language.sf
 'scripts/Extended tests/binomialmod.sf'
+'scripts/Extended tests/carmichael_with_n_factors.sf'
 'scripts/Extended tests/chebyshev_factorization_method.sf'
 'scripts/Extended tests/digits2num.pl'
 'scripts/Extended tests/fermat_pseudoprimes.sf'
@@ -204,6 +205,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/is_super_psp.sf'
 'scripts/Extended tests/lucas_carmichael_negative.sf'
 'scripts/Extended tests/lucas_carmichael_positive.sf'
+'scripts/Extended tests/lucas_carmichael_with_n_factors.sf'
 'scripts/Extended tests/lucas_sequences.sf'
 'scripts/Extended tests/mertens_function.sf'
 'scripts/Extended tests/nth_prime.sf'

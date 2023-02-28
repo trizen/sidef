@@ -3,15 +3,15 @@
 # Tests for the squarefree pseudoprime generators.
 
 # Timings:
-#   27 feb 2023: 3.516s (with MPU)
-#   27 feb 2023: 4.421s (without MPU)
+#   28 feb 2023: 3.032s (with MPU)
+#   28 feb 2023: 4.848s (without MPU)
 
 for k in (2..4) {
 
     say "Testing k = #{k}"
 
     var lo          = k.pn_primorial*4
-    var hi          = lo*100
+    var hi          = lo*200
     var sqfr_primes = k.squarefree_almost_primes(lo, hi)
 
     assert_eq(sqfr_primes.len, k.squarefree_almost_prime_count(lo, hi))
@@ -31,23 +31,26 @@ for k in (2..4) {
             die "[Strong Fermat psp] Error for k = #{k} and base = #{base} with hi = #{hi}\n#{this} != #{that}"
 
         if (k >= 3) {
-            this = sqfr_primes.grep { .is_carmichael }
-            that = k.carmichael(lo, hi)
 
-            this == that ||
-                die "[Carmichael] Error for k = #{k} and base = #{base} with hi = #{hi}\n#{this} != #{that}"
-
-            this = this.grep { .is_strong_pseudoprime(base) }
+            this = this.grep { .is_carmichael }
             that = k.strong_fermat_carmichael(base, lo, hi)
 
             this == that ||
                 die "[Strong Fermat Carmichael] Error for k = #{k} and base = #{base} with hi = #{hi}\n#{this} != #{that}"
 
-            this = sqfr_primes.grep { .is_lucas_carmichael }
-            that = k.lucas_carmichael(lo, hi)
+            if (base == 2) {
+                this = sqfr_primes.grep { .is_carmichael }
+                that = k.carmichael(lo, hi)
 
-            this == that ||
-                die "[Lucas-Carmichael] Error for k = #{k} and base = #{base} with hi = #{hi}\n#{this} != #{that}"
+                this == that ||
+                    die "[Carmichael] Error for k = #{k} with hi = #{hi}\n#{this} != #{that}"
+
+                this = sqfr_primes.grep { .is_lucas_carmichael }
+                that = k.lucas_carmichael(lo, hi)
+
+                this == that ||
+                    die "[Lucas-Carmichael] Error for k = #{k} with hi = #{hi}\n#{this} != #{that}"
+            }
         }
     }
 }
