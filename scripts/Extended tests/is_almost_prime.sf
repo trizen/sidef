@@ -5,6 +5,7 @@
 # Timings:
 #   17 feb 2023: 4.385s +/- 0.1
 #   23 feb 2023: 3.913s
+#   04 mar 2023: 3.635s
 
 func A242786(n) {
     for (var p = 2; true; p.next_prime!) {

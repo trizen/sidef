@@ -17538,6 +17538,10 @@ package Sidef::Types::Number::Number {
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($z);
 
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($z, 10) > YAFU_MIN) {
+            @factors = map { $$_ } @{_set_int($z)->special_factors};
+        }
+
         if (scalar(@factors) > 1) {
 
             my @primes;
@@ -17652,6 +17656,10 @@ package Sidef::Types::Number::Number {
         };
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($z);
+
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($z, 10) > YAFU_MIN) {
+            @factors = map { $$_ } @{_set_int($z)->special_factors};
+        }
 
         if (scalar(@factors) > 1) {
 
@@ -23891,7 +23899,8 @@ package Sidef::Types::Number::Number {
 
                             if ($fermat and $m == 1) {
                                 for (my $v = $p * $p ; $v - 1 < $B ; $v *= $p) {
-                                    if ($v >= $A and Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1) {
+                                    if ($v >= $A) {
+                                        Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1 or last;
                                         push @omega_primes, $v;
                                     }
                                 }
@@ -23900,7 +23909,7 @@ package Sidef::Types::Number::Number {
                                 for (my $v = $m * $p ; $v - 1 < $B ; $v *= $p) {
                                     if ($v >= $A) {
                                         if ($fermat) {
-                                            Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1 or next;
+                                            Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1 or last;
                                         }
                                         push @omega_primes, $v;
                                     }
@@ -24072,9 +24081,10 @@ package Sidef::Types::Number::Number {
                                      Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
 
                                     if (Math::GMPz::Rmpz_cmp($v, $A) >= 0) {
+
                                         Math::GMPz::Rmpz_sub_ui($u, $v, 1);
                                         Math::GMPz::Rmpz_powm($u, $w, $u, $v);
-                                        Math::GMPz::Rmpz_cmp_ui($u, 1) == 0 or next;
+                                        Math::GMPz::Rmpz_cmp_ui($u, 1) == 0 or last;
 
                                         my $value =
                                             Math::GMPz::Rmpz_fits_ulong_p($v)
@@ -24097,7 +24107,7 @@ package Sidef::Types::Number::Number {
                                         if ($fermat) {
                                             Math::GMPz::Rmpz_sub_ui($u, $v, 1);
                                             Math::GMPz::Rmpz_powm($u, $w, $u, $v);
-                                            Math::GMPz::Rmpz_cmp_ui($u, 1) == 0 or next;
+                                            Math::GMPz::Rmpz_cmp_ui($u, 1) == 0 or last;
                                         }
 
                                         my $value =
@@ -26479,6 +26489,10 @@ package Sidef::Types::Number::Number {
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($remainder);
 
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > YAFU_MIN) {
+            @factors = map { $$_ } @{_set_int($remainder)->special_factors};
+        }
+
         if (scalar(@factors) > 1) {
 
             my %seen;
@@ -26656,6 +26670,10 @@ package Sidef::Types::Number::Number {
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _lucas_factor($remainder);
 
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > YAFU_MIN) {
+            @factors = map { $$_ } @{_set_int($remainder)->special_factors};
+        }
+
         if (scalar(@factors) > 1) {
 
             my %seen;
@@ -26804,6 +26822,10 @@ package Sidef::Types::Number::Number {
         }
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($remainder);
+
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > YAFU_MIN) {
+            @factors = map { $$_ } @{_set_int($remainder)->special_factors};
+        }
 
         if (scalar(@factors) > 1) {
 

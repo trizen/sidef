@@ -2027,8 +2027,9 @@ package Sidef::Parser {
                 my $include_pos = pos($_);
 
                 state $x = do {
-                    require File::Spec;
                     require Cwd;
+                    require File::Spec;
+                    require File::Basename;
                 };
 
                 my @abs_filenames;
@@ -2051,7 +2052,6 @@ package Sidef::Parser {
                     $Sidef::INCLUDED{$var_name} = $mod_path;
 
                     if (@{$self->{inc}} == 0) {
-                        state $y = require File::Basename;
                         push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
 
                         push @{$self->{inc}},
