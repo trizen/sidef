@@ -2,6 +2,10 @@
 
 # Tests for some Number methods.
 
+# Timings:
+#   4 March 2023: 4.791s (with MPU)
+#   4 March 2023: 6.789s (without MPU)
+
 assert_eq(squarefree_sum(1e6), 303961062910)
 assert_eq(squarefree_sum(1e7), 30396557311887)
 

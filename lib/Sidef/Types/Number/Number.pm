@@ -23897,22 +23897,12 @@ package Sidef::Types::Number::Number {
                             }
 #>>>
 
-                            if ($fermat and $m == 1) {
-                                for (my $v = $p * $p ; $v - 1 < $B ; $v *= $p) {
-                                    if ($v >= $A) {
+                            for (my $v = (($fermat and $m == 1) ? ($p * $p) : ($m * $p)) ; $v - 1 < $B ; $v *= $p) {
+                                if ($v >= $A) {
+                                    if ($fermat) {
                                         Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1 or last;
-                                        push @omega_primes, $v;
                                     }
-                                }
-                            }
-                            else {
-                                for (my $v = $m * $p ; $v - 1 < $B ; $v *= $p) {
-                                    if ($v >= $A) {
-                                        if ($fermat) {
-                                            Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1 or last;
-                                        }
-                                        push @omega_primes, $v;
-                                    }
+                                    push @omega_primes, $v;
                                 }
                             }
                         }
@@ -24076,48 +24066,30 @@ package Sidef::Types::Number::Number {
 
                             if ($fermat and Math::GMPz::Rmpz_cmp_ui($m, 1) == 0) {
                                 Math::GMPz::Rmpz_set_ui($v, $p);
-                                for (Math::GMPz::Rmpz_mul_ui($v, $v, $p) ;
-                                     Math::GMPz::Rmpz_cmp($v, $B) <= 0 ;
-                                     Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
+                            }
+                            else {
+                                Math::GMPz::Rmpz_set($v, $m);
+                            }
 
-                                    if (Math::GMPz::Rmpz_cmp($v, $A) >= 0) {
+                            for (Math::GMPz::Rmpz_mul_ui($v, $v, $p) ;
+                                 Math::GMPz::Rmpz_cmp($v, $B) <= 0 ;
+                                 Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
 
+                                if (Math::GMPz::Rmpz_cmp($v, $A) >= 0) {
+
+                                    if ($fermat) {
                                         Math::GMPz::Rmpz_sub_ui($u, $v, 1);
                                         Math::GMPz::Rmpz_powm($u, $w, $u, $v);
                                         Math::GMPz::Rmpz_cmp_ui($u, 1) == 0 or last;
-
-                                        my $value =
-                                            Math::GMPz::Rmpz_fits_ulong_p($v)
-                                          ? Math::GMPz::Rmpz_get_ui($v)
-                                          : Math::GMPz::Rmpz_init_set($v);
-
-                                        if (!$seen{$value}++) {
-                                            push @omega_primes, $value;
-                                        }
                                     }
-                                }
-                            }
-                            else {
-                                for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ;
-                                     Math::GMPz::Rmpz_cmp($v, $B) <= 0 ;
-                                     Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
 
-                                    if (Math::GMPz::Rmpz_cmp($v, $A) >= 0) {
+                                    my $value =
+                                        Math::GMPz::Rmpz_fits_ulong_p($v)
+                                      ? Math::GMPz::Rmpz_get_ui($v)
+                                      : Math::GMPz::Rmpz_init_set($v);
 
-                                        if ($fermat) {
-                                            Math::GMPz::Rmpz_sub_ui($u, $v, 1);
-                                            Math::GMPz::Rmpz_powm($u, $w, $u, $v);
-                                            Math::GMPz::Rmpz_cmp_ui($u, 1) == 0 or last;
-                                        }
-
-                                        my $value =
-                                            Math::GMPz::Rmpz_fits_ulong_p($v)
-                                          ? Math::GMPz::Rmpz_get_ui($v)
-                                          : Math::GMPz::Rmpz_init_set($v);
-
-                                        if ($fermat ? (!$seen{$value}++) : 1) {
-                                            push @omega_primes, $value;
-                                        }
+                                    if ($fermat ? (!$seen{$value}++) : 1) {
+                                        push @omega_primes, $value;
                                     }
                                 }
                             }
@@ -26384,8 +26356,8 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         # If n is a native integer, Math::Prime::Util::is_carmichael() is slighly faster.
-        if (_fits_ulong($n)) {
-            $n = _get_ulong($n);
+        if (!ref($n) or _fits_ulong($n)) {
+            $n = _get_ulong($n) if ref($n);
             return (
                     (HAS_PRIME_UTIL ? Math::Prime::Util::is_carmichael($n) : Math::Prime::Util::GMP::is_carmichael($n))
                     ? Sidef::Types::Bool::Bool::TRUE
@@ -26583,6 +26555,33 @@ package Sidef::Types::Number::Number {
         my ($n) = @_;
 
         $n = $$n;
+
+        if (!ref($n) and $n < ULONG_MAX) {
+
+            $n >= 399   or return Sidef::Types::Bool::Bool::FALSE;
+            $n % 2 == 1 or return Sidef::Types::Bool::Bool::FALSE;
+
+            foreach my $p (3, 5, 7, 11, 13, 17, 19) {
+                if ($n % $p == 0) {
+                    if ($n % ($p * $p) == 0) {
+                        return Sidef::Types::Bool::Bool::FALSE;
+                    }
+                    ($n + 1) % ($p + 1) == 0
+                      or return Sidef::Types::Bool::Bool::FALSE;
+                }
+            }
+
+            if (HAS_PRIME_UTIL) {
+                my %seen;
+                foreach my $p (Math::Prime::Util::factor($n)) {
+                    $seen{$p}++
+                      and return Sidef::Types::Bool::Bool::FALSE;
+                    ($n + 1) % ($p + 1) == 0
+                      or return Sidef::Types::Bool::Bool::FALSE;
+                }
+                return return Sidef::Types::Bool::Bool::TRUE;
+            }
+        }
 
         if (ref($n) ne 'Math::GMPz') {
             __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
