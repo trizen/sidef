@@ -3704,7 +3704,7 @@ Returns a true value when `n >= min` and `n <= max`.
 
 =head2 is_bpsw_prime
 
-    n.is_bpsw_prime()
+    n.is_bpsw_prime
 
 Returns true if C<n> passes the B-PSW primality test (extra-strong variant).
 
@@ -3712,9 +3712,9 @@ Returns true if C<n> passes the B-PSW primality test (extra-strong variant).
 
 =head2 is_carmichael
 
-    n.is_carmichael()
+    n.is_carmichael
 
-Returns true if is a Carmichael number.
+Determine if C<n> is a Carmichael number or not.
 
 =cut
 

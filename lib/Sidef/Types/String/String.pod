@@ -24,9 +24,14 @@ Inherits methods from:
 
 =head2 %
 
-    a % b
+    format_str % (args...)
 
-Returns the
+Returns a string that is formatted according to a specified format string and arguments.
+
+Parameters:
+
+    format_str  : A string that specifies the format of the output string. It can contain placeholders that are replaced by the values of the arguments passed to the function.
+    args...     : Any number of arguments that are used to replace the placeholders in the format string. The number of arguments must match the number of placeholders in the format string.
 
 Aliases: I<sprintf>
 
@@ -34,9 +39,9 @@ Aliases: I<sprintf>
 
 =head2 &
 
-    a & b
+    str1 & str2
 
-Returns the
+Performs a bitwise B<AND> operation on two strings and returns the result as a new string.
 
 Aliases: I<and>
 
@@ -44,19 +49,19 @@ Aliases: I<and>
 
 =head2 *
 
-    a * b
+    str * n
 
-Returns the
+Takes a string C<str> and a non-negative integer C<n> as input and returns a new string consisting of C<n> copies of C<str> concatenated together.
 
-Aliases: I<mul>
+Aliases: I<mul>, I<repeat>
 
 =cut
 
 =head2 +
 
-    a + b
+    str1 + str2
 
-Returns the
+Concatenates two strings into a single string.
 
 Aliases: I<add>, I<append>, I<concat>
 
@@ -64,9 +69,9 @@ Aliases: I<add>, I<append>, I<concat>
 
 =head2 ++
 
-    a ++ b
+    a++
 
-Returns the
+Increments an alphanumeric string to the next ASCIIbetical string.
 
 Aliases: I<inc>
 
@@ -74,9 +79,16 @@ Aliases: I<inc>
 
 =head2 -
 
-    a - b
+    str - substr
+    str - regex
 
-Returns the
+Remove from C<str> the first occurrence of C<substr>:
+
+    'fo boo' - 'o'    #=> 'fo boo'
+
+When a regular expression is given, it removes all occurrences matched by the regex:
+
+    'foo boo' - /o/     #=> 'f b'
 
 Aliases: I<diff>
 
@@ -86,7 +98,7 @@ Aliases: I<diff>
 
     a .. b
 
-Returns the
+Returns a RangeStr object: C<RangeStr(a, b)>.
 
 Aliases: I<to>, I<upto>
 
@@ -94,9 +106,12 @@ Aliases: I<to>, I<upto>
 
 =head2 /
 
-    a / b
+    str / n
 
-Returns the
+Divide the C<str> into at least C<n> parts, returing an Array object.
+
+    'foobar' / 2   => ["foo", "bar"]
+    'fooba' / 2    => ["fo", "ob", "a"]
 
 Aliases: I<÷>, I<div>
 
@@ -104,9 +119,9 @@ Aliases: I<÷>, I<div>
 
 =head2 <
 
-    a < b
+    str1 < str2
 
-Returns the
+Returns true if C<str1> is lexicographically less than C<str2>.
 
 Aliases: I<lt>
 
@@ -114,9 +129,9 @@ Aliases: I<lt>
 
 =head2 <<
 
-    a << b
+    str << n
 
-Returns the
+Returns a new string that is formed by dropping the first n characters from the input string.
 
 Aliases: I<drop_left>, I<shift_left>
 
@@ -124,9 +139,15 @@ Aliases: I<drop_left>, I<shift_left>
 
 =head2 <=>
 
-    a <=> b
+    str1 <=> str2
 
-Returns the
+Compares two strings lexicographically and returns an integer that represents their relative order.
+
+If C<str1> is lexicographically less than C<str2>, the function returns a negative integer.
+
+If C<str1> is lexicographically greater than C<str2>, the function returns a positive integer.
+
+If the two strings are equal, the function returns C<0>.
 
 Aliases: I<cmp>
 
@@ -134,9 +155,9 @@ Aliases: I<cmp>
 
 =head2 ==
 
-    a == b
+    str1 == str2
 
-Returns the
+Compares if the given two strings are equal to each other. If the two strings are equal, the function returns true.
 
 Aliases: I<eq>
 
@@ -144,9 +165,15 @@ Aliases: I<eq>
 
 =head2 =~
 
-    a =~ b
+    str =~ regex
+    str.match(regex, pos)
 
-Returns the
+Searches for a match between a regular expression and a string, starting from a specified position in the string. It returns a match object.
+
+Parameters:
+
+    regex : A regular expression to be matched against the string.
+    pos   : An integer that represents the position in the string where the search is to begin. The default value is 0, which means the search starts from the beginning of the string.
 
 Aliases: I<match>
 
@@ -154,9 +181,9 @@ Aliases: I<match>
 
 =head2 >
 
-    a > b
+    str1 > str2
 
-Returns the
+Returns true if C<str1> is lexicographically greater than C<str2>.
 
 Aliases: I<gt>
 
@@ -164,9 +191,9 @@ Aliases: I<gt>
 
 =head2 >>
 
-    a >> b
+    str >> n
 
-Returns the
+Returns a new string that is formed by dropping the last n characters from the input string.
 
 Aliases: I<drop_right>, I<shift_right>
 
@@ -174,9 +201,9 @@ Aliases: I<drop_right>, I<shift_right>
 
 =head2 ^
 
-    a ^ b
+    str1 ^ str2
 
-Returns the
+Performs a bitwise B<XOR> operation on two strings and returns the result as a new string.
 
 Aliases: I<xor>
 
@@ -184,9 +211,9 @@ Aliases: I<xor>
 
 =head2 |
 
-    a | b
+    str1 | str2
 
-Returns the
+Performs a bitwise B<OR> operation on two strings and returns the result as a new string.
 
 Aliases: I<or>
 
@@ -194,9 +221,9 @@ Aliases: I<or>
 
 =head2 ~
 
-    a ~ b
+    ~str
 
-Returns the
+Performs a bitwise unary B<NOT> operation on the given string and returns the result as a new string.
 
 Aliases: I<not>
 
@@ -204,9 +231,9 @@ Aliases: I<not>
 
 =head2 ≠
 
-    a ≠ b
+    str1 ≠ str2
 
-Returns the
+Compares if the given two strings are equal to each other. If the two strings are equal, the function returns false.
 
 Aliases: I<!=>, I<ne>
 
@@ -214,9 +241,9 @@ Aliases: I<!=>, I<ne>
 
 =head2 ≤
 
-    a ≤ b
+    str1 ≤ str2
 
-Returns the
+Returns true if C<str1> is lexicographically less than or equal to C<str2>.
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -224,9 +251,9 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-    a ≥ b
+    str1 ≥ str2
 
-Returns the
+Returns true if C<str1> is lexicographically greater than or equal to C<str2>.
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -242,9 +269,9 @@ Returns the
 
 =head2 ascii2bin
 
-    self.ascii2bin
+    str.ascii2bin
 
-Returns the
+Takes a string of ASCII characters as input and returns a string of binary digits representing the ASCII values of the characters.
 
 =cut
 
@@ -252,7 +279,7 @@ Returns the
 
     self.ascii2bits
 
-Returns the
+Takes a string of ASCII characters as input and returns a string of bits representing the ASCII values of the characters. Each character is converted to its 8-bit binary representation.
 
 =cut
 
@@ -266,9 +293,11 @@ Returns the
 
 =head2 base64_decode
 
-    self.base64_decode
+    str.base64_decode
 
-Returns the
+Decodes a base64 encoded string into its original form.
+
+Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format by translating it into a radix-64 representation. The encoded string can be safely transferred or stored without any data loss or corruption. The C<base64_decode()> method reverses the encoding process and converts the base64 string back to its original binary form.
 
 Aliases: I<decode_base64>
 
@@ -276,9 +305,9 @@ Aliases: I<decode_base64>
 
 =head2 base64_encode
 
-    self.base64_encode
+    str.base64_encode
 
-Returns the
+Encodes a string in base64 format. Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format by translating it into a radix-64 representation. The encoded string can be safely transferred or stored without any data loss or corruption. The C<base64_encode()> method encodes the input string in base64 format.
 
 Aliases: I<encode_base64>
 
@@ -286,9 +315,9 @@ Aliases: I<encode_base64>
 
 =head2 begins_with
 
-    self.begins_with(string)
+    str.begins_with(prefix)
 
-Returns the
+Check whether a string starts with a given prefix string or not. It takes a string as an input and checks whether the string starts with the prefix string specified as an argument. If the string starts with the specified prefix, it returns True, otherwise, it returns False.
 
 Aliases: I<starts_with>
 
@@ -304,25 +333,25 @@ Returns the
 
 =head2 bin2ascii
 
-    self.bin2ascii
+    str.bin2ascii
 
-Returns the
+Converts a binary string into its equivalent ASCII string representation. It takes a binary string as an input and returns the equivalent ASCII string representation of the binary string.
 
 =cut
 
 =head2 bytes
 
-    self.bytes
+    str.bytes
 
-Returns the
+Convert a string into an Array of bytes, ranging from C<0> to C<255>.
 
 =cut
 
 =head2 bytes_len
 
-    self.bytes_len
+    str.bytes_len
 
-Returns the
+Determine the length of a string in bytes. It takes a string as an input and returns the length of the string in bytes.
 
 Aliases: I<bytes_length>
 
@@ -406,17 +435,21 @@ Returns the
 
 =head2 decode
 
-    self.decode(enc)
+    str.decode(enconding)
 
-Returns the
+Decodes a string using a specified character encoding and returns the corresponding Unicode string.
+
+Parameters:
+
+    encoding : A string that specifies the character encoding used to encode the input string.
 
 =cut
 
 =head2 decode_utf8
 
-    self.decode_utf8
+    str.decode_utf8
 
-Returns the
+Decodes a UTF-8 encoded string and returns the corresponding Unicode string.
 
 =cut
 
@@ -464,9 +497,9 @@ Aliases: I<inspect>
 
 =head2 each
 
-    self.each(code)
+    self.each {|char| ... }
 
-Returns the
+Iterates through each character in the string and applies a given block of code to each character.
 
 Aliases: I<each_char>
 
@@ -474,17 +507,17 @@ Aliases: I<each_char>
 
 =head2 each_byte
 
-    self.each_byte(code)
+    self.each_byte {|byte| ... }
 
-Returns the
+Iterates through each byte value in the string and applies a given block of code to each byte value.
 
 =cut
 
 =head2 each_graph
 
-    self.each_graph(code)
+    self.each_graph {|grapheme| ... }
 
-Returns the
+Iterates through each grapheme in the string and applies a given block of code to each grapheme.
 
 Aliases: I<each_grapheme>
 
@@ -492,17 +525,17 @@ Aliases: I<each_grapheme>
 
 =head2 each_line
 
-    self.each_line(code)
+    self.each_line {|line| ... }
 
-Returns the
+Iterates through each line in the string and applies a given block of code to each line.
 
 =cut
 
 =head2 each_num
 
-    self.each_num(code)
+    self.each_num {|num| ... }
 
-Returns the
+Iterates through each word, converted to a number, in the string and applies a given block of code to each number.
 
 Aliases: I<each_number>
 
@@ -510,17 +543,21 @@ Aliases: I<each_number>
 
 =head2 each_word
 
-    self.each_word(code)
+    self.each_word {|word| ... }
 
-Returns the
+Iterates through each word in the string and applies a given block of code to each word.
 
 =cut
 
 =head2 encode
 
-    self.encode(enc)
+    str.encode(encoding)
 
-Returns the
+Encodes a string into a specified character encoding and returns a new string object.
+
+Parameters:
+
+    encoding : A string that specifies the character encoding to be used for encoding the input string.
 
 =cut
 
@@ -528,23 +565,27 @@ Returns the
 
     self.encode_utf8
 
-Returns the
+Encodes a Unicode string using the UTF-8 character encoding and returns a new string object.
 
 =cut
 
 =head2 ends_with
 
-    self.ends_with(string)
+    str.ends_with(suffix)
 
-Returns the
+Checks if a string ends with a specified suffix and returns a boolean value.
+
+Parameters:
+
+    suffix : A string that represents the suffix to be searched for at the end of the input string.
 
 =cut
 
 =head2 escape
 
-    self.escape
+    str.escape
 
-Returns the
+Returns a copy of the input string with all non-word characters escaped using a backslash character.
 
 Aliases: I<quotemeta>
 
@@ -600,9 +641,11 @@ Returns the
 
 =head2 fc
 
-    self.fc
+    str.fc
 
-Returns the
+Returns a copy of the input string with all uppercase characters converted to their lowercase equivalents.
+
+Casefolding is the process of mapping strings to a form where case differences are erased; comparing two strings in their casefolded form is effectively a way of asking if two strings are equal, regardless of case.
 
 Aliases: I<foldcase>
 
@@ -610,17 +653,21 @@ Aliases: I<foldcase>
 
 =head2 first
 
-    self.first(num)
+    str.first(n)
 
-Returns the
+Returns the first C<n> characters of the input string, where C<n> is an integer.
+
+Parameters:
+
+    n : An integer that represents the number of characters to be returned from the beginning of the input string.
 
 =cut
 
 =head2 flip
 
-    self.flip
+    str.flip
 
-Returns the
+Returns a copy of the input string with the order of its characters reversed.
 
 Aliases: I<reverse>
 
@@ -644,9 +691,15 @@ Returns the
 
 =head2 ft
 
-    self.ft(from, to)
+    str.ft(from, to)
+    str.slice(from, to)
 
-Returns the
+Returns a substring of the input string that starts at the specified C<from> index and ends at the specified C<to> index.
+
+Parameters:
+
+    from : An integer that represents the index at which to start the substring.
+    to   : An integer that represents the index at which to end the substring.
 
 Aliases: I<slice>
 
@@ -678,9 +731,9 @@ Returns the
 
 =head2 graphs
 
-    self.graphs
+    str.graphs
 
-Returns the
+Returns an Array of grapheme clusters in the input string. A grapheme cluster is a sequence of one or more Unicode code points that represents a single user-perceived character.
 
 Aliases: I<graphemes>
 
@@ -688,9 +741,9 @@ Aliases: I<graphemes>
 
 =head2 graphs_len
 
-    self.graphs_len
+    str.graphs_len
 
-Returns the
+Returns the number of grapheme clusters in the input string.
 
 Aliases: I<graphs_length>
 
@@ -724,9 +777,17 @@ Returns the
 
 =head2 has
 
-    self.has(arg, start_pos)
+    self.has(substr, pos=0)
+    self.has(regex, pos=0)
 
-Returns the
+Checks if a substring exists within the input string starting from a given position.
+
+Parameters:
+
+    substr  : A string that represents the substring to search for.
+    pos     : An integer that represents the starting position from where to search for the substring. The default value is 0.
+
+When a regular expression is given, it checks if the regular expression pattern matches within the input string starting from a given position.
 
 Aliases: I<contain>, I<include>, I<contains>, I<includes>
 
@@ -744,7 +805,7 @@ Returns the
 
     self.hex2ascii
 
-Returns the
+Decodes a hexadecimal string and returns its equivalent byte-string.
 
 Aliases: I<unhexlify>
 
@@ -754,7 +815,7 @@ Aliases: I<unhexlify>
 
     self.hexlify
 
-Returns the
+Encodes the input string as a hexadecimal string.
 
 Aliases: I<ascii2hex>
 
@@ -762,9 +823,15 @@ Aliases: I<ascii2hex>
 
 =head2 index
 
-    self.index(substr, pos)
+    str.index(substr, pos)
 
-Returns the
+Returns the index of the first occurrence of a substring in a given string starting from a specified position.
+
+Parameters:
+
+    str        : The original string in which the substring is to be searched.
+    substring  : The substring to be searched in the original string.
+    pos        : The position in the original string from where the search is to begin. The default value is 0.
 
 =cut
 
@@ -778,9 +845,16 @@ Returns the
 
 =head2 insert
 
-    self.insert(string, pos, len)
+    str.insert(substring, pos, len)
 
-Returns the
+Inserts a substring into a given string at a specified position for a given length.
+
+Parameters:
+
+    str        : The original string into which the substring is to be inserted.
+    substring  : The substring to be inserted into the original string.
+    pos        : The position in the original string where the insertion is to begin.
+    len        : The length of the original string from the position where the insertion is to begin.
 
 =cut
 
@@ -820,6 +894,22 @@ Returns the
 
 =cut
 
+=head2 is_blank
+
+    self.is_blank
+
+Returns the
+
+=cut
+
+=head2 is_control
+
+    self.is_control
+
+Returns the
+
+=cut
+
 =head2 is_digit
 
     self.is_digit
@@ -830,7 +920,15 @@ Returns the
 
 =head2 is_empty
 
-    self.is_empty
+    str.is_empty
+
+Determine if a given string is empty or not. It takes a string as an input and returns True if the string is empty, False otherwise.
+
+=cut
+
+=head2 is_graph
+
+    self.is_graph
 
 Returns the
 
@@ -848,9 +946,9 @@ Aliases: I<is_lowercase>
 
 =head2 is_numeric
 
-    self.is_numeric
+    str.is_numeric
 
-Returns the
+Checks whether a given string looks like a number or not. It checks if the string can be converted to a number without raising an exception.
 
 Aliases: I<looks_like_number>
 
@@ -858,7 +956,15 @@ Aliases: I<looks_like_number>
 
 =head2 is_palindrome
 
-    self.is_palindrome
+    str.is_palindrome
+
+Checks whether a given string is a palindrome or not. A palindrome is a word, phrase, number, or other sequence of characters that reads the same backward as forward.
+
+=cut
+
+=head2 is_printable
+
+    self.is_printable
 
 Returns the
 
@@ -900,6 +1006,14 @@ Returns the
 
 =cut
 
+=head2 is_xdigit
+
+    self.is_xdigit
+
+Returns the
+
+=cut
+
 =head2 iter
 
     self.iter
@@ -910,51 +1024,53 @@ Returns the
 
 =head2 jaro_distance
 
-    s.jaro_distance(t, winkler)
+    jaro_distance(str1, str2, winkler=false)
 
-Returns the
+Calculates the Jaro distance between two strings. Jaro distance is a measure of similarity between two strings, based on the number of matching characters and transpositions.
+
+When the third argument is true, it returns the Jaro-Winkler distance.
 
 =cut
 
 =head2 join
 
-    self.join(*rest)
+    delim.join(strings...)
 
-Returns the
+Concatenates a list of strings and returns a single string, using a specified delimiter.
 
 =cut
 
 =head2 last
 
-    self.last(num)
+    str.last(n)
 
-Returns the
+Returns the last n characters of a string.
 
 =cut
 
 =head2 lc
 
-    self.lc
+    str.lc
 
-Returns the
+Returns a new string with all alphabetic characters converted to lowercase.
 
-Aliases: I<lower>, I<downcase>
+Aliases: I<lower>, I<downcase>, I<lowercase>
 
 =cut
 
 =head2 lcfirst
 
-    self.lcfirst
+    str.lcfirst
 
-Returns the
+Returns a new string with the first character of the string converted to lowercase.
 
 =cut
 
 =head2 len
 
-    self.len
+    str.len
 
-Returns the
+Returns the length of the string.
 
 Aliases: I<size>, I<length>, I<chars_len>, I<chars_length>
 
@@ -962,9 +1078,9 @@ Aliases: I<size>, I<length>, I<chars_len>, I<chars_length>
 
 =head2 lev
 
-    self.lev(arg)
+    levenshtein(str1, str2)
 
-Returns the
+Calculates the Levenshtein distance between two strings, which is the minimum number of single-character edits (insertions, deletions, or substitutions) required to transform one string into the other.
 
 Aliases: I<leven>, I<levenshtein>
 
@@ -972,17 +1088,20 @@ Aliases: I<leven>, I<levenshtein>
 
 =head2 lines
 
-    self.lines
+    str.lines
 
-Returns the
+Returns an array of the lines in a string. A line is defined as a sequence of characters terminated by a newline character ("\n") or a carriage return character followed by a newline character ("\r\n").
 
 =cut
 
 =head2 ltrim
 
-    self.ltrim(arg)
+    str.ltrim
+    self.ltrim(regex)
 
-Returns the
+Takes a regular expression regex and removes any substring from the beginning of the string str that matches the regular expression. The resulting string is returned.
+
+When no argument is given, it strips whitespace characters from the beginning of the string.
 
 Aliases: I<lstrip>, I<trim_beg>, I<strip_beg>, I<trim_left>, I<strip_left>
 
@@ -990,17 +1109,17 @@ Aliases: I<lstrip>, I<trim_beg>, I<strip_beg>, I<trim_left>, I<strip_left>
 
 =head2 md5
 
-    self.md5
+    str.md5
 
-Returns the
+Returns the MD5 digest for the given string in hexadecimal form.
 
 =cut
 
 =head2 new
 
-    self.new
+    Str(args...)
 
-Returns the
+Creates a new string, by concatenating together a given list of objects.
 
 Aliases: I<call>
 
@@ -1008,9 +1127,13 @@ Aliases: I<call>
 
 =head2 num
 
-    self.num(base)
+    str.num(base=10)
 
-Returns the
+Returns the numeric representation of the string according to the specified base.
+
+Parameters:
+
+    base : An integer representing the numeric base to use for conversion. Valid values for base are between 2 and 62 (inclusive). If not specified, base defaults to 10.
 
 Aliases: I<to_n>, I<to_num>
 
@@ -1018,9 +1141,13 @@ Aliases: I<to_n>, I<to_num>
 
 =head2 nums
 
-    self.nums
+    str.nums
 
-Returns the
+Returns a list of numbers that were found in the string.
+
+The function splits the string by whitespace, and collects every word that looks like a number.
+
+The numbers in the returned list will be in the same order that they appeared in the string.
 
 Aliases: I<numbers>
 
@@ -1060,9 +1187,9 @@ Returns the
 
 =head2 overlaps
 
-    self.overlaps(arg)
+    overlaps(str1, str2)
 
-Returns the
+Checks whether there is any overlap between two strings, i.e., whether they have any characters in common. It returns True if there is any overlap, and False otherwise.
 
 =cut
 
@@ -1076,9 +1203,15 @@ Returns the
 
 =head2 parse_quotewords
 
-    self.parse_quotewords(delim, keep)
+    str.parse_quotewords(delim, keep)
 
-Returns the
+Parse a string into an Array of words or phrases. It takes a string as an input and returns an Array of words or phrases parsed from the input string. The function can also handle quoted phrases, allowing users to specify phrases containing delimiters.
+
+The method takes three parameters:
+
+    str     : A string that needs to be split into words.
+    delim   : A string that represents the delimiter to be used while splitting the string. The default value is a space character (' ').
+    keep    : A Boolean value that indicates whether to keep the quotes around quoted words or not. The default value is False.
 
 =cut
 
@@ -1092,17 +1225,17 @@ Returns the
 
 =head2 pop
 
-    self.pop
+    str.pop
 
-Returns the
+Returns the last character of the string.
 
 =cut
 
 =head2 prepend
 
-    self.prepend(string)
+    str.prepend(prefix)
 
-Returns the
+Returns a new string with the C<prefix> added to the beginning of the C<str>.
 
 =cut
 
@@ -1125,14 +1258,6 @@ Returns the
 =head2 range
 
     from.range(to, step)
-
-Returns the
-
-=cut
-
-=head2 repeat
-
-    self.repeat(num)
 
 Returns the
 
@@ -1200,23 +1325,23 @@ Returns the
 
     self.sha256
 
-Returns the
+Returns the SHA-256 digest for the given string in hexadecimal form.
 
 =cut
 
 =head2 sha512
 
-    self.sha512
+    str.sha512
 
-Returns the
+Returns the SHA-512 digest for the given string in hexadecimal form.
 
 =cut
 
 =head2 slices
 
-    self.slices(n)
+    str.slices(n)
 
-Returns the
+Takes a string and divides it into slices of a specified length. The length of the slice is specified by the integer parameter C<n>. If the length of the string is not evenly divisible by C<n>, the last slice will be shorter than C<n> characters.
 
 =cut
 
@@ -1266,9 +1391,9 @@ Aliases: I<substring>
 
 =head2 tc
 
-    self.tc
+    str.tc
 
-Returns the
+Returns a new string where each word in the input string C<str> is capitalized.
 
 Aliases: I<ucfirst>, I<titlecase>
 
@@ -1278,7 +1403,7 @@ Aliases: I<ucfirst>, I<titlecase>
 
     self.tclc
 
-Returns the
+Returns the string with the first character capitalized and the remaining characters in lower case.
 
 Aliases: I<capitalize>
 
@@ -1334,9 +1459,9 @@ Aliases: I<strip>
 
 =head2 uc
 
-    self.uc
+    str.uc
 
-Returns the
+Convert all the characters in a string to uppercase. It takes a string as an input and returns the same string with all the characters converted to uppercase.
 
 Aliases: I<upper>, I<upcase>
 
@@ -1344,9 +1469,9 @@ Aliases: I<upper>, I<upcase>
 
 =head2 unescape
 
-    self.unescape
+    str.unescape
 
-Returns the
+Removes backslash escapes from a string. The reverse of the C<str.escape> method.
 
 =cut
 
@@ -1378,7 +1503,7 @@ Returns the
 
     self.wc
 
-Returns the
+Change the case of words in a string. It takes a string as an input and returns the same string with the case of each word modified, making the first letter uppercase and the other letters lowercase.
 
 Aliases: I<wordcase>
 
@@ -1386,8 +1511,8 @@ Aliases: I<wordcase>
 
 =head2 words
 
-    self.words
+    str.words
 
-Returns the
+Split a string into words. It takes a string as an input and returns an Array of words in the string. A word is defined as a sequence of characters separated by whitespace characters.
 
 =cut

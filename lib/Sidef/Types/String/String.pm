@@ -153,10 +153,7 @@ package Sidef::Types::String::String {
         $self->new($$self x $num);
     }
 
-    sub repeat {
-        my ($self, $num) = @_;
-        $self->times($num // (Sidef::Types::Number::Number::ONE));
-    }
+    *repeat = \&mul;
 
     sub eq {
         my ($self, $arg) = @_;
@@ -198,16 +195,18 @@ package Sidef::Types::String::String {
         $self->new(CORE::lc $$self);
     }
 
-    *downcase = \&lc;
-    *lower    = \&lc;
+    *downcase  = \&lc;
+    *lower     = \&lc;
+    *lowercase = \&lc;
 
     sub uc {
         my ($self) = @_;
         $self->new(CORE::uc $$self);
     }
 
-    *upcase = \&uc;
-    *upper  = \&uc;
+    *upcase    = \&uc;
+    *upper     = \&uc;
+    *uppercase = \&uc;
 
     sub fc {
         my ($self) = @_;
@@ -377,6 +376,7 @@ package Sidef::Types::String::String {
 
     sub parse_quotewords {
         my ($self, $delim, $keep) = @_;
+        $delim //= ' ';
         state $x = require Text::ParseWords;
         my @words = map { bless \$_ } Text::ParseWords::parse_line("$delim", ($keep ? 1 : 0), $$self);
         Sidef::Types::Array::Array->new(\@words);
@@ -548,6 +548,41 @@ package Sidef::Types::String::String {
     }
 
     *is_alnum = \&is_alphanum;
+
+    sub is_blank {
+        my ($self) = @_;
+        ($$self =~ /^[[:blank:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_graph {
+        my ($self) = @_;
+        ($$self =~ /^[[:graph:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_control {
+        my ($self) = @_;
+        ($$self =~ /^[[:cntrl:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_printable {
+        my ($self) = @_;
+        ($$self =~ /^[[:print:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_xdigit {
+        my ($self) = @_;
+        ($$self =~ /^[[:xdigit:]]+\z/)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
 
     sub index {
         my ($self, $substr, $pos) = @_;
