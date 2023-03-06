@@ -1,0 +1,38 @@
+#!/usr/bin/ruby
+
+# Smallest base-n Fermat pseudoprime with n distinct prime factors.
+# https://oeis.org/A271874
+
+# Timings:
+#   04 march 2023: 3.305s (with MPU)
+#   04 march 2023: 3.637s (without MPU)
+
+func a(n) {
+    return nil if (n < 2)
+
+    var x = 1
+    var y = 2*x
+
+    loop {
+        #say "Sieving range: #{[x,y]}"
+        var arr = n.fermat_psp(n,x,y)
+
+        if (arr.len >= 1) {
+            return arr[0]
+        }
+
+        x = y+1
+        y = 2*x
+    }
+}
+
+var arr = gather {
+    for n in (2..16) {
+        say "a(#{n}) = #{take(a(n))}"
+    }
+}
+
+assert_eq(
+    arr,
+    %n[341, 286, 11305, 2203201, 12306385, 9073150801, 3958035081, 2539184851126, 152064312120721, 10963650080564545, 378958695265110961, 1035551157050957605345, 57044715596229144811105, 6149883077429715389052001, 426634466310819456228926101]
+)
