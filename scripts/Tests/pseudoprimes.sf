@@ -2,6 +2,10 @@
 
 # Tests for some pseudoprime-related functions
 
+# Timings:
+#   07 March 2023: 2.403s (with MPU)
+#   07 March 2023: 3.420s (without MPU)
+
 assert_eq(
     10.by{.is_fermat_psp(9) && .is_composite },
     %n[4, 8, 28, 52, 91, 121, 205, 286, 364, 511],
@@ -17,6 +21,93 @@ with (%n[1373653, 1530787, 1987021, 2284453, 3116107, 5173601, 6787327, 11541307
     assert_eq(arr.grep { .is_psp(2,3,5) }, arr.grep { powmod(5, .dec, _) == 1 })
     assert_eq(arr.grep { .is_strong_psp(2,3,5) }, %n[25326001])
 }
+
+assert_eq(
+    10.by { .is_lucas_carmichael },
+    %n[399, 935, 2015, 2915, 4991, 5719, 7055, 8855, 12719, 18095],
+)
+
+assert_eq(
+    10.by { .is_carmichael },
+    %n[561, 1105, 1729, 2465, 2821, 6601, 8911, 10585, 15841, 29341],
+)
+
+assert_eq(
+    10.by { .is_psp && .is_composite },
+    %n[341, 561, 645, 1105, 1387, 1729, 1905, 2047, 2465, 2701]
+)
+
+assert_eq(
+    10.by { .is_psp(3) && .is_composite },
+    %n[91, 121, 286, 671, 703, 949, 1105, 1541, 1729, 1891]
+)
+
+assert_eq(
+    10.by { .is_psp(3) && .is_composite },
+    %n[91, 121, 286, 671, 703, 949, 1105, 1541, 1729, 1891]
+)
+
+assert_eq(
+    10.by { .is_psp(2,3) && .is_composite },
+    %n[1105, 1729, 2465, 2701, 2821, 6601, 8911, 10585, 15841, 18721]
+)
+
+assert_eq(
+    5.by { .is_strong_psp && .is_composite },
+    %n[2047, 3277, 4033, 4681, 8321]
+)
+
+assert_eq(
+    5.by { .is_strong_psp(3) && .is_composite },
+    %n[121, 703, 1891, 3281, 8401]
+)
+
+assert(1373653.is_strong_psp(2,3))
+
+assert_eq(
+    10.by{.is_super_psp && .is_composite},
+    %n[341, 1387, 2047, 2701, 3277, 4033, 4369, 4681, 5461, 7957]
+)
+
+assert_eq(
+    10.by{.is_super_psp(3) && .is_composite},
+    %n[91, 121, 671, 703, 949, 1541, 1891, 2701, 3281, 7381]
+)
+
+assert_eq(
+    3.by{.is_super_psp(2,3) && .is_composite},
+    %n[2701, 18721, 31621]
+)
+
+assert_eq(
+    3.by{.is_over_psp && .is_composite},
+    %n[2047, 3277, 4033]
+)
+
+assert_eq(
+    3.by{.is_over_psp(3) && .is_composite},
+    %n[121, 703, 3281]
+)
+
+assert_eq(
+    10.by{.is_fib_psp && .is_composite},
+    %n[323, 377, 1891, 3827, 4181, 5777, 6601, 6721, 8149, 10877]
+)
+
+assert_eq(
+    10.by{.is_pell_psp && .is_composite},
+    %n[169, 385, 741, 961, 1121, 2001, 3827, 4879, 5719, 6215]
+)
+
+assert_eq(
+    10.by{.is_lucas_psp && .is_composite},
+    %n[323, 377, 1159, 1829, 3827, 5459, 5777, 9071, 9179, 10877]
+)
+
+assert_eq(
+    5.by{.is_strong_lucas_psp && .is_composite},
+    %n[5459, 5777, 10877, 16109, 18971]
+)
 
 assert_eq(
     9.lucas_carmichael(61044448782239)

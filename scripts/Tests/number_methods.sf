@@ -3,8 +3,8 @@
 # Tests for some Number methods.
 
 # Timings:
-#   4 March 2023: 4.791s (with MPU)
-#   4 March 2023: 6.789s (without MPU)
+#   07 March 2023: 4.140s (with MPU)
+#   07 March 2023: 7.661s (without MPU)
 
 assert_eq(squarefree_sum(1e6), 303961062910)
 assert_eq(squarefree_sum(1e7), 30396557311887)
@@ -804,5 +804,53 @@ for name,f,g in ([
         }
     }
 }
+
+assert_eq(
+    20.of { .phi },
+    %n[0, 1, 1, 2, 2, 4, 2, 6, 4, 6, 4, 10, 4, 12, 6, 8, 8, 16, 6, 18]
+)
+
+assert_eq(
+    20.of { .lambda },
+    %n[0, 1, 1, 2, 2, 4, 2, 6, 2, 6, 4, 10, 2, 12, 6, 4, 4, 16, 6, 18]
+)
+
+assert_eq(
+    20.of { .liouville },
+    %n[-1, 1, -1, -1, 1, -1, 1, -1, -1, 1, 1, -1, -1, -1, 1, 1, 1, -1, -1, -1]
+)
+
+assert_eq(
+    20.of { .moebius },
+    %n[0, 1, -1, -1, 0, -1, 1, -1, 0, 0, 1, -1, 0, -1, 1, 1, 0, -1, 0, -1]
+)
+
+assert_eq(
+    30.of { .bell },
+    %n[1, 1, 2, 5, 15, 52, 203, 877, 4140, 21147, 115975, 678570, 4213597, 27644437, 190899322, 1382958545, 10480142147, 82864869804, 682076806159, 5832742205057, 51724158235372, 474869816156751, 4506715738447323, 44152005855084346, 445958869294805289, 4638590332229999353, 49631246523618756274, 545717047936059989389, 6160539404599934652455, 71339801938860275191172],
+)
+
+assert_eq(
+    30.of { .bellmod(4171) },
+    %n[1, 1, 2, 5, 15, 52, 203, 877, 4140, 21147, 115975, 678570, 4213597, 27644437, 190899322, 1382958545, 10480142147, 82864869804, 682076806159, 5832742205057, 51724158235372, 474869816156751, 4506715738447323, 44152005855084346, 445958869294805289, 4638590332229999353, 49631246523618756274, 545717047936059989389, 6160539404599934652455, 71339801938860275191172].map { .mod(4171) },
+)
+
+assert_eq(
+    20.by { .is_composite },
+    %n[4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32],
+)
+
+assert_eq(20.of { .composite_count },   20.of { .is_composite ? 1 : 0 }.acc)
+assert_eq(20.of { .mertens },           20.of { .moebius }.acc)
+assert_eq(20.of { .pi },                20.of { .is_prime ? 1 : 0 }.acc)
+assert_eq(20.of { .sum_primes },        20.of { .is_prime ? _ : 0 }.acc)
+assert_eq(20.of { sum_primes(0,_) },    20.of { .is_prime ? _ : 0 }.acc)
+assert_eq(20.of { sum_primes(0,_,2) },  20.of { .is_prime ? _*_ : 0 }.acc)
+assert_eq(20.of { .sigma0 },            20.of { .divisors.len })
+assert_eq(20.of { .sigma(0) },          20.of { .divisors.len })
+assert_eq(20.of { .sigma },             20.of { .divisors.sum })
+assert_eq(20.of { .sigma(2) },          20.of { .divisors.sum { _*_ } })
+assert_eq(20.of { .omega },             20.of { .factor_exp.len })
+assert_eq(20.of { .bigomega },          20.of { .factor.len })
 
 say "** Tests passed!"

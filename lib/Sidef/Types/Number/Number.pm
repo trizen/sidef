@@ -26572,14 +26572,21 @@ package Sidef::Types::Number::Number {
             }
 
             if (HAS_PRIME_UTIL) {
+
+                my @factors = Math::Prime::Util::factor($n);
+
+                if (scalar(@factors) <= 2) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+
                 my %seen;
-                foreach my $p (Math::Prime::Util::factor($n)) {
+                foreach my $p (@factors) {
                     $seen{$p}++
                       and return Sidef::Types::Bool::Bool::FALSE;
                     ($n + 1) % ($p + 1) == 0
                       or return Sidef::Types::Bool::Bool::FALSE;
                 }
-                return return Sidef::Types::Bool::Bool::TRUE;
+                return Sidef::Types::Bool::Bool::TRUE;
             }
         }
 
