@@ -3,8 +3,8 @@
 # Tests for some pseudoprime-related functions
 
 # Timings:
-#   07 March 2023: 2.403s (with MPU)
-#   07 March 2023: 3.420s (without MPU)
+#   07 March 2023: 2.991s (with MPU)
+#   07 March 2023: 4.275s (without MPU)
 
 assert_eq(
     10.by{.is_fermat_psp(9) && .is_composite },
@@ -30,6 +30,28 @@ assert_eq(
 assert_eq(
     10.by { .is_carmichael },
     %n[561, 1105, 1729, 2465, 2821, 6601, 8911, 10585, 15841, 29341],
+)
+
+assert_eq(
+    5.by { .is_abs_euler_psp },
+    %n[1729, 2465, 15841, 41041, 46657]
+)
+
+assert(%n[294409, 399001, 488881, 512461, 1152271].all { .is_imprimitive_carmichael })
+
+assert_eq(
+    10.by { .is_euler_psp && .is_composite },
+    %n[561, 1105, 1729, 1905, 2047, 2465, 3277, 4033, 4681, 6601]
+)
+
+assert_eq(
+    10.by { .is_euler_psp(3) && .is_composite },
+    %n[121, 703, 1729, 1891, 2821, 3281, 7381, 8401, 8911, 10585]
+)
+
+assert_eq(
+    5.by { .is_euler_psp(2,3) && .is_composite },
+    %n[1729, 10585, 15841, 29341, 41041]
 )
 
 assert_eq(

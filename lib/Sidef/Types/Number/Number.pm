@@ -17707,28 +17707,40 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and _fits_ulong($n)) {
-            return (
-                Math::Prime::Util::is_euler_pseudoprime(
-                    _get_ulong($n),
-                    do {
-                        @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
-                        @bases ? (@bases) : (2);
-                    }
-                  )
-                ? Sidef::Types::Bool::Bool::TRUE
-                : Sidef::Types::Bool::Bool::FALSE
-            );
+        if (ref($n)) {
+            __is_int__($n)
+              || return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        __is_int__($n)
-          && Math::Prime::Util::GMP::is_euler_pseudoprime(
-            _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
-            do {
-                @bases = grep { defined($_) and $_ > 1 } map { _big2uistr($_) } @bases;
-                @bases ? (@bases) : (2);
-            }
-          )
+        if (scalar(@bases)) {
+            @bases = map { ref($_) ? (_any2mpz($_) // return Sidef::Types::Bool::Bool::FALSE) : $_ } map { $$_ } @bases;
+        }
+        else {
+            @bases = (2);
+        }
+
+        if (HAS_PRIME_UTIL and !ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
+            return (
+                    Math::Prime::Util::is_euler_pseudoprime($n, $bases[0])
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+        elsif (HAS_NEW_PRIME_UTIL and !ref($n) and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
+            return (
+                    Math::Prime::Util::is_euler_pseudoprime($n, @bases)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        Math::Prime::Util::GMP::is_euler_pseudoprime(
+                                                      _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
+                                                      (
+                                                       grep { (defined($_) and $_ > 1) || return Sidef::Types::Bool::Bool::FALSE }
+                                                       map { _big2uistr($_) } @bases
+                                                      )
+                                                     )
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -17769,14 +17781,13 @@ package Sidef::Types::Number::Number {
                    );
         }
 
-        __is_int__($n)
-          && Math::Prime::Util::GMP::is_strong_pseudoprime(
-                                                           _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
-                                                           (
-                                                            grep { (defined($_) and $_ > 1) || return Sidef::Types::Bool::Bool::FALSE }
-                                                            map { _big2uistr($_) } @bases
-                                                           )
-                                                          )
+        Math::Prime::Util::GMP::is_strong_pseudoprime(
+                                                      _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
+                                                      (
+                                                       grep { (defined($_) and $_ > 1) || return Sidef::Types::Bool::Bool::FALSE }
+                                                       map { _big2uistr($_) } @bases
+                                                      )
+                                                     )
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
