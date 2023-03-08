@@ -15745,7 +15745,7 @@ package Sidef::Types::Number::Number {
                         else {
                             my $t = $n << 2;    # n is a Math::GMPz object
                             $count =
-                              ($t < ULONG_MAX)
+                              Math::GMPz::Rmpz_fits_ulong_p($t)
                               ? eval { Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($t)) }
                               : undef;
                         }
@@ -16951,7 +16951,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_ui_pow_ui($t, $trial_limit + 2, $k - $bigomega);
+                Math::GMPz::Rmpz_ui_pow_ui($t, $trial_limit + 1, $k - $bigomega);
                 Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                   or return Sidef::Types::Bool::Bool::FALSE;
 
@@ -17205,7 +17205,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_ui_pow_ui($t, $trial_limit + 2, $k - $omega);
+                Math::GMPz::Rmpz_ui_pow_ui($t, $trial_limit + 1, $k - $omega);
                 Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                   or return Sidef::Types::Bool::Bool::FALSE;
 
@@ -17735,12 +17735,12 @@ package Sidef::Types::Number::Number {
         }
 
         Math::Prime::Util::GMP::is_euler_pseudoprime(
-                                                      _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
-                                                      (
-                                                       grep { (defined($_) and $_ > 1) || return Sidef::Types::Bool::Bool::FALSE }
-                                                       map { _big2uistr($_) } @bases
-                                                      )
+                                                     _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
+                                                     (
+                                                      grep { (defined($_) and $_ > 1) || return Sidef::Types::Bool::Bool::FALSE }
+                                                      map { _big2uistr($_) } @bases
                                                      )
+                                                    )
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -26097,12 +26097,16 @@ package Sidef::Types::Number::Number {
             $z = _any2mpz($z) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        if (Math::GMPz::Rmpz_sizeinbase($z, 2) > SMALL_NUMBER_MAX_BITS) {
-            state $lim_small = _set_int(1e4);
-            state $lim_large = _set_int(1e6);
+        my $size = Math::GMPz::Rmpz_sizeinbase($z, 2);
 
+        if ($size > SMALL_NUMBER_MAX_BITS) {
+            state $lim_small = _set_int(1e4);
             $n->is_prob_squarefree($lim_small) || return Sidef::Types::Bool::Bool::FALSE;
-            $n->is_prob_squarefree($lim_large) || return Sidef::Types::Bool::Bool::FALSE;
+
+            if ($size > MEDIUM_NUMBER_MAX_BITS) {
+                state $lim_large = _set_int(1e6);
+                $n->is_prob_squarefree($lim_large) || return Sidef::Types::Bool::Bool::FALSE;
+            }
         }
 
         $z = _big2uistr($z) // return Sidef::Types::Bool::Bool::FALSE;

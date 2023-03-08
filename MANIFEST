@@ -685,6 +685,7 @@ scripts/smart_word_wrap_simple.sf
 scripts/space_collisions.sf
 scripts/stern-brocot_sequence.sf
 scripts/symmetric_summation_of_fractions.sf
+scripts/Tests/almost_and_omega_primes.sf
 scripts/Tests/amb.sf
 scripts/Tests/amb_nested_loops.sf
 scripts/Tests/anonymous_recursion.sf
@@ -793,6 +794,7 @@ scripts/Tests/execute_system_command.sf
 scripts/Tests/expression_call.sf
 scripts/Tests/extended_builtin_class.sf
 scripts/Tests/extreme_floating_point_values.sf
+scripts/Tests/factorization_methods.sf
 scripts/Tests/fibonacci_closed_solution.sf
 scripts/Tests/fibonacci_iterative.sf
 scripts/Tests/fibonacci_mystery.sf

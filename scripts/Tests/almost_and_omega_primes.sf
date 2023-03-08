@@ -1,0 +1,109 @@
+#!/usr/bin/ruby
+
+# Tests for the generation of k-almost and k-omega primes (and also various kinds of k-omega pseudoprimes).
+
+# Timings:
+#   07 March 2023: 1.845s (with MPU)
+#   07 March 2023: 2.388s (without MPU)
+
+for k in (0..10) {
+
+    assert_eq(k.almost_primes(1000), 1..1000 -> grep { .is_almost_prime(k) })
+    assert_eq(k.omega_primes(1000), 1..1000 -> grep { .is_omega_prime(k) })
+    assert_eq(k.squarefree_almost_primes(1000), k.almost_primes(1, 1000).grep{.is_squarefree})
+
+    assert_eq(gather { k.almost_primes_each(1000, { take(_) }) }, k.almost_primes(1000))
+    assert_eq(gather { k.omega_primes_each(1000, { take(_) }) }, k.omega_primes(1000))
+    assert_eq(gather { k.squarefree_almost_primes_each(1000, { take(_) }) }, k.squarefree_almost_primes(1000))
+
+    var from = 1000.irand
+    var upto = from+1000.irand
+
+    assert_eq(k.almost_primes(from, upto), from..upto -> grep { .is_almost_prime(k) })
+    assert_eq(k.omega_primes(from, upto), from..upto -> grep { .is_omega_prime(k) })
+    assert_eq(k.squarefree_almost_primes(from, upto), k.almost_primes(from, upto).grep{.is_squarefree})
+
+    assert_eq(gather { k.carmichael_each(from, 100*upto, { take(_) }) }, k.carmichael(from, 100*upto))
+    assert_eq(gather { k.lucas_carmichael_each(from, 100*upto, { take(_) }) }, k.lucas_carmichael(from, 100*upto))
+
+    assert_eq(gather { k.carmichael_strong_fermat_each(2, from, 1e4*upto, { take(_) }) }, k.carmichael_strong_fermat(2, from, 1e4*upto))
+    assert_eq(gather { k.carmichael_strong_fermat_each(3, from, 1e4*upto, { take(_) }) }, k.carmichael_strong_fermat(3, from, 1e4*upto))
+
+    assert_eq(gather { k.squarefree_strong_fermat_psp_each(2, from, 1e3*upto, { take(_) }) }, k.squarefree_strong_fermat_psp(2, from, 1e3*upto))
+    assert_eq(gather { k.squarefree_strong_fermat_psp_each(3, from, 1e3*upto, { take(_) }) }, k.squarefree_strong_fermat_psp(3, from, 1e3*upto))
+
+    assert_eq(gather { k.strong_fermat_psp_each(2, from, 1e2*upto, { take(_) }) }, k.strong_fermat_psp(2, from, 1e2*upto))
+    assert_eq(gather { k.strong_fermat_psp_each(3, from, 1e2*upto, { take(_) }) }, k.strong_fermat_psp(3, from, 1e2*upto))
+
+    assert_eq(gather { k.squarefree_fermat_psp_each(2, from, 100*upto, { take(_) }) }, k.squarefree_fermat_psp(2, from, 100*upto))
+    assert_eq(gather { k.squarefree_fermat_psp_each(3, from, 100*upto, { take(_) }) }, k.squarefree_fermat_psp(3, from, 100*upto))
+
+    assert_eq(gather { k.almost_primes_each(from, upto, { take(_) }) }, k.almost_primes(from, upto))
+    assert_eq(gather { k.omega_primes_each(from, upto, { take(_) }) }, k.omega_primes(from, upto))
+    assert_eq(gather { k.squarefree_almost_primes_each(from, upto, { take(_) }) }, k.squarefree_almost_primes(from, upto))
+}
+
+if (Number.HAS_PRIME_UTIL) {
+    with (2**65) {|n|
+
+        assert_eq(1.almost_primes(n, n+100), range(n, n+100).grep{.is_prime})
+        assert_eq(1.squarefree_almost_primes(n, n+100), range(n, n+100).grep{.is_prime})
+
+        assert_eq(gather { 1.almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).grep{.is_almost_prime(1)})
+        assert_eq(gather { 1.squarefree_almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).primes)
+
+        assert_eq(2.almost_primes(n, n+100), range(n, n+100).grep{.is_semiprime})
+        assert_eq(2.squarefree_almost_primes(n, n+100), range(n, n+100).grep{.is_squarefree && .is_semiprime})
+
+        assert_eq(gather { 2.almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).grep{.is_almost_prime(2)})
+        assert_eq(gather { 2.squarefree_almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).grep{.is_squarefree && .is_almost_prime(2)})
+    }
+}
+
+for k in (1..12) {
+    var n = k.pn_primorial
+
+    #say "Testing: #{k} -> #{n}"
+
+    var from = n-100
+    var upto = n+100
+
+    assert_eq(k.almost_primes(from, upto), from..upto -> grep{ .is_almost_prime(k) })
+    assert_eq(k.squarefree_almost_primes(from, upto), from..upto -> grep{ .is_squarefree && .is_almost_prime(k) })
+    assert_eq(k.omega_primes(from, upto), from..upto -> grep{ .is_omega_prime(k) })
+}
+
+assert_eq(2.almost_primes(50, 100).len, 2.almost_primepi(50, 100))
+assert_eq(2.almost_primes(10, 106).len, 2.almost_primepi(10, 106))
+assert_eq(2.almost_primes(50, 106).len, 2.almost_primepi(50, 106))
+assert_eq(3.almost_primes(50, 106).len, 3.almost_primepi(50, 106))
+assert_eq(3.almost_primes(49, 105).len, 3.almost_primepi(49, 105))
+
+assert_eq(2.omega_primes(50, 100).len, 2.omega_prime_count(50, 100))
+assert_eq(2.omega_primes(10, 106).len, 2.omega_prime_count(10, 106))
+assert_eq(2.omega_primes(50, 106).len, 2.omega_prime_count(50, 106))
+assert_eq(3.omega_primes(50, 106).len, 3.omega_prime_count(50, 106))
+assert_eq(3.omega_primes(49, 105).len, 3.omega_prime_count(49, 105))
+
+assert_eq(2.squarefree_almost_primes(50, 100).len, 2.squarefree_almost_prime_count(50, 100))
+assert_eq(2.squarefree_almost_primes(10, 106).len, 2.squarefree_almost_prime_count(10, 106))
+assert_eq(2.squarefree_almost_primes(50, 106).len, 2.squarefree_almost_prime_count(50, 106))
+assert_eq(3.squarefree_almost_primes(50, 106).len, 3.squarefree_almost_prime_count(50, 106))
+assert_eq(3.squarefree_almost_primes(49, 105).len, 3.squarefree_almost_prime_count(49, 105))
+
+for k in (1..4) {
+
+    var a = irand(50, 100)
+    var b = irand(a, 150)
+
+    assert_eq(k.omega_primes(a,b), range(a,b).grep { .is_omega_prime(k) })
+    assert_eq(k.squarefree_almost_primes(a,b), range(a,b).grep { .is_almost_prime(k) && .is_squarefree })
+    assert_eq(k.squarefree_almost_primes(a,b), range(a,b).grep { .is_squarefree_almost_prime(k) })
+}
+
+assert(43**20 * 101 -> is_almost_prime(21))
+assert(43**20 * 101**2 -> is_almost_prime(22))
+assert(43**20 * 101**2 -> is_omega_prime(2))
+assert(19 * 43**20 * 101 -> is_omega_prime(3))
+
+say "** Tests passed!"

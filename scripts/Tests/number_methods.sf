@@ -3,8 +3,8 @@
 # Tests for some Number methods.
 
 # Timings:
-#   07 March 2023: 4.140s (with MPU)
-#   07 March 2023: 7.661s (without MPU)
+#   07 March 2023: 2.020s (with MPU)
+#   07 March 2023: 2.418s (without MPU)
 
 assert_eq(squarefree_sum(1e6), 303961062910)
 assert_eq(squarefree_sum(1e7), 30396557311887)
@@ -31,73 +31,6 @@ assert_eq(
     prime_powers(50, 100),
     50..100 -> grep { .is_prime_power },
 )
-
-for k in (0..10) {
-
-    assert_eq(k.almost_primes(1000), 1..1000 -> grep { .is_almost_prime(k) })
-    assert_eq(k.omega_primes(1000), 1..1000 -> grep { .is_omega_prime(k) })
-    assert_eq(k.squarefree_almost_primes(1000), k.almost_primes(1, 1000).grep{.is_squarefree})
-
-    assert_eq(gather { k.almost_primes_each(1000, { take(_) }) }, k.almost_primes(1000))
-    assert_eq(gather { k.omega_primes_each(1000, { take(_) }) }, k.omega_primes(1000))
-    assert_eq(gather { k.squarefree_almost_primes_each(1000, { take(_) }) }, k.squarefree_almost_primes(1000))
-
-    var from = 1000.irand
-    var upto = from+1000.irand
-
-    assert_eq(k.almost_primes(from, upto), from..upto -> grep { .is_almost_prime(k) })
-    assert_eq(k.omega_primes(from, upto), from..upto -> grep { .is_omega_prime(k) })
-    assert_eq(k.squarefree_almost_primes(from, upto), k.almost_primes(from, upto).grep{.is_squarefree})
-
-    assert_eq(gather { k.carmichael_each(from, 100*upto, { take(_) }) }, k.carmichael(from, 100*upto))
-    assert_eq(gather { k.lucas_carmichael_each(from, 100*upto, { take(_) }) }, k.lucas_carmichael(from, 100*upto))
-
-    assert_eq(gather { k.carmichael_strong_fermat_each(2, from, 1e4*upto, { take(_) }) }, k.carmichael_strong_fermat(2, from, 1e4*upto))
-    assert_eq(gather { k.carmichael_strong_fermat_each(3, from, 1e4*upto, { take(_) }) }, k.carmichael_strong_fermat(3, from, 1e4*upto))
-
-    assert_eq(gather { k.squarefree_strong_fermat_psp_each(2, from, 1e3*upto, { take(_) }) }, k.squarefree_strong_fermat_psp(2, from, 1e3*upto))
-    assert_eq(gather { k.squarefree_strong_fermat_psp_each(3, from, 1e3*upto, { take(_) }) }, k.squarefree_strong_fermat_psp(3, from, 1e3*upto))
-
-    assert_eq(gather { k.strong_fermat_psp_each(2, from, 1e2*upto, { take(_) }) }, k.strong_fermat_psp(2, from, 1e2*upto))
-    assert_eq(gather { k.strong_fermat_psp_each(3, from, 1e2*upto, { take(_) }) }, k.strong_fermat_psp(3, from, 1e2*upto))
-
-    assert_eq(gather { k.squarefree_fermat_psp_each(2, from, 100*upto, { take(_) }) }, k.squarefree_fermat_psp(2, from, 100*upto))
-    assert_eq(gather { k.squarefree_fermat_psp_each(3, from, 100*upto, { take(_) }) }, k.squarefree_fermat_psp(3, from, 100*upto))
-
-    assert_eq(gather { k.almost_primes_each(from, upto, { take(_) }) }, k.almost_primes(from, upto))
-    assert_eq(gather { k.omega_primes_each(from, upto, { take(_) }) }, k.omega_primes(from, upto))
-    assert_eq(gather { k.squarefree_almost_primes_each(from, upto, { take(_) }) }, k.squarefree_almost_primes(from, upto))
-}
-
-if (Number.HAS_PRIME_UTIL) {
-    with (2**65) {|n|
-
-        assert_eq(1.almost_primes(n, n+100), range(n, n+100).grep{.is_prime})
-        assert_eq(1.squarefree_almost_primes(n, n+100), range(n, n+100).grep{.is_prime})
-
-        assert_eq(gather { 1.almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).grep{.is_almost_prime(1)})
-        assert_eq(gather { 1.squarefree_almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).primes)
-
-        assert_eq(2.almost_primes(n, n+100), range(n, n+100).grep{.is_semiprime})
-        assert_eq(2.squarefree_almost_primes(n, n+100), range(n, n+100).grep{.is_squarefree && .is_semiprime})
-
-        assert_eq(gather { 2.almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).grep{.is_almost_prime(2)})
-        assert_eq(gather { 2.squarefree_almost_primes_each(n, n+100, { take(_) } ) }, range(n, n+100).grep{.is_squarefree && .is_almost_prime(2)})
-    }
-}
-
-for k in (1..12) {
-    var n = k.pn_primorial
-
-    #say "Testing: #{k} -> #{n}"
-
-    var from = n-100
-    var upto = n+100
-
-    assert_eq(k.almost_primes(from, upto), from..upto -> grep{ .is_almost_prime(k) })
-    assert_eq(k.squarefree_almost_primes(from, upto), from..upto -> grep{ .is_squarefree && .is_almost_prime(k) })
-    assert_eq(k.omega_primes(from, upto), from..upto -> grep{ .is_omega_prime(k) })
-}
 
 # RangeNumber k-almost primes
 
@@ -276,40 +209,13 @@ for k in (1..4) {
 
     assert_eq(k.omega_prime_count(n), 1..n -> count { .is_omega_prime(k) })
     assert_eq(k.almost_prime_count(n), 1..n -> count { .is_almost_prime(k) })
-    assert_eq(k.squarefree_almost_prime_count(n), 1..n -> count { .is_squarefree && .is_almost_prime(k) })
+    assert_eq(k.squarefree_almost_prime_count(n), 1..n -> count { .is_squarefree_almost_prime(k) })
 
     n = irand(100, 1000)
 
     assert_eq(k.omega_prime_count(n), k.omega_primes(n).len)
     assert_eq(k.almost_prime_count(n), k.almost_primes(n).len)
     assert_eq(k.squarefree_almost_prime_count(n), k.squarefree_almost_primes(n).len)
-}
-
-assert_eq(2.almost_primes(50, 100).len, 2.almost_primepi(50, 100))
-assert_eq(2.almost_primes(10, 106).len, 2.almost_primepi(10, 106))
-assert_eq(2.almost_primes(50, 106).len, 2.almost_primepi(50, 106))
-assert_eq(3.almost_primes(50, 106).len, 3.almost_primepi(50, 106))
-assert_eq(3.almost_primes(49, 105).len, 3.almost_primepi(49, 105))
-
-assert_eq(2.omega_primes(50, 100).len, 2.omega_prime_count(50, 100))
-assert_eq(2.omega_primes(10, 106).len, 2.omega_prime_count(10, 106))
-assert_eq(2.omega_primes(50, 106).len, 2.omega_prime_count(50, 106))
-assert_eq(3.omega_primes(50, 106).len, 3.omega_prime_count(50, 106))
-assert_eq(3.omega_primes(49, 105).len, 3.omega_prime_count(49, 105))
-
-assert_eq(2.squarefree_almost_primes(50, 100).len, 2.squarefree_almost_prime_count(50, 100))
-assert_eq(2.squarefree_almost_primes(10, 106).len, 2.squarefree_almost_prime_count(10, 106))
-assert_eq(2.squarefree_almost_primes(50, 106).len, 2.squarefree_almost_prime_count(50, 106))
-assert_eq(3.squarefree_almost_primes(50, 106).len, 3.squarefree_almost_prime_count(50, 106))
-assert_eq(3.squarefree_almost_primes(49, 105).len, 3.squarefree_almost_prime_count(49, 105))
-
-for k in (1..4) {
-
-    var a = irand(50, 100)
-    var b = irand(a, 150)
-
-    assert_eq(k.omega_primes(a,b), range(a,b).grep { .is_omega_prime(k) })
-    assert_eq(k.squarefree_almost_primes(a,b), range(a,b).grep { .is_squarefree && .is_almost_prime(k) })
 }
 
 assert_eq(2.powerful(50, 100).len, 2.powerful_count(50, 100))
@@ -468,85 +374,6 @@ do {
 }
 
 do {
-    {|n| assert_eq(mbe_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(flt_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(fibonacci_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(dop_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(cop_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(fermat_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(phi_finder_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(pell_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(miller_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(lucas_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(holf_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(pm1_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(pp1_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(chebyshev_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(ecm_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(squfof_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(qs_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(trial_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(cyclotomic_factor(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(special_factors(n).prod, n||1) }.each(0..30)
-    {|n| assert_eq(Math.gcd_factors(n, n.isqrt.primes).prod, n||1) }.each(0..30)
-}
-
-do {
-    func verify_factors(f,n) {
-        assert_eq(f.prod, n)
-        assert(f.len >= 2)
-        assert(f.all { n % _ == 0})
-    }
-
-    for n in ([10**120 - 10**40, 2**128 - 1]) {
-
-        verify_factors(n.factor { .squfof_factor(1e4) }, n)
-        verify_factors(n.factor { .trial_factor }, n)
-        verify_factors(n.factor { .pell_factor }, n)
-        verify_factors(n.factor { .flt_factor }, n)
-        verify_factors(n.factor { .fibonacci_factor }, n)
-        verify_factors(n.factor { .holf_factor }, n)
-        verify_factors(n.factor { .mbe_factor }, n)
-        verify_factors(n.factor { .fermat_factor }, n)
-        verify_factors(n.factor { .cyclotomic_factor }, n)
-        verify_factors(n.factor { .chebyshev_factor(1e4) }, n)
-        verify_factors(n.factor { .ecm_factor }, n)
-        verify_factors(n.factor { .pm1_factor(1e4) }, n)
-        verify_factors(n.factor { .pp1_factor(1e4) }, n)
-
-        verify_factors(n.special_factors, n)
-        verify_factors(n.dop_factor, n)
-        verify_factors(n.cop_factor, n)
-
-        if (n.is_odd) {
-        verify_factors(n.factor { .phi_finder_factor }, n)
-            verify_factors(n.factor { .miller_factor }, n)
-            verify_factors(n.factor { .lucas_factor }, n)
-        }
-    }
-
-    verify_factors(phi_finder_factor(43*97), 43*97)
-    verify_factors(phi_finder_factor(503*863), 503*863)
-    verify_factors(phi_finder_factor(622882096110539), 622882096110539)
-    verify_factors(phi_finder_factor(132750061135361, 1e5), 132750061135361)
-
-    with (283874509653487424333753053009549245120760303237063459589551) {|n|
-        verify_factors(n.phi_finder_factor, n)
-        verify_factors(n.fermat_factor(1e5), n)
-    }
-
-    verify_factors(fibonacci_factor(480.fib), 480.fib)
-    verify_factors(fibonacci_factor(480.lucas), 480.lucas)
-
-    with (58571442634534443082821160508299574798027946748324125518533225605795841) {|n|
-        verify_factors(miller_factor(n), n)
-        verify_factors(lucas_factor(n), n)
-        verify_factors(lucas_factor(n, -1), n)
-        verify_factors(lucas_factor(n, +1), n)
-    }
-}
-
-do {
     assert_eq(20.of {.lnsuperprimorial} ~Z=~= 20.of{.superprimorial.ln} -> uniq, [true])
     assert_eq(20.of {.lnsuperfactorial} ~Z=~= 20.of{.superfactorial.ln} -> uniq, [true])
     assert_eq(20.of {.lnhyperfactorial} ~Z=~= 20.of{.hyperfactorial.ln} -> uniq, [true])
@@ -688,7 +515,7 @@ assert_eq(
 
 assert_eq(
     diff_of_squares(2**64 + 3),
-    [[19965236662, 19497792975], [9223372036854775810, 9223372036854775809]]
+    [%n[19965236662, 19497792975], %n[9223372036854775810, 9223372036854775809]]
 )
 
 assert_eq(
@@ -698,7 +525,7 @@ assert_eq(
 
 assert_eq(
     sum_of_squares(2**64 + 9),
-    [[3, 4294967296], [1202590840, 4123168605], [1511828491, 4020089388], [2576980380, 3435973835]],
+    [%n[3, 4294967296], %n[1202590840, 4123168605], %n[1511828491, 4020089388], %n[2576980380, 3435973835]],
 )
 
 assert_eq(primitive_part(423, 2), 1)
@@ -822,7 +649,7 @@ assert_eq(
 
 assert_eq(
     20.of { .moebius },
-    %n[0, 1, -1, -1, 0, -1, 1, -1, 0, 0, 1, -1, 0, -1, 1, 1, 0, -1, 0, -1]
+    20.of { .is_squarefree ? ((-1)**.omega) : 0 }
 )
 
 assert_eq(
@@ -837,9 +664,16 @@ assert_eq(
 
 assert_eq(
     20.by { .is_composite },
-    %n[4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 22, 24, 25, 26, 27, 28, 30, 32],
+    20.by { !.is_prime &&  _>=4 }
 )
 
+assert_eq(
+    20.by { .is_squarefree },
+    20.by { .moebius != 0 }
+)
+
+assert_eq(20.of { .squarefree_count },  20.of { .is_squarefree ? 1 : 0 }.acc)
+assert_eq(20.of { .squarefree_sum },    20.of { .is_squarefree ? _ : 0 }.acc)
 assert_eq(20.of { .composite_count },   20.of { .is_composite ? 1 : 0 }.acc)
 assert_eq(20.of { .mertens },           20.of { .moebius }.acc)
 assert_eq(20.of { .pi },                20.of { .is_prime ? 1 : 0 }.acc)

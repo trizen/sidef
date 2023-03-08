@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-var json = require('JSON').new;
+var json = require('JSON::PP').new;
 
 # Parse JSON
 var data = json.decode('{"blue": [1, 2], "ocean": "water"}');
