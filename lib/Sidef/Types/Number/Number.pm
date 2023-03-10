@@ -51,7 +51,7 @@ package Sidef::Types::Number::Number {
 
         YAFU_MIN               => 49,     # in decimal digits
         FACTORDB_MIN           => 65,     # in decimal digits
-        SPECIAL_FACTORS_MIN    => 49,     # in decimal digits (must be greater than SMALL_NUMBER_MAX_BITS)
+        SPECIAL_FACTORS_MIN    => 36,     # in decimal digits (must be greater than SMALL_NUMBER_MAX_BITS)
         SMALL_NUMBER_MAX_BITS  => 110,    # in bits (numbers that can be factorized fast)
         MEDIUM_NUMBER_MAX_BITS => 150,    # in bits (numbers that can be factorized moderately fast)
 
@@ -924,6 +924,10 @@ package Sidef::Types::Number::Number {
         my %is_prob_prime_cache;
 
         if (length($n) >= SPECIAL_FACTORS_MIN and $SPECIAL_FACTORS) {
+
+            if (_is_prob_prime($n, \%is_prob_prime_cache)) {
+                return (@factors, $n);
+            }
 
             local $SPECIAL_FACTORS = 0;
             say "Looking for special factors: $n" if $VERBOSE;
@@ -17324,9 +17328,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and (!ref($n) or _fits_ulong($n))) {
+        if (HAS_PRIME_UTIL and !ref($n)) {
             return (
-                    Math::Prime::Util::is_prob_prime(ref($n) ? _get_ulong($n) : $n)
+                    Math::Prime::Util::is_prob_prime($n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -18844,8 +18848,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($n)) {
-            return _set_int(Math::Prime::Util::prev_prime(ref($n) ? _get_ulong($n) : $n) || goto &nan);
+        if (HAS_PRIME_UTIL and !ref($n)) {
+            $n > 2 or goto &nan;
+            return _set_int(Math::Prime::Util::prev_prime($n) || goto &nan);
         }
 
         _set_int(Math::Prime::Util::GMP::prev_prime(_big2uistr($n) // goto &nan) || goto &nan);
@@ -18856,8 +18861,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($n)) {
-            return _set_int(Math::Prime::Util::next_prime(ref($n) ? _get_ulong($n) : $n) || goto &nan);
+        if (HAS_PRIME_UTIL and !ref($n)) {
+            $n > 0 or return TWO;
+            return _set_int(Math::Prime::Util::next_prime($n));
         }
 
         _set_int(Math::Prime::Util::GMP::next_prime(_big2uistr($n) // goto &nan) || goto &nan);
@@ -19439,14 +19445,7 @@ package Sidef::Types::Number::Number {
             _valid(\$m);
         }
         else {
-            return
-              $n->gcd_factors(
-                              Sidef::Types::Array::Array->new(
-                                         [map { _is_prob_prime($$_, \%is_prob_prime_cache) ? $_ : @{$_->special_factors(ONE)} }
-                                            @{$n->special_factors(ZERO)}
-                                         ]
-                              )
-                             );
+            $m = ONE;
         }
 
         my $z = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
@@ -19465,6 +19464,7 @@ package Sidef::Types::Number::Number {
         }
 
         my @factors;
+        my %rec_tried;
         my $factorized = 0;
 
         my $collect_factors = sub {
@@ -19480,15 +19480,31 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            foreach my $factor (@arr, $rem) {
+            push @arr, $rem;
+
+            while (@arr) {
+                my $factor = CORE::shift(@arr);
                 if (   !ref($$factor)
                     or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= SMALL_NUMBER_MAX_BITS
                     or _is_prob_prime($$factor, \%is_prob_prime_cache)) {
                     $factorized ||= 1;
                 }
                 else {
-                    $factorized = 0;
-                    last;
+                    my @new_factors = (
+                        ($rec_tried{$$factor}++ or $factor->mul($factor)->gt($n)) ? () : do {
+                            say "Recursively factoring: $$factor" if $VERBOSE;
+                            @{$factor->special_factors};
+                        }
+                    );
+
+                    if (scalar(@new_factors) >= 2) {
+                        push @arr,     @new_factors;
+                        push @factors, @new_factors;
+                    }
+                    else {
+                        $factorized = 0;
+                        last;
+                    }
                 }
             }
         };
