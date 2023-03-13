@@ -33,6 +33,7 @@ ok(str_3.encode_utf8.bytes.decode, str_3);
 ok(str_3.encode('UTF-16').bytes.decode('UTF-16'), str_3);
 
 assert_eq("\37\x8B".bytes, [31, 139])
+assert_eq("\37\x8B".bytes_len, 2)
 assert_eq("\37\x8B".chars.map{.ord}, [31, 139])
 assert_eq([unpack("C*", "\37\x8B")], ["31", "139"])
 assert_eq(pack("C*", unpack("C*", "\37\x8B")), "\37\x8B")

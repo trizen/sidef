@@ -1643,7 +1643,7 @@ package Sidef::Types::String::String {
                     my $block = $char;
 
                     if ($string ne '') {
-                        $append_arg->(Encode::decode_utf8(Encode::encode_utf8($string)));
+                        $append_arg->($string);
                         $string = '';
                     }
                     $append_arg->($block);
@@ -1654,13 +1654,13 @@ package Sidef::Types::String::String {
             }
 
             if ($string ne '') {
-                $append_arg->(Encode::decode_utf8(Encode::encode_utf8($string)));
+                $append_arg->($string);
             }
 
             return $expr;
         }
 
-        $self->new(Encode::decode_utf8(Encode::encode_utf8(CORE::join('', @chars))));
+        $self->new(CORE::join('', @chars));
     }
 
     sub shift_left {

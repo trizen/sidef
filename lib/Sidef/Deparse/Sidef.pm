@@ -170,9 +170,13 @@ package Sidef::Deparse::Sidef {
         my ($type, $str) = $num->_dump;
 
         state $table = {
-                        '@inf@'  => q{Inf},
-                        '-@inf@' => q{Inf.neg},
-                        '@nan@'  => q{NaN},
+            '@inf@'  => q{Inf},
+            '-@inf@' => q{Inf.neg},
+            '@nan@'  => q{NaN},
+
+            'inf'  => q{Inf},
+            '-inf' => q{Inf.neg},
+            'nan'  => q{NaN},
                        };
 
         state $special_values = {
@@ -193,7 +197,7 @@ package Sidef::Deparse::Sidef {
                 $str;
             }
             elsif ($type eq 'float') {
-                "$str.float";
+                $str . 'f';
             }
             elsif (index($str, '/') != -1) {
                 "Number(\"$str\")";
@@ -485,7 +489,7 @@ package Sidef::Deparse::Sidef {
               . $self->deparse_args($obj->{false}) . ')';
         }
         elsif ($ref eq 'Sidef::Module::OO') {
-            $code = '%s' . $self->_dump_string($obj->{module});
+            $code = '%O' . $self->_dump_string($obj->{module});
         }
         elsif ($ref eq 'Sidef::Module::Func') {
             $code = '%S' . $self->_dump_string($obj->{module});

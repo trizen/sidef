@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Simple_windowed_application
 #
 
-Perl.eval('use Gtk3 "-init"')
+use('Gtk3 -init')
 
 # Window.
 var window = %s'Gtk3::Window'.new;

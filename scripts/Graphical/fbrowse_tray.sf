@@ -7,8 +7,8 @@
 # Translation of:
 #   https://github.com/trizen/fbrowse-tray
 
-Perl.eval('use Gtk3 "-init"')
-require('File::MimeInfo')
+use('Gtk3 -init')
+use('File::MimeInfo')
 
 const pkgname = 'fbrowse-tray'
 const version = 0.07

@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Window_creation
 #
 
-Perl.eval("use Gtk3 '-init'")
+use('Gtk3 -init')
 var gtk3 = %O'Gtk3'
 var window = %O'Gtk3::Window'.new;
 window.signal_connect(destroy => func(_) { gtk3.main_quit });

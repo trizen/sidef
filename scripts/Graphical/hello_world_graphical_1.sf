@@ -4,7 +4,7 @@
 ## http://rosettacode.org/wiki/Hello_world/Graphical
 #
 
-Perl.eval("use Gtk3 '-init'")
+use('Gtk3 -init')
  
 var gtk3   = 'Gtk3'.to_caller;
 var window = 'Gtk3::Window'.to_caller.new;
