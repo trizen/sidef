@@ -696,6 +696,30 @@ package Sidef::Types::Block::Block {
 
     {
         no strict 'refs';
+
+        foreach my $name (qw(bsearch bsearch_le bsearch_ge)) {
+
+            *{__PACKAGE__ . '::' . $name} = sub {
+                my ($self, $x, $y) = @_;
+
+                my $from = $x // Sidef::Types::Number::Number::ZERO;
+                my $upto = $y // Sidef::Types::Number::Number::TWO;
+
+                while (1) {
+                    my $k = $from->$name($upto, $self);
+
+                    if (defined($k) and $k->is_between($from, $upto)) {
+                        return $k;
+                    }
+
+                    $from = $upto->inc;
+                    $upto = $from->add($from);
+                }
+
+                return Sidef::Types::Number::Number::MONE;
+            };
+        }
+
         *{__PACKAGE__ . '::' . '*'}  = \&repeat;
         *{__PACKAGE__ . '::' . '<<'} = \&for;
         *{__PACKAGE__ . '::' . '>>'} = \&map;

@@ -93,23 +93,17 @@ class new(diacritics            = true,
             if (nums.len && (i < nums[0])) {
                 var n = nums.shift;
 
-                # This is a special case, where: int(log(1000)/log(10)) == 2
-                var l = n.log10;
-                if (l.to_s.len == l.int.to_s.len) {
-                    l = sprintf('%.0f', l);
-                }
-
                 # Factor (e.g.: 400 -> 4)
-                var f = (i / (10**(i.log10.int)) -> int);
+                var f = idiv(i, 10**i.ilog10);
 
                 # When the next number is not really next to the current number
-                # e.g.: $i == 400 and $n == 5000 # should produce 405_000 not 45_000
+                # e.g.: $i == 400 and $n == 5000 # will produce 405_000, not 45_000
                 if ((var mod = (n.len % 3)) != 0) {
                     f *= 10**(3 - mod);
                 }
 
                 # Join the numbers and continue
-                num += (10**(l.to_i) * f + n);
+                num += (10**n.ilog10 * f + n);
                 next;
             }
 
