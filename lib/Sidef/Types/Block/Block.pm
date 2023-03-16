@@ -553,6 +553,15 @@ package Sidef::Types::Block::Block {
         return 1;
     }
 
+    sub time {
+        my ($self) = @_;
+        require Time::HiRes;
+        my $t0 = [Time::HiRes::gettimeofday()];
+        $self->run;
+        my $elapsed = Time::HiRes::tv_interval($t0);
+        Sidef::Types::Number::Number->new($elapsed);
+    }
+
     sub for {
         my ($self, @objs) = @_;
         _iterate($self, @objs);

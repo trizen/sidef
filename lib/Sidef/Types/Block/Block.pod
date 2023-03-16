@@ -276,6 +276,14 @@ Aliases: I<thread>
 
 =cut
 
+=head2 time
+
+    self.time
+
+Returns the
+
+=cut
+
 =head2 to_s
 
     self.to_s
