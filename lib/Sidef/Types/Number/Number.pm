@@ -1193,7 +1193,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (length($n) >= YAFU_MIN) {
+        if (length($n) >= SPECIAL_FACTORS_MIN) {
             my $t = _set_int($n);
             my $D = $t->divisors($t);
             return map { (ref($$_) eq 'Math::GMPz') ? Math::GMPz::Rmpz_get_str($$_, 10) : $$_ } @$D;
@@ -1274,7 +1274,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (length($n) >= YAFU_MIN) {
+        if (length($n) >= SPECIAL_FACTORS_MIN) {
             my @factors = _factor($n);
             my %seen;
             foreach my $f (@factors) {
@@ -17542,7 +17542,7 @@ package Sidef::Types::Number::Number {
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($z);
 
-        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($z, 10) > YAFU_MIN) {
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($z, 10) > SPECIAL_FACTORS_MIN) {
             @factors = map { $$_ } @{_set_int($z)->special_factors};
         }
 
@@ -17661,7 +17661,7 @@ package Sidef::Types::Number::Number {
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($z);
 
-        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($z, 10) > YAFU_MIN) {
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($z, 10) > SPECIAL_FACTORS_MIN) {
             @factors = map { $$_ } @{_set_int($z)->special_factors};
         }
 
@@ -19044,17 +19044,33 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($y) and _fits_ulong($x)) {
-            my $r = Math::Prime::Util::znorder(_get_ulong($x), _get_ulong($y)) // goto &nan;
+        if (HAS_PRIME_UTIL and !ref($y) and !ref($x)) {
+            my $r = Math::Prime::Util::znorder($x, $y) // goto &nan;
             return _set_int($r);
         }
 
-        $x = _any2mpz($x) // goto &nan;
-        $y = _any2mpz($y) // goto &nan;
+        $x = _big2istr($x) // goto &nan;
+        $y = _big2istr($y) // goto &nan;
 
-        my $r = Math::Prime::Util::GMP::znorder(Math::GMPz::Rmpz_get_str($x, 10), Math::GMPz::Rmpz_get_str($y, 10))
-          // goto &nan;
+        if (length($y) >= SPECIAL_FACTORS_MIN) {
+            Math::Prime::Util::GMP::gcd($y, $x) eq '1' or goto &nan;
+            $y = Math::Prime::Util::GMP::absint($y) if (substr($y, 0, 1) eq '-');
+            $x = Math::Prime::Util::GMP::modint($x, $y);
+            my @znorders;
+            foreach my $pp (_factor_exp($y)) {
+                my ($p, $e) = @$pp;
+                if (HAS_PRIME_UTIL and $e == 1 and $p < ULONG_MAX) {
+                    push @znorders, Math::Prime::Util::znorder($x, $p);
+                }
+                else {
+                    push @znorders,
+                      Math::Prime::Util::GMP::znorder($x, (($e == 1) ? $p : Math::Prime::Util::GMP::powint($p, $e)));
+                }
+            }
+            return _set_int(Math::Prime::Util::GMP::lcm(@znorders));
+        }
 
+        my $r = Math::Prime::Util::GMP::znorder($x, $y) // goto &nan;
         _set_int($r);
     }
 
@@ -21647,7 +21663,7 @@ package Sidef::Types::Number::Number {
 
         $n = _big2uistr($n) // goto &nan;
 
-        if (length($n) < YAFU_MIN) {
+        if (length($n) < SPECIAL_FACTORS_MIN) {
             my $r = Math::Prime::Util::GMP::totient($n);
             return _set_int($r);
         }
@@ -22453,7 +22469,23 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        my $r = Math::Prime::Util::GMP::carmichael_lambda(_big2uistr($n) // goto &nan);
+        $n = _big2uistr($n) // goto &nan;
+
+        if (length($n) >= SPECIAL_FACTORS_MIN) {
+            my @lambdas;
+            foreach my $pp (_factor_exp($n)) {
+                my ($p, $e) = @$pp;
+                if ($e == 1) {
+                    push @lambdas, (($p < ULONG_MAX) ? ($p - 1) : Math::Prime::Util::GMP::subint($p, 1));
+                }
+                else {
+                    push @lambdas, Math::Prime::Util::GMP::carmichael_lambda(Math::Prime::Util::GMP::powint($p, $e));
+                }
+            }
+            return _set_int(Math::Prime::Util::GMP::lcm(@lambdas));
+        }
+
+        my $r = Math::Prime::Util::GMP::carmichael_lambda($n);
         _set_int($r);
     }
 
@@ -23431,7 +23463,7 @@ package Sidef::Types::Number::Number {
 
         $n = Math::GMPz::Rmpz_get_str($n, 10);
 
-        if (length($n) < YAFU_MIN) {
+        if (length($n) < SPECIAL_FACTORS_MIN) {
             return _set_int(Math::Prime::Util::GMP::sigma($n, 0));
         }
 
@@ -23465,7 +23497,7 @@ package Sidef::Types::Number::Number {
         if (HAS_PRIME_UTIL and CORE::abs($k) == 1 and $n < (ULONG_MAX >> 2)) {
             $r = Math::Prime::Util::divisor_sum($n);
         }
-        elsif (length($n) < YAFU_MIN) {
+        elsif (length($n) < SPECIAL_FACTORS_MIN) {
             $r = Math::Prime::Util::GMP::sigma($n, CORE::abs($k));
         }
         else {
@@ -26492,7 +26524,7 @@ package Sidef::Types::Number::Number {
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($remainder);
 
-        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > YAFU_MIN) {
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > SPECIAL_FACTORS_MIN) {
             @factors = map { $$_ } @{_set_int($remainder)->special_factors};
         }
 
@@ -26707,7 +26739,7 @@ package Sidef::Types::Number::Number {
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _lucas_factor($remainder);
 
-        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > YAFU_MIN) {
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > SPECIAL_FACTORS_MIN) {
             @factors = map { $$_ } @{_set_int($remainder)->special_factors};
         }
 
@@ -26860,7 +26892,7 @@ package Sidef::Types::Number::Number {
 
         my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($remainder);
 
-        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > YAFU_MIN) {
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > SPECIAL_FACTORS_MIN) {
             @factors = map { $$_ } @{_set_int($remainder)->special_factors};
         }
 
