@@ -8075,7 +8075,7 @@ package Sidef::Types::Number::Number {
                 $B *= $base;
             }
 
-            return ${_set_int($r)};
+            return $r;
         }
 
         my @d = map { Math::GMPz::Rmpz_init_set_ui($_) } @D;
@@ -8110,6 +8110,24 @@ package Sidef::Types::Number::Number {
 
         $base   = $$base;
         @digits = map { $$_ } @digits;
+
+        my $all_native = (ref($base) eq '' and $base >= 2);
+
+        if ($all_native) {
+            foreach my $digit (@digits) {
+                if (ref($digit) eq '' and $digit >= 0 and $digit < $base) {
+                    ## ok
+                }
+                else {
+                    $all_native = 0;
+                    last;
+                }
+            }
+        }
+
+        if ($all_native) {
+            return _set_int(__digits2num__($base, [CORE::reverse(@digits)]));
+        }
 
         my $all_mpz = ref($base) eq 'Math::GMPz';
 
@@ -28510,7 +28528,7 @@ package Sidef::Types::Number::Number {
             }
 
             if ($is_greater) {
-                return bless \__digits2num__($base, \@d);
+                return _set_int(__digits2num__($base, \@d));
             }
         }
 
@@ -28530,7 +28548,7 @@ package Sidef::Types::Number::Number {
             $d[-1] = 1;
         }
 
-        bless \__digits2num__($base, \@d);
+        _set_int(__digits2num__($base, \@d));
     }
 
     sub reverse {
