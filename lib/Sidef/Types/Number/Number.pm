@@ -418,6 +418,9 @@ package Sidef::Types::Number::Number {
 
         $s = lc($s);
 
+        # Remove underscores and whitespace
+        $s =~ tr/_ \a\b\t\n\f\r\e//d;
+
         if ($s eq 'inf' or $s eq '+inf') {
             goto &_inf;
         }
@@ -427,9 +430,6 @@ package Sidef::Types::Number::Number {
         elsif ($s eq 'nan') {
             goto &_nan;
         }
-
-        # Remove underscores
-        $s =~ tr/_//d;
 
         # Performance improvement for Perl integers
         if (CORE::int($s) eq $s and $s > LONG_MIN and $s < ULONG_MAX) {
@@ -701,23 +701,19 @@ package Sidef::Types::Number::Number {
     }
 
     sub _fits_ulong {
-        my ($n) = @_;
-        (!ref($n)) ? ($n >= 0) : (ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($n));
+        (!ref($_[0])) ? ($_[0] >= 0) : (ref($_[0]) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($_[0]));
     }
 
     sub _fits_slong {
-        my ($n) = @_;
-        (!ref($n)) ? 1 : (ref($n) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($n));
+        (!ref($_[0])) ? 1 : (ref($_[0]) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($_[0]));
     }
 
     sub _get_ulong {
-        my ($n) = @_;
-        (!ref($n)) ? $n : Math::GMPz::Rmpz_get_ui($n);
+        (!ref($_[0])) ? $_[0] : Math::GMPz::Rmpz_get_ui($_[0]);
     }
 
     sub _get_slong {
-        my ($n) = @_;
-        (!ref($n)) ? $n : Math::GMPz::Rmpz_get_si($n);
+        (!ref($_[0])) ? $_[0] : Math::GMPz::Rmpz_get_si($_[0]);
     }
 
     #
