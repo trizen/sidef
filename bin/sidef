@@ -32,6 +32,7 @@ my $version = $Sidef::VERSION;
 my %args;
 if ($#ARGV != -1 and chr ord $ARGV[0] eq '-') {
     require Getopt::Std;
+    $Getopt::Std::STANDARD_HELP_VERSION = 1;
     Getopt::Std::getopts('e:E:Dho:ivHWwbcrR:tCO:kP:M:sN:', \%args);
 }
 
@@ -47,13 +48,13 @@ if (defined $args{R}) {
 
 # Help
 if (defined $args{h}) {
-    output_usage();
+    HELP_MESSAGE();
     exit 0;
 }
 
 # Version
 if (defined $args{v}) {
-    output_version();
+    VERSION_MESSAGE();
     exit 0;
 }
 
@@ -257,7 +258,7 @@ else {
 ## Subroutines
 #
 
-sub output_usage {
+sub HELP_MESSAGE {
 #<<<
     my %switches = (
                     '-i'         => 'interactive mode',
@@ -317,7 +318,7 @@ Run '$basename -i' for interactive mode.
 END
 }
 
-sub output_version {
+sub VERSION_MESSAGE {
     print "$name $version\n";
 }
 
