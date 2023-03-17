@@ -19345,10 +19345,16 @@ package Sidef::Types::Number::Number {
     sub gpf {
         my ($n) = @_;
 
-        $n = _any2mpz($$n) // goto &nan;
-        Math::GMPz::Rmpz_sgn($n) >= 0 or goto &nan;
+        $n = $$n;
 
-        if (Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0) {
+        if (ref($n)) {
+            $n = _big2uistr($n) // goto &nan;
+        }
+        else {
+            $n >= 0 or goto &nan;
+        }
+
+        if ($n eq '0' or $n eq '1') {
             return bless \$n;
         }
 
@@ -19420,7 +19426,7 @@ package Sidef::Types::Number::Number {
         $upto =
           defined($upto)
           ? do { _any2ui($$upto) // return Sidef::Types::Array::Array->new(bless \$n) }
-          : (2 * __ilog__($n, 2));
+          : CORE::int(1.4747698 * __ilog__($n, 2));
 
         my @factors;
         my $g = Math::GMPz::Rmpz_init();
@@ -19550,8 +19556,8 @@ package Sidef::Types::Number::Number {
         $factorized || $collect_factors->($n->holf_factor($m->inc->mul(_set_int(1e4))));
 
         $factorized || $collect_factors->($n->dop_factor($m->inc->mul($n->ilog2->isqrt)->mul(TWO)));
-        $factorized || $collect_factors->($n->fibonacci_factor);
         $factorized || $collect_factors->($n->miller_factor($m->inc->mul(_set_int(5))));
+        $factorized || $collect_factors->($n->fibonacci_factor);
         $factorized || $collect_factors->($n->lucas_factor(ONE, $m->inc->mul(_set_int(2))));
         $factorized || $collect_factors->($n->cop_factor($m->inc->mul($n->ilog2->isqrt->shift_right(ONE))));
 

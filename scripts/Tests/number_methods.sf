@@ -672,6 +672,15 @@ assert_eq(
     20.by { .moebius != 0 }
 )
 
+assert_eq(lpf(2**64 + 1), 274177)
+assert_eq(gpf(2**64 + 1), 67280421310721)
+
+assert_eq(1000!.lpf, 2)
+assert_eq(1000!.make_coprime(2*3*5*7).lpf, 11)
+
+assert_eq(1000!.gpf, 1000.prev_prime)
+assert_eq(gpf(1000! * (2**64 + 1)), 67280421310721)
+
 assert_eq(20.of { .squarefree_count },  20.of { .is_squarefree ? 1 : 0 }.acc)
 assert_eq(20.of { .squarefree_sum },    20.of { .is_squarefree ? _ : 0 }.acc)
 assert_eq(20.of { .composite_count },   20.of { .is_composite ? 1 : 0 }.acc)
@@ -686,5 +695,7 @@ assert_eq(20.of { .sigma },             20.of { .divisors.sum })
 assert_eq(20.of { .sigma(2) },          20.of { .divisors.sum { _*_ } })
 assert_eq(20.of { .omega },             20.of { .factor_exp.len })
 assert_eq(20.of { .bigomega },          20.of { .factor.len })
+assert_eq(20.of { .gpf },               20.of { .factor.tail \\ _ })
+assert_eq(20.of { .lpf },               20.of { .factor.head \\ _ })
 
 say "** Tests passed!"
