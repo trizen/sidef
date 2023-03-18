@@ -462,16 +462,18 @@ HEADER
     sub _dump_indices {
         my ($self, $array) = @_;
 
+        # TODO: use only one `map {}` statement for all indices.
+
         join(
             ',',
             grep { $_ ne '' } map {
                 ref($_) eq 'Sidef::Types::Number::Number'
-                  ? Sidef::Types::Number::Number::__numify__($$_)
-                  : ref($_)
-                  ? ('(map { ref($_) eq "Sidef::Types::Number::Number" ? Sidef::Types::Number::Number::__numify__($$_) '
-                     . ': do {my$sub=UNIVERSAL::can($_, "..."); '
-                     . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
-                     . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
+                  ? (ref($$_) ? Sidef::Types::Number::Number::__numify__($$_) : $$_)
+                  : ref($_) ? ('(map { ref($_) eq "Sidef::Types::Number::Number" ? '
+                               . '(ref($$_) ? Sidef::Types::Number::Number::__numify__($$_) : $$_) '
+                               . ': do {my$sub=UNIVERSAL::can($_, "..."); '
+                               . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
+                               . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
                   : $_
             } @{$array}
         );
