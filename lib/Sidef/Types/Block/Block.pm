@@ -706,7 +706,7 @@ package Sidef::Types::Block::Block {
     {
         no strict 'refs';
 
-        foreach my $name (qw(bsearch bsearch_le bsearch_ge)) {
+        foreach my $name (qw(bsearch bsearch_le bsearch_ge bsearch_inverse)) {
 
             *{__PACKAGE__ . '::' . $name} = sub {
                 my ($self, $x, $y) = @_;

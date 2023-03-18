@@ -116,6 +116,14 @@ Returns the
 
 =cut
 
+=head2 bsearch_inverse
+
+    self.bsearch_inverse
+
+Returns the
+
+=cut
+
 =head2 bsearch_le
 
     self.bsearch_le

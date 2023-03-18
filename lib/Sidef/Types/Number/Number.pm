@@ -3931,11 +3931,14 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
 
-        $y = _any2si($$y) // goto &nan;
+        $x = $$x;
+        $y = $$y;
 
-        if ($y >= 0 and _fits_ulong($$x)) {
+        if (ref($y)) {
+            $y = _any2si($y) // goto &nan;
+        }
 
-            $x = _get_ulong($$x);
+        if ($y >= 0 and !ref($x) and $x >= 0) {
 
             if (HAS_NEW_PRIME_UTIL and $x > 0 and CORE::log($x) * $y < CORE::log(ULONG_MAX)) {
                 my $r = Math::Prime::Util::powint($x, $y);
@@ -3948,7 +3951,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        $x = _any2mpz($$x) // goto &nan;
+        $x = _any2mpz($x) // goto &nan;
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_pow_ui($r, $x, CORE::abs($y));
@@ -27938,6 +27941,14 @@ package Sidef::Types::Number::Number {
         $n = $$n;
         $k = $$k;
 
+        if (HAS_PRIME_UTIL and !ref($n) and !ref($k) and $k >= 3) {
+            return (
+                    Math::Prime::Util::is_polygonal($n, $k)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         if (ref($n) ne 'Math::GMPz') {
             __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
             $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
@@ -28057,8 +28068,18 @@ package Sidef::Types::Number::Number {
 
         _valid(\$k);
 
-        $n = _any2mpz($$n) // goto &nan;
-        $k = _any2mpz($$k) // goto &nan;
+        $n = $$n;
+        $k = $$k;
+
+        if (HAS_NEW_PRIME_UTIL and !ref($n) and !ref($k)) {
+            my $t = $n * ($n * $k - $k - 2 * $n + 4);
+            if ($t < ULONG_MAX and $t > LONG_MIN) {
+                return _set_int(Math::Prime::Util::divint($t, 2));
+            }
+        }
+
+        $n = _any2mpz($n) // goto &nan;
+        $k = _any2mpz($k) // goto &nan;
 
         # polygonal(n, k) = n * (n*k - k - 2*n + 4) / 2
 
