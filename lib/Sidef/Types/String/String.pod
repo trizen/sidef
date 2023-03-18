@@ -1475,6 +1475,16 @@ Removes backslash escapes from a string. The reverse of the C<str.escape> method
 
 =cut
 
+=head2 uniq
+
+    self.uniq
+
+Returns the
+
+Aliases: I<unique>, I<distinct>
+
+=cut
+
 =head2 unpack
 
     self.unpack(arg)

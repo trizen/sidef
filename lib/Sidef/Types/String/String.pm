@@ -772,6 +772,15 @@ package Sidef::Types::String::String {
         $self->new(CORE::join('', sort(CORE::split(//, $$self))));
     }
 
+    sub unique {
+        my ($self) = @_;
+        my %seen;
+        $self->new(CORE::join('', grep { !$seen{$_}++ } CORE::split(//, $$self)));
+    }
+
+    *uniq     = \&unique;
+    *distinct = \&unique;
+
     sub format {
         my ($self) = @_;
         CORE::chomp(my $text = 'format __MY_FORMAT__ = ' . "\n" . $$self);
