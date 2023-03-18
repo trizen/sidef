@@ -8,7 +8,7 @@ var iter = 20;          # the number of polygons
 var size = 200;         # the diameter of each polygon in pixels
 
 var (width=(iter*size + size), height=700);
-var img = %s<Imager>.new(xsize => width, ysize => height);
+var img = %O<Imager>.new(xsize => width, ysize => height);
 img.box(filled => 1, color => 'white');
 
 iter.times { |k|

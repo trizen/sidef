@@ -11,10 +11,15 @@ var center = Complex(width/2 , height/2)
 
 var img = %O<Imager>.new(xsize => width, ysize => height)
 
+define(
+    PI  = Num.pi,
+    TAU = Num.tau,
+)
+
 for y=(^height), x=(^width) {
     var vector    = (center - x - y.i)
-    var magnitude = (vector.abs * 2 / width)
-    var direction = ((Num.pi + atan2(vector.real, vector.imag)) / Num.tau)
+    var magnitude = (2*vector.abs / width)
+    var direction = ((PI + atan2(vector.real, vector.imag)) / TAU)
     img.setpixel(x => x, y => y,
         color => Hash(hsv => [360*direction, magnitude, magnitude < 1 ? 1 : 0])
     )

@@ -6,7 +6,7 @@
 
 require('GD');
  
-var img = %s'GD::Image'.new(256, 256, 1);
+var img = %O'GD::Image'.new(256, 256, 1);
 
 var r = 0..255;
 

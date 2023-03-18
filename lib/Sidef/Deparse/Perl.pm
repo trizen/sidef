@@ -462,36 +462,98 @@ HEADER
     sub _dump_indices {
         my ($self, $array) = @_;
 
-        # TODO: use only one `map {}` statement for all indices.
+        my @indices;
 
-        join(
-            ',',
-            grep { $_ ne '' } map {
-                ref($_) eq 'Sidef::Types::Number::Number'
-                  ? (ref($$_) ? Sidef::Types::Number::Number::__numify__($$_) : $$_)
-                  : ref($_) ? ('(map { ref($_) eq "Sidef::Types::Number::Number" ? '
-                               . '(ref($$_) ? Sidef::Types::Number::Number::__numify__($$_) : $$_) '
-                               . ': do {my$sub=UNIVERSAL::can($_, "..."); '
-                               . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
-                               . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
-                  : $_
-            } @{$array}
-        );
+        foreach my $entry (@{$array}) {
+
+            # Optimization: when the index is just a number parsed as an expression
+            if (ref($entry) eq 'HASH' and exists($entry->{self}) and scalar(keys %$entry) == 1) {
+                my $obj = $entry->{self};
+                if (ref($obj) eq 'HASH' and scalar(keys %$obj) == 1 and !exists($obj->{self})) {
+                    foreach my $class (keys %$obj) {
+                        my $statements = $obj->{$class};
+                        scalar(@$statements) == 1 or next;
+                        $obj = $statements->[0];
+                        ref($obj) eq 'HASH'     or next;
+                        scalar(keys %$obj) == 1 or next;
+                        exists($obj->{self})    or next;
+                        $obj = $obj->{self};
+                        if (ref($obj) eq 'Sidef::Types::Number::Number') {
+                            $entry = $obj;
+                        }
+                    }
+                }
+            }
+
+            if (ref($entry) eq 'Sidef::Types::Number::Number') {
+                push @indices, (ref($$entry) ? CORE::int(Sidef::Types::Number::Number::__numify__($$entry)) : $$entry);
+            }
+            elsif (ref($entry)) {
+                my $str = $self->deparse_expr(ref($entry) eq 'HASH' ? $entry : {self => $entry});
+
+                if ($str ne '') {
+                    push @indices,
+                      (   '(map { ref($_) eq "Sidef::Types::Number::Number" ? '
+                        . '(ref($$_) ? Sidef::Types::Number::Number::__numify__($$_) : $$_) '
+                        . ': do {my$sub=UNIVERSAL::can($_, "..."); '
+                        . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
+                        . $str
+                        . ')');
+                }
+            }
+            else {
+                push @indices, $entry;
+            }
+        }
+
+        join(',', @indices);
     }
 
     sub _dump_lookups {
         my ($self, $array) = @_;
 
-        join(
-            ',',
-            grep { $_ ne '' } map {
-                (ref($_) eq 'Sidef::Types::String::String' or ref($_) eq 'Sidef::Types::Number::Number')
-                  ? $self->_dump_string("$_")
-                  : ref($_) ?    ('(map { ref($_) eq "Sidef::Types::String::String" ? $$_ : "$_" }'
-                               . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
-                  : qq{"\Q$_\E"}
-            } @{$array}
-        );
+        my @indices;
+
+        foreach my $entry (@{$array}) {
+
+            # Optimization: when the index is just a string or a number parsed as an expression
+            if (ref($entry) eq 'HASH' and exists($entry->{self}) and scalar(keys %$entry) == 1) {
+                my $obj = $entry->{self};
+                if (ref($obj) eq 'HASH' and scalar(keys %$obj) == 1 and !exists($obj->{self})) {
+                    foreach my $class (keys %$obj) {
+                        my $statements = $obj->{$class};
+                        scalar(@$statements) == 1 or next;
+                        $obj = $statements->[0];
+                        ref($obj) eq 'HASH'     or next;
+                        scalar(keys %$obj) == 1 or next;
+                        exists($obj->{self})    or next;
+                        $obj = $obj->{self};
+                        if (ref($obj) eq 'Sidef::Types::String::String' or ref($obj) eq 'Sidef::Types::Number::Number') {
+                            $entry = $obj;
+                        }
+                    }
+                }
+            }
+
+            if (ref($entry) eq 'Sidef::Types::String::String') {
+                push @indices, $self->_dump_string($$entry);
+            }
+            elsif (ref($entry) eq 'Sidef::Types::Number::Number') {
+                push @indices, $self->_dump_string("$entry");
+            }
+            elsif (ref($entry)) {
+                my $str = $self->deparse_expr(ref($entry) eq 'HASH' ? $entry : {self => $entry});
+
+                if ($str ne '') {
+                    push @indices, ('(map { ref($_) eq "Sidef::Types::String::String" ? $$_ : "$_" } ' . $str . ')');
+                }
+            }
+            else {
+                push @indices, $self->_dump_string($entry);
+            }
+        }
+
+        join(',', @indices);
     }
 
     sub _dump_var_attr {

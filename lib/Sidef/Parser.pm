@@ -1159,7 +1159,7 @@ package Sidef::Parser {
                 my @array;
                 my $obj = $self->parse_array(code => $opt{code});
 
-                if (ref $obj->{$self->{class}} eq 'ARRAY') {
+                if (ref($obj->{$self->{class}}) eq 'ARRAY') {
                     push @array, @{$obj->{$self->{class}}};
                 }
 

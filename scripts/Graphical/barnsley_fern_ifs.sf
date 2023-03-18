@@ -6,7 +6,7 @@
 require('Imager')
 
 var (width, height) = (500, 500)
-var img = %s<Imager>.new(xsize => width, ysize => height)
+var img = %O<Imager>.new(xsize => width, ysize => height)
 
 struct Rule {
     a, b, c, d, tx, ty, w
@@ -52,7 +52,7 @@ var rules = [
 ]
 
 func plot(x, y) {
-    static green = %s<Imager::Color>.new('#00ff00')
+    static green = %O<Imager::Color>.new('#00ff00')
     img.setpixel(
         x     => width/2 + Math.map(2*x, 0, 10, 0, width/2),
         y     => height  - Math.map(2*y, 0, 10, 0, height/2),
