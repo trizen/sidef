@@ -523,6 +523,14 @@ Aliases: I<each_grapheme>
 
 =cut
 
+=head2 each_kv
+
+    self.each_kv(block)
+
+Returns the
+
+=cut
+
 =head2 each_line
 
     self.each_line {|line| ... }
@@ -593,7 +601,7 @@ Aliases: I<quotemeta>
 
 =head2 esub
 
-    self.esub(regex, code)
+    self.esub(regex, block)
 
 Returns the
 
@@ -707,7 +715,7 @@ Aliases: I<slice>
 
 =head2 gesub
 
-    self.gesub(regex, code)
+    self.gesub(regex, block)
 
 Returns the
 

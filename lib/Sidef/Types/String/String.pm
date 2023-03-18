@@ -683,28 +683,28 @@ package Sidef::Types::String::String {
     }
 
     sub esub {
-        my ($self, $regex, $code) = @_;
+        my ($self, $regex, $block) = @_;
 
         my $search = _string_or_regex($regex);
 
-        if (ref($code) eq 'Sidef::Types::Block::Block') {
-            return $self->new($$self =~ s{$search}{$code->run(_get_captures($$self))}er);
+        if (ref($block) eq 'Sidef::Types::Block::Block') {
+            return $self->new($$self =~ s{$search}{$block->run(_get_captures($$self))}er);
         }
 
-        $self->new($$self =~ s{$search}{"$code"}eer);
+        $self->new($$self =~ s{$search}{"$block"}eer);
     }
 
     sub gesub {
-        my ($self, $regex, $code) = @_;
+        my ($self, $regex, $block) = @_;
 
         my $search = _string_or_regex($regex);
 
-        if (ref($code) eq 'Sidef::Types::Block::Block') {
+        if (ref($block) eq 'Sidef::Types::Block::Block') {
             my $value = $$self;
-            return $self->new($value =~ s{$search}{$code->run(_get_captures($value))}ger);
+            return $self->new($value =~ s{$search}{$block->run(_get_captures($value))}ger);
         }
 
-        my $value = "$code";
+        my $value = "$block";
         $self->new($$self =~ s{$search}{$value}geer);
     }
 
@@ -802,10 +802,10 @@ package Sidef::Types::String::String {
     }
 
     sub each_word {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $word (CORE::split(' ', $$self)) {
-            $code->run(bless \$word);
+            $block->run(bless \$word);
         }
 
         $self;
@@ -840,10 +840,10 @@ package Sidef::Types::String::String {
     }
 
     sub each_number {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $num (CORE::split(' ', $$self)) {
-            $code->run(Sidef::Types::Number::Number->new($num));
+            $block->run(Sidef::Types::Number::Number->new($num));
         }
 
         $self;
@@ -863,13 +863,13 @@ package Sidef::Types::String::String {
     }
 
     sub each_byte {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my $string = $$self;
 
         require bytes;
         foreach my $i (0 .. bytes::length($string) - 1) {
-            $code->run(Sidef::Types::Number::Number::_set_int(CORE::ord bytes::substr($string, $i, 1)));
+            $block->run(Sidef::Types::Number::Number::_set_int(CORE::ord bytes::substr($string, $i, 1)));
         }
 
         $self;
@@ -897,16 +897,29 @@ package Sidef::Types::String::String {
     }
 
     sub each_char {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $char (CORE::split(//, $$self)) {
-            $code->run(bless \$char);
+            $block->run(bless \$char);
         }
 
         $self;
     }
 
     *each = \&each_char;
+
+    sub each_kv {
+        my ($self, $block) = @_;
+
+        my @chars = CORE::split(//, $$self);
+
+        foreach my $i (0 .. $#chars) {
+            my $char = $chars[$i];
+            $block->run(Sidef::Types::Number::Number::_set_int($i), (bless \$char));
+        }
+
+        $self;
+    }
 
     sub graphemes {
         my ($self) = @_;
@@ -916,11 +929,11 @@ package Sidef::Types::String::String {
     *graphs = \&graphemes;
 
     sub each_grapheme {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         my $str = $$self;
         while ($str =~ /(\X)/g) {
-            $code->run(bless \(my $str = $1));
+            $block->run(bless \(my $str = $1));
         }
 
         $self;
@@ -934,10 +947,10 @@ package Sidef::Types::String::String {
     }
 
     sub each_line {
-        my ($self, $code) = @_;
+        my ($self, $block) = @_;
 
         foreach my $line (CORE::split(/\R/, $$self)) {
-            $code->run(bless \$line);
+            $block->run(bless \$line);
         }
 
         $self;
