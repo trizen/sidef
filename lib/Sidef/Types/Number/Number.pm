@@ -9974,17 +9974,29 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $x = _any2mpz($$x) // return (nan(), nan());
-        $y = _any2mpz($$y) // return (nan(), nan());
+        $x = $$x;
+        $y = $$y;
+
+        if (!ref($x) and !ref($y) and $y != 0) {
+            my ($q, $r) = (
+                           HAS_NEW_PRIME_UTIL
+                           ? Math::Prime::Util::divrem($x, $y)
+                           : Math::Prime::Util::GMP::divrem($x, $y)
+                          );
+            return (_set_int($q), _set_int($r));
+        }
+
+        $x = _any2mpz($x) // return (nan(), nan());
+        $y = _any2mpz($y) // return (nan(), nan());
 
         Math::GMPz::Rmpz_sgn($y)
           || return (nan(), nan());
 
+        my $q = Math::GMPz::Rmpz_init();
         my $r = Math::GMPz::Rmpz_init();
-        my $s = Math::GMPz::Rmpz_init();
 
-        Math::GMPz::Rmpz_divmod($r, $s, $x, $y);
-        ((bless \$r), (bless \$s));
+        Math::GMPz::Rmpz_divmod($q, $r, $x, $y);
+        ((bless \$q), (bless \$r));
     }
 
     sub and {
