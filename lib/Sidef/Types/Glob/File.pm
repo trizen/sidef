@@ -45,7 +45,7 @@ package Sidef::Types::Glob::File {
     sub size {
         ref($_[0]) || shift(@_);
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(-s "$self");
+        Sidef::Types::Number::Number::_set_int(-s "$self");
     }
 
     sub md5 {

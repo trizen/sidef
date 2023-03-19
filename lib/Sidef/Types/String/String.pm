@@ -841,8 +841,8 @@ package Sidef::Types::String::String {
     sub integers {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-                                        [map  { Sidef::Types::Number::Number->new($_)->int }
-                                         grep { Scalar::Util::looks_like_number($_) } CORE::split(' ', $$self)
+                                        [map  { Sidef::Types::Number::Number::_set_int($_) }
+                                         grep { /^-?[0-9]+\z/ } CORE::split(' ', $$self)
                                         ]
                                        );
     }

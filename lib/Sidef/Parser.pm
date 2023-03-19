@@ -1447,7 +1447,7 @@ package Sidef::Parser {
                                         error => q{expected one or more variable names after <enum>},
                                        );
 
-                my $value = Sidef::Types::Number::Number->new(-1);
+                my $value = Sidef::Types::Number::Number::_set_int(-1);
 
                 foreach my $var (@{$vars}) {
                     my $name = $var->{name};
@@ -2195,7 +2195,7 @@ package Sidef::Parser {
             # Super-script power
             if (/\G([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gc) {
                 my $num = ($1 =~ tr/⁰¹²³⁴⁵⁶⁷⁸⁹/0-9/r);
-                return Sidef::Types::Number::Number->new($num);
+                return Sidef::Types::Number::Number::_set_int($num);
             }
 
             # Binary, hexadecimal and octal numbers
@@ -2221,7 +2221,11 @@ package Sidef::Parser {
                     return Sidef::Types::Number::Number::_set_str('float', $num);
                 }
 
-                return Sidef::Types::Number::Number->new($num);
+                return (
+                        $num =~ /^-?[0-9]+\z/
+                        ? Sidef::Types::Number::Number::_set_int($num)
+                        : Sidef::Types::Number::Number->new($num)
+                       );
             }
 
             # Prefix `...`

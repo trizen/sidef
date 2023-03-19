@@ -5,7 +5,7 @@ package Sidef::Types::Glob::DirHandle {
 
     use parent qw(
       Sidef::Object::Object
-      );
+    );
 
     require Encode;
     require File::Spec;
@@ -87,7 +87,7 @@ package Sidef::Types::Glob::DirHandle {
 
     sub tell {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::telldir($self->{dh}));
+        Sidef::Types::Number::Number::_set_int(CORE::telldir($self->{dh}));
     }
 
     sub seek {

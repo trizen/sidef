@@ -92,7 +92,7 @@ package Sidef::Types::Number::Number {
             return $_[0];
         }
 
-        if (ref($base)) {
+        if (defined($base) and ref($base)) {
             if (ref($base) eq __PACKAGE__) {
                 $base = _any2ui($$base) // 0;
             }
@@ -102,6 +102,16 @@ package Sidef::Types::Number::Number {
         }
 
         my $ref = ref($num);
+
+        if ($ref eq 'Sidef::Types::String::String') {
+            $num = "$$num";
+            $ref = '';
+        }
+
+        # Optimization: return faster for base-10 integers
+        if (!defined($base) and !$ref and $num =~ /^-?[0-9]+\z/) {
+            return _set_int($num);
+        }
 
         if (   $ref eq 'Sidef::Types::Number::Mod'
             or $ref eq 'Sidef::Types::Number::Gauss'
@@ -19412,7 +19422,7 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@factors);
     }
 
-    *gcd_factor = \&gcd_factor;
+    *gcd_factor = \&gcd_factors;
 
     sub fibonacci_factor {
         my ($n, $upto) = @_;

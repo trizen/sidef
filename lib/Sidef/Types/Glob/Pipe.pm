@@ -5,7 +5,7 @@ package Sidef::Types::Glob::Pipe {
 
     use parent qw(
       Sidef::Object::Object
-      );
+    );
 
     use overload q{""} => sub {
         'Pipe(' . join(', ', map { ${Sidef::Types::String::String->new("$_")->dump} } @{$_[0]}) . ')';
@@ -42,7 +42,7 @@ package Sidef::Types::Glob::Pipe {
             ${$var_ref} = $pipe_obj;
 
             return defined($pid)
-              ? Sidef::Types::Number::Number->new($pid)
+              ? Sidef::Types::Number::Number::_set_int($pid)
               : undef;
         }
 
