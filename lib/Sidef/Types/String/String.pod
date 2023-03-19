@@ -549,6 +549,14 @@ Aliases: I<each_number>
 
 =cut
 
+=head2 each_slice
+
+    self.each_slice(n, block)
+
+Returns the
+
+=cut
+
 =head2 each_word
 
     self.each_word {|word| ... }

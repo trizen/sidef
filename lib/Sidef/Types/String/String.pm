@@ -742,7 +742,23 @@ package Sidef::Types::String::String {
 
     sub slices {
         my ($self, $n) = @_;
-        Sidef::Types::Array::Array->new([map { bless \$_ } unpack '(a' . CORE::int($n) . ')*', $$self]);
+        $n = CORE::int($n);
+        $n > 0 or return Sidef::Types::Array::Array->new;
+        Sidef::Types::Array::Array->new([map { bless \$_ } unpack('(a' . $n . ')*', $$self)]);
+    }
+
+    sub each_slice {
+        my ($self, $n, $block) = @_;
+
+        $n = CORE::int($n);
+        $n > 0 or return $self;
+
+        my $len = length($$self);
+        for (my $i = 0 ; $i < $len ; $i += $n) {
+            $block->run(bless \(my $str = substr($$self, $i, $n)));
+        }
+
+        $self;
     }
 
     sub split {
