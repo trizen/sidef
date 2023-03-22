@@ -3206,6 +3206,37 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub imod {
+        my ($x, $y) = @_;
+
+        _valid(\$y);
+
+        $x = $$x;
+        $y = $$y;
+
+        if (!ref($x) and !ref($y)) {
+            return bless \__mod__($x, $y);
+        }
+
+        $x = _any2mpz($x) // (goto &nan);
+        $y = _any2mpz($y) // (goto &nan);
+
+        my $sign_y = Math::GMPz::Rmpz_sgn($y)
+          || goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r, $x, $y);
+
+        if (!Math::GMPz::Rmpz_sgn($r)) {
+            ## OK
+        }
+        elsif ($sign_y < 0) {
+            Math::GMPz::Rmpz_add($r, $r, $y);
+        }
+
+        bless \$r;
+    }
+
     sub idiv {
         my ($x, $y) = @_;
 
@@ -8928,30 +8959,6 @@ package Sidef::Types::Number::Number {
 
         push @r, $x;
         map { bless \$_ } @r;
-    }
-
-    sub imod {
-        my ($x, $y) = @_;
-
-        _valid(\$y);
-
-        $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2mpz($$y) // (goto &nan);
-
-        my $sign_y = Math::GMPz::Rmpz_sgn($y)
-          || goto &nan;
-
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mod($r, $x, $y);
-
-        if (!Math::GMPz::Rmpz_sgn($r)) {
-            ## OK
-        }
-        elsif ($sign_y < 0) {
-            Math::GMPz::Rmpz_add($r, $r, $y);
-        }
-
-        bless \$r;
     }
 
     sub quadratic_nonresidue {
@@ -23539,7 +23546,7 @@ package Sidef::Types::Number::Number {
 
         $n = Math::GMPz::Rmpz_get_str($n, 10);
 
-        if (HAS_PRIME_UTIL and CORE::abs($k) == 1 and $n < (ULONG_MAX >> 2)) {
+        if (HAS_PRIME_UTIL and CORE::abs($k) == 1 and $n < (ULONG_MAX >> 3)) {
             $r = Math::Prime::Util::divisor_sum($n);
         }
         elsif (length($n) < SPECIAL_FACTORS_MIN) {
@@ -23600,9 +23607,9 @@ package Sidef::Types::Number::Number {
         (Math::GMPz::Rmpz_sgn($n) || return ZERO) > 0 or goto &nan;
 
         my $s =
-          (HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($n, ULONG_MAX >> 2) <= 0)
+          (HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($n, ULONG_MAX >> 3) <= 0)
           ? Math::Prime::Util::divisor_sum(Math::GMPz::Rmpz_get_ui($n))
-          : Math::Prime::Util::GMP::sigma($n);
+          : ${_set_int($n)->sigma};
 
         $s = Math::Prime::Util::GMP::subint($s, $n);
 
@@ -23612,32 +23619,38 @@ package Sidef::Types::Number::Number {
     sub is_abundant {
         my ($n) = @_;
 
-        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
-        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
-        Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
 
-        my $nstr = (
-                      Math::GMPz::Rmpz_fits_ulong_p($n)
-                    ? Math::GMPz::Rmpz_get_ui($n)
-                    : Math::GMPz::Rmpz_get_str($n, 10)
-                   );
+        my $sigma;
 
-        my $sigma = Math::Prime::Util::GMP::sigma($nstr);
+        if (!ref($n)) {
+            $n > 0 or return Sidef::Types::Bool::Bool::FALSE;
+            $sigma = (
+                      (HAS_PRIME_UTIL and $n < (ULONG_MAX >> 3))
+                      ? Math::Prime::Util::divisor_sum($n)
+                      : Math::Prime::Util::GMP::sigma($n)
+                     );
+        }
+        else {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+            Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Bool::Bool::FALSE;
+            $sigma = ${(bless \$n)->sigma};
+        }
 
-        if ($nstr < ULONG_MAX and $sigma < ULONG_MAX) {
+        if (!ref($n) and $sigma < ULONG_MAX) {
             return (
-                    (($sigma >> 1) > $nstr)
+                    (($sigma >> 1) > $n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
 
-        state $s = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_set_str($s, $sigma, 10);
+        my $s = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_str($s, "$sigma", 10);
         Math::GMPz::Rmpz_div_2exp($s, $s, 1);
 
-        (Math::GMPz::Rmpz_cmp($s, $n) > 0)
+        (__cmp__($s, $n) > 0)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -27767,10 +27780,10 @@ package Sidef::Types::Number::Number {
               or Math::GMPz::Rmpz_congruent_ui_p($n, 81,  324)
               or return Sidef::Types::Bool::Bool::FALSE;
 
-            my $t = Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::sigma("$n"), 10);
+            my $t = _set_int($n)->sigma;
 
             return (
-                    (Math::GMPz::Rmpz_cmp($t, 2 * $n) == 0)
+                    (__cmp__($$t, 2 * $n) == 0)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
