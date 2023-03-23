@@ -56,9 +56,9 @@ class Forest(p=0.01f, f=0.001f, height, width) {
     }
 
     method show {
-        for i in ^height {
-            say pix[spot[i]]
-        }
+        print spot.map {|row|
+            join('', pix[row...])
+        }.join("\n")
     }
 }
 
@@ -68,10 +68,10 @@ var width  = Num(`tput cols`  || 80)-1
 var height = Num(`tput lines` || 24)-1
 
 var forest = Forest(height: height, width: width)
-print "\e[2J";
+print "\e[2J"
 
 loop {
-    print "\e[H";
-    forest.show;
-    forest.step;
+    print "\e[H"
+    forest.show
+    forest.step
 }

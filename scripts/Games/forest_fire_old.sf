@@ -51,7 +51,7 @@ STDOUT.autoflush(true)
 func init_forest {
     print r
     forest.each { |row|
-        print chars[row]
+        print chars[row...]
         print "\033[E\033[1G"
     }
     iterate()

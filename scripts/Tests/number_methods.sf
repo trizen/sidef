@@ -698,4 +698,56 @@ assert_eq(20.of { .bigomega },          20.of { .factor.len })
 assert_eq(20.of { .gpf },               20.of { .factor.tail \\ _ })
 assert_eq(20.of { .lpf },               20.of { .factor.head \\ _ })
 
+assert_eq(20.of { .digits(2).sum },     20.of { .hammingweight })
+assert_eq(20.of { .digits(2).len },     20.of { .len(2) })
+assert_eq(20.of { .digits.len },        20.of { .len })
+assert_eq(20.of { .digits(10).len },    20.of { .len(10) })
+
+assert_eq(20.of { .sumdigits },         20.of { .digits.sum })
+assert_eq(20.of { .sumdigits(2) },      20.of { .digits(2).sum })
+assert_eq(20.of { .sumdigits(3) },      20.of { .digits(3).sum })
+assert_eq(20.of { .sumdigits(8) },      20.of { .digits(8).sum })
+assert_eq(20.of { .sumdigits(9) },      20.of { .digits(9).sum })
+assert_eq(20.of { .sumdigits(10) },     20.of { .digits(10).sum })
+assert_eq(20.of { .sumdigits(11) },     20.of { .digits(11).sum })
+assert_eq(20.of { .sumdigits(16) },     20.of { .digits(16).sum })
+
+assert_eq(20.of { .digits.digits2num },            20.of { _ })
+assert_eq(20.of { .digits(2).digits2num(2) },      20.of { _ })
+assert_eq(20.of { .digits(3).digits2num(3) },      20.of { _ })
+assert_eq(20.of { .digits(8).digits2num(8) },      20.of { _ })
+assert_eq(20.of { .digits(9).digits2num(9) },      20.of { _ })
+assert_eq(20.of { .digits(10).digits2num(10) },    20.of { _ })
+assert_eq(20.of { .digits(11).digits2num(11) },    20.of { _ })
+assert_eq(20.of { .digits(16).digits2num(16) },    20.of { _ })
+
+for n in (2**31, 2**63, 4294967293, 4294967297, 18446744073709551613, 18446744073709551617) {
+    assert_eq(sumdigits(n, 2**32 + 2), digits(n, 2**32 + 2).sum)
+    assert_eq(sumdigits(n, 2**32 - 2), digits(n, 2**32 - 2).sum)
+    assert_eq(sumdigits(n, 2**32 + 3), digits(n, 2**32 + 3).sum)
+    assert_eq(sumdigits(n, 2**31 - 3), digits(n, 2**31 - 3).sum)
+    assert_eq(sumdigits(n, 2**30 + 5), digits(n, 2**30 + 5).sum)
+    assert_eq(sumdigits(n, 2**31 + 3), digits(n, 2**31 + 3).sum)
+
+    assert_eq(digits(n, 2**32 - 2).digits2num(2**32 - 2), n)
+    assert_eq(digits(n, 2**32 + 2).digits2num(2**32 + 2), n)
+    assert_eq(digits(n, 2**32 + 3).digits2num(2**32 + 3), n)
+    assert_eq(digits(n, 2**31 - 3).digits2num(2**31 - 3), n)
+    assert_eq(digits(n, 2**30 + 5).digits2num(2**30 + 5), n)
+    assert_eq(digits(n, 2**31 + 3).digits2num(2**31 + 3), n)
+
+    assert_eq(n.digits.sum, n.sumdigits)
+    assert_eq(n.digits.digits2num, n)
+
+    var bases = [2, 8, 9, 10, 11, 16, 43, irand(2, n**2), irand(2, n**3), irand(2, n), irand(2, n.isqrt), irand(2, n.iroot(3))]
+    var nums  = [n, n.irand, irand(n**2), irand(n**3)]
+
+    for b in (bases), k in (nums) {
+        var D = k.digits(b)
+        assert_eq(D.len, k.len(b))
+        assert_eq(D.digits2num(b), k)
+        assert_eq(k.sumdigits(b), D.sum)
+    }
+}
+
 say "** Tests passed!"

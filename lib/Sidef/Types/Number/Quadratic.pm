@@ -193,6 +193,11 @@ package Sidef::Types::Number::Quadratic {
 
     sub div {
         my ($x, $y) = @_;
+
+        if (ref($y) eq 'Sidef::Types::Number::Number') {
+            return __PACKAGE__->new($x->{a}->div($y), $x->{b}->div($y), $x->{w});
+        }
+
         $x->mul($y->inv);
     }
 

@@ -66,11 +66,8 @@ package Sidef::Types::Number::Number {
     my %DIGITS_62;
     @DIGITS_62{0 .. 9, 'A' .. 'Z', 'a' .. 'z'} = (0 .. 61);
 
-    my %FROM_DIGITS_36;
-    @FROM_DIGITS_36{0 .. 35} = (0 .. 9, 'a' .. 'z');
-
-    my %FROM_DIGITS_62;
-    @FROM_DIGITS_62{0 .. 61} = (0 .. 9, 'A' .. 'Z', 'a' .. 'z');
+    my @FROM_DIGITS_36 = (0 .. 9, 'a' .. 'z');
+    my @FROM_DIGITS_62 = (0 .. 9, 'A' .. 'Z', 'a' .. 'z');
 
     state $LUCAS_PQ_LIMIT = CORE::int(CORE::sqrt(ULONG_MAX >> 2));
 
@@ -7863,22 +7860,50 @@ package Sidef::Types::Number::Number {
 
     sub as_bin {
         my ($x) = @_;
-        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($$x) // return undef), 2));
+
+        $x = $$x;
+
+        if (!ref($x)) {
+            return Sidef::Types::String::String->new((($x < 0) ? '-' : '') . CORE::sprintf('%b', CORE::abs($x)));
+        }
+
+        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($x) // return undef), 2));
     }
 
     sub as_oct {
         my ($x) = @_;
-        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($$x) // return undef), 8));
+
+        $x = $$x;
+
+        if (!ref($x)) {
+            return Sidef::Types::String::String->new((($x < 0) ? '-' : '') . CORE::sprintf('%o', CORE::abs($x)));
+        }
+
+        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($x) // return undef), 8));
     }
 
     sub as_hex {
         my ($x) = @_;
-        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($$x) // return undef), 16));
+
+        $x = $$x;
+
+        if (!ref($x)) {
+            return Sidef::Types::String::String->new((($x < 0) ? '-' : '') . CORE::sprintf('%x', CORE::abs($x)));
+        }
+
+        Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($x) // return undef), 16));
     }
 
     sub bits {
         my ($x) = @_;
-        $x = _any2mpz($$x) // return Sidef::Types::Array::Array->new;
+
+        $x = $$x;
+
+        if (!ref($x)) {
+            return Sidef::Types::Array::Array->new([map { $_ ? ONE : ZERO } split(//, CORE::sprintf('%b', CORE::abs($x)))]);
+        }
+
+        $x = _any2mpz($x) // return Sidef::Types::Array::Array->new;
         my $bin = Math::GMPz::Rmpz_get_str($x, 2);
         $bin = substr($bin, 1) if substr($bin, 0, 1) eq '-';
         Sidef::Types::Array::Array->new([map { $_ ? ONE : ZERO } split(//, $bin)]);
@@ -7971,7 +7996,54 @@ package Sidef::Types::Number::Number {
     sub digits {
         my ($n, $k) = @_;
 
-        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+        $n = $$n;
+
+        if (!defined($k) and !ref($n)) {
+            $n == 0 and return Sidef::Types::Array::Array->new([ZERO]);
+            my @digits = CORE::reverse(HAS_PRIME_UTIL ? Math::Prime::Util::todigits(CORE::abs($n)) : split(//, CORE::abs($n)));
+            return Sidef::Types::Array::Array->new([map { bless \$_ } @digits]);
+        }
+
+        if (defined($k)) {
+            _valid(\$k);
+
+            $k = $$k;
+
+            if (!ref($k) and !ref($n)) {
+
+                $k >= 2 or return Sidef::Types::Array::Array->new;
+                $n == 0 and return Sidef::Types::Array::Array->new([ZERO]);
+                CORE::abs($n) < $k and return Sidef::Types::Array::Array->new([_set_int(CORE::abs($n))]);
+
+                my @digits;
+
+                if (HAS_PRIME_UTIL and $k < 2147483647) {
+                    @digits = Math::Prime::Util::todigits(CORE::abs($n), $k);
+                }
+                elsif ($k == 2 or $k == 8) {
+                    @digits = split(//, sprintf(($k == 2 ? '%b' : '%o'), CORE::abs($n)));
+                }
+                elsif ($k == 10) {
+                    @digits = split(//, CORE::abs($n));
+                }
+                elsif ($k == 16) {
+                    @digits = @DIGITS_36{split(//, sprintf('%x', CORE::abs($n)))};
+                }
+
+                if (@digits) {
+                    return Sidef::Types::Array::Array->new([map { bless \$_ } CORE::reverse(@digits)]);
+                }
+            }
+
+            $k = _any2mpz($k) // return Sidef::Types::Array::Array->new;
+
+            # Not defined for k <= 1
+            if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
+                return Sidef::Types::Array::Array->new;
+            }
+        }
+
+        $n = _any2mpz($n) // return Sidef::Types::Array::Array->new;
 
         my $sgn = Math::GMPz::Rmpz_sgn($n);
 
@@ -7983,23 +8055,14 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_abs($n, $n);
         }
 
-        if (defined($k)) {
-            _valid(\$k);
-
-            $k = _any2mpz($$k) // return Sidef::Types::Array::Array->new;
-
-            # Not defined for k <= 1
-            if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
-                return Sidef::Types::Array::Array->new;
-            }
-        }
-
 #<<<
         if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
             $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
             return Sidef::Types::Array::Array->new([
-                map { bless(\(my $o = ($k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_}))) }
-                    split(//, scalar CORE::reverse scalar Math::GMPz::Rmpz_get_str($n, $k))
+               map { bless \$_ }
+                ($k <= 36)
+                    ? @DIGITS_36{split(//, scalar CORE::reverse scalar Math::GMPz::Rmpz_get_str($n, $k))}
+                    : @DIGITS_62{split(//, scalar CORE::reverse scalar Math::GMPz::Rmpz_get_str($n, $k))}
             ]);
         }
 #>>>
@@ -8010,14 +8073,10 @@ package Sidef::Types::Number::Number {
             my $A = $n;
             my $B = Math::GMPz::Rmpz_get_ui($k);
 
-            # When B < 2^32, use Math::Prime::Util::GMP::todigits().
-            if ($B <= 4294967295) {
-                return
-                  Sidef::Types::Array::Array->new(
-                                       [map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) }
-                                          CORE::reverse(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B))
-                                       ]
-                  );
+            # When B < 2^31, use Math::Prime::Util::GMP::todigits().
+            if ($B < 2147483647) {
+                return Sidef::Types::Array::Array->new(
+                    [map { bless \$_ } CORE::reverse(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B))]);
             }
 
             # Find r such that B^(2r - 2) <= A < B^(2r)
@@ -8096,11 +8155,11 @@ package Sidef::Types::Number::Number {
         }
 
         if ($base <= 36) {
-            return Math::GMPz::Rmpz_init_set_str(join('', map { $FROM_DIGITS_36{$_} } @$digits), $base);
+            return Math::GMPz::Rmpz_init_set_str(join('', @FROM_DIGITS_36[@$digits]), $base);
         }
 
         if ($base <= 62) {
-            return Math::GMPz::Rmpz_init_set_str(join('', map { $FROM_DIGITS_62{$_} } @$digits), $base);
+            return Math::GMPz::Rmpz_init_set_str(join('', @FROM_DIGITS_62[@$digits]), $base);
         }
 
         my @D   = CORE::reverse(@$digits);
@@ -8294,7 +8353,51 @@ package Sidef::Types::Number::Number {
     sub sumdigits {
         my ($n, $k) = @_;
 
-        $n = _any2mpz($$n) // return undef;
+        $n = $$n;
+
+        if (!defined($k) and !ref($n)) {
+            $n == 0 and return ZERO;
+            return _set_int(
+                      List::Util::sum(HAS_PRIME_UTIL ? Math::Prime::Util::todigits(CORE::abs($n)) : split(//, CORE::abs($n))));
+        }
+
+        if (defined($k)) {
+            _valid(\$k);
+
+            $k = $$k;
+
+            if (!ref($k) and !ref($n)) {
+
+                $k >= 2 or return undef;
+                $n == 0 and return ZERO;
+                CORE::abs($n) < $k and return _set_int(CORE::abs($n));
+
+                if (HAS_PRIME_UTIL and $k < 2147483647) {
+                    if ($k == 2) {
+                        return _set_int(Math::Prime::Util::hammingweight(CORE::abs($n)));
+                    }
+                    return _set_int(List::Util::sum(Math::Prime::Util::todigits(CORE::abs($n), $k)));
+                }
+                elsif ($k == 2 or $k == 8) {
+                    return _set_int(List::Util::sum(split(//, sprintf(($k == 2 ? '%b' : '%o'), CORE::abs($n)))));
+                }
+                elsif ($k == 10) {
+                    return _set_int(List::Util::sum(split(//, CORE::abs($n))));
+                }
+                elsif ($k == 16) {
+                    return _set_int(List::Util::sum(@DIGITS_36{split(//, sprintf('%x', CORE::abs($n)))}));
+                }
+            }
+
+            $k = _any2mpz($k) // return undef;
+
+            # Not defined for k <= 1
+            if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
+                return undef;
+            }
+        }
+
+        $n = _any2mpz($n) // return undef;
 
         my $sgn = Math::GMPz::Rmpz_sgn($n);
 
@@ -8306,17 +8409,6 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_abs($n, $n);
         }
 
-        if (defined($k)) {
-            _valid(\$k);
-
-            $k = _any2mpz($$k) // return undef;
-
-            # Not defined for k <= 1
-            if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
-                return undef;
-            }
-        }
-
 #<<<
         if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
             $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
@@ -8324,7 +8416,12 @@ package Sidef::Types::Number::Number {
             return _set_int(scalar Math::GMPz::Rmpz_popcount($n)) if ($k == 2);
 
             if (Math::GMPz::Rmpz_sizeinbase($n, $k) <= 1e6) {
-                return _set_int(List::Util::sum(map { $k <= 36 ? $DIGITS_36{$_} : $DIGITS_62{$_} } split(//, Math::GMPz::Rmpz_get_str($n, $k))));
+                if ($k <= 36) {
+                    return _set_int(List::Util::sum(@DIGITS_36{split(//, Math::GMPz::Rmpz_get_str($n, $k))}));
+                }
+                else {
+                    return _set_int(List::Util::sum(@DIGITS_62{split(//, Math::GMPz::Rmpz_get_str($n, $k))}));
+                }
             }
             else {
                 $k = Math::GMPz::Rmpz_init_set_ui($k);
@@ -8338,10 +8435,9 @@ package Sidef::Types::Number::Number {
             my $A = $n;
             my $B = Math::GMPz::Rmpz_get_ui($k);
 
-            # When B < 2^32, use Math::Prime::Util::GMP::todigits().
-            if ($B <= 4294967295 and Math::GMPz::Rmpz_sizeinbase($n, 62) <= 1e6) {
-                return _set_int(
-                       Math::Prime::Util::GMP::vecsum(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B)));
+            # When B < 2^31, use Math::Prime::Util::GMP::todigits().
+            if ($B < 2147483647 and Math::GMPz::Rmpz_sizeinbase($n, 62) <= 1e6) {
+                return _set_int(List::Util::sum(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B)));
             }
 
             # Find r such that B^(2r - 2) <= A < B^(2r)
@@ -8430,7 +8526,14 @@ package Sidef::Types::Number::Number {
     sub length {
         my ($x, $y) = @_;
 
-        $x = _any2mpz($$x) // return undef;
+        $x = $$x;
+
+        if (!defined($y) and !ref($x)) {
+            my $len = CORE::length($x) - (($x < 0) ? 1 : 0);
+            return bless \$len;
+        }
+
+        $x = _any2mpz($x) // return undef;
 
         my $neg = ((Math::GMPz::Rmpz_sgn($x) || return ONE) < 0) ? 1 : 0;
 
@@ -28543,10 +28646,10 @@ package Sidef::Types::Number::Number {
             @d = split(//, scalar CORE::reverse Math::GMPz::Rmpz_get_str($n, $base));
         }
         elsif ($base <= 36) {
-            @d = map { $DIGITS_36{$_} } split(//, scalar CORE::reverse Math::GMPz::Rmpz_get_str($n, $base));
+            @d = @DIGITS_36{split(//, scalar CORE::reverse Math::GMPz::Rmpz_get_str($n, $base))};
         }
         elsif ($base <= 62) {
-            @d = map { $DIGITS_62{$_} } split(//, scalar CORE::reverse Math::GMPz::Rmpz_get_str($n, $base));
+            @d = @DIGITS_62{split(//, scalar CORE::reverse Math::GMPz::Rmpz_get_str($n, $base))};
         }
         else {
             @d = map { (ref($$_) eq 'Math::GMPz') ? Math::GMPz::Rmpz_get_ui($$_) : $$_ } @{$_[0]->digits($_[1])};

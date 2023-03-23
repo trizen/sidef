@@ -10,10 +10,10 @@ var rw = ^w
 var dirs = [[-1,-1], [-1, 0], [-1, 1], [ 0,-1],
             [ 0, 1], [ 1,-1], [ 1, 0], [ 1, 1]]
 
-var universe = h.of { w.of {1.rand < 0.1} }
+var universe = h.of { w.of { 1.rand < 0.1 } }
 
 func iterate {
-    var new = h.of { w.of(false) }
+    var new = h.of { w.of(nil) }
     for i=rh, j=rw {
         var neighbor = 0
         for y,x in (dirs.map {|dir| dir »+« [i, j] }) {
@@ -31,6 +31,6 @@ STDOUT.autoflush(true)
 
 loop {
     print r
-    say universe.map{|row| row.map{|cell| cell ? '#' : ' '}.join }.join("\n")
+    print universe.map{|row| row.map{|cell| cell ? '#' : ' '}.join }.join("\n")
     iterate()
 }
