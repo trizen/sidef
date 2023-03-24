@@ -8011,23 +8011,25 @@ package Sidef::Types::Number::Number {
 
             if (!ref($k) and !ref($n)) {
 
+                $n = CORE::abs($n);
+
                 $k >= 2 or return Sidef::Types::Array::Array->new;
                 $n == 0 and return Sidef::Types::Array::Array->new([ZERO]);
-                CORE::abs($n) < $k and return Sidef::Types::Array::Array->new([_set_int(CORE::abs($n))]);
+                $n < $k and return Sidef::Types::Array::Array->new([bless \$n]);
 
                 my @digits;
 
                 if (HAS_PRIME_UTIL and $k < 2147483647) {
-                    @digits = Math::Prime::Util::todigits(CORE::abs($n), $k);
+                    @digits = Math::Prime::Util::todigits($n, $k);
                 }
                 elsif ($k == 2 or $k == 8) {
-                    @digits = split(//, sprintf(($k == 2 ? '%b' : '%o'), CORE::abs($n)));
+                    @digits = split(//, sprintf(($k == 2 ? '%b' : '%o'), $n));
                 }
                 elsif ($k == 10) {
-                    @digits = split(//, CORE::abs($n));
+                    @digits = split(//, $n);
                 }
                 elsif ($k == 16) {
-                    @digits = @DIGITS_36{split(//, sprintf('%x', CORE::abs($n)))};
+                    @digits = @DIGITS_36{split(//, sprintf('%x', $n))};
                 }
 
                 if (@digits) {
@@ -8357,8 +8359,8 @@ package Sidef::Types::Number::Number {
 
         if (!defined($k) and !ref($n)) {
             $n == 0 and return ZERO;
-            return _set_int(
-                      List::Util::sum(HAS_PRIME_UTIL ? Math::Prime::Util::todigits(CORE::abs($n)) : split(//, CORE::abs($n))));
+            return
+              bless \List::Util::sum(HAS_PRIME_UTIL ? Math::Prime::Util::todigits(CORE::abs($n)) : split(//, CORE::abs($n)));
         }
 
         if (defined($k)) {
@@ -8368,24 +8370,26 @@ package Sidef::Types::Number::Number {
 
             if (!ref($k) and !ref($n)) {
 
+                $n = CORE::abs($n);
+
                 $k >= 2 or return undef;
                 $n == 0 and return ZERO;
-                CORE::abs($n) < $k and return _set_int(CORE::abs($n));
+                $n < $k and return _set_int($n);
 
                 if (HAS_PRIME_UTIL and $k < 2147483647) {
                     if ($k == 2) {
-                        return _set_int(Math::Prime::Util::hammingweight(CORE::abs($n)));
+                        return bless \Math::Prime::Util::hammingweight($n);
                     }
-                    return _set_int(List::Util::sum(Math::Prime::Util::todigits(CORE::abs($n), $k)));
+                    return bless \List::Util::sum(Math::Prime::Util::todigits($n, $k));
                 }
                 elsif ($k == 2 or $k == 8) {
-                    return _set_int(List::Util::sum(split(//, sprintf(($k == 2 ? '%b' : '%o'), CORE::abs($n)))));
+                    return bless \List::Util::sum(split(//, sprintf(($k == 2 ? '%b' : '%o'), $n)));
                 }
                 elsif ($k == 10) {
-                    return _set_int(List::Util::sum(split(//, CORE::abs($n))));
+                    return bless \List::Util::sum(split(//, $n));
                 }
                 elsif ($k == 16) {
-                    return _set_int(List::Util::sum(@DIGITS_36{split(//, sprintf('%x', CORE::abs($n)))}));
+                    return bless \List::Util::sum(@DIGITS_36{split(//, sprintf('%x', $n))});
                 }
             }
 
