@@ -755,7 +755,7 @@ package Sidef::Types::String::String {
 
         my $len = length($$self);
         for (my $i = 0 ; $i < $len ; $i += $n) {
-            $block->run(bless \(my $str = substr($$self, $i, $n)));
+            $block->run(bless \(my $str = CORE::substr($$self, $i, $n)));
         }
 
         $self;
@@ -1412,7 +1412,7 @@ package Sidef::Types::String::String {
         state $x = require IO::Compress::RawDeflate;
         my $input = $$self;
         IO::Compress::RawDeflate::rawdeflate(\$input => \my $output)
-          or die "String.deflate failed: $IO::Compress::RawDeflate::RawDeflateError";
+          or CORE::die("String.deflate failed: $IO::Compress::RawDeflate::RawDeflateError");
         bless \$output;
     }
 
@@ -1421,7 +1421,7 @@ package Sidef::Types::String::String {
         state $x = require IO::Uncompress::RawInflate;
         my $input = $$self;
         IO::Uncompress::RawInflate::rawinflate(\$input => \my $output)
-          or die "String.inflate failed: $IO::Uncompress::RawInflate::RawInflateError";
+          or CORE::die("String.inflate failed: $IO::Uncompress::RawInflate::RawInflateError");
         bless \$output;
     }
 
@@ -1430,7 +1430,7 @@ package Sidef::Types::String::String {
         state $x = require IO::Compress::Gzip;
         my $input = $$self;
         IO::Compress::Gzip::gzip(\$input => \my $output)
-          or die "String.gzip failed: $IO::Compress::Gzip::GzipError";
+          or CORE::die("String.gzip failed: $IO::Compress::Gzip::GzipError");
         bless \$output;
     }
 
@@ -1439,7 +1439,7 @@ package Sidef::Types::String::String {
         state $x = require IO::Uncompress::Gunzip;
         my $input = $$self;
         IO::Uncompress::Gunzip::gunzip(\$input => \my $output)
-          or die "String.gunzip failed: $IO::Uncompress::Gunzip::GunzipError";
+          or CORE::die("String.gunzip failed: $IO::Uncompress::Gunzip::GunzipError");
         bless \$output;
     }
 

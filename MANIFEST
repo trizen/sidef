@@ -834,7 +834,6 @@ scripts/Tests/hash_sort.sf
 scripts/Tests/heap_s_algorithm_iter.sf
 scripts/Tests/heap_s_algorithm_rec.sf
 scripts/Tests/horner_s_rule.sf
-scripts/Tests/http_tiny.sf
 scripts/Tests/hypot.sf
 scripts/Tests/i_love_you.sf
 scripts/Tests/iban.sf
@@ -875,7 +874,6 @@ scripts/Tests/loops.sf
 scripts/Tests/lucas_sequences.sf
 scripts/Tests/luhn_test_of_credit_card_numbers.sf
 scripts/Tests/lvalues.sf
-scripts/Tests/lwp_module.sf
 scripts/Tests/magic_vars.sf
 scripts/Tests/man_or_boy.sf
 scripts/Tests/man_or_boy_2.sf
@@ -1105,6 +1103,8 @@ scripts/visualize_tree.sf
 scripts/walk_a_dir_recursively.sf
 scripts/WWW/deranged_anagrams.sf
 scripts/WWW/DNS_query.sf
+scripts/WWW/http_tiny.sf
+scripts/WWW/lwp_module.sf
 scripts/WWW/rc_rank_languages_by_popularity.sf
 scripts/WWW/socket.sf
 scripts/WWW/socket_inet.sf
