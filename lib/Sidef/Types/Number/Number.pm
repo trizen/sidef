@@ -917,7 +917,7 @@ package Sidef::Types::Number::Number {
 
         my @factors;
 
-        if (length($n) > 500) {
+        if (CORE::length($n) > 500) {
 
             ($n, @factors) = _adaptive_trial_factor($n);
 
@@ -934,7 +934,7 @@ package Sidef::Types::Number::Number {
 
         my %is_prob_prime_cache;
 
-        if (length($n) >= SPECIAL_FACTORS_MIN and $SPECIAL_FACTORS) {
+        if (CORE::length($n) >= SPECIAL_FACTORS_MIN and $SPECIAL_FACTORS) {
 
             if (_is_prob_prime($n, \%is_prob_prime_cache)) {
                 return (@factors, $n);
@@ -946,7 +946,7 @@ package Sidef::Types::Number::Number {
             my @special_factors;
             my $composite_factors = 0;
 
-            foreach my $p (@{_set_int($n)->special_factors}) {
+            foreach my $p (@{_set_int($n)->special_factors((CORE::length($n) <= YAFU_MIN ? ZERO : ()))}) {
                 if (_is_prob_prime($$p, \%is_prob_prime_cache)) {
                     push @special_factors, "$$p";
                 }
@@ -966,7 +966,7 @@ package Sidef::Types::Number::Number {
             return (@factors, @special_factors);
         }
 
-        if (length($n) >= FACTORDB_MIN and $USE_FACTORDB) {
+        if (CORE::length($n) >= FACTORDB_MIN and $USE_FACTORDB) {
 
             if (_is_prob_prime($n, \%is_prob_prime_cache)) {
                 return (@factors, $n);
@@ -1052,7 +1052,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (length($n) >= YAFU_MIN and $USE_YAFU) {
+        if (CORE::length($n) >= YAFU_MIN and $USE_YAFU) {
 
             if (_is_prob_prime($n, \%is_prob_prime_cache)) {
                 return (@factors, $n);
@@ -1204,7 +1204,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (length($n) >= SPECIAL_FACTORS_MIN) {
+        if (CORE::length($n) >= SPECIAL_FACTORS_MIN) {
             my $t = _set_int($n);
             my $D = $t->divisors($t);
             return map { (ref($$_) eq 'Math::GMPz') ? Math::GMPz::Rmpz_get_str($$_, 10) : $$_ } @$D;
@@ -1285,7 +1285,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (length($n) >= SPECIAL_FACTORS_MIN) {
+        if (CORE::length($n) >= SPECIAL_FACTORS_MIN) {
             my @factors = _factor($n);
             my %seen;
             foreach my $f (@factors) {
@@ -1701,7 +1701,11 @@ package Sidef::Types::Number::Number {
 
     sub int {
         my ($x) = @_;
-        (!ref($$x) or ref($$x) eq 'Math::GMPz') ? $x : bless \(_any2mpz($$x) // (goto &nan));
+        (!ref($$x) or ref($$x) eq 'Math::GMPz') ? $x : do {
+            my $t = _any2mpz($$x) // (goto &nan);
+            $t = Math::GMPz::Rmpz_get_si($t) if Math::GMPz::Rmpz_fits_slong_p($t);
+            bless \$t;
+        };
     }
 
     *trunc  = \&int;
@@ -3066,11 +3070,7 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL && _fits_ulong($m) && _fits_slong($x) && _fits_slong($y)) {
-            $x = _get_slong($x) if ref($x);
-            $y = _get_slong($y) if ref($y);
-            $m = _get_ulong($m) if ref($m);
-            $m || goto &nan;
+        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
             my $r = Math::Prime::Util::addmod($x, $y, $m);
             return bless \$r;
         }
@@ -3096,11 +3096,7 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $m = $$m;
 
-        if (HAS_NEW_PRIME_UTIL && _fits_ulong($m) && _fits_slong($x) && _fits_slong($y)) {
-            $x = _get_slong($x) if ref($x);
-            $y = _get_slong($y) if ref($y);
-            $m = _get_ulong($m) if ref($m);
-            $m || goto &nan;
+        if (HAS_NEW_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
             my $r = Math::Prime::Util::submod($x, $y, $m);
             return bless \$r;
         }
@@ -3126,11 +3122,7 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL && _fits_ulong($m) && _fits_slong($x) && _fits_slong($y)) {
-            $x = _get_slong($x) if ref($x);
-            $y = _get_slong($y) if ref($y);
-            $m = _get_ulong($m) if ref($m);
-            $m || goto &nan;
+        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
             my $r = Math::Prime::Util::mulmod($x, $y, $m);
             return bless \$r;
         }
@@ -8157,8 +8149,12 @@ package Sidef::Types::Number::Number {
     sub __digits2num__ {
         my ($base, $digits) = @_;
 
-        # $base is a native integer
+        # $base is a native integer >= 2
         # $digits is a non-empty array of native integers < base (msd first)
+
+        if (HAS_PRIME_UTIL and $base < 2147483647 and CORE::log($base) * scalar(@$digits) < CORE::log(ULONG_MAX)) {
+            return Math::Prime::Util::fromdigits($digits, $base);
+        }
 
         if ($base <= 10) {
             return Math::GMPz::Rmpz_init_set_str(join('', @$digits), $base);
@@ -8220,11 +8216,11 @@ package Sidef::Types::Number::Number {
         $base   = $$base;
         @digits = map { $$_ } @digits;
 
-        my $all_native = (ref($base) eq '' and $base >= 2);
+        my $all_native = (!ref($base) and $base >= 2);
 
         if ($all_native) {
             foreach my $digit (@digits) {
-                if (ref($digit) eq '' and $digit >= 0 and $digit < $base) {
+                if (!ref($digit) and $digit >= 0 and $digit < $base) {
                     ## ok
                 }
                 else {
@@ -10521,7 +10517,7 @@ package Sidef::Types::Number::Number {
 
         if (HAS_PRIME_UTIL and _fits_ulong($m) and _fits_ulong($n)) {
             my $r = Math::Prime::Util::factorialmod(_get_ulong($n), _get_ulong($m)) // goto &nan;
-            return _set_int($r);
+            return bless \$r;
         }
 
         $n = _any2mpz($n) // goto &nan;
@@ -12491,14 +12487,12 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new(\@array);
         }
 
-        my $m;
-        if (HAS_PRIME_UTIL and _fits_ulong($$n)) {
-            $m = Math::Prime::Util::moebius(_get_ulong($$n));
-        }
-        else {
-            $n = _any2mpz($$n) // goto &nan;
-            $m = Math::Prime::Util::GMP::moebius(Math::GMPz::Rmpz_get_str($n, 10));
-        }
+        $n = $$n;
+
+        my $m =
+          (HAS_PRIME_UTIL and !ref($n) and $n >= 0)
+          ? Math::Prime::Util::moebius($n)
+          : Math::Prime::Util::GMP::moebius(_big2uistr($n) // goto &nan);
 
         $m ? ($m == 1) ? ONE : MONE : ZERO;
     }
@@ -13377,51 +13371,54 @@ package Sidef::Types::Number::Number {
 
             # Number of primes below 10^n
             # OEIS: https://oeis.org/A006880
-            "1000000"                      => "78498",
-            "10000000"                     => "664579",
-            "100000000"                    => "5761455",
-            "1000000000"                   => "50847534",
-            "10000000000"                  => "455052511",
-            "100000000000"                 => "4118054813",
-            "1000000000000"                => "37607912018",
-            "10000000000000"               => "346065536839",
-            "100000000000000"              => "3204941750802",
-            "1000000000000000"             => "29844570422669",
-            "10000000000000000"            => "279238341033925",
-            "100000000000000000"           => "2623557157654233",
-            "1000000000000000000"          => "24739954287740860",
-            "10000000000000000000"         => "234057667276344607",
-            "100000000000000000000"        => "2220819602560918840",
-            "1000000000000000000000"       => "21127269486018731928",
-            "10000000000000000000000"      => "201467286689315906290",
-            "100000000000000000000000"     => "1925320391606803968923",
-            "1000000000000000000000000"    => "18435599767349200867866",
-            "10000000000000000000000000"   => "176846309399143769411680",
-            "100000000000000000000000000"  => "1699246750872437141327603",
-            "1000000000000000000000000000" => "16352460426841680446427399",
+            "1000000"                        => "78498",
+            "10000000"                       => "664579",
+            "100000000"                      => "5761455",
+            "1000000000"                     => "50847534",
+            "10000000000"                    => "455052511",
+            "100000000000"                   => "4118054813",
+            "1000000000000"                  => "37607912018",
+            "10000000000000"                 => "346065536839",
+            "100000000000000"                => "3204941750802",
+            "1000000000000000"               => "29844570422669",
+            "10000000000000000"              => "279238341033925",
+            "100000000000000000"             => "2623557157654233",
+            "1000000000000000000"            => "24739954287740860",
+            "10000000000000000000"           => "234057667276344607",
+            "100000000000000000000"          => "2220819602560918840",
+            "1000000000000000000000"         => "21127269486018731928",
+            "10000000000000000000000"        => "201467286689315906290",
+            "100000000000000000000000"       => "1925320391606803968923",
+            "1000000000000000000000000"      => "18435599767349200867866",
+            "10000000000000000000000000"     => "176846309399143769411680",
+            "100000000000000000000000000"    => "1699246750872437141327603",
+            "1000000000000000000000000000"   => "16352460426841680446427399",
+            "10000000000000000000000000000"  => "157589269275973410412739598",
+            "100000000000000000000000000000" => "1520698109714272166094258063",
 
             # Number of primes <= floor(sqrt(10^(2n+1)))
             # OEIS: https://oeis.org/A122121
-            "3162277"                    => "227647",
-            "31622776"                   => "1951957",
-            "316227766"                  => "17082666",
-            "3162277660"                 => "151876932",
-            "31622776601"                => "1367199811",
-            "316227766016"               => "12431880460",
-            "3162277660168"              => "113983535775",
-            "31622776601683"             => "1052370166553",
-            "316227766016837"            => "9773865306521",
-            "3162277660168379"           => "91238789797384",
-            "31622776601683793"          => "855502559228365",
-            "316227766016837933"         => "8052994747583677",
-            "3162277660168379331"        => "76066570954337300",
-            "31622776601683793319"       => "720722641159301040",
-            "316227766016837933199"      => "6847673381013822597",
-            "3162277660168379331998"     => "65223071241820793398",
-            "31622776601683793319988"    => "622647095301172021671",
-            "316227766016837933199889"   => "5956317545928249075039",
-            "3162277660168379331998893"  => "57086403558149290301868",
-            "31622776601683793319988935" => "548074549053620897173483",
+            "3162277"                     => "227647",
+            "31622776"                    => "1951957",
+            "316227766"                   => "17082666",
+            "3162277660"                  => "151876932",
+            "31622776601"                 => "1367199811",
+            "316227766016"                => "12431880460",
+            "3162277660168"               => "113983535775",
+            "31622776601683"              => "1052370166553",
+            "316227766016837"             => "9773865306521",
+            "3162277660168379"            => "91238789797384",
+            "31622776601683793"           => "855502559228365",
+            "316227766016837933"          => "8052994747583677",
+            "3162277660168379331"         => "76066570954337300",
+            "31622776601683793319"        => "720722641159301040",
+            "316227766016837933199"       => "6847673381013822597",
+            "3162277660168379331998"      => "65223071241820793398",
+            "31622776601683793319988"     => "622647095301172021671",
+            "316227766016837933199889"    => "5956317545928249075039",
+            "3162277660168379331998893"   => "57086403558149290301868",
+            "31622776601683793319988935"  => "548074549053620897173483",
+            "316227766016837933199889354" => "5270353162790246525701178",
 
             # Number of primes <= floor(10^n / k), for some small numbers k
             "10309278350515"   => "356392355629",
@@ -13736,6 +13733,7 @@ package Sidef::Types::Number::Number {
             "618970019642690137449562112"  => "10201730804263125133012340",
             "1237940039285380274899124224" => "20172933541156002700963336",
             "2475880078570760549798248448" => "39895115987049029184882256",
+            "4951760157141521099596496896" => "78908656317357166866404346",
                                 };
 
         if (defined($y)) {
@@ -15106,24 +15104,25 @@ package Sidef::Types::Number::Number {
 
             # (10^n)-th prime.
             # OEIS: https://oeis.org/A006988
-            "10000000"                  => "179424673",
-            "100000000"                 => "2038074743",
-            "1000000000"                => "22801763489",
-            "10000000000"               => "252097800623",
-            "100000000000"              => "2760727302517",
-            "1000000000000"             => "29996224275833",
-            "10000000000000"            => "323780508946331",
-            "100000000000000"           => "3475385758524527",
-            "1000000000000000"          => "37124508045065437",
-            "10000000000000000"         => "394906913903735329",
-            "100000000000000000"        => "4185296581467695669",
-            "1000000000000000000"       => "44211790234832169331",
-            "10000000000000000000"      => "465675465116607065549",
-            "100000000000000000000"     => "4892055594575155744537",
-            "1000000000000000000000"    => "51271091498016403471853",
-            "10000000000000000000000"   => "536193870744162118627429",
-            "100000000000000000000000"  => "5596564467986980643073683",
-            "1000000000000000000000000" => "58310039994836584070534263",
+            "10000000"                   => "179424673",
+            "100000000"                  => "2038074743",
+            "1000000000"                 => "22801763489",
+            "10000000000"                => "252097800623",
+            "100000000000"               => "2760727302517",
+            "1000000000000"              => "29996224275833",
+            "10000000000000"             => "323780508946331",
+            "100000000000000"            => "3475385758524527",
+            "1000000000000000"           => "37124508045065437",
+            "10000000000000000"          => "394906913903735329",
+            "100000000000000000"         => "4185296581467695669",
+            "1000000000000000000"        => "44211790234832169331",
+            "10000000000000000000"       => "465675465116607065549",
+            "100000000000000000000"      => "4892055594575155744537",
+            "1000000000000000000000"     => "51271091498016403471853",
+            "10000000000000000000000"    => "536193870744162118627429",
+            "100000000000000000000000"   => "5596564467986980643073683",
+            "1000000000000000000000000"  => "58310039994836584070534263",
+            "10000000000000000000000000" => "606527267811189857426370533",
 
             # (2^n)-th prime
             # OEIS: https://oeis.org/A033844
@@ -16248,8 +16247,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (_fits_ulong($x)) {
-            $x = _get_ulong($x);
+        if (!ref($x)) {
             $x > 1 or return Sidef::Types::Bool::Bool::FALSE;
 
             my $res;
@@ -16257,8 +16255,7 @@ package Sidef::Types::Number::Number {
             _valid(\$y);
             $y = $$y;
 
-            if (_fits_ulong($y)) {
-                $y   = _get_ulong($y);
+            if (!ref($y)) {
                 $res = (($x < $y) and ($y % $x == 0));
             }
             elsif (ref($y) eq 'Math::GMPz') {
@@ -16607,11 +16604,9 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        __is_int__($x) || return Sidef::Types::Bool::Bool::FALSE;
-
-        if (!ref($x) or _fits_ulong($x)) {
-            $x = _get_ulong($x) if ref($x);
-            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::is_semiprime($x) : Math::Prime::Util::GMP::is_semiprime($x));
+        if (!ref($x)) {
+            my $r =
+              ($x >= 4 and (HAS_PRIME_UTIL ? Math::Prime::Util::is_semiprime($x) : Math::Prime::Util::GMP::is_semiprime($x)));
             return (
                     $r
                     ? Sidef::Types::Bool::Bool::TRUE
@@ -16619,6 +16614,7 @@ package Sidef::Types::Number::Number {
                    );
         }
 
+        __is_int__($x) || return Sidef::Types::Bool::Bool::FALSE;
         $x = _any2mpz($x) // return Sidef::Types::Bool::Bool::FALSE;
 
         # When n is large enough, is_almost_prime(n,2) is faster
@@ -16973,9 +16969,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and (!ref($n) or _fits_ulong($n))) {
+        if (HAS_PRIME_UTIL and !ref($n)) {
             return (
-                    Math::Prime::Util::is_prime(ref($n) ? _get_ulong($n) : $n)
+                    Math::Prime::Util::is_prime($n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -17053,7 +17049,7 @@ package Sidef::Types::Number::Number {
         elsif ($k == 1) {
             return $n->is_prime;
         }
-        elsif ($k == 2 and _fits_ulong($$n)) {
+        elsif ($k == 2 and !ref($$n)) {
             return $n->is_semiprime;
         }
 
@@ -17508,9 +17504,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($n)) {
+        if (HAS_PRIME_UTIL and !ref($n)) {
             return (
-                    Math::Prime::Util::is_prime(_get_ulong($n))
+                    Math::Prime::Util::is_prime($n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -18261,9 +18257,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and _fits_ulong($n)) {
+        if (HAS_NEW_PRIME_UTIL and !ref($n)) {
             return (
-                    Math::Prime::Util::is_lucas_pseudoprime(_get_ulong($n))
+                    Math::Prime::Util::is_lucas_pseudoprime($n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -18284,9 +18280,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and _fits_ulong($n)) {
+        if (HAS_NEW_PRIME_UTIL and !ref($n)) {
             return (
-                    Math::Prime::Util::is_strong_lucas_pseudoprime(_get_ulong($n))
+                    Math::Prime::Util::is_strong_lucas_pseudoprime($n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -18307,9 +18303,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and _fits_ulong($n)) {
+        if (HAS_NEW_PRIME_UTIL and !ref($n)) {
             return (
-                    Math::Prime::Util::is_extra_strong_lucas_pseudoprime(_get_ulong($n))
+                    Math::Prime::Util::is_extra_strong_lucas_pseudoprime($n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -18333,9 +18329,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and _fits_ulong($n)) {
+        if (HAS_NEW_PRIME_UTIL and !ref($n)) {
             return (
-                    Math::Prime::Util::is_almost_extra_strong_lucas_pseudoprime(_get_ulong($n))
+                    Math::Prime::Util::is_almost_extra_strong_lucas_pseudoprime($n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -19028,13 +19024,12 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         # Optimization for native integers
-        if (_fits_ulong($n)) {
-            $n = _get_ulong($n);
+        if (!ref($n)) {
             $n <= 4 and goto &nan;
             $n = $n - 1;
-            return _set_int($n) if (($n & 1) == 0);
-            --$n                if _is_prob_prime($n);
-            return _set_int($n);
+            return (bless \$n) if (($n & 1) == 0);
+            --$n               if _is_prob_prime($n);
+            return bless \$n;
         }
 
         $n = _any2mpz($n) // goto &nan;
@@ -19427,9 +19422,9 @@ package Sidef::Types::Number::Number {
     sub lpf {
         my ($n) = @_;
 
-        if (_fits_ulong($n)) {
-            $n = _get_ulong($n);
-            return _set_int($n) if ($n <= 1);
+        if (!ref($n)) {
+            $n >= 0 or goto &nan;
+            return (bless \$n) if ($n <= 1);
             my @f = _factor($n);
             return _set_int($f[0]);
         }
@@ -19673,20 +19668,22 @@ package Sidef::Types::Number::Number {
             }
         };
 
-        $factorized || $collect_factors->($n->trial_factor($m->inc->mul(_set_int(1e6))));
+        my $mp1 = $m->inc;
+
+        $factorized || $collect_factors->($n->trial_factor($mp1->mul(_set_int(1e6))));
 
         # Methods that depdend on the special form of n
-        $factorized || $collect_factors->($n->fermat_factor($m->inc->mul(_set_int(1e3))));
-        $factorized || $collect_factors->($n->holf_factor($m->inc->mul(_set_int(1e4))));
+        $factorized || $collect_factors->($n->fermat_factor($mp1->mul(_set_int(1e3))));
+        $factorized || $collect_factors->($n->holf_factor($mp1->mul(_set_int(1e4))));
 
-        $factorized || $collect_factors->($n->dop_factor($m->inc->mul($n->ilog2->isqrt)->mul(TWO)));
-        $factorized || $collect_factors->($n->miller_factor($m->inc->mul(_set_int(5))));
+        $factorized || $collect_factors->($n->dop_factor($mp1->mul($n->ilog2->isqrt)->mul(TWO)));
+        $factorized || $collect_factors->($n->miller_factor($mp1->mul(_set_int(5))));
         $factorized || $collect_factors->($n->fibonacci_factor);
-        $factorized || $collect_factors->($n->lucas_factor(ONE, $m->inc->mul(_set_int(2))));
-        $factorized || $collect_factors->($n->cop_factor($m->inc->mul($n->ilog2->isqrt->shift_right(ONE))));
+        $factorized || $collect_factors->($n->lucas_factor(ONE, $mp1->mul(_set_int(2))));
+        $factorized || $collect_factors->($n->cop_factor($mp1->mul($n->ilog2->isqrt->shift_right(ONE))));
 
-        $factorized || $collect_factors->($n->pell_factor($m->inc->mul(_set_int(5e2))));
-        $factorized || $collect_factors->($n->phi_finder_factor($m->inc->mul(_set_int(1e3))));
+        $factorized || $collect_factors->($n->pell_factor($mp1->mul(_set_int(5e2))));
+        $factorized || $collect_factors->($n->phi_finder_factor($mp1->mul(_set_int(1e3))));
 
         @factors = @{$n->gcd_factors(Sidef::Types::Array::Array->new([@factors]))};
 
@@ -21804,16 +21801,15 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($n)) {
-            my $r = Math::Prime::Util::euler_phi(_get_ulong($n));
+        if (HAS_PRIME_UTIL and !ref($n)) {
+            my $r = Math::Prime::Util::euler_phi($n);
             return bless \$r;
         }
 
         $n = _big2uistr($n) // goto &nan;
 
         if (CORE::length($n) < SPECIAL_FACTORS_MIN) {
-            my $r = Math::Prime::Util::GMP::totient($n);
-            return _set_int($r);
+            return _set_int(Math::Prime::Util::GMP::totient($n));
         }
 
         state $t = Math::GMPz::Rmpz_init_nobless();
@@ -22718,8 +22714,8 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($n)) {
-            my $r = Math::Prime::Util::carmichael_lambda(_get_ulong($n));
+        if (HAS_PRIME_UTIL and !ref($n) and $n >= 0) {
+            my $r = Math::Prime::Util::carmichael_lambda($n);
             return bless \$r;
         }
 
@@ -22739,8 +22735,7 @@ package Sidef::Types::Number::Number {
             return _set_int(Math::Prime::Util::GMP::lcm(@lambdas));
         }
 
-        my $r = Math::Prime::Util::GMP::carmichael_lambda($n);
-        _set_int($r);
+        _set_int(Math::Prime::Util::GMP::carmichael_lambda($n));
     }
 
     *lambda = \&carmichael_lambda;
@@ -22750,13 +22745,12 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($n)) {
-            my $r = Math::Prime::Util::liouville(_get_ulong($n));
+        if (HAS_PRIME_UTIL and !ref($n) and $n >= 0) {
+            my $r = Math::Prime::Util::liouville($n);
             return bless \$r;
         }
 
-        my $r = Math::Prime::Util::GMP::liouville(_big2uistr($n) // goto &nan);
-        bless \$r;
+        Math::Prime::Util::GMP::liouville(_big2uistr($n) // goto &nan) eq '1' ? ONE : MONE;
     }
 
     *Liouville        = \&liouville;
@@ -26671,8 +26665,10 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (_fits_ulong($n)) {
-            $n = _get_ulong($n) || return Sidef::Types::Bool::Bool::FALSE;
+        if (!ref($n)) {
+
+            $n <= 0 and return Sidef::Types::Bool::Bool::FALSE;
+
             if ($n <= 3) {    # 1,2,3 are terms
                 return Sidef::Types::Bool::Bool::TRUE;
             }
@@ -26736,8 +26732,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         # If n is a native integer, Math::Prime::Util::is_carmichael() is slighly faster.
-        if (!ref($n) or _fits_ulong($n)) {
-            $n = _get_ulong($n) if ref($n);
+        if (!ref($n)) {
             return (
                     (HAS_PRIME_UTIL ? Math::Prime::Util::is_carmichael($n) : Math::Prime::Util::GMP::is_carmichael($n))
                     ? Sidef::Types::Bool::Bool::TRUE
@@ -28074,9 +28069,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($n)) {
+        if (HAS_PRIME_UTIL and !ref($n)) {
             return (
-                    Math::Prime::Util::is_prime_power(_get_ulong($n))
+                    Math::Prime::Util::is_prime_power($n)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
