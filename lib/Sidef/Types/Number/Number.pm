@@ -16916,10 +16916,23 @@ package Sidef::Types::Number::Number {
         my ($n) = @_;
 
         if (!ref($n)) {
-            $n > 0 or return;
+            $n > 1 or return;
+
             if ($n % 2 == 0) {
                 return ($n == 2);
             }
+
+            $n > 101 or return 1;
+
+            if (HAS_PRIME_UTIL and ULONG_MAX >= 18446744073709551615) {
+                Math::Prime::Util::gcd($n, 16294579238595022365) == 1 or return 0;
+                Math::Prime::Util::gcd($n, 7145393598349078859) == 1  or return 0;
+            }
+            else {
+                Math::Prime::Util::GMP::gcd($n, "16294579238595022365") eq '1' or return 0;
+                Math::Prime::Util::GMP::gcd($n, "7145393598349078859") eq '1'  or return 0;
+            }
+
             return 1;
         }
 
@@ -16966,19 +16979,24 @@ package Sidef::Types::Number::Number {
 
             foreach my $k (@checks) {
 
-                #~ say "Checking factors < $k";
+                say "[primality_pretest] Checking for prime factors < $k" if $VERBOSE;
 
                 my $primorial = _cached_primorial($k);
                 Math::GMPz::Rmpz_gcd($g, $primorial, $n);
 
                 if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
-                    ## say "Composite with a factor < $k";
+
+                    if ($VERBOSE) {
+                        say "[primality_pretest] Composite with g = ", Math::GMPz::Rmpz_get_str($g, 10);
+                    }
+
                     return 0;
                 }
             }
+
+            say "[primality_pretest] No small factor found..." if $VERBOSE;
         }
 
-        #~ say "No small factor...";
         return 1;
     }
 
@@ -17002,9 +17020,13 @@ package Sidef::Types::Number::Number {
         my %seen;
 
         foreach my $n (@vals) {
-            my $str = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
+            my $str = ref($$n) ? (_big2uistr($$n) // return Sidef::Types::Bool::Bool::FALSE) : $$n;
             next if $seen{$str}++;
-            Math::Prime::Util::GMP::is_euler_plumb_pseudoprime($str)
+            (
+             (HAS_PRIME_UTIL and $str < ULONG_MAX)
+             ? Math::Prime::Util::is_euler_plumb_pseudoprime($str)
+             : Math::Prime::Util::GMP::is_euler_plumb_pseudoprime($str)
+            )
               || return Sidef::Types::Bool::Bool::FALSE;
             push @strs, $str;
         }
@@ -18419,7 +18441,17 @@ package Sidef::Types::Number::Number {
 
     sub is_plumb_pseudoprime {
         my ($n) = @_;
+
         $n = $$n;
+
+        if (HAS_PRIME_UTIL and !ref($n)) {
+            return (
+                    Math::Prime::Util::is_euler_plumb_pseudoprime($n)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         __is_int__($n)
           && Math::Prime::Util::GMP::is_euler_plumb_pseudoprime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
@@ -18434,7 +18466,17 @@ package Sidef::Types::Number::Number {
 
     sub is_perrin_pseudoprime {
         my ($n) = @_;
+
         $n = $$n;
+
+        if (HAS_PRIME_UTIL and !ref($n)) {
+            return (
+                    Math::Prime::Util::is_perrin_pseudoprime($n)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         __is_int__($n)
           && Math::Prime::Util::GMP::is_perrin_pseudoprime(_big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE))
           ? Sidef::Types::Bool::Bool::TRUE
@@ -18469,6 +18511,14 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
+        if (HAS_PRIME_UTIL and !ref($n)) {
+            return (
+                    Math::Prime::Util::is_frobenius_underwood_pseudoprime($n)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         __is_int__($n)
           && Math::Prime::Util::GMP::is_frobenius_underwood_pseudoprime(_big2uistr($n)
                                                                         // (return Sidef::Types::Bool::Bool::FALSE))
@@ -18484,7 +18534,17 @@ package Sidef::Types::Number::Number {
 
     sub is_frobenius_khashin_pseudoprime {
         my ($n) = @_;
+
         $n = $$n;
+
+        if (HAS_PRIME_UTIL and !ref($n)) {
+            return (
+                    Math::Prime::Util::is_frobenius_khashin_pseudoprime($n)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         __is_int__($n)
           && Math::Prime::Util::GMP::is_frobenius_khashin_pseudoprime(_big2uistr($n)
                                                                       // (return Sidef::Types::Bool::Bool::FALSE))
