@@ -224,12 +224,10 @@ package Sidef::Types::Number::Polynomial {
                   map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}->eval($value)) } CORE::keys %$x);
     }
 
-    sub keys {
+    sub exponents {
         my ($x) = @_;
         Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number::_set_int($_) } sort { $a <=> $b } CORE::keys(%$x));
     }
-
-    *exponents = \&keys;
 
     sub coeff {
         my ($x, $key) = @_;

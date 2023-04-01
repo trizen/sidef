@@ -263,6 +263,14 @@ Returns the
 
 =cut
 
+=head2 exponents
+
+    x.exponents
+
+Returns the
+
+=cut
+
 =head2 float
 
     x.float
@@ -364,16 +372,6 @@ Returns the
     x.is_zero
 
 Returns the
-
-=cut
-
-=head2 keys
-
-    x.keys
-
-Returns the
-
-Aliases: I<exponents>
 
 =cut
 

@@ -15,7 +15,7 @@ assert_eq(a2, [6])
 
 do {
     var t = { 'JSON'.require }.ffork.wait
-    assert_eq(t.new.encode(Hash(a => 1)), %({"a":"1"}))
+    assert_eq(t.new.encode(Hash(a => 1)), %({"a":1}))
 }
 
 do {

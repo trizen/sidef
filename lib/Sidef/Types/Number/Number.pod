@@ -216,7 +216,7 @@ When C<a> and C<b> are integers, this is equivalent with:
 
     floor(a/b)
 
-Aliases: I<fld>, I<idiv>, I<idiv_floor>
+Aliases: I<divint>, I<fld>, I<idiv>, I<idiv_floor>
 
 =cut
 
@@ -446,7 +446,7 @@ Aliases: I<mu>, I<mobius>, I<möbius>, I<moebius>
 
 Returns the product of a given list of numbers.
 
-Aliases: I<prod>
+Aliases: I<prod>, I<vecprod>
 
 =cut
 
@@ -480,7 +480,7 @@ Aliases: I<pi>
 
 Returns the sum of a given list of numbers.
 
-Aliases: I<sum>
+Aliases: I<sum>, I<vecsum>
 
 =cut
 
@@ -746,6 +746,18 @@ Returns true if all the given values are positive composite numbers.
     all_prime(...)
 
 Returns true if all the given values are prime numbers.
+
+=cut
+
+=head2 allsqrtmod
+
+    allsqrtmod(a, n)
+
+Given two integers C<a> and C<n>, return a sorted array of all modular square roots of C<a> mod C<|n|>. If no square root exists, an empty array is returned.
+
+    say allsqrtmod(4095, 8469)     #=> [1110, 1713, 3933, 4536, 6756, 7359]
+
+Aliases: I<sqrtmod_all>
 
 =cut
 
@@ -2258,7 +2270,7 @@ Aliases: I<divisors_sum>
 
 When only two arguments are provided, it returns C<(a//b, a%b)>.
 
-    say [divmod(23, 10)]    #=> [2,3]
+    say [divmod(23, 10)]    #=> [2, 3]
 
 When three arguments are given, it does integer modular division: C<(a/b) % m>.
 
@@ -3238,11 +3250,23 @@ Multiplies C<x> by the imaginary unit C<i>.
 
 =cut
 
+=head2 iabs
+
+    iabs(n)
+
+integer absolute value, by first truncating C<n> to an integer.
+
+Aliases: I<absint>
+
+=cut
+
 =head2 iadd
 
     iadd(a,b)
 
 Integer addition: C<a+b>.
+
+Aliases: I<addint>
 
 =cut
 
@@ -3252,11 +3276,23 @@ Integer addition: C<a+b>.
 
 Integer cube root of C<n>.
 
+Aliases: I<cbrtint>
+
+=cut
+
+=head2 icmp
+
+    x.icmp(y)
+
+Integer comparison, by first truncating C<x> and C<y> to integers.
+
+Aliases: I<cmpint>
+
 =cut
 
 =head2 idivisors
 
-    idivisors(n)
+    n.idivisors
 
 Returns an array with the infinitary divisors (or i-divisors) of C<n>.
 
@@ -3273,6 +3309,8 @@ Aliases: I<infinitary_divisors>
 Integer logarithm of C<n> to base C<b>, satisfying:
 
     b**ilog(n,b) <= n < b**(ilog(n,b)+1)
+
+Aliases: I<logint>
 
 =cut
 
@@ -3312,6 +3350,8 @@ Aliases: I<imag>, I<imaginary>
 
 Integer remainder of C<a> when divided by C<m>: C<a % m>.
 
+Aliases: I<modint>
+
 =cut
 
 =head2 imul
@@ -3319,6 +3359,18 @@ Integer remainder of C<a> when divided by C<m>: C<a % m>.
     imul(a,b)
 
 Integer multiplication: C<a*b>.
+
+Aliases: I<mulint>
+
+=cut
+
+=head2 ineg
+
+    ineg(n)
+
+Integer negation, by first truncating C<n> to an integer.
+
+Aliases: I<negint>
 
 =cut
 
@@ -3332,10 +3384,10 @@ Returns the positive Infinity special floating-point value.
 
 =head2 int
 
-    int(x)
-    trunc(x)
+    int(n)
+    trunc(n)
 
-Truncate C<x> to an integer.
+Truncate C<n> to an integer.
 
 Aliases: I<to_i>, I<to_int>, I<trunc>
 
@@ -3343,9 +3395,9 @@ Aliases: I<to_i>, I<to_int>, I<trunc>
 
 =head2 inv
 
-    inv(x)
+    inv(n)
 
-Multiplicative inverse of C<x>: C<1/x>.
+Multiplicative inverse of C<n>: C<1/n>.
 
 =cut
 
@@ -3584,6 +3636,8 @@ Second integer k-gonal root of C<n>.
 
 Integer exponentiation: C<b^n>.
 
+Aliases: I<powint>
+
 =cut
 
 =head2 ipow10
@@ -3637,6 +3691,8 @@ If C<a> is greater than C<b>, the returned integer will be in the range C<b..a>.
     n.iroot(k)
 
 Integer k-th root of C<n>.
+
+Aliases: I<rootint>
 
 =cut
 
@@ -4399,6 +4455,8 @@ Returns true if C<n> is a k-gonal pyramidal number.
 
 Integer square root of C<n>.
 
+Aliases: I<sqrtint>
+
 =cut
 
 =head2 isqrtrem
@@ -4623,6 +4681,8 @@ Given an integer C<n>, returns true if there exists an integer C<x> such that C<
     isub(a,b)
 
 Integer subtraction: C<a-b>.
+
+Aliases: I<subint>
 
 =cut
 
@@ -5089,6 +5149,8 @@ The Mangoldt function. For the exponential values, see C<exp_mangoldt>.
 
 Returns the maximum value from a list of numbers.
 
+Aliases: I<vecmax>
+
 =cut
 
 =head2 mbe_factor
@@ -5168,6 +5230,8 @@ Return true if C<n> passes the Miller-Rabin primality test with C<k> random base
     min(...)
 
 Returns the smallest value from a list of numbers.
+
+Aliases: I<vecmin>
 
 =cut
 
@@ -7378,16 +7442,6 @@ Modular square root of C<a>, returning a solution C<r>, such that C<r^2 = a (mod
 
     say sqrtmod(544, 800)         #=> 512
     say sqrtmod(436, 1752)        #=> 1010
-
-=cut
-
-=head2 sqrtmod_all
-
-    sqrtmod_all(a, n)
-
-Given two integers C<a> and C<n>, return a sorted array of all modular square roots of C<a> mod C<|n|>. If no square root exists, an empty array is returned.
-
-    say sqrtmod_all(4095, 8469)     #=> [1110, 1713, 3933, 4536, 6756, 7359]
 
 =cut
 

@@ -3163,6 +3163,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *addint = \&iadd;
+
     sub isub {
         my ($x, $y) = @_;
 
@@ -3183,6 +3185,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *subint = \&isub;
+
     sub imul {
         my ($x, $y) = @_;
 
@@ -3202,6 +3206,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_mul($r, $x, $y);
         bless \$r;
     }
+
+    *mulint = \&imul;
 
     sub imod {
         my ($x, $y) = @_;
@@ -3234,6 +3240,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *modint = \&imod;
+
     sub idiv {
         my ($x, $y) = @_;
 
@@ -3242,11 +3250,19 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($x) and !ref($y) and $x > 0 and $y > 0) {
-            return _set_int(Math::Prime::Util::divint($x, $y));
+        if (!ref($x) and !ref($y) and $x >= 0 and $y > 0) {
+            return _set_int(HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($x, $y) : Math::Prime::Util::GMP::divint($x, $y));
         }
 
         $x = _any2mpz($x) // (goto &nan);
+
+        if (!ref($y) and $y > 0) {
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_div_ui($r, $x, $y);
+            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+            return bless \$r;
+        }
+
         $y = _any2mpz($y) // (goto &nan);
 
         # Detect division by zero
@@ -3272,6 +3288,7 @@ package Sidef::Types::Number::Number {
 
     *fld        = \&idiv;
     *idiv_floor = \&idiv;
+    *divint     = \&idiv;
 
     sub idiv_ceil {
         my ($x, $y) = @_;
@@ -3414,6 +3431,13 @@ package Sidef::Types::Number::Number {
         bless \__neg__($$x);
     }
 
+    sub ineg {
+        my ($x) = @_;
+        $x->to_i->neg;
+    }
+
+    *negint = \&ineg;
+
     sub __abs__ {
         my ($x) = @_;
         goto((ref($x) || return CORE::abs($x)) =~ tr/:/_/rs);
@@ -3450,6 +3474,13 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         bless \__abs__($$x);
     }
+
+    sub iabs {
+        my ($x) = @_;
+        $x->to_i->abs;
+    }
+
+    *absint = \&iabs;
 
     sub __inv__ {
         my ($x) = @_;
@@ -3641,6 +3672,8 @@ package Sidef::Types::Number::Number {
         bless \__iroot__(_any2mpz($x) // (goto &nan), $y);
     }
 
+    *rootint = \&iroot;
+
     sub isqrt {
         my ($x) = @_;
 
@@ -3659,6 +3692,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *sqrtint = \&isqrt;
+
     sub icbrt {
         my ($x) = @_;
 
@@ -3670,6 +3705,8 @@ package Sidef::Types::Number::Number {
 
         bless \__iroot__(_any2mpz($x) // (goto &nan), 3);
     }
+
+    *cbrtint = \&icbrt;
 
     sub isqrtrem {
         my ($x) = @_;
@@ -4002,6 +4039,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *powint = \&ipow;
+
     sub ipow2 {
         my ($n) = @_;
 
@@ -4225,6 +4264,8 @@ package Sidef::Types::Number::Number {
             bless \(_any2mpz(__log__(_any2mpfr_mpc($$x))) // goto &nan);
         }
     }
+
+    *logint = \&ilog;
 
     sub ilog2 {
         my ($x) = @_;
@@ -6715,6 +6756,14 @@ package Sidef::Types::Number::Number {
         }
     }
 
+    sub icmp {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        $x->to_i->cmp->($y->to_i);
+    }
+
+    *cmpint = \&icmp;
+
     sub cmp {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -7219,7 +7268,8 @@ package Sidef::Types::Number::Number {
         $r;
     }
 
-    *Σ = \&sum;
+    *Σ      = \&sum;
+    *vecsum = \&sum;
 
     sub prod {
         my (@vals) = @_;
@@ -7253,7 +7303,8 @@ package Sidef::Types::Number::Number {
         return $r;
     }
 
-    *Π = \&prod;
+    *Π       = \&prod;
+    *vecprod = \&prod;
 
     sub max {
         my (@vals) = @_;
@@ -7270,6 +7321,8 @@ package Sidef::Types::Number::Number {
         $max;
     }
 
+    *vecmax = \&max;
+
     sub min {
         my (@vals) = @_;
         _valid(\(@vals));
@@ -7284,6 +7337,8 @@ package Sidef::Types::Number::Number {
 
         $min;
     }
+
+    *vecmin = \&min;
 
     sub as_int {
         my ($x, $y) = @_;
@@ -8526,6 +8581,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sub($r, $n, _any2mpz($$sum));    # r = n-sum
         Math::GMPz::Rmpz_divexact($r, $r, $t);            # r = r/t
 
+        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
+
         bless \$r;
     }
 
@@ -9438,6 +9495,8 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Array::Array->new(\@roots);
     }
 
+    *allsqrtmod = \&sqrtmod_all;
+
     sub difference_of_squares {
         my ($n) = @_;
 
@@ -10149,6 +10208,8 @@ package Sidef::Types::Number::Number {
         ((bless \$q), (bless \$r));
     }
 
+    *divrem = \&divmod;
+
     sub and {
         my ($x, $y) = @_;
 
@@ -10535,6 +10596,7 @@ package Sidef::Types::Number::Number {
         $n = _any2ui($$n) // goto &nan;
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_fac_ui($r, $n);
+        $r = Math::GMPz::Rmpz_get_ui($r) if ($n <= ((CORE::log(ULONG_MAX) / CORE::log(2) <= 32) ? 12 : 20));
         bless \$r;
     }
 
@@ -12088,6 +12150,7 @@ package Sidef::Types::Number::Number {
         if (!ref($x) and $x <= 1e6 and $x >= 0 and $y >= 0) {
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_bin_uiui($r, $x, $y);
+            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
             return bless \$r;
         }
 
@@ -12098,6 +12161,8 @@ package Sidef::Types::Number::Number {
         ($y < 0)
           ? Math::GMPz::Rmpz_bin_si($r, $x, $y)
           : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
+
+        $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
 
         bless \$r;
     }
@@ -19914,13 +19979,8 @@ package Sidef::Types::Number::Number {
 
         my @pairs;
         foreach my $pk (_factor_exp($n)) {
-
             my ($p, $k) = @$pk;
-
-            $p = _set_int($p);
-            $k = _set_int($k);
-
-            push @pairs, bless([$p, $k], 'Sidef::Types::Array::Array');
+            push @pairs, bless([(($p < ULONG_MAX) ? (bless \$p) : _set_int($p)), (bless \$k)], 'Sidef::Types::Array::Array');
         }
 
         Sidef::Types::Array::Array->new(\@pairs);
@@ -21030,23 +21090,36 @@ package Sidef::Types::Number::Number {
 
         my $s = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_sqrt($s, $n);
-
-        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
-
-        my $t = bless \Math::GMPz::Rmpz_init_set_ui(0);
-        my $u = bless \Math::GMPz::Rmpz_init_set_ui(0);
-
         Math::GMPz::Rmpz_fits_slong_p($s) || goto &nan;
+
+        my $q_obj;
+        my $native_n = Math::GMPz::Rmpz_fits_ulong_p($n);
+
+        if ($native_n) {
+            $n = Math::GMPz::Rmpz_get_ui($n);
+        }
+        else {
+            $q_obj = bless \Math::GMPz::Rmpz_init_set_ui(0);
+        }
+
+        my $sum = 0;
 
         foreach my $k (1 .. Math::GMPz::Rmpz_get_ui($s)) {
 
-            Math::GMPz::Rmpz_set_ui($$t, $k);
-            Math::GMPz::Rmpz_div_ui($$u, $n, $k);
+            if ($native_n) {
+                $q_obj = bless \(my $r =
+                            (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($n, $k) : Math::Prime::Util::GMP::divint($n, $k)));
+            }
+            else {
+                Math::GMPz::Rmpz_div_ui($$q_obj, $n, $k);
+            }
 
-            my $f_r = $f->run($t);
-            my $g_r = $g->run($t);
-            my $F_r = $F->run($u);
-            my $G_r = $G->run($u);
+            my $k_obj = bless \$k;
+
+            my $f_r = $f->run($k_obj);
+            my $g_r = $g->run($k_obj);
+            my $F_r = $F->run($q_obj);
+            my $G_r = $G->run($q_obj);
 
             $f_r = $f_r->to_n if ref($f_r) ne __PACKAGE__;
             $g_r = $g_r->to_n if ref($g_r) ne __PACKAGE__;
@@ -21058,17 +21131,7 @@ package Sidef::Types::Number::Number {
             $F_r = $$F_r;
             $G_r = $$G_r;
 
-            if (    ref($f_r) eq 'Math::GMPz'
-                and ref($g_r) eq 'Math::GMPz'
-                and ref($F_r) eq 'Math::GMPz'
-                and ref($G_r) eq 'Math::GMPz'
-                and ref($sum) eq 'Math::GMPz') {
-                Math::GMPz::Rmpz_addmul($sum, $f_r, $G_r);
-                Math::GMPz::Rmpz_addmul($sum, $g_r, $F_r);
-            }
-            else {
-                $sum = __add__($sum, __add__(__mul__($f_r, $G_r), __mul__($g_r, $F_r)));
-            }
+            $sum = __add__($sum, __add__(__mul__($f_r, $G_r), __mul__($g_r, $F_r)));
         }
 
         $sum = __sub__($sum, __mul__(${$F->run(_set_int($s))->to_n}, ${$G->run(_set_int($s))->to_n}));
