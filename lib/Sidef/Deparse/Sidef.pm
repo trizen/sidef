@@ -171,11 +171,11 @@ package Sidef::Deparse::Sidef {
 
         state $table = {
             '@inf@'  => q{Inf},
-            '-@inf@' => q{Inf.neg},
+            '-@inf@' => q{Inf->neg()},
             '@nan@'  => q{NaN},
 
             'inf'  => q{Inf},
-            '-inf' => q{Inf.neg},
+            '-inf' => q{Inf->neg()},
             'nan'  => q{NaN},
                        };
 
@@ -193,10 +193,7 @@ package Sidef::Deparse::Sidef {
         }
 
         $table->{lc($str)} // do {
-            if ($str eq 'Inf' or $str eq 'Inf.neg' or $str eq 'NaN') {
-                $str;
-            }
-            elsif ($type eq 'float') {
+            if ($type eq 'float') {
                 $str . 'f';
             }
             elsif (index($str, '/') != -1) {
@@ -560,7 +557,7 @@ package Sidef::Deparse::Sidef {
             }
         }
         elsif ($ref eq 'Sidef::Variable::Magic') {
-            $code = $obj->{name};
+            $code = $obj->{dump} // $obj->{name};
         }
         elsif ($ref eq 'Sidef::Types::Hash::Hash') {
             $code = $obj->dump->get_value;
@@ -649,6 +646,28 @@ package Sidef::Deparse::Sidef {
                         }
                     }
                     else {
+
+                        if ($ref eq 'Sidef::Operator::Unary' and $method eq '-' and $code eq '') {
+
+                            # Constant-folding: negate the literal number
+                            my $data = $call->{arg};
+                            if (scalar(@$data) == 1 and ref($data->[0]) eq 'HASH' and scalar(keys %{$data->[0]}) == 1) {
+                                $data = $data->[0];
+                                my ($class) = keys(%$data);
+                                $data = $data->{$class};
+                                if (ref($data) eq 'ARRAY' and scalar(@$data) == 1) {
+                                    $data = $data->[0];
+                                    if (ref($data) eq 'HASH' and scalar(keys %$data) == 1 and exists($data->{self})) {
+                                        $data = $data->{self};
+                                    }
+                                    if (ref($data) eq 'Sidef::Types::Number::Number') {
+                                        $code = $self->deparse_expr({self => $data->neg});
+                                        next;
+                                    }
+                                }
+                            }
+                        }
+
                         if ($ref eq 'Sidef::Variable::Ref' or $ref eq 'Sidef::Operator::Unary') {
                             $code .= $method;
                         }

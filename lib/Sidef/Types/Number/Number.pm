@@ -276,7 +276,7 @@ package Sidef::Types::Number::Number {
         if ($type eq 'int') {
 
             if ($str < ULONG_MAX and $str > LONG_MIN) {
-                return (bless \$str);
+                return (bless \(my $o = 0 + $str));
             }
 
             bless \Math::GMPz::Rmpz_init_set_str("$str", 10);
@@ -1678,7 +1678,7 @@ package Sidef::Types::Number::Number {
             }
 
             #$im = '' if $im eq '1';
-            return ($re eq '0' ? $sign eq '+' ? "${im}i" : "$sign${im}i" : "$re$sign${im}i");
+            return ($re eq '0' ? $sign eq '+' ? "${im}i" : "$sign${im}i" : "$re $sign ${im}i");
         }
     }
 
@@ -3781,6 +3781,9 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($r, $x, $y);
                 return $r;
             }
+            elsif ($x == -1) {
+                return (($y % 2 == 0) ? 1 : -1);
+            }
             elsif ($x < 0 and $y > 0) {
                 if (CORE::log(CORE::abs($x)) * $y < CORE::log(CORE::abs(LONG_MIN))) {
                     my $r = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::powint($x, $y) : Math::Prime::Util::GMP::powint($x, $y));
@@ -3822,6 +3825,8 @@ package Sidef::Types::Number::Number {
         ## GMPq
         #
       Math_GMPq__Scalar: {
+
+            $y || return 1;
 
             my $r = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_pow_ui($r, $x, CORE::abs($y));
@@ -4024,6 +4029,10 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_ui_pow_ui($r, $x, $y);
             $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
             return bless \$r;
+        }
+
+        if (!ref($x) and $x == -1) {
+            return (($y % 2 == 0) ? ONE : MONE);
         }
 
         $x = _any2mpz($x) // goto &nan;
@@ -24396,11 +24405,15 @@ package Sidef::Types::Number::Number {
     sub _sieve_omega_primes {
         my ($from, $to, $k, %opt) = @_;
 
-        return [1] if ($k == 0 and $to >= 1 and $from <= 1);
-        return []  if ($k == 0);
-
         my $fermat = $opt{fermat};
         my $strong = $opt{strong};
+
+        if ($fermat) {
+            return [] if ($k < 1);
+        }
+
+        return [1] if ($k == 0 and $to >= 1 and $from <= 1);
+        return []  if ($k == 0);
 
         my @omega_primes;
 

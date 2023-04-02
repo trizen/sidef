@@ -81,7 +81,7 @@ is("$r", "1033.55177121");
 
 $r = $float2->pow($o->new("4.23"));
 is(ref($r), 'Sidef::Types::Number::Number');
-like("$r", qr/^1155\.531831861.*?\+1018\.7383470368.*?i\z/);
+like("$r", qr/^1155\.531831861.*?\s*\+\s*1018\.7383470368.*?i\z/);
 
 $r = $o->new(0)->pow($int2);
 is(ref($r),  'Sidef::Types::Number::Number');

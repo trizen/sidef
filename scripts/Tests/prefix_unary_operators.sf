@@ -12,4 +12,26 @@ assert_eq([-(3)+4], [1])
 assert_eq([-(3)-4], [-7])
 assert_eq(@(1..9)-[3,5], [1,2,4,6,7,8,9])
 
+assert_eq([43-(-(42))], [85])
+assert_eq([((43))-(-(42))], [85])
+assert_eq([+(43)-(-(42))], [85])
+assert_eq([(-(42))-+(43)], [-85])
+assert_eq([(-(42))-(-(43))], [1])
+assert_eq([(x)-(-(43))], [46])
+assert_eq([(x)-(-(y))], [7])
+assert_eq([-(x)-(-(y))], [1])
+assert_eq([(-(x))-(-(y))], [1])
+assert_eq([(-(-(3)))-(-(y))], [7])
+assert_eq([(-(42))-(43)], [-85])
+assert_eq([(-(42))-43], [-85])
+
+assert_eq(-x**2, -9)
+assert_eq(-(x**2), -9)
+assert_eq(-(x)**2, 9)
+
+assert_eq(-42**2, -1764)
+assert_eq(-(42)**2, 1764)
+assert_eq(-(42) -> pow(2), 1764)
+assert_eq(-(42**2), -1764)
+
 say "** Test passed!"

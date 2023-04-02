@@ -644,6 +644,11 @@ package Sidef::Types::Range::Range {
         $self->new($self->{from}->div($arg), $self->{to}->div($arg), $self->{step});
     }
 
+    sub neg {
+        my ($self) = @_;
+        $self->new($self->{from}->neg, $self->{to}, $self->{step});
+    }
+
     sub eq {
         my ($r1, $r2) = @_;
 

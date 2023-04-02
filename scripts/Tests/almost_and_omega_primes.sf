@@ -106,4 +106,9 @@ assert(43**20 * 101**2 -> is_almost_prime(22))
 assert(43**20 * 101**2 -> is_omega_prime(2))
 assert(19 * 43**20 * 101 -> is_omega_prime(3))
 
+assert_eq(0.strong_fermat_psp(2, 0, 1000), [])
+assert_eq(0.fermat_psp(2, 0, 1000), [])
+assert_eq(0.carmichael(0, 1000), [])
+assert_eq(0.lucas_carmichael(0, 1000), [])
+
 say "** Tests passed!"

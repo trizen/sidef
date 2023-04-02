@@ -121,8 +121,8 @@ package Sidef::Parser {
                      | \$;                            (?{ state $x = bless({name => '$;'}, 'Sidef::Variable::Magic') })
                      | \$,                            (?{ state $x = bless({name => '$,'}, 'Sidef::Variable::Magic') })
                      | \$\^O\b                        (?{ state $x = bless({name => '$^O'}, 'Sidef::Variable::Magic') })
-                     | \$\^PERL\b                     (?{ state $x = bless({name => '$^X'}, 'Sidef::Variable::Magic') })
-                     | (?:\$0|\$\^SIDEF)\b            (?{ state $x = bless({name => '$0'}, 'Sidef::Variable::Magic') })
+                     | \$\^PERL\b                     (?{ state $x = bless({name => '$^X', dump => '$^PERL'}, 'Sidef::Variable::Magic') })
+                     | (?:\$0|\$\^SIDEF)\b            (?{ state $x = bless({name => '$0', dump => '$^SIDEF'}, 'Sidef::Variable::Magic') })
                      | \$\)                           (?{ state $x = bless({name => '$)'}, 'Sidef::Variable::Magic') })
                      | \$\(                           (?{ state $x = bless({name => '$('}, 'Sidef::Variable::Magic') })
                      | \$<                            (?{ state $x = bless({name => '$<'}, 'Sidef::Variable::Magic') })
@@ -2211,7 +2211,7 @@ package Sidef::Parser {
             }
 
             # Integer or float number
-            if (/\G([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
+            if (/\G([+]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
                 my $num = $1 =~ tr/_//dr;
 
                 if (/\Gi\b/gc) {    # imaginary

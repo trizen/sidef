@@ -240,6 +240,8 @@ assert_eq(powmod(Gaussian(43, 99), -5, 1234567), invmod(Gaussian(43, 99)**5, 123
 assert_eq(powmod(Gaussian(43, 99), -4, 1234567), invmod(powmod(Gaussian(43, 99), 4, 1234567), 1234567))
 assert_eq(powmod(Gaussian(43, 99), -5, 1234567), invmod(powmod(Gaussian(43, 99), 5, 1234567), 1234567))
 
+assert_eq(Quadratic(Gauss(3,4), Gauss(5,6), 2).powmod(43, 97), Quadratic(Gauss(52, 44), Gauss(92, 8), 2))
+
 assert_eq(Gaussian(43, 97)**(-5), (Gaussian(43,97)**5)**(-1))
 assert_eq(Gaussian(43, 97)**(-5), (Gaussian(43,97)**5).inv)
 assert_eq(Gaussian(43, 97)**(-5), (Gaussian(43,97).inv)**5)
@@ -256,7 +258,7 @@ assert_eq(Mod(Gaussian(3,4), 1234567)**-1234 -> lift, powmod(Gaussian(3,4), -123
 assert_eq(Gaussian(3/5,11/4)**(-27), Gaussian(3/5,11/4)**27 -> inv)
 assert_eq(Gaussian(3/5,11/4)**(-27), Gaussian(3/5,11/4).inv**27)
 
-assert_eq(Gaussian(Gaussian(3,4), Gaussian(17,19)).to_n.to_n, -16+21i)
+assert_eq(Gaussian(Gaussian(3,4), Gaussian(17,19)).to_n.to_n, -16 + 21i)
 assert_eq(Gaussian(Mod(13, 97), Mod(43, 97)).to_n.to_n, 13+43i)
 assert_eq(Gaussian(Mod(13, 97), Mod(43, 97)), Gaussian(Mod(13, 97), Mod(43, 97)))
 assert_eq(Mod(Gaussian(3, 4), 97)*1234, Mod(Gaussian(16, 86), 97))

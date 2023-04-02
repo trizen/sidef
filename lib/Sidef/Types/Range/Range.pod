@@ -343,6 +343,14 @@ Returns the
 
 =cut
 
+=head2 neg
+
+    self.neg
+
+Returns the
+
+=cut
+
 =head2 new
 
     self.new

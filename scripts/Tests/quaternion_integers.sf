@@ -148,6 +148,6 @@ assert(%n[2, 5, 7, 11, 17, 19, 79, 163, 193, 239, 317, 353, 659, 709, 1049, 1103
 })
 
 assert_eq(43 % Quaternion(15,17,19,23), Quaternion(43) % Quaternion(15,17,19,23))
-assert_eq(Str(Quaternion(Quaternion(3,Quaternion(5,13)),4).to_n), "-10+9i")
+assert_eq(Str(Quaternion(Quaternion(3,Quaternion(5,13)),4).to_n), "-10 + 9i")
 
 say "** Test passed!"

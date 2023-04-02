@@ -117,6 +117,6 @@ assert_eq(Fraction(160/7,9).round, round((160/7)/9))
 assert_eq(43 % Fraction(29, 13), Fraction(43, 1) % Fraction(29, 13))
 assert_eq(19 % Fraction(7,15), 19 % 7/15)
 assert_eq(Str(Fraction(Fraction(3, 13), Fraction(4, 99)).to_n.dump), "297/52")
-assert_eq(Str(Fraction(Fraction(12, 5), Gauss(10, 5)).to_n), "0.192-0.096i")
+assert_eq(Str(Fraction(Fraction(12, 5), Gauss(10, 5)).to_n), "0.192 - 0.096i")
 
 say "** Test passed!"

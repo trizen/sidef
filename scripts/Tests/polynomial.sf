@@ -131,7 +131,7 @@ assert_eq(
 
 assert_eq(
     Poly([3,4,3+4i, 9]).to_s,
-    "3*x^3 + 4*x^2 + (3+4i)*x + 9"
+    "3*x^3 + 4*x^2 + (3 + 4i)*x + 9"
 )
 
 assert_eq(
