@@ -33,5 +33,6 @@ assert_eq(-42**2, -1764)
 assert_eq(-(42)**2, 1764)
 assert_eq(-(42) -> pow(2), 1764)
 assert_eq(-(42**2), -1764)
+assert_eq(-(x+y), -7)
 
 say "** Test passed!"

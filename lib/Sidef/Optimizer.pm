@@ -7,6 +7,11 @@ package Sidef::Optimizer {
     use constant {
                   STRING        => 'Sidef::Types::String::String',
                   NUMBER        => 'Sidef::Types::Number::Number',
+                  MOD           => 'Sidef::Types::Number::Mod',
+                  GAUSS         => 'Sidef::Types::Number::Gauss',
+                  FRACTION      => 'Sidef::Types::Number::Fraction',
+                  QUADRATIC     => 'Sidef::Types::Number::Quadratic',
+                  QUATERNION    => 'Sidef::Types::Number::Quaternion',
                   REGEX         => 'Sidef::Types::Regex::Regex',
                   BOOL          => 'Sidef::Types::Bool::Bool',
                   ARRAY         => 'Sidef::Types::Array::Array',
@@ -118,7 +123,7 @@ package Sidef::Optimizer {
         \%tree;
     }
 
-    state $rules = {
+    my %rules = (
         (STRING) => build_tree(
 
             # String.method(String)
@@ -281,7 +286,242 @@ package Sidef::Optimizer {
             ),
         ),
 
+        (MOD) => build_tree(
+
+            # Mod.method()
+            (
+                map { [$_, []] } methods(
+                    MOD, qw(
+                      abs dump fib lucas inv
+                      is_inf is_mone is_nan
+                      is_neg is_ninf is_one
+                      is_pos is_real is_zero
+                      lift neg norm pretty
+                      re sqr sqrt to_s znorder
+                      not chinese factorial
+                      inc dec eval
+                      )
+                )
+            ),
+
+            # Mod.method(Mod | Number)
+            (
+                map { [$_, [table(MOD, NUMBER)]] } methods(
+                    MOD, qw(
+                      + - / * %
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      eval ChebyshevT ChebyshevU cyclotomic
+                      )
+                )
+            ),
+
+            # Mod.method(Number)
+            (
+                map { [$_, [table(MOD, NUMBER)]] } methods(
+                    MOD, qw(
+                      << >> **
+                      ChebyshevT ChebyshevU cyclotomic
+                      )
+                )
+            ),
+
+            # Mod.method(Mod)
+            (
+                map { [$_, [table(MOD)]] } methods(
+                    MOD, qw(
+                      chinese
+                      )
+                )
+            ),
+
+            # Mod.method(Number, Number, Number)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    MOD, qw(
+                      LucasU LucasV
+                      )
+                )
+            ),
+        ),
+
+        (FRACTION) => build_tree(
+
+            # Fraction.method()
+            (
+                map { [$_, []] } methods(
+                    FRACTION, qw(
+                      nu de abs ceil floor trunc dump
+                      float inv inc dec
+                      is_mone is_nan is_one
+                      is_real is_zero lift neg
+                      parts pretty round eval
+                      sgn sqr to_s to_n not
+                      )
+                )
+            ),
+
+            # Fraction.method(Fraction | Number)
+            (
+                map { [$_, [table(FRACTION, NUMBER)]] } methods(
+                    FRACTION, qw(
+                      + - / * % ** << >>
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      eval invmod round
+                      )
+                )
+            ),
+
+            # Fraction.method(Number, Number)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    FRACTION, qw(
+                      powmod
+                      )
+                )
+            ),
+        ),
+
+        (GAUSS) => build_tree(
+
+            # Gauss.method()
+            (
+                map { [$_, []] } methods(
+                    GAUSS, qw(
+                      a b abs ceil conj dump
+                      float floor i iabs inv inc dec
+                      is_imag is_mone is_one is_prime
+                      is_real is_zero lift neg
+                      norm parts pretty round
+                      sgn sqr to_c to_s not eval
+                      )
+                )
+            ),
+
+            # Gauss.method(Gauss | Number)
+            (
+                map { [$_, [table(GAUSS, NUMBER)]] } methods(
+                    GAUSS, qw(
+                      + - / * % ** << >>
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      gcd gcd_norm eval
+                      invmod is_coprime round
+                      )
+                )
+            ),
+
+            # Gauss.method(Number, Gauss | Number)
+            (
+                map { [$_, [table(NUMBER), table(GAUSS, NUMBER)]] } methods(
+                    GAUSS, qw(
+                      powmod
+                      )
+                )
+            ),
+        ),
+
+        (QUADRATIC) => build_tree(
+
+            # Quadratic.method()
+            (
+                map { [$_, []] } methods(
+                    QUADRATIC, qw(
+                      a b abs ceil conj dump
+                      float floor inv inc dec not
+                      is_mone is_one is_zero eval
+                      lift neg norm order parts
+                      pretty round sgn sqr to_c to_s
+                      )
+                )
+            ),
+
+            # Quadratic.method(Quadratic | Number)
+            (
+                map { [$_, [table(QUADRATIC, NUMBER)]] } methods(
+                    QUADRATIC, qw(
+                      + - / * % ** << >>
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      eval invmod is_coprime round
+                      )
+                )
+            ),
+
+            # Quadratic.method(Number, Number)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    QUADRATIC, qw(
+                      powmod
+                      )
+                )
+            ),
+        ),
+
+        (QUATERNION) => build_tree(
+
+            # Quaternion.method()
+            (
+                map { [$_, []] } methods(
+                    QUATERNION, qw(
+                      a b c d abs ceil conj dump
+                      float floor inv inc dec not
+                      is_mone is_one is_zero
+                      lift neg norm parts
+                      pretty round sgn sqr to_c to_s
+                      to_gauss eval
+                      )
+                )
+            ),
+
+            # Quaternion.method(Quaternion | Number)
+            (
+                map { [$_, [table(QUATERNION, NUMBER)]] } methods(
+                    QUATERNION, qw(
+                      + - / * % ** << >>
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      eval invmod is_coprime round
+                      )
+                )
+            ),
+
+            # Quaternion.method(Number, Number)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    QUATERNION, qw(
+                      powmod
+                      )
+                )
+            ),
+        ),
+
         (NUMBER) => build_tree(
+
+            # Number.method(Number)
+            (
+                map { [$_, [table(MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)]] } methods(
+                    NUMBER, qw(
+                      + - * /
+                      )
+                )
+            ),
 
             # Number.method(Number)
             (
@@ -341,7 +581,7 @@ package Sidef::Optimizer {
                       lnhyperfactorial
                       sqrt isqrt
                       abs int rat float complex
-                      norm conj sqr
+                      norm conj sqr cube
 
                       zeta
                       eta
@@ -449,6 +689,7 @@ package Sidef::Optimizer {
                       ilog10
 
                       isqrt
+                      icbrt
 
                       numerator
                       denominator
@@ -462,6 +703,7 @@ package Sidef::Optimizer {
                       as_frac
 
                       dump
+                      eval
                       commify
                       )
                 )
@@ -764,7 +1006,7 @@ package Sidef::Optimizer {
 
             # Gauss.method(NUMBER)
             (
-                map { [$_, [table(NUMBER)]] } dtypes(
+                map { [$_, [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)]] } dtypes(
                     GAUSS_DT, qw(
                       new call
                       )
@@ -773,7 +1015,13 @@ package Sidef::Optimizer {
 
             # Gauss.method(NUMBER, NUMBER)
             (
-                map { [$_, [table(NUMBER), table(NUMBER)]] } dtypes(
+                map {
+                    [$_,
+                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
+                     ]
+                    ]
+                } dtypes(
                     GAUSS_DT, qw(
                       new call
                       )
@@ -785,7 +1033,13 @@ package Sidef::Optimizer {
 
             # Mod.method(NUMBER, NUMBER)
             (
-                map { [$_, [table(NUMBER), table(NUMBER)]] } dtypes(
+                map {
+                    [$_,
+                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
+                     ]
+                    ]
+                } dtypes(
                     MOD_DT, qw(
                       new call
                       )
@@ -806,7 +1060,13 @@ package Sidef::Optimizer {
 
             # Fraction.method(NUMBER, NUMBER)
             (
-                map { [$_, [table(NUMBER), table(NUMBER)]] } dtypes(
+                map {
+                    [$_,
+                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
+                     ]
+                    ]
+                } dtypes(
                     FRACTION_DT, qw(
                       new call
                       )
@@ -818,7 +1078,14 @@ package Sidef::Optimizer {
 
             # Quadratic.method(NUMBER, NUMBER, NUMBER)
             (
-                map { [$_, [table(NUMBER), table(NUMBER), table(NUMBER)]] } dtypes(
+                map {
+                    [$_,
+                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER)
+                     ]
+                    ]
+                } dtypes(
                     QUADRATIC_DT, qw(
                       new call
                       )
@@ -830,7 +1097,15 @@ package Sidef::Optimizer {
 
             # Quaternion.method(NUMBER, NUMBER, NUMBER, NUMBER)
             (
-                map { [$_, [table(NUMBER), table(NUMBER), table(NUMBER), table(NUMBER)]] } dtypes(
+                map {
+                    [$_,
+                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
+                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
+                     ]
+                    ]
+                } dtypes(
                     QUATERNION_DT, qw(
                       new call
                       )
@@ -944,7 +1219,7 @@ package Sidef::Optimizer {
                 )
             ),
         ),
-    };
+    );
 
     my %addr;
 
@@ -983,13 +1258,13 @@ package Sidef::Optimizer {
                 or $ref eq 'Sidef::Variable::Const'
                 or $ref eq 'Sidef::Variable::Define'
                )
-               and exists($obj->{expr})
+               and exists($obj->{value})
           ) {
             if ($addr{refaddr($obj)}++) {
                 ## ok
             }
             else {
-                $obj->{expr} = {$self->optimize($obj->{expr})};
+                $obj->{value} = {$self->optimize($obj->{value})};
             }
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
@@ -1209,7 +1484,7 @@ package Sidef::Optimizer {
                 #
                 my $optimized = 0;
                 if (    defined($ref_obj)
-                    and exists($rules->{$ref_obj})
+                    and exists($rules{$ref_obj})
                     and ref($method) eq '') {
 
                     my $code = ($cache{join(' ', $ref_obj, $method)} //= UNIVERSAL::can($ref_obj, $method));
@@ -1217,7 +1492,7 @@ package Sidef::Optimizer {
                     if (defined $code) {
                         my $obj_call = $obj->{call}[$i];
 
-                        my $ref = $rules->{$ref_obj};
+                        my $ref = $rules{$ref_obj};
                         if (exists($ref->{$code}) and (exists($obj_call->{arg}) ? ($#{$obj_call->{arg}} == 0) : 1)) {
                             $ref = $ref->{$code};
 
