@@ -267,6 +267,22 @@ Returns the
 
 =cut
 
+=head2 inv
+
+    x.inv
+
+Returns the
+
+=cut
+
+=head2 invmod
+
+    x.invmod(n)
+
+Returns the
+
+=cut
+
 =head2 is_mone
 
     x.is_mone
@@ -351,6 +367,22 @@ Returns the
 
 =cut
 
+=head2 parts
+
+    self.parts
+
+Returns the
+
+=cut
+
+=head2 powmod
+
+    x.powmod(n, m)
+
+Returns the
+
+=cut
+
 =head2 pretty
 
     x.pretty
@@ -364,6 +396,14 @@ Aliases: I<stringify>
 =head2 round
 
     x.round
+
+Returns the
+
+=cut
+
+=head2 sqr
+
+    x.sqr
 
 Returns the
 

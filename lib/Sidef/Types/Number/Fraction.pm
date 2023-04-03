@@ -110,6 +110,10 @@ package Sidef::Types::Number::Fraction {
         ($_[0]->{a}, $_[0]->{b});
     }
 
+    sub parts {
+        Sidef::Types::Array::Array->new([$_[0]->nude]);
+    }
+
     sub neg {
         my ($x) = @_;
         __PACKAGE__->new($x->{a}->neg, $x->{b});
@@ -165,6 +169,21 @@ package Sidef::Types::Number::Fraction {
         __PACKAGE__->new($x->{a}->mul($y), $x->{b});
     }
 
+    sub sqr {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{a}->mul($x->{a}), $x->{b}->mul($x->{b}));
+    }
+
+    sub inv {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{b}, $x->{a});
+    }
+
+    sub invmod {
+        my ($x, $n) = @_;
+        $x->inv->mod($n);
+    }
+
     sub div {
         my ($x, $y) = @_;
 
@@ -184,6 +203,36 @@ package Sidef::Types::Number::Fraction {
         }
 
         __PACKAGE__->new($x->{a}->pow($n), $x->{b}->pow($n));
+    }
+
+    sub powmod {
+        my ($x, $n, $m) = @_;
+
+        $x = $x->mod($m);
+
+        my $negative_power = 0;
+
+        if ($n->is_neg) {
+            $n              = $n->abs;
+            $negative_power = 1;
+        }
+
+        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ONE);
+
+        foreach my $bit (reverse split(//, $n->as_bin)) {
+
+            # c = (c*x)%m if bit
+            # x = (x*x)%m
+
+            $c = $c->mul($x)->mod($m) if $bit;
+            $x = $x->sqr->mod($m);
+        }
+
+        if ($negative_power) {
+            $c = $c->invmod($m);
+        }
+
+        return $c;
     }
 
     sub lsft {
