@@ -10148,7 +10148,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (HAS_PRIME_UTIL and !ref($x) and !ref($y)) {
+        if (HAS_PRIME_UTIL and !ref($y) and !ref($x)) {
             my $r = Math::Prime::Util::invmod($x, $y) // goto &nan;
             return bless \$r;
         }
@@ -10169,9 +10169,20 @@ package Sidef::Types::Number::Number {
 
             _valid(\$y, \$m);
 
-            $x = _any2mpz($$x) // goto &nan;
-            $y = _any2mpz($$y) // goto &nan;
-            $m = _any2mpz($$m) // goto &nan;
+            $x = $$x;
+            $y = $$y;
+            $m = $$m;
+
+            if (HAS_PRIME_UTIL and !ref($m) and !ref($x) and !ref($y)) {
+                my $r = Math::Prime::Util::divmod($x, $y, $m);
+                if (defined($r)) {
+                    return bless \$r;
+                }
+            }
+
+            $x = _any2mpz($x) // goto &nan;
+            $y = _any2mpz($y) // goto &nan;
+            $m = _any2mpz($m) // goto &nan;
 
             my $r = Math::GMPz::Rmpz_init();
 
