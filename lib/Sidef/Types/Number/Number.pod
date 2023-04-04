@@ -7999,6 +7999,25 @@ The unitary totient function. (OEIS: A047994)
 
 =cut
 
+=head2 urand
+
+    urand(n)
+    urand(a, b)
+
+Given a positive integer C<n>, returns a random unsigned integer less than C<n>.
+
+    say urand(100)          # random integer in [0,99]
+
+When two arguments are given, returns a uniform random unsigned integer in the range C<[a,b]> (inclusive on both ends).
+
+    say urand(100, 110)     # random integer in [100, 110]
+
+Both arguments must be non-negative. If C<a> is greater than C<b>, then function will return a random integer in the range C<[b,a]>.
+
+Aliases: I<urandomm>
+
+=cut
+
 =head2 usigma
 
     usigma(n, k=1)

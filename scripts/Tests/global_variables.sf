@@ -13,12 +13,12 @@ assert_eq(b, [1,2,3])
 assert_eq(b[1], 2)
 
 func foo() {
-    global x = 42
+    global xxx = 42
 }
 
-assert_eq(global x, nil)        # not defined yet
-foo()                           # define x
-assert_eq(global x, 42)         # should be defined
-assert_eq(x, 42)                # also available in the current scope (after accessing it once with `global`)
+assert_eq(global xxx, nil)        # not defined yet
+foo()                             # define xxx
+assert_eq(global xxx, 42)         # should be defined
+assert_eq(xxx, 42)                # also available in the current scope (after accessing it once with `global`)
 
 say "** Test passed!"

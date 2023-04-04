@@ -16715,19 +16715,45 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub urandomm {
+        my ($n, $m) = @_;
+
+        if (defined($m)) {
+            _valid(\$m);
+
+            $n = $$n;
+            $m = $$m;
+
+            $n = (ref($n) ? _any2mpz($n) : $n) // return ZERO;
+            $m = (ref($m) ? _any2mpz($m) : $m) // return ZERO;
+
+            if (__cmp__($n, $m) > 0) {
+                ($n, $m) = ($m, $n);
+            }
+
+            $n = _big2uistr($n) // return ZERO;
+            $m = _big2uistr($m) // return ZERO;
+
+            return _set_int(Math::Prime::Util::GMP::urandomr($n, $m) || return ZERO);
+        }
+
+        _set_int(Math::Prime::Util::GMP::urandomm(_big2uistr($$n) || return ZERO) || return ZERO);
+    }
+
+    *urand = \&urandomm;
+
     sub random_prime {
         my ($from, $to) = @_;
 
-        my $prime;
+        $from = _big2uistr($$from) // (goto &nan);
+
         if (defined($to)) {
             _valid(\$to);
-            $prime = Math::Prime::Util::GMP::random_prime(_big2uistr($from) // (goto &nan), _big2uistr($to) // (goto &nan));
-        }
-        else {
-            $prime = Math::Prime::Util::GMP::random_prime(2, _big2uistr($from) // (goto &nan));
+            $to = _big2uistr($$to) // (goto &nan);
+            return _set_int(Math::Prime::Util::GMP::random_prime($from, $to) // goto &nan);
         }
 
-        _set_int($prime // goto &nan);
+        _set_int(Math::Prime::Util::GMP::random_prime(2, $from) // goto &nan);
     }
 
     sub random_bytes {
