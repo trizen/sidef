@@ -7248,19 +7248,43 @@ package Sidef::Types::Number::Number {
         }
 
         my @non_mpz;
-        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+        my ($native_sum, $new_sum, $sum) = (0, 0, undef);
 
         foreach my $n (@numbers) {
             if (!ref($n)) {
-                ($n < 0)
-                  ? Math::GMPz::Rmpz_sub_ui($sum, $sum, -$n)
-                  : Math::GMPz::Rmpz_add_ui($sum, $sum, $n);
+                $new_sum = $native_sum + $n;
+
+                if ($new_sum < ULONG_MAX and $new_sum > LONG_MIN) {
+                    $native_sum = $new_sum;
+                }
+                else {
+                    $sum //= Math::GMPz::Rmpz_init_set_ui(0);
+                    ($native_sum < 0)
+                      ? Math::GMPz::Rmpz_sub_ui($sum, $sum, -$native_sum)
+                      : Math::GMPz::Rmpz_add_ui($sum, $sum, $native_sum);
+                    $native_sum = $n;    # reset the sum
+                }
             }
             elsif (ref($n) eq 'Math::GMPz') {
+                $sum //= Math::GMPz::Rmpz_init_set_ui(0);
                 Math::GMPz::Rmpz_add($sum, $sum, $n);
             }
             else {
                 push @non_mpz, $n;
+            }
+        }
+
+        if (!defined($sum)) {
+            $sum = $native_sum;
+        }
+        elsif ($native_sum != 0) {
+
+            ($native_sum < 0)
+              ? Math::GMPz::Rmpz_sub_ui($sum, $sum, -$native_sum)
+              : Math::GMPz::Rmpz_add_ui($sum, $sum, $native_sum);
+
+            if (Math::GMPz::Rmpz_fits_slong_p($sum)) {
+                $sum = Math::GMPz::Rmpz_get_si($sum);
             }
         }
 
@@ -8809,12 +8833,7 @@ package Sidef::Types::Number::Number {
         #
       Scalar__Scalar: {
             $y || goto &_nan;
-
-            #$x = _any2mpz($x);
-            #$y = _any2mpz($y);
-            #goto Math_GMPz__Math_GMPz;
-
-            return $x % $y;    # TODO: make sure this is always correct
+            return $x % $y;
         }
 
       Scalar__Math_GMPz: {
@@ -8879,7 +8898,8 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPq__Math_GMPz: {
-            Math::GMPz::Rmpz_sgn($y) || goto &_nan;
+            my $sgn_y = Math::GMPz::Rmpz_sgn($y) || goto &_nan;
+
             my $r = _modular_rational($x, $y) // do {
 
                 my $quo = Math::GMPq::Rmpq_init();
@@ -8898,7 +8918,16 @@ package Sidef::Types::Number::Number {
 
                 return $quo;
             };
+
             Math::GMPz::Rmpz_mod($r, $r, $y);
+
+            if (!Math::GMPz::Rmpz_sgn($r)) {
+                ## ok
+            }
+            elsif ($sgn_y < 0) {
+                Math::GMPz::Rmpz_add($r, $r, $y);
+            }
+
             $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
         }
@@ -8924,10 +8953,8 @@ package Sidef::Types::Number::Number {
       Math_GMPz__Math_GMPz: {
 
             if (Math::GMPz::Rmpz_fits_ulong_p($y)) {
-                my $r = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_mod_ui($r, $x, Math::GMPz::Rmpz_get_ui($y) || goto &_nan);
-                $r = Math::GMPz::Rmpz_get_ui($r);
-                return $r;
+                state $t = Math::GMPz::Rmpz_init_nobless();
+                return Math::GMPz::Rmpz_mod_ui($t, $x, Math::GMPz::Rmpz_get_ui($y) || goto &_nan);
             }
 
             my $sgn_y = Math::GMPz::Rmpz_sgn($y) || goto &_nan;
@@ -8955,10 +8982,8 @@ package Sidef::Types::Number::Number {
 
             $y || goto &_nan;
 
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_mod_ui($r, $x, $y);
-            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-            return $r;
+            state $t = Math::GMPz::Rmpz_init_nobless();
+            return Math::GMPz::Rmpz_mod_ui($t, $x, $y);
         }
 
       Math_GMPz__Math_GMPq: {
@@ -21306,7 +21331,7 @@ package Sidef::Types::Number::Number {
                 }
             }
             else {
-                my $t = Math::GMPz::Rmpz_init();
+                state $t = Math::GMPz::Rmpz_init_nobless();
                 foreach my $k (1 .. $n) {
                     Math::GMPz::Rmpz_add_ui($sum, $sum, Math::GMPz::Rmpz_mod_ui($t, $v, $k));
                 }

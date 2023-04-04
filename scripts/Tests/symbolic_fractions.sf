@@ -1,17 +1,17 @@
 #!/usr/bin/ruby
 
 #
-## A very basic MyFraction() class, implementing a few symbolic relations.
+## A very basic Rational() class, implementing a few symbolic relations.
 #
 
-class MyFraction(num, den) {
+class Rational(num, den) {
 
     method +(Number o) {
-        self + MyFraction(o, 1)
+        self + Rational(o, 1)
     }
 
-    method +(MyFraction o) {
-        MyFraction(
+    method +(Rational o) {
+        Rational(
             num*o.den + o.num*den,
             den*o.den
         )
@@ -21,27 +21,27 @@ class MyFraction(num, den) {
         self + -o
     }
 
-    method -(MyFraction o) {
+    method -(Rational o) {
         self + -o
     }
 
     method *(Number o) {
-        MyFraction(num*o, den)
+        Rational(num*o, den)
     }
 
-    method *(MyFraction o) {
-        MyFraction(num*o.num, den*o.den)
+    method *(Rational o) {
+        Rational(num*o.num, den*o.den)
     }
 
     method /(Number o) {
-        MyFraction(
+        Rational(
             num,
             den * o
         )
     }
 
-    method /(MyFraction o) {
-        MyFraction(
+    method /(Rational o) {
+        Rational(
             num * o.den,
             den * o.num,
         )
@@ -50,62 +50,62 @@ class MyFraction(num, den) {
     method **(Number o) {
         if (o < 0) {
             var a = o.abs
-            MyFraction(den**a, num**a)
+            Rational(den**a, num**a)
         }
         else {
-            MyFraction(num**o, den**o)
+            Rational(num**o, den**o)
         }
     }
 
     method neg {
-        MyFraction(-num, den)
+        Rational(-num, den)
     }
 
     method to_s {
-        "MyFraction(#{num}, #{den})"
+        "Rational(#{num}, #{den})"
     }
 }
 
 class Number {
-    method +(MyFraction o) {
+    method +(Rational o) {
         o + self
     }
 
-    method -(MyFraction o) {
+    method -(Rational o) {
         -o + self
     }
 
-    method *(MyFraction o) {
+    method *(Rational o) {
         o * self
     }
 
-    method /(MyFraction o) {
+    method /(Rational o) {
         o**(-1) * self
     }
 }
 
-var r = 42+MyFraction(3,4)
+var r = 42+Rational(3,4)
 
 assert_eq(r.num, 171)
 assert_eq(r.den, 4)
 assert_eq(42 + 3/4, r.num/r.den)
 
-r = 42*MyFraction(3, 4)
+r = 42*Rational(3, 4)
 assert_eq(r.num, 42*3)
 assert_eq(r.den, 4)
 
-r = 1/MyFraction(3,4)
+r = 1/Rational(3,4)
 assert_eq(r.num, 4)
 assert_eq(r.den, 3)
 
-r = 12-MyFraction(3, 4)
+r = 12-Rational(3, 4)
 assert_eq(r.num, 45)
 assert_eq(r.den, 4)
 
 #
 ## sum(f(n)) = e, as n->oo.
 #
-func f((0)) { MyFraction(1, 1) }
+func f((0)) { Rational(1, 1) }
 func f(n)   { f(n-1) / n     }
 
 assert_eq(f(10).den, 10!)
@@ -116,10 +116,10 @@ func den(n) { (2*n + 1)**2 }
 #
 ## sum(num(n)/den(n)) = Catalan's constant, as n->oo.
 #
-var sum = MyFraction(0, 1)
+var sum = Rational(0, 1)
 
 for i in (0 .. 5) {
-    sum += MyFraction(num(i), den(i))
+    sum += Rational(num(i), den(i))
     say sum
 }
 
