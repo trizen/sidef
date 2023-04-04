@@ -6903,6 +6903,18 @@ Returns a random n-bit prime.
 
 =cut
 
+=head2 random_nbit_safe_prime
+
+    random_nbit_safe_prime(n)
+
+Returns a random n-bit safe-prime.
+
+    say random_nbit_safe_prime(512)   #=> 512-bit safe prime
+
+Provided by L<Math::Prime::Util::GMP> >= 0.52.
+
+=cut
+
 =head2 random_nbit_strong_prime
 
     random_nbit_strong_prime(n)
@@ -6932,18 +6944,6 @@ Returns a random prime <= C<n>, or in the range C<a..b>.
 
     say random_prime(100)         # random prime in range [2, 100]
     say random_prime(100, 1000)   # random prime in range [100, 1000]
-
-=cut
-
-=head2 random_safe_prime
-
-    random_safe_prime(n)
-
-Returns a random n-bit safe-prime.
-
-    say random_safe_prime(512)   #=> 512-bit safe prime
-
-Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
 =cut
 

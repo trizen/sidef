@@ -16730,12 +16730,6 @@ package Sidef::Types::Number::Number {
         _set_int($prime // goto &nan);
     }
 
-    sub random_safe_prime {
-        my ($bits) = @_;
-        my $prime  = Math::Prime::Util::GMP::random_safe_prime(_big2uistr($bits) // (goto &nan));
-        _set_int($prime // goto &nan);
-    }
-
     sub random_bytes {
         Sidef::Types::Array::Array->new(
                                         [map { bless(\(my $o = ord($_))) }
@@ -16749,34 +16743,38 @@ package Sidef::Types::Number::Number {
     }
 
     sub random_nbit_prime {
-        my ($x) = @_;
-        my $n = _any2ui($$x) // goto &nan;
-        $n <= 1 && return _set_int(2);
-        _set_int(Math::Prime::Util::GMP::random_nbit_prime($n));
+        my ($n) = @_;
+        $n = _any2ui($$n) || goto &nan;
+        _set_int(Math::Prime::Util::GMP::random_nbit_prime($n) || goto &nan);
+    }
+
+    sub random_nbit_safe_prime {
+        my ($n) = @_;
+        $n = _any2ui($$n) || goto &nan;
+        _set_int(Math::Prime::Util::GMP::random_safe_prime($n) || goto &nan);
     }
 
     sub random_nbit_strong_prime {
-        my ($x) = @_;
-        my $n = _any2ui($$x) // goto &nan;
+        my ($n) = @_;
+        $n = _any2ui($$n) || goto &nan;
         $n < 128 && goto &random_nbit_prime;
-        _set_int(Math::Prime::Util::GMP::random_strong_prime($n));
+        _set_int(Math::Prime::Util::GMP::random_strong_prime($n) || goto &nan);
     }
 
     *random_strong_nbit_prime = \&random_nbit_strong_prime;
 
     sub random_nbit_maurer_prime {
-        my ($x) = @_;
-        my $n = _any2ui($$x) // goto &nan;
-        $n <= 1 && goto &nan;
-        _set_int(Math::Prime::Util::GMP::random_maurer_prime($n));
+        my ($n) = @_;
+        $n = _any2ui($$n) || goto &nan;
+        _set_int(Math::Prime::Util::GMP::random_maurer_prime($n) || goto &nan);
     }
 
     *random_maurer_nbit_prime = \&random_nbit_maurer_prime;
 
     sub random_ndigit_prime {
-        my ($x) = @_;
-        my $n = _any2ui($$x) || goto &nan;
-        _set_int(Math::Prime::Util::GMP::random_ndigit_prime($n));
+        my ($n) = @_;
+        $n = _any2ui($$n) || goto &nan;
+        _set_int(Math::Prime::Util::GMP::random_ndigit_prime($n) || goto &nan);
     }
 
     sub is_semiprime {

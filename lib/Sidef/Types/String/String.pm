@@ -290,17 +290,17 @@ package Sidef::Types::String::String {
 
     sub bin {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self, 2);
+        Sidef::Types::Number::Number->new($$self || '0', 2);
     }
 
     sub oct {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self, 8);
+        Sidef::Types::Number::Number->new($$self || '0', 8);
     }
 
     sub hex {
         my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self, 16);
+        Sidef::Types::Number::Number->new($$self || '0', 16);
     }
 
     sub hexlify {

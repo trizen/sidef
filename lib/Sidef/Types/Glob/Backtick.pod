@@ -22,21 +22,21 @@ Inherits methods from:
 
 =head1 METHODS
 
-=head2 `
-
-    a ` b
-
-Returns the
-
-Aliases: I<run>, I<exec>, I<execute>
-
-=cut
-
 =head2 call
 
     self.call
 
 Returns the
+
+=cut
+
+=head2 run
+
+    self.run
+
+Returns the
+
+Aliases: I<exec>, I<execute>
 
 =cut
 

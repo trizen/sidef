@@ -19,6 +19,7 @@ package Sidef::Optimizer {
                   RANGESTR      => 'Sidef::Types::Range::RangeString',
                   DIR_DT        => 'Sidef::DataTypes::Glob::Dir',
                   FILE_DT       => 'Sidef::DataTypes::Glob::File',
+                  PIPE_DT       => 'Sidef::DataTypes::Glob::Pipe',
                   NUMBER_DT     => 'Sidef::DataTypes::Number::Number',
                   STRING_DT     => 'Sidef::DataTypes::String::String',
                   COMPLEX_DT    => 'Sidef::DataTypes::Number::Complex',
@@ -989,6 +990,32 @@ package Sidef::Optimizer {
             ),
         ),
 
+        (PIPE_DT) => build_tree(
+
+            # Pipe.method(STRING)
+            (
+                map { [$_, [table(STRING)]] } dtypes(
+                    PIPE_DT, qw(
+                      new
+                      call
+                      )
+                )
+            ),
+        ),
+
+        (BACKTICK_DT) => build_tree(
+
+            # Backtick.method(STRING)
+            (
+                map { [$_, [table(STRING)]] } dtypes(
+                    BACKTICK_DT, qw(
+                      new
+                      call
+                      )
+                )
+            ),
+        ),
+
         (DIR_DT) => build_tree(
 
             # Dir.method(STRING)
@@ -1203,18 +1230,6 @@ package Sidef::Optimizer {
                 map { [$_, [table(STRING, NUMBER), table(STRING, NUMBER)]] } dtypes(
                     COMPLEX_DT, qw(
                       new call
-                      )
-                )
-            ),
-        ),
-
-        (BACKTICK_DT) => build_tree(
-
-            # Backtick.method(STRING)
-            (
-                map { [$_, [table(STRING)]] } dtypes(
-                    BACKTICK_DT, qw(
-                      new
                       )
                 )
             ),
