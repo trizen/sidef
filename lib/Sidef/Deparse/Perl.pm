@@ -9,6 +9,9 @@ package Sidef::Deparse::Perl {
     my %addr;
     my %top_add;
 
+    my %constant_number_cache;
+    my %constant_string_cache;
+
     my %composite_constants = (
         'Sidef::Types::Range::RangeNumber' => {
                                                name   => 'RangeNum',
@@ -183,8 +186,11 @@ HEADER
             $opts{header} .= "local \$Sidef::Types::Number::Number::ROUND = $round;";
         }
 
-        %addr    = ();
-        %top_add = ();
+        undef %addr;
+        undef %top_add;
+
+        undef %constant_number_cache;
+        undef %constant_string_cache;
 
         bless \%opts, __PACKAGE__;
     }
@@ -1235,14 +1241,17 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Number::Number') {
             my ($type, $content) = $obj->_dump;
             if ($type eq 'int') {
-                $code = $self->make_constant($ref, '_set_int', "Number", args => ["'${content}'"], sub => 1);
+                $code = ($constant_number_cache{$content} //=
+                         $self->make_constant($ref, '_set_int', "Number", args => ["'${content}'"], sub => 1));
             }
             else {
-                $code = $self->make_constant($ref, '_set_str', "Number", args => ["'${type}'", "'${content}'"], sub => 1);
+                $code = ($constant_number_cache{join(' ', $type, $content)} //=
+                         $self->make_constant($ref, '_set_str', "Number", args => ["'${type}'", "'${content}'"], sub => 1));
             }
         }
         elsif ($ref eq 'Sidef::Types::String::String') {
-            $code = $self->make_constant($ref, 'new', "String", args => [$self->_dump_string($$obj)]);
+            $code = ($constant_string_cache{$$obj} //=
+                     $self->make_constant($ref, 'new', "String", args => [$self->_dump_string($$obj)]));
         }
         elsif ($ref eq 'Sidef::Types::Array::Array' or $ref eq 'Sidef::Types::Array::HCArray') {
             $code = $self->_dump_array('Sidef::Types::Array::Array', $obj);

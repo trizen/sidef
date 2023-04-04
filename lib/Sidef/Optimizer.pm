@@ -1225,7 +1225,7 @@ package Sidef::Optimizer {
 
     sub new {
         my (undef, %opts) = @_;
-        %addr = ();
+        undef(%addr);    # reset the %addr hash
         bless \%opts, __PACKAGE__;
     }
 
@@ -1449,15 +1449,28 @@ package Sidef::Optimizer {
                                             '√' => 'sqrt',
                                             '~' => 'not',
                                             '^' => 'range',
+                                            '+' => undef,
                                            };
 
+                    my $unary_optimized = 0;
+
                     if (    $ref_obj eq 'Sidef::Operator::Unary'
-                        and exists $unary_methods->{$method}
+                        and exists($unary_methods->{$method})
                         and scalar(@{$call->{arg}}) == 1) {
                         my $arg = $call->{arg}[0];
-                        $obj = $self->optimize_expr({self => $arg, call => [{method => $unary_methods->{$method}}]});
+                        my $opt_obj = $self->optimize_expr(
+                                 {
+                                  self => $arg,
+                                  (defined($unary_methods->{$method}) ? (call => [{method => $unary_methods->{$method}}]) : ())
+                                 }
+                        );
+                        if (($method eq '+') ? (ref($opt_obj) ne 'HASH') : 1) {
+                            $obj             = $opt_obj;
+                            $unary_optimized = 1;
+                        }
                     }
-                    else {
+
+                    if (!$unary_optimized) {
                         foreach my $j (0 .. $#{$call->{arg}}) {
                             my $arg = $call->{arg}[$j];
                             push @{$obj->{call}[$i]{arg}},

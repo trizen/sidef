@@ -417,10 +417,10 @@ sub code_interactive {
                             opt        => \%args,
                             parser_opt => {interactive => 1},
                            );
+        $sidef->execute_code('');    # warm-up
     };
 
     $init_sidef->();
-    $sidef->execute_code('');    # warm-up
 
     my ($copy_array, $copy_hash);
 
@@ -522,7 +522,6 @@ EOT
             elsif ($line =~ /^#+\h*load\h+(.+)/) {
                 my $file = unpack('A*', $1);
                 $init_sidef->();
-                $sidef->execute_code('');
                 open my $fh, '<:utf8', $file or do {
                     warn "Can't open file <<$file>> for read: $!\n";
                     redo MAINLOOP;
@@ -589,7 +588,6 @@ EOT
             # Reset the parser
             if ($line eq 'reset') {
                 $init_sidef->();
-                $sidef->execute_code('');    # warm-up
                 undef $vars;
                 undef $ref_vars_refs;
                 @values = ();

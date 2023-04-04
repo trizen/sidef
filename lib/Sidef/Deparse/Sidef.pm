@@ -78,7 +78,7 @@ package Sidef::Deparse::Sidef {
             },
             %args,
         );
-        %addr = ();    # reset the `addr` hash
+        undef(%addr);    # reset the %addr hash
         bless \%opts, __PACKAGE__;
     }
 
@@ -647,7 +647,12 @@ package Sidef::Deparse::Sidef {
                     }
                     else {
 
-                        if ($ref eq 'Sidef::Operator::Unary' and $method eq '-' and $code eq '') {
+                        state $unary_methods = {
+                                                '-' => 'neg',
+                                                '+' => undef,
+                                               };
+
+                        if ($ref eq 'Sidef::Operator::Unary' and $code eq '' and exists($unary_methods->{$method})) {
 
                             # Constant-folding: negate the literal number
                             my $data = $call->{arg};
@@ -661,7 +666,9 @@ package Sidef::Deparse::Sidef {
                                         $data = $data->{self};
                                     }
                                     if (ref($data) eq 'Sidef::Types::Number::Number') {
-                                        $code = $self->deparse_expr({self => $data->neg});
+                                        my $unary_method = $unary_methods->{$method};
+                                        $code = $self->deparse_expr(
+                                                            {self => (defined($unary_method) ? $data->$unary_method : $data)});
                                         next;
                                     }
                                 }
