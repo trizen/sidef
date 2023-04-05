@@ -16715,6 +16715,27 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub useed {
+        my ($n) = @_;
+
+        state $_x = require Digest::SHA;
+
+        my $z = _any2mpz($$n) // die "[ERROR] Number.useed(): invalid seed value <<$n>> (expected an integer)";
+
+        my $hex = Math::GMPz::Rmpz_get_str($z, 16);
+        $hex = substr($hex, 1) if (substr($hex, 0, 1) eq '-');
+
+        my $bin  = CORE::pack('H*', $hex);
+        my $seed = Digest::SHA::sha512($bin);
+
+        while (length($seed) < 1024) {
+            $seed = Digest::SHA::sha512($seed) . CORE::reverse($seed);
+        }
+
+        Math::Prime::Util::GMP::seed_csprng(1024, $seed);
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
+
     sub urandomm {
         my ($n, $m) = @_;
 

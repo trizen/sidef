@@ -8018,6 +8018,18 @@ Aliases: I<urandomm>
 
 =cut
 
+=head2 useed
+
+    useed(n)
+
+Takes a non-negative integer C<n>, which is used to seed the internal CSPRNG used for random functions, such as C<urand> and the random prime functions.
+
+For good security, C<n> should be at least an 128-bit random integer.
+
+Internally, the value of C<n> is converted into a binary string, SHA-512 hashed and expanded into a 8192-bit key.
+
+=cut
+
 =head2 usigma
 
     usigma(n, k=1)
