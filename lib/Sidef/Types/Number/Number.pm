@@ -40,6 +40,9 @@ package Sidef::Types::Number::Number {
           ULONG_MAX => Math::GMPq::_ulong_max(),
           LONG_MIN  => Math::GMPq::_long_min(),
 
+          #ULONG_MAX => 4294967295,
+          #LONG_MIN  => -2147483647,
+
           HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 } // 0,
 
           # Check if we have a recent enough version of Math::Prime::Util
@@ -55,7 +58,7 @@ package Sidef::Types::Number::Number {
         SMALL_NUMBER_MAX_BITS  => 110,    # in bits (numbers that can be factorized fast)
         MEDIUM_NUMBER_MAX_BITS => 150,    # in bits (numbers that can be factorized moderately fast)
 
-        PRIMECOUNT_MIN => ((ULONG_MAX < 1e11) ? ULONG_MAX : 1e11),    # absolute value
+        PRIMECOUNT_MIN => List::Util::min(ULONG_MAX, (HAS_PRIME_UTIL ? 1e11 : 1e8)),    # absolute value
     };
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
@@ -9327,7 +9330,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($y) and !ref($x)) {
+        if (HAS_PRIME_UTIL and !ref($y) and !ref($x)) {
             if (defined(my $r = Math::Prime::Util::sqrtmod($x, $y))) {
                 return bless \$r;
             }
@@ -15236,7 +15239,9 @@ package Sidef::Types::Number::Number {
     sub nth_prime {
         my ($n) = @_;
 
-        $n = _big2uistr($n) // goto &nan;
+        $n = $$n;
+        $n = (ref($n) ? _any2mpz($n) : $n) // goto &nan;
+        $n < 0 and goto &nan;
 
         if ($n == 0) {
             return ONE;    # not a prime, but may be convenient...
@@ -15320,47 +15325,48 @@ package Sidef::Types::Number::Number {
                                   };
 
         if (exists($nth_prime_lookup->{$n})) {
-            my $p = $nth_prime_lookup->{$n};
-            return _set_int($p);
+            return _set_int($nth_prime_lookup->{$n});
         }
 
         if ($n > 1_000_000) {
 
-            if (HAS_PRIME_UTIL) {
-                my $p = Math::Prime::Util::nth_prime($n);
-                return _set_int("$p");
+            if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+                return _set_int(Math::Prime::Util::nth_prime($n));
             }
 
             my $min = _any2mpz(${_set_int($n)->nth_prime_lower});
             my $max = _any2mpz(${_set_int($n)->nth_prime_upper});
 
-            if (!Math::GMPz::Rmpz_fits_ulong_p($max)) {
-                goto &nan;
+            if (Math::GMPz::Rmpz_fits_ulong_p($max)) {
+                $min = Math::GMPz::Rmpz_get_ui($min);
+                $max = Math::GMPz::Rmpz_get_ui($max);
             }
-
-            $min = Math::GMPz::Rmpz_get_ui($min);
-            $max = Math::GMPz::Rmpz_get_ui($max);
 
             my $k = 0;
             my $count;
 
             while (1) {
                 $k = (
-                      HAS_NEW_PRIME_UTIL
+                      (HAS_NEW_PRIME_UTIL and $max < ULONG_MAX)
                       ? Math::Prime::Util::divint(Math::Prime::Util::addint($min, $max), 2)
                       : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
                      );
 
-                # Make sure k does not overflow; otherwise return NaN
-                goto &nan if ($k > ~0 or $k <= 0);
-
                 $count = (
-                          (HAS_PRIME_UTIL and ($k < PRIMECOUNT_MIN or !$USE_PRIMECOUNT))
+                          (HAS_PRIME_UTIL and $k < PRIMECOUNT_MIN)
                           ? Math::Prime::Util::prime_count($k)
                           : _prime_count($k)
                          );
 
-                if (CORE::abs($count - $n) <= $k**(2 / 3)) {
+                if ($k > (ULONG_MAX >> 1)) {
+                    $k = _any2mpz($k) // goto &nan;
+                }
+
+                if ($count > (ULONG_MAX >> 1)) {
+                    $count = _any2mpz($count) // goto &nan;
+                }
+
+                if (CORE::abs($count - $n) <= CORE::int("$k"**(2 / 3))) {
                     last;
                 }
 
@@ -15392,7 +15398,7 @@ package Sidef::Types::Number::Number {
 
         state @table;
 
-        my $limit = 1000 + CORE::int(2 * $n * CORE::log($n));
+        my $limit = 1000 + (2 * $n * CORE::int(CORE::log("$n")));
         $limit = 15_485_863 if $limit > 15_485_863;
 
         if (@table < $n) {
@@ -15407,7 +15413,10 @@ package Sidef::Types::Number::Number {
 
     sub nth_prime_power {
         my ($n) = @_;
-        $n = _any2ui($$n) // goto &nan;
+
+        $n = $$n;
+        $n = (ref($n) ? _any2mpz($n) : $n) // goto &nan;
+        $n < 0 and goto &nan;
 
         return ONE         if ($n == 0);    # not a prime power, but...
         return _set_int(2) if ($n == 1);
@@ -15415,7 +15424,7 @@ package Sidef::Types::Number::Number {
 
         # Lower and upper bounds
         my $min = $n;
-        my $max = _nth_prime_upper($n);
+        my $max = _nth_prime_upper(_big2uistr($n));
 
         if ($n > 1e6) {
 
@@ -15423,13 +15432,13 @@ package Sidef::Types::Number::Number {
             $min = _any2mpz(${_set_int($n)->nth_prime_power_lower});
             $max = _any2mpz(${_set_int($n)->nth_prime_power_upper});
 
-            Math::GMPz::Rmpz_fits_ulong_p($max) || goto &nan;
-
-            $min = Math::GMPz::Rmpz_get_ui($min);
-            $max = Math::GMPz::Rmpz_get_ui($max);
+            if (Math::GMPz::Rmpz_fits_ulong_p($max)) {
+                $min = Math::GMPz::Rmpz_get_ui($min);
+                $max = Math::GMPz::Rmpz_get_ui($max);
+            }
         }
 
-        if (HAS_NEW_PRIME_UTIL and $n < 1e11) {
+        if (HAS_NEW_PRIME_UTIL and $n < PRIMECOUNT_MIN) {
             return _set_int(Math::Prime::Util::nth_prime_power($n));
         }
 
@@ -15438,25 +15447,30 @@ package Sidef::Types::Number::Number {
 
         while (1) {
             $k = (
-                  HAS_NEW_PRIME_UTIL
+                  (HAS_NEW_PRIME_UTIL and $max < ULONG_MAX)
                   ? Math::Prime::Util::divint(Math::Prime::Util::addint($min, $max), 2)
                   : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
                  );
 
-            # Make sure k does not overflow; otherwise return NaN
-            goto &nan if ($k > ~0 or $k <= 0);
-
             $count = (
-                      HAS_NEW_PRIME_UTIL
+                      (HAS_NEW_PRIME_UTIL and $k < PRIMECOUNT_MIN)
                       ? Math::Prime::Util::prime_power_count($k)
                       : ${_set_int($k)->prime_power_count}
                      );
+
+            if ($k > (ULONG_MAX >> 1)) {
+                $k = _any2mpz($k) // goto &nan;
+            }
+
+            if ($count > (ULONG_MAX >> 1)) {
+                $count = _any2mpz($count) // goto &nan;
+            }
 
             if (CORE::abs($count - $n) <= CORE::int(CORE::sqrt($k))) {
                 last;
             }
 
-            my $cmp = $count <=> $n;
+            my $cmp = ($count <=> $n);
 
             if ($cmp > 0) {
                 $max = $k - 1;
@@ -15512,14 +15526,14 @@ package Sidef::Types::Number::Number {
     sub nth_composite {
         my ($n) = @_;
 
-        $n = _any2ui($$n) // goto &nan;
+        $n = $$n;
+        $n = (ref($n) ? _any2mpz($n) : $n) // goto &nan;
+        $n < 0 and goto &nan;
 
         return ONE         if ($n == 0);      # not composite, but...
         return _set_int(4) if ($n == 1);
 
-        # Lower and upper bounds from A002808 (for n >= 4).
-        my $min = CORE::int($n + $n / CORE::log($n) + $n / (CORE::log($n)**2));
-        my $max = CORE::int($n + $n / CORE::log($n) + (3 * $n) / (CORE::log($n)**2));
+        my ($min, $max);
 
         if ($n > 1e6) {
 
@@ -15527,10 +15541,17 @@ package Sidef::Types::Number::Number {
             $min = _any2mpz(${_set_int($n)->nth_composite_lower});
             $max = _any2mpz(${_set_int($n)->nth_composite_upper});
 
-            Math::GMPz::Rmpz_fits_ulong_p($max) || goto &nan;
+            if (Math::GMPz::Rmpz_fits_ulong_p($max)) {
+                $min = Math::GMPz::Rmpz_get_ui($min);
+                $max = Math::GMPz::Rmpz_get_ui($max);
+            }
+        }
+        else {
+            my $k = ref($n) ? _big2uistr($n) : $n;
 
-            $min = Math::GMPz::Rmpz_get_ui($min);
-            $max = Math::GMPz::Rmpz_get_ui($max);
+            # Lower and upper bounds from A002808 (for n >= 4).
+            $min = CORE::int($k + $k / CORE::log($k) + $k / (CORE::log($k)**2));
+            $max = CORE::int($k + $k / CORE::log($k) + (3 * $k) / (CORE::log($k)**2));
         }
 
         if ($n < 4) {
@@ -15543,21 +15564,26 @@ package Sidef::Types::Number::Number {
 
         while (1) {
             $k = (
-                  HAS_NEW_PRIME_UTIL
+                  (HAS_NEW_PRIME_UTIL and $max < ULONG_MAX)
                   ? Math::Prime::Util::divint(Math::Prime::Util::addint($min, $max), 2)
                   : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
                  );
 
-            # Make sure k does not overflow; otherwise return NaN
-            goto &nan if ($k > ~0 or $k <= 0);
-
             my $pi = (
-                      (HAS_PRIME_UTIL and ($k < PRIMECOUNT_MIN or !$USE_PRIMECOUNT))
+                      (HAS_PRIME_UTIL and $k < PRIMECOUNT_MIN)
                       ? Math::Prime::Util::prime_count($k)
                       : _prime_count($k)
                      );
 
-            $count = ($k - $pi - 1);
+            if ($k > (ULONG_MAX >> 1)) {
+                $k = _any2mpz($k) // goto &nan;
+            }
+
+            if ($pi > (ULONG_MAX >> 1)) {
+                $pi = _any2mpz($pi) // goto &nan;
+            }
+
+            $count = $k - $pi - 1;
 
             if (CORE::abs($count - $n) <= CORE::int(CORE::sqrt($k))) {
                 last;
@@ -16928,16 +16954,29 @@ package Sidef::Types::Number::Number {
             return $value;
         }
 
-        if (HAS_PRIME_UTIL) {
+        if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
             return Math::Prime::Util::semiprime_count($n);
         }
 
         my $t = 0;
         my $s = Math::Prime::Util::GMP::sqrtint($n);
 
+        state $bits = CORE::int(CORE::log(ULONG_MAX) / CORE::log(2));
+
         my $count = 0;
         foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $s)) {
-            $count += _prime_count(CORE::int($n / $p)) - ++$t + 1;
+            if ($bits <= 32) {
+                $count = Math::Prime::Util::GMP::addint(
+                                                        $count,
+                                                        Math::Prime::Util::GMP::subint(
+                                                                          _prime_count(Math::Prime::Util::GMP::divint($n, $p)),
+                                                                          (++$t - 1)
+                                                                                      )
+                                                       );
+            }
+            else {
+                $count += _prime_count(CORE::int($n / $p)) - ++$t + 1;
+            }
         }
 
         return $count;
@@ -16960,23 +16999,30 @@ package Sidef::Types::Number::Number {
 
     sub nth_semiprime {
         my ($n) = @_;
-        $n = _any2ui($$n) // goto &nan;
+
+        $n = $$n;
+        $n = (ref($n) ? _any2mpz($n) : $n) // goto &nan;
+        $n < 0 and goto &nan;
 
         return ONE         if ($n == 0);    # not semiprime, but...
         return _set_int(4) if ($n == 1);
 
-        if (HAS_PRIME_UTIL) {
-            my $k = Math::Prime::Util::nth_semiprime($n);
-            return _set_int("$k");
+        if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+            return _set_int(Math::Prime::Util::nth_semiprime($n));
         }
 
-        # n-th semiprime is ~ n * log(n) / log(log(n))
-        my $max = CORE::int($n * CORE::log($n) / CORE::log(CORE::log($n)));
-        my $min = CORE::int(0.965 * $max);
+        my ($min, $max);
 
         if ($n < 3e3) {
             $min = 4;
             $max = 11465;
+        }
+        else {
+            my $k = ref($n) ? _big2uistr($n) : $n;
+
+            # n-th semiprime is ~ n * log(n) / log(log(n))
+            $max = CORE::int($k * CORE::log($k) / CORE::log(CORE::log($k)));
+            $min = CORE::int(0.965 * $max);
         }
 
         require Memoize;
@@ -16987,15 +17033,20 @@ package Sidef::Types::Number::Number {
 
         while (1) {
             $k = (
-                  HAS_NEW_PRIME_UTIL
+                  (HAS_NEW_PRIME_UTIL and $max < ULONG_MAX)
                   ? Math::Prime::Util::divint(Math::Prime::Util::addint($min, $max), 2)
                   : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
                  );
 
-            # Make sure k does not overflow; otherwise return NaN
-            goto &nan if ($k > ~0 or $k <= 0);
-
             $count = _semiprime_count($k);
+
+            if ($k > (ULONG_MAX >> 1)) {
+                $k = _any2mpz($k) // goto &nan;
+            }
+
+            if ($count > (ULONG_MAX >> 1)) {
+                $count = _any2mpz($count) // goto &nan;
+            }
 
             if (CORE::abs($count - $n) <= CORE::sqrt($k)) {
                 last;
