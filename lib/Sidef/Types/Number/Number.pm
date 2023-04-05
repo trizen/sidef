@@ -40,8 +40,8 @@ package Sidef::Types::Number::Number {
           ULONG_MAX => Math::GMPq::_ulong_max(),
           LONG_MIN  => Math::GMPq::_long_min(),
 
-          #ULONG_MAX => 4294967295,
-          #LONG_MIN  => -2147483647,
+          #~ ULONG_MAX => 4294967295,
+          #~ LONG_MIN  => -2147483647,
 
           HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 } // 0,
 
@@ -604,9 +604,14 @@ package Sidef::Types::Number::Number {
 
         if (!ref($x)) {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            ($x < 0)
-              ? Math::MPC::Rmpc_set_si($r, $x, $ROUND)
-              : Math::MPC::Rmpc_set_ui($r, $x, $ROUND);
+            if ($x < ULONG_MAX and $x > LONG_MIN) {
+                ($x < 0)
+                  ? Math::MPC::Rmpc_set_si($r, $x, $ROUND)
+                  : Math::MPC::Rmpc_set_ui($r, $x, $ROUND);
+            }
+            else {
+                Math::MPC::Rmpc_set_str($r, $x, 10, $ROUND);
+            }
             return $r;
         }
 
@@ -625,9 +630,14 @@ package Sidef::Types::Number::Number {
 
         if (!ref($x)) {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            ($x < 0)
-              ? Math::MPFR::Rmpfr_set_si($r, $x, $ROUND)
-              : Math::MPFR::Rmpfr_set_ui($r, $x, $ROUND);
+            if ($x < ULONG_MAX and $x > LONG_MIN) {
+                ($x < 0)
+                  ? Math::MPFR::Rmpfr_set_si($r, $x, $ROUND)
+                  : Math::MPFR::Rmpfr_set_ui($r, $x, $ROUND);
+            }
+            else {
+                Math::MPFR::Rmpfr_set_str($r, $x, 10, $ROUND);
+            }
             return $r;
         }
 
@@ -670,7 +680,12 @@ package Sidef::Types::Number::Number {
     sub _any2mpz {
         my ($x) = @_;
 
-        !ref($x)                && return (($x < 0) ? Math::GMPz::Rmpz_init_set_si($x) : Math::GMPz::Rmpz_init_set_ui($x));
+        ref($x)
+          || return (
+                       ($x < ULONG_MAX and $x > LONG_MIN)
+                     ? (($x < 0) ? Math::GMPz::Rmpz_init_set_si($x) : Math::GMPz::Rmpz_init_set_ui($x))
+                     : Math::GMPz::Rmpz_init_set_str($x, 10)
+                    );
         ref($x) eq 'Math::GMPz' && return $x;
         ref($x) eq 'Math::GMPq' && goto &_mpq2mpz;
 
@@ -693,7 +708,19 @@ package Sidef::Types::Number::Number {
     sub _any2mpq {
         my ($x) = @_;
 
-        ref($x) || return _mpz2mpq(_any2mpz($x));
+        if (!ref($x)) {
+            my $q = Math::GMPq::Rmpq_init();
+            if ($x < ULONG_MAX and $x > LONG_MIN) {
+                ($x < 0)
+                  ? Math::GMPq::Rmpq_set_si($q, $x, 1)
+                  : Math::GMPq::Rmpq_set_ui($q, $x, 1);
+            }
+            else {
+                Math::GMPq::Rmpq_set_str($q, $x, 10);
+            }
+            return $q;
+        }
+
         ref($x) eq 'Math::GMPq' && return $x;
         ref($x) eq 'Math::GMPz' && goto &_mpz2mpq;
 
@@ -3254,7 +3281,8 @@ package Sidef::Types::Number::Number {
         $y = $$y;
 
         if (!ref($x) and !ref($y) and $x >= 0 and $y > 0) {
-            return _set_int(HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($x, $y) : Math::Prime::Util::GMP::divint($x, $y));
+            my $r = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($x, $y) : Math::Prime::Util::GMP::divint($x, $y));
+            return bless \$r;
         }
 
         $x = _any2mpz($x) // (goto &nan);
@@ -3669,7 +3697,8 @@ package Sidef::Types::Number::Number {
             if ($y == 1) {
                 return bless \$x;
             }
-            return _set_int(Math::Prime::Util::rootint($x, $y));
+            my $r = Math::Prime::Util::rootint($x, $y);
+            return bless \$r;
         }
 
         bless \__iroot__(_any2mpz($x) // (goto &nan), $y);
@@ -3683,7 +3712,8 @@ package Sidef::Types::Number::Number {
         $x = $$x;
 
         if (HAS_PRIME_UTIL and !ref($x) and $x >= 0) {
-            return _set_int(Math::Prime::Util::sqrtint($x));
+            my $r = Math::Prime::Util::sqrtint($x);
+            return bless \$r;
         }
 
         $x = _any2mpz($x) // goto &nan;
@@ -3703,7 +3733,8 @@ package Sidef::Types::Number::Number {
         $x = $$x;
 
         if (HAS_PRIME_UTIL and !ref($x) and $x >= 0) {
-            return _set_int(Math::Prime::Util::rootint($x, 3));
+            my $r = Math::Prime::Util::rootint($x, 3);
+            return bless \$r;
         }
 
         bless \__iroot__(_any2mpz($x) // (goto &nan), 3);
@@ -4267,7 +4298,8 @@ package Sidef::Types::Number::Number {
             $y = $$y;
 
             if (HAS_PRIME_UTIL and !ref($x) and !ref($y) and $x > 0 and $y > 1) {
-                return _set_int(Math::Prime::Util::logint($x, $y));
+                my $r = Math::Prime::Util::logint($x, $y);
+                return bless \$r;
             }
 
             _set_int(__ilog__((_any2mpz($x) // goto &nan), (_any2mpz($y) // goto &nan)) // goto &nan);
@@ -4285,7 +4317,8 @@ package Sidef::Types::Number::Number {
         $x = $$x;
 
         if (HAS_PRIME_UTIL and !ref($x) and $x > 0) {
-            return _set_int(Math::Prime::Util::logint($x, 2));
+            my $r = Math::Prime::Util::logint($x, 2);
+            return bless \$r;
         }
 
         _set_int(__ilog__((_any2mpz($x) // goto &nan), 2) // goto &nan);
@@ -4297,7 +4330,8 @@ package Sidef::Types::Number::Number {
         $x = $$x;
 
         if (HAS_PRIME_UTIL and !ref($x) and $x > 0) {
-            return _set_int(Math::Prime::Util::logint($x, 10));
+            my $r = Math::Prime::Util::logint($x, 10);
+            return bless \$r;
         }
 
         _set_int(__ilog__((_any2mpz($x) // goto &nan), 10) // goto &nan);
@@ -15330,8 +15364,18 @@ package Sidef::Types::Number::Number {
 
         if ($n > 1_000_000) {
 
+            if ($n > (PRIMECOUNT_MIN >> 6) and $USE_PRIMECOUNT) {
+                my $p = `primecount -n $n`;
+                if (defined($p)) {
+                    chomp($p);
+                    return _set_int($p);
+                }
+            }
+
             if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-                return _set_int(Math::Prime::Util::nth_prime($n));
+                if ((CORE::int(CORE::log(ULONG_MAX) / CORE::log(2)) <= 32) ? ($n < 203280221) : 1) {
+                    return _set_int(Math::Prime::Util::nth_prime("$n"));
+                }
             }
 
             my $min = _any2mpz(${_set_int($n)->nth_prime_lower});
@@ -15359,11 +15403,11 @@ package Sidef::Types::Number::Number {
                          );
 
                 if ($k > (ULONG_MAX >> 1)) {
-                    $k = _any2mpz($k) // goto &nan;
+                    $k = _str2obj("$k");
                 }
 
                 if ($count > (ULONG_MAX >> 1)) {
-                    $count = _any2mpz($count) // goto &nan;
+                    $count = _str2obj("$count");
                 }
 
                 if (CORE::abs($count - $n) <= CORE::int("$k"**(2 / 3))) {
@@ -15438,7 +15482,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (HAS_NEW_PRIME_UTIL and $n < PRIMECOUNT_MIN) {
+        if (HAS_NEW_PRIME_UTIL and $n < PRIMECOUNT_MIN and !ref($max)) {
             return _set_int(Math::Prime::Util::nth_prime_power($n));
         }
 
@@ -15459,11 +15503,11 @@ package Sidef::Types::Number::Number {
                      );
 
             if ($k > (ULONG_MAX >> 1)) {
-                $k = _any2mpz($k) // goto &nan;
+                $k = _str2obj("$k");
             }
 
             if ($count > (ULONG_MAX >> 1)) {
-                $count = _any2mpz($count) // goto &nan;
+                $count = _str2obj("$count");
             }
 
             if (CORE::abs($count - $n) <= CORE::int(CORE::sqrt($k))) {
@@ -15576,11 +15620,11 @@ package Sidef::Types::Number::Number {
                      );
 
             if ($k > (ULONG_MAX >> 1)) {
-                $k = _any2mpz($k) // goto &nan;
+                $k = _str2obj("$k");
             }
 
             if ($pi > (ULONG_MAX >> 1)) {
-                $pi = _any2mpz($pi) // goto &nan;
+                $pi = _str2obj("$pi");
             }
 
             $count = $k - $pi - 1;
@@ -16685,7 +16729,7 @@ package Sidef::Types::Number::Number {
             $y = CORE::abs($y) if ($y < 0);
             $y == 1 && return ZERO;
             my $r = HAS_PRIME_UTIL ? Math::Prime::Util::valuation($x, $y) : Math::Prime::Util::GMP::valuation($x, $y);
-            return _set_int($r);
+            return bless \$r;
         }
 
         $x = _any2mpz($x) // goto &nan;
@@ -16695,7 +16739,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmpabs_ui($y, 1) || return ZERO;
 
         state $t = Math::GMPz::Rmpz_init_nobless();
-        _set_int(scalar Math::GMPz::Rmpz_remove($t, $x, $y));
+        my $r = Math::GMPz::Rmpz_remove($t, $x, $y);
+        bless \$r;
     }
 
     sub remove {
@@ -17007,10 +17052,6 @@ package Sidef::Types::Number::Number {
         return ONE         if ($n == 0);    # not semiprime, but...
         return _set_int(4) if ($n == 1);
 
-        if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-            return _set_int(Math::Prime::Util::nth_semiprime($n));
-        }
-
         my ($min, $max);
 
         if ($n < 3e3) {
@@ -17023,6 +17064,10 @@ package Sidef::Types::Number::Number {
             # n-th semiprime is ~ n * log(n) / log(log(n))
             $max = CORE::int($k * CORE::log($k) / CORE::log(CORE::log($k)));
             $min = CORE::int(0.965 * $max);
+        }
+
+        if (HAS_PRIME_UTIL and $max < ULONG_MAX) {
+            return _set_int(Math::Prime::Util::nth_semiprime($n));
         }
 
         require Memoize;
@@ -17041,11 +17086,11 @@ package Sidef::Types::Number::Number {
             $count = _semiprime_count($k);
 
             if ($k > (ULONG_MAX >> 1)) {
-                $k = _any2mpz($k) // goto &nan;
+                $k = _str2obj("$k");
             }
 
             if ($count > (ULONG_MAX >> 1)) {
-                $count = _any2mpz($count) // goto &nan;
+                $count = _str2obj("$count");
             }
 
             if (CORE::abs($count - $n) <= CORE::sqrt($k)) {
@@ -19087,10 +19132,10 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($n) > 0
           or return Sidef::Types::Array::Array->new();
 
-        @primes = map { _fits_ulong($$_) ? _get_ulong($$_) : _any2mpz($$_) } @primes;
+        @primes = map { ref($$_) ? (_fits_ulong($$_) ? _get_ulong($$_) : _any2mpz($$_)) : $$_ } @primes;
 
         # Optimization when n is a native integer
-        if (Math::GMPz::Rmpz_fits_ulong_p($n) and Math::GMPz::Rmpz_get_ui($n) < ULONG_MAX) {
+        if (Math::GMPz::Rmpz_cmp_ui($n, ULONG_MAX) < 0) {
 
             $n = Math::GMPz::Rmpz_get_ui($n);
 
@@ -19525,7 +19570,7 @@ package Sidef::Types::Number::Number {
 
         if (HAS_PRIME_UTIL and !ref($y) and !ref($x)) {
             my $r = Math::Prime::Util::znorder($x, $y) // goto &nan;
-            return _set_int($r);
+            return bless \$r;
         }
 
         $x = _big2istr($x) // goto &nan;
@@ -23099,15 +23144,19 @@ package Sidef::Types::Number::Number {
 
         if ($m == 0) {
 
+            my $r;
             if (HAS_NEW_PRIME_UTIL and $n < ULONG_MAX) {
-                return _set_int(Math::Prime::Util::prime_bigomega($n));
+                $r = Math::Prime::Util::prime_bigomega($n);
             }
             elsif (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-                return _set_int(scalar Math::Prime::Util::factor($n));
+                $r = scalar Math::Prime::Util::factor($n);
+            }
+            else {
+                my @factors = _factor($n);
+                $r = scalar @factors;
             }
 
-            my @factors = _factor($n);
-            return _set_int(scalar @factors);
+            return bless \$r;
         }
 
         # Ω_m(n) = Sum_{p^k|n} Sum_{j=1..k} n^m / p^(j*m)
@@ -23181,14 +23230,18 @@ package Sidef::Types::Number::Number {
 
         if ($m == 0) {
 
+            my $r;
             if (HAS_NEW_PRIME_UTIL and $n < ULONG_MAX) {
-                return _set_int(Math::Prime::Util::prime_omega($n));
+                $r = Math::Prime::Util::prime_omega($n);
             }
             elsif (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-                return _set_int(scalar Math::Prime::Util::factor_exp($n));
+                $r = scalar Math::Prime::Util::factor_exp($n);
+            }
+            else {
+                $r = scalar _factor_exp($n);
             }
 
-            return _set_int(scalar _factor_exp($n));
+            return bless \$r;
         }
 
         # omega_m(n) = n^m * Sum_{p|n} 1/p^m
@@ -27819,7 +27872,7 @@ package Sidef::Types::Number::Number {
 
         if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             my $r = Math::Prime::Util::legendre_phi(Math::GMPz::Rmpz_get_ui($n), Math::Prime::Util::prime_count($k - 1));
-            return _set_int($r);
+            return bless \$r;
         }
 
         my $count = sub {

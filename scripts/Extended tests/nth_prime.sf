@@ -1,18 +1,15 @@
 #!/usr/bin/ruby
 
-require('ntheory')
-
-#irand(1234)
-
 for n in (1..100) {
     var k = irand(1e7)
 
     say "Testing k=#{k}"
 
     var p = k.nth_prime
-    var q = %S<ntheory>.nth_prime(k)
 
-    if (p != q) {
+    assert(p.is_prime)
+
+    if (p.prime_count != k) {
         die "Error for k=#{k}"
     }
 }
@@ -23,9 +20,10 @@ for n in (1..10) {
     say "Testing k=#{k}"
 
     var p = k.nth_prime
-    var q = %S<ntheory>.nth_prime(k)
 
-    if (p != q) {
+    assert(p.is_prime)
+
+    if (p.prime_count != k) {
         die "Error for k=#{k}"
     }
 }
@@ -36,9 +34,10 @@ for n in (1..10) {
     say "Testing k=#{k}"
 
     var p = k.nth_prime
-    var q = %S<ntheory>.nth_prime(k)
 
-    if (p != q) {
+    assert(p.is_prime)
+
+    if (p.prime_count != k) {
         die "Error for k=#{k}"
     }
 }
@@ -49,9 +48,10 @@ for n in (1..8) {
     say "Testing k=#{k}"
 
     var p = k.nth_prime
-    var q = %S<ntheory>.nth_prime(k)
 
-    if (p != q) {
+    assert(p.is_prime)
+
+    if (p.prime_count != k) {
         die "Error for k=#{k}"
     }
 }

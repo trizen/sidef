@@ -10,6 +10,7 @@ use strict;
 use CGI qw(:standard -utf8);
 #use CGI::Carp qw(fatalsToBrowser);
 use Capture::Tiny qw(capture);
+use HTML::Entities qw(encode_entities);
 
 # Path where Sidef exists (when not installed)
 #use lib qw(/home/user/Sidef/lib);
@@ -115,7 +116,7 @@ if (param) {
 
         if ($errors ne '') {
             chomp($errors);
-            print pre($errors);
+            print pre(encode_entities($errors));
             print hr;
             $errors = '';
         }
@@ -125,12 +126,12 @@ if (param) {
 
             if ($errors ne "") {
                 chomp($errors);
-                print pre($errors);
+                print pre(encode_entities($errors));
                 print hr;
             }
 
             if (defined $output and $output ne '') {
-                print pre($output);
+                print pre(encode_entities($output));
             }
         }
     }
