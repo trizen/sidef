@@ -13274,10 +13274,63 @@ package Sidef::Types::Number::Number {
             return Math::Prime::Util::powerfree_count($n, 2);
         }
 
-        my $s = CORE::int(CORE::sqrt($n));
+        my $s = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($n) : Math::Prime::Util::GMP::sqrtint($n));
 
-        # Using moebius(1, sqrt(n)) for values of n <= 2^40
-        if ($n < ~0 and $n <= 1099511627776) {
+        if ($n < ((~0) >> 1)) {
+
+            # Basic method from https://arxiv.org/pdf/1107.4890.pdf
+            # Based on code by Dana Jacobsen (translated from Math::Prime::Util).
+
+            use integer;
+
+            my $I = (HAS_PRIME_UTIL ? Math::Prime::Util::rootint($n, 5)   : Math::Prime::Util::GMP::rootint($n, 5));
+            my $D = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($n / $I) : Math::Prime::Util::GMP::sqrtint($n / $I));
+
+            my $S1 = $n;
+
+            my $k       = 2;
+            my @M       = (0, 1);
+            my $mertens = 1;
+
+            foreach my $mu (
+                            HAS_PRIME_UTIL
+                            ? Math::Prime::Util::moebius(2, $D)
+                            : Math::Prime::Util::GMP::moebius(2, $D)
+              ) {
+                if ($mu) {
+                    $S1      += $mu * ($n / ($k * $k));
+                    $mertens += $mu;
+                }
+                push @M, $mertens;
+                ++$k;
+            }
+
+            my @Mx;
+            my $Mxisum = 0;
+
+            for (my $i = $I - 1 ; $i > 0 ; --$i) {
+
+                my $Mxi = 1;
+                my $xi  = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($n / $i) : Math::Prime::Util::GMP::sqrtint($n / $i));
+                my $L   = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($xi)     : Math::Prime::Util::GMP::sqrtint($xi));
+
+                foreach my $j (1 .. ($xi / ($L + 1))) {
+                    $Mxi -= $M[$j] * (($xi / $j) - ($xi / ($j + 1)));
+                }
+                foreach my $j (2 .. $L) {
+                    $Mxi -= (($xi / $j) <= $D) ? $M[$xi / $j] : $Mx[$j * $j * $i];
+                }
+                $Mx[$i] = $Mxi;
+                $Mxisum += $Mxi;
+            }
+
+            my $S2 = $Mxisum - ($I - 1) * $M[$D];
+
+            return $S1 + $S2;
+        }
+
+        # Using moebius(1, sqrt(n)) for values of n <= 2^50
+        if ($n < ~0 and $n <= 1125899906842624) {
 
             my ($count, $k) = (0, 0);
 
@@ -13306,9 +13359,10 @@ package Sidef::Types::Number::Number {
             );
         }
         else {
+            # TODO: segment 1..s into multiple [a,b] ranges and use moebius(a,b)
             my $m;
             foreach my $k (1 .. $s) {
-                if ($m = Math::Prime::Util::GMP::moebius($k)) {
+                if ($m = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k))) {
                     $count += $m * CORE::int($n / ($k * $k));
                 }
             }
@@ -13339,8 +13393,7 @@ package Sidef::Types::Number::Number {
 
         # Optimization for native integers
         if ($k == 2 and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            my $count = _native_squarefree_count(Math::GMPz::Rmpz_get_ui($n));
-            return _set_int($count);
+            return _set_int(_native_squarefree_count(Math::GMPz::Rmpz_get_ui($n)));
         }
 
         if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
@@ -13368,9 +13421,10 @@ package Sidef::Types::Number::Number {
             );
         }
         else {
+            # TODO: segment 1..s into multiple [a,b] ranges and use moebius(a,b)
             my $m;
             for (my $v = 1 ; $v <= $s ; ++$v) {
-                if ($m = Math::Prime::Util::GMP::moebius($v)) {
+                if ($m = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($v) : Math::Prime::Util::GMP::moebius($v))) {
                     Math::GMPz::Rmpz_ui_pow_ui($t, $v, $k);
                     Math::GMPz::Rmpz_div($t, $n, $t);
                     ($m == 1)
@@ -15728,13 +15782,14 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        until (_is_squarefree($k)) {
+        until (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($k) : Math::Prime::Util::GMP::moebius($k)) {
             --$k;
         }
 
         my $cmp = ($n <=> $count);
         while ($count != $n) {
-            do { $k += $cmp } until _is_squarefree($k);
+            do { $k += $cmp }
+              until (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($k) : Math::Prime::Util::GMP::moebius($k));
             $count += $cmp;
         }
 
@@ -15764,7 +15819,10 @@ package Sidef::Types::Number::Number {
         #   https://mathoverflow.net/questions/66701/bounds-on-squarefree-numbers
 
         if ($n >= 144) {
-            my $f = Math::MPFR::Rmpfr_init2(256);
+
+            my $prec = Math::GMPz::Rmpz_sizeinbase($n, 2) + 1;
+
+            my $f = Math::MPFR::Rmpfr_init2($prec);
             Math::MPFR::Rmpfr_zeta_ui($f, $k, $ROUND);
             Math::MPFR::Rmpfr_mul_z($f, $f, $n, $ROUND);
 
@@ -15772,7 +15830,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_root($r, $n, $k);
             Math::GMPz::Rmpz_mul_ui($r, $r, 5);
 
-            my $t = Math::MPFR::Rmpfr_init2(256);
+            my $t = Math::MPFR::Rmpfr_init2($prec);
             Math::MPFR::Rmpfr_sub_z($t, $f, $r, $ROUND);
             $min = _any2mpz($t) // goto &nan;
             Math::MPFR::Rmpfr_add_z($t, $f, $r, $ROUND);

@@ -134,6 +134,8 @@ for j in (2..5), n in (2..5 -> map{|b| b**j }), k in (2..5) {
     }
 }
 
+assert_eq(3.powerfree_count(1099999), 915099)
+
 for j in (2..8), n in (2..15 -> map{|b| b**j }), k in (2..10) {
     do {
         var t = nth_powerfree(n, k)
