@@ -1,5 +1,6 @@
 package Sidef::Time::Time {
 
+    use utf8;
     use 5.016;
     use parent qw(Sidef::Object::Object);
 
