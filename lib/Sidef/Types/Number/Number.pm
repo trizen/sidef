@@ -58,7 +58,7 @@ package Sidef::Types::Number::Number {
         SMALL_NUMBER_MAX_BITS  => 110,    # in bits (numbers that can be factorized fast)
         MEDIUM_NUMBER_MAX_BITS => 150,    # in bits (numbers that can be factorized moderately fast)
 
-        PRIMECOUNT_MIN => List::Util::min(ULONG_MAX, (HAS_PRIME_UTIL ? 1e10 : 1e8)),    # absolute value
+        PRIMECOUNT_MIN => List::Util::min(ULONG_MAX, (HAS_PRIME_UTIL ? 1e10 : 1e7)),    # absolute value
     };
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
@@ -8700,7 +8700,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_set_q($r, $x);
             Math::GMPq::Rmpq_integer_p($x) && return $r;
             Math::GMPz::Rmpz_sub_ui($r, $r, 1) if Math::GMPq::Rmpq_sgn($x) < 0;
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+            $r = Math::GMPz::Rmpz_get_si($r)   if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
         }
 
@@ -8745,7 +8745,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_set_q($r, $x);
             Math::GMPq::Rmpq_integer_p($x) && return $r;
             Math::GMPz::Rmpz_add_ui($r, $r, 1) if Math::GMPq::Rmpq_sgn($x) > 0;
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+            $r = Math::GMPz::Rmpz_get_si($r)   if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
         }
 
@@ -15234,21 +15234,19 @@ package Sidef::Types::Number::Number {
 
                 if ($x == 2) {
 
-                    $y = __PACKAGE__->new($y);
-
                     my $pp_count = ZERO;
-                    my $ilog2    = _any2ui(${$y->ilog2});
+                    my $ilog2    = __ilog__($y, 2);
 
                     for (my $k = 1 ; $k <= $ilog2 ; ++$k) {
-                        my $root = $y->iroot(_set_int($k));
-                        $pp_count = $pp_count->add($root->prime_count);
+                        my $root = Math::Prime::Util::GMP::rootint($y, $k);
+                        $pp_count = $pp_count->add(_set_int(_prime_count($root)));
                     }
 
                     return $pp_count;
                 }
 
-                my $x_pp_count = __PACKAGE__->new($x)->prime_power_count;
-                my $y_pp_count = __PACKAGE__->new($y)->prime_power_count;
+                my $x_pp_count = _set_int($x)->prime_power_count;
+                my $y_pp_count = _set_int($y)->prime_power_count;
 
                 my $pp_count = $y_pp_count->sub($x_pp_count);
 
@@ -15303,7 +15301,7 @@ package Sidef::Types::Number::Number {
             return _set_int($count);
         }
 
-        my $pp_count = sub {
+        state $pp_count = sub {
             my ($n) = @_;
 
             return $pp_table->[$n] if $n <= 100;
@@ -15314,14 +15312,14 @@ package Sidef::Types::Number::Number {
 
             my $count = 0;
 
-            foreach my $k (1 .. Math::Prime::Util::GMP::logint($n, 2)) {
+            foreach my $k (1 .. (HAS_PRIME_UTIL ? Math::Prime::Util::logint($n, 2) : Math::Prime::Util::GMP::logint($n, 2))) {
                 my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::rootint($n, $k) : Math::Prime::Util::GMP::rootint($n, $k));
 
                 if ($r <= 100) {
                     $count += $pi_table->[$r];
                 }
                 else {
-                    $count += _prime_count($r);
+                    $count += (HAS_PRIME_UTIL and $r < PRIMECOUNT_MIN) ? Math::Prime::Util::prime_count($r) : _prime_count($r);
                 }
             }
 
@@ -15333,11 +15331,11 @@ package Sidef::Types::Number::Number {
 
         my $count = $y_pp_count - $x_pp_count;
 
-        if ($x == 2 or Math::Prime::Util::GMP::is_prime_power($x)) {
+        if ($x == 2 or (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($x) : Math::Prime::Util::GMP::is_prime_power($x))) {
             ++$count;
         }
 
-        _set_int($count);
+        bless \$count;
     }
 
     sub nth_prime {
@@ -28368,6 +28366,11 @@ package Sidef::Types::Number::Number {
 
         $k = _any2ui($$k) // return ZERO;
 
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            my $r = Math::Prime::Util::powerful_count(Math::GMPz::Rmpz_get_ui($n), $k);
+            return bless \$r;
+        }
+
         my $t     = Math::GMPz::Rmpz_init();
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -28382,6 +28385,23 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
+            my $z = Math::GMPz::Rmpz_init();
+
+            if ($r > $k and $t < 1e7 and $t > 1) {
+                my $v = 1;
+                foreach my $mu (HAS_PRIME_UTIL ? Math::Prime::Util::moebius(1, $t) : Math::Prime::Util::GMP::moebius(1, $t)) {
+                    if ($mu) {
+                        if ($k == 2 or Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1) {
+                            Math::GMPz::Rmpz_ui_pow_ui($z, $v, $r);
+                            Math::GMPz::Rmpz_mul($z, $z, $m);
+                            __SUB__->($z, $r - 1);
+                        }
+                    }
+                    ++$v;
+                }
+                return;
+            }
+
             foreach my $v (1 .. $t) {
 
                 if ($r > $k) {
@@ -28389,8 +28409,9 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                        or next;
                 }
 
-                Math::GMPz::Rmpz_ui_pow_ui($t, $v, $r);
-                __SUB__->($m * $t, $r - 1);
+                Math::GMPz::Rmpz_ui_pow_ui($z, $v, $r);
+                Math::GMPz::Rmpz_mul($z, $z, $m);
+                __SUB__->($z, $r - 1);
             }
           }
           ->($ONE, 2 * $k - 1);
