@@ -58,6 +58,7 @@ package Sidef::Types::Number::Number {
         SMALL_NUMBER_MAX_BITS  => 110,    # in bits (numbers that can be factorized fast)
         MEDIUM_NUMBER_MAX_BITS => 150,    # in bits (numbers that can be factorized moderately fast)
 
+        INTSIZE        => CORE::int(CORE::log(ULONG_MAX) / CORE::log(2)),               # size of ULONG_MAX in base 2
         PRIMECOUNT_MIN => List::Util::min(ULONG_MAX, (HAS_PRIME_UTIL ? 1e10 : 1e7)),    # absolute value
     };
 
@@ -10682,7 +10683,7 @@ package Sidef::Types::Number::Number {
         $n = _any2ui($$n) // goto &nan;
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_fac_ui($r, $n);
-        $r = Math::GMPz::Rmpz_get_ui($r) if ($n <= ((CORE::log(ULONG_MAX) / CORE::log(2) <= 32) ? 12 : 20));
+        $r = Math::GMPz::Rmpz_get_ui($r) if ($n <= ((INTSIZE <= 32) ? 12 : 20));
         bless \$r;
     }
 
@@ -13082,12 +13083,12 @@ package Sidef::Types::Number::Number {
 
         push @sd, [$ONE, 0];
 
+        my $base = Math::GMPz::Rmpz_init();
         my $prod = Math::GMPz::Rmpz_init_set_ui(1);
 
         foreach my $pair (@sd) {
             my ($d, $c) = @$pair;
 
-            my $base = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_divexact($base, $n, $d);
             Math::GMPz::Rmpz_powm($base, $x, $base, $m);    # x^(n/d) mod m
             Math::GMPz::Rmpz_sub_ui($base, $base, 1);
@@ -15441,7 +15442,7 @@ package Sidef::Types::Number::Number {
             }
 
             if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-                if ((CORE::int(CORE::log(ULONG_MAX) / CORE::log(2)) <= 32) ? ($n < 203280221) : 1) {
+                if ((INTSIZE <= 32) ? ($n < 203280221) : 1) {
                     return _set_int(Math::Prime::Util::nth_prime("$n"));
                 }
             }
@@ -17078,16 +17079,14 @@ package Sidef::Types::Number::Number {
         my $t = 0;
         my $s = Math::Prime::Util::GMP::sqrtint($n);
 
-        state $bits = CORE::int(CORE::log(ULONG_MAX) / CORE::log(2));
-
         my $count = 0;
         foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $s)) {
-            if ($bits <= 32) {
+            if (INTSIZE <= 32) {
                 $count = Math::Prime::Util::GMP::addint(
                                                         $count,
                                                         Math::Prime::Util::GMP::subint(
                                                                           _prime_count(Math::Prime::Util::GMP::divint($n, $p)),
-                                                                          (++$t - 1)
+                                                                          ++$t - 1
                                                                                       )
                                                        );
             }
@@ -17495,7 +17494,7 @@ package Sidef::Types::Number::Number {
         my $bigomega  = 0;
         my $remainder = $n;
 
-        if ($size >= 40) {
+        if ($size >= ((INTSIZE <= 32) ? 32 : 40)) {
 
             my %is_prob_prime_cache;
             my $t = Math::GMPz::Rmpz_init();
@@ -17747,7 +17746,7 @@ package Sidef::Types::Number::Number {
         my $remainder = $n;
         my $size      = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
-        if ($size >= 40) {
+        if ($size >= ((INTSIZE <= 32) ? 32 : 40)) {
 
             my %is_prob_prime_cache;
             my $t = Math::GMPz::Rmpz_init();

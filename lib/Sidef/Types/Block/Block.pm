@@ -712,7 +712,7 @@ package Sidef::Types::Block::Block {
                 my ($self, $x, $y) = @_;
 
                 my $from = $x // Sidef::Types::Number::Number::ZERO;
-                my $upto = $y // Sidef::Types::Number::Number::TWO;
+                my $upto = $y // $from->inc->mul(Sidef::Types::Number::Number::TWO);
 
                 while (1) {
                     my $k = $from->$name($upto, $self);
