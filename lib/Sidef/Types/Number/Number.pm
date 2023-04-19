@@ -1718,6 +1718,8 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
+        ref($x) || return $x;    # native integer
+
         # Convert fraction to a floating-point value, so it can be passed to Perl modules
         if (ref($x) eq 'Math::GMPq' and !Math::GMPq::Rmpq_integer_p($x)) {
             $x = _mpq2mpfr($x);

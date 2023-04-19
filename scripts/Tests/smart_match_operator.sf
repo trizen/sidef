@@ -146,3 +146,18 @@ assert(Pair(1,2) ~~ [42, Pair(1,2), 99])
 assert(1 ~~ Pair(1,2))
 assert(2 ~~ Pair(1,2))
 assert([1,2] ~~ Pair([1,2],42))
+
+#
+## nil
+#
+
+assert(nil ~~ [2,nil,3])
+assert(nil !~ [2,3,4])
+assert(nil ~~ nil)
+assert(nil !~ "")
+assert("" !~ nil)
+assert([2,nil,3] ~~ nil)
+assert(!([2,nil,4] !~ nil))
+assert([2,3,4] !~ nil)
+assert(!(nil ~~ 0))
+assert(0 !~ nil)

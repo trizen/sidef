@@ -80,7 +80,6 @@ package Sidef::Deparse::Perl {
             overload_methods => {
                                  '=='  => 'eq',
                                  '<=>' => 'cmp',
-                                 '~~'  => '~~',
                                 },
 
             data_types => {
@@ -634,7 +633,8 @@ HEADER
                   . '}'
               } @vars
           )
-          . ']' . ','
+          . ']'
+          . ','
           . 'table=>{'
           . join(',', map { $self->_dump_string($vars[$_]{name}) . '=>' . $_ } 0 .. $#vars) . '}';
     }
@@ -1394,7 +1394,7 @@ HEADER
 
             $code =
                 "if (\$continue) {my \$t = $arg;"
-              . "if (defined(\$given_value) ? defined(\$t) ? (\$given_value ~~ \$t) : 0 : 1) {"
+              . "if (defined(\$given_value) ? defined(\$t) ? Sidef::Object::Object::smartmatch(\$given_value, \$t) : 0 : 1) {"
               . "\$continue = 0; \@given_values = do"
               . $self->deparse_block_with_scope($obj->{block}) . "}};";
         }
@@ -1786,11 +1786,11 @@ HEADER
                     if ($method eq '~~' or $method eq '!~') {
                         $self->top_add(q{no warnings 'experimental::smartmatch';});
                         $code =
-                            'do{my$bool=do{'
+                            'do{my$bool=Sidef::Object::Object::smartmatch(do{'
                           . $code
-                          . '}~~do{'
+                          . '}, do{'
                           . $self->deparse_args(@{$call->{arg}})
-                          . '};ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)}'
+                          . '});ref($bool) ? $bool : ($bool ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE)}'
                           . ($method eq '!~' ? '->not' : '');
                         next;
                     }

@@ -10,7 +10,6 @@ package Sidef::Object::Object {
     use parent qw(Sidef::Object::Convert);
 
     use overload
-      q{~~}   => \&{__PACKAGE__ . '::' . '~~'},
       q{bool} => sub {
         if (defined(my $sub = UNIVERSAL::can($_[0], 'to_b'))) {
             @_ = ($_[0]);
@@ -418,70 +417,26 @@ package Sidef::Object::Object {
             Sidef::Types::Hash::Hash->new(\%methods);
         }
 
-        # Pipeline operator
-        *{__PACKAGE__ . '::' . '|>'} = sub {
-            my ($arg, $func, @args) = @_;
-
-            if (CORE::ref($func) eq 'Sidef::Types::Array::Array') {
-                @args = @$func;
-                $func = shift(@args);
-            }
-
-            if (CORE::ref($func) eq 'Sidef::Types::String::String') {
-                return $arg->$$func(@args);
-            }
-
-            $func->call($arg, @args);
-        };
-
-        # Deprecated pair method: ASCII colon; U+3A
-        *{__PACKAGE__ . '::' . ':'} = sub {
-            Sidef::Types::Array::Pair->new($_[0], $_[1]);
-        };
-
-        # Pair method: Fullwidth Colon; U+FF1A
-        *{__PACKAGE__ . '::' . '：'} = sub {
-            Sidef::Types::Array::Pair->new($_[0], $_[1]);
-        };
-
-        # NamedParam method: Triple Colon Operator; U+2AF6
-        *{__PACKAGE__ . '::' . '⫶'} = sub {
-            Sidef::Variable::NamedParam->new($_[0], $_[1]);
-        };
-
-        # Logical AND
-        *{__PACKAGE__ . '::' . '&&'} = sub {
-            $_[0] ? $_[1] : $_[0];
-        };
-
-        # Logical OR
-        *{__PACKAGE__ . '::' . '||'} = sub {
-            $_[0] ? $_[0] : $_[1];
-        };
-
-        # Logical XOR
-        *{__PACKAGE__ . '::' . '^'} = sub {
-            ($_[0] xor $_[1])
-              ? (Sidef::Types::Bool::Bool::TRUE)
-              : (Sidef::Types::Bool::Bool::FALSE);
-        };
-
-        # Defined-OR
-        *{__PACKAGE__ . '::' . '\\\\'} = sub {
-            defined($_[0]) ? $_[1] : $_[0];
-        };
-
         # Smart match operator
-        *{__PACKAGE__ . '::' . '~~'} = sub {
-            my ($first, $second, $swapped) = @_;
+        sub smartmatch {
+            my ($first, $second) = @_;
 
-            if ($swapped) {
-                ($first, $second) = ($second, $first);
+            if (!defined($first) and !defined($second)) {
+                return Sidef::Types::Bool::Bool::TRUE;
             }
 
             # Second is not an object (assuming it is a typename)
             # Return true if `typeof(first)` is a subclass of `second`
-            if (!CORE::ref($second)) {
+            if (defined($second) and !CORE::ref($second)) {
+
+                if (defined($first) and !CORE::ref($first)) {
+                    return (
+                            ($first eq $second)
+                            ? Sidef::Types::Bool::Bool::TRUE
+                            : Sidef::Types::Bool::Bool::FALSE
+                           );
+                }
+
                 return (
                         UNIVERSAL::isa(CORE::ref($first), $second)
                         ? Sidef::Types::Bool::Bool::TRUE
@@ -491,7 +446,7 @@ package Sidef::Object::Object {
 
             # First is not an object (assuming it is a typename)
             # Return true if `first` is a subclass of `typeof(second)`
-            if (!CORE::ref($first)) {
+            if (defined($first) and !CORE::ref($first)) {
                 return (
                         UNIVERSAL::isa($first, CORE::ref($second))
                         ? Sidef::Types::Bool::Bool::TRUE
@@ -631,6 +586,14 @@ package Sidef::Object::Object {
                 return $second->match($first)->is_successful;
             }
 
+            if (defined($first) and !defined($second)) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if (defined($second) and !defined($first)) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
             my $bool = $first eq $second;
 #<<<
             CORE::ref($bool) ? $bool : (
@@ -638,12 +601,64 @@ package Sidef::Object::Object {
                              : Sidef::Types::Bool::Bool::FALSE
             );
 #>>>
+        }
+
+        # Pipeline operator
+        *{__PACKAGE__ . '::' . '|>'} = sub {
+            my ($arg, $func, @args) = @_;
+
+            if (CORE::ref($func) eq 'Sidef::Types::Array::Array') {
+                @args = @$func;
+                $func = shift(@args);
+            }
+
+            if (CORE::ref($func) eq 'Sidef::Types::String::String') {
+                return $arg->$$func(@args);
+            }
+
+            $func->call($arg, @args);
         };
 
-        # Negation of smart match
+        # Deprecated pair method: ASCII colon; U+3A
+        *{__PACKAGE__ . '::' . ':'} = sub {
+            Sidef::Types::Array::Pair->new($_[0], $_[1]);
+        };
+
+        # Pair method: Fullwidth Colon; U+FF1A
+        *{__PACKAGE__ . '::' . '：'} = sub {
+            Sidef::Types::Array::Pair->new($_[0], $_[1]);
+        };
+
+        # NamedParam method: Triple Colon Operator; U+2AF6
+        *{__PACKAGE__ . '::' . '⫶'} = sub {
+            Sidef::Variable::NamedParam->new($_[0], $_[1]);
+        };
+
+        # Logical AND
+        *{__PACKAGE__ . '::' . '&&'} = sub {
+            $_[0] ? $_[1] : $_[0];
+        };
+
+        # Logical OR
+        *{__PACKAGE__ . '::' . '||'} = sub {
+            $_[0] ? $_[0] : $_[1];
+        };
+
+        # Logical XOR
+        *{__PACKAGE__ . '::' . '^'} = sub {
+            ($_[0] xor $_[1])
+              ? (Sidef::Types::Bool::Bool::TRUE)
+              : (Sidef::Types::Bool::Bool::FALSE);
+        };
+
+        # Defined-OR
+        *{__PACKAGE__ . '::' . '\\\\'} = sub {
+            defined($_[0]) ? $_[1] : $_[0];
+        };
+
+        # Negation of smartmatch
         *{__PACKAGE__ . '::' . '!~'} = sub {
-            state $method = '~~';
-            $_[0]->$method($_[1])->neg;
+            Sidef::Object::Object::smartmatch($_[0], $_[1])->neg;
         };
     }
 }

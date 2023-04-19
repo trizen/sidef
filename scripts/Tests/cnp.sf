@@ -153,7 +153,7 @@ var era = years{cnp[0]}{:era};
 var current = Time.local;
 
 if (era == 0) {
-    era = [1900, 2000][year < (current.year() - 100)];
+    era = [1900, 2000][year < (current.year - 2000)];
     nationality = years{cnp[0]}{:cet};
 }
 
@@ -174,7 +174,7 @@ if (month == 2 && (day == 29)) {
     }
 }
 
-var age = (current.year + 1900 - birth_year);
+var age = (current.year - birth_year);
 if (current.month < month || (month == current.month && (day < current.day))) {
     age--;
 }
