@@ -84,6 +84,8 @@ Returns the
 
 Returns the
 
+Aliases: I<smartmatch>
+
 =cut
 
 =head2 ⫶

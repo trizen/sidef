@@ -687,6 +687,7 @@ package Sidef::Types::Number::Number {
                      ? (($x < 0) ? Math::GMPz::Rmpz_init_set_si($x) : Math::GMPz::Rmpz_init_set_ui($x))
                      : Math::GMPz::Rmpz_init_set_str($x, 10)
                     );
+
         ref($x) eq 'Math::GMPz' && return $x;
         ref($x) eq 'Math::GMPq' && goto &_mpq2mpz;
 
@@ -7530,7 +7531,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $n = defined($n) ? do { _valid(\$n); _any2ui($$n) // 0 } : ($p >> 1);
 
-        goto(ref($x) =~ tr/:/_/rs);
+        goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
 
       Math_GMPq: {
             my @cfrac;
@@ -7541,7 +7542,7 @@ package Sidef::Types::Number::Number {
             for (1 .. $n) {
                 my $z = __floor__($q);
                 push @cfrac, bless \$z;
-                Math::GMPq::Rmpq_sub_z($q, $q, $z);
+                Math::GMPq::Rmpq_sub_z($q, $q, _any2mpz($z));
                 Math::GMPq::Rmpq_sgn($q) || last;
                 Math::GMPq::Rmpq_inv($q, $q);
             }
@@ -7614,6 +7615,10 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPz: {
+            return Sidef::Types::Array::Array->new([bless \$x]);
+        }
+
+      Scalar: {
             return Sidef::Types::Array::Array->new([bless \$x]);
         }
     }

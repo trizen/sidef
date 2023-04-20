@@ -656,6 +656,9 @@ package Sidef::Object::Object {
             defined($_[0]) ? $_[1] : $_[0];
         };
 
+        # Smartmatch operator
+        *{__PACKAGE__ . '::' . '~~'} = \&smartmatch;
+
         # Negation of smartmatch
         *{__PACKAGE__ . '::' . '!~'} = sub {
             Sidef::Object::Object::smartmatch($_[0], $_[1])->neg;
