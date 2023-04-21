@@ -457,4 +457,14 @@ do {
     assert_eq(Poly(C.last(-1)), -5*z**2 - 7*z)
 }
 
+assert_eq(Poly(5).inc.dec, Poly(5))
+assert_eq(Poly(5).dec.inc, Poly(5))
+assert_eq(Poly(5).dec, Poly(5) - 1)
+assert_eq(Poly(5).inc, Poly(5) + 1)
+assert_eq(Poly(5).inc.inc, Poly(5) + 2)
+assert_eq(Poly(5).dec.dec, Poly(5) - 2)
+
+assert_eq(Poly(4 => 13, 5 => 7, 4 => 0), Polynomial(5 => 7))
+assert_eq(Poly(4 => 13, 4 => 3, 5 => 7), Polynomial(4 => 3, 5 => 7))
+
 say "** Test passed!"

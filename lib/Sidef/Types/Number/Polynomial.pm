@@ -49,15 +49,14 @@ package Sidef::Types::Number::Polynomial {
 
         my %poly;
 
-        while (@args) {
-            my ($key, $value) = splice(@args, 0, 2);
+        my %pairs = @args;
+        foreach my $key (CORE::keys(%pairs)) {
 
-            $key //= 0;
-            $value // next;
+            my $value = $pairs{$key} // next;
             $value = Sidef::Types::Number::Number->new($value) if !UNIVERSAL::isa($value, 'Sidef::Types::Number::Number');
 
             unless ($value->is_zero) {
-                $poly{"$key"} = $value;
+                $poly{$key} = $value;
             }
         }
 
