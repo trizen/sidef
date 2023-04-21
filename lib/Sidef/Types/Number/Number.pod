@@ -8074,9 +8074,11 @@ Returns the number 0.
 
     znorder(a,m)
 
-The smallest positive integer k such that C<powmod(a, k, m) == 1>.
+The smallest positive integer C<k> such that C<powmod(a, k, m) == 1>.
 
 Return C<NaN> if C<a> is not coprime to C<m>.
+
+Aliases: I<multiplicative_order>
 
 =cut
 

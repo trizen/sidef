@@ -221,6 +221,8 @@ package Sidef::Types::Number::Mod {
         $x->{n}->znorder($x->{m});
     }
 
+    *multiplicative_order = \&znorder;
+
     sub pow {
         my ($x, $y) = @_;
         __PACKAGE__->new($x->{n}->powmod($y, $x->{m}), $x->{m});

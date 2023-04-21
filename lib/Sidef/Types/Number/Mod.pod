@@ -497,4 +497,6 @@ Returns the
 
 Returns the
 
+Aliases: I<multiplicative_order>
+
 =cut

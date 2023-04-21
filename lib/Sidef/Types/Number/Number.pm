@@ -19675,6 +19675,8 @@ package Sidef::Types::Number::Number {
         _set_int(Math::Prime::Util::GMP::znorder($x, $y) // goto &nan);
     }
 
+    *multiplicative_order = \&znorder;
+
     sub znprimroot {
         _set_int(Math::Prime::Util::GMP::znprimroot(_big2uistr($_[0]) // (goto &nan)) // goto &nan);
     }
