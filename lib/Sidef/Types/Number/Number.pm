@@ -16879,7 +16879,7 @@ package Sidef::Types::Number::Number {
         my $bin  = CORE::pack('H*', $hex);
         my $seed = Digest::SHA::sha512($bin);
 
-        while (length($seed) < 1024) {
+        while (CORE::length($seed) < 1024) {
             $seed = Digest::SHA::sha512($seed) . CORE::reverse($seed);
         }
 
@@ -20374,8 +20374,6 @@ package Sidef::Types::Number::Number {
 
         state $V1 = Math::GMPz::Rmpz_init_nobless();
         state $V2 = Math::GMPz::Rmpz_init_nobless();
-        state $Q1 = Math::GMPz::Rmpz_init_nobless();
-        state $Q2 = Math::GMPz::Rmpz_init_nobless();
 
         my $chebyshevTmod = sub {
             my ($v, $x) = @_;
@@ -20384,8 +20382,6 @@ package Sidef::Types::Number::Number {
 
             Math::GMPz::Rmpz_set_ui($V1, 2);
             Math::GMPz::Rmpz_set($V2, $x);
-            Math::GMPz::Rmpz_set_ui($Q1, 1);
-            Math::GMPz::Rmpz_set_ui($Q2, 1);
 
             my @bits;
             while ($v) {
@@ -20395,22 +20391,18 @@ package Sidef::Types::Number::Number {
 
             foreach my $bit (@bits) {
 
-                Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
-                Math::GMPz::Rmpz_mod($Q1, $Q1, $n);
-
                 if ($bit) {
                     Math::GMPz::Rmpz_mul($V1, $V1, $V2);
                     Math::GMPz::Rmpz_powm_ui($V2, $V2, 2, $n);
-                    Math::GMPz::Rmpz_submul($V1, $Q1, $x);
-                    Math::GMPz::Rmpz_submul_ui($V2, $Q2, 2);
+                    Math::GMPz::Rmpz_sub($V1, $V1, $x);
+                    Math::GMPz::Rmpz_sub_ui($V2, $V2, 2);
                     Math::GMPz::Rmpz_mod($V1, $V1, $n);
                 }
                 else {
-                    Math::GMPz::Rmpz_set($Q2, $Q1);
                     Math::GMPz::Rmpz_mul($V2, $V2, $V1);
                     Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $n);
-                    Math::GMPz::Rmpz_submul($V2, $Q1, $x);
-                    Math::GMPz::Rmpz_submul_ui($V1, $Q2, 2);
+                    Math::GMPz::Rmpz_sub($V2, $V2, $x);
+                    Math::GMPz::Rmpz_sub_ui($V1, $V1, 2);
                     Math::GMPz::Rmpz_mod($V2, $V2, $n);
                 }
             }
@@ -27566,6 +27558,16 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
+        # If n is a native integer, check if it is a Carmichael number
+        if (!ref($n)) {
+            (
+             HAS_PRIME_UTIL
+             ? (Math::Prime::Util::is_carmichael($n) && Math::Prime::Util::is_euler_pseudoprime($n, 2))
+             : (Math::Prime::Util::GMP::is_carmichael($n) && Math::Prime::Util::GMP::is_euler_pseudoprime($n, 2))
+            )
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
+
         if (ref($n) ne 'Math::GMPz') {
             __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
             $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
@@ -27574,6 +27576,12 @@ package Sidef::Types::Number::Number {
         # Small or even
         Math::GMPz::Rmpz_odd_p($n)             or return Sidef::Types::Bool::Bool::FALSE;
         Math::GMPz::Rmpz_cmp_ui($n, 1729) >= 0 or return Sidef::Types::Bool::Bool::FALSE;
+
+        # Must also be an Euler pseudoprime to base 2
+        if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            Math::Prime::Util::GMP::is_euler_pseudoprime(Math::GMPz::Rmpz_get_str($n, 10), 2)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
 
         state $nm1   = Math::GMPz::Rmpz_init_nobless();
         state $nm1d2 = Math::GMPz::Rmpz_init_nobless();
@@ -27600,31 +27608,6 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_cmp_ui($pm1, 1) == 0
                   or Math::GMPz::Rmpz_cmp($pm1, $nm1) == 0
                   or return Sidef::Types::Bool::Bool::FALSE;
-            }
-        }
-
-        # If n is a native integer, check if it is a Carmichael number
-        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            my $nstr = Math::GMPz::Rmpz_get_ui($n);
-            (
-             HAS_PRIME_UTIL
-             ? Math::Prime::Util::is_carmichael($nstr)
-             : Math::Prime::Util::GMP::is_carmichael($nstr)
-            )
-              || return Sidef::Types::Bool::Bool::FALSE;
-        }
-        else {
-            my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
-
-            # Must also be an Euler pseudoprime to base 2
-            Math::Prime::Util::GMP::is_euler_pseudoprime($nstr, 2)
-              || return Sidef::Types::Bool::Bool::FALSE;
-
-            # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test
-            # Incorrect for some inputs: https://github.com/danaj/Math-Prime-Util-GMP/issues/34
-            if (0 and Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
-                Math::Prime::Util::GMP::is_carmichael($nstr)
-                  || return Sidef::Types::Bool::Bool::FALSE;
             }
         }
 
