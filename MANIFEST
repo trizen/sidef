@@ -224,6 +224,8 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/strong_fermat_with_n_factors.sf'
 'scripts/Extended tests/strong_fermat_with_n_factors_to_base_n.sf'
 'scripts/Extended tests/sumdigits.pl'
+'scripts/Extended tests/tie_berkeley_db.sf'
+'scripts/Extended tests/tie_gdbm_db.sf'
 scripts/fast_fourier_transform.sf
 scripts/faulhaber_s_formula.sf
 scripts/fibonacci_sequence.sf

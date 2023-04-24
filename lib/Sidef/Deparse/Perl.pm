@@ -1536,7 +1536,12 @@ HEADER
             $code = $self->make_constant($ref, '__NEW__', "ModuleOO", args => [$self->_dump_string($obj->{module})]);
         }
         elsif ($ref eq 'Sidef::Module::Func') {
-            $code = $self->make_constant($ref, '__NEW__', "ModuleFunc", args => [$self->_dump_string($obj->{module})]);
+            if ($obj->{module} =~ /^[\$\@\%\*]/) {    # class-variable
+                $code = "$obj->{module}";
+            }
+            else {
+                $code = $self->make_constant($ref, '__NEW__', "ModuleFunc", args => [$self->_dump_string($obj->{module})]);
+            }
         }
         elsif (exists($composite_constants{$ref})) {
             my $data = $composite_constants{$ref};

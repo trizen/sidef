@@ -1,0 +1,56 @@
+#!/usr/bin/ruby
+
+# Example on how to create and use a Berkeley database.
+
+require('DB_File')
+
+var DB_TYPE = %S<$DB_File::DB_HASH>
+#var DB_TYPE = %S<DB_File!DB_BTREE>
+
+#var DB_TYPE = Perl.eval('$DB_File::DB_HASH')
+#var DB_TYPE = Perl.eval('$DB_File::DB_BTREE')
+
+var h      = Hash()
+var file   = File("fruit") -> unlink
+var db_obj = Perl.tie(h, "DB_File", file, File.O_RDWR | File.O_CREAT, 0666, DB_TYPE) || die "Can't open #{file}"
+
+say db_obj
+
+# Add a few key/value pairs to the file
+h{"apple"}  = "red"
+h{"orange"} = "orange"
+h{"banana"} = "yellow"
+h{"tomato"} = "red"
+
+# Check for existence of a key
+print "Banana Exists\n\n" if h.exists("banana")
+
+assert_eq(Str(h{:banana}), "yellow")
+
+# Delete a key/value pair.
+h.delete("apple")
+
+# print the contents of the file
+h.each_kv {|k,v|
+    say [k,v]
+}
+
+db_obj.sync
+assert_eq(Perl.untie(h), 1)
+
+Perl.tie(var h2 = Hash(), "DB_File", file, File.O_RDONLY, 0644, DB_TYPE) || die "Can't open #{file}"
+
+assert_eq(Str(h2{:banana}), 'yellow')
+
+assert_eq(
+    h2,
+    Hash(
+        "banana" => *'yellow',
+        "orange" => *'orange',
+        "tomato" => *'red',
+    )
+)
+
+say file.size
+Perl.untie(h2)
+file.unlink

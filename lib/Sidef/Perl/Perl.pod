@@ -41,11 +41,27 @@ Returns the version of Perl as a Number object (e.g.: C<5.036>).
 
 =cut
 
+=head2 tie
+
+    Perl.tie(variable, class_name, *args)
+
+Returns the
+
+=cut
+
 =head2 to_sidef
 
     Perl.to_sidef(perl_structure)
 
 Converts a given a Perl data structure into a Sidef data structure.
+
+=cut
+
+=head2 untie
+
+    Perl.untie(variable)
+
+Returns the
 
 =cut
 

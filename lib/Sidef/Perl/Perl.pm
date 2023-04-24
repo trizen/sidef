@@ -102,6 +102,26 @@ package Sidef::Perl::Perl {
         my ($self, $perl_code) = @_;
         $self->to_sidef(eval "$perl_code");
     }
+
+    sub tie {
+        my ($self, $variable, $class_name, @args) = @_;
+        state $x = require Scalar::Util;
+        my $type = Scalar::Util::reftype($variable);
+        $self->to_sidef(
+                        CORE::tie(
+                                  ($type eq 'ARRAY' ? (@$variable) : $type eq 'HASH' ? %$variable : $variable),
+                                  "$class_name",
+                                  map { defined($_) ? $_->get_value : $_ } @args
+                                 )
+                       );
+    }
+
+    sub untie {
+        my ($self, $variable) = @_;
+        state $x = require Scalar::Util;
+        my $type = Scalar::Util::reftype($variable);
+        $self->to_sidef(CORE::untie($type eq 'ARRAY' ? (@$variable) : $type eq 'HASH' ? %$variable : $variable));
+    }
 };
 
 1
