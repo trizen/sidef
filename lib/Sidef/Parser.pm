@@ -96,7 +96,7 @@ package Sidef::Parser {
                      | Sidef\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Sidef::Sidef') })
                      | Sig\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sig') })
                      | Sys\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sys') })
-                     | Perl\b                         (?{ state $x = bless({}, 'Sidef::Perl::Perl') })
+                     | Perl\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Perl::Perl') })
                      | Math\b                         (?{ state $x = bless({}, 'Sidef::Math::Math') })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new })
                      | Date\b                         (?{ state $x = Sidef::Time::Date->new })
@@ -189,6 +189,10 @@ package Sidef::Parser {
                 # Symbols
                 | %[Os]\b.                                                 (?{ [qw(0 __NEW__ Sidef::Module::OO)] })
                 | %S\b.                                                    (?{ [qw(0 __NEW__ Sidef::Module::Func)] })
+
+                # Arbitrary Perl code
+                | %perl\b.                                                 (?{ [qw(0 new Sidef::Types::Perl::Perl)] })
+                | %Perl\b.                                                 (?{ [qw(1 new Sidef::Types::Perl::Perl)] })
              )
             }xs,
             built_in_classes => {
@@ -1102,6 +1106,17 @@ package Sidef::Parser {
                     $method     = 'new';
                 }
 
+                if ($package eq 'Sidef::Module::Func' or $package eq 'Sidef::Module::OO') {
+                    if ($string !~ /^$self->{var_name_re}\z/) {
+                        $self->fatal_error(
+                                           code   => $_,
+                                           pos    => (pos($_) - length($string) - 1),
+                                           error  => "invalid symbol declaration",
+                                           reason => "expected a variable-like name",
+                                          );
+                    }
+                }
+
                 my $obj = (
                     $double_quoted
                     ? do {
@@ -1111,8 +1126,8 @@ package Sidef::Parser {
                     : $package->$method($string =~ s{\\\\}{\\}gr)
                 );
 
-                # Special case for backticks (add method 'run')
-                if ($package eq 'Sidef::Types::Glob::Backtick') {
+                # Special case for backticks and Perl code (add method 'run')
+                if ($package eq 'Sidef::Types::Glob::Backtick' or $package eq 'Sidef::Types::Perl::Perl') {
                     my $struct =
                         $double_quoted && ref($obj) eq 'HASH'
                       ? $obj

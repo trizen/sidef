@@ -48,6 +48,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Glob::SocketHandle    SocketHandle
                   Sidef::DataTypes::Glob::Dir             Dir
                   Sidef::DataTypes::Glob::File            File
+                  Sidef::DataTypes::Perl::Perl            Perl
                   Sidef::DataTypes::Object::Object        Object
                   Sidef::DataTypes::Sidef::Sidef          Sidef
                   Sidef::DataTypes::Object::Lazy          Lazy
@@ -68,7 +69,6 @@ package Sidef::Deparse::Sidef {
                   Sidef::Types::Block::Break              break
                   Sidef::Types::Block::Continue           continue
 
-                  Sidef::Perl::Perl                       Perl
                   Sidef::Time::Time                       Time
                   Sidef::Time::Date                       Date
                   Sidef::Sys::Sig                         Sig
@@ -531,7 +531,8 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Types::Block::CFor') {
             $code =
-                'for' . '('
+                'for'
+              . '('
               . join(';', map { $self->deparse_args($_) } @{$obj->{expr}}) . ')'
               . $self->deparse_bare_block($obj->{block}{code});
         }

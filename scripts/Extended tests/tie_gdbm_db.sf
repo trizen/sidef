@@ -6,9 +6,9 @@ require('GDBM_File')
 
 var h      = Hash()
 var file   = File("fruit") -> unlink
-var db_obj = Perl.tie(h, "GDBM_File", file, %S<GDBM_File>.GDBM_WRCREAT, 0666) || die "Error: #{%S<$GDBM_File::gdbm_errno>}"
+var db_obj = Perl.tie(h, "GDBM_File", file, %S<GDBM_File>.GDBM_WRCREAT, 0666) || die "Error: #{%perl<$GDBM_File::gdbm_errno>}"
 
-assert_eq(Str(%S<$GDBM_File::gdbm_errno>), "No error")
+assert_eq(%perl<$GDBM_File::gdbm_errno>, "No error")
 
 say db_obj
 
@@ -34,7 +34,7 @@ h.each_kv {|k,v|
 db_obj.close
 assert_eq(Perl.untie(h), 1)
 
-Perl.tie(var h2 = Hash(), "GDBM_File", file, %S<GDBM_File>.GDBM_READER, 0666) || die "Error: #{%S<$GDBM_File::gdbm_errno>}"
+Perl.tie(var h2 = Hash(), "GDBM_File", file, %S<GDBM_File>.GDBM_READER, 0666) || die "Error: #{%perl<$GDBM_File::gdbm_errno>}"
 
 assert_eq(Str(h2{:banana}), 'yellow')
 

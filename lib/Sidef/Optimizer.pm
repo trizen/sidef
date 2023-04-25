@@ -32,6 +32,7 @@ package Sidef::Optimizer {
                   RANGENUM_DT   => 'Sidef::DataTypes::Range::RangeNumber',
                   RANGESTR_DT   => 'Sidef::DataTypes::Range::RangeString',
                   BACKTICK_DT   => 'Sidef::DataTypes::Glob::Backtick',
+                  PERL_DT       => 'Sidef::DataTypes::Perl::Perl',
                  };
 
     my %dt_table = (
@@ -59,6 +60,7 @@ package Sidef::Optimizer {
           Sidef::DataTypes::Glob::Pipe            Sidef::Types::Glob::Pipe
           Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
           Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
+          Sidef::DataTypes::Perl::Perl            Sidef::Types::Perl::Perl
           )
     );
 
@@ -1009,6 +1011,19 @@ package Sidef::Optimizer {
             (
                 map { [$_, [table(STRING)]] } dtypes(
                     BACKTICK_DT, qw(
+                      new
+                      call
+                      )
+                )
+            ),
+        ),
+
+        (PERL_DT) => build_tree(
+
+            # Perl.method(STRING)
+            (
+                map { [$_, [table(STRING)]] } dtypes(
+                    PERL_DT, qw(
                       new
                       call
                       )

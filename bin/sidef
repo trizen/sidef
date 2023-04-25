@@ -608,7 +608,6 @@ EOT
                 or $@ =~ /attempt to (?:use|call|delete) /i
                 or $@ =~ /not declared in the current scope/i
                 or $@ =~ /expected a block after/i
-                or $@ =~ /invalid module declaration/i
                 or $@ =~ /unexpected end-of-statement/i
                 or (
                       $@    =~ /unbalanced/ || $@ =~ /string terminator/

@@ -6,7 +6,7 @@ package Sidef::Types::Glob::Socket {
 
     use parent qw(
       Sidef::Object::Object
-      );
+    );
 
     use Sidef::Types::Bool::Bool;
 
@@ -34,8 +34,8 @@ package Sidef::Types::Glob::Socket {
 
                 return (
                         @results > 1
-                        ? (map { Sidef::Perl::Perl->to_sidef($_) } @results)
-                        : Sidef::Perl::Perl->to_sidef($results[0])
+                        ? (map { Sidef::Types::Perl::Perl->to_sidef($_) } @results)
+                        : Sidef::Types::Perl::Perl->to_sidef($results[0])
                        );
             };
         }

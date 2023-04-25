@@ -1,14 +1,14 @@
 #!/usr/bin/ruby
 
-# Example on how to create and use a Berkeley database.
+# Example on how to create and use a Berkeley HASH database.
 
 require('DB_File')
 
-var DB_TYPE = %S<$DB_File::DB_HASH>
-#var DB_TYPE = %S<DB_File!DB_BTREE>
+var DB_TYPE = %perl<$DB_File::DB_HASH>
+#var DB_TYPE = %perl<$DB_File::DB_BTREE>
 
-#var DB_TYPE = Perl.eval('$DB_File::DB_HASH')
-#var DB_TYPE = Perl.eval('$DB_File::DB_BTREE')
+#var DB_TYPE = Perl('$DB_File::DB_HASH').eval
+#var DB_TYPE = Perl('$DB_File::DB_BTREE').eval
 
 var h      = Hash()
 var file   = File("fruit") -> unlink

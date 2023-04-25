@@ -1,11 +1,31 @@
-package Sidef::Perl::Perl {
+package Sidef::Types::Perl::Perl {
 
     use utf8;
     use 5.016;
-    use Sidef::Types::Number::Number;
+
+    use parent qw(
+      Sidef::Object::Object
+    );
+
+    use overload q{""} => sub {
+        'Perl(' . ${Sidef::Types::String::String->new(${$_[0]})->dump} . ')';
+    };
 
     sub new {
-        bless {}, __PACKAGE__;
+        my (undef, $code) = @_;
+
+        if (ref($_[0]) eq __PACKAGE__) {
+            return $_[0]->eval;
+        }
+
+        bless \(my $o = "$code"), __PACKAGE__;
+    }
+
+    *call = \&new;
+
+    sub code {
+        my ($self) = @_;
+        Sidef::Types::String::String->new($$self);
     }
 
     sub numeric_version {
@@ -98,16 +118,20 @@ package Sidef::Perl::Perl {
           ->($data);
     }
 
-    sub eval {
-        my ($self, $perl_code) = @_;
-        $self->to_sidef(eval "$perl_code");
+    sub execute {
+        ref($_[0]) || shift(@_);
+        my ($self) = @_;
+        __PACKAGE__->to_sidef(CORE::eval($$self));
     }
+
+    *run = \&execute;
+    *eval = \&execute;
 
     sub tie {
         my ($self, $variable, $class_name, @args) = @_;
         state $x = require Scalar::Util;
         my $type = Scalar::Util::reftype($variable);
-        $self->to_sidef(
+        __PACKAGE__->to_sidef(
                         CORE::tie(
                                   ($type eq 'ARRAY' ? (@$variable) : $type eq 'HASH' ? %$variable : $variable),
                                   "$class_name",
@@ -120,8 +144,16 @@ package Sidef::Perl::Perl {
         my ($self, $variable) = @_;
         state $x = require Scalar::Util;
         my $type = Scalar::Util::reftype($variable);
-        $self->to_sidef(CORE::untie($type eq 'ARRAY' ? (@$variable) : $type eq 'HASH' ? %$variable : $variable));
+        __PACKAGE__->to_sidef(CORE::untie($type eq 'ARRAY' ? (@$variable) : $type eq 'HASH' ? %$variable : $variable));
     }
+
+    sub dump {
+        my ($self) = @_;
+        Sidef::Types::String::String->new("$self");
+    }
+
+    *to_s   = \&dump;
+    *to_str = \&dump;
 };
 
 1

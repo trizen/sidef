@@ -214,8 +214,8 @@ package Sidef::Sys::Sys {
     }
 
     sub eval {
-        my ($self, @args) = @_;
-        Sidef::Perl::Perl->eval(@args);
+        my ($self, $code) = @_;
+        Sidef::Types::Perl::Perl->new($code)->eval;
     }
 
     sub bless {

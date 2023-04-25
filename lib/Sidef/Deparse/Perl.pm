@@ -114,6 +114,7 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Glob::SocketHandle    Sidef::Types::Glob::SocketHandle
                   Sidef::DataTypes::Glob::Dir             Sidef::Types::Glob::Dir
                   Sidef::DataTypes::Glob::File            Sidef::Types::Glob::File
+                  Sidef::DataTypes::Perl::Perl            Sidef::Types::Perl::Perl
                   Sidef::DataTypes::Object::Object        Sidef::Object::Object
                   Sidef::DataTypes::Sidef::Sidef          Sidef
                   Sidef::DataTypes::Object::Lazy          Sidef::Object::Lazy
@@ -125,7 +126,6 @@ package Sidef::Deparse::Perl {
 
                   Sidef::Sys::Sig                         Sidef::Sys::Sig
                   Sidef::Sys::Sys                         Sidef::Sys::Sys
-                  Sidef::Perl::Perl                       Sidef::Perl::Perl
                   Sidef::Math::Math                       Sidef::Math::Math
 
                   Sidef::Time::Time                       Sidef::Time::Time
@@ -1536,12 +1536,10 @@ HEADER
             $code = $self->make_constant($ref, '__NEW__', "ModuleOO", args => [$self->_dump_string($obj->{module})]);
         }
         elsif ($ref eq 'Sidef::Module::Func') {
-            if ($obj->{module} =~ /^[\$\@\%\*]/) {    # class-variable
-                $code = "$obj->{module}";
-            }
-            else {
-                $code = $self->make_constant($ref, '__NEW__', "ModuleFunc", args => [$self->_dump_string($obj->{module})]);
-            }
+            $code = $self->make_constant($ref, '__NEW__', "ModuleFunc", args => [$self->_dump_string($obj->{module})]);
+        }
+        elsif ($ref eq 'Sidef::Types::Perl::Perl') {
+            $code = $self->make_constant($ref, 'new', "PerlCode", args => [$self->_dump_string(${$obj})]);
         }
         elsif (exists($composite_constants{$ref})) {
             my $data = $composite_constants{$ref};

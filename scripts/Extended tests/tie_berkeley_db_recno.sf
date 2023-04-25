@@ -1,0 +1,48 @@
+#!/usr/bin/ruby
+
+# Example on how to create and use a Berkeley RECNO database.
+
+require('DB_File')
+
+var DB_TYPE = %perl<$DB_File::DB_RECNO>
+
+var arr    = []
+var file   = File("colors") -> unlink
+var db_obj = Perl.tie(arr, "DB_File", file, File.O_RDWR | File.O_CREAT, 0666, DB_TYPE) || die "Can't open #{file}"
+
+say db_obj
+
+# Add a few values to the file
+arr << "red"
+arr << "orange"
+arr << "yellow"
+
+# Check for existence of a value
+assert(arr.contains(*"yellow"))
+
+assert_eq(Str(arr[0]), "red")
+assert_eq(Str(arr[1]), "orange")
+
+# Delete last value
+arr.pop
+
+# print the contents of the file
+arr.each_kv {|k,v|
+    say [k,v]
+}
+
+db_obj.sync
+assert_eq(Perl.untie(arr), 1)
+
+Perl.tie(var arr2 = [], "DB_File", file, File.O_RDONLY, 0644, DB_TYPE) || die "Can't open #{file}"
+
+assert_eq(Str(arr2[-1]), 'orange')
+
+assert_eq(
+    arr2,
+    [*'red', *'orange']
+)
+
+say file.size
+Perl.untie(arr2)
+file.unlink

@@ -49,7 +49,6 @@ my %singletons = map { $_ => 1 } qw(
   Sidef::Sys::Sys
   Sidef::Sys::Sig
   Sidef::Math::Math
-  Sidef::Perl::Perl
 );
 
 my %ignored_modules = map { $_ => 1 } qw(

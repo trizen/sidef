@@ -1,0 +1,103 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Perl::Perl
+
+=head1 DESCRIPTION
+
+This class implements support for evaluating arbitrary Perl code inside a Sidef script.
+
+The result is implicitly converted into a Sidef data structure.
+
+=head1 SYNOPSIS
+
+    var obj = Perl('my $x = 42; sqrt($x)')
+    var res = obj.eval
+
+=head1 METHODS
+
+=head2 code
+
+    obj.code
+
+Returns the Perl code as a String object.
+
+=cut
+
+=head2 new
+
+    var obj = Perl(perl_code)
+
+Builds and returns a new Perl object, given a string that contains Perl code.
+
+=cut
+
+=head2 numeric_version
+
+    Perl.numeric_version
+
+Returns the version of Perl as a Number object (e.g.: C<5.036>).
+
+=cut
+
+=head2 run
+
+    obj.run
+    Perl.eval(perl_code)
+
+Evaluates the Perl code and returns a Sidef data structure.
+
+Aliases: I<eval>, I<execute>
+
+=cut
+
+=head2 tie
+
+    Perl.tie(variable, class_name, *args)
+
+Binds a variable to a package class and returns the result as an object.
+
+Example:
+
+        require('DB_File')
+        var h = Hash()   # variable of HASH type
+        var o = Perl.tie(h, "DB_File", "file.db", File.O_RDWR | File.O_CREAT, 0666, %perl<$DB_File::DB_HASH>)
+        h{"foo"} = "bar"
+        o.sync
+=cut
+
+=head2 to_s
+
+    obj.to_s
+
+Dumps the Perl object as a String object.
+
+Aliases: I<dump>, I<to_str>
+
+=cut
+
+=head2 to_sidef
+
+    Perl.to_sidef(perl_structure)
+
+Converts a given a Perl data structure into a Sidef data structure.
+
+=cut
+
+=head2 untie
+
+    Perl.untie(variable)
+
+Unbinds a tied variable.
+
+=cut
+
+=head2 version
+
+    Perl.version
+
+Returns the version of Perl as String object (e.g.: C<"v5.36.0">).
+
+=cut

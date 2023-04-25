@@ -22,8 +22,6 @@ lib/Sidef/Object/Object.pm
 lib/Sidef/Object/Object.pod
 lib/Sidef/Optimizer.pm
 lib/Sidef/Parser.pm
-lib/Sidef/Perl/Perl.pm
-lib/Sidef/Perl/Perl.pod
 lib/Sidef/Sys/Sig.pm
 lib/Sidef/Sys/Sig.pod
 lib/Sidef/Sys/Sys.pm
@@ -86,6 +84,8 @@ lib/Sidef/Types/Number/Quadratic.pm
 lib/Sidef/Types/Number/Quadratic.pod
 lib/Sidef/Types/Number/Quaternion.pm
 lib/Sidef/Types/Number/Quaternion.pod
+lib/Sidef/Types/Perl/Perl.pm
+lib/Sidef/Types/Perl/Perl.pod
 lib/Sidef/Types/Range/Range.pm
 lib/Sidef/Types/Range/Range.pod
 lib/Sidef/Types/Range/RangeNumber.pm
@@ -225,6 +225,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/strong_fermat_with_n_factors_to_base_n.sf'
 'scripts/Extended tests/sumdigits.pl'
 'scripts/Extended tests/tie_berkeley_db.sf'
+'scripts/Extended tests/tie_berkeley_db_recno.sf'
 'scripts/Extended tests/tie_gdbm_db.sf'
 scripts/fast_fourier_transform.sf
 scripts/faulhaber_s_formula.sf
