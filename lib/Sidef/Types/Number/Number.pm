@@ -3104,8 +3104,12 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
-            my $r = Math::Prime::Util::addmod($x, $y, $m);
+        if (!ref($m) and $m > 0 and !ref($x) and !ref($y)) {
+            my $r = (
+                     HAS_PRIME_UTIL
+                     ? Math::Prime::Util::addmod($x, $y, $m)
+                     : Math::Prime::Util::GMP::addmod($x, $y, $m)
+                    );
             return bless \$r;
         }
 
@@ -3117,6 +3121,40 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_add($r, $x, $y);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        bless \$r;
+    }
+
+    sub addmulmod {
+        my ($x, $y, $z, $m) = @_;
+
+        # r = (x + y*z) % m
+
+        _valid(\$y, \$z, \$m);
+
+        $x = $$x;
+        $y = $$y;
+        $z = $$z;
+        $m = $$m;
+
+        if (!ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
+            my $r = (
+                     HAS_PRIME_UTIL
+                     ? Math::Prime::Util::addmod($x, Math::Prime::Util::mulmod($y, $z, $m), $m)
+                     : Math::Prime::Util::GMP::addmod($x, Math::Prime::Util::GMP::mulmod($y, $z, $m), $m)
+                    );
+            return bless \$r;
+        }
+
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $z = _any2mpz($z) // goto &nan;
+        $m = _any2mpz($m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_addmul($r, $y, $z);
         Math::GMPz::Rmpz_mod($r, $r, $m);
         bless \$r;
     }
@@ -3156,8 +3194,12 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
-            my $r = Math::Prime::Util::mulmod($x, $y, $m);
+        if (!ref($m) and $m > 0 and !ref($x) and !ref($y)) {
+            my $r = (
+                     HAS_PRIME_UTIL
+                     ? Math::Prime::Util::mulmod($x, $y, $m)
+                     : Math::Prime::Util::GMP::mulmod($x, $y, $m)
+                    );
             return bless \$r;
         }
 
@@ -8274,7 +8316,7 @@ package Sidef::Types::Number::Number {
             }
 
             # Find r such that B^(2r - 2) <= A < B^(2r)
-            my $r = (__ilog__($n, $k) >> 1) + 1;
+            my $r = (__ilog__($A, $B) >> 1) + 1;
 
             state $Q = Math::GMPz::Rmpz_init_nobless();
             state $R = Math::GMPz::Rmpz_init_nobless();
@@ -8296,10 +8338,6 @@ package Sidef::Types::Number::Number {
                     }
                     return @digits;
                 }
-
-                #~ if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
-                #~ return Math::GMPz::Rmpz_get_ui($A);
-                #~ }
 
                 my $t = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_ui_pow_ui($t, $B, 2 * ($r - 1));    # can this be optimized away?
@@ -8641,7 +8679,7 @@ package Sidef::Types::Number::Number {
             }
 
             # Find r such that B^(2r - 2) <= A < B^(2r)
-            my $r = (__ilog__($n, $k) >> 1) + 1;
+            my $r = (__ilog__($A, $B) >> 1) + 1;
 
             state $Q = Math::GMPz::Rmpz_init_nobless();
             state $R = Math::GMPz::Rmpz_init_nobless();
@@ -8663,10 +8701,6 @@ package Sidef::Types::Number::Number {
                     }
                     return $sum;
                 }
-
-                #~ if (Math::GMPz::Rmpz_cmp_ui($A, $B) < 0) {
-                #~ return Math::GMPz::Rmpz_get_ui($A);
-                #~ }
 
                 my $w = ($r + 1) >> 1;
                 my $t = Math::GMPz::Rmpz_init();
@@ -10281,8 +10315,12 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (HAS_PRIME_UTIL and !ref($y) and !ref($x)) {
-            my $r = Math::Prime::Util::invmod($x, $y) // goto &nan;
+        if (!ref($y) and !ref($x)) {
+            my $r = (
+                     HAS_PRIME_UTIL
+                     ? (Math::Prime::Util::invmod($x, $y) // goto &nan)
+                     : (Math::Prime::Util::GMP::invmod($x, $y) // goto &nan)
+                    );
             return bless \$r;
         }
 
@@ -10306,8 +10344,12 @@ package Sidef::Types::Number::Number {
             $y = $$y;
             $m = $$m;
 
-            if (HAS_PRIME_UTIL and !ref($m) and !ref($x) and !ref($y)) {
-                my $r = Math::Prime::Util::divmod($x, $y, $m);
+            if (!ref($m) and !ref($x) and !ref($y) and $y > 1) {
+                my $r = (
+                         HAS_PRIME_UTIL
+                         ? Math::Prime::Util::divmod($x, $y, $m)
+                         : Math::Prime::Util::GMP::divmod($x, $y, $m)
+                        );
                 if (defined($r)) {
                     return bless \$r;
                 }
@@ -12162,6 +12204,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mul($r, $r, $n);
             Math::GMPz::Rmpz_div_2exp($r, $r, 1);
             Math::GMPz::Rmpz_mul($r, $r, $r) if ($p == 3);
+            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
             return bless \$r;
         }
 
@@ -12175,6 +12218,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_sub_ui($z, $z, 1);
             Math::GMPz::Rmpz_mul($r, $r, $z);
             Math::GMPz::Rmpz_divexact_ui($r, $r, 6);
+            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
             return bless \$r;
         }
 
@@ -12185,6 +12229,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($z, $k, $p);
                 Math::GMPz::Rmpz_add($r, $r, $z);
             }
+            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
             return bless \$r;
         }
 
@@ -12224,6 +12269,7 @@ package Sidef::Types::Number::Number {
         # z = sum/(p+1)
         Math::GMPq::Rmpq_get_num($u, $sum);
         Math::GMPz::Rmpz_divexact_ui($u, $u, $p + 1);
+        $u = Math::GMPz::Rmpz_get_ui($u) if Math::GMPz::Rmpz_fits_ulong_p($u);
         bless \$u;
     }
 

@@ -702,6 +702,14 @@ Modular integer addition: C<(a+b) % m>.
 
 =cut
 
+=head2 addmulmod
+
+    addmulmod(x, y, z, m)
+
+Modular operation: C<(x + y*z) % m>.
+
+=cut
+
 =head2 agm
 
     agm(a, b)
