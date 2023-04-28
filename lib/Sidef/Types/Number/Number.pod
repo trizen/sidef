@@ -2658,6 +2658,17 @@ Aliases: I<euler_number>
 
 =cut
 
+=head2 euler_numbers
+
+    euler_numbers(n)
+
+Returns an Array with the Euler numbers in the range C<0..n>.
+
+    say euler_numbers(9)    #=> [1, 0, -1, 0, 5, 0, -61, 0, 1385, 0]
+    say euler_numbers(10)   #=> [1, 0, -1, 0, 5, 0, -61, 0, 1385, 0, -50521]
+
+=cut
+
 =head2 euler_polynomial
 
     euler_polynomial(n)

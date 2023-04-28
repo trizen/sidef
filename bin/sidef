@@ -574,7 +574,8 @@ EOT
         $vars          = $copy_hash->($sidef->{parser}{vars});
         $ref_vars_refs = $copy_hash->($sidef->{parser}{ref_vars_refs});
 
-        $line =~ s{#(-?[1-9][0-9]*)\b}{(abs($1) <= scalar(@values)) ? $values[($1 < 0) ? $1 : $1-1]->{value} : "#$1"}ge;
+        $line =~
+          s{#(-?[1-9][0-9]*)\b}{(abs($1) <= scalar(@values)) ? ('(' . $values[($1 < 0) ? $1 : $1-1]->{value} . ')') : "#$1"}ge;
 
         my $ccode = eval { $sidef->compile_code($line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
 

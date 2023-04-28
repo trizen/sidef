@@ -5857,7 +5857,7 @@ package Sidef::Types::Number::Number {
 
         $n = _any2ui($$n) // goto &nan;
 
-        my @S = _secant_numbers($n >> 1);
+        my @S = _secant_numbers(($n >> 1) + 1);
 
         my $u = $n + 1;
         my $z = Math::GMPz::Rmpz_init();
@@ -5902,13 +5902,36 @@ package Sidef::Types::Number::Number {
 
         $n & 1 and return ZERO;    # E_n = 0 for all odd indices
 
-        my $e = Math::GMPz::Rmpz_init_set((_secant_numbers($n >> 1))[$n >> 1]);
+        my $e = Math::GMPz::Rmpz_init_set((_secant_numbers(($n >> 1) + 1))[$n >> 1]);
         Math::GMPz::Rmpz_neg($e, $e) if (($n >> 1) & 1);
         bless \$e;
     }
 
     *Euler        = \&euler;
     *euler_number = \&euler;
+
+    sub euler_numbers {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // return Sidef::Types::Array::Array->new;
+
+        my @euler = _secant_numbers(($n >> 1) + 1);
+
+        $#euler = ($n >> 1) + 1;
+
+        for (my $i = 1 ; $i <= $#euler ; $i += 2) {
+            my $t = Math::GMPz::Rmpz_init_set($euler[$i]);
+            Math::GMPz::Rmpz_neg($t, $t);
+            splice(@euler, $i, 1, $t);
+        }
+
+        for (my $i = 1 ; $i <= $n ; $i += 2) {
+            splice(@euler, $i, 0, 0);
+        }
+
+        $#euler = $n;
+        Sidef::Types::Array::Array->new([map { bless \$_ } @euler]);
+    }
 
     sub secant_number {
         my ($n) = @_;

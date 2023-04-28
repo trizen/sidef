@@ -753,4 +753,26 @@ assert_eq(42.neg.as_cfrac, [-42])
 assert_eq((3/4).as_cfrac, [0, 1, 3])
 assert_eq((2/3).as_cfrac, [0, 1, 2])
 
+assert_eq(euler_numbers(0), %n[1])
+assert_eq(euler_numbers(1), %n[1, 0])
+assert_eq(euler_numbers(2), %n[1, 0, -1])
+assert_eq(euler_numbers(3), %n[1, 0, -1, 0])
+assert_eq(euler_numbers(4), %n[1, 0, -1, 0, 5])
+
+assert_eq(bernoulli_numbers(0), %n[1])
+assert_eq(bernoulli_numbers(1), %n[1, -1/2])
+assert_eq(bernoulli_numbers(2), %n[1, -1/2, 1/6])
+assert_eq(bernoulli_numbers(3), %n[1, -1/2, 1/6, 0])
+assert_eq(bernoulli_numbers(4), %n[1, -1/2, 1/6, 0, -1/30])
+
+assert_eq( euler_numbers(10),  10.inc.of { .euler_number })
+assert_eq( euler_numbers(11),  11.inc.of { .euler_number })
+assert_eq(euler_numbers(100), 100.inc.of { .euler_number })
+assert_eq(euler_numbers(200), 200.inc.of { .euler_number })
+
+assert_eq( bernoulli_numbers(10),  10.inc.of { .bernoulli(0) })
+assert_eq( bernoulli_numbers(11),  11.inc.of { .bernoulli(0) })
+assert_eq(bernoulli_numbers(100), 100.inc.of { .bernoulli(0) })
+assert_eq(bernoulli_numbers(200), 200.inc.of { .bernoulli(0) })
+
 say "** Tests passed!"
