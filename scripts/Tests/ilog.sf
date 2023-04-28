@@ -73,4 +73,45 @@ assert_eq(1.next_pow(3), 3)
 assert_eq(2.next_pow(3), 3)
 assert_eq(3.next_pow(3), 9)
 
+assert_eq(ilog(2147483646, 1319909920001892772), 0)
+assert_eq(ilog(1319909920001892772, 2147483646), 1)
+
+assert_eq(ilog(2**64, 2**32 - 1), 2)
+assert_eq(ilog(2**64 - 1, 2**32), 1)
+assert_eq(ilog(2**64, 2**32 + 1), 1)
+
+assert_eq(ilog(2**64, 2**32), 2)
+assert_eq(ilog(2**64 - 1, 2**32 - 1), 2)
+
+assert_eq(ilog(18446744073709551614, 2**32 - 1), 2)
+assert_eq(ilog(18446744073709551614, 2**32), 1)
+
+assert_eq({ .ilog2 }.map(1..20),    { .log2.floor }.map(1..20))
+assert_eq({ .ilog(3) }.map(1..20),  { .log(3).floor }.map(1..20))
+assert_eq({ .ilog10 }.map(1..20),   { .log10.floor }.map(1..20))
+
+assert_eq(ilog(2, 2), 1)
+
+# Run some random tests
+for n in (1..66), k in (1..66) {
+
+    var a = irand(1, 1<<n)
+    var b = irand(2, 1<<k)
+
+    try  {
+        var x = a.ilog(b)
+        var y = a.log(b).floor
+
+        if (ipow(b, x) == a) {    # perfect power
+            ## ok
+        }
+        else {
+            assert_eq(x, y)
+        }
+    }
+    catch {|m|
+        die "Failed for ilog(#{a}, #{b}) with error: #{m}"
+    }
+}
+
 say "** Test passed!"

@@ -4240,16 +4240,30 @@ package Sidef::Types::Number::Number {
     sub __ilog__ {
         my ($x, $y) = @_;
 
+        if (ref($y) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_ulong_p($y)) {
+            $y = Math::GMPz::Rmpz_get_ui($y);
+        }
+
         # ilog(x, y <= 1) = NaN
         $y <= 1 and return;
 
         # ilog(x <= 0, y) = NaN
         Math::GMPz::Rmpz_sgn($x) <= 0 and return;
 
+        # ilog(x,y) = 0, when y > x
+        (ref($y) ? Math::GMPz::Rmpz_cmp($x, $y) : Math::GMPz::Rmpz_cmp_ui($x, $y)) >= 0
+          or return 0;
+
+        if (!ref($y) and Math::GMPz::Rmpz_fits_ulong_p($x)) {
+            return (
+                    HAS_PRIME_UTIL
+                    ? Math::Prime::Util::logint(Math::GMPz::Rmpz_get_ui($x), $y)
+                    : Math::Prime::Util::GMP::logint(Math::GMPz::Rmpz_get_ui($x), $y)
+                   );
+        }
+
         # Return faster for y <= 62
         if ($y <= 62) {
-
-            $y = Math::GMPz::Rmpz_get_ui($y) if ref($y);
 
             # NOTE: size is always exact for base = 2.
             my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || return) - 1;
@@ -4301,8 +4315,13 @@ package Sidef::Types::Number::Number {
             $x = $$x;
             $y = $$y;
 
-            if (HAS_PRIME_UTIL and !ref($x) and !ref($y) and $x > 0 and $y > 1) {
-                my $r = Math::Prime::Util::logint($x, $y);
+            if (!ref($x) and !ref($y) and $x > 0 and $y > 1) {
+
+                if ($y > $x) {
+                    return ZERO;
+                }
+
+                my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::logint($x, $y) : Math::Prime::Util::GMP::logint($x, $y));
                 return bless \$r;
             }
 
@@ -4320,8 +4339,8 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (HAS_PRIME_UTIL and !ref($x) and $x > 0) {
-            my $r = Math::Prime::Util::logint($x, 2);
+        if (!ref($x) and $x > 0) {
+            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::logint($x, 2) : Math::Prime::Util::GMP::logint($x, 2));
             return bless \$r;
         }
 
@@ -4333,8 +4352,8 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (HAS_PRIME_UTIL and !ref($x) and $x > 0) {
-            my $r = Math::Prime::Util::logint($x, 10);
+        if (!ref($x) and $x > 0) {
+            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::logint($x, 10) : Math::Prime::Util::GMP::logint($x, 10));
             return bless \$r;
         }
 
