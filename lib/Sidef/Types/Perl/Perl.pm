@@ -124,7 +124,7 @@ package Sidef::Types::Perl::Perl {
         __PACKAGE__->to_sidef(CORE::eval($$self));
     }
 
-    *run = \&execute;
+    *run  = \&execute;
     *eval = \&execute;
 
     sub tie {
@@ -132,12 +132,12 @@ package Sidef::Types::Perl::Perl {
         state $x = require Scalar::Util;
         my $type = Scalar::Util::reftype($variable);
         __PACKAGE__->to_sidef(
-                        CORE::tie(
-                                  ($type eq 'ARRAY' ? (@$variable) : $type eq 'HASH' ? %$variable : $variable),
-                                  "$class_name",
-                                  map { defined($_) ? $_->get_value : $_ } @args
-                                 )
-                       );
+                              CORE::tie(
+                                        ($type eq 'ARRAY' ? (@$variable) : $type eq 'HASH' ? %$variable : $variable),
+                                        "$class_name",
+                                        map { defined($_) ? $_->get_value : $_ } @args
+                                       )
+                             );
     }
 
     sub untie {

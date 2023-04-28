@@ -5727,6 +5727,23 @@ package Sidef::Types::Number::Number {
         return (@cache, (@B > @cache ? @B[@cache .. $#B] : ()));
     }
 
+    sub bernoulli_numbers {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // return Sidef::Types::Array::Array->new;
+
+        my @bern = _bernoulli_numbers($n);
+
+        $#bern = ($n >> 1) + 1;
+
+        for (my $i = 3 ; $i <= $n ; $i += 2) {
+            splice(@bern, $i, 0, 0);
+        }
+
+        $#bern = $n;
+        Sidef::Types::Array::Array->new([map { bless \$_ } @bern]);
+    }
+
     sub bernoulli_polynomial {
         my ($n, $x) = @_;
 

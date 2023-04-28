@@ -9,39 +9,37 @@
 # Created on: 21 August 2012
 # Latest edit on: 10 November 2013
 # Translated to Sidef in 21 September 2014
-# Latest edit on: 15 November 2022
+# Latest edit on: 16 November 2022
 # Website: https://github.com/trizen/asciiplanes
 
 # Find the planes' positions on a grid. (text-based game)
 
-var asciitable = (
-                   try   { require('Text::ASCIITable') }
-                   catch { STDERR.print("Can't load the 'Text::ASCIITable' Perl module...\n"); Sys.exit(2) }
-                 )
+var asciitable =
+        try   { require('Text::ASCIITable') }
+        catch { STDERR.print("Can't load the 'Text::ASCIITable' Perl module...\n"); Sys.exit(2) }
 
-var ANSI = (
-                try   { frequire('Term::ANSIColor') }
-                catch { nil }
-           )
+var ANSI =
+        try   { frequire('Term::ANSIColor') }
+        catch { nil }
 
 ## Package variables
-var pkgname = 'asciiplanes';
-var version = 0.05;
+var pkgname = 'asciiplanes'
+var version = 0.06
 
 ## Game variables
-var BOARD_SIZE = 8;
-var PLANES_NUM = 3;
+var BOARD_SIZE = 8
+var PLANES_NUM = 3
 
-var parts = (['head'] + ['hit']*7);
-var plane_chars = ['$', '#', '@'];
+var parts = (['head'] + ['hit']*7)
+var plane_chars = ['$', '#', '@']
 
 var use_colors = defined(ANSI)
-var wrap_plane = false;
-var hit_char   = %q{*};
-var miss_char  = %q{`};
+var wrap_plane = false
+var hit_char   = %q{O}
+var miss_char  = %q{`}
 
-func usage {
-    print <<"EOT";
+func print_usage {
+    print <<"EOT"
 usage: #{__MAIN__} [options]
 
 main:
@@ -61,70 +59,58 @@ example:
 
 EOT
 
-    Sys.exit;
+    Sys.exit
 }
 
-func ver {
-    print "#{pkgname} #{version}\n";
-    Sys.exit;
+func print_version {
+    print "#{pkgname} #{version}\n"
+    Sys.exit
 }
 
-if (!ARGV.is_empty) {
-    var getopt = (
-                    try   { frequire('Getopt::Long') }
-                    catch { STDERR.print("Can't load the 'Getopt::Long' Perl module...\n"); Sys.exit(2) }
-                 );
-
-    getopt.GetOptions(
-         'board-size|size=i' => func(_,v) { BOARD_SIZE = Num(v)  },
-         'planes-num=i'      => func(_,v) { PLANES_NUM = Num(v)  },
-         'hit-char=s'        => func(_,v) { hit_char   = Str(v)  },
-         'miss-char=s'       => func(_,v) { miss_char  = Str(v)  },
-         'wrap!'             => func(_,v) { wrap_plane = Bool(v) },
-         'colors!'           => func(_,v) { use_colors = Bool(v) },
-         'help|h|?'          => func(*_)  { usage() },
-         'version|v|V'       => func(*_)  { ver() },
-    );
+if (ARGV) {
+    ARGV.getopt!(
+         'board-size|size=i' => \BOARD_SIZE,
+         'planes-num=i'      => \PLANES_NUM,
+         'hit-char=s'        => \hit_char,
+         'miss-char=s'       => \miss_char,
+         'wrap!'             => \wrap_plane,
+         'colors!'           => \use_colors,
+         'help|h|?'          => print_usage,
+         'version|v|V'       => print_version,
+    )
 }
 
 ## The play-board of the game, and some other arrays
 #---------------------------------------------------------------
-var play_board = BOARD_SIZE.of { [nil] * BOARD_SIZE };
-var info_board = BOARD_SIZE.of { [' '] * BOARD_SIZE };
+var play_board = BOARD_SIZE.of { [nil] * BOARD_SIZE }
+var info_board = BOARD_SIZE.of { [' '] * BOARD_SIZE }
 
-var letters = Hash.new;
+var letters = Hash()
 play_board.range.each { |i|
-    static char = 'a';
-    letters{char++} = i;
+    static char = 'a'
+    letters{char++} = i
 }
 
 #---------------------------------------------------------------
 
 func pointers(board, x, y, indices) {
+    gather {
+        [[0,0]] + indices -> each { |pair|
 
-    var output = [];
-    [[0,0]] + indices -> each { |pair|
+            pair.kind_of(Array) || next
+            var (row, col) = (x + pair[0], y + pair[1])
 
-        pair.is_an(Array) || next;
-        var (row, col) = (x + pair[0], y + pair[1]);
+            if (wrap_plane) {
+                row %= BOARD_SIZE   #=
+                col %= BOARD_SIZE   #=
+            }
 
-        if (row > board.end) {
-            wrap_plane || return [];
-            row %= board.len;
+            row.is_between(0, BOARD_SIZE-1) || return []
+            col.is_between(0, BOARD_SIZE-1) || return []
+
+            take(\board[row][col])
         }
-
-        if (col > board[row].end) {
-            wrap_plane || return [];
-            col %= board[row].len;
-        }
-
-        if (!wrap_plane && (row<0 || col<0)) {
-            return [];
-        }
-        output.append(\board[row][col]);
     }
-
-    return output;
 }
 
 func up(board, x, y) {
@@ -163,20 +149,19 @@ func right(board, x, y) {
 
 func assign(change=false, plane=[], data=[]) {
 
-    plane.len == 0 ->
-        && return false;
+    plane.len || return false
 
     change || (
         plane.each { |c|
-            *c == nil || return false;
+            *c == nil || return false
         }
-    );
+    )
 
     plane.range.each { |i|
-        *plane[i] = data[i];
+        *plane[i] = data[i]
     }
 
-    return true;
+    return true
 }
 
 func print_ascii_table {
@@ -184,7 +169,7 @@ func print_ascii_table {
 
     table.setCols(' ', (1..BOARD_SIZE)...)
 
-    var char = 'a'
+    var char = 'a';
     info_board.each { |row|
         table.addRow([char++, row...])
         table.addRowLine()
@@ -203,16 +188,16 @@ func print_ascii_table {
     say t
 }
 
-var count = 0;
-var max_tries = 1_000;
-var directions = [up, down, left, right];
+var count = 0
+var max_tries = 1_000
+var directions = [up, down, left, right]
 
 while (count != PLANES_NUM) {
-    var x = play_board.end.irand;
-    var y = play_board[0].end.irand;
+    var x = play_board.end.irand
+    var y = play_board[0].end.irand
 
-    var rand = directions.end.irand;
-    var code = directions[rand];
+    var rand = directions.end.irand
+    var code = directions[rand]
 
     if (--max_tries <= 0) {
         die "FATAL ERROR: try to increase the size of the grid (--size=x).\n"
@@ -222,66 +207,67 @@ while (count != PLANES_NUM) {
            change: false,
            plane:  code.call(play_board, x, y),
            data:   parts.map {|c| "#{c}_#{rand}" },
-    ) || next;
+    ) || next
 
-    count++;
+    count++
 }
 
 ## MAIN
 
-var tries      = 0;
-var start_time = Time.new.sec;
+var tries      = 0
+var start_time = Time.new.sec
 
-print_ascii_table();
+print_ascii_table()
 
 while (count > 0) {
 
-    var letter = letters.keys.rand;
-    var number = irand(1, BOARD_SIZE);
-    var text = "=>> Your guess (e.g.: #{letter}#{number})\n> ";
+    var letter = letters.keys.rand
+    var number = irand(1, BOARD_SIZE)
 
-    var input = lc(Sys.scanln(text) \\ break);
-    input ~~ ['q', 'quit'] && break;
+    say "=>> Your guess (e.g.: #{letter}#{number})"
 
-    var m = input.match(/^\h*([a-z]+)\D*([0-9]+)/) || next;
+    var input = (Sys.scanln("> ") \\ break -> lc)
+    input ~~ ['q', 'quit'] && break
 
-    letters.has_key(m[0]) || next;
+    var m = input.match(/^\h*([a-z]+)\D*([0-9]+)/) || next
 
-    var x = letters{m[0]};
-    var y = m[1].to_num.dec;
+    letters.has_key(m[0]) || next
 
-    (y >= 0) && (y < BOARD_SIZE) || next;
+    var x = letters{m[0]}
+    var y = Num(m[1]).dec
 
-    var point = play_board[x][y];
+    (y >= 0) && (y < BOARD_SIZE) || next
+
+    var point = play_board[x][y]
 
     if (point == nil) {
-        info_board[x][y] = miss_char;
+        info_board[x][y] = miss_char
     }
-    elsif (var m = point.match(/^head_(\d)$/i)) {
-        var dir  = m[0].to_num;
-        var item = plane_chars[(PLANES_NUM - count) % plane_chars.len];
-        var code = directions[dir];
+    elsif (point.match(/^head_(\d)$/i)) { |m|
+        var dir  = Num(m[0])
+        var item = plane_chars[(PLANES_NUM - count) % plane_chars.len]
+        var code = directions[dir]
 
         [play_board, info_board].each { |board|
             assign(
                    change: true,
                    data:   [item]*8,
-                   plane:  code.call($board, $x, $y),
+                   plane:  code.call(board, x, y),
             ) || die "#{__MAIN__}: unexpected error!"
         }
 
         count--;
     }
     elsif (point ~~ /^hit_\d$/i) {
-        info_board[x][y] = hit_char;
+        info_board[x][y] = hit_char
     }
 
-    tries++;
-    print_ascii_table();
+    tries++
+    print_ascii_table()
 }
 
-printf("** Info: %d tries in %d seconds\n", tries, Time.new.sec - start_time);
+printf("** Info: %d tries in %d seconds\n", tries, Time.new.sec - start_time)
 
 if (count == 0) {
-    say "** Congratulations! All the planes are destroyed!";
+    say "** Congratulations! All the planes are destroyed!"
 }

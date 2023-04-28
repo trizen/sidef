@@ -236,6 +236,7 @@ scripts/functional_summation_of_fractions.sf
 scripts/Games/24_game.sf
 scripts/Games/24_game_solve.sf
 scripts/Games/24_game_solve_no_eval.sf
+scripts/Games/asciiplanes-player.sf
 scripts/Games/asciiplanes.sf
 scripts/Games/bulls_and_cows.sf
 scripts/Games/bulls_and_cows_player.sf

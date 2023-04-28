@@ -3772,8 +3772,9 @@ package Sidef::Types::Array::Array {
     sub getopt {
         my ($self, %opts) = @_;
 
-        state $x = require Getopt::Long;
+        @$self or return Sidef::Types::Array::Array->new;
 
+        state $x = require Getopt::Long;
         Getopt::Long::Configure('no_ignore_case');
 
         my @argv = map { "$_" } @$self;

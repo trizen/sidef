@@ -1064,6 +1064,17 @@ Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
 =cut
 
+=head2 bernoulli_numbers
+
+    bernoulli_numbers(n)
+
+Returns an Array with the Bernoulli numbers in the range C<0..n>.
+
+    say bernoulli_numbers(5)    #=> [1, -1/2, 1/6, 0, -1/30, 0]
+    say bernoulli_numbers(6)    #=> [1, -1/2, 1/6, 0, -1/30, 0, 1/42]
+
+=cut
+
 =head2 bernoulli_polynomial
 
     bernoulli_polynomial(n)
