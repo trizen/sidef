@@ -10344,7 +10344,7 @@ package Sidef::Types::Number::Number {
             $y = $$y;
             $m = $$m;
 
-            if (!ref($m) and !ref($x) and !ref($y) and $y > 1) {
+            if (!ref($m) and $m > 0 and !ref($y) and $y > 1 and !ref($x)) {
                 my $r = (
                          HAS_PRIME_UTIL
                          ? Math::Prime::Util::divmod($x, $y, $m)
@@ -10381,7 +10381,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y) and $y != 0) {
+        if (!ref($y) and $y > 0 and !ref($x)) {
             my ($q, $r) = (
                            HAS_NEW_PRIME_UTIL
                            ? Math::Prime::Util::divrem($x, $y)
@@ -20238,17 +20238,16 @@ package Sidef::Types::Number::Number {
         $factorized || $collect_factors->($n->trial_factor($mp1->mul(_set_int(1e6))));
 
         # Methods that depdend on the special form of n
-        $factorized || $collect_factors->($n->fermat_factor($mp1->mul(_set_int(1e3))));
+        $factorized || $collect_factors->($n->fermat_factor($mp1->mul(_set_int(1e4))));
         $factorized || $collect_factors->($n->holf_factor($mp1->mul(_set_int(1e4))));
+        $factorized || $collect_factors->($n->phi_finder_factor($mp1->mul(_set_int(1e4))));
 
         $factorized || $collect_factors->($n->dop_factor($mp1->mul($n->ilog2->isqrt)->mul(TWO)));
         $factorized || $collect_factors->($n->miller_factor($mp1->mul(_set_int(5))));
         $factorized || $collect_factors->($n->fibonacci_factor);
         $factorized || $collect_factors->($n->lucas_factor(ONE, $mp1->mul(_set_int(2))));
         $factorized || $collect_factors->($n->cop_factor($mp1->mul($n->ilog2->isqrt->shift_right(ONE))));
-
-        $factorized || $collect_factors->($n->pell_factor($mp1->mul(_set_int(5e2))));
-        $factorized || $collect_factors->($n->phi_finder_factor($mp1->mul(_set_int(1e3))));
+        $factorized || $collect_factors->($n->pell_factor($mp1->mul(_set_int(1e3))));
 
         @factors = @{$n->gcd_factors(Sidef::Types::Array::Array->new([@factors]))};
 
@@ -21299,7 +21298,7 @@ package Sidef::Types::Number::Number {
                 }
             }
 
-            last if (Math::GMPz::Rmpz_cmp_ui($z, 1) == 0);
+            last if (Math::GMPz::Rmpz_cmpabs_ui($z, 1) == 0);
         }
 
         Sidef::Types::Array::Array->new([bless(\$n)]);

@@ -13,6 +13,11 @@ assert_eq(-x % -y,    -m);
 assert_eq( x % -y, m - y);
 assert_eq(-x %  y, y - m);
 
+assert_eq( x.rat %   y.rat,   m);
+assert_eq(-x.rat %  -y.rat,  -m);
+assert_eq( x.rat %  -y.rat,  m - y);
+assert_eq(-x.rat %   y.rat,  y - m);
+
 var f1 = 399.8;
 var f2 = 41.2;
 
@@ -20,5 +25,43 @@ assert_eq( f1 %  f2 -> roundf( 0),    29);
 assert_eq(-f1 % -f2 -> roundf( 0),   -29);
 assert_eq( f1 % -f2 -> roundf(-1), -12.2);
 assert_eq(-f1 %  f2 -> roundf(-1),  12.2);
+
+for a,b in [[657512488, -20663738120], [-657512488, -20663738120], [-657512488, 20663738120]] {
+    assert_eq([divmod(a,b)], [floor(a/b), a%b], [a,b])
+}
+
+for n in (31..33, 63..65), k in (31..33, 63..65), m in (31..33, 63..65) {
+
+    var a = irand(1 << n)*[1,-1].rand
+    var b = irand(1 << k)*[1,-1].rand
+    var c = irand(1 << m)
+
+    c || next
+
+    assert_eq(imod(a - b, c), (a - b) % c, [a,b,c])
+    assert_eq(imod(a - b, -c) % -c, (a - b) % -c, [a,b,-c])
+
+    assert_eq(addmod(a, b, c), (a+b)%c, [a,b,c])
+    assert_eq(addmod(a, b, -c) % -c, (a+b) % -c, [a,b,-c])
+
+    assert_eq(submod(a, b, c), (a-b)%c, [a,b,c])
+    assert_eq(submod(a, b, -c) % -c, (a-b) % -c, [a,b,-c])
+
+    assert_eq(mulmod(a, b, c), (a*b) % c, [a,b,c])
+    assert_eq(mulmod(a, b, -c) % -c, (a*b) % -c, [a,b,-c])
+
+    assert_eq(addmulmod(a, b, a, c), (a + a*b) % c, [a,b,c])
+    assert_eq(addmulmod(a, b, a, -c) % -c, (a + a*b) % -c, [a,b,-c])
+
+    if (b != 0) {
+        assert_eq([divmod(a,b)], [floor(a/b), a%b], [a,b])
+        assert_eq([divmod(a,b)], [idiv(a,b), imod(a,b)], [a,b])
+    }
+
+    if (b.is_coprime(c)) {
+        assert_eq(divmod(a, b, c), (a*invmod(b,c))%c, [a,b,c])
+        assert_eq(divmod(a, b, -c) % -c, (a*invmod(b,-c)) % -c, [a,b,-c])
+    }
+}
 
 say "** Test passed!";
