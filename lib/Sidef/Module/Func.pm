@@ -20,7 +20,7 @@ package Sidef::Module::Func {
 
         my @args = (
                     @arg
-                    ? (map { index(ref($_), 'Sidef::') == 0 ? $_->get_value : $_ } @arg)
+                    ? (map { (index(ref($_), 'Sidef::') == 0) ? $_->get_value : $_ } @arg)
                     : ()
                    );
 

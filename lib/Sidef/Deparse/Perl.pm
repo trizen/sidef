@@ -545,8 +545,8 @@ HEADER
                     push @indices,
                       (   '(map { ref($_) eq "Sidef::Types::Number::Number" ? '
                         . '(ref($$_) ? Sidef::Types::Number::Number::__numify__($$_) : $$_) '
-                        . ': do {my$sub=UNIVERSAL::can($_, "..."); '
-                        . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
+                        . ': do {my$sub=ref($_) && UNIVERSAL::can($_, "..."); '
+                        . '$sub ? $sub->($_) : CORE::int($_) } } '
                         . $str
                         . ')');
                 }
@@ -1601,7 +1601,7 @@ HEADER
                   . qq~ or CORE::die((~
                   . (defined($args[2]) ? "do{$args[2]}" : "undef")
                   . qq~// ('$obj->{act}('.~
-                  . qq~join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr)) . ')'))~
+                  . qq~join(', ',map{(ref(\$_) && UNIVERSAL::can(\$_,'dump')) ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr)) . ')'))~
                   . qq~." failed at \Q$obj->{file}\E line $obj->{line}\\n")}~;
             }
         }
@@ -1855,8 +1855,8 @@ HEADER
                             $code =
                                 '(do{my$obj='
                               . $self->deparse_args(@{$call->{arg}})
-                              . ';my$sub=UNIVERSAL::can($obj, "to_a"); '
-                              . 'defined($sub) ? $sub->($obj) : bless([$obj], "Sidef::Types::Array::Array")})';
+                              . ';my$sub=ref($obj) && UNIVERSAL::can($obj, "to_a"); '
+                              . '$sub ? $sub->($obj) : bless([$obj], "Sidef::Types::Array::Array")})';
                             next;
                         }
 
@@ -1864,8 +1864,8 @@ HEADER
                             $code =
                                 '(do{my$obj='
                               . $self->deparse_args(@{$call->{arg}})
-                              . ';my$sub=UNIVERSAL::can($obj, "..."); '
-                              . 'defined($sub) ? $sub->($obj) : $obj })';
+                              . ';my$sub=ref($obj) && UNIVERSAL::can($obj, "..."); '
+                              . '$sub ? $sub->($obj) : $obj })';
                             next;
                         }
 

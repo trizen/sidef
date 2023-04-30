@@ -276,9 +276,9 @@ package Sidef::Types::Block::Block {
           . join(
             ', ',
             map {
-                    ref($_) && defined(UNIVERSAL::can($_, 'dump')) ? $_->dump
-                  : ref($_)                                        ? Sidef::normalize_type(ref($_))
-                  : defined($_)                                    ? Sidef::normalize_type($_)
+                    ref($_) && UNIVERSAL::can($_, 'dump') ? $_->dump
+                  : ref($_)                               ? Sidef::normalize_type(ref($_))
+                  : defined($_)                           ? Sidef::normalize_type($_)
                   : 'nil'
               } @args
           )
@@ -531,13 +531,13 @@ package Sidef::Types::Block::Block {
 
             $obj // last;
 
-            my $sub = UNIVERSAL::can($obj, 'iter') // do {
-                my $arr = eval { $obj->to_a };
+            my $sub = (ref($obj) && UNIVERSAL::can($obj, 'iter')) || do {
+                my $arr = eval { ref($obj) ? $obj->to_a : Sidef::Types::Array::Array->new($obj) };
                 ref($arr) ? do { $obj = $arr; UNIVERSAL::can($obj, 'iter') } : ();
             };
 
             my $break;
-            my $iter = defined($sub) ? $sub->($obj) : $obj->iter;
+            my $iter = $sub ? $sub->($obj) : $obj->iter;
 
             while (1) {
                 $break = 1;

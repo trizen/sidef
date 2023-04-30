@@ -604,10 +604,8 @@ package Sidef::Types::Set::Bag {
     sub freq {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-            map {
-                Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})])
-            } CORE::values(%$self)
-        );
+                    map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})]) }
+                      CORE::values(%$self));
     }
 
     sub most_common {
@@ -617,10 +615,7 @@ package Sidef::Types::Set::Bag {
         my @top    = splice(@sorted, 0, CORE::int($n));
 
         Sidef::Types::Array::Array->new(
-            map {
-                Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})])
-              } @top
-        );
+             map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})]) } @top);
     }
 
     *top = \&most_common;
@@ -804,6 +799,7 @@ package Sidef::Types::Set::Bag {
 
     sub to_a {
         my ($self) = @_;
+        ref($self) || return Sidef::Types::Array::Array->new($self);
         Sidef::Types::Array::Array->new([map { ($_->{value}) x $_->{count} } CORE::values(%$self)]);
     }
 
@@ -823,11 +819,9 @@ package Sidef::Types::Set::Bag {
     sub pairs {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-            [
-             map {
-                 Sidef::Types::Array::Pair->new($_->{value}, Sidef::Types::Number::Number::_set_int($_->{count}))
-             } CORE::values(%$self)
-            ]
+                      [map { Sidef::Types::Array::Pair->new($_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})) }
+                         CORE::values(%$self)
+                      ]
         );
     }
 
@@ -929,12 +923,12 @@ package Sidef::Types::Set::Bag {
             $addr{$refaddr} = "Bag(#`($refaddr)...)";
 
             my ($s, $v);
-            "Bag(" . CORE::join(
+            "Bag("
+              . CORE::join(
                 ', ',
-                map {
-                    ((ref($v = $_->{value}) && ($s = UNIVERSAL::can($v, 'dump'))) ? $s->($v) : ($v // 'nil')) x $_->{count}
-                  } @values
-              )
+                map { ((ref($v = $_->{value}) && ($s = UNIVERSAL::can($v, 'dump'))) ? $s->($v) : ($v // 'nil')) x $_->{count} }
+                             @values
+                          )
               . ')';
         };
 

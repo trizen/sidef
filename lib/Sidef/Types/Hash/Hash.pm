@@ -444,10 +444,8 @@ package Sidef::Types::Hash::Hash {
         }
 
         Sidef::Types::Array::Array->new(
-            map {
-                Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_})
-            } CORE::sort(CORE::keys(%$self))
-        );
+                                     map { Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_}) }
+                                       CORE::sort(CORE::keys(%$self)));
     }
 
     sub _min_max {
@@ -475,13 +473,11 @@ package Sidef::Types::Hash::Hash {
 
     sub to_a {
         my ($self) = @_;
+
+        ref($self) || return Sidef::Types::Array::Array->new($self);
+
         Sidef::Types::Array::Array->new(
-            [
-             map {
-                 Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_})
-             } CORE::keys(%$self)
-            ]
-        );
+              [map { Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_}) } CORE::keys(%$self)]);
     }
 
     *to_array = \&to_a;

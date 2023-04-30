@@ -889,7 +889,6 @@ scripts/Tests/matrix_determinant.sf
 scripts/Tests/matrix_multiplication.sf
 scripts/Tests/matrix_operations.sf
 scripts/Tests/median.sf
-scripts/Tests/memoize.sf
 scripts/Tests/merge_sort.sf
 scripts/Tests/merge_sort_2.sf
 scripts/Tests/metaprogramming_2.sf
@@ -1115,8 +1114,6 @@ scripts/WWW/socket_inet.sf
 scripts/xiaolin_wu_s_line_algorithm.sf
 scripts/y_combinator.sf
 scripts/zeta_2n.sf
-share/sidef/Memoize.sm
-share/sidef/ntheory.sm
 t/00-load.t
 t/01-number.t
 t/02-pow.t

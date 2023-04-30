@@ -59,7 +59,7 @@ var r = "\033[H";
 var dir = LEFT;
 var grid = h.of { w.of { Array.new(VOID) } };
 
-var head_pos = [h/2, w/2];
+var head_pos = [h>>1, w>>1];
 var tail_pos = [head_pos[0], head_pos[1]+1];
 
 grid[head_pos[0]][head_pos[1]] = [HEAD, dir];    # head

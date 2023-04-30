@@ -32,4 +32,40 @@ do {
     assert_eq(b, 44)
 }
 
+do {
+    require('Algorithm::Combinatorics')
+
+    var data = %w(a b c)
+    var iter = +%S<Algorithm::Combinatorics>.permutations(data)
+
+    assert_eq(
+        gather {
+            while (var p = iter.next) {
+                take(p)
+            }
+        },
+    data.permutations)
+
+    assert_eq([%S<Algorithm::Combinatorics>.permutations(data)], data.permutations)   # list context
+}
+
+do {
+    require('Algorithm::Loops')
+
+    var arr1 = %w(a b c)
+    var arr2 = %w(x y z)
+    var iter = +%S<Algorithm::Loops>.NestedLoops([arr1, arr2])
+
+    assert_eq(
+        gather {
+            while (var *car = iter.call) {
+                take(car.clone)
+            }
+        },
+        [arr1, arr2].cartesian
+    )
+
+    assert_eq([%S<Algorithm::Loops>.NestedLoops([arr1, arr2], {|*a| a })], [arr1, arr2].cartesian)  # list context
+}
+
 say "** Test passed!"

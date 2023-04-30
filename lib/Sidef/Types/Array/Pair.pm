@@ -5,7 +5,7 @@ package Sidef::Types::Array::Pair {
 
     use parent qw(
       Sidef::Types::Array::Array
-      );
+    );
 
     use overload q{""} => \&_dump;
 
@@ -76,7 +76,7 @@ package Sidef::Types::Array::Pair {
 
     sub to_array {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(@$self);
+        Sidef::Types::Array::Array->new(ref($self) ? [@$self] : $self);
     }
 
     *to_a = \&to_array;

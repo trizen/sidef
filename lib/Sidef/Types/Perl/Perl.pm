@@ -46,6 +46,10 @@ package Sidef::Types::Perl::Perl {
 
             my $ref = CORE::ref($val // return undef);
 
+            if (index($ref, "Sidef::") == 0) {
+                return $val;
+            }
+
             if ($ref eq 'ARRAY') {
                 my $array = $refs{$val} //= Sidef::Types::Array::Array->new([]);
                 foreach my $item (@{$val}) {
@@ -70,6 +74,14 @@ package Sidef::Types::Perl::Perl {
                                     );
                 }
                 return $hash;
+            }
+
+            if ($ref eq 'CODE') {
+                return Sidef::Types::Block::Block->new(
+                    code => sub {
+                        map { $self->to_sidef($_) } $val->(map { (index(ref($_), 'Sidef::') == 0) ? $_->get_value : $_ } @_);
+                    }
+                );
             }
 
             if ($ref eq 'Regexp') {

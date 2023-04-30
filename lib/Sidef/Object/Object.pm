@@ -340,13 +340,18 @@ package Sidef::Object::Object {
 
             $addr{$refaddr} = $str;
 
+            my $s;
             $$str = (
                 "$type(" . CORE::join(
                     ', ',
                     map {
                         my $str = (
                                    defined($obj->{$_})
-                                   ? (UNIVERSAL::can($obj->{$_}, 'dump') ? $obj->{$_}->dump : "$obj->{$_}")
+                                   ? (
+                                      (ref($obj->{$_}) && ($s = UNIVERSAL::can($obj->{$_}, 'dump')))
+                                      ? $s->($obj->{$_})
+                                      : "$obj->{$_}"
+                                     )
                                    : 'nil'
                                   );
                         "$_: $str";

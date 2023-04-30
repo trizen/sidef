@@ -3883,7 +3883,7 @@ package Sidef::Types::Array::Array {
     *to_h = \&to_hash;
 
     sub to_a {
-        $_[0];
+        ref($_[0]) ? $_[0] : __PACKAGE__->new($_[0]);
     }
 
     *to_array = \&to_a;

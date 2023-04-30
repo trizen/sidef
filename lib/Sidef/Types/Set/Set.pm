@@ -493,7 +493,7 @@ package Sidef::Types::Set::Set {
 
     sub to_a {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new([CORE::values(%$self)]);
+        Sidef::Types::Array::Array->new(ref($self) ? [CORE::values(%$self)] : $self);
     }
 
     *values   = \&to_a;

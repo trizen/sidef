@@ -39,7 +39,7 @@ class SnakeGame(w, h) {
     method init {
         grid = h.of { w.of { [VOID] } }
 
-        head_pos = [h//2, w//2]
+        head_pos = [h>>1, w>>1]
         tail_pos = [head_pos[0], head_pos[1]+1]
 
         grid[head_pos[0]][head_pos[1]] = [HEAD, dir]    # head
