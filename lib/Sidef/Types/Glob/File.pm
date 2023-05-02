@@ -381,23 +381,13 @@ package Sidef::Types::Glob::File {
             push @lines, $code->run(Sidef::Types::String::String->new($line));
         }
 
-        truncate($fh, 0) || do {
-            warn "[WARNING] Can't truncate file `$self`: $!";
-            return undef;
-        };
-
-        seek($fh, 0, 0) || do {
-            warn "[WARNING] Can't seek the begining of file `$self`: $!";
-            return undef;
-        };
+        truncate($fh, 0) || return undef;
+        seek($fh, 0, 0)  || return undef;
 
         do {
             local $, = q{};
             local $\ = q{};
-            (print $fh @lines) || do {
-                warn "[WARNING] Can't write to file `$self`: $!";
-                return undef;
-            };
+            (print $fh @lines) || return undef;
             close $fh;
           }
           ? (Sidef::Types::Bool::Bool::TRUE)
@@ -409,11 +399,7 @@ package Sidef::Types::Glob::File {
         my ($self, $mode) = @_;
 
         $mode = defined($mode) ? "$mode" : 'utf8';
-
-        open(my $fh, "<:$mode", "$self") || do {
-            warn "[WARNING] Can't open file `$self` for reading: $!";
-            return undef;
-        };
+        open(my $fh, "<:$mode", "$self") || return undef;
 
         local $/;
         Sidef::Types::String::String->new(scalar <$fh>);
@@ -424,16 +410,9 @@ package Sidef::Types::Glob::File {
         my ($self, $string, $mode) = @_;
 
         $mode = defined($mode) ? "$mode" : 'utf8';
+        open(my $fh, ">:$mode", "$self") || return undef;
 
-        open(my $fh, ">:$mode", "$self") || do {
-            warn "[WARNING] Can't open file `$self` for writing: $!";
-            return undef;
-        };
-
-        (print $fh "$string") || do {
-            warn "[WARNING] Can't write to file `$self`: $!";
-            return undef;
-        };
+        (print $fh "$string") || return undef;
 
         (close $fh)
           ? (Sidef::Types::Bool::Bool::TRUE)
@@ -445,16 +424,9 @@ package Sidef::Types::Glob::File {
         my ($self, $string, $mode) = @_;
 
         $mode = defined($mode) ? "$mode" : 'utf8';
+        open(my $fh, ">>:$mode", "$self") || return undef;
 
-        open(my $fh, ">>:$mode", "$self") || do {
-            warn "[WARNING] Can't open file `$self` for appending: $!";
-            return undef;
-        };
-
-        (print $fh "$string") || do {
-            warn "[WARNING] Can't append to file `$self`: $!";
-            return undef;
-        };
+        (print $fh "$string") || return undef;
 
         (close $fh)
           ? (Sidef::Types::Bool::Bool::TRUE)

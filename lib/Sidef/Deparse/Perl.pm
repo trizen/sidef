@@ -1291,6 +1291,24 @@ HEADER
             $code .= '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::While') {
+
+            # TODO: add support for slurpy parameters.
+            # Example: while (expr) {|*arr| ... }
+
+#<<<
+            # Concept for the above TODO
+            # However, this does not localize variables correctly to the body of the `while` loop.
+            # For example: `scripts/Tests/dynamic_block_scoping.sf` will fail.
+            #~ my $arg;
+            #~ if (exists($obj->{block}{init_vars}) and @{$obj->{block}{init_vars}{vars}}) {
+                #~ local $obj->{block}{init_vars}{args} = $obj->{expr};
+                #~ $arg = $self->_dump_init_vars($obj->{block}{init_vars});
+            #~ }
+            #~ else {
+                #~ $arg = $self->deparse_args($obj->{expr});
+            #~ }
+#>>>
+
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
             my $arg  = $self->deparse_args($obj->{expr});
 
