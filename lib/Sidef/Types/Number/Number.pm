@@ -4100,8 +4100,8 @@ package Sidef::Types::Number::Number {
 
         if ($y >= 0 and !ref($x) and $x >= 0) {
 
-            if (HAS_NEW_PRIME_UTIL and $x > 0 and CORE::log($x) * $y < CORE::log(ULONG_MAX)) {
-                my $r = Math::Prime::Util::powint($x, $y);
+            if ($x > 0 and CORE::log($x) * $y < CORE::log(ULONG_MAX)) {
+                my $r = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::powint($x, $y) : Math::Prime::Util::GMP::powint($x, $y));
                 return bless \$r;
             }
 
@@ -13563,6 +13563,93 @@ package Sidef::Types::Number::Number {
     }
 
     *square_free_count = \&squarefree_count;
+
+    sub non_powerfree {
+        my ($k, $A, $B) = @_;
+
+        _valid(\$A);
+
+        $k = _any2ui($$k) || return Sidef::Types::Array::Array->new;
+        $A = _any2mpz($$A) // return Sidef::Types::Array::Array->new;
+
+        if (defined($B)) {
+            _valid(\$B);
+            $B = _any2mpz($$B) // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $B = $A;
+            $A = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($A) <= 0) {
+            $A = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+        state $m = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_root($t, $B, $k);
+        Math::GMPz::Rmpz_fits_ulong_p($t) || return undef;    # too large
+
+        my @arr;
+
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($B)) {
+
+            $A = Math::GMPz::Rmpz_get_ui($A);
+            $B = Math::GMPz::Rmpz_get_ui($B);
+
+            foreach my $j (2 .. Math::GMPz::Rmpz_get_ui($t)) {
+
+                my $m = Math::Prime::Util::powint($j, $k);
+                my $t = Math::Prime::Util::divint($A, $m);
+                my $u = Math::Prime::Util::divint($B, $m);
+
+                if (Math::Prime::Util::mulint($t, $m) < $A) {
+                    ++$t;
+                }
+
+                foreach my $s ($t .. $u) {
+                    if (Math::Prime::Util::is_powerfree($s, $k)) {
+                        my $z = Math::Prime::Util::mulint($m, $s);
+                        push @arr, bless \$z;
+                    }
+                }
+            }
+        }
+        else {
+            foreach my $j (2 .. Math::GMPz::Rmpz_get_ui($t)) {
+
+                Math::GMPz::Rmpz_ui_pow_ui($m, $j, $k);
+                Math::GMPz::Rmpz_cdiv_q($t, $A, $m);
+                Math::GMPz::Rmpz_div($u, $B, $m);
+
+                for (; Math::GMPz::Rmpz_cmp($t, $u) <= 0 ; Math::GMPz::Rmpz_add_ui($t, $t, 1)) {
+                    if (    HAS_NEW_PRIME_UTIL
+                        and Math::GMPz::Rmpz_fits_ulong_p($t)
+                        and Math::Prime::Util::is_powerfree(Math::GMPz::Rmpz_get_ui($t), $k)) {
+                        my $z = Math::GMPz::Rmpz_init();
+                        Math::GMPz::Rmpz_mul_ui($z, $m, Math::GMPz::Rmpz_get_ui($t));
+                        $z = Math::GMPz::Rmpz_get_ui($z) if Math::GMPz::Rmpz_fits_ulong_p($z);
+                        push @arr, bless \$z;
+                    }
+                    elsif ((bless \$t)->is_powerfree(bless \$k)) {
+                        my $z = Math::GMPz::Rmpz_init();
+                        Math::GMPz::Rmpz_mul($z, $m, $t);
+                        $z = Math::GMPz::Rmpz_get_ui($z) if Math::GMPz::Rmpz_fits_ulong_p($z);
+                        push @arr, bless \$z;
+                    }
+                }
+            }
+        }
+
+        @arr = sort { $$a <=> $$b } @arr;
+        Sidef::Types::Array::Array->new(\@arr);
+    }
 
     sub _prime_count_checkpoint {
         my ($n, $i) = @_;
