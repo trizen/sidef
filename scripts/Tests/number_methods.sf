@@ -236,6 +236,12 @@ assert_eq(4.non_powerfree(100), 1..100 -> grep { .is_powerfree(4).not })
 assert_eq(2.non_powerfree(65, 100, 2), %n[68, 72, 75, 76, 80, 81, 84, 88, 90, 92, 96, 98, 99, 100])
 assert_eq(3.non_powerfree(64, 150, 3), %n[64, 72, 80, 81, 88, 96, 104, 108, 112, 120, 125, 128, 135, 136, 144])
 
+assert_eq(2.non_powerfree_count(65, 100, 2), 14)
+assert_eq(3.non_powerfree_count(64, 150, 2), 15)
+
+assert_eq(2.non_powerfree_sum(65, 100, 2), 1199)
+assert_eq(3.non_powerfree_sum(64, 150, 2), 1593)
+
 for k in (2..5) {
     var lo = 1e6.irand
     var hi = 1e8.irand

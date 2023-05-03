@@ -13651,6 +13651,32 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@arr);
     }
 
+    sub non_powerfree_count {
+        my ($k, $from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->non_powerfree_count($to)->sub($k->non_powerfree_count($from->dec));
+        }
+
+        _valid(\$from);
+        $from->sub($k->powerfree_count($from));
+    }
+
+    sub non_powerfree_sum {
+        my ($k, $from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->non_powerfree_sum($to)->sub($k->non_powerfree_sum($from->dec));
+        }
+
+        _valid(\$from);
+        $from->faulhaber_sum(ONE)->sub($k->powerfree_sum($from));
+    }
+
     sub _prime_count_checkpoint {
         my ($n, $i) = @_;
 

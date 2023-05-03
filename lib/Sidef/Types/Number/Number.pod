@@ -5598,10 +5598,28 @@ Aliases: I<binomial>
     k.non_powerfree(n)
     k.non_powerfree(a,b)
 
-Returns an Array with numbers <= C<n> or in the range C<a..b>, that are not k-powerfree.
+Returns an Array of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
     say 2.non_powerfree(100)        # numbers that are not squarefree <= 100
     say 3.non_powerfree(50, 100)    # numbers that are not cubefree in range 50..100
+
+=cut
+
+=head2 non_powerfree_count
+
+    k.non_powerfree_count(n)
+    k.non_powerfree_count(a,b)
+
+Returns the number of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
+
+=cut
+
+=head2 non_powerfree_sum
+
+    k.non_powerfree_sum(n)
+    k.non_powerfree_sum(a,b)
+
+Returns the sum of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
 =cut
 
