@@ -224,6 +224,15 @@ assert_eq(2.powerful(50, 106).len, 2.powerful_count(50, 106))
 assert_eq(3.powerful(50, 106).len, 3.powerful_count(50, 106))
 assert_eq(3.powerful(49, 105).len, 3.powerful_count(49, 105))
 
+for k in (2..5) {
+    var lo = 1e6.irand
+    var hi = 1e8.irand
+    assert_eq(k.powerful(lo, hi).sum, k.powerful_sum(lo, hi))
+}
+
+assert_eq(10.powerful_sum(1e20), 10.powerful(1e20).sum)
+assert_eq(11.powerful_sum(1e20), 11.powerful(1e20).sum)
+
 # Almost prime divisors
 
 assert_eq(5040.almost_prime_divisors.flat.sort, 5040.divisors)

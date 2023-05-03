@@ -8799,7 +8799,10 @@ package Sidef::Types::Number::Number {
       Math_GMPq: {
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_set_q($r, $x);
-            Math::GMPq::Rmpq_integer_p($x) && return $r;
+            if (Math::GMPq::Rmpq_integer_p($x)) {
+                $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+                return $r;
+            }
             Math::GMPz::Rmpz_sub_ui($r, $r, 1) if Math::GMPq::Rmpq_sgn($x) < 0;
             $r = Math::GMPz::Rmpz_get_si($r)   if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
@@ -13357,7 +13360,7 @@ package Sidef::Types::Number::Number {
         else {
             my $m;
             for (my $v = 1 ; $v <= $s ; ++$v) {
-                if ($m = Math::Prime::Util::GMP::moebius($v)) {
+                if ($m = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($v) : Math::Prime::Util::GMP::moebius($v))) {
 
                     # u = faulhaber(floor(n/v^k), 1)
                     Math::GMPz::Rmpz_ui_pow_ui($w, $v, $k);
@@ -28466,7 +28469,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        my $t     = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
         sub {
@@ -28482,22 +28485,22 @@ package Sidef::Types::Number::Number {
 
             my $z = Math::GMPz::Rmpz_init();
 
-            if ($r > $k and $t < 1e7 and $t > 1) {
-                my $v = 1;
-                foreach my $mu (HAS_PRIME_UTIL ? Math::Prime::Util::moebius(1, $t) : Math::Prime::Util::GMP::moebius(1, $t)) {
-                    if ($mu) {
-                        if ($k == 2 or Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1) {
-                            Math::GMPz::Rmpz_ui_pow_ui($z, $v, $r);
-                            Math::GMPz::Rmpz_mul($z, $z, $m);
-                            __SUB__->($z, $r - 1);
-                        }
+            if ($r > $k and Math::GMPz::Rmpz_cmp_ui($t, 1e7) <= 0 and Math::GMPz::Rmpz_cmp_ui($t, 1) > 0) {
+                my $v  = 1;
+                my $hi = Math::GMPz::Rmpz_get_ui($t);
+                foreach my $mu (HAS_PRIME_UTIL ? Math::Prime::Util::moebius(1, $hi) : Math::Prime::Util::GMP::moebius(1, $hi))
+                {
+                    if ($mu and ($k == 2 or Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1)) {
+                        Math::GMPz::Rmpz_ui_pow_ui($z, $v, $r);
+                        Math::GMPz::Rmpz_mul($z, $z, $m);
+                        __SUB__->($z, $r - 1);
                     }
                     ++$v;
                 }
                 return;
             }
 
-            foreach my $v (1 .. $t) {
+            foreach my $v (1 .. Math::GMPz::Rmpz_get_ui($t)) {
 
                 if ($r > $k) {
                     (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
@@ -28511,7 +28514,64 @@ package Sidef::Types::Number::Number {
           }
           ->($ONE, 2 * $k - 1);
 
+        $count = Math::GMPz::Rmpz_get_ui($count) if Math::GMPz::Rmpz_fits_ulong_p($count);
         bless \$count;
+    }
+
+    sub powerful_sum {    # sum of k-powerful numbers
+        my ($k, $from, $to) = @_;
+
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->powerful_sum($to)->sub($k->powerful_sum($from->dec));
+        }
+
+        my $n = _any2mpz($$from) // return ZERO;
+        Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
+
+        $k = _any2ui($$k) // return ZERO;
+
+        my $t   = Math::GMPz::Rmpz_init();
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        sub {
+            my ($m, $r) = @_;
+
+            Math::GMPz::Rmpz_div($t, $n, $m);
+            Math::GMPz::Rmpz_root($t, $t, $r);
+
+            if ($r <= $k) {
+                my $w = ${(bless \$t)->faulhaber_sum(bless \$r)};
+                if (ref($w) eq 'Math::GMPz') {
+                    Math::GMPz::Rmpz_addmul($sum, $m, $w);
+                }
+                else {
+                    Math::GMPz::Rmpz_addmul_ui($sum, $m, $w);
+                }
+                return;
+            }
+
+            my $z = Math::GMPz::Rmpz_init();
+
+            foreach my $v (1 .. Math::GMPz::Rmpz_get_ui($t)) {
+
+                if ($r > $k) {
+                    (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
+                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                        or next;
+                }
+
+                Math::GMPz::Rmpz_ui_pow_ui($z, $v, $r);
+                Math::GMPz::Rmpz_mul($z, $z, $m);
+                __SUB__->($z, $r - 1);
+            }
+          }
+          ->($ONE, 2 * $k - 1);
+
+        $sum = Math::GMPz::Rmpz_get_ui($sum) if Math::GMPz::Rmpz_fits_ulong_p($sum);
+        bless \$sum;
     }
 
     sub is_powerful {
