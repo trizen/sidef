@@ -3739,11 +3739,11 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = _any2si($$y) // (goto &nan);
 
-        if (HAS_PRIME_UTIL and $y >= 1 and !ref($x) and $x >= 0) {
+        if ($y >= 1 and !ref($x) and $x >= 0) {
             if ($y == 1) {
                 return bless \$x;
             }
-            my $r = Math::Prime::Util::rootint($x, $y);
+            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::rootint($x, $y) : Math::Prime::Util::GMP::rootint($x, $y));
             return bless \$r;
         }
 
@@ -3757,8 +3757,8 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (HAS_PRIME_UTIL and !ref($x) and $x >= 0) {
-            my $r = Math::Prime::Util::sqrtint($x);
+        if (!ref($x) and $x >= 0) {
+            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($x) : Math::Prime::Util::GMP::sqrtint($x));
             return bless \$r;
         }
 
@@ -3778,8 +3778,8 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (HAS_PRIME_UTIL and !ref($x) and $x >= 0) {
-            my $r = Math::Prime::Util::rootint($x, 3);
+        if (!ref($x) and $x >= 0) {
+            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::rootint($x, 3) : Math::Prime::Util::GMP::rootint($x, 3));
             return bless \$r;
         }
 
@@ -17474,7 +17474,7 @@ package Sidef::Types::Number::Number {
 
             $n > 101 or return 1;
 
-            if (HAS_PRIME_UTIL and ULONG_MAX >= 18446744073709551615) {
+            if (HAS_PRIME_UTIL and INTSIZE >= 64) {
                 Math::Prime::Util::gcd($n, 16294579238595022365) == 1 or return 0;
                 Math::Prime::Util::gcd($n, 7145393598349078859) == 1  or return 0;
             }
@@ -17503,7 +17503,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 101) > 0 or return 1;
 
         # Check for very small factors
-        if (ULONG_MAX >= 18446744073709551615) {
+        if (INTSIZE >= 64) {
             Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 16294579238595022365) == 1 or return 0;
             Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, 7145393598349078859) == 1  or return 0;
         }
@@ -19673,9 +19673,10 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             $n > 2 or goto &nan;
-            return _set_int(Math::Prime::Util::prev_prime($n) || goto &nan);
+            return _set_int((HAS_PRIME_UTIL ? Math::Prime::Util::prev_prime($n) : Math::Prime::Util::GMP::prev_prime($n))
+                            || goto &nan);
         }
 
         _set_int(Math::Prime::Util::GMP::prev_prime(_big2uistr($n) // goto &nan) || goto &nan);
@@ -19686,8 +19687,8 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n) and $n >= 0) {
-            return _set_int(Math::Prime::Util::next_prime($n));
+        if (!ref($n) and $n >= 0) {
+            return _set_int((HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($n) : Math::Prime::Util::GMP::next_prime($n)));
         }
 
         _set_int(Math::Prime::Util::GMP::next_prime(_big2uistr($n) // goto &nan) || goto &nan);
@@ -19867,8 +19868,9 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (HAS_PRIME_UTIL and !ref($y) and !ref($x)) {
-            my $r = Math::Prime::Util::znorder($x, $y) // goto &nan;
+        if (!ref($y) and !ref($x)) {
+            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::znorder($x, $y) : Math::Prime::Util::GMP::znorder($x, $y))
+              // goto &nan;
             return bless \$r;
         }
 
@@ -22471,8 +22473,8 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
-            my $r = Math::Prime::Util::euler_phi($n);
+        if (!ref($n)) {
+            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::euler_phi($n) : Math::Prime::Util::GMP::totient($n));
             return bless \$r;
         }
 
@@ -27628,23 +27630,20 @@ package Sidef::Types::Number::Number {
                 }
             }
 
-            if (HAS_PRIME_UTIL) {
+            my @factors = (HAS_PRIME_UTIL ? Math::Prime::Util::factor($n) : Math::Prime::Util::GMP::factor($n));
 
-                my @factors = Math::Prime::Util::factor($n);
-
-                if (scalar(@factors) <= 2) {
-                    return Sidef::Types::Bool::Bool::FALSE;
-                }
-
-                my %seen;
-                foreach my $p (@factors) {
-                    $seen{$p}++
-                      and return Sidef::Types::Bool::Bool::FALSE;
-                    ($n + 1) % ($p + 1) == 0
-                      or return Sidef::Types::Bool::Bool::FALSE;
-                }
-                return Sidef::Types::Bool::Bool::TRUE;
+            if (scalar(@factors) <= 2) {
+                return Sidef::Types::Bool::Bool::FALSE;
             }
+
+            my %seen;
+            foreach my $p (@factors) {
+                $seen{$p}++
+                  and return Sidef::Types::Bool::Bool::FALSE;
+                ($n + 1) % ($p + 1) == 0
+                  or return Sidef::Types::Bool::Bool::FALSE;
+            }
+            return Sidef::Types::Bool::Bool::TRUE;
         }
 
         if (ref($n) ne 'Math::GMPz') {
@@ -28984,9 +28983,9 @@ package Sidef::Types::Number::Number {
         $n = $$n;
         $k = $$k;
 
-        if (HAS_PRIME_UTIL and !ref($n) and !ref($k) and $k >= 3) {
+        if (!ref($n) and !ref($k) and $k >= 3) {
             return (
-                    Math::Prime::Util::is_polygonal($n, $k)
+                    (HAS_PRIME_UTIL ? Math::Prime::Util::is_polygonal($n, $k) : Math::Prime::Util::GMP::is_polygonal($n, $k))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
