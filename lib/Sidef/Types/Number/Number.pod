@@ -1076,7 +1076,7 @@ Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
     bernoulli_numbers(n)
 
-Returns an Array with the Bernoulli numbers in the range C<0..n>.
+Returns an Array containing the Bernoulli numbers with indices in the range C<0..n>.
 
     say bernoulli_numbers(5)    #=> [1, -1/2, 1/6, 0, -1/30, 0]
     say bernoulli_numbers(6)    #=> [1, -1/2, 1/6, 0, -1/30, 0, 1/42]
@@ -2670,7 +2670,7 @@ Aliases: I<euler_number>
 
     euler_numbers(n)
 
-Returns an Array with the Euler numbers in the range C<0..n>.
+Returns an Array containing the Euler numbers with indices in the range C<0..n>.
 
     say euler_numbers(9)    #=> [1, 0, -1, 0, 5, 0, -61, 0, 1385, 0]
     say euler_numbers(10)   #=> [1, 0, -1, 0, 5, 0, -61, 0, 1385, 0, -50521]
@@ -3069,6 +3069,28 @@ Example (try with base 3 and give up after 10^6 iterations):
     say flt_factor(2**64 + 1, 3, 1e6)   #=> [274177, 67280421310721]
 
 The product of the factors will give back C<n>. However, some factors may be composite.
+
+=cut
+
+=head2 fubini
+
+    fubini(n)
+
+Returns the n-th Fubini number.
+
+    say 10.of { .fubini }    #=> OEIS: A000670
+
+Aliases: I<fubini_number>
+
+=cut
+
+=head2 fubini_numbers
+
+    fubini_numbers(n)
+
+Returns an Array containing the Fubini numbers with indices in the range C<0..n>.
+
+    say fubini_numbers(5)   #=> [1, 1, 3, 13, 75, 541]
 
 =cut
 

@@ -5994,6 +5994,44 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([map { bless \$_ } @euler]);
     }
 
+    sub _fubini_numbers {
+        my ($n) = @_;
+
+        state $F = [Math::GMPz::Rmpz_init_set_ui(1)];
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        foreach my $i ($#{$F} + 1 .. $n) {
+            my $w = Math::GMPz::Rmpz_init_set_ui(0);
+            foreach my $k (0 .. $i - 1) {
+                Math::GMPz::Rmpz_bin_uiui($t, $i, $i - $k);
+                Math::GMPz::Rmpz_addmul($w, $F->[$k], $t);
+            }
+            $F->[$i] = $w;
+        }
+
+        return $F;
+    }
+
+    sub fubini_numbers {    # OEIS: A000670
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // return Sidef::Types::Array::Array->new;
+
+        my @F = @{_fubini_numbers($n)};
+        $#F = $n;
+        Sidef::Types::Array::Array->new([map { bless \$_ } @F]);
+    }
+
+    sub fubini {            # OEIS: A000670
+        my ($n) = @_;
+        $n = _any2ui($$n) // goto &nan;
+        my $r = _fubini_numbers($n)->[$n];
+        bless \$r;
+    }
+
+    *Fubini        = \&fubini;
+    *fubini_number = \&fubini;
+
     sub secant_number {
         my ($n) = @_;
 
