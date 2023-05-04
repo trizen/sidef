@@ -251,6 +251,9 @@ for k in (2..5) {
 assert_eq(10.powerful_sum(1e20), 10.powerful(1e20).sum)
 assert_eq(11.powerful_sum(1e20), 11.powerful(1e20).sum)
 
+assert_eq(10.powerful_count(1e20), 10.powerful(1e20).len)
+assert_eq(11.powerful_count(1e20), 11.powerful(1e20).len)
+
 # Almost prime divisors
 
 assert_eq(5040.almost_prime_divisors.flat.sort, 5040.divisors)
