@@ -123,6 +123,14 @@ Returns the
 
 =cut
 
+=head2 composite_sum
+
+    self.composite_sum
+
+Returns the
+
+=cut
+
 =head2 each_almost_prime
 
     self.each_almost_prime
@@ -150,6 +158,14 @@ Returns the
 =head2 each_lucas_carmichael
 
     self.each_lucas_carmichael
+
+Returns the
+
+=cut
+
+=head2 each_non_powerfree
+
+    self.each_non_powerfree
 
 Returns the
 
@@ -295,6 +311,30 @@ Aliases: I<call>
 
 =cut
 
+=head2 non_powerfree
+
+    self.non_powerfree
+
+Returns the
+
+=cut
+
+=head2 non_powerfree_count
+
+    self.non_powerfree_count
+
+Returns the
+
+=cut
+
+=head2 non_powerfree_sum
+
+    self.non_powerfree_sum
+
+Returns the
+
+=cut
+
 =head2 omega_prime_count
 
     self.omega_prime_count
@@ -338,6 +378,14 @@ Returns the
 =head2 powerful_count
 
     self.powerful_count
+
+Returns the
+
+=cut
+
+=head2 powerful_sum
+
+    self.powerful_sum
 
 Returns the
 

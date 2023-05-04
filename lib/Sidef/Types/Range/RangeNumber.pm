@@ -400,6 +400,7 @@ package Sidef::Types::Range::RangeNumber {
                             each_name  => 'each_composite',
                             arr_name   => 'composites',
                             count_name => 'composite_count',
+                            sum_name   => 'composite_sum',
                             predicate  => sub { $_[0]->is_composite },
                            },
                            {
@@ -552,9 +553,20 @@ package Sidef::Types::Range::RangeNumber {
                  arr_name   => 'powerful',
                  each_name  => 'each_powerful',
                  count_name => 'powerful_count',
+                 sum_name   => 'powerful_sum',
                  predicate  => sub {
                      my ($k) = @_;
                      sub { $_[0]->is_powerful($k) };
+                 },
+                },
+                {
+                 arr_name   => 'non_powerfree',
+                 each_name  => 'each_non_powerfree',
+                 count_name => 'non_powerfree_count',
+                 sum_name   => 'non_powerfree_sum',
+                 predicate  => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_powerfree($k)->not };
                  },
                 },
                 {

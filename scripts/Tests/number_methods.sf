@@ -869,4 +869,24 @@ assert_eq(20.of { .liouville_sum }, %n[0, 1, 0, -1, 0, -1, 0, -1, -2, -1, 0, -1,
 assert_eq(liouville_sum(123456), -92)
 assert_eq(liouville_sum(12345), -49)
 
+assert_eq(
+    gather { primes_each(2**65, 2**65 + 1000, {|k| take(k) }) },
+    prime_count(2**65, 2**65 + 1000).next_primes(2**65),
+)
+
+assert_eq(
+    primes(2**63 - 10, 2**63 + 1000),
+    prime_count(2**63 - 10, 2**63 + 1000).next_primes(2**63 - 10),
+)
+
+assert_eq(
+    primes(2**64 - 10, 2**64 + 1000),
+    prime_count(2**64 - 10, 2**64 + 1000).next_primes(2**64 - 10),
+)
+
+assert_eq(
+    primes(2**65, 2**65 + 1000),
+    prime_count(2**65, 2**65 + 1000).next_primes(2**65),
+)
+
 say "** Tests passed!"

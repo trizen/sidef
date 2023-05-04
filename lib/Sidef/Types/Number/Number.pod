@@ -2422,6 +2422,20 @@ Aliases: I<lucas_carmichael_each>
 
 =cut
 
+=head2 each_non_powerfree
+
+    k.non_powerfree_each(n, { ... })
+    k.non_powerfree_each(a, b, { ... })
+
+Iterates over the numbers <= C<n>, or in the range C<a..b>, that are not C<k>-powerfree.
+
+    2.non_powerfree_each(100, {|n| say n })         # iterate over non-squarefree numbers <= 100
+    3.non_powerfree_each(50, 100, {|n| say n })     # iterate over non-cubefree numbers in range 50..100
+
+Aliases: I<non_powerfree_each>
+
+=cut
+
 =head2 each_omega_prime
 
     k.omega_primes_each(n, { ... })

@@ -1521,7 +1521,7 @@ package Sidef::Types::Number::Number {
                 }
 
                 #~ say ":: Sieving ($from, $upto) with step = $step";
-                @buffer = @{$buffer_callback->($from, $upto)};
+                @buffer = @{$buffer_callback->($from, $upto) // die "Unexpected error"};
                 $from   = $upto + 1;
                 @buffer || next;
             }
@@ -13603,30 +13603,8 @@ package Sidef::Types::Number::Number {
 
     *square_free_count = \&squarefree_count;
 
-    sub non_powerfree {
-        my ($k, $A, $B) = @_;
-
-        _valid(\$A);
-
-        $k = _any2ui($$k) || return Sidef::Types::Array::Array->new;
-        $A = _any2mpz($$A) // return Sidef::Types::Array::Array->new;
-
-        if (defined($B)) {
-            _valid(\$B);
-            $B = _any2mpz($$B) // return Sidef::Types::Array::Array->new;
-        }
-        else {
-            $B = $A;
-            $A = $ONE;
-        }
-
-        if (Math::GMPz::Rmpz_sgn($A) <= 0) {
-            $A = $ONE;
-        }
-
-        if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
-            return Sidef::Types::Array::Array->new;
-        }
+    sub _sieve_non_powerfree {
+        my ($A, $B, $k) = @_;
 
         state $m = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
@@ -13657,8 +13635,7 @@ package Sidef::Types::Number::Number {
 
                 foreach my $s ($t .. $u) {
                     if (Math::Prime::Util::is_powerfree($s, $k)) {
-                        my $z = Math::Prime::Util::mulint($m, $s);
-                        push @arr, bless \$z;
+                        push @arr, Math::Prime::Util::mulint($m, $s);
                     }
                 }
             }
@@ -13677,21 +13654,83 @@ package Sidef::Types::Number::Number {
                         my $z = Math::GMPz::Rmpz_init();
                         Math::GMPz::Rmpz_mul_ui($z, $m, Math::GMPz::Rmpz_get_ui($t));
                         $z = Math::GMPz::Rmpz_get_ui($z) if Math::GMPz::Rmpz_fits_ulong_p($z);
-                        push @arr, bless \$z;
+                        push @arr, $z;
                     }
                     elsif ((bless \$t)->is_powerfree(bless \$k)) {
                         my $z = Math::GMPz::Rmpz_init();
                         Math::GMPz::Rmpz_mul($z, $m, $t);
                         $z = Math::GMPz::Rmpz_get_ui($z) if Math::GMPz::Rmpz_fits_ulong_p($z);
-                        push @arr, bless \$z;
+                        push @arr, $z;
                     }
                 }
             }
         }
 
-        @arr = sort { $$a <=> $$b } @arr;
-        Sidef::Types::Array::Array->new(\@arr);
+        @arr = sort { $a <=> $b } @arr;
+        return \@arr;
     }
+
+    sub non_powerfree {
+        my ($k, $A, $B) = @_;
+
+        _valid(\$A);
+
+        $k = _any2ui($$k) || return Sidef::Types::Array::Array->new;
+        $A = _any2mpz($$A) // return Sidef::Types::Array::Array->new;
+
+        if (defined($B)) {
+            _valid(\$B);
+            $B = _any2mpz($$B) // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $B = $A;
+            $A = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($A) <= 0) {
+            $A = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+#<<<
+        my @non_powerfree = map {
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
+        } @{_sieve_non_powerfree($A, $B, $k) // return undef};
+#>>>
+
+        Sidef::Types::Array::Array->new(\@non_powerfree);
+    }
+
+    sub non_powerfree_each {
+        my ($k, $from, $to, $block) = @_;
+
+        _valid(\$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        my $step_value = 3e3 * $TWO**$k;
+        _generic_each($from, $to, $block, sub { $step_value }, sub { _sieve_non_powerfree($_[0], $_[1], $k) });
+    }
+
+    *each_non_powerfree = \&non_powerfree_each;
 
     sub non_powerfree_count {
         my ($k, $from, $to) = @_;
@@ -14306,11 +14345,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (HAS_PRIME_UTIL and $y < ~0) {
-            my $prime_count = Math::Prime::Util::prime_count("$x", "$y");
-            return "$prime_count";
-        }
-        elsif (($y >= 1e7 and Math::Prime::Util::GMP::subint($y, $x) <= 1e6) or "$x" / "$y" >= 0.999) {
+        if (($y >= 1e7 and Math::Prime::Util::GMP::subint($y, $x) <= 1e6) or "$x" / "$y" >= 0.999) {
 
             if ("$x" eq "$y") {    # workaround for danaj/Math-Prime-Util-GMP #33
                 return (_is_prob_prime("$x") ? 1 : 0);
@@ -14319,6 +14354,12 @@ package Sidef::Types::Number::Number {
             # Support for arbitrary large integers (slow for wide ranges)
             my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
             return $prime_count;
+        }
+        elsif (HAS_PRIME_UTIL and $y < ULONG_MAX) {
+
+            # XXX: somehow, this is slow for prime_count(2**63 - 10, 2**63 + 1000)
+            my $prime_count = Math::Prime::Util::prime_count("$x", "$y");
+            return "$prime_count";
         }
         elsif (0 and $y >= ~0) {    # too slow
 
@@ -19436,8 +19477,11 @@ package Sidef::Types::Number::Number {
         $x = (_big2uistr($x) // 0) if ref($x);
         $y = (_big2uistr($y) // 0);
 
+        Math::Prime::Util::GMP::subint($y, $x) < ULONG_MAX
+          or return undef;    # too large range
+
         Sidef::Types::Array::Array->new(
-                      [map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } Math::Prime::Util::GMP::sieve_primes($x, $y, 0)]);
+                         [map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } Math::Prime::Util::GMP::sieve_primes($x, $y)]);
     }
 
     sub composites {
@@ -24821,10 +24865,9 @@ package Sidef::Types::Number::Number {
                 }
               }
               ->($ONE, 2 * $k - 1);
-
-            @powerful = sort { $a <=> $b } @powerful;
         }
 
+        @powerful = sort { $a <=> $b } @powerful;
         return \@powerful;
     }
 
