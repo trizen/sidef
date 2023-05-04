@@ -1311,6 +1311,7 @@ package Sidef::Optimizer {
                or $ref eq 'Sidef::Types::Block::Do'
                or $ref eq 'Sidef::Types::Block::Loop'
                or $ref eq 'Sidef::Types::Block::Given'
+               or $ref eq 'Sidef::Types::Block::Gather'
                or $ref eq 'Sidef::Types::Block::When'
                or $ref eq 'Sidef::Types::Block::Case'
                or $ref eq 'Sidef::Types::Block::Default') {
@@ -1396,6 +1397,9 @@ package Sidef::Optimizer {
             $obj->{value} = [map { {main => [$self->optimize_expr({self => $_})]} } @{$obj->{value}}];
         }
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
+            $obj->{expr} = {$self->optimize($obj->{expr})};
+        }
+        elsif ($ref eq 'Sidef::Types::Block::Take') {
             $obj->{expr} = {$self->optimize($obj->{expr})};
         }
         elsif ($ref eq 'Sidef::Meta::Assert') {
