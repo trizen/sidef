@@ -131,6 +131,54 @@ Returns the
 
 =cut
 
+=head2 cubefree
+
+    self.cubefree
+
+Returns the
+
+=cut
+
+=head2 cubefree_count
+
+    self.cubefree_count
+
+Returns the
+
+=cut
+
+=head2 cubefree_sum
+
+    self.cubefree_sum
+
+Returns the
+
+=cut
+
+=head2 cubeful
+
+    self.cubeful
+
+Returns the
+
+=cut
+
+=head2 cubeful_count
+
+    self.cubeful_count
+
+Returns the
+
+=cut
+
+=head2 cubeful_sum
+
+    self.cubeful_sum
+
+Returns the
+
+=cut
+
 =head2 each_almost_prime
 
     self.each_almost_prime
@@ -155,9 +203,33 @@ Returns the
 
 =cut
 
+=head2 each_cubefree
+
+    self.each_cubefree
+
+Returns the
+
+=cut
+
+=head2 each_cubeful
+
+    self.each_cubeful
+
+Returns the
+
+=cut
+
 =head2 each_lucas_carmichael
 
     self.each_lucas_carmichael
+
+Returns the
+
+=cut
+
+=head2 each_non_cubefree
+
+    self.each_non_cubefree
 
 Returns the
 
@@ -171,9 +243,25 @@ Returns the
 
 =cut
 
+=head2 each_non_squarefree
+
+    self.each_non_squarefree
+
+Returns the
+
+=cut
+
 =head2 each_omega_prime
 
     self.each_omega_prime
+
+Returns the
+
+=cut
+
+=head2 each_powerfree
+
+    self.each_powerfree
 
 Returns the
 
@@ -230,6 +318,14 @@ Returns the
 =head2 each_squarefree_semiprime
 
     self.each_squarefree_semiprime
+
+Returns the
+
+=cut
+
+=head2 each_squareful
+
+    self.each_squareful
 
 Returns the
 
@@ -311,6 +407,30 @@ Aliases: I<call>
 
 =cut
 
+=head2 non_cubefree
+
+    self.non_cubefree
+
+Returns the
+
+=cut
+
+=head2 non_cubefree_count
+
+    self.non_cubefree_count
+
+Returns the
+
+=cut
+
+=head2 non_cubefree_sum
+
+    self.non_cubefree_sum
+
+Returns the
+
+=cut
+
 =head2 non_powerfree
 
     self.non_powerfree
@@ -335,6 +455,30 @@ Returns the
 
 =cut
 
+=head2 non_squarefree
+
+    self.non_squarefree
+
+Returns the
+
+=cut
+
+=head2 non_squarefree_count
+
+    self.non_squarefree_count
+
+Returns the
+
+=cut
+
+=head2 non_squarefree_sum
+
+    self.non_squarefree_sum
+
+Returns the
+
+=cut
+
 =head2 omega_prime_count
 
     self.omega_prime_count
@@ -346,6 +490,14 @@ Returns the
 =head2 omega_primes
 
     self.omega_primes
+
+Returns the
+
+=cut
+
+=head2 powerfree
+
+    self.powerfree
 
 Returns the
 
@@ -522,6 +674,30 @@ Returns the
 =head2 squarefree_sum
 
     self.squarefree_sum
+
+Returns the
+
+=cut
+
+=head2 squareful
+
+    self.squareful
+
+Returns the
+
+=cut
+
+=head2 squareful_count
+
+    self.squareful_count
+
+Returns the
+
+=cut
+
+=head2 squareful_sum
+
+    self.squareful_sum
 
 Returns the
 

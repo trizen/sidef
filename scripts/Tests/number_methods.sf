@@ -177,6 +177,40 @@ assert_eq(
     10..100 `by` 3 -> grep { .is_composite }
 )
 
+# RangeNumber powerfree numbers
+
+assert_eq(
+    gather { 10..100 -> each_powerfree(3, {|k| take(k) }) },
+    3.powerfree(10, 100)
+)
+
+assert_eq(
+    gather { 1..100 -> each_powerfree(2, {|k| take(k) }) },
+    2.powerfree(100)
+)
+
+assert_eq(
+    gather { 10..100 `by` 3 -> each_powerfree(3, {|k| take(k) }) },
+    10..100 `by` 3 -> grep { .is_cubefree }
+)
+
+# RangeNumber non-powerfree numbers
+
+assert_eq(
+    gather { 10..100 -> each_non_powerfree(3, {|k| take(k) }) },
+    3.non_powerfree(10, 100)
+)
+
+assert_eq(
+    gather { 1..100 -> each_non_powerfree(2, {|k| take(k) }) },
+    2.non_powerfree(100)
+)
+
+assert_eq(
+    gather { 10..100 `by` 3 -> each_non_powerfree(3, {|k| take(k) }) },
+    10..100 `by` 3 -> grep { !.is_cubefree }
+)
+
 # RangeNumber semiprime numbers
 
 assert_eq(
@@ -740,8 +774,25 @@ assert_eq(1000!.make_coprime(2*3*5*7).lpf, 11)
 assert_eq(1000!.gpf, 1000.prev_prime)
 assert_eq(gpf(1000! * (2**64 + 1)), 67280421310721)
 
+assert_eq({ .non_squarefree_count }.map(1..20),      { !.is_squarefree ? 1 : 0 }.map(1..20).acc)
+assert_eq({ .non_squarefree_sum }.map(1..20),        { !.is_squarefree ? _ : 0 }.map(1..20).acc)
+assert_eq({ .non_cubefree_count }.map(1..20),        { !.is_cubefree ? 1 : 0 }.map(1..20).acc)
+assert_eq({ .non_cubefree_sum }.map(1..20),          { !.is_cubefree ? _ : 0 }.map(1..20).acc)
+
+assert_eq({ 4.non_powerfree_count(_) }.map(1..20),   { !.is_powerfree(4) ? 1 : 0 }.map(1..20).acc)
+assert_eq({ 4.non_powerfree_sum(_) }.map(1..20),     { !.is_powerfree(4) ? _ : 0 }.map(1..20).acc)
+
+assert_eq({ 4.powerfree_count(_) }.map(1..20),   { .is_powerfree(4) ? 1 : 0 }.map(1..20).acc)
+assert_eq({ 4.powerfree_sum(_) }.map(1..20),     { .is_powerfree(4) ? _ : 0 }.map(1..20).acc)
+
 assert_eq(20.of { .squarefree_count },  20.of { .is_squarefree ? 1 : 0 }.acc)
 assert_eq(20.of { .squarefree_sum },    20.of { .is_squarefree ? _ : 0 }.acc)
+assert_eq(20.of { .cubefree_count },    20.of { .is_cubefree ? 1 : 0 }.acc)
+assert_eq(20.of { .cubefree_sum },      20.of { .is_cubefree ? _ : 0 }.acc)
+assert_eq(20.of { .squareful_count },   20.of { .is_squareful ? 1 : 0 }.acc)
+assert_eq(20.of { .squareful_sum },     20.of { .is_squareful ? _ : 0 }.acc)
+assert_eq(20.of { .cubeful_count },     20.of { .is_cubeful ? 1 : 0 }.acc)
+assert_eq(20.of { .cubeful_sum },       20.of { .is_cubeful ? _ : 0 }.acc)
 assert_eq(20.of { .composite_count },   20.of { .is_composite ? 1 : 0 }.acc)
 assert_eq(20.of { .composite_sum },     20.of { .is_composite ? _ : 0 }.acc)
 assert_eq(20.of { .mertens },           20.of { .moebius }.acc)

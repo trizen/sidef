@@ -32,10 +32,11 @@ package Sidef::Types::Number::Number {
 #<<<
     use constant {
 
-          ONE  => bless(\(my $one = 1)),
-          TWO  => bless(\(my $two = 2)),
-          ZERO => bless(\(my $zero = 0)),
-          MONE => bless(\(my $mone = -1)),
+          ONE   => bless(\(my $one = 1)),
+          TWO   => bless(\(my $two = 2)),
+          THREE => bless(\(my $three = 3)),
+          ZERO  => bless(\(my $zero = 0)),
+          MONE  => bless(\(my $mone = -1)),
 
           ULONG_MAX => Math::GMPq::_ulong_max(),
           LONG_MIN  => Math::GMPq::_long_min(),
@@ -1521,7 +1522,7 @@ package Sidef::Types::Number::Number {
                 }
 
                 #~ say ":: Sieving ($from, $upto) with step = $step";
-                @buffer = @{$buffer_callback->($from, $upto) // die "Unexpected error"};
+                @buffer = @{$buffer_callback->($from, $upto) // die "[ERROR] Failed to sieve the range [$from, $upto]"};
                 $from   = $upto + 1;
                 @buffer || next;
             }
@@ -11498,7 +11499,7 @@ package Sidef::Types::Number::Number {
         }
 
         if (Math::GMPz::Rmpz_odd_p($m) and (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x)))) {
-            return _set_int(2 * $x)->lucasVmod(_set_int(1), (bless \$n), (bless \$m))->divmod(TWO, (bless \$m));
+            return _set_int(2 * $x)->lucasVmod(ONE, (bless \$n), (bless \$m))->divmod(TWO, (bless \$m));
         }
 
         # T_n(x) = 1/2 * ((x - sqrt(x^2 - 1))^n + (x + sqrt(x^2 - 1))^n)
@@ -11539,7 +11540,7 @@ package Sidef::Types::Number::Number {
         }
 
         if (ref($x) eq 'Math::GMPz' or (__is_rat__($x) and __is_int__($x))) {
-            my $r = _set_int(2 * $x)->lucasUmod(_set_int(1), (bless \$n)->inc, (bless \$m));
+            my $r = _set_int(2 * $x)->lucasUmod(ONE, (bless \$n)->inc, (bless \$m));
             $r = $r->neg->mod(bless \$m) if $negative;
             return $r;
         }
@@ -13422,8 +13423,11 @@ package Sidef::Types::Number::Number {
     }
 
     sub squarefree_sum {
-        my ($from, $to) = @_;
-        (TWO)->powerfree_sum($from, $to);
+        (TWO)->powerfree_sum(@_);
+    }
+
+    sub cubefree_sum {
+        (THREE)->powerfree_sum(@_);
     }
 
     sub _native_squarefree_count {
@@ -13597,23 +13601,59 @@ package Sidef::Types::Number::Number {
     }
 
     sub squarefree_count {
-        my ($from, $to) = @_;
-        (TWO)->powerfree_count($from, $to);
+        (TWO)->powerfree_count(@_);
     }
 
     *square_free_count = \&squarefree_count;
 
+    sub cubefree_count {
+        (THREE)->powerfree_count(@_);
+    }
+
     sub _sieve_non_powerfree {
         my ($A, $B, $k) = @_;
+
+        # $A and $B are Math::GMPz objects
+        # $k is a non-negative native integer
 
         state $m = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
 
         my $t = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_root($t, $B, $k);
-        Math::GMPz::Rmpz_fits_ulong_p($t) || return undef;    # too large
 
         my @arr;
+
+        if (
+            !Math::GMPz::Rmpz_fits_slong_p($t) or do {
+                Math::GMPz::Rmpz_sub($m, $B, $A);
+                Math::GMPz::Rmpz_cmp($m, $t) < 0;
+            }
+          ) {    # too large or small range
+
+            Math::GMPz::Rmpz_set($t, $A);
+
+            my $k_obj = bless \$k;
+            my $t_obj = bless \$t;
+
+            my $native_A = Math::GMPz::Rmpz_fits_ulong_p($A);
+
+            for (; Math::GMPz::Rmpz_cmp($t, $B) <= 0 ; Math::GMPz::Rmpz_add_ui($t, $t, 1)) {
+                if (HAS_NEW_PRIME_UTIL and $native_A and Math::GMPz::Rmpz_fits_ulong_p($t)) {
+                    unless (Math::Prime::Util::is_powerfree(Math::GMPz::Rmpz_get_ui($t), $k)) {
+                        push @arr, Math::GMPz::Rmpz_get_ui($t);
+                    }
+                }
+                else {
+                    unless ($t_obj->is_powerfree($k_obj)) {
+                        push @arr,
+                          (Math::GMPz::Rmpz_fits_ulong_p($t) ? Math::GMPz::Rmpz_get_ui($t) : Math::GMPz::Rmpz_init_set($t));
+                    }
+                }
+            }
+
+            return \@arr;
+        }
 
         if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($B)) {
 
@@ -13704,6 +13744,14 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@non_powerfree);
     }
 
+    sub non_squarefree {
+        (TWO)->non_powerfree(@_);
+    }
+
+    sub non_cubefree {
+        (THREE)->non_powerfree(@_);
+    }
+
     sub non_powerfree_each {
         my ($k, $from, $to, $block) = @_;
 
@@ -13726,11 +13774,28 @@ package Sidef::Types::Number::Number {
             $from = $ONE;
         }
 
-        my $step_value = 3e3 * $TWO**$k;
+        my $step_value = $TWO**$k;
+
+        if ($step_value < 1e4) {
+            $step_value = 1e4;
+        }
+
         _generic_each($from, $to, $block, sub { $step_value }, sub { _sieve_non_powerfree($_[0], $_[1], $k) });
     }
 
     *each_non_powerfree = \&non_powerfree_each;
+
+    sub non_squarefree_each {
+        (TWO)->non_powerfree_each(@_);
+    }
+
+    *each_non_squarefree = \&non_squarefree_each;
+
+    sub non_cubefree_each {
+        (THREE)->non_powerfree_each(@_);
+    }
+
+    *each_non_cubefree = \&non_cubefree_each;
 
     sub non_powerfree_count {
         my ($k, $from, $to) = @_;
@@ -13745,6 +13810,14 @@ package Sidef::Types::Number::Number {
         $from->sub($k->powerfree_count($from));
     }
 
+    sub non_squarefree_count {
+        (TWO)->non_powerfree_count(@_);
+    }
+
+    sub non_cubefree_count {
+        (THREE)->non_powerfree_count(@_);
+    }
+
     sub non_powerfree_sum {
         my ($k, $from, $to) = @_;
 
@@ -13757,6 +13830,137 @@ package Sidef::Types::Number::Number {
         _valid(\$from);
         $from->faulhaber_sum(ONE)->sub($k->powerfree_sum($from));
     }
+
+    sub non_squarefree_sum {
+        (TWO)->non_powerfree_sum(@_);
+    }
+
+    sub non_cubefree_sum {
+        (THREE)->non_powerfree_sum(@_);
+    }
+
+    sub _sieve_powerfree {
+        my ($A, $B, $k) = @_;
+
+        # $A and $B are Math::GMPz objects
+        # $k is a non-negative native integer
+
+        my $non_powerfree = _sieve_non_powerfree($A, $B, $k) // return undef;
+
+        my $i     = 0;
+        my $max_i = $#{$non_powerfree};
+
+        my @powerfree;
+        if (Math::GMPz::Rmpz_fits_slong_p($B)) {
+
+            $A = Math::GMPz::Rmpz_get_ui($A);
+            $B = Math::GMPz::Rmpz_get_ui($B);
+
+            foreach my $k ($A .. $B) {
+                if ($i <= $max_i and $k == $non_powerfree->[$i]) {
+                    ++$i;
+                }
+                else {
+                    push @powerfree, $k;
+                }
+            }
+        }
+        else {
+            my $t = Math::GMPz::Rmpz_init_set($A);
+
+            for (; Math::GMPz::Rmpz_cmp($t, $B) <= 0 ; Math::GMPz::Rmpz_add_ui($t, $t, 1)) {
+                if ($i <= $max_i and $t == $non_powerfree->[$i]) {
+                    ++$i;
+                }
+                else {
+                    push @powerfree,
+                      (Math::GMPz::Rmpz_fits_ulong_p($t) ? Math::GMPz::Rmpz_get_ui($t) : Math::GMPz::Rmpz_init_set($t));
+                }
+            }
+        }
+
+        return \@powerfree;
+    }
+
+    sub powerfree {
+        my ($k, $A, $B) = @_;
+
+        _valid(\$A);
+
+        $k = _any2ui($$k) || return Sidef::Types::Array::Array->new;
+        $A = _any2mpz($$A) // return Sidef::Types::Array::Array->new;
+
+        if (defined($B)) {
+            _valid(\$B);
+            $B = _any2mpz($$B) // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $B = $A;
+            $A = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($A) <= 0) {
+            $A = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+        if ($k == 2) {
+            return ((bless \$A)->squarefree(bless \$B));
+        }
+
+#<<<
+        my @powerfree = map {
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
+        } @{_sieve_powerfree($A, $B, $k) // return undef};
+#>>>
+
+        Sidef::Types::Array::Array->new(\@powerfree);
+    }
+
+    sub cubefree {
+        (THREE)->powerfree(@_);
+    }
+
+    sub powerfree_each {
+        my ($k, $from, $to, $block) = @_;
+
+        _valid(\$from);
+
+        if (defined($block)) {
+            _valid(\$to);
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
+        }
+        else {
+            $block = $to;
+            $to    = _any2mpz($$from) // return ZERO;
+            $from  = $ONE;
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if ($k == 2) {
+            return ((bless \$from)->squarefree_each((bless \$to), $block));
+        }
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        my $step_value = 1e3;
+        _generic_each($from, $to, $block, sub { $step_value }, sub { _sieve_powerfree($_[0], $_[1], $k) });
+    }
+
+    *each_powerfree = \&powerfree_each;
+
+    sub cubefree_each {
+        (THREE)->powerfree_each(@_);
+    }
+
+    *each_cubefree = \&cubefree_each;
 
     sub _prime_count_checkpoint {
         my ($n, $i) = @_;
@@ -14604,7 +14808,7 @@ package Sidef::Types::Number::Number {
 
         # n + n/log(n) + (3*n)/(log(n)**2))
         my $log_n = $n->log;
-        $n->add($n->div($log_n))->add($n->mul(_set_int(3))->div($log_n->mul($log_n)));
+        $n->add($n->div($log_n))->add($n->mul(THREE)->div($log_n->mul($log_n)));
     }
 
     sub nth_composite_lower {
@@ -15842,9 +16046,9 @@ package Sidef::Types::Number::Number {
         $n = (ref($n) ? _any2mpz($n) : $n) // goto &nan;
         $n < 0 and goto &nan;
 
-        return ONE         if ($n == 0);    # not a prime power, but...
-        return _set_int(2) if ($n == 1);
-        return _set_int(3) if ($n == 2);
+        return ONE   if ($n == 0);    # not a prime power, but...
+        return TWO   if ($n == 1);
+        return THREE if ($n == 2);
 
         # Lower and upper bounds
         my $min = $n;
@@ -16078,7 +16282,7 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto &nan;
 
         Math::GMPz::Rmpz_fits_slong_p($n)
-          or return _set_int($n)->nth_powerfree(_set_int(2));
+          or return _set_int($n)->nth_powerfree(TWO);
 
         $n = _any2ui($n) // goto &nan;
 
@@ -19742,8 +19946,8 @@ package Sidef::Types::Number::Number {
                           );
             }
 
-            return (_set_int(2)->sum_primes(_set_int($to), _set_int($k))
-                    ->sub(_set_int(2)->sum_primes(_set_int($from)->dec, _set_int($k))));
+            return (
+                   (TWO)->sum_primes(_set_int($to), _set_int($k))->sub((TWO)->sum_primes(_set_int($from)->dec, _set_int($k))));
         }
 
         # Simple implementation of the prime-summation function:
@@ -19887,7 +20091,7 @@ package Sidef::Types::Number::Number {
         $n = _any2mpz($$n) // goto &nan;
 
         Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
-        Math::GMPz::Rmpz_cmp_ui($n, 2) < 0 and return _set_int(2);
+        Math::GMPz::Rmpz_cmp_ui($n, 2) < 0 and return TWO;
 
         # Optimization for native integers
         if (Math::GMPz::Rmpz_fits_slong_p($n)) {
@@ -20484,7 +20688,7 @@ package Sidef::Types::Number::Number {
         $factorized || $collect_factors->($n->dop_factor($mp1->mul($n->ilog2->isqrt)->mul(TWO)));
         $factorized || $collect_factors->($n->miller_factor($mp1->mul(_set_int(5))));
         $factorized || $collect_factors->($n->fibonacci_factor);
-        $factorized || $collect_factors->($n->lucas_factor(ONE, $mp1->mul(_set_int(2))));
+        $factorized || $collect_factors->($n->lucas_factor(ONE, $mp1->mul(TWO)));
         $factorized || $collect_factors->($n->cop_factor($mp1->mul($n->ilog2->isqrt->shift_right(ONE))));
         $factorized || $collect_factors->($n->pell_factor($mp1->mul(_set_int(1e3))));
 
@@ -20713,7 +20917,7 @@ package Sidef::Types::Number::Number {
         # Try to compute invmod(2, n)
         # If n is even, return faster
         Math::GMPz::Rmpz_invert($i, $i, $n)
-          || return Sidef::Types::Array::Array->new([_set_int(2), (($n == 2) ? () : _set_int($n >> 1))]);
+          || return Sidef::Types::Array::Array->new([TWO, (($n == 2) ? () : _set_int($n >> 1))]);
 
         state $V1 = Math::GMPz::Rmpz_init_nobless();
         state $V2 = Math::GMPz::Rmpz_init_nobless();
@@ -24906,6 +25110,14 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@powerful);
     }
 
+    sub squareful {
+        (TWO)->powerful(@_);
+    }
+
+    sub cubeful {
+        (THREE)->powerful(@_);
+    }
+
     sub powerful_each {
         my ($k, $from, $to, $block) = @_;
 
@@ -24933,6 +25145,18 @@ package Sidef::Types::Number::Number {
     }
 
     *each_powerful = \&powerful_each;
+
+    sub squareful_each {
+        (TWO)->powerful_each(@_);
+    }
+
+    *each_squareful = \&squareful_each;
+
+    sub cubeful_each {
+        (THREE)->powerful_each(@_);
+    }
+
+    *each_cubeful = \&cubeful_each;
 
     sub nth_powerful {
         my ($n, $k) = @_;
@@ -28615,15 +28839,11 @@ package Sidef::Types::Number::Number {
     }
 
     sub is_cubefree {
-        my ($n) = @_;
-        state $three = _set_int(3);
-        $n->is_powerfree($three);
+        $_[0]->is_powerfree(THREE);
     }
 
     sub is_cubeful {
-        my ($n) = @_;
-        state $three = _set_int(3);
-        $n->is_powerful($three);
+        $_[0]->is_powerful(THREE);
     }
 
     sub is_squareful {
@@ -28798,6 +29018,14 @@ package Sidef::Types::Number::Number {
         bless \$count;
     }
 
+    sub squareful_count {
+        (TWO)->powerful_count(@_);
+    }
+
+    sub cubeful_count {
+        (THREE)->powerful_count(@_);
+    }
+
     sub powerful_sum {    # sum of k-powerful numbers
         my ($k, $from, $to) = @_;
 
@@ -28852,6 +29080,14 @@ package Sidef::Types::Number::Number {
 
         $sum = Math::GMPz::Rmpz_get_ui($sum) if Math::GMPz::Rmpz_fits_ulong_p($sum);
         bless \$sum;
+    }
+
+    sub squareful_sum {
+        (TWO)->powerful_sum(@_);
+    }
+
+    sub cubeful_sum {
+        (THREE)->powerful_sum(@_);
     }
 
     sub is_powerful {

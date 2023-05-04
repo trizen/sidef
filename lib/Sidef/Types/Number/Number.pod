@@ -778,7 +778,7 @@ Returns the k-almost prime divisors of C<n>.
 
     say 5040.almost_prime_divisors(7)   #=> [720, 1008, 1680, 2520]
 
-When C<k> is omitted, an array of arrays with the k-almost prime divisors of C<n>, for each k in the range C<0..bigomega(n)>, is returned:
+When C<k> is omitted, an array of arrays with the k-almost prime divisors of C<n>, for each C<k> in the range C<0..bigomega(n)>, is returned:
 
     say 120.almost_prime_divisors       #=> [[1], [2, 3, 5], [4, 6, 10, 15], [8, 12, 20, 30], [24, 40, 60], [120]]
 
@@ -1076,7 +1076,7 @@ Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
     bernoulli_numbers(n)
 
-Returns an Array containing the Bernoulli numbers with indices in the range C<0..n>.
+Returns an array containing the Bernoulli numbers with indices in the range C<0..n>.
 
     say bernoulli_numbers(5)    #=> [1, -1/2, 1/6, 0, -1/30, 0]
     say bernoulli_numbers(6)    #=> [1, -1/2, 1/6, 0, -1/30, 0, 1/42]
@@ -1767,7 +1767,7 @@ Aliases: I<nth_composite>
     composite_count(n)
     composite_count(a,b)
 
-Returns the number of composite numbers <= C<n>, or in the range C<a..b>.
+Returns the count of composite numbers <= C<n>, or in the range C<a..b>.
 
     say composite_count(100)          # number of composites <= 100
     say composite_count(50, 100)      # number of composites in the range 50..100
@@ -1985,6 +1985,82 @@ Returns the cube of C<x>. Equivalent with C<x**3>.
 
 =cut
 
+=head2 cubefree
+
+    cubefree(n)
+    cubefree(a,b)
+
+Returns an array with the cubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubefree_count
+
+    cubefree_count(n)
+    cubefree_count(a,b)
+
+Returns the count of cubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubefree_each
+
+    n.cubefree_each { ... }
+    cubefree_each(a, b, { ... })
+
+Iterates over the cubefree numbers <= C<n>, or in the range C<a..b>.
+
+Aliases: I<each_cubefree>
+
+=cut
+
+=head2 cubefree_sum
+
+    cubefree_sum(n)
+    cubefree_sum(a,b)
+
+Returns the sum of cubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubeful
+
+    cubeful(n)
+    cubeful(a,b)
+
+Returns an array with the cubeful numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubeful_count
+
+    cubeful_count(n)
+    cubeful_count(a,b)
+
+Returns the count of cubeful numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubeful_each
+
+    n.cubeful_each { ... }
+    cubeful_each(a, b, { ... })
+
+Iterates over the cubeful numbers <= C<n>, or in the range C<a..b>.
+
+Aliases: I<each_cubeful>
+
+=cut
+
+=head2 cubeful_sum
+
+    cubeful_sum(n)
+    cubeful_sum(a,b)
+
+Returns the sum of cubeful numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
 =head2 cubic_formula
 
     cubic_formula(a, b, c, d)
@@ -2046,7 +2122,7 @@ It returns NaN when C<moebius(d) = -1> and C<gcd(n/d, m) != 1>, for some C<d|n>.
     tau(n)
     sigma0(n)
 
-Returns the number of positive divisors of C<n>.
+Returns the count of positive divisors of C<n>.
 
 =cut
 
@@ -2399,7 +2475,7 @@ Aliases: I<composites_each>
     k.fermat_psp_each(base, n, { ... })
     k.fermat_psp_each(base, a, b, { ... })
 
-Iterates over the C<k>-omega Fermat pseudoprimes <= C<n> or in the range C<a..b>.
+Iterates over the k-omega Fermat pseudoprimes <= C<n> or in the range C<a..b>.
 
     3.fermat_psp_each(2, 1e5, {|n| say n })          # iterate over 3-Fermat psp to base 2 <= 1e5
     4.fermat_psp_each(2, 1e5, 1e6, {|n| say n })     # iterate over 4-Fermat psp to base 2 in range 1e4..1e6
@@ -2422,12 +2498,23 @@ Aliases: I<lucas_carmichael_each>
 
 =cut
 
+=head2 each_non_cubefree
+
+    n.non_cubefree_each { ... }
+    non_cubefree_each(a, b, { ... })
+
+Iterates over the non-cubefree numbers <= C<n>, or in the range C<a..b>.
+
+Aliases: I<non_cubefree_each>
+
+=cut
+
 =head2 each_non_powerfree
 
     k.non_powerfree_each(n, { ... })
     k.non_powerfree_each(a, b, { ... })
 
-Iterates over the numbers <= C<n>, or in the range C<a..b>, that are not C<k>-powerfree.
+Iterates over the numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
     2.non_powerfree_each(100, {|n| say n })         # iterate over non-squarefree numbers <= 100
     3.non_powerfree_each(50, 100, {|n| say n })     # iterate over non-cubefree numbers in range 50..100
@@ -2436,19 +2523,44 @@ Aliases: I<non_powerfree_each>
 
 =cut
 
+=head2 each_non_squarefree
+
+    n.non_squarefree_each { ... }
+    non_squarefree_each(a, b, { ... })
+
+Iterates over the non-squarefree numbers <= C<n>, or in the range C<a..b>.
+
+Aliases: I<non_squarefree_each>
+
+=cut
+
 =head2 each_omega_prime
 
     k.omega_primes_each(n, { ... })
     k.omega_primes_each(a, b, { ... })
 
-Iterates over the C<k>-omega primes <= C<n>, or in the range C<a..b>.
+Iterates over the k-omega primes <= C<n>, or in the range C<a..b>.
 
-C<k>-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
+k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
     1.omega_primes_each(100, {|n| say n })          # iterate over prime powers <= 100
     2.omega_primes_each(50, 100, {|n| say n })      # iterate over 2-omega primes in range 50..100
 
 Aliases: I<omega_primes_each>
+
+=cut
+
+=head2 each_powerfree
+
+    k.powerfree_each(n, { ... })
+    k.powerfree_each(a, b, { ... })
+
+Iterates over the k-powerfree numbers <= C<n>, or in the range C<a..b>.
+
+    2.powerfree_each(100, {|n| say n })          # iterate over squarefree numbers <= 100
+    3.powerfree_each(50, 100, {|n| say n })      # iterate over cubefree numbers in the range 50..100
+
+Aliases: I<powerfree_each>
 
 =cut
 
@@ -2460,7 +2572,7 @@ Aliases: I<omega_primes_each>
 Iterates over the k-powerful numbers <= C<n>, or in the range C<a..b>.
 
     2.powerful_each(100, {|n| say n })          # iterate over 2-powerful numbers <= 100
-    2.powerful_each(50, 100, {|n| say n })      # iterate over 2-powerful in the range 50..100
+    2.powerful_each(50, 100, {|n| say n })      # iterate over 2-powerful numbers in the range 50..100
 
 Aliases: I<powerful_each>
 
@@ -2597,12 +2709,23 @@ Aliases: I<squarefree_strong_fermat_psp_each>
 
 =cut
 
+=head2 each_squareful
+
+    n.squareful_each { ... }
+    squareful_each(a, b, { ... })
+
+Iterates over the squareful numbers <= C<n>, or in the range C<a..b>.
+
+Aliases: I<squareful_each>
+
+=cut
+
 =head2 each_strong_fermat_psp
 
     k.each_strong_fermat_psp(base, n, { ... })
     k.each_strong_fermat_psp(base, a, b, { ... })
 
-Iterates over the C<k>-omega strong Fermat pseudoprimes <= C<n> or in the range C<a..b>.
+Iterates over the k-omega strong Fermat pseudoprimes <= C<n> or in the range C<a..b>.
 
     3.each_strong_fermat_psp(2, 1e6, {|n| say n })          # iterate over 3-omega strong Fermat psp to base 2 <= 1e6
     4.each_strong_fermat_psp(2, 1e7, 1e8, {|n| say n })     # iterate over 4-omega strong Fermat psp to base 2 in range 1e7..1e8
@@ -2702,7 +2825,7 @@ Aliases: I<euler_number>
 
     euler_numbers(n)
 
-Returns an Array containing the Euler numbers with indices in the range C<0..n>.
+Returns an array containing the Euler numbers with indices in the range C<0..n>.
 
     say euler_numbers(9)    #=> [1, 0, -1, 0, 5, 0, -61, 0, 1385, 0]
     say euler_numbers(10)   #=> [1, 0, -1, 0, 5, 0, -61, 0, 1385, 0, -50521]
@@ -3002,7 +3125,7 @@ The product of the factors will give back C<n>. However, some factors may be com
     k.fermat_psp(base, n)
     k.fermat_psp(base, a, b)
 
-Returns an array with all the C<k>-omega Fermat pseudoprimes to the given C<base> that are <= C<n> or in the range C<a..b>.
+Returns an array with all the k-omega Fermat pseudoprimes to the given C<base> that are <= C<n> or in the range C<a..b>.
 
     say 3.fermat_psp(2, 10000)            # 3-omega Fermat psp to base 2
     say 4.fermat_psp(2, 10000, 100000)    # 4-omega Fermat psp to base 2 in range
@@ -3120,7 +3243,7 @@ Aliases: I<fubini_number>
 
     fubini_numbers(n)
 
-Returns an Array containing the Fubini numbers with indices in the range C<0..n>.
+Returns an array containing the Fubini numbers with indices in the range C<0..n>.
 
     say fubini_numbers(5)   #=> [1, 1, 3, 13, 75, 541]
 
@@ -3934,7 +4057,7 @@ Return true if C<n> is a cube number (i.e.: if it can be written as C<b^3>, for 
 
     n.is_cubefree
 
-Returns true if C<n> is not divisible by any perfect cube.
+Returns true if C<n> is not divisible by any perfect cube > 1.
 
 =cut
 
@@ -4272,9 +4395,9 @@ Returns true when C<n> is an odd composite integer.
 
     n.is_omega_prime(k=2)
 
-Return true if C<n> is a C<k>-omega prime (i.e.: true if C<n> is divisible by exactly C<k> different primes).
+Return true if C<n> is a k-omega prime (i.e.: true if C<n> is divisible by exactly C<k> different primes).
 
-Equivalently, C<k>-omega primes are numbers C<n> such that C<omega(n) == k>.
+Equivalently, k-omega primes are numbers C<n> such that C<omega(n) == k>.
 
     say 20.by { .is_omega_prime(1) }   # prime powers
     say 20.by { .is_omega_prime(2) }   # numbers n such that omega(n) == 2
@@ -5133,7 +5256,7 @@ Returns the index of the least significant bit of C<n> that is non-zero.
 
     lucas(n)
 
-Returns the C<n>-th Lucas number.
+Returns the n-th Lucas number.
 
 =cut
 
@@ -5437,7 +5560,7 @@ Returns the count of the non-bi-unitary divisors of C<n>.
 
     n.next_composites(start=4)
 
-Returns an Array with C<n> consecutive composite numbers starting from C<start>.
+Returns an array with C<n> consecutive composite numbers starting from C<start>.
 
     say 5.next_composites        #=> [4, 6, 8, 9, 10]
     say 5.next_composites(50)    #=> [50, 51, 52, 54, 55]
@@ -5526,7 +5649,7 @@ Given a non-negative integer C<n>, returns the next composite number greater tha
 
     n.next_omega_prime(k=2)
 
-Returns the next C<k>-omega prime greater than C<n>.
+Returns the next k-omega prime greater than C<n>.
 
 =cut
 
@@ -5671,12 +5794,39 @@ Aliases: I<binomial>
 
 =cut
 
+=head2 non_cubefree
+
+    non_cubefree(n)
+    non_cubefree(a,b)
+
+Returns an array with the non-cubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 non_cubefree_count
+
+    non_cubefree_count(n)
+    non_cubefree_count(a,b)
+
+Returns the count of non-cubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 non_cubefree_sum
+
+    non_cubefree_sum(n)
+    non_cubefree_sum(a,b)
+
+Returns the sum of non-cubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
 =head2 non_powerfree
 
     k.non_powerfree(n)
     k.non_powerfree(a,b)
 
-Returns an Array of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
+Returns an array of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
     say 2.non_powerfree(100)        # numbers that are not squarefree <= 100
     say 3.non_powerfree(50, 100)    # numbers that are not cubefree in range 50..100
@@ -5688,7 +5838,7 @@ Returns an Array of numbers <= C<n>, or in the range C<a..b>, that are not k-pow
     k.non_powerfree_count(n)
     k.non_powerfree_count(a,b)
 
-Returns the number of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
+Returns the count of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
 =cut
 
@@ -5698,6 +5848,33 @@ Returns the number of numbers <= C<n>, or in the range C<a..b>, that are not k-p
     k.non_powerfree_sum(a,b)
 
 Returns the sum of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
+
+=cut
+
+=head2 non_squarefree
+
+    non_squarefree(n)
+    non_squarefree(a,b)
+
+Returns an array with the non-squarefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 non_squarefree_count
+
+    non_squarefree_count(n)
+    non_squarefree_count(a,b)
+
+Returns the count of non-squarefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 non_squarefree_sum
+
+    non_squarefree_sum(n)
+    non_squarefree_sum(a,b)
+
+Returns the sum of non-squarefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
@@ -5713,7 +5890,7 @@ Returns the normalized value of C<x>: C<abs(x)^2>.
 
     n.next_primes(start=2)
 
-Returns an Array containing C<n> consecutive primes that are `>= start` (if omitted, then start = 2).
+Returns an array containing C<n> consecutive primes that are `>= start` (if omitted, then start = 2).
 
     say 10.next_primes        #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
     say 10.next_primes(1000)  #=> [1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061]
@@ -5742,7 +5919,7 @@ Returns the n-th k-almost prime.
 
     nth_omega_prime(n, k=2)
 
-Returns the C<n>-th C<k>-omega prime.
+Returns the n-th k-omega prime.
 
     say nth_omega_prime(1e7, 2)    #=> 42314023
     say nth_omega_prime(1e7, 3)    #=> 28013887
@@ -5900,11 +6077,11 @@ Returns an array with C<n> elements mapped to the given block. The block is call
     n.omega_prime_divisors
     n.omega_prime_divisors(k)
 
-Returns the C<k>-omega prime divisors of C<n>.
+Returns the k-omega prime divisors of C<n>.
 
     say 5040.omega_prime_divisors(4)    #=> [210, 420, 630, 840, 1260, 1680, 2520, 5040]
 
-When C<k> is omitted, an array of arrays with the C<k>-omega prime divisors of C<n>, for each C<k> in the range C<0..omega(n)>, is returned:
+When C<k> is omitted, an array of arrays with the k-omega prime divisors of C<n>, for each C<k> in the range C<0..omega(n)>, is returned:
 
     say 120.omega_prime_divisors        #=> [[1], [2, 3, 4, 5, 8], [6, 10, 12, 15, 20, 24, 40], [30, 60, 120]]
 
@@ -5915,7 +6092,7 @@ When C<k> is omitted, an array of arrays with the C<k>-omega prime divisors of C
     k.omega_prime_count(n)
     k.omega_prime_count(a,b)
 
-Returns the number of C<k>-omega primes <= C<n>, or in the range C<a..b>.
+Returns the count of k-omega primes <= C<n>, or in the range C<a..b>.
 
     say 1.omega_prime_count(100)            # number prime powers <= 100
     say 2.omega_prime_count(50, 100)        # number of 2-omega primes in range 50..100
@@ -5929,9 +6106,9 @@ Aliases: I<omega_primepi>
     k.omega_primes(n)
     k.omega_primes(a,b)
 
-Returns an array with C<k>-omega primes <= C<n>, or in the range C<a..b>.
+Returns an array with k-omega primes <= C<n>, or in the range C<a..b>.
 
-C<k>-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
+k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
     say 1.omega_primes(100)         # prime powers <= 100
     say 2.omega_primes(50, 100)     # 2-omega primes in range 50..100
@@ -6044,7 +6221,7 @@ The product of the factors will give back C<n>. However, some factors may be com
     k.almost_prime_count(n)
     k.almost_prime_count(a,b)
 
-Returns the number of k-almost primes <= C<n>, or in the range C<a..b>.
+Returns the count of k-almost primes <= C<n>, or in the range C<a..b>.
 
     say 1.almost_prime_count(100)           # count of primes <= 100
     say 2.almost_prime_count(50, 100)       # count of semiprimes in range 50..100
@@ -6150,7 +6327,7 @@ Aliases: I<hammingweight>
 
     n.power_count
 
-Returns the number of perfect powers <= C<n>.
+Returns the count of perfect powers <= C<n>.
 
     say power_count(10**6)      #=> 1111
     say power_count(10**20)     #=> 10004650118
@@ -6171,6 +6348,18 @@ Return an array with the k-th power divisors of C<n>.
 Equivalent with:
 
     n.divisors.grep { .is_power(k) }
+
+=cut
+
+=head2 powerfree
+
+    k.powerfree(n)
+    k.powerfree(a, b)
+
+Returns an array with the k-powerfree <= C<n>, or in the range C<a..b>.
+
+    say 2.powerfree(50)           # squarefree numbers <= 50
+    say 3.powerfree(50, 100)      # cubefree numbers in the range 50..100
 
 =cut
 
@@ -6456,7 +6645,7 @@ Returns the previous composite number smaller than C<n>.
 
     n.prev_composites(start)
 
-Returns an Array with C<n> consecutive decreasing composite numbers starting from C<start>.
+Returns an array with C<n> consecutive decreasing composite numbers starting from C<start>.
 
     say 5.prev_composites(10)   #=> [10, 9, 8, 6, 4]
     say 5.prev_composites(97)   #=> [96, 95, 94, 93, 92]
@@ -6488,7 +6677,7 @@ Returns the previous prime smaller than C<n>.
 
     n.prev_primes(start)
 
-Returns an Array with C<n> consecutive decreasing prime numbers starting from C<start>.
+Returns an array with C<n> consecutive decreasing prime numbers starting from C<start>.
 
     say 5.prev_primes(100)  #=> [97, 89, 83, 79, 73]
 
@@ -6546,10 +6735,11 @@ Aliases: I<nth_prime_lower>
 
 =head2 primepi
 
+    pi(n)
     primepi(n)
     primepi(a,b)
 
-Returns the number of primes <= C<n>, or in the range C<a..b>.
+Returns the count of primes <= C<n>, or in the range C<a..b>.
 
 Aliases: I<prime_count>, I<count_primes>
 
@@ -6591,7 +6781,7 @@ Returns the exponent C<k> if C<n> is a power of the form C<n = p^k> for some pri
     prime_power_count(n)
     prime_power_count(a,b)
 
-Returns the number of prime powers <= C<n>, or in the range C<a..b>.
+Returns the count of prime powers <= C<n>, or in the range C<a..b>.
 
     say prime_power_count(1e15)     # number of prime powers <= 10^15
     say prime_power_count(1e6, 1e8) # number of prime powers in [10^6, 10^8]
@@ -6669,7 +6859,7 @@ Equivalent with:
 
     prime_power_sigma0(n)
 
-Returns the number of prime power divisors of C<n>.
+Returns the count of prime power divisors of C<n>.
 
 Equivalent with:
 
@@ -6724,7 +6914,7 @@ Equivalent with:
 
     prime_power_usigma0(n)
 
-Returns the number of unitary prime power divisors of C<n>.
+Returns the count of unitary prime power divisors of C<n>.
 
 Equivalent with:
 
@@ -6767,7 +6957,7 @@ Sum of the unique prime divisors of C<n>, each divisor raised to the k-th power.
 
     prime_sigma0(n)
 
-Returns the number of prime divisors of C<n>.
+Returns the count of prime divisors of C<n>.
 
 Equivalent with:
 
@@ -7228,7 +7418,7 @@ Rotate the digits of C<n> to the left when C<k> is positive or to the right othe
     k.rough_count(n)
     k.rough_count(a,b)
 
-Returns the number of k-rough numbers <= C<n>, or in the range C<a..b>.
+Returns the count of k-rough numbers <= C<n>, or in the range C<a..b>.
 
     say 97.rough_count(1e6)    #=> 122005
     say 23.rough_count(1e9)    #=> 171024023
@@ -7406,7 +7596,7 @@ Hyperbolic sine function.
     k.smooth_count(n)
     k.smooth_count(a,b)
 
-Returns the number of k-smooth numbers <= C<n>, or in the range C<a..b>.
+Returns the count of k-smooth numbers <= C<n>, or in the range C<a..b>.
 
     say 30.of {|n| 13.smooth_count(10**n) }   #=> OEIS: A106629
 
@@ -7647,20 +7837,20 @@ Returns an array with the squarefree k-almost primes <= C<n>, or in the range C<
 
 =cut
 
-=head2 square_free_count
+=head2 squarefree_count
 
-    square_free_count(n)
-    square_free_count(a,b)
+    squarefree_count(n)
+    squarefree_count(a,b)
 
-Returns the number of squarefree integers <= C<n>, or in the range C<a..b>.
+Returns the count of squarefree integers <= C<n>, or in the range C<a..b>.
 
-    # The number of square-free integers between 10^5 and 10^6
-    say square_free_count(10**5, 10**6) # 547132
+    # The number of squarefree integers between 10^5 and 10^6
+    say squarefree_count(10**5, 10**6) # 547132
 
-    # The number of square-free integers <= 2^40
-    say square_free_count(2**40)        # 668422917419
+    # The number of squarefree integers <= 2^40
+    say squarefree_count(2**40)        # 668422917419
 
-Aliases: I<squarefree_count>
+Aliases: I<square_free_count>
 
 =cut
 
@@ -7691,7 +7881,7 @@ Returns an array with all the squarefree Fermat pseudoprimes to the given C<base
     k.squarefree_almost_prime_count(n)
     k.squarefree_almost_prime_count(a,b)
 
-Returns the number of squarefree k-almost primes <= C<n>, or in the range C<a..b>.
+Returns the count of squarefree k-almost primes <= C<n>, or in the range C<a..b>.
 
     say 1.squarefree_almost_prime_count(1000)          # count of primes <= 1000
     say 2.squarefree_almost_prime_count(50, 1000)      # count of squarefree semiprimes in range 50..1000
@@ -7793,6 +7983,33 @@ Returns the number of unitary squarefree divisors of C<n>.
 
 =cut
 
+=head2 squareful
+
+    squareful(n)
+    squareful(a,b)
+
+Returns an array with the squareful numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 squareful_count
+
+    squareful_count(n)
+    squareful_count(a,b)
+
+Returns the count of squareful numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 squareful_sum
+
+    squareful_sum(n)
+    squareful_sum(a,b)
+
+Returns the sum of squareful numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
 =head2 square_sigma
 
     n.square_sigma(k=1)
@@ -7812,7 +8029,7 @@ Equivalent with:
 
     square_sigma0(n)
 
-Returns the number of square divisors of C<n>.
+Returns the count of square divisors of C<n>.
 
 =cut
 
@@ -7861,7 +8078,7 @@ Equivalent with:
 
     square_usigma0(n)
 
-Returns the number of unitary square divisors of C<n>.
+Returns the count of unitary square divisors of C<n>.
 
 =cut
 
@@ -8192,9 +8409,9 @@ Returns the sum of the unitary divisors of C<n>, each divisor raised to the powe
 
     usigma0(n)
 
-Returns the number of unitary divisor of C<n>.
+Returns the count of unitary divisor of C<n>.
 
-Equivalently, the number of squarefree divisors of C<n>.
+Equivalently, the count of squarefree divisors of C<n>.
 
     say usigma0(5040)   #=> 16
 

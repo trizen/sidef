@@ -81,4 +81,76 @@ assert_eq(3000.of{.nth_powerfree(2)}.ft(1), 3000.dec.by{.is_powerfree(2)})
 assert_eq(3000.of{.nth_powerfree(3)}.ft(1), 3000.dec.by{.is_powerfree(3)})
 assert_eq(3000.of{.nth_powerfree(4)}.ft(1), 3000.dec.by{.is_powerfree(4)})
 
+do {
+    func non_powerfree(A, B, k=1) {
+
+        var arr = []
+
+        for j in (2 .. B.iroot(k)) {
+            var m = j**k
+            k.powerfree(idiv_ceil(A,m), idiv(B,m)).each {|s|
+                arr << m*s
+            }
+        }
+
+        return arr.sort
+    }
+
+    assert_eq(non_powerfree(65, 100, 2), %n[68, 72, 75, 76, 80, 81, 84, 88, 90, 92, 96, 98, 99, 100])
+    assert_eq(non_powerfree(64, 150, 3), %n[64, 72, 80, 81, 88, 96, 104, 108, 112, 120, 125, 128, 135, 136, 144])
+}
+
+do {
+    func non_powerfree(A, B, k=1) {
+
+        var arr = []
+
+        for j in (2 .. B.iroot(k)) {
+            var m = j**k
+            k.powerfree_each(idiv_ceil(A,m), idiv(B,m), {|s|
+                arr << m*s
+            })
+        }
+
+        return arr.sort
+    }
+
+    assert_eq(non_powerfree(65, 100, 2), 2.non_powerfree(65, 100))
+    assert_eq(non_powerfree(64, 150, 3), 3.non_powerfree(64, 150))
+}
+
+assert_eq(2.non_powerfree(1e12, 1e12 + 10),   range(1e12, 1e12+10).grep { !.is_squarefree })
+assert_eq(3.non_powerfree(1e9, 1e9 + 50),     range(1e9, 1e9+50).grep { !.is_cubefree })
+assert_eq(4.non_powerfree(2**64, 2**64 + 50), range(2**64, 2**64 + 50).grep { !.is_powerfree(4) })
+assert_eq(2.non_powerfree(2**64, 2**64 + 50), range(2**64, 2**64 + 50).grep { !.is_squarefree })
+
+assert_eq(4.powerfree(1e9, 1e9+50),       range(1e9, 1e9+50).grep { .is_powerfree(4) })
+assert_eq(2.powerfree(2**64, 2**64 + 10), range(2**64, 2**64 + 10).grep { .is_squarefree })
+assert_eq(3.powerfree(2**64, 2**64 + 10), range(2**64, 2**64 + 10).grep { .is_cubefree })
+
+assert_eq(100.non_powerfree(3**100, 3**100 + (2 * 2**100)), %n[515377520732011331036461129765621272702107522001, 515377520732011331800499870237994849832678719488, 515377520732011333068150470466224251329381924864])
+assert_eq(100.powerfree(3**100, 3**100 + 5), %n[515377520732011331036461129765621272702107522002, 515377520732011331036461129765621272702107522003, 515377520732011331036461129765621272702107522004, 515377520732011331036461129765621272702107522005, 515377520732011331036461129765621272702107522006])
+
+assert_eq(
+    gather {
+        var count = 0
+        100.powerfree_each(3**100, 100**100, {|k|
+            take(k)
+            break if (++count >= 5)
+        })
+    },
+    %n[515377520732011331036461129765621272702107522002, 515377520732011331036461129765621272702107522003, 515377520732011331036461129765621272702107522004, 515377520732011331036461129765621272702107522005, 515377520732011331036461129765621272702107522006]
+)
+
+assert_eq(
+    gather {
+        var count = 0
+        100.non_powerfree_each(3**100, 100**100, {|k|
+            take(k)
+            break if (++count >= 5)
+        })
+    },
+    %n[515377520732011331036461129765621272702107522001, 515377520732011331800499870237994849832678719488, 515377520732011333068150470466224251329381924864, 515377520732011334335801070694453652826085130240, 515377520732011335603451670922683054322788335616]
+)
+
 say ":: Test passed!"
