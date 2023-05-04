@@ -13051,7 +13051,8 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $k, 2);
                 Math::GMPz::Rmpz_div($t, $n, $t);
             }
-            $L += Math::GMPz::Rmpz_get_si(${mertens($t)});    # most of the time is spent here
+            my $M = ${(bless \$t)->mertens};    # most of the time is spent here
+            $L += ref($M) ? Math::GMPz::Rmpz_get_si($M) : $M;
         }
 
         $liouville_table->{$n} = $L;
@@ -15905,6 +15906,37 @@ package Sidef::Types::Number::Number {
         bless \__dec__(__sub__($n, $$pi));    # n - pi(n) - 1
     }
 
+    sub composite_sum {
+        my ($from, $to, $k) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $to->composite_sum(undef, $k)->sub($from->dec->composite_sum(undef, $k));
+        }
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+        }
+        else {
+            $k = 1;
+        }
+
+        if ($k == 0) {
+            return $from->composite_count;
+        }
+
+        my $n = _any2mpz($$from) // goto &nan;
+
+        Math::GMPz::Rmpz_cmp_ui($n, 4) >= 0
+          or return ZERO;
+
+        (bless \$n)->faulhaber_sum(bless \$k)->sub((TWO)->prime_sum((bless \$n), (bless \$k)))->dec;
+    }
+
+    *composites_sum = \&composite_sum;
+
     sub nth_composite {
         my ($n) = @_;
 
@@ -15912,7 +15944,7 @@ package Sidef::Types::Number::Number {
         $n = (ref($n) ? _any2mpz($n) : $n) // goto &nan;
         $n < 0 and goto &nan;
 
-        return ONE         if ($n == 0);      # not composite, but...
+        return ONE         if ($n == 0);    # not composite, but...
         return _set_int(4) if ($n == 1);
 
         my ($min, $max);
@@ -19201,14 +19233,14 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sub_ui($t, $t, 1);
 
         $valid
-          || return ((bless \$t)->is_prime);
+          || return ((bless \$t)->is_prob_prime);
 
         _primality_pretest($t) || return Sidef::Types::Bool::Bool::FALSE;
 
         my $r = Math::Prime::Util::GMP::is_llr_prime(Math::GMPz::Rmpz_get_str($t, 10));
 
         if ($r < 0) {
-            return ((bless \$t)->is_prime);
+            return ((bless \$t)->is_prob_prime);
         }
 
         ($r >= 1)
@@ -19238,14 +19270,14 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_add_ui($t, $t, 1);
 
         $valid
-          || return ((bless \$t)->is_prime);
+          || return ((bless \$t)->is_prob_prime);
 
         _primality_pretest($t) || return Sidef::Types::Bool::Bool::FALSE;
 
         my $r = Math::Prime::Util::GMP::is_proth_prime(Math::GMPz::Rmpz_get_str($t, 10));
 
         if ($r < 0) {
-            return ((bless \$t)->is_prime);
+            return ((bless \$t)->is_prob_prime);
         }
 
         ($r >= 1)
@@ -19642,6 +19674,10 @@ package Sidef::Types::Number::Number {
             $k = 1;
         }
 
+        if ($from > $to) {
+            return ZERO;
+        }
+
         if ($k == 0) {
             return _set_int($from)->prime_count(_set_int($to));
         }
@@ -19662,8 +19698,8 @@ package Sidef::Types::Number::Number {
                           );
             }
 
-            return _set_int(2)->sum_primes(_set_int($to), _set_int($k))
-              ->sub(_set_int(2)->sum_primes(_set_int($from)->dec, _set_int($k)));
+            return (_set_int(2)->sum_primes(_set_int($to), _set_int($k))
+                    ->sub(_set_int(2)->sum_primes(_set_int($from)->dec, _set_int($k))));
         }
 
         # Simple implementation of the prime-summation function:
@@ -23458,12 +23494,18 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n) and $n >= 0) {
+        if (HAS_PRIME_UTIL and !ref($n) and $n > 0) {
             my $r = Math::Prime::Util::liouville($n);
             return bless \$r;
         }
 
-        Math::Prime::Util::GMP::liouville(_big2uistr($n) // goto &nan) eq '1' ? ONE : MONE;
+        my $str = _big2uistr($n) // goto &nan;
+
+        if ($str eq '0') {
+            return ZERO;
+        }
+
+        Math::Prime::Util::GMP::liouville($str) eq '1' ? ONE : MONE;
     }
 
     *Liouville        = \&liouville;
@@ -28527,6 +28569,23 @@ package Sidef::Types::Number::Number {
         __is_power__($n, 3)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_cubefree {
+        my ($n) = @_;
+        state $three = _set_int(3);
+        $n->is_powerfree($three);
+    }
+
+    sub is_cubeful {
+        my ($n) = @_;
+        state $three = _set_int(3);
+        $n->is_powerful($three);
+    }
+
+    sub is_squareful {
+        my ($n) = @_;
+        $n->is_powerful;
     }
 
     sub is_power {

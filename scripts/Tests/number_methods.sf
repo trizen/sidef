@@ -671,7 +671,7 @@ assert_eq(
 
 assert_eq(
     20.of { .liouville },
-    %n[-1, 1, -1, -1, 1, -1, 1, -1, -1, 1, 1, -1, -1, -1, 1, 1, 1, -1, -1, -1]
+    %n[0, 1, -1, -1, 1, -1, 1, -1, -1, 1, 1, -1, -1, -1, 1, 1, 1, -1, -1, -1]
 )
 
 assert_eq(
@@ -702,6 +702,38 @@ assert_eq(
 assert_eq(lpf(2**64 + 1), 274177)
 assert_eq(gpf(2**64 + 1), 67280421310721)
 
+assert_eq(10.of { .catalan }, %n[1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862])
+assert_eq(10.of { euler_number(_) }, %n[1, 0, -1, 0, 5, 0, -61, 0, 1385, 0])
+assert_eq(10.of { euler_number(2*_) }, %n[1, -1, 5, -61, 1385, -50521, 2702765, -199360981, 19391512145, -2404879675441])
+
+assert_eq(15.of { .lucas },        %n[2, 1, 3, 4, 7, 11, 18, 29, 47, 76, 123, 199, 322, 521, 843])
+assert_eq(15.of { .fibonacci(2) }, %n[0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377])
+assert_eq(15.of { .fibonacci(3) }, %n[0, 0, 1, 1, 2, 4, 7, 13, 24, 44, 81, 149, 274, 504, 927])
+assert_eq(15.of { .fibonacci(4) }, %n[0, 0, 0, 1, 1, 2, 4, 8, 15, 29, 56, 108, 208, 401, 773])
+
+assert_eq(15.of {|n| n! }, %n[1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600, 6227020800, 87178291200])
+assert_eq(15.of {|n| n!! }, %n[1, 1, 2, 3, 8, 15, 48, 105, 384, 945, 3840, 10395, 46080, 135135, 645120])
+assert_eq(15.of {|n| n.multi_factorial(3) }, %n[1, 1, 2, 3, 4, 10, 18, 28, 80, 162, 280, 880, 1944, 3640, 12320])
+assert_eq(15.of {|n| n.subfactorial }, %n[1, 0, 1, 2, 9, 44, 265, 1854, 14833, 133496, 1334961, 14684570, 176214841, 2290792932, 32071101049])
+
+assert_eq(prime_sum(50, 100, 2), primes(50, 100).sum { _**2 })
+assert_eq(composite_sum(50, 100, 2), composites(50, 100).sum { _**2 })
+
+assert_eq(composite_sum(100, 97), 0)
+assert_eq(composite_sum(100, 97), 0)
+assert_eq(composite_sum(93, 93), 93)
+
+assert_eq(composite_sum(1e2, 1e3), composites(1e2, 1e3).sum)
+assert_eq(composite_sum(1e2.prev_prime, 1e3), composites(1e2.prev_prime, 1e3).sum)
+assert_eq(composite_sum(1e2, 1e3.next_prime), composites(1e2, 1e3.next_prime).sum)
+assert_eq(composite_sum(1e2.next_prime, 1e3.next_prime), composites(1e2.next_prime, 1e3.next_prime).sum)
+
+assert_eq(20.by { .is_squarefree }, squarefree(20.nth_squarefree))
+assert_eq(20.by { .is_cubefree }, 1..20.nth_powerfree(3) -> grep { .is_powerfree(3) })
+
+assert_eq(20.by { .is_squareful }, 2.powerful(20.nth_powerful(2)))
+assert_eq(20.by { .is_cubeful }, 3.powerful(20.nth_powerful(3)))
+
 assert_eq(1000!.lpf, 2)
 assert_eq(1000!.make_coprime(2*3*5*7).lpf, 11)
 
@@ -711,19 +743,34 @@ assert_eq(gpf(1000! * (2**64 + 1)), 67280421310721)
 assert_eq(20.of { .squarefree_count },  20.of { .is_squarefree ? 1 : 0 }.acc)
 assert_eq(20.of { .squarefree_sum },    20.of { .is_squarefree ? _ : 0 }.acc)
 assert_eq(20.of { .composite_count },   20.of { .is_composite ? 1 : 0 }.acc)
+assert_eq(20.of { .composite_sum },     20.of { .is_composite ? _ : 0 }.acc)
 assert_eq(20.of { .mertens },           20.of { .moebius }.acc)
+assert_eq(20.of { .liouville },         20.of { .is_zero ? 0 : ((-1)**bigomega(_)) })
+assert_eq(20.of { .liouville_sum },     20.of { .liouville }.acc)
 assert_eq(20.of { .pi },                20.of { .is_prime ? 1 : 0 }.acc)
-assert_eq(20.of { .sum_primes },        20.of { .is_prime ? _ : 0 }.acc)
-assert_eq(20.of { sum_primes(0,_) },    20.of { .is_prime ? _ : 0 }.acc)
-assert_eq(20.of { sum_primes(0,_,2) },  20.of { .is_prime ? _*_ : 0 }.acc)
+assert_eq(20.of { .prime_sum },         20.of { .is_prime ? _ : 0 }.acc)
+assert_eq(20.of { prime_sum(2,_,0) },   20.of { .is_prime ? 1 : 0 }.acc)
+assert_eq(20.of { prime_sum(0,_) },     20.of { .is_prime ? _ : 0 }.acc)
+assert_eq(20.of { .prime_sum(nil,2) },  20.of { .is_prime ? .sqr : 0 }.acc)
+assert_eq(20.of { prime_sum(2,_,3) },   20.of { .is_prime ? .cube : 0 }.acc)
+assert_eq(20.of { prime_sum(3,_,3) },   20.of { (.is_prime && _>=3) ? .cube : 0 }.acc)
+assert_eq(20.of { .primorial },         20.of { .is_prime ? _ : 1 }.map_reduce{|a,b| a*b })
+assert_eq(20.of { .pn_primorial },      20.of { .nth_prime }.map_reduce{|a,b| a*b })
 assert_eq(20.of { .sigma0 },            20.of { .divisors.len })
 assert_eq(20.of { .sigma(0) },          20.of { .divisors.len })
 assert_eq(20.of { .sigma },             20.of { .divisors.sum })
-assert_eq(20.of { .sigma(2) },          20.of { .divisors.sum { _*_ } })
+assert_eq(20.of { .sigma(2) },          20.of { .divisors.sum { .sqr } })
+assert_eq(20.of { .omega },             20.of { .rad.factor.len })
 assert_eq(20.of { .omega },             20.of { .factor_exp.len })
 assert_eq(20.of { .bigomega },          20.of { .factor.len })
 assert_eq(20.of { .gpf },               20.of { .factor.tail \\ _ })
 assert_eq(20.of { .lpf },               20.of { .factor.head \\ _ })
+assert_eq(20.of { .sopf },              20.of { .rad.factor.sum })
+assert_eq(20.of { .sopfr },             20.of { .factor.sum })
+assert_eq(20.of { .factorial },         20.of { .is_zero ? 1 : _ }.map_reduce{|a,b| a*b })
+assert_eq(20.of { .superfactorial },    20.of { .factorial }.map_reduce{|a,b| a*b })
+assert_eq(20.of { .hyperfactorial },    20.of { _**_ }.map_reduce{|a,b| a*b })
+assert_eq(20.of { .subfactorial },      20.of {|n| (-1)**n / n! }.acc.map_kv {|k,v| k! * v })
 
 assert_eq(20.of { .digits(2).sum },     20.of { .hammingweight })
 assert_eq(20.of { .digits(2).len },     20.of { .len(2) })
@@ -747,6 +794,14 @@ assert_eq(20.of { .digits(9).digits2num(9) },      20.of { _ })
 assert_eq(20.of { .digits(10).digits2num(10) },    20.of { _ })
 assert_eq(20.of { .digits(11).digits2num(11) },    20.of { _ })
 assert_eq(20.of { .digits(16).digits2num(16) },    20.of { _ })
+
+assert_eq(20.of { composite_sum(0, _, 0) },  20.of { .composite_count })
+assert_eq(20.of { composite_sum(2, _, 0) },  20.of { .is_composite ? 1 : 0 }.acc)
+assert_eq(20.of { composite_sum(3, _, 1) },  20.of { .is_composite ? _ : 0 }.acc)
+assert_eq(20.of { .composite_sum(nil, 2) },  20.of { .is_composite ? _**2 : 0 }.acc)
+assert_eq(20.of { composite_sum(0, _, 2) },  20.of { .is_composite ? _**2 : 0 }.acc)
+assert_eq(20.of { composite_sum(4, _, 3) },  20.of { .is_composite ? _**3 : 0 }.acc)
+assert_eq(20.of { composite_sum(6, _, 3) },  20.of { (.is_composite && _>=6) ? _**3 : 0 }.acc)
 
 for n in (2147483646, 2147483647, 2147483648, 4294967293, 4294967294, 4294967295, 4294967297, 9223372036854775808, 18446744073709551613, 18446744073709551614, 18446744073709551617) {
 
@@ -808,5 +863,10 @@ assert_eq(bernoulli_numbers(200), 200.inc.of { .bernoulli(0) })
 assert_eq(fubini_numbers(10), %n[1, 1, 3, 13, 75, 541, 4683, 47293, 545835, 7087261, 102247563])
 assert_eq(fubini_numbers(5), %n[1, 1, 3, 13, 75, 541])
 assert_eq(21.of { .fubini }, %n[1, 1, 3, 13, 75, 541, 4683, 47293, 545835, 7087261, 102247563, 1622632573, 28091567595, 526858348381, 10641342970443, 230283190977853, 5315654681981355, 130370767029135901, 3385534663256845323, 92801587319328411133, 2677687796244384203115])
+
+assert_eq(20.of { .liouville_sum }, %n[0, 1, 0, -1, 0, -1, 0, -1, -2, -1, 0, -1, -2, -3, -2, -1, 0, -1, -2, -3])
+
+assert_eq(liouville_sum(123456), -92)
+assert_eq(liouville_sum(12345), -49)
 
 say "** Tests passed!"

@@ -1809,6 +1809,24 @@ Returns an array with the composite numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
+=head2 composite_sum
+
+    composite_sum(n)
+    composite_sum(a, b, k=1)
+
+Returns the sum of composite numbers <= C<n>, or in the range C<a..b>.
+
+    say composite_sum(100)          # sum of composite numbers <= 100
+    say composite_sum(50, 100)      # sum of composite numbers in range 50..100
+
+When C<k> is specified, it returns the sum of composite numbers, each number raised to the k-th power:
+
+    say composite_sum(50, 100, 2)   # 50^2 + 51^2 + ... + 100^2
+
+Aliases: I<composites_sum>
+
+=cut
+
 =head2 composite_upper
 
     composite_upper(n)
@@ -3898,6 +3916,22 @@ Return true if C<n> is a cube number (i.e.: if it can be written as C<b^3>, for 
 
 =cut
 
+=head2 is_cubefree
+
+    n.is_cubefree
+
+Returns true if C<n> is not divisible by any perfect cube.
+
+=cut
+
+=head2 is_cubeful
+
+    n.is_cubeful
+
+Returns true if C<n> is divisible by the cubes of all its prime factors.
+
+=cut
+
 =head2 is_cyclic
 
     n.is_cyclic
@@ -4630,6 +4664,14 @@ Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == ome
     is_squarefree_semiprime(n)
 
 Returns true if C<n> is a squarefree semiprime (i.e.: C<n = p*q>, where C<p> and C<q> are two distinct primes).
+
+=cut
+
+=head2 is_squareful
+
+    n.is_squareful
+
+Returns true if C<n> is divisible by the squares of all its prime factors.
 
 =cut
 
