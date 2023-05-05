@@ -1,0 +1,86 @@
+#!/usr/bin/ruby
+
+# A basic implementation of the UNIX `compress` tool, creating a .Z compressed file, using LZW compression.
+
+# This implementation reads from STDIN and outputs to STDOUT:
+#   sidef compress.sf < input.txt > output.Z
+
+# See also:
+#   https://youtube.com/watch?v=1cJL9Va80Pk
+#   https://en.wikipedia.org/wiki/Lempel%E2%80%93Ziv%E2%80%93Welch
+
+define (
+    BUFFER_SIZE     = 8*512,           # must be a multiple of 8
+    MAGIC_SIGNATURE = "\x1f\x9d\x90",
+)
+
+func compress (FileHandle in_fh, FileHandle out_fh) {
+
+    in_fh.binmode(:raw)
+    out_fh.binmode(:raw)
+
+    out_fh.print(MAGIC_SIGNATURE)
+
+    var dict_size = 256
+    var dictionary = Hash(dict_size.of {|i| (i.chr, i) }...)
+
+    ++dict_size     # 256 is the 'RESET' marker
+
+    var num_bits = 9
+    var max_bits = 16
+
+    var max_bits_size = (1 << num_bits)
+    var max_dict_size = (1 << max_bits)
+
+    var bitstream = []
+    var bitstream_size = 0
+
+    var output_index = {|symbol|
+
+        bitstream << ('%0*b' % (num_bits, dictionary{symbol}) -> flip)
+        bitstream_size += num_bits
+
+        if (bitstream_size % BUFFER_SIZE == 0) {
+            out_fh.print(pack("b*", bitstream.join))
+            bitstream = []
+            bitstream_size = 0
+        }
+    }
+
+    var w = ''
+
+    in_fh.each_char {|c|
+        var wc = w+c
+        if (dictionary.has(wc)) {
+            w = wc
+        }
+        else {
+            output_index.run(w)
+            if (dict_size < max_dict_size) {
+                dictionary{wc} = dict_size++
+                if (dict_size > max_bits_size) {
+                    ++num_bits
+                    max_bits_size <<= 1
+                }
+            }
+            w = c
+        }
+    }
+
+    if (w != '') {
+        output_index.run(w)
+    }
+
+    if (bitstream.len > 0) {
+        out_fh.print(pack('b*', bitstream.join))
+    }
+
+    return true
+}
+
+var in_fh = "banana".open_r(:raw)
+var (out_fh, enc) = FileHandle.new_buf(:raw)
+compress(in_fh, out_fh)
+assert_eq(enc, pack("H*", "1f9d9062c2b8111806"))
+
+say "** Test passed!"

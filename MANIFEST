@@ -758,6 +758,7 @@ scripts/Tests/code_interpolation.sf
 scripts/Tests/combs_and_perms.sf
 scripts/Tests/complex_numbers.sf
 scripts/Tests/composites.sf
+scripts/Tests/compress.sf
 scripts/Tests/congruence_of_powers_factorization.sf
 scripts/Tests/const_tests.sf
 scripts/Tests/constant_folding.sf

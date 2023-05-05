@@ -1177,17 +1177,9 @@ Returns the
 
 =cut
 
-=head2 open
-
-    self.open(*rest)
-
-Returns the
-
-=cut
-
 =head2 open_r
 
-    self.open_r(*rest)
+    self.open_r(mode)
 
 Returns the
 

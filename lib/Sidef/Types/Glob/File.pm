@@ -500,6 +500,14 @@ package Sidef::Types::Glob::File {
 
     *open_read_write = \&open_rw;
 
+    sub open_arw {
+        ref($_[0]) || shift(@_);
+        my ($self, @args) = @_;
+        Sidef::Types::Glob::File::open($self, '+>>:utf8', @args);
+    }
+
+    *open_append_read_write = \&open_arw;
+
     sub opendir {
         ref($_[0]) || shift(@_);
         my ($self, @args) = @_;

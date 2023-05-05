@@ -236,6 +236,16 @@ Aliases: I<collect>
 
 =cut
 
+=head2 new_buf
+
+    self.new_buf(mode)
+
+Returns the
+
+Aliases: I<new_buffer>
+
+=cut
+
 =head2 print
 
     self.print(*args)

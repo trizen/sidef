@@ -416,6 +416,16 @@ Aliases: I<open_append>
 
 =cut
 
+=head2 open_arw
+
+    self.open_arw(*args)
+
+Returns the
+
+Aliases: I<open_append_read_write>
+
+=cut
+
 =head2 opendir
 
     self.opendir(*args)

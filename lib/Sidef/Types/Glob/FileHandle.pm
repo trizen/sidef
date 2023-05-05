@@ -31,6 +31,18 @@ package Sidef::Types::Glob::FileHandle {
 
     *file = \&parent;
 
+    sub new_buf {
+        my ($self, $mode) = @_;
+        $mode //= 'utf8';
+        my $str = "";
+        open(my $fh, "+<:$mode", \$str) or return undef;
+        my $str_obj = bless(\$str, 'Sidef::Types::String::String');
+        my $fh_obj  = __PACKAGE__->new($fh, $str_obj);
+        wantarray ? ($fh_obj, $str_obj) : $fh_obj;
+    }
+
+    *new_buffer = \&new_buf;
+
     sub is_on_tty {
         (-t $_[0]{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }

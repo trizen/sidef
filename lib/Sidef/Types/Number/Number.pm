@@ -6003,9 +6003,11 @@ package Sidef::Types::Number::Number {
 
         foreach my $i ($#{$F} + 1 .. $n) {
             my $w = Math::GMPz::Rmpz_init_set_ui(0);
+            Math::GMPz::Rmpz_set_ui($t, 1);
             foreach my $k (0 .. $i - 1) {
-                Math::GMPz::Rmpz_bin_uiui($t, $i, $i - $k);
                 Math::GMPz::Rmpz_addmul($w, $F->[$k], $t);
+                Math::GMPz::Rmpz_mul_ui($t, $t, $i - $k);
+                Math::GMPz::Rmpz_divexact_ui($t, $t, $k + 1);
             }
             $F->[$i] = $w;
         }
@@ -11584,12 +11586,12 @@ package Sidef::Types::Number::Number {
         }
 
         my $t = Math::GMPz::Rmpz_init();
+        my $w = Math::GMPz::Rmpz_init_set_ui(1);
 
         my @terms;
         foreach my $k (0 .. $n) {
 
-            Math::GMPz::Rmpz_bin_uiui($t, $n, $k);
-            Math::GMPz::Rmpz_mul($t, $t, $t);
+            Math::GMPz::Rmpz_mul($t, $w, $w);
 
             if ($polynomial) {
                 push @terms, $x1->pow(_set_int($n - $k))->mul($x2->pow(_set_int($k)))->mul(bless \$t);
@@ -11597,6 +11599,9 @@ package Sidef::Types::Number::Number {
             else {
                 push @terms, __mul__(__mul__(__pow__($x1, $n - $k), __pow__($x2, $k)), $t);
             }
+
+            Math::GMPz::Rmpz_mul_ui($w, $w, $n - $k);
+            Math::GMPz::Rmpz_divexact_ui($w, $w, $k + 1);
         }
 
         if ($polynomial) {
@@ -11760,12 +11765,17 @@ package Sidef::Types::Number::Number {
 
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init_set_ui(1);
+        my $w = Math::GMPz::Rmpz_init_set_ui(1);
 
         my @terms;
         foreach my $k (0 .. $n) {
 
-            Math::GMPz::Rmpz_bin_uiui($t, $n, $k);
-            Math::GMPz::Rmpz_neg($t, $t) if ($k & 1);
+            if ($k & 1) {
+                Math::GMPz::Rmpz_neg($t, $w);
+            }
+            else {
+                Math::GMPz::Rmpz_set($t, $w);
+            }
 
             if ($polynomial) {
                 push @terms, $x->pow(_set_int($k))->mul(bless \$t)->div(bless \$u);
@@ -11775,6 +11785,8 @@ package Sidef::Types::Number::Number {
             }
 
             Math::GMPz::Rmpz_mul_ui($u, $u, $k + 1);
+            Math::GMPz::Rmpz_mul_ui($w, $w, $n - $k);
+            Math::GMPz::Rmpz_divexact_ui($w, $w, $k + 1);
         }
 
         $polynomial
@@ -12291,12 +12303,12 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mul($u, $u, $n);
 
             # Skip when bernoulli(p-j) == 0
-            ($p - $j) % 2 == 0 or next;
-
-            Math::GMPz::Rmpz_bin_uiui($z, $p + 1, $p - $j);
-            Math::GMPz::Rmpz_mul($z, $z, $u);
-            Math::GMPq::Rmpq_mul_z($q, $B[(($p - $j) >> 1) + 1], $z);
-            Math::GMPq::Rmpq_add($sum, $sum, $q);
+            if (($p - $j) % 2 == 0) {
+                Math::GMPz::Rmpz_bin_uiui($z, $p + 1, $j + 1);
+                Math::GMPz::Rmpz_mul($z, $z, $u);
+                Math::GMPq::Rmpq_mul_z($q, $B[(($p - $j) >> 1) + 1], $z);
+                Math::GMPq::Rmpq_add($sum, $sum, $q);
+            }
         }
 
         # sum += (1/2) * n^p * (2*n + p + 1)

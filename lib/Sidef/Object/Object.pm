@@ -348,7 +348,7 @@ package Sidef::Object::Object {
                         my $str = (
                                    defined($obj->{$_})
                                    ? (
-                                      (ref($obj->{$_}) && ($s = UNIVERSAL::can($obj->{$_}, 'dump')))
+                                      (CORE::ref($obj->{$_}) && ($s = UNIVERSAL::can($obj->{$_}, 'dump')))
                                       ? $s->($obj->{$_})
                                       : "$obj->{$_}"
                                      )

@@ -983,17 +983,12 @@ package Sidef::Types::String::String {
     }
 
     sub open_r {
-        my ($self, @rest) = @_;
+        my ($self, $mode) = @_;
+        $mode //= 'utf8';
         require Encode;
-        my $string = Encode::encode_utf8($$self);
-        Sidef::Types::Glob::File->new(\$string)->open_r(@rest);
-    }
-
-    sub open {
-        my ($self, @rest) = @_;
-        require Encode;
-        my $string = Encode::encode_utf8($$self);
-        Sidef::Types::Glob::File->new(\$string)->open(@rest);
+        my $str = Encode::encode_utf8($$self);
+        open(my $fh, "<:$mode", \$str) or return undef;
+        Sidef::Types::Glob::FileHandle->new($fh);
     }
 
     sub center {
