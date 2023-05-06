@@ -377,8 +377,8 @@ package Sidef::Types::Glob::FileHandle {
     }
 
     sub write_from {
-        my ($self, $string) = @_;
-        CORE::print {$self->{fh}} $string;
+        my ($self, @args) = @_;
+        CORE::print {$self->{fh}} @args;
         $self;
     }
 

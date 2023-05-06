@@ -985,8 +985,7 @@ package Sidef::Types::String::String {
     sub open_r {
         my ($self, $mode) = @_;
         $mode //= 'utf8';
-        require Encode;
-        my $str = Encode::encode_utf8($$self);
+        my $str = $$self;
         open(my $fh, "<:$mode", \$str) or return undef;
         Sidef::Types::Glob::FileHandle->new($fh);
     }

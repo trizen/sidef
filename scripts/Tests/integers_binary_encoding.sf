@@ -1,0 +1,84 @@
+#!/usr/bin/ruby
+
+# Author: Trizen
+# Date: 23 March 2023
+# https://github.com/trizen
+
+# Encode and decode a random list of integers into a binary string.
+
+func encode_integers (Array integers) {
+
+    var counts = []
+    var count = 0
+    var bits_per_symbol = 2
+    var processed_len = 0
+
+    for k in (integers) {
+        while (k >= bits_per_symbol) {
+
+            if (count > 0) {
+                counts << [bits_per_symbol.len(2)-1, count]
+                processed_len += count
+            }
+
+            count = 0
+            bits_per_symbol *= 2
+        }
+        ++count
+    }
+
+    counts << [[bits_per_symbol.len(2)-1, integers.len - processed_len]].grep { .tail > 0 }...
+
+    var clen = counts.len
+    var header = clen.chr
+
+    for b,len in (counts) {
+        header += chr(b)
+        header += pack('N', len)
+    }
+
+    var bits = []
+
+    for b,len in (counts) {
+        bits << integers.splice(0, len).map{ sprintf('%0*s', b, .as_bin) }...
+    }
+
+    header + pack('B*', bits.join)
+}
+
+func decode_integers (String str) {
+
+    var str_fh = str.open_r(:raw)
+    var count_len = str_fh.getc.ord
+    var counts = []
+
+    count_len.times {
+        var b = str_fh.getc.ord
+        var l = Num(unpack('N', 4.of { str_fh.getc }.join))
+        counts << [b, l] if (l > 0)
+    }
+
+    var chunks = []
+    var bits_fh = str_fh.slurp.ascii2bin.open_r(:raw)
+
+    for b,len in (counts) {
+        bits_fh.read(\var chunk, len*b)
+        chunks << chunk.slices(b)...
+    }
+
+    chunks.map { .bin }
+}
+
+var integers = 1000.of { .irand }
+var str      = encode_integers(integers.clone)
+
+say ("Encoded length: ", str.len)
+say ("Rawdata length: ", integers.join(' ').len)
+
+var decoded = decode_integers(str)
+
+assert_eq(integers, decoded)
+
+__END__
+Encoded length: 1158
+Rawdata length: 3621

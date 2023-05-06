@@ -1488,7 +1488,8 @@ package Sidef::Optimizer {
 
                     my $unary_optimized = 0;
 
-                    if (    $ref_obj eq 'Sidef::Operator::Unary'
+                    if (    defined($ref_obj)
+                        and $ref_obj eq 'Sidef::Operator::Unary'
                         and exists($unary_methods->{$method})
                         and scalar(@{$call->{arg}}) == 1) {
                         my $arg = $call->{arg}[0];

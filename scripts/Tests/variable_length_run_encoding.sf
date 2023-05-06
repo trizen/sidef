@@ -1,0 +1,69 @@
+#!/usr/bin/ruby
+
+# Implementation of the Variable Length Run Encoding.
+
+# Reference:
+#   Data Compression (Summer 2023) - Lecture 5 - Basic Techniques
+#   https://youtube.com/watch?v=TdFWb8mL5Gk
+
+func VLR_encoding (String str) {
+
+    var bitstream = FileHandle.new_buf(:raw)
+
+    for c,v in (str.chars.run_length) {
+        bitstream << c.ascii2bin
+        if (v == 1) {
+            bitstream << '0'
+        }
+        else {
+            var t = (v-1).as_bin
+            bitstream << ('1'*t.len, '0', t.substr(1))
+        }
+    }
+
+    bitstream.parent
+}
+
+func VLR_decoding (String bitstring) {
+
+    var decoded = FileHandle.new_buf(:raw)
+    var bits_fh = bitstring.open_r(:raw)
+
+    while (!bits_fh.eof) {
+        var s = 8.of { bits_fh.getc }.join
+        var c = pack('B*', s)
+
+        var bit_len = 0
+        while (bits_fh.getc == '1') {
+            ++bit_len
+        }
+
+        decoded << c
+
+        if (bit_len > 0) {
+            decoded << c*Num('1' + (bit_len-1).of { bits_fh.getc }.join, 2)
+        }
+    }
+
+    decoded.parent
+}
+
+var str = join('', 'a'*13, 'b'*14, 'c'*10, 'd'*3, 'e'*1, 'f'*1, 'g'*4)
+
+var enc = VLR_encoding(str)
+var dec = VLR_decoding(enc)
+
+say enc
+say dec
+
+assert_eq(dec, str)
+
+with (File(__FILE__).read(':raw')) {|str|
+    var enc = VLR_encoding(str)
+    assert(enc.len < 8*str.len)
+    assert_eq(VLR_decoding(enc), str)
+}
+
+__END__
+011000011111010001100010111101010110001111110001011001001100011001010011001100011001111101
+aaaaaaaaaaaaabbbbbbbbbbbbbbccccccccccdddefgggg

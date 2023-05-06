@@ -850,6 +850,7 @@ scripts/Tests/infix_methods.sf
 scripts/Tests/inherited_blocks.sf
 scripts/Tests/integer_division.sf
 scripts/Tests/integer_limits.sf
+scripts/Tests/integers_binary_encoding.sf
 scripts/Tests/inverse_of_factorial.sf
 scripts/Tests/inverted_syntax.sf
 scripts/Tests/irootrem.sf
@@ -1085,6 +1086,7 @@ scripts/Tests/unicode_whitespaces.sf
 scripts/Tests/url_encoding_decoding.sf
 scripts/Tests/var_ref.sf
 scripts/Tests/var_scoping.sf
+scripts/Tests/variable_length_run_encoding.sf
 scripts/Tests/variable_references.sf
 scripts/Tests/vector.sf
 scripts/Tests/vigenere_cipher.sf
