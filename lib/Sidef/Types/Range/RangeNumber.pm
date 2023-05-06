@@ -410,14 +410,14 @@ package Sidef::Types::Range::RangeNumber {
                             arr_name   => 'non_squarefree',
                             count_name => 'non_squarefree_count',
                             sum_name   => 'non_squarefree_sum',
-                            predicate  => sub { $_[0]->is_squarefree->not },
+                            predicate  => sub { $_[0]->is_non_squarefree },
                            },
                            {
                             each_name  => 'each_non_cubefree',
                             arr_name   => 'non_cubefree',
                             count_name => 'non_cubefree_count',
                             sum_name   => 'non_cubefree_sum',
-                            predicate  => sub { $_[0]->is_cubefree->not },
+                            predicate  => sub { $_[0]->is_non_cubefree },
                            },
                            {
                             each_name  => 'each_semiprime',
@@ -601,7 +601,7 @@ package Sidef::Types::Range::RangeNumber {
                  sum_name   => 'non_powerfree_sum',
                  predicate  => sub {
                      my ($k) = @_;
-                     sub { $_[0]->is_powerfree($k)->not };
+                     sub { $_[0]->is_non_powerfree($k) };
                  },
                 },
                 {

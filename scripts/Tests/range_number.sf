@@ -38,14 +38,14 @@ do {
                             arr_name   => 'non_squarefree',
                             count_name => 'non_squarefree_count',
                             sum_name   => 'non_squarefree_sum',
-                            predicate  => func(n) { !n.is_squarefree },
+                            predicate  => func(n) { n.is_non_squarefree },
                            ),
                            :(
                             each_name  => 'each_non_cubefree',
                             arr_name   => 'non_cubefree',
                             count_name => 'non_cubefree_count',
                             sum_name   => 'non_cubefree_sum',
-                            predicate  => func(n) { !n.is_cubefree },
+                            predicate  => func(n) { n.is_non_cubefree },
                            ),
                            :(
                             each_name  => 'each_semiprime',
@@ -106,7 +106,7 @@ do {
                  each_name  => 'each_non_powerfree',
                  count_name => 'non_powerfree_count',
                  sum_name   => 'non_powerfree_sum',
-                 predicate  => func(k) { func(n) { n.is_powerfree(k).not } },
+                 predicate  => func(k) { func(n) { n.is_non_powerfree(k) } },
                 ),
                 :(
                  arr_name   => 'powerfree',

@@ -4351,6 +4351,30 @@ Aliases: I<is_pm1_prime>, I<is_nminus1_prime>
 
 =cut
 
+=head2 is_non_cubefree
+
+    n.is_non_cubefree
+
+Returns true if C<n> is a positive integer divisible by the cube of a prime.
+
+=cut
+
+=head2 is_non_powerfree
+
+    n.is_non_powerfree
+
+Returns true if C<n> is a positive integer divisible by the k-th power of a prime.
+
+=cut
+
+=head2 is_non_squarefree
+
+    n.is_non_squarefree
+
+Returns true if C<n> is a positive integer divisible by the square of a prime.
+
+=cut
+
 =head2 is_np1_prime
 
     n.is_np1_prime

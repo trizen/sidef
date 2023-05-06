@@ -13622,6 +13622,18 @@ package Sidef::Types::Number::Number {
         (THREE)->powerfree_count(@_);
     }
 
+    sub is_non_squarefree {
+        $_[0]->is_squarefree->not && $_[0]->is_pos;
+    }
+
+    sub is_non_cubefree {
+        $_[0]->is_cubefree->not && $_[0]->is_pos;
+    }
+
+    sub is_non_powerfree {
+        $_[0]->is_powerfree($_[1])->not && $_[0]->is_pos;
+    }
+
     sub _sieve_non_powerfree {
         my ($A, $B, $k) = @_;
 

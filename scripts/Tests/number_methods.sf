@@ -263,9 +263,9 @@ assert_eq(
     100.powerfree_sum(2**100 * 10000)
 )
 
-assert_eq(2.non_powerfree(100), 1..100 -> grep { .is_powerfree(2).not })
-assert_eq(3.non_powerfree(100), 1..100 -> grep { .is_powerfree(3).not })
-assert_eq(4.non_powerfree(100), 1..100 -> grep { .is_powerfree(4).not })
+assert_eq(2.non_powerfree(100), 0..100 -> grep { .is_non_powerfree(2) })
+assert_eq(3.non_powerfree(100), 0..100 -> grep { .is_non_powerfree(3) })
+assert_eq(4.non_powerfree(100), 0..100 -> grep { .is_non_powerfree(4) })
 
 assert_eq(2.non_powerfree(65, 100, 2), %n[68, 72, 75, 76, 80, 81, 84, 88, 90, 92, 96, 98, 99, 100])
 assert_eq(3.non_powerfree(64, 150, 3), %n[64, 72, 80, 81, 88, 96, 104, 108, 112, 120, 125, 128, 135, 136, 144])
@@ -774,16 +774,16 @@ assert_eq(1000!.make_coprime(2*3*5*7).lpf, 11)
 assert_eq(1000!.gpf, 1000.prev_prime)
 assert_eq(gpf(1000! * (2**64 + 1)), 67280421310721)
 
-assert_eq({ .non_squarefree_count }.map(1..20),      { !.is_squarefree ? 1 : 0 }.map(1..20).acc)
-assert_eq({ .non_squarefree_sum }.map(1..20),        { !.is_squarefree ? _ : 0 }.map(1..20).acc)
-assert_eq({ .non_cubefree_count }.map(1..20),        { !.is_cubefree ? 1 : 0 }.map(1..20).acc)
-assert_eq({ .non_cubefree_sum }.map(1..20),          { !.is_cubefree ? _ : 0 }.map(1..20).acc)
+assert_eq(20.of{ .non_squarefree_count },      20.of{ .is_non_squarefree ? 1 : 0 }.acc)
+assert_eq(20.of{ .non_squarefree_sum },        20.of{ .is_non_squarefree ? _ : 0 }.acc)
+assert_eq(20.of{ .non_cubefree_count },        20.of{ .is_non_cubefree ? 1 : 0 }.acc)
+assert_eq(20.of{ .non_cubefree_sum },          20.of{ .is_non_cubefree ? _ : 0 }.acc)
 
-assert_eq({ 4.non_powerfree_count(_) }.map(1..20),   { !.is_powerfree(4) ? 1 : 0 }.map(1..20).acc)
-assert_eq({ 4.non_powerfree_sum(_) }.map(1..20),     { !.is_powerfree(4) ? _ : 0 }.map(1..20).acc)
+assert_eq(20.of{ 4.non_powerfree_count(_) },   20.of{ .is_non_powerfree(4) ? 1 : 0 }.acc)
+assert_eq(20.of{ 4.non_powerfree_sum(_) },     20.of{ .is_non_powerfree(4) ? _ : 0 }.acc)
 
-assert_eq({ 4.powerfree_count(_) }.map(1..20),   { .is_powerfree(4) ? 1 : 0 }.map(1..20).acc)
-assert_eq({ 4.powerfree_sum(_) }.map(1..20),     { .is_powerfree(4) ? _ : 0 }.map(1..20).acc)
+assert_eq(20.of{ 4.powerfree_count(_) },       20.of{ .is_powerfree(4) ? 1 : 0 }.acc)
+assert_eq(20.of{ 4.powerfree_sum(_) },         20.of{ .is_powerfree(4) ? _ : 0 }.acc)
 
 assert_eq(20.of { .squarefree_count },  20.of { .is_squarefree ? 1 : 0 }.acc)
 assert_eq(20.of { .squarefree_sum },    20.of { .is_squarefree ? _ : 0 }.acc)
