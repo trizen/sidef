@@ -650,7 +650,20 @@ EOT
             # use overload;
             # overload::StrVal($_) ? "$_" : $_->dump;
 
-            my $dump = join(', ', map { ref($_) ? UNIVERSAL::can($_, 'dump') ? $_->dump : $_ : ($_ // 'nil') } @results);
+            my $dump = join(
+                ', ',
+                map {
+                    (ref($_) ? UNIVERSAL::can($_, 'dump') ? $_->dump : $_ : ($_ // 'nil'))
+                      . (
+                         (
+                                ref($_) eq 'Sidef::Types::Number::Number'
+                            and ref($$_) eq 'Math::MPFR'
+                            and Math::MPFR::Rmpfr_number_p($$_)
+                         ) ? 'f' : ''
+                        )
+                  } @results
+            );
+
             $dump = "($dump)" if @results > 1;
 
             push @values,
