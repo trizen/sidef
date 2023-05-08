@@ -409,6 +409,14 @@ Aliases: I<call>
 
 =cut
 
+=head2 newton_method
+
+    f.newton_method(x, df)
+
+Returns the
+
+=cut
+
 =head2 norm
 
     self.norm
@@ -456,6 +464,14 @@ Returns the
 Returns the
 
 Aliases: I<real>
+
+=cut
+
+=head2 roots
+
+    f.roots
+
+Returns the
 
 =cut
 

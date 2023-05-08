@@ -242,6 +242,96 @@ package Sidef::Types::Number::Polynomial {
         );
     }
 
+    sub newton_method {
+        my ($f, $x, $df) = @_;
+
+        $x  //= Sidef::Types::Number::Number->i;
+        $df //= $f->derivative;
+
+        for (0 .. CORE::int($Sidef::Types::Number::Number::PREC)) {
+            my $fx = $f->eval($x);
+            if ($fx->approx_eq(Sidef::Types::Number::Number::ZERO)) {
+                return $x;
+            }
+            my $dfx = $df->eval($x);
+            $x = $x->sub($fx->div($dfx));
+        }
+
+        return $x;
+    }
+
+    sub roots {
+        my ($f) = @_;
+
+        my $degree         = $f->degree;
+        my @roots_of_unity = @{$degree->roots_of_unity};
+
+        @roots_of_unity || return Sidef::Types::Array::Array->new;
+
+        my $df = $f->derivative;
+
+        my $prec     = Sidef::Types::Number::Number::_set_int(-((CORE::int($Sidef::Types::Number::Number::PREC) >> 2) - 1));
+        my $prec_min = Sidef::Types::Number::Number::_set_int(-(CORE::int($Sidef::Types::Number::Number::PREC) >> 3));
+
+        my %seen;
+        my @polygonal_roots;
+
+        foreach my $root (@roots_of_unity) {
+            my $solution = $f->newton_method($root, $df);
+            if (defined($solution)) {
+                my $key = join('', $solution->round($prec));
+                if (!exists($seen{$key}) and $f->eval($solution)->round($prec_min)->is_zero) {
+                    push @polygonal_roots, $solution;
+                    $seen{$key} = 1;
+                }
+            }
+        }
+
+        $degree = CORE::int($degree);
+
+        # TODO: find a more efficient approach for inputs like:
+        #       x = Poly(1); roots(5*x**4 + 11*x**2 + 100)
+        #       x = Poly(1); roots(5*x**4 + 9*x**3 + 11*x**2 + 100)
+        #       x = Poly(1); roots(12*x**4 + 11*x**2 + 4171)
+        if (scalar(@polygonal_roots) != $degree) {
+
+            my @transformations = (
+                                   sub { $_[0]->i },
+                                   sub { $_[0]->exp },
+                                   sub { $_[0]->neg },
+                                   sub { $_[0]->sqr->dec },
+                                   sub { $_[0]->sqr->inc },
+                                   sub { $_[0]->sqrt },
+                                   sub { $_[0]->conj },
+                                   sub { $_[0]->neg },
+                                  );
+
+            while (@transformations) {
+
+                my $transform = CORE::shift(@transformations);
+                @roots_of_unity = map { $transform->($_) } @roots_of_unity;
+
+                foreach my $root (@roots_of_unity) {
+                    my $solution = $f->newton_method($root, $df);
+                    if (defined($solution)) {
+
+                        my $key = join('', $solution->round($prec));
+                        if (!exists($seen{$key}) and $f->eval($solution)->round($prec_min)->is_zero) {
+                            push @polygonal_roots, $solution;
+                            $seen{$key} = 1;
+                        }
+
+                        last if (scalar(@polygonal_roots) == $degree);
+                    }
+                }
+
+                last if (scalar(@polygonal_roots) == $degree);
+            }
+        }
+
+        Sidef::Types::Array::Array->new(\@polygonal_roots);
+    }
+
     sub binomial {
         my ($n, $k) = @_;
 
