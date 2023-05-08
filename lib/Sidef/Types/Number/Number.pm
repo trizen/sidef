@@ -5398,6 +5398,35 @@ package Sidef::Types::Number::Number {
         bless \__cis__(_any2mpfr_mpc($$x));
     }
 
+    sub roots_of_unity {
+        my ($n) = @_;
+        $n = _any2ui($$n) || return Sidef::Types::Array::Array->new;
+
+        my $one = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_set_ui($one, 1, $ROUND);
+        my @roots = (bless \$one);
+
+        my $cos = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $sin = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+
+        foreach my $i (1 .. $n - 1) {
+
+            # r = exp(2*pi / n * i)
+            Math::MPFR::Rmpfr_mul_ui($sin, $pi, 2 * $i, $ROUND);
+            Math::MPFR::Rmpfr_div_ui($sin, $sin, $n, $ROUND);
+            Math::MPFR::Rmpfr_sin_cos($sin, $cos, $sin, $ROUND);
+
+            my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            Math::MPC::Rmpc_set_fr_fr($r, $cos, $sin, $ROUND);
+            push @roots, bless \$r;
+        }
+
+        Sidef::Types::Array::Array->new(\@roots);
+    }
+
     sub __sin_cos__ {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);

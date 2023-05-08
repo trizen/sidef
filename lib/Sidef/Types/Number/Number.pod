@@ -7426,6 +7426,14 @@ The k-th root of C<n>, defined as:
 
 =cut
 
+=head2 roots_of_unity
+
+    roots_of_unity(n)
+
+Returns an array with the complex n-th roots of 1.
+
+=cut
+
 =head2 rotate
 
     rotate(n, k, b=10)
