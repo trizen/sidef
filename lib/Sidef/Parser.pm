@@ -422,21 +422,14 @@ package Sidef::Parser {
 
         my $error_line = (split(/\R/, substr($opt{code}, $start, $point + 80)))[0];
 
-        if (length($error_line) >= 80) {
+        if (length($error_line) > 80 && $point > 60) {
+            my $from = $point - 40;
+            my $rem  = $point + 40 - length($error_line);
 
-            if ($point > 60) {
+            $from -= $rem;
+            $point = 40 + $rem;
 
-                my $from = $point - 40;
-                my $rem  = $point + 40 - length($error_line);
-
-                $from -= $rem;
-                $point = 40 + $rem;
-
-                $error_line = substr($error_line, $from, 80);
-            }
-            else {
-                $error_line = substr($error_line, 0, 80);
-            }
+            $error_line = substr($error_line, $from, 80);
         }
 
         my @lines = (
