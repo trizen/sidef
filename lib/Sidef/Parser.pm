@@ -7,6 +7,8 @@ package Sidef::Parser {
     use List::Util   qw(first);
     use Scalar::Util qw(refaddr);
 
+    our $REGMARK;
+
     sub new {
         my (undef, %opts) = @_;
 
@@ -612,7 +614,7 @@ package Sidef::Parser {
 
         my $orig_pos   = pos($_);
         my $beg_delim  = quotemeta $delim;
-        my $pair_delim = exists($self->{delim_pairs}{$delim}) ? $self->{delim_pairs}{$delim} : ();
+        my $pair_delim = $self->{delim_pairs}{$delim};
 
         my $string = '';
         if (defined $pair_delim) {
@@ -622,7 +624,7 @@ package Sidef::Parser {
 
             # if (m{\G(?<main>$beg_delim((?>[^$re_delim\\]+|\\.|(?&main))*+)$end_delim)}sgc) {
 
-            if (m{\G(?<main>$beg_delim((?>[^\\$re_delim]*+(?>\\.[^\\$re_delim]*|(?&main)){0,}){0,})$end_delim)}sgc) {
+            if (m{\G(?<main>$beg_delim((?>[^\\$re_delim]*+(?>\\.[^\\$re_delim]*|(?&main)){0,}){0,})(?:$end_delim(*ACCEPT:term))?)(*PRUNE)(*FAIL)}sgc) {
                 $string = $2 =~ s/\\([$re_delim])/$1/gr;
             }
         }
@@ -630,11 +632,12 @@ package Sidef::Parser {
         # elsif (m{\G$beg_delim([^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*)*)}sgc) {    # limited to 2^15-1 escapes
         # elsif (m{\G$beg_delim((?>(?>[^$beg_delim\\]++|\\.){0,}+){0,}+)}sgc) {
 
-        elsif (m{\G$beg_delim((?>[^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*){0,}){0,})}sgc) {
+        elsif (m{\G$beg_delim((?>[^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*){0,}){0,})(?:$beg_delim(*ACCEPT:term))?(*PRUNE)(*FAIL)}sgc) {
             $string = $1 =~ s/\\([$beg_delim])/$1/gr;
         }
 
-        (defined($pair_delim) ? /\G(?<=\Q$pair_delim\E)/ : /\G$beg_delim/gc)
+        #(defined($pair_delim) ? /\G(?<=\Q$pair_delim\E)/ : /\G$beg_delim/gc)
+        $REGMARK eq 'term'
           || $self->fatal_error(
                                 error => sprintf(qq{can't find the quoted string terminator <<%s>>}, $pair_delim // $delim),
                                 code  => $_,
