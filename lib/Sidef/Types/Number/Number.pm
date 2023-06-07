@@ -25096,11 +25096,11 @@ package Sidef::Types::Number::Number {
 
     *factors_prod = \&factor_prod;
 
-    sub partitions {
+    sub partition_count {
         _set_int(Math::Prime::Util::GMP::partitions(_big2uistr($_[0]) // goto &nan));
     }
 
-    *partition_number = \&partitions;
+    *partition_number = \&partition_count;
 
     sub is_primitive_root {
         my ($x, $y) = @_;

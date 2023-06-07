@@ -92,6 +92,7 @@ package Sidef::Types::Regex::Match {
     *caps     = \&captures;
     *to_a     = \&captures;
     *to_array = \&captures;
+    *groups   = \&captures;
 
     sub named_captures {
         my ($self) = @_;
@@ -103,8 +104,9 @@ package Sidef::Types::Regex::Match {
         $hash;
     }
 
-    *ncap  = \&named_captures;
-    *ncaps = \&named_captures;
+    *ncap         = \&named_captures;
+    *ncaps        = \&named_captures;
+    *named_groups = \&named_captures;
 
     sub join {
         my ($self, $sep) = @_;

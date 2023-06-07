@@ -36,7 +36,7 @@ Returns the
 
 Returns the
 
-Aliases: I<to_a>, I<caps>, I<to_array>, I<captures>
+Aliases: I<to_a>, I<caps>, I<groups>, I<to_array>, I<captures>
 
 =cut
 
@@ -62,7 +62,7 @@ Returns the
 
 Returns the
 
-Aliases: I<ncaps>, I<named_captures>
+Aliases: I<ncaps>, I<named_groups>, I<named_captures>
 
 =cut
 
