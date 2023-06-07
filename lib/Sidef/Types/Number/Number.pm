@@ -11881,11 +11881,47 @@ package Sidef::Types::Number::Number {
                 return ZERO;
             }
 
-            # Algorithm after M. F. Hasler
-            # See: https://oeis.org/A302990
+            state $crosspoints = {
+                                  3  => 6144,
+                                  4  => 14911,
+                                  5  => 32767,
+                                  6  => 65535,
+                                  7  => 98304,
+                                  8  => 196607,
+                                  9  => 339967,
+                                  10 => 465843,
+                                  11 => 729595,
+                                 };
+
+            if ($n >= 1e6 and !exists($crosspoints->{$k}) and $k <= 50) {
+
+                my $w = 0.0834627296565757;
+                my $x = 1.07324642799115;
+                my $y = 6.39808475499695;
+                my $z = -6.14170531832506;
+
+                my ($f1, $f2, $f3, $f4) = (@{$crosspoints}{qw(3 4 5 6)});
+
+                for (1 .. ($k - 6)) {
+                    ($f1, $f2, $f3, $f4) = ($f2, $f3, $f4, $f1 * $z + $f2 * $y + $f3 * $x + $f4 * $w);
+                }
+
+                $crosspoints->{$k} = CORE::abs(CORE::int($f4));
+            }
+
+            # Use a sublinear algorithm, when it's faster
+            if (exists($crosspoints->{$k}) and $n > $crosspoints->{$k}) {
+                return
+                  Sidef::Math::Math->linear_rec(Sidef::Types::Array::Array->new([(ONE) x $k]),
+                                                Sidef::Types::Array::Array->new([(ZERO) x ($k - 1), ONE]),
+                                                (bless \$n));
+            }
+
+            # Algorithm due to M. F. Hasler, running in linear time.
+            # From: https://oeis.org/A302990
 
             my @f = map {
-                $_ < $k
+                ($_ < $k)
                   ? do {
                     my $z = Math::GMPz::Rmpz_init();
                     Math::GMPz::Rmpz_setbit($z, $_);
