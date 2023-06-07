@@ -45,9 +45,6 @@ package Sidef::Types::Number::Number {
           #~ LONG_MIN  => -2147483647,
 
           HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 } // 0,
-
-          # Check if we have a recent enough version of Math::Prime::Util
-          HAS_NEW_PRIME_UTIL => eval { require Math::Prime::Util; defined(&Math::Prime::Util::is_perfect_power); } // 0,
     };
 #>>>
 
@@ -58,6 +55,10 @@ package Sidef::Types::Number::Number {
         SPECIAL_FACTORS_MIN    => 36,     # in decimal digits (must be greater than SMALL_NUMBER_MAX_BITS)
         SMALL_NUMBER_MAX_BITS  => 110,    # in bits (numbers that can be factorized fast)
         MEDIUM_NUMBER_MAX_BITS => 150,    # in bits (numbers that can be factorized moderately fast)
+
+        # Check if we have a recent enough version of Math::Prime::Util
+        HAS_NEW_PRIME_UTIL   => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::is_perfect_power)) // 0,
+        HAS_NEWER_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::is_congruent))     // 0,
 
         IS_PRIME_CACHE_SIZE => 1e5,                                                          # how many entries to cache
         INTSIZE             => CORE::int(CORE::log(ULONG_MAX) / CORE::log(2)),               # size of ULONG_MAX in base 2
@@ -15501,9 +15502,7 @@ package Sidef::Types::Number::Number {
 
         my $n = _any2mpz($$from) // return ZERO;
 
-        # MPU is quite slow for large k.
-        # https://github.com/danaj/Math-Prime-Util/issues/72
-        if (HAS_NEW_PRIME_UTIL and $k < 15 and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+        if ((HAS_NEWER_PRIME_UTIL or (HAS_NEW_PRIME_UTIL and $k < 15)) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return _set_int(Math::Prime::Util::omega_prime_count($k, Math::GMPz::Rmpz_get_ui($n)));
         }
 
@@ -15637,7 +15636,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mul_ui($max, $max, 2);
         }
 
-        if (HAS_NEW_PRIME_UTIL and $k <= 12 and Math::GMPz::Rmpz_fits_ulong_p($max)) {    # too slow for large k
+        if ((HAS_NEWER_PRIME_UTIL or (HAS_NEW_PRIME_UTIL and $k <= 12)) and Math::GMPz::Rmpz_fits_ulong_p($max)) {
             my $r = Math::Prime::Util::nth_omega_prime($k, $n);
             if ($r) {
                 return _set_int("$r");
@@ -15652,7 +15651,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_div_2exp($v, $v, 1);
 
             $count =
-              (HAS_NEW_PRIME_UTIL and $k < 15 and Math::GMPz::Rmpz_fits_ulong_p($v))
+              ((HAS_NEWER_PRIME_UTIL or (HAS_NEW_PRIME_UTIL and $k < 15)) and Math::GMPz::Rmpz_fits_ulong_p($v))
               ? Math::GMPz::Rmpz_init_set_ui(Math::Prime::Util::omega_prime_count($k, Math::GMPz::Rmpz_get_ui($v)))
               : ${$k_obj->omega_prime_count(bless \$v)};
 
@@ -25370,7 +25369,7 @@ package Sidef::Types::Number::Number {
         # TODO: optimization when A and B are close to each other.
         # Idea: if |A-B| < sqrt(B), then just iterate over the range A..B and grep the k-omega primes.
 
-        if (0 and HAS_NEW_PRIME_UTIL and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+        if (0 and HAS_NEWER_PRIME_UTIL and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
             # XXX: Out of memory for: omega_primes(12, 1e13)
             # https://github.com/danaj/Math-Prime-Util/issues/67
@@ -26050,7 +26049,15 @@ package Sidef::Types::Number::Number {
 
         my $squarefree = $opt{squarefree};
 
-        if ($k == 2 and !$fermat) {
+        if (    HAS_NEWER_PRIME_UTIL
+            and !$squarefree
+            and !$fermat
+            and !$carmichael
+            and !$lucas_carmichael
+            and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+            return Math::Prime::Util::almost_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+        }
+        elsif ($k == 2 and !$fermat) {
             if (HAS_PRIME_UTIL) {
                 if (Math::GMPz::Rmpz_fits_ulong_p($to)) {
                     $from = Math::GMPz::Rmpz_get_ui($from);
