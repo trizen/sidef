@@ -6203,6 +6203,17 @@ Returns the largest power C<k> of C<n> for which there exists an integer C<r>, s
 
 =cut
 
+=head2 perfect_power_count
+
+    n.perfect_power_count
+
+Returns the count of perfect powers <= C<n>.
+
+    say perfect_power_count(10**6)      #=> 1111
+    say perfect_power_count(10**20)     #=> 10004650118
+
+=cut
+
 =head2 perfect_root
 
     n.perfect_root
@@ -6349,14 +6360,10 @@ Aliases: I<hammingweight>
 
 =head2 power_count
 
-    n.power_count
+    k.power_count(n)
+    k.power_count(a,b)
 
-Returns the count of perfect powers <= C<n>.
-
-    say power_count(10**6)      #=> 1111
-    say power_count(10**20)     #=> 10004650118
-
-Aliases: I<perfect_power_count>
+Returns the number of k-th power positive integers in <= C<n>, or in the range C<a..b>.
 
 =cut
 
@@ -6571,6 +6578,15 @@ Equivalent with (but much faster):
 Returns the number of the k-th power divisors of C<n>.
 
     say 30.of { 2.power_sigma0(_) }       # OEIS: A046951
+
+=cut
+
+=head2 power_sum
+
+    k.power_sum(n)
+    k.power_sum(a,b)
+
+Returns the sum of k-th power positive integers <= C<n>, or in the range C<a..b>.
 
 =cut
 

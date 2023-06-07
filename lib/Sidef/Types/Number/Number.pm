@@ -12316,6 +12316,34 @@ package Sidef::Types::Number::Number {
         return $to->faulhaber_sum($k)->sub($from->dec->faulhaber_sum($k));
     }
 
+    sub power_sum {
+        my ($k, $from, $to) = @_;
+
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->power_sum($to)->sub($k->power_sum($from->dec));
+        }
+
+        $from->iroot($k)->faulhaber_sum($k);
+    }
+
+    sub power_count {
+        my ($k, $from, $to) = @_;
+
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->power_count($to)->sub($k->power_count($from->dec));
+        }
+
+        $from->iroot($k);
+    }
+
     sub faulhaber_sum {
         my ($n, $p) = @_;
 
@@ -29002,7 +29030,7 @@ package Sidef::Types::Number::Number {
     *is_pow           = \&is_power;
     *is_perfect_power = \&is_power;
 
-    sub power_count {    # OEIS: A069623
+    sub perfect_power_count {    # OEIS: A069623
         my ($n, $k) = @_;
 
         if (defined($k)) {
@@ -29029,8 +29057,6 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sub($r, $n, $r);
         bless \$r;
     }
-
-    *perfect_power_count = \&power_count;
 
     sub is_power_of {
         my ($n, $k) = @_;
