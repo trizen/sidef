@@ -351,7 +351,7 @@ Aliases: I<catalan_G>
 
 =head2 Y
 
-    Num.Y()
+    Num.Y
 
 Returns the Euler–Mascheroni constant: 0.5772156649...
 
@@ -1162,7 +1162,7 @@ Aliases: I<getbit>, I<testbit>
 
 =head2 bits
 
-    n.bits()
+    n.bits
 
 Returns the binary digits of C<n>.
 
@@ -2023,41 +2023,41 @@ Returns the sum of cubefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 cubeful
+=head2 cubefull
 
-    cubeful(n)
-    cubeful(a,b)
+    cubefull(n)
+    cubefull(a,b)
 
-Returns an array with the cubeful numbers <= C<n>, or in the range C<a..b>.
-
-=cut
-
-=head2 cubeful_count
-
-    cubeful_count(n)
-    cubeful_count(a,b)
-
-Returns the count of cubeful numbers <= C<n>, or in the range C<a..b>.
+Returns an array with the cubefull numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 cubeful_each
+=head2 cubefull_count
 
-    n.cubeful_each { ... }
-    cubeful_each(a, b, { ... })
+    cubefull_count(n)
+    cubefull_count(a,b)
 
-Iterates over the cubeful numbers <= C<n>, or in the range C<a..b>.
-
-Aliases: I<each_cubeful>
+Returns the count of cubefull numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 cubeful_sum
+=head2 cubefull_each
 
-    cubeful_sum(n)
-    cubeful_sum(a,b)
+    n.cubefull_each { ... }
+    cubefull_each(a, b, { ... })
 
-Returns the sum of cubeful numbers <= C<n>, or in the range C<a..b>.
+Iterates over the cubefull numbers <= C<n>, or in the range C<a..b>.
+
+Aliases: I<each_cubefull>
+
+=cut
+
+=head2 cubefull_sum
+
+    cubefull_sum(n)
+    cubefull_sum(a,b)
+
+Returns the sum of cubefull numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
@@ -2709,14 +2709,14 @@ Aliases: I<squarefree_strong_fermat_psp_each>
 
 =cut
 
-=head2 each_squareful
+=head2 each_squarefull
 
-    n.squareful_each { ... }
-    squareful_each(a, b, { ... })
+    n.squarefull_each { ... }
+    squarefull_each(a, b, { ... })
 
-Iterates over the squareful numbers <= C<n>, or in the range C<a..b>.
+Iterates over the squarefull numbers <= C<n>, or in the range C<a..b>.
 
-Aliases: I<squareful_each>
+Aliases: I<squarefull_each>
 
 =cut
 
@@ -3612,7 +3612,7 @@ Multiplicative inverse of C<n>: C<1/n>.
 
     n.inverse_phi
 
-Returns all the solutions C<x> to the Euler totient function: phi(x) = n.
+Returns all the solutions C<x> to the Euler totient function: C<phi(x) = n>.
 
 Aliases: I<inverse_totient>
 
@@ -3622,7 +3622,7 @@ Aliases: I<inverse_totient>
 
     n.inverse_phi_len
 
-Returns the number of solutions to the Euler totient function: phi(x) = n.
+Returns the number of solutions to the Euler totient function: C<phi(x) = n>.
 
 Equivalent with:
 
@@ -3636,7 +3636,7 @@ Aliases: I<inverse_totient_len>
 
     n.inverse_phi_max
 
-Returns the largest solution x to the Euler totient function: phi(x) = n.
+Returns the largest solution x to the Euler totient function: C<phi(x) = n>.
 
 Equivalent with:
 
@@ -3652,7 +3652,7 @@ Aliases: I<inverse_euler_phi_max>
 
     n.inverse_phi_min
 
-Returns the smallest solution x to the Euler totient function: phi(x) = n.
+Returns the smallest solution x to the Euler totient function: C<phi(x) = n>.
 
 Equivalent with:
 
@@ -3680,7 +3680,7 @@ Aliases: I<polygonal_inverse>
 
     n.inverse_psi
 
-Returns all the solutions C<x> to the Dedekin psi function: psi(x) = n.
+Returns all the solutions C<x> to the Dedekin psi function: C<psi(x) = n>.
 
     say inverse_psi(120)    #=> [75, 76, 87, 95]
 
@@ -3692,7 +3692,7 @@ Aliases: I<inverse_dedekind_psi>
 
     n.inverse_psi_len
 
-Returns the number of solutions to Dedekind's psi function: psi(x) = n.
+Returns the number of solutions to Dedekind's psi function: C<psi(x) = n>.
 
 Equivalent to C<n.inverse_psi.len>, but much faster.
 
@@ -3704,7 +3704,7 @@ Aliases: I<inverse_dedekind_psi_len>
 
     n.inverse_psi_max
 
-Returns the largest solution x to the Dedekind psi function: psi(x) = n.
+Returns the largest solution x to the Dedekind psi function: C<psi(x) = n>.
 
 Equivalent with:
 
@@ -3720,7 +3720,7 @@ Aliases: I<inverse_dedekind_psi_max>
 
     n.inverse_psi_min
 
-Returns the smallest solution x to the Dedekind psi function: psi(x) = n.
+Returns the smallest solution x to the Dedekind psi function: C<psi(x) = n>.
 
 Equivalent with:
 
@@ -3751,21 +3751,23 @@ Also works with arbitrary large integers:
 
     n.inverse_sigma_len(k=1)
 
-Returns the number of solutions to the sigma sum of divisors function: sigma_k(x) = n.
+Returns the number of solutions to the sigma sum of divisors function: C<sigma_k(x) = n>.
 
-Equivalent to C<n.inverse_sigma(k).len>, but much faster.
+Equivalent with:
+
+    n.inverse_sigma(k).len
 
 =cut
 
 =head2 inverse_sigma_max
 
-    n.inverse_sigma_max
+    n.inverse_sigma_max(k=1)
 
-Returns the largest solution x to the sum of divisors function: sigma(x) = n.
+Returns the largest solution x to the sum of divisors function: C<sigma_k(x) = n>.
 
 Equivalent with:
 
-    n.inverse_sigma.max
+    n.inverse_sigma(k).max
 
 Returns C<nil> if there are no solutions.
 
@@ -3773,13 +3775,13 @@ Returns C<nil> if there are no solutions.
 
 =head2 inverse_sigma_min
 
-    n.inverse_sigma_min
+    n.inverse_sigma_min(k=1)
 
-Returns the smallest solution x to the sum of divisors function: sigma(x) = n.
+Returns the smallest solution x to the sum of divisors function: C<sigma_k(x) = n>.
 
 Equivalent with:
 
-    n.inverse_sigma.min
+    n.inverse_sigma(k).min
 
 Returns C<nil> if there are no solutions.
 
@@ -3799,11 +3801,9 @@ Returns an array with all the solutions C<x> to C<uphi(x) = n>.
 
     n.inverse_usigma
 
-Returns an array with all the possible solutions for C<x> in usigma(x) = n.
+Returns an array with all the possible solutions C<x> to C<usigma(x) = n>.
 
     say inverse_usigma(120)                         #=> [60, 87, 92, 95, 99]
-    say inverse_usigma(5040).len                    #=> 38
-    say inverse_usigma(5040).map { .usigma }.uniq   #=> [5040]
 
 =cut
 
@@ -3919,7 +3919,7 @@ Equivalent with:
 
     n.is_abs_euler_psp
 
-Returns true if C<n> is an absolute Euler pseudoprime: p-1 | (n-1)/2 for every p|n, where C<n> is a squarefree composite integer.
+Returns true if C<n> is an absolute Euler pseudoprime: C<p-1 | (n-1)/2> for every C<p|n>, where C<n> is a squarefree composite integer.
 
     say 10.by { .is_abs_euler_psp }     #=> OEIS: A033181
 
@@ -3994,7 +3994,7 @@ Returns true if C<n> is a centered k-gonal number.
 
 =head2 is_chebyshev
 
-    n.is_chebyshev()
+    n.is_chebyshev
 
 Returns true if C<n> is an odd composite Chebyshev pseudoprime, as defined by OEIS A175530.
 
@@ -4061,9 +4061,9 @@ Returns true if C<n> is not divisible by any perfect cube > 1.
 
 =cut
 
-=head2 is_cubeful
+=head2 is_cubefull
 
-    n.is_cubeful
+    n.is_cubefull
 
 Returns true if C<n> is divisible by the cubes of all its prime factors.
 
@@ -4607,7 +4607,7 @@ Aliases: I<is_power>, I<is_perfect_power>
 
 =head2 is_practical
 
-    n.is_practical()
+    n.is_practical
 
 Returns true if C<n> is a practical number (OEIS: A005153).
 
@@ -4828,9 +4828,9 @@ Returns true if C<n> is a squarefree semiprime (i.e.: C<n = p*q>, where C<p> and
 
 =cut
 
-=head2 is_squareful
+=head2 is_squarefull
 
-    n.is_squareful
+    n.is_squarefull
 
 Returns true if C<n> is divisible by the squares of all its prime factors.
 
@@ -5016,7 +5016,7 @@ Alias: I<carmichael_lambda>.
 
 The Lambert-W function. When the value of C<x> is less than C<-1/e>, it returns a complex number.
 
-    It also accepts a complex number as input.
+It also accepts a complex number as input.
 
 Identities (assuming x>0):
 
@@ -5114,7 +5114,7 @@ Returns the logarithmic integral of x.
 
     li2(x)
 
-Dilogarithm function, defined as the integral of C<-log(1-t)/t> from 0 to x.
+Dilogarithm function, defined as the integral of C<-log(1-t)/t> from C<0> to C<x>.
 
 =cut
 
@@ -6720,7 +6720,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 =head2 primality_pretest
 
-    n.primality_pretest()
+    n.primality_pretest
 
 The method returns true when C<n> passes the internal primality pretest (when C<n> is large enough and it has no small factors).
 
@@ -7069,7 +7069,7 @@ Returns the
 
 =head2 primorial_deflation
 
-    n.primorial_deflation()
+    n.primorial_deflation
 
 Primorial deflation of C<n>, satisfying:
 
@@ -7083,7 +7083,7 @@ Defined as:
 
 =head2 primorial_inflation
 
-    n.primorial_inflation()
+    n.primorial_inflation
 
 Primorial inflation of C<n>.
 
@@ -8015,30 +8015,30 @@ Returns the number of unitary squarefree divisors of C<n>.
 
 =cut
 
-=head2 squareful
+=head2 squarefull
 
-    squareful(n)
-    squareful(a,b)
+    squarefull(n)
+    squarefull(a,b)
 
-Returns an array with the squareful numbers <= C<n>, or in the range C<a..b>.
-
-=cut
-
-=head2 squareful_count
-
-    squareful_count(n)
-    squareful_count(a,b)
-
-Returns the count of squareful numbers <= C<n>, or in the range C<a..b>.
+Returns an array with the squarefull numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 squareful_sum
+=head2 squarefull_count
 
-    squareful_sum(n)
-    squareful_sum(a,b)
+    squarefull_count(n)
+    squarefull_count(a,b)
 
-Returns the sum of squareful numbers <= C<n>, or in the range C<a..b>.
+Returns the count of squarefull numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 squarefull_sum
+
+    squarefull_sum(n)
+    squarefull_sum(a,b)
+
+Returns the sum of squarefull numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 

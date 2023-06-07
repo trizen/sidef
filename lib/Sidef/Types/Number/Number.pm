@@ -970,7 +970,8 @@ package Sidef::Types::Number::Number {
         if (CORE::length($n) >= SPECIAL_FACTORS_MIN and $SPECIAL_FACTORS) {
 
             if (_is_prob_prime($n, \%is_prob_prime_cache)) {
-                return (@factors, $n);
+                push @factors, $n;
+                return @factors;
             }
 
             local $SPECIAL_FACTORS = 0;
@@ -996,13 +997,15 @@ package Sidef::Types::Number::Number {
                   map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @special_factors;
             }
 
-            return (@factors, @special_factors);
+            push @factors, @special_factors;
+            return @factors;
         }
 
         if (CORE::length($n) >= FACTORDB_MIN and $USE_FACTORDB) {
 
             if (_is_prob_prime($n, \%is_prob_prime_cache)) {
-                return (@factors, $n);
+                push @factors, $n;
+                return @factors;
             }
 
             say "FactorDB: factoring $n" if $VERBOSE;
@@ -1079,7 +1082,8 @@ package Sidef::Types::Number::Number {
                         @factordb_factors = map { $_->[0] }
                           sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
                           map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @factordb_factors;
-                        return (@factors, @factordb_factors);
+                        push @factors, @factordb_factors;
+                        return @factors;
                     }
                 }
             }
@@ -1088,7 +1092,8 @@ package Sidef::Types::Number::Number {
         if (CORE::length($n) >= YAFU_MIN and $USE_YAFU) {
 
             if (_is_prob_prime($n, \%is_prob_prime_cache)) {
-                return (@factors, $n);
+                push @factors, $n;
+                return @factors;
             }
 
             say "YAFU: factoring $n" if $VERBOSE;
@@ -1175,19 +1180,20 @@ package Sidef::Types::Number::Number {
                     @yafu_factors = map { $_->[0] }
                       sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
                       map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @yafu_factors;
-                    return (@factors, @yafu_factors);
+                    push @factors, @yafu_factors;
+                    return @factors;
                 }
             }
         }
 
-        (
-         @factors,
-         (
-          (HAS_PRIME_UTIL and $n < ULONG_MAX)
-          ? Math::Prime::Util::factor($n)
-          : Math::Prime::Util::GMP::factor($n)
-         )
-        );
+        push @factors,
+          (
+            (HAS_PRIME_UTIL and $n < ULONG_MAX)
+            ? Math::Prime::Util::factor($n)
+            : Math::Prime::Util::GMP::factor($n)
+          );
+
+        return @factors;
     }
 
     # Prime factorization in [p,k] form, where k is the multiplicity of p.
@@ -25205,11 +25211,11 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@powerful);
     }
 
-    sub squareful {
+    sub squarefull {
         (TWO)->powerful(@_);
     }
 
-    sub cubeful {
+    sub cubefull {
         (THREE)->powerful(@_);
     }
 
@@ -25241,17 +25247,17 @@ package Sidef::Types::Number::Number {
 
     *each_powerful = \&powerful_each;
 
-    sub squareful_each {
+    sub squarefull_each {
         (TWO)->powerful_each(@_);
     }
 
-    *each_squareful = \&squareful_each;
+    *each_squarefull = \&squarefull_each;
 
-    sub cubeful_each {
+    sub cubefull_each {
         (THREE)->powerful_each(@_);
     }
 
-    *each_cubeful = \&cubeful_each;
+    *each_cubefull = \&cubefull_each;
 
     sub nth_powerful {
         my ($n, $k) = @_;
@@ -25347,6 +25353,7 @@ package Sidef::Types::Number::Number {
         if (0 and HAS_NEW_PRIME_UTIL and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
             # XXX: Out of memory for: omega_primes(12, 1e13)
+            # https://github.com/danaj/Math-Prime-Util/issues/67
             return Math::Prime::Util::omega_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
         }
         elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
@@ -28963,11 +28970,11 @@ package Sidef::Types::Number::Number {
         $_[0]->is_powerfree(THREE);
     }
 
-    sub is_cubeful {
+    sub is_cubefull {
         $_[0]->is_powerful(THREE);
     }
 
-    sub is_squareful {
+    sub is_squarefull {
         my ($n) = @_;
         $n->is_powerful;
     }
@@ -29139,11 +29146,11 @@ package Sidef::Types::Number::Number {
         bless \$count;
     }
 
-    sub squareful_count {
+    sub squarefull_count {
         (TWO)->powerful_count(@_);
     }
 
-    sub cubeful_count {
+    sub cubefull_count {
         (THREE)->powerful_count(@_);
     }
 
@@ -29203,11 +29210,11 @@ package Sidef::Types::Number::Number {
         bless \$sum;
     }
 
-    sub squareful_sum {
+    sub squarefull_sum {
         (TWO)->powerful_sum(@_);
     }
 
-    sub cubeful_sum {
+    sub cubefull_sum {
         (THREE)->powerful_sum(@_);
     }
 

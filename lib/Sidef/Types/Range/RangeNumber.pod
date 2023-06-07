@@ -155,25 +155,25 @@ Returns the
 
 =cut
 
-=head2 cubeful
+=head2 cubefull
 
-    self.cubeful
-
-Returns the
-
-=cut
-
-=head2 cubeful_count
-
-    self.cubeful_count
+    self.cubefull
 
 Returns the
 
 =cut
 
-=head2 cubeful_sum
+=head2 cubefull_count
 
-    self.cubeful_sum
+    self.cubefull_count
+
+Returns the
+
+=cut
+
+=head2 cubefull_sum
+
+    self.cubefull_sum
 
 Returns the
 
@@ -211,9 +211,9 @@ Returns the
 
 =cut
 
-=head2 each_cubeful
+=head2 each_cubefull
 
-    self.each_cubeful
+    self.each_cubefull
 
 Returns the
 
@@ -323,9 +323,9 @@ Returns the
 
 =cut
 
-=head2 each_squareful
+=head2 each_squarefull
 
-    self.each_squareful
+    self.each_squarefull
 
 Returns the
 
@@ -679,25 +679,25 @@ Returns the
 
 =cut
 
-=head2 squareful
+=head2 squarefull
 
-    self.squareful
-
-Returns the
-
-=cut
-
-=head2 squareful_count
-
-    self.squareful_count
+    self.squarefull
 
 Returns the
 
 =cut
 
-=head2 squareful_sum
+=head2 squarefull_count
 
-    self.squareful_sum
+    self.squarefull_count
+
+Returns the
+
+=cut
+
+=head2 squarefull_sum
+
+    self.squarefull_sum
 
 Returns the
 
