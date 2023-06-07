@@ -24011,7 +24011,7 @@ package Sidef::Types::Number::Number {
         $n eq '0' and return ZERO;
 
         if (HAS_NEW_PRIME_UTIL and $n < ULONG_MAX) {
-            return _set_int(1 << Math::Prime::Util::prime_omega($n));
+            return _set_int(1 << (Math::Prime::Util::prime_omega($n)));
         }
 
         my $r = Math::GMPz::Rmpz_init();
@@ -27917,6 +27917,19 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sub_ui($nm1, $n, 1);
 
         # Divisible by a small square
+        foreach my $k (3, 5, 7, 11, 13, 17, 19) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($n, $k)) {
+
+                if (Math::GMPz::Rmpz_divisible_ui_p($n, $k * $k)) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+
+                Math::GMPz::Rmpz_divisible_ui_p($nm1, $k - 1)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        # Check: p^(n-1) == 1 (mod n), for random primes p
         foreach my $k (1 .. 7) {
             my $p = _random_prime(CORE::int(CORE::sqrt(ULONG_MAX)));
             if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
@@ -28277,6 +28290,19 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_div_2exp($nm1d2, $nm1, 1);
 
         # Divisible by a small square
+        foreach my $k (3, 5, 7, 11, 13, 17, 19) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($n, $k)) {
+
+                if (Math::GMPz::Rmpz_divisible_ui_p($n, $k * $k)) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+
+                Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $k - 1)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        # Check: p^((n-1)/2) == +/-1 (mod n), for random primes p
         foreach my $k (1 .. 7) {
             my $p = _random_prime(CORE::int(CORE::sqrt(ULONG_MAX)));
             if (Math::GMPz::Rmpz_divisible_ui_p($n, $p)) {
