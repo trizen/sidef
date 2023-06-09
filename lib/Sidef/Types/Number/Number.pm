@@ -26929,14 +26929,6 @@ package Sidef::Types::Number::Number {
             goto &nan;
         };
 
-        if (HAS_NEW_PRIME_UTIL) {
-            ## XXX: dies for nth_almost_prime(41, 136192538)
-            my $r = eval { Math::Prime::Util::nth_almost_prime("$k", "$n") };
-            if ($r) {                                         # workaround for danaj/Math-Prime-Util #71
-                return _set_int("$r");
-            }
-        }
-
         my $min = Math::GMPz::Rmpz_init();
         my $max = Math::GMPz::Rmpz_init_set($n);
 
@@ -26946,6 +26938,13 @@ package Sidef::Types::Number::Number {
         while (__cmp__(${$k_obj->almost_prime_count(bless \$max)}, $n) < 0) {
             Math::GMPz::Rmpz_set($min, $max);
             Math::GMPz::Rmpz_mul_ui($max, $max, $k);
+        }
+
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($max)) {
+            my $r = eval { Math::Prime::Util::nth_almost_prime("$k", "$n") };
+            if ($r) {                                         # workaround for danaj/Math-Prime-Util #71
+                return _set_int("$r");
+            }
         }
 
         my $v     = Math::GMPz::Rmpz_init();
