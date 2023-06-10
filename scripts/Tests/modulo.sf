@@ -34,33 +34,43 @@ for n in (31..33, 63..65), k in (31..33, 63..65), m in (31..33, 63..65) {
 
     var a = irand(1 << n)*[1,-1].rand
     var b = irand(1 << k)*[1,-1].rand
-    var c = irand(1 << m)
+    var c = irand(1 << [k,n].rand)*[1,-1].rand
+    var M = irand(1 << m)
 
-    c || next
+    M || next
 
-    assert_eq(imod(a - b, c), (a - b) % c, [a,b,c])
-    assert_eq(imod(a - b, -c) % -c, (a - b) % -c, [a,b,-c])
+    assert_eq(imod(a - b, M),      (a - b) %  M, [a,b,M])
+    assert_eq(imod(a - b,-M) % -M, (a - b) % -M, [a,b,-M])
 
-    assert_eq(addmod(a, b, c), (a+b)%c, [a,b,c])
-    assert_eq(addmod(a, b, -c) % -c, (a+b) % -c, [a,b,-c])
+    assert_eq(addmod(a, b, M),      (a+b) %  M, [a,b,M])
+    assert_eq(addmod(a, b,-M) % -M, (a+b) % -M, [a,b,-M])
 
-    assert_eq(submod(a, b, c), (a-b)%c, [a,b,c])
-    assert_eq(submod(a, b, -c) % -c, (a-b) % -c, [a,b,-c])
+    assert_eq(submod(a, b, M),      (a-b) %  M, [a,b,M])
+    assert_eq(submod(a, b,-M) % -M, (a-b) % -M, [a,b,-M])
 
-    assert_eq(mulmod(a, b, c), (a*b) % c, [a,b,c])
-    assert_eq(mulmod(a, b, -c) % -c, (a*b) % -c, [a,b,-c])
+    assert_eq(mulmod(a, b, M),      (a*b) %  M, [a,b,M])
+    assert_eq(mulmod(a, b,-M) % -M, (a*b) % -M, [a,b,-M])
 
-    assert_eq(addmulmod(a, b, a, c), (a + a*b) % c, [a,b,c])
-    assert_eq(addmulmod(a, b, a, -c) % -c, (a + a*b) % -c, [a,b,-c])
+    assert_eq(addmulmod(a, b, c, M),      (a + b*c) %  M, [a,b,c,M])
+    assert_eq(addmulmod(a, b, c,-M) % -M, (a + b*c) % -M, [a,b,c,-M])
+
+    assert_eq(submulmod(a, b, c, M),      (a - b*c) %  M, [a,b,c,M])
+    assert_eq(submulmod(a, b, c,-M) % -M, (a - b*c) % -M, [a,b,c,-M])
+
+    assert_eq(muladdmod(a, b, c, M),      (a*b + c) %  M, [a,b,c,M])
+    assert_eq(muladdmod(a, b, c,-M) % -M, (a*b + c) % -M, [a,b,c,M])
+
+    assert_eq(mulsubmod(a, b, c, M),      (a*b - c) %  M, [a,b,c,M])
+    assert_eq(mulsubmod(a, b, c,-M) % -M, (a*b - c) % -M, [a,b,c,M])
 
     if (b != 0) {
         assert_eq([divmod(a,b)], [floor(a/b), a%b], [a,b])
         assert_eq([divmod(a,b)], [idiv(a,b), imod(a,b)], [a,b])
     }
 
-    if (b.is_coprime(c)) {
-        assert_eq(divmod(a, b, c), (a*invmod(b,c))%c, [a,b,c])
-        assert_eq(divmod(a, b, -c) % -c, (a*invmod(b,-c)) % -c, [a,b,-c])
+    if (b.is_coprime(M)) {
+        assert_eq(divmod(a, b, M), (a*invmod(b,M))%M, [a,b,M])
+        assert_eq(divmod(a, b, -M) % -M, (a*invmod(b,-M)) % -M, [a,b,-M])
     }
 }
 

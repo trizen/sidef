@@ -704,9 +704,9 @@ Modular integer addition: C<(a+b) % m>.
 
 =head2 addmulmod
 
-    addmulmod(x, y, z, m)
+    addmulmod(a, b, c, m)
 
-Modular operation: C<(x + y*z) % m>.
+Modular operation: C<(a + b*c) % m>.
 
 =cut
 
@@ -5534,6 +5534,14 @@ Returns the index of the most significant bit of C<n>.
 
 =cut
 
+=head2 muladdmod
+
+    muladdmod(a, b, c, m)
+
+Modular operation: C<(a*b + c) % m>.
+
+=cut
+
 =head2 mulmod
 
     mulmod(a,b,m)
@@ -5541,6 +5549,14 @@ Returns the index of the most significant bit of C<n>.
 Modular integer multiplication: C<(a*b) % m>.
 
     say mulmod(43, 97, 127)     # == (43*97)%127
+
+=cut
+
+=head2 mulsubmod
+
+    mulsubmod(a, b, c, m)
+
+Modular operation: C<(a*b - c) % m>.
 
 =cut
 
@@ -8196,6 +8212,14 @@ Number of derangements of a set with C<n> elements having exactly C<k> fixed poi
 Modular integer subtraction: C<(a-b) % m>.
 
     say submod(43, 97, 127)     #=> (43-97)%127
+
+=cut
+
+=head2 submulmod
+
+    submulmod(a, b, c, m)
+
+Modular operation: C<(a - b*c) % m>.
 
 =cut
 

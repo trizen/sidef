@@ -3172,6 +3172,34 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub submulmod {
+        my ($x, $y, $z, $m) = @_;
+
+        _valid(\$y, \$z, \$m);
+
+        $x = $$x;
+        $y = $$y;
+        $z = $$z;
+        $m = $$m;
+
+        if (HAS_NEW_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
+            my $r = Math::Prime::Util::submod($x, Math::Prime::Util::mulmod($y, $z, $m), $m);
+            return bless \$r;
+        }
+
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $z = _any2mpz($z) // goto &nan;
+        $m = _any2mpz($m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init_set($x);
+        Math::GMPz::Rmpz_submul($r, $y, $z);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        bless \$r;
+    }
+
     sub submod {
         my ($x, $y, $m) = @_;
 
@@ -3224,6 +3252,63 @@ package Sidef::Types::Number::Number {
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mul($r, $x, $y);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        bless \$r;
+    }
+
+    sub muladdmod {
+        my ($x, $y, $z, $m) = @_;
+
+        _valid(\$y, \$z, \$m);
+
+        $x = $$x;
+        $y = $$y;
+        $z = $$z;
+        $m = $$m;
+
+        if (HAS_NEWER_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
+            my $r = Math::Prime::Util::muladdmod($x, $y, $z, $m);
+            return bless \$r;
+        }
+
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $z = _any2mpz($z) // goto &nan;
+        $m = _any2mpz($m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init_set($z);
+        Math::GMPz::Rmpz_addmul($r, $x, $y);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        bless \$r;
+    }
+
+    sub mulsubmod {
+        my ($x, $y, $z, $m) = @_;
+
+        _valid(\$y, \$z, \$m);
+
+        $x = $$x;
+        $y = $$y;
+        $z = $$z;
+        $m = $$m;
+
+        if (HAS_NEWER_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
+            my $r = Math::Prime::Util::mulsubmod($x, $y, $z, $m);
+            return bless \$r;
+        }
+
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $z = _any2mpz($z) // goto &nan;
+        $m = _any2mpz($m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init_set($z);
+        Math::GMPz::Rmpz_neg($r, $r);
+        Math::GMPz::Rmpz_addmul($r, $x, $y);
         Math::GMPz::Rmpz_mod($r, $r, $m);
         bless \$r;
     }
@@ -26942,7 +27027,7 @@ package Sidef::Types::Number::Number {
 
         if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($max)) {
             my $r = eval { Math::Prime::Util::nth_almost_prime("$k", "$n") };
-            if ($r) {                                         # workaround for danaj/Math-Prime-Util #71
+            if ($r) {    # workaround for danaj/Math-Prime-Util #71
                 return _set_int("$r");
             }
         }
