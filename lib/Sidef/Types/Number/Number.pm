@@ -3313,6 +3313,68 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub muladdmulmod {
+        my ($w, $x, $y, $z, $m) = @_;
+
+        _valid(\$x, \$y, \$z, \$m);
+
+        $w = $$w;
+        $x = $$x;
+        $y = $$y;
+        $z = $$z;
+        $m = $$m;
+
+        if (HAS_NEWER_PRIME_UTIL and !ref($m) and $m > 0 and !ref($w) and !ref($x) and !ref($y) and !ref($z)) {
+            my $r = Math::Prime::Util::muladdmod($w, $x, Math::Prime::Util::mulmod($y, $z, $m), $m);
+            return bless \$r;
+        }
+
+        $w = _any2mpz($w) // goto &nan;
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $z = _any2mpz($z) // goto &nan;
+        $m = _any2mpz($m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $w, $x);
+        Math::GMPz::Rmpz_addmul($r, $y, $z);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        bless \$r;
+    }
+
+    sub mulsubmulmod {
+        my ($w, $x, $y, $z, $m) = @_;
+
+        _valid(\$x, \$y, \$z, \$m);
+
+        $w = $$w;
+        $x = $$x;
+        $y = $$y;
+        $z = $$z;
+        $m = $$m;
+
+        if (HAS_NEWER_PRIME_UTIL and !ref($m) and $m > 0 and !ref($w) and !ref($x) and !ref($y) and !ref($z)) {
+            my $r = Math::Prime::Util::mulsubmod($w, $x, Math::Prime::Util::mulmod($y, $z, $m), $m);
+            return bless \$r;
+        }
+
+        $w = _any2mpz($w) // goto &nan;
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $z = _any2mpz($z) // goto &nan;
+        $m = _any2mpz($m) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $w, $x);
+        Math::GMPz::Rmpz_submul($r, $y, $z);
+        Math::GMPz::Rmpz_mod($r, $r, $m);
+        bless \$r;
+    }
+
     #
     ## Integer operations
     #
@@ -28017,17 +28079,6 @@ package Sidef::Types::Number::Number {
         # Small or even
         Math::GMPz::Rmpz_odd_p($n)            or return Sidef::Types::Bool::Bool::FALSE;
         Math::GMPz::Rmpz_cmp_ui($n, 561) >= 0 or return Sidef::Types::Bool::Bool::FALSE;
-
-        # If n is large enough, Math::Prime::Util::GMP::is_carmichael() uses a probable test.
-        # Incorrect for some inputs: https://github.com/danaj/Math-Prime-Util-GMP/issues/34
-        if (0 and Math::GMPz::Rmpz_sizeinbase($n, 10) > 50) {
-            my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
-            return (
-                    Math::Prime::Util::GMP::is_carmichael($nstr)
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
-        }
 
         state $nm1 = Math::GMPz::Rmpz_init_nobless();
         state $pm1 = Math::GMPz::Rmpz_init_nobless();

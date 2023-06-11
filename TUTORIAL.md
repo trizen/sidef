@@ -1176,10 +1176,10 @@ say lzsplit('-')        #=> ["A", "B", "C"]
 This concept can also be used to create partial virtual functions:
 
 ```ruby
-var add1 = 1.method('+')
-var eqv2 = 2.method('==')
+var add10   = 10.method('+')
+var isprime = Num.method(:is_prime)
 
-say (1..100 -> map{ add1(_) }.grep{ eqv2(_) })    #=> [2]
+say (1..10 -> map(add10).grep(isprime))   #=> [11, 13, 17, 19]
 ```
 
 # Method introspection

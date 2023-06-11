@@ -5542,6 +5542,14 @@ Modular operation: C<(a*b + c) % m>.
 
 =cut
 
+=head2 muladdmulmod
+
+    muladdmulmod(a, b, c, d, m)
+
+Modular operation: C<(a*b + c*d) % m>.
+
+=cut
+
 =head2 mulmod
 
     mulmod(a,b,m)
@@ -5557,6 +5565,14 @@ Modular integer multiplication: C<(a*b) % m>.
     mulsubmod(a, b, c, m)
 
 Modular operation: C<(a*b - c) % m>.
+
+=cut
+
+=head2 mulsubmulmod
+
+    mulsubmulmod(a, b, c, d, m)
+
+Modular operation: C<(a*b - c*d) % m>.
 
 =cut
 
