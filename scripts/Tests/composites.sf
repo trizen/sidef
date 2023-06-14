@@ -115,6 +115,6 @@ for n in (1..8) {
     }
 }
 
-assert_eq(3000.of{.nth_composite}.ft(1), 3000.dec.by{.is_composite})
+assert_eq(3000.of{.nth_composite}.slice(1), 3000.dec.by{.is_composite})
 
 say "** Test passed!"

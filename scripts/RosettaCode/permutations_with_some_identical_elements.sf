@@ -17,7 +17,7 @@ func next_unique_perm (array) {
     return (array.flip, false) if (i == -1)
 
     if (array[i+1] > array[k]) {
-        array = [array.slice(0, i)..., array.slice(i+1, k).flip...]
+        array = [array.slice(0, i+1)..., array.slice(i+1, k+1).flip...]
     }
 
     var j = i+1

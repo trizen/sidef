@@ -35,7 +35,7 @@ class SmartWordWrap {
 
             root << [
                 array.first(i+1).join(' '),
-                self.prepare_words(array.ft(i+1), depth+1, callback)
+                self.prepare_words(array.slice(i+1), depth+1, callback)
             ]
 
             if (depth.is_zero) {
@@ -83,7 +83,7 @@ class SmartWordWrap {
         self.prepare_words(words, callback: { |path|
             self.combine([], path, { |combination|
                 var score = 0
-                combination.ft(0, -2).each { |line|
+                combination.slice(0, -1).each { |line|
                     score += (width - line.len -> sqr)
                 }
 

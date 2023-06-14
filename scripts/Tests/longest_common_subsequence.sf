@@ -7,8 +7,8 @@
 func lcs(String xstr, String ystr) is cached -> String {
     (xstr.is_empty || ystr.is_empty) && return '';
 
-    var(x, xs, y, ys) = (xstr.first, xstr.ft(1),
-                         ystr.first, ystr.ft(1));
+    var(x, xs, y, ys) = (xstr.first, xstr.slice(1),
+                         ystr.first, ystr.slice(1));
 
     if (x == y) {
         x + lcs(xs, ys)

@@ -705,22 +705,6 @@ Returns the
 
 =cut
 
-=head2 ft
-
-    str.ft(from, to)
-    str.slice(from, to)
-
-Returns a substring of the input string that starts at the specified C<from> index and ends at the specified C<to> index.
-
-Parameters:
-
-    from : An integer that represents the index at which to start the substring.
-    to   : An integer that represents the index at which to end the substring.
-
-Aliases: I<slice>
-
-=cut
-
 =head2 gesub
 
     self.gesub(regex, block)
@@ -1345,6 +1329,23 @@ Returns the SHA-512 digest for the given string in hexadecimal form.
 
 =cut
 
+=head2 slice
+
+    str.slice(offset)
+    str.slice(offset, length)
+
+Extracts a substring out of the self-string and returns it. First character is at offset zero.
+
+If C<offset> is negative, starts that far back from the end of the string.
+
+If C<length> is omitted, returns everything through the end of the string.
+
+If C<length> is negative, leaves that many characters off the end of the string.
+
+Aliases: I<substr>, I<substring>
+
+=cut
+
 =head2 slices
 
     str.slices(n)
@@ -1384,16 +1385,6 @@ Returns the
 Returns the
 
 Aliases: I<replace>
-
-=cut
-
-=head2 substr
-
-    self.substr(offs, len)
-
-Returns the
-
-Aliases: I<substring>
 
 =cut
 

@@ -429,31 +429,7 @@ package Sidef::Types::String::String {
     }
 
     *substring = \&substr;
-
-    sub ft {
-        my ($self, $from, $to) = @_;
-
-        my $max = CORE::length($$self);
-
-        $from = defined($from) ? CORE::int($from) : 0;
-        $to   = defined($to)   ? CORE::int($to)   : $max;
-
-        if (abs($from) > $max) {
-            return state $x = bless \(my $str = '');
-        }
-
-        if ($to < 0) {
-            $to += $max;
-        }
-
-        if ($from < 0) {
-            $from += $max;
-        }
-
-        __PACKAGE__->new($to < $from ? '' : CORE::substr($$self, $from, $to - $from + 1));
-    }
-
-    *slice = \&ft;
+    *slice     = \&substr;
 
     sub insert {
         my ($self, $string, $pos, $len) = @_;

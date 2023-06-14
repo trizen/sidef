@@ -2,9 +2,9 @@
 
 # Tests for some Number methods of the form nth_*.
 
-assert_eq(300.of{.nth_semiprime}.ft(1), 300.dec.by{.is_semiprime})
-assert_eq(300.of{.nth_prime_power}.ft(1), 300.dec.by{.is_prime_power})
-assert_eq(300.of{.nth_prime}.ft(1), 300.dec.by{.is_prime})
+assert_eq(300.of{.nth_semiprime}.slice(1), 300.dec.by{.is_semiprime})
+assert_eq(300.of{.nth_prime_power}.slice(1), 300.dec.by{.is_prime_power})
+assert_eq(300.of{.nth_prime}.slice(1), 300.dec.by{.is_prime})
 
 assert_eq(nth_almost_prime(500, 500), 487939787489518647498841089183363998627293204988294345182353119556829944026571800837287448137330088425304046352764423084811447303871041402011783643791360)
 
@@ -25,17 +25,17 @@ assert_eq(
 
 for k in (1..5) {
     assert_eq(
-        20.of { nth_almost_prime(_, k) }.ft(1),
+        20.of { nth_almost_prime(_, k) }.slice(1),
         19.by { .is_almost_prime(k) }
     )
 
     assert_eq(
-        20.of { nth_squarefree_almost_prime(_, k) }.ft(1),
+        20.of { nth_squarefree_almost_prime(_, k) }.slice(1),
         19.by { .is_almost_prime(k) && .is_squarefree }
     )
 
     assert_eq(
-        20.of { nth_omega_prime(_, k) }.ft(1),
+        20.of { nth_omega_prime(_, k) }.slice(1),
         19.by { .is_omega_prime(k) }
     )
 

@@ -1010,16 +1010,6 @@ Returns the
 
 =cut
 
-=head2 ft
-
-    self.ft
-
-Returns the
-
-Aliases: I<slice>
-
-=cut
-
 =head2 gauss_jordan_invert
 
     self.gauss_jordan_invert
@@ -1981,6 +1971,21 @@ Returns the
     self.shuffle
 
 Returns the
+
+=cut
+
+=head2 slice
+
+    arr.slice(offset)
+    arr.slice(offset, length)
+
+Extracts a slice out of the self-array and returns it. First entry is at offset zero.
+
+If C<offset> is negative, starts that far back from the end of the array.
+
+If C<length> is omitted, returns everything through the end of the array.
+
+If C<length> is negative, leaves that many entries off the end of the array.
 
 =cut
 

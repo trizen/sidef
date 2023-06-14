@@ -3,7 +3,7 @@
 var code = { |*words|
 
     var chr = words[0].last;
-    words.ft(1).each { |word|
+    words.slice(1).each { |word|
         word.first == chr || goto :END;
         chr = word.last;
     }

@@ -31,7 +31,7 @@ class SmartWordWrap(WIDTH=80) {
                 break;
             );
 
-            root.append(array.ft(0, i) + __METHOD__(self, array.ft(i + 1, array.end)));
+            root.append(array.slice(0, i+1) + __METHOD__(self, array.slice(i + 1, array.end)));
             (++len >= self.WIDTH) && break;
         }
 
@@ -164,3 +164,4 @@ var words = %w(aaa bb cc ddddd);
 var wrapped = sww.wrap(words);
 
 say wrapped;
+assert_eq(wrapped, "aaa\nbb cc\nddddd")

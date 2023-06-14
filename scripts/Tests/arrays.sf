@@ -136,4 +136,21 @@ assert([false].none)
 assert([false, false].none)
 assert([].none)
 
+# Tests for Array .slice(i,j) method.
+
+for k in (0..100) {
+
+    var arr = k.of { urand(65, 65+25).chr }
+
+    var i = arr.len.sqr.urand
+    var j = arr.len.sqr.urand
+
+    var str = arr.join
+
+    assert_eq(arr.slice( i, j).join, str.substr( i, j), [str,  i,  j])
+    assert_eq(arr.slice( i,-j).join, str.substr( i,-j), [str,  i, -j])
+    assert_eq(arr.slice(-i,-j).join, str.substr(-i,-j), [str, -i, -j])
+    assert_eq(arr.slice(-i, j).join, str.substr(-i, j), [str, -i,  j])
+}
+
 say "** Test passed!"

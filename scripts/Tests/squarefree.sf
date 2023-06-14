@@ -152,6 +152,6 @@ for n in (1..8), k in (2..15 -> map{|b| b**n }) {
     assert_eq(t.squarefree_count, k)
 }
 
-assert_eq(3000.of{.nth_squarefree}.ft(1), 3000.dec.by{.is_squarefree})
+assert_eq(3000.of{.nth_squarefree}.slice(1), 3000.dec.by{.is_squarefree})
 
 say "** Test passed!"

@@ -13,8 +13,8 @@ func merge(left, right) {
         array << (left[i] <= right[j] ? left[i++] : right[j++]);
     }
 
-    array += left.ft(i);
-    array += right.ft(j);
+    array += left.slice(i);
+    array += right.slice(j);
 
     return array;
 }

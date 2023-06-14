@@ -1306,34 +1306,39 @@ package Sidef::Types::Array::Array {
 
         my $max = @$self;
 
-        $from = defined($from) ? CORE::int($from) : 0;
-        $to   = defined($to)   ? CORE::int($to)   : $max - 1;
-
-        if (abs($from) > $max) {
+        if ($max == 0) {
             return;
         }
+
+        $from = defined($from) ? CORE::int($from) : 0;
+        $to   = defined($to)   ? CORE::int($to)   : $max;
 
         if ($from < 0) {
             $from += $max;
         }
 
         if ($to < 0) {
-            $to += $max;
+            $to += $max - 1;
+        }
+        else {
+            $to += $from - 1;
         }
 
         if ($to >= $max) {
             $to = $max - 1;
         }
 
+        if ($from < 0) {
+            $from = 0;
+        }
+
         @$self[$from .. $to];
     }
 
-    sub ft {
+    sub slice {
         my ($self) = @_;
         bless [_slice(@_)];
     }
-
-    *slice = \&ft;
 
     sub each {
         my ($self, $block) = @_;

@@ -7,7 +7,7 @@
 #
 func horner_rec(coeff, x) {
     coeff.len > 0 ? (
-        coeff[0] + x*horner_rec(coeff.ft(1), x)
+        coeff[0] + x*horner_rec(coeff.slice(1), x)
     ) : 0
 }
 

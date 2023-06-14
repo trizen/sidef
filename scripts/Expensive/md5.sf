@@ -88,7 +88,7 @@ class MD5(String msg) {
         var H = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476]
 
         for i in (^M `by` 16) {
-            md5_block(H, M.ft(i, i+15))
+            md5_block(H, M.slice(i, 16))
         }
 
         little_endian(8, 4, H)

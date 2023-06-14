@@ -20,7 +20,7 @@ for (var i = 0; true; i++) {
 
     arr.push(fib(i) % srt);
 
-    arr.ft(-2) == [0,1] && (
+    arr.slice(-2) == [0,1] && (
         fmt.printf(srt, fib(srt), arr.len-1);
         srt >= max && break; arr=[]; i = 0; srt++;
     );

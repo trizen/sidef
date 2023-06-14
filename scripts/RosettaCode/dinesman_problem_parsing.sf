@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Dinesman%27s_multiple-dwelling_problem
+## https://rosettacode.org/wiki/Dinesman%27s_multiple-dwelling_problem
 #
 
 func dinesman(problem) {
@@ -15,7 +15,7 @@ func dinesman(problem) {
   var re_keywords = Regex(words.join('|'))
 
   # Build an array of lambda's
-  var predicates = lines.ft(1, lines.end-1).map{ |line|
+    var predicates = lines.slice(1,-1).map{ |line|
     var keywords = line.scan(re_keywords)
     var (name1, name2) = line.scan(re_names)...
 

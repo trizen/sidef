@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-func p (n, a, l) { n>0 ? (l.range.map{p(n-1, a+[l[_]], l.ft(_))}) : a };
+func p (n, a, l) { n>0 ? (l.range.map{p(n-1, a+[l[_]], l.slice(_))}) : a };
 func f (n)       { n>0 ? (n * f(n - 1)) : 1 };
 func n (n, m)    { f(n + m - 1) / f(n) / f(m - 1) };
 

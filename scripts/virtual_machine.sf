@@ -34,7 +34,7 @@ class VM {
 
     method trace {
         var op = ops{code[pc]};
-        var args = code.ft(pc+1, pc + op.nargs);
+        var args = code.slice(pc+1, op.nargs);
         printf("%04d:%-10s%20s%40s\n", pc, op.name, args, stack);
     }
 

@@ -77,9 +77,9 @@ do {
     }
 }
 
-assert_eq(3000.of{.nth_powerfree(2)}.ft(1), 3000.dec.by{.is_powerfree(2)})
-assert_eq(3000.of{.nth_powerfree(3)}.ft(1), 3000.dec.by{.is_powerfree(3)})
-assert_eq(3000.of{.nth_powerfree(4)}.ft(1), 3000.dec.by{.is_powerfree(4)})
+assert_eq(3000.of{.nth_powerfree(2)}.slice(1), 3000.dec.by{.is_powerfree(2)})
+assert_eq(3000.of{.nth_powerfree(3)}.slice(1), 3000.dec.by{.is_powerfree(3)})
+assert_eq(3000.of{.nth_powerfree(4)}.slice(1), 3000.dec.by{.is_powerfree(4)})
 
 do {
     func non_powerfree(A, B, k=1) {

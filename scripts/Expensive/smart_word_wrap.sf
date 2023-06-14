@@ -34,7 +34,7 @@ class SmartWordWrap(width=80) {
 
             root << [
                 array.first(i+1).join(' '),
-                self.prepare_words(array.ft(i+1))
+                self.prepare_words(array.slice(i+1))
             ]
             break if (++len >= width)
         }

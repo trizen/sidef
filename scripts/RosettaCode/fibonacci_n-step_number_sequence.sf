@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Fibonacci_n-step_number_sequences
+## https://rosettacode.org/wiki/Fibonacci_n-step_number_sequences
 #
 
 func fib(n, xs=[1]) {
@@ -10,7 +10,7 @@ func fib(n, xs=[1]) {
     loop {
         var len = xs.len;
         len >= 20 && break;
-        xs.append(xs.ft(0.max(len - n), len-1).sum);
+        xs.append(xs.slice(0 `max` len-n, len).sum);
     }
 
     xs;

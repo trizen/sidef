@@ -29,12 +29,12 @@ func abbrev(array, code=nil) {
             __FUNC__(hash{key});
 
             if (keys.len > 1) {
-                var count = 1;
+                var count = 0;
                 var ref = hash.delete(key);
                 while (var key = ref.keys[0]) {
                     key.is_a(String) || next;
                     key == END && do {
-                        var arr = ref{key}.ft(0, -count);
+                        var arr = ref{key}.flip.slice(count).flip;
                         CALL ? code.call(arr) : abbrevs.append(arr);
                         break;
                     };
@@ -73,4 +73,9 @@ var words = %w(
     jaguar
 );
 
-abbrev(words.map{.split(1)}, func(a) { say a.join });
+assert_eq(
+    gather {
+        abbrev(words.map{.split(1)}, func(a) { say take(a.join) });
+    },
+    %w(deca decora deco deo j pla plecar plecat)
+)

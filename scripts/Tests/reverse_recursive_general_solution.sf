@@ -10,7 +10,7 @@ func reverse (data) {
 
     # Cut the last item from data
     var last = data.last;
-    data = data.ft!(0, -2);
+    data = data.slice!(0, -1);
 
     # Append it to our reversed object
     rev.append!(last);
@@ -22,7 +22,6 @@ func reverse (data) {
 
     return rev;
 }
-
 
 # String
 say reverse('abc').dump;
@@ -36,3 +35,6 @@ say reverse(%w(a b c)).dump;
 
 # Array (built-in)
 say %w(a b c).reverse.dump;
+
+assert_eq(reverse('abc'), 'abc'.reverse)
+assert_eq(reverse(%w(a b c)), %w(a b c).reverse)

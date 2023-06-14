@@ -136,6 +136,7 @@ package Sidef::Optimizer {
                       to
                       downto
 
+                      pack
                       concat
                       prepend
 
@@ -236,6 +237,7 @@ package Sidef::Optimizer {
                       div
                       repeat
                       char
+                      slice
 
                       sprintf
                       sprintlnf
@@ -263,6 +265,15 @@ package Sidef::Optimizer {
                 map { [$_, [table(STRING), table(STRING), table(STRING)]] } methods(
                     STRING, qw(
                       tr
+                      )
+                )
+            ),
+
+            # String.method(Number, Number)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    STRING, qw(
+                      slice
                       )
                 )
             ),
@@ -799,7 +810,7 @@ package Sidef::Optimizer {
                       first
                       last
                       item
-                      ft
+                      slice
 
                       sum
                       prod

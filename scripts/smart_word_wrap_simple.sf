@@ -30,8 +30,7 @@ class SmartWordWrap(WIDTH=80) {
                 break;
             );
 
-            root.append(Hash.new(array.ft(0, i).join(" ")
-                => self.prepare_words(array.ft(i + 1, array.end))));
+            root.append(Hash(array.slice(0, i+1).join(" ") => self.prepare_words(array.slice(i+1))))
             ++len >= WIDTH && break;
         }
 

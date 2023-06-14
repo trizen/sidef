@@ -8,7 +8,7 @@ func cycle_sort (array) {
     var (writes=0, pos=0)
 
     func f(cycle_start, Ref item, bool=false) {
-        pos = (cycle_start + array.ft(cycle_start+1).count{ _ < *item })
+        pos = (cycle_start + array.slice(cycle_start+1).count{ _ < *item })
         return(false) if (bool && pos==cycle_start)
         while (*item == array[pos]) { ++pos }
         (array[pos], *item) = (*item, array[pos])

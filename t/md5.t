@@ -95,7 +95,7 @@ class MD5(String msg) {
         var H = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476]
 
         for i in (range(0, M.end, 16)) {
-            md5_block(H, M.ft(i, i+15))
+            md5_block(H, M.slice(i, 16))
         }
 
         little_endian(8, 4, H)
@@ -134,9 +134,9 @@ my @md5 = qw(
   c3fcd3d76192e4007dfb496cca67e13b
   d174ab98d277d9f5a5611c2c9f419d9f
   57edf4a22be3c955ac49da2e2107b67a
-  );
+);
 
-my $sidef = Sidef->new(name => "md5");
+my $sidef  = Sidef->new(name => "md5");
 my $result = $sidef->execute_code($code);
 
 foreach my $md5 (split(' ', "$result")) {
