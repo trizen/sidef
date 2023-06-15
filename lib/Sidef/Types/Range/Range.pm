@@ -430,6 +430,16 @@ package Sidef::Types::Range::Range {
 
     *to_a = \&to_array;
 
+    sub sort {
+        my ($self, $block) = @_;
+        $self->to_array->sort($block);
+    }
+
+    sub sort_by {
+        my ($self, $block) = @_;
+        $self->to_array->sort_by($block);
+    }
+
     sub to_vector {
         my ($self) = @_;
         $self->to_a->to_v;

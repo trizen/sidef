@@ -429,6 +429,22 @@ Aliases: I<map_slice>
 
 =cut
 
+=head2 sort
+
+    self.sort(block)
+
+Returns the
+
+=cut
+
+=head2 sort_by
+
+    self.sort_by(block)
+
+Returns the
+
+=cut
+
 =head2 step
 
     self.step
