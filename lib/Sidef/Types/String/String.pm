@@ -872,6 +872,13 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new([map { bless \$_ } CORE::split(//, $$self)]);
     }
 
+    sub code_points {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Number::Number::_set_int($_) } unpack('C*', $$self)]);
+    }
+
+    *codes = \&code_points;
+
     sub iter {
         my ($self) = @_;
 

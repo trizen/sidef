@@ -32,7 +32,9 @@ func my_pp_count(a, b) {
         return 0
     }
 
-    return (%S<ntheory>.prime_power_count(b) - %S<ntheory>.prime_power_count(a-1))
+    with (try { %S<ntheory>.prime_power_count(b) - %S<ntheory>.prime_power_count(a-1) }) {|v|
+        return v
+    }
 
     if (a == 2) {
         return sum(1..b.ilog2, {|k|

@@ -377,9 +377,11 @@ Aliases: I<char_at>
 
 =head2 chars
 
-    self.chars
+    str.chars
 
-Returns the
+Convert a string into an Array of characters.
+
+    say "foo".chars     #=> ["f", "o", "o"]
 
 =cut
 
@@ -404,6 +406,19 @@ Returns the
     self.clear
 
 Returns the
+
+=cut
+
+=head2 codes
+
+    str.codes
+
+Convert a string into an Array of code points.
+
+    say "foo".codes   #=> [102, 111, 111]
+    say "€".codes     #=> [8364]
+
+Aliases: I<code_points>
 
 =cut
 
