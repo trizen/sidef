@@ -14803,7 +14803,9 @@ package Sidef::Types::Number::Number {
 
                 if (defined($count)) {
                     chomp $count;
-                    return $count;
+                    if ($count) {    # make sure count is not zero
+                        return $count;
+                    }
                 }
             }
         }
@@ -16224,7 +16226,9 @@ package Sidef::Types::Number::Number {
                 my $p = `primecount -n $n`;
                 if (defined($p)) {
                     chomp($p);
-                    return _set_int($p);
+                    if ($p) {    # make sure p is not zero
+                        return _set_int($p);
+                    }
                 }
             }
 
