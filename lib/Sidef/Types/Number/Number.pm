@@ -163,7 +163,14 @@ package Sidef::Types::Number::Number {
                 return bless \$r;
             }
             else {
-                return bless \(eval { Math::GMPz::Rmpz_init_set_str($num, $int_base) } // goto &nan);
+                state $t = Math::GMPz::Rmpz_init_nobless();
+                eval { Math::GMPz::Rmpz_set_str($t, $num, $int_base) };
+                $@ && goto &nan;
+                my $r =
+                    Math::GMPz::Rmpz_fits_ulong_p($t) ? Math::GMPz::Rmpz_get_ui($t)
+                  : Math::GMPz::Rmpz_fits_slong_p($t) ? Math::GMPz::Rmpz_get_si($t)
+                  :                                     Math::GMPz::Rmpz_init_set($t);
+                return bless \$r;
             }
         }
 
@@ -18397,11 +18404,10 @@ package Sidef::Types::Number::Number {
                 if (($bigomega == 0 and $j >= 7) or $j >= 8) {
 
                     my @special_factors = @{(bless \$n)->special_factors(($j <= 8) ? ONE : TWO)};
-                    my @gcd_factors     = @{
-                        (bless \$n)->gcd_factors(
-                                        Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)])
-                        )
-                    };
+                    my @gcd_factors =
+                      @{(bless \$n)
+                        ->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)]))
+                       };
 
                     if (scalar(@gcd_factors) > $k) {
                         return Sidef::Types::Bool::Bool::FALSE;
@@ -18654,11 +18660,10 @@ package Sidef::Types::Number::Number {
                 if (($omega == 0 and $j >= 7) or $j >= 8) {
 
                     my @special_factors = @{(bless \$n)->special_factors(($j <= 8) ? ONE : TWO)};
-                    my @gcd_factors     = @{
-                        (bless \$n)->gcd_factors(
-                                        Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)])
-                        )
-                    };
+                    my @gcd_factors =
+                      @{(bless \$n)
+                        ->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)]))
+                       };
 
                     my @prime_factors;
                     my @composite_factors;
@@ -26530,7 +26535,7 @@ package Sidef::Types::Number::Number {
                                                                   )
                                                 );
                                     Math::GMPz::Rmpz_divisible_ui_p($u, $order);
-                                }
+                                  }
                                 : die "bug"
                               ) {
                                 push @almost_primes,
