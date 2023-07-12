@@ -6,6 +6,7 @@
 #   17 feb 2023: 4.385s +/- 0.1
 #   23 feb 2023: 3.913s
 #   04 mar 2023: 3.635s
+#   13 jul 2023: 3.364s
 
 func A242786(n) {
     for (var p = 2; true; p.next_prime!) {
@@ -20,7 +21,7 @@ assert_eq(
     %n[2, 3, 3, 43, 7, 41, 23, 643, 17, 557, 251],
 )
 
-#assert_eq(A242786(21), 1151)
+assert_eq(A242786(21), 1151)
 
 func A241793(n) {
     for k in (1..Inf) {
@@ -56,11 +57,8 @@ assert_eq(
 func A280005(n) {
     for(var p = 2; true; p.next_prime!) {
         var v = (p**n + 1)
-        v.is_prob_squarefree(1e4) || next
-        v.is_almost_prime(n) || next
-        if (v.is_squarefree) {
-            return p
-        }
+        v.is_squarefree_almost_prime(n) || next
+        return p
     }
 }
 
@@ -72,11 +70,8 @@ assert_eq(
 func A281940(n) {
     for k in (1..Inf) {
         var v = (k**n + 1)
-        v.is_prob_squarefree(1e4) || next
-        v.is_almost_prime(n) || next
-        if (v.is_squarefree) {
-            return k
-        }
+        v.is_squarefree_almost_prime(n) || next
+        return k
     }
 }
 

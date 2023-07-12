@@ -18401,9 +18401,9 @@ package Sidef::Types::Number::Number {
                 last if (($j >= 8) && ($r_size <= 200));    # <= 60 digits
 
                 # Try to find special factors
-                if (($bigomega == 0 and $j >= 7) or $j >= 8) {
+                if ($j >= 6) {
 
-                    my @special_factors = @{(bless \$n)->special_factors(($j <= 8) ? ONE : TWO)};
+                    my @special_factors = @{(bless \$n)->special_factors(_set_int($j - 6))};
                     my @gcd_factors =
                       @{(bless \$n)
                         ->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)]))
@@ -18455,7 +18455,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                       or return Sidef::Types::Bool::Bool::FALSE;
 
-                    if (    $j == 8
+                    if (    $j <= 8
                         and @composite_factors
                         and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > YAFU_MIN) {
                         next;
@@ -18657,9 +18657,9 @@ package Sidef::Types::Number::Number {
                 last if (($j >= 8) && ($r_size <= 200));    # <= 60 digits
 
                 # Try to find special factors
-                if (($omega == 0 and $j >= 7) or $j >= 8) {
+                if ($j >= 6) {
 
-                    my @special_factors = @{(bless \$n)->special_factors(($j <= 8) ? ONE : TWO)};
+                    my @special_factors = @{(bless \$n)->special_factors(_set_int($j - 6))};
                     my @gcd_factors =
                       @{(bless \$n)
                         ->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)]))
@@ -18703,7 +18703,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                       or return Sidef::Types::Bool::Bool::FALSE;
 
-                    if (    $j == 8
+                    if (    $j <= 8
                         and @composite_factors
                         and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > YAFU_MIN) {
                         next;
