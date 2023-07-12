@@ -241,8 +241,8 @@ package Sidef::Types::Glob::FileHandle {
         Sidef::Types::Array::Array->new(
             [
              map {
-                 map    { Sidef::Types::String::String->new($_) }
-                   grep { $_ ne '' }
+                 map  { Sidef::Types::String::String->new($_) }
+                 grep { $_ ne '' }
                    split(' ', $_)
              } CORE::readline($self->{fh})
             ]
@@ -294,6 +294,13 @@ package Sidef::Types::Glob::FileHandle {
     sub tell {
         my ($self) = @_;
         Sidef::Types::Number::Number::_set_int(CORE::tell($self->{fh}));
+    }
+
+    sub rewind {
+        my ($self) = @_;
+        CORE::seek($self->{fh}, 0, 0)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
     }
 
     sub seek {

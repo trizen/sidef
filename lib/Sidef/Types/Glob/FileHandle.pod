@@ -272,6 +272,14 @@ Returns the
 
 =cut
 
+=head2 rewind
+
+    self.rewind
+
+Returns the
+
+=cut
+
 =head2 say
 
     self.say(*args)
