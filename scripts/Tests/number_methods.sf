@@ -948,4 +948,11 @@ assert_eq(
     prime_count(2**65, 2**65 + 1000).next_primes(2**65),
 )
 
+assert_eq(
+    10.by {|n|
+        n.is_composite && (divmod(powmod(10, n-1, n)-1, 9, n) == 0)
+    },
+    %n[91 259 451 481 703 1729 2821 2981 3367 4141],
+)
+
 say "** Tests passed!"
