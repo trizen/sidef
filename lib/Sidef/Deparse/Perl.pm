@@ -160,7 +160,7 @@ HEADER
 
         if (exists $opts{opt}{P}) {
             my $precision = abs(int($opts{opt}{P}));
-            $opts{header} .= "BEGIN { \$Sidef::Types::Number::Number::PREC = 4*$precision; }";
+            $opts{header} .= "BEGIN { \$Sidef::Types::Number::Number::PREC = 4*$precision };";
         }
 
         if (exists $opts{opt}{M}) {
@@ -178,11 +178,14 @@ HEADER
             elsif ($round eq 'inf') {    # away from zero
                 $round = 4;
             }
+            elsif ($round eq 'faith') {
+                $round = 5;
+            }
             else {
                 $round = 0;
             }
 
-            $opts{header} .= "local \$Sidef::Types::Number::Number::ROUND = $round;";
+            $opts{header} .= "BEGIN { \$Sidef::Types::Number::Number::ROUND = $round };";
         }
 
         undef %addr;

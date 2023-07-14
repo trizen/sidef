@@ -87,4 +87,44 @@ do {
     assert_eq(x, 42)
 }
 
+do {
+    func foo(n) {
+        try {
+            return 42
+        }
+        catch {
+            die 'catch'
+        }
+        return n
+    }
+
+    func bar(n) {
+        try {
+            die "error"
+        }
+        catch {
+            return 97
+        }
+        return n
+    }
+
+    func f(n) {
+        (n > 100) || die "error"
+    }
+
+    func baz(n) {
+        try {
+            return f(n)
+        }
+        catch {
+            return 13
+        }
+        return n
+    }
+
+    assert_eq(foo(1), 42)
+    assert_eq(bar(1), 97)
+    assert_eq(baz(1), 13)
+}
+
 say "** Test passed!"

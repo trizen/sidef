@@ -42,4 +42,9 @@ do {
     assert_eq(test.map{ .[3] }.uniq.len, 3)
 }
 
+do {
+    var fs = 10.of { |i| ->(k) { i + k } }
+    assert_eq(fs[3](4), 7)
+}
+
 say "** Test passed!"

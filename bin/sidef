@@ -270,7 +270,7 @@ sub HELP_MESSAGE {
                                      'valid levels: [0], 1, 2'],
                     '-P int'     => 'set the precision of floating-point numbers (default: ' . int($Sidef::Types::Number::Number::PREC / 4) . ')',
                     '-M mode'    => ['set the rounding mode of floating-point numbers',
-                                     'valid modes: [near], zero, inf, +inf, -inf'],
+                                     'valid modes: [near], zero, inf, +inf, -inf, faith'],
                     '-N options' => ['modify class-variables inside the Number class',
                                      "valid format: 'VERBOSE=1; USE_YAFU=1; USE_PRIMECOUNT=1'"],
                     '-k'         => 'keep track of potentially incorrect parser interpretations',
@@ -867,6 +867,8 @@ Usage: sidef [switches] [--] [programfile] [arguments]
   -k            keep track of potentially incorrect parser interpretations
   -M mode       set the rounding mode of floating-point numbers
                 valid modes: [near], zero, inf, +inf, -inf
+  -N options    modify class-variables inside the Number class
+                valid format: 'VERBOSE=1; USE_YAFU=1; USE_PRIMECOUNT=1'
   -o file       file where to dump the output
   -O level      perform code optimizations before execution
                 valid levels: [0], 1, 2
@@ -964,6 +966,35 @@ Currently, there are three level of optimization available:
     2 -- Does constant folding, after which it deparses the AST into Sidef code, parses the code again and does more constant folding on the new AST.
 
 In the end, the code is translated to Perl and is ready to be executed. In the translation process, several other optimizations are also performed.
+
+=head1 NUMBER OPTIONS
+
+The C<-N> option can be used for changing the class-variables in the Number class:
+
+    sidef -N 'PREC = 192'               # precision for floating-point numbers
+    sidef -N 'ROUND = 0'                # rounding mode for floating-point numbers
+    sidef -N 'VERBOSE = false'          # true to enable verbose/debug mode
+    sidef -N 'USE_YAFU = false'         # true to use YAFU for factoring large integers
+    sidef -N 'USE_FACTORDB = false'     # true to use factordb.com for factoring large integers
+    sidef -N 'USE_PRIMECOUNT = false'   # true to use Kim Walisch's primecount in prime_count(n)
+    sidef -N 'SPECIAL_FACTORS = true'   # true to try to find factors of special form in factor(n)
+
+Multiple options can be separated with C<;>, as in:
+
+    sidef -N 'VERBOSE = true; USE_FACTORDB = true' -E 'say factor(2**256 + 1)'
+
+The C<-P> option can be used for changing the precision of floating-point numbers:
+
+    sidef -P 1024 -E 'say sqrt(2)'
+
+The C<-M> option can be used for changing the rounding-mode for floating-point numbers:
+
+    sidef -M 'near'     # round to nearest (default)
+    sidef -M 'zero'     # round towards zero
+    sidef -M 'inf'      # round away from zero
+    sidef -M '+inf'     # round towards +Infinity
+    sidef -M '-inf'     # round towards -Infinity
+    sidef -M 'faith'    # faithful rounding
 
 =head1 PARSER WARNINGS
 
