@@ -8,8 +8,7 @@ var iter = (^Inf -> lazy.grep{ .is_prime }.iter)
 
 var a = 10.of(iter)
 var b = 10.defs(iter)
-
-var c = 10.first { .is_prime }
+var c = 10.by{.is_prime}
 
 assert_eq(a, [2, 3, 5, 7, 11, 13, 17, 19, 23, 29])
 assert_eq(b, [31, 37, 41, 43, 47, 53, 59, 61, 67, 71])

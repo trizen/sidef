@@ -1312,7 +1312,7 @@ Aliases: I<bsearch_inverse>
 
 Returns the sum of the bi-unitary divisors of C<n>, each divisor raised to the k-th power.
 
-    say 20.of { .bsigma }   #=> OEIS: A188999
+    say 20.of { .bsigma }    #=> OEIS: A188999
 
 Aliases: I<biusigma>
 
@@ -1324,7 +1324,7 @@ Aliases: I<biusigma>
 
 Returns the count of the bi-unitary divisors of C<n>.
 
-    say 20.of { .bsigma0 }  #=> OEIS: A286324
+    say 20.of { .bsigma0 }   #=> OEIS: A286324
 
 Aliases: I<biusigma0>
 
@@ -1338,8 +1338,6 @@ Returns an array with C<n> elements >= 0 that satisfy the provided block of code
 
     say 10.by { .is_prime }      # first 10 primes
     say 10.by { .is_square }     # first 10 squares
-
-Aliases: I<first>
 
 =cut
 

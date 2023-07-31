@@ -937,6 +937,40 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_get_str($x, 10);
     }
 
+    sub _is_prob_prime {
+        my ($n) = @_;
+
+        if (ref($n) eq 'Math::GMPz') {
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                $n = Math::GMPz::Rmpz_get_ui($n);
+            }
+            else {
+                $n = Math::GMPz::Rmpz_get_str($n, 10);
+            }
+        }
+
+        state %internal_cache;
+        state $internal_cache_size = 0;
+
+        if (exists($internal_cache{$n})) {
+            ## say "Prime cache hit: $n (entries: $internal_cache_size)";
+            return $internal_cache{$n};
+        }
+
+        my $r =
+          (HAS_PRIME_UTIL and $n < ULONG_MAX)
+          ? Math::Prime::Util::is_prime($n)
+          : Math::Prime::Util::GMP::is_prob_prime($n);
+
+        if (++$internal_cache_size > IS_PRIME_CACHE_SIZE) {
+            $internal_cache_size = 1;
+            undef %internal_cache;
+        }
+
+        $internal_cache{$n} = $r;
+        $r;
+    }
+
     sub _factor {
         my ($n) = @_;
 
@@ -982,7 +1016,7 @@ package Sidef::Types::Number::Number {
             }
 
             local $SPECIAL_FACTORS = 0;
-            say "Looking for special factors: $n" if $VERBOSE;
+            say STDERR "Looking for special factors: $n" if $VERBOSE;
 
             my @special_factors;
             my $composite_factors = 0;
@@ -992,7 +1026,7 @@ package Sidef::Types::Number::Number {
                     push @special_factors, "$$p";
                 }
                 else {
-                    say "Recursively factoring: $$p" if $VERBOSE;
+                    say STDERR "Recursively factoring: $$p" if $VERBOSE;
                     $composite_factors = 1;
                     push @special_factors, _factor($$p);
                 }
@@ -1015,7 +1049,7 @@ package Sidef::Types::Number::Number {
                 return @factors;
             }
 
-            say "FactorDB: factoring $n" if $VERBOSE;
+            say STDERR "FactorDB: factoring $n" if $VERBOSE;
 
             require HTTP::Tiny;
 
@@ -1043,7 +1077,7 @@ package Sidef::Types::Number::Number {
                             push @factordb_factors, ($p) x Math::Prime::Util::GMP::valuation($n, $p);
                         }
                         else {
-                            say "FactorDB: composite factor $p" if $VERBOSE;
+                            say STDERR "FactorDB: composite factor $p" if $VERBOSE;
                             local $USE_FACTORDB = 0;
                             my @arr = _factor($p);
                             push @unknown_factors, @arr;
@@ -1054,29 +1088,29 @@ package Sidef::Types::Number::Number {
                     }
 
                     if (@unknown_factors) {
-                        say "FactorDB: sending new factors to factordb.com" if $VERBOSE;
+                        say STDERR "FactorDB: sending new factors to factordb.com" if $VERBOSE;
                         my $form_data  = "$n = " . join(' * ', @unknown_factors);
                         my $report_url = "http://factordb.com/report.php";
                         my $resp       = $http->post_form($report_url, {msub => $form_data});
                         if ($resp->{success}) {
                             if ($VERBOSE) {
                                 if ($resp->{content} =~ /Thank you for your contribution/) {
-                                    say "FactorDB: thank you for your contribution!";
+                                    say STDERR "FactorDB: thank you for your contribution!";
                                 }
                                 else {
-                                    say "FactorDB: sent factors successfully!";
+                                    say STDERR "FactorDB: sent factors successfully!";
                                 }
                             }
                         }
                         else {
-                            say "FactorDB: failed to send the new factors..." if $VERBOSE;
+                            say STDERR "FactorDB: failed to send the new factors..." if $VERBOSE;
                         }
                     }
 
                     my $factors_prod = Math::Prime::Util::GMP::vecprod(@factordb_factors);
 
                     if ($factors_prod ne $n and Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
-                        say "FactorDB: recursively factoring the remainder." if $VERBOSE;
+                        say STDERR "FactorDB: recursively factoring the remainder." if $VERBOSE;
                         my $r = Math::Prime::Util::GMP::divint($n, $factors_prod);
                         local $USE_FACTORDB = 0;
                         push @factordb_factors, _factor($r);
@@ -1085,7 +1119,7 @@ package Sidef::Types::Number::Number {
 
                     # The prime factors must multiply back to n
                     if ($factors_prod eq $n) {
-                        say "FactorDB: successful factorization." if $VERBOSE;
+                        say STDERR "FactorDB: successful factorization." if $VERBOSE;
                         @factordb_factors = map { $_->[0] }
                           sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
                           map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @factordb_factors;
@@ -1103,7 +1137,7 @@ package Sidef::Types::Number::Number {
                 return @factors;
             }
 
-            say "YAFU: factoring $n" if $VERBOSE;
+            say STDERR "YAFU: factoring $n" if $VERBOSE;
 
             my $cwd = Sidef::Types::Glob::Dir->cwd;
 
@@ -1116,7 +1150,7 @@ package Sidef::Types::Number::Number {
             $cwd->chdir;
 
             # Parse the YAFU output
-            if (defined($yafu_output)) {
+            if ($? == 0 and defined($yafu_output)) {
 
                 my @yafu_factors;
                 while ($yafu_output =~ /^([PC])\d+\s*=\s*([0-9]+)/gm) {
@@ -1142,7 +1176,7 @@ package Sidef::Types::Number::Number {
 
                 # If some factors are not prime, then factor them without using YAFU
                 if (!$all_prime) {
-                    say "YAFU: not all factors are prime." if $VERBOSE;
+                    say STDERR "YAFU: not all factors are prime." if $VERBOSE;
                     local $USE_YAFU = 0;
                     @yafu_factors = map { _factor($_) } @yafu_factors;
                 }
@@ -1151,10 +1185,10 @@ package Sidef::Types::Number::Number {
 
                 # Workaround for when factors do not multiple back to n.
                 if ($factors_prod ne $n) {
-                    say "YAFU: factors do not multiply to n." if $VERBOSE;
+                    say STDERR "YAFU: factors do not multiply to n." if $VERBOSE;
                     if (Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
 
-                        say "YAFU: recomputing multiplicities..." if $VERBOSE;
+                        say STDERR "YAFU: recomputing multiplicities..." if $VERBOSE;
 
                         my @corrected_factors;
                         foreach my $p (List::Util::uniq(@yafu_factors)) {
@@ -1169,7 +1203,7 @@ package Sidef::Types::Number::Number {
                         $factors_prod = Math::Prime::Util::GMP::vecprod(@yafu_factors);
 
                         if ($factors_prod ne $n and Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
-                            say "YAFU: recursively factoring the remainder." if $VERBOSE;
+                            say STDERR "YAFU: recursively factoring the remainder." if $VERBOSE;
                             my $r = Math::Prime::Util::GMP::divint($n, $factors_prod);
                             local $USE_YAFU = 0;
                             push @yafu_factors, _factor($r);
@@ -1177,13 +1211,13 @@ package Sidef::Types::Number::Number {
                         }
                     }
                     else {
-                        say "YAFU: product of factors do not divide n." if $VERBOSE;
+                        say STDERR "YAFU: product of factors do not divide n." if $VERBOSE;
                     }
                 }
 
                 # The prime factors must multiply back to n
                 if ($factors_prod eq $n) {
-                    say "YAFU: successful factorization: @yafu_factors" if $VERBOSE;
+                    say STDERR "YAFU: successful factorization: @yafu_factors" if $VERBOSE;
                     @yafu_factors = map { $_->[0] }
                       sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
                       map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @yafu_factors;
@@ -1289,40 +1323,6 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_primorial_ui($t, $k);
             $t;
         };
-    }
-
-    sub _is_prob_prime {
-        my ($n) = @_;
-
-        if (ref($n) eq 'Math::GMPz') {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                $n = Math::GMPz::Rmpz_get_ui($n);
-            }
-            else {
-                $n = Math::GMPz::Rmpz_get_str($n, 10);
-            }
-        }
-
-        state %internal_cache;
-        state $internal_cache_size = 0;
-
-        if (exists($internal_cache{$n})) {
-            ## say "Prime cache hit: $n (entries: $internal_cache_size)";
-            return $internal_cache{$n};
-        }
-
-        my $r =
-          (HAS_PRIME_UTIL and $n < ULONG_MAX)
-          ? Math::Prime::Util::is_prime($n)
-          : Math::Prime::Util::GMP::is_prob_prime($n);
-
-        if (++$internal_cache_size > IS_PRIME_CACHE_SIZE) {
-            $internal_cache_size = 1;
-            undef %internal_cache;
-        }
-
-        $internal_cache{$n} = $r;
-        $r;
     }
 
     sub _is_squarefree {
@@ -14809,7 +14809,7 @@ package Sidef::Types::Number::Number {
             if ($y > PRIMECOUNT_MIN and $USE_PRIMECOUNT) {
                 my $count = `primecount $y`;
 
-                if (defined($count)) {
+                if ($? == 0 and defined($count)) {
                     chomp $count;
                     if ($count) {    # make sure count is not zero
                         return $count;
@@ -14825,7 +14825,7 @@ package Sidef::Types::Number::Number {
 
                 my $y_count = `primecount $y`;
 
-                if (defined($y_count)) {
+                if ($? == 0 and defined($y_count)) {
                     chomp $y_count;
                     my $x_count = _prime_count(Math::Prime::Util::GMP::subint($x, 1));
                     return Math::Prime::Util::GMP::subint($y_count, $x_count);
@@ -16247,7 +16247,7 @@ package Sidef::Types::Number::Number {
 
             if ($n > (PRIMECOUNT_MIN >> 6) and $USE_PRIMECOUNT) {
                 my $p = `primecount -n $n`;
-                if (defined($p)) {
+                if ($? == 0 and defined($p)) {
                     chomp($p);
                     if ($p) {    # make sure p is not zero
                         return _set_int($p);
@@ -18152,7 +18152,7 @@ package Sidef::Types::Number::Number {
 
             foreach my $k (@checks) {
 
-                say "[primality_pretest] Checking for prime factors < $k" if $VERBOSE;
+                say STDERR "[primality_pretest] Checking for prime factors < $k" if $VERBOSE;
 
                 my $primorial = _cached_primorial($k);
                 Math::GMPz::Rmpz_gcd($g, $primorial, $n);
@@ -18160,14 +18160,14 @@ package Sidef::Types::Number::Number {
                 if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
 
                     if ($VERBOSE) {
-                        say "[primality_pretest] Composite with g = ", Math::GMPz::Rmpz_get_str($g, 10);
+                        say STDERR "[primality_pretest] Composite with g = ", Math::GMPz::Rmpz_get_str($g, 10);
                     }
 
                     return 0;
                 }
             }
 
-            say "[primality_pretest] No small factor found..." if $VERBOSE;
+            say STDERR "[primality_pretest] No small factor found..." if $VERBOSE;
         }
 
         return 1;
@@ -20956,7 +20956,7 @@ package Sidef::Types::Number::Number {
                 else {
                     my @new_factors = (
                         ($rec_tried{$$factor}++ or $factor->mul($factor)->gt($n)) ? () : do {
-                            say "Recursively factoring: $$factor" if $VERBOSE;
+                            say STDERR "Recursively factoring: $$factor" if $VERBOSE;
                             @{$factor->special_factors};
                         }
                     );
@@ -30845,8 +30845,6 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Array::Array->new(\@items);
     }
-
-    *first = \&by;
 
     sub defs {
         my ($x, $block, $range) = @_;
