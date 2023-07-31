@@ -959,7 +959,7 @@ The REPL supports the following special commands:
 
 The C<-O level> command-line option controls the level of optimization before the execution begins.
 
-Currently, there are three level of optimization available:
+Currently, there are three levels of optimization available:
 
     0 -- Does nothing. (default)
     1 -- Does constant folding on the AST. (recommended)

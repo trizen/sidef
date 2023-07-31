@@ -3530,6 +3530,7 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *fdiv       = \&idiv;
     *fld        = \&idiv;
     *idiv_floor = \&idiv;
     *divint     = \&idiv;
@@ -10269,6 +10270,10 @@ package Sidef::Types::Number::Number {
 
     sub complex_div {
         my ($x_re, $x_im, $y_re, $y_im) = @_;
+
+        if (!defined($y_re) and !defined($y_im)) {    # ceil division
+            return $x_re->idiv_ceil($x_im);
+        }
 
         # (a + b*i) / (x + y*i) = (a*x + b*y)/(x^2 + y^2) + (b*x - a*y)/(x^2 + y^2)*i
 
