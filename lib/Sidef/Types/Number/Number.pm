@@ -20768,6 +20768,67 @@ package Sidef::Types::Number::Number {
         _set_int($f[0]);
     }
 
+    sub lpf_sum {    # sum of lpf(k)
+        my ($from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $to->lpf_sum->sub($from->dec->lpf_sum);
+        }
+
+        my $n = $$from;
+
+        if (ref($n)) {
+            $n = _big2istr($n) // goto &nan;
+        }
+
+        if ($n < 0) {
+            return ZERO;
+        }
+
+        my $s = Math::Prime::Util::GMP::sqrtint($n);
+
+        if ($s > ULONG_MAX) {    # too large
+            goto &nan;
+        }
+
+        if (HAS_PRIME_UTIL and ((INTSIZE > 32) ? ($n <= 1e10) : ($n <= 1e5))) {
+
+            my $pi  = 0;
+            my $sum = 0;
+
+            foreach my $p (@{Math::Prime::Util::primes($s)}) {
+                $sum += $p * Math::Prime::Util::legendre_phi(CORE::int($n / $p), $pi++);
+            }
+
+            return _set_int(Math::Prime::Util::GMP::addint($sum, Math::Prime::Util::sum_primes(_next_prime($s), $n)));
+        }
+
+        my $pi  = 0;
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $s)) {
+            my $d = Math::Prime::Util::GMP::divint($n, $p);
+            my $r =
+              (HAS_PRIME_UTIL and $d < ULONG_MAX)
+              ? Math::Prime::Util::legendre_phi($d, $pi)
+              : ${(bless \$p)->rough_count(_set_int($d))};
+            my $w = Math::Prime::Util::GMP::mulint($r, $p);
+            if ($w < ULONG_MAX) {
+                Math::GMPz::Rmpz_add_ui($sum, $sum, $w);
+            }
+            else {
+                state $t = Math::GMPz::Rmpz_init_nobless();
+                Math::GMPz::Rmpz_set_str($t, "$w", 10);
+                Math::GMPz::Rmpz_add($sum, $sum, $t);
+            }
+            ++$pi;
+        }
+
+        (bless \$sum)->add(_set_int(_next_prime($s))->sum_primes(_set_int($n)));
+    }
+
     sub gpf {
         my ($n) = @_;
 

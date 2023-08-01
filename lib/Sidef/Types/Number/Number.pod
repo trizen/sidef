@@ -5264,6 +5264,17 @@ Example:
 
 =cut
 
+=head2 lpf_sum
+
+    lpf_sum(n)
+    lpf_sum(a,b)
+
+Returns the sum of least prime factors of numbers from C<1> to C<n>, or in the range C<a..b>.
+
+    say 30.of { .lpf_sum }     #=> OEIS: A088821
+
+=cut
+
 =head2 lsb
 
     lsb(n)
