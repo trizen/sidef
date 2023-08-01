@@ -20849,6 +20849,96 @@ package Sidef::Types::Number::Number {
         _set_int($f[-1]);
     }
 
+    sub gpf_sum {    # sum of gpf(k)
+        my ($from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $to->gpf_sum->sub($from->dec->gpf_sum);
+        }
+
+        my $n = $$from;
+
+        if (ref($n)) {
+            $n = _big2istr($n) // goto &nan;
+        }
+
+        if ($n < 0) {
+            return ZERO;
+        }
+
+        my $s = Math::Prime::Util::GMP::sqrtint($n);
+
+        if ($s > ULONG_MAX) {    # too large
+            goto &nan;
+        }
+
+        if (HAS_NEW_PRIME_UTIL and ((INTSIZE > 32) ? ($n <= 1e10) : ($n <= 1e5))) {
+
+            my $sum = 0;
+
+            foreach my $p (@{Math::Prime::Util::primes($s)}) {
+                $sum += $p * Math::Prime::Util::smooth_count(CORE::int($n / $p), $p);
+            }
+
+            for (my $p = Math::Prime::Util::next_prime($s) ; $p <= $n ; $p = Math::Prime::Util::next_prime($p)) {
+
+                my $u = CORE::int($n / $p);
+                my $r = CORE::int($n / $u);
+
+                $sum += $u * Math::Prime::Util::sum_primes($p, $r);
+                $p = $r;
+            }
+
+            return _set_int($sum);
+        }
+
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+        foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $s)) {
+            my $d = Math::Prime::Util::GMP::divint($n, $p);
+            my $r =
+              (HAS_NEW_PRIME_UTIL and $d < ULONG_MAX)
+              ? Math::Prime::Util::smooth_count($d, $p)
+              : ${(bless \$p)->smooth_count(_set_int($d))};
+            my $w = Math::Prime::Util::GMP::mulint($r, $p);
+            if ($w < ULONG_MAX) {
+                Math::GMPz::Rmpz_add_ui($sum, $sum, $w);
+            }
+            else {
+                state $t = Math::GMPz::Rmpz_init_nobless();
+                Math::GMPz::Rmpz_set_str($t, "$w", 10);
+                Math::GMPz::Rmpz_add($sum, $sum, $t);
+            }
+        }
+
+        if ($n > ULONG_MAX) {
+            $n = Math::GMPz::Rmpz_init_set_str("$n", 10);
+        }
+
+        for (my $p = _next_prime($s) ; $p <= $n ; $p = _next_prime($p)) {
+
+            my $u = Math::Prime::Util::GMP::divint($n, $p);
+            my $r = Math::Prime::Util::GMP::divint($n, $u);
+
+            my $w = Math::Prime::Util::GMP::mulint($u, _set_int($p)->sum_primes(_set_int($r)));
+
+            if ($w < ULONG_MAX) {
+                Math::GMPz::Rmpz_add_ui($sum, $sum, $w);
+            }
+            else {
+                state $t = Math::GMPz::Rmpz_init_nobless();
+                Math::GMPz::Rmpz_set_str($t, "$w", 10);
+                Math::GMPz::Rmpz_add($sum, $sum, $t);
+            }
+
+            $p = $r;
+        }
+
+        bless \$sum;
+    }
+
     sub gcd_factors {
         my ($n, $arr) = @_;
 
@@ -28813,6 +28903,11 @@ package Sidef::Types::Number::Number {
 
         if (Math::GMPz::Rmpz_cmp_ui($n, $k) <= 0) {
             return bless \$n;
+        }
+
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            my $r = Math::Prime::Util::smooth_count(Math::GMPz::Rmpz_get_ui($n), $k);
+            return bless \$r;
         }
 
         my $count = sub {

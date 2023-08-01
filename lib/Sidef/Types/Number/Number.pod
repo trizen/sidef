@@ -3330,6 +3330,17 @@ Example:
 
 =cut
 
+=head2 gpf_sum
+
+    gpf_sum(n)
+    gpf_sum(a,b)
+
+Returns the sum of largest prime factors of numbers from C<1> to C<n>, or in the range C<a..b>.
+
+    say 30.of { .gpf_sum }   #=> OEIS: A088822
+
+=cut
+
 =head2 hamdist
 
     hamdist(a,b)

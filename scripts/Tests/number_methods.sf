@@ -816,6 +816,7 @@ assert_eq(20.of { prime_sum(3,_,3) },   20.of { (.is_prime && _>=3) ? .cube : 0 
 assert_eq(20.of { .primorial },         20.of { .is_prime ? _ : 1 }.map_reduce{|a,b| a*b })
 assert_eq(20.of { .pn_primorial },      20.of { .nth_prime }.map_reduce{|a,b| a*b })
 assert_eq(20.of { .lpf_sum },           20.of { _ >= 2 ? .lpf : 0 }.acc)
+assert_eq(20.of { .gpf_sum },           20.of { _ >= 2 ? .gpf : 0 }.acc)
 assert_eq(20.of { .sigma0 },            20.of { .divisors.len })
 assert_eq(20.of { .sigma(0) },          20.of { .divisors.len })
 assert_eq(20.of { .sigma },             20.of { .divisors.sum })
@@ -884,6 +885,7 @@ for n in (2147483646, 2147483647, 2147483648, 4294967293, 4294967294, 4294967295
 }
 
 assert_eq(lpf_sum(50, 100), 50..100 -> sum{.lpf})
+assert_eq(gpf_sum(50, 100), 50..100 -> sum{.gpf})
 
 assert_eq(convergents(3/2), [1, 3/2])
 assert_eq(convergents(2/3), [0, 1, 2/3])
