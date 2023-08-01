@@ -52,4 +52,16 @@ assert_eq(arr, [1,5,3]);
 ((arr[1]).sub!(1)).sub!(2);
 assert_eq(arr, [1,2,3]);
 
+do {
+    var x = 42 -> sub!(2)
+    x.log!.sqrt!
+    assert_eq(x, sqrt(log(40)))
+}
+
+do {
+    assert_eq([var x = 42 -> sub!(2)], [40])
+    assert_eq([x.log!.sqrt!], [sqrt(log(40))])
+    assert_eq(x, sqrt(log(40)))
+}
+
 say "** Test passed!";

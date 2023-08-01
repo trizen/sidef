@@ -153,8 +153,18 @@ for k in (0..100) {
         assert_eq(arr.slice( i,-j).join, str.substr( i,-j), [str,  i, -j])
         assert_eq(arr.slice(-i,-j).join, str.substr(-i,-j), [str, -i, -j])
         assert_eq(arr.slice(-i, j).join, str.substr(-i, j), [str, -i,  j])
+
+        assert_eq(arr.ft(i,j), [arr[i..j]].grep{defined(_)})
+        assert_eq(arr.ft(j,i), [arr[j..i]].grep{defined(_)})
+
+        if (j > 0) {
+            assert_eq(arr.ft(i,-j), [arr[i .. arr.len-j]].grep{defined(_)})
+        }
     }
 }
+
+assert_eq(["C", "S", "D"].ft, ["C", "S", "D"])
+assert_eq(["C", "S", "D"].slice, ["C", "S", "D"])
 
 assert_eq("CWS".chars.slice(-1), ["S"])
 assert_eq("CWS".chars.slice(-2), ["W","S"])
@@ -166,5 +176,28 @@ assert_eq("CWS".chars.slice(-7), ["C","W","S"])
 
 assert_eq("CWS".chars.slice(-4, 2), ["C"])  # weird, but consistent with string.subtr()
 assert_eq("CWS".substr(-4, 2), "C")
+
+assert_eq(["C", "S"].ft(1,1), ["S"])
+assert_eq(["C", "S"].ft(1,0), [])
+
+assert_eq(["C", "S", "D"].ft(0), ["C", "S", "D"])
+assert_eq(["C", "S", "D"].ft(1), ["S", "D"])
+assert_eq(["C", "S", "D"].ft(2), ["D"])
+assert_eq(["C", "S", "D"].ft(3), [])
+
+assert_eq(["C", "S", "D"].ft(-1), ["D"])
+assert_eq(["C", "S", "D"].ft(-2), ["S", "D"])
+assert_eq(["C", "S", "D"].ft(-3), ["C", "S", "D"])
+assert_eq(["C", "S", "D"].ft(-4), ["C", "S", "D"])
+
+assert_eq(["C", "S", "D"].ft(-1,1), [])
+assert_eq(["C", "S", "D"].ft(-1,2), ["D"])
+
+assert_eq(["C", "S", "D"].ft(-2,0), [])
+assert_eq(["C", "S", "D"].ft(-2,1), ["S"])
+assert_eq(["C", "S", "D"].ft(-2,2), ["S","D"])
+
+assert_eq(%w(a b c).ft(-2, -1), ["b", "c"])
+assert_eq(%w(a b c).ft(-2, -2), ["b"])
 
 say "** Test passed!"

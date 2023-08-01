@@ -1311,7 +1311,7 @@ package Sidef::Types::Array::Array {
 
         my $pos2 = 0;
 
-        if ($pos1 < 0 and $curlen > 0) {
+        if ($pos1 < 0) {
             $pos1 += $curlen;
         }
 
@@ -1358,8 +1358,55 @@ package Sidef::Types::Array::Array {
     }
 
     sub slice {
-        my ($self) = @_;
         bless [_slice(@_)];
+    }
+
+    sub _ft {
+        my ($self, $pos1, $pos2) = @_;
+
+        $pos1 = defined($pos1) ? CORE::int($pos1) : 0;
+        $pos2 = defined($pos2) ? CORE::int($pos2) : undef;
+
+        my $curlen = scalar(@$self);
+
+        if ($pos1 < 0) {
+            $pos1 += $curlen;
+        }
+
+        if ($pos1 > 0 and $pos1 > $curlen) {
+            return;
+        }
+
+        if (defined($pos2)) {
+            if ($pos2 < 0) {
+                $pos2 += $curlen;
+            }
+            elsif ($pos1 < 0) {
+                $pos2 = $pos1 + $pos2;
+            }
+        }
+        else {
+            $pos2 = $curlen - 1;
+        }
+
+        if ($pos2 < 0) {
+            if ($pos1 < 0) {
+                return;
+            }
+        }
+        elsif ($pos1 < 0) {
+            $pos1 = 0;
+        }
+
+        if ($pos2 >= $curlen) {
+            $pos2 = $curlen - 1;
+        }
+
+        @$self[$pos1 .. $pos2];
+    }
+
+    sub ft {
+        bless [_ft(@_)];
     }
 
     sub each {
