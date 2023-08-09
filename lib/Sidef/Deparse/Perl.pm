@@ -1684,7 +1684,7 @@ HEADER
                         $code = '%{(' . $code . ')}';
                     }
                     else {
-                        $code = "\@{$code}{$keys}";
+                        $code = "\@{($code)}{$keys}";
                     }
                 }
 
