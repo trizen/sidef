@@ -2065,6 +2065,8 @@ package Sidef::Types::Number::Number {
         };
     }
 
+    *NaN = \&nan;
+
     sub _inf {
         state $inf = do {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -2080,6 +2082,8 @@ package Sidef::Types::Number::Number {
             bless \$r;
         };
     }
+
+    *Inf = \&inf;
 
     sub _ninf {
         state $ninf = do {
@@ -5750,6 +5754,9 @@ package Sidef::Types::Number::Number {
 
     sub gamma {
         my ($x) = @_;
+
+        ref($_[0]) || goto &EulerGamma;
+
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_gamma($r, _any2mpfr($$x), $ROUND);
         bless \$r;
@@ -8415,19 +8422,23 @@ package Sidef::Types::Number::Number {
 
         $n = _any2mpfr_mpc($$n) // goto &nan;
 
-        my $log = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $log;
 
         if (defined($base)) {
             _valid(\$base);
-            $base = _any2mpfr($$base) // goto &nan;
-            Math::MPFR::Rmpfr_log($log, $base, $ROUND);
+            $base = _any2mpfr_mpc($$base) // goto &nan;
+            $log  = __log__($base);
         }
         else {
-            Math::MPFR::Rmpfr_set_ui($log, 10, $ROUND);
-            Math::MPFR::Rmpfr_log($log, $log, $ROUND);
+            state $ten = _any2mpfr(10);
+            $log = __log__($ten);
         }
 
-        if (ref($n) eq 'Math::MPFR') {
+        if (ref($log) eq 'Math::MPC' and ref($n) eq 'Math::MPFR') {
+            $n = _mpfr2mpc($n);
+        }
+
+        if (ref($n) eq 'Math::MPFR' and ref($log) eq 'Math::MPFR') {
 
             my $exp = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
@@ -8443,7 +8454,9 @@ package Sidef::Types::Number::Number {
 
         my $exp = Math::MPC::Rmpc_init2(CORE::int($PREC));
 
-        Math::MPC::Rmpc_div_fr($exp, $n, $log, $ROUND);
+        ref($log) eq 'Math::MPFR'
+          ? Math::MPC::Rmpc_div_fr($exp, $n, $log, $ROUND)
+          : Math::MPC::Rmpc_div($exp, $n, $log, $ROUND);
 
         my $real = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         my $imag = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -8457,7 +8470,11 @@ package Sidef::Types::Number::Number {
         Math::MPC::Rmpc_set_fr_fr($exp, $real, $imag, $ROUND);
 
         Math::MPC::Rmpc_add_ui($exp, $exp, 1, $ROUND);
-        Math::MPC::Rmpc_mul_fr($exp, $exp, $log, $ROUND);
+
+        ref($log) eq 'Math::MPFR'
+          ? Math::MPC::Rmpc_mul_fr($exp, $exp, $log, $ROUND)
+          : Math::MPC::Rmpc_mul($exp, $exp, $log, $ROUND);
+
         Math::MPC::Rmpc_sub($exp, $n, $exp, $ROUND);
         Math::MPC::Rmpc_exp($exp, $exp, $ROUND);
 
@@ -11996,8 +12013,76 @@ package Sidef::Types::Number::Number {
     *laguerre_polynomial = \&laguerreL;
 
     sub fibonaccimod {
-        my ($n, $m) = @_;
-        _valid(\$m);
+        my ($n, $k, $m) = @_;
+
+        if (defined($m)) {
+            _valid(\$k, \$m);
+
+            $k = _any2ui($$k) // (goto &nan);
+
+            if ($k == 2) {
+                return $n->fibmod($m);
+            }
+
+            $n = _any2mpz($$n) // goto &nan;
+            $m = _any2mpz($$m) // goto &nan;
+
+            Math::GMPz::Rmpz_sgn($n) >= 0 or goto &nan;
+            Math::GMPz::Rmpz_sgn($m) > 0  or goto &nan;
+
+            $k < 0 and goto &nan;
+
+            if ($k == 0) {
+                $k = 1;
+            }
+
+            if (    1e3 * $k * $k < ULONG_MAX
+                and Math::GMPz::Rmpz_fits_ulong_p($n)
+                and Math::GMPz::Rmpz_cmp_ui($n, 1e3 * $k * $k) <= 0) {
+
+                $n = Math::GMPz::Rmpz_get_ui($n);
+
+                if ($n < $k - 1) {
+                    return ZERO;
+                }
+
+                # Algorithm due to M. F. Hasler, running in linear time with respect to n.
+                # From: https://oeis.org/A302990
+
+                my @f = map {
+                    ($_ < $k)
+                      ? do {
+                        my $z = Math::GMPz::Rmpz_init();
+                        Math::GMPz::Rmpz_setbit($z, $_);
+                        Math::GMPz::Rmpz_mod($z, $z, $m);
+                        $z;
+                      }
+                      : Math::GMPz::Rmpz_init_set_ui(1)
+                } 1 .. ($k + 1);
+
+                my $t = Math::GMPz::Rmpz_init();
+
+                foreach my $i (2 * ++$k - 2 .. $n) {
+                    Math::GMPz::Rmpz_mul_2exp($t, $f[($i - 1) % $k], 1);
+                    Math::GMPz::Rmpz_sub($f[$i % $k], $t, $f[$i % $k]);
+                    Math::GMPz::Rmpz_mod($f[$i % $k], $f[$i % $k], $m);
+                }
+
+                my $r = $f[$n % $k];
+                return bless \$r;
+            }
+
+            # Sublinear algorithm with time-complexity based on k.
+            return
+              Sidef::Math::Math->linear_recmod(Sidef::Types::Array::Array->new([(ONE) x $k]),
+                                               Sidef::Types::Array::Array->new([(ZERO) x ($k - 1), ONE]),
+                                               (bless \$n),
+                                               (bless \$m));
+        }
+        else {
+            _valid(\$k);
+            $m = $k;
+        }
 
         $n = _big2uistr($n) // goto &nan;
         $m = _big2pistr($m) // goto &nan;
@@ -12076,7 +12161,7 @@ package Sidef::Types::Number::Number {
                 $crosspoints->{$k} = CORE::abs(CORE::int($f4));
             }
 
-            # Use a sublinear algorithm, when it's faster
+            # Use a sublinear algorithm, when it's faster, with time-complexity based on k.
             if (exists($crosspoints->{$k}) and $n > $crosspoints->{$k}) {
                 return
                   Sidef::Math::Math->linear_rec(Sidef::Types::Array::Array->new([(ONE) x $k]),
@@ -12084,7 +12169,7 @@ package Sidef::Types::Number::Number {
                                                 (bless \$n));
             }
 
-            # Algorithm due to M. F. Hasler, running in linear time.
+            # Algorithm due to M. F. Hasler, running in linear time with respect to n.
             # From: https://oeis.org/A302990
 
             my @f = map {
@@ -21075,14 +21160,23 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mod($V1, $V1, $n);
             Math::GMPz::Rmpz_set($V0, $g);
 
-            foreach my $t ($U1, $V1 - $P, $V1, $V1 - 1, $V1 + 1) {
+            foreach my $param ([$U1, 0], [$V1, -$P, 0]) {
 
-                Math::GMPz::Rmpz_gcd($g, $t, $n);
+                my ($t, @deltas) = @$param;
 
-                if (    Math::GMPz::Rmpz_cmp_ui($g, 1) > 0
-                    and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
-                    my $r = Math::GMPz::Rmpz_init_set($g);
-                    push @factors, bless \$r;
+                foreach my $delta (@deltas) {
+
+                    ($delta >= 0)
+                      ? Math::GMPz::Rmpz_add_ui($g, $t, $delta)
+                      : Math::GMPz::Rmpz_sub_ui($g, $t, -$delta);
+
+                    Math::GMPz::Rmpz_gcd($g, $g, $n);
+
+                    if (    Math::GMPz::Rmpz_cmp_ui($g, 1) > 0
+                        and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
+                        my $r = Math::GMPz::Rmpz_init_set($g);
+                        push @factors, bless \$r;
+                    }
                 }
             }
         }

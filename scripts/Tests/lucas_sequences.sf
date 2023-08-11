@@ -174,4 +174,16 @@ func pisano_period(n, P=1, Q=-1) {
 {|n| pisano_period(n, 2, -1) }.map(1..30)       # Periods of Pell numbers
 {|n| pisano_period(n, 3, -1) }.map(1..30)       # Periods of 3-Fibonacci numbers
 
+for k in (0..10) {
+    var m = 43*97
+    assert_eq(20.of { .fibmod(k, m) }, 20.of { .fib(k) % m })
+}
+
+assert_eq(fibmod(43, 3, 2**128 + 1), fib(43, 3) % (2**128 + 1))
+assert_eq(fibmod(2**128 + 1, 3, 2**128 - 1), 220193395512101899249036009241856381864)
+assert_eq(fibmod(2**128 + 1, 3, 2**127 - 1), 21277636584740672870826766395962370082)
+assert_eq(fibmod(2**127 - 1, 3, 2**128 + 1), 85447148131207702798335464791538973804)
+assert_eq(fibmod(2**127 - 1, 4, 2**128 + 1), 279405613631561682761560761315872506950)
+assert_eq(fibmod(2**128 + 1, 2, 2**128 - 1), fibmod(2**128 + 1, 2**128 - 1))
+
 say "** Test passed!"

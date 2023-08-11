@@ -266,7 +266,7 @@ Aliases: I<cmp>
 
 =cut
 
-=head2 approx_cmp
+=head2 <~>
 
     a <~> b
     approx_cmp(a, b)
@@ -279,6 +279,8 @@ Equivalent with:
     a.round(k) <=> b.round(k)
 
 When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
+
+Aliases: I<approx_cmp>
 
 =cut
 
@@ -352,6 +354,7 @@ Aliases: I<catalan_G>
 =head2 Y
 
     Num.Y
+    Num.EulerGamma
 
 Returns the Euler–Mascheroni constant: 0.5772156649...
 
@@ -384,8 +387,13 @@ Aliases: I<not>
 
     Γ(n)
     gamma(n)
+    Num.gamma
 
-The gamma function, where for any positive integer C<n>:
+When called as C<Num.gamma>, it returns the Euler-Mascheroni constant:
+
+    say Num.gamma   #=> 0.5772156...
+
+When given a numeric real value, it computes the gamma function (as a floating-point value), which has the identity:
 
     gamma(n) = (n-1)!
 
@@ -2581,19 +2589,13 @@ Aliases: I<powerful_each>
     n.each_prime {...}
     each_prime(a,b,{...})
 
-It efficiently iterates over the primes in the given range, using a segmented prime sieve.
+Iterates over the primes in the given range.
 
     # Iterate over the primes between 100 and 200
-    each_prime(100, 200, {|p|
-        say p
-    })
+    each_prime(100, 200, {|p| say p })
 
     # Iterate over the primes <= 100
-    100.each_prime {|p|
-        say p
-    }
-
-It's considerably faster than using the C<next_prime(n)> method.
+    100.each_prime {|p| say p }
 
 Aliases: I<primes_each>
 
@@ -2901,7 +2903,7 @@ Aliases: I<powmod>
 
     expnorm(n, b=10)
 
-Returns C<exp(n)> normalized in the range C<[0,1)>. The base C<b> can be value > 1.
+Returns C<exp(n)> normalized in the range C<[0,1)>. The base C<b> can be any value != C<{0,1}>.
 
     say expnorm(log(2) * 20996011)          #=> 0.125976895450330105020494309574...
 
@@ -3167,8 +3169,15 @@ Aliases: I<fibonacci_factor>
 =head2 fibmod
 
     fibmod(n,m)
+    fibmod(n,k,m)
 
-Efficiently compute the n-th Fibonacci number modulo C<m>.
+Efficiently computes the n-th Fibonacci number modulo C<m>.
+
+    fibmod(n,m) == (fibonacci(n) % m)
+
+When three arguments are given, it computes the n-th k-th order Fibonacci number modulo C<m>.
+
+    fibmod(n,k,m) == (fibonacci(n,k) % m)
 
 Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
@@ -3178,7 +3187,7 @@ Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
     n.flip(base=10)
 
-Returns the reversal of C<n> in base C<b>. When C<b> is not given, it defaults to base 10.
+Returns the reversal of C<n> in base C<b>. When C<b> is not given, it defaults to base C<10>.
 
     say 20.of { .flip }         # A004086
     say 20.of { .flip(2) }      # A030101
@@ -3215,9 +3224,9 @@ Round C<x> towards -Infinity.
 
 Tries to find a factor of C<n>, using a new factorization method, inspired by Fermat's Little Theorem (FLT).
 
-This method is particularly effective for numbers that have factors closed to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
+This method is particularly effective for numbers that have factors close to each other, or have a factor C<k> for which C<znorder(2,k)> is small.
 
-Example (try with base 3 and give up after 10^6 iterations):
+Example (try with base C<3> and give up after C<10^6> iterations):
 
     say flt_factor(2**64 + 1, 3, 1e6)   #=> [274177, 67280421310721]
 
