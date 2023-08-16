@@ -503,6 +503,14 @@ Returns the
 
 =cut
 
+=head2 omega_prime_sum
+
+    self.omega_prime_sum
+
+Returns the
+
+=cut
+
 =head2 powerfree
 
     self.powerfree
@@ -570,6 +578,14 @@ Returns the
 =head2 prime_powers
 
     self.prime_powers
+
+Returns the
+
+=cut
+
+=head2 prime_power_sum
+
+    self.prime_power_sum
 
 Returns the
 

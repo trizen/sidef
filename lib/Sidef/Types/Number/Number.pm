@@ -16002,12 +16002,10 @@ package Sidef::Types::Number::Number {
                         if (Math::GMPz::Rmpz_cmp_ui($t, $r) < 0) {
                             last;
                         }
-
-                        my $w =
-                          Math::GMPz::Rmpz_fits_ulong_p($t) ? Math::GMPz::Rmpz_get_ui($t) : Math::GMPz::Rmpz_get_str($t, 10);
-                        my $pi =
-                          (HAS_PRIME_UTIL and $w < PRIMECOUNT_MIN) ? Math::Prime::Util::prime_count($w) : _prime_count($w);
-
+#<<<
+                        my $w  = Math::GMPz::Rmpz_fits_ulong_p($t) ? Math::GMPz::Rmpz_get_ui($t) : Math::GMPz::Rmpz_get_str($t, 10);
+                        my $pi = (HAS_PRIME_UTIL and $w < PRIMECOUNT_MIN) ? Math::Prime::Util::prime_count($w) : _prime_count($w);
+#>>>
                         if ($pi < ULONG_MAX) {
                             Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
                         }
@@ -16065,6 +16063,121 @@ package Sidef::Types::Number::Number {
     }
 
     *omega_primepi = \&omega_prime_count;
+
+    sub omega_prime_sum {
+        my ($k, $from, $to) = @_;
+
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->omega_prime_sum($to)->sub($k->omega_prime_sum($from->dec));
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if ($k == 0) {
+            return ONE;
+        }
+        elsif ($k == 1) {
+            return $_[1]->prime_power_sum;
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $v = Math::GMPz::Rmpz_init_nobless();
+
+        my $n = _any2mpz($$from) // return ZERO;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return ZERO;
+
+        my $total = Math::GMPz::Rmpz_init_set_ui(0);
+
+        sub {
+            my ($m, $p, $k, $j, $s) = @_;
+
+            $s //= do {
+                Math::GMPz::Rmpz_div($t, $n, $m);
+                Math::GMPz::Rmpz_root($t, $t, $k);
+                Math::GMPz::Rmpz_get_ui($t);
+            };
+
+            if ($k == 2) {
+
+                while ($p <= $s) {
+
+                    $j += $p;
+                    my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : _next_prime($p));
+
+                    for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ;
+                         Math::GMPz::Rmpz_cmp($v, $n) <= 0 ;
+                         Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
+
+                        Math::GMPz::Rmpz_div($u, $n, $v);
+
+                        if (Math::GMPz::Rmpz_cmp_ui($u, $r) < 0) {
+                            last;
+                        }
+#<<<
+                    my $w = Math::GMPz::Rmpz_fits_ulong_p($u) ? Math::GMPz::Rmpz_get_ui($u) : Math::GMPz::Rmpz_get_str($u, 10);
+                    my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
+#>>>
+                        if ($ps < ULONG_MAX) {
+                            Math::GMPz::Rmpz_addmul_ui($total, $v, $ps - $j);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set_str($u, "$ps", 10);
+                            Math::GMPz::Rmpz_sub_ui($u, $u, $j);
+                            Math::GMPz::Rmpz_addmul($total, $u, $v);
+                        }
+
+                        for (my $r2 = $r ;
+                             $r2 <= $w ;
+                             $r2 = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($r2) : _next_prime($r2))) {
+
+                            Math::GMPz::Rmpz_mul_ui($u, $v, $r2);
+                            Math::GMPz::Rmpz_mul_ui($u, $u, $r2);
+
+                            if (Math::GMPz::Rmpz_cmp($u, $n) > 0) {
+                                last;
+                            }
+
+                            for (; Math::GMPz::Rmpz_cmp($u, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($u, $u, $r2)) {
+                                Math::GMPz::Rmpz_add($total, $total, $u);
+                            }
+                        }
+                    }
+
+                    $p = $r;
+                }
+
+                return;
+            }
+
+            while ($p <= $s) {
+
+                $j += $p;
+                my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : _next_prime($p));
+
+                for (my $w = $m * $p ; Math::GMPz::Rmpz_cmp($w, $n) <= 0 ; Math::GMPz::Rmpz_mul_ui($w, $w, $p)) {
+
+                    Math::GMPz::Rmpz_div($t, $n, $w);
+                    Math::GMPz::Rmpz_root($t, $t, $k - 1);
+
+                    my $s = Math::GMPz::Rmpz_get_ui($t);
+                    last if ($r > $s);
+                    __SUB__->($w, $r, $k - 1, $j, $s);
+                }
+
+                $p = $r;
+            }
+          }
+          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
+
+        bless \$total;
+    }
 
     sub nth_omega_prime {
         my ($n, $k) = @_;
@@ -16445,6 +16558,12 @@ package Sidef::Types::Number::Number {
 
         bless \$count;
     }
+
+    sub prime_power_sum {
+        prime_powers(@_)->sum;    # TODO: optimize
+    }
+
+    *prime_powers_sum = \&prime_power_sum;
 
     sub nth_prime {
         my ($n) = @_;

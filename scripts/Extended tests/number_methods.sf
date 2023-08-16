@@ -3,17 +3,31 @@
 # Tests for some Number methods.
 
 for k in (1..7) {
-    assert_eq(k.omega_prime_count(1e6-2e3, 1e6), k.omega_primes(1e6-2e3, 1e6).len)
-    assert_eq(k.omega_prime_count(1e6-1e4, 1e6), k.omega_primes(1e6-1e4, 1e6).len)
 
-    if (k <= 2) {
-        assert_eq(k.powerful(1e6-2e3, 1e6), range(1e6-2e3, 1e6).grep{.is_powerful(k)})
-        assert_eq(k.powerful(1e6-1e4, 1e6), range(1e6-1e4, 1e6).grep{.is_powerful(k)})
+    var hi = 1e6.irand
+    var lo = hi-1e4.irand
+
+    with (k.omega_primes(lo, hi)) {|a|
+        assert_eq(k.omega_prime_count(lo, hi), a.len)
+        assert_eq(k.omega_prime_sum(lo, hi), a.sum)
     }
 
-    assert_eq(k.powerful(1e6-2e3, 1e6).len, k.powerful_count(1e6-2e3, 1e6))
-    assert_eq(k.powerful(1e6-1e4, 1e6).len, k.powerful_count(1e6-1e4, 1e6))
-    assert_eq(k.powerful(1e6-1e5, 1e6).len, k.powerful_count(1e6-1e5, 1e6))
+    with (k.almost_primes(lo, hi)) {|a|
+        assert_eq(k.almost_prime_count(lo, hi), a.len)
+        assert_eq(k.almost_prime_sum(lo, hi), a.sum)
+    }
+
+    with (k.squarefree_almost_primes(lo, hi)) {|a|
+        assert_eq(k.squarefree_almost_prime_count(lo, hi), a.len)
+        assert_eq(k.squarefree_almost_prime_sum(lo, hi), a.sum)
+    }
+
+    if (k <= 2) {
+        assert_eq(k.powerful(lo, hi), range(lo, hi).grep{.is_powerful(k)})
+    }
+
+    assert_eq(k.powerful(lo, hi).len, k.powerful_count(lo, hi))
+    assert_eq(k.powerful(hi-1e5, hi).len, k.powerful_count(hi-1e5, hi))
 }
 
 with (10!) {|n|

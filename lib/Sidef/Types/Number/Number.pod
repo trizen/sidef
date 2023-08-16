@@ -6213,6 +6213,18 @@ k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
 =cut
 
+=head2 omega_prime_sum
+
+    k.omega_prime_sum(n)
+    k.omega_prime_sum(a,b)
+
+Returns the sum of k-omega primes <= C<n>, or in the range C<a..b>.
+
+    say 1.omega_prime_sum(100)            # sum of prime powers <= 100
+    say 2.omega_prime_sum(50, 100)        # sum of 2-omega primes in range 50..100
+
+=cut
+
 =head2 one
 
     Num.one
@@ -6978,6 +6990,17 @@ Returns the count of prime power divisors of C<n>.
 Equivalent with:
 
     bigomega(n)
+
+=cut
+
+=head2 prime_power_sum
+
+    prime_power_sum(n)
+    prime_power_sum(a,b)
+
+Returns the sum of prime powers <= C<n>, or in the range C<a..b>.
+
+Aliases: I<prime_powers_sum>
 
 =cut
 

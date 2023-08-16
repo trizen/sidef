@@ -79,6 +79,7 @@ do {
                             each_name  => 'each_prime_power',
                             arr_name   => 'prime_powers',
                             count_name => 'prime_power_count',
+                            sum_name   => 'prime_power_sum',
                             predicate  => func(n) { n.is_prime_power },
                            ),
                     ]
@@ -95,6 +96,7 @@ do {
                  arr_name   => 'omega_primes',
                  each_name  => 'each_omega_prime',
                  count_name => 'omega_prime_count',
+                 sum_name   => 'omega_prime_sum',
                  predicate  => func(k) { func(n) { n.is_omega_prime(k) } },
                 ),
                 :(
