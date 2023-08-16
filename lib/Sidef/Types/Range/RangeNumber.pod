@@ -647,6 +647,14 @@ Returns the
 
 =cut
 
+=head2 squarefree_almost_prime_sum
+
+    self.squarefree_almost_prime_sum
+
+Returns the
+
+=cut
+
 =head2 squarefree_count
 
     self.squarefree_count

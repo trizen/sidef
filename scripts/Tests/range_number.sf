@@ -80,6 +80,7 @@ do {
                  arr_name   => 'squarefree_almost_primes',
                  each_name  => 'each_squarefree_almost_prime',
                  count_name => 'squarefree_almost_prime_count',
+                 sum_name   => 'squarefree_almost_prime_sum',
                  predicate  => func(k) { func(n) { n.is_squarefree_almost_prime(k) } },
                 ),
                 :(

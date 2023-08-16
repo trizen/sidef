@@ -15778,6 +15778,85 @@ package Sidef::Types::Number::Number {
 
     *squarefree_semiprimes_count = \&squarefree_semiprime_count;
 
+    sub squarefree_almost_prime_sum {
+        my ($k, $from, $to) = @_;
+
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $k->squarefree_almost_prime_sum($to)->sub($k->squarefree_almost_prime_sum($from->dec));
+        }
+
+        $k = _any2ui($$k) // return ZERO;
+
+        if ($k == 0) {
+            return ONE;
+        }
+        elsif ($k == 1) {
+            return $_[1]->prime_sum;
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+
+        my $n = _any2mpz($$from) // return ZERO;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return ZERO;
+
+        my $total = Math::GMPz::Rmpz_init_set_ui(0);
+
+        sub {
+            my ($m, $p, $k, $j) = @_;
+
+            my $s = do {
+                Math::GMPz::Rmpz_div($t, $n, $m);
+                Math::GMPz::Rmpz_root($t, $t, $k);
+                Math::GMPz::Rmpz_get_ui($t);
+            };
+
+            if ($k == 2) {
+
+                foreach my $q (
+                               HAS_PRIME_UTIL
+                               ? @{Math::Prime::Util::primes($p, $s)}
+                               : Math::Prime::Util::GMP::sieve_primes($p, $s)
+                  ) {
+
+                    $j += $q;
+                    Math::GMPz::Rmpz_mul_ui($t, $m, $q);
+                    Math::GMPz::Rmpz_div($u, $n, $t);
+#<<<
+                    my $w = Math::GMPz::Rmpz_fits_ulong_p($u) ? Math::GMPz::Rmpz_get_ui($u) : Math::GMPz::Rmpz_get_str($u, 10);
+                    my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
+#>>>
+                    if ($ps < ULONG_MAX) {
+                        Math::GMPz::Rmpz_addmul_ui($total, $t, $ps - $j);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_set_str($u, "$ps", 10);
+                        Math::GMPz::Rmpz_sub_ui($u, $u, $j);
+                        Math::GMPz::Rmpz_addmul($total, $u, $t);
+                    }
+                }
+
+                return;
+            }
+
+            while ($p <= $s) {
+                my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : _next_prime($p));
+                $j += $p;
+                __SUB__->($m * $p, $r, $k - 1, $j);
+                $p = $r;
+            }
+          }
+          ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
+
+        bless \$total;
+    }
+
     sub omega_prime_count {
         my ($k, $from, $to) = @_;
 

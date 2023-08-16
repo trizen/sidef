@@ -7947,6 +7947,18 @@ Returns an array with the squarefree k-almost primes <= C<n>, or in the range C<
 
 =cut
 
+=head2 squarefree_almost_prime_sum
+
+    k.squarefree_almost_prime_sum(n)
+    k.squarefree_almost_prime_sum(a,b)
+
+Returns the sum of squarefree k-almost primes <= C<n>, or in the range C<a..b>.
+
+    say 1.squarefree_almost_prime_sum(1000)          # sum of primes <= 1000
+    say 2.squarefree_almost_prime_sum(50, 1000)      # sum of squarefree semiprimes in range 50..1000
+
+=cut
+
 =head2 squarefree_count
 
     squarefree_count(n)
@@ -7986,7 +7998,7 @@ Returns an array with all the squarefree Fermat pseudoprimes to the given C<base
 
 =cut
 
-=head2 squarefree_pi_k
+=head2 squarefree_almost_prime_count
 
     k.squarefree_almost_prime_count(n)
     k.squarefree_almost_prime_count(a,b)
@@ -7996,7 +8008,7 @@ Returns the count of squarefree k-almost primes <= C<n>, or in the range C<a..b>
     say 1.squarefree_almost_prime_count(1000)          # count of primes <= 1000
     say 2.squarefree_almost_prime_count(50, 1000)      # count of squarefree semiprimes in range 50..1000
 
-Aliases: I<squarefree_almost_primepi>, I<squarefree_almost_prime_count>
+Aliases: I<squarefree_almost_primepi>, I<squarefree_pi_k>
 
 =cut
 
