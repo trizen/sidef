@@ -423,12 +423,14 @@ package Sidef::Types::Range::RangeNumber {
                             each_name  => 'each_semiprime',
                             arr_name   => 'semiprimes',
                             count_name => 'semiprime_count',
+                            sum_name   => 'semiprime_sum',
                             predicate  => sub { $_[0]->is_semiprime },
                            },
                            {
                             each_name  => 'each_squarefree_semiprime',
                             arr_name   => 'squarefree_semiprimes',
                             count_name => 'squarefree_semiprime_count',
+                            sum_name   => 'squarefree_semiprime_sum',
                             predicate  => sub { $_[0]->is_squarefree_semiprime },
                            },
                            {
@@ -580,6 +582,7 @@ package Sidef::Types::Range::RangeNumber {
                  arr_name   => 'almost_primes',
                  each_name  => 'each_almost_prime',
                  count_name => 'almost_prime_count',
+                 sum_name   => 'almost_prime_sum',
                  predicate  => sub {
                      my ($k) = @_;
                      sub { $_[0]->is_almost_prime($k) };

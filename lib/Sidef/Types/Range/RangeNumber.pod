@@ -59,6 +59,14 @@ Returns the
 
 =cut
 
+=head2 almost_prime_sum
+
+    self.almost_prime_sum
+
+Returns the
+
+=cut
+
 =head2 avg
 
     self.avg(arg)
@@ -615,6 +623,14 @@ Returns the
 
 =cut
 
+=head2 semiprime_sum
+
+    self.semiprime_sum
+
+Returns the
+
+=cut
+
 =head2 smooth_count
 
     self.smooth_count
@@ -674,6 +690,14 @@ Returns the
 =head2 squarefree_semiprimes
 
     self.squarefree_semiprimes
+
+Returns the
+
+=cut
+
+=head2 squarefree_semiprime_sum
+
+    self.squarefree_semiprime_sum
 
 Returns the
 
