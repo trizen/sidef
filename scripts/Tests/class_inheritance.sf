@@ -85,6 +85,19 @@ do {
     }
 }
 
+do {
+    class Duck {
+        method speak { self.noise }
+        method noise { "Quack" }
+    }
+
+    class VikingDuck < Duck {
+        method noise { "Kvack" }
+    }
+
+    assert_eq(VikingDuck().speak, "Kvack")
+}
+
 var dog = Dog();
 say "Dog is a #{dog.type}, has #{dog.legs_num} legs and says '#{dog.speak}'";
 

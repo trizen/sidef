@@ -11,11 +11,12 @@ package Sidef::Types::Number::Number {
     use List::Util             qw();
     use Math::Prime::Util::GMP qw();
 
-    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_YAFU, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS);
+    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_PRIMESUM, $USE_YAFU, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS);
 
     BEGIN {
         $ROUND           = Math::MPFR::MPFR_RNDN();    # rounding mode for floating-point numbers
         $PREC            = 192;                        # precision in bits for floating-point numbers
+        $USE_PRIMESUM    = 0;                          # true to use Kim Walisch's primesum for large n
         $USE_PRIMECOUNT  = 0;                          # true to use Kim Walisch's primecount for large n
         $USE_YAFU        = 0;                          # true to use YAFU for factoring large integers
         $USE_FACTORDB    = 0;                          # true to use factordb.com for factoring large integers
@@ -60,9 +61,10 @@ package Sidef::Types::Number::Number {
         HAS_NEW_PRIME_UTIL   => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::is_perfect_power)) // 0,
         HAS_NEWER_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::is_congruent))     // 0,
 
-        IS_PRIME_CACHE_SIZE => 1e5,                                                          # how many entries to cache
-        INTSIZE             => CORE::int(CORE::log(ULONG_MAX) / CORE::log(2)),               # size of ULONG_MAX in base 2
-        PRIMECOUNT_MIN      => List::Util::min(ULONG_MAX, (HAS_PRIME_UTIL ? 1e10 : 1e7)),    # absolute value
+        IS_PRIME_CACHE_SIZE => 1e5,                                               # how many entries to cache
+        INTSIZE             => CORE::int(CORE::log(ULONG_MAX) / CORE::log(2)),    # size of ULONG_MAX in base 2
+        PRIMECOUNT_MIN      => List::Util::min(ULONG_MAX,       (HAS_PRIME_UTIL ? 1e10 : 1e7)),    # absolute value
+        PRIMESUM_MIN        => List::Util::min(ULONG_MAX >> 14, (HAS_PRIME_UTIL ? 1e8  : 1e5)),    # absolute value
     };
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
@@ -14908,7 +14910,7 @@ package Sidef::Types::Number::Number {
         return 0 if ($y < $x);
         return 0 if ($y <= 0);
 
-        my $table_len = 100003;
+        state $table_len = (HAS_PRIME_UTIL ? 1e5 : 1e6);
 
         state $pi_table = do {
             my @pi;
@@ -20357,6 +20359,58 @@ package Sidef::Types::Number::Number {
             return _set_int($from)->prime_count(_set_int($to));
         }
 
+        state $table_len = (HAS_PRIME_UTIL ? 1e5 : 1e6);
+
+        state $prime_sum_table = do {
+            my @prime_sums;
+
+            my $k   = 0;
+            my $sum = 0;
+
+            foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $table_len)) {
+                splice(@prime_sums, $k, $p - $k + 1, ($sum) x ($p - $k + 1));
+                $k = $p;
+                $sum += $p;
+            }
+
+            \@prime_sums;
+        };
+
+        if ($k == 1 and $from eq '2') {
+            if ($to < $table_len) {
+                return _set_int($prime_sum_table->[$to]);
+            }
+        }
+
+        if ($k == 1 and $from eq '2') {
+
+            if ($to > PRIMESUM_MIN and $to < 1e30 and $USE_PRIMESUM) {
+                my $sum = `primesum $to`;
+
+                if ($? == 0 and defined($sum)) {
+                    chomp $sum;
+                    if ($sum) {    # make sure the sum is not zero
+                        return _set_int($sum);
+                    }
+                }
+            }
+        }
+
+        if ($k == 1 and $from ne '2' and $USE_PRIMESUM) {
+            my $diff = Math::Prime::Util::GMP::subint($to, $from);
+
+            if ($diff > PRIMESUM_MIN and $diff < 1e30) {
+
+                my $y_sum = `primesum $to`;
+
+                if ($? == 0 and defined($y_sum)) {
+                    chomp $y_sum;
+                    my $x_sum = _set_int(Math::Prime::Util::GMP::subint($from, 1))->prime_sum;
+                    return _set_int(Math::Prime::Util::GMP::subint($y_sum, $x_sum));
+                }
+            }
+        }
+
         if (HAS_PRIME_UTIL and $k == 1) {
             my $r = Math::Prime::Util::sum_primes($from, $to);
             return _set_int("$r");
@@ -20930,7 +20984,7 @@ package Sidef::Types::Number::Number {
                 $sum += $p * Math::Prime::Util::legendre_phi(CORE::int($n / $p), $pi++);
             }
 
-            return _set_int(Math::Prime::Util::GMP::addint($sum, Math::Prime::Util::sum_primes(_next_prime($s), $n)));
+            return _set_int($sum)->add(_set_int(_next_prime($s))->sum_primes(_set_int($n)));
         }
 
         my $pi  = 0;
@@ -21015,7 +21069,11 @@ package Sidef::Types::Number::Number {
                 my $u = CORE::int($n / $p);
                 my $r = CORE::int($n / $u);
 
-                $sum += $u * Math::Prime::Util::sum_primes($p, $r);
+                $sum += $u * (
+                              ($r - $p < PRIMESUM_MIN)
+                              ? Math::Prime::Util::sum_primes($p, $r)
+                              : ${_set_int($p)->sum_primes(_set_int($r))}
+                             );
                 $p = $r;
             }
 
@@ -21302,7 +21360,7 @@ package Sidef::Types::Number::Number {
             my $phi_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->phi_finder_factor($m->mul(_set_int(1e3))) });
             my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e4))) });
             my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(5e2))) });
-            my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_random_prime(1e4)), $m->mul(_set_int(5e2))) });
+            my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_random_prime(1e4)), $m->mul(_set_int(1e4))) });
 
             my $pm1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) });
             my $pm1_small_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(20000)), $m->mul(_set_int(200000))) });
@@ -29130,6 +29188,18 @@ package Sidef::Types::Number::Number {
         if (Math::GMPz::Rmpz_cmp_ui($n, $k) < 0) {
             return TWO if (Math::GMPz::Rmpz_cmp_ui($n, $k) == 0);
             return ONE;
+        }
+
+        if ($USE_PRIMECOUNT and Math::GMPz::Rmpz_sizeinbase($n, 2) <= 63 and $n > PRIMECOUNT_MIN) {
+            my $c     = _prime_count($k - 1);
+            my $count = `primecount --phi $n $c`;
+
+            if ($? == 0 and defined($count)) {
+                chomp $count;
+                if ($count) {    # make sure count is not zero
+                    return _set_int($count);
+                }
+            }
         }
 
         if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
