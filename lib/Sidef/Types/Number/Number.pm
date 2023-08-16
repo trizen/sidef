@@ -14910,7 +14910,7 @@ package Sidef::Types::Number::Number {
         return 0 if ($y < $x);
         return 0 if ($y <= 0);
 
-        state $table_len = (HAS_PRIME_UTIL ? 1e5 : 1e6);
+        state $table_len = _next_prime(HAS_PRIME_UTIL ? 1e5 : 1e6);
 
         state $pi_table = do {
             my @pi;
@@ -16560,7 +16560,44 @@ package Sidef::Types::Number::Number {
     }
 
     sub prime_power_sum {
-        prime_powers(@_)->sum;    # TODO: optimize
+        my ($from, $to) = @_;
+
+        if (defined($to)) {
+            _valid(\$to);
+            return ZERO if $to->lt($from);
+            return $to->prime_power_sum->sub($from->dec->prime_power_sum);
+        }
+
+        my $n = _big2pistr($from) // return ZERO;
+
+        my $pi  = _set_int($n)->sum_primes;
+        my $sr  = Math::Prime::Util::GMP::sqrtint($n);
+        my $cr  = Math::Prime::Util::GMP::rootint($n, 3);
+        my $pi2 = _set_int($cr + 1)->sum_primes(_set_int($sr), TWO);
+
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        my $z  = Math::GMPz::Rmpz_init_set_str("$n", 10);
+        my $pp = Math::GMPz::Rmpz_init_set_ui(0);
+
+        foreach my $p (
+                       HAS_PRIME_UTIL
+                       ? @{Math::Prime::Util::primes(2, $cr)}
+                       : Math::Prime::Util::GMP::sieve_primes(2, $cr)
+          ) {
+
+            # f(p) = sum(1..n.ilog(p), {|k| p**k }) - p
+            #      = (1 - p**(n.ilog(p)+1))/(1-p) - p - 1
+
+            my $l = __ilog__($z, $p);
+            Math::GMPz::Rmpz_ui_pow_ui($u, $p, $l + 1);
+            Math::GMPz::Rmpz_ui_sub($u, 1, $u);
+            Math::GMPz::Rmpz_divexact_ui($u, $u, $p - 1);
+            Math::GMPz::Rmpz_neg($u, $u);
+            Math::GMPz::Rmpz_sub_ui($u, $u, $p + 1);
+            Math::GMPz::Rmpz_add($pp, $pp, $u);
+        }
+
+        $pi->add($pi2)->add(bless \$pp);
     }
 
     *prime_powers_sum = \&prime_power_sum;
@@ -20649,7 +20686,7 @@ package Sidef::Types::Number::Number {
             return _set_int($from)->prime_count(_set_int($to));
         }
 
-        state $table_len = (HAS_PRIME_UTIL ? 1e5 : 1e6);
+        state $table_len = _next_prime(HAS_PRIME_UTIL ? 1e5 : 1e6);
 
         state $prime_sum_table = do {
             my @prime_sums;
@@ -25970,6 +26007,8 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_div($t, $to, $m);
                 Math::GMPz::Rmpz_root($t, $t, $r);
 
+                Math::GMPz::Rmpz_fits_ulong_p($t) || die "Too large value!";
+
                 my $lo = 1;
                 my $hi = Math::GMPz::Rmpz_get_ui($t);
 
@@ -26361,6 +26400,8 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_tdiv_q($u, $B, $m);
                 Math::GMPz::Rmpz_root($u, $u, $j);
 
+                Math::GMPz::Rmpz_fits_ulong_p($u) || die "Too large value!";
+
                 my $hi = Math::GMPz::Rmpz_get_ui($u);
 
                 if ($lo > $hi) {
@@ -26440,6 +26481,8 @@ package Sidef::Types::Number::Number {
                     if (Math::GMPz::Rmpz_fits_ulong_p($L)) {
                         $L = Math::GMPz::Rmpz_get_ui($L);
                     }
+
+                    Math::GMPz::Rmpz_fits_ulong_p($v) || die "Too large value!";
 
                     my $t = Math::GMPz::Rmpz_get_ui($v);
                     $t > $hi && return;
@@ -27128,6 +27171,8 @@ package Sidef::Types::Number::Number {
                         if (Math::GMPz::Rmpz_fits_ulong_p($L)) {
                             $L = Math::GMPz::Rmpz_get_ui($L);
                         }
+
+                        Math::GMPz::Rmpz_fits_ulong_p($v) || die "Too large value!";
 
                         my $t = Math::GMPz::Rmpz_get_ui($v);
                         $t > $hi && return;

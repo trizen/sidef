@@ -12,6 +12,15 @@ assert_eq(squarefree_sum(1e7), 30396557311887)
 assert_eq(squarefree_count(1e9), 607927124)
 assert_eq(squarefree_count(1e10), 6079270942)
 
+assert_eq(prime_count(1e5-1), 9592)
+assert_eq(prime_count(1e6-1), 78498)
+
+assert_eq(prime_count(1e5.next_prime-1), 9592)
+assert_eq(prime_count(1e6.next_prime-1), 78498)
+
+assert_eq(prime_count(1e5.next_prime), 9593)
+assert_eq(prime_count(1e6.next_prime), 78499)
+
 assert_eq(
     semiprimes(100),
     1..100 -> grep { .is_semiprime },
@@ -478,6 +487,14 @@ assert_eq(prime_count(620, 621), 0)
 assert_eq(prime_count(620, 630), 0)
 assert_eq(prime_count(620, 631), 1)
 assert_eq(prime_count(619, 631), 2)
+
+assert_eq(prime_power_sum(626, 630), prime_powers(626, 630).sum)
+assert_eq(prime_power_sum(620, 630), prime_powers(620, 630).sum)
+assert_eq(prime_power_sum(620, 631), prime_powers(620, 631).sum)
+assert_eq(prime_power_sum(619, 631), prime_powers(619, 631).sum)
+
+assert_eq(prime_power_sum(43**2), prime_powers(43**2).sum)
+assert_eq(prime_power_sum(43**3), prime_powers(43**3).sum)
 
 assert_eq(prime_count(2**127 - 1, 2**127 - 1), 1)
 assert_eq(3.almost_prime_count(82654, 7158821), 1736362)
