@@ -16575,7 +16575,7 @@ package Sidef::Types::Number::Number {
         }
 
         # a(n) = Sum_{p prime <= n} p
-        # b(n) = Sum_{n^(1/3) < p prime <= n^(1/2)} p^2
+        # b(n) = Sum_{p prime <= n^(1/2)} p^2
         # c(n) = Sum_{p prime <= n^(1/3)} f(p)
 
         # prime_power_sum(n) = a(n) + b(n) + c(n)
@@ -16586,7 +16586,7 @@ package Sidef::Types::Number::Number {
         my $cr = Math::Prime::Util::GMP::rootint($n, 3);
 
         my $ps1 = _set_int($n)->sum_primes;
-        my $ps2 = _set_int($cr + 1)->sum_primes(_set_int($sr), TWO);
+        my $ps2 = (TWO)->sum_primes(_set_int($sr), TWO);
 
         state $u = Math::GMPz::Rmpz_init_nobless();
 
@@ -16599,14 +16599,22 @@ package Sidef::Types::Number::Number {
                        : Math::Prime::Util::GMP::sieve_primes(2, $cr)
           ) {
 
-            # f(p) = sum(1..n.ilog(p), {|k| p**k }) - p
-            #      = (1 - p**(n.ilog(p)+1))/(1-p) - p - 1
+            # f(p) = sum(1..n.ilog(p), {|k| p**k }) - p^2 - p
+            #      = (p**(n.ilog(p)+1) - 1)/(p-1) - p^2 - p - 1
 
             my $l = __ilog__($z, $p);
             Math::GMPz::Rmpz_ui_pow_ui($u, $p, $l + 1);
             Math::GMPz::Rmpz_sub_ui($u, $u, 1);
             Math::GMPz::Rmpz_divexact_ui($u, $u, $p - 1);
-            Math::GMPz::Rmpz_sub_ui($u, $u, $p + 1);
+            if ($p * $p + $p + 1 < ULONG_MAX) {
+                Math::GMPz::Rmpz_sub_ui($u, $u, $p * $p + $p + 1);
+            }
+            else {    # for very large n (>10^28 on 64-bit and >10^14 on 32-bit)
+                my $t = Math::GMPz::Rmpz_init_set_ui($p);
+                Math::GMPz::Rmpz_mul_ui($t, $t, $p);
+                Math::GMPz::Rmpz_add_ui($t, $t, $p + 1);
+                Math::GMPz::Rmpz_sub($u, $u, $t);
+            }
             Math::GMPz::Rmpz_add($pp, $pp, $u);
         }
 
