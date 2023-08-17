@@ -16568,14 +16568,22 @@ package Sidef::Types::Number::Number {
             return $to->prime_power_sum->sub($from->dec->prime_power_sum);
         }
 
+        # a(n) = Sum_{p prime <= n} p
+        # b(n) = Sum_{n^(1/3) < p prime <= n^(1/2)} p^2
+        # c(n) = Sum_{p prime <= n^(1/3)} f(p)
+
+        # prime_power_sum(n) = a(n) + b(n) + c(n)
+
         my $n = _big2pistr($from) // return ZERO;
 
-        my $pi  = _set_int($n)->sum_primes;
-        my $sr  = Math::Prime::Util::GMP::sqrtint($n);
-        my $cr  = Math::Prime::Util::GMP::rootint($n, 3);
-        my $pi2 = _set_int($cr + 1)->sum_primes(_set_int($sr), TWO);
+        my $sr = Math::Prime::Util::GMP::sqrtint($n);
+        my $cr = Math::Prime::Util::GMP::rootint($n, 3);
+
+        my $ps1 = _set_int($n)->sum_primes;
+        my $ps2 = _set_int($cr + 1)->sum_primes(_set_int($sr), TWO);
 
         state $u = Math::GMPz::Rmpz_init_nobless();
+
         my $z  = Math::GMPz::Rmpz_init_set_str("$n", 10);
         my $pp = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -16590,14 +16598,13 @@ package Sidef::Types::Number::Number {
 
             my $l = __ilog__($z, $p);
             Math::GMPz::Rmpz_ui_pow_ui($u, $p, $l + 1);
-            Math::GMPz::Rmpz_ui_sub($u, 1, $u);
+            Math::GMPz::Rmpz_sub_ui($u, $u, 1);
             Math::GMPz::Rmpz_divexact_ui($u, $u, $p - 1);
-            Math::GMPz::Rmpz_neg($u, $u);
             Math::GMPz::Rmpz_sub_ui($u, $u, $p + 1);
             Math::GMPz::Rmpz_add($pp, $pp, $u);
         }
 
-        $pi->add($pi2)->add(bless \$pp);
+        $ps1->add($ps2)->add(bless \$pp);
     }
 
     *prime_powers_sum = \&prime_power_sum;
