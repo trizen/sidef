@@ -15390,14 +15390,21 @@ package Sidef::Types::Number::Number {
 
         $k = _any2ui($$k) // return ZERO;
 
-        if ($k == 0) {
-            return ONE;
-        }
-        elsif ($k == 1) {
+        if ($k == 1) {
             return $_[1]->prime_count;
         }
         elsif ($k == 2) {
             return $_[1]->semiprime_count;
+        }
+
+        my $n = _any2mpz($$from) // return ZERO;
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, $k) <= 0) {
+            return ZERO;
+        }
+
+        if ($k == 0) {
+            return ONE;
         }
 
         state $pi_k_lookup = {
@@ -15619,12 +15626,6 @@ package Sidef::Types::Number::Number {
             return _set_int($count);
         }
 
-        my $n = _any2mpz($$from) // return ZERO;
-
-        if (Math::GMPz::Rmpz_cmp_ui($n, $k) <= 0) {
-            return ZERO;
-        }
-
         state $t = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_set_ui($t, 0);
         Math::GMPz::Rmpz_setbit($t, $k);
@@ -15704,20 +15705,21 @@ package Sidef::Types::Number::Number {
 
         $k = _any2ui($$k) // return ZERO;
 
-        if ($k == 0) {
-            return ONE;
-        }
-        elsif ($k == 1) {
+        if ($k == 1) {
             return $_[1]->prime_sum;
         }
-
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
 
         my $n = _any2mpz($$from) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
+
+        if ($k == 0) {
+            return ONE;
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
 
         my $total = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -15784,19 +15786,20 @@ package Sidef::Types::Number::Number {
 
         $k = _any2ui($$k) // return ZERO;
 
-        if ($k == 0) {
-            return ONE;
-        }
-        elsif ($k == 1) {
+        if ($k == 1) {
             return $_[1]->prime_count;
         }
-
-        state $t = Math::GMPz::Rmpz_init_nobless();
 
         my $n = _any2mpz($$from) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
+
+        if ($k == 0) {
+            return ONE;
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
 
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -15877,20 +15880,21 @@ package Sidef::Types::Number::Number {
 
         $k = _any2ui($$k) // return ZERO;
 
-        if ($k == 0) {
-            return ONE;
-        }
-        elsif ($k == 1) {
+        if ($k == 1) {
             return $_[1]->prime_sum;
         }
-
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
 
         my $n = _any2mpz($$from) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
+
+        if ($k == 0) {
+            return ONE;
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
 
         my $total = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -15956,25 +15960,26 @@ package Sidef::Types::Number::Number {
 
         $k = _any2ui($$k) // return ZERO;
 
+        if ($k == 1) {
+            return $_[1]->prime_power_count;
+        }
+
+        my $n = _any2mpz($$from) // return ZERO;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return ZERO;
+
         if ($k == 0) {
             return ONE;
-        }
-        elsif ($k == 1) {
-            return $_[1]->prime_power_count;
         }
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
         state $v = Math::GMPz::Rmpz_init_nobless();
 
-        my $n = _any2mpz($$from) // return ZERO;
-
         if ((HAS_NEWER_PRIME_UTIL or (HAS_NEW_PRIME_UTIL and $k < 15)) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return _set_int(Math::Prime::Util::omega_prime_count($k, Math::GMPz::Rmpz_get_ui($n)));
         }
-
-        Math::GMPz::Rmpz_sgn($n) > 0
-          or return ZERO;
 
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -16077,21 +16082,22 @@ package Sidef::Types::Number::Number {
 
         $k = _any2ui($$k) // return ZERO;
 
-        if ($k == 0) {
-            return ONE;
-        }
-        elsif ($k == 1) {
+        if ($k == 1) {
             return $_[1]->prime_power_sum;
         }
-
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
-        state $v = Math::GMPz::Rmpz_init_nobless();
 
         my $n = _any2mpz($$from) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
+
+        if ($k == 0) {
+            return ONE;
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $v = Math::GMPz::Rmpz_init_nobless();
 
         my $total = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -29905,14 +29911,21 @@ package Sidef::Types::Number::Number {
     sub perfect_power_count {    # OEIS: A069623
         my ($n, $k) = @_;
 
-        if (defined($k)) {
-            return $n->iroot($k);
-        }
-
         $n = _any2mpz($$n) // return ZERO;
         Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
-        # a(n) = n - Sum_{k=1..floor(log_2(n))} μ(k) * (floor(n^(1/k)) - 1).
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+            $k == 0 and return ONE;
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_root($r, $n, $k);
+            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
+            return bless \$r;
+        }
+
+        # Formula:
+        #   a(n) = n - Sum_{k=1..floor(log_2(n))} μ(k) * (floor(n^(1/k)) - 1).
 
         my $r = Math::GMPz::Rmpz_init_set_ui(0);
         state $t = Math::GMPz::Rmpz_init_nobless();
@@ -29928,6 +29941,38 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_sub($r, $n, $r);
         bless \$r;
+    }
+
+    sub perfect_power_sum {
+        my ($n, $k) = @_;
+
+        $n = _any2mpz($$n) // return ZERO;
+        Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+            $k == 0 and return ONE;
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_root($r, $n, $k);
+            return ((bless \$r)->faulhaber_sum(bless \$k));
+        }
+
+        # Formula:
+        #   a(n) = faulhaber(n,1) - Sum_{k=1..floor(log_2(n))} μ(k) * (faulhaber(floor(n^(1/k)),k) - 1).
+
+        my @terms;
+        my $t = Math::GMPz::Rmpz_init();
+
+        foreach my $k (1 .. __ilog__($n, 2)) {
+            my $mu = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k)) || next;
+            Math::GMPz::Rmpz_root($t, $n, $k);
+            my $f = (bless \$t)->faulhaber_sum(bless \$k)->dec;
+            $f = $f->neg if ($mu == -1);
+            push @terms, $$f;
+        }
+
+        (bless \$n)->faulhaber_sum(ONE)->sub(_set_int(Math::Prime::Util::GMP::vecsum(@terms)));
     }
 
     sub is_power_of {
@@ -29978,6 +30023,10 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
         $k = _any2ui($$k) // return ZERO;
+
+        if ($k <= 1) {
+            return bless \$n;
+        }
 
         if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             my $r = Math::Prime::Util::powerful_count(Math::GMPz::Rmpz_get_ui($n), $k);
@@ -30059,6 +30108,10 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
         $k = _any2ui($$k) // return ZERO;
+
+        if ($k <= 1) {
+            return ((bless \$n)->faulhaber_sum(ONE));
+        }
 
         my $t   = Math::GMPz::Rmpz_init();
         my $sum = Math::GMPz::Rmpz_init_set_ui(0);

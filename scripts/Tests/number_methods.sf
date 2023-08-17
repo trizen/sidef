@@ -850,6 +850,25 @@ assert_eq(20.of { .superfactorial },    20.of { .factorial }.map_reduce{|a,b| a*
 assert_eq(20.of { .hyperfactorial },    20.of { _**_ }.map_reduce{|a,b| a*b })
 assert_eq(20.of { .subfactorial },      20.of {|n| (-1)**n / n! }.acc.map_kv {|k,v| k! * v })
 
+assert_eq(20.of { .perfect_power_count },     20.of { .is_perfect_power && .is_pos ? 1 : 0 }.acc)
+assert_eq(20.of { .perfect_power_sum },       20.of { .is_perfect_power ? _ : 0 }.acc)
+
+for k in (0..3) {
+    assert_eq(20.of { k.almost_prime_sum(_) },            20.of { .is_almost_prime(k) ? _ : 0 }.acc)
+    assert_eq(20.of { k.squarefree_almost_prime_sum(_) }, 20.of { .is_squarefree_almost_prime(k) ? _ : 0 }.acc)
+    assert_eq(20.of { k.omega_prime_sum(_) },             20.of { .is_omega_prime(k) ? _ : 0 }.acc)
+
+    assert_eq(20.of { k.almost_prime_count(_) },            20.of { .is_almost_prime(k) ? 1 : 0 }.acc)
+    assert_eq(20.of { k.squarefree_almost_prime_count(_) }, 20.of { .is_squarefree_almost_prime(k) ? 1 : 0 }.acc)
+    assert_eq(20.of { k.omega_prime_count(_) },             20.of { .is_omega_prime(k) ? 1 : 0 }.acc)
+
+    assert_eq(20.of { .perfect_power_count(k) },  20.of { .is_power(k) && .is_pos ? 1 : 0 }.acc)
+    assert_eq(20.of { .perfect_power_sum(k) },    20.of { .is_power(k) ? _ : 0 }.acc)
+
+    assert_eq(20.of { k.powerful_count(_) },  20.of { .is_powerful(k) && .is_pos ? 1 : 0 }.acc)
+    assert_eq(20.of { k.powerful_sum(_) },    20.of { .is_powerful(k) ? _ : 0 }.acc)
+}
+
 assert_eq(20.of { .digits(2).sum },     20.of { .hammingweight })
 assert_eq(20.of { .digits(2).len },     20.of { .len(2) })
 assert_eq(20.of { .digits.len },        20.of { .len })

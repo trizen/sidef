@@ -6291,12 +6291,29 @@ Returns the largest power C<k> of C<n> for which there exists an integer C<r>, s
 
 =head2 perfect_power_count
 
-    n.perfect_power_count
+    perfect_power_count(n)
+    perfect_power_count(n,k)
 
 Returns the count of perfect powers <= C<n>.
 
     say perfect_power_count(10**6)      #=> 1111
     say perfect_power_count(10**20)     #=> 10004650118
+
+When C<k> is provided, it returns the number of k-powers <= C<n>.
+
+=cut
+
+=head2 perfect_power_sum
+
+    perfect_power_sum(n)
+    perfect_power_sum(n,k)
+
+Returns the sum of perfect powers <= C<n>.
+
+    say perfect_power_sum(10**6)      #=> 361590619
+    say perfect_power_sum(10**20)     #=> 333449517656248628022493884999
+
+When C<k> is provided, it returns the sum of k-powers <= C<n>.
 
 =cut
 
