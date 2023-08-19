@@ -6025,6 +6025,20 @@ Returns the n-th k-omega prime.
 
 =cut
 
+=head2 nth_perfect_power
+
+    nth_perfect_power(n)
+    nth_perfect_power(n,k)
+
+Returns the n-th perfect power.
+
+    say nth_perfect_power(1e8)  #=> 9956760243243489
+    say nth_perfect_power(1e9)  #=> 997995681331086244
+
+When C<k> is given, it returns the n-th k-perfect-power.
+
+=cut
+
 =head2 nth_powerfree
 
     nth_powerfree(n, k=2)

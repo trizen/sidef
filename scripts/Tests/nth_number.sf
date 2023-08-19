@@ -8,6 +8,18 @@ assert_eq(300.of{.nth_prime}.slice(1), 300.dec.by{.is_prime})
 
 assert_eq(nth_almost_prime(500, 500), 487939787489518647498841089183363998627293204988294345182353119556829944026571800837287448137330088425304046352764423084811447303871041402011783643791360)
 
+assert_eq(20.of { .nth_perfect_power }, 20.by { .is_perfect_power })
+
+with (20.of { .nth_perfect_power }) {|a|
+    var b = a.map { .nth_perfect_power }
+    assert(a.all { .is_perfect_power })
+    assert(b.all { .is_perfect_power })
+    assert_eq(b.map { .perfect_power_count }, a)
+    assert_eq(a.map { .perfect_power_count }, @^20)
+}
+
+assert_eq(nth_perfect_power(1e30), 999999999799999998042589213648741079622476300756355004439076)
+
 assert_eq(
     { nth_almost_prime(_, _) }.map(1..29)
     %n[2, 6, 18, 40, 108, 224, 480, 1296, 2688, 5632, 11520, 25600, 53248, 124416, 258048, 540672, 1105920, 2228224, 4587520, 9830400, 19922944, 40894464, 95551488, 192937984, 396361728, 822083584, 1660944384, 3397386240, 6845104128]
@@ -98,6 +110,12 @@ for n in (1 .. (Number.HAS_PRIME_UTIL ? 8 : 5)), k in (2..14 -> map{|b| b**n }) 
         var t = nth_prime_power(k)
         assert(t.is_prime_power)
         assert_eq(t.prime_power_count, k)
+    }
+
+    do {
+        var t = nth_perfect_power(k)
+        assert(t.is_perfect_power)
+        assert_eq(t.perfect_power_count, k)
     }
 
     do {

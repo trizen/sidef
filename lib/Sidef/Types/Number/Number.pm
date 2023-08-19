@@ -16574,9 +16574,13 @@ package Sidef::Types::Number::Number {
             return $to->prime_power_sum->sub($from->dec->prime_power_sum);
         }
 
-        # a(n) = Sum_{p prime <= n} p
-        # b(n) = Sum_{p prime <= n^(1/2)} p^2
-        # c(n) = Sum_{p prime <= n^(1/3)} f(p)
+        # Simple formula:
+        #   prime_power_sum(n) = Sum_{k=1..floor(log_2(n))} Sum_{p prime <= n^(1/k)} p^k
+
+        # Optimized formula:
+        #   a(n) = Sum_{p prime <= n} p
+        #   b(n) = Sum_{p prime <= n^(1/2)} p^2
+        #   c(n) = Sum_{p prime <= n^(1/3)} f(p)
 
         # prime_power_sum(n) = a(n) + b(n) + c(n)
 
@@ -16599,8 +16603,8 @@ package Sidef::Types::Number::Number {
                        : Math::Prime::Util::GMP::sieve_primes(2, $cr)
           ) {
 
-            # f(p) = sum(1..n.ilog(p), {|k| p**k }) - p^2 - p
-            #      = (p**(n.ilog(p)+1) - 1)/(p-1) - p^2 - p - 1
+            # f(p) = sum(3..n.ilog(p), {|k| p**k })
+            #      = (p**(n.ilog(p)+1) - 1)/(p-1) - p**2 - p - 1
 
             my $l = __ilog__($z, $p);
             Math::GMPz::Rmpz_ui_pow_ui($u, $p, $l + 1);
@@ -18304,7 +18308,7 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($x) // return Sidef::Types::Bool::Bool::FALSE;
 
         # When n is large enough, is_almost_prime(n,2) is faster
-        if (Math::GMPz::Rmpz_sizeinbase($x, 2) > MEDIUM_NUMBER_MAX_BITS) {
+        if (Math::GMPz::Rmpz_sizeinbase($x, 10) > FACTORDB_MIN) {
             return _set_int($x)->is_almost_prime(TWO);
         }
 
@@ -29981,6 +29985,30 @@ package Sidef::Types::Number::Number {
         }
 
         (bless \$n)->faulhaber_sum(ONE)->sub(_set_int(Math::Prime::Util::GMP::vecsum(@terms)));
+    }
+
+    sub nth_perfect_power {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            return $n->ipow($k);
+        }
+
+        my $z = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($z) <= 0) {
+            return ZERO;
+        }
+
+        bsearch_min(
+            $n,
+            $n->sqr,    # conjecture?
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $_[0]->perfect_power_count->cmp($n);
+                }
+            )
+        );
     }
 
     sub is_power_of {
