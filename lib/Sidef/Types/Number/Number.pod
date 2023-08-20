@@ -6824,6 +6824,14 @@ Returns an array with C<n> consecutive decreasing composite numbers starting fro
 
 =cut
 
+=head2 prev_omega_prime
+
+    n.prev_omega_prime(k=2)
+
+Returns the previous k-omega prime smaller than C<n>.
+
+=cut
+
 =head2 prev_perfect_power
 
     prev_perfect_power(n)

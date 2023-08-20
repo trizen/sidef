@@ -551,8 +551,20 @@ with (15.omega_primes(1922334673882737115)) {|a|
     assert_eq(a.len, 365)
 }
 
-assert_eq(next_omega_prime(1e12, 7), 1000000000090)
-assert_eq(next_omega_prime(1e12, 6), 1000000000010)
+for n,k in ([[4171, 1], [4171, 2], [4171, 3], [8.pn_primorial*17, 8], [1e8, 8], [1e8, 7], [1e8,6], [1e8,5], [1e12,7], [1e12,6], [1e12,5]]) {
+
+    assert_eq(next_omega_prime(n,k), ->(n) {
+        ++n; while (!n.is_omega_prime(k)) { ++n }; n
+    }(n))
+
+    assert_eq(prev_omega_prime(n,k), ->(n) {
+        --n; while (!n.is_omega_prime(k)) { --n }; n
+    }(n))
+}
+
+assert_eq(prev_perfect_power(4171), do {
+    var n = 4171; while (!n.is_perfect_power) { --n }; n
+})
 
 assert_eq(
     10.by { .is_squarefree_almost_prime(2) },
