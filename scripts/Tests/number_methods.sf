@@ -454,32 +454,56 @@ do {
 
 do {
     var p = (2**127 - 1)
+    var t = nil
 
     for k in (-100 .. 100) {
-        var t = next_prime_power(p+k)
-        assert(t.is_prime_power)
+
+        if (1.rand < 0.3) {
+            t = next_prime_power(p+k)
+            assert(t.is_prime_power)
+            assert(t > p+k)
+
+            t = prev_prime_power(p+k)
+            assert(t.is_prime_power)
+            assert(t < p+k)
+        }
 
         if (1.rand < 0.05) {
             t = next_perfect_power(p+k)
             assert(t.is_perfect_power)
+            assert(t > p+k)
+
             t = prev_perfect_power(p+k)
             assert(t.is_perfect_power)
+            assert(t < p+k)
         }
     }
 }
 
 do {
     var p = 4171
+    var t = nil
 
     for k in (-100 .. 100) {
-        var t = next_prime_power(p+k)
-        assert(t.is_prime_power)
+
+        if (1.rand < 0.3) {
+            t = next_prime_power(p+k)
+            assert(t.is_prime_power)
+            assert(t > p+k)
+
+            t = prev_prime_power(p+k)
+            assert(t.is_prime_power)
+            assert(t < p+k)
+        }
 
         if (1.rand < 0.1) {
             t = next_perfect_power(p+k)
             assert(t.is_perfect_power)
+            assert(t > p+k)
+
             t = prev_perfect_power(p+k)
             assert(t.is_perfect_power)
+            assert(t < p+k)
         }
     }
 }

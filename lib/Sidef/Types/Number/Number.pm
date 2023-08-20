@@ -20945,6 +20945,31 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub prev_prime_power {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_cmp_ui($n, 2) <= 0 and goto &nan;
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) - 1;
+            until (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($n) : Math::Prime::Util::GMP::is_prime_power($n)) {
+                --$n;
+            }
+            return bless \$n;
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($r, $n, 1);
+
+        until (Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($r, 10))) {
+            Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+        }
+
+        bless \$r;
+    }
+
     sub next_squarefree {
         my ($n) = @_;
 
