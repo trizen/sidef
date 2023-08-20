@@ -30007,8 +30007,8 @@ package Sidef::Types::Number::Number {
 
         my $z = _any2mpz($$n) // goto &nan;
 
-        if (Math::GMPz::Rmpz_sgn($z) <= 0) {
-            return ZERO;
+        if (Math::GMPz::Rmpz_sgn($z) < 0) {
+            goto &nan;
         }
 
         bsearch_min(
@@ -30020,6 +30020,26 @@ package Sidef::Types::Number::Number {
                 }
             )
         );
+    }
+
+    sub next_perfect_power {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            return $n->iroot($k)->inc->ipow($k);
+        }
+
+        $n->perfect_power_count->inc->nth_perfect_power;
+    }
+
+    sub prev_perfect_power {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            return $n->iroot($k)->dec->ipow($k);
+        }
+
+        $n->perfect_power_count->dec->nth_perfect_power;
     }
 
     sub is_power_of {

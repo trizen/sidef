@@ -458,6 +458,13 @@ do {
     for k in (-100 .. 100) {
         var t = next_prime_power(p+k)
         assert(t.is_prime_power)
+
+        if (1.rand < 0.05) {
+            t = next_perfect_power(p+k)
+            assert(t.is_perfect_power)
+            t = prev_perfect_power(p+k)
+            assert(t.is_perfect_power)
+        }
     }
 }
 
@@ -467,6 +474,13 @@ do {
     for k in (-100 .. 100) {
         var t = next_prime_power(p+k)
         assert(t.is_prime_power)
+
+        if (1.rand < 0.1) {
+            t = next_perfect_power(p+k)
+            assert(t.is_perfect_power)
+            t = prev_perfect_power(p+k)
+            assert(t.is_perfect_power)
+        }
     }
 }
 

@@ -5764,6 +5764,21 @@ Efficiently returns the next palindrome in base-b greater than C<n>.
 
 =cut
 
+=head2 next_perfect_power
+
+    next_perfect_power(n)
+    next_perfect_power(n,k)
+
+Returns the next perfect power greater than C<n>.
+
+    say next_perfect_power(1e6)     #=> 1002001
+
+When C<k> is given, it returns the next k-perfect-power greater than C<n>.
+
+    say next_perfect_power(1e6, 3)  #=> 1030301
+
+=cut
+
 =head2 next_pow
 
     n.next_pow(b)
@@ -6806,6 +6821,21 @@ Returns an array with C<n> consecutive decreasing composite numbers starting fro
 
     say 5.prev_composites(10)   #=> [10, 9, 8, 6, 4]
     say 5.prev_composites(97)   #=> [96, 95, 94, 93, 92]
+
+=cut
+
+=head2 prev_perfect_power
+
+    prev_perfect_power(n)
+    prev_perfect_power(n,k)
+
+Returns the previous perfect power less than C<n>.
+
+    say prev_perfect_power(1e6)     #=> 998001
+
+When C<k> is given, it returns the previous k-perfect-power less than C<n>.
+
+    say prev_perfect_power(1e6,3)   #=> 970299
 
 =cut
 
