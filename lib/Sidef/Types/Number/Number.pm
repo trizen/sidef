@@ -29971,20 +29971,31 @@ package Sidef::Types::Number::Number {
         }
 
         # Formula:
-        #   a(n) = faulhaber(n,1) - Sum_{k=1..floor(log_2(n))} μ(k) * (faulhaber(floor(n^(1/k)),k) - 1).
+        #   a(n) = faulhaber(n,1) - Sum_{k=1..floor(log_2(n))} μ(k) * (faulhaber(floor(n^(1/k)),k) - 1)
+        #        = 1 - Sum_{k=2..floor(log_2(n))} μ(k) * (faulhaber(floor(n^(1/k)),k) - 1)
 
-        my @terms;
-        my $t = Math::GMPz::Rmpz_init();
+        my $t   = Math::GMPz::Rmpz_init();
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
-        foreach my $k (1 .. __ilog__($n, 2)) {
+        foreach my $k (2 .. __ilog__($n, 2)) {
             my $mu = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k)) || next;
             Math::GMPz::Rmpz_root($t, $n, $k);
-            my $f = (bless \$t)->faulhaber_sum(bless \$k)->dec;
-            $f = $f->neg if ($mu == -1);
-            push @terms, $$f;
+            my $f = ${(bless \$t)->faulhaber_sum(bless \$k)} - 1;
+            if (ref($f)) {
+                ($mu == 1)
+                  ? Math::GMPz::Rmpz_add($sum, $sum, $f)
+                  : Math::GMPz::Rmpz_sub($sum, $sum, $f);
+            }
+            else {
+                ($mu == 1)
+                  ? Math::GMPz::Rmpz_add_ui($sum, $sum, $f)
+                  : Math::GMPz::Rmpz_sub_ui($sum, $sum, $f);
+            }
         }
 
-        (bless \$n)->faulhaber_sum(ONE)->sub(_set_int(Math::Prime::Util::GMP::vecsum(@terms)));
+        Math::GMPz::Rmpz_ui_sub($sum, 1, $sum);
+        $sum = Math::GMPz::Rmpz_get_ui($sum) if Math::GMPz::Rmpz_fits_ulong_p($sum);
+        bless \$sum;
     }
 
     sub nth_perfect_power {
