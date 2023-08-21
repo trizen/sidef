@@ -6805,6 +6805,14 @@ Aliases: I<perfect_power_udivisors>, I<perfect_power_unitary_divisors>
 
 =cut
 
+=head2 prev_almost_prime
+
+    n.prev_almost_prime(k=2)
+
+Returns the previous k-almost prime smaller than C<n>.
+
+=cut
+
 =head2 prev_composite
 
     prev_composite(n)
@@ -6883,6 +6891,14 @@ Returns the previous prime power smaller than C<n>.
 Returns an array with C<n> consecutive decreasing prime numbers starting from C<start>.
 
     say 5.prev_primes(100)  #=> [97, 89, 83, 79, 73]
+
+=cut
+
+=head2 prev_semiprime
+
+    n.prev_semiprime
+
+Returns the previous semiprime smaller than C<n>.
 
 =cut
 

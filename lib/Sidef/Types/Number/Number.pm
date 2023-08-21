@@ -16261,8 +16261,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        # TODO: detect large n with moderately large k
-        if ($k <= 7) {
+        if ($k <= 7 or $n > $r * ($k * $k)) {
 
             # Optimization for native integers
             if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_slong_p($n)) {
@@ -16318,8 +16317,7 @@ package Sidef::Types::Number::Number {
             goto &nan;
         }
 
-        # TODO: detect large n with moderately large k
-        if ($k <= 7) {
+        if ($k <= 7 or $n > $r * ($k * $k)) {
 
             # Optimization for native integers
             if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
@@ -16439,8 +16437,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        # TODO: detect large n with moderately large k
-        if ($k <= 7) {
+        if ($k <= 7 or $n > $r * ($k * $k)) {
 
             # Optimization for native integers
             if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_slong_p($n)) {
@@ -18575,7 +18572,7 @@ package Sidef::Types::Number::Number {
             until (HAS_PRIME_UTIL ? Math::Prime::Util::is_semiprime($n) : Math::Prime::Util::GMP::is_semiprime($n)) {
                 ++$n;
             }
-            return _set_int($n);
+            return bless \$n;
         }
 
         my $r = Math::GMPz::Rmpz_init();
@@ -18583,6 +18580,31 @@ package Sidef::Types::Number::Number {
 
         until (Math::Prime::Util::GMP::is_semiprime(Math::GMPz::Rmpz_get_str($r, 10))) {
             Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        }
+
+        bless \$r;
+    }
+
+    sub prev_semiprime {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_cmp_ui($n, 4) <= 0 and goto &nan;
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) - 1;
+            until (HAS_PRIME_UTIL ? Math::Prime::Util::is_semiprime($n) : Math::Prime::Util::GMP::is_semiprime($n)) {
+                --$n;
+            }
+            return bless \$n;
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($r, $n, 1);
+
+        until (Math::Prime::Util::GMP::is_semiprime(Math::GMPz::Rmpz_get_str($r, 10))) {
+            Math::GMPz::Rmpz_sub_ui($r, $r, 1);
         }
 
         bless \$r;
@@ -27843,6 +27865,25 @@ package Sidef::Types::Number::Number {
         $k_obj->almost_primes((bless \$min), (bless \$v))->last;
     }
 
+    sub _almost_prime_count_cost {
+        my ($n, $k) = @_;
+
+        sub {
+            my ($m, $k) = @_;
+
+            my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($n, $m), $k);
+
+            if ($k == 2) {
+                return
+                  Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::rootint($s, (HAS_NEW_PRIME_UTIL ? 3 : 2)),
+                                                 Math::Prime::Util::GMP::prime_count_upper($s));
+            }
+
+            Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::prime_count_upper($s), __SUB__->(Math::Prime::Util::GMP::mulint($m, $s), $k - 1));
+          }
+          ->(1, $k);
+    }
+
     sub next_almost_prime {
         my ($n, $k) = @_;
 
@@ -27862,7 +27903,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $n_obj = $n;
-        my $k_obj = _set_int($k);
+        my $k_obj = bless \$k;
 
         $n = _any2mpz($$n) // goto &nan;
 
@@ -27880,24 +27921,8 @@ package Sidef::Types::Number::Number {
 
         if ($k <= 23) {
 
-            # Approximate the cost it would take to count the k-almost primes <= n
-            my $cost = sub {
-                my ($m, $k) = @_;
-
-                my $s = Math::Prime::Util::GMP::rootint(Math::Prime::Util::GMP::divint($n, $m), $k);
-
-                if ($k == 2) {
-                    return
-                      Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::rootint($s, (HAS_NEW_PRIME_UTIL ? 3 : 2)),
-                                                     Math::Prime::Util::GMP::prime_count_upper($s));
-                }
-
-                Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::prime_count_upper($s), __SUB__->(Math::Prime::Util::GMP::mulint($m, $s), $k - 1));
-              }
-              ->(1, $k);
-
             # When the cost is too large, do a linear search for the next k-almost prime
-            if ($cost >= 1e7) {
+            if ($k <= 20 or _almost_prime_count_cost($n, $k) >= 1e7) {
 
                 # Optimization for native integers
                 if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_slong_p($n)) {
@@ -27905,7 +27930,7 @@ package Sidef::Types::Number::Number {
                     until (Math::Prime::Util::is_almost_prime($k, $n)) {
                         ++$n;
                     }
-                    return _set_int($n);
+                    return bless \$n;
                 }
 
                 Math::GMPz::Rmpz_add_ui($r, $n, 1);
@@ -27921,6 +27946,72 @@ package Sidef::Types::Number::Number {
         }
 
         $k_obj->almost_prime_count($n_obj)->inc->nth_almost_prime($k_obj);
+    }
+
+    sub prev_almost_prime {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) || goto &nan;
+        }
+        else {
+            $k = 2;
+        }
+
+        if ($k == 1) {
+            return $n->prev_prime;
+        }
+        elsif ($k == 2) {
+            return $n->prev_semiprime;
+        }
+
+        my $n_obj = $n;
+        my $k_obj = bless \$k;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+            goto &nan;
+        }
+
+        my $r = Math::GMPz::Rmpz_init_set_ui(0);
+        Math::GMPz::Rmpz_setbit($r, $k);
+
+        # Smallest k-almost prime is 2^k
+        if (Math::GMPz::Rmpz_cmp($n, $r) <= 0) {
+            goto &nan;
+        }
+
+        if ($k <= 23) {
+
+            # When the cost is too large, do a linear search for the next k-almost prime
+            if ($k <= 20 or _almost_prime_count_cost($n, $k) >= 1e7) {
+
+                # Optimization for native integers
+                if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                    $n = Math::GMPz::Rmpz_get_ui($n) - 1;
+                    until (Math::Prime::Util::is_almost_prime($k, $n)) {
+                        --$n;
+                    }
+                    return bless \$n;
+                }
+
+                Math::GMPz::Rmpz_sub_ui($r, $n, 1);
+
+                my $r_obj = bless \$r;
+
+                until ($r_obj->is_almost_prime($k_obj)) {
+                    Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+                }
+
+                return $r_obj;
+            }
+        }
+
+        my $count = $k_obj->almost_prime_count($n_obj);
+        $count = $count->dec if $n_obj->is_almost_prime($k_obj);
+        $count->nth_almost_prime($k_obj);
     }
 
     sub squarefree_almost_primes {
