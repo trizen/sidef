@@ -551,6 +551,12 @@ with (15.omega_primes(1922334673882737115)) {|a|
     assert_eq(a.len, 365)
 }
 
+assert_eq(next_squarefree(2**31 + 3), 2**31 + 6)
+assert_eq(next_squarefree(2**128 + 1), 2**128 + 2)
+
+assert_eq(prev_squarefree(2**31 + 3), 2**31 + 1)
+assert_eq(prev_squarefree(2**128 + 3), 2**128 + 2)
+
 assert_eq(next_semiprime(4171), 4174)
 assert_eq(next_semiprime(4171-1), 4171)
 assert_eq(next_semiprime(2**128 + 1), 2**128 + 3)
@@ -565,6 +571,8 @@ assert_eq(next_almost_prime(2**128 + 1, 126), (75*128**18 + 120*128**17)/15)
 
 #assert_eq(next_omega_prime(16.pn_primorial, 16), 36278497172720993190)  # quite slow
 
+var seen = Set()
+
 for n,k in ([[4171, 1], [4171, 2], [4171, 3], [8.pn_primorial*17, 8], [1e8, 8], [1e8, 7], [1e8,6], [1e8,5], [1e12,7], [1e12,6], [1e12,5]]) {
 
     assert_eq(prev_almost_prime(next_almost_prime(n, k), k), prev_almost_prime(n+1, k))
@@ -572,6 +580,43 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [8.pn_primorial*17, 8], [1e8, 8], 
 
     assert_eq(prev_omega_prime(next_omega_prime(n, k), k), prev_omega_prime(n+1, k))
     assert_eq(next_omega_prime(prev_omega_prime(n, k), k), next_omega_prime(n-1, k))
+
+    if (!seen.has(n)) {     # methods that take only one argument (n)
+
+        seen << n
+
+        assert_eq(next_semiprime(n), ->(n) {
+            ++n; while (!n.is_semiprime) { ++n }; n
+        }(n))
+
+        assert_eq(prev_semiprime(n), ->(n) {
+            --n; while (!n.is_semiprime) { --n }; n
+        }(n))
+
+        assert_eq(next_squarefree(n), ->(n) {
+            ++n; while (!n.is_squarefree) { ++n }; n
+        }(n))
+
+        assert_eq(prev_squarefree(n), ->(n) {
+            --n; while (!n.is_squarefree) { --n }; n
+        }(n))
+
+        assert_eq(next_prime(n), ->(n) {
+            ++n; while (!n.is_prime) { ++n }; n
+        }(n))
+
+        assert_eq(prev_prime(n), ->(n) {
+            --n; while (!n.is_prime) { --n }; n
+        }(n))
+
+        assert_eq(next_prime_power(n), ->(n) {
+            ++n; while (!n.is_prime_power) { ++n }; n
+        }(n))
+
+        assert_eq(prev_prime_power(n), ->(n) {
+            --n; while (!n.is_prime_power) { --n }; n
+        }(n))
+    }
 
     assert_eq(next_omega_prime(n,k), ->(n) {
         ++n; while (!n.is_omega_prime(k)) { ++n }; n
@@ -589,6 +634,10 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [8.pn_primorial*17, 8], [1e8, 8], 
         --n; while (!n.is_almost_prime(k)) { --n }; n
     }(n))
 }
+
+assert_eq(next_perfect_power(4171), do {
+    var n = 4171; while (!n.is_perfect_power) { ++n }; n
+})
 
 assert_eq(prev_perfect_power(4171), do {
     var n = 4171; while (!n.is_perfect_power) { --n }; n

@@ -6845,11 +6845,11 @@ Returns the previous k-omega prime smaller than C<n>.
     prev_perfect_power(n)
     prev_perfect_power(n,k)
 
-Returns the previous perfect power less than C<n>.
+Returns the previous perfect power smaller than C<n>.
 
     say prev_perfect_power(1e6)     #=> 998001
 
-When C<k> is given, it returns the previous k-perfect-power less than C<n>.
+When C<k> is given, it returns the previous k-perfect-power smaller than C<n>.
 
     say prev_perfect_power(1e6,3)   #=> 970299
 
@@ -6899,6 +6899,14 @@ Returns an array with C<n> consecutive decreasing prime numbers starting from C<
     n.prev_semiprime
 
 Returns the previous semiprime smaller than C<n>.
+
+=cut
+
+=head2 prev_squarefree
+
+    n.prev_squarefree
+
+Returns the previous squarefree number smaller than C<n>.
 
 =cut
 
@@ -8651,7 +8659,7 @@ The unitary totient function. (OEIS: A047994)
     urand(n)
     urand(a, b)
 
-Given a positive integer C<n>, returns a random unsigned integer less than C<n>.
+Given a positive integer C<n>, returns a random unsigned integer smaller than C<n>.
 
     say urand(100)          # random integer in [0,99]
 

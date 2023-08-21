@@ -16422,7 +16422,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $n_obj = $n;
-        my $k_obj = _set_int($k);
+        my $k_obj = bless \$k;
 
         $n = _any2mpz($$n) // goto &nan;
 
@@ -16445,7 +16445,7 @@ package Sidef::Types::Number::Number {
                 until (Math::Prime::Util::is_almost_prime($k, $n) and Math::Prime::Util::is_square_free($n)) {
                     ++$n;
                 }
-                return _set_int($n);
+                return bless \$n;
             }
 
             Math::GMPz::Rmpz_add_ui($r, $n, 1);
@@ -21009,10 +21009,10 @@ package Sidef::Types::Number::Number {
         # Optimization for native integers
         if (Math::GMPz::Rmpz_fits_slong_p($n)) {
             $n = Math::GMPz::Rmpz_get_ui($n) + 1;
-            until (_is_squarefree($n)) {
+            until (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($n) : Math::Prime::Util::GMP::moebius($n)) {
                 ++$n;
             }
-            return _set_int($n);
+            return bless \$n;
         }
 
         my $r = Math::GMPz::Rmpz_init();
@@ -21022,6 +21022,33 @@ package Sidef::Types::Number::Number {
 
         until ($r_obj->is_squarefree) {
             Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        }
+
+        $r_obj;
+    }
+
+    sub prev_squarefree {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0 and goto &nan;
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) - 1;
+            until (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($n) : Math::Prime::Util::GMP::moebius($n)) {
+                --$n;
+            }
+            return bless \$n;
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($r, $n, 1);
+
+        my $r_obj = bless \$r;
+
+        until ($r_obj->is_squarefree) {
+            Math::GMPz::Rmpz_sub_ui($r, $r, 1);
         }
 
         $r_obj;
