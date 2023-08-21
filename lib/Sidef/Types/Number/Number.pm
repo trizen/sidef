@@ -16420,6 +16420,9 @@ package Sidef::Types::Number::Number {
         if ($k == 1) {
             return $n->next_prime;
         }
+        elsif ($k == 2) {
+            return $n->next_squarefree_semiprime;
+        }
 
         my $n_obj = $n;
         my $k_obj = bless \$k;
@@ -18605,6 +18608,42 @@ package Sidef::Types::Number::Number {
 
         until (Math::Prime::Util::GMP::is_semiprime(Math::GMPz::Rmpz_get_str($r, 10))) {
             Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+        }
+
+        bless \$r;
+    }
+
+    sub next_squarefree_semiprime {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
+        Math::GMPz::Rmpz_cmp_ui($n, 6) < 0 and return _set_int(6);
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_slong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) + 1;
+            until (
+                   HAS_PRIME_UTIL
+                   ? (Math::Prime::Util::is_semiprime($n) && !Math::Prime::Util::is_square($n))
+                   : (Math::Prime::Util::GMP::is_semiprime($n) && !Math::Prime::Util::GMP::is_square($n))
+              ) {
+                ++$n;
+            }
+            return bless \$n;
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add_ui($r, $n, 1);
+
+        until (
+            do {
+                my $str = Math::GMPz::Rmpz_get_str($r, 10);
+                Math::Prime::Util::GMP::is_semiprime($str) && !Math::Prime::Util::GMP::is_square($str);
+            }
+          ) {
+            Math::GMPz::Rmpz_add_ui($r, $r, 1);
         }
 
         bless \$r;
@@ -26213,13 +26252,13 @@ package Sidef::Types::Number::Number {
         if (defined($k)) {
             _valid(\$k);
             $k = _any2ui($$k) // goto &nan;
-            $k >= 2 or goto &nan;
+            $k >= 1 or goto &nan;
         }
         else {
             $k = 2;
         }
 
-        my $k_obj = _set_int($k);
+        my $k_obj = bless \$k;
         my $n_obj = $n;
 
         $n = _any2mpz($$n) // goto &nan;
@@ -26228,6 +26267,10 @@ package Sidef::Types::Number::Number {
             return ZERO if (Math::GMPz::Rmpz_sgn($n) == 0);    # not k-powerful, but...
             goto &nan;
         };
+
+        if ($k == 1) {
+            return bless \$n;
+        }
 
         my $min = Math::GMPz::Rmpz_init_set_ui(1);
         my $max = Math::GMPz::Rmpz_init_set($n);

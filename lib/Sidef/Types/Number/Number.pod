@@ -5852,6 +5852,14 @@ Returns the next squarefree k-almost prime greater than C<n>.
 
 =cut
 
+=head2 next_squarefree_semiprime
+
+    n.next_squarefree_semiprime
+
+Returns the next squarefree semiprime greater than C<n>.
+
+=cut
+
 =head2 next_twin_prime
 
     n.next_twin_prime

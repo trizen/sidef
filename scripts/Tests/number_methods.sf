@@ -557,9 +557,15 @@ assert_eq(next_squarefree(2**128 + 1), 2**128 + 2)
 assert_eq(prev_squarefree(2**31 + 3), 2**31 + 1)
 assert_eq(prev_squarefree(2**128 + 3), 2**128 + 2)
 
+assert_eq(next_semiprime(23), 25)
 assert_eq(next_semiprime(4171), 4174)
 assert_eq(next_semiprime(4171-1), 4171)
 assert_eq(next_semiprime(2**128 + 1), 2**128 + 3)
+
+assert_eq(next_squarefree_semiprime(23), 26)
+assert_eq(next_squarefree_semiprime(4171), 4174)
+assert_eq(next_squarefree_semiprime(4171-1), 4171)
+assert_eq(next_squarefree_semiprime(2**128 + 1), 2**128 + 3)
 
 assert_eq(prev_semiprime(4171), 4169)
 assert_eq(prev_semiprime(4171+1), 4171)
@@ -592,6 +598,14 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [8.pn_primorial*17, 8], [1e8, 8], 
         assert_eq(prev_semiprime(n), ->(n) {
             --n; while (!n.is_semiprime) { --n }; n
         }(n))
+
+        assert_eq(next_squarefree_semiprime(n), ->(n) {
+            ++n; while (!n.is_squarefree_semiprime) { ++n }; n
+        }(n))
+
+        #~ assert_eq(prev_squarefree_semiprime(n), ->(n) {
+            #~ --n; while (!n.is_squarefree_semiprime) { --n }; n
+        #~ }(n))
 
         assert_eq(next_squarefree(n), ->(n) {
             ++n; while (!n.is_squarefree) { ++n }; n
@@ -633,6 +647,16 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [8.pn_primorial*17, 8], [1e8, 8], 
     assert_eq(prev_almost_prime(n,k), ->(n) {
         --n; while (!n.is_almost_prime(k)) { --n }; n
     }(n))
+
+    if (n <= 1e6) {
+        assert_eq(next_powerful(n,k), ->(n) {
+            ++n; while (!n.is_powerful(k)) { ++n }; n
+        }(n))
+
+        #~ assert_eq(prev_powerful(n,k), ->(n) {
+            #~ --n; while (!n.is_powerful(k)) { --n }; n
+        #~ }(n))
+    }
 }
 
 assert_eq(next_perfect_power(4171), do {
