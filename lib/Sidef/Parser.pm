@@ -7,7 +7,7 @@ package Sidef::Parser {
     use List::Util   qw(first);
     use Scalar::Util qw(refaddr);
 
-    our $REGMARK;
+    # our $REGMARK;
 
     sub new {
         my (undef, %opts) = @_;
@@ -607,7 +607,7 @@ package Sidef::Parser {
 
         my $orig_pos   = pos($_);
         my $beg_delim  = quotemeta $delim;
-        my $pair_delim = $self->{delim_pairs}{$delim};
+        my $pair_delim = exists($self->{delim_pairs}{$delim}) ? $self->{delim_pairs}{$delim} : ();
 
         my $string = '';
         if (defined $pair_delim) {
@@ -616,21 +616,23 @@ package Sidef::Parser {
             my $re_delim  = $beg_delim . $end_delim;
 
             # if (m{\G(?<main>$beg_delim((?>[^$re_delim\\]+|\\.|(?&main))*+)$end_delim)}sgc) {
+            # if (m{\G(?<main>$beg_delim((?>[^\\$re_delim]*+(?>\\.[^\\$re_delim]*|(?&main)){0,}){0,})(?:$end_delim(*ACCEPT:term))?)(*PRUNE)(*FAIL)}sgc) {
 
-            if (m{\G(?<main>$beg_delim((?>[^\\$re_delim]*+(?>\\.[^\\$re_delim]*|(?&main)){0,}){0,})(?:$end_delim(*ACCEPT:term))?)(*PRUNE)(*FAIL)}sgc) {
+            if (m{\G(?<main>$beg_delim((?>[^\\$re_delim]*+(?>\\.[^\\$re_delim]*|(?&main)){0,}){0,})$end_delim)}sgc) {
                 $string = $2 =~ s/\\([$re_delim])/$1/gr;
             }
         }
 
         # elsif (m{\G$beg_delim([^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*)*)}sgc) {    # limited to 2^15-1 escapes
         # elsif (m{\G$beg_delim((?>(?>[^$beg_delim\\]++|\\.){0,}+){0,}+)}sgc) {
+        # elsif (m{\G$beg_delim((?>[^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*){0,}){0,})(?:$beg_delim(*ACCEPT:term))?(*PRUNE)(*FAIL)}sgc) {
 
-        elsif (m{\G$beg_delim((?>[^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*){0,}){0,})(?:$beg_delim(*ACCEPT:term))?(*PRUNE)(*FAIL)}sgc) {
+        elsif (m{\G$beg_delim((?>[^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*){0,}){0,})}sgc) {
             $string = $1 =~ s/\\([$beg_delim])/$1/gr;
         }
 
-        #(defined($pair_delim) ? /\G(?<=\Q$pair_delim\E)/ : /\G$beg_delim/gc)
-        $REGMARK eq 'term'
+        # $REGMARK eq 'term'
+        (defined($pair_delim) ? /\G(?<=\Q$pair_delim\E)/ : /\G$beg_delim/gc)
           || $self->fatal_error(
                                 error => sprintf(qq{can't find the quoted string terminator <<%s>>}, $pair_delim // $delim),
                                 code  => $_,
@@ -1016,11 +1018,11 @@ package Sidef::Parser {
                             /\G\R/gc
                               ? ++$self->{line}
                               : $self->fatal_error(
-                                                 error => "can't find string terminator <<$name>> anywhere before end-of-file",
-                                                 code  => $_,
-                                                 pos   => $eot->{pos},
-                                                 line  => $eot->{line},
-                              );
+                                                   error => "can't find string terminator <<$name>> anywhere before end-of-file",
+                                                   code  => $_,
+                                                   pos   => $eot->{pos},
+                                                   line  => $eot->{line},
+                                                  );
                         }
 
                         if ($indent and $spaces > 0) {
@@ -1561,10 +1563,8 @@ package Sidef::Parser {
                 }
 
                 my $obj =
-                  ($type eq 'func' or $type eq 'method')
-                  ? bless({name => $name, type => $type, class => $class_name}, 'Sidef::Variable::Variable')
-                  : $type eq 'class'
-                  ? bless({name => ($built_in_obj // $name), class => $class_name}, 'Sidef::Variable::ClassInit')
+                    ($type eq 'func' or $type eq 'method') ? bless({name => $name, type => $type, class => $class_name}, 'Sidef::Variable::Variable')
+                  : $type eq 'class' ? bless({name => ($built_in_obj // $name), class => $class_name}, 'Sidef::Variable::ClassInit')
                   : $self->fatal_error(
                                        error  => "invalid type",
                                        reason => "expected a magic thing to happen",
@@ -2065,8 +2065,7 @@ package Sidef::Parser {
                     if (@{$self->{inc}} == 0) {
                         push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
 
-                        push @{$self->{inc}},
-                          File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
+                        push @{$self->{inc}}, File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
 
                         if (-f $self->{script_name}) {
                             push @{$self->{inc}}, File::Basename::dirname(Cwd::abs_path($self->{script_name}));
@@ -2086,10 +2085,10 @@ package Sidef::Parser {
                     }
 
                     $found_module // $self->fatal_error(
-                          code  => $_,
-                          pos   => $include_pos,
-                          error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
-                    );
+                                                        code  => $_,
+                                                        pos   => $include_pos,
+                                                        error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
+                                                       );
 
                     push @abs_filenames, [$full_path, $var_name];
                 }
@@ -2114,9 +2113,9 @@ package Sidef::Parser {
                     my @files = (
                         ref($expr) eq 'HASH'
                         ? do {
-                            map   { $_->{self} }
-                              map { @{$_->{self}->{$self->{class}}} }
-                              map { @{$expr->{$_}} }
+                            map { $_->{self} }
+                            map { @{$_->{self}->{$self->{class}}} }
+                            map { @{$expr->{$_}} }
                               keys %{$expr};
                           }
                         : $expr
@@ -2131,10 +2130,10 @@ package Sidef::Parser {
 
                         ref($filename) ne ''
                           and $self->fatal_error(
-                                  code  => $_,
-                                  pos   => $include_pos,
-                                  error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
-                          );
+                                                 code  => $_,
+                                                 pos   => $include_pos,
+                                                 error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
+                                                );
 
                         my @files;
                         foreach my $file (glob($filename)) {
@@ -2142,10 +2141,10 @@ package Sidef::Parser {
 
                             if (!defined($abs) or $abs eq '') {
                                 $self->fatal_error(
-                                          code  => $_,
-                                          pos   => $include_pos,
-                                          error => 'include-error: cannot resolve the absolute path to file <<' . $file . '>>',
-                                );
+                                                   code  => $_,
+                                                   pos   => $include_pos,
+                                                   error => 'include-error: cannot resolve the absolute path to file <<' . $file . '>>',
+                                                  );
                             }
 
                             push @files, $abs;
@@ -2595,18 +2594,14 @@ package Sidef::Parser {
                 if (
                     ref($self->{current_class}) eq 'Sidef::Variable::ClassInit'
                     and defined(
-                           my $var = (
-                               first { $_->{name} eq $name }
-                                 (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}})
-                           )
+                        my $var = (first { $_->{name} eq $name } (@{$self->{current_class}{vars}}, map { @{$_->{vars}} } @{$self->{current_class}{attributes}}))
                     )
                   ) {
                     if (exists $self->{current_method}) {
                         if (defined(my $var = $self->find_var('self', $class))) {
 
                             if ($self->{opt}{k}) {
-                                print STDERR
-                                  "[INFO] `$name` is parsed as `self.$name` at $self->{file_name} line $self->{line}\n";
+                                print STDERR "[INFO] `$name` is parsed as `self.$name` at $self->{file_name} line $self->{line}\n";
                             }
 
                             $var->{count}++;
@@ -2645,8 +2640,7 @@ package Sidef::Parser {
                 if (/\G(?=\h*:?=(?![=~>]))/) {
 
                     if (not $self->{interactive}) {
-                        warn "[WARNING] Implicit declaration of global variable `$name`"
-                          . " at $self->{file_name} line $self->{line}\n";
+                        warn "[WARNING] Implicit declaration of global variable `$name`" . " at $self->{file_name} line $self->{line}\n";
                     }
 
                     my $code = "global $name";
@@ -2657,8 +2651,7 @@ package Sidef::Parser {
                 if ($len_var == length($name)) {
 
                     if ($self->{opt}{k}) {
-                        print STDERR
-                          "[INFO] `$name` is parsed as a prefix method-call at $self->{file_name} line $self->{line}\n";
+                        print STDERR "[INFO] `$name` is parsed as a prefix method-call at $self->{file_name} line $self->{line}\n";
                     }
 
                     if ($self->{allow_class_variable}) {
@@ -3256,10 +3249,10 @@ package Sidef::Parser {
                                     $self->parse_whitespace(code => $opt{code});
 
                                     my $block = $self->parse_block(code => $opt{code}, with_vars => 1) // $self->fatal_error(
-                                                                          code  => $_,
-                                                                          pos   => pos($_) - 1,
-                                                                          error => "invalid declaration of the `if` statement",
-                                                                          reason => "expected a block after `elsif(...)`",
+                                                                                                           code  => $_,
+                                                                                                           pos   => pos($_) - 1,
+                                                                                                           error => "invalid declaration of the `if` statement",
+                                                                                                           reason => "expected a block after `elsif(...)`",
                                     );
 
                                     push @{$obj->{if}}, {expr => $arg, block => $block};
@@ -3298,10 +3291,10 @@ package Sidef::Parser {
                                     $self->parse_whitespace(code => $opt{code});
 
                                     my $block = $self->parse_block(code => $opt{code}, topic_var => 1) // $self->fatal_error(
-                                                                        code  => $_,
-                                                                        pos   => pos($_) - 1,
-                                                                        error => "invalid declaration of the `with` statement",
-                                                                        reason => "expected a block after `orwith(...)`",
+                                                                                                         code  => $_,
+                                                                                                         pos   => pos($_) - 1,
+                                                                                                         error => "invalid declaration of the `with` statement",
+                                                                                                         reason => "expected a block after `orwith(...)`",
                                     );
 
                                     push @{$obj->{with}}, {expr => $arg, block => $block};
