@@ -16472,6 +16472,67 @@ package Sidef::Types::Number::Number {
         $k_obj->squarefree_almost_prime_count($n_obj)->inc->nth_squarefree_almost_prime($k_obj);
     }
 
+    sub prev_squarefree_almost_prime {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) || goto &nan;
+        }
+        else {
+            $k = 2;
+        }
+
+        if ($k == 1) {
+            return $n->prev_prime;
+        }
+        elsif ($k == 2) {
+            return $n->prev_squarefree_semiprime;
+        }
+
+        my $n_obj = $n;
+        my $k_obj = bless \$k;
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($n) < 0) {
+            goto &nan;
+        }
+
+        my $r = Math::GMPz::Rmpz_init_set(_cached_pn_primorial($k));
+
+        # The smallest squarefree k-almost prime is primorial(p_k)
+        if (Math::GMPz::Rmpz_cmp($n, $r) <= 0) {
+            goto &nan;
+        }
+
+        if ($k <= 7 or $n > $r * ($k * $k)) {
+
+            # Optimization for native integers
+            if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                $n = Math::GMPz::Rmpz_get_ui($n) - 1;
+                until (Math::Prime::Util::is_almost_prime($k, $n) and Math::Prime::Util::is_square_free($n)) {
+                    --$n;
+                }
+                return bless \$n;
+            }
+
+            Math::GMPz::Rmpz_sub_ui($r, $n, 1);
+
+            my $r_obj = bless \$r;
+
+            until ($r_obj->is_squarefree_almost_prime($k_obj)) {
+                Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+            }
+
+            return $r_obj;
+        }
+
+        my $count = $k_obj->squarefree_almost_prime_count($n_obj);
+        $count = $count->dec if $n_obj->is_squarefree_almost_prime($k_obj);
+        $count->nth_squarefree_almost_prime($k_obj);
+    }
+
     sub prime_power_count {
         my ($x, $y) = @_;
 
@@ -18651,6 +18712,40 @@ package Sidef::Types::Number::Number {
             }
           ) {
             Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        }
+
+        bless \$r;
+    }
+
+    sub prev_squarefree_semiprime {
+        my ($n) = @_;
+
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_cmp_ui($n, 6) <= 0 and goto &nan;
+
+        # Optimization for native integers
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) - 1;
+            until (
+                   HAS_PRIME_UTIL
+                   ? (Math::Prime::Util::is_semiprime($n) && !Math::Prime::Util::is_square($n))
+                   : (Math::Prime::Util::GMP::is_semiprime($n) && !Math::Prime::Util::GMP::is_square($n))
+              ) {
+                --$n;
+            }
+            return bless \$n;
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($r, $n, 1);
+
+        until (
+            do {
+                my $str = Math::GMPz::Rmpz_get_str($r, 10);
+                Math::Prime::Util::GMP::is_semiprime($str) && !Math::Prime::Util::GMP::is_square($str);
+            }
+          ) {
+            Math::GMPz::Rmpz_sub_ui($r, $r, 1);
         }
 
         bless \$r;

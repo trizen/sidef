@@ -600,8 +600,8 @@ for k in (1..3) {
     )
 
     #~ assert_eq(
-        #~ n.inc.of { .next_powerful(k).prev_powerful(k) }.grep.uniq,
-        #~ k.powerful(n),
+        #~ n.inc.of { .next_non_powerfree(k).prev_non_powerfree(k) }.grep.uniq,
+        #~ k.non_powerfree(n),
     #~ )
 
     assert_eq(
@@ -609,10 +609,10 @@ for k in (1..3) {
         k.almost_primes(n),
     )
 
-    #~ assert_eq(
-        #~ n.inc.of { .next_squarefree_almost_prime(k).prev_squarefree_almost_prime(k) }.grep.uniq,
-        #~ k.squarefree_almost_primes(n),
-    #~ )
+    assert_eq(
+        n.inc.of { .next_squarefree_almost_prime(k).prev_squarefree_almost_prime(k) }.grep.uniq,
+        k.squarefree_almost_primes(n),
+    )
 
     assert_eq(
         n.inc.of { .next_omega_prime(k).prev_omega_prime(k) }.grep.uniq,
@@ -646,9 +646,9 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [8.pn_primorial*17, 8], [1e8, 8], 
             ++n; while (!n.is_squarefree_semiprime) { ++n }; n
         }(n))
 
-        #~ assert_eq(prev_squarefree_semiprime(n), ->(n) {
-            #~ --n; while (!n.is_squarefree_semiprime) { --n }; n
-        #~ }(n))
+        assert_eq(prev_squarefree_semiprime(n), ->(n) {
+            --n; while (!n.is_squarefree_semiprime) { --n }; n
+        }(n))
 
         assert_eq(next_squarefree(n), ->(n) {
             ++n; while (!n.is_squarefree) { ++n }; n
@@ -691,6 +691,14 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [8.pn_primorial*17, 8], [1e8, 8], 
         --n; while (!n.is_almost_prime(k)) { --n }; n
     }(n))
 
+    assert_eq(next_squarefree_almost_prime(n,k), ->(n) {
+        ++n; while (!n.is_squarefree_almost_prime(k)) { ++n }; n
+    }(n))
+
+    assert_eq(prev_squarefree_almost_prime(n,k), ->(n) {
+        --n; while (!n.is_squarefree_almost_prime(k)) { --n }; n
+    }(n))
+
     if (k > 1) {
         assert_eq(next_powerfree(n,k), ->(n) {
             ++n; while (!n.is_powerfree(k)) { ++n }; n
@@ -706,9 +714,9 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [8.pn_primorial*17, 8], [1e8, 8], 
             ++n; while (!n.is_powerful(k)) { ++n }; n
         }(n))
 
-        #~ assert_eq(prev_powerful(n,k), ->(n) {
-            #~ --n; while (!n.is_powerful(k)) { --n }; n
-        #~ }(n))
+        assert_eq(prev_powerful(n,k), ->(n) {
+            --n; while (!n.is_powerful(k)) { --n }; n
+        }(n))
     }
 }
 

@@ -6934,6 +6934,22 @@ Returns the previous squarefree number smaller than C<n>.
 
 =cut
 
+=head2 prev_squarefree_almost_prime
+
+    n.prev_squarefree_almost_prime(k=2)
+
+Returns the previous squarefree k-almost prime smaller than C<n>.
+
+=cut
+
+=head2 prev_squarefree_semiprime
+
+    n.prev_squarefree_semiprime
+
+Returns the previous squarefree semiprime smaller than C<n>.
+
+=cut
+
 =head2 prho_factor
 
     n.prho_factor
