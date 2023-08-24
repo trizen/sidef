@@ -594,10 +594,10 @@ for k in (1..3) {
         )
     }
 
-    #~ assert_eq(
-        #~ n.inc.of { .next_powerful(k).prev_powerful(k) }.grep.uniq,
-        #~ k.powerful(n),
-    #~ )
+    assert_eq(
+        n.inc.of { .next_powerful(k).prev_powerful(k) }.grep.uniq,
+        k.powerful(n),
+    )
 
     #~ assert_eq(
         #~ n.inc.of { .next_powerful(k).prev_powerful(k) }.grep.uniq,

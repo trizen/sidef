@@ -6884,6 +6884,14 @@ Returns the previous k-powerfree number smaller than C<n>.
 
 =cut
 
+=head2 prev_powerful
+
+    n.prev_powerful(k=2)
+
+Returns the previous k-powerful number smaller than C<n>.
+
+=cut
+
 =head2 prev_prime
 
     n.prev_prime
