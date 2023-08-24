@@ -2727,7 +2727,7 @@ Aliases: I<squarefree_strong_fermat_psp_each>
     n.squarefull_each { ... }
     squarefull_each(a, b, { ... })
 
-Iterates over the squarefull numbers <= C<n>, or in the range C<a..b>.
+Iterates over the squarefull (or 2-full) numbers <= C<n>, or in the range C<a..b>.
 
 Aliases: I<squarefull_each>
 
@@ -5743,6 +5743,46 @@ Given a non-negative integer C<n>, returns the next composite number greater tha
 
 =cut
 
+=head2 next_cubefree
+
+    n.next_cubefree
+
+Returns the next cubefree number greater than C<n>.
+
+=cut
+
+=head2 next_cubefull
+
+    n.next_cubefull
+
+Returns the next cubefull (or 2-full) number greater than C<n>.
+
+=cut
+
+=head2 next_non_cubefree
+
+    n.next_non_cubefree
+
+Returns the next non-cubefree number greater than C<n>.
+
+=cut
+
+=head2 next_non_powerfree
+
+    n.next_non_powerfree(k=2)
+
+Returns the next non-k-powerfree number greater than C<n>.
+
+=cut
+
+=head2 next_non_squarefree
+
+    n.next_non_squarefree
+
+Returns the next non-squarefree number greater than C<n>.
+
+=cut
+
 =head2 next_omega_prime
 
     n.next_omega_prime(k=2)
@@ -5808,7 +5848,7 @@ Returns the next k-powerfree number greater than C<n>.
 
     n.next_powerful(k=2)
 
-Returns the next k-powerful number greater than C<n>.
+Returns the next k-powerful (or k-full) number greater than C<n>.
 
 =cut
 
@@ -5857,6 +5897,14 @@ Returns the next squarefree k-almost prime greater than C<n>.
     n.next_squarefree_semiprime
 
 Returns the next squarefree semiprime greater than C<n>.
+
+=cut
+
+=head2 next_squarefull
+
+    n.next_squarefull
+
+Returns the next squarefull (or 2-full) number greater than C<n>.
 
 =cut
 
@@ -6122,7 +6170,7 @@ Returns the n-th k-powerfree number.
 
     nth_powerful(n, k=2)
 
-Returns the n-th k-powerful number.
+Returns the n-th k-powerful (or k-full) number.
 
     say nth_powerful(1e4, 2)    #=> 23002083
     say nth_powerful(1e4, 3)    #=> 16720797973
@@ -6717,7 +6765,7 @@ Returns the number of the k-powerfree unitary divisors of C<n>.
     k.powerful(n)
     k.powerful(a,b)
 
-Efficiently generates all the k-powerful numbers <= C<n>, or in the range C<a..b>.
+Returns an array with the k-powerful (or k-full) numbers <= C<n>, or in the range C<a..b>.
 
     say 2.powerful(100)          #=> 2-powerful numbers <= 100
     say 2.powerful(50, 100)      #=> 2-powerful numbers in the range 50..100
@@ -6729,7 +6777,7 @@ Efficiently generates all the k-powerful numbers <= C<n>, or in the range C<a..b
     k.powerful_count(n)
     k.powerful_count(a,b)
 
-Efficiently counts the number of k-powerful numbers <= C<n>, or in the range C<a..b>.
+Returns the number of k-powerful (or k-full) numbers <= C<n>, or in the range C<a..b>.
 
     say 2.powerful_count(100)       #=> count of 2-powerful numbers <= 100
     say 2.powerful_count(50, 100)   #=> count of 2-powerful numbers in the range 50..100
@@ -6741,7 +6789,7 @@ Efficiently counts the number of k-powerful numbers <= C<n>, or in the range C<a
     k.powerful_sum(n)
     k.powerful_sum(a,b)
 
-Efficiently sums the k-powerful numbers <= C<n>, or in the range C<a..b>.
+Returns the sum of k-powerful (or k-full) numbers <= C<n>, or in the range C<a..b>.
 
     say 2.powerful_sum(100)       #=> sum of 2-powerful numbers <= 100
     say 2.powerful_sum(50, 100)   #=> sum of 2-powerful numbers in the range 50..100
@@ -6892,6 +6940,46 @@ Returns an array with C<n> consecutive decreasing composite numbers starting fro
 
 =cut
 
+=head2 prev_cubefree
+
+    n.prev_cubefree
+
+Returns the previous cubefree number smaller than C<n>.
+
+=cut
+
+=head2 prev_cubefull
+
+    n.prev_cubefull
+
+Returns the previous cubefull or (3-full) number smaller than C<n>.
+
+=cut
+
+=head2 prev_non_cubefree
+
+    n.prev_non_cubefree
+
+Returns the previous non-cubefree number smaller than C<n>.
+
+=cut
+
+=head2 prev_non_powerfree
+
+    n.prev_non_powerfree(k)
+
+Returns the previous non-k-powerfree number smaller than C<n>.
+
+=cut
+
+=head2 prev_non_squarefree
+
+    n.prev_non_squarefree
+
+Returns the previous non-squarefree number smaller than C<n>.
+
+=cut
+
 =head2 prev_omega_prime
 
     n.prev_omega_prime(k=2)
@@ -6940,7 +7028,7 @@ Returns the previous k-powerfree number smaller than C<n>.
 
     n.prev_powerful(k=2)
 
-Returns the previous k-powerful number smaller than C<n>.
+Returns the previous k-powerful (or k-full) number smaller than C<n>.
 
 =cut
 
@@ -6999,6 +7087,14 @@ Returns the previous squarefree k-almost prime smaller than C<n>.
     n.prev_squarefree_semiprime
 
 Returns the previous squarefree semiprime smaller than C<n>.
+
+=cut
+
+=head2 prev_squarefull
+
+    n.prev_squarefull
+
+Returns the previous squarefull (or 2-full) number smaller than C<n>.
 
 =cut
 

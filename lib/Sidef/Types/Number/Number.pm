@@ -14256,15 +14256,23 @@ package Sidef::Types::Number::Number {
     sub nth_non_powerfree {
         my ($n, $k) = @_;
 
-        $k = _any2ui($$k)  // goto &nan;
-        $n = _any2mpz($$n) // goto &nan;
-
-        if ($k <= 0) {
-            goto &nan;
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+            $k >= 1 or goto &nan;
         }
+        else {
+            $k = 2;
+        }
+
+        $n = _any2mpz($$n) // goto &nan;
 
         if (Math::GMPz::Rmpz_sgn($n) <= 0) {
             goto &nan;
+        }
+
+        if ($k == 1) {
+            return ((bless \$n)->inc);
         }
 
         # If x is the n-th non-k-powerfree number, then:
@@ -14326,6 +14334,58 @@ package Sidef::Types::Number::Number {
     sub nth_non_cubefree {
         my ($n) = @_;
         $n->nth_non_powerfree(THREE);
+    }
+
+    sub next_non_powerfree {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+        }
+        else {
+            $k = TWO;
+        }
+
+        # TODO: optimize when n^(1/k) is too large.
+
+        $k->non_powerfree_count($n)->inc->nth_non_powerfree($k);
+    }
+
+    sub next_non_squarefree {
+        my ($n) = @_;
+        $n->next_non_powerfree(TWO);
+    }
+
+    sub next_non_cubefree {
+        my ($n) = @_;
+        $n->next_non_powerfree(THREE);
+    }
+
+    sub prev_non_powerfree {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+        }
+        else {
+            $k = TWO;
+        }
+
+        # TODO: optimize when n^(1/k) is too large.
+
+        my $count = $k->non_powerfree_count($n);
+        $count = $count->dec if $n->is_non_powerfree($k);
+        $count->nth_non_powerfree($k);
+    }
+
+    sub prev_non_squarefree {
+        my ($n) = @_;
+        $n->prev_non_powerfree(TWO);
+    }
+
+    sub prev_non_cubefree {
+        my ($n) = @_;
+        $n->prev_non_powerfree(THREE);
     }
 
     sub _sieve_powerfree {
@@ -21319,6 +21379,11 @@ package Sidef::Types::Number::Number {
         $r_obj;
     }
 
+    sub next_cubefree {
+        my ($n) = @_;
+        $n->next_powerfree(THREE);
+    }
+
     sub prev_powerfree {
         my ($n, $k) = @_;
 
@@ -21358,6 +21423,11 @@ package Sidef::Types::Number::Number {
         }
 
         $r_obj;
+    }
+
+    sub prev_cubefree {
+        my ($n) = @_;
+        $n->prev_powerfree(THREE);
     }
 
     sub znorder {
@@ -26556,6 +26626,16 @@ package Sidef::Types::Number::Number {
         $k->powerful_count($n)->inc->nth_powerful($k);
     }
 
+    sub next_squarefull {
+        my ($n) = @_;
+        $n->next_powerful(TWO);
+    }
+
+    sub next_cubefull {
+        my ($n) = @_;
+        $n->next_powerful(THREE);
+    }
+
     sub prev_powerful {
         my ($n, $k) = @_;
 
@@ -26569,6 +26649,16 @@ package Sidef::Types::Number::Number {
         my $count = $k->powerful_count($n);
         $count = $count->dec if $n->is_powerful($k);
         $count->nth_powerful($k);
+    }
+
+    sub prev_squarefull {
+        my ($n) = @_;
+        $n->prev_powerful(TWO);
+    }
+
+    sub prev_cubefull {
+        my ($n) = @_;
+        $n->prev_powerful(THREE);
     }
 
     sub _sieve_omega_primes {

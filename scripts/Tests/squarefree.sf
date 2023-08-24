@@ -88,8 +88,38 @@ assert_eq(
 )
 
 assert_eq(
+    Math.seq(next_cubefree(0), { .tail.next_cubefree }).while { _ <= 100 },
+    cubefree(1..100)
+)
+
+assert_eq(
     Math.seq(next_powerfree(0,3), { .tail.next_powerfree(3) }).while { _ <= 100 },
     1..100 -> grep { .is_powerfree(3) }
+)
+
+assert_eq(
+    Math.seq(next_powerfree(0,4), { .tail.next_powerfree(4) }).while { _ <= 100 },
+    powerfree(1..100, 4)
+)
+
+assert_eq(
+    Math.seq(next_non_squarefree(0), { .tail.next_non_squarefree }).while { _ <= 100 },
+    non_squarefree(1..100)
+)
+
+assert_eq(
+    Math.seq(next_non_cubefree(0), { .tail.next_non_cubefree }).while { _ <= 100 },
+    non_cubefree(1..100)
+)
+
+assert_eq(
+    Math.seq(next_non_powerfree(0, 4), { .tail.next_non_powerfree(4) }).while { _ <= 100 },
+    non_powerfree(1..100, 4)
+)
+
+assert_eq(
+    Math.seq(next_powerful(0, 4), { .tail.next_powerful(4) }).while { _ <= 100 },
+    powerful(1..100, 4)
 )
 
 for n in (31, 32, 63, 64) {

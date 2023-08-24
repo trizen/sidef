@@ -22,6 +22,21 @@ assert_eq(prime_count(1e5.next_prime), 9593)
 assert_eq(prime_count(1e6.next_prime), 78499)
 
 assert_eq(
+    30.of { .inc.nth_non_powerfree(1) },
+    30.by { .is_non_powerfree(1) }
+)
+
+assert_eq(
+    30.of { .inc.nth_non_powerfree(2) },
+    30.by { .is_non_powerfree(2) }
+)
+
+assert_eq(
+    30.of { .inc.nth_non_powerfree(3) },
+    30.by { .is_non_powerfree(3) }
+)
+
+assert_eq(
     100.of { .prime_power_sum },
     100.of {|n|
         sum(1..n.ilog2, {|k|
@@ -608,10 +623,10 @@ for k in (1..3) {
         k.powerful(n),
     )
 
-    #~ assert_eq(
-        #~ n.inc.of { .next_non_powerfree(k).prev_non_powerfree(k) }.grep.uniq,
-        #~ k.non_powerfree(n),
-    #~ )
+    assert_eq(
+        n.inc.of { .next_non_powerfree(k).prev_non_powerfree(k) }.grep.uniq,
+        k.non_powerfree(n),
+    )
 
     assert_eq(
         n.inc.of { .next_almost_prime(k).prev_almost_prime(k) }.grep.uniq,
@@ -778,13 +793,29 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [1e4, 4], [1e8, 7], [1e8,6], [1e8,
             --n; while (!n.is_powerful(k)) { --n }; n
         }(n))
 
-        with (next_powerful(n,k)) {|w|
-            assert_eq([w], k.powerful(n+1, w))
-        }
+        assert_eq(next_non_powerfree(n,k), ->(n) {
+            ++n; while (!n.is_non_powerfree(k)) { ++n }; n
+        }(n))
 
-        with (prev_powerful(n,k)) {|w|
-            assert_eq([w], k.powerful(w, n-1))
-        }
+        assert_eq(prev_non_powerfree(n,k), ->(n) {
+            --n; while (!n.is_non_powerfree(k)) { --n }; n
+        }(n))
+    }
+
+    with (next_powerful(n,k)) {|w|
+        assert_eq([w], k.powerful(n+1, w))
+    }
+
+    with (prev_powerful(n,k)) {|w|
+        assert_eq([w], k.powerful(w, n-1))
+    }
+
+    with (next_non_powerfree(n,k)) {|w|
+        assert_eq([w], k.non_powerfree(n+1, w))
+    }
+
+    with (prev_non_powerfree(n,k)) {|w|
+        assert_eq([w], k.non_powerfree(w, n-1))
     }
 }
 
