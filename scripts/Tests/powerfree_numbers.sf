@@ -81,6 +81,22 @@ assert_eq(3000.of{.nth_powerfree(2)}.slice(1), 3000.dec.by{.is_powerfree(2)})
 assert_eq(3000.of{.nth_powerfree(3)}.slice(1), 3000.dec.by{.is_powerfree(3)})
 assert_eq(3000.of{.nth_powerfree(4)}.slice(1), 3000.dec.by{.is_powerfree(4)})
 
+assert_eq(300.of{.nth_non_powerfree(2)}.slice(1), 2.non_powerfree(300.dec.nth_non_powerfree(2)))
+assert_eq(300.of{.nth_non_powerfree(3)}.slice(1), 3.non_powerfree(300.dec.nth_non_powerfree(3)))
+assert_eq(300.of{.nth_non_powerfree(4)}.slice(1), 4.non_powerfree(300.dec.nth_non_powerfree(4)))
+
+assert_eq(nth_non_powerfree(1e6, 200), 1606938044258990275541962092341162602522202993782792835301376000000)
+assert_eq(nth_non_powerfree(1e6 + 1, 200), 1606939651197034534532237634303254943684805515985786618094211301376)
+assert_eq(nth_non_powerfree(1e6 - 1, 200), 1606936437320946016551686550379070261359600471579799052508540698624)
+
+assert_eq(nth_non_powerfree(1e6, 300), 2037035976334486086268445688409378161051468393665936250636140449354381299763336706183397376000000)
+assert_eq(nth_non_powerfree(1e6 + 1, 300), 2037038013370462420754531956855066570429629445134329916572391085494830654144636469520103559397376)
+assert_eq(nth_non_powerfree(1e6 - 1, 300), 2037033939298509751782359419963689751673307342197542584699889813213931945382036942846691192602624)
+
+assert_eq(nth_non_powerfree(123456, 15), 4036198400)
+assert_eq(nth_non_powerfree(123456+1, 15), 4036231168)
+assert_eq(nth_non_powerfree(123456-1, 15), 4036165632)
+
 do {
     func non_powerfree(A, B, k=1) {
 

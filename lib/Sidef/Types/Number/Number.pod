@@ -6036,6 +6036,50 @@ Returns the n-th k-almost prime.
 
 =cut
 
+=head2 nth_cubefree
+
+    n.nth_cubefree
+
+Returns the n-th cubefree number.
+
+=cut
+
+=head2 nth_cubefull
+
+    n.nth_cubefull
+
+Returns the n-th cubefull (or 3-full) number.
+
+=cut
+
+=head2 nth_non_cubefree
+
+    n.nth_non_cubefree
+
+Returns the n-th non-cubefree number.
+
+=cut
+
+=head2 nth_non_powerfree
+
+    n.nth_non_powerfree(k)
+
+Returns the n-th k-non-powerfree number.
+
+    say nth_non_powerfree(1e9, 2)   #=> 2550546152
+    say nth_non_powerfree(1e9, 3)   #=> 5949100928
+    say nth_non_powerfree(1e9, 4)   #=> 13147239114
+
+=cut
+
+=head2 nth_non_squarefree
+
+    n.nth_non_squarefree
+
+Returns the n-th non-squarefree number.
+
+=cut
+
 =head2 nth_omega_prime
 
     nth_omega_prime(n, k=2)
@@ -6114,6 +6158,14 @@ Returns the n-th squarefree k-almost prime.
     say nth_squarefree_almost_prime(1e7, 2)     #=> 56173891
     say nth_squarefree_almost_prime(1e7, 3)     #=> 48108421
     say nth_squarefree_almost_prime(1e7, 4)     #=> 81556446
+
+=cut
+
+=head2 nth_squarefull
+
+    n.nth_squarefull
+
+Returns the n-th squarefull (or 2-full) number.
 
 =cut
 

@@ -173,7 +173,9 @@ for j in (2..5), n in (2..5 -> map{|b| b**j }), k in (2..5) {
 
     do {
         var t = nth_squarefree_almost_prime(n, k)
+        assert(t.is_squarefree_almost_prime(k))
         assert(t.is_almost_prime(k))
+        assert(t.is_omega_prime(k))
         assert(t.is_squarefree)
         assert_eq(k.squarefree_almost_prime_count(t), n)
     }
@@ -192,6 +194,12 @@ for j in (2..8), n in (2..15 -> map{|b| b**j }), k in (2..10) {
         var t = nth_powerfree(n, k)
         assert(t.is_powerfree(k))
         assert_eq(k.powerfree_count(t), n)
+    }
+
+    do {
+        var t = nth_non_powerfree(n, k)
+        assert(t.is_non_powerfree(k))
+        assert_eq(k.non_powerfree_count(t), n)
     }
 }
 

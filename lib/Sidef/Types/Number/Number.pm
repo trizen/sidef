@@ -14253,6 +14253,81 @@ package Sidef::Types::Number::Number {
         (THREE)->non_powerfree_sum(@_);
     }
 
+    sub nth_non_powerfree {
+        my ($n, $k) = @_;
+
+        $k = _any2ui($$k)  // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+
+        if ($k <= 0) {
+            goto &nan;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            goto &nan;
+        }
+
+        # If x is the n-th non-k-powerfree number, then:
+        #   x/(x-n) ~ zeta(k)
+        #   (x*zeta(k) - n*zeta(k))/x ~ 1
+        #   zeta(k) - n*zeta(k)/x ~ 1
+
+        my $prec = $k + Math::GMPz::Rmpz_sizeinbase($n, 2) + 2;
+
+        my $f = Math::MPFR::Rmpfr_init2($prec);
+        my $t = Math::MPFR::Rmpfr_init2($prec);
+        my $u = Math::MPFR::Rmpfr_init2($prec);
+
+        Math::MPFR::Rmpfr_zeta_ui($t, $k, $ROUND);      # t = zeta(k)
+        Math::MPFR::Rmpfr_mul_z($f, $t, $n, $ROUND);    # f = n*zeta(k)
+
+        my $w = Math::GMPz::Rmpz_init_set($n);
+        my $v = Math::GMPz::Rmpz_init();
+
+        while (1) {
+
+            Math::GMPz::Rmpz_mul_2exp($w, $w, 1);
+            Math::MPFR::Rmpfr_div_z($u, $f, $w, $ROUND);    # u = n*zeta(k)/w
+            Math::MPFR::Rmpfr_sub($u, $t, $u, $ROUND);      # u = zeta(k) - n*zeta(k)/w
+
+            if (Math::MPFR::Rmpfr_cmp_ui($u, 1) >= 0) {
+
+                if (Math::MPFR::Rmpfr_cmp_ui($u, 1) == 0) {    # exact result
+                    return bless \$w;
+                }
+
+                last;
+            }
+        }
+
+        Math::GMPz::Rmpz_div_2exp($v, $w, 1);
+
+        my $min = bless \$v;
+        my $max = bless \$w;
+
+        my $n_obj = bless \$n;
+        my $k_obj = bless \$k;
+
+        bsearch_min(
+            $min, $max,
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $k_obj->non_powerfree_count($_[0])->cmp($n_obj);
+                }
+            )
+        );
+    }
+
+    sub nth_non_squarefree {
+        my ($n) = @_;
+        $n->nth_non_powerfree(TWO);
+    }
+
+    sub nth_non_cubefree {
+        my ($n) = @_;
+        $n->nth_non_powerfree(THREE);
+    }
+
     sub _sieve_powerfree {
         my ($A, $B, $k) = @_;
 
@@ -17272,7 +17347,7 @@ package Sidef::Types::Number::Number {
             $max = _any2mpz($t) // goto &nan;
         }
 
-        my $k_obj     = _set_int($k);
+        my $k_obj     = bless \$k;
         my $v         = Math::GMPz::Rmpz_init();
         my $count     = Math::GMPz::Rmpz_init();
         my $min_delta = Math::GMPz::Rmpz_init();
@@ -17327,6 +17402,11 @@ package Sidef::Types::Number::Number {
         }
 
         $v_obj;
+    }
+
+    sub nth_cubefree {
+        my ($n) = @_;
+        $n->nth_powerfree(THREE);
     }
 
     sub legendre {
@@ -26453,6 +26533,16 @@ package Sidef::Types::Number::Number {
         $k_obj->powerful((bless \$min), (bless \$v))->last;
     }
 
+    sub nth_squarefull {
+        my ($n) = @_;
+        $n->nth_powerful(TWO);
+    }
+
+    sub nth_cubefull {
+        my ($n) = @_;
+        $n->nth_powerful(THREE);
+    }
+
     sub next_powerful {
         my ($n, $k) = @_;
 
@@ -30249,6 +30339,7 @@ package Sidef::Types::Number::Number {
         }
 
         Math::GMPz::Rmpz_ui_sub($r, 1, $r);
+        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
         bless \$r;
     }
 
@@ -30271,8 +30362,8 @@ package Sidef::Types::Number::Number {
         #   a(n) = faulhaber(n,1) - Sum_{k=1..floor(log_2(n))} μ(k) * (faulhaber(floor(n^(1/k)),k) - 1)
         #        = 1 - Sum_{k=2..floor(log_2(n))} μ(k) * (faulhaber(floor(n^(1/k)),k) - 1)
 
-        my $t   = Math::GMPz::Rmpz_init();
-        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+        my $t = Math::GMPz::Rmpz_init();
+        my $r = Math::GMPz::Rmpz_init_set_ui(0);
 
         foreach my $k (2 .. __ilog__($n, 2)) {
             my $mu = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k)) || next;
@@ -30280,19 +30371,19 @@ package Sidef::Types::Number::Number {
             my $f = ${(bless \$t)->faulhaber_sum(bless \$k)} - 1;
             if (ref($f)) {
                 ($mu == 1)
-                  ? Math::GMPz::Rmpz_add($sum, $sum, $f)
-                  : Math::GMPz::Rmpz_sub($sum, $sum, $f);
+                  ? Math::GMPz::Rmpz_add($r, $r, $f)
+                  : Math::GMPz::Rmpz_sub($r, $r, $f);
             }
             else {
                 ($mu == 1)
-                  ? Math::GMPz::Rmpz_add_ui($sum, $sum, $f)
-                  : Math::GMPz::Rmpz_sub_ui($sum, $sum, $f);
+                  ? Math::GMPz::Rmpz_add_ui($r, $r, $f)
+                  : Math::GMPz::Rmpz_sub_ui($r, $r, $f);
             }
         }
 
-        Math::GMPz::Rmpz_ui_sub($sum, 1, $sum);
-        $sum = Math::GMPz::Rmpz_get_ui($sum) if Math::GMPz::Rmpz_fits_ulong_p($sum);
-        bless \$sum;
+        Math::GMPz::Rmpz_ui_sub($r, 1, $r);
+        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
+        bless \$r;
     }
 
     sub nth_perfect_power {
