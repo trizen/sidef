@@ -4071,8 +4071,15 @@ package Sidef::Types::Number::Number {
         }
 
       Scalar__Math_MPFR: {
-            $x = _any2mpz($x);
-            goto Math_GMPz__Math_MPFR;
+
+            if ($x >= 0) {
+                my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+                Math::MPFR::Rmpfr_ui_pow($r, $x, $y, $ROUND);
+                return $r;
+            }
+
+            $x = _any2mpfr($x);
+            goto Math_MPFR__Math_MPFR;
         }
 
         #
@@ -21121,17 +21128,58 @@ package Sidef::Types::Number::Number {
             until (Math::Prime::Util::is_powerfree($n, $k)) {
                 ++$n;
             }
-            return _set_int($n);
+            return bless \$n;
         }
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_add_ui($r, $n, 1);
 
-        my $k_obj = _set_int($k);
-        my $r_obj = bless(\$r);
+        my $k_obj = bless \$k;
+        my $r_obj = bless \$r;
 
         until ($r_obj->is_powerfree($k_obj)) {
             Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        }
+
+        $r_obj;
+    }
+
+    sub prev_powerfree {
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            _valid(\$k);
+            $k = _any2ui($$k) // goto &nan;
+            $k >= 2 or goto &nan;
+        }
+        else {
+            $k = 2;
+        }
+
+        if ($k == 2) {
+            return $n->prev_squarefree;
+        }
+
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0 and goto &nan;
+
+        # Optimization for native integers
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            $n = Math::GMPz::Rmpz_get_ui($n) - 1;
+            until (Math::Prime::Util::is_powerfree($n, $k)) {
+                --$n;
+            }
+            return bless \$n;
+        }
+
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($r, $n, 1);
+
+        my $k_obj = bless \$k;
+        my $r_obj = bless \$r;
+
+        until ($r_obj->is_powerfree($k_obj)) {
+            Math::GMPz::Rmpz_sub_ui($r, $r, 1);
         }
 
         $r_obj;
@@ -30075,12 +30123,13 @@ package Sidef::Types::Number::Number {
         }
 
         # Formula:
-        #   a(n) = n - Sum_{k=1..floor(log_2(n))} μ(k) * (floor(n^(1/k)) - 1).
+        #   a(n) = n - Sum_{k=1..floor(log_2(n))} μ(k) * (floor(n^(1/k)) - 1)
+        #        = 1 - Sum_{k=2..floor(log_2(n))} μ(k) * (floor(n^(1/k)) - 1)
 
         my $r = Math::GMPz::Rmpz_init_set_ui(0);
         state $t = Math::GMPz::Rmpz_init_nobless();
 
-        foreach my $k (1 .. __ilog__($n, 2)) {
+        foreach my $k (2 .. __ilog__($n, 2)) {
             my $mu = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k)) || next;
             Math::GMPz::Rmpz_root($t, $n, $k);
             Math::GMPz::Rmpz_sub_ui($t, $t, 1);
@@ -30089,7 +30138,7 @@ package Sidef::Types::Number::Number {
               : Math::GMPz::Rmpz_sub($r, $r, $t);
         }
 
-        Math::GMPz::Rmpz_sub($r, $n, $r);
+        Math::GMPz::Rmpz_ui_sub($r, 1, $r);
         bless \$r;
     }
 

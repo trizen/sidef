@@ -360,7 +360,7 @@ package Sidef::Math::Math {
                 and @$pair == 2
                 and ref($pair->[0]) eq 'Sidef::Types::Number::Number'
                 and ref($pair->[1]) eq 'Sidef::Types::Number::Number') {
-                push @pairs, [map { $_->_big2istr } @$pair];
+                push @pairs, [map { Sidef::Types::Number::Number::_big2istr($$_) } @$pair];
             }
             else {
                 return Sidef::Types::Number::Number->nan;

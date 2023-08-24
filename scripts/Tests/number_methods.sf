@@ -557,6 +557,12 @@ assert_eq(next_squarefree(2**128 + 1), 2**128 + 2)
 assert_eq(prev_squarefree(2**31 + 3), 2**31 + 1)
 assert_eq(prev_squarefree(2**128 + 3), 2**128 + 2)
 
+assert_eq(next_powerfree(2**31 + 3, 3), 2**31 + 4)
+assert_eq(next_powerfree(2**128 + 1, 3), 2**128 + 2)
+
+assert_eq(prev_powerfree(2**31 + 3, 3), 2**31 + 2)
+assert_eq(prev_powerfree(2**128 + 3, 3), 2**128 + 2)
+
 assert_eq(next_semiprime(23), 25)
 assert_eq(next_semiprime(4171), 4174)
 assert_eq(next_semiprime(4171-1), 4171)
@@ -576,6 +582,43 @@ assert_eq(prev_almost_prime(2**128 + 1, 125), 2**128 - 2**122)
 assert_eq(next_almost_prime(2**128 + 1, 126), (75*128**18 + 120*128**17)/15)
 
 #assert_eq(next_omega_prime(16.pn_primorial, 16), 36278497172720993190)  # quite slow
+
+for k in (1..3) {
+
+    var n = 30
+
+    if (k > 1) {
+        assert_eq(
+            n.inc.of { .next_powerfree(k).prev_powerfree(k) }.grep.uniq,
+            k.powerfree(n),
+        )
+    }
+
+    #~ assert_eq(
+        #~ n.inc.of { .next_powerful(k).prev_powerful(k) }.grep.uniq,
+        #~ k.powerful(n),
+    #~ )
+
+    #~ assert_eq(
+        #~ n.inc.of { .next_powerful(k).prev_powerful(k) }.grep.uniq,
+        #~ k.powerful(n),
+    #~ )
+
+    assert_eq(
+        n.inc.of { .next_almost_prime(k).prev_almost_prime(k) }.grep.uniq,
+        k.almost_primes(n),
+    )
+
+    #~ assert_eq(
+        #~ n.inc.of { .next_squarefree_almost_prime(k).prev_squarefree_almost_prime(k) }.grep.uniq,
+        #~ k.squarefree_almost_primes(n),
+    #~ )
+
+    assert_eq(
+        n.inc.of { .next_omega_prime(k).prev_omega_prime(k) }.grep.uniq,
+        k.omega_primes(n),
+    )
+}
 
 var seen = Set()
 
@@ -647,6 +690,16 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [8.pn_primorial*17, 8], [1e8, 8], 
     assert_eq(prev_almost_prime(n,k), ->(n) {
         --n; while (!n.is_almost_prime(k)) { --n }; n
     }(n))
+
+    if (k > 1) {
+        assert_eq(next_powerfree(n,k), ->(n) {
+            ++n; while (!n.is_powerfree(k)) { ++n }; n
+        }(n))
+
+        assert_eq(prev_powerfree(n,k), ->(n) {
+            --n; while (!n.is_powerfree(k)) { --n }; n
+        }(n))
+    }
 
     if (n <= 1e6) {
         assert_eq(next_powerful(n,k), ->(n) {

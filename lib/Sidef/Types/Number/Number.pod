@@ -6876,6 +6876,14 @@ Aliases: I<prev_power>
 
 =cut
 
+=head2 prev_powerfree
+
+    n.prev_powerfree(k=2)
+
+Returns the previous k-powerfree number smaller than C<n>.
+
+=cut
+
 =head2 prev_prime
 
     n.prev_prime

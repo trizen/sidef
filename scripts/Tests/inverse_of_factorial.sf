@@ -43,3 +43,9 @@ for n,f in tests {
         die "a=#{a} is incorrect!"
     }
 }
+
+var x = inv_fac_W(-123456789)
+var y = inv_fac_lgrt(-123456789)
+
+assert_eq(x.round(-20), y.round(-20))
+assert((sqrt(2*Num.pi*x) * (x/e)**x) / -123456789 -> is_between(0.9, 0.99))
