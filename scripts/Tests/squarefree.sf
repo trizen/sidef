@@ -103,18 +103,18 @@ assert_eq(
 )
 
 assert_eq(
-    Math.seq(next_non_squarefree(0), { .tail.next_non_squarefree }).while { _ <= 100 },
-    non_squarefree(1..100)
+    Math.seq(next_nonsquarefree(0), { .tail.next_nonsquarefree }).while { _ <= 100 },
+    nonsquarefree(1..100)
 )
 
 assert_eq(
-    Math.seq(next_non_cubefree(0), { .tail.next_non_cubefree }).while { _ <= 100 },
-    non_cubefree(1..100)
+    Math.seq(next_noncubefree(0), { .tail.next_noncubefree }).while { _ <= 100 },
+    noncubefree(1..100)
 )
 
 assert_eq(
-    Math.seq(next_non_powerfree(0, 4), { .tail.next_non_powerfree(4) }).while { _ <= 100 },
-    non_powerfree(1..100, 4)
+    Math.seq(next_nonpowerfree(0, 4), { .tail.next_nonpowerfree(4) }).while { _ <= 100 },
+    nonpowerfree(1..100, 4)
 )
 
 assert_eq(

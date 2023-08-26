@@ -197,9 +197,9 @@ for j in (2..8), n in (2..15 -> map{|b| b**j }), k in (2..10) {
     }
 
     do {
-        var t = nth_non_powerfree(n, k)
-        assert(t.is_non_powerfree(k))
-        assert_eq(k.non_powerfree_count(t), n)
+        var t = nth_nonpowerfree(n, k)
+        assert(t.is_nonpowerfree(k))
+        assert_eq(k.nonpowerfree_count(t), n)
     }
 }
 

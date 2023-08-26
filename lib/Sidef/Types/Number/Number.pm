@@ -7642,7 +7642,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my @non_mpz;
+        my @nonmpz;
         my ($native_sum, $new_sum, $sum) = (0, 0, undef);
 
         foreach my $n (@numbers) {
@@ -7665,7 +7665,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_add($sum, $sum, $n);
             }
             else {
-                push @non_mpz, $n;
+                push @nonmpz, $n;
             }
         }
 
@@ -7683,8 +7683,8 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (@non_mpz) {
-            $sum = __add__($sum, _binsplit(\@non_mpz, \&__add__));
+        if (@nonmpz) {
+            $sum = __add__($sum, _binsplit(\@nonmpz, \&__add__));
         }
 
         my $r = bless \$sum;
@@ -14013,19 +14013,19 @@ package Sidef::Types::Number::Number {
         (THREE)->powerfree_count(@_);
     }
 
-    sub is_non_squarefree {
+    sub is_nonsquarefree {
         $_[0]->is_squarefree->not && $_[0]->is_pos;
     }
 
-    sub is_non_cubefree {
+    sub is_noncubefree {
         $_[0]->is_cubefree->not && $_[0]->is_pos;
     }
 
-    sub is_non_powerfree {
+    sub is_nonpowerfree {
         $_[0]->is_powerfree($_[1])->not && $_[0]->is_pos;
     }
 
-    sub _sieve_non_powerfree {
+    sub _sieve_nonpowerfree {
         my ($A, $B, $k) = @_;
 
         # $A and $B are Math::GMPz objects
@@ -14124,7 +14124,7 @@ package Sidef::Types::Number::Number {
         return \@arr;
     }
 
-    sub non_powerfree {
+    sub nonpowerfree {
         my ($k, $A, $B) = @_;
 
         _valid(\$A);
@@ -14150,23 +14150,23 @@ package Sidef::Types::Number::Number {
         }
 
 #<<<
-        my @non_powerfree = map {
+        my @nonpowerfree = map {
             (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
-        } @{_sieve_non_powerfree($A, $B, $k) // return undef};
+        } @{_sieve_nonpowerfree($A, $B, $k) // return undef};
 #>>>
 
-        Sidef::Types::Array::Array->new(\@non_powerfree);
+        Sidef::Types::Array::Array->new(\@nonpowerfree);
     }
 
-    sub non_squarefree {
-        (TWO)->non_powerfree(@_);
+    sub nonsquarefree {
+        (TWO)->nonpowerfree(@_);
     }
 
-    sub non_cubefree {
-        (THREE)->non_powerfree(@_);
+    sub noncubefree {
+        (THREE)->nonpowerfree(@_);
     }
 
-    sub non_powerfree_each {
+    sub nonpowerfree_each {
         my ($k, $from, $to, $block) = @_;
 
         _valid(\$from);
@@ -14194,66 +14194,66 @@ package Sidef::Types::Number::Number {
             $step_value = 1e4;
         }
 
-        _generic_each($from, $to, $block, sub { $step_value }, sub { _sieve_non_powerfree($_[0], $_[1], $k) });
+        _generic_each($from, $to, $block, sub { $step_value }, sub { _sieve_nonpowerfree($_[0], $_[1], $k) });
     }
 
-    *each_non_powerfree = \&non_powerfree_each;
+    *each_nonpowerfree = \&nonpowerfree_each;
 
-    sub non_squarefree_each {
-        (TWO)->non_powerfree_each(@_);
+    sub nonsquarefree_each {
+        (TWO)->nonpowerfree_each(@_);
     }
 
-    *each_non_squarefree = \&non_squarefree_each;
+    *each_nonsquarefree = \&nonsquarefree_each;
 
-    sub non_cubefree_each {
-        (THREE)->non_powerfree_each(@_);
+    sub noncubefree_each {
+        (THREE)->nonpowerfree_each(@_);
     }
 
-    *each_non_cubefree = \&non_cubefree_each;
+    *each_noncubefree = \&noncubefree_each;
 
-    sub non_powerfree_count {
+    sub nonpowerfree_count {
         my ($k, $from, $to) = @_;
 
         if (defined($to)) {
             _valid(\$to);
             return ZERO if $to->lt($from);
-            return $k->non_powerfree_count($to)->sub($k->non_powerfree_count($from->dec));
+            return $k->nonpowerfree_count($to)->sub($k->nonpowerfree_count($from->dec));
         }
 
         _valid(\$from);
         $from->sub($k->powerfree_count($from));
     }
 
-    sub non_squarefree_count {
-        (TWO)->non_powerfree_count(@_);
+    sub nonsquarefree_count {
+        (TWO)->nonpowerfree_count(@_);
     }
 
-    sub non_cubefree_count {
-        (THREE)->non_powerfree_count(@_);
+    sub noncubefree_count {
+        (THREE)->nonpowerfree_count(@_);
     }
 
-    sub non_powerfree_sum {
+    sub nonpowerfree_sum {
         my ($k, $from, $to) = @_;
 
         if (defined($to)) {
             _valid(\$to);
             return ZERO if $to->lt($from);
-            return $k->non_powerfree_sum($to)->sub($k->non_powerfree_sum($from->dec));
+            return $k->nonpowerfree_sum($to)->sub($k->nonpowerfree_sum($from->dec));
         }
 
         _valid(\$from);
         $from->faulhaber_sum(ONE)->sub($k->powerfree_sum($from));
     }
 
-    sub non_squarefree_sum {
-        (TWO)->non_powerfree_sum(@_);
+    sub nonsquarefree_sum {
+        (TWO)->nonpowerfree_sum(@_);
     }
 
-    sub non_cubefree_sum {
-        (THREE)->non_powerfree_sum(@_);
+    sub noncubefree_sum {
+        (THREE)->nonpowerfree_sum(@_);
     }
 
-    sub nth_non_powerfree {
+    sub nth_nonpowerfree {
         my ($n, $k) = @_;
 
         if (defined($k)) {
@@ -14289,6 +14289,28 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_zeta_ui($t, $k, $ROUND);      # t = zeta(k)
         Math::MPFR::Rmpfr_mul_z($f, $t, $n, $ROUND);    # f = n*zeta(k)
 
+#<<<
+        # Conjectured bounds:
+        #   lower = ((zeta(k)*(n-1) / (zeta(k)-1)) - n)
+        #   upper = ((zeta(k)*(n+1) / (zeta(k)-1)) + n)
+
+        #~ my $w = Math::GMPz::Rmpz_init();
+        #~ Math::GMPz::Rmpz_sub_ui($w, $n, 1);
+        #~ Math::MPFR::Rmpfr_mul_z($f, $t, $w, $ROUND);
+        #~ Math::MPFR::Rmpfr_sub_ui($u, $t, 1, $ROUND);
+        #~ Math::MPFR::Rmpfr_div($f, $f, $u, $ROUND);
+        #~ Math::MPFR::Rmpfr_sub_z($f, $f, $n, $ROUND);
+
+        #~ my $min = bless \(_any2mpz($f) // goto &nan);
+
+        #~ Math::GMPz::Rmpz_add_ui($w, $n, 1);
+        #~ Math::MPFR::Rmpfr_mul_z($f, $t, $w, $ROUND);
+        #~ Math::MPFR::Rmpfr_div($f, $f, $u, $ROUND);
+        #~ Math::MPFR::Rmpfr_add_z($f, $f, $n, $ROUND);
+
+        #~ my $max = bless \(_any2mpz($f) // goto &nan);
+#>>>
+
         my $w = Math::GMPz::Rmpz_init_set($n);
         my $v = Math::GMPz::Rmpz_init();
 
@@ -14320,23 +14342,23 @@ package Sidef::Types::Number::Number {
             $min, $max,
             Sidef::Types::Block::Block->new(
                 code => sub {
-                    $k_obj->non_powerfree_count($_[0])->cmp($n_obj);
+                    $k_obj->nonpowerfree_count($_[0])->cmp($n_obj);
                 }
             )
         );
     }
 
-    sub nth_non_squarefree {
+    sub nth_nonsquarefree {
         my ($n) = @_;
-        $n->nth_non_powerfree(TWO);
+        $n->nth_nonpowerfree(TWO);
     }
 
-    sub nth_non_cubefree {
+    sub nth_noncubefree {
         my ($n) = @_;
-        $n->nth_non_powerfree(THREE);
+        $n->nth_nonpowerfree(THREE);
     }
 
-    sub next_non_powerfree {
+    sub next_nonpowerfree {
         my ($n, $k) = @_;
 
         if (defined($k)) {
@@ -14348,20 +14370,20 @@ package Sidef::Types::Number::Number {
 
         # TODO: optimize when n^(1/k) is too large.
 
-        $k->non_powerfree_count($n)->inc->nth_non_powerfree($k);
+        $k->nonpowerfree_count($n)->inc->nth_nonpowerfree($k);
     }
 
-    sub next_non_squarefree {
+    sub next_nonsquarefree {
         my ($n) = @_;
-        $n->next_non_powerfree(TWO);
+        $n->next_nonpowerfree(TWO);
     }
 
-    sub next_non_cubefree {
+    sub next_noncubefree {
         my ($n) = @_;
-        $n->next_non_powerfree(THREE);
+        $n->next_nonpowerfree(THREE);
     }
 
-    sub prev_non_powerfree {
+    sub prev_nonpowerfree {
         my ($n, $k) = @_;
 
         if (defined($k)) {
@@ -14373,19 +14395,19 @@ package Sidef::Types::Number::Number {
 
         # TODO: optimize when n^(1/k) is too large.
 
-        my $count = $k->non_powerfree_count($n);
-        $count = $count->dec if $n->is_non_powerfree($k);
-        $count->nth_non_powerfree($k);
+        my $count = $k->nonpowerfree_count($n);
+        $count = $count->dec if $n->is_nonpowerfree($k);
+        $count->nth_nonpowerfree($k);
     }
 
-    sub prev_non_squarefree {
+    sub prev_nonsquarefree {
         my ($n) = @_;
-        $n->prev_non_powerfree(TWO);
+        $n->prev_nonpowerfree(TWO);
     }
 
-    sub prev_non_cubefree {
+    sub prev_noncubefree {
         my ($n) = @_;
-        $n->prev_non_powerfree(THREE);
+        $n->prev_nonpowerfree(THREE);
     }
 
     sub _sieve_powerfree {
@@ -14394,10 +14416,10 @@ package Sidef::Types::Number::Number {
         # $A and $B are Math::GMPz objects
         # $k is a non-negative native integer
 
-        my $non_powerfree = _sieve_non_powerfree($A, $B, $k) // return undef;
+        my $nonpowerfree = _sieve_nonpowerfree($A, $B, $k) // return undef;
 
         my $i     = 0;
-        my $max_i = $#{$non_powerfree};
+        my $max_i = $#{$nonpowerfree};
 
         my @powerfree;
         if (Math::GMPz::Rmpz_fits_slong_p($B)) {
@@ -14406,7 +14428,7 @@ package Sidef::Types::Number::Number {
             $B = Math::GMPz::Rmpz_get_ui($B);
 
             foreach my $k ($A .. $B) {
-                if ($i <= $max_i and $k == $non_powerfree->[$i]) {
+                if ($i <= $max_i and $k == $nonpowerfree->[$i]) {
                     ++$i;
                 }
                 else {
@@ -14418,7 +14440,7 @@ package Sidef::Types::Number::Number {
             my $t = Math::GMPz::Rmpz_init_set($A);
 
             for (; Math::GMPz::Rmpz_cmp($t, $B) <= 0 ; Math::GMPz::Rmpz_add_ui($t, $t, 1)) {
-                if ($i <= $max_i and $t == $non_powerfree->[$i]) {
+                if ($i <= $max_i and $t == $nonpowerfree->[$i]) {
                     ++$i;
                 }
                 else {

@@ -2517,39 +2517,39 @@ Aliases: I<lucas_carmichael_each>
 
 =cut
 
-=head2 each_non_cubefree
+=head2 each_noncubefree
 
-    n.non_cubefree_each { ... }
-    non_cubefree_each(a, b, { ... })
+    n.noncubefree_each { ... }
+    noncubefree_each(a, b, { ... })
 
-Iterates over the non-cubefree numbers <= C<n>, or in the range C<a..b>.
+Iterates over the noncubefree numbers <= C<n>, or in the range C<a..b>.
 
-Aliases: I<non_cubefree_each>
+Aliases: I<noncubefree_each>
 
 =cut
 
-=head2 each_non_powerfree
+=head2 each_nonpowerfree
 
-    k.non_powerfree_each(n, { ... })
-    k.non_powerfree_each(a, b, { ... })
+    k.nonpowerfree_each(n, { ... })
+    k.nonpowerfree_each(a, b, { ... })
 
 Iterates over the numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
-    2.non_powerfree_each(100, {|n| say n })         # iterate over non-squarefree numbers <= 100
-    3.non_powerfree_each(50, 100, {|n| say n })     # iterate over non-cubefree numbers in range 50..100
+    2.nonpowerfree_each(100, {|n| say n })         # iterate over nonsquarefree numbers <= 100
+    3.nonpowerfree_each(50, 100, {|n| say n })     # iterate over noncubefree numbers in range 50..100
 
-Aliases: I<non_powerfree_each>
+Aliases: I<nonpowerfree_each>
 
 =cut
 
-=head2 each_non_squarefree
+=head2 each_nonsquarefree
 
-    n.non_squarefree_each { ... }
-    non_squarefree_each(a, b, { ... })
+    n.nonsquarefree_each { ... }
+    nonsquarefree_each(a, b, { ... })
 
-Iterates over the non-squarefree numbers <= C<n>, or in the range C<a..b>.
+Iterates over the nonsquarefree numbers <= C<n>, or in the range C<a..b>.
 
-Aliases: I<non_squarefree_each>
+Aliases: I<nonsquarefree_each>
 
 =cut
 
@@ -3088,7 +3088,7 @@ Sum of powers: C<1^k + 2^k + ... + n^k>, using Faulhaber's summation formula.
 
     faulhaber(5, 2)   # 1^2 + 2^2 + 3^2 + 4^2 + 5^2 = 55
 
-The value for C<k> must be a non-negative native integer.
+The value for C<k> must be a nonnegative native integer.
 
 Aliases: I<faulhaber_sum>
 
@@ -3117,7 +3117,7 @@ Sum of powers: C<a^k + (a+1)^k + (a+2)^k + ... + b^k>, using Faulhaber's summati
 
     faulhaber_range(50, 100, 2)   # 50^2 + 51^2 + ... + 100^2 = 297925
 
-The value for C<k> must be a non-negative native integer.
+The value for C<k> must be a nonnegative native integer.
 
 =cut
 
@@ -3127,7 +3127,7 @@ The value for C<k> must be a non-negative native integer.
 
 Tries to factorize a given number using Fermat's factorization method (using at most C<k> iterations).
 
-Works for odd composite non-power numbers C<n> that have two divisors close to C<sqrt(n)>.
+Works for odd composite nonpower numbers C<n> that have two divisors close to C<sqrt(n)>.
 
 The product of the factors will give back C<n>. However, some factors may be composite.
 
@@ -3295,7 +3295,7 @@ The extended greatest common divisor of C<a> and C<b>, returning C<(u, v, d)>, w
 
     u*a + v*b = d.
 
-The value of C<d> is always non-negative.
+The value of C<d> is always nonnegative.
 
 =cut
 
@@ -3303,7 +3303,7 @@ The value of C<d> is always non-negative.
 
     gcd_factors(n, [a, b, ...])
 
-Given a positive integer and an array of integers, it tries to find non-trivial factors of C<n>, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
+Given a positive integer and an array of integers, it tries to find nontrivial factors of C<n>, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
 
     var n = 43*43*97*503
     var a = [19*43*97, 1, 13*41*43*101]
@@ -3459,7 +3459,7 @@ Hyperfactorial of C<n>, defined as C<Prod_{k=1..n} k^k>.
 
     hyperfactorial_ln(n)
 
-Natural logarithm of C<hyperfactorial(n)>, where C<n> is a non-negative integer.
+Natural logarithm of C<hyperfactorial(n)>, where C<n> is a nonnegative integer.
 
 Aliases: I<lnhyperfactorial>, I<hyperfactorial_log>
 
@@ -4382,25 +4382,25 @@ Aliases: I<is_pm1_prime>, I<is_nminus1_prime>
 
 =cut
 
-=head2 is_non_cubefree
+=head2 is_noncubefree
 
-    n.is_non_cubefree
+    n.is_noncubefree
 
 Returns true if C<n> is a positive integer divisible by the cube of a prime.
 
 =cut
 
-=head2 is_non_powerfree
+=head2 is_nonpowerfree
 
-    n.is_non_powerfree
+    n.is_nonpowerfree
 
 Returns true if C<n> is a positive integer divisible by the k-th power of a prime.
 
 =cut
 
-=head2 is_non_squarefree
+=head2 is_nonsquarefree
 
-    n.is_non_squarefree
+    n.is_nonsquarefree
 
 Returns true if C<n> is a positive integer divisible by the square of a prime.
 
@@ -4420,7 +4420,7 @@ Aliases: I<is_pp1_prime>, I<is_nplus1_prime>
 
     g.is_ntf(n)
 
-Returns true if C<g> is a non-trivial integer factor of C<n>.
+Returns true if C<g> is a nontrivial integer factor of C<n>.
 
 Equivalent with (assuming C<g> and C<n> are both integers):
 
@@ -5312,7 +5312,7 @@ Returns the sum of least prime factors of numbers from C<1> to C<n>, or in the r
 
     lsb(n)
 
-Returns the index of the least significant bit of C<n> that is non-zero.
+Returns the index of the least significant bit of C<n> that is nonzero.
 
     say 0b110010101111000000.lsb    # 6
 
@@ -5700,7 +5700,7 @@ Negates the sign of C<x> (equivalent with: C<-x>).
 
     nesigma(n, k=1)
 
-Returns the sum of the non-exponential divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the nonexponential divisors of C<n>, each divisor raised to the k-th power.
 
     say 30.of { .nesigma }      #=> OEIS: A160135
 
@@ -5710,7 +5710,7 @@ Returns the sum of the non-exponential divisors of C<n>, each divisor raised to 
 
     nesigma0(n)
 
-Returns the count of the non-exponential divisors of C<n>.
+Returns the count of the nonexponential divisors of C<n>.
 
     say 30.of { .nesigma0 }     #=> OEIS: A160097
 
@@ -5739,7 +5739,7 @@ Returns the next k-almost prime greater than C<n>.
 
     n.next_composite
 
-Given a non-negative integer C<n>, returns the next composite number greater than C<n>.
+Given a nonnegative integer C<n>, returns the next composite number greater than C<n>.
 
 =cut
 
@@ -5759,27 +5759,27 @@ Returns the next cubefull (or 2-full) number greater than C<n>.
 
 =cut
 
-=head2 next_non_cubefree
+=head2 next_noncubefree
 
-    n.next_non_cubefree
+    n.next_noncubefree
 
-Returns the next non-cubefree number greater than C<n>.
-
-=cut
-
-=head2 next_non_powerfree
-
-    n.next_non_powerfree(k=2)
-
-Returns the next non-k-powerfree number greater than C<n>.
+Returns the next noncubefree number greater than C<n>.
 
 =cut
 
-=head2 next_non_squarefree
+=head2 next_nonpowerfree
 
-    n.next_non_squarefree
+    n.next_nonpowerfree(k=2)
 
-Returns the next non-squarefree number greater than C<n>.
+Returns the next k-nonpowerfree number greater than C<n>.
+
+=cut
+
+=head2 next_nonsquarefree
+
+    n.next_nonsquarefree
+
+Returns the next nonsquarefree number greater than C<n>.
 
 =cut
 
@@ -5864,7 +5864,7 @@ Returns the next prime larger than C<n>.
 
     n.next_prime_power
 
-Given a non-negative integer C<n>, returns the next prime power (C<p^k> with k >= 1) greater than C<n>.
+Given a nonnegative integer C<n>, returns the next prime power (C<p^k> with k >= 1) greater than C<n>.
 
 =cut
 
@@ -5930,7 +5930,7 @@ Returns the negative infinity special value (C<-Inf>).
 
     nisigma(n, k=1)
 
-Returns the sum of the non-infinitary divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the noninfinitary divisors of C<n>, each divisor raised to the k-th power.
 
     say 30.of { .nisigma }      #=> OEIS: A348271
 
@@ -5940,7 +5940,7 @@ Returns the sum of the non-infinitary divisors of C<n>, each divisor raised to t
 
     nisigma0(n)
 
-Returns the count of the non-infinitary divisors of C<n>.
+Returns the count of the noninfinitary divisors of C<n>.
 
     say 30.of { .nisigma0 }     #=> OEIS: A348341
 
@@ -5963,87 +5963,87 @@ Aliases: I<binomial>
 
 =cut
 
-=head2 non_cubefree
+=head2 noncubefree
 
-    non_cubefree(n)
-    non_cubefree(a,b)
+    noncubefree(n)
+    noncubefree(a,b)
 
-Returns an array with the non-cubefree numbers <= C<n>, or in the range C<a..b>.
-
-=cut
-
-=head2 non_cubefree_count
-
-    non_cubefree_count(n)
-    non_cubefree_count(a,b)
-
-Returns the count of non-cubefree numbers <= C<n>, or in the range C<a..b>.
+Returns an array with the noncubefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 non_cubefree_sum
+=head2 noncubefree_count
 
-    non_cubefree_sum(n)
-    non_cubefree_sum(a,b)
+    noncubefree_count(n)
+    noncubefree_count(a,b)
 
-Returns the sum of non-cubefree numbers <= C<n>, or in the range C<a..b>.
+Returns the count of noncubefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 non_powerfree
+=head2 noncubefree_sum
 
-    k.non_powerfree(n)
-    k.non_powerfree(a,b)
+    noncubefree_sum(n)
+    noncubefree_sum(a,b)
+
+Returns the sum of noncubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 nonpowerfree
+
+    k.nonpowerfree(n)
+    k.nonpowerfree(a,b)
 
 Returns an array of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
-    say 2.non_powerfree(100)        # numbers that are not squarefree <= 100
-    say 3.non_powerfree(50, 100)    # numbers that are not cubefree in range 50..100
+    say 2.nonpowerfree(100)        # numbers that are not squarefree <= 100
+    say 3.nonpowerfree(50, 100)    # numbers that are not cubefree in range 50..100
 
 =cut
 
-=head2 non_powerfree_count
+=head2 nonpowerfree_count
 
-    k.non_powerfree_count(n)
-    k.non_powerfree_count(a,b)
+    k.nonpowerfree_count(n)
+    k.nonpowerfree_count(a,b)
 
 Returns the count of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
 =cut
 
-=head2 non_powerfree_sum
+=head2 nonpowerfree_sum
 
-    k.non_powerfree_sum(n)
-    k.non_powerfree_sum(a,b)
+    k.nonpowerfree_sum(n)
+    k.nonpowerfree_sum(a,b)
 
 Returns the sum of numbers <= C<n>, or in the range C<a..b>, that are not k-powerfree.
 
 =cut
 
-=head2 non_squarefree
+=head2 nonsquarefree
 
-    non_squarefree(n)
-    non_squarefree(a,b)
+    nonsquarefree(n)
+    nonsquarefree(a,b)
 
-Returns an array with the non-squarefree numbers <= C<n>, or in the range C<a..b>.
-
-=cut
-
-=head2 non_squarefree_count
-
-    non_squarefree_count(n)
-    non_squarefree_count(a,b)
-
-Returns the count of non-squarefree numbers <= C<n>, or in the range C<a..b>.
+Returns an array with the nonsquarefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
-=head2 non_squarefree_sum
+=head2 nonsquarefree_count
 
-    non_squarefree_sum(n)
-    non_squarefree_sum(a,b)
+    nonsquarefree_count(n)
+    nonsquarefree_count(a,b)
 
-Returns the sum of non-squarefree numbers <= C<n>, or in the range C<a..b>.
+Returns the count of nonsquarefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 nonsquarefree_sum
+
+    nonsquarefree_sum(n)
+    nonsquarefree_sum(a,b)
+
+Returns the sum of nonsquarefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
@@ -6100,31 +6100,31 @@ Returns the n-th cubefull (or 3-full) number.
 
 =cut
 
-=head2 nth_non_cubefree
+=head2 nth_noncubefree
 
-    n.nth_non_cubefree
+    n.nth_noncubefree
 
-Returns the n-th non-cubefree number.
-
-=cut
-
-=head2 nth_non_powerfree
-
-    n.nth_non_powerfree(k)
-
-Returns the n-th k-non-powerfree number.
-
-    say nth_non_powerfree(1e9, 2)   #=> 2550546152
-    say nth_non_powerfree(1e9, 3)   #=> 5949100928
-    say nth_non_powerfree(1e9, 4)   #=> 13147239114
+Returns the n-th noncubefree number.
 
 =cut
 
-=head2 nth_non_squarefree
+=head2 nth_nonpowerfree
 
-    n.nth_non_squarefree
+    n.nth_nonpowerfree(k)
 
-Returns the n-th non-squarefree number.
+Returns the n-th k-nonpowerfree number.
+
+    say nth_nonpowerfree(1e9, 2)   #=> 2550546152
+    say nth_nonpowerfree(1e9, 3)   #=> 5949100928
+    say nth_nonpowerfree(1e9, 4)   #=> 13147239114
+
+=cut
+
+=head2 nth_nonsquarefree
+
+    n.nth_nonsquarefree
+
+Returns the n-th nonsquarefree number.
 
 =cut
 
@@ -6244,7 +6244,7 @@ Returns a list with the numerator and the denominator of a rational number C<r>.
 
     num2perm(n,k)
 
-Given a non-negative integer C<n> and integer C<k>, return the rank C<k> lexicographic permutation of C<n> elements.
+Given a nonnegative integer C<n> and integer C<k>, return the rank C<k> lexicographic permutation of C<n> elements.
 
 C<k> will be interpreted as mod C<n!>.
 
@@ -6280,7 +6280,7 @@ Although this may or may not be actually faster.
 
     nusigma(n, k=1)
 
-Returns the sum of the non-unitary divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the nonunitary divisors of C<n>, each divisor raised to the k-th power.
 
     say 30.of { .nusigma }     #=> OEIS: A048146
 
@@ -6290,7 +6290,7 @@ Returns the sum of the non-unitary divisors of C<n>, each divisor raised to the 
 
     nusigma0(n)
 
-Returns the count of the non-unitary divisors of C<n>.
+Returns the count of the nonunitary divisors of C<n>.
 
     say 30.of { .nusigma0 }    #=> OEIS: A048105
 
@@ -6956,27 +6956,27 @@ Returns the previous cubefull or (3-full) number smaller than C<n>.
 
 =cut
 
-=head2 prev_non_cubefree
+=head2 prev_noncubefree
 
-    n.prev_non_cubefree
+    n.prev_noncubefree
 
-Returns the previous non-cubefree number smaller than C<n>.
-
-=cut
-
-=head2 prev_non_powerfree
-
-    n.prev_non_powerfree(k)
-
-Returns the previous non-k-powerfree number smaller than C<n>.
+Returns the previous noncubefree number smaller than C<n>.
 
 =cut
 
-=head2 prev_non_squarefree
+=head2 prev_nonpowerfree
 
-    n.prev_non_squarefree
+    n.prev_nonpowerfree(k)
 
-Returns the previous non-squarefree number smaller than C<n>.
+Returns the previous k-nonpowerfree number smaller than C<n>.
+
+=cut
+
+=head2 prev_nonsquarefree
+
+    n.prev_nonsquarefree
+
+Returns the previous nonsquarefree number smaller than C<n>.
 
 =cut
 
@@ -7539,7 +7539,7 @@ Returns the k-gonal pyramidal root of C<n>. Also defined for complex numbers.
 
     qnr(n)
 
-Returns the least quadratic non-residue of C<n>.
+Returns the least quadratic nonresidue of C<n>.
 
     say qnr(17676352761153241)      #=> 37
     say qnr(172138573277896681)     #=> 41
@@ -8855,7 +8855,7 @@ When two arguments are given, returns a uniform random unsigned integer in the r
 
     say urand(100, 110)     # random integer in [100, 110]
 
-Both arguments must be non-negative. If C<a> is greater than C<b>, then function will return a random integer in the range C<[b,a]>.
+Both arguments must be nonnegative. If C<a> is greater than C<b>, then function will return a random integer in the range C<[b,a]>.
 
 Aliases: I<urandomm>
 
@@ -8865,7 +8865,7 @@ Aliases: I<urandomm>
 
     useed(n)
 
-Takes a non-negative integer C<n>, which is used to seed the internal CSPRNG used for random functions, such as C<urand> and the random prime functions.
+Takes a nonnegative integer C<n>, which is used to seed the internal CSPRNG used for random functions, such as C<urand> and the random prime functions.
 
 For good security, C<n> should be at least an 128-bit random integer.
 

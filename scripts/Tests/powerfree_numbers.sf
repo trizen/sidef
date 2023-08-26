@@ -81,24 +81,24 @@ assert_eq(3000.of{.nth_powerfree(2)}.slice(1), 3000.dec.by{.is_powerfree(2)})
 assert_eq(3000.of{.nth_powerfree(3)}.slice(1), 3000.dec.by{.is_powerfree(3)})
 assert_eq(3000.of{.nth_powerfree(4)}.slice(1), 3000.dec.by{.is_powerfree(4)})
 
-assert_eq(300.of{.nth_non_powerfree(2)}.slice(1), 2.non_powerfree(300.dec.nth_non_powerfree(2)))
-assert_eq(300.of{.nth_non_powerfree(3)}.slice(1), 3.non_powerfree(300.dec.nth_non_powerfree(3)))
-assert_eq(300.of{.nth_non_powerfree(4)}.slice(1), 4.non_powerfree(300.dec.nth_non_powerfree(4)))
+assert_eq(300.of{.nth_nonpowerfree(2)}.slice(1), 2.nonpowerfree(300.dec.nth_nonpowerfree(2)))
+assert_eq(300.of{.nth_nonpowerfree(3)}.slice(1), 3.nonpowerfree(300.dec.nth_nonpowerfree(3)))
+assert_eq(300.of{.nth_nonpowerfree(4)}.slice(1), 4.nonpowerfree(300.dec.nth_nonpowerfree(4)))
 
-assert_eq(nth_non_powerfree(1e6, 200), 1606938044258990275541962092341162602522202993782792835301376000000)
-assert_eq(nth_non_powerfree(1e6 + 1, 200), 1606939651197034534532237634303254943684805515985786618094211301376)
-assert_eq(nth_non_powerfree(1e6 - 1, 200), 1606936437320946016551686550379070261359600471579799052508540698624)
+assert_eq(nth_nonpowerfree(1e6, 200), 1606938044258990275541962092341162602522202993782792835301376000000)
+assert_eq(nth_nonpowerfree(1e6 + 1, 200), 1606939651197034534532237634303254943684805515985786618094211301376)
+assert_eq(nth_nonpowerfree(1e6 - 1, 200), 1606936437320946016551686550379070261359600471579799052508540698624)
 
-assert_eq(nth_non_powerfree(1e6, 300), 2037035976334486086268445688409378161051468393665936250636140449354381299763336706183397376000000)
-assert_eq(nth_non_powerfree(1e6 + 1, 300), 2037038013370462420754531956855066570429629445134329916572391085494830654144636469520103559397376)
-assert_eq(nth_non_powerfree(1e6 - 1, 300), 2037033939298509751782359419963689751673307342197542584699889813213931945382036942846691192602624)
+assert_eq(nth_nonpowerfree(1e6, 300), 2037035976334486086268445688409378161051468393665936250636140449354381299763336706183397376000000)
+assert_eq(nth_nonpowerfree(1e6 + 1, 300), 2037038013370462420754531956855066570429629445134329916572391085494830654144636469520103559397376)
+assert_eq(nth_nonpowerfree(1e6 - 1, 300), 2037033939298509751782359419963689751673307342197542584699889813213931945382036942846691192602624)
 
-assert_eq(nth_non_powerfree(123456, 15), 4036198400)
-assert_eq(nth_non_powerfree(123456+1, 15), 4036231168)
-assert_eq(nth_non_powerfree(123456-1, 15), 4036165632)
+assert_eq(nth_nonpowerfree(123456, 15), 4036198400)
+assert_eq(nth_nonpowerfree(123456+1, 15), 4036231168)
+assert_eq(nth_nonpowerfree(123456-1, 15), 4036165632)
 
 do {
-    func non_powerfree(A, B, k=1) {
+    func nonpowerfree(A, B, k=1) {
 
         var arr = []
 
@@ -112,12 +112,12 @@ do {
         return arr.sort
     }
 
-    assert_eq(non_powerfree(65, 100, 2), %n[68, 72, 75, 76, 80, 81, 84, 88, 90, 92, 96, 98, 99, 100])
-    assert_eq(non_powerfree(64, 150, 3), %n[64, 72, 80, 81, 88, 96, 104, 108, 112, 120, 125, 128, 135, 136, 144])
+    assert_eq(nonpowerfree(65, 100, 2), %n[68, 72, 75, 76, 80, 81, 84, 88, 90, 92, 96, 98, 99, 100])
+    assert_eq(nonpowerfree(64, 150, 3), %n[64, 72, 80, 81, 88, 96, 104, 108, 112, 120, 125, 128, 135, 136, 144])
 }
 
 do {
-    func non_powerfree(A, B, k=1) {
+    func nonpowerfree(A, B, k=1) {
 
         var arr = []
 
@@ -131,20 +131,20 @@ do {
         return arr.sort
     }
 
-    assert_eq(non_powerfree(65, 100, 2), 2.non_powerfree(65, 100))
-    assert_eq(non_powerfree(64, 150, 3), 3.non_powerfree(64, 150))
+    assert_eq(nonpowerfree(65, 100, 2), 2.nonpowerfree(65, 100))
+    assert_eq(nonpowerfree(64, 150, 3), 3.nonpowerfree(64, 150))
 }
 
-assert_eq(2.non_powerfree(1e12, 1e12 + 10),   range(1e12, 1e12+10).grep { !.is_squarefree })
-assert_eq(3.non_powerfree(1e9, 1e9 + 50),     range(1e9, 1e9+50).grep { !.is_cubefree })
-assert_eq(4.non_powerfree(2**64, 2**64 + 50), range(2**64, 2**64 + 50).grep { !.is_powerfree(4) })
-assert_eq(2.non_powerfree(2**64, 2**64 + 50), range(2**64, 2**64 + 50).grep { !.is_squarefree })
+assert_eq(2.nonpowerfree(1e12, 1e12 + 10),   range(1e12, 1e12+10).grep { !.is_squarefree })
+assert_eq(3.nonpowerfree(1e9, 1e9 + 50),     range(1e9, 1e9+50).grep { !.is_cubefree })
+assert_eq(4.nonpowerfree(2**64, 2**64 + 50), range(2**64, 2**64 + 50).grep { !.is_powerfree(4) })
+assert_eq(2.nonpowerfree(2**64, 2**64 + 50), range(2**64, 2**64 + 50).grep { !.is_squarefree })
 
 assert_eq(4.powerfree(1e9, 1e9+50),       range(1e9, 1e9+50).grep { .is_powerfree(4) })
 assert_eq(2.powerfree(2**64, 2**64 + 10), range(2**64, 2**64 + 10).grep { .is_squarefree })
 assert_eq(3.powerfree(2**64, 2**64 + 10), range(2**64, 2**64 + 10).grep { .is_cubefree })
 
-assert_eq(100.non_powerfree(3**100, 3**100 + (2 * 2**100)), %n[515377520732011331036461129765621272702107522001, 515377520732011331800499870237994849832678719488, 515377520732011333068150470466224251329381924864])
+assert_eq(100.nonpowerfree(3**100, 3**100 + (2 * 2**100)), %n[515377520732011331036461129765621272702107522001, 515377520732011331800499870237994849832678719488, 515377520732011333068150470466224251329381924864])
 assert_eq(100.powerfree(3**100, 3**100 + 5), %n[515377520732011331036461129765621272702107522002, 515377520732011331036461129765621272702107522003, 515377520732011331036461129765621272702107522004, 515377520732011331036461129765621272702107522005, 515377520732011331036461129765621272702107522006])
 
 assert_eq(
@@ -161,7 +161,7 @@ assert_eq(
 assert_eq(
     gather {
         var count = 0
-        100.non_powerfree_each(3**100, 100**100, {|k|
+        100.nonpowerfree_each(3**100, 100**100, {|k|
             take(k)
             break if (++count >= 5)
         })

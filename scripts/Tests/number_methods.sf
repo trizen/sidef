@@ -22,18 +22,18 @@ assert_eq(prime_count(1e5.next_prime), 9593)
 assert_eq(prime_count(1e6.next_prime), 78499)
 
 assert_eq(
-    30.of { .inc.nth_non_powerfree(1) },
-    30.by { .is_non_powerfree(1) }
+    30.of { .inc.nth_nonpowerfree(1) },
+    30.by { .is_nonpowerfree(1) }
 )
 
 assert_eq(
-    30.of { .inc.nth_non_powerfree(2) },
-    30.by { .is_non_powerfree(2) }
+    30.of { .inc.nth_nonpowerfree(2) },
+    30.by { .is_nonpowerfree(2) }
 )
 
 assert_eq(
-    30.of { .inc.nth_non_powerfree(3) },
-    30.by { .is_non_powerfree(3) }
+    30.of { .inc.nth_nonpowerfree(3) },
+    30.by { .is_nonpowerfree(3) }
 )
 
 assert_eq(
@@ -230,17 +230,17 @@ assert_eq(
 # RangeNumber non-powerfree numbers
 
 assert_eq(
-    gather { 10..100 -> each_non_powerfree(3, {|k| take(k) }) },
-    3.non_powerfree(10, 100)
+    gather { 10..100 -> each_nonpowerfree(3, {|k| take(k) }) },
+    3.nonpowerfree(10, 100)
 )
 
 assert_eq(
-    gather { 1..100 -> each_non_powerfree(2, {|k| take(k) }) },
-    2.non_powerfree(100)
+    gather { 1..100 -> each_nonpowerfree(2, {|k| take(k) }) },
+    2.nonpowerfree(100)
 )
 
 assert_eq(
-    gather { 10..100 `by` 3 -> each_non_powerfree(3, {|k| take(k) }) },
+    gather { 10..100 `by` 3 -> each_nonpowerfree(3, {|k| take(k) }) },
     10..100 `by` 3 -> grep { !.is_cubefree }
 )
 
@@ -292,22 +292,22 @@ assert_eq(3.powerful(50, 106).len, 3.powerful_count(50, 106))
 assert_eq(3.powerful(49, 105).len, 3.powerful_count(49, 105))
 
 assert_eq(
-    (faulhaber_sum(2**100 * 10000, 1) - 100.non_powerfree(2**100 * 10000).sum),
+    (faulhaber_sum(2**100 * 10000, 1) - 100.nonpowerfree(2**100 * 10000).sum),
     100.powerfree_sum(2**100 * 10000)
 )
 
-assert_eq(2.non_powerfree(100), 0..100 -> grep { .is_non_powerfree(2) })
-assert_eq(3.non_powerfree(100), 0..100 -> grep { .is_non_powerfree(3) })
-assert_eq(4.non_powerfree(100), 0..100 -> grep { .is_non_powerfree(4) })
+assert_eq(2.nonpowerfree(100), 0..100 -> grep { .is_nonpowerfree(2) })
+assert_eq(3.nonpowerfree(100), 0..100 -> grep { .is_nonpowerfree(3) })
+assert_eq(4.nonpowerfree(100), 0..100 -> grep { .is_nonpowerfree(4) })
 
-assert_eq(2.non_powerfree(65, 100, 2), %n[68, 72, 75, 76, 80, 81, 84, 88, 90, 92, 96, 98, 99, 100])
-assert_eq(3.non_powerfree(64, 150, 3), %n[64, 72, 80, 81, 88, 96, 104, 108, 112, 120, 125, 128, 135, 136, 144])
+assert_eq(2.nonpowerfree(65, 100, 2), %n[68, 72, 75, 76, 80, 81, 84, 88, 90, 92, 96, 98, 99, 100])
+assert_eq(3.nonpowerfree(64, 150, 3), %n[64, 72, 80, 81, 88, 96, 104, 108, 112, 120, 125, 128, 135, 136, 144])
 
-assert_eq(2.non_powerfree_count(65, 100, 2), 14)
-assert_eq(3.non_powerfree_count(64, 150, 2), 15)
+assert_eq(2.nonpowerfree_count(65, 100, 2), 14)
+assert_eq(3.nonpowerfree_count(64, 150, 2), 15)
 
-assert_eq(2.non_powerfree_sum(65, 100, 2), 1199)
-assert_eq(3.non_powerfree_sum(64, 150, 2), 1593)
+assert_eq(2.nonpowerfree_sum(65, 100, 2), 1199)
+assert_eq(3.nonpowerfree_sum(64, 150, 2), 1593)
 
 for k in (2..5) {
     var lo = 1e6.irand
@@ -624,8 +624,8 @@ for k in (1..3) {
     )
 
     assert_eq(
-        n.inc.of { .next_non_powerfree(k).prev_non_powerfree(k) }.grep.uniq,
-        k.non_powerfree(n),
+        n.inc.of { .next_nonpowerfree(k).prev_nonpowerfree(k) }.grep.uniq,
+        k.nonpowerfree(n),
     )
 
     assert_eq(
@@ -793,12 +793,12 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [1e4, 4], [1e8, 7], [1e8,6], [1e8,
             --n; while (!n.is_powerful(k)) { --n }; n
         }(n))
 
-        assert_eq(next_non_powerfree(n,k), ->(n) {
-            ++n; while (!n.is_non_powerfree(k)) { ++n }; n
+        assert_eq(next_nonpowerfree(n,k), ->(n) {
+            ++n; while (!n.is_nonpowerfree(k)) { ++n }; n
         }(n))
 
-        assert_eq(prev_non_powerfree(n,k), ->(n) {
-            --n; while (!n.is_non_powerfree(k)) { --n }; n
+        assert_eq(prev_nonpowerfree(n,k), ->(n) {
+            --n; while (!n.is_nonpowerfree(k)) { --n }; n
         }(n))
     }
 
@@ -810,12 +810,12 @@ for n,k in ([[4171, 1], [4171, 2], [4171, 3], [1e4, 4], [1e8, 7], [1e8,6], [1e8,
         assert_eq([w], k.powerful(w, n-1))
     }
 
-    with (next_non_powerfree(n,k)) {|w|
-        assert_eq([w], k.non_powerfree(n+1, w))
+    with (next_nonpowerfree(n,k)) {|w|
+        assert_eq([w], k.nonpowerfree(n+1, w))
     }
 
-    with (prev_non_powerfree(n,k)) {|w|
-        assert_eq([w], k.non_powerfree(w, n-1))
+    with (prev_nonpowerfree(n,k)) {|w|
+        assert_eq([w], k.nonpowerfree(w, n-1))
     }
 }
 
@@ -1097,8 +1097,8 @@ assert_eq(composite_sum(1e2.next_prime, 1e3.next_prime), composites(1e2.next_pri
 assert_eq(20.by { .is_squarefree }, squarefree(20.nth_squarefree))
 assert_eq(20.by { .is_cubefree }, 1..20.nth_cubefree -> grep { .is_powerfree(3) })
 
-assert_eq(20.by { .is_non_squarefree }, non_squarefree(20.nth_non_squarefree))
-assert_eq(20.by { .is_non_cubefree }, 1..20.nth_non_cubefree -> grep { .is_non_powerfree(3) })
+assert_eq(20.by { .is_nonsquarefree }, nonsquarefree(20.nth_nonsquarefree))
+assert_eq(20.by { .is_noncubefree }, 1..20.nth_noncubefree -> grep { .is_nonpowerfree(3) })
 
 assert_eq(20.by { .is_squarefull }, 2.powerful(20.nth_powerful(2)))
 assert_eq(20.by { .is_cubefull }, 3.powerful(20.nth_powerful(3)))
@@ -1109,13 +1109,13 @@ assert_eq(1000!.make_coprime(2*3*5*7).lpf, 11)
 assert_eq(1000!.gpf, 1000.prev_prime)
 assert_eq(gpf(1000! * (2**64 + 1)), 67280421310721)
 
-assert_eq(20.of{ .non_squarefree_count },      20.of{ .is_non_squarefree ? 1 : 0 }.acc)
-assert_eq(20.of{ .non_squarefree_sum },        20.of{ .is_non_squarefree ? _ : 0 }.acc)
-assert_eq(20.of{ .non_cubefree_count },        20.of{ .is_non_cubefree ? 1 : 0 }.acc)
-assert_eq(20.of{ .non_cubefree_sum },          20.of{ .is_non_cubefree ? _ : 0 }.acc)
+assert_eq(20.of{ .nonsquarefree_count },      20.of{ .is_nonsquarefree ? 1 : 0 }.acc)
+assert_eq(20.of{ .nonsquarefree_sum },        20.of{ .is_nonsquarefree ? _ : 0 }.acc)
+assert_eq(20.of{ .noncubefree_count },        20.of{ .is_noncubefree ? 1 : 0 }.acc)
+assert_eq(20.of{ .noncubefree_sum },          20.of{ .is_noncubefree ? _ : 0 }.acc)
 
-assert_eq(20.of{ 4.non_powerfree_count(_) },   20.of{ .is_non_powerfree(4) ? 1 : 0 }.acc)
-assert_eq(20.of{ 4.non_powerfree_sum(_) },     20.of{ .is_non_powerfree(4) ? _ : 0 }.acc)
+assert_eq(20.of{ 4.nonpowerfree_count(_) },   20.of{ .is_nonpowerfree(4) ? 1 : 0 }.acc)
+assert_eq(20.of{ 4.nonpowerfree_sum(_) },     20.of{ .is_nonpowerfree(4) ? _ : 0 }.acc)
 
 assert_eq(20.of{ 4.powerfree_count(_) },       20.of{ .is_powerfree(4) ? 1 : 0 }.acc)
 assert_eq(20.of{ 4.powerfree_sum(_) },         20.of{ .is_powerfree(4) ? _ : 0 }.acc)

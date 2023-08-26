@@ -406,18 +406,18 @@ package Sidef::Types::Range::RangeNumber {
                             predicate  => sub { $_[0]->is_cubefull },
                            },
                            {
-                            each_name  => 'each_non_squarefree',
-                            arr_name   => 'non_squarefree',
-                            count_name => 'non_squarefree_count',
-                            sum_name   => 'non_squarefree_sum',
-                            predicate  => sub { $_[0]->is_non_squarefree },
+                            each_name  => 'each_nonsquarefree',
+                            arr_name   => 'nonsquarefree',
+                            count_name => 'nonsquarefree_count',
+                            sum_name   => 'nonsquarefree_sum',
+                            predicate  => sub { $_[0]->is_nonsquarefree },
                            },
                            {
-                            each_name  => 'each_non_cubefree',
-                            arr_name   => 'non_cubefree',
-                            count_name => 'non_cubefree_count',
-                            sum_name   => 'non_cubefree_sum',
-                            predicate  => sub { $_[0]->is_non_cubefree },
+                            each_name  => 'each_noncubefree',
+                            arr_name   => 'noncubefree',
+                            count_name => 'noncubefree_count',
+                            sum_name   => 'noncubefree_sum',
+                            predicate  => sub { $_[0]->is_noncubefree },
                            },
                            {
                             each_name  => 'each_semiprime',
@@ -601,13 +601,13 @@ package Sidef::Types::Range::RangeNumber {
                  },
                 },
                 {
-                 arr_name   => 'non_powerfree',
-                 each_name  => 'each_non_powerfree',
-                 count_name => 'non_powerfree_count',
-                 sum_name   => 'non_powerfree_sum',
+                 arr_name   => 'nonpowerfree',
+                 each_name  => 'each_nonpowerfree',
+                 count_name => 'nonpowerfree_count',
+                 sum_name   => 'nonpowerfree_sum',
                  predicate  => sub {
                      my ($k) = @_;
-                     sub { $_[0]->is_non_powerfree($k) };
+                     sub { $_[0]->is_nonpowerfree($k) };
                  },
                 },
                 {
