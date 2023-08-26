@@ -331,6 +331,7 @@ sub read_script {
 }
 
 sub help_interactive {
+    my ($term) = @_;
 
     require File::Spec;
     require File::Basename;
@@ -338,7 +339,7 @@ sub help_interactive {
     require Encode;
     require Term::ReadLine;
 
-    my $term = Term::ReadLine->new("$name $version -- help interactive mode");
+    $term //= Term::ReadLine->new("$name $version -- help interactive mode");
 
     print <<"HELP";
 Welcome to $name $version! This is the interactive help utility.
@@ -512,7 +513,7 @@ EOT
             $line .= Encode::decode_utf8($term->readline($line eq '' ? '> ' : '   ') // return);
 
             if ($line eq 'help') {
-                help_interactive();
+                help_interactive($term);
                 redo MAINLOOP;
             }
             elsif ($line eq '##') {
@@ -574,8 +575,7 @@ EOT
         $vars          = $copy_hash->($sidef->{parser}{vars});
         $ref_vars_refs = $copy_hash->($sidef->{parser}{ref_vars_refs});
 
-        $line =~
-          s{#(-?[1-9][0-9]*)\b}{(abs($1) <= scalar(@values)) ? ('(' . $values[($1 < 0) ? $1 : $1-1]->{value} . ')') : "#$1"}ge;
+        $line =~ s{#(-?[1-9][0-9]*)\b}{(abs($1) <= scalar(@values)) ? ('(' . $values[($1 < 0) ? $1 : $1-1]->{value} . ')') : "#$1"}ge;
 
         my $ccode = eval { $sidef->compile_code($line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
 
@@ -653,14 +653,8 @@ EOT
             my $dump = join(
                 ', ',
                 map {
-                    (ref($_) ? UNIVERSAL::can($_, 'dump') ? $_->dump : $_ : ($_ // 'nil'))
-                      . (
-                         (
-                                ref($_) eq 'Sidef::Types::Number::Number'
-                            and ref($$_) eq 'Math::MPFR'
-                            and Math::MPFR::Rmpfr_number_p($$_)
-                         ) ? 'f' : ''
-                        )
+                        (ref($_) ? UNIVERSAL::can($_, 'dump') ? $_->dump : $_ : ($_ // 'nil'))
+                      . ((ref($_) eq 'Sidef::Types::Number::Number' and ref($$_) eq 'Math::MPFR' and Math::MPFR::Rmpfr_number_p($$_)) ? 'f' : '')
                   } @results
             );
 
