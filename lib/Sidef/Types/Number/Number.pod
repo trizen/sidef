@@ -1878,7 +1878,7 @@ Aliases: I<consecutive_integer_lcm>
 
     n.convergents(k)
 
-Returns an array with the continued fraction convergents for a given real number C<n>, where C<k> is the number of convergenents to be computed and returned.
+Returns an array with the continued fraction convergents for a given real number C<n>, where C<k> is the number of convergents to be computed and returned.
 
     say Num.pi.convergents(5)   #=> [3, 22/7, 333/106, 355/113, 103993/33102]
 
@@ -2234,8 +2234,6 @@ Returns an array of C<[a,b]> pairs with all the possible solutions to the equati
     n.digit(k, b=10)
 
 Returns the k-th digit of C<n> in a base C<b>.
-
-Exmaples:
 
     say 1119.digit(0)         #=> 9
     say 1181.digit(1)         #=> 8
@@ -3711,7 +3709,7 @@ Aliases: I<polygonal_inverse>
 
     n.inverse_psi
 
-Returns all the solutions C<x> to the Dedekin psi function: C<psi(x) = n>.
+Returns all the solutions C<x> to Dedekind's psi function: C<psi(x) = n>.
 
     say inverse_psi(120)    #=> [75, 76, 87, 95]
 
@@ -3735,7 +3733,7 @@ Aliases: I<inverse_dedekind_psi_len>
 
     n.inverse_psi_max
 
-Returns the largest solution x to the Dedekind psi function: C<psi(x) = n>.
+Returns the largest solution C<x> to Dedekind's psi function: C<psi(x) = n>.
 
 Equivalent with:
 
@@ -3751,7 +3749,7 @@ Aliases: I<inverse_dedekind_psi_max>
 
     n.inverse_psi_min
 
-Returns the smallest solution x to the Dedekind psi function: C<psi(x) = n>.
+Returns the smallest solution C<x> to Dedekind's psi function: C<psi(x) = n>.
 
 Equivalent with:
 
@@ -4881,7 +4879,7 @@ Aliases: I<is_extra_strong_lucas_psp>, I<is_stronger_lucas_pseudoprime>, I<is_ex
 
     n.is_strong_fib
 
-Teturns true if C<n> is a strong Fibonacci pseudoprime, satisfying:
+Returns true if C<n> is a strong Fibonacci pseudoprime, satisfying:
 
     V_n(P,Q) = P (mod)
 

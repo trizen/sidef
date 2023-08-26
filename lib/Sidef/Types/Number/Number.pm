@@ -20310,7 +20310,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_sub_ui($u, $v, 1);
             Math::GMPz::Rmpz_divisible_p($nm1, $u) || return Sidef::Types::Bool::Bool::FALSE;
 
-            # Check if any of the following condition is satisifed:
+            # Check if any of the following condition is satisfied:
             #    2(p + 1) | (n − 1)
             #    2(p + 1) | (n − p)
 
@@ -22105,7 +22105,7 @@ package Sidef::Types::Number::Number {
 
         $factorized || $collect_factors->($n->trial_factor($mp1->mul(_set_int(1e6))));
 
-        # Methods that depdend on the special form of n
+        # Methods that depend on the special form of n
         $factorized || $collect_factors->($n->fermat_factor($mp1->mul(_set_int(1e4))));
         $factorized || $collect_factors->($n->holf_factor($mp1->mul(_set_int(1e4))));
         $factorized || $collect_factors->($n->phi_finder_factor($mp1->mul(_set_int(1e4))));
@@ -22819,12 +22819,15 @@ package Sidef::Types::Number::Number {
         my $process = sub {
             my ($root, $e) = @_;
 
-            for my $j (1, 0) {
+            for my $j (-1, 0, 1) {
 
                 my $k = Math::GMPz::Rmpz_init();
                 my $u = Math::GMPz::Rmpz_init();
 
-                Math::GMPz::Rmpz_add_ui($k, $root, $j);
+                ($j < 0)
+                  ? Math::GMPz::Rmpz_sub_ui($k, $root, CORE::abs($j))
+                  : Math::GMPz::Rmpz_add_ui($k, $root, $j);
+
                 Math::GMPz::Rmpz_powm_ui($u, $k, $e, $n);
 
                 foreach my $z ($u, $n - $u) {
@@ -25657,7 +25660,7 @@ package Sidef::Types::Number::Number {
 
             if ($p < ULONG_MAX) {
 
-                if ($e == 1) {    # optimizaiton
+                if ($e == 1) {    # optimization
                     push @terms, $p - 1;
                     next;
                 }
@@ -29291,7 +29294,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        # If n is a native integer, Math::Prime::Util::is_carmichael() is slighly faster.
+        # If n is a native integer, Math::Prime::Util::is_carmichael() is slightly faster.
         if (!ref($n)) {
             return (
                     (HAS_PRIME_UTIL ? Math::Prime::Util::is_carmichael($n) : Math::Prime::Util::GMP::is_carmichael($n))
