@@ -2004,6 +2004,20 @@ Returns the cube of C<x>. Equivalent with C<x**3>.
 
 =cut
 
+=head2 cube_divisors
+
+    n.cube_divisors
+
+Returns the cube divisors of C<n>.
+
+    say 10!.cube_divisors    #=> [1, 8, 27, 64, 216, 1728]
+
+Equivalent with:
+
+    n.divisors.grep { .is_cube }
+
+=cut
+
 =head2 cubefree
 
     cubefree(n)
@@ -2022,6 +2036,16 @@ Returns the count of cubefree numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
+=head2 cubefree_divisors
+
+    n.cubefree_divisors
+
+Returns an array with the cubefree divisors of C<n>.
+
+    say cubefree_divisors(120)  #=> [1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60]
+
+=cut
+
 =head2 cubefree_each
 
     n.cubefree_each { ... }
@@ -2033,12 +2057,62 @@ Aliases: I<each_cubefree>
 
 =cut
 
+=head2 cubefree_sigma
+
+    n.cubefree_sigma(k=1)
+
+Sum of the cubefree divisors of C<n>, each divisor raised to power C<k>.
+
+    say cubefree_sigma(5040)      #=> 4368
+    say cubefree_sigma(5040, 2)   #=> 2484300
+
+=cut
+
+=head2 cubefree_sigma0
+
+    n.cubefree_sigma0
+
+Returns the count of cubefree divisors of C<n>.
+
+=cut
+
 =head2 cubefree_sum
 
     cubefree_sum(n)
     cubefree_sum(a,b)
 
 Returns the sum of cubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubefree_udivisors
+
+    n.cubefree_udivisors
+
+Returns the unitary cubefree divisors of C<n>.
+
+    say cubefree_udivisors(5040)   #=> [1, 5, 7, 9, 35, 45, 63, 315]
+
+=cut
+
+=head2 cubefree_usigma
+
+    n.cubefree_usigma(k=1)
+
+Sum of the unitary cubefree divisors of C<n>, each divisor raised to power C<k>.
+
+    say 5040.cubefree_usigma     #=> 480
+    say 5040.cubefree_usigma(2)  #=> 106600
+
+=cut
+
+=head2 cubefree_usigma0
+
+    n.cubefree_usigma0
+
+Returns the number of unitary cubefree divisors of C<n>.
+
+    say cubefree_usigma0(5040)    #=> 8
 
 =cut
 
@@ -2077,6 +2151,62 @@ Aliases: I<each_cubefull>
     cubefull_sum(a,b)
 
 Returns the sum of cubefull numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cube_sigma
+
+    n.cube_sigma(k=1)
+
+Sum of the cube divisors of C<n>, each divisor raised to the power C<k>.
+
+    say 10!.cube_sigma       #=> 2044
+    say 10!.cube_sigma(2)    #=> 3037530
+
+Equivalent with:
+
+    n.cube_divisors.sum {|d| d**k }
+
+=cut
+
+=head2 cube_sigma0
+
+    n.cube_sigma0
+
+Returns the count of cube divisors of C<n>.
+
+=cut
+
+=head2 cube_udivisors
+
+    n.cube_udivisors
+
+Returns the unitary cube divisors of C<n>, such that each divisor C<d> is a cube and C<gcd(n/d, d) = 1>.
+
+    say 15!.cube_udivisors   #=> [1, 125, 729, 91125]
+
+=cut
+
+=head2 cube_usigma
+
+    n.cube_usigma(k=1)
+
+Sum of the unitary cube divisors of C<n>, each divisor raised to power C<k>.
+
+    say cube_usigma(15!)     #=> 91980
+    say cube_usigma(15!, 2)  #=> 8304312692
+
+Equivalent with:
+
+    n.cube_udivisors.sum {|d| d**k }
+
+=cut
+
+=head2 cube_usigma0
+
+    n.cube_usigma0
+
+Returns the count of unitary cube divisors of C<n>.
 
 =cut
 
@@ -4589,8 +4719,8 @@ Aliases: I<is_positive>
 
 Returns true when all the exponents in the prime-power factorization of C<n> are less than C<k>.
 
-    say 15.by { .is_powerfree(2) }      # square-free numbers
-    say 15.by { .is_powerfree(3) }      # cube-free numbers
+    say 15.by { .is_powerfree(2) }      # squarefree numbers
+    say 15.by { .is_powerfree(3) }      # cubefree numbers
 
 =cut
 
@@ -6729,8 +6859,6 @@ Equivalent with (but much faster):
     n.udivisors.grep { .is_powerfree(k) }
     k.powerfree_divisors(n).grep {|d| gcd(n/d, d) == 1 }
 
-Aliases: I<powerfree_unitary_divisors>, I<unitary_powerfree_divisors>
-
 =cut
 
 =head2 powerfree_usigma
@@ -8313,7 +8441,7 @@ Aliases: I<square_free_count>
 
     squarefree_divisors(n)
 
-Returns an array with the square-free divisors of C<n>.
+Returns an array with the squarefree divisors of C<n>.
 
     say squarefree_divisors(120)  #=> [1, 2, 3, 5, 6, 10, 15, 30]
 
@@ -8385,7 +8513,7 @@ Aliases: I<squarefree_semiprimes_sum>
 
     squarefree_sigma(n,k=1)
 
-Sum of the square free divisors of C<n>, each divisor raised to power C<k>.
+Sum of the squarefree divisors of C<n>, each divisor raised to power C<k>.
 
     say squarefree_sigma(5040)      #=> 576
     say squarefree_sigma(5040, 2)   #=> 65000
@@ -8424,15 +8552,13 @@ Returns the unitary squarefree divisors of C<n>.
 
     say squarefree_udivisors(5040)   #=> [1, 5, 7, 35]
 
-Aliases: I<squarefree_unitary_divisors>, I<unitary_squarefree_divisors>
-
 =cut
 
 =head2 squarefree_usigma
 
     n.squarefree_usigma(k=1)
 
-Sum of the unitary squarefree divisors of C<n>, each divisor raised to the k-th power.
+Sum of the unitary squarefree divisors of C<n>, each divisor raised to power C<k>.
 
     say 5040.squarefree_usigma     #=> 48
     say 5040.squarefree_usigma(2)  #=> 1300
@@ -8520,8 +8646,6 @@ Aliases: I<sum_of_squares_count>
 Returns the unitary square divisors of C<n>, such that each divisor C<d> is a square and C<gcd(n/d, d) = 1>.
 
     say 5040.square_udivisors   #=> [1, 9, 16, 144]
-
-Aliases: I<square_unitary_divisors>, I<unitary_square_divisors>
 
 =cut
 

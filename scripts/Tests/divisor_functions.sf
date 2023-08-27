@@ -9,13 +9,17 @@ var h = Hash(
     prime_divisors => 'prime_sigma',
     prime_power_divisors => 'prime_power_sigma',
     square_divisors => 'square_sigma',
+    cube_divisors => 'cube_sigma',
     squarefree_divisors => 'squarefree_sigma',
+    cubefree_divisors => 'cubefree_sigma',
 
     udivisors => 'usigma',
     prime_udivisors => 'prime_usigma',
     prime_power_udivisors => 'prime_power_usigma',
     square_udivisors => 'square_usigma',
+    cube_udivisors => 'cube_usigma',
     squarefree_udivisors => 'squarefree_usigma',
+    cubefree_udivisors => 'cubefree_usigma',
 
     edivisors => 'esigma',
     idivisors => 'isigma',

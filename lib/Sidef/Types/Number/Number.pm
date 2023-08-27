@@ -23929,6 +23929,10 @@ package Sidef::Types::Number::Number {
         (TWO)->powerfree_divisors($_[0]);
     }
 
+    sub cubefree_divisors {
+        (THREE)->powerfree_divisors($_[0]);
+    }
+
     my $power_divisors_func = sub {
         my ($k, $factor_exp) = @_;
 
@@ -24000,6 +24004,10 @@ package Sidef::Types::Number::Number {
 
     sub square_divisors {
         (TWO)->power_divisors($_[0]);
+    }
+
+    sub cube_divisors {
+        (THREE)->power_divisors($_[0]);
     }
 
     my $power_udivisors_func = sub {
@@ -24078,8 +24086,9 @@ package Sidef::Types::Number::Number {
         (TWO)->power_udivisors($_[0]);
     }
 
-    *unitary_square_divisors = \&square_udivisors;
-    *square_unitary_divisors = \&square_udivisors;
+    sub cube_udivisors {
+        (THREE)->power_udivisors($_[0]);
+    }
 
     sub powerfree_udivisors {
         my ($k, $n) = @_;
@@ -24128,15 +24137,13 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@d);
     }
 
-    *unitary_powerfree_divisors = \&powerfree_udivisors;
-    *powerfree_unitary_divisors = \&powerfree_udivisors;
-
     sub squarefree_udivisors {
         (TWO)->powerfree_udivisors($_[0]);
     }
 
-    *unitary_squarefree_divisors = \&squarefree_udivisors;
-    *squarefree_unitary_divisors = \&squarefree_udivisors;
+    sub cubefree_udivisors {
+        (THREE)->powerfree_udivisors($_[0]);
+    }
 
     sub prime_divisors {
         my $n = _big2pistr($_[0]) // return Sidef::Types::Array::Array->new();
@@ -25771,14 +25778,30 @@ package Sidef::Types::Number::Number {
         (TWO)->powerfree_usigma0($_[0]);
     }
 
+    sub cubefree_usigma0 {
+        (THREE)->powerfree_usigma0($_[0]);
+    }
+
     sub squarefree_usigma {
         (TWO)->powerfree_usigma($_[0], $_[1]);
     }
 
+    sub cubefree_usigma {
+        (THREE)->powerfree_usigma($_[0], $_[1]);
+    }
+
     *squarefree_sigma0 = \&usigma0;
+
+    sub cubefree_sigma0 {
+        (THREE)->powerfree_sigma0($_[0]);
+    }
 
     sub squarefree_sigma {
         (TWO)->powerfree_sigma($_[0], $_[1]);
+    }
+
+    sub cubefree_sigma {
+        (THREE)->powerfree_sigma($_[0], $_[1]);
     }
 
     sub power_sigma0 {
@@ -25862,6 +25885,14 @@ package Sidef::Types::Number::Number {
         (TWO)->power_sigma($_[0], $_[1]);
     }
 
+    sub cube_sigma0 {
+        (THREE)->power_sigma0($_[0]);
+    }
+
+    sub cube_sigma {
+        (THREE)->power_sigma($_[0], $_[1]);
+    }
+
     sub power_usigma0 {
         my ($k, $n) = @_;
 
@@ -25934,6 +25965,14 @@ package Sidef::Types::Number::Number {
 
     sub square_usigma {
         (TWO)->power_usigma($_[0], $_[1]);
+    }
+
+    sub cube_usigma0 {
+        (THREE)->power_usigma0($_[0]);
+    }
+
+    sub cube_usigma {
+        (THREE)->power_usigma($_[0], $_[1]);
     }
 
     sub powerfree_sigma0 {
@@ -29677,12 +29716,6 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_odd_p($n)             or return Sidef::Types::Bool::Bool::FALSE;
         Math::GMPz::Rmpz_cmp_ui($n, 1729) >= 0 or return Sidef::Types::Bool::Bool::FALSE;
 
-        # Must also be an Euler pseudoprime to base 2
-        if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            Math::Prime::Util::GMP::is_euler_pseudoprime(Math::GMPz::Rmpz_get_str($n, 10), 2)
-              || return Sidef::Types::Bool::Bool::FALSE;
-        }
-
         state $nm1   = Math::GMPz::Rmpz_init_nobless();
         state $nm1d2 = Math::GMPz::Rmpz_init_nobless();
         state $pm1   = Math::GMPz::Rmpz_init_nobless();
@@ -29701,6 +29734,12 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $k - 1)
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
+        }
+
+        # Must also be an Euler pseudoprime to base 2
+        if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            Math::Prime::Util::GMP::is_euler_pseudoprime(Math::GMPz::Rmpz_get_str($n, 10), 2)
+              || return Sidef::Types::Bool::Bool::FALSE;
         }
 
         # Check: p^((n-1)/2) == +/-1 (mod n), for random primes p
