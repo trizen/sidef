@@ -30,24 +30,22 @@ package Sidef::Types::Number::Number {
     state $TWO  = Math::GMPz::Rmpz_init_set_ui(2);
     state $TEN  = Math::GMPz::Rmpz_init_set_ui(10);
 
-#<<<
     use constant {
 
-          ONE   => bless(\(my $one = 1)),
-          TWO   => bless(\(my $two = 2)),
-          THREE => bless(\(my $three = 3)),
-          ZERO  => bless(\(my $zero = 0)),
-          MONE  => bless(\(my $mone = -1)),
+        ONE   => bless(\(my $one   = 1)),
+        TWO   => bless(\(my $two   = 2)),
+        THREE => bless(\(my $three = 3)),
+        ZERO  => bless(\(my $zero  = 0)),
+        MONE  => bless(\(my $mone  = -1)),
 
-          ULONG_MAX => Math::GMPq::_ulong_max(),
-          LONG_MIN  => Math::GMPq::_long_min(),
+        ULONG_MAX => Math::GMPq::_ulong_max(),
+        LONG_MIN  => Math::GMPq::_long_min(),
 
-          #~ ULONG_MAX => 4294967295,
-          #~ LONG_MIN  => -2147483647,
+        #~ ULONG_MAX => 4294967295,
+        #~ LONG_MIN  => -2147483647,
 
-          HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 } // 0,
+        HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 } // 0,
     };
-#>>>
 
     use constant {
 
@@ -439,7 +437,7 @@ package Sidef::Types::Number::Number {
 
         $s || return 0;
 
-        $s = lc($s);
+        $s = CORE::lc($s);
 
         # Remove underscores and whitespace
         $s =~ tr/_ \a\b\t\n\f\r\e//d;
@@ -8909,7 +8907,6 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_abs($n, $n);
         }
 
-#<<<
         if (!defined($k) or Math::GMPz::Rmpz_cmp_ui($k, 62) <= 0) {
             $k = defined($k) ? Math::GMPz::Rmpz_get_ui($k) : 10;
 
@@ -8927,7 +8924,6 @@ package Sidef::Types::Number::Number {
                 $k = Math::GMPz::Rmpz_init_set_ui($k);
             }
         }
-#>>>
 
         # Subquadratic Algorithm 1.26 FastIntegerOutput from "Modern Computer Arithmetic v0.5.9"
         if (Math::GMPz::Rmpz_fits_ulong_p($k)) {
@@ -12261,12 +12257,9 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         my $n = _any2ui($$x) // goto &nan;
 
-#<<<
         if ($n < 100) {
-              return _set_int(
-                    Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::stirling($n, $_, 2) } 0 .. $n));
+            return _set_int(Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::stirling($n, $_, 2) } 0 .. $n));
         }
-#>>>
 
         my @acc;
 
@@ -15887,10 +15880,10 @@ package Sidef::Types::Number::Number {
 
                     Math::GMPz::Rmpz_mul_ui($t, $m, $q);
                     Math::GMPz::Rmpz_div($u, $n, $t);
-#<<<
-                    my $w = Math::GMPz::Rmpz_fits_ulong_p($u) ? Math::GMPz::Rmpz_get_ui($u) : Math::GMPz::Rmpz_get_str($u, 10);
+
+                    my $w  = Math::GMPz::Rmpz_fits_ulong_p($u)      ? Math::GMPz::Rmpz_get_ui($u)       : Math::GMPz::Rmpz_get_str($u, 10);
                     my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
-#>>>
+
                     if ($ps < ULONG_MAX) {
                         Math::GMPz::Rmpz_addmul_ui($total, $t, $ps - $j);
                     }
@@ -16063,10 +16056,10 @@ package Sidef::Types::Number::Number {
                     $j += $q;
                     Math::GMPz::Rmpz_mul_ui($t, $m, $q);
                     Math::GMPz::Rmpz_div($u, $n, $t);
-#<<<
-                    my $w = Math::GMPz::Rmpz_fits_ulong_p($u) ? Math::GMPz::Rmpz_get_ui($u) : Math::GMPz::Rmpz_get_str($u, 10);
+
+                    my $w  = Math::GMPz::Rmpz_fits_ulong_p($u)      ? Math::GMPz::Rmpz_get_ui($u)       : Math::GMPz::Rmpz_get_str($u, 10);
                     my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
-#>>>
+
                     if ($ps < ULONG_MAX) {
                         Math::GMPz::Rmpz_addmul_ui($total, $t, $ps - $j);
                     }
@@ -16150,10 +16143,10 @@ package Sidef::Types::Number::Number {
                         if (Math::GMPz::Rmpz_cmp_ui($t, $r) < 0) {
                             last;
                         }
-#<<<
-                        my $w  = Math::GMPz::Rmpz_fits_ulong_p($t) ? Math::GMPz::Rmpz_get_ui($t) : Math::GMPz::Rmpz_get_str($t, 10);
+
+                        my $w  = Math::GMPz::Rmpz_fits_ulong_p($t)        ? Math::GMPz::Rmpz_get_ui($t)        : Math::GMPz::Rmpz_get_str($t, 10);
                         my $pi = (HAS_PRIME_UTIL and $w < PRIMECOUNT_MIN) ? Math::Prime::Util::prime_count($w) : _prime_count($w);
-#>>>
+
                         if ($pi < ULONG_MAX) {
                             Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
                         }
@@ -16265,10 +16258,10 @@ package Sidef::Types::Number::Number {
                         if (Math::GMPz::Rmpz_cmp_ui($u, $r) < 0) {
                             last;
                         }
-#<<<
-                    my $w = Math::GMPz::Rmpz_fits_ulong_p($u) ? Math::GMPz::Rmpz_get_ui($u) : Math::GMPz::Rmpz_get_str($u, 10);
-                    my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
-#>>>
+
+                        my $w  = Math::GMPz::Rmpz_fits_ulong_p($u)      ? Math::GMPz::Rmpz_get_ui($u)       : Math::GMPz::Rmpz_get_str($u, 10);
+                        my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
+
                         if ($ps < ULONG_MAX) {
                             Math::GMPz::Rmpz_addmul_ui($total, $v, $ps - $j);
                         }
@@ -19233,8 +19226,7 @@ package Sidef::Types::Number::Number {
                 if ($j >= 6) {
 
                     my @special_factors = @{(bless \$n)->special_factors(_set_int($j - 6))};
-                    my @gcd_factors =
-                      @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)]))};
+                    my @gcd_factors     = @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)]))};
 
                     if (scalar(@gcd_factors) > $k) {
                         return Sidef::Types::Bool::Bool::FALSE;
@@ -19487,8 +19479,7 @@ package Sidef::Types::Number::Number {
                 if ($j >= 6) {
 
                     my @special_factors = @{(bless \$n)->special_factors(_set_int($j - 6))};
-                    my @gcd_factors =
-                      @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)]))};
+                    my @gcd_factors     = @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)]))};
 
                     my @prime_factors;
                     my @composite_factors;
@@ -22047,11 +22038,13 @@ package Sidef::Types::Number::Number {
 
         # Factorize directly when n is a native integer
         if (Math::GMPz::Rmpz_fits_ulong_p($z)) {
+            local $SPECIAL_FACTORS = 0;
             return Sidef::Types::Array::Array->new([map { bless \$_ } _factor(Math::GMPz::Rmpz_get_ui($z))]);
         }
 
         # Factorize directly when n is small enough
         if (Math::GMPz::Rmpz_sizeinbase($z, 2) <= SMALL_NUMBER_MAX_BITS) {
+            local $SPECIAL_FACTORS = 0;
             return Sidef::Types::Array::Array->new([map { _set_int($_) } _factor(Math::GMPz::Rmpz_get_str($z, 10))]);
         }
 
@@ -22083,7 +22076,7 @@ package Sidef::Types::Number::Number {
                 }
                 else {
                     my @new_factors = (
-                        ($rec_tried{$$factor}++ or $factor->mul($factor)->gt($n)) ? () : do {
+                        ($rec_tried{$$factor}++ or $factor->sqr->gt($n)) ? () : do {
                             say STDERR "Recursively factoring: $$factor" if $VERBOSE;
                             @{$factor->special_factors};
                         }
@@ -22127,6 +22120,7 @@ package Sidef::Types::Number::Number {
                 push @prime_factors, $f;
             }
             elsif (!ref($$f) or Math::GMPz::Rmpz_sizeinbase($$f, 2) <= SMALL_NUMBER_MAX_BITS) {
+                local $SPECIAL_FACTORS = 0;
                 push @prime_factors, map { _set_int($_) } _factor($$f);
             }
             else {
@@ -22137,7 +22131,6 @@ package Sidef::Types::Number::Number {
         # Methods that can find special factors, recursively
         if (@composite_factors and $m->is_positive) {
 
-#<<<
             my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))) });
             my $phi_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->phi_finder_factor($m->mul(_set_int(1e3))) });
             my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e4))) });
@@ -22150,8 +22143,7 @@ package Sidef::Types::Number::Number {
             my $chebyshev_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(5e3))) });
             my $prho_block      = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))) });
             my $ecm_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(2000)), $m->mul(_set_int(10))) });
-            my $ecm_small_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(600)), $m->mul(_set_int(20))) });
-#>>>
+            my $ecm_small_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(600)),  $m->mul(_set_int(20))) });
 
             @composite_factors = map { @{$_->factor($fermat_block)} } @composite_factors;
             @composite_factors = map { @{$_->factor($holf_block)} } @composite_factors;
@@ -22194,11 +22186,11 @@ package Sidef::Types::Number::Number {
                         my ($n) = @_;
                         _is_prob_prime($$n) ? Sidef::Types::Array::Array->new() : do {
                             my $factors = do { $cache{"$n"} //= $block->run($n) };
-                            $factors->first(-1)->concat($factors->last(-1));
+                            $factors->first(-1)->concat($factors->last(-1))->uniq;
                         };
                     }
                 )
-            )->uniq;
+            );
             return $n->gcd_factors($f);
         }
 
@@ -26786,13 +26778,11 @@ package Sidef::Types::Number::Number {
                                 next;
                             }
 
-#<<<
                             if ($strong) {
                                 my $val = Math::Prime::Util::valuation($p - 1, 2);
-                                $val > $args{k_exp} or next;
+                                $val > $args{k_exp}                                                                              or next;
                                 Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                             }
-#>>>
 
                             for (my $v = (($fermat and $m == 1) ? ($p * $p) : ($m * $p)) ; $v - 1 < $B ; $v *= $p) {
                                 if ($v >= $A) {
@@ -26817,13 +26807,11 @@ package Sidef::Types::Number::Number {
                             and Math::Prime::Util::gcd($m,      $p) == 1
                             and Math::Prime::Util::gcd($fermat, $p) == 1) {
 
-#<<<
                             if ($strong) {
                                 my $val = Math::Prime::Util::valuation($p - 1, 2);
-                                $val > $args{k_exp} or next;
+                                $val > $args{k_exp}                                                                              or next;
                                 Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                             }
-#>>>
 
                             my $v = $m * $p;
                             $v >= $A or next;
@@ -26846,13 +26834,11 @@ package Sidef::Types::Number::Number {
                         next;
                     }
 
-#<<<
                     if ($strong) {
                         my $val = Math::Prime::Util::valuation($p - 1, 2);
-                        $val > $args{k_exp} or next;
+                        $val > $args{k_exp}                                                                              or next;
                         Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                     }
-#>>>
 
                     my $z;
 
@@ -27018,7 +27004,6 @@ package Sidef::Types::Number::Number {
                                  : (Math::Prime::Util::GMP::gcd($fermat, $p) == 1)
                                 )
                           ) {
-
 #<<<
                             if ($strong) {
                                 my $val = (HAS_PRIME_UTIL ? Math::Prime::Util::valuation($p - 1, 2) : Math::Prime::Util::GMP::valuation($p - 1, 2));
@@ -27028,7 +27013,6 @@ package Sidef::Types::Number::Number {
                                  : Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)) == ($args{congr} % $p) or next;
                             }
 #>>>
-
                             Math::GMPz::Rmpz_mul_ui($v, $m, $p);
 
                             if ($k == 1 and _is_prob_prime($p) and Math::GMPz::Rmpz_cmp_ui($m, 1) == 0) {
@@ -27480,13 +27464,12 @@ package Sidef::Types::Number::Number {
                             Math::Prime::Util::is_prime($p) || next;
                             my $n = $m * $p;
                             if (($n - 1) % ($p - 1) == 0) {
-#<<<
+
                                 if ($strong) {
                                     my $val = Math::Prime::Util::valuation($p - 1, 2);
-                                    $val > $args{k_exp} or next;
+                                    $val > $args{k_exp}                                                                              or next;
                                     Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                                 }
-#>>>
 
                                 push(@almost_primes, $n);
                             }
@@ -27522,13 +27505,11 @@ package Sidef::Types::Number::Number {
                             my $n = $m * $p;
                             if (($n - 1) % ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p)) == 0) {
 
-#<<<
                                 if ($strong) {
                                     my $val = Math::Prime::Util::valuation($p - 1, 2);
-                                    $val > $args{k_exp} or next;
+                                    $val > $args{k_exp}                                                                              or next;
                                     Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                                 }
-#>>>
 
                                 push(@almost_primes, $n);
                             }
@@ -27555,14 +27536,12 @@ package Sidef::Types::Number::Number {
 
                     $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
 
-#<<<
                     if ($strong and $fermat) {
                         $fermat % $p == 0 and next;
                         my $val = Math::Prime::Util::valuation($p - 1, 2);
-                        $val > $args{k_exp} or next;
+                        $val > $args{k_exp}                                                                              or next;
                         Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
                     }
-#>>>
 
                     if ($carmichael) {
                         Math::Prime::Util::gcd($m, $p - 1) == 1 or next;
@@ -27711,6 +27690,7 @@ package Sidef::Types::Number::Number {
                                     : Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)) == ($args{congr} % $p) or next;
                             }
 #>>>
+
                             Math::GMPz::Rmpz_mul_ui($v, $m, $p);
 
                             $lucas_carmichael
@@ -27787,7 +27767,6 @@ package Sidef::Types::Number::Number {
                     if ($fermat) {
                         $fermat % $p == 0 and next;
                     }
-
 #<<<
                     if ($strong and $fermat) {
                         my $val = (HAS_PRIME_UTIL ? Math::Prime::Util::valuation($p - 1, 2) : Math::Prime::Util::GMP::valuation($p - 1, 2));
@@ -27797,7 +27776,6 @@ package Sidef::Types::Number::Number {
                             : Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)) == ($args{congr} % $p) or next;
                     }
 #>>>
-
                     if ($carmichael) {
                         Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $p - 1) == 1 or next;
                         Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p - 1);
@@ -28942,11 +28920,14 @@ package Sidef::Types::Number::Number {
 
         my @squarefree;
 
-#<<<
         if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-            Math::Prime::Util::forsquarefree(sub {   # XXX: leaks memory in MPU 0.73
-                push @squarefree, $_;
-            }, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+            Math::Prime::Util::forsquarefree(    # XXX: leaks memory in MPU 0.73
+               sub {
+                   push @squarefree, $_;
+               },
+               Math::GMPz::Rmpz_get_ui($from),
+               Math::GMPz::Rmpz_get_ui($to)
+            );
         }
         elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
@@ -28954,7 +28935,7 @@ package Sidef::Types::Number::Number {
             $to   = Math::GMPz::Rmpz_get_ui($to);
 
             my @mu = Math::Prime::Util::moebius($from, $to);
-            for (my $i = -1; $from < $to; ++$from) {
+            for (my $i = -1 ; $from < $to ; ++$from) {
                 push(@squarefree, $from) if $mu[++$i];
             }
             push(@squarefree, $to) if $mu[-1];
@@ -28964,11 +28945,10 @@ package Sidef::Types::Number::Number {
             my $t  = Math::GMPz::Rmpz_init_set($from);
             my @mu = Math::Prime::Util::GMP::moebius($from, $to);
 
-            for (my $i = -1; ; Math::GMPz::Rmpz_add_ui($t, $t, 1)) {
+            for (my $i = -1 ; ; Math::GMPz::Rmpz_add_ui($t, $t, 1)) {
                 push(@squarefree, Math::GMPz::Rmpz_get_str($t, 10)) if ($mu[++$i] // last);
             }
         }
-#>>>
 
         return \@squarefree;
     }
@@ -32269,10 +32249,8 @@ package Sidef::Types::Number::Number {
       ) {
         no strict 'refs';
         *{__PACKAGE__ . '::' . $name} = sub {
-#<<<
             my ($n, $block) = @_;
             Sidef::Types::Array::Array->new([map { bless \$_ } 0 .. __numify__($$n) - 1])->$name($block);
-#>>>
         };
     }
 
@@ -32289,10 +32267,8 @@ package Sidef::Types::Number::Number {
       ) {
         no strict 'refs';
         *{__PACKAGE__ . '::' . $name} = sub {
-#<<<
             my ($n, $k, $block) = @_;
             Sidef::Types::Array::Array->new([map { bless \$_ } 0 .. __numify__($$n) - 1])->$name($k, $block);
-#>>>
         };
     }
 
