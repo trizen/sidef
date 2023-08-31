@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 185;
+use Test::More tests => 188;
 
 use Sidef;
 
@@ -52,6 +52,18 @@ my $mone = $o->new(-1);
 
     #$x = $o->new("1e2/1e1");
     #is("$x", "10");
+
+    $x = $o->new("8");
+    $x = $x->rsft($o->new("32"));
+    is("$x", "0");
+
+    $x = $o->new("112");
+    $x = $x->rsft($o->new("32"));
+    is("$x", "0");
+
+    $x = $o->new("640");
+    $x = $x->rsft($o->new("64"));
+    is("$x", "0");
 
     $x = $o->new("1 / 3");
     like($x->as_rat, re '1/3');
@@ -232,9 +244,8 @@ my $mone = $o->new(-1);
 
     is("${\($o->new(-2)->bernfrac)}", 'NaN');    # make sure we check for even correctly
 
-    is($o->new(52)->bernfrac->as_frac->get_value, '-801165718135489957347924991853/1590');
-    is($o->new(106)->bernfrac->as_frac->get_value,
-        '36373903172617414408151820151593427169231298640581690038930816378281879873386202346572901/642');
+    is($o->new(52)->bernfrac->as_frac->get_value,  '-801165718135489957347924991853/1590');
+    is($o->new(106)->bernfrac->as_frac->get_value, '36373903172617414408151820151593427169231298640581690038930816378281879873386202346572901/642');
 
     #
     ## bernreal()

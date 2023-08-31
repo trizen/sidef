@@ -164,7 +164,7 @@ package Sidef::Types::Number::Number {
             }
             else {
                 state $t = Math::GMPz::Rmpz_init_nobless();
-                eval { Math::GMPz::Rmpz_set_str($t, $num, $int_base) };
+                eval { Math::GMPz::Rmpz_set_str($t, "$num", $int_base) };
                 $@ && goto &nan;
                 my $r =
                     Math::GMPz::Rmpz_fits_ulong_p($t) ? Math::GMPz::Rmpz_get_ui($t)
@@ -31808,8 +31808,20 @@ package Sidef::Types::Number::Number {
         $y = _any2si($$y) // (goto &nan);
 
         if ($y >= 0 and !ref($x) and $x >= 0) {
-            my $r = $x >> $y;
-            return bless \$r;
+
+            if ($y >= $x) {
+                return ZERO;
+            }
+
+            if ($y == 0) {
+                return bless \$x;
+            }
+
+            # Fails on (old?) 32-bit perl with use64bitint=undef
+            # perl -E 'say (112 >> 32)'   # incorrectly prints 112 instead of 0
+            # https://www.cpantesters.org/cpan/report/38630124-4799-11ee-98b0-b3c3213a625c
+            # my $r = $x >> $y;
+            # return bless \$r;
         }
 
         $x = _any2mpz($x) // (goto &nan);
@@ -31820,6 +31832,7 @@ package Sidef::Types::Number::Number {
           ? Math::GMPz::Rmpz_mul_2exp($r, $x, -$y)
           : Math::GMPz::Rmpz_div_2exp($r, $x, $y);
 
+        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
         bless \$r;
     }
 
