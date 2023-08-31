@@ -31780,7 +31780,7 @@ package Sidef::Types::Number::Number {
                 return bless \$x;
             }
 
-            if (CORE::log($x) + CORE::log(2) * $y < CORE::log(ULONG_MAX)) {
+            if ($] >= 5.024000 and CORE::log($x) + CORE::log(2) * $y < CORE::log(ULONG_MAX)) {
                 my $r = $x << $y;
                 return bless \$r;
             }
@@ -31820,8 +31820,13 @@ package Sidef::Types::Number::Number {
             # Fails on (old?) 32-bit perl with use64bitint=undef
             # perl -E 'say (112 >> 32)'   # incorrectly prints 112 instead of 0
             # https://www.cpantesters.org/cpan/report/38630124-4799-11ee-98b0-b3c3213a625c
-            # my $r = $x >> $y;
-            # return bless \$r;
+
+            # This issue has been fixed in perl-5.24.0
+            # https://perldoc.perl.org/5.24.0/perldelta#Integer-shift-(%3C%3C-and-%3E%3E)-now-more-explicitly-defined
+            if ($] >= 5.024000) {
+                my $r = $x >> $y;
+                return bless \$r;
+            }
         }
 
         $x = _any2mpz($x) // (goto &nan);
