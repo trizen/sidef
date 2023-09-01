@@ -766,8 +766,8 @@ package Sidef::Types::String::String {
 
     sub unique {
         my ($self) = @_;
-        my %seen;
-        $self->new(CORE::join('', grep { !$seen{$_}++ } CORE::split(//, $$self)));
+        require List::Util;
+        $self->new(CORE::join('', List::Util::uniq(CORE::split(//, $$self))));
     }
 
     *uniq     = \&unique;

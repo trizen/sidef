@@ -40,7 +40,7 @@ class MD5(String msg) {
     func little_endian(Number w, Number n, Array v) {
         var step1 = (^n »*» w)
         var step2 = (v ~X>> step1)
-        step2 »%» (1 << w)
+        step2 »%» (1 << w)  #»
     }
 
     func block(Number a, Number b) { (a  + b) & 0xffffffff }
