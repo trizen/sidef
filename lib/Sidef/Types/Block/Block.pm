@@ -269,8 +269,7 @@ package Sidef::Types::Block::Block {
         my $name = $self->_name;
 
         die "[ERROR] $self->{type} `$name` does not match $name("
-          . join(', ',
-                 map { ref($_) ? Sidef::normalize_type(ref($_)) : defined($_) ? Sidef::normalize_type($_) : 'nil' } @args)
+          . join(', ', map { ref($_) ? Sidef::normalize_type(ref($_)) : defined($_) ? Sidef::normalize_type($_) : 'nil' } @args)
           . "), invoked as "
           . $name . '('
           . join(
@@ -513,13 +512,15 @@ package Sidef::Types::Block::Block {
             *threads::wait = \&threads::join;
             1;
         };
-        threads->create(
-                        {
-                         'context' => 'list',
-                         'exit'    => 'thread_only'
-                        },
-                        sub { $self->call(@args) }
-                       );
+        Sidef::Module::OO->__NEW__(
+                                   threads->create(
+                                                   {
+                                                    'context' => 'list',
+                                                    'exit'    => 'thread_only'
+                                                   },
+                                                   sub { $self->call(@args) }
+                                                  )
+                                  );
     }
 
     *thr = \&thread;

@@ -11,7 +11,7 @@ var lsys = LSystem(
     width:  1000,
     height: 1000,
 
-    scale: 0.7,
+    scale: 0.7f,
     xoff: -200,
     yoff:  300,
 
