@@ -30555,7 +30555,26 @@ package Sidef::Types::Number::Number {
             return $n->iroot($k)->inc->ipow($k);
         }
 
-        $n->perfect_power_count->inc->nth_perfect_power;
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_sgn($n) >= 0 or goto &nan;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        my $r = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_sqrt($r, $n);
+        Math::GMPz::Rmpz_add_ui($r, $r, 1);
+        Math::GMPz::Rmpz_mul($r, $r, $r);
+
+        foreach my $k (3 .. __ilog__($n, 2) + 1) {
+            Math::GMPz::Rmpz_root($t, $n, $k);
+            Math::GMPz::Rmpz_add_ui($t, $t, 1);
+            Math::GMPz::Rmpz_pow_ui($t, $t, $k);
+            if (Math::GMPz::Rmpz_cmp($t, $r) < 0) {
+                Math::GMPz::Rmpz_set($r, $t);
+            }
+        }
+
+        bless \$r;
     }
 
     sub prev_perfect_power {
@@ -30565,9 +30584,28 @@ package Sidef::Types::Number::Number {
             return $n->iroot($k)->dec->ipow($k);
         }
 
-        my $count = $n->perfect_power_count;
-        $count = $count->dec if $n->is_perfect_power;
-        $count->nth_perfect_power;
+        $n = _any2mpz($$n) // goto &nan;
+        Math::GMPz::Rmpz_sgn($n) > 0 or goto &nan;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        my $r = Math::GMPz::Rmpz_init();
+
+        if (Math::GMPz::Rmpz_root($r, $n, 2)) {
+            Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+        }
+        Math::GMPz::Rmpz_mul($r, $r, $r);
+
+        foreach my $k (3 .. __ilog__($n, 2)) {
+            if (Math::GMPz::Rmpz_root($t, $n, $k)) {
+                Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+            }
+            Math::GMPz::Rmpz_pow_ui($t, $t, $k);
+            if (Math::GMPz::Rmpz_cmp($t, $r) > 0) {
+                Math::GMPz::Rmpz_set($r, $t);
+            }
+        }
+
+        bless \$r;
     }
 
     sub is_power_of {

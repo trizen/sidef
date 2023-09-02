@@ -838,6 +838,11 @@ assert_eq(prev_perfect_power(4171), do {
 })
 
 assert_eq(
+    next_perfect_power(1<<3320).prev_perfect_power.prev_perfect_power.next_perfect_power,
+    1 << 3320,
+)
+
+assert_eq(
     10.by { .is_squarefree_almost_prime(2) },
     10.of { .inc.nth_squarefree_almost_prime(2) },
 )
