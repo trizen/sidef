@@ -97,8 +97,7 @@ package Sidef::Types::Array::Pair {
 
             my $s;
 
-            'Pair('
-              . join(', ', map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : ($_ // 'nil') } @$obj) . ')';
+            'Pair(' . join(', ', map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : ($_ // 'nil') } @$obj) . ')';
         };
 
         no warnings 'redefine';

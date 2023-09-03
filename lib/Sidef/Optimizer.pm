@@ -1068,13 +1068,7 @@ package Sidef::Optimizer {
 
             # Gauss.method(NUMBER, NUMBER)
             (
-                map {
-                    [$_,
-                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
-                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
-                     ]
-                    ]
-                } dtypes(
+                map { [$_, [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION), table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)]] } dtypes(
                     GAUSS_DT, qw(
                       new call
                       )
@@ -1086,13 +1080,7 @@ package Sidef::Optimizer {
 
             # Mod.method(NUMBER, NUMBER)
             (
-                map {
-                    [$_,
-                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
-                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
-                     ]
-                    ]
-                } dtypes(
+                map { [$_, [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION), table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)]] } dtypes(
                     MOD_DT, qw(
                       new call
                       )
@@ -1113,13 +1101,7 @@ package Sidef::Optimizer {
 
             # Fraction.method(NUMBER, NUMBER)
             (
-                map {
-                    [$_,
-                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
-                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)
-                     ]
-                    ]
-                } dtypes(
+                map { [$_, [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION), table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION)]] } dtypes(
                     FRACTION_DT, qw(
                       new call
                       )
@@ -1132,11 +1114,7 @@ package Sidef::Optimizer {
             # Quadratic.method(NUMBER, NUMBER, NUMBER)
             (
                 map {
-                    [$_,
-                     [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
-                      table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION),
-                      table(NUMBER)
-                     ]
+                    [$_, [table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION), table(NUMBER, MOD, GAUSS, QUADRATIC, QUATERNION, FRACTION), table(NUMBER)]
                     ]
                 } dtypes(
                     QUADRATIC_DT, qw(
@@ -1293,14 +1271,8 @@ package Sidef::Optimizer {
                 }
             }
         }
-        elsif (
-               (
-                   $ref eq 'Sidef::Variable::Static'
-                or $ref eq 'Sidef::Variable::Const'
-                or $ref eq 'Sidef::Variable::Define'
-               )
-               and exists($obj->{value})
-          ) {
+        elsif (($ref eq 'Sidef::Variable::Static' or $ref eq 'Sidef::Variable::Const' or $ref eq 'Sidef::Variable::Define')
+               and exists($obj->{value})) {
             if ($addr{refaddr($obj)}++) {
                 ## ok
             }
@@ -1505,11 +1477,11 @@ package Sidef::Optimizer {
                         and scalar(@{$call->{arg}}) == 1) {
                         my $arg = $call->{arg}[0];
                         my $opt_obj = $self->optimize_expr(
-                                 {
-                                  self => $arg,
-                                  (defined($unary_methods->{$method}) ? (call => [{method => $unary_methods->{$method}}]) : ())
-                                 }
-                        );
+                                                           {
+                                                            self => $arg,
+                                                            (defined($unary_methods->{$method}) ? (call => [{method => $unary_methods->{$method}}]) : ())
+                                                           }
+                                                          );
                         if (($method eq '+') ? (ref($opt_obj) ne 'HASH') : 1) {
                             $obj             = $opt_obj;
                             $unary_optimized = 1;

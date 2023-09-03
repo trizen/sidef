@@ -200,8 +200,7 @@ package Sidef::Types::Glob::FileHandle {
 
     sub read_lines {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(
-                                       [map { chomp($_); Sidef::Types::String::String->new($_) } CORE::readline($self->{fh})]);
+        Sidef::Types::Array::Array->new([map { chomp($_); Sidef::Types::String::String->new($_) } CORE::readline($self->{fh})]);
     }
 
     *readlines = \&read_lines;

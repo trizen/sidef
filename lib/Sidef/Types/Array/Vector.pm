@@ -67,8 +67,7 @@ package Sidef::Types::Array::Vector {
     sub chebyshev_dist {
         my ($v1, $v2) = @_;
         my $end = List::Util::min($#{$v1}, $#{$v2});
-        Sidef::Types::Number::Number::max(Sidef::Types::Number::Number::ZERO,
-                                          map { $v1->[$_]->sub($v2->[$_])->abs } 0 .. $end);
+        Sidef::Types::Number::Number::max(Sidef::Types::Number::Number::ZERO, map { $v1->[$_]->sub($v2->[$_])->abs } 0 .. $end);
     }
 
     sub dist_norm {

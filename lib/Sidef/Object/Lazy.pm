@@ -138,9 +138,7 @@ package Sidef::Object::Lazy {
     sub prod_kv {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_fast_reduce('prod',
-                            Sidef::Types::Number::Number::ONE,
-                            sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
+        $self->_fast_reduce('prod', Sidef::Types::Number::Number::ONE, sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
     }
 
     sub iter {

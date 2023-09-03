@@ -1035,9 +1035,7 @@ package Sidef::Types::Array::Array {
 
     sub sum_kv {
         my ($self, $block) = @_;
-        $self->_reduce_by('sum',
-                          Sidef::Types::Number::Number::ZERO,
-                          sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
+        $self->_reduce_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
     }
 
     sub sum_2d {
@@ -1083,9 +1081,7 @@ package Sidef::Types::Array::Array {
 
     sub prod_kv {
         my ($self, $block) = @_;
-        $self->_reduce_by('prod',
-                          Sidef::Types::Number::Number::ONE,
-                          sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
+        $self->_reduce_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
     }
 
     sub prod {
@@ -2474,8 +2470,7 @@ package Sidef::Types::Array::Array {
                 my $fc = Sidef::Types::Number::Polynomial->new(map { @$_ } @cf)->div($d->neg)->coeffs;
 
                 my %lookup = (map { @$_ } @$fc);
-                return Sidef::Types::Array::Array->new(
-                                  [map { $lookup{$_} // Sidef::Types::Number::Number::ZERO } CORE::reverse(0 .. $degree - 1)]);
+                return Sidef::Types::Array::Array->new([map { $lookup{$_} // Sidef::Types::Number::Number::ZERO } CORE::reverse(0 .. $degree - 1)]);
             }
 
             @A = @B;
@@ -3348,8 +3343,7 @@ package Sidef::Types::Array::Array {
 
     sub perm2num {
         my ($self) = @_;
-        Sidef::Types::Number::Number::_set_int(Math::Prime::Util::GMP::permtonum([map { CORE::int($_) } @$self])
-                                               // return undef);
+        Sidef::Types::Number::Number::_set_int(Math::Prime::Util::GMP::permtonum([map { CORE::int($_) } @$self]) // return undef);
     }
 
     sub det_bareiss {
@@ -3933,8 +3927,7 @@ package Sidef::Types::Array::Array {
 
             my $s;
 
-            '['
-              . CORE::join(', ', map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : ($_ // 'nil') } @$obj) . ']';
+            '[' . CORE::join(', ', map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : ($_ // 'nil') } @$obj) . ']';
         };
 
         no warnings 'redefine';

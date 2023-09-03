@@ -424,8 +424,7 @@ package Sidef::Types::Hash::Hash {
             push @array, [$key, $str, $block->run($str, $self->{$key})];
         }
 
-        Sidef::Types::Array::Array->new(
-              [map { Sidef::Types::Array::Pair->new($_->[1], $self->{$_->[0]}) } (CORE::sort { $a->[2] cmp $b->[2] } @array)]);
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Array::Pair->new($_->[1], $self->{$_->[0]}) } (CORE::sort { $a->[2] cmp $b->[2] } @array)]);
     }
 
     sub sort {
@@ -436,16 +435,15 @@ package Sidef::Types::Hash::Hash {
               Sidef::Types::Array::Array->new(
                                               [
                                                map { Sidef::Types::Array::Pair->new($_->[1], $self->{$_->[0]}) } (
-                                                       CORE::sort { scalar $block->run($a->[1], $b->[1]) }
-                                                         map { [$_, Sidef::Types::String::String->new($_)] } CORE::keys(%$self)
+                                                                                        CORE::sort { scalar $block->run($a->[1], $b->[1]) }
+                                                                                          map { [$_, Sidef::Types::String::String->new($_)] } CORE::keys(%$self)
                                                )
                                               ]
                                              );
         }
 
-        Sidef::Types::Array::Array->new(
-                                     map { Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_}) }
-                                       CORE::sort(CORE::keys(%$self)));
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_}) }
+                                        CORE::sort(CORE::keys(%$self)));
     }
 
     sub _min_max {
@@ -476,8 +474,7 @@ package Sidef::Types::Hash::Hash {
 
         ref($self) || return Sidef::Types::Array::Array->new($self);
 
-        Sidef::Types::Array::Array->new(
-              [map { Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_}) } CORE::keys(%$self)]);
+        Sidef::Types::Array::Array->new([map { Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($_), $self->{$_}) } CORE::keys(%$self)]);
     }
 
     *to_array = \&to_a;
@@ -506,8 +503,7 @@ package Sidef::Types::Hash::Hash {
                     push @body, $v->as_tree(Sidef::Types::String::String->new($k));
                 }
                 else {
-                    push @body,
-                      Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($k), Sidef::Types::Array::Array->new);
+                    push @body, Sidef::Types::Array::Pair->new(Sidef::Types::String::String->new($k), Sidef::Types::Array::Array->new);
                 }
             }
 

@@ -101,8 +101,7 @@ package Sidef::Types::Glob::Dir {
 
     sub up {
         my ($self) = @_;
-        __PACKAGE__->new(
-                    Encode::decode_utf8(File::Spec->catdir(ref($self) ? Encode::encode_utf8($$self) : (), File::Spec->updir)));
+        __PACKAGE__->new(Encode::decode_utf8(File::Spec->catdir(ref($self) ? Encode::encode_utf8($$self) : (), File::Spec->updir)));
     }
 
     sub split {

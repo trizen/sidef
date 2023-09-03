@@ -76,16 +76,14 @@ package Sidef::Types::Regex::Match {
 
     sub pos {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(
-                     [@{$self->{_cached_pos} //= [map { Sidef::Types::Number::Number::_set_int($_) } @{$self->{match_pos}}]}]);
+        Sidef::Types::Array::Array->new([@{$self->{_cached_pos} //= [map { Sidef::Types::Number::Number::_set_int($_) } @{$self->{match_pos}}]}]);
     }
 
     *match_pos = \&pos;
 
     sub captures {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(
-                           [@{$self->{_cached_cap} //= [map { Sidef::Types::String::String->new($_) } @{$self->{captures}}]}]);
+        Sidef::Types::Array::Array->new([@{$self->{_cached_cap} //= [map { Sidef::Types::String::String->new($_) } @{$self->{captures}}]}]);
     }
 
     *cap      = \&captures;

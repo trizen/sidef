@@ -89,13 +89,8 @@ package Sidef::Types::Array::Matrix {
 
         bless [
             map {
-                bless(
-                      [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
-                       Sidef::Types::Number::Number::ONE,
-                       (Sidef::Types::Number::Number::ZERO) x ($n - $_)
-                      ],
-                      'Sidef::Types::Array::Array'
-                     )
+                bless([(Sidef::Types::Number::Number::ZERO) x ($_ - 1), Sidef::Types::Number::Number::ONE, (Sidef::Types::Number::Number::ZERO) x ($n - $_)],
+                      'Sidef::Types::Array::Array')
               } 1 .. $n
         ];
     }
@@ -158,13 +153,7 @@ package Sidef::Types::Array::Matrix {
 
         bless [
             map {
-                bless(
-                      [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
-                       $value,
-                       (Sidef::Types::Number::Number::ZERO) x ($n - $_)
-                      ],
-                      'Sidef::Types::Array::Array'
-                     )
+                bless([(Sidef::Types::Number::Number::ZERO) x ($_ - 1), $value, (Sidef::Types::Number::Number::ZERO) x ($n - $_)], 'Sidef::Types::Array::Array')
               } 1 .. $n
         ];
     }
@@ -658,12 +647,8 @@ package Sidef::Types::Array::Matrix {
 
         my $n = $#$self;
 
-        my @I = map {
-            [(Sidef::Types::Number::Number::ZERO) x $_,
-             Sidef::Types::Number::Number::ONE,
-             (Sidef::Types::Number::Number::ZERO) x ($n - $_)
-            ]
-        } 0 .. $n;
+        my @I =
+          map { [(Sidef::Types::Number::Number::ZERO) x $_, Sidef::Types::Number::Number::ONE, (Sidef::Types::Number::Number::ZERO) x ($n - $_)] } 0 .. $n;
         my @A = map { [@{$self->[$_]}, @{$I[$_]}] } 0 .. $n;
 
         my $r = rref(\@A);

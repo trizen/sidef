@@ -219,8 +219,7 @@ package Sidef::Types::Number::Polynomial {
     sub eval {
         my ($x, $value) = @_;
         CORE::keys(%$x) || return Sidef::Types::Number::Number::ZERO;
-        Sidef::Types::Number::Number::sum(
-                  map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}->eval($value)) } CORE::keys %$x);
+        Sidef::Types::Number::Number::sum(map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}->eval($value)) } CORE::keys %$x);
     }
 
     sub exponents {
@@ -236,10 +235,10 @@ package Sidef::Types::Number::Polynomial {
     sub coeffs {
         my ($x) = @_;
         Sidef::Types::Array::Array->new(
-                               [map { Sidef::Types::Array::Array->new([Sidef::Types::Number::Number::_set_int($_), $x->{$_}]) }
-                                sort { $a <=> $b } CORE::keys(%$x)
-                               ]
-        );
+                                        [map  { Sidef::Types::Array::Array->new([Sidef::Types::Number::Number::_set_int($_), $x->{$_}]) }
+                                         sort { $a <=> $b } CORE::keys(%$x)
+                                        ]
+                                       );
     }
 
     sub newton_method {

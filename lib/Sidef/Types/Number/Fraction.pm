@@ -31,8 +31,7 @@ package Sidef::Types::Number::Fraction {
 
     sub stringify {
         my ($x) = @_;
-        Sidef::Types::String::String->new(
-                                    join('/', join('', '(', $x->{a}->stringify, ')'), join('', '(', $x->{b}->stringify, ')')));
+        Sidef::Types::String::String->new(join('/', join('', '(', $x->{a}->stringify, ')'), join('', '(', $x->{b}->stringify, ')')));
     }
 
     *pretty = \&stringify;

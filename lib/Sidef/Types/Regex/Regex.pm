@@ -224,8 +224,7 @@ package Sidef::Types::Regex::Regex {
         my $str   = $self->{raw};
         my $flags = $self->{flags};
 
-        Sidef::Types::String::String->new(
-                                    '/' . $str =~ s{(?<!\\)(?:\\\\)*\K/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
+        Sidef::Types::String::String->new('/' . $str =~ s{(?<!\\)(?:\\\\)*\K/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
     }
 
     *to_s   = \&dump;

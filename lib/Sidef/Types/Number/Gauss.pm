@@ -167,9 +167,7 @@ package Sidef::Types::Number::Gauss {
         my ($x, $y) = @_;
 
         if (ref($y) eq __PACKAGE__) {
-            return
-              __PACKAGE__->new($x->{a}->mul($y->{a})->sub($x->{b}->mul($y->{b})),
-                               $x->{a}->mul($y->{b})->add($x->{b}->mul($y->{a})));
+            return __PACKAGE__->new($x->{a}->mul($y->{a})->sub($x->{b}->mul($y->{b})), $x->{a}->mul($y->{b})->add($x->{b}->mul($y->{a})));
         }
 
         __PACKAGE__->new($x->{a}->mul($y), $x->{b}->mul($y));

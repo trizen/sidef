@@ -24,10 +24,10 @@ package Sidef::Module::OO {
         my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
 
         my @args = (
-               @arg
-               ? (map { (ref($_) eq __PACKAGE__) ? $_->{module} : (index(ref($_), 'Sidef::') == 0) ? $_->get_value : $_ } @arg)
-               : ()
-        );
+                    @arg
+                    ? (map { (ref($_) eq __PACKAGE__) ? $_->{module} : (index(ref($_), 'Sidef::') == 0) ? $_->get_value : $_ } @arg)
+                    : ()
+                   );
 
         my $multi_values = wantarray;
 

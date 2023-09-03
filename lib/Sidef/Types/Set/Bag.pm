@@ -603,9 +603,8 @@ package Sidef::Types::Set::Bag {
 
     sub freq {
         my ($self) = @_;
-        Sidef::Types::Array::Array->new(
-                    map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})]) }
-                      CORE::values(%$self));
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})]) }
+                                        CORE::values(%$self));
     }
 
     sub most_common {
@@ -614,8 +613,7 @@ package Sidef::Types::Set::Bag {
         my @sorted = sort { $b->{count} <=> $a->{count} } CORE::values(%$self);
         my @top    = splice(@sorted, 0, CORE::int($n));
 
-        Sidef::Types::Array::Array->new(
-             map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})]) } @top);
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})]) } @top);
     }
 
     *top = \&most_common;
@@ -819,10 +817,7 @@ package Sidef::Types::Set::Bag {
     sub pairs {
         my ($self) = @_;
         Sidef::Types::Array::Array->new(
-                      [map { Sidef::Types::Array::Pair->new($_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})) }
-                         CORE::values(%$self)
-                      ]
-        );
+                               [map { Sidef::Types::Array::Pair->new($_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})) } CORE::values(%$self)]);
     }
 
     *kv = \&pairs;
@@ -924,12 +919,7 @@ package Sidef::Types::Set::Bag {
 
             my ($s, $v);
             "Bag("
-              . CORE::join(
-                ', ',
-                map { ((ref($v = $_->{value}) && ($s = UNIVERSAL::can($v, 'dump'))) ? $s->($v) : ($v // 'nil')) x $_->{count} }
-                             @values
-                          )
-              . ')';
+              . CORE::join(', ', map { ((ref($v = $_->{value}) && ($s = UNIVERSAL::can($v, 'dump'))) ? $s->($v) : ($v // 'nil')) x $_->{count} } @values) . ')';
         };
 
         no warnings 'redefine';

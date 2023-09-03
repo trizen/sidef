@@ -5,7 +5,7 @@ package Sidef::Types::Glob::SocketHandle {
 
     use parent qw(
       Sidef::Types::Glob::FileHandle
-      );
+    );
 
     sub new {
         my (undef, $sh, $socket) = @_;

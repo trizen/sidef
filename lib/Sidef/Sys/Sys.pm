@@ -269,14 +269,10 @@ package Sidef::Sys::Sys {
         my ($self, $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell) = @_;
         $name // return undef;
         Sidef::Types::Array::Array->new(
-                                        Sidef::Types::String::String->new($name),
-                                        Sidef::Types::String::String->new($passwd),
-                                        Sidef::Types::Number::Number->new($uid),
-                                        Sidef::Types::Number::Number->new($gid),
-                                        Sidef::Types::String::String->new($quota),
-                                        Sidef::Types::String::String->new($comment),
-                                        Sidef::Types::String::String->new($gcos),
-                                        Sidef::Types::String::String->new($shell),
+                                        Sidef::Types::String::String->new($name),  Sidef::Types::String::String->new($passwd),
+                                        Sidef::Types::Number::Number->new($uid),   Sidef::Types::Number::Number->new($gid),
+                                        Sidef::Types::String::String->new($quota), Sidef::Types::String::String->new($comment),
+                                        Sidef::Types::String::String->new($gcos),  Sidef::Types::String::String->new($shell),
                                        );
     }
 
@@ -303,13 +299,10 @@ package Sidef::Sys::Sys {
     sub __GETGR__ {
         my ($self, $name, $passwd, $gid, $members) = @_;
         $name // return
-          Sidef::Types::Array::Array->new(
-                                          Sidef::Types::String::String->new($name),
+          Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name),
                                           Sidef::Types::String::String->new($passwd),
                                           Sidef::Types::Number::Number->new($gid),
-                                          Sidef::Types::Array::Array->new(
-                                                             map { Sidef::Types::String::String->new($_) } split(' ', $members)
-                                          ),
+                                          Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } split(' ', $members)),
                                          );
     }
 
@@ -368,12 +361,8 @@ package Sidef::Sys::Sys {
     sub __GETNET__ {
         my ($self, $name, $aliases, $addrtype, $net) = @_;
         $name // return undef;
-        Sidef::Types::Array::Array->new(
-                                        Sidef::Types::String::String->new($name),
-                                        Sidef::Types::String::String->new($aliases),
-                                        Sidef::Types::String::String->new($addrtype),
-                                        Sidef::Types::String::String->new($net),
-                                       );
+        Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name),     Sidef::Types::String::String->new($aliases),
+                                        Sidef::Types::String::String->new($addrtype), Sidef::Types::String::String->new($net),);
     }
 
     sub setnetent {
@@ -399,8 +388,7 @@ package Sidef::Sys::Sys {
     sub __GETPROTO__ {
         my ($self, $name, $aliases, $proto) = @_;
         $name // return undef;
-        Sidef::Types::Array::Array->new(
-                                        Sidef::Types::String::String->new($name),
+        Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name),
                                         Sidef::Types::String::String->new($aliases),
                                         Sidef::Types::String::String->new($proto),
                                        );
@@ -429,12 +417,8 @@ package Sidef::Sys::Sys {
     sub __GETSERV__ {
         my ($self, $name, $aliases, $port, $proto) = @_;
         $name // return undef;
-        Sidef::Types::Array::Array->new(
-                                        Sidef::Types::String::String->new($name),
-                                        Sidef::Types::String::String->new($aliases),
-                                        Sidef::Types::Number::Number->new($port),
-                                        Sidef::Types::String::String->new($proto),
-                                       );
+        Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name), Sidef::Types::String::String->new($aliases),
+                                        Sidef::Types::Number::Number->new($port), Sidef::Types::String::String->new($proto),);
     }
 
     sub setservent {

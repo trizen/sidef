@@ -84,15 +84,10 @@ package Sidef::Deparse::Sidef {
 
     sub deparse_generic {
         my ($self, $before, $sep, $after, @args) = @_;
-        $before . join(
-            $sep,
-            grep { $_ ne '' }
-              map {
-                    ref($_) eq 'HASH' ? $self->deparse_script($_)
-                  : ref($_)           ? $self->deparse_expr({self => $_})
-                  : $self->_dump_string($_)
-              } @args
-          )
+        $before
+          . join($sep,
+                 grep { $_ ne '' }
+                 map  { ref($_) eq 'HASH' ? $self->deparse_script($_) : ref($_) ? $self->deparse_expr({self => $_}) : $self->_dump_string($_) } @args)
           . $after;
     }
 
@@ -134,10 +129,9 @@ package Sidef::Deparse::Sidef {
             return $self->{data_types}{$ref};
         }
 
-        ($ref eq 'Sidef::Variable::ClassInit' || $ref eq 'Sidef::Variable::Struct' || $ref eq 'Sidef::Variable::Subset')
-          ? ($obj->{class} . '::' . $obj->{name})
-          : $ref eq 'Sidef::Types::Block::BlockInit' ? 'Block'
-          :                                            substr($ref, rindex($ref, '::') + 2);
+        ($ref eq 'Sidef::Variable::ClassInit' || $ref eq 'Sidef::Variable::Struct' || $ref eq 'Sidef::Variable::Subset') ? ($obj->{class} . '::' . $obj->{name})
+          : $ref eq 'Sidef::Types::Block::BlockInit'                                                                     ? 'Block'
+          :                                                                                                                substr($ref, rindex($ref, '::') + 2);
     }
 
     sub _dump_vars {
@@ -264,9 +258,7 @@ package Sidef::Deparse::Sidef {
                     local $self->{class} = $obj->{class};
                     my $var_obj = delete $block->{init_vars};
 
-                    $code .= '('
-                      . $self->_dump_vars(@{$var_obj->{vars}}[($obj->{type} eq 'method' ? 1 : 0) .. $#{$var_obj->{vars}}])
-                      . ') ';
+                    $code .= '(' . $self->_dump_vars(@{$var_obj->{vars}}[($obj->{type} eq 'method' ? 1 : 0) .. $#{$var_obj->{vars}}]) . ') ';
 
                     if (exists $obj->{cached}) {
                         $code .= 'is cached ';
@@ -480,10 +472,7 @@ package Sidef::Deparse::Sidef {
             }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
-            $code = '('
-              . $self->deparse_script($obj->{cond}) . ' ? '
-              . $self->deparse_args($obj->{true}) . ' : '
-              . $self->deparse_args($obj->{false}) . ')';
+            $code = '(' . $self->deparse_script($obj->{cond}) . ' ? ' . $self->deparse_args($obj->{true}) . ' : ' . $self->deparse_args($obj->{false}) . ')';
         }
         elsif ($ref eq 'Sidef::Module::OO') {
             $code = '%O' . $self->_dump_string($obj->{module});
@@ -530,20 +519,13 @@ package Sidef::Deparse::Sidef {
             $code = 'foreach' . $self->deparse_args($obj->{expr}) . $self->deparse_expr({self => $obj->{block}});
         }
         elsif ($ref eq 'Sidef::Types::Block::CFor') {
-            $code =
-                'for'
-              . '('
-              . join(';', map { $self->deparse_args($_) } @{$obj->{expr}}) . ')'
-              . $self->deparse_bare_block($obj->{block}{code});
+            $code = 'for' . '(' . join(';', map { $self->deparse_args($_) } @{$obj->{expr}}) . ')' . $self->deparse_bare_block($obj->{block}{code});
         }
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
             $code = 'for ' . join(
                 ', ',
                 map {
-                    join(',',
-                         map { ($_->{slurpy} ? ($_->{array} ? '*' : ':') : '') . $self->deparse_expr({self => $_}) }
-                           @{$_->{vars}})
-                      . ' in ('
+                    join(',', map { ($_->{slurpy} ? ($_->{array} ? '*' : ':') : '') . $self->deparse_expr({self => $_}) } @{$_->{vars}}) . ' in ('
                       . $self->deparse_expr({self => $_->{expr}}) . ')'
                 } @{$obj->{loops}}
               )
@@ -584,11 +566,8 @@ package Sidef::Deparse::Sidef {
                     $code .= $self->_dump_array($ind->{array});
                 }
                 else {
-                    $code .= '{'
-                      . join(',',
-                             map { ref($_) eq 'HASH' ? ($self->deparse_expr($_)) : $self->deparse_generic('', '', '', $_) }
-                               @{$ind->{hash}})
-                      . '}';
+                    $code .=
+                      '{' . join(',', map { ref($_) eq 'HASH' ? ($self->deparse_expr($_)) : $self->deparse_generic('', '', '', $_) } @{$ind->{hash}}) . '}';
                 }
             }
         }
@@ -668,8 +647,7 @@ package Sidef::Deparse::Sidef {
                                     }
                                     if (ref($data) eq 'Sidef::Types::Number::Number') {
                                         my $unary_method = $unary_methods->{$method};
-                                        $code = $self->deparse_expr(
-                                                            {self => (defined($unary_method) ? $data->$unary_method : $data)});
+                                        $code = $self->deparse_expr({self => (defined($unary_method) ? $data->$unary_method : $data)});
                                         next;
                                     }
                                 }

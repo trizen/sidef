@@ -6,7 +6,7 @@ package Sidef::Variable::NamedParam {
 
     use parent qw(
       Sidef::Types::Hash::Hash
-      );
+    );
 
     use Sidef::Types::Array::Array;
 

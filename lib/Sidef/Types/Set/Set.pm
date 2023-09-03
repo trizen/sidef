@@ -477,9 +477,7 @@ package Sidef::Types::Set::Set {
             $addr{$refaddr} = "Set(#`($refaddr)...)";
 
             my $s;
-            "Set("
-              . CORE::join(', ', map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : ($_ // 'nil') } @values)
-              . ')';
+            "Set(" . CORE::join(', ', map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : ($_ // 'nil') } @values) . ')';
         };
 
         no warnings 'redefine';

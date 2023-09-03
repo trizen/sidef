@@ -90,8 +90,7 @@ package Sidef::Types::Number::Quadratic {
 
     sub stringify {
         my ($x) = @_;
-        Sidef::Types::String::String->new(
-                       join(' + ', $x->{a}->stringify, join('', '(', $x->{b}->stringify, ')*sqrt(', $x->{w}->stringify, ')')));
+        Sidef::Types::String::String->new(join(' + ', $x->{a}->stringify, join('', '(', $x->{b}->stringify, ')*sqrt(', $x->{w}->stringify, ')')));
     }
 
     *pretty = \&stringify;
