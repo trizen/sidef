@@ -55,7 +55,7 @@ EOT4
 my $i = 0;
 foreach my $code (@codes) {
     ++$i;
-    my $sidef = Sidef->new(name => "fibonacci-$i");
+    my $sidef  = Sidef->new(name => "fibonacci-$i");
     my $result = $sidef->execute_code($code);
     is("$result", "144", "fib-$i");
 }

@@ -27,7 +27,7 @@ func lev(s, t) {
 EOT
 
 my $sidef = Sidef->new(name => 'levenshtein');
-my $lev = $sidef->execute_code($code);
+my $lev   = $sidef->execute_code($code);
 
 my @tests = (
              {

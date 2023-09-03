@@ -22,7 +22,7 @@ eval_with_x('2 ** x', 3, 5)     # should be: "24"
 
 EOT
 
-my $sidef = Sidef->new(name => 'eval');
+my $sidef  = Sidef->new(name => 'eval');
 my $result = $sidef->execute_code($code);
 
 is("$result", "24");

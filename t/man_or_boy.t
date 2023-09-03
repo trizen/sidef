@@ -40,11 +40,11 @@ class MOB {
 var obj = MOB();
 obj.a(10, {1}, {-1}, {-1}, {1}, {0})
 EOT3
-            );
+);
 
 foreach my $code (@codes) {
 
-    my $sidef = Sidef->new(name => 'man_or_boy');
+    my $sidef  = Sidef->new(name => 'man_or_boy');
     my $result = $sidef->execute_code($code);
 
     is("$result", "-67");

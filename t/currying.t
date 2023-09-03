@@ -27,7 +27,7 @@ adder(29);
 
 EOT
 
-my $sidef = Sidef->new(name => 'currying');
+my $sidef  = Sidef->new(name => 'currying');
 my $result = $sidef->execute_code($code);
 
 is("$result", "42");

@@ -39,7 +39,7 @@ results.join(' ')
 
 EOT
 
-my $sidef = Sidef->new(name => 'factors_of_mersenne_numbers');
+my $sidef  = Sidef->new(name => 'factors_of_mersenne_numbers');
 my $result = $sidef->execute_code($code);
 
 is("$result", '2:p 3:p 5:p 7:p 11:23 13:p 17:p 19:p 23:47 29:233 31:p 37:223 41:13367 43:431 47:2351 53:6361');

@@ -32,7 +32,7 @@ func best_shuffle(str) {
 
 EOT
 
-my $sidef = Sidef->new(name => 'best_shuffle');
+my $sidef    = Sidef->new(name => 'best_shuffle');
 my $bshuffle = $sidef->execute_code($code);
 
 my @tests = (

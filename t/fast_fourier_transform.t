@@ -31,8 +31,7 @@ fft(wave).map { '%6.3f' % .abs }.join(' ')
 
 EOT
 
-my $sidef = Sidef->new(name => 'fast_fourier_transform');
+my $sidef  = Sidef->new(name => 'fast_fourier_transform');
 my $result = $sidef->execute_code($code);
 
-is("$result",
-    ' 0.000  0.000  0.000  8.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  8.000  0.000  0.000');
+is("$result", ' 0.000  0.000  0.000  8.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  0.000  8.000  0.000  0.000');

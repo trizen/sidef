@@ -19,7 +19,7 @@ func Accumulator(sum) {
 EOT
 
 my $sidef = Sidef->new(name => 'accumulator_factory');
-my $acc = $sidef->execute_code($code);
+my $acc   = $sidef->execute_code($code);
 
 my $x = $acc->call(Sidef::Types::Number::Number->new(1));
 

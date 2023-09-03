@@ -37,7 +37,7 @@ bernoulli_number = func(n) is cached {
 EOT
 
 my $sidef = Sidef->new(name => 'bernoulli_numbers');
-my $bern = $sidef->execute_code($code);
+my $bern  = $sidef->execute_code($code);
 
 my @bnums = qw(
   1/1
@@ -50,7 +50,7 @@ my @bnums = qw(
   7/6
   -3617/510
   43867/798
-  );
+);
 
 foreach my $i (0 .. 9) {
     my ($num, $den) = $bern->call(Sidef::Types::Number::Number->new(2 * $i))->nude;

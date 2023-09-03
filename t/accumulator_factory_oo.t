@@ -21,7 +21,7 @@ class Accumulator(sum) {
 EOT
 
 my $sidef = Sidef->new(name => 'accumulator_factory_oo');
-my $acc = $sidef->execute_code($code);
+my $acc   = $sidef->execute_code($code);
 
 my $obj = $acc->call(Sidef::Types::Number::Number->new(1));
 

@@ -32,7 +32,7 @@ var cat = Cat(name: "Mitten", age: 3)
 EOT
 
 my $sidef = Sidef->new(name => 'oo_inheritance');
-my $objs = $sidef->execute_code($code);
+my $objs  = $sidef->execute_code($code);
 
 my $dog = $objs->[0];
 my $cat = $objs->[1];
