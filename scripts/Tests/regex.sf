@@ -49,3 +49,13 @@ assert_eq(
     "asd awer wer side".findall(/(\w+)\s+(\w+)/),
     [["asd", "awer"], ["wer", "side"]]
 )
+
+assert(//.le(//))
+assert(!/a/.le(//))
+assert(//.lt(/a/))
+assert(!//.lt(//))
+assert(/a/.gt(//))
+assert(!//.gt(//))
+assert(/a/.ge(//))
+assert(!//.ge(/a/))
+assert(/a/.ge(/a/))
