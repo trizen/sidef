@@ -200,4 +200,17 @@ assert_eq(["C", "S", "D"].ft(-2,2), ["S","D"])
 assert_eq(%w(a b c).ft(-2, -1), ["b", "c"])
 assert_eq(%w(a b c).ft(-2, -2), ["b"])
 
+assert([1,2,3,4].lt([1,2,3,5]))
+assert([1,2,3].le([1,2,3]))
+assert(![1,2,4].le([1,2,3]))
+assert(![1,2,4].lt([1,2,3]))
+assert([1,2,4].ge([1,2,3]))
+assert([1,2,4].gt([1,2,3]))
+assert([1,2,3].ge([1,2,3]))
+
+assert([].le)
+assert([].ge)
+assert(![].lt)
+assert(![].gt)
+
 say "** Test passed!"

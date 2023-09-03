@@ -876,28 +876,28 @@ package Sidef::Types::Array::Array {
 
     sub lt {
         my ($self, $array) = @_;
-        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) < 0
+        $self->cmp($array)->lt(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub le {
         my ($self, $array) = @_;
-        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) <= 0
+        $self->cmp($array)->le(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub gt {
         my ($self, $array) = @_;
-        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) > 0
+        $self->cmp($array)->gt(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub ge {
         my ($self, $array) = @_;
-        Math::GMPz::Rmpz_sgn(${$self->cmp($array)}) >= 0
+        $self->cmp($array)->ge(Sidef::Types::Number::Number::ZERO)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
