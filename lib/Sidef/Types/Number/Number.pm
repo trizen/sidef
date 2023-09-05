@@ -17415,15 +17415,28 @@ package Sidef::Types::Number::Number {
             Math::MPFR::Rmpfr_zeta_ui($f, $k, $ROUND);
             Math::MPFR::Rmpfr_mul_z($f, $f, $n, $ROUND);
 
-            my $r = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_root($r, $n, $k);
-            Math::GMPz::Rmpz_mul_ui($r, $r, 5);
+            if ($k == 2 and Math::GMPz::Rmpz_cmp_ui($n, 268293) >= 0) {
+                my $t = Math::MPFR::Rmpfr_init2($prec);
+                my $r = Math::MPFR::Rmpfr_init2($prec);
+                Math::MPFR::Rmpfr_set_z($r, $n, $ROUND);
+                Math::MPFR::Rmpfr_sqrt($r, $r, $ROUND);
+                Math::MPFR::Rmpfr_mul_d($r, $r, 0.058377, $ROUND);
+                Math::MPFR::Rmpfr_sub($t, $f, $r, $ROUND);
+                $min = _any2mpz($t) // goto &nan;
+                Math::MPFR::Rmpfr_add($t, $f, $r, $ROUND);
+                $max = _any2mpz($t) // goto &nan;
+            }
+            else {
+                my $r = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_root($r, $n, $k);
+                Math::GMPz::Rmpz_mul_ui($r, $r, 5);
 
-            my $t = Math::MPFR::Rmpfr_init2($prec);
-            Math::MPFR::Rmpfr_sub_z($t, $f, $r, $ROUND);
-            $min = _any2mpz($t) // goto &nan;
-            Math::MPFR::Rmpfr_add_z($t, $f, $r, $ROUND);
-            $max = _any2mpz($t) // goto &nan;
+                my $t = Math::MPFR::Rmpfr_init2($prec);
+                Math::MPFR::Rmpfr_sub_z($t, $f, $r, $ROUND);
+                $min = _any2mpz($t) // goto &nan;
+                Math::MPFR::Rmpfr_add_z($t, $f, $r, $ROUND);
+                $max = _any2mpz($t) // goto &nan;
+            }
         }
 
         my $k_obj     = bless \$k;
