@@ -34,7 +34,7 @@ package Sidef::Types::Number::Complex {
               ? Sidef::Types::Number::Number::_str2obj("$real")
               : ${(Sidef::Types::Number::Number::ZERO)};
 
-            $real = Sidef::Types::Number::Number::_any2mpz($real) if (ref($real) eq '');
+            $real = Sidef::Types::Number::Number::_any2mpz($real) if !ref($real);
         }
 
         if (defined($imag)) {
@@ -46,7 +46,7 @@ package Sidef::Types::Number::Complex {
                 $imag = Sidef::Types::Number::Number::_str2obj("$imag");
             }
 
-            $imag = Sidef::Types::Number::Number::_any2mpz($imag) if (ref($imag) eq '');
+            $imag = Sidef::Types::Number::Number::_any2mpz($imag) if !ref($imag);
 
             my $c   = Math::MPC::Rmpc_init2($PREC);
             my $sig = join(' ', ref($real), ref($imag));

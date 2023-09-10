@@ -1516,7 +1516,7 @@ package Sidef::Optimizer {
                 my $optimized = 0;
                 if (    defined($ref_obj)
                     and exists($rules{$ref_obj})
-                    and ref($method) eq '') {
+                    and !ref($method)) {
 
                     my $code = ($cache{join(' ', $ref_obj, $method)} //= UNIVERSAL::can($ref_obj, $method));
 

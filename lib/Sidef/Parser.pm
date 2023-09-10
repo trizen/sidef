@@ -386,7 +386,7 @@ package Sidef::Parser {
                 }x;
             },
 
-            # Reference: http://en.wikipedia.org/wiki/International_variation_in_quotation_marks
+            # Reference: https://en.wikipedia.org/wiki/International_variation_in_quotation_marks
             delim_pairs => {
                 qw~
                   ( )       [ ]       { }       < >

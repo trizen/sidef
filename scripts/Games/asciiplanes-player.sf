@@ -97,7 +97,7 @@ if (ARGV) {
 
 if (seed) {
     iseed(seed)
-    Perl.eval("srand(#{seed})")
+    %Perl{srand(#{seed})}
 }
 
 #---------------------------------------------------------------

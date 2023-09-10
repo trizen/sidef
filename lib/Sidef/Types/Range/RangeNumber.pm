@@ -63,16 +63,16 @@ package Sidef::Types::Range::RangeNumber {
 
             if (    ref($step) eq 'Sidef::Types::Number::Number'
                 and ref($from) eq 'Sidef::Types::Number::Number'
-                and (ref($$from) eq 'Math::GMPz' or ref($$from) eq '')
-                and (ref($$step) eq 'Math::GMPz' or ref($$step) eq '')) {
+                and (!ref($$from) or ref($$from) eq 'Math::GMPz')
+                and (!ref($$step) or ref($$step) eq 'Math::GMPz')) {
 
                 $from = $$from;
                 $step = $$step;
 
                 if (    ref($to) eq 'Sidef::Types::Number::Number'
-                    and (ref($$to) eq ''  or (ref($$to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($$to)))
-                    and (ref($from) eq '' or Math::GMPz::Rmpz_fits_slong_p($from))
-                    and (ref($step) eq '' or Math::GMPz::Rmpz_fits_slong_p($step))) {
+                    and (!ref($$to)  or (ref($$to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($$to)))
+                    and (!ref($from) or Math::GMPz::Rmpz_fits_slong_p($from))
+                    and (!ref($step) or Math::GMPz::Rmpz_fits_slong_p($step))) {
 
                     $from = Math::GMPz::Rmpz_get_si($from) if ref($from);
                     $step = Math::GMPz::Rmpz_get_si($step) if ref($step);
@@ -87,8 +87,8 @@ package Sidef::Types::Range::RangeNumber {
                     );
                 }
 
-                if (    (ref($from) eq '' or Math::GMPz::Rmpz_fits_slong_p($from))
-                    and (ref($step) eq '' or Math::GMPz::Rmpz_fits_slong_p($step))) {
+                if (    (!ref($from) or Math::GMPz::Rmpz_fits_slong_p($from))
+                    and (!ref($step) or Math::GMPz::Rmpz_fits_slong_p($step))) {
 
                     $from = Math::GMPz::Rmpz_get_si($from) if ref($from);
                     $step = Math::GMPz::Rmpz_get_si($step) if ref($step);
