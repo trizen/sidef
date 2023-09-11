@@ -15103,8 +15103,9 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        my $diff = Math::Prime::Util::GMP::subint($y, $x);
+
         if ($USE_PRIMECOUNT) {
-            my $diff = Math::Prime::Util::GMP::subint($y, $x);
 
             if ($diff > PRIMECOUNT_MIN) {
 
@@ -15118,21 +15119,28 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (($y >= 1e7 and Math::Prime::Util::GMP::subint($y, $x) <= 1e6) or "$x" / "$y" >= 0.999) {
+        if (($y >= 1e8 and $diff <= 1e4) or "$x" / "$y" >= 0.9999) {
+
+            if (HAS_PRIME_UTIL and $y < PRIMECOUNT_MIN) {
+                return Math::Prime::Util::prime_count("$x", "$y");
+            }
 
             if ("$x" eq "$y") {    # workaround for danaj/Math-Prime-Util-GMP #33
                 return (_is_prob_prime("$x") ? 1 : 0);
             }
 
+            if ($diff >= 1e5 and $diff <= 1e6) {
+                my $count = () = Math::Prime::Util::GMP::sieve_primes("$x", "$y");
+                return $count;
+            }
+
             # Support for arbitrary large integers (slow for wide ranges)
-            my $prime_count = Math::Prime::Util::GMP::prime_count("$x", "$y");
-            return $prime_count;
+            return Math::Prime::Util::GMP::prime_count("$x", "$y");
         }
         elsif (HAS_PRIME_UTIL and $y < ULONG_MAX) {
 
-            # XXX: somehow, this is slow for prime_count(2**63 - 10, 2**63 + 1000)
-            my $prime_count = Math::Prime::Util::prime_count("$x", "$y");
-            return "$prime_count";
+            # XXX: somehow this is slow for prime_count(2**63 - 10, 2**63 + 1000)
+            return Math::Prime::Util::prime_count("$x", "$y");
         }
         elsif (0 and $y >= ~0) {    # too slow
 
@@ -30087,7 +30095,7 @@ package Sidef::Types::Number::Number {
             return ONE;
         }
 
-        if ($USE_PRIMECOUNT and Math::GMPz::Rmpz_sizeinbase($n, 2) <= 63 and $n > PRIMECOUNT_MIN) {
+        if ($k > 50 and $USE_PRIMECOUNT and Math::GMPz::Rmpz_sizeinbase($n, 2) <= 63 and $n > PRIMECOUNT_MIN) {
             my $c     = _prime_count($k - 1);
             my $count = `primecount --phi $n $c`;
 
