@@ -1606,6 +1606,53 @@ Aliases: I<nth_permutation>
 
 =cut
 
+=head2 ordered_partitions
+
+    arr.ordered_partitions
+    arr.ordered_partitions(k)
+    arr.ordered_partitions{|*a| ... }
+    arr.ordered_partitions(k, {|*a| ... })
+
+Iterates over the ordered partitions C<P> of C<arr>, such that C<P.flat == arr>.
+
+        [1,2,3,4,5].ordered_partitions(2, {|*a| say a })
+
+Outputs:
+
+        [[1], [2, 3, 4, 5]]
+        [[1, 2], [3, 4, 5]]
+        [[1, 2, 3], [4, 5]]
+        [[1, 2, 3, 4], [5]]
+
+When no block is given, it returns an array containing the ordered partitions (there are C<binomial(n-1, k-1)> ordered partitions, where C<n> is the size of the array):
+
+        say [1,2,3,4].ordered_partitions(2)
+
+Outputs:
+
+        [[[1], [2, 3, 4]], [[1, 2], [3, 4]], [[1, 2, 3], [4]]]
+
+Additionally, when the value for C<k> is ommited, it generates all the ordered partitions (there are C<2^(n-1)> ordered partitions, where C<n> is the size of the array):
+
+        [1,2,3,4].ordered_partitions{|*a| say a }
+
+Outputs:
+
+        [[1], [2], [3], [4]]
+        [[1, 2], [3], [4]]
+        [[1], [2, 3], [4]]
+        [[1, 2, 3], [4]]
+        [[1], [2], [3, 4]]
+        [[1, 2], [3, 4]]
+        [[1], [2, 3, 4]]
+        [[1, 2, 3, 4]]
+
+Up to the ordering, the method is equivalent with (but more efficient):
+
+        arr.partitions(k).grep { .flat == arr }
+
+=cut
+
 =head2 pack
 
     self.pack(format)

@@ -3238,6 +3238,35 @@ package Sidef::Types::Array::Array {
         bless \@result;
     }
 
+    sub ordered_partitions {
+        my ($self, $k, $block) = @_;
+
+        require Algorithm::Combinatorics;
+
+        if (not defined($block) and ref($k) eq 'Sidef::Types::Block::Block') {
+            ($block, $k) = ($k, undef);
+        }
+
+        my $iter = do {
+            local $SIG{__WARN__} = sub { };
+            Algorithm::Combinatorics::subsets([0 .. $#{$self} - 1], (defined($k) ? (CORE::int($k) - 1) : ()));
+        };
+
+        if (defined($block)) {
+            while (defined(my $indices = $iter->next)) {
+                $block->run(@{$self->segment(@$indices)});
+            }
+            return $self;
+        }
+
+        my @result;
+        while (defined(my $indices = $iter->next)) {
+            push @result, $self->segment(@$indices);
+        }
+
+        bless \@result;
+    }
+
     sub nth_permutation {
         my ($self, $n) = @_;
 
