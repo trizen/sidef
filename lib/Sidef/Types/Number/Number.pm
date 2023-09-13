@@ -30359,6 +30359,19 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
+    sub is_cubefree {
+        $_[0]->is_powerfree(THREE);
+    }
+
+    sub is_cubefull {
+        $_[0]->is_powerful(THREE);
+    }
+
+    sub is_squarefull {
+        my ($n) = @_;
+        $n->is_powerful;
+    }
+
     sub __is_power__ {
         my ($n, $k) = @_;
 
@@ -30394,63 +30407,74 @@ package Sidef::Types::Number::Number {
         !!Math::GMPz::Rmpz_root($t, $n, $k);
     }
 
-    sub is_square {
-        my ($n) = @_;
-
-        $n = $$n;
-
-        if (ref($n) ne 'Math::GMPz') {
-            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
-            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
-        }
-
-        Math::GMPz::Rmpz_perfect_square_p($n)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    *is_sqr            = \&is_square;
-    *is_perfect_square = \&is_square;
-
-    sub is_cube {
-        my ($n) = @_;
-
-        $n = $$n;
-
-        if (ref($n) ne 'Math::GMPz') {
-            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
-            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
-        }
-
-        __is_power__($n, 3)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    sub is_cubefree {
-        $_[0]->is_powerfree(THREE);
-    }
-
-    sub is_cubefull {
-        $_[0]->is_powerful(THREE);
-    }
-
-    sub is_squarefull {
-        my ($n) = @_;
-        $n->is_powerful;
-    }
-
     sub is_power {
         my ($n, $k) = @_;
 
         $n = $$n;
 
+        if (!ref($n)) {
+
+            if (defined($k)) {
+                _valid(\$k);
+                $k = _any2si($$k) // return Sidef::Types::Bool::Bool::FALSE;
+
+                if ($k == 1) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+
+                if ($n == 1) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+
+                if ($k % 2 and $n == -1) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+
+                if ($k <= 0 or ($k % 2 == 0 and $n < 0)) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+            }
+
+            if ($n == 0 or $n == 1 or $n == -1) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+
+            my $res;
+            if (defined($k) and $k == 2) {
+                $res = (
+                        HAS_PRIME_UTIL
+                        ? Math::Prime::Util::is_square($n)
+                        : Math::Prime::Util::GMP::is_square($n)
+                       );
+            }
+            elsif (defined($k)) {
+                $res = (
+                        HAS_PRIME_UTIL
+                        ? Math::Prime::Util::is_power($n, $k)
+                        : Math::Prime::Util::GMP::is_power($n, $k)
+                       );
+            }
+            else {
+                $res = (
+                        HAS_PRIME_UTIL
+                        ? Math::Prime::Util::is_power($n)
+                        : Math::Prime::Util::GMP::is_power($n)
+                       );
+            }
+
+            return (
+                    $res
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         if (ref($n) ne 'Math::GMPz') {
             __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
             $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        if (defined $k) {
+        if (defined($k)) {
             _valid(\$k);
 
             $k = _any2si($$k) // return undef;
@@ -30470,6 +30494,34 @@ package Sidef::Types::Number::Number {
     *is_pp            = \&is_power;
     *is_pow           = \&is_power;
     *is_perfect_power = \&is_power;
+
+    sub is_square {
+        my ($n, $k) = @_;
+
+        if (!ref($$n)) {
+            $n = $$n;
+            $n < 0 and return Sidef::Types::Bool::Bool::FALSE;
+            my $r = (
+                     HAS_PRIME_UTIL
+                     ? Math::Prime::Util::is_square($n)
+                     : Math::Prime::Util::GMP::is_square($n)
+                    );
+            return (
+                    $r
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
+        $n->is_power(TWO);
+    }
+
+    *is_sqr            = \&is_square;
+    *is_perfect_square = \&is_square;
+
+    sub is_cube {
+        $_[0]->is_power(THREE);
+    }
 
     sub perfect_power_count {    # OEIS: A069623
         my ($n, $k) = @_;
