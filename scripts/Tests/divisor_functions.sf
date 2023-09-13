@@ -2,8 +2,6 @@
 
 # Tests for various Number divisor functions.
 
-var n = irand(3,10)!
-
 var h = Hash(
     divisors => 'sigma',
     prime_divisors => 'prime_sigma',
@@ -26,13 +24,6 @@ var h = Hash(
     bdivisors => 'bsigma',
 )
 
-for k in (0..5) {
-    h.each {|a,b|
-        assert_eq(n.(a).sum {|d| d**k }, n.(b)(k), "#{a} != #{b} for n=#{n} and k=#{k}")
-        assert_eq(n.(a).len, n.(b+'0'), "#{a}.len != #{b+'0'} for n=#{n}")
-    }
-}
-
 var h2 = Hash(
     power_divisors => 'power_sigma',
     power_udivisors => 'power_usigma',
@@ -41,10 +32,24 @@ var h2 = Hash(
     powerfree_udivisors => 'powerfree_usigma',
 )
 
-for k in (0..5), j in (0..5) {
+with([irand(3,10)!, 340282366920938463942989953348216553641, 92971590131496140210160].rand) {|n|
+
+    h.each {|a,b|
+        var D = n.(a)
+        for k in (0..3) {
+            assert_eq(D.sum {|d| d**k }, n.(b)(k), "#{a} != #{b} for n=#{n} and k=#{k}")
+        }
+        assert_eq(D.len, n.(b+'0'), "#{a}.len != #{b+'0'} for n=#{n}")
+    }
+
     h2.each {|a,b|
-        assert_eq(k.(a)(n).sum {|d| d**j }, k.(b)(n,j), "#{a} != #{b} for n=#{n}, k=#{k}, j=#{j}")
-        assert_eq(k.(a)(n).len, k.(b+'0')(n), "#{a}.len != #{b+'0'} for n=#{n}, k=#{k}")
+        for k in (0..3) {
+            var D = k.(a)(n)
+            for j in (0..3) {
+                assert_eq(D.sum {|d| d**j }, k.(b)(n,j), "#{a} != #{b} for n=#{n}, k=#{k}, j=#{j}")
+            }
+            assert_eq(D.len, k.(b+'0')(n), "#{a}.len != #{b+'0'} for n=#{n}, k=#{k}")
+        }
     }
 }
 

@@ -8321,8 +8321,9 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
         Sidef::Types::String::String->new(
-                                            ref($x) eq 'Math::GMPq' ? Math::GMPq::Rmpq_get_str($x, 10)
+                                           !ref($x)                 ? $x
                                           : ref($x) eq 'Math::GMPz' ? Math::GMPz::Rmpz_get_str($x, 10)
+                                          : ref($x) eq 'Math::GMPq' ? Math::GMPq::Rmpq_get_str($x, 10)
                                           :                           __stringify__($x)
                                          );
     }
@@ -12059,9 +12060,8 @@ package Sidef::Types::Number::Number {
                 my @f = map {
                     ($_ < $k)
                       ? do {
-                        my $z = Math::GMPz::Rmpz_init();
-                        Math::GMPz::Rmpz_setbit($z, $_);
-                        Math::GMPz::Rmpz_mod($z, $z, $m);
+                        my $z = Math::GMPz::Rmpz_init_set_ui(2);
+                        Math::GMPz::Rmpz_powm_ui($z, $z, $_, $m);
                         $z;
                       }
                       : Math::GMPz::Rmpz_init_set_ui(1)
@@ -22111,6 +22111,11 @@ package Sidef::Types::Number::Number {
                         push @arr,     @new_factors;
                         push @factors, @new_factors;
                     }
+                    elsif ($factor->is_perfect_power) {
+                        my @perfect_factors = (($factor->perfect_root) x CORE::int($factor->perfect_power));
+                        push @arr,     @perfect_factors;
+                        push @factors, @perfect_factors;
+                    }
                     else {
                         $factorized = 0;
                         last;
@@ -22121,12 +22126,16 @@ package Sidef::Types::Number::Number {
 
         my $mp1 = $m->inc;
 
-        $factorized || $collect_factors->($n->trial_factor($mp1->mul(_set_int(1e6))));
+        if ($n->is_perfect_power) {
+            $factorized || $collect_factors->([($n->perfect_root) x CORE::int($n->perfect_power)]);
+        }
+
+        $factorized || $collect_factors->($n->trial_factor($mp1->mul(_set_int(1e5))));
 
         # Methods that depend on the special form of n
-        $factorized || $collect_factors->($n->fermat_factor($mp1->mul(_set_int(1e4))));
         $factorized || $collect_factors->($n->holf_factor($mp1->mul(_set_int(1e4))));
-        $factorized || $collect_factors->($n->phi_finder_factor($mp1->mul(_set_int(1e4))));
+        $factorized || $collect_factors->($n->fermat_factor($mp1->mul(_set_int(1e3))));
+        $factorized || $collect_factors->($n->phi_finder_factor($mp1->mul(_set_int(1e3))));
 
         $factorized || $collect_factors->($n->dop_factor($mp1->mul($n->ilog2->isqrt)->mul(TWO)));
         $factorized || $collect_factors->($n->miller_factor($mp1->mul(_set_int(5))));
@@ -25552,14 +25561,11 @@ package Sidef::Types::Number::Number {
 
         my @terms;
         foreach my $pe (_factor_exp($n)) {
-
             my ($p, $e) = @$pe;
-
-            Math::GMPz::Rmpz_set_ui($t, 1);
 
             ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_set_ui($t, $p)
-              : Math::GMPz::Rmpz_set_str($t, $p, 10);
+              : Math::GMPz::Rmpz_set_str($t, "$p", 10);
 
             my $j = 0;
             do {
