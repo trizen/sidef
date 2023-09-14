@@ -11,13 +11,14 @@ package Sidef::Types::Number::Number {
     use List::Util             qw();
     use Math::Prime::Util::GMP qw();
 
-    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_PRIMESUM, $USE_YAFU, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS);
+    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_PRIMESUM, $USE_PARI_GP, $USE_YAFU, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS);
 
     BEGIN {
         $ROUND           = Math::MPFR::MPFR_RNDN();    # rounding mode for floating-point numbers
         $PREC            = 192;                        # precision in bits for floating-point numbers
         $USE_PRIMESUM    = 0;                          # true to use Kim Walisch's primesum for large n
         $USE_PRIMECOUNT  = 0;                          # true to use Kim Walisch's primecount for large n
+        $USE_PARI_GP     = 0;                          # true to use PARI/GP in several methods where it excels
         $USE_YAFU        = 0;                          # true to use YAFU for factoring large integers
         $USE_FACTORDB    = 0;                          # true to use factordb.com for factoring large integers
         $VERBOSE         = 0;                          # true to enable verbose/debug mode
@@ -935,6 +936,15 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_sgn($x) > 0 or return undef;
         Math::GMPz::Rmpz_get_str($x, 10);
+    }
+
+    sub _execute_pari_gp {
+        my ($code) = @_;
+        say STDERR ":: Executing PARI/GP with: $code" if $VERBOSE;
+        my $res = `$^X -e 'print \$ARGV[0]' \Q$code\E | gp -q -f`;
+        (defined($res) and $? == 0) or return;
+        chomp($res);
+        return $res;
     }
 
     sub _is_prob_prime {
@@ -26470,7 +26480,15 @@ package Sidef::Types::Number::Number {
     *factors_prod = \&factor_prod;
 
     sub partition_count {
-        _set_int(Math::Prime::Util::GMP::partitions(_big2uistr($_[0]) // goto &nan));
+        my $n = _big2uistr($_[0]) // goto &nan;
+
+        if ($n >= 1e4 and $USE_PARI_GP) {
+            if (my $res = _execute_pari_gp("numbpart($n)")) {
+                return _set_int($res);
+            }
+        }
+
+        _set_int(Math::Prime::Util::GMP::partitions($n));
     }
 
     *partition_number = \&partition_count;
