@@ -111,6 +111,7 @@ Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
+NUMBER_THEORY_TUTORIAL.md
 README.md
 scripts/absolute_string.sf
 scripts/abstract_type.sf
@@ -213,6 +214,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/nth_prime.sf'
 'scripts/Extended tests/nth_prime_near_powers_of_10.sf'
 'scripts/Extended tests/number_methods.sf'
+'scripts/Extended tests/oeis_sequences.sf'
 'scripts/Extended tests/prime_bounds.sf'
 'scripts/Extended tests/prime_count.sf'
 'scripts/Extended tests/prime_power_count.sf'

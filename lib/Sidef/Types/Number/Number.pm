@@ -942,8 +942,9 @@ package Sidef::Types::Number::Number {
         my ($code) = @_;
         say STDERR ":: Executing PARI/GP with: $code" if $VERBOSE;
         my $res = `$^X -e 'print \$ARGV[0]' \Q$code\E | gp -q -f --default parisizemax=500000000`;
-        (defined($res) and $? == 0) or return;
+        (defined($res) and $? == 0) or return undef;
         chomp($res);
+        $res eq '' and return undef;
         return $res;
     }
 
@@ -29230,6 +29231,8 @@ package Sidef::Types::Number::Number {
 
     sub is_practical {    # OEIS: A005153
         my ($x) = @_;
+
+        # XXX: requires the GitHub version of Math::Prime::Util::GMP.
         __is_int__($$x)
           && Math::Prime::Util::GMP::is_practical(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
