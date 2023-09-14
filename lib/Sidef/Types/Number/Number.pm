@@ -114,7 +114,7 @@ package Sidef::Types::Number::Number {
         }
 
         # Optimization: return faster for base-10 integers
-        if (!defined($base) and !$ref and $num =~ /^-?[0-9]+\z/) {
+        if (!defined($base) and !$ref and $num =~ /^-?[0-9]++\z/) {
             return _set_int($num);
         }
 
@@ -941,7 +941,7 @@ package Sidef::Types::Number::Number {
     sub _execute_pari_gp {
         my ($code) = @_;
         say STDERR ":: Executing PARI/GP with: $code" if $VERBOSE;
-        my $res = `$^X -e 'print \$ARGV[0]' \Q$code\E | gp -q -f`;
+        my $res = `$^X -e 'print \$ARGV[0]' \Q$code\E | gp -q -f --default parisizemax=500000000`;
         (defined($res) and $? == 0) or return;
         chomp($res);
         return $res;
@@ -6046,6 +6046,12 @@ package Sidef::Types::Number::Number {
 
         $n = _any2ui($$n) // goto &nan;
 
+        if ($polynomial and $n >= 4500 and $USE_PARI_GP) {
+            if (my $res = _execute_pari_gp("bernpol($n)")) {
+                return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
+            }
+        }
+
         my @B = _bernoulli_numbers($n);
 
         my $u = $n + 1;
@@ -6086,6 +6092,14 @@ package Sidef::Types::Number::Number {
 
         if ($n > 1 and $n < 512) {
             return bless \((_bernoulli_numbers($n))[($n >> 1) + 1]);
+        }
+
+        if ($n >= 5000 and $USE_PARI_GP) {
+            if (my $res = _execute_pari_gp("bernfrac($n)")) {
+                my $q = Math::GMPq::Rmpq_init();
+                Math::GMPq::Rmpq_set_str($q, $res, 10);
+                return bless \$q;
+            }
         }
 
         # Using bernfrac() from `Math::Prime::Util::GMP`
@@ -6139,6 +6153,12 @@ package Sidef::Types::Number::Number {
 
         $n = _any2ui($$n) // goto &nan;
 
+        if ($polynomial and $n >= 25 and $USE_PARI_GP) {
+            if (my $res = _execute_pari_gp("eulerpol($n)")) {
+                return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
+            }
+        }
+
         my @S = _secant_numbers(($n >> 1) + 1);
 
         my $u = $n + 1;
@@ -6183,6 +6203,13 @@ package Sidef::Types::Number::Number {
         $n = _any2ui($$n) // goto &nan;
 
         $n & 1 and return ZERO;    # E_n = 0 for all odd indices
+
+        if ($n >= 1500 and $USE_PARI_GP) {
+            if (my $res = _execute_pari_gp("eulerfrac($n)")) {
+                my $z = Math::GMPz::Rmpz_init_set_str($res, 10);
+                return bless \$z;
+            }
+        }
 
         my $e = Math::GMPz::Rmpz_init_set((_secant_numbers(($n >> 1) + 1))[$n >> 1]);
         Math::GMPz::Rmpz_neg($e, $e) if (($n >> 1) & 1);
@@ -11809,6 +11836,12 @@ package Sidef::Types::Number::Number {
         $n == 0 && return ONE;
         $n == 1 && return $x;
 
+        if ($polynomial and $n >= 15 and $USE_PARI_GP) {
+            if (my $res = _execute_pari_gp("pollegendre($n)")) {
+                return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
+            }
+        }
+
         my ($x1, $x2) = ($x->dec, $x->inc);
 
         if (!$polynomial) {
@@ -11870,6 +11903,12 @@ package Sidef::Types::Number::Number {
         }
 
         $n = _any2ui($$n) // goto &nan;
+
+        if ($polynomial and $n >= 250 and $USE_PARI_GP) {
+            if (my $res = _execute_pari_gp("polhermite($n)")) {
+                return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
+            }
+        }
 
         $n == 0 && return ONE;
         $x = $x->add($x);
@@ -13487,6 +13526,12 @@ package Sidef::Types::Number::Number {
             }
             elsif ($n == 1) {
                 return Sidef::Types::Number::Polynomial->new(ONE)->dec;
+            }
+
+            if ($n >= 150 and $USE_PARI_GP) {
+                if (my $res = _execute_pari_gp("polcyclo($n)")) {
+                    return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
+                }
             }
 
             my @factor_exp = _factor_exp($n);
