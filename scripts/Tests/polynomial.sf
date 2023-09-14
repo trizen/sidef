@@ -477,4 +477,106 @@ assert_eq(Poly(5).dec.dec, Poly(5) - 2)
 assert_eq(Poly(4 => 13, 5 => 7, 4 => 0), Polynomial(5 => 7))
 assert_eq(Poly(4 => 13, 4 => 3, 5 => 7), Polynomial(4 => 3, 5 => 7))
 
+# Polynomial parsing
+
+do {
+    var a = Poly("x^32 + x^28 - x^20 - x^16 - x^12 + x^4 + 1")
+    var b = ::cyclotomic(120)
+    assert_eq(a,b)
+}
+
+do {
+    var a = Poly("x^42 + x^41 + x^40 + x^39 + x^38 + x^37 + x^36 + x^35 + x^34 + x^33 + x^32 + x^31 + x^30 + x^29 + x^28 + x^27 + x^26 + x^25 + x^24 + x^23 + x^22 + x^21 + x^20 + x^19 + x^18 + x^17 + x^16 + x^15 + x^14 + x^13 + x^12 + x^11 + x^10 + x^9 + x^8 + x^7 + x^6 + x^5 + x^4 + x^3 + x^2 + x + 1")
+    var b = ::cyclotomic(43)
+    assert_eq(a,b)
+}
+
+do {
+    var a = Poly("x^12 - 6*x^11 + 11*x^10 - 33/2*x^8 + 22*x^6 - 33/2*x^4 + 5*x^2 - 691/2730")
+    var b = ::bernoulli_polynomial(12)
+    assert_eq(a,b)
+}
+
+do {
+    var a = Poly("x^13 - 13/2*x^12 + 13*x^11 - 143/6*x^9 + 286/7*x^7 - 429/10*x^5 + 65/3*x^3 - 691/210*x")
+    var b = ::bernoulli_polynomial(13)
+    assert_eq(a,b)
+}
+
+do {
+    var a = Poly("9694845/2048*x^15 - 35102025/2048*x^13 + 50702925/2048*x^11 - 37182145/2048*x^9 + 14549535/2048*x^7 - 2909907/2048*x^5 + 255255/2048*x^3 - 6435/2048*x")
+    var b = ::legendre_polynomial(15)
+    assert_eq(a,b)
+}
+
+do {
+    var a = Poly("300540195/32768*x^16 - 145422675/4096*x^14 + 456326325/8192*x^12 - 185910725/4096*x^10 + 334639305/16384*x^8 - 20369349/4096*x^6 + 4849845/8192*x^4 - 109395/4096*x^2 + 6435/32768")
+    var b = ::legendre_polynomial(16)
+    assert_eq(a,b)
+}
+
+do {
+    var a = Poly("32768*x^15 - 1720320*x^13 + 33546240*x^11 - 307507200*x^9 + 1383782400*x^7 - 2905943040*x^5 + 2421619200*x^3 - 518918400*x")
+    var b = ::hermiteH(15)
+    assert_eq(a,b)
+}
+
+do {
+    var a = Poly("65536*x^16 - 3932160*x^14 + 89456640*x^12 - 984023040*x^10 + 5535129600*x^8 - 15498362880*x^6 + 19372953600*x^4 - 8302694400*x^2 + 518918400")
+    var b = ::hermiteH(16)
+    assert_eq(a,b)
+}
+
+assert_eq(Poly("x"), Poly(1))
+assert_eq(Poly("1/x"), 1/Poly(1))
+assert_eq(Poly("5/x"), 5/Poly(1))
+assert_eq(Poly("-5/x"), -5/Poly(1))
+assert_eq(Poly("5/-x"), 5/-Poly(1))
+assert_eq(Poly("1/(x+2)"), 1/(Poly(1)+2))
+assert_eq(Poly("3/(x-2)"), 3/(Poly(1)-2))
+assert_eq(Poly("1/x^3"), 1/Poly(3))
+assert_eq(Poly("1/(x^3 + 1)"), 1/(Poly(3) + 1))
+assert_eq(Poly("x^2"), Poly(2))
+assert_eq(Poly("x^8 + 1"), Poly(8)+1)
+assert_eq(Poly("-x^2"), -Poly(2))
+assert_eq(Poly("5*x^2"), 5*Poly(2))
+assert_eq(Poly("5*x^2+3"), 5*Poly(2) + 3)
+assert_eq(Poly("5*x^2-3"), 5*Poly(2) - 3)
+assert_eq(Poly("-5*x^2-3"), -5*Poly(2) - 3)
+assert_eq(Poly("-5*x^2"), -5*Poly(2))
+assert_eq(Poly("1/3*x^3 + 1/2*x^2 + 1/6*x"), Polynomial(1 => 1/6, 2 => 1/2, 3 => 1/3))
+assert_eq(Poly("-5"), -5)
+assert_eq(Poly("5"), 5)
+assert_eq(Poly("1 - x"), 1 - Poly(1))
+assert_eq(Poly("1 + x^2 + x"), 1 + Poly(2) + Poly(1))
+assert_eq(Poly("x^(-2)+5"), Poly(-2)+5)
+assert_eq(Poly("x^-2+5"), Poly(-2) + 5)
+assert_eq(Poly("(3*x^2+5)/(7*x^3+2)"), (3*Poly(2) + 5) / (7*Poly(3) + 2))
+assert_eq(Poly("(4*x + 3)/(9*x + 7)"), Fraction(Polynomial(0 => 3, 1 => 4), Polynomial(0 => 7, 1 => 9)))
+
+assert_eq(Poly("x^20 + x^14 + x^9 - x^2 + 1")(2), Poly("(x^21 - x^20 + x^15 - x^14 + x^9 - x^2 + x - 1)/1")(2))
+assert_eq(Poly("x^911 - x^456 + 3*x^455 - 1")(7), Poly("(6*x^911 - 4*x^456 + 4*x^455 - 6)/6")(7))
+
+assert_eq(Poly("1/9*x^20 + 2/9*x^16 + 5/9*x^13 + 1/9*x^9 - 1"), Poly("(x^20 + 2*x^16 + 5*x^13 + x^9 - 9)/9"))
+assert_eq(Poly("((36*x^2 - 9*x - 27)/(9*x^2 - 2*x - 7))/9"), Poly("(4*x + 3)/(9*x + 7)"))
+assert_eq(Poly("((36*x^2 - 9*x - 27)/(9*x^2 - 2*x - 7))/9")(10), Poly("(4*x + 3)/(9*x + 7)")(10))
+
+func log_factorial_correction_terms(terms=10) {
+    sum(1..terms, {|k|
+        bernoulli(2*k) / (2*k * (2*k - 1) * Poly(2*k - 1))
+    })
+}
+
+assert_eq(Poly("(1/6)/(2*x)"), log_factorial_correction_terms(1))
+assert_eq(Poly("1/(12*x)"), log_factorial_correction_terms(1))
+
+assert_eq(Poly("(2*x^3 - 1/15*x)/(24*x^4)"), log_factorial_correction_terms(2))
+assert_eq(Poly("(30*x^2 - 1)/(360*x^3)"), log_factorial_correction_terms(2))
+
+assert_eq(Poly("(60*x^8 - 2*x^6 + 4/7*x^4)/(720*x^9)"), log_factorial_correction_terms(3))
+assert_eq(Poly("(210*x^4 - 7*x^2 + 2)/(2520*x^5)"), log_factorial_correction_terms(3))
+
+assert_eq(Poly("(39916800*x^35 - 1330560*x^33 + 380160*x^31 - 285120*x^29 + 403200*x^27 - 11940480/13*x^25)/(479001600*x^36)"), log_factorial_correction_terms(6))
+assert_eq(Poly("(180180*x^10 - 6006*x^8 + 1716*x^6 - 1287*x^4 + 1820*x^2 - 4146)/(2162160*x^11)"), log_factorial_correction_terms(6))
+
 say "** Test passed!"

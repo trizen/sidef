@@ -30,6 +30,69 @@ package Sidef::Types::Number::Polynomial {
                 return $_[0]->eval($value);
             }
 
+            if (ref($value) eq 'Sidef::Types::String::String') {
+                my $str = "$value";
+
+                # Basic support for fractions of polynomials
+                if (
+
+                    # (anything)/(anything)
+                    # anything/(anything)
+                    $str =~ m{^\s*+
+                        \(?+(?<numerator>.*?)\)?+
+                            \s*+/\s*+
+                        \((?<denominator>.*)\)
+                    \s*+\z}x
+
+                    # (anything)/x
+                    # anything/x
+                    # anything/x^5
+                    or $str =~ m{^\s*+
+                        \(?+(?<numerator>.*?)\)?+
+                            \s*+/\s*+
+                        (?<denominator>[-+]?+\s*x(?>\^[-+]?+[0-9]++)?+)
+                    \s*+\z}x
+
+                    # (anything)/integer
+                    or $str =~ m{^\s*+
+                        \((?<numerator>.*?)\)
+                            \s*+/\s*+
+                        (?<denominator>[-+]?+[0-9]++)
+                    \s*+\z}x
+                  ) {
+                    my $num   = $+{numerator};
+                    my $den   = $+{denominator};
+                    my $poly1 = __PACKAGE__->new(Sidef::Types::String::String->new($num));
+                    my $poly2 = __PACKAGE__->new(Sidef::Types::String::String->new($den));
+                    return $poly1->div($poly2);
+                }
+
+                my %pairs;
+                while (
+                    $str =~ m{\G\s*+
+                        (?<sign>[-+])?+\s*+
+                        (?<coeff>[0-9]++\s*+(?>/\s*[1-9]+[0-9]*)?)?+
+                        (?>\s*\*\s*)?+
+                        (?>(?<x>x)(?>\^\(?(?<exp>[-+]?[0-9]++))?+\)?+)?+
+                \s*+}gcx
+                  ) {
+                    my $sign  = $+{sign} // '+';
+                    my $exp   = defined($+{x}) ? ($+{exp} // 1) : 0;
+                    my $coeff = Sidef::Types::Number::Number->new(($+{coeff} eq '') ? '1' : $+{coeff});
+                    $coeff = $coeff->neg if $sign eq '-';
+                    $pairs{$exp} = $coeff;
+                    last if $str =~ /\G\z/;
+                }
+
+                # Failed to parse the entire string: return NaN
+                if ($str !~ /\G\z/) {
+                    return __PACKAGE__->new('0' => Sidef::Types::Number::Number::nan());
+                }
+
+                # Create and return the parsed polynomial
+                return __PACKAGE__->new(%pairs);
+            }
+
             if (UNIVERSAL::isa($value, 'Sidef::Types::Array::Array')) {
                 my $end = $#{$value};
                 return __PACKAGE__->new(
