@@ -30768,6 +30768,10 @@ package Sidef::Types::Number::Number {
             $k = _any2mpz($k) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
         if (Math::GMPz::Rmpz_cmp_ui($k, 2) == 0) {
             return (
                     (Math::GMPz::Rmpz_popcount($n) == 1)
@@ -32010,7 +32014,7 @@ package Sidef::Types::Number::Number {
 
             # This issue has been fixed in perl-5.24.0
             # https://perldoc.perl.org/5.24.0/perldelta#Integer-shift-(%3C%3C-and-%3E%3E)-now-more-explicitly-defined
-            if ($] >= 5.024000) {
+            if ($] >= 5.024000 or $y < 32) {
                 my $r = $x >> $y;
                 return bless \$r;
             }

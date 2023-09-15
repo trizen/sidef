@@ -7,7 +7,7 @@
 #   23 feb 2023: 3.913s
 #   04 mar 2023: 3.635s
 #   13 jul 2023: 3.364s
-#   14 sep 2023: 2.575s
+#   14 sep 2023: 2.575s (after removing a duplicated test)
 
 func A242786(n) {
     for (var p = 2; true; p.next_prime!) {

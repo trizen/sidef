@@ -4,87 +4,97 @@ Sidef is a modern, high-level, general-purpose programming language, focusing on
 
 # BOOK
 
-The Sidef Programming Language: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang))
+The Sidef Programming Language: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-book.pdf)).
 
 # Installation
 
-Sidef can be installed from the [CPAN](https://metacpan.org/pod/distribution/Sidef/lib/Sidef.pod), by invoking the following command:
-
-```
-$ cpan Sidef
-```
-
-If the testing takes a long time, add the `-T` flag to build and install Sidef without testing:
-
-```
-$ cpan -T Sidef
-```
-
-When the `cpan` command is not available, try:
-
-```
-$ perl -MCPAN -e "CPAN::Shell->install(q{Sidef})"
-```
+This section describes how to install Sidef for various operating systems.
 
 **IMPORTANT**: Sidef needs the [GMP](https://gmplib.org/), [MPFR](http://www.mpfr.org/) and [MPC](http://www.multiprecision.org/) C libraries.
 
-### Installing from git source
+## Windows executable
 
-To install Sidef manually, download the [latest version](https://github.com/trizen/sidef/archive/master.zip), unzip it and follow the installation steps:
+For Windows, Sidef is available as a portable 32-bit executable:
 
-```
-$ perl Build.PL
-# ./Build installdeps
-# ./Build install
-```
-
-When [Module::Build](https://metacpan.org/pod/Module::Build) is not installed, try:
-
-```
-$ perl Makefile.PL
-$ make test
-# make install
-```
+* https://github.com/trizen/sidef/releases/download/23.08/sidef-23.08.exe.zip
 
 ## Linux installation
 
 ### Arch Linux
 
-Sidef is available on the [AUR](https://aur.archlinux.org/packages/sidef) and can be installed using an AUR helper, like [trizen](https://github.com/trizen/trizen):
+Sidef is available in the [AUR](https://aur.archlinux.org/packages/sidef) and can be installed using an AUR helper, like [trizen](https://github.com/trizen/trizen):
 
-```
+```console
 $ trizen -S sidef
 ```
 
 ### Debian / Ubuntu / Linux Mint
 
-On Debian-based distributions, Sidef can be installed from the [CPAN](https://metacpan.org/dist/Sidef), by executing the following commands:
+On Debian-based distributions, Sidef can be installed from the [MetaCPAN](https://metacpan.org/dist/Sidef), by executing the following commands:
 
-```
+```console
 $ sudo apt install libgmp-dev libmpfr-dev libmpc-dev libc-dev cpanminus
-$ sudo cpanm -n Sidef
+$ cpanm --sudo -n Sidef
 ```
 
 ### Android installation
 
 It's also possible to install Sidef on Android, by installing [Termux](https://f-droid.org/en/packages/com.termux/) and executing the following commands:
 
-```
+```console
 $ pkg install perl make clang libgmp libmpfr libmpc
 $ cpan -T Sidef
 ```
 
 If the installation succeeded, the `sidef` command should be available:
 
-```
+```console
 $ sidef -h
 ```
 
-## Run Sidef without installing it
+## Installing from MetaCPAN
+
+Sidef can be installed from the [MetaCPAN](https://metacpan.org/pod/distribution/Sidef/lib/Sidef.pod), by invoking the following command:
+
+```console
+$ cpan Sidef
+```
+
+If the testing takes a long time, add the `-T` flag to build and install Sidef without testing:
+
+```console
+$ cpan -T Sidef
+```
+
+When the `cpan` command is not available, try:
+
+```console
+$ perl -MCPAN -e "CPAN::Shell->install(q{Sidef})"
+```
+
+## Installing from git source
+
+To install Sidef manually, download the [latest version](https://github.com/trizen/sidef/archive/master.zip), unzip it and follow the installation steps:
+
+```console
+$ perl Build.PL
+$ sudo ./Build installdeps
+$ sudo ./Build install
+```
+
+When [Module::Build](https://metacpan.org/pod/Module::Build) is not installed, try:
+
+```console
+$ perl Makefile.PL
+$ make test
+$ sudo make install
+```
+
+# Running from source
 
 It is also possible to run Sidef without having to install it. In a Unix-like environment, the following commands can be executed:
 
-```
+```console
 $ wget 'https://github.com/trizen/sidef/archive/master.zip' -O 'master.zip'
 $ unzip 'master.zip'
 $ cd 'sidef-master/bin/'
@@ -95,7 +105,7 @@ Those commands will download and unpack the latest version of Sidef and will exe
 
 To execute a Sidef script, run:
 
-```
+```console
 $ ./sidef ../scripts/sierpinski_carpet.sf
 ```
 
@@ -105,18 +115,17 @@ It's also possible to add the following alias to `~/.bashrc` or `~/.zshrc`:
 alias sidef="/path/to/bin/sidef"
 ```
 
-## Packaging
+# Packaging
 
 For packaging Sidef, run:
 
-```
+```console
 $ perl Build.PL --destdir "/my/package/path" --installdirs vendor
 $ ./Build test
 $ ./Build install --install_path script=/usr/bin
 ```
 
-
-## Creating the first Sidef script
+# Hello world
 
 A Sidef script can be written in any text editor and, by convention, it has the **`.sf`** extension.
 
@@ -130,13 +139,17 @@ say "Hello, 世界"
 
 If we save the content in a new file called **`hello.sf`**, we can execute the code by running:
 
-```
+```console
 $ sidef hello.sf
 ```
 
-### Real code
+# Real code
 
-Before taking a closer look at the syntax of the language, let's take a brief look at how a real program might look like. The following program defines the Bitmap class and generates a PPM file with a color palette:
+Before taking a closer look at the syntax of the language, let's take a brief look at how a real program might look like.
+
+## PPM image generation
+
+The following program defines the Bitmap class and generates a PPM file with a color palette:
 
 ```ruby
 subset Int   < Number {|n| n.is_int  }
@@ -188,6 +201,8 @@ By executing the code, the following image is produced:
 
 ![color-palette](https://raw.githubusercontent.com/trizen/rc/master/img/color_palette-sidef.png)
 
+## Linear congruential generator
+
 Another example is the implementation of the [LCG algorithm](https://en.wikipedia.org/wiki/Linear_congruential_generator), illustrating modules and classes.
 
 ```ruby
@@ -229,7 +244,10 @@ say 5.of { lcg2.rand }
 [41, 18467, 6334, 26500, 19169]
 ```
 
+## Longest common substring
+
 A last example, implementing a simple algorithm that finds the longest common substring from two given strings, illustrating the declaration of functions with typed parameters, the `gather/take` construct and the set-intersection operator (`&`).
+
 ```ruby
 func createSubstrings(String word) -> Array {
   gather {
@@ -299,7 +317,7 @@ is equivalent with:
 say "abc".uc.reverse.chars
 ```
 
-### Keywords
+## Keywords
 
 Initially, Sidef was designed without any keywords. However, as it turned out, keywords can simplify the writing of code, at the cost of not having a variable with the same name as that of a keyword.
 
@@ -349,7 +367,7 @@ include         # load a Sidef module
 import          # import a list of identifiers from a given module
 ```
 
-### Prefix operators
+## Prefix operators
 
 Sidef defines the following list of built-in prefix operators:
 
@@ -371,7 +389,7 @@ Sidef defines the following list of built-in prefix operators:
 √               # square root of a number
 ```
 
-### Postfix operators
+## Postfix operators
 
 Additionally to prefix operators, Sidef also defines a small list of postfix operators:
 
@@ -383,7 +401,7 @@ Additionally to prefix operators, Sidef also defines a small list of postfix ope
 ...              # unpacks an object into a list
 ```
 
-### Built-in types
+## Built-in types
 
 These classes deal with the standard data types in Sidef and implement the useful methods visible to the user.
 
@@ -441,7 +459,7 @@ false                      # same as: Bool(0)
 "first":"second"           # same as: Pair("first", "second")
 ```
 
-# Method invocations
+# Methods
 
 A method is a function defined for a specific type of object. For strings, we have a method named `length`, which differs from the method with the same name that is defined for array-type objects.
 
@@ -452,7 +470,7 @@ A method is a function defined for a specific type of object. For strings, we ha
 
 In many languages, method invocations require parentheses, but in Sidef the parentheses are optional when we call a method without any arguments.
 
-### Methods
+## Method invocations
 
 For calling a method, we have the following notation:
 
@@ -621,13 +639,13 @@ var str = "42"
 var bool = true
 ```
 
-### Variable types
+## Variable types
 
 In Sidef exists four types of variables: **lexical variables**, **static variables**, **global variables** and **local variables**.
 
 
 
-#### LEXICAL VARIABLES
+### LEXICAL VARIABLES
 
 This kind of variables are dynamic, but statically block scoped. This is the usual way of declaring variables in Sidef.
 
@@ -636,7 +654,7 @@ var x = 42    # sets the lexical x to 42
 say x         # prints the lexical value of x
 ```
 
-#### STATIC VARIABLES
+### STATIC VARIABLES
 
 This type of variables are static, block-scoped and initialized only once.
 
@@ -661,7 +679,7 @@ say b   #=> [1,2,3,4]
 say c   #=> Hash(x => 1, y => 2)
 ```
 
-#### GLOBAL VARIABLES
+### GLOBAL VARIABLES
 
 Global variables are declared at the top-level of the current namespace. They can be accessed from everywhere, anytime. However, it's recommended to avoid them, unless there isn't a better alternative.
 
@@ -670,7 +688,7 @@ global x = 42     # sets global x to 42
 say x             # prints the global value of x
 ```
 
-#### LOCAL VARIABLES
+### LOCAL VARIABLES
 
 Local variables (also known as "dynamically scoped variables") are used to localize array/hash lvalues or global variables to a limited scope.
 
@@ -683,7 +701,7 @@ do {
 say x            # prints the global value of x (42)
 ```
 
-### Variable scoping
+## Variable scoping
 
 All variables, including functions and classes, are block scoped in the following way:
 
@@ -747,7 +765,7 @@ say a   #=> 42
 say b   #=> 52
 ```
 
-### Slurpy variables
+## Slurpy variables
 
 Slurpy variables are a special type of variables which can be initialized with a list of values, creating automatically a container to hold the data.
 
@@ -759,7 +777,7 @@ var :hash = (a => 1, b => 2)   # creates an Hash
 say hash                       # prints: Hash(a => 1, b => 2)
 ```
 
-### Working with variables
+## Working with variables
 
 Any method applied to a variable is applied to the object stored inside the variable.
 
@@ -819,7 +837,7 @@ var x = nil
 x \\ say "x is not defined"     # prints "x is not defined"
 ```
 
-### Special variables
+## Special variables
 
 Currently, there are only two predefined variables: `ARGV` and `ENV`.
 
@@ -831,8 +849,7 @@ ARGV.each { |arg|
 say ENV{:HOME}
 ```
 
-
-### Deleting variables
+## Deleting variables
 
 Any identifier can be deleted using the `del` keyword followed by the name of the identifier.
 
@@ -842,7 +859,7 @@ del foo
 say foo          # parse-time error: attempt to use deleted identifier
 ```
 
-### Topic variable
+## Topic variable
 
 The special topic variable (`_`) is declared at compile-time in all the block-objects of a program. Its name may not be seen very often because it has been overtaken by the elegant unary dot (`.`) operator:
 
@@ -869,7 +886,7 @@ and
 say [Hash(a=>41), Hash(a=>42), Hash(a=>43)].map { .{:a} }   #=> [41, 42, 43]
 ```
 
-### Magic variables
+## Magic variables
 
 Sidef's magic variables are directly bound to Perl's magic variables.
 
@@ -881,7 +898,7 @@ say $^PERL            # prints the path to perl executable
 say $^SIDEF           # prints the path to sidef executable
 ```
 
-### File-handle constants
+## File-handle constants
 
 This constants look like variables, but are actually file-handles.
 
@@ -914,11 +931,11 @@ some data
 lines
 ```
 
-## Constants
+# Constants
 
 Sidef implements three kinds of constants:
 
-#### **const**
+## **const**
 
 The common way of declaring constants in Sidef, is by using the `const` keyword:
 
@@ -956,7 +973,7 @@ say f(40)       #=> 42
 say f(50)       #=> 52
 ```
 
-#### **define**
+## **define**
 
 This keyword will define a compile-time evaluated constant and will point directly to the object at which it evaluated to.
 
@@ -993,7 +1010,7 @@ say pi         # prints: 3.14
 
 This type of constants are the most efficient ones.
 
-#### **enum**
+## **enum**
 
 `enum` will automatically declare and assign a list of constants with ascending numeric values (starting with 0):
 
@@ -1011,7 +1028,7 @@ say α             # prints: 'a'
 say β             # prints: 'b'
 ```
 
-## Variable references
+# Variable references
 
 Like other programming languages, Sidef is capable of taking references to variables.
 
@@ -1045,7 +1062,7 @@ var block = {
 }
 ```
 
-### Block callbacks
+## Block callbacks
 
 Blocks are also used as arguments to many built-in methods as callback blocks:
 
@@ -1075,7 +1092,7 @@ Each of those methods accept more than one argument, which can be any object tha
 {|n| say n**2 } << (1..3, 101..103, 1001..1003)
 ```
 
-### Block parameters
+## Block parameters
 
 For declaring block parameters, Sidef borrows Ruby's way of doing this, by using the `|arg1, arg2, ...|` special syntax.
 
@@ -1088,7 +1105,7 @@ For declaring block parameters, Sidef borrows Ruby's way of doing this, by using
 }(1, 2)
 ```
 
-### Default block parameter values
+## Default block parameter values
 
 We can also specify default values for block parameters. This can be done by using the syntax: `arg=value`.
 
@@ -1102,7 +1119,7 @@ The default value can be any expression:
 say { | a=1/2, b=(a**2) | a + b }(5)      # prints the result of: 5 + 5**2
 ```
 
-### Lazy evaluation
+# Lazy evaluation
 
 Lazy evaluation is a very common feature in functional programming languages and provides an way to delay the evaluation of an expression until the result is actually needed.
 
@@ -1152,7 +1169,7 @@ say obj.lazy.grep{.is_prime}.to_a       # filters all the primes lazily
 
 Currently, the `.iter()` method is defined in the following built-in classes: Array, String, FileHandle, DirHandle, RangeString, RangeNumber and Lazy.
 
-### Lazy methods
+# Lazy methods
 
 A lazy method is an interesting concept of partially applying a method on a given object, delaying the evaluation until the result is needed.
 
@@ -1296,7 +1313,7 @@ f = func (name, age) {
 f("Sidef", 100)
 ```
 
-### Closures
+## Closures
 
 In Sidef, all functions are first-class objects which can be passed around like any other object. Additionally, all functions and methods are lexical closures.
 
@@ -1315,7 +1332,7 @@ var adder = curry(add, 1)
 say adder(3)                   #=> 4
 ```
 
-### Automatically cached functions
+## Automatically cached functions
 
 By specifying the `cached` trait to a function or a method, Sidef will automatically cache it.
 
@@ -1339,7 +1356,7 @@ say fib(100)    #=> 354224848179261915075
 fib.uncache     # disables memoization
 ```
 
-### Function parameters
+## Function parameters
 
 The parameters of a function can be defined to have a default value when the function is called with a lower number of arguments than required.
 
@@ -1374,7 +1391,7 @@ say foo(1)             # prints: 3  (the result of: 1 + 1+1)
 say foo(21,21)         # prints: 42 (the result of: 21 + 21)
 ```
 
-### Named parameters (a.k.a. keyword arguments)
+## Named parameters (a.k.a. keyword arguments)
 
 This is a very nice feature which allows a function to be called with named parameters, giving us the flexibility to put the arguments in no specific order:
 
@@ -1386,7 +1403,7 @@ func div(a, b) {
 say div(b: 5, a: 35)  # prints: 7
 ```
 
-### Variadic functions
+## Variadic functions
 
 A slurpy variable in the form of `*name` can be used as a function parameter to collect the remaining arguments inside an array:
 
@@ -1408,7 +1425,7 @@ func f(:pairs) {
 f(a => 1, b => 2)
 ```
 
-### Typed parameters
+## Typed parameters
 
 A function can be declared with typed parameters, which are checked at runtime.
 
@@ -1439,7 +1456,7 @@ say concat("mini")    # prints: "minibar"
 say concat(1, 2)      # this is still a runtime error
 ```
 
-### Subsets
+## Subsets
 
 A subset is a definition which specifies the upper limit of inheritance, with optional argument validation.
 
@@ -1506,7 +1523,7 @@ say concat(13, 29)         # 42
 say concat([41], [42])     # runtime error
 ```
 
-### Multiple dispatch
+## Multiple dispatch
 
 Sidef also includes multiple dispatch for functions and methods, based on the number of arguments and their types:
 
@@ -1542,7 +1559,7 @@ Got a number: 12 and an array: [1, 1]
 Got a number: 42
 ```
 
-### Functional pattern matching
+## Functional pattern matching
 
 This feature looks like this:
 
@@ -1616,7 +1633,7 @@ func arithmetic_derivative(Number n) {
 printf("(42!)' = %s\n", arithmetic_derivative(42!))
 ```
 
-### Returned type
+## Returned type
 
 Sidef also has the capability to check the return type of a function and stop the execution of the program if the returned type doesn't match the type defined in the function declaration.
 
@@ -1647,7 +1664,7 @@ func foo() -> (Number, String) {
 var (a, b) = foo()
 ```
 
-### Alternative function declaration
+## Alternative function declaration
 
 A function can also be declared by using the fancy unary operator `->`, which is synonym with the `func` or `method` keywords, depending on the context where it is used.
 
@@ -1860,7 +1877,7 @@ Most used methods are:
 
 For more methods, see: [String.pod](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/String/String.pod)
 
-### String quotes
+## String quotes
 
 Being a new programming language, Sidef has built-in support for Unicode quotes:
 
@@ -1967,7 +1984,9 @@ Number("10110111", 2)     # new binary number
 Number("deadbeef", 16)    # new hexadecimal number
 ```
 
-### Integers
+The documentation for each Number method can be read at: [https://metacpan.org/pod/Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number)
+
+## Integers
 
 Here is `255` written as integer in different bases:
 
@@ -1978,7 +1997,7 @@ Here is `255` written as integer in different bases:
 0b1111_1111      # binary
 ```
 
-### Decimal literals
+## Decimal literals
 
 In Sidef, decimal literals are always represented in rational form, using [Math::GMPz](https://metacpan.org/pod/Math::GMPz) or [Math::GMPq](https://metacpan.org/pod/Math::GMPq).
 
@@ -1996,7 +2015,7 @@ say 1.234.dump           #=> 617/500
 say (0.1 + 0.2 == 0.3)   #=> true
 ```
 
-### Floating-point values
+## Floating-point values
 
 Floating-point values are represented by [Math::MPFR](https://metacpan.org/pod/Math::MPFR) with a default precision of 192 bits.
 
@@ -2008,7 +2027,7 @@ A given number can be explicitly converted to a floating-point value by calling 
 1.234.float      # floating-point value
 ```
 
-### Complex numbers
+## Complex numbers
 
 Complex numbers are represented by [Math::MPC](https://metacpan.org/pod/Math::MPC) in floating-point form, with a default precision of 192 bits for each component.
 
@@ -2030,7 +2049,7 @@ log(-1)         # 3.14159265358979323846264338327950288419716939938i
 (3+4i)**2       # -7+24i
 ```
 
-### Floating-point precision
+## Floating-point precision
 
 The default floating-point precision can be changed with the `-P int` command-line flag passed to `sidef`, which specifies the number of decimals of precision.
 
@@ -2222,7 +2241,7 @@ say array
 
 If you're familiar with Perl, you already know about autovivification. It's the feature responsible for the dynamic creation of data structures.
 
-### Array filtering
+## Array filtering
 
 The `Array` object has many interesting methods for making it safer and easier to work with arrays in a pure OO style.<br/>
 
@@ -2251,7 +2270,7 @@ var new_arr arr.sort {|a,b| a.lc <=> b.lc}
 var new_arr arr.sort_by { .lc }
 ```
 
-### Unroll operator
+## Unroll operator
 
 It's a nice metaoperator borrowed from Raku, which unrolls two arrays and applies the operator on each two element-wise objects, creating a new array with the results. The operator can be a method or any other valid operator and must be enclosed between `» «` or `>> <<`.
 
@@ -2262,7 +2281,7 @@ It's a nice metaoperator borrowed from Raku, which unrolls two arrays and applie
 
 Internally, the `unroll_operator` method is called, which can, also, be implemented in user-defined classes.
 
-### Map operator
+## Map operator
 
 The array map operator works exactly like the `Array.map{}` method, but it's slightly more efficient and easier to write. The map operator must be enclosed between `» »` or `>> >>`.
 
@@ -2272,7 +2291,7 @@ The array map operator works exactly like the `Array.map{}` method, but it's sli
 
 Internally, the `map_operator` method is called.
 
-### Pam operator
+## Pam operator
 
 The pam operator is kind of a reversed mapping of the array ("pam" is "map" spelled backwards), where the provided argument is used as the first operand to the operator provided. The operator must be enclosed between `« «` or `<< <<`.
 
@@ -2282,7 +2301,7 @@ The pam operator is kind of a reversed mapping of the array ("pam" is "map" spel
 
 Internally, the `pam_operator` method is called.
 
-### Reduce operator
+## Reduce operator
 
 This metaoperator reduces an array to a single element. The operator needs to be enclosed inside `« »` or `<< >>`.
 
@@ -2293,7 +2312,7 @@ This metaoperator reduces an array to a single element. The operator needs to be
 
 Internally, the `reduce_operator` method is called.
 
-### Cross operator
+## Cross operator
 
 The metaoperator `~X` or `~Xop` crosses two arrays and returns a new one.
 
@@ -2304,7 +2323,7 @@ The metaoperator `~X` or `~Xop` crosses two arrays and returns a new one.
 
 Internally, the `cross_operator` method is called.
 
-### Zip operator
+## Zip operator
 
 The metaoperator `~Z` or `~Zop` zips two arrays and returns a new one.
 
@@ -2315,7 +2334,7 @@ The metaoperator `~Z` or `~Zop` zips two arrays and returns a new one.
 
 Internally, the `zip_operator` method is called.
 
-### Wise operator
+## Wise operator
 
 Almost equivalent with the zip metaoperator, it does element-wise folding on two arbitrary nested arrays, where both arrays must have the same structure.
 
@@ -2327,7 +2346,7 @@ Almost equivalent with the zip metaoperator, it does element-wise folding on two
 
 Internally, the `wise_operator` method is called.
 
-### Scalar operator
+## Scalar operator
 
 The scalar operator applies a given operator to the elements of an arbitrary nested array, where the provided scalar is used as the second operand to the given operator.
 
@@ -2339,7 +2358,7 @@ The scalar operator applies a given operator to the elements of an arbitrary nes
 
 Internally, the `scalar_operator` method is called.
 
-### Reverse scalar operator
+## Reverse scalar operator
 
 The reverse scalar operator uses the given scalar as a first operand to the given operator and is also defined for arbitrary nested arrays.
 
@@ -2351,7 +2370,7 @@ The reverse scalar operator uses the given scalar as a first operand to the give
 
 Internally, the `rscalar_operator` method is called.
 
-### Entrywise operations
+## Entrywise operations
 
 The `Array.wise_op()` method takes two arbitrary nested arrays and an operator, folding each element (entrywise) with the provided operator, which is also available as `a ~Wop b`:
 
@@ -2389,7 +2408,7 @@ Output:
 [[16, 13], [14, 10]]
 ```
 
-### Scalar operations
+## Scalar operations
 
 ```ruby
 A `scalar_add` 42   # scalar addition       (aliased as `sadd`)
@@ -2465,7 +2484,7 @@ Matrix(
 )
 ```
 
-### Operations
+## Operations
 
 A subset of `Matrix` operations are included in the following example:
 
@@ -2500,7 +2519,7 @@ say B.det             # matrix determinant
 say B.solve([1,2,3])  # solve a system of linear equations
 ```
 
-### Matrix iteration
+## Matrix iteration
 
 The extended `for-in` loop provides built-in iteration over a 2D-array, which is useful in combination with the cross or zip metaoperators:
 
@@ -2529,7 +2548,7 @@ and outputs:
 
 The same functionality is also provided by the `.each_2d {|a,b,...| ... }` Array method.
 
-### Lists
+# Lists
 
 An array can be converted into a list using the following notations:
 
@@ -2541,7 +2560,7 @@ say Hash(@|arr)              # ==//==
 
 The difference between postfix `...` and prefix `@|` consists in the fact that `@|` invokes the `...` method only when its argument can respond to this method, while in the first case, the `...` method is invoked unconditionally.
 
-### Slices
+# Slices
 
 A slice is a sub-array, just like a sub-string is for a string.
 
@@ -2676,7 +2695,7 @@ hash{:age} = 99    # sets the key "age" to value 99
 hash.{"age"} = 99  # ==//==
 ```
 
-### Multiple values
+## Multiple values
 
 Just like arrays, hashes also support the retrieving of multiple values at once.
 
@@ -2709,7 +2728,7 @@ hash{} = (c => 3, d => 4)         # replaces the entire hash
 say hash                          # prints: Hash(c => 3, d => 4)
 ```
 
-### Working with hashes
+## Working with hashes
 
 Hashes, like everything else, are objects which have many methods built-in, helping in dealing with hash tables.
 
@@ -2743,7 +2762,7 @@ A set is an unordered collection of objects, with no duplicates.
 Set('foo', 'bar', 'baz')
 ```
 
-### Operations
+## Operations
 
 All the set operators, such as intersection, difference, symmetric difference, union and concatenation, are supported.
 
@@ -2768,7 +2787,7 @@ say (A ^ B)         #=> Set("baz", "qux")
 say (A + B)         #=> Set("baz", "bar", "qux", "foo")
 ```
 
-### Updating
+## Updating
 
 The method `set.delete(obj)` can be used for removing a given object from the set.
 
@@ -2780,7 +2799,7 @@ A bag (also known as a multi-set) is a unordered collection of objects, similar 
 Bag('foo', 'bar', 'baz')
 ```
 
-### Operations
+## Operations
 
 The Bag class supports all the set operators, such as intersection, difference, symmetric difference, union and concatenation.
 
@@ -2808,7 +2827,7 @@ say (A ^ B)         #=> Bag("foo", "qux", "baz")
 say (A + B)         #=> Bag("foo", "foo", "foo", "bar", "bar", "baz", "qux")
 ```
 
-### Updating
+## Updating
 
 The methods `bag.add_pair(obj, count)` and `bag.update_pair(obj, count)` can be used for efficiently updating a bag in-place.
 
@@ -2916,7 +2935,7 @@ File('/tmp/abc.txt').edit { |line|
 }
 ```
 
-### File info
+## File info
 
 Here is a list with the most important methods which verifies some attributes of the file.
 
@@ -2949,7 +2968,7 @@ file.abs         # the absolute path the file
 file.dir         # the parent directory of the file
 ```
 
-### Manipulating files
+## Manipulating files
 
 We can also delete and rename files and do other things to files.
 
@@ -2963,7 +2982,7 @@ file.chmod(0666)                  # change the permissions
 file.utime(atime, mtime)          # change the access and modification times
 ```
 
-### Open files
+## Open files
 
 A `File` object has a main `open` method which is directly bound to Perl's `open` function.
 
@@ -2979,7 +2998,7 @@ var fh   = file.open_r              # open the file for reading
 var bool = file.open_r(\var fh)     # same thing, but returns a Boolean value
 ```
 
-### File handles
+## File handles
 
 For reading the content of a file into a string, we can use the `FileHandle.slurp()` method:
 
@@ -3005,6 +3024,8 @@ fh.each { |line|
 
 Conditional expression are almost the same in most programming languages and _Sidef_ will not make an exception, so we'll have the classic `if`, `while` and `for` conditional expressions.
 
+## `if` statement
+
 The `if` statement is one of the most basic conditional constructs.
 
 ```ruby
@@ -3018,6 +3039,8 @@ else {
 
 }
 ```
+
+## `with` statement
 
 The `with` statement behaves almost like the `if` statement, but instead of testing for trueness, it checks to see if the given argument is not a `nil` value.
 
@@ -3041,6 +3064,8 @@ with (some_function()) { |value|
 }
 ```
 
+## `while` loop
+
 The `while` statement is almost like the `if` construct, except that it will keep executing its block as long the given expression evaluates to a true value.
 
 ```ruby
@@ -3048,6 +3073,8 @@ while (bool) {
 
 }
 ```
+
+## `for` loop
 
 The `for` statement it's usually used for iteration over collections and for counting.
 
@@ -3057,11 +3084,15 @@ for (var i = 0; i <= 10; i++) {
 }
 ```
 
+## Ternary operator
+
 Also, we have the ternary operator and the _case and switch statements_:
 
 ```ruby
 bool ? (true) : (false)
 ```
+
+## `given/when/case` construct
 
 Given/when is used to compare two values using the rules of the smartmatch operator (`~~`):
 
@@ -3175,7 +3206,7 @@ say m[0]                                   # prints: hello
 say m[1]                                   # prints: world
 ```
 
-### Global matching
+## Global matching
 
 A regex can match multiple times inside a given string, therefore Sidef provides support for global matching.
 
@@ -3283,7 +3314,7 @@ say obj.age                # prints: 51
 
 Classes in Sidef are a little bit different than classes from other languages. Instance-variables (also known as attributes) are accessible via a method call which can either get or set a value, as illustrated in the example above.
 
-### Class attributes
+## Class attributes
 
 The attributes of a class can be either specified as parameters, or declared with the `has` keyword.
 
@@ -3301,7 +3332,7 @@ say obj.c   #=> 3
 say obj.d   #=> 4
 ```
 
-### Class initialization
+## Class initialization
 
 Extra object-initialization setup can be done by defining a method named `init`, which will be called automatically called whenever a new instance-object is created.
 
@@ -3323,7 +3354,7 @@ var obj = Example(3, 4)
 say obj.foo              #=> 7
 ```
 
-### Class inheritance
+## Class inheritance
 
 A class can inherit methods from other classes by using the special operator `<`, followed by the name of the inherited class:
 
@@ -3359,7 +3390,7 @@ class MobilePhone { }
 class CameraPhone << Camera, MobilePhone { }
 ```
 
-### Class variables
+## Class variables
 
 The syntax `ClassName!var_name` can be used for defining, accessing or modifying a class variable.
 
@@ -3391,7 +3422,7 @@ The modification of a class variable can be localized by prefixing the declarati
 local Example!hidden = 'local value'
 ```
 
-### Metaprogramming
+## Metaprogramming
 
 An interesting feature is the definition of methods at runtime:
 
@@ -3514,7 +3545,7 @@ var spec = frequire('File::Spec::Functions')
 say spec.rel2abs(spec.curdir)
 ```
 
-### Literal Perl modules
+## Literal Perl modules
 
 There is also a special syntax for literal names of Perl modules, creating a module-interface object, without `require`-ing the module in the first place.
 
@@ -3598,7 +3629,7 @@ Currently, Sidef code that includes `eval()` cannot be compiled into an executab
 
 # Inlining Perl code in Sidef
 
-`Perl.eval()` can evaluate arbitrary Perl code and convert the result into a Sidef data structure which can be used later in the program.
+`Perl.eval()` can evaluate arbitrary Perl code and convert the result into a Sidef data structure which can be used later in the program:
 
 ```ruby
 var perl_code = <<'CODE'
@@ -3621,29 +3652,26 @@ say data{:result}                 #=> 3628800
 say Sys.ref(data{:result})        #=> Sidef::Types::Number::Number
 ```
 
-A practical example would be the creation of Sidef blocks which incorporate arbitrary Perl code. Doing so, the returned object will behave exactly like a native Sidef block:
+Additionally, the `%perl{...}` syntax can execute arbitrary Perl code and return a Sidef object. A practical example would be the creation of Sidef blocks which incorporate arbitrary Perl code. Doing so, the returned object will behave exactly like a native Sidef block:
 
 ```ruby
-var perl_code = <<'CODE'
-
-Sidef::Types::Block::Block->new(
-    code => sub {
+var block = %perl{
+    sub {
         my ($n) = @_;
-        ($n <= 1) ? $n
-                  : (CORE::__SUB__->($n-1) + CORE::__SUB__->($n-2));
-    },
-    type => 'func',
-    name => 'fib',
-    table => {'n' => 0},
-    vars => [{name => 'n'}],
-);
+        $n <= 1 ? $n : __SUB__->($n-1) + __SUB__->($n-2);
+    }
+}
 
-CODE
-
-var block = Perl.eval(perl_code)
+say block.ref     # Sidef::Types::Block::Block
 say block(28)     # 28-th Fibonacci number
 ```
 
 # More examples
 
-For more examples, see: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+For more Sidef code examples, please see: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+
+# The end
+
+If you have any questions related to Sidef, please ask here:
+
+* https://github.com/trizen/sidef/discussions/categories/q-a

@@ -6,6 +6,7 @@
 #   17 feb 2023: 9.713s +/- 0.4
 #   23 feb 2023: 8.970s
 #   13 jul 2023: 3.088s
+#   15 sep 2023: 3.904s (after adding a few more tests)
 
 func A219019(n) {
     for k in (1..Inf) {
@@ -27,6 +28,21 @@ assert_eq(A219019(18), 373)
 assert_eq(A219019(20), 1000)
 assert_eq(A219019(21), 4096)
 assert_eq(A219019(24), 563)
+
+func A219018(n) {
+    for k in (1..Inf) {
+        var v = (k**n + 1)
+        v.is_omega_prime(n) || next
+        return k
+    }
+}
+
+assert_eq(
+    A219018.map(1..12),
+    %n[1, 3, 5, 43, 17, 47, 51, 1697, 59, 512, 521, 3255],
+)
+
+assert_eq(A219018(15), 656)
 
 func A281940(n) {
     for k in (1..Inf) {

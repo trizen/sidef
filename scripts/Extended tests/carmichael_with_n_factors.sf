@@ -8,7 +8,7 @@
 #   27 feb 2023: 7.226s (without MPU)
 
 func a(n) {
-    return nil if (n < 2)
+    return nil if (n < 3)
 
     var x = pn_primorial(n+1)>>1
     var y = 3*x

@@ -14,7 +14,7 @@ In this tutorial we're going to look how we can use Sidef for doing various comp
       **   **               ****   *********   *********   *
 ```
 
-To get started with Sidef and how to install it, see [beginner's tutorial](https://github.com/trizen/sidef/blob/master/TUTORIAL.md).
+To get started with Sidef and how to install it, see [beginner's tutorial](https://github.com/trizen/sidef/blob/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-tutorial.pdf)).
 
 Over the years, Sidef incorporated more and more mathematical functions, many of them provided by Dana Jacobsen's excellent [Math::Prime::Util](https://github.com/danaj/Math-Prime-Util) and [Math::Prime::Util::GMP](https://github.com/danaj/Math-Prime-Util-GMP) Perl modules, which provide great performance in tasks involving integer factorization, primality testing and prime counting.
 
@@ -57,6 +57,15 @@ var y = x**3    # compute x^3 and store the result in y
 say (x + y)     # print the result of x+y
 ```
 
+In Sidef, the following `4` statements are all equivalent:
+
+```ruby
+say 10.by { .is_composite }
+say 10.by { is_composite(_) }
+say 10.by {|n| n.is_composite }
+say 10.by {|n| is_composite(n) }
+```
+
 # Number theoretic functions
 
 Below we have a small collection of popular functions used in computational number theory:
@@ -66,25 +75,58 @@ is_prime(n)                 # true if n is a probable prime (B-PSW test)
 is_prov_prime(n)            # true if n is a provable prime
 is_composite(n)             # true if n is a composite number
 is_squarefree(n)            # true if n is squarefree
+is_power(n,k)               # true if n = b^k, for some b >= 1
+is_power_of(n,b)            # true if n a power of b: n = b^k, for some k >= 1
+is_perfect_power(n)         # true if n is a perfect power
+is_gaussian_prime(a,b)      # true if a+b*i is a Gaussian prime
 
 factor(n)                   # array with the prime factors of n
 divisors(n)                 # array with the positive divisors of n
+udivisors(n)                # array with the unitary divisors of n
+edivisors(n)                # array with the exponential divisors of n
+idivisors(n)                # array with the infinitary divisors of n
+bdivisors(n)                # array with the bi-unitary divisors of n
+
+omega(n,k=0)                # omega function: number of distinct primes of n
+Omega(n,k=0)                # Omega function: number of primes of n counted with multiplicity
+
+omega_prime_divisors(n,k)   # divisors of n with omega(n) = k
+almost_prime_divisors(n,k)  # divisors of n with Omega(n) = k
+prime_power_divisors(n)     # prime power divisors of n
+square_divisors(n)          # square divisors of n
+squarefree_divisors(n)      # squarefree divisors of n
+
+k.smooth_divisors(n)        # k-smooth divisors of n
+k.rough_divisors(n)         # k-rough divisors of n
+k.power_divisors(n)         # k-th power divisors of n
+k.power_udivisors(n)        # k-th power unitary divisors of n
+k.powerfree_divisors(n)     # k-powerfree divisors of n
+k.powerfree_udivisors(n)    # k-powerfree unitary divisors of n
+
 tau(n)                      # count of divisors of n
-omega(n)                    # omega function: number of distinct primes of n
-Omega(n)                    # Omega function: number of primes of n counted with multiplicity
 sigma(n,k=1)                # sigma_k(n) function: sum of divisors of n
 psi(n,k=1)                  # Dedekind's Psi function
 phi(n)                      # Euler's totient function
 jordan_totient(n,k=1)       # Jordan's totient function: J_k(n)
-pi(n)                       # count of primes <= n
-pi(a,b)                     # count of primes in the range a..b
+
+iroot(n,k)                  # integer k-th root of n
+ilog(n,k)                   # integer logarithm of n in base k
+valuation(n,k)              # number of times n is divisible by k
+
+gcd(...)                    # greatest common divisor of a list of integers
+gcud(...)                   # greatest common unitary divisor of a list of integers
+lcm(...)                    # least common multiple of a list of integers
 
 factorial(n)                # n-th factorial (equivalently: n!)
 mfactorial(n,k)             # k-multi-factorial of n (where k=2 means n!!)
+falling_factorial(n,k)      # falling factorial
+rising_factorial(n,k)       # rising factorial
 binomial(n,k)               # the binomial coefficient: n!/((n-k)! * k!)
 binomialmod(n,k,m)          # binomial(n,k) modulo m
 factorialmod(n,m)           # factorial(n) modulo m
 
+pi(n)                       # count of primes <= n
+pi(a,b)                     # count of primes in the range a..b
 prime(n)                    # n-th prime number
 primes(a,b)                 # array of primes in the range a..b
 prime_sum(a,b,k=1)          # sum of primes: Sum_{a <= p prime <= b} p^k
@@ -94,6 +136,7 @@ composites(a,b)             # array of composites in the range a..b
 composite_count(n)          # count of composites <= n
 composite_sum(a,b,k=1)      # sum of composites: Sum_{a <= c composite <= b} c^k
 
+squarefree_count(n)         # count of squarefree numbers <= n
 prime_power_count(n)        # count of prime powers <= n
 perfect_power_count(n)      # count of perfect powers <= n
 
@@ -107,7 +150,8 @@ sqrtmod(a,n)                # find a solution x to the congruence x^2 == a (mod 
 sqrtmod_all(a,n)            # find all solutions x to the congruence x^2 == a (mod n)
 
 sqrtQ(n)                    # square root of n as a Quadratic object
-powmod(n,k,m)               # modular exponentation: n^k (mod m)
+invmod(a,m)                 # modular inverse: a^(-1) (mod m)
+powmod(n,k,m)               # modular exponentiation: n^k (mod m)
 expnorm(n,B=10)             # exp(n) normalized to base B in interval [0,1)
 
 harmonic(n,k=1)             # n-th Harmonic number of k-th order
@@ -116,6 +160,11 @@ euler(n)                    # n-th Euler number
 
 bernoulli(n,x)              # n-th Bernoulli polynomial evaluated at x
 euler(n,x)                  # n-th Euler polynomial evaluated at x
+
+var(x,y)=solve_pell(n)      # smallest solution to Pell's equation: x^2 - n*y^2 = 1
+
+sum_of_squares(n)           # array of [x,y] solutions for representing n as: x^2 + y^2
+diff_of_squares(n)          # array of [x,y] solutions for representing n as: x^2 - y^2
 
 cyclotomic(n)               # n-th cyclotomic polynomial (as a Polynomial object)
 cyclotomic(n,x)             # n-th cyclotomic polynomial evaluated at x
@@ -151,7 +200,11 @@ is_pell_psp(n)              # true if n is a Pell pseudoprime: U_n(2, -1) = (2|n
 is_abs_euler_psp(n)         # true if n is an absolute Euler pseudoprime
 is_lucasU_psp(n,P=1,Q=-1)   # true if Lucas sequence U_n(P,Q) = 0 (mod n)
 is_lucasV_psp(n,P=1,Q=-1)   # true if Lucas sequence V_n(P,Q) = P (mod n)
-is_gaussian_prime(a,b)      # true if a+b*i is a Gaussian prime
+
+k.fermat_psp(B,a,b)         # Fermat pseudoprimes to base B with k distinct prime factors in range a..b
+k.strong_fermat_psp(B,a,b)  # strong Fermat pseudoprimes to base B with k distinct prime factors in range a..b
+k.carmichael(a,b)           # Carmichael numbers with k prime factors in range a..b
+k.lucas_carmichael(a,b)     # Lucas-Carmichael numbers with k prime factors in range a..b
 ```
 
 Additionally, here's a list of functions involving various `k-property` numbers:
@@ -184,12 +237,9 @@ k.almost_prime_sum(a,b)     # sum of k-almost primes in the range a..b
 k.powerful_sum(a,b)         # sum of k-powerful numbers in the range a..b
 k.powerfree_sum(a,b)        # sum of k-powerfree numbers in the range a..b
 k.nonpowerfree_sum(a,b)     # sum of k-nonpowerfree numbers in the range a..b
-
-k.fermat_psp(B,a,b)         # Fermat pseudoprimes to base B with k distinct prime factors in range a..b
-k.strong_fermat_psp(B,a,b)  # strong Fermat pseudoprimes to base B with k distinct prime factors in range a..b
-k.carmichael(a,b)           # Carmichael numbers with k prime factors in range a..b
-k.lucas_carmichael(a,b)     # Lucas-Carmichael numbers with k prime factors in range a..b
 ```
+
+The full documentation of each function can be read at: [https://metacpan.org/pod/Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number)
 
 # Generating sequences
 
@@ -198,16 +248,16 @@ The first `n` terms of a sequence can be easily generated by using the following
 ```ruby
 n.by {|k| ... }         # collect the first n integers >= 0 for which the block returns true
 n.of {|k| ... }         # calls the block with the first n integers >= 0 and collects the results
+```
 
-n.by({|k| ... }, a..b)  # same as n.by{...}, but in a given range a..b
-n.of({|k| ... }, a..b)  # same as n.of{...}, but in a given range a..b
+And there is also the `map` method, which maps the values in a given range to a given block, collecting the results:
 
-map(a..b, {|k| ... })   # map the values in a given range to a given block, collecting the results
-a..b -> map {|k| ... }  # same as above
+```ruby
+map(a..b, {|k| ... })   # returns an array
 {|k| ... }.map(a..b)    # same as above
 ```
 
-It's conventational in Sidef to use an implicit method call on the block argument (`_`), without storing the argument in a named variable:
+It's conventional in Sidef to use an implicit method call on the block argument (`_`), without storing the argument in a named variable:
 
 ```ruby
 # First 10 composite numbers
@@ -216,23 +266,8 @@ say 10.by { .is_composite }         #=> [4, 6, 8, 9, 10, 12, 14, 15, 16, 18]
 # Values of phi(x) in range 0..9
 say 10.of { .phi }                  #=> [0, 1, 1, 2, 2, 4, 2, 6, 4, 6]
 
-# First 10 prime numbers >= 50
-say 10.by({ .is_prime }, 50..Inf)   #=> [53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
-
-# Value of phi(x) in range 20 .. 20+10-1
-say 10.of({ .phi }, 20..Inf)        #=> [8, 12, 10, 22, 8, 20, 12, 18, 12, 28]
-
 # Values of phi(x) in range 20..30
 say map(20..30, { .phi })           #=> [8, 12, 10, 22, 8, 20, 12, 18, 12, 28, 8]
-```
-
-For example, the following four statements are all equivalent:
-
-```ruby
-say 10.by { .is_composite }
-say 10.by { is_composite(_) }
-say 10.by {|n| n.is_composite }
-say 10.by {|n| is_composite(n) }
 ```
 
 Additionally, there is also the `Math.seq()` function, that constructs an infinite lazy sequence:
@@ -254,14 +289,14 @@ func function_name(a,b,c,...) {
 }
 ```
 
-Additionally, when calling a built-in method that requires a block (`{...}`), a user-defined function name can be passed as well:
+Additionally, when calling a built-in method that requires a block (`{...}`), a user-defined function name can be provided instead:
 
 ```ruby
-func cond(n) { n.is_composite }
-say 10.by(cond)                    # first 10 composite numbers
+func my_condition(n) { n.is_composite && n.is_squarefree }
+say 10.by(my_condition)   # first 10 squarefree composite numbers
 ```
 
-In number theory, multiplicative functions are very common and can be very easily implemented using the `n.factor_prod{|p,e| ... }` method:
+Implementation of multiplicative functions can be easily done by using the `n.factor_prod{|p,e| ... }` method:
 
 ```ruby
 func exponential_sigma(n, k=1) {
@@ -273,16 +308,6 @@ func exponential_sigma(n, k=1) {
 say map(1..20, {|n| exponential_sigma(n, 1)})
 say map(1..20, {|n| exponential_sigma(n, 2)})
 say map(1..20, {|n| exponential_sigma(n, 3)})
-```
-
-Alternatively, using the `is cached` trait, which also caches the results of the function:
-
-```ruby
-func exponential_sigma(p, e, k=1) is cached {
-    e.divisors.sum {|d| p**(d*k) }
-}
-
-say map(1..20, {|n| n.factor_prod{|p,e| exponential_sigma(p,e) } })
 ```
 
 For computing the sum over a given range, we have the `sum(a..b, {|k| ... })` syntax:
@@ -305,35 +330,168 @@ func superfactorial(n) {
 say 8.of(superfactorial)   #=> [1, 1, 2, 12, 288, 34560, 24883200, 125411328000]
 ```
 
+For recursive functions there is also the `is cached` trait, which automatically caches the results of the function:
+
+```ruby
+func a(n) is cached {
+    return 1 if (n == 0)
+    -sum(^n, {|k| a(k) * binomial(n+1, k)**2 }) / (n+1)**2
+}
+
+for n in (0..30) {
+    printf("(B^S)_1(%2d) = %45s / %s\n", n, a(n) / n! -> nude)
+}
+```
+
+# Built-in classes
+
+This section briefly describes the built-in classes related to computational number theory.
+
+For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-book.pdf)).
+
+## Mod class
+
+The built-in `Mod(a,m)` class is similar to PARI/GP `Mod(a,m)` class, constructing and returning a `Mod` object:
+
+```ruby
+var a = Mod(13, 97)
+
+say a**42    # Mod(85, 97)
+say 42*a     # Mod(61, 97)
+
+say chinese(Mod(43, 19), Mod(13, 41))   # Chinese Remainder Theorem
+```
+
+## Polynomial class
+
+The built-in `Poly()` class can be used for constructing a polynomial object:
+
+```ruby
+say Poly(5)                   # monomial: x^5
+say Poly([1,2,3,4])           # x^3 + 2*x^2 + 3*x + 4
+say Poly(5 => 3, 2 => 10)     # 3*x^5 + 10*x^2
+```
+
+## Gauss class
+
+The `Gauss(a,b)` class represents a Gaussian integer of the form: `a + b*i`.
+
+```ruby
+say Gauss(3,4)**100
+say Mod(Gauss(3,4), 1000001)**100   #=> Mod(Gauss(826585, 77265), 1000001)
+
+var a = Gauss(17,19)
+var b = Gauss(43,97)
+
+say (a + b)     #=> Gauss(60, 116)
+say (a - b)     #=> Gauss(-26, -78)
+say (a * b)     #=> Gauss(-1112, 2466)
+say (a / b)     #=> Gauss(99/433, -32/433)
+```
+
+## Quadratic class
+
+The `Quadratic(a,b,w)` class represents a quadratic integer of the form: `a + b*sqrt(w)`.
+
+```ruby
+var x = Quadratic(3, 4, 5)      # represents: 3 + 4*sqrt(5)
+var y = Quadratic(6, 1, 2)      # represents: 6 + sqrt(2)
+
+say x**10               #=> (29578174649, 13203129720, 5)
+say y**10               #=> (253025888, 176008128, 2)
+
+say x.powmod(100, 97)   #=> (83, 42, 5)
+say y.powmod(100, 97)   #=> (83, 39, 2)
+```
+
+## Quaternion class
+
+The `Quaternion(a,b,c,d)` class represents a quaternion integer of the form: `a + b*i + c*j + d*k`.
+
+```ruby
+var a = Quaternion(1,2,3,4)
+var b = Quaternion(5,6,7,8)
+
+say (a + b)         #=> Quaternion(6, 8, 10, 12)
+say (a - b)         #=> Quaternion(-4, -4, -4, -4)
+say (a * b)         #=> Quaternion(-60, 12, 30, 24)
+say (b * a)         #=> Quaternion(-60, 20, 14, 32)
+say (a / b)         #=> Quaternion(35/87, 4/87, 0, 8/87)
+
+say a**5                #=> Quaternion(3916, 1112, 1668, 2224)
+say a.powmod(43, 97)    #=> Quaternion(61, 38, 57, 76)
+say a.powmod(-5, 43)    #=> Quaternion(11, 22, 33, 1)
+```
+
+## Matrix class
+
+The `Matrix()` class builds and returns a Matrix object, which supports various arithmetical operations:
+
+```ruby
+var A = Matrix(
+    [2, -3,  1],
+    [1, -2, -2],
+    [3, -4,  1],
+)
+
+var B = Matrix(
+    [9, -3, -2],
+    [3, -1,  7],
+    [2, -4, -8],
+)
+
+say (A + B)     # matrix addition
+say (A - B)     # matrix subtraction
+say (A * B)     # matrix multiplication
+say (A / B)     # matrix division
+
+say (A + 42)    # matrix-scalar addition
+say (A - 42)    # matrix-scalar subtraction
+say (A * 42)    # matrix-scalar multiplication
+say (A / 42)    # matrix-scalar division
+
+say A**20               # matrix exponentiation
+say A**-1               # matrix inverse: A^-1
+say A**-2               # (A^2)^-1
+say A.powmod(43, 97)    # modular matrix exponentiation
+
+say B.det             # matrix determinant
+say B.solve([1,2,3])  # solve a system of linear equations
+```
+
 # Computing OEIS sequences
 
 Sidef is particularly useful in quickly generating various sequences, which can then be searched in the [OEIS](https://oeis.org) for finding more information about them:
 
 ```ruby
 say map(1..50, { .mu })
+say map(1..50, { .mertens })
 say map(1..50, { .tau })
 say map(1..50, { .pi })
-say map(1..50, { .mertens })
+say map(1..50, { .liouville })
+say map(1..50, { .liouville_sum })
+say map(1..50, { .exp_mangoldt })
 say map(1..50, { .sopfr })
 say map(1..50, { .sopf })
 say map(1..50, { .gpf })
 say map(1..50, { .lpf })
 say map(1..50, { .gpf_sum })
 say map(1..50, { .lpf_sum })
+say map(1..50, { .rad })
 say map(1..50, { .core })
 
 say map(1..50, { .composite_count })
 say map(1..50, { .prime_power_count })
 say map(1..50, { .perfect_power_count })
 
-say map(1..50, { 2.omega_prime_count(_) })
-say map(1..50, { 3.omega_prime_count(_) })
+say map(1..50, {|n| 2.omega_prime_count(n) })
+say map(1..50, {|n| 3.omega_prime_count(n) })
 
-say map(1..50, { 2.almost_prime_count(_) })
-say map(1..50, { 3.almost_prime_count(_) })
+say map(1..50, {|n| 2.almost_prime_count(n) })
+say map(1..50, {|n| 3.almost_prime_count(n) })
 
-say map(1..50, { 2.squarefree_almost_prime_count(_) })
-say map(1..50, { 3.squarefree_almost_prime_count(_) })
+say map(1..50, {|n| 2.squarefree_almost_prime_count(n) })
+say map(1..50, {|n| 3.squarefree_almost_prime_count(n) })
 
 say 30.of { .dirichlet_convolution({.mu}, {_}) }
 say 30.of { .dirichlet_convolution({.phi}, {.mu}) }
@@ -357,6 +515,7 @@ say 30.by { .is_palindrome }
 say 30.by { .is_palindrome(2) }
 
 say map(1..30, { .nth_prime })
+say map(1..30, { .nth_composite })
 say map(1..30, { .nth_prime_power })
 say map(1..30, { .nth_perfect_power })
 say map(1..30, { .nth_composite })
@@ -371,6 +530,27 @@ say map(1..30, { .nth_powerfree(2) })
 say map(1..30, { .nth_powerfree(4) })
 say map(1..30, { .nth_nonpowerfree(2) })
 say map(1..30, { .nth_nonpowerfree(4) })
+say map(1..30, { .nth_almost_prime(3) })
+say map(1..30, { .nth_omega_prime(3) })
+say map(1..30, { .nth_squarefree_almost_prime(3) })
+
+say 10.of {|n| prime_sum(10**n) }
+say 10.of {|n| composite_sum(10**n) }
+say 10.of {|n| prime_sum(1, 10**n, 2) }
+say 10.of {|n| composite_sum(1, 10**n, 2) }
+say 10.of {|n| squarefree_sum(10**n) }
+
+say 10.of {|n| nth_prime(10**n) }
+say 10.of {|n| nth_composite(10**n) }
+say 10.of {|n| nth_semiprime(10**n) }
+say 10.of {|n| nth_squarefree(10**n) }
+say 10.of {|n| nth_almost_prime(10**n, 2) }
+say 10.of {|n| nth_omega_prime(10**n, 2) }
+say 10.of {|n| nth_squarefree_almost_prime(10**n, 2) }
+
+say 30.of {|n| 2.almost_prime_sum(n) }
+say 30.of {|n| 2.omega_prime_sum(n) }
+say 30.of {|n| 2.squarefree_almost_prime_sum(n) }
 
 say 50.of { .hclassno.nu }
 say 50.of { .hclassno.de }
@@ -392,23 +572,25 @@ say 30.of {|n| pyramidal(n, 5) }    # pentagonal pyramidal numbers
 say 30.of {|n| centered_polygonal(n, 3) }   # centered triangular numbers
 say 30.of {|n| centered_polygonal(n, 6) }   # centered hexagonal numbers
 
-say 15.of { .fib }
-say 15.of { .fib(3) }
-say 15.of { .lucas }
+say 30.of { .fib }
+say 30.of { .fib(3) }
+say 30.of { .lucas }
 say 25.of { .motzkin }
 say 20.of { .fubini }
 say 20.of { .bell }
-say 15.of { .factorial }
-say 15.of { .subfactorial }
-say 15.of { .subfactorial(2) }
-say 15.of { .left_factorial }
-say 15.of { .primorial }
+say 20.of { .factorial }
+say 20.of { .subfactorial }
+say 20.of { .subfactorial(2) }
+say 20.of { .left_factorial }
+say 25.of { .primorial }
+say 15.of { .pn_primorial }
 
 say map(1..30, { .ramanujan_tau })
 say map(1..15, { .secant_number })
 say map(1..15, { .tangent_number })
 
 say 15.of {|n| 3.rough_part(n!) }
+say 15.of {|n| 3.smooth_part(n!) }
 say 10.of {|k| semiprime(10**k) }
 say 20.of {|k| semiprime_count(2**k) }
 say 20.of {|n| 13.smooth_count(10**n) }
@@ -421,6 +603,9 @@ say 50.of { .collatz }
 say 50.of { .flip }
 say 50.of { .flip(2) }
 say 50.of { .digital_root }
+
+say 50.of {|n| n.factor_prod {|p,e| p*e } }
+say 50.of {|n| n.divisor_sum {|d| phi(d) * sigma(n/d) } }
 
 say 25.of {|n| euler_number(n) }
 say 20.of {|n| bernoulli(2*n).nu }
@@ -441,17 +626,21 @@ say 50.of {|n| polygonal(-n, 5) }  # second pentagonal numbers
 say 25.of { .mfac(2) }    # double-factorials
 say 25.of { .mfac(3) }    # triple-factorials
 
-say 50.of { 2.powerfree_part(_) }       # squarefree part of n
-say 50.of { 3.powerfree_part(_) }       # cubefree part of n
+say 30.of {|n| n.primitive_part({.fib}) }
+say 30.of {|n| 2.powerfree_part_sum(n) }
+say 30.of {|n| 3.powerfree_part_sum(n) }
 
-say 50.of { 2.powerfree_sigma(_) }
-say 50.of { 3.powerfree_sigma(_) }
+say 50.of {|n| 2.powerfree_part(n) }       # squarefree part of n
+say 50.of {|n| 3.powerfree_part(n) }       # cubefree part of n
 
-say 50.of { 2.powerfree_usigma(_) }
-say 50.of { 2.powerfree_usigma(_, 2) }
+say 50.of {|n| 2.powerfree_sigma(n) }
+say 50.of {|n| 3.powerfree_sigma(n) }
 
-say 50.of { 2.power_sigma(_) }
-say 50.of { 3.power_sigma(_) }
+say 50.of {|n| 2.powerfree_usigma(n) }
+say 50.of {|n| 2.powerfree_usigma(n, 2) }
+
+say 50.of {|n| 2.power_sigma(n) }
+say 50.of {|n| 3.power_sigma(n) }
 
 say 20.by { .is_llr_prime(3) }     # numbers n such that 2^n * 3 - 1 is prime
 say 20.by { .is_proth_prime(3) }   # numbers n such that 2^n * 3 + 1 is prime
@@ -522,11 +711,298 @@ say 15.by { .is_composite && .is_lucasU_psp }
 say 15.by { .is_composite && .is_lucasV_psp }
 ```
 
+# Finding closed-form to sequences
+
+Given an unknown sequence of integers, we can try to find a closed-form to it, by using polynomial interpolation, which is built into Sidef as `Array.solve_seq()`:
+
+```ruby
+say [0, 1, 4, 9, 16, 25, 36, 49, 64, 81].solve_seq      # x^2
+say [0, 1, 33, 276, 1300, 4425, 12201].solve_seq        # 1/6*x^6 + 1/2*x^5 + 5/12*x^4 - 1/12*x^2
+```
+
+Additionally, we can try to find a linear-recurrence to a sequence, using `Array.solve_rec_seq()`:
+
+```ruby
+say [0, 0, 1, 1, 2, 4, 7, 13, 24, 44, 81, 149].solve_rec_seq      # [1, 1, 1]
+say [0, 1, 9, 36, 100, 225, 441, 784, 1296, 2025].solve_rec_seq   # [5, -10, 10, -5, 1]
+```
+
+The returned linear-recurrence signature can be passed to `Math.linear_rec(signature, initial_terms, from, to)` for efficiently computing the terms in a given range or only the n-th term of the sequence:
+
+```ruby
+say Math.linear_rec([1, 1, 1], [0, 0, 1], 0, 20)    # terms in range 0..20
+say Math.linear_rec([1, 1, 1], [0, 0, 1], 1000)     # only the 1000-th term
+```
+
+If only the remainder is needed, we can use `Math.linear_recmod(signature, initial_terms, n, m)`, which efficiently computes the n-th term modulo `m`:
+
+```ruby
+say Math.linear_recmod([5, -10, 10, -5, 1], [0, 1, 9, 36, 100], 2**128, 10**10)   # (2^128)-th term modulo 10^10
+```
+
+# OEIS autoload
+
+[OEIS autoload](https://github.com/trizen/oeis-autoload) is a Sidef command-line tool and a library that implements support for using [OEIS](https://oeis.org) sequences as functions.
+
+The source-code files can be downloaded from:
+
+* backend library: https://raw.githubusercontent.com/trizen/oeis-autoload/main/OEIS.sm
+* command-line tool: https://raw.githubusercontent.com/trizen/oeis-autoload/main/oeis.sf
+
+After downloading the above two files, we can execute:
+
+```console
+$ sidef oeis.sf 'A060881(n)' 0 9    # print the first 10 terms of A060881
+```
+
+Several other usage examples:
+
+```console
+$ sidef oeis.sf 'A033676(n)^2 + A033677(n)^2'              # first 10 terms
+$ sidef oeis.sf 'A033676(n)^2 + A033677(n)^2' 5            # 5-th term
+$ sidef oeis.sf 'A033676(n)^2 + A033677(n)^2' 5 20         # terms 5..20
+```
+
+The ID of a [OEIS](https://oeis.org) sequence can be called like any other function:
+
+```console
+$ sidef oeis.sf 'sum(1..n, {|k| A000330(k) })'
+$ sidef oeis.sf 'sum(0..n, {|k| A048994(n, k) * A048993(n+k, n) })'
+```
+
+The `OEIS.sm` library can also be used inside Sidef scripts, by placing it in the same directory with the script:
+
+```ruby
+include OEIS
+say map(1..10, {|k| A000330(k) })
+```
+
 # Non-trivial OEIS sequences
 
-Sidef was extensively used over the years in extending various [OEIS](https://oeis.org) sequences that had the keyword `more` and/or `hard`.
+Sidef was extensively used over the years in extending various [OEIS](https://oeis.org) sequences that had the `more` and/or `hard` keywords.
 
 In this section we present several code examples that compute non-trivial [OEIS](https://oeis.org) sequences.
+
+## Generation of pseudoprimes
+
+---
+
+* **[A007011](https://oeis.org/A007011)**
+
+Smallest pseudoprime to base `2` with `n` prime factors.
+
+```ruby
+func A007011(n) {
+    return nil if (n < 2)
+
+    var x = pn_primorial(n)
+    var y = 2*x
+
+    loop {
+        var arr = n.fermat_psp(2, x, y)
+        return arr[0] if arr
+        x = y+1
+        y = 2*x
+    }
+}
+
+for n in (2..100) { print(A007011(n), ", ") }
+```
+
+**NOTE:** there is also the `n.squarefree_fermat_psp(base, x, y)` method, which is slightly faster.
+
+---
+
+* **[A180065](https://oeis.org/A180065)**
+
+Smallest strong pseudoprime to base `2` with `n` prime factors.
+
+```ruby
+func A180065(n) {
+    return nil if (n < 2)
+
+    var x = pn_primorial(n)
+    var y = 2*x
+
+    loop {
+        var arr = n.strong_fermat_psp(2, x, y)
+        return arr[0] if arr
+        x = y+1
+        y = 2*x
+    }
+}
+
+for n in (2..100) { print(A180065(n), ", ") }
+```
+
+**NOTE:** there is also the `n.squarefree_strong_fermat_psp(base, x, y)` method, which is slightly faster.
+
+---
+
+* **[A271874](https://oeis.org/A271874)**
+
+Smallest Fermat pseudoprime to base `n` with `n` distinct prime factors.
+
+```ruby
+func A271874(n, k=n) {
+    return nil if (n < 2)
+
+    var x = pn_primorial(k)
+    var y = 2*x
+
+    loop {
+        var arr = k.fermat_psp(n,x,y)
+        return arr[0] if arr
+        x = y+1
+        y = 2*x
+    }
+}
+
+for n in (2..100) { print(A271874(n), ", ") }
+```
+
+---
+
+* **[A271873](https://oeis.org/A271873)**
+
+Square array `A(n, k)` read by antidiagonals downwards: smallest Fermat pseudoprime to base `n` with `k` distinct prime factors for `k`, `n` >= `2`.
+
+```ruby
+{|x| {|y| A271874(x,y) }.map(2..10) }.map(2..10).each { .say }  # takes 0.5 seconds
+```
+
+(reusing the `A271874(n,k)` function defined above)
+
+---
+
+* **[A006931](https://oeis.org/A006931)**
+
+Least Carmichael number with `n` prime factors.
+
+```ruby
+func A006931(n) {
+    return nil if (n < 3)
+
+    var x = pn_primorial(n+1)/2
+    var y = 3*x
+
+    loop {
+        var arr = n.carmichael(x,y)
+        return arr[0] if arr
+        x = y+1
+        y = 3*x
+    }
+}
+
+for n in (3..100) { print(A006931(n), ", ") }
+```
+
+---
+
+* **[A216928](https://oeis.org/A216928)**
+
+Least Lucas-Carmichael number with `n` prime factors.
+
+```ruby
+func A216928(n) {
+    return nil if (n < 3)
+
+    var x = pn_primorial(n+1)/2
+    var y = 3*x
+
+    loop {
+        var arr = n.lucas_carmichael(x,y)
+        return arr[0] if arr
+        x = y+1
+        y = 3*x
+    }
+}
+
+for n in (3..100) { print(A216928(n), ", ") }
+```
+
+---
+
+* **[A356866](https://oeis.org/A356866)**
+
+Smallest Carmichael number ([A002997](https://oeis.org/A002997)) with `n` prime factors that is also a strong pseudoprime to base `2` ([A001262](https://oeis.org/A001262)).
+
+```ruby
+func A356866(n) {
+    return nil if (n < 3)
+
+    var x = pn_primorial(n+1)/2
+    var y = 3*x
+
+    loop {
+        var arr = n.strong_fermat_carmichael(2,x,y)
+        return arr[0] if arr
+        x = y+1
+        y = 3*x
+    }
+}
+
+for n in (3..100) { print(A356866(n), ", ") }
+```
+
+---
+
+## Numbers with `n` prime factors
+
+---
+
+* **[A219018](https://oeis.org/A219018)**
+
+Smallest `k > 1` such that `k^n + 1` has exactly `n` distinct prime factors.
+
+```ruby
+func A219018(n) {
+    for k in (1..Inf) {
+        var v = (k**n + 1)
+        v.is_omega_prime(n) || next
+        return k
+    }
+}
+
+for n in (1..100) { print(A219018(n), ", ") }
+```
+
+---
+
+* **[A219019](https://oeis.org/A219019)**
+
+Smallest `k > 1` such that `k^n - 1` has exactly `n` distinct prime divisors.
+
+```ruby
+func A219019(n) {
+    for k in (1..Inf) {
+        var v = (k**n - 1)
+        v.is_omega_prime(n) || next
+        return k
+    }
+}
+
+for n in (1..100) { print(A219019(n), ", ") }
+```
+
+---
+
+* **[A359070](https://oeis.org/A359070)**
+
+Smallest `k > 1` such that `k^n - 1` is the product of `n` distinct primes.
+
+```ruby
+func A359070(n) {
+    for k in (1..Inf) {
+        is_squarefree(k-1) || next
+        var v = (k**n - 1)
+        v.is_squarefree_almost_prime(n) || next
+        return k
+    }
+}
+
+for n in (1..100) { print(A359070(n), ", ") }
+```
 
 ---
 
@@ -605,7 +1081,7 @@ for n in (1..100) { print(A280005(n), ", ") }
 
 * **[A358863](https://oeis.org/A358863)**
 
-`a(n)` is the smallest `n`-gonal number with exactly `n` prime factors (counted with multiplicity).
+`a(n)` is the smallest n-gonal number with exactly `n` prime factors (counted with multiplicity).
 
 ```ruby
 func A358863(n) {
@@ -622,7 +1098,7 @@ for n in (3..100) { print(A358863(n), ", ") }
 Alternative solution:
 
 ```ruby
-func A358863(n, from = 2, upto = 2*from) {
+func A358863(n, from = 2**n, upto = 2*from) {
     loop {
         n.almost_primes(from, upto).each {|v|
             v.is_polygonal(n) || next
@@ -640,7 +1116,7 @@ for n in (3..100) { print(A358863(n), ", ") }
 
 * **[A358865](https://oeis.org/A358865)**
 
-`a(n)` is the smallest `n`-gonal pyramidal number with exactly `n` prime factors (counted with multiplicity).
+`a(n)` is the smallest n-gonal pyramidal number with exactly `n` prime factors (counted with multiplicity).
 
 ```ruby
 func A358865(n) {
@@ -658,7 +1134,7 @@ for n in (3..100) { print(A358865(n), ", ") }
 
 * **[A358862](https://oeis.org/A358862)**
 
-`a(n)` is the smallest `n`-gonal number with exactly `n` distinct prime factors.
+`a(n)` is the smallest n-gonal number with exactly `n` distinct prime factors.
 
 ```ruby
 func A358862(n) {
@@ -675,7 +1151,7 @@ for n in (3..100) { print(A358862(n), ", ") }
 Alternative solution:
 
 ```ruby
-func A358862(n, from = 2, upto = 2*from) {
+func A358862(n, from = n.pn_primorial, upto = 2*from) {
     loop {
         n.omega_primes(from, upto).each {|v|
             v.is_polygonal(n) || next
@@ -693,7 +1169,7 @@ for n in (3..100) { print(A358862(n), ", ") }
 
 * **[A358864](https://oeis.org/A358864)**
 
-`a(n)` is the smallest `n`-gonal pyramidal number with exactly `n` distinct prime factors.
+`a(n)` is the smallest n-gonal pyramidal number with exactly `n` distinct prime factors.
 
 ```ruby
 func A358864(n) {
@@ -709,38 +1185,585 @@ for n in (3..100) { print(A358864(n), ", ") }
 
 ---
 
-* **[A219019](https://oeis.org/A219019)**
+* **[A127637](https://oeis.org/A127637)**
 
-Smallest positive number `k` such that `k^n - 1` contains `n` distinct prime divisors.
+Smallest squarefree triangular number with exactly `n` prime factors.
 
 ```ruby
-func A219019(n) {
-    for k in (1..Inf) {
-        var v = (k**n - 1)
-        v.is_omega_prime(n) || next
-        return k
+func A127637(n, from = n.pn_primorial, upto = 2*from) {
+    loop {
+        n.squarefree_almost_primes(from, upto).each {|v|
+            v.is_polygonal(3) || next
+            return v
+        }
+        from = upto+1
+        upto *= 2
     }
 }
 
-for n in (1..100) { print(A219019(n), ", ") }
+for n in (1..100) { print(A127637(n), ", ") }
 ```
 
 ---
 
-*TODO*: add examples on how to compute the smallest {Carmichael,Lucas-Carmichael,Fermat,strong Fermat} number with `n` prime factors.
+* **[A239696](https://oeis.org/A239696)**
 
-# Finding closed-form of sequences
+Smallest number `m` such that `m` and `reverse(m)` each have `n` distinct prime factors.
 
-*TODO*
+```ruby
+func A239696(n, from = n.pn_primorial, upto = 2*from) {
+    loop {
+        n.omega_primes(from, upto).each {|v|
+            v.reverse.is_omega_prime(n) || next
+            return v
+        }
+        from = upto+1
+        upto *= 2
+    }
+}
 
-# Advanced number theory functions
+for n in (1..100) { print(A239696(n), ", ") }
+```
 
-*TODO*
+---
+
+* **[A291138](https://oeis.org/A291138)**
+
+`a(n)` is the smallest `k` such that `psi(k)` and `phi(k)` have same distinct prime factors when `k` is the product of `n` distinct primes, or `0` if no such `k` exists.
+
+```ruby
+func A291138(n, from = n.pn_primorial, upto = 2*from) {
+    loop {
+        n.squarefree_almost_primes_each(from, upto, {|v|
+            var a = v.phi
+            var b = v.psi
+            a.is_smooth_over_prod(b) || next
+            b.is_smooth_over_prod(a) || next
+            return v
+        })
+        from = upto+1
+        upto *= 2
+    }
+}
+
+for n in (1..100) { print(A291138(n), ", ") }
+```
+
+---
+
+## Inverse of multiplicative functions
+
+---
+
+* **[A329660](https://oeis.org/A329660)**
+
+Numbers `m` such that `sigma(m)` is a Lucas number ([A000032](https://oeis.org/A000032)), where `sigma(m)` is the sum of divisors of `m` ([A000203](https://oeis.org/A000203)).
+
+```ruby
+for k in (1..1000) {
+    var arr = k.lucas.inverse_sigma
+    print(arr.join(", "), ", ") if arr
+}
+```
+
+---
+
+* **[A291487](https://oeis.org/A291487)**
+
+`a(n)` is the smallest `k` such that `psi(k) = n!`, or `0` if no such `k` exists (`psi(k) =` [A001615](https://oeis.org/A001615)(k)).
+
+```ruby
+for k in (1..100) {
+    print(k!.inverse_psi_min || 0, ", ")
+}
+```
+
+---
+
+* **[A291356](https://oeis.org/A291356)**
+
+`a(n)` is the smallest `k` such that `usigma(k) =` [A002110](https://oeis.org/A002110)(n), or `0` if no such `k` exists.
+
+```ruby
+for k in (1..100) {
+    print(k.pn_primorial.inverse_usigma.first || 0, ", ")
+}
+```
+
+---
+
+## Counting functions
+
+---
+
+* **[A106629](https://oeis.org/A106629)**
+
+Number of positive integers `<= 10^n` that are divisible by no prime exceeding `13`.
+
+```ruby
+for n in (0..100) {
+    print(13.smooth_count(10**n), ", ")
+}
+```
+
+---
+
+* **[A116429](https://oeis.org/A116429)**
+
+The number of n-almost primes less than or equal to `9^n`, starting with `a(0)=1`.
+
+```ruby
+for n in (0..100) {
+    print(n.almost_prime_count(9**n), ", ")
+}
+```
+
+---
+
+## Misc sequences
+
+---
+
+* **[A323697](https://oeis.org/A323697)**
+
+Primes `p` such that the norm of the quadratic-field analog of Mersenne numbers `M_{p,alpha} = (alpha^p - 1)/(alpha - 1)`, with `alpha = 2 + sqrt(2)`, is a rational prime.
+
+```ruby
+var alpha = (2 + sqrtQ(2))    # creates a Quadratic integer
+
+each_prime(2, 1e6, {|p|
+    var k = norm((alpha**p - 1) / (alpha-1))
+    print(p, ", ") if k.is_prime
+})
+```
+
+---
+
+* **[A061682](https://oeis.org/A061682)**
+
+Length of period of continued fraction expansion of square root of `(2^(2n+1)+1)`.
+
+```ruby
+for n in  (2..100) {
+    print(sqrt_cfrac_period_len(2**(2*n + 1) + 1), ", ")
+}
+```
+
+---
+
+* **[A139822](https://oeis.org/A139822)**
+
+Denominator of `BernoulliB(10^n)`.
+
+```ruby
+func bernoulli_denominator(n) {   # Von Staudt-Clausen theorem
+
+    return 1 if (n == 0)
+    return 2 if (n == 1)
+    return 1 if n.is_odd
+
+    n.divisors.grep {|d| is_prime(d+1) }.prod {|d| d+1 }
+}
+
+for n in (0..10) { print(bernoulli_denominator(10**n), ", ") }
+```
+
+---
+
+* **[A071255](https://oeis.org/A071255)**
+
+`a(1) = 2`, `a(n+1) = a(n)`-th squarefree number.
+
+```ruby
+var n = 1
+var prev = n+1
+
+for (1..100) {
+    n = nth_squarefree(n+1)
+    assert_eq(n.squarefree_count, prev)
+    print(n, ", ")
+    prev = n+1
+}
+```
+
+---
+
+* **[A037274](https://oeis.org/A037274)**
+
+Home primes: for `n >= 2`, `a(n) =` the prime that is finally reached when you start with `n`, concatenate its prime factors ([A037276](https://oeis.org/A037276)) and repeat until a prime is reached (`a(n) = -1` if no prime is ever reached).
+
+```ruby
+func A037274(n) {
+    return n if (n < 2)
+    loop {
+        n = Num(n.factor.join)
+        break if n.is_prime
+    }
+    return n
+}
+
+for n in (1..100) { print(A037274(n), ", ") }
+```
+
+---
+
+* **[A359492](https://oeis.org/A359492)**
+
+`a(n)` is the least number of the form `p^2 + q^2 - 2` for primes `p` and `q` that is an odd prime times `2^n`, or `-1` if there is no such number.
+
+```ruby
+func A359492(n) {
+    var t = 2**n
+    for (var p = 3; true; p.next_prime!) {
+        if (sum_of_squares(t*p + 2).any {.all_prime}) {
+            return (t*p)
+        }
+    }
+}
+
+for n in (3..100) { print(A359492(n), ", ") }
+```
+
+---
+
+* **[A357435](https://oeis.org/A357435)**
+
+`a(n)` is the least prime `p` such that `p^2+4` is a prime times `5^n`.
+
+```ruby
+func A357435(n, solution = Inf) {
+    var m = 5**n
+
+    for x in (modular_quadratic_formula(1, 0, 4, m)) {
+
+        x > solution && break
+
+        for k in (0 .. Inf) {
+            var p = (m*k + x)
+
+            p > solution && break
+            p.is_prime || next
+
+            var u = (p**2 + 4)
+            u.is_power_of(5) || u.remdiv(5).is_prime || next
+
+            var v = (u.valuation(5) - (u.is_power_of(5) ? 1 : 0))
+
+            if (v == n) {
+                solution = min(p, solution)
+            }
+        }
+    }
+
+    return solution
+}
+
+for n in (0..100) { print(A357435(n), ", ") }
+```
+
+---
 
 # Making Sidef faster
 
-*TODO*
+It's possible to make certain functions faster, by using external tools and resources, such as [FactorDB](http://factordb.com), [YAFU](https://github.com/bbuhrow/yafu), [PARI/GP](http://pari.math.u-bordeaux.fr/), [primecount](https://github.com/kimwalisch/primecount) and [primesum](https://github.com/kimwalisch/primesum), which can be enabled in the following lines of code (which must be placed at the top of a program):
 
-# State-of-the-art performance
+```ruby
+Num!USE_YAFU       = false      # true to use YAFU for factoring large integers
+Num!USE_PARI_GP    = false      # true to use PARI/GP in several functions
+Num!USE_FACTORDB   = false      # true to use factordb.com for factoring large integers
+Num!USE_PRIMESUM   = false      # true to use Kim Walisch's primesum in prime_sum(n)
+Num!USE_PRIMECOUNT = false      # true to use Kim Walisch's primecount in prime_count(n)
+```
 
-*TODO*
+When these external tools and resources are being used, some debug information is printed out, which can be seen by setting:
+
+```ruby
+Num!VERBOSE = true      # true to enable verbose/debug
+```
+
+Here's an example using [FactorDB](http://factordb.com) to retrieve the prime factorization of a large integer:
+
+```ruby
+Num!VERBOSE = true
+Num!USE_FACTORDB = true
+say factor(43**97 + 1)
+```
+
+Alternatively, the features can be enabled from the command-line as well, using the `-N` option:
+
+```console
+$ sidef -N "VERBOSE=1; USE_FACTORDB=1;" script.sf
+```
+
+It's also highly recommended to install the [Math::Prime::Util](https://metacpan.org/pod/Math::Prime::Util) Perl module, which provides great performance in many functions for native integers.
+
+If possible, the [GitHub version](https://github.com/danaj/Math-Prime-Util) is recommended instead, which includes some new functionality and optimizations not yet released on MetaCPAN:
+
+```console
+$ cpanm --sudo -nv https://github.com/danaj/Math-Prime-Util/archive/refs/heads/master.zip
+```
+
+# Integer factorization
+
+Sidef includes over `20` special-purpose integer factorization methods, which are combined under a single function:
+
+```ruby
+special_factor(n, effort=1)     # tries to find special factors of n
+```
+
+The `special_factor(n)` function efficiently tries to find special factors (not necessarily prime) of a large integer `n`, using various special-purpose factorization methods, such as:
+
+* Trial division
+* Fermat factorization method
+* HOLF method
+* Pell factorization method
+* Phi-finder method
+* Difference of powers method
+* Congruence of powers method
+* Miller factorization method
+* Lucas factorization method
+* Fibonacci factorization method
+* FLT factorization method
+* Pollard's p-1 method
+* Pollard's rho method
+* Williams' p+1 method
+* Chebyshev factorization method
+* Cyclotomic factorization method
+* Lenstra's Elliptic Curve Method.
+
+Some of these special-purpose factorization methods are described in [this blog post](https://trizenx.blogspot.com/2019/08/special-purpose-factorization-algorithms.html).
+
+By providing an integer argument for `effort` greater than `1`, the function increases the amount of tries accordingly, before giving up. For example, `special_factor(n, 2)` will double the number of tries.
+
+The method returns an array with the factors of `n`. The product of the factors will give back `n`, but some factors may be composite.
+
+Here are some examples where `special_factor(n)` excels:
+
+```ruby
+say special_factor(lucas(480))                   # finds all prime factors, taking 0.01s
+say special_factor(fibonacci(480))               # finds all prime factors, taking 0.01s
+say special_factor(fibonacci(361)**2 + 1)        # finds all prime factors, taking 0.05s
+
+say special_factor(2**512 - 1)                   # finds 12 factors, taking 1.5s
+say special_factor(10**122 - 15**44)             # finds all prime factors, taking 0.1s
+say special_factor(17**48 + 17**120)             # finds all prime factors, taking 0.1s
+say special_factor((3**120 + 1) * (5**240 - 1))  # finds all prime factors, taking 0.1s
+
+say special_factor(181490268975016506576033519670430436718066889008242598463521)
+say special_factor(173315617708997561998574166143524347111328490824959334367069087)
+say special_factor(5373477536385214579076118706681399189136056405078551802232403683)
+say special_factor(57981220983721718930050466285761618141354457135475808219583649146881)
+say special_factor(2425361208749736840354501506901183117777758034612345610725789878400467)
+say special_factor(2828427124746190097638422773161207685721457240278848640927457308905928537636961)
+say special_factor(90000000000000000000000000000000000002689807631151675321570673859864194363258374661)
+say special_factor(1000000000000000000000110940350000000000000004102587086035000000000050571383025434301)
+say special_factor(178558027781611975691578574219321581742259878171663349730859376950932642242171853408904221)
+say special_factor(6384263073451390405968126023273631892411500902402571736234793541658288688275134678964387652)
+say special_factor(1000000000000000000000000000367000000000000000000000000038559000000000000000000000001190673)
+say special_factor(999999999999999999999999999977900000000000000000000000000143909999999999999999999999999752869)
+```
+
+The function `special_factor(n)` is also used internally in `factor(n)` for large enough `n`, making all the number theory functions, that depend on the factorization of `n`, very fast for special values of `n`.
+
+Additionally, the following special-purpose factorization methods can be used individually:
+
+```ruby
+n.trial_factor(limit)               # Trial division
+n.fermat_factor(k=1e4)              # Fermat factorization method
+n.holf_factor(tries=1e4)            # HOLF method
+n.dop_factor(tries=n.ilog2)         # Difference of powers method
+n.cop_factor(tries=n.ilog2)         # Congruence of powers method
+n.cyclotomic_factor(bases...)       # Cyclotomic factorization method
+n.ecm_factor(B1, curves)            # Elliptic curve method
+n.fib_factor(upto = 2*n.ilog2)      # Fibonacci factorization method
+n.flt_factor(base=2, tries=1e4)     # Fermat's Little Theorem method
+n.miller_factor(tries=100)          # Miller factorization method
+n.lucas_factor(j=1, tries=100)      # Lucas factorization method
+n.mbe_factor(tries=10)              # Modular Binary Exponentiation method
+n.prho_factor(tries)                # Pollard's rho factorization method
+n.pbrent_factor(tries)              # Pollard-Brent factorization method
+n.pell_factor(tries=1e4)            # Pell factorization method
+n.phi_finder_factor(tries=1e4)      # Phi-finder method
+n.pm1_factor(B)                     # Pollard's p-1 method
+n.pp1_factor(B)                     # Williams' p+1 method
+n.chebyshev_factor(B,x)             # Chebyshev T factorization method
+n.squfof_factor(tries=1e4)          # Shanks’ square forms method
+n.qs_factor                         # Quadratic sieve factorization
+```
+
+# Inverse of multiplicative functions
+
+Based on methods presented by [Max Alekseyev](https://cs.uwaterloo.ca/journals/JIS/VOL19/Alekseyev/alek5.html), Sidef implements support for computing the inverse of the following functions:
+
+* The divisor sum function: `sigma_k(n)`
+* Euler's totient function: `phi(n)`
+* Dedekind's Psi function: `psi(n)`
+* Unitary totient function: `uphi(n)`
+* Unitary sigma function: `usigma(n)`
+
+Example:
+
+```ruby
+var n = 252
+say inverse_phi(n)          #=> [301, 381, 387, 441, 508, 602, 762, 774, 882]
+say inverse_psi(n)          #=> [130, 164, 166, 205, 221, 251]
+say inverse_sigma(n)        #=> [96, 130, 166, 205, 221, 251]
+say inverse_uphi(n)         #=> [296, 301, 320, 381, 456, 516, 602, 762]
+say inverse_usigma(n)       #=> [130, 166, 205, 216, 221, 251]
+```
+
+Additionally, there are functions for computing only the minimum or the maximum value, as well as only the number of solutions, all of which can be computed more efficiently than generating all the solutions:
+
+```ruby
+var n = 15!
+
+say inverse_sigma_len(n)        #=> 910254
+say inverse_sigma_min(n)        #=> 264370186080
+say inverse_sigma_max(n)        #=> 1307672080867
+
+say inverse_phi_len(n)          #=> 2852886
+say inverse_phi_min(n)          #=> 1307676655073
+say inverse_phi_max(n)          #=> 7959363061650
+
+say inverse_psi_len(n)          #=> 1162269
+say inverse_psi_min(n)          #=> 370489869750
+say inverse_psi_max(n)          #=> 1307672080867
+```
+
+# Where Sidef excels
+
+This section includes several examples in which Sidef does very well in terms of performance.
+
+## Identification of k-almost primes
+
+The following `3` functions use efficient trial-division (based on primorials) to obtain a bound `B`, trying to disprove that `n` has a given number of prime factors:
+
+```ruby
+n.is_almost_prime(k)                # true if Omega(n) == k
+n.is_omega_prime(k)                 # true if omega(n) == k
+n.is_squarefree_almost_prime(k)     # true if omega(n) == k and n is squarefree
+```
+
+In order for `n` to have at least `k` prime factors, without having any prime factors less than `B`, it implies that `n` must be greater than `B^k`, since all the prime factors of `n` are greater than or equal to `B`.
+
+Additionally, the function also calls `special_factor(n)` internally and returns early when the composite part of `n` is smaller than the required bound for it to have `k-j` prime factors.
+
+A massive speed improvement would be using ECM with conjectured bounds to push `B` much higher than we can achieve with trial-division. This would allow us to reject many numbers faster. But that approach would be based on unproved conjectures and therefore is not implemented.
+
+Another conjectured approach would be using Pollard's rho method to find a larger bound for `B`, which requires `O(sqrt(B))` steps to find a prime factor less than `B`. Therefore, if we take `B = 10^12`, after `c*10^6` iterations of the Pollard rho method without success in finding a prime factor of `n`, it's very probable that `n` has no prime factor less than `10^12`. This approach is also not implemented.
+
+## Factorization of integers of special form
+
+The `factor(n)` function is very fast for integers of special form that can be factorized by the `special_factor(n)` function.
+
+This performance is extended to all the other built-in functions that require the prime factorization of `n`:
+
+```ruby
+var p = (primorial(557)*144 + 1)
+var q = (primorial(557)*288 + 1)
+
+assert(p.is_prov_prime)
+assert(q.is_prov_prime)
+
+say factor(p * q)                   # takes 0.01s
+say is_carmichael(p * q)            # false (also takes 0.01s)
+say phi(p * q)                      # this also takes 0.01s
+```
+
+## Modular binomial
+
+Another function that is very well optimized in Sidef, is `binomial(n,k,m)`:
+
+```ruby
+say binomialmod(1e10, 1e5, 20!)                         # takes 0.01s
+say binomialmod(2**60 - 99, 1e5, next_prime(2**64))     # takes 0.15s
+say binomialmod(4294967291 + 1, 1e5, 4294967291**2)     # takes 0.08s
+say binomialmod(1e10, 1e4, (2**128 - 1)**2)             # takes 0.01s
+say binomialmod(1e10, 1e10 - 1e5, 2**127 - 1)           # takes 0.11s
+say binomialmod(1e10, 1e5, 2**127 - 1)                  # takes 0.08s
+say binomialmod(1e10, 1e6, 2**127 - 1)                  # takes 1.28s
+```
+
+## Sum of `k` squares function
+
+The sum of squares function `r_k(n)` returns the number of ways of representing `n` as a sum of `k` squares.
+
+```ruby
+say 30.of { .squares_r(2) }     # OEIS: A004018
+say 30.of { .squares_r(3) }     # OEIS: A005875
+say 30.of { .squares_r(4) }     # OEIS: A000118
+```
+
+The Sidef implementation uses fast algorithms for `k = {2, 4, 6, 8, 10}` based on the prime factorization of `n`:
+
+```ruby
+say squares_r(2**128 + 1, 2)       # takes 0.49s
+say squares_r(2**128 - 1, 4)       # takes 0.01s
+say squares_r(2**128 - 1, 6)       # takes 0.01s
+say squares_r(2**128 - 1, 10)      # takes 0.01s
+```
+
+The case `k = 3` is also decently fast for values of `n` up to about `2^40`:
+
+```ruby
+say squares_r(2**40 + 1, 3)    # 15312384 (takes 2.5s)
+say squares_r(2**42 + 1, 3)    # 19943424 (takes 5.7s)
+```
+
+In general, any positive value of `k` is supported, but only the above ones are specially optimized:
+
+```ruby
+say squares_r(5040, 15)       # 3354826635339287557503600 (takes 6.78s)
+```
+
+The other cases, like `k = 7`, recursively count the number of solutions based on the solutions for `k-1`:
+
+```ruby
+say squares_r(2**32 + 1, 7)   # 18040153467917470423562112 (takes 0.91s)
+say squares_r(2**32 + 1, 11)  # 239232267533254255253533478654408687317150080 (takes 3.96s)
+```
+
+# Tips and tricks
+
+This section provides various tips and tricks to achieve a better performance when solving specific problems.
+
+## Primality testing
+
+When two or more numbers need to be simultaneously prime, it's faster to use the function `all_prime(...)`, than calling `is_prime(n)` on each one.
+
+The reason being that, if one of the terms is composite having a small prime factors, `all_prime(...)` will return faster, without doing any primality testing, since we already know that one of the terms is composite.
+
+Additionally, if no small prime factor can be found for any of the provided terms, the function does a quick Plumb-Euler test on each term, also trying to return early if one of the terms do not pass the test.
+
+Then, at the end, it performs a full Baillie-PSW test on each term.
+
+```ruby
+all_prime(a, b)      # overall faster than: (is_prime(a) && is_prime(b))
+```
+
+Sidef also provides the very fast `primality_pretest(n)` function, which tries to find a small prime factors of `n`, returning `false` if `n` is definitely not a prime number,
+
+## Squarefree checking
+
+When checking if a given number `n` is squarefree, rather than fully factoring the number, is enough to find a square factor of `n`, which instantly proves than `n` is not squarefree.
+
+In this regard, Sidef provides the `is_prob_squarefree(n, limit)` function, which checks if `n` is divisible by a square `p^2` with `p <= limit`:
+
+```ruby
+say is_prob_squarefree(2**512 - 1, 1e6)     # true   (probably squarefree)
+say is_prob_squarefree(10**136 + 1, 1e3)    # false  (definitely not squarefree)
+```
+
+If `n` is less than `limit^3`, and the function returns `true`, then `n` is definitely squarefree.
+
+If the `limit` parameter is omitted, multiple limits are tested internally, trying to find a square factor of `n`, up to `limit = 10^7`.
+
+# More examples
+
+For more Sidef code examples, please see: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+
+# The end
+
+If you have any questions related to Sidef, please ask here:
+
+* https://github.com/trizen/sidef/discussions/categories/q-a

@@ -1887,7 +1887,7 @@ Returns an array with the continued fraction convergents for a given real number
 
 =head2 cop_factor
 
-    cop_factor(n, tries=n.ilog2)
+    n.cop_factor(tries=n.ilog2)
 
 Congruence of Powers (CoP) factorization method, trying to find algebraic factors of C<n>.
 
@@ -2240,8 +2240,8 @@ Aliases: I<cyclotomic_polynomial>
 
 =head2 cyclotomic_factor
 
-    cyclotomic_factor(n)
-    cyclotomic_factor(n, bases...)
+    n.cyclotomic_factor
+    n.cyclotomic_factor(bases...)
 
 Factorization method, based on cyclotomic polynomials, trying to find algebraic factors of C<n>.
 
@@ -2541,7 +2541,7 @@ When three arguments are given, it does integer modular division: C<(a/b) % m>.
 
 =head2 dop_factor
 
-    dop_factor(n, tries=n.ilog2)
+    n.dop_factor(tries=n.ilog2)
 
 Difference of Powers (DoP) factorization method, trying to find algebraic factors of C<n>.
 
@@ -3430,7 +3430,7 @@ The value of C<d> is always nonnegative.
 
 =head2 gcd_factors
 
-    gcd_factors(n, [a, b, ...])
+    n.gcd_factors([a, b, ...])
 
 Given a positive integer and an array of integers, it tries to find nontrivial factors of C<n>, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
 
@@ -6533,7 +6533,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 =head2 pell_factor
 
-    pell_factor(n, tries=1e4)
+    n.pell_factor(tries=1e4)
 
 Pell factorization method, trying to find a factor of C<n>.
 
@@ -8268,7 +8268,7 @@ Sum of the primes dividing C<n> (with repetition).
 
 =head2 special_factor
 
-    special_factor(n, tries=1)
+    n.special_factor(tries=1)
 
 Tries to find special factors of C<n>, using various special-factorization methods, including trial division, p-1 method, p+1 method, HOLF method, Fermat method, Pell method, Miller-Rabin method and the Lucas-Miller method.
 
@@ -8630,7 +8630,7 @@ Returns the count of square divisors of C<n>.
 
     squares_r(n, k=2)
 
-Sum of squares function C<r_k(n)>: returns the number of ways or representing C<n> as a sum of C<k> squares.
+The sum of squares function C<r_k(n)> returns the number of ways of representing C<n> as a sum of C<k> squares.
 
     say 30.of { .squares_r(2) }     # OEIS: A004018
     say 30.of { .squares_r(3) }     # OEIS: A005875
