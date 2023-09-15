@@ -395,11 +395,12 @@ package Sidef::Types::Array::Matrix {
     sub pow {
         my ($A, $pow) = @_;
 
-        $pow = CORE::int($pow);
-        my $neg = ($pow < 0);
-        $pow = CORE::int(CORE::abs($pow));
+        my $neg = $pow->is_neg;
 
-        return $A->inv if ($neg and $pow == 1);
+        if ($neg) {
+            return $A->inv if $pow->is_mone;
+            $pow = $pow->abs;
+        }
 
 #<<<
         my $n = $#$A;
@@ -413,11 +414,12 @@ package Sidef::Types::Array::Matrix {
         } 0 .. $n];
 #>>>
 
-        return $B if ($pow == 0);
+        return $B if $pow->is_zero;
 
         while (1) {
-            $B = $B->mul($A) if ($pow & 1);
-            $pow >>= 1 or last;
+            $B   = $B->mul($A) if $pow->is_odd;
+            $pow = $pow->rsft(Sidef::Types::Number::Number::ONE);
+            last if $pow->is_zero;
             $A = $A->mul($A);
         }
 
