@@ -32,9 +32,10 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
 
 ### WWW
 
-* Gitbook: https://trizen.gitbook.io/sidef-lang/ ([legacy](https://trizen.gitbooks.io/sidef-lang))
-* Tutorial: https://notabug.org/trizen/sidef/wiki
+* [Beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-tutorial.pdf))
+* [Number theory tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-number-theory.pdf))
 * RosettaCode: https://rosettacode.org/wiki/Sidef
+* Gitbook: https://trizen.gitbook.io/sidef-lang/ ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-book.pdf))
 
 ### Q&A
 

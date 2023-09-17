@@ -14,7 +14,7 @@ In this tutorial we're going to look how we can use [Sidef](https://github.com/t
       **   **               ****   *********   *********   *
 ```
 
-To get started with Sidef and how to install it, please see [beginner's tutorial](https://github.com/trizen/sidef/blob/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-tutorial.pdf)).
+To get started with Sidef and how to install it, please see [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-tutorial.pdf)).
 
 Over the years, Sidef incorporated more and more mathematical functions, many of them provided by Dana Jacobsen's excellent [Math::Prime::Util](https://github.com/danaj/Math-Prime-Util) and [Math::Prime::Util::GMP](https://github.com/danaj/Math-Prime-Util-GMP) Perl modules, which provide great performance in tasks involving integer factorization, primality testing and prime counting.
 
@@ -26,7 +26,7 @@ Sidef includes support for big integers, rationals, Gaussian integers, Quaternio
 
 # Basic usage
 
-After [installing Sidef](https://github.com/trizen/sidef/blob/master/TUTORIAL.md), we can start the REPL by executing the `sidef` command in a console:
+After [installing Sidef](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md), we can start the REPL by executing the `sidef` command in a console:
 
 ```
 $ sidef
@@ -1750,7 +1750,7 @@ Then, at the end, it performs a full Baillie-PSW test on each term.
 all_prime(a, b)      # overall faster than: (is_prime(a) && is_prime(b))
 ```
 
-Sidef also provides the very fast `primality_pretest(n)` function, which tries to find a small prime factors of `n`, returning `false` if `n` is definitely not a prime number,
+Sidef also provides the very fast `primality_pretest(n)` function, which tries to find a small prime factors of `n`, returning `false` if `n` is definitely not a prime number.
 
 ## Squarefree checking
 
