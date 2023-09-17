@@ -1,6 +1,6 @@
 # Introduction
 
-In this tutorial we're going to look how we can use Sidef for doing various computations in number theory.
+In this tutorial we're going to look how we can use [Sidef](https://github.com/trizen/sidef) for doing various computations in number theory.
 
 ```
             **   **         ****   *           *********   *********
@@ -46,7 +46,7 @@ factor(2**128 + 1)      # prime factorization of the 7-th Fermat number
 Additionally, by creating a script called `script.sf`, we can execute it as:
 
 ```console
-$ sidef script.sf
+sidef script.sf
 ```
 
 Some basic functionality of the language:
@@ -799,22 +799,22 @@ The source-code files can be downloaded from:
 After downloading the above two files, we can execute:
 
 ```console
-$ sidef oeis.sf 'A060881(n)' 0 9    # print the first 10 terms of A060881
+sidef oeis.sf 'A060881(n)' 0 9    # print the first 10 terms of A060881
 ```
 
 Several other usage examples:
 
 ```console
-$ sidef oeis.sf 'A033676(n)^2 + A033677(n)^2'              # first 10 terms
-$ sidef oeis.sf 'A033676(n)^2 + A033677(n)^2' 5            # 5-th term
-$ sidef oeis.sf 'A033676(n)^2 + A033677(n)^2' 5 20         # terms 5..20
+sidef oeis.sf 'A033676(n)^2 + A033677(n)^2'              # first 10 terms
+sidef oeis.sf 'A033676(n)^2 + A033677(n)^2' 5            # 5-th term
+sidef oeis.sf 'A033676(n)^2 + A033677(n)^2' 5 20         # terms 5..20
 ```
 
 The ID of a [OEIS](https://oeis.org) sequence can be called like any other function:
 
 ```console
-$ sidef oeis.sf 'sum(1..n, {|k| A000330(k) })'
-$ sidef oeis.sf 'sum(0..n, {|k| A048994(n, k) * A048993(n+k, n) })'
+sidef oeis.sf 'sum(1..n, {|k| A000330(k) })'
+sidef oeis.sf 'sum(0..n, {|k| A048994(n, k) * A048993(n+k, n) })'
 ```
 
 The `OEIS.sm` library can also be used inside Sidef scripts, by placing it in the same directory with the script:
@@ -1720,15 +1720,16 @@ say factor(43**97 + 1)
 Alternatively, the features can be enabled from the command-line as well, using the `-N` option:
 
 ```console
-$ sidef -N "VERBOSE=1; USE_FACTORDB=1;" script.sf
+sidef -N "VERBOSE=1; USE_FACTORDB=1;" script.sf
 ```
 
 It's also highly recommended to install the [Math::Prime::Util](https://metacpan.org/pod/Math::Prime::Util) Perl module, which provides great performance in many functions for native integers.
 
-If possible, the [GitHub version](https://github.com/danaj/Math-Prime-Util) is recommended instead, which includes some new functionality and optimizations not yet released on MetaCPAN:
+If possible, the [GitHub version](https://github.com/danaj/Math-Prime-Util) is recommended instead, which includes many new functions and optimizations not yet released on MetaCPAN:
 
 ```console
-$ cpanm --sudo -nv https://github.com/danaj/Math-Prime-Util/archive/refs/heads/master.zip
+cpanm --sudo -nv https://github.com/danaj/Math-Prime-Util-GMP/archive/refs/heads/master.zip
+cpanm --sudo -nv https://github.com/danaj/Math-Prime-Util/archive/refs/heads/master.zip
 ```
 
 # Tips and tricks

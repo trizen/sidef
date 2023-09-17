@@ -25,7 +25,7 @@ For Windows, Sidef is available as a portable 32-bit executable:
 Sidef is available in the [AUR](https://aur.archlinux.org/packages/sidef) and can be installed using an AUR helper, like [trizen](https://github.com/trizen/trizen):
 
 ```console
-$ trizen -S sidef
+trizen -S sidef
 ```
 
 ### Debian / Ubuntu / Linux Mint
@@ -33,8 +33,8 @@ $ trizen -S sidef
 On Debian-based distributions, Sidef can be installed from the [MetaCPAN](https://metacpan.org/dist/Sidef), by executing the following commands:
 
 ```console
-$ sudo apt install libgmp-dev libmpfr-dev libmpc-dev libc-dev cpanminus
-$ cpanm --sudo -n Sidef
+sudo apt install libgmp-dev libmpfr-dev libmpc-dev libc-dev cpanminus
+cpanm --sudo -n Sidef
 ```
 
 ### Android installation
@@ -42,14 +42,14 @@ $ cpanm --sudo -n Sidef
 It's also possible to install Sidef on Android, by installing [Termux](https://f-droid.org/en/packages/com.termux/) and executing the following commands:
 
 ```console
-$ pkg install perl make clang libgmp libmpfr libmpc
-$ cpan -T Sidef
+pkg install perl make clang libgmp libmpfr libmpc
+cpan -T Sidef
 ```
 
 If the installation succeeded, the `sidef` command should be available:
 
 ```console
-$ sidef -h
+sidef -h
 ```
 
 ## Installing from MetaCPAN
@@ -57,19 +57,19 @@ $ sidef -h
 Sidef can be installed from the [MetaCPAN](https://metacpan.org/pod/distribution/Sidef/lib/Sidef.pod), by invoking the following command:
 
 ```console
-$ cpan Sidef
+cpan Sidef
 ```
 
 If the testing takes a long time, add the `-T` flag to build and install Sidef without testing:
 
 ```console
-$ cpan -T Sidef
+cpan -T Sidef
 ```
 
 When the `cpan` command is not available, try:
 
 ```console
-$ perl -MCPAN -e "CPAN::Shell->install(q{Sidef})"
+perl -MCPAN -e "CPAN::Shell->install(q{Sidef})"
 ```
 
 ## Installing from git source
@@ -77,17 +77,17 @@ $ perl -MCPAN -e "CPAN::Shell->install(q{Sidef})"
 To install Sidef manually, download the [latest version](https://github.com/trizen/sidef/archive/master.zip), unzip it and follow the installation steps:
 
 ```console
-$ perl Build.PL
-$ sudo ./Build installdeps
-$ sudo ./Build install
+perl Build.PL
+sudo ./Build installdeps
+sudo ./Build install
 ```
 
 When [Module::Build](https://metacpan.org/pod/Module::Build) is not installed, try:
 
 ```console
-$ perl Makefile.PL
-$ make test
-$ sudo make install
+perl Makefile.PL
+make test
+sudo make install
 ```
 
 # Running from source
@@ -95,10 +95,10 @@ $ sudo make install
 It is also possible to run Sidef without having to install it. In a Unix-like environment, the following commands can be executed:
 
 ```console
-$ wget 'https://github.com/trizen/sidef/archive/master.zip' -O 'master.zip'
-$ unzip 'master.zip'
-$ cd 'sidef-master/bin/'
-$ ./sidef -v
+wget 'https://github.com/trizen/sidef/archive/master.zip' -O 'master.zip'
+unzip 'master.zip'
+cd 'sidef-master/bin/'
+./sidef -v
 ```
 
 Those commands will download and unpack the latest version of Sidef and will execute the `bin/sidef` script which will print out the current version of the language.
@@ -106,7 +106,7 @@ Those commands will download and unpack the latest version of Sidef and will exe
 To execute a Sidef script, run:
 
 ```console
-$ ./sidef ../scripts/sierpinski_carpet.sf
+./sidef ../scripts/sierpinski_carpet.sf
 ```
 
 It's also possible to add the following alias to `~/.bashrc` or `~/.zshrc`:
@@ -120,9 +120,9 @@ alias sidef="/path/to/bin/sidef"
 For packaging Sidef, run:
 
 ```console
-$ perl Build.PL --destdir "/my/package/path" --installdirs vendor
-$ ./Build test
-$ ./Build install --install_path script=/usr/bin
+perl Build.PL --destdir "/my/package/path" --installdirs vendor
+./Build test
+./Build install --install_path script=/usr/bin
 ```
 
 # Hello world
@@ -140,7 +140,7 @@ say "Hello, 世界"
 If we save the content in a new file called **`hello.sf`**, we can execute the code by running:
 
 ```console
-$ sidef hello.sf
+sidef hello.sf
 ```
 
 # Real code
