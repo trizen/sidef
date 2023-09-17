@@ -14,7 +14,7 @@ In this tutorial we're going to look how we can use Sidef for doing various comp
       **   **               ****   *********   *********   *
 ```
 
-To get started with Sidef and how to install it, see [beginner's tutorial](https://github.com/trizen/sidef/blob/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-tutorial.pdf)).
+To get started with Sidef and how to install it, please see [beginner's tutorial](https://github.com/trizen/sidef/blob/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-tutorial.pdf)).
 
 Over the years, Sidef incorporated more and more mathematical functions, many of them provided by Dana Jacobsen's excellent [Math::Prime::Util](https://github.com/danaj/Math-Prime-Util) and [Math::Prime::Util::GMP](https://github.com/danaj/Math-Prime-Util-GMP) Perl modules, which provide great performance in tasks involving integer factorization, primality testing and prime counting.
 
@@ -96,13 +96,6 @@ prime_power_divisors(n)     # prime power divisors of n
 square_divisors(n)          # square divisors of n
 squarefree_divisors(n)      # squarefree divisors of n
 
-k.smooth_divisors(n)        # k-smooth divisors of n
-k.rough_divisors(n)         # k-rough divisors of n
-k.power_divisors(n)         # k-th power divisors of n
-k.power_udivisors(n)        # k-th power unitary divisors of n
-k.powerfree_divisors(n)     # k-powerfree divisors of n
-k.powerfree_udivisors(n)    # k-powerfree unitary divisors of n
-
 tau(n)                      # count of divisors of n
 sigma(n,k=1)                # sigma_k(n) function: sum of divisors of n
 psi(n,k=1)                  # Dedekind's Psi function
@@ -161,7 +154,15 @@ euler(n)                    # n-th Euler number
 bernoulli(n,x)              # n-th Bernoulli polynomial evaluated at x
 euler(n,x)                  # n-th Euler polynomial evaluated at x
 
+sqrt_cfrac(n)               # continued fraction expansion of sqrt(n)
+sqrt_cfrac_period_len(n)    # length of the continued fraction period of sqrt(n)
+convergents(n)              # continued fraction convergents of n
+rat_approx(n)               # rational approximation of n
+
 var(x,y)=solve_pell(n)      # smallest solution to Pell's equation: x^2 - n*y^2 = 1
+
+digits(n, base=10)          # array with digits of n in a given base
+digits_sum(n, base=10)      # sum of digits of n in a given base
 
 sum_of_squares(n)           # array of [x,y] solutions for representing n as: x^2 + y^2
 diff_of_squares(n)          # array of [x,y] solutions for representing n as: x^2 - y^2
@@ -237,6 +238,13 @@ k.almost_prime_sum(a,b)     # sum of k-almost primes in the range a..b
 k.powerful_sum(a,b)         # sum of k-powerful numbers in the range a..b
 k.powerfree_sum(a,b)        # sum of k-powerfree numbers in the range a..b
 k.nonpowerfree_sum(a,b)     # sum of k-nonpowerfree numbers in the range a..b
+
+k.smooth_divisors(n)        # k-smooth divisors of n
+k.rough_divisors(n)         # k-rough divisors of n
+k.power_divisors(n)         # k-th power divisors of n
+k.power_udivisors(n)        # k-th power unitary divisors of n
+k.powerfree_divisors(n)     # k-powerfree divisors of n
+k.powerfree_udivisors(n)    # k-powerfree unitary divisors of n
 ```
 
 The full documentation of each function can be read at: [https://metacpan.org/pod/Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number)
@@ -273,10 +281,10 @@ say map(20..30, { .phi })           #=> [8, 12, 10, 22, 8, 20, 12, 18, 12, 28, 8
 Additionally, there is also the `Math.seq()` function, that constructs an infinite lazy sequence:
 
 ```ruby
-say Math.seq(2, { .last.next_prime }).first(30)                     # prime numbers
-say Math.seq(1, 1, { .last(2).sum }).first(30)                      # Fibonacci numbers
+say Math.seq(2, {|a| a[-1].next_prime }).first(30)                  # prime numbers
+say Math.seq(1, 1, {|a| a.last(2).sum }).first(30)                  # Fibonacci numbers
 say Math.seq(1, 1, {|a,n| a[-1] + n*subfactorial(n-1) }).first(10)  # OEIS: A177265
-say Math.seq(1, { .last.next_omega_prime(2) }).first(20)            # OEIS: A007774
+say Math.seq(1, {|a| a[-1].next_omega_prime(2) }).first(20)         # OEIS: A007774
 ```
 
 # User-defined functions
@@ -534,19 +542,19 @@ say map(1..30, { .nth_almost_prime(3) })
 say map(1..30, { .nth_omega_prime(3) })
 say map(1..30, { .nth_squarefree_almost_prime(3) })
 
-say 10.of {|n| prime_sum(10**n) }
-say 10.of {|n| composite_sum(10**n) }
-say 10.of {|n| prime_sum(1, 10**n, 2) }
-say 10.of {|n| composite_sum(1, 10**n, 2) }
-say 10.of {|n| squarefree_sum(10**n) }
+say 8.of {|n| prime_sum(10**n) }
+say 8.of {|n| composite_sum(10**n) }
+say 8.of {|n| prime_sum(1, 10**n, 2) }
+say 8.of {|n| composite_sum(1, 10**n, 2) }
+say 8.of {|n| squarefree_sum(10**n) }
 
-say 10.of {|n| nth_prime(10**n) }
-say 10.of {|n| nth_composite(10**n) }
-say 10.of {|n| nth_semiprime(10**n) }
-say 10.of {|n| nth_squarefree(10**n) }
-say 10.of {|n| nth_almost_prime(10**n, 2) }
-say 10.of {|n| nth_omega_prime(10**n, 2) }
-say 10.of {|n| nth_squarefree_almost_prime(10**n, 2) }
+say 8.of {|n| nth_prime(10**n) }
+say 8.of {|n| nth_composite(10**n) }
+say 8.of {|n| nth_semiprime(10**n) }
+say 8.of {|n| nth_squarefree(10**n) }
+say 8.of {|n| nth_almost_prime(10**n, 2) }
+say 8.of {|n| nth_omega_prime(10**n, 2) }
+say 8.of {|n| nth_squarefree_almost_prime(10**n, 2) }
 
 say 30.of {|n| 2.almost_prime_sum(n) }
 say 30.of {|n| 2.omega_prime_sum(n) }
@@ -738,6 +746,45 @@ If only the remainder is needed, we can use `Math.linear_recmod(signature, initi
 
 ```ruby
 say Math.linear_recmod([5, -10, 10, -5, 1], [0, 1, 9, 36, 100], 2**128, 10**10)   # (2^128)-th term modulo 10^10
+```
+
+# Inverse of multiplicative functions
+
+Based on methods by [Max Alekseyev](https://cs.uwaterloo.ca/journals/JIS/VOL19/Alekseyev/alek5.html), Sidef implements support for computing the inverse of the following functions:
+
+* Sum of divisors function: `sigma_k(n)`
+* Euler's totient function: `phi(n)`
+* Dedekind's Psi function: `psi(n)`
+* Unitary totient function: `uphi(n)`
+* Unitary sigma function: `usigma(n)`
+
+Example:
+
+```ruby
+var n = 252
+say inverse_phi(n)          #=> [301, 381, 387, 441, 508, 602, 762, 774, 882]
+say inverse_psi(n)          #=> [130, 164, 166, 205, 221, 251]
+say inverse_sigma(n)        #=> [96, 130, 166, 205, 221, 251]
+say inverse_uphi(n)         #=> [296, 301, 320, 381, 456, 516, 602, 762]
+say inverse_usigma(n)       #=> [130, 166, 205, 216, 221, 251]
+```
+
+Additionally, there are functions for computing only the minimum or the maximum value, as well as only the number of solutions, all of which can be computed more efficiently than generating all the solutions:
+
+```ruby
+var n = 15!
+
+say inverse_sigma_len(n)        #=> 910254
+say inverse_sigma_min(n)        #=> 264370186080
+say inverse_sigma_max(n)        #=> 1307672080867
+
+say inverse_phi_len(n)          #=> 2852886
+say inverse_phi_min(n)          #=> 1307676655073
+say inverse_phi_max(n)          #=> 7959363061650
+
+say inverse_psi_len(n)          #=> 1162269
+say inverse_psi_min(n)          #=> 370489869750
+say inverse_psi_max(n)          #=> 1307672080867
 ```
 
 # OEIS autoload
@@ -1463,46 +1510,6 @@ for n in (0..100) { print(A357435(n), ", ") }
 
 ---
 
-# Making Sidef faster
-
-It's possible to make certain functions faster, by using external tools and resources, such as [FactorDB](http://factordb.com), [YAFU](https://github.com/bbuhrow/yafu), [PARI/GP](http://pari.math.u-bordeaux.fr/), [primecount](https://github.com/kimwalisch/primecount) and [primesum](https://github.com/kimwalisch/primesum), which can be enabled in the following lines of code (which must be placed at the top of a program):
-
-```ruby
-Num!USE_YAFU       = false      # true to use YAFU for factoring large integers
-Num!USE_PARI_GP    = false      # true to use PARI/GP in several functions
-Num!USE_FACTORDB   = false      # true to use factordb.com for factoring large integers
-Num!USE_PRIMESUM   = false      # true to use Kim Walisch's primesum in prime_sum(n)
-Num!USE_PRIMECOUNT = false      # true to use Kim Walisch's primecount in prime_count(n)
-```
-
-When these external tools and resources are being used, some debug information is printed out, which can be seen by setting:
-
-```ruby
-Num!VERBOSE = true      # true to enable verbose/debug
-```
-
-Here's an example using [FactorDB](http://factordb.com) to retrieve the prime factorization of a large integer:
-
-```ruby
-Num!VERBOSE = true
-Num!USE_FACTORDB = true
-say factor(43**97 + 1)
-```
-
-Alternatively, the features can be enabled from the command-line as well, using the `-N` option:
-
-```console
-$ sidef -N "VERBOSE=1; USE_FACTORDB=1;" script.sf
-```
-
-It's also highly recommended to install the [Math::Prime::Util](https://metacpan.org/pod/Math::Prime::Util) Perl module, which provides great performance in many functions for native integers.
-
-If possible, the [GitHub version](https://github.com/danaj/Math-Prime-Util) is recommended instead, which includes some new functionality and optimizations not yet released on MetaCPAN:
-
-```console
-$ cpanm --sudo -nv https://github.com/danaj/Math-Prime-Util/archive/refs/heads/master.zip
-```
-
 # Integer factorization
 
 Sidef includes over `20` special-purpose integer factorization methods, which are combined under a single function:
@@ -1589,45 +1596,6 @@ n.pp1_factor(B)                     # Williams' p+1 method
 n.chebyshev_factor(B,x)             # Chebyshev T factorization method
 n.squfof_factor(tries=1e4)          # Shanks’ square forms method
 n.qs_factor                         # Quadratic sieve factorization
-```
-
-# Inverse of multiplicative functions
-
-Based on methods presented by [Max Alekseyev](https://cs.uwaterloo.ca/journals/JIS/VOL19/Alekseyev/alek5.html), Sidef implements support for computing the inverse of the following functions:
-
-* The divisor sum function: `sigma_k(n)`
-* Euler's totient function: `phi(n)`
-* Dedekind's Psi function: `psi(n)`
-* Unitary totient function: `uphi(n)`
-* Unitary sigma function: `usigma(n)`
-
-Example:
-
-```ruby
-var n = 252
-say inverse_phi(n)          #=> [301, 381, 387, 441, 508, 602, 762, 774, 882]
-say inverse_psi(n)          #=> [130, 164, 166, 205, 221, 251]
-say inverse_sigma(n)        #=> [96, 130, 166, 205, 221, 251]
-say inverse_uphi(n)         #=> [296, 301, 320, 381, 456, 516, 602, 762]
-say inverse_usigma(n)       #=> [130, 166, 205, 216, 221, 251]
-```
-
-Additionally, there are functions for computing only the minimum or the maximum value, as well as only the number of solutions, all of which can be computed more efficiently than generating all the solutions:
-
-```ruby
-var n = 15!
-
-say inverse_sigma_len(n)        #=> 910254
-say inverse_sigma_min(n)        #=> 264370186080
-say inverse_sigma_max(n)        #=> 1307672080867
-
-say inverse_phi_len(n)          #=> 2852886
-say inverse_phi_min(n)          #=> 1307676655073
-say inverse_phi_max(n)          #=> 7959363061650
-
-say inverse_psi_len(n)          #=> 1162269
-say inverse_psi_min(n)          #=> 370489869750
-say inverse_psi_max(n)          #=> 1307672080867
 ```
 
 # Where Sidef excels
@@ -1721,6 +1689,46 @@ The other cases, like `k = 7`, recursively count the number of solutions based o
 ```ruby
 say squares_r(2**32 + 1, 7)   # 18040153467917470423562112 (takes 0.91s)
 say squares_r(2**32 + 1, 11)  # 239232267533254255253533478654408687317150080 (takes 3.96s)
+```
+
+# Making Sidef faster
+
+It's possible to make certain functions faster, by using external tools and resources, such as [FactorDB](http://factordb.com), [YAFU](https://github.com/bbuhrow/yafu), [PARI/GP](http://pari.math.u-bordeaux.fr/), [primecount](https://github.com/kimwalisch/primecount) and [primesum](https://github.com/kimwalisch/primesum), which can be enabled in the following lines of code (which must be placed at the top of a program):
+
+```ruby
+Num!USE_YAFU       = false      # true to use YAFU for factoring large integers
+Num!USE_PARI_GP    = false      # true to use PARI/GP in several functions
+Num!USE_FACTORDB   = false      # true to use factordb.com for factoring large integers
+Num!USE_PRIMESUM   = false      # true to use Kim Walisch's primesum in prime_sum(n)
+Num!USE_PRIMECOUNT = false      # true to use Kim Walisch's primecount in prime_count(n)
+```
+
+When these external tools and resources are being used, some debug information is printed out, which can be seen by setting:
+
+```ruby
+Num!VERBOSE = true      # true to enable verbose/debug
+```
+
+Here's an example using [FactorDB](http://factordb.com) to retrieve the prime factorization of a large integer:
+
+```ruby
+Num!VERBOSE = true
+Num!USE_FACTORDB = true
+say factor(43**97 + 1)
+```
+
+Alternatively, the features can be enabled from the command-line as well, using the `-N` option:
+
+```console
+$ sidef -N "VERBOSE=1; USE_FACTORDB=1;" script.sf
+```
+
+It's also highly recommended to install the [Math::Prime::Util](https://metacpan.org/pod/Math::Prime::Util) Perl module, which provides great performance in many functions for native integers.
+
+If possible, the [GitHub version](https://github.com/danaj/Math-Prime-Util) is recommended instead, which includes some new functionality and optimizations not yet released on MetaCPAN:
+
+```console
+$ cpanm --sudo -nv https://github.com/danaj/Math-Prime-Util/archive/refs/heads/master.zip
 ```
 
 # Tips and tricks
