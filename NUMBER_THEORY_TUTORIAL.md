@@ -247,7 +247,7 @@ k.powerfree_divisors(n)     # k-powerfree divisors of n
 k.powerfree_udivisors(n)    # k-powerfree unitary divisors of n
 ```
 
-The full documentation of each function can be read at: [https://metacpan.org/pod/Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number)
+For the full documentation of each function, please see: [https://metacpan.org/pod/Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-number-class-documentation.pdf))
 
 # Generating sequences
 
