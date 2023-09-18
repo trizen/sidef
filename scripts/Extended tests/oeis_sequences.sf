@@ -2,7 +2,7 @@
 
 # Tests for some number methods, generating various OEIS sequences.
 
-{
+var output_lines = {
     say map(1..50, { .mu })
     say map(1..50, { .mertens })
     say map(1..50, { .tau })
@@ -249,7 +249,16 @@
     say 15.by { .is_composite && .is_lucasU_psp }
     say 15.by { .is_composite && .is_lucasV_psp }
 
-}.capture == DATA.slurp || die "error"
+}.capture.lines
+
+var tests = 0
+
+output_lines.each {|line|
+    assert_eq(line, DATA.readline)
+    ++tests
+}
+
+assert(tests > 0)
 
 say "** Test passed!"
 

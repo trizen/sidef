@@ -16,6 +16,8 @@ assert_eq(8 >> 8, 0)
 assert_eq(0 >> 0, 0)
 assert_eq(1234 >> 8, 4)
 
+assert_eq(13.smooth_count(1e16), 511985)
+
 assert_eq(squarefree_sum(1e6), 303961062910)
 assert_eq(squarefree_sum(1e7), 30396557311887)
 

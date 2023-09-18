@@ -30096,13 +30096,11 @@ package Sidef::Types::Number::Number {
                     return 1 + (HAS_PRIME_UTIL ? Math::Prime::Util::logint($n, 2) : Math::Prime::Util::GMP::logint($n, 2));
                 }
 
-                use integer;
-
                 my $q   = _prev_prime($k);
                 my $sum = 0;
 
                 for (my $t = 1 ; ; $t *= $k) {
-                    my $r = $n / $t;
+                    my $r = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($n, $t) : Math::Prime::Util::GMP::divint($n, $t));
                     if ($r <= $q) {
                         $sum += $r;
                         last;
@@ -30191,17 +30189,18 @@ package Sidef::Types::Number::Number {
 
                 $n = Math::GMPz::Rmpz_get_ui($n) if ref($n);
 
-                use integer;
-
                 if ($p * $p > $n) {
                     return 1;
                 }
 
                 $p == 2 and return ($n >> 1);
-                $p == 3 and return do { my $t = $n / 3; $t - ($t >> 1) };
+                $p == 3 and return do {
+                    my $t = HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($n, 3) : Math::Prime::Util::GMP::divint($n, 3);
+                    $t - ($t >> 1);
+                };
 
                 my $u = 0;
-                my $t = $n / $p;
+                my $t = HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($n, $p) : Math::Prime::Util::GMP::divint($n, $p);
 
                 for (my $q = 2 ; $q < $p ; $q = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($q) : Math::Prime::Util::GMP::next_prime($q))) {
 
