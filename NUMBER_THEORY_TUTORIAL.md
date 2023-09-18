@@ -282,7 +282,7 @@ Additionally, there is also the `Math.seq()` function, that constructs an infini
 
 ```ruby
 say Math.seq(2, {|a| a[-1].next_prime }).first(30)                  # prime numbers
-say Math.seq(1, 1, {|a| a.last(2).sum }).first(30)                  # Fibonacci numbers
+say Math.seq(0, 1, {|a| a.last(2).sum }).first(30)                  # Fibonacci numbers
 say Math.seq(1, 1, {|a,n| a[-1] + n*subfactorial(n-1) }).first(10)  # OEIS: A177265
 say Math.seq(1, {|a| a[-1].next_omega_prime(2) }).first(20)         # OEIS: A007774
 ```
@@ -405,11 +405,11 @@ The `Quadratic(a,b,w)` class represents a quadratic integer of the form: `a + b*
 var x = Quadratic(3, 4, 5)      # represents: 3 + 4*sqrt(5)
 var y = Quadratic(6, 1, 2)      # represents: 6 + sqrt(2)
 
-say x**10               #=> (29578174649, 13203129720, 5)
-say y**10               #=> (253025888, 176008128, 2)
+say x**10               #=> Quadratic(29578174649, 13203129720, 5)
+say y**10               #=> Quadratic(253025888, 176008128, 2)
 
-say x.powmod(100, 97)   #=> (83, 42, 5)
-say y.powmod(100, 97)   #=> (83, 39, 2)
+say x.powmod(100, 97)   #=> Quadratic(83, 42, 5)
+say y.powmod(100, 97)   #=> Quadratic(83, 39, 2)
 ```
 
 ## Quaternion class
@@ -613,7 +613,7 @@ say 50.of { .flip(2) }
 say 50.of { .digital_root }
 
 say 50.of {|n| n.factor_prod {|p,e| p*e } }
-say 50.of {|n| n.divisor_sum {|d| phi(d) * sigma(n/d) } }
+say 50.of {|n| n.divisor_sum {|d| psi(d) * sigma(n/d) } }
 
 say 25.of {|n| euler_number(n) }
 say 20.of {|n| bernoulli(2*n).nu }
