@@ -68,7 +68,7 @@ say 10.by {|n| is_composite(n) }
 
 # Number theoretic functions
 
-Below we have a small collection of popular functions used in computational number theory:
+Below we have a small collection of common functions used in computational number theory:
 
 ```ruby
 is_prime(n)                 # true if n is a probable prime (B-PSW test)
@@ -230,7 +230,7 @@ k.powerful(a,b)             # generate k-powerful numbers in the range a..b
 k.nonpowerfree(a,b)         # generate k-nonpowerfree numbers in the range a..b
 
 k.powerfree_count(a,b)      # count of k-powerfree numbers in the range a..b
-k.powerful_count(a,b)       # count of k-powerfree numbers in the range a..b
+k.powerful_count(a,b)       # count of k-powerful numbers in the range a..b
 k.nonpowerfree_count(a,b)   # count of k-nonpowerfree numbers in the range a..b
 
 k.omega_prime_sum(a,b)      # sum of k-omega primes in the range a..b
@@ -313,9 +313,9 @@ func exponential_sigma(n, k=1) {
     }
 }
 
-say map(1..20, {|n| exponential_sigma(n, 1)})
-say map(1..20, {|n| exponential_sigma(n, 2)})
-say map(1..20, {|n| exponential_sigma(n, 3)})
+say map(1..20, {|n| exponential_sigma(n, 1) })
+say map(1..20, {|n| exponential_sigma(n, 2) })
+say map(1..20, {|n| exponential_sigma(n, 3) })
 ```
 
 For computing the sum over a given range, we have the `sum(a..b, {|k| ... })` syntax:
@@ -834,9 +834,7 @@ In this section we present several code examples that compute non-trivial [OEIS]
 
 ---
 
-* **[A007011](https://oeis.org/A007011)**
-
-Smallest pseudoprime to base `2` with `n` prime factors.
+**[A007011](https://oeis.org/A007011)**: Smallest pseudoprime to base `2` with `n` prime factors.
 
 ```ruby
 func A007011(n) {
@@ -860,9 +858,7 @@ for n in (2..100) { print(A007011(n), ", ") }
 
 ---
 
-* **[A180065](https://oeis.org/A180065)**
-
-Smallest strong pseudoprime to base `2` with `n` prime factors.
+**[A180065](https://oeis.org/A180065)**: Smallest strong pseudoprime to base `2` with `n` prime factors.
 
 ```ruby
 func A180065(n) {
@@ -886,9 +882,7 @@ for n in (2..100) { print(A180065(n), ", ") }
 
 ---
 
-* **[A271874](https://oeis.org/A271874)**
-
-Smallest Fermat pseudoprime to base `n` with `n` distinct prime factors.
+**[A271874](https://oeis.org/A271874)**: Smallest Fermat pseudoprime to base `n` with `n` distinct prime factors.
 
 ```ruby
 func A271874(n, k=n) {
@@ -910,9 +904,7 @@ for n in (2..100) { print(A271874(n), ", ") }
 
 ---
 
-* **[A271873](https://oeis.org/A271873)**
-
-Square array `A(n, k)` read by antidiagonals downwards: smallest Fermat pseudoprime to base `n` with `k` distinct prime factors for `k`, `n` >= `2`.
+**[A271873](https://oeis.org/A271873)**: Square array `A(n, k)` read by antidiagonals downwards: smallest Fermat pseudoprime to base `n` with `k` distinct prime factors for `k`, `n` >= `2`.
 
 ```ruby
 {|x| {|y| A271874(x,y) }.map(2..10) }.map(2..10).each { .say }  # takes 0.5 seconds
@@ -922,9 +914,7 @@ Square array `A(n, k)` read by antidiagonals downwards: smallest Fermat pseudopr
 
 ---
 
-* **[A006931](https://oeis.org/A006931)**
-
-Least Carmichael number with `n` prime factors.
+**[A006931](https://oeis.org/A006931)**: Least Carmichael number with `n` prime factors.
 
 ```ruby
 func A006931(n) {
@@ -946,9 +936,7 @@ for n in (3..100) { print(A006931(n), ", ") }
 
 ---
 
-* **[A216928](https://oeis.org/A216928)**
-
-Least Lucas-Carmichael number with `n` prime factors.
+**[A216928](https://oeis.org/A216928)**: Least Lucas-Carmichael number with `n` prime factors.
 
 ```ruby
 func A216928(n) {
@@ -970,9 +958,7 @@ for n in (3..100) { print(A216928(n), ", ") }
 
 ---
 
-* **[A356866](https://oeis.org/A356866)**
-
-Smallest Carmichael number ([A002997](https://oeis.org/A002997)) with `n` prime factors that is also a strong pseudoprime to base `2` ([A001262](https://oeis.org/A001262)).
+**[A356866](https://oeis.org/A356866)**: Smallest Carmichael number ([A002997](https://oeis.org/A002997)) with `n` prime factors that is also a strong pseudoprime to base `2` ([A001262](https://oeis.org/A001262)).
 
 ```ruby
 func A356866(n) {
@@ -998,9 +984,7 @@ for n in (3..100) { print(A356866(n), ", ") }
 
 ---
 
-* **[A219018](https://oeis.org/A219018)**
-
-Smallest `k > 1` such that `k^n + 1` has exactly `n` distinct prime factors.
+**[A219018](https://oeis.org/A219018)**: Smallest `k > 1` such that `k^n + 1` has exactly `n` distinct prime factors.
 
 ```ruby
 func A219018(n) {
@@ -1016,9 +1000,7 @@ for n in (1..100) { print(A219018(n), ", ") }
 
 ---
 
-* **[A219019](https://oeis.org/A219019)**
-
-Smallest `k > 1` such that `k^n - 1` has exactly `n` distinct prime divisors.
+**[A219019](https://oeis.org/A219019)**: Smallest `k > 1` such that `k^n - 1` has exactly `n` distinct prime divisors.
 
 ```ruby
 func A219019(n) {
@@ -1034,9 +1016,7 @@ for n in (1..100) { print(A219019(n), ", ") }
 
 ---
 
-* **[A359070](https://oeis.org/A359070)**
-
-Smallest `k > 1` such that `k^n - 1` is the product of `n` distinct primes.
+**[A359070](https://oeis.org/A359070)**: Smallest `k > 1` such that `k^n - 1` is the product of `n` distinct primes.
 
 ```ruby
 func A359070(n) {
@@ -1053,9 +1033,7 @@ for n in (1..100) { print(A359070(n), ", ") }
 
 ---
 
-* **[A242786](https://oeis.org/A242786)**
-
-Least prime `p` such that `p^n` and `p^n+1` have the same number of prime factors (counted with multiplicity) or `0` if no such number exists.
+**[A242786](https://oeis.org/A242786)**: Least prime `p` such that `p^n` and `p^n+1` have the same number of prime factors (counted with multiplicity) or `0` if no such number exists.
 
 ```ruby
 func A242786(n) {
@@ -1071,9 +1049,7 @@ for n in (1..100) { print(A242786(n), ", ") }
 
 ---
 
-* **[A241793](https://oeis.org/A241793)**
-
-Least number `k` such that `k^n` and `k^n-1` contain the same number of prime factors (counted with multiplicity) or `0` if no such `k` exists.
+**[A241793](https://oeis.org/A241793)**: Least number `k` such that `k^n` and `k^n-1` contain the same number of prime factors (counted with multiplicity) or `0` if no such `k` exists.
 
 ```ruby
 func A241793(n) {
@@ -1090,9 +1066,7 @@ for n in (1..100) { print(A241793(n), ", ") }
 
 ---
 
-* **[A281940](https://oeis.org/A281940)**
-
-Least `k` such that `k^n + 1` is the product of `n` distinct primes (`k > 0`).
+**[A281940](https://oeis.org/A281940)**: Least `k` such that `k^n + 1` is the product of `n` distinct primes (`k > 0`).
 
 ```ruby
 func A281940(n) {
@@ -1108,9 +1082,7 @@ for n in (1..100) { print(A281940(n), ", ") }
 
 ---
 
-* **[A280005](https://oeis.org/A280005)**
-
-Least prime `p` such that `p^n + 1` is the product of `n` distinct primes.
+**[A280005](https://oeis.org/A280005)**: Least prime `p` such that `p^n + 1` is the product of `n` distinct primes.
 
 ```ruby
 func A280005(n) {
@@ -1126,9 +1098,7 @@ for n in (1..100) { print(A280005(n), ", ") }
 
 ---
 
-* **[A358863](https://oeis.org/A358863)**
-
-`a(n)` is the smallest n-gonal number with exactly `n` prime factors (counted with multiplicity).
+**[A358863](https://oeis.org/A358863)**: `a(n)` is the smallest n-gonal number with exactly `n` prime factors (counted with multiplicity).
 
 ```ruby
 func A358863(n) {
@@ -1161,9 +1131,7 @@ for n in (3..100) { print(A358863(n), ", ") }
 
 ---
 
-* **[A358865](https://oeis.org/A358865)**
-
-`a(n)` is the smallest n-gonal pyramidal number with exactly `n` prime factors (counted with multiplicity).
+**[A358865](https://oeis.org/A358865)**: `a(n)` is the smallest n-gonal pyramidal number with exactly `n` prime factors (counted with multiplicity).
 
 ```ruby
 func A358865(n) {
@@ -1179,9 +1147,7 @@ for n in (3..100) { print(A358865(n), ", ") }
 
 ---
 
-* **[A358862](https://oeis.org/A358862)**
-
-`a(n)` is the smallest n-gonal number with exactly `n` distinct prime factors.
+**[A358862](https://oeis.org/A358862)**: `a(n)` is the smallest n-gonal number with exactly `n` distinct prime factors.
 
 ```ruby
 func A358862(n) {
@@ -1214,9 +1180,7 @@ for n in (3..100) { print(A358862(n), ", ") }
 
 ---
 
-* **[A358864](https://oeis.org/A358864)**
-
-`a(n)` is the smallest n-gonal pyramidal number with exactly `n` distinct prime factors.
+**[A358864](https://oeis.org/A358864)**: `a(n)` is the smallest n-gonal pyramidal number with exactly `n` distinct prime factors.
 
 ```ruby
 func A358864(n) {
@@ -1232,9 +1196,7 @@ for n in (3..100) { print(A358864(n), ", ") }
 
 ---
 
-* **[A127637](https://oeis.org/A127637)**
-
-Smallest squarefree triangular number with exactly `n` prime factors.
+**[A127637](https://oeis.org/A127637)**: Smallest squarefree triangular number with exactly `n` prime factors.
 
 ```ruby
 func A127637(n, from = n.pn_primorial, upto = 2*from) {
@@ -1253,9 +1215,7 @@ for n in (1..100) { print(A127637(n), ", ") }
 
 ---
 
-* **[A239696](https://oeis.org/A239696)**
-
-Smallest number `m` such that `m` and `reverse(m)` each have `n` distinct prime factors.
+**[A239696](https://oeis.org/A239696)**: Smallest number `m` such that `m` and `reverse(m)` each have `n` distinct prime factors.
 
 ```ruby
 func A239696(n, from = n.pn_primorial, upto = 2*from) {
@@ -1274,9 +1234,7 @@ for n in (1..100) { print(A239696(n), ", ") }
 
 ---
 
-* **[A291138](https://oeis.org/A291138)**
-
-`a(n)` is the smallest `k` such that `psi(k)` and `phi(k)` have same distinct prime factors when `k` is the product of `n` distinct primes, or `0` if no such `k` exists.
+**[A291138](https://oeis.org/A291138)**: `a(n)` is the smallest `k` such that `psi(k)` and `phi(k)` have same distinct prime factors when `k` is the product of `n` distinct primes, or `0` if no such `k` exists.
 
 ```ruby
 func A291138(n, from = n.pn_primorial, upto = 2*from) {
@@ -1302,9 +1260,7 @@ for n in (1..100) { print(A291138(n), ", ") }
 
 ---
 
-* **[A329660](https://oeis.org/A329660)**
-
-Numbers `m` such that `sigma(m)` is a Lucas number ([A000032](https://oeis.org/A000032)), where `sigma(m)` is the sum of divisors of `m` ([A000203](https://oeis.org/A000203)).
+**[A329660](https://oeis.org/A329660)**: Numbers `m` such that `sigma(m)` is a Lucas number ([A000032](https://oeis.org/A000032)), where `sigma(m)` is the sum of divisors of `m` ([A000203](https://oeis.org/A000203)).
 
 ```ruby
 for k in (1..1000) {
@@ -1315,9 +1271,7 @@ for k in (1..1000) {
 
 ---
 
-* **[A291487](https://oeis.org/A291487)**
-
-`a(n)` is the smallest `k` such that `psi(k) = n!`, or `0` if no such `k` exists (`psi(k) =` [A001615](https://oeis.org/A001615)(k)).
+**[A291487](https://oeis.org/A291487)**: `a(n)` is the smallest `k` such that `psi(k) = n!`, or `0` if no such `k` exists (`psi(k) =` [A001615](https://oeis.org/A001615)(k)).
 
 ```ruby
 for k in (1..100) {
@@ -1327,9 +1281,7 @@ for k in (1..100) {
 
 ---
 
-* **[A291356](https://oeis.org/A291356)**
-
-`a(n)` is the smallest `k` such that `usigma(k) =` [A002110](https://oeis.org/A002110)(n), or `0` if no such `k` exists.
+**[A291356](https://oeis.org/A291356)**: `a(n)` is the smallest `k` such that `usigma(k) =` [A002110](https://oeis.org/A002110)(n), or `0` if no such `k` exists.
 
 ```ruby
 for k in (1..100) {
@@ -1343,9 +1295,7 @@ for k in (1..100) {
 
 ---
 
-* **[A106629](https://oeis.org/A106629)**
-
-Number of positive integers `<= 10^n` that are divisible by no prime exceeding `13`.
+**[A106629](https://oeis.org/A106629)**: Number of positive integers `<= 10^n` that are divisible by no prime exceeding `13`.
 
 ```ruby
 for n in (0..100) {
@@ -1355,9 +1305,7 @@ for n in (0..100) {
 
 ---
 
-* **[A116429](https://oeis.org/A116429)**
-
-The number of n-almost primes less than or equal to `9^n`, starting with `a(0)=1`.
+**[A116429](https://oeis.org/A116429)**: The number of n-almost primes less than or equal to `9^n`, starting with `a(0)=1`.
 
 ```ruby
 for n in (0..100) {
@@ -1371,9 +1319,7 @@ for n in (0..100) {
 
 ---
 
-* **[A323697](https://oeis.org/A323697)**
-
-Primes `p` such that the norm of the quadratic-field analog of Mersenne numbers `M_{p,alpha} = (alpha^p - 1)/(alpha - 1)`, with `alpha = 2 + sqrt(2)`, is a rational prime.
+**[A323697](https://oeis.org/A323697)**: Primes `p` such that the norm of the quadratic-field analog of Mersenne numbers `M_{p,alpha} = (alpha^p - 1)/(alpha - 1)`, with `alpha = 2 + sqrt(2)`, is a rational prime.
 
 ```ruby
 var alpha = (2 + sqrtQ(2))    # creates a Quadratic integer
@@ -1386,9 +1332,7 @@ each_prime(2, 1e6, {|p|
 
 ---
 
-* **[A061682](https://oeis.org/A061682)**
-
-Length of period of continued fraction expansion of square root of `(2^(2n+1)+1)`.
+**[A061682](https://oeis.org/A061682)**: Length of period of continued fraction expansion of square root of `(2^(2n+1)+1)`.
 
 ```ruby
 for n in  (2..100) {
@@ -1398,9 +1342,7 @@ for n in  (2..100) {
 
 ---
 
-* **[A139822](https://oeis.org/A139822)**
-
-Denominator of `BernoulliB(10^n)`.
+**[A139822](https://oeis.org/A139822)**: Denominator of `BernoulliB(10^n)`.
 
 ```ruby
 func bernoulli_denominator(n) {   # Von Staudt-Clausen theorem
@@ -1417,9 +1359,7 @@ for n in (0..10) { print(bernoulli_denominator(10**n), ", ") }
 
 ---
 
-* **[A071255](https://oeis.org/A071255)**
-
-`a(1) = 2`, `a(n+1) = a(n)`-th squarefree number.
+**[A071255](https://oeis.org/A071255)**: `a(1) = 2`, `a(n+1) = a(n)`-th squarefree number.
 
 ```ruby
 var n = 1
@@ -1435,9 +1375,7 @@ for (1..100) {
 
 ---
 
-* **[A037274](https://oeis.org/A037274)**
-
-Home primes: for `n >= 2`, `a(n) =` the prime that is finally reached when you start with `n`, concatenate its prime factors ([A037276](https://oeis.org/A037276)) and repeat until a prime is reached (`a(n) = -1` if no prime is ever reached).
+**[A037274](https://oeis.org/A037274)**: Home primes: for `n >= 2`, `a(n) =` the prime that is finally reached when you start with `n`, concatenate its prime factors ([A037276](https://oeis.org/A037276)) and repeat until a prime is reached (`a(n) = -1` if no prime is ever reached).
 
 ```ruby
 func A037274(n) {
@@ -1454,9 +1392,7 @@ for n in (1..100) { print(A037274(n), ", ") }
 
 ---
 
-* **[A359492](https://oeis.org/A359492)**
-
-`a(n)` is the least number of the form `p^2 + q^2 - 2` for primes `p` and `q` that is an odd prime times `2^n`, or `-1` if there is no such number.
+**[A359492](https://oeis.org/A359492)**: `a(n)` is the least number of the form `p^2 + q^2 - 2` for primes `p` and `q` that is an odd prime times `2^n`, or `-1` if there is no such number.
 
 ```ruby
 func A359492(n) {
@@ -1473,9 +1409,7 @@ for n in (3..100) { print(A359492(n), ", ") }
 
 ---
 
-* **[A357435](https://oeis.org/A357435)**
-
-`a(n)` is the least prime `p` such that `p^2+4` is a prime times `5^n`.
+**[A357435](https://oeis.org/A357435)**: `a(n)` is the least prime `p` such that `p^2+4` is a prime times `5^n`.
 
 ```ruby
 func A357435(n, solution = Inf) {
@@ -1612,7 +1546,7 @@ n.is_omega_prime(k)                 # true if omega(n) == k
 n.is_squarefree_almost_prime(k)     # true if omega(n) == k and n is squarefree
 ```
 
-In order for `n` to have at least `k` prime factors, without having any prime factors less than `B`, it implies that `n` must be greater than `B^k`, since all the prime factors of `n` are greater than or equal to `B`.
+In order for `n` to have at least `k` prime factors, without having any prime factors less than or equal to `B`, it implies that `n` must be greater than `B^k`, since all the prime factors of `n` are greater than `B`.
 
 Additionally, the function also calls `special_factor(n)` internally and returns early when the composite part of `n` is smaller than the required bound for it to have `k-j` prime factors.
 
@@ -1643,7 +1577,7 @@ say phi(p * q)                      # this also takes 0.01s
 Another function that is very well optimized in Sidef, is `binomial(n,k,m)`:
 
 ```ruby
-say binomialmod(1e10, 1e5, 20!)                         # takes 0.01s
+say binomialmod(1e20, 1e13, 20!)                        # takes 0.01s
 say binomialmod(2**60 - 99, 1e5, next_prime(2**64))     # takes 0.15s
 say binomialmod(4294967291 + 1, 1e5, 4294967291**2)     # takes 0.08s
 say binomialmod(1e10, 1e4, (2**128 - 1)**2)             # takes 0.01s
