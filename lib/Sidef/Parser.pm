@@ -2043,6 +2043,18 @@ package Sidef::Parser {
                     require File::Basename;
                 };
 
+                if (@{$self->{inc}} == 0) {
+                    push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
+
+                    push @{$self->{inc}}, File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
+
+                    if (-f $self->{script_name}) {
+                        push @{$self->{inc}}, File::Basename::dirname(Cwd::abs_path($self->{script_name}));
+                    }
+
+                    push @{$self->{inc}}, File::Spec->curdir;
+                }
+
                 my @abs_filenames;
                 if (/\G($self->{var_name_re})/gc) {
                     my $var_name = $1;
@@ -2061,18 +2073,6 @@ package Sidef::Parser {
                     my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
 
                     $Sidef::INCLUDED{$var_name} = $mod_path;
-
-                    if (@{$self->{inc}} == 0) {
-                        push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
-
-                        push @{$self->{inc}}, File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
-
-                        if (-f $self->{script_name}) {
-                            push @{$self->{inc}}, File::Basename::dirname(Cwd::abs_path($self->{script_name}));
-                        }
-
-                        push @{$self->{inc}}, File::Spec->curdir;
-                    }
 
                     my ($full_path, $found_module);
                     foreach my $inc_dir (@{$self->{inc}}) {
@@ -2130,32 +2130,40 @@ package Sidef::Parser {
 
                         ref($filename) ne ''
                           and $self->fatal_error(
-                                                 code  => $_,
+                                                 code  => ${$opt{code}},
                                                  pos   => $include_pos,
                                                  error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
                                                 );
 
                         my @files;
                         foreach my $file (glob($filename)) {
-                            my $abs = Cwd::abs_path($file);
 
-                            if (!defined($abs) or $abs eq '') {
-                                $self->fatal_error(
-                                                   code  => $_,
-                                                   pos   => $include_pos,
-                                                   error => 'include-error: cannot resolve the absolute path to file <<' . $file . '>>',
-                                                  );
+                            my $resolved = 0;
+                            foreach my $base ('', @{$self->{inc}}) {
+                                my $abs_path = File::Spec->rel2abs($file, $base) // next;
+
+                                if (-f $abs_path) {
+                                    push @files, $abs_path;
+                                    $resolved = 1;
+                                    last;
+                                }
                             }
 
-                            push @files, $abs;
+                            if (!$resolved) {
+                                $self->fatal_error(
+                                                   code  => ${$opt{code}},
+                                                   pos   => $include_pos,
+                                                   error => "include-error: could not resolve path to file `$file`",
+                                                  );
+                            }
                         }
 
                         foreach my $file (@files) {
                             if (exists $Sidef::INCLUDED{$file}) {
                                 $self->fatal_error(
-                                                   code  => $_,
+                                                   code  => ${$opt{code}},
                                                    pos   => $include_pos,
-                                                   error => "include-error: circular inclusion of file: $file",
+                                                   error => "include-error: circular inclusion of file `$file`",
                                                   );
                             }
                         }
@@ -2174,7 +2182,7 @@ package Sidef::Parser {
 
                     open(my $fh, '<:utf8', $full_path)
                       || $self->fatal_error(
-                                            code  => $_,
+                                            code  => ${$opt{code}},
                                             pos   => $include_pos,
                                             error => "can't open file `$full_path`: $!"
                                            );
