@@ -99,8 +99,15 @@ squarefree_divisors(n)      # squarefree divisors of n
 tau(n)                      # count of divisors of n
 sigma(n,k=1)                # sigma_k(n) function: sum of divisors of n
 psi(n,k=1)                  # Dedekind's Psi function
+znorder(a,n)                # Multiplicative order of a mod n
+lambda(n)                   # Carmichael lambda function
 phi(n)                      # Euler's totient function
 jordan_totient(n,k=1)       # Jordan's totient function: J_k(n)
+
+idiv(a,b)                   # integer floor division: floor(a/b)
+idiv_round(a,b)             # integer round division: round(a/b)
+idiv_ceil(a,b)              # integer ceil division: ceil(a/b)
+idiv_trunc(a,b)             # integer truncated division: trunc(a/b)
 
 iroot(n,k)                  # integer k-th root of n
 ilog(n,k)                   # integer logarithm of n in base k
@@ -1315,6 +1322,16 @@ for n in (0..100) {
 
 ---
 
+**[A062761](https://oeis.org/A062761)**: Number of powerful numbers between `2^(n-1)+1` and `2^n`.
+
+```ruby
+for n in (1..100) {
+    print(2.powerful_count(2**(n-1) + 1, 2**n), ", ")
+}
+```
+
+---
+
 ## Misc sequences
 
 ---
@@ -1405,6 +1422,37 @@ func A359492(n) {
 }
 
 for n in (3..100) { print(A359492(n), ", ") }
+```
+
+---
+
+**[A323137](https://oeis.org/A323137)**: Largest prime that is both left-truncatable and right-truncatable in base `n`.
+
+```ruby
+func is_left_truncatable_prime(n, base) {
+    for (var r = base; r < n; r *= base) {
+        is_prime(n - r*idiv(n, r)) || return false
+    }
+    return true
+}
+
+func generate_from_prefix(p, base, digits) {
+    var seq = [p]
+    digits.each {|d|
+        var n = (p*base + d)
+        n.is_prime || next
+        seq += __FUNC__(n, base, digits).grep {|k| is_left_truncatable_prime(k, base) }
+    }
+    return seq
+}
+
+func both_truncatable_primes(base) {
+    primes(base-1).map {|p|
+        generate_from_prefix(p, base, @(1 ..^ base))
+    }.flat.sort
+}
+
+for base in (3..100) { print(both_truncatable_primes(base).max, ", ") }
 ```
 
 ---

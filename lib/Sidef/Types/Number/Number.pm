@@ -31376,6 +31376,8 @@ package Sidef::Types::Number::Number {
         bless \__ipolygonal_root__($n, $k);
     }
 
+    *polygonal_iroot = \&ipolygonal_root;
+
     #
     ## Second integer k-gonal root of `n`
     #
@@ -31390,6 +31392,8 @@ package Sidef::Types::Number::Number {
 
         bless \__ipolygonal_root__($n, $k, 1);
     }
+
+    *polygonal_iroot2 = \&ipolygonal_root2;
 
     #
     ## n-th k-gonal number

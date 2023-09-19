@@ -4809,9 +4809,17 @@ Returns true if C<n> is probably prime. The method does some trial division, the
 
 =head2 is_prob_squarefree
 
-    n.is_prob_squarefree(k)
+    n.is_prob_squarefree
+    n.is_prob_squarefree(limit)
 
-Returns true iff C<n> is not a power and is not divisible by a square <= C<k>.
+Returns true if C<n> is probably squarefree, checking if C<n> is divisible by a square C<p^2> with C<p> less than or equal to C<limit>:
+
+    say is_prob_squarefree(2**512 - 1, 1e6)   # true   (probably squarefree)
+    say is_prob_squarefree(10**136 + 1, 1e3)  # false  (definitely not squarefree)
+
+If C<n> is less than C<limit^3> and the function returns C<true>, then C<n> is definitely squarefree.
+
+If the C<limit> parameter is omitted, multiple limits are tested internally, trying to find a square factor of C<n>, up to C<limit = 10^7>.
 
 =cut
 
