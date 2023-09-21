@@ -2167,6 +2167,122 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::_set_int($middle);
     }
 
+    sub bindex_min_by {
+        my ($self, $block) = @_;
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while ($left < $right) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($block->run($item));
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+            }
+            else {
+                $right = $middle;
+            }
+        }
+
+        Sidef::Types::Number::Number::_set_int($left);
+    }
+
+    sub bindex_min {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &bindex_min_by;
+        }
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while ($left < $right) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($item cmp $obj);
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+            }
+            else {
+                $right = $middle;
+            }
+        }
+
+        Sidef::Types::Number::Number::_set_int($left);
+    }
+
+    sub bindex_max_by {
+        my ($self, $block) = @_;
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while ($left < $right) {
+
+            $middle = 1 + (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($block->run($item));
+
+            if ($cmp > 0) {
+                $right = $middle - 1;
+            }
+            else {
+                $left = $middle;
+            }
+        }
+
+        Sidef::Types::Number::Number::_set_int($right);
+    }
+
+    sub bindex_max {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &bindex_max_by;
+        }
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while ($left < $right) {
+
+            $middle = 1 + (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($item cmp $obj);
+
+            if ($cmp > 0) {
+                $right = $middle - 1;
+            }
+            else {
+                $left = $middle;
+            }
+        }
+
+        Sidef::Types::Number::Number::_set_int($right);
+    }
+
+    sub bsearch_min {
+        my ($self, $obj) = @_;
+        my $index = $self->bindex_min($obj);
+        $index->is_mone ? undef : $self->[CORE::int($index)];
+    }
+
+    sub bsearch_max {
+        my ($self, $obj) = @_;
+        my $index = $self->bindex_max($obj);
+        $index->is_mone ? undef : $self->[CORE::int($index)];
+    }
+
     sub bsearch_le {
         my ($self, $obj) = @_;
         my $index = $self->bindex_le($obj);

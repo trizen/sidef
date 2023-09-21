@@ -442,6 +442,38 @@ Returns the
 
 =cut
 
+=head2 bindex_max
+
+    self.bindex_max(obj)
+
+Returns the
+
+=cut
+
+=head2 bindex_max_by
+
+    self.bindex_max_by(block)
+
+Returns the
+
+=cut
+
+=head2 bindex_min
+
+    self.bindex_min(obj)
+
+Returns the
+
+=cut
+
+=head2 bindex_min_by
+
+    self.bindex_min_by(block)
+
+Returns the
+
+=cut
+
 =head2 binsert
 
     arr.binsert(obj)
@@ -493,6 +525,22 @@ Aliases: I<bsearch_ge_by>
 Returns the
 
 Aliases: I<bsearch_le_by>
+
+=cut
+
+=head2 bsearch_max
+
+    self.bsearch_max(obj)
+
+Returns the
+
+=cut
+
+=head2 bsearch_min
+
+    self.bsearch_min(obj)
+
+Returns the
 
 =cut
 

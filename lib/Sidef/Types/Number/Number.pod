@@ -1283,7 +1283,7 @@ Binary search, returning the largest integer value in the range C<a..b> that sat
 
 where:
 
-    n = 546 is the  largest value satisfying pi(n) <= 100
+    n = 546 is the largest value satisfying pi(n) <= 100
 
 =cut
 
