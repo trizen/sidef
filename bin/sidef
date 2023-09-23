@@ -403,6 +403,44 @@ HELP
     }
 }
 
+sub create_search_tree {
+    scalar {
+
+            table       => {},
+            special_key => "\0\0\1\0\0",
+           };
+}
+
+sub add_tree_entry {
+    my ($tree, $key, $value) = @_;
+
+    my $ref = $tree->{table};
+
+    foreach my $item (@$key) {
+        $ref = $ref->{$item} //= {};
+        push @{$ref->{$tree->{special_key}}}, $value;
+    }
+
+    $tree;
+}
+
+sub search_tree {
+    my ($tree, $prefix) = @_;
+
+    my $ref = $tree->{table};
+
+    foreach my $item (@$prefix) {
+        if (exists $ref->{$item}) {
+            $ref = $ref->{$item};
+        }
+        else {
+            return;
+        }
+    }
+
+    @{$ref->{$tree->{special_key}} // []};
+}
+
 sub code_interactive {
 
     require Encode;
@@ -496,8 +534,38 @@ EOT
             open my $fh, '>', $history_file;
         }
 
+        my $tree = create_search_tree();
         my $attr = $term->Attribs;
-        $attr->{inhibit_completion} = 1;
+
+        #$attr->{inhibit_completion} = 1;
+
+        foreach my $class (
+                           qw(
+                           Sidef::Types::Number::Number
+                           )
+          ) {
+            foreach my $method_name (keys %{$class->methods}) {
+                add_tree_entry($tree, [split(//, $method_name)], $method_name);
+            }
+        }
+
+        my @results;
+        $attr->{completion_entry_function} = sub {
+            my ($prefix, $state) = @_;
+
+            my $root = '';
+            if ($prefix =~ /^(.*\.)(\w+)\z/) {
+                $root   = $1;
+                $prefix = $2;
+            }
+
+            if ($state == 0) {
+                @results = search_tree($tree, [split(//, $prefix)]);
+            }
+
+            @results || return undef;
+            $root . shift @results;
+        };
 
         $term->ReadHistory($history_file);
     }
