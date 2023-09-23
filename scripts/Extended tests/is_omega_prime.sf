@@ -7,6 +7,7 @@
 #   23 feb 2023: 8.970s
 #   13 jul 2023: 3.088s
 #   15 sep 2023: 3.904s (after adding a few more tests)
+#   23 sep 2023: 3.118s
 
 func A219019(n) {
     for k in (1..Inf) {
@@ -47,6 +48,7 @@ assert_eq(A219018(15), 656)
 func A281940(n) {
     for k in (1..Inf) {
         var v = (k**n + 1)
+        v.is_prob_squarefree(1e3) || next
         v.is_omega_prime(n) || next
         v.is_squarefree || next
         return k

@@ -973,6 +973,7 @@ The C<-N> option can be used for changing the class-variables in the Number clas
     sidef -N 'USE_FACTORDB = false'     # true to use factordb.com for factoring large integers
     sidef -N 'USE_PRIMESUM = false'     # true to use Kim Walisch's primesum in prime_sum(n)
     sidef -N 'USE_PRIMECOUNT = false'   # true to use Kim Walisch's primecount in prime_count(n)
+    sidef -N 'USE_CONJECTURES = false'  # true to use conjectured methods for better performance
     sidef -N 'SPECIAL_FACTORS = true'   # true to try to find factors of special form in factor(n)
 
 Multiple options can be separated with C<;>, as in:

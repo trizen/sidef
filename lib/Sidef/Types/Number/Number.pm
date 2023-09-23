@@ -11,7 +11,7 @@ package Sidef::Types::Number::Number {
     use List::Util             qw();
     use Math::Prime::Util::GMP qw();
 
-    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_PRIMESUM, $USE_PARI_GP, $USE_YAFU, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS);
+    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_PRIMESUM, $USE_PARI_GP, $USE_YAFU, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS, $USE_CONJECTURES);
 
     BEGIN {
         $ROUND           = Math::MPFR::MPFR_RNDN();    # rounding mode for floating-point numbers
@@ -22,6 +22,7 @@ package Sidef::Types::Number::Number {
         $USE_YAFU        = 0;                          # true to use YAFU for factoring large integers
         $USE_FACTORDB    = 0;                          # true to use factordb.com for factoring large integers
         $VERBOSE         = 0;                          # true to enable verbose/debug mode
+        $USE_CONJECTURES = 0;                          # true to use conjectured methods for better performance
         $SPECIAL_FACTORS = 1;                          # true to check for special factors in `_factor(n)`
     }
 
@@ -15589,6 +15590,8 @@ package Sidef::Types::Number::Number {
         _valid(\$from);
 
         if (defined($to)) {
+
+            # TODO: implement k-almost prime counting in a given range and use it when |from-to| < sqrt(to).
             _valid(\$to);
             return ZERO if $to->lt($from);
             return $k->almost_prime_count($to)->sub($k->almost_prime_count($from->dec));
@@ -16159,6 +16162,8 @@ package Sidef::Types::Number::Number {
         _valid(\$from);
 
         if (defined($to)) {
+
+            # TODO: implement k-omega prime counting in a given range and use it when |from-to| < sqrt(to).
             _valid(\$to);
             return ZERO if $to->lt($from);
             return $k->omega_prime_count($to)->sub($k->omega_prime_count($from->dec));
@@ -19205,6 +19210,44 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    sub _pollard_rho_factor {
+        my ($r, $reps) = @_;
+
+        my @factors;
+
+        while (1) {
+            my @f = Math::Prime::Util::GMP::pbrent_factor($r, $reps);
+
+            $r = pop @f;
+            my @new_factors;
+
+            if (@f) {
+                say STDERR "pbrent_factor(r, $reps): @f" if $VERBOSE;
+                @new_factors = map { ($_ < ULONG_MAX) ? $_ : _any2mpz($_) }
+                  map { (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($_) : Math::Prime::Util::GMP::is_prime($_)) ? $_ : _factor($_) } @f;
+                push @factors, @new_factors;
+            }
+
+            if ($r < $reps * $reps) {
+                push @factors, _factor($r);
+                $r = 1;
+                last;
+            }
+
+            foreach my $p (@new_factors) {
+                my $v = Math::Prime::Util::GMP::valuation($r, $p);
+                if ($v > 0) {
+                    push @factors, ($p) x $v;
+                    $r = Math::Prime::Util::GMP::divint($r, Math::Prime::Util::GMP::powint($p, $v));
+                }
+            }
+
+            @f or last;
+        }
+
+        return ($r, @factors);
+    }
+
     sub is_almost_prime {
         my ($n, $k) = @_;
 
@@ -19257,6 +19300,19 @@ package Sidef::Types::Number::Number {
 
                 my $trial_limit = 10**$j;
                 my ($r, @new_factors) = _primorial_trial_factor($remainder, $trial_limit);
+
+                # A fast conjectured approach, based on Pollard's rho method,
+                # which is expected to find a factor `p` in `O(sqrt(p))` steps.
+                if (    $j <= 6
+                    and $USE_CONJECTURES
+                    and Math::GMPz::Rmpz_sizeinbase($r, 2) > SMALL_NUMBER_MAX_BITS
+                    and Math::GMPz::Rmpz_sizeinbase($r, 10) <= 500) {
+                    my ($rem, @f) = _pollard_rho_factor($r, 2 * $trial_limit);
+                    $trial_limit = Math::Prime::Util::GMP::mulint($trial_limit, $trial_limit);
+                    $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
+                    push @new_factors, @f;
+                    $r = $rem;
+                }
 
                 push @trial_factors, @new_factors;
 
@@ -19504,6 +19560,19 @@ package Sidef::Types::Number::Number {
 
                 my $trial_limit = 10**$j;
                 my ($r, @new_factors) = _primorial_trial_factor($remainder, $trial_limit);
+
+                # A fast conjectured approach, based on Pollard's rho method,
+                # which is expected to find a factor `p` in `O(sqrt(p))` steps.
+                if (    $j <= 6
+                    and $USE_CONJECTURES
+                    and Math::GMPz::Rmpz_sizeinbase($r, 2) > SMALL_NUMBER_MAX_BITS
+                    and Math::GMPz::Rmpz_sizeinbase($r, 10) <= 500) {
+                    my ($rem, @f) = _pollard_rho_factor($r, 2 * $trial_limit);
+                    $trial_limit = Math::Prime::Util::GMP::mulint($trial_limit, $trial_limit);
+                    $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
+                    push @new_factors, @f;
+                    $r = $rem;
+                }
 
                 if (@new_factors) {
                     push @trial_factors, List::Util::uniq(@new_factors);
@@ -26988,7 +27057,7 @@ package Sidef::Types::Number::Number {
 
             my $u = Math::GMPz::Rmpz_init();
             my $v = Math::GMPz::Rmpz_init();
-            my $w = Math::GMPz::Rmpz_init_set_ui($fermat);
+            my $w = Math::GMPz::Rmpz_init_set_ui($fermat // 0);
 
             Math::GMPz::Rmpz_set($u, _cached_pn_primorial($k));
 
@@ -27895,7 +27964,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_cdiv_q($u, $A, $x);
                     Math::GMPz::Rmpz_div($v, $B, $x);
 
-                    if (!(Math::GMPz::Rmpz_cmp($u, $v) > 0)) {
+                    if (Math::GMPz::Rmpz_cmp($u, $v) <= 0) {
 
                         $p = $r if $squarefree;
 
