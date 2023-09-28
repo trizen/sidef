@@ -450,6 +450,15 @@ package Sidef::Types::Glob::File {
         $success ? $fh_obj : undef;
     }
 
+	sub symlink {
+		ref($_[0]) || shift(@_);
+	    my ($self, $symlink_file) = @_;
+	    symlink($self, $symlink_file);
+	    Sidef::Types::Glob::File::open($self);
+	}
+
+	*sl     = \&symlink;
+
     sub touch {
         ref($_[0]) || shift(@_);
         my ($self, @args) = @_;
