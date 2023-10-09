@@ -23340,10 +23340,10 @@ package Sidef::Types::Number::Number {
         foreach my $k (1 .. $reps) {
 
             # Deterministic version
-            # Math::GMPz::Rmpz_div_ui($t, $n, $k+1);
+            Math::GMPz::Rmpz_div_ui($t, $n, $k+1);
 
             # Randomized version
-            Math::GMPz::Rmpz_urandomm($t, $state, $n, 1);
+            #Math::GMPz::Rmpz_urandomm($t, $state, $n, 1);
 
             Math::GMPz::Rmpz_set($A, $t);
             Math::GMPz::Rmpz_set($B, $t);
@@ -32402,7 +32402,11 @@ package Sidef::Types::Number::Number {
                     my $r = Math::GMPz::Rmpz_init();
                     Math::GMPz::Rmpz_sub($r, $y, $x);
                     Math::GMPz::Rmpz_add_ui($r, $r, 1);
-                    Math::GMPz::Rmpz_urandomm($r, $state, $r, 1);
+                    my $sgn = Math::GMPz::Rmpz_sgn($r);
+                    Math::GMPz::Rmpz_abs($r,$r);
+                    $r = _any2mpz(${(bless \$r)->urand}); # workaround
+                    Math::GMPz::Rmpz_neg($r, $r)     if $sgn < 0;
+                    #Math::GMPz::Rmpz_urandomm($r, $state, $r, 1);
                     Math::GMPz::Rmpz_add($r, $r, $x);
                     $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
                     return bless \$r;
@@ -32420,7 +32424,9 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_add_ui($x, $x, 1);
                 }
 
-                Math::GMPz::Rmpz_urandomm($x, $state, $x, 1);
+                Math::GMPz::Rmpz_abs($x,$x);
+                $x = _any2mpz(${(bless \$x)->urand}); # workaround
+                #Math::GMPz::Rmpz_urandomm($x, $state, $x, 1);
                 Math::GMPz::Rmpz_neg($x, $x)     if $sgn < 0;
                 $x = Math::GMPz::Rmpz_get_si($x) if Math::GMPz::Rmpz_fits_slong_p($x);
                 bless \$x;
@@ -32428,6 +32434,7 @@ package Sidef::Types::Number::Number {
 
             sub iseed {
                 my ($x) = @_;
+                return $x->useed(); # workaround
                 my $z = _any2mpz($$x) // die "[ERROR] Number.iseed(): invalid seed value <<$x>> (expected an integer)";
                 Math::GMPz::zgmp_randseed($state, $z);
                 bless \$z;
