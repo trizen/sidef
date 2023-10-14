@@ -20434,7 +20434,7 @@ package Sidef::Types::Number::Number {
 
         my $V = _modular_lucas_V($P, $Q, $n, $n);
 
-        (ref($V) ? Math::GMPz::Rmpz_congruent_p($V, $P, $n) : ($V == ($P % $n)))
+        ($V == ($P % $n))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
