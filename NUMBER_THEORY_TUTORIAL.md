@@ -1724,9 +1724,9 @@ When two or more numbers need to be simultaneously prime, it's faster to use the
 
 The reason being that, if one of the terms is composite having a small prime factors, `all_prime(...)` will return faster, without doing any primality testing, since we already know that one of the terms is composite.
 
-Additionally, if no small prime factor can be found for any of the provided terms, the function does a quick Plumb-Euler test on each term, also trying to return early if one of the terms do not pass the test.
+Additionally, if no small prime factor can be found for any of the provided terms, the function does a strong Fermat test to base `2` on each term, also trying to return early if one of the terms do not pass the test.
 
-Then, at the end, it performs a full Baillie-PSW test on each term.
+Then, in the end, it performs an extra-strong Lucas test on each term, resulting in a BPSW test.
 
 ```ruby
 all_prime(a, b)      # overall faster than: (is_prime(a) && is_prime(b))

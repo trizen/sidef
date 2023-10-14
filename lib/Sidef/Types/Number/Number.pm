@@ -19113,18 +19113,40 @@ package Sidef::Types::Number::Number {
         # Native integer -- return early
         Math::GMPz::Rmpz_fits_ulong_p($n) && return 1;
 
-        # Size of n in base-2
-        my $size = Math::GMPz::Rmpz_sizeinbase($n, 2);
+        # Size of n in base-10
+        my $size = Math::GMPz::Rmpz_sizeinbase($n, 10);
 
         # When n is large enough, try to find a small factor (up to 10^8)
-        if ($size > 15_000) {
+        if ($size > 1000) {
 
             state $g = Math::GMPz::Rmpz_init_nobless();
 
-            my @checks = (1e4, 1e6);
+            my @checks = (1e3, 1e4, 1e5);
 
-            push(@checks, 1e7) if ($size > 20_000);
-            push(@checks, 1e8) if ($size > 30_000);
+            if ($size >= 9000) {
+                push @checks, 1e8;
+            }
+            elsif ($size >= 4500) {
+                push @checks, 1e7;
+            }
+            elsif ($size >= 4000) {
+                push @checks, 7968751;
+            }
+            elsif ($size >= 3500) {
+                push @checks, 5789445;
+            }
+            elsif ($size >= 3000) {
+                push @checks, 4201049;
+            }
+            elsif ($size >= 2500) {
+                push @checks, 2908076;
+            }
+            elsif ($size >= 2000) {
+                push @checks, 1670609;
+            }
+            elsif ($size >= 1500) {
+                push @checks, 908433;
+            }
 
             foreach my $k (@checks) {
 
@@ -19173,15 +19195,19 @@ package Sidef::Types::Number::Number {
             next if $seen{$str}++;
             (
              (HAS_PRIME_UTIL and $str < ULONG_MAX)
-             ? Math::Prime::Util::is_euler_plumb_pseudoprime($str)
-             : Math::Prime::Util::GMP::is_euler_plumb_pseudoprime($str)
+             ? Math::Prime::Util::is_strong_pseudoprime($str, 2)
+             : Math::Prime::Util::GMP::is_strong_pseudoprime($str, 2)
             )
               || return Sidef::Types::Bool::Bool::FALSE;
             push @strs, $str;
         }
 
         foreach my $n (@strs) {
-            _is_prob_prime($n)
+            (
+             (HAS_PRIME_UTIL and $n < ULONG_MAX)
+             ? Math::Prime::Util::is_extra_strong_lucas_pseudoprime($n)
+             : Math::Prime::Util::GMP::is_extra_strong_lucas_pseudoprime($n)
+            )
               || return Sidef::Types::Bool::Bool::FALSE;
         }
 
@@ -19786,13 +19812,13 @@ package Sidef::Types::Number::Number {
                    );
         }
 
-        _primality_pretest($n)
-          && Math::Prime::Util::GMP::is_prob_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
+        _primality_pretest($n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        my $str = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
+        (Math::Prime::Util::GMP::is_strong_pseudoprime($str, 2) && Math::Prime::Util::GMP::is_frobenius_underwood_pseudoprime($str))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
-
-    *is_strong_bpsw_prp = \&is_prob_prime;
 
     sub is_prov_prime {
         my ($n) = @_;
