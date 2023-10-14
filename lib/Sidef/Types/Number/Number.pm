@@ -11534,7 +11534,7 @@ package Sidef::Types::Number::Number {
         if (    (ref($P) ? (Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($P) < $LUCAS_PQ_LIMIT))
             and (ref($Q) ? (Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($Q) < $LUCAS_PQ_LIMIT))) {
             my ($U, $V);
-            if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            if (HAS_NEW_PRIME_UTIL and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m)) and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
                 eval {
                     ($U, $V) =
                       Math::Prime::Util::lucas_sequence(
@@ -11582,7 +11582,7 @@ package Sidef::Types::Number::Number {
         if (    (ref($P) ? (Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($P) < $LUCAS_PQ_LIMIT))
             and (ref($Q) ? (Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($Q) < $LUCAS_PQ_LIMIT))) {
             my ($U, $V);
-            if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            if (HAS_NEW_PRIME_UTIL and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m)) and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
                 eval {
                     ($U, $V) =
                       Math::Prime::Util::lucas_sequence(
