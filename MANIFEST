@@ -982,6 +982,7 @@ scripts/Tests/quaternion_integers.sf
 scripts/Tests/quicksort.sf
 scripts/Tests/quoted_strings.sf
 scripts/Tests/rand_pick.sf
+scripts/Tests/random.sf
 scripts/Tests/range_number.sf
 scripts/Tests/range_objects.sf
 scripts/Tests/range_prod.sf

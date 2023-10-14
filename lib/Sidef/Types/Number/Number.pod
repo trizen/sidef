@@ -4045,12 +4045,14 @@ Aliases: I<integer_quadratic_formula>
     irand(n)
     irand(a,b)
 
-Returns a pseudorandom integer in range C<0..n> (all inclusive), or in the range C<a..b> (all inclusive).
+Returns a cryptographically-secure pseudorandom integer in the range C<0..n> (all inclusive), or in the range C<a..b> (all inclusive).
 
 If C<a> is greater than C<b>, the returned integer will be in the range C<b..a>.
 
     irand(10)        # a pseudorandom integer in the interval [0, 10]
     irand(10, 20)    # a pseudorandom integer in the interval [10, 20]
+
+The underlying CSPRNG is ISAAC-32.
 
 =cut
 
@@ -4248,11 +4250,16 @@ Return true if C<n> can be proved prime using the Elliptic Curve Primality Provi
 
 =cut
 
-=head2 iseed
+=head2 useed
 
     iseed(n)
+    useed(n)
 
-Re-seed the C<irand()> function. The value for C<n> can be any arbitrary large integer.
+Takes a nonnegative integer C<n>, which is used to seed the internal CSPRNG (currently, ISAAC-32) used for random functions, such as C<irand>, C<urand> and the random prime functions.
+
+For good security, C<n> should be at least an 128-bit random integer.
+
+Internally, the value of C<n> is converted into a binary string, SHA-512 hashed and expanded into a 8192-bit key.
 
 =cut
 
@@ -8979,29 +8986,19 @@ The unitary totient function. (OEIS: A047994)
     urand(n)
     urand(a, b)
 
-Given a positive integer C<n>, returns a random unsigned integer smaller than C<n>.
+Given a positive integer C<n>, returns a cryptographically-secure pseudorandom unsigned integer smaller than C<n>.
 
-    say urand(100)          # random integer in [0,99]
+    say urand(100)          # pseudorandom integer in [0,99]
 
-When two arguments are given, returns a uniform random unsigned integer in the range C<[a,b]> (inclusive on both ends).
+When two arguments are given, returns a uniform pseudorandom unsigned integer in the range C<[a,b]> (inclusive on both ends).
 
-    say urand(100, 110)     # random integer in [100, 110]
+    say urand(100, 110)     # pseudorandom integer in [100, 110]
 
-Both arguments must be nonnegative. If C<a> is greater than C<b>, then function will return a random integer in the range C<[b,a]>.
+Both arguments must be nonnegative. If C<a> is greater than C<b>, then will return a pseudorandom integer in the range C<[b,a]>.
+
+The underlying CSPRNG is ISAAC-32.
 
 Aliases: I<urandomm>
-
-=cut
-
-=head2 useed
-
-    useed(n)
-
-Takes a nonnegative integer C<n>, which is used to seed the internal CSPRNG used for random functions, such as C<urand> and the random prime functions.
-
-For good security, C<n> should be at least an 128-bit random integer.
-
-Internally, the value of C<n> is converted into a binary string, SHA-512 hashed and expanded into a 8192-bit key.
 
 =cut
 

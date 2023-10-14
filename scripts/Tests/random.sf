@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+# Tests for methods that generate random numbers.
+
+assert_eq(100.of{irand(0, 5)}.uniq.sort, %n[0, 1, 2, 3, 4, 5])
+assert_eq(100.of{irand(5, -2)}.uniq.sort, %n[-2, -1, 0, 1, 2, 3, 4, 5])
+assert_eq(100.of{irand(-2, 5)}.uniq.sort, %n[-2, -1, 0, 1, 2, 3, 4, 5])
+assert_eq(100.of{irand(-5, -10)}.uniq.sort, %n[-10, -9, -8, -7, -6, -5])
+assert_eq(100.of{irand(5, 10)}.uniq.sort, %n[5, 6, 7, 8, 9, 10])
+assert_eq(100.of{irand(5)}.uniq.sort, %n[0, 1, 2, 3, 4, 5])
+
+assert_eq(100.of{urand(0, 5)}.uniq.sort, %n[0,1,2,3,4,5])
+assert_eq(100.of{urand(5, 10)}.uniq.sort, %n[5, 6, 7, 8, 9, 10])
+assert_eq(100.of{urand(5)}.uniq.sort, %n[0, 1, 2, 3, 4])     # urand is not inclusive
+
+say "** Test passed!"

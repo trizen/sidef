@@ -18537,6 +18537,8 @@ package Sidef::Types::Number::Number {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
+    *iseed = \&useed;
+
     sub urandomm {
         my ($n, $m) = @_;
 
@@ -18553,8 +18555,19 @@ package Sidef::Types::Number::Number {
                 ($n, $m) = ($m, $n);
             }
 
-            $n = _big2uistr($n) // return ZERO;
-            $m = _big2uistr($m) // return ZERO;
+            if (ref($n)) {
+                $n = _big2uistr($n) // 0;
+            }
+            else {
+                $n >= 0 or do { $n = 0 };
+            }
+
+            if (ref($m)) {
+                $m = _big2uistr($m) // 0;
+            }
+            else {
+                $m >= 0 or do { $m = 0 };
+            }
 
             return _set_int(Math::Prime::Util::GMP::urandomr($n, $m) || return ZERO);
         }
@@ -18563,6 +18576,62 @@ package Sidef::Types::Number::Number {
     }
 
     *urand = \&urandomm;
+
+    sub irand {
+        my ($n, $m) = @_;
+
+        if (defined($m)) {
+            _valid(\$m);
+        }
+        else {
+            ($n, $m) = (ZERO, $n);
+        }
+
+        $n = $$n;
+        $m = $$m;
+
+        $n = (ref($n) ? _any2mpz($n) : $n) // goto &nan;
+        $m = (ref($m) ? _any2mpz($m) : $m) // goto &nan;
+
+        if (ref($n) or ref($m)) {
+            $n = _any2mpz($n) if !ref($n);
+            $m = _any2mpz($m) if !ref($m);
+
+            if (Math::GMPz::Rmpz_cmp($n, $m) > 0) {
+                ($n, $m) = ($m, $n);
+            }
+
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_sub($r, $m, $n);
+            Math::GMPz::Rmpz_add_ui($r, $r, 1);
+            Math::GMPz::Rmpz_set_str($r, Math::Prime::Util::GMP::urandomm(Math::GMPz::Rmpz_get_str($r, 10)) // "0", 10);
+            Math::GMPz::Rmpz_add($r, $r, $n);
+            return bless \$r;
+        }
+
+        if ($n > $m) {
+            ($n, $m) = ($m, $n);
+        }
+
+#<<<
+        my $r = (
+                 ($n == 0) ? ($m + 1)
+                 : (
+                    HAS_NEW_PRIME_UTIL
+                    ? Math::Prime::Util::addint(Math::Prime::Util::subint($m, $n), 1)
+                    : Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::subint($m, $n), 1)
+                   )
+                );
+#>>>
+
+        $r = Math::Prime::Util::GMP::urandomm($r) // 0;
+
+        if ($n != 0) {
+            $r = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::addint($r, $n) : Math::Prime::Util::GMP::addint($r, $n));
+        }
+
+        _set_int($r);
+    }
 
     sub random_prime {
         my ($from, $to) = @_;
@@ -23327,9 +23396,6 @@ package Sidef::Types::Number::Number {
         $reps =
           defined($reps) ? do { _valid(\$reps); _any2ui($$reps) || return Sidef::Types::Array::Array->new(bless \$n) } : 10;
 
-        state $state = Math::GMPz::zgmp_randinit_mt_nobless();
-        Math::GMPz::zgmp_randseed_ui($state, CORE::int(CORE::rand(1e9)));
-
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $g = Math::GMPz::Rmpz_init_nobless();
 
@@ -23337,13 +23403,15 @@ package Sidef::Types::Number::Number {
         state $B = Math::GMPz::Rmpz_init_nobless();
         state $C = Math::GMPz::Rmpz_init_nobless();
 
+        my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
+
         foreach my $k (1 .. $reps) {
 
             # Deterministic version
-            Math::GMPz::Rmpz_div_ui($t, $n, $k+1);
+            #Math::GMPz::Rmpz_div_ui($t, $n, $k + 1);
 
             # Randomized version
-            #Math::GMPz::Rmpz_urandomm($t, $state, $n, 1);
+            Math::GMPz::Rmpz_set_str($t, Math::Prime::Util::GMP::urandomm($n_str), 10);
 
             Math::GMPz::Rmpz_set($A, $t);
             Math::GMPz::Rmpz_set($B, $t);
@@ -26624,8 +26692,45 @@ package Sidef::Types::Number::Number {
 
         my @powerful;
 
-        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-            ## TODO
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+
+            $from = Math::GMPz::Rmpz_get_ui($from);
+            $to   = Math::GMPz::Rmpz_get_ui($to);
+
+            sub {
+                my ($m, $r) = @_;
+
+                if ($r < $k) {
+                    push @powerful, $m;
+                    return;
+                }
+
+                my $lo = 1;
+                my $hi = Math::Prime::Util::rootint((HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($to, $m) : Math::Prime::Util::GMP::divint($to, $m)), $r);
+
+                if ($r <= $k and $from > $m) {
+                    my $t = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($from, $m) : Math::Prime::Util::GMP::divint($from, $m));
+                    ++$t if ($from % $m != 0);
+                    $lo = Math::Prime::Util::rootint($t, $r);
+                }
+
+                foreach my $v ($lo .. $hi) {
+
+                    if ($r > $k) {
+                        Math::Prime::Util::is_square_free($v) or next;
+                        Math::Prime::Util::gcd($m, $v) == 1   or next;
+                    }
+
+                    my $t = $m * (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::powint($v, $r) : Math::Prime::Util::GMP::powint($v, $r));
+
+                    if ($r <= $k and $t < $from) {
+                        next;
+                    }
+
+                    __SUB__->($t, $r - 1);
+                }
+              }
+              ->(1, 2 * $k - 1);
         }
         else {
             my $t = Math::GMPz::Rmpz_init();
@@ -32345,7 +32450,7 @@ package Sidef::Types::Number::Number {
     }
 
     {
-        my $srand = srand();
+        my $srand = (HAS_PRIME_UTIL ? Math::Prime::Util::urandomm(ULONG_MAX) : Math::Prime::Util::GMP::urandomm(ULONG_MAX));
 
         {
             state $state = Math::MPFR::Rmpfr_randinit_mt_nobless();
@@ -32373,70 +32478,6 @@ package Sidef::Types::Number::Number {
                 my ($x) = @_;
                 my $z = _any2mpz($$x) // die "[ERROR] Number.seed(): invalid seed value <<$x>> (expected an integer)";
                 Math::MPFR::Rmpfr_randseed($state, $z);
-                bless \$z;
-            }
-        }
-
-        {
-            state $state = Math::GMPz::zgmp_randinit_mt_nobless();
-            Math::GMPz::zgmp_randseed_ui($state, $srand);
-
-            sub irand {
-                my ($x, $y) = @_;
-
-                if (defined($y)) {
-                    _valid(\$y);
-
-                    $x = _any2mpz($$x) // goto &nan;
-                    $y = _any2mpz($$y) // goto &nan;
-
-                    my $cmp = Math::GMPz::Rmpz_cmp($y, $x);
-
-                    if ($cmp == 0) {
-                        return $_[0];
-                    }
-                    elsif ($cmp < 0) {
-                        ($x, $y) = ($y, $x);
-                    }
-
-                    my $r = Math::GMPz::Rmpz_init();
-                    Math::GMPz::Rmpz_sub($r, $y, $x);
-                    Math::GMPz::Rmpz_add_ui($r, $r, 1);
-                    my $sgn = Math::GMPz::Rmpz_sgn($r);
-                    Math::GMPz::Rmpz_abs($r,$r);
-                    $r = _any2mpz(${(bless \$r)->urand}); # workaround
-                    Math::GMPz::Rmpz_neg($r, $r)     if $sgn < 0;
-                    #Math::GMPz::Rmpz_urandomm($r, $state, $r, 1);
-                    Math::GMPz::Rmpz_add($r, $r, $x);
-                    $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-                    return bless \$r;
-                }
-
-                $x = Math::GMPz::Rmpz_init_set(_any2mpz($$x) // goto &nan);
-
-                my $sgn = Math::GMPz::Rmpz_sgn($x)
-                  || return ZERO;
-
-                if ($sgn < 0) {
-                    Math::GMPz::Rmpz_sub_ui($x, $x, 1);
-                }
-                else {
-                    Math::GMPz::Rmpz_add_ui($x, $x, 1);
-                }
-
-                Math::GMPz::Rmpz_abs($x,$x);
-                $x = _any2mpz(${(bless \$x)->urand}); # workaround
-                #Math::GMPz::Rmpz_urandomm($x, $state, $x, 1);
-                Math::GMPz::Rmpz_neg($x, $x)     if $sgn < 0;
-                $x = Math::GMPz::Rmpz_get_si($x) if Math::GMPz::Rmpz_fits_slong_p($x);
-                bless \$x;
-            }
-
-            sub iseed {
-                my ($x) = @_;
-                return $x->useed(); # workaround
-                my $z = _any2mpz($$x) // die "[ERROR] Number.iseed(): invalid seed value <<$x>> (expected an integer)";
-                Math::GMPz::zgmp_randseed($state, $z);
                 bless \$z;
             }
         }
