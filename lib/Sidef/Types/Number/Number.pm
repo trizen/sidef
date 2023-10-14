@@ -20599,6 +20599,70 @@ package Sidef::Types::Number::Number {
     *is_strong_fib_psp       = \&is_strong_fibonacci_pseudoprime;
     *is_strong_fibonacci_psp = \&is_strong_fibonacci_pseudoprime;
 
+    sub is_bfw_psp {    # OEIS: A365514
+        my ($n) = @_;
+
+        # Reference:
+        #   Strengthening the Baillie-PSW primality test
+        #   https://arxiv.org/abs/2006.14425
+
+        $n = _any2mpz($$n) // goto &nan;
+
+        Math::GMPz::Rmpz_sgn($n) <= 0
+          && return Sidef::Types::Bool::Bool::FALSE;
+
+        if (Math::GMPz::Rmpz_even_p($n)) {
+            return Sidef::Types::Bool::Bool::TRUE if (Math::GMPz::Rmpz_cmp_ui($n, 2) == 0);
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my $P = 1;
+        my $Q = undef;
+
+        # Find first D for which kronecker(D, n) == -1
+        for (my $k = 2 ; ; ++$k) {
+            my $D = (-1)**$k * (2 * $k + 1);
+            my $K = Math::GMPz::Rmpz_si_kronecker($D, $n);
+
+            if ($K == 0) {
+                my $g = Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $n, CORE::abs($D));
+                if ($g > 1 and Math::GMPz::Rmpz_cmp_ui($n, $g) > 0) {
+                    return Sidef::Types::Bool::Bool::FALSE;
+                }
+            }
+
+            if ($k == 20 and Math::GMPz::Rmpz_perfect_square_p($n)) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if ($K == -1) {
+                $Q = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint(1 - $D, 4) : Math::Prime::Util::GMP::divint(1 - $D, 4));
+                last;
+            }
+        }
+
+        if ($Q == -1) {
+            $P = 5;
+            $Q = 5;
+        }
+
+        state $t = Math::GMPz::Rmpz_init();
+        state $u = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_add_ui($t, $n, 1);
+
+        my $V = _modular_lucas_V($P, $Q, $t, $n);
+        ref($V)
+          ? Math::GMPz::Rmpz_set($t, $V)
+          : Math::GMPz::Rmpz_set_ui($t, $V);
+        Math::GMPz::Rmpz_set_si($u, 2 * $Q);
+        Math::GMPz::Rmpz_congruent_p($t, $u, $n)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    *is_vpsp = \&is_bfw_psp;
+
     sub is_lucas_pseudoprime {
         my ($n, $P, $Q) = @_;
 

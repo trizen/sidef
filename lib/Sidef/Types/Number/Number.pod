@@ -4423,6 +4423,16 @@ Returns true if C<2^n * k - 1> is prime, using the Lucas-Lehmer-Riesel (LLR) pri
 
 =cut
 
+=head2 is_lucas_psp
+
+    n.is_lucas_psp
+
+Return true if C<n> is a Lucas pseudoprime.
+
+Aliases: I<is_lucas_pseudoprime>
+
+=cut
+
 =head2 is_lucas
 
     n.is_lucas
@@ -4439,16 +4449,6 @@ Returns true if C<n> is a Lucas-Carmichael number.
 
     say 10.by(:is_lucas_carmichael)                               # OEIS: A006972
     say is_lucas_carmichael(58735331016965175152455996272482303)  # true
-
-=cut
-
-=head2 is_lucas_psp
-
-    n.is_lucas_psp
-
-Return true if C<n> is a Lucas pseudoprime.
-
-Aliases: I<is_lucas_pseudoprime>
 
 =cut
 
@@ -4946,6 +4946,16 @@ Returns true if C<n> has exactly two prime factors (not necessarily distinct).
 
 =cut
 
+=head2 is_strong_lucas_psp
+
+    n.is_strong_lucas_psp
+
+Return true if C<n> is a strong Lucas pseudoprime.
+
+Aliases: I<is_strong_lucas_pseudoprime>
+
+=cut
+
 =head2 is_smooth
 
     n.is_smooth(k)
@@ -4959,6 +4969,16 @@ Returns true if all the prime factors of C<n> are <= C<k>. False otherwise.
     n.is_smooth_over_prod(k)
 
 Returns true when C<n> is smooth over the prime factors of C<k>.
+
+=cut
+
+=head2 is_strong_psp
+
+    n.is_strong_psp(bases...)
+
+Return true if C<n> is a strong pseudoprime.
+
+Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<is_strong_fermat_pseudoprime>
 
 =cut
 
@@ -5058,26 +5078,6 @@ Aliases: I<is_strongish_lucas_pseudoprime>
 
 =cut
 
-=head2 is_strong_lucas_psp
-
-    n.is_strong_lucas_psp
-
-Return true if C<n> is a strong Lucas pseudoprime.
-
-Aliases: I<is_strong_lucas_pseudoprime>
-
-=cut
-
-=head2 is_strong_psp
-
-    n.is_strong_psp(bases...)
-
-Return true if C<n> is a strong pseudoprime.
-
-Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<is_strong_fermat_pseudoprime>
-
-=cut
-
 =head2 is_super_psp
 
     n.is_super_psp(bases...)
@@ -5124,6 +5124,25 @@ Aliases: I<subint>
 Return true if C<n> passes the efficient Frobenius test of Paul Underwood.
 
 Aliases: I<is_underwood_pseudoprime>, I<is_frobenius_underwood_psp>, I<is_frobenius_underwood_pseudoprime>
+
+=cut
+
+=head2 is_vpsp
+
+    n.is_vpsp
+
+Returns true if C<n> passes the Lucas-V BFW test: C<V_{n+1} == 2*Q (mod n)> for carefully chosen values of C<P> and C<Q>.
+
+The composite numbers that pass this test are extremely rare (see OEIS A365514).
+
+When combined with a strong Fermat pseudoprime test to base 2, there are no known composites that pass both tests.
+
+Reference:
+
+    Strengthening the Baillie-PSW primality test
+    https://arxiv.org/abs/2006.14425
+
+Aliases: I<is_bfw_psp>
 
 =cut
 
