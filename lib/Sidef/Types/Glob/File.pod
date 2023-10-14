@@ -112,9 +112,11 @@ Aliases: I<copy>
 
 =head2 delete
 
-    self.delete(*args)
+    file.delete
 
-Returns the
+Deletes a file and return C<true> on success.
+
+Will not attempt to delete directories.
 
 Aliases: I<remove>
 
@@ -122,9 +124,9 @@ Aliases: I<remove>
 
 =head2 dir
 
-    self.dir
+    file.dir
 
-Returns the
+Returns the directory of the filename, similar to the Unix shell command C<dirname>.
 
 Aliases: I<dir_name>, I<dirname>
 
@@ -132,9 +134,9 @@ Aliases: I<dir_name>, I<dirname>
 
 =head2 dump
 
-    self.dump
+    file.dump
 
-Returns the
+Returns a String representation of the File object.
 
 =cut
 
@@ -148,41 +150,41 @@ Returns the
 
 =head2 exists
 
-    self.exists
+    file.exists
 
-Returns the
+Returns C<true> if file exists.
 
 =cut
 
 =head2 has_setgid_bit
 
-    self.has_setgid_bit
+    file.has_setgid_bit
 
-Returns the
+Returns C<true> if file has setgid bit set.
 
 =cut
 
 =head2 has_setuid_bit
 
-    self.has_setuid_bit
+    file.has_setuid_bit
 
-Returns the
+Returns C<true> if file has setuid bit set.
 
 =cut
 
 =head2 has_sticky_bit
 
-    self.has_sticky_bit
+    file.has_sticky_bit
 
-Returns the
+Returns C<true> if file has sticky bit set.
 
 =cut
 
 =head2 is_abs
 
-    self.is_abs
+    file.is_abs
 
-Returns the
+Returns C<true> if file name is absolute.
 
 Aliases: I<is_absolute>
 
@@ -190,33 +192,33 @@ Aliases: I<is_absolute>
 
 =head2 is_binary
 
-    self.is_binary
+    file.is_binary
 
-Returns the
+Returns C<true> if file looks like a binary file (heuristic guess).
 
 =cut
 
 =head2 is_block
 
-    self.is_block
+    file.is_block
 
-Returns the
+Returns C<true> if file is a block special file.
 
 =cut
 
 =head2 is_char_device
 
-    self.is_char_device
+    file.is_char_device
 
-Returns the
+Returns C<true> if file is a character special file.
 
 =cut
 
 =head2 is_dir
 
-    self.is_dir
+    file.is_dir
 
-Returns the
+Returns C<true> if file is a directory.
 
 Aliases: I<is_directory>
 
@@ -224,105 +226,117 @@ Aliases: I<is_directory>
 
 =head2 is_empty
 
-    self.is_empty
+    file.is_empty
 
-Returns the
+Returns C<true> if file has zero size (i.e.: is empty).
 
 =cut
 
 =head2 is_executable
 
-    self.is_executable
+    file.is_executable
 
-Returns the
+Returns C<true> if file is executable by effective uid/gid.
 
 =cut
 
 =head2 is_file
 
-    self.is_file
+    file.is_file
 
-Returns the
+Returns C<true> if file is a plain file.
 
 =cut
 
 =head2 is_link
 
-    self.is_link
+    file.is_link
 
-Returns the
+Returns C<true> if file is a symbolic link.
+
+Returns C<false> if symlinks aren't supported by the file system.
 
 =cut
 
 =head2 is_owned
 
-    self.is_owned
+    file.is_owned
 
-Returns the
+Returns C<true> if file is owned by effective uid.
 
 =cut
 
 =head2 is_readable
 
-    self.is_readable
+    file.is_readable
 
-Returns the
+Returns C<true> if file is readable by effective uid/gid.
 
 =cut
 
 =head2 is_real_executable
 
-    self.is_real_executable
+    file.is_real_executable
 
-Returns the
+Returns C<true> if file is executable by real uid/gid.
 
 =cut
 
 =head2 is_real_owned
 
-    self.is_real_owned
+    file.is_real_owned
 
-Returns the
+Returns C<true> if file is owned by real uid.
 
 =cut
 
 =head2 is_real_readable
 
-    self.is_real_readable
+    file.is_real_readable
 
-Returns the
+Returns C<true> if file is readable by real uid/gid.
 
 =cut
 
 =head2 is_real_writeable
 
-    self.is_real_writeable
+    file.is_real_writeable
 
-Returns the
+Returns C<true> if file is writable by real uid/gid.
 
 =cut
 
 =head2 is_socket
 
-    self.is_socket
+    file.is_socket
 
-Returns the
+Returns C<true> if file is a socket.
 
 =cut
 
 =head2 is_text
 
-    self.is_text
+    file.is_text
 
-Returns the
+Returns C<true> if file is an ASCII or UTF-8 text file (heuristic guess).
 
 =cut
 
 =head2 is_writeable
 
-    self.is_writeable
+    file.is_writeable
 
-Returns the
+Returns C<true> if file is writable by effective uid/gid.
+
+=cut
+
+=head2 link
+
+    oldfile.link(newfile)
+
+Creates a new filename linked to the old filename.
+
+Returns C<true> for success, C<false> otherwise.
 
 =cut
 
@@ -553,6 +567,16 @@ Returns the
     self.stat
 
 Returns the
+
+=cut
+
+=head2 symlink
+
+    oldfile.symlink(newfile)
+
+Creates a new filename symbolically linked to the old filename.
+
+Returns C<true> for success, C<false> otherwise.
 
 =cut
 
