@@ -11483,14 +11483,18 @@ package Sidef::Types::Number::Number {
     sub _modular_lucas_UV {
         my ($P, $Q, $n, $m) = @_;
 
-        if (    Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0
-            and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) {
+        if (    (ref($P) ? (Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($P) < $LUCAS_PQ_LIMIT))
+            and (ref($Q) ? (Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($Q) < $LUCAS_PQ_LIMIT))) {
             my ($U, $V);
-            if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            if (HAS_NEW_PRIME_UTIL and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m)) and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
                 eval {
                     ($U, $V) =
-                      Math::Prime::Util::lucas_sequence(Math::GMPz::Rmpz_get_ui($m), Math::GMPz::Rmpz_get_si($P),
-                                                        Math::GMPz::Rmpz_get_si($Q), Math::GMPz::Rmpz_get_ui($n));
+                      Math::Prime::Util::lucas_sequence(
+                                                        (ref($m) ? Math::GMPz::Rmpz_get_ui($m) : $m),
+                                                        (ref($P) ? Math::GMPz::Rmpz_get_si($P) : $P),
+                                                        (ref($Q) ? Math::GMPz::Rmpz_get_si($Q) : $Q),
+                                                        (ref($n) ? Math::GMPz::Rmpz_get_ui($n) : $n)
+                                                       );
                 };
             }
             else {
@@ -11498,6 +11502,11 @@ package Sidef::Types::Number::Number {
             }
             defined($U) && defined($V) && return (map { _str2obj($_) } ($U, $V));
         }
+
+        $P = _any2mpz($P) if !ref($P);
+        $Q = _any2mpz($Q) if !ref($Q);
+        $n = _any2mpz($n) if !ref($n);
+        $m = _any2mpz($m) if !ref($m);
 
         state $D = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_mul($D, $P, $P);
@@ -11522,14 +11531,18 @@ package Sidef::Types::Number::Number {
     sub _modular_lucas_U {
         my ($P, $Q, $n, $m) = @_;
 
-        if (    Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0
-            and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) {
+        if (    (ref($P) ? (Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($P) < $LUCAS_PQ_LIMIT))
+            and (ref($Q) ? (Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($Q) < $LUCAS_PQ_LIMIT))) {
             my ($U, $V);
             if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
                 eval {
                     ($U, $V) =
-                      Math::Prime::Util::lucas_sequence(Math::GMPz::Rmpz_get_ui($m), Math::GMPz::Rmpz_get_si($P),
-                                                        Math::GMPz::Rmpz_get_si($Q), Math::GMPz::Rmpz_get_ui($n));
+                      Math::Prime::Util::lucas_sequence(
+                                                        (ref($m) ? Math::GMPz::Rmpz_get_ui($m) : $m),
+                                                        (ref($P) ? Math::GMPz::Rmpz_get_si($P) : $P),
+                                                        (ref($Q) ? Math::GMPz::Rmpz_get_si($Q) : $Q),
+                                                        (ref($n) ? Math::GMPz::Rmpz_get_ui($n) : $n)
+                                                       );
                 };
             }
             else {
@@ -11537,6 +11550,11 @@ package Sidef::Types::Number::Number {
             }
             defined($U) && return _str2obj($U);
         }
+
+        $P = _any2mpz($P) if !ref($P);
+        $Q = _any2mpz($Q) if !ref($Q);
+        $n = _any2mpz($n) if !ref($n);
+        $m = _any2mpz($m) if !ref($m);
 
         state $D = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_mul($D, $P, $P);
@@ -11561,14 +11579,18 @@ package Sidef::Types::Number::Number {
     sub _modular_lucas_V {
         my ($P, $Q, $n, $m) = @_;
 
-        if (    Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0
-            and Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) {
+        if (    (ref($P) ? (Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($P) < $LUCAS_PQ_LIMIT))
+            and (ref($Q) ? (Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($Q) < $LUCAS_PQ_LIMIT))) {
             my ($U, $V);
             if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($m) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
                 eval {
                     ($U, $V) =
-                      Math::Prime::Util::lucas_sequence(Math::GMPz::Rmpz_get_ui($m), Math::GMPz::Rmpz_get_si($P),
-                                                        Math::GMPz::Rmpz_get_si($Q), Math::GMPz::Rmpz_get_ui($n));
+                      Math::Prime::Util::lucas_sequence(
+                                                        (ref($m) ? Math::GMPz::Rmpz_get_ui($m) : $m),
+                                                        (ref($P) ? Math::GMPz::Rmpz_get_si($P) : $P),
+                                                        (ref($Q) ? Math::GMPz::Rmpz_get_si($Q) : $Q),
+                                                        (ref($n) ? Math::GMPz::Rmpz_get_ui($n) : $n)
+                                                       );
                 };
             }
             else {
@@ -11576,6 +11598,11 @@ package Sidef::Types::Number::Number {
             }
             defined($V) && return _str2obj($V);
         }
+
+        $P = _any2mpz($P) if !ref($P);
+        $Q = _any2mpz($Q) if !ref($Q);
+        $n = _any2mpz($n) if !ref($n);
+        $m = _any2mpz($m) if !ref($m);
 
         (__lucasVmod__($P, $Q, $n, $m))[0];
     }
@@ -12142,13 +12169,15 @@ package Sidef::Types::Number::Number {
             $m = $k;
         }
 
-        $n = _big2uistr($n) // goto &nan;
-        $m = _big2pistr($m) // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
 
-        return ZERO if $m eq '1';
+        Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
+        Math::GMPz::Rmpz_sgn($m) > 0 or goto &nan;
 
-        my ($r) = Math::Prime::Util::GMP::lucas_sequence($m, 1, -1, $n);
-        _set_int($r);
+        Math::GMPz::Rmpz_cmp_ui($m, 1) == 0 and return ZERO;
+
+        bless \_modular_lucas_U(1, -1, $n, $m);
     }
 
     *fibmod        = \&fibonaccimod;
@@ -20270,6 +20299,7 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_spsp               = \&is_strong_fermat_pseudoprime;
     *miller_rabin          = \&is_strong_fermat_pseudoprime;
     *is_strong_psp         = \&is_strong_fermat_pseudoprime;
     *is_strong_prp         = \&is_strong_fermat_pseudoprime;
@@ -20291,10 +20321,10 @@ package Sidef::Types::Number::Number {
         # V_n(P,1) == P (mod n) for any integer P.
         foreach my $i (1 .. 10) {    # test with random values of P
 
-            my $P = CORE::int(CORE::rand(1e6)) + 11;
-            my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($nstr, $P, 1, $nstr);
+            my $P = CORE::int(CORE::rand($LUCAS_PQ_LIMIT - 11)) + 11;
+            my $V = _modular_lucas_V($P, 1, $n, $n);
 
-            if ($V ne $P) {
+            if ($V != ($P % $n)) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
 
@@ -20305,9 +20335,9 @@ package Sidef::Types::Number::Number {
 
         # V_n(P,1) == P (mod n) for any integer P.
         foreach my $P (1, 3 .. 10) {    # test with small P
-            my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($nstr, $P, 1, $nstr);
+            my $V = _modular_lucas_V($P, 1, $n, $n);
 
-            if ($V ne $P) {
+            if ($V != ($P % $n)) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
         }
@@ -20354,29 +20384,29 @@ package Sidef::Types::Number::Number {
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
 
-        $P = defined($P) ? do { _valid(\$P); _any2si($$P) // return Sidef::Types::Bool::Bool::FALSE } : +1;
-        $Q = defined($Q) ? do { _valid(\$Q); _any2si($$Q) // return Sidef::Types::Bool::Bool::FALSE } : -1;
+        $P = defined($P) ? do { _valid(\$P); _any2mpz($$P) // return Sidef::Types::Bool::Bool::FALSE } : +1;
+        $Q = defined($Q) ? do { _valid(\$Q); _any2mpz($$Q) // return Sidef::Types::Bool::Bool::FALSE } : -1;
 
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Bool::Bool::FALSE;
 
+        my $k = 0;
         my $D = $P * $P - 4 * $Q;
 
-        Math::Prime::Util::GMP::is_square($D)
-          && return Sidef::Types::Bool::Bool::FALSE;
+        if (ref($D)) {
+            Math::GMPz::Rmpz_perfect_square_p($D) && return Sidef::Types::Bool::Bool::FALSE;
+            $k = Math::GMPz::Rmpz_kronecker($D, $n) || return Sidef::Types::Bool::Bool::FALSE;
+        }
+        else {
+            Math::Prime::Util::GMP::is_square($D) && return Sidef::Types::Bool::Bool::FALSE;
+            $k = Math::Prime::Util::GMP::kronecker($D, $n) || return Sidef::Types::Bool::Bool::FALSE;
+        }
 
-        my $k =
-          ($D < 0)
-          ? Math::GMPz::Rmpz_si_kronecker($D, $n)
-          : Math::GMPz::Rmpz_ui_kronecker($D, $n);
+        my $U = _modular_lucas_U($P, $Q, $n - $k, $n);
 
-        $k || return Sidef::Types::Bool::Bool::FALSE;
-
-        my ($U, $V) = eval { Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $n - $k) };
-
-        defined($U) and ($U eq '0')
+        ($U == 0)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -20394,17 +20424,17 @@ package Sidef::Types::Number::Number {
 
         __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
 
-        $P = defined($P) ? do { _valid(\$P); _any2si($$P) // return Sidef::Types::Bool::Bool::FALSE } : +1;
-        $Q = defined($Q) ? do { _valid(\$Q); _any2si($$Q) // return Sidef::Types::Bool::Bool::FALSE } : -1;
+        $P = defined($P) ? do { _valid(\$P); _any2mpz($$P) // return Sidef::Types::Bool::Bool::FALSE } : 1;
+        $Q = defined($Q) ? do { _valid(\$Q); _any2mpz($$Q) // return Sidef::Types::Bool::Bool::FALSE } : -1;
 
         $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return Sidef::Types::Bool::Bool::FALSE;
 
-        my ($U, $V) = eval { Math::Prime::Util::GMP::lucas_sequence($n, $P, $Q, $n) };
+        my $V = _modular_lucas_V($P, $Q, $n, $n);
 
-        (defined($V) and $V eq join('', $P % $n))
+        (ref($V) ? Math::GMPz::Rmpz_congruent_p($V, $P, $n) : ($V == ($P % $n)))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -20426,8 +20456,8 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 2) > 0
           or return Sidef::Types::Bool::Bool::FALSE;
 
-        my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 2, -1, $n);
-        $V eq '2' ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
+        my $V = _modular_lucas_V(2, -1, $n, $n);
+        $V == 2 ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
     }
 
     *is_pell_lucas_psp = \&is_pell_lucas_pseudoprime;
@@ -20442,11 +20472,11 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 2) > 0 or return Sidef::Types::Bool::Bool::FALSE;
         Math::GMPz::Rmpz_even_p($n) and return Sidef::Types::Bool::Bool::FALSE;
 
-        my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($n, 2, -1, $n);
+        my $U = _modular_lucas_U(2, -1, $n, $n);
 
         if (Math::GMPz::Rmpz_ui_kronecker(2, $n) == 1) {
             return (
-                    $U eq '1'
+                    ($U == 1)
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -20454,11 +20484,13 @@ package Sidef::Types::Number::Number {
 
         state $t = Math::GMPz::Rmpz_init_nobless();
 
-        ($U < ULONG_MAX)
-          ? Math::GMPz::Rmpz_set_ui($t, $U)
-          : Math::GMPz::Rmpz_set_str($t, $U, 10);
+        if (ref($U)) {
+            Math::GMPz::Rmpz_add_ui($t, $U, 1);
+        }
+        else {
+            Math::GMPz::Rmpz_set_ui($t, $U + 1);
+        }
 
-        Math::GMPz::Rmpz_add_ui($t, $t, 1);
         Math::GMPz::Rmpz_cmp($t, $n)
           ? Sidef::Types::Bool::Bool::FALSE
           : Sidef::Types::Bool::Bool::TRUE;
@@ -20494,10 +20526,10 @@ package Sidef::Types::Number::Number {
         # V_n(P,-1) == P (mod n) for any integer P.
         foreach my $i (1 .. 10) {    # test with random values of P
 
-            my $P = CORE::int(CORE::rand(1e6)) + 11;
-            my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($nstr, $P, -1, $nstr);
+            my $P = CORE::int(CORE::rand($LUCAS_PQ_LIMIT - 11)) + 11;
+            my $V = _modular_lucas_V($P, -1, $n, $n);
 
-            if ($V ne $P) {
+            if ($V != ($P % $n)) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
 
@@ -20508,9 +20540,9 @@ package Sidef::Types::Number::Number {
 
         # V_n(P,-1) == P (mod n) for any integer P.
         foreach my $P (1, 3 .. 10) {    # test with small P
-            my ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($nstr, $P, -1, $nstr);
+            my $V = _modular_lucas_V($P, -1, $n, $n);
 
-            if ($V ne $P) {
+            if ($V != ($P % $n)) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
         }
@@ -20590,6 +20622,7 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_lpsp          = \&is_lucas_pseudoprime;
     *is_lucas_psp     = \&is_lucas_pseudoprime;
     *is_lucas_prp     = \&is_lucas_pseudoprime;
     *is_selfridge_prp = \&is_lucas_pseudoprime;
@@ -20613,6 +20646,7 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_slpsp                = \&is_strong_lucas_pseudoprime;
     *is_strong_lucas_psp     = \&is_strong_lucas_pseudoprime;
     *is_strong_lucas_prp     = \&is_strong_lucas_pseudoprime;
     *is_strong_selfridge_prp = \&is_strong_lucas_pseudoprime;
