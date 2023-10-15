@@ -478,6 +478,8 @@ do {
         assert(!n.is_bpsw_prp)
         assert(!n.is_fib_psp)
         assert(!n.is_carmichael)
+        assert(!n.is_chebyshev_psp)
+        assert(!n.is_strong_fib_psp)
         assert(!n.is_lucas_psp)
         assert(!n.is_lucasU_psp(1, -1))
         assert(!n.is_lucasV_psp(1, -1))

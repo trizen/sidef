@@ -61,6 +61,9 @@ package Sidef::Types::Number::Number {
         HAS_NEW_PRIME_UTIL   => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::is_perfect_power)) // 0,
         HAS_NEWER_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::is_congruent))     // 0,
 
+        # Check if we have a recent enough version of Math::Prime::Util::GMP
+        HAS_NEW_PRIME_UTIL_GMP => defined(&Math::Prime::Util::GMP::lucasvmod) // 0,
+
         IS_PRIME_CACHE_SIZE => 1e5,                                                                # how many entries to cache
         INTSIZE             => CORE::int(CORE::log(ULONG_MAX) / CORE::log(2)),                     # size of ULONG_MAX in base 2
         PRIMECOUNT_MIN      => List::Util::min(ULONG_MAX,       (HAS_PRIME_UTIL ? 1e10 : 1e7)),    # absolute value
@@ -11535,18 +11538,36 @@ package Sidef::Types::Number::Number {
             and (ref($Q) ? (Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($Q) < $LUCAS_PQ_LIMIT))) {
             my ($U, $V);
             if (HAS_NEW_PRIME_UTIL and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m)) and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
-                eval {
-                    ($U, $V) =
-                      Math::Prime::Util::lucas_sequence(
-                                                        (ref($m) ? Math::GMPz::Rmpz_get_ui($m) : $m),
-                                                        (ref($P) ? Math::GMPz::Rmpz_get_si($P) : $P),
-                                                        (ref($Q) ? Math::GMPz::Rmpz_get_si($Q) : $Q),
-                                                        (ref($n) ? Math::GMPz::Rmpz_get_ui($n) : $n)
-                                                       );
-                };
+                if (HAS_NEWER_PRIME_UTIL) {
+                    eval {
+                        $U =
+                          Math::Prime::Util::lucasumod(
+                                                       (ref($P) ? Math::GMPz::Rmpz_get_si($P) : $P),
+                                                       (ref($Q) ? Math::GMPz::Rmpz_get_si($Q) : $Q),
+                                                       (ref($n) ? Math::GMPz::Rmpz_get_ui($n) : $n),
+                                                       (ref($m) ? Math::GMPz::Rmpz_get_ui($m) : $m),
+                                                      );
+                    };
+                }
+                else {
+                    eval {
+                        ($U, $V) =
+                          Math::Prime::Util::lucas_sequence(
+                                                            (ref($m) ? Math::GMPz::Rmpz_get_ui($m) : $m),
+                                                            (ref($P) ? Math::GMPz::Rmpz_get_si($P) : $P),
+                                                            (ref($Q) ? Math::GMPz::Rmpz_get_si($Q) : $Q),
+                                                            (ref($n) ? Math::GMPz::Rmpz_get_ui($n) : $n),
+                                                           );
+                    };
+                }
             }
             else {
-                eval { ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($m, $P, $Q, $n) };
+                if (HAS_NEW_PRIME_UTIL_GMP) {
+                    eval { $U = Math::Prime::Util::GMP::lucasumod($P, $Q, $n, $m) };
+                }
+                else {
+                    eval { ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($m, $P, $Q, $n) };
+                }
             }
             defined($U) && return _str2obj($U);
         }
@@ -11583,18 +11604,36 @@ package Sidef::Types::Number::Number {
             and (ref($Q) ? (Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($Q) < $LUCAS_PQ_LIMIT))) {
             my ($U, $V);
             if (HAS_NEW_PRIME_UTIL and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m)) and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
-                eval {
-                    ($U, $V) =
-                      Math::Prime::Util::lucas_sequence(
-                                                        (ref($m) ? Math::GMPz::Rmpz_get_ui($m) : $m),
-                                                        (ref($P) ? Math::GMPz::Rmpz_get_si($P) : $P),
-                                                        (ref($Q) ? Math::GMPz::Rmpz_get_si($Q) : $Q),
-                                                        (ref($n) ? Math::GMPz::Rmpz_get_ui($n) : $n)
-                                                       );
-                };
+                if (HAS_NEWER_PRIME_UTIL) {
+                    eval {
+                        $V =
+                          Math::Prime::Util::lucasvmod(
+                                                       (ref($P) ? Math::GMPz::Rmpz_get_si($P) : $P),
+                                                       (ref($Q) ? Math::GMPz::Rmpz_get_si($Q) : $Q),
+                                                       (ref($n) ? Math::GMPz::Rmpz_get_ui($n) : $n),
+                                                       (ref($m) ? Math::GMPz::Rmpz_get_ui($m) : $m),
+                                                      );
+                    };
+                }
+                else {
+                    eval {
+                        ($U, $V) =
+                          Math::Prime::Util::lucas_sequence(
+                                                            (ref($m) ? Math::GMPz::Rmpz_get_ui($m) : $m),
+                                                            (ref($P) ? Math::GMPz::Rmpz_get_si($P) : $P),
+                                                            (ref($Q) ? Math::GMPz::Rmpz_get_si($Q) : $Q),
+                                                            (ref($n) ? Math::GMPz::Rmpz_get_ui($n) : $n),
+                                                           );
+                    };
+                }
             }
             else {
-                eval { ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($m, $P, $Q, $n) };
+                if (HAS_NEW_PRIME_UTIL_GMP) {
+                    eval { $V = Math::Prime::Util::GMP::lucasvmod($P, $Q, $n, $m) };
+                }
+                else {
+                    eval { ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($m, $P, $Q, $n) };
+                }
             }
             defined($V) && return _str2obj($V);
         }
