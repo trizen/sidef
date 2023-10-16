@@ -19273,8 +19273,8 @@ package Sidef::Types::Number::Number {
         foreach my $n (@strs) {
             (
              (HAS_PRIME_UTIL and $n < ULONG_MAX)
-             ? Math::Prime::Util::is_extra_strong_lucas_pseudoprime($n)
-             : Math::Prime::Util::GMP::is_extra_strong_lucas_pseudoprime($n)
+             ? Math::Prime::Util::is_almost_extra_strong_lucas_pseudoprime($n)
+             : Math::Prime::Util::GMP::is_almost_extra_strong_lucas_pseudoprime($n)
             )
               || return Sidef::Types::Bool::Bool::FALSE;
         }
@@ -19368,7 +19368,7 @@ package Sidef::Types::Number::Number {
 
         (   Math::Prime::Util::GMP::is_strong_pseudoprime($t, 2)
          && Math::Prime::Util::GMP::is_strong_pseudoprime($n, 2)
-         && Math::Prime::Util::GMP::is_extra_strong_lucas_pseudoprime($t))
+         && Math::Prime::Util::GMP::is_almost_extra_strong_lucas_pseudoprime($t))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }

@@ -12,6 +12,13 @@ assert_eq(208 >> 64, 0)
 assert_eq(496 >> 32, 0)
 assert_eq(640 >> 32, 0)
 
+assert(all_prime(5))
+assert([2].all_prime)
+assert([5].all_prime)
+assert([2,3,5,7,11].all_prime)
+
+assert_eq(10.by{.is_safe_prime}, %n[5, 7, 11, 23, 47, 59, 83, 107, 167, 179])
+
 assert_eq(8 >> 8, 0)
 assert_eq(0 >> 0, 0)
 assert_eq(1234 >> 8, 4)
