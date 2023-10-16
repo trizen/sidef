@@ -403,7 +403,7 @@ HELP
     }
 }
 
-sub create_search_tree {
+sub create_completion_tree {
     scalar {
 
             table       => {},
@@ -439,6 +439,45 @@ sub search_tree {
     }
 
     @{$ref->{$tree->{special_key}} // []};
+}
+
+sub add_class_methods_to_completion {
+    my ($tree, $class) = @_;
+
+    my $modules_count = scalar(keys %INC);
+
+    state %seen;
+    state $included_modules = $modules_count - 1;
+
+    if ($modules_count == $included_modules) {
+        return 1;
+    }
+
+    foreach my $module (keys %INC) {
+
+        next if $seen{$module}++;
+
+        my $class = $module =~ s{\.pm\z}{}r =~ s{\W+}{::}gr;
+        $class =~ /^Sidef::Types::/ or next;
+
+        foreach my $method_name (keys %{$class->methods}) {
+            add_tree_entry($tree, [split(//, $method_name)], $method_name);
+        }
+    }
+
+    $included_modules = $modules_count;
+    return 1;
+}
+
+sub add_words_to_completion {
+    my ($tree, $string) = @_;
+
+    while ($string =~ /(\w+)/g) {
+        my $word = $1;
+        add_tree_entry($tree, [split(//, $word)], $word);
+    }
+
+    return 1;
 }
 
 sub code_interactive {
@@ -525,6 +564,7 @@ EOT
     my $valid_lines = '';
     my ($vars, $ref_vars_refs);
 
+    my $completion_tree;
     my $history_support = $term->can('ReadHistory') && $term->can('Attribs');
     my $history_file    = File::Spec->catfile($sidef->get_sidef_config_dir(), 'sidef_history.txt');
 
@@ -534,37 +574,30 @@ EOT
             open my $fh, '>', $history_file;
         }
 
-        my $tree = create_search_tree();
+        $completion_tree = create_completion_tree();
+
         my $attr = $term->Attribs;
 
-        #$attr->{inhibit_completion} = 1;
+        $attr->{basic_quote_characters} = q{};
 
-        foreach my $class (
-                           qw(
-                           Sidef::Types::Number::Number
-                           )
-          ) {
-            foreach my $method_name (keys %{$class->methods}) {
-                add_tree_entry($tree, [split(//, $method_name)], $method_name);
-            }
-        }
+        add_class_methods_to_completion($completion_tree);
 
         my @results;
         $attr->{completion_entry_function} = sub {
             my ($prefix, $state) = @_;
 
             my $root = '';
-            if ($prefix =~ /^(.*\.)(\w+)\z/) {
+            if ($prefix !~ /^\w+\z/ and $prefix =~ /^(.*)\b(\w+)\z/) {
                 $root   = $1;
                 $prefix = $2;
             }
 
             if ($state == 0) {
-                @results = search_tree($tree, [split(//, $prefix)]);
+                @results = search_tree($completion_tree, [split(//, $prefix)]);
             }
 
             @results || return undef;
-            $root . shift @results;
+            $root . shift(@results);
         };
 
         $term->ReadHistory($history_file);
@@ -700,6 +733,7 @@ EOT
                 $term->addhistory($line =~ s/\R/\r/gr);
             }
             $term->append_history(1, $history_file);
+            add_words_to_completion($completion_tree, $line);
         }
 
         if (defined($args{r}) or defined($args{R})) {
@@ -735,6 +769,10 @@ EOT
               };
 
             say "#" . scalar(@values) . " = $dump";
+
+            if ($history_support) {
+                add_class_methods_to_completion($completion_tree);
+            }
         }
         redo;
     }
