@@ -14,7 +14,7 @@ In this tutorial we're going to look how we can use [Sidef](https://github.com/t
       **   **               ****   *********   *********   *
 ```
 
-To get started with Sidef and how to install it, please see [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-tutorial.pdf)).
+To get started with Sidef and how to install it, please see [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/23.10/sidef-tutorial.pdf)).
 
 Over the years, Sidef incorporated more and more mathematical functions, many of them provided by Dana Jacobsen's excellent [Math::Prime::Util](https://github.com/danaj/Math-Prime-Util) and [Math::Prime::Util::GMP](https://github.com/danaj/Math-Prime-Util-GMP) Perl modules, which provide great performance in tasks involving integer factorization, primality testing and prime counting.
 
@@ -30,7 +30,7 @@ After [installing Sidef](https://codeberg.org/trizen/sidef/src/branch/master/TUT
 
 ```
 $ sidef
-Sidef 23.08, running on Linux, using Perl v5.38.0.
+Sidef 23.10, running on Linux, using Perl v5.38.0.
 Type "help", "copyright" or "license" for more information.
 >
 ```
@@ -254,7 +254,7 @@ k.powerfree_divisors(n)     # k-powerfree divisors of n
 k.powerfree_udivisors(n)    # k-powerfree unitary divisors of n
 ```
 
-For the full documentation of each function, please see: [https://metacpan.org/pod/Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-number-class-documentation.pdf))
+For the full documentation of each function, please see: [https://metacpan.org/pod/Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number) ([PDF](https://github.com/trizen/sidef/releases/download/23.10/sidef-number-class-documentation.pdf))
 
 # Generating sequences
 
@@ -362,7 +362,7 @@ for n in (0..30) {
 
 This section briefly describes the built-in classes related to computational number theory.
 
-For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/23.08/sidef-book.pdf)).
+For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/23.10/sidef-book.pdf)).
 
 ## Mod class
 
@@ -1600,7 +1600,9 @@ Additionally, the function also calls `special_factor(n)` internally and returns
 
 A massive speed improvement would be using ECM with conjectured bounds to push `B` much higher than we can achieve with trial-division. This would allow us to reject many numbers faster. But that approach would be based on unproved conjectures and therefore is not implemented.
 
-Another conjectured approach would be using Pollard's rho method to find a larger bound for `B`, which requires `O(sqrt(B))` steps to find a prime factor less than `B`. Therefore, if we take `B = 10^12`, after `c*10^6` iterations of the Pollard rho method without success in finding a prime factor of `n`, it's very probable that `n` has no prime factor less than `10^12`. This approach is also not implemented.
+Another conjectured approach would be using Pollard's rho method to find a larger bound for `B`, which requires `O(sqrt(B))` steps to find a prime factor less than `B`. Therefore, if we take `B = 10^12`, after `c*10^6` iterations of the Pollard rho method without success in finding a prime factor of `n`, it's very probable that `n` has no prime factor less than `10^12`.
+
+This later approach is implemented by setting `Num!USE_CONJECTURES = true` and is useful for computing upper-bounds, being about 5x faster than the rigorous method.
 
 ## Factorization of integers of special form
 
