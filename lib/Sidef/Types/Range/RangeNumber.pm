@@ -5,7 +5,6 @@ package Sidef::Types::Range::RangeNumber {
 
     use parent qw(
       Sidef::Types::Range::Range
-      Sidef::Object::Object
     );
 
     use overload q{""} => sub {

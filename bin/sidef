@@ -459,7 +459,7 @@ sub add_class_methods_to_completion {
         my $class = $module =~ s{\.pm\z}{}r =~ s{\W+}{::}gr;
         $class =~ /^Sidef::Types::/ or next;
 
-        foreach my $method_name (keys %{$class->methods}) {
+        foreach my $method_name (keys %{(eval { $class->methods }) // {}}) {
             add_tree_entry($tree, [split(//, $method_name)], $method_name);
         }
     }

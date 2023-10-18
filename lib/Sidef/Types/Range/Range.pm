@@ -19,6 +19,8 @@ package Sidef::Types::Range::Range {
         };
     };
 
+    use parent qw(Sidef::Object::Object);
+
     sub new {
         shift();
         my $from = shift;

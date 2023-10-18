@@ -3,6 +3,10 @@ package Sidef::Types::Block::Fork {
     use utf8;
     use 5.016;
 
+    use parent qw(
+      Sidef::Object::Object
+    );
+
     sub new {
         my (undef, %opts) = @_;
         bless \%opts, __PACKAGE__;

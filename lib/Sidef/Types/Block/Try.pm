@@ -3,6 +3,10 @@ package Sidef::Types::Block::Try {
     use utf8;
     use 5.016;
 
+    use parent qw(
+      Sidef::Object::Object
+    );
+
     sub new {
         bless {catch => 0}, __PACKAGE__;
     }
