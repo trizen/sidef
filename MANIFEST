@@ -80,6 +80,8 @@ lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Number/Polynomial.pm
 lib/Sidef/Types/Number/Polynomial.pod
+lib/Sidef/Types/Number/PolynomialMod.pm
+lib/Sidef/Types/Number/PolynomialMod.pod
 lib/Sidef/Types/Number/Quadratic.pm
 lib/Sidef/Types/Number/Quadratic.pod
 lib/Sidef/Types/Number/Quaternion.pm
@@ -965,6 +967,7 @@ scripts/Tests/pipeline_cross_operator.sf
 scripts/Tests/pipeline_map_operator.sf
 scripts/Tests/pipeline_operator.sf
 scripts/Tests/pipeline_zip_operator.sf
+scripts/Tests/polymod.sf
 scripts/Tests/polynomial.sf
 scripts/Tests/polynomial_regression.sf
 scripts/Tests/postfix_exclamation_mark.sf

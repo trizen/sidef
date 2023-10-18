@@ -77,6 +77,7 @@ package Sidef::Parser {
                      | Quadratic\b                    (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quadratic') })
                      | Quaternion\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quaternion') })
                      | Poly(?:nomial)?\b              (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Polynomial') })
+                     | Poly(?:nomial)?Mod\b           (?{ state $x = bless({}, 'Sidef::DataTypes::Number::PolynomialMod') })
                      | Frac(?:tion)?\b                (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Fraction') })
                      | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
                      | NaN\b                          (?{ state $x = Sidef::Types::Number::Number->nan })
@@ -215,6 +216,7 @@ package Sidef::Parser {
                   Str String
                   Num Number
                   Poly Polynomial
+                  PolyMod PolynomialMod
                   Frac Fraction
                   Mod
                   Gauss

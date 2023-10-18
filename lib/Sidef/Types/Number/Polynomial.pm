@@ -77,8 +77,8 @@ package Sidef::Types::Number::Polynomial {
                 \s*+}gcx
                   ) {
                     my $sign  = $+{sign} // '+';
-                    my $exp   = defined($+{x}) ? ($+{exp} // 1) : 0;
-                    my $coeff = Sidef::Types::Number::Number->new(($+{coeff} eq '') ? '1' : $+{coeff});
+                    my $exp   = defined($+{x}) ? ($+{exp} // '1') : '0';
+                    my $coeff = Sidef::Types::Number::Number->new($+{coeff} // 1);
                     $coeff = $coeff->neg if $sign eq '-';
                     $pairs{$exp} = $coeff;
                     last if $str =~ /\G\z/;
@@ -202,7 +202,8 @@ package Sidef::Types::Number::Polynomial {
 
     sub __dump__ {
         my ($x) = @_;
-        'Polynomial(' . join(", ", map { join(' => ', $_, $x->{$_}->dump) } sort { $a <=> $b } CORE::keys %$x) . ')';
+        my $str = join(", ", map { join(' => ', $_, $x->{$_}->dump) } sort { $a <=> $b } CORE::keys %$x);
+        'Polynomial(' . $str . ')';
     }
 
     sub __boolify__ {

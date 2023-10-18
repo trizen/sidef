@@ -1,15 +1,12 @@
 TODO list for Sidef
 
 New built-in classes:
-    * Add the `PolyMod()` class for representing a modular polynomial.
-        - See: "Math::Polynomial::ModInt" on CPAN.
-        - https://metacpan.org/pod/Math::Polynomial::ModInt
-
     * Add the `Seq()` class for representing a sequence.
         - Take a block for computing the terms, based on the previous terms of the sequence.
         - Maybe allow array-like indexing.
         - Internal caching of terms.
         - See: https://docs.raku.org/type/Seq.html
+        - Not sure if it's worth it. We already have the `Math.seq()` function.
 
 Classes:
     * Implement roles (from Raku) and add the `does` trait for classes.

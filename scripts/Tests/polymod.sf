@@ -1,0 +1,119 @@
+#!/usr/bin/ruby
+
+# Tests for the PolyMod() class.
+
+# Polynomial multiplication, using the Chinese Remainder Theorem (CRT).
+
+# Reference:
+#   Lecture 14, Week 8 (2hrs) - Towards polynomial factorization
+#   https://youtube.com/watch?v=KNyHz0eoAMA (from 1 hour and 7 minutes)
+
+func CRT (*congruences) {
+
+    var c = 0
+    var m = congruences.lcm { _[1] }
+
+    for a,n in (congruences) {
+
+        var t = m/n
+        var u = (t * invmod(t, n))
+
+        c += ((a.lift*u) % m)
+    }
+
+    return (c % m)
+}
+
+func poly_height(x) {
+    x.coeffs.map { .tail.abs }.max
+}
+
+func CRT_poly_mul(a,b) {
+    var c_height = 2*(poly_height(a) * poly_height(b) * min(a.coeffs.len, b.coeffs.len))
+
+    var m = 1
+    var P = []
+
+    Math.seq(3, {.tail.next_prime}).each {|p|
+        m *= p
+        P << p
+        break if (m > c_height)
+    }
+
+    var c = lift(CRT(P.map{|p| [PolyMod(a, p) * PolyMod(b, p), p] }...))
+    var t = (m>>1)
+
+    return Poly(c.coeffs.map_2d {|x,y| [x, (y > t) ? (y-m) : y] })
+}
+
+var x = Poly(1)
+
+assert_eq(CRT_poly_mul(3*x - 4, 6*x + 5), (3*x - 4)*(6*x + 5))
+
+var a = (17*x**3 + 7*x**2 - x + 65)
+var b = (34*x**4 - 23*x**2 + 8*x - 12)
+
+assert_eq((a*b), CRT_poly_mul(a,b))
+assert_eq((a*b) % (2**127 - 1), PolyMod(a, 2**127 - 1) * PolyMod(b, 2**127 - 1) -> lift)
+
+do {
+    var x = PolyMod(1, 7)
+    assert_eq(x**2 / (2*x), 4*x)
+    assert_eq((1/2 * x) <=> 4*x, 0)
+}
+
+do {
+    var p1 = PolyMod("2*x^2 + 3*x - 5", 101)
+    var p2 = PolyMod("-3*x^2 - 4*x + 6", 101)
+
+    var (q,r) = p1.divmod(p2)
+    assert_eq(q, PolyMod(0 => 33, 101))
+    assert_eq(r, PolyMod(0 => 100, 1 => 34, 101))
+}
+
+do {
+
+    var n = 5040
+    var sd = n.squarefree_divisors
+
+    var num = []
+    var den = []
+
+    for d in (sd) {
+        var t = idiv(n,d)
+        var base = Poly(t)-1
+        if (moebius(d) == 1) {
+            num << base
+        }
+        else {
+            den << base
+        }
+    }
+
+    var m = n.next_prime
+
+    var p1 = (num.prod / den.prod)
+    var p2 = (PolyMod(num.prod, m) / PolyMod(den.prod, m))
+
+    assert_eq(Mod(p1, m).eval(42), p2.eval(42))
+    assert_eq(p1.eval(43) % m, p2.eval(43))
+    assert_eq(PolyMod(p1, m), p2)
+}
+
+do {
+    var a = PolyMod("2*x^2 + 3*x - 5", 101)
+    var b = PolyMod("-3*x^2 - 4*x + 6", 101)
+
+    assert_eq(
+        gcd(a*b, b), PolyMod("98*x^2 + 97*x + 6", 101)
+    )
+
+    assert_eq(gcd(a, b), 68)
+
+    assert_eq(
+        [gcdext(a*b, b)],
+        [PolyMod("98*x^2 + 97*x + 6", 101), 0, 1, PolyMod("2*x^2 + 3*x + 96", 101), 1]
+    )
+}
+
+say "** Test passed!"

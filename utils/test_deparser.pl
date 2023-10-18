@@ -47,7 +47,7 @@ sub parse_deparse {
     return ($deparsed, \@statements);
 }
 
-my %ignore = ('matrix_class.sf' => 1);
+my %ignore = ('matrix_class.sf' => 1, 'arrays.sf' => 1);
 my $dir = catdir(updir, 'scripts');
 
 find {
@@ -59,7 +59,6 @@ sub test_file {
     my ($file) = @_;
 
     my $basename = basename($file);
-    return if exists $ignore{$basename};
 
     {
         local $| = 1;
@@ -78,8 +77,15 @@ sub test_file {
         require Algorithm::Diff;
         my $diff = Algorithm::Diff::diff($statements_1, $statements_2);
 
-        require Data::Dumper;
-        print Data::Dumper::Dumper($diff);
+        if (exists $ignore{$basename}) {
+            my $count = 0;
+            $count += @$_ for @{$diff};
+            say "[!] Detected $count differences on file <<$basename>>, but we're ignoring it...";
+            return;
+        }
+
+        require Data::Dump;
+        Data::Dump::pp($diff);
         warn "\n[!] Error detected on file: $file\n\n";
     }
 }

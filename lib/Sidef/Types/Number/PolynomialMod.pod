@@ -1,0 +1,487 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::PolynomialMod
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+var obj = PolynomialMod(...)
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+       * Sidef::Types::Number::Polynomial
+
+=head1 METHODS
+
+=head2 !=
+
+    a != b
+
+Returns the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 %
+
+    a % b
+
+Returns the
+
+Aliases: I<mod>
+
+=cut
+
+=head2 *
+
+    a * b
+
+Returns the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 **
+
+    a ** b
+
+Returns the
+
+Aliases: I<pow>
+
+=cut
+
+=head2 +
+
+    a + b
+
+Returns the
+
+Aliases: I<add>
+
+=cut
+
+=head2 ++
+
+    a ++ b
+
+Returns the
+
+Aliases: I<inc>
+
+=cut
+
+=head2 -
+
+    a - b
+
+Returns the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 --
+
+    a -- b
+
+Returns the
+
+Aliases: I<dec>
+
+=cut
+
+=head2 /
+
+    a / b
+
+Returns the
+
+Aliases: I<÷>, I<div>
+
+=cut
+
+=head2 //
+
+    a // b
+
+Returns the
+
+Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
+
+=cut
+
+=head2 <
+
+    a < b
+
+Returns the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <=>
+
+    a <=> b
+
+Returns the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+    a == b
+
+Returns the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+    a > b
+
+Returns the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 ≤
+
+    a ≤ b
+
+Returns the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+    a ≥ b
+
+Returns the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
+=head2 abs
+
+    x.abs
+
+Returns the
+
+=cut
+
+=head2 binomial
+
+    n.binomial(k)
+
+Returns the
+
+=cut
+
+=head2 ceil
+
+    x.ceil
+
+Returns the
+
+=cut
+
+=head2 coeff
+
+    x.coeff(key)
+
+Returns the
+
+=cut
+
+=head2 coeffs
+
+    x.coeffs
+
+Returns the
+
+=cut
+
+=head2 degree
+
+    x.degree
+
+Returns the
+
+=cut
+
+=head2 derivative
+
+    x.derivative
+
+Returns the
+
+=cut
+
+=head2 divmod
+
+    x.divmod(y)
+
+Returns the
+
+=cut
+
+=head2 dump
+
+    x.dump
+
+Returns the
+
+=cut
+
+=head2 eval
+
+    x.eval(value)
+
+Returns the
+
+=cut
+
+=head2 exponents
+
+    x.exponents
+
+Returns the
+
+=cut
+
+=head2 float
+
+    x.float
+
+Returns the
+
+=cut
+
+=head2 floor
+
+    x.floor
+
+Returns the
+
+=cut
+
+=head2 gcd
+
+    x.gcd(y)
+
+Returns the
+
+=cut
+
+=head2 gcdext
+
+    x.gcdext(y)
+
+Returns the
+
+=cut
+
+=head2 inv
+
+    x.inv
+
+Returns the
+
+=cut
+
+=head2 is_inf
+
+    x.is_inf
+
+Returns the
+
+=cut
+
+=head2 is_mone
+
+    x.is_mone
+
+Returns the
+
+=cut
+
+=head2 is_nan
+
+    x.is_nan
+
+Returns the
+
+=cut
+
+=head2 is_ninf
+
+    x.is_ninf
+
+Returns the
+
+=cut
+
+=head2 is_one
+
+    x.is_one
+
+Returns the
+
+=cut
+
+=head2 is_real
+
+    x.is_real
+
+Returns the
+
+=cut
+
+=head2 is_zero
+
+    x.is_zero
+
+Returns the
+
+=cut
+
+=head2 lcm
+
+    x.lcm(y)
+
+Returns the
+
+=cut
+
+=head2 lift
+
+    self.lift
+
+Returns the
+
+Aliases: I<to_poly>
+
+=cut
+
+=head2 neg
+
+    x.neg
+
+Returns the
+
+=cut
+
+=head2 new
+
+    self.new
+
+Returns the
+
+Aliases: I<call>
+
+=cut
+
+=head2 norm
+
+    x.norm
+
+Returns the
+
+=cut
+
+=head2 pretty
+
+    x.pretty
+
+Returns the
+
+=cut
+
+=head2 rat
+
+    x.rat
+
+Returns the
+
+=cut
+
+=head2 rat_approx
+
+    x.rat_approx
+
+Returns the
+
+=cut
+
+=head2 re
+
+    x.re
+
+Returns the
+
+Aliases: I<real>
+
+=cut
+
+=head2 round
+
+    x.round(r)
+
+Returns the
+
+=cut
+
+=head2 sgn
+
+    x.sgn
+
+Returns the
+
+=cut
+
+=head2 sqr
+
+    x.sqr
+
+Returns the
+
+=cut
+
+=head2 to_n
+
+    x.to_n
+
+Returns the
+
+=cut
+
+=head2 to_s
+
+    x.to_s
+
+Returns the
+
+Aliases: I<stringify>
+
+=cut

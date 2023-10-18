@@ -213,4 +213,6 @@ assert([].ge)
 assert(![].lt)
 assert(![].gt)
 
+assert_eq([(), (), ()], [])
+
 say "** Test passed!"

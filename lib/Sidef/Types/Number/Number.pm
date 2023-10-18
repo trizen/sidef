@@ -92,8 +92,6 @@ package Sidef::Types::Number::Number {
 
     use Sidef::Types::Bool::Bool;
 
-    my @cache = (ZERO, ONE);
-
     sub new {
         my (undef, $num, $base) = @_;
 
@@ -2321,7 +2319,8 @@ package Sidef::Types::Number::Number {
             or $ref eq 'Sidef::Types::Number::Fraction'
             or $ref eq 'Sidef::Types::Number::Quadratic'
             or $ref eq 'Sidef::Types::Number::Quaternion'
-            or $ref eq 'Sidef::Types::Number::Polynomial') {
+            or $ref eq 'Sidef::Types::Number::Polynomial'
+            or $ref eq 'Sidef::Types::Number::PolynomialMod') {
             return $y->add($x);
         }
 
@@ -2576,6 +2575,10 @@ package Sidef::Types::Number::Number {
             return $ref->new(0 => $x)->sub($y);
         }
 
+        if ($ref eq 'Sidef::Types::Number::PolynomialMod') {
+            return $ref->new(0 => $x, $y->[1])->sub($y);
+        }
+
         _valid(\$y);
         bless \__sub__($$x, $$y);
     }
@@ -2782,6 +2785,7 @@ package Sidef::Types::Number::Number {
             or $ref eq 'Sidef::Types::Number::Quadratic'
             or $ref eq 'Sidef::Types::Number::Quaternion'
             or $ref eq 'Sidef::Types::Number::Polynomial'
+            or $ref eq 'Sidef::Types::Number::PolynomialMod'
             or $ref eq 'Sidef::Types::Array::Matrix') {
             return $y->mul($x);
         }
@@ -3126,6 +3130,10 @@ package Sidef::Types::Number::Number {
 
         if ($ref eq 'Sidef::Types::Number::Polynomial') {
             return $ref->new(0 => $x)->div($y);
+        }
+
+        if ($ref eq 'Sidef::Types::Number::PolynomialMod') {
+            return $ref->new(0 => $x, $y->[1])->div($y);
         }
 
         _valid(\$y);
