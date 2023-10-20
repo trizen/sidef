@@ -473,7 +473,9 @@ sub add_words_to_completion {
 
     while ($string =~ /(\w+)/g) {
         my $word = $1;
-        add_tree_entry($tree, [split(//, $word)], $word);
+        if (length($word) <= 50) {
+            add_tree_entry($tree, [split(//, $word)], $word);
+        }
     }
 
     return 1;
