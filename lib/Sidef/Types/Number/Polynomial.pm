@@ -200,9 +200,59 @@ package Sidef::Types::Number::Polynomial {
         $_[0]->real->norm;
     }
 
+    sub content {
+        my ($x) = @_;
+        Sidef::Types::Number::Number::gcd(CORE::values %$x);
+    }
+
+    *cont = \&content;
+
+    sub primitive_part {
+        my ($x) = @_;
+        $x->div($x->content);
+    }
+
+    *prim_part = \&primitive_part;
+    *primpart  = \&primitive_part;
+
+    sub leading_term {
+        my ($x)   = @_;
+        my ($deg) = List::Util::max(CORE::keys(%$x)) // return __PACKAGE__->new();
+        __PACKAGE__->new($deg => $x->{$deg});
+    }
+
+    sub leading_coefficient {
+        my ($x)   = @_;
+        my ($deg) = List::Util::max(CORE::keys(%$x)) // return Sidef::Types::Number::Number::ZERO;
+        $x->{$deg};
+    }
+
+    *leading_coeff = \&leading_coefficient;
+
+    sub leading_monomial {
+        my ($x)   = @_;
+        my ($deg) = List::Util::max(CORE::keys(%$x)) // return __PACKAGE__->new();
+        __PACKAGE__->new($deg => Sidef::Types::Number::Number::ONE);
+    }
+
+    sub height {
+        my ($x) = @_;
+        Sidef::Types::Number::Number::max(map { $_->abs } CORE::values %$x);
+    }
+
+    sub is_squarefree {
+        my ($x) = @_;
+        $x->gcd($x->derivative)->is_one;
+    }
+
+    sub squarefree_part {
+        my ($x) = @_;
+        $x->div($x->gcd($x->derivative));
+    }
+
     sub __dump__ {
         my ($x) = @_;
-        my $str = join(", ", map { join(' => ', $_, $x->{$_}->dump) } sort { $a <=> $b } CORE::keys %$x);
+        my $str = join(", ", map { join(' => ', $_, $x->{$_}->dump) } sort { ($a <=> $b) || ($a cmp $b) } CORE::keys %$x);
         'Polynomial(' . $str . ')';
     }
 
@@ -217,7 +267,7 @@ package Sidef::Types::Number::Polynomial {
         $method //= 'to_s';
 
         my $str  = '';
-        my @keys = sort { $b <=> $a } CORE::keys %$x;
+        my @keys = sort { ($b <=> $a) || ($b cmp $a) } CORE::keys(%$x);
 
         foreach my $key (@keys) {
 
@@ -237,9 +287,9 @@ package Sidef::Types::Number::Polynomial {
                 $c_str = "($c_str)";
             }
 
-            $str .= $c_str if ($key == 0 or $c_str ne '1');
+            $str .= $c_str if ($key eq '0' or $c_str ne '1');
 
-            if ($key != 0) {
+            if ($key ne '0') {
                 $str .= '*' if ($c_str ne '1');
                 $str .= "x";
                 $str .= "^$key" if ($key != 1);
@@ -272,12 +322,15 @@ package Sidef::Types::Number::Polynomial {
 
     sub degree {
         my ($x) = @_;
-        Sidef::Types::Number::Number::_set_int(List::Util::max(CORE::keys(%$x)) // 0);
+        my $deg = List::Util::max(CORE::keys(%$x)) // return Sidef::Types::Number::Number::ZERO;
+        Sidef::Types::Number::Number::_set_int($deg);
     }
+
+    *deg = \&degree;
 
     sub derivative {
         my ($x) = @_;
-        __PACKAGE__->new(map { ($_ - 1, $x->{$_}->mul(Sidef::Types::Number::Number::_set_int($_))) } CORE::keys(%$x));
+        __PACKAGE__->new(map { (Math::Prime::Util::GMP::subint($_, 1), $x->{$_}->mul(Sidef::Types::Number::Number::_set_int($_))) } CORE::keys(%$x));
     }
 
     sub eval {
@@ -288,7 +341,7 @@ package Sidef::Types::Number::Polynomial {
 
     sub exponents {
         my ($x) = @_;
-        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number::_set_int($_) } sort { $a <=> $b } CORE::keys(%$x));
+        Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number::_set_int($_) } sort { ($a <=> $b) || ($a cmp $b) } CORE::keys(%$x));
     }
 
     sub coeff {
@@ -300,7 +353,7 @@ package Sidef::Types::Number::Polynomial {
         my ($x) = @_;
         Sidef::Types::Array::Array->new(
                                         [map  { Sidef::Types::Array::Array->new([Sidef::Types::Number::Number::_set_int($_), $x->{$_}]) }
-                                         sort { $a <=> $b } CORE::keys(%$x)
+                                         sort { ($a <=> $b) || ($a cmp $b) } CORE::keys(%$x)
                                         ]
                                        );
     }
@@ -425,7 +478,7 @@ package Sidef::Types::Number::Polynomial {
             return __PACKAGE__->new(0 => $y, %$x);
         }
 
-        __PACKAGE__->new(map { $_ => (($_ == 0) ? $x->{$_}->add($y) : $x->{$_}) } CORE::keys(%$x));
+        __PACKAGE__->new(map { $_ => (($_ eq '0') ? $x->{$_}->add($y) : $x->{$_}) } CORE::keys(%$x));
     }
 
     sub sub {
@@ -441,7 +494,7 @@ package Sidef::Types::Number::Polynomial {
             return __PACKAGE__->new(0 => $y->neg, %$x);
         }
 
-        __PACKAGE__->new(map { $_ => (($_ == 0) ? $x->{$_}->sub($y) : $x->{$_}) } CORE::keys(%$x));
+        __PACKAGE__->new(map { $_ => (($_ eq '0') ? $x->{$_}->sub($y) : $x->{$_}) } CORE::keys(%$x));
     }
 
     sub mul {
@@ -457,7 +510,7 @@ package Sidef::Types::Number::Polynomial {
                 foreach my $key_y (@keys_y) {
 
                     my $coeff = $x->{$key_x}->mul($y->{$key_y});
-                    my $key_z = $key_x + $key_y;
+                    my $key_z = Math::Prime::Util::GMP::addint($key_x, $key_y);
 
                     if (exists $poly{$key_z}) {
                         $poly{$key_z} = $poly{$key_z}->add($coeff);
@@ -488,8 +541,16 @@ package Sidef::Types::Number::Polynomial {
         my $deg_r = List::Util::max(CORE::keys(%$x));    # deg(x)
         $deg_r // return (__PACKAGE__->new(), __PACKAGE__->new());
 
+        if ($deg_r > ~0) {
+            $deg_r = Math::GMPz::Rmpz_init_set_str("$deg_r", 10);
+        }
+
         my $deg_y = List::Util::max(CORE::keys(%$y));    # deg(y)
         $deg_y // return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf()), __PACKAGE__->new());
+
+        if ($deg_y > ~0) {
+            $deg_y = Math::GMPz::Rmpz_init_set_str("$deg_y", 10);
+        }
 
         my $q = __PACKAGE__->new();
         my $r = $x;
@@ -506,12 +567,16 @@ package Sidef::Types::Number::Polynomial {
             }
 
             # s := lc(r)/c * x^(deg(r)−deg(y))
-            my $s = __PACKAGE__->new($deg_r - $deg_y, $t);
+            my $s = __PACKAGE__->new(Math::Prime::Util::GMP::subint($deg_r, $deg_y), $t);
             $q = $q->add($s);
             $r = $r->sub($s->mul($y));
 
             # Find deg(r) for the new r
             $deg_r = List::Util::max(CORE::keys(%$r)) // last;
+
+            if ($deg_r > ~0) {
+                $deg_r = Math::GMPz::Rmpz_init_set_str("$deg_r", 10);
+            }
         }
 
         return ($q, $r);
@@ -786,8 +851,8 @@ package Sidef::Types::Number::Polynomial {
 
         if (ref($y) eq __PACKAGE__) {
 
-            my @keys_x = sort { $a <=> $b } CORE::keys %$x;
-            my @keys_y = sort { $a <=> $b } CORE::keys %$y;
+            my @keys_x = sort { ($a <=> $b) || ($a cmp $b) } CORE::keys %$x;
+            my @keys_y = sort { ($a <=> $b) || ($a cmp $b) } CORE::keys %$y;
 
             scalar(@keys_x) == scalar(@keys_y)
               or return Sidef::Types::Number::Number::_set_int(scalar(@keys_x) <=> scalar(@keys_y));
@@ -815,7 +880,7 @@ package Sidef::Types::Number::Polynomial {
         exists($x->{0}) || return undef;
 
         foreach my $key (CORE::keys(%$x)) {
-            ($key == 0 or $x->{$key}->is_zero)
+            ($key eq '0' or $x->{$key}->is_zero)
               or return undef;
         }
 
@@ -859,7 +924,7 @@ package Sidef::Types::Number::Polynomial {
           || return Sidef::Types::Bool::Bool::FALSE;
 
         foreach my $key (CORE::keys(%$x)) {
-            ($key == 0 or $x->{$key}->is_zero)
+            ($key eq '0' or $x->{$key}->is_zero)
               or return Sidef::Types::Bool::Bool::FALSE;
         }
 

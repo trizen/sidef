@@ -206,30 +206,6 @@ Returns the
 
 =cut
 
-=head2 coeff
-
-    x.coeff(key)
-
-Returns the
-
-=cut
-
-=head2 coeffs
-
-    x.coeffs
-
-Returns the
-
-=cut
-
-=head2 degree
-
-    x.degree
-
-Returns the
-
-=cut
-
 =head2 derivative
 
     x.derivative
@@ -257,14 +233,6 @@ Returns the
 =head2 eval
 
     x.eval(value)
-
-Returns the
-
-=cut
-
-=head2 exponents
-
-    x.exponents
 
 Returns the
 
@@ -310,14 +278,6 @@ Returns the
 
 =cut
 
-=head2 is_inf
-
-    x.is_inf
-
-Returns the
-
-=cut
-
 =head2 is_mone
 
     x.is_mone
@@ -326,33 +286,9 @@ Returns the
 
 =cut
 
-=head2 is_nan
-
-    x.is_nan
-
-Returns the
-
-=cut
-
-=head2 is_ninf
-
-    x.is_ninf
-
-Returns the
-
-=cut
-
 =head2 is_one
 
     x.is_one
-
-Returns the
-
-=cut
-
-=head2 is_real
-
-    x.is_real
 
 Returns the
 
@@ -384,6 +320,14 @@ Aliases: I<to_poly>
 
 =cut
 
+=head2 modulus
+
+    self.modulus
+
+Returns the
+
+=cut
+
 =head2 neg
 
     x.neg
@@ -399,14 +343,6 @@ Returns the
 Returns the
 
 Aliases: I<call>
-
-=cut
-
-=head2 norm
-
-    x.norm
-
-Returns the
 
 =cut
 
@@ -434,16 +370,6 @@ Returns the
 
 =cut
 
-=head2 re
-
-    x.re
-
-Returns the
-
-Aliases: I<real>
-
-=cut
-
 =head2 round
 
     x.round(r)
@@ -452,25 +378,9 @@ Returns the
 
 =cut
 
-=head2 sgn
-
-    x.sgn
-
-Returns the
-
-=cut
-
 =head2 sqr
 
     x.sqr
-
-Returns the
-
-=cut
-
-=head2 to_n
-
-    x.to_n
 
 Returns the
 

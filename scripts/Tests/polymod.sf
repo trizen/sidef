@@ -116,4 +116,13 @@ do {
     )
 }
 
+do {
+    var x = PolyMod(1, 101)
+    var p = (x**2 + x + 1)**3
+    assert_eq(p/gcd(p, p.derivative), PolyMod("35*x^2 + 35*x + 35", 101))
+    assert_eq(squarefree_part(p), PolyMod("35*x^2 + 35*x + 35", 101))
+    assert(!p.is_squarefree)
+    assert(squarefree_part(p).is_squarefree)
+}
+
 say "** Test passed!"

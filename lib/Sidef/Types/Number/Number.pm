@@ -32621,7 +32621,7 @@ package Sidef::Types::Number::Number {
     }
 
     {
-        my $srand = (HAS_PRIME_UTIL ? Math::Prime::Util::urandomm(ULONG_MAX) : Math::Prime::Util::GMP::urandomm(ULONG_MAX));
+        my $srand = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::urandomm(ULONG_MAX) : Math::Prime::Util::GMP::urandomm(ULONG_MAX));
 
         {
             state $state = Math::MPFR::Rmpfr_randinit_mt_nobless();

@@ -52,41 +52,8 @@ package Sidef::Types::Number::PolynomialMod {
 
     *lift = \&to_poly;
 
-    sub to_n {
-        my ($x) = @_;
-        $x->[0]->SUPER::to_n;
-    }
-
-    sub real {
-        my ($x) = @_;
-        $x->[0]->SUPER::real;
-    }
-
-    *re = \&real;
-
-    sub is_real {
-        my ($x) = @_;
-        $x->[0]->SUPER::real;
-    }
-
-    sub is_nan {
-        my ($x) = @_;
-        $x->[0]->SUPER::is_nan;
-    }
-
-    sub is_inf {
-        my ($x) = @_;
-        $x->[0]->SUPER::is_inf;
-    }
-
-    sub is_ninf {
-        my ($x) = @_;
-        $x->[0]->SUPER::is_ninf;
-    }
-
-    sub norm {
-        my ($x) = @_;
-        $x->[0]->SUPER::norm;
+    sub modulus {
+        $_[0][1];
     }
 
     sub __dump__ {
@@ -125,16 +92,12 @@ package Sidef::Types::Number::PolynomialMod {
         Sidef::Types::String::String->new($x->__dump__);
     }
 
-    sub degree {
-        my ($x) = @_;
-        $x->[0]->SUPER::degree;
-    }
-
     sub derivative {
         my ($x) = @_;
         my $m = $x->[1];
         $x = $x->[0];
-        __PACKAGE__->new((map { ($_ - 1, $x->{$_}->mulmod(Sidef::Types::Number::Number::_set_int($_), $m)) } CORE::keys(%$x)), $m);
+        __PACKAGE__->new((map { (Math::Prime::Util::GMP::subint($_, 1), $x->{$_}->mulmod(Sidef::Types::Number::Number::_set_int($_), $m)) } CORE::keys(%$x)),
+                         $m);
     }
 
     sub eval {
@@ -148,21 +111,6 @@ package Sidef::Types::Number::PolynomialMod {
         $value = $value->mod($m);
         Sidef::Types::Number::Number::sum(map { $value->powmod(Sidef::Types::Number::Number::_set_int($_), $m)->mulmod($x->{$_}->eval($value), $m) }
                                           CORE::keys(%$x))->mod($m);
-    }
-
-    sub exponents {
-        my ($x) = @_;
-        $x->[0]->SUPER::exponents;
-    }
-
-    sub coeff {
-        my ($x, $key) = @_;
-        $x->[0]{$key} // Sidef::Types::Number::Number::ZERO;
-    }
-
-    sub coeffs {
-        my ($x) = @_;
-        $x->[0]->SUPER::coeffs;
     }
 
     sub binomial {
@@ -208,7 +156,7 @@ package Sidef::Types::Number::PolynomialMod {
 
         $y = $y->mod($m);
 
-        __PACKAGE__->new((map { $_ => (($_ == 0) ? $x->{$_}->addmod($y, $m) : $x->{$_}) } CORE::keys(%$x)), $m);
+        __PACKAGE__->new((map { $_ => (($_ eq '0') ? $x->{$_}->addmod($y, $m) : $x->{$_}) } CORE::keys(%$x)), $m);
     }
 
     sub sub {
@@ -237,7 +185,7 @@ package Sidef::Types::Number::PolynomialMod {
 
         $y = $y->mod($m);
 
-        __PACKAGE__->new((map { $_ => (($_ == 0) ? $x->{$_}->submod($y, $m) : $x->{$_}) } CORE::keys(%$x)), $m);
+        __PACKAGE__->new((map { $_ => (($_ eq '0') ? $x->{$_}->submod($y, $m) : $x->{$_}) } CORE::keys(%$x)), $m);
     }
 
     sub mul {
@@ -258,7 +206,7 @@ package Sidef::Types::Number::PolynomialMod {
                 foreach my $key_y (@keys_y) {
 
                     my $coeff = $x->{$key_x}->mulmod($y->{$key_y}, $m);
-                    my $key_z = $key_x + $key_y;
+                    my $key_z = Math::Prime::Util::GMP::addint($key_x, $key_y);
 
                     if (exists $poly{$key_z}) {
                         $poly{$key_z} = $poly{$key_z}->addmod($coeff, $m);
@@ -309,8 +257,16 @@ package Sidef::Types::Number::PolynomialMod {
         my $deg_r = List::Util::max(CORE::keys(%$x));    # deg(x)
         $deg_r // return (__PACKAGE__->new(0 => 0, $m), __PACKAGE__->new(0 => 0, $m));
 
+        if ($deg_r > ~0) {
+            $deg_r = Math::GMPz::Rmpz_init_set_str("$deg_r", 10);
+        }
+
         my $deg_y = List::Util::max(CORE::keys(%$y));    # deg(y)
         $deg_y // return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf(), $m), __PACKAGE__->new(0 => 0, $m));
+
+        if ($deg_y > ~0) {
+            $deg_y = Math::GMPz::Rmpz_init_set_str("$deg_y", 10);
+        }
 
         my $q = __PACKAGE__->new(0 => 0, $m);
         my $r = $x_mod;
@@ -327,20 +283,19 @@ package Sidef::Types::Number::PolynomialMod {
             }
 
             # s := lc(r)/c * x^(deg(r)−deg(y))
-            my $s = __PACKAGE__->new(($deg_r - $deg_y) => $t, $m);
+            my $s = __PACKAGE__->new(Math::Prime::Util::GMP::subint($deg_r, $deg_y) => $t, $m);
             $q = $q->add($s);
             $r = $r->sub($s->mul($y_mod));
 
             # Find deg(r) for the new r
             $deg_r = List::Util::max(CORE::keys(%{$r->[0]})) // last;
+
+            if ($deg_r > ~0) {
+                $deg_r = Math::GMPz::Rmpz_init_set_str("$deg_r", 10);
+            }
         }
 
         return ($q, $r);
-    }
-
-    sub sgn {
-        my ($x) = @_;
-        $x->[0]->SUPER::sgn;
     }
 
     sub abs {
