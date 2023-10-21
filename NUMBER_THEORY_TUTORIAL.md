@@ -1598,11 +1598,11 @@ In order for `n` to have at least `k` prime factors, without having any prime fa
 
 Additionally, the function also calls `special_factor(n)` internally and returns early when the composite part of `n` is smaller than the required bound for it to have `k-j` prime factors.
 
-A massive speed improvement would be using ECM with conjectured bounds to push `B` much higher than we can achieve with trial-division. This would allow us to reject many numbers faster. But that approach would be based on unproved conjectures and therefore is not implemented.
+A massive speed improvement would be using ECM with conjectured bounds to push `B` much higher than we can achieve with trial-division. This would allow us to reject many numbers faster.
 
 Another conjectured approach would be using Pollard's rho method to find a larger bound for `B`, which requires `O(sqrt(B))` steps to find a prime factor less than `B`. Therefore, if we take `B = 10^12`, after `c*10^6` iterations of the Pollard rho method without success in finding a prime factor of `n`, it's very probable that `n` has no prime factor less than `10^12`.
 
-This later approach is implemented by setting `Num!USE_CONJECTURES = true` and is useful for computing upper-bounds, being about 5x faster than the rigorous method.
+This later approach can be enabled by setting `Num!USE_CONJECTURES = true` and is useful for computing upper-bounds, being about 5x faster than the rigorous method.
 
 ## Factorization of integers of special form
 

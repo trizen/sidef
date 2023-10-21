@@ -951,7 +951,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub _is_prob_prime {
-        my ($n) = @_;
+        my ($n, $cache) = @_;
 
         if (ref($n) eq 'Math::GMPz') {
             if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
@@ -975,12 +975,14 @@ package Sidef::Types::Number::Number {
           ? Math::Prime::Util::is_prime($n)
           : Math::Prime::Util::GMP::is_prob_prime($n);
 
-        if (++$internal_cache_size > IS_PRIME_CACHE_SIZE) {
-            $internal_cache_size = 1;
-            undef %internal_cache;
+        if ($cache) {
+            if (++$internal_cache_size > IS_PRIME_CACHE_SIZE) {
+                $internal_cache_size = 1;
+                undef %internal_cache;
+            }
+            $internal_cache{$n} = $r;
         }
 
-        $internal_cache{$n} = $r;
         $r;
     }
 
@@ -1023,7 +1025,7 @@ package Sidef::Types::Number::Number {
 
         if (CORE::length($n) >= SPECIAL_FACTORS_MIN and $SPECIAL_FACTORS) {
 
-            if (_is_prob_prime($n)) {
+            if (_is_prob_prime($n, 1)) {
                 push @factors, $n;
                 return @factors;
             }
@@ -1035,7 +1037,7 @@ package Sidef::Types::Number::Number {
             my $composite_factors = 0;
 
             foreach my $p (@{_set_int($n)->special_factors((CORE::length($n) <= YAFU_MIN ? ZERO : ()))}) {
-                if (_is_prob_prime($$p)) {
+                if (_is_prob_prime($$p, 1)) {
                     push @special_factors, "$$p";
                 }
                 else {
@@ -1057,7 +1059,7 @@ package Sidef::Types::Number::Number {
 
         if (CORE::length($n) >= FACTORDB_MIN and $USE_FACTORDB) {
 
-            if (_is_prob_prime($n)) {
+            if (_is_prob_prime($n, 1)) {
                 push @factors, $n;
                 return @factors;
             }
@@ -1086,7 +1088,7 @@ package Sidef::Types::Number::Number {
                     foreach my $pp (@factor_exp) {
                         my ($p, $e) = @$pp;
 
-                        if (_is_prob_prime($p)) {
+                        if (_is_prob_prime($p, 1)) {
                             push @factordb_factors, ($p) x Math::Prime::Util::GMP::valuation($n, $p);
                         }
                         else {
@@ -1145,7 +1147,7 @@ package Sidef::Types::Number::Number {
 
         if (CORE::length($n) >= YAFU_MIN and $USE_YAFU) {
 
-            if (_is_prob_prime($n)) {
+            if (_is_prob_prime($n, 1)) {
                 push @factors, $n;
                 return @factors;
             }
@@ -1181,7 +1183,7 @@ package Sidef::Types::Number::Number {
                 # Make sure all factors are prime
                 my $all_prime = 1;
                 foreach my $p (List::Util::uniq(@yafu_factors)) {
-                    if (!_is_prob_prime($p)) {
+                    if (!_is_prob_prime($p, 1)) {
                         $all_prime = 0;
                         last;
                     }
@@ -13863,7 +13865,7 @@ package Sidef::Types::Number::Number {
                     my $valuation = Math::GMPz::Rmpz_remove($n, $n, $g);
                     push(@factors, (Math::GMPz::Rmpz_init_set($g)) x $valuation);
 
-                    if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0 or _is_prob_prime($n)) {
+                    if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0 or _is_prob_prime($n, 1)) {
                         last OUTER;
                     }
                 }
@@ -19507,7 +19509,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                   or return Sidef::Types::Bool::Bool::FALSE;
 
-                my $r_is_prime = _is_prob_prime($remainder);
+                my $r_is_prime = _is_prob_prime($remainder, 1);
 
                 if ($r_is_prime) {
                     if ($bigomega + 1 == $k) {
@@ -19544,7 +19546,7 @@ package Sidef::Types::Number::Number {
                     my @composite_factors;
 
                     foreach my $f (@gcd_factors) {
-                        if (_is_prob_prime($$f)) {
+                        if (_is_prob_prime($$f, 1)) {
                             push @prime_factors, $f;
                         }
                         elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_MAX_BITS) {
@@ -19806,7 +19808,7 @@ package Sidef::Types::Number::Number {
                     my @composite_factors;
 
                     foreach my $f (@gcd_factors) {
-                        if (_is_prob_prime($$f)) {
+                        if (_is_prob_prime($$f, 1)) {
                             push @prime_factors, $f;
                         }
                         elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_MAX_BITS) {
@@ -20110,7 +20112,7 @@ package Sidef::Types::Number::Number {
                       or return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                if (_is_prob_prime($f)) {
+                if (_is_prob_prime($f, 1)) {
                     push @primes, $f;
                 }
                 else {
@@ -20228,7 +20230,7 @@ package Sidef::Types::Number::Number {
                       or return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                if (_is_prob_prime($f)) {
+                if (_is_prob_prime($f, 1)) {
                     push @primes, $f;
                 }
                 else {
@@ -20375,7 +20377,7 @@ package Sidef::Types::Number::Number {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
 
-            if ($i == 1 and _is_prob_prime($nstr)) {
+            if ($i == 1 and _is_prob_prime($nstr, 1)) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
         }
@@ -20580,7 +20582,7 @@ package Sidef::Types::Number::Number {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
 
-            if ($i == 1 and _is_prob_prime($nstr)) {
+            if ($i == 1 and _is_prob_prime($nstr, 1)) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
         }
@@ -22461,7 +22463,7 @@ package Sidef::Types::Number::Number {
                 my $factor = CORE::shift(@arr);
                 if (   !ref($$factor)
                     or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= SMALL_NUMBER_MAX_BITS
-                    or _is_prob_prime($$factor)) {
+                    or _is_prob_prime($$factor, 1)) {
                     $factorized ||= 1;
                 }
                 else {
@@ -22515,7 +22517,7 @@ package Sidef::Types::Number::Number {
         my @composite_factors;
 
         foreach my $f (@factors) {
-            if (_is_prob_prime($$f)) {
+            if (_is_prob_prime($$f, 1)) {
                 push @prime_factors, $f;
             }
             elsif (!ref($$f) or Math::GMPz::Rmpz_sizeinbase($$f, 2) <= SMALL_NUMBER_MAX_BITS) {
@@ -22560,7 +22562,7 @@ package Sidef::Types::Number::Number {
 
             if ($m->ge(TWO)) {    # pretty slow; use it only with m >= 2
                 @composite_factors = map {
-                    _is_prob_prime($$_)
+                    _is_prob_prime($$_, 1)
                       ? $_
                       : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(5))))}
                 } @composite_factors;
@@ -22583,7 +22585,7 @@ package Sidef::Types::Number::Number {
                 Sidef::Types::Block::Block->new(
                     code => sub {
                         my ($n) = @_;
-                        _is_prob_prime($$n) ? Sidef::Types::Array::Array->new() : do {
+                        _is_prob_prime($$n, 1) ? Sidef::Types::Array::Array->new() : do {
                             my $factors = do { $cache{"$n"} //= $block->run($n) };
                             $factors->first(-1)->concat($factors->last(-1))->uniq;
                         };
@@ -22869,8 +22871,8 @@ package Sidef::Types::Number::Number {
 
                         Math::GMPz::Rmpz_divexact($x, $n, $g);
 
-                        my @g_factors = (_is_prob_prime($g) ? $g : __SUB__->($g));
-                        my @x_factors = (_is_prob_prime($x) ? $x : __SUB__->($x));
+                        my @g_factors = (_is_prob_prime($g, 1) ? $g : __SUB__->($g));
+                        my @x_factors = (_is_prob_prime($x, 1) ? $x : __SUB__->($x));
 
                         return (@g_factors, @x_factors);
                     }
@@ -22884,7 +22886,7 @@ package Sidef::Types::Number::Number {
 
         if (scalar(@holf_factors) > 1) {
             return (
-                    map { _is_prob_prime($_) ? $_ : __SUB__->($_) }
+                    map { _is_prob_prime($_, 1) ? $_ : __SUB__->($_) }
                     map { Math::GMPz::Rmpz_init_set_str($_, 10) } @holf_factors
                    );
         }
@@ -22924,7 +22926,7 @@ package Sidef::Types::Number::Number {
 
         if (!defined($j)) {
             my @factors = __SUB__->($n, 1);
-            @factors = map { _is_prob_prime($_) ? $_ : __SUB__->($_, -1) } @factors;
+            @factors = map { _is_prob_prime($_, 1) ? $_ : __SUB__->($_, -1) } @factors;
             return @factors;
         }
 
@@ -22986,8 +22988,8 @@ package Sidef::Types::Number::Number {
                     if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
                         Math::GMPz::Rmpz_divexact($x, $n, $g);
 
-                        my @g_factors = (_is_prob_prime($g) ? $g : __SUB__->($g, $j));
-                        my @x_factors = (_is_prob_prime($x) ? $x : __SUB__->($x, $j));
+                        my @g_factors = (_is_prob_prime($g, 1) ? $g : __SUB__->($g, $j));
+                        my @x_factors = (_is_prob_prime($x, 1) ? $x : __SUB__->($x, $j));
 
                         return (@g_factors, @x_factors);
                     }
@@ -23005,7 +23007,7 @@ package Sidef::Types::Number::Number {
 
         if (scalar(@holf_factors) > 1) {
             return (
-                    map { _is_prob_prime($_) ? $_ : __SUB__->($_, $j) }
+                    map { _is_prob_prime($_, 1) ? $_ : __SUB__->($_, $j) }
                     map { Math::GMPz::Rmpz_init_set_str($_, 10) } @holf_factors
                    );
         }
@@ -29877,7 +29879,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                if (_is_prob_prime($f)) {
+                if (_is_prob_prime($f, 1)) {
                     $check_conditions->($f)
                       || return Sidef::Types::Bool::Bool::FALSE;
                     ++$omega;
@@ -30089,7 +30091,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                if (_is_prob_prime($f)) {
+                if (_is_prob_prime($f, 1)) {
                     $check_conditions->($f)
                       || return Sidef::Types::Bool::Bool::FALSE;
                     ++$omega;
@@ -30246,7 +30248,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                if (_is_prob_prime($f)) {
+                if (_is_prob_prime($f, 1)) {
                     $check_conditions->($f)
                       || return Sidef::Types::Bool::Bool::FALSE;
                     ++$omega;
