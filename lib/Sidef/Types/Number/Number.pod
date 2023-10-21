@@ -6440,6 +6440,14 @@ Although this may or may not be actually faster.
 
 =cut
 
+=head2 nuphi
+
+    nuphi(n)
+
+The nonunitary totient function. (OEIS: A254503)
+
+=cut
+
 =head2 nusigma
 
     nusigma(n, k=1)

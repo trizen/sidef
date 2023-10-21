@@ -26039,7 +26039,7 @@ package Sidef::Types::Number::Number {
         $n->sigma($k)->sub($n->esigma($k));
     }
 
-    sub uphi {
+    sub uphi {        # OEIS: A047994
 
         # Multiplicative with:
         #   uphi(p^e) = p^e - 1
@@ -26069,6 +26069,55 @@ package Sidef::Types::Number::Number {
             }
 
             Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+
+            push @terms,
+              (
+                  Math::GMPz::Rmpz_fits_ulong_p($t)
+                ? Math::GMPz::Rmpz_get_ui($t)
+                : Math::GMPz::Rmpz_init_set($t)
+              );
+        }
+
+        @terms || return ONE;
+        bless \_binsplit(\@terms, \&__mul__);
+    }
+
+    sub nuphi {    # OEIS: A254503
+
+        # Multiplicative with:
+        #   a(p) = p
+        #   a(p^e) = phi(p^e) = (p-1) * p^(e-1), for e > 1.
+
+        my $n = _big2uistr($_[0]) // goto &nan;
+        $n eq '0' and return ZERO;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+
+        my @terms;
+        foreach my $pe (_factor_exp($n)) {
+
+            my ($p, $e) = @$pe;
+
+            if ($p < ULONG_MAX) {
+
+                if ($e == 1) {
+                    push @terms, $p;
+                    next;
+                }
+
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e - 1);
+                Math::GMPz::Rmpz_mul_ui($t, $t, $p - 1);
+            }
+            elsif ($e == 1) {
+                Math::GMPz::Rmpz_set_str($t, "$p", 10);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($u, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($t, $u, $e - 1);
+                Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+                Math::GMPz::Rmpz_mul($t, $t, $u);
+            }
 
             push @terms,
               (
