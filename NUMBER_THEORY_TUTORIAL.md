@@ -660,9 +660,11 @@ say 50.of {|n| 3.power_sigma(n) }
 say 20.by { .is_llr_prime(3) }     # numbers n such that 2^n * 3 - 1 is prime
 say 20.by { .is_proth_prime(3) }   # numbers n such that 2^n * 3 + 1 is prime
 
-say map(1..50, { .phi })
-say map(1..50, { .uphi })
 say map(1..50, { .psi })
+say map(1..50, { .phi })
+say map(1..50, { .iphi })
+say map(1..50, { .uphi })
+say map(1..50, { .nuphi })
 say map(1..50, { .sigma })
 say map(1..50, { .usigma })
 say map(1..50, { .isigma })
@@ -674,6 +676,7 @@ say map(1..50, { .nesigma })
 say map(1..50, { .nbsigma })
 
 say map(1..50, { .psi(2) })
+say map(1..50, { .phi(2) })
 say map(1..50, { .sigma(2) })
 say map(1..50, { .usigma(2) })
 say map(1..50, { .isigma(2) })
@@ -683,7 +686,6 @@ say map(1..50, { .nusigma(2) })
 say map(1..50, { .nisigma(2) })
 say map(1..50, { .nesigma(2) })
 say map(1..50, { .nbsigma(2) })
-say map(1..50, { .jordan_totient(2) })
 
 say 10.of { .hyperfactorial }
 say 10.of { .superfactorial }

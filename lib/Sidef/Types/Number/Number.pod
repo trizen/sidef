@@ -529,7 +529,7 @@ Aliases: I<tau>
     Num.phi
 
     φ(n)
-    phi(n)
+    phi(n,k=1)
 
 Returns the golden ratio constant C<PHI>, or the Euler totient of C<n>.
 
@@ -8933,10 +8933,12 @@ Aliases: I<to_str>
 
 =head2 totient
 
-    phi(n)
-    totient(n)
+    phi(n,k=1)
+    totient(n,k=1)
 
 Euler's totient function.
+
+For k>1, it returns the generalized Jordan's totient C<J_k(n)>.
 
 Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
 
@@ -9010,7 +9012,7 @@ Aliases: I<unitary_divisors>
 
 =head2 uphi
 
-    uphi(n)
+    uphi(n,k=1)
 
 The unitary totient function. (OEIS: A047994)
 

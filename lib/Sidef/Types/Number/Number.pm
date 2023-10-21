@@ -2050,7 +2050,7 @@ package Sidef::Types::Number::Number {
     sub phi {
 
         if (ref($_[0])) {
-            return $_[0]->euler_phi;
+            goto &euler_phi;
         }
 
         state $five4_f = (Math::MPFR::Rmpfr_init_set_d_nobless(1.25, $ROUND))[0];
@@ -24603,7 +24603,11 @@ package Sidef::Types::Number::Number {
     }
 
     sub euler_phi {
-        my ($n) = @_;
+        my ($n, $k) = @_;
+
+        if (defined($k)) {
+            goto &jordan_totient;
+        }
 
         $n = $$n;
 
@@ -26040,11 +26044,14 @@ package Sidef::Types::Number::Number {
     }
 
     sub uphi {        # OEIS: A047994
+        my ($n, $k) = @_;
 
         # Multiplicative with:
-        #   uphi(p^e) = p^e - 1
+        #   uphi(p^e, k) = p^(e*k) - 1
 
-        my $n = _big2uistr($_[0]) // goto &nan;
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+        $n = _big2uistr($n) // goto &nan;
         $n eq '0' and return ZERO;
 
         state $t = Math::GMPz::Rmpz_init_nobless();
@@ -26056,16 +26063,16 @@ package Sidef::Types::Number::Number {
 
             if ($p < ULONG_MAX) {
 
-                if ($e == 1) {    # optimization
+                if ($e == 1 and $k == 1) {    # optimization
                     push @terms, $p - 1;
                     next;
                 }
 
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e * $k);
             }
             else {
                 Math::GMPz::Rmpz_set_str($t, "$p", 10);
-                Math::GMPz::Rmpz_pow_ui($t, $t, $e);
+                Math::GMPz::Rmpz_pow_ui($t, $t, $e * $k);
             }
 
             Math::GMPz::Rmpz_sub_ui($t, $t, 1);
@@ -26083,6 +26090,8 @@ package Sidef::Types::Number::Number {
     }
 
     sub nuphi {    # OEIS: A254503
+
+        # TODO: generalize for k > 1.
 
         # Multiplicative with:
         #   a(p) = p
