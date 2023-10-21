@@ -26131,6 +26131,50 @@ package Sidef::Types::Number::Number {
         bless \_binsplit(\@terms, \&__mul__);
     }
 
+    sub iphi {    # OEIS: A091732 -- infinitary analog of Euler's phi function
+        my ($n, $k) = @_;
+
+        # Let e = Sum_{k >= 0} d_k 2^k (binary representation of e).
+
+        # Multiplicative with, where d_k is odd in the binary representation of e (ignore even d_k):
+        #   iphi(p^e, r) = Product_{k >= 0} (p^(r * 2^k) - 1)
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+        $n = _big2uistr($n) // goto &nan;
+        $n eq '0' and return ZERO;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+
+        my @terms;
+        foreach my $pe (_factor_exp($n)) {
+            my ($p, $e) = @$pe;
+
+            ($p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($t, $p)
+              : Math::GMPz::Rmpz_set_str($t, "$p", 10);
+
+            my $j = 0;
+            do {
+                if ($e % 2 == 1) {
+                    Math::GMPz::Rmpz_pow_ui($u, $t, (1 << $j) * $k);
+                    Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+                    push @terms,
+                      (
+                          Math::GMPz::Rmpz_fits_ulong_p($u)
+                        ? Math::GMPz::Rmpz_get_ui($u)
+                        : Math::GMPz::Rmpz_init_set($u)
+                      );
+                }
+                ++$j;
+            } while ($e >>= 1);
+        }
+
+        @terms || return ONE;
+        bless \_binsplit(\@terms, \&__mul__);
+    }
+
     sub prime_power_sigma {
         my ($n, $k) = @_;
 

@@ -3976,6 +3976,14 @@ Returns the modular inverse of C<n> modulo C<m>.
 
 =cut
 
+=head2 iphi
+
+    iphi(n, k=1)
+
+Infinitary analog of Euler's phi function. (OEIS: A091732)
+
+=cut
+
 =head2 ipolygonal_root
 
     ipolygonal_root(n,k)

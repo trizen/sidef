@@ -1355,4 +1355,13 @@ assert_eq(
     [false, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false]
 )
 
+30.times {|n|
+    var D = n.idivisors
+    assert_eq(D.sum{|d| iphi(d) }, n)
+    assert_eq(D.sum{|d| iphi(d,2) }, n**2)
+    assert_eq(D.sum{|d| iphi(d,3) }, n**3)
+}
+
+assert_eq(map(1..70, {.nuphi}), %n[1,2,3,2,5,6,7,4,6,10,11,6,13,14,15,8,17,12,19,10,21,22,23,12,20,26,18,14,29,30,31,16,33,34,35,12,37,38,39,20,41,42,43,22,30,46,47,24,42,40,51,26,53,36,55,28,57,58,59,30,61,62,42,32,65,66,67,34,69,70])
+
 say "** Tests passed!"

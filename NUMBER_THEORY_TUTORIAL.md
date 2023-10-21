@@ -1602,7 +1602,7 @@ A massive speed improvement would be using ECM with conjectured bounds to push `
 
 Another conjectured approach would be using Pollard's rho method to find a larger bound for `B`, which requires `O(sqrt(B))` steps to find a prime factor less than `B`. Therefore, if we take `B = 10^12`, after `c*10^6` iterations of the Pollard rho method without success in finding a prime factor of `n`, it's very probable that `n` has no prime factor less than `10^12`.
 
-This later approach can be enabled by setting `Num!USE_CONJECTURES = true` and is useful for computing upper-bounds, being about 5x faster than the rigorous method.
+This latter approach can be enabled by setting `Num!USE_CONJECTURES = true` and is useful for computing upper-bounds, being about 5x faster than the rigorous method.
 
 ## Factorization of integers of special form
 
