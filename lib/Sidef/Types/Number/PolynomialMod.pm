@@ -19,9 +19,9 @@ package Sidef::Types::Number::PolynomialMod {
     use overload
       q{bool} => sub { (@_) = ($_[0]); goto &__boolify__ },
       q{""}   => sub { (@_) = ($_[0]); goto &__stringify__ },
-      q{${}}  => \&to_n,
       q{%{}}  => \&to_poly,
-      q{0+}   => \&to_n;
+      q{${}}  => \&Sidef::Types::Number::Polynomial::to_n,
+      q{0+}   => \&Sidef::Types::Number::Polynomial::to_n;
 
     sub new {
         my (undef, @args) = @_;
@@ -128,6 +128,24 @@ package Sidef::Types::Number::PolynomialMod {
 
         my $prod = Sidef::Types::Number::Number::_binsplit(\@terms, \&Sidef::Types::Number::PolynomialMod::mul);
         $prod->div($k->factorial);
+    }
+
+    sub chinese {
+        my (@polynomials) = @_;
+
+        my @moduli = map { $_->modulus } @polynomials;
+        my $m      = Sidef::Types::Number::Number::lcm(@moduli);
+        my $c      = __PACKAGE__->new($m);
+
+        foreach my $i (0 .. $#polynomials) {
+            my $poly = $polynomials[$i];
+            my $n    = $moduli[$i];
+            my $t    = $m->idiv($n);
+            my $u    = $t->mul($t->invmod($n));
+            $c = $c->add(__PACKAGE__->new($poly->lift, $m)->mul($u));
+        }
+
+        return $c;
     }
 
     sub add {
@@ -237,13 +255,8 @@ package Sidef::Types::Number::PolynomialMod {
         #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclidean_division
 
         if ($x->[1]->ne($y->[1])) {
-            return (
-                    __PACKAGE__->new(Sidef::Types::Number::Number::nan(), Sidef::Types::Number::Number::nan()),
-                    __PACKAGE__->new(
-                                     0 => 0,
-                                     Sidef::Types::Number::Number::nan()
-                                    )
-                   );
+            return (__PACKAGE__->new(Sidef::Types::Number::Number::nan(), Sidef::Types::Number::Number::nan()),
+                    __PACKAGE__->new(Sidef::Types::Number::Number::nan()));
         }
 
         my $m = $x->[1];
@@ -255,20 +268,20 @@ package Sidef::Types::Number::PolynomialMod {
         $y = $y->[0];
 
         my $deg_r = List::Util::max(CORE::keys(%$x));    # deg(x)
-        $deg_r // return (__PACKAGE__->new(0 => 0, $m), __PACKAGE__->new(0 => 0, $m));
+        $deg_r // return (__PACKAGE__->new($m), __PACKAGE__->new($m));
 
         if ($deg_r > ~0) {
             $deg_r = Math::GMPz::Rmpz_init_set_str("$deg_r", 10);
         }
 
         my $deg_y = List::Util::max(CORE::keys(%$y));    # deg(y)
-        $deg_y // return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf(), $m), __PACKAGE__->new(0 => 0, $m));
+        $deg_y // return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf(), $m), __PACKAGE__->new($m));
 
         if ($deg_y > ~0) {
             $deg_y = Math::GMPz::Rmpz_init_set_str("$deg_y", 10);
         }
 
-        my $q = __PACKAGE__->new(0 => 0, $m);
+        my $q = __PACKAGE__->new($m);
         my $r = $x_mod;
         my $c = $y->{$deg_y};                            # lc(y)
 
@@ -279,7 +292,7 @@ package Sidef::Types::Number::PolynomialMod {
 
             # When the result of division is NaN, the loop never stops
             if ($t->is_nan) {
-                return (__PACKAGE__->new(Sidef::Types::Number::Number::nan(), Sidef::Types::Number::Number::nan()), __PACKAGE__->new(0 => 0, $m));
+                return (__PACKAGE__->new(Sidef::Types::Number::Number::nan(), Sidef::Types::Number::Number::nan()), __PACKAGE__->new($m));
             }
 
             # s := lc(r)/c * x^(deg(r)−deg(y))
@@ -366,7 +379,7 @@ package Sidef::Types::Number::PolynomialMod {
         my ($x, $y) = @_;
 
         if (ref($y) ne __PACKAGE__) {
-            $y = __PACKAGE__->new(0 => $y);
+            $y = __PACKAGE__->new(0 => $y, $x->[1]);
         }
 
         my ($quot, $rem) = $x->divmod($y);
@@ -393,7 +406,7 @@ package Sidef::Types::Number::PolynomialMod {
             my $frac = Sidef::Types::Number::Fraction->new($quot->mul($y)->add($rem), $y);
 
             if ($frac->is_zero) {
-                return __PACKAGE__->new(0, $x->[1]);
+                return __PACKAGE__->new($x->[1]);
             }
 
             return $frac;

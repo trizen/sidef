@@ -206,6 +206,14 @@ Returns the
 
 =cut
 
+=head2 chinese
+
+    *polynomials.chinese
+
+Returns the
+
+=cut
+
 =head2 derivative
 
     x.derivative

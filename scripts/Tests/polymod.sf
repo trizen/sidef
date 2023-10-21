@@ -46,14 +46,34 @@ func CRT_poly_mul(a,b) {
     return Poly(c.coeffs.map_2d {|x,y| [x, (y > t) ? (y-m) : y] })
 }
 
+func CRT_poly_mul_2(a,b) {
+    var c_height = 2*(a.height * b.height * min(a.coeffs.len, b.coeffs.len))
+
+    var m = 1
+    var P = []
+
+    Math.seq(3, {.tail.next_prime}).each {|p|
+        m *= p
+        P << p
+        break if (m > c_height)
+    }
+
+    var c = chinese(P.map{|p| PolyMod(a, p) * PolyMod(b, p) }...).lift
+    var t = (m>>1)
+
+    return Poly(c.coeffs.map_2d {|x,y| [x, (y > t) ? (y-m) : y] })
+}
+
 var x = Poly(1)
 
 assert_eq(CRT_poly_mul(3*x - 4, 6*x + 5), (3*x - 4)*(6*x + 5))
+assert_eq(CRT_poly_mul_2(3*x - 4, 6*x + 5), (3*x - 4)*(6*x + 5))
 
 var a = (17*x**3 + 7*x**2 - x + 65)
 var b = (34*x**4 - 23*x**2 + 8*x - 12)
 
 assert_eq((a*b), CRT_poly_mul(a,b))
+assert_eq((a*b), CRT_poly_mul_2(a,b))
 assert_eq((a*b) % (2**127 - 1), PolyMod(a, 2**127 - 1) * PolyMod(b, 2**127 - 1) -> lift)
 
 do {
