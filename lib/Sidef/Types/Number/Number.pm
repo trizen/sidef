@@ -23947,15 +23947,49 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_sgn($k) > 0
               or return Sidef::Types::Array::Array->new();
 
-            my @factors;
+            # When k > n, set k = n
+            if (Math::GMPz::Rmpz_cmp($k, $n) > 0) {
+                $k = Math::GMPz::Rmpz_init_set($n);
+            }
 
-            if (   !Math::GMPz::Rmpz_fits_ulong_p($n)
-                and Math::GMPz::Rmpz_fits_ulong_p($k)
+            if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+
+                $n = Math::GMPz::Rmpz_get_ui($n);
+                $k = Math::GMPz::Rmpz_get_ui($k);
+
+                my @d  = (1);
+                my @pp = grep { $_->[0] <= $k } _factor_exp($n);
+
+                foreach my $pp (@pp) {
+
+                    my ($p, $e) = @$pp;
+
+                    my @t;
+                    my $r = 1;
+
+                    for my $i (1 .. $e) {
+                        $r *= $p;
+                        foreach my $u (@d) {
+                            push(@t, $u * $r) if ($u * $r <= $k);
+                        }
+                    }
+
+                    push @d, @t;
+                }
+
+                return Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @d]);
+            }
+
+            my @factors;
+            my $native_k = Math::GMPz::Rmpz_fits_ulong_p($k);
+
+            if (    $native_k
+                and !Math::GMPz::Rmpz_fits_ulong_p($n)
                 and ($k <= 1e6 or $k == 1e7 or $k == 1e8)) {
                 (undef, @factors) = _primorial_trial_factor($n, Math::GMPz::Rmpz_get_ui($k));
             }
             else {
-                @factors = grep { Math::GMPz::Rmpz_init_set_str($_, 10) <= $k } _factor($n);
+                @factors = grep { (($_ < ULONG_MAX) ? $_ : Math::GMPz::Rmpz_init_set_str("$_", 10)) <= $k } _factor($n);
             }
 
             @factors || return Sidef::Types::Array::Array->new([ONE]);
@@ -23963,19 +23997,36 @@ package Sidef::Types::Number::Number {
             my %table;
             ++$table{$_} for @factors;
 
-            my @d = (Math::GMPz::Rmpz_init_set_ui(1));
+            my @d = (1);
+            state $t = Math::GMPz::Rmpz_init_nobless();
 
-            foreach my $p (sort { Math::GMPz::Rmpz_cmp($a, $b) } map { Math::GMPz::Rmpz_init_set_str($_, 10) } keys %table) {
+            foreach my $p (keys %table) {
 
                 my @t;
                 my $r = Math::GMPz::Rmpz_init_set_ui(1);
 
                 for my $i (1 .. $table{$p}) {
-                    Math::GMPz::Rmpz_mul($r, $r, $p);
+                    if ($p < ULONG_MAX) {
+                        Math::GMPz::Rmpz_mul_ui($r, $r, $p);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_set_str($t, "$p", 10);
+                        Math::GMPz::Rmpz_mul($r, $r, $t);
+                    }
                     foreach my $u (@d) {
-                        my $prod = Math::GMPz::Rmpz_init();
-                        Math::GMPz::Rmpz_mul($prod, $u, $r);
-                        push(@t, $prod) if (Math::GMPz::Rmpz_cmp($prod, $k) <= 0);
+                        ref($u)
+                          ? Math::GMPz::Rmpz_mul($t, $r, $u)
+                          : Math::GMPz::Rmpz_mul_ui($t, $r, $u);
+                        if (Math::GMPz::Rmpz_cmp($t, $k) <= 0) {
+                            push(
+                                 @t,
+                                 (
+                                  $native_k
+                                  ? Math::GMPz::Rmpz_get_ui($t)
+                                  : (Math::GMPz::Rmpz_fits_ulong_p($t) ? Math::GMPz::Rmpz_get_ui($t) : Math::GMPz::Rmpz_init_set($t))
+                                 )
+                                );
+                        }
                     }
                 }
 
@@ -23984,8 +24035,8 @@ package Sidef::Types::Number::Number {
 
             return
               Sidef::Types::Array::Array->new(
-                                              [map  { bless \(Math::GMPz::Rmpz_fits_ulong_p($_) ? Math::GMPz::Rmpz_get_ui($_) : $_) }
-                                               sort { Math::GMPz::Rmpz_cmp($a, $b) } @d
+                                              [map  { bless \$_ }
+                                               sort { $a <=> $b } @d
                                               ]
                                              );
         }
