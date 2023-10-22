@@ -1225,6 +1225,14 @@ Returns C<nil> if C<n> cannot be truncated to an integer or if C<k> is negative.
 
 =cut
 
+=head2 bphi
+
+    bphi(n)
+
+The bi-unitary analog of Euler's totient function of C<n>. (OEIS: A116550)
+
+=cut
+
 =head2 bsearch
 
     bsearch(n, {...})

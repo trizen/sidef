@@ -663,6 +663,7 @@ say 20.by { .is_proth_prime(3) }   # numbers n such that 2^n * 3 + 1 is prime
 say map(1..50, { .psi })
 say map(1..50, { .phi })
 say map(1..50, { .iphi })
+say map(1..50, { .bphi })
 say map(1..50, { .uphi })
 say map(1..50, { .nuphi })
 say map(1..50, { .sigma })

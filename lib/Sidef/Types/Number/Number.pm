@@ -24081,7 +24081,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
                 }
                 else {
-                    Math::GMPz::Rmpz_set_str($pp, $p, 10);
+                    Math::GMPz::Rmpz_set_str($pp, "$p", 10);
                     Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
                 }
             }
@@ -26233,6 +26233,40 @@ package Sidef::Types::Number::Number {
 
         @terms || return ONE;
         bless \_binsplit(\@terms, \&__mul__);
+    }
+
+    sub bphi {    # OEIS: A116550 -- bi-unitary analog of Euler's totient function of n.
+        my ($n) = @_;
+
+        # Formula:
+        #   a(n) = Sum{d|n, d is unitary} (-1)^omega(d) * Sum{k|d, k is squarefree, k <= n/d} mu(k) * floor(n/(d*k)).
+
+        my @final_terms;
+
+        foreach my $v (@{$n->udivisors}) {
+            my $sign = (-1)**(scalar _factor_exp($$v));
+            my $x    = $n->idiv($v);
+            my $nod  = "$$x";
+
+            if ($nod eq '1') {
+                push @final_terms, $sign;
+                next;
+            }
+
+            my @terms;
+            foreach my $u (@{$v->squarefree_divisors}) {
+                my $k   = $$u;
+                my $div = Math::Prime::Util::GMP::divint($nod, $k);
+                last if ($div eq '0');
+                my $mu = ((HAS_PRIME_UTIL and !ref($k)) ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k));
+                push @terms, Math::Prime::Util::GMP::mulint($mu, $div);
+            }
+
+            push @final_terms, Math::Prime::Util::GMP::mulint($sign, ((scalar(@terms) == 1) ? $terms[0] : Math::Prime::Util::GMP::vecsum(@terms)));
+        }
+
+        @final_terms || return ZERO;
+        _set_int(Math::Prime::Util::GMP::vecsum(@final_terms));
     }
 
     sub prime_power_sigma {
