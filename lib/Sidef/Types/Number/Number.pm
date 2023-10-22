@@ -19489,7 +19489,7 @@ package Sidef::Types::Number::Number {
 
                 push @trial_factors, @new_factors;
 
-                $bigomega  = scalar(@trial_factors);
+                $bigomega  = List::Util::max($bigomega, scalar(@trial_factors));
                 $remainder = _any2mpz($r);
 
                 if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
@@ -19536,7 +19536,7 @@ package Sidef::Types::Number::Number {
                 if ($j >= 6) {
 
                     my @special_factors = @{(bless \$n)->special_factors(_set_int($j - 6))};
-                    my @gcd_factors     = @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)]))};
+                    my @gcd_factors = @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)]))};
 
                     if (scalar(@gcd_factors) > $k) {
                         return Sidef::Types::Bool::Bool::FALSE;
@@ -19564,8 +19564,9 @@ package Sidef::Types::Number::Number {
                     my $prod = Sidef::Types::Number::Number::prod(@prime_factors);
                     my $c    = (bless \$n)->idiv($prod);
 
-                    $remainder = _any2mpz($$c);
-                    $bigomega  = scalar(@prime_factors);
+                    $remainder     = _any2mpz($$c);
+                    @trial_factors = map { $$_ } @prime_factors;
+                    $bigomega      = scalar(@trial_factors);
 
                     if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                         if ($bigomega == $k) {
@@ -19751,7 +19752,7 @@ package Sidef::Types::Number::Number {
                     push @trial_factors, List::Util::uniq(@new_factors);
                 }
 
-                $omega     = scalar(@trial_factors);
+                $omega     = List::Util::max($omega, scalar(@trial_factors));
                 $remainder = _any2mpz($r);
 
                 if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
@@ -19802,7 +19803,7 @@ package Sidef::Types::Number::Number {
                 if ($j >= 6) {
 
                     my @special_factors = @{(bless \$n)->special_factors(_set_int($j - 6))};
-                    my @gcd_factors     = @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { bless \$_ } @trial_factors)]))};
+                    my @gcd_factors = @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)]))};
 
                     my @prime_factors;
                     my @composite_factors;
@@ -19822,8 +19823,9 @@ package Sidef::Types::Number::Number {
                     my $prod = Sidef::Types::Number::Number::prod(@prime_factors);
                     my $c    = (bless \$n)->idiv($prod);
 
-                    $remainder = _any2mpz($$c);
-                    $omega     = scalar(List::Util::uniq(map { ref($_) ? "$$_" : $_ } @prime_factors));
+                    $remainder     = _any2mpz($$c);
+                    @trial_factors = List::Util::uniq(map { "$$_" } @prime_factors);
+                    $omega         = scalar(@trial_factors);
 
                     if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
                         if ($omega == $k) {
