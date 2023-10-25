@@ -7553,12 +7553,33 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (ref($x) eq 'Math::GMPz' and ref($y) eq 'Math::GMPz') {
+        if (!ref($x) and !ref($y)) {
+            $y == 0 and return Sidef::Types::Bool::Bool::FALSE;
             return (
-                      (Math::GMPz::Rmpz_divisible_p($x, $y) && Math::GMPz::Rmpz_sgn($y))
+                    ($x % $y == 0)
                     ? (Sidef::Types::Bool::Bool::TRUE)
                     : (Sidef::Types::Bool::Bool::FALSE)
                    );
+        }
+
+        if (ref($x) eq 'Math::GMPz') {
+
+            if (!ref($y)) {
+                $y == 0 and return Sidef::Types::Bool::Bool::FALSE;
+                return (
+                        Math::GMPz::Rmpz_divisible_ui_p($x, CORE::abs($y))
+                        ? (Sidef::Types::Bool::Bool::TRUE)
+                        : (Sidef::Types::Bool::Bool::FALSE)
+                       );
+            }
+
+            if (ref($y) eq 'Math::GMPz') {
+                return (
+                        (Math::GMPz::Rmpz_divisible_p($x, $y) && Math::GMPz::Rmpz_sgn($y))
+                        ? (Sidef::Types::Bool::Bool::TRUE)
+                        : (Sidef::Types::Bool::Bool::FALSE)
+                       );
+            }
         }
 
         __eq__(__mod__($x, $y), 0)

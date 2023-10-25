@@ -12,6 +12,25 @@ assert_eq(208 >> 64, 0)
 assert_eq(496 >> 32, 0)
 assert_eq(640 >> 32, 0)
 
+assert(42.is_div(6))
+assert(!42.is_div(8))
+
+assert(2**32 - 1 -> is_div(2**16 + 1))
+assert(2**32 - 1 -> is_div(2**16 + 3) -> not)
+assert(2**64 - 1 -> is_div(2**32 + 1))
+assert(2**64 - 1 -> is_div(2**32 + 3) -> not)
+assert(2**64 - 1 -> is_div(2**32 - 1))
+assert(2**128 - 1 -> is_div(2**64 + 1))
+
+assert(2**128 + 1 -> is_div(59649589127497217))
+assert(2**128 + 1 -> is_div(59649589127497215) -> not)
+assert(2**128 + 1 -> is_div(5704689200685129054721))
+assert(2**128 + 1 -> is_div(5704689200685129054723) -> not)
+
+assert_eq(10.by{ .is_div(3) }, [0, 3, 6, 9, 12, 15, 18, 21, 24, 27])
+assert_eq({|v| 10.by{ v.is_div(_) } }(20.primorial), 20.primorial.divisors(14))
+assert_eq({|v| 10.by{ v.is_div(_) } }(100.primorial), 100.primorial.divisors(14))
+
 assert(all_prime(5))
 assert([2].all_prime)
 assert([5].all_prime)
