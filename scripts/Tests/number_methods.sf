@@ -31,6 +31,9 @@ assert_eq(10.by{ .is_div(3) }, [0, 3, 6, 9, 12, 15, 18, 21, 24, 27])
 assert_eq({|v| 10.by{ v.is_div(_) } }(20.primorial), 20.primorial.divisors(14))
 assert_eq({|v| 10.by{ v.is_div(_) } }(100.primorial), 100.primorial.divisors(14))
 
+assert_eq(10.by{.is_powerful},    2.powerful(10.nth_powerful))
+assert_eq(10.by{.is_powerful(3)}, 3.powerful(10.nth_powerful(3)))
+
 assert(all_prime(5))
 assert([2].all_prime)
 assert([5].all_prime)

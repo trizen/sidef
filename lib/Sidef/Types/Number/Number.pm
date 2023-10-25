@@ -7556,7 +7556,7 @@ package Sidef::Types::Number::Number {
         if (!ref($x) and !ref($y)) {
             $y == 0 and return Sidef::Types::Bool::Bool::FALSE;
             return (
-                    ($x % $y == 0)
+                      ($x % $y == 0)
                     ? (Sidef::Types::Bool::Bool::TRUE)
                     : (Sidef::Types::Bool::Bool::FALSE)
                    );
@@ -7575,7 +7575,7 @@ package Sidef::Types::Number::Number {
 
             if (ref($y) eq 'Math::GMPz') {
                 return (
-                        (Math::GMPz::Rmpz_divisible_p($x, $y) && Math::GMPz::Rmpz_sgn($y))
+                          (Math::GMPz::Rmpz_divisible_p($x, $y) && Math::GMPz::Rmpz_sgn($y))
                         ? (Sidef::Types::Bool::Bool::TRUE)
                         : (Sidef::Types::Bool::Bool::FALSE)
                        );
@@ -22686,6 +22686,8 @@ package Sidef::Types::Number::Number {
         );
     }
 
+    *rho_factor = \&prho_factor;
+
     sub pbrent_factor {
         my ($n, $k) = @_;
         _valid(\$k) if defined($k);
@@ -22698,6 +22700,8 @@ package Sidef::Types::Number::Number {
                                         ]
                                        );
     }
+
+    *rho_brent_factor = \&pbrent_factor;
 
     sub pminus1_factor {
         my ($n, $B1, $B2) = @_;
@@ -31533,13 +31537,15 @@ package Sidef::Types::Number::Number {
                     if ($n % ($p * $p) != 0) {
                         return Sidef::Types::Bool::Bool::FALSE;
                     }
-                    my $v = (
-                             HAS_PRIME_UTIL
-                             ? Math::Prime::Util::valuation($n, $p)
-                             : Math::Prime::Util::GMP::valuation($n, $p)
-                            );
-                    if ($v < $k) {
-                        return Sidef::Types::Bool::Bool::FALSE;
+                    if ($k > 2) {
+                        my $v = (
+                                 HAS_PRIME_UTIL
+                                 ? Math::Prime::Util::valuation($n, $p)
+                                 : Math::Prime::Util::GMP::valuation($n, $p)
+                                );
+                        if ($v < $k) {
+                            return Sidef::Types::Bool::Bool::FALSE;
+                        }
                     }
                 }
             }
@@ -31560,7 +31566,7 @@ package Sidef::Types::Number::Number {
           or return Sidef::Types::Bool::Bool::FALSE;
 
         Math::GMPz::Rmpz_divisible_2exp_p($n, 1)
-          and !Math::GMPz::Rmpz_divisible_2exp_p($n, 2)
+          and !Math::GMPz::Rmpz_divisible_2exp_p($n, $k)
           and return Sidef::Types::Bool::Bool::FALSE;
 
         foreach my $p (3, 5, 7, 11, 13) {
@@ -31593,8 +31599,12 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Bool::Bool::TRUE;
         }
 
-        if (Math::Prime::Util::GMP::is_power($rem) >= $k) {
-            return Sidef::Types::Bool::Bool::TRUE;
+        if (my $exp = Math::Prime::Util::GMP::is_power($rem)) {
+            return (
+                    ($exp >= $k)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
         }
 
         if (Math::GMPz::Rmpz_cmp_ui($t, $trial_limit) < 0) {

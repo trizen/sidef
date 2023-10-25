@@ -6579,10 +6579,10 @@ Returns an array with the real and imaginary parts of C<x>.
 
 =cut
 
-=head2 pbrent_factor
+=head2 rho_brent_factor
 
-    n.pbrent_factor
-    n.pbrent_factor(tries)
+    n.rho_brent_factor
+    n.rho_brent_factor(tries)
 
 Pollard-Brent rho factorization method.
 
@@ -7284,17 +7284,6 @@ Returns the previous squarefull (or 2-full) number smaller than C<n>.
 
 =cut
 
-=head2 prho_factor
-
-    n.prho_factor
-    n.prho_factor(tries)
-
-Pollard rho factorization method.
-
-The product of the factors will give back C<n>. However, some factors may be composite.
-
-=cut
-
 =head2 primality_pretest
 
     n.primality_pretest
@@ -7987,6 +7976,17 @@ Equivalent with:
     n / k**valuation(n,k)
 
 Aliases: I<remove>
+
+=cut
+
+=head2 rho_factor
+
+    n.rho_factor
+    n.rho_factor(tries)
+
+Pollard rho factorization method.
+
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
