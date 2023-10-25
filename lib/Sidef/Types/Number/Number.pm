@@ -9162,7 +9162,7 @@ package Sidef::Types::Number::Number {
 
     sub floor {
         my ($x) = @_;
-        ref($$x) eq 'Math::GMPz' and return $x;    # already an integer
+        (!ref($$x) or ref($$x) eq 'Math::GMPz') and return $x;    # already an integer
         bless \__floor__($$x);
     }
 
@@ -9207,7 +9207,7 @@ package Sidef::Types::Number::Number {
 
     sub ceil {
         my ($x) = @_;
-        ref($$x) eq 'Math::GMPz' and return $x;    # already an integer
+        (!ref($$x) or ref($$x) eq 'Math::GMPz') and return $x;    # already an integer
         bless \__ceil__($$x);
     }
 

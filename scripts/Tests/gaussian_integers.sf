@@ -274,4 +274,26 @@ do {
     assert_eq(Gauss(Mod(Poly(3,4), 127), 923).lift, Gauss(Polynomial(3 => 4), 923))
 }
 
+assert_eq(Gauss(5040).factor.len, 14)
+assert_eq(Gauss(0, 5040).factor.len, 13)
+
+assert_eq(Gauss(5040).factor.prod, Gauss(5040))
+assert_eq(Gauss(-5040).factor.prod, Gauss(-5040))
+assert_eq(Gauss(0, 5040).factor.prod, Gauss(0, 5040))
+assert_eq(Gauss(0, -5040).factor.prod, Gauss(0, -5040))
+
+assert_eq(Gauss(38, 60).factor.len, 5)
+assert_eq(Gauss(38, 60).factor.prod, Gauss(38, 60))
+
+assert_eq(Gauss(5040).factor_exp.len, 6)
+assert_eq(Gauss(0, 5040).factor_exp.len, 5)
+assert_eq(Gauss(5040).factor_exp.prod_2d{|p,e| p**e }, Gauss(5040))
+assert_eq(Gauss(0, 5040).factor_exp.prod_2d{|p,e| p**e }, Gauss(0, 5040))
+
+assert_eq(Gauss(-38, -60).factor_exp.prod_2d{|p,e| p**e }, Gauss(-38, -60))
+assert_eq(Gauss( 38, -60).factor_exp.prod_2d{|p,e| p**e }, Gauss( 38, -60))
+assert_eq(Gauss(-38,  60).factor_exp.prod_2d{|p,e| p**e }, Gauss(-38,  60))
+
+assert_eq(20.of{ Gauss(_).factor.prod.to_n }, 20.of { _ })
+
 say "** Test passed!"

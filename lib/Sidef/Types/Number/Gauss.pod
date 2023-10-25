@@ -287,6 +287,22 @@ Returns the
 
 =cut
 
+=head2 factor
+
+    z.factor
+
+Returns the
+
+=cut
+
+=head2 factor_exp
+
+    z.factor_exp
+
+Returns the
+
+=cut
+
 =head2 float
 
     x.float
@@ -356,6 +372,16 @@ Returns the
     n.is_coprime(k)
 
 Returns the
+
+=cut
+
+=head2 is_div
+
+    x.is_div(y)
+
+Returns the
+
+Aliases: I<is_divisible>
 
 =cut
 

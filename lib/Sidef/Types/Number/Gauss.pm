@@ -108,6 +108,31 @@ package Sidef::Types::Number::Gauss {
 
     sub stringify {
         my ($x) = @_;
+
+        if ($x->{b}->is_zero) {
+            return $x->{a}->stringify;
+        }
+
+        if ($x->{a}->is_zero) {
+
+            if ($x->{b}->is_one) {
+                return Sidef::Types::String::String->new('1i');
+            }
+            elsif ($x->{b}->is_mone) {
+                return Sidef::Types::String::String->new('-1i');
+            }
+
+            return Sidef::Types::String::String->new(join('', '(', $x->{b}->stringify, ')*1i'));
+        }
+
+        if ($x->{b}->is_one) {
+            return Sidef::Types::String::String->new(join(' + ', $x->{a}->stringify, '1i'));
+        }
+
+        if ($x->{b}->is_mone) {
+            return Sidef::Types::String::String->new(join(' - ', $x->{a}->stringify, '1i'));
+        }
+
         Sidef::Types::String::String->new(join(' + ', $x->{a}->stringify, join('', '(', $x->{b}->stringify, ')*1i')));
     }
 
@@ -228,6 +253,13 @@ package Sidef::Types::Number::Gauss {
         $x->sub($y->mul($x->div($y)->floor));
     }
 
+    sub is_divisible {
+        my ($x, $y) = @_;
+        $x->mod($y)->is_zero;
+    }
+
+    *is_div = \&is_divisible;
+
     sub is_prime {
         my ($x) = @_;
         Sidef::Types::Number::Number::is_gaussian_prime($x->{a}, $x->{b});
@@ -297,6 +329,66 @@ package Sidef::Types::Number::Gauss {
     sub is_coprime {
         my ($n, $k) = @_;
         $n->norm->gcd($k->norm)->is_one;
+    }
+
+    sub factor {
+        my ($z) = @_;
+
+        # Reference:
+        #   https://www.alpertron.com.ar/GAUSSIAN.HTM
+
+        my @factors;
+        my $n = $z->norm;
+
+        state $one_one = __PACKAGE__->new(Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ONE);
+
+        foreach my $pe (Sidef::Types::Number::Number::_factor_exp($$n)) {
+            my ($p, $e) = @$pe;
+
+            if ($p eq '2') {
+                while ($z->is_div($one_one)) {    # divisible by 1+1i
+                    push @factors, $one_one;
+                    $z = $z->div($one_one);
+                }
+            }
+            elsif (Math::Prime::Util::GMP::modint($p, 4) == 3) {
+                my $t = __PACKAGE__->new(Sidef::Types::Number::Number::_set_int($p));
+                while ($z->is_div($t)) {
+                    push @factors, $t;
+                    $z = $z->div($t);
+                }
+            }
+            else {    # here we have: p % 4 == 1
+                my $p_obj = Sidef::Types::Number::Number::_set_int($p);
+                foreach my $solution (@{$p_obj->sum_of_squares}) {
+                    my ($x, $y) = @$solution;
+
+                    my $t1 = __PACKAGE__->new($x, $y);
+                    my $t2 = __PACKAGE__->new($y, $x);
+
+                    while ($z->is_div($t1)) {
+                        push @factors, $t1;
+                        $z = $z->div($t1);
+                    }
+
+                    while ($z->is_div($t2)) {
+                        push @factors, $t2;
+                        $z = $z->div($t2);
+                    }
+                }
+            }
+        }
+
+        if (!($z->is_one)) {
+            push @factors, $z;
+        }
+
+        Sidef::Types::Array::Array->new(\@factors)->sort;
+    }
+
+    sub factor_exp {
+        my ($z) = @_;
+        $z->factor->run_length;
     }
 
     sub inc {
