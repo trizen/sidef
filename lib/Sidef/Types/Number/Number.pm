@@ -31350,6 +31350,10 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
+        if (HAS_NEW_PRIME_UTIL_GMP) {
+            return _set_int(Math::Prime::Util::GMP::powerful_count(Math::GMPz::Rmpz_get_str($n, 10), $k));
+        }
+
         state $t = Math::GMPz::Rmpz_init_nobless();
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
