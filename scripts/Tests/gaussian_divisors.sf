@@ -1,0 +1,85 @@
+#!/usr/bin/ruby
+
+# Tests for the Gauss `divisors` method.
+
+assert_eq(
+    1..5 -> map{divisors(Gauss(_)).grep{.real.is_pos}.sum},
+    [Gauss(1), Gauss(5), Gauss(4), Gauss(13), Gauss(12)]
+)
+
+assert_eq(
+    1..48 -> map{divisors(Gauss(_)).grep{.real.is_pos}.sum}.sum,
+    Gauss(3654)
+)
+
+assert_eq(
+    1..5 -> map{divisors(Gauss(0, _)).grep{.real.is_pos}.sum},
+    [Gauss(1), Gauss(5), Gauss(4), Gauss(13), Gauss(12)]
+)
+
+assert_eq(  # OEIS: A125271
+    30.of { divisors(Gauss(_)).grep{.real.is_pos}.len },
+    %n[1, 1, 4, 2, 7, 6, 8, 2, 10, 3, 20, 2, 14, 6, 8, 12, 13, 6, 12, 2, 34, 4, 8, 2, 20, 15, 20, 4, 14, 6]
+)
+
+assert_eq(  # OEIS: A078930
+    30.of { divisors(Gauss(_)).grep{.real.is_pos}.sum.real },
+    %n[1, 1, 5, 4, 13, 12, 20, 8, 29, 13, 56, 12, 52, 24, 40, 48, 61, 28, 65, 20, 144, 32, 60, 24, 116, 81, 112, 40, 104, 44]
+)
+
+assert_eq(  # OEIS: A078930
+    30.of { divisors(Gauss(_)).grep{.real.is_pos}.map{.real}.sum },
+    %n[1, 1, 5, 4, 13, 12, 20, 8, 29, 13, 56, 12, 52, 24, 40, 48, 61, 28, 65, 20, 144, 32, 60, 24, 116, 81, 112, 40, 104, 44]
+)
+
+assert_eq(  # OEIS: A078930
+    30.of { divisors(Gauss(_)).grep{.imag.is_pos}.map{.imag}.sum },
+    %n[1, 1, 5, 4, 13, 12, 20, 8, 29, 13, 56, 12, 52, 24, 40, 48, 61, 28, 65, 20, 144, 32, 60, 24, 116, 81, 112, 40, 104, 44]
+)
+
+assert_eq(  # OEIS: A078911
+    30.of { divisors(Gauss(_)).grep{.real.is_pos && .imag.is_pos}.map{.imag}.sum },
+    %n[0, 0, 1, 0, 3, 3, 4, 0, 7, 0, 19, 0, 12, 5, 8, 12, 15, 5, 13, 0, 51, 0, 12, 0, 28, 25, 35, 0, 24, 7]
+)
+
+assert_eq(  # OEIS: A078911
+    30.of { divisors(Gauss(_)).grep{.real.is_pos && .imag.is_pos}.map{.real}.sum },
+    %n[0, 0, 1, 0, 3, 3, 4, 0, 7, 0, 19, 0, 12, 5, 8, 12, 15, 5, 13, 0, 51, 0, 12, 0, 28, 25, 35, 0, 24, 7]
+)
+
+assert_eq(  # OEIS: A078911
+    30.of { divisors(Gauss(_)).grep{.real>=0 || .imag>=0}.sum.real },
+    %n[0, 0, 1, 0, 3, 3, 4, 0, 7, 0, 19, 0, 12, 5, 8, 12, 15, 5, 13, 0, 51, 0, 12, 0, 28, 25, 35, 0, 24, 7]
+)
+
+assert_eq(  # OEIS: A078911
+    30.of { divisors(Gauss(_)).grep{.real>=0 && .imag>0}.sum.real },
+    %n[0, 0, 1, 0, 3, 3, 4, 0, 7, 0, 19, 0, 12, 5, 8, 12, 15, 5, 13, 0, 51, 0, 12, 0, 28, 25, 35, 0, 24, 7]
+)
+
+assert_eq(  # OEIS: A078911
+    30.of { divisors(Gauss(_)).grep{.real>=0 || .imag>=0}.sum.imag },
+    %n[0, 0, 1, 0, 3, 3, 4, 0, 7, 0, 19, 0, 12, 5, 8, 12, 15, 5, 13, 0, 51, 0, 12, 0, 28, 25, 35, 0, 24, 7]
+)
+
+assert_eq(  # OEIS: A078910
+    30.of { divisors(Gauss(_)).grep{.real.is_pos || .imag.is_pos}.map{.real}.sum },
+    %n[1, 1, 4, 4, 10, 9, 16, 8, 22, 13, 37, 12, 40, 19, 32, 36, 46, 23, 52, 20, 93, 32, 48, 24, 88, 56, 77, 40, 80, 37]
+)
+
+assert_eq(  # OEIS: A078910
+    30.of { divisors(Gauss(_)).grep{.real.is_pos || .imag.is_pos}.map{.imag}.sum },
+    %n[1, 1, 4, 4, 10, 9, 16, 8, 22, 13, 37, 12, 40, 19, 32, 36, 46, 23, 52, 20, 93, 32, 48, 24, 88, 56, 77, 40, 80, 37]
+)
+
+assert_eq(  # OEIS: A078910
+    30.of { divisors(Gauss(_)).grep{.real>0 && .imag>=0}.sum.real },
+    %n[1, 1, 4, 4, 10, 9, 16, 8, 22, 13, 37, 12, 40, 19, 32, 36, 46, 23, 52, 20, 93, 32, 48, 24, 88, 56, 77, 40, 80, 37]
+)
+
+assert_eq(
+    30.of { divisors(Gauss(_)).sum },
+    30.of { Gauss(0,0) }
+)
+
+say "** Test passed!"

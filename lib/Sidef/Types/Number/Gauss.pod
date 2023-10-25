@@ -271,6 +271,14 @@ Returns the
 
 =cut
 
+=head2 divisors
+
+    n.divisors
+
+Returns the
+
+=cut
+
 =head2 dump
 
     x.dump
@@ -292,6 +300,8 @@ Returns the
     z.factor
 
 Returns the
+
+Aliases: I<factors>
 
 =cut
 

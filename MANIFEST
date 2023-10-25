@@ -822,6 +822,7 @@ scripts/Tests/function_composition.sf
 scripts/Tests/functional_modules.sf
 scripts/Tests/functional_style.sf
 scripts/Tests/gather_take.sf
+scripts/Tests/gaussian_divisors.sf
 scripts/Tests/gaussian_integers.sf
 scripts/Tests/gcd.sf
 scripts/Tests/get_value_cyclic_references.sf

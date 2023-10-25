@@ -386,9 +386,46 @@ package Sidef::Types::Number::Gauss {
         Sidef::Types::Array::Array->new(\@factors)->sort;
     }
 
+    *factors = \&factor;
+
     sub factor_exp {
         my ($z) = @_;
         $z->factor->run_length;
+    }
+
+    sub divisors {
+        my ($n) = @_;
+
+        state $one    = __PACKAGE__->new(Sidef::Types::Number::Number::ONE);
+        state $mone   = __PACKAGE__->new(Sidef::Types::Number::Number::MONE);
+        state $one_i  = __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ONE);
+        state $mone_i = __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::MONE);
+
+        my @D = ($one, $mone, $one_i, $mone_i);
+        my @F = @{$n->factor_exp};
+
+        if (    @F
+            and ($F[0][0]->real->is_zero || $F[0][0]->imag->is_zero)
+            and ($F[0][0]->eq($one) || $F[0][0]->eq($mone) || $F[0][0]->eq($one_i) || $F[0][0]->eq($mone_i))) {
+            shift @F;    # remove the unit factor
+        }
+
+        foreach my $pe (@F) {
+            my ($p, $e) = @$pe;
+
+            my $r = $one;
+            my @t;
+
+            for (1 .. CORE::int($e)) {
+                $r = $r->mul($p);
+                foreach my $u (@D) {
+                    push @t, $u->mul($r);
+                }
+            }
+            push @D, @t;
+        }
+
+        return Sidef::Types::Array::Array->new(\@D);
     }
 
     sub inc {

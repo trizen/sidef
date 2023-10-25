@@ -296,4 +296,11 @@ assert_eq(Gauss(-38,  60).factor_exp.prod_2d{|p,e| p**e }, Gauss(-38,  60))
 
 assert_eq(20.of{ Gauss(_).factor.prod.to_n }, 20.of { _ })
 
+assert_eq(divisors(Gauss(0,-5040)).len, 864)
+assert({|t| t.divisors.all { t.is_div(_) } }(Gauss(-38, 60)))
+assert({|t| t.divisors.all { t.is_div(_) } }(Gauss(-41)))
+assert({|t| t.divisors.all { t.is_div(_) } }(Gauss(0, 97)))
+
+assert(Gauss(0, 100.primorial*503*863*43*97).factor.all{.is_prime})
+
 say "** Test passed!"
