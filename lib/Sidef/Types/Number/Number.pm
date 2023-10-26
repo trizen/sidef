@@ -18714,7 +18714,7 @@ package Sidef::Types::Number::Number {
 
 #<<<
         my $r = (
-                 ($n == 0) ? ($m + 1)
+                 ($n == 0 and $m < ULONG_MAX) ? ($m + 1)
                  : (
                     HAS_NEW_PRIME_UTIL
                     ? Math::Prime::Util::addint(Math::Prime::Util::subint($m, $n), 1)

@@ -12,6 +12,12 @@ assert_eq(208 >> 64, 0)
 assert_eq(496 >> 32, 0)
 assert_eq(640 >> 32, 0)
 
+assert(irand(0, isqrt(2**64 - 1)).is_between(0, 2**32))
+assert(irand(0, isqrt(2**128 - 1)).is_between(0, 2**64))
+
+assert_eq(isqrt(2**64 - 1).factor, factor(2**32 - 1))
+assert_eq(isqrt(2**128 - 1).factor, factor(2**64 - 1))
+
 assert(42.is_div(6))
 assert(!42.is_div(8))
 
