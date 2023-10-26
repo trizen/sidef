@@ -1,0 +1,434 @@
+#!/usr/bin/ruby
+
+# Various other tests for the Number methods.
+# Some tests are translated from the SymPy library.
+
+define True = true
+define False = false
+
+assert(znorder(2, 13) == 12)
+assert((1..^7).map {|a| znorder(a, 7) } == %n[1, 3, 6, 3, 6, 2])
+assert(znorder(5, 17) == 16)
+assert(znorder(17, 11) == znorder(6, 11))
+assert(znorder(101, 119) == 6)
+assert(znorder(11, (10**50 + 151)**2) == 10000000000000000000000000000000000000000000000030100000000000000000000000000000000000000000000022650) if Bool(Num.HAS_NEW_PRIME_UTIL_GMP)
+assert(znorder(6, 9).is_nan)
+
+assert(is_primitive_root(2, 7) == False)
+assert(is_primitive_root(3, 8) == False)
+assert(is_primitive_root(11, 14) == False)
+assert(is_primitive_root(12, 17) == is_primitive_root(29, 17))
+
+assert(sqrtmod(3, 13) == 4)
+assert(sqrtmod(3, -13) == 4)
+assert(sqrtmod(6, 23) == 11)
+assert(sqrtmod(345, 690) == 345)
+assert(sqrtmod(67, 101).is_nan)
+assert(sqrtmod(1020, 104729).is_nan)
+
+assert(sqrtmod_all(9, 27) == %n[3, 6, 12, 15, 21, 24])
+assert(sqrtmod_all(9, 81) == %n[3, 24, 30, 51, 57, 78])
+assert(sqrtmod_all(9, 3**5) == %n[3, 78, 84, 159, 165, 240])
+assert(sqrtmod_all(81, 3**4) == %n[0, 9, 18, 27, 36, 45, 54, 63, 72])
+assert(sqrtmod_all(81, 3**5) == %n[9, 18, 36, 45, 63, 72, 90, 99, 117, 126, 144, 153, 171, 180, 198, 207, 225, 234])
+assert(sqrtmod_all(81, 3**6) == %n[9, 72, 90, 153, 171, 234, 252, 315, 333, 396, 414, 477, 495, 558, 576, 639, 657, 720])
+assert(sqrtmod_all(81, 3**7) == %n[9, 234, 252, 477, 495, 720, 738, 963, 981, 1206, 1224, 1449, 1467, 1692, 1710, 1935, 1953, 2178])
+
+[
+    [26214400, 32768000000], [26214400, 16384000000],
+    [262144, 1048576], [87169610025, 163443018796875],
+    [22315420166400, 167365651248000000]
+].each_2d {|a,p|
+
+    # FIXME: make sqrtmod(a,p) fast for big composite p
+    p > Num(Num.ULONG_MAX) && next
+    Bool(Num.HAS_NEW_PRIME_UTIL) || next
+
+    assert(powmod(sqrtmod(a, p), 2, p) == a)
+}
+
+assert(legendre_symbol(5, 11) == 1)
+assert(legendre_symbol(25, 41) == 1)
+assert(legendre_symbol(67, 101) == -1)
+assert(legendre_symbol(0, 13) == 0)
+assert(legendre_symbol(9, 3) == 0)
+assert(legendre_symbol(2, 4) == 0)
+
+assert(jacobi_symbol(25, 41) == 1)
+assert(jacobi_symbol(-23, 83) == -1)
+assert(jacobi_symbol(3, 9) == 0)
+assert(jacobi_symbol(42, 97) == -1)
+assert(jacobi_symbol(3, 5) == -1)
+assert(jacobi_symbol(7, 9) == 1)
+assert(jacobi_symbol(0, 3) == 0)
+assert(jacobi_symbol(0, 1) == 1)
+assert(jacobi_symbol(2, 1) == 1)
+assert(jacobi_symbol(1, 3) == 1)
+assert(jacobi_symbol(3, 8) == -1)
+
+assert(mobius(13*7) == 1)
+assert(mobius(1) == 1)
+assert(mobius(13*7*5) == -1)
+assert(mobius(13**2) == 0)
+assert(mobius(-3).is_nan)
+
+assert(is_perfect(6) == True)
+assert(is_perfect(15) == False)
+assert(is_perfect(28) == True)
+assert(is_perfect(400) == False)
+assert(is_perfect(496) == True)
+assert(is_perfect(8128) == True)
+assert(is_perfect(10000) == False)
+
+assert(is_deficient(10) == True)
+assert(is_deficient(22) == True)
+assert(is_deficient(56) == False)
+assert(is_deficient(20) == False)
+assert(is_deficient(36) == False)
+
+assert(is_abundant(10) == False)
+assert(is_abundant(12) == True)
+assert(is_abundant(18) == True)
+assert(is_abundant(21) == False)
+assert(is_abundant(945) == True)
+
+assert(bigomega(2) == 1)
+assert(bigomega(2 * 2) == 2)
+assert(bigomega(2 * 2 * 3) == 3)
+assert(bigomega(3 * 25) == (bigomega(3) + bigomega(25)))
+assert(10.primes.map{.bigomega} == %n[1, 1, 1, 1])
+assert(bigomega(fac(50)) == 108)
+assert(bigomega(2 ** 9941 - 1) == 1)
+
+assert(omega(2) == 1)
+assert(omega(2 * 3) == 2)
+assert(omega(2 * 3 * 5) == 3)
+assert(omega(3 * 25) == (omega(3) + omega(25)))
+assert(10.primes.map{.omega} == %n[1, 1, 1, 1])
+assert(omega(fac(50)) == 15)
+assert(omega(2 ** 9941 - 1) == 1)
+
+#assert(core(35**13, 10) == 42875)
+assert(core(210**2) == 1)
+#assert(core(7776, 3) == 36)
+#assert(core(10**27, 22) == 10**5)
+assert(core(537824) == 14)
+assert(core(1, 6) == 1)
+
+assert(proper_sigma0(6) == 3)
+assert(proper_sigma0(108) == 11)
+
+assert(proper_divisors(-1) == %n[])
+assert(proper_divisors(28) == %n[1, 2, 4, 7, 14])
+
+assert_eq(30.of{.aliquot(0)}, 30.of{.proper_sigma0})
+assert_eq(30.of{.aliquot(0)}, 30.of{.proper_divisors.len})
+assert_eq(30.of{.aliquot(2)}, 30.of{.proper_divisors.sum{_**2}})
+assert_eq(30.of{.aliquot(-2)}, 30.of{.proper_divisors.sum{_**-2}})
+
+assert(sigma0(0) == 0)
+assert(sigma0(6) == 4)
+
+assert(divisors(28) == %n[1, 2, 4, 7, 14, 28])
+assert(divisors(0) == %n[])
+
+assert((1..^12).map{.usigma} == %n[1, 3, 4, 5, 6, 12, 8, 9, 10, 18, 12])
+assert((1..^12).map{.usigma(3)} == %n[1, 9, 28, 65, 126, 252, 344, 513, 730, 1134, 1332])
+assert(usigma(23450) == 42432)
+assert(usigma(23450, 0) == 16)
+assert(usigma(23450, 1) == 42432)
+assert(usigma(23450, 2) == 702685000)
+assert(usigma(23450, 4) == 321426961814978248)
+
+assert((1..^12).map{.sigma} == %n[1, 3, 4, 7, 6, 12, 8, 15, 13, 18, 12])
+assert((1..^12).map{.sigma(2)} == %n[1, 5, 10, 21, 26, 50, 50, 85, 91, 130, 122])
+assert(sigma(23450) == 50592)
+assert(sigma(23450, 0) == 24)
+assert(sigma(23450, 1) == 50592)
+assert(sigma(23450, 2) == 730747500)
+assert(sigma(23450, 3) == 14666785333344)
+
+assert((1..^16).map{.reduced_totient} == %n[1, 1, 2, 2, 4, 2, 6, 2, 6, 4, 10, 2, 12, 6, 4])
+assert(reduced_totient(5005) == 60)
+assert(reduced_totient(5006) == 2502)
+assert(reduced_totient(5009) == 5008)
+assert(reduced_totient(2**100) == 2**98)
+
+assert((1..^12).map{.totient} == %n[1, 1, 2, 2, 4, 2, 6, 4, 6, 4, 10])
+assert(totient(5005) == 2880)
+assert(totient(5006) == 2502)
+assert(totient(5009) == 5008)
+assert(totient(2**100) == 2**99)
+
+#assert(udivisors(-1) == [1])
+assert(udivisors(0) == %n[])
+assert(udivisors(1) == %n[1])
+assert(udivisors(2) == %n[1, 2])
+assert(udivisors(3) == %n[1, 3])
+assert(udivisors(17) == %n[1, 17])
+assert(udivisors(10) == %n[1, 2, 5, 10])
+assert(udivisors(100) == %n[1, 4, 25, 100])
+assert(udivisors(101) == %n[1, 101])
+assert(udivisors(1000) == %n[1, 8, 125, 1000])
+
+assert(usigma0(0) == 0)
+#assert(usigma0(-1) == 1)
+assert(usigma0(1) == 1)
+assert(usigma0(6) == 4)
+assert(usigma0(12) == 4)
+
+assert(usigma0(180) == 8)
+assert(usigma0(2*3*5*7) == 16)
+
+assert(proper_divisors(-1) == %n[])
+assert(proper_divisors(0) == %n[])
+assert(proper_divisors(1) == %n[])
+assert(proper_divisors(2) == %n[1])
+assert(proper_divisors(3) == %n[1])
+assert(proper_divisors(17) == %n[1])
+assert(proper_divisors(10) == %n[1, 2, 5])
+assert(proper_divisors(100) == %n[1, 2, 4, 5, 10, 20, 25, 50])
+assert(proper_divisors(1000000007) == %n[1])
+
+assert(proper_sigma0(0) == 0)
+#assert(proper_sigma0(-1) == 0)
+assert(proper_sigma0(1) == 0)
+assert(proper_sigma0(36) == 8)
+assert(proper_sigma0(2*3*5) == 7)
+
+#assert(divisors(-1) == [1])
+assert(divisors(0) == %n[])
+assert(divisors(1) == %n[1])
+assert(divisors(2) == %n[1, 2])
+assert(divisors(3) == %n[1, 3])
+assert(divisors(17) == %n[1, 17])
+assert(divisors(10) == %n[1, 2, 5, 10])
+assert(divisors(100) == %n[1, 2, 4, 5, 10, 20, 25, 50, 100])
+assert(divisors(101) == %n[1, 101])
+
+assert(sigma0(0) == 0)
+#assert(sigma0(-1) == 1)
+assert(sigma0(1) == 1)
+assert(sigma0(6) == 4)
+assert(sigma0(12) == 6)
+
+assert_eq(factor(10**38 - 1), %n[3, 3, 11, 909090909090909091, 1111111111111111111])
+assert_eq(factor_exp(10**38 - 1), [[3, 2], [11, 1], [909090909090909091, 1], [1111111111111111111, 1]])
+
+#assert(factor(0) == [0])
+assert(factor(1) == %n[])
+#assert(factor(-1) == [-1])
+#assert(factor(-2) == [-1, 2])
+#assert(factor(-16) == [-1, 2, 2, 2, 2])
+assert(factor(2) == %n[2])
+assert(factor(24) == %n[2, 2, 2, 3])
+assert(factor(126) == %n[2, 3, 3, 7])
+assert(factor(123456) == %n[2, 2, 2, 2, 2, 2, 3, 643])
+assert(factor(5951757) == %n[3, 7, 29, 29, 337])
+assert(factor(64015937) == %n[7993, 8009])
+assert(factor(2**(2**6) + 1) == %n[274177, 67280421310721])
+
+assert(is_amicable(173, 129) == False)
+assert(is_amicable(220, 284) == True)
+assert(is_amicable(8756, 8756) == False)
+assert(is_amicable(220, 204) == False)
+assert_eq(1.by{220.is_amicable(_)}, %n[284])
+
+#assert(is_euler_pseudoprime(9, 1) == True)
+assert(is_euler_pseudoprime(341, 2) == False)
+assert(is_euler_pseudoprime(121, 3) == True)
+assert(is_euler_pseudoprime(341, 4) == True)
+assert(is_euler_pseudoprime(217, 5) == False)
+assert(is_euler_pseudoprime(185, 6) == False)
+assert(is_euler_pseudoprime(55, 111) == True)
+assert(is_euler_pseudoprime(115, 114) == True)
+assert(is_euler_pseudoprime(49, 117) == True)
+assert(is_euler_pseudoprime(85, 84) == True)
+assert(is_euler_pseudoprime(87, 88) == True)
+assert(is_euler_pseudoprime(49, 128) == True)
+assert(is_euler_pseudoprime(39, 77) == True)
+assert(is_euler_pseudoprime(9881, 30) == True)
+#assert(is_euler_pseudoprime(8841, 29) == False)     # XXX: bug in SymPy?
+assert(is_euler_pseudoprime(8841, 29) == True)
+assert(is_euler_pseudoprime(8421, 29) == False)
+assert(is_euler_pseudoprime(9997, 19) == True)
+
+assert(is_extra_strong_lucas_prp(4) == False)
+assert(is_extra_strong_lucas_prp(989) == True)
+assert(is_extra_strong_lucas_prp(10877) == True)
+assert(is_extra_strong_lucas_prp(9) == False)
+assert(is_extra_strong_lucas_prp(16) == False)
+assert(is_extra_strong_lucas_prp(169) == False)
+
+for f in ([
+    Num.method(:is_prime), Num.method(:all_prime),
+    Num.method(:is_prob_prime), Num.method(:is_prov_prime),
+    Num.method(:is_bpsw_prime), Num.method(:is_pell_psp),
+    Num.method(:is_bfw_psp), Num.method(:is_lucas_psp),
+    Num.method(:is_strong_lucas_psp), Num.method(:is_extra_strong_lucas_psp),
+    Num.method(:is_strong_psp), Num.method(:is_psp),
+    Num.method(:is_euler_psp), Num.method(:is_plumb_psp),
+    Num.method(:is_frobenius_psp), Num.method(:is_khashin_psp),
+    Num.method(:is_underwood_psp),
+]) {
+    assert(f.call(2819))
+    assert(f.call(179424673))
+    assert(f.call(20678048681))
+    assert(f.call(1968188556461))
+    assert(f.call(2614941710599))
+    assert(f.call(65635624165761929287))
+    assert(f.call(1162566711635022452267983))
+    assert(f.call(77123077103005189615466924501))
+    assert(f.call(3991617775553178702574451996736229))
+    assert(f.call(273952953553395851092382714516720001799))
+    assert(f.call(531137992816767098689588206552468627329593117727031923199444138200403559860852242739162502265229285668889329486246501015346579337652707239409519978766587351943831270835393219031728127))
+    assert(f.call(2**61 - 1))
+    assert(f.call(2**89 - 1))
+    assert(f.call(2**607 - 1))
+}
+
+for f in ([
+    Num.method(:is_prime), Num.method(:all_prime),
+    Num.method(:is_prob_prime), Num.method(:is_prov_prime),
+    Num.method(:is_bpsw_prime),
+    Num.method(:is_bfw_psp), Num.method(:is_lucas_psp),
+    Num.method(:is_strong_lucas_psp), Num.method(:is_extra_strong_lucas_psp),
+    Num.method(:is_frobenius_psp), Num.method(:is_khashin_psp),
+    Num.method(:is_underwood_psp),
+]) {
+    assert(!f.call(2**601 - 1))
+    assert(!f.call(2152302898747))
+    assert(!f.call(3474749660383))
+    assert(!f.call(341550071728321))
+    assert(!f.call(3825123056546413051))
+    assert(!f.call(9188353522314541))
+    assert(!f.call(877777777777777777777777))
+    assert(!f.call(318665857834031151167461))
+    assert(!f.call(564132928021909221014087501701))
+    assert(!f.call(8038374574536394912570796143419421081388376882875581458374889175222974273765333652186502336163960045457915042023603208766569966760987284043965408232928738791850869166857328267761771029389697739470167082304286871099974399765441448453411558724506334092790222752962294149842306881685404326457534018329786111298960644845216191652872597534901))
+    assert(!f.call(2887148238050771212671429597130393991977609459279722700926516024197432303799152733116328983144639225941977803110929349655578418949441740933805615113979999421542416933972905423711002751042080134966731755152859226962916775325475044445856101949404200039904432116776619949629539250452698719329070373564032273701278453899126120309244841494728976885406024976768122077071687938121709811322297802059565867))
+
+    assert(!f.call(2931))
+    assert(!f.call(2.5))
+}
+
+assert(25.range.grep{.is_square} == %n[0, 1, 4, 9, 16])
+
+assert(!is_square(60 ** 3))
+assert(!is_square(60 ** 5))
+assert(!is_square(84 ** 7))
+assert(!is_square(105 ** 9))
+assert(!is_square(120 ** 3))
+
+assert(is_gaussian_prime(0, 7))
+assert(is_gaussian_prime(7))
+assert(is_gaussian_prime(2, 3))
+assert(!is_gaussian_prime(2, 2))
+
+assert(is_prime(Gauss(0, 7)))
+assert(is_prime(Gauss(7)))
+assert(is_prime(Gauss(2, 3)))
+assert(!is_prime(Gauss(2, 2)))
+
+assert(prime(1) == 2)
+assert(prime(2) == 3)
+assert(prime(5) == 11)
+assert(prime(11) == 31)
+assert(prime(57) == 269)
+assert(prime(296) == 1949)
+assert(prime(559) == 4051)
+assert(prime(3000) == 27449)
+assert(prime(4096) == 38873)
+assert(prime(9096) == 94321)
+assert(prime(25023) == 287341)
+assert(prime(10000000) == 179424673)
+assert(prime(99999999) == 2038074739)
+
+assert(primepi(-1) == 0)
+assert(primepi(1) == 0)
+assert(primepi(2) == 1)
+assert(primepi(7/2) == 2)
+assert(primepi(Fraction(7, 2)) == 2)
+assert(primepi(3.5) == 2)
+assert(primepi(5) == 3)
+assert(primepi(11) == 5)
+assert(primepi(57) == 16)
+assert(primepi(296) == 62)
+assert(primepi(559) == 102)
+assert(primepi(3000) == 430)
+assert(primepi(4096) == 564)
+assert(primepi(9096) == 1128)
+assert(primepi(25023) == 2763)
+assert(primepi(10**8) == 5761455)
+assert(primepi(253425253) == 13856396)
+assert(primepi(8769575643) == 401464322)
+assert(primepi(2000) == 303)
+
+assert(composite(1) == 4)
+assert(composite(2) == 6)
+assert(composite(5) == 10)
+assert(composite(11) == 20)
+assert(composite(41) == 58)
+assert(composite(57) == 80)
+assert(composite(296) == 370)
+assert(composite(559) == 684)
+assert(composite(3000) == 3488)
+assert(composite(4096) == 4736)
+assert(composite(9096) == 10368)
+assert(composite(25023) == 28088)
+assert(composite(1957) == 2300)
+assert(composite(2568) == 2998)
+
+assert(composite_count(1) == 0)
+assert(composite_count(2) == 0)
+assert(composite_count(5) == 1)
+assert(composite_count(11) == 5)
+assert(composite_count(57) == 40)
+assert(composite_count(296) == 233)
+assert(composite_count(559) == 456)
+assert(composite_count(3000) == 2569)
+assert(composite_count(4096) == 3531)
+assert(composite_count(9096) == 7967)
+assert(composite_count(25023) == 22259)
+assert(composite_count(10**8) == 94238544)
+assert(composite_count(253425253) == 239568856)
+assert(composite_count(8769575643) == 8368111320)
+assert(composite_count(2321) == 1976)
+
+#assert(next_prime(-4) == 2)
+assert(next_prime(2) == 3)
+assert(next_prime(5) == 7)
+assert(next_prime(12) == 13)
+assert(prev_prime(3) == 2)
+assert(prev_prime(7) == 5)
+assert(prev_prime(13) == 11)
+assert(prev_prime(19) == 17)
+assert(prev_prime(20) == 19)
+
+assert(next_prime(90) == 97)
+assert(next_prime(10**40) == (10**40 + 121))
+assert(prev_prime(97) == 89)
+assert(prev_prime(10**40) == (10**40 - 17))
+
+assert(primes(10, 1) == %n[])
+assert(primes(5, 9) == %n[5, 7])
+assert(primes(2, 13) == %n[2, 3, 5, 7, 11,13])
+assert(primes(13) == %n[2, 3, 5, 7, 11,13])
+assert(primes(8) == %n[2, 3, 5, 7])
+assert(primes(-2) == %n[])
+assert(primes(29) == %n[2, 3, 5, 7, 11, 13, 17, 19, 23,29])
+assert(primes(34) == %n[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31])
+
+assert(totient_range(5, 14) == %n[4, 2, 6, 4, 6, 4, 10, 4, 12, 6])
+assert(totient_range(3, 12) == %n[2, 2, 4, 2, 6, 4, 6, 4, 10, 4])
+assert(totient_range(900, 1000) == range(900, 1000).map{.totient})
+assert(totient_range(0, 0) == %n[0])
+assert(totient_range(1, 1) == %n[1])
+
+assert(mobius_range(5, 14) == %n[-1, 1, -1, 0, 0, 1, -1, 0, -1, 1])
+assert(mobius_range(3, 12) == %n[-1, 0, -1, 1, -1, 0, 0, 1, -1, 0])
+assert(mobius_range(1050, 1100) == range(1050, 1100).map{.mobius})
+assert(mobius_range(0, 0) == %n[0])
+assert(mobius_range(1, 1) == %n[1])
+
+say "** Test passed!"

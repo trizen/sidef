@@ -4110,7 +4110,9 @@ Aliases: I<is_absolute_euler_psp>
 
     n.is_abundant
 
-Returns true when sigma(n) > 2*n.
+Returns true if C<n> is an abundant number, else false.
+
+An abundant number is smaller than the sum of its positive proper divisors.
 
 =cut
 
@@ -4133,6 +4135,18 @@ Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == k>.
     say 20.by { .is_almost_prime(1) }   # primes
     say 20.by { .is_almost_prime(2) }   # semiprimes
     say 20.by { .is_almost_prime(3) }   # 3-almost primes
+
+=cut
+
+=head2 is_amicable
+
+    is_amicable(n,m)
+
+Returns true if the numbers C<n> and C<m> are "amicable", else false.
+
+Amicable numbers are two different numbers so related that the sum of the proper divisors of each is equal to that of the other.
+
+    say is_amicable(220, 284)   #=> true
 
 =cut
 
@@ -4255,6 +4269,16 @@ Returns true if C<n> is divisible by the cubes of all its prime factors.
 Returns true when C<gcd(phi(n), n) = 1>, where C<phi(n)> is the Euler totient function.
 
     say 30.by { .is_cyclic }    # OEIS: A003277
+
+=cut
+
+=head2 is_deficient
+
+    n.is_deficient
+
+Returns true if C<n> is a deficient number, else false.
+
+A deficient number is greater than the sum of its positive proper divisors.
 
 =cut
 
@@ -5723,6 +5747,18 @@ Return true if C<n> passes the Miller-Rabin primality test with C<k> random base
 Returns the smallest value from a list of numbers.
 
 Aliases: I<vecmin>
+
+=cut
+
+=head2 mobius_range
+
+    mobius_range(a, b)
+
+Returns an array with the Möbius values for the range C<a..b>.
+
+    say moebius_range(7, 17) => [-1, 0, 0, 1, -1, 0, -1, 1, 1, 0, -1]
+
+Aliases: I<moebius_range>
 
 =cut
 
@@ -7673,6 +7709,28 @@ The method also accepts C<n> to be a fraction, which is computed as:
 
 =cut
 
+=head2 proper_divisors
+
+    n.proper_divisors
+
+Return an array with the divisors of C<n> less than C<n>.
+
+    say proper_divisors(6)  #=> [1, 2, 3]
+
+=cut
+
+=head2 proper_sigma0
+
+    n.proper_sigma0
+
+Returns the number of proper divisors of C<n>.
+
+    say proper_sigma0(6)    #=> 3
+
+Aliases: I<proper_divisor_count>
+
+=cut
+
 =head2 psi
 
     n.psi(k=1)
@@ -8965,6 +9023,16 @@ Euler's totient function.
 For k>1, it returns the generalized Jordan's totient C<J_k(n)>.
 
 Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
+
+=cut
+
+=head2 totient_range
+
+    totient_range(a, b)
+
+Returns an array with the totient values for the range C<a..b>.
+
+    say totient_range(7, 17)  #=> [6, 4, 6, 4, 10, 4, 12, 6, 8, 8, 16]
 
 =cut
 

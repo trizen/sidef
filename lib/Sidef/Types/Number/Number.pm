@@ -257,7 +257,7 @@ package Sidef::Types::Number::Number {
 
             return bless \Math::GMPz::Rmpz_init_set($_[0]);
         }
-        ($_[0] < ULONG_MAX and $_[0] > LONG_MIN)
+        (!ref($_[0]) and $_[0] < ULONG_MAX and $_[0] > LONG_MIN)
           ? (bless \(my $o = 0 + $_[0]))
           : (bless \Math::GMPz::Rmpz_init_set_str("$_[0]", 10));
     }
@@ -9852,7 +9852,12 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($x) // goto &nan;
         $y = _any2mpz($y) // goto &nan;
 
-        Math::GMPz::Rmpz_sgn($y) <= 0 and goto &nan;
+        my $y_sgn = Math::GMPz::Rmpz_sgn($y) || goto &nan;
+
+        if ($y_sgn < 0) {
+            $y = Math::GMPz::Rmpz_init_set($y);
+            Math::GMPz::Rmpz_abs($y, $y);
+        }
 
         my $n = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mod($n, $x, $y);
@@ -9872,6 +9877,12 @@ package Sidef::Types::Number::Number {
 
         if (_is_prob_prime($ystr)) {
             return _set_int(Math::Prime::Util::GMP::sqrtmod($nstr, $ystr) // goto &nan);
+        }
+
+        if (HAS_PRIME_UTIL) {
+            if (defined(my $r = Math::Prime::Util::sqrtmod($nstr, $ystr))) {
+                return _set_int("$r");
+            }
         }
 
         # Workaround: find all the solutions and return the smallest one
@@ -13379,23 +13390,47 @@ package Sidef::Types::Number::Number {
         _set_int($modular_binomial->($n, $k, $m));
     }
 
-    sub moebius {
+    sub totient_range {
         my ($n, $k) = @_;
 
-        if (defined($k)) {
+        _valid(\$k);
 
-            _valid(\$k);
+        $n = _big2istr($n) // return Sidef::Types::Array::Array->new;
+        $k = _big2istr($k) // return Sidef::Types::Array::Array->new;
 
-            $n = _big2istr($n) // return Sidef::Types::Array::Array->new;
-            $k = _big2istr($k) // return Sidef::Types::Array::Array->new;
+        my @array = map { ref($_) eq __PACKAGE__ ? $_ : _set_int($_) } (
+                                                                 (HAS_PRIME_UTIL and $k < ULONG_MAX)
+                                                                 ? Math::Prime::Util::euler_phi($n, $k)
+                                                                 : _set_int($n)->range(_set_int($k))->map(Sidef::Types::String::String->new("totient"))->to_list
+        );
 
-            my @array = map { $_ ? ($_ == 1) ? ONE : MONE : ZERO } (
-                                                                    HAS_PRIME_UTIL
-                                                                    ? Math::Prime::Util::moebius($n, $k)
-                                                                    : Math::Prime::Util::GMP::moebius($n, $k)
-                                                                   );
+        return Sidef::Types::Array::Array->new(\@array);
+    }
 
-            return Sidef::Types::Array::Array->new(\@array);
+    sub moebius_range {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _big2istr($n) // return Sidef::Types::Array::Array->new;
+        $k = _big2istr($k) // return Sidef::Types::Array::Array->new;
+
+        my @array = map { $_ ? ($_ == 1) ? ONE : MONE : ZERO } (
+                                                                HAS_PRIME_UTIL
+                                                                ? Math::Prime::Util::moebius($n, $k)
+                                                                : Math::Prime::Util::GMP::moebius($n, $k)
+                                                               );
+
+        return Sidef::Types::Array::Array->new(\@array);
+    }
+
+    *mobius_range = \&moebius_range;
+
+    sub moebius {
+        my ($n) = @_;
+
+        if (scalar(@_) > 1) {
+            goto &moebius_range;
         }
 
         $n = $$n;
@@ -20740,7 +20775,8 @@ package Sidef::Types::Number::Number {
         #   Strengthening the Baillie-PSW primality test
         #   https://arxiv.org/abs/2006.14425
 
-        $n = _any2mpz($$n) // goto &nan;
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
 
         Math::GMPz::Rmpz_sgn($n) <= 0
           && return Sidef::Types::Bool::Bool::FALSE;
@@ -25690,7 +25726,8 @@ package Sidef::Types::Number::Number {
         _set_int(Math::Prime::Util::GMP::carmichael_lambda($n));
     }
 
-    *lambda = \&carmichael_lambda;
+    *lambda          = \&carmichael_lambda;
+    *reduced_totient = \&carmichael_lambda;
 
     sub liouville {
         my ($n) = @_;
@@ -26903,6 +26940,10 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
+        if (HAS_PRIME_UTIL and $k == 1 and !ref($n) and $n > 0 and $n < (ULONG_MAX >> 3)) {
+            return _set_int(Math::Prime::Util::divisor_sum($n));
+        }
+
         if (ref($n) ne 'Math::GMPz') {
             $n = _any2mpz($n) // goto &nan;
         }
@@ -26971,7 +27012,7 @@ package Sidef::Types::Number::Number {
     *σ = \&sigma;
 
     sub aliquot {
-        my ($n) = @_;
+        my ($n, $k) = @_;
 
         $n = $$n;
 
@@ -26980,6 +27021,10 @@ package Sidef::Types::Number::Number {
         }
 
         (Math::GMPz::Rmpz_sgn($n) || return ZERO) > 0 or goto &nan;
+
+        if (defined($k)) {
+            return ((bless \$n)->sigma($k)->sub((bless \$n)->pow($k)));
+        }
 
         my $s =
           (HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($n, ULONG_MAX >> 3) <= 0)
@@ -26991,43 +27036,20 @@ package Sidef::Types::Number::Number {
         _set_int($s);
     }
 
-    sub is_abundant {
+    *proper_sigma = \&aliquot;
+
+    sub proper_divisor_count {
         my ($n) = @_;
+        $n->sigma0->dec->max(ZERO);
+    }
 
-        $n = $$n;
+    *proper_sigma0 = \&proper_divisor_count;
 
-        my $sigma;
-
-        if (!ref($n)) {
-            $n > 0 or return Sidef::Types::Bool::Bool::FALSE;
-            $sigma = (
-                      (HAS_PRIME_UTIL and $n < (ULONG_MAX >> 3))
-                      ? Math::Prime::Util::divisor_sum($n)
-                      : Math::Prime::Util::GMP::sigma($n)
-                     );
-        }
-        else {
-            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
-            $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
-            Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Bool::Bool::FALSE;
-            $sigma = ${(bless \$n)->sigma};
-        }
-
-        if (!ref($n) and $sigma < ULONG_MAX) {
-            return (
-                    (($sigma >> 1) > $n)
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
-        }
-
-        my $s = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_set_str($s, "$sigma", 10);
-        Math::GMPz::Rmpz_div_2exp($s, $s, 1);
-
-        (__cmp__($s, $n) > 0)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
+    sub proper_divisors {
+        my ($n) = @_;
+        my $divisors = $n->divisors;
+        $divisors->pop;
+        $divisors;
     }
 
     sub abundancy_index {
@@ -27036,6 +27058,31 @@ package Sidef::Types::Number::Number {
     }
 
     *abundancy = \&abundancy_index;
+
+    sub is_deficient {
+        my ($n) = @_;
+        (__cmp__(${$n->sigma}, __mul__($$n, 2)) < 0)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_abundant {
+        my ($n) = @_;
+        (__cmp__(${$n->sigma}, __mul__($$n, 2)) > 0)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_amicable {
+        my ($n, $m) = @_;
+        _valid(\$m);
+        if ($n->eq($m)) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+        ($n->aliquot->eq($m) && $m->aliquot->eq($n))
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
 
     sub sopf {    # OEIS: A008472
         my $n = _big2uistr($_[0]) // goto &nan;

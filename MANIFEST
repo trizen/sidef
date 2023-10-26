@@ -903,6 +903,7 @@ scripts/Tests/metaprogramming_method_definition.sf
 scripts/Tests/method_aliases.sf
 scripts/Tests/method_expressions.sf
 scripts/Tests/miller_rabin_primality_test.sf
+scripts/Tests/misc_number_tests.sf
 scripts/Tests/mod_class.sf
 scripts/Tests/modular_quadratic_formula.sf
 scripts/Tests/Module/Bar.sm
