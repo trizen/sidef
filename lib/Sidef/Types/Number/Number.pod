@@ -5337,6 +5337,20 @@ Returns the self object.
 
 =cut
 
+=head2 linear_congruence
+
+    linear_congruence(n, r, m)
+
+Return an array with the values of C<x> satisfying the following linear congruence:
+
+    n*x == r (mod m)
+
+Example:
+
+    say linear_congruence(3, 12, 15)    #=> [4, 9, 14]
+
+=cut
+
 =head2 liouville
 
     liouville(n)
@@ -5709,22 +5723,6 @@ Return true if C<n> passes the Miller-Rabin primality test with C<k> random base
 Returns the smallest value from a list of numbers.
 
 Aliases: I<vecmin>
-
-=cut
-
-=head2 modular_quadratic_formula
-
-    modular_quadratic_formula(a,b,c,m)
-
-Returns an array with all the positive solutions for C<x> to the following modular quadratic equation:
-
-    a*x^2 + b*x + c == 0 (mod m)
-
-where C<a,b,c> are rational values and C<m> is a positive integer.
-
-Example:
-
-    say modular_quadratic_formula(3,4,5,124)  #=> [47, 55, 109, 117]
 
 =cut
 
@@ -7730,6 +7728,24 @@ Aliases: I<quadratic_nonresidue>
 Pomerance's Quadratic Sieve factorization method (SIMPQS).
 
 The product of the factors will give back C<n>. However, some factors may be composite.
+
+=cut
+
+=head2 quadratic_congruence
+
+    quadratic_congruence(a,b,c,m)
+
+Returns an array with all the positive solutions for C<x> to the following quadratic congruence:
+
+    a*x^2 + b*x + c == 0 (mod m)
+
+where C<a,b,c> are rational values and C<m> is a positive integer.
+
+Example:
+
+    say quadratic_congruence(3,4,5,124)  #=> [47, 55, 109, 117]
+
+Aliases: I<modular_quadratic_formula>
 
 =cut
 

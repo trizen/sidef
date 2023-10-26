@@ -8206,6 +8206,45 @@ package Sidef::Types::Number::Number {
 
     *solve_linear_congruence = \&solve_lcg;
 
+    sub linear_congruence {
+        my ($n, $r, $m) = @_;
+
+        if ($n->is_div($m)) {
+            if ($r->is_div($m)) {
+                return $m->range->to_a;
+            }
+            else {
+                return Sidef::Types::Array::Array->new;
+            }
+        }
+
+        # TODO: rewrite for better performance
+
+        $n = _big2istr($$n) // return Sidef::Types::Array::Array->new;
+        $r = _big2istr($$r) // return Sidef::Types::Array::Array->new;
+        $m = _big2istr($$m) // return Sidef::Types::Array::Array->new;
+
+        my ($u, $v, $g) = Math::Prime::Util::GMP::gcdext($n, $m);
+
+        if (Math::Prime::Util::GMP::modint($r, $g) ne '0') {
+            return return Sidef::Types::Array::Array->new;
+        }
+
+        my $orig_m = $m;
+
+        $r = Math::Prime::Util::GMP::divint($r, $g);
+        $m = Math::Prime::Util::GMP::divint($m, $g);
+
+        my $z = Math::Prime::Util::GMP::mulint($u, $r);
+
+        my @solutions;
+        for my $t (0 .. $g - 1) {
+            push @solutions, _set_int(Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::addint($z, Math::Prime::Util::GMP::mulint($m, $t)), $orig_m));
+        }
+
+        return Sidef::Types::Array::Array->new(\@solutions)->sort;
+    }
+
     sub sqrt_cfrac_period_each {
         my ($n, $block, $max) = @_;
 
@@ -12654,26 +12693,37 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y, \$z, \$m);
 
-        $x = _any2mpq($$x) // return Sidef::Types::Array::Array->new;
-        $y = _any2mpq($$y) // return Sidef::Types::Array::Array->new;
-        $z = _any2mpq($$z) // return Sidef::Types::Array::Array->new;
+        $x = __mod__($$x, $$m);
+        $y = __mod__($$y, $$m);
+        $z = __mod__($$z, $$m);
+
         $m = _any2mpz($$m) // return Sidef::Types::Array::Array->new;
+        $x = _any2mpz($x)  // return Sidef::Types::Array::Array->new;
+        $y = _any2mpz($y)  // return Sidef::Types::Array::Array->new;
+        $z = _any2mpz($z)  // return Sidef::Types::Array::Array->new;
 
         # x must not be zero
-        Math::GMPq::Rmpq_sgn($x)
-          || return Sidef::Types::Array::Array->new;
+        if (Math::GMPz::Rmpz_sgn($x) == 0) {
+            return (bless \$y)->linear_congruence((bless \$z)->neg, bless \$m);
+        }
 
-        my $four_m = __mul__($m, 4);
+        my $four_xm = __mul__(__mul__($x, 4), $m);
 
         # D = b^2 - 4*a*c
-        my $D = __mod__(__sub__(__mul__($y, $y), __mul__(__mul__($x, $z), 4)), $four_m);
+        my $D = __mod__(__sub__(__mul__($y, $y), __mul__(__mul__($x, $z), 4)), $four_xm);
+
+        # Discriminant seems to be rational
+        if (ref($D) eq 'Math::GMPq') {
+            Math::GMPq::Rmpq_integer_p($D) || return Sidef::Types::Array::Array->new;
+            $D = _any2mpz($D) // return Sidef::Types::Array::Array->new;
+        }
 
         # The discriminant must be an integer
-        (!ref($D) or ref($D) eq 'Math::GMPz' or (ref($D) eq 'Math::GMPq' and Math::GMPq::Rmpq_integer_p($D)))
+        (!ref($D) or ref($D) eq 'Math::GMPz')
           || return Sidef::Types::Array::Array->new;
 
-        # Find all the solutions k to: k^2 == D (mod 4*m)
-        my $S = _set_int($D)->sqrtmod_all(_set_int($four_m));
+        # Find all the solutions k to: k^2 == D (mod 4*x*m)
+        my $S = (bless \$D)->sqrtmod_all(bless \$four_xm);
 
         @$S || return $S;
 
@@ -12683,16 +12733,28 @@ package Sidef::Types::Number::Number {
         my @solutions;
 
         foreach my $k (@$S) {
-            foreach my $u (__add__($neg_b, $$k), __sub__($neg_b, $$k)) {
+
+            # This is much slower and finds only integer solutions
+            # my $res = (bless \$two_a)->linear_congruence((bless \__sub__($$k, $y)), bless \$four_xm);
+            # foreach my $j (@$res) {
+            #     push @solutions, bless \__mod__($$j, $m);
+            # }
+
+            #foreach my $u (__add__($neg_b, $$k), __sub__($neg_b, $$k)) {
+            foreach my $u (__add__($neg_b, $$k)) {
                 my $r = __mod__(__div__($u, $two_a), $m);
-                if (__cmp__(__mod__(__add__(__add__(__mul__($x, __mul__($r, $r)), __mul__($y, $r)), $z), $m), 0) == 0) {
-                    push @solutions, (bless \$r);
-                }
+
+                #if (__cmp__(__mod__(__add__(__add__(__mul__($x, __mul__($r, $r)), __mul__($y, $r)), $z), $m), 0) == 0) {
+                #    push @solutions, (bless \$r);
+                #}
+                push @solutions, bless \$r;
             }
         }
 
-        Sidef::Types::Array::Array->new(\@solutions)->sort->uniq;
+        Sidef::Types::Array::Array->new(\@solutions)->uniq->sort;
     }
+
+    *quadratic_congruence = \&modular_quadratic_formula;
 
     sub geometric_sum {
         my ($n, $r) = @_;

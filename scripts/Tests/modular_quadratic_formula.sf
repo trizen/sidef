@@ -14,6 +14,27 @@ assert_eq(modular_quadratic_formula(1,1,-1e10 + 8,1e10), %n[1810486343, 26328730
 assert_eq(modular_quadratic_formula(4,6,10 - 1e10, 1e10), %n[905243171, 1316436515, 7367126967/2, 8189513655/2, 5905243171, 6316436515, 17367126967/2, 18189513655/2])
 assert_eq(modular_quadratic_formula(1,1,-1e10 - 10, 1e10), %n[263226214, 1620648089, 8379351910, 9736773785])
 
+assert_eq(linear_congruence(4, 3, 5), [2])
+assert_eq(linear_congruence(0, 3, 5), [])
+assert_eq(linear_congruence(6, 1, 4), [])
+assert_eq(linear_congruence(0, 5, 5), [0, 1, 2, 3, 4])
+assert_eq(linear_congruence(3, 12, 15), [4, 9, 14])
+assert_eq(linear_congruence(6, 0, 18), [0, 3, 6, 9, 12, 15])
+assert_eq(linear_congruence(143, 44, 231), 231.range.grep {|x| 143*x -> is_congruent(44, 231) })
+
+# Several tests from SymPy
+assert_eq(quadratic_congruence(400, 85, 125, 1600), [1983/80, 2035/16, 963/5, 295, 27583/80, 7155/16, 2563/5, 615, 53183/80, 12275/16, 4163/5, 935, 78783/80, 17395/16, 5763/5, 1255, 104383/80, 22515/16, 7363/5, 1575])
+assert_eq(quadratic_congruence(3, 6, 5, 25), [3, 20])
+assert_eq(quadratic_congruence(120, 80, 175, 500), [])
+assert_eq(quadratic_congruence(15, 14, 7, 2), [1])
+assert_eq(quadratic_congruence(8, 15, 7, 29), [10, 28])
+assert_eq(quadratic_congruence(160, 200, 300, 461), [144, 431])
+assert_eq(quadratic_congruence(100000, 123456, 7415263, 48112959837082048697), [30417843635344493501, 36001135160550533083])
+assert_eq(quadratic_congruence(65, 121, 72, 277), [249, 252])
+assert_eq(quadratic_congruence(5, 10, 14, 2), [0])
+assert_eq(quadratic_congruence(10, 17, 19, 2), [1])
+assert_eq(quadratic_congruence(10, 14, 20, 2), [0, 1])
+
 assert_eq(
     150.of { modular_quadratic_formula(1,1,1, _) }.flat,     # OEIS: A343232
     %n[0, 1, 2, 4, 3, 9, 7, 11, 4, 16, 5, 25, 10, 26, 16, 22, 6, 36, 18, 30, 7, 49, 13, 47, 29, 37, 8, 64, 23, 55, 9, 16, 74, 81, 25, 67, 35, 61, 46, 56, 45, 63, 10, 100, 19, 107, 49, 79, 11, 30, 102, 121, 42, 96, 67, 79],
@@ -26,21 +47,26 @@ assert_eq(
 
 func solve_modular_quadratic(a,b,c,m) {
 
-    var D = (b**2 - 4*a*c).mod(m)
+    var D = (b**2 - 4*a*c).mod(4*a*m)
 
     var solutions = []
 
-    sqrtmod_all(D, m).each {|t|
-        for u in (-b + t, -b - t) {
+    sqrtmod_all(D, 4*a*m).each {|t|
+        #for u in (-b + t, -b - t) {
+        for u in (-b + t) {
             var x = (u/(2*a))%m
-            if ((a*x*x + b*x + c) % m == 0) {
-                solutions << x
-            }
+            assert_eq((a*x*x + b*x + c) % m, 0)
+            solutions << x
         }
     }
 
-    return solutions.sort.uniq
+    return solutions.uniq.sort
 }
+
+assert_eq(
+    solve_modular_quadratic(400, 85, 125, 1600),
+    quadratic_congruence(400, 85, 125, 1600)
+)
 
 assert_eq(
     modular_quadratic_formula(1, 886+2, 886, 5**27),
