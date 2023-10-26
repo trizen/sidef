@@ -1510,7 +1510,7 @@ package Sidef::Types::Number::Number {
         my ($arr, $func) = @_;
 
         while ($#$arr > 0) {
-            push(@$arr, $func->(shift(@$arr), shift(@$arr)));
+            push(@$arr, $func->(splice(@$arr, 0, 2)));
         }
 
         $arr->[0];
@@ -22646,8 +22646,13 @@ package Sidef::Types::Number::Number {
 
         if (!defined($k)) {
             $n = _big2pistr($n) // (return Sidef::Types::Array::Array->new);
-            my ($rem, @factors) = _adaptive_trial_factor($n);
-            return Sidef::Types::Array::Array->new([map { bless \$_ } (@factors, ((Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) ? () : $rem))]);
+            my ($r, @factors) = _adaptive_trial_factor($n);
+            @factors = map { bless \$_ } @factors;
+            if (Math::GMPz::Rmpz_cmp_ui($r, 1) > 0) {
+                $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
+                push @factors, bless \$r;
+            }
+            return Sidef::Types::Array::Array->new(\@factors);
         }
 
         _valid(\$k);
@@ -22658,20 +22663,17 @@ package Sidef::Types::Number::Number {
 
         return Sidef::Types::Array::Array->new()          if Math::GMPz::Rmpz_sgn($n) <= 0;
         return Sidef::Types::Array::Array->new(bless \$n) if $k <= 0;
-        return Sidef::Types::Array::Array->new(ONE)       if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
 
         my ($r, @factors) = _primorial_trial_factor($n, $k);
 
-        @factors
-          || return Sidef::Types::Array::Array->new(bless \$n);
-
-        my @return = map { bless \$_ } @factors;
+        @factors = map { bless \$_ } @factors;
 
         if (Math::GMPz::Rmpz_cmp_ui($r, 1) > 0) {
-            push @return, bless \$r;
+            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
+            push @factors, bless \$r;
         }
 
-        return Sidef::Types::Array::Array->new(\@return);
+        return Sidef::Types::Array::Array->new(\@factors);
     }
 
     sub prho_factor {

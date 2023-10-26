@@ -24,6 +24,7 @@ do {
     {|n| assert_eq(squfof_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(qs_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(trial_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(trial_factor(n, 100).prod, n||1) }.each(0..30)
     {|n| assert_eq(cyclotomic_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(special_factors(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(Math.gcd_factors(n, n.isqrt.primes).prod, n||1) }.each(0..30)
@@ -40,6 +41,7 @@ do {
 
         verify_factors(n.factor { .squfof_factor(1e4) }, n)
         verify_factors(n.factor { .trial_factor }, n)
+        verify_factors(n.factor { .trial_factor(1e5) }, n)
         verify_factors(n.factor { .pell_factor }, n)
         verify_factors(n.factor { .flt_factor }, n)
         verify_factors(n.factor { .fibonacci_factor }, n)
