@@ -10,6 +10,9 @@ assert_eq(modular_quadratic_formula(3/13, 4/7, 5, 124), %n[5, 25, 67, 87])
 assert_eq(modular_quadratic_formula(3/13, 4/7, 5/11, 125), %n[3, 60])
 assert_eq(modular_quadratic_formula(1,1,1,1729), %n[562, 653, 809, 828, 900, 919, 1075, 1166])
 
+assert_eq(quadratic_congruence(2, 5, 3, 7), [2, 6])
+assert_eq(quadratic_congruence(8, 6, 4, 15), [])
+
 assert_eq(modular_quadratic_formula(1,1,-1e10 + 8,1e10), %n[1810486343, 2632873031, 7367126968, 8189513656])
 assert_eq(modular_quadratic_formula(4,6,10 - 1e10, 1e10), %n[905243171, 1316436515, 7367126967/2, 8189513655/2, 5905243171, 6316436515, 17367126967/2, 18189513655/2])
 assert_eq(modular_quadratic_formula(1,1,-1e10 - 10, 1e10), %n[263226214, 1620648089, 8379351910, 9736773785])

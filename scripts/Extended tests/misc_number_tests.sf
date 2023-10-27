@@ -6,6 +6,54 @@
 define True = true
 define False = false
 
+assert(is_fermat_pseudoprime(5, 1))
+assert(is_fermat_pseudoprime(9, 1))
+
+assert(is_euler_pseudoprime(13, 1))
+assert(is_euler_pseudoprime(15, 1))
+assert(is_euler_pseudoprime(17, 6))
+assert(is_euler_pseudoprime(101, 7))
+assert(is_euler_pseudoprime(1009, 10))
+assert(is_euler_pseudoprime(11287, 41))
+
+assert(!is_euler_pseudoprime(0, 4))
+assert(!is_euler_pseudoprime(3, 0))
+assert(!is_euler_pseudoprime(15, 6))
+
+#assert(binomialmod(-1, 1, 10) == 0)  # SymPy bug?
+assert(binomialmod(-1, 1, 10) == 9)
+assert(binomialmod(1, -1, 10) == 0)
+#assert(binomialmod(2, 1, -1).is_nan)  # SymPy bug?
+assert(binomialmod(2, 1, -1) == 0)
+assert(binomialmod(51, 10, 10) == 0)
+assert(binomialmod(10**3, 500, 3**6) == 567)
+assert(binomialmod(10**18 - 1, 123456789, 4) == 0)
+assert(binomialmod(10**18, 10**12, (10**5 + 3)**2) == 3744312326)
+
+do {
+    # A047713
+    var euler_prp = %n[561,1105,1729,1905,2047,2465,3277,4033,4681,6601,8321,8481,10585,12801,15841,16705,18705,25761,29341,30121,33153,34945,41041,42799,46657,49141,52633,62745,65281,74665,75361,80581,85489,87249,88357,90751,104653]
+    for p in (euler_prp) {
+        assert(is_euler_pseudoprime(p, 2), p)
+    }
+}
+
+do {
+    # A048950
+    var euler_prp = %n[121,703,1729,1891,2821,3281,7381,8401,8911,10585,12403,15457,15841,16531,18721,19345,23521,24661,28009,29341,31621,41041,44287,46657,47197,49141,50881,52633,55969,63139,63973,74593,75361,79003,82513]
+    for p in (euler_prp) {
+        assert(is_euler_pseudoprime(p, 3), p)
+    }
+}
+
+do {
+    # A033181
+    var absolute_euler_prp = %n[1729,2465,15841,41041,46657,75361,162401,172081,399001,449065,488881,530881,656601,670033,838201,997633,1050985,1615681,1773289,1857241,2113921,2433601,2455921,2704801,3057601,3224065,3581761,3664585,3828001,4463641,4903921]
+    for p in (absolute_euler_prp) {
+        assert(p.is_abs_euler_psp, p)
+    }
+}
+
 assert(znorder(2, 13) == 12)
 assert((1..^7).map {|a| znorder(a, 7) } == %n[1, 3, 6, 3, 6, 2])
 assert(znorder(5, 17) == 16)

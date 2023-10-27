@@ -12708,6 +12708,9 @@ package Sidef::Types::Number::Number {
         $y = __mod__($$y, $$m);
         $z = __mod__($$z, $$m);
 
+        (__is_int__($x) && __is_int__($y) && __is_int__($z))
+          || return Sidef::Types::Array::Array->new;
+
         $m = _any2mpz($$m) // return Sidef::Types::Array::Array->new;
         $x = _any2mpz($x)  // return Sidef::Types::Array::Array->new;
         $y = _any2mpz($y)  // return Sidef::Types::Array::Array->new;
@@ -12715,23 +12718,44 @@ package Sidef::Types::Number::Number {
 
         # x must not be zero
         if (Math::GMPz::Rmpz_sgn($x) == 0) {
-            return (bless \$y)->linear_congruence((bless \$z)->neg, bless \$m);
+            return (bless \$y)->linear_congruence((bless \__neg__($z)), (bless \$m));
         }
 
-        my $four_xm = __mul__(__mul__($x, 4), $m);
+        state $inv_a = Math::GMPz::Rmpz_init_nobless();
 
-        # D = b^2 - 4*a*c
+        if (Math::GMPz::Rmpz_odd_p($m) and Math::GMPz::Rmpz_invert($inv_a, $x, $m)) {
+
+            # This part of code was translated from SymPy.
+
+            $y = Math::GMPz::Rmpz_init_set($y);
+            $z = Math::GMPz::Rmpz_init_set($z);
+
+            Math::GMPz::Rmpz_mul($y, $y, $inv_a);
+            Math::GMPz::Rmpz_mul($z, $z, $inv_a);
+
+            if (Math::GMPz::Rmpz_odd_p($y)) {
+                Math::GMPz::Rmpz_add($y, $y, $m);
+            }
+
+            Math::GMPz::Rmpz_div_2exp($y, $y, 1);
+
+            my $D = __mod__(__sub__(__mul__($y, $y), $z), $m);
+            my $S = (bless \$D)->sqrtmod_all(bless \$m);
+
+            @$S || return $S;
+
+            my @solutions;
+            foreach my $k (@$S) {
+                push @solutions, bless \__mod__(__sub__($$k, $y), $m);
+            }
+
+            return Sidef::Types::Array::Array->new(\@solutions)->sort;
+        }
+
+        my $four_xm = __mul__(__mul__($x, 4), $m);    # 4*x*m
+
+        # D = b^2 - 4*a*c (mod 4*a*m)
         my $D = __mod__(__sub__(__mul__($y, $y), __mul__(__mul__($x, $z), 4)), $four_xm);
-
-        # Discriminant seems to be rational
-        if (ref($D) eq 'Math::GMPq') {
-            Math::GMPq::Rmpq_integer_p($D) || return Sidef::Types::Array::Array->new;
-            $D = _any2mpz($D) // return Sidef::Types::Array::Array->new;
-        }
-
-        # The discriminant must be an integer
-        (!ref($D) or ref($D) eq 'Math::GMPz')
-          || return Sidef::Types::Array::Array->new;
 
         # Find all the solutions k to: k^2 == D (mod 4*x*m)
         my $S = (bless \$D)->sqrtmod_all(bless \$four_xm);
@@ -12744,20 +12768,10 @@ package Sidef::Types::Number::Number {
         my @solutions;
 
         foreach my $k (@$S) {
-
-            # This is much slower and finds only integer solutions
-            # my $res = (bless \$two_a)->linear_congruence((bless \__sub__($$k, $y)), bless \$four_xm);
-            # foreach my $j (@$res) {
-            #     push @solutions, bless \__mod__($$j, $m);
-            # }
-
-            #foreach my $u (__add__($neg_b, $$k), __sub__($neg_b, $$k)) {
+            ## foreach my $u (__add__($neg_b, $$k), __sub__($neg_b, $$k)) {
             foreach my $u (__add__($neg_b, $$k)) {
                 my $r = __mod__(__div__($u, $two_a), $m);
-
-                #if (__cmp__(__mod__(__add__(__add__(__mul__($x, __mul__($r, $r)), __mul__($y, $r)), $z), $m), 0) == 0) {
-                #    push @solutions, (bless \$r);
-                #}
+                ## __cmp__(__mod__(__add__(__add__(__mul__($x, __mul__($r, $r)), __mul__($y, $r)), $z), $m), 0) == 0 or die "error for solution: $r";
                 push @solutions, bless \$r;
             }
         }
@@ -20410,11 +20424,20 @@ package Sidef::Types::Number::Number {
                    );
         }
 
+        # Any value > 1 is an Euler-Jacobi pseudoprime to base 1
+        if (scalar(@bases) == 1 and $bases[0] == 1) {
+            return (
+                    ($n > 1)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         Math::Prime::Util::GMP::is_euler_pseudoprime(
-                                                     _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
+                                                     _big2pistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
                                                      (
-                                                      grep { (defined($_) and $_ > 1) || return Sidef::Types::Bool::Bool::FALSE }
-                                                      map  { _big2uistr($_) } @bases
+                                                      grep { $_ ne '1' }
+                                                      map  { _big2pistr($_) // return Sidef::Types::Bool::Bool::FALSE } @bases
                                                      )
                                                     )
           ? Sidef::Types::Bool::Bool::TRUE

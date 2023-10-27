@@ -213,6 +213,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/lucas_carmichael_with_n_factors.sf'
 'scripts/Extended tests/lucas_sequences.sf'
 'scripts/Extended tests/mertens_function.sf'
+'scripts/Extended tests/misc_number_tests.sf'
 'scripts/Extended tests/nth_prime.sf'
 'scripts/Extended tests/nth_prime_near_powers_of_10.sf'
 'scripts/Extended tests/number_methods.sf'
@@ -903,7 +904,6 @@ scripts/Tests/metaprogramming_method_definition.sf
 scripts/Tests/method_aliases.sf
 scripts/Tests/method_expressions.sf
 scripts/Tests/miller_rabin_primality_test.sf
-scripts/Tests/misc_number_tests.sf
 scripts/Tests/mod_class.sf
 scripts/Tests/modular_quadratic_formula.sf
 scripts/Tests/Module/Bar.sm
