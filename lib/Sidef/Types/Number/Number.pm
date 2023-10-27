@@ -20120,7 +20120,7 @@ package Sidef::Types::Number::Number {
 
         if (HAS_PRIME_UTIL and !ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
             return (
-                    Math::Prime::Util::is_pseudoprime($n, $bases[0])
+                    ($n > 1 and Math::Prime::Util::is_pseudoprime($n, $bases[0]))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -20129,7 +20129,7 @@ package Sidef::Types::Number::Number {
                and !ref($n)
                and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
             return (
-                    Math::Prime::Util::is_pseudoprime($n, @bases)
+                    ($n > 1 and Math::Prime::Util::is_pseudoprime($n, @bases))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -20397,14 +20397,14 @@ package Sidef::Types::Number::Number {
 
         if (HAS_PRIME_UTIL and !ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
             return (
-                    Math::Prime::Util::is_euler_pseudoprime($n, $bases[0])
+                    ($n > 1 and Math::Prime::Util::is_euler_pseudoprime($n, $bases[0]))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
         elsif (HAS_NEW_PRIME_UTIL and !ref($n) and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
             return (
-                    Math::Prime::Util::is_euler_pseudoprime($n, @bases)
+                    ($n > 1 and Math::Prime::Util::is_euler_pseudoprime($n, @bases))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -20444,14 +20444,14 @@ package Sidef::Types::Number::Number {
 
         if (HAS_PRIME_UTIL and !ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
             return (
-                    Math::Prime::Util::is_strong_pseudoprime($n, $bases[0])
+                    ($n > 1 and Math::Prime::Util::is_strong_pseudoprime($n, $bases[0]))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
         elsif (HAS_NEW_PRIME_UTIL and !ref($n) and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
             return (
-                    Math::Prime::Util::is_strong_pseudoprime($n, @bases)
+                    ($n > 1 and Math::Prime::Util::is_strong_pseudoprime($n, @bases))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -22559,6 +22559,11 @@ package Sidef::Types::Number::Number {
         if (Math::GMPz::Rmpz_sizeinbase($z, 2) <= SMALL_NUMBER_MAX_BITS) {
             local $SPECIAL_FACTORS = 0;
             return Sidef::Types::Array::Array->new([map { _set_int($_) } _factor(Math::GMPz::Rmpz_get_str($z, 10))]);
+        }
+
+        # Return ealry if input is a prime number
+        if (_is_prob_prime($z, 1)) {
+            return Sidef::Types::Array::Array->new([bless \$z]);
         }
 
         my @factors;

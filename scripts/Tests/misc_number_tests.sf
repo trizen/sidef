@@ -41,7 +41,7 @@ assert(sqrtmod_all(81, 3**7) == %n[9, 234, 252, 477, 495, 720, 738, 963, 981, 12
 ].each_2d {|a,p|
 
     # FIXME: make sqrtmod(a,p) fast for big composite p
-    p > Num(Num.ULONG_MAX) && next
+    #p > Num(Num.ULONG_MAX) && next
     Bool(Num.HAS_NEW_PRIME_UTIL) || next
 
     assert(powmod(sqrtmod(a, p), 2, p) == a)
@@ -265,12 +265,26 @@ for f in ([
     Num.method(:is_prob_prime), Num.method(:is_prov_prime),
     Num.method(:is_bpsw_prime), Num.method(:is_pell_psp),
     Num.method(:is_bfw_psp), Num.method(:is_lucas_psp),
-    Num.method(:is_strong_lucas_psp), Num.method(:is_extra_strong_lucas_psp),
-    Num.method(:is_strong_psp), Num.method(:is_psp),
+    Num.method(:is_strong_lucas_psp), Num.method(:is_stronger_lucas_psp),
+    Num.method(:is_strongish_lucas_psp), Num.method(:is_super_psp),
+    Num.method(:is_strong_psp), Num.method(:is_psp), Num.method(:is_lucasV_psp),
     Num.method(:is_euler_psp), Num.method(:is_plumb_psp),
     Num.method(:is_frobenius_psp), Num.method(:is_khashin_psp),
-    Num.method(:is_underwood_psp),
+    Num.method(:is_underwood_psp), Num.method(:is_over_psp),
+    Num.method(:is_lucasU_psp), Num.method(:is_fib_psp),
+    Num.method(:is_pell_lucas_psp), Num.method(:is_ecpp_prime),
 ]) {
+
+    if (Str(f{:calls}[0]{:method}) !~ /_psp\z/) {
+        assert(f.call(2))
+        assert(f.call(5))
+    }
+
+    assert(!f.call(0))
+    assert(!f.call(1))
+    assert(!f.call(-2))
+    assert(!f.call(-5))
+
     assert(f.call(2819))
     assert(f.call(179424673))
     assert(f.call(20678048681))
@@ -290,11 +304,12 @@ for f in ([
 for f in ([
     Num.method(:is_prime), Num.method(:all_prime),
     Num.method(:is_prob_prime), Num.method(:is_prov_prime),
-    Num.method(:is_bpsw_prime),
+    Num.method(:is_bpsw_prime), Num.method(:is_strongish_lucas_psp),
+    Num.method(:is_strong_fib_psp), Num.method(:is_chebyshev_psp),
     Num.method(:is_bfw_psp), Num.method(:is_lucas_psp),
-    Num.method(:is_strong_lucas_psp), Num.method(:is_extra_strong_lucas_psp),
+    Num.method(:is_strong_lucas_psp), Num.method(:is_stronger_lucas_psp),
     Num.method(:is_frobenius_psp), Num.method(:is_khashin_psp),
-    Num.method(:is_underwood_psp),
+    Num.method(:is_underwood_psp), Num.method(:is_ecpp_prime),
 ]) {
     assert(!f.call(2**601 - 1))
     assert(!f.call(2152302898747))
