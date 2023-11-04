@@ -8227,7 +8227,7 @@ package Sidef::Types::Number::Number {
         my ($u, $v, $g) = Math::Prime::Util::GMP::gcdext($n, $m);
 
         if (Math::Prime::Util::GMP::modint($r, $g) ne '0') {
-            return return Sidef::Types::Array::Array->new;
+            return Sidef::Types::Array::Array->new;
         }
 
         my $orig_m = $m;
@@ -22635,7 +22635,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mod($V1, $V1, $n);
             Math::GMPz::Rmpz_set($V0, $g);
 
-            foreach my $param ([$U1, 0], [$V1, -$P, 0]) {
+            foreach my $param ([$U1, 0], [$V1, -$P, -2*$Q, 0]) {
 
                 my ($t, @deltas) = @$param;
 

@@ -5188,7 +5188,7 @@ Aliases: I<is_underwood_pseudoprime>, I<is_frobenius_underwood_psp>, I<is_froben
 
 Returns true if C<n> passes the Lucas-V BFW test: C<V_{n+1} == 2*Q (mod n)> for carefully chosen values of C<P> and C<Q>.
 
-The composite numbers that pass this test are extremely rare (see OEIS A365514).
+The composite numbers that pass this test are extremely rare (OEIS A365514).
 
 When combined with a strong Fermat pseudoprime test to base 2, there are no known composites that pass both tests.
 
