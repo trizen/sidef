@@ -612,7 +612,7 @@ EOT
         my $line = '';
 
       LINE: {
-            $line .= Encode::decode_utf8($term->readline($line eq '' ? '> ' : '   ') // return);
+            $line .= Encode::decode_utf8($term->readline($line eq '' ? '> ' : '  ') // return);
 
             if ($line eq 'help') {
                 help_interactive($term);

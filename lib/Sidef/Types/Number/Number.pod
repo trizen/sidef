@@ -4158,6 +4158,21 @@ Returns a true value when `n >= min` and `n <= max`.
 
 =cut
 
+=head2 is_bfsw_psp
+
+    n.is_bfsw_psp
+
+Returns true if C<n> passes a slightly stronger and faster variant of the BFW primality test, based on the Lucas-V function, checking the following congruences:
+
+    V_{n+1} == 2*Q (mod n)
+    Q^(n+1) == Q^2 (mod n)
+
+where C<Q = -2> and C<P> is the first integer >= 2 such that C<D = P^2 - 4*Q> gives C<kronecker(D, n) == -1>.
+
+There are no known composites that pass this test.
+
+=cut
+
 =head2 is_bpsw_prime
 
     n.is_bpsw_prime

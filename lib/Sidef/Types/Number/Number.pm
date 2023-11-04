@@ -20856,6 +20856,114 @@ package Sidef::Types::Number::Number {
 
     *is_vpsp = \&is_bfw_psp;
 
+    sub is_bfsw_psp {    # a slightly stronger and faster BFW test
+        my ($n) = @_;
+
+        # No counter-examples are known to this test.
+        # Also the test is not correlated with the BFW test, using different P and Q.
+
+        # See also:
+        #   Strengthening the Baillie-PSW primality test
+        #   https://arxiv.org/abs/2006.14425
+
+        __is_int__($$n) || return Sidef::Types::Bool::Bool::FALSE;
+        $n = _any2mpz($$n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        Math::GMPz::Rmpz_sgn($n) <= 0
+          && return Sidef::Types::Bool::Bool::FALSE;
+
+        if (Math::GMPz::Rmpz_even_p($n)) {
+            return Sidef::Types::Bool::Bool::TRUE if (Math::GMPz::Rmpz_cmp_ui($n, 2) == 0);
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my $P = undef;
+        my $Q = -2;
+
+        # Find the first P >= 2 such that D = P^2 - 4*Q has kronecker(D, n) == -1
+        for ($P = 2 ; ; ++$P) {
+            my $D = $P * $P - 4 * $Q;
+
+            my $K = Math::GMPz::Rmpz_si_kronecker($D, $n);
+
+            if ($K == -1) {
+                last;
+            }
+            elsif ($K == 0 and Math::GMPz::Rmpz_cmp_ui($n, CORE::abs($D)) > 0) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+            elsif ($P == 20 and Math::GMPz::Rmpz_perfect_square_p($n)) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_add_ui($t, $n, 1);
+
+        my $s = Math::GMPz::Rmpz_scan1($t, 0);
+        Math::GMPz::Rmpz_div_2exp($t, $t, $s + 1);
+
+        state $V1 = Math::GMPz::Rmpz_init_nobless();
+        state $V2 = Math::GMPz::Rmpz_init_nobless();
+
+        state $Q1 = Math::GMPz::Rmpz_init_nobless();
+        state $Q2 = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_ui($V1, 2);
+        Math::GMPz::Rmpz_set_ui($V2, $P);
+
+        Math::GMPz::Rmpz_set_ui($Q1, 1);
+        Math::GMPz::Rmpz_set_ui($Q2, 1);
+
+        foreach my $bit (split(//, Math::GMPz::Rmpz_get_str($t, 2))) {
+
+            Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+            Math::GMPz::Rmpz_mod($Q1, $Q1, $n);
+
+            if ($bit) {
+                Math::GMPz::Rmpz_mul_si($Q2, $Q1, $Q);
+                Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+                Math::GMPz::Rmpz_powm_ui($V2, $V2, 2, $n);
+                Math::GMPz::Rmpz_submul_ui($V1, $Q1, $P);
+                Math::GMPz::Rmpz_submul_ui($V2, $Q2, 2);
+                Math::GMPz::Rmpz_mod($V1, $V1, $n);
+            }
+            else {
+                Math::GMPz::Rmpz_set($Q2, $Q1);
+                Math::GMPz::Rmpz_mul($V2, $V2, $V1);
+                Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $n);
+                Math::GMPz::Rmpz_submul_ui($V2, $Q1, $P);
+                Math::GMPz::Rmpz_submul_ui($V1, $Q2, 2);
+                Math::GMPz::Rmpz_mod($V2, $V2, $n);
+            }
+        }
+
+        Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
+        Math::GMPz::Rmpz_mod($Q1, $Q1, $n);
+
+        Math::GMPz::Rmpz_mul_si($Q2, $Q1, $Q);
+        Math::GMPz::Rmpz_mul($V1, $V1, $V2);
+        Math::GMPz::Rmpz_submul_ui($V1, $Q1, $P);
+        Math::GMPz::Rmpz_mul($Q2, $Q2, $Q1);
+
+        for (1 .. $s) {
+            Math::GMPz::Rmpz_powm_ui($V1, $V1, 2, $n);
+            Math::GMPz::Rmpz_submul_ui($V1, $Q2, 2);
+            Math::GMPz::Rmpz_powm_ui($Q2, $Q2, 2, $n);
+        }
+
+        Math::GMPz::Rmpz_set_si($t, 2 * $Q);
+        Math::GMPz::Rmpz_congruent_p($V1, $t, $n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        # Known counter-examples if we return true here:
+        #   245, 1957, 5256479
+
+        Math::GMPz::Rmpz_set_si($t, $Q * $Q);
+        Math::GMPz::Rmpz_congruent_p($Q2, $t, $n) || return Sidef::Types::Bool::Bool::FALSE;
+
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
+
     sub is_lucas_pseudoprime {
         my ($n, $P, $Q) = @_;
 
@@ -31383,7 +31491,7 @@ package Sidef::Types::Number::Number {
 
         bsearch_min(
             $n,
-            $n->sqr,    # conjecture?
+            $n->sqr,
             Sidef::Types::Block::Block->new(
                 code => sub {
                     $_[0]->perfect_power_count->cmp($n);
