@@ -4136,6 +4136,12 @@ Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == k>.
     say 20.by { .is_almost_prime(2) }   # semiprimes
     say 20.by { .is_almost_prime(3) }   # 3-almost primes
 
+In order for C<n> to have at least C<k> prime factors, without having any prime factors less than or equal to C<B>, it implies that C<n> must be greater than C<B^k>, since all the prime factors of C<n> are greater than C<B>.
+
+By setting C<Num!USE_CONJECTURES = true>, the function uses a conjectured approach based on Pollard's rho method to find a larger bound for C<B>, which requires C<O(sqrt(B))> steps to find a prime factor less than C<B>. Therefore, if we take C<B = 10^12>, after C<c*10^6> iterations (we use C<c=2>) of the Pollard rho method without success in finding a prime factor of C<n>, it's very probable that C<n> has no prime factor less than C<10^12>.
+
+By enabling the conjectured approach, the function becomes about 5x faster than the rigorous method, for large enough inputs.
+
 =cut
 
 =head2 is_amicable
@@ -4648,6 +4654,12 @@ Equivalently, k-omega primes are numbers C<n> such that C<omega(n) == k>.
 
     say 20.by { .is_omega_prime(1) }   # prime powers
     say 20.by { .is_omega_prime(2) }   # numbers n such that omega(n) == 2
+
+In order for C<n> to have at least C<k> prime factors, without having any prime factors less than or equal to C<B>, it implies that C<n> must be greater than C<B^k>, since all the prime factors of C<n> are greater than C<B>.
+
+By setting C<Num!USE_CONJECTURES = true>, the function uses a conjectured approach based on Pollard's rho method to find a larger bound for C<B>, which requires C<O(sqrt(B))> steps to find a prime factor less than C<B>. Therefore, if we take C<B = 10^12>, after C<c*10^6> iterations (we use C<c=2>) of the Pollard rho method without success in finding a prime factor of C<n>, it's very probable that C<n> has no prime factor less than C<10^12>.
+
+By enabling the conjectured approach, the function becomes about 5x faster than the rigorous method, for large enough inputs.
 
 =cut
 

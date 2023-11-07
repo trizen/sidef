@@ -4,7 +4,7 @@ Sidef is a modern, high-level, general-purpose programming language, focusing on
 
 # BOOK
 
-The Sidef Programming Language: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/23.10/sidef-book.pdf)).
+The Sidef Programming Language: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/23.11/sidef-book.pdf)).
 
 # Installation
 
@@ -16,7 +16,7 @@ This section describes how to install Sidef for various operating systems.
 
 For Windows, Sidef is available as a portable 32-bit executable:
 
-* https://github.com/trizen/sidef/releases/download/23.10/sidef-23.10.exe.zip
+* https://github.com/trizen/sidef/releases/download/23.11/sidef-23.11.exe.zip
 
 ## Linux installation
 
@@ -428,6 +428,7 @@ Gauss
 Quadratic
 Quaternion
 Polynomial
+PolynomialMod
 Math
 Pipe
 Ref
@@ -616,6 +617,7 @@ In the current implementation of the language, we have the following built-in cl
       * [Quadratic](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Quadratic.pod)
       * [Quaternion](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Quaternion.pod)
       * [Polynomial](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Polynomial.pod)
+      * [PolynomialMod](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/PolynomialMod.pod)
     * [Range](https://github.com/trizen/sidef/tree/master/lib/Sidef/Types/Range)
       * [Range](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Range/Range.pod)
       * [RangeNumber](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Range/RangeNumber.pod)
