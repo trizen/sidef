@@ -72,7 +72,7 @@ package Sidef::Types::Number::PolynomialMod {
     sub __stringify__ {
         my ($x, $method) = @_;
         $method //= 'to_s';
-        $x->[0]->SUPER::__stringify__($method);
+        $x->[0]->SUPER::__stringify__($method) . join('', " (mod ", ($x->[1] // '1'), ')');
     }
 
     sub to_s {

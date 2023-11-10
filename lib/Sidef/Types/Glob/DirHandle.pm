@@ -106,7 +106,7 @@ package Sidef::Types::Glob::DirHandle {
 
     sub close {
         my ($self) = @_;
-        closedir($self->{dh})
+        CORE::closedir($self->{dh})
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }

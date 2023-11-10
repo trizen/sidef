@@ -167,7 +167,7 @@ package Sidef::Types::Glob::Dir {
         ref($_[0]) || shift(@_);
         my ($self, $fh_ref, $err_ref) = @_;
 
-        my $success = opendir(my $dir_h, "$self");
+        my $success = CORE::opendir(my $dir_h, "$self");
         my $error   = $!;
         my $dir_obj = Sidef::Types::Glob::DirHandle->new($dir_h, $self);
 
@@ -218,9 +218,11 @@ package Sidef::Types::Glob::Dir {
         my ($self) = @_;
         CORE::opendir(my $dir_h, "$self") || return undef;
         while (defined(my $file = CORE::readdir $dir_h)) {
-            next if $file eq '.' or $file eq '..';
+            next if ($file eq '.' or $file eq '..');
+            CORE::closedir($dir_h);
             return (Sidef::Types::Bool::Bool::FALSE);
         }
+        CORE::closedir($dir_h);
         (Sidef::Types::Bool::Bool::TRUE);
     }
 

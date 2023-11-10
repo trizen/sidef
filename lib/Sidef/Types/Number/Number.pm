@@ -20062,6 +20062,7 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *is_bpsw_psp = \&is_bpsw_prime;
     *is_bpsw_prp = \&is_bpsw_prime;
 
     sub is_aks_prime {
@@ -22635,7 +22636,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mod($V1, $V1, $n);
             Math::GMPz::Rmpz_set($V0, $g);
 
-            foreach my $param ([$U1, 0], [$V1, -$P, -2*$Q, 0]) {
+            foreach my $param ([$U1, 0], [$V1, -$P, -2 * $Q, 0]) {
 
                 my ($t, @deltas) = @$param;
 
