@@ -8337,6 +8337,17 @@ Hyperbolic sine function.
 
 =cut
 
+=head2 smod
+
+    x.smod(m)
+
+Returns the residual mod C<m> such that it is within half of the modulus.
+
+    say smod(1, 6)      #=> 1
+    say smod(4, 6)      #=> -2
+
+=cut
+
 =head2 smooth_count
 
     k.smooth_count(n)

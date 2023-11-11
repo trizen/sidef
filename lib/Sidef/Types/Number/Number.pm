@@ -9657,6 +9657,17 @@ package Sidef::Types::Number::Number {
         bless \__mod__($$x, $$y);
     }
 
+    sub smod {
+        my ($x, $m) = @_;
+
+        my $r = $x->mod($m);
+        if ($r->add($r)->le($m)) {
+            return $r;
+        }
+
+        return $r->sub($m);
+    }
+
     sub polymod {
         my ($x, @m) = @_;
 
