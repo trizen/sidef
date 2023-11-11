@@ -1058,6 +1058,16 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::sum(@$self);
     }
 
+    sub summod {
+        my ($self, $mod) = @_;
+
+        my $sum = Sidef::Types::Number::Number::ZERO;
+        foreach my $k (@$self) {
+            $sum = $sum->addmod($k, $mod);
+        }
+        return $sum->mod($mod);
+    }
+
     sub avg_by {
         my ($self, $block) = @_;
         $self->sum_by($block)->div($self->len);
@@ -1092,6 +1102,16 @@ package Sidef::Types::Array::Array {
         }
 
         Sidef::Types::Number::Number::prod(@$self);
+    }
+
+    sub prodmod {
+        my ($self, $mod) = @_;
+
+        my $prod = Sidef::Types::Number::Number::ONE;
+        foreach my $k (@$self) {
+            $prod = $prod->mulmod($k, $mod);
+        }
+        return $prod->mod($mod);
     }
 
     sub gcd_by {

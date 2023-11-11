@@ -1856,6 +1856,14 @@ Returns the
 
 =cut
 
+=head2 prodmod
+
+    self.prodmod(mod)
+
+Returns the
+
+=cut
+
 =head2 rand
 
     self.rand(amount)
@@ -2288,6 +2296,14 @@ Sum of an array, by mapping each element to the given block.
 =head2 sum_kv
 
     self.sum_kv(block)
+
+Returns the
+
+=cut
+
+=head2 summod
+
+    self.summod(mod)
 
 Returns the
 
