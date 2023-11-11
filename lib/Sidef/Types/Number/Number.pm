@@ -20133,8 +20133,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         if (ref($n)) {
-            __is_int__($n)
-              || return Sidef::Types::Bool::Bool::FALSE;
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
         }
 
         if (scalar(@bases)) {
@@ -20410,8 +20409,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         if (ref($n)) {
-            __is_int__($n)
-              || return Sidef::Types::Bool::Bool::FALSE;
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
         }
 
         if (scalar(@bases)) {
@@ -20466,8 +20464,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         if (ref($n)) {
-            __is_int__($n)
-              || return Sidef::Types::Bool::Bool::FALSE;
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
         }
 
         if (scalar(@bases)) {
@@ -20492,11 +20489,20 @@ package Sidef::Types::Number::Number {
                    );
         }
 
+        # Any value > 1 is a strong psp to base 1
+        if (scalar(@bases) == 1 and $bases[0] == 1) {
+            return (
+                    ($n > 1)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         Math::Prime::Util::GMP::is_strong_pseudoprime(
-                                                      _big2uistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
+                                                      _big2pistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
                                                       (
-                                                       grep { (defined($_) and $_ > 1) || return Sidef::Types::Bool::Bool::FALSE }
-                                                       map  { _big2uistr($_) } @bases
+                                                       grep { $_ ne '1' }
+                                                       map  { _big2pistr($_) // return Sidef::Types::Bool::Bool::FALSE } @bases
                                                       )
                                                      )
           ? Sidef::Types::Bool::Bool::TRUE

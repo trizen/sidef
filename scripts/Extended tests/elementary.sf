@@ -1,0 +1,214 @@
+#!/usr/bin/ruby
+
+# Various other tests for the Number methods.
+# Some tests are translated from the SymPy library.
+
+#assert(bit_scan1(0) == nil)
+assert(bit_scan1(1) == 0)
+assert(bit_scan1(-1) == 0)
+assert(bit_scan1(2) == 1)
+assert(bit_scan1(7) == 0)
+assert(bit_scan1(-7) == 0)
+
+#assert(bit_scan0(-1) == nil)
+assert(bit_scan0(0) == 0)
+assert(bit_scan0(1) == 1)
+assert(bit_scan0(-2) == 0)
+
+for i in (100.range) {
+    assert(bit_scan1(1 << i) == i)
+    assert(bit_scan1((1 << i) * 31337) == i)
+}
+
+for i in (500.range) {
+    var n = ((1 << 500) + (1 << i))
+    assert(bit_scan1(n) == i)
+}
+
+assert(bit_scan1(1 << 1000001) == 1000001)
+assert(bit_scan1((1 << 273956)*7**37) == 273956)
+
+for i in (1..10) {
+    var big = (1 << i)
+    assert(bit_scan1(-big) == bit_scan1(big))
+}
+
+assert([gcdext(0, 0)] == %n(0, 0, 0))
+assert([gcdext(3, 0)] == %n(1, 0, 3))
+assert([gcdext(0, 4)] == %n(0, 1, 4))
+
+for n in (1..10) {
+    assert([gcdext(n, 1)] == %n(0, 1, 1))
+    assert([gcdext(n, -1)] == %n(0, -1, 1))
+    assert([gcdext(n, n)] == [(0, 1, n)])
+    assert([gcdext(n, -n)] == [(0, -1, n)])
+}
+
+for n in (2..10) {
+    assert([gcdext(1, n)] == %n(1, 0, 1))
+    assert([gcdext(-1, n)] == %n(-1, 0, 1))
+}
+
+[2**5, 3, 5, 7**2, 11].combinations(2, {|a,b|
+    var (x, y, g) = gcdext(a, b)
+    assert_eq(g, a*x + b*y)
+    assert_eq(g, 1)
+})
+
+assert(!is_fermat_prp(1, 3))
+assert(!is_fermat_prp(0, 10))
+assert(is_fermat_prp(5, 1))
+
+# n is prime
+#assert(is_fermat_prp(2, 4))    # fixme
+assert(is_fermat_prp(2, 5))
+assert(is_fermat_prp(3, 2))
+assert(is_fermat_prp(11, 3))
+assert(is_fermat_prp(2**31 - 1, 5))
+
+# A001567
+%n[341, 561, 645, 1105, 1387, 1729, 1905, 2047,
+2465, 2701, 2821, 3277, 4033, 4369, 4371, 4681].each {|n|
+    assert(is_fermat_prp(n, 2))
+}
+
+# A020136
+%n[15, 85, 91, 341, 435, 451, 561, 645, 703, 1105,
+1247, 1271, 1387, 1581, 1695, 1729, 1891, 1905].each {|n|
+    assert(is_fermat_prp(n, 4))
+}
+
+assert(!is_euler_prp(0, 10))
+assert(is_euler_prp(5, 1))
+assert(!is_euler_prp(1, 3))
+
+assert(is_euler_prp(2, 4))
+assert(is_euler_prp(3, 2))
+assert(is_euler_prp(11, 3))
+assert(is_euler_prp(2**31 - 1, 5))
+
+# A047713
+%n[561, 1105, 1729, 1905, 2047, 2465, 3277, 4033,
+4681, 6601, 8321, 8481, 10585, 12801, 15841].each {|n|
+    assert(is_euler_prp(n, 2))
+}
+
+# A048950
+%n[121, 703, 1729, 1891, 2821, 3281, 7381, 8401,
+8911, 10585, 12403, 15457, 15841, 16531, 18721].each {|n|
+    assert(is_euler_prp(n,3))
+}
+
+assert(!is_strong_prp(0, 10))
+assert(is_strong_prp(5, 1))
+
+# n = 1
+assert(!is_strong_prp(1, 3))
+
+# n is prime
+assert(is_strong_prp(2, 4))
+assert(is_strong_prp(3, 2))
+assert(is_strong_prp(11, 3))
+assert(is_strong_prp(2**31 - 1, 5))
+
+# A001262
+%n[2047, 3277, 4033, 4681, 8321, 15841, 29341,
+42799, 49141, 52633, 65281, 74665, 80581].each {|n|
+    assert(is_strong_prp(n,2))
+}
+
+# A020229
+%n[121, 703, 1891, 3281, 8401, 8911, 10585, 12403,
+16531, 18721, 19345, 23521, 31621, 44287, 47197].each {|n|
+    assert(is_strong_prp(n,3))
+}
+
+# invalid input
+assert(is_lucasV_psp(3, 2, 1))
+assert(is_lucasV_psp(3, -5, 1))
+assert(is_lucasV_psp(3, 5, 2))
+assert(!is_lucasV_psp(0, 5, -1))
+
+# n = 1
+assert(!is_lucasV_psp(1, 3, 1))
+
+# n is prime
+assert(is_lucasV_psp(2, 5, 1))
+assert(is_lucasV_psp(3, 6, -1))
+assert(is_lucasV_psp(11, 7, 1))
+assert(is_lucasV_psp(2**31 - 1, 8, -1))
+
+# A005845
+%n[705, 2465, 2737, 3745, 4181, 5777, 6721,
+10877, 13201, 15251, 24465, 29281, 34561].each {|n|
+    assert(is_lucasV_psp(n, 1, -1))
+}
+
+# invalid input
+assert(!is_lucasU_psp(3, 2, 1))
+assert(!is_lucasU_psp(0, 5, -1))
+assert(!is_lucasU_psp(15, 3, 1))
+
+# n = 1
+assert(!is_lucasU_psp(1, 3, 1))
+
+# n is prime
+#assert(is_lucasU_psp(2, 5, 2))     # fixme
+assert(is_lucasU_psp(3, 6, -1))
+assert(is_lucasU_psp(11, 7, 5))
+assert(is_lucasU_psp(2**31 - 1, 8, -3))
+
+# A081264
+%n[323, 377, 1891, 3827, 4181, 5777, 6601, 6721,
+8149, 10877, 11663, 13201, 13981, 15251, 17119].each {|n|
+    assert(is_lucasU_psp(n, 1, -1))
+}
+
+# invalid input
+assert !is_selfridge_prp(0)
+
+# n = 1
+assert !is_selfridge_prp(1)
+
+# n is prime
+assert is_selfridge_prp(2)
+assert is_selfridge_prp(3)
+assert is_selfridge_prp(11)
+assert is_selfridge_prp(2**31 - 1)
+
+# A217120
+%n[323, 377, 1159, 1829, 3827, 5459, 5777, 9071,
+9179, 10877, 11419, 11663, 13919, 14839, 16109].each {|n|
+    assert is_selfridge_prp(n)
+}
+
+assert !is_strong_selfridge_prp(0)
+
+# n = 1
+assert !is_strong_selfridge_prp(1)
+
+# n is prime
+assert is_strong_selfridge_prp(2)
+assert is_strong_selfridge_prp(3)
+assert is_strong_selfridge_prp(11)
+assert is_strong_selfridge_prp(2**31 - 1)
+
+# A217255
+%n[5459, 5777, 10877, 16109, 18971, 22499, 24569,
+25199, 40309, 58519, 75077, 97439, 100127, 113573].each {|n|
+    assert is_strong_selfridge_prp(n)
+}
+
+# invalid input
+assert !is_bpsw_prp(0)
+
+# n = 1
+assert !is_bpsw_prp(1)
+
+# n is prime
+assert is_bpsw_prp(2)
+assert is_bpsw_prp(3)
+assert is_bpsw_prp(11)
+assert is_bpsw_prp(2**31 - 1)
+
+say "** Test passed!"
