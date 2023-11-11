@@ -17061,7 +17061,7 @@ package Sidef::Types::Number::Number {
             return _set_int($count);
         }
 
-        state $pp_count = sub {
+        my $pp_count = sub {
             my ($n) = @_;
 
             return $pp_table->[$n] if $n <= 100;
@@ -22666,6 +22666,93 @@ package Sidef::Types::Number::Number {
 
     *fib_factor = \&fibonacci_factor;
 
+    sub sophie_germain_factor {
+        my ($n) = @_;
+
+        # A simple factorization method, based on Sophie Germain's identity:
+        #   x^4 + 4y^4 = (x^2 + 2xy + 2y^2) * (x^2 - 2xy + 2y^2)
+
+        # This method is also effective for numbers of the form: n^4 + 4^(2k+1).
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        state $w = Math::GMPz::Rmpz_init_nobless();
+        state $z = Math::GMPz::Rmpz_init_nobless();
+
+        my $sophie_germain_decomposition = sub {
+            my ($n) = @_;
+
+            state $t = Math::GMPz::Rmpz_init_nobless();
+            state $u = Math::GMPz::Rmpz_init_nobless();
+
+            Math::GMPz::Rmpz_root($t, $n, 4);
+            Math::GMPz::Rmpz_pow_ui($w, $t, 4);
+            Math::GMPz::Rmpz_sub($u, $n, $w);
+            Math::GMPz::Rmpz_div_2exp($u, $u, 2);
+
+            if (Math::GMPz::Rmpz_root($u, $u, 4)) {
+
+                # n = t^4 + 4*u^4
+                Math::GMPz::Rmpz_pow_ui($z, $u, 4);
+                Math::GMPz::Rmpz_mul_2exp($z, $z, 2);
+                Math::GMPz::Rmpz_add($w, $w, $z);
+
+                if (Math::GMPz::Rmpz_cmp($w, $n) == 0) {
+                    return ($t, $u);
+                }
+            }
+
+            Math::GMPz::Rmpz_mul_2exp($t, $n, 2);
+            Math::GMPz::Rmpz_root($t, $t, 4);
+            Math::GMPz::Rmpz_div_2exp($t, $t, 1);
+            Math::GMPz::Rmpz_pow_ui($z, $t, 4);
+            Math::GMPz::Rmpz_mul_2exp($z, $z, 2);
+            Math::GMPz::Rmpz_sub($u, $n, $z);
+
+            if (Math::GMPz::Rmpz_root($u, $u, 4)) {
+
+                # n = u^4 + 4*t^4
+                Math::GMPz::Rmpz_pow_ui($w, $u, 4);
+                Math::GMPz::Rmpz_add($w, $w, $z);
+
+                if (Math::GMPz::Rmpz_cmp($w, $n) == 0) {
+                    return ($u, $t);
+                }
+            }
+
+            return;
+        };
+
+        my ($x, $y) = $sophie_germain_decomposition->($n);
+
+        if (!defined($x) or !defined($y)) {
+            return Sidef::Types::Array::Array->new([bless \$n]);
+        }
+
+        my $p = Math::GMPz::Rmpz_init();
+        my $q = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_mul($w, $x, $y);
+        Math::GMPz::Rmpz_mul_2exp($w, $w, 1);
+        Math::GMPz::Rmpz_mul($z, $x, $x);
+
+        Math::GMPz::Rmpz_sub($p, $z, $w);
+        Math::GMPz::Rmpz_add($q, $z, $w);
+
+        Math::GMPz::Rmpz_mul($w, $y, $y);
+        Math::GMPz::Rmpz_mul_2exp($w, $w, 1);
+
+        Math::GMPz::Rmpz_add($p, $p, $w);
+        Math::GMPz::Rmpz_add($q, $q, $w);
+
+        return Sidef::Types::Array::Array->new([(bless \$p), (bless \$q)]);
+    }
+
+    *germain_factor = \&sophie_germain_factor;
+
     sub special_factors {
         my ($n, $m) = @_;
 
@@ -22758,6 +22845,7 @@ package Sidef::Types::Number::Number {
         $factorized || $collect_factors->($n->trial_factor($mp1->mul(_set_int(1e5))));
 
         # Methods that depend on the special form of n
+        $factorized || $collect_factors->($n->germain_factor);
         $factorized || $collect_factors->($n->holf_factor($mp1->mul(_set_int(1e4))));
         $factorized || $collect_factors->($n->fermat_factor($mp1->mul(_set_int(1e3))));
         $factorized || $collect_factors->($n->phi_finder_factor($mp1->mul(_set_int(1e3))));
@@ -31623,7 +31711,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        if (HAS_NEW_PRIME_UTIL_GMP) {
+        if (HAS_NEW_PRIME_UTIL_GMP and $k >= 5) {
             return _set_int(Math::Prime::Util::GMP::powerful_count(Math::GMPz::Rmpz_get_str($n, 10), $k));
         }
 

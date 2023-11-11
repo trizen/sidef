@@ -3473,6 +3473,20 @@ Example:
 
 =cut
 
+=head2 germain_factor
+
+    germain_factor(n)
+
+Tries to factorize C<n>, using the Sophie Germain identity:
+
+    x^4 + 4y^4 = (x^2 - 2xy + 2y^2) * (x^2 + 2xy + 2y^2)
+
+The product of the factors will give back C<n>. However, some factors may be composite.
+
+Aliases: I<sophie_germain_factor>
+
+=cut
+
 =head2 gpf
 
     gpf(n)

@@ -26,6 +26,7 @@ do {
     {|n| assert_eq(trial_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(trial_factor(n, 100).prod, n||1) }.each(0..30)
     {|n| assert_eq(cyclotomic_factor(n).prod, n||1) }.each(0..30)
+    {|n| assert_eq(germain_factor(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(special_factors(n).prod, n||1) }.each(0..30)
     {|n| assert_eq(Math.gcd_factors(n, n.isqrt.primes).prod, n||1) }.each(0..30)
 }
@@ -69,6 +70,14 @@ do {
     verify_factors(phi_finder_factor(503*863), 503*863)
     verify_factors(phi_finder_factor(622882096110539), 622882096110539)
     verify_factors(phi_finder_factor(132750061135361, 1e5), 132750061135361)
+
+    with (170296437766520678260984540689850857933985582784142928557942562632249992969239530014613965028536428517542093436236756805) {|n|
+        verify_factors(germain_factor(n), n)
+    }
+
+    with (681185751066082713043938162759403431735942331136571714231766350676201018716794593662979976783654271745458522802602418805) {|n|
+        verify_factors(germain_factor(n), n)
+    }
 
     with (283874509653487424333753053009549245120760303237063459589551) {|n|
         verify_factors(n.phi_finder_factor, n)
