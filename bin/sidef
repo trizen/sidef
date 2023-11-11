@@ -261,7 +261,7 @@ else {
 sub HELP_MESSAGE {
 #<<<
     my %switches = (
-                    '-i'         => 'interactive mode',
+                    '-i file'    => 'execute a program in interactive mode',
                     '-c'         => 'compile the code into a Perl program',
                     '-C'         => 'check syntax only',
                     '-D'         => 'dump the syntax tree of a program',
@@ -313,7 +313,7 @@ USAGE
 
     print <<"END";
 
-Run '$basename -i' for interactive mode.
+Run '$basename' for entering the interactive mode.
 
 END
 }
@@ -607,12 +607,32 @@ EOT
     my $tΔ = 0;
 
     my @values;
+    my $FH = undef;
+
+    if (@ARGV) {
+        my $file = shift(@ARGV);
+        open $FH, '<:utf8', $file
+          or die "Can't open file <<$file>> for reading: $!\n";
+    }
 
   MAINLOOP: {
         my $line = '';
 
       LINE: {
-            $line .= Encode::decode_utf8($term->readline($line eq '' ? '> ' : '  ') // return);
+
+            if (defined($FH) and !eof($FH)) {
+                chomp(my $curr_line = <$FH>);
+                if ($line eq '' and $curr_line =~ /^\s*__(?:END|DATA)__\s*\z/) {
+                    $curr_line .= "\n" . do { local $/; <$FH> };
+                }
+                if ($history_support and $curr_line ne '' and $line eq '') {
+                    $term->addhistory($curr_line =~ s/\R/\r/gr);
+                }
+                $line .= $curr_line;
+            }
+            else {
+                $line .= Encode::decode_utf8($term->readline($line eq '' ? '> ' : '  ') // return);
+            }
 
             if ($line eq 'help') {
                 help_interactive($term);
@@ -624,9 +644,17 @@ EOT
             }
             elsif ($line =~ /^#+\h*load\h+(.+)/) {
                 my $file = unpack('A*', $1);
+                open $FH, '<:utf8', $file or do {
+                    warn "Can't open file <<$file>> for reading: $!\n";
+                    redo MAINLOOP;
+                };
+                redo MAINLOOP;
+            }
+            elsif ($line =~ /^#+\h*exec\h+(.+)/) {
+                my $file = unpack('A*', $1);
                 $init_sidef->();
                 open my $fh, '<:utf8', $file or do {
-                    warn "Can't open file <<$file>> for read: $!\n";
+                    warn "Can't open file <<$file>> for reading: $!\n";
                     redo MAINLOOP;
                 };
                 $line = do { local $/; <$fh> };
@@ -635,7 +663,7 @@ EOT
             elsif ($line =~ /^#+\h*save\h+(.+)/) {
                 my $file = unpack('A*', $1);
                 open my $fh, '>:utf8', $file or do {
-                    warn "Can't open file <<$file>> for write: $!\n";
+                    warn "Can't open file <<$file>> for writing: $!\n";
                     redo MAINLOOP;
                 };
                 print $fh $valid_lines;
@@ -964,10 +992,10 @@ Usage: sidef [switches] [--] [programfile] [arguments]
   -D            dump the syntax tree of a program
   -E program    one line of program
   -H            interactive help
-  -i            interactive mode
+  -i file       execute a program in interactive mode
   -k            keep track of potentially incorrect parser interpretations
   -M mode       set the rounding mode of floating-point numbers
-                valid modes: [near], zero, inf, +inf, -inf
+                valid modes: [near], zero, inf, +inf, -inf, faith
   -N options    modify class-variables inside the Number class
                 valid format: 'VERBOSE=1; USE_YAFU=1; USE_PRIMECOUNT=1'
   -o file       file where to dump the output
@@ -983,7 +1011,7 @@ Usage: sidef [switches] [--] [programfile] [arguments]
   -w            enable warnings with stack backtrace
   -W            make warnings fatal (with stack backtrace)
 
-Run 'sidef -i' for interactive mode.
+Run 'sidef' for entering the interactive mode.
 
 =head1 HELLO WORLD
 
@@ -1038,13 +1066,17 @@ The REPL supports the following special commands:
     #1 = 7
     > sqrt(#1)
 
+=item * Load a Sidef file inside the REPL, line by line:
+
+    > # load filename.sf
+
+=item * Execute a Sidef file inside the REPL:
+
+    > # exec filename.sf
+
 =item * Save the code from the REPL inside a file:
 
     > # save filename.sf
-
-=item * Load a Sidef file inside the REPL:
-
-    > # load filename.sf
 
 =item * Reset the REPL:
 
