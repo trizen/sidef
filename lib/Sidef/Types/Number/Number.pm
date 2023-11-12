@@ -28435,10 +28435,19 @@ package Sidef::Types::Number::Number {
             my $A = Math::GMPz::Rmpz_get_ui($from);
             my $B = Math::GMPz::Rmpz_get_ui($to);
 
+            my $max_p = undef;
+
             if ($squarefree) {
                 if ($carmichael or $lucas_carmichael) {
                     my $m = Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::pn_primorial($k + 1), 2);
                     $A = Math::Prime::Util::vecmax($A, $m);
+
+                    if ($carmichael) {
+                        $max_p = (1 + Math::Prime::Util::sqrtint(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint(8, $B), 1))) >> 2;
+                    }
+                    elsif ($lucas_carmichael) {
+                        $max_p = Math::Prime::Util::sqrtint($B);
+                    }
                 }
                 else {
                     $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
@@ -28459,6 +28468,10 @@ package Sidef::Types::Number::Number {
 
                     my $lo = $args{from};
                     my $hi = $args{upto};
+
+                    if (defined($max_p) and $hi > $max_p) {
+                        $hi = $max_p;
+                    }
 
                     $lo > $hi && return;
 
@@ -28622,10 +28635,29 @@ package Sidef::Types::Number::Number {
             my $u = Math::GMPz::Rmpz_init();
             my $v = Math::GMPz::Rmpz_init();
 
+            my $max_p = undef;
+
             if ($squarefree) {
                 if ($carmichael or $lucas_carmichael) {
                     my $m = Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::pn_primorial($k + 1), 2);
                     Math::GMPz::Rmpz_set_str($u, $m, 10);
+
+                    if ($carmichael) {
+
+                        # max_p = floor((1 + sqrt(8*B + 1))/4)
+                        $max_p = Math::GMPz::Rmpz_init();
+                        Math::GMPz::Rmpz_mul_2exp($max_p, $B, 3);
+                        Math::GMPz::Rmpz_add_ui($max_p, $max_p, 1);
+                        Math::GMPz::Rmpz_sqrt($max_p, $max_p);
+                        Math::GMPz::Rmpz_add_ui($max_p, $max_p, 1);
+                        Math::GMPz::Rmpz_div_2exp($max_p, $max_p, 2);
+                        $max_p = Math::GMPz::Rmpz_get_ui($max_p) if Math::GMPz::Rmpz_fits_ulong_p($max_p);
+                    }
+                    elsif ($lucas_carmichael) {
+                        $max_p = Math::GMPz::Rmpz_init();
+                        Math::GMPz::Rmpz_sqrt($max_p, $B);
+                        $max_p = Math::GMPz::Rmpz_get_ui($max_p) if Math::GMPz::Rmpz_fits_ulong_p($max_p);
+                    }
                 }
                 else {
                     Math::GMPz::Rmpz_set_str($u, Math::Prime::Util::GMP::pn_primorial($k), 10);
@@ -28655,6 +28687,10 @@ package Sidef::Types::Number::Number {
                         my $lo = $args{from};
                         my $hi = $args{upto};
 
+                        if (defined($max_p) and $hi > $max_p) {
+                            $hi = $max_p;
+                        }
+
                         if ($lo > $hi) {
                             return;
                         }
@@ -28664,7 +28700,7 @@ package Sidef::Types::Number::Number {
                         Math::GMPz::Rmpz_invert($v, $m, $L);
                         Math::GMPz::Rmpz_sub($v, $L, $v) if $lucas_carmichael;
 
-                        if (Math::GMPz::Rmpz_cmp_ui($v, $hi) > 0) {
+                        if ($v > $hi) {
                             return;
                         }
 
@@ -28825,8 +28861,8 @@ package Sidef::Types::Number::Number {
                                   (
                                    ($k == 2)
                                    ? (
-                                      from => Math::GMPz::Rmpz_get_str($u, 10),
-                                      upto => Math::GMPz::Rmpz_get_str($v, 10)
+                                      from => (Math::GMPz::Rmpz_fits_ulong_p($u) ? Math::GMPz::Rmpz_get_ui($u) : Math::GMPz::Rmpz_get_str($u, 10)),
+                                      upto => (Math::GMPz::Rmpz_fits_ulong_p($v) ? Math::GMPz::Rmpz_get_ui($v) : Math::GMPz::Rmpz_get_str($v, 10)),
                                      )
                                    : ()
                                   ),
