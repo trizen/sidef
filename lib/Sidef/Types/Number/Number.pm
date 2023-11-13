@@ -1145,7 +1145,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (CORE::length($n) >= YAFU_MIN and $USE_YAFU) {
+        if (CORE::length($n) >= YAFU_MIN and $USE_YAFU and -t STDIN) {
 
             if (_is_prob_prime($n, 1)) {
                 push @factors, $n;
@@ -17611,7 +17611,7 @@ package Sidef::Types::Number::Number {
         my $min = 1;
         my $max = 231;
 
-        my $zeta2  = 1.64493406684823;
+        my $zeta2  = 1.64493406684822643647241516664603;
         my $sqrt_n = CORE::sqrt($n);
 
         # Bounds on squarefree numbers:
@@ -23203,19 +23203,30 @@ package Sidef::Types::Number::Number {
             return _factor(Math::GMPz::Rmpz_get_ui($n));
         }
 
-        my $D = Math::GMPz::Rmpz_init();    # n-1
-        Math::GMPz::Rmpz_sub_ui($D, $n, 1);
+        if (_is_prob_prime($n, 1)) {
+            return ($n);
+        }
 
-        my $s = Math::GMPz::Rmpz_scan1($D, 0) || return ($n);
+        state $nm1 = Math::GMPz::Rmpz_init_nobless();    # n-1
+        state $d   = Math::GMPz::Rmpz_init_nobless();    # (n-1) >> s
+
+        Math::GMPz::Rmpz_sub_ui($nm1, $n, 1);
+
+        my $s = Math::GMPz::Rmpz_scan1($nm1, 0) || return ($n);
         my $r = $s - 1;
 
-        my $d = Math::GMPz::Rmpz_init();    # D >> s
-        Math::GMPz::Rmpz_div_2exp($d, $D, $s);
+        Math::GMPz::Rmpz_div_2exp($d, $nm1, $s);
 
         $tries //= 1 + CORE::int(200 / $s);
 
-        my $x = Math::GMPz::Rmpz_init();
-        my $g = Math::GMPz::Rmpz_init();
+        state $x = Math::GMPz::Rmpz_init();
+        state $g = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init();
+        state $N = Math::GMPz::Rmpz_init();
+
+        my @all_factors;
+
+        Math::GMPz::Rmpz_set($N, $n);
 
         for (1 .. $tries) {
 
@@ -23226,29 +23237,48 @@ package Sidef::Types::Number::Number {
             foreach my $k (0 .. $r) {
 
                 last if (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0);
-                last if (Math::GMPz::Rmpz_cmp($x, $D) == 0);
+                last if (Math::GMPz::Rmpz_cmp($x, $nm1) == 0);
 
-                foreach my $i (1, -1) {
+                # gcd(x +/- 1, n) may be a non-trivial factor of n
+                Math::GMPz::Rmpz_sub_ui($g, $x, 1);
+                Math::GMPz::Rmpz_gcd($g, $g, $n);
 
-                    ($i < 0)
-                      ? Math::GMPz::Rmpz_sub_ui($g, $x, -$i)
-                      : Math::GMPz::Rmpz_add_ui($g, $x, +$i);
+                if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
 
-                    Math::GMPz::Rmpz_gcd($g, $g, $n);
-
-                    if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
-
-                        Math::GMPz::Rmpz_divexact($x, $n, $g);
-
-                        my @g_factors = (_is_prob_prime($g, 1) ? $g : __SUB__->($g));
-                        my @x_factors = (_is_prob_prime($x, 1) ? $x : __SUB__->($x));
-
-                        return (@g_factors, @x_factors);
+                    Math::GMPz::Rmpz_gcd($t, $N, $g);
+                    if (_is_prob_prime($t, 1)) {
+                        Math::GMPz::Rmpz_divexact($N, $N, $t);
+                        push @all_factors, Math::GMPz::Rmpz_init_set($t);
                     }
+                    elsif (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0) {
+                        Math::GMPz::Rmpz_divexact($t, $N, $t);
+                        if (_is_prob_prime($t, 1)) {
+                            Math::GMPz::Rmpz_divexact($N, $N, $t);
+                            push @all_factors, Math::GMPz::Rmpz_init_set($t);
+                        }
+                    }
+
+                    push @all_factors, Math::GMPz::Rmpz_init_set($g);
+
+                    if (scalar(@all_factors) >= 10 or Math::GMPz::Rmpz_cmp_ui($N, 1) == 0 or _is_prob_prime($N, 1)) {
+                        return map { $$_ } @{((bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([map { bless \$_ } @all_factors])))};
+                    }
+
+                    # Recursive approach
+                    #~ Math::GMPz::Rmpz_divexact($t, $n, $g);
+
+                    #~ my @g_factors = (_is_prob_prime($g, 1) ? Math::GMPz::Rmpz_init_set($g) : __SUB__->(Math::GMPz::Rmpz_init_set($g)));
+                    #~ my @t_factors = (_is_prob_prime($t, 1) ? Math::GMPz::Rmpz_init_set($t) : __SUB__->(Math::GMPz::Rmpz_init_set($t)));
+
+                    #~ return (@g_factors, @t_factors);
                 }
 
                 Math::GMPz::Rmpz_powm_ui($x, $x, 2, $n);
             }
+        }
+
+        if (@all_factors) {
+            return map { $$_ } @{((bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([map { bless \$_ } @all_factors])))};
         }
 
         my @holf_factors = Math::Prime::Util::GMP::holf_factor(Math::GMPz::Rmpz_get_str($n, 10), 10_000);
@@ -23293,37 +23323,40 @@ package Sidef::Types::Number::Number {
             return _factor(Math::GMPz::Rmpz_get_ui($n));
         }
 
+        if (_is_prob_prime($n, 1)) {
+            return ($n);
+        }
+
         if (!defined($j)) {
             my @factors = __SUB__->($n, 1);
             @factors = map { _is_prob_prime($_, 1) ? $_ : __SUB__->($_, -1) } @factors;
             return @factors;
         }
 
-        my $D = Math::GMPz::Rmpz_init();    # n + j
+        state $npj = Math::GMPz::Rmpz_init_nobless();    # n + j
 
         ($j < 0)
-          ? Math::GMPz::Rmpz_sub_ui($D, $n, -$j)
-          : Math::GMPz::Rmpz_add_ui($D, $n, +$j);
+          ? Math::GMPz::Rmpz_sub_ui($npj, $n, -$j)
+          : Math::GMPz::Rmpz_add_ui($npj, $n, +$j);
 
-        my $s = Math::GMPz::Rmpz_scan1($D, 0) || return ($n);
-        my $r = $s;
+        my $s = Math::GMPz::Rmpz_scan1($npj, 0) || return ($n);
 
-        my $d = Math::GMPz::Rmpz_init();    # D >> s
-        Math::GMPz::Rmpz_div_2exp($d, $D, $s);
-        $d = Math::GMPz::Rmpz_get_str($d, 10);
+        Math::GMPz::Rmpz_div_2exp($npj, $npj, $s);       # (n+j) >> s
+        my $dstr = Math::GMPz::Rmpz_get_str($npj, 10);
 
         $tries //= 1 + CORE::int(100 / $s);
 
-        my $x = Math::GMPz::Rmpz_init();
-        my $g = Math::GMPz::Rmpz_init();
-
         my $PQ_limit = $LUCAS_PQ_LIMIT;
 
-        if (Math::GMPz::Rmpz_cmp_ui($n, 1e6) <= 0) {
-            $PQ_limit = Math::GMPz::Rmpz_get_ui($n) - 1;
-        }
+        state $g = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init();
+        state $N = Math::GMPz::Rmpz_init();
 
-        my $N = Math::GMPz::Rmpz_get_str($n, 10);
+        my @all_factors;
+
+        Math::GMPz::Rmpz_set($N, $n);
+
+        my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
 
         foreach my $i (1 .. $tries) {
 
@@ -23342,25 +23375,48 @@ package Sidef::Types::Number::Number {
                  );
 
             my ($U1, $V1, $Q1) =
-              map { Math::GMPz::Rmpz_init_set_str($_, 10) } Math::Prime::Util::GMP::lucas_sequence($N, $P, $Q, $d);
+              map { Math::GMPz::Rmpz_init_set_str($_, 10) } Math::Prime::Util::GMP::lucas_sequence($nstr, $P, $Q, $dstr);
 
-            for my $k (1 .. $r) {
+            for my $k (1 .. $s) {
 
-                foreach my $t ($U1, $V1, $P) {
-                    if (ref($t)) {
-                        Math::GMPz::Rmpz_gcd($g, $t, $n);
+                foreach my $x ($U1, $V1, $P) {
+
+                    if (ref($x)) {
+                        Math::GMPz::Rmpz_gcd($g, $x, $n);
                     }
                     else {
-                        Math::GMPz::Rmpz_sub_ui($g, $V1, $t);
+                        Math::GMPz::Rmpz_sub_ui($g, $V1, $x);
                         Math::GMPz::Rmpz_gcd($g, $g, $n);
                     }
+
                     if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
-                        Math::GMPz::Rmpz_divexact($x, $n, $g);
 
-                        my @g_factors = (_is_prob_prime($g, 1) ? $g : __SUB__->($g, $j));
-                        my @x_factors = (_is_prob_prime($x, 1) ? $x : __SUB__->($x, $j));
+                        Math::GMPz::Rmpz_gcd($t, $N, $g);
+                        if (_is_prob_prime($t, 1)) {
+                            Math::GMPz::Rmpz_divexact($N, $N, $t);
+                            push @all_factors, Math::GMPz::Rmpz_init_set($t);
+                        }
+                        elsif (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0) {
+                            Math::GMPz::Rmpz_divexact($t, $N, $t);
+                            if (_is_prob_prime($t, 1)) {
+                                Math::GMPz::Rmpz_divexact($N, $N, $t);
+                                push @all_factors, Math::GMPz::Rmpz_init_set($t);
+                            }
+                        }
 
-                        return (@g_factors, @x_factors);
+                        push @all_factors, Math::GMPz::Rmpz_init_set($g);
+
+                        if (scalar(@all_factors) >= 5 or Math::GMPz::Rmpz_cmp_ui($N, 1) == 0 or _is_prob_prime($N, 1)) {
+                            return map { $$_ } @{((bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([map { bless \$_ } @all_factors])))};
+                        }
+
+                        # Recursive approach
+                        #~ Math::GMPz::Rmpz_divexact($t, $n, $g);
+
+                        #~ my @g_factors = (_is_prob_prime($g, 1) ? Math::GMPz::Rmpz_init_set($g) : __SUB__->(Math::GMPz::Rmpz_init_set($g)));
+                        #~ my @t_factors = (_is_prob_prime($t, 1) ? Math::GMPz::Rmpz_init_set($t) : __SUB__->(Math::GMPz::Rmpz_init_set($t)));
+
+                        #~ return (@g_factors, @t_factors);
                     }
                 }
 
@@ -23372,7 +23428,11 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my @holf_factors = Math::Prime::Util::GMP::holf_factor($N, 10_000);
+        if (@all_factors) {
+            return map { $$_ } @{((bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([map { bless \$_ } @all_factors])))};
+        }
+
+        my @holf_factors = Math::Prime::Util::GMP::holf_factor($nstr, 10_000);
 
         if (scalar(@holf_factors) > 1) {
             return (
@@ -30396,6 +30456,62 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        my $check_conditions = sub {
+
+            my %seen;
+            foreach my $p (@_) {
+
+                if ($seen{$p}++) {    # not squarefree
+                    return;
+                }
+
+                # Check the Korselt criterion: p-1 | n-1, for each prime p|n.
+                if (ref($p) eq 'Math::GMPz') {
+                    Math::GMPz::Rmpz_sub_ui($pm1, $p, 1);
+                    Math::GMPz::Rmpz_divisible_p($nm1, $pm1) || return;
+                }
+                elsif ($p < ULONG_MAX) {
+                    Math::GMPz::Rmpz_divisible_ui_p($nm1, $p - 1) || return;
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($pm1, "$p", 10);
+                    Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
+                    Math::GMPz::Rmpz_divisible_p($nm1, $pm1) || return;
+                }
+            }
+
+            return 1;
+        };
+
+        my $omega              = 0;
+        my $remainder          = $n;
+        my $did_trial_division = 0;
+
+        # Do first a little bit of trial division for large enough n.
+        if (Math::GMPz::Rmpz_sizeinbase($remainder, 10) >= 200) {
+
+            my ($r, @factors) = _adaptive_trial_factor($remainder, 3, 1e5, 1e6);
+
+            $did_trial_division = 1;
+
+            if (@factors) {
+
+                $check_conditions->(@factors)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+
+                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+                elsif (Math::GMPz::Rmpz_sizeinbase($r, 2) <= SMALL_NUMBER_MAX_BITS) {
+                    $check_conditions->(_factor($r)) || return Sidef::Types::Bool::Bool::FALSE;
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+
+                $omega += scalar(@factors);
+                $remainder = $r;
+            }
+        }
+
         # Check: p^(n-1) == 1 (mod n), for random primes p
         foreach my $k (1 .. 7) {
             my $p = _random_prime(CORE::int(CORE::sqrt(ULONG_MAX)));
@@ -30421,35 +30537,9 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($pm1, 1) == 0
           or return Sidef::Types::Bool::Bool::FALSE;
 
-        my $check_conditions = sub {
+        if (!$did_trial_division and !Math::GMPz::Rmpz_fits_ulong_p($remainder)) {
 
-            my %seen;
-            foreach my $p (@_) {
-
-                if ($seen{$p}++) {    # not squarefree
-                    return;
-                }
-
-                # Check the Korselt criterion: p-1 | n-1, for each prime p|n.
-                if ($p < ULONG_MAX) {
-                    Math::GMPz::Rmpz_divisible_ui_p($nm1, $p - 1) || return;
-                }
-                else {
-                    Math::GMPz::Rmpz_set_str($pm1, $p, 10);
-                    Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
-                    Math::GMPz::Rmpz_divisible_p($nm1, $pm1) || return;
-                }
-            }
-
-            return 1;
-        };
-
-        my $omega     = 0;
-        my $remainder = $n;
-
-        if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
-
-            my ($r, @factors) = _adaptive_trial_factor($n);
+            my ($r, @factors) = _adaptive_trial_factor($remainder, 3, 1e5, 1e6);
 
             if (@factors) {
 
@@ -30459,16 +30549,20 @@ package Sidef::Types::Number::Number {
                 if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
                     return Sidef::Types::Bool::Bool::TRUE;
                 }
+                elsif (Math::GMPz::Rmpz_fits_ulong_p($r)) {
+                    $check_conditions->(_factor(Math::GMPz::Rmpz_get_ui($r))) || return Sidef::Types::Bool::Bool::FALSE;
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
 
                 $omega += scalar(@factors);
                 $remainder = $r;
             }
         }
 
-        my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($remainder);
+        my @factors = _miller_factor($n);
 
         if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > SPECIAL_FACTORS_MIN) {
-            @factors = map { $$_ } @{_set_int($remainder)->special_factors};
+            @factors = map { $$_ } @{_set_int($n)->special_factors};
         }
 
         if (scalar(@factors) > 1) {
@@ -30498,7 +30592,10 @@ package Sidef::Types::Number::Number {
             @factors = @composites;
         }
 
-        @factors = map { _factor($_) } @factors;
+        @factors =
+          map { _is_prob_prime($_, 1) ? $_ : _factor($_) }
+          map { _is_prob_prime($_, 1) ? $_ : _lucas_factor(_any2mpz($_), -1, CORE::length("$_")) }
+          map { _is_prob_prime($_, 1) ? $_ : _miller_factor(_any2mpz($_), 4 * CORE::length("$_")) } @factors;
 
         $omega += scalar(@factors);
 
@@ -30643,7 +30740,11 @@ package Sidef::Types::Number::Number {
                 }
 
                 # Check the Lucas-Korselt criterion: p+1 | n+1, for each prime p|n.
-                if ($p < ULONG_MAX) {
+                if (ref($p) eq 'Math::GMPz') {
+                    Math::GMPz::Rmpz_add_ui($pp1, $p, 1);
+                    Math::GMPz::Rmpz_divisible_p($np1, $pp1) || return;
+                }
+                elsif ($p < ULONG_MAX) {
                     Math::GMPz::Rmpz_divisible_ui_p($np1, $p + 1) || return;
                 }
                 else {
@@ -30659,9 +30760,9 @@ package Sidef::Types::Number::Number {
         my $omega     = 0;
         my $remainder = $n;
 
-        if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
+        if (!Math::GMPz::Rmpz_fits_ulong_p($remainder)) {
 
-            my ($r, @factors) = _adaptive_trial_factor($n);
+            my ($r, @factors) = _adaptive_trial_factor($remainder, 3, 1e5, 1e6);
 
             if (@factors) {
 
@@ -30671,16 +30772,24 @@ package Sidef::Types::Number::Number {
                 if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
                     return Sidef::Types::Bool::Bool::TRUE;
                 }
+                elsif (Math::GMPz::Rmpz_sizeinbase($r, 2) <= SMALL_NUMBER_MAX_BITS) {
+                    $check_conditions->(_factor($r)) || return Sidef::Types::Bool::Bool::FALSE;
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
 
                 $omega += scalar(@factors);
                 $remainder = $r;
             }
         }
 
-        my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _lucas_factor($remainder);
+        my @factors = _lucas_factor($remainder);
+
+        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 2) > MEDIUM_NUMBER_MAX_BITS) {
+            @factors = _lucas_factor($n);
+        }
 
         if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > SPECIAL_FACTORS_MIN) {
-            @factors = map { $$_ } @{_set_int($remainder)->special_factors};
+            @factors = map { $$_ } @{_set_int($n)->special_factors};
         }
 
         if (scalar(@factors) > 1) {
@@ -30710,7 +30819,9 @@ package Sidef::Types::Number::Number {
             @factors = @composites;
         }
 
-        @factors = map { _factor($_) } @factors;
+        @factors =
+          map { _is_prob_prime($_, 1) ? $_ : _factor($_) }
+          map { _is_prob_prime($_, 1) ? $_ : _lucas_factor(_any2mpz($_), undef, CORE::length("$_")) } @factors;
 
         $omega += scalar(@factors);
 
@@ -30763,10 +30874,60 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        # Must also be an Euler pseudoprime to base 2
-        if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            Math::Prime::Util::GMP::is_euler_pseudoprime(Math::GMPz::Rmpz_get_str($n, 10), 2)
-              || return Sidef::Types::Bool::Bool::FALSE;
+        my $check_conditions = sub {
+
+            my %seen;
+            foreach my $p (@_) {
+
+                if ($seen{$p}++) {    # not squarefree
+                    return;
+                }
+
+                # Check the criterion for absolute Euler pseudoprimes: p-1 | (n-1)/2, for each prime p|n.
+                if (ref($p) eq 'Math::GMPz') {
+                    Math::GMPz::Rmpz_sub_ui($pm1, $p, 1);
+                    Math::GMPz::Rmpz_divisible_p($nm1d2, $pm1) || return;
+                }
+                elsif ($p < ULONG_MAX) {
+                    Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p - 1) || return;
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($pm1, "$p", 10);
+                    Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
+                    Math::GMPz::Rmpz_divisible_p($nm1d2, $pm1) || return;
+                }
+            }
+
+            return 1;
+        };
+
+        my $omega              = 0;
+        my $remainder          = $n;
+        my $did_trial_division = 0;
+
+        # Do first a little bit of trial division for large enough n.
+        if (Math::GMPz::Rmpz_sizeinbase($remainder, 10) >= 200) {
+
+            my ($r, @factors) = _adaptive_trial_factor($remainder, 3, 1e5, 1e6);
+
+            $did_trial_division = 1;
+
+            if (@factors) {
+
+                $check_conditions->(@factors)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+
+                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+                elsif (Math::GMPz::Rmpz_sizeinbase($r, 2) <= SMALL_NUMBER_MAX_BITS) {
+                    $check_conditions->(_factor($r)) || return Sidef::Types::Bool::Bool::FALSE;
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
+
+                $omega += scalar(@factors);
+                $remainder = $r;
+            }
         }
 
         # Check: p^((n-1)/2) == +/-1 (mod n), for random primes p
@@ -30790,35 +30951,15 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my $check_conditions = sub {
-
-            my %seen;
-            foreach my $p (@_) {
-
-                if ($seen{$p}++) {    # not squarefree
-                    return;
-                }
-
-                # Check the criterion for absolute Euler pseudoprimes: p-1 | (n-1)/2, for each prime p|n.
-                if ($p < ULONG_MAX) {
-                    Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p - 1) || return;
-                }
-                else {
-                    Math::GMPz::Rmpz_set_str($pm1, $p, 10);
-                    Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
-                    Math::GMPz::Rmpz_divisible_p($nm1d2, $pm1) || return;
-                }
-            }
-
-            return 1;
-        };
-
-        my $omega     = 0;
-        my $remainder = $n;
-
+        # Must also be an Euler pseudoprime to base 2
         if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            Math::Prime::Util::GMP::is_euler_pseudoprime(Math::GMPz::Rmpz_get_str($n, 10), 2)
+              || return Sidef::Types::Bool::Bool::FALSE;
+        }
 
-            my ($r, @factors) = _adaptive_trial_factor($n);
+        if (!$did_trial_division and !Math::GMPz::Rmpz_fits_ulong_p($remainder)) {
+
+            my ($r, @factors) = _adaptive_trial_factor($remainder, 3, 1e5, 1e6);
 
             if (@factors) {
 
@@ -30828,16 +30969,20 @@ package Sidef::Types::Number::Number {
                 if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
                     return Sidef::Types::Bool::Bool::TRUE;
                 }
+                elsif (Math::GMPz::Rmpz_fits_ulong_p($r)) {
+                    $check_conditions->(_factor(Math::GMPz::Rmpz_get_ui($r))) || return Sidef::Types::Bool::Bool::FALSE;
+                    return Sidef::Types::Bool::Bool::TRUE;
+                }
 
                 $omega += scalar(@factors);
                 $remainder = $r;
             }
         }
 
-        my @factors = map { ref($_) ? Math::GMPz::Rmpz_get_str($_, 10) : $_ } _miller_factor($remainder);
+        my @factors = _miller_factor($n);
 
         if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > SPECIAL_FACTORS_MIN) {
-            @factors = map { $$_ } @{_set_int($remainder)->special_factors};
+            @factors = map { $$_ } @{_set_int($n)->special_factors};
         }
 
         if (scalar(@factors) > 1) {
@@ -30867,7 +31012,10 @@ package Sidef::Types::Number::Number {
             @factors = @composites;
         }
 
-        @factors = map { _factor($_) } @factors;
+        @factors =
+          map { _is_prob_prime($_, 1) ? $_ : _factor($_) }
+          map { _is_prob_prime($_, 1) ? $_ : _lucas_factor(_any2mpz($_), -1, CORE::length("$_")) }
+          map { _is_prob_prime($_, 1) ? $_ : _miller_factor(_any2mpz($_), 4 * CORE::length("$_")) } @factors;
 
         $omega += scalar(@factors);
 
