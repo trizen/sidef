@@ -30562,7 +30562,7 @@ package Sidef::Types::Number::Number {
         my @factors = _miller_factor($n);
 
         if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > SPECIAL_FACTORS_MIN) {
-            @factors = map { $$_ } @{_set_int($n)->special_factors};
+            @factors = map { $$_ } @{_set_int($remainder)->special_factors};
         }
 
         if (scalar(@factors) > 1) {
@@ -30772,8 +30772,8 @@ package Sidef::Types::Number::Number {
                 if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
                     return Sidef::Types::Bool::Bool::TRUE;
                 }
-                elsif (Math::GMPz::Rmpz_sizeinbase($r, 2) <= SMALL_NUMBER_MAX_BITS) {
-                    $check_conditions->(_factor($r)) || return Sidef::Types::Bool::Bool::FALSE;
+                elsif (Math::GMPz::Rmpz_fits_ulong_p($r)) {
+                    $check_conditions->(_factor(Math::GMPz::Rmpz_get_ui($r))) || return Sidef::Types::Bool::Bool::FALSE;
                     return Sidef::Types::Bool::Bool::TRUE;
                 }
 
@@ -30784,12 +30784,8 @@ package Sidef::Types::Number::Number {
 
         my @factors = _lucas_factor($remainder);
 
-        if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 2) > MEDIUM_NUMBER_MAX_BITS) {
-            @factors = _lucas_factor($n);
-        }
-
         if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > SPECIAL_FACTORS_MIN) {
-            @factors = map { $$_ } @{_set_int($n)->special_factors};
+            @factors = map { $$_ } @{_set_int($remainder)->special_factors};
         }
 
         if (scalar(@factors) > 1) {
@@ -30982,7 +30978,7 @@ package Sidef::Types::Number::Number {
         my @factors = _miller_factor($n);
 
         if (scalar(@factors) == 1 and Math::GMPz::Rmpz_sizeinbase($remainder, 10) > SPECIAL_FACTORS_MIN) {
-            @factors = map { $$_ } @{_set_int($n)->special_factors};
+            @factors = map { $$_ } @{_set_int($remainder)->special_factors};
         }
 
         if (scalar(@factors) > 1) {
