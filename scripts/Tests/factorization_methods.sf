@@ -4,6 +4,7 @@
 
 # Timings:
 #   07 March 2023: 1.136s (with MPU)
+#   13 November 2023: 1.516s (with MPU) (after adding more tests)
 
 do {
     {|n| assert_eq(mbe_factor(n).prod, n||1) }.each(0..30)
@@ -114,6 +115,11 @@ do {
         verify_factors(lucas_factor(n), n)
         verify_factors(lucas_factor(n, -1), n)
         verify_factors(lucas_factor(n, +1), n)
+    }
+
+    with (12810195243021764561861712454144132816027333806396076328657799091081731188973323792862969472203379046137906472535989245982808404394090155128185793637753278955521) {|n|
+        verify_factors(miller_factor(n), n)
+        verify_factors(lucas_factor(n), n)
     }
 }
 

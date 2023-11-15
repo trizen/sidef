@@ -954,12 +954,10 @@ package Sidef::Types::Number::Number {
         my ($n, $cache) = @_;
 
         if (ref($n) eq 'Math::GMPz') {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                $n = Math::GMPz::Rmpz_get_ui($n);
-            }
-            else {
-                $n = Math::GMPz::Rmpz_get_str($n, 10);
-            }
+            $n =
+                Math::GMPz::Rmpz_fits_ulong_p($n)
+              ? Math::GMPz::Rmpz_get_ui($n)
+              : Math::GMPz::Rmpz_get_str($n, 10);
         }
 
         state %internal_cache;
@@ -23246,21 +23244,24 @@ package Sidef::Types::Number::Number {
                 if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
 
                     Math::GMPz::Rmpz_gcd($t, $N, $g);
-                    if (_is_prob_prime($t, 1)) {
-                        Math::GMPz::Rmpz_divexact($N, $N, $t);
-                        push @all_factors, Math::GMPz::Rmpz_init_set($t);
-                    }
-                    elsif (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0) {
-                        Math::GMPz::Rmpz_divexact($t, $N, $t);
+
+                    if (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0 and Math::GMPz::Rmpz_cmp($t, $N) < 0) {
                         if (_is_prob_prime($t, 1)) {
-                            Math::GMPz::Rmpz_divexact($N, $N, $t);
+                            Math::GMPz::Rmpz_remove($N, $N, $t);
                             push @all_factors, Math::GMPz::Rmpz_init_set($t);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_divexact($t, $N, $t);
+                            if (_is_prob_prime($t, 1)) {
+                                Math::GMPz::Rmpz_remove($N, $N, $t);
+                                push @all_factors, Math::GMPz::Rmpz_init_set($t);
+                            }
                         }
                     }
 
                     push @all_factors, Math::GMPz::Rmpz_init_set($g);
 
-                    if (scalar(@all_factors) >= 10 or Math::GMPz::Rmpz_cmp_ui($N, 1) == 0 or _is_prob_prime($N, 1)) {
+                    if (scalar(@all_factors) >= 10 or Math::GMPz::Rmpz_fits_ulong_p($N) or _is_prob_prime(Math::GMPz::Rmpz_get_str($N, 10), 1)) {
                         return map { $$_ } @{((bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([map { bless \$_ } @all_factors])))};
                     }
 
@@ -23392,21 +23393,24 @@ package Sidef::Types::Number::Number {
                     if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
 
                         Math::GMPz::Rmpz_gcd($t, $N, $g);
-                        if (_is_prob_prime($t, 1)) {
-                            Math::GMPz::Rmpz_divexact($N, $N, $t);
-                            push @all_factors, Math::GMPz::Rmpz_init_set($t);
-                        }
-                        elsif (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0) {
-                            Math::GMPz::Rmpz_divexact($t, $N, $t);
+
+                        if (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0 and Math::GMPz::Rmpz_cmp($t, $N) < 0) {
                             if (_is_prob_prime($t, 1)) {
-                                Math::GMPz::Rmpz_divexact($N, $N, $t);
+                                Math::GMPz::Rmpz_remove($N, $N, $t);
                                 push @all_factors, Math::GMPz::Rmpz_init_set($t);
+                            }
+                            else {
+                                Math::GMPz::Rmpz_divexact($t, $N, $t);
+                                if (_is_prob_prime($t, 1)) {
+                                    Math::GMPz::Rmpz_remove($N, $N, $t);
+                                    push @all_factors, Math::GMPz::Rmpz_init_set($t);
+                                }
                             }
                         }
 
                         push @all_factors, Math::GMPz::Rmpz_init_set($g);
 
-                        if (scalar(@all_factors) >= 5 or Math::GMPz::Rmpz_cmp_ui($N, 1) == 0 or _is_prob_prime($N, 1)) {
+                        if (scalar(@all_factors) >= 5 or Math::GMPz::Rmpz_fits_ulong_p($N) or _is_prob_prime(Math::GMPz::Rmpz_get_str($N, 10), 1)) {
                             return map { $$_ } @{((bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([map { bless \$_ } @all_factors])))};
                         }
 
@@ -28503,7 +28507,7 @@ package Sidef::Types::Number::Number {
                     $A = Math::Prime::Util::vecmax($A, $m);
 
                     if ($carmichael) {
-                        $max_p = (1 + Math::Prime::Util::sqrtint(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint(8, $B), 1))) >> 2;
+                        $max_p = (1 + Math::Prime::Util::GMP::sqrtint(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint(8, $B), 1))) >> 2;
                     }
                     elsif ($lucas_carmichael) {
                         $max_p = Math::Prime::Util::sqrtint($B);
