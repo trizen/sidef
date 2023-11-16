@@ -9103,23 +9103,33 @@ package Sidef::Types::Number::Number {
     sub factorial_power {
         my ($n, $p) = @_;
 
+        # Formula:
+        #   (n - sumdigits(n,p)) / (p-1)
+
         _valid(\$p);
 
-        my $sum = $n->sumdigits($p) // return undef;
+        $n = $$n;
+        $p = $$p;
 
-        $n = _any2mpz($$n) // return undef;
-        $p = _any2mpz($$p) // return undef;
+        if (!ref($n) and !ref($p) and $p < 2147483647 and $n > 0 and $p > 1) {
 
-        my $r = Math::GMPz::Rmpz_init();
-        my $t = Math::GMPz::Rmpz_init();
+            my $sum = (
+                       HAS_PRIME_UTIL
+                       ? List::Util::sum(Math::Prime::Util::todigits($n, $p))
+                       : List::Util::sum(Math::Prime::Util::GMP::todigits($n, $p))
+                      );
 
-        Math::GMPz::Rmpz_sub_ui($t, $p, 1);               # t = p-1
-        Math::GMPz::Rmpz_sub($r, $n, _any2mpz($$sum));    # r = n-sum
-        Math::GMPz::Rmpz_divexact($r, $r, $t);            # r = r/t
+            my $r = (
+                     HAS_NEW_PRIME_UTIL
+                     ? Math::Prime::Util::divint($n - $sum, $p - 1)
+                     : Math::Prime::Util::GMP::divint($n - $sum, $p - 1)
+                    );
 
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
+            return bless \$r;
+        }
 
-        bless \$r;
+        my $sum = ${$_[0]->sumdigits($_[1]) // return undef};
+        bless \__div__(__sub__($n, $sum), __dec__($p));
     }
 
     *factorial_valuation = \&factorial_power;

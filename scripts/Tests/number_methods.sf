@@ -33,6 +33,12 @@ assert(2**128 + 1 -> is_div(59649589127497215) -> not)
 assert(2**128 + 1 -> is_div(5704689200685129054721))
 assert(2**128 + 1 -> is_div(5704689200685129054723) -> not)
 
+assert_eq(factorial_valuation(3**25 + 1, 2), 847288609427)
+assert_eq(factorial_valuation(3**25 - 1, 3), 423644304696)
+assert_eq(factorial_valuation(3**25, 127), 6724512769)
+assert_eq(factorial_valuation(2**128 + 1, 2**64 + 1), 18446744073709551615)
+assert_eq(factorial_valuation(2**128 + 1, 43), 8101961117165201511032728748375433594)
+
 assert_eq(10.by{ .is_div(3) }, [0, 3, 6, 9, 12, 15, 18, 21, 24, 27])
 assert_eq({|v| 10.by{ v.is_div(_) } }(20.primorial), 20.primorial.divisors(14))
 assert_eq({|v| 10.by{ v.is_div(_) } }(100.primorial), 100.primorial.divisors(14))
