@@ -2804,11 +2804,7 @@ package Sidef::Types::Number::Number {
         #
       Scalar__Scalar: {
             if ($y != 0 and $x % $y == 0) {
-                my $r = (
-                         HAS_NEW_PRIME_UTIL
-                         ? Math::Prime::Util::divint($x, $y)
-                         : Math::Prime::Util::GMP::divint($x, $y)
-                        );
+                my $r = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($x, $y) : Math::Prime::Util::GMP::divint($x, $y));
                 if ($r < ULONG_MAX and $r > LONG_MIN) {
                     return $r;
                 }
@@ -3243,8 +3239,8 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $m = $$m;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
-            my $r = Math::Prime::Util::submod($x, $y, $m);
+        if ((HAS_NEW_PRIME_UTIL || HAS_NEW_PRIME_UTIL_GMP) and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
+            my $r = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::submod($x, $y, $m) : Math::Prime::Util::GMP::submod($x, $y, $m));
             return bless \$r;
         }
 
@@ -17819,8 +17815,8 @@ package Sidef::Types::Number::Number {
         my $s;
 
         if (!ref($x)) {
-            if (HAS_PRIME_UTIL and !ref($y)) {
-                $s = Math::Prime::Util::kronecker($x, $y);
+            if (!ref($y)) {
+                $s = (HAS_PRIME_UTIL ? Math::Prime::Util::kronecker($x, $y) : Math::Prime::Util::GMP::kronecker($x, $y));
             }
             elsif ($x >= 0) {
                 $s = Math::GMPz::Rmpz_ui_kronecker($x, _any2mpz($y) // (goto &nan));
@@ -19455,9 +19451,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_prime($n)
+                    ($n > 1 and (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($n) : Math::Prime::Util::GMP::is_prime($n)))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -20025,9 +20021,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_prob_prime($n)
+                    ($n > 1 and (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($n) : Math::Prime::Util::GMP::is_prime($n)))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -20046,9 +20042,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_prime($n)
+                    ($n > 1 and (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($n) : Math::Prime::Util::GMP::is_prime($n)))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -20089,9 +20085,8 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         if (!ref($n)) {
-            $n > 3 or return Sidef::Types::Bool::Bool::FALSE;
             return (
-                    (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($n) : Math::Prime::Util::GMP::is_prob_prime($n))
+                    ($n <= 3 or (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($n) : Math::Prime::Util::GMP::is_prime($n)))
                     ? Sidef::Types::Bool::Bool::FALSE
                     : Sidef::Types::Bool::Bool::TRUE
                    );
@@ -20099,9 +20094,6 @@ package Sidef::Types::Number::Number {
 
         (_primality_pretest($n) // return Sidef::Types::Bool::Bool::FALSE)
           || return Sidef::Types::Bool::Bool::TRUE;
-
-        $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
-        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0 or return Sidef::Types::Bool::Bool::FALSE;
 
         _is_prob_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::FALSE
@@ -20417,10 +20409,15 @@ package Sidef::Types::Number::Number {
             @bases = (2);
         }
 
-        if (HAS_PRIME_UTIL and !ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
+        if (!ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
             return (
-                    ($n > 1 and Math::Prime::Util::is_euler_pseudoprime($n, $bases[0]))
-                    ? Sidef::Types::Bool::Bool::TRUE
+                    (
+                     $n > 1
+                       and (
+                            HAS_PRIME_UTIL ? Math::Prime::Util::is_euler_pseudoprime($n, $bases[0])
+                            : Math::Prime::Util::GMP::is_euler_pseudoprime($n, $bases[0])
+                           )
+                    ) ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
@@ -20472,10 +20469,15 @@ package Sidef::Types::Number::Number {
             @bases = (2);
         }
 
-        if (HAS_PRIME_UTIL and !ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
+        if (!ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
             return (
-                    ($n > 1 and Math::Prime::Util::is_strong_pseudoprime($n, $bases[0]))
-                    ? Sidef::Types::Bool::Bool::TRUE
+                    (
+                     $n > 1
+                       and (
+                            HAS_PRIME_UTIL ? Math::Prime::Util::is_strong_pseudoprime($n, $bases[0])
+                            : Math::Prime::Util::GMP::is_strong_pseudoprime($n, $bases[0])
+                           )
+                    ) ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
@@ -20989,9 +20991,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_lucas_pseudoprime($n)
+                    ($n > 1 and (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::is_lucas_pseudoprime($n) : Math::Prime::Util::GMP::is_lucas_pseudoprime($n)))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -21013,12 +21015,12 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_strong_lucas_pseudoprime($n)
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
+                ($n > 1 and (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::is_strong_lucas_pseudoprime($n) : Math::Prime::Util::GMP::is_strong_lucas_pseudoprime($n)))
+                ? Sidef::Types::Bool::Bool::TRUE
+                : Sidef::Types::Bool::Bool::FALSE
+            );
         }
 
         __is_int__($n)
@@ -21037,10 +21039,15 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_extra_strong_lucas_pseudoprime($n)
-                    ? Sidef::Types::Bool::Bool::TRUE
+                    (
+                     $n > 1
+                       and (
+                            HAS_NEW_PRIME_UTIL ? Math::Prime::Util::is_extra_strong_lucas_pseudoprime($n)
+                            : Math::Prime::Util::GMP::is_extra_strong_lucas_pseudoprime($n)
+                           )
+                    ) ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
@@ -21062,10 +21069,15 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_almost_extra_strong_lucas_pseudoprime($n)
-                    ? Sidef::Types::Bool::Bool::TRUE
+                    (
+                     $n > 1
+                       and (
+                            HAS_NEW_PRIME_UTIL ? Math::Prime::Util::is_almost_extra_strong_lucas_pseudoprime($n)
+                            : Math::Prime::Util::GMP::is_almost_extra_strong_lucas_pseudoprime($n)
+                           )
+                    ) ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
@@ -21084,9 +21096,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_euler_plumb_pseudoprime($n)
+                    ($n > 1 and (HAS_PRIME_UTIL ? Math::Prime::Util::is_euler_plumb_pseudoprime($n) : Math::Prime::Util::GMP::is_euler_plumb_pseudoprime($n)))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -21109,9 +21121,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_perrin_pseudoprime($n)
+                    ($n > 1 and (HAS_PRIME_UTIL ? Math::Prime::Util::is_perrin_pseudoprime($n) : Math::Prime::Util::GMP::is_perrin_pseudoprime($n)))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -21150,10 +21162,15 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_frobenius_underwood_pseudoprime($n)
-                    ? Sidef::Types::Bool::Bool::TRUE
+                    (
+                     $n > 1
+                       and (
+                            HAS_PRIME_UTIL ? Math::Prime::Util::is_frobenius_underwood_pseudoprime($n)
+                            : Math::Prime::Util::GMP::is_frobenius_underwood_pseudoprime($n)
+                           )
+                    ) ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
@@ -21175,10 +21192,15 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_frobenius_khashin_pseudoprime($n)
-                    ? Sidef::Types::Bool::Bool::TRUE
+                    (
+                     $n > 1
+                       and (
+                            HAS_PRIME_UTIL ? Math::Prime::Util::is_frobenius_khashin_pseudoprime($n)
+                            : Math::Prime::Util::GMP::is_frobenius_khashin_pseudoprime($n)
+                           )
+                    ) ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
         }
@@ -26008,8 +26030,8 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n) and $n >= 0) {
-            my $r = Math::Prime::Util::carmichael_lambda($n);
+        if (!ref($n) and $n >= 0) {
+            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::carmichael_lambda($n) : Math::Prime::Util::GMP::carmichael_lambda($n));
             return bless \$r;
         }
 
@@ -26040,8 +26062,8 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n) and $n > 0) {
-            my $r = Math::Prime::Util::liouville($n);
+        if (!ref($n) and $n > 0) {
+            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::liouville($n) : Math::Prime::Util::GMP::liouville($n));
             return bless \$r;
         }
 
@@ -30174,9 +30196,9 @@ package Sidef::Types::Number::Number {
                    );
         }
 
-        if (HAS_PRIME_UTIL and $k == 2 and !ref($n)) {
+        if ($k == 2 and !ref($n)) {
             return (
-                    ($n > 0 and Math::Prime::Util::is_square_free($n))
+                    ($n > 0 and (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($n) : Math::Prime::Util::GMP::moebius($n)))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -32219,9 +32241,9 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
+        if (!ref($n)) {
             return (
-                    Math::Prime::Util::is_prime_power($n)
+                    ($n > 1 and (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($n) : Math::Prime::Util::GMP::is_prime_power($n)))
                     ? Sidef::Types::Bool::Bool::TRUE
                     : Sidef::Types::Bool::Bool::FALSE
                    );
@@ -32515,10 +32537,10 @@ package Sidef::Types::Number::Number {
         $n = $$n;
         $k = $$k;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($n) and !ref($k)) {
+        if (!ref($n) and !ref($k)) {
             my $t = $n * ($n * $k - $k - 2 * $n + 4);
             if ($t < ULONG_MAX and $t > LONG_MIN) {
-                return _set_int(Math::Prime::Util::divint($t, 2));
+                return _set_int(HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($t, 2) : Math::Prime::Util::GMP::divint($t, 2));
             }
         }
 
