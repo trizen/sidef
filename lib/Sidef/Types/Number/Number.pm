@@ -694,6 +694,8 @@ package Sidef::Types::Number::Number {
     sub _any2mpz {
         my ($x) = @_;
 
+        # TODO: find a way to reuse old mpz objects, instead of creating new ones every time
+
         ref($x)
           || return (
                        ($x < ULONG_MAX and $x > LONG_MIN)
@@ -24401,7 +24403,15 @@ package Sidef::Types::Number::Number {
     sub divisors {
         my ($n, $k) = @_;
 
-        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new();
+        $n = $$n;
+
+        if (!ref($n) and !defined($k)) {
+            $n > 0 or return Sidef::Types::Array::Array->new();
+            return Sidef::Types::Array::Array->new(
+                                                 [map { bless \$_ } (HAS_PRIME_UTIL ? Math::Prime::Util::divisors($n) : Math::Prime::Util::GMP::divisors($n))]);
+        }
+
+        $n = _any2mpz($n) // return Sidef::Types::Array::Array->new();
         Math::GMPz::Rmpz_sgn($n) > 0 or return Sidef::Types::Array::Array->new();
 
         if (defined($k)) {
@@ -24512,6 +24522,38 @@ package Sidef::Types::Number::Number {
         }
 
         Sidef::Types::Array::Array->new([map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } _divisors($n)]);
+    }
+
+    sub antidivisors {
+        my ($n) = @_;
+
+        $n = $$n;
+
+        my @antidivisors;
+
+        foreach my $d (@{(bless \$n)->divisors}) {
+            my $y = __add__($$d, $$d);
+            if (__cmp__($n, $y) > 0 and __cmp__(__mod__($n, $y), 0) != 0) {
+                push @antidivisors, $y;
+            }
+        }
+
+        my $n2 = __add__($n, $n);
+
+        foreach my $d (@{(bless \__dec__($n2))->divisors}) {
+            if (__cmp__($n, $$d) > 0 and __cmp__($$d, 2) >= 0 and __cmp__(__mod__($n, $$d), 0) != 0) {
+                push @antidivisors, $$d;
+            }
+        }
+
+        foreach my $d (@{(bless \__inc__($n2))->divisors}) {
+            if (__cmp__($n, $$d) > 0 and __cmp__($$d, 2) >= 0 and __cmp__(__mod__($n, $$d), 0) != 0) {
+                push @antidivisors, $$d;
+            }
+        }
+
+        @antidivisors = sort { $a <=> $b } @antidivisors;
+        Sidef::Types::Array::Array->new([map { bless \$_ } @antidivisors]);
     }
 
     sub udivisors {
@@ -27344,6 +27386,25 @@ package Sidef::Types::Number::Number {
     }
 
     *σ = \&sigma;
+
+    sub antidivisor_count {
+        my ($n) = @_;
+
+        $n = $$n;
+
+        if (__cmp__($n, 2) <= 0) {
+            return ZERO;
+        }
+
+        my $n2 = __add__($n, $n);
+
+        my $w = (bless \__dec__($n2))->sigma0;
+        my $x = (bless \__inc__($n2))->sigma0;
+        my $y = (bless \$n)->sigma0;
+        my $z = (__cmp__(__mod__($n, 2), 0) == 0) ? ((bless \__div__($n, 2))->sigma0) : ZERO;
+
+        bless \__sub__(__sub__(__add__(__add__($$w, $$x), $$y), $$z), 5);
+    }
 
     sub aliquot {
         my ($n, $k) = @_;

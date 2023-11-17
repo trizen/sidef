@@ -819,6 +819,30 @@ Returns the sum of k-almost primes <= C<n>, or in the range C<a..b>.
 
 =cut
 
+=head2 antidivisor_count
+
+    antidivisor_count(n)
+
+Returns the number of antidivisors of C<n>.
+
+    say antidivisor_count(13)   #=> 4
+    say antidivisor_count(27)   #=> 5
+
+=cut
+
+=head2 antidivisors
+
+    antidivisors(n)
+
+Returns an array with the antidivisors of C<n> sorted from C<1..n>.
+
+Antidivisors of C<n> are numbers that do not divide C<n> by the largest possible margin.
+
+    say antidivisors(24)    #=> [7, 16]
+    say antidivisors(128)   #=> [3, 5, 15, 17, 51, 85]
+
+=cut
+
 =head2 approx_ge
 
     approx_ge(a, b)
