@@ -10,7 +10,10 @@ package Sidef::Types::Set::Bag {
     use overload
       q{bool} => sub { scalar(CORE::keys(%{$_[0]})) },
       q{0+}   => sub { scalar(CORE::keys(%{$_[0]})) },
-      q{""}   => \&_dump;
+      q{@{}}  => sub {
+        [map { ($_->{value}) x $_->{count} } CORE::values(%{$_[0]})]
+      },
+      q{""} => \&_dump;
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;

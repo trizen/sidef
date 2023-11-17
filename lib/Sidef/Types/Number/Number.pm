@@ -25500,23 +25500,16 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new;
         }
 
-#<<<
-        if (HAS_NEW_PRIME_UTIL) {     # XXX: MPU 0.73 leaks memory
-            return Sidef::Types::Array::Array->new([
-                map {
-                    ref($_) eq 'Math::GMPz'
-                        ? (bless \$_)
-                        : _set_int("$_")
-                } Math::Prime::Util::inverse_totient($n)
-            ]);
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {    # XXX: MPU 0.73 leaks memory
+            return Sidef::Types::Array::Array->new([map { bless \$_ } Math::Prime::Util::inverse_totient(Math::GMPz::Rmpz_get_ui($n))]);
         }
-#>>>
 
         my $result = _dynamic_preimage($n, _cook_euler_phi($n));
         Sidef::Types::Array::Array->new([map { bless \$_ } sort { $a <=> $b } @$result]);
     }
 
-    *inverse_phi = \&inverse_totient;
+    *inverse_phi       = \&inverse_totient;
+    *inverse_euler_phi = \&inverse_totient;
 
     sub inverse_totient_len {
         my ($n) = @_;
@@ -25540,7 +25533,8 @@ package Sidef::Types::Number::Number {
         _set_int($r);
     }
 
-    *inverse_phi_len = \&inverse_totient_len;
+    *inverse_phi_len       = \&inverse_totient_len;
+    *inverse_euler_phi_len = \&inverse_totient_len;
 
     sub inverse_euler_phi_min {
         my ($n) = @_;
@@ -25556,7 +25550,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
-    *inverse_phi_min = \&inverse_euler_phi_min;
+    *inverse_totient_min = \&inverse_euler_phi_min;
+    *inverse_phi_min     = \&inverse_euler_phi_min;
 
     sub inverse_euler_phi_max {
         my ($n) = @_;
@@ -25572,7 +25567,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
-    *inverse_phi_max = \&inverse_euler_phi_max;
+    *inverse_totient_max = \&inverse_euler_phi_max;
+    *inverse_phi_max     = \&inverse_euler_phi_max;
 
     sub _cook_dedekind_psi {
         my ($N, $k) = @_;

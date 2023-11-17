@@ -10,6 +10,7 @@ package Sidef::Types::Set::Set {
     use overload
       q{bool} => sub { scalar(CORE::keys(%{$_[0]})) },
       q{0+}   => sub { scalar(CORE::keys(%{$_[0]})) },
+      q{@{}}  => sub { [CORE::values(%{$_[0]})] },
       q{""}   => \&_dump;
 
     use Sidef::Types::Block::Block;
