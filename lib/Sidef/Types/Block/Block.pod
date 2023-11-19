@@ -250,6 +250,14 @@ Returns the
 
 =cut
 
+=head2 nest
+
+    block.nest(num, value)
+
+Returns the
+
+=cut
+
 =head2 new
 
     self.new

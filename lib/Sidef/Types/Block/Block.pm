@@ -389,6 +389,18 @@ package Sidef::Types::Block::Block {
         $num->times($block);
     }
 
+    sub nest {
+        my ($block, $num, $value) = @_;
+
+        $value //= Sidef::Types::Number::Number::ZERO;
+
+        foreach my $i (1 .. CORE::int($num)) {
+            $value = $block->run($value);
+        }
+
+        $value;
+    }
+
     sub exec {
         my ($self, @args) = @_;
         $self->run(@args);
