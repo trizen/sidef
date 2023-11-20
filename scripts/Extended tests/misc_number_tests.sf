@@ -346,6 +346,8 @@ for f in ([
     Num.method(:is_underwood_psp), Num.method(:is_over_psp),
     Num.method(:is_lucasU_psp), Num.method(:is_fib_psp),
     Num.method(:is_pell_lucas_psp), Num.method(:is_ecpp_prime),
+    Num.method(:miller_rabin_random), Num.method(:is_nminus1_prime),
+    Num.method(:is_nplus1_prime),
 ]) {
 
     if (Str(f{:calls}[0]{:method}) !~ /_psp\z/) {
@@ -368,6 +370,11 @@ for f in ([
     assert(f.call(77123077103005189615466924501))
     assert(f.call(3991617775553178702574451996736229))
     assert(f.call(273952953553395851092382714516720001799))
+
+    if (Str(f{:calls}[0]{:method}) =~ /is_n(?:minus|plus)1_prime\z/) {
+        next
+    }
+
     assert(f.call(531137992816767098689588206552468627329593117727031923199444138200403559860852242739162502265229285668889329486246501015346579337652707239409519978766587351943831270835393219031728127))
     assert(f.call(2**61 - 1))
     assert(f.call(2**89 - 1))
@@ -383,6 +390,7 @@ for f in ([
     Num.method(:is_strong_lucas_psp), Num.method(:is_stronger_lucas_psp),
     Num.method(:is_frobenius_psp), Num.method(:is_khashin_psp),
     Num.method(:is_underwood_psp), Num.method(:is_ecpp_prime),
+    Num.method(:is_nminus1_prime), Num.method(:is_nplus1_prime),
 ]) {
     assert(!f.call(2**601 - 1))
     assert(!f.call(2152302898747))
@@ -527,5 +535,24 @@ assert(partition_count(1001) == 25032297938763929621013218349796)
 assert(partition_count(2000) == 4720819175619413888601432406799959512200344166)
 assert(partition_count(10000) % 10**10 == 6916435144)
 assert(partition_count(100000) % 10**10 == 9421098519)
+
+assert_eq(prime_divisors(5040), %n[2, 3, 5, 7])
+assert_eq(prime_udivisors(5040), %n[5, 7])
+
+assert_eq(Math.seq(3, {.last.next_twin_prime}).first(10), %n[3, 5, 11, 17, 29, 41, 59, 71, 101, 107])
+assert_eq(30.of{.prime.znprimroot}, %n[0, 1, 2, 2, 3, 2, 2, 3, 2, 5, 2, 3, 2, 6, 3, 5, 2, 2, 2, 2, 7, 5, 3, 2, 3, 5, 2, 5, 2, 6])
+
+assert_eq(prime_root(13**17), 13)
+assert_eq(prime_root(5040), 5040)
+assert_eq(prime_root(43*97), 43*97)
+assert_eq(20.of{.prime_root}, %n[0, 1, 2, 3, 2, 5, 6, 7, 2, 3, 10, 11, 12, 13, 14, 15, 2, 17, 18, 19])
+
+assert_eq(prime_power(13**17), 17)
+assert_eq(prime_power(5040), 1)
+assert_eq(prime_power(43*97), 1)
+assert_eq(20.of{.prime_power}, %n[1, 1, 1, 1, 2, 1, 1, 1, 3, 2, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1])
+
+assert(is_frobenius_pseudoprime(97, 1, -1))
+assert(!is_frobenius_pseudoprime(341, 5, 5))
 
 say "** Test passed!"
