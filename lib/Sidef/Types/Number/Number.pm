@@ -906,6 +906,10 @@ package Sidef::Types::Number::Number {
     sub _big2uistr {
         my ($x) = @_;
 
+        if (!ref($x)) {
+            return (($x >= 0) ? $x : undef);
+        }
+
         $x = $$x if index(ref($x), 'Sidef::') == 0;
 
         if (!ref($x)) {
@@ -924,6 +928,10 @@ package Sidef::Types::Number::Number {
     # Big to positive integer-string
     sub _big2pistr {
         my ($x) = @_;
+
+        if (!ref($x)) {
+            return (($x > 0) ? $x : undef);
+        }
 
         $x = $$x if index(ref($x), 'Sidef::') == 0;
 
@@ -21345,23 +21353,53 @@ package Sidef::Types::Number::Number {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
-    sub is_mersenne_prime {
-        my ($n) = @_;
+    {
+        # Note: This list should be updated whenever new Mersenne primes are found.
+        # Refer: https://www.mersenne.org/
+        my %MERSENNE_PRIME_EXPONENTS;
+        @MERSENNE_PRIME_EXPONENTS{
+            (
+                2,        3,        5,        7,        13,       17,       19,       31,       61,       89,       107,      127,
+                521,      607,      1279,     2203,     2281,     3217,     4253,     4423,     9689,     9941,     11213,    19937,
+                21701,    23209,    44497,    86243,    110503,   132049,   216091,   756839,   859433,   1257787,  1398269,  2976221,
+                3021377,  6972593,  13466917, 20996011, 24036583, 25964951, 30402457, 32582657, 37156667, 42643801, 43112609, 57885161,
+                74207281, 77232917, 82589933
+            )
+        } = ();
 
-        $n = $$n;
+        sub is_mersenne_prime {
+            my ($n) = @_;
 
-        if (HAS_PRIME_UTIL and _fits_ulong($n)) {
-            return (
-                    Math::Prime::Util::is_mersenne_prime(_get_ulong($n))
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
+            $n = $$n;
+
+            if (ref($n)) {
+                __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+                $n = _big2pistr($n) // return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if (exists $MERSENNE_PRIME_EXPONENTS{$n}) {
+                return Sidef::Types::Bool::Bool::TRUE;
+            }
+
+            if ($n < 65_000_000 or !_is_prob_prime($n)) {
+
+                # According to GIMPS, verification was completed on September 19, 2023 for p less than 65 million.
+                # https://www.mersenne.org/report_milestones/
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+                return (
+                        Math::Prime::Util::is_mersenne_prime($n)
+                        ? Sidef::Types::Bool::Bool::TRUE
+                        : Sidef::Types::Bool::Bool::FALSE
+                       );
+            }
+
+            Math::Prime::Util::GMP::is_mersenne_prime($n)
+              ? Sidef::Types::Bool::Bool::TRUE
+              : Sidef::Types::Bool::Bool::FALSE;
         }
-
-        __is_int__($n)
-          && Math::Prime::Util::GMP::is_mersenne_prime(_big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub primes_each {

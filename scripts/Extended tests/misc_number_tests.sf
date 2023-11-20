@@ -519,4 +519,13 @@ assert(mobius_range(1050, 1100) == range(1050, 1100).map{.mobius})
 assert(mobius_range(0, 0) == %n[0])
 assert(mobius_range(1, 1) == %n[1])
 
+assert(13.of{.partition_count} == [1, 1, 2, 3, 5, 7, 11, 15, 22, 30, 42, 56, 77])
+assert(partition_count(100) == 190569292)
+assert(partition_count(200) == 3972999029388)
+assert(partition_count(1000) == 24061467864032622473692149727991)
+assert(partition_count(1001) == 25032297938763929621013218349796)
+assert(partition_count(2000) == 4720819175619413888601432406799959512200344166)
+assert(partition_count(10000) % 10**10 == 6916435144)
+assert(partition_count(100000) % 10**10 == 9421098519)
+
 say "** Test passed!"
