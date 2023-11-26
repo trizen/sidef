@@ -12421,6 +12421,52 @@ package Sidef::Types::Number::Number {
     *fib       = \&fibonacci;
     *Fibonacci = \&fibonacci;
 
+    sub pisano_period {
+        my ($n) = @_;
+
+        # Assumes that Wall-Sun-Sun primes do not exist.
+
+        $n = $$n;
+
+        if (ref($n)) {
+            $n = _any2mpz($n) // goto &nan;
+            Math::GMPz::Rmpz_sgn($n) <= 0 and return ZERO;
+            Math::GMPz::Rmpz_cmp_ui($n, 1) == 0 and return ONE;
+        }
+        else {
+            $n <= 0 and return ZERO;
+            $n == 1 and return ONE;
+        }
+
+        my $prime_power_period = sub {
+            my ($p, $e) = @_;
+            foreach my $d (_divisors(Math::Prime::Util::GMP::subint($p, Math::Prime::Util::GMP::kronecker(5, $p)))) {
+                if (_modular_lucas_U(1, -1, $d, $p) == 0) {
+                    $e == 1 and return $d;
+                    return Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::powint($p, $e - 1), $d);
+                }
+            }
+            die "Conjecture disproved for prime power: $p^$e";
+        };
+
+        my $d = _any2mpz(Math::Prime::Util::GMP::lcm(map { $prime_power_period->($_->[0], $_->[1]) } _factor_exp($n))) // goto &nan;
+
+        foreach my $k (0 .. 2) {
+
+            Math::GMPz::Rmpz_add_ui($d, $d, 1);
+
+            if (_modular_lucas_U(1, -1, $d, $n) == 1) {
+                Math::GMPz::Rmpz_sub_ui($d, $d, 1);
+                return bless \$d;
+            }
+
+            Math::GMPz::Rmpz_sub_ui($d, $d, 1);
+            Math::GMPz::Rmpz_mul_2exp($d, $d, 1);
+        }
+
+        die "Conjecture disproved for n = $n";
+    }
+
     sub motzkin {    # OEIS: A001006
         my ($n) = @_;
 

@@ -6792,6 +6792,17 @@ Aliases: I<almost_primepi>, I<pi_k>
 
 =cut
 
+=head2 pisano_period
+
+    pisano_period(n)
+
+Returns the n-th Pisano number: period of Fibonacci numbers mod C<n>.
+
+    say pisano_period(10!)          #=> 86400
+    say pisano_period(2**128 + 1)   #=> 28356863910078205764000346543980814080
+
+=cut
+
 =head2 pm1_factor
 
     n.pm1_factor
