@@ -7586,7 +7586,8 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and $x > 0) {
+        if (!ref($x)) {
+            $x == 0 and return Sidef::Types::Bool::Bool::FALSE;
             if (!ref($y)) {
                 return (
                           ($y % $x == 0)
@@ -7596,7 +7597,7 @@ package Sidef::Types::Number::Number {
             }
             elsif (ref($y) eq 'Math::GMPz') {
                 return (
-                          ($x > 0 and Math::GMPz::Rmpz_divisible_ui_p($y, $x))
+                        Math::GMPz::Rmpz_divisible_ui_p($y, CORE::abs($x))
                         ? (Sidef::Types::Bool::Bool::TRUE)
                         : (Sidef::Types::Bool::Bool::FALSE)
                        );
@@ -12792,6 +12793,38 @@ package Sidef::Types::Number::Number {
     }
 
     *quadratic_congruence = \&modular_quadratic_formula;
+
+    sub solve_quadratic_form {
+        my ($d, $n) = @_;
+        _valid(\$n);
+
+        my $D = $d->neg;
+
+        if ($D->kronecker($n)->is_mone && _is_prob_prime($$n)) {
+            return Sidef::Types::Array::Array->new;
+        }
+
+        my @solutions;
+
+        foreach my $x (@{$D->sqrtmod_all($n)}) {
+
+            my ($A, $B, $C) = ($n, $x, $n->isqrt);
+
+            while (__cmp__($$B, $$C) > 0) {
+                ($A, $B) = ($B, $A->mod($B));
+            }
+
+            my $t = $n->sub($B->sqr);
+
+            $d->divides($t) || next;
+            my $q = $t->idiv($d);
+            $q->is_square || next;
+
+            push @solutions, Sidef::Types::Array::Array->new([$B, $q->isqrt]);
+        }
+
+        return Sidef::Types::Array::Array->new(\@solutions)->uniq;
+    }
 
     sub geometric_sum {
         my ($n, $r) = @_;
@@ -18696,6 +18729,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *multiplicity = \&valuation;
+
     sub remove {
         my ($x, $y) = @_;
 
@@ -19548,18 +19583,23 @@ package Sidef::Types::Number::Number {
                 push @factors, @new_factors;
             }
 
-            if ($r < $reps * $reps) {
-                push @factors, _factor($r);
-                $r = 1;
-                last;
-            }
-
             foreach my $p (@new_factors) {
                 my $v = Math::Prime::Util::GMP::valuation($r, $p);
                 if ($v > 0) {
                     push @factors, ($p) x $v;
                     $r = Math::Prime::Util::GMP::divint($r, Math::Prime::Util::GMP::powint($p, $v));
                 }
+            }
+
+            if ($r < $reps * $reps) {
+                push @factors, _factor($r);
+                $r = 1;
+                last;
+            }
+            elsif ($reps >= 1e4 and _is_prob_prime($r, 1)) {
+                push @factors, $r;
+                $r = 1;
+                last;
             }
 
             @f or last;
@@ -19625,7 +19665,7 @@ package Sidef::Types::Number::Number {
                 # which is expected to find a factor `p` in `O(sqrt(p))` steps.
                 if (    $j <= 6
                     and $USE_CONJECTURES
-                    and Math::GMPz::Rmpz_sizeinbase($r, 2) > SMALL_NUMBER_MAX_BITS
+                    and Math::GMPz::Rmpz_sizeinbase($r, 10) >= SPECIAL_FACTORS_MIN
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) <= 500) {
                     my ($rem, @f) = _pollard_rho_factor($r, 2 * $trial_limit);
                     $trial_limit = Math::Prime::Util::GMP::mulint($trial_limit, $trial_limit);
@@ -19886,7 +19926,7 @@ package Sidef::Types::Number::Number {
                 # which is expected to find a factor `p` in `O(sqrt(p))` steps.
                 if (    $j <= 6
                     and $USE_CONJECTURES
-                    and Math::GMPz::Rmpz_sizeinbase($r, 2) > SMALL_NUMBER_MAX_BITS
+                    and Math::GMPz::Rmpz_sizeinbase($r, 10) >= SPECIAL_FACTORS_MIN
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) <= 500) {
                     my ($rem, @f) = _pollard_rho_factor($r, 2 * $trial_limit);
                     $trial_limit = Math::Prime::Util::GMP::mulint($trial_limit, $trial_limit);

@@ -10,6 +10,8 @@
 #   14 sep 2023: 2.575s (after removing a duplicated test)
 #   23 sep 2023: 3.391s (after adding two more tests)
 
+#~ Num!USE_CONJECTURES = true
+
 func A242786(n) {
     for (var p = 2; true; p.next_prime!) {
         var v = (p**n + 1)

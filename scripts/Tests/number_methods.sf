@@ -18,6 +18,39 @@ assert(irand(0, isqrt(2**128 - 1)).is_between(0, 2**64))
 assert_eq(isqrt(2**64 - 1).factor, factor(2**32 - 1))
 assert_eq(isqrt(2**128 - 1).factor, factor(2**64 - 1))
 
+assert(43 `divides` 4171)
+assert((-43) `divides` 4171)
+
+assert(41 `divides` 4171 -> not)
+assert((-41) `divides` 4171 -> not)
+
+assert(4171 `is_div` 43)
+assert(4171 `is_div` (-43))
+
+assert(4171 `is_div` 41 -> not)
+assert(4171 `is_div` (-41) -> not)
+
+assert((2**128 + 1)*43 `is_div` -43)
+assert((2**128 + 1)*43 `is_div` 43)
+
+assert((2**128 + 1)*43 `is_div` -41 -> not)
+assert((2**128 + 1)*43 `is_div` 41 -> not)
+
+assert(43 `divides` ((2**128 + 1)*43))
+assert((-43) `divides` ((2**128 + 1)*43))
+
+assert(43 `divides` ((2**128 + 1)*41) -> not)
+assert((-43) `divides` ((2**128 + 1)*41) -> not)
+
+assert((2**128 + 1) `is_div` 5704689200685129054721)
+assert((2**128 + 1) `is_div` (-5704689200685129054721))
+
+assert((2**128 + 1) `is_div` 5704689200685129054723 -> not)
+assert(5704689200685129054723 `divides` (2**128 + 1) -> not)
+
+assert(5704689200685129054721 `divides` (2**128 + 1))
+assert((-5704689200685129054721) `divides` (2**128 + 1))
+
 assert(42.is_div(6))
 assert(!42.is_div(8))
 

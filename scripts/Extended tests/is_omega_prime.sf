@@ -9,6 +9,8 @@
 #   15 sep 2023: 3.904s (after adding a few more tests)
 #   23 sep 2023: 3.118s
 
+#~ Num!USE_CONJECTURES = true
+
 func A219019(n) {
     for k in (1..Inf) {
         var v = (k**n - 1)

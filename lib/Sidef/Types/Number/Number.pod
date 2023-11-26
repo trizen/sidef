@@ -8455,6 +8455,23 @@ Return C<(nil,nil)> when a solution does not exist.
 
 =cut
 
+=head2 solve_quadratic_form
+
+    solve_quadratic_form(d, n)
+
+Given a positive integer C<n> and a positive integer C<d>, returns an array with C<[x,y]> solutions to the equation:
+
+    x^2 + d*y^2 = n
+
+Example:
+
+    say solve_quadratic_form(13, 97)      #=> []
+    say solve_quadratic_form(18, 43*97)   #=> [[61, 5], [11, 15]]
+
+Not all solutions may be returned. Returns an empty array if there are no solutions.
+
+=cut
+
 =head2 sopf
 
     sopf(n)
