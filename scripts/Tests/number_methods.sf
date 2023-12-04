@@ -12,6 +12,26 @@ assert_eq(208 >> 64, 0)
 assert_eq(496 >> 32, 0)
 assert_eq(640 >> 32, 0)
 
+assert_eq(5040.remove(2), 315)
+assert_eq(5040.neg.remove(2), -315)
+assert_eq(5040.neg.remove(-2), -315)
+assert_eq(5040.remove(-2), 315)
+
+assert_eq(5040.remove(32), 5040)
+assert_eq(5040.remove(24), 210)
+assert_eq(5040.remove(29), 5040)
+assert_eq(5040.remove(7), 720)
+assert_eq(5040.remove(5), 1008)
+assert_eq(5040.remove(-5), -1008)
+assert_eq(5040.neg.remove(-3), -560)
+
+assert_eq(12!.remove(-3), -1971200)
+assert_eq(12!.neg.remove(-3), 1971200)
+
+assert_eq(5040.remove(0), 5040)
+assert_eq(5040.remove(1), 5040)
+assert_eq(5040.remove(-1), 5040)
+
 assert(irand(0, isqrt(2**64 - 1)).is_between(0, 2**32))
 assert(irand(0, isqrt(2**128 - 1)).is_between(0, 2**64))
 

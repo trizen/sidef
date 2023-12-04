@@ -12449,7 +12449,7 @@ package Sidef::Types::Number::Number {
             die "Conjecture disproved for prime power: $p^$e";
         };
 
-        my $d = _any2mpz(Math::Prime::Util::GMP::lcm(map { $prime_power_period->($_->[0], $_->[1]) } _factor_exp($n))) // goto &nan;
+        my $d = Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::lcm(map { $prime_power_period->($_->[0], $_->[1]) } _factor_exp($n)), 10);
 
         foreach my $k (0 .. 2) {
 
@@ -18782,11 +18782,44 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2mpz($$y) // goto &nan;
+        $x = $$x;
+        $y = $$y;
 
-        Math::GMPz::Rmpz_sgn($y)          || return $_[0];
-        Math::GMPz::Rmpz_cmpabs_ui($y, 1) || return $_[0];
+        if (!ref($x) and !ref($y)) {
+
+            CORE::abs($y) <= 1 and return bless \$x;
+
+            my $v = (
+                     HAS_PRIME_UTIL
+                     ? Math::Prime::Util::valuation(CORE::abs($x), CORE::abs($y))
+                     : Math::Prime::Util::GMP::valuation(CORE::abs($x), CORE::abs($y))
+                    );
+
+            if ($v == 0) {
+                return bless \$x;
+            }
+
+            if ($v == 1) {
+                my $q = (
+                         HAS_NEW_PRIME_UTIL
+                         ? Math::Prime::Util::divint($x, $y)
+                         : Math::Prime::Util::GMP::divint($x, $y)
+                        );
+                return bless \$q;
+            }
+
+            my $q = (
+                     HAS_NEW_PRIME_UTIL
+                     ? Math::Prime::Util::divint($x, Math::Prime::Util::powint($y, $v))
+                     : Math::Prime::Util::GMP::divint($x, Math::Prime::Util::GMP::powint($y, $v))
+                    );
+            return bless \$q;
+        }
+
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+
+        Math::GMPz::Rmpz_cmpabs_ui($y, 1) <= 0 and return $_[0];
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_remove($r, $x, $y);
@@ -27606,7 +27639,7 @@ package Sidef::Types::Number::Number {
 
     *σ = \&sigma;
 
-    sub antidivisor_count {
+    sub antidivisor_count {    # OEIS: A066272
         my ($n) = @_;
 
         $n = $$n;
@@ -27619,10 +27652,9 @@ package Sidef::Types::Number::Number {
 
         my $w = (bless \__dec__($n2))->sigma0;
         my $x = (bless \__inc__($n2))->sigma0;
-        my $y = (bless \$n)->sigma0;
-        my $z = (__cmp__(__mod__($n, 2), 0) == 0) ? ((bless \__div__($n, 2))->sigma0) : ZERO;
+        my $y = (bless \$n)->remove(TWO)->sigma0;
 
-        bless \__sub__(__sub__(__add__(__add__($$w, $$x), $$y), $$z), 5);
+        bless \__sub__(__add__(__add__($$w, $$x), $$y), 5);
     }
 
     sub aliquot {
