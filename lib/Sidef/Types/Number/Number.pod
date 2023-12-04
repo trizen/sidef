@@ -843,6 +843,16 @@ Antidivisors of C<n> are numbers that do not divide C<n> by the largest possible
 
 =cut
 
+=head2 antidivisor_sum
+
+    antidivisor_sum(n)
+
+Returns the sum of anti-divisors of C<n>.
+
+Aliases: I<antidivisor_sigma>
+
+=cut
+
 =head2 approx_ge
 
     approx_ge(a, b)

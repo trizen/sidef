@@ -284,6 +284,16 @@ do {    # infinitary divisors
         30.of { divisors(_) - idivisors(_) -> sum { _**2 } },
         30.of { .nisigma(2) },
     )
+
+    assert_eq(
+        30.of { .antidivisors.sum },
+        30.of { .antidivisor_sum },
+    )
+
+    assert_eq(
+        30.of { .antidivisors.len },
+        30.of { .antidivisor_count },
+    )
 }
 
 do {    # A051377: exponential divisors

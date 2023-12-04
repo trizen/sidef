@@ -18757,9 +18757,8 @@ package Sidef::Types::Number::Number {
         $y = $$y;
 
         if (!ref($x) and !ref($y)) {
-            $y || return ZERO;
             $y = CORE::abs($y) if ($y < 0);
-            $y == 1 && return ZERO;
+            $y <= 1 and return ZERO;
             my $r = HAS_PRIME_UTIL ? Math::Prime::Util::valuation($x, $y) : Math::Prime::Util::GMP::valuation($x, $y);
             return bless \$r;
         }
@@ -18767,8 +18766,7 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($x) // goto &nan;
         $y = _any2mpz($y) // goto &nan;
 
-        Math::GMPz::Rmpz_sgn($y)          || return ZERO;
-        Math::GMPz::Rmpz_cmpabs_ui($y, 1) || return ZERO;
+        Math::GMPz::Rmpz_cmpabs_ui($y, 1) <= 0 and return ZERO;
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         my $r = Math::GMPz::Rmpz_remove($t, $x, $y);
@@ -27555,7 +27553,8 @@ package Sidef::Types::Number::Number {
         _set_int(Math::Prime::Util::GMP::vecprod(map { $_->[1] + 1 } _factor_exp($n)));
     }
 
-    *d = \&sigma0;
+    *d             = \&sigma0;
+    *divisor_count = \&sigma0;
 
     sub sigma {
         my ($n, $k) = @_;
@@ -27656,6 +27655,32 @@ package Sidef::Types::Number::Number {
 
         bless \__sub__(__add__(__add__($$w, $$x), $$y), 5);
     }
+
+    *antidivisor_sigma0 = \&antidivisor_count;
+
+    sub antidivisor_sigma {    # OEIS: A066417
+        my ($n) = @_;
+
+        # TODO: find a formula for computing:
+        #   antidivisors(n).sum {|d| d**k }, for k > 1
+
+        $n = $$n;
+
+        if (__cmp__($n, 2) <= 0) {
+            return ZERO;
+        }
+
+        my $n2 = __add__($n, $n);
+
+        my $v = (bless \$n)->valuation(TWO);
+        my $x = (bless \__inc__($n2))->sigma;
+        my $y = (bless \__dec__($n2))->sigma;
+        my $z = (bless \$n)->remove(TWO)->sigma->shift_left(bless \__inc__($$v));
+
+        bless \__sub__(__sub__(__add__(__add__($$x, $$y), $$z), __mul__($n, 6)), 2);
+    }
+
+    *antidivisor_sum = \&antidivisor_sigma;
 
     sub aliquot {
         my ($n, $k) = @_;
