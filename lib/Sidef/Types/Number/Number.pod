@@ -1535,6 +1535,22 @@ Returns the centered k-gonal root of C<n>. Also defined for complex numbers.
 
 =cut
 
+=head2 centered_pyramidal
+
+    n.centered_pyramidal(k)
+
+Returns the n-th centered k-gonal pyramidal number.
+
+=cut
+
+=head2 centered_pyramidal_root
+
+    n.centered_pyramidal_root(k)
+
+Returns the centered k-gonal pyramidal root of C<n>. Also defined for complex numbers.
+
+=cut
+
 =head2 cfrac
 
     n.cfrac

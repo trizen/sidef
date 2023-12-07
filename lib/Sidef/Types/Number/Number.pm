@@ -12698,6 +12698,21 @@ package Sidef::Types::Number::Number {
         $C = $$C;
         $D = $$D;
 
+        # Case when B = 0 and C = 0
+        if (__cmp__($B, 0) == 0 and __cmp__($C, 0) == 0) {
+
+            my $n      = __neg__($D);
+            my $n_cbrt = __cbrt__(_any2mpfr_mpc($n));
+            my $k_cbrt = __cbrt__(_any2mpfr_mpc($A));
+
+            my $unit_cbrt = __cbrt__(_any2mpc(-1));
+            my $r1        = __div__($n_cbrt, $k_cbrt);
+            my $r2        = __neg__(__mul__($r1,        $unit_cbrt));
+            my $r3        = __mul__(__mul__($unit_cbrt, $unit_cbrt), $r1);
+
+            return ((bless \$r1), (bless \$r2), (bless \$r3));
+        }
+
         my $A3    = __mul__($A, 3);
         my $AC    = __mul__($A, $C);
         my $BB    = __mul__($B, $B);     # b^2
@@ -33062,6 +33077,34 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    #
+    ## n-th k-gonal centered pyramidal number
+    #
+
+    sub centered_pyramidal {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
+
+        # centered_pyramidal(n, k) = (k-1)*(n-1)*n*(n+1)/6 + n = n*(k*n^2 - k - n^2 + 7)/6
+
+        my $r = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_mul($t, $n, $n);
+        Math::GMPz::Rmpz_mul($r, $k, $t);           # r = k * n^2
+        Math::GMPz::Rmpz_sub($r, $r, $k);           # r = k * n^2 - k
+        Math::GMPz::Rmpz_sub($r, $r, $t);           # r = k * n^2 - k - n^2
+        Math::GMPz::Rmpz_add_ui($r, $r, 7);         # r = k * n^2 - k - n^2 + 7
+        Math::GMPz::Rmpz_mul($r, $r, $n);           # r = n*(k*n^2 - k - n^2 + 7)
+        Math::GMPz::Rmpz_divexact_ui($r, $r, 6);    # r = n*(k*n^2 - k - n^2 + 7)/6
+
+        bless \$r;
+    }
+
     sub is_pyramidal {
         my ($n, $k) = @_;
 
@@ -33301,6 +33344,31 @@ package Sidef::Types::Number::Number {
         }
 
         $root;
+    }
+
+    sub centered_pyramidal_root {
+        my ($n, $k) = @_;
+        _valid(\$k);
+
+        # cubic_formula(k/6 - 1/6, 0, -k/6 + 7/6, -n)
+
+        $n = $$n;
+        $k = $$k;
+
+        my $k_over_6 = __div__($k, 6);
+
+        my $A = __sub__($k_over_6, __div__(1, 6));
+        my $C = __add__(__neg__($k_over_6), __div__(7, 6));
+        my $D = __neg__($n);
+
+        my @root = (bless \$A)->cubic_formula(ZERO, (bless \$C), (bless \$D));
+
+        if (__is_real__($n) and __cmp__($n, 0) >= 0) {
+            my @pos = grep { $_->is_pos } map { $_->real } @root;
+            @pos and return $pos[0];
+        }
+
+        $root[0];
     }
 
     sub is_palindrome {
