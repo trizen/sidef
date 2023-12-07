@@ -37,6 +37,7 @@ package Sidef::Types::Number::Number {
         ONE   => bless(\(my $one   = 1)),
         TWO   => bless(\(my $two   = 2)),
         THREE => bless(\(my $three = 3)),
+        TEN   => bless(\(my $three = 10)),
         ZERO  => bless(\(my $zero  = 0)),
         MONE  => bless(\(my $mone  = -1)),
 
@@ -4327,9 +4328,20 @@ package Sidef::Types::Number::Number {
     sub ipow2 {
         my ($n) = @_;
 
-        $n = _any2si($$n) // goto &nan;
+        $n = $$n;
 
-        return ZERO if $n < 0;
+        if (ref($n)) {
+            $n = _any2si($n) // goto &nan;
+        }
+
+        ($n == 0) and return ONE;
+        ($n == 1) and return TWO;
+        ($n < 0)  and return ZERO;
+
+        if (CORE::log(2) * $n < CORE::log(ULONG_MAX)) {
+            my $r = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::powint(2, $n) : Math::Prime::Util::GMP::powint(2, $n));
+            return bless \$r;
+        }
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_setbit($r, $n);
@@ -4339,9 +4351,20 @@ package Sidef::Types::Number::Number {
     sub ipow10 {
         my ($n) = @_;
 
-        $n = _any2si($$n) // goto &nan;
+        $n = $$n;
 
-        return ZERO if $n < 0;
+        if (ref($n)) {
+            $n = _any2si($n) // goto &nan;
+        }
+
+        ($n == 0) and return ONE;
+        ($n == 1) and return TEN;
+        ($n < 0)  and return ZERO;
+
+        if (CORE::log(10) * $n < CORE::log(ULONG_MAX)) {
+            my $r = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::powint(10, $n) : Math::Prime::Util::GMP::powint(10, $n));
+            return bless \$r;
+        }
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_ui_pow_ui($r, 10, $n);
@@ -13178,7 +13201,7 @@ package Sidef::Types::Number::Number {
 
             # say "Small k: ($n, $k, $m)";
 
-            if ($k <= 1e6) {
+            if ($k <= 1e7) {
                 my $bin = Math::GMPz::Rmpz_init();
                 if (Math::GMPz::Rmpz_fits_ulong_p($n) and Math::GMPz::Rmpz_cmp_ui($n, 1e5) <= 0) {
                     Math::GMPz::Rmpz_bin_uiui($bin, Math::GMPz::Rmpz_get_ui($n), $k);
@@ -13190,6 +13213,8 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_mod($bin, $bin, $m);
                 return $bin;
             }
+
+            # TODO: find a faster algorithm
 
             my $t   = Math::GMPz::Rmpz_init();
             my $u   = Math::GMPz::Rmpz_init();
