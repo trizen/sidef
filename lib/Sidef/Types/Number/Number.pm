@@ -65,10 +65,12 @@ package Sidef::Types::Number::Number {
         # Check if we have a recent enough version of Math::Prime::Util::GMP
         HAS_NEW_PRIME_UTIL_GMP => defined(&Math::Prime::Util::GMP::lucasvmod) // 0,
 
-        IS_PRIME_CACHE_SIZE => 1e5,                                                                # how many entries to cache
-        INTSIZE             => CORE::int(CORE::log(ULONG_MAX) / CORE::log(2)),                     # size of ULONG_MAX in base 2
-        PRIMECOUNT_MIN      => List::Util::min(ULONG_MAX,       (HAS_PRIME_UTIL ? 1e10 : 1e7)),    # absolute value
-        PRIMESUM_MIN        => List::Util::min(ULONG_MAX >> 14, (HAS_PRIME_UTIL ? 1e8  : 1e5)),    # absolute value
+        IS_PRIME_CACHE_SIZE   => 1e5,     # how many entries to cache
+        PRIMALITY_PRETEST_MIN => 500,     # in decimal digits
+
+        INTSIZE        => CORE::int(CORE::log(ULONG_MAX) / CORE::log(2)),                     # size of ULONG_MAX in base 2
+        PRIMECOUNT_MIN => List::Util::min(ULONG_MAX,       (HAS_PRIME_UTIL ? 1e10 : 1e7)),    # absolute value
+        PRIMESUM_MIN   => List::Util::min(ULONG_MAX >> 14, (HAS_PRIME_UTIL ? 1e8  : 1e5)),    # absolute value
     };
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
@@ -19494,7 +19496,7 @@ package Sidef::Types::Number::Number {
         my $size = Math::GMPz::Rmpz_sizeinbase($n, 10);
 
         # When n is large enough, try to find a small factor (up to 10^8)
-        if ($size > 1000) {
+        if ($size > PRIMALITY_PRETEST_MIN) {
 
             state $g = Math::GMPz::Rmpz_init_nobless();
 
@@ -19573,7 +19575,7 @@ package Sidef::Types::Number::Number {
             (
              (HAS_PRIME_UTIL and $str < ULONG_MAX)
              ? Math::Prime::Util::is_strong_pseudoprime($str, 2)
-             : Math::Prime::Util::GMP::is_strong_pseudoprime($str, 2)
+             : (CORE::length($str) > PRIMALITY_PRETEST_MIN ? Math::Prime::Util::GMP::is_strong_pseudoprime($str, 2) : Math::Prime::Util::GMP::is_prime($str))
             )
               || return Sidef::Types::Bool::Bool::FALSE;
             push @strs, $str;
@@ -19583,7 +19585,7 @@ package Sidef::Types::Number::Number {
             (
              (HAS_PRIME_UTIL and $n < ULONG_MAX)
              ? Math::Prime::Util::is_almost_extra_strong_lucas_pseudoprime($n)
-             : Math::Prime::Util::GMP::is_almost_extra_strong_lucas_pseudoprime($n)
+             : (CORE::length($n) > PRIMALITY_PRETEST_MIN ? Math::Prime::Util::GMP::is_almost_extra_strong_lucas_pseudoprime($n) : 1)
             )
               || return Sidef::Types::Bool::Bool::FALSE;
         }
@@ -20197,10 +20199,13 @@ package Sidef::Types::Number::Number {
         }
 
         _primality_pretest($n) || return Sidef::Types::Bool::Bool::FALSE;
-
         my $str = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
-        (Math::Prime::Util::GMP::is_strong_pseudoprime($str, 2) && Math::Prime::Util::GMP::is_frobenius_underwood_pseudoprime($str))
-          ? Sidef::Types::Bool::Bool::TRUE
+
+        (
+           (CORE::length($str) > PRIMALITY_PRETEST_MIN)
+         ? (Math::Prime::Util::GMP::is_strong_pseudoprime($str, 2) && Math::Prime::Util::GMP::is_frobenius_underwood_pseudoprime($str))
+         : Math::Prime::Util::GMP::is_prob_prime($str)
+          ) ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
