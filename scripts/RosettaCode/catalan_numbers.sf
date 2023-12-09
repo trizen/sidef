@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Catalan_numbers
+## https://rosettacode.org/wiki/Catalan_numbers
 #
 
 func f(i) { i==0 ? 1 : (i * f(i-1)) };

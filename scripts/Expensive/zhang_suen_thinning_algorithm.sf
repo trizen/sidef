@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Zhang-Suen_thinning_algorithm
+## https://rosettacode.org/wiki/Zhang-Suen_thinning_algorithm
 #
 
 class ZhangSuen(str, black="1") {

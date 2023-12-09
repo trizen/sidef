@@ -3,7 +3,7 @@
 # Author: Daniel "Trizen" Șuteu
 # License: GPLv3
 # Date: 21 April 2014
-# Website: http://github.com/trizen
+# Website: https://github.com/trizen
 
 # Function to parse the input file into a 2D-matrix
 func parse_table(file) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Determine_if_a_string_is_numeric
+## https://rosettacode.org/wiki/Determine_if_a_string_is_numeric
 #
 
 func is_numeric(s) {

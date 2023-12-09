@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Filter
+## https://rosettacode.org/wiki/Filter
 #
 
 var arr = [1,2,3,4,5];

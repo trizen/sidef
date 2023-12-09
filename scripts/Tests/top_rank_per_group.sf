@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Top_rank_per_group
+## https://rosettacode.org/wiki/Top_rank_per_group
 #
 
 var data = <<'EOF'.lines.map{ (var h = Hash()){@|<name id salary dept>} = @|.split(','); h }

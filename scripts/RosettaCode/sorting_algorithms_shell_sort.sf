@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sorting_algorithms/Shell_sort
+## https://rosettacode.org/wiki/Sorting_algorithms/Shell_sort
 #
 
 func shell_sort(a) {

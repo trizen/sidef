@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Decimal_floating_point_number_to_binary
+## https://rosettacode.org/wiki/Decimal_floating_point_number_to_binary
 #
 
 func dec2bin(String n) {

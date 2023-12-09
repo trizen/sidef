@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Maze_generation#Sidef
+## https://rosettacode.org/wiki/Maze_generation#Sidef
 #
 
 var(w, h) = (5, 5);

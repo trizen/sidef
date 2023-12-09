@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Price_fraction
+## https://rosettacode.org/wiki/Price_fraction
 #
 
 var table = <<'EOT'.lines.map { .words.grep{.looks_like_number}.map{.to_num} };

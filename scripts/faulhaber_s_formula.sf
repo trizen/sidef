@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Faulhaber%27s_formula
+## https://rosettacode.org/wiki/Faulhaber%27s_formula
 #
 
 func bernoulli({.is_one}) { 1/2 }

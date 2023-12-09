@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Variable-length_quantity
+## https://rosettacode.org/wiki/Variable-length_quantity
 #
 
 func vlq_encode(num) {

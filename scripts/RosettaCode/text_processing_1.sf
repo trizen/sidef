@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Text_processing/1
+## https://rosettacode.org/wiki/Text_processing/1
 #
 
 var gaps = [];

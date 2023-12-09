@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Partial_function_application
+## https://rosettacode.org/wiki/Partial_function_application
 #
 
 func fs(f) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## Code from: http://ruby-doc.org/core-2.3.1/Enumeratorerable.html
+## Code from: https://ruby-doc.org/core-2.3.1/Enumeratorerable.html
 #
 
 func wordwrap(words, maxwidth) {

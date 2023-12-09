@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Cipolla%27s_algorithm
+## https://rosettacode.org/wiki/Cipolla%27s_algorithm
 #
 
 func cipolla(n, p) {

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Best_shuffle#Sidef
+# https://rosettacode.org/wiki/Best_shuffle#Sidef
 
 func best_shuffle(original_word) {
 

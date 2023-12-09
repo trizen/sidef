@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Digital_root/Multiplicative_digital_root
+## https://rosettacode.org/wiki/Digital_root/Multiplicative_digital_root
 #
 
 func mdroot(n) {

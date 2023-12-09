@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Emirp_primes
+## https://rosettacode.org/wiki/Emirp_primes
 #
 
 func forprimes(a, b, callback) {

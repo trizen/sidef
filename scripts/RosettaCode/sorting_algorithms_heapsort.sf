@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sorting_algorithms/Heapsort
+## https://rosettacode.org/wiki/Sorting_algorithms/Heapsort
 #
 
 func siftDown(a, start, end) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Rock-paper-scissors
+## https://rosettacode.org/wiki/Rock-paper-scissors
 #
 
 const rps = %w(r p s)

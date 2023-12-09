@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Benford's_law#Perl
+# Translation of: https://rosettacode.org/wiki/Benford's_law#Perl
 
 var (actuals, expected) = ([], [])
 var fibonacci = 1000.of {|i| fib(i).digit(-1) }

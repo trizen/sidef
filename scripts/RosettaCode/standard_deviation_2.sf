@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Standard_deviation
+## https://rosettacode.org/wiki/Standard_deviation
 #
 
 func stddev(x) {

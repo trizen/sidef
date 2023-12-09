@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Loop_over_multiple_arrays_simultaneously
+## https://rosettacode.org/wiki/Loop_over_multiple_arrays_simultaneously
 #
 
 [%w(a b c),%w(A B C),%w(1 2 3)].zip { |i,j,k|

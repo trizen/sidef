@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Map_range
+## https://rosettacode.org/wiki/Map_range
 #
 
 func map_range(a, b, x) {

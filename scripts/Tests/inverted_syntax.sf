@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Inverted syntax:  http://rosettacode.org/wiki/Inverted_syntax
+# Inverted syntax:  https://rosettacode.org/wiki/Inverted_syntax
 
 #
 ## Variable assignments ('assign_to' == '»' == '>>')

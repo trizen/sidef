@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Colour_bars/Display
+## https://rosettacode.org/wiki/Colour_bars/Display
 #
 
 require('GD');

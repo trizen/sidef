@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Dinesman%27s_multiple-dwelling_problem
+## https://rosettacode.org/wiki/Dinesman%27s_multiple-dwelling_problem
 #
 
 var names = %w(Baker Cooper Fletcher Miller Smith)

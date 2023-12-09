@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Arithmetic-geometric_mean
+# https://rosettacode.org/wiki/Arithmetic-geometric_mean
 
 func agm0(a0, g0) {
     var (a1, g1);

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/MD5/Implementation
+## https://rosettacode.org/wiki/MD5/Implementation
 #
 
 class MD5(String msg) {

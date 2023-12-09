@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Classes
+## https://rosettacode.org/wiki/Classes
 #
 
 class MyClass(instance_var=1) {

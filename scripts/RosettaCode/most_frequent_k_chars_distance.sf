@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Most_frequent_k_chars_distance
+## https://rosettacode.org/wiki/Most_frequent_k_chars_distance
 #
 
 func _MostFreqKHashing(string, k) {

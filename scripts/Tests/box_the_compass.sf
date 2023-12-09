@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Box_the_compass#Sidef
+## https://rosettacode.org/wiki/Box_the_compass#Sidef
 #
 
 func point (index) {

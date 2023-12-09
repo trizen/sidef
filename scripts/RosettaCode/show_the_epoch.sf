@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Show_the_epoch
+## https://rosettacode.org/wiki/Show_the_epoch
 #
 
 say Time(0).gmtime.ctime

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Define_a_primitive_data_type
+## https://rosettacode.org/wiki/Define_a_primitive_data_type
 #
 
 subset Integer    < Number  { .is_int }

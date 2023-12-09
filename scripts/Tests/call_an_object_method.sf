@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Call_an_object_method
+## https://rosettacode.org/wiki/Call_an_object_method
 #
 
 class MyClass {

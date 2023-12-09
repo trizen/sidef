@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sorting_algorithms/Comb_sort
+## https://rosettacode.org/wiki/Sorting_algorithms/Comb_sort
 #
 
 func comb_sort(Array arr) {

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Palindrome_detection#Sidef
+# https://rosettacode.org/wiki/Palindrome_detection#Sidef
 
 func palindrome(s) {
     if (s.len <= 1) {

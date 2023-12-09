@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Priority_queue#Sidef
+## https://rosettacode.org/wiki/Priority_queue#Sidef
 #
 
 class PriorityQueue {

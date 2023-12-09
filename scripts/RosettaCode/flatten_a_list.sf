@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Flatten_a_list
+## https://rosettacode.org/wiki/Flatten_a_list
 #
 
 func flatten(a) {

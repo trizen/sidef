@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Maximum_triangle_path_sum
+# https://rosettacode.org/wiki/Maximum_triangle_path_sum
 
 var triangle = <<'EOT';
                           55

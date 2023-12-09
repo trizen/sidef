@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Reduced_row_echelon_form
+## https://rosettacode.org/wiki/Reduced_row_echelon_form
 #
 
 func rref (Array m) {

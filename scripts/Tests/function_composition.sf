@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Functional_Composition
+# https://rosettacode.org/wiki/Functional_Composition
 
 func compose (f, g) {
     func(n){ f(g(n)) }

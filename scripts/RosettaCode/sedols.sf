@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/SEDOLs
+## https://rosettacode.org/wiki/SEDOLs
 #
 
 func sedol(s) {

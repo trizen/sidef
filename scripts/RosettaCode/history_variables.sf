@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/History_variables
+## https://rosettacode.org/wiki/History_variables
 #
 
 class HistoryVar(v) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Non-decimal_radices/Convert
+## https://rosettacode.org/wiki/Non-decimal_radices/Convert
 #
 
 static to = [@|'0'..'9', @|'a'..'z']

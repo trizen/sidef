@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Topological_sort
+## https://rosettacode.org/wiki/Topological_sort
 #
 
 func print_topo_sort (deps) {

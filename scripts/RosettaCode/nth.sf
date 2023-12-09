@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/N'th
+## https://rosettacode.org/wiki/N'th
 #
 
 func nth(n) {

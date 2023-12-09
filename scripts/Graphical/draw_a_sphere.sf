@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Draw_a_sphere
+## https://rosettacode.org/wiki/Draw_a_sphere
 #
 
 # Generates a PGM image.

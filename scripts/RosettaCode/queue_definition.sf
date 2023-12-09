@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Queue/Definition
+## https://rosettacode.org/wiki/Queue/Definition
 #
 
 class FIFO(*array) {

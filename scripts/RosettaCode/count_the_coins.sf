@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Count_the_coins
+## https://rosettacode.org/wiki/Count_the_coins
 #
 
 func cc(_)                { 0 }

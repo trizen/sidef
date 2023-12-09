@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Loops/Do-while
+## https://rosettacode.org/wiki/Loops/Do-while
 #
 
 var value = 0;

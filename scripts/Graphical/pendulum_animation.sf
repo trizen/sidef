@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Animate_a_pendulum
+## https://rosettacode.org/wiki/Animate_a_pendulum
 #
 
 require('Tk')

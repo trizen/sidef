@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## Translation of: http://rosettacode.org/wiki/Knuth_shuffle#Perl
+## Translation of: https://rosettacode.org/wiki/Knuth_shuffle#Perl
 #
 
 func shuffle (a) {

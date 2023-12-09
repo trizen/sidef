@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Perfect_shuffle
+## https://rosettacode.org/wiki/Perfect_shuffle
 #
 
 func perfect_shuffle(deck) {

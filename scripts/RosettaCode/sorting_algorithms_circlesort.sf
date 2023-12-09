@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sorting_Algorithms/Circle_Sort
+## https://rosettacode.org/wiki/Sorting_Algorithms/Circle_Sort
 #
 
 func circlesort(arr, beg=0, end=arr.end) {

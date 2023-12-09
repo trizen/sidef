@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Averages/Root_mean_square#Perl_6
+# Translation of: https://rosettacode.org/wiki/Averages/Root_mean_square#Perl_6
 
 func rms (a) {
     a.map{_**2} -> sum / a.len -> sqrt;

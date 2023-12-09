@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/File_modification_time
+## https://rosettacode.org/wiki/File_modification_time
 #
 
 var file = File.new(__FILE__);

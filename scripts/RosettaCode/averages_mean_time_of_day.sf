@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Averages/Mean_time_of_day
+## https://rosettacode.org/wiki/Averages/Mean_time_of_day
 #
 
 func mean_angle(angles) {

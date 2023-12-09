@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Convert_seconds_to_compound_duration
+## https://rosettacode.org/wiki/Convert_seconds_to_compound_duration
 #
 
 func polymod(n, *divs) {

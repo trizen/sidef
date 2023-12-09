@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Five_weekends
+## https://rosettacode.org/wiki/Five_weekends
 #
 
 require('DateTime');

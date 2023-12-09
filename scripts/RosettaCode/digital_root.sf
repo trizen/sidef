@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Digital_root
+## https://rosettacode.org/wiki/Digital_root
 #
 
 func digroot (r, base = 10) {

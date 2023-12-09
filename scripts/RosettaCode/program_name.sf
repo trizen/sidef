@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Program_name
+## https://rosettacode.org/wiki/Program_name
 #
 
 say __MAIN__;

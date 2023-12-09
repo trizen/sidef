@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Character_codes
+## https://rosettacode.org/wiki/Character_codes
 #
 
 say 'a'.ord;    # => 97

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sorting_algorithms/Sleep_sort
+## https://rosettacode.org/wiki/Sorting_algorithms/Sleep_sort
 #
 
 ARGV.map{.to_i}.map{ |i|

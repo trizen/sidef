@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sort_using_a_custom_comparator
+## https://rosettacode.org/wiki/Sort_using_a_custom_comparator
 #
 
 func mycmp(a, b) { (b.len <=> a.len) || (a.lc <=> b.lc) };

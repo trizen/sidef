@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Hello_world/Graphical
+## https://rosettacode.org/wiki/Hello_world/Graphical
 #
 
 var tk = require('Tk');

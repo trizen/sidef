@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Sierpinski_triangle/Graphical#Sidef
+# https://rosettacode.org/wiki/Sierpinski_triangle/Graphical#Sidef
 
 func sierpinski_triangle(n) -> Array {
   var triangle = ['*']

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Run-length_encoding
+# https://rosettacode.org/wiki/Run-length_encoding
 
 func encode (str) {
     var chars = str.chars;

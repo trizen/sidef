@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Roots_of_unity#Sidef
+## https://rosettacode.org/wiki/Roots_of_unity#Sidef
 #
 
 func roots_of_unity (n) {

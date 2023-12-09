@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Knight%27s_tour
+## https://rosettacode.org/wiki/Knight%27s_tour
 #
 
 var board = []

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sudoku
+## https://rosettacode.org/wiki/Sudoku
 #
 
 func check(i, j) is cached {

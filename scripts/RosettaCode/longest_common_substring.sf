@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Longest_Common_Substring
+## https://rosettacode.org/wiki/Longest_Common_Substring
 #
 
 func createSubstrings(String word) -> Array {

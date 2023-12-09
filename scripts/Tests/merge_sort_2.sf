@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Sorting_algorithms/Merge_sort
+# https://rosettacode.org/wiki/Sorting_algorithms/Merge_sort
 
 func merge(left, right) {
     gather {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Luhn_test_of_credit_card_numbers
+## https://rosettacode.org/wiki/Luhn_test_of_credit_card_numbers
 #
 
 func luhn (n) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Split_a_character_string_based_on_change_of_character
+## https://rosettacode.org/wiki/Split_a_character_string_based_on_change_of_character
 #
 
 func group(str) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/24_game
+## https://rosettacode.org/wiki/24_game
 #
 
 const digits  = @(1..9).shuffle.first(4);

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Vigen%C3%A8re_cipher
+## https://rosettacode.org/wiki/Vigen%C3%A8re_cipher
 #
 
 func s2v(s) { s.uc.scan(/[A-Z]/)»ord()» »-» 65 };

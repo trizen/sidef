@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/First-class_functions
+## https://rosettacode.org/wiki/First-class_functions
 #
 
 func compose(f,g) {

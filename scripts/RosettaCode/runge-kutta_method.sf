@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Runge-Kutta_method
+## https://rosettacode.org/wiki/Runge-Kutta_method
 #
 
 func runge_kutta(yp) {

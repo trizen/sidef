@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## Inspired by Tom Hudson: http://www.youtube.com/watch?v=GjGRhIl0xWs
+## Inspired by Tom Hudson: https://www.youtube.com/watch?v=GjGRhIl0xWs
 #
 
 enum (

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Bulls_and_cows/Player#Sidef
+## https://rosettacode.org/wiki/Bulls_and_cows/Player#Sidef
 #
 
 # Build a list of all possible solutions.  The regular expression weeds

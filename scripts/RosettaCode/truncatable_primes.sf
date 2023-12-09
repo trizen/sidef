@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Truncatable_primes
+## https://rosettacode.org/wiki/Truncatable_primes
 #
 
 func t_prime(n, left=true) {

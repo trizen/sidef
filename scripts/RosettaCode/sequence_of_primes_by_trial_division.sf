@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sequence_of_primes_by_Trial_Division
+## https://rosettacode.org/wiki/Sequence_of_primes_by_Trial_Division
 #
 
 func is_prime(a) {

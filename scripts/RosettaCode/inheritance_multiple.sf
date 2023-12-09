@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Inheritance/Multiple
+## https://rosettacode.org/wiki/Inheritance/Multiple
 #
 
 class Camera {};

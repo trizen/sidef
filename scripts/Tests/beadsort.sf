@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sorting_algorithms/Bead_sort#Sidef
+## https://rosettacode.org/wiki/Sorting_algorithms/Bead_sort#Sidef
 #
 
 func beadsort(arr) {

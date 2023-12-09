@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Suffix_tree
+## https://rosettacode.org/wiki/Suffix_tree
 #
 
 func suffix_tree(Str t) {

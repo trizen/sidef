@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/SHA-256
+## https://rosettacode.org/wiki/SHA-256
 #
 
 var sha = frequire('Digest::SHA');

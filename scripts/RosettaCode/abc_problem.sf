@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/ABC_Problem
+## https://rosettacode.org/wiki/ABC_Problem
 #
 
 func can_make_word(word, blocks) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sorting_algorithms/Patience_sort
+## https://rosettacode.org/wiki/Sorting_algorithms/Patience_sort
 #
 
 func patience(deck) {

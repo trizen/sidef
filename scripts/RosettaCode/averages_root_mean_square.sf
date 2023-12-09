@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Averages/Root_mean_square
+## https://rosettacode.org/wiki/Averages/Root_mean_square
 #
 
 func rms(a) {

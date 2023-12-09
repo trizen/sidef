@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Arithmetic-geometric_mean
+## https://rosettacode.org/wiki/Arithmetic-geometric_mean
 #
 
 func agm(a, g) {

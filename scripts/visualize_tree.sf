@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Visualize_a_tree
+## https://rosettacode.org/wiki/Visualize_a_tree
 #
 
 func visualize_tree(tree, label, children,

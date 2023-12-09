@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Hash_join
+## https://rosettacode.org/wiki/Hash_join
 #
 
 func hashJoin(table1, index1, table2, index2) {

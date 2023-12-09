@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Parallel_calculations
+## https://rosettacode.org/wiki/Parallel_calculations
 #
 
 func prime_factors(n) {

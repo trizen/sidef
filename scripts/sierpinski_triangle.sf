@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sierpinski_triangle
+## https://rosettacode.org/wiki/Sierpinski_triangle
 #
 
 func sierpinski_triangle(n) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Cholesky_decomposition
+## https://rosettacode.org/wiki/Cholesky_decomposition
 #
 
 func cholesky(matrix) {

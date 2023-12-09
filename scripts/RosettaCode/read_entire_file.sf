@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Read_entire_file
+## https://rosettacode.org/wiki/Read_entire_file
 #
 
 var file = File.new(__FILE__);

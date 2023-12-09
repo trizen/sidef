@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Generator/Exponential#Sidef
+## https://rosettacode.org/wiki/Generator/Exponential#Sidef
 #
 
 func gen_pow(m) {

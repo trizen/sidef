@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Quaternion_type
+## https://rosettacode.org/wiki/Quaternion_type
 #
 
 class Quaternion(r, i, j, k) {

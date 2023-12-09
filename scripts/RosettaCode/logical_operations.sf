@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Logical_operations
+## https://rosettacode.org/wiki/Logical_operations
 #
 
 func logic(a, b) {

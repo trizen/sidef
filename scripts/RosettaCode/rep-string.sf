@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Rep-string
+## https://rosettacode.org/wiki/Rep-string
 #
 
 var array = <1001110011 1110111011

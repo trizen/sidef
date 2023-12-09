@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Stack
+## https://rosettacode.org/wiki/Stack
 #
 
 var stack = [];

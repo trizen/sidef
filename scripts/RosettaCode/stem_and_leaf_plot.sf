@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Stem-and-leaf_plot
+## https://rosettacode.org/wiki/Stem-and-leaf_plot
 #
 
 var data = %i(

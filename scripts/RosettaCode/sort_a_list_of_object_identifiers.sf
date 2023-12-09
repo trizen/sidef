@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sort_a_list_of_object_identifiers
+## https://rosettacode.org/wiki/Sort_a_list_of_object_identifiers
 #
 
 func sort_OIDs(ids) {

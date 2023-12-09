@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Catalan_numbers
+## https://rosettacode.org/wiki/Catalan_numbers
 #
 
 var mem = [1]

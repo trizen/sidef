@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Tonelli-Shanks_algorithm
+## https://rosettacode.org/wiki/Tonelli-Shanks_algorithm
 #
 
 func tonelli(n, p) {

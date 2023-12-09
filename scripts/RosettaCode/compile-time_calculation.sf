@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Compile-time_calculation
+## https://rosettacode.org/wiki/Compile-time_calculation
 #
 
 define n = 10!;

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Loops/Nested
+## https://rosettacode.org/wiki/Loops/Nested
 #
 
 var arr = 10.of{ 10.of{ 20.irand + 1 } };

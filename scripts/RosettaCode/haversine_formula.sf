@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Haversine_formula
+## https://rosettacode.org/wiki/Haversine_formula
 #
 
 class EarthPoint(lat, lon) {

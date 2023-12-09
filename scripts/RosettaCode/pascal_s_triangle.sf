@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Pascal's_triangle
+## https://rosettacode.org/wiki/Pascal's_triangle
 #
 
 func pascal(rows) {

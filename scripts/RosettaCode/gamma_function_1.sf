@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Gamma_function
+## https://rosettacode.org/wiki/Gamma_function
 #
 
 define e  = Number.e;

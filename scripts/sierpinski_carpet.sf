@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sierpinski_carpet
+## https://rosettacode.org/wiki/Sierpinski_carpet
 #
 
 var c = ['##']

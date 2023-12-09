@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/S-Expressions#Sidef
+## https://rosettacode.org/wiki/S-Expressions#Sidef
 #
 
 var t = frequire('Text::Balanced');

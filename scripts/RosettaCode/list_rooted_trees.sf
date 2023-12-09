@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/List_rooted_trees
+## https://rosettacode.org/wiki/List_rooted_trees
 #
 
 func bagchain(x, n, bb, start=0) {

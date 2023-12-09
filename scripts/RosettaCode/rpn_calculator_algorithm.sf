@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Parsing/RPN_calculator_algorithm
+## https://rosettacode.org/wiki/Parsing/RPN_calculator_algorithm
 #
 
 var proggie = '3 4 2 * 1 5 - 2 3 ^ ^ / +';

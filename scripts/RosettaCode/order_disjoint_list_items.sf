@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Order_disjoint_list_items#Sidef
+## https://rosettacode.org/wiki/Order_disjoint_list_items#Sidef
 #
 
 func dsort(m, n) {

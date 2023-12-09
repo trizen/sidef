@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Search_a_list
+## https://rosettacode.org/wiki/Search_a_list
 #
 
 var haystack = %w(Zig Zag Wally Ronald Bush Krusty Charlie Bush Bozo);

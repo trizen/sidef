@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Elementary_cellular_automaton/Infinite_length
+## https://rosettacode.org/wiki/Elementary_cellular_automaton/Infinite_length
 #
 
 func evolve(rule, bin) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Polynomial_synthetic_division
+## https://rosettacode.org/wiki/Polynomial_synthetic_division
 #
 
 func extended_synthetic_division(dividend, divisor) {

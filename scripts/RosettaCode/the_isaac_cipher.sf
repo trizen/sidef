@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/The_ISAAC_Cipher
+## https://rosettacode.org/wiki/The_ISAAC_Cipher
 #
 
 require('Math::Random::ISAAC');

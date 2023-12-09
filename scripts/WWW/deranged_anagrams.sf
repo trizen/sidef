@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Anagrams/Deranged_anagrams#Perl
+# Translation of: https://rosettacode.org/wiki/Anagrams/Deranged_anagrams#Perl
 
 func find_deranged (a) {
 

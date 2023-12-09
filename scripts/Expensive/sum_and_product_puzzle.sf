@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sum_and_Product_Puzzle
+## https://rosettacode.org/wiki/Sum_and_Product_Puzzle
 #
 
 func grep_unique(a, by) { a.group_by{ .(by) }.values.grep{.len == 1}.map{_[0]} }

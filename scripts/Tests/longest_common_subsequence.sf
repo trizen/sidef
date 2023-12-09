@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Longest_common_subsequence#Sidef
+## https://rosettacode.org/wiki/Longest_common_subsequence#Sidef
 #
 
 func lcs(String xstr, String ystr) is cached -> String {

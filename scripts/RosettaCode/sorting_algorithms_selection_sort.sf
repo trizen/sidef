@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sorting_algorithms/Selection_sort
+## https://rosettacode.org/wiki/Sorting_algorithms/Selection_sort
 #
 
 class Array {

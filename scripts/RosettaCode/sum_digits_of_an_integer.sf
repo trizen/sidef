@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sum_digits_of_an_integer
+## https://rosettacode.org/wiki/Sum_digits_of_an_integer
 #
 
 func Σ(String str, base=36) {

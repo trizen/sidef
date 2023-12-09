@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Fibonacci_word#Sidef
+## https://rosettacode.org/wiki/Fibonacci_word#Sidef
 #
 
 func entropy(s) {

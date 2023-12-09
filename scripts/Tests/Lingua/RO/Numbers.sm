@@ -41,7 +41,7 @@ class new(diacritics            = true,
     (11, 12, 13, 14, 15, 15, 16, 17, 17, 18, 19);
 
     # This array contains number greater than 1000 and it's used to convert numbers into text
-    # See: http://ro.wikipedia.org/wiki/Sistem_zecimal#Denumiri_ale_numerelor
+    # See: https://ro.wikipedia.org/wiki/Sistem_zecimal#Denumiri_ale_numerelor
     static BIGNUMS = (
                 [
                     [ 10**2,        'suta',         'sute',  true],

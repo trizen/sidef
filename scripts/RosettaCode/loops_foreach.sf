@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Loops/Foreach
+## https://rosettacode.org/wiki/Loops/Foreach
 #
 
 foreach [1,2,3] { |i|

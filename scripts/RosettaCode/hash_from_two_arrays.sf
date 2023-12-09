@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Hash_from_two_arrays
+## https://rosettacode.org/wiki/Hash_from_two_arrays
 #
 
 var keys = %w(a b c);

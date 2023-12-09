@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Reverse_words_in_a_string
+## https://rosettacode.org/wiki/Reverse_words_in_a_string
 #
 
 DATA.each{|line| line.words.reverse.join(" ").say};

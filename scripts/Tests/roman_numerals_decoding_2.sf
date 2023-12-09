@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Roman_numerals/Decode#Go
+# Translation of: https://rosettacode.org/wiki/Roman_numerals/Decode#Go
 
 func roman2arabic(roman) {
 

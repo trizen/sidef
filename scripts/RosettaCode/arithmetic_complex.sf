@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Arithmetic/Complex
+## https://rosettacode.org/wiki/Arithmetic/Complex
 #
 
 var a = 1:1;                # Complex(1, 1)

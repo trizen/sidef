@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Catalan_numbers/Pascal%27s_triangle
+## https://rosettacode.org/wiki/Catalan_numbers/Pascal%27s_triangle
 #
 
 func catalan(num) {

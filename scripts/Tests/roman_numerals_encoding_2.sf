@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Roman_numerals/Encode#ActionScript
+# Translation of: https://rosettacode.org/wiki/Roman_numerals/Encode#ActionScript
 
 func arabic2roman(num, roman='') {
 

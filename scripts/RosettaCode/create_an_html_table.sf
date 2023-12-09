@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Create_an_HTML_table
+## https://rosettacode.org/wiki/Create_an_HTML_table
 #
 
 class HTML {

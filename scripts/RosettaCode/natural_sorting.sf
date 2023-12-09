@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Natural_sorting#Sidef
+## https://rosettacode.org/wiki/Natural_sorting#Sidef
 #
 
 class String {

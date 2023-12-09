@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/French_Republican_calendar
+## https://rosettacode.org/wiki/French_Republican_calendar
 #
 
 require('DateTime')

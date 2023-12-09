@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Apply_a_digitial_filter_(direct_form_II_transposed)
+## https://rosettacode.org/wiki/Apply_a_digitial_filter_(direct_form_II_transposed)
 #
 
 func TDF_II_filter(signal, a, b) {

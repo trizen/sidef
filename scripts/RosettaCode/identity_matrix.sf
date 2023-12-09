@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Identity_matrix
+## https://rosettacode.org/wiki/Identity_matrix
 #
 
 func identity_matrix(n) {

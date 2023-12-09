@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Multifactorial
+## https://rosettacode.org/wiki/Multifactorial
 #
 
 func mfact(s, n) {

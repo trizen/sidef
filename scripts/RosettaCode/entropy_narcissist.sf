@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Entropy/Narcissist
+## https://rosettacode.org/wiki/Entropy/Narcissist
 #
 
 func entropy(s) {

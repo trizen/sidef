@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Equilibrium_index
+## https://rosettacode.org/wiki/Equilibrium_index
 #
 
 func eq_index(nums) {

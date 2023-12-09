@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 # 90-degree version of Sierpinski's triangle
-# http://rosettacode.org/wiki/Sierpinski_triangle
+# https://rosettacode.org/wiki/Sierpinski_triangle
 
 func sierpinski_triangle_90(n) {
     var triangle = ['*'];

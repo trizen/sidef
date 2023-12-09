@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Regular_expressions
+## https://rosettacode.org/wiki/Regular_expressions
 #
 
 var str = <<'EOF';

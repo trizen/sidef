@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Empty_directory
+## https://rosettacode.org/wiki/Empty_directory
 #
 
 func is_empty(dir) {

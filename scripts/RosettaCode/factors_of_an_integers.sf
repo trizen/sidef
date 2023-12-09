@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Factors_of_an_integer
+## https://rosettacode.org/wiki/Factors_of_an_integer
 #
 
 func factors(n) {

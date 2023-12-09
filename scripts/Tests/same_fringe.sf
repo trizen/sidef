@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Same_Fringe
+## https://rosettacode.org/wiki/Same_Fringe
 #
 
 var trees = [

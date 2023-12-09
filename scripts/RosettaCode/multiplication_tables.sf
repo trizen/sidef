@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Multiplication_tables
+## https://rosettacode.org/wiki/Multiplication_tables
 #
 
 var max = 12;

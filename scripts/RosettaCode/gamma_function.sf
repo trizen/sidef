@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Gamma_function
+## https://rosettacode.org/wiki/Gamma_function
 #
 
 var a = [ 1.00000_00000_00000_00000,  0.57721_56649_01532_86061, -0.65587_80715_20253_88108,

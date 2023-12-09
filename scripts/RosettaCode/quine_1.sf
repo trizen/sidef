@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Quine
+## https://rosettacode.org/wiki/Quine
 #
 
 say(<<e*2, 'e')

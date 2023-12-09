@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Angle_difference_between_two_bearings
+## https://rosettacode.org/wiki/Angle_difference_between_two_bearings
 #
 
 func bearingAngleDiff(b1, b2) {

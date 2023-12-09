@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Random_number_generator_(device)
+## https://rosettacode.org/wiki/Random_number_generator_(device)
 #
 
 func urandom() {

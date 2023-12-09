@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Water_collected_between_towers
+## https://rosettacode.org/wiki/Water_collected_between_towers
 #
 
 func max_l(Array a, m = a[0]) {

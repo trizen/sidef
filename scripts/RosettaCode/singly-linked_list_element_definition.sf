@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Singly-linked_list/Element_definition
+## https://rosettacode.org/wiki/Singly-linked_list/Element_definition
 #
 
 var foo_node = Hash.new(foo => 1);

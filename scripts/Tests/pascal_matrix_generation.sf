@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Pascal_matrix_generation
+## https://rosettacode.org/wiki/Pascal_matrix_generation
 #
 
 func grow_matrix(matrix, callback) {

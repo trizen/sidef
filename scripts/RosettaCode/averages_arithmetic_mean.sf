@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Averages/Arithmetic_mean
+## https://rosettacode.org/wiki/Averages/Arithmetic_mean
 #
 
 func avg(list) {

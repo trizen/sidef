@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Binary_search
+## https://rosettacode.org/wiki/Binary_search
 #
 
 func binary_search(array, value, low, high) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Dice_game_probabilities
+## https://rosettacode.org/wiki/Dice_game_probabilities
 #
 
 func combos(sides, n) {

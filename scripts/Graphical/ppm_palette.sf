@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Bitmap/Write_a_PPM_file
+## https://rosettacode.org/wiki/Bitmap/Write_a_PPM_file
 #
 
 subset Int   < Number {|n| n.is_int  }

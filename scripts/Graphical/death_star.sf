@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Death_Star#Sidef
+## https://rosettacode.org/wiki/Death_Star#Sidef
 #
 
 # Writes a PGM to stdout.

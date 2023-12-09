@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Euler_method#Sidef
+## https://rosettacode.org/wiki/Euler_method#Sidef
 #
 
 func euler_method(t0, t1, k, step_size) {

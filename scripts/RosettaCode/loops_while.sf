@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Loops/While
+## https://rosettacode.org/wiki/Loops/While
 #
 
 var i = 1024;

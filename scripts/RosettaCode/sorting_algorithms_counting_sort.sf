@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sorting_algorithms/Counting_sort
+## https://rosettacode.org/wiki/Sorting_algorithms/Counting_sort
 #
 
 func counting_sort(a, min, max) {

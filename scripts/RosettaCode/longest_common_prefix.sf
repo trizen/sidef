@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Longest_common_prefix
+## https://rosettacode.org/wiki/Longest_common_prefix
 #
 
 # Finds the first point where the tree bifurcates

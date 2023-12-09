@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Runtime_evaluation/In_an_environment
+## https://rosettacode.org/wiki/Runtime_evaluation/In_an_environment
 #
 
 func eval_with_x(code, x, y) {

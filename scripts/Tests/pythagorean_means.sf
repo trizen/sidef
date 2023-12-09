@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Averages/Pythagorean_means#Perl_6
+# Translation of: https://rosettacode.org/wiki/Averages/Pythagorean_means#Perl_6
 
 func A(a) { a«+» / a.len }
 func G(a) { a«*» ** 1/a.len }

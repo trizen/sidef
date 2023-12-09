@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Standard_deviation
+## https://rosettacode.org/wiki/Standard_deviation
 #
 
 class StdDevAccumulator(n=0, sum=0, sumofsquares=0) {

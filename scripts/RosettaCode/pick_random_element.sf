@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Pick_random_element
+## https://rosettacode.org/wiki/Pick_random_element
 #
 
 var arr = %w(north east south west);

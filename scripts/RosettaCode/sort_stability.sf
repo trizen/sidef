@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sort_stability
+## https://rosettacode.org/wiki/Sort_stability
 #
 
 var table = [

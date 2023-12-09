@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Letter_frequency#Sidef
+## https://rosettacode.org/wiki/Letter_frequency#Sidef
 #
 
 func letter_frequency(File file) {

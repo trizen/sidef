@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Multisplit#Sidef
+## https://rosettacode.org/wiki/Multisplit#Sidef
 #
 
 func multisplit(sep, str, :opt) {

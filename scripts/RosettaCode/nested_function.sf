@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Nested_function
+## https://rosettacode.org/wiki/Nested_function
 #
 
 func make_list(separator = ') ') {

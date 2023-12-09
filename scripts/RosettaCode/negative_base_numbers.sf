@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Negative_base_numbers
+## https://rosettacode.org/wiki/Negative_base_numbers
 #
 
 func EncodeNegBase(Num n, Num b { .~~ (-36 .. -2) }) {

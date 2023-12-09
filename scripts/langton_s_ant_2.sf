@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 # Sidef implementation of Langton's Ant
-# Translation of: http://rosettacode.org/wiki/Langton%27s_ant#Perl
+# Translation of: https://rosettacode.org/wiki/Langton%27s_ant#Perl
 
 # Using screen coordinates - 0,0 in upper-left, +X right, +Y down -
 # these directions (right, up, left, down) are counterclockwise

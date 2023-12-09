@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Calendar#Sidef
+## https://rosettacode.org/wiki/Calendar#Sidef
 #
 
 require('DateTime')

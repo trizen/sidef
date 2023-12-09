@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Middle_three_digits
+## https://rosettacode.org/wiki/Middle_three_digits
 #
 
 func middle_three(n) {

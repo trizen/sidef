@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Thue-Morse
+## https://rosettacode.org/wiki/Thue-Morse
 #
 
 func recmap(repeat, seed, transform, callback) {

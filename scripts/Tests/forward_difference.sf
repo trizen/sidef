@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Forward_difference
+## https://rosettacode.org/wiki/Forward_difference
 #
 
 func dif(arr) {

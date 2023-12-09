@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Continued_fraction/Arithmetic/Construct_from_rational_number
+## https://rosettacode.org/wiki/Continued_fraction/Arithmetic/Construct_from_rational_number
 #
 
 func r2cf(num, den) {

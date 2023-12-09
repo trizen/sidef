@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Range_expansion
+## https://rosettacode.org/wiki/Range_expansion
 #
 
 func rangex(str) {

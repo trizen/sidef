@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Kaprekar_numbers
+## https://rosettacode.org/wiki/Kaprekar_numbers
 #
 
 var kap = Hash()

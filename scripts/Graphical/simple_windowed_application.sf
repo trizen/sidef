@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Simple_windowed_application
+## https://rosettacode.org/wiki/Simple_windowed_application
 #
 
 use('Gtk3 -init')

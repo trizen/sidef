@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/First_class_environments
+## https://rosettacode.org/wiki/First_class_environments
 #
 
 func calculator({.is_one} ) { 1 }

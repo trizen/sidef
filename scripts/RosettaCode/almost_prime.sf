@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Almost_prime#Sidef
+## https://rosettacode.org/wiki/Almost_prime#Sidef
 #
 
 func is_k_almost_prime(n, k) {

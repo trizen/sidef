@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Reverse_a_string
+## https://rosettacode.org/wiki/Reverse_a_string
 #
 
 say "asdf".reverse;             # fdsa

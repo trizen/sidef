@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Matrix_multiplication
+## https://rosettacode.org/wiki/Matrix_multiplication
 #
 
 func matrix_multi(a, b) {

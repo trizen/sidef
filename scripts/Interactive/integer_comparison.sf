@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Integer_comparison
+## https://rosettacode.org/wiki/Integer_comparison
 #
 
 var a = read("a: ", Number);

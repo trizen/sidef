@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Zig-zag_matrix#Sidef
+## https://rosettacode.org/wiki/Zig-zag_matrix#Sidef
 #
 
 func zig_zag(w, h) {

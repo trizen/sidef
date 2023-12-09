@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# See: http://en.wikipedia.org/wiki/Sylvester's_sequence
+# See: https://en.wikipedia.org/wiki/Sylvester's_sequence
 
 func sylvesters_sequence(n, code) {
 

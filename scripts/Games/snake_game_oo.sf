@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Snake
+## https://rosettacode.org/wiki/Snake
 #
 
 class SnakeGame(w, h) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Averages/Mode
+## https://rosettacode.org/wiki/Averages/Mode
 #
 
 func mode(array) {

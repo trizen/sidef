@@ -1,19 +1,19 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Hello_world/Graphical
+## https://rosettacode.org/wiki/Hello_world/Graphical
 #
 
 use('Gtk3 -init')
- 
-var gtk3   = 'Gtk3'.to_caller;
-var window = 'Gtk3::Window'.to_caller.new;
-var label  = 'Gtk3::Label'.to_caller.new('Goodbye, World!');
- 
-window.set_title('Goodbye, World!');
-window.signal_connect(destroy => func(_) { gtk3.main_quit });
- 
-window.add(label);
-window.show_all;
- 
-gtk3.main;
+
+var gtk3   = %O'Gtk3'
+var window = %O'Gtk3::Window'.new
+var label  = %O'Gtk3::Label'.new('Goodbye, World!')
+
+window.set_title('Goodbye, World!')
+window.signal_connect(destroy => { gtk3.main_quit })
+
+window.add(label)
+window.show_all
+
+gtk3.main

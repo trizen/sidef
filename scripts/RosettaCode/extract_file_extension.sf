@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Extract_file_extension
+## https://rosettacode.org/wiki/Extract_file_extension
 #
 
 func extension(filename) {

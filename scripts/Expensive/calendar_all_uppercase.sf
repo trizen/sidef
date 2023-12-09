@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Calendar_-_for_%22REAL%22_programmers
+## https://rosettacode.org/wiki/Calendar_-_for_%22REAL%22_programmers
 #
 
 -> DT { ('DATE'.("\LWC") + 'TIME'.("\LWC")).("\LREQUIRE") }

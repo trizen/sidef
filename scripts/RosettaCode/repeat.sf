@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Repeat
+## https://rosettacode.org/wiki/Repeat
 #
 
 func repeat(f, n) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Get_system_command_output
+## https://rosettacode.org/wiki/Get_system_command_output
 #
 
 var pipe   = %p(ls);          # same as: Pipe.new('ls');

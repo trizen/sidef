@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://en.wikipedia.org/wiki/Ruby_(programming_language)#Metaprogramming
+# https://en.wikipedia.org/wiki/Ruby_(programming_language)#Metaprogramming
 
 var colors = Hash(
                'black'   => "000",

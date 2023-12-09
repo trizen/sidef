@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Knuth%27s_power_tree
+## https://rosettacode.org/wiki/Knuth%27s_power_tree
 #
 
 var p = Hash(1 => 0)

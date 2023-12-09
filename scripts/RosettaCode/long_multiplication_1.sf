@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Long_multiplication
+## https://rosettacode.org/wiki/Long_multiplication
 #
 
 func add_with_carry(result, addend, addendpos) {

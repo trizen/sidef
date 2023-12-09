@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 # Translation of M.E. O'Neill's C code:
-#   http://www.pcg-random.org/download.html
+#   https://www.pcg-random.org/download.html
 
 struct PCG32 {
     Number state,

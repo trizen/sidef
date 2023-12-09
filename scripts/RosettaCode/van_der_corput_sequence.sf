@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Van_der_Corput_sequence
+## https://rosettacode.org/wiki/Van_der_Corput_sequence
 #
 
 func vdc(value, base=2) {

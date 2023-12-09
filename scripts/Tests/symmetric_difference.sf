@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Symmetric_difference
+## https://rosettacode.org/wiki/Symmetric_difference
 #
 
 var a = ["John", "Serena", "Bob", "Mary", "Serena"];

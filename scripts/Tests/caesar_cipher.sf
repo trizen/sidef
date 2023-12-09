@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Caesar_cipher
+## https://rosettacode.org/wiki/Caesar_cipher
 #
 
 func caesar(msg, key, decode=false) {

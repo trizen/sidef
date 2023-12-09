@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Ramsey%27s_theorem
+## https://rosettacode.org/wiki/Ramsey%27s_theorem
 #
 
 var a = 17.of { 17.of(0) }

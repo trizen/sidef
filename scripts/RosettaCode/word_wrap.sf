@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Word_wrap
+## https://rosettacode.org/wiki/Word_wrap
 #
 
 class String {

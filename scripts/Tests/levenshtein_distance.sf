@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Levenshtein_distance#Go
+# Translation of: https://rosettacode.org/wiki/Levenshtein_distance#Go
 
 func levenshtein(s, t) {
 

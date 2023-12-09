@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Ludic_numbers
+## https://rosettacode.org/wiki/Ludic_numbers
 #
 
 func ludics_upto(nmax=100000) {

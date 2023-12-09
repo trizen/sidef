@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Binary_search#Perl
+# Translation of: https://rosettacode.org/wiki/Binary_search#Perl
 
 func binary_search(array, value, low, high) {
     high < low && return -1;

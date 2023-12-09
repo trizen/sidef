@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Strip_a_set_of_characters_from_a_string
+## https://rosettacode.org/wiki/Strip_a_set_of_characters_from_a_string
 #
 
 func stripchars_1(str, char_list) {

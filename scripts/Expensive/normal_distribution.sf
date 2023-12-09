@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Statistics/Normal_distribution
+## https://rosettacode.org/wiki/Statistics/Normal_distribution
 #
 
 define τ = Number.tau

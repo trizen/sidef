@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Numerical_integration/Gauss-Legendre_Quadrature
+## https://rosettacode.org/wiki/Numerical_integration/Gauss-Legendre_Quadrature
 #
 
 func legendre_pair((1), x) { (x, 1) }

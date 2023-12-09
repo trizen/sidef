@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 # The old problem of string expanding
-# http://trizenx.blogspot.ro/2012/03/expand-string.html
+# https://trizenx.blogspot.ro/2012/03/expand-string.html
 
 func abs_str (str) {
 

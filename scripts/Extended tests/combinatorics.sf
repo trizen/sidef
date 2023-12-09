@@ -90,7 +90,7 @@ assert_eq(11.of(andre), %n[1, 1, 1, 2, 5, 16, 61, 272, 1385, 7936, 50521])
 assert_eq(9.of{.partition_count}, %n[1, 1, 2, 3, 5, 7, 11, 15, 22])
 assert_eq(11.of{stirling(9, _)}, %n[0, 40320, -109584, 118124, -67284, 22449, -4536, 546, -36, 1, 0])
 
-# http://oeis.org/A008275
+# https://oeis.org/A008275
 assert_eq(10.of {|n| 1..n -> map {|k| stirling(n, k) } }.flat, %n[
         1, -1,
         1, 2, -3,

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Largest_int_from_concatenated_ints
+## https://rosettacode.org/wiki/Largest_int_from_concatenated_ints
 #
 
 func maxnum(nums) {

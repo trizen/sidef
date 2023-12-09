@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Names_to_numbers
+## https://rosettacode.org/wiki/Names_to_numbers
 #
 
 func names_to_number(str) {

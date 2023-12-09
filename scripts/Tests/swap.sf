@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Generic_swap#Sidef
+## https://rosettacode.org/wiki/Generic_swap#Sidef
 #
 
 func swap_1(Ref a, Ref b) {

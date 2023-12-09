@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Extreme_floating_point_values
+## https://rosettacode.org/wiki/Extreme_floating_point_values
 #
 
 var inf = (1 / 0)    #=> Inf

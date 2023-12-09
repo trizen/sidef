@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Hickerson_series_of_almost_integers
+## https://rosettacode.org/wiki/Hickerson_series_of_almost_integers
 #
 
 func h(n) {

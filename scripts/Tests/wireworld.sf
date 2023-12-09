@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Wireworld
+## https://rosettacode.org/wiki/Wireworld
 #
 
 var f = [[], DATA.lines.map {['', .chomp.chars..., '']}..., []];

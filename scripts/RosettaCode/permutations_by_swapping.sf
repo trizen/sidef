@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Permutations_by_swapping
+## https://rosettacode.org/wiki/Permutations_by_swapping
 #
 
 func perms(n) {

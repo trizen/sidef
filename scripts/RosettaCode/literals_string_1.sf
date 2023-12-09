@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Literals/String
+## https://rosettacode.org/wiki/Literals/String
 #
 
 var a = 42;

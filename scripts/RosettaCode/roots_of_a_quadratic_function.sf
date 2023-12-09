@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Roots_of_a_quadratic_function
+## https://rosettacode.org/wiki/Roots_of_a_quadratic_function
 #
 
 var sets = [

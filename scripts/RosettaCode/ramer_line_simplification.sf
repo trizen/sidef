@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Ramer-Douglas-Peucker_line_simplification
+## https://rosettacode.org/wiki/Ramer-Douglas-Peucker_line_simplification
 #
 
 func perpendicular_distance(Arr start, Arr end, Arr point) {

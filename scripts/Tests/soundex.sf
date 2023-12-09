@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Soundex
+## https://rosettacode.org/wiki/Soundex
 #
 
 func soundex(word, length=3) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Jaro_distance
+## https://rosettacode.org/wiki/Jaro_distance
 #
 
 func jaro(s, t) {

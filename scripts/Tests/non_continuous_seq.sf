@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Non-continuous_subsequences
+## https://rosettacode.org/wiki/Non-continuous_subsequences
 #
 
 func non_continuous(min, max, subseq=[], has_gap=false) {

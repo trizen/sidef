@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Left_factorials#Sidef
+## https://rosettacode.org/wiki/Left_factorials#Sidef
 #
 
 func left_fact(k) {

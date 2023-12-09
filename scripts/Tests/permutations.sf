@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Permutations
+## https://rosettacode.org/wiki/Permutations
 #
 
 func permute (code, arr) {

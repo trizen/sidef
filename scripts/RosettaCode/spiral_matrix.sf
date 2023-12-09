@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Spiral_matrix
+## https://rosettacode.org/wiki/Spiral_matrix
 #
 
 func spiral(n) {

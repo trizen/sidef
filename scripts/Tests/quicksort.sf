@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Sorting_algorithms/Quicksort#Perl
+# Translation of: https://rosettacode.org/wiki/Sorting_algorithms/Quicksort#Perl
 
 func quicksort (a) {
     a.len < 2 && return(a);

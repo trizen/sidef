@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Averages/Pythagorean_means
+## https://rosettacode.org/wiki/Averages/Pythagorean_means
 #
 
 func A(a) { a.sum / a.len };

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Parsing/Shunting-yard_algorithm
+## https://rosettacode.org/wiki/Parsing/Shunting-yard_algorithm
 #
 
 var prec = Hash(

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/DNS_query
+## https://rosettacode.org/wiki/DNS_query
 #
 
 var (err, *res) = Socket.getaddrinfo(

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Subtractive_generator
+## https://rosettacode.org/wiki/Subtractive_generator
 #
 
 class SubRandom(seed, state=[]) {

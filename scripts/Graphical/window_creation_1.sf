@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Window_creation
+## https://rosettacode.org/wiki/Window_creation
 #
 
 use('Gtk3 -init')

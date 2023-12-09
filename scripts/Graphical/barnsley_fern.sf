@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Barnsley_fern
+## https://rosettacode.org/wiki/Barnsley_fern
 #
 
 require('Imager')

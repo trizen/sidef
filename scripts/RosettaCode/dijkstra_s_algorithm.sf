@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Dijkstra%27s_algorithm
+## https://rosettacode.org/wiki/Dijkstra%27s_algorithm
 #
 
 class Graph(*args) {

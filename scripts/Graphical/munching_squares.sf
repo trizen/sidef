@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Munching_squares
+## https://rosettacode.org/wiki/Munching_squares
 #
 
 require('GD');

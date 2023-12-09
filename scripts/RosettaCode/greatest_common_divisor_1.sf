@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Greatest_common_divisor
+## https://rosettacode.org/wiki/Greatest_common_divisor
 #
 
 func gcd(a, b) {

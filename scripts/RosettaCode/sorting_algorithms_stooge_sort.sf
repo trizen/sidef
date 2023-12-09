@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sorting_algorithms/Stooge_sort
+## https://rosettacode.org/wiki/Sorting_algorithms/Stooge_sort
 #
 
 func stooge(x, i, j) {

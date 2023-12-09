@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/I.Q._Puzzle
+## https://rosettacode.org/wiki/I.Q._Puzzle
 #
 
 const N = [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1]

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Roots_of_a_function
+# https://rosettacode.org/wiki/Roots_of_a_function
 
 func f(x) {
     x*x*x - 3*x*x + 2*x;

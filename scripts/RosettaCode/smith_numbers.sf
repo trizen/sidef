@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Smith_numbers
+## https://rosettacode.org/wiki/Smith_numbers
 #
 
 var primes = Enumerator({ |callback|

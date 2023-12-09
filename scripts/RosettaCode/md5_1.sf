@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/MD5
+## https://rosettacode.org/wiki/MD5
 #
 
 var md5 = require('Digest::MD5').new;

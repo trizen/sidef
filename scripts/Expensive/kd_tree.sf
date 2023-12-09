@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/K-d_tree
+## https://rosettacode.org/wiki/K-d_tree
 #
 
 struct Kd_node {

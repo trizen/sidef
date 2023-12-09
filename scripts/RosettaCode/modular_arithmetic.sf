@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Modular_arithmetic
+## https://rosettacode.org/wiki/Modular_arithmetic
 #
 
 class Modulo(n=0, m=13) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Write_language_name_in_3D_ASCII
+## https://rosettacode.org/wiki/Write_language_name_in_3D_ASCII
 #
 
 var text = <<'EOT';

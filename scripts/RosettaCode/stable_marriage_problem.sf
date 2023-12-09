@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Stable_marriage_problem
+## https://rosettacode.org/wiki/Stable_marriage_problem
 #
 
 var he_likes = Hash(

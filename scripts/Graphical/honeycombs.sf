@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Honeycombs
+## https://rosettacode.org/wiki/Honeycombs
 #
 
 require('Tk')

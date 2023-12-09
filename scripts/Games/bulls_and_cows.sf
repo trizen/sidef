@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Bulls_and_cows#Sidef
+## https://rosettacode.org/wiki/Bulls_and_cows#Sidef
 #
 
 var size = 4;

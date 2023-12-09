@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Compound_data_type
+## https://rosettacode.org/wiki/Compound_data_type
 #
 
 class Point(x, y) {};

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Zebra_puzzle
+## https://rosettacode.org/wiki/Zebra_puzzle
 #
 
 var CONTENT = Hash(

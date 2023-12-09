@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Color_wheel
+## https://rosettacode.org/wiki/Color_wheel
 #
 
 require('Imager')

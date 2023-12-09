@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sutherland-Hodgman_polygon_clipping
+## https://rosettacode.org/wiki/Sutherland-Hodgman_polygon_clipping
 #
 
 class Point(x, y) {

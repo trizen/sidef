@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Nth_root
+## https://rosettacode.org/wiki/Nth_root
 #
 
 func nthroot(n, a, precision=1e-5) {

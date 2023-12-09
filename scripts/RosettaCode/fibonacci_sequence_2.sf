@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Fibonacci_sequence
+## https://rosettacode.org/wiki/Fibonacci_sequence
 #
 
 var c = [];

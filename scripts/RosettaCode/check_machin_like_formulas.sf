@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Check_Machin-like_formulas
+## https://rosettacode.org/wiki/Check_Machin-like_formulas
 #
 var equationtext = <<'EOT'
   pi/4 = arctan(1/2) + arctan(1/3)

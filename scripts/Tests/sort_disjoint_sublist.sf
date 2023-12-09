@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sort_disjoint_sublist
+## https://rosettacode.org/wiki/Sort_disjoint_sublist
 #
 
 func disjointSort(values, indices) {

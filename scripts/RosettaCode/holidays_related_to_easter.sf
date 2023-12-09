@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Holidays_related_to_Easter
+## https://rosettacode.org/wiki/Holidays_related_to_Easter
 #
 
 require('Date::Calc')

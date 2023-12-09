@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/File_size
+## https://rosettacode.org/wiki/File_size
 #
 
 say (Dir.cwd  + %f'input.txt' -> size);

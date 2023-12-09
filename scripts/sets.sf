@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/MySet#Sidef
+## https://rosettacode.org/wiki/MySet#Sidef
 #
 
 class MySet(*set) {

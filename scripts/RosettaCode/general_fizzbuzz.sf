@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/General_FizzBuzz
+## https://rosettacode.org/wiki/General_FizzBuzz
 #
 
 class FizzBuzz(schema=Hash.new(<3 Fizz 5 Buzz>...)) {

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/9_billion_names_of_God_the_integer#Python
+# Translation of: https://rosettacode.org/wiki/9_billion_names_of_God_the_integer#Python
 
 var cache = [[1]];
 

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Find_common_directory_path#Sidef
+## https://rosettacode.org/wiki/Find_common_directory_path#Sidef
 #
 
 var dirs = %w(

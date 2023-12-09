@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Secure_temporary_file
+## https://rosettacode.org/wiki/Secure_temporary_file
 #
 
 var tmpfile = require('File::Temp');

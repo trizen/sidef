@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# http://rosettacode.org/wiki/Horner%27s_rule_for_polynomial_evaluation
+# https://rosettacode.org/wiki/Horner%27s_rule_for_polynomial_evaluation
 
 #
 ## Recursive

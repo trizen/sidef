@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Probabilistic_choice
+## https://rosettacode.org/wiki/Probabilistic_choice
 #
 
 define TRIALS = 10;

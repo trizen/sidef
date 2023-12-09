@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/First-class_functions/Use_numbers_analogously
+## https://rosettacode.org/wiki/First-class_functions/Use_numbers_analogously
 #
 
 func multiplier(n1, n2) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Bitwise_operations
+## https://rosettacode.org/wiki/Bitwise_operations
 #
 
 func bitwise(a, b) {

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/A*_search_algorithm
+## https://rosettacode.org/wiki/A*_search_algorithm
 #
 
 class AStarGraph {

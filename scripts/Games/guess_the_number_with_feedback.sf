@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Guess_the_number/With_feedback
+## https://rosettacode.org/wiki/Guess_the_number/With_feedback
 #
 
 var number = rand(1..10);

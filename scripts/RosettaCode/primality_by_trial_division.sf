@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Primality_by_trial_division
+## https://rosettacode.org/wiki/Primality_by_trial_division
 #
 
 func is_prime(a) {

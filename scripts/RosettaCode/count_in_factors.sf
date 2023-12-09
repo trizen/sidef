@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Count_in_factors
+## https://rosettacode.org/wiki/Count_in_factors
 #
 
 class Counter {

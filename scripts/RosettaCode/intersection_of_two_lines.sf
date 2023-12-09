@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Find_the_intersection_of_two_lines
+## https://rosettacode.org/wiki/Find_the_intersection_of_two_lines
 #
 
 func det(a, b, c, d ) { a*d - b*c }

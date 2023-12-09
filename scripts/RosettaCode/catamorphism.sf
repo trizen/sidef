@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Catamorphism
+## https://rosettacode.org/wiki/Catamorphism
 #
 
 say (1..10 -> reduce('+'));

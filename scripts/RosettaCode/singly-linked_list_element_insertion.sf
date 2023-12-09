@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Singly-linked_list/Element_insertion
+## https://rosettacode.org/wiki/Singly-linked_list/Element_insertion
 #
 
 func insert_after(a,b) {

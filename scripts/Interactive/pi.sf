@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Pi
+## https://rosettacode.org/wiki/Pi
 #
 
 func pi(callback) {

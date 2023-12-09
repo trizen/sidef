@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Julia_set
+## https://rosettacode.org/wiki/Julia_set
 #
 
 var (w, h) = (80, 30)

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Levenshtein_distance/Alignment
+## https://rosettacode.org/wiki/Levenshtein_distance/Alignment
 #
 
 func align(s, t) {

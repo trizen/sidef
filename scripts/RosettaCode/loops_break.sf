@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Loops/Break
+## https://rosettacode.org/wiki/Loops/Break
 #
 
 var lim = 20;

@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Thiele%27s_interpolation_formula
+## https://rosettacode.org/wiki/Thiele%27s_interpolation_formula
 #
 
 func thiele(x, y) {

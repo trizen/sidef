@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Binary_digits
+## https://rosettacode.org/wiki/Binary_digits
 #
 
 [5, 50, 9000].each { |n|

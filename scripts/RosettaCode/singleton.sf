@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Singleton
+## https://rosettacode.org/wiki/Singleton
 #
 
 class Singleton(name) {

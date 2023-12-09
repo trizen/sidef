@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Short-circuit_evaluation
+## https://rosettacode.org/wiki/Short-circuit_evaluation
 #
 
 func a(bool) { print 'A'; return bool };

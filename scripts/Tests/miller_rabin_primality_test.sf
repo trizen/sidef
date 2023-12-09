@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Miller%E2%80%93Rabin_primality_test
+## https://rosettacode.org/wiki/Miller%E2%80%93Rabin_primality_test
 #
 
 func is_prime(n { .is_odd && (_ > 2) }, k) {

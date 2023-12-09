@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/User_input/Graphical
+## https://rosettacode.org/wiki/User_input/Graphical
 #
 
 use('Gtk3 -init')

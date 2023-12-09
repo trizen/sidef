@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Loops/For
+## https://rosettacode.org/wiki/Loops/For
 #
 
 for (1..5) { |i|

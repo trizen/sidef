@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Return_multiple_values
+## https://rosettacode.org/wiki/Return_multiple_values
 #
 
 func foo(a,b) {

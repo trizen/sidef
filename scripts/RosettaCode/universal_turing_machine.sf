@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Universal_Turing_machine#Sidef
+## https://rosettacode.org/wiki/Universal_Turing_machine#Sidef
 #
 
 func run_utm(state="", blank="", rules=[], tape=[blank], halt="", pos=0) {

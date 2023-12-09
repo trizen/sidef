@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-# Translation of: http://rosettacode.org/wiki/Hailstone_sequence#Perl
+# Translation of: https://rosettacode.org/wiki/Hailstone_sequence#Perl
 
 func hailstone (n) {
 

@@ -31,7 +31,7 @@ var COLORS = Hash.new(
         );
 
 # Redefine the String class and define new methods in it with 'def_method' keyword
-# Inspired from: http://en.wikipedia.org/wiki/Ruby_(programming_language)#Metaprogramming
+# Inspired from: https://en.wikipedia.org/wiki/Ruby_(programming_language)#Metaprogramming
 class String {
     COLORS.each { |color,code|
        __CLASS__.def_method("in_#{color}", func(self) {

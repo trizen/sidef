@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Sieve_of_Eratosthenes#Sidef
+## https://rosettacode.org/wiki/Sieve_of_Eratosthenes#Sidef
 #
 
 func sieve_iter(limit) {

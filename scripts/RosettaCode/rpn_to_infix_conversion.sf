@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Parsing/RPN_to_infix_conversion
+## https://rosettacode.org/wiki/Parsing/RPN_to_infix_conversion
 #
 
 func p(pair, prec) {

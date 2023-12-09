@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Move-to-front_algorithm#Sidef
+## https://rosettacode.org/wiki/Move-to-front_algorithm#Sidef
 #
 
 func encode(str) {

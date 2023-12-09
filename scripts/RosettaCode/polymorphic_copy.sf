@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Polymorphic_copy
+## https://rosettacode.org/wiki/Polymorphic_copy
 #
 
 class T(value) {

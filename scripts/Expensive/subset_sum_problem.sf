@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Subset_sum_problem
+## https://rosettacode.org/wiki/Subset_sum_problem
 #
 
 var pairs = Hash(

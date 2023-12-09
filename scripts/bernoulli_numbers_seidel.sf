@@ -3,7 +3,7 @@
 # Seidel's algorithm for computing Bernoulli numbers.
 
 # Algorithm from:
-#   http://oeis.org/wiki/User:Peter_Luschny/ComputationAndAsymptoticsOfBernoulliNumbers#Seidel
+#   https://oeis.org/wiki/User:Peter_Luschny/ComputationAndAsymptoticsOfBernoulliNumbers#Seidel
 
 func bernoulli_seidel(n) {
 

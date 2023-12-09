@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 #
-## http://rosettacode.org/wiki/Diversity_prediction_theorem
+## https://rosettacode.org/wiki/Diversity_prediction_theorem
 #
 
 func avg_error(m, v) {
