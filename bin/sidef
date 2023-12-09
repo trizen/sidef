@@ -747,7 +747,7 @@ EOT
                 or $@ =~ /expected a block after/i
                 or $@ =~ /unexpected end-of-statement/i
                 or (
-                      $@    =~ /unbalanced/ || $@ =~ /string terminator/
+                      $@    =~ /unbalanced|string terminator|delimiter/
                     ? $line =~ /\R\R\z/
                     : $line =~ /\R\z/
                    )
