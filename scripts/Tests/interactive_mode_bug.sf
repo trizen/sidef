@@ -1,0 +1,13 @@
+#!/usr/bin/ruby
+
+# The following code used to fail in interactive mode (fixed):
+#   sidef -i interactive_mode_bug.sf
+
+func f(n) { sqrt(n) }
+func g(n) { f(n) + 42 }
+func h(n) { f(n) - 42 }
+
+for n in (1..5) {
+    say g(n)
+    say h(n)
+}

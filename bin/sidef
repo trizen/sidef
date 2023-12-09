@@ -135,7 +135,7 @@ if (defined $args{t}) {
         say "-" x 80;
 
         my $sidef = Sidef->new(opt  => \%args,
-                               name => $script_name,);
+                               name => $script_name);
 
         my $code     = read_script($script_name);
         my $deparsed = eval { $sidef->compile_code($code, 'Perl') };
@@ -205,7 +205,7 @@ else {
     $code // exit 2;
 
     my $sidef = Sidef->new(opt  => \%args,
-                           name => $script_name,);
+                           name => $script_name);
 
     # Dump the AST
     if (defined $args{D}) {
@@ -352,7 +352,7 @@ HELP
 
     my $sidef = Sidef->new(
                            name       => '-H',
-                           opt        => \%args,
+                           opt        => {i           => 1, %args},
                            parser_opt => {interactive => 1},
                           );
 
@@ -493,7 +493,7 @@ sub code_interactive {
     my $init_sidef = sub {
         $sidef = Sidef->new(
                             name       => '-i',
-                            opt        => \%args,
+                            opt        => {i           => 1, %args},
                             parser_opt => {interactive => 1},
                            );
         $sidef->execute_code('');    # warm-up
@@ -706,6 +706,12 @@ EOT
         $ref_vars_refs = $copy_hash->($sidef->{parser}{ref_vars_refs});
 
         $line =~ s{#(-?[1-9][0-9]*)\b}{(abs($1) <= scalar(@values)) ? ('(' . $values[($1 < 0) ? $1 : $1-1]->{value} . ')') : "#$1"}ge;
+
+        # Last character was '\': read the next line
+        if ($line =~ /\\\s*\z/) {
+            $line .= "\n";
+            goto LINE;
+        }
 
         my $ccode = eval { $sidef->compile_code($line, $args{r} ? 'Sidef' : ($args{R} || 'Perl')) };
 

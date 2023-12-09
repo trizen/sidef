@@ -321,8 +321,8 @@ HEADER
          : '$'
         )
           . ($var->{type} eq 'global' ? ($var->{class} . '::') : '')
-
-          . $var->{name} . ($var->{type} eq 'global' ? '' : ($opt{refaddr} // refaddr($var)));
+          . $var->{name}
+          . ($var->{type} eq 'global' ? '' : ($opt{refaddr} // refaddr($var)));
     }
 
     sub _dump_init_vars {
@@ -785,7 +785,8 @@ HEADER
                         local $self->{parent_name}       = [$obj->{type}, $name];
                         local $self->{current_namespace} = $obj->{class};
 
-                        push @{$self->{function_declarations}}, [$self->{function}, "my \$${alphaname}$refaddr;", $self->{depth} // 0];
+                        push @{$self->{function_declarations}},
+                          [$self->{function}, "my \$${alphaname}$refaddr;", ($self->{opt}{i} ? 1 : ($self->{depth} // 0))];
 
 #<<<
                         if ($self->{ref_class} and !exists($obj->{parent})) {

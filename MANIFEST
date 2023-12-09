@@ -860,6 +860,7 @@ scripts/Tests/inherited_blocks.sf
 scripts/Tests/integer_division.sf
 scripts/Tests/integer_limits.sf
 scripts/Tests/integers_binary_encoding.sf
+scripts/Tests/interactive_mode_bug.sf
 scripts/Tests/inverse_of_factorial.sf
 scripts/Tests/inverted_syntax.sf
 scripts/Tests/irootrem.sf
