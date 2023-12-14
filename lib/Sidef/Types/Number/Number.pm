@@ -1331,6 +1331,7 @@ package Sidef::Types::Number::Number {
         }
 
         $cache{$k} //= do {
+            say STDERR "Computing primorial($k)..." if ($k >= 1e6 and $VERBOSE);
             my $t = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_primorial_ui($t, $k);
             $t;
@@ -19775,14 +19776,14 @@ package Sidef::Types::Number::Number {
 
             my @trial_factors;
 
-            foreach my $j (2 .. 9) {
+            foreach my $j (2 .. (INTSIZE <= 32 ? 8 : 9)) {
 
                 my $trial_limit = 10**$j;
                 my ($r, @new_factors) = _primorial_trial_factor($remainder, $trial_limit);
 
                 # A fast conjectured approach, based on Pollard's rho method,
                 # which is expected to find a factor `p` in `O(sqrt(p))` steps.
-                if (    $j <= 6
+                if (    $j <= (INTSIZE <= 32 ? 5 : 7)
                     and $USE_CONJECTURES
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) >= SPECIAL_FACTORS_MIN
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) <= 500) {
@@ -19832,11 +19833,12 @@ package Sidef::Types::Number::Number {
 
                 my $r_size = Math::GMPz::Rmpz_sizeinbase($remainder, 2);
 
-                last if (($j >= 4) && ($r_size <= 83));     # <= 25 digits
-                last if (($j >= 5) && ($r_size <= 100));    # <= 30 digits
-                last if (($j >= 6) && ($r_size <= 133));    # <= 40 digits
-                last if (($j >= 7) && ($r_size <= 150));    # <= 45 digits
-                last if (($j >= 8) && ($r_size <= 200));    # <= 60 digits
+                last if (($j >= 4) && ($r_size <= 83));                  # <= 25 digits
+                last if (($j >= 5) && ($r_size <= 100));                 # <= 30 digits
+                last if (($j >= 6) && ($r_size <= 133));                 # <= 40 digits
+                last if (($j >= 7) && ($r_size <= 150));                 # <= 45 digits
+                last if (($j >= 8) && ($r_size <= 200));                 # <= 60 digits
+                last if (($j >= 8) && ($r_size <= 250) && $USE_YAFU);    # <= 75 digits
 
                 # Try to find special factors
                 if ($j >= 6) {
@@ -19893,7 +19895,7 @@ package Sidef::Types::Number::Number {
 
                     if (    $j <= 8
                         and @composite_factors
-                        and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > YAFU_MIN) {
+                        and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > ($j == 8 ? FACTORDB_MIN : YAFU_MIN)) {
                         next;
                     }
 
@@ -20036,14 +20038,14 @@ package Sidef::Types::Number::Number {
 
             my @trial_factors;
 
-            foreach my $j (2 .. 9) {
+            foreach my $j (2 .. (INTSIZE <= 32 ? 8 : 9)) {
 
                 my $trial_limit = 10**$j;
                 my ($r, @new_factors) = _primorial_trial_factor($remainder, $trial_limit);
 
                 # A fast conjectured approach, based on Pollard's rho method,
                 # which is expected to find a factor `p` in `O(sqrt(p))` steps.
-                if (    $j <= 6
+                if (    $j <= (INTSIZE <= 32 ? 5 : 7)
                     and $USE_CONJECTURES
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) >= SPECIAL_FACTORS_MIN
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) <= 500) {
@@ -20099,11 +20101,12 @@ package Sidef::Types::Number::Number {
 
                 my $r_size = Math::GMPz::Rmpz_sizeinbase($remainder, 2);
 
-                last if (($j >= 4) && ($r_size <= 83));     # <= 25 digits
-                last if (($j >= 5) && ($r_size <= 100));    # <= 30 digits
-                last if (($j >= 6) && ($r_size <= 133));    # <= 40 digits
-                last if (($j >= 7) && ($r_size <= 150));    # <= 45 digits
-                last if (($j >= 8) && ($r_size <= 200));    # <= 60 digits
+                last if (($j >= 4) && ($r_size <= 83));                  # <= 25 digits
+                last if (($j >= 5) && ($r_size <= 100));                 # <= 30 digits
+                last if (($j >= 6) && ($r_size <= 133));                 # <= 40 digits
+                last if (($j >= 7) && ($r_size <= 150));                 # <= 45 digits
+                last if (($j >= 8) && ($r_size <= 200));                 # <= 60 digits
+                last if (($j >= 8) && ($r_size <= 250) && $USE_YAFU);    # <= 75 digits
 
                 # Try to find special factors
                 if ($j >= 6) {
@@ -20152,7 +20155,7 @@ package Sidef::Types::Number::Number {
 
                     if (    $j <= 8
                         and @composite_factors
-                        and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > YAFU_MIN) {
+                        and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > ($j == 8 ? FACTORDB_MIN : YAFU_MIN)) {
                         next;
                     }
 
