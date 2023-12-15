@@ -6125,6 +6125,12 @@ package Sidef::Types::Number::Number {
             return bless \((_bernoulli_numbers($n))[($n >> 1) + 1]);
         }
 
+        if ($n == 1) {
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_ui($q, 1, 2);
+            return bless \$q;
+        }
+
         if ($n >= 5000 and $USE_PARI_GP) {
             if (my $res = _execute_pari_gp("bernfrac($n)")) {
                 my $q = Math::GMPq::Rmpq_init();
@@ -12917,10 +12923,41 @@ package Sidef::Types::Number::Number {
         my ($n, $r) = @_;
         _valid(\$r);
 
+        # (r^(n+1) - 1) / (r-1)
+
         $n = $$n;
         $r = $$r;
 
         bless \__div__(__sub__(__pow__($r, __add__($n, 1)), 1), __sub__($r, 1));
+    }
+
+    sub geometric_summod {
+        my ($n, $r, $m) = @_;
+        _valid(\$r, \$m);
+
+        # (r^(n+1) - 1) * invmod(r-1, m) (mod m)
+
+        $n = _any2mpz($$n) // goto &nan;
+        $r = _any2mpz($$r) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
+
+        my $t = Math::GMPz::Rmpz_init();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_add_ui($t, $n, 1);
+
+        if (Math::GMPz::Rmpz_sgn($t) < 0) {
+            Math::GMPz::Rmpz_invert($u, $r, $m) || goto &nan;
+        }
+
+        Math::GMPz::Rmpz_powm($t, $r, $t, $m);
+        Math::GMPz::Rmpz_sub_ui($t, $t, 1);
+        Math::GMPz::Rmpz_sub_ui($u, $r, 1);
+        Math::GMPz::Rmpz_invert($u, $u, $m) || goto &nan;
+        Math::GMPz::Rmpz_mul($t, $t, $u);
+        Math::GMPz::Rmpz_mod($t, $t, $m);
+
+        bless \$t;
     }
 
     sub faulhaber_range {

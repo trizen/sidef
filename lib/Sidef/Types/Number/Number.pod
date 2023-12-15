@@ -3523,6 +3523,16 @@ Example:
 
 =cut
 
+=head2 geometric_summod
+
+    geometric_summod(n, r, m)
+
+Geometric sum modulo C<m>: C<r^0 + r^1 + ... + r^n (mod m)>, using the following formula:
+
+    geometric_summod(n, r, m) = ((powmod(r, n+1, m)-1) * invmod(r-1, m)) % m
+
+=cut
+
 =head2 germain_factor
 
     germain_factor(n)
