@@ -1,0 +1,184 @@
+#!/usr/bin/ruby
+
+# Tests for k-almost and k-omega prime numbers.
+
+for k in (1..7) {
+
+    var hi = 1e6.irand
+    var lo = hi-1e4.irand
+
+    with (k.omega_primes(lo, hi)) {|a|
+        assert_eq(k.omega_prime_count(lo, hi), a.len)
+        assert_eq(k.omega_prime_sum(lo, hi), a.sum)
+    }
+
+    with (k.almost_primes(lo, hi)) {|a|
+        assert_eq(k.almost_prime_count(lo, hi), a.len)
+        assert_eq(k.almost_prime_sum(lo, hi), a.sum)
+    }
+
+    with (k.squarefree_almost_primes(lo, hi)) {|a|
+        assert_eq(k.squarefree_almost_prime_count(lo, hi), a.len)
+        assert_eq(k.squarefree_almost_prime_sum(lo, hi), a.sum)
+    }
+
+    if (k <= 2) {
+        assert_eq(k.powerful(lo, hi), range(lo, hi).grep{.is_powerful(k)})
+    }
+
+    assert_eq(k.powerful(lo, hi).len, k.powerful_count(lo, hi))
+    assert_eq(k.powerful(hi-1e5, hi).len, k.powerful_count(hi-1e5, hi))
+}
+
+with (10!) {|n|
+    var divisors = n.divisors
+    for k in (0 .. (1+n.bigomega)) {
+        assert_eq(n.almost_prime_divisors(k), divisors.grep { .is_almost_prime(k) })
+        assert_eq(n.omega_prime_divisors(k), divisors.grep { .is_omega_prime(k) })
+    }
+}
+
+with (21!) {|n|
+    assert_eq(almost_prime_divisors(n, 0), [1])
+    assert_eq(almost_prime_divisors(n, 1), n.prime_divisors)
+    assert_eq(almost_prime_divisors(n, 2), n.prime_divisors.combinations_with_repetition(2).map{.prod}.sort.grep {|d| d `divides` n })
+    assert_eq(almost_prime_divisors(n, 37), n.divisors.grep { .is_almost_prime(37) })
+    assert_eq(almost_prime_divisors(n, n.bigomega), [n])
+    assert_eq(almost_prime_divisors(n, n.bigomega+1), [])
+    assert_eq(omega_prime_divisors(n, n.omega+1), [])
+}
+
+assert_eq(12.omega_primes(1e13), %n[7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
+assert_eq(12.squarefree_almost_primes(1e13), %n[7420738134810, 8222980095330, 8624101075590, 9426343036110, 9814524629910])
+
+assert_eq(65.almost_primes(2**65 - 1e12, 2**65 + 1e12), %n[36893488147419103232])
+assert_eq(16.omega_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
+assert_eq(16.squarefree_almost_primes(16.pn_primorial - 100, 16.pn_primorial + 100), %n[32589158477190044730])
+
+assert(!is_almost_prime(503**72 * (2**64 + 1), 77))
+assert(!is_almost_prime(503**76 * (2**64 + 1), 77))
+assert(!is_almost_prime(503**77 * (2**64 + 1), 77))
+assert(!is_almost_prime(503**78 * (2**64 + 1), 77))
+assert(is_almost_prime(503**75 * (2**64 + 1), 77))
+
+assert(!is_almost_prime(503**74 * (2**128 + 1), 77))
+assert(!is_almost_prime(503**76 * (2**128 + 1), 77))
+assert(!is_almost_prime(503**77 * (2**128 + 1), 77))
+assert(!is_almost_prime(503**78 * (2**128 + 1), 77))
+assert(is_almost_prime(503**75 * (2**128 + 1), 77))
+
+assert(!is_almost_prime(3449**74 * 1e100.random_prime, 76))
+assert(!is_almost_prime(3449**76 * 1e100.random_prime, 76))
+assert(is_almost_prime(3449**75 * 1e100.random_prime, 76))
+
+# Count of k-omega and k-almost primes <= limit
+
+for n in (1e6, 1e7, 1e8, 1e9) {
+
+    var limit = n.irand
+
+    say ":: Counting of k-omega and k-almost primes <= #{limit.commify}:"
+
+    var omega_total = 0
+    var squarefree_omega_total = 0
+
+    for k in (0..Inf) {
+
+        break if (pn_primorial(k) > limit)
+
+        var oc = k.omega_prime_count(limit)
+        var soc = k.squarefree_almost_prime_count(limit)
+
+        omega_total += oc
+        squarefree_omega_total += soc
+
+        if (oc < 1e4) {
+            assert_eq(k.omega_primes(limit).len, oc)
+        }
+
+        if (soc < 1e4) {
+            assert_eq(k.squarefree_almost_primes(limit).len, soc)
+        }
+
+        assert_eq(soc, limit.prime_count) if (k == 1)
+        assert_eq(oc, limit.prime_power_count) if (k == 1)
+    }
+
+    var bigomega_total = 0
+
+    for k in (0..Inf) {
+
+        break if (2**k > limit)
+
+        var bc = k.almost_prime_count(limit)
+
+        if (bc < 1e4) {
+            assert_eq(k.almost_primes(limit).len, bc)
+        }
+
+        bigomega_total += bc
+        assert_eq(bc, limit.prime_count) if (k == 1)
+    }
+
+    assert_eq(omega_total, limit)
+    assert_eq(bigomega_total, limit)
+    assert_eq(squarefree_omega_total, limit.squarefree_count)
+}
+
+# Count of k-omega and k-almost prime in a range [lo, hi]
+
+for n in (1e6, 1e7, 1e8, 1e9) {
+
+    var (lo, hi) = [n.irand, n.irand].sort...
+
+    say ":: Counting of k-omega and k-almost primes in range #{[lo, hi]}:"
+
+    var omega_total = 0
+    var squarefree_omega_total = 0
+
+    for k in (0..Inf) {
+
+        break if (pn_primorial(k) > hi)
+
+        var oc = k.omega_prime_count(lo, hi)
+        var soc = k.squarefree_almost_prime_count(lo, hi)
+
+        omega_total += oc
+        squarefree_omega_total += soc
+
+        if (oc < 1e4) {
+            assert_eq(k.omega_primes(lo, hi).len, oc)
+        }
+
+        if (soc < 1e4) {
+            assert_eq(k.squarefree_almost_primes(lo, hi).len, soc)
+        }
+
+        assert_eq(soc, prime_count(lo, hi)) if (k == 1)
+        assert_eq(oc, prime_power_count(lo, hi)) if (k == 1)
+    }
+
+    var bigomega_total = 0
+
+    for k in (0..Inf) {
+
+        break if (2**k > hi)
+
+        var bc = k.almost_prime_count(lo, hi)
+
+        if (bc < 1e4) {
+            assert_eq(k.almost_primes(lo, hi).len, bc)
+        }
+
+        bigomega_total += bc
+        assert_eq(bc, prime_count(lo, hi)) if (k == 1)
+    }
+
+    var delta = (hi - lo + 1)
+
+    assert_eq(omega_total, delta)
+    assert_eq(bigomega_total, delta)
+    assert_eq(squarefree_omega_total, squarefree_count(lo, hi))
+}
+
+say "** Test passed!"

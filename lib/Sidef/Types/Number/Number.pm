@@ -8563,6 +8563,11 @@ package Sidef::Types::Number::Number {
     sub expnorm {
         my ($n, $base) = @_;
 
+        # Based on the following identities (where b is the base):
+        #   f / exp(log(b)*floor(log(f) / log(b) + 1)) = exp(log(f) - log(b)*floor(log(f) / log(b) + 1))
+        #                                              = b^(-1 - floor(log(f^(1/log(b))))) * f
+        #                                              = exp(log(b)*(-1 - floor(log(f) / log(b))) + log(f))
+
         $n = _any2mpfr_mpc($$n) // goto &nan;
 
         my $log;
@@ -32528,7 +32533,12 @@ package Sidef::Types::Number::Number {
         if (defined($k)) {
             _valid(\$k);
             $k = _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE;
-            $k <= 1 and return Sidef::Types::Bool::Bool::TRUE;
+            $k <= 1
+              and return (
+                          __cmp__($n, 0) > 0
+                          ? Sidef::Types::Bool::Bool::TRUE
+                          : Sidef::Types::Bool::Bool::FALSE
+                         );
         }
         else {
             $k = 2;

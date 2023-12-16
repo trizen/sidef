@@ -32,6 +32,8 @@ assert_eq(5040.remove(0), 5040)
 assert_eq(5040.remove(1), 5040)
 assert_eq(5040.remove(-1), 5040)
 
+assert_eq(1.powerful(-12, 12), 1.powerful(-12, 12))
+
 assert(irand(0, isqrt(2**64 - 1)).is_between(0, 2**32))
 assert(irand(0, isqrt(2**128 - 1)).is_between(0, 2**64))
 
