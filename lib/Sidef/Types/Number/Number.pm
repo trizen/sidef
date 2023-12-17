@@ -1004,6 +1004,7 @@ package Sidef::Types::Number::Number {
         }
 
         my @factors;
+        my $orig_n = $n;
 
         if (CORE::length($n) > 500) {
 
@@ -1026,6 +1027,9 @@ package Sidef::Types::Number::Number {
                 push @factors, $n;
                 return @factors;
             }
+
+            # Throw away the small factors (if any)
+            ($n, @factors) = ($orig_n);
 
             local $SPECIAL_FACTORS = 0;
             say STDERR "Looking for special factors: $n" if $VERBOSE;
