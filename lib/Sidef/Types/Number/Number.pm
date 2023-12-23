@@ -950,6 +950,26 @@ package Sidef::Types::Number::Number {
         return $res;
     }
 
+    sub _execute_in_tmpdir {
+        my ($cmd) = @_;
+
+        my $cwd = Sidef::Types::Glob::Dir->cwd;
+
+        # The directory is deleted when the object goes out of scope.
+        require File::Temp;
+
+        my $tmp = File::Temp->newdir(CLEANUP => 1);
+
+        CORE::chdir($tmp);
+
+        my $output    = `$cmd`;
+        my $exit_code = $?;
+
+        $cwd->chdir;
+
+        return ($output, $exit_code);
+    }
+
     sub _is_prob_prime {
         my ($n, $cache) = @_;
 
@@ -1156,18 +1176,10 @@ package Sidef::Types::Number::Number {
 
             say STDERR "YAFU: factoring $n" if $VERBOSE;
 
-            my $cwd = Sidef::Types::Glob::Dir->cwd;
-
-            # The directory is deleted when the object goes out of scope.
-            require File::Temp;
-            my $tmp = File::Temp->newdir(CLEANUP => 1);
-
-            chdir($tmp);
-            my $yafu_output = `yafu $n`;
-            $cwd->chdir;
+            my ($yafu_output, $exit_code) = _execute_in_tmpdir("yafu $n");
 
             # Parse the YAFU output
-            if ($? == 0 and defined($yafu_output)) {
+            if ($exit_code == 0 and defined($yafu_output)) {
 
                 my @yafu_factors;
                 while ($yafu_output =~ /^([PC])\d+\s*=\s*([0-9]+)/gm) {
@@ -19596,14 +19608,14 @@ package Sidef::Types::Number::Number {
 
             if ($size >= 3_000 and $USE_PFGW) {
 
-                my $res = `pfgw64 -q$n &> /dev/stdout`;
+                my ($res, $exit_code) = _execute_in_tmpdir("pfgw64 -q$n &> /dev/stdout");
 
                 if (defined($res) and index($res, 'is composite') != -1) {
                     say STDERR "[primality_pretest] PFGW: composite" if $VERBOSE;
                     return 0;
                 }
 
-                if (defined($res) and $? == 0) {
+                if (defined($res) and $exit_code == 0) {
                     say STDERR "[primality_pretest] PFGW: PRP found" if $VERBOSE;
                     return 1;
                 }
