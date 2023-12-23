@@ -17,6 +17,7 @@ The following class-variables can be changed during runtime:
     Num!ROUND           = 0          # rounding mode for floating-point numbers
     Num!VERBOSE         = false      # true to enable verbose/debug mode
     Num!USE_YAFU        = false      # true to use YAFU for factoring large integers
+    Num!USE_PFGW        = false      # true to use PFGW64 as a primality pretest for large enough n
     Num!USE_PARI_GP     = false      # true to use PARI/GP in several methods
     Num!USE_FACTORDB    = false      # true to use factordb.com for factoring large integers
     Num!USE_PRIMESUM    = false      # true to use Kim Walisch's primesum in prime_sum(n)

@@ -11,13 +11,14 @@ package Sidef::Types::Number::Number {
     use List::Util             qw();
     use Math::Prime::Util::GMP qw();
 
-    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_PRIMESUM, $USE_PARI_GP, $USE_YAFU, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS, $USE_CONJECTURES);
+    our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_PRIMESUM, $USE_PARI_GP, $USE_YAFU, $USE_PFGW, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS, $USE_CONJECTURES);
 
     BEGIN {
         $ROUND           = Math::MPFR::MPFR_RNDN();    # rounding mode for floating-point numbers
         $PREC            = 192;                        # precision in bits for floating-point numbers
         $USE_PRIMESUM    = 0;                          # true to use Kim Walisch's primesum for large n
         $USE_PRIMECOUNT  = 0;                          # true to use Kim Walisch's primecount for large n
+        $USE_PFGW        = 0;                          # true to use PFGW64 as a primality pretest for large enough n
         $USE_PARI_GP     = 0;                          # true to use PARI/GP in several methods where it excels
         $USE_YAFU        = 0;                          # true to use YAFU for factoring large integers
         $USE_FACTORDB    = 0;                          # true to use factordb.com for factoring large integers
@@ -19592,6 +19593,21 @@ package Sidef::Types::Number::Number {
             }
 
             say STDERR "[primality_pretest] No small factor found..." if $VERBOSE;
+
+            if ($size >= 3_000 and $USE_PFGW) {
+
+                my $res = `pfgw64 -q$n &> /dev/stdout`;
+
+                if (defined($res) and index($res, 'is composite') != -1) {
+                    say STDERR "[primality_pretest] PFGW: composite" if $VERBOSE;
+                    return 0;
+                }
+
+                if (defined($res) and $? == 0) {
+                    say STDERR "[primality_pretest] PFGW: PRP found" if $VERBOSE;
+                    return 1;
+                }
+            }
         }
 
         return 1;
