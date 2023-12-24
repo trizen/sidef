@@ -29056,9 +29056,8 @@ package Sidef::Types::Number::Number {
                         $t += $L while ($t < $lo);
 
                         for (my $p = $t ; $p <= $hi ; $p += $L) {
-                            Math::Prime::Util::is_prime($p) || next;
                             my $n = $m * $p;
-                            if (($n - 1) % ($p - 1) == 0) {
+                            if (($n - 1) % ($p - 1) == 0 and Math::Prime::Util::is_prime($p)) {
 
                                 if ($strong) {
                                     my $val = Math::Prime::Util::valuation($p - 1, 2);
@@ -29078,9 +29077,8 @@ package Sidef::Types::Number::Number {
                         $t += $L while ($t < $lo);
 
                         for (my $p = $t ; $p <= $hi ; $p += $L) {
-                            Math::Prime::Util::is_prime($p) || next;
                             my $n = $m * $p;
-                            if (($n + 1) % ($p + 1) == 0) {
+                            if (($n + 1) % ($p + 1) == 0 and Math::Prime::Util::is_prime($p)) {
                                 push(@almost_primes, $n);
                             }
                         }
