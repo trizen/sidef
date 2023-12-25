@@ -22454,7 +22454,136 @@ package Sidef::Types::Number::Number {
         _set_int(Math::Prime::Util::GMP::znprimroot(_big2uistr($$n) // (goto &nan)) // goto &nan);
     }
 
-    sub rad {    # A007947
+    {
+
+        my $dlp_bsgs = sub {
+            my ($a, $g, $p, $n) = @_;
+
+            # Algorithm from Math::Prime::Util::PP
+
+            my $invg = Math::GMPz::Rmpz_init();
+            my $maxm = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_invert($invg, $g, $p) || return undef;
+
+            Math::GMPz::Rmpz_sqrt($maxm, $n);
+            Math::GMPz::Rmpz_add_ui($maxm, $maxm, 1);
+
+            my $b = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_add($b, $p, $maxm);
+            Math::GMPz::Rmpz_sub_ui($b, $b, 1);
+            Math::GMPz::Rmpz_div($b, $b, $maxm);
+
+            # Limit for time and space.
+            $b    = (Math::GMPz::Rmpz_cmp_ui($b,    4_000_000) <= 0) ? Math::GMPz::Rmpz_get_ui($b) : 4_000_000;
+            $maxm = (Math::GMPz::Rmpz_cmp_ui($maxm, $b) > 0)         ? $b                          : Math::GMPz::Rmpz_get_ui($maxm);
+
+            my %hash;
+            my $gm  = Math::GMPz::Rmpz_init();
+            my $am  = Math::GMPz::Rmpz_init_set_ui(1);
+            my $key = Math::GMPz::Rmpz_init_set($a);
+
+            Math::GMPz::Rmpz_powm_ui($gm, $invg, $maxm, $p);
+
+            foreach my $m (0 .. $b) {
+
+                # Baby Step
+                if ($m <= $maxm) {
+                    my $am_key = Math::GMPz::Rmpz_get_str($am, 10);
+                    if (exists($hash{$am_key})) {
+                        my $r = $hash{$am_key};
+                        my $t = Math::GMPz::Rmpz_init_set_ui($maxm);
+                        Math::GMPz::Rmpz_mul_ui($t, $t, $r);
+                        Math::GMPz::Rmpz_add_ui($t, $t, $m);
+                        Math::GMPz::Rmpz_mod($t, $t, $p);
+                        return $t;
+                    }
+                    $hash{$am_key} = $m;
+                    Math::GMPz::Rmpz_mul($am, $am, $g);
+                    Math::GMPz::Rmpz_mod($am, $am, $p);
+                    if ($am == $a) {
+                        return Math::GMPz::Rmpz_init_set_ui($m + 1);
+                    }
+                }
+
+                my $key_str = Math::GMPz::Rmpz_get_str($key, 10);
+
+                # Giant Step
+                if (exists $hash{$key_str}) {
+                    my $r = $hash{$key_str};
+                    my $t = Math::GMPz::Rmpz_init_set_ui($maxm);
+                    Math::GMPz::Rmpz_mul_ui($t, $t, $m);
+                    Math::GMPz::Rmpz_add_ui($t, $t, $r);
+                    Math::GMPz::Rmpz_mod($t, $t, $p);
+                    return $t;
+                }
+
+                $hash{$key_str} = $m if ($m <= $maxm);
+                Math::GMPz::Rmpz_mul($key, $key, $gm);
+                Math::GMPz::Rmpz_mod($key, $key, $p);
+            }
+
+            return undef;
+        };
+
+        sub znlog {
+            my ($a, $g, $n) = @_;
+            _valid(\$g, \$n);
+
+            # Algorithm from Math::Prime::Util::PP
+
+            $a = _any2mpz($$a) // goto &nan;
+            $g = _any2mpz($$g) // goto &nan;
+            $n = _any2mpz($$n) // goto &nan;
+
+            my $sgn = Math::GMPz::Rmpz_sgn($n) || goto &nan;
+
+            if ($sgn < 0) {
+                $n = Math::GMPz::Rmpz_init_set($n);
+                Math::GMPz::Rmpz_abs($n, $n);
+            }
+
+            if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+                return ZERO;
+            }
+
+            $a = Math::GMPz::Rmpz_init_set($a);    # copy
+            $g = Math::GMPz::Rmpz_init_set($g);    # copy
+
+            Math::GMPz::Rmpz_mod($a, $a, $n);
+            Math::GMPz::Rmpz_mod($g, $g, $n);
+
+            if (   Math::GMPz::Rmpz_cmp_ui($a, 1) == 0
+                or Math::GMPz::Rmpz_cmp_ui($g, 0) == 0) {
+                return ZERO;
+            }
+
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                my $r = Math::Prime::Util::znlog(Math::GMPz::Rmpz_get_ui($a), Math::GMPz::Rmpz_get_ui($g), Math::GMPz::Rmpz_get_ui($n)) // goto &nan;
+                return _set_int($r);
+            }
+
+            my $ord = ${(bless \$g)->znorder(bless \$n)};
+            if (ref($ord) ne 'Math::MPFR') {
+
+                my $x = $dlp_bsgs->($a, $g, $n, _any2mpz($ord));
+
+                if (    defined($x)
+                    and Math::GMPz::Rmpz_sgn($x) > 0
+                    and (bless \$g)->powmod((bless \$x), (bless \$n))->eq(bless \$a)) {
+                    return bless \$x;
+                }
+            }
+
+            if (HAS_PRIME_UTIL) {
+                return _set_int(Math::Prime::Util::znlog($a, $g, $n));
+            }
+
+            goto &nan;    # give up
+        }
+    }
+
+    sub rad {             # A007947
         my ($n) = @_;
         $n = $$n;
         if (ref($n)) {
@@ -23564,9 +23693,10 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_set_ui($g, $p);
             Math::GMPz::Rmpz_powm($x, $g, $d, $n);
 
+            next if (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0);
+
             foreach my $k (0 .. $r) {
 
-                last if (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0);
                 last if (Math::GMPz::Rmpz_cmp($x, $nm1) == 0);
 
                 # gcd(x +/- 1, n) may be a non-trivial factor of n
@@ -23607,6 +23737,7 @@ package Sidef::Types::Number::Number {
                 }
 
                 Math::GMPz::Rmpz_powm_ui($x, $x, 2, $n);
+                last if (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0);
             }
         }
 

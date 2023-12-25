@@ -9312,6 +9312,16 @@ Returns the number 0.
 
 =cut
 
+=head2 znlog
+
+    znlog(a, g, m)
+
+Returns the integer C<k> that solves the congruence: C<a = g^k (mod m)>.
+
+Returns C<NaN> if a solution is not found.
+
+=cut
+
 =head2 znorder
 
     znorder(a,m)
