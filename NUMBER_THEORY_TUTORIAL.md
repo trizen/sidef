@@ -1680,20 +1680,21 @@ say squares_r(2**32 + 1, 11)  # 239232267533254255253533478654408687317150080 (t
 
 # Making Sidef faster
 
-It's possible to make certain functions faster, by using external tools and resources, such as [FactorDB](http://factordb.com), [YAFU](https://github.com/bbuhrow/yafu), [PARI/GP](http://pari.math.u-bordeaux.fr/), [primecount](https://github.com/kimwalisch/primecount) and [primesum](https://github.com/kimwalisch/primesum), which can be enabled in the following lines of code (which must be placed at the top of a program):
+It's possible to make certain functions faster, by using external tools and resources, such as [FactorDB](http://factordb.com), [YAFU](https://github.com/bbuhrow/yafu), [PFGW64](https://sourceforge.net/projects/openpfgw/), [PARI/GP](http://pari.math.u-bordeaux.fr/), [primecount](https://github.com/kimwalisch/primecount) and [primesum](https://github.com/kimwalisch/primesum), which can be enabled in the following lines of code (which must be placed at the top of a program):
 
 ```ruby
 Num!USE_YAFU       = false      # true to use YAFU for factoring large integers
+Num!USE_PFGW       = false      # true to use PFGW64 as a primality pretest for large enough n
 Num!USE_PARI_GP    = false      # true to use PARI/GP in several functions
 Num!USE_FACTORDB   = false      # true to use factordb.com for factoring large integers
 Num!USE_PRIMESUM   = false      # true to use Kim Walisch's primesum in prime_sum(n)
 Num!USE_PRIMECOUNT = false      # true to use Kim Walisch's primecount in prime_count(n)
 ```
 
-When these external tools and resources are being used, some debug information is printed out, which can be seen by setting:
+When these external tools and resources are being used, some debugging information is printed out, which can be seen by setting:
 
 ```ruby
-Num!VERBOSE = true      # true to enable verbose/debug
+Num!VERBOSE = true      # true to enable verbose/debug mode
 ```
 
 Here's an example using [FactorDB](http://factordb.com) to retrieve the prime factorization of a large integer:
