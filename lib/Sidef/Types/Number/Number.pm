@@ -3580,8 +3580,25 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2mpz($$y) // (goto &nan);
+        $x = $$x;
+        $y = $$y;
+
+        if (!ref($x) and !ref($y) and $x >= 0 and $y > 0) {
+            my ($q, $r) = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divrem($x, $y) : Math::Prime::Util::GMP::divrem($x, $y));
+            ++$q if $r;
+            return bless \$q;
+        }
+
+        $x = _any2mpz($x) // (goto &nan);
+
+        if (!ref($y) and $y > 0) {
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_cdiv_q_ui($r, $x, $y);
+            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+            return bless \$r;
+        }
+
+        $y = _any2mpz($y) // (goto &nan);
 
         # Detect division by zero
         Math::GMPz::Rmpz_sgn($y) || do {
@@ -28513,7 +28530,17 @@ package Sidef::Types::Number::Number {
                     my $t = Math::Prime::Util::invmod($m, $lambda);
 
                     $t > $hi && return;
-                    $t += $lambda while ($t < $lo);
+
+                    if ($t < $lo) {
+                        my ($j, $r) = (
+                                       HAS_NEW_PRIME_UTIL
+                                       ? Math::Prime::Util::divrem($lo - $t, $lambda)
+                                       : Math::Prime::Util::GMP::divrem($lo - $t, $lambda)
+                                      );
+                        $t += ($j + ($r ? 1 : 0)) * $lambda;
+                    }
+
+                    $t > $hi && return;
 
                     for (my $p = $t ; $p <= $hi ; $p += $lambda) {
                         if (    Math::Prime::Util::is_prime_power($p)
@@ -29184,7 +29211,17 @@ package Sidef::Types::Number::Number {
                         my $L = $args{lambda};
                         my $t = Math::Prime::Util::invmod($m, $L);
                         $t > $hi && return;
-                        $t += $L while ($t < $lo);
+
+                        if ($t < $lo) {
+                            my ($j, $r) = (
+                                           HAS_NEW_PRIME_UTIL
+                                           ? Math::Prime::Util::divrem($lo - $t, $L)
+                                           : Math::Prime::Util::GMP::divrem($lo - $t, $L)
+                                          );
+                            $t += ($j + ($r ? 1 : 0)) * $L;
+                        }
+
+                        $t > $hi && return;
 
                         for (my $p = $t ; $p <= $hi ; $p += $L) {
                             my $n = $m * $p;
@@ -29205,7 +29242,17 @@ package Sidef::Types::Number::Number {
                         my $L = $args{lambda};
                         my $t = $L - Math::Prime::Util::invmod($m, $L);
                         $t > $hi && return;
-                        $t += $L while ($t < $lo);
+
+                        if ($t < $lo) {
+                            my ($j, $r) = (
+                                           HAS_NEW_PRIME_UTIL
+                                           ? Math::Prime::Util::divrem($lo - $t, $L)
+                                           : Math::Prime::Util::GMP::divrem($lo - $t, $L)
+                                          );
+                            $t += ($j + ($r ? 1 : 0)) * $L;
+                        }
+
+                        $t > $hi && return;
 
                         for (my $p = $t ; $p <= $hi ; $p += $L) {
                             my $n = $m * $p;
@@ -29219,7 +29266,17 @@ package Sidef::Types::Number::Number {
                         my $L = $args{lambda};
                         my $t = Math::Prime::Util::invmod($m, $L);
                         $t > $hi && return;
-                        $t += $L while ($t < $lo);
+
+                        if ($t < $lo) {
+                            my ($j, $r) = (
+                                           HAS_NEW_PRIME_UTIL
+                                           ? Math::Prime::Util::divrem($lo - $t, $L)
+                                           : Math::Prime::Util::GMP::divrem($lo - $t, $L)
+                                          );
+                            $t += ($j + ($r ? 1 : 0)) * $L;
+                        }
+
+                        $t > $hi && return;
 
                         for (my $p = $t ; $p <= $hi ; $p += $L) {
 
@@ -29268,7 +29325,7 @@ package Sidef::Types::Number::Number {
                     }
 
                     if ($carmichael) {
-                        Math::Prime::Util::gcd($m, $p - 1) == 1 or next;
+                        Math::Prime::Util::gcd($m, $p >> 1) == 1 or next;
                         $L = Math::Prime::Util::lcm($lambda, $p - 1);
                     }
                     elsif ($lucas_carmichael) {
@@ -29414,7 +29471,17 @@ package Sidef::Types::Number::Number {
 
                         my $t = Math::GMPz::Rmpz_get_ui($v);
                         $t > $hi && return;
-                        $t += $L while ($t < $lo);
+
+                        if ($t < $lo) {
+                            my ($j, $r) = (
+                                           HAS_NEW_PRIME_UTIL
+                                           ? Math::Prime::Util::divrem($lo - $t, $L)
+                                           : Math::Prime::Util::GMP::divrem($lo - $t, $L)
+                                          );
+                            $t += ($j + ($r ? 1 : 0)) * $L;
+                        }
+
+                        $t > $hi && return;
 
                         for (my $p = $t ; $p <= $hi ; $p += $L) {
 
@@ -29524,7 +29591,7 @@ package Sidef::Types::Number::Number {
                     }
 #>>>
                     if ($carmichael) {
-                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $p - 1) == 1 or next;
+                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $p >> 1) == 1 or next;
                         Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p - 1);
                     }
                     elsif ($lucas_carmichael) {
@@ -31047,7 +31114,7 @@ package Sidef::Types::Number::Number {
                 if ($seen{$p}++) {    # n must be squarefree
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
-                if (Math::Prime::Util::GMP::gcd($nstr, $p - 1) != 1) {
+                if (Math::Prime::Util::GMP::gcd($nstr, $p >> 1) != 1) {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
             }
@@ -31112,15 +31179,15 @@ package Sidef::Types::Number::Number {
 
                 # Check the Korselt criterion: p-1 | n-1, for each prime p|n.
                 if (ref($p) eq 'Math::GMPz') {
-                    Math::GMPz::Rmpz_sub_ui($pm1, $p, 1);
+                    Math::GMPz::Rmpz_div_2exp($pm1, $p, 1);
                     Math::GMPz::Rmpz_divisible_p($nm1, $pm1) || return;
                 }
                 elsif ($p < ULONG_MAX) {
-                    Math::GMPz::Rmpz_divisible_ui_p($nm1, $p - 1) || return;
+                    Math::GMPz::Rmpz_divisible_ui_p($nm1, $p >> 1) || return;
                 }
                 else {
                     Math::GMPz::Rmpz_set_str($pm1, "$p", 10);
-                    Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
+                    Math::GMPz::Rmpz_div_2exp($pm1, $pm1, 1);
                     Math::GMPz::Rmpz_divisible_p($nm1, $pm1) || return;
                 }
             }
@@ -31166,7 +31233,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_divisible_ui_p($nm1, $p - 1)
+                Math::GMPz::Rmpz_divisible_ui_p($nm1, $p >> 1)
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
             else {
@@ -31526,15 +31593,15 @@ package Sidef::Types::Number::Number {
 
                 # Check the criterion for absolute Euler pseudoprimes: p-1 | (n-1)/2, for each prime p|n.
                 if (ref($p) eq 'Math::GMPz') {
-                    Math::GMPz::Rmpz_sub_ui($pm1, $p, 1);
+                    Math::GMPz::Rmpz_div_2exp($pm1, $p, 1);
                     Math::GMPz::Rmpz_divisible_p($nm1d2, $pm1) || return;
                 }
                 elsif ($p < ULONG_MAX) {
-                    Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p - 1) || return;
+                    Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p >> 1) || return;
                 }
                 else {
                     Math::GMPz::Rmpz_set_str($pm1, "$p", 10);
-                    Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
+                    Math::GMPz::Rmpz_div_2exp($pm1, $pm1, 1);
                     Math::GMPz::Rmpz_divisible_p($nm1d2, $pm1) || return;
                 }
             }
@@ -31580,7 +31647,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p - 1)
+                Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p >> 1)
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
             else {
