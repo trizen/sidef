@@ -1508,6 +1508,7 @@ The `special_factor(n)` function efficiently tries to find special factors (not 
 * Trial division
 * Fermat factorization method
 * HOLF method
+* S. Germain factorization method
 * Pell factorization method
 * Phi-finder method
 * Difference of powers method
@@ -1553,6 +1554,8 @@ say special_factor(1785580277816119756915785742193215817422598781716633497308593
 say special_factor(6384263073451390405968126023273631892411500902402571736234793541658288688275134678964387652)
 say special_factor(1000000000000000000000000000367000000000000000000000000038559000000000000000000000001190673)
 say special_factor(999999999999999999999999999977900000000000000000000000000143909999999999999999999999999752869)
+say special_factor(170296437766520678260984540689850857933985582784142928557942562632249992969239530014613965028536428517542093436236756805)
+say special_factor(681185751066082713043938162759403431735942331136571714231766350676201018716794593662979976783654271745458522802602418805)
 ```
 
 The function `special_factor(n)` is also used internally in `factor(n)` for large enough `n`, making all the number theory functions, that depend on the factorization of `n`, very fast for special values of `n`.
@@ -1563,6 +1566,7 @@ Additionally, the following special-purpose factorization methods can be used in
 n.trial_factor(limit)               # Trial division
 n.fermat_factor(k=1e4)              # Fermat factorization method
 n.holf_factor(tries=1e4)            # HOLF method
+n.sophie_germain_factor             # Sophie Germain factorization method
 n.dop_factor(tries=n.ilog2)         # Difference of powers method
 n.cop_factor(tries=n.ilog2)         # Congruence of powers method
 n.cyclotomic_factor(bases...)       # Cyclotomic factorization method
