@@ -768,7 +768,6 @@ EOT
                 $term->addhistory($line =~ s/\R/\r/gr);
             }
             $term->append_history(1, $history_file);
-            add_words_to_completion($completion_tree, $line);
         }
 
         if (defined($args{r}) or defined($args{R})) {
@@ -780,7 +779,12 @@ EOT
 
             my @results = $sidef->execute_perl($ccode);
 
-            print $@ if $@;
+            if ($@) {
+                print $@;
+            }
+            elsif ($history_support) {
+                add_words_to_completion($completion_tree, $line);
+            }
 
             $tΔ = eval { Time::HiRes::tv_interval($t0) };
 
