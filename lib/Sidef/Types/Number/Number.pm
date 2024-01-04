@@ -29329,7 +29329,7 @@ package Sidef::Types::Number::Number {
                         $L = Math::Prime::Util::lcm($lambda, $p - 1);
                     }
                     elsif ($lucas_carmichael) {
-                        Math::Prime::Util::gcd($m, $p + 1) == 1 or next;
+                        Math::Prime::Util::gcd($m, ($p >> 1) + 1) == 1 or next;
                         $L = Math::Prime::Util::lcm($lambda, $p + 1);
                     }
                     elsif ($fermat) {
@@ -29595,7 +29595,7 @@ package Sidef::Types::Number::Number {
                         Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p - 1);
                     }
                     elsif ($lucas_carmichael) {
-                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $p + 1) == 1 or next;
+                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, ($p >> 1) + 1) == 1 or next;
                         Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p + 1);
                     }
                     elsif ($fermat) {
@@ -31179,15 +31179,15 @@ package Sidef::Types::Number::Number {
 
                 # Check the Korselt criterion: p-1 | n-1, for each prime p|n.
                 if (ref($p) eq 'Math::GMPz') {
-                    Math::GMPz::Rmpz_div_2exp($pm1, $p, 1);
+                    Math::GMPz::Rmpz_sub_ui($pm1, $p, 1);
                     Math::GMPz::Rmpz_divisible_p($nm1, $pm1) || return;
                 }
                 elsif ($p < ULONG_MAX) {
-                    Math::GMPz::Rmpz_divisible_ui_p($nm1, $p >> 1) || return;
+                    Math::GMPz::Rmpz_divisible_ui_p($nm1, $p - 1) || return;
                 }
                 else {
                     Math::GMPz::Rmpz_set_str($pm1, "$p", 10);
-                    Math::GMPz::Rmpz_div_2exp($pm1, $pm1, 1);
+                    Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
                     Math::GMPz::Rmpz_divisible_p($nm1, $pm1) || return;
                 }
             }
@@ -31233,7 +31233,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_divisible_ui_p($nm1, $p >> 1)
+                Math::GMPz::Rmpz_divisible_ui_p($nm1, $p - 1)
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
             else {
@@ -31568,6 +31568,7 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_sub_ui($nm1, $n, 1);
         Math::GMPz::Rmpz_div_2exp($nm1d2, $nm1, 1);
+        Math::GMPz::Rmpz_even_p($nm1d2) || return Sidef::Types::Bool::Bool::FALSE;
 
         # Divisible by a small square
         foreach my $k (3, 5, 7, 11, 13, 17, 19) {
@@ -31593,15 +31594,15 @@ package Sidef::Types::Number::Number {
 
                 # Check the criterion for absolute Euler pseudoprimes: p-1 | (n-1)/2, for each prime p|n.
                 if (ref($p) eq 'Math::GMPz') {
-                    Math::GMPz::Rmpz_div_2exp($pm1, $p, 1);
+                    Math::GMPz::Rmpz_sub_ui($pm1, $p, 1);
                     Math::GMPz::Rmpz_divisible_p($nm1d2, $pm1) || return;
                 }
                 elsif ($p < ULONG_MAX) {
-                    Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p >> 1) || return;
+                    Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p - 1) || return;
                 }
                 else {
                     Math::GMPz::Rmpz_set_str($pm1, "$p", 10);
-                    Math::GMPz::Rmpz_div_2exp($pm1, $pm1, 1);
+                    Math::GMPz::Rmpz_sub_ui($pm1, $pm1, 1);
                     Math::GMPz::Rmpz_divisible_p($nm1d2, $pm1) || return;
                 }
             }
@@ -31647,7 +31648,7 @@ package Sidef::Types::Number::Number {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p >> 1)
+                Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p - 1)
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
             else {
