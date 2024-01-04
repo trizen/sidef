@@ -1,6 +1,6 @@
 # Introduction
 
-Sidef is a modern, high-level, general-purpose programming language, focusing on simplicity, readability and elegance, taking the best from languages like Ruby, Raku and Julia.
+Sidef is a modern, high-level programming language with a general-purpose orientation, emphasizing simplicity, readability, and elegance. It draws inspiration from languages such as Ruby, Raku and Julia.
 
 # BOOK
 
@@ -101,7 +101,7 @@ cd 'sidef-master/bin/'
 ./sidef -v
 ```
 
-Those commands will download and unpack the latest version of Sidef and will execute the `bin/sidef` script which will print out the current version of the language.
+Those commands help obtain and unpack the latest GitHub version of Sidef, subsequently running the `bin/sidef` script to display the language's current version.
 
 To execute a Sidef script, run:
 
@@ -145,7 +145,7 @@ sidef hello.sf
 
 # Real code
 
-Before taking a closer look at the syntax of the language, let's take a brief look at how a real program might look like.
+Before delving into the syntax of the language, let's briefly examine the structure of a typical program.
 
 ## PPM image generation
 
@@ -157,30 +157,27 @@ subset UInt  < Int    {|n| n >= 0    }
 subset UInt8 < Int    {|n| n ~~ ^256 }
 
 struct Pixel {
-    R < UInt8,
-    G < UInt8,
-    B < UInt8
+    UInt8 R,
+    UInt8 G,
+    UInt8 B,
 }
 
-class Bitmap(width < UInt, height < UInt) {
+class Bitmap(UInt width, UInt height) {
+
     has data = []
 
-    method fill(Pixel p) {
-        data = (width*height -> of { Pixel(p.R, p.G, p.B) })
-    }
-
-    method setpixel(i < UInt, j < UInt, Pixel p) {
+    method setpixel(UInt i, UInt j, Pixel p) {
 
         subset WidthLimit  < UInt { |n| n ~~ ^width  }
         subset HeightLimit < UInt { |n| n ~~ ^height }
 
-        func (w < WidthLimit, h < HeightLimit) {
+        func (WidthLimit w, HeightLimit h) {
             data[w*height + h] = p
         }(i, j)
     }
 
     method p6 {
-        <<-EOT + data.map {|p| [p.R, p.G, p.B].pack('C3') }.join
+        <<-EOT + data.map { [.R, .G, .B].pack('C3') }.join
         P6
         #{width} #{height}
         255
@@ -244,44 +241,22 @@ say 5.of { lcg2.rand }
 [41, 18467, 6334, 26500, 19169]
 ```
 
-## Longest common substring
-
-A last example, implementing a simple algorithm that finds the longest common substring from two given strings, illustrating the declaration of functions with typed parameters, the `gather/take` construct and the set-intersection operator (`&`).
-
-```ruby
-func createSubstrings(String word) -> Array {
-  gather {
-    combinations(word.len+1, 2, {|i,j|
-        take(word.substr(i, j-i))
-    })
-  }
-}
-
-func findLongestCommon(String first, String second) -> String {
-    createSubstrings(first) & createSubstrings(second) -> max_by { .len }
-}
-
-say findLongestCommon("thisisatest", "testing123testing")
-```
-
 # Syntax
 
-The syntax of Sidef looks very much like the syntax of Ruby or JavaScript, but we'll see that there are some important differences regarding the semantics.
-
-All operators have the same precedence, which is controlled by the lack of whitespace between the operands.
+The Sidef syntax closely resembles that of Ruby or JavaScript, yet significant differences in semantics become apparent upon examination. Notably, all operators share an identical precedence level, which is controlled by the absence of whitespace between operands:
 
 ```ruby
 1+2 * 3+4   # means: (1+2) * (3+4)
 ```
 
-In the above example, the lack of whitespace between `1`, `+` and `2`, classifies the operation as a distinct expression.
+In the above example, the absence of whitespace between `1`, `+`, and `2`, classifies the operation as a discrete expression.
 
 The implications are the following:
 
 ```ruby
 var n = 1 + 2       # incorrect -- it means: (var n = 1) + 2
 var n = 1+2         # correct
-var n = (1 + 2)     # correct
+var n = (1 + 2)     # better
 ```
 
 When no precedence is defined, the order of operations is from left to right:
@@ -319,7 +294,7 @@ say "abc".uc.reverse.chars
 
 ## Keywords
 
-Initially, Sidef was designed without any keywords. However, as it turned out, keywords can simplify the writing of code, at the cost of not having a variable with the same name as that of a keyword.
+Originally, Sidef was designed without incorporating keywords. However, as it turned out, keywords can simplify the writing of code, at the cost of not having a variable with the same name as that of a keyword.
 
 ```ruby
 var             # declare a lexical variable
@@ -526,7 +501,7 @@ There are two method-invocation operators in Sidef: `.` and `->`:
 20 + 5->sqrt   # means: sqrt(20 + 5)
 ```
 
-`->` will make everything, from the left-most side of it, a single expression and applies the method on the result returned by this expression, while `.` will simply apply the method on the object which precedes the dot.
+The `->` takes everything on its left as one expression and applies the method to the result of that expression. Meanwhile, `.` simply applies the method to the object that comes before the dot.
 
 Additionally, any alphanumeric method name can be used as an infix operator, by surrounding it with backticks:
 
@@ -646,7 +621,6 @@ var bool = true
 In Sidef exists four types of variables: **lexical variables**, **static variables**, **global variables** and **local variables**.
 
 
-
 ### LEXICAL VARIABLES
 
 This kind of variables are dynamic, but statically block scoped. This is the usual way of declaring variables in Sidef.
@@ -683,7 +657,7 @@ say c   #=> Hash(x => 1, y => 2)
 
 ### GLOBAL VARIABLES
 
-Global variables are declared at the top-level of the current namespace. They can be accessed from everywhere, anytime. However, it's recommended to avoid them, unless there isn't a better alternative.
+Global variables are declared at the highest level of the current namespace and are accessible from any part of the code at any time. However, it's advisable to minimize their usage, opting for better alternatives whenever possible.
 
 ```ruby
 global x = 42     # sets global x to 42
@@ -863,7 +837,7 @@ say foo          # parse-time error: attempt to use deleted identifier
 
 ## Topic variable
 
-The special topic variable (`_`) is declared at compile-time in all the block-objects of a program. Its name may not be seen very often because it has been overtaken by the elegant unary dot (`.`) operator:
+The special `_` variable is pre-declared within all block objects during program compilation. Its usage might not be prevalent due to the prevalent use of the sleek unary dot (`.`) operator:
 
 ```ruby
 [25,36,49].map {.sqrt} \
@@ -872,9 +846,9 @@ The special topic variable (`_`) is declared at compile-time in all the block-ob
 
 `.sqrt` really means `_.sqrt`, and `.log.say` means `_.log.say`.
 
-The `map` method iterates over the anonymous array and calls the block for each element of the array, which gets set to the topic variable `_`. When the iteration is complete, the `map` method will return the new array, on which we call the `each` method with another block as the argument.
+The `map` method cycles through the anonymous array, executing the block for each array element, designated to the variable `_`. Upon completion, `map` yields the new array, initiating a subsequent `each` method call with another block as its argument.
 
-The `each` method, as the `map` method, will iterate over the array and will run the block for each element of the array, which will get assigned to the topic variable `_`, on which we call the `log` method, followed by `say`.
+Similar to `map`, `each` iterates over the array, executing the block for each element designated to the variable `_`, and subsequently applies the `log` method, followed by `say`.
 
 Additionally, same as in Raku, we can lookup an element from an array or an hash stored inside the topic variable, using the following syntax:
 
@@ -902,7 +876,7 @@ say $^SIDEF           # prints the path to sidef executable
 
 ## File-handle constants
 
-This constants look like variables, but are actually file-handles.
+These constants look like variables, but are actually file-handles.
 
 ```ruby
 STDERR.say("Some error!")
@@ -947,7 +921,7 @@ say pi                 # prints: 3.14
 #pi = 3                # runtime error: can't modify non-lvalue constant
 ```
 
-This kind of constants are created dynamically at runtime and cannot be changed after initialization.
+These constants are generated dynamically during runtime and remain immutable once initialized.
 
 Multiple constant values can be declared and initialized, using the syntax:
 
@@ -1134,8 +1108,8 @@ say (^Inf -> lazy.grep{ .is_prime }.first(10))     # first 10 primes
 The `.lazy` method returns a `Lazy` object, which behaves almost like an `Array`, except that it executes the methods in a pipeline fashion and dynamically stops when no more elements are required, without creating any temporary arrays in memory:
 
 ```ruby
-for line in (DATA.lazy.grep{ _ < 'd' }.map{ print ">> "; .uc }) {
-   print line
+for line in (DATA.lazy.grep{ _ < 'd' && print ">" }.map{ print "> "; .uc }) {
+   say line
 }
 
 __DATA__
@@ -1145,7 +1119,7 @@ c
 d
 ```
 
-Output (which shows that `.map{}` is really lazy):
+Output (which shows that `.grep{}` and `.map{}` are really lazy):
 
 ```
 >> A
@@ -1346,7 +1320,7 @@ func fib(n) is cached {
 say fib(100)              # prints: 354224848179261915075
 ```
 
-Additionally, the method `Block.cache()` enables memoization on the self-block, while `Block.uncache()` disables the memoization and also cleans-up the cache.
+Additionally, the `Block.cache()` method enables memoization on the self-block, whereas `Block.uncache()` disables memoization and also clears the cache.
 
 ```ruby
 func fib(n) {
@@ -1467,7 +1441,7 @@ subset Integer     < Number  { |n| n.is_int }
 subset Natural     < Integer { |n| n.is_pos }
 subset EvenNatural < Natural { |n| n.is_even }
 
-func foo(n < EvenNatural) {
+func foo(EvenNatural n) {
     say n
 }
 
@@ -1491,7 +1465,7 @@ class Hey < Hi {
 }
 ```
 
-If we declare a function that accepts a subset of `Hi`, it will accept `Hello`, but it cannot accept `Hey`:
+A class name can be used as a subset, by using the syntax `variable < ClassName`. If we declare a function that accepts a subset of `Hi`, it will accept `Hello`, but it cannot accept `Hey`:
 
 ```ruby
 func greet(obj < Hi) { obj.greet }       # `Hi` is the upper limit
@@ -1516,7 +1490,7 @@ Subsets can also be used for combining multiple types into one type, creating an
 ```ruby
 subset StrNum < String, Number
 
-func concat(a < StrNum, b < StrNum) {
+func concat(StrNum a, StrNum b) {
     a + b
 }
 
@@ -1613,13 +1587,13 @@ subset Prime    < Positive { .is_prime }
 func arithmetic_derivative((0)) { 0 }
 func arithmetic_derivative((1)) { 1 }
 
-func arithmetic_derivative(_ < Prime) { 1 }
+func arithmetic_derivative(Prime _) { 1 }
 
-func arithmetic_derivative(n < Negative) {
+func arithmetic_derivative(Negative n) {
     -arithmetic_derivative(-n)
 }
 
-func arithmetic_derivative(n < Positive) is cached {
+func arithmetic_derivative(Positive n) is cached {
 
     var a = n.lpf
     var b = n/a
@@ -2021,12 +1995,19 @@ say (0.1 + 0.2 == 0.3)   #=> true
 
 Floating-point values are represented by [Math::MPFR](https://metacpan.org/pod/Math::MPFR) with a default precision of 192 bits.
 
-A literal floating-point value is usually returned by some mathematical functions (including `sin(x)`, `log(x)`, etc...).
-
-A given number can be explicitly converted to a floating-point value by calling the `.float` method on it:
+A floating-point value is usually returned by various mathematical functions (including `sin(x)`, `log(x)`, etc...), but it can also be created as a literal value, using the suffix `f`:
 
 ```ruby
-1.234.float      # floating-point value
+12345f      # floating-point value
+12.34f      # ==//==
+1.5e9f      # ==//==
+```
+
+At run-time, a number can be explicitly converted to a floating-point value by calling the `.float` method on it:
+
+```ruby
+var n = 12.345
+var f = n.float      # floating-point value
 ```
 
 ## Complex numbers
@@ -2241,7 +2222,7 @@ array[3][4] = "hei"
 say array
 ```
 
-If you're familiar with Perl, you already know about autovivification. It's the feature responsible for the dynamic creation of data structures.
+If you're familiar with Perl, you're likely familiar with autovivification, the functionality responsible for dynamically creating data structures.
 
 ## Array filtering
 
@@ -2604,7 +2585,7 @@ say arr                        # prints: ['foo', 'bar']
 
 # Ranges
 
-A range is a definition of some consecutive values, either in increasing or decreasing order. The main advantage of a range over an array is that a range can be infinite, while an array can't, and this is because ranges are lazy.
+A range defines a sequence of consecutive values, either ascending or descending. The primary advantage of a range compared to an array lies in its potential to be infinite, a capability absent in arrays. This distinction arises from the lazy evaluation characteristic inherent in ranges.
 
 A range can be created with one of the following operators: `..`, `^..` or `..^`;
 
@@ -3024,7 +3005,7 @@ fh.each { |line|
 
 # Conditional expressions
 
-Conditional expression are almost the same in most programming languages and _Sidef_ will not make an exception, so we'll have the classic `if`, `while` and `for` conditional expressions.
+Conditional expressions in Sidef closely resemble those found in most programming languages, featuring the familiar `if`, `while`, and `for` expressions.
 
 ## `if` statement
 
@@ -3289,7 +3270,7 @@ say baz          #=> 84
 
 # Classes
 
-A class is a collection of methods and attributes. From classes, we can create objects. When a class is _called_, an instance-object of that class is returned, which encapsulates the given data provided at class initialization. Each individual _call_ to a class, returns a different instance-object.
+A class represents a set of methods and attributes. Objects are created from classes. When a class is invoked, an instance-object of that class is generated, encapsulating the supplied data from class initialization. Each call to a class produces a distinct instance-object.
 
 ```ruby
 class Person (name, age, address) {
@@ -3314,7 +3295,7 @@ obj.increment_age          # increments age by 1
 say obj.age                # prints: 51
 ```
 
-Classes in Sidef are a little bit different than classes from other languages. Instance-variables (also known as attributes) are accessible via a method call which can either get or set a value, as illustrated in the example above.
+In Sidef, classes exhibit some divergence from classes in other languages. Instance variables are accessible through method calls that facilitate both retrieval and assignment of values, as depicted in the above example.
 
 ## Class attributes
 
@@ -3499,9 +3480,9 @@ example.ding("dong")  # prints “tried to handle unknown method ding”
 
 # Parallel computation
 
-Sidef has a very basic support for parallel computation, but pretty powerful. There is the `Block.ffork()` method which creates a new system process that executes (in parallel) the content of a given block and returns a new `Fork` object which accepts the `wait` (or `get`) method that waits for the process to finish and returns the computed value.
+Sidef offers basic, yet robust support for parallel computation. The `Block.ffork()` method initiates a new system process that concurrently executes the content within a specified block. This method returns a new `Fork` object, enabling the use of the `wait` (or `get`) method to await process completion and retrieve the computed value.
 
-To take advantage of this mechanism, fork two or more processes and store the returned objects in variables or inside an array and get their values at a later time. The process is executed soon after it has been forked.
+To harness this capability, initiate two or more processes using the forking method and store the resulting objects either in variables or within an array. The execution of each process occurs promptly after forking. Later, retrieve their values when necessary.
 
 Example for the quicksort algorithm in parallel:
 
