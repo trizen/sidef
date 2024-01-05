@@ -23809,8 +23809,8 @@ package Sidef::Types::Number::Number {
         }
 
         if (!defined($j)) {
-            my @factors = __SUB__->($n, 1);
-            @factors = map { _is_prob_prime($_, 1) ? $_ : __SUB__->($_, -1) } @factors;
+            my @factors = __SUB__->($n, 1, $tries);
+            @factors = map { _is_prob_prime($_, 1) ? $_ : __SUB__->($_, -1, $tries) } @factors;
             return @factors;
         }
 
