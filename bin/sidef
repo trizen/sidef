@@ -672,7 +672,7 @@ EOT
             }
             elsif ($line eq 'copyright') {
                 print <<'EOT';
-Copyright © 2013-2023 Daniel Șuteu, Ioana Fălcușan
+Copyright © 2013-2024 Daniel Șuteu, Ioana Fălcușan
 All Rights Reserved.
 EOT
                 redo MAINLOOP;
@@ -1246,7 +1246,7 @@ You can find more info about Sidef, by clicking on the following links:
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2023 Daniel Șuteu, Ioana Fălcușan
+Copyright (C) 2013-2024 Daniel Șuteu, Ioana Fălcușan
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the B<Artistic License (2.0)>. You may obtain a copy

@@ -160,7 +160,7 @@ Need help with Sidef? Feel free to ask questions here: L<https://github.com/triz
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2023 Daniel Șuteu, Ioana Fălcușan
+Copyright (C) 2013-2024 Daniel Șuteu, Ioana Fălcușan
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the B<Artistic License (2.0)>. You may obtain a copy
