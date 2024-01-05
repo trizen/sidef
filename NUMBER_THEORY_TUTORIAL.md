@@ -18,11 +18,11 @@ To initiate your journey with Sidef and installation instructions, refer to the 
 
 Over time, Sidef has integrated numerous mathematical functions, many sourced from Dana Jacobsen's commendable [Math::Prime::Util](https://github.com/danaj/Math-Prime-Util) and [Math::Prime::Util::GMP](https://github.com/danaj/Math-Prime-Util-GMP) Perl modules. These modules significantly enhance performance in tasks like integer factorization, primality testing, and prime counting.
 
-Presently, Sidef encompasses more than $1000$ numerical functions; explore the [source code](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Number.pm).
+Presently, Sidef encompasses more than $1000$ numerical functions; explore the [source code](https://notabug.org/trizen/sidef/src/master/lib/Sidef/Types/Number/Number.pm).
 
 The majority of these functions match the speed of PARI/GP and Mathematica, while a few are marginally slower or even faster.
 
-Sidef offers support for big integers, rationals, Gaussian integers, Quaternion integers, Quadratic integers, matrices, polynomials, and floating-points of arbitrary precision. This capability is achieved using the [GMP](https://gmplib.org/), [MPFR](https://www.mpfr.org/) and [MPC](https://www.multiprecision.org/) C libraries.
+Sidef has built-in support for big integers, rationals, Gaussian integers, Quaternion integers, Quadratic integers, matrices, polynomials, and floating-points of arbitrary precision, using the [GMP](https://gmplib.org/), [MPFR](https://www.mpfr.org/) and [MPC](https://www.multiprecision.org/) C libraries.
 
 # Basic usage
 
@@ -422,7 +422,7 @@ say (a / b)     #=> Gauss(99/433, -32/433)
 
 ## Quadratic class
 
-The `Quadratic(a,b,w)` class represents a quadratic integer of the form: $a + b*\sqrt(w)$.
+The `Quadratic(a,b,w)` class represents a quadratic integer of the form: $a + b*\sqrt w$.
 
 ```ruby
 var x = Quadratic(3, 4, 5)      # represents: 3 + 4*sqrt(5)
@@ -1411,7 +1411,7 @@ for (1..100) {
 
 ---
 
-**[A037274](https://oeis.org/A037274)**: Home primes: for `n >= 2`, `a(n) =` the prime that is finally reached when you start with $n$, concatenate its prime factors ([A037276](https://oeis.org/A037276)) and repeat until a prime is reached (`a(n) = -1` if no prime is ever reached).
+**[A037274](https://oeis.org/A037274)**: Home primes: for $n >= 2$, $a(n)$ is the prime that is finally reached when you start with $n$, concatenate its prime factors ([A037276](https://oeis.org/A037276)) and repeat until a prime is reached ($a(n) = -1$ if no prime is ever reached).
 
 ```ruby
 func A037274(n) {
