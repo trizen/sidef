@@ -2,7 +2,19 @@
 
 Sidef is a modern, high-level programming language with a general-purpose orientation, emphasizing simplicity, readability, and elegance. It draws inspiration from languages such as Ruby, Raku and Julia.
 
-# BOOK
+```
+            **   **         ****   *           *********   *********
+          * * ** * *        ****   **          ** ** **    ** ** **
+           **   **          ****   ***         *********   *  *  *
+  **        **        **    ****   *  *        ******      ******
+* * *     * * *     * * *   ****   ** **       ** **       ** **
+ **        **        **     ****   ******      ******      *  *
+       **   **              ****   *  *  *     *********   ***
+     * * ** * *             ****   ** ** **    ** ** **    **
+      **   **               ****   *********   *********   *
+```
+
+# Book
 
 The Sidef Programming Language: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/23.11/sidef-book.pdf)).
 

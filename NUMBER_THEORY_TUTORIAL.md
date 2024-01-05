@@ -1321,7 +1321,7 @@ for k in (1..100) {
 
 ---
 
-**[A106629](https://oeis.org/A106629)**: Number of positive integers `<= 10^n` that are divisible by no prime exceeding $13$.
+**[A106629](https://oeis.org/A106629)**: Number of positive integers $<= 10^n$ that are divisible by no prime exceeding $13$.
 
 ```ruby
 for n in (0..100) {
@@ -1764,16 +1764,16 @@ Sidef also provides the very fast `primality_pretest(n)` function, which tries t
 
 When checking if a given number $n$ is squarefree, rather than fully factoring the number, is enough to find a square factor of $n$, which instantly proves than $n$ is not squarefree.
 
-In this regard, Sidef provides the `is_prob_squarefree(n, limit)` function, which checks if $n$ is divisible by a square $p^2$ with `p <= limit`:
+In this regard, Sidef provides the `is_prob_squarefree(n, B)` function, which checks if $n$ is divisible by a square $p^2$ with $p <= B$:
 
 ```ruby
 say is_prob_squarefree(2**512 - 1, 1e6)     # true   (probably squarefree)
 say is_prob_squarefree(10**136 + 1, 1e3)    # false  (definitely not squarefree)
 ```
 
-If $n$ is less than `limit^3`, and the function returns `true`, then $n$ is definitely squarefree.
+If $n$ is less than $B^3$, and the function returns `true`, then $n$ is definitely squarefree.
 
-If the `limit` parameter is omitted, multiple limits are tested internally, trying to find a square factor of $n$, up to `limit = 10^7`.
+If the $B$ parameter is omitted, multiple limits are tested internally, trying to find a square factor of $n$, up to $B = 10^7$.
 
 # More examples
 
