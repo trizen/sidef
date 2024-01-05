@@ -38,7 +38,7 @@ package Sidef::Types::Number::Number {
         ONE   => bless(\(my $one   = 1)),
         TWO   => bless(\(my $two   = 2)),
         THREE => bless(\(my $three = 3)),
-        TEN   => bless(\(my $three = 10)),
+        TEN   => bless(\(my $ten   = 10)),
         ZERO  => bless(\(my $zero  = 0)),
         MONE  => bless(\(my $mone  = -1)),
 
@@ -991,7 +991,18 @@ package Sidef::Types::Number::Number {
         my $r =
           (HAS_PRIME_UTIL and $n < ULONG_MAX)
           ? Math::Prime::Util::is_prime($n)
-          : Math::Prime::Util::GMP::is_prob_prime($n);
+          : do {
+            (
+             (CORE::length($n) > PRIMALITY_PRETEST_MIN)
+             ? do {
+                 state $t = Math::GMPz::Rmpz_init();
+                 Math::GMPz::Rmpz_set_str($t, "$n", 10);
+                 _primality_pretest($t);
+               }
+             : 1
+            )
+              && Math::Prime::Util::GMP::is_prime($n);
+          };
 
         if ($cache) {
             if (++$internal_cache_size > IS_PRIME_CACHE_SIZE) {
@@ -9778,7 +9789,7 @@ package Sidef::Types::Number::Number {
             return TWO;
         }
 
-        if (_primality_pretest($n) && _is_prob_prime($n)) {
+        if (_is_prob_prime($n)) {
             for (my $k = 3 ; ; $k = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($k) : Math::Prime::Util::GMP::next_prime($k))) {
                 if (Math::GMPz::Rmpz_ui_kronecker($k, $n) == -1) {
                     return _set_int($k);
@@ -20295,12 +20306,14 @@ package Sidef::Types::Number::Number {
         _primality_pretest($n) || return Sidef::Types::Bool::Bool::FALSE;
         my $str = _big2uistr($n) // return Sidef::Types::Bool::Bool::FALSE;
 
+#<<<
         (
-           (CORE::length($str) > PRIMALITY_PRETEST_MIN)
-         ? (Math::Prime::Util::GMP::is_strong_pseudoprime($str, 2) && Math::Prime::Util::GMP::is_frobenius_underwood_pseudoprime($str))
-         : Math::Prime::Util::GMP::is_prob_prime($str)
-          ) ? Sidef::Types::Bool::Bool::TRUE
+         (CORE::length($str) > PRIMALITY_PRETEST_MIN)
+          ? (Math::Prime::Util::GMP::is_strong_pseudoprime($str, 2) && Math::Prime::Util::GMP::is_frobenius_underwood_pseudoprime($str))
+          : Math::Prime::Util::GMP::is_prime($str)
+        ) ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
+#>>>
     }
 
     sub is_prov_prime {
@@ -27018,7 +27031,7 @@ package Sidef::Types::Number::Number {
         # Multiplicative with:
         #   a(p^e) = tau(e)
 
-        my $n = _big2uistr($$n) // goto &nan;
+        $n = _big2uistr($$n) // goto &nan;
         $n eq '0' and return ZERO;
 
         my @terms;
