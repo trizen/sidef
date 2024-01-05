@@ -387,9 +387,25 @@ say Poly([1,2,3,4])           # x^3 + 2*x^2 + 3*x + 4
 say Poly(5 => 3, 2 => 10)     # 3*x^5 + 10*x^2
 ```
 
+## PolyMod class
+
+The `PolyMod()` class represents a modular polynomial:
+
+```ruby
+var a = PolyMod([13,4,51], 43)
+var b = PolyMod([5,0,-11], 43)
+
+say a*b         #=> 22*x^4 + 20*x^3 + 26*x^2 + 42*x + 41 (mod 43)
+say a-b         #=> 8*x^2 + 4*x + 19 (mod 43)
+say a+b         #=> 18*x^2 + 4*x + 40 (mod 43)
+
+# Division and remainder
+say [a.divmod(b)].join(' and ')         #=> 37 (mod 43) and 4*x + 28 (mod 43)
+```
+
 ## Gauss class
 
-The `Gauss(a,b)` class represents a Gaussian integer of the form: `a + b*i`.
+The `Gauss(a,b)` class represents a Gaussian integer of the form: $a + b*i$.
 
 ```ruby
 say Gauss(3,4)**100
@@ -406,7 +422,7 @@ say (a / b)     #=> Gauss(99/433, -32/433)
 
 ## Quadratic class
 
-The `Quadratic(a,b,w)` class represents a quadratic integer of the form: `a + b*sqrt(w)`.
+The `Quadratic(a,b,w)` class represents a quadratic integer of the form: $a + b*\sqrt(w)$.
 
 ```ruby
 var x = Quadratic(3, 4, 5)      # represents: 3 + 4*sqrt(5)
@@ -421,7 +437,7 @@ say y.powmod(100, 97)   #=> Quadratic(83, 39, 2)
 
 ## Quaternion class
 
-The `Quaternion(a,b,c,d)` class represents a quaternion integer of the form: `a + b*i + c*j + d*k`.
+The `Quaternion(a,b,c,d)` class represents a quaternion integer of the form: $a + b*i + c*j + d*k$.
 
 ```ruby
 var a = Quaternion(1,2,3,4)
@@ -752,7 +768,7 @@ say Math.linear_rec([1, 1, 1], [0, 0, 1], 0, 20)    # terms in range 0..20
 say Math.linear_rec([1, 1, 1], [0, 0, 1], 1000)     # only the 1000-th term
 ```
 
-If only the remainder is needed, we can use `Math.linear_recmod(signature, initial_terms, n, m)`, which efficiently computes the n-th term modulo `m`:
+If only the remainder is needed, we can use `Math.linear_recmod(signature, initial_terms, n, m)`, which efficiently computes the n-th term modulo $m$:
 
 ```ruby
 say Math.linear_recmod([5, -10, 10, -5, 1], [0, 1, 9, 36, 100], 2**128, 10**10)   # (2^128)-th term modulo 10^10
@@ -844,7 +860,7 @@ In this section we present several code examples that compute non-trivial [OEIS]
 
 ---
 
-**[A007011](https://oeis.org/A007011)**: Smallest pseudoprime to base `2` with `n` prime factors.
+**[A007011](https://oeis.org/A007011)**: Smallest pseudoprime to base $2$ with $n$ prime factors.
 
 ```ruby
 func A007011(n) {
@@ -868,7 +884,7 @@ for n in (2..100) { print(A007011(n), ", ") }
 
 ---
 
-**[A180065](https://oeis.org/A180065)**: Smallest strong pseudoprime to base `2` with `n` prime factors.
+**[A180065](https://oeis.org/A180065)**: Smallest strong pseudoprime to base $2$ with $n$ prime factors.
 
 ```ruby
 func A180065(n) {
@@ -892,7 +908,7 @@ for n in (2..100) { print(A180065(n), ", ") }
 
 ---
 
-**[A271874](https://oeis.org/A271874)**: Smallest Fermat pseudoprime to base `n` with `n` distinct prime factors.
+**[A271874](https://oeis.org/A271874)**: Smallest Fermat pseudoprime to base $n$ with $n$ distinct prime factors.
 
 ```ruby
 func A271874(n, k=n) {
@@ -914,7 +930,7 @@ for n in (2..100) { print(A271874(n), ", ") }
 
 ---
 
-**[A271873](https://oeis.org/A271873)**: Square array `A(n, k)` read by antidiagonals downwards: smallest Fermat pseudoprime to base `n` with `k` distinct prime factors for `k`, `n` >= `2`.
+**[A271873](https://oeis.org/A271873)**: Square array $A(n, k)$ read by antidiagonals downwards: smallest Fermat pseudoprime to base $n$ with $k$ distinct prime factors for $k$, $n$ >= $2$.
 
 ```ruby
 {|x| {|y| A271874(x,y) }.map(2..10) }.map(2..10).each { .say }  # takes 0.5 seconds
@@ -924,7 +940,7 @@ for n in (2..100) { print(A271874(n), ", ") }
 
 ---
 
-**[A006931](https://oeis.org/A006931)**: Least Carmichael number with `n` prime factors.
+**[A006931](https://oeis.org/A006931)**: Least Carmichael number with $n$ prime factors.
 
 ```ruby
 func A006931(n) {
@@ -946,7 +962,7 @@ for n in (3..100) { print(A006931(n), ", ") }
 
 ---
 
-**[A216928](https://oeis.org/A216928)**: Least Lucas-Carmichael number with `n` prime factors.
+**[A216928](https://oeis.org/A216928)**: Least Lucas-Carmichael number with $n$ prime factors.
 
 ```ruby
 func A216928(n) {
@@ -968,7 +984,7 @@ for n in (3..100) { print(A216928(n), ", ") }
 
 ---
 
-**[A356866](https://oeis.org/A356866)**: Smallest Carmichael number ([A002997](https://oeis.org/A002997)) with `n` prime factors that is also a strong pseudoprime to base `2` ([A001262](https://oeis.org/A001262)).
+**[A356866](https://oeis.org/A356866)**: Smallest Carmichael number ([A002997](https://oeis.org/A002997)) with $n$ prime factors that is also a strong pseudoprime to base $2$ ([A001262](https://oeis.org/A001262)).
 
 ```ruby
 func A356866(n) {
@@ -990,11 +1006,11 @@ for n in (3..100) { print(A356866(n), ", ") }
 
 ---
 
-## Numbers with `n` prime factors
+## Numbers with $n$ prime factors
 
 ---
 
-**[A219018](https://oeis.org/A219018)**: Smallest `k > 1` such that `k^n + 1` has exactly `n` distinct prime factors.
+**[A219018](https://oeis.org/A219018)**: Smallest $k > 1$ such that $k^n + 1$ has exactly $n$ distinct prime factors.
 
 ```ruby
 func A219018(n) {
@@ -1010,7 +1026,7 @@ for n in (1..100) { print(A219018(n), ", ") }
 
 ---
 
-**[A219019](https://oeis.org/A219019)**: Smallest `k > 1` such that `k^n - 1` has exactly `n` distinct prime divisors.
+**[A219019](https://oeis.org/A219019)**: Smallest $k > 1$ such that $k^n - 1$ has exactly $n$ distinct prime divisors.
 
 ```ruby
 func A219019(n) {
@@ -1026,7 +1042,7 @@ for n in (1..100) { print(A219019(n), ", ") }
 
 ---
 
-**[A359070](https://oeis.org/A359070)**: Smallest `k > 1` such that `k^n - 1` is the product of `n` distinct primes.
+**[A359070](https://oeis.org/A359070)**: Smallest $k > 1$ such that $k^n - 1$ is the product of $n$ distinct primes.
 
 ```ruby
 func A359070(n) {
@@ -1043,7 +1059,7 @@ for n in (1..100) { print(A359070(n), ", ") }
 
 ---
 
-**[A242786](https://oeis.org/A242786)**: Least prime `p` such that `p^n` and `p^n+1` have the same number of prime factors (counted with multiplicity) or `0` if no such number exists.
+**[A242786](https://oeis.org/A242786)**: Least prime $p$ such that $p^n$ and $p^n+1$ have the same number of prime factors (counted with multiplicity) or $0$ if no such number exists.
 
 ```ruby
 func A242786(n) {
@@ -1059,7 +1075,7 @@ for n in (1..100) { print(A242786(n), ", ") }
 
 ---
 
-**[A241793](https://oeis.org/A241793)**: Least number `k` such that `k^n` and `k^n-1` contain the same number of prime factors (counted with multiplicity) or `0` if no such `k` exists.
+**[A241793](https://oeis.org/A241793)**: Least number $k$ such that $k^n$ and $k^n-1$ contain the same number of prime factors (counted with multiplicity) or $0$ if no such $k$ exists.
 
 ```ruby
 func A241793(n) {
@@ -1076,7 +1092,7 @@ for n in (1..100) { print(A241793(n), ", ") }
 
 ---
 
-**[A281940](https://oeis.org/A281940)**: Least `k` such that `k^n + 1` is the product of `n` distinct primes (`k > 0`).
+**[A281940](https://oeis.org/A281940)**: Least $k$ such that $k^n + 1$ is the product of $n$ distinct primes ($k > 0$).
 
 ```ruby
 func A281940(n) {
@@ -1092,7 +1108,7 @@ for n in (1..100) { print(A281940(n), ", ") }
 
 ---
 
-**[A280005](https://oeis.org/A280005)**: Least prime `p` such that `p^n + 1` is the product of `n` distinct primes.
+**[A280005](https://oeis.org/A280005)**: Least prime $p$ such that $p^n + 1$ is the product of $n$ distinct primes.
 
 ```ruby
 func A280005(n) {
@@ -1108,7 +1124,7 @@ for n in (1..100) { print(A280005(n), ", ") }
 
 ---
 
-**[A358863](https://oeis.org/A358863)**: `a(n)` is the smallest n-gonal number with exactly `n` prime factors (counted with multiplicity).
+**[A358863](https://oeis.org/A358863)**: $a(n)$ is the smallest n-gonal number with exactly $n$ prime factors (counted with multiplicity).
 
 ```ruby
 func A358863(n) {
@@ -1141,7 +1157,7 @@ for n in (3..100) { print(A358863(n), ", ") }
 
 ---
 
-**[A358865](https://oeis.org/A358865)**: `a(n)` is the smallest n-gonal pyramidal number with exactly `n` prime factors (counted with multiplicity).
+**[A358865](https://oeis.org/A358865)**: $a(n)$ is the smallest n-gonal pyramidal number with exactly $n$ prime factors (counted with multiplicity).
 
 ```ruby
 func A358865(n) {
@@ -1157,7 +1173,7 @@ for n in (3..100) { print(A358865(n), ", ") }
 
 ---
 
-**[A358862](https://oeis.org/A358862)**: `a(n)` is the smallest n-gonal number with exactly `n` distinct prime factors.
+**[A358862](https://oeis.org/A358862)**: $a(n)$ is the smallest n-gonal number with exactly $n$ distinct prime factors.
 
 ```ruby
 func A358862(n) {
@@ -1190,7 +1206,7 @@ for n in (3..100) { print(A358862(n), ", ") }
 
 ---
 
-**[A358864](https://oeis.org/A358864)**: `a(n)` is the smallest n-gonal pyramidal number with exactly `n` distinct prime factors.
+**[A358864](https://oeis.org/A358864)**: $a(n)$ is the smallest n-gonal pyramidal number with exactly $n$ distinct prime factors.
 
 ```ruby
 func A358864(n) {
@@ -1206,7 +1222,7 @@ for n in (3..100) { print(A358864(n), ", ") }
 
 ---
 
-**[A127637](https://oeis.org/A127637)**: Smallest squarefree triangular number with exactly `n` prime factors.
+**[A127637](https://oeis.org/A127637)**: Smallest squarefree triangular number with exactly $n$ prime factors.
 
 ```ruby
 func A127637(n, from = n.pn_primorial, upto = 2*from) {
@@ -1225,7 +1241,7 @@ for n in (1..100) { print(A127637(n), ", ") }
 
 ---
 
-**[A239696](https://oeis.org/A239696)**: Smallest number `m` such that `m` and `reverse(m)` each have `n` distinct prime factors.
+**[A239696](https://oeis.org/A239696)**: Smallest number $m$ such that $m$ and `reverse(m)` each have $n$ distinct prime factors.
 
 ```ruby
 func A239696(n, from = n.pn_primorial, upto = 2*from) {
@@ -1244,7 +1260,7 @@ for n in (1..100) { print(A239696(n), ", ") }
 
 ---
 
-**[A291138](https://oeis.org/A291138)**: `a(n)` is the smallest `k` such that `psi(k)` and `phi(k)` have same distinct prime factors when `k` is the product of `n` distinct primes, or `0` if no such `k` exists.
+**[A291138](https://oeis.org/A291138)**: $a(n)$ is the smallest $k$ such that $\psi(k)$ and $\phi(k)$ have same distinct prime factors when $k$ is the product of $n$ distinct primes, or $0$ if no such $k$ exists.
 
 ```ruby
 func A291138(n, from = n.pn_primorial, upto = 2*from) {
@@ -1270,7 +1286,7 @@ for n in (1..100) { print(A291138(n), ", ") }
 
 ---
 
-**[A329660](https://oeis.org/A329660)**: Numbers `m` such that `sigma(m)` is a Lucas number ([A000032](https://oeis.org/A000032)), where `sigma(m)` is the sum of divisors of `m` ([A000203](https://oeis.org/A000203)).
+**[A329660](https://oeis.org/A329660)**: Numbers $m$ such that $\sigma(m)$ is a Lucas number ([A000032](https://oeis.org/A000032)), where $\sigma(m)$ is the sum of divisors of $m$ ([A000203](https://oeis.org/A000203)).
 
 ```ruby
 for k in (1..1000) {
@@ -1281,7 +1297,7 @@ for k in (1..1000) {
 
 ---
 
-**[A291487](https://oeis.org/A291487)**: `a(n)` is the smallest `k` such that `psi(k) = n!`, or `0` if no such `k` exists (`psi(k) =` [A001615](https://oeis.org/A001615)(k)).
+**[A291487](https://oeis.org/A291487)**: $a(n)$ is the smallest $k$ such that $\psi(k) = n!$, or $0$ if no such $k$ exists (`psi(k) =` [A001615](https://oeis.org/A001615)(k)).
 
 ```ruby
 for k in (1..100) {
@@ -1291,7 +1307,7 @@ for k in (1..100) {
 
 ---
 
-**[A291356](https://oeis.org/A291356)**: `a(n)` is the smallest `k` such that `usigma(k) =` [A002110](https://oeis.org/A002110)(n), or `0` if no such `k` exists.
+**[A291356](https://oeis.org/A291356)**: $a(n)$ is the smallest $k$ such that `usigma(k) =` [A002110](https://oeis.org/A002110)(n), or $0$ if no such $k$ exists.
 
 ```ruby
 for k in (1..100) {
@@ -1325,7 +1341,7 @@ for n in (0..100) {
 
 ---
 
-**[A062761](https://oeis.org/A062761)**: Number of powerful numbers between $2^(n-1)+1$ and $2^n$.
+**[A062761](https://oeis.org/A062761)**: Number of powerful numbers between $2^{n-1}+1$ and $2^n$.
 
 ```ruby
 for n in (1..100) {
@@ -1339,7 +1355,7 @@ for n in (1..100) {
 
 ---
 
-**[A323697](https://oeis.org/A323697)**: Primes $p$ such that the norm of the quadratic-field analog of Mersenne numbers $M_{p,\alpha} = (\alpha^p - 1)/(\alpha - 1)$, with $\alpha = 2 + \sqrt(2)$, is a rational prime.
+**[A323697](https://oeis.org/A323697)**: Primes $p$ such that the norm of the quadratic-field analog of Mersenne numbers $M_{p,\alpha} = (\alpha^p - 1)/(\alpha - 1)$, with $\alpha = 2 + \sqrt 2$, is a rational prime.
 
 ```ruby
 var alpha = (2 + sqrtQ(2))    # creates a Quadratic integer
@@ -1352,7 +1368,7 @@ each_prime(2, 1e6, {|p|
 
 ---
 
-**[A061682](https://oeis.org/A061682)**: Length of period of continued fraction expansion of square root of `(2^(2n+1)+1)`.
+**[A061682](https://oeis.org/A061682)**: Length of period of continued fraction expansion of square root of $2^{2n+1}+1$.
 
 ```ruby
 for n in  (2..100) {
@@ -1379,7 +1395,7 @@ for n in (0..10) { print(bernoulli_denominator(10**n), ", ") }
 
 ---
 
-**[A071255](https://oeis.org/A071255)**: `a(1) = 2`, `a(n+1) = a(n)`-th squarefree number.
+**[A071255](https://oeis.org/A071255)**: $a(1) = 2$, $a(n+1) = a(n)$-th squarefree number.
 
 ```ruby
 var n = 1
@@ -1395,7 +1411,7 @@ for (1..100) {
 
 ---
 
-**[A037274](https://oeis.org/A037274)**: Home primes: for `n >= 2`, `a(n) =` the prime that is finally reached when you start with `n`, concatenate its prime factors ([A037276](https://oeis.org/A037276)) and repeat until a prime is reached (`a(n) = -1` if no prime is ever reached).
+**[A037274](https://oeis.org/A037274)**: Home primes: for `n >= 2`, `a(n) =` the prime that is finally reached when you start with $n$, concatenate its prime factors ([A037276](https://oeis.org/A037276)) and repeat until a prime is reached (`a(n) = -1` if no prime is ever reached).
 
 ```ruby
 func A037274(n) {
@@ -1412,7 +1428,7 @@ for n in (1..100) { print(A037274(n), ", ") }
 
 ---
 
-**[A359492](https://oeis.org/A359492)**: `a(n)` is the least number of the form $p^2 + q^2 - 2$ for primes $p$ and $q$ that is an odd prime times $2^n$, or $-1$ if there is no such number.
+**[A359492](https://oeis.org/A359492)**: $a(n)$ is the least number of the form $p^2 + q^2 - 2$ for primes $p$ and $q$ that is an odd prime times $2^n$, or $-1$ if there is no such number.
 
 ```ruby
 func A359492(n) {
@@ -1460,7 +1476,7 @@ for base in (3..100) { print(both_truncatable_primes(base).max, ", ") }
 
 ---
 
-**[A357435](https://oeis.org/A357435)**: `a(n)` is the least prime `p` such that `p^2+4` is a prime times `5^n`.
+**[A357435](https://oeis.org/A357435)**: $a(n)$ is the least prime $p$ such that $p^2+4$ is a prime times $5^n$.
 
 ```ruby
 func A357435(n, solution = Inf) {
@@ -1558,7 +1574,7 @@ say special_factor(1702964377665206782609845406898508579339855827841429285579425
 say special_factor(681185751066082713043938162759403431735942331136571714231766350676201018716794593662979976783654271745458522802602418805)
 ```
 
-The function `special_factor(n)` is also used internally in `factor(n)` for large enough `n`, making all the number theory functions, that depend on the factorization of `n`, very fast for special values of `n`.
+The function `special_factor(n)` is also used internally in `factor(n)` for large enough $n$, making all the number theory functions, that depend on the factorization of $n$, very fast for special values of $n$.
 
 Additionally, the following special-purpose factorization methods can be used individually:
 
@@ -1607,7 +1623,7 @@ Moreover, the function internally invokes `special_factor(n)` and promptly concl
 
 A significant speed enhancement could be achieved by using ECM with conjectured bounds to increase $B$ much higher than what can now be achieved with trial-division. This would effectively reject numerous numbers more swiftly.
 
-Another conjectured approach would be using Pollard's rho method to find a larger bound for $B$, which requires $O(sqrt(B))$ steps to find a prime factor less than $B$. Therefore, if we take $B = 10^12$, after $c*10^6$ iterations of the Pollard rho method without success in finding a prime factor of $n$, it's very likely that $n$ has no prime factor less than $10^12$.
+Another conjectured approach would be using Pollard's rho method to find a larger bound for $B$, which requires $O(\sqrt B)$ steps to find a prime factor less than $B$. Therefore, if we take $B = 10^{12}$, after $c*10^6$ iterations of the Pollard rho method without success in finding a prime factor of $n$, it's very likely that $n$ has no prime factor less than $10^{12}$.
 
 This latter approach can be enabled by setting `Num!USE_CONJECTURES = true` and is useful for computing upper bounds, being approximately 5x faster than the rigorous method.
 
@@ -1643,9 +1659,9 @@ say binomialmod(1e10, 1e5, 2**127 - 1)                  # takes 0.08s
 say binomialmod(1e10, 1e6, 2**127 - 1)                  # takes 1.28s
 ```
 
-## Sum of `k` squares function
+## Sum of $k$ squares function
 
-The sum of squares function `r_k(n)` returns the number of ways of representing `n` as a sum of `k` squares.
+The sum of squares function `r_k(n)` returns the number of ways of representing $n$ as a sum of $k$ squares.
 
 ```ruby
 say 30.of { .squares_r(2) }     # OEIS: A004018
@@ -1653,7 +1669,7 @@ say 30.of { .squares_r(3) }     # OEIS: A005875
 say 30.of { .squares_r(4) }     # OEIS: A000118
 ```
 
-The Sidef implementation uses fast algorithms for `k = {2, 4, 6, 8, 10}` based on the prime factorization of `n`:
+The Sidef implementation uses fast algorithms for `k = {2, 4, 6, 8, 10}` based on the prime factorization of $n$:
 
 ```ruby
 say squares_r(2**128 + 1, 2)       # takes 0.49s
@@ -1662,20 +1678,20 @@ say squares_r(2**128 - 1, 6)       # takes 0.01s
 say squares_r(2**128 - 1, 10)      # takes 0.01s
 ```
 
-The case `k = 3` is also decently fast for values of `n` up to about `2^40`:
+The case $k = 3$ is also decently fast for values of $n$ up to about $2^{40}$:
 
 ```ruby
 say squares_r(2**40 + 1, 3)    # 15312384 (takes 2.5s)
 say squares_r(2**42 + 1, 3)    # 19943424 (takes 5.7s)
 ```
 
-In general, any positive value of `k` is supported, but only the above ones are specially optimized:
+In general, any positive value of $k$ is supported, but only the above ones are specially optimized:
 
 ```ruby
 say squares_r(5040, 15)       # 3354826635339287557503600 (takes 6.78s)
 ```
 
-The other cases, like `k = 7`, recursively count the number of solutions based on the solutions for `k-1`:
+The other cases, like $k = 7$, recursively count the number of solutions based on the solutions for $k-1$:
 
 ```ruby
 say squares_r(2**32 + 1, 7)   # 18040153467917470423562112 (takes 0.91s)
@@ -1734,7 +1750,7 @@ When multiple numbers necessitate simultaneous primality verification, using the
 
 The advantage lies in the ability to expedite processing: if one term is composite, containing small prime factors, `all_prime(...)` swiftly returns without performing primality tests, acknowledging the composite nature of at least one term.
 
-Moreover, if no small prime factor is found for any provided term, the function does a strong Fermat test to base `2` for each term. It attempts early termination if any term fails this test.
+Moreover, if no small prime factor is found for any provided term, the function does a strong Fermat test to base $2$ for each term. It attempts early termination if any term fails this test.
 
 Lastly, the function performs an extra-strong Lucas test on each term, resulting in a BPSW test.
 
@@ -1742,22 +1758,22 @@ Lastly, the function performs an extra-strong Lucas test on each term, resulting
 all_prime(a, b)      # overall faster than: (is_prime(a) && is_prime(b))
 ```
 
-Sidef also provides the very fast `primality_pretest(n)` function, which tries to find a small prime factors of `n`, returning `false` if `n` is definitely not a prime number.
+Sidef also provides the very fast `primality_pretest(n)` function, which tries to find a small prime factors of $n$, returning `false` if $n$ is definitely not a prime number.
 
 ## Squarefree checking
 
-When checking if a given number `n` is squarefree, rather than fully factoring the number, is enough to find a square factor of `n`, which instantly proves than `n` is not squarefree.
+When checking if a given number $n$ is squarefree, rather than fully factoring the number, is enough to find a square factor of $n$, which instantly proves than $n$ is not squarefree.
 
-In this regard, Sidef provides the `is_prob_squarefree(n, limit)` function, which checks if `n` is divisible by a square `p^2` with `p <= limit`:
+In this regard, Sidef provides the `is_prob_squarefree(n, limit)` function, which checks if $n$ is divisible by a square $p^2$ with `p <= limit`:
 
 ```ruby
 say is_prob_squarefree(2**512 - 1, 1e6)     # true   (probably squarefree)
 say is_prob_squarefree(10**136 + 1, 1e3)    # false  (definitely not squarefree)
 ```
 
-If `n` is less than `limit^3`, and the function returns `true`, then `n` is definitely squarefree.
+If $n$ is less than `limit^3`, and the function returns `true`, then $n$ is definitely squarefree.
 
-If the `limit` parameter is omitted, multiple limits are tested internally, trying to find a square factor of `n`, up to `limit = 10^7`.
+If the `limit` parameter is omitted, multiple limits are tested internally, trying to find a square factor of $n$, up to `limit = 10^7`.
 
 # More examples
 
