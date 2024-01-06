@@ -16,11 +16,15 @@ Sidef is a modern, high-level programming language with a general-purpose orient
 
 # Book
 
-The Sidef Programming Language: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/23.11/sidef-book.pdf)).
+The Sidef Programming Language: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/24.01/sidef-book.pdf)).
 
 # Installation
 
 This section describes how to install Sidef for various operating systems.
+
+The latest release can be found at:
+
+* https://github.com/trizen/sidef/releases/
 
 **IMPORTANT**: Sidef needs the [GMP](https://gmplib.org/), [MPFR](http://www.mpfr.org/) and [MPC](http://www.multiprecision.org/) C libraries.
 
@@ -28,7 +32,7 @@ This section describes how to install Sidef for various operating systems.
 
 For Windows, Sidef is available as a portable 32-bit executable:
 
-* https://github.com/trizen/sidef/releases/download/23.11/sidef-23.11.exe.zip
+* https://github.com/trizen/sidef/releases/download/24.01/sidef-24.01.exe.zip
 
 ## Linux installation
 
