@@ -405,7 +405,7 @@ say [a.divmod(b)].join(' and ')         #=> 37 (mod 43) and 4*x + 28 (mod 43)
 
 ## Gauss class
 
-The `Gauss(a,b)` class represents a Gaussian integer of the form: $a + b*i$.
+The `Gauss(a,b)` class represents a Gaussian integer of the form: $a + b i$.
 
 ```ruby
 say Gauss(3,4)**100
@@ -422,7 +422,7 @@ say (a / b)     #=> Gauss(99/433, -32/433)
 
 ## Quadratic class
 
-The `Quadratic(a,b,w)` class represents a quadratic integer of the form: $a + b*\sqrt w$.
+The `Quadratic(a,b,w)` class represents a quadratic integer of the form: $a + b \sqrt w$.
 
 ```ruby
 var x = Quadratic(3, 4, 5)      # represents: 3 + 4*sqrt(5)
@@ -437,7 +437,7 @@ say y.powmod(100, 97)   #=> Quadratic(83, 39, 2)
 
 ## Quaternion class
 
-The `Quaternion(a,b,c,d)` class represents a quaternion integer of the form: $a + b*i + c*j + d*k$.
+The `Quaternion(a,b,c,d)` class represents a quaternion integer of the form: $a + b i + c j + d k$.
 
 ```ruby
 var a = Quaternion(1,2,3,4)
@@ -1570,8 +1570,6 @@ say special_factor(1785580277816119756915785742193215817422598781716633497308593
 say special_factor(6384263073451390405968126023273631892411500902402571736234793541658288688275134678964387652)
 say special_factor(1000000000000000000000000000367000000000000000000000000038559000000000000000000000001190673)
 say special_factor(999999999999999999999999999977900000000000000000000000000143909999999999999999999999999752869)
-say special_factor(170296437766520678260984540689850857933985582784142928557942562632249992969239530014613965028536428517542093436236756805)
-say special_factor(681185751066082713043938162759403431735942331136571714231766350676201018716794593662979976783654271745458522802602418805)
 ```
 
 The function `special_factor(n)` is also used internally in `factor(n)` for large enough $n$, making all the number theory functions, that depend on the factorization of $n$, very fast for special values of $n$.
@@ -1623,7 +1621,7 @@ Moreover, the function internally invokes `special_factor(n)` and promptly concl
 
 A significant speed enhancement could be achieved by using ECM with conjectured bounds to increase $B$ much higher than what can now be achieved with trial-division. This would effectively reject numerous numbers more swiftly.
 
-Another conjectured approach would be using Pollard's rho method to find a larger bound for $B$, which requires $O(\sqrt B)$ steps to find a prime factor less than $B$. Therefore, if we take $B = 10^{12}$, after $c*10^6$ iterations of the Pollard rho method without success in finding a prime factor of $n$, it's very likely that $n$ has no prime factor less than $10^{12}$.
+Another conjectured approach would be using Pollard's rho method to find a larger bound for $B$, which requires $O(\sqrt B)$ steps to find a prime factor less than $B$. Therefore, if we take $B = 10^{12}$, after $O(10^6)$ iterations of the Pollard rho method without success in finding a prime factor of $n$, it's very likely that $n$ has no prime factor less than $10^{12}$.
 
 This latter approach can be enabled by setting `Num!USE_CONJECTURES = true` and is useful for computing upper bounds, being approximately 5x faster than the rigorous method.
 
