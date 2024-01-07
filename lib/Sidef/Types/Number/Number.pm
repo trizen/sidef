@@ -20413,21 +20413,19 @@ package Sidef::Types::Number::Number {
             @bases = (2);
         }
 
-        if (HAS_PRIME_UTIL and !ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
-            return (
-                    ($n > 1 and Math::Prime::Util::is_pseudoprime($n, $bases[0]))
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
-        }
-        elsif (    HAS_NEW_PRIME_UTIL
-               and !ref($n)
-               and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
-            return (
-                    ($n > 1 and Math::Prime::Util::is_pseudoprime($n, @bases))
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
+        if (!ref($n) and HAS_PRIME_UTIL) {    # optimization
+            foreach my $base (@bases) {
+
+                $base == 1 && next;
+                $base < 1  && next;
+                $base < $n || next;
+
+                Math::Prime::Util::gcd($n, $base) == 1
+                  || return Sidef::Types::Bool::Bool::FALSE;
+
+                Math::Prime::Util::is_pseudoprime($n, $base)
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
         }
 
         $n = _any2mpz($n);
@@ -20449,7 +20447,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my $t = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_sub_ui($g, $n, 1);
 
         foreach my $base (@bases) {
@@ -20751,44 +20749,48 @@ package Sidef::Types::Number::Number {
             @bases = (2);
         }
 
-        if (!ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
-            return (
-                    (
-                     $n > 1
-                       and (
-                            HAS_PRIME_UTIL ? Math::Prime::Util::is_strong_pseudoprime($n, $bases[0])
-                            : Math::Prime::Util::GMP::is_strong_pseudoprime($n, $bases[0])
-                           )
-                    ) ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
-        }
-        elsif (HAS_NEW_PRIME_UTIL and !ref($n) and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
-            return (
-                    ($n > 1 and Math::Prime::Util::is_strong_pseudoprime($n, @bases))
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
+        if (!ref($n)) {
+
+            $n < 1 and return Sidef::Types::Bool::Bool::FALSE;
+
+            foreach my $base (@bases) {
+
+                $base < 1  and return Sidef::Types::Bool::Bool::FALSE;
+                $base == 1 and next;
+
+                $base == $n
+                  && return Sidef::Types::Bool::Bool::FALSE;
+
+                (HAS_PRIME_UTIL ? Math::Prime::Util::gcd($n, $base) : Math::Prime::Util::GMP::gcd($n, $base)) == 1
+                  || return Sidef::Types::Bool::Bool::FALSE;
+
+                ((HAS_PRIME_UTIL and $base < ULONG_MAX)
+                 ? Math::Prime::Util::is_strong_pseudoprime($n, $base)
+                 : Math::Prime::Util::GMP::is_strong_pseudoprime($n, $base))
+                  || return Sidef::Types::Bool::Bool::FALSE;
+            }
+
+            return Sidef::Types::Bool::Bool::TRUE;
         }
 
-        # Any value > 1 is a strong psp to base 1
-        if (scalar(@bases) == 1 and $bases[0] == 1) {
-            return (
-                    ($n > 1)
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
+        $n = _big2pistr($n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        foreach my $base (@bases) {
+
+            $base < 1 and return Sidef::Types::Bool::Bool::FALSE;
+            $base eq '1' and next;
+
+            $base eq $n
+              && return Sidef::Types::Bool::Bool::FALSE;
+
+            Math::Prime::Util::GMP::gcd($n, $base) eq '1'
+              || return Sidef::Types::Bool::Bool::FALSE;
+
+            Math::Prime::Util::GMP::is_strong_pseudoprime($n, (_big2pistr($base) // return Sidef::Types::Bool::Bool::FALSE))
+              || return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        Math::Prime::Util::GMP::is_strong_pseudoprime(
-                                                      _big2pistr($n) // (return Sidef::Types::Bool::Bool::FALSE),
-                                                      (
-                                                       grep { $_ ne '1' }
-                                                       map  { _big2pistr($_) // return Sidef::Types::Bool::Bool::FALSE } @bases
-                                                      )
-                                                     )
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
+        return Sidef::Types::Bool::Bool::TRUE;
     }
 
     *is_spsp               = \&is_strong_fermat_pseudoprime;

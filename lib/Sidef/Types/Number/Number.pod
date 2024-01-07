@@ -4999,6 +4999,8 @@ Aliases: I<is_provable_prime>
 
 Returns true if C<n> is a Fermat pseudoprime to the provided bases.
 
+Each base must be coprime to C<n>.
+
 Aliases: I<is_fermat_psp>, I<is_pseudoprime>, I<is_fermat_pseudoprime>
 
 =cut
@@ -5118,7 +5120,9 @@ Returns true when C<n> is smooth over the prime factors of C<k>.
 
     n.is_strong_psp(bases...)
 
-Return true if C<n> is a strong pseudoprime.
+Return true if C<n> is a strong Fermat pseudoprime to the given bases.
+
+Each base must be coprime to C<n>.
 
 Aliases: I<miller_rabin>, I<is_strong_fermat_psp>, I<is_strong_pseudoprime>, I<is_strong_fermat_pseudoprime>
 
