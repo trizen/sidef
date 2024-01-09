@@ -3,7 +3,7 @@
 # Author: Daniel "Trizen" Șuteu
 # License: GPLv3
 # Date: 20 September 2014
-# Website: http://github.com/trizen
+# Website: https://github.com/trizen
 
 use 5.014;
 use strict;

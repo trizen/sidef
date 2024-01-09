@@ -3,7 +3,7 @@
 # Author: Trizen
 # License: GPLv3
 # Date: 24 March 2013
-# http://trizen.googlecode.com
+# https://github.com/trizen
 
 use 5.010;
 use strict;

@@ -22772,7 +22772,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_divexact_ui($u, $n, $p);
                 }
                 else {
-                    Math::GMPz::Rmpz_set_str($u, $p, 10);
+                    Math::GMPz::Rmpz_set_str($u, "$p", 10);
                     Math::GMPz::Rmpz_divexact($u, $n, $u);
                 }
 

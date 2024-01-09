@@ -1760,7 +1760,7 @@ Sidef also provides the very fast `primality_pretest(n)` function, which tries t
 
 ## Squarefree checking
 
-When checking if a given number $n$ is squarefree, rather than fully factoring the number, is enough to find a square factor of $n$, which instantly proves than $n$ is not squarefree.
+When checking if a given number $n$ is squarefree, rather than fully factoring the number, is enough to find a square factor of $n$, which instantly proves that $n$ is not squarefree.
 
 In this regard, Sidef provides the `is_prob_squarefree(n, B)` function, which checks if $n$ is divisible by a square $p^2$ with $p <= B$:
 

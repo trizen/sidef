@@ -3,7 +3,7 @@
 # Author: Daniel "Trizen" Șuteu
 # License: GPLv3
 # Date: 30 April 2014
-# Wesbite: http://github.com/trizen
+# Wesbite: https://github.com/trizen
 
 # Experimental Sidef parser, using Damian Conway's Regexp::Grammars.
 

@@ -1,7 +1,6 @@
-The Sidef Programming Language
-=======
+# The Sidef Programming Language
 
-Sidef is a modern, high-level, general-purpose programming language, inspired by Ruby, Raku and Julia.
+Sidef is a modern, high-level programming language designed for versatile general-purpose applications, drawing inspiration from the principles of Ruby, Raku, and Julia.
 
 ```
             **   **         ****   *           *********   *********
@@ -15,31 +14,31 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
       **   **               ****   *********   *********   *
 ```
 
-* The main features of Sidef include:
+- Key features of Sidef include:
 
-    * object-oriented programming
-    * functional programming
-    * functional pattern matching
-    * optional lazy evaluation
-    * multiple dispatch
-    * lexical scoping
-    * lexical closures
-    * keyword arguments
-    * regular expressions
-    * support for using Perl modules
-    * optional dynamic type checking
-    * big integers, rationals, floats and complex numbers
+  - Object-oriented programming
+  - Functional programming
+  - Functional pattern matching
+  - Optional lazy evaluation
+  - Multiple dispatch
+  - Lexical scoping
+  - Lexical closures
+  - Keyword arguments
+  - Regular expressions
+  - Seamless integration with Perl modules
+  - Optional dynamic type checking
+  - Robust support for big integers, rationals, floats, and complex numbers
 
-### WWW
+### Resources
 
-* [Beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.01/sidef-tutorial.pdf))
-* [Number theory tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.01/sidef-number-theory.pdf))
-* RosettaCode: https://rosettacode.org/wiki/Sidef
-* Gitbook: https://trizen.gitbook.io/sidef-lang/ ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/24.01/sidef-book.pdf))
+- [Beginner's Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.01/sidef-tutorial.pdf))
+- [Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.01/sidef-number-theory.pdf))
+- RosettaCode: [Sidef](https://rosettacode.org/wiki/Sidef)
+- Gitbook: [Sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/24.01/sidef-book.pdf))
 
-### Q&A
+### Questions & Answers
 
-Need help with Sidef? Feel free to ask questions here: https://github.com/trizen/sidef/discussions/categories/q-a
+For assistance or inquiries regarding Sidef, please visit the dedicated [discussion forum](https://github.com/trizen/sidef/discussions/categories/q-a).
 
 ## EXAMPLES
 
@@ -52,21 +51,6 @@ say 10.of { |i| y(fac)(i) }     #=> [1, 1, 2, 6, 24, 120, 720, 5040, 40320, 3628
 
 var fib = ->(f) { ->(n) { n < 2 ? n : (f(n-2) + f(n-1)) } }
 say 10.of { |i| y(fib)(i) }     #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
-```
-
-### Approximation of the [gamma function](https://en.wikipedia.org/wiki/Gamma_function):
-```ruby
-define ℯ = Num.e
-define τ = Num.tau
-
-func Γ(x, r=50) {
-    x < r ? (__FUNC__(x+1, r) / x)
-          : (sqrt(τ*x) * pow(x/ℯ + 1/(12*ℯ*x), x) / x)
-}
-
-for i in (1..10) {
-    say ("%.14f" % Γ(i/3))
-}
 ```
 
 ### ASCII generation of the [Sierpinski triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle):
@@ -164,8 +148,8 @@ Output:
 
 ```
 
-### More examples
-   * For more examples, please see: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+### Additional Examples
+   * To explore further examples, kindly refer to: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
 
 ### INTERACTIVE MODE
 
