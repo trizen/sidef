@@ -1,0 +1,62 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/Almost_prime#Sidef
+#
+
+func almost_primes(a, b, k) {
+
+    a = max(2**k, a)
+    var arr = []
+
+    func (m, lo, k) {
+
+        var hi = idiv(b,m).iroot(k)
+
+        if (k == 1) {
+
+            lo = max(lo, idiv_ceil(a, m))
+
+            each_prime(lo, hi, {|p|
+                arr << m*p
+            })
+
+            return nil
+        }
+
+        each_prime(lo, hi, {|p|
+
+            var t = m*p
+            var u = idiv_ceil(a, t)
+            var v = idiv(b, t)
+
+            next if (u > v)
+
+            __FUNC__(t, p, k-1)
+        })
+    }(1, 2, k)
+
+    return arr.sort
+}
+
+assert_eq(
+  gather {
+    for k in (1..5) {
+        var (x=10, lo=1, hi=2)
+        var arr = []
+        loop {
+            arr += almost_primes(lo, hi, k)
+            break if (arr.len >= x)
+            lo = hi+1
+            hi = 2*lo
+        }
+        say take(arr.first(x))
+    }
+},
+[
+    [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+    [4, 6, 9, 10, 14, 15, 21, 22, 25, 26]
+    [8, 12, 18, 20, 27, 28, 30, 42, 44, 45]
+    [16, 24, 36, 40, 54, 56, 60, 81, 84, 88]
+    [32, 48, 72, 80, 108, 112, 120, 162, 168, 176]
+])

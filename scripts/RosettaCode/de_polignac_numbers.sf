@@ -1,0 +1,16 @@
+#!/usr/bin/ruby
+
+#
+## https://rosettacode.org/wiki/De_Polignac_numbers
+#
+
+var polignacs = (1..Inf -> by(2).lazy.grep {|n|
+    RangeNum(n.ilog2, 0, -1).none {|k| n - (1<<k) -> is_prime }
+})
+
+with (50) {|n|
+    say ("first #{n} de Polignac numbers:")
+    var P = polignacs.first(n)
+    P.slices(10).each{|s| say("%5d"*s.len % s...) }
+    assert_eq(P, %n[1 127 149 251 331 337 373 509 599 701 757 809 877 905 907 959 977 997 1019 1087 1199 1207 1211 1243 1259 1271 1477 1529 1541 1549 1589 1597 1619 1649 1657 1719 1759 1777 1783 1807 1829 1859 1867 1927 1969 1973 1985 2171 2203 2213])
+}
