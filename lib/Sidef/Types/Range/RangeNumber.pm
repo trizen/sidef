@@ -51,10 +51,10 @@ package Sidef::Types::Range::RangeNumber {
         my $from = $self->{from};
         my $to   = $self->{to};
 
-        my $times = ($self->{_times} //= $to->sub($from)->add($step)->div($step));
+        my $times = ($self->{_times} //= ((ref($$step) || ($$step != 1)) ? $to->sub($from)->add($step)->div($step) : $to->sub($from)->add($step)));
 
         if (ref($times) eq 'Sidef::Types::Number::Number') {
-            my $repetitions = CORE::int(Sidef::Types::Number::Number::__numify__($$times));
+            my $repetitions = ref($$times) ? CORE::int(Sidef::Types::Number::Number::__numify__($$times)) : $$times;
 
             if ($repetitions < 0) {
                 return Sidef::Types::Block::Block->new(code => sub { undef; });
