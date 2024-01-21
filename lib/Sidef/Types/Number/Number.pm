@@ -5011,6 +5011,8 @@ package Sidef::Types::Number::Number {
         bless \__asin__(_any2mpfr_mpc($$x));
     }
 
+    *arcsin = \&asin;
+
     sub __asinh__ {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);
@@ -5032,6 +5034,8 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         bless \__asinh__(_any2mpfr_mpc($$x));
     }
+
+    *arcsinh = \&asinh;
 
     #
     ## cos / cosh / acos / acosh
@@ -5112,6 +5116,8 @@ package Sidef::Types::Number::Number {
         bless \__acos__(_any2mpfr_mpc($$x));
     }
 
+    *arccos = \&acos;
+
     sub __acosh__ {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);
@@ -5141,6 +5147,8 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         bless \__acosh__(_any2mpfr_mpc($$x));
     }
+
+    *arccosh = \&acosh;
 
     #
     ## tan / tanh / atan / atanh
@@ -5212,6 +5220,8 @@ package Sidef::Types::Number::Number {
         bless \__atan__(_any2mpfr_mpc($$x));
     }
 
+    *arctan = \&atan;
+
     sub __atanh__ {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);
@@ -5242,6 +5252,8 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         bless \__atanh__(_any2mpfr_mpc($$x));
     }
+
+    *arctanh = \&atanh;
 
     sub __atan2__ {
         my ($x, $y) = @_;
@@ -5380,6 +5392,8 @@ package Sidef::Types::Number::Number {
         bless \__asec__(_any2mpfr_mpc($$x));
     }
 
+    *arcsec = \&asec;
+
     sub __asech__ {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);
@@ -5413,6 +5427,8 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         bless \__asech__(_any2mpfr_mpc($$x));
     }
+
+    *arcsech = \&asech;
 
     #
     ## csc / csch / acsc / acsch
@@ -5500,6 +5516,8 @@ package Sidef::Types::Number::Number {
         bless \__acsc__(_any2mpfr_mpc($$x));
     }
 
+    *arccsc = \&acsc;
+
     sub __acsch__ {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);
@@ -5525,6 +5543,8 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         bless \__acsch__(_any2mpfr_mpc($$x));
     }
+
+    *arccsch = \&acsch;
 
     #
     ## cot / coth / acot / acoth
@@ -5604,6 +5624,8 @@ package Sidef::Types::Number::Number {
         bless \__acot__(_any2mpfr_mpc($$x));
     }
 
+    *arccot = \&acot;
+
     sub __acoth__ {
         my ($x) = @_;
         goto(ref($x) =~ tr/:/_/rs);
@@ -5637,6 +5659,8 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         bless \__acoth__(_any2mpfr_mpc($$x));
     }
+
+    *arccoth = \&acoth;
 
     sub __cis__ {
         my ($x) = @_;
@@ -6195,6 +6219,7 @@ package Sidef::Types::Number::Number {
     *bern             = \&bernfrac;
     *bernoulli        = \&bernfrac;
     *Bernoulli        = \&bernfrac;
+    *BernoulliB       = \&bernfrac;
     *bernoulli_number = \&bernfrac;
 
     sub faulhaber_polynomial {
@@ -20764,9 +20789,11 @@ package Sidef::Types::Number::Number {
                 (HAS_PRIME_UTIL ? Math::Prime::Util::gcd($n, $base) : Math::Prime::Util::GMP::gcd($n, $base)) == 1
                   || return Sidef::Types::Bool::Bool::FALSE;
 
-                ((HAS_PRIME_UTIL and $base < ULONG_MAX)
+                (
+                 (HAS_PRIME_UTIL and $base < ULONG_MAX)
                  ? Math::Prime::Util::is_strong_pseudoprime($n, $base)
-                 : Math::Prime::Util::GMP::is_strong_pseudoprime($n, $base))
+                 : Math::Prime::Util::GMP::is_strong_pseudoprime($n, $base)
+                )
                   || return Sidef::Types::Bool::Bool::FALSE;
             }
 
