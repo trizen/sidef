@@ -3973,7 +3973,9 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = $$x;
-        $y = _any2si($$y) // (goto &nan);
+        $y = $$y;
+
+        $y = _any2si($y) // (goto &nan) if ref($y);
 
         if ($y >= 1 and !ref($x) and $x >= 0) {
             if ($y == 1) {
@@ -4044,8 +4046,10 @@ package Sidef::Types::Number::Number {
 
         _valid(\$y);
 
-        $x = _any2mpz($$x) // goto &nan;
-        $y = _any2si($$y)  // goto &nan;
+        $x = _any2mpz($$x) // (goto &nan);
+        $y = $$y;
+
+        $y = _any2si($y) // (goto &nan) if ref($y);
 
         if ($y == 0) {
             Math::GMPz::Rmpz_sgn($x) || return (ZERO, MONE);    # 0^Inf = 0
@@ -4337,9 +4341,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (ref($y)) {
-            $y = _any2si($y) // goto &nan;
-        }
+        $y = _any2si($y) // (goto &nan) if ref($y);
 
         if ($y >= 0 and !ref($x) and $x >= 0) {
 
@@ -4377,10 +4379,7 @@ package Sidef::Types::Number::Number {
         my ($n) = @_;
 
         $n = $$n;
-
-        if (ref($n)) {
-            $n = _any2si($n) // goto &nan;
-        }
+        $n = _any2si($n) // (goto &nan) if ref($n);
 
         ($n == 0) and return ONE;
         ($n == 1) and return TWO;
@@ -4400,10 +4399,7 @@ package Sidef::Types::Number::Number {
         my ($n) = @_;
 
         $n = $$n;
-
-        if (ref($n)) {
-            $n = _any2si($n) // goto &nan;
-        }
+        $n = _any2si($n) // (goto &nan) if ref($n);
 
         ($n == 0) and return ONE;
         ($n == 1) and return TEN;
@@ -9017,8 +9013,10 @@ package Sidef::Types::Number::Number {
 
         _valid(\$i);
 
-        $n = _any2mpz($$n) // return undef;
-        $i = _any2si($$i)  // return undef;
+        $n = _any2mpz($$n) // (return undef);
+        $i = $$i;
+
+        $i = _any2si($i) // (return undef) if ref($i);
 
         if (defined($k)) {
             _valid(\$k);
@@ -11367,7 +11365,9 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2si($$y)  // (goto &nan);
+        $y = $$y;
+
+        $y = _any2si($y) // (goto &nan) if ref($y);
 
         my $r = Math::GMPz::Rmpz_init_set($x);
 
@@ -11407,7 +11407,9 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = _any2mpz($$x) // (goto &nan);
-        $y = _any2si($$y)  // (goto &nan);
+        $y = $$y;
+
+        $y = _any2si($y) // (goto &nan) if ref($y);
 
         my $r = Math::GMPz::Rmpz_init_set($x);
         Math::GMPz::Rmpz_add_ui($r, $r, CORE::abs($y));
@@ -11927,8 +11929,9 @@ package Sidef::Types::Number::Number {
 
         _valid(\$n);
 
-        $n = _any2si($$n) // goto &nan;
-        $n = -$n if $n < 0;
+        $n = $$n;
+        $n = _any2si($n) // (goto &nan) if ref($n);
+        $n = -$n                        if $n < 0;
         $n == 0 and return ONE;
 
         if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
@@ -11967,7 +11970,8 @@ package Sidef::Types::Number::Number {
 
         _valid(\$n);
 
-        $n = _any2si($$n) // goto &nan;
+        $n = $$n;
+        $n = _any2si($n) // (goto &nan) if ref($n);
         $n == 0 and return ONE;
 
         my $negative = 0;
@@ -13228,7 +13232,9 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = $$x;
-        $y = _any2si($$y) // (goto &nan);
+        $y = $$y;
+
+        $y = _any2si($y) // (goto &nan) if ref($y);
 
         if (!ref($x) and $x <= 1e6 and $x >= 0 and $y >= 0) {
             my $r = Math::GMPz::Rmpz_init();
@@ -33878,7 +33884,9 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = $$x;
-        $y = _any2si($$y) // (goto &nan);
+        $y = $$y;
+
+        $y = _any2si($y) // (goto &nan) if ref($y);
 
         if ($y == 0) {
             return bless \$x;
@@ -33915,7 +33923,9 @@ package Sidef::Types::Number::Number {
         _valid(\$y);
 
         $x = $$x;
-        $y = _any2si($$y) // (goto &nan);
+        $y = $$y;
+
+        $y = _any2si($y) // (goto &nan) if ref($y);
 
         if ($y >= 0 and !ref($x) and $x >= 0) {
 
