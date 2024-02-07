@@ -19614,35 +19614,42 @@ package Sidef::Types::Number::Number {
         # Size of n in base-10
         my $size = Math::GMPz::Rmpz_sizeinbase($n, 10);
 
-        # When n is large enough, try to find a small factor (up to 10^8)
+        # When n is large enough, try to find a small factor
         if ($size > PRIMALITY_PRETEST_MIN) {
 
             state $g = Math::GMPz::Rmpz_init_nobless();
 
             my @checks = (1e3, 1e4, 1e5);
 
-            if ($size >= 9000) {
+            if (INTSIZE > 32 and $size >= 50_000) {
+               push @checks, 1e7;
+               push @checks, 1e8;
+               push @checks, 1e9;
+            }
+            elsif ($size >= 9_000) {
+                push @checks, 1e7;
                 push @checks, 1e8;
             }
-            elsif ($size >= 4500) {
+            elsif ($size >= 4_500) {
+                push @checks, 1e6;
                 push @checks, 1e7;
             }
-            elsif ($size >= 4000) {
+            elsif ($size >= 4_000) {
                 push @checks, 7968751;
             }
-            elsif ($size >= 3500) {
+            elsif ($size >= 3_500) {
                 push @checks, 5789445;
             }
-            elsif ($size >= 3000) {
+            elsif ($size >= 3_000) {
                 push @checks, 4201049;
             }
-            elsif ($size >= 2500) {
+            elsif ($size >= 2_500) {
                 push @checks, 2908076;
             }
-            elsif ($size >= 2000) {
+            elsif ($size >= 2_000) {
                 push @checks, 1670609;
             }
-            elsif ($size >= 1500) {
+            elsif ($size >= 1_500) {
                 push @checks, 908433;
             }
 
