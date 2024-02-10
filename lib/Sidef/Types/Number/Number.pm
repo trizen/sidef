@@ -19622,9 +19622,9 @@ package Sidef::Types::Number::Number {
             my @checks = (1e3, 1e4, 1e5);
 
             if (INTSIZE > 32 and $size >= 50_000) {
-               push @checks, 1e7;
-               push @checks, 1e8;
-               push @checks, 1e9;
+                push @checks, 1e7;
+                push @checks, 1e8;
+                push @checks, 1e9;
             }
             elsif ($size >= 9_000) {
                 push @checks, 1e7;
@@ -28057,16 +28057,51 @@ package Sidef::Types::Number::Number {
 
     sub is_deficient {
         my ($n) = @_;
-        (__cmp__(${$n->sigma}, __mul__($$n, 2)) < 0)
+        (__is_int__($$n) && __cmp__(${$n->sigma}, __mul__($$n, 2)) < 0)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub is_abundant {
         my ($n) = @_;
-        (__cmp__(${$n->sigma}, __mul__($$n, 2)) > 0)
+        (__is_int__($$n) && __cmp__(${$n->sigma}, __mul__($$n, 2)) > 0)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_primitive_abundant {
+        my ($n) = @_;
+
+        $n->is_abundant || return Sidef::Types::Bool::Bool::FALSE;
+        $n = $$n;
+
+        if (!ref($n)) {
+            foreach my $pp (_factor_exp($n)) {
+                my $t = (
+                         HAS_NEW_PRIME_UTIL
+                         ? Math::Prime::Util::divint($n, $pp->[0])
+                         : Math::Prime::Util::GMP::divint($n, $pp->[0])
+                        );
+                (bless \$t)->is_abundant && return Sidef::Types::Bool::Bool::FALSE;
+            }
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        $n = _any2mpz($n) // return Sidef::Types::Bool::Bool::FALSE;
+
+        my $t = Math::GMPz::Rmpz_init();
+        foreach my $pp (_factor_exp($n)) {
+            if ($pp->[0] < ULONG_MAX) {
+                Math::GMPz::Rmpz_divexact_ui($t, $n, $pp->[0]);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($t, "$pp->[0]", 10);
+                Math::GMPz::Rmpz_divexact($t, $n, $t);
+            }
+            (bless \$t)->is_abundant && return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub is_amicable {
@@ -28075,7 +28110,7 @@ package Sidef::Types::Number::Number {
         if ($n->eq($m)) {
             return Sidef::Types::Bool::Bool::FALSE;
         }
-        ($n->aliquot->eq($m) && $m->aliquot->eq($n))
+        (__is_int__($$n) && __is_int__($$m) && $n->aliquot->eq($m) && $m->aliquot->eq($n))
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }

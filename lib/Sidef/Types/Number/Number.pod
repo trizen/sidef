@@ -4187,6 +4187,8 @@ Aliases: I<is_absolute_euler_psp>
 
 Returns true if C<n> is an abundant number, else false.
 
+    say 20.by { .is_abundant }  #=> OEIS: A005101
+
 An abundant number is smaller than the sum of its positive proper divisors.
 
 =cut
@@ -4938,6 +4940,18 @@ Returns true if C<n> is a prime number.
     n.is_prime_power
 
 Returns true if C<n> is a power of some prime.
+
+=cut
+
+=head2 is_primitive_abundant
+
+    n.is_primitive_abundant
+
+Returns true if C<n> is a primitive abundant number, else false.
+
+    say 20.by { .is_primitive_abundant }    #=> OEIS: A091191
+
+A primitive abundant number is an abundant number having no abundant proper divisor.
 
 =cut
 
