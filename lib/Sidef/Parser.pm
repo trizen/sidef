@@ -1052,6 +1052,12 @@ package Sidef::Parser {
                 }
             }
 
+            # ZERO WIDTH SPACE
+            # https://www.fileformat.info/info/unicode/char/200b/index.htm
+            if (/\G\x{200B}+/gc) {
+                redo;
+            }
+
             # Embedded comments (https://docs.raku.org/language/syntax#Multi-line_/_embedded_comments)
             if (/\G#`(?=[[:punct:]])/gc) {
                 $self->get_quoted_string(code => $opt{code});
