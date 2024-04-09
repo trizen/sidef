@@ -28251,48 +28251,40 @@ package Sidef::Types::Number::Number {
             sub {
                 my ($m, $r) = @_;
 
-                if ($r < $k) {
-                    push @powerful, $m;
-                    return;
-                }
-
                 my $lo = 1;
                 my $hi = Math::Prime::Util::rootint((HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($to, $m) : Math::Prime::Util::GMP::divint($to, $m)), $r);
 
-                if ($r <= $k and $from > $m) {
-                    my $t = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($from, $m) : Math::Prime::Util::GMP::divint($from, $m));
-                    ++$t if ($from % $m != 0);
-                    $lo = Math::Prime::Util::rootint($t, $r);
+                if ($r <= $k) {
+
+                    if ($from > $m) {
+                        my $t = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($from, $m) : Math::Prime::Util::GMP::divint($from, $m));
+                        $t++ if ($from % $m != 0);
+                        $lo = Math::Prime::Util::rootint($t, $r);
+                        $lo++ if ((HAS_NEW_PRIME_UTIL ? Math::Prime::Util::powint($lo, $r) : Math::Prime::Util::GMP::powint($lo, $r)) != $t);
+                    }
+
+                    foreach my $v ($lo .. $hi) {
+                        push @powerful, $m * (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::powint($v, $r) : Math::Prime::Util::GMP::powint($v, $r));
+                    }
+
+                    return;
                 }
 
                 foreach my $v ($lo .. $hi) {
 
-                    if ($r > $k) {
-                        Math::Prime::Util::is_square_free($v) or next;
-                        Math::Prime::Util::gcd($m, $v) == 1   or next;
-                    }
+                    Math::Prime::Util::is_square_free($v) or next;
+                    Math::Prime::Util::gcd($m, $v) == 1   or next;
 
-                    my $t = $m * (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::powint($v, $r) : Math::Prime::Util::GMP::powint($v, $r));
-
-                    if ($r <= $k and $t < $from) {
-                        next;
-                    }
-
-                    __SUB__->($t, $r - 1);
+                    __SUB__->($m * (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::powint($v, $r) : Math::Prime::Util::GMP::powint($v, $r)), $r - 1);
                 }
               }
               ->(1, 2 * $k - 1);
         }
         else {
-            my $t = Math::GMPz::Rmpz_init();
+            state $t = Math::GMPz::Rmpz_init_nobless();
 
             sub {
                 my ($m, $r) = @_;
-
-                if ($r < $k) {
-                    push @powerful, (Math::GMPz::Rmpz_fits_ulong_p($m) ? Math::GMPz::Rmpz_get_ui($m) : $m);
-                    return;
-                }
 
                 Math::GMPz::Rmpz_div($t, $to, $m);
                 Math::GMPz::Rmpz_root($t, $t, $r);
@@ -28302,25 +28294,30 @@ package Sidef::Types::Number::Number {
                 my $lo = 1;
                 my $hi = Math::GMPz::Rmpz_get_ui($t);
 
-                if ($r <= $k and Math::GMPz::Rmpz_cmp($from, $m) > 0) {
-                    Math::GMPz::Rmpz_cdiv_q($t, $from, $m);
-                    Math::GMPz::Rmpz_root($t, $t, $r);
-                    $lo = Math::GMPz::Rmpz_get_ui($t);
+                if ($r <= $k) {
+
+                    if (Math::GMPz::Rmpz_cmp($from, $m) > 0) {
+                        Math::GMPz::Rmpz_cdiv_q($t, $from, $m);
+                        my $exact = Math::GMPz::Rmpz_root($t, $t, $r);
+                        $lo = Math::GMPz::Rmpz_get_ui($t) + ($exact ? 0 : 1);
+                    }
+
+                    foreach my $v ($lo .. $hi) {
+                        Math::GMPz::Rmpz_ui_pow_ui($t, $v, $r);
+                        Math::GMPz::Rmpz_mul($t, $t, $m);
+                        push @powerful, (Math::GMPz::Rmpz_fits_ulong_p($t) ? Math::GMPz::Rmpz_get_ui($t) : Math::GMPz::Rmpz_init_set($t));
+                    }
+
+                    return;
                 }
 
                 foreach my $v ($lo .. $hi) {
 
-                    if ($r > $k) {
-                        (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
-                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                        or next;
-                    }
+                    (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
+                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                        or next;
 
                     Math::GMPz::Rmpz_ui_pow_ui($t, $v, $r);
                     Math::GMPz::Rmpz_mul($t, $t, $m);
-
-                    if ($r <= $k and Math::GMPz::Rmpz_cmp($t, $from) < 0) {
-                        next;
-                    }
 
                     __SUB__->(Math::GMPz::Rmpz_init_set($t), $r - 1);
                 }

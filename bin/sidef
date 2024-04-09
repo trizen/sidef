@@ -1118,6 +1118,7 @@ The C<-N> option can be used for changing the class-variables in the Number clas
     sidef -N 'ROUND = 0'                # rounding mode for floating-point numbers
     sidef -N 'VERBOSE = false'          # true to enable verbose/debug mode
     sidef -N 'USE_YAFU = false'         # true to use YAFU for factoring large integers
+    sidef -N 'USE_PFGW = false'         # true to use PFGW64 as a primality pretest for large enough n
     sidef -N 'USE_PARI_GP = false'      # true to use PARI/GP in several methods
     sidef -N 'USE_FACTORDB = false'     # true to use factordb.com for factoring large integers
     sidef -N 'USE_PRIMESUM = false'     # true to use Kim Walisch's primesum in prime_sum(n)
