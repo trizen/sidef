@@ -1363,7 +1363,6 @@ HEADER
             $code = 'while(1)' . $self->deparse_block_with_scope($obj->{block});
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
-            $self->top_add(q{no warnings 'experimental::smartmatch';});
 
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
 
@@ -1761,7 +1760,6 @@ HEADER
 
                     # !~ and ~~ methods
                     if ($method eq '~~' or $method eq '!~') {
-                        $self->top_add(q{no warnings 'experimental::smartmatch';});
                         $code =
                             'do{my$bool=Sidef::Object::Object::smartmatch(do{'
                           . $code

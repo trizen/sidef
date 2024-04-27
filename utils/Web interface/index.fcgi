@@ -3,7 +3,7 @@
 # Run Sidef code inside the browser (using FastCGI)
 
 use utf8;
-use 5.018;
+use 5.016;
 use strict;
 #use autodie;
 
