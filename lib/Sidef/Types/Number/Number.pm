@@ -31282,16 +31282,13 @@ package Sidef::Types::Number::Number {
             return 1;
         };
 
-        my $omega              = 0;
-        my $remainder          = $n;
-        my $did_trial_division = 0;
+        my $omega     = 0;
+        my $remainder = $n;
 
         # Do first a little bit of trial division for large enough n.
         if (Math::GMPz::Rmpz_sizeinbase($remainder, 10) >= 200) {
 
             my ($r, @factors) = _adaptive_trial_factor($remainder, 3, 1e5, 1e6);
-
-            $did_trial_division = 1;
 
             if (@factors) {
 
@@ -31335,28 +31332,6 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_powm($pm1, $TWO, $nm1, $n);
         Math::GMPz::Rmpz_cmp_ui($pm1, 1) == 0
           or return Sidef::Types::Bool::Bool::FALSE;
-
-        if (!$did_trial_division and !Math::GMPz::Rmpz_fits_ulong_p($remainder)) {
-
-            my ($r, @factors) = _adaptive_trial_factor($remainder, 3, 1e5, 1e6);
-
-            if (@factors) {
-
-                $check_conditions->(@factors)
-                  || return Sidef::Types::Bool::Bool::FALSE;
-
-                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
-                    return Sidef::Types::Bool::Bool::TRUE;
-                }
-                elsif (Math::GMPz::Rmpz_fits_ulong_p($r)) {
-                    $check_conditions->(_factor(Math::GMPz::Rmpz_get_ui($r))) || return Sidef::Types::Bool::Bool::FALSE;
-                    return Sidef::Types::Bool::Bool::TRUE;
-                }
-
-                $omega += scalar(@factors);
-                $remainder = $r;
-            }
-        }
 
         my @factors = _miller_factor($n);
 
@@ -31697,16 +31672,13 @@ package Sidef::Types::Number::Number {
             return 1;
         };
 
-        my $omega              = 0;
-        my $remainder          = $n;
-        my $did_trial_division = 0;
+        my $omega     = 0;
+        my $remainder = $n;
 
         # Do first a little bit of trial division for large enough n.
         if (Math::GMPz::Rmpz_sizeinbase($remainder, 10) >= 200) {
 
             my ($r, @factors) = _adaptive_trial_factor($remainder, 3, 1e5, 1e6);
-
-            $did_trial_division = 1;
 
             if (@factors) {
 
@@ -31751,28 +31723,6 @@ package Sidef::Types::Number::Number {
         if (!Math::GMPz::Rmpz_fits_ulong_p($n)) {
             Math::Prime::Util::GMP::is_euler_pseudoprime(Math::GMPz::Rmpz_get_str($n, 10), 2)
               || return Sidef::Types::Bool::Bool::FALSE;
-        }
-
-        if (!$did_trial_division and !Math::GMPz::Rmpz_fits_ulong_p($remainder)) {
-
-            my ($r, @factors) = _adaptive_trial_factor($remainder, 3, 1e5, 1e6);
-
-            if (@factors) {
-
-                $check_conditions->(@factors)
-                  || return Sidef::Types::Bool::Bool::FALSE;
-
-                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
-                    return Sidef::Types::Bool::Bool::TRUE;
-                }
-                elsif (Math::GMPz::Rmpz_fits_ulong_p($r)) {
-                    $check_conditions->(_factor(Math::GMPz::Rmpz_get_ui($r))) || return Sidef::Types::Bool::Bool::FALSE;
-                    return Sidef::Types::Bool::Bool::TRUE;
-                }
-
-                $omega += scalar(@factors);
-                $remainder = $r;
-            }
         }
 
         my @factors = _miller_factor($n);
