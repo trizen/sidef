@@ -3,9 +3,9 @@ package Sidef::Types::Number::Number {
     use utf8;
     use 5.016;
 
-    use Math::MPFR qw();
-    use Math::GMPq qw();
     use Math::GMPz qw();
+    use Math::GMPq qw();
+    use Math::MPFR qw();
     use Math::MPC  qw();
 
     use List::Util             qw();
@@ -899,9 +899,8 @@ package Sidef::Types::Number::Number {
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
 
         Math::GMPz::Rmpz_fits_slong_p($x)
-          and return Math::GMPz::Rmpz_get_si($x);
-
-        Math::GMPz::Rmpz_get_str($x, 10);
+          ? Math::GMPz::Rmpz_get_si($x)
+          : Math::GMPz::Rmpz_get_str($x, 10);
     }
 
     # Big to unsigned (non-negative) integer-string
@@ -915,10 +914,8 @@ package Sidef::Types::Number::Number {
         $x = (_any2mpz($x) // return undef) if ref($x) ne 'Math::GMPz';
 
         Math::GMPz::Rmpz_fits_ulong_p($x)
-          and return Math::GMPz::Rmpz_get_ui($x);
-
-        Math::GMPz::Rmpz_sgn($x) >= 0 or return undef;
-        Math::GMPz::Rmpz_get_str($x, 10);
+          ? Math::GMPz::Rmpz_get_ui($x)
+          : ((Math::GMPz::Rmpz_sgn($x) >= 0) ? Math::GMPz::Rmpz_get_str($x, 10) : undef);
     }
 
     # Big to positive integer-string
@@ -936,8 +933,7 @@ package Sidef::Types::Number::Number {
             return (($ui > 0) ? $ui : undef);
         }
 
-        Math::GMPz::Rmpz_sgn($x) > 0 or return undef;
-        Math::GMPz::Rmpz_get_str($x, 10);
+        (Math::GMPz::Rmpz_sgn($x) > 0) ? Math::GMPz::Rmpz_get_str($x, 10) : undef;
     }
 
     sub _execute_pari_gp {
@@ -957,7 +953,6 @@ package Sidef::Types::Number::Number {
 
         # The directory is deleted when the object goes out of scope.
         require File::Temp;
-
         my $tmp = File::Temp->newdir(CLEANUP => 1);
 
         CORE::chdir($tmp);
@@ -18761,7 +18756,7 @@ package Sidef::Types::Number::Number {
         _valid(\(@vals));
 
         @vals || return ZERO;    # By convention, gcd of an empty set is 0.
-        @vals == 1 and return $vals[0];
+        @vals == 1 and return $vals[0]->iabs;
 
         if (@vals > 2) {
 
@@ -18817,7 +18812,7 @@ package Sidef::Types::Number::Number {
         _valid(\(@vals));
 
         @vals || return ZERO;    # By convention, gcd of an empty set is 0.
-        @vals == 1 and return $vals[0];
+        @vals == 1 and return $vals[0]->iabs;
 
         my @terms = map { _any2mpz($$_) // goto &nan } @vals;
         my $g     = Math::GMPz::Rmpz_init_set($terms[0]);
@@ -18875,7 +18870,7 @@ package Sidef::Types::Number::Number {
         _valid(\(@vals));
 
         @vals or return ONE;    # By convention, lcm of an empty set is 1.
-        @vals == 1 and return $vals[0];
+        @vals == 1 and return $vals[0]->iabs;
 
         if (@vals > 2) {
             my @terms = map { _any2mpz($$_) // goto &nan } @vals;
@@ -32526,6 +32521,9 @@ package Sidef::Types::Number::Number {
             goto &nan;
         }
 
+        # Asymptotic Formulae for the n-th Perfect Power
+        # https://www.emis.de/journals/JIS/VOL15/Jakimczuk/jak29.html
+
         bsearch_min(
             $n,
             $n->sqr,
@@ -32659,7 +32657,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        if (HAS_NEW_PRIME_UTIL_GMP and $k >= 5) {
+        if (0 and HAS_NEW_PRIME_UTIL_GMP and $k >= 5) {    # this is somehow slower
             return _set_int(Math::Prime::Util::GMP::powerful_count(Math::GMPz::Rmpz_get_str($n, 10), $k));
         }
 
@@ -32677,11 +32675,12 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            my $z = Math::GMPz::Rmpz_init();
+            my $z  = Math::GMPz::Rmpz_init();
+            my $hi = Math::GMPz::Rmpz_get_ui($t);
 
-            if ($r > $k and Math::GMPz::Rmpz_cmp_ui($t, 3) > 0 and Math::GMPz::Rmpz_cmp_ui($t, 1e7) <= 0) {
-                my $v  = 1;
-                my $hi = Math::GMPz::Rmpz_get_ui($t);
+            if ($hi > 3 and $hi < 1e7) {
+
+                my $v = 1;
                 foreach my $mu (
                                 HAS_PRIME_UTIL
                                 ? Math::Prime::Util::moebius(1, $hi)
@@ -32697,12 +32696,10 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            foreach my $v (1 .. Math::GMPz::Rmpz_get_ui($t)) {
+            foreach my $v (1 .. $hi) {
 
-                if ($r > $k) {
-                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                        or next;
-                    (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
-                }
+                Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                        or next;
+                (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
 
                 Math::GMPz::Rmpz_ui_pow_ui($z, $v, $r);
                 Math::GMPz::Rmpz_mul($z, $z, $m);

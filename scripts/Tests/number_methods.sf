@@ -1486,4 +1486,26 @@ assert_eq(
     %n[NaN, 0, NaN, 1, 7, 3, 27, 43, 75, 139, 11, 779, 267, 1291, 3339, 7435, 32011, 48395, 81163, 146699, 277771, 15627, 1588491, 2637067, 539915, 4734219, 13122827, 63454475, 29900043, 231226635, 97008907, 902315275, 365444363, 1439186187, 3586669835, 7881637131].join(' ')
 )
 
+# GCD/LCM tests on negative inputs
+
+assert_eq(lcm(-43), 43)
+assert_eq(gcd(-43), 43)
+assert_eq(gcud(-43), 43)
+
+assert_eq(lcm(-42.7), 42)
+assert_eq(gcd(-42.7), 42)
+assert_eq(gcud(-42.7), 42)
+
+assert_eq(lcm(-42.7, 1), 42)
+assert_eq(gcd(-42.7, 0), 42)
+assert_eq(gcud(-42.7, 0), 42)
+
+assert_eq(lcm(-42.7, 1, 1), 42)
+assert_eq(gcd(-42.7, 0, 0), 42)
+assert_eq(gcud(-42.7, 0, 0), 42)
+
+assert_eq(lcm(1, 1, -42.7), 42)
+assert_eq(gcd(0, 0, -42.7), 42)
+assert_eq(gcud(0, 0, -42.7), 42)
+
 say "** Tests passed!"
