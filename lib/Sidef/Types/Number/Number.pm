@@ -32678,7 +32678,7 @@ package Sidef::Types::Number::Number {
             my $z  = Math::GMPz::Rmpz_init();
             my $hi = Math::GMPz::Rmpz_get_ui($t);
 
-            if ($hi > 3 and $hi < 1e7) {
+            if (HAS_PRIME_UTIL and $hi > 3 and $hi < 1e7) {
 
                 my $v = 1;
                 foreach my $mu (
