@@ -146,7 +146,8 @@ package Sidef::Deparse::Perl {
         $opts{header} .= <<"HEADER";
 
 use utf8;
-use 5.016;
+use strict;
+use feature qw(state unicode_strings unicode_eval evalbytes);
 local \$| = 1;   # autoflush
 
 HEADER
