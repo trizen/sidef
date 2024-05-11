@@ -1,0 +1,208 @@
+#!/usr/bin/ruby
+
+# Daniel "Trizen" Șuteu
+# Date: 10 January 2020
+# https://github.com/trizen
+
+# Prove the primality of a number N, using the Lucas `U` sequence and the Pocklington primality test, recursively factoring N-1 and N+1 (whichever is easier to factorize first).
+
+# See also:
+#   https://en.wikipedia.org/wiki/Pocklington_primality_test
+#   https://en.wikipedia.org/wiki/Primality_certificate
+#   https://mathworld.wolfram.com/PrattCertificate.html
+#   https://math.stackexchange.com/questions/663341/n1-primality-proving-is-slow
+
+func lucas_pocklington_primality_proving(n, lim=2**64) is cached {
+
+    if ((n <= lim) || (n <= 2)) {
+        return n.is_prime
+    }
+
+    n.is_prob_prime || return false
+
+    var nm1 = n-1
+    var np1 = n+1
+
+    const TRIAL_LIMIT = 1e6
+
+    var f1 = nm1.trial_factor(TRIAL_LIMIT)
+    var f2 = np1.trial_factor(TRIAL_LIMIT)
+
+    var B1 = f1.pop
+    var B2 = f2.pop
+
+    if (B1 < TRIAL_LIMIT) {
+        f1 << B1
+        B1 = 1
+    }
+
+    if (B2 < TRIAL_LIMIT) {
+        f2 << B2
+        B2 = 1
+    }
+
+    if (f1.prod<B1 && f2.prod<B2) {
+        if (B1 < B2) {
+            if (__FUNC__(B1, lim)) {
+                f1 << B1
+                B1 = 1
+            }
+            elsif (__FUNC__(B2, lim)) {
+                f2 << B2
+                B2 = 1
+            }
+        }
+        else {
+            if (__FUNC__(B2, lim)) {
+                f2 << B2
+                B2 = 1
+            }
+            elsif (__FUNC__(B1, lim)) {
+                f1 << B1
+                B1 = 1
+            }
+        }
+    }
+
+    func pocklington_prove_primality() {
+        f1.uniq.all {|p|
+            1..Inf -> any {
+                var a = irand(2, nm1)
+                n.is_strong_pseudoprime(a) || return false
+                if (is_coprime(powmod(a, nm1/p, n) - 1, n)) {
+                    say [a, p]
+                    true
+                }
+                else {
+                    false
+                }
+            }
+        }
+    }
+
+    func find_PQD() {
+
+       var l = min(1e6, n-1)
+
+       loop {
+            var P = (irand(1,l))
+            var Q = (irand(1,l) * [1,-1].rand)
+            var D = (P*P - 4*Q)
+
+            next if is_square(D % n)
+            next if (P >= n)
+            next if (Q >= n)
+            next if (kronecker(D,n) != -1)
+
+            return (P, Q, D)
+        }
+    }
+
+    func lucas_prove_primality() {
+        var (P, Q, D) = find_PQD()
+
+        n.is_strong_pseudoprime(P+1) || return false
+        lucasUmod(P, Q, np1, n) == 0 || return false
+
+        return f2.uniq.all {|p|
+            1..Inf -> any {
+                assert_eq(D, P*P - 4*Q)
+
+                if (P>=n || Q>=n) {
+                    return __FUNC__()
+                }
+
+                if (is_coprime(lucasUmod(P, Q, np1/p, n), n)) {
+                    say [P, Q, p]
+                    true
+                }
+                else {
+                    (P, Q) = (P+2, P+Q+1)
+                    n.is_strong_pseudoprime(P) || return false
+                    false
+                }
+            }
+        }
+    }
+
+    loop {
+        var A1 = f1.prod
+        var A2 = f2.prod
+
+        if (A1>B1 && is_coprime(A1, B1)) {
+            say "\n:: N-1 primality proving of: #{n}"
+            return pocklington_prove_primality()
+        }
+
+        if (A2>B2 && is_coprime(A2, B2)) {
+            say "\n:: N+1 primality proving of: #{n}"
+            return lucas_prove_primality()
+        }
+
+        for p in ((B1*B2).ecm_factor) {
+
+            if (B1%p == 0 && __FUNC__(p, lim)) {
+                while (B1%p == 0) {
+                    f1 << p
+                    A1 *= p
+                    B1 /= p
+                }
+                if (__FUNC__(B1, lim)) {
+                    f1 << B1
+                    A1 *= B1
+                    B1 /= B1
+                }
+                break if (A1 > B1)
+            }
+
+            if (B2%p == 0 && __FUNC__(p, lim)) {
+                while (B2%p == 0) {
+                    f2 << p
+                    A2 *= p
+                    B2 /= p
+                }
+                if (__FUNC__(B2, lim)) {
+                    f2 << B2
+                    A2 *= B2
+                    B2 /= B2
+                }
+                break if (A2 > B2)
+            }
+        }
+    }
+}
+
+say assert(lucas_pocklington_primality_proving(610347760013638302077109801592928591036750649061221421483459))
+
+__END__
+:: N-1 proving primality of: 10200837030535946432415781
+[8109413315100632090346069, 2]
+[6217691240797091025962993, 3]
+[1683759098694605074537760, 5]
+[6095863793857504156729879, 103]
+[7370888006164389927696208, 3167]
+[5752952585500377495777556, 57910426226274407]
+
+:: N+1 proving primality of: 9596539444846996965759470133559
+[707331559, 2780343822, 2]
+[707331559, 2780343822, 5]
+[707331559, 2780343822, 29]
+[707331559, 2780343822, 811]
+[707331559, 2780343822, 10200837030535946432415781]
+
+:: N+1 proving primality of: 72274331657576353317849179356870186439080146899611
+[463737873, 907446171, 2]
+[463737875, 1371184045, 7]
+[463737875, 1371184045, 271]
+[463737875, 1371184045, 1597]
+[463737875, 1371184045, 32843]
+[463737875, 1371184045, 2703313]
+[463737875, 1371184045, 9596539444846996965759470133559]
+
+:: N-1 proving primality of: 610347760013638302077109801592928591036750649061221421483459
+[458927913562990853766467404877977676633964854423861109730700, 2]
+[521567765542977579939751238756224795178906383030754017389367, 3]
+[174471562612093345937604728173142260370910552339274032675230, 6689]
+[406206980707027884885407295255687843286085618117473520920511, 70139]
+[114626012721946710404343117115811868015815903146304429630277, 72274331657576353317849179356870186439080146899611]
+true

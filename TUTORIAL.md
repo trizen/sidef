@@ -914,7 +914,7 @@ Like in Perl, there is also the `DATA` file-handle which will point to the data 
 
 ```ruby
 DATA.each { |line|
-    say "=>> #{line.chomp}"
+    say "=>> #{line}"
 }
 
 __DATA__

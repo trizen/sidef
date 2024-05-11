@@ -20810,9 +20810,8 @@ package Sidef::Types::Number::Number {
 
         $n = _big2pistr($n) // return Sidef::Types::Bool::Bool::FALSE;
 
-        foreach my $base (@bases) {
+        foreach my $base (map { _big2pistr($_) // return Sidef::Types::Bool::Bool::FALSE } @bases) {
 
-            $base < 1 and return Sidef::Types::Bool::Bool::FALSE;
             $base eq '1' and next;
 
             $base eq $n
@@ -20821,7 +20820,7 @@ package Sidef::Types::Number::Number {
             Math::Prime::Util::GMP::gcd($n, $base) eq '1'
               || return Sidef::Types::Bool::Bool::FALSE;
 
-            Math::Prime::Util::GMP::is_strong_pseudoprime($n, (_big2pistr($base) // return Sidef::Types::Bool::Bool::FALSE))
+            Math::Prime::Util::GMP::is_strong_pseudoprime($n, $base)
               || return Sidef::Types::Bool::Bool::FALSE;
         }
 

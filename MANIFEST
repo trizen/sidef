@@ -895,6 +895,7 @@ scripts/Tests/longest_common_prefix.sf
 scripts/Tests/longest_common_subsequence.sf
 scripts/Tests/longest_common_subsequence_2.sf
 scripts/Tests/loops.sf
+scripts/Tests/lucas-pocklington_primality_proving.sf
 scripts/Tests/lucas_sequences.sf
 scripts/Tests/luhn_test_of_credit_card_numbers.sf
 scripts/Tests/lvalues.sf
