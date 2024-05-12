@@ -33,3 +33,9 @@ inc/
 /MANIFEST.bak
 /pm_to_blib
 /*.zip
+
+# PDF files
+/sidef-number-class-documentation.pdf
+/sidef-number-theory.pdf
+/sidef-tutorial.pdf
+/sidef-book.pdf

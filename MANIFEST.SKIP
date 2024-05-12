@@ -81,3 +81,9 @@
 
 # Avoid archives of this distribution
 \bSidef-[\d\.\_]+
+
+# Avoid PDF files
+^sidef-tutorial.pdf$
+^sidef-number-theory.pdf$
+^sidef-number-class-documentation.pdf$
+^sidef-book.pdf$
