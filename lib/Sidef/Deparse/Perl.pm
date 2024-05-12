@@ -504,7 +504,7 @@ HEADER
     sub _dump_array {
         my ($self, $ref, $array) = @_;
         $self->load_mod($ref);
-        'bless([' . join(',', map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . "], '${ref}')";
+        'bless([' . join(',', grep { $_ ne '' } map { $self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_}) } @{$array}) . "], '${ref}')";
     }
 
     sub _dump_indices {
