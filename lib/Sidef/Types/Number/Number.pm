@@ -12527,6 +12527,28 @@ package Sidef::Types::Number::Number {
     *fib       = \&fibonacci;
     *Fibonacci = \&fibonacci;
 
+    sub fibonorial {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // goto &nan;
+
+        return ONE if ($n <= 2);
+
+        my $x = Math::GMPz::Rmpz_init_set_ui(1);
+        my $y = Math::GMPz::Rmpz_init_set_ui(1);
+        my $t = Math::GMPz::Rmpz_init();
+
+        my @terms;
+        foreach my $k (1 .. $n - 2) {
+            Math::GMPz::Rmpz_set($t, $y);
+            Math::GMPz::Rmpz_add($y, $y, $x);
+            Math::GMPz::Rmpz_set($x, $t);
+            push @terms, Math::GMPz::Rmpz_init_set($y);
+        }
+
+        bless \_binsplit(\@terms, \&__mul__);
+    }
+
     sub pisano_period {
         my ($n) = @_;
 

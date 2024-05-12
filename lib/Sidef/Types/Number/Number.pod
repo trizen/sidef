@@ -3385,6 +3385,14 @@ Aliases: I<fibonacci_mod>, I<fibonaccimod>
 
 =cut
 
+=head2 fibonorial
+
+    fibonorial(n)
+
+Returns the product of first C<n> nonzero Fibonacci numbers C<F(1), ..., F(n)>.
+
+=cut
+
 =head2 flip
 
     n.flip(base=10)
