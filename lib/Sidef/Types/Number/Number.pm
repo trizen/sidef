@@ -28,9 +28,9 @@ package Sidef::Types::Number::Number {
     }
 
     state $MONE = Math::GMPz::Rmpz_init_set_si(-1);
-    state $ZERO = Math::GMPz::Rmpz_init_set_ui(0);
-    state $ONE  = Math::GMPz::Rmpz_init_set_ui(1);
-    state $TWO  = Math::GMPz::Rmpz_init_set_ui(2);
+    state $ZERO = Math::GMPz::Rmpz_init_set_ui( 0);
+    state $ONE  = Math::GMPz::Rmpz_init_set_ui( 1);
+    state $TWO  = Math::GMPz::Rmpz_init_set_ui( 2);
     state $TEN  = Math::GMPz::Rmpz_init_set_ui(10);
 
     use constant {
@@ -13825,7 +13825,7 @@ package Sidef::Types::Number::Number {
                 return _set_int($value);
             }
 
-            if (HAS_NEW_PRIME_UTIL) {
+            if (HAS_NEW_PRIME_UTIL and $y < ULONG_MAX) {
                 return _set_int($mertens_table->{$y} = Math::Prime::Util::mertens($y));
             }
         }
@@ -13936,8 +13936,13 @@ package Sidef::Types::Number::Number {
             return $to->liouville_sum->sub($from->dec->liouville_sum);
         }
 
-        my $n = _any2mpz($$from) // goto &nan;
-        Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
+        my $n = $$from;
+
+        if (ref($n)) {
+            $n = _big2istr($n) // goto &nan;
+        }
+
+        $n > 0 or return ZERO;
 
         state $liouville_table = {
 
@@ -13966,31 +13971,23 @@ package Sidef::Types::Number::Number {
                                  };
 
         if (defined(my $value = $liouville_table->{$n})) {
-            return _set_int($value);
+            return bless \$value;
         }
 
-        state $t = Math::GMPz::Rmpz_init();
-
-        Math::GMPz::Rmpz_sqrt($t, $n);
-        Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
-
         my $L    = 0;
-        my $sqrt = Math::GMPz::Rmpz_get_ui($t);
+        my $sqrt = Math::Prime::Util::GMP::sqrtint($n);
 
         foreach my $k (1 .. $sqrt) {
-            if ($k * $k < ULONG_MAX) {
-                Math::GMPz::Rmpz_div_ui($t, $n, $k * $k);
-            }
-            else {
-                Math::GMPz::Rmpz_ui_pow_ui($t, $k, 2);
-                Math::GMPz::Rmpz_div($t, $n, $t);
-            }
-            my $M = ${(bless \$t)->mertens};    # most of the time is spent here
+            my $t =
+              (HAS_NEW_PRIME_UTIL and $n < ULONG_MAX)
+              ? Math::Prime::Util::divint($n, $k * $k)
+              : Math::Prime::Util::GMP::divint($n, (($k * $k < ULONG_MAX) ? ($k * $k) : Math::Prime::Util::GMP::mulint($k, $k)));
+            my $M = ${(($t < ULONG_MAX) ? (bless \$t) : _set_int($t))->mertens};
             $L += ref($M) ? Math::GMPz::Rmpz_get_si($M) : $M;
         }
 
         $liouville_table->{$n} = $L;
-        _set_int($L);
+        bless \$L;
     }
 
     sub cyclotomic_polynomial {

@@ -681,8 +681,7 @@ HEADER
                 : "bless({\@data}, 'Sidef::Types::Hash::Hash')"
                )
              : "\$data[0]"
-            )
-          . "}";
+            ) . "}";
     }
 
     sub deparse_generic {
