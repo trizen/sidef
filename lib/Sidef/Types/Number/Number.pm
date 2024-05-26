@@ -23399,7 +23399,7 @@ package Sidef::Types::Number::Number {
         $factorized || $collect_factors->($n->dop_factor($mp1->mul($n->ilog2->isqrt)->mul(TWO)));
         $factorized || $collect_factors->($n->miller_factor($mp1->mul(_set_int(5))));
         $factorized || $collect_factors->($n->fibonacci_factor);
-        $factorized || $collect_factors->($n->lucas_factor(ONE, $mp1->mul(TWO)));
+        $factorized || $collect_factors->($n->lucas_factor(undef, $mp1->mul(TWO)));
         $factorized || $collect_factors->($n->cop_factor($mp1->mul($n->ilog2->isqrt->shift_right(ONE))));
         $factorized || $collect_factors->($n->pell_factor($mp1->mul(_set_int(1e3))));
 
@@ -32693,6 +32693,8 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
+            Math::GMPz::Rmpz_fits_ulong_p($t) or die "Too large value!";
+
             my $z  = Math::GMPz::Rmpz_init();
             my $hi = Math::GMPz::Rmpz_get_ui($t);
 
@@ -32938,10 +32940,11 @@ package Sidef::Types::Number::Number {
 
         if (Math::GMPz::Rmpz_odd_p($n)) {    # odd case
 
-            # Reference:
+            # References:
+            #   https://www.lirmm.fr/~ochem/opn/
             #   https://en.wikipedia.org/wiki/Perfect_number#Odd_perfect_numbers
 
-            Math::GMPz::Rmpz_sizeinbase($n, 10) > 1500
+            Math::GMPz::Rmpz_sizeinbase($n, 10) > 2190
               or return Sidef::Types::Bool::Bool::FALSE;
 
             Math::GMPz::Rmpz_divisible_ui_p($n, 105)
