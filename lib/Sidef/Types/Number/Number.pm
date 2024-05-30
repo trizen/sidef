@@ -17901,19 +17901,32 @@ package Sidef::Types::Number::Number {
             return ((bless \$n)->nth_squarefree);
         }
 
-        my $prec = Math::GMPz::Rmpz_sizeinbase($n, 2) + 2;
-        my $f    = Math::MPFR::Rmpfr_init2($prec);
-        Math::MPFR::Rmpfr_zeta_ui($f, $k, $ROUND);
-        Math::MPFR::Rmpfr_mul_z($f, $f, $n, $ROUND);
+        my $prec   = Math::GMPz::Rmpz_sizeinbase($n, 2) + 2;
+        my $approx = Math::MPFR::Rmpfr_init2($prec);
 
-        my $v     = _any2mpz($f) // goto &nan;
+        Math::MPFR::Rmpfr_zeta_ui($approx, $k, $ROUND);
+        Math::MPFR::Rmpfr_mul_z($approx, $approx, $n, $ROUND);
+
+        my $v     = _any2mpz($approx) // goto &nan;
         my $k_obj = bless \$k;
         my $v_obj = bless \$v;
 
-        my $count =
-          (HAS_NEW_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
-          ? Math::GMPz::Rmpz_init_set_ui(Math::Prime::Util::powerfree_count(Math::GMPz::Rmpz_get_ui($v), $k))
-          : ${$k_obj->powerfree_count($v_obj)};
+        my $count;
+
+        while (1) {
+
+            $count =
+              (HAS_NEW_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
+              ? Math::GMPz::Rmpz_init_set_ui(Math::Prime::Util::powerfree_count(Math::GMPz::Rmpz_get_ui($v), $k))
+              : ${$k_obj->powerfree_count($v_obj)};
+
+            last if Math::GMPz::Rmpz_sizeinbase($n, 10) <= 30;    # stop early for small numbers
+
+            my $diff = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_sub($diff, $n, $count);
+            last if (CORE::abs($diff) <= 20);
+            Math::GMPz::Rmpz_add($v, $v, $diff);
+        }
 
         until ($v_obj->is_powerfree($k_obj)) {
             Math::GMPz::Rmpz_sub_ui($v, $v, 1);
