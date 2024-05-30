@@ -17863,59 +17863,14 @@ package Sidef::Types::Number::Number {
         return ZERO if ($n == 0);    # not squarefree, but...
         return ONE  if ($n == 1);
 
-        my $min = 1;
-        my $max = 231;
+        my $zeta2 = 1.64493406684822643647241516664603;
+        my $k     = CORE::int($zeta2 * $n);
 
-        my $zeta2  = 1.64493406684822643647241516664603;
-        my $sqrt_n = CORE::sqrt($n);
-
-        # Bounds on squarefree numbers:
-        #   https://mathoverflow.net/questions/66701/bounds-on-squarefree-numbers
-
-        if ($n >= 268293) {
-            $min = CORE::int($zeta2 * $n - 0.058377 * $sqrt_n);
-            $max = CORE::int($zeta2 * $n + 0.058377 * $sqrt_n);
-        }
-        elsif ($n >= 144) {
-            $min = CORE::int($zeta2 * $n - 5 * $sqrt_n);
-            $max = CORE::int($zeta2 * $n + 5 * $sqrt_n);
-        }
-
-        my $k = 0;
-        my $count;
-
-        while (1) {
-            $k = (
-                  HAS_NEW_PRIME_UTIL
-                  ? Math::Prime::Util::divint(Math::Prime::Util::addint($min, $max), 2)
-                  : Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::addint($min, $max), 2)
-                 );
-
-            # Make sure k does not overflow; otherwise return NaN
-            goto &nan if ($k > ~0 or $k <= 0);
-
-            $count = (
-                      HAS_NEW_PRIME_UTIL
-                      ? Math::Prime::Util::powerfree_count($k, 2)
-                      : _native_squarefree_count($k)
-                     );
-
-            if (CORE::abs($count - $n) <= CORE::int(CORE::sqrt($k))) {
-                last;
-            }
-
-            my $cmp = $count <=> $n;
-
-            if ($cmp > 0) {
-                $max = $k - 1;
-            }
-            elsif ($cmp < 0) {
-                $min = $k + 1;
-            }
-            else {
-                last;
-            }
-        }
+        my $count = (
+                     HAS_NEW_PRIME_UTIL
+                     ? Math::Prime::Util::powerfree_count($k, 2)
+                     : _native_squarefree_count($k)
+                    );
 
         until (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($k) : Math::Prime::Util::GMP::moebius($k)) {
             --$k;
@@ -17946,78 +17901,19 @@ package Sidef::Types::Number::Number {
             return ((bless \$n)->nth_squarefree);
         }
 
-        my $min = Math::GMPz::Rmpz_init_set_ui(1);
-        my $max = Math::GMPz::Rmpz_init_set_ui(231);
+        my $prec = Math::GMPz::Rmpz_sizeinbase($n, 2) + 2;
+        my $f    = Math::MPFR::Rmpfr_init2($prec);
+        Math::MPFR::Rmpfr_zeta_ui($f, $k, $ROUND);
+        Math::MPFR::Rmpfr_mul_z($f, $f, $n, $ROUND);
 
-        # Bounds on squarefree numbers:
-        #   https://mathoverflow.net/questions/66701/bounds-on-squarefree-numbers
-
-        if ($n >= 144) {
-
-            my $prec = Math::GMPz::Rmpz_sizeinbase($n, 2) + 1;
-
-            my $f = Math::MPFR::Rmpfr_init2($prec);
-            Math::MPFR::Rmpfr_zeta_ui($f, $k, $ROUND);
-            Math::MPFR::Rmpfr_mul_z($f, $f, $n, $ROUND);
-
-            if ($k == 2 and Math::GMPz::Rmpz_cmp_ui($n, 268293) >= 0) {
-                my $t = Math::MPFR::Rmpfr_init2($prec);
-                my $r = Math::MPFR::Rmpfr_init2($prec);
-                Math::MPFR::Rmpfr_set_z($r, $n, $ROUND);
-                Math::MPFR::Rmpfr_sqrt($r, $r, $ROUND);
-                Math::MPFR::Rmpfr_mul_d($r, $r, 0.058377, $ROUND);
-                Math::MPFR::Rmpfr_sub($t, $f, $r, $ROUND);
-                $min = _any2mpz($t) // goto &nan;
-                Math::MPFR::Rmpfr_add($t, $f, $r, $ROUND);
-                $max = _any2mpz($t) // goto &nan;
-            }
-            else {
-                my $r = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_root($r, $n, $k);
-                Math::GMPz::Rmpz_mul_ui($r, $r, 5);
-
-                my $t = Math::MPFR::Rmpfr_init2($prec);
-                Math::MPFR::Rmpfr_sub_z($t, $f, $r, $ROUND);
-                $min = _any2mpz($t) // goto &nan;
-                Math::MPFR::Rmpfr_add_z($t, $f, $r, $ROUND);
-                $max = _any2mpz($t) // goto &nan;
-            }
-        }
-
-        my $k_obj     = bless \$k;
-        my $v         = Math::GMPz::Rmpz_init();
-        my $count     = Math::GMPz::Rmpz_init();
-        my $min_delta = Math::GMPz::Rmpz_init();
-
-        while (1) {
-            Math::GMPz::Rmpz_add($v, $min, $max);
-            Math::GMPz::Rmpz_div_2exp($v, $v, 1);
-
-            $count =
-              (HAS_NEW_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
-              ? Math::GMPz::Rmpz_init_set_ui(Math::Prime::Util::powerfree_count(Math::GMPz::Rmpz_get_ui($v), $k))
-              : ${$k_obj->powerfree_count(bless \$v)};
-
-            Math::GMPz::Rmpz_root($min_delta, $v, $k);
-
-            if (__cmp__(CORE::abs($count - $n), $min_delta) <= 0) {
-                last;
-            }
-
-            my $cmp = __cmp__($count, $n);
-
-            if ($cmp > 0) {
-                Math::GMPz::Rmpz_sub_ui($max, $v, 1);
-            }
-            elsif ($cmp < 0) {
-                Math::GMPz::Rmpz_add_ui($min, $v, 1);
-            }
-            else {
-                last;
-            }
-        }
-
+        my $v     = _any2mpz($f) // goto &nan;
+        my $k_obj = bless \$k;
         my $v_obj = bless \$v;
+
+        my $count =
+          (HAS_NEW_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
+          ? Math::GMPz::Rmpz_init_set_ui(Math::Prime::Util::powerfree_count(Math::GMPz::Rmpz_get_ui($v), $k))
+          : ${$k_obj->powerfree_count($v_obj)};
 
         until ($v_obj->is_powerfree($k_obj)) {
             Math::GMPz::Rmpz_sub_ui($v, $v, 1);
