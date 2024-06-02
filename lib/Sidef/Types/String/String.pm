@@ -734,6 +734,30 @@ package Sidef::Types::String::String {
         $self;
     }
 
+    sub cons {
+        my ($self, $n) = @_;
+        $n = CORE::int($n);
+        $n > 0 or return Sidef::Types::Array::Array->new;
+        my @strings;
+        foreach my $i (0 .. CORE::length($$self) - $n) {
+            push @strings, bless \(my $str = substr($$self, $i, $n));
+        }
+        Sidef::Types::Array::Array->new(\@strings);
+    }
+
+    sub each_cons {
+        my ($self, $n, $block) = @_;
+
+        $n = CORE::int($n);
+        $n > 0 or return $self;
+
+        foreach my $i (0 .. CORE::length($$self) - $n) {
+            $block->run(bless \(my $str = CORE::substr($$self, $i, $n)));
+        }
+
+        $self;
+    }
+
     sub split {
         my ($self, $sep, $size) = @_;
 

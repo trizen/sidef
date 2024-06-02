@@ -17924,7 +17924,7 @@ package Sidef::Types::Number::Number {
 
             my $diff = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_sub($diff, $n, $count);
-            last if (CORE::abs($diff) <= 20);
+            last if (CORE::abs($diff) <= 0);
             Math::GMPz::Rmpz_add($v, $v, $diff);
         }
 
