@@ -145,4 +145,9 @@ do {
     assert(squarefree_part(p).is_squarefree)
 }
 
+do {
+    var x = Poly(1)
+    assert_eq(chinese(PolyMod(x**2 + x + 2, 3), PolyMod(x-1, 5)), PolyMod(10*x**2 + x + 14, 15))    # from PARI/GP
+}
+
 say "** Test passed!"

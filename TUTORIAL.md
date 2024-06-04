@@ -2170,7 +2170,7 @@ say a.powmod(-5, 43)    #=> Quaternion(11, 22, 33, 1)
 The [Polynomial](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/Polynomial.pod) class implements support for [polynomials](https://en.wikipedia.org/wiki/Polynomial).
 
 ```ruby
-say Polynomial(5)                   # monomial: x^5
+say Polynomial(5)                   # x^5
 say Polynomial([1,2,3,4])           # x^3 + 2*x^2 + 3*x + 4
 say Polynomial(5 => 3, 2 => 10)     # 3*x^5 + 10*x^2
 ```
@@ -2191,6 +2191,39 @@ say 42*b    #=> 168*x^3 + 210*x^2 - 252*x + 294
 
 say a/42    #=> 1/42*x^2 + 1/21*x + 1/14
 say b/42    #=> 2/21*x^3 + 5/42*x^2 - 1/7*x + 1/6
+
+# Parsing a polynomial as a string
+say Poly("2*x^2 + 3*x - 5")     #=> 2*x^2 + 3*x - 5
+```
+
+## PolynomialMod
+
+The [PolynomialMod](https://github.com/trizen/sidef/blob/master/lib/Sidef/Types/Number/PolynomialMod.pod) class implements support for modular [polynomials](https://en.wikipedia.org/wiki/Polynomial).
+
+```ruby
+say PolynomialMod(5, 127)                   # x^5 (mod 127)
+say PolynomialMod([1,2,3,4], 127)           # x^3 + 2*x^2 + 3*x + 4 (mod 127)
+say PolynomialMod(5 => 3, 2 => 10, 127)     # 3*x^5 + 10*x^2 (mod 127)
+```
+
+Also aliased as `PolyMod()`:
+
+```ruby
+var a = PolyMod([13,4,51], 43)
+var b = PolyMod([5,0,-11], 43)
+
+say a-b         #=> 8*x^2 + 4*x + 19 (mod 43)
+say a+b         #=> 18*x^2 + 4*x + 40 (mod 43)
+say a*b         #=> 22*x^4 + 20*x^3 + 26*x^2 + 42*x + 41 (mod 43)
+
+# Division and remainder
+say [a.divmod(b)].join(' ; ')           #=> 37 (mod 43) ; 4*x + 28 (mod 43)
+
+# Parsing a polynomial as a string
+say PolyMod("2*x^2 + 3*x - 5", 101)     #=> 2*x^2 + 3*x + 96 (mod 101)
+
+# Chinese Remainder Theorem (CRT)
+say chinese(PolyMod("x^2+x+2", 3), PolyMod("x-1", 5))  #=> 10*x^2 + x + 14 (mod 15)
 ```
 
 ## Numerical conversions
