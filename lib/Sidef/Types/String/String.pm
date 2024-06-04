@@ -339,36 +339,36 @@ package Sidef::Types::String::String {
 
     sub decode_base64 {
         state $x = require MIME::Base64;
-        bless \MIME::Base64::decode_base64(${$_[0]});
+        bless \(my $value = MIME::Base64::decode_base64(${$_[0]}));
     }
 
     *base64_decode = \&decode_base64;
 
     sub encode_base64 {
         state $x = require MIME::Base64;
-        bless \MIME::Base64::encode_base64(${$_[0]});
+        bless \(my $value = MIME::Base64::encode_base64(${$_[0]}));
     }
 
     *base64_encode = \&encode_base64;
 
     sub md5 {
         state $x = require Digest::MD5;
-        bless \Digest::MD5::md5_hex(${$_[0]});
+        bless \(my $value = Digest::MD5::md5_hex(${$_[0]}));
     }
 
     sub sha1 {
         state $x = require Digest::SHA;
-        bless \Digest::SHA::sha1_hex(${$_[0]});
+        bless \(my $value = Digest::SHA::sha1_hex(${$_[0]}));
     }
 
     sub sha256 {
         state $x = require Digest::SHA;
-        bless \Digest::SHA::sha256_hex(${$_[0]});
+        bless \(my $value = Digest::SHA::sha256_hex(${$_[0]}));
     }
 
     sub sha512 {
         state $x = require Digest::SHA;
-        bless \Digest::SHA::sha512_hex(${$_[0]});
+        bless \(my $value = Digest::SHA::sha512_hex(${$_[0]}));
     }
 
     sub parse_quotewords {
@@ -437,7 +437,7 @@ package Sidef::Types::String::String {
 
     sub join {
         my ($self, @rest) = @_;
-        bless \CORE::join($$self, @rest);
+        bless \(my $value = CORE::join($$self, @rest));
     }
 
     sub clear {
@@ -684,7 +684,7 @@ package Sidef::Types::String::String {
     sub glob {
         my ($self) = @_;
         state $x = require Encode;
-        Sidef::Types::Array::Array->new([map { bless \Encode::decode_utf8($_) } CORE::glob($$self)]);
+        Sidef::Types::Array::Array->new([map { bless \(my $value = Encode::decode_utf8($_)) } CORE::glob($$self)]);
     }
 
     sub quotemeta {
@@ -1751,7 +1751,7 @@ package Sidef::Types::String::String {
             my $str = "${$_[0]}";
 
             $str =~ s/([\\\"]|#\{)/\\$1/g;
-            $str =~ /[^\040-\176]/ or return bless \qq("$str");
+            $str =~ /[^\040-\176]/ or return bless \(my $value = qq("$str"));
 
             $str =~ s/([\a\b\t\n\f\r\e\13])/$esc{$1}/g;
             $str =~ s/([\0-\037])(?!\d)/CORE::sprintf('\\%o',CORE::ord($1))/eg;
@@ -1759,7 +1759,7 @@ package Sidef::Types::String::String {
             $str =~ s/([\0-\037\177-\377])/CORE::sprintf('\\x%02X',CORE::ord($1))/eg;
             $str =~ s/([^\040-\176])/CORE::sprintf('\\x{%X}',CORE::ord($1))/eg;
 
-            bless \qq("$str");
+            bless \(my $value2 = qq("$str"));
         }
     }
 

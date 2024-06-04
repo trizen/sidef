@@ -193,7 +193,7 @@ package Sidef::Types::Number::Number {
 
         # GMPz
         if ($ref eq 'Math::GMPz') {
-            return bless \Math::GMPz::Rmpz_init_set($num);
+            return bless \(my $value = Math::GMPz::Rmpz_init_set($num));
         }
 
         # MPFR
@@ -259,11 +259,11 @@ package Sidef::Types::Number::Number {
                 return bless \(my $o = Math::GMPz::Rmpz_get_ui($_[0]));
             }
 
-            return bless \Math::GMPz::Rmpz_init_set($_[0]);
+            return bless \(my $value = Math::GMPz::Rmpz_init_set($_[0]));
         }
         (!ref($_[0]) and $_[0] < ULONG_MAX and $_[0] > LONG_MIN)
           ? (bless \(my $o = 0 + $_[0]))
-          : (bless \Math::GMPz::Rmpz_init_set_str("$_[0]", 10));
+          : (bless \(my $value = Math::GMPz::Rmpz_init_set_str("$_[0]", 10)));
     }
 
     sub _dump {
@@ -300,7 +300,7 @@ package Sidef::Types::Number::Number {
                 return (bless \(my $o = 0 + $str));
             }
 
-            bless \Math::GMPz::Rmpz_init_set_str("$str", 10);
+            bless \(my $value = Math::GMPz::Rmpz_init_set_str("$str", 10));
         }
         elsif ($type eq 'rat') {
             Math::GMPq::Rmpq_set_str((my $r = Math::GMPq::Rmpq_init()), "$str", 10);
@@ -6386,7 +6386,7 @@ package Sidef::Types::Number::Number {
         $n = _any2ui($$n) // goto &nan;
 
         my @E = _secant_numbers($n);
-        bless \Math::GMPz::Rmpz_init_set($E[$n]);
+        bless \(my $value = Math::GMPz::Rmpz_init_set($E[$n]));
     }
 
     sub tangent_number {
@@ -8959,7 +8959,7 @@ package Sidef::Types::Number::Number {
                 }
 
                 if ($optimize) {
-                    return bless \Math::GMPz::Rmpz_init_set_str($str, $B);
+                    return bless \(my $value = Math::GMPz::Rmpz_init_set_str($str, $B));
                 }
             }
 
@@ -9058,7 +9058,7 @@ package Sidef::Types::Number::Number {
 
         if (!defined($k) and !ref($n)) {
             $n == 0 and return ZERO;
-            return bless \List::Util::sum(HAS_PRIME_UTIL ? Math::Prime::Util::todigits(CORE::abs($n)) : split(//, CORE::abs($n)));
+            return bless \(my $value = List::Util::sum(HAS_PRIME_UTIL ? Math::Prime::Util::todigits(CORE::abs($n)) : split(//, CORE::abs($n))));
         }
 
         if (defined($k)) {
@@ -9076,18 +9076,18 @@ package Sidef::Types::Number::Number {
 
                 if (HAS_PRIME_UTIL and $k < 2147483647) {
                     if ($k == 2) {
-                        return bless \Math::Prime::Util::hammingweight($n);
+                        return bless \(my $value = Math::Prime::Util::hammingweight($n));
                     }
-                    return bless \List::Util::sum(Math::Prime::Util::todigits($n, $k));
+                    return bless \(my $value = List::Util::sum(Math::Prime::Util::todigits($n, $k)));
                 }
                 elsif ($k == 2 or $k == 8) {
-                    return bless \List::Util::sum(split(//, sprintf(($k == 2 ? '%b' : '%o'), $n)));
+                    return bless \(my $value = List::Util::sum(split(//, sprintf(($k == 2 ? '%b' : '%o'), $n))));
                 }
                 elsif ($k == 10) {
-                    return bless \List::Util::sum(split(//, $n));
+                    return bless \(my $value = List::Util::sum(split(//, $n)));
                 }
                 elsif ($k == 16) {
-                    return bless \List::Util::sum(@DIGITS_36{split(//, sprintf('%x', $n))});
+                    return bless \(my $value = List::Util::sum(@DIGITS_36{split(//, sprintf('%x', $n))}));
                 }
             }
 
@@ -24601,7 +24601,7 @@ package Sidef::Types::Number::Number {
             $n = Math::GMPz::Rmpz_get_ui($n);
         }
         else {
-            $q_obj = bless \Math::GMPz::Rmpz_init_set_ui(0);
+            $q_obj = bless \(my $value = Math::GMPz::Rmpz_init_set_ui(0));
         }
 
         my $sum = 0;
@@ -33777,7 +33777,7 @@ package Sidef::Types::Number::Number {
                 return _set_int($str);
             }
 
-            return bless \Math::GMPz::Rmpz_init_set_str("$str", $k);
+            return bless \(my $value = Math::GMPz::Rmpz_init_set_str("$str", $k));
         }
 
         $_[0]->digits($_[1])->flip->digits2num($_[1])->mul($_[0]->sgn);
@@ -34350,7 +34350,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add($middle, $left, $right);
             Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
 
-            my $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            my $item = bless \(my $value = Math::GMPz::Rmpz_init_set($middle));
             my $cmp  = CORE::int($block->run($item)) || return $item;
 
             if ($cmp > 0) {
@@ -34385,7 +34385,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add($middle, $left, $right);
             Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
 
-            my $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            my $item = bless \(my $value = Math::GMPz::Rmpz_init_set($middle));
             my $cmp  = CORE::int($block->run($item)) || return $item;
 
             if ($cmp < 0) {
@@ -34426,7 +34426,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add($middle, $left, $right);
             Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
 
-            my $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            my $item = bless \(my $value = Math::GMPz::Rmpz_init_set($middle));
             my $cmp  = CORE::int($block->run($item)) || return $item;
 
             if ($cmp < 0) {
@@ -34466,7 +34466,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add($middle, $left, $right);
             Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
 
-            my $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            my $item = bless \(my $value = Math::GMPz::Rmpz_init_set($middle));
             my $cmp  = CORE::int($block->run($item));
 
             if ($cmp < 0) {
@@ -34502,7 +34502,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_div_2exp($middle, $middle, 1);
             Math::GMPz::Rmpz_add_ui($middle, $middle, 1);
 
-            my $item = bless \Math::GMPz::Rmpz_init_set($middle);
+            my $item = bless \(my $value = Math::GMPz::Rmpz_init_set($middle));
             my $cmp  = CORE::int($block->run($item));
 
             if ($cmp > 0) {
