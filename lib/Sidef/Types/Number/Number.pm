@@ -61,10 +61,10 @@ package Sidef::Types::Number::Number {
 
         # Check if we have a recent enough version of Math::Prime::Util
         HAS_NEW_PRIME_UTIL   => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::is_perfect_power)) // 0,
-        HAS_NEWER_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::is_congruent))     // 0,
+        HAS_NEWER_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::nth_powerfree))    // 0,
 
         # Check if we have a recent enough version of Math::Prime::Util::GMP
-        HAS_NEW_PRIME_UTIL_GMP => defined(&Math::Prime::Util::GMP::lucasvmod) // 0,
+        HAS_NEW_PRIME_UTIL_GMP => defined(&Math::Prime::Util::GMP::nth_powerfree) // 0,
 
         IS_PRIME_CACHE_SIZE   => 1e5,     # how many entries to cache
         PRIMALITY_PRETEST_MIN => 500,     # in decimal digits
@@ -14487,13 +14487,17 @@ package Sidef::Types::Number::Number {
         return ZERO if ($k == 0);
         return ONE  if ($k == 1);
 
-        # Optimization for native integers
+        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            return _set_int(Math::Prime::Util::powerfree_count(Math::GMPz::Rmpz_get_ui($n), $k));
+        }
+
+        # Squarefree count for native integers
         if ($k == 2 and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return _set_int(_native_squarefree_count(Math::GMPz::Rmpz_get_ui($n)));
         }
 
-        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            return _set_int(Math::Prime::Util::powerfree_count(Math::GMPz::Rmpz_get_ui($n), $k));
+        if (HAS_NEW_PRIME_UTIL_GMP) {
+            return _set_int(Math::Prime::Util::GMP::powerfree_count(Math::GMPz::Rmpz_get_str($n, 10), $k));
         }
 
         my $c = Math::GMPz::Rmpz_init_set_ui(0);
@@ -17863,6 +17867,11 @@ package Sidef::Types::Number::Number {
         return ZERO if ($n == 0);    # not squarefree, but...
         return ONE  if ($n == 1);
 
+        if (HAS_NEWER_PRIME_UTIL) {
+            my $r = Math::Prime::Util::nth_powerfree($n, 2);
+            return bless \$r;
+        }
+
         my $zeta2 = 1.64493406684822643647241516664603;
         my $k     = CORE::int($zeta2 * $n);
 
@@ -17901,6 +17910,16 @@ package Sidef::Types::Number::Number {
             return ((bless \$n)->nth_squarefree);
         }
 
+        if (HAS_NEWER_PRIME_UTIL and Math::GMPz::Rmpz_fits_slong_p($n)) {
+            my $r = Math::Prime::Util::nth_powerfree(Math::GMPz::Rmpz_get_ui($n), $k);
+            return bless \$r;
+        }
+
+        if (0 and HAS_NEW_PRIME_UTIL_GMP) {
+            ## Slower for: nth_powerfree(1e40, 10)
+            return _set_int(Math::Prime::Util::GMP::nth_powerfree(Math::GMPz::Rmpz_get_str($n, 10), $k));
+        }
+
         my $prec   = Math::GMPz::Rmpz_sizeinbase($n, 2) + 2;
         my $approx = Math::MPFR::Rmpfr_init2($prec);
 
@@ -17924,7 +17943,7 @@ package Sidef::Types::Number::Number {
 
             my $diff = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_sub($diff, $n, $count);
-            last if (CORE::abs($diff) <= 0);
+            last if Math::GMPz::Rmpz_cmpabs_ui($diff, 0) <= 0;
             Math::GMPz::Rmpz_add($v, $v, $diff);
         }
 
@@ -32584,7 +32603,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        if (0 and HAS_NEW_PRIME_UTIL_GMP and $k >= 5) {    # this is somehow slower
+        if (HAS_NEW_PRIME_UTIL_GMP) {
             return _set_int(Math::Prime::Util::GMP::powerful_count(Math::GMPz::Rmpz_get_str($n, 10), $k));
         }
 
