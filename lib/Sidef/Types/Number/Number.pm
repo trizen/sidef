@@ -17915,8 +17915,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        if (0 and HAS_NEW_PRIME_UTIL_GMP) {
-            ## Slower for: nth_powerfree(1e40, 10)
+        if (HAS_NEW_PRIME_UTIL_GMP) {
             return _set_int(Math::Prime::Util::GMP::nth_powerfree(Math::GMPz::Rmpz_get_str($n, 10), $k));
         }
 
