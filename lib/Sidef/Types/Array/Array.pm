@@ -1961,6 +1961,47 @@ package Sidef::Types::Array::Array {
 
     *tail = \&last;
 
+    sub skip_by {
+        my ($self, $block) = @_;
+
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+
+        my @array;
+        foreach my $item (@$self) {
+            $block->run($item) || CORE::push(@array, $item);
+        }
+
+        bless \@array, ref($self);
+    }
+
+    sub skip {
+        my ($self, $n) = @_;
+
+        if (defined($n) and ref($n) eq 'Sidef::Types::Block::Block') {
+            goto &skip_by;
+        }
+
+        $n = defined($n) ? CORE::int($n) : 1;
+        $n == 0 and return $self->clone;
+
+        $self->last(-$n);
+    }
+
+    *skip_first = \&skip;
+
+    sub skip_last {
+        my ($self, $n) = @_;
+
+        if (defined($n) and ref($n) eq 'Sidef::Types::Block::Block') {
+            goto &skip_by;
+        }
+
+        $n = defined($n) ? CORE::int($n) : 1;
+        $n == 0 and return $self->clone;
+
+        $self->first(-$n);
+    }
+
     sub any {
         my ($self, $block) = @_;
 

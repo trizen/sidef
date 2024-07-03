@@ -432,6 +432,14 @@ Aliases: I<find_all>, I<findall>
 
 =cut
 
+=head2 cons
+
+    self.cons(n)
+
+Returns the
+
+=cut
+
 =head2 count
 
     self.count(arg)
@@ -525,6 +533,14 @@ Aliases: I<each_char>
     self.each_byte {|byte| ... }
 
 Iterates through each byte value in the string and applies a given block of code to each byte value.
+
+=cut
+
+=head2 each_cons
+
+    self.each_cons(n, block)
+
+Returns the
 
 =cut
 

@@ -740,7 +740,7 @@ package Sidef::Types::String::String {
         $n > 0 or return Sidef::Types::Array::Array->new;
         my @strings;
         foreach my $i (0 .. CORE::length($$self) - $n) {
-            push @strings, bless \(my $str = substr($$self, $i, $n));
+            push @strings, bless \(my $str = CORE::substr($$self, $i, $n));
         }
         Sidef::Types::Array::Array->new(\@strings);
     }

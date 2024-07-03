@@ -2085,6 +2085,32 @@ Returns the
 
 =cut
 
+=head2 skip
+
+    self.skip(n)
+
+Returns the
+
+Aliases: I<skip_first>
+
+=cut
+
+=head2 skip_by
+
+    self.skip_by(block)
+
+Returns the
+
+=cut
+
+=head2 skip_last
+
+    self.skip_last(n)
+
+Returns the
+
+=cut
+
 =head2 slice
 
     arr.slice(offset)

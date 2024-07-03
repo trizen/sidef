@@ -16323,9 +16323,11 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        if (    HAS_NEW_PRIME_UTIL
-            and Math::GMPz::Rmpz_fits_ulong_p($n)
-            and Math::Prime::Util::almost_prime_count(10, 1024) == 1) {
+        if (
+            HAS_NEWER_PRIME_UTIL ? Math::GMPz::Rmpz_fits_ulong_p($n) : (    HAS_NEW_PRIME_UTIL
+                                                                        and Math::GMPz::Rmpz_fits_ulong_p($n)
+                                                                        and Math::Prime::Util::almost_prime_count(10, 1024) == 1)
+          ) {
             return _set_int(Math::Prime::Util::almost_prime_count($k, Math::GMPz::Rmpz_get_ui($n)));
         }
 
@@ -22043,7 +22045,7 @@ package Sidef::Types::Number::Number {
 
         if ($k == 1 and $from eq '2') {
 
-            if ($to > PRIMESUM_MIN and $to < 1e30 and $USE_PRIMESUM) {
+            if ($to >= PRIMESUM_MIN and $to < 1e30 and $USE_PRIMESUM) {
                 my $sum = `primesum $to`;
 
                 if ($? == 0 and defined($sum)) {
@@ -22058,7 +22060,7 @@ package Sidef::Types::Number::Number {
         if ($k == 1 and $from ne '2' and $USE_PRIMESUM) {
             my $diff = Math::Prime::Util::GMP::subint($to, $from);
 
-            if ($diff > PRIMESUM_MIN and $diff < 1e30) {
+            if ($diff >= PRIMESUM_MIN and $diff < 1e30) {
 
                 my $y_sum = `primesum $to`;
 
