@@ -1053,13 +1053,17 @@ Returns the
 
 =cut
 
-=head2 jaro_distance
+=head2 jaro
 
-    jaro_distance(str1, str2, winkler=false)
+    jaro(str1, str2, winkler=false)
 
-Calculates the Jaro distance between two strings. Jaro distance is a measure of similarity between two strings, based on the number of matching characters and transpositions.
+Calculates the Jaro similarity between two strings. Jaro distance is a measure of similarity between two strings, based on the number of matching characters and transpositions.
 
-When the third argument is true, it returns the Jaro-Winkler distance.
+    say jaro("accommodate", "accomodate")         #=> 0.96969696969697
+
+When the third argument is true, it returns the Jaro-Winkler similarity score.
+
+    say jaro("accommodate", "accomodate", true)   #=> 0.981818181818182
 
 =cut
 

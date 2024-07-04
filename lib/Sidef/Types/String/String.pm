@@ -1192,7 +1192,7 @@ package Sidef::Types::String::String {
     *lev   = \&levenshtein;
     *leven = \&levenshtein;
 
-    sub jaro_distance {
+    sub jaro {
         my ($s, $t, $winkler) = @_;
 
         $s = $$s;
@@ -1245,7 +1245,7 @@ package Sidef::Types::String::String {
 
         my $jaro = (($matches / $s_len) + ($matches / $t_len) + (($matches - $transpositions / 2) / $matches)) / 3;
 
-        $winkler || return Sidef::Types::Number::Number->new($jaro);    # return the Jaro distance instead of Jaro-Winkler
+        $winkler || return Sidef::Types::Number::Number->new($jaro);    # return the Jaro similarity instead of Jaro-Winkler
 
         my $prefix = 0;
         foreach my $i (0 .. List::Util::min(3, $#t, $#s)) {

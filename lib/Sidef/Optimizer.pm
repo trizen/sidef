@@ -149,7 +149,7 @@ package Sidef::Optimizer {
                       crypt
 
                       levenshtein
-                      jaro_distance
+                      jaro
                       contains
                       overlaps
                       begins_with
