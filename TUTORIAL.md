@@ -3152,6 +3152,19 @@ given (-1) {
 }
 ```
 
+An alternative way for testing for trueness, is by passing a Block to `when`:
+
+```ruby
+given (42) {
+    when ({.is_prime}) {
+        say "is prime"
+    }
+    when ({.is_even}) {
+        say "is even"
+    }
+}
+```
+
 `case` and `when` statements can be mixed together:
 
 ```ruby

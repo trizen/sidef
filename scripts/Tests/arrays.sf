@@ -215,4 +215,20 @@ assert(![].gt)
 
 assert_eq([(), (), ()], [])
 
+do {
+    var arr = %n[1,2,3,4,5]
+
+    assert_eq(arr.skip(0), %n[1,2,3,4,5])
+    assert_eq(arr.skip_last(0), %n[1,2,3,4,5])
+
+    assert_eq(arr.skip, %n[2, 3, 4, 5])
+    assert_eq(arr.skip_last, %n[1, 2, 3, 4])
+
+    assert_eq(arr.skip(2), %n[3, 4, 5])
+    assert_eq(arr.skip_last(2), %n[1, 2, 3])
+
+    assert_eq(arr.skip { .is_even }, %n[1, 3, 5])
+    assert_eq(arr.skip { .is_odd }, %n[2, 4])
+}
+
 say "** Test passed!"

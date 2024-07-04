@@ -103,4 +103,37 @@ assert_eq(c2, 6);
 assert_eq( given(42) { when(42) { (3, 4) } } * 10, 40)
 assert_eq([given(42) { when(42) { (3, 4) } }], [3, 4])
 
+do {
+    var f = func(n) { n+1 }
+
+    given (f) {
+        when ({true}) {
+            assert(false)
+        }
+    }
+
+    var c = 0
+    given (f) {
+        when (f) {
+            ++c
+        }
+    }
+
+    assert_eq(c, 1)
+
+    given (42) {
+        when ({.is_even}) {
+            ++c
+        }
+    }
+
+    assert_eq(c, 2)
+
+    given (42) {
+        when ({.is_odd}) {
+            assert(false)
+        }
+    }
+}
+
 say "** Test passed!";

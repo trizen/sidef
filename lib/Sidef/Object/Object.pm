@@ -591,6 +591,13 @@ package Sidef::Object::Object {
                 return $second->match($first)->is_successful;
             }
 
+            # Second is Block
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Block::Block')) {
+                if (!UNIVERSAL::isa($first, 'Sidef::Types::Block::Block')) {
+                    return $second->run($first);
+                }
+            }
+
             if (defined($first) and !defined($second)) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
