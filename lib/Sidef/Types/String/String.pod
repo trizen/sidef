@@ -1274,14 +1274,6 @@ Returns the
 
 =cut
 
-=head2 printlnf
-
-    self.printlnf(*arguments)
-
-Returns the
-
-=cut
-
 =head2 range
 
     from.range(to, step)
@@ -1329,6 +1321,16 @@ Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
     method.run(self, *args)
 
 Returns the
+
+=cut
+
+=head2 sayf
+
+    self.sayf(*arguments)
+
+Returns the
+
+Aliases: I<printlnf>
 
 =cut
 

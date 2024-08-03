@@ -3,7 +3,7 @@
 say "=> Testing Lucas U"
 
 for n in (0..1000) {
-    var m = 1e6.irand
+    var m = 2+1e6.irand
     var p = irand(-1e6, 1e6)
     var q = irand(-1e6, 1e6)
 
@@ -18,7 +18,7 @@ for n in (0..1000) {
 say '=> Testing Lucas V'
 
 for n in (0..1000) {
-    var m = 1e6.irand
+    var m = 2+1e6.irand
     var p = irand(-1e6, 1e6)
     var q = irand(-1e6, 1e6)
 
@@ -33,7 +33,7 @@ for n in (0..1000) {
 say '=> Testing Lucas UV'
 
 for n in (0..1000) {
-    var m = 1e6.irand
+    var m = 2+1e6.irand
     var p = irand(-1e6, 1e6)
     var q = irand(-1e6, 1e6)
 

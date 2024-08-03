@@ -603,6 +603,8 @@ package Sidef::Types::String::String {
           : Sidef::Types::Bool::Bool::FALSE;
     }
 
+    *sayf = \&printlnf;
+
     sub sprintf {
         my ($self, @arguments) = @_;
         $self->new(CORE::sprintf $$self, @arguments);

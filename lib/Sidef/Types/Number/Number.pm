@@ -16323,11 +16323,9 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        if (
-            HAS_NEWER_PRIME_UTIL ? Math::GMPz::Rmpz_fits_ulong_p($n) : (    HAS_NEW_PRIME_UTIL
-                                                                        and Math::GMPz::Rmpz_fits_ulong_p($n)
-                                                                        and Math::Prime::Util::almost_prime_count(10, 1024) == 1)
-          ) {
+        if (    HAS_NEW_PRIME_UTIL
+            and Math::GMPz::Rmpz_fits_ulong_p($n)
+            and Math::Prime::Util::almost_prime_count(10, 1024) == 1) {
             return _set_int(Math::Prime::Util::almost_prime_count($k, Math::GMPz::Rmpz_get_ui($n)));
         }
 
