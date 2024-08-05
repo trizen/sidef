@@ -30,9 +30,9 @@ Access the latest release at:
 
 ## Windows executable
 
-For Windows, Sidef is available as a portable 32-bit executable (however, not the latest version):
+For Windows, Sidef is available as a portable 32-bit executable:
 
-* https://github.com/trizen/sidef/releases/download/24.01/sidef-24.01.exe.zip
+* https://github.com/trizen/sidef/releases/download/24.05/sidef-24.05.exe.zip
 
 ## Linux installation
 
