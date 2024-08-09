@@ -69,9 +69,9 @@ package Sidef::Types::Number::Number {
         IS_PRIME_CACHE_SIZE   => 1e5,     # how many entries to cache
         PRIMALITY_PRETEST_MIN => 500,     # in decimal digits
 
-        INTSIZE        => CORE::int(CORE::log(ULONG_MAX) / CORE::log(2)),                     # size of ULONG_MAX in base 2
-        PRIMECOUNT_MIN => List::Util::min(ULONG_MAX,       (HAS_PRIME_UTIL ? 1e10 : 1e7)),    # absolute value
-        PRIMESUM_MIN   => List::Util::min(ULONG_MAX >> 14, (HAS_PRIME_UTIL ? 1e8  : 1e5)),    # absolute value
+        INTSIZE        => List::Util::max(32, CORE::int(CORE::log(ULONG_MAX) / CORE::log(2))),    # size of ULONG_MAX in base 2
+        PRIMECOUNT_MIN => List::Util::min(ULONG_MAX,       (HAS_PRIME_UTIL ? 1e10 : 1e7)),        # absolute value
+        PRIMESUM_MIN   => List::Util::min(ULONG_MAX >> 14, (HAS_PRIME_UTIL ? 1e8  : 1e5)),        # absolute value
     };
 
     state $round_z = Math::MPFR::MPFR_RNDZ();
@@ -19562,7 +19562,7 @@ package Sidef::Types::Number::Number {
 
             my @checks = (1e3, 1e4, 1e5);
 
-            if (INTSIZE > 32 and $size >= 50_000) {
+            if (INTSIZE >= 64 and $size >= 50_000) {
                 push @checks, 1e7;
                 push @checks, 1e8;
                 push @checks, 1e9;
@@ -22866,7 +22866,7 @@ package Sidef::Types::Number::Number {
             goto &nan;
         }
 
-        if (HAS_PRIME_UTIL and ((INTSIZE > 32) ? ($n <= 1e10) : ($n <= 1e5))) {
+        if (HAS_PRIME_UTIL and ((INTSIZE >= 64) ? ($n <= 1e10) : ($n <= 1e5))) {
 
             my $pi  = 0;
             my $sum = 0;
@@ -22947,7 +22947,7 @@ package Sidef::Types::Number::Number {
             goto &nan;
         }
 
-        if (HAS_NEW_PRIME_UTIL and ((INTSIZE > 32) ? ($n <= 1e10) : ($n <= 1e5))) {
+        if (HAS_NEW_PRIME_UTIL and ((INTSIZE >= 64) ? ($n <= 1e10) : ($n <= 1e5))) {
 
             my $sum = 0;
 

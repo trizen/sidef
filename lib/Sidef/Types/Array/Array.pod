@@ -1251,6 +1251,22 @@ Returns the
 
 =cut
 
+=head2 isort
+
+    self.isort
+
+Returns the
+
+=cut
+
+=head2 isort_by
+
+    self.isort_by(block)
+
+Returns the
+
+=cut
+
 =head2 item
 
     self.item(index)

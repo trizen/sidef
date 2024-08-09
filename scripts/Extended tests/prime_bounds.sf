@@ -15,6 +15,6 @@ func f(n) {
 }
 
 for k in (1..100) {
-    f(1e9.irand)
+    f((Num(Num.INTSIZE) <= 32 ? 2e8 : 1e9).irand)
     f(k)
 }

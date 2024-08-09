@@ -3300,11 +3300,23 @@ package Sidef::Types::Array::Array {
         bless [CORE::sort { $a cmp $b } @$self], ref($self);
     }
 
+    sub isort {
+        my ($self) = @_;
+        bless [CORE::sort { $$a <=> $$b } @$self], ref($self);
+    }
+
     sub sort_by {
         my ($self, $block) = @_;
         $block //= Sidef::Types::Block::Block::IDENTITY;
         my @keys = map { scalar $block->run($_) } @$self;
         bless [@{$self}[CORE::sort { $keys[$a] cmp $keys[$b] } 0 .. $#$self]], ref($self);
+    }
+
+    sub isort_by {
+        my ($self, $block) = @_;
+        $block //= Sidef::Types::Block::Block::IDENTITY;
+        my @keys = map { ${$block->run($_)} } @$self;
+        bless [@{$self}[CORE::sort { $keys[$a] <=> $keys[$b] } 0 .. $#$self]], ref($self);
     }
 
     foreach my $name (
