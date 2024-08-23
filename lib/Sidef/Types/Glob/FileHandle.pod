@@ -238,7 +238,7 @@ Aliases: I<collect>
 
 =head2 new_buf
 
-    self.new_buf(mode)
+    self.new_buf(mode, initial_string)
 
 Returns the
 

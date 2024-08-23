@@ -1,0 +1,17 @@
+#!/usr/bin/ruby
+
+# Tests for various file-handles.
+
+var buf = FileHandle.new_buf(:raw, "foo")
+buf.print("bar")
+assert_eq(buf.parent, "foobar")
+
+var buf2 = FileHandle.new_buf(:raw, "șkß€r§".encode_utf8)
+buf2.print("ășđkâß".encode_utf8)
+assert_eq(buf2.parent.decode_utf8, "șkß€r§ășđkâß")
+
+var buf3 = FileHandle.new_buf(:utf8, "șkß€r§")
+buf3.print("ășđkâß")
+assert_eq(buf3.parent.decode_utf8, "șkß€r§ășđkâß")
+
+say ":: Test passed!"

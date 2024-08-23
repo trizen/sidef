@@ -32,10 +32,21 @@ package Sidef::Types::Glob::FileHandle {
     *file = \&parent;
 
     sub new_buf {
-        my ($self, $mode) = @_;
-        $mode //= 'utf8';
-        my $str = "";
-        open(my $fh, "+<:$mode", \$str) or return undef;
+        my ($self, $mode, $initial_string) = @_;
+
+        $mode           //= 'raw';
+        $initial_string //= '';
+        $mode = "$mode" if (ref($mode) ne '');
+
+        my $str = "$initial_string";
+
+        if ($mode ne 'raw' and $str ne '') {
+            require Encode;
+            $str = Encode::encode($mode, $str);
+        }
+
+        CORE::open(my $fh, "+<:$mode", \$str) or return undef;
+        CORE::seek($fh, CORE::length($str), 0) if ($str ne '');
         my $str_obj = bless(\$str, 'Sidef::Types::String::String');
         my $fh_obj  = __PACKAGE__->new($fh, $str_obj);
         wantarray ? ($fh_obj, $str_obj) : $fh_obj;

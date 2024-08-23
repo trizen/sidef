@@ -819,6 +819,7 @@ scripts/Tests/factorization_methods.sf
 scripts/Tests/fibonacci_closed_solution.sf
 scripts/Tests/fibonacci_iterative.sf
 scripts/Tests/fibonacci_mystery.sf
+scripts/Tests/filehandles.sf
 scripts/Tests/find_the_missing_permutation.sf
 scripts/Tests/first_class_functions_analogously.sf
 scripts/Tests/floyds_triangle.sf
