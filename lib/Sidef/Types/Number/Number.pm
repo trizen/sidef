@@ -8532,6 +8532,61 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@list);
     }
 
+    sub farey_neighbors {
+        my ($n, $pq) = @_;
+
+        $n  = _any2mpz($$n)  // return (undef, undef);
+        $pq = _any2mpq($$pq) // return (undef, undef);
+
+        Math::GMPq::Rmpq_sgn($pq) > 0          or return (undef, undef);
+        Math::GMPq::Rmpq_cmp_ui($pq, 1, 1) < 0 or return (undef, undef);
+
+        my $p = Math::GMPz::Rmpz_init();
+        my $q = Math::GMPz::Rmpz_init();
+
+        Math::GMPq::Rmpq_get_num($p, $pq);
+        Math::GMPq::Rmpq_get_den($q, $pq);
+
+        my $pl = Math::GMPz::Rmpz_init();
+        my $ql = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_invert($pl, $q, $p);
+        Math::GMPz::Rmpz_neg($pl, $pl);
+        Math::GMPz::Rmpz_mod($pl, $pl, $p);
+        Math::GMPz::Rmpz_invert($ql, $p, $q);
+
+        my $pr = Math::GMPz::Rmpz_init();
+        my $qr = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_sub($pr, $p, $pl);
+        Math::GMPz::Rmpz_sub($qr, $q, $ql);
+
+        my $fl = Math::GMPz::Rmpz_init();
+        my $fr = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_sub($fl, $n, $ql);
+        Math::GMPz::Rmpz_sub($fr, $n, $qr);
+        Math::GMPz::Rmpz_div($fl, $fl, $q);
+        Math::GMPz::Rmpz_div($fr, $fr, $q);
+
+        my $q1 = Math::GMPq::Rmpq_init();
+        my $q2 = Math::GMPq::Rmpq_init();
+
+        Math::GMPz::Rmpz_addmul($pl, $p, $fl);
+        Math::GMPz::Rmpz_addmul($ql, $q, $fl);
+
+        Math::GMPz::Rmpz_addmul($pr, $p, $fr);
+        Math::GMPz::Rmpz_addmul($qr, $q, $fr);
+
+        Math::GMPq::Rmpq_set_num($q1, $pl);
+        Math::GMPq::Rmpq_set_den($q1, $ql);
+
+        Math::GMPq::Rmpq_set_num($q2, $pr);
+        Math::GMPq::Rmpq_set_den($q2, $qr);
+
+        return ((bless \$q1), (bless \$q2));
+    }
+
     sub dump {
         my ($x) = @_;
 
