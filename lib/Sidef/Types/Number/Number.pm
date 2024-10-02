@@ -8587,6 +8587,44 @@ package Sidef::Types::Number::Number {
         return ((bless \$q1), (bless \$q2));
     }
 
+    sub egypt_greedy {
+        my ($pq) = @_;
+
+        $pq = _any2mpq($$pq) // return undef;
+
+        my $n = Math::GMPz::Rmpz_init();
+        my $d = Math::GMPz::Rmpz_init();
+
+        Math::GMPq::Rmpq_get_num($n, $pq);
+        Math::GMPq::Rmpq_get_den($d, $pq);
+
+        my @list;
+
+        state $g = Math::GMPz::Rmpz_init_nobless();
+
+        while (Math::GMPz::Rmpz_cmp_ui($n, 1) != 0) {
+
+            my $x = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_div($x, $d, $n);
+            Math::GMPz::Rmpz_add_ui($x, $x, 1);
+
+            push @list, $x;
+
+            Math::GMPz::Rmpz_mul($n, $n, $x);
+            Math::GMPz::Rmpz_sub($n, $n, $d);
+            Math::GMPz::Rmpz_mul($d, $d, $x);
+            Math::GMPz::Rmpz_gcd($g, $n, $d);
+
+            if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+                Math::GMPz::Rmpz_divexact($n, $n, $g);
+                Math::GMPz::Rmpz_divexact($d, $d, $g);
+            }
+        }
+
+        push @list, $d;
+        Sidef::Types::Array::Array->new([map { bless \$_ } @list]);
+    }
+
     sub dump {
         my ($x) = @_;
 

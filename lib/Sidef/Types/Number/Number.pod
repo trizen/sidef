@@ -2960,6 +2960,19 @@ Aliases: I<exponential_divisors>
 
 =cut
 
+=head2 egypt_greedy
+
+    egypt_greedy(p/q)
+
+Greedy algorithm for Egyptian fraction expansion (also called the Fibonacci-Sylvester algorithm): at each step, extract the largest unit fraction less than the target and replace the target with the remainder.
+
+    say egypt_greedy(9/10)      #=> [2, 3, 15]
+    say egypt_greedy(5/121)     #=> [25, 757, 763309, 873960180913, 1527612795642093418846225]
+
+Returns the array of denominators, such that C<egypt_greedy(p/q).sum{|d| 1/d }> equals C<p/q>.
+
+=cut
+
 =head2 ei
 
     ei(x)
