@@ -1508,4 +1508,8 @@ assert_eq(lcm(1, 1, -42.7), 42)
 assert_eq(gcd(0, 0, -42.7), 42)
 assert_eq(gcud(0, 0, -42.7), 42)
 
+assert_eq(farey(5), [0, 1/5, 1/4, 1/3, 2/5, 1/2, 3/5, 2/3, 3/4, 4/5, 1]);
+assert_eq(10.of{.farey.map{.nu}.sum}, %n[0, 1, 2, 5, 9, 19, 25, 46, 62, 89])
+assert_eq(10.of{.farey.map{.de}.sum}, %n[1, 2, 4, 10, 18, 38, 50, 92, 124, 178])
+
 say "** Tests passed!"

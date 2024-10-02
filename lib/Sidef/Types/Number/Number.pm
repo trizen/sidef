@@ -8512,6 +8512,26 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new(\@convergents);
     }
 
+    sub farey {
+        my ($n) = @_;
+
+        $n = _any2ui($$n) // return undef;
+
+        my ($A, $B, $C, $D) = (0, 1, 1, $n);
+
+        my @list = (ZERO);
+
+        while ($C >= 0 and $C <= $n) {
+            my $k = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($n + $B, $D) : Math::Prime::Util::GMP::divint($n + B, $D));
+            ($A, $B, $C, $D) = ($C, $D, $k * $C - $A, $k * $D - $B);
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set_ui($q, $A, $B);
+            push @list, bless \$q;
+        }
+
+        Sidef::Types::Array::Array->new(\@list);
+    }
+
     sub dump {
         my ($x) = @_;
 
