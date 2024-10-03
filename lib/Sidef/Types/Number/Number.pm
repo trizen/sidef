@@ -8522,7 +8522,7 @@ package Sidef::Types::Number::Number {
         my @list = (ZERO);
 
         while ($C >= 0 and $C <= $n) {
-            my $k = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($n + $B, $D) : Math::Prime::Util::GMP::divint($n + B, $D));
+            my $k = (HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($n + $B, $D) : Math::Prime::Util::GMP::divint($n + $B, $D));
             ($A, $B, $C, $D) = ($C, $D, $k * $C - $A, $k * $D - $B);
             my $q = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_ui($q, $A, $B);
