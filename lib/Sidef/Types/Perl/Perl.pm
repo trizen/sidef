@@ -108,7 +108,7 @@ package Sidef::Types::Perl::Perl {
 
             if ($ref eq '') {
 
-                if (Scalar::Util::looks_like_number($val)) {
+                if (Scalar::Util::looks_like_number($val) and $val !~ /^0[0-9]/) {
 
                     if ($val =~ tr/e.//) {    # parse as float
                         return Sidef::Types::Number::Number::_set_str('float', "$val");
