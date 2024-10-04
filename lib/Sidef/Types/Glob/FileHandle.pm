@@ -113,6 +113,13 @@ package Sidef::Types::Glob::FileHandle {
         (CORE::printf {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    sub printlnf {
+        my ($self, $format, @args) = @_;
+        $self->printf("$format\n", @args);
+    }
+
+    *sayf = \&printlnf;
+
     sub iter {
         my ($self) = @_;
         Sidef::Types::Block::Block->new(

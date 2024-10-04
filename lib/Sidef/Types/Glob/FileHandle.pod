@@ -290,6 +290,16 @@ Aliases: I<println>
 
 =cut
 
+=head2 sayf
+
+    self.sayf(format, *args)
+
+Returns the
+
+Aliases: I<printlnf>
+
+=cut
+
 =head2 seek
 
     self.seek(pos, whence)
