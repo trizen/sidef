@@ -21720,11 +21720,12 @@ package Sidef::Types::Number::Number {
         my %MERSENNE_PRIME_EXPONENTS;
         @MERSENNE_PRIME_EXPONENTS{
             (
-                2,        3,        5,        7,        13,       17,       19,       31,       61,       89,       107,      127,
-                521,      607,      1279,     2203,     2281,     3217,     4253,     4423,     9689,     9941,     11213,    19937,
-                21701,    23209,    44497,    86243,    110503,   132049,   216091,   756839,   859433,   1257787,  1398269,  2976221,
-                3021377,  6972593,  13466917, 20996011, 24036583, 25964951, 30402457, 32582657, 37156667, 42643801, 43112609, 57885161,
-                74207281, 77232917, 82589933
+                2,        3,        5,        7,        13,       17,       19,       31,       61,       89,
+                107,      127,      521,      607,      1279,     2203,     2281,     3217,     4253,     4423,
+                9689,     9941,     11213,    19937,    21701,    23209,    44497,    86243,    110503,   132049,
+                216091,   756839,   859433,   1257787,  1398269,  2976221,  3021377,  6972593,  13466917, 20996011,
+                24036583, 25964951, 30402457, 32582657, 37156667, 42643801, 43112609, 57885161, 74207281, 77232917,
+                82589933, 136279841
             )
         } = ();
 
@@ -21742,9 +21743,9 @@ package Sidef::Types::Number::Number {
                 return Sidef::Types::Bool::Bool::TRUE;
             }
 
-            if ($n < 65_000_000 or !_is_prob_prime($n)) {
+            if ($n < 69_369_389 or !_is_prob_prime($n)) {
 
-                # According to GIMPS, verification was completed on September 19, 2023 for p less than 65 million.
+                # According to GIMPS, all exponents below 69369389 have been tested and verified. (2024-10-23)
                 # https://www.mersenne.org/report_milestones/
                 return Sidef::Types::Bool::Bool::FALSE;
             }
