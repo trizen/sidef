@@ -222,11 +222,11 @@ package Sidef::Types::Glob::FileHandle {
         my $byte = CORE::ord(CORE::getc($self->{fh}));
 
         if (defined $var_ref) {
-            $$var_ref = Sidef::Types::Number::Number->new($byte // return Sidef::Types::Bool::Bool::FALSE);
+            $$var_ref = Sidef::Types::Number::Number::_set_int($byte // return Sidef::Types::Bool::Bool::FALSE);
             return Sidef::Types::Bool::Bool::TRUE;
         }
 
-        Sidef::Types::Number::Number->new($byte // return undef);
+        Sidef::Types::Number::Number::_set_int($byte // return undef);
     }
 
     *getb = \&read_byte;

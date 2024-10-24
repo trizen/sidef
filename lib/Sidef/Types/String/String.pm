@@ -225,17 +225,38 @@ package Sidef::Types::String::String {
         bless \(my $t = CORE::substr($$self, 0, defined($num) ? CORE::int($num) : 1));
     }
 
+    *head = \&first;
+
     sub last {
         my ($self, $num) = @_;
         bless \(my $t = CORE::substr($$self, defined($num) ? -(CORE::int($num) || return $self->new('')) : -1));
     }
 
+    *tail = \&last;
+
     sub char {
         my ($self, $pos) = @_;
-        bless \(my $t = CORE::substr($$self, CORE::int($pos), 1));
+        bless \(my $t = CORE::substr($$self, CORE::int($pos), 1) // '');
     }
 
     *char_at = \&char;
+
+    sub byte {
+        my ($self, $pos) = @_;
+
+        require bytes;
+
+        $pos = CORE::int($pos);
+
+        if ($pos >= bytes::length($$self)) {
+            return undef;
+        }
+
+        my $char = bytes::substr($$self, $pos, 1) // return undef;
+        Sidef::Types::Number::Number::_set_int(CORE::ord($char));
+    }
+
+    *byte_at = \&byte;
 
     sub wordcase {
         my ($self) = @_;

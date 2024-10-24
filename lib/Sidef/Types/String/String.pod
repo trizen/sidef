@@ -339,6 +339,16 @@ Converts a binary string into its equivalent ASCII string representation. It tak
 
 =cut
 
+=head2 byte
+
+    self.byte(pos)
+
+Returns the
+
+Aliases: I<byte_at>
+
+=cut
+
 =head2 bytes
 
     str.bytes
@@ -698,18 +708,6 @@ Aliases: I<foldcase>
 
 =cut
 
-=head2 first
-
-    str.first(n)
-
-Returns the first C<n> characters of the input string, where C<n> is an integer.
-
-Parameters:
-
-    n : An integer that represents the number of characters to be returned from the beginning of the input string.
-
-=cut
-
 =head2 flip
 
     str.flip
@@ -821,6 +819,18 @@ Parameters:
 When a regular expression is given, it checks if the regular expression pattern matches within the input string starting from a given position.
 
 Aliases: I<contain>, I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 first
+
+    str.first(n)
+
+Returns the first C<n> characters of the input string, where C<n> is an integer.
+
+Parameters:
+
+    n : An integer that represents the number of characters to be returned from the beginning of the input string.
 
 =cut
 
