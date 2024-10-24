@@ -58,6 +58,16 @@ Returns the
 
 =cut
 
+=head2 byte
+
+    self.byte(var_ref)
+
+Returns the
+
+Aliases: I<getb>, I<read_byte>
+
+=cut
+
 =head2 call
 
     self.call

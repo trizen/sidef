@@ -216,6 +216,22 @@ package Sidef::Types::Glob::FileHandle {
     *char = \&read_char;
     *getc = \&read_char;
 
+    sub read_byte {
+        my ($self, $var_ref) = @_;
+
+        my $byte = CORE::ord(CORE::getc($self->{fh}));
+
+        if (defined $var_ref) {
+            $$var_ref = Sidef::Types::Number::Number->new($byte // return Sidef::Types::Bool::Bool::FALSE);
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        Sidef::Types::Number::Number->new($byte // return undef);
+    }
+
+    *getb = \&read_byte;
+    *byte = \&read_byte;
+
     sub read_lines {
         my ($self) = @_;
         Sidef::Types::Array::Array->new([map { chomp($_); Sidef::Types::String::String->new($_) } CORE::readline($self->{fh})]);
