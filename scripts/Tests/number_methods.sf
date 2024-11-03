@@ -991,6 +991,17 @@ assert(!is_cyclic(2**256 - 1))
 assert(!is_cyclic(2**256 - 11))
 assert(!is_cyclic(100!))
 
+# OEIS: A376332
+assert(1..12 -> map {|k|       489118019 - k! }.all{.is_semiprime})
+assert(1..13 -> map {|k|      6233987183 - k! }.all{.is_semiprime})
+assert(1..14 -> map {|k|     87199150463 - k! }.all{.is_semiprime})
+assert(1..15 -> map {|k|   1310334397523 - k! }.all{.is_semiprime})
+assert(1..16 -> map {|k|  20937254735843 - k! }.all{.is_semiprime})
+assert(1..17 -> map {|k| 355693511854763 - k! }.all{.is_semiprime})
+
+assert(33110689978317405605970.phi.is_power(14))
+assert(1262838284613442604484690.phi.is_power(15))
+
 assert_eq(sum_primes(1e6), 37550402023)
 assert_eq(sum_primes(1, 1e6, 2), 24693298341834533)
 assert_eq(sum_primes(2, 1e6, 3), 18393235410255348281725)
