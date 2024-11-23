@@ -317,6 +317,8 @@ package Sidef {
     sub normalize_type {
         my ($type) = @_;
 
+        $type // return '';
+
         if (index($type, 'Sidef::') == 0) {
 
             if ($type =~ /::[0-9]+::/) {
@@ -332,7 +334,7 @@ package Sidef {
 
     sub normalize_method {
         my ($type, $method) = ($_[0] =~ /^(.*[^:])::(.*)$/);
-        normalize_type($type) . '#' . $method;
+        normalize_type($type) . '#' . ($method // '');
     }
 
     sub jaro {
