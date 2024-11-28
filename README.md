@@ -31,10 +31,10 @@ Sidef is a modern, high-level programming language designed for versatile genera
 
 ### Resources
 
-- [Beginner's Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.05/sidef-tutorial.pdf))
-- [Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.05/sidef-number-theory.pdf))
+- [Beginner's Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.11/sidef-tutorial.pdf))
+- [Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.11/sidef-number-theory.pdf))
 - RosettaCode: [Sidef](https://rosettacode.org/wiki/Sidef)
-- Gitbook: [Sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/24.05/sidef-book.pdf))
+- Gitbook: [Sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/24.11/sidef-book.pdf))
 
 ### Questions & Answers
 

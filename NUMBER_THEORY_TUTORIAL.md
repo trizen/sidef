@@ -14,7 +14,7 @@ In this tutorial we're going to look how we can use [Sidef](https://github.com/t
       **   **               ****   *********   *********   *
 ```
 
-To initiate your journey with Sidef and installation instructions, refer to the [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.05/sidef-tutorial.pdf)).
+To initiate your journey with Sidef and installation instructions, refer to the [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.11/sidef-tutorial.pdf)).
 
 Over time, Sidef has integrated numerous mathematical functions, many sourced from Dana Jacobsen's commendable [Math::Prime::Util](https://github.com/danaj/Math-Prime-Util) and [Math::Prime::Util::GMP](https://github.com/danaj/Math-Prime-Util-GMP) Perl modules. These modules significantly enhance performance in tasks like integer factorization, primality testing, and prime counting.
 
@@ -30,7 +30,7 @@ After [installing Sidef](https://codeberg.org/trizen/sidef/src/branch/master/TUT
 
 ```
 $ sidef
-Sidef 24.05, running on Linux, using Perl v5.38.2.
+Sidef 24.11, running on Linux, using Perl v5.40.0.
 Type "help", "copyright" or "license" for more information.
 >
 ```
@@ -254,7 +254,7 @@ k.powerfree_divisors(n)     # k-powerfree divisors of n
 k.powerfree_udivisors(n)    # k-powerfree unitary divisors of n
 ```
 
-For the full documentation of each function, please see: [https://metacpan.org/pod/Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number) ([PDF](https://github.com/trizen/sidef/releases/download/24.05/sidef-number-class-documentation.pdf))
+For the full documentation of each function, please see: [https://metacpan.org/pod/Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number) ([PDF](https://github.com/trizen/sidef/releases/download/24.11/sidef-number-class-documentation.pdf))
 
 # Generating sequences
 
@@ -362,7 +362,7 @@ for n in (0..30) {
 
 This section briefly describes the built-in classes related to computational number theory.
 
-For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/24.05/sidef-book.pdf)).
+For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/24.11/sidef-book.pdf)).
 
 ## Mod class
 
