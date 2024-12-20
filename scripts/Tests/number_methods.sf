@@ -1543,4 +1543,33 @@ assert_eq(egypt_greedy(5/121), %n[25, 757, 763309, 873960180913, 152761279564209
 assert_eq(egypt_greedy(43/97).sum{.inv}, 43/97)
 assert_eq(egypt_greedy(97/43).sum{.inv}, 97/43)
 
+assert_eq(prime_cluster(1, 100, 2), primes(100).grep{ _+2 -> is_prime })
+assert_eq(prime_cluster(78977932125503-1e6, 78977932125503+1e6, 1..14 -> map {|k| 4*k*(k+1) }...), [78977932125503])
+
+do {
+
+    func f(n, c) {
+
+        var lo = 1
+        var hi = 2*lo
+
+        var diffs = (1 ..^ n -> map {|k| c*k*(k+1) })
+
+        loop {
+            var terms = prime_cluster(lo, hi, diffs...).grep {|p| !is_prime(p + c*n*(n+1)) }
+            if (terms) {
+                return terms[0]
+            }
+            lo = hi+1
+            hi = 2*lo
+        }
+    }
+
+    assert_eq(1..14 -> map {|n| f(n, 4) }, %n[2, 3, 29, 5, 23, 269, 272879, 149, 61463, 929, 7426253, 2609, 233, 59])
+    assert_eq(1..12 -> map {|n| f(n, 6) }, %n[2, 19, 5, 67, 7, 281, 1051, 6791, 11, 115599457, 365705201, 79352440891])
+    assert_eq(1..11 -> map {|n| f(n, 7) }, %n[2, 3, 59, 5, 89, 599, 3329, 617, 269, 21107, 9833477])
+    assert_eq(1..14 -> map {|n| f(n, 8) }, %n[2, 3, 151, 181, 13, 811, 23671, 92221, 45417481, 5078503, 4861, 20379346831, 12180447943, 31])
+    assert_eq(1..13 -> map {|n| f(n, 9) }, %n[2, 11, 13, 5, 19, 173, 3163, 83, 21013, 878359, 3676219, 239, 43])
+}
+
 say "** Tests passed!"

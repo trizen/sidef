@@ -60,6 +60,7 @@ do {   # Recursive Fibonacci in Perl
     assert_eq(Num(f(12)), 144)
 }
 
+assert_eq(Perl.eval("'0'"), 0)
 assert_eq(Perl.eval("'00'"), "00")
 assert_eq(Perl.eval("'000'"), "000")
 assert_eq(Perl.eval("'010'"), "010")

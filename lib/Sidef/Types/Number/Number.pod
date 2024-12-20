@@ -7512,6 +7512,18 @@ Aliases: I<nth_prime>
 
 =cut
 
+=head2 prime_cluster
+
+    prime_cluster(lo, hi, *diffs)
+
+Returns an array of primes C<p> such that C<p+diffs[0]>, C<p+diffs[1]>, etc, are also primes.
+
+    say prime_cluster(1, 100, 2)    # twin primes <= 100
+
+Aliases: I<sieve_prime_cluster>
+
+=cut
+
 =head2 prime_divisors
 
     prime_divisors(n)

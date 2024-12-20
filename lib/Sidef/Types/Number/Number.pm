@@ -21890,6 +21890,25 @@ package Sidef::Types::Number::Number {
         Sidef::Types::Array::Array->new([map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } Math::Prime::Util::GMP::sieve_primes($x, $y)]);
     }
 
+    sub prime_cluster {
+        my ($lo, $hi, @diffs) = @_;
+
+        _valid(\$lo);
+        _valid(\$hi);
+        _valid(\(@diffs));
+
+        $lo = _big2uistr($$lo) // return undef;
+        $hi = _big2uistr($$hi) // return undef;
+
+        @diffs = map { _big2uistr($$_) // return undef } @diffs;
+
+        my @primes = map { _set_int($_) }
+          (HAS_PRIME_UTIL ? Math::Prime::Util::sieve_prime_cluster($lo, $hi, @diffs) : Math::Prime::Util::GMP::sieve_prime_cluster($lo, $hi, @diffs));
+        Sidef::Types::Array::Array->new(\@primes);
+    }
+
+    *sieve_prime_cluster = \&prime_cluster;
+
     sub composites {
         my ($from, $to) = @_;
 
