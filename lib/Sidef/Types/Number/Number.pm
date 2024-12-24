@@ -21902,8 +21902,23 @@ package Sidef::Types::Number::Number {
 
         @diffs = map { _big2uistr($$_) // return undef } @diffs;
 
-        my @primes = map { _set_int($_) }
-          (HAS_PRIME_UTIL ? Math::Prime::Util::sieve_prime_cluster($lo, $hi, @diffs) : Math::Prime::Util::GMP::sieve_prime_cluster($lo, $hi, @diffs));
+        if (!HAS_PRIME_UTIL and $hi <= 100) {
+            return Sidef::Types::Array::Array->new(
+                [
+                 map { bless \$_ } grep {
+                     my $p = $_;
+                     List::Util::all(sub { _is_prob_prime($p + $_) }, @diffs)
+                 } Math::Prime::Util::GMP::sieve_primes($lo, $hi)
+                ]
+            );
+        }
+
+        my @primes = map { _set_int($_) } (
+                                           HAS_PRIME_UTIL
+                                           ? Math::Prime::Util::sieve_prime_cluster($lo, $hi, @diffs)
+                                           : Math::Prime::Util::GMP::sieve_prime_cluster($lo, $hi, @diffs)
+                                          );
+
         Sidef::Types::Array::Array->new(\@primes);
     }
 
@@ -22356,10 +22371,20 @@ package Sidef::Types::Number::Number {
     sub next_prime_power {
         my ($n) = @_;
 
-        $n = _any2mpz($$n) // goto &nan;
+        $n = $$n;
+
+        # Optimization for native integers
+        if (!ref($n) and $n >= 0 and $n < (ULONG_MAX >> 1)) {
+            ++$n;
+            until (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($n) : Math::Prime::Util::GMP::is_prime_power($n)) {
+                ++$n;
+            }
+            return bless \$n;
+        }
+
+        $n = _any2mpz($n) // goto &nan;
 
         Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
-        Math::GMPz::Rmpz_cmp_ui($n, 2) < 0 and return TWO;
 
         # Optimization for native integers
         if (Math::GMPz::Rmpz_fits_slong_p($n)) {
@@ -22367,7 +22392,7 @@ package Sidef::Types::Number::Number {
             until (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($n) : Math::Prime::Util::GMP::is_prime_power($n)) {
                 ++$n;
             }
-            return _set_int($n);
+            return bless \$n;
         }
 
         my $r = Math::GMPz::Rmpz_init();
