@@ -492,8 +492,7 @@ package Sidef::Parser {
             "Parser has encountered Schrödinger’s code. It’s both broken and not broken, but we won’t know until you fix it.",
                     );
 
-        my $error = sprintf("%s: %s\n\nFile : %s\nLine : %s : %s\nError: %s\n\n" . ("~" x 80) . "\n%s\n",
-                            'Parsing error',
+        my $error = sprintf("%s\n\nFile : %s\nLine : %s : %s\nError: %s\n\n" . ("~" x 80) . "\n%s\n",
                             $lines[rand @lines],
                             $self->{file_name} // '-',
                             $line, $column, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line);

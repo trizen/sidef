@@ -19981,11 +19981,25 @@ package Sidef::Types::Number::Number {
                     and $USE_CONJECTURES
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) >= SPECIAL_FACTORS_MIN
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) <= 500) {
-                    my ($rem, @f) = _pollard_rho_factor($r, 2 * $trial_limit);
-                    $trial_limit = Math::Prime::Util::GMP::mulint($trial_limit, $trial_limit);
-                    $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
-                    push @new_factors, @f;
-                    $r = $rem;
+                    if ($j <= 2) {
+                        my ($rem, @f) = _pollard_rho_factor($r, 2 * $trial_limit);
+                        $trial_limit = Math::Prime::Util::GMP::mulint($trial_limit, $trial_limit);
+                        $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
+                        push @new_factors, @f;
+                        $r = $rem;
+                    }
+                    else {
+                        my $r_obj = _set_int($r);
+                        $trial_limit = $r_obj->iroot(_set_int($k - $bigomega))->inc;
+                        my $f   = $r_obj->factor_upto($trial_limit);
+                        my $rem = _any2mpz(${$f->pop});
+
+                        $trial_limit = $trial_limit->numify;
+                        $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
+
+                        push @new_factors, map { _big2uistr($$_) } @$f;
+                        $r = $rem;
+                    }
                 }
 
                 push @trial_factors, @new_factors;
@@ -20243,11 +20257,25 @@ package Sidef::Types::Number::Number {
                     and $USE_CONJECTURES
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) >= SPECIAL_FACTORS_MIN
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) <= 500) {
-                    my ($rem, @f) = _pollard_rho_factor($r, 2 * $trial_limit);
-                    $trial_limit = Math::Prime::Util::GMP::mulint($trial_limit, $trial_limit);
-                    $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
-                    push @new_factors, @f;
-                    $r = $rem;
+                    if ($j <= 2) {
+                        my ($rem, @f) = _pollard_rho_factor($r, 2 * $trial_limit);
+                        $trial_limit = Math::Prime::Util::GMP::mulint($trial_limit, $trial_limit);
+                        $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
+                        push @new_factors, @f;
+                        $r = $rem;
+                    }
+                    else {
+                        my $r_obj = _set_int($r);
+                        $trial_limit = $r_obj->iroot(_set_int($k - $omega));
+                        my $f   = $r_obj->factor_upto($trial_limit);
+                        my $rem = _any2mpz(${$f->pop});
+
+                        $trial_limit = $trial_limit->numify;
+                        $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
+
+                        push @new_factors, map { _big2uistr($$_) } @$f;
+                        $r = $rem;
+                    }
                 }
 
                 if (@new_factors) {
@@ -23593,10 +23621,10 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         if (ref($n)) {
-            $n = _big2pistr($n) // return Sidef::Types::Array::Array->new();
+            $n = _big2pistr($n) // return Sidef::Types::Array::Array->new;
         }
         else {
-            $n > 0 or return Sidef::Types::Array::Array->new();
+            $n > 0 or return Sidef::Types::Array::Array->new;
         }
 
         my @pairs;
@@ -23609,6 +23637,122 @@ package Sidef::Types::Number::Number {
     }
 
     *factors_exp = \&factor_exp;
+
+    sub factor_upto {
+        my ($n, $limit) = @_;
+
+        # Reference:
+        #   https://members.loria.fr/PZimmermann/records/ecm/params.html
+        state $ecm_table = [
+            qw(
+              30      1358        2
+              35      1270        5
+              40      1629        10
+              45      4537        10
+              50      12322       9
+              55      12820       18
+              60      21905       21
+              65      24433       41
+              70      32918       66
+              75      64703       71
+              80      76620       119
+              85      155247      123
+              90      183849      219
+              95      245335      321
+              100     445657      339
+              105     643986      468
+              110     1305195     439
+              115     1305195     818
+              120     3071166     649
+              125     3784867     949
+              130     4572523     1507
+              135     7982718     1497
+              140     9267681     2399
+              145     22025673    1826
+              150     22025673    3159
+              155     26345943    4532
+              160     35158748    6076
+              165     46919468    8177
+              170     47862548    14038
+              175     153319098   7166
+              180     153319098   12017
+              185     188949210   16238
+              190     410593604   13174
+              195     496041799   17798
+              200     491130495   29584
+              205     1067244762  23626
+              210     1056677983  38609
+              215     1328416470  49784
+              220     1315263832  81950
+              225     2858117139  63461
+              )
+        ];
+
+        if (!defined($limit)) {
+            $limit = $n->isqrt;
+        }
+
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        my $size = $limit->ilog2->numify + 1;
+
+        if ($size < 10) {
+            return ((bless \$n)->trial_factor(_set_int(1 << $size)));
+        }
+
+        my $limit_isqrt = $limit->isqrt->numify;
+        my ($B1, $curves) = (2858117139, 63461);
+
+        foreach my $i (0 .. (@$ecm_table / 3 - 1)) {
+            if ($ecm_table->[3 * $i] >= $size) {
+                ($B1, $curves) = (@{$ecm_table}[3 * $i + 1, 3 * $i + 2]);
+                last;
+            }
+        }
+
+        my @factors;
+        my $r = Math::GMPz::Rmpz_get_str($n, 10);
+
+        while (1) {
+            my @f;
+
+            if ($size < 30) {
+                @f = Math::Prime::Util::GMP::pbrent_factor($r, 2 * $limit_isqrt);
+                $r = pop @f;
+                say STDERR sprintf("rho_factor(r, %s): @f", 2 * $limit_isqrt) if (@f && $VERBOSE);
+            }
+            else {
+                @f = Math::Prime::Util::GMP::ecm_factor($r, $B1, $curves);
+                $r = pop @f;
+                say STDERR "ecm_factor(r, $B1, $curves): @f" if (@f && $VERBOSE);
+            }
+
+            my @new_factors;
+
+            if (@f) {
+                @new_factors = map { ($_ < ULONG_MAX) ? $_ : _any2mpz($_) }
+                  map { (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($_) : Math::Prime::Util::GMP::is_prime($_)) ? $_ : _factor($_) } @f;
+                push @factors, @new_factors;
+            }
+
+            foreach my $p (@new_factors) {
+                my $v = Math::Prime::Util::GMP::valuation($r, $p);
+                if ($v > 0) {
+                    push @factors, ($p) x $v;
+                    $r = Math::Prime::Util::GMP::divint($r, Math::Prime::Util::GMP::powint($p, $v));
+                }
+            }
+
+            if (_is_prob_prime($r, 1)) {
+                last;
+            }
+
+            @f or last;
+        }
+
+        push @factors, $r;
+        Sidef::Types::Array::Array->new([map { _set_int($_) } @factors])->sort;
+    }
 
     sub trial_factor {
         my ($n, $k) = @_;

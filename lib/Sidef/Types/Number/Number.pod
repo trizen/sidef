@@ -3266,6 +3266,18 @@ Aliases: I<factors_sum>
 
 =cut
 
+=head2 factor_upto
+
+    n.factor_upto(limit)
+
+Returns an array of factors of C<n>, using trial division, the Pollard Rho method and the Elliptic Curve method, based on heuristic bounds to find all the prime factors of C<n> that are less than C<limit>.
+
+The product of the factors will give back C<n>. However, the last factor may be composite.
+
+B<NOTE:> some factors may be larger than C<limit>. Also, it's not guaranteed that a prime factor less than C<limit> is always found, even when it exists.
+
+=cut
+
 =head2 falling_factorial
 
     falling_factorial(n,k)

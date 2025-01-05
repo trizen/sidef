@@ -2,6 +2,9 @@
 
 # Tests for k-almost and k-omega prime numbers.
 
+#local Num!USE_CONJECTURES = true
+#local Num!VERBOSE = true
+
 for k in (1..7) {
 
     var hi = 1e6.irand
