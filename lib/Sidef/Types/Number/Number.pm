@@ -19892,7 +19892,7 @@ package Sidef::Types::Number::Number {
 
             if (@f) {
                 say STDERR "pbrent_factor(r, $reps): @f" if $VERBOSE;
-                @new_factors = map { ($_ < ULONG_MAX) ? $_ : _any2mpz($_) }
+                @new_factors =
                   map { (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($_) : Math::Prime::Util::GMP::is_prime($_)) ? $_ : _factor($_) } @f;
                 push @factors, @new_factors;
             }
@@ -19992,12 +19992,12 @@ package Sidef::Types::Number::Number {
                         my $r_obj = _set_int($r);
                         $trial_limit = $r_obj->iroot(_set_int($k - $bigomega))->inc;
                         my $f   = $r_obj->factor_upto($trial_limit);
-                        my $rem = _any2mpz(${$f->pop});
+                        my $rem = ${$f->pop};
 
                         $trial_limit = $trial_limit->numify;
                         $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
 
-                        push @new_factors, map { _big2uistr($$_) } @$f;
+                        push @new_factors, map { $$_ } @$f;
                         $r = $rem;
                     }
                 }
@@ -20266,14 +20266,14 @@ package Sidef::Types::Number::Number {
                     }
                     else {
                         my $r_obj = _set_int($r);
-                        $trial_limit = $r_obj->iroot(_set_int($k - $omega));
+                        $trial_limit = $r_obj->iroot(_set_int($k - $omega))->inc;
                         my $f   = $r_obj->factor_upto($trial_limit);
-                        my $rem = _any2mpz(${$f->pop});
+                        my $rem = ${$f->pop};
 
                         $trial_limit = $trial_limit->numify;
                         $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
 
-                        push @new_factors, map { _big2uistr($$_) } @$f;
+                        push @new_factors, map { ref($$_) ? _big2uistr($$_) : $$_ } @$f;
                         $r = $rem;
                     }
                 }
@@ -23692,12 +23692,17 @@ package Sidef::Types::Number::Number {
             $limit = $n->isqrt;
         }
 
-        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
-
+        my $r    = _big2uistr($$n) // return Sidef::Types::Array::Array->new;
         my $size = $limit->ilog2->numify + 1;
 
+        my $max_size = Math::Prime::Util::GMP::logint(Math::Prime::Util::GMP::sqrtint($r), 2) + 1;
+
+        if ($size > $max_size) {
+            $size = $max_size;
+        }
+
         if ($size < 10) {
-            return ((bless \$n)->trial_factor(_set_int(1 << $size)));
+            return $n->trial_factor(_set_int(1 << $size));
         }
 
         my $limit_isqrt = $limit->isqrt->numify;
@@ -23711,7 +23716,6 @@ package Sidef::Types::Number::Number {
         }
 
         my @factors;
-        my $r = Math::GMPz::Rmpz_get_str($n, 10);
 
         while (1) {
             my @f;
@@ -23730,7 +23734,7 @@ package Sidef::Types::Number::Number {
             my @new_factors;
 
             if (@f) {
-                @new_factors = map { ($_ < ULONG_MAX) ? $_ : _any2mpz($_) }
+                @new_factors =
                   map { (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($_) : Math::Prime::Util::GMP::is_prime($_)) ? $_ : _factor($_) } @f;
                 push @factors, @new_factors;
             }

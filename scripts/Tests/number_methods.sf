@@ -6,6 +6,9 @@
 #   07 March 2023: 2.020s (with MPU)
 #   07 March 2023: 2.418s (without MPU)
 
+#local Num!USE_CONJECTURES = true
+#local Num!VERBOSE = true
+
 assert_eq(8 >> 32, 0)
 assert_eq(112 >> 32, 0)
 assert_eq(208 >> 64, 0)
