@@ -9313,13 +9313,30 @@ package Sidef::Types::Number::Number {
     sub factorial_power {
         my ($n, $p) = @_;
 
-        # Formula:
-        #   (n - sumdigits(n,p)) / (p-1)
-
         _valid(\$p);
 
         $n = $$n;
         $p = $$p;
+
+        # Generalized method for composite p
+        # Formula from SymPy:
+        #   https://github.com/sympy/sympy/blob/d7938cbc2f703801413075c147f54db350d29bff/sympy/ntheory/factor_.py#L227
+
+        if (!_is_prob_prime($p)) {
+            my %seen;
+            my @list;
+            foreach my $pp (grep { !$seen{$_->[1]}++ } CORE::reverse(_factor_exp($p))) {
+                push @list,
+                  _set_int(
+                           Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::subint($n, ${$_[0]->sumdigits(_set_int($pp->[0]))}),
+                                                          Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::subint($pp->[0], 1), $pp->[1]))
+                          );
+            }
+            return (Sidef::Types::Array::Array->new(\@list)->min() // ZERO);
+        }
+
+        # Formula for prime p:
+        #   (n - sumdigits(n,p)) / (p-1)
 
         if (!ref($n) and !ref($p) and $p < 2147483647 and $n > 0 and $p > 1) {
 
@@ -9338,7 +9355,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        my $sum = ${$_[0]->sumdigits($_[1]) // return undef};
+        my $sum = ${$_[0]->sumdigits($_[1]) // return ZERO};
         bless \__div__(__sub__($n, $sum), __dec__($p));
     }
 

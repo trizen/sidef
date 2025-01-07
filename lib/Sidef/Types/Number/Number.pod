@@ -3198,13 +3198,13 @@ Equivalent with (but much faster):
 
 =head2 factorial_valuation
 
-    factorial_valuation(n, p)
+    factorial_valuation(n, k)
 
-Returns the number of times C<n!> is divisible by C<p>, where C<p> is a prime number.
+Returns the number of times C<n!> is divisible by C<k>, where C<k> is either prime or composite.
 
 Equivalent with (but more efficient):
 
-    valuation(n!, p)
+    valuation(n!, k)
 
 Aliases: I<factorial_power>
 

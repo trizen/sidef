@@ -393,6 +393,10 @@ HEADER
         # Return the lvalue variables on assignments
         if (@code > 1 or exists($init_obj->{args})) {
             push @code, '(' . join(',', map { $self->_dump_var($_) } @vars) . ')';
+
+            # TODO: when lvalues are not used, use a do{} block:
+            # return 'do{' . join(';', @code) . '}';
+
             return 'CORE::sub:lvalue{' . join(';', @code) . '}->()';
         }
 

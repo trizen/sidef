@@ -96,7 +96,7 @@ assert(2**128 + 1 -> is_div(5704689200685129054723) -> not)
 assert_eq(factorial_valuation(3**25 + 1, 2), 847288609427)
 assert_eq(factorial_valuation(3**25 - 1, 3), 423644304696)
 assert_eq(factorial_valuation(3**25, 127), 6724512769)
-assert_eq(factorial_valuation(2**128 + 1, 2**64 + 1), 18446744073709551615)
+assert_eq(factorial_valuation(2**128 + 1, 2**64 + 1), 5057672949897538906173183)
 assert_eq(factorial_valuation(2**128 + 1, 43), 8101961117165201511032728748375433594)
 
 assert_eq(10.by{ .is_div(3) }, [0, 3, 6, 9, 12, 15, 18, 21, 24, 27])
@@ -1578,5 +1578,7 @@ do {
 with (1e6.random_prime) {|p|
     assert_eq(factor_upto(p**5, 1e6), 5.of(p))
 }
+
+assert_eq(10!.divisors.sum {|k| factorial_valuation(10, k) }, 312)
 
 say "** Tests passed!"
