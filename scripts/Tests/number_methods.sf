@@ -1575,4 +1575,8 @@ do {
     assert_eq(1..13 -> map {|n| f(n, 9) }, %n[2, 11, 13, 5, 19, 173, 3163, 83, 21013, 878359, 3676219, 239, 43])
 }
 
+with (1e6.random_prime) {|p|
+    assert_eq(factor_upto(p**5, 1e6), 5.of(p))
+}
+
 say "** Tests passed!"

@@ -245,7 +245,7 @@ package Sidef::Types::Number::Number {
              }
 
              $$_ = $tmp;
-         }
+           }
         ) for @_;
     }
 
@@ -23692,7 +23692,7 @@ package Sidef::Types::Number::Number {
             $limit = $n->isqrt;
         }
 
-        my $r    = _big2uistr($$n) // return Sidef::Types::Array::Array->new;
+        my $r    = _big2pistr($$n) // return Sidef::Types::Array::Array->new;
         my $size = $limit->ilog2->numify + 1;
 
         my $max_size = Math::Prime::Util::GMP::logint(Math::Prime::Util::GMP::sqrtint($r), 2) + 1;
@@ -23701,12 +23701,14 @@ package Sidef::Types::Number::Number {
             $size = $max_size;
         }
 
-        if ($size < 10) {
+        if ($size <= 13) {
             return $n->trial_factor(_set_int(1 << $size));
         }
 
         my $limit_isqrt = $limit->isqrt->numify;
         my ($B1, $curves) = (2858117139, 63461);
+
+        $limit_isqrt = 100 if ($limit_isqrt < 100);
 
         foreach my $i (0 .. (@$ecm_table / 3 - 1)) {
             if ($ecm_table->[3 * $i] >= $size) {
@@ -23720,7 +23722,12 @@ package Sidef::Types::Number::Number {
         while (1) {
             my @f;
 
-            if ($size < 30) {
+            if (my $k = Math::Prime::Util::GMP::is_prime_power($r)) {
+                $r = Math::Prime::Util::GMP::rootint($r, $k);
+                @f = ($r) x ($k - 1);
+                say STDERR "is_prime_power(r): $r^$k" if (@f && $VERBOSE);
+            }
+            elsif ($size < 30) {
                 @f = Math::Prime::Util::GMP::pbrent_factor($r, 2 * $limit_isqrt);
                 $r = pop @f;
                 say STDERR sprintf("rho_factor(r, %s): @f", 2 * $limit_isqrt) if (@f && $VERBOSE);
@@ -23747,14 +23754,17 @@ package Sidef::Types::Number::Number {
                 }
             }
 
-            if (_is_prob_prime($r, 1)) {
+            if ($r eq '1' or _is_prob_prime($r, 1)) {
                 last;
             }
 
             @f or last;
         }
 
-        push @factors, $r;
+        if ($r ne '1') {
+            push @factors, $r;
+        }
+
         Sidef::Types::Array::Array->new([map { _set_int($_) } @factors])->sort;
     }
 
@@ -26068,7 +26078,7 @@ package Sidef::Types::Number::Number {
                                   }
                                   : do {
                                     Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $y, $_) == 1;
-                                }
+                                  }
                             } @list;
                         }
 

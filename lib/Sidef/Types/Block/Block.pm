@@ -298,8 +298,7 @@ package Sidef::Types::Block::Block {
                   )
                   . ')'
               } @methods
-          )
-          . "\n\n";
+          ) . "\n\n";
     }
 
     sub call {

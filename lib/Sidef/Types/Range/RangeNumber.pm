@@ -360,7 +360,8 @@ package Sidef::Types::Range::RangeNumber {
         }
 
         $self->lazy->grep(Sidef::Types::Block::Block->new(code => sub { $_[0]->is_squarefree }))
-          ->map(Sidef::Types::Block::Block->new(code => sub { $_[0]->moebius }))->sum;
+          ->map(Sidef::Types::Block::Block->new(code => sub { $_[0]->moebius }))
+          ->sum;
     }
 
     sub dump {
