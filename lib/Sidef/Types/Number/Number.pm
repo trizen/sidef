@@ -9328,7 +9328,7 @@ package Sidef::Types::Number::Number {
             foreach my $pp (grep { !$seen{$_->[1]}++ } CORE::reverse(_factor_exp($p))) {
                 push @list,
                   _set_int(
-                           Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::subint($n, ${$_[0]->sumdigits(_set_int($pp->[0]))}),
+                           Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::subint($n, ${$_[0]->sumdigits(_set_int($pp->[0])) // return ZERO}),
                                                           Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::subint($pp->[0], 1), $pp->[1]))
                           );
             }
@@ -19904,6 +19904,10 @@ package Sidef::Types::Number::Number {
         while (1) {
             my @f = Math::Prime::Util::GMP::pbrent_factor($r, $reps);
 
+            if (scalar(@f) == 1) {
+                @f = Math::Prime::Util::GMP::prho_factor($r, $reps);
+            }
+
             $r = pop @f;
             my @new_factors;
 
@@ -23705,11 +23709,12 @@ package Sidef::Types::Number::Number {
               )
         ];
 
+        my $r = _big2pistr($$n) // return Sidef::Types::Array::Array->new;
+
         if (!defined($limit)) {
             $limit = $n->isqrt;
         }
 
-        my $r    = _big2pistr($$n) // return Sidef::Types::Array::Array->new;
         my $size = $limit->ilog2->numify + 1;
 
         my $max_size = Math::Prime::Util::GMP::logint(Math::Prime::Util::GMP::sqrtint($r), 2) + 1;
@@ -23742,15 +23747,27 @@ package Sidef::Types::Number::Number {
             if (my $k = Math::Prime::Util::GMP::is_prime_power($r)) {
                 $r = Math::Prime::Util::GMP::rootint($r, $k);
                 @f = ($r) x ($k - 1);
-                say STDERR "is_prime_power(r): $r^$k" if (@f && $VERBOSE);
+                say STDERR "is_prime_power(r): $r^$k" if $VERBOSE;
+            }
+            elsif ($r < 0xffffffff) {   # 2^32 - 1
+                @f = (HAS_PRIME_UTIL ? Math::Prime::Util::factor($r) : Math::Prime::Util::GMP::factor($r));
+                $r = 1;
+                say STDERR "factor(r): @f" if $VERBOSE;
             }
             elsif ($size < 30) {
+
                 @f = Math::Prime::Util::GMP::pbrent_factor($r, 2 * $limit_isqrt);
                 $r = pop @f;
-                say STDERR sprintf("rho_factor(r, %s): @f", 2 * $limit_isqrt) if (@f && $VERBOSE);
+                say STDERR sprintf("pbrent_factor(r, %s): @f", 2 * $limit_isqrt) if (@f && $VERBOSE);
+
+                if (!@f) {
+                    @f = Math::Prime::Util::GMP::prho_factor($r, 2 * $limit_isqrt);
+                    $r = pop @f;
+                    say STDERR sprintf("prho_factor(r, %s): @f", 2 * $limit_isqrt) if (@f && $VERBOSE);
+                }
             }
             else {
-                @f = Math::Prime::Util::GMP::ecm_factor($r, $B1, $curves);
+                @f = Math::Prime::Util::GMP::ecm_factor($r, 2 * $B1, 2 * $curves);
                 $r = pop @f;
                 say STDERR "ecm_factor(r, $B1, $curves): @f" if (@f && $VERBOSE);
             }
