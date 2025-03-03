@@ -8326,7 +8326,7 @@ package Sidef::Types::Number::Number {
             push @solutions, _set_int(Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::addint($z, Math::Prime::Util::GMP::mulint($m, $t)), $orig_m));
         }
 
-        return Sidef::Types::Array::Array->new(\@solutions)->sort;
+        return Sidef::Types::Array::Array->new(\@solutions)->isort;
     }
 
     sub sqrt_cfrac_period_each {
@@ -13081,7 +13081,7 @@ package Sidef::Types::Number::Number {
                 push @solutions, bless \__mod__(__sub__($$k, $y), $m);
             }
 
-            return Sidef::Types::Array::Array->new(\@solutions)->sort;
+            return Sidef::Types::Array::Array->new(\@solutions)->isort;
         }
 
         my $four_xm = __mul__(__mul__($x, 4), $m);    # 4*x*m
@@ -13108,7 +13108,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        Sidef::Types::Array::Array->new(\@solutions)->uniq->sort;
+        Sidef::Types::Array::Array->new(\@solutions)->isort->iuniq;
     }
 
     *quadratic_congruence = \&modular_quadratic_formula;
@@ -23613,7 +23613,7 @@ package Sidef::Types::Number::Number {
                         my ($n) = @_;
                         _is_prob_prime($$n, 1) ? Sidef::Types::Array::Array->new() : do {
                             my $factors = do { $cache{"$n"} //= $block->run($n) };
-                            $factors->first(-1)->concat($factors->last(-1))->uniq;
+                            $factors->first(-1)->concat($factors->last(-1))->iuniq;
                         };
                     }
                 )
@@ -23749,7 +23749,7 @@ package Sidef::Types::Number::Number {
                 @f = ($r) x ($k - 1);
                 say STDERR "is_prime_power(r): $r^$k" if $VERBOSE;
             }
-            elsif ($r < 0xffffffff) {   # 2^32 - 1
+            elsif ($r < 0xffffffff) {    # 2^32 - 1
                 @f = (HAS_PRIME_UTIL ? Math::Prime::Util::factor($r) : Math::Prime::Util::GMP::factor($r));
                 $r = 1;
                 say STDERR "factor(r): @f" if $VERBOSE;
@@ -23799,7 +23799,7 @@ package Sidef::Types::Number::Number {
             push @factors, $r;
         }
 
-        Sidef::Types::Array::Array->new([map { _set_int($_) } @factors])->sort;
+        Sidef::Types::Array::Array->new([map { _set_int($_) } @factors])->isort;
     }
 
     sub trial_factor {
@@ -25743,7 +25743,7 @@ package Sidef::Types::Number::Number {
             push @lists, $power_divisors_func->($k, \@factor_exp);
         }
 
-        Sidef::Types::Array::Array->new([map { @$_ } @lists])->sort->uniq;
+        Sidef::Types::Array::Array->new([map { @$_ } @lists])->isort->iuniq;
     }
 
     *pp_divisors = \&perfect_power_divisors;
@@ -25822,7 +25822,7 @@ package Sidef::Types::Number::Number {
             push @lists, $power_udivisors_func->($k, \@factor_exp);
         }
 
-        Sidef::Types::Array::Array->new([map { @$_ } @lists])->sort->uniq;
+        Sidef::Types::Array::Array->new([map { @$_ } @lists])->isort->iuniq;
     }
 
     *pp_udivisors                   = \&perfect_power_udivisors;

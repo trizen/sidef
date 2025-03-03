@@ -2911,6 +2911,28 @@ package Sidef::Types::Array::Array {
     *uniq     = \&unique;
     *distinct = \&unique;
 
+    sub iuniq {
+        my ($self) = @_;
+
+        my @sorted = do {
+            my @arr;
+            foreach my $i (0 .. $#$self) {
+                CORE::push(@arr, [$i, $self->[$i]]);
+            }
+            CORE::sort { ${$a->[1]} <=> ${$b->[1]} } @arr;
+        };
+
+        my @unique;
+        my $max = $#sorted;
+
+        for (my $i = 0 ; $i <= $max ; $i++) {
+            $unique[$sorted[$i][0]] = $sorted[$i][1];
+            ++$i while ($i < $max and ${$sorted[$i][1]} == ${$sorted[$i + 1][1]});
+        }
+
+        bless [grep { defined($_) } @unique], ref($self);
+    }
+
     sub last_unique {
         my ($self) = @_;
 
