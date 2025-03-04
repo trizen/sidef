@@ -2887,13 +2887,30 @@ package Sidef::Types::Array::Array {
     }
 
     sub unique {
-        my ($self) = @_;
+        my ($self, $block) = @_;
+
+        if (defined($block)) {
+            return $self->uniq_by($block);
+        }
 
         my @sorted = do {
+
             my @arr;
+            my $numeric = 1;
+
             foreach my $i (0 .. $#$self) {
+
                 CORE::push(@arr, [$i, $self->[$i]]);
+
+                if (ref($self->[$i]) ne 'Sidef::Types::Number::Number') {
+                    $numeric = 0;
+                }
             }
+
+            if ($numeric) {
+                return $self->iuniq;
+            }
+
             CORE::sort { $a->[1] cmp $b->[1] } @arr;
         };
 
@@ -2917,9 +2934,9 @@ package Sidef::Types::Array::Array {
         my @sorted = do {
             my @arr;
             foreach my $i (0 .. $#$self) {
-                CORE::push(@arr, [$i, $self->[$i]]);
+                CORE::push(@arr, [$i, $self->[$i], ${$self->[$i]}]);
             }
-            CORE::sort { ${$a->[1]} <=> ${$b->[1]} } @arr;
+            CORE::sort { $a->[2] <=> $b->[2] } @arr;
         };
 
         my @unique;
@@ -2927,7 +2944,7 @@ package Sidef::Types::Array::Array {
 
         for (my $i = 0 ; $i <= $max ; $i++) {
             $unique[$sorted[$i][0]] = $sorted[$i][1];
-            ++$i while ($i < $max and ${$sorted[$i][1]} == ${$sorted[$i + 1][1]});
+            ++$i while ($i < $max and $sorted[$i][2] == $sorted[$i + 1][2]);
         }
 
         bless [grep { defined($_) } @unique], ref($self);
@@ -3317,6 +3334,19 @@ package Sidef::Types::Array::Array {
 
         if (defined $block) {
             return bless [CORE::sort { scalar $block->run($a, $b) } @$self], ref($self);
+        }
+
+        my $numeric = 1;
+
+        foreach my $item (@$self) {
+            if (ref($item) ne 'Sidef::Types::Number::Number') {
+                $numeric = 0;
+                last;
+            }
+        }
+
+        if ($numeric) {
+            return $self->isort;
         }
 
         bless [CORE::sort { $a cmp $b } @$self], ref($self);
