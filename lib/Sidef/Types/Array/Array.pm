@@ -2902,7 +2902,7 @@ package Sidef::Types::Array::Array {
 
                 CORE::push(@arr, [$i, $self->[$i]]);
 
-                if (ref($self->[$i]) ne 'Sidef::Types::Number::Number' or ref(${$self->[$i]}) eq 'Math::MPC') {
+                if ($numeric and (ref($self->[$i]) ne 'Sidef::Types::Number::Number' or ref(${$self->[$i]}) eq 'Math::MPC')) {
                     $numeric = 0;
                 }
             }
