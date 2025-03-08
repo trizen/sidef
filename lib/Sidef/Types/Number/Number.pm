@@ -1996,7 +1996,7 @@ package Sidef::Types::Number::Number {
     sub pi {
 
         if (ref($_[0])) {
-            return $_[0]->prime_count($_[1]);
+            goto &prime_count;
         }
 
         my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -2009,7 +2009,7 @@ package Sidef::Types::Number::Number {
     sub tau {
 
         if (ref($_[0])) {
-            return $_[0]->sigma0;
+            goto &sigma0;
         }
 
         my $tau = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
