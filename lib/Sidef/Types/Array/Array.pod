@@ -1291,6 +1291,14 @@ Returns the
 
 =cut
 
+=head2 iuniq
+
+    self.iuniq
+
+Returns the
+
+=cut
+
 =head2 jaro
 
     jaro(arr1, arr2, winkler=false)
@@ -2469,7 +2477,7 @@ Aliases: I<variations_with_repetition>
 
 =head2 uniq
 
-    self.uniq
+    self.uniq(block)
 
 Returns the
 

@@ -27639,6 +27639,57 @@ package Sidef::Types::Number::Number {
         _set_int(Math::Prime::Util::GMP::vecsum(@final_terms));
     }
 
+    sub pillai {    # OEIS: A018804 -- Pillai's arithmetical function: Sum_{k=1..n} gcd(k, n).
+        my ($n) = @_;
+
+        # TODO: generalize for k > 1.
+
+        # Multiplicative with:
+        #   a(p^e) = p^(e-1)*((p-1)*e + p) = p^(e-1) * ((1+e)*p - e)
+
+        $n = $$n;
+
+        if (ref($n)) {
+            $n = _big2uistr($n) // goto &nan;
+        }
+        else {
+            $n < 0 and goto &nan;
+        }
+        $n eq '0' and return ZERO;
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+
+        my @terms;
+        foreach my $pe (_factor_exp($n)) {
+
+            my ($p, $e) = @$pe;
+
+            if ($p < ULONG_MAX) {
+                Math::GMPz::Rmpz_set_ui($u, $p);
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e - 1);
+            }
+            else {
+                Math::GMPz::Rmpz_set_str($u, "$p", 10);
+                Math::GMPz::Rmpz_pow_ui($t, $u, $e - 1);
+            }
+
+            Math::GMPz::Rmpz_mul_ui($u, $u, 1 + $e);
+            Math::GMPz::Rmpz_sub_ui($u, $u, $e);
+            Math::GMPz::Rmpz_mul($t, $t, $u);
+
+            push @terms,
+              (
+                  Math::GMPz::Rmpz_fits_ulong_p($t)
+                ? Math::GMPz::Rmpz_get_ui($t)
+                : Math::GMPz::Rmpz_init_set($t)
+              );
+        }
+
+        @terms || return ONE;
+        bless \_binsplit(\@terms, \&__mul__);
+    }
+
     sub prime_power_sigma {
         my ($n, $k) = @_;
 
