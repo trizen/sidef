@@ -23732,7 +23732,7 @@ package Sidef::Types::Number::Number {
 
         $limit_isqrt = 100 if ($limit_isqrt < 100);
 
-        foreach my $i (0 .. (@$ecm_table / 3 - 1)) {
+        foreach my $i (0 .. CORE::int(@$ecm_table / 3 - 1)) {
             if ($ecm_table->[3 * $i] >= $size) {
                 ($B1, $curves) = (@{$ecm_table}[3 * $i + 1, 3 * $i + 2]);
                 last;
@@ -27647,6 +27647,9 @@ package Sidef::Types::Number::Number {
         # Multiplicative with:
         #   a(p^e) = p^(e-1)*((p-1)*e + p) = p^(e-1) * ((1+e)*p - e)
 
+        # Multiplicative formula for Sum_{k=1..n} gcd(n,k)^m
+        #   a(p^e) = p^(e-1)*(p^((m-1)*e+m) - p^((m-1)*e) - p + 1)/(p^(m-1)-1)
+
         $n = $$n;
 
         if (ref($n)) {
@@ -31501,9 +31504,17 @@ package Sidef::Types::Number::Number {
             if ($n <= 3) {    # 1,2,3 are terms
                 return Sidef::Types::Bool::Bool::TRUE;
             }
-            if ($n % 2 == 0) {    # n > 2 cannot be even
+
+            if (
+                !($n & 1)                                                                 # 2 only even
+                || !($n % 9)   || !($n % 25) || !($n % 49)                                # not square-free
+                || !($n % 21)  || !($n % 39) || !($n % 55) || !($n % 57) || !($n % 93)    # q = 1 mod p
+                || !($n % 121) || !($n % 169)                                             # not square-free
+                || !($n % 111) || !($n % 129) || !($n % 155) || !($n % 183)               # q = 1 mod p
+              ) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
+
             if (
                 (
                  HAS_PRIME_UTIL
@@ -31530,6 +31541,12 @@ package Sidef::Types::Number::Number {
                 return Sidef::Types::Bool::Bool::TRUE;
             }
             return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        foreach my $k (9, 25, 49, 21, 39, 55, 57, 93, 121, 169, 111, 129, 155, 183) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($n, $k)) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
         }
 
         my $nstr = Math::GMPz::Rmpz_get_str($n, 10);
