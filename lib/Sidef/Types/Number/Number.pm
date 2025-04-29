@@ -9332,7 +9332,7 @@ package Sidef::Types::Number::Number {
                                                           Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::subint($pp->[0], 1), $pp->[1]))
                           );
             }
-            return (Sidef::Types::Array::Array->new(\@list)->min() // ZERO);
+            return (Sidef::Types::Array::Array->new(\@list)->imin() // ZERO);
         }
 
         # Formula for prime p:

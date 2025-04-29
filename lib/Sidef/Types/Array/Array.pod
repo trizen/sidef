@@ -1188,6 +1188,30 @@ Aliases: I<first>
 
 =cut
 
+=head2 imax
+
+    self.imax
+
+Returns the
+
+=cut
+
+=head2 imin
+
+    self.imin
+
+Returns the
+
+=cut
+
+=head2 iminmax
+
+    self.iminmax
+
+Returns the
+
+=cut
+
 =head2 index
 
     arr.index(obj)

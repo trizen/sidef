@@ -232,14 +232,35 @@ do {
 }
 
 assert_eq(%n[1,2,2,3,4,2,3,4].uniq, %n[1, 2, 3, 4])
-assert_eq([1,2,2,3,4,2,3,4].iuniq, %n[1,2,3,4])
-assert_eq([1,2,2,3,4,2,3,4].isort, %n[1, 2, 2, 2, 3, 3, 4, 4])
-assert_eq([1,2,2,3,4,2,3,4].sort, %n[1, 2, 2, 2, 3, 3, 4, 4])
+assert_eq(%n[1,2,2,3,4,2,3,4].iuniq, %n[1,2,3,4])
+assert_eq(%n[1,2,2,3,4,2,3,4].isort, %n[1, 2, 2, 2, 3, 3, 4, 4])
+assert_eq(%n[1,2,2,3,4,2,3,4].sort, %n[1, 2, 2, 2, 3, 3, 4, 4])
 
 assert_eq([1,2,2,3,4,"w",2,3,5,4,"w"].uniq, [1, 2, 3, 4, "w", 5])
 assert_eq([1,2,2,3,"a",4,2,"a",3,4].sort, [1, 2, 2, 2, 3, 3, 4, 4, "a", "a"])
 
 assert_eq([3,1,3+4i,4,5,3+4i].sort, [1, 3, 3 + 4i, 3 + 4i, 4, 5])
 assert_eq([3,1,3+4i,4,5,3+4i].uniq, [3, 1, 3 + 4i, 4, 5])
+
+assert_eq(%n[3,1,4,1,5,9,2,6,5,8,9].shuffle.min, 1)
+assert_eq(%n[3,1,4,1,5,9,2,6,5,8,9].shuffle.max, 9)
+
+assert_eq([].imin, nil)
+assert_eq([].imax, nil)
+
+assert_eq([].min, nil)
+assert_eq([].max, nil)
+
+assert_eq(["foo"].min, "foo")
+assert_eq(["foo"].max, "foo")
+
+assert_eq([42].min, 42)
+assert_eq([42].max, 42)
+
+assert_eq(["foo", "bar", "baz"].min, "bar")
+assert_eq(["foo", "bar", "baz"].max, "foo")
+
+assert_eq(%n[3,1,4,1,5,9,2,6,5,8,9].shuffle.imin, 1)
+assert_eq(%n[3,1,4,1,5,9,2,6,5,8,9].shuffle.imax, 9)
 
 say "** Test passed!"

@@ -970,6 +970,36 @@ package Sidef::Types::Array::Array {
         bless \@arr;
     }
 
+    sub _int_min_max {
+        my ($self, $order) = @_;
+
+        @$self || return undef;
+
+        my $item = $self->[0];
+
+        foreach my $i (1 .. $#$self) {
+            my $value = $self->[$i];
+            $item = $value if (($$value <=> $$item) == $order);
+        }
+
+        $item;
+    }
+
+    sub imax {
+        @_ = ($_[0], 1);
+        goto &_int_min_max;
+    }
+
+    sub imin {
+        @_ = ($_[0], -1);
+        goto &_int_min_max;
+    }
+
+    sub iminmax {
+        my ($self) = @_;
+        ($self->imin, $self->imax);
+    }
+
     sub _min_max {
         my ($self, $order) = @_;
 
