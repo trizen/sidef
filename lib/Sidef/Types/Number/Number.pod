@@ -8477,6 +8477,18 @@ Aliases: I<sign>
 
 =cut
 
+=head2 sigma_sum
+
+    sigma_sum(n, k=1)
+
+Returns the sum of the C<sigma_k(j)> function, for C<j=1..n>.
+
+    say sigma_sum(100, 0)      #=> 482
+    say sigma_sum(100, 1)      #=> 8299
+    say sigma_sum(100, 2)      #=> 407819
+
+=cut
+
 =head2 sin
 
     sin(x)

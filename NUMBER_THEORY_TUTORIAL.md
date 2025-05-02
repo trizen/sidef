@@ -16,9 +16,9 @@ In this tutorial we're going to look how we can use [Sidef](https://github.com/t
 
 To initiate your journey with Sidef and installation instructions, refer to the [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/24.11/sidef-tutorial.pdf)).
 
-Over time, Sidef has integrated numerous mathematical functions, many sourced from Dana Jacobsen's commendable [Math::Prime::Util](https://github.com/danaj/Math-Prime-Util) and [Math::Prime::Util::GMP](https://github.com/danaj/Math-Prime-Util-GMP) Perl modules. These modules significantly enhance performance in tasks like integer factorization, primality testing, and prime counting.
+Over time, Sidef has integrated numerous mathematical functions, many based on Dana Jacobsen's [Math::Prime::Util](https://github.com/danaj/Math-Prime-Util) and [Math::Prime::Util::GMP](https://github.com/danaj/Math-Prime-Util-GMP) awesome Perl modules. These modules significantly enhance performance in tasks like integer factorization, primality testing, and prime counting.
 
-Presently, Sidef encompasses more than $1000$ numerical functions; explore the [source code](https://codeberg.org/trizen/sidef/src/master/lib/Sidef/Types/Number/Number.pm).
+Presently, Sidef encompasses more than $1000$ numerical functions; feel free to explore the [source code](https://codeberg.org/trizen/sidef/src/master/lib/Sidef/Types/Number/Number.pm).
 
 The majority of these functions match the speed of PARI/GP and Mathematica, while a few are marginally slower or even faster.
 

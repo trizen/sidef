@@ -24985,25 +24985,20 @@ package Sidef::Types::Number::Number {
 
             my $k_obj = bless \$k;
 
-            my $f_r = $f->run($k_obj);
-            my $g_r = $g->run($k_obj);
-            my $F_r = $F->run($q_obj);
-            my $G_r = $G->run($q_obj);
+            my $f_r = $f->($k_obj);
+            my $g_r = $g->($k_obj);
+            my $F_r = $F->($q_obj);
+            my $G_r = $G->($q_obj);
 
-            $f_r = $f_r->to_n if ref($f_r) ne __PACKAGE__;
-            $g_r = $g_r->to_n if ref($g_r) ne __PACKAGE__;
-            $F_r = $F_r->to_n if ref($F_r) ne __PACKAGE__;
-            $G_r = $G_r->to_n if ref($G_r) ne __PACKAGE__;
-
-            $f_r = $$f_r;
-            $g_r = $$g_r;
-            $F_r = $$F_r;
-            $G_r = $$G_r;
+            $f_r = $$f_r if ref($f_r);
+            $g_r = $$g_r if ref($g_r);
+            $F_r = $$F_r if ref($F_r);
+            $G_r = $$G_r if ref($G_r);
 
             $sum = __add__($sum, __add__(__mul__($f_r, $G_r), __mul__($g_r, $F_r)));
         }
 
-        $sum = __sub__($sum, __mul__(${$F->run(_set_int($s))->to_n}, ${$G->run(_set_int($s))->to_n}));
+        $sum = __sub__($sum, __mul__(${$F->(_set_int($s))->to_n}, ${$G->(_set_int($s))->to_n}));
         bless \$sum;
     }
 
@@ -28306,6 +28301,23 @@ package Sidef::Types::Number::Number {
     }
 
     *σ = \&sigma;
+
+    sub sigma_sum {
+        my ($n, $k) = @_;
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+        if ($k == 0) {
+            return $n->dirichlet_hyperbola(sub { 1 }, sub { 1 }, sub { $_[0] }, sub { $_[0] });
+        }
+
+        if ($k == 1) {
+            return $n->dirichlet_hyperbola(sub { $_[0] }, sub { 1 }, sub { $_[0]->faulhaber_sum(ONE) }, sub { $_[0] });
+        }
+
+        my $k_obj = bless \$k;
+        $n->dirichlet_hyperbola(sub { $_[0]->ipow($k_obj) }, sub { 1 }, sub { $_[0]->faulhaber_sum($k_obj) }, sub { $_[0] });
+    }
 
     sub antidivisor_count {    # OEIS: A066272
         my ($n) = @_;

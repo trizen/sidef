@@ -1582,4 +1582,8 @@ with (1e6.random_prime) {|p|
 assert_eq(10!.divisors.sum {|k| factorial_valuation(10, k) }, 312)
 assert_eq(1520802979.factor_upto(38998), %n[6269, 242591])
 
+assert_eq(sigma_sum(100, 0), 482)
+assert_eq(sigma_sum(100, 1), 8299)
+assert_eq(sigma_sum(100, 2), 407819)
+
 say "** Tests passed!"
