@@ -9281,6 +9281,19 @@ Returns an array with the totient values for the range C<a..b>.
 
 =cut
 
+=head2 totient_sum
+
+    totient_sum(n, k=1)
+
+Returns the sum of the Jordan totient function C<J_k(j)>, for C<j=1..n>.
+
+    say totient_sum(100, 1)      #=> 3044
+    say totient_sum(100, 2)      #=> 280608
+
+Aliases: I<euler_phi_sum>, I<jordan_totient_sum>
+
+=cut
+
 =head2 idiv_trunc
 
     idiv_trunc(a,b)

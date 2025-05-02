@@ -1586,4 +1586,8 @@ assert_eq(sigma_sum(100, 0), 482)
 assert_eq(sigma_sum(100, 1), 8299)
 assert_eq(sigma_sum(100, 2), 407819)
 
+assert_eq(totient_sum(100, 0), 1)
+assert_eq(totient_sum(100, 1), 3044)
+assert_eq(totient_sum(100, 2), 280608)
+
 say "** Tests passed!"

@@ -26026,6 +26026,32 @@ package Sidef::Types::Number::Number {
     *euler_totient = \&euler_phi;
     *totient       = \&euler_phi;
 
+    sub totient_sum {
+        my ($n, $k) = @_;
+
+        # TODO: use a faster formula
+        # https://github.com/trizen/perl-scripts/blob/master/Math/partial_sums_of_euler_totient_function_fast.pl
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+        my $k_obj = bless \$k;
+
+        my $f = sub { $_[0]->ipow($k_obj) };
+        my $g = sub { $_[0]->moebius };
+
+        my $F = sub { $_[0]->faulhaber_sum($k_obj) };
+        my $G = sub { $_[0]->mertens };
+
+        if ($k == 1) {
+            $f = sub { $_[0] };
+        }
+
+        $n->dirichlet_hyperbola($f, $g, $F, $G);
+    }
+
+    *euler_phi_sum      = \&totient_sum;
+    *jordan_totient_sum = \&totient_sum;
+
     sub _n_over_d_divisors {
         my ($N, $d, $u, $D) = @_;
 
@@ -28307,16 +28333,25 @@ package Sidef::Types::Number::Number {
 
         $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
-        if ($k == 0) {
-            return $n->dirichlet_hyperbola(sub { 1 }, sub { 1 }, sub { $_[0] }, sub { $_[0] });
-        }
-
-        if ($k == 1) {
-            return $n->dirichlet_hyperbola(sub { $_[0] }, sub { 1 }, sub { $_[0]->faulhaber_sum(ONE) }, sub { $_[0] });
-        }
-
         my $k_obj = bless \$k;
-        $n->dirichlet_hyperbola(sub { $_[0]->ipow($k_obj) }, sub { 1 }, sub { $_[0]->faulhaber_sum($k_obj) }, sub { $_[0] });
+
+        my $f = sub { $_[0]->ipow($k_obj) };
+        my $g = sub { 1 };
+
+        my $F = sub { $_[0]->faulhaber_sum($k_obj) };
+        my $G = sub { $_[0] };
+
+        if ($k == 0) {
+            $f = sub { 1 };
+            $g = sub { 1 };
+            $F = sub { $_[0] };
+            $G = sub { $_[0] };
+        }
+        elsif ($k == 1) {
+            $f = sub { $_[0] };
+        }
+
+        $n->dirichlet_hyperbola($f, $g, $F, $G);
     }
 
     sub antidivisor_count {    # OEIS: A066272
