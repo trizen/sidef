@@ -27032,6 +27032,31 @@ package Sidef::Types::Number::Number {
     *Ω     = \&bigomega;
     *Omega = \&bigomega;
 
+    sub bigomega_sum {
+        my ($n, $k) = @_;
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 0;
+
+        my $k_obj = bless \$k;
+
+        my $f = sub { $_[0]->ipow($k_obj) };
+        my $g = sub { ${$_[0]->is_prime_power} ? 1 : 0 };
+
+        my $F = sub { $_[0]->faulhaber_sum($k_obj) };
+        my $G = sub { $_[0]->prime_power_count };
+
+        if ($k == 1) {
+            $f = sub { $_[0] };
+        }
+
+        if ($k == 0) {
+            $f = sub { 1 };
+            $F = sub { $_[0] };
+        }
+
+        $n->dirichlet_hyperbola($f, $g, $F, $G);
+    }
+
     sub prime_power_sigma0 {
         $_[0]->bigomega;
     }
@@ -27116,6 +27141,31 @@ package Sidef::Types::Number::Number {
     }
 
     *ω = \&omega;
+
+    sub omega_sum {
+        my ($n, $k) = @_;
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 0;
+
+        my $k_obj = bless \$k;
+
+        my $f = sub { $_[0]->ipow($k_obj) };
+        my $g = sub { ${$_[0]->is_prime} ? 1 : 0 };
+
+        my $F = sub { $_[0]->faulhaber_sum($k_obj) };
+        my $G = sub { $_[0]->prime_count };
+
+        if ($k == 1) {
+            $f = sub { $_[0] };
+        }
+
+        if ($k == 0) {
+            $f = sub { 1 };
+            $F = sub { $_[0] };
+        }
+
+        $n->dirichlet_hyperbola($f, $g, $F, $G);
+    }
 
     sub prime_sigma0 {
         $_[0]->omega;

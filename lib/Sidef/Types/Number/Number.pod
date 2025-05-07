@@ -1188,6 +1188,18 @@ Defined as:
 
 =cut
 
+=head2 bigomega_sum
+
+    bigomega_sum(n, k=0)
+
+Returns the sum of the generalized Omega function C<Ω_k(j)>, for C<j=1..n>.
+
+    say bigomega_sum(100, 0)      #=> 239
+    say bigomega_sum(100, 1)      #=> 2815
+    say bigomega_sum(100, 2)      #=> 66799
+
+=cut
+
 =head2 binomialmod
 
     binomialmod(n, k, m)
@@ -6755,6 +6767,18 @@ Returns the sum of k-omega primes <= C<n>, or in the range C<a..b>.
 
     say 1.omega_prime_sum(100)            # sum of prime powers <= 100
     say 2.omega_prime_sum(50, 100)        # sum of 2-omega primes in range 50..100
+
+=cut
+
+=head2 omega_sum
+
+    omega_sum(n, k=0)
+
+Returns the sum of the generalized omega function C<ω_k(j)>, for C<j=1..n>.
+
+    say omega_sum(100, 0)      #=> 171
+    say omega_sum(100, 1)      #=> 2298
+    say omega_sum(100, 2)      #=> 59962
 
 =cut
 
