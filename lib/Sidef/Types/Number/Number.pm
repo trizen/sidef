@@ -24974,6 +24974,8 @@ package Sidef::Types::Number::Number {
 
         my $sum = 0;
 
+        my ($f_r, $g_r, $F_r, $G_r);
+
         foreach my $k (1 .. Math::GMPz::Rmpz_get_ui($s)) {
 
             if ($native_n) {
@@ -24985,20 +24987,40 @@ package Sidef::Types::Number::Number {
 
             my $k_obj = bless \$k;
 
-            my $f_r = $f->($k_obj);
-            my $g_r = $g->($k_obj);
-            my $F_r = $F->($q_obj);
-            my $G_r = $G->($q_obj);
+            $f_r = $f->($k_obj);
+            $g_r = $g->($k_obj);
 
             $f_r = $$f_r if ref($f_r);
             $g_r = $$g_r if ref($g_r);
+
+            if (!ref($f_r) and $f_r == 0) {
+                $G_r = 0;
+                $F_r = $F->($q_obj);
+            }
+            elsif (!ref($g_r) and $g_r == 0) {
+                $F_r = 0;
+                $G_r = $G->($q_obj);
+            }
+            else {
+                $F_r = $F->($q_obj);
+                $G_r = $G->($q_obj);
+            }
+
             $F_r = $$F_r if ref($F_r);
             $G_r = $$G_r if ref($G_r);
 
             $sum = __add__($sum, __add__(__mul__($f_r, $G_r), __mul__($g_r, $F_r)));
         }
 
-        $sum = __sub__($sum, __mul__(${$F->(_set_int($s))->to_n}, ${$G->(_set_int($s))->to_n}));
+        my $s_obj = _set_int($s);
+
+        $F_r = $F->($s_obj);
+        $G_r = $G->($s_obj);
+
+        $F_r = $$F_r if ref($F_r);
+        $G_r = $$G_r if ref($G_r);
+
+        $sum = __sub__($sum, __mul__($F_r, $G_r));
         bless \$sum;
     }
 
@@ -27040,10 +27062,10 @@ package Sidef::Types::Number::Number {
         my $k_obj = bless \$k;
 
         my $f = sub { $_[0]->ipow($k_obj) };
-        my $g = sub { ${$_[0]->is_prime_power} ? 1 : 0 };
+        my $g = sub { (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power(${$_[0]}) : Math::Prime::Util::GMP::is_prime_power(${$_[0]})) ? 1 : 0 };
 
         my $F = sub { $_[0]->faulhaber_sum($k_obj) };
-        my $G = sub { $_[0]->prime_power_count };
+        my $G = sub { HAS_NEW_PRIME_UTIL ? Math::Prime::Util::prime_power_count(${$_[0]}) : $_[0]->prime_power_count };
 
         if ($k == 1) {
             $f = sub { $_[0] };
@@ -27150,10 +27172,10 @@ package Sidef::Types::Number::Number {
         my $k_obj = bless \$k;
 
         my $f = sub { $_[0]->ipow($k_obj) };
-        my $g = sub { ${$_[0]->is_prime} ? 1 : 0 };
+        my $g = sub { (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime(${$_[0]}) : Math::Prime::Util::GMP::is_prime(${$_[0]})) ? 1 : 0 };
 
         my $F = sub { $_[0]->faulhaber_sum($k_obj) };
-        my $G = sub { $_[0]->prime_count };
+        my $G = sub { HAS_PRIME_UTIL ? Math::Prime::Util::prime_count(${$_[0]}) : $_[0]->prime_count };
 
         if ($k == 1) {
             $f = sub { $_[0] };
@@ -27762,6 +27784,14 @@ package Sidef::Types::Number::Number {
 
         @terms || return ONE;
         bless \_binsplit(\@terms, \&__mul__);
+    }
+
+    sub pillai_sum {
+
+        # TODO: implement
+        # TODO: generalize for any k >= 1
+
+        ...;
     }
 
     sub prime_power_sigma {
