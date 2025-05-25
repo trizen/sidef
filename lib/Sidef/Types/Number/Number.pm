@@ -27810,17 +27810,19 @@ package Sidef::Types::Number::Number {
     }
 
     sub pillai {    # OEIS: A018804 -- Pillai's arithmetical function: Sum_{k=1..n} gcd(k, n).
-        my ($n) = @_;
-
-        # TODO: generalize for k > 1.
+        my ($n, $k) = @_;
 
         # Multiplicative with:
         #   a(p^e) = p^(e-1)*((p-1)*e + p) = p^(e-1) * ((1+e)*p - e)
 
-        # Multiplicative formula for Sum_{k=1..n} gcd(n,k)^m
+        # Multiplicative formula for Sum_{k=1..n} gcd(n,k)^m:
         #   a(p^e) = p^(e-1)*(p^((m-1)*e+m) - p^((m-1)*e) - p + 1)/(p^(m-1)-1)
 
+        # Multiplicative formula for Sum_{1 <= x_1, x_2, ..., x_k <= n} gcd(x_1, x_2, ..., x_k, n)^k:
+        #   a(p^e) = (e - e/p^k + 1) * p^(k*e) = p^((e - 1) * k) * (p^k + e*(p^k - 1))
+
         $n = $$n;
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         if (ref($n)) {
             $n = _big2uistr($n) // goto &nan;
@@ -27832,6 +27834,7 @@ package Sidef::Types::Number::Number {
 
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
+        state $v = Math::GMPz::Rmpz_init_nobless();
 
         my @terms;
         foreach my $pe (_factor_exp($n)) {
@@ -27840,15 +27843,17 @@ package Sidef::Types::Number::Number {
 
             if ($p < ULONG_MAX) {
                 Math::GMPz::Rmpz_set_ui($u, $p);
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e - 1);
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * ($e - 1));
             }
             else {
                 Math::GMPz::Rmpz_set_str($u, "$p", 10);
-                Math::GMPz::Rmpz_pow_ui($t, $u, $e - 1);
+                Math::GMPz::Rmpz_pow_ui($t, $u, $k * ($e - 1));
             }
 
-            Math::GMPz::Rmpz_mul_ui($u, $u, 1 + $e);
-            Math::GMPz::Rmpz_sub_ui($u, $u, $e);
+            Math::GMPz::Rmpz_pow_ui($u, $u, $k) if ($k > 1);
+            Math::GMPz::Rmpz_sub_ui($v, $u, 1);
+            Math::GMPz::Rmpz_mul_ui($v, $v, $e);
+            Math::GMPz::Rmpz_add($u, $u, $v);
             Math::GMPz::Rmpz_mul($t, $t, $u);
 
             push @terms,
@@ -27864,11 +27869,31 @@ package Sidef::Types::Number::Number {
     }
 
     sub pillai_sum {
+        my ($n, $k) = @_;
 
-        # TODO: implement
-        # TODO: generalize for any k >= 1
+        # TODO: try to compute the sum, based on the Dirichlet convolution:
+        #   pillai(n,k) = Sum_{d|n} mu(n/d) * d^k * tau(d)
 
-        ...;
+        # See also:
+        #   https://github.com/trizen/sidef-scripts/blob/master/Math/partial_sums_of_gcd-sum_function_fast.sf
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+        my $k_obj = bless \$k;
+
+        my $f = sub { $_[0]->jordan_totient($k_obj) };
+        my $g = sub { $_[0]->ipow($k_obj) };
+
+        my $F = sub { $_[0]->totient_sum($k_obj) };
+        my $G = sub { $_[0]->faulhaber_sum($k_obj) };
+
+        if ($k == 1) {
+            $g = sub { $_[0] };
+            $f = sub { $_[0]->euler_phi };
+            $F = sub { $_[0]->totient_sum };
+        }
+
+        $n->dirichlet_hyperbola($f, $g, $F, $G);
     }
 
     sub prime_power_sigma {

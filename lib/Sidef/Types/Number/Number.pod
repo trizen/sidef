@@ -6927,17 +6927,25 @@ Aliases: I<almost_primepi>, I<pi_k>
 
 =head2 pillai
 
-    pillai(n)
+    pillai(n, k=1)
 
 Pillai's arithmetical function: C<Sum_{k=1..n} gcd(k, n)>. (OEIS: A018804)
+
+Generalized as:
+
+    pillai(n,k) = Sum_{1 <= x_1, x_2, ..., x_k <= n} gcd(x_1, x_2, ..., x_k, n)^k
+
+Which has the identity:
+
+    pillai(n,k) = Sum_{d|n} mu(n/d) * d^k * tau(d)
 
 =cut
 
 =head2 pillai_sum
 
-    self.pillai_sum
+    pillai_sum(n,k=1)
 
-Returns the
+Partial sums of the generalized Pillai arithmetical function C<pillai(n,k)>.
 
 =cut
 

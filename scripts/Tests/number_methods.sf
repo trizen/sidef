@@ -1590,4 +1590,9 @@ assert_eq(totient_sum(100, 0), 1)
 assert_eq(totient_sum(100, 1), 3044)
 assert_eq(totient_sum(100, 2), 280608)
 
+assert_eq(20.of{.pillai },    [0]+20.of{.pillai_sum   }.diffs)
+assert_eq(20.of{.pillai(2) }, [0]+20.of{.pillai_sum(2)}.diffs)
+assert_eq(20.of{.pillai(3) }, [0]+20.of{.pillai_sum(3)}.diffs)
+assert_eq(20.of{.pillai(4) }, [0]+20.of{.pillai_sum(4)}.diffs)
+
 say "** Tests passed!"
