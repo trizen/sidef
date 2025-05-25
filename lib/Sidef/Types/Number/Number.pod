@@ -6933,6 +6933,14 @@ Pillai's arithmetical function: C<Sum_{k=1..n} gcd(k, n)>. (OEIS: A018804)
 
 =cut
 
+=head2 pillai_sum
+
+    self.pillai_sum
+
+Returns the
+
+=cut
+
 =head2 pisano_period
 
     pisano_period(n)

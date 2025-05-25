@@ -14057,6 +14057,8 @@ package Sidef::Types::Number::Number {
         _set_int($value);
     }
 
+    *moebius_sum = \&mertens;
+
     sub liouville_sum {
         my ($from, $to) = @_;
 
@@ -14107,13 +14109,33 @@ package Sidef::Types::Number::Number {
         my $L    = 0;
         my $sqrt = Math::Prime::Util::GMP::sqrtint($n);
 
-        foreach my $k (1 .. $sqrt) {
+        state $mertens_table = [ 0,  1,  0, -1, -1, -2, -1, -2, -2, -2, -1, -2, -2, -3, -2, -1, -1, -2, -2, -3, -3, -2, -1, -2, -2, -2,
+                                -1, -1, -1, -2, -3, -4, -4, -3, -2, -1, -1, -2, -1,  0,  0, -1, -2, -3, -3, -3, -2, -3, -3, -3, -3, -2,
+                                -2, -3, -3, -2, -2, -1,  0, -1, -1, -2, -1, -1, -1,  0, -1, -2, -2, -1, -2, -3, -3, -4, -3, -3, -3, -2,
+                                -3, -4, -4, -4, -3, -4, -4, -3, -2, -1, -1, -2, -2, -1, -1,  0,  1,  2,  2,  1,  1,  1,  1,  0, -1, -2,
+                               ];
+
+        my $u = 0;
+        my $k = 1;
+
+        while ($k <= $sqrt) {
+
             my $t =
               (HAS_NEW_PRIME_UTIL and $n < ULONG_MAX)
               ? Math::Prime::Util::divint($n, $k * $k)
               : Math::Prime::Util::GMP::divint($n, (($k * $k < ULONG_MAX) ? ($k * $k) : Math::Prime::Util::GMP::mulint($k, $k)));
-            my $M = ${(($t < ULONG_MAX) ? (bless \$t) : _set_int($t))->mertens};
-            $L += ref($M) ? Math::GMPz::Rmpz_get_si($M) : $M;
+
+            my $v =
+              (HAS_NEW_PRIME_UTIL and $n < ULONG_MAX)
+              ? Math::Prime::Util::sqrtint(Math::Prime::Util::divint($n, $t))
+              : Math::Prime::Util::GMP::sqrtint(Math::Prime::Util::GMP::divint($n, $t));
+
+            my $f = $v - $u;
+            my $M = ($t <= 103) ? $mertens_table->[$t] : ${(($t < ULONG_MAX) ? (bless \$t) : _set_int($t))->mertens};
+
+            $L += $f * (ref($M) ? Math::GMPz::Rmpz_get_si($M) : $M);
+            $k += $f;
+            $u = $v;
         }
 
         $liouville_table->{$n} = $L;
