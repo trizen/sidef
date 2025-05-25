@@ -3998,10 +3998,13 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($x) // goto &nan;
         Math::GMPz::Rmpz_sgn($x) < 0 and goto &nan;
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_sqrt($r, $x);
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     *sqrtint = \&isqrt;
@@ -4345,10 +4348,13 @@ package Sidef::Types::Number::Number {
                 return bless \$r;
             }
 
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_ui_pow_ui($r, $x, $y);
-            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-            return bless \$r;
+            my $r2 =
+                Math::GMPz::Rmpz_fits_ulong_p($r)
+              ? Math::GMPz::Rmpz_get_ui($r)
+              : Math::GMPz::Rmpz_init_set($r);
+            return bless \$r2;
         }
 
         if (!ref($x) and $x == -1) {
@@ -10564,7 +10570,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
 
         if (Math::GMPz::Rmpz_sgn($k) < 0) {
             Math::GMPz::Rmpz_invert($r, $n, $m) or goto &nan;
@@ -10574,9 +10580,12 @@ package Sidef::Types::Number::Number {
           ? Math::GMPz::Rmpz_powm_ui($r, $n, Math::GMPz::Rmpz_get_ui($k), $m)
           : Math::GMPz::Rmpz_powm($r, $n, $k, $m);
 
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
 
-        bless \$r;
+        bless \$r2;
     }
 
     *expmod = \&powmod;
@@ -10958,10 +10967,13 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($x) // (goto &nan);
         $y = _any2mpz($y) // (goto &nan);
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_invert($r, $x, $y) || (goto &nan);
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub divmod {
@@ -11048,10 +11060,13 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($x) // (goto &nan);
         $y = _any2mpz($y) // (goto &nan);
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_and($r, $x, $y);
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub or {
@@ -11070,10 +11085,13 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($x) // (goto &nan);
         $y = _any2mpz($y) // (goto &nan);
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_ior($r, $x, $y);
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub xor {
@@ -11092,10 +11110,13 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($x) // (goto &nan);
         $y = _any2mpz($y) // (goto &nan);
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_xor($r, $x, $y);
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub not {
@@ -11103,10 +11124,13 @@ package Sidef::Types::Number::Number {
 
         $x = _any2mpz($$x) // (goto &nan);
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_com($r, $x);
-        $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub bit {
@@ -13234,38 +13258,48 @@ package Sidef::Types::Number::Number {
         }
 
         if ($p == 1 or $p == 3) {
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_add_ui($r, $n, 1);
             Math::GMPz::Rmpz_mul($r, $r, $n);
             Math::GMPz::Rmpz_div_2exp($r, $r, 1);
             Math::GMPz::Rmpz_mul($r, $r, $r) if ($p == 3);
-            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-            return bless \$r;
+            my $r2 =
+                Math::GMPz::Rmpz_fits_ulong_p($r)
+              ? Math::GMPz::Rmpz_get_ui($r)
+              : Math::GMPz::Rmpz_init_set($r);
+            return bless \$r2;
         }
 
         state $z = Math::GMPz::Rmpz_init_nobless();
 
         if ($p == 2) {    # n*(n+1)*(2*n+1)/6
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_add_ui($z, $n, 1);
             Math::GMPz::Rmpz_mul($r, $z, $n);
             Math::GMPz::Rmpz_mul_2exp($z, $z, 1);
             Math::GMPz::Rmpz_sub_ui($z, $z, 1);
             Math::GMPz::Rmpz_mul($r, $r, $z);
             Math::GMPz::Rmpz_divexact_ui($r, $r, 6);
-            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-            return bless \$r;
+            my $r2 =
+                Math::GMPz::Rmpz_fits_ulong_p($r)
+              ? Math::GMPz::Rmpz_get_ui($r)
+              : Math::GMPz::Rmpz_init_set($r);
+            return bless \$r2;
         }
 
         # When p >= n, sum the powers directly.
         if (Math::GMPz::Rmpz_cmp_ui($n, $p) <= 0) {
-            my $r = Math::GMPz::Rmpz_init_set_ui(0);
+            state $r = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_set_ui($r, 0);
             foreach my $k (1 .. Math::GMPz::Rmpz_get_ui($n)) {
                 Math::GMPz::Rmpz_ui_pow_ui($z, $k, $p);
                 Math::GMPz::Rmpz_add($r, $r, $z);
             }
-            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-            return bless \$r;
+            my $r2 =
+                Math::GMPz::Rmpz_fits_ulong_p($r)
+              ? Math::GMPz::Rmpz_get_ui($r)
+              : Math::GMPz::Rmpz_init_set($r);
+            return bless \$r2;
         }
 
         my @B = _bernoulli_numbers($p);
@@ -13384,23 +13418,29 @@ package Sidef::Types::Number::Number {
         $y = _any2si($y) // (goto &nan) if ref($y);
 
         if (!ref($x) and $x <= 1e6 and $x >= 0 and $y >= 0) {
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_bin_uiui($r, $x, $y);
-            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-            return bless \$r;
+            my $r2 =
+                Math::GMPz::Rmpz_fits_ulong_p($r)
+              ? Math::GMPz::Rmpz_get_ui($r)
+              : Math::GMPz::Rmpz_init_set($r);
+            return bless \$r2;
         }
 
         $x = _any2mpz($x) // (goto &nan);
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
 
         ($y < 0)
           ? Math::GMPz::Rmpz_bin_si($r, $x, $y)
           : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
 
-        $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+        my $r2 =
+            Math::GMPz::Rmpz_fits_slong_p($r)
+          ? Math::GMPz::Rmpz_get_si($r)
+          : Math::GMPz::Rmpz_init_set($r);
 
-        bless \$r;
+        bless \$r2;
     }
 
     *nok = \&binomial;
@@ -18859,15 +18899,20 @@ package Sidef::Types::Number::Number {
         if (@vals > 2) {
 
             my @terms = map { _any2mpz($$_) // goto &nan } @vals;
-            my $r     = Math::GMPz::Rmpz_init_set(shift(@terms));
+            state $r = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_set($r, shift(@terms));
 
             foreach my $z (@terms) {
                 Math::GMPz::Rmpz_gcd($r, $r, $z);
                 last if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0);
             }
 
-            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-            return bless \$r;
+            my $r2 =
+                Math::GMPz::Rmpz_fits_ulong_p($r)
+              ? Math::GMPz::Rmpz_get_ui($r)
+              : Math::GMPz::Rmpz_init_set($r);
+
+            return bless \$r2;
         }
 
         my ($x, $y) = @vals;
@@ -18899,10 +18944,13 @@ package Sidef::Types::Number::Number {
             $y = _any2mpz($y) // goto &nan;
         }
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_gcd($r, $x, $y);
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub gcud {    # greatest common unitary divisor (OEIS: A165430)
@@ -18982,10 +19030,13 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($$x) // goto &nan;
         $y = _any2mpz($$y) // goto &nan;
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_lcm($r, $x, $y);
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub consecutive_integer_lcm {
@@ -27238,10 +27289,14 @@ package Sidef::Types::Number::Number {
             return _set_int(1 << (Math::Prime::Util::prime_omega($n)));
         }
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_set_ui($r, 0);
         Math::GMPz::Rmpz_setbit($r, scalar _factor_exp($n));
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub usigma {
@@ -28026,10 +28081,14 @@ package Sidef::Types::Number::Number {
         $k > 0 or return ZERO;
         $n eq '0' and return ZERO;
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_set_ui($r, 0);
         Math::GMPz::Rmpz_setbit($r, scalar grep { $_->[1] % $k == 0 } _factor_exp($n));
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub power_usigma {
@@ -28178,10 +28237,14 @@ package Sidef::Types::Number::Number {
         $k > 0 or return ZERO;
         $n eq '0' and return ZERO;
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_set_ui($r, 0);
         Math::GMPz::Rmpz_setbit($r, scalar grep { $_->[1] < $k } _factor_exp($n));
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub powerfree_usigma {
@@ -32950,18 +33013,23 @@ package Sidef::Types::Number::Number {
             _valid(\$k);
             $k = _any2ui($$k) // goto &nan;
             $k == 0 and return ONE;
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_root($r, $n, $k);
-            $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-            return bless \$r;
+            my $r2 =
+                Math::GMPz::Rmpz_fits_ulong_p($r)
+              ? Math::GMPz::Rmpz_get_ui($r)
+              : Math::GMPz::Rmpz_init_set($r);
+            return bless \$r2;
         }
 
         # Formula:
         #   a(n) = n - Sum_{k=1..floor(log_2(n))} μ(k) * (floor(n^(1/k)) - 1)
         #        = 1 - Sum_{k=2..floor(log_2(n))} μ(k) * (floor(n^(1/k)) - 1)
 
-        my $r = Math::GMPz::Rmpz_init_set_ui(0);
+        state $r = Math::GMPz::Rmpz_init_nobless();
         state $t = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_ui($r, 0);
 
         foreach my $k (2 .. __ilog__($n, 2)) {
             my $mu = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k)) || next;
@@ -32973,8 +33041,11 @@ package Sidef::Types::Number::Number {
         }
 
         Math::GMPz::Rmpz_ui_sub($r, 1, $r);
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub perfect_power_sum {
@@ -34452,14 +34523,17 @@ package Sidef::Types::Number::Number {
 
         $x = _any2mpz($x) // (goto &nan);
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
 
         ($y < 0)
           ? Math::GMPz::Rmpz_mul_2exp($r, $x, -$y)
           : Math::GMPz::Rmpz_div_2exp($r, $x, $y);
 
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     *rsft = \&shift_right;
