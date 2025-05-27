@@ -2169,7 +2169,7 @@ package Sidef::Types::Number::Number {
             ($y < 0)
               ? Math::GMPz::Rmpz_sub_ui($r, $x, -$y)
               : Math::GMPz::Rmpz_add_ui($r, $x, $y);
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+            ## $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
         }
 
@@ -2224,7 +2224,7 @@ package Sidef::Types::Number::Number {
       Math_GMPz__Math_GMPz: {
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_add($r, $x, $y);
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+            ## $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
         }
 
@@ -2372,12 +2372,15 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPz__Scalar: {
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             ($y < 0)
               ? Math::GMPz::Rmpz_add_ui($r, $x, -$y)
               : Math::GMPz::Rmpz_sub_ui($r, $x, $y);
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-            return $r;
+            my $r2 =
+                Math::GMPz::Rmpz_fits_slong_p($r)
+              ? Math::GMPz::Rmpz_get_si($r)
+              : Math::GMPz::Rmpz_init_set($r);
+            return $r2;
         }
 
       Math_GMPq__Scalar: {
@@ -2630,15 +2633,17 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPz__Scalar: {
+            $y || return 0;
             my $r = Math::GMPz::Rmpz_init();
             ($y < 0)
               ? Math::GMPz::Rmpz_mul_si($r, $x, $y)
               : Math::GMPz::Rmpz_mul_ui($r, $x, $y);
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+            ## $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
         }
 
       Math_GMPq__Scalar: {
+            $y || return 0;
             my $r = Math::GMPq::Rmpq_init();
             ($y < 0)
               ? Math::GMPq::Rmpq_set_si($r, $y, 1)
@@ -2717,7 +2722,7 @@ package Sidef::Types::Number::Number {
       Math_GMPz__Math_GMPz: {
             my $r = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_mul($r, $x, $y);
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+            ## $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
         }
 
@@ -2846,11 +2851,14 @@ package Sidef::Types::Number::Number {
 
             # Check for exact divisibility
             if (Math::GMPz::Rmpz_divisible_ui_p($x, CORE::abs($y))) {
-                my $r = Math::GMPz::Rmpz_init();
+                state $r = Math::GMPz::Rmpz_init_nobless();
                 Math::GMPz::Rmpz_divexact_ui($r, $x, CORE::abs($y));
-                Math::GMPz::Rmpz_neg($r, $r)     if ($y < 0);
-                $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-                return $r;
+                Math::GMPz::Rmpz_neg($r, $r) if ($y < 0);
+                my $r2 =
+                    Math::GMPz::Rmpz_fits_slong_p($r)
+                  ? Math::GMPz::Rmpz_get_si($r)
+                  : Math::GMPz::Rmpz_init_set($r);
+                return $r2;
             }
 
             my $r = Math::GMPq::Rmpq_init();
@@ -3031,10 +3039,13 @@ package Sidef::Types::Number::Number {
 
             # Check for exact divisibility
             if (Math::GMPz::Rmpz_divisible_p($x, $y)) {
-                my $r = Math::GMPz::Rmpz_init();
+                state $r = Math::GMPz::Rmpz_init_nobless();
                 Math::GMPz::Rmpz_divexact($r, $x, $y);
-                $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-                return $r;
+                return (
+                          Math::GMPz::Rmpz_fits_slong_p($r)
+                        ? Math::GMPz::Rmpz_get_si($r)
+                        : Math::GMPz::Rmpz_init_set($r)
+                       );
             }
 
             my $r = Math::GMPq::Rmpq_init();
@@ -3547,10 +3558,13 @@ package Sidef::Types::Number::Number {
         $x = _any2mpz($x) // (goto &nan);
 
         if (!ref($y) and $y > 0) {
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_div_ui($r, $x, $y);
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-            return bless \$r;
+            my $r2 =
+                Math::GMPz::Rmpz_fits_slong_p($r)
+              ? Math::GMPz::Rmpz_get_si($r)
+              : Math::GMPz::Rmpz_init_set($r);
+            return bless \$r2;
         }
 
         $y = _any2mpz($y) // (goto &nan);
@@ -3570,10 +3584,13 @@ package Sidef::Types::Number::Number {
             }
         };
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_div($r, $x, $y);
-        $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_slong_p($r)
+          ? Math::GMPz::Rmpz_get_si($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     *fdiv       = \&idiv;
@@ -3957,10 +3974,9 @@ package Sidef::Types::Number::Number {
             goto &_nan;
         }
 
-        my $r = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_root($r, $x, $y);
-        $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-        $r;
+        Math::GMPz::Rmpz_fits_slong_p($r) ? Math::GMPz::Rmpz_get_si($r) : Math::GMPz::Rmpz_init_set($r);
     }
 
     sub iroot {
@@ -4216,7 +4232,7 @@ package Sidef::Types::Number::Number {
                 return $q;
             }
 
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
+            ## $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
             return $r;
         }
 
@@ -9405,15 +9421,21 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPq: {
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_set_q($r, $x);
             if (Math::GMPq::Rmpq_integer_p($x)) {
-                $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-                return $r;
+                return (
+                          Math::GMPz::Rmpz_fits_slong_p($r)
+                        ? Math::GMPz::Rmpz_get_si($r)
+                        : Math::GMPz::Rmpz_init_set($r)
+                       );
             }
             Math::GMPz::Rmpz_sub_ui($r, $r, 1) if Math::GMPq::Rmpq_sgn($x) < 0;
-            $r = Math::GMPz::Rmpz_get_si($r)   if Math::GMPz::Rmpz_fits_slong_p($r);
-            return $r;
+            return (
+                      Math::GMPz::Rmpz_fits_slong_p($r)
+                    ? Math::GMPz::Rmpz_get_si($r)
+                    : Math::GMPz::Rmpz_init_set($r)
+                   );
         }
 
       Math_MPC: {
@@ -9453,12 +9475,21 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPq: {
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_set_q($r, $x);
-            Math::GMPq::Rmpq_integer_p($x) && return $r;
+            if (Math::GMPq::Rmpq_integer_p($x)) {
+                return (
+                          Math::GMPz::Rmpz_fits_slong_p($r)
+                        ? Math::GMPz::Rmpz_get_si($r)
+                        : Math::GMPz::Rmpz_init_set($r)
+                       );
+            }
             Math::GMPz::Rmpz_add_ui($r, $r, 1) if Math::GMPq::Rmpq_sgn($x) > 0;
-            $r = Math::GMPz::Rmpz_get_si($r)   if Math::GMPz::Rmpz_fits_slong_p($r);
-            return $r;
+            return (
+                      Math::GMPz::Rmpz_fits_slong_p($r)
+                    ? Math::GMPz::Rmpz_get_si($r)
+                    : Math::GMPz::Rmpz_init_set($r)
+                   );
         }
 
       Math_MPC: {
@@ -9503,10 +9534,13 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPz: {
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_add_ui($r, $x, 1);
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-            return $r;
+            return (
+                      Math::GMPz::Rmpz_fits_slong_p($r)
+                    ? Math::GMPz::Rmpz_get_si($r)
+                    : Math::GMPz::Rmpz_init_set($r)
+                   );
         }
 
       Math_MPFR: {
@@ -9547,10 +9581,13 @@ package Sidef::Types::Number::Number {
         }
 
       Math_GMPz: {
-            my $r = Math::GMPz::Rmpz_init();
+            state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_sub_ui($r, $x, 1);
-            $r = Math::GMPz::Rmpz_get_si($r) if Math::GMPz::Rmpz_fits_slong_p($r);
-            return $r;
+            return (
+                      Math::GMPz::Rmpz_fits_slong_p($r)
+                    ? Math::GMPz::Rmpz_get_si($r)
+                    : Math::GMPz::Rmpz_init_set($r)
+                   );
         }
 
       Math_MPFR: {
@@ -13304,9 +13341,10 @@ package Sidef::Types::Number::Number {
 
         my @B = _bernoulli_numbers($p);
 
-        my $q = Math::GMPq::Rmpq_init();
-        my $u = Math::GMPz::Rmpz_init_set_ui(1);
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_set_ui($u, 1);
 
+        my $q   = Math::GMPq::Rmpq_init();
         my $sum = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_ui($sum, 0, 1);
 
@@ -13338,8 +13376,11 @@ package Sidef::Types::Number::Number {
         # z = sum/(p+1)
         Math::GMPq::Rmpq_get_num($u, $sum);
         Math::GMPz::Rmpz_divexact_ui($u, $u, $p + 1);
-        $u = Math::GMPz::Rmpz_get_ui($u) if Math::GMPz::Rmpz_fits_ulong_p($u);
-        bless \$u;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($u)
+          ? Math::GMPz::Rmpz_get_ui($u)
+          : Math::GMPz::Rmpz_init_set($u);
+        bless \$r2;
     }
 
     *faulhaber    = \&faulhaber_sum;
