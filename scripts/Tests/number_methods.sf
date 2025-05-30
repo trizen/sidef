@@ -1595,4 +1595,15 @@ assert_eq(20.of{.pillai(2) }, [0]+20.of{.pillai_sum(2)}.diffs)
 assert_eq(20.of{.pillai(3) }, [0]+20.of{.pillai_sum(3)}.diffs)
 assert_eq(20.of{.pillai(4) }, [0]+20.of{.pillai_sum(4)}.diffs)
 
+assert_eq([0]+20.of{ .sigma_sum }.diffs, 20.of { .sigma })
+assert_eq([0]+20.of{ .sigma_sum(0,1) }.diffs, 20.of { .tau * _ })
+assert_eq([0]+20.of{ .sigma_sum(1,1) }.diffs, 20.of { .sigma * _ })
+assert_eq([0]+20.of{ .sigma_sum(2,1) }.diffs, 20.of { .sigma(2) * _ })
+assert_eq([0]+20.of{ .sigma_sum(2,2) }.diffs, 20.of { .sigma(2) * _*_ })
+assert_eq([0]+20.of{ .sigma_sum(0,2) }.diffs, 20.of { .tau * _*_ })
+assert_eq([0]+20.of{ .sigma_sum(1,2) }.diffs, 20.of { .sigma * _*_ })
+assert_eq([0]+20.of{ .sigma_sum(2,0) }.diffs, 20.of { .sigma(2) })
+assert_eq([0]+20.of{ .sigma_sum(1) }.diffs, 20.of { .sigma(1) })
+assert_eq([0]+20.of{ .sigma_sum(0) }.diffs, 20.of { .tau })
+
 say "** Tests passed!"

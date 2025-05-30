@@ -26168,6 +26168,8 @@ package Sidef::Types::Number::Number {
         # TODO: use a faster formula
         # https://github.com/trizen/perl-scripts/blob/master/Math/partial_sums_of_euler_totient_function_fast.pl
 
+        # TODO: generalize to compute: Sum_{k=1..n} k^m * J_i(k)
+
         $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
         my $k_obj = bless \$k;
@@ -27922,17 +27924,30 @@ package Sidef::Types::Number::Number {
 
         my $k_obj = bless \$k;
 
-        my $f = sub { $_[0]->jordan_totient($k_obj) };
-        my $g = sub { $_[0]->ipow($k_obj) };
+        my $f = sub { $_[0]->ipow($k_obj)->mul($_[0]->tau) };
+        my $g = sub { HAS_PRIME_UTIL ? Math::Prime::Util::moebius(${$_[0]}) : Math::Prime::Util::GMP::moebius(${$_[0]}) };
 
-        my $F = sub { $_[0]->totient_sum($k_obj) };
-        my $G = sub { $_[0]->faulhaber_sum($k_obj) };
+        my $F = sub { $_[0]->sigma_sum(ZERO, $k_obj) };
+        my $G = sub { $_[0]->mertens };
 
         if ($k == 1) {
-            $g = sub { $_[0] };
-            $f = sub { $_[0]->euler_phi };
-            $F = sub { $_[0]->totient_sum };
+            $f = sub { $_[0]->mul($_[0]->tau) };
         }
+
+#<<<
+        # Alternative formula (slightly slower)
+        #~ my $f = sub { $_[0]->jordan_totient($k_obj) };
+        #~ my $g = sub { $_[0]->ipow($k_obj) };
+
+        #~ my $F = sub { $_[0]->totient_sum($k_obj) };
+        #~ my $G = sub { $_[0]->faulhaber_sum($k_obj) };
+
+        #~ if ($k == 1) {
+            #~ $g = sub { $_[0] };
+            #~ $f = sub { $_[0]->euler_phi };
+            #~ $F = sub { $_[0]->totient_sum };
+        #~ }
+#>>>
 
         $n->dirichlet_hyperbola($f, $g, $F, $G);
     }
@@ -28560,17 +28575,21 @@ package Sidef::Types::Number::Number {
     *σ = \&sigma;
 
     sub sigma_sum {
-        my ($n, $k) = @_;
+        my ($n, $k, $j) = @_;
 
         $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+        $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 0;
+
+        $k += $j;
 
         my $k_obj = bless \$k;
+        my $j_obj = bless \$j;
 
         my $f = sub { $_[0]->ipow($k_obj) };
-        my $g = sub { 1 };
+        my $g = sub { $_[0]->ipow($j_obj) };
 
         my $F = sub { $_[0]->faulhaber_sum($k_obj) };
-        my $G = sub { $_[0] };
+        my $G = sub { $_[0]->faulhaber_sum($j_obj) };
 
         if ($k == 0) {
             $f = sub { 1 };
@@ -28580,6 +28599,14 @@ package Sidef::Types::Number::Number {
         }
         elsif ($k == 1) {
             $f = sub { $_[0] };
+        }
+
+        if ($j == 0) {
+            $g = sub { 1 };
+            $G = sub { $_[0] };
+        }
+        elsif ($j == 1) {
+            $g = sub { $_[0] };
         }
 
         $n->dirichlet_hyperbola($f, $g, $F, $G);

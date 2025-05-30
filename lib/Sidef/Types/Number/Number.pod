@@ -8519,13 +8519,14 @@ Aliases: I<sign>
 
 =head2 sigma_sum
 
-    sigma_sum(n, k=1)
+    sigma_sum(n, k=1, j=0)
 
-Returns the sum of the C<sigma_k(j)> function, for C<j=1..n>.
+Returns the sum of C<m^j * sigma_k(m)>, for C<m=1..n>, computed in C<O(sqrt(n))> steps.
 
     say sigma_sum(100, 0)      #=> 482
     say sigma_sum(100, 1)      #=> 8299
     say sigma_sum(100, 2)      #=> 407819
+    say sigma_sum(100, 2, 3)   #=> 207528104123
 
 =cut
 
