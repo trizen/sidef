@@ -29888,6 +29888,9 @@ package Sidef::Types::Number::Number {
                 }
                 my $arr = Math::Prime::Util::semi_primes($from, $to);
                 (@$arr = grep { !Math::Prime::Util::is_square($_) } @$arr) if $squarefree;
+                if (@$arr and ref($arr->[-1])) { # unbox Math::* objects
+                    @$arr = map { "$_" } @$arr;
+                }
                 return $arr;
             }
         }
