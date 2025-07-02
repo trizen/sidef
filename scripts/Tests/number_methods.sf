@@ -1606,4 +1606,19 @@ assert_eq([0]+20.of{ .sigma_sum(2,0) }.diffs, 20.of { .sigma(2) })
 assert_eq([0]+20.of{ .sigma_sum(1) }.diffs, 20.of { .sigma(1) })
 assert_eq([0]+20.of{ .sigma_sum(0) }.diffs, 20.of { .tau })
 
+assert_eq(3.strong_fermat_psp(2,13981,15841), [15841])
+assert_eq(3.strong_fermat_psp(2,15841-10,15841+10), [15841])
+assert_eq(3.strong_fermat_psp(2,13981-10,13981+10), [])
+assert_eq(3.strong_fermat_psp(2,635401-10,635401+10), [635401])
+assert_eq(3.strong_fermat_psp(2,950797-10,950797+10), [])
+
+assert_eq(3.squarefree_strong_fermat_psp(2,13981,15841), [15841])
+assert_eq(3.squarefree_strong_fermat_psp(2,15841-10,15841+10), [15841])
+assert_eq(3.squarefree_strong_fermat_psp(2,13981-10,13981+10), [])
+assert_eq(3.squarefree_strong_fermat_psp(2,635401-10,635401+10), [635401])
+assert_eq(3.squarefree_strong_fermat_psp(2,950797-10,950797+10), [])
+
+assert_eq(3.almost_primes(2**65 - 100, 2**65 + 100).sum, 1365059061454506819408)
+assert_eq(3.squarefree_almost_primes(2**65 - 100, 2**65 + 100).sum, 1291272085159668613085)
+
 say "** Tests passed!"

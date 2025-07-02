@@ -74,6 +74,10 @@ package Sidef::Types::Number::Number {
         PRIMESUM_MIN   => List::Util::min(ULONG_MAX >> 14, (HAS_PRIME_UTIL ? 1e8  : 1e5)),        # absolute value
     };
 
+    if (HAS_NEW_PRIME_UTIL) {
+        eval { Math::Prime::Util::prime_set_config(bigint => 'Math::GMPz') };
+    }
+
     state $round_z = Math::MPFR::MPFR_RNDZ();
 
     my %DIGITS_36;
@@ -29198,8 +29202,45 @@ package Sidef::Types::Number::Number {
 
         my @omega_primes;
 
-        # TODO: optimization when A and B are close to each other.
-        # Idea: if |A-B| < sqrt(B), then just iterate over the range A..B and grep the k-omega primes.
+        {
+            # Optimization when A and B are close to each other.
+            # If |A-B| < B^(1/(k+1)), then just iterate over the range A..B and grep the k-omega primes.
+            state $t = Math::GMPz::Rmpz_init_nobless();
+            state $u = Math::GMPz::Rmpz_init_nobless();
+
+            Math::GMPz::Rmpz_sub($t, $to, $from);
+            Math::GMPz::Rmpz_root($u, $to, $k + 1);
+
+            if (Math::GMPz::Rmpz_cmp($t, $u) < 0) {
+
+                $VERBOSE && say STDERR "omega_primes: small range: ($from, $to) with k = $k";
+
+                my $v        = Math::GMPz::Rmpz_init_set($from);
+                my $o        = bless \$v;
+                my $k_obj    = bless \$k;
+                my $base_obj = bless \$fermat;
+
+                my @arr;
+                for (; Math::GMPz::Rmpz_cmp($v, $to) <= 0 ; Math::GMPz::Rmpz_add_ui($v, $v, 1)) {
+                    if ($fermat) {
+                        if ($strong) {
+                            $o->is_strong_fermat_psp($base_obj) || next;
+                        }
+                        else {
+                            $o->is_fermat_psp($base_obj) || next;
+                        }
+                    }
+                    if ($k == 1) {
+                        $o->is_prime_power || next;
+                    }
+                    else {
+                        $o->is_omega_prime($k_obj) || next;
+                    }
+                    push @arr, Math::GMPz::Rmpz_init_set($v);
+                }
+                return \@arr;
+            }
+        }
 
         if (0 and HAS_NEWER_PRIME_UTIL and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
@@ -29880,25 +29921,81 @@ package Sidef::Types::Number::Number {
             and Math::GMPz::Rmpz_fits_ulong_p($to)) {
             return Math::Prime::Util::almost_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
         }
-        elsif ($k == 2 and !$fermat) {
-            if (HAS_PRIME_UTIL) {
-                if (Math::GMPz::Rmpz_fits_ulong_p($to)) {
-                    $from = Math::GMPz::Rmpz_get_ui($from);
-                    $to   = Math::GMPz::Rmpz_get_ui($to);
-                }
-                my $arr = Math::Prime::Util::semi_primes($from, $to);
-                (@$arr = grep { !Math::Prime::Util::is_square($_) } @$arr) if $squarefree;
-                if (@$arr and ref($arr->[-1])) { # unbox Math::* objects
-                    @$arr = map { "$_" } @$arr;
-                }
-                return $arr;
+        elsif (HAS_PRIME_UTIL and $k == 2 and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+
+            $from = Math::GMPz::Rmpz_get_ui($from);
+            $to   = Math::GMPz::Rmpz_get_ui($to);
+
+            my $arr = Math::Prime::Util::semi_primes($from, $to);
+            if ($squarefree) {
+                @$arr = grep { !Math::Prime::Util::is_square($_) } @$arr;
             }
+            return $arr;
         }
 
         my @almost_primes;
 
-        # TODO: optimization when A and B are close to each other.
-        # Idea: if |A-B| < sqrt(B), then just iterate over the range A..B and grep the k-almost primes.
+        {
+            # Optimization when A and B are close to each other.
+            # If |A-B| < B^(1/k), then just iterate over the range A..B and grep the k-almost primes.
+            state $t = Math::GMPz::Rmpz_init_nobless();
+            state $u = Math::GMPz::Rmpz_init_nobless();
+
+            Math::GMPz::Rmpz_sub($t, $to, $from);
+            Math::GMPz::Rmpz_root($u, $to, $k);
+
+            if (Math::GMPz::Rmpz_cmp($t, $u) < 0) {
+
+                $VERBOSE and say STDERR "almost_primes: small range: ($from, $to) with k = $k";
+
+                my $v        = Math::GMPz::Rmpz_init_set($from);
+                my $o        = bless \$v;
+                my $base_obj = bless \$fermat;
+                my $k_obj    = bless \$k;
+
+                my @arr;
+                for (; Math::GMPz::Rmpz_cmp($v, $to) <= 0 ; Math::GMPz::Rmpz_add_ui($v, $v, 1)) {
+                    if ($fermat) {
+                        if ($strong) {
+                            $o->is_strong_fermat_psp($base_obj) || next;
+                        }
+                        else {
+                            $o->is_fermat_psp($base_obj) || next;
+                        }
+                    }
+                    if ($carmichael) {
+                        $o->is_carmichael || next;
+                    }
+                    if ($lucas_carmichael) {
+                        $o->is_lucas_carmichael || next;
+                    }
+                    if ($squarefree) {
+                        if ($k == 1) {
+                            $o->is_prime || next;
+                        }
+                        elsif ($k == 2) {
+                            $o->is_squarefree_semiprime || next;
+                        }
+                        else {
+                            $o->is_squarefree_almost_prime($k_obj) || next;
+                        }
+                    }
+                    else {
+                        if ($k == 1) {
+                            $o->is_prime || next;
+                        }
+                        elsif ($k == 2) {
+                            $o->is_semiprime || next;
+                        }
+                        else {
+                            $o->is_almost_prime($k_obj) || next;
+                        }
+                    }
+                    push @arr, Math::GMPz::Rmpz_init_set($v);
+                }
+                return \@arr;
+            }
+        }
 
         if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
