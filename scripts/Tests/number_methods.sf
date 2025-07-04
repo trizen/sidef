@@ -1620,5 +1620,8 @@ assert_eq(3.squarefree_strong_fermat_psp(2,950797-10,950797+10), [])
 
 assert_eq(3.almost_primes(2**65 - 100, 2**65 + 100).sum, 1365059061454506819408)
 assert_eq(3.squarefree_almost_primes(2**65 - 100, 2**65 + 100).sum, 1291272085159668613085)
+assert_eq(3.omega_primes(2**65 - 100, 2**65 + 100).sum, 1807780919223536058347)
+
+assert_eq(prime_powers(50, 100), %n[53, 59, 61, 64, 67, 71, 73, 79, 81, 83, 89, 97])
 
 say "** Tests passed!"

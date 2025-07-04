@@ -29200,6 +29200,10 @@ package Sidef::Types::Number::Number {
         return [1] if ($k == 0 and $to >= 1 and $from <= 1);
         return []  if ($k == 0);
 
+        if (HAS_NEWER_PRIME_UTIL and $k == 1 and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {    # prime powers
+            return scalar Math::Prime::Util::prime_powers(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+        }
+
         my @omega_primes;
 
         {
