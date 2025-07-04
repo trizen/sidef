@@ -26187,6 +26187,9 @@ package Sidef::Types::Number::Number {
         if ($k == 1) {
             $f = sub { $_[0] };
         }
+        elsif ($k == 2) {
+            $f = sub { $_[0]->sqr };
+        }
 
         $n->dirichlet_hyperbola($f, $g, $F, $G);
     }
@@ -27049,6 +27052,35 @@ package Sidef::Types::Number::Number {
     *psi         = \&dedekind_psi;
     *DedekindPsi = \&dedekind_psi;
 
+    sub dedekind_psi_sum {
+        my ($n, $k) = @_;
+
+        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+        my $k_obj = bless \$k;
+
+        my $f = sub { $_[0]->is_squarefree ? 1 : 0 };
+        my $g = sub { $_[0]->ipow($k_obj) };
+
+        my $F = sub { $_[0]->squarefree_count };
+        my $G = sub { $_[0]->faulhaber_sum($k_obj) };
+
+        if ($k == 0) {
+            $g = sub { 1 };
+            $G = sub { $_[0] };
+        }
+        elsif ($k == 1) {
+            $g = sub { $_[0] };
+        }
+        elsif ($k == 2) {
+            $g = sub { $_[0]->sqr };
+        }
+
+        $n->dirichlet_hyperbola($f, $g, $F, $G);
+    }
+
+    *psi_sum = \&dedekind_psi_sum;
+
     sub carmichael_lambda {
         my ($n) = @_;
 
@@ -27190,6 +27222,9 @@ package Sidef::Types::Number::Number {
         if ($k == 1) {
             $f = sub { $_[0] };
         }
+        elsif ($k == 2) {
+            $f = sub { $_[0]->sqr };
+        }
 
         if ($k == 0) {
             $f = sub { 1 };
@@ -27299,6 +27334,9 @@ package Sidef::Types::Number::Number {
 
         if ($k == 1) {
             $f = sub { $_[0] };
+        }
+        elsif ($k == 2) {
+            $f = sub { $_[0]->sqr };
         }
 
         if ($k == 0) {
@@ -28604,6 +28642,9 @@ package Sidef::Types::Number::Number {
         elsif ($k == 1) {
             $f = sub { $_[0] };
         }
+        elsif ($k == 2) {
+            $f = sub { $_[0]->sqr };
+        }
 
         if ($j == 0) {
             $g = sub { 1 };
@@ -28611,6 +28652,9 @@ package Sidef::Types::Number::Number {
         }
         elsif ($j == 1) {
             $g = sub { $_[0] };
+        }
+        elsif ($j == 2) {
+            $g = sub { $_[0]->sqr };
         }
 
         $n->dirichlet_hyperbola($f, $g, $F, $G);

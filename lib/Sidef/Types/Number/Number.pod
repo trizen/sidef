@@ -7990,6 +7990,19 @@ Aliases: I<dedekind_psi>
 
 =cut
 
+=head2 psi_sum
+
+    n.psi_sum(k=1)
+
+Returns the sum of the Dedekind psi function C<ψ_k(j)>, for C<j=1..n>.
+
+    say psi_sum(100, 1)      #=> 7664
+    say psi_sum(100, 2)      #=> 400576
+
+Aliases: I<dedekind_psi_sum>
+
+=cut
+
 =head2 pyramidal
 
     n.pyramidal(k)
