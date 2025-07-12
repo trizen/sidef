@@ -30081,28 +30081,6 @@ package Sidef::Types::Number::Number {
 
         my $squarefree = $opt{squarefree};
 
-        if (    HAS_NEWER_PRIME_UTIL
-            and !$squarefree
-            and !$fermat
-            and !$carmichael
-            and !$lucas_carmichael
-            and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-            return Math::Prime::Util::almost_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
-        }
-        elsif (HAS_PRIME_UTIL and $k == 2 and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-
-            $from = Math::GMPz::Rmpz_get_ui($from);
-            $to   = Math::GMPz::Rmpz_get_ui($to);
-
-            my $arr = Math::Prime::Util::semi_primes($from, $to);
-            if ($squarefree) {
-                @$arr = grep { !Math::Prime::Util::is_square($_) } @$arr;
-            }
-            return $arr;
-        }
-
-        my @almost_primes;
-
         {
             # Optimization when A and B are close to each other.
             # If |A-B| < B^(1/k), then just iterate over the range A..B and grep the k-almost primes.
@@ -30164,6 +30142,28 @@ package Sidef::Types::Number::Number {
                 return \@arr;
             }
         }
+
+        if (    HAS_NEWER_PRIME_UTIL
+            and !$squarefree
+            and !$fermat
+            and !$carmichael
+            and !$lucas_carmichael
+            and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+            return Math::Prime::Util::almost_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+        }
+        elsif (HAS_PRIME_UTIL and $k == 2 and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+
+            $from = Math::GMPz::Rmpz_get_ui($from);
+            $to   = Math::GMPz::Rmpz_get_ui($to);
+
+            my $arr = Math::Prime::Util::semi_primes($from, $to);
+            if ($squarefree) {
+                @$arr = grep { !Math::Prime::Util::is_square($_) } @$arr;
+            }
+            return $arr;
+        }
+
+        my @almost_primes;
 
         if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
