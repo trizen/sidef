@@ -1626,6 +1626,21 @@ assert_eq(20.of{.bigomega(1)}.acc, 20.of{.bigomega_sum(1)})
 assert_eq(20.of{.bigomega(2)}.acc, 20.of{.bigomega_sum(2)})
 assert_eq(20.of{.bigomega(3)}.acc, 20.of{.bigomega_sum(3)})
 
+assert_eq(20.of{.exp_omega(0)}.acc, 20.of{.exp_omega_sum(0)})
+assert_eq(20.of{.exp_omega(1)}.acc, 20.of{.exp_omega_sum(1)})
+assert_eq(20.of{.exp_omega(2)}.acc, 20.of{.exp_omega_sum(2)})
+assert_eq(20.of{.exp_omega(-1)}.acc, 20.of{.exp_omega_sum(-1)})
+
+assert_eq(20.of{.exp_squarefree_omega(0)}.acc, 20.of{.exp_squarefree_omega_sum(0)})
+assert_eq(20.of{.exp_squarefree_omega(1)}.acc, 20.of{.exp_squarefree_omega_sum(1)})
+assert_eq(20.of{.exp_squarefree_omega(2)}.acc, 20.of{.exp_squarefree_omega_sum(2)})
+assert_eq(20.of{.exp_squarefree_omega(-1)}.acc, 20.of{.exp_squarefree_omega_sum(-1)})
+
+assert_eq(20.of{.exp_bigomega(0)}.acc, 20.of{.exp_bigomega_sum(0)})
+assert_eq(20.of{.exp_bigomega(1)}.acc, 20.of{.exp_bigomega_sum(1)})
+assert_eq(20.of{.exp_bigomega(2)}.acc, 20.of{.exp_bigomega_sum(2)})
+assert_eq(20.of{.exp_bigomega(-1)}.acc, 20.of{.exp_bigomega_sum(-1)})
+
 assert_eq(3.strong_fermat_psp(2,13981,15841), [15841])
 assert_eq(3.strong_fermat_psp(2,15841-10,15841+10), [15841])
 assert_eq(3.strong_fermat_psp(2,13981-10,13981+10), [])

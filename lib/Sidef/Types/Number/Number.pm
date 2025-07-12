@@ -14169,6 +14169,94 @@ package Sidef::Types::Number::Number {
 
     *moebius_sum = \&mertens;
 
+    sub exp_bigomega {
+        my ($n, $k) = @_;
+        _valid(\$k);
+        $n->is_positive || return ZERO;
+        $k->pow($n->bigomega);
+    }
+
+    sub exp_bigomega_sum {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n);
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO;
+        }
+
+        my $n_obj = bless \$n;
+
+        my @terms;
+        foreach my $i (0 .. __ilog__($n, 2)) {
+            my $i_obj = _set_int($i);
+            push @terms, $i_obj->almost_prime_count($n_obj)->mul($k->pow($i_obj));
+        }
+
+        Sidef::Types::Number::Number::sum(@terms);
+    }
+
+    sub exp_omega {
+        my ($n, $k) = @_;
+        _valid(\$k);
+        $n->is_positive || return ZERO;
+        $k->pow($n->omega);
+    }
+
+    sub exp_omega_sum {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n);
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO;
+        }
+
+        my $n_obj = bless \$n;
+
+        my @terms;
+        foreach my $i (0 .. __ilog__($n, 2)) {
+            my $i_obj = _set_int($i);
+            push @terms, $i_obj->omega_prime_count($n_obj)->mul($k->pow($i_obj));
+        }
+
+        Sidef::Types::Number::Number::sum(@terms);
+    }
+
+    sub exp_squarefree_omega {    # k^omega(n) * mu(n)^2
+        my ($n, $k) = @_;
+        _valid(\$k);
+        $n->is_positive   || return ZERO;
+        $n->is_squarefree || return ZERO;
+        $k->pow($n->omega);
+    }
+
+    sub exp_squarefree_omega_sum {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        $n = _any2mpz($$n);
+
+        if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+            return ZERO;
+        }
+
+        my $n_obj = bless \$n;
+
+        my @terms;
+        foreach my $i (0 .. __ilog__($n, 2)) {
+            my $i_obj = _set_int($i);
+            push @terms, $i_obj->squarefree_almost_prime_count($n_obj)->mul($k->pow($i_obj));
+        }
+
+        Sidef::Types::Number::Number::sum(@terms);
+    }
+
     sub liouville_sum {
         my ($from, $to) = @_;
 
@@ -14214,6 +14302,10 @@ package Sidef::Types::Number::Number {
 
         if (defined(my $value = $liouville_table->{$n})) {
             return bless \$value;
+        }
+
+        if (HAS_NEW_PRIME_UTIL and $n < ULONG_MAX and $n > 1e6) {    # this is faster for large n
+            return ((MONE)->exp_bigomega_sum(bless \$n));
         }
 
         my $L    = 0;

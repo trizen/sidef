@@ -3105,6 +3105,25 @@ Exponential function: C<2^x>.
 
 =cut
 
+=head2 exp_bigomega
+
+    exp_bigomega(n,k)
+
+Returns the result of C<k**bigomega(n)>.
+
+=cut
+
+=head2 exp_bigomega_sum
+
+    exp_bigomega_sum(n,k)
+
+Partial sums of the C<exp_bigomega()> function.
+
+    exp_bigomega_sum(n,  2)    # Sum_{k=1..n} 2^bigomega(k)
+    exp_bigomega_sum(n, -1)    # Sum_{k=1..n} (-1)^bigomega(k) = liouville_sum(n)
+
+=cut
+
 =head2 exp_mangoldt
 
     exp_mangoldt(n)
@@ -3149,6 +3168,44 @@ Complex numbers are also supported:
 Equivalent with:
 
     exp(n) / b**k        # for some positive integer value of k
+
+=cut
+
+=head2 exp_omega
+
+    exp_omega(n,k)
+
+Returns the result of C<k**omega(n)>.
+
+=cut
+
+=head2 exp_omega_sum
+
+    exp_omega_sum(n,k)
+
+Partial sums of the C<exp_omega()> function.
+
+    exp_omega_sum(n,  2)    # Sum_{k=1..n} 2^omega(k)
+    exp_omega_sum(n, -1)    # Sum_{k=1..n} (-1)^omega(k)
+
+=cut
+
+=head2 exp_squarefree_omega
+
+    exp_squarefree_omega(n,k)
+
+Returns the result of C<k**omega(n) * mu(n)**2>.
+
+=cut
+
+=head2 exp_squarefree_omega_sum
+
+    exp_squarefree_omega_sum(n,k)
+
+Partial sums of the C<exp_squarefree_omega()> function.
+
+    exp_squarefree_omega_sum(n,  3)     # Sum_{k=1..n} 3^omega(k) * mu(k)^2
+    exp_squarefree_omega_sum(n, -1)     # Sum_{k=1..n} (-1)^omega(k) * mu(k)^2 = mertens(n)
 
 =cut
 
