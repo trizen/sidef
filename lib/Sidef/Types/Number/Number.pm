@@ -14305,7 +14305,7 @@ package Sidef::Types::Number::Number {
         }
 
         if (HAS_NEW_PRIME_UTIL and $n < ULONG_MAX and $n > 1e6) {    # this is faster for large n
-            return ((MONE)->exp_bigomega_sum(bless \$n));
+            return ((bless \$n)->exp_bigomega_sum(MONE));
         }
 
         my $L    = 0;

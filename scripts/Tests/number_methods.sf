@@ -1641,6 +1641,8 @@ assert_eq(20.of{.exp_bigomega(1)}.acc, 20.of{.exp_bigomega_sum(1)})
 assert_eq(20.of{.exp_bigomega(2)}.acc, 20.of{.exp_bigomega_sum(2)})
 assert_eq(20.of{.exp_bigomega(-1)}.acc, 20.of{.exp_bigomega_sum(-1)})
 
+assert_eq(liouville_sum(1e6+1234), -514)
+
 assert_eq(3.strong_fermat_psp(2,13981,15841), [15841])
 assert_eq(3.strong_fermat_psp(2,15841-10,15841+10), [15841])
 assert_eq(3.strong_fermat_psp(2,13981-10,13981+10), [])
