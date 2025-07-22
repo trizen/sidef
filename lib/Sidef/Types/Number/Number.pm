@@ -14219,7 +14219,7 @@ package Sidef::Types::Number::Number {
         my $n_obj = bless \$n;
 
         my @terms;
-        foreach my $i (0 .. CORE::int($n_obj->log->lambert_w->exp->numify)) {
+        foreach my $i (0 .. CORE::int($n_obj->log->lambert_w->exp->numify) + 1) {
             my $i_obj = _set_int($i);
             push @terms, $i_obj->omega_prime_count($n_obj)->mul($k->pow($i_obj));
         }
@@ -14249,7 +14249,7 @@ package Sidef::Types::Number::Number {
         my $n_obj = bless \$n;
 
         my @terms;
-        foreach my $i (0 .. CORE::int($n_obj->log->lambert_w->exp->numify)) {
+        foreach my $i (0 .. CORE::int($n_obj->log->lambert_w->exp->numify) + 1) {
             my $i_obj = _set_int($i);
             push @terms, $i_obj->squarefree_almost_prime_count($n_obj)->mul($k->pow($i_obj));
         }
