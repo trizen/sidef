@@ -705,8 +705,8 @@ package Sidef::Types::Number::Number {
         if (!ref($x)) {
 
             if (defined($k)) {
-                state $table = [];
-                my $mpz = ($table->[$k] //= Math::GMPz::Rmpz_init());
+                state @table;
+                my $mpz = ($table[$k] //= Math::GMPz::Rmpz_init());
                 ($x < ULONG_MAX and $x > LONG_MIN)
                   ? (($x < 0) ? Math::GMPz::Rmpz_set_si($mpz, $x) : Math::GMPz::Rmpz_set_ui($mpz, $x))
                   : Math::GMPz::Rmpz_set_str($mpz, $x, 10);
@@ -14219,7 +14219,7 @@ package Sidef::Types::Number::Number {
         my $n_obj = bless \$n;
 
         my @terms;
-        foreach my $i (0 .. __ilog__($n, 2)) {
+        foreach my $i (0 .. CORE::int($n_obj->log->lambert_w->exp->numify)) {
             my $i_obj = _set_int($i);
             push @terms, $i_obj->omega_prime_count($n_obj)->mul($k->pow($i_obj));
         }
@@ -14249,7 +14249,7 @@ package Sidef::Types::Number::Number {
         my $n_obj = bless \$n;
 
         my @terms;
-        foreach my $i (0 .. __ilog__($n, 2)) {
+        foreach my $i (0 .. CORE::int($n_obj->log->lambert_w->exp->numify)) {
             my $i_obj = _set_int($i);
             push @terms, $i_obj->squarefree_almost_prime_count($n_obj)->mul($k->pow($i_obj));
         }
@@ -16813,6 +16813,13 @@ package Sidef::Types::Number::Number {
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
 
+        Math::GMPz::Rmpz_set_ui($t, 0);
+        Math::GMPz::Rmpz_setbit($t, $k);
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
+
         my $total = Math::GMPz::Rmpz_init_set_ui(0);
 
         sub {
@@ -16892,6 +16899,19 @@ package Sidef::Types::Number::Number {
         }
 
         state $t = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_ui($t, 0);
+        Math::GMPz::Rmpz_setbit($t, $k);
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
+
+        Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
 
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -16988,6 +17008,19 @@ package Sidef::Types::Number::Number {
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
 
+        Math::GMPz::Rmpz_set_ui($t, 0);
+        Math::GMPz::Rmpz_setbit($t, $k);
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
+
+        Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
+
         my $total = Math::GMPz::Rmpz_init_set_ui(0);
 
         sub {
@@ -17070,6 +17103,19 @@ package Sidef::Types::Number::Number {
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
         state $v = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_ui($t, 0);
+        Math::GMPz::Rmpz_setbit($t, $k);
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
+
+        Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
 
         if ((HAS_NEWER_PRIME_UTIL or (HAS_NEW_PRIME_UTIL and $k < 15)) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return _set_int(Math::Prime::Util::omega_prime_count($k, Math::GMPz::Rmpz_get_ui($n)));
@@ -17188,6 +17234,19 @@ package Sidef::Types::Number::Number {
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
         state $v = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_ui($t, 0);
+        Math::GMPz::Rmpz_setbit($t, $k);
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
+
+        Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
 
         my $total = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -29472,7 +29531,11 @@ package Sidef::Types::Number::Number {
             my $A = Math::GMPz::Rmpz_get_ui($from);
             my $B = Math::GMPz::Rmpz_get_ui($to);
 
-            $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
+            $A = Math::Prime::Util::vecmax($A, Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
+
+            if ($A > $B) {
+                return [];
+            }
 
             my %znorder;
 
@@ -29636,6 +29699,11 @@ package Sidef::Types::Number::Number {
             # A = max(A, u)
             if (Math::GMPz::Rmpz_cmp($u, $A) > 0) {
                 Math::GMPz::Rmpz_set($A, $u);
+            }
+
+            # Return early when A > B
+            if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
+                return [];
             }
 
             my %seen;
@@ -30088,7 +30156,7 @@ package Sidef::Types::Number::Number {
             $from = $ONE;
         }
 
-        my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e7;
+        my $step = ($k > 8) ? Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10) : 1e7;
 
         if ($step > ULONG_MAX) {
             $step = Math::GMPz::Rmpz_init_set_str("$step", 10);
@@ -30225,8 +30293,7 @@ package Sidef::Types::Number::Number {
 
             if ($squarefree) {
                 if ($carmichael or $lucas_carmichael) {
-                    my $m = Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::pn_primorial($k + 1), 2);
-                    $A = Math::Prime::Util::vecmax($A, $m);
+                    $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::divint(Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k + 1), 10), 2));
 
                     if ($carmichael) {
                         $max_p = (1 + Math::Prime::Util::GMP::sqrtint(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint(8, $B), 1))) >> 2;
@@ -30236,11 +30303,15 @@ package Sidef::Types::Number::Number {
                     }
                 }
                 else {
-                    $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::pn_primorial($k));
+                    $A = Math::Prime::Util::vecmax($A, Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
                 }
             }
             else {
                 $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::powint(2, $k));
+            }
+
+            if ($A > $B) {
+                return [];
             }
 
             my %znorder;
@@ -30453,8 +30524,7 @@ package Sidef::Types::Number::Number {
 
             if ($squarefree) {
                 if ($carmichael or $lucas_carmichael) {
-                    my $m = Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::pn_primorial($k + 1), 2);
-                    Math::GMPz::Rmpz_set_str($u, $m, 10);
+                    Math::GMPz::Rmpz_set_str($u, Math::Prime::Util::GMP::divint(Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k + 1), 10), 2), 10);
 
                     if ($carmichael) {
 
@@ -30474,7 +30544,7 @@ package Sidef::Types::Number::Number {
                     }
                 }
                 else {
-                    Math::GMPz::Rmpz_set_str($u, Math::Prime::Util::GMP::pn_primorial($k), 10);
+                    Math::GMPz::Rmpz_set($u, _cached_pn_primorial($k));
                 }
             }
             else {
@@ -30485,6 +30555,11 @@ package Sidef::Types::Number::Number {
             # A = max(A, u)
             if (Math::GMPz::Rmpz_cmp($u, $A) > 0) {
                 Math::GMPz::Rmpz_set($A, $u);
+            }
+
+            # Return early when A > B
+            if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
+                return [];
             }
 
             my %znorder;
@@ -31393,7 +31468,7 @@ package Sidef::Types::Number::Number {
             $from = $ONE;
         }
 
-        my $step = ($k > 8) ? Math::Prime::Util::GMP::pn_primorial($k) : 1e7;
+        my $step = ($k > 8) ? Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10) : 1e7;
 
         if ($step > ULONG_MAX) {
             $step = Math::GMPz::Rmpz_init_set_str("$step", 10);
@@ -31437,7 +31512,7 @@ package Sidef::Types::Number::Number {
         }
 
         # TODO: tweak the step value for better performance
-        my $step = Math::Prime::Util::GMP::vecprod(($k) x (($k >> 1) + 1), Math::Prime::Util::GMP::pn_primorial($k));
+        my $step = Math::Prime::Util::GMP::vecprod(($k) x (($k >> 1) + 1), Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
 
         if ($step < 1e7) {
             $step = '1' . ('0' x 7);
@@ -31488,7 +31563,7 @@ package Sidef::Types::Number::Number {
         }
 
         # TODO: tweak the step value for better performance
-        my $step = Math::Prime::Util::GMP::vecprod(($k) x ($k + 1), Math::Prime::Util::GMP::pn_primorial($k));
+        my $step = Math::Prime::Util::GMP::vecprod(($k) x ($k + 1), Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
 
         if ($step < 1e8) {
             $step = '1' . ('0' x 8);
@@ -31549,7 +31624,7 @@ package Sidef::Types::Number::Number {
         }
 
         # TODO: tweak the step value for better performance
-        my $step = Math::Prime::Util::GMP::vecprod(($k) x (($k >> 1) + 1), Math::Prime::Util::GMP::pn_primorial($k));
+        my $step = Math::Prime::Util::GMP::vecprod(($k) x (($k >> 1) + 1), Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
 
         if ($step < 1e7) {
             $step = 1e7;
@@ -31600,7 +31675,7 @@ package Sidef::Types::Number::Number {
         }
 
         # TODO: tweak the step value for better performance
-        my $step = Math::Prime::Util::GMP::vecprod(($k + 1) x (($k + 1) >> 1), Math::Prime::Util::GMP::pn_primorial($k));
+        my $step = Math::Prime::Util::GMP::vecprod(($k + 1) x (($k + 1) >> 1), Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
 
         if ($step < 1e7) {
             $step = '1' . ('0' x 7);
@@ -31651,7 +31726,7 @@ package Sidef::Types::Number::Number {
         }
 
         # TODO: tweak the step value for better performance
-        my $step = Math::Prime::Util::GMP::vecprod(($k) x ($k + 1), Math::Prime::Util::GMP::pn_primorial($k));
+        my $step = Math::Prime::Util::GMP::vecprod(($k) x ($k + 1), Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
 
         if ($step < 1e7) {
             $step = '1' . ('0' x 7);
@@ -31710,7 +31785,7 @@ package Sidef::Types::Number::Number {
         }
 
         # TODO: tweak the step value for better performance
-        my $step = Math::Prime::Util::GMP::vecprod(($k + 1) x (($k + 1) >> 1), Math::Prime::Util::GMP::pn_primorial($k));
+        my $step = Math::Prime::Util::GMP::vecprod(($k + 1) x (($k + 1) >> 1), Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
 
         if ($step < 1e7) {
             $step = '1' . ('0' x 7);
@@ -31761,7 +31836,7 @@ package Sidef::Types::Number::Number {
         }
 
         # TODO: tweak the step value for better performance
-        my $step = Math::Prime::Util::GMP::vecprod(($k) x ($k + 1), Math::Prime::Util::GMP::pn_primorial($k));
+        my $step = Math::Prime::Util::GMP::vecprod(($k) x ($k + 1), Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
 
         if ($step < 1e6) {
             $step = '1' . ('0' x 6);
