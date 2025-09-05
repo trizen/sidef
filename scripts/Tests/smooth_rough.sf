@@ -145,6 +145,7 @@ assert_eq(11.rough_count(2**64), 4216398645419326083)
 assert_eq(11.rough_count(2**64 + 1), 4216398645419326084)
 assert_eq(12.rough_count(2**64), 3833089677653932802)
 assert_eq(5.rough_count(2**64),  6148914691236517205)
+assert_eq(19.rough_count(2**65), 6660210118638507676)
 
 do {
     for k in (2..10) {
@@ -201,6 +202,88 @@ do {
         assert_eq(k.smooth_divisors(n), n.divisors.grep{.is_smooth(k)})
         assert_eq(k.rough_divisors(n), n.divisors.grep{.is_rough(k)})
     }}
+}
+
+func my_rough_count_1 (n,k) {
+
+    var P = k.dec.primes
+
+    if (P.len == 0) {
+        return n
+    }
+
+    func (n,a) is cached {
+
+        var count = (n - (n >> 1))
+
+        for j in (1 ..^ a) {
+            count -= __FUNC__(idiv(n, P[j]), j)
+        }
+
+        return count
+    }(n, P.len)
+}
+
+func my_rough_count_2 (n, k) {
+
+    var P = k.dec.primes
+
+    func (n,a) is cached {
+
+        if (a == 0) {
+            return n
+        }
+
+        __FUNC__(n, a-1) - __FUNC__(idiv(n, P[a-1]), a-1)
+    }(n, P.len)
+}
+
+func my_rough_count_3 (n,k) {
+
+    if (n <= 0) {
+        return 0
+    }
+
+    func (n,p) is cached {
+
+        if (p > n.isqrt) {
+            return 1
+        }
+
+        if (p == 2) {
+            return (n >> 1)
+        }
+
+        if (p == 3) {
+            var t = idiv(n,3)
+            return (t - (t >> 1))
+        }
+
+        var u = 0
+        var t = idiv(n,p)
+
+        for (var q = 2; q < p; q.next_prime!) {
+
+            var v = __FUNC__(t - (t % q), q)
+
+            if (v == 1) {
+                u += prime_count(q, p-1)
+                break
+            }
+
+            u += v
+        }
+
+        t - u
+    }(n*k, k)
+}
+
+for p in (primes(23)) {
+    var values = 15.range.map { irand(10**_) }
+    var built_in = 15.range.map { p.rough_count(values[_]) }
+    assert_eq(15.range.map { my_rough_count_1(values[_], p) }, built_in)
+    assert_eq(15.range.map { my_rough_count_2(values[_], p) }, built_in)
+    assert_eq(15.range.map { my_rough_count_3(values[_], p) }, built_in)
 }
 
 say "** Test passed!"

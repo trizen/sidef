@@ -33084,92 +33084,84 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        my $count = sub {
-            my ($n, $p) = @_;
+        my %cache;
+        my @P = (HAS_PRIME_UTIL ? @{Math::Prime::Util::primes($k - 1)} : Math::Prime::Util::GMP::sieve_primes(2, $k - 1));
 
+        my $result = sub {
+            my ($n, $x) = @_;
+
+            # Optimization for native n
             if (!ref($n) or Math::GMPz::Rmpz_fits_slong_p($n)) {
 
                 $n = Math::GMPz::Rmpz_get_ui($n) if ref($n);
 
-                if ($p * $p > $n) {
-                    return 1;
-                }
+                return (
+                    sub {
+                        my ($n, $x) = @_;
 
-                $p == 2 and return ($n >> 1);
-                $p == 3 and return do {
-                    my $t = HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($n, 3) : Math::Prime::Util::GMP::divint($n, 3);
-                    $t - ($t >> 1);
-                };
+                        my $key = "$n,$x";
 
-                my $u = 0;
-                my $t = HAS_NEW_PRIME_UTIL ? Math::Prime::Util::divint($n, $p) : Math::Prime::Util::GMP::divint($n, $p);
+                        return $cache{$key}
+                          if exists $cache{$key};
 
-                for (my $q = 2 ; $q < $p ; $q = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($q) : Math::Prime::Util::GMP::next_prime($q))) {
+                        # Initial count: odd numbers ≤ n
+                        my $count = $n - ($n >> 1);
 
-                    my $v = __SUB__->($t, $q);
+                        # Inclusion-Exclusion principle
+                        for my $j (1 .. $x - 1) {
+                            last if ($P[$j] > $n);
+                            $count -= __SUB__->(
+                                                (
+                                                 HAS_NEW_PRIME_UTIL
+                                                 ? Math::Prime::Util::divint($n, $P[$j])
+                                                 : Math::Prime::Util::GMP::divint($n, $P[$j])
+                                                ),
+                                                $j
+                                               );
+                        }
 
-                    if ($v == 1) {
-                        $u += (HAS_PRIME_UTIL ? Math::Prime::Util::prime_count($q, $p - 1) : _prime_count($q, $p - 1));
-                        last;
-                    }
-
-                    $u += $v;
-                }
-
-                return ($t - $u);
+                        $cache{$key} = $count;
+                      }
+                      ->($n, $x)
+                );
             }
 
-            if (Math::GMPz::Rmpz_cmp_ui($n, $p * $p) < 0) {
-                return 1;
-            }
+            my $key = join(",", Math::GMPz::Rmpz_get_str($n, 10), $x);
 
-            if ($p == 2) {
-                return ($n >> 1);
-            }
+            return $cache{$key}
+              if exists $cache{$key};
 
-            if ($p == 3) {
-                my $t = $n / 3;
-                return ($t - ($t >> 1));
-            }
+            # Initial count: odd numbers ≤ n
+            my $count = Math::GMPz::Rmpz_init_set($n);
+            Math::GMPz::Rmpz_div_2exp($count, $count, 1);
+            Math::GMPz::Rmpz_sub($count, $n, $count);
 
-            my $u = Math::GMPz::Rmpz_init_set_ui(0);
             my $t = Math::GMPz::Rmpz_init();
 
-            Math::GMPz::Rmpz_div_ui($t, $n, $p);
+            # Inclusion-Exclusion principle
+            foreach my $j (1 .. $x - 1) {
 
-            for (my $q = 2 ; $q < $p ; $q = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($q) : Math::Prime::Util::GMP::next_prime($q))) {
+                Math::GMPz::Rmpz_div_ui($t, $n, $P[$j]);
 
-                my $v = __SUB__->($t, $q);
+                my $r = __SUB__->($t, $j);
 
-                if ($v == 1) {
-                    Math::GMPz::Rmpz_add_ui(
-                                            $u, $u,
-                                            (
-                                             HAS_PRIME_UTIL
-                                             ? Math::Prime::Util::prime_count($q, $p - 1)
-                                             : _prime_count($q, $p - 1)
-                                            )
-                                           );
-                    last;
-                }
-
-                if (ref($v)) {
-                    Math::GMPz::Rmpz_add($u, $u, $v);
-                }
-                else {
-                    Math::GMPz::Rmpz_add_ui($u, $u, $v);
-                }
+                ref($r)
+                  ? Math::GMPz::Rmpz_sub($count, $count, $r)
+                  : Math::GMPz::Rmpz_sub_ui($count, $count, $r);
             }
 
-            $t - $u;
+            $cache{$key} =
+                Math::GMPz::Rmpz_fits_ulong_p($count)
+              ? Math::GMPz::Rmpz_get_ui($count)
+              : $count;
           }
-          ->($n * $k, $k);
+          ->($n, scalar @P);
 
-        if (ref($count)) {
-            return bless \$count;
+        if (ref($result)) {
+            return bless \$result;
         }
 
-        _set_int($count);
+        _set_int($result);
     }
 
     sub legendre_phi {
