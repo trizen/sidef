@@ -33095,6 +33095,10 @@ package Sidef::Types::Number::Number {
 
                 $n = Math::GMPz::Rmpz_get_ui($n) if ref($n);
 
+                if (HAS_PRIME_UTIL) {
+                    return Math::Prime::Util::legendre_phi($n, $x);
+                }
+
                 return (
                     sub {
                         my ($n, $x) = @_;
