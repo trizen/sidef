@@ -286,4 +286,22 @@ for p in (primes(23)) {
     assert_eq(15.range.map { my_rough_count_3(values[_], p) }, built_in)
 }
 
+func meissel_lehmer_prime_count(n) {
+
+    if (n <= 1) {
+        return 0
+    }
+
+    var a = n.icbrt+1
+    var k = a+1
+    var s = k.rough_count(n)
+
+    s + a.pi - 1 - 2.almost_primes(n.isqrt, n).count { .is_rough(k) }
+}
+
+for n in (1..5) {
+    var t = irand(10**n)
+    assert_eq(meissel_lehmer_prime_count(t), t.pi)
+}
+
 say "** Test passed!"
