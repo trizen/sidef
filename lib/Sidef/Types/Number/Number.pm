@@ -16718,11 +16718,7 @@ package Sidef::Types::Number::Number {
             return _set_int($count);
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        Math::GMPz::Rmpz_set_ui($t, 0);
-        Math::GMPz::Rmpz_setbit($t, $k);
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) <= $k) {
             return ZERO;
         }
 
@@ -16733,6 +16729,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
+        state $t = Math::GMPz::Rmpz_init_nobless();
 
         sub {
             my ($m, $p, $k, $j) = @_;
@@ -16810,15 +16807,12 @@ package Sidef::Types::Number::Number {
             return ONE;
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_set_ui($t, 0);
-        Math::GMPz::Rmpz_setbit($t, $k);
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) <= $k) {
             return ZERO;
         }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
 
         my $total = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -16898,15 +16892,11 @@ package Sidef::Types::Number::Number {
             return ONE;
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_set_ui($t, 0);
-        Math::GMPz::Rmpz_setbit($t, $k);
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) <= $k) {
             return ZERO;
         }
 
+        state $t = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
 
         if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
@@ -17005,15 +16995,12 @@ package Sidef::Types::Number::Number {
             return ONE;
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_set_ui($t, 0);
-        Math::GMPz::Rmpz_setbit($t, $k);
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) <= $k) {
             return ZERO;
         }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
 
@@ -17100,16 +17087,13 @@ package Sidef::Types::Number::Number {
             return ONE;
         }
 
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) <= $k) {
+            return ZERO;
+        }
+
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
         state $v = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_set_ui($t, 0);
-        Math::GMPz::Rmpz_setbit($t, $k);
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
-            return ZERO;
-        }
 
         Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
 
@@ -17231,16 +17215,13 @@ package Sidef::Types::Number::Number {
             return ONE;
         }
 
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) <= $k) {
+            return ZERO;
+        }
+
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
         state $v = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_set_ui($t, 0);
-        Math::GMPz::Rmpz_setbit($t, $k);
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
-            return ZERO;
-        }
 
         Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
 
