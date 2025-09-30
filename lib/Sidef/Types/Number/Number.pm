@@ -19278,8 +19278,19 @@ package Sidef::Types::Number::Number {
 
         my ($x, $y) = @vals;
 
-        $x = _any2mpz($$x, 0) // goto &nan;
-        $y = _any2mpz($$y, 1) // goto &nan;
+        $x = $$x;
+        $y = $$y;
+
+        if (!ref($x) and !ref($y) and CORE::abs($x) * CORE::abs($y) < ULONG_MAX) {
+            my $r =
+              HAS_PRIME_UTIL
+              ? Math::Prime::Util::lcm($x, $y)
+              : Math::Prime::Util::GMP::lcm($x, $y);
+            return bless \$r;
+        }
+
+        $x = _any2mpz($x, 0) // goto &nan;
+        $y = _any2mpz($y, 1) // goto &nan;
 
         state $r = Math::GMPz::Rmpz_init_nobless();
         Math::GMPz::Rmpz_lcm($r, $x, $y);

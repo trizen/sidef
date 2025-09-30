@@ -2597,6 +2597,7 @@ package Sidef::Types::Array::Array {
         bless \@diffs, ref($self);
     }
 
+    *deltas          = \&differences;
     *diffs           = \&differences;
     *nth_differences = \&differences;
 
