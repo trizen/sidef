@@ -1661,4 +1661,39 @@ assert_eq(3.omega_primes(2**65 - 100, 2**65 + 100).sum, 1807780919223536058347)
 
 assert_eq(prime_powers(50, 100), %n[53, 59, 61, 64, 67, 71, 73, 79, 81, 83, 89, 97])
 
+assert_eq(linear_forms_primes(1, 41, 41, [1, 1]...), %n[2, 6, 12, 18, 20, 26, 30, 32, 38])
+assert_eq(linear_forms_primes(1, 50, 1, [1]...), [1, 2, 4, 6, 10, 12, 16, 18, 22, 28, 30, 36, 40, 42, 46])
+assert_eq(linear_forms_primes(1, 100, 1, [1,2]...), [1, 2, 6, 18, 30, 36, 78, 96])
+assert_eq(linear_forms_primes(1, 1000, 1, [1,2,3]...), [2, 6, 36, 210, 270, 306, 330, 336, 600, 726])
+assert_eq(linear_forms_primes(1, 10000, 1, [1,2,3,4]...), [330, 1530, 3060, 4260, 4950, 6840])
+assert_eq(linear_forms_primes(1, 12000, 1, [1,2,3,4,5]...), [10830])
+assert_eq(linear_forms_primes(9538620, 9993270, 1, [1,2,3,4,5]...), [9538620, 9780870, 9783060, 9993270])
+assert_eq(linear_forms_primes(9538620+1, 9993270, 1, [1,2,3,4,5]...), [9780870, 9783060, 9993270])
+
+assert_eq(linear_forms_primes(1, 1000, -1, [1, 2, 3]...), %n[4, 6, 24, 30, 84, 90, 174, 234, 240, 294, 420, 660, 954])
+assert_eq(linear_forms_primes(1, 10000, -1, [1, 2, 3, 4]...), %n[6, 90, 1410, 1890])
+assert_eq(linear_forms_primes(1, 500, -1, [2,4,6]...), %n[2, 3, 12, 15, 42, 45, 87, 117, 120, 147, 210, 330, 477])
+
+func A088250(n, alpha=1) {
+
+    var terms = @(1..n)
+
+    var A = 1
+    var B = 2*A
+
+    loop {
+        var arr = linear_forms_primes(A, B, alpha, terms...)
+
+        if (arr) {
+            return arr[0]
+        }
+
+        A = B+1
+        B = 2*A
+    }
+}
+
+assert_eq(1..8 -> map {|n| A088250(n, +1) }, %n[1, 1, 2, 330, 10830, 25410, 512820, 512820])
+assert_eq(1..8 -> map {|n| A088250(n, -1) }, %n[3, 3, 4, 6, 6, 154770, 2894220, 2894220])
+
 say "** Tests passed!"

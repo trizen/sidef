@@ -22312,6 +22312,159 @@ package Sidef::Types::Number::Number {
 
     *sieve_prime_cluster = \&prime_cluster;
 
+    sub _remainders_for_primes {
+        my ($primes, $terms, $alpha) = @_;
+
+        my $res = [[0, 1]];
+
+        foreach my $p (@$primes) {
+
+            my @rems;
+
+            foreach my $m (0 .. $p - 1) {
+                my $ok = 1;
+
+                foreach my $k (@$terms) {
+                    if (Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint($k, $m), $alpha), $p) == 0) {
+                        $ok = 0;
+                        last;
+                    }
+                }
+
+                if ($ok) {
+                    push @rems, $m;
+                }
+            }
+
+            if (!@rems) {
+                @rems = (0);
+            }
+
+            my @nres;
+            foreach my $r (@$res) {
+                foreach my $rem (@rems) {
+                    push @nres, [Math::Prime::Util::GMP::chinese($r, [$rem, $p]), Math::Prime::Util::GMP::lcm($p, $r->[1])];
+                }
+            }
+
+            $res = \@nres;
+        }
+
+        [sort { Math::Prime::Util::GMP::cmpint($a, $b) } map { $_->[0] } @$res];
+    }
+
+    sub _deltas {
+        my ($integers) = @_;
+
+        my @deltas;
+        my $prev = 0;
+
+        foreach my $n (@$integers) {
+            push @deltas, $n - $prev;
+            $prev = $n;
+        }
+
+        return @deltas;
+    }
+
+    sub linear_forms_primes {
+        my ($A, $B, $alpha, @terms) = @_;
+
+        _valid(\$A);
+        _valid(\$B);
+        _valid(\$alpha);
+        _valid(\(@terms));
+
+        $A     = _big2uistr($$A)    // return Sidef::Types::Array::Array->new;
+        $B     = _big2uistr($$B)    // return Sidef::Types::Array::Array->new;
+        $alpha = _big2istr($$alpha) // return undef;
+        @terms = map { _big2istr($$_) // return undef } @terms;
+
+        my $order  = scalar(@terms);
+        my @primes = map { $$_ } @{_set_int($order)->pn_primes};
+
+        # TODO: cache the remainders for a given set of terms
+        my $r = _remainders_for_primes(\@primes, \@terms, $alpha);
+        my @d = _deltas($r);
+        my $s = Math::Prime::Util::GMP::vecprod(@primes);
+
+        while ($d[0] eq '0') {
+            shift(@d);
+        }
+
+        push @d, Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::addint($r->[0], $s), $r->[-1]);
+
+        my $m     = $r->[0];
+        my $d_len = scalar(@d);
+
+        my $d_sum = Math::Prime::Util::GMP::vecsum(@d);
+        my $times = Math::Prime::Util::GMP::divint($A, $d_sum);
+
+        if ($times ne '0') {
+            $m = Math::Prime::Util::GMP::addint($m, Math::Prime::Util::GMP::mulint($d_sum, $times));
+        }
+
+        my @arr;
+        my $trial_bound = $primes[-1] + 1;    # FIXME: this may not be correct!
+
+        if ($A <= $trial_bound) {
+
+            my $end = $trial_bound;
+
+            if ($B < $end) {
+                $end = $B;
+            }
+
+            foreach my $x ($A .. $end) {
+                my $ok = 1;
+                foreach my $k (@terms) {
+                    if (!Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint($k, $x), $alpha))) {
+                        $ok = 0;
+                        last;
+                    }
+                }
+                if ($ok) {
+                    push @arr, _set_int($x);
+                }
+            }
+        }
+
+        my $j = 0;
+
+        my $from = $A;
+
+        if ($A < $trial_bound) {
+            $from = $trial_bound + 1;
+        }
+
+        if (Math::Prime::Util::GMP::cmpint($from, $B) > 0) {
+            return Sidef::Types::Array::Array->new(\@arr);
+        }
+
+        while (Math::Prime::Util::GMP::cmpint($m, $from) < 0) {
+            $m = Math::Prime::Util::GMP::addint($m, $d[$j++ % $d_len]);
+        }
+
+        while (Math::Prime::Util::GMP::cmpint($m, $B) <= 0) {
+
+            my $ok = 1;
+            foreach my $k (@terms) {
+                if (!Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint($k, $m), $alpha))) {
+                    $ok = 0;
+                    last;
+                }
+            }
+
+            if ($ok) {
+                push @arr, _set_int($m);
+            }
+
+            $m = Math::Prime::Util::GMP::addint($m, $d[$j++ % $d_len]);
+        }
+
+        Sidef::Types::Array::Array->new(\@arr);
+    }
+
     sub composites {
         my ($from, $to) = @_;
 

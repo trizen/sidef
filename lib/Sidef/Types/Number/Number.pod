@@ -5618,6 +5618,17 @@ Example:
 
 =cut
 
+=head2 linear_forms_primes
+
+    linear_forms_primes(A, B, alpha, *terms)
+
+Returns an array with values C<m> in the range C<[A, B]>, such that C<m * terms[0] + alpha>, C<m * terms[1] + alpha>, ..., C<m * terms[-1] + alpha> are all prime.
+
+    say linear_forms_primes(1, 1e4,  1, [1,2,3,4]...)    #=> [330, 1530, 3060, 4260, 4950, 6840]
+    say linear_forms_primes(1, 200, -1, [2,4,6]...)      #=> [2, 3, 12, 15, 42, 45, 87, 117, 120, 147]
+
+=cut
+
 =head2 liouville
 
     liouville(n)
