@@ -22350,7 +22350,7 @@ package Sidef::Types::Number::Number {
             $res = \@nres;
         }
 
-        [sort { Math::Prime::Util::GMP::cmpint($a, $b) } map { $_->[0] } @$res];
+        [sort { $a <=> $b } map { $_->[0] } @$res];
     }
 
     sub _deltas {
@@ -22433,19 +22433,20 @@ package Sidef::Types::Number::Number {
 
         my $from = $A;
 
-        if ($A < $trial_bound) {
+        if ($A <= $trial_bound) {
             $from = $trial_bound + 1;
         }
 
-        if (Math::Prime::Util::GMP::cmpint($from, $B) > 0) {
+        if ($from > $B) {
             return Sidef::Types::Array::Array->new(\@arr);
         }
 
-        while (Math::Prime::Util::GMP::cmpint($m, $from) < 0) {
+        while ($m < $from) {
             $m = Math::Prime::Util::GMP::addint($m, $d[$j++ % $d_len]);
         }
 
-        while (Math::Prime::Util::GMP::cmpint($m, $B) <= 0) {
+        # TODO: add support for non-native integers (when m > ULONG_MAX)
+        while ($m <= $B) {
 
             my $ok = 1;
             foreach my $k (@terms) {
