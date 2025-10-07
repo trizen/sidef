@@ -13269,11 +13269,11 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_mul($t, $t, $u);
         Math::GMPz::Rmpz_mod($t, $t, $m);
 
-        my $r =
+        my $r2 =
             Math::GMPz::Rmpz_fits_ulong_p($t)
           ? Math::GMPz::Rmpz_get_ui($t)
           : Math::GMPz::Rmpz_init_set($t);
-        bless \$r;
+        bless \$r2;
     }
 
     sub faulhaber_range {
@@ -22313,21 +22313,33 @@ package Sidef::Types::Number::Number {
     *sieve_prime_cluster = \&prime_cluster;
 
     sub _remainders_for_primes {
-        my ($primes, $terms, $alpha) = @_;
+        my ($primes, $terms, $alphas) = @_;
 
         my $res = [[0, 1]];
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
 
         foreach my $p (@$primes) {
 
             my @rems;
 
             foreach my $m (0 .. $p - 1) {
+
                 my $ok = 1;
 
-                foreach my $k (@$terms) {
-                    if (Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint($k, $m), $alpha), $p) == 0) {
-                        $ok = 0;
-                        last;
+                foreach my $i (0 .. $#$terms) {
+
+                    my $k     = $terms->[$i];
+                    my $alpha = $alphas->[$i];
+
+                    Math::GMPz::Rmpz_mul_ui($t, $k, $m);
+                    Math::GMPz::Rmpz_add($t, $t, $alpha);
+
+                    if (Math::GMPz::Rmpz_divisible_ui_p($t, $p)) {
+                        if (Math::GMPz::Rmpz_cmp_ui($t, $p) > 0) {
+                            $ok = 0;
+                            last;
+                        }
                     }
                 }
 
@@ -22350,7 +22362,7 @@ package Sidef::Types::Number::Number {
             $res = \@nres;
         }
 
-        [sort { $a <=> $b } map { $_->[0] } @$res];
+        [sort { $a <=> $b } map { my $n = $_->[0]; ($n < ULONG_MAX) ? $n : Math::GMPz::Rmpz_init_set_str("$n", 10) } @$res];
     }
 
     sub _deltas {
@@ -22364,93 +22376,98 @@ package Sidef::Types::Number::Number {
             $prev = $n;
         }
 
+        CORE::shift(@deltas);
         return @deltas;
     }
 
     sub linear_forms_primes {
-        my ($A, $B, $alpha, @terms) = @_;
+        my ($A, $B, @pairs) = @_;
 
         _valid(\$A);
         _valid(\$B);
-        _valid(\$alpha);
-        _valid(\(@terms));
 
-        $A     = _big2uistr($$A)    // return Sidef::Types::Array::Array->new;
-        $B     = _big2uistr($$B)    // return Sidef::Types::Array::Array->new;
-        $alpha = _big2istr($$alpha) // return undef;
-        @terms = map { _big2istr($$_) // return undef } @terms;
+        my @terms  = map { $_->[0] } @pairs;
+        my @alphas = map { $_->[1] } @pairs;
+
+        _valid(\(@terms));
+        _valid(\(@alphas));
+
+        $A = _any2mpz(_big2uistr($$A) // return Sidef::Types::Array::Array->new);
+        $B = _any2mpz(_big2uistr($$B) // return Sidef::Types::Array::Array->new);
+
+        @terms  = map { _any2mpz($_) } map { _big2uistr($$_) // return undef } @terms;
+        @alphas = map { _any2mpz($_) } map { _big2istr($$_)  // return undef } @alphas;
 
         my $order  = scalar(@terms);
         my @primes = map { $$_ } @{_set_int($order)->pn_primes};
 
-        # TODO: cache the remainders for a given set of terms
-        my $r = _remainders_for_primes(\@primes, \@terms, $alpha);
+        my $key = do {
+            local $" = " ";
+            "@terms | @alphas";
+        };
+
+        state $cache = {};
+
+        my $r = undef;
+
+        if (exists $cache->{$key}) {
+            $r = $cache->{$key};
+        }
+        else {
+            $cache         = {};                                                    # clear cache
+            $r             = _remainders_for_primes(\@primes, \@terms, \@alphas);
+            $cache->{$key} = $r;
+        }
+
         my @d = _deltas($r);
         my $s = Math::Prime::Util::GMP::vecprod(@primes);
 
-        while ($d[0] eq '0') {
-            shift(@d);
+        while (@d and $d[0] == 0) {
+            CORE::shift(@d);
         }
 
         push @d, Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::addint($r->[0], $s), $r->[-1]);
 
-        my $m     = $r->[0];
+        my $m     = Math::GMPz::Rmpz_init_set_str("$r->[0]", 10);
         my $d_len = scalar(@d);
 
         my $d_sum = Math::Prime::Util::GMP::vecsum(@d);
         my $times = Math::Prime::Util::GMP::divint($A, $d_sum);
 
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
         if ($times ne '0') {
-            $m = Math::Prime::Util::GMP::addint($m, Math::Prime::Util::GMP::mulint($d_sum, $times));
+            state $u = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_set_str($t, $d_sum, 10);
+            Math::GMPz::Rmpz_set_str($u, $times, 10);
+            Math::GMPz::Rmpz_mul($t, $t, $u);
+            Math::GMPz::Rmpz_add($m, $m, $t);
         }
 
-        my @arr;
-        my $trial_bound = $primes[-1] + 1;    # FIXME: this may not be correct!
-
-        if ($A <= $trial_bound) {
-
-            my $end = $trial_bound;
-
-            if ($B < $end) {
-                $end = $B;
-            }
-
-            foreach my $x ($A .. $end) {
-                my $ok = 1;
-                foreach my $k (@terms) {
-                    if (!Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint($k, $x), $alpha))) {
-                        $ok = 0;
-                        last;
-                    }
-                }
-                if ($ok) {
-                    push @arr, _set_int($x);
-                }
-            }
+        if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
+            return Sidef::Types::Array::Array->new();
         }
 
         my $j = 0;
 
-        my $from = $A;
-
-        if ($A <= $trial_bound) {
-            $from = $trial_bound + 1;
+        while (Math::GMPz::Rmpz_cmp($m, $A) < 0) {
+            Math::GMPz::Rmpz_add_ui($m, $m, $d[$j++ % $d_len]);
         }
 
-        if ($from > $B) {
-            return Sidef::Types::Array::Array->new(\@arr);
-        }
+        my @arr;
 
-        while ($m < $from) {
-            $m = Math::Prime::Util::GMP::addint($m, $d[$j++ % $d_len]);
-        }
-
-        # TODO: add support for non-native integers (when m > ULONG_MAX)
-        while ($m <= $B) {
+        while (Math::GMPz::Rmpz_cmp($m, $B) <= 0) {
 
             my $ok = 1;
-            foreach my $k (@terms) {
-                if (!Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint($k, $m), $alpha))) {
+            foreach my $i (0 .. $#terms) {
+
+                my $k     = $terms[$i];
+                my $alpha = $alphas[$i];
+
+                Math::GMPz::Rmpz_mul($t, $k, $m);
+                Math::GMPz::Rmpz_add($t, $t, $alpha);
+
+                if (!Math::GMPz::Rmpz_probab_prime_p($t, 23)) {
                     $ok = 0;
                     last;
                 }
@@ -22460,7 +22477,7 @@ package Sidef::Types::Number::Number {
                 push @arr, _set_int($m);
             }
 
-            $m = Math::Prime::Util::GMP::addint($m, $d[$j++ % $d_len]);
+            Math::GMPz::Rmpz_add_ui($m, $m, $d[$j++ % $d_len]);
         }
 
         Sidef::Types::Array::Array->new(\@arr);

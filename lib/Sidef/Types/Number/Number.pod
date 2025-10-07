@@ -5620,12 +5620,13 @@ Example:
 
 =head2 linear_forms_primes
 
-    linear_forms_primes(A, B, alpha, *terms)
+    linear_forms_primes(A, B, [a_1, b_1], ..., [a_k, b_k])
 
-Returns an array with values C<m> in the range C<[A, B]>, such that C<m * terms[0] + alpha>, C<m * terms[1] + alpha>, ..., C<m * terms[-1] + alpha> are all prime.
+Returns an array with values C<m> in the range C<[A, B]>, such that C<m * a_1 + b_1>, C<m * a_2 + b_2>, ..., C<m * a_k + b_k> are all prime.
 
-    say linear_forms_primes(1, 1e4,  1, [1,2,3,4]...)    #=> [330, 1530, 3060, 4260, 4950, 6840]
-    say linear_forms_primes(1, 200, -1, [2,4,6]...)      #=> [2, 3, 12, 15, 42, 45, 87, 117, 120, 147]
+    say linear_forms_primes(1, 100, [1, 0])                     # primes in range 1..100
+    say linear_forms_primes(1, 500, [1, 0], [1, 2])             # lesser of twin primes in range 1..500
+    say linear_forms_primes(1, 200, [2,-1], [4,-1], [6, -1])    # OEIS: A124486
 
 =cut
 
