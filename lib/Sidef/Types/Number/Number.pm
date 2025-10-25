@@ -22292,8 +22292,10 @@ package Sidef::Types::Number::Number {
 
         if (!HAS_PRIME_UTIL and $hi <= 100) {
 
-   # FIXME: this takes way too long for many diff values
-   #return $_[0]->linear_forms_primes($_[1], Sidef::Types::Array::Array->new([ONE, ZERO]), map { Sidef::Types::Array::Array->new([ONE, _set_int($_)]) } @diffs);
+            # FIXME: this may be slow
+            # return $_[0]->linear_forms_primes($_[1],
+            #     Sidef::Types::Array::Array->new([ONE, ZERO]),
+            #     map { Sidef::Types::Array::Array->new([ONE, _set_int($_)]) } @diffs);
 
             # Workaround
             return Sidef::Types::Array::Array->new(
@@ -22508,12 +22510,21 @@ package Sidef::Types::Number::Number {
             $B      = Math::GMPz::Rmpz_get_ui($B);
         }
 
+        # Calculate the maximum value of `p`, based on the number of terms and the size of the range
+        # TODO: I think this can be improved!
         my $primes_num = scalar(@terms);
-        my @primes     = map { $$_ } @{_set_int($primes_num)->pn_primes};
+        my $max_p      = ${_set_int($primes_num)->prime};
+        my $range_size = CORE::int(_set_int($B - $A)->lambert_w->int->next_prime->numify + 1);
+
+        if ($range_size < $max_p) {
+            $max_p = $range_size;
+        }
+
+        my @primes = map { $$_ } @{_set_int($max_p)->primes};
 
         my $key = do {
             local $" = " ";
-            "@terms | @alphas";
+            "@terms | @alphas | @primes";
         };
 
         state $cache = {};
