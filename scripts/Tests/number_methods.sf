@@ -1707,4 +1707,25 @@ func A088250(n, alpha=1) {
 assert_eq(1..8 -> map {|n| A088250(n, +1) }, %n[1, 1, 2, 330, 10830, 25410, 512820, 512820])
 assert_eq(1..8 -> map {|n| A088250(n, -1) }, %n[3, 3, 4, 6, 6, 154770, 2894220, 2894220])
 
+func A318646(n) {
+    var terms = [6, 12, 1 .. n-2 -> map{|k| 9 * 2**k }...].map { [_, 1] }
+
+    var A = 1
+    var B = 2*A
+
+    loop {
+
+        var arr = linear_forms_primes(A, B, terms...).grep {|k| k.valuation(2) >= n-4 }
+
+        if (arr) {
+            return arr[0]
+        }
+
+        A = B+1
+        B = 2*A
+    }
+}
+
+assert_eq(A318646.map(3..8), %n[1, 1, 380, 380, 780320, 950560])
+
 say "** Tests passed!"

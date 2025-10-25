@@ -22291,6 +22291,11 @@ package Sidef::Types::Number::Number {
         @diffs = map { _big2uistr($$_) // return undef } @diffs;
 
         if (!HAS_PRIME_UTIL and $hi <= 100) {
+
+   # FIXME: this takes way too long for many diff values
+   #return $_[0]->linear_forms_primes($_[1], Sidef::Types::Array::Array->new([ONE, ZERO]), map { Sidef::Types::Array::Array->new([ONE, _set_int($_)]) } @diffs);
+
+            # Workaround
             return Sidef::Types::Array::Array->new(
                 [
                  map { bless \$_ } grep {
@@ -22312,10 +22317,33 @@ package Sidef::Types::Number::Number {
 
     *sieve_prime_cluster = \&prime_cluster;
 
+    sub _combine_crt {
+        my ($arr, $M, $p, $S_p) = @_;
+
+        my @res;
+        my $Minv_mod_p = (
+                          HAS_PRIME_UTIL
+                          ? Math::Prime::Util::invmod($M % $p, $p)
+                          : Math::Prime::Util::GMP::invmod($M % $p, $p)
+                         );
+
+        foreach my $r (@$arr) {
+            foreach my $s (@$S_p) {
+                my $k = (($s - ($r % $p)) % $p);
+                $k = HAS_PRIME_UTIL ? Math::Prime::Util::mulmod($k, $Minv_mod_p, $p) : (($k * $Minv_mod_p) % $p);
+                my $x = (($k * $M + $r) % ($M * $p));
+                push @res, $x;
+            }
+        }
+
+        return \@res;
+    }
+
     sub _remainders_for_primes {
         my ($primes, $terms, $alphas) = @_;
 
-        my $res = [[0, 1]];
+        my $residues = [0];
+        my $M        = 1;
 
         state $t = Math::GMPz::Rmpz_init_nobless();
 
@@ -22348,29 +22376,26 @@ package Sidef::Types::Number::Number {
                 }
             }
 
+            if (scalar(@rems) == $p) {
+                next;    # skip trivial primes
+            }
+
             if (!@rems) {
                 @rems = (0);
             }
 
-            my @nres;
-            foreach my $r (@$res) {
-                foreach my $rem (@rems) {
-                    push @nres, [Math::Prime::Util::GMP::chinese($r, [$rem, $p]), Math::Prime::Util::GMP::lcm($p, $r->[1])];
-                }
-            }
-
-            $res = \@nres;
+            $residues = _combine_crt($residues, $M, $p, \@rems);
+            $M *= $p;
         }
 
-        [sort { $a <=> $b } map { my $n = $_->[0]; ($n < ULONG_MAX) ? $n : Math::GMPz::Rmpz_init_set_str("$n", 10) } @$res];
+        ($M, [sort { $a <=> $b } @$residues]);
     }
 
     sub _remainders_for_primes_native {
         my ($primes, $terms, $alphas) = @_;
 
-        my $res = [[0, 1]];
-
-        state $t = Math::GMPz::Rmpz_init_nobless();
+        my $residues = [0];
+        my $M        = 1;
 
         foreach my $p (@$primes) {
 
@@ -22392,26 +22417,19 @@ package Sidef::Types::Number::Number {
                 }
             }
 
+            if (scalar(@rems) == $p) {
+                next;    # skip trivial primes
+            }
+
             if (!@rems) {
                 @rems = (0);
             }
 
-            my @nres;
-            foreach my $r (@$res) {
-                foreach my $rem (@rems) {
-                    if (HAS_PRIME_UTIL) {
-                        push @nres, [Math::Prime::Util::chinese($r, [$rem, $p]), Math::Prime::Util::lcm($p, $r->[1])];
-                    }
-                    else {
-                        push @nres, [Math::Prime::Util::GMP::chinese($r, [$rem, $p]), Math::Prime::Util::GMP::lcm($p, $r->[1])];
-                    }
-                }
-            }
-
-            $res = \@nres;
+            $residues = _combine_crt($residues, $M, $p, \@rems);
+            $M *= $p;
         }
 
-        [sort { $a <=> $b } map { $_->[0] } @$res];
+        ($M, [sort { $a <=> $b } @$residues]);
     }
 
     sub _deltas {
@@ -22450,6 +22468,8 @@ package Sidef::Types::Number::Number {
         if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
             return Sidef::Types::Array::Array->new();
         }
+
+        # TODO: when A and B are small enough, or very close to each other, do a linear search (would be faster)
 
         state $t = Math::GMPz::Rmpz_init_nobless();
 
@@ -22499,24 +22519,27 @@ package Sidef::Types::Number::Number {
         state $cache = {};
 
         my $r = undef;
+        my $M = undef;
 
         if (exists $cache->{$key}) {
-            $r = $cache->{$key};
+            ($M, $r) = @{$cache->{$key}};
         }
         else {
             $cache = {};    # clear cache
-            $r = $native_int ? _remainders_for_primes_native(\@primes, \@terms, \@alphas) : _remainders_for_primes(\@primes, \@terms, \@alphas);
-            $cache->{$key} = $r;
+            ($M, $r) =
+              $native_int
+              ? _remainders_for_primes_native(\@primes, \@terms, \@alphas)
+              : _remainders_for_primes(\@primes, \@terms, \@alphas);
+            $cache->{$key} = [$M, $r];
         }
 
         my @d = _deltas($r);
-        my $s = Math::Prime::Util::GMP::vecprod(@primes);
 
         while (@d and $d[0] == 0) {
             CORE::shift(@d);
         }
 
-        push @d, Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::addint($r->[0], $s), $r->[-1]);
+        push @d, Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::addint($r->[0], $M), $r->[-1]);
 
         my $m     = Math::GMPz::Rmpz_init_set_str("$r->[0]", 10);
         my $d_len = scalar(@d);
