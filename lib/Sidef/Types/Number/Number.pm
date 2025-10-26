@@ -22651,7 +22651,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_mul_ui($t, $k, $v);
                     Math::GMPz::Rmpz_add($t, $t, $alpha);
 
-                    if (!Math::GMPz::Rmpz_probab_prime_p($t, 23)) {
+                    if (!Math::GMPz::Rmpz_probab_prime_p($t, 23) or Math::GMPz::Rmpz_sgn($t) <= 0) {
                         $ok = 0;
                         last;
                     }
@@ -22678,7 +22678,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_mul($t, $k, $m);
                 Math::GMPz::Rmpz_add($t, $t, $alpha);
 
-                if (!Math::GMPz::Rmpz_probab_prime_p($t, 23)) {
+                if (!Math::GMPz::Rmpz_probab_prime_p($t, 23) or Math::GMPz::Rmpz_sgn($t) <= 0) {
                     $ok = 0;
                     last;
                 }
