@@ -22511,15 +22511,11 @@ package Sidef::Types::Number::Number {
         }
 
         # Calculate the maximum value of `p`, based on the number of terms and the size of the range
-        my $primes_num = scalar(@terms);
-        my $max_p      = ${_set_int($primes_num)->prime};
-        my $range_size = _set_int($B - $A + 1)->lgrt->prime->numify;
+        my $terms_len  = scalar(@terms);
+        my $range_size = _set_int($B - $A + 1)->lgrt->int->numify;
 
-        if ($range_size < $max_p) {
-            $max_p = $range_size;
-        }
-
-        my @primes = map { $$_ } @{_set_int($max_p)->primes};
+        my $max_n  = ($range_size < $terms_len) ? $range_size : $terms_len;
+        my @primes = map { $$_ } @{_set_int($max_n)->pn_primes};
 
         my $key = do {
             local $" = " ";
