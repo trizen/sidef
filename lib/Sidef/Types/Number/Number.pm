@@ -22471,8 +22471,6 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new();
         }
 
-        # TODO: when A and B are small enough, or very close to each other, do a linear search (would be faster)
-
         state $t = Math::GMPz::Rmpz_init_nobless();
 
         # Check to see if we can do the computation using native ints (would be faster)
@@ -22503,6 +22501,8 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        # $native_int = 0;
+
         if ($native_int) {
             @terms  = map { Math::GMPz::Rmpz_get_ui($_) } @terms;
             @alphas = map { Math::GMPz::Rmpz_get_si($_) } @alphas;
@@ -22511,10 +22511,9 @@ package Sidef::Types::Number::Number {
         }
 
         # Calculate the maximum value of `p`, based on the number of terms and the size of the range
-        # TODO: I think this can be improved!
         my $primes_num = scalar(@terms);
         my $max_p      = ${_set_int($primes_num)->prime};
-        my $range_size = CORE::int(_set_int($B - $A)->lambert_w->int->next_prime->numify + 1);
+        my $range_size = _set_int($B - $A + 1)->log->lambert_w->exp->prime->numify;
 
         if ($range_size < $max_p) {
             $max_p = $range_size;
@@ -22579,12 +22578,14 @@ package Sidef::Types::Number::Number {
             }
 
             my $terms_end = $#terms;
+            my @range     = (0 .. $terms_end);
+            my $ok        = 1;
 
             while ($m <= $B) {
 
-                my $ok = 1;
+                $ok = 1;
 
-                foreach my $i (0 .. $terms_end) {
+                foreach my $i (@range) {
                     if (
                         !(
                            HAS_PRIME_UTIL

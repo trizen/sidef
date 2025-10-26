@@ -1726,7 +1726,45 @@ func A318646(n) {
     }
 }
 
-assert_eq(A318646.map(3..8), %n[1, 1, 380, 380, 780320, 950560])
+assert_eq(A318646.map(3..9), %n[1, 1, 380, 380, 780320, 950560, 950560])
 assert_eq(linear_forms_primes(78977932125503-1e6, 78977932125503+1e6, [1, 0], 1..14 -> map {|k| [1, 4*k*(k+1)] }...), [78977932125503])
+
+do {
+    var n = 10
+    var terms = [6, 12, 1 .. n-2 -> map{|k| 9 * 2**k }...].map { [_, 1] }
+
+    var A = 3208386195840-1e6
+    var B = 3208386195840+1e6
+
+    var arr = linear_forms_primes(A, B, terms...).grep {|k| k.valuation(2) >= n-4 }
+    assert_eq(arr, [3208386195840])
+}
+
+do {
+
+    func f(n, c) {
+
+        var lo = 1
+        var hi = 2*lo
+
+        var diffs = (1 ..^ n -> map {|k| [1, c*k*(k+1)] })
+
+        loop {
+            var terms = linear_forms_primes(lo, hi, [1, 0], diffs...).grep {|p| !is_prime(p + c*n*(n+1)) }
+            if (terms) {
+                return terms[0]
+            }
+            lo = hi+1
+            hi = 2*lo
+        }
+    }
+
+    assert_eq(f(16, 7), 17)
+    assert_eq(1..14 -> map {|n| f(n, 4) }, %n[2, 3, 29, 5, 23, 269, 272879, 149, 61463, 929, 7426253, 2609, 233, 59])
+    assert_eq(1..9  -> map {|n| f(n, 6) }, %n[2, 19, 5, 67, 7, 281, 1051, 6791, 11])
+    assert_eq(1..11 -> map {|n| f(n, 7) }, %n[2, 3, 59, 5, 89, 599, 3329, 617, 269, 21107, 9833477])
+    assert_eq(1..11 -> map {|n| f(n, 8) }, %n[2, 3, 151, 181, 13, 811, 23671, 92221, 45417481, 5078503, 4861])
+    assert_eq(1..13 -> map {|n| f(n, 9) }, %n[2, 11, 13, 5, 19, 173, 3163, 83, 21013, 878359, 3676219, 239, 43])
+}
 
 say "** Tests passed!"
