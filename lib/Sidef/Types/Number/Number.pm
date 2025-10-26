@@ -22329,11 +22329,12 @@ package Sidef::Types::Number::Number {
                           : Math::Prime::Util::GMP::invmod($M % $p, $p)
                          );
 
+        my ($k, $x);
         foreach my $r (@$arr) {
             foreach my $s (@$S_p) {
-                my $k = (($s - ($r % $p)) % $p);
+                $k = (($s - ($r % $p)) % $p);
                 $k = HAS_PRIME_UTIL ? Math::Prime::Util::mulmod($k, $Minv_mod_p, $p) : (($k * $Minv_mod_p) % $p);
-                my $x = (($k * $M + $r) % ($M * $p));
+                $x = (($k * $M + $r) % ($M * $p));
                 push @res, $x;
             }
         }
@@ -22366,10 +22367,8 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_add($t, $t, $alpha);
 
                     if (Math::GMPz::Rmpz_divisible_ui_p($t, $p)) {
-                        if (Math::GMPz::Rmpz_cmp_ui($t, $p) > 0) {
-                            $ok = 0;
-                            last;
-                        }
+                        $ok = 0;
+                        last;
                     }
                 }
 
@@ -22408,7 +22407,7 @@ package Sidef::Types::Number::Number {
                 my $ok = 1;
                 foreach my $i (0 .. $#$terms) {
                     my $t = $terms->[$i] * $m + $alphas->[$i];
-                    if ($t % $p == 0 and $t > $p) {
+                    if ($t % $p == 0) {
                         $ok = 0;
                         last;
                     }
@@ -22503,6 +22502,22 @@ package Sidef::Types::Number::Number {
 
         # $native_int = 0;
 
+        my $compute_small_values = 0;
+        my $small_values_limit   = 500;
+        my $original_A           = undef;
+
+        if (Math::GMPz::Rmpz_cmp_ui($A, $small_values_limit) < 0) {
+
+            $original_A           = Math::GMPz::Rmpz_get_ui($A);
+            $A                    = Math::GMPz::Rmpz_init_set_ui($small_values_limit + 1);
+            $compute_small_values = 1;
+
+            if (Math::GMPz::Rmpz_cmp_ui($A, $B) > 0) {
+                $A                  = $B;
+                $small_values_limit = Math::GMPz::Rmpz_get_ui($B);
+            }
+        }
+
         if ($native_int) {
             @terms  = map { Math::GMPz::Rmpz_get_ui($_) } @terms;
             @alphas = map { Math::GMPz::Rmpz_get_si($_) } @alphas;
@@ -22561,7 +22576,9 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add($m, $m, $t);
         }
 
-        my $j = 0;
+        my $j     = 0;
+        my $ok    = 1;
+        my @range = (0 .. $#terms);
 
         my @arr;
 
@@ -22573,9 +22590,28 @@ package Sidef::Types::Number::Number {
                 $m += $d[$j++ % $d_len];
             }
 
-            my $terms_end = $#terms;
-            my @range     = (0 .. $terms_end);
-            my $ok        = 1;
+            if ($compute_small_values) {
+                foreach my $k ($original_A .. $small_values_limit) {
+                    $ok = 1;
+
+                    foreach my $i (@range) {
+                        if (
+                            !(
+                               HAS_PRIME_UTIL
+                               ? Math::Prime::Util::is_prime($terms[$i] * $k + $alphas[$i])
+                               : Math::Prime::Util::GMP::is_prime($terms[$i] * $k + $alphas[$i])
+                             )
+                          ) {
+                            $ok = 0;
+                            last;
+                        }
+                    }
+
+                    if ($ok) {
+                        push @arr, _set_int($k);
+                    }
+                }
+            }
 
             while ($m <= $B) {
 
@@ -22605,14 +22641,38 @@ package Sidef::Types::Number::Number {
             return Sidef::Types::Array::Array->new(\@arr);
         }
 
+        if ($compute_small_values) {
+            foreach my $v ($original_A .. $small_values_limit) {
+
+                $ok = 1;
+                foreach my $i (@range) {
+
+                    my $k     = $terms[$i];
+                    my $alpha = $alphas[$i];
+
+                    Math::GMPz::Rmpz_mul_ui($t, $k, $v);
+                    Math::GMPz::Rmpz_add($t, $t, $alpha);
+
+                    if (!Math::GMPz::Rmpz_probab_prime_p($t, 23)) {
+                        $ok = 0;
+                        last;
+                    }
+                }
+
+                if ($ok) {
+                    push @arr, _set_int($v);
+                }
+            }
+        }
+
         while (Math::GMPz::Rmpz_cmp($m, $A) < 0) {
             Math::GMPz::Rmpz_add_ui($m, $m, $d[$j++ % $d_len]);
         }
 
         while (Math::GMPz::Rmpz_cmp($m, $B) <= 0) {
 
-            my $ok = 1;
-            foreach my $i (0 .. $#terms) {
+            $ok = 1;
+            foreach my $i (@range) {
 
                 my $k     = $terms[$i];
                 my $alpha = $alphas[$i];
