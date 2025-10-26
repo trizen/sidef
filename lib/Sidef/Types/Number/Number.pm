@@ -22502,22 +22502,6 @@ package Sidef::Types::Number::Number {
 
         # $native_int = 0;
 
-        my $compute_small_values = 0;
-        my $small_values_limit   = 500;
-        my $original_A           = undef;
-
-        if (Math::GMPz::Rmpz_cmp_ui($A, $small_values_limit) < 0) {
-
-            $original_A           = Math::GMPz::Rmpz_get_ui($A);
-            $A                    = Math::GMPz::Rmpz_init_set_ui($small_values_limit + 1);
-            $compute_small_values = 1;
-
-            if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
-                $A                  = $B + 1;
-                $small_values_limit = Math::GMPz::Rmpz_get_ui($B);
-            }
-        }
-
         if ($native_int) {
             @terms  = map { Math::GMPz::Rmpz_get_ui($_) } @terms;
             @alphas = map { Math::GMPz::Rmpz_get_si($_) } @alphas;
@@ -22561,6 +22545,20 @@ package Sidef::Types::Number::Number {
         }
 
         push @d, Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::addint($r->[0], $M), $r->[-1]);
+
+        my $compute_small_values = 0;
+        my $small_values_limit   = ($B < 500) ? $B : 500;
+        my $original_A           = undef;
+
+        if ($A < $small_values_limit) {
+            $original_A           = $A;
+            $A                    = $small_values_limit + 1;
+            $compute_small_values = 1;
+
+            if (!$native_int) {
+                $A = Math::GMPz::Rmpz_init_set_ui($A) if !ref($A);
+            }
+        }
 
         my $m     = Math::GMPz::Rmpz_init_set_str("$r->[0]", 10);
         my $d_len = scalar(@d);
