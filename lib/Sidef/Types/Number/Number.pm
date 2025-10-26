@@ -14219,7 +14219,7 @@ package Sidef::Types::Number::Number {
         my $n_obj = bless \$n;
 
         my @terms;
-        foreach my $i (0 .. CORE::int($n_obj->log->lambert_w->exp->numify) + 1) {
+        foreach my $i (0 .. CORE::int($n_obj->lgrt->numify) + 1) {
             my $i_obj = _set_int($i);
             push @terms, $i_obj->omega_prime_count($n_obj)->mul($k->pow($i_obj));
         }
@@ -14249,7 +14249,7 @@ package Sidef::Types::Number::Number {
         my $n_obj = bless \$n;
 
         my @terms;
-        foreach my $i (0 .. CORE::int($n_obj->log->lambert_w->exp->numify) + 1) {
+        foreach my $i (0 .. CORE::int($n_obj->lgrt->numify) + 1) {
             my $i_obj = _set_int($i);
             push @terms, $i_obj->squarefree_almost_prime_count($n_obj)->mul($k->pow($i_obj));
         }
@@ -22513,7 +22513,7 @@ package Sidef::Types::Number::Number {
         # Calculate the maximum value of `p`, based on the number of terms and the size of the range
         my $primes_num = scalar(@terms);
         my $max_p      = ${_set_int($primes_num)->prime};
-        my $range_size = _set_int($B - $A + 1)->log->lambert_w->exp->prime->numify;
+        my $range_size = _set_int($B - $A + 1)->lgrt->prime->numify;
 
         if ($range_size < $max_p) {
             $max_p = $range_size;
