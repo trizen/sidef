@@ -22512,8 +22512,8 @@ package Sidef::Types::Number::Number {
             $A                    = Math::GMPz::Rmpz_init_set_ui($small_values_limit + 1);
             $compute_small_values = 1;
 
-            if (Math::GMPz::Rmpz_cmp_ui($A, $B) > 0) {
-                $A                  = $B;
+            if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
+                $A                  = $B + 1;
                 $small_values_limit = Math::GMPz::Rmpz_get_ui($B);
             }
         }
