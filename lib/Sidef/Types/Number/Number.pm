@@ -22330,15 +22330,12 @@ package Sidef::Types::Number::Number {
 
         my $new_mod = $M * $p;
 
-        my ($k, @res);
+        my @res;
         foreach my $r (@$arr_ref) {
             foreach my $s (@$S_p_ref) {
 
                 # Solve r + k*M ≡ s (mod p) -> k ≡ (s - r) * Minv (mod p)
-                $k = ((($s - ($r % $p)) % $p) * $Minv) % $p;
-
-                # Lift to modulus M*p
-                push @res, (($k * $M + $r) % $new_mod);
+                push @res, (((((($s - ($r % $p)) % $p) * $Minv) % $p) * $M + $r) % $new_mod);
             }
         }
 
@@ -22380,13 +22377,12 @@ package Sidef::Types::Number::Number {
     sub _remaindersmodp_native {
         my ($p, $terms, $alphas) = @_;
 
-        my @rems;
+        my ($ok, @rems);
         foreach my $m (0 .. $p - 1) {
 
-            my $ok = 1;
+            $ok = 1;
             foreach my $i (0 .. $#$terms) {
-                my $t = $terms->[$i] * $m + $alphas->[$i];
-                if ($t % $p == 0) {
+                if (($terms->[$i] * $m + $alphas->[$i]) % $p == 0) {
                     $ok = 0;
                     last;
                 }
@@ -22401,24 +22397,19 @@ package Sidef::Types::Number::Number {
     }
 
     sub _remainders_for_primes {
-        my ($primes, $terms, $alphas, $remaindersmodp_f) = @_;
+        my ($primes) = @_;
 
         my $residues = [0];
         my $M        = 1;
 
-        foreach my $p (@$primes) {
+        foreach my $pair (@$primes) {
+            my ($p, $rems) = @$pair;
 
-            my @rems = $remaindersmodp_f->($p, $terms, $alphas);
-
-            if (scalar(@rems) == $p) {
-                next;    # skip trivial primes
+            if (!@$rems) {
+                $rems = [0];
             }
 
-            if (!@rems) {
-                @rems = (0);
-            }
-
-            $residues = _combine_crt($residues, $M, $p, \@rems);
+            $residues = _combine_crt($residues, $M, $p, $rems);
             $M *= $p;
         }
 
@@ -22444,22 +22435,30 @@ package Sidef::Types::Number::Number {
         my ($A, $B, $terms, $alphas, $remaindersmodp_f) = @_;
 
         my $range = $B - $A;
-        return (2) if $range <= 0;
 
-        my $target_modulus = "$range"**(3 / 4);
+        if ($range <= 0) {
+            return;
+        }
+
+        my $target_modulus = "$range"**(4 / 5);
 
         my $M = 1;
         my @primes;
+
         for (my $p = 2 ; ; $p = _next_prime($p)) {
             my @S_p = $remaindersmodp_f->($p, $terms, $alphas);
-            next if scalar(@S_p) == $p;
-            CORE::push(@primes, $p);
+
+            if (scalar(@S_p) == $p) {
+                next;    # skip trivial primes
+            }
+
+            CORE::push(@primes, [$p, \@S_p]);
             $M *= $p;
             last if $M > $target_modulus;
         }
 
-        if (!@primes) {
-            @primes = (2);
+        if (!@primes) {    # should not happen
+            @primes = ([2, [$remaindersmodp_f->(2, $terms, $alphas)]]);
         }
 
         return @primes;
@@ -22533,7 +22532,7 @@ package Sidef::Types::Number::Number {
 
         my $key = do {
             local $" = " ";
-            "@terms | @alphas | @primes";
+            "@terms | @alphas | " . join(' ', map { $_->[0] } @primes);
         };
 
         state $cache = {};
@@ -22546,7 +22545,7 @@ package Sidef::Types::Number::Number {
         }
         else {
             $cache = {};    # clear cache
-            ($M, $r) = _remainders_for_primes(\@primes, \@terms, \@alphas, $remaindersmodp_f);
+            ($M, $r) = _remainders_for_primes(\@primes);
             $cache->{$key} = [$M, $r];
         }
 
