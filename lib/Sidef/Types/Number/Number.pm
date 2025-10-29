@@ -22347,11 +22347,10 @@ package Sidef::Types::Number::Number {
 
         state $t = Math::GMPz::Rmpz_init_nobless();
 
-        my @rems;
+        my ($ok, @rems);
         foreach my $m (0 .. $p - 1) {
 
-            my $ok = 1;
-
+            $ok = 1;
             foreach my $i (0 .. $#$terms) {
 
                 my $k     = $terms->[$i];
@@ -22404,16 +22403,11 @@ package Sidef::Types::Number::Number {
 
         foreach my $pair (@$primes) {
             my ($p, $rems) = @$pair;
-
-            if (!@$rems) {
-                $rems = [0];
-            }
-
             $residues = _combine_crt($residues, $M, $p, $rems);
             $M *= $p;
         }
 
-        ($M, [sort { $a <=> $b } @$residues]);
+        [sort { $a <=> $b } @$residues];
     }
 
     sub _deltas {
@@ -22428,19 +22422,23 @@ package Sidef::Types::Number::Number {
         }
 
         CORE::shift(@deltas);
-        return @deltas;
+        return \@deltas;
     }
 
     sub _select_optimal_primes {
         my ($A, $B, $terms, $alphas, $remaindersmodp_f) = @_;
 
-        my $range = $B - $A;
+        my $range = $B - $A + 1;
 
         if ($range <= 0) {
             return;
         }
 
-        my $target_modulus = "$range"**(4 / 5);
+        my $target_modulus = (
+                              HAS_PRIME_UTIL
+                              ? Math::Prime::Util::rootint($range, 5)
+                              : Math::Prime::Util::GMP::rootint($range, 5)
+                             )**4;
 
         my $M = 1;
         my @primes;
@@ -22457,11 +22455,7 @@ package Sidef::Types::Number::Number {
             last if $M > $target_modulus;
         }
 
-        if (!@primes) {    # should not happen
-            @primes = ([2, [$remaindersmodp_f->(2, $terms, $alphas)]]);
-        }
-
-        return @primes;
+        return ($M, \@primes);
     }
 
     sub linear_forms_primes {
@@ -22528,28 +22522,26 @@ package Sidef::Types::Number::Number {
         my $remaindersmodp_f = ($native_int ? \&_remaindersmodp_native : \&_remaindersmodp);
 
         # Compute the list of primes, based on the size of the range (adaptive strategy)
-        my @primes = _select_optimal_primes($A, $B, \@terms, \@alphas, $remaindersmodp_f);
+        my ($M, $primes) = _select_optimal_primes($A, $B, \@terms, \@alphas, $remaindersmodp_f);
 
         my $key = do {
             local $" = " ";
-            "@terms | @alphas | " . join(' ', map { $_->[0] } @primes);
+            "@terms | @alphas | " . join(' ', map { $_->[0] } @$primes);
         };
 
         state $cache = {};
 
         my $r = undef;
-        my $M = undef;
-
         if (exists $cache->{$key}) {
-            ($M, $r) = @{$cache->{$key}};
+            $r = $cache->{$key};
         }
         else {
-            $cache = {};    # clear cache
-            ($M, $r) = _remainders_for_primes(\@primes);
-            $cache->{$key} = [$M, $r];
+            $cache         = {};                                # clear cache
+            $r             = _remainders_for_primes($primes);
+            $cache->{$key} = $r;
         }
 
-        my @d = _deltas($r);
+        my @d = @{_deltas($r)};
 
         while (@d and $d[0] == 0) {
             CORE::shift(@d);
