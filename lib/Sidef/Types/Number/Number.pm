@@ -22435,9 +22435,11 @@ package Sidef::Types::Number::Number {
         }
 
         my $target_modulus = (
-                              HAS_PRIME_UTIL
-                              ? Math::Prime::Util::rootint($range, 5)
-                              : Math::Prime::Util::GMP::rootint($range, 5)
+                              1 + (
+                                   HAS_PRIME_UTIL
+                                   ? Math::Prime::Util::rootint($range, 5)
+                                   : Math::Prime::Util::GMP::rootint($range, 5)
+                                  )
                              )**4;
 
         my $M = 1;
