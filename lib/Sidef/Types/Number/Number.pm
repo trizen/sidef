@@ -22292,20 +22292,9 @@ package Sidef::Types::Number::Number {
 
         if (!HAS_PRIME_UTIL and $hi <= 100) {
 
-            # FIXME: this may be slow
-            # return $_[0]->linear_forms_primes($_[1],
-            #     Sidef::Types::Array::Array->new([ONE, ZERO]),
-            #     map { Sidef::Types::Array::Array->new([ONE, _set_int($_)]) } @diffs);
-
-            # Workaround
-            return Sidef::Types::Array::Array->new(
-                [
-                 map { bless \$_ } grep {
-                     my $p = $_;
-                     List::Util::all(sub { _is_prob_prime($p + $_) }, @diffs)
-                 } Math::Prime::Util::GMP::sieve_primes($lo, $hi)
-                ]
-            );
+            # Workaround for https://github.com/danaj/Math-Prime-Util-GMP/issues/51
+            return $_[0]
+              ->linear_forms_primes($_[1], Sidef::Types::Array::Array->new([ONE, ZERO]), map { Sidef::Types::Array::Array->new([ONE, _set_int($_)]) } @diffs);
         }
 
         my @primes = map { _set_int($_) } (
@@ -22328,14 +22317,12 @@ package Sidef::Types::Number::Number {
                     : Math::Prime::Util::GMP::invmod($M % $p, $p)
                    );
 
-        my $new_mod = $M * $p;
-
         my @res;
         foreach my $r (@$arr_ref) {
             foreach my $s (@$S_p_ref) {
 
                 # Solve r + k*M ≡ s (mod p) -> k ≡ (s - r) * Minv (mod p)
-                push @res, (((((($s - ($r % $p)) % $p) * $Minv) % $p) * $M + $r) % $new_mod);
+                push @res, (((($s - ($r % $p)) % $p) * $Minv) % $p) * $M + $r;
             }
         }
 
@@ -22345,54 +22332,48 @@ package Sidef::Types::Number::Number {
     sub _remaindersmodp {
         my ($p, $terms, $alphas) = @_;
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
+        my @bad;    # bad[m] = 1 means m is forbidden modulo p
 
-        my ($ok, @rems);
-        foreach my $m (0 .. $p - 1) {
+        foreach my $i (0 .. $#$terms) {
 
-            $ok = 1;
-            foreach my $i (0 .. $#$terms) {
+            my $m = $terms->[$i];
+            my $k = $alphas->[$i];
 
-                my $k     = $terms->[$i];
-                my $alpha = $alphas->[$i];
+            if (ref($m) or ref($k)) {
+                $m = Math::Prime::Util::GMP::modint($m, $p);
+                $k = Math::Prime::Util::GMP::modint($k, $p);
+            }
+            else {
+                $m %= $p;
+                $k %= $p;
+            }
 
-                Math::GMPz::Rmpz_mul_ui($t, $k, $m);
-                Math::GMPz::Rmpz_add($t, $t, $alpha);
+            if ($m == 0) {
 
-                if (Math::GMPz::Rmpz_divisible_ui_p($t, $p)) {
-                    $ok = 0;
-                    last;
+                # Term is constant mod p
+                if ($k == 0) {
+
+                    # Always 0 mod p -> no admissible residue exists
+                    return ();
                 }
+                next;    # This term forbids no residue for this p
             }
 
-            if ($ok) {
-                push @rems, $m;
-            }
+            # Forbid the unique residue m ≡ -k * m^{-1} (mod p)
+            my $m_inv = (
+                         HAS_PRIME_UTIL
+                         ? Math::Prime::Util::invmod($m, $p)
+                         : Math::Prime::Util::GMP::invmod($m, $p)
+                        );
+            my $m_forbid = (-$k * $m_inv) % $p;
+            $bad[$m_forbid] = 1;
         }
 
-        return @rems;
-    }
-
-    sub _remaindersmodp_native {
-        my ($p, $terms, $alphas) = @_;
-
-        my ($ok, @rems);
+        my @S_p;
         foreach my $m (0 .. $p - 1) {
-
-            $ok = 1;
-            foreach my $i (0 .. $#$terms) {
-                if (($terms->[$i] * $m + $alphas->[$i]) % $p == 0) {
-                    $ok = 0;
-                    last;
-                }
-            }
-
-            if ($ok) {
-                push @rems, $m;
-            }
+            push(@S_p, $m) if !$bad[$m];
         }
-
-        return @rems;
+        return @S_p;
     }
 
     sub _remainders_for_primes {
@@ -22426,7 +22407,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub _select_optimal_primes {
-        my ($A, $B, $terms, $alphas, $remaindersmodp_f) = @_;
+        my ($A, $B, $terms, $alphas) = @_;
 
         my $range = $B - $A + 1;
 
@@ -22446,7 +22427,7 @@ package Sidef::Types::Number::Number {
         my @primes;
 
         for (my $p = 2 ; ; $p = _next_prime($p)) {
-            my @S_p = $remaindersmodp_f->($p, $terms, $alphas);
+            my @S_p = _remaindersmodp($p, $terms, $alphas);
 
             if (scalar(@S_p) == $p) {
                 next;    # skip trivial primes
@@ -22460,14 +22441,16 @@ package Sidef::Types::Number::Number {
         return ($M, \@primes);
     }
 
-    sub linear_forms_primes {
-        my ($A, $B, @pairs) = @_;
+    sub _linear_forms_primes_base {
+        my ($A, $B, $pairs, $iter) = @_;
+
+        # TODO: add support for $iter = 1, returning a Sidef::Object::Enumerator iterator
 
         _valid(\$A);
         _valid(\$B);
 
-        my @terms  = map { $_->[0] } @pairs;
-        my @alphas = map { $_->[1] } @pairs;
+        my @terms  = map { $_->[0] } @$pairs;
+        my @alphas = map { $_->[1] } @$pairs;
 
         _valid(\(@terms));
         _valid(\(@alphas));
@@ -22478,7 +22461,7 @@ package Sidef::Types::Number::Number {
         @terms  = map { _any2mpz($_) } map { _big2uistr($$_) // return undef } @terms;
         @alphas = map { _any2mpz($_) } map { _big2istr($$_)  // return undef } @alphas;
 
-        if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
+        if (Math::GMPz::Rmpz_cmp($A, $B) > 0 or !@terms or scalar(@alphas) != scalar(@terms)) {
             return Sidef::Types::Array::Array->new();
         }
 
@@ -22521,10 +22504,8 @@ package Sidef::Types::Number::Number {
             $B      = Math::GMPz::Rmpz_get_ui($B);
         }
 
-        my $remaindersmodp_f = ($native_int ? \&_remaindersmodp_native : \&_remaindersmodp);
-
         # Compute the list of primes, based on the size of the range (adaptive strategy)
-        my ($M, $primes) = _select_optimal_primes($A, $B, \@terms, \@alphas, $remaindersmodp_f);
+        my ($M, $primes) = _select_optimal_primes($A, $B, \@terms, \@alphas);
 
         my $key = do {
             local $" = " ";
@@ -22697,6 +22678,11 @@ package Sidef::Types::Number::Number {
         }
 
         Sidef::Types::Array::Array->new(\@arr);
+    }
+
+    sub linear_forms_primes {
+        my ($A, $B, @pairs) = @_;
+        _linear_forms_primes_base($A, $B, \@pairs);
     }
 
     sub composites {
