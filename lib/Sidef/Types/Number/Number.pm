@@ -22524,6 +22524,10 @@ package Sidef::Types::Number::Number {
             $cache->{$key} = $r;
         }
 
+        if (!@$r) {
+            return Sidef::Types::Array::Array->new();
+        }
+
         my @d = @{_deltas($r)};
 
         while (@d and $d[0] == 0) {
