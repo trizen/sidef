@@ -10448,28 +10448,31 @@ package Sidef::Types::Number::Number {
     # return all distinct sign/ordering variations.
     sub _combine_pairs {
         my ($A, $B, $C, $D) = @_;
+#<<<
         return (
                 [$A * $C - $B * $D, $A * $D + $B * $C],
                 [$A * $C + $B * $D, $A * $D - $B * $C],
-                [$B * $C - $A * $D, $A * $C + $B * $D],
-                [$B * $C + $A * $D, $A * $C - $B * $D],
                );
+#>>>
     }
 
     # Multiply two *sets* of representations
     sub _multiply_sets {
         my ($A, $B) = @_;
-        my %seen;
-        my @new;
+        my (@new, %seen);
         for my $p (@$A) {
             for my $q (@$B) {
                 for my $r (_combine_pairs(@$p, @$q)) {
                     my ($x, $y) = @$r;
+
+                    $x = -$x if ($x < 0);
+                    $y = -$y if ($y < 0);
+
                     if ($x > $y) {
                         ($x, $y) = ($y, $x);
                     }
-                    my $key = "$x,$y";
-                    next if $seen{$key}++;
+
+                    next if $seen{"$x,$y"}++;
                     push @new, [$x, $y];
                 }
             }
@@ -10503,28 +10506,33 @@ package Sidef::Types::Number::Number {
         # Start with representation of 1
         my @reps = ([0, 1]);    # (0^2 + 1^2 = 1)
 
+        # Handle primes p ≡ 3 (mod 4) with even exponent: they contribute as a perfect square factor s^2.
+        # Multiply each (x,y) by s where s = product p^{e/2} over such primes.
+        my $square_scale = Math::GMPz::Rmpz_init_set_ui(1);
+
         foreach my $pp (@factor_exp) {
             my ($p, $k) = @$pp;
 
             # Handle primes 3 mod 4
             if (Math::GMPz::Rmpz_congruent_ui_p($p, 3, 4)) {
+
                 if ($k % 2 != 0) {
                     return Sidef::Types::Array::Array->new;    # no solutions
                 }
 
                 # p^{2t} contributes factor (p^t)^2 which is a square; doesn't change reps aside from scaling
-                # We'll multiply later by p^{k/2} as a scaling factor on both coordinates.
-                # For simplicity, handle by multiplying reps by p^{k/2} at the end.
+                # We multiply by p^{k/2} as a scaling factor on both coordinates.
+                Math::GMPz::Rmpz_pow_ui($t, $p, $k >> 1);
+                Math::GMPz::Rmpz_mul($square_scale, $square_scale, $t);
                 next;
             }
 
             # Representation of p = x^2 + y^2
             my ($x, $y) = _primitive_sum_of_two_squares($p);
-            my @unit = ([$x, $y]);
 
             # Use binary exponentiation to get representations for p^k
             my @acc   = ([0, 1]);
-            my @base  = @unit;
+            my @base  = ([$x, $y]);
             my $exp_k = $k;
             while ($exp_k > 0) {
                 if ($exp_k & 1) {
@@ -10534,23 +10542,10 @@ package Sidef::Types::Number::Number {
                 $exp_k >>= 1;
             }
 
-            @reps = grep { $_->[0] >= 0 and $_->[1] >= 0 } _multiply_sets(\@reps, \@acc);
+            @reps = _multiply_sets(\@reps, \@acc);
         }
 
-        # Handle primes p ≡ 3 (mod 4) with even exponent: they contribute as a perfect square factor s^2.
-        # Multiply each (x,y) by s where s = product p^{e/2} over such primes.
-        my $square_scale = Math::GMPz::Rmpz_init_set_ui(1);
-        foreach my $pp (@factor_exp) {
-            my ($p, $e) = @$pp;
-
-            # Keep only p = 3 mod 4
-            Math::GMPz::Rmpz_congruent_ui_p($p, 3, 4) or next;
-
-            Math::GMPz::Rmpz_pow_ui($t, $p, $e >> 1);
-            Math::GMPz::Rmpz_mul($square_scale, $square_scale, $t);
-        }
-
-        if ($square_scale != 1) {
+        if (Math::GMPz::Rmpz_cmp_ui($square_scale, 1) > 0) {
             @reps = map { [$_->[0] * $square_scale, $_->[1] * $square_scale] } @reps;
         }
 
