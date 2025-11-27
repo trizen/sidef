@@ -10494,14 +10494,24 @@ package Sidef::Types::Number::Number {
 
         state $t = Math::GMPz::Rmpz_init_nobless();
 
-        my @factor_exp = map {
+        my @factor_exp = _factor_exp($n);
+
+        foreach my $pp (@factor_exp) {
+            my ($p, $k) = @$pp;
+            if ($k % 2 != 0
+                and ($p < ULONG_MAX ? ($p % 4 == 3) : (Math::Prime::Util::GMP::modint($p, 4) == 3))) {
+                return Sidef::Types::Array::Array->new;    # no solutions
+            }
+        }
+
+        @factor_exp = map {
             my ($p, $e) = @$_;
             $p =
               ($p < ULONG_MAX)
               ? Math::GMPz::Rmpz_init_set_ui($p)
               : Math::GMPz::Rmpz_init_set_str("$p", 10);
             [$p, $e]
-        } _factor_exp($n);
+        } @factor_exp;
 
         # Start with representation of 1
         my @reps = ([0, 1]);    # (0^2 + 1^2 = 1)
@@ -10515,10 +10525,6 @@ package Sidef::Types::Number::Number {
 
             # Handle primes 3 mod 4
             if (Math::GMPz::Rmpz_congruent_ui_p($p, 3, 4)) {
-
-                if ($k % 2 != 0) {
-                    return Sidef::Types::Array::Array->new;    # no solutions
-                }
 
                 # p^{2t} contributes factor (p^t)^2 which is a square; doesn't change reps aside from scaling
                 # We multiply by p^{k/2} as a scaling factor on both coordinates.
