@@ -10243,8 +10243,11 @@ package Sidef::Types::Number::Number {
             }
         }
 
+        # Fallback to rootmod(a,2,m)
+        return _set_int($n)->rootmod(TWO, _set_int($y));
+
         # Workaround: find all the solutions and return the smallest one
-        return (_set_int($n)->sqrtmod_all(_set_int($y))->first // goto &nan);
+        # return (_set_int($n)->sqrtmod_all(_set_int($y))->first // goto &nan);
 
         # The code below fails to find a solution for: sqrtmod(17640, 48465)
         my $u = Math::GMPz::Rmpz_init();
@@ -10362,7 +10365,7 @@ package Sidef::Types::Number::Number {
     # Chinese Remainder Theorem:   combine roots from two moduli
     #----------------------------------------------------------
     sub _crt_combine {
-        my ($roots_a, $mod_a, $roots_b, $mod_b) = @_;
+        my ($roots_a, $mod_a, $roots_b, $mod_b, $single_root) = @_;
 
         state $mod = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mul($mod, $mod_a, $mod_b);
@@ -10386,6 +10389,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_mod($result, $result, $mod);
 
                 push @roots, Math::GMPz::Rmpz_init_set($result);
+                return \@roots if $single_root;
             }
         }
 
@@ -10396,7 +10400,7 @@ package Sidef::Types::Number::Number {
     # All k-th roots of a modulo prime p
     #----------------------------------------------------------
     sub _roots_mod_prime {
-        my ($a, $k, $p) = @_;
+        my ($a, $k, $p, $single_root) = @_;
 
         state $a_mod = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mod($a_mod, $a, $p);
@@ -10430,6 +10434,7 @@ package Sidef::Types::Number::Number {
         return [] if (Math::GMPz::Rmpz_cmp_ui($test, 1) != 0);
 
         if (Math::GMPz::Rmpz_cmp_ui($p, 3) == 0) {
+            return [Math::GMPz::Rmpz_init_set_ui(1)] if $single_root;
             return [Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(2)];
         }
 
@@ -10446,7 +10451,10 @@ package Sidef::Types::Number::Number {
         }
 
         my @roots = (Math::GMPz::Rmpz_init_set($root));
-        my $r     = Math::GMPz::Rmpz_init();
+
+        return \@roots if $single_root;
+
+        my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mul($r, $root, $zeta);
         Math::GMPz::Rmpz_mod($r, $r, $p);
 
@@ -10465,7 +10473,7 @@ package Sidef::Types::Number::Number {
     # Hensel lifting helpers
     #----------------------------------------------------------
     sub _hensel_lift_standard {
-        my ($roots, $A, $k, $mod) = @_;
+        my ($roots, $A, $k, $mod, $single_root) = @_;
 
         my @result;
 
@@ -10507,12 +10515,13 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_mod($new_s, $new_s, $mod);
 
             push @result, Math::GMPz::Rmpz_init_set($new_s);
+            last if $single_root;
         }
         return \@result;
     }
 
     sub _hensel_lift_singular {
-        my ($roots, $A, $k, $p, $mod) = @_;
+        my ($roots, $A, $k, $p, $mod, $single_root) = @_;
 
         state $ext_mod = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mul($ext_mod, $mod, $p);
@@ -10579,6 +10588,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_mod($new_r, $new_r, $mod);
 
                 $seen{Math::GMPz::Rmpz_get_str($new_r, 10)} = Math::GMPz::Rmpz_init_set($new_r);
+                return [values %seen] if $single_root;
             }
         }
         return [values %seen];
@@ -10588,9 +10598,9 @@ package Sidef::Types::Number::Number {
     # All k-th roots of r modulo prime power p^e
     #----------------------------------------------------------
     sub _roots_mod_prime_power {
-        my ($r, $k, $p, $e) = @_;
+        my ($r, $k, $p, $e, $single_root) = @_;
 
-        return _roots_mod_prime($r, $k, $p) if ($e == 1);
+        return _roots_mod_prime($r, $k, $p, $single_root) if ($e == 1);
 
         my $mod = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_pow_ui($mod, $p, $e);
@@ -10616,6 +10626,7 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_mul_ui($val, $pt, $i);
                 Math::GMPz::Rmpz_mod($val, $val, $mod);
                 push @result, Math::GMPz::Rmpz_init_set($val);
+                last if $single_root;
             }
             return \@result;
         }
@@ -10635,7 +10646,9 @@ package Sidef::Types::Number::Number {
             my $r_div_pk = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_divexact($r_div_pk, $r, $pk);
 
-            my $sub = _roots_mod_prime_power($r_div_pk, $k, $p, $e - $k_ui);
+            my $sub = _roots_mod_prime_power($r_div_pk, $k, $p, $e - $k_ui, $single_root);
+
+            return [] if !@$sub;
 
             my @result;
             my $base = Math::GMPz::Rmpz_init();
@@ -10650,6 +10663,7 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_add($val, $val, $base);
                     Math::GMPz::Rmpz_mod($val, $val, $mod);
                     push @result, Math::GMPz::Rmpz_init_set($val);
+                    return \@result if $single_root;
                 }
             }
             return \@result;
@@ -10666,13 +10680,13 @@ package Sidef::Types::Number::Number {
           ? int(($e + 1) / 2)
           : int(($e + 3) / 2);
 
-        my $sub = _roots_mod_prime_power($r, $k, $p, $half);
+        my $sub = _roots_mod_prime_power($r, $k, $p, $half, $single_root);
 
         if (Math::GMPz::Rmpz_cmp($k, $p) != 0) {
-            return _hensel_lift_standard($sub, $r, $k, $mod);
+            return _hensel_lift_standard($sub, $r, $k, $mod, $single_root);
         }
         else {
-            return _hensel_lift_singular($sub, $r, $k, $p, $mod);
+            return _hensel_lift_singular($sub, $r, $k, $p, $mod, $single_root);
         }
     }
 
@@ -10680,7 +10694,7 @@ package Sidef::Types::Number::Number {
     # All k-th roots of r modulo n (with factorization)
     #----------------------------------------------------------
     sub _roots_mod_composite {
-        my ($r, $k, $factors) = @_;
+        my ($r, $k, $factors, $single_root) = @_;
 
         my $mod   = Math::GMPz::Rmpz_init_set_ui(1);
         my $roots = [];
@@ -10689,13 +10703,13 @@ package Sidef::Types::Number::Number {
         for my $factor (@$factors) {
             my ($p, $e) = @$factor;
 
-            my $sub = _roots_mod_prime_power($r, $k, $p, $e);
+            my $sub = _roots_mod_prime_power($r, $k, $p, $e, $single_root);
             return [] if (!@$sub);
 
             Math::GMPz::Rmpz_pow_ui($pe, $p, $e);
 
             if (@$roots) {
-                $roots = _crt_combine($roots, $mod, $sub, $pe);
+                $roots = _crt_combine($roots, $mod, $sub, $pe, $single_root);
             }
             else {
                 $roots = $sub;
@@ -10709,13 +10723,13 @@ package Sidef::Types::Number::Number {
     # Main entry point:   all k-th roots of A modulo n
     #----------------------------------------------------------
     sub rootmod_all {
-        my ($A, $k, $n) = @_;
+        my ($A, $k, $n, $single_root) = @_;
 
         $A = _any2mpz($$A, 0) // return Sidef::Types::Array::Array->new;
         $k = _any2mpz($$k, 1) // return Sidef::Types::Array::Array->new;
         $n = _any2mpz($$n, 2) // return Sidef::Types::Array::Array->new;
 
-        if (HAS_NEWER_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+        if (HAS_NEWER_PRIME_UTIL and !$single_root and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             $A = Math::GMPz::Rmpz_get_str($A, 10);
             $k = Math::GMPz::Rmpz_get_str($k, 10);
             $n = Math::GMPz::Rmpz_get_ui($n);
@@ -10751,6 +10765,7 @@ package Sidef::Types::Number::Number {
         if (Math::GMPz::Rmpz_cmp_ui($k, 0) == 0) {
             if (Math::GMPz::Rmpz_cmp_ui($A, 1) == 0) {
                 my $n_ui = Math::GMPz::Rmpz_get_ui($n);
+                return Sidef::Types::Array::Array->new([ZERO]) if $single_root;
                 return Sidef::Types::Array::Array->new([map { bless \$_ } (0 .. $n_ui - 1)]);
             }
             return Sidef::Types::Array::Array->new();
@@ -10764,7 +10779,7 @@ package Sidef::Types::Number::Number {
         for my $prime_factor (@k_factors) {
             my @new_roots;
             for my $r (@$roots) {
-                my $sub = _roots_mod_composite($r, $prime_factor, \@factors);
+                my $sub = _roots_mod_composite($r, $prime_factor, \@factors, $single_root);
                 push @new_roots, @$sub;
             }
             $roots = \@new_roots;
@@ -10775,7 +10790,7 @@ package Sidef::Types::Number::Number {
 
     sub rootmod {
         my ($A, $k, $n) = @_;
-        $A->rootmod_all($k, $n)->first // goto &nan;    # TODO: compute only one root
+        $A->rootmod_all($k, $n, 1)->first // goto &nan;
     }
 
     sub difference_of_squares {

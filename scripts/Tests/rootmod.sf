@@ -168,12 +168,26 @@ var rootmods = [
     [198, -1, 519, nil],
 ]
 
-for t in rootmods {
-    say "Testing: kth_root_mod(#{t[1]}, #{t[0]}, #{t[2]})";
-    assert_eq(kth_root_mod(t[1], t[0], t[2]), (defined(t[3]) ? t[3] : []))
+for a,k,m,t in rootmods {
+    say "Testing: rootmod(#{a}, #{k}, #{m})";
+    assert_eq(rootmod_all(a,k,m), (defined(t) ? t : []))
+    assert_eq(rootmod(a,k,m).powmod(k,m), a%m) if defined(t)
 }
 
-assert_eq(rootmod(2131968,5,10000000000), 7811648)
-assert_eq(rootmod(15,3,1000000000000000000117), 72574612502199260377)
+for a,k,m in ([
+  [2131968,5,10000000000],
+  [15,3, 1000000000000000000117]
+]) {
+    assert_eq(rootmod(a,k,m).powmod(k,m), a % m)
+}
+
+for a,n in (
+    [
+    [26214400, 32768000000],                                                    [26214400, 16384000000],                                                    [262144, 1048576],                                                          [87169610025, 163443018796875],                                             [22315420166400, 167365651248000000],
+    ]
+) {
+   var r = rootmod(a,2,n)
+   assert_eq(r**2 % n, a % n)
+}
 
 say "** Tests passed!"

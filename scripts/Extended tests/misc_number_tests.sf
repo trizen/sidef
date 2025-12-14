@@ -87,11 +87,7 @@ assert(sqrtmod_all(81, 3**7) == %n[9, 234, 252, 477, 495, 720, 738, 963, 981, 12
     [262144, 1048576], [87169610025, 163443018796875],
     [22315420166400, 167365651248000000]
 ].each_2d {|a,p|
-
-    # FIXME: make sqrtmod(a,p) fast for big composite p
-    #p > Num(Num.ULONG_MAX) && next
-    Bool(Num.HAS_NEW_PRIME_UTIL) || next
-
+    say "sqrtmod(#{a}, #{p})"
     assert(powmod(sqrtmod(a, p), 2, p) == a)
 }
 
