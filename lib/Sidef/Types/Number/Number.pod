@@ -769,18 +769,6 @@ Returns true if all the given values are prime numbers.
 
 =cut
 
-=head2 allsqrtmod
-
-    allsqrtmod(a, n)
-
-Given two integers C<a> and C<n>, return a sorted array of all modular square roots of C<a> mod C<|n|>. If no square root exists, an empty array is returned.
-
-    say allsqrtmod(4095, 8469)     #=> [1110, 1713, 3933, 4536, 6756, 7359]
-
-Aliases: I<sqrtmod_all>
-
-=cut
-
 =head2 almost_prime_divisors
 
     n.almost_prime_divisors
@@ -8415,6 +8403,35 @@ The k-th root of C<n>, defined as:
 
 =cut
 
+=head2 rootmod
+
+    rootmod(a, k, n)
+
+Returns a solution C<x> to the following congruence:
+
+    x^k == a (mod n)
+
+Return C<NaN> if a solution does not exist.
+
+    say rootmod(2131968,5,10000000000)          #=> 7811648
+    say rootmod(15,3,1000000000000000000117)    #=> 72574612502199260377
+
+=cut
+
+=head2 rootmod_all
+
+    rootmod_all(a, k, n)
+
+Returns an array with all the solutions C<x> to the following congruence:
+
+    x^k == a (mod n)
+
+If no solution exists, an empty array is returned.
+
+    say rootmod_all(243, 5, 1000)    #=> [3, 203, 403, 603, 803]
+
+=cut
+
 =head2 roots_of_unity
 
     roots_of_unity(n)
@@ -8853,8 +8870,22 @@ Returns the length of the period of continued fraction for square root of C<n>. 
 
 Modular square root of C<a>, returning a solution C<r>, such that C<r^2 = a (mod m)>.
 
-    say sqrtmod(544, 800)         #=> 512
-    say sqrtmod(436, 1752)        #=> 1010
+    say sqrtmod(544, 800)         #=> 288
+    say sqrtmod(436, 1752)        #=> 134
+
+=cut
+
+=head2 sqrtmod_all
+
+    sqrtmod_all(a, n)
+
+Returns an array with all the solutions C<x> to the following congruence:
+
+    x^2 == a (mod n)
+
+If no solution exists, an empty array is returned.
+
+    say sqrtmod_all(4095, 8469)     #=> [1110, 1713, 3933, 4536, 6756, 7359]
 
 =cut
 

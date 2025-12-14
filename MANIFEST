@@ -1028,6 +1028,7 @@ scripts/Tests/roman_numerals_decoding_3.sf
 scripts/Tests/roman_numerals_encoding.sf
 scripts/Tests/roman_numerals_encoding_2.sf
 scripts/Tests/root_mean_square.sf
+scripts/Tests/rootmod.sf
 scripts/Tests/roots_on_the_rise.sf
 scripts/Tests/round_half_to_even.sf
 scripts/Tests/roundf.sf

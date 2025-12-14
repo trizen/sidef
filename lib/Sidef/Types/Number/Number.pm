@@ -10274,147 +10274,506 @@ package Sidef::Types::Number::Number {
 
     sub sqrtmod_all {
         my ($A, $N) = @_;
-
-        # Algorithm by Hugo van der Sanden:
-        #   https://github.com/danaj/Math-Prime-Util/pull/55
-
-        _valid(\$N);
-
-        $A = $$A;
-        $N = $$N;
-
-        if (HAS_NEW_PRIME_UTIL and !ref($A) and !ref($N)) {
-            my @arr = Math::Prime::Util::allsqrtmod($A, $N);
-            return Sidef::Types::Array::Array->new([map { bless \$_ } @arr]);
-        }
-
-        $A = _any2mpz($A, 0) // return Sidef::Types::Array::Array->new;
-        $N = _any2mpz($N, 1) // return Sidef::Types::Array::Array->new;
-
-        # Copy objects for modification
-        $A = Math::GMPz::Rmpz_init_set($A);
-        $N = Math::GMPz::Rmpz_init_set($N);
-
-        # Make n positive when < 0
-        if (Math::GMPz::Rmpz_sgn($N) < 0) {
-            Math::GMPz::Rmpz_abs($N, $N);
-        }
-
-        # return [] if (n <= 0)
-        if (Math::GMPz::Rmpz_sgn($N) <= 0) {
-            return Sidef::Types::Array::Array->new;
-        }
-
-        # return [0] if (n == 1)
-        if (Math::GMPz::Rmpz_cmp_ui($N, 1) == 0) {
-            return Sidef::Types::Array::Array->new([ZERO]);
-        }
-
-        Math::GMPz::Rmpz_mod($A, $A, $N);    # a %= n
-
-        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($N)) {
-            my @arr = Math::Prime::Util::allsqrtmod(Math::GMPz::Rmpz_get_ui($A), Math::GMPz::Rmpz_get_ui($N));
-            return Sidef::Types::Array::Array->new([map { bless \$_ } @arr]);
-        }
-
-        my $sqrtmod_pk = sub {
-            my ($A, $p, $k) = @_;
-
-            my $pk = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_pow_ui($pk, $p, $k);
-
-            if (Math::GMPz::Rmpz_divisible_p($A, $p)) {
-
-                if (Math::GMPz::Rmpz_divisible_p($A, $pk)) {
-                    my $low = Math::GMPz::Rmpz_init();
-                    Math::GMPz::Rmpz_pow_ui($low, $p, $k >> 1);
-                    my $high = ($k & 1) ? ($low * $p) : $low;
-                    return map { $high * $_ } 0 .. $low - 1;
-                }
-
-                my $A2 = Math::GMPz::Rmpz_init();
-
-                Math::GMPz::Rmpz_divexact($A2, $A, $p);
-                Math::GMPz::Rmpz_divisible_p($A2, $p) || return;
-
-                my $pj = Math::GMPz::Rmpz_init();
-                my $Aj = Math::GMPz::Rmpz_init();
-
-                Math::GMPz::Rmpz_divexact($pj, $pk, $p);
-                Math::GMPz::Rmpz_divexact($Aj, $A2, $p);
-
-                return map {
-                    my $q = $_;
-                    map { $q * $p + $_ * $pj } 0 .. $p - 1
-                } __SUB__->($Aj, $p, $k - 2);
-            }
-
-            my $pk_root = _sqrtmod($A, $p, $k) // return;
-            my $q       = Math::GMPz::Rmpz_init_set_str($pk_root, 10);
-
-            #my $q = ${_set_int($A)->sqrtmod(_set_int($pk)) // return};
-
-            ref($q) eq 'Math::GMPz' or return;
-
-            return ($q, $pk - $q) if ($p != 2);
-            return ($q)           if ($k == 1);
-            return ($q, $pk - $q) if ($k == 2);
-
-            my $pj = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_divexact($pj, $pk, $p);
-
-            my $q2 = Math::GMPz::Rmpz_init();
-
-            Math::GMPz::Rmpz_mul($q2, $q, $pj - 1);
-            Math::GMPz::Rmpz_mod($q2, $q2, $pk);
-
-            return ($q, $pk - $q, $q2, $pk - $q2);
-        };
-
-        my @congruences;
-
-        foreach my $pe (_factor_exp($N)) {
-            my ($p, $k) = @$pe;
-
-            $p =
-              ($p < ULONG_MAX)
-              ? Math::GMPz::Rmpz_init_set_ui($p)
-              : Math::GMPz::Rmpz_init_set_str("$p", 10);
-
-            my $pk = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_pow_ui($pk, $p, $k);
-
-            push @congruences, [map { [$_, $pk] } $sqrtmod_pk->($A, $p, $k)];
-        }
-
-        my @roots;
-
-        if (HAS_PRIME_UTIL) {
-            Math::Prime::Util::forsetproduct(
-                sub {
-                    push @roots, Math::Prime::Util::GMP::chinese(@_);
-                },
-                @congruences
-            );
-        }
-        else {
-            require Algorithm::Loops;
-            my $iter = Algorithm::Loops::NestedLoops(\@congruences);
-
-            while (my @arr = $iter->()) {
-                push @roots, Math::Prime::Util::GMP::chinese(@arr);
-            }
-        }
-
-        @roots = map  { Math::GMPz::Rmpz_init_set_str($_, 10) } @roots;
-        @roots = grep { ($_ * $_) % $N == $A } @roots;
-        @roots = sort { Math::GMPz::Rmpz_cmp($a, $b) } @roots;
-        @roots = map  { bless \$_ } @roots;
-
-        return Sidef::Types::Array::Array->new(\@roots);
+        return $A->rootmod_all(TWO, $N);
     }
 
-    *allsqrtmod = \&sqrtmod_all;
+    #----------------------------------------------------------
+    # Tonelli-Shanks algorithm for k-th roots modulo a prime
+    #----------------------------------------------------------
+    sub _tonelli_shanks {
+        my ($a, $k, $p) = @_;
+
+        my $exp = 0;
+        my $q   = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($q, $p, 1);
+
+        while (Math::GMPz::Rmpz_divisible_p($q, $k)) {
+            $exp++;
+            Math::GMPz::Rmpz_divexact($q, $q, $k);
+        }
+
+        my $k_exp = Math::GMPz::Rmpz_init();
+        my $tmp   = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($tmp, $p, 1);
+        Math::GMPz::Rmpz_divexact($k_exp, $tmp, $q);
+
+        my $inv_k   = Math::GMPz::Rmpz_init();
+        my $k_mod_q = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($k_mod_q, $k, $q);
+        Math::GMPz::Rmpz_invert($inv_k, $k_mod_q, $q);
+
+        my $root = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_powm($root, $a, $inv_k, $p);
+
+        my $root_k = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_powm($root_k, $root, $k, $p);
+
+        my $inv_a = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_invert($inv_a, $a, $p);
+
+        my $b = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($b, $root_k, $inv_a);
+        Math::GMPz::Rmpz_mod($b, $b, $p);
+
+        # Find a generator of the k-th roots of unity
+        my $candidate   = Math::GMPz::Rmpz_init_set_ui(2);
+        my $zeta        = Math::GMPz::Rmpz_init_set_ui(1);
+        my $gen         = Math::GMPz::Rmpz_init();
+        my $k_exp_div_k = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_divexact($k_exp_div_k, $k_exp, $k);
+
+        while (Math::GMPz::Rmpz_cmp_ui($zeta, 1) == 0) {
+            Math::GMPz::Rmpz_powm($gen,  $candidate, $q,           $p);
+            Math::GMPz::Rmpz_powm($zeta, $gen,       $k_exp_div_k, $p);
+            Math::GMPz::Rmpz_add_ui($candidate, $candidate, 1);
+        }
+
+        # Iteratively refine the root
+        my $new_gen           = Math::GMPz::Rmpz_init();
+        my $k_exp_div_k_inner = Math::GMPz::Rmpz_init();
+        my $test              = Math::GMPz::Rmpz_init();
+
+        while (Math::GMPz::Rmpz_cmp($k_exp, $k) != 0) {
+            Math::GMPz::Rmpz_divexact($k_exp, $k_exp, $k);
+
+            Math::GMPz::Rmpz_powm($new_gen, $gen, $k, $p);
+            Math::GMPz::Rmpz_set($candidate, $gen);
+            Math::GMPz::Rmpz_set($gen,       $new_gen);
+
+            Math::GMPz::Rmpz_divexact($k_exp_div_k_inner, $k_exp, $k);
+            Math::GMPz::Rmpz_powm($test, $b, $k_exp_div_k_inner, $p);
+
+            while (Math::GMPz::Rmpz_cmp_ui($test, 1) != 0) {
+                Math::GMPz::Rmpz_mul($root, $root, $candidate);
+                Math::GMPz::Rmpz_mod($root, $root, $p);
+
+                Math::GMPz::Rmpz_mul($b, $b, $gen);
+                Math::GMPz::Rmpz_mod($b, $b, $p);
+
+                Math::GMPz::Rmpz_mul($test, $test, $zeta);
+                Math::GMPz::Rmpz_mod($test, $test, $p);
+            }
+        }
+
+        return ($root, $gen);    # return both root and zeta (gen)
+    }
+
+    #----------------------------------------------------------
+    # Chinese Remainder Theorem:   combine roots from two moduli
+    #----------------------------------------------------------
+    sub _crt_combine {
+        my ($roots_a, $mod_a, $roots_b, $mod_b) = @_;
+
+        state $mod = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($mod, $mod_a, $mod_b);
+
+        state $inv = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_invert($inv, $mod_a, $mod_b)
+          or die "CRT: undefined inverse";
+
+        my @roots;
+        state $diff   = Math::GMPz::Rmpz_init();
+        state $result = Math::GMPz::Rmpz_init();
+
+        for my $ra (@$roots_a) {
+            for my $rb (@$roots_b) {
+                Math::GMPz::Rmpz_sub($diff, $rb, $ra);
+                Math::GMPz::Rmpz_mul($diff, $diff, $inv);
+                Math::GMPz::Rmpz_mod($diff, $diff, $mod_b);
+
+                Math::GMPz::Rmpz_mul($result, $mod_a, $diff);
+                Math::GMPz::Rmpz_add($result, $result, $ra);
+                Math::GMPz::Rmpz_mod($result, $result, $mod);
+
+                push @roots, Math::GMPz::Rmpz_init_set($result);
+            }
+        }
+
+        return \@roots;
+    }
+
+    #----------------------------------------------------------
+    # All k-th roots of a modulo prime p
+    #----------------------------------------------------------
+    sub _roots_mod_prime {
+        my ($a, $k, $p) = @_;
+
+        state $a_mod = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($a_mod, $a, $p);
+
+        if (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0 || Math::GMPz::Rmpz_cmp_ui($a_mod, 0) == 0) {
+            return [Math::GMPz::Rmpz_init_set($a_mod)];
+        }
+
+        state $phi = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($phi, $p, 1);
+
+        state $g = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_gcd($g, $k, $phi);
+
+        # Unique root when gcd(k, p-1) = 1
+        if (Math::GMPz::Rmpz_cmp_ui($g, 1) == 0) {
+            my $k_mod_phi = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mod($k_mod_phi, $k, $phi);
+            my $inv = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_invert($inv, $k_mod_phi, $phi);
+            my $root = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_powm($root, $a_mod, $inv, $p);
+            return [$root];
+        }
+
+        # No roots if a is not a k-th power residue
+        state $phi_div_g = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_divexact($phi_div_g, $phi, $g);
+        state $test = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_powm($test, $a_mod, $phi_div_g, $p);
+        return [] if (Math::GMPz::Rmpz_cmp_ui($test, 1) != 0);
+
+        if (Math::GMPz::Rmpz_cmp_ui($p, 3) == 0) {
+            return [Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(2)];
+        }
+
+        # Find one root and generate all others using roots of unity
+        my ($root, $zeta) = _tonelli_shanks($a_mod, $k, $p);
+
+        if (Math::GMPz::Rmpz_cmp_ui($zeta, 0) == 0) {
+            die "Failed to find root";
+        }
+        state $root_k = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_powm($root_k, $root, $k, $p);
+        if (Math::GMPz::Rmpz_cmp($root_k, $a_mod) != 0) {
+            die "Failed to find root";
+        }
+
+        my @roots = (Math::GMPz::Rmpz_init_set($root));
+        my $r     = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $root, $zeta);
+        Math::GMPz::Rmpz_mod($r, $r, $p);
+
+        my $k_ui = Math::GMPz::Rmpz_get_ui($k);
+
+        while (Math::GMPz::Rmpz_cmp($r, $root) != 0 && scalar(@roots) < $k_ui) {
+            push @roots, Math::GMPz::Rmpz_init_set($r);
+            Math::GMPz::Rmpz_mul($r, $r, $zeta);
+            Math::GMPz::Rmpz_mod($r, $r, $p);
+        }
+
+        return \@roots;
+    }
+
+    #----------------------------------------------------------
+    # Hensel lifting helpers
+    #----------------------------------------------------------
+    sub _hensel_lift_standard {
+        my ($roots, $A, $k, $mod) = @_;
+
+        my @result;
+
+        state $k_minus_1 = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($k_minus_1, $k, 1);
+
+        state $s_pow     = Math::GMPz::Rmpz_init();
+        state $deriv     = Math::GMPz::Rmpz_init();
+        state $s_k       = Math::GMPz::Rmpz_init();
+        state $residue   = Math::GMPz::Rmpz_init();
+        state $common    = Math::GMPz::Rmpz_init();
+        state $res_div   = Math::GMPz::Rmpz_init();
+        state $deriv_div = Math::GMPz::Rmpz_init();
+        state $inv_deriv = Math::GMPz::Rmpz_init();
+        state $quot      = Math::GMPz::Rmpz_init();
+        state $new_s     = Math::GMPz::Rmpz_init();
+
+        for my $s (@$roots) {
+            Math::GMPz::Rmpz_powm($s_pow, $s, $k_minus_1, $mod);
+
+            Math::GMPz::Rmpz_mul($deriv, $k, $s_pow);
+            Math::GMPz::Rmpz_mod($deriv, $deriv, $mod);
+
+            Math::GMPz::Rmpz_powm($s_k, $s, $k, $mod);
+
+            Math::GMPz::Rmpz_sub($residue, $A, $s_k);
+            Math::GMPz::Rmpz_mod($residue, $residue, $mod);
+            Math::GMPz::Rmpz_gcd($common, $residue, $deriv);
+
+            Math::GMPz::Rmpz_divexact($res_div,   $residue, $common);
+            Math::GMPz::Rmpz_divexact($deriv_div, $deriv,   $common);
+
+            Math::GMPz::Rmpz_invert($inv_deriv, $deriv_div, $mod);
+
+            Math::GMPz::Rmpz_mul($quot, $res_div, $inv_deriv);
+            Math::GMPz::Rmpz_mod($quot, $quot, $mod);
+
+            Math::GMPz::Rmpz_add($new_s, $s, $quot);
+            Math::GMPz::Rmpz_mod($new_s, $new_s, $mod);
+
+            push @result, Math::GMPz::Rmpz_init_set($new_s);
+        }
+        return \@result;
+    }
+
+    sub _hensel_lift_singular {
+        my ($roots, $A, $k, $p, $mod) = @_;
+
+        state $ext_mod = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($ext_mod, $mod, $p);
+
+        state $submod_val = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_divexact($submod_val, $mod, $p);
+
+        my %seen;
+
+        state $k_minus_1 = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($k_minus_1, $k, 1);
+
+        state $s_pow     = Math::GMPz::Rmpz_init();
+        state $deriv     = Math::GMPz::Rmpz_init();
+        state $s_k       = Math::GMPz::Rmpz_init();
+        state $residue   = Math::GMPz::Rmpz_init();
+        state $common    = Math::GMPz::Rmpz_init();
+        state $res_div   = Math::GMPz::Rmpz_init();
+        state $deriv_div = Math::GMPz::Rmpz_init();
+        state $inv_deriv = Math::GMPz::Rmpz_init();
+        state $quot      = Math::GMPz::Rmpz_init();
+        state $r         = Math::GMPz::Rmpz_init();
+        state $r_k       = Math::GMPz::Rmpz_init();
+        state $A_mod     = Math::GMPz::Rmpz_init();
+        state $i_val     = Math::GMPz::Rmpz_init();
+        state $new_r     = Math::GMPz::Rmpz_init();
+
+        my $k_ui = Math::GMPz::Rmpz_get_ui($k);
+
+        for my $s (@$roots) {
+            Math::GMPz::Rmpz_powm($s_pow, $s, $k_minus_1, $ext_mod);
+
+            Math::GMPz::Rmpz_mul($deriv, $k, $s_pow);
+            Math::GMPz::Rmpz_mod($deriv, $deriv, $ext_mod);
+            Math::GMPz::Rmpz_powm($s_k, $s, $k, $ext_mod);
+
+            Math::GMPz::Rmpz_sub($residue, $A, $s_k);
+            Math::GMPz::Rmpz_mod($residue, $residue, $ext_mod);
+            Math::GMPz::Rmpz_gcd($common, $residue, $deriv);
+
+            Math::GMPz::Rmpz_divexact($res_div,   $residue, $common);
+            Math::GMPz::Rmpz_divexact($deriv_div, $deriv,   $common);
+
+            Math::GMPz::Rmpz_invert($inv_deriv, $deriv_div, $mod);
+
+            Math::GMPz::Rmpz_mul($quot, $res_div, $inv_deriv);
+            Math::GMPz::Rmpz_mod($quot, $quot, $mod);
+
+            Math::GMPz::Rmpz_add($r, $s, $quot);
+            Math::GMPz::Rmpz_mod($r, $r, $mod);
+
+            Math::GMPz::Rmpz_powm($r_k, $r, $k, $mod);
+
+            Math::GMPz::Rmpz_mod($A_mod, $A, $mod);
+            next if (Math::GMPz::Rmpz_cmp($r_k, $A_mod) != 0);
+
+            for my $i (0 .. $k_ui - 1) {
+                Math::GMPz::Rmpz_mul_ui($i_val, $submod_val, $i);
+                Math::GMPz::Rmpz_mod($i_val, $i_val, $mod);
+                Math::GMPz::Rmpz_add_ui($i_val, $i_val, 1);
+                Math::GMPz::Rmpz_mod($i_val, $i_val, $mod);
+
+                Math::GMPz::Rmpz_mul($new_r, $r, $i_val);
+                Math::GMPz::Rmpz_mod($new_r, $new_r, $mod);
+
+                $seen{Math::GMPz::Rmpz_get_str($new_r, 10)} = Math::GMPz::Rmpz_init_set($new_r);
+            }
+        }
+        return [values %seen];
+    }
+
+    #----------------------------------------------------------
+    # All k-th roots of r modulo prime power p^e
+    #----------------------------------------------------------
+    sub _roots_mod_prime_power {
+        my ($r, $k, $p, $e) = @_;
+
+        return _roots_mod_prime($r, $k, $p) if ($e == 1);
+
+        my $mod = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_pow_ui($mod, $p, $e);
+
+        my $k_ui = Math::GMPz::Rmpz_get_ui($k);
+        my $pk   = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_pow_ui($pk, $p, $k_ui);
+
+        # Special case:   a ≡ 0 (mod p^e)
+        my $r_mod = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r_mod, $r, $mod);
+        if (Math::GMPz::Rmpz_cmp_ui($r_mod, 0) == 0) {
+            my $t  = int(($e - 1) / $k_ui) + 1;
+            my $pt = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_pow_ui($pt, $p, $t);
+            my $cnt = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_pow_ui($cnt, $p, $e - $t);
+            my $cnt_ui = Math::GMPz::Rmpz_get_ui($cnt);
+
+            my @result;
+            my $val = Math::GMPz::Rmpz_init();
+            for my $i (0 .. $cnt_ui - 1) {
+                Math::GMPz::Rmpz_mul_ui($val, $pt, $i);
+                Math::GMPz::Rmpz_mod($val, $val, $mod);
+                push @result, Math::GMPz::Rmpz_init_set($val);
+            }
+            return \@result;
+        }
+
+        # Special case:  a ≡ 0 (mod p^k) but a ≢ 0 (mod p^e)
+        my $r_mod_pk = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r_mod_pk, $r, $pk);
+        if (Math::GMPz::Rmpz_cmp_ui($r_mod_pk, 0) == 0) {
+
+            my $factor = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_pow_ui($factor, $p, ($e - $k_ui) + 1);
+
+            my $count = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_pow_ui($count, $p, $k_ui - 1);
+
+            my $count_ui = Math::GMPz::Rmpz_get_ui($count);
+            my $r_div_pk = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_divexact($r_div_pk, $r, $pk);
+
+            my $sub = _roots_mod_prime_power($r_div_pk, $k, $p, $e - $k_ui);
+
+            my @result;
+            my $base = Math::GMPz::Rmpz_init();
+            my $val  = Math::GMPz::Rmpz_init();
+
+            for my $s (@$sub) {
+                Math::GMPz::Rmpz_mul($base, $s, $p);
+                Math::GMPz::Rmpz_mod($base, $base, $mod);
+
+                for my $i (0 .. $count_ui - 1) {
+                    Math::GMPz::Rmpz_mul_ui($val, $factor, $i);
+                    Math::GMPz::Rmpz_add($val, $val, $base);
+                    Math::GMPz::Rmpz_mod($val, $val, $mod);
+                    push @result, Math::GMPz::Rmpz_init_set($val);
+                }
+            }
+            return \@result;
+        }
+
+        # No roots if p | a but p^k ∤ a
+        my $r_mod_p = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r_mod_p, $r, $p);
+        return [] if (Math::GMPz::Rmpz_cmp_ui($r_mod_p, 0) == 0);
+
+        # Hensel lifting from smaller exponent
+        my $half =
+          (Math::GMPz::Rmpz_cmp_ui($p, 2) > 0 || $e < 5)
+          ? int(($e + 1) / 2)
+          : int(($e + 3) / 2);
+
+        my $sub = _roots_mod_prime_power($r, $k, $p, $half);
+
+        if (Math::GMPz::Rmpz_cmp($k, $p) != 0) {
+            return _hensel_lift_standard($sub, $r, $k, $mod);
+        }
+        else {
+            return _hensel_lift_singular($sub, $r, $k, $p, $mod);
+        }
+    }
+
+    #----------------------------------------------------------
+    # All k-th roots of r modulo n (with factorization)
+    #----------------------------------------------------------
+    sub _roots_mod_composite {
+        my ($r, $k, $factors) = @_;
+
+        my $mod   = Math::GMPz::Rmpz_init_set_ui(1);
+        my $roots = [];
+        my $pe    = Math::GMPz::Rmpz_init();
+
+        for my $factor (@$factors) {
+            my ($p, $e) = @$factor;
+
+            my $sub = _roots_mod_prime_power($r, $k, $p, $e);
+            return [] if (!@$sub);
+
+            Math::GMPz::Rmpz_pow_ui($pe, $p, $e);
+
+            if (@$roots) {
+                $roots = _crt_combine($roots, $mod, $sub, $pe);
+            }
+            else {
+                $roots = $sub;
+            }
+            Math::GMPz::Rmpz_mul($mod, $mod, $pe);
+        }
+        return $roots;
+    }
+
+    #----------------------------------------------------------
+    # Main entry point:   all k-th roots of A modulo n
+    #----------------------------------------------------------
+    sub rootmod_all {
+        my ($A, $k, $n) = @_;
+
+        $A = _any2mpz($$A) // return Sidef::Types::Array::Array->new;
+        $k = _any2mpz($$k) // return Sidef::Types::Array::Array->new;
+        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        if (HAS_NEWER_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            my @roots = Math::Prime::Util::allrootmod(Math::GMPz::Rmpz_get_str($A, 10), Math::GMPz::Rmpz_get_str($k, 10), Math::GMPz::Rmpz_get_ui($n));
+            return Sidef::Types::Array::Array->new([map { bless \$_ } @roots]);
+        }
+
+        Math::GMPz::Rmpz_abs($n, $n);
+        return Sidef::Types::Array::Array->new() if (Math::GMPz::Rmpz_cmp_ui($n, 0) == 0);
+
+        Math::GMPz::Rmpz_mod($A, $A, $n);
+
+        if (Math::GMPz::Rmpz_cmp_ui($k, 0) <= 0 && Math::GMPz::Rmpz_cmp_ui($A, 0) == 0) {
+            return Sidef::Types::Array::Array->new();
+        }
+
+        if (Math::GMPz::Rmpz_sgn($k) < 0) {
+            my $inv = Math::GMPz::Rmpz_init();
+            if (!Math::GMPz::Rmpz_invert($inv, $A, $n)) {
+                return Sidef::Types::Array::Array->new();
+            }
+            my $g = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_gcd($g, $inv, $n);
+            return Sidef::Types::Array::Array->new() if (Math::GMPz::Rmpz_cmp_ui($g, 1) != 0);
+            Math::GMPz::Rmpz_set($A, $inv);
+            Math::GMPz::Rmpz_neg($k, $k);
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($n, 2) <= 0 || Math::GMPz::Rmpz_cmp_ui($k, 1) == 0) {
+            return Sidef::Types::Array::Array->new([_set_int($A)]);
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($k, 0) == 0) {
+            if (Math::GMPz::Rmpz_cmp_ui($A, 1) == 0) {
+                my $n_ui = Math::GMPz::Rmpz_get_ui($n);
+                return Sidef::Types::Array::Array->new([map { bless \$_ } (0 .. $n_ui - 1)]);
+            }
+            return Sidef::Types::Array::Array->new();
+        }
+
+        my @factors = map { [Math::GMPz::Rmpz_init_set_str($_->[0], 10), $_->[1]] } _factor_exp(Math::GMPz::Rmpz_get_str($n, 10));
+
+        my $roots     = [Math::GMPz::Rmpz_init_set($A)];
+        my @k_factors = map { Math::GMPz::Rmpz_init_set_str($_, 10) } _factor(Math::GMPz::Rmpz_get_str($k, 10));
+
+        for my $prime_factor (@k_factors) {
+            my @new_roots;
+            for my $r (@$roots) {
+                my $sub = _roots_mod_composite($r, $prime_factor, \@factors);
+                push @new_roots, @$sub;
+            }
+            $roots = \@new_roots;
+        }
+
+        Sidef::Types::Array::Array->new([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$roots]);
+    }
+
+    sub rootmod {
+        my ($A, $k, $n) = @_;
+        $A->rootmod_all($k, $n)->first // goto &nan;    # TODO: compute only one root
+    }
 
     sub difference_of_squares {
         my ($n) = @_;
