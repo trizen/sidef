@@ -11051,7 +11051,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($y) and !ref($x)) {
+        if (!ref($y) and !ref($x) and $x != 0) {
             my $r = (
                      HAS_PRIME_UTIL
                      ? (Math::Prime::Util::invmod($x, $y) // goto &nan)
