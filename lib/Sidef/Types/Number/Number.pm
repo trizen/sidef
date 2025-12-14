@@ -10711,12 +10711,15 @@ package Sidef::Types::Number::Number {
     sub rootmod_all {
         my ($A, $k, $n) = @_;
 
-        $A = _any2mpz($$A) // return Sidef::Types::Array::Array->new;
-        $k = _any2mpz($$k) // return Sidef::Types::Array::Array->new;
-        $n = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+        $A = _any2mpz($$A, 0) // return Sidef::Types::Array::Array->new;
+        $k = _any2mpz($$k, 1) // return Sidef::Types::Array::Array->new;
+        $n = _any2mpz($$n, 2) // return Sidef::Types::Array::Array->new;
 
         if (HAS_NEWER_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            my @roots = Math::Prime::Util::allrootmod(Math::GMPz::Rmpz_get_str($A, 10), Math::GMPz::Rmpz_get_str($k, 10), Math::GMPz::Rmpz_get_ui($n));
+            $A = Math::GMPz::Rmpz_get_str($A, 10);
+            $k = Math::GMPz::Rmpz_get_str($k, 10);
+            $n = Math::GMPz::Rmpz_get_ui($n);
+            my @roots = Math::Prime::Util::allrootmod($A, $k, $n);
             return Sidef::Types::Array::Array->new([map { bless \$_ } @roots]);
         }
 
