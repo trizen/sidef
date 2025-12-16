@@ -10201,7 +10201,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (HAS_PRIME_UTIL and !ref($y) and !ref($x)) {
+        if (0 and HAS_PRIME_UTIL and !ref($y) and !ref($x)) {
             if (defined(my $r = Math::Prime::Util::sqrtmod($x, $y))) {
                 return bless \$r;
             }
@@ -10224,7 +10224,7 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
+        if (0 and HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($y)) {
             if (defined(my $r = Math::Prime::Util::sqrtmod(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($y)))) {
                 return bless \$r;
             }
@@ -10237,7 +10237,7 @@ package Sidef::Types::Number::Number {
             return _set_int(Math::Prime::Util::GMP::sqrtmod($nstr, $ystr) // goto &nan);
         }
 
-        if (HAS_PRIME_UTIL) {
+        if (0 and HAS_PRIME_UTIL) {
             if (defined(my $r = Math::Prime::Util::sqrtmod($nstr, $ystr))) {
                 return _set_int("$r");
             }
