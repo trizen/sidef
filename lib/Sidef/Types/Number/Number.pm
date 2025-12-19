@@ -10044,156 +10044,6 @@ package Sidef::Types::Number::Number {
 
     *qnr = \&quadratic_nonresidue;
 
-    sub _sqrtmod {    # sqrt(n) modulo a prime power p^e
-        my ($n_, $p_, $e) = @_;
-
-        # trivial prime case
-        return Math::Prime::Util::GMP::sqrtmod($n_, $p_) if $e == 1;
-
-        # allocate GMP temporaries (reuse them)
-        my $p   = Math::GMPz::Rmpz_init();
-        my $pp  = Math::GMPz::Rmpz_init();
-        my $n   = Math::GMPz::Rmpz_init();
-        my $m   = Math::GMPz::Rmpz_init();    # current modulus p^k
-        my $s   = Math::GMPz::Rmpz_init();    # candidate root
-        my $t   = Math::GMPz::Rmpz_init();    # temp for s^2 - n
-        my $inv = Math::GMPz::Rmpz_init();    # inverse of (2*s) mod p
-
-        # set n
-        if (ref($n_)) {
-            Math::GMPz::Rmpz_set($n, $n_);
-        }
-        else {
-            ($n_ < ULONG_MAX and $n_ > 0)
-              ? Math::GMPz::Rmpz_set_ui($n, $n_)
-              : Math::GMPz::Rmpz_set_str($n, "$n_", 10);
-        }
-
-        # set p
-        if (ref($p_)) {
-            Math::GMPz::Rmpz_set($p, $p_);
-        }
-        else {
-            ($p_ < ULONG_MAX and $p_ > 0)
-              ? Math::GMPz::Rmpz_set_ui($p, $p_)
-              : Math::GMPz::Rmpz_set_str($p, "$p_", 10);
-        }
-
-        # pp = p^e and reduce n modulo pp
-        Math::GMPz::Rmpz_pow_ui($pp, $p, $e);
-        Math::GMPz::Rmpz_mod($n, $n, $pp);
-
-        return 0 if Math::GMPz::Rmpz_sgn($n) == 0;
-
-        # fast path: if p^e fits in ulong, let Math::Prime::Util try
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($pp)) {
-            my $ui_n  = Math::GMPz::Rmpz_get_ui($n);
-            my $ui_pp = Math::GMPz::Rmpz_get_ui($pp);
-            if (defined(my $r = Math::Prime::Util::sqrtmod($ui_n, $ui_pp))) {
-                return $r;
-            }
-        }
-
-        # === special handling for p == 2 ===
-        if (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0) {
-
-            # e == 1 handled earlier; e == 2: require n ≡ 1 (mod 4)
-            return (Math::GMPz::Rmpz_congruent_ui_p($n, 1, 4) ? 1 : 0) if $e == 2;
-
-            # for e >= 3 there is a solution only if n ≡ 1 (mod 8)
-            Math::GMPz::Rmpz_congruent_ui_p($n, 1, 8) or return;
-
-            # find a root modulo 8 by brute force (small fixed set)
-            my $found = 0;
-            for my $cand (1, 3, 5, 7) {
-                Math::GMPz::Rmpz_set_ui($s, $cand);
-                Math::GMPz::Rmpz_mul($t, $s, $s);        # t := s^2
-                Math::GMPz::Rmpz_sub($t, $t, $n);        # t := s^2 - n
-                Math::GMPz::Rmpz_mod_2exp($t, $t, 3);    # t mod 8
-                if (Math::GMPz::Rmpz_cmp_ui($t, 0) == 0) {
-                    $found = 1;
-                    last;
-                }
-            }
-            return unless $found;
-
-            # set current modulus m = 8 (2^3)
-            Math::GMPz::Rmpz_set_ui($m, 8);
-
-            # iterative Hensel lift: for k from 3 .. e-1 lift m -> 2*m each iteration
-            for (my $k = 3 ; $k < $e ; ++$k) {
-
-                # compute t := (s^2 - n) / m (we only need it mod 2)
-                Math::GMPz::Rmpz_mul($t, $s, $s);         # t := s^2
-                Math::GMPz::Rmpz_sub($t, $t, $n);         # t := s^2 - n
-                Math::GMPz::Rmpz_divexact($t, $t, $m);    # t := (s^2 - n) / m
-                                                          # t is small (mod 2), compute correction c = (t * inv(2*s / m)) mod 2
-                                                          # but for p=2 a simpler formula works: if (s^2 - n)/m is odd, add m/2 to s
-                if (Math::GMPz::Rmpz_odd_p($t)) {
-
-                    # add m/2
-                    Math::GMPz::Rmpz_div_2exp($t, $m, 1);    # t := m/2
-                    Math::GMPz::Rmpz_add($s, $s, $t);
-                    Math::GMPz::Rmpz_mod($s, $s, $pp);
-                }
-
-                # update m := m*2 (increase modulus by one power of 2)
-                Math::GMPz::Rmpz_mul_2exp($m, $m, 1);
-            }
-
-            return Math::GMPz::Rmpz_get_str($s, 10);
-        }
-
-        # === odd prime p: iterative Hensel lifting (Newton) ===
-        # get a root modulo p first
-        my $s0 = Math::Prime::Util::GMP::sqrtmod($n_, $p_) // return;
-        if ($s0 < ULONG_MAX) {
-            Math::GMPz::Rmpz_set_ui($s, $s0);
-        }
-        else {
-            Math::GMPz::Rmpz_set_str($s, $s0, 10);
-        }
-
-        # set current modulus m := p
-        Math::GMPz::Rmpz_set($m, $p);
-
-        # iterative lift: while m < p^e, lift to modulus m*p each loop
-        while (Math::GMPz::Rmpz_cmp($m, $pp) < 0) {
-
-            # compute t := (s^2 - n) / m  (this is integer because s^2 ≡ n (mod m))
-            Math::GMPz::Rmpz_mul($t, $s, $s);         # t := s^2
-            Math::GMPz::Rmpz_sub($t, $t, $n);         # t := s^2 - n
-            Math::GMPz::Rmpz_divexact($t, $t, $m);    # t := (s^2 - n) / m
-
-            # inv := inverse of (2*s/m) modulo p
-            # compute a = 2*s mod p (we only need it modulo p)
-            Math::GMPz::Rmpz_mod($inv, $s, $p);          # inv := s mod p
-            Math::GMPz::Rmpz_mul_2exp($inv, $inv, 1);    # inv := 2*s mod p
-            Math::GMPz::Rmpz_mod($inv, $inv, $p);
-
-            # invert inv modulo p
-            if (Math::GMPz::Rmpz_invert($inv, $inv, $p) == 0) {
-
-                # if 2*s is not invertible mod p (shouldn't happen for odd p and s not ≡ 0 mod p)
-                return;
-            }
-
-            # correction c = ( t * inv ) mod p
-            Math::GMPz::Rmpz_mul($t, $t, $inv);          # t := t * inv
-            Math::GMPz::Rmpz_mod($t, $t, $p);            # t := c mod p
-
-            # s := s - c * m   (lift to modulus m*p)
-            Math::GMPz::Rmpz_mul($t, $t, $m);            # t := c * m
-            Math::GMPz::Rmpz_sub($s, $s, $t);
-            Math::GMPz::Rmpz_mod($s, $s, $pp);
-
-            # m := m * p
-            Math::GMPz::Rmpz_mul($m, $m, $p);
-        }
-
-        return Math::GMPz::Rmpz_get_str($s, 10);
-    }
-
     sub sqrtmod {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -10245,34 +10095,6 @@ package Sidef::Types::Number::Number {
 
         # Fallback to rootmod(a,2,m)
         return _set_int($n)->rootmod(TWO, _set_int($y));
-
-        # Workaround: find all the solutions and return the smallest one
-        # return (_set_int($n)->sqrtmod_all(_set_int($y))->first // goto &nan);
-
-        # The code below fails to find a solution for: sqrtmod(17640, 48465)
-        my $u = Math::GMPz::Rmpz_init();
-        my $v = Math::GMPz::Rmpz_init();
-
-        my @congruences;
-
-        foreach my $pe (_factor_exp($ystr)) {
-            my ($p, $e) = @$pe;
-            my $root = _sqrtmod($nstr, $p, $e) // goto &nan;
-            my $pk   = Math::Prime::Util::GMP::powint($p, $e);
-            push @congruences, [$root, $pk];
-        }
-
-        my $r = Math::Prime::Util::GMP::chinese(@congruences) // goto &nan;
-
-        ($r < ULONG_MAX)
-          ? Math::GMPz::Rmpz_set_ui($v, $r)
-          : Math::GMPz::Rmpz_set_str($v, $r, 10);
-
-        # Check that v^2 = m (mod y)
-        Math::GMPz::Rmpz_powm_ui($u, $v, 2, $y);
-        Math::GMPz::Rmpz_cmp($u, $n) == 0 or goto &nan;
-
-        bless \$v;
     }
 
     sub sqrtmod_all {
@@ -10764,17 +10586,17 @@ package Sidef::Types::Number::Number {
 
         if (Math::GMPz::Rmpz_cmp_ui($k, 0) == 0) {
             if (Math::GMPz::Rmpz_cmp_ui($A, 1) == 0) {
-                my $n_ui = Math::GMPz::Rmpz_get_ui($n);
                 return Sidef::Types::Array::Array->new([ZERO]) if $single_root;
+                my $n_ui = Math::GMPz::Rmpz_get_ui($n);
                 return Sidef::Types::Array::Array->new([map { bless \$_ } (0 .. $n_ui - 1)]);
             }
             return Sidef::Types::Array::Array->new();
         }
 
-        my @factors = map { [Math::GMPz::Rmpz_init_set_str($_->[0], 10), $_->[1]] } _factor_exp(Math::GMPz::Rmpz_get_str($n, 10));
+        my @factors = map { [Math::GMPz::Rmpz_init_set_str($_->[0], 10), $_->[1]] } _factor_exp($n);
 
         my $roots     = [Math::GMPz::Rmpz_init_set($A)];
-        my @k_factors = map { Math::GMPz::Rmpz_init_set_str($_, 10) } _factor(Math::GMPz::Rmpz_get_str($k, 10));
+        my @k_factors = map { Math::GMPz::Rmpz_init_set_str($_, 10) } _factor($k);
 
         for my $prime_factor (@k_factors) {
             my @new_roots;
