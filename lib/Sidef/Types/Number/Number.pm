@@ -24383,169 +24383,198 @@ package Sidef::Types::Number::Number {
 
     *germain_factor = \&sophie_germain_factor;
 
-    sub special_factors {
-        my ($n, $m) = @_;
+    sub _is_small_number {
+        my ($z) = @_;
+        return Math::GMPz::Rmpz_fits_ulong_p($z)
+          || Math::GMPz::Rmpz_sizeinbase($z, 2) <= SMALL_NUMBER_MAX_BITS;
+    }
 
-        if (defined($m)) {
-            _valid(\$m);
-        }
-        else {
-            $m = ONE;
-        }
+    sub _get_recursive_factors {
+        my ($factor, $rec_tried, $n) = @_;
 
-        my $z = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+        return () if ($rec_tried->{$$factor}++ || $factor->sqr->gt($n));
 
-        Math::GMPz::Rmpz_sgn($z) > 0
-          or return Sidef::Types::Array::Array->new;
+        say STDERR "Recursively factoring: $$factor" if $VERBOSE;
+        return @{$factor->special_factors};
+    }
 
-        # Factorize directly when n is a native integer
-        if (Math::GMPz::Rmpz_fits_ulong_p($z)) {
-            local $SPECIAL_FACTORS = 0;
-            return Sidef::Types::Array::Array->new([map { bless \$_ } _factor(Math::GMPz::Rmpz_get_ui($z))]);
-        }
+    sub _is_trivial_factor {
+        my ($factor) = @_;
+        return (!ref($$factor) or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= SMALL_NUMBER_MAX_BITS or _is_prob_prime($$factor, 1));
+    }
 
-        # Factorize directly when n is small enough
-        if (Math::GMPz::Rmpz_sizeinbase($z, 2) <= SMALL_NUMBER_MAX_BITS) {
-            local $SPECIAL_FACTORS = 0;
-            return Sidef::Types::Array::Array->new([map { _set_int($_) } _factor(Math::GMPz::Rmpz_get_str($z, 10))]);
-        }
+    sub _create_collector {
+        my ($factors, $rec_tried, $factorized_ref, $n) = @_;
 
-        # Return ealry if input is a prime number
-        if (_is_prob_prime($z, 1)) {
-            return Sidef::Types::Array::Array->new([bless \$z]);
-        }
-
-        my @factors;
-        my %rec_tried;
-        my $factorized = 0;
-
-        my $collect_factors = sub {
+        return sub {
             my ($f) = @_;
-
             my @arr = @$f;
             my $rem = pop(@arr);
 
-            if (@arr) {
-                push(@factors, @arr);
-            }
-            else {
-                return;
-            }
-
-            push @arr, $rem;
+            return unless @arr;
+            push(@$factors, @arr);
+            push(@arr,      $rem);
 
             while (@arr) {
-                my $factor = CORE::shift(@arr);
-                if (   !ref($$factor)
-                    or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= SMALL_NUMBER_MAX_BITS
-                    or _is_prob_prime($$factor, 1)) {
-                    $factorized ||= 1;
+                my $factor = shift(@arr);
+
+                if (_is_trivial_factor($factor)) {
+                    $$factorized_ref ||= 1;
                 }
                 else {
-                    my @new_factors = (
-                        ($rec_tried{$$factor}++ or $factor->sqr->gt($n)) ? () : do {
-                            say STDERR "Recursively factoring: $$factor" if $VERBOSE;
-                            @{$factor->special_factors};
-                        }
-                    );
+                    my @new_factors = _get_recursive_factors($factor, $rec_tried, $n);
 
-                    if (scalar(@new_factors) >= 2) {
-                        push @arr,     @new_factors;
-                        push @factors, @new_factors;
+                    if (@new_factors >= 2) {
+                        push @arr,      @new_factors;
+                        push @$factors, @new_factors;
                     }
                     elsif ($factor->is_perfect_power) {
-                        my @perfect_factors = (($factor->perfect_root) x CORE::int($factor->perfect_power));
-                        push @arr,     @perfect_factors;
-                        push @factors, @perfect_factors;
+                        my @perfect = (($factor->perfect_root) x int($factor->perfect_power));
+                        push @arr,      @perfect;
+                        push @$factors, @perfect;
                     }
                     else {
-                        $factorized = 0;
+                        $$factorized_ref = 0;
                         last;
                     }
                 }
             }
         };
+    }
 
-        my $mp1 = $m->inc;
+    sub _try_factorization_methods {
+        my ($n, $mp1, $collector, $factorized_ref) = @_;
 
-        if ($n->is_perfect_power) {
-            $factorized || $collect_factors->([($n->perfect_root) x CORE::int($n->perfect_power)]);
+        my @methods = (
+                       sub { $n->is_perfect_power ? [($n->perfect_root) x int($n->perfect_power)] : undef },
+                       sub { $n->trial_factor($mp1->mul(_set_int(1e5))) },
+                       sub { $n->germain_factor },
+                       sub { $n->holf_factor($mp1->mul(_set_int(1e4))) },
+                       sub { $n->fermat_factor($mp1->mul(_set_int(1e3))) },
+                       sub { $n->phi_finder_factor($mp1->mul(_set_int(1e3))) },
+                       sub { $n->dop_factor($mp1->mul($n->ilog2->isqrt)->mul(TWO)) },
+                       sub { $n->miller_factor($mp1->mul(_set_int(5))) },
+                       sub { $n->fibonacci_factor },
+                       sub { $n->lucas_factor(undef, $mp1->mul(TWO)) },
+                       sub { $n->cop_factor($mp1->mul($n->ilog2->isqrt->shift_right(ONE))) },
+                       sub { $n->pell_factor($mp1->mul(_set_int(1e3))) },
+                      );
+
+        for my $method (@methods) {
+            last if $$factorized_ref;
+            my $result = $method->();
+            $collector->($result) if defined($result);
         }
+    }
 
-        $factorized || $collect_factors->($n->trial_factor($mp1->mul(_set_int(1e5))));
+    sub _separate_factors {
+        my ($factors) = @_;
+        my (@prime, @composite);
 
-        # Methods that depend on the special form of n
-        $factorized || $collect_factors->($n->germain_factor);
-        $factorized || $collect_factors->($n->holf_factor($mp1->mul(_set_int(1e4))));
-        $factorized || $collect_factors->($n->fermat_factor($mp1->mul(_set_int(1e3))));
-        $factorized || $collect_factors->($n->phi_finder_factor($mp1->mul(_set_int(1e3))));
-
-        $factorized || $collect_factors->($n->dop_factor($mp1->mul($n->ilog2->isqrt)->mul(TWO)));
-        $factorized || $collect_factors->($n->miller_factor($mp1->mul(_set_int(5))));
-        $factorized || $collect_factors->($n->fibonacci_factor);
-        $factorized || $collect_factors->($n->lucas_factor(undef, $mp1->mul(TWO)));
-        $factorized || $collect_factors->($n->cop_factor($mp1->mul($n->ilog2->isqrt->shift_right(ONE))));
-        $factorized || $collect_factors->($n->pell_factor($mp1->mul(_set_int(1e3))));
-
-        @factors = @{$n->gcd_factors(Sidef::Types::Array::Array->new([@factors]))};
-
-        my @prime_factors;
-        my @composite_factors;
-
-        foreach my $f (@factors) {
+        for my $f (@$factors) {
             if (_is_prob_prime($$f, 1)) {
-                push @prime_factors, $f;
+                push @prime, $f;
             }
             elsif (!ref($$f) or Math::GMPz::Rmpz_sizeinbase($$f, 2) <= SMALL_NUMBER_MAX_BITS) {
                 local $SPECIAL_FACTORS = 0;
-                push @prime_factors, map { _set_int($_) } _factor($$f);
+                push @prime, map { _set_int($_) } _factor($$f);
             }
             else {
-                push @composite_factors, $f;
+                push @composite, $f;
             }
         }
 
-        # Methods that can find special factors, recursively
-        if (@composite_factors and $m->is_positive) {
+        return (\@prime, \@composite);
+    }
 
-            my $fermat_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))) });
-            my $phi_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->phi_finder_factor($m->mul(_set_int(1e3))) });
-            my $holf_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e4))) });
-            my $pell_block   = Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(5e2))) });
-            my $FLT_block    = Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_random_prime(1e4)), $m->mul(_set_int(1e4))) });
+    sub _build_factorization_blocks {
+        my ($m) = @_;
 
-            my $pm1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) });
-            my $pm1_small_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(20000)), $m->mul(_set_int(200000))) });
-            my $pp1_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(5e4))) });
-            my $chebyshev_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(5e3))) });
-            my $prho_block      = Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))) });
-            my $ecm_block       = Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(2000)), $m->mul(_set_int(10))) });
-            my $ecm_small_block = Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(600)),  $m->mul(_set_int(20))) });
+        return (
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e4))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(5e2))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_random_prime(1e4)), $m->mul(_set_int(1e4))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(20000)), $m->mul(_set_int(200000))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(600)),  $m->mul(_set_int(20))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(2000)), $m->mul(_set_int(10))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(5e4))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(5e3))) }),
+                Sidef::Types::Block::Block->new(code => sub { $_[0]->phi_finder_factor($m->mul(_set_int(1e3))) }),
+               );
+    }
 
-            @composite_factors = map { @{$_->factor($fermat_block)} } @composite_factors;
-            @composite_factors = map { @{$_->factor($holf_block)} } @composite_factors;
-            @composite_factors = map { @{$_->factor($pell_block)} } @composite_factors;
-            @composite_factors = map { @{$_->factor($FLT_block)} } @composite_factors;
+    sub _apply_recursive_methods {
+        my ($composite, $m) = @_;
 
-            @composite_factors = map { @{$_->factor($pm1_small_block)} } @composite_factors;
-            @composite_factors = map { @{$_->factor($ecm_small_block)} } @composite_factors;
-            @composite_factors = map { @{$_->factor($ecm_block)} } @composite_factors;
-            @composite_factors = map { @{$_->factor($pm1_block)} } @composite_factors;
-            @composite_factors = map { @{$_->factor($pp1_block)} } @composite_factors;
-            @composite_factors = map { @{$_->factor($prho_block)} } @composite_factors;
-            @composite_factors = map { @{$_->factor($chebyshev_block)} } @composite_factors;
-            @composite_factors = map { @{$_->factor($phi_block)} } @composite_factors;
+        state $methods = {};
+        $methods->{$m} //= [_build_factorization_blocks($m)];
 
-            if ($m->ge(TWO)) {    # pretty slow; use it only with m >= 2
-                @composite_factors = map {
+        for my $block (@{$methods->{$m}}) {
+            $composite = [map { @{$_->factor($block)} } @$composite];
+        }
+
+        # Apply cyclotomic factorization for m >= 2
+        if ($m->ge(TWO)) {
+            $composite = [
+                map {
                     _is_prob_prime($$_, 1)
                       ? $_
                       : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(5))))}
-                } @composite_factors;
-            }
+                  } @$composite
+            ];
         }
 
-        $n->gcd_factors(Sidef::Types::Array::Array->new([@prime_factors, @composite_factors]));
+        return $composite;
+    }
+
+    sub _factorize_small {
+        my ($z) = @_;
+        local $SPECIAL_FACTORS = 0;
+
+        my @factors =
+          Math::GMPz::Rmpz_fits_ulong_p($z)
+          ? map { bless \$_ } _factor(Math::GMPz::Rmpz_get_ui($z))
+          : map { _set_int($_) } _factor(Math::GMPz::Rmpz_get_str($z, 10));
+
+        return Sidef::Types::Array::Array->new(\@factors);
+    }
+
+    sub special_factors {
+        my ($n, $m) = @_;
+
+        # Initialize and validate parameters
+        $m = defined($m) ? (_valid(\$m), $m) : ONE;
+        my $z = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
+
+        return Sidef::Types::Array::Array->new if Math::GMPz::Rmpz_sgn($z) <= 0;
+
+        # Handle small numbers directly
+        return _factorize_small($z) if _is_small_number($z);
+
+        # Handle prime numbers
+        return Sidef::Types::Array::Array->new([bless \$z]) if _is_prob_prime($z, 1);
+
+        # Main factorization
+        my (@factors, %rec_tried, $factorized);
+        my $mp1 = $m->inc;
+
+        # Collect factors using various methods
+        my $collect_factors = _create_collector(\@factors, \%rec_tried, \$factorized, $n);
+
+        _try_factorization_methods($n, $mp1, $collect_factors, \$factorized);
+
+        # Process factors
+        @factors = @{$n->gcd_factors(Sidef::Types::Array::Array->new([@factors]))};
+        my ($prime_factors, $composite_factors) = _separate_factors(\@factors);
+
+        # Apply recursive methods if needed
+        $composite_factors = _apply_recursive_methods($composite_factors, $m)
+          if (@$composite_factors && $m->is_positive);
+
+        return $n->gcd_factors(Sidef::Types::Array::Array->new([@$prime_factors, @$composite_factors]));
     }
 
     *special_factor = \&special_factors;

@@ -8,6 +8,7 @@
 #   13 jul 2023: 3.088s
 #   15 sep 2023: 3.904s (after adding a few more tests)
 #   23 sep 2023: 3.118s
+#   20 dec 2025: 3.235s
 
 #~ local Num!USE_CONJECTURES = true
 #~ local Num!VERBOSE = true

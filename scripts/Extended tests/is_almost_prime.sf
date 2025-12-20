@@ -10,9 +10,10 @@
 #   14 sep 2023: 2.575s (after removing a duplicated test)
 #   23 sep 2023: 3.391s (after adding two more tests)
 #   14 dec 2023: 3.894s (after adding more tests)
+#   20 dec 2025: 4.808s
 
-#~ local Num!USE_CONJECTURES = true
-#~ local Num!VERBOSE = true
+#local Num!USE_CONJECTURES = true
+#local Num!VERBOSE = true
 
 #define EXTRA = true     # true to run extra tests (slower)
 define EXTRA = false     # true to run extra tests (slower)
