@@ -20513,18 +20513,109 @@ package Sidef::Types::Number::Number {
         return ($r, @factors);
     }
 
-    sub is_almost_prime {
-        my ($n, $k) = @_;
+    sub _bool_result {
+        $_[0] ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub _check_remainder_special {
+        my ($remainder, $type) = @_;
+
+        if ($type eq 'almost') {
+            return _is_prob_prime($remainder, 1);
+        }
+
+        (
+         (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($remainder))
+         ? Math::Prime::Util::is_prime_power(Math::GMPz::Rmpz_get_ui($remainder))
+         : Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($remainder, 10))
+        );
+    }
+
+    sub _process_special_factors {
+        my ($n, $k, $count, $trial_limit, $trial_factors_ref, $j, $type) = @_;
+
+        my @special_factors = @{(bless \$n)->special_factors(_set_int($j - 6))};
+        my @gcd_factors     = @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @$trial_factors_ref)]))};
+
+        if ($type eq 'almost' and scalar(@gcd_factors) > $k) {
+            return (_bool_result(0), undef, 0);
+        }
+
+        my @prime_factors;
+        my @composite_factors;
+
+        foreach my $f (@gcd_factors) {
+            if (_is_prob_prime($$f, 1)) {
+                push @prime_factors, $f;
+            }
+            elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_MAX_BITS) {
+                push @prime_factors, (map { _set_int($_) } _factor($$f));
+            }
+            else {
+                push @composite_factors, $f;
+            }
+        }
+
+        if ($type eq 'almost' and scalar(@prime_factors) + 2 * scalar(@composite_factors) > $k) {
+            return (_bool_result(0), undef, 0);
+        }
+
+        my $prod = Sidef::Types::Number::Number::prod(@prime_factors);
+        my $c    = (bless \$n)->idiv($prod);
+
+        my $remainder = _any2mpz($$c);
+        @$trial_factors_ref =
+          ($type eq 'omega')
+          ? List::Util::uniq(map { "$$_" } @prime_factors)
+          : map { $$_ } @prime_factors;
+        $count = scalar(@$trial_factors_ref);
+
+        if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
+            return (_bool_result($count == $k), undef, 0);
+        }
+
+        if ($count >= $k) {
+            return (_bool_result(0), undef, 0);
+        }
+
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime($trial_limit), $k - $count);
+        Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
+          or return (_bool_result(0), undef, 0);
+
+        if (    $j <= 8
+            and @composite_factors
+            and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > ($j == 8 ? FACTORDB_MIN : YAFU_MIN)) {
+            return ($count, $remainder, 1);
+        }
+
+        foreach my $f (@composite_factors) {
+            push @prime_factors, _factor($$f);
+        }
+
+        if ($type eq 'omega') {
+            $count = scalar(List::Util::uniq(map { ref($_) ? "$$_" : $_ } @prime_factors));
+        }
+        else {
+            $count = scalar(@prime_factors);
+        }
+
+        return (_bool_result($count == $k), undef, 0);
+    }
+
+    sub _is_k_prime {
+        my ($n, $k, $type) = @_;
 
         $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE } : 2;
 
+        # Handle special cases
         if ($k == 0) {
             return $n->is_one;
         }
         elsif ($k == 1) {
-            return $n->is_prime;
+            return (($type eq 'almost') ? $n->is_prime : $n->is_prime_power);
         }
-        elsif ($k == 2 and !ref($$n)) {
+        elsif ($k == 2 and $type eq 'almost' and !ref($$n)) {
             return $n->is_semiprime;
         }
 
@@ -20540,34 +20631,41 @@ package Sidef::Types::Number::Number {
 
         my $size = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
-        if ($k >= $size) {    # the smallest k-almost prime is 2^k
-            return Sidef::Types::Bool::Bool::FALSE;
+        # Type-specific early checks
+        if ($type eq 'almost') {
+            if ($k >= $size) {    # the smallest k-almost prime is 2^k
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+        elsif ($type eq 'omega') {    # the smallest k-omega prime is primorial(p_k)
+            if (Math::GMPz::Rmpz_cmp($n, _cached_pn_primorial($k)) < 0) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+        else {
+            die "Invalid type: <<$type>>";
         }
 
         if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            return (
-                    Math::Prime::Util::is_almost_prime($k, Math::GMPz::Rmpz_get_ui($n))
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
+            my $result =
+              ($type eq 'almost')
+              ? Math::Prime::Util::is_almost_prime($k, Math::GMPz::Rmpz_get_ui($n))
+              : Math::Prime::Util::is_omega_prime($k, Math::GMPz::Rmpz_get_ui($n));
+            return $result ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
         }
 
-        my $bigomega  = 0;
+        my $count     = 0;
         my $remainder = $n;
 
         if ($size >= ((INTSIZE <= 32) ? 32 : 40)) {
-
             my $t = Math::GMPz::Rmpz_init();
-
             my @trial_factors;
 
             foreach my $j (2 .. (INTSIZE <= 32 ? 8 : 9)) {
-
                 my $trial_limit = 10**$j;
                 my ($r, @new_factors) = _primorial_trial_factor($remainder, $trial_limit);
 
-                # A fast conjectured approach, based on Pollard's rho method,
-                # which is expected to find a factor `p` in `O(sqrt(p))` steps.
+                # A fast conjectured approach, based on Pollard's rho method
                 if (    $j <= (INTSIZE <= 32 ? 5 : 7)
                     and $USE_CONJECTURES
                     and Math::GMPz::Rmpz_sizeinbase($r, 10) >= SPECIAL_FACTORS_MIN
@@ -20581,52 +20679,54 @@ package Sidef::Types::Number::Number {
                     }
                     else {
                         my $r_obj = _set_int($r);
-                        $trial_limit = $r_obj->iroot(_set_int($k - $bigomega))->inc;
+                        $trial_limit = $r_obj->iroot(_set_int($k - $count))->inc;
                         my $f   = $r_obj->factor_upto($trial_limit);
                         my $rem = ${$f->pop};
 
                         $trial_limit = $trial_limit->numify;
                         $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
 
-                        push @new_factors, map { $$_ } @$f;
+                        if ($type eq 'omega') {
+                            push @new_factors, map { "$$_" } @$f;
+                        }
+                        else {
+                            push @new_factors, map { $$_ } @$f;
+                        }
                         $r = $rem;
                     }
                 }
 
-                push @trial_factors, @new_factors;
-
-                $bigomega  = List::Util::max($bigomega, scalar(@trial_factors));
-                $remainder = _any2mpz($r);
-
-                if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
-                    if ($bigomega == $k) {
-                        return Sidef::Types::Bool::Bool::TRUE;
-                    }
-                    else {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
+                if ($type eq 'omega' and @new_factors) {
+                    push @trial_factors, List::Util::uniq(@new_factors);
+                }
+                else {
+                    push @trial_factors, @new_factors;
                 }
 
-                if ($bigomega >= $k) {
+                $count     = List::Util::max($count, scalar(@trial_factors));
+                $remainder = _any2mpz($r);
+
+                # Check if remainder is 1
+                if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
+                    return _bool_result($count == $k);
+                }
+
+                if ($count >= $k) {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
-                Math::GMPz::Rmpz_ui_pow_ui($t, $trial_limit + 1, $k - $bigomega);
+                Math::GMPz::Rmpz_ui_pow_ui($t, $trial_limit + 1, $k - $count);
                 Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
                   or return Sidef::Types::Bool::Bool::FALSE;
 
-                my $r_is_prime = _is_prob_prime($remainder, 1);
+                # Check if remainder is prime/prime_power
+                my $r_is_special = _check_remainder_special($remainder, $type);
 
-                if ($r_is_prime) {
-                    if ($bigomega + 1 == $k) {
-                        return Sidef::Types::Bool::Bool::TRUE;
-                    }
-                    else {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
+                if ($r_is_special) {
+                    return _bool_result($count + 1 == $k);
                 }
 
-                if ($bigomega + ($r_is_prime ? 1 : 2) > $k) {
+                if ($count + ($r_is_special ? 1 : 2) > $k) {
                     return Sidef::Types::Bool::Bool::FALSE;
                 }
 
@@ -20641,88 +20741,38 @@ package Sidef::Types::Number::Number {
 
                 # Try to find special factors
                 if ($j >= 6) {
+                    my ($new_count, $new_remainder, $should_continue) = _process_special_factors($n, $k, $count, $trial_limit, \@trial_factors, $j, $type);
 
-                    my @special_factors = @{(bless \$n)->special_factors(_set_int($j - 6))};
-                    my @gcd_factors = @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)]))};
-
-                    if (scalar(@gcd_factors) > $k) {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
-
-                    my @prime_factors;
-                    my @composite_factors;
-
-                    foreach my $f (@gcd_factors) {
-                        if (_is_prob_prime($$f, 1)) {
-                            push @prime_factors, $f;
+                    if (defined $new_count) {
+                        if (ref($new_count) eq 'Sidef::Types::Bool::Bool') {
+                            return $new_count;
                         }
-                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_MAX_BITS) {
-                            push @prime_factors, (map { _set_int($_) } _factor($$f));
-                        }
-                        else {
-                            push @composite_factors, $f;
-                        }
-                    }
-
-                    if (scalar(@prime_factors) + 2 * scalar(@composite_factors) > $k) {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
-
-                    my $prod = Sidef::Types::Number::Number::prod(@prime_factors);
-                    my $c    = (bless \$n)->idiv($prod);
-
-                    $remainder     = _any2mpz($$c);
-                    @trial_factors = map { $$_ } @prime_factors;
-                    $bigomega      = scalar(@trial_factors);
-
-                    if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
-                        if ($bigomega == $k) {
-                            return Sidef::Types::Bool::Bool::TRUE;
-                        }
-                        else {
-                            return Sidef::Types::Bool::Bool::FALSE;
-                        }
-                    }
-
-                    if ($bigomega >= $k) {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
-
-                    Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime($trial_limit), $k - $bigomega);
-                    Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
-                      or return Sidef::Types::Bool::Bool::FALSE;
-
-                    if (    $j <= 8
-                        and @composite_factors
-                        and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > ($j == 8 ? FACTORDB_MIN : YAFU_MIN)) {
-                        next;
-                    }
-
-                    foreach my $f (@composite_factors) {
-                        push @prime_factors, _factor($$f);
-                    }
-
-                    if (scalar(@prime_factors) == $k) {
-                        return Sidef::Types::Bool::Bool::TRUE;
-                    }
-                    else {
-                        return Sidef::Types::Bool::Bool::FALSE;
+                        $count     = $new_count;
+                        $remainder = $new_remainder;
+                        next if $should_continue;
                     }
                 }
             }
         }
 
-        if ($bigomega > $k) {
+        if ($count > $k) {
             return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        my @factors = _factor($remainder);
+        my @factors = $type eq 'omega' ? _factor_exp($remainder) : _factor($remainder);
+        $count += scalar(@factors);
 
-        $bigomega += scalar(@factors);
+        return _bool_result($count == $k);
+    }
 
-        ($bigomega == $k)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
+    sub is_almost_prime {
+        my ($n, $k) = @_;
+        return _is_k_prime($n, $k, 'almost');
+    }
+
+    sub is_omega_prime {
+        my ($n, $k) = @_;
+        return _is_k_prime($n, $k, 'omega');
     }
 
     sub is_squarefree_almost_prime {
@@ -20790,215 +20840,6 @@ package Sidef::Types::Number::Number {
         }
 
         return Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    sub is_omega_prime {
-        my ($n, $k) = @_;
-
-        $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // return Sidef::Types::Bool::Bool::FALSE } : 2;
-
-        if ($k == 0) {
-            return $n->is_one;
-        }
-        elsif ($k == 1) {
-            return $n->is_prime_power;
-        }
-
-        $n = $$n;
-
-        if (ref($n) ne 'Math::GMPz') {
-            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
-            $n = _any2mpz($n, 0) // return Sidef::Types::Bool::Bool::FALSE;
-        }
-
-        Math::GMPz::Rmpz_sgn($n) > 0
-          or return Sidef::Types::Bool::Bool::FALSE;
-
-        # The smallest k-omega prime is primorial(p_k)
-        if (Math::GMPz::Rmpz_cmp($n, _cached_pn_primorial($k)) < 0) {
-            return Sidef::Types::Bool::Bool::FALSE;
-        }
-
-        if (HAS_NEW_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            return (
-                    Math::Prime::Util::is_omega_prime($k, Math::GMPz::Rmpz_get_ui($n))
-                    ? Sidef::Types::Bool::Bool::TRUE
-                    : Sidef::Types::Bool::Bool::FALSE
-                   );
-        }
-
-        my $omega     = 0;
-        my $remainder = $n;
-        my $size      = Math::GMPz::Rmpz_sizeinbase($n, 2);
-
-        if ($size >= ((INTSIZE <= 32) ? 32 : 40)) {
-
-            my $t = Math::GMPz::Rmpz_init();
-
-            my @trial_factors;
-
-            foreach my $j (2 .. (INTSIZE <= 32 ? 8 : 9)) {
-
-                my $trial_limit = 10**$j;
-                my ($r, @new_factors) = _primorial_trial_factor($remainder, $trial_limit);
-
-                # A fast conjectured approach, based on Pollard's rho method,
-                # which is expected to find a factor `p` in `O(sqrt(p))` steps.
-                if (    $j <= (INTSIZE <= 32 ? 5 : 7)
-                    and $USE_CONJECTURES
-                    and Math::GMPz::Rmpz_sizeinbase($r, 10) >= SPECIAL_FACTORS_MIN
-                    and Math::GMPz::Rmpz_sizeinbase($r, 10) <= 500) {
-                    if ($j <= 2) {
-                        my ($rem, @f) = _pollard_rho_factor($r, 2 * $trial_limit);
-                        $trial_limit = Math::Prime::Util::GMP::mulint($trial_limit, $trial_limit);
-                        $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
-                        push @new_factors, @f;
-                        $r = $rem;
-                    }
-                    else {
-                        my $r_obj = _set_int($r);
-                        $trial_limit = $r_obj->iroot(_set_int($k - $omega))->inc;
-                        my $f   = $r_obj->factor_upto($trial_limit);
-                        my $rem = ${$f->pop};
-
-                        $trial_limit = $trial_limit->numify;
-                        $trial_limit = (ULONG_MAX >> 1) if ($trial_limit > ULONG_MAX);
-
-                        push @new_factors, map { ref($$_) ? _big2uistr($$_) : $$_ } @$f;
-                        $r = $rem;
-                    }
-                }
-
-                if (@new_factors) {
-                    push @trial_factors, List::Util::uniq(@new_factors);
-                }
-
-                $omega     = List::Util::max($omega, scalar(@trial_factors));
-                $remainder = _any2mpz($r);
-
-                if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
-                    if ($omega == $k) {
-                        return Sidef::Types::Bool::Bool::TRUE;
-                    }
-                    else {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
-                }
-
-                if ($omega >= $k) {
-                    return Sidef::Types::Bool::Bool::FALSE;
-                }
-
-                Math::GMPz::Rmpz_ui_pow_ui($t, $trial_limit + 1, $k - $omega);
-                Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
-                  or return Sidef::Types::Bool::Bool::FALSE;
-
-                my $r_is_prime_power = (
-                                        (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($remainder))
-                                        ? Math::Prime::Util::is_prime_power(Math::GMPz::Rmpz_get_ui($remainder))
-                                        : Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($remainder, 10))
-                                       );
-
-                if ($r_is_prime_power) {
-                    if ($omega + 1 == $k) {
-                        return Sidef::Types::Bool::Bool::TRUE;
-                    }
-                    else {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
-                }
-
-                if ($omega + ($r_is_prime_power ? 1 : 2) > $k) {
-                    return Sidef::Types::Bool::Bool::FALSE;
-                }
-
-                my $r_size = Math::GMPz::Rmpz_sizeinbase($remainder, 2);
-
-                last if (($j >= 4) && ($r_size <= 83));                  # <= 25 digits
-                last if (($j >= 5) && ($r_size <= 100));                 # <= 30 digits
-                last if (($j >= 6) && ($r_size <= 133));                 # <= 40 digits
-                last if (($j >= 7) && ($r_size <= 150));                 # <= 45 digits
-                last if (($j >= 8) && ($r_size <= 200));                 # <= 60 digits
-                last if (($j >= 8) && ($r_size <= 250) && $USE_YAFU);    # <= 75 digits
-
-                # Try to find special factors
-                if ($j >= 6) {
-
-                    my @special_factors = @{(bless \$n)->special_factors(_set_int($j - 6))};
-                    my @gcd_factors = @{(bless \$n)->gcd_factors(Sidef::Types::Array::Array->new([@special_factors, (map { _set_int($_) } @trial_factors)]))};
-
-                    my @prime_factors;
-                    my @composite_factors;
-
-                    foreach my $f (@gcd_factors) {
-                        if (_is_prob_prime($$f, 1)) {
-                            push @prime_factors, $f;
-                        }
-                        elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_MAX_BITS) {
-                            push @prime_factors, (map { _set_int($_) } _factor($$f));
-                        }
-                        else {
-                            push @composite_factors, $f;
-                        }
-                    }
-
-                    my $prod = Sidef::Types::Number::Number::prod(@prime_factors);
-                    my $c    = (bless \$n)->idiv($prod);
-
-                    $remainder     = _any2mpz($$c);
-                    @trial_factors = List::Util::uniq(map { "$$_" } @prime_factors);
-                    $omega         = scalar(@trial_factors);
-
-                    if (Math::GMPz::Rmpz_cmp_ui($remainder, 1) == 0) {
-                        if ($omega == $k) {
-                            return Sidef::Types::Bool::Bool::TRUE;
-                        }
-                        else {
-                            return Sidef::Types::Bool::Bool::FALSE;
-                        }
-                    }
-
-                    if ($omega >= $k) {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
-
-                    Math::GMPz::Rmpz_ui_pow_ui($t, _next_prime($trial_limit), $k - $omega);
-                    Math::GMPz::Rmpz_cmp($remainder, $t) >= 0
-                      or return Sidef::Types::Bool::Bool::FALSE;
-
-                    if (    $j <= 8
-                        and @composite_factors
-                        and Math::GMPz::Rmpz_sizeinbase(_any2mpz(${$composite_factors[-1]}), 10) > ($j == 8 ? FACTORDB_MIN : YAFU_MIN)) {
-                        next;
-                    }
-
-                    foreach my $f (@composite_factors) {
-                        push @prime_factors, _factor($$f);
-                    }
-
-                    $omega = scalar(List::Util::uniq(map { ref($_) ? "$$_" : $_ } @prime_factors));
-
-                    if ($omega == $k) {
-                        return Sidef::Types::Bool::Bool::TRUE;
-                    }
-                    else {
-                        return Sidef::Types::Bool::Bool::FALSE;
-                    }
-                }
-            }
-        }
-
-        if ($omega > $k) {
-            return Sidef::Types::Bool::Bool::FALSE;
-        }
-
-        my @factors = _factor_exp($remainder);
-
-        $omega += scalar(@factors);
-
-        ($omega == $k)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
     }
 
     sub is_prob_prime {
