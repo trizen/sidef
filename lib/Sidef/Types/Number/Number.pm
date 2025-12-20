@@ -22552,17 +22552,18 @@ package Sidef::Types::Number::Number {
 
         my @res;
         foreach my $r (@$arr_ref) {
+            my $r_mod_p = $r % $p;
             foreach my $s (@$S_p_ref) {
 
                 # Solve r + k*M ≡ s (mod p) -> k ≡ (s - r) * Minv (mod p)
-                push @res, (((($s - ($r % $p)) % $p) * $Minv) % $p) * $M + $r;
+                push @res, (((($s - $r_mod_p) % $p) * $Minv) % $p) * $M + $r;
             }
         }
 
         return \@res;
     }
 
-    sub _remaindersmodp {
+    sub _remainders_mod_p {
         my ($p, $terms, $alphas) = @_;
 
         my @bad;    # bad[m] = 1 means m is forbidden modulo p
@@ -22659,8 +22660,8 @@ package Sidef::Types::Number::Number {
         my $M = 1;
         my @primes;
 
-        for (my $p = 2 ; ; $p = _next_prime($p)) {
-            my @S_p = _remaindersmodp($p, $terms, $alphas);
+        for (my $p = 2 ; $M <= $target_modulus ; $p = _next_prime($p)) {
+            my @S_p = _remainders_mod_p($p, $terms, $alphas);
 
             if (scalar(@S_p) == $p) {
                 next;    # skip trivial primes
@@ -22668,7 +22669,6 @@ package Sidef::Types::Number::Number {
 
             CORE::push(@primes, [$p, \@S_p]);
             $M *= $p;
-            last if $M > $target_modulus;
         }
 
         return ($M, \@primes);
@@ -27077,57 +27077,83 @@ package Sidef::Types::Number::Number {
 
         # Based on invphi.gp ver. 2.1 by Max Alekseyev.
 
-        my %R = (1 => [$ONE]);
-        my $u = Math::GMPz::Rmpz_init();
+        # With memory optimization by Dana Jacobsen
+        # https://github.com/danaj/Math-Prime-Util/issues/83
 
+        # Phase 1: Determine which intermediate values are actually needed
+        my %needed = (Math::GMPz::Rmpz_get_str($N, 10) => undef);
+        my @operations;
+
+        my $u       = Math::GMPz::Rmpz_init();
         my $unitary = $opt{unitary};
 
         foreach my $l (@$L) {
-            my %t;
+            my @current_ops;
 
             foreach my $pair (@$l) {
                 my ($x, $y) = @$pair;
 
                 foreach my $d (_n_over_d_divisors($N, $x, $u, $D)) {
-                    if (exists $R{$d}) {
 
-                        ($d < ULONG_MAX)
-                          ? Math::GMPz::Rmpz_mul_ui($u, $x, $d)
-                          : do {
-                            Math::GMPz::Rmpz_set_str($u, $d, 10);
-                            Math::GMPz::Rmpz_mul($u, $u, $x);
-                          };
+                    ($d < ULONG_MAX)
+                      ? Math::GMPz::Rmpz_mul_ui($u, $x, $d)
+                      : do {
+                        Math::GMPz::Rmpz_set_str($u, $d, 10);
+                        Math::GMPz::Rmpz_mul($u, $u, $x);
+                      };
 
-                        my $key  = Math::GMPz::Rmpz_get_str($u, 10);
-                        my @list = @{$R{$d}};
-
-                        if ($unitary) {
-                            @list = grep {
-                                ref($_)
-                                  ? do {
-                                    Math::GMPz::Rmpz_gcd($u, $y, $_);
-                                    Math::GMPz::Rmpz_cmp_ui($u, 1) == 0;
-                                  }
-                                  : do {
-                                    Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $y, $_) == 1;
-                                  }
-                            } @list;
-                        }
-
-                        push @{$t{$key}}, map {
-                            my $w = Math::GMPz::Rmpz_init();
-                            ref($_)
-                              ? Math::GMPz::Rmpz_mul($w, $y, $_)
-                              : Math::GMPz::Rmpz_mul_ui($w, $y, $_);
-                            $w = Math::GMPz::Rmpz_get_ui($w) if Math::GMPz::Rmpz_fits_ulong_p($w);
-                            $w;
-                        } @list;
+                    # Only track operations that lead to needed values
+                    if (exists $needed{Math::GMPz::Rmpz_get_str($u, 10)}) {
+                        undef $needed{$d};
+                        push(@current_ops, [$d, $y, Math::GMPz::Rmpz_init_set($u)]);
                     }
                 }
             }
 
-            while (my ($key, $value) = each %t) {
-                push @{$R{$key}}, @$value;
+            unshift(@operations, \@current_ops) if @current_ops;
+        }
+
+        undef %needed;
+
+        my %R = (1 => [1]);
+
+        foreach my $ops (@operations) {
+            my %t;
+
+            foreach my $op (@$ops) {
+                my ($d, $y, $F) = @$op;
+
+                if (exists $R{$d}) {
+
+                    my $key  = Math::GMPz::Rmpz_get_str($F, 10);
+                    my @list = @{$R{$d}};
+
+                    if ($unitary) {
+                        @list = grep {
+                            ref($_)
+                              ? do {
+                                Math::GMPz::Rmpz_gcd($u, $y, $_);
+                                Math::GMPz::Rmpz_cmp_ui($u, 1) == 0;
+                              }
+                              : do {
+                                Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $y, $_) == 1;
+                              }
+                        } @list;
+                    }
+
+                    push @{$t{$key}}, map {
+                        my $w = Math::GMPz::Rmpz_init();
+                        ref($_)
+                          ? Math::GMPz::Rmpz_mul($w, $y, $_)
+                          : Math::GMPz::Rmpz_mul_ui($w, $y, $_);
+                        $w = Math::GMPz::Rmpz_get_ui($w) if Math::GMPz::Rmpz_fits_ulong_p($w);
+                        $w;
+                    } @list;
+                }
+            }
+
+            foreach my $k (keys %t) {
+                push @{$R{$k}}, @{delete $t{$k}};
             }
         }
 
@@ -27318,7 +27344,6 @@ package Sidef::Types::Number::Number {
 
                 Math::GMPz::Rmpz_pow_ui($v, $p, $_ - 1);
                 Math::GMPz::Rmpz_pow_ui($y, $p, $_);
-
                 Math::GMPz::Rmpz_sub_ui($x, $p, 1);
                 Math::GMPz::Rmpz_mul($x, $x, $v);
 
