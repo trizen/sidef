@@ -16,7 +16,7 @@ Sidef is a modern, high-level programming language designed for versatile genera
 
 # Book
 
-The Sidef Programming Language: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/24.11/sidef-book.pdf)).
+The Sidef Programming Language: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-book.pdf)).
 
 # Installation
 
@@ -32,7 +32,7 @@ Access the latest release at:
 
 For Windows, Sidef is available as a portable 32-bit executable:
 
-* https://github.com/trizen/sidef/releases/download/24.11/sidef-24.11.exe.zip
+* https://github.com/trizen/sidef/releases/download/25.12/sidef-25.12.exe.zip
 
 ## Linux installation
 
