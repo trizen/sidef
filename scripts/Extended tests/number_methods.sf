@@ -2,6 +2,9 @@
 
 # Tests for some Number methods.
 
+#local Num!USE_CONJECTURES = true
+#local Num!VERBOSE = true
+
 func A358860(n) {
     for k in (1..Inf) {
         var t = pyramidal(k, n)

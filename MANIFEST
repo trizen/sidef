@@ -873,8 +873,10 @@ scripts/Tests/interactive_mode_bug.sf
 scripts/Tests/inverse_of_factorial.sf
 scripts/Tests/inverted_syntax.sf
 scripts/Tests/irootrem.sf
+scripts/Tests/is_almost_prime.sf
 scripts/Tests/is_even_perfect.sf
 scripts/Tests/is_even_perfect_2.sf
+scripts/Tests/is_omega_prime.sf
 scripts/Tests/is_power.sf
 scripts/Tests/is_prime.sf
 scripts/Tests/karatsuba_multiplication.sf

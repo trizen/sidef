@@ -1814,5 +1814,12 @@ do {
 }
 
 assert_eq(invmod(0, 1), 0)
+assert_eq(323.factor_upto, %n[17,19])
+assert_eq(323.factor_upto(18), %n[17,19])
+assert_eq(323.factor_upto(17), %n[17,19])
+assert_eq(factor_upto((2**64 + 1) * 274177, 274177), %n[274177, 274177, 67280421310721])
+assert_eq(218196290503625371633066083.factor_upto, %n[3, 135635139683, 536233434820267])
+assert_eq(factor_upto((2**64 + 1)**5), factor(2**64 + 1)*5 -> isort)
+assert_eq(factor_upto((2**128 + 1) * (2**64 + 1), 274177), %n[274177, 22894341011050090868949881974522315437050433829130497])
 
 say "** Tests passed!"

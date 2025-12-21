@@ -10,8 +10,8 @@
 #   23 sep 2023: 3.118s
 #   20 dec 2025: 3.235s
 
-#~ local Num!USE_CONJECTURES = true
-#~ local Num!VERBOSE = true
+#local Num!USE_CONJECTURES = true
+#local Num!VERBOSE = true
 
 func A219019(n) {
     for k in (1..Inf) {
@@ -132,5 +132,23 @@ assert(is_omega_prime(3997087877499983596169090, 5))
 assert(is_omega_prime(51403227993662852987455497928, 5))
 assert(is_omega_prime(2011545292777067446258687026, 5))
 assert(is_omega_prime(4810554005148753711362794456, 4))
+
+do {
+    local Number!USE_CONJECTURES = true
+    assert(is_omega_prime(4522, 4))
+    assert(is_omega_prime(40666088, 3))
+    assert(is_omega_prime(66122822, 3))
+    assert(is_omega_prime(944911386291, 5))
+    assert(is_omega_prime(1762610652661, 4))
+    assert(is_omega_prime(17295389739104958689918, 6))
+    assert(is_omega_prime(3194569977264671866214863610, 4))
+    assert(is_omega_prime(72960029911372484469592, 4))
+    assert(is_omega_prime(158441958340314419522552997965, 5))
+    assert(is_omega_prime(1038735417774685624754922, 5))
+    assert(is_omega_prime(323463936073052242257157, 2))
+    assert(is_omega_prime(63625815508153350513817311207, 4))
+    assert(is_omega_prime(2468336534484213369852218139, 4))
+    assert(is_omega_prime(307764215443043830937725274, 3))
+}
 
 say "** Test passed!"

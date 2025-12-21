@@ -1,0 +1,71 @@
+#!/usr/bin/ruby
+
+# A fast method for checking if a given integer n has exactly k distinct prime factors (i.e.: omega(n) = k).
+
+# Algorithm from the PARI program posted by Jinyuan Wang:
+#   https://oeis.org/history?seq=A219019
+
+func my_is_omega_prime (n, k) {
+
+    if (k == 1) {
+        return n.is_prime_power
+    }
+
+    return false if (n <= 1)
+
+    var f = [n]
+    var r = 0
+
+    while (k > 1) {
+
+        var t = f.last.iroot(k)+1
+
+        t > r || return false
+        r = t
+
+        f = factor_upto(f.last, r).iuniq
+
+        if (f.len == 1) {
+            return false
+        }
+
+        if (f.last.is_prime_power) {
+            return (k == f.len)
+        }
+
+        k = (k - f.len + 1)
+    }
+
+    return false
+}
+
+for n in (1..100) {
+    var t = irand(1 << n)+1
+
+    say "Testing: #{t}"
+
+    for k in (1..20) {
+        if (t.is_omega_prime(k)) {
+            assert(my_is_omega_prime(t, k), [t,k])
+        }
+        elsif (my_is_omega_prime(t, k)) {
+            die "counter-example: #{[t, k]}"
+        }
+    }
+}
+
+# These tests may randomly fail
+assert(my_is_omega_prime(4522, 4))
+assert(my_is_omega_prime(40666088, 3))
+assert(my_is_omega_prime(66122822, 3))
+assert(my_is_omega_prime(944911386291, 5))
+assert(my_is_omega_prime(1762610652661, 4))
+assert(my_is_omega_prime(17295389739104958689918, 6))
+assert(my_is_omega_prime(3194569977264671866214863610, 4))
+assert(my_is_omega_prime(72960029911372484469592, 4))
+assert(my_is_omega_prime(158441958340314419522552997965, 5))
+assert(my_is_omega_prime(1038735417774685624754922, 5))
+assert(my_is_omega_prime(323463936073052242257157, 2))
+assert(my_is_omega_prime(63625815508153350513817311207, 4))
+assert(my_is_omega_prime(2468336534484213369852218139, 4))
+assert(my_is_omega_prime(307764215443043830937725274, 3))

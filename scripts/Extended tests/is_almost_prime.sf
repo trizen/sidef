@@ -229,4 +229,28 @@ assert(is_almost_prime(51403227993662852987455497928, 7))
 assert(is_almost_prime(2011545292777067446258687026, 5))
 assert(is_almost_prime(4810554005148753711362794456, 6))
 
+do {
+    local Number!USE_CONJECTURES = true
+
+    assert(is_almost_prime(4522, 4))
+    assert(is_almost_prime(40666088, 5))
+    assert(is_almost_prime(66122822, 3))
+    assert(is_almost_prime(1762610652661, 4))
+    assert(is_almost_prime(4063735837155532, 4))
+    assert(is_almost_prime(17295389739104958689918, 6))
+    assert(is_almost_prime(3194569977264671866214863610, 4))
+    assert(is_almost_prime(72960029911372484469592, 6))
+    assert(is_almost_prime(158441958340314419522552997965, 5))
+    assert(is_almost_prime(1038735417774685624754922, 8))
+    assert(is_almost_prime(323463936073052242257157, 2))
+    assert(is_almost_prime(63625815508153350513817311207, 4))
+    assert(is_almost_prime(2468336534484213369852218139, 4))
+    assert(is_almost_prime(307764215443043830937725274, 3))
+    assert(is_almost_prime(2068360226936926347380742889, 4))
+    assert(is_almost_prime(3997087877499983596169090, 6))
+    assert(is_almost_prime(51403227993662852987455497928, 7))
+    assert(is_almost_prime(2011545292777067446258687026, 5))
+    assert(is_almost_prime(4810554005148753711362794456, 6))
+}
+
 say "** Test passed!"

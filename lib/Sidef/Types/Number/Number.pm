@@ -20658,7 +20658,7 @@ package Sidef::Types::Number::Number {
         my $remainder = $n;
 
         if ($size >= ((INTSIZE <= 32) ? 32 : 40)) {
-            my $t = Math::GMPz::Rmpz_init();
+            state $t = Math::GMPz::Rmpz_init();
             my @trial_factors;
 
             foreach my $j (2 .. (INTSIZE <= 32 ? 8 : 9)) {
@@ -24479,6 +24479,152 @@ package Sidef::Types::Number::Number {
 
     *factors_exp = \&factor_exp;
 
+    sub _factor_remainder {
+        my ($r, $size, $ecm_table) = @_;
+
+        if (ref($r) eq 'Math::GMPz') {
+            $r = Math::GMPz::Rmpz_get_str($r, 10);
+        }
+
+        # Recalculate size for remainder
+        my $max_size = (Math::Prime::Util::GMP::logint($r, 2) >> 1) + 1;
+        if ($size > $max_size) {
+            $size = $max_size;
+        }
+
+        my $limit_isqrt = 1 << (($size >> 1) + 1);
+        my ($B1, $curves) = (2858117139, 63461);
+
+        $limit_isqrt = 100 if ($limit_isqrt < 100);
+
+        # ECM parameter selection
+        foreach my $i (0 .. CORE::int(@$ecm_table / 3 - 1)) {
+            if ($ecm_table->[3 * $i] >= $size) {
+                ($B1, $curves) = (@{$ecm_table}[3 * $i + 1, 3 * $i + 2]);
+
+                # Scale curves with difficulty
+                my $scale_factor = ($size > 100) ? 2.5 : 2.0;
+                $curves = CORE::int($curves * $scale_factor);
+                last;
+            }
+        }
+
+        # Check prime power
+        if (my $k = Math::Prime::Util::GMP::is_prime_power($r)) {
+            my $base = Math::Prime::Util::GMP::rootint($r, $k);
+            say STDERR "is_prime_power(r): $base^$k" if $VERBOSE;
+            return (($base) x $k);
+        }
+
+        # Check perfect power
+        if (my $k = Math::Prime::Util::GMP::is_power($r)) {
+            my $base = Math::Prime::Util::GMP::rootint($r, $k);
+            say STDERR "is_power(r): $base^$k" if $VERBOSE;
+            return ((_factor_remainder($base, $size, $ecm_table)) x $k);
+        }
+
+        my @factors;
+
+        while (1) {
+            my @f;
+
+            # Early termination for primes
+            if (_is_prob_prime($r)) {
+                last;
+            }
+
+            if ($r < 0xffffffff) {    # 2^32 - 1
+                @f = (HAS_PRIME_UTIL ? Math::Prime::Util::factor($r) : Math::Prime::Util::GMP::factor($r));
+                $r = 1;
+                say STDERR "factor(r): @f" if $VERBOSE;
+            }
+
+            # Method selection based on expected factor size
+            elsif ($size < 20) {
+
+                # Very small: use Pollard Rho
+                my $effort = 2 * $limit_isqrt;
+                @f = Math::Prime::Util::GMP::prho_factor($r, $effort);
+                $r = pop @f;
+                say STDERR "prho_factor(r, $effort): @f" if (@f && $VERBOSE);
+            }
+            elsif ($size < 35) {
+
+                # Small to medium: try Brent first, then Rho
+                my $effort = 2 * $limit_isqrt;
+                @f = Math::Prime::Util::GMP::pbrent_factor($r, $effort);
+                $r = pop @f;
+                say STDERR "pbrent_factor(r, $effort): @f" if (@f && $VERBOSE);
+
+                if (!@f) {
+                    @f = Math::Prime::Util::GMP::prho_factor($r, $effort);
+                    $r = pop @f;
+                    say STDERR "prho_factor(r, $effort): @f" if (@f && $VERBOSE);
+                }
+            }
+            else {
+                # Large: use ECM
+                # Dynamic effort multiplier
+                my $effort_multiplier = ($size < 60) ? 2 : ($size < 100) ? 3 : 5;
+                @f = Math::Prime::Util::GMP::ecm_factor($r, $effort_multiplier * $B1, $curves);
+                $r = pop @f;
+                say STDERR "ecm_factor(r, ", $effort_multiplier * $B1, ", $curves): @f" if (@f && $VERBOSE);
+            }
+
+            if (!@f) {
+                last;
+            }
+
+            my @new_factors;
+
+            foreach my $factor (@f) {
+                if (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($factor) : Math::Prime::Util::GMP::is_prime($factor)) {
+                    push @new_factors, $factor;
+                }
+                else {
+                    # Only recurse if not prime
+                    push @new_factors, _factor($factor);
+                }
+            }
+
+            push @factors, @new_factors;
+
+            # Batch process all factors efficiently
+            if (@new_factors) {
+
+                # Build product of all new factors
+                my $product = Math::Prime::Util::GMP::vecprod(@new_factors);
+
+                # Use GCD to find common factors efficiently
+                my $g = Math::Prime::Util::GMP::gcd($r, $product);
+
+                if ($g ne '1' and $g ne $r) {
+
+                    # Find valuation for each prime in the GCD
+                    foreach my $p (@new_factors) {
+                        my $v = Math::Prime::Util::GMP::valuation($r, $p);
+                        if ($v > 0) {
+                            push @factors, ($p) x $v;
+                            $r = Math::Prime::Util::GMP::divint($r, Math::Prime::Util::GMP::powint($p, $v));
+                        }
+                    }
+                }
+            }
+
+            # Recalculate size for remainder
+            my $max_size = (Math::Prime::Util::GMP::logint($r, 2) >> 1) + 1;
+            if ($size > $max_size) {
+                $size = $max_size;
+            }
+        }
+
+        if ($r ne '1') {
+            push @factors, $r;
+        }
+
+        return @factors;
+    }
+
     sub factor_upto {
         my ($n, $limit) = @_;
 
@@ -24529,96 +24675,50 @@ package Sidef::Types::Number::Number {
               )
         ];
 
-        my $r = _big2pistr($$n) // return Sidef::Types::Array::Array->new;
+        my $r = _any2mpz($$n) // return Sidef::Types::Array::Array->new;
 
-        if (!defined($limit)) {
-            $limit = $n->isqrt;
+        Math::GMPz::Rmpz_sgn($r) > 0
+          or return Sidef::Types::Array::Array->new;
+
+        if (defined($limit)) {
+            $limit = _big2pistr($$limit) // return Sidef::Types::Array::Array->new([$n]);
+        }
+        else {
+            $limit = Math::Prime::Util::GMP::sqrtint($r);
         }
 
-        my $size = $limit->ilog2->numify + 1;
-
-        my $max_size = Math::Prime::Util::GMP::logint(Math::Prime::Util::GMP::sqrtint($r), 2) + 1;
+        my $size     = Math::Prime::Util::GMP::logint($limit, 2) + 1;
+        my $max_size = (Math::GMPz::Rmpz_sizeinbase($r, 2) >> 1) + 1;    # ilog_2(sqrt(r))
 
         if ($size > $max_size) {
             $size = $max_size;
+        }
+
+        # Trial division first for small factors
+        if ($size > 13) {
+            my $trial_limit = ($size > 16) ? (1 << 16) : (1 << $size);
+
+            ($r, (my @small_factors)) = _primorial_trial_factor($r, $trial_limit);
+
+            if (@small_factors > 0) {
+
+                # If fully factored, return result
+                if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
+                    return Sidef::Types::Array::Array->new([map { bless \$_ } @small_factors]);
+                }
+
+                my @factors = ((map { bless \$_ } @small_factors), (map { _set_int($_) } _factor_remainder($r, $size, $ecm_table)));
+
+                return Sidef::Types::Array::Array->new(\@factors)->isort;
+            }
         }
 
         if ($size <= 13) {
             return $n->trial_factor(_set_int(1 << $size));
         }
 
-        my $limit_isqrt = $limit->isqrt->numify;
-        my ($B1, $curves) = (2858117139, 63461);
-
-        $limit_isqrt = 100 if ($limit_isqrt < 100);
-
-        foreach my $i (0 .. CORE::int(@$ecm_table / 3 - 1)) {
-            if ($ecm_table->[3 * $i] >= $size) {
-                ($B1, $curves) = (@{$ecm_table}[3 * $i + 1, 3 * $i + 2]);
-                last;
-            }
-        }
-
-        my @factors;
-
-        while (1) {
-            my @f;
-
-            if (my $k = Math::Prime::Util::GMP::is_prime_power($r)) {
-                $r = Math::Prime::Util::GMP::rootint($r, $k);
-                @f = ($r) x ($k - 1);
-                say STDERR "is_prime_power(r): $r^$k" if $VERBOSE;
-            }
-            elsif ($r < 0xffffffff) {    # 2^32 - 1
-                @f = (HAS_PRIME_UTIL ? Math::Prime::Util::factor($r) : Math::Prime::Util::GMP::factor($r));
-                $r = 1;
-                say STDERR "factor(r): @f" if $VERBOSE;
-            }
-            elsif ($size < 30) {
-
-                @f = Math::Prime::Util::GMP::pbrent_factor($r, 2 * $limit_isqrt);
-                $r = pop @f;
-                say STDERR sprintf("pbrent_factor(r, %s): @f", 2 * $limit_isqrt) if (@f && $VERBOSE);
-
-                if (!@f) {
-                    @f = Math::Prime::Util::GMP::prho_factor($r, 2 * $limit_isqrt);
-                    $r = pop @f;
-                    say STDERR sprintf("prho_factor(r, %s): @f", 2 * $limit_isqrt) if (@f && $VERBOSE);
-                }
-            }
-            else {
-                @f = Math::Prime::Util::GMP::ecm_factor($r, 2 * $B1, 2 * $curves);
-                $r = pop @f;
-                say STDERR "ecm_factor(r, $B1, $curves): @f" if (@f && $VERBOSE);
-            }
-
-            my @new_factors;
-
-            if (@f) {
-                @new_factors =
-                  map { (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($_) : Math::Prime::Util::GMP::is_prime($_)) ? $_ : _factor($_) } @f;
-                push @factors, @new_factors;
-            }
-
-            foreach my $p (@new_factors) {
-                my $v = Math::Prime::Util::GMP::valuation($r, $p);
-                if ($v > 0) {
-                    push @factors, ($p) x $v;
-                    $r = Math::Prime::Util::GMP::divint($r, Math::Prime::Util::GMP::powint($p, $v));
-                }
-            }
-
-            if ($r eq '1' or _is_prob_prime($r, 1)) {
-                last;
-            }
-
-            @f or last;
-        }
-
-        if ($r ne '1') {
-            push @factors, $r;
-        }
-
+        # Factor the remainder
+        my @factors = _factor_remainder($r, $size, $ecm_table);
         Sidef::Types::Array::Array->new([map { _set_int($_) } @factors])->isort;
     }
 
