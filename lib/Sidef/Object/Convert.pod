@@ -1,17 +1,36 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Object::Convert
+Sidef::Object::Convert - Type conversion methods for Sidef objects
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class provides a comprehensive set of type conversion methods that allow Sidef objects to be transformed into different data types. These methods enable flexible type coercion and are fundamental to Sidef's dynamic type system.
+
+The Convert class is inherited by all Sidef objects, making these conversion methods universally available throughout the language. Each method attempts to intelligently convert the object to the target type while preserving semantic meaning where possible.
 
 =head1 SYNOPSIS
 
-var obj = Convert(...)
+    # Convert numbers to different types
+    var n = 42
+    say n.to_s          #=> "42"
+    say n.to_f          #=> 42.0
+    say n.to_r          #=> 42/1
+
+    # Convert strings to various types
+    var str = "3.14159"
+    say str.to_n        #=> 3.14159
+    say str.to_i        #=> 3
+
+    # Convert arrays and collections
+    var arr = [1, 2, 3]
+    say arr.to_set      #=> Set(1, 2, 3)
+    say arr.to_bag      #=> Bag(1, 2, 3)
+
+    # Type-specific conversions
+    say "/tmp".to_dir   #=> Dir("/tmp")
+    say "test.txt".to_file  #=> File("test.txt")
 
 =head1 METHODS
 
@@ -19,7 +38,12 @@ var obj = Convert(...)
 
     self.to_a
 
-Returns the
+Converts the object to an Array. For scalar values, returns a single-element array containing the value. For collection types, returns an array containing all elements. For iterables, exhausts the iterator and returns collected elements.
+
+    42.to_a             #=> [42]
+    "hello".to_a        #=> ["hello"]
+    (1..5).to_a         #=> [1, 2, 3, 4, 5]
+    Set(1,2,3).to_a     #=> [1, 2, 3]
 
 Aliases: I<to_array>
 
@@ -29,7 +53,14 @@ Aliases: I<to_array>
 
     self.to_b
 
-Returns the
+Converts the object to a Boolean value (true or false). Returns true for non-zero numbers, non-empty strings and collections, and most objects. Returns false for zero, empty strings, empty collections, and nil/null values.
+
+    0.to_b              #=> false
+    1.to_b              #=> true
+    "".to_b             #=> false
+    "hello".to_b        #=> true
+    [].to_b             #=> false
+    [1,2].to_b          #=> true
 
 Aliases: I<to_bool>
 
@@ -39,7 +70,13 @@ Aliases: I<to_bool>
 
     self.to_bag
 
-Returns the
+Converts the object to a Bag (multiset). For arrays and other collections, creates a bag containing all elements with their multiplicities. For scalar values, creates a bag with a single element.
+
+    [1,2,2,3,3,3].to_bag    #=> Bag(1, 2:2, 3:3)
+    42.to_bag               #=> Bag(42)
+    "hello".to_bag          #=> Bag("hello")
+
+Bags are useful for counting occurrences and performing multiset operations.
 
 =cut
 
@@ -47,7 +84,11 @@ Returns the
 
     self.to_caller
 
-Returns the
+Converts the object to a Caller object, which can be invoked as a function. This is useful for creating callable objects from blocks, methods, or other callable entities.
+
+    var f = { |x| x * 2 }
+    var caller = f.to_caller
+    say caller(21)      #=> 42
 
 =cut
 
@@ -55,7 +96,10 @@ Returns the
 
     self.to_dir
 
-Returns the
+Converts the object to a Dir (directory) object. Strings are interpreted as directory paths. This enables file system operations on the resulting directory object.
+
+    "/tmp".to_dir       #=> Dir("/tmp")
+    "~/Documents".to_dir.exists  #=> true/false
 
 =cut
 
@@ -63,7 +107,11 @@ Returns the
 
     self.to_f
 
-Returns the
+Converts the object to a floating-point number (Float). Strings are parsed as decimal numbers, integers are promoted to floats, and rationals are evaluated.
+
+    42.to_f             #=> 42.0
+    "3.14".to_f         #=> 3.14
+    (22/7).to_f         #=> 3.14285714285714
 
 Aliases: I<to_float>
 
@@ -73,7 +121,11 @@ Aliases: I<to_float>
 
     self.to_fcaller
 
-Returns the
+Converts the object to a fast-callable function object optimized for performance. Similar to to_caller but with potential optimizations for frequently called functions.
+
+    var f = { |x| x + 1 }
+    var fcaller = f.to_fcaller
+    say fcaller(41)     #=> 42
 
 =cut
 
@@ -81,7 +133,10 @@ Returns the
 
     self.to_file
 
-Returns the
+Converts the object to a File object. Strings are interpreted as file paths, enabling file I/O operations on the resulting object.
+
+    "data.txt".to_file          #=> File("data.txt")
+    "config.json".to_file.read  #=> (file contents)
 
 =cut
 
@@ -89,7 +144,12 @@ Returns the
 
     self.to_i
 
-Returns the
+Converts the object to an integer (Int). Strings are parsed as numbers and truncated, floats are truncated toward zero, and other numeric types are converted appropriately.
+
+    3.14.to_i           #=> 3
+    "42".to_i           #=> 42
+    "-17.9".to_i        #=> -17
+    (22/7).to_i         #=> 3
 
 Aliases: I<to_int>
 
@@ -99,7 +159,10 @@ Aliases: I<to_int>
 
     self.to_m
 
-Returns the
+Converts the object to a Matrix. Arrays of arrays are converted to matrix form. Single-dimensional arrays may be converted to row or column vectors depending on context.
+
+    [[1,2],[3,4]].to_m  #=> Matrix([[1,2],[3,4]])
+    [1,2,3].to_m        #=> Matrix([[1,2,3]])
 
 Aliases: I<to_matrix>
 
@@ -109,7 +172,12 @@ Aliases: I<to_matrix>
 
     self.to_n
 
-Returns the
+Converts the object to a Number. This is the most general numeric conversion, automatically selecting the appropriate numeric type (integer, float, rational, or complex) based on the input.
+
+    "42".to_n           #=> 42
+    "3.14".to_n         #=> 3.14
+    "2/3".to_n          #=> 2/3
+    "3+4i".to_n         #=> 3+4i
 
 Aliases: I<to_num>
 
@@ -119,7 +187,12 @@ Aliases: I<to_num>
 
     self.to_r
 
-Returns the
+Converts the object to a Rational number (exact fraction). Integers become rationals with denominator 1, floats are converted to their exact rational representation, and strings are parsed as fractions.
+
+    2.to_r              #=> 2/1
+    0.5.to_r            #=> 1/2
+    "22/7".to_r         #=> 22/7
+    1.5.to_r            #=> 3/2
 
 Aliases: I<to_rat>
 
@@ -129,7 +202,10 @@ Aliases: I<to_rat>
 
     self.to_re
 
-Returns the
+Converts the object to a Regex (regular expression) object. Strings are compiled as regex patterns, allowing pattern matching and text processing operations.
+
+    "\\d+".to_re        #=> Regex(\d+)
+    "[a-z]+".to_re.match("hello")  #=> Match object
 
 Aliases: I<to_regex>
 
@@ -139,7 +215,12 @@ Aliases: I<to_regex>
 
     self.to_s
 
-Returns the
+Converts the object to a String. This is one of the most commonly used conversion methods, providing a string representation of any object.
+
+    42.to_s             #=> "42"
+    [1,2,3].to_s        #=> "[1, 2, 3]"
+    true.to_s           #=> "true"
+    (22/7).to_s         #=> "22/7"
 
 Aliases: I<to_str>
 
@@ -149,7 +230,13 @@ Aliases: I<to_str>
 
     self.to_set
 
-Returns the
+Converts the object to a Set (unordered collection of unique elements). Arrays and other collections have duplicates removed. Scalar values become single-element sets.
+
+    [1,2,2,3,3,3].to_set    #=> Set(1, 2, 3)
+    42.to_set               #=> Set(42)
+    (1..5).to_set           #=> Set(1, 2, 3, 4, 5)
+
+Sets are useful for membership testing and set operations (union, intersection, difference).
 
 =cut
 
@@ -157,7 +244,15 @@ Returns the
 
     self.to_type(obj)
 
-Returns the
+Converts the current object to the same type as the provided object. This is a dynamic type conversion that adapts based on the target object's type.
+
+    var x = 42
+    var y = "3.14"
+    
+    say x.to_type(y)    #=> "42" (converted to string)
+    say y.to_type(x)    #=> 3 (converted to integer)
+
+This method is particularly useful in generic programming where you need to match types dynamically.
 
 =cut
 
@@ -165,8 +260,41 @@ Returns the
 
     self.to_v
 
-Returns the
+Converts the object to a Vector. Arrays are converted to vector form for mathematical operations. This enables vector arithmetic and linear algebra operations.
+
+    [1,2,3].to_v        #=> Vector(1, 2, 3)
+    42.to_v             #=> Vector(42)
 
 Aliases: I<to_vector>
+
+=cut
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Array::Array>
+
+=item * L<Sidef::Types::Number::Number>
+
+=item * L<Sidef::Types::String::String>
+
+=item * L<Sidef::Types::Set::Set>
+
+=item * L<Sidef::Types::Set::Bag>
+
+=back
+
+=head1 AUTHOR
+
+Daniel Șuteu, E<lt>trizen@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2025 Daniel Șuteu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.0 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut
