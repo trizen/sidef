@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,7 +6,9 @@ Sidef::Types::Set::Set
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements an unordered collection of unique elements. A Set automatically eliminates duplicate values and provides efficient membership testing. Sets support mathematical set operations like union, intersection, difference, and symmetric difference.
+
+Sets are useful when you need to track unique items, test membership, or perform set algebra operations. Unlike arrays, sets don't maintain insertion order and don't allow duplicate elements.
 
 =head1 SYNOPSIS
 
@@ -37,7 +38,11 @@ Inherits methods from:
 
     a & b
 
-Returns the
+Returns the intersection of two sets (elements present in both sets).
+
+    var a = Set(1,2,3,4)
+    var b = Set(3,4,5,6)
+    say (a & b)     #=> Set(3, 4)
 
 Aliases: I<∩>, I<and>, I<intersection>
 
@@ -47,7 +52,11 @@ Aliases: I<∩>, I<and>, I<intersection>
 
     a + b
 
-Returns the
+Returns the concatenation of two sets (union operation, same as C<|>).
+
+    var a = Set(1,2,3)
+    var b = Set(4,5,6)
+    say (a + b)     #=> Set(1, 2, 3, 4, 5, 6)
 
 Aliases: I<concat>
 
@@ -57,7 +66,11 @@ Aliases: I<concat>
 
     a - b
 
-Returns the
+Returns the difference of two sets (elements in the first set but not in the second).
+
+    var a = Set(1,2,3,4,5)
+    var b = Set(3,4,5)
+    say (a - b)     #=> Set(1, 2)
 
 Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
@@ -67,7 +80,11 @@ Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
     a ... b
 
-Returns the
+Returns a range from the minimum element of set C<a> to the maximum element of set C<b> as a list.
+
+    var a = Set(1,2,3)
+    var b = Set(8,9,10)
+    say (a ... b)   #=> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 Aliases: I<to_list>
 
@@ -77,7 +94,11 @@ Aliases: I<to_list>
 
     a << b
 
-Returns the
+Adds element C<b> to set C<a> in-place and returns the modified set.
+
+    var s = Set(1,2,3)
+    s << 4
+    say s           #=> Set(1, 2, 3, 4)
 
 Aliases: I<add>, I<push>, I<append>
 
@@ -87,7 +108,11 @@ Aliases: I<add>, I<push>, I<append>
 
     a ^ b
 
-Returns the
+Returns the symmetric difference of two sets (elements in either set but not in both).
+
+    var a = Set(1,2,3,4)
+    var b = Set(3,4,5,6)
+    say (a ^ b)     #=> Set(1, 2, 5, 6)
 
 Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
@@ -97,7 +122,11 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
     a | b
 
-Returns the
+Returns the union of two sets (all elements from both sets).
+
+    var a = Set(1,2,3)
+    var b = Set(3,4,5)
+    say (a | b)     #=> Set(1, 2, 3, 4, 5)
 
 Aliases: I<∪>, I<or>, I<union>
 
@@ -107,7 +136,11 @@ Aliases: I<∪>, I<or>, I<union>
 
     a ∋ b
 
-Returns the
+Returns true if set C<a> contains element C<b>, false otherwise.
+
+    var s = Set(1,2,3)
+    say (s ∋ 2)     #=> true
+    say (s ∋ 5)     #=> false
 
 Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
@@ -117,7 +150,11 @@ Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<con
 
     a ∌ b
 
-Returns the
+Returns true if set C<a> does not contain element C<b>, false otherwise.
+
+    var s = Set(1,2,3)
+    say (s ∌ 5)     #=> true
+    say (s ∌ 2)     #=> false
 
 =cut
 
@@ -125,7 +162,13 @@ Returns the
 
     a ≡ b
 
-Returns the
+Returns true if sets C<a> and C<b> contain exactly the same elements, false otherwise.
+
+    var a = Set(1,2,3)
+    var b = Set(3,2,1)
+    var c = Set(1,2,4)
+    say (a ≡ b)     #=> true
+    say (a ≡ c)     #=> false
 
 =cut
 
@@ -133,7 +176,11 @@ Returns the
 
     a ≤ b
 
-Returns the
+Returns true if set C<a> is a subset of or equal to set C<b> (all elements of C<a> are in C<b>).
+
+    var a = Set(1,2)
+    var b = Set(1,2,3,4)
+    say (a ≤ b)     #=> true
 
 Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
@@ -143,7 +190,11 @@ Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
     a ≥ b
 
-Returns the
+Returns true if set C<a> is a superset of or equal to set C<b> (all elements of C<b> are in C<a>).
+
+    var a = Set(1,2,3,4)
+    var b = Set(1,2)
+    say (a ≥ b)     #=> true
 
 Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
@@ -153,7 +204,11 @@ Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
     self.all(block)
 
-Returns the
+Returns true if the given block returns true for all elements in the set.
+
+    var s = Set(2,4,6,8)
+    say s.all { .is_even }      #=> true
+    say s.all { _ > 5 }         #=> false
 
 =cut
 
@@ -161,7 +216,11 @@ Returns the
 
     self.any(block)
 
-Returns the
+Returns true if the given block returns true for any element in the set.
+
+    var s = Set(1,2,3,4)
+    say s.any { _ > 3 }         #=> true
+    say s.any { _ > 10 }        #=> false
 
 =cut
 
@@ -169,7 +228,10 @@ Returns the
 
     self.collect(block)
 
-Returns the
+Returns a new set with the results of running the block for each element (same as C<map>).
+
+    var s = Set(1,2,3)
+    say s.collect { _ * 2 }     #=> Set(2, 4, 6)
 
 =cut
 
@@ -177,7 +239,11 @@ Returns the
 
     self.contains_all(*objects)
 
-Returns the
+Returns true if the set contains all of the given objects.
+
+    var s = Set(1,2,3,4,5)
+    say s.contains_all(1,2,3)   #=> true
+    say s.contains_all(1,2,9)   #=> false
 
 =cut
 
@@ -185,7 +251,11 @@ Returns the
 
     self.count(obj)
 
-Returns the
+Returns the number of occurrences of C<obj> in the set (always 0 or 1 for sets).
+
+    var s = Set(1,2,3)
+    say s.count(2)              #=> 1
+    say s.count(5)              #=> 0
 
 =cut
 
@@ -193,7 +263,10 @@ Returns the
 
     self.count_by(block)
 
-Returns the
+Returns a hash with counts of elements grouped by the result of the block.
+
+    var s = Set(1,2,3,4,5,6)
+    say s.count_by { .is_even } #=> Hash(true => 3, false => 3)
 
 =cut
 
@@ -201,7 +274,11 @@ Returns the
 
     self.delete(*objects)
 
-Returns the
+Removes the specified objects from the set and returns the modified set.
+
+    var s = Set(1,2,3,4,5)
+    s.delete(2,4)
+    say s                       #=> Set(1, 3, 5)
 
 Aliases: I<remove>, I<discard>
 
@@ -211,7 +288,11 @@ Aliases: I<remove>, I<discard>
 
     self.delete_first_if(block)
 
-Returns the
+Removes the first element for which the block returns true and returns the modified set.
+
+    var s = Set(1,2,3,4,5)
+    s.delete_first_if { _ > 3 }
+    say s.len                   #=> 4
 
 =cut
 
@@ -219,7 +300,11 @@ Returns the
 
     self.delete_if(block)
 
-Returns the
+Removes all elements for which the block returns true and returns the modified set.
+
+    var s = Set(1,2,3,4,5,6)
+    s.delete_if { .is_even }
+    say s                       #=> Set(1, 3, 5)
 
 =cut
 
@@ -227,7 +312,10 @@ Returns the
 
     self.dump
 
-Returns the
+Returns a string representation of the set suitable for debugging.
+
+    var s = Set(1,2,3)
+    say s.dump                  #=> Set(1, 2, 3)
 
 =cut
 
@@ -235,7 +323,12 @@ Returns the
 
     self.each(block)
 
-Returns the
+Iterates over each element in the set, passing it to the block. Returns the set itself.
+
+    var s = Set(1,2,3)
+    s.each { |n|
+        say n
+    }
 
 =cut
 
@@ -243,7 +336,12 @@ Returns the
 
     self.each_2d(block)
 
-Returns the
+Iterates over each element in the set with its index, passing both to the block.
+
+    var s = Set('a','b','c')
+    s.each_2d { |i, v|
+        say "#{i}: #{v}"
+    }
 
 =cut
 
@@ -251,7 +349,10 @@ Returns the
 
     self.grep(block)
 
-Returns the
+Returns a new set containing only the elements for which the block returns true.
+
+    var s = Set(1,2,3,4,5,6)
+    say s.grep { .is_even }     #=> Set(2, 4, 6)
 
 Aliases: I<select>
 
@@ -261,7 +362,10 @@ Aliases: I<select>
 
     self.grep_2d(block)
 
-Returns the
+Returns a new set of elements for which the block returns true, with elements and indices passed to the block.
+
+    var s = Set(10,20,30)
+    say s.grep_2d { |i, v| v > 15 }   #=> Set(20, 30)
 
 =cut
 
@@ -269,7 +373,12 @@ Returns the
 
     self.iter
 
-Returns the
+Returns an iterator object for the set.
+
+    var s = Set(1,2,3)
+    var it = s.iter
+    say it.next                 #=> 1
+    say it.next                 #=> 2
 
 =cut
 
@@ -277,7 +386,10 @@ Returns the
 
     self.join(*rest)
 
-Returns the
+Joins the elements of the set into a string, using the first argument as separator.
+
+    var s = Set(1,2,3)
+    say s.join(', ')            #=> "1, 2, 3" (order may vary)
 
 =cut
 
@@ -285,7 +397,10 @@ Returns the
 
     self.map(block)
 
-Returns the
+Returns a new set with the results of running the block for each element.
+
+    var s = Set(1,2,3)
+    say s.map { _**2 }          #=> Set(1, 4, 9)
 
 =cut
 
@@ -293,7 +408,10 @@ Returns the
 
     self.map_2d(block)
 
-Returns the
+Returns a new set with the results of running the block for each element and its index.
+
+    var s = Set('a','b','c')
+    say s.map_2d { |i, v| "#{i}:#{v}" }
 
 =cut
 
@@ -301,7 +419,10 @@ Returns the
 
     self.max
 
-Returns the
+Returns the maximum element in the set.
+
+    var s = Set(5,2,8,1,9)
+    say s.max                   #=> 9
 
 =cut
 
@@ -309,7 +430,10 @@ Returns the
 
     self.max_by(block)
 
-Returns the
+Returns the element for which the block returns the maximum value.
+
+    var s = Set(-5, 3, -10, 7)
+    say s.max_by { .abs }       #=> -10
 
 =cut
 
@@ -317,7 +441,10 @@ Returns the
 
     self.min
 
-Returns the
+Returns the minimum element in the set.
+
+    var s = Set(5,2,8,1,9)
+    say s.min                   #=> 1
 
 =cut
 
@@ -325,7 +452,10 @@ Returns the
 
     self.min_by(block)
 
-Returns the
+Returns the element for which the block returns the minimum value.
+
+    var s = Set(-5, 3, -10, 7)
+    say s.min_by { .abs }       #=> 3
 
 =cut
 
@@ -333,7 +463,11 @@ Returns the
 
     self.new
 
-Returns the
+Creates a new empty set, or a set from the given elements.
+
+    var s1 = Set.new
+    var s2 = Set.new(1,2,3)
+    var s3 = Set(1,2,3)         # shorthand
 
 Aliases: I<call>
 
@@ -343,7 +477,11 @@ Aliases: I<call>
 
     self.none(block)
 
-Returns the
+Returns true if the block returns false for all elements in the set.
+
+    var s = Set(1,3,5,7)
+    say s.none { .is_even }     #=> true
+    say s.none { _ > 5 }        #=> false
 
 =cut
 
@@ -351,7 +489,11 @@ Returns the
 
     self.pop
 
-Returns the
+Removes and returns an arbitrary element from the set.
+
+    var s = Set(1,2,3)
+    say s.pop                   # returns and removes one element
+    say s.len                   #=> 2
 
 =cut
 
@@ -359,7 +501,11 @@ Returns the
 
     self.prod(block)
 
-Returns the
+Returns the product of all elements, or the product of the results of applying the block to each element.
+
+    var s = Set(2,3,4)
+    say s.prod                  #=> 24
+    say s.prod { _**2 }         #=> 576
 
 Aliases: I<prod_by>
 
@@ -369,7 +515,10 @@ Aliases: I<prod_by>
 
     self.prod_2d(block)
 
-Returns the
+Returns the product of the results of applying the block to each element and its index.
+
+    var s = Set(2,3,4)
+    say s.prod_2d { |i, v| v + i }
 
 =cut
 
@@ -377,7 +526,10 @@ Returns the
 
     self.shift
 
-Returns the
+Removes and returns an arbitrary element from the set (same as C<pop>).
+
+    var s = Set(1,2,3)
+    say s.shift                 # returns and removes one element
 
 =cut
 
@@ -385,7 +537,11 @@ Returns the
 
     self.sort(block)
 
-Returns the
+Returns an array of the set's elements sorted according to the optional comparison block.
+
+    var s = Set(3,1,4,1,5)
+    say s.sort                  #=> [1, 3, 4, 5]
+    say s.sort { |a,b| b <=> a } #=> [5, 4, 3, 1]
 
 =cut
 
@@ -393,7 +549,10 @@ Returns the
 
     self.sort_by(block)
 
-Returns the
+Returns an array of the set's elements sorted by the result of the block.
+
+    var s = Set(-5, 3, -10, 7)
+    say s.sort_by { .abs }      #=> [3, -5, 7, -10]
 
 =cut
 
@@ -401,7 +560,11 @@ Returns the
 
     self.sum(block)
 
-Returns the
+Returns the sum of all elements, or the sum of the results of applying the block to each element.
+
+    var s = Set(1,2,3,4)
+    say s.sum                   #=> 10
+    say s.sum { _**2 }          #=> 30
 
 Aliases: I<sum_by>
 
@@ -411,7 +574,10 @@ Aliases: I<sum_by>
 
     self.sum_2d(block)
 
-Returns the
+Returns the sum of the results of applying the block to each element and its index.
+
+    var s = Set(10,20,30)
+    say s.sum_2d { |i, v| i + v }
 
 =cut
 
@@ -419,7 +585,10 @@ Returns the
 
     self.to_a
 
-Returns the
+Returns an array containing all elements of the set.
+
+    var s = Set(1,2,3)
+    say s.to_a                  #=> [1, 2, 3] (order may vary)
 
 Aliases: I<values>, I<to_array>
 
@@ -429,7 +598,11 @@ Aliases: I<values>, I<to_array>
 
     self.to_bag
 
-Returns the
+Converts the set to a Bag (multiset) where each element has a count of 1.
+
+    var s = Set(1,2,3)
+    var b = s.to_bag
+    say b                       #=> Bag(1, 2, 3)
 
 =cut
 
@@ -437,6 +610,25 @@ Returns the
 
     self.to_set
 
-Returns the
+Returns a copy of the set.
+
+    var s1 = Set(1,2,3)
+    var s2 = s1.to_set
+    say s2                      #=> Set(1, 2, 3)
+
+=cut
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Hash::Hash>, L<Sidef::Types::Array::Array>, L<Sidef::Types::Set::Bag>
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
 
 =cut
