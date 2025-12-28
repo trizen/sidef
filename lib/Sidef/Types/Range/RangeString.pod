@@ -1,18 +1,44 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Range::RangeString
+Sidef::Types::Range::RangeString - String range objects for iteration and manipulation
 
 =head1 DESCRIPTION
 
-This class implements ...
+The RangeString class implements range objects for strings, allowing iteration over character sequences with optional step values. This is useful for generating sequences of characters, such as alphabetic ranges ('a'..'z') or custom character progressions.
+
+RangeString objects are created using the range operator C<..> between two strings, or by calling the RangeString constructor directly. The range includes both endpoints by default.
+
+String ranges iterate by incrementing characters according to their lexicographical order. When a character reaches 'z', it wraps to 'a' and carries over to the next position (similar to odometer behavior).
 
 =head1 SYNOPSIS
 
-var obj = RangeString(...)
-
+    # Create string ranges
+    var range1 = RangeString('a', 'z')      # 'a' to 'z'
+    var range2 = 'A'..'Z'                    # 'A' to 'Z'
+    var range3 = RangeString('aa', 'zz', 5)  # with step
+    
+    # Iterate over a range
+    'a'..'e' -> each { |char|
+        say char    # prints: a, b, c, d, e
+    }
+    
+    # Convert to array
+    var letters = 'a'..'f' -> to_a
+    say letters    #=> ['a', 'b', 'c', 'd', 'e', 'f']
+    
+    # Check containment
+    say ('a'..'z').contains('m')    #=> true
+    say ('a'..'z').contains('A')    #=> false
+    
+    # Pick random elements
+    say ('a'..'z').rand(3)    # e.g., ['h', 'q', 'b']
+    
+    # Get bounds
+    var r = 'c'..'x'
+    say r.min    #=> 'c'
+    say r.max    #=> 'x'
 
 =head1 INHERITS
 
@@ -25,9 +51,30 @@ Inherits methods from:
 
 =head2 call
 
+    RangeString.call(from, to)
     RangeString.call(from, to, step)
 
-Returns the
+Constructor method that creates a new RangeString object. This is typically called implicitly when using the range operator C<..> with strings.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<from> - The starting string of the range
+
+=item * C<to> - The ending string of the range (inclusive)
+
+=item * C<step> - Optional. The step increment (default: 1)
+
+=back
+
+B<Returns:> A new RangeString object
+
+B<Example:>
+
+    var r1 = RangeString('a', 'z')
+    var r2 = RangeString('A', 'Z', 2)    # every second letter
+    var r3 = 'a'..'z'                    # using range operator
 
 =cut
 
@@ -35,7 +82,24 @@ Returns the
 
     self.contain(value)
 
-Returns the
+Checks whether the given value is contained within the range. For strings, this checks if the value falls lexicographically between the range's start and end points (inclusive).
+
+B<Parameters:>
+
+=over 4
+
+=item * C<value> - The string value to check for containment
+
+=back
+
+B<Returns:> Boolean (true if the value is in the range, false otherwise)
+
+B<Example:>
+
+    var range = 'a'..'z'
+    say range.contain('m')     #=> true
+    say range.contain('A')     #=> false (capital letters are different)
+    say range.contain('ma')    #=> true (lexicographically between 'a' and 'z')
 
 Aliases: I<include>, I<contains>, I<includes>
 
@@ -45,7 +109,25 @@ Aliases: I<include>, I<contains>, I<includes>
 
     self.from(from)
 
-Returns the
+Gets or sets the starting value (lower bound) of the range.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<from> - Optional. If provided, sets the new starting value
+
+=back
+
+B<Returns:> The starting value of the range
+
+B<Example:>
+
+    var range = 'a'..'z'
+    say range.from           #=> 'a'
+    
+    range.from('c')          # modify the starting point
+    say range.from           #=> 'c'
 
 =cut
 
@@ -53,7 +135,26 @@ Returns the
 
     self.iter
 
-Returns the
+Returns an iterator object for the range. The iterator generates each string value in the range sequence when called, following the step increment if specified.
+
+B<Returns:> An iterator object
+
+B<Example:>
+
+    var range = 'a'..'e'
+    var iterator = range.iter
+    
+    say iterator.run    #=> 'a'
+    say iterator.run    #=> 'b'
+    say iterator.run    #=> 'c'
+    # ... and so on
+    
+    # More commonly used with loops
+    var it = ('x'..'z').iter
+    loop {
+        var val = it.run
+        say val
+    }
 
 =cut
 
@@ -61,7 +162,17 @@ Returns the
 
     self.max
 
-Returns the
+Returns the maximum (ending) value of the range.
+
+B<Returns:> The ending string value of the range
+
+B<Example:>
+
+    var range = 'a'..'z'
+    say range.max    #=> 'z'
+    
+    var range2 = 'aa'..'zz'
+    say range2.max   #=> 'zz'
 
 =cut
 
@@ -69,7 +180,17 @@ Returns the
 
     self.min
 
-Returns the
+Returns the minimum (starting) value of the range.
+
+B<Returns:> The starting string value of the range
+
+B<Example:>
+
+    var range = 'a'..'z'
+    say range.min    #=> 'a'
+    
+    var range2 = 'aa'..'zz'
+    say range2.min   #=> 'aa'
 
 =cut
 
@@ -77,7 +198,14 @@ Returns the
 
     self.new
 
-Returns the
+Creates a new RangeString object. This is the underlying constructor, but it's more common to use the C<call> method or the range operator C<..>.
+
+B<Returns:> A new RangeString instance
+
+B<Example:>
+
+    var range = RangeString.new
+    # Usually you'll use RangeString('a', 'z') or 'a'..'z' instead
 
 =cut
 
@@ -85,7 +213,27 @@ Returns the
 
     self.pick(num)
 
-Returns the
+Returns a specified number of randomly selected distinct elements from the range. Unlike C<rand>, this method ensures all returned elements are unique.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<num> - The number of elements to pick
+
+=back
+
+B<Returns:> An array of randomly selected unique strings from the range
+
+B<Example:>
+
+    var range = 'a'..'z'
+    say range.pick(3)    #=> e.g., ['h', 'm', 't']
+    say range.pick(5)    #=> e.g., ['b', 'q', 'e', 'w', 'k']
+    
+    # All elements are unique
+    var picked = ('a'..'e').pick(5)
+    say picked    #=> ['d', 'b', 'e', 'a', 'c'] (some permutation)
 
 =cut
 
@@ -93,7 +241,24 @@ Returns the
 
     self.rand(num)
 
-Returns the
+Returns a specified number of randomly selected elements from the range. Elements may be repeated. If no argument is provided, returns a single random element.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<num> - Optional. The number of random elements to return (default: 1)
+
+=back
+
+B<Returns:> A single random string if no argument given, or an array of random strings
+
+B<Example:>
+
+    var range = 'a'..'z'
+    say range.rand         #=> e.g., 'q'
+    say range.rand(3)      #=> e.g., ['h', 'h', 't'] (may have duplicates)
+    say range.rand(5)      #=> e.g., ['a', 'z', 'c', 'a', 'm']
 
 Aliases: I<sample>
 
@@ -103,7 +268,25 @@ Aliases: I<sample>
 
     self.to(to)
 
-Returns the
+Gets or sets the ending value (upper bound) of the range.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<to> - Optional. If provided, sets the new ending value
+
+=back
+
+B<Returns:> The ending value of the range
+
+B<Example:>
+
+    var range = 'a'..'z'
+    say range.to           #=> 'z'
+    
+    range.to('m')          # modify the ending point
+    say range.to           #=> 'm'
 
 =cut
 
@@ -111,8 +294,126 @@ Returns the
 
     self.to_s
 
-Returns the
+Returns a string representation of the RangeString object, typically in the format "from..to" or "from..to:step" if a step is specified.
+
+B<Returns:> A string representation of the range
+
+B<Example:>
+
+    var range1 = 'a'..'z'
+    say range1.to_s    #=> "a..z"
+    
+    var range2 = RangeString('A', 'Z', 2)
+    say range2.to_s    #=> "A..Z:2"
+    
+    # Useful for debugging
+    var range3 = 'aa'..'zz'
+    say "Range: #{range3}"    #=> "Range: aa..zz"
 
 Aliases: I<dump>, I<to_str>
+
+=cut
+
+=head1 INHERITED METHODS
+
+RangeString inherits additional methods from Sidef::Types::Range::Range, including:
+
+=over 4
+
+=item * C<each> - Iterate over each element in the range
+
+=item * C<map> - Transform each element and return an array
+
+=item * C<grep> - Filter elements based on a condition
+
+=item * C<to_a> - Convert the range to an array
+
+=item * C<reverse> - Reverse the range direction
+
+=item * C<length> - Get the number of elements in the range
+
+=back
+
+See the Range class documentation for complete details on inherited methods.
+
+=head1 EXAMPLES
+
+=head2 Basic Iteration
+
+    # Print the alphabet
+    'a'..'z' -> each { |c|
+        print c
+    }
+    
+    # Print every third letter
+    RangeString('a', 'z', 3).each { |c|
+        say c    # a, d, g, j, m, p, s, v, y
+    }
+
+=head2 String Generation
+
+    # Generate column labels (like in spreadsheets)
+    var columns = 'A'..'Z' -> to_a
+    say columns[0]     #=> 'A'
+    say columns[25]    #=> 'Z'
+    
+    # Multi-character ranges
+    var codes = 'aa'..'az' -> to_a
+    say codes          #=> ['aa', 'ab', 'ac', ..., 'az']
+
+=head2 Filtering and Transformation
+
+    # Get vowels from a range
+    var vowels = ('a'..'z').grep { |c|
+        c ~~ /[aeiou]/
+    }
+    say vowels    #=> ['a', 'e', 'i', 'o', 'u']
+    
+    # Convert to uppercase
+    var upper = ('a'..'z').map { |c|
+        c.uc
+    }
+    say upper    #=> ['A', 'B', 'C', ..., 'Z']
+
+=head2 Random Selection
+
+    # Password generation with random characters
+    var password = ('a'..'z').rand(8).join
+    say password    #=> e.g., "qhbktmpa"
+    
+    # Pick unique random letters
+    var unique = ('a'..'z').pick(5)
+    say unique    #=> e.g., ['m', 'z', 'c', 'k', 'p']
+
+=head2 Range Checking
+
+    # Validate input
+    func is_lowercase_letter(str) {
+        ('a'..'z').contains(str)
+    }
+    
+    say is_lowercase_letter('m')    #=> true
+    say is_lowercase_letter('M')    #=> false
+    say is_lowercase_letter('5')    #=> false
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Range::Range> - The parent Range class
+
+=item * L<Sidef::Types::Range::RangeNumber> - Numeric ranges
+
+=item * L<Sidef::Types::String::String> - String manipulation
+
+=back
+
+=head1 AUTHOR
+
+Daniel Șuteu (trizen)
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut
