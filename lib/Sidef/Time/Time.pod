@@ -7,16 +7,17 @@ Sidef::Time::Time
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class represents a point in time as Unix epoch seconds, providing methods to retrieve the current time, convert to local or GMT representations, and obtain high-resolution timestamps.
 
 =head1 SYNOPSIS
 
-var obj = Time(...)
+var obj = Time()           # current time
+var obj = Time(1234567890) # specific Unix timestamp
 
 
 =head1 INHERITS
 
-Inherits methods from:
+Inherits methods from: 
 
        * Sidef::Object::Object
 
@@ -24,19 +25,19 @@ Inherits methods from:
 
 =head2 dump
 
-    self.dump
+    self. dump
 
-Returns the
+Returns a String representation of the Time object in the format C<Time(seconds)>, useful for debugging and serialization.
 
 =cut
 
 =head2 gmt
 
-    self.gmt
+    self. gmt
 
-Returns the
+Returns a Date object representing this time in GMT (Greenwich Mean Time) / UTC timezone. 
 
-Aliases: I<gmtime>
+Aliases:  I<gmtime>
 
 =cut
 
@@ -44,7 +45,7 @@ Aliases: I<gmtime>
 
     self.local
 
-Returns the
+Returns a Date object representing this time in the local timezone. 
 
 Aliases: I<localtime>
 
@@ -54,7 +55,7 @@ Aliases: I<localtime>
 
     self.micro
 
-Returns the
+Returns the current time as a Number with microsecond precision, using high-resolution timing.
 
 Aliases: I<micro_sec>, I<micro_seconds>
 
@@ -63,8 +64,9 @@ Aliases: I<micro_sec>, I<micro_seconds>
 =head2 new
 
     self.new
+    self.new(seconds)
 
-Returns the
+Creates a new Time object.  If C<seconds> is provided, it uses that value as the Unix epoch timestamp; otherwise, it uses the current time. 
 
 Aliases: I<call>
 
@@ -74,7 +76,7 @@ Aliases: I<call>
 
     self.now
 
-Returns the
+Returns the current Unix epoch time as a Number.
 
 =cut
 
@@ -82,7 +84,7 @@ Returns the
 
     self.sec
 
-Returns the
+Returns the Unix epoch seconds of this Time object as a Number. 
 
 Aliases: I<time>
 
@@ -92,7 +94,7 @@ Aliases: I<time>
 
     self.to_s
 
-Returns the
+Returns the Unix epoch seconds of this Time object as a String.
 
 Aliases: I<to_str>
 
