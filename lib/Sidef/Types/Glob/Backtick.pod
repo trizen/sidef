@@ -1,51 +1,130 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Glob::Backtick
-
-=head1 DESCRIPTION
-
-This class implements ...
+Sidef::Types::Glob::Backtick — Shell command execution via backticks
 
 =head1 SYNOPSIS
 
-var obj = Backtick(...)
+    # Execute a shell command and capture its output
+    var out = `ls -1`
 
+    say out
+
+    # Explicit object usage (normally implicit)
+    var cmd = Backtick("uname -a")
+    var out = cmd.call
+
+=head1 DESCRIPTION
+
+The `Sidef::Types::Glob::Backtick` class represents a **backtick expression**
+in Sidef.
+
+A backtick expression executes a command using the system shell and returns
+the command's standard output as a B<string>.
+
+This behavior is analogous to backticks in Perl or POSIX shells:
+
+    `command`
+
+is equivalent to executing the command in a subshell and capturing its output.
+
+Backtick expressions are evaluated at runtime and are typically used for:
+
+  * Querying system information
+  * Interfacing with external programs
+  * Capturing command output in scripts
 
 =head1 INHERITS
 
-Inherits methods from:
+This class inherits from:
 
-       * Sidef::Object::Object
+  * Sidef::Object::Object
 
 =head1 METHODS
 
 =head2 call
 
-    self.call
+    var output = obj.call
 
-Returns the
+Executes the stored shell command and returns its standard output as a string.
 
-=cut
+The output includes everything written to STDOUT by the command.
+Trailing newlines are preserved unless explicitly removed by the caller.
+
+If the command fails, behavior depends on the runtime environment and shell;
+typically an empty string or partial output may be returned.
 
 =head2 run
 
-    self.run
+    var output = obj.run
 
-Returns the
-
-Aliases: I<exec>, I<execute>
-
-=cut
+Alias for C<call>. This method exists for internal consistency with other
+callable Sidef objects.
 
 =head2 to_s
 
-    self.to_s
+    var str = obj.to_s
 
-Returns the
+Returns the literal command string represented by the backtick expression,
+without executing it.
 
-Aliases: I<dump>, I<to_str>
+This is useful for debugging or introspection.
+
+=head1 BACKTICK SYNTAX
+
+Backtick expressions can be written directly in Sidef source code:
+
+    var date = `date`
+    var user = `whoami`
+    var files = `ls *.sidef`
+
+The command is executed by the system shell. Shell features such as pipes,
+redirections, and glob expansion are handled by the shell itself, not by Sidef.
+
+=head1 EXAMPLES
+
+=head2 Capturing command output
+
+    var kernel = `uname -r`
+    say "Kernel: #{kernel}"
+
+=head2 Using shell pipelines
+
+    var count = `ps aux | wc -l`
+    say count
+
+=head2 Trimming output
+
+    var user = `whoami`.trim
+    say user
+
+=head1 SECURITY CONSIDERATIONS
+
+Backtick expressions execute arbitrary shell commands.
+
+B<Never> interpolate untrusted input into backtick expressions without proper
+validation or escaping, as this may lead to command injection vulnerabilities.
+
+Example of unsafe usage:
+
+    var name = readln
+    var out  = `echo #{name}`   # dangerous
+
+=head1 IMPLEMENTATION NOTES
+
+Backtick expressions are represented in the AST using
+C<Sidef::Types::Glob::Backtick> objects, which store the command string and
+execute it when evaluated.
+
+Command execution and output capture are delegated to the host operating
+system via the shell.
+
+=head1 SEE ALSO
+
+  * Sidef::Types::String
+  * Sidef::Types::Glob
+  * Shell command execution semantics
+  * Perl backticks (C<qx//>)
 
 =cut

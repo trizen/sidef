@@ -7,11 +7,26 @@ Sidef::Object::Lazy
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements lazy evaluation for iterable objects in Sidef.  Lazy evaluation delays the evaluation of an expression until its result is actually needed, processing elements in a pipeline fashion without creating temporary arrays in memory.
 
 =head1 SYNOPSIS
 
 var obj = Lazy(...)
+
+    # Create a lazy iterator from a range
+    say (^Inf -> lazy. grep{ . is_prime }. first(10))     # first 10 primes
+
+    # Lazy processing of file lines
+    File("data.txt").open_r.lazy.grep{ .match(/pattern/) }.map{ . uc }. first(5)
+
+    # Lazy array processing
+    [1,2,3,4,5].lazy. grep{ .is_even }.map{ _**2 }.to_a
+
+=head1 INHERITS
+
+Inherits methods from: 
+
+       * Sidef::Object::Object
 
 =head1 METHODS
 
@@ -19,7 +34,9 @@ var obj = Lazy(...)
 
     self.each(block)
 
-Returns the
+Returns the Lazy object after iterating over each element and executing the given block.  The block receives each element as an argument. 
+
+    (1..10).lazy.grep{ .is_prime }.each { say _ }
 
 =cut
 
@@ -27,7 +44,10 @@ Returns the
 
     self.first(n)
 
-Returns the
+Returns the first I<n> elements from the lazy iterator as an Array.  If I<n> is not provided, returns only the first element.  If I<n> is a Block, it behaves like C<first_by>. 
+
+    say (^Inf -> lazy.grep{ . is_prime }.first(5))      #=> [2, 3, 5, 7, 11]
+    say (^Inf -> lazy.grep{ .is_prime }.first)         #=> 2
 
 =cut
 
@@ -35,7 +55,9 @@ Returns the
 
     self.first_by(block)
 
-Returns the
+Returns the first element for which the block returns a true value. 
+
+    say (1..100).lazy.first_by { . is_prime && (_ > 50) }   #=> 53
 
 =cut
 
@@ -43,9 +65,11 @@ Returns the
 
     self.grep(block)
 
-Returns the
+Returns a new Lazy object that filters elements, keeping only those for which the block returns a true value.  The filtering is performed lazily. 
 
-Aliases: I<select>
+    (1..100).lazy.grep{ .is_even }.first(5).say    #=> [2, 4, 6, 8, 10]
+
+Aliases:  I<select>
 
 =cut
 
@@ -53,7 +77,12 @@ Aliases: I<select>
 
     self.iter
 
-Returns the
+Returns a Block (iterator) that, when called, returns the next element from the lazy sequence. Returns C<nil> when the sequence is exhausted.
+
+    var iter = (1..5).lazy.map{ _**2 }.iter
+    say iter()    #=> 1
+    say iter()    #=> 4
+    say iter()    #=> 9
 
 =cut
 
@@ -61,15 +90,19 @@ Returns the
 
     self.lazy
 
-Returns the
+Returns the Lazy object itself.  This method is idempotent and allows chaining.
+
+    var lz = (1..10).lazy.lazy    # same as (1..10).lazy
 
 =cut
 
 =head2 map
 
-    self.map(block)
+    self. map(block)
 
-Returns the
+Returns a new Lazy object that transforms each element by applying the given block.  The transformation is performed lazily. 
+
+    (1.. 5).lazy.map{ _**2 }. to_a. say    #=> [1, 4, 9, 16, 25]
 
 Aliases: I<collect>
 
@@ -79,7 +112,7 @@ Aliases: I<collect>
 
     self.new
 
-Returns the
+Returns a new Lazy object. This is typically not called directly; instead, use the C<. lazy> method on an iterable object.
 
 =cut
 
@@ -87,7 +120,9 @@ Returns the
 
     self.nth(n)
 
-Returns the
+Returns the I<n>-th element (1-indexed) from the lazy iterator. Returns C<nil> if I<n> is less than or equal to 0.
+
+    say (^Inf -> lazy. grep{ .is_prime }.nth(5))    #=> 11
 
 =cut
 
@@ -95,7 +130,10 @@ Returns the
 
     self.prod(block)
 
-Returns the
+Returns the product of all elements in the lazy sequence after applying the optional block transformation. If no block is given, computes the product of the elements directly.
+
+    say (1..5).lazy.prod                   #=> 120
+    say (1.. 5).lazy.prod { _**2 }          #=> 14400
 
 Aliases: I<prod_by>
 
@@ -103,9 +141,11 @@ Aliases: I<prod_by>
 
 =head2 prod_kv
 
-    self.prod_kv(block)
+    self. prod_kv(block)
 
-Returns the
+Returns the product of results from calling the block with each index-value pair (key-value). The index is 0-based.
+
+    say (1..3).lazy.prod_kv { |k, v| k + v }    # product of (0+1), (1+2), (2+3)
 
 =cut
 
@@ -113,7 +153,10 @@ Returns the
 
     self.reduce(operator, result)
 
-Returns the
+Reduces the lazy sequence using the given operator (as a string or Block), with an optional initial result value. Returns the accumulated result.
+
+    say (1..5).lazy.reduce('+')        #=> 15
+    say (1.. 5).lazy.reduce('*', 1)     #=> 120
 
 =cut
 
@@ -121,7 +164,10 @@ Returns the
 
     self.reduce_by(block, result)
 
-Returns the
+Reduces the lazy sequence using a custom block. The block receives the accumulator and the current element.  If no initial result is provided, the first element is used. 
+
+    say (1..5).lazy.reduce_by { |acc, v| acc + v }         #=> 15
+    say (1..5).lazy.reduce_by({ |acc, v| acc + v }, 10)    #=> 25
 
 =cut
 
@@ -129,7 +175,10 @@ Returns the
 
     self.sum(block)
 
-Returns the
+Returns the sum of all elements in the lazy sequence after applying the optional block transformation. If no block is given, computes the sum of the elements directly.
+
+    say (1..5).lazy.sum                #=> 15
+    say (1..5).lazy.sum { _**2 }       #=> 55
 
 Aliases: I<sum_by>
 
@@ -139,7 +188,9 @@ Aliases: I<sum_by>
 
     self.sum_kv(block)
 
-Returns the
+Returns the sum of results from calling the block with each index-value pair (key-value). The index is 0-based.
+
+    say (1..3).lazy.sum_kv { |k, v| k + v }    # sum of (0+1), (1+2), (2+3) = 9
 
 =cut
 
@@ -147,7 +198,9 @@ Returns the
 
     self.to_a
 
-Returns the
+Evaluates the entire lazy sequence and returns the results as an Array. Use with caution on infinite sequences.
+
+    say (1..5).lazy.map{ _**2 }.to_a    #=> [1, 4, 9, 16, 25]
 
 =cut
 
@@ -155,6 +208,8 @@ Returns the
 
     self.while(block)
 
-Returns the
+Returns an Array of elements from the lazy sequence while the block returns a true value.  Stops collecting elements as soon as the block returns false.
+
+    say (^Inf -> lazy. map { _**2 }. while { _ < 100 })    #=> [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
 
 =cut

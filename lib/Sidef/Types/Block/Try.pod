@@ -1,32 +1,276 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Block::Try
+Sidef::Types::Block::Try - Exception handling block in Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements the try-catch exception handling construct in Sidef. The Try block provides a mechanism to execute code that may throw errors or exceptions, and gracefully handle those errors without causing the program to terminate unexpectedly.
+
+A try-catch construct allows you to:
+
+=over 4
+
+=item * Execute potentially unsafe or error-prone code
+
+=item * Catch and handle exceptions that occur during execution
+
+=item * Maintain program flow even when errors occur
+
+=item * Provide error recovery mechanisms
+
+=back
 
 =head1 SYNOPSIS
 
-var obj = Try(...)
+Basic try-catch usage:
+
+    try {
+        # Code that might throw an exception
+        var result = (10 / 0)
+    }
+    catch { |error|
+        say "Error occurred: #{error}"
+    }
+
+Try-catch with specific error handling:
+
+    try {
+        var file = File("nonexistent.txt").open_r
+        var content = file.slurp
+    }
+    catch { |err|
+        say "Failed to read file: #{err}"
+    }
+
+Nested try-catch blocks:
+
+    try {
+        try {
+            # Inner operation
+            die "Inner error"
+        }
+        catch { |e|
+            say "Caught inner: #{e}"
+            die "Outer error"
+        }
+    }
+    catch { |e|
+        say "Caught outer: #{e}"
+    }
 
 =head1 METHODS
-
-=head2 catch
-
-    self.catch(block)
-
-Returns the
-
-=cut
 
 =head2 try
 
     self.try(block)
 
-Returns the
+Executes the provided block of code within a protected context. If an exception occurs during the execution of the block, control is transferred to the associated catch block rather than terminating the program.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<block> - A Block object containing the code to execute
+
+=back
+
+B<Returns:> The Try object (for method chaining with catch)
+
+B<Example:>
+
+    var result = try {
+        var x = some_risky_operation()
+        x * 2
+    }
+    catch { |e|
+        say "Operation failed: #{e}"
+        nil  # Return nil on error
+    }
+
+=head2 catch
+
+    self.catch(block)
+
+Defines the exception handler that will be executed if an exception occurs in the try block. The catch block receives the exception/error object as its parameter, which can be used to inspect the error details.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<block> - A Block object that handles the exception. The block receives the error object as its first parameter.
+
+=back
+
+B<Returns:> The result of either the try block (if successful) or the catch block (if an exception occurred)
+
+B<Example:>
+
+    try {
+        var num = Number("not_a_number")
+    }
+    catch { |error|
+        say "Conversion failed: #{error}"
+        0  # Return default value
+    }
+
+=head1 USAGE NOTES
+
+=head2 Exception Propagation
+
+If a catch block is not provided, or if the catch block itself throws an exception, the error will propagate up the call stack to the next outer try-catch block or cause the program to terminate.
+
+=head2 Return Values
+
+Both the try and catch blocks can return values. The last expression in whichever block completes will be the return value of the entire try-catch construct:
+
+    var result = try {
+        42  # Returned if successful
+    }
+    catch {
+        0   # Returned if exception occurs
+    }
+
+=head2 Multiple Catches
+
+While Sidef doesn't support multiple catch blocks for different exception types in a single construct, you can handle different error types within a single catch block using conditional logic:
+
+    try {
+        risky_operation()
+    }
+    catch { |e|
+        given (e) {
+            when (e ~~ /FileError/) {
+                say "File error: #{e}"
+            }
+            when (e ~~ /NetworkError/) {
+                say "Network error: #{e}"
+            }
+            default {
+                say "Unknown error: #{e}"
+            }
+        }
+    }
+
+=head2 Throwing Exceptions
+
+You can explicitly throw exceptions using the C<die> function:
+
+    try {
+        die "Something went wrong!"
+    }
+    catch { |e|
+        say "Caught: #{e}"
+    }
+
+=head1 COMMON PATTERNS
+
+=head2 Resource Cleanup
+
+While Sidef doesn't have a finally clause, you can ensure cleanup by placing cleanup code after the try-catch block:
+
+    var file = nil
+    try {
+        file = File("data.txt").open_r
+        # Process file
+    }
+    catch { |e|
+        say "Error: #{e}"
+    }
+    
+    # Cleanup always happens
+    file && file.close
+
+=head2 Error Logging with Re-throw
+
+You can log an error and then re-throw it:
+
+    try {
+        critical_operation()
+    }
+    catch { |e|
+        say "Error logged: #{e}"
+        die e  # Re-throw the exception
+    }
+
+=head2 Default Values on Error
+
+Provide default values when operations fail:
+
+    func safe_divide(a, b) {
+        try {
+            a / b
+        }
+        catch {
+            0  # Return 0 on division by zero
+        }
+    }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Block::Block> - Base block type
+
+=item * L<die> - Function to throw exceptions
+
+=item * L<eval> - Evaluate code in a string (also provides exception handling)
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Example 1: Safe File Reading
+
+    func read_config(filename) {
+        try {
+            var file = File(filename).open_r
+            var content = file.slurp
+            file.close
+            return content
+        }
+        catch { |e|
+            say "Warning: Could not read #{filename}: #{e}"
+            return ""
+        }
+    }
+
+=head2 Example 2: Parsing with Error Handling
+
+    func parse_number(str) {
+        try {
+            return Number(str)
+        }
+        catch { |e|
+            say "Invalid number format: '#{str}'"
+            return nil
+        }
+    }
+    
+    var nums = ["42", "abc", "123", "xyz"].map { |s|
+        parse_number(s)
+    }.grep { defined(_) }
+    
+    say nums  # [42, 123]
+
+=head2 Example 3: Retry Logic
+
+    func fetch_with_retry(url, max_attempts = 3) {
+        var attempts = 0
+        
+        loop {
+            try {
+                return fetch_url(url)
+            }
+            catch { |e|
+                attempts++
+                if (attempts >= max_attempts) {
+                    die "Failed after #{attempts} attempts: #{e}"
+                }
+                say "Attempt #{attempts} failed, retrying..."
+            }
+        }
+    }
 
 =cut

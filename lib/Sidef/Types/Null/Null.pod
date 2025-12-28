@@ -1,24 +1,28 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Null::Null
+Sidef::Types::Null::Null - The Null object in Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements the special "Null" object type in the Sidef programming language.
+
+The C<Null> object represents the absence of a value or a "null" value. It is a singleton object, meaning there is only one instance of Null, analogous to C<undef> in Perl or C<null> in other languages. It is used to represent missing, undefined, or intentionally absent values in Sidef programs.
 
 =head1 SYNOPSIS
 
-var obj = Null(...)
+    var obj = Null          # The unique Null object
+    say obj.to_s            # Prints "null"
+    if (obj == Null) { ... }
 
+Usually, you do not need to construct Null objects manually; instead, the built-in C<Null> is used universally.
 
 =head1 INHERITS
 
 Inherits methods from:
 
-       * Sidef::Object::Object
+    * Sidef::Object::Object
 
 =head1 METHODS
 
@@ -26,9 +30,11 @@ Inherits methods from:
 
     self.new
 
-Returns the
+Returns the unique Null object instance.
 
-Aliases: I<call>
+Calling this constructor always returns the singleton Null object.
+
+B<Aliases>: I<call>
 
 =cut
 
@@ -36,8 +42,48 @@ Aliases: I<call>
 
     self.to_s
 
-Returns the
+Returns the string representation of the Null object, which is always C<"null">.
 
-Aliases: I<dump>, I<to_str>
+B<Aliases>: I<dump>, I<to_str>
+
+=cut
+
+=head2 is_null
+
+    self.is_null
+
+Returns true, as this is the Null object.
+
+=cut
+
+=head2 boolean
+
+    self.boolean
+
+Returns false. This means the Null object evaluates as false in boolean context.
+
+=cut
+
+=head2 equals
+
+    self.equals(other)
+
+Returns true if and only if C<other> is also the Null object.
+
+=cut
+
+=head1 SEE ALSO
+
+L<Sidef::Object::Object>, L<Sidef::Types::Undefined::Undefined>, L<Sidef::Types::Bool::Bool>
+
+=head1 AUTHOR
+
+Sidef contributors
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2025, Daniel Șuteu
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
 
 =cut

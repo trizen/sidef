@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,12 +6,36 @@ Sidef::Types::Array::Pair
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements a pair data structure, representing an ordered collection of exactly two elements. A Pair is commonly used to represent key-value associations, coordinate points, or any two related values. Pairs are immutable once created and are often used as building blocks for other data structures like hashes.
+
+In Sidef, pairs can be created using the C<Pair()> constructor or the C<=>> operator (fat comma).
 
 =head1 SYNOPSIS
 
-var obj = Pair(...)
-
+    # Creating pairs
+    var pair1 = Pair('key', 'value')
+    var pair2 = ('name' => 'Alice')
+    var pair3 = (10 => 20)
+    
+    # Accessing elements
+    say pair1.key      #=> "key"
+    say pair1.value    #=> "value"
+    say pair1.first    #=> "key"
+    say pair1.second   #=> "value"
+    
+    # Converting pairs
+    say pair2.to_a     #=> ["name", "Alice"]
+    say pair2.to_h     #=> Hash(name => "Alice")
+    
+    # Swapping elements
+    var swapped = pair3.swap
+    say swapped        #=> (20 => 10)
+    
+    # Using pairs in iterations
+    var hash = Hash(a => 1, b => 2, c => 3)
+    hash.each { |pair|
+        say "#{pair.key} => #{pair.value}"
+    }
 
 =head1 INHERITS
 
@@ -22,23 +45,52 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 new
+
+    Pair.new(key, value)
+    self.new(key, value)
+
+Creates and returns a new Pair object with the specified key and value. This is the primary constructor for creating pairs programmatically.
+
+    var pair = Pair.new('x', 100)
+    say pair           #=> (x => 100)
+    
+    var coords = Pair.new(3.5, 7.2)
+    say coords         #=> (3.5 => 7.2)
+
+Aliases: I<call>
+
+=cut
+
 =head2 key
 
     self.key
 
-Returns the
+Returns the first element of the pair, conventionally referred to as the "key". This method provides semantic access to the first component when the pair is used to represent key-value associations.
+
+    var pair = ('username' => 'john_doe')
+    say pair.key       #=> "username"
+    
+    var point = (10 => 20)
+    say point.key      #=> 10
 
 Aliases: I<first>
 
 =cut
 
-=head2 new
+=head2 value
 
-    self.new
+    self.value
 
-Returns the
+Returns the second element of the pair, conventionally referred to as the "value". This method provides semantic access to the second component when the pair is used to represent key-value associations.
 
-Aliases: I<call>
+    var pair = ('username' => 'john_doe')
+    say pair.value     #=> "john_doe"
+    
+    var point = (10 => 20)
+    say point.value    #=> 20
+
+Aliases: I<second>
 
 =cut
 
@@ -46,7 +98,17 @@ Aliases: I<call>
 
     self.swap
 
-Returns the
+Returns a new Pair with the key and value positions swapped. The original pair remains unchanged. This is useful for inverting associations or transforming coordinate systems.
+
+    var original = ('name' => 'Alice')
+    var swapped = original.swap
+    
+    say original       #=> (name => "Alice")
+    say swapped        #=> (Alice => "name")
+    
+    # Useful for coordinate transformations
+    var point = (3 => 4)
+    var reflected = point.swap    #=> (4 => 3)
 
 =cut
 
@@ -54,7 +116,17 @@ Returns the
 
     self.to_a
 
-Returns the
+Converts the Pair to a two-element Array containing the key and value in order. This is useful when you need to process the pair as a regular array or pass it to functions expecting array arguments.
+
+    var pair = ('color' => 'blue')
+    var array = pair.to_a
+    
+    say array          #=> ["color", "blue"]
+    say array[0]       #=> "color"
+    say array[1]       #=> "blue"
+    
+    # Useful for destructuring
+    var (k, v) = pair.to_a
 
 Aliases: I<to_array>
 
@@ -64,7 +136,19 @@ Aliases: I<to_array>
 
     self.to_h
 
-Returns the
+Converts the Pair to a Hash containing a single key-value entry. This is convenient when you need to create a hash from a pair or merge a pair into existing hash structures.
+
+    var pair = ('age' => 25)
+    var hash = pair.to_h
+    
+    say hash           #=> Hash(age => 25)
+    say hash{:age}     #=> 25
+    
+    # Merging multiple pairs
+    var settings = [
+        ('theme' => 'dark'),
+        ('font' => 'monospace')
+    ].map { .to_h }.reduce { |a, b| a + b }
 
 Aliases: I<to_hash>
 
@@ -74,18 +158,80 @@ Aliases: I<to_hash>
 
     self.to_s
 
-Returns the
+Returns a string representation of the Pair in the format C<(key => value)>. This provides a human-readable serialization of the pair, useful for debugging and display purposes.
+
+    var pair = ('status' => 'active')
+    say pair.to_s      #=> "(status => active)"
+    
+    var numeric = (42 => 3.14)
+    say numeric.to_s   #=> "(42 => 3.14)"
+    
+    # Automatically called by say/print
+    say pair           #=> (status => active)
 
 Aliases: I<dump>, I<to_str>
 
 =cut
 
-=head2 value
+=head1 EXAMPLES
 
-    self.value
+=head2 Working with Hash Entries
 
-Returns the
+    var hash = Hash(
+        name   => 'Alice',
+        age    => 30,
+        city   => 'Boston'
+    )
+    
+    # Iterating as pairs
+    hash.each { |pair|
+        say "The #{pair.key} is #{pair.value}"
+    }
+    
+    # Filtering pairs
+    var adults = hash.grep { |pair|
+        pair.key == 'age' && pair.value >= 18
+    }
 
-Aliases: I<second>
+=head2 Coordinate Transformations
+
+    var points = [
+        (0 => 0),
+        (3 => 4),
+        (5 => 12)
+    ]
+    
+    # Swap x and y coordinates
+    var reflected = points.map { .swap }
+    
+    # Calculate distances from origin
+    var distances = points.map { |p|
+        hypot(p.key, p.value)
+    }
+
+=head2 Building Data Structures
+
+    # Create a hash from an array of pairs
+    var pairs = [
+        ('apple'  => 1.20),
+        ('banana' => 0.50),
+        ('cherry' => 2.00)
+    ]
+    
+    var prices = Hash(pairs...)
+    say prices{:apple}    #=> 1.20
+    
+    # Invert a hash (swap keys and values)
+    var inverted = Hash(
+        prices.map { |k, v| (v => k) }...
+    )
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Array::Array>, L<Sidef::Types::Hash::Hash>
+
+=head1 AUTHOR
+
+Daniel Șuteu
 
 =cut

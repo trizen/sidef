@@ -1,639 +1,456 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Glob::File
-
-=head1 DESCRIPTION
-
-This class implements ...
+Sidef::Types::Glob::File — Filesystem path and file operations
 
 =head1 SYNOPSIS
 
-var obj = File(...)
+    var f = File("example.txt")
 
+    say f.exists
+    say f.size
+    say f.read
+
+=head1 DESCRIPTION
+
+The C<Sidef::Types::Glob::File> class represents a filesystem path and provides
+methods for inspecting, reading, writing, and manipulating files and
+directories.
+
+A C<File> object behaves like a string containing a path, while also exposing
+filesystem-related functionality. This allows file paths to be used naturally
+as strings while enabling direct interaction with the filesystem.
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::String::String
+C<Sidef::Types::String::String>
 
 =head1 METHODS
 
+=head2 new
+
+Creates a new C<File> object from a path string.
+
+    var f = File("test.txt")
+
 =head2 abs
 
-    self.abs(base)
+Returns the absolute path of the file.
 
-Returns the
-
-Aliases: I<abs_name>, I<absname>, I<rel2abs>
-
-=cut
+    say File("a/b").abs
 
 =head2 abs_path
 
-    self.abs_path
+Returns the absolute filesystem path.
 
-Returns the
-
-Aliases: I<realpath>
-
-=cut
+    say File("test.txt").abs_path
 
 =head2 access_time_days_diff
 
-    self.access_time_days_diff
+Returns the number of days since the file was last accessed.
 
-Returns the
-
-=cut
+    say File("test.txt").access_time_days_diff
 
 =head2 append
 
-    self.append(string, mode)
+Appends a string to the file.
 
-Returns the
-
-=cut
+    File("log.txt").append("hello\n")
 
 =head2 base
 
-    self.base
+Returns the basename of the path.
 
-Returns the
-
-Aliases: I<base_name>, I<basename>
-
-=cut
+    say File("/tmp/a.txt").base
 
 =head2 change_time_days_diff
 
-    self.change_time_days_diff
+Returns the number of days since file metadata was last changed.
 
-Returns the
-
-=cut
+    say File("test.txt").change_time_days_diff
 
 =head2 chmod
 
-    self.chmod(permission)
+Changes the file permissions.
 
-Returns the
-
-=cut
+    File("script.sh").chmod(0o755)
 
 =head2 chown
 
-    self.chown(uid, gid)
+Changes the owner and group of the file.
 
-Returns the
-
-=cut
+    File("data").chown(1000, 1000)
 
 =head2 compare
 
-    self.compare(file)
+Compares this file with another file.
 
-Returns the
-
-=cut
+    File("a").compare(File("b"))
 
 =head2 cp
 
-    self.cp(file)
+Copies the file to another path.
 
-Returns the
-
-Aliases: I<copy>
-
-=cut
+    File("a.txt").cp("b.txt")
 
 =head2 delete
 
-    file.delete
+Deletes the file from the filesystem.
 
-Deletes a file and return C<true> on success.
-
-Will not attempt to delete directories.
-
-Aliases: I<remove>
-
-=cut
+    File("old.txt").delete
 
 =head2 dir
 
-    file.dir
+Returns the directory component of the path.
 
-Returns the directory of the filename, similar to the Unix shell command C<dirname>.
-
-Aliases: I<dir_name>, I<dirname>
-
-=cut
+    say File("/tmp/a.txt").dir
 
 =head2 dump
 
-    file.dump
+Returns a debugging representation of the object.
 
-Returns a String representation of the File object.
-
-=cut
+    say File("a.txt").dump
 
 =head2 edit
 
-    self.edit(code)
+Edits the file contents using a transformation block.
 
-Returns the
-
-=cut
+    File("a.txt").edit {|s| s.uc }
 
 =head2 exists
 
-    file.exists
+Returns a boolean indicating whether the file exists.
 
-Returns C<true> if file exists.
-
-=cut
+    say File("a.txt").exists
 
 =head2 has_setgid_bit
 
-    file.has_setgid_bit
+Returns true if the setgid bit is set.
 
-Returns C<true> if file has setgid bit set.
-
-=cut
+    say File("bin").has_setgid_bit
 
 =head2 has_setuid_bit
 
-    file.has_setuid_bit
+Returns true if the setuid bit is set.
 
-Returns C<true> if file has setuid bit set.
-
-=cut
+    say File("bin").has_setuid_bit
 
 =head2 has_sticky_bit
 
-    file.has_sticky_bit
+Returns true if the sticky bit is set.
 
-Returns C<true> if file has sticky bit set.
-
-=cut
+    say File("/tmp").has_sticky_bit
 
 =head2 is_abs
 
-    file.is_abs
+Returns true if the path is absolute.
 
-Returns C<true> if file name is absolute.
-
-Aliases: I<is_absolute>
-
-=cut
+    say File("/etc/passwd").is_abs
 
 =head2 is_binary
 
-    file.is_binary
+Returns true if the file appears to be binary.
 
-Returns C<true> if file looks like a binary file (heuristic guess).
-
-=cut
+    say File("image.png").is_binary
 
 =head2 is_block
 
-    file.is_block
+Returns true if the file is a block device.
 
-Returns C<true> if file is a block special file.
-
-=cut
+    say File("/dev/sda").is_block
 
 =head2 is_char_device
 
-    file.is_char_device
+Returns true if the file is a character device.
 
-Returns C<true> if file is a character special file.
-
-=cut
+    say File("/dev/null").is_char_device
 
 =head2 is_dir
 
-    file.is_dir
+Returns true if the path refers to a directory.
 
-Returns C<true> if file is a directory.
-
-Aliases: I<is_directory>
-
-=cut
+    say File("/tmp").is_dir
 
 =head2 is_empty
 
-    file.is_empty
+Returns true if the file is empty.
 
-Returns C<true> if file has zero size (i.e.: is empty).
-
-=cut
+    say File("empty.txt").is_empty
 
 =head2 is_executable
 
-    file.is_executable
+Returns true if the file is executable.
 
-Returns C<true> if file is executable by effective uid/gid.
-
-=cut
+    say File("script.sh").is_executable
 
 =head2 is_file
 
-    file.is_file
+Returns true if the path refers to a regular file.
 
-Returns C<true> if file is a plain file.
-
-=cut
+    say File("a.txt").is_file
 
 =head2 is_link
 
-    file.is_link
+Returns true if the file is a symbolic link.
 
-Returns C<true> if file is a symbolic link.
-
-Returns C<false> if symlinks aren't supported by the file system.
-
-=cut
+    say File("link").is_link
 
 =head2 is_owned
 
-    file.is_owned
+Returns true if the file is owned by the effective user.
 
-Returns C<true> if file is owned by effective uid.
-
-=cut
+    say File("a.txt").is_owned
 
 =head2 is_readable
 
-    file.is_readable
+Returns true if the file is readable.
 
-Returns C<true> if file is readable by effective uid/gid.
-
-=cut
+    say File("a.txt").is_readable
 
 =head2 is_real_executable
 
-    file.is_real_executable
+Returns true if the file is executable by the real user.
 
-Returns C<true> if file is executable by real uid/gid.
-
-=cut
+    say File("script.sh").is_real_executable
 
 =head2 is_real_owned
 
-    file.is_real_owned
+Returns true if the file is owned by the real user.
 
-Returns C<true> if file is owned by real uid.
-
-=cut
+    say File("a.txt").is_real_owned
 
 =head2 is_real_readable
 
-    file.is_real_readable
+Returns true if the file is readable by the real user.
 
-Returns C<true> if file is readable by real uid/gid.
-
-=cut
+    say File("a.txt").is_real_readable
 
 =head2 is_real_writeable
 
-    file.is_real_writeable
+Returns true if the file is writeable by the real user.
 
-Returns C<true> if file is writable by real uid/gid.
-
-=cut
+    say File("a.txt").is_real_writeable
 
 =head2 is_socket
 
-    file.is_socket
+Returns true if the file is a socket.
 
-Returns C<true> if file is a socket.
-
-=cut
-
-=head2 is_text
-
-    file.is_text
-
-Returns C<true> if file is an ASCII or UTF-8 text file (heuristic guess).
-
-=cut
+    say File("/var/run/docker.sock").is_socket
 
 =head2 is_writeable
 
-    file.is_writeable
+Returns true if the file is writeable.
 
-Returns C<true> if file is writable by effective uid/gid.
-
-=cut
+    say File("a.txt").is_writeable
 
 =head2 link
 
-    oldfile.link(newfile)
+Creates a hard link.
 
-Creates a new filename linked to the old filename.
-
-Returns C<true> for success, C<false> otherwise.
-
-=cut
-
-=head2 lstat
-
-    self.lstat
-
-Returns the
-
-=cut
-
-=head2 make
-
-    self.make(*args)
-
-Returns the
-
-Aliases: I<touch>, I<create>, I<mkfile>
-
-=cut
-
-=head2 md5
-
-    self.md5
-
-Returns the
-
-=cut
-
-=head2 mktemp
-
-    self.mktemp(:opts)
-
-Returns the
-
-Aliases: I<make_tmp>, I<make_temp>
-
-=cut
-
-=head2 modification_time_days_diff
-
-    self.modification_time_days_diff
-
-Returns the
-
-=cut
-
-=head2 mv
-
-    self.mv(file)
-
-Returns the
-
-Aliases: I<move>
-
-=cut
-
-=head2 name
-
-    self.name
-
-Returns the
-
-=cut
-
-=head2 new
-
-    self.new
-
-Returns the
-
-Aliases: I<call>
-
-=cut
-
-=head2 open
-
-    self.open(mode, fh_ref, err_ref)
-
-Returns the
-
-=cut
-
-=head2 open_a
-
-    self.open_a(*args)
-
-Returns the
-
-Aliases: I<open_append>
-
-=cut
-
-=head2 open_arw
-
-    self.open_arw(*args)
-
-Returns the
-
-Aliases: I<open_append_read_write>
-
-=cut
-
-=head2 opendir
-
-    self.opendir(*args)
-
-Returns the
-
-=cut
-
-=head2 open_r
-
-    self.open_r(*args)
-
-Returns the
-
-Aliases: I<open_read>
-
-=cut
-
-=head2 open_rw
-
-    self.open_rw(*args)
-
-Returns the
-
-Aliases: I<open_read_write>
-
-=cut
-
-=head2 open_w
-
-    self.open_w(*args)
-
-Returns the
-
-Aliases: I<open_write>
-
-=cut
-
-=head2 read
-
-    self.read(mode)
-
-Returns the
-
-=cut
-
-=head2 read_link
-
-    self.read_link
-
-Returns the
-
-Aliases: I<readlink>
-
-=cut
-
-=head2 rel
-
-    self.rel(base)
-
-Returns the
-
-Aliases: I<abs2rel>, I<rel_name>, I<relname>
-
-=cut
-
-=head2 rename
-
-    self.rename(file)
-
-Returns the
-
-=cut
-
-=head2 sha1
-
-    self.sha1
-
-Returns the
-
-=cut
-
-=head2 sha256
-
-    self.sha256
-
-Returns the
-
-=cut
-
-=head2 sha512
-
-    self.sha512
-
-Returns the
-
-=cut
-
-=head2 size
-
-    self.size
-
-Returns the
-
-=cut
-
-=head2 split
-
-    self.split
-
-Returns the
-
-=cut
-
-=head2 splitpath
-
-    self.splitpath
-
-Returns the
-
-=cut
-
-=head2 stat
-
-    self.stat
-
-Returns the
-
-=cut
+    File("a.txt").link("b.txt")
 
 =head2 symlink
 
-    oldfile.symlink(newfile)
+Creates a symbolic link.
 
-Creates a new filename symbolically linked to the old filename.
+    File("a.txt").symlink("b.txt")
 
-Returns C<true> for success, C<false> otherwise.
+=head2 lstat
 
-=cut
+Returns file status information without following symbolic links.
 
-=head2 sysopen
+    say File("link").lstat
 
-    self.sysopen(var_ref, mode, perm)
+=head2 make
 
-Returns the
+Creates the file or directory path.
 
-=cut
+    File("dir/sub").make
+
+=head2 md5
+
+Returns the MD5 checksum of the file contents.
+
+    say File("a.txt").md5
+
+=head2 sha1
+
+Returns the SHA-1 checksum of the file contents.
+
+    say File("a.txt").sha1
+
+=head2 sha256
+
+Returns the SHA-256 checksum of the file contents.
+
+    say File("a.txt").sha256
+
+=head2 sha512
+
+Returns the SHA-512 checksum of the file contents.
+
+    say File("a.txt").sha512
+
+=head2 mktemp
+
+Creates a temporary file or filename.
+
+    say File("tmpXXXX").mktemp
+
+=head2 modification_time_days_diff
+
+Returns the number of days since the file was last modified.
+
+    say File("a.txt").modification_time_days_diff
+
+=head2 mv
+
+Moves or renames the file.
+
+    File("a.txt").mv("b.txt")
+
+=head2 name
+
+Returns the filename without directory components.
+
+    say File("/tmp/a.txt").name
+
+=head2 open
+
+Opens the file and returns a filehandle.
+
+    var fh = File("a.txt").open
+
+=head2 open_r
+
+Opens the file for reading.
+
+    var fh = File("a.txt").open_r
+
+=head2 open_w
+
+Opens the file for writing.
+
+    var fh = File("a.txt").open_w
+
+=head2 open_rw
+
+Opens the file for reading and writing.
+
+    var fh = File("a.txt").open_rw
+
+=head2 open_a
+
+Opens the file for appending.
+
+    var fh = File("a.txt").open_a
+
+=head2 open_arw
+
+Opens the file for appending and reading.
+
+    var fh = File("a.txt").open_arw
+
+=head2 open_dirs
+
+Opens a directory stream.
+
+    var d = File("/tmp").open_dirs
+
+=head2 read
+
+Reads the file contents and returns them as a string.
+
+    say File("a.txt").read
+
+=head2 read_link
+
+Returns the target of a symbolic link.
+
+    say File("link").read_link
+
+=head2 rel
+
+Returns the path relative to a base directory.
+
+    say File("/a/b/c").rel("/a")
+
+=head2 rename
+
+Renames the file.
+
+    File("a.txt").rename("b.txt")
+
+=head2 size
+
+Returns the file size in bytes.
+
+    say File("a.txt").size
+
+=head2 split
+
+Splits the path into components.
+
+    say File("/a/b/c").split
+
+=head2 splitpath
+
+Splits the path into volume, directory, and filename components.
+
+    say File("/a/b/c.txt").splitpath
+
+=head2 stat
+
+Returns filesystem status information.
+
+    say File("a.txt").stat
 
 =head2 to_file
 
-    self.to_file
+Converts the value to a C<File> object.
 
-Returns the
-
-=cut
+    say "a.txt".to_file
 
 =head2 to_s
 
-    self.to_s
+Returns the string representation of the path.
 
-Returns the
-
-Aliases: I<to_str>
-
-=cut
+    say File("a.txt").to_s
 
 =head2 truncate
 
-    self.truncate(length)
+Truncates the file to a specified size.
 
-Returns the
-
-=cut
+    File("a.txt").truncate(0)
 
 =head2 unlink
 
-    self.unlink(*args)
+Deletes the file.
 
-Returns the
+    File("a.txt").unlink
 
-=cut
+=head2 sysopen
+
+Opens the file using low-level system flags.
+
+    File("a.txt").sysopen(:rw)
 
 =head2 utime
 
-    self.utime(atime, mtime)
+Sets the access and modification times.
 
-Returns the
-
-=cut
+    File("a.txt").utime(time, time)
 
 =head2 write
 
-    self.write(string, mode)
+Writes a string to the file.
 
-Returns the
+    File("a.txt").write("hello\n")
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Glob>,
+L<Sidef::Types::String::String>
 
 =cut
