@@ -1,564 +1,241 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Set::Bag
+Sidef::Types::Set::Bag - Multiset (Bag) data type
 
 =head1 DESCRIPTION
 
-This class implements ...
+A C<Bag> is an unordered collection of elements that allows duplicate values.
+Unlike a L<Sidef::Types::Set::Set>, a Bag keeps track of how many times each
+element occurs.
+
+In other words, a Bag is a I<multiset>. Each element has an associated
+I<multiplicity> (frequency). Most set-like operations are supported, but they
+take multiplicity into account.
+
+For example, the Bag:
+
+    Bag(1, 1, 2, 3)
+
+contains the element C<1> twice, and C<2> and C<3> once.
 
 =head1 SYNOPSIS
 
     var a = Bag(1, 1, 2, 3)
-    var b = Bag(1, 4, 3, 5)
+    var b = Bag(1, 3, 4)
 
-    say (a | b)     #=> Bag(1, 1, 2, 3, 4, 5)
-    say (a ^ b)     #=> Bag(1, 2, 4, 5)
-    say (a & b)     #=> Bag(1, 3)
-    say (a - b)     #=> Bag(1, 2)
-    say (a + b)     #=> Bag(1, 1, 1, 2, 3, 3, 4, 5)
+    say a.len           # 4  (total number of elements)
+    say a.elems         # 3  (number of distinct elements)
 
-    say a.count(1)  #=> 2
-    say a.elems     #=> 3
-    say a.len       #=> 4
+    say a.count(1)      # 2
+    say a.keys          # [1, 2, 3]
+    say a.freq          # [[1,2], [2,1], [3,1]]
 
-    say a.keys      #=> [1, 2, 3]
-    say a.freq      #=> [[1, 2], [2, 1], [3, 1]]
+    say a + b           # Bag(1,1,1,2,3,3,4)
+    say a & b           # Bag(1,3)
+    say a - b           # Bag(1,2)
+    say a | b           # Bag(1,1,2,3,4)
 
 =head1 INHERITS
 
-Inherits methods from:
+This class inherits from:
 
-       * Sidef::Types::Set::Set
+=over 4
+
+=item *
+
+L<Sidef::Types::Set::Set>
+
+=back
+
+=head1 OPERATORS
+
+The following operators are supported for Bag objects.
+
+=over 4
+
+=item C<a + b>
+
+Returns the I<multiset sum> of C<a> and C<b>. All elements from both bags are
+included, preserving their multiplicities.
+
+Alias: C<concat>, C<union_all>
+
+=item C<a & b>
+
+Returns the I<intersection> of C<a> and C<b>.  
+Each element appears the minimum number of times it occurs in both bags.
+
+Alias: C<intersection>, C<and>, C<∩>
+
+=item C<a | b>
+
+Returns the I<union> of C<a> and C<b>.  
+Each element appears the maximum number of times it occurs in either bag.
+
+Alias: C<union>, C<∪>
+
+=item C<a - b>
+
+Returns the I<difference> of C<a> and C<b>.  
+Elements from C<b> are removed from C<a> according to their multiplicities.
+
+Alias: C<difference>, C<∖>
+
+=item C<a ^ b>
+
+Returns the I<symmetric difference> of C<a> and C<b>.
+
+Alias: C<xor>
+
+=item C<a << b>
+
+Appends all elements from C<b> into C<a>.
+
+Alias: C<append>, C<push>
+
+=item C<a == b>
+
+Returns true if both bags contain the same elements with the same
+multiplicities.
+
+Alias: C<eq>, C<≡>
+
+=item C<a != b>
+
+Returns true if the two bags are not equal.
+
+Alias: C<ne>, C<≠>
+
+=item C<a <= b>
+
+Returns true if C<a> is a I<sub-bag> of C<b>, meaning that every element in
+C<a> occurs no more times than in C<b>.
+
+Alias: C<le>, C<⊆>
+
+=item C<a >= b>
+
+Returns true if C<a> is a I<super-bag> of C<b>.
+
+Alias: C<ge>, C<⊇>
+
+=item C<a ∋ x>
+
+Returns true if element C<x> exists in C<a>.
+
+Alias: C<contains>, C<has>
+
+=item C<a ∌ x>
+
+Returns true if element C<x> does not exist in C<a>.
+
+Alias: C<not_contains>
+
+=back
 
 =head1 METHODS
 
-=head2 &
+=head2 add_kv(obj, count)
 
-    a & b
+Adds C<count> occurrences of C<obj> to the bag.
 
-Returns the
+Returns the bag itself.
 
-Aliases: I<∩>, I<and>, I<intersection>
+=head2 add_kvs(*pairs)
 
-=cut
-
-=head2 +
-
-    a + b
-
-Returns the
-
-Aliases: I<concat>
-
-=cut
-
-=head2 -
-
-    a - b
-
-Returns the
-
-Aliases: I<∖>, I<sub>, I<diff>, I<difference>
-
-=cut
-
-=head2 ...
-
-    a ... b
-
-Returns the
-
-Aliases: I<to_list>
-
-=cut
-
-=head2 <<
-
-    a << b
-
-Returns the
-
-Aliases: I<add>, I<push>, I<append>
-
-=cut
-
-=head2 ^
-
-    a ^ b
-
-Returns the
-
-Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
-
-=cut
-
-=head2 |
-
-    a | b
-
-Returns the
-
-Aliases: I<∪>, I<or>, I<union>
-
-=cut
-
-=head2 ∋
-
-    a ∋ b
-
-Returns the
-
-Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
-
-=cut
-
-=head2 ∌
-
-    a ∌ b
-
-Returns the
-
-=cut
-
-=head2 ≠
-
-    a ≠ b
-
-Returns the
-
-Aliases: I<!=>, I<ne>
-
-=cut
-
-=head2 ≡
-
-    a ≡ b
-
-Returns the
-
-Aliases: I<==>, I<eq>
-
-=cut
-
-=head2 ≤
-
-    a ≤ b
-
-Returns the
-
-Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
-
-=cut
-
-=head2 ≥
-
-    a ≥ b
-
-Returns the
-
-Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
-
-=cut
-
-=head2 add_kv
-
-    self.add_kv(obj, n)
-
-Returns the
-
-Aliases: I<push_kv>, I<add_pair>, I<append_kv>, I<push_pair>, I<append_pair>
-
-=cut
-
-=head2 add_kvs
-
-    self.add_kvs(*pairs)
-
-Returns the
-
-Aliases: I<push_kvs>, I<add_pairs>, I<append_kvs>, I<push_pairs>, I<append_pairs>
-
-=cut
+Adds multiple C<(object, count)> pairs to the bag.
 
 =head2 clone
 
-    self.clone
+Returns a shallow copy of the bag.
 
-Returns the
+=head2 collect(block)
 
-=cut
+Applies C<block> to each element and returns a new Bag with the results.
 
-=head2 collect
+=head2 contains_all(*objects)
 
-    self.collect(block)
+Returns true if all listed objects exist in the bag (ignores multiplicity).
 
-Returns the
+=head2 count(obj)
 
-=cut
+Returns the number of times C<obj> occurs in the bag.
 
-=head2 contains_all
+Alias: C<get>
 
-    self.contains_all(*objects)
+=head2 count_by(block)
 
-Returns the
+Returns a new Bag that counts elements based on the value returned by
+C<block>.
 
-=cut
+=head2 delete(*objects)
 
-=head2 count_by
+Deletes one occurrence of each listed object from the bag.
 
-    self.count_by(block)
+Alias: C<remove>
 
-Returns the
+=head2 delete_all(*objects)
 
-=cut
+Deletes all occurrences of the listed objects from the bag.
 
-=head2 delete
+=head2 delete_if(block)
 
-    self.delete(*objects)
-
-Returns the
-
-Aliases: I<remove>, I<discard>
-
-=cut
-
-=head2 delete_all
-
-    self.delete_all(*objects)
-
-Returns the
-
-Aliases: I<remove_all>, I<discard_all>
-
-=cut
-
-=head2 delete_first_if
-
-    self.delete_first_if(block)
-
-Returns the
-
-=cut
-
-=head2 delete_if
-
-    self.delete_if(block)
-
-Returns the
-
-=cut
-
-=head2 delete_key
-
-    self.delete_key(obj)
-
-Returns the
-
-Aliases: I<remove_key>, I<discard_key>
-
-=cut
-
-=head2 dump
-
-    self.dump
-
-Returns the
-
-=cut
-
-=head2 each
-
-    self.each(block)
-
-Returns the
-
-=cut
-
-=head2 each_2d
-
-    self.each_2d(block)
-
-Returns the
-
-=cut
-
-=head2 each_kv
-
-    self.each_kv(block)
-
-Returns the
-
-=cut
+Deletes all elements for which C<block> returns true.
 
 =head2 elems
 
-    self.elems
-
-Returns the
-
-Aliases: I<keys_len>
-
-=cut
+Returns the number of distinct elements in the bag.
 
 =head2 freq
 
-    self.freq
-
-Returns the
-
-=cut
-
-=head2 get
-
-    self.get(obj)
-
-Returns the
-
-Aliases: I<count>
-
-=cut
-
-=head2 grep
-
-    self.grep(block)
-
-Returns the
-
-Aliases: I<select>
-
-=cut
-
-=head2 grep_2d
-
-    self.grep_2d(block)
-
-Returns the
-
-=cut
-
-=head2 grep_kv
-
-    self.grep_kv(block)
-
-Returns the
-
-=cut
-
-=head2 iter
-
-    self.iter
-
-Returns the
-
-=cut
-
-=head2 join
-
-    self.join(*rest)
-
-Returns the
-
-=cut
+Returns an array of C<[key, count]> pairs.
 
 =head2 keys
 
-    self.keys
-
-Returns the
-
-=cut
-
-=head2 kv
-
-    self.kv
-
-Returns the
-
-Aliases: I<pairs>
-
-=cut
+Returns an array of distinct elements in the bag.
 
 =head2 len
 
-    self.len
-
-Returns the
-
-Aliases: I<size>, I<length>
-
-=cut
-
-=head2 map
-
-    self.map(block)
-
-Returns the
-
-=cut
-
-=head2 map_2d
-
-    self.map_2d(block)
-
-Returns the
-
-=cut
-
-=head2 map_kv
-
-    self.map_kv(block)
-
-Returns the
-
-=cut
-
-=head2 max
-
-    self.max
-
-Returns the
-
-=cut
-
-=head2 max_by
-
-    self.max_by(block)
-
-Returns the
-
-=cut
-
-=head2 min
-
-    self.min
-
-Returns the
-
-=cut
-
-=head2 min_by
-
-    self.min_by(block)
-
-Returns the
-
-=cut
-
-=head2 new
-
-    self.new
-
-Returns the
-
-Aliases: I<call>
-
-=cut
-
-=head2 pop
-
-    self.pop
-
-Returns the
-
-=cut
-
-=head2 set_kv
-
-    self.set_kv(obj, n)
-
-Returns the
-
-Aliases: I<update_kv>, I<update_pair>, I<replace_pair>
-
-=cut
-
-=head2 set_kvs
-
-    self.set_kvs(*pairs)
-
-Returns the
-
-Aliases: I<update_kvs>, I<update_pairs>, I<replace_pairs>
-
-=cut
-
-=head2 shift
-
-    self.shift
-
-Returns the
-
-=cut
-
-=head2 sort
-
-    self.sort(block)
-
-Returns the
-
-=cut
-
-=head2 sort_by
-
-    self.sort_by(block)
-
-Returns the
-
-=cut
+Returns the total number of elements, including duplicates.
 
 =head2 to_a
 
-    self.to_a
-
-Returns the
-
-Aliases: I<expand>, I<to_array>
-
-=cut
-
-=head2 to_bag
-
-    self.to_bag
-
-Returns the
-
-=cut
-
-=head2 top
-
-    self.top(n)
-
-Returns the
-
-Aliases: I<most_common>
-
-=cut
+Returns an array containing all elements, including duplicates.
 
 =head2 to_set
 
-    self.to_set
+Converts the bag into a L<Sidef::Types::Set::Set>, discarding multiplicities.
 
-Returns the
+=head2 to_bag
 
-=cut
+Returns the bag itself.
 
-=head2 uniq
+=head1 EXAMPLES
 
-    self.uniq
+    var bag = Bag("a", "a", "b")
 
-Returns the
+    bag.add_kv("c", 3)
+    say bag.freq
+    # [["a",2], ["b",1], ["c",3]]
 
-Aliases: I<unique>
+    bag.delete("a")
+    say bag.count("a")
+    # 1
 
-=cut
+=head1 SEE ALSO
 
-=head2 values
+=over 4
 
-    self.values
+=item *
 
-Returns the
+L<Sidef::Types::Set::Set>
+
+=item *
+
+Multiset (Bag) data structure
+
+=back
 
 =cut
