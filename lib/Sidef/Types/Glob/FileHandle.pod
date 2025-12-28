@@ -7,18 +7,36 @@ Sidef::Types::Glob::FileHandle
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements file handle operations for reading from and writing to files, as well as in-memory string buffers. It provides methods for I/O operations, file positioning, locking, and iteration over file content.
 
 =head1 SYNOPSIS
 
-var obj = FileHandle(...)
+    # Open a file and get a FileHandle
+    var fh = File("/path/to/file. txt").open_r
+
+    # Read all content
+    var content = fh.slurp
+
+    # Read line by line
+    fh.each { |line|
+        say line
+    }
+
+    # Create an in-memory buffer
+    var buf = FileHandle.new_buf(: raw, "initial content")
+    buf.print("more content")
+
+    # Standard streams
+    var stdout = FileHandle.stdout
+    var stderr = FileHandle.stderr
+    var stdin  = FileHandle.stdin
 
 
 =head1 INHERITS
 
-Inherits methods from:
+Inherits methods from: 
 
-       * Sidef::Object::Object
+       * Sidef::Object:: Object
 
 =head1 METHODS
 
@@ -26,9 +44,9 @@ Inherits methods from:
 
     a « b
 
-Returns the
+Writes the content of C<b> to the file handle C<a> and returns the file handle.  This is an operator alias for writing data to a file handle. 
 
-Aliases: I<E<lt>E<lt>>, I<write_from>
+Aliases:  I<E<lt>E<lt>>, I<write_from>
 
 =cut
 
@@ -36,7 +54,7 @@ Aliases: I<E<lt>E<lt>>, I<write_from>
 
     a » b
 
-Returns the
+Reads a line from file handle C<a> into variable reference C<b> (with newline removed) and returns the file handle. Sets C<b> to C<nil> at end of file. 
 
 Aliases: I<E<gt>E<gt>>, I<read_to>
 
@@ -46,15 +64,15 @@ Aliases: I<E<gt>E<gt>>, I<read_to>
 
     self.autoflush(bool)
 
-Returns the
+Enables or disables autoflush mode on the file handle. When enabled (C<true>), output is flushed immediately after each write operation.  Returns the file handle.
 
 =cut
 
 =head2 binmode
 
-    self.binmode(encoding)
+    self. binmode(encoding)
 
-Returns the
+Sets the encoding layer for the file handle. Common values include C<:raw>, C<:utf8>, C<:encoding(UTF-8)>. Returns the file handle.
 
 =cut
 
@@ -62,7 +80,7 @@ Returns the
 
     self.byte(var_ref)
 
-Returns the
+Reads a single byte from the file handle.  If C<var_ref> is provided, stores the byte value (as a Number) in it and returns C<true> on success or C<false> on failure.  Without C<var_ref>, returns the byte value directly or C<nil> at end of file. 
 
 Aliases: I<getb>, I<read_byte>
 
@@ -72,7 +90,7 @@ Aliases: I<getb>, I<read_byte>
 
     self.call
 
-Returns the
+Creates a new FileHandle object.  This is an alias for the constructor.
 
 =cut
 
@@ -80,7 +98,7 @@ Returns the
 
     self.char(var_ref)
 
-Returns the
+Reads a single character from the file handle. If C<var_ref> is provided, stores the character in it and returns C<true> on success or C<false> on failure. Without C<var_ref>, returns the character directly or C<nil> at end of file. 
 
 Aliases: I<getc>, I<read_char>
 
@@ -90,7 +108,7 @@ Aliases: I<getc>, I<read_char>
 
     self.chars
 
-Returns the
+Reads the entire file and returns an Array of individual characters (as Strings).
 
 =cut
 
@@ -98,7 +116,7 @@ Returns the
 
     self.close
 
-Returns the
+Closes the file handle. Returns C<true> on success, C<false> on failure. 
 
 =cut
 
@@ -106,7 +124,7 @@ Returns the
 
     self.cp(fh)
 
-Returns the
+Copies the content from this file handle to another FileHandle C<fh>.  Returns C<true> on success, C<false> on failure. 
 
 Aliases: I<copy>
 
@@ -116,7 +134,11 @@ Aliases: I<copy>
 
     self.each(code)
 
-Returns the
+Iterates over each line in the file, executing C<code> with each line (with newline removed) as an argument. Returns the file handle.
+
+    fh.each { |line|
+        say line
+    }
 
 Aliases: I<each_line>
 
@@ -126,15 +148,19 @@ Aliases: I<each_line>
 
     self.each_char(code)
 
-Returns the
+Iterates over each character in the file, executing C<code> with each character as an argument. Returns the file handle.
+
+    fh.each_char { |char|
+        print char
+    }
 
 =cut
 
 =head2 eof
 
-    self.eof
+    self. eof
 
-Returns the
+Returns C<true> if the file handle is at end of file, C<false> otherwise. 
 
 =cut
 
@@ -142,7 +168,7 @@ Returns the
 
     self.fcntl(func, flags)
 
-Returns the
+Performs a file control operation on the file handle. Takes a function code and flags as arguments.  Returns C<true> on success, C<false> on failure.
 
 =cut
 
@@ -150,7 +176,7 @@ Returns the
 
     self.file
 
-Returns the
+Returns the parent File object associated with this file handle, or the string buffer if this is a buffer handle. 
 
 Aliases: I<parent>
 
@@ -158,17 +184,17 @@ Aliases: I<parent>
 
 =head2 fileno
 
-    self.fileno
+    self. fileno
 
-Returns the
+Returns the file descriptor number (as a Number) for the file handle. 
 
 =cut
 
 =head2 flock
 
-    self.flock(mode)
+    self. flock(mode)
 
-Returns the
+Applies an advisory lock on the file handle with the specified mode. Returns C<true> on success, C<false> on failure. 
 
 =cut
 
@@ -176,7 +202,7 @@ Returns the
 
     self.get(var_ref)
 
-Returns the
+Reads a single line from the file handle (with newline removed). If C<var_ref> is provided, stores the line in it and returns C<true> on success or C<false> at end of file.  Without C<var_ref>, returns the line directly or C<nil> at end of file. 
 
 Aliases: I<line>, I<readln>, I<read_line>, I<readline>
 
@@ -186,7 +212,9 @@ Aliases: I<line>, I<readln>, I<read_line>, I<readline>
 
     self.grep(obj)
 
-Returns the
+Reads all lines from the file and returns an Array containing only the lines for which C<obj> (a Block or Regex) returns true. 
+
+    var matches = fh.grep { |line| line.contains("pattern") }
 
 Aliases: I<select>
 
@@ -196,7 +224,7 @@ Aliases: I<select>
 
     self.isatty
 
-Returns the
+Returns C<true> if the file handle is connected to a terminal (TTY), C<false> otherwise. 
 
 Aliases: I<is_on_tty>
 
@@ -206,7 +234,12 @@ Aliases: I<is_on_tty>
 
     self.iter
 
-Returns the
+Returns an iterator Block that yields one line at a time (with newline removed) on each call. Returns C<nil> when end of file is reached. 
+
+    var iter = fh. iter
+    while (defined(var line = iter.run)) {
+        say line
+    }
 
 =cut
 
@@ -214,7 +247,9 @@ Returns the
 
     self.lines
 
-Returns the
+Reads all lines from the file and returns them as an Array of Strings (with newlines removed).
+
+    var lines = fh. lines
 
 Aliases: I<read_lines>, I<readlines>
 
@@ -222,9 +257,9 @@ Aliases: I<read_lines>, I<readlines>
 
 =head2 lock
 
-    self.lock
+    self. lock
 
-Returns the
+Applies an exclusive lock (LOCK_EX) on the file handle.  Returns C<true> on success, C<false> on failure. 
 
 =cut
 
@@ -232,7 +267,7 @@ Returns the
 
     self.lstat
 
-Returns the
+Returns a Stat object with information about the file (without following symbolic links).
 
 =cut
 
@@ -240,7 +275,9 @@ Returns the
 
     self.map(block)
 
-Returns the
+Reads all lines from the file and applies C<block> to each line, returning an Array of the transformed results. 
+
+    var upper = fh.map { |line| line. uc }
 
 Aliases: I<collect>
 
@@ -248,9 +285,13 @@ Aliases: I<collect>
 
 =head2 new_buf
 
-    self.new_buf(mode, initial_string)
+    self. new_buf(mode, initial_string)
 
-Returns the
+Creates a new in-memory file handle backed by a string buffer. The C<mode> can be C<:raw> for binary mode or an encoding like C<:utf8>. The C<initial_string> provides the initial content. Returns the FileHandle (or in list context, both the FileHandle and the String buffer).
+
+    var buf = FileHandle.new_buf(:raw, "initial")
+    buf.print("appended")
+    say buf.parent  # => "initialappended"
 
 Aliases: I<new_buffer>
 
@@ -260,7 +301,7 @@ Aliases: I<new_buffer>
 
     self.print(*args)
 
-Returns the
+Writes the given arguments to the file handle without a trailing newline. Returns C<true> on success, C<false> on failure. 
 
 Aliases: I<spurt>, I<write>
 
@@ -270,7 +311,9 @@ Aliases: I<spurt>, I<write>
 
     self.printf(*args)
 
-Returns the
+Writes formatted output to the file handle using a format string and arguments (similar to C printf). Returns C<true> on success, C<false> on failure.
+
+    fh.printf("%s:  %d\n", name, value)
 
 =cut
 
@@ -278,15 +321,15 @@ Returns the
 
     self.read(var_ref, length, offset)
 
-Returns the
+Reads up to C<length> bytes from the file handle into C<var_ref>, optionally at the specified C<offset>. Returns the number of bytes read. 
 
 =cut
 
 =head2 rewind
 
-    self.rewind
+    self. rewind
 
-Returns the
+Repositions the file pointer to the beginning of the file. Returns C<true> on success, C<false> on failure.
 
 =cut
 
@@ -294,7 +337,7 @@ Returns the
 
     self.say(*args)
 
-Returns the
+Writes the given arguments to the file handle followed by a newline.  Returns C<true> on success, C<false> on failure. 
 
 Aliases: I<println>
 
@@ -304,7 +347,9 @@ Aliases: I<println>
 
     self.sayf(format, *args)
 
-Returns the
+Writes formatted output to the file handle followed by a newline.  Returns C<true> on success, C<false> on failure. 
+
+    fh. sayf("%s:  %d", name, value)
 
 Aliases: I<printlnf>
 
@@ -312,9 +357,9 @@ Aliases: I<printlnf>
 
 =head2 seek
 
-    self.seek(pos, whence)
+    self. seek(pos, whence)
 
-Returns the
+Positions the file pointer at C<pos> bytes relative to C<whence>. The C<whence> value can be 0 (beginning), 1 (current position), or 2 (end of file). Returns C<true> on success, C<false> on failure.
 
 =cut
 
@@ -322,7 +367,9 @@ Returns the
 
     self.slurp
 
-Returns the
+Reads and returns the entire remaining content of the file as a single String. 
+
+    var content = fh.slurp
 
 =cut
 
@@ -330,7 +377,7 @@ Returns the
 
     self.stat
 
-Returns the
+Returns a Stat object with information about the file. 
 
 =cut
 
@@ -338,7 +385,9 @@ Returns the
 
     self.stderr
 
-Returns the
+Returns a FileHandle for the standard error stream (STDERR).
+
+    var stderr = FileHandle.stderr
 
 =cut
 
@@ -346,7 +395,9 @@ Returns the
 
     self.stdin
 
-Returns the
+Returns a FileHandle for the standard input stream (STDIN).
+
+    var stdin = FileHandle.stdin
 
 =cut
 
@@ -354,7 +405,9 @@ Returns the
 
     self.stdout
 
-Returns the
+Returns a FileHandle for the standard output stream (STDOUT).
+
+    var stdout = FileHandle.stdout
 
 =cut
 
@@ -362,15 +415,15 @@ Returns the
 
     self.sysread(var_ref, length, offset)
 
-Returns the
+Performs a low-level read of up to C<length> bytes from the file handle into C<var_ref>, optionally at the specified C<offset>. Returns the number of bytes read.  This bypasses buffered I/O. 
 
 =cut
 
 =head2 sysseek
 
-    self.sysseek(pos, whence)
+    self. sysseek(pos, whence)
 
-Returns the
+Performs a low-level seek to position C<pos> relative to C<whence>. Returns C<true> on success, C<false> on failure.  This bypasses buffered I/O. 
 
 =cut
 
@@ -378,7 +431,7 @@ Returns the
 
     self.syswrite(scalar, length, offset)
 
-Returns the
+Performs a low-level write of C<scalar> to the file handle, optionally writing only C<length> bytes starting at C<offset>. Returns C<true> on success, C<false> on failure.  This bypasses buffered I/O. 
 
 =cut
 
@@ -386,23 +439,23 @@ Returns the
 
     self.tell
 
-Returns the
+Returns the current position (as a Number) of the file pointer in bytes from the beginning of the file.
 
 =cut
 
 =head2 truncate
 
-    self.truncate(length)
+    self. truncate(length)
 
-Returns the
+Truncates the file to the specified C<length> in bytes (default 0). Returns C<true> on success, C<false> on failure.
 
 =cut
 
 =head2 unlock
 
-    self.unlock
+    self. unlock
 
-Returns the
+Releases the advisory lock on the file handle (LOCK_UN). Returns C<true> on success, C<false> on failure. 
 
 =cut
 
@@ -410,6 +463,8 @@ Returns the
 
     self.words
 
-Returns the
+Reads the entire file and returns an Array of all whitespace-separated words as Strings.
+
+    var words = fh.words
 
 =cut
