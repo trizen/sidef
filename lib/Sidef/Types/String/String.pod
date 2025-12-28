@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,12 +6,27 @@ Sidef::Types::String::String
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements strings in Sidef. Strings are sequences of Unicode characters that can be manipulated in various ways, including concatenation, pattern matching, transformation, and encoding operations.
+
+Sidef strings are Unicode-aware and support a rich set of operations including regular expression matching, case conversion, splitting, joining, and various encoding/decoding operations.
 
 =head1 SYNOPSIS
 
-var obj = String(...)
-
+    var str = String("hello")
+    var str = "hello"                  # String literal
+    
+    # String operations
+    say str.uc                          #=> "HELLO"
+    say str * 3                         #=> "hellohellohello"
+    say str + " world"                  #=> "hello world"
+    say str.chars                       #=> ["h", "e", "l", "l", "o"]
+    
+    # Pattern matching
+    str =~ /l+/ && say "Match found!"
+    str.gsub(/l/, 'L')                  #=> "heLLo"
+    
+    # Encoding operations
+    say str.encode_utf8.bytes_len       # Length in bytes
 
 =head1 INHERITS
 
@@ -33,6 +47,11 @@ Parameters:
     format_str  : A string that specifies the format of the output string. It can contain placeholders that are replaced by the values of the arguments passed to the function.
     args...     : Any number of arguments that are used to replace the placeholders in the format string. The number of arguments must match the number of placeholders in the format string.
 
+Example:
+
+    say "Hello, %s! You have %d messages." % ("Alice", 5)
+    #=> "Hello, Alice! You have 5 messages."
+
 Aliases: I<sprintf>
 
 =cut
@@ -41,7 +60,11 @@ Aliases: I<sprintf>
 
     str1 & str2
 
-Performs a bitwise B<AND> operation on two strings and returns the result as a new string.
+Performs a bitwise B<AND> operation on two strings and returns the result as a new string. Each byte in the result is the bitwise AND of the corresponding bytes in the input strings.
+
+Example:
+
+    say ("abc" & "def")    # Bitwise AND of corresponding bytes
 
 Aliases: I<and>
 
@@ -53,6 +76,11 @@ Aliases: I<and>
 
 Takes a string C<str> and a non-negative integer C<n> as input and returns a new string consisting of C<n> copies of C<str> concatenated together.
 
+Example:
+
+    say "ha" * 3           #=> "hahaha"
+    say "x" * 0            #=> ""
+
 Aliases: I<mul>, I<repeat>
 
 =cut
@@ -63,6 +91,10 @@ Aliases: I<mul>, I<repeat>
 
 Concatenates two strings into a single string.
 
+Example:
+
+    say "hello" + " " + "world"    #=> "hello world"
+
 Aliases: I<add>, I<append>, I<concat>
 
 =cut
@@ -71,7 +103,14 @@ Aliases: I<add>, I<append>, I<concat>
 
     a++
 
-Increments an alphanumeric string to the next ASCIIbetical string.
+Increments an alphanumeric string to the next ASCIIbetical string. This is useful for generating sequences of strings.
+
+Example:
+
+    var s = "aa"
+    say s++              #=> "aa"
+    say s                #=> "ab"
+    say "z"++            #=> "z" (returns current, then increments to "aa")
 
 Aliases: I<inc>
 
@@ -84,7 +123,7 @@ Aliases: I<inc>
 
 Remove from C<str> the first occurrence of C<substr>:
 
-    'fo boo' - 'o'    #=> 'fo boo'
+    'foo boo' - 'o'    #=> 'fo boo'
 
 When a regular expression is given, it removes all occurrences matched by the regex:
 
@@ -98,7 +137,12 @@ Aliases: I<diff>
 
     a .. b
 
-Returns a RangeStr object: C<RangeStr(a, b)>.
+Returns a RangeStr object: C<RangeStr(a, b)>. This creates a range that can iterate through strings.
+
+Example:
+
+    say ('a'..'e').to_a    #=> ["a", "b", "c", "d", "e"]
+    say ('aa'..'ac').to_a  #=> ["aa", "ab", "ac"]
 
 Aliases: I<to>, I<upto>
 
@@ -108,10 +152,13 @@ Aliases: I<to>, I<upto>
 
     str / n
 
-Divide the C<str> into at least C<n> parts, returing an Array object.
+Divide the C<str> into at least C<n> parts, returning an Array object. If the string doesn't divide evenly, the last parts will be shorter.
 
-    'foobar' / 2   => ["foo", "bar"]
-    'fooba' / 2    => ["fo", "ob", "a"]
+Example:
+
+    'foobar' / 2   #=> ["foo", "bar"]
+    'fooba' / 2    #=> ["fo", "ob", "a"]
+    'abcde' / 3    #=> ["ab", "cd", "e"]
 
 Aliases: I<÷>, I<div>
 
@@ -123,6 +170,11 @@ Aliases: I<÷>, I<div>
 
 Returns true if C<str1> is lexicographically less than C<str2>.
 
+Example:
+
+    say ("abc" < "abd")    #=> true
+    say ("z" < "a")        #=> false
+
 Aliases: I<lt>
 
 =cut
@@ -132,6 +184,11 @@ Aliases: I<lt>
     str << n
 
 Returns a new string that is formed by dropping the first n characters from the input string.
+
+Example:
+
+    say ("hello" << 2)     #=> "llo"
+    say ("test" << 5)      #=> ""
 
 Aliases: I<drop_left>, I<shift_left>
 
@@ -149,6 +206,12 @@ If C<str1> is lexicographically greater than C<str2>, the function returns a pos
 
 If the two strings are equal, the function returns C<0>.
 
+Example:
+
+    say ("abc" <=> "abd")  #=> -1
+    say ("xyz" <=> "abc")  #=> 1
+    say ("test" <=> "test") #=> 0
+
 Aliases: I<cmp>
 
 =cut
@@ -159,6 +222,11 @@ Aliases: I<cmp>
 
 Compares if the given two strings are equal to each other. If the two strings are equal, the function returns true.
 
+Example:
+
+    say ("hello" == "hello")    #=> true
+    say ("hello" == "world")    #=> false
+
 Aliases: I<eq>
 
 =cut
@@ -168,12 +236,19 @@ Aliases: I<eq>
     str =~ regex
     str.match(regex, pos)
 
-Searches for a match between a regular expression and a string, starting from a specified position in the string. It returns a match object.
+Searches for a match between a regular expression and a string, starting from a specified position in the string. It returns a match object if successful, or nil if no match is found.
 
 Parameters:
 
     regex : A regular expression to be matched against the string.
     pos   : An integer that represents the position in the string where the search is to begin. The default value is 0, which means the search starts from the beginning of the string.
+
+Example:
+
+    var m = ("hello world" =~ /w\w+/)
+    m && say m[0]                      #=> "world"
+    
+    "testing" =~ /(\w+)ing/ && say $1  #=> "test"
 
 Aliases: I<match>
 
@@ -185,6 +260,11 @@ Aliases: I<match>
 
 Returns true if C<str1> is lexicographically greater than C<str2>.
 
+Example:
+
+    say ("xyz" > "abc")    #=> true
+    say ("aaa" > "zzz")    #=> false
+
 Aliases: I<gt>
 
 =cut
@@ -195,6 +275,11 @@ Aliases: I<gt>
 
 Returns a new string that is formed by dropping the last n characters from the input string.
 
+Example:
+
+    say ("hello" >> 2)     #=> "hel"
+    say ("test" >> 5)      #=> ""
+
 Aliases: I<drop_right>, I<shift_right>
 
 =cut
@@ -203,7 +288,11 @@ Aliases: I<drop_right>, I<shift_right>
 
     str1 ^ str2
 
-Performs a bitwise B<XOR> operation on two strings and returns the result as a new string.
+Performs a bitwise B<XOR> operation on two strings and returns the result as a new string. Each byte in the result is the bitwise XOR of the corresponding bytes in the input strings.
+
+Example:
+
+    say ("abc" ^ "def")    # Bitwise XOR of corresponding bytes
 
 Aliases: I<xor>
 
@@ -213,7 +302,11 @@ Aliases: I<xor>
 
     str1 | str2
 
-Performs a bitwise B<OR> operation on two strings and returns the result as a new string.
+Performs a bitwise B<OR> operation on two strings and returns the result as a new string. Each byte in the result is the bitwise OR of the corresponding bytes in the input strings.
+
+Example:
+
+    say ("abc" | "def")    # Bitwise OR of corresponding bytes
 
 Aliases: I<or>
 
@@ -223,7 +316,11 @@ Aliases: I<or>
 
     ~str
 
-Performs a bitwise unary B<NOT> operation on the given string and returns the result as a new string.
+Performs a bitwise unary B<NOT> operation on the given string and returns the result as a new string. Each byte in the result is the bitwise complement of the corresponding byte in the input string.
+
+Example:
+
+    say ~"abc"             # Bitwise NOT of each byte
 
 Aliases: I<not>
 
@@ -233,7 +330,12 @@ Aliases: I<not>
 
     str1 ≠ str2
 
-Compares if the given two strings are equal to each other. If the two strings are equal, the function returns false.
+Compares if the given two strings are not equal to each other. If the two strings are different, the function returns true.
+
+Example:
+
+    say ("hello" ≠ "world")    #=> true
+    say ("test" ≠ "test")      #=> false
 
 Aliases: I<!=>, I<ne>
 
@@ -245,6 +347,11 @@ Aliases: I<!=>, I<ne>
 
 Returns true if C<str1> is lexicographically less than or equal to C<str2>.
 
+Example:
+
+    say ("abc" ≤ "abc")    #=> true
+    say ("abc" ≤ "abd")    #=> true
+
 Aliases: I<E<lt>=>, I<le>
 
 =cut
@@ -255,15 +362,24 @@ Aliases: I<E<lt>=>, I<le>
 
 Returns true if C<str1> is lexicographically greater than or equal to C<str2>.
 
+Example:
+
+    say ("xyz" ≥ "abc")    #=> true
+    say ("abc" ≥ "abc")    #=> true
+
 Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
 =head2 apply_escapes
 
-    self.apply_escapes(parser)
+    str.apply_escapes
 
-Returns the
+Interprets escape sequences in the string and returns a new string with the escapes applied. This processes backslash escape sequences like \n, \t, \r, etc.
+
+Example:
+
+    say "hello\\nworld".apply_escapes    #=> "hello\nworld" (with actual newline)
 
 =cut
 
@@ -271,23 +387,37 @@ Returns the
 
     str.ascii2bin
 
-Takes a string of ASCII characters as input and returns a string of binary digits representing the ASCII values of the characters.
+Takes a string of ASCII characters as input and returns a string of binary digits representing the ASCII values of the characters. Each character is converted to its binary representation.
+
+Example:
+
+    say "Hi".ascii2bin    #=> "0100100001101001"
 
 =cut
 
 =head2 ascii2bits
 
-    self.ascii2bits
+    str.ascii2bits
 
 Takes a string of ASCII characters as input and returns a string of bits representing the ASCII values of the characters. Each character is converted to its 8-bit binary representation.
+
+Example:
+
+    say "A".ascii2bits    #=> "01000001"
 
 =cut
 
 =head2 backtick
 
-    self.backtick
+    str.backtick
 
-Returns the
+Executes the string as a shell command and returns the output. This is equivalent to running the string in backticks or using qx{}.
+
+Example:
+
+    say "echo hello".backtick    #=> "hello\n"
+
+Warning: Use with caution as it executes arbitrary shell commands.
 
 =cut
 
@@ -299,6 +429,10 @@ Decodes a base64 encoded string into its original form.
 
 Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format by translating it into a radix-64 representation. The encoded string can be safely transferred or stored without any data loss or corruption. The C<base64_decode()> method reverses the encoding process and converts the base64 string back to its original binary form.
 
+Example:
+
+    say "SGVsbG8gV29ybGQ=".base64_decode    #=> "Hello World"
+
 Aliases: I<decode_base64>
 
 =cut
@@ -308,6 +442,10 @@ Aliases: I<decode_base64>
     str.base64_encode
 
 Encodes a string in base64 format. Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format by translating it into a radix-64 representation. The encoded string can be safely transferred or stored without any data loss or corruption. The C<base64_encode()> method encodes the input string in base64 format.
+
+Example:
+
+    say "Hello World".base64_encode    #=> "SGVsbG8gV29ybGQ="
 
 Aliases: I<encode_base64>
 
@@ -319,15 +457,25 @@ Aliases: I<encode_base64>
 
 Check whether a string starts with a given prefix string or not. It takes a string as an input and checks whether the string starts with the prefix string specified as an argument. If the string starts with the specified prefix, it returns True, otherwise, it returns False.
 
+Example:
+
+    say "hello".begins_with("he")     #=> true
+    say "hello".begins_with("lo")     #=> false
+
 Aliases: I<starts_with>
 
 =cut
 
 =head2 bin
 
-    self.bin
+    str.bin
 
-Returns the
+Converts a binary string (consisting of 0s and 1s) to a Number object. The string is interpreted as a base-2 number.
+
+Example:
+
+    say "1010".bin         #=> 10
+    say "11111111".bin     #=> 255
 
 =cut
 
@@ -337,13 +485,22 @@ Returns the
 
 Converts a binary string into its equivalent ASCII string representation. It takes a binary string as an input and returns the equivalent ASCII string representation of the binary string.
 
+Example:
+
+    say "0100100001101001".bin2ascii    #=> "Hi"
+
 =cut
 
 =head2 byte
 
-    self.byte(pos)
+    str.byte(pos)
 
-Returns the
+Returns the byte value at the specified position in the string. Position indexing starts at 0.
+
+Example:
+
+    say "hello".byte(0)    #=> 104 (ASCII value of 'h')
+    say "hello".byte(1)    #=> 101 (ASCII value of 'e')
 
 Aliases: I<byte_at>
 
@@ -353,7 +510,12 @@ Aliases: I<byte_at>
 
     str.bytes
 
-Convert a string into an Array of bytes, ranging from C<0> to C<255>.
+Convert a string into an Array of bytes, ranging from C<0> to C<255>. Each byte represents the numeric value of the corresponding byte in the string's encoding.
+
+Example:
+
+    say "Hi".bytes         #=> [72, 105]
+    say "€".encode_utf8.bytes    #=> [226, 130, 172]
 
 =cut
 
@@ -361,7 +523,12 @@ Convert a string into an Array of bytes, ranging from C<0> to C<255>.
 
     str.bytes_len
 
-Determine the length of a string in bytes. It takes a string as an input and returns the length of the string in bytes.
+Determine the length of a string in bytes. It takes a string as an input and returns the length of the string in bytes. For multi-byte characters, this may differ from the character count.
+
+Example:
+
+    say "hello".bytes_len    #=> 5
+    say "€".encode_utf8.bytes_len    #=> 3
 
 Aliases: I<bytes_length>
 
@@ -369,17 +536,27 @@ Aliases: I<bytes_length>
 
 =head2 center
 
-    self.center(size, char)
+    str.center(width, padstr=" ")
 
-Returns the
+Centers the string within a field of the given width, padding with the specified padding string (default is space). If the string is already longer than the width, it is returned unchanged.
+
+Example:
+
+    say "hi".center(10)         #=> "    hi    "
+    say "test".center(10, "-")  #=> "---test---"
 
 =cut
 
 =head2 char
 
-    self.char(pos)
+    str.char(pos)
 
-Returns the
+Returns the character at the specified position in the string. Position indexing starts at 0. Returns nil if the position is out of bounds.
+
+Example:
+
+    say "hello".char(0)    #=> "h"
+    say "hello".char(4)    #=> "o"
 
 Aliases: I<char_at>
 
@@ -391,31 +568,49 @@ Aliases: I<char_at>
 
 Convert a string into an Array of characters.
 
+Example:
+
     say "foo".chars     #=> ["f", "o", "o"]
+    say "€".chars       #=> ["€"]
 
 =cut
 
 =head2 chomp
 
-    self.chomp
+    str.chomp
 
-Returns the
+Returns a copy of the string with the trailing newline (or record separator) removed. If there is no newline at the end, the string is returned unchanged.
+
+Example:
+
+    say "hello\n".chomp    #=> "hello"
+    say "test".chomp       #=> "test"
 
 =cut
 
 =head2 chop
 
-    self.chop
+    str.chop
 
-Returns the
+Returns a copy of the string with the last character removed. If the string is empty, returns an empty string.
+
+Example:
+
+    say "hello".chop    #=> "hell"
+    say "a".chop        #=> ""
 
 =cut
 
 =head2 clear
 
-    self.clear
+    str.clear
 
-Returns the
+Clears the content of the string, making it empty. Returns an empty string.
+
+Example:
+
+    var s = "hello"
+    say s.clear         #=> ""
 
 =cut
 
@@ -423,10 +618,13 @@ Returns the
 
     str.codes
 
-Convert a string into an Array of code points.
+Convert a string into an Array of Unicode code points. Each element is the numeric value of the corresponding character in Unicode.
+
+Example:
 
     say "foo".codes   #=> [102, 111, 111]
     say "€".codes     #=> [8364]
+    say "Hi".codes    #=> [72, 105]
 
 Aliases: I<code_points>
 
@@ -434,9 +632,14 @@ Aliases: I<code_points>
 
 =head2 collect
 
-    self.collect(regex)
+    str.collect(regex)
 
-Returns the
+Collects all matches of the given regular expression in the string and returns them as an Array. This is similar to the global match operation.
+
+Example:
+
+    say "foo bar baz".collect(/b\w+/)    #=> ["bar", "baz"]
+    say "123 456 789".collect(/\d+/)     #=> ["123", "456", "789"]
 
 Aliases: I<find_all>, I<findall>
 
@@ -444,37 +647,58 @@ Aliases: I<find_all>, I<findall>
 
 =head2 cons
 
-    self.cons(n)
+    str.cons(n)
 
-Returns the
+Returns an Array of all consecutive subsequences of length n from the string.
+
+Example:
+
+    say "abcde".cons(2)    #=> ["ab", "bc", "cd", "de"]
+    say "test".cons(3)     #=> ["tes", "est"]
 
 =cut
 
 =head2 count
 
-    self.count(arg)
+    str.count(substr)
+    str.count(regex)
 
-Returns the
+Returns the number of non-overlapping occurrences of the substring or pattern in the string.
+
+Example:
+
+    say "hello world".count("l")    #=> 3
+    say "aaa".count("aa")           #=> 1 (non-overlapping)
+    say "foo bar baz".count(/ba/)   #=> 2
 
 =cut
 
 =head2 crypt
 
-    self.crypt(salt)
+    str.crypt(salt)
 
-Returns the
+Encrypts the string using the crypt(3) function with the specified salt. This is typically used for password hashing. The salt determines the encryption algorithm used.
+
+Example:
+
+    say "password".crypt('$6$somesalt')    # SHA-512 based hash
 
 =cut
 
 =head2 decode
 
-    str.decode(enconding)
+    str.decode(encoding)
 
 Decodes a string using a specified character encoding and returns the corresponding Unicode string.
 
 Parameters:
 
-    encoding : A string that specifies the character encoding used to encode the input string.
+    encoding : A string that specifies the character encoding used to encode the input string (e.g., "utf8", "utf16", "latin1", etc.).
+
+Example:
+
+    var bytes = "café".encode("utf8")
+    say bytes.decode("utf8")    #=> "café"
 
 =cut
 
@@ -482,47 +706,76 @@ Parameters:
 
     str.decode_utf8
 
-Decodes a UTF-8 encoded string and returns the corresponding Unicode string.
+Decodes a UTF-8 encoded string and returns the corresponding Unicode string. This is equivalent to decode("utf8").
+
+Example:
+
+    var utf8_bytes = "\xc3\xa9"    # UTF-8 bytes for "é"
+    say utf8_bytes.decode_utf8     #=> "é"
 
 =cut
 
 =head2 deflate
 
-    self.deflate
+    str.deflate
 
-Returns the
+Compresses the string using the DEFLATE compression algorithm and returns the compressed data.
+
+Example:
+
+    var compressed = "hello world".deflate
+    say compressed.len < "hello world".len    #=> true (usually)
 
 =cut
 
 =head2 die
 
-    self.die
+    str.die
 
-Returns the
+Prints the string to STDERR and terminates the program with a non-zero exit code.
+
+Example:
+
+    "Error: file not found".die    # Prints error and exits
 
 =cut
 
 =head2 digits
 
-    self.digits
+    str.digits
 
-Returns the
+Returns an Array of the digit characters found in the string.
+
+Example:
+
+    say "abc123def456".digits    #=> ["1", "2", "3", "4", "5", "6"]
+    say "no digits here".digits  #=> []
 
 =cut
 
 =head2 downto
 
-    from.downto(to, step)
+    from.downto(to) { |str| ... }
+    from.downto(to, step) { |str| ... }
 
-Returns the
+Iterates from the string C<from> down to the string C<to>, executing the given block for each string in the sequence. The optional C<step> parameter controls the decrement.
+
+Example:
+
+    "c".downto("a", { |s| say s })    # Prints: c, b, a
 
 =cut
 
 =head2 dump
 
-    self.dump
+    str.dump
 
-Returns the
+Returns a string representation of the string that shows its internal structure, with special characters escaped. Useful for debugging.
+
+Example:
+
+    say "hello\nworld".dump    #=> "hello\\nworld"
+    say "test".dump            #=> "test"
 
 Aliases: I<inspect>
 
@@ -530,9 +783,13 @@ Aliases: I<inspect>
 
 =head2 each
 
-    self.each {|char| ... }
+    str.each { |char| ... }
 
 Iterates through each character in the string and applies a given block of code to each character.
+
+Example:
+
+    "hello".each { |c| say c }    # Prints each character on a new line
 
 Aliases: I<each_char>
 
@@ -540,25 +797,37 @@ Aliases: I<each_char>
 
 =head2 each_byte
 
-    self.each_byte {|byte| ... }
+    str.each_byte { |byte| ... }
 
 Iterates through each byte value in the string and applies a given block of code to each byte value.
+
+Example:
+
+    "Hi".each_byte { |b| say b }    # Prints: 72, 105
 
 =cut
 
 =head2 each_cons
 
-    self.each_cons(n, block)
+    str.each_cons(n) { |substr| ... }
 
-Returns the
+Iterates through each consecutive substring of length n and applies the given block to each one.
+
+Example:
+
+    "abcde".each_cons(2, { |s| say s })    # Prints: ab, bc, cd, de
 
 =cut
 
 =head2 each_graph
 
-    self.each_graph {|grapheme| ... }
+    str.each_graph { |grapheme| ... }
 
-Iterates through each grapheme in the string and applies a given block of code to each grapheme.
+Iterates through each grapheme cluster in the string and applies a given block of code to each grapheme. A grapheme cluster represents a single user-perceived character.
+
+Example:
+
+    "hello".each_graph { |g| say g }    # Prints each grapheme
 
 Aliases: I<each_grapheme>
 
@@ -566,25 +835,37 @@ Aliases: I<each_grapheme>
 
 =head2 each_kv
 
-    self.each_kv(block)
+    str.each_kv { |index, char| ... }
 
-Returns the
+Iterates through each character in the string along with its index, passing both the index and character to the given block.
+
+Example:
+
+    "abc".each_kv { |i, c| say "#{i}: #{c}" }    # Prints: 0: a, 1: b, 2: c
 
 =cut
 
 =head2 each_line
 
-    self.each_line {|line| ... }
+    str.each_line { |line| ... }
 
-Iterates through each line in the string and applies a given block of code to each line.
+Iterates through each line in the string and applies a given block of code to each line. Lines are separated by newline characters.
+
+Example:
+
+    "line1\nline2\nline3".each_line { |line| say line }
 
 =cut
 
 =head2 each_num
 
-    self.each_num {|num| ... }
+    str.each_num { |num| ... }
 
-Iterates through each word, converted to a number, in the string and applies a given block of code to each number.
+Iterates through each word in the string, converts it to a number, and applies a given block of code to each number. Non-numeric words are skipped.
+
+Example:
+
+    "10 20 30".each_num { |n| say n * 2 }    # Prints: 20, 40, 60
 
 Aliases: I<each_number>
 
@@ -592,17 +873,25 @@ Aliases: I<each_number>
 
 =head2 each_slice
 
-    self.each_slice(n, block)
+    str.each_slice(n) { |slice| ... }
 
-Returns the
+Divides the string into slices of length n and applies the given block to each slice.
+
+Example:
+
+    "abcdef".each_slice(2, { |s| say s })    # Prints: ab, cd, ef
 
 =cut
 
 =head2 each_word
 
-    self.each_word {|word| ... }
+    str.each_word { |word| ... }
 
-Iterates through each word in the string and applies a given block of code to each word.
+Iterates through each word in the string and applies a given block of code to each word. Words are separated by whitespace.
+
+Example:
+
+    "hello world test".each_word { |w| say w }    # Prints: hello, world, test
 
 =cut
 
@@ -614,15 +903,23 @@ Encodes a string into a specified character encoding and returns a new string ob
 
 Parameters:
 
-    encoding : A string that specifies the character encoding to be used for encoding the input string.
+    encoding : A string that specifies the character encoding to be used for encoding the input string (e.g., "utf8", "utf16", "latin1", etc.).
+
+Example:
+
+    say "café".encode("utf8").bytes    # Shows UTF-8 byte representation
 
 =cut
 
 =head2 encode_utf8
 
-    self.encode_utf8
+    str.encode_utf8
 
 Encodes a Unicode string using the UTF-8 character encoding and returns a new string object.
+
+Example:
+
+    say "€".encode_utf8.bytes    #=> [226, 130, 172]
 
 =cut
 
@@ -636,13 +933,23 @@ Parameters:
 
     suffix : A string that represents the suffix to be searched for at the end of the input string.
 
+Example:
+
+    say "hello".ends_with("lo")    #=> true
+    say "hello".ends_with("he")    #=> false
+
 =cut
 
 =head2 escape
 
     str.escape
 
-Returns a copy of the input string with all non-word characters escaped using a backslash character.
+Returns a copy of the input string with all non-word characters escaped using a backslash character. This is useful for preparing strings to be used in regular expressions.
+
+Example:
+
+    say "hello.world".escape    #=> "hello\\.world"
+    say "(test)".escape         #=> "\\(test\\)"
 
 Aliases: I<quotemeta>
 
@@ -650,49 +957,73 @@ Aliases: I<quotemeta>
 
 =head2 esub
 
-    self.esub(regex, block)
+    str.esub(regex) { |match| ... }
 
-Returns the
+Performs a substitution on the first match of the regular expression, evaluating the block for the match and replacing it with the block's return value.
+
+Example:
+
+    say "hello world".esub(/\w+/, { |m| m.uc })    #=> "HELLO world"
 
 =cut
 
 =head2 extract_bracketed
 
-    self.extract_bracketed(brackets)
+    str.extract_bracketed(brackets)
 
-Returns the
+Extracts a bracketed substring from the string. The brackets parameter specifies which types of brackets to match (e.g., "(){}[]").
+
+Example:
+
+    say "text (inside) more".extract_bracketed("()")    #=> "(inside)"
 
 =cut
 
 =head2 extract_codeblock
 
-    self.extract_codeblock(delim)
+    str.extract_codeblock(delim)
 
-Returns the
+Extracts a code block from the string, using the specified delimiter to identify the block boundaries.
+
+Example:
+
+    say "code { block } end".extract_codeblock("{}")    #=> "{ block }"
 
 =cut
 
 =head2 extract_delimited
 
-    self.extract_delimited(delim)
+    str.extract_delimited(delim)
 
-Returns the
+Extracts a delimited substring from the string using the specified delimiter.
+
+Example:
+
+    say 'text "quoted" more'.extract_delimited('"')    #=> '"quoted"'
 
 =cut
 
 =head2 extract_quotelike
 
-    self.extract_quotelike
+    str.extract_quotelike
 
-Returns the
+Extracts a quote-like expression from the string. This recognizes Perl-style quote operators.
+
+Example:
+
+    say "q{text} more".extract_quotelike    #=> "q{text}"
 
 =cut
 
 =head2 extract_tagged
 
-    self.extract_tagged
+    str.extract_tagged
 
-Returns the
+Extracts a tagged region from the string, typically used for XML or HTML-style tags.
+
+Example:
+
+    say "<tag>content</tag>".extract_tagged    #=> "<tag>content</tag>"
 
 =cut
 
@@ -700,11 +1031,33 @@ Returns the
 
     str.fc
 
-Returns a copy of the input string with all uppercase characters converted to their lowercase equivalents.
+Returns a copy of the input string with all uppercase characters converted to their lowercase equivalents using casefolding.
 
 Casefolding is the process of mapping strings to a form where case differences are erased; comparing two strings in their casefolded form is effectively a way of asking if two strings are equal, regardless of case.
 
+Example:
+
+    say "HELLO".fc == "hello".fc    #=> true
+    say "Straße".fc                  #=> "strasse" (German ß folds to ss)
+
 Aliases: I<foldcase>
+
+=cut
+
+=head2 first
+
+    str.first(n)
+
+Returns the first C<n> characters of the input string, where C<n> is an integer.
+
+Parameters:
+
+    n : An integer that represents the number of characters to be returned from the beginning of the input string.
+
+Example:
+
+    say "hello world".first(5)    #=> "hello"
+    say "test".first(2)           #=> "te"
 
 =cut
 
@@ -714,47 +1067,72 @@ Aliases: I<foldcase>
 
 Returns a copy of the input string with the order of its characters reversed.
 
+Example:
+
+    say "hello".flip    #=> "olleh"
+    say "12345".flip    #=> "54321"
+
 Aliases: I<reverse>
 
 =cut
 
 =head2 format
 
-    self.format
+    format_str.format(args...)
 
-Returns the
+Formats the string using the provided arguments. This is similar to sprintf-style formatting.
+
+Example:
+
+    say "%s has %d apples".format("Alice", 5)    #=> "Alice has 5 apples"
 
 =cut
 
 =head2 frequire
 
-    self.frequire
+    str.frequire
 
-Returns the
+Loads and executes a Sidef source file specified by the string. The 'f' stands for "file require". Returns true if successful.
+
+Example:
+
+    "mylib.sf".frequire    # Loads mylib.sf
 
 =cut
 
 =head2 gesub
 
-    self.gesub(regex, block)
+    str.gesub(regex) { |match| ... }
 
-Returns the
+Performs global substitution on all matches of the regular expression, evaluating the block for each match and replacing it with the block's return value.
+
+Example:
+
+    say "hello world".gesub(/\w+/, { |m| m.uc })    #=> "HELLO WORLD"
 
 =cut
 
 =head2 glob
 
-    self.glob
+    str.glob
 
-Returns the
+Expands the string as a filename pattern and returns an Array of matching filenames. Uses shell-style wildcards.
+
+Example:
+
+    say "*.txt".glob    # Returns array of all .txt files in current directory
 
 =cut
 
 =head2 gmatch
 
-    self.gmatch(regex, pos)
+    str.gmatch(regex, pos=0)
 
-Returns the
+Performs a global match operation, finding all matches of the regular expression in the string starting from the specified position. Returns an Array of match objects.
+
+Example:
+
+    say "foo bar baz".gmatch(/\w+/)    #=> Returns array of all word matches
 
 =cut
 
@@ -764,6 +1142,11 @@ Returns the
 
 Returns an Array of grapheme clusters in the input string. A grapheme cluster is a sequence of one or more Unicode code points that represents a single user-perceived character.
 
+Example:
+
+    say "hello".graphs    #=> ["h", "e", "l", "l", "o"]
+    say "é".graphs        #=> ["é"] (even if composed of multiple code points)
+
 Aliases: I<graphemes>
 
 =cut
@@ -772,7 +1155,12 @@ Aliases: I<graphemes>
 
     str.graphs_len
 
-Returns the number of grapheme clusters in the input string.
+Returns the number of grapheme clusters in the input string. This represents the number of user-perceived characters.
+
+Example:
+
+    say "hello".graphs_len    #=> 5
+    say "café".graphs_len     #=> 4
 
 Aliases: I<graphs_length>
 
@@ -780,9 +1168,14 @@ Aliases: I<graphs_length>
 
 =head2 gsub
 
-    self.gsub(regex, str)
+    str.gsub(regex, replacement)
 
-Returns the
+Performs global substitution, replacing all matches of the regular expression with the replacement string.
+
+Example:
+
+    say "hello world".gsub(/l/, "L")    #=> "heLLo worLd"
+    say "foo bar".gsub(/o/, "0")        #=> "f00 bar"
 
 Aliases: I<replace_all>
 
@@ -790,17 +1183,28 @@ Aliases: I<replace_all>
 
 =head2 gunzip
 
-    self.gunzip
+    str.gunzip
 
-Returns the
+Decompresses a gzip-compressed string and returns the original data.
+
+Example:
+
+    var original = "hello world"
+    var compressed = original.gzip
+    say compressed.gunzip    #=> "hello world"
 
 =cut
 
 =head2 gzip
 
-    self.gzip
+    str.gzip
 
-Returns the
+Compresses the string using gzip compression and returns the compressed data.
+
+Example:
+
+    var compressed = "hello world hello world".gzip
+    say (compressed.len < "hello world hello world".len)    #=> true
 
 =cut
 
@@ -1449,7 +1853,7 @@ Aliases: I<ucfirst>, I<titlecase>
 
     self.tclc
 
-Returns the string with the first character capitalized and the remaining characters in lower case.
+Returns the string with the first chapatterracter capitalized and the remaining characters in lower case.
 
 Aliases: I<capitalize>
 
