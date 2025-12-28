@@ -3,20 +3,37 @@
 
 =head1 NAME
 
-Sidef::Types::Hash::Hash
+Sidef::Types::Hash:: Hash
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements a hash (associative array) data type, providing key-value storage and various methods for hash manipulation, iteration, and set operations.
 
 =head1 SYNOPSIS
 
-var obj = Hash(...)
+    var hash = Hash(a => 1, b => 2, c => 3)
+    
+    say hash.keys       # Array of keys
+    say hash.values     # Array of values
+    say hash.len        # 3
+    
+    hash.each {|key, value|
+        say "#{key} => #{value}"
+    }
+    
+    # Set operations
+    var h1 = Hash(a => 1, b => 2)
+    var h2 = Hash(b => 3, c => 4)
+    
+    say (h1 | h2)   # Union
+    say (h1 & h2)   # Intersection
+    say (h1 - h2)   # Difference
+    say (h1 ^ h2)   # Symmetric difference
 
 
 =head1 INHERITS
 
-Inherits methods from:
+Inherits methods from: 
 
        * Sidef::Object::Object
 
@@ -26,9 +43,9 @@ Inherits methods from:
 
     a & b
 
-Returns the
+Returns the intersection of two hashes.  The result contains only keys that exist in both hashes, with values taken from the first hash. 
 
-Aliases: I<and>, I<intersection>
+Aliases:  I<and>, I<intersection>
 
 =cut
 
@@ -36,7 +53,7 @@ Aliases: I<and>, I<intersection>
 
     a + b
 
-Returns the
+Returns a new hash containing all key-value pairs from both hashes.  If a key exists in both, the value from the second hash is used. 
 
 Aliases: I<merge>, I<concat>
 
@@ -46,17 +63,17 @@ Aliases: I<merge>, I<concat>
 
     a - b
 
-Returns the
+Returns the difference of two hashes. The result contains only keys that exist in the first hash but not in the second.
 
 Aliases: I<sub>, I<diff>, I<difference>
 
 =cut
 
-=head2 ...
+=head2 ... 
 
     a ... b
 
-Returns the
+Returns the hash as a flat list of alternating keys and values. 
 
 Aliases: I<to_list>
 
@@ -66,7 +83,7 @@ Aliases: I<to_list>
 
     a == b
 
-Returns the
+Returns true if both hashes have the same keys with equal values.
 
 Aliases: I<eq>
 
@@ -76,7 +93,7 @@ Aliases: I<eq>
 
     a ^ b
 
-Returns the
+Returns the symmetric difference of two hashes.  The result contains keys that exist in either hash but not in both.
 
 Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
@@ -86,7 +103,7 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
     a | b
 
-Returns the
+Returns the union of two hashes. The result contains all keys from both hashes, with values from the first hash taking precedence for common keys.
 
 Aliases: I<or>, I<union>
 
@@ -96,7 +113,7 @@ Aliases: I<or>, I<union>
 
     a ≠ b
 
-Returns the
+Returns true if the two hashes are not equal (different keys or values).
 
 Aliases: I<!=>, I<ne>
 
@@ -104,9 +121,9 @@ Aliases: I<!=>, I<ne>
 
 =head2 append
 
-    self.append(:pairs)
+    self.append(: pairs)
 
-Returns the
+Appends the given key-value pairs to the hash in-place and returns the modified hash.
 
 =cut
 
@@ -114,7 +131,7 @@ Returns the
 
     self.as_tree(root)
 
-Returns the
+Returns the hash as a tree structure represented as nested Pairs, with the given root as the tree's root label.
 
 =cut
 
@@ -122,7 +139,7 @@ Returns the
 
     self.clear
 
-Returns the
+Removes all key-value pairs from the hash and returns the empty hash.
 
 =cut
 
@@ -130,7 +147,7 @@ Returns the
 
     self.collect(block)
 
-Returns the
+Iterates over each key-value pair, calling the block with (key, value), and collects all return values into an Array. 
 
 Aliases: I<collect_kv>
 
@@ -140,7 +157,7 @@ Aliases: I<collect_kv>
 
     self.count(obj)
 
-Returns the
+Returns 1 if the given key exists in the hash, 0 otherwise.  If a block is provided, counts the number of key-value pairs for which the block returns true.
 
 =cut
 
@@ -148,7 +165,7 @@ Returns the
 
     self.count_by(block)
 
-Returns the
+Returns the count of key-value pairs for which the block returns a true value.
 
 =cut
 
@@ -156,7 +173,7 @@ Returns the
 
     self.delete(*keys)
 
-Returns the
+Removes the specified keys from the hash and returns the deleted values. 
 
 Aliases: I<remove>
 
@@ -166,7 +183,7 @@ Aliases: I<remove>
 
     self.delete_if(block)
 
-Returns the
+Deletes all key-value pairs for which the block returns true. The block receives (key, value) as arguments.  Returns the modified hash.
 
 =cut
 
@@ -174,15 +191,15 @@ Returns the
 
     self.dig(key, *keys)
 
-Returns the
+Recursively retrieves nested values.  Returns the value at the nested key path, or undef if any key in the path doesn't exist.
 
 =cut
 
 =head2 each
 
-    self.each(obj)
+    self.each(block)
 
-Returns the
+Iterates over each key-value pair in the hash, calling the block with (key, value). Returns the block when given, or the next (key, value) pair when called without arguments.
 
 Aliases: I<each_kv>, I<each_pair>
 
@@ -192,7 +209,7 @@ Aliases: I<each_kv>, I<each_pair>
 
     self.each_k(block)
 
-Returns the
+Iterates over each key in the hash, calling the block with the key.  Returns the hash. 
 
 Aliases: I<each_key>
 
@@ -202,7 +219,7 @@ Aliases: I<each_key>
 
     self.each_v(block)
 
-Returns the
+Iterates over each value in the hash, calling the block with the value. Returns the hash.
 
 Aliases: I<each_value>
 
@@ -212,7 +229,7 @@ Aliases: I<each_value>
 
     self.fetch(key, default)
 
-Returns the
+Returns the value for the given key if it exists, otherwise returns the default value. 
 
 =cut
 
@@ -220,7 +237,7 @@ Returns the
 
     self.flip
 
-Returns the
+Returns a new hash with keys and values swapped.  The original values become keys and the original keys become values. 
 
 Aliases: I<invert>, I<reverse>
 
@@ -230,7 +247,7 @@ Aliases: I<invert>, I<reverse>
 
     self.get_pair(key)
 
-Returns the
+Returns a Pair object containing the given key and its associated value.
 
 =cut
 
@@ -238,7 +255,7 @@ Returns the
 
     self.get_pairs(*keys)
 
-Returns the
+Returns an Array of Pair objects for the specified keys.
 
 =cut
 
@@ -246,7 +263,7 @@ Returns the
 
     self.grep(block)
 
-Returns the
+Returns a new hash containing only the key-value pairs for which the block returns true.  The block receives (key, value) as arguments.
 
 Aliases: I<grep_kv>, I<select>
 
@@ -256,7 +273,7 @@ Aliases: I<grep_kv>, I<select>
 
     self.grep_v(block)
 
-Returns the
+Returns a new hash containing only the key-value pairs for which the block (called with value only) returns true.
 
 Aliases: I<grep_val>
 
@@ -266,7 +283,7 @@ Aliases: I<grep_val>
 
     self.has(key)
 
-Returns the
+Returns true if the given key exists in the hash, false otherwise.
 
 Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
@@ -276,7 +293,7 @@ Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, 
 
     self.is_empty
 
-Returns the
+Returns true if the hash contains no key-value pairs, false otherwise. 
 
 =cut
 
@@ -284,7 +301,7 @@ Returns the
 
     self.item(key)
 
-Returns the
+Returns the value associated with the given key, or undef if the key doesn't exist. 
 
 =cut
 
@@ -292,7 +309,7 @@ Returns the
 
     self.items(*keys)
 
-Returns the
+Returns an Array of values for the specified keys.  Returns undef for keys that don't exist. 
 
 =cut
 
@@ -300,15 +317,15 @@ Returns the
 
     self.keys
 
-Returns the
+Returns an Array containing all keys in the hash. 
 
 =cut
 
 =head2 kv
 
-    self.kv
+    self. kv
 
-Returns the
+Returns an Array of Pair objects, where each Pair contains a key and its associated value. 
 
 Aliases: I<to_a>, I<pairs>, I<to_array>
 
@@ -318,7 +335,7 @@ Aliases: I<to_a>, I<pairs>, I<to_array>
 
     self.len
 
-Returns the
+Returns the number of key-value pairs in the hash. 
 
 Aliases: I<size>, I<length>
 
@@ -328,7 +345,7 @@ Aliases: I<size>, I<length>
 
     self.lsel(keys)
 
-Returns the
+Performs linear selection:  returns a new hash with the specified keys.  Keys that don't exist in the original hash will have nil values. 
 
 Aliases: I<linsel>, I<linear_selection>
 
@@ -338,7 +355,7 @@ Aliases: I<linsel>, I<linear_selection>
 
     self.map(block)
 
-Returns the
+Transforms the hash by calling the block with (key, value) for each pair. The block should return pairs of (new_key, new_value). Returns a new hash. 
 
 Aliases: I<map_kv>
 
@@ -348,7 +365,7 @@ Aliases: I<map_kv>
 
     self.map_v(block)
 
-Returns the
+Returns a new hash with the same keys but with values transformed by the block.  The block receives (key, value) and should return the new value. 
 
 Aliases: I<map_val>
 
@@ -356,9 +373,9 @@ Aliases: I<map_val>
 
 =head2 max_by
 
-    self.max_by(block)
+    self. max_by(block)
 
-Returns the
+Returns the key-value Pair for which the block returns the maximum value.  The block receives (key, value).
 
 =cut
 
@@ -366,7 +383,7 @@ Returns the
 
     self.merge_values(obj)
 
-Returns the
+Updates values in the hash for keys that also exist in obj. Only existing keys are affected. Modifies and returns the hash. 
 
 =cut
 
@@ -374,7 +391,7 @@ Returns the
 
     self.min_by(block)
 
-Returns the
+Returns the key-value Pair for which the block returns the minimum value. The block receives (key, value).
 
 =cut
 
@@ -382,7 +399,7 @@ Returns the
 
     self.new
 
-Returns the
+Creates and returns a new Hash object. 
 
 Aliases: I<call>
 
@@ -392,7 +409,7 @@ Aliases: I<call>
 
     self.same_keys(obj)
 
-Returns the
+Returns true if the hash has exactly the same keys as the given object, false otherwise. 
 
 =cut
 
@@ -400,7 +417,7 @@ Returns the
 
     self.set_keys(*keys)
 
-Returns the
+Sets the specified keys with nil values and returns the hash. 
 
 =cut
 
@@ -408,7 +425,7 @@ Returns the
 
     self.slice(*keys)
 
-Returns the
+Returns a new hash containing only the specified keys and their values from the original hash. 
 
 =cut
 
@@ -416,7 +433,7 @@ Returns the
 
     self.sort(block)
 
-Returns the
+Returns an Array of Pairs sorted by keys.  If a block is provided, uses it as a comparison function for sorting keys.
 
 =cut
 
@@ -424,7 +441,7 @@ Returns the
 
     self.sort_by(block)
 
-Returns the
+Returns an Array of Pairs sorted by the values returned by the block.  The block receives (key, value).
 
 =cut
 
@@ -432,7 +449,7 @@ Returns the
 
     self.to_bag
 
-Returns the
+Converts the hash's keys to a Bag object. 
 
 =cut
 
@@ -440,7 +457,7 @@ Returns the
 
     self.to_s
 
-Returns the
+Returns a string representation of the hash. 
 
 Aliases: I<dump>, I<to_str>
 
@@ -450,7 +467,7 @@ Aliases: I<dump>, I<to_str>
 
     self.to_set
 
-Returns the
+Converts the hash's keys to a Set object. 
 
 =cut
 
@@ -458,6 +475,6 @@ Returns the
 
     self.values
 
-Returns the
+Returns an Array containing all values in the hash.
 
 =cut
