@@ -14,16 +14,16 @@ to be called with arguments in any order by specifying the parameter name.
 
 =head1 SYNOPSIS
 
-var obj = NamedParam("foo", 1, 2, 3)
+  var obj = NamedParam("foo", 1, 2, 3)
 
-# Named parameter syntax with colon
-var t = foo: (1, 2, 3)
-say t.name              #=> "foo"
-say [t.value]           #=> [1, 2, 3]
+  # Named parameter syntax with colon
+  var t = foo: (1, 2, 3)
+  say t.name              #=> "foo"
+  say [t.value]           #=> [1, 2, 3]
 
-# Using named parameters in function calls
-func div(a, b) { a / b }
-say div(b:  5, a: 35)    #=> 7
+  # Using named parameters in function calls
+  func div(a, b) { a / b }
+  say div(b:  5, a: 35)    #=> 7
 
 
 =head1 INHERITS
