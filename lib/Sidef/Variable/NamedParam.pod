@@ -7,16 +7,28 @@ Sidef::Variable::NamedParam
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements named parameters (also known as keyword arguments) in Sidef. 
+A NamedParam object stores a name-value pair, where the name is a String and the
+value is an Array containing one or more arguments.  Named parameters allow functions
+to be called with arguments in any order by specifying the parameter name.
 
 =head1 SYNOPSIS
 
-var obj = NamedParam(...)
+var obj = NamedParam("foo", 1, 2, 3)
+
+# Named parameter syntax with colon
+var t = foo: (1, 2, 3)
+say t.name              #=> "foo"
+say [t.value]           #=> [1, 2, 3]
+
+# Using named parameters in function calls
+func div(a, b) { a / b }
+say div(b:  5, a: 35)    #=> 7
 
 
 =head1 INHERITS
 
-Inherits methods from:
+Inherits methods from: 
 
        * Sidef::Types::Hash::Hash
 
@@ -26,7 +38,10 @@ Inherits methods from:
 
     self.dump
 
-Returns the
+Returns a String representation of the NamedParam object that can be used to recreate it.
+
+    var t = foo: (1, 2, 3)
+    say t. dump          #=> NamedParam("foo", 1, 2, 3)
 
 =cut
 
@@ -34,15 +49,23 @@ Returns the
 
     self.name
 
-Returns the
+Returns the name of the named parameter as a String.
+
+    var t = foo:  (1, 2, 3)
+    say t.name          #=> "foo"
 
 =cut
 
 =head2 new
 
+    NamedParam(name, value1, value2, ...)
     self.new
 
-Returns the
+Creates a new NamedParam object with the given name and one or more values. 
+The values are stored as an Array internally.
+
+    var np = NamedParam("arg", 42)
+    var np2 = NamedParam("coords", 10, 20, 30)
 
 Aliases: I<call>
 
@@ -52,6 +75,13 @@ Aliases: I<call>
 
     self.value
 
-Returns the
+Returns the value(s) stored in the NamedParam.  When multiple values were provided,
+they are returned as a list.
+
+    var t = foo: (1, 2, 3)
+    say [t.value]       #=> [1, 2, 3]
+
+    var s = bar: 42
+    say s.value         #=> 42
 
 =cut
