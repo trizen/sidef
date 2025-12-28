@@ -4,24 +4,33 @@
 
 Sidef::Types::Glob::File — Filesystem path and file operations
 
+=head1 SYNOPSIS
+
+    var f = File("example.txt")
+
+    say f.exists
+    say f.size
+    say f.read
+
 =head1 DESCRIPTION
 
-The `Sidef::Types::Glob::File` class represents a filesystem path and provides
+The C<Sidef::Types::Glob::File> class represents a filesystem path and provides
 methods for inspecting, reading, writing, and manipulating files and
 directories.
 
-A `File` object behaves like a string containing a path, while also exposing
-filesystem-related functionality in an object-oriented manner.
+A C<File> object behaves like a string containing a path, while also exposing
+filesystem-related functionality. This allows file paths to be used naturally
+as strings while enabling direct interaction with the filesystem.
 
 =head1 INHERITS
 
-Sidef::Types::String::String
+C<Sidef::Types::String::String>
 
 =head1 METHODS
 
 =head2 new
 
-Creates a new `File` object from a path string.
+Creates a new C<File> object from a path string.
 
     var f = File("test.txt")
 
@@ -111,7 +120,7 @@ Edits the file contents using a transformation block.
 
 =head2 exists
 
-Returns true if the file exists.
+Returns a boolean indicating whether the file exists.
 
     say File("a.txt").exists
 
@@ -249,7 +258,7 @@ Creates a symbolic link.
 
 =head2 lstat
 
-Returns file status without following symlinks.
+Returns file status information without following symbolic links.
 
     say File("link").lstat
 
@@ -261,25 +270,25 @@ Creates the file or directory path.
 
 =head2 md5
 
-Returns the MD5 checksum of the file.
+Returns the MD5 checksum of the file contents.
 
     say File("a.txt").md5
 
 =head2 sha1
 
-Returns the SHA-1 checksum of the file.
+Returns the SHA-1 checksum of the file contents.
 
     say File("a.txt").sha1
 
 =head2 sha256
 
-Returns the SHA-256 checksum of the file.
+Returns the SHA-256 checksum of the file contents.
 
     say File("a.txt").sha256
 
 =head2 sha512
 
-Returns the SHA-512 checksum of the file.
+Returns the SHA-512 checksum of the file contents.
 
     say File("a.txt").sha512
 
@@ -291,7 +300,7 @@ Creates a temporary file or filename.
 
 =head2 modification_time_days_diff
 
-Returns the number of days since last modification.
+Returns the number of days since the file was last modified.
 
     say File("a.txt").modification_time_days_diff
 
@@ -351,7 +360,7 @@ Opens a directory stream.
 
 =head2 read
 
-Reads the file contents and returns a string.
+Reads the file contents and returns them as a string.
 
     say File("a.txt").read
 
@@ -387,7 +396,7 @@ Splits the path into components.
 
 =head2 splitpath
 
-Splits the path into volume, directory, and filename.
+Splits the path into volume, directory, and filename components.
 
     say File("/a/b/c.txt").splitpath
 
@@ -399,7 +408,7 @@ Returns filesystem status information.
 
 =head2 to_file
 
-Converts the value to a `File` object.
+Converts the value to a C<File> object.
 
     say "a.txt".to_file
 
@@ -411,7 +420,7 @@ Returns the string representation of the path.
 
 =head2 truncate
 
-Truncates the file to a given size.
+Truncates the file to a specified size.
 
     File("a.txt").truncate(0)
 
@@ -429,7 +438,7 @@ Opens the file using low-level system flags.
 
 =head2 utime
 
-Sets access and modification times.
+Sets the access and modification times.
 
     File("a.txt").utime(time, time)
 
@@ -441,7 +450,7 @@ Writes a string to the file.
 
 =head1 SEE ALSO
 
-Sidef::Types::Glob,
-Sidef::Types::String::String
+L<Sidef::Types::Glob>,
+L<Sidef::Types::String::String>
 
 =cut
