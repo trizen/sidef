@@ -1,18 +1,42 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Array::Vector
+Sidef::Types::Array::Vector - Mathematical vector operations in Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements mathematical vectors with support for common vector operations
+including arithmetic, comparison, and geometric calculations. Vectors are ordered
+collections of numeric elements that support element-wise operations and various
+distance metrics.
+
+A Vector is similar to an Array but is optimized for mathematical operations and
+always contains numeric elements. Operations between vectors are performed element-wise.
 
 =head1 SYNOPSIS
 
-var obj = Vector(...)
-
+    # Create vectors
+    var v1 = Vector(1, 2, 3)
+    var v2 = Vector(4, 5, 6)
+    
+    # Basic arithmetic
+    var sum = v1 + v2           # Vector(5, 7, 9)
+    var diff = v1 - v2          # Vector(-3, -3, -3)
+    var prod = v1 * v2          # Element-wise: Vector(4, 10, 18)
+    var quot = v1 / v2          # Element-wise: Vector(0.25, 0.4, 0.5)
+    
+    # Scalar operations
+    var scaled = v1 * 2         # Vector(2, 4, 6)
+    var powered = v1 ** 2       # Vector(1, 4, 9)
+    
+    # Vector operations
+    say v1.norm                 # Euclidean norm (magnitude)
+    say v1.abs                  # Absolute value of each element
+    say v1.dist(v2)             # Euclidean distance between vectors
+    
+    # Create special vectors
+    var zeros = Vector.zero(5)  # Vector of 5 zeros
 
 =head1 INHERITS
 
@@ -24,9 +48,12 @@ Inherits methods from:
 
 =head2 &
 
-    a & b
+    v1 & v2
 
-Returns the
+Returns a new vector with element-wise bitwise AND operation between two vectors.
+Each element of the result is the bitwise AND of the corresponding elements.
+
+    Vector(5, 7, 3) & Vector(3, 5, 1)  #=> Vector(1, 5, 1)
 
 Aliases: I<and>
 
@@ -34,9 +61,15 @@ Aliases: I<and>
 
 =head2 *
 
-    a * b
+    v1 * v2
+    v * scalar
 
-Returns the
+Returns a new vector with element-wise multiplication. When multiplying with a scalar,
+each element is multiplied by that scalar. When multiplying two vectors, corresponding
+elements are multiplied together (Hadamard product).
+
+    Vector(1, 2, 3) * 2               #=> Vector(2, 4, 6)
+    Vector(1, 2, 3) * Vector(2, 3, 4) #=> Vector(2, 6, 12)
 
 Aliases: I<mul>
 
@@ -44,9 +77,13 @@ Aliases: I<mul>
 
 =head2 **
 
-    a ** b
+    v ** n
 
-Returns the
+Returns a new vector where each element is raised to the power n. The exponent
+can be a scalar or another vector for element-wise exponentiation.
+
+    Vector(2, 3, 4) ** 2              #=> Vector(4, 9, 16)
+    Vector(2, 3, 4) ** Vector(1, 2, 3) #=> Vector(2, 9, 64)
 
 Aliases: I<pow>
 
@@ -54,9 +91,14 @@ Aliases: I<pow>
 
 =head2 +
 
-    a + b
+    v1 + v2
+    v + scalar
 
-Returns the
+Returns a new vector with element-wise addition. When adding a scalar, it is added
+to each element. When adding two vectors, corresponding elements are added together.
+
+    Vector(1, 2, 3) + 5               #=> Vector(6, 7, 8)
+    Vector(1, 2, 3) + Vector(4, 5, 6) #=> Vector(5, 7, 9)
 
 Aliases: I<add>
 
@@ -64,9 +106,15 @@ Aliases: I<add>
 
 =head2 -
 
-    a - b
+    v1 - v2
+    v - scalar
 
-Returns the
+Returns a new vector with element-wise subtraction. When subtracting a scalar, it is
+subtracted from each element. When subtracting two vectors, corresponding elements
+are subtracted.
+
+    Vector(5, 7, 9) - 2               #=> Vector(3, 5, 7)
+    Vector(5, 7, 9) - Vector(1, 2, 3) #=> Vector(4, 5, 6)
 
 Aliases: I<sub>
 
@@ -74,9 +122,15 @@ Aliases: I<sub>
 
 =head2 /
 
-    a / b
+    v1 / v2
+    v / scalar
 
-Returns the
+Returns a new vector with element-wise division. When dividing by a scalar, each
+element is divided by that scalar. When dividing two vectors, corresponding elements
+are divided.
+
+    Vector(10, 20, 30) / 2               #=> Vector(5, 10, 15)
+    Vector(10, 20, 30) / Vector(2, 4, 5) #=> Vector(5, 5, 6)
 
 Aliases: I<÷>, I<div>
 
@@ -84,9 +138,12 @@ Aliases: I<÷>, I<div>
 
 =head2 ^
 
-    a ^ b
+    v1 ^ v2
 
-Returns the
+Returns a new vector with element-wise bitwise XOR operation between two vectors.
+Each element of the result is the bitwise XOR of the corresponding elements.
+
+    Vector(5, 7, 3) ^ Vector(3, 5, 1)  #=> Vector(6, 2, 2)
 
 Aliases: I<xor>
 
@@ -94,9 +151,12 @@ Aliases: I<xor>
 
 =head2 |
 
-    a | b
+    v1 | v2
 
-Returns the
+Returns a new vector with element-wise bitwise OR operation between two vectors.
+Each element of the result is the bitwise OR of the corresponding elements.
+
+    Vector(5, 7, 3) | Vector(3, 5, 1)  #=> Vector(7, 7, 3)
 
 Aliases: I<or>
 
@@ -106,7 +166,10 @@ Aliases: I<or>
 
     v.abs
 
-Returns the
+Returns a new vector where each element is the absolute value of the corresponding
+element in the original vector.
+
+    Vector(-1, 2, -3).abs  #=> Vector(1, 2, 3)
 
 =cut
 
@@ -114,15 +177,22 @@ Returns the
 
     v1.atan2(v2)
 
-Returns the
+Returns a new vector containing the element-wise arctangent of the quotient of
+corresponding elements from v1 and v2. This is useful for computing angles in
+two-dimensional space.
+
+    Vector(1, 0).atan2(Vector(0, 1))  #=> Vector(atan(∞), 0)
 
 =cut
 
 =head2 ceil
 
-    self.ceil
+    v.ceil
 
-Returns the
+Returns a new vector where each element is rounded up to the nearest integer
+(ceiling function).
+
+    Vector(1.2, 2.8, -0.5).ceil  #=> Vector(2, 3, 0)
 
 =cut
 
@@ -130,7 +200,11 @@ Returns the
 
     v1.chebyshev_dist(v2)
 
-Returns the
+Returns the Chebyshev distance (L∞ metric) between two vectors. This is the maximum
+absolute difference between corresponding elements. Also known as the chessboard
+distance or maximum metric.
+
+    Vector(1, 2, 3).chebyshev_dist(Vector(4, 5, 6))  #=> 3
 
 =cut
 
@@ -138,23 +212,34 @@ Returns the
 
     v1.dist(v2)
 
-Returns the
+Returns the Euclidean distance (L2 metric) between two vectors. This is the straight-line
+distance in n-dimensional space, calculated as the square root of the sum of squared
+differences between corresponding elements.
+
+    Vector(1, 2, 3).dist(Vector(4, 5, 6))  #=> sqrt(27) ≈ 5.196
 
 =cut
 
 =head2 dist_norm
 
-    v1.dist_norm(v2)
+    v1.dist_norm(p, v2)
 
-Returns the
+Returns the Lp-norm distance between two vectors. The parameter p specifies the norm
+degree. Common values are p=1 (Manhattan), p=2 (Euclidean), and p=∞ (Chebyshev).
+
+    Vector(1, 2, 3).dist_norm(1, Vector(4, 5, 6))  #=> 9 (Manhattan)
+    Vector(1, 2, 3).dist_norm(2, Vector(4, 5, 6))  #=> 5.196... (Euclidean)
 
 =cut
 
 =head2 floor
 
-    self.floor
+    v.floor
 
-Returns the
+Returns a new vector where each element is rounded down to the nearest integer
+(floor function).
+
+    Vector(1.8, 2.3, -0.5).floor  #=> Vector(1, 2, -1)
 
 =cut
 
@@ -162,7 +247,11 @@ Returns the
 
     v1.manhattan_dist(v2)
 
-Returns the
+Returns the Manhattan distance (L1 metric) between two vectors. This is the sum of
+absolute differences between corresponding elements. Also known as taxicab distance
+or city block distance.
+
+    Vector(1, 2, 3).manhattan_dist(Vector(4, 5, 6))  #=> 9
 
 =cut
 
@@ -170,23 +259,33 @@ Returns the
 
     v.manhattan_norm
 
-Returns the
+Returns the Manhattan norm (L1 norm) of the vector. This is the sum of the absolute
+values of all elements.
+
+    Vector(1, -2, 3).manhattan_norm  #=> 6
 
 =cut
 
 =head2 neg
 
-    v1.neg
+    v.neg
 
-Returns the
+Returns a new vector where each element is the negation of the corresponding element
+in the original vector. Equivalent to multiplying by -1.
+
+    Vector(1, -2, 3).neg  #=> Vector(-1, 2, -3)
 
 =cut
 
 =head2 new
 
-    self.new
+    Vector.new(elements...)
+    Vector(elements...)
 
-Returns the
+Creates a new Vector object from the given elements. Elements should be numeric values.
+
+    var v1 = Vector.new(1, 2, 3)
+    var v2 = Vector(1, 2, 3)  # Same as above
 
 Aliases: I<call>
 
@@ -196,23 +295,35 @@ Aliases: I<call>
 
     v.norm
 
-Returns the
+Returns the Euclidean norm (L2 norm, magnitude, or length) of the vector. This is
+the square root of the sum of squares of all elements.
+
+    Vector(3, 4).norm  #=> 5
+    Vector(1, 2, 3).norm  #=> sqrt(14) ≈ 3.742
 
 =cut
 
 =head2 not
 
-    v1.not
+    v.not
 
-Returns the
+Returns a new vector where each element is the bitwise NOT of the corresponding
+element in the original vector.
+
+    Vector(5, 7, 3).not  #=> Vector with bitwise complement of each element
 
 =cut
 
 =head2 round
 
-    self.round(digits)
+    v.round(digits=-1)
 
-Returns the
+Returns a new vector where each element is rounded to the specified number of digits.
+If digits is negative (default), rounds to the nearest integer. If digits is positive,
+rounds to that many decimal places.
+
+    Vector(1.234, 2.567, 3.891).round      #=> Vector(1, 3, 4)
+    Vector(1.234, 2.567, 3.891).round(2)   #=> Vector(1.23, 2.57, 3.89)
 
 =cut
 
@@ -220,7 +331,9 @@ Returns the
 
     v.to_a
 
-Returns the
+Converts the vector to a regular Array object, preserving all elements in order.
+
+    Vector(1, 2, 3).to_a  #=> [1, 2, 3]
 
 Aliases: I<to_array>
 
@@ -228,9 +341,11 @@ Aliases: I<to_array>
 
 =head2 to_s
 
-    self.to_s
+    v.to_s
 
-Returns the
+Returns a string representation of the vector, showing all elements.
+
+    Vector(1, 2, 3).to_s  #=> "Vector(1, 2, 3)"
 
 Aliases: I<dump>, I<to_str>
 
@@ -240,6 +355,48 @@ Aliases: I<dump>, I<to_str>
 
     Vector.zero(n)
 
-Returns the
+Creates a new vector of length n with all elements initialized to zero. This is a
+class method used to create zero vectors of a specified dimension.
+
+    Vector.zero(3)  #=> Vector(0, 0, 0)
+    Vector.zero(5)  #=> Vector(0, 0, 0, 0, 0)
+
+=cut
+
+=head1 EXAMPLES
+
+    # Vector arithmetic and operations
+    var v1 = Vector(1, 2, 3)
+    var v2 = Vector(4, 5, 6)
+    
+    # Element-wise operations
+    say (v1 + v2)  # Vector(5, 7, 9)
+    say (v1 * v2)  # Vector(4, 10, 18)
+    
+    # Scalar operations
+    say (v1 * 2)   # Vector(2, 4, 6)
+    say (v1 + 10)  # Vector(11, 12, 13)
+    
+    # Norms and distances
+    say v1.norm                # Magnitude of v1
+    say v1.manhattan_norm      # L1 norm
+    say v1.dist(v2)            # Euclidean distance
+    say v1.manhattan_dist(v2)  # Manhattan distance
+    say v1.chebyshev_dist(v2)  # Chebyshev distance
+    
+    # Transformations
+    say v1.abs                 # Absolute values
+    say v1.neg                 # Negation
+    say v1.round(2)            # Round to 2 decimals
+    say v1.ceil                # Ceiling
+    say v1.floor               # Floor
+    
+    # Creating special vectors
+    var zeros = Vector.zero(5)
+    say zeros  # Vector(0, 0, 0, 0, 0)
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Array::Array>
 
 =cut
