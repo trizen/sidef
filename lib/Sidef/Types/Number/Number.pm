@@ -30117,7 +30117,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (0 and HAS_NEWER_PRIME_UTIL and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+        if (HAS_NEWER_PRIME_UTIL and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
 
             # XXX: Out of memory for: omega_primes(12, 1e13)
             # https://github.com/danaj/Math-Prime-Util/issues/67
