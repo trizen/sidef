@@ -82,7 +82,7 @@ Sidef contributors
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012-2025, Flaviu Stănescu, et al.
+Copyright (C) 2013-2025, Daniel Șuteu
 
 This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
 
