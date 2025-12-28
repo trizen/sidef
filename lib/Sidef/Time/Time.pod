@@ -1,72 +1,77 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Time::Time
+Sidef::Time::Time - Representation of time as Unix epoch seconds
 
 =head1 DESCRIPTION
 
-This class represents a point in time as Unix epoch seconds, providing methods to retrieve the current time, convert to local or GMT representations, and obtain high-resolution timestamps.
+This class represents a point in time as Unix epoch seconds (the number of seconds since January 1, 1970, 00:00:00 UTC). It provides methods to retrieve the current time, convert between different time representations (local time and GMT/UTC), and obtain high-resolution timestamps with microsecond precision.
+
+The Time class is useful for timestamping events, measuring elapsed time, and working with date/time conversions through its integration with the Date class.
 
 =head1 SYNOPSIS
 
-var obj = Time()           # current time
-var obj = Time(1234567890) # specific Unix timestamp
-
+    # Create a Time object for the current moment
+    var current_time = Time()
+    say current_time              #=> Time(1735401600)
+    
+    # Create a Time object from a specific Unix timestamp
+    var past_time = Time(1234567890)
+    say past_time                 #=> Time(1234567890)
+    
+    # Get the current Unix epoch seconds
+    var now = Time.now
+    say now                       #=> 1735401600
+    
+    # Convert to local time representation
+    var local_date = current_time.local
+    say local_date                #=> Date object in local timezone
+    
+    # Convert to GMT/UTC representation
+    var gmt_date = current_time.gmt
+    say gmt_date                  #=> Date object in GMT/UTC
+    
+    # Get high-resolution time with microseconds
+    var precise_time = Time.micro
+    say precise_time              #=> 1735401600.123456
+    
+    # Convert to string
+    say current_time.to_s         #=> "1735401600"
+    
+    # Get the underlying seconds value
+    say current_time.sec          #=> 1735401600
 
 =head1 INHERITS
 
-Inherits methods from: 
+Inherits methods from:
 
        * Sidef::Object::Object
 
 =head1 METHODS
 
-=head2 dump
-
-    self. dump
-
-Returns a String representation of the Time object in the format C<Time(seconds)>, useful for debugging and serialization.
-
-=cut
-
-=head2 gmt
-
-    self. gmt
-
-Returns a Date object representing this time in GMT (Greenwich Mean Time) / UTC timezone. 
-
-Aliases:  I<gmtime>
-
-=cut
-
-=head2 local
-
-    self.local
-
-Returns a Date object representing this time in the local timezone. 
-
-Aliases: I<localtime>
-
-=cut
-
-=head2 micro
-
-    self.micro
-
-Returns the current time as a Number with microsecond precision, using high-resolution timing.
-
-Aliases: I<micro_sec>, I<micro_seconds>
-
-=cut
-
 =head2 new
 
-    self.new
-    self.new(seconds)
+    Time.new
+    Time.new(seconds)
 
-Creates a new Time object.  If C<seconds> is provided, it uses that value as the Unix epoch timestamp; otherwise, it uses the current time. 
+Creates a new Time object. If C<seconds> is provided, it uses that value as the Unix epoch timestamp (seconds since January 1, 1970, 00:00:00 UTC). If called without arguments, it initializes the object with the current time.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<seconds> (optional) - A Number representing Unix epoch seconds
+
+=back
+
+B<Returns:> A new Time object
+
+B<Examples:>
+
+    var t1 = Time.new              # Current time
+    var t2 = Time.new(1234567890)  # Specific timestamp
+    var t3 = Time()                # Also current time (using call alias)
 
 Aliases: I<call>
 
@@ -74,28 +79,172 @@ Aliases: I<call>
 
 =head2 now
 
-    self.now
+    Time.now
 
-Returns the current Unix epoch time as a Number.
+Returns the current Unix epoch time as a Number. This is a class method that provides the current timestamp without creating a Time object.
+
+B<Returns:> The current Unix epoch seconds as a Number
+
+B<Examples:>
+
+    var timestamp = Time.now
+    say timestamp                  #=> 1735401600
+    
+    # Useful for benchmarking
+    var start = Time.now
+    # ... some operation ...
+    var elapsed = Time.now - start
+    say "Operation took #{elapsed} seconds"
 
 =cut
 
 =head2 sec
 
-    self.sec
+    time_obj.sec
 
-Returns the Unix epoch seconds of this Time object as a Number. 
+Returns the Unix epoch seconds stored in this Time object as a Number. This provides access to the underlying timestamp value.
+
+B<Returns:> Unix epoch seconds as a Number
+
+B<Examples:>
+
+    var t = Time(1234567890)
+    say t.sec                      #=> 1234567890
+    
+    # Compare two times
+    var t1 = Time(1000000)
+    var t2 = Time(2000000)
+    say (t2.sec - t1.sec)          #=> 1000000
 
 Aliases: I<time>
 
 =cut
 
+=head2 micro
+
+    Time.micro
+
+Returns the current time as a Number with microsecond precision. This uses high-resolution timing mechanisms to provide fractional seconds with microsecond accuracy, useful for precise time measurements and benchmarking.
+
+B<Returns:> Current time as a Number with microseconds (e.g., 1735401600.123456)
+
+B<Examples:>
+
+    var precise_start = Time.micro
+    # ... some fast operation ...
+    var precise_end = Time.micro
+    var microseconds = (precise_end - precise_start) * 1e6
+    say "Operation took #{microseconds} microseconds"
+    
+    # High-precision timestamp
+    say Time.micro                 #=> 1735401600.123456
+
+Aliases: I<micro_sec>, I<micro_seconds>
+
+=cut
+
+=head2 local
+
+    time_obj.local
+
+Converts this Time object to a Date object representing the same moment in the local timezone. The returned Date object provides access to individual date/time components (year, month, day, hour, minute, second) adjusted for the system's local timezone.
+
+B<Returns:> A Date object in the local timezone
+
+B<Examples:>
+
+    var t = Time(1234567890)
+    var local_date = t.local
+    say local_date.hour            # Hour in local timezone
+    say local_date.mday            # Day of month in local timezone
+    
+    # Current time in local representation
+    var now_local = Time().local
+    say now_local
+
+Aliases: I<localtime>
+
+=cut
+
+=head2 gmt
+
+    time_obj.gmt
+
+Converts this Time object to a Date object representing the same moment in GMT (Greenwich Mean Time) / UTC (Coordinated Universal Time). The returned Date object provides access to individual date/time components in the UTC timezone, which is useful for standardized time representations.
+
+B<Returns:> A Date object in GMT/UTC timezone
+
+B<Examples:>
+
+    var t = Time(1234567890)
+    var gmt_date = t.gmt
+    say gmt_date.hour              # Hour in GMT/UTC
+    say gmt_date.year              # Year in GMT/UTC
+    
+    # Compare local and GMT times
+    var now = Time()
+    say "Local: #{now.local}"
+    say "GMT: #{now.gmt}"
+
+Aliases: I<gmtime>
+
+=cut
+
 =head2 to_s
 
-    self.to_s
+    time_obj.to_s
 
-Returns the Unix epoch seconds of this Time object as a String.
+Returns a String representation of the Unix epoch seconds stored in this Time object. This is useful for displaying the timestamp or using it in string contexts.
+
+B<Returns:> Unix epoch seconds as a String
+
+B<Examples:>
+
+    var t = Time(1234567890)
+    say t.to_s                     #=> "1234567890"
+    
+    # String interpolation
+    var msg = "Timestamp: #{t}"    # Calls to_s automatically
 
 Aliases: I<to_str>
+
+=cut
+
+=head2 dump
+
+    time_obj.dump
+
+Returns a String representation of the Time object in the format C<Time(seconds)>. This format is useful for debugging, logging, and serialization purposes as it clearly shows both the class type and the value.
+
+B<Returns:> A String in the format C<Time(seconds)>
+
+B<Examples:>
+
+    var t = Time(1234567890)
+    say t.dump                     #=> "Time(1234567890)"
+    
+    # Useful for debugging
+    var times = [Time(1000), Time(2000), Time(3000)]
+    say times.map{.dump}           #=> ["Time(1000)", "Time(2000)", "Time(3000)"]
+
+=cut
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Date::Date> - For working with structured date/time representations
+
+=item * L<Sidef::Object::Object> - The parent class
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut
