@@ -1853,7 +1853,7 @@ Aliases: I<ucfirst>, I<titlecase>
 
     self.tclc
 
-Returns the string with the first chapatterracter capitalized and the remaining characters in lower case.
+Returns the string with the first character capitalized and the remaining characters in lower case.
 
 Aliases: I<capitalize>
 
