@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,12 +6,29 @@ Sidef::Types::Bool::Bool
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements the Boolean type in Sidef, representing logical true and false values. Boolean objects are immutable and are the result of comparison operations, logical operations, and conditional expressions. The two Boolean values are C<true> and C<false>.
 
 =head1 SYNOPSIS
 
-var obj = Bool(...)
-
+    var obj = Bool(1)           # true
+    var obj = Bool(0)           # false
+    var obj = Bool("string")    # true
+    var obj = Bool(nil)         # false
+    
+    # Boolean operations
+    true & false                # false (logical AND)
+    true | false                # true (logical OR)
+    true ^ false                # true (logical XOR)
+    !true                       # false (logical NOT)
+    
+    # Comparisons return Bool
+    5 > 3                       # true
+    "hello" == "world"          # false
+    
+    # Conditionals use Bool
+    if (true) {
+        say "This executes"
+    }
 
 =head1 INHERITS
 
@@ -26,7 +42,11 @@ Inherits methods from:
 
     a & b
 
-Returns the
+Returns the logical AND of two boolean values. Returns C<true> only if both operands are true, otherwise returns C<false>.
+
+    true & true      # true
+    true & false     # false
+    false & false    # false
 
 =cut
 
@@ -34,7 +54,11 @@ Returns the
 
     a ^ b
 
-Returns the
+Returns the logical XOR (exclusive OR) of two boolean values. Returns C<true> if exactly one operand is true, otherwise returns C<false>.
+
+    true ^ false     # true
+    true ^ true      # false
+    false ^ false    # false
 
 =cut
 
@@ -42,7 +66,11 @@ Returns the
 
     a | b
 
-Returns the
+Returns the logical OR of two boolean values. Returns C<true> if at least one operand is true, otherwise returns C<false>.
+
+    true | false     # true
+    false | false    # false
+    true | true      # true
 
 =cut
 
@@ -50,7 +78,10 @@ Returns the
 
     self.false
 
-Returns the
+Returns the boolean value C<false>. This is a class method that returns the false singleton object.
+
+    Bool.false       # false
+    true.false       # false (class method callable on instances)
 
 =cut
 
@@ -58,7 +89,10 @@ Returns the
 
     self.is_true
 
-Returns the
+Returns C<true> if the boolean value is true, C<false> otherwise. This method tests the truthiness of the boolean object.
+
+    true.is_true     # true
+    false.is_true    # false
 
 =cut
 
@@ -66,7 +100,11 @@ Returns the
 
     self.neg
 
-Returns the
+Returns the logical negation of the boolean value. If the value is C<true>, returns C<false>; if the value is C<false>, returns C<true>.
+
+    true.neg         # false
+    false.neg        # true
+    !true            # false (using operator form)
 
 Aliases: I<not>, I<flip>, I<toggle>, I<is_false>
 
@@ -75,8 +113,18 @@ Aliases: I<not>, I<flip>, I<toggle>, I<is_false>
 =head2 new
 
     self.new
+    Bool.new(value)
 
-Returns the
+Creates a new Boolean object from the given value. Any value can be converted to a boolean:
+- C<false>, C<0>, empty string, C<nil> become C<false>
+- Everything else becomes C<true>
+
+    Bool.new(1)          # true
+    Bool.new(0)          # false
+    Bool.new("text")     # true
+    Bool.new("")         # false
+    Bool.new(nil)        # false
+    Bool.new([])         # true (empty array is truthy)
 
 Aliases: I<call>
 
@@ -86,7 +134,12 @@ Aliases: I<call>
 
     self.pick
 
-Returns the
+Returns a random boolean value (either C<true> or C<false>) with equal probability.
+
+    Bool.pick        # randomly returns true or false
+    true.pick        # randomly returns true or false
+
+This is useful for randomized algorithms and simulations.
 
 Aliases: I<rand>
 
@@ -96,7 +149,10 @@ Aliases: I<rand>
 
     self.run
 
-Returns back the self object.
+Returns back the self object. This method simply returns the boolean value unchanged, useful for consistency with other types' interfaces.
+
+    true.run         # true
+    false.run        # false
 
 =cut
 
@@ -104,7 +160,10 @@ Returns back the self object.
 
     self.to_b
 
-Returns the
+Returns the boolean value itself. Converts the object to a boolean (which for a Bool object is a no-op, returning self).
+
+    true.to_b        # true
+    false.to_b       # false
 
 Aliases: I<to_bool>
 
@@ -114,7 +173,11 @@ Aliases: I<to_bool>
 
     self.to_s
 
-Returns the
+Returns the string representation of the boolean value. Returns the string C<"true"> for true values and C<"false"> for false values.
+
+    true.to_s        # "true"
+    false.to_s       # "false"
+    say true         # prints: true
 
 Aliases: I<dump>, I<to_str>
 
@@ -124,6 +187,106 @@ Aliases: I<dump>, I<to_str>
 
     self.true
 
-Returns the
+Returns the boolean value C<true>. This is a class method that returns the true singleton object.
+
+    Bool.true        # true
+    false.true       # true (class method callable on instances)
+
+=cut
+
+=head1 OPERATORS
+
+The Bool class supports the following operators:
+
+=over 4
+
+=item * C<&> - Logical AND
+
+=item * C<|> - Logical OR
+
+=item * C<^> - Logical XOR
+
+=item * C<!> - Logical NOT (negation)
+
+=item * C<&&> - Short-circuit AND
+
+=item * C<||> - Short-circuit OR
+
+=back
+
+=head1 TRUTHINESS
+
+In Sidef, the following values are considered false:
+
+=over 4
+
+=item * C<false> - the boolean false value
+
+=item * C<0> - numeric zero
+
+=item * C<""> - empty string
+
+=item * C<nil> - the null/undefined value
+
+=back
+
+All other values are considered true, including:
+
+=over 4
+
+=item * C<true> - the boolean true value
+
+=item * Any non-zero number
+
+=item * Any non-empty string (including C<"0">)
+
+=item * Any array or hash (even if empty)
+
+=item * Any object
+
+=back
+
+=head1 EXAMPLES
+
+    # Using booleans in conditionals
+    var is_valid = true
+    if (is_valid) {
+        say "Valid!"
+    }
+    
+    # Boolean algebra
+    var a = true
+    var b = false
+    say (a & b)          # false
+    say (a | b)          # true
+    say (a ^ b)          # true
+    say !a               # false
+    
+    # Comparison operations return Bool
+    var result = (10 > 5)
+    say result.class     # Bool
+    say result           # true
+    
+    # Converting to boolean
+    say Bool(42)         # true
+    say Bool(0)          # false
+    say Bool(nil)        # false
+    say Bool([])         # true
+    
+    # Random boolean
+    var coin_flip = Bool.pick
+    say (coin_flip ? "Heads" : "Tails")
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Number::Number>
+
+=item * L<Sidef::Types::String::String>
+
+=item * L<Sidef::Object::Object>
+
+=back
 
 =cut
