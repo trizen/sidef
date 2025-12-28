@@ -1,39 +1,56 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Hash:: Hash
+Sidef::Types::Hash::Hash
 
 =head1 DESCRIPTION
 
-This class implements a hash (associative array) data type, providing key-value storage and various methods for hash manipulation, iteration, and set operations.
+This class implements a hash (associative array) data type, providing key-value storage and various methods for hash manipulation, iteration, transformation, and set operations.
+
+A Hash is an unordered collection of key-value pairs where each unique key maps to exactly one value. Keys are compared using structural equality.
 
 =head1 SYNOPSIS
 
+    # Creating hashes
     var hash = Hash(a => 1, b => 2, c => 3)
+    var h = Hash(:foo, :bar)  # Keys with nil values
     
-    say hash.keys       # Array of keys
-    say hash.values     # Array of values
-    say hash.len        # 3
+    # Accessing values
+    say hash{:a}        #=> 1
+    say hash.item(:b)   #=> 2
     
+    # Setting values
+    hash{:d} = 4
+    hash.append(e => 5, f => 6)
+    
+    # Basic operations
+    say hash.keys       #=> [:a, :b, :c, :d, :e, :f]
+    say hash.values     #=> [1, 2, 3, 4, 5, 6]
+    say hash.len        #=> 6
+    say hash.has(:a)    #=> true
+    
+    # Iteration
     hash.each {|key, value|
         say "#{key} => #{value}"
     }
+    
+    # Transformation
+    var doubled = hash.map_v { _1 * 2 }
+    var filtered = hash.grep { |k, v| v > 2 }
     
     # Set operations
     var h1 = Hash(a => 1, b => 2)
     var h2 = Hash(b => 3, c => 4)
     
-    say (h1 | h2)   # Union
-    say (h1 & h2)   # Intersection
-    say (h1 - h2)   # Difference
-    say (h1 ^ h2)   # Symmetric difference
-
+    say (h1 | h2)   #=> Hash(a => 1, b => 2, c => 4)  # Union
+    say (h1 & h2)   #=> Hash(b => 2)                  # Intersection
+    say (h1 - h2)   #=> Hash(a => 1)                  # Difference
+    say (h1 ^ h2)   #=> Hash(a => 1, c => 4)          # Symmetric difference
 
 =head1 INHERITS
 
-Inherits methods from: 
+Inherits methods from:
 
        * Sidef::Object::Object
 
@@ -41,19 +58,27 @@ Inherits methods from:
 
 =head2 &
 
-    a & b
+    hash1 & hash2
 
-Returns the intersection of two hashes.  The result contains only keys that exist in both hashes, with values taken from the first hash. 
+Returns the intersection of two hashes. The result contains only keys that exist in both hashes, with values taken from the first hash.
 
-Aliases:  I<and>, I<intersection>
+    var h1 = Hash(a => 1, b => 2, c => 3)
+    var h2 = Hash(b => 20, c => 30, d => 40)
+    say (h1 & h2)  #=> Hash(b => 2, c => 3)
+
+Aliases: I<and>, I<intersection>
 
 =cut
 
 =head2 +
 
-    a + b
+    hash1 + hash2
 
-Returns a new hash containing all key-value pairs from both hashes.  If a key exists in both, the value from the second hash is used. 
+Returns a new hash containing all key-value pairs from both hashes. If a key exists in both, the value from the second hash is used (right-hand precedence).
+
+    var h1 = Hash(a => 1, b => 2)
+    var h2 = Hash(b => 20, c => 30)
+    say (h1 + h2)  #=> Hash(a => 1, b => 20, c => 30)
 
 Aliases: I<merge>, I<concat>
 
@@ -61,19 +86,28 @@ Aliases: I<merge>, I<concat>
 
 =head2 -
 
-    a - b
+    hash1 - hash2
 
 Returns the difference of two hashes. The result contains only keys that exist in the first hash but not in the second.
+
+    var h1 = Hash(a => 1, b => 2, c => 3)
+    var h2 = Hash(b => 20, d => 40)
+    say (h1 - h2)  #=> Hash(a => 1, c => 3)
 
 Aliases: I<sub>, I<diff>, I<difference>
 
 =cut
 
-=head2 ... 
+=head2 ...
 
-    a ... b
+    hash...
 
-Returns the hash as a flat list of alternating keys and values. 
+Returns the hash as a flat list of alternating keys and values.
+
+    var h = Hash(a => 1, b => 2)
+    say h...  #=> [:a, 1, :b, 2]
+
+This is useful for unpacking hashes into argument lists or for converting to other data structures.
 
 Aliases: I<to_list>
 
@@ -81,9 +115,13 @@ Aliases: I<to_list>
 
 =head2 ==
 
-    a == b
+    hash1 == hash2
 
-Returns true if both hashes have the same keys with equal values.
+Returns true if both hashes have the same keys with equal values (structural equality).
+
+    var h1 = Hash(a => 1, b => 2)
+    var h2 = Hash(b => 2, a => 1)
+    say (h1 == h2)  #=> true
 
 Aliases: I<eq>
 
@@ -91,9 +129,13 @@ Aliases: I<eq>
 
 =head2 ^
 
-    a ^ b
+    hash1 ^ hash2
 
-Returns the symmetric difference of two hashes.  The result contains keys that exist in either hash but not in both.
+Returns the symmetric difference of two hashes. The result contains keys that exist in either hash but not in both.
+
+    var h1 = Hash(a => 1, b => 2)
+    var h2 = Hash(b => 20, c => 30)
+    say (h1 ^ h2)  #=> Hash(a => 1, c => 30)
 
 Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
@@ -101,9 +143,15 @@ Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
 
 =head2 |
 
-    a | b
+    hash1 | hash2
 
-Returns the union of two hashes. The result contains all keys from both hashes, with values from the first hash taking precedence for common keys.
+Returns the union of two hashes. The result contains all keys from both hashes, with values from the first hash taking precedence for common keys (left-hand precedence).
+
+    var h1 = Hash(a => 1, b => 2)
+    var h2 = Hash(b => 20, c => 30)
+    say (h1 | h2)  #=> Hash(a => 1, b => 2, c => 30)
+
+Note the difference from C<+> (merge): union keeps left values, merge keeps right values.
 
 Aliases: I<or>, I<union>
 
@@ -111,9 +159,13 @@ Aliases: I<or>, I<union>
 
 =head2 ≠
 
-    a ≠ b
+    hash1 ≠ hash2
 
 Returns true if the two hashes are not equal (different keys or values).
+
+    var h1 = Hash(a => 1)
+    var h2 = Hash(a => 2)
+    say (h1 ≠ h2)  #=> true
 
 Aliases: I<!=>, I<ne>
 
@@ -121,33 +173,55 @@ Aliases: I<!=>, I<ne>
 
 =head2 append
 
-    self.append(: pairs)
+    hash.append(pairs...)
 
-Appends the given key-value pairs to the hash in-place and returns the modified hash.
+Appends the given key-value pairs to the hash in-place and returns the modified hash. This modifies the original hash.
+
+    var h = Hash(a => 1)
+    h.append(b => 2, c => 3)
+    say h  #=> Hash(a => 1, b => 2, c => 3)
+
+If a key already exists, its value will be updated.
 
 =cut
 
 =head2 as_tree
 
-    self.as_tree(root)
+    hash.as_tree(root)
 
 Returns the hash as a tree structure represented as nested Pairs, with the given root as the tree's root label.
+
+    var h = Hash(a => 1, b => 2)
+    say h.as_tree(:root)  #=> Pair(:root, [Pair(:a, 1), Pair(:b, 2)])
+
+This is useful for visualizing or processing hashes as hierarchical data structures.
 
 =cut
 
 =head2 clear
 
-    self.clear
+    hash.clear
 
-Removes all key-value pairs from the hash and returns the empty hash.
+Removes all key-value pairs from the hash and returns the empty hash. This modifies the hash in-place.
+
+    var h = Hash(a => 1, b => 2)
+    h.clear
+    say h        #=> Hash()
+    say h.len    #=> 0
 
 =cut
 
 =head2 collect
 
-    self.collect(block)
+    hash.collect { |key, value| ... }
 
-Iterates over each key-value pair, calling the block with (key, value), and collects all return values into an Array. 
+Iterates over each key-value pair, calling the block with (key, value), and collects all return values into an Array.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    var result = h.collect { |k, v|
+        "#{k}=#{v}"
+    }
+    say result  #=> ["a=1", "b=2", "c=3"]
 
 Aliases: I<collect_kv>
 
@@ -155,25 +229,42 @@ Aliases: I<collect_kv>
 
 =head2 count
 
-    self.count(obj)
+    hash.count(key)
+    hash.count { |key, value| ... }
 
-Returns 1 if the given key exists in the hash, 0 otherwise.  If a block is provided, counts the number of key-value pairs for which the block returns true.
+When called with a key, returns 1 if the key exists in the hash, 0 otherwise.
+
+When called with a block, returns the number of key-value pairs for which the block returns true.
+
+    var h = Hash(a => 1, b => 2, c => 3, d => 4)
+    
+    say h.count(:b)             #=> 1
+    say h.count(:z)             #=> 0
+    say h.count { |k, v| v > 2 }  #=> 2
 
 =cut
 
 =head2 count_by
 
-    self.count_by(block)
+    hash.count_by { |key, value| ... }
 
 Returns the count of key-value pairs for which the block returns a true value.
+
+    var h = Hash(a => 1, b => 2, c => 3, d => 4)
+    say h.count_by { |k, v| v.is_even }  #=> 2
 
 =cut
 
 =head2 delete
 
-    self.delete(*keys)
+    hash.delete(keys...)
 
-Removes the specified keys from the hash and returns the deleted values. 
+Removes the specified keys from the hash and returns the deleted values as an Array (or a single value if one key was given). This modifies the hash in-place.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    say h.delete(:b)        #=> 2
+    say h.delete(:a, :c)    #=> [1, 3]
+    say h                   #=> Hash()
 
 Aliases: I<remove>
 
@@ -181,25 +272,57 @@ Aliases: I<remove>
 
 =head2 delete_if
 
-    self.delete_if(block)
+    hash.delete_if { |key, value| ... }
 
-Deletes all key-value pairs for which the block returns true. The block receives (key, value) as arguments.  Returns the modified hash.
+Deletes all key-value pairs for which the block returns true. The block receives (key, value) as arguments. Returns the modified hash.
+
+    var h = Hash(a => 1, b => 2, c => 3, d => 4)
+    h.delete_if { |k, v| v.is_even }
+    say h  #=> Hash(a => 1, c => 3)
+
+This is the destructive version of C<grep> (which returns a new hash).
 
 =cut
 
 =head2 dig
 
-    self.dig(key, *keys)
+    hash.dig(key, keys...)
 
-Recursively retrieves nested values.  Returns the value at the nested key path, or undef if any key in the path doesn't exist.
+Recursively retrieves nested values. Returns the value at the nested key path, or nil if any key in the path doesn't exist.
+
+    var h = Hash(
+        a => Hash(
+            b => Hash(
+                c => 42
+            )
+        )
+    )
+    
+    say h.dig(:a, :b, :c)  #=> 42
+    say h.dig(:a, :x)      #=> nil
+
+This is safer than chaining subscript operations because it won't error if intermediate values are missing.
 
 =cut
 
 =head2 each
 
-    self.each(block)
+    hash.each { |key, value| ... }
 
-Iterates over each key-value pair in the hash, calling the block with (key, value). Returns the block when given, or the next (key, value) pair when called without arguments.
+Iterates over each key-value pair in the hash, calling the block with (key, value). Returns the hash when a block is given, or acts as an iterator when called without arguments.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    
+    h.each { |k, v|
+        say "#{k} => #{v}"
+    }
+    
+    # As iterator
+    var iter = h.each
+    loop {
+        var (k, v) = iter() \\ break
+        say "#{k} => #{v}"
+    }
 
 Aliases: I<each_kv>, I<each_pair>
 
@@ -207,9 +330,14 @@ Aliases: I<each_kv>, I<each_pair>
 
 =head2 each_k
 
-    self.each_k(block)
+    hash.each_k { |key| ... }
 
-Iterates over each key in the hash, calling the block with the key.  Returns the hash. 
+Iterates over each key in the hash, calling the block with the key. Returns the hash.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    h.each_k { |k|
+        say k
+    }
 
 Aliases: I<each_key>
 
@@ -217,9 +345,14 @@ Aliases: I<each_key>
 
 =head2 each_v
 
-    self.each_v(block)
+    hash.each_v { |value| ... }
 
 Iterates over each value in the hash, calling the block with the value. Returns the hash.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    h.each_v { |v|
+        say v * 2
+    }
 
 Aliases: I<each_value>
 
@@ -227,17 +360,30 @@ Aliases: I<each_value>
 
 =head2 fetch
 
-    self.fetch(key, default)
+    hash.fetch(key, default)
 
-Returns the value for the given key if it exists, otherwise returns the default value. 
+Returns the value for the given key if it exists, otherwise returns the default value.
+
+    var h = Hash(a => 1, b => 2)
+    
+    say h.fetch(:a, 0)     #=> 1
+    say h.fetch(:z, 0)     #=> 0
+    say h.fetch(:z, nil)   #=> nil
+
+Unlike direct subscript access (C<hash{key}>), fetch allows you to distinguish between a missing key and a key with a nil value.
 
 =cut
 
 =head2 flip
 
-    self.flip
+    hash.flip
 
-Returns a new hash with keys and values swapped.  The original values become keys and the original keys become values. 
+Returns a new hash with keys and values swapped. The original values become keys and the original keys become values.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    say h.flip  #=> Hash(1 => :a, 2 => :b, 3 => :c)
+
+Note: If multiple keys have the same value, only one will survive in the flipped hash (last one wins).
 
 Aliases: I<invert>, I<reverse>
 
@@ -245,25 +391,45 @@ Aliases: I<invert>, I<reverse>
 
 =head2 get_pair
 
-    self.get_pair(key)
+    hash.get_pair(key)
 
 Returns a Pair object containing the given key and its associated value.
+
+    var h = Hash(a => 1, b => 2)
+    var p = h.get_pair(:a)
+    say p        #=> Pair(:a, 1)
+    say p.key    #=> :a
+    say p.value  #=> 1
+
+Returns nil if the key doesn't exist.
 
 =cut
 
 =head2 get_pairs
 
-    self.get_pairs(*keys)
+    hash.get_pairs(keys...)
 
 Returns an Array of Pair objects for the specified keys.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    var pairs = h.get_pairs(:a, :c)
+    say pairs  #=> [Pair(:a, 1), Pair(:c, 3)]
+
+Missing keys will produce Pair objects with nil values.
 
 =cut
 
 =head2 grep
 
-    self.grep(block)
+    hash.grep { |key, value| ... }
 
-Returns a new hash containing only the key-value pairs for which the block returns true.  The block receives (key, value) as arguments.
+Returns a new hash containing only the key-value pairs for which the block returns true. The block receives (key, value) as arguments.
+
+    var h = Hash(a => 1, b => 2, c => 3, d => 4)
+    var evens = h.grep { |k, v| v.is_even }
+    say evens  #=> Hash(b => 2, d => 4)
+
+This is the non-destructive version of C<delete_if>.
 
 Aliases: I<grep_kv>, I<select>
 
@@ -271,9 +437,13 @@ Aliases: I<grep_kv>, I<select>
 
 =head2 grep_v
 
-    self.grep_v(block)
+    hash.grep_v { |value| ... }
 
 Returns a new hash containing only the key-value pairs for which the block (called with value only) returns true.
+
+    var h = Hash(a => 1, b => 2, c => 3, d => 4)
+    var evens = h.grep_v { .is_even }
+    say evens  #=> Hash(b => 2, d => 4)
 
 Aliases: I<grep_val>
 
@@ -281,9 +451,15 @@ Aliases: I<grep_val>
 
 =head2 has
 
-    self.has(key)
+    hash.has(key)
 
 Returns true if the given key exists in the hash, false otherwise.
+
+    var h = Hash(a => 1, b => nil)
+    
+    say h.has(:a)  #=> true
+    say h.has(:b)  #=> true  (key exists even with nil value)
+    say h.has(:z)  #=> false
 
 Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
@@ -291,41 +467,70 @@ Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, 
 
 =head2 is_empty
 
-    self.is_empty
+    hash.is_empty
 
-Returns true if the hash contains no key-value pairs, false otherwise. 
+Returns true if the hash contains no key-value pairs, false otherwise.
+
+    var h1 = Hash()
+    var h2 = Hash(a => 1)
+    
+    say h1.is_empty  #=> true
+    say h2.is_empty  #=> false
 
 =cut
 
 =head2 item
 
-    self.item(key)
+    hash.item(key)
 
-Returns the value associated with the given key, or undef if the key doesn't exist. 
+Returns the value associated with the given key, or nil if the key doesn't exist.
+
+    var h = Hash(a => 1, b => 2)
+    
+    say h.item(:a)  #=> 1
+    say h.item(:z)  #=> nil
+
+This is equivalent to subscript notation: C<hash{key}>.
 
 =cut
 
 =head2 items
 
-    self.items(*keys)
+    hash.items(keys...)
 
-Returns an Array of values for the specified keys.  Returns undef for keys that don't exist. 
+Returns an Array of values for the specified keys. Returns nil for keys that don't exist.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    say h.items(:a, :c, :z)  #=> [1, 3, nil]
 
 =cut
 
 =head2 keys
 
-    self.keys
+    hash.keys
 
-Returns an Array containing all keys in the hash. 
+Returns an Array containing all keys in the hash.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    say h.keys  #=> [:a, :b, :c]
+
+Note: Hash keys are unordered, so the order of keys in the returned array is not guaranteed.
 
 =cut
 
 =head2 kv
 
-    self. kv
+    hash.kv
 
-Returns an Array of Pair objects, where each Pair contains a key and its associated value. 
+Returns an Array of Pair objects, where each Pair contains a key and its associated value.
+
+    var h = Hash(a => 1, b => 2)
+    say h.kv  #=> [Pair(:a, 1), Pair(:b, 2)]
+    
+    # Useful for iteration with destructuring
+    h.kv.each { |pair|
+        say "#{pair.key} => #{pair.value}"
+    }
 
 Aliases: I<to_a>, I<pairs>, I<to_array>
 
@@ -333,9 +538,12 @@ Aliases: I<to_a>, I<pairs>, I<to_array>
 
 =head2 len
 
-    self.len
+    hash.len
 
-Returns the number of key-value pairs in the hash. 
+Returns the number of key-value pairs in the hash.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    say h.len  #=> 3
 
 Aliases: I<size>, I<length>
 
@@ -343,9 +551,15 @@ Aliases: I<size>, I<length>
 
 =head2 lsel
 
-    self.lsel(keys)
+    hash.lsel(keys_array)
 
-Performs linear selection:  returns a new hash with the specified keys.  Keys that don't exist in the original hash will have nil values. 
+Performs linear selection: returns a new hash with the specified keys. Keys that don't exist in the original hash will have nil values in the result.
+
+    var h = Hash(a => 1, b => 2)
+    var selected = h.lsel([:a, :c])
+    say selected  #=> Hash(a => 1, c => nil)
+
+This differs from C<slice>, which omits missing keys.
 
 Aliases: I<linsel>, I<linear_selection>
 
@@ -353,9 +567,15 @@ Aliases: I<linsel>, I<linear_selection>
 
 =head2 map
 
-    self.map(block)
+    hash.map { |key, value| ... }
 
-Transforms the hash by calling the block with (key, value) for each pair. The block should return pairs of (new_key, new_value). Returns a new hash. 
+Transforms the hash by calling the block with (key, value) for each pair. The block should return a new key-value pair (as a two-element array or pair). Returns a new hash.
+
+    var h = Hash(a => 1, b => 2)
+    var mapped = h.map { |k, v|
+        (k.uc, v * 10)
+    }
+    say mapped  #=> Hash(A => 10, B => 20)
 
 Aliases: I<map_kv>
 
@@ -363,9 +583,17 @@ Aliases: I<map_kv>
 
 =head2 map_v
 
-    self.map_v(block)
+    hash.map_v { |key, value| ... }
 
-Returns a new hash with the same keys but with values transformed by the block.  The block receives (key, value) and should return the new value. 
+Returns a new hash with the same keys but with values transformed by the block. The block receives (key, value) and should return the new value.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    var doubled = h.map_v { |k, v| v * 2 }
+    say doubled  #=> Hash(a => 2, b => 4, c => 6)
+    
+    # Block can also take just the value
+    var squared = h.map_v { _1 ** 2 }
+    say squared  #=> Hash(a => 1, b => 4, c => 9)
 
 Aliases: I<map_val>
 
@@ -373,33 +601,54 @@ Aliases: I<map_val>
 
 =head2 max_by
 
-    self. max_by(block)
+    hash.max_by { |key, value| ... }
 
-Returns the key-value Pair for which the block returns the maximum value.  The block receives (key, value).
+Returns the key-value Pair for which the block returns the maximum value. The block receives (key, value).
+
+    var h = Hash(a => 3, b => 1, c => 5, d => 2)
+    var max_pair = h.max_by { |k, v| v }
+    say max_pair  #=> Pair(:c, 5)
 
 =cut
 
 =head2 merge_values
 
-    self.merge_values(obj)
+    hash.merge_values(other_hash)
 
-Updates values in the hash for keys that also exist in obj. Only existing keys are affected. Modifies and returns the hash. 
+Updates values in the hash for keys that also exist in the other hash. Only existing keys are affected (no new keys are added). Modifies and returns the hash.
+
+    var h1 = Hash(a => 1, b => 2, c => 3)
+    var h2 = Hash(b => 20, c => 30, d => 40)
+    
+    h1.merge_values(h2)
+    say h1  #=> Hash(a => 1, b => 20, c => 30)
+    
+Note: Key :d was not added because it didn't exist in h1.
 
 =cut
 
 =head2 min_by
 
-    self.min_by(block)
+    hash.min_by { |key, value| ... }
 
 Returns the key-value Pair for which the block returns the minimum value. The block receives (key, value).
+
+    var h = Hash(a => 3, b => 1, c => 5, d => 2)
+    var min_pair = h.min_by { |k, v| v }
+    say min_pair  #=> Pair(:b, 1)
 
 =cut
 
 =head2 new
 
-    self.new
+    Hash.new
+    Hash.new(pairs...)
 
-Creates and returns a new Hash object. 
+Creates and returns a new Hash object, optionally initialized with the given key-value pairs.
+
+    var h1 = Hash.new
+    var h2 = Hash.new(a => 1, b => 2)
+    var h3 = Hash(a => 1, b => 2)  # Shorthand
 
 Aliases: I<call>
 
@@ -407,57 +656,100 @@ Aliases: I<call>
 
 =head2 same_keys
 
-    self.same_keys(obj)
+    hash.same_keys(other)
 
-Returns true if the hash has exactly the same keys as the given object, false otherwise. 
+Returns true if the hash has exactly the same keys as the given object (another hash, array, or other iterable), false otherwise. Values are not compared.
+
+    var h1 = Hash(a => 1, b => 2)
+    var h2 = Hash(a => 10, b => 20)
+    var h3 = Hash(a => 1, c => 3)
+    
+    say h1.same_keys(h2)  #=> true
+    say h1.same_keys(h3)  #=> false
 
 =cut
 
 =head2 set_keys
 
-    self.set_keys(*keys)
+    hash.set_keys(keys...)
 
-Sets the specified keys with nil values and returns the hash. 
+Sets the specified keys with nil values and returns the hash. Modifies the hash in-place.
+
+    var h = Hash(a => 1)
+    h.set_keys(:b, :c)
+    say h  #=> Hash(a => 1, b => nil, c => nil)
+
+This is useful for initializing hash keys before setting their actual values.
 
 =cut
 
 =head2 slice
 
-    self.slice(*keys)
+    hash.slice(keys...)
 
-Returns a new hash containing only the specified keys and their values from the original hash. 
+Returns a new hash containing only the specified keys and their values from the original hash. Keys that don't exist in the original are omitted.
+
+    var h = Hash(a => 1, b => 2, c => 3, d => 4)
+    var subset = h.slice(:a, :c, :z)
+    say subset  #=> Hash(a => 1, c => 3)
+
+Note: Key :z was omitted because it doesn't exist in the original hash.
 
 =cut
 
 =head2 sort
 
-    self.sort(block)
+    hash.sort
+    hash.sort { |a, b| ... }
 
-Returns an Array of Pairs sorted by keys.  If a block is provided, uses it as a comparison function for sorting keys.
+Returns an Array of Pairs sorted by keys. If a block is provided, uses it as a comparison function for sorting keys.
+
+    var h = Hash(c => 3, a => 1, b => 2)
+    say h.sort  #=> [Pair(:a, 1), Pair(:b, 2), Pair(:c, 3)]
+    
+    # Custom sort
+    var rev = h.sort { |a, b| b <=> a }
+    say rev  #=> [Pair(:c, 3), Pair(:b, 2), Pair(:a, 1)]
 
 =cut
 
 =head2 sort_by
 
-    self.sort_by(block)
+    hash.sort_by { |key, value| ... }
 
-Returns an Array of Pairs sorted by the values returned by the block.  The block receives (key, value).
+Returns an Array of Pairs sorted by the values returned by the block. The block receives (key, value).
+
+    var h = Hash(a => 3, b => 1, c => 2)
+    var sorted = h.sort_by { |k, v| v }
+    say sorted  #=> [Pair(:b, 1), Pair(:c, 2), Pair(:a, 3)]
+    
+    # Sort by key length
+    var by_len = h.sort_by { |k, v| k.len }
 
 =cut
 
 =head2 to_bag
 
-    self.to_bag
+    hash.to_bag
 
-Converts the hash's keys to a Bag object. 
+Converts the hash's keys to a Bag object.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    var bag = h.to_bag
+    say bag  #=> Bag(:a, :b, :c)
+
+The hash values are ignored; only keys are used to create the Bag.
 
 =cut
 
 =head2 to_s
 
-    self.to_s
+    hash.to_s
 
-Returns a string representation of the hash. 
+Returns a string representation of the hash.
+
+    var h = Hash(a => 1, b => 2)
+    say h.to_s  #=> "Hash(a => 1, b => 2)"
 
 Aliases: I<dump>, I<to_str>
 
@@ -465,16 +757,89 @@ Aliases: I<dump>, I<to_str>
 
 =head2 to_set
 
-    self.to_set
+    hash.to_set
 
-Converts the hash's keys to a Set object. 
+Converts the hash's keys to a Set object.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    var set = h.to_set
+    say set  #=> Set(:a, :b, :c)
+
+The hash values are ignored; only keys are used to create the Set.
 
 =cut
 
 =head2 values
 
-    self.values
+    hash.values
 
 Returns an Array containing all values in the hash.
+
+    var h = Hash(a => 1, b => 2, c => 3)
+    say h.values  #=> [1, 2, 3]
+
+Note: Since hash keys are unordered, the order of values in the returned array is not guaranteed to match any particular order.
+
+=cut
+
+=head1 EXAMPLES
+
+=head2 Frequency Counting
+
+    var text = "hello world"
+    var freq = Hash()
+    
+    text.each_char { |char|
+        freq{char} := 0
+        freq{char}++
+    }
+    
+    say freq  #=> Hash(h => 1, e => 1, l => 3, ...)
+
+=head2 Grouping Data
+
+    var people = [
+        Hash(name => "Alice", age => 30),
+        Hash(name => "Bob", age => 25),
+        Hash(name => "Carol", age => 30)
+    ]
+    
+    var by_age = Hash()
+    people.each { |person|
+        var age = person{:age}
+        by_age{age} := []
+        by_age{age} << person
+    }
+
+=head2 Transforming Data
+
+    var prices = Hash(apple => 1.50, banana => 0.75, orange => 2.00)
+    
+    # Apply discount
+    var discounted = prices.map_v { _1 * 0.9 }
+    
+    # Filter expensive items
+    var expensive = prices.grep { |k, v| v > 1.00 }
+
+=head2 Merging with Custom Logic
+
+    var defaults = Hash(color => :red, size => :medium, count => 1)
+    var options = Hash(size => :large)
+    
+    # Keep defaults for missing keys
+    var config = defaults + options
+    say config  #=> Hash(color => :red, size => :large, count => 1)
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Array::Array>, L<Sidef::Types::Set::Set>, L<Sidef::Types::Bag::Bag>
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut
