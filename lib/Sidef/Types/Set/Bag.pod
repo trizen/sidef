@@ -2,240 +2,834 @@
 
 =head1 NAME
 
-Sidef::Types::Set::Bag - Multiset (Bag) data type
+Sidef::Types::Set::Bag - A multiset (bag) data structure for Sidef
 
 =head1 DESCRIPTION
 
-A C<Bag> is an unordered collection of elements that allows duplicate values.
-Unlike a L<Sidef::Types::Set::Set>, a Bag keeps track of how many times each
-element occurs.
+This class implements a multiset (also known as a bag), which is a collection that allows duplicate elements and tracks the frequency of each unique element. Unlike a regular Set where each element appears at most once, a Bag maintains a count for each element, making it useful for frequency analysis and operations that need to preserve multiplicity.
 
-In other words, a Bag is a I<multiset>. Each element has an associated
-I<multiplicity> (frequency). Most set-like operations are supported, but they
-take multiplicity into account.
-
-For example, the Bag:
-
-    Bag(1, 1, 2, 3)
-
-contains the element C<1> twice, and C<2> and C<3> once.
+A Bag is essentially a mapping from elements to their frequencies, where the frequency represents how many times each element appears in the collection.
 
 =head1 SYNOPSIS
 
     var a = Bag(1, 1, 2, 3)
-    var b = Bag(1, 3, 4)
+    var b = Bag(1, 4, 3, 5)
 
-    say a.len           # 4  (total number of elements)
-    say a.elems         # 3  (number of distinct elements)
+    say (a | b)     #=> Bag(1, 1, 2, 3, 4, 5)
+    say (a ^ b)     #=> Bag(1, 2, 4, 5)
+    say (a & b)     #=> Bag(1, 3)
+    say (a - b)     #=> Bag(1, 2)
+    say (a + b)     #=> Bag(1, 1, 1, 2, 3, 3, 4, 5)
 
-    say a.count(1)      # 2
-    say a.keys          # [1, 2, 3]
-    say a.freq          # [[1,2], [2,1], [3,1]]
+    say a.count(1)  #=> 2
+    say a.elems     #=> 3
+    say a.len       #=> 4
 
-    say a + b           # Bag(1,1,1,2,3,3,4)
-    say a & b           # Bag(1,3)
-    say a - b           # Bag(1,2)
-    say a | b           # Bag(1,1,2,3,4)
+    say a.keys      #=> [1, 2, 3]
+    say a.freq      #=> [[1, 2], [2, 1], [3, 1]]
 
 =head1 INHERITS
 
-This class inherits from:
+Inherits methods from:
 
-=over 4
-
-=item *
-
-L<Sidef::Types::Set::Set>
-
-=back
-
-=head1 OPERATORS
-
-The following operators are supported for Bag objects.
-
-=over 4
-
-=item C<a + b>
-
-Returns the I<multiset sum> of C<a> and C<b>. All elements from both bags are
-included, preserving their multiplicities.
-
-Alias: C<concat>, C<union_all>
-
-=item C<a & b>
-
-Returns the I<intersection> of C<a> and C<b>.  
-Each element appears the minimum number of times it occurs in both bags.
-
-Alias: C<intersection>, C<and>, C<∩>
-
-=item C<a | b>
-
-Returns the I<union> of C<a> and C<b>.  
-Each element appears the maximum number of times it occurs in either bag.
-
-Alias: C<union>, C<∪>
-
-=item C<a - b>
-
-Returns the I<difference> of C<a> and C<b>.  
-Elements from C<b> are removed from C<a> according to their multiplicities.
-
-Alias: C<difference>, C<∖>
-
-=item C<a ^ b>
-
-Returns the I<symmetric difference> of C<a> and C<b>.
-
-Alias: C<xor>
-
-=item C<a << b>
-
-Appends all elements from C<b> into C<a>.
-
-Alias: C<append>, C<push>
-
-=item C<a == b>
-
-Returns true if both bags contain the same elements with the same
-multiplicities.
-
-Alias: C<eq>, C<≡>
-
-=item C<a != b>
-
-Returns true if the two bags are not equal.
-
-Alias: C<ne>, C<≠>
-
-=item C<a <= b>
-
-Returns true if C<a> is a I<sub-bag> of C<b>, meaning that every element in
-C<a> occurs no more times than in C<b>.
-
-Alias: C<le>, C<⊆>
-
-=item C<a >= b>
-
-Returns true if C<a> is a I<super-bag> of C<b>.
-
-Alias: C<ge>, C<⊇>
-
-=item C<a ∋ x>
-
-Returns true if element C<x> exists in C<a>.
-
-Alias: C<contains>, C<has>
-
-=item C<a ∌ x>
-
-Returns true if element C<x> does not exist in C<a>.
-
-Alias: C<not_contains>
-
-=back
+       * Sidef::Types::Set::Set
 
 =head1 METHODS
 
-=head2 add_kv(obj, count)
+=head2 &
 
-Adds C<count> occurrences of C<obj> to the bag.
+    a & b
 
-Returns the bag itself.
+Returns the intersection of two bags. The resulting bag contains elements that appear in both bags, with the frequency being the minimum of the frequencies in the two bags.
 
-=head2 add_kvs(*pairs)
+Example:
 
-Adds multiple C<(object, count)> pairs to the bag.
+    Bag(1, 1, 2, 3) & Bag(1, 2, 2, 4)  #=> Bag(1, 2)
+
+Aliases: I<∩>, I<and>, I<intersection>
+
+=cut
+
+=head2 +
+
+    a + b
+
+Returns the sum (concatenation) of two bags. The resulting bag contains all elements from both bags, with frequencies added together.
+
+Example:
+
+    Bag(1, 2) + Bag(2, 3)  #=> Bag(1, 2, 2, 3)
+
+Aliases: I<concat>
+
+=cut
+
+=head2 -
+
+    a - b
+
+Returns the difference of two bags. The resulting bag contains elements from the first bag with their frequencies reduced by the frequencies in the second bag. Elements are removed entirely if their frequency becomes zero or negative.
+
+Example:
+
+    Bag(1, 1, 2, 3) - Bag(1, 3)  #=> Bag(1, 2)
+
+Aliases: I<∖>, I<sub>, I<diff>, I<difference>
+
+=cut
+
+=head2 ...
+
+    a ... b
+
+Returns an array containing all elements from the bag expanded according to their frequencies, up to the range specified.
+
+Aliases: I<to_list>
+
+=cut
+
+=head2 <<
+
+    a << b
+
+Adds an element to the bag, incrementing its frequency by 1. Returns the modified bag.
+
+Example:
+
+    var bag = Bag(1, 2)
+    bag << 2              #=> Bag(1, 2, 2)
+
+Aliases: I<add>, I<push>, I<append>
+
+=cut
+
+=head2 ^
+
+    a ^ b
+
+Returns the symmetric difference of two bags. The resulting bag contains elements that appear in either bag but not in both (with equal frequency). Frequencies are calculated as the absolute difference.
+
+Example:
+
+    Bag(1, 1, 2) ^ Bag(1, 3)  #=> Bag(1, 2, 3)
+
+Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
+
+=cut
+
+=head2 |
+
+    a | b
+
+Returns the union of two bags. The resulting bag contains all elements from both bags, with the frequency being the maximum of the frequencies in the two bags.
+
+Example:
+
+    Bag(1, 1, 2) | Bag(1, 3, 3)  #=> Bag(1, 1, 2, 3, 3)
+
+Aliases: I<∪>, I<or>, I<union>
+
+=cut
+
+=head2 ∋
+
+    a ∋ b
+
+Returns true if the bag contains the specified element (at least once), false otherwise.
+
+Example:
+
+    Bag(1, 2, 3) ∋ 2  #=> true
+    Bag(1, 2, 3) ∋ 5  #=> false
+
+Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 ∌
+
+    a ∌ b
+
+Returns true if the bag does not contain the specified element, false otherwise. This is the negation of the ∋ operator.
+
+Example:
+
+    Bag(1, 2, 3) ∌ 5  #=> true
+    Bag(1, 2, 3) ∌ 2  #=> false
+
+=cut
+
+=head2 ≠
+
+    a ≠ b
+
+Returns true if two bags are not equal (contain different elements or different frequencies), false otherwise.
+
+Example:
+
+    Bag(1, 2) ≠ Bag(1, 2, 2)  #=> true
+
+Aliases: I<!=>, I<ne>
+
+=cut
+
+=head2 ≡
+
+    a ≡ b
+
+Returns true if two bags are equal (contain the same elements with the same frequencies), false otherwise.
+
+Example:
+
+    Bag(1, 2, 2) ≡ Bag(2, 1, 2)  #=> true
+
+Aliases: I<==>, I<eq>
+
+=cut
+
+=head2 ≤
+
+    a ≤ b
+
+Returns true if bag 'a' is a subset of bag 'b' (every element in 'a' appears in 'b' with at least the same frequency), false otherwise.
+
+Example:
+
+    Bag(1, 2) ≤ Bag(1, 2, 2, 3)  #=> true
+
+Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
+
+=cut
+
+=head2 ≥
+
+    a ≥ b
+
+Returns true if bag 'a' is a superset of bag 'b' (every element in 'b' appears in 'a' with at least the same frequency), false otherwise.
+
+Example:
+
+    Bag(1, 2, 2, 3) ≥ Bag(1, 2)  #=> true
+
+Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
+
+=cut
+
+=head2 add_kv
+
+    self.add_kv(obj, n)
+
+Adds an element to the bag with a specific frequency increment. Increases the frequency of 'obj' by 'n'. Returns the modified bag.
+
+Example:
+
+    var bag = Bag(1, 2)
+    bag.add_kv(2, 3)  #=> Bag(1, 2, 2, 2, 2)
+
+Aliases: I<push_kv>, I<add_pair>, I<append_kv>, I<push_pair>, I<append_pair>
+
+=cut
+
+=head2 add_kvs
+
+    self.add_kvs(*pairs)
+
+Adds multiple elements with their frequencies to the bag. Accepts pairs of [element, frequency] as arguments. Returns the modified bag.
+
+Example:
+
+    var bag = Bag(1)
+    bag.add_kvs([2, 3], [3, 2])  #=> Bag(1, 2, 2, 2, 3, 3)
+
+Aliases: I<push_kvs>, I<add_pairs>, I<append_kvs>, I<push_pairs>, I<append_pairs>
+
+=cut
 
 =head2 clone
 
-Returns a shallow copy of the bag.
+    self.clone
 
-=head2 collect(block)
+Returns a shallow copy of the bag with the same elements and frequencies.
 
-Applies C<block> to each element and returns a new Bag with the results.
+Example:
 
-=head2 contains_all(*objects)
+    var a = Bag(1, 2, 3)
+    var b = a.clone
+    b << 4
+    say a  #=> Bag(1, 2, 3)
+    say b  #=> Bag(1, 2, 3, 4)
 
-Returns true if all listed objects exist in the bag (ignores multiplicity).
+=cut
 
-=head2 count(obj)
+=head2 collect
 
-Returns the number of times C<obj> occurs in the bag.
+    self.collect(block)
 
-Alias: C<get>
+Applies a transformation block to each element in the bag (respecting multiplicity) and returns a new bag with the transformed elements.
 
-=head2 count_by(block)
+Example:
 
-Returns a new Bag that counts elements based on the value returned by
-C<block>.
+    Bag(1, 2, 2).collect { _ * 2 }  #=> Bag(2, 4, 4)
 
-=head2 delete(*objects)
+=cut
 
-Deletes one occurrence of each listed object from the bag.
+=head2 contains_all
 
-Alias: C<remove>
+    self.contains_all(*objects)
 
-=head2 delete_all(*objects)
+Returns true if the bag contains all of the specified objects (at least once each), false otherwise.
 
-Deletes all occurrences of the listed objects from the bag.
+Example:
 
-=head2 delete_if(block)
+    Bag(1, 2, 3, 3).contains_all(1, 3)  #=> true
+    Bag(1, 2, 3).contains_all(1, 4)     #=> false
 
-Deletes all elements for which C<block> returns true.
+=cut
+
+=head2 count_by
+
+    self.count_by(block)
+
+Groups elements by the result of applying the block to each element (respecting multiplicity) and returns a new bag where keys are the block results and frequencies are the counts.
+
+Example:
+
+    Bag(1, 2, 3, 4).count_by { _ % 2 }  #=> Bag(0, 0, 1, 1)
+
+=cut
+
+=head2 delete
+
+    self.delete(*objects)
+
+Removes one occurrence of each specified object from the bag. Decrements the frequency by 1 for each object. Returns the modified bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).delete(1, 2)  #=> Bag(1, 3)
+
+Aliases: I<remove>, I<discard>
+
+=cut
+
+=head2 delete_all
+
+    self.delete_all(*objects)
+
+Removes all occurrences of each specified object from the bag. Returns the modified bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).delete_all(1, 2)  #=> Bag(3)
+
+Aliases: I<remove_all>, I<discard_all>
+
+=cut
+
+=head2 delete_first_if
+
+    self.delete_first_if(block)
+
+Removes the first element (according to iteration order) that satisfies the condition in the block. Decrements its frequency by 1. Returns the modified bag.
+
+Example:
+
+    Bag(1, 2, 3, 4).delete_first_if { _ > 2 }  #=> Bag(1, 2, 4)
+
+=cut
+
+=head2 delete_if
+
+    self.delete_if(block)
+
+Removes all elements that satisfy the condition in the block. Removes all occurrences of matching elements. Returns the modified bag.
+
+Example:
+
+    Bag(1, 2, 2, 3, 4).delete_if { _ % 2 == 0 }  #=> Bag(1, 3)
+
+=cut
+
+=head2 delete_key
+
+    self.delete_key(obj)
+
+Completely removes the specified key (element) from the bag along with all its occurrences. Returns the modified bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).delete_key(1)  #=> Bag(2, 3)
+
+Aliases: I<remove_key>, I<discard_key>
+
+=cut
+
+=head2 dump
+
+    self.dump
+
+Returns a string representation of the bag suitable for debugging or serialization, showing the internal structure.
+
+Example:
+
+    Bag(1, 2, 2).dump  #=> "Bag(1, 2, 2)"
+
+=cut
+
+=head2 each
+
+    self.each(block)
+
+Iterates over each element in the bag (respecting multiplicity) and executes the block for each occurrence. Returns the bag.
+
+Example:
+
+    Bag(1, 2, 2).each { say _ }
+    # Prints: 1, 2, 2
+
+=cut
+
+=head2 each_2d
+
+    self.each_2d(block)
+
+Iterates over the bag as a 2D structure, passing pairs of [element, frequency] to the block. Returns the bag.
+
+Example:
+
+    Bag(1, 2, 2).each_2d { |k, v| say "#{k}: #{v}" }
+    # Prints: 1: 1, 2: 2
+
+=cut
+
+=head2 each_kv
+
+    self.each_kv(block)
+
+Iterates over key-value pairs in the bag, passing the element and its frequency to the block. Returns the bag.
+
+Example:
+
+    Bag(1, 2, 2, 3).each_kv { |k, v| say "#{k} appears #{v} times" }
+
+=cut
 
 =head2 elems
 
-Returns the number of distinct elements in the bag.
+    self.elems
+
+Returns the number of unique elements (distinct keys) in the bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).elems  #=> 3
+
+Aliases: I<keys_len>
+
+=cut
 
 =head2 freq
 
-Returns an array of C<[key, count]> pairs.
+    self.freq
+
+Returns an array of [element, frequency] pairs for all elements in the bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).freq  #=> [[1, 2], [2, 1], [3, 1]]
+
+=cut
+
+=head2 get
+
+    self.get(obj)
+
+Returns the frequency (count) of the specified element in the bag. Returns 0 if the element is not present.
+
+Example:
+
+    Bag(1, 1, 2, 3).get(1)  #=> 2
+    Bag(1, 1, 2, 3).get(5)  #=> 0
+
+Aliases: I<count>
+
+=cut
+
+=head2 grep
+
+    self.grep(block)
+
+Returns a new bag containing only the elements (with their frequencies) that satisfy the condition in the block.
+
+Example:
+
+    Bag(1, 2, 2, 3, 4).grep { _ % 2 == 0 }  #=> Bag(2, 2, 4)
+
+Aliases: I<select>
+
+=cut
+
+=head2 grep_2d
+
+    self.grep_2d(block)
+
+Filters the bag by applying the block to [element, frequency] pairs. Returns a new bag with pairs that satisfy the condition.
+
+Example:
+
+    Bag(1, 2, 2, 3).grep_2d { |k, v| v > 1 }  #=> Bag(2, 2)
+
+=cut
+
+=head2 grep_kv
+
+    self.grep_kv(block)
+
+Filters the bag by applying the block to element-frequency pairs. Returns a new bag with elements whose key-value pairs satisfy the condition.
+
+Example:
+
+    Bag(1, 2, 2, 3, 3, 3).grep_kv { |k, v| k == v }  #=> Bag(3, 3, 3)
+
+=cut
+
+=head2 iter
+
+    self.iter
+
+Returns an iterator object that can be used to iterate over the elements in the bag (respecting multiplicity).
+
+Example:
+
+    var iter = Bag(1, 2, 2).iter
+    say iter.next  #=> 1
+    say iter.next  #=> 2
+    say iter.next  #=> 2
+
+=cut
+
+=head2 join
+
+    self.join(*rest)
+
+Converts the bag elements to strings and joins them using the specified separator. Multiple arguments are treated as additional separators for nested structures.
+
+Example:
+
+    Bag(1, 2, 2, 3).join(", ")  #=> "1, 2, 2, 3"
+
+=cut
 
 =head2 keys
 
-Returns an array of distinct elements in the bag.
+    self.keys
+
+Returns an array of unique elements (keys) in the bag, without their frequencies.
+
+Example:
+
+    Bag(1, 1, 2, 3).keys  #=> [1, 2, 3]
+
+=cut
+
+=head2 kv
+
+    self.kv
+
+Returns an array of [element, frequency] pairs for all elements in the bag. Similar to freq().
+
+Example:
+
+    Bag(1, 1, 2).kv  #=> [[1, 2], [2, 1]]
+
+Aliases: I<pairs>
+
+=cut
 
 =head2 len
 
-Returns the total number of elements, including duplicates.
+    self.len
+
+Returns the total number of elements in the bag, counting multiplicities (sum of all frequencies).
+
+Example:
+
+    Bag(1, 1, 2, 3).len  #=> 4
+
+Aliases: I<size>, I<length>
+
+=cut
+
+=head2 map
+
+    self.map(block)
+
+Applies the block to each element in the bag (respecting multiplicity) and returns a new bag with the results.
+
+Example:
+
+    Bag(1, 2, 2).map { _ * 2 }  #=> Bag(2, 4, 4)
+
+=cut
+
+=head2 map_2d
+
+    self.map_2d(block)
+
+Applies the block to [element, frequency] pairs and returns a new bag constructed from the results.
+
+Example:
+
+    Bag(1, 2, 2).map_2d { |k, v| [k * 2, v] }  #=> Bag(2, 4, 4)
+
+=cut
+
+=head2 map_kv
+
+    self.map_kv(block)
+
+Applies the block to element-frequency pairs and returns a new bag constructed from the results.
+
+Example:
+
+    Bag(1, 2).map_kv { |k, v| [k + 1, v * 2] }  #=> Bag(2, 2, 3, 3)
+
+=cut
+
+=head2 max
+
+    self.max
+
+Returns the maximum element in the bag (ignoring frequencies).
+
+Example:
+
+    Bag(1, 5, 3, 3).max  #=> 5
+
+=cut
+
+=head2 max_by
+
+    self.max_by(block)
+
+Returns the element for which the block returns the maximum value (ignoring frequencies).
+
+Example:
+
+    Bag(1, 2, 3).max_by { _ * -1 }  #=> 1
+
+=cut
+
+=head2 min
+
+    self.min
+
+Returns the minimum element in the bag (ignoring frequencies).
+
+Example:
+
+    Bag(5, 1, 3, 3).min  #=> 1
+
+=cut
+
+=head2 min_by
+
+    self.min_by(block)
+
+Returns the element for which the block returns the minimum value (ignoring frequencies).
+
+Example:
+
+    Bag(1, 2, 3).min_by { _ * -1 }  #=> 3
+
+=cut
+
+=head2 new
+
+    self.new
+
+Creates a new empty bag, or a bag initialized with the provided elements.
+
+Example:
+
+    var bag = Bag.new
+    var bag2 = Bag.new(1, 2, 2, 3)  #=> Bag(1, 2, 2, 3)
+
+Aliases: I<call>
+
+=cut
+
+=head2 pop
+
+    self.pop
+
+Removes and returns an arbitrary element from the bag. Decrements its frequency by 1. The bag must not be empty.
+
+Example:
+
+    var bag = Bag(1, 2, 2)
+    bag.pop  #=> returns one element, e.g., 1
+
+=cut
+
+=head2 set_kv
+
+    self.set_kv(obj, n)
+
+Sets the frequency of an element to a specific value. If n is 0 or negative, the element is removed. Returns the modified bag.
+
+Example:
+
+    var bag = Bag(1, 2, 2)
+    bag.set_kv(2, 5)  #=> Bag(1, 2, 2, 2, 2, 2)
+
+Aliases: I<update_kv>, I<update_pair>, I<replace_pair>
+
+=cut
+
+=head2 set_kvs
+
+    self.set_kvs(*pairs)
+
+Sets the frequencies of multiple elements. Accepts pairs of [element, frequency]. Returns the modified bag.
+
+Example:
+
+    var bag = Bag(1)
+    bag.set_kvs([1, 3], [2, 2])  #=> Bag(1, 1, 1, 2, 2)
+
+Aliases: I<update_kvs>, I<update_pairs>, I<replace_pairs>
+
+=cut
+
+=head2 shift
+
+    self.shift
+
+Removes and returns an arbitrary element from the bag (typically the first in iteration order). Decrements its frequency by 1. The bag must not be empty.
+
+Example:
+
+    var bag = Bag(1, 2, 2)
+    bag.shift  #=> returns one element, e.g., 1
+
+=cut
+
+=head2 sort
+
+    self.sort(block)
+
+Returns an array of elements sorted according to the optional comparison block. Elements are expanded according to their frequencies.
+
+Example:
+
+    Bag(3, 1, 2, 2).sort  #=> [1, 2, 2, 3]
+    Bag(3, 1, 2).sort { |a, b| b <=> a }  #=> [3, 2, 1]
+
+=cut
+
+=head2 sort_by
+
+    self.sort_by(block)
+
+Returns an array of elements sorted by the result of applying the block to each element. Elements are expanded according to their frequencies.
+
+Example:
+
+    Bag(1, 2, 3, 3).sort_by { _ * -1 }  #=> [3, 3, 2, 1]
+
+=cut
 
 =head2 to_a
 
-Returns an array containing all elements, including duplicates.
+    self.to_a
 
-=head2 to_set
+Converts the bag to an array, expanding all elements according to their frequencies.
 
-Converts the bag into a L<Sidef::Types::Set::Set>, discarding multiplicities.
+Example:
+
+    Bag(1, 2, 2, 3).to_a  #=> [1, 2, 2, 3]
+
+Aliases: I<expand>, I<to_array>
+
+=cut
 
 =head2 to_bag
 
-Returns the bag itself.
+    self.to_bag
 
-=head1 EXAMPLES
+Returns the bag itself (identity operation).
 
-    var bag = Bag("a", "a", "b")
+Example:
 
-    bag.add_kv("c", 3)
-    say bag.freq
-    # [["a",2], ["b",1], ["c",3]]
+    var bag = Bag(1, 2, 3)
+    bag.to_bag  #=> Bag(1, 2, 3)
 
-    bag.delete("a")
-    say bag.count("a")
-    # 1
+=cut
+
+=head2 top
+
+    self.top(n)
+
+Returns an array of the top n most common elements with their frequencies, as [element, frequency] pairs, sorted by frequency in descending order.
+
+Example:
+
+    Bag(1, 2, 2, 3, 3, 3).top(2)  #=> [[3, 3], [2, 2]]
+
+Aliases: I<most_common>
+
+=cut
+
+=head2 to_set
+
+    self.to_set
+
+Converts the bag to a set, discarding frequency information and keeping only unique elements.
+
+Example:
+
+    Bag(1, 1, 2, 3).to_set  #=> Set(1, 2, 3)
+
+=cut
+
+=head2 uniq
+
+    self.uniq
+
+Returns a new bag with all elements having a frequency of 1 (effectively converting it to behave like a set while maintaining bag type).
+
+Example:
+
+    Bag(1, 1, 2, 3, 3).uniq  #=> Bag(1, 2, 3)
+
+Aliases: I<unique>
+
+=cut
+
+=head2 values
+
+    self.values
+
+Returns an array of all frequency values in the bag.
+
+Example:
+
+    Bag(1, 1, 2, 3).values  #=> [2, 1, 1]
+
+=cut
 
 =head1 SEE ALSO
 
-=over 4
-
-=item *
-
 L<Sidef::Types::Set::Set>
 
-=item *
+=head1 AUTHOR
 
-Multiset (Bag) data structure
+Daniel "Trizen" Șuteu
 
-=back
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
 
 =cut
