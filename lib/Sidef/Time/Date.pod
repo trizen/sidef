@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,12 +6,13 @@ Sidef::Time::Date
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements date and time manipulation functionality in Sidef. It provides methods for creating, parsing, formatting, and performing arithmetic operations on dates and times. The Date class wraps time values and provides convenient methods for working with various date components like year, month, day, hour, minute, and second.
 
 =head1 SYNOPSIS
 
-var obj = Date(...)
-
+    var obj = Date()                    # Current date/time
+    var date = Date(2024, 12, 25)      # Specific date
+    var parsed = Date.parse("2024-12-25", "%Y-%m-%d")
 
 =head1 INHERITS
 
@@ -26,7 +26,7 @@ Inherits methods from:
 
     a != b
 
-Returns the
+Returns true if two dates are not equal, false otherwise. Compares the date/time values to determine inequality.
 
 Aliases: I<ne>
 
@@ -36,7 +36,7 @@ Aliases: I<ne>
 
     a + b
 
-Returns the
+Returns a new Date object with the specified number of seconds added to the current date. The parameter C<b> should be a numeric value representing seconds.
 
 Aliases: I<add>, I<add_seconds>
 
@@ -46,7 +46,7 @@ Aliases: I<add>, I<add_seconds>
 
     a - b
 
-Returns the
+Returns a new Date object with the specified number of seconds subtracted from the current date, or the difference in seconds between two dates if C<b> is a Date object.
 
 Aliases: I<sub>, I<subtract>
 
@@ -56,7 +56,7 @@ Aliases: I<sub>, I<subtract>
 
     a < b
 
-Returns the
+Returns true if date C<a> is earlier than date C<b>, false otherwise. Performs chronological comparison.
 
 Aliases: I<lt>
 
@@ -66,7 +66,7 @@ Aliases: I<lt>
 
     a <= b
 
-Returns the
+Returns true if date C<a> is earlier than or equal to date C<b>, false otherwise.
 
 Aliases: I<le>
 
@@ -76,7 +76,7 @@ Aliases: I<le>
 
     a <=> b
 
-Returns the
+Returns -1 if C<a> is earlier than C<b>, 0 if they are equal, or 1 if C<a> is later than C<b>. Standard three-way comparison operator.
 
 Aliases: I<cmp>
 
@@ -86,7 +86,7 @@ Aliases: I<cmp>
 
     a == b
 
-Returns the
+Returns true if two dates represent the same moment in time, false otherwise.
 
 Aliases: I<eq>
 
@@ -96,7 +96,7 @@ Aliases: I<eq>
 
     a > b
 
-Returns the
+Returns true if date C<a> is later than date C<b>, false otherwise.
 
 Aliases: I<gt>
 
@@ -106,7 +106,7 @@ Aliases: I<gt>
 
     a >= b
 
-Returns the
+Returns true if date C<a> is later than or equal to date C<b>, false otherwise.
 
 Aliases: I<ge>
 
@@ -116,7 +116,7 @@ Aliases: I<ge>
 
     self.add_days(days)
 
-Returns the
+Returns a new Date object with the specified number of days added to the current date. Accepts both positive and negative values.
 
 =cut
 
@@ -124,7 +124,7 @@ Returns the
 
     self.add_months(months)
 
-Returns the
+Returns a new Date object with the specified number of months added to the current date. Handles month overflow correctly (e.g., adding 1 month to January 31 results in February 28/29).
 
 =cut
 
@@ -132,7 +132,7 @@ Returns the
 
     self.add_years(years)
 
-Returns the
+Returns a new Date object with the specified number of years added to the current date. Preserves the month and day where possible.
 
 =cut
 
@@ -140,7 +140,7 @@ Returns the
 
     self.call
 
-Returns the
+Returns the current date/time as a new Date object. Allows Date to be called as a function.
 
 =cut
 
@@ -148,7 +148,7 @@ Returns the
 
     self.date
 
-Returns the
+Returns the date portion of the Date object, typically as a formatted string or date-only representation.
 
 =cut
 
@@ -156,7 +156,7 @@ Returns the
 
     self.day
 
-Returns the
+Returns the day of the month (1-31) for the current Date object.
 
 Aliases: I<mday>, I<month_day>
 
@@ -166,7 +166,7 @@ Aliases: I<mday>, I<month_day>
 
     self.dmy
 
-Returns the
+Returns the date in day-month-year format as a string (e.g., "25-12-2024").
 
 =cut
 
@@ -174,7 +174,7 @@ Returns the
 
     self.dump
 
-Returns the
+Returns a string representation of the Date object suitable for debugging, showing its internal structure.
 
 =cut
 
@@ -182,7 +182,7 @@ Returns the
 
     self.epoch
 
-Returns the
+Returns the Unix epoch time (number of seconds since January 1, 1970, 00:00:00 UTC) as a number.
 
 =cut
 
@@ -190,7 +190,7 @@ Returns the
 
     self.format(format)
 
-Returns the
+Returns a formatted string representation of the date according to the specified format string. Uses strftime-style format specifiers (e.g., "%Y-%m-%d %H:%M:%S").
 
 Aliases: I<strftime>
 
@@ -200,7 +200,7 @@ Aliases: I<strftime>
 
     self.fullmonth
 
-Returns the
+Returns the full name of the month (e.g., "January", "February", "December").
 
 =cut
 
@@ -208,7 +208,7 @@ Returns the
 
     self.gmt(sec)
 
-Returns the
+Returns a new Date object representing the specified number of seconds since the Unix epoch, interpreted as GMT/UTC time.
 
 Aliases: I<gmtime>
 
@@ -218,7 +218,7 @@ Aliases: I<gmtime>
 
     self.hour
 
-Returns the
+Returns the hour component (0-23) of the Date object.
 
 =cut
 
@@ -226,7 +226,7 @@ Returns the
 
     self.isdst
 
-Returns the
+Returns true if daylight saving time is in effect for this date, false otherwise.
 
 Aliases: I<daylight_savings>
 
@@ -236,7 +236,7 @@ Aliases: I<daylight_savings>
 
     self.julian_day
 
-Returns the
+Returns the Julian Day Number, which is the continuous count of days since the beginning of the Julian Period (January 1, 4713 BC).
 
 =cut
 
@@ -244,7 +244,7 @@ Returns the
 
     self.local(sec)
 
-Returns the
+Returns a new Date object representing the specified number of seconds since the Unix epoch, interpreted as local time.
 
 Aliases: I<localtime>
 
@@ -254,7 +254,7 @@ Aliases: I<localtime>
 
     self.mdy
 
-Returns the
+Returns the date in month-day-year format as a string (e.g., "12-25-2024").
 
 =cut
 
@@ -262,7 +262,7 @@ Returns the
 
     self.min
 
-Returns the
+Returns the minute component (0-59) of the Date object.
 
 Aliases: I<minute>
 
@@ -272,7 +272,7 @@ Aliases: I<minute>
 
     self.mon
 
-Returns the
+Returns the month number (1-12) of the Date object, where 1 is January and 12 is December.
 
 Aliases: I<month>
 
@@ -282,7 +282,7 @@ Aliases: I<month>
 
     self.monname
 
-Returns the
+Returns the abbreviated name of the month (e.g., "Jan", "Feb", "Dec").
 
 =cut
 
@@ -290,7 +290,7 @@ Returns the
 
     self.month_last_day
 
-Returns the
+Returns the last day of the month for the current Date object (e.g., 28, 29, 30, or 31 depending on the month and year).
 
 =cut
 
@@ -298,7 +298,7 @@ Returns the
 
     self.now
 
-Returns the
+Returns a new Date object representing the current date and time.
 
 Aliases: I<today>
 
@@ -308,7 +308,7 @@ Aliases: I<today>
 
     self.parse(string, format)
 
-Returns the
+Returns a new Date object by parsing the given string according to the specified format. Uses strptime-style format specifiers.
 
 Aliases: I<strptime>
 
@@ -318,7 +318,7 @@ Aliases: I<strptime>
 
     self.sec
 
-Returns the
+Returns the seconds component (0-59) of the Date object.
 
 Aliases: I<second>
 
@@ -328,7 +328,7 @@ Aliases: I<second>
 
     self.time
 
-Returns the
+Returns the time portion of the Date object as a formatted string or time representation.
 
 =cut
 
@@ -336,7 +336,7 @@ Returns the
 
     self.to_s
 
-Returns the
+Returns a string representation of the Date object in a standard format (typically "Day Mon DD HH:MM:SS YYYY").
 
 Aliases: I<cdate>, I<ctime>, I<to_str>
 
@@ -346,7 +346,7 @@ Aliases: I<cdate>, I<ctime>, I<to_str>
 
     self.truncate_to_day
 
-Returns the
+Returns a new Date object with the time components (hours, minutes, seconds) set to zero, keeping only the date portion.
 
 =cut
 
@@ -354,7 +354,7 @@ Returns the
 
     self.truncate_to_hour
 
-Returns the
+Returns a new Date object with the minutes and seconds set to zero, preserving the date and hour.
 
 =cut
 
@@ -362,7 +362,7 @@ Returns the
 
     self.truncate_to_minute
 
-Returns the
+Returns a new Date object with the seconds set to zero, preserving the date, hour, and minute.
 
 =cut
 
@@ -370,7 +370,7 @@ Returns the
 
     self.truncate_to_month
 
-Returns the
+Returns a new Date object truncated to the first day of the month at midnight (day set to 1, time components set to zero).
 
 =cut
 
@@ -378,7 +378,7 @@ Returns the
 
     self.truncate_to_quarter
 
-Returns the
+Returns a new Date object truncated to the first day of the quarter (January 1, April 1, July 1, or October 1) at midnight.
 
 =cut
 
@@ -386,7 +386,7 @@ Returns the
 
     self.truncate_to_second
 
-Returns the
+Returns a new Date object with subsecond precision removed (if any), keeping only whole seconds.
 
 =cut
 
@@ -394,7 +394,7 @@ Returns the
 
     self.truncate_to_year
 
-Returns the
+Returns a new Date object truncated to January 1 of the current year at midnight.
 
 =cut
 
@@ -402,7 +402,7 @@ Returns the
 
     self.valid(string, format)
 
-Returns the
+Returns true if the given string represents a valid date according to the specified format, false otherwise. Useful for validation before parsing.
 
 Aliases: I<valid_date>
 
@@ -412,7 +412,7 @@ Aliases: I<valid_date>
 
     self.wday
 
-Returns the
+Returns the day of the week (0-6) where 0 is Sunday and 6 is Saturday.
 
 Aliases: I<week_day>
 
@@ -422,7 +422,7 @@ Aliases: I<week_day>
 
     self.wdayname
 
-Returns the
+Returns the name of the day of the week (e.g., "Monday", "Tuesday", "Sunday").
 
 =cut
 
@@ -430,7 +430,7 @@ Returns the
 
     self.week
 
-Returns the
+Returns the week number of the year (typically 1-53) according to ISO 8601 or similar week numbering system.
 
 =cut
 
@@ -438,7 +438,7 @@ Returns the
 
     self.yday
 
-Returns the
+Returns the day of the year (1-366), where January 1 is day 1.
 
 Aliases: I<year_day>
 
@@ -448,7 +448,7 @@ Aliases: I<year_day>
 
     self.year
 
-Returns the
+Returns the four-digit year of the Date object.
 
 =cut
 
@@ -456,7 +456,7 @@ Returns the
 
     self.ymd
 
-Returns the
+Returns the date in year-month-day format as a string (e.g., "2024-12-25").
 
 =cut
 
@@ -464,6 +464,43 @@ Returns the
 
     self.yy
 
-Returns the
+Returns the two-digit year representation (e.g., "24" for 2024).
+
+=cut
+
+=head1 EXAMPLES
+
+    # Create a date object
+    var now = Date.now
+    say now.year        # Current year
+    say now.month       # Current month
+    say now.day         # Current day
+
+    # Format dates
+    say now.format("%Y-%m-%d %H:%M:%S")
+    say now.ymd         # ISO date format
+    say now.dmy         # Day-Month-Year
+
+    # Date arithmetic
+    var tomorrow = now.add_days(1)
+    var next_month = now.add_months(1)
+    var last_year = now.add_years(-1)
+
+    # Parse dates
+    var date = Date.parse("2024-12-25", "%Y-%m-%d")
+    say date.wdayname   # Day of week name
+
+    # Compare dates
+    if (date1 < date2) {
+        say "date1 is earlier"
+    }
+
+    # Truncate dates
+    var start_of_day = now.truncate_to_day
+    var start_of_month = now.truncate_to_month
+
+=head1 SEE ALSO
+
+L<Sidef::Object::Object>
 
 =cut
