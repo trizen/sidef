@@ -1,18 +1,38 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Glob::SocketHandle
+Sidef::Types::Glob::SocketHandle - Socket handle interface for network programming
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements a socket handle interface for network communication in Sidef. It provides methods for creating and managing network sockets, supporting both client and server operations over TCP/IP and other protocols. SocketHandle wraps Perl's socket functionality and provides a Sidef-friendly API for network programming.
 
 =head1 SYNOPSIS
 
-var obj = SocketHandle(...)
-
+    # Create a server socket
+    var server = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, Socket.IPPROTO_TCP)
+    server.bind(Socket.pack_sockaddr_in(8080, Socket.INADDR_ANY))
+    server.listen(5)
+    
+    say "Server listening on port 8080..."
+    var client = server.accept
+    
+    # Read from client
+    var data = client.readline
+    say "Received: #{data}"
+    
+    # Send response
+    client.say("Hello from server!")
+    client.close
+    
+    # Create a client socket
+    var sock = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, Socket.IPPROTO_TCP)
+    var addr = Socket.pack_sockaddr_in(80, Socket.inet_aton("example.com"))
+    sock.connect(addr)
+    sock.say("GET / HTTP/1.0\r\n\r\n")
+    say sock.slurp
+    sock.close
 
 =head1 INHERITS
 
@@ -20,102 +40,406 @@ Inherits methods from:
 
        * Sidef::Types::Glob::FileHandle
 
+This means all file handle methods (like C<read>, C<write>, C<print>, C<say>, C<close>, etc.) are available on socket handles as well.
+
 =head1 METHODS
-
-=head2 accept
-
-    self.accept
-
-Returns the
-
-=cut
-
-=head2 bind
-
-    self.bind(name)
-
-Returns the
-
-=cut
-
-=head2 connect
-
-    self.connect(name)
-
-Returns the
-
-=cut
-
-=head2 getpeername
-
-    self.getpeername
-
-Returns the
-
-=cut
-
-=head2 getsockname
-
-    self.getsockname
-
-Returns the
-
-=cut
-
-=head2 getsockopt
-
-    self.getsockopt(level, optname)
-
-Returns the
-
-=cut
-
-=head2 listen
-
-    self.listen(queuesize)
-
-Returns the
-
-=cut
 
 =head2 new
 
-    self.new
+    SocketHandle.new(domain, type, protocol)
+    Socket.new(domain, type, protocol)
 
-Returns the
+Creates a new socket handle with the specified domain (address family), socket type, and protocol.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<domain> - Address family (e.g., Socket.PF_INET for IPv4, Socket.PF_INET6 for IPv6)
+
+=item * C<type> - Socket type (e.g., Socket.SOCK_STREAM for TCP, Socket.SOCK_DGRAM for UDP)
+
+=item * C<protocol> - Protocol number (e.g., Socket.IPPROTO_TCP, Socket.IPPROTO_UDP, or 0 for default)
+
+=back
+
+B<Returns:> A new SocketHandle object, or nil on failure.
+
+B<Example:>
+
+    var tcp_socket = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, Socket.IPPROTO_TCP)
+    var udp_socket = Socket.new(Socket.PF_INET, Socket.SOCK_DGRAM, Socket.IPPROTO_UDP)
 
 Aliases: I<call>
 
 =cut
 
-=head2 recv
+=head2 bind
 
-    self.recv(length, flags)
+    socket.bind(address)
 
-Returns the
+Binds the socket to a local address and port. This is typically used by server sockets before calling listen().
+
+B<Parameters:>
+
+=over 4
+
+=item * C<address> - Packed socket address structure (created with Socket.pack_sockaddr_in or similar)
+
+=back
+
+B<Returns:> True on success, false on failure.
+
+B<Example:>
+
+    var sock = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, 0)
+    var addr = Socket.pack_sockaddr_in(8080, Socket.INADDR_ANY)
+    sock.bind(addr) || die "Cannot bind: #{$!}"
+
+=cut
+
+=head2 listen
+
+    socket.listen(queuesize)
+
+Marks the socket as a passive socket that will accept incoming connections. Must be called after bind() and before accept().
+
+B<Parameters:>
+
+=over 4
+
+=item * C<queuesize> - Maximum length of the queue of pending connections (typically 5-128)
+
+=back
+
+B<Returns:> True on success, false on failure.
+
+B<Example:>
+
+    sock.bind(addr)
+    sock.listen(5) || die "Cannot listen: #{$!}"
+
+=cut
+
+=head2 accept
+
+    socket.accept
+
+Accepts an incoming connection on a listening socket. This blocks until a client connects.
+
+B<Returns:> A new SocketHandle object representing the client connection, or nil on failure.
+
+B<Example:>
+
+    var server = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, 0)
+    server.bind(Socket.pack_sockaddr_in(8080, Socket.INADDR_ANY))
+    server.listen(5)
+    
+    loop {
+        var client = server.accept || next
+        var peer = Socket.unpack_sockaddr_in(client.getpeername)
+        say "Connection from #{Socket.inet_ntoa(peer[1])}:#{peer[0]}"
+        client.say("Welcome!")
+        client.close
+    }
+
+=cut
+
+=head2 connect
+
+    socket.connect(address)
+
+Initiates a connection to a remote socket. This is typically used by client sockets.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<address> - Packed socket address structure of the remote endpoint
+
+=back
+
+B<Returns:> True on success, false on failure.
+
+B<Example:>
+
+    var sock = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, 0)
+    var addr = Socket.pack_sockaddr_in(80, Socket.inet_aton("192.168.1.1"))
+    sock.connect(addr) || die "Cannot connect: #{$!}"
 
 =cut
 
 =head2 send
 
-    self.send(msg, flags, to)
+    socket.send(message, flags=0, to=nil)
 
-Returns the
+Sends a message through the socket. For connected sockets (TCP), the C<to> parameter is not needed. For connectionless sockets (UDP), C<to> specifies the destination.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<message> - The data to send (string or bytes)
+
+=item * C<flags> - Optional flags for send operation (default: 0)
+
+=item * C<to> - Optional destination address for connectionless sockets
+
+=back
+
+B<Returns:> The number of bytes sent, or nil on error.
+
+B<Example:>
+
+    # TCP socket
+    var sent = sock.send("Hello, World!")
+    
+    # UDP socket with destination
+    var addr = Socket.pack_sockaddr_in(9999, Socket.inet_aton("192.168.1.100"))
+    sock.send("UDP message", 0, addr)
+
+=cut
+
+=head2 recv
+
+    socket.recv(length, flags=0)
+
+Receives data from the socket.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<length> - Maximum number of bytes to receive
+
+=item * C<flags> - Optional flags for receive operation (default: 0)
+
+=back
+
+B<Returns:> The received data as a string, or nil on error.
+
+B<Example:>
+
+    var data = sock.recv(1024)
+    if (defined(data)) {
+        say "Received: #{data}"
+    }
+
+=cut
+
+=head2 getsockname
+
+    socket.getsockname
+
+Returns the local address to which the socket is bound.
+
+B<Returns:> Packed socket address structure, or nil on failure.
+
+B<Example:>
+
+    var addr = sock.getsockname
+    if (defined(addr)) {
+        var (port, ip) = Socket.unpack_sockaddr_in(addr)
+        say "Local address: #{Socket.inet_ntoa(ip)}:#{port}"
+    }
+
+=cut
+
+=head2 getpeername
+
+    socket.getpeername
+
+Returns the address of the peer (remote end) connected to this socket.
+
+B<Returns:> Packed socket address structure, or nil on failure.
+
+B<Example:>
+
+    var addr = sock.getpeername
+    if (defined(addr)) {
+        var (port, ip) = Socket.unpack_sockaddr_in(addr)
+        say "Peer address: #{Socket.inet_ntoa(ip)}:#{port}"
+    }
+
+=cut
+
+=head2 getsockopt
+
+    socket.getsockopt(level, optname)
+
+Gets a socket option value.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<level> - Protocol level (e.g., Socket.SOL_SOCKET)
+
+=item * C<optname> - Option name (e.g., Socket.SO_REUSEADDR, Socket.SO_KEEPALIVE)
+
+=back
+
+B<Returns:> The option value, or nil on failure.
+
+B<Example:>
+
+    var reuse = sock.getsockopt(Socket.SOL_SOCKET, Socket.SO_REUSEADDR)
+    say "SO_REUSEADDR is #{reuse ? 'enabled' : 'disabled'}"
 
 =cut
 
 =head2 setsockopt
 
-    self.setsockopt(level, optname, optval)
+    socket.setsockopt(level, optname, optval)
 
-Returns the
+Sets a socket option value.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<level> - Protocol level (e.g., Socket.SOL_SOCKET)
+
+=item * C<optname> - Option name (e.g., Socket.SO_REUSEADDR, Socket.SO_KEEPALIVE)
+
+=item * C<optval> - Option value to set
+
+=back
+
+B<Returns:> True on success, false on failure.
+
+B<Example:>
+
+    # Enable address reuse (useful for servers)
+    sock.setsockopt(Socket.SOL_SOCKET, Socket.SO_REUSEADDR, 1) || 
+        die "Cannot set SO_REUSEADDR: #{$!}"
+    
+    # Enable TCP keepalive
+    sock.setsockopt(Socket.SOL_SOCKET, Socket.SO_KEEPALIVE, 1)
 
 =cut
 
 =head2 shutdown
 
-    self.shutdown(how)
+    socket.shutdown(how)
 
-Returns the
+Shuts down part or all of the socket connection.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<how> - How to shut down the socket:
+
+=over 8
+
+=item * 0 (SHUT_RD) - Further receives are disallowed
+
+=item * 1 (SHUT_WR) - Further sends are disallowed
+
+=item * 2 (SHUT_RDWR) - Further sends and receives are disallowed
+
+=back
+
+=back
+
+B<Returns:> True on success, false on failure.
+
+B<Example:>
+
+    # Finish sending data and close the write side
+    sock.shutdown(1)
+    
+    # Read remaining data from the peer
+    var remaining = sock.slurp
+    
+    # Close completely
+    sock.close
+
+=cut
+
+=head1 COMMON USAGE PATTERNS
+
+=head2 TCP Server
+
+    var server = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, 0)
+    server.setsockopt(Socket.SOL_SOCKET, Socket.SO_REUSEADDR, 1)
+    server.bind(Socket.pack_sockaddr_in(8080, Socket.INADDR_ANY))
+    server.listen(10)
+    
+    say "Server started on port 8080"
+    
+    loop {
+        var client = server.accept || next
+        say "Client connected"
+        
+        # Handle client in a fork or thread
+        client.say("Welcome to the server!")
+        var request = client.readline
+        say "Received: #{request}"
+        
+        client.close
+    }
+
+=head2 TCP Client
+
+    var sock = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, 0)
+    var addr = Socket.pack_sockaddr_in(80, Socket.inet_aton("example.com"))
+    
+    sock.connect(addr) || die "Cannot connect: #{$!}"
+    
+    sock.say("GET / HTTP/1.1")
+    sock.say("Host: example.com")
+    sock.say("Connection: close")
+    sock.say("")
+    
+    say sock.slurp
+    sock.close
+
+=head2 UDP Server
+
+    var sock = Socket.new(Socket.PF_INET, Socket.SOCK_DGRAM, 0)
+    sock.bind(Socket.pack_sockaddr_in(9999, Socket.INADDR_ANY))
+    
+    say "UDP server listening on port 9999"
+    
+    loop {
+        var data = sock.recv(1024)
+        defined(data) || next
+        
+        var peer = sock.getpeername
+        var (port, ip) = Socket.unpack_sockaddr_in(peer)
+        say "Received from #{Socket.inet_ntoa(ip)}:#{port}: #{data}"
+    }
+
+=head2 UDP Client
+
+    var sock = Socket.new(Socket.PF_INET, Socket.SOCK_DGRAM, 0)
+    var addr = Socket.pack_sockaddr_in(9999, Socket.inet_aton("192.168.1.100"))
+    
+    sock.send("Hello, UDP server!", 0, addr)
+    
+    var response = sock.recv(1024)
+    say "Response: #{response}" if defined(response)
+    
+    sock.close
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Glob::FileHandle> - Parent class with I/O methods
+
+=item * L<Socket> - Perl's Socket module documentation for constants and helper functions
+
+=back
+
+=head1 AUTHOR
+
+Daniel "trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut
