@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,12 +6,27 @@ Sidef::Types::Regex::Regex
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements regular expression pattern matching functionality in Sidef. Regular expressions (regex) are powerful tools for pattern matching, searching, and text manipulation. The Regex class provides methods for compiling patterns, matching against strings, and performing various regex operations.
+
+Regular expressions in Sidef support standard Perl-compatible regular expression (PCRE) syntax, including character classes, quantifiers, anchors, capturing groups, and various modifiers.
 
 =head1 SYNOPSIS
 
-var obj = Regex(...)
-
+    # Create a regex object
+    var regex = /\d+/;
+    var regex2 = Regex('\w+', 'i');  # case-insensitive
+    
+    # Match against a string
+    if ("hello123" =~ /\d+/) {
+        say "Found digits!";
+    }
+    
+    # Extract all matches
+    var matches = /\d+/.gmatches("abc123def456");
+    say matches;  # [123, 456]
+    
+    # Combine regexes
+    var combined = /foo/ + /bar/;  # matches "foobar"
 
 =head1 INHERITS
 
@@ -26,7 +40,14 @@ Inherits methods from:
 
     a + b
 
-Returns the
+Concatenates two regular expressions to create a new regex that matches the first pattern followed immediately by the second pattern. This is useful for building complex patterns from simpler components.
+
+    var re1 = /foo/;
+    var re2 = /bar/;
+    var combined = re1 + re2;  # matches "foobar"
+    
+    say ("foobar" =~ combined);  # true
+    say ("foo bar" =~ combined); # false
 
 Aliases: I<add>, I<concat>
 
@@ -36,7 +57,11 @@ Aliases: I<add>, I<concat>
 
     a < b
 
-Returns the
+Compares two regular expressions lexicographically based on their string representations. Returns true if the first regex is lexicographically less than the second.
+
+    var re1 = /abc/;
+    var re2 = /xyz/;
+    say (re1 < re2);  # true
 
 Aliases: I<lt>
 
@@ -46,7 +71,14 @@ Aliases: I<lt>
 
     a <=> b
 
-Returns the
+Performs a three-way comparison between two regular expressions based on their string representations. Returns -1 if the first regex is less than the second, 0 if they are equal, and 1 if the first is greater than the second.
+
+    var re1 = /abc/;
+    var re2 = /xyz/;
+    say (re1 <=> re2);  # -1
+    
+    var re3 = /abc/;
+    say (re1 <=> re3);  # 0
 
 Aliases: I<cmp>
 
@@ -56,7 +88,14 @@ Aliases: I<cmp>
 
     a == b
 
-Returns the
+Tests whether two regular expressions are equal by comparing their string representations and modifiers. Returns true if both regex patterns are identical, false otherwise.
+
+    var re1 = /abc/i;
+    var re2 = /abc/i;
+    var re3 = /abc/;
+    
+    say (re1 == re2);  # true
+    say (re1 == re3);  # false (different modifiers)
 
 Aliases: I<eq>
 
@@ -66,7 +105,19 @@ Aliases: I<eq>
 
     a =~ b
 
-Returns the
+Matches the regex pattern against a string. This is the primary matching operator. Returns a Match object if the pattern is found, or nil if no match is found. The Match object can be used to access captured groups and match information.
+
+    var text = "Hello, World!";
+    var match = /W\w+/ =~ text;
+    
+    if (match) {
+        say match;  # "World"
+    }
+    
+    # With capturing groups
+    if ("age: 25" =~ /(\d+)/) {
+        say $1;  # 25
+    }
 
 Aliases: I<run>, I<match>
 
@@ -76,7 +127,11 @@ Aliases: I<run>, I<match>
 
     a > b
 
-Returns the
+Compares two regular expressions lexicographically based on their string representations. Returns true if the first regex is lexicographically greater than the second.
+
+    var re1 = /xyz/;
+    var re2 = /abc/;
+    say (re1 > re2);  # true
 
 Aliases: I<gt>
 
@@ -86,7 +141,13 @@ Aliases: I<gt>
 
     a | b
 
-Returns the
+Creates a new regular expression that matches either the first pattern or the second pattern (alternation). This is equivalent to the regex alternation operator.
+
+    var re = /cat/ | /dog/;
+    
+    say ("I have a cat" =~ re);  # true
+    say ("I have a dog" =~ re);  # true
+    say ("I have a bird" =~ re); # false
 
 Aliases: I<union>
 
@@ -96,7 +157,11 @@ Aliases: I<union>
 
     a ≠ b
 
-Returns the
+Tests whether two regular expressions are not equal. Returns true if the regex patterns differ in their string representation or modifiers, false if they are identical.
+
+    var re1 = /abc/;
+    var re2 = /xyz/;
+    say (re1 ≠ re2);  # true
 
 Aliases: I<!=>, I<ne>
 
@@ -106,7 +171,11 @@ Aliases: I<!=>, I<ne>
 
     a ≤ b
 
-Returns the
+Compares two regular expressions lexicographically. Returns true if the first regex is less than or equal to the second.
+
+    var re1 = /abc/;
+    var re2 = /abc/;
+    say (re1 ≤ re2);  # true
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -116,7 +185,11 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Returns the
+Compares two regular expressions lexicographically. Returns true if the first regex is greater than or equal to the second.
+
+    var re1 = /xyz/;
+    var re2 = /abc/;
+    say (re1 ≥ re2);  # true
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -124,17 +197,36 @@ Aliases: I<E<gt>=>, I<ge>
 
 =head2 call
 
-    self.call
+    self.call(string)
 
-Returns the
+Invokes the regex as a callable object, matching it against the provided string. This allows regex objects to be used as functions. Returns a Match object on success, or nil on failure.
+
+    var regex = /\d+/;
+    var match = regex.call("abc123def");
+    
+    if (match) {
+        say match;  # 123
+    }
+    
+    # Can also be called with parentheses syntax
+    var result = regex("test456");
 
 =cut
 
 =head2 gmatch
 
-    self.gmatch(obj, pos)
+    self.gmatch(string, position=0)
 
-Returns the
+Performs a global match starting from the specified position in the string. Returns the next match found after the given position. Useful for iterating through matches one at a time.
+
+    var text = "abc123def456ghi789";
+    var regex = /\d+/;
+    
+    var match1 = regex.gmatch(text, 0);
+    say match1;  # 123
+    
+    var match2 = regex.gmatch(text, match1.end);
+    say match2;  # 456
 
 Aliases: I<global_match>
 
@@ -142,9 +234,25 @@ Aliases: I<global_match>
 
 =head2 gmatches
 
-    self.gmatches(obj, third, fourth)
+    self.gmatches(string, offset=0, length=inf)
 
-Returns the
+Finds all non-overlapping matches of the regex pattern in the given string. Returns an array containing all matches. Optional parameters allow specifying a starting offset and maximum number of matches to return.
+
+    var text = "The year 2024 has 365 days";
+    var numbers = /\d+/.gmatches(text);
+    say numbers;  # [2024, 365]
+    
+    # With offset
+    var more = /\d+/.gmatches("a1b2c3d4", 4);
+    say more;  # [3, 4]
+    
+    # With limit
+    var limited = /\d+/.gmatches("a1b2c3d4", 0, 2);
+    say limited;  # [1, 2]
+    
+    # Extract words
+    var words = /\w+/.gmatches("Hello, World!");
+    say words;  # ["Hello", "World"]
 
 Aliases: I<all_matches>, I<map_matches>, I<global_matches>, I<repeated_match>
 
@@ -154,7 +262,11 @@ Aliases: I<all_matches>, I<map_matches>, I<global_matches>, I<repeated_match>
 
     self.to_re
 
-Returns the
+Returns the regex object itself. This method is provided for compatibility and type conversion purposes, allowing regex objects to be explicitly converted to the Regex type (which is effectively a no-op since they're already Regex objects).
+
+    var regex = /test/i;
+    var same = regex.to_re;
+    say (regex == same);  # true
 
 Aliases: I<to_regex>
 
@@ -164,8 +276,81 @@ Aliases: I<to_regex>
 
     self.to_s
 
-Returns the
+Returns a string representation of the regular expression, including its pattern and any modifiers. This is useful for debugging, logging, or displaying regex objects.
+
+    var regex = /hello/i;
+    say regex.to_s;  # "(?^i:hello)" or similar representation
+    
+    var complex = /\d{3}-\d{4}/;
+    say complex.to_s;  # String representation of the pattern
 
 Aliases: I<dump>, I<to_str>
+
+=cut
+
+=head1 REGEX MODIFIERS
+
+Sidef supports various regex modifiers that can be applied when creating regular expressions:
+
+=over 4
+
+=item * B<i> - Case-insensitive matching
+
+=item * B<s> - Single-line mode (dot matches newlines)
+
+=item * B<m> - Multi-line mode (^ and $ match line boundaries)
+
+=item * B<x> - Extended mode (ignore whitespace and comments in pattern)
+
+=item * B<g> - Global matching (find all matches)
+
+=back
+
+Example usage:
+
+    var case_insensitive = /hello/i;
+    var multiline = /^start/m;
+    var combined = /pattern/ims;
+
+=head1 COMMON PATTERNS
+
+Here are some commonly used regex patterns in Sidef:
+
+    # Email validation (simple)
+    var email_regex = /\w+@\w+\.\w+/;
+    
+    # Phone number (US format)
+    var phone_regex = /\d{3}-\d{3}-\d{4}/;
+    
+    # URL matching
+    var url_regex = /https?:\/\/\S+/;
+    
+    # Whitespace trimming
+    var trim_regex = /^\s+|\s+$/;
+    
+    # Extract quoted strings
+    var quote_regex = /"([^"]*)"/;
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::String::String> - String manipulation methods
+
+=item * L<Sidef::Types::Array::Array> - Array operations for processing matches
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2025 Daniel Șuteu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.0 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut
