@@ -1,17 +1,41 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Range::Range
+Sidef::Types::Range::Range - Range class for representing sequences of values
 
 =head1 DESCRIPTION
 
-This class implements ...
+The Range class implements a lazy sequence of values between two endpoints. Ranges are memory-efficient as they don't store all values but generate them on demand. They support arithmetic operations, iteration, and functional programming methods.
+
+A range can be created using the range operator C<..> or by calling the Range constructor. Ranges are commonly used in loops, array slicing, and generating sequences.
 
 =head1 SYNOPSIS
 
-var obj = Range(...)
+    # Create a range from 1 to 10
+    var r = (1..10)
+    
+    # Iterate over range
+    (1..10).each { |n|
+        say n
+    }
+    
+    # Range with custom step
+    var evens = (0..20 `by` 2)
+    
+    # Infinite ranges
+    var infinite = (1..Inf)
+    
+    # Map over a range
+    var squares = (1..5).map { |n| n**2 }
+    
+    # Filter range values
+    var odds = (1..20).grep { .is_odd }
+    
+    # Range arithmetic
+    var r1 = (1..5)
+    var r2 = (10..15)
+    say (r1 + r2)  # Add ranges
 
 =head1 METHODS
 
@@ -19,7 +43,10 @@ var obj = Range(...)
 
     a * b
 
-Returns the
+Multiplies the range by a scalar value or another range. When multiplying by a scalar, each element in the range is multiplied. When multiplying by another range, performs element-wise multiplication.
+
+    say ((1..5) * 2)      #=> Range(2, 4, 6, 8, 10)
+    say ((1..3) * (2..4)) #=> Range(2, 6, 12)
 
 Aliases: I<mul>
 
@@ -29,7 +56,10 @@ Aliases: I<mul>
 
     a + b
 
-Returns the
+Adds a scalar value or another range to the range. When adding a scalar, adds it to each element. When adding another range, performs element-wise addition.
+
+    say ((1..5) + 10)     #=> Range(11, 12, 13, 14, 15)
+    say ((1..3) + (5..7)) #=> Range(6, 8, 10)
 
 Aliases: I<add>
 
@@ -39,7 +69,10 @@ Aliases: I<add>
 
     a - b
 
-Returns the
+Subtracts a scalar value or another range from the range. When subtracting a scalar, subtracts it from each element. When subtracting another range, performs element-wise subtraction.
+
+    say ((10..15) - 5)    #=> Range(5, 6, 7, 8, 9, 10)
+    say ((10..12) - (1..3)) #=> Range(9, 10, 11)
 
 Aliases: I<sub>
 
@@ -49,7 +82,10 @@ Aliases: I<sub>
 
     a ... b
 
-Returns the
+Converts the range to a list (array) containing all values in the range. This forces evaluation of the lazy range.
+
+    var arr = (1..5)...
+    say arr  #=> [1, 2, 3, 4, 5]
 
 Aliases: I<to_list>
 
@@ -59,7 +95,10 @@ Aliases: I<to_list>
 
     a / b
 
-Returns the
+Divides the range by a scalar value or another range. When dividing by a scalar, divides each element. When dividing by another range, performs element-wise division.
+
+    say ((10..20 `by` 5) / 2)  #=> Range(5, 7.5, 10)
+    say ((10..30 `by` 10) / (2..4)) #=> Range(5, 10, 15)
 
 Aliases: I<÷>, I<div>
 
@@ -69,7 +108,11 @@ Aliases: I<÷>, I<div>
 
     a == b
 
-Returns the
+Checks if two ranges are equal. Ranges are equal if they have the same bounds, step, and direction.
+
+    say ((1..10) == (1..10))  #=> true
+    say ((1..10) == (1..20))  #=> false
+    say ((1..10 `by` 2) == (1..10)) #=> false
 
 Aliases: I<eq>
 
@@ -79,7 +122,10 @@ Aliases: I<eq>
 
     a ≠ b
 
-Returns the
+Checks if two ranges are not equal. Returns true if the ranges differ in bounds, step, or direction.
+
+    say ((1..10) ≠ (1..20))  #=> true
+    say ((1..10) ≠ (1..10))  #=> false
 
 Aliases: I<!=>, I<ne>
 
@@ -87,17 +133,22 @@ Aliases: I<!=>, I<ne>
 
 =head2 accumulate
 
-    self.accumulate(arg)
+    self.accumulate(block)
 
-Returns the
+Returns an array of accumulated values by applying the given block (or operator) cumulatively. Similar to a running sum or cumulative operation.
+
+    say (1..5).accumulate { |a, b| a + b }  #=> [1, 3, 6, 10, 15]
+    say (1..4).accumulate { |a, b| a * b }  #=> [1, 2, 6, 24]
 
 =cut
 
 =head2 accumulate_by
 
-    self.accumulate_by(arg)
+    self.accumulate_by(block)
 
-Returns the
+Returns an array of accumulated values by applying the given block to each element first, then accumulating.
+
+    say (1..5).accumulate_by { |n| n**2 }  #=> [1, 5, 14, 30, 55]
 
 =cut
 
@@ -105,7 +156,10 @@ Returns the
 
     self.all(block)
 
-Returns the
+Returns true if all elements in the range satisfy the condition in the block. Returns false otherwise.
+
+    say (1..10).all { |n| n > 0 }    #=> true
+    say (1..10).all { |n| n.is_even } #=> false
 
 =cut
 
@@ -113,7 +167,11 @@ Returns the
 
     self.any(block)
 
-Returns the
+Returns true if at least one element in the range satisfies the condition in the block. Returns false if none do.
+
+    say (1..10).any { |n| n > 5 }     #=> true
+    say (1..10).any { |n| n > 20 }    #=> false
+    say (1..10).any { |n| n.is_even } #=> true
 
 =cut
 
@@ -121,7 +179,11 @@ Returns the
 
     self.bounds
 
-Returns the
+Returns an array containing the start and end bounds of the range.
+
+    say (1..10).bounds    #=> [1, 10]
+    say (5..1).bounds     #=> [5, 1]
+    say (0..100 `by` 5).bounds  #=> [0, 100]
 
 =cut
 
@@ -129,7 +191,11 @@ Returns the
 
     self.by(step)
 
-Returns the
+Creates a new range with the specified step size. This allows you to skip values in the sequence.
+
+    say (1..10 `by` 2)...    #=> [1, 3, 5, 7, 9]
+    say (0..20 `by` 5)...    #=> [0, 5, 10, 15, 20]
+    say (10..1 `by` -2)...   #=> [10, 8, 6, 4, 2]
 
 =cut
 
@@ -137,7 +203,9 @@ Returns the
 
     self.cons(n, block)
 
-Returns the
+Maps over consecutive groups of n elements from the range. Returns an array of results from applying the block to each consecutive group.
+
+    say (1..10).cons(3) { |*group| group.sum }  #=> [6, 9, 12, 15, 18, 21, 24, 27]
 
 Aliases: I<map_cons>
 
@@ -147,7 +215,12 @@ Aliases: I<map_cons>
 
     self.contain(value)
 
-Returns the
+Checks if the range contains the specified value. Takes into account the range's bounds, step, and direction.
+
+    say (1..10).contain(5)        #=> true
+    say (1..10).contain(15)       #=> false
+    say (1..10 `by` 2).contain(3) #=> false
+    say (1..10 `by` 2).contain(5) #=> true
 
 Aliases: I<include>, I<contains>, I<includes>
 
@@ -157,15 +230,25 @@ Aliases: I<include>, I<contains>, I<includes>
 
     self.count(arg)
 
-Returns the
+Counts elements in the range that match the given value or satisfy the given block condition.
+
+    say (1..10).count(5)            #=> 1
+    say (1..10).count { |n| n.is_even }  #=> 5
+    say (1..20).count { |n| n.is_prime } #=> 8
 
 =cut
 
 =head2 count_by
 
-    self.count_by(arg)
+    self.count_by(block)
 
-Returns the
+Returns a hash with counts of elements grouped by the result of applying the block to each element.
+
+    say (1..10).count_by { |n| n % 3 }
+    #=> Hash(0 => 3, 1 => 4, 2 => 3)
+    
+    say (1..10).count_by { |n| n.is_even ? "even" : "odd" }
+    #=> Hash("even" => 5, "odd" => 5)
 
 =cut
 
@@ -173,7 +256,10 @@ Returns the
 
     self.cross_operator(*args)
 
-Returns the
+Performs a cross product operation with other ranges or arrays, applying an operator to combinations.
+
+    say (1..3).cross_operator('+', 10..12)
+    #=> [[11, 12, 13], [12, 13, 14], [13, 14, 15]]
 
 =cut
 
@@ -181,7 +267,12 @@ Returns the
 
     self.each_cons(n, block)
 
-Returns the
+Iterates over consecutive groups of n elements, passing each group to the block. Similar to cons but doesn't collect results.
+
+    (1..10).each_cons(3) { |*group|
+        say group
+    }
+    # Prints: [1, 2, 3], [2, 3, 4], [3, 4, 5], ...
 
 =cut
 
@@ -189,7 +280,12 @@ Returns the
 
     self.each_slice(n, block)
 
-Returns the
+Iterates over the range in slices of n elements, passing each slice to the block.
+
+    (1..10).each_slice(3) { |*slice|
+        say slice
+    }
+    # Prints: [1, 2, 3], [4, 5, 6], [7, 8, 9], [10]
 
 =cut
 
@@ -197,7 +293,10 @@ Returns the
 
     self.first_by(block)
 
-Returns the
+Returns the first element for which the block returns true, or nil if no element satisfies the condition.
+
+    say (1..100).first_by { |n| n > 50 && n.is_prime }  #=> 53
+    say (1..10).first_by { |n| n > 100 }  #=> nil
 
 =cut
 
@@ -205,7 +304,10 @@ Returns the
 
     self.flip
 
-Returns the
+Returns a new range with reversed bounds (flips the direction of iteration).
+
+    say (1..10).flip...   #=> [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
+    say (5..1).flip...    #=> [1, 2, 3, 4, 5]
 
 Aliases: I<reverse>
 
@@ -215,7 +317,12 @@ Aliases: I<reverse>
 
     self.for(block)
 
-Returns the
+Iterates over each element in the range, passing it to the block. This is the standard iteration method.
+
+    (1..5).for { |n|
+        say n
+    }
+    # Prints: 1, 2, 3, 4, 5
 
 Aliases: I<each>, I<foreach>
 
@@ -225,7 +332,9 @@ Aliases: I<each>, I<foreach>
 
     self.from(from)
 
-Returns the
+Creates a new range starting from the specified value, keeping the original end bound.
+
+    say (1..10).from(5)...   #=> [5, 6, 7, 8, 9, 10]
 
 =cut
 
@@ -233,7 +342,10 @@ Returns the
 
     self.grep(block)
 
-Returns the
+Filters the range, returning an array of elements that satisfy the condition in the block.
+
+    say (1..20).grep { |n| n.is_prime }  #=> [2, 3, 5, 7, 11, 13, 17, 19]
+    say (1..10).grep { |n| n > 5 }       #=> [6, 7, 8, 9, 10]
 
 Aliases: I<select>
 
@@ -243,7 +355,10 @@ Aliases: I<select>
 
     self.head(num)
 
-Returns the
+Returns an array containing the first num elements of the range.
+
+    say (1..100).head(5)   #=> [1, 2, 3, 4, 5]
+    say (10..1).head(3)    #=> [10, 9, 8]
 
 Aliases: I<first>
 
@@ -253,7 +368,10 @@ Aliases: I<first>
 
     self.join(sep)
 
-Returns the
+Converts the range to a string with elements joined by the specified separator.
+
+    say (1..5).join(', ')    #=> "1, 2, 3, 4, 5"
+    say (1..3).join(' + ')   #=> "1 + 2 + 3"
 
 =cut
 
@@ -261,7 +379,9 @@ Returns the
 
     self.kv
 
-Returns the
+Returns an array of [index, value] pairs for each element in the range.
+
+    say (10..13).kv  #=> [[0, 10], [1, 11], [2, 12], [3, 13]]
 
 Aliases: I<pairs>, I<zip_indices>
 
@@ -271,7 +391,9 @@ Aliases: I<pairs>, I<zip_indices>
 
     self.last(num)
 
-Returns the
+Returns an array containing the last num elements of the range.
+
+    say (1..10).last(3)   #=> [8, 9, 10]
 
 Aliases: I<tail>
 
@@ -281,7 +403,10 @@ Aliases: I<tail>
 
     self.last_by(block)
 
-Returns the
+Returns the last element for which the block returns true, or nil if no element satisfies the condition.
+
+    say (1..100).last_by { |n| n < 50 && n.is_prime }  #=> 47
+    say (1..10).last_by { |n| n > 100 }  #=> nil
 
 =cut
 
@@ -289,7 +414,11 @@ Returns the
 
     self.len
 
-Returns the
+Returns the number of elements in the range.
+
+    say (1..10).len           #=> 10
+    say (0..20 `by` 5).len    #=> 5
+    say (10..1).len           #=> 10
 
 Aliases: I<length>
 
@@ -299,15 +428,21 @@ Aliases: I<length>
 
     self.map(block)
 
-Returns the
+Transforms each element in the range using the given block, returning an array of results.
+
+    say (1..5).map { |n| n**2 }      #=> [1, 4, 9, 16, 25]
+    say (1..3).map { |n| n * 10 }    #=> [10, 20, 30]
 
 =cut
 
 =head2 map_operator
 
-    self.map_operator(*args)
+    self.map_operator(op, *args)
 
-Returns the
+Maps an operator over the range with additional arguments.
+
+    say (1..5).map_operator('+', 10)  #=> [11, 12, 13, 14, 15]
+    say (1..5).map_operator('**', 2)  #=> [1, 4, 9, 16, 25]
 
 =cut
 
@@ -315,7 +450,10 @@ Returns the
 
     self.max(block)
 
-Returns the
+Returns the maximum element in the range. With a block, compares elements using the block's return value.
+
+    say (1..10).max              #=> 10
+    say (1..10).max { |a, b| b <=> a }  #=> 1 (reverse order)
 
 =cut
 
@@ -323,7 +461,10 @@ Returns the
 
     self.max_by(block)
 
-Returns the
+Returns the element that produces the maximum value when passed through the block.
+
+    say (-5..5).max_by { |n| n.abs }      #=> -5 or 5
+    say (1..10).max_by { |n| n % 3 }      #=> 2 (or 5 or 8)
 
 =cut
 
@@ -331,7 +472,10 @@ Returns the
 
     self.min(block)
 
-Returns the
+Returns the minimum element in the range. With a block, compares elements using the block's return value.
+
+    say (1..10).min              #=> 1
+    say (1..10).min { |a, b| b <=> a }  #=> 10 (reverse order)
 
 =cut
 
@@ -339,7 +483,10 @@ Returns the
 
     self.min_by(block)
 
-Returns the
+Returns the element that produces the minimum value when passed through the block.
+
+    say (-5..5).min_by { |n| n.abs }      #=> 0
+    say (1..10).min_by { |n| -n }         #=> 10
 
 =cut
 
@@ -347,15 +494,22 @@ Returns the
 
     self.neg
 
-Returns the
+Returns a new range with all elements negated.
+
+    say (1..5).neg...    #=> [-1, -2, -3, -4, -5]
+    say (-3..3).neg...   #=> [3, 2, 1, 0, -1, -2, -3]
 
 =cut
 
 =head2 new
 
-    self.new
+    Range.new(from, to, step)
 
-Returns the
+Creates a new range object with the specified start, end, and optional step values.
+
+    var r1 = Range.new(1, 10)
+    var r2 = Range.new(0, 20, 2)
+    var r3 = Range(5, 1, -1)
 
 Aliases: I<call>
 
@@ -365,15 +519,20 @@ Aliases: I<call>
 
     self.none(block)
 
-Returns the
+Returns true if no elements in the range satisfy the condition in the block.
+
+    say (1..10).none { |n| n > 20 }     #=> true
+    say (1..10).none { |n| n > 5 }      #=> false
 
 =cut
 
 =head2 pam_operator
 
-    self.pam_operator(*args)
+    self.pam_operator(op, *args)
 
-Returns the
+Applies the pam operator (parallel map) over the range elements.
+
+    say (1..5).pam_operator('+', 10)
 
 =cut
 
@@ -381,7 +540,10 @@ Returns the
 
     self.pick(n)
 
-Returns the
+Returns n random elements from the range without replacement. If n is not specified, returns one random element.
+
+    say (1..10).pick      #=> (random number from 1 to 10)
+    say (1..10).pick(3)   #=> [random 3 numbers, e.g., [7, 2, 9]]
 
 =cut
 
@@ -389,7 +551,10 @@ Returns the
 
     self.rand(n)
 
-Returns the
+Returns n random elements from the range with replacement. Each call can return duplicate values.
+
+    say (1..10).rand      #=> (random number from 1 to 10)
+    say (1..10).rand(5)   #=> [5 random numbers, may contain duplicates]
 
 Aliases: I<sample>
 
@@ -399,7 +564,12 @@ Aliases: I<sample>
 
     self.reduce(op, initial)
 
-Returns the
+Reduces the range to a single value by applying the given operator or block cumulatively. The initial value is optional.
+
+    say (1..5).reduce { |a, b| a + b }      #=> 15
+    say (1..4).reduce { |a, b| a * b }      #=> 24
+    say (1..10).reduce('+')                 #=> 55
+    say (1..5).reduce('+', 100)             #=> 115
 
 =cut
 
@@ -407,7 +577,10 @@ Returns the
 
     self.reduce_operator(op, initial)
 
-Returns the
+Reduces the range using a named operator. Similar to reduce but takes an operator name as a string.
+
+    say (1..10).reduce_operator('+')     #=> 55
+    say (1..4).reduce_operator('*')      #=> 24
 
 =cut
 
@@ -415,7 +588,9 @@ Returns the
 
     self.shuffle
 
-Returns the
+Returns an array with the range elements in random order.
+
+    say (1..10).shuffle   #=> [random permutation, e.g., [3, 7, 1, 9, 2, 5, 10, 4, 8, 6]]
 
 =cut
 
@@ -423,7 +598,10 @@ Returns the
 
     self.slices(n, block)
 
-Returns the
+Maps over slices of n elements, applying the block to each slice and returning an array of results.
+
+    say (1..10).slices(3) { |*slice| slice.sum }
+    #=> [6, 15, 24, 10]
 
 Aliases: I<map_slice>
 
@@ -433,7 +611,9 @@ Aliases: I<map_slice>
 
     self.sort(block)
 
-Returns the
+Returns a sorted array of the range elements. With a block, uses the block for custom comparison.
+
+    say (1..10).sort { |a, b| b <=> a }  #=> [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 
 =cut
 
@@ -441,7 +621,10 @@ Returns the
 
     self.sort_by(block)
 
-Returns the
+Returns an array sorted by the value returned from applying the block to each element.
+
+    say (-5..5).sort_by { |n| n.abs }    #=> [0, -1, 1, -2, 2, -3, 3, -4, 4, -5, 5]
+    say (1..10).sort_by { |n| -n }       #=> [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 
 =cut
 
@@ -449,7 +632,11 @@ Returns the
 
     self.step
 
-Returns the
+Returns the step size of the range. For ranges created without an explicit step, returns 1 or -1 depending on direction.
+
+    say (1..10).step          #=> 1
+    say (0..20 `by` 5).step   #=> 5
+    say (10..1).step          #=> -1
 
 =cut
 
@@ -457,7 +644,9 @@ Returns the
 
     self.to(to)
 
-Returns the
+Creates a new range with the specified end bound, keeping the original start bound.
+
+    say (1..5).to(10)...   #=> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 =cut
 
@@ -465,7 +654,9 @@ Returns the
 
     self.to_a
 
-Returns the
+Converts the range to an array containing all its elements. Forces evaluation of the lazy range.
+
+    say (1..5).to_a   #=> [1, 2, 3, 4, 5]
 
 Aliases: I<to_array>
 
@@ -475,7 +666,9 @@ Aliases: I<to_array>
 
     self.to_v
 
-Returns the
+Converts the range to a vector (Vector object).
+
+    var vec = (1..5).to_v
 
 Aliases: I<to_vec>, I<to_vector>
 
@@ -483,9 +676,11 @@ Aliases: I<to_vec>, I<to_vector>
 
 =head2 unroll_operator
 
-    self.unroll_operator(*args)
+    self.unroll_operator(op, *args)
 
-Returns the
+Applies an unroll operator operation over the range.
+
+    say (1..5).unroll_operator('+', 10)
 
 =cut
 
@@ -493,14 +688,28 @@ Returns the
 
     self.while(block)
 
-Returns the
+Iterates over the range while the block condition is true, returning an array of elements.
+
+    say (1..100).while { |n| n < 10 }  #=> [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 =cut
 
 =head2 zip_operator
 
-    self.zip_operator(*args)
+    self.zip_operator(op, *args)
 
-Returns the
+Zips the range with other ranges or arrays, applying an operator to corresponding elements.
+
+    say (1..3).zip_operator('+', 10..12)  #=> [11, 13, 15]
+
+=cut
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Array::Array>, L<Sidef::Types::Number::Number>
+
+=head1 AUTHOR
+
+Daniel Șuteu (trizen)
 
 =cut
