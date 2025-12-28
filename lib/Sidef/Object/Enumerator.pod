@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,7 +6,7 @@ Sidef::Object::Enumerator
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements an enumerator object, allowing for functional-style operations such as mapping, filtering, and accessing elements within a collection. The enumerator is designed with extra parentheses to accommodate the absence of operator precedence rules in Sidef.
 
 =head1 SYNOPSIS
 
@@ -19,7 +18,7 @@ var obj = Enumerator(...)
 
     self.count(block)
 
-Returns the
+Counts the elements in the enumerator collection that satisfy the given block condition. Returns the count.
 
 Aliases: I<count_by>
 
@@ -29,7 +28,7 @@ Aliases: I<count_by>
 
     self.each(block)
 
-Returns the
+Iterates over all elements in the enumerator, yielding each element to the given block. Returns the enumerator itself.
 
 =cut
 
@@ -37,7 +36,7 @@ Returns the
 
     self.first(n, block)
 
-Returns the
+Returns the first `n` elements of the enumerator. If a block is provided, it retrieves the first `n` elements that satisfy the block condition.
 
 =cut
 
@@ -45,7 +44,7 @@ Returns the
 
     self.grep(block)
 
-Returns the
+Filters the elements in the enumerator collection based on the given block condition. Returns a new array with elements that satisfy the condition.
 
 Aliases: I<select>
 
@@ -55,7 +54,7 @@ Aliases: I<select>
 
     self.len
 
-Returns the
+Returns the total number of elements in the enumerator.
 
 Aliases: I<size>, I<length>
 
@@ -65,7 +64,7 @@ Aliases: I<size>, I<length>
 
     self.map(block)
 
-Returns the
+Applies the given block to each element of the enumerator and returns a new array with the transformed elements.
 
 Aliases: I<collect>
 
@@ -75,7 +74,7 @@ Aliases: I<collect>
 
     self.new
 
-Returns the
+Creates a new enumerator instance. Returns the new instance.
 
 Aliases: I<call>
 
@@ -86,9 +85,7 @@ Aliases: I<call>
     e.nth(n)
     e.nth(n, {...})
 
-Returns the n-th term.
-
-An optional block can be given to filter out terms, counting only the terms for which the block returns a true value.
+Retrieves the `n`-th term from the enumerator collection. An optional block can be given to filter out terms, counting only the terms for which the block returns a true value.
 
 =cut
 
@@ -96,7 +93,7 @@ An optional block can be given to filter out terms, counting only the terms for 
 
     self.to_a
 
-Returns the
+Converts the enumerator into an array and returns it.
 
 =cut
 
@@ -104,6 +101,6 @@ Returns the
 
     self.while(block)
 
-Returns the
+Yields elements to the given block and stops iterating when the block returns false. Returns an enumerator with the processed elements.
 
 =cut
