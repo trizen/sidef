@@ -2,88 +2,149 @@
 
 =head1 NAME
 
-Sidef::Types::Null::Null - The Null object in Sidef
+Sidef::Types::Null::Null - The Null type in Sidef
 
 =head1 DESCRIPTION
 
-This class implements the special "Null" object type in the Sidef programming language.
+This class implements the B<Null> type in Sidef, representing the absence of a value or an undefined state. Null is a singleton object that serves as Sidef's representation of "nothing" or "no value". It is commonly used as a default return value for operations that don't produce meaningful results, or to indicate the absence of data.
 
-The C<Null> object represents the absence of a value or a "null" value. It is a singleton object, meaning there is only one instance of Null, analogous to C<undef> in Perl or C<null> in other languages. It is used to represent missing, undefined, or intentionally absent values in Sidef programs.
+The Null object evaluates to false in boolean contexts and can be used for nil-checking patterns common in many programming scenarios.
 
 =head1 SYNOPSIS
 
-    var obj = Null          # The unique Null object
-    say obj.to_s            # Prints "null"
-    if (obj == Null) { ... }
-
-Usually, you do not need to construct Null objects manually; instead, the built-in C<Null> is used universally.
+    # Null is automatically returned by some operations
+    var result = [1,2,3].first { _ > 10 }  # returns Null if not found
+    
+    # Explicit Null creation
+    var obj = Null()
+    var nothing = Null.new
+    
+    # Boolean context - Null is falsy
+    if (Null) {
+        say "This won't execute"
+    }
+    
+    # Checking for Null
+    if (result == Null) {
+        say "No result found"
+    }
+    
+    # Using Null in conditionals
+    var value = some_function() \\ "default"  # Use default if Null
+    
+    # Converting Null to string
+    say Null.to_s  # prints "null"
 
 =head1 INHERITS
 
 Inherits methods from:
 
-    * Sidef::Object::Object
+       * Sidef::Object::Object
 
 =head1 METHODS
 
 =head2 new
 
+    Null.new
     self.new
 
-Returns the unique Null object instance.
+Returns the singleton Null object. Since Null is a singleton, all calls to C<new> return the same Null instance.
 
-Calling this constructor always returns the singleton Null object.
+B<Example:>
 
-B<Aliases>: I<call>
+    var n1 = Null.new
+    var n2 = Null.new
+    say (n1 == n2)  # true - same object
+
+Aliases: I<call>
 
 =cut
 
 =head2 to_s
 
+    Null.to_s
     self.to_s
 
-Returns the string representation of the Null object, which is always C<"null">.
+Returns the string representation of the Null object, which is the lowercase string C<"null">.
 
-B<Aliases>: I<dump>, I<to_str>
+B<Example:>
 
-=cut
+    say Null.to_s        # prints: null
+    say "Value: #{Null}" # prints: Value: null
 
-=head2 is_null
+B<Returns:> A String object containing C<"null">
 
-    self.is_null
-
-Returns true, as this is the Null object.
-
-=cut
-
-=head2 boolean
-
-    self.boolean
-
-Returns false. This means the Null object evaluates as false in boolean context.
+Aliases: I<dump>, I<to_str>
 
 =cut
 
-=head2 equals
+=head1 BOOLEAN CONTEXT
 
-    self.equals(other)
+The Null object evaluates to false in boolean contexts:
 
-Returns true if and only if C<other> is also the Null object.
+    if (Null) {
+        # This block never executes
+    }
+    
+    say (Null ? "true" : "false")  # prints: false
+    say (!Null)                     # prints: true
 
-=cut
+=head1 EQUALITY AND COMPARISON
+
+Null can be compared with other values:
+
+    say (Null == Null)      # true
+    say (Null == nil)       # true (nil is an alias)
+    say (Null == false)     # false
+    say (Null == 0)         # false
+    say (Null == "")        # false
+
+=head1 COMMON USES
+
+=over 4
+
+=item * Default return value for functions that find no result
+
+    var item = array.first { condition }  # returns Null if not found
+
+=item * Optional parameters and missing values
+
+    func process(value = Null) {
+        if (value != Null) {
+            # Process the value
+        }
+    }
+
+=item * Nil-coalescing operations
+
+    var result = might_be_null() \\ default_value
+
+=item * Database NULL representations
+
+=item * Absence of object references
+
+=back
 
 =head1 SEE ALSO
 
-L<Sidef::Object::Object>, L<Sidef::Types::Undefined::Undefined>, L<Sidef::Types::Bool::Bool>
+=over 4
+
+=item * L<Sidef::Types::Bool::Bool> - Boolean type
+
+=item * L<Sidef::Object::Object> - Base object class
+
+=back
 
 =head1 AUTHOR
 
-Sidef contributors
+Daniel Șuteu, E<lt>trizen@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2025, Daniel Șuteu
+Copyright (C) 2013-2025 Daniel Șuteu
 
-This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.2 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut
