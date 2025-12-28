@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,12 +6,19 @@ Sidef::Types::Array::Array
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements arrays in Sidef - ordered, mutable collections of elements. Arrays support various operations including arithmetic, set operations, iteration, transformation, and matrix operations. Arrays are zero-indexed and can contain elements of any type.
 
 =head1 SYNOPSIS
 
-var obj = Array(...)
+    var arr = Array(1, 2, 3)
+    var arr = [1, 2, 3]
+    var arr = %w(a b c)
 
+    arr[0]           #=> first element
+    arr[-1]          #=> last element
+    arr.len          #=> length
+    arr.push(4)      #=> append element
+    arr.map{_**2}    #=> transform elements
 
 =head1 INHERITS
 
@@ -26,7 +32,7 @@ Inherits methods from:
 
     a & b
 
-Returns the intersection of two arrays.
+Returns the intersection of two arrays, preserving duplicates from the first array.
 
     <a a a b c> & <a x y a c>    #=> ["a", "a", "c"]
 
@@ -50,7 +56,7 @@ Aliases: I<mul>
 
     a ** n
 
-Matrix exponentiation, excpecting array C<a> to be a 2D array.
+Matrix exponentiation, expecting array C<a> to be a 2D array (matrix).
 
     var A = [[1, 2, 0],
              [0, 3, 1],
@@ -90,7 +96,7 @@ Aliases: I<sub>, I<diff>
 
     a...
 
-Converts array C<a> into a list.
+Converts array C<a> into a list for unpacking or splatting.
 
     var (a,b,c) = <1 2 3>...
 
@@ -102,7 +108,7 @@ Aliases: I<to_list>
 
     a / n
 
-Divides the array C<a> into C<n> segments.
+Divides the array C<a> into C<n> segments of approximately equal size.
 
 If the division is not exact, the remaining incomplete segment is added to the end of the returned array.
 
@@ -117,7 +123,7 @@ Aliases: I<÷>, I<div>
 
     a < b
 
-Less-than array comparison, done term-by-term, returning C<true> or C<false>.
+Less-than array comparison, done term-by-term lexicographically, returning C<true> or C<false>.
 
 Aliases: I<lt>
 
@@ -127,7 +133,7 @@ Aliases: I<lt>
 
     a <=> b
 
-Array comparison, done term-by-term, returning:
+Array comparison, done term-by-term lexicographically, returning:
 
      1 when a > b
      0 when a == b
@@ -141,7 +147,7 @@ Aliases: I<cmp>
 
     a == b
 
-Returns true if C<a> and C<b> are equal to each other.
+Returns true if C<a> and C<b> are equal to each other element-wise.
 
 Aliases: I<eq>
 
@@ -151,7 +157,7 @@ Aliases: I<eq>
 
     a > b
 
-Greater-than array comparison, done term-by-term, returning C<true> or C<false>.
+Greater-than array comparison, done term-by-term lexicographically, returning C<true> or C<false>.
 
 Aliases: I<gt>
 
@@ -161,7 +167,7 @@ Aliases: I<gt>
 
     a ^ b
 
-Returns the set difference of two arrays.
+Returns the symmetric set difference (XOR) of two arrays - elements that appear in one array but not both.
 
     <a a a b c> ^ <a x y a c>   #=> ["a", "b", "x", "y"]
 
@@ -173,7 +179,7 @@ Aliases: I<xor>
 
     a | b
 
-Returns the union of two arrays.
+Returns the union of two arrays, preserving all duplicates from both arrays.
 
     <a a a b c> | <a x y a c>   #=> ["a", "a", "a", "b", "c", "x", "y"]
 
@@ -185,7 +191,9 @@ Aliases: I<or>
 
     a |>> b
 
-Returns the
+Pipeline map operator: maps each element through a callable (block or method).
+
+    [1,2,3] |>> { _**2 }     #=> [1, 4, 9]
 
 Aliases: I<pipeline_map_op>
 
@@ -195,7 +203,7 @@ Aliases: I<pipeline_map_op>
 
     a |X> (block1, block2, ...)
 
-Pipeline cross-product operator, mapping each element to each given block.
+Pipeline cross-product operator, mapping each element to each given block, creating a Cartesian product of results.
 
    say ([1,2,3] |X> ({ .cube }, { _+42 }))     #=> [1, 43, 8, 44, 27, 45]
 
@@ -205,9 +213,11 @@ Aliases: I<pipeline_cross_op>
 
 =head2 |Z>
 
-    self.|Z>(*callbacks)
+    a |Z> (block1, block2, ...)
 
-Returns the
+Pipeline zip operator: applies each callback to corresponding elements in parallel.
+
+    [1,2,3] |Z> ({ _**2 }, { _**3 }, { _**4 })     #=> [1, 8, 81]
 
 Aliases: I<pipeline_zip_op>
 
@@ -217,7 +227,10 @@ Aliases: I<pipeline_zip_op>
 
     a « b
 
-Returns the
+Appends element(s) to the end of array C<a>, modifying it in-place. Returns the array.
+
+    var a = [1,2,3]
+    a « 4           #=> [1, 2, 3, 4]
 
 Aliases: I<E<lt>E<lt>>, I<push>, I<append>
 
@@ -225,9 +238,12 @@ Aliases: I<E<lt>E<lt>>, I<push>, I<append>
 
 =head2 »
 
-    a » b
+    a » n
 
-Returns the
+Removes and returns the last C<n> element(s) from array C<a>. If no argument is given, removes one element.
+
+    var a = [1,2,3,4]
+    a » 2           #=> [3, 4]    (and a becomes [1,2])
 
 Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
 
@@ -237,7 +253,10 @@ Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
 
     a ∋ b
 
-Returns the
+Returns true if array C<a> contains element C<b>.
+
+    [1,2,3] ∋ 2     #=> true
+    [1,2,3] ∋ 5     #=> false
 
 Aliases: I<has>, I<contain>, I<include>, I<contains>, I<includes>
 
@@ -247,7 +266,10 @@ Aliases: I<has>, I<contain>, I<include>, I<contains>, I<includes>
 
     a ∌ b
 
-Returns the
+Returns true if array C<a> does NOT contain element C<b> (negation of ∋).
+
+    [1,2,3] ∌ 5     #=> true
+    [1,2,3] ∌ 2     #=> false
 
 =cut
 
@@ -255,7 +277,7 @@ Returns the
 
     a ≠ b
 
-Returns the
+Returns true if arrays C<a> and C<b> are not equal (negation of ==).
 
 Aliases: I<!=>, I<ne>
 
@@ -265,7 +287,7 @@ Aliases: I<!=>, I<ne>
 
     a ≤ b
 
-Returns the
+Less-than-or-equal array comparison, done term-by-term lexicographically.
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -275,7 +297,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Returns the
+Greater-than-or-equal array comparison, done term-by-term lexicographically.
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -286,7 +308,7 @@ Aliases: I<E<gt>=>, I<ge>
     arr.abbrev
     arr.abbrev(/pattern/)
 
-Returns an Hash with the unambiguous abbreviations for the given array of strings.
+Returns a Hash with the unambiguous abbreviations for the given array of strings.
 
     say ['loved', 'loving', 'lover', 'lost'].abbrev
 
@@ -302,7 +324,7 @@ Output:
         "loving" => "loving"
     )
 
-When an additionaly regular expression is given, it collects only the abbreviations that will match the regex.
+When a regular expression is given, it collects only the abbreviations that match the regex.
 
 Aliases: I<abbreviations>
 
@@ -310,9 +332,11 @@ Aliases: I<abbreviations>
 
 =head2 acc
 
-    self.acc(block)
+    arr.acc { |a,b| ... }
 
-Returns the
+Returns an array of accumulated values using the given block, similar to map_reduce but with a binary operator.
+
+    [1,2,3,4].acc { |a,b| a + b }    #=> [1, 3, 6, 10]
 
 Aliases: I<accumulate>
 
@@ -320,9 +344,11 @@ Aliases: I<accumulate>
 
 =head2 acc_by
 
-    self.acc_by(block)
+    arr.acc_by { ... }
 
-Returns the
+Returns an array of accumulated values by mapping each element through the block first, then accumulating.
+
+    [1,2,3,4].acc_by { _**2 }    #=> [1, 5, 14, 30]
 
 Aliases: I<accumulate_by>
 
@@ -330,33 +356,45 @@ Aliases: I<accumulate_by>
 
 =head2 all
 
-    self.all(block)
+    arr.all { ... }
 
-Returns the
+Returns true if all elements satisfy the condition given in the block.
+
+    [2, 4, 6].all { .is_even }    #=> true
+    [2, 3, 6].all { .is_even }    #=> false
 
 =cut
 
 =head2 all_composite
 
-    self.all_composite
+    arr.all_composite
 
-Returns the
+Returns true if all elements in the array are composite numbers.
+
+    [4, 6, 8, 9].all_composite    #=> true
+    [4, 5, 6].all_composite       #=> false
 
 =cut
 
 =head2 all_prime
 
-    self.all_prime
+    arr.all_prime
 
-Returns the
+Returns true if all elements in the array are prime numbers.
+
+    [2, 3, 5, 7].all_prime    #=> true
+    [2, 3, 4].all_prime       #=> false
 
 =cut
 
 =head2 any
 
-    self.any(block)
+    arr.any { ... }
 
-Returns the
+Returns true if any element satisfies the condition given in the block.
+
+    [1, 2, 3].any { .is_even }    #=> true
+    [1, 3, 5].any { .is_even }    #=> false
 
 =cut
 
@@ -364,7 +402,7 @@ Returns the
 
     arr.avg
 
-Returns the average of a list of numbers.
+Returns the arithmetic mean (average) of a list of numbers.
 
     say [1,2,3,4].avg   #=> 2.5
 
@@ -374,7 +412,7 @@ Returns the average of a list of numbers.
 
     arr.avg_by { ... }
 
-Returns the average of a list of numbers, by mapping each value to a given block of code.
+Returns the average of a list of numbers, by mapping each value to the given block first.
 
     say [1,2,3,4].avg_by { _**2 }   #=> 7.5
 
@@ -384,12 +422,14 @@ Returns the average of a list of numbers, by mapping each value to a given block
 
     arr.bindex(obj)
 
-Returns the index of a given element inside a sorted array, using the I<Binary Search> algorithm.
+Returns the index of a given element inside a sorted array, using Binary Search.
 
     var a = ["Alice", "Jane", "Joe", "John", "Kate", "Zerg"]
 
-    say a.bindex('Alice')   #=> 0 (first index)
-    say a.bindex('Jane')    #=> 1 (second index)
+    say a.bindex('Alice')   #=> 0
+    say a.bindex('Jane')    #=> 1
+
+Returns nil if the element is not found.
 
 Aliases: I<bsearch_index>
 
@@ -397,14 +437,16 @@ Aliases: I<bsearch_index>
 
 =head2 bindex_by
 
-    arr.bindex_by { ... }
+    arr.bindex_by { |elem| ... }
 
-Returns the index of any element inside a sorted array, based on a given comparison block, using the I<Binary Search> algorithm.
+Returns the index of an element inside a sorted array using Binary Search, based on a comparison block.
 
     var a = ["Alice", "Jane", "Joe", "John", "Kate", "Zerg"]
 
-    say a.bindex { _ <=> 'Joe' }     #=> 2 (third index)
-    say a.bindex { _ <=> 'John' }    #=> 3 (fourth index)
+    say a.bindex_by { _ <=> 'Joe' }     #=> 2
+    say a.bindex_by { _ <=> 'John' }    #=> 3
+
+The block should return -1, 0, or 1 for comparison.
 
 Aliases: I<bsearch_index_by>
 
@@ -412,65 +454,75 @@ Aliases: I<bsearch_index_by>
 
 =head2 bindex_ge
 
-    self.bindex_ge(obj)
+    arr.bindex_ge(obj)
 
-Returns the
+Binary search returning the index of the smallest element that is greater than or equal to C<obj> in a sorted array.
+
+    [1, 3, 5, 7, 9].bindex_ge(5)    #=> 2
+    [1, 3, 5, 7, 9].bindex_ge(6)    #=> 3
 
 =cut
 
 =head2 bindex_ge_by
 
-    self.bindex_ge_by(obj)
+    arr.bindex_ge_by { |elem| ... }
 
-Returns the
+Binary search with a comparison block, returning the index of the smallest element that is greater than or equal to the search target.
 
 =cut
 
 =head2 bindex_le
 
-    self.bindex_le(obj)
+    arr.bindex_le(obj)
 
-Returns the
+Binary search returning the index of the largest element that is less than or equal to C<obj> in a sorted array.
+
+    [1, 3, 5, 7, 9].bindex_le(5)    #=> 2
+    [1, 3, 5, 7, 9].bindex_le(6)    #=> 2
 
 =cut
 
 =head2 bindex_le_by
 
-    self.bindex_le_by(obj)
+    arr.bindex_le_by { |elem| ... }
 
-Returns the
+Binary search with a comparison block, returning the index of the largest element that is less than or equal to the search target.
 
 =cut
 
 =head2 bindex_max
 
-    self.bindex_max(obj)
+    arr.bindex_max(obj)
 
-Returns the
+Binary search returning the highest index at which C<obj> appears in a sorted array (useful for arrays with duplicates).
+
+    [1, 2, 2, 2, 3].bindex_max(2)    #=> 3
 
 =cut
 
 =head2 bindex_max_by
 
-    self.bindex_max_by(block)
+    arr.bindex_max_by { ... }
 
-Returns the
+Binary search with a comparison block, returning the highest index matching the search criteria.
 
 =cut
 
 =head2 bindex_min
 
-    self.bindex_min(obj)
+    arr.bindex_min(obj)
 
-Returns the
+Binary search returning the lowest index at which C<obj> appears in a sorted array (useful for arrays with duplicates).
+
+    [1, 2, 2, 2, 3].bindex_min(2)    #=> 1
 
 =cut
 
 =head2 bindex_min_by
 
-    self.bindex_min_by(block)
+    arr.bindex_min_by { ... }
 
-Returns the
+Binary search with a comparison block, returning the lowest index matching the search criteria.
 
 =cut
 
@@ -478,31 +530,31 @@ Returns the
 
     arr.binsert(obj)
 
-Inserts an element into a sorted array, such that the array will still be sorted.
+Inserts an element into a sorted array maintaining sort order. Modifies the array in-place.
 
     var a = ['a', 'b', 'd']
     a.binsert('c')                  # inserts 'c' before 'd'
-    say a                           # prints: ['a', 'b', 'c', 'd']
-
-Modifies the array in-place.
+    say a                           #=> ['a', 'b', 'c', 'd']
 
 =cut
 
 =head2 binsplit
 
-    arr.binsplit {|a,b| ... }
+    arr.binsplit { |a,b| ... }
 
-Applies the binary splitting algorithm to the self-array, returning the result computed using the given block of code.
+Applies binary splitting algorithm to the array, recursively combining elements using the given binary operation.
 
-    say [1,2,3,4,5].binsplit {|a,b| a*b }   #=> 120
+    say [1,2,3,4,5].binsplit { |a,b| a*b }    #=> 120
 
 =cut
 
 =head2 bsearch
 
-    self.bsearch(obj)
+    arr.bsearch { |elem| ... }
 
-Returns the
+Performs binary search on a sorted array using a comparison block. Returns the matching element or nil.
+
+    [1, 3, 5, 7, 9].bsearch { _ <=> 5 }    #=> 5
 
 Aliases: I<bsearch_by>
 
@@ -510,9 +562,11 @@ Aliases: I<bsearch_by>
 
 =head2 bsearch_ge
 
-    self.bsearch_ge(obj)
+    arr.bsearch_ge(obj)
 
-Returns the
+Binary search returning the smallest element that is greater than or equal to C<obj>.
+
+    [1, 3, 5, 7, 9].bsearch_ge(6)    #=> 7
 
 Aliases: I<bsearch_ge_by>
 
@@ -520,9 +574,11 @@ Aliases: I<bsearch_ge_by>
 
 =head2 bsearch_le
 
-    self.bsearch_le(obj)
+    arr.bsearch_le(obj)
 
-Returns the
+Binary search returning the largest element that is less than or equal to C<obj>.
+
+    [1, 3, 5, 7, 9].bsearch_le(6)    #=> 5
 
 Aliases: I<bsearch_le_by>
 
@@ -530,17 +586,21 @@ Aliases: I<bsearch_le_by>
 
 =head2 bsearch_max
 
-    self.bsearch_max(obj)
+    arr.bsearch_max(obj)
 
-Returns the
+Binary search returning the last occurrence of C<obj> in a sorted array with duplicates.
+
+    [1, 2, 2, 2, 3].bsearch_max(2)    #=> 2
 
 =cut
 
 =head2 bsearch_min
 
-    self.bsearch_min(obj)
+    arr.bsearch_min(obj)
 
-Returns the
+Binary search returning the first occurrence of C<obj> in a sorted array with duplicates.
+
+    [1, 2, 2, 2, 3].bsearch_min(2)    #=> 2
 
 =cut
 
@@ -548,7 +608,9 @@ Returns the
 
     arr.bshuffle
 
-Shuffles an array in such a way that no element will be on the same position as in the original array (if possible).
+Shuffles an array ensuring no element remains in its original position (perfect derangement).
+
+    [1,2,3,4].bshuffle    #=> [3,4,2,1] (example - varies each time)
 
 Aliases: I<best_shuffle>
 
@@ -557,26 +619,15 @@ Aliases: I<best_shuffle>
 =head2 cartesian
 
     arr.cartesian
-    arr.cartesian {|*c| ... }
+    arr.cartesian { |*c| ... }
 
-Returns the Cartesian product of a 2D array.
+Returns the Cartesian product of a 2D array (all possible combinations).
 
     say [[1,2],[3,4]].cartesian    #=> [[1,3], [1,4], [2,3], [2,4]]
 
-When a block is given, it gets called which each combination:
+When a block is given, it's called with each combination:
 
-    [[1,2],[3,4],[5,6]].cartesian {|*c| say c }
-
-Output:
-
-    [1, 3, 5]
-    [1, 3, 6]
-    [1, 4, 5]
-    [1, 4, 6]
-    [2, 3, 5]
-    [2, 3, 6]
-    [2, 4, 5]
-    [2, 4, 6]
+    [[1,2],[3,4],[5,6]].cartesian { |*c| say c }
 
 =cut
 
@@ -584,7 +635,7 @@ Output:
 
     arr.cfrac2num
 
-Converts a given continued fraction expansion to a number.
+Converts a continued fraction expansion array to a rational number.
 
     var c = Num.pi.cfrac(10)    # [3, 7, 15, 1, 292, 1, 1, 1, 2, 1]
     say c.cfrac2num.as_frac     #=> 4272943/1360120
@@ -593,17 +644,24 @@ Converts a given continued fraction expansion to a number.
 
 =head2 change_to
 
-    self.change_to(arg)
+    arr.change_to(new_array)
 
-Returns the
+Replaces all elements of the array with elements from C<new_array>, modifying it in-place.
+
+    var a = [1, 2, 3]
+    a.change_to([4, 5])
+    say a                   #=> [4, 5]
 
 =cut
 
 =head2 chrs
 
-    self.chrs(encoding)
+    arr.chrs
+    arr.chrs(encoding)
 
-Returns the
+Converts an array of byte values to a string, optionally with specified encoding.
+
+    [72, 101, 108, 108, 111].chrs    #=> "Hello"
 
 Aliases: I<decode>, I<join_bytes>
 
@@ -611,57 +669,76 @@ Aliases: I<decode>, I<join_bytes>
 
 =head2 circular_permutations
 
-    self.circular_permutations
+    arr.circular_permutations
+    arr.circular_permutations { |*perm| ... }
 
-Returns the
+Generates all circular (rotational) permutations of the array.
+
+    [1,2,3].circular_permutations    #=> [[1,2,3], [2,3,1], [3,1,2]]
 
 =cut
 
 =head2 clear
 
-    self.clear
+    arr.clear
 
-Returns the
+Removes all elements from the array, making it empty. Modifies in-place.
+
+    var a = [1, 2, 3]
+    a.clear
+    say a    #=> []
 
 =cut
 
 =head2 collapse
 
-    self.collapse(initial)
+    arr.collapse(initial)
 
-Returns the
+Collapses an array using a right-to-left fold operation starting with an initial value.
+
+    [1,2,3,4].collapse(0) { |a,b| a+b }    #=> 10
 
 =cut
 
 =head2 combinations
 
-    self.combinations
+    arr.combinations
+    arr.combinations(k)
+    arr.combinations(k) { |*c| ... }
 
-Returns the
+Generates all k-combinations (subsets of size k) of the array.
+
+    [1,2,3].combinations(2)    #=> [[1,2], [1,3], [2,3]]
 
 =cut
 
 =head2 combinations_with_repetition
 
-    self.combinations_with_repetition
+    arr.combinations_with_repetition(k)
 
-Returns the
+Generates all k-combinations with repetition allowed.
+
+    [1,2].combinations_with_repetition(3)    #=> [[1,1,1], [1,1,2], [1,2,2], [2,2,2]]
 
 =cut
 
 =head2 combine
 
-    self.combine(block)
+    arr.combine { |a,b| ... }
 
-Returns the
+Combines elements of a 2D array using the given binary operation.
+
+    [[1,2], [3,4], [5,6]].combine { |a,b| a+b }    #=> [9, 12]
 
 =cut
 
 =head2 compact
 
-    self.compact
+    arr.compact
 
-Returns the
+Removes all undefined (nil) values from the array, returning a new array.
+
+    [1, nil, 2, nil, 3].compact    #=> [1, 2, 3]
 
 =cut
 
@@ -669,9 +746,9 @@ Returns the
 
     arr.cons(n)
 
-Returns a new array of arrays with n-consecutive elements from the self-array.
+Returns consecutive n-element windows of the array.
 
-    say [1,2,3,4].cons(2)      #=> [[1, 2], [2, 3], [3, 4]]
+    [1,2,3,4].cons(2)    #=> [[1,2], [2,3], [3,4]]
 
 Aliases: I<map_cons>
 
@@ -679,49 +756,64 @@ Aliases: I<map_cons>
 
 =head2 contains_all
 
-    self.contains_all(array)
+    arr.contains_all(other_arr)
 
-Returns the
+Returns true if the array contains all elements from C<other_arr>.
+
+    [1,2,3,4].contains_all([2,3])    #=> true
+    [1,2,3,4].contains_all([2,5])    #=> false
 
 =cut
 
 =head2 contains_any
 
-    self.contains_any(array)
+    arr.contains_any(other_arr)
 
-Returns the
+Returns true if the array contains any element from C<other_arr>.
+
+    [1,2,3].contains_any([3,4,5])    #=> true
+    [1,2,3].contains_any([4,5,6])    #=> false
 
 =cut
 
 =head2 contains_type
 
-    self.contains_type(obj)
+    arr.contains_type(Type)
 
-Returns the
+Returns true if the array contains any element of the given type.
+
+    [1, "a", 3.5].contains_type(String)    #=> true
+    [1, 2, 3].contains_type(String)        #=> false
 
 =cut
 
 =head2 count
 
-    self.count(obj)
+    arr.count(obj)
 
-Returns the
+Returns the number of times C<obj> appears in the array.
+
+    [1,2,1,3,1].count(1)    #=> 3
 
 =cut
 
 =head2 count_by
 
-    self.count_by(block)
+    arr.count_by { ... }
 
-Returns the
+Returns the number of elements for which the block returns true.
+
+    [1,2,3,4,5].count_by { .is_prime }    #=> 3
 
 =cut
 
 =head2 cross_op
 
-    self.cross_op(operator, arg)
+    arr.cross_op(operator, other_arr)
 
-Returns the
+Applies an operator to every pair from the Cartesian product of two arrays.
+
+    [1,2].cross_op('+', [3,4])    #=> [4, 5, 5, 6]
 
 Aliases: I<cross_operator>
 
@@ -729,17 +821,24 @@ Aliases: I<cross_operator>
 
 =head2 defined
 
-    self.defined(index)
+    arr.defined(index)
 
-Returns the
+Returns true if the element at the given index is defined (not nil).
+
+    [1, nil, 3].defined(0)    #=> true
+    [1, nil, 3].defined(1)    #=> false
 
 =cut
 
 =head2 delete
 
-    self.delete(obj)
+    arr.delete(obj)
 
-Returns the
+Removes all occurrences of C<obj> from the array. Modifies in-place and returns the array.
+
+    var a = [1,2,1,3,1]
+    a.delete(1)
+    say a    #=> [2, 3]
 
 Aliases: I<remove>
 
@@ -747,9 +846,13 @@ Aliases: I<remove>
 
 =head2 delete_by
 
-    self.delete_by(block)
+    arr.delete_by { ... }
 
-Returns the
+Removes all elements for which the block returns true. Modifies in-place.
+
+    var a = [1,2,3,4,5]
+    a.delete_by { .is_even }
+    say a    #=> [1, 3, 5]
 
 Aliases: I<delete_if>, I<remove_by>, I<remove_if>
 
@@ -757,9 +860,13 @@ Aliases: I<delete_if>, I<remove_by>, I<remove_if>
 
 =head2 delete_first
 
-    self.delete_first(obj)
+    arr.delete_first(obj)
 
-Returns the
+Removes the first occurrence of C<obj> from the array. Returns true if removed.
+
+    var a = [1,2,1,3]
+    a.delete_first(1)
+    say a    #=> [2, 1, 3]
 
 Aliases: I<remove_first>
 
@@ -767,9 +874,13 @@ Aliases: I<remove_first>
 
 =head2 delete_first_by
 
-    self.delete_first_by(block)
+    arr.delete_first_by { ... }
 
-Returns the
+Removes the first element for which the block returns true.
+
+    var a = [1,2,3,4,5]
+    a.delete_first_by { .is_even }
+    say a    #=> [1, 3, 4, 5]
 
 Aliases: I<delete_first_if>, I<remove_first_by>, I<remove_first_if>
 
@@ -779,13 +890,11 @@ Aliases: I<delete_first_if>, I<remove_first_by>, I<remove_first_if>
 
     arr.delete_last(obj)
 
-Removes the last C<obj> element from the array, modifying the array in-place.
+Removes the last occurrence of C<obj> from the array. Returns true if removed.
 
-    var arr = %w[a b c a]
-    arr.delete_last('a')
-    say arr                 #=> ["a", "b", "c"]
-
-Returns true if such an element was removed.
+    var a = [1,2,1,3,1]
+    a.delete_last(1)
+    say a    #=> [1, 2, 1, 3]
 
 Aliases: I<remove_last>
 
@@ -793,9 +902,13 @@ Aliases: I<remove_last>
 
 =head2 delete_last_by
 
-    self.delete_last_by(block)
+    arr.delete_last_by { ... }
 
-Returns the
+Removes the last element for which the block returns true.
+
+    var a = [1,2,3,4,5]
+    a.delete_last_by { .is_even }
+    say a    #=> [1, 2, 3, 5]
 
 Aliases: I<delete_last_if>, I<remove_last_by>, I<remove_last_if>
 
@@ -803,9 +916,12 @@ Aliases: I<delete_last_if>, I<remove_last_by>, I<remove_last_if>
 
 =head2 derangements
 
-    self.derangements
+    arr.derangements
+    arr.derangements { |*d| ... }
 
-Returns the
+Generates all derangements (permutations where no element appears in its original position).
+
+    [1,2,3].derangements    #=> [[2,3,1], [3,1,2]]
 
 Aliases: I<complete_permutations>
 
@@ -813,9 +929,11 @@ Aliases: I<complete_permutations>
 
 =head2 det
 
-    self.det
+    matrix.det
 
-Returns the
+Computes the determinant of a square matrix (2D array).
+
+    [[1,2], [3,4]].det    #=> -2
 
 Aliases: I<determinant>
 
@@ -823,23 +941,23 @@ Aliases: I<determinant>
 
 =head2 det_bareiss
 
-    self.det_bareiss
+    matrix.det_bareiss
 
-Returns the
+Computes the determinant using Bareiss algorithm (integer-preserving method).
+
+    [[1,2,3], [4,5,6], [7,8,9]].det_bareiss    #=> 0
 
 =cut
 
 =head2 diffs
 
-    arr.diffs(n=1)
+    arr.diffs
+    arr.diffs(n)
 
-Returns the n-th differences of the array (calling C<sub>).
+Returns the n-th order differences of consecutive elements.
 
-    var a = [43, 97, 128, 999]
-
-    say a.diffs                     #=> [54, 31, 871]
-    say a.diffs(2)                  #=> [-23, 840]
-    say a.diffs(3)                  #=> [863]
+    [43, 97, 128, 999].diffs      #=> [54, 31, 871]
+    [43, 97, 128, 999].diffs(2)   #=> [-23, 840]
 
 Aliases: I<differences>, I<nth_differences>
 
@@ -847,20 +965,24 @@ Aliases: I<differences>, I<nth_differences>
 
 =head2 dig
 
-    self.dig(key, *keys)
+    arr.dig(index, *more_indices)
 
-Returns the
+Traverses nested arrays/hashes to retrieve a deeply nested value.
+
+    [[1, [2, 3]], 4].dig(0, 1, 1)    #=> 3
 
 =cut
 
 =head2 digits2num
 
-    arr.digits2num(base=10)
+    arr.digits2num
+    arr.digits2num(base)
 
-Converts the list of values returned by Number C<digits(n, base)> back to C<n>.
+Converts an array of digits back to a number (inverse of Number.digits).
 
-    say 1234.digits.digits2num              #=> 1234
-    say [73, 56, 0, 76, 22].digits2num(100) #=> 2276005673
+    [1, 2, 3, 4].digits2num         #=> 1234
+    [1, 2, 3, 4].digits2num(10)     #=> 1234
+    [1, 1, 0, 1].digits2num(2)      #=> 13
 
 Aliases: I<from_digits>
 
@@ -868,11 +990,11 @@ Aliases: I<from_digits>
 
 =head2 each_2d
 
-    arr.each_2d {|a,b,c,...| ... }
+    arr.each_2d { |a, b, c, ...| ... }
 
-Iterate over a 2D array.
+Iterates over a 2D array, unpacking each sub-array.
 
-    [[1,2],[3,4]].each_2d {|a,b|
+    [[1,2], [3,4]].each_2d { |a,b|
         say (a**2 + b**2)
     }
 
@@ -880,27 +1002,22 @@ Iterate over a 2D array.
 
 =head2 each_cons
 
-    arr.each_cons(n, { ... })
+    arr.each_cons(n) { |*elements| ... }
 
-Iterate over C<n> consecutive values at a time.
+Iterates over consecutive n-element windows.
 
-    [1,2,3,4,5,6,7].each_cons(3, {|*c| say c })
-
-Outputs:
-
-    [1, 2, 3]
-    [2, 3, 4]
-    [3, 4, 5]
-    [4, 5, 6]
-    [5, 6, 7]
+    [1,2,3,4,5].each_cons(3) { |*c| say c }
+    # Prints: [1,2,3], [2,3,4], [3,4,5]
 
 =cut
 
 =head2 each_k
 
-    self.each_k(block)
+    arr.each_k { |index| ... }
 
-Returns the
+Iterates over array indices (0 to length-1).
+
+    ['a','b','c'].each_k { |i| say i }    # Prints: 0, 1, 2
 
 Aliases: I<each_key>, I<each_index>
 
@@ -908,25 +1025,32 @@ Aliases: I<each_key>, I<each_index>
 
 =head2 each_kv
 
-    self.each_kv(block)
+    arr.each_kv { |index, value| ... }
 
-Returns the
+Iterates over index-value pairs.
+
+    ['a','b','c'].each_kv { |i,v| say "#{i}: #{v}" }
 
 =cut
 
 =head2 each_slice
 
-    self.each_slice(n, block)
+    arr.each_slice(n) { |*slice| ... }
 
-Returns the
+Iterates over non-overlapping slices of size n.
+
+    [1,2,3,4,5].each_slice(2) { |*s| say s }
+    # Prints: [1,2], [3,4], [5]
 
 =cut
 
 =head2 end
 
-    self.end
+    arr.end
 
-Returns the
+Returns the index of the last element (length - 1).
+
+    [1,2,3].end    #=> 2
 
 Aliases: I<offset>
 
@@ -934,9 +1058,12 @@ Aliases: I<offset>
 
 =head2 exists
 
-    self.exists(index)
+    arr.exists(index)
 
-Returns the
+Returns true if the given index exists in the array.
+
+    [1,2,3].exists(2)     #=> true
+    [1,2,3].exists(10)    #=> false
 
 Aliases: I<has_index>
 
@@ -946,9 +1073,9 @@ Aliases: I<has_index>
 
     arr.expand { ... }
 
-Recursively expand an array, given a block of code.
+Recursively expands nested arrays using a block that returns an array or element.
 
-    say [1,[2,[3,4]],5].expand { _ }    #=> [1, 5, 2, 3, 4]
+    [1, [2, [3, 4]], 5].expand { _ }    #=> [1, 2, 3, 4, 5]
 
 Aliases: I<expand_by>
 
@@ -956,25 +1083,40 @@ Aliases: I<expand_by>
 
 =head2 extract_by
 
-    self.extract_by(block)
+    arr.extract_by { ... }
 
-Returns the
+Removes and returns all elements for which the block returns true.
+
+    var a = [1,2,3,4,5]
+    var b = a.extract_by { .is_even }
+    say b    #=> [2, 4]
+    say a    #=> [1, 3, 5]
 
 =cut
 
 =head2 extract_first_by
 
-    self.extract_first_by(block)
+    arr.extract_first_by { ... }
 
-Returns the
+Removes and returns the first element for which the block returns true.
+
+    var a = [1,2,3,4,5]
+    var b = a.extract_first_by { .is_even }
+    say b    #=> 2
+    say a    #=> [1, 3, 4, 5]
 
 =cut
 
 =head2 extract_last_by
 
-    self.extract_last_by(block)
+    arr.extract_last_by { ... }
 
-Returns the
+Removes and returns the last element for which the block returns true.
+
+    var a = [1,2,3,4,5]
+    var b = a.extract_last_by { .is_even }
+    say b    #=> 4
+    say a    #=> [1, 2, 3, 5]
 
 =cut
 
@@ -982,19 +1124,21 @@ Returns the
 
     arr.fetch(index, default)
 
-Fetches a value at the given index. When the index does not exist, it returns the default value.
+Fetches a value at the given index. Returns default if index doesn't exist.
 
-    var a = [3,9,27]
-    say a.fetch(2, 42)     # fetches index 2 and prints: 27
-    say a.fetch(3, 42)     # fails to fetch index 3, therefore prints: 42
+    var a = [3, 9, 27]
+    say a.fetch(2, 42)     #=> 27
+    say a.fetch(5, 42)     #=> 42
 
 =cut
 
 =head2 find
 
-    self.find(block)
+    arr.find { ... }
 
-Returns the
+Returns the first element for which the block returns true.
+
+    [1,2,3,4,5].find { .is_prime }    #=> 2
 
 Aliases: I<first_by>
 
@@ -1002,9 +1146,11 @@ Aliases: I<first_by>
 
 =head2 flat
 
-    self.flat
+    arr.flat
 
-Returns the
+Flattens a nested array completely, recursively.
+
+    [[1, [2, 3]], 4].flat    #=> [1, 2, 3, 4]
 
 Aliases: I<flatten>
 
@@ -1014,17 +1160,19 @@ Aliases: I<flatten>
 
     arr.flat_map { ... }
 
-Similar to C<.map{}>, but it expects the returned block-value to be an array, which will be collected as a list.
+Maps each element through the block and flattens the result by one level.
 
-    say [1,2,3,4,5].flat_map { .factor }      #=> [2, 3, 2, 2, 5]
+    [[1,2], [3,4]].flat_map { [_, _**2] }    #=> [1, 2, 1, 4, 3, 4, 9, 16]
 
 =cut
 
 =head2 flip
 
-    self.flip
+    arr.flip
 
-Returns the
+Returns a new array with elements in reverse order.
+
+    [1,2,3,4].flip    #=> [4, 3, 2, 1]
 
 Aliases: I<reverse>
 
@@ -1032,9 +1180,11 @@ Aliases: I<reverse>
 
 =head2 for
 
-    self.for(block)
+    arr.for { |elem| ... }
 
-Returns the
+Iterates over each element, calling the block with each element.
+
+    [1,2,3].for { |n| say n }
 
 Aliases: I<each>, I<foreach>
 
@@ -1044,73 +1194,90 @@ Aliases: I<each>, I<foreach>
 
     arr.freq
 
-Returns a frequency Hash for the elements inside the array.
+Returns a frequency Hash counting occurrences of each element.
 
-    say ["a","b","a"].freq      #=> Hash(a => 2, b => 1)
+    ["a", "b", "a", "c", "b", "a"].freq    #=> Hash(a => 3, b => 2, c => 1)
 
 =cut
 
 =head2 freq_by
 
-    self.freq_by(block)
+    arr.freq_by { ... }
 
-Returns the
+Returns a frequency Hash by mapping elements through the block first.
+
+    ["Alice", "Bob", "Anna"].freq_by { .char(0) }    #=> Hash(A => 2, B => 1)
 
 =cut
 
 =head2 ft
 
-    self.ft
+    arr.ft
 
-Returns the
+Performs a Fast Fourier Transform on the array of complex numbers.
+
+    var data = [1, 2, 3, 4]
+    say data.ft
 
 =cut
 
 =head2 gauss_jordan_invert
 
-    self.gauss_jordan_invert
+    matrix.gauss_jordan_invert
 
-Returns the
+Inverts a matrix using Gauss-Jordan elimination.
+
+    [[1, 2], [3, 4]].gauss_jordan_invert    #=> [[-2, 1], [1.5, -0.5]]
 
 =cut
 
 =head2 gauss_jordan_solve
 
-    self.gauss_jordan_solve(vector)
+    matrix.gauss_jordan_solve(vector)
 
-Returns the
+Solves a system of linear equations Ax = b using Gauss-Jordan elimination.
+
+    var A = [[2, 1], [1, 3]]
+    var b = [5, 7]
+    say A.gauss_jordan_solve(b)    #=> [1.4, 1.8]
 
 =cut
 
 =head2 gcd
 
-    self.gcd(block)
+    arr.gcd
 
-Returns the
+Returns the greatest common divisor of all array elements.
+
+    [12, 18, 24].gcd    #=> 6
 
 =cut
 
 =head2 gcd_by
 
-    self.gcd_by(block)
+    arr.gcd_by { ... }
 
-Returns the
+Returns the GCD of all elements after mapping through the block.
+
+    [2,3,4].gcd_by { _! }    #=> 2
 
 =cut
 
 =head2 gcud
 
-    self.gcud(block)
+    arr.gcud
 
-Returns the
+Returns the greatest common unitary divisor of all array elements.
+
+    [12, 18, 24].gcud
 
 =cut
 
 =head2 gcud_by
 
-    self.gcud_by(block)
+    arr.gcud_by { ... }
 
-Returns the
+Returns the GCUD after mapping elements through the block.
 
 =cut
 
@@ -1118,31 +1285,27 @@ Returns the
 
     arr.getopt(...)
 
-Parse an array containing (long) command-line arguments, automatically converting the argument-values based on the types of the default values.
+Parses command-line style arguments with automatic type conversion.
 
     var file = File('file.dat')
     var length = 42
     var verbose = false
 
-    var args = ['--file', 'foo.txt', '--length', '1234', '--verbose']
-
-    args.getopt(
-        'length=i' => \length,
+    ['--file', 'foo.txt', '--length', '100', '--verbose'].getopt(
         'file=s'   => \file,
+        'length=i' => \length,
         'verbose!' => \verbose,
     )
-
-    say file.dump           #=> File("foo.txt")
-    say length              #=> 1234
-    say verbose             #=> true
 
 =cut
 
 =head2 grep
 
-    self.grep(block)
+    arr.grep { ... }
 
-Returns the
+Filters the array, returning elements for which the block returns true.
+
+    [1,2,3,4,5].grep { .is_prime }    #=> [2, 3, 5]
 
 Aliases: I<select>
 
@@ -1150,19 +1313,21 @@ Aliases: I<select>
 
 =head2 grep_2d
 
-    arr.grep_2d {|a,b,c,...| ... }
+    arr.grep_2d { |a, b, c, ...| ... }
 
-Filtering of a 2D array, given a block of code.
+Filters a 2D array using a block that receives unpacked sub-arrays.
 
-    say [[1,2],[3,4]].grep_2d {|a,b| a+b == 7 }    #=> [[3,4]]
+    [[1,2], [3,4], [5,6]].grep_2d { |a,b| a+b > 7 }    #=> [[3,4], [5,6]]
 
 =cut
 
 =head2 grep_kv
 
-    self.grep_kv(block)
+    arr.grep_kv { |index, value| ... }
 
-Returns the
+Filters based on index-value pairs, returning matching elements.
+
+    ['a','b','c'].grep_kv { |i,v| i.is_even }    #=> ['a', 'c']
 
 Aliases: I<select_kv>
 
@@ -1170,9 +1335,11 @@ Aliases: I<select_kv>
 
 =head2 group
 
-    self.group(block)
+    arr.group { ... }
 
-Returns the
+Groups elements into a Hash based on block return values.
+
+    [1,2,3,4,5,6].group { _ % 3 }    #=> Hash(0 => [3,6], 1 => [1,4], 2 => [2,5])
 
 Aliases: I<group_by>
 
@@ -1180,9 +1347,13 @@ Aliases: I<group_by>
 
 =head2 head
 
-    self.head(arg)
+    arr.head
+    arr.head(n)
 
-Returns the
+Returns the first element, or first n elements.
+
+    [1,2,3,4].head      #=> 1
+    [1,2,3,4].head(2)   #=> [1, 2]
 
 Aliases: I<first>
 
@@ -1190,25 +1361,31 @@ Aliases: I<first>
 
 =head2 imax
 
-    self.imax
+    arr.imax
 
-Returns the
+Returns the index of the maximum element.
+
+    [3, 1, 4, 1, 5].imax    #=> 4
 
 =cut
 
 =head2 imin
 
-    self.imin
+    arr.imin
 
-Returns the
+Returns the index of the minimum element.
+
+    [3, 1, 4, 1, 5].imin    #=> 1
 
 =cut
 
 =head2 iminmax
 
-    self.iminmax
+    arr.iminmax
 
-Returns the
+Returns a pair [min_index, max_index].
+
+    [3, 1, 4, 1, 5].iminmax    #=> [1, 4]
 
 =cut
 
@@ -1217,14 +1394,10 @@ Returns the
     arr.index(obj)
     arr.index { ... }
 
-Returns the first index of a given item inside the array.
+Returns the first index of the element, or first index where block is true.
 
-    say %w(a b c).index("a")   #=> 0
-    say %w(a b c).index("c")   #=> 2
-
-When a block is given, it returns the first index of the element for which the block returns a true value:
-
-    say %w(A B C).index { .lc == 'b' }   #=> 1
+    ['a', 'b', 'c'].index('b')           #=> 1
+    ['a', 'b', 'c'].index { _ eq 'c' }   #=> 2
 
 Aliases: I<index_by>, I<first_index>, I<first_index_by>
 
@@ -1232,18 +1405,13 @@ Aliases: I<index_by>, I<first_index>, I<first_index_by>
 
 =head2 inject
 
-    arr.inject {|a,b| ... }
-    arr.inject({|a,b| ... }, obj)
+    arr.inject { |a, b| ... }
+    arr.inject({ |a, b| ... }, initial)
 
-Reduce a given array to a single element, given a block of code that is called with a pair C<a,b>, where C<a> is the previous result returned by the block and C<b> is the current element of the array.
+Reduces array to single value using binary operation. Like fold/reduce.
 
-The initial value of C<a> is the first element of the array.
-
-    say [1,2,3,4].reduce {|a,b| a + b }        #=> 10
-
-When an additional argument is given, it will be used as the initial value for C<a>:
-
-    say [1,2,3,4].reduce({|a,b| a + b }, 5)    #=> 15
+    [1,2,3,4].inject { |a,b| a + b }        #=> 10
+    [1,2,3,4].inject({ |a,b| a * b }, 2)   #=> 48
 
 Aliases: I<reduce>
 
@@ -1251,17 +1419,23 @@ Aliases: I<reduce>
 
 =head2 insert
 
-    self.insert(i, *objects)
+    arr.insert(index, *objects)
 
-Returns the
+Inserts objects at the specified index. Modifies in-place.
+
+    var a = [1, 2, 5]
+    a.insert(2, 3, 4)
+    say a    #=> [1, 2, 3, 4, 5]
 
 =cut
 
 =head2 inv
 
-    self.inv
+    matrix.inv
 
-Returns the
+Returns the inverse of a matrix.
+
+    [[1, 2], [3, 4]].inv    #=> [[-2, 1], [1.5, -0.5]]
 
 Aliases: I<invert>, I<inverse>
 
@@ -1269,79 +1443,103 @@ Aliases: I<invert>, I<inverse>
 
 =head2 is_empty
 
-    self.is_empty
+    arr.is_empty
 
-Returns the
+Returns true if the array has no elements.
+
+    [].is_empty         #=> true
+    [1].is_empty        #=> false
 
 =cut
 
 =head2 isort
 
-    self.isort
+    arr.isort
 
-Returns the
+Sorts the array in-place. Returns the array.
+
+    var a = [3, 1, 2]
+    a.isort
+    say a    #=> [1, 2, 3]
 
 =cut
 
 =head2 isort_by
 
-    self.isort_by(block)
+    arr.isort_by { ... }
 
-Returns the
+Sorts the array in-place using a mapping block.
+
+    var a = ['foo', 'a', 'bb']
+    a.isort_by { .len }
+    say a    #=> ['a', 'bb', 'foo']
 
 =cut
 
 =head2 item
 
-    self.item(index)
+    arr.item(index)
 
-Returns the
+Returns the element at the given index. Alias for arr[index].
+
+    [10, 20, 30].item(1)    #=> 20
 
 =cut
 
 =head2 items
 
-    self.items(*indices)
+    arr.items(*indices)
 
-Returns the
+Returns an array of elements at the specified indices.
+
+    ['a', 'b', 'c', 'd'].items(0, 2, 3)    #=> ['a', 'c', 'd']
 
 =cut
 
 =head2 iter
 
-    self.iter
+    arr.iter
 
-Returns the
+Returns an iterator object for the array.
+
+    var it = [1,2,3].iter
+    say it.next    #=> 1
 
 =cut
 
 =head2 iuniq
 
-    self.iuniq
+    arr.iuniq
 
-Returns the
+Removes duplicates from the array in-place. Returns the array.
+
+    var a = [1, 2, 1, 3, 2]
+    a.iuniq
+    say a    #=> [1, 2, 3]
 
 =cut
 
 =head2 jaro
 
-    jaro(arr1, arr2, winkler=false)
+    jaro(arr1, arr2)
+    jaro(arr1, arr2, winkler)
 
-Calculates the Jaro similarity between two arrays. Jaro distance is a measure of similarity between two sequences of symbols, based on the number of matching symbols and transpositions.
+Calculates Jaro (or Jaro-Winkler) similarity between two arrays.
 
-    say jaro("accommodate".chars, "accomodate".chars)         #=> 0.96969696969697
-
-When the third argument is true, it returns the Jaro-Winkler similarity score.
-
-    say jaro("accommodate".chars, "accomodate".chars, true)   #=> 0.981818181818182
+    jaro("hello".chars, "hallo".chars)         #=> 0.8666...
+    jaro("hello".chars, "hallo".chars, true)   #=> 0.92 (Jaro-Winkler)
 
 =cut
 
 =head2 join
 
-    self.join(delim, block)
+    arr.join
+    arr.join(delimiter)
 
-Returns the
+Joins array elements into a string with optional delimiter.
+
+    [1, 2, 3].join         #=> "123"
+    [1, 2, 3].join(', ')   #=> "1, 2, 3"
 
 =cut
 
@@ -1349,9 +1547,9 @@ Returns the
 
     arr.join_insert(obj)
 
-Inserts the given object between every element of the array. Returns a new array.
+Inserts object between every element. Returns new array.
 
-    say [1,2,3,4].join_insert(0)    #=> [1, 0, 2, 0, 3, 0, 4]
+    [1, 2, 3].join_insert(0)    #=> [1, 0, 2, 0, 3]
 
 =cut
 
@@ -1359,9 +1557,9 @@ Inserts the given object between every element of the array. Returns a new array
 
     arr.keys
 
-Returns an array with the indices of the self-array.
+Returns array of all valid indices [0, 1, 2, ...].
 
-    say ["x","y","z"].keys   #=> [0, 1, 2]
+    ['a', 'b', 'c'].keys    #=> [0, 1, 2]
 
 Aliases: I<indices>
 
@@ -1371,9 +1569,10 @@ Aliases: I<indices>
 
     arr.keys_by { ... }
 
-Returns an array with the indices for which the given block returns a true value.
+Returns indices where block returns true.
 
-    say [41, 42, 43].indices_by { .is_prime }     #=> [0, 2]
+    [10, 15, 20, 25].keys_by { _ % 5 == 0 }    #=> [0, 1, 2, 3]
+    [10, 15, 21, 25].keys_by { _ % 5 == 0 }    #=> [0, 1, 3]
 
 Aliases: I<indices_by>
 
@@ -1383,9 +1582,9 @@ Aliases: I<indices_by>
 
     arr.keys_of(obj)
 
-Returns an array with the indices of C<obj> inside the self-array.
+Returns all indices where object appears.
 
-     say [1,2,3,1,4,1].indices_of(1)         #=> [0, 3, 5]
+    [1, 2, 1, 3, 1].keys_of(1)    #=> [0, 2, 4]
 
 Aliases: I<indices_of>
 
@@ -1393,9 +1592,11 @@ Aliases: I<indices_of>
 
 =head2 kv
 
-    self.kv
+    arr.kv
 
-Returns the
+Returns array of [index, value] pairs.
+
+    ['a', 'b', 'c'].kv    #=> [[0, 'a'], [1, 'b'], [2, 'c']]
 
 Aliases: I<pairs>, I<zip_indices>
 
@@ -1403,9 +1604,13 @@ Aliases: I<pairs>, I<zip_indices>
 
 =head2 last
 
-    self.last(arg)
+    arr.last
+    arr.last(n)
 
-Returns the
+Returns the last element, or last n elements.
+
+    [1, 2, 3, 4].last      #=> 4
+    [1, 2, 3, 4].last(2)   #=> [3, 4]
 
 Aliases: I<tail>
 
@@ -1413,17 +1618,21 @@ Aliases: I<tail>
 
 =head2 last_by
 
-    self.last_by(block)
+    arr.last_by { ... }
 
-Returns the
+Returns the last element for which block returns true.
+
+    [1, 2, 3, 4, 5].last_by { .is_even }    #=> 4
 
 =cut
 
 =head2 last_uniq
 
-    self.last_uniq
+    arr.last_uniq
 
-Returns the
+Keeps only the last occurrence of each duplicate element.
+
+    [1, 2, 1, 3, 2].last_uniq    #=> [1, 3, 2]
 
 Aliases: I<last_unique>
 
@@ -1431,9 +1640,11 @@ Aliases: I<last_unique>
 
 =head2 last_uniq_by
 
-    self.last_uniq_by(block)
+    arr.last_uniq_by { ... }
 
-Returns the
+Keeps last occurrence based on block's return value.
+
+    ['a', 'A', 'b', 'B'].last_uniq_by { .uc }    #=> ['A', 'B']
 
 Aliases: I<last_unique_by>
 
@@ -1441,25 +1652,31 @@ Aliases: I<last_unique_by>
 
 =head2 lcm
 
-    self.lcm(block)
+    arr.lcm
 
-Returns the
+Returns the least common multiple of all elements.
+
+    [4, 6, 8].lcm    #=> 24
 
 =cut
 
 =head2 lcm_by
 
-    self.lcm_by(block)
+    arr.lcm_by { ... }
 
-Returns the
+Returns LCM after mapping elements through block.
+
+    [2, 3, 4].lcm_by { _! }    #=> 24
 
 =cut
 
 =head2 len
 
-    self.len
+    arr.len
 
-Returns the
+Returns the number of elements in the array.
+
+    [1, 2, 3].len    #=> 3
 
 Aliases: I<size>, I<length>
 
@@ -1467,9 +1684,11 @@ Aliases: I<size>, I<length>
 
 =head2 lev
 
-    self.lev(arg)
+    arr1.lev(arr2)
 
-Returns the
+Calculates Levenshtein distance between two arrays.
+
+    "kitten".chars.lev("sitting".chars)    #=> 3
 
 Aliases: I<leven>, I<levenshtein>
 
@@ -1477,9 +1696,11 @@ Aliases: I<leven>, I<levenshtein>
 
 =head2 madd
 
-    m1.madd(m2)
+    matrix1.madd(matrix2)
 
-Returns the
+Matrix addition - adds corresponding elements.
+
+    [[1,2], [3,4]].madd([[5,6], [7,8]])    #=> [[6,8], [10,12]]
 
 Aliases: I<matrix_add>
 
@@ -1487,25 +1708,31 @@ Aliases: I<matrix_add>
 
 =head2 make
 
-    self.make(size, obj)
+    Array.make(size, obj)
 
-Returns the
+Creates an array of given size filled with object.
+
+    Array.make(5, 0)    #=> [0, 0, 0, 0, 0]
 
 =cut
 
 =head2 make_by
 
-    self.make_by(size, block)
+    Array.make_by(size) { |i| ... }
 
-Returns the
+Creates an array by calling block for each index.
+
+    Array.make_by(5) { |i| i**2 }    #=> [0, 1, 4, 9, 16]
 
 =cut
 
 =head2 map
 
-    self.map(block)
+    arr.map { ... }
 
-Returns the
+Transforms each element using the block.
+
+    [1, 2, 3].map { _**2 }    #=> [1, 4, 9]
 
 Aliases: I<collect>
 
@@ -1513,19 +1740,21 @@ Aliases: I<collect>
 
 =head2 map_2d
 
-    arr.map_2d {|a,b,c,...| ... }
+    arr.map_2d { |a, b, c, ...| ... }
 
-Mapping of a 2D array, given a block of code.
+Maps over a 2D array, unpacking each sub-array.
 
-    say [[1,2],[3,4]].map_2d {|a,b| [a**2, b**2] }   #=> [[1, 4], [9, 16]]
+    [[1,2], [3,4]].map_2d { |a,b| a+b }    #=> [3, 7]
 
 =cut
 
 =head2 map_kv
 
-    self.map_kv(block)
+    arr.map_kv { |index, value| ... }
 
-Returns the
+Maps using both index and value.
+
+    ['a', 'b', 'c'].map_kv { |i,v| "#{i}:#{v}" }    #=> ['0:a', '1:b', '2:c']
 
 Aliases: I<collect_kv>
 
@@ -1533,9 +1762,11 @@ Aliases: I<collect_kv>
 
 =head2 map_op
 
-    self.map_op(operator, *args)
+    arr.map_op(operator, *args)
 
-Returns the
+Applies operator to each element with given arguments.
+
+    [1, 2, 3].map_op('+', 10)    #=> [11, 12, 13]
 
 Aliases: I<map_operator>
 
@@ -1543,12 +1774,11 @@ Aliases: I<map_operator>
 
 =head2 map_reduce
 
-    arr.map_reduce {|a,b| ... }
+    arr.map_reduce { |a, b| ... }
 
-Behaves almost like the C<reduce> method, except that all the intermediary terms are returned as an array.
+Returns all intermediate results of reduce operation.
 
-    say [1,2,3,4,5].map_reduce {|a,b| a+b }         #=> [1, 3, 6, 10, 15]
-    say [1,2,3,4,5].map_reduce {|a,b| a*b }         #=> [1, 2, 6, 24, 120]
+    [1, 2, 3, 4].map_reduce { |a,b| a+b }    #=> [1, 3, 6, 10]
 
 Aliases: I<reduce_map>
 
@@ -1558,33 +1788,39 @@ Aliases: I<reduce_map>
 
     arr.match(/regex/)
 
-Recursively match an array against a regular expression.
+Recursively matches array elements against regex.
 
-    say ['a', ['foo'], 'b'].match(/^foo/)
+    ['foo', ['bar'], 'baz'].match(/^ba/)    #=> true
 
 =cut
 
 =head2 max
 
-    self.max
+    arr.max
 
-Returns the
+Returns the maximum element.
+
+    [3, 1, 4, 1, 5].max    #=> 5
 
 =cut
 
 =head2 max_by
 
-    self.max_by
+    arr.max_by { ... }
 
-Returns the
+Returns element that gives maximum when passed through block.
+
+    ['a', 'bbb', 'cc'].max_by { .len }    #=> 'bbb'
 
 =cut
 
 =head2 mdiv
 
-    m1.mdiv(m2)
+    matrix1.mdiv(matrix2)
 
-Returns the
+Matrix division (multiplies by inverse).
+
+    m1.mdiv(m2)    # equivalent to m1.mmul(m2.inv)
 
 Aliases: I<matrix_div>
 
@@ -1592,46 +1828,41 @@ Aliases: I<matrix_div>
 
 =head2 min
 
-    self.min
+    arr.min
 
-Returns the
+Returns the minimum element.
+
+    [3, 1, 4, 1, 5].min    #=> 1
 
 =cut
 
 =head2 min_by
 
-    self.min_by
+    arr.min_by { ... }
 
-Returns the
+Returns element that gives minimum when passed through block.
+
+    ['aaa', 'b', 'cc'].min_by { .len }    #=> 'b'
 
 =cut
 
 =head2 minmax
 
-    self.minmax
+    arr.minmax
 
-Returns the
+Returns pair [minimum, maximum].
+
+    [3, 1, 4, 1, 5].minmax    #=> [1, 5]
 
 =cut
 
 =head2 mmul
 
-    a `mmul` b
+    matrix1.mmul(matrix2)
 
-Multiply two 2D-matrices, returing a Matrix object.
+Matrix multiplication.
 
-Example:
-
-    say ([[1, 2],
-          [3, 4]] `mmul` [[-3, -8, 3],
-                          [-2,  1, 4]])
-
-Output:
-
-    Matrix(
-        [-7, -6, 11],
-        [-17, -20, 25]
-    )
+    [[1,2], [3,4]].mmul([[5,6], [7,8]])    #=> [[19,22], [43,50]]
 
 Aliases: I<matrix_mul>
 
@@ -1639,9 +1870,11 @@ Aliases: I<matrix_mul>
 
 =head2 msolve
 
-    self.msolve(vector)
+    matrix.msolve(vector)
 
-Returns the
+Solves linear system Ax = b.
+
+    [[2,1], [1,3]].msolve([5,7])    #=> solution vector
 
 Aliases: I<matrix_solve>
 
@@ -1649,9 +1882,11 @@ Aliases: I<matrix_solve>
 
 =head2 msub
 
-    m1.msub(m2)
+    matrix1.msub(matrix2)
 
-Returns the
+Matrix subtraction - subtracts corresponding elements.
+
+    [[5,6], [7,8]].msub([[1,2], [3,4]])    #=> [[4,4], [4,4]]
 
 Aliases: I<matrix_sub>
 
@@ -1659,9 +1894,12 @@ Aliases: I<matrix_sub>
 
 =head2 new
 
-    self.new
+    Array.new
+    Array.new(*elements)
 
-Returns the
+Creates a new array with optional initial elements.
+
+    Array.new(1, 2, 3)    #=> [1, 2, 3]
 
 Aliases: I<call>
 
@@ -1671,18 +1909,11 @@ Aliases: I<call>
 
     arr.next_permutation
 
-It modifies the self array in place to contain the next unique permutation and returns true if there are more permutations available, or false if the current permutation is the last one.
+Modifies array in-place to next lexicographic permutation. Returns true if more permutations exist.
 
-Example:
-
-    var arr = [1,1,2]
-    do { say arr } while arr.next_permutation
-
-Output:
-
-    [1, 1, 2]
-    [1, 2, 1]
-    [2, 1, 1]
+    var a = [1, 2, 3]
+    do { say a } while a.next_permutation
+    # Prints all 6 permutations
 
 =cut
 
@@ -1690,9 +1921,10 @@ Output:
 
     arr.none { ... }
 
-Returns true if none of the elements satisfy the condition given in the block of code.
+Returns true if no elements satisfy the condition.
 
-    say [2, 4, 6].none { .is_odd }  #=> true
+    [2, 4, 6].none { .is_odd }    #=> true
+    [1, 2, 3].none { .is_odd }    #=> false
 
 =cut
 
@@ -1700,9 +1932,9 @@ Returns true if none of the elements satisfy the condition given in the block of
 
     arr.nth_perm(n)
 
-Efficiently returns the n-th permuation of the self array.
+Returns the nth lexicographic permutation efficiently.
 
-    say nth_perm([0,1,2,3,4,5,6,7,8,9], 10**6)
+    [0, 1, 2, 3].nth_perm(10)    #=> [1, 3, 0, 2]
 
 Aliases: I<nth_permutation>
 
@@ -1712,62 +1944,31 @@ Aliases: I<nth_permutation>
 
     arr.ordered_partitions
     arr.ordered_partitions(k)
-    arr.ordered_partitions{|*a| ... }
-    arr.ordered_partitions(k, {|*a| ... })
+    arr.ordered_partitions(k) { |*parts| ... }
 
-Iterates over the ordered partitions C<P> of C<arr>, such that C<P.flat == arr>.
+Generates ordered partitions where concatenation equals original array.
 
-        [1,2,3,4,5].ordered_partitions(2, {|*a| say a })
-
-Outputs:
-
-        [[1], [2, 3, 4, 5]]
-        [[1, 2], [3, 4, 5]]
-        [[1, 2, 3], [4, 5]]
-        [[1, 2, 3, 4], [5]]
-
-When no block is given, it returns an array containing the ordered partitions (there are C<binomial(n-1, k-1)> ordered partitions, where C<n> is the size of the array):
-
-        say [1,2,3,4].ordered_partitions(2)
-
-Outputs:
-
-        [[[1], [2, 3, 4]], [[1, 2], [3, 4]], [[1, 2, 3], [4]]]
-
-Additionally, when the value for C<k> is ommited, it generates all the ordered partitions (there are C<2^(n-1)> ordered partitions, where C<n> is the size of the array):
-
-        [1,2,3,4].ordered_partitions{|*a| say a }
-
-Outputs:
-
-        [[1], [2], [3], [4]]
-        [[1, 2], [3], [4]]
-        [[1], [2, 3], [4]]
-        [[1, 2, 3], [4]]
-        [[1], [2], [3, 4]]
-        [[1, 2], [3, 4]]
-        [[1], [2, 3, 4]]
-        [[1, 2, 3, 4]]
-
-Up to the ordering, the method is equivalent with (but more efficient):
-
-        arr.partitions(k).grep { .flat == arr }
+    [1,2,3].ordered_partitions(2)    #=> [[[1],[2,3]], [[1,2],[3]]]
 
 =cut
 
 =head2 pack
 
-    self.pack(format)
+    arr.pack(template)
 
-Returns the
+Packs array elements into binary string using template.
+
+    [65, 66, 67].pack('C*')    #=> "ABC"
 
 =cut
 
 =head2 pair_map
 
-    self.pair_map(block)
+    arr.pair_map { |a, b| ... }
 
-Returns the
+Maps over pairs of consecutive elements.
+
+    [1, 2, 3, 4].pair_map { |a,b| a+b }    #=> [3, 7]
 
 Aliases: I<pairmap>
 
@@ -1777,13 +1978,9 @@ Aliases: I<pairmap>
 
     arr.pam_op(operator, obj)
 
-Reversed-mapping of the array, given an operator.
+Reverse mapping - applies operator with array elements as right operand.
 
-    say [1,2,3].pam_operator('/', 10)   # [10/1, 10/2, 10/3]
-
-This method is used internally by the C<«OP«> hyper-operator:
-
-    say ([1,2,3] «/« 10)
+    [1, 2, 3].pam_op('/', 12)    #=> [12, 6, 4]  (12/1, 12/2, 12/3)
 
 Aliases: I<pam_operator>
 
@@ -1793,14 +1990,9 @@ Aliases: I<pam_operator>
 
     arr.part(n)
 
-Partition the array into two parts, given an index:
+Partitions array at index n into two arrays.
 
-    [1,2,3,4,5].part(3)     # returns: ([1, 2, 3], [4, 5])
-    [1,2,3,4,5].part(2)     # returns: ([1, 2], [3, 4, 5])
-
-Negative indices are supported as well:
-
-    [1,2,3,4,5].part(-1)    # returns: ([1, 2, 3, 4], [5])
+    [1, 2, 3, 4, 5].part(2)    #=> ([1,2], [3,4,5])
 
 Aliases: I<partition>
 
@@ -1808,41 +2000,58 @@ Aliases: I<partition>
 
 =head2 partitions
 
-    self.partitions(k, block)
+    arr.partitions
+    arr.partitions(k)
+    arr.partitions(k) { |*parts| ... }
 
-Returns the
+Generates all ways to partition array into k non-empty subsets.
+
+    [1,2,3].partitions(2)    #=> [[[1],[2,3]], [[1,2],[3]], [[1,3],[2]]]
 
 =cut
 
 =head2 perm2num
 
-    self.perm2num
+    arr.perm2num
 
-Returns the
+Converts a permutation array to its lexicographic index.
+
+    [1, 3, 0, 2].perm2num    #=> 10
 
 =cut
 
 =head2 permutations
 
-    self.permutations
+    arr.permutations
+    arr.permutations(k)
+    arr.permutations(k) { |*perm| ... }
 
-Returns the
+Generates all permutations (or k-permutations).
+
+    [1,2,3].permutations    #=> all 6 permutations
+    [1,2,3].permutations(2) #=> [[1,2], [1,3], [2,1], [2,3], [3,1], [3,2]]
 
 =cut
 
 =head2 pick
 
-    self.pick(amount)
+    arr.pick(n)
 
-Returns the
+Randomly picks n distinct elements.
+
+    [1, 2, 3, 4, 5].pick(3)    #=> random 3 elements
 
 =cut
 
 =head2 pop_at
 
-    self.pop_at(offset)
+    arr.pop_at(index)
 
-Returns the
+Removes and returns element at index. Modifies in-place.
+
+    var a = [1, 2, 3, 4]
+    say a.pop_at(1)    #=> 2
+    say a              #=> [1, 3, 4]
 
 Aliases: I<delete_at>, I<delete_index>
 
@@ -1850,25 +2059,36 @@ Aliases: I<delete_at>, I<delete_index>
 
 =head2 pop_rand
 
-    self.pop_rand
+    arr.pop_rand
 
-Returns the
+Removes and returns a random element.
+
+    var a = [1, 2, 3, 4]
+    say a.pop_rand    #=> random element
 
 =cut
 
 =head2 pop_while
 
-    self.pop_while(block)
+    arr.pop_while { ... }
 
-Returns the
+Removes elements from the end while condition is true.
+
+    var a = [1, 2, 3, 4, 5]
+    a.pop_while { _ > 2 }
+    say a    #=> [1, 2]
 
 =cut
 
 =head2 prepend
 
-    self.prepend(*args)
+    arr.prepend(*objects)
 
-Returns the
+Adds elements to the beginning. Modifies in-place.
+
+    var a = [3, 4]
+    a.prepend(1, 2)
+    say a    #=> [1, 2, 3, 4]
 
 Aliases: I<unshift>
 
@@ -1876,19 +2096,21 @@ Aliases: I<unshift>
 
 =head2 prod
 
-    self.prod(arg)
+    arr.prod
 
-Returns the
+Returns the product of all elements.
+
+    [2, 3, 4].prod    #=> 24
 
 =cut
 
 =head2 prod_2d
 
-    arr.prod_2d {|a,b,c,...| ... }
+    arr.prod_2d { |a, b, c, ...| ... }
 
-Product of a 2D array, by mapping each row to the given block.
+Product over 2D array after mapping each row.
 
-    say [[2,4],[3,2],[5,1],[7,1]].prod_2d {|p,k| p**k }    #=> 5040
+    [[2,3], [4,2]].prod_2d { |a,b| a**b }    #=> 64
 
 =cut
 
@@ -1896,33 +2118,41 @@ Product of a 2D array, by mapping each row to the given block.
 
     arr.prod_by { ... }
 
-Product of an array, by mapping each element to the given block.
+Product after mapping each element.
 
-    say [1,2,3,4].prod_by {|n| n**3 }    # product of each element cubed
+    [1, 2, 3, 4].prod_by { _**2 }    #=> 576
 
 =cut
 
 =head2 prod_kv
 
-    self.prod_kv(block)
+    arr.prod_kv { |index, value| ... }
 
-Returns the
+Product using both index and value in block.
+
+    [2, 3, 4].prod_kv { |i,v| v**i }    #=> 1152
 
 =cut
 
 =head2 prodmod
 
-    self.prodmod(mod)
+    arr.prodmod(modulus)
 
-Returns the
+Returns product modulo a number.
+
+    [100, 200, 300].prodmod(1000)    #=> product mod 1000
 
 =cut
 
 =head2 rand
 
-    self.rand(amount)
+    arr.rand
+    arr.rand(n)
 
-Returns the
+Returns random element(s) with replacement.
+
+    [1, 2, 3, 4].rand      #=> one random element
+    [1, 2, 3, 4].rand(5)   #=> 5 random elements (with repeats)
 
 Aliases: I<sample>
 
@@ -1932,20 +2162,9 @@ Aliases: I<sample>
 
     arr.rand_perm
 
-Returns a random permutation of the self array.
+Returns a random permutation of the array.
 
-Example:
-
-    var arr = %w(a b c d e f g)
-    say arr.random_permutation
-
-Additionally, by setting a seed value for C<irand> with Number C<iseed()>, the results returned by C<random_permutation> can be reproduced.
-
-Example with iseed():
-
-    iseed(42)
-    var arr = %w(a b c d e f g)
-    say arr.random_permutation      #=> ["d", "f", "g", "b", "c", "e", "a"]
+    [1, 2, 3, 4].rand_perm    #=> random ordering
 
 Aliases: I<random_permutation>
 
@@ -1953,9 +2172,11 @@ Aliases: I<random_permutation>
 
 =head2 range
 
-    self.range
+    arr.range
 
-Returns the
+Returns the difference between maximum and minimum.
+
+    [1, 5, 3, 9, 2].range    #=> 8
 
 =cut
 
@@ -1963,20 +2184,21 @@ Returns the
 
     arr.recmap { ... }
 
-Recursively map the value of an array, given a block of code.
+Recursively maps nested structures, replacing elements based on block.
 
-    # Generate all the 5-smooth numbers <= 20
-    var (a, k, L) = ([1], 5, 20)
-    k.primes.each {|p| a.recmap! {|n| n*p <= L ? [n*p] : () } }
-    say a.sort    #=> [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20]
+    [1, [2, 3]].recmap { _*2 }    #=> [2, [4, 6]]
 
 =cut
 
 =head2 reduce_op
 
-    self.reduce_op(operator, initial)
+    arr.reduce_op(operator)
+    arr.reduce_op(operator, initial)
 
-Returns the
+Reduces using an operator instead of a block.
+
+    [1, 2, 3, 4].reduce_op('+')       #=> 10
+    [1, 2, 3, 4].reduce_op('*', 2)    #=> 48
 
 Aliases: I<reduce_operator>
 
@@ -1984,15 +2206,13 @@ Aliases: I<reduce_operator>
 
 =head2 resize
 
-    arr.resize(index)
+    arr.resize(new_size)
 
-Efficienlty resize the array to a given index, modifying the array in-place.
+Resizes array to new_size. Truncates or extends (with nil).
 
-    var arr = %w[a b c d e]
-    arr.resize(2)            # removes indices > 2
-    say arr                  # ['a', 'b', 'c']
-
-Use index C<-1> to empty the array.
+    var a = [1, 2, 3, 4, 5]
+    a.resize(3)
+    say a    #=> [1, 2, 3]
 
 Aliases: I<resize_to>
 
@@ -2000,9 +2220,12 @@ Aliases: I<resize_to>
 
 =head2 rindex
 
-    self.rindex(obj)
+    arr.rindex(obj)
+    arr.rindex { ... }
 
-Returns the
+Returns last index of element or where block is true.
+
+    [1, 2, 3, 2, 1].rindex(2)    #=> 3
 
 Aliases: I<rindex_by>, I<last_index>, I<last_index_by>
 
@@ -2010,17 +2233,22 @@ Aliases: I<rindex_by>, I<last_index>, I<last_index_by>
 
 =head2 rotate
 
-    self.rotate(num)
+    arr.rotate(n)
 
-Returns the
+Rotates array n positions left (negative for right).
+
+    [1, 2, 3, 4, 5].rotate(2)     #=> [3, 4, 5, 1, 2]
+    [1, 2, 3, 4, 5].rotate(-1)    #=> [5, 1, 2, 3, 4]
 
 =cut
 
 =head2 rref
 
-    self.rref
+    matrix.rref
 
-Returns the
+Returns reduced row echelon form of matrix.
+
+    [[1,2,3], [4,5,6]].rref
 
 Aliases: I<reduced_row_echelon_form>
 
@@ -2028,9 +2256,11 @@ Aliases: I<reduced_row_echelon_form>
 
 =head2 rscalar_op
 
-    self.rscalar_op(operator, scalar)
+    arr.rscalar_op(operator, scalar)
 
-Returns the
+Reverse scalar operation (scalar OP element).
+
+    [1, 2, 3].rscalar_op('-', 10)    #=> [9, 8, 7]  (10-1, 10-2, 10-3)
 
 Aliases: I<rscalar_operator>
 
@@ -2041,10 +2271,9 @@ Aliases: I<rscalar_operator>
     arr.run_length
     arr.run_length { ... }
 
-The run-length algorithm, returning an array of pairs C<[a,n]>.
+Run-length encoding - groups consecutive equal elements.
 
-    say [1,1,1,2,3,3].run_length            #=> [[1, 3], [2, 1], [3, 2]]
-    say %w(a a b C c c).run_length { .lc }  #=> [['a', 2], ['b', 1], ['C', 3]]
+    [1, 1, 2, 2, 2, 3].run_length    #=> [[1,2], [2,3], [3,1]]
 
 Aliases: I<run_length_by>
 
@@ -2052,9 +2281,11 @@ Aliases: I<run_length_by>
 
 =head2 sadd
 
-    self.sadd(scalar)
+    arr.sadd(scalar)
 
-Returns the
+Adds scalar to each element.
+
+    [1, 2, 3].sadd(10)    #=> [11, 12, 13]
 
 Aliases: I<scalar_add>
 
@@ -2062,9 +2293,11 @@ Aliases: I<scalar_add>
 
 =head2 scalar_op
 
-    self.scalar_op(operator, scalar)
+    arr.scalar_op(operator, scalar)
 
-Returns the
+Applies operator between each element and scalar.
+
+    [1, 2, 3].scalar_op('*', 2)    #=> [2, 4, 6]
 
 Aliases: I<scalar_operator>
 
@@ -2072,9 +2305,11 @@ Aliases: I<scalar_operator>
 
 =head2 sdiv
 
-    self.sdiv(scalar)
+    arr.sdiv(scalar)
 
-Returns the
+Divides each element by scalar.
+
+    [10, 20, 30].sdiv(10)    #=> [1, 2, 3]
 
 Aliases: I<scalar_div>
 
@@ -2082,17 +2317,11 @@ Aliases: I<scalar_div>
 
 =head2 segment
 
-    arr.segment(indices...)
+    arr.segment(*indices)
 
-Segment an array at the given indices.
+Splits array at specified indices.
 
-    var arr = [1,2,3,4]
-    say arr.segment(1)         #=> [[1, 2], [3, 4]]
-    say arr.segment(2)         #=> [[1, 2, 3], [4]]
-    say arr.segment(0, 1, 2)   #=> [[1], [2], [3], [4]]
-    say arr.segment(0, 2)      #=> [[1], [2, 3], [4]]
-
-Negative indices can be used for couting from the end of the array (e.g.: -1 means the end of the array).
+    [1, 2, 3, 4, 5].segment(2, 4)    #=> [[1,2,3], [4,5]]
 
 =cut
 
@@ -2100,24 +2329,24 @@ Negative indices can be used for couting from the end of the array (e.g.: -1 mea
 
     arr.segment_by { ... }
 
-Segment the array into multiple sub-arrays, whenever the block returns a true value.
+Splits array before elements where block returns true.
 
-Example:
-
-    # Segment the array after each prime number
-    say @(1..prime(5)).segment_by { .is_prime }
-
-Output:
-
-    [[1, 2], [3], [4, 5], [6, 7], [8, 9, 10, 11]]
+    [1, 2, 5, 6, 3, 7].segment_by { .is_prime }    
+    #=> [[1, 2], [5], [6], [3], [7]]
 
 =cut
 
 =head2 shift
 
-    self.shift(num)
+    arr.shift
+    arr.shift(n)
 
-Returns the
+Removes and returns first element(s).
+
+    var a = [1, 2, 3, 4]
+    say a.shift      #=> 1
+    say a.shift(2)   #=> [2, 3]
+    say a            #=> [4]
 
 Aliases: I<drop_left>, I<drop_first>
 
@@ -2125,25 +2354,33 @@ Aliases: I<drop_left>, I<drop_first>
 
 =head2 shift_while
 
-    self.shift_while(block)
+    arr.shift_while { ... }
 
-Returns the
+Removes elements from beginning while condition is true.
+
+    var a = [1, 2, 3, 4, 5]
+    a.shift_while { _ < 4 }
+    say a    #=> [4, 5]
 
 =cut
 
 =head2 shuffle
 
-    self.shuffle
+    arr.shuffle
 
-Returns the
+Returns randomly shuffled copy of array.
+
+    [1, 2, 3, 4, 5].shuffle    #=> random order
 
 =cut
 
 =head2 skip
 
-    self.skip(n)
+    arr.skip(n)
 
-Returns the
+Returns new array without first n elements.
+
+    [1, 2, 3, 4, 5].skip(2)    #=> [3, 4, 5]
 
 Aliases: I<skip_first>
 
@@ -2151,17 +2388,19 @@ Aliases: I<skip_first>
 
 =head2 skip_by
 
-    self.skip_by(block)
+    arr.skip_by { ... }
 
-Returns the
+Skips elements from start while block returns true.
+
+    [1, 2, 3, 4, 1].skip_by { _ < 3 }    #=> [3, 4, 1]
 
 =cut
 
 =head2 skip_last
 
-    self.skip_last(n)
+    arr.skip_last(n)
 
-Returns the
+Returns new array without last n elements.
 
 =cut
 
