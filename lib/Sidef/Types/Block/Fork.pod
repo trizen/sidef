@@ -1,42 +1,278 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Block::Fork
+Sidef::Types::Block::Fork - Fork object for parallel process execution
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements a Fork object that represents a forked system process in Sidef. Fork objects are created by the C<ffork()> method on Block objects and enable parallel computation by executing code in separate system processes. The Fork class allows you to manage forked processes, wait for their completion, and retrieve their computed values.
+
+When a block is forked using C<ffork()>, it creates a new system process that executes in parallel with the main program. The Fork object acts as a handle to this background process, providing methods to control and synchronize with it.
 
 =head1 SYNOPSIS
 
-var obj = Fork(...)
+    # Basic forking - execute code in parallel
+    var fork = { say "Hello from fork!"; 42 }.ffork
+    var result = fork.get    # waits and returns 42
+    
+    # Parallel quicksort example
+    func quicksort(arr {.len <= 1}) { arr }
+    func quicksort(arr) {
+        var p = arr.pop_rand
+        var forks = [
+            quicksort.ffork(arr.grep { _ <= p }),
+            quicksort.ffork(arr.grep { _ >  p }),
+        ]
+        forks[0].wait + [p] + forks[1].wait
+    }
+    
+    say quicksort(@("a".."z") -> shuffle)
+    
+    # Parallel calculations on multiple values
+    var nums = [
+        1275792312878611,
+        12345678915808973,
+        1578070919762253,
+        14700694496703910,
+    ]
+    
+    var factors = nums.map {|n| 
+        prime_factors.ffork(n)
+    }.map { .wait }
+    
+    say ((nums ~Z factors) -> max_by {|m| m[1][0] })
+    
+    # Multiple independent forks
+    var fork1 = { slow_computation_1() }.ffork
+    var fork2 = { slow_computation_2() }.ffork
+    var fork3 = { slow_computation_3() }.ffork
+    
+    # Do some work while forks run in background
+    do_other_work()
+    
+    # Collect all results
+    var results = [fork1.get, fork2.get, fork3.get]
 
 =head1 METHODS
 
+=head2 new
+
+    Fork.new
+
+Creates a new Fork object. This method is typically not called directly by user code. Instead, Fork objects are created automatically when calling C<ffork()> on a Block object.
+
+Returns a new Fork object.
+
 =head2 get
 
-    self.get
+    fork.get
 
-Returns the
+Waits for the forked process to complete and returns the value computed by the block. This method blocks execution until the forked process finishes. If the block returns a value, that value is returned by C<get()>.
+
+B<Example:>
+
+    var fork = { 2 + 2 }.ffork
+    var result = fork.get    # blocks until done, returns 4
+
+B<Returns:> The value computed by the forked block, or C<nil> if no value was returned.
 
 Aliases: I<join>, I<wait>
 
-=cut
+=head2 join
+
+    fork.join
+
+Alias for C<get()>. Waits for the forked process to complete and returns its computed value.
+
+=head2 wait
+
+    fork.wait
+
+Alias for C<get()>. Waits for the forked process to complete and returns its computed value. This naming follows the common Unix convention for waiting on child processes.
+
+B<Example:>
+
+    var forks = []
+    for i in (1..10) {
+        forks << { expensive_computation(i) }.ffork
+    }
+    var results = forks.map { .wait }
 
 =head2 kill
 
-    self.kill(signal)
+    fork.kill(signal)
 
-Returns the
+Sends a signal to the forked process, typically to terminate it. The signal parameter specifies which signal to send to the process (e.g., SIGTERM, SIGKILL, SIGINT).
 
-=cut
+B<Parameters:>
 
-=head2 new
+=over 4
 
-    self.new
+=item * C<signal> - The signal number or name to send to the process
 
-Returns the
+=back
+
+B<Example:>
+
+    var fork = { loop { sleep(1) } }.ffork
+    sleep(5)
+    fork.kill(9)    # Send SIGKILL (9) to terminate immediately
+
+B<Returns:> The result of the kill operation (typically a boolean or status code).
+
+B<Note:> Use caution with kill() as it may leave resources in an inconsistent state if the forked process is interrupted during critical operations.
+
+=head1 CREATING FORKS
+
+Fork objects are not typically instantiated directly. Instead, they are created by calling the C<ffork()> method on a Block object:
+
+    var block = { expensive_computation() }
+    var fork = block.ffork    # Creates and starts a Fork object
+    
+    # Or more commonly:
+    var fork = { expensive_computation() }.ffork
+
+The C<ffork()> method immediately starts executing the block in a new system process and returns a Fork object that can be used to wait for completion and retrieve the result.
+
+=head1 PARALLEL COMPUTATION PATTERNS
+
+=head2 Map-Reduce Pattern
+
+Fork objects work well with functional programming patterns like map:
+
+    var data = [1, 2, 3, 4, 5]
+    var forks = data.map {|n| { n**2 }.ffork }
+    var results = forks.map { .wait }
+    say results    # [1, 4, 9, 16, 25]
+
+=head2 Divide and Conquer
+
+Recursive algorithms benefit from parallel execution:
+
+    func parallel_sum(arr) {
+        return 0 if arr.is_empty
+        return arr[0] if (arr.len == 1)
+        
+        var mid = arr.len // 2
+        var left_fork = parallel_sum.ffork(arr.first(mid))
+        var right_fork = parallel_sum.ffork(arr.last(arr.len - mid))
+        
+        left_fork.wait + right_fork.wait
+    }
+
+=head2 Independent Tasks
+
+Execute completely independent operations in parallel:
+
+    var download_fork = { download_file(url) }.ffork
+    var process_fork  = { process_data(data) }.ffork
+    var upload_fork   = { upload_results(results) }.ffork
+    
+    # Wait for all to complete
+    download_fork.wait
+    process_fork.wait
+    upload_fork.wait
+
+=head1 PERFORMANCE CONSIDERATIONS
+
+=over 4
+
+=item * B<Process Creation Overhead>
+
+Creating system processes has overhead. Forking is most beneficial for computationally expensive tasks that take significantly longer than the fork creation time.
+
+=item * B<Number of Forks>
+
+Creating too many concurrent forks can overwhelm the system. Consider limiting the number of parallel processes to match available CPU cores.
+
+=item * B<Memory Usage>
+
+Each forked process has its own memory space. Large data structures will be duplicated, potentially consuming significant memory.
+
+=item * B<Communication Cost>
+
+Values returned from forks must be serialized and passed between processes, which adds overhead for large data structures.
+
+=back
+
+=head1 ALTERNATIVES
+
+For lighter-weight concurrency, Sidef also provides:
+
+=over 4
+
+=item * C<Block.thr()> - Creates a Perl thread (deprecated) or system fork if the C<forks> Perl module is installed
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Block::Block> - The Block class that provides the C<ffork()> method
+
+=item * Sidef Tutorial - Parallel Computation section
+
+=item * UNIX fork() system call documentation
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Example 1: Parallel File Processing
+
+    var files = Dir.cwd.open.glob('*.txt')
+    var forks = files.map {|file|
+        { process_file(file) }.ffork
+    }
+    forks.each { .wait }
+
+=head2 Example 2: Parallel Prime Factorization
+
+    func prime_factors(n) {
+        # Implementation here
+    }
+    
+    var numbers = [12345, 67890, 98765, 43210]
+    var factors = numbers.map {|n|
+        prime_factors.ffork(n)
+    }.map { .wait }
+    
+    numbers.zip(factors).each {|pair|
+        say "#{pair[0]} = #{pair[1].join(' × ')}"
+    }
+
+=head2 Example 3: Timeout Pattern
+
+    var fork = { potentially_slow_operation() }.ffork
+    var timeout = 5  # seconds
+    
+    # Note: Sidef doesn't have built-in timeout for forks
+    # You would need to implement timeout logic with sleep/kill
+    var start = Time.sec
+    loop {
+        sleep(0.1)
+        if (Time.sec - start > timeout) {
+            fork.kill(15)  # SIGTERM
+            die "Operation timed out"
+        }
+    }
+
+=head1 NOTES
+
+=over 4
+
+=item * Fork objects represent true system processes (using the Unix fork() system call), not lightweight threads
+
+=item * Each forked process has its own memory space and cannot directly modify variables in the parent process
+
+=item * Values are passed back to the parent process through inter-process communication when C<get()>/C<wait()>/C<join()> is called
+
+=item * Always ensure you call C<wait()>, C<get()>, or C<join()> on Fork objects to prevent zombie processes
+
+=item * Forking may not be available or may behave differently on non-Unix systems (e.g., Windows)
+
+=back
 
 =cut
