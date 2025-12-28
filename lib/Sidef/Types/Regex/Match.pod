@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,12 +6,33 @@ Sidef::Types::Regex::Match
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements a match object that represents the result of a regular expression matching operation in Sidef. A Match object is returned when a regex pattern successfully matches against a string, and it provides methods to access captured groups, named captures, match position, and other details about the match.
 
 =head1 SYNOPSIS
 
-var obj = Match(...)
-
+    # Basic matching
+    var match = "Hello World".match(/(\w+)\s+(\w+)/)
+    
+    # Access captured groups
+    say match.cap             # ["Hello", "World"]
+    say match[0]              # "Hello" (first capture group)
+    say match[1]              # "World" (second capture group)
+    
+    # Named captures
+    var m = "John Doe".match(/(?<first>\w+)\s+(?<last>\w+)/)
+    say m.ncap                # {first: "John", last: "Doe"}
+    
+    # Check if match was successful
+    if ("test".match(/\d+/).to_bool) {
+        say "Contains digits"
+    }
+    
+    # Get match position
+    var pos = "abc123def".match(/\d+/).pos
+    say pos                   # Position where match occurred
+    
+    # Get the matched string
+    say "test123".match(/\d+/).to_s    # "123"
 
 =head1 INHERITS
 
@@ -22,19 +42,17 @@ Inherits methods from:
 
 =head1 METHODS
 
-=head2 ...
-
-    a ... b
-
-Returns the
-
-=cut
-
 =head2 cap
 
-    self.cap
+    match.cap -> Array
 
-Returns the
+Returns an array containing all the captured groups from the regular expression match. The array includes all parenthesized capture groups in the order they appear in the pattern. If the regex has no capture groups, it returns an empty array.
+
+    var match = "John Doe".match(/(\w+)\s+(\w+)/)
+    say match.cap    # ["John", "Doe"]
+    
+    var m2 = "abc".match(/abc/)
+    say m2.cap       # [] (no capture groups)
 
 Aliases: I<to_a>, I<caps>, I<groups>, I<to_array>, I<captures>
 
@@ -42,25 +60,45 @@ Aliases: I<to_a>, I<caps>, I<groups>, I<to_array>, I<captures>
 
 =head2 dump
 
-    self.dump
+    match.dump -> String
 
-Returns the
+Returns a detailed string representation of the Match object, suitable for debugging. This includes information about the matched string, position, captured groups, and named captures.
+
+    var match = "test123".match(/(\w+)(\d+)/)
+    say match.dump
+    # Outputs detailed match information
 
 =cut
 
 =head2 join
 
-    self.join(sep)
+    match.join(separator) -> String
 
-Returns the
+Joins all the captured groups into a single string using the specified separator. This is a convenience method for working with multiple capture groups.
+
+    var match = "2024-12-28".match(/(\d+)-(\d+)-(\d+)/)
+    say match.join('/')     # "2024/12/28"
+    
+    var m2 = "a,b,c".match(/(\w),(\w),(\w)/)
+    say m2.join(' ')        # "a b c"
 
 =cut
 
 =head2 ncap
 
-    self.ncap
+    match.ncap -> Hash
 
-Returns the
+Returns a hash containing all named capture groups from the regular expression match. The keys are the capture group names, and the values are the matched strings. If the regex has no named captures, it returns an empty hash.
+
+    var match = "John Doe".match(/(?<first>\w+)\s+(?<last>\w+)/)
+    say match.ncap          # {first: "John", last: "Doe"}
+    say match.ncap{:first}  # "John"
+    say match.ncap{:last}   # "Doe"
+    
+    # Using named captures with additional patterns
+    var email = "user@example.com".match(/(?<user>\w+)@(?<domain>[\w.]+)/)
+    say email.ncap{:user}   # "user"
+    say email.ncap{:domain} # "example.com"
 
 Aliases: I<ncaps>, I<named_groups>, I<named_captures>
 
@@ -68,9 +106,16 @@ Aliases: I<ncaps>, I<named_groups>, I<named_captures>
 
 =head2 pos
 
-    self.pos
+    match.pos -> Number
 
-Returns the
+Returns the position (index) in the original string where the match occurred. This is useful for determining where in the string the pattern was found.
+
+    var str = "abc123def"
+    var match = str.match(/\d+/)
+    say match.pos           # 3 (position where "123" starts)
+    
+    var m2 = "test".match(/s/)
+    say m2.pos              # 2 (position where "s" is found)
 
 Aliases: I<match_pos>
 
@@ -78,25 +123,49 @@ Aliases: I<match_pos>
 
 =head2 regex
 
-    self.regex
+    match.regex -> Regex
 
-Returns the
+Returns the original Regex object that was used to create this match. This allows you to access the regex pattern and perform additional operations with it.
+
+    var pattern = /\d+/
+    var match = "test123".match(pattern)
+    say match.regex         # Returns the Regex object /\d+/
+    
+    # You can use it to match against other strings
+    say "abc456".match(match.regex).to_s    # "456"
 
 =cut
 
 =head2 string
 
-    self.string
+    match.string -> String
 
-Returns the
+Returns the original string that was matched against. This is the complete input string, not just the matched portion.
+
+    var str = "Hello World 2024"
+    var match = str.match(/\d+/)
+    say match.string        # "Hello World 2024"
+    say match.to_s          # "2024" (the matched portion)
 
 =cut
 
 =head2 to_bool
 
-    self.to_bool
+    match.to_bool -> Bool
 
-Returns the
+Returns true if the match was successful, false otherwise. This is useful for conditional checks to determine if a pattern was found in the string.
+
+    var text = "test123"
+    
+    if (text.match(/\d+/).to_bool) {
+        say "Found digits"
+    }
+    
+    if (!text.match(/[A-Z]+/).to_bool) {
+        say "No uppercase letters found"
+    }
+
+Note: In most contexts, you can use the Match object directly in boolean expressions without explicitly calling to_bool.
 
 Aliases: I<matched>, I<is_successful>
 
@@ -104,10 +173,68 @@ Aliases: I<matched>, I<is_successful>
 
 =head2 to_s
 
-    self.to_s
+    match.to_s -> String
 
-Returns the
+Returns the matched substring as a string. This is the portion of the original string that matched the regular expression pattern.
+
+    var match = "Hello World".match(/\w+/)
+    say match.to_s          # "Hello"
+    
+    var m2 = "Price: $19.99".match(/\$\d+\.\d+/)
+    say m2.to_s             # "$19.99"
 
 Aliases: I<to_str>
+
+=cut
+
+=head1 ARRAY-LIKE ACCESS
+
+Match objects support array-like indexing to access individual capture groups:
+
+    var match = "John Doe 30".match(/(\w+)\s+(\w+)\s+(\d+)/)
+    say match[0]    # "John"   (first capture group)
+    say match[1]    # "Doe"    (second capture group)
+    say match[2]    # "30"     (third capture group)
+
+=head1 COMMON PATTERNS
+
+=head2 Extracting Email Components
+
+    var email = "user@example.com"
+    var match = email.match(/(?<user>[\w.]+)@(?<domain>[\w.]+)/)
+    
+    if (match.to_bool) {
+        say "Username: #{match.ncap{:user}}"
+        say "Domain: #{match.ncap{:domain}}"
+    }
+
+=head2 Parsing Dates
+
+    var date = "2024-12-28"
+    var match = date.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/)
+    
+    if (match.to_bool) {
+        say "Year: #{match.ncap{:year}}"
+        say "Month: #{match.ncap{:month}}"
+        say "Day: #{match.ncap{:day}}"
+    }
+
+=head2 Validating and Extracting Phone Numbers
+
+    var phone = "Call me at (555) 123-4567"
+    var match = phone.match(/\((\d{3})\)\s+(\d{3})-(\d{4})/)
+    
+    if (match.to_bool) {
+        var formatted = match.join('-')
+        say "Phone: #{formatted}"    # "555-123-4567"
+    }
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Regex::Regex>, L<Sidef::Types::String::String>
+
+=head1 AUTHOR
+
+Daniel Șuteu (trizen)
 
 =cut
