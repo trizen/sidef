@@ -1,24 +1,33 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Sys::Sys
+Sidef::Sys::Sys - System-level utilities and core system interaction for Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class provides access to core system functions, process management, filehandles, user/group/network/protocol queries, and various low-level utilities for the Sidef programming language.
+
+These methods are modeled after features found in Perl and POSIX, providing tools to manipulate and query the operating system environment from within Sidef scripts.
 
 =head1 SYNOPSIS
 
-var obj = Sys(...)
+    var pid = Sys.fork
+    if (pid == 0) {
+        Sys.exec("/bin/ls", "-l")
+    }
+    else {
+        Sys.wait
+    }
 
+    Sys.say("User: ", Sys.user)
+    Sys.print("OS: ", Sys.os, "\n")
 
 =head1 INHERITS
 
 Inherits methods from:
 
-       * Sidef::Object::Object
+    * Sidef::Object::Object
 
 =head1 METHODS
 
@@ -26,560 +35,408 @@ Inherits methods from:
 
     Sys.alarm(sec)
 
-Returns the
-
-=cut
+Schedules a SIGALRM to be delivered to the process after C<sec> seconds. Returns the number of seconds remaining from any previous alarm, or zero if none scheduled.
 
 =head2 bless
 
     Sys.bless(obj, class)
 
-Returns the
-
-=cut
+Blesses an object into the specified class, changing its type at runtime. Returns the blessed object.
 
 =head2 class_name
 
     Sys.class_name(obj)
 
-Returns the
-
-=cut
+Returns the class (package) name that the given object is blessed into or its base type for non-objects.
 
 =head2 defined
 
     Sys.defined(obj)
 
-Returns the
-
-=cut
+Returns a boolean indicating whether the given object has a defined (non-nil) value.
 
 =head2 die
 
     Sys.die(*args)
 
-Returns the
-
-Aliases: I<raise>
-
-=cut
+Throws an exception, printing the message built from C<*args> to STDERR and terminating the program (unless caught). Aliases: I<raise>
 
 =head2 eval
 
     Sys.eval(code)
 
-Returns the
-
-=cut
+Dynamically evaluates a string of Sidef code. Returns the result of the evaluation, or raises an exception on error.
 
 =head2 exec
 
     Sys.exec(*args)
 
-Returns the
-
-=cut
+Replaces the current process with a program, passing C<*args> as its arguments. Does not return on success.
 
 =head2 exit
 
     Sys.exit(code)
 
-Returns the
-
-=cut
+Terminates the process with the specified exit code. Equivalent to Perl's C<exit()>.
 
 =head2 fork
 
     Sys.fork
 
-Returns the
-
-=cut
+Creates a new process by duplicating the current process. Returns the PID in the parent process, 0 in the child, or -1 on failure.
 
 =head2 getgrent
 
     Sys.getgrent
 
-Returns the
-
-=cut
+Returns the next entry from the groups database as a structure or record. Iterates over all system groups.
 
 =head2 getgrgid
 
     Sys.getgrgid(gid)
 
-Returns the
-
-=cut
+Returns the group database entry corresponding to the given group ID.
 
 =head2 getgrnam
 
     Sys.getgrnam(name)
 
-Returns the
-
-=cut
+Returns the group database entry for the specified group name.
 
 =head2 gethostbyaddr
 
     Sys.gethostbyaddr(addr, addrtype)
 
-Returns the
-
-=cut
+Resolves a network address and type (e.g., AF_INET) to a host entry.
 
 =head2 gethostbyname
 
     Sys.gethostbyname(name)
 
-Returns the
-
-=cut
+Resolves a hostname to a network address structure.
 
 =head2 gethostent
 
     Sys.gethostent
 
-Returns the
-
-=cut
+Retrieves the next entry from the network host database.
 
 =head2 getnetbyaddr
 
     Sys.getnetbyaddr(addr, addrtype)
 
-Returns the
-
-=cut
+Returns the network entry for a given address and type.
 
 =head2 getnetbyname
 
     Sys.getnetbyname(name)
 
-Returns the
-
-=cut
+Returns the network entry for the given network name.
 
 =head2 getnetent
 
     Sys.getnetent
 
-Returns the
-
-=cut
+Retrieves the next entry from the network database.
 
 =head2 getpgrp
 
     Sys.getpgrp(pid)
 
-Returns the
-
-=cut
+Returns the process group ID for the specified process.
 
 =head2 getppid
 
     Sys.getppid
 
-Returns the
-
-=cut
+Returns the parent process ID of the current process.
 
 =head2 getpriority
 
     Sys.getpriority(which, who)
 
-Returns the
-
-=cut
+Retrieves the scheduling priority of a process (or process group/user) given by C<which> (e.g., PRIO_PROCESS) and C<who> (ID).
 
 =head2 getprotobyname
 
     Sys.getprotobyname(name)
 
-Returns the
-
-=cut
+Returns protocol information for the given protocol name (e.g., "tcp" or "udp").
 
 =head2 getprotobynumber
 
     Sys.getprotobynumber(num)
 
-Returns the
-
-=cut
+Returns protocol information for the given protocol number.
 
 =head2 getprotoent
 
     Sys.getprotoent
 
-Returns the
-
-=cut
+Returns the next entry from the protocols database.
 
 =head2 getpwent
 
     Sys.getpwent
 
-Returns the
-
-=cut
+Returns the next entry from the password database.
 
 =head2 getpwnam
 
     Sys.getpwnam(name)
 
-Returns the
-
-=cut
+Returns user information for the specified username.
 
 =head2 getpwuid
 
     Sys.getpwuid(uid)
 
-Returns the
-
-=cut
+Returns user information for the given user ID.
 
 =head2 getservbyname
 
     Sys.getservbyname(name, proto)
 
-Returns the
-
-=cut
+Returns service information for the given service name (e.g., "http") and protocol ("tcp" or "udp").
 
 =head2 getservbyport
 
     Sys.getservbyport(port, proto)
 
-Returns the
-
-=cut
+Returns service information for the specified port and protocol.
 
 =head2 getservent
 
     Sys.getservent
 
-Returns the
-
-=cut
+Returns the next entry from the services database.
 
 =head2 isweak
 
     Sys.isweak(obj)
 
-Returns the
-
-=cut
+Returns true if the given reference is a weak reference.
 
 =head2 kill
 
     Sys.kill(signal, *list)
 
-Returns the
-
-=cut
+Sends the specified signal to a list of processes. The signal can be provided by name ("TERM") or number (15).
 
 =head2 nano_sleep
 
     Sys.nano_sleep(sec)
 
-Returns the
-
-Aliases: I<nanosleep>
-
-=cut
+Suspends the current process for the specified number of seconds (fractional allowed) using nanosecond precision. Aliases: I<nanosleep>
 
 =head2 open
 
     Sys.open(var, mode, filename)
 
-Returns the
-
-=cut
+Opens a file with the specified mode (e.g., "r", "w") and binds it to the given variable.
 
 =head2 opendir
 
     Sys.opendir(var, dirname)
 
-Returns the
-
-=cut
+Opens a directory and binds its handle to the specified variable for reading directory entries.
 
 =head2 os
 
     Sys.os
 
-Returns the
-
-Aliases: I<osname>
-
-=cut
+Returns the name of the operating system on which the script is being run (e.g., "linux", "darwin", "windows"). Aliases: I<osname>
 
 =head2 print
 
     Sys.print(*args)
 
-Returns the
-
-=cut
+Prints the arguments to standard output (STDOUT), without a trailing newline.
 
 =head2 printf
 
     Sys.printf(*args)
 
-Returns the
-
-=cut
+Prints formatted output to STDOUT, using C-like formatting strings.
 
 =head2 printh
 
     Sys.printh(fh, *args)
 
-Returns the
-
-=cut
+Prints the arguments to the specified filehandle C<fh>, without a newline.
 
 =head2 read
 
     Sys.read(type, opt_arg)
 
-Returns the
-
-=cut
+Reads data of the given C<type> ("line", "char", "all", etc.) from standard input or another appropriate source.
 
 =head2 readln
 
-    Sys.readln(text)
+    Sys.readln(text?)
 
-Returns the
-
-Aliases: I<scanln>, I<readline>
-
-=cut
+Reads a line of input from the user, optionally displaying C<text> as a prompt. Aliases: I<scanln>, I<readline>
 
 =head2 ref
 
     Sys.ref(obj)
 
-Returns the
-
-=cut
+Returns a string representing the reference type of C<obj> (e.g., "Array", "Hash", "Code", or "Scalar").
 
 =head2 refaddr
 
     Sys.refaddr(obj)
 
-Returns the
-
-=cut
+Returns the memory address of the referenced object (if any).
 
 =head2 reftype
 
     Sys.reftype(obj)
 
-Returns the
-
-=cut
+Returns the basic type of reference for C<obj>, such as "ARRAY", "HASH", or "CODE".
 
 =head2 run
 
     Sys.run(*args)
 
-Returns the
-
-Aliases: I<system>
-
-=cut
+Runs a command as a subprocess, waits for it to finish, and returns the exit status. Aliases: I<system>
 
 =head2 say
 
     Sys.say(*args)
 
-Returns the
-
-Aliases: I<println>
-
-=cut
+Prints arguments to STDOUT, followed by a newline. Aliases: I<println>
 
 =head2 select
 
     Sys.select(fh)
 
-Returns the
-
-=cut
+Sets the default output filehandle for print operations to C<fh>. Returns the previous filehandle.
 
 =head2 setgrent
 
     Sys.setgrent
 
-Returns the
-
-=cut
+Resets the group database iterator to the beginning.
 
 =head2 sethostent
 
     Sys.sethostent(stayopen)
 
-Returns the
-
-=cut
+Resets the host database iterator, optionally keeping it open.
 
 =head2 setnetent
 
     Sys.setnetent(stayopen)
 
-Returns the
-
-=cut
+Resets the network database iterator.
 
 =head2 setpgrp
 
     Sys.setpgrp(pid, pgrp)
 
-Returns the
-
-=cut
+Sets the process group ID C<pgrp> for the process C<pid>.
 
 =head2 setpriority
 
     Sys.setpriority(which, who, priority)
 
-Returns the
-
-=cut
+Sets the scheduling priority for a process, process group, or user.
 
 =head2 setprotoent
 
     Sys.setprotoent(stayopen)
 
-Returns the
-
-=cut
+Resets the protocol database iterator.
 
 =head2 setpwent
 
     Sys.setpwent
 
-Returns the
-
-=cut
+Resets the password database iterator.
 
 =head2 setservent
 
     Sys.setservent(stayopen)
 
-Returns the
-
-=cut
+Resets the service database iterator.
 
 =head2 sidef
 
     Sys.sidef
 
-Returns the
-
-=cut
+Returns the current Sidef interpreter version as a string.
 
 =head2 sleep
 
     Sys.sleep(sec)
 
-Returns the
-
-=cut
+Pauses the process for the given number of seconds.
 
 =head2 stderr
 
     Sys.stderr
 
-Returns the
-
-=cut
+Returns the standard error filehandle.
 
 =head2 stdin
 
     Sys.stdin
 
-Returns the
-
-=cut
+Returns the standard input filehandle.
 
 =head2 stdout
 
     Sys.stdout
 
-Returns the
-
-=cut
+Returns the standard output filehandle.
 
 =head2 ualarm
 
     Sys.ualarm(sec)
 
-Returns the
-
-Aliases: I<micro_alarm>
-
-=cut
+Schedules a SIGALRM to be delivered after C<sec> microseconds. Aliases: I<micro_alarm>
 
 =head2 umask
 
     Sys.umask(mode)
 
-Returns the
-
-=cut
+Sets the process file mode creation mask to C<mode>, returning the previous value.
 
 =head2 unweaken
 
     Sys.unweaken(obj)
 
-Returns the
-
-=cut
+Removes the weak reference from the given object, making it strong again.
 
 =head2 user
 
     Sys.user
 
-Returns the
-
-Aliases: I<getlogin>
-
-=cut
+Returns the name of the effective user running the process. Aliases: I<getlogin>
 
 =head2 usleep
 
     Sys.usleep(sec)
 
-Returns the
-
-Aliases: I<micro_sleep>
-
-=cut
+Suspends execution for C<sec> microseconds (1e-6 seconds). Aliases: I<micro_sleep>
 
 =head2 wait
 
     Sys.wait
 
-Returns the
-
-=cut
+Waits for the next child process to finish and returns its status.
 
 =head2 warn
 
     Sys.warn(*args)
 
-Returns the
-
-=cut
+Prints a warning message to STDERR, constructed from C<*args>.
 
 =head2 weaken
 
     Sys.weaken(obj)
 
-Returns the
+Turns the reference in C<obj> into a weak reference, so it does not prevent its referent from being garbage collected.
 
 =cut
