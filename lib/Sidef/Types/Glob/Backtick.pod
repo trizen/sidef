@@ -2,129 +2,661 @@
 
 =head1 NAME
 
-Sidef::Types::Glob::Backtick — Shell command execution via backticks
+Sidef::Types::Glob::Backtick - Shell command execution via backticks
 
 =head1 SYNOPSIS
 
     # Execute a shell command and capture its output
     var out = `ls -1`
-
     say out
+
+    # With string interpolation
+    var dir = "/tmp"
+    var files = `ls #{dir}`
 
     # Explicit object usage (normally implicit)
     var cmd = Backtick("uname -a")
     var out = cmd.call
+    say out
+
+    # Chaining with string methods
+    var user = `whoami`.trim
+    var lines = `cat file.txt`.lines
+
+    # Using in expressions
+    if (`which git`.trim) {
+        say "Git is installed"
+    }
 
 =head1 DESCRIPTION
 
-The `Sidef::Types::Glob::Backtick` class represents a **backtick expression**
-in Sidef.
+The C<Sidef::Types::Glob::Backtick> class represents a backtick expression
+in Sidef, which executes shell commands and captures their output.
 
-A backtick expression executes a command using the system shell and returns
-the command's standard output as a B<string>.
+A backtick expression executes a command using the system shell (typically
+C</bin/sh> on Unix-like systems or C<cmd.exe> on Windows) and returns the
+command's standard output as a B<String> object.
 
-This behavior is analogous to backticks in Perl or POSIX shells:
+This behavior is analogous to backticks in Perl, Ruby, or POSIX shells:
 
     `command`
 
-is equivalent to executing the command in a subshell and capturing its output.
+The command is executed in a subshell with the output captured and returned
+as a string. All text written to STDOUT is captured, while STDERR is not
+captured by default (it goes to the parent process's STDERR).
 
-Backtick expressions are evaluated at runtime and are typically used for:
+=head2 Common Use Cases
 
-  * Querying system information
-  * Interfacing with external programs
-  * Capturing command output in scripts
+Backtick expressions are typically used for:
+
+=over 4
+
+=item * Querying system information (kernel version, hostname, etc.)
+
+=item * Interfacing with external command-line programs
+
+=item * Capturing output from Unix utilities in scripts
+
+=item * Quick system administration tasks
+
+=item * Reading data from external sources via shell commands
+
+=back
 
 =head1 INHERITS
 
 This class inherits from:
 
-  * Sidef::Object::Object
+=over 4
+
+=item * L<Sidef::Object::Object>
+
+=back
 
 =head1 METHODS
 
 =head2 call
 
-    var output = obj.call
+    var output = backtick_obj.call
+    var output = backtick_obj()
 
-Executes the stored shell command and returns its standard output as a string.
+Executes the stored shell command and returns its standard output as a String.
 
-The output includes everything written to STDOUT by the command.
-Trailing newlines are preserved unless explicitly removed by the caller.
+The returned string includes everything written to STDOUT by the command,
+including any trailing newlines. Trailing whitespace is B<not> automatically
+removed; use the C<trim> method if needed.
 
-If the command fails, behavior depends on the runtime environment and shell;
-typically an empty string or partial output may be returned.
+B<Return value:> String containing the command's output
+
+B<Exit status:> The exit status of the command is not returned. If you need
+to check the exit status, use the C<Sys.run> method instead.
+
+B<Error handling:> If the command fails or cannot be found, behavior depends
+on the shell. Typically:
+
+=over 4
+
+=item * An empty string may be returned
+
+=item * Partial output up to the point of failure may be returned
+
+=item * Shell error messages may appear on STDERR
+
+=back
+
+Example:
+
+    var kernel = Backtick("uname -r")
+    say kernel.call
 
 =head2 run
 
-    var output = obj.run
+    var output = backtick_obj.run
 
-Alias for C<call>. This method exists for internal consistency with other
-callable Sidef objects.
+Alias for C<call>. Executes the command and returns its output.
+
+This method exists for internal consistency with other callable Sidef objects
+and for compatibility with the general "run" interface pattern.
+
+Example:
+
+    var cmd = Backtick("date")
+    var timestamp = cmd.run
 
 =head2 to_s
 
-    var str = obj.to_s
+    var command_string = backtick_obj.to_s
 
-Returns the literal command string represented by the backtick expression,
-without executing it.
+Returns the literal command string represented by the backtick expression
+B<without executing it>.
 
-This is useful for debugging or introspection.
+This is useful for:
+
+=over 4
+
+=item * Debugging - see what command would be executed
+
+=item * Logging - record the command before execution
+
+=item * Introspection - examining backtick objects programmatically
+
+=back
+
+B<Return value:> String containing the command text
+
+Example:
+
+    var cmd = Backtick("ls -la")
+    say cmd.to_s              # prints: ls -la
+    say cmd.call              # executes and returns output
+
+=head2 dump
+
+    var representation = backtick_obj.dump
+
+Returns a string representation of the Backtick object suitable for debugging.
+
+Example:
+
+    var cmd = Backtick("echo hello")
+    say cmd.dump    # Backtick("echo hello")
 
 =head1 BACKTICK SYNTAX
 
-Backtick expressions can be written directly in Sidef source code:
+Backticks can be written directly in Sidef source code using the grave accent
+character (`` ` ``):
 
     var date = `date`
     var user = `whoami`
     var files = `ls *.sidef`
 
-The command is executed by the system shell. Shell features such as pipes,
-redirections, and glob expansion are handled by the shell itself, not by Sidef.
+The command string is passed to the system shell exactly as written, allowing
+full use of shell features.
+
+=head2 String Interpolation
+
+Backtick expressions support Sidef string interpolation, allowing variables
+to be embedded in commands:
+
+    var dir = "/home/user"
+    var count = `ls #{dir} | wc -l`
+
+    var filename = "data.txt"
+    var contents = `cat #{filename}`
+
+=head2 Shell Features
+
+Since commands are executed by the shell, all shell features are available:
+
+=over 4
+
+=item * B<Pipes:> C<`ps aux | grep firefox`>
+
+=item * B<Redirections:> C<`command 2>&1`>
+
+=item * B<Glob expansion:> C<`ls *.txt`>
+
+=item * B<Command substitution:> C<`echo $(date)`>
+
+=item * B<Environment variables:> C<`echo $HOME`>
+
+=item * B<Logical operators:> C<`command1 && command2`>
+
+=back
+
+Example with shell features:
+
+    # Multiple commands
+    var info = `uname -s && uname -r`
+
+    # Pipe through multiple commands
+    var top_processes = `ps aux | sort -rn -k 3 | head -5`
+
+    # Redirection
+    var combined = `command 2>&1`
 
 =head1 EXAMPLES
 
-=head2 Capturing command output
+=head2 Basic Command Execution
 
-    var kernel = `uname -r`
-    say "Kernel: #{kernel}"
+    # Get current date
+    var date = `date`
+    say date
 
-=head2 Using shell pipelines
-
-    var count = `ps aux | wc -l`
-    say count
-
-=head2 Trimming output
-
+    # Get username
     var user = `whoami`.trim
-    say user
+    say "Hello, #{user}!"
+
+    # Check if command exists
+    var git_path = `which git 2>/dev/null`.trim
+    if (git_path) {
+        say "Git found at: #{git_path}"
+    }
+
+=head2 Using Shell Pipelines
+
+    # Count running processes
+    var count = `ps aux | wc -l`.to_i
+    say "Running processes: #{count}"
+
+    # Find large files
+    var large = `find . -type f -size +1M | head -10`
+    say large
+
+    # Text processing
+    var words = `cat file.txt | tr ' ' '\n' | sort | uniq -c`
+
+=head2 String Processing
+
+    # Trim whitespace
+    var hostname = `hostname`.trim
+    say hostname
+
+    # Split output into lines
+    var files = `ls`.lines
+    files.each { |file|
+        say "File: #{file}"
+    }
+
+    # Parse structured output
+    var df = `df -h`.lines
+    df.each { |line|
+        var parts = line.split(/\s+/)
+        say parts
+    }
+
+=head2 Conditional Execution
+
+    # Check if program is installed
+    if (`which python3`.trim) {
+        say "Python 3 is installed"
+        var version = `python3 --version`.trim
+        say version
+    }
+
+    # Check command success by output
+    var status = `systemctl is-active nginx 2>/dev/null`.trim
+    if (status == "active") {
+        say "Nginx is running"
+    }
+
+=head2 Capturing and Processing Output
+
+    # Get and parse date components
+    var date_parts = `date +%Y-%m-%d`.trim.split('-')
+    var (year, month, day) = date_parts...
+    say "Year: #{year}, Month: #{month}, Day: #{day}"
+
+    # Read file through command
+    var lines = `cat /etc/hosts`.lines.grep { !_.starts_with('#') }
+    lines.each { |line| say line }
+
+    # Process JSON output from command
+    # var json = `curl -s api.example.com/data`.trim
+    # var data = json.parse_json
+
+=head2 Working with Files
+
+    # List files modified today
+    var today_files = `find . -type f -mtime 0`
+    say today_files
+
+    # Count lines in source files
+    var line_count = `find . -name '*.sidef' -exec wc -l {} + | tail -1`.trim
+    say "Total lines: #{line_count}"
+
+    # Search for pattern
+    var matches = `grep -r "TODO" . 2>/dev/null`
+    if (matches) {
+        say "Found TODOs:"
+        say matches
+    }
+
+=head2 System Information
+
+    # Get system information
+    var os = `uname -s`.trim
+    var kernel = `uname -r`.trim
+    var arch = `uname -m`.trim
+    
+    say "OS: #{os}"
+    say "Kernel: #{kernel}"
+    say "Architecture: #{arch}"
+
+    # Get memory info (Linux)
+    var mem = `free -h | grep Mem`.trim
+    say mem
+
+    # Get disk usage
+    var disk = `df -h /`.lines[1]
+    say "Root disk: #{disk}"
+
+=head2 Advanced Usage
+
+    # Combine with error handling
+    var output = ""
+    try {
+        output = `command 2>&1`.trim
+    } catch {
+        say "Command failed"
+    }
+
+    # Use in array/hash construction
+    var env = Hash(
+        user: `whoami`.trim,
+        home: `echo $HOME`.trim,
+        shell: `echo $SHELL`.trim
+    )
+    say env
+
+    # Filter and transform
+    var users = `cut -d: -f1 /etc/passwd`.lines.sort
+    say "System users: #{users.join(', ')}"
 
 =head1 SECURITY CONSIDERATIONS
 
-Backtick expressions execute arbitrary shell commands.
+Backtick expressions execute arbitrary shell commands with the privileges of
+the running process. B<Extreme caution> is required when using user input.
+
+=head2 Command Injection Vulnerability
 
 B<Never> interpolate untrusted input into backtick expressions without proper
-validation or escaping, as this may lead to command injection vulnerabilities.
+validation or escaping. This can lead to command injection vulnerabilities
+where attackers can execute arbitrary commands.
 
-Example of unsafe usage:
+B<Unsafe example> (VULNERABLE):
 
-    var name = readln
-    var out  = `echo #{name}`   # dangerous
+    # DANGEROUS - DO NOT USE
+    var filename = readln              # User input
+    var content = `cat #{filename}`    # EXPLOITABLE!
+    
+    # If user enters: file.txt; rm -rf /
+    # The command becomes: cat file.txt; rm -rf /
+
+B<Safer alternatives:>
+
+=over 4
+
+=item 1. B<Validate input> against a whitelist of allowed values
+
+    var filename = readln.trim
+    if (filename ~~ /^[a-zA-Z0-9._-]+$/) {
+        var content = `cat #{filename}`
+    } else {
+        die "Invalid filename"
+    }
+
+=item 2. B<Use File I/O instead> of shell commands when possible
+
+    var filename = readln.trim
+    var content = File(filename).read   # Safer - no shell involved
+
+=item 3. B<Use Sys.run with array arguments> for proper escaping
+
+    var filename = readln.trim
+    var content = Sys.run("cat", filename)
+
+=item 4. B<Escape shell metacharacters> (complex and error-prone)
+
+    # Not recommended - easy to get wrong
+    var escaped = filename.escape
+    var content = `cat #{escaped}`
+
+=back
+
+=head2 Other Security Concerns
+
+=over 4
+
+=item * B<Environment variables> - The shell environment is inherited and can
+affect command behavior
+
+=item * B<PATH injection> - Ensure PATH is controlled in security-sensitive contexts
+
+=item * B<Working directory> - Commands execute in the current directory
+
+=item * B<Shell features> - Wildcards, pipes, and redirections can have
+unexpected effects
+
+=back
+
+=head2 Best Practices
+
+=over 4
+
+=item * Only use backticks with trusted, static commands when possible
+
+=item * Prefer File I/O and Sidef built-ins over shell commands
+
+=item * Use C<Sys.run> or C<Sys.exec> with array arguments for better control
+
+=item * Validate and sanitize all user input before using in commands
+
+=item * Use absolute paths for commands in security-sensitive code
+
+=item * Consider using restricted shells or sandboxing for untrusted commands
+
+=back
+
+=head1 RETURN VALUES AND ERROR HANDLING
+
+Backtick expressions return the captured STDOUT as a String. Error handling
+is limited:
+
+=over 4
+
+=item * B<Exit status> is not returned or checked
+
+=item * B<STDERR> is not captured (goes to parent's STDERR)
+
+=item * B<Failed commands> may return empty strings or partial output
+
+=item * B<Command not found> errors depend on the shell
+
+=back
+
+If you need more control over command execution:
+
+    # For exit status
+    var (output, status) = Sys.run("command")
+    if (status == 0) {
+        say "Success: #{output}"
+    }
+
+    # For STDERR capture
+    var output = `command 2>&1`  # Redirect STDERR to STDOUT
+
+    # For complex execution control
+    Sys.exec("command", "arg1", "arg2")
+
+=head1 PLATFORM DIFFERENCES
+
+Command execution behavior varies by platform:
+
+=over 4
+
+=item * B<Unix/Linux/macOS:> Uses C</bin/sh> or C<$SHELL>
+
+=item * B<Windows:> Uses C<cmd.exe> or C<PowerShell> depending on configuration
+
+=item * B<Command syntax:> Must match the target shell's syntax
+
+=item * B<Path separators:> Unix uses C</>, Windows uses C<\>
+
+=item * B<Available commands:> Vary significantly between platforms
+
+=back
+
+For portable code, either:
+
+=over 4
+
+=item * Use platform detection and conditional commands
+
+=item * Stick to commands available on all target platforms
+
+=item * Use Sidef built-ins instead of shell commands where possible
+
+=back
+
+=head1 PERFORMANCE CONSIDERATIONS
+
+Backtick expressions spawn a new shell process for each execution, which has
+overhead:
+
+=over 4
+
+=item * Process creation takes time (milliseconds)
+
+=item * Each execution creates a new shell + subprocess
+
+=item * Repeated execution in loops can be slow
+
+=back
+
+For better performance:
+
+    # Slow - spawns 1000 shells
+    1000.times {
+        var date = `date`
+    }
+
+    # Better - call once, reuse result
+    var date = `date`
+    1000.times {
+        say date
+    }
+
+    # Best - use Sidef built-ins when available
+    var date = Time.now
+    1000.times {
+        say date
+    }
+
+=head1 COMPARISON WITH OTHER APPROACHES
+
+=head2 Backticks vs File I/O
+
+    # Using backticks
+    var content = `cat file.txt`
+
+    # Using File I/O (preferred)
+    var content = File("file.txt").read
+
+File I/O is generally preferred because it's:
+
+=over 4
+
+=item * Faster (no shell overhead)
+
+=item * More portable (no external commands)
+
+=item * Safer (no command injection risk)
+
+=item * More predictable error handling
+
+=back
+
+=head2 Backticks vs Sys Methods
+
+    # Backticks - simple, returns output only
+    var output = `command arg`
+
+    # Sys.run - returns output and exit status
+    var (output, status) = Sys.run("command", "arg")
+
+    # Sys.exec - replaces current process
+    Sys.exec("command", "arg")
+
+Use C<Sys> methods when you need:
+
+=over 4
+
+=item * Exit status checking
+
+=item * Better error handling
+
+=item * Argument array passing (safer with user input)
+
+=item * More control over execution environment
+
+=back
 
 =head1 IMPLEMENTATION NOTES
 
-Backtick expressions are represented in the AST using
+Backtick expressions are represented in the Sidef AST using
 C<Sidef::Types::Glob::Backtick> objects, which store the command string and
 execute it when evaluated.
 
-Command execution and output capture are delegated to the host operating
-system via the shell.
+Implementation details:
+
+=over 4
+
+=item * Command execution is delegated to the host operating system shell
+
+=item * Output capture uses standard process I/O redirection
+
+=item * The command string is evaluated at runtime, allowing interpolation
+
+=item * No caching - each C<call> executes the command again
+
+=back
+
+=head1 DIAGNOSTICS
+
+Common issues and solutions:
+
+=over 4
+
+=item * B<"Command not found"> - Command is not in PATH or doesn't exist
+
+=item * B<Empty output> - Command failed, has no output, or wrong redirect
+
+=item * B<Unexpected results> - Shell interpretation of special characters
+
+=item * B<Permission denied> - Insufficient permissions to execute command
+
+=back
+
+Debugging tips:
+
+    # See the actual command
+    var cmd = Backtick("ls -la")
+    say cmd.to_s
+
+    # Capture errors
+    var output = `command 2>&1`
+
+    # Test command in shell first
+    # $ command arg1 arg2
 
 =head1 SEE ALSO
 
-  * Sidef::Types::String
-  * Sidef::Types::Glob
-  * Shell command execution semantics
-  * Perl backticks (C<qx//>)
+=over 4
+
+=item * L<Sidef::Types::String> - String manipulation methods
+
+=item * L<Sidef::Types::Glob> - Glob pattern matching
+
+=item * L<Sidef::Sys::Sys> - System interface methods (C<run>, C<exec>)
+
+=item * L<Sidef::Types::Glob::File> - File I/O operations
+
+=item * Perl C<qx//> operator (similar functionality)
+
+=item * Ruby backticks (similar functionality)
+
+=item * POSIX shell command substitution C<$(...)>
+
+=back
+
+=head1 AUTHOR
+
+Daniel "trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
 
 =cut
