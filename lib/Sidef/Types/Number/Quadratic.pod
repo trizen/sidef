@@ -1,13 +1,20 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Number::Quadratic
+Sidef::Types::Number::Quadratic - Quadratic integer arithmetic
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements quadratic integers of the form C<a + b√w>, where C<a> and C<b> 
+are rational numbers and C<w> is a square-free integer (the discriminant). Quadratic 
+integers are an extension of the rational numbers that include square roots.
+
+The class provides arithmetic operations, modular arithmetic, and various utility 
+methods for working with quadratic integers. Common applications include algebraic 
+number theory, cryptography, and solving Pell equations.
+
+For more information, see: L<https://en.wikipedia.org/wiki/Quadratic_integer>
 
 =head1 SYNOPSIS
 
@@ -20,6 +27,19 @@ This class implements ...
     say x.powmod(100, 97)   #=> (83, 42, 5)
     say y.powmod(100, 97)   #=> (83, 39, 2)
 
+    # Basic arithmetic
+    var sum = x + y         # addition
+    var prod = x * y        # multiplication
+    var quot = x / y        # division
+    
+    # Properties
+    say x.norm              # compute the norm: a² - b²w
+    say x.conj              # conjugate: a - b√w
+    say x.abs               # absolute value: sqrt(norm)
+    
+    # Modular arithmetic
+    say x.powmod(100, 97)   # modular exponentiation
+
 =head1 INHERITS
 
 Inherits methods from:
@@ -28,53 +48,103 @@ Inherits methods from:
 
 =head1 METHODS
 
-=head2 !=
+=head2 new
 
-    a != b
+    Quadratic(a, b, w)
+    Quadratic.new(a, b, w)
 
-Returns the
+Constructs a new quadratic integer representing C<a + b√w>.
 
-Aliases: I<ne>
+B<Parameters:>
 
-=cut
+=over 4
 
-=head2 %
+=item * C<a> - The rational part (default: 0)
 
-    a % b
+=item * C<b> - The coefficient of the square root term (default: 0)
 
-Returns the
+=item * C<w> - The discriminant/order (default: 1)
 
-Aliases: I<mod>
+=back
 
-=cut
+B<Returns:> A new Quadratic object
 
-=head2 &
+B<Example:>
 
-    a & b
+    var q = Quadratic(3, 4, 5)    # 3 + 4√5
+    var q2 = Quadratic(2, 1)      # 2 + √1 = 3
 
-Returns the
-
-Aliases: I<and>
-
-=cut
-
-=head2 *
-
-    a * b
-
-Returns the
-
-Aliases: I<mul>
+Aliases: I<call>
 
 =cut
 
-=head2 **
+=head2 a
 
-    a ** b
+    q.a
 
-Returns the
+Returns the rational part (real component) of the quadratic integer.
 
-Aliases: I<pow>
+For a quadratic C<a + b√w>, this returns C<a>.
+
+B<Returns:> Number - the rational part
+
+Aliases: I<re>, I<real>
+
+=cut
+
+=head2 b
+
+    q.b
+
+Returns the coefficient of the square root term (imaginary component).
+
+For a quadratic C<a + b√w>, this returns C<b>.
+
+B<Returns:> Number - the coefficient
+
+Aliases: I<im>, I<imag>
+
+=cut
+
+=head2 w
+
+    q.w
+
+Returns the discriminant (order) of the quadratic integer.
+
+For a quadratic C<a + b√w>, this returns C<w>.
+
+B<Returns:> Number - the discriminant
+
+Aliases: I<order>
+
+=cut
+
+=head2 reals
+
+    q.reals
+
+Returns the rational part and coefficient as a pair.
+
+B<Returns:> (Number, Number) - tuple of (a, b)
+
+B<Example:>
+
+    var (a, b) = Quadratic(3, 4, 5).reals  # a=3, b=4
+
+=cut
+
+=head2 parts
+
+    q.parts
+
+Returns all three components as an array.
+
+B<Returns:> Array - [a, b, w]
+
+B<Example:>
+
+    var parts = Quadratic(3, 4, 5).parts  # [3, 4, 5]
 
 =cut
 
@@ -82,19 +152,13 @@ Aliases: I<pow>
 
     a + b
 
-Returns the
+Addition of quadratic integers or addition with a regular number.
+
+For quadratics with the same discriminant: C<(a + b√w) + (c + d√w) = (a+c) + (b+d)√w>
+
+B<Returns:> Quadratic - the sum
 
 Aliases: I<add>
-
-=cut
-
-=head2 ++
-
-    a ++ b
-
-Returns the
-
-Aliases: I<inc>
 
 =cut
 
@@ -102,19 +166,28 @@ Aliases: I<inc>
 
     a - b
 
-Returns the
+Subtraction of quadratic integers or subtraction with a regular number.
+
+For quadratics with the same discriminant: C<(a + b√w) - (c + d√w) = (a-c) + (b-d)√w>
+
+B<Returns:> Quadratic - the difference
 
 Aliases: I<sub>
 
 =cut
 
-=head2 --
+=head2 *
 
-    a -- b
+    a * b
 
-Returns the
+Multiplication of quadratic integers or multiplication with a scalar.
 
-Aliases: I<dec>
+For quadratics with the same discriminant: 
+C<(a + b√w)(c + d√w) = (ac + bdw) + (ad + bc)√w>
+
+B<Returns:> Quadratic - the product
+
+Aliases: I<mul>
 
 =cut
 
@@ -122,79 +195,88 @@ Aliases: I<dec>
 
     a / b
 
-Returns the
+Division of quadratic integers or division by a scalar.
+
+For division by a number, divides both components. For division by another 
+quadratic, multiplies by the multiplicative inverse.
+
+B<Returns:> Quadratic - the quotient
 
 Aliases: I<÷>, I<div>
 
 =cut
 
-=head2 <
+=head2 **
 
-    a < b
+    a ** b
 
-Returns the
+Exponentiation. Raises the quadratic integer to an integer power.
 
-Aliases: I<lt>
+For non-integer exponents, converts to a regular number first.
 
-=cut
+B<Returns:> Quadratic or Number - the result of exponentiation
 
-=head2 <<
+B<Example:>
 
-    a << b
+    var q = Quadratic(3, 4, 5)
+    say q**2        # (49, 24, 5)  = 49 + 24√5
+    say q**10       # very large result
 
-Returns the
-
-Aliases: I<lsft>, I<shift_left>
-
-=cut
-
-=head2 <=>
-
-    a <=> b
-
-Returns the
-
-Aliases: I<cmp>
+Aliases: I<pow>
 
 =cut
 
-=head2 ==
+=head2 %
 
-    a == b
+    a % b
 
-Returns the
+Modulo operation. Computes C<a - b * floor(a/b)>.
 
-Aliases: I<eq>
+For modulo with a number, applies to both components independently.
 
-=cut
+B<Returns:> Quadratic - the remainder
 
-=head2 >
-
-    a > b
-
-Returns the
-
-Aliases: I<gt>
+Aliases: I<mod>
 
 =cut
 
-=head2 >>
+=head2 ++
 
-    a >> b
+    a++
+    ++a
 
-Returns the
+Increment operator. Adds 1 to the rational part.
 
-Aliases: I<rsft>, I<shift_right>
+B<Returns:> Quadratic - incremented value
+
+Aliases: I<inc>
 
 =cut
 
-=head2 ^
+=head2 --
 
-    a ^ b
+    a--
+    --a
 
-Returns the
+Decrement operator. Subtracts 1 from the rational part.
 
-Aliases: I<xor>
+B<Returns:> Quadratic - decremented value
+
+Aliases: I<dec>
+
+=cut
+
+=head2 &
+
+    a & b
+
+Bitwise AND operation on the components.
+
+Applies bitwise AND to both the rational and coefficient parts.
+
+B<Returns:> Quadratic - result of bitwise AND
+
+Aliases: I<and>
 
 =cut
 
@@ -202,9 +284,116 @@ Aliases: I<xor>
 
     a | b
 
-Returns the
+Bitwise OR operation on the components.
+
+Applies bitwise OR to both the rational and coefficient parts.
+
+B<Returns:> Quadratic - result of bitwise OR
 
 Aliases: I<or>
+
+=cut
+
+=head2 ^
+
+    a ^ b
+
+Bitwise XOR operation on the components.
+
+Applies bitwise XOR to both the rational and coefficient parts.
+
+B<Returns:> Quadratic - result of bitwise XOR
+
+Aliases: I<xor>
+
+=cut
+
+=head2 <<
+
+    a << b
+
+Left bit shift. Equivalent to multiplying by C<2^b>.
+
+B<Returns:> Quadratic - result after left shift
+
+Aliases: I<lsft>, I<shift_left>
+
+=cut
+
+=head2 >>
+
+    a >> b
+
+Right bit shift. Equivalent to dividing by C<2^b>.
+
+B<Returns:> Quadratic - result after right shift
+
+Aliases: I<rsft>, I<shift_right>
+
+=cut
+
+=head2 ==
+
+    a == b
+
+Equality comparison.
+
+Two quadratics are equal if all three components (a, b, w) are equal.
+A quadratic equals a number if b=0 and a equals that number.
+
+B<Returns:> Bool - true if equal, false otherwise
+
+Aliases: I<eq>
+
+=cut
+
+=head2 !=
+
+    a != b
+
+Inequality comparison.
+
+B<Returns:> Bool - true if not equal, false otherwise
+
+Aliases: I<ne>
+
+=cut
+
+=head2 <=>
+
+    a <=> b
+
+Three-way comparison operator (spaceship operator).
+
+Compares lexicographically by a, then b, then w.
+
+B<Returns:> Number - -1 if less, 0 if equal, 1 if greater
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 <
+
+    a < b
+
+Less-than comparison based on lexicographic ordering.
+
+B<Returns:> Bool - true if less than, false otherwise
+
+Aliases: I<lt>
+
+=cut
+
+=head2 >
+
+    a > b
+
+Greater-than comparison based on lexicographic ordering.
+
+B<Returns:> Bool - true if greater than, false otherwise
+
+Aliases: I<gt>
 
 =cut
 
@@ -212,7 +401,9 @@ Aliases: I<or>
 
     a ≤ b
 
-Returns the
+Less-than-or-equal comparison.
+
+B<Returns:> Bool - true if less than or equal, false otherwise
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -222,101 +413,206 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Returns the
+Greater-than-or-equal comparison.
+
+B<Returns:> Bool - true if greater than or equal, false otherwise
 
 Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
-=head2 a
-
-    self.a
-
-Returns the
-
-Aliases: I<re>, I<real>
-
-=cut
-
 =head2 abs
 
-    x.abs
+    q.abs
 
-Returns the
+Computes the absolute value (magnitude) of the quadratic integer.
+
+Defined as C<sqrt(norm(q))> where norm is C<a² - b²w>.
+
+B<Returns:> Number - the absolute value
+
+B<Example:>
+
+    var q = Quadratic(3, 4, 5)
+    say q.abs       # sqrt(3² - 4²*5) = sqrt(-71)
 
 =cut
 
-=head2 b
+=head2 norm
 
-    self.b
+    q.norm
 
-Returns the
+Computes the norm of the quadratic integer.
 
-Aliases: I<im>, I<imag>
+For C<a + b√w>, the norm is C<a² - b²w>. This is equal to the 
+product of the quadratic with its conjugate.
 
-=cut
+B<Returns:> Number - the norm
 
-=head2 ceil
+B<Example:>
 
-    x.ceil
-
-Returns the
+    var q = Quadratic(3, 4, 5)
+    say q.norm      # 3² - 4²*5 = 9 - 80 = -71
 
 =cut
 
 =head2 conj
 
-    x.conj
+    q.conj
 
-Returns the
+Returns the conjugate of the quadratic integer.
 
-=cut
+For C<a + b√w>, the conjugate is C<a - b√w>.
 
-=head2 dump
+B<Returns:> Quadratic - the conjugate
 
-    x.dump
+B<Example:>
 
-Returns the
-
-=cut
-
-=head2 eval
-
-    x.eval(v)
-
-Returns the
+    var q = Quadratic(3, 4, 5)
+    say q.conj      # Quadratic(3, -4, 5)
 
 =cut
 
-=head2 float
+=head2 neg
 
-    x.float
+    q.neg
+    -q
 
-Returns the
+Returns the negation of the quadratic integer.
 
-=cut
+For C<a + b√w>, returns C<-a - b√w>.
 
-=head2 floor
-
-    x.floor
-
-Returns the
+B<Returns:> Quadratic - the negation
 
 =cut
 
 =head2 inv
 
-    x.inv
+    q.inv
 
-Returns the
+Computes the multiplicative inverse.
+
+For C<a + b√w>, the inverse is C<a/(a²-b²w) - b/(a²-b²w)√w>.
+
+B<Returns:> Quadratic - the multiplicative inverse
+
+B<Example:>
+
+    var q = Quadratic(3, 4, 5)
+    say q.inv       # 1/q
+    say q * q.inv   # Quadratic(1, 0, w) ≈ 1
+
+=cut
+
+=head2 sqr
+
+    q.sqr
+
+Computes the square of the quadratic integer efficiently.
+
+This is more efficient than C<q**2> or C<q*q>.
+
+B<Returns:> Quadratic - the square
+
+=cut
+
+=head2 sgn
+
+    q.sgn
+
+Returns the sign (unit) of the quadratic integer.
+
+Computed as C<q / q.abs>.
+
+B<Returns:> Quadratic - the sign/unit
+
+=cut
+
+=head2 powmod
+
+    q.powmod(n, m)
+
+Modular exponentiation: computes C<q^n mod m> efficiently.
+
+Uses binary exponentiation for efficiency. Supports negative exponents
+by computing the modular inverse.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<n> - the exponent (integer)
+
+=item * C<m> - the modulus (positive integer)
+
+=back
+
+B<Returns:> Quadratic - the result of C<q^n mod m>
+
+B<Example:>
+
+    var q = Quadratic(3, 4, 5)
+    say q.powmod(100, 97)   # (83, 42, 5)
 
 =cut
 
 =head2 invmod
 
-    x.invmod(m)
+    q.invmod(m)
 
-Returns the
+Computes the modular multiplicative inverse: finds C<q'> such that C<q * q' ≡ 1 (mod m)>.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<m> - the modulus
+
+=back
+
+B<Returns:> Quadratic - the modular inverse
+
+B<Example:>
+
+    var q = Quadratic(3, 4, 5)
+    var inv = q.invmod(97)
+    say (q * inv) % 97      # should be ≈ 1
+
+=cut
+
+=head2 is_zero
+
+    q.is_zero
+
+Checks if the quadratic integer equals zero.
+
+Returns true if both a and b are zero.
+
+B<Returns:> Bool - true if zero, false otherwise
+
+=cut
+
+=head2 is_one
+
+    q.is_one
+
+Checks if the quadratic integer equals one.
+
+Returns true if a=1 and b=0.
+
+B<Returns:> Bool - true if one, false otherwise
+
+=cut
+
+=head2 is_mone
+
+    q.is_mone
+
+Checks if the quadratic integer equals minus one.
+
+Returns true if a=-1 and b=0.
+
+B<Returns:> Bool - true if minus one, false otherwise
 
 =cut
 
@@ -324,150 +620,225 @@ Returns the
 
     n.is_coprime(k)
 
-Returns the
+Checks if two quadratic integers are coprime.
+
+Two quadratics are coprime if gcd(norm(n), norm(k)) = 1.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<k> - another quadratic integer
+
+=back
+
+B<Returns:> Bool - true if coprime, false otherwise
 
 =cut
 
-=head2 is_mone
+=head2 floor
 
-    x.is_mone
+    q.floor
 
-Returns the
+Applies floor function to both components.
 
-=cut
-
-=head2 is_one
-
-    x.is_one
-
-Returns the
+B<Returns:> Quadratic - result with floored components
 
 =cut
 
-=head2 is_zero
+=head2 ceil
 
-    x.is_zero
+    q.ceil
 
-Returns the
+Applies ceiling function to both components.
 
-=cut
-
-=head2 lift
-
-    x.lift
-
-Returns the
-
-=cut
-
-=head2 neg
-
-    x.neg
-
-Returns the
-
-=cut
-
-=head2 new
-
-    self.new
-
-Returns the
-
-Aliases: I<call>
-
-=cut
-
-=head2 norm
-
-    x.norm
-
-Returns the
-
-=cut
-
-=head2 parts
-
-    self.parts
-
-Returns the
-
-=cut
-
-=head2 powmod
-
-    x.powmod(n, m)
-
-Returns the
-
-=cut
-
-=head2 pretty
-
-    x.pretty
-
-Returns the
-
-Aliases: I<stringify>
-
-=cut
-
-=head2 reals
-
-    self.reals
-
-Returns the
+B<Returns:> Quadratic - result with ceiling applied to components
 
 =cut
 
 =head2 round
 
-    x.round(r)
+    q.round(r)
 
-Returns the
+Rounds both components to r decimal places.
 
-=cut
+B<Parameters:>
 
-=head2 sgn
+=over 4
 
-    x.sgn
+=item * C<r> - number of decimal places (optional)
 
-Returns the
+=back
 
-=cut
-
-=head2 sqr
-
-    x.sqr
-
-Returns the
+B<Returns:> Quadratic - result with rounded components
 
 =cut
 
-=head2 to_c
+=head2 float
 
-    x.to_c
+    q.float
 
-Returns the
+Converts both components to floating-point numbers.
 
-Aliases: I<to_n>
+B<Returns:> Quadratic - with floating-point components
+
+=cut
+
+=head2 to_n
+
+    q.to_n
+
+Converts the quadratic integer to a regular number.
+
+Computes C<a + b*sqrt(w)> as a Number object.
+
+B<Returns:> Number - the numerical value
+
+B<Example:>
+
+    var q = Quadratic(3, 4, 5)
+    say q.to_n      # approximately 12.944271909...
+
+Aliases: I<to_c>
 
 =cut
 
 =head2 to_s
 
-    x.to_s
+    q.to_s
 
-Returns the
+Converts to a string representation showing the constructor form.
+
+B<Returns:> String - "Quadratic(a, b, w)"
+
+B<Example:>
+
+    var q = Quadratic(3, 4, 5)
+    say q.to_s      # "Quadratic(3, 4, 5)"
 
 =cut
 
-=head2 w
+=head2 pretty
 
-    self.w
+    q.pretty
 
-Returns the
+Returns a human-readable algebraic representation.
 
-Aliases: I<order>
+B<Returns:> String - "a + (b)*sqrt(w)"
+
+B<Example:>
+
+    var q = Quadratic(3, 4, 5)
+    say q.pretty    # "3 + (4)*sqrt(5)"
+
+Aliases: I<stringify>
+
+=cut
+
+=head2 dump
+
+    q.dump
+
+Returns a string representation suitable for debugging or serialization.
+
+B<Returns:> String - "Quadratic(a, b, w)"
+
+=cut
+
+=head2 eval
+
+    q.eval(v)
+
+Evaluates the quadratic by substituting a value for variables in the components.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<v> - value to substitute
+
+=back
+
+B<Returns:> Quadratic - result after evaluation
+
+=cut
+
+=head2 lift
+
+    q.lift
+
+Lifts the quadratic integer by applying lift to all components.
+
+Used in modular arithmetic contexts.
+
+B<Returns:> Quadratic - lifted version
+
+=cut
+
+=head1 MATHEMATICAL PROPERTIES
+
+=head2 Norm and Conjugate
+
+For a quadratic integer C<q = a + b√w>:
+
+=over 4
+
+=item * Conjugate: C<conj(q) = a - b√w>
+
+=item * Norm: C<norm(q) = q × conj(q) = a² - b²w>
+
+=item * Absolute value: C<abs(q) = sqrt(norm(q))>
+
+=back
+
+=head2 Arithmetic
+
+Quadratic integers form a ring under addition and multiplication when they share 
+the same discriminant w. The operations are:
+
+=over 4
+
+=item * Addition: C<(a+b√w) + (c+d√w) = (a+c) + (b+d)√w>
+
+=item * Multiplication: C<(a+b√w)(c+d√w) = (ac+bdw) + (ad+bc)√w>
+
+=item * Inverse: C<1/(a+b√w) = (a-b√w)/(a²-b²w)>
+
+=back
+
+=head1 EXAMPLES
+
+    # Golden ratio powers using Quadratic(0, 1, 5)
+    var phi = Quadratic(0, 1, 5)  # √5
+    say phi**2      # Quadratic(5, 0, 5) = 5
+    
+    # Pell equation solutions
+    var x = Quadratic(1, 1, 2)    # 1 + √2
+    say x**2        # Quadratic(3, 2, 2) = 3 + 2√2
+    
+    # Modular arithmetic
+    var a = Quadratic(3, 4, 5)
+    say a.powmod(1000, 100)  # efficient modular exponentiation
+    
+    # Working with Gaussian integers (w=-1)
+    var z = Quadratic(3, 4, -1)   # 3 + 4i
+    say z.norm      # 25 (= 3² + 4²)
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Number::Number>
+
+L<https://en.wikipedia.org/wiki/Quadratic_integer>
+
+L<https://en.wikipedia.org/wiki/Quadratic_field>
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
 
 =cut
