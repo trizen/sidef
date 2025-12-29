@@ -32,7 +32,7 @@ The Mod class supports standard arithmetic operations (addition, subtraction, mu
     var x = Mod(2, 3)
     var y = Mod(3, 5)
     var z = Mod(2, 7)
-    say [x, y, z].chinese   # Mod(23, 105)
+    say chinese(x,y,z)   # Mod(23, 105)
 
 =head1 INHERITS
 
@@ -465,8 +465,8 @@ Applies the Chinese Remainder Theorem to solve a system of modular congruences. 
     var a = Mod(2, 3)       # x ≡ 2 (mod 3)
     var b = Mod(3, 5)       # x ≡ 3 (mod 5)
     var c = Mod(2, 7)       # x ≡ 2 (mod 7)
-    
-    say [a, b, c].chinese   # Mod(23, 105)
+
+    say chinese(a, b, c)    # Mod(23, 105)
                             # 23 ≡ 2 (mod 3)
                             # 23 ≡ 3 (mod 5)
                             # 23 ≡ 2 (mod 7)
@@ -630,23 +630,23 @@ has a unique solution modulo M = m₁ * m₂ * ... * m_k.
 
     var a = Mod(7, 12)
     var b = Mod(5, 12)
-    
-    say a + b               # Mod(0, 12)   -- 7 + 5 = 12 ≡ 0 (mod 12)
-    say a * b               # Mod(11, 12)  -- 7 * 5 = 35 ≡ 11 (mod 12)
-    say a - b               # Mod(2, 12)   -- 7 - 5 = 2
+
+    say (a + b)               # Mod(0, 12)   -- 7 + 5 = 12 ≡ 0 (mod 12)
+    say (a * b)               # Mod(11, 12)  -- 7 * 5 = 35 ≡ 11 (mod 12)
+    say (a - b)               # Mod(2, 12)   -- 7 - 5 = 2
 
 =head2 Modular Exponentiation
 
     # Compute 2^100 mod 1000
     var x = Mod(2, 1000)
-    say x ** 100            # Mod(376, 1000)
+    say x**100            # Mod(376, 1000)
 
 =head2 Solving Linear Congruences
 
     # Solve: 3x ≡ 7 (mod 11)
     var a = Mod(7, 11)
     var b = Mod(3, 11)
-    say a / b               # Mod(6, 11)  -- solution: x = 6
+    say (a / b)             # Mod(6, 11)  -- solution: x = 6
     # Verify: 3 * 6 = 18 ≡ 7 (mod 11) ✓
 
 =head2 Finding Multiplicative Order
@@ -661,8 +661,8 @@ has a unique solution modulo M = m₁ * m₂ * ... * m_k.
     # x ≡ 2 (mod 3)
     # x ≡ 3 (mod 4)
     # x ≡ 1 (mod 5)
-    
-    var crt = [Mod(2, 3), Mod(3, 4), Mod(1, 5)].chinese
+
+    var crt = chinese(Mod(2, 3), Mod(3, 4), Mod(1, 5))
     say crt                 # Mod(11, 60)
     # Verify: 11 mod 3 = 2 ✓
     #         11 mod 4 = 3 ✓
