@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef:: Object::Object
+Sidef::Object::Object
 
 =head1 DESCRIPTION
 
@@ -284,7 +284,7 @@ Prints the object to standard output without a trailing newline. Returns C<true>
 
     obj.ref
 
-Returns the full class name (package name) of the object as a String. For example, C<Sidef:: Types::Number::Number>.
+Returns the full class name (package name) of the object as a String. For example, C<Sidef::Types::Number::Number>.
 
 =cut
 

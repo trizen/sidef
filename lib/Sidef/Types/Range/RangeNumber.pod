@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Range:: RangeNumber
+Sidef::Types::Range::RangeNumber
 
 =head1 DESCRIPTION
 
@@ -18,7 +18,7 @@ This class represents numerical ranges in Sidef, providing functionality for ite
 
 =head1 INHERITS
 
-Inherits methods from: 
+Inherits methods from:
 
        * Sidef::Types::Range::Range
        * Sidef::Object::Object
@@ -30,7 +30,7 @@ Inherits methods from:
     self. Π
     self.Π(block)
 
-Returns the product of all elements in the range.  When a block is provided, returns the product of the block applied to each element. 
+Returns the product of all elements in the range.  When a block is provided, returns the product of the block applied to each element.
 
     say (1..5).Π          #=> 120 (1*2*3*4*5)
     say (1..5).Π {|n| n**2 }  #=> 14400 (1*4*9*16*25)
@@ -78,7 +78,7 @@ Returns an array of k-almost prime numbers in the range.  A k-almost prime is a 
 
     self.almost_prime_sum(k)
 
-Returns the sum of all k-almost prime numbers in the range. 
+Returns the sum of all k-almost prime numbers in the range.
 
     say (1..100).almost_prime_sum(2)    # sum of semiprimes in range
 
@@ -100,7 +100,7 @@ Returns the arithmetic mean of all elements in the range. When a block is provid
 
     self.avg_by(block)
 
-Returns the arithmetic mean of the block applied to each element in the range. 
+Returns the arithmetic mean of the block applied to each element in the range.
 
     say (1..10).avg_by {|n| n**2 }  #=> 38.5
 
@@ -141,7 +141,7 @@ Performs a binary search and returns the last element for which the block return
 
     self.carmichael(k)
 
-Returns the Carmichael numbers in the range that are also k-almost primes.  Carmichael numbers are composite numbers n that satisfy a^(n-1) ≡ 1 (mod n) for all integers a coprime to n. 
+Returns the Carmichael numbers in the range that are also k-almost primes.  Carmichael numbers are composite numbers n that satisfy a^(n-1) ≡ 1 (mod n) for all integers a coprime to n.
 
     say (1..10000).carmichael(3)    # 3-factor Carmichael numbers
 
@@ -151,7 +151,7 @@ Returns the Carmichael numbers in the range that are also k-almost primes.  Carm
 
     self. composite_count
 
-Returns the count of composite numbers in the range. 
+Returns the count of composite numbers in the range.
 
     say (1..100).composite_count    #=> 74
 
@@ -161,7 +161,7 @@ Returns the count of composite numbers in the range.
 
     self. composites
 
-Returns an array of composite numbers in the range. 
+Returns an array of composite numbers in the range.
 
     say (1..20).composites    #=> [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20]
 
@@ -201,7 +201,7 @@ Returns the count of cubefree numbers in the range.
 
     self.cubefree_sum
 
-Returns the sum of all cubefree numbers in the range. 
+Returns the sum of all cubefree numbers in the range.
 
     say (1..100).cubefree_sum
 
@@ -211,7 +211,7 @@ Returns the sum of all cubefree numbers in the range.
 
     self.cubefull
 
-Returns an array of cubefull (3-powerful) numbers in the range. A cubefull number has all prime factors appearing at least 3 times. 
+Returns an array of cubefull (3-powerful) numbers in the range. A cubefull number has all prime factors appearing at least 3 times.
 
     say (1.. 1000).cubefull    #=> [1, 8, 16, 27, 32, 64, 81, ...]
 
@@ -221,7 +221,7 @@ Returns an array of cubefull (3-powerful) numbers in the range. A cubefull numbe
 
     self.cubefull_count
 
-Returns the count of cubefull numbers in the range. 
+Returns the count of cubefull numbers in the range.
 
     say (1..10000).cubefull_count
 
@@ -241,7 +241,7 @@ Returns the sum of all cubefull numbers in the range.
 
     self.each_almost_prime(k, block)
 
-Iterates over all k-almost prime numbers in the range, executing the block for each. 
+Iterates over all k-almost prime numbers in the range, executing the block for each.
 
     (1..100).each_almost_prime(2, {|n| say n })    # print semiprimes
 
@@ -251,7 +251,7 @@ Iterates over all k-almost prime numbers in the range, executing the block for e
 
     self.each_carmichael(k, block)
 
-Iterates over all Carmichael numbers in the range that are also k-almost primes. 
+Iterates over all Carmichael numbers in the range that are also k-almost primes.
 
     (1.. 100000).each_carmichael(3, {|n| say n })
 
@@ -291,7 +291,7 @@ Iterates over all cubefull numbers in the range, executing the block for each.
 
     self.each_lucas_carmichael(k, block)
 
-Iterates over all Lucas-Carmichael numbers in the range that are also k-almost primes.  Lucas-Carmichael numbers are similar to Carmichael numbers but defined using the relation (p+1) | (n+1) for all prime factors p. 
+Iterates over all Lucas-Carmichael numbers in the range that are also k-almost primes.  Lucas-Carmichael numbers are similar to Carmichael numbers but defined using the relation (p+1) | (n+1) for all prime factors p.
 
     (1.. 100000).each_lucas_carmichael(3, {|n| say n })
 
@@ -303,7 +303,7 @@ Iterates over all Lucas-Carmichael numbers in the range that are also k-almost p
 
 Iterates over all non-cubefree numbers in the range (numbers divisible by a perfect cube > 1).
 
-    (1.. 100).each_noncubefree {|n| say n }    # 8, 16, 24, 27, ... 
+    (1.. 100).each_noncubefree {|n| say n }    # 8, 16, 24, 27, ...
 
 =cut
 
@@ -323,7 +323,7 @@ Iterates over all non-k-powerfree numbers in the range (numbers divisible by a k
 
 Iterates over all non-squarefree numbers in the range (numbers divisible by a perfect square > 1).
 
-    (1..100).each_nonsquarefree {|n| say n }    # 4, 8, 9, 12, 16, ... 
+    (1..100).each_nonsquarefree {|n| say n }    # 4, 8, 9, 12, 16, ...
 
 =cut
 
@@ -331,7 +331,7 @@ Iterates over all non-squarefree numbers in the range (numbers divisible by a pe
 
     self.each_omega_prime(k, block)
 
-Iterates over all k-omega prime numbers in the range.  A k-omega prime has exactly k distinct prime factors. 
+Iterates over all k-omega prime numbers in the range.  A k-omega prime has exactly k distinct prime factors.
 
     (1.. 100).each_omega_prime(2, {|n| say n })    # numbers with exactly 2 distinct prime factors
 
@@ -373,7 +373,7 @@ Iterates over all prime numbers in the range, executing the block for each.
 
 Iterates over all prime powers in the range. A prime power is p^k where p is prime and k >= 1.
 
-    (1..100).each_prime_power {|n| say n }    # 2, 3, 4, 5, 7, 8, 9, 11, ... 
+    (1..100).each_prime_power {|n| say n }    # 2, 3, 4, 5, 7, 8, 9, 11, ...
 
 =cut
 
@@ -383,7 +383,7 @@ Iterates over all prime powers in the range. A prime power is p^k where p is pri
 
 Iterates over all semiprimes (2-almost primes) in the range.  A semiprime is a product of exactly two primes.
 
-    (1..100).each_semiprime {|n| say n }    # 4, 6, 9, 10, 14, 15, ... 
+    (1..100).each_semiprime {|n| say n }    # 4, 6, 9, 10, 14, 15, ...
 
 =cut
 
@@ -401,7 +401,7 @@ Iterates over all squarefree numbers in the range, executing the block for each.
 
     self.each_squarefree_almost_prime(k, block)
 
-Iterates over all squarefree k-almost prime numbers in the range. 
+Iterates over all squarefree k-almost prime numbers in the range.
 
     (1.. 100).each_squarefree_almost_prime(3, {|n| say n })    # products of 3 distinct primes
 
@@ -431,7 +431,7 @@ Iterates over all squarefull (2-powerful) numbers in the range.  A squarefull nu
 
     self.faulhaber(k)
 
-Returns the sum of the k-th powers of all integers in the range using Faulhaber's summation formula. 
+Returns the sum of the k-th powers of all integers in the range using Faulhaber's summation formula.
 
     say (1..10).faulhaber(2)    #=> 385 (sum of squares:  1+4+9+... +100)
     say (1.. 10).faulhaber(3)    #=> 3025 (sum of cubes: 1+8+27+... +1000)
@@ -466,7 +466,7 @@ Returns the greatest common divisor of the block applied to each element in the 
 
     self.iter
 
-Returns an iterator (Block) that generates successive elements of the range. 
+Returns an iterator (Block) that generates successive elements of the range.
 
     var it = (1..5).iter
     say it.run    #=> 1
@@ -491,7 +491,7 @@ Returns the least common multiple of all elements in the range. For the range 1.
 
     self. lcm_by(block)
 
-Returns the least common multiple of the block applied to each element in the range. 
+Returns the least common multiple of the block applied to each element in the range.
 
     say (1.. 10).lcm_by {|n| n + 1 }
 
@@ -501,7 +501,7 @@ Returns the least common multiple of the block applied to each element in the ra
 
     self.lucas_carmichael(k)
 
-Returns the Lucas-Carmichael numbers in the range that are also k-almost primes. 
+Returns the Lucas-Carmichael numbers in the range that are also k-almost primes.
 
     say (1..100000).lucas_carmichael(3)
 
@@ -565,7 +565,7 @@ Returns the sum of all non-cubefree numbers in the range.
 
     self. nonpowerfree(k)
 
-Returns an array of non-k-powerfree numbers in the range. 
+Returns an array of non-k-powerfree numbers in the range.
 
     say (1..100).nonpowerfree(2)    # non-squarefree numbers
 
@@ -575,7 +575,7 @@ Returns an array of non-k-powerfree numbers in the range.
 
     self.nonpowerfree_count(k)
 
-Returns the count of non-k-powerfree numbers in the range. 
+Returns the count of non-k-powerfree numbers in the range.
 
     say (1.. 1000).nonpowerfree_count(2)
 
@@ -585,7 +585,7 @@ Returns the count of non-k-powerfree numbers in the range.
 
     self.nonpowerfree_sum(k)
 
-Returns the sum of all non-k-powerfree numbers in the range. 
+Returns the sum of all non-k-powerfree numbers in the range.
 
     say (1.. 100).nonpowerfree_sum(2)
 
@@ -635,7 +635,7 @@ Returns the count of k-omega prime numbers in the range (numbers with exactly k 
 
     self. omega_primes(k)
 
-Returns an array of k-omega prime numbers in the range. 
+Returns an array of k-omega prime numbers in the range.
 
     say (1..100).omega_primes(2)    # numbers with exactly 2 distinct prime factors
 
@@ -645,7 +645,7 @@ Returns an array of k-omega prime numbers in the range.
 
     self.omega_prime_sum(k)
 
-Returns the sum of all k-omega prime numbers in the range. 
+Returns the sum of all k-omega prime numbers in the range.
 
     say (1.. 1000).omega_prime_sum(2)
 
@@ -696,7 +696,7 @@ Returns an array of k-powerful numbers in the range. A k-powerful number has all
 
     self.powerful_count(k)
 
-Returns the count of k-powerful numbers in the range. 
+Returns the count of k-powerful numbers in the range.
 
     say (1..10000).powerful_count(2)
 
@@ -716,7 +716,7 @@ Returns the sum of all k-powerful numbers in the range.
 
     self. prime_count
 
-Returns the count of prime numbers in the range. 
+Returns the count of prime numbers in the range.
 
     say (1..100).prime_count    #=> 25
 
@@ -736,7 +736,7 @@ Returns the count of prime powers in the range (numbers of the form p^k where p 
 
     self.prime_powers
 
-Returns an array of prime powers in the range. 
+Returns an array of prime powers in the range.
 
     say (1..50).prime_powers    #=> [2, 3, 4, 5, 7, 8, 9, 11, 13, 16, 17, 19, 23, 25, 27, 29, 31, 32, 37, 41, 43, 47, 49]
 
@@ -756,7 +756,7 @@ Returns the sum of all prime powers in the range.
 
     self.primes
 
-Returns an array of prime numbers in the range. 
+Returns an array of prime numbers in the range.
 
     say (1..50).primes    #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
 
@@ -776,7 +776,7 @@ Returns the sum of all prime numbers in the range.
 
     self. prod_by(block)
 
-Returns the product of the block applied to each element in the range. 
+Returns the product of the block applied to each element in the range.
 
     say (1.. 5).prod_by {|n| n + 1 }    #=> 720 (2*3*4*5*6)
 
@@ -806,7 +806,7 @@ Returns the count of semiprimes (products of exactly two primes) in the range.
 
     self.semiprimes
 
-Returns an array of semiprimes in the range. 
+Returns an array of semiprimes in the range.
 
     say (1..50).semiprimes    #=> [4, 6, 9, 10, 14, 15, 21, 22, 25, 26, 33, 34, 35, 38, 39, 46, 49]
 
@@ -836,7 +836,7 @@ Returns the count of k-smooth numbers in the range.  A k-smooth number has all p
 
     self.squarefree
 
-Returns an array of squarefree numbers in the range.  A squarefree number has no perfect square (other than 1) as a divisor. 
+Returns an array of squarefree numbers in the range.  A squarefree number has no perfect square (other than 1) as a divisor.
 
     say (1..20).squarefree    #=> [1, 2, 3, 5, 6, 7, 10, 11, 13, 14, 15, 17, 19]
 
@@ -856,7 +856,7 @@ Returns the count of squarefree k-almost prime numbers in the range (products of
 
     self. squarefree_almost_primes(k)
 
-Returns an array of squarefree k-almost prime numbers in the range. 
+Returns an array of squarefree k-almost prime numbers in the range.
 
     say (1..100).squarefree_almost_primes(3)    # products of 3 distinct primes:  [30, 42, 66, 70, 78]
 
@@ -866,7 +866,7 @@ Returns an array of squarefree k-almost prime numbers in the range.
 
     self.squarefree_almost_prime_sum(k)
 
-Returns the sum of all squarefree k-almost prime numbers in the range. 
+Returns the sum of all squarefree k-almost prime numbers in the range.
 
     say (1.. 1000).squarefree_almost_prime_sum(3)
 
@@ -876,7 +876,7 @@ Returns the sum of all squarefree k-almost prime numbers in the range.
 
     self.squarefree_count
 
-Returns the count of squarefree numbers in the range. 
+Returns the count of squarefree numbers in the range.
 
     say (1.. 100).squarefree_count    #=> 61
 
@@ -916,7 +916,7 @@ Returns the sum of all squarefree semiprimes in the range.
 
     self.squarefree_sum
 
-Returns the sum of all squarefree numbers in the range. 
+Returns the sum of all squarefree numbers in the range.
 
     say (1..100).squarefree_sum
 

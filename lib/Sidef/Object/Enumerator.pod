@@ -2,13 +2,13 @@
 
 =head1 NAME
 
-Sidef:: Object::Enumerator
+Sidef::Object::Enumerator
 
 =head1 DESCRIPTION
 
 This class implements an enumerator object, allowing for functional-style operations such as mapping, filtering, and accessing elements within a collection.  The enumerator is designed with lazy evaluation in mind, making it suitable for working with potentially infinite sequences.
 
-An enumerator is created with a block that receives a callback function. The block calls this callback for each element it wants to yield. This enables the creation of custom iterators and generators. 
+An enumerator is created with a block that receives a callback function. The block calls this callback for each element it wants to yield. This enables the creation of custom iterators and generators.
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ An enumerator is created with a block that receives a callback function. The blo
     Enumerator(block)
     self. new
 
-Creates a new enumerator instance with the given block.  The block receives a callback function (commonly named C<yield> or C<f> or C<cb>) that should be called for each element the enumerator produces. 
+Creates a new enumerator instance with the given block.  The block receives a callback function (commonly named C<yield> or C<f> or C<cb>) that should be called for each element the enumerator produces.
 
     var squares = Enumerator({ |yield|
         for n in (1.. Inf) {
@@ -61,7 +61,7 @@ Counts and returns the number of elements in the enumerator collection that sati
     var e = Enumerator({ |f| 1.. 100 -> each { |i| f(i) } })
     say e.count { . is_prime }    # 25
 
-B<Note: > This method consumes the entire enumerator. 
+B<Note: > This method consumes the entire enumerator.
 
 Aliases: I<count_by>
 
@@ -71,7 +71,7 @@ Aliases: I<count_by>
 
     self.each(block)
 
-Iterates over all elements in the enumerator, passing each element to the given block.  Returns the enumerator itself. 
+Iterates over all elements in the enumerator, passing each element to the given block.  Returns the enumerator itself.
 
     var e = Enumerator({ |f| 1..5 -> each { |i| f(i) } })
     e.each { |n| say n }    # prints 1, 2, 3, 4, 5
@@ -85,7 +85,7 @@ B<Warning:> Do not use on infinite enumerators as it will loop forever.
     self.first(n)
     self.first(n, block)
 
-Returns the first C<n> elements of the enumerator as an array. If a block is provided, it retrieves the first C<n> elements that satisfy the block condition. 
+Returns the first C<n> elements of the enumerator as an array. If a block is provided, it retrieves the first C<n> elements that satisfy the block condition.
 
     var e = Enumerator({ |f| 1.. Inf -> each { |i| f(i) } })
 
@@ -103,7 +103,7 @@ Filters the elements in the enumerator collection based on the given block condi
     var e = Enumerator({ |f| 1..20 -> each { |i| f(i) } })
     say e.grep { .is_even }    # [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
 
-B<Note:> This method consumes the entire enumerator. 
+B<Note:> This method consumes the entire enumerator.
 
 Aliases: I<select>
 
@@ -118,7 +118,7 @@ Returns the total number of elements in the enumerator by consuming all elements
     var e = Enumerator({ |f| 1..100 -> each { |i| f(i) if i.is_prime } })
     say e.len    # 25
 
-B<Warning:> Do not use on infinite enumerators as it will loop forever. 
+B<Warning:> Do not use on infinite enumerators as it will loop forever.
 
 Aliases: I<size>, I<length>
 
@@ -133,7 +133,7 @@ Applies the given block to each element of the enumerator and returns a new arra
     var e = Enumerator({ |f| 1..5 -> each { |i| f(i) } })
     say e.map { _ * 2 }    # [2, 4, 6, 8, 10]
 
-B<Note:> This method consumes the entire enumerator. 
+B<Note:> This method consumes the entire enumerator.
 
 Aliases: I<collect>
 
@@ -238,6 +238,6 @@ This method is particularly useful for working with infinite enumerators when yo
 
 =head1 SEE ALSO
 
-L<Sidef::Types:: Array:: Array>, L<Sidef::Types::Range::RangeNumber>
+L<Sidef::Types::Array::Array>, L<Sidef::Types::Range::RangeNumber>
 
 =cut

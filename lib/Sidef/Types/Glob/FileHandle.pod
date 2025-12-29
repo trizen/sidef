@@ -34,9 +34,9 @@ This class implements file handle operations for reading from and writing to fil
 
 =head1 INHERITS
 
-Inherits methods from: 
+Inherits methods from:
 
-       * Sidef::Object:: Object
+       * Sidef::Object::Object
 
 =head1 METHODS
 
@@ -44,7 +44,7 @@ Inherits methods from:
 
     a « b
 
-Writes the content of C<b> to the file handle C<a> and returns the file handle.  This is an operator alias for writing data to a file handle. 
+Writes the content of C<b> to the file handle C<a> and returns the file handle.  This is an operator alias for writing data to a file handle.
 
 Aliases:  I<E<lt>E<lt>>, I<write_from>
 
@@ -54,7 +54,7 @@ Aliases:  I<E<lt>E<lt>>, I<write_from>
 
     a » b
 
-Reads a line from file handle C<a> into variable reference C<b> (with newline removed) and returns the file handle. Sets C<b> to C<nil> at end of file. 
+Reads a line from file handle C<a> into variable reference C<b> (with newline removed) and returns the file handle. Sets C<b> to C<nil> at end of file.
 
 Aliases: I<E<gt>E<gt>>, I<read_to>
 
@@ -80,7 +80,7 @@ Sets the encoding layer for the file handle. Common values include C<:raw>, C<:u
 
     self.byte(var_ref)
 
-Reads a single byte from the file handle.  If C<var_ref> is provided, stores the byte value (as a Number) in it and returns C<true> on success or C<false> on failure.  Without C<var_ref>, returns the byte value directly or C<nil> at end of file. 
+Reads a single byte from the file handle.  If C<var_ref> is provided, stores the byte value (as a Number) in it and returns C<true> on success or C<false> on failure.  Without C<var_ref>, returns the byte value directly or C<nil> at end of file.
 
 Aliases: I<getb>, I<read_byte>
 
@@ -98,7 +98,7 @@ Creates a new FileHandle object.  This is an alias for the constructor.
 
     self.char(var_ref)
 
-Reads a single character from the file handle. If C<var_ref> is provided, stores the character in it and returns C<true> on success or C<false> on failure. Without C<var_ref>, returns the character directly or C<nil> at end of file. 
+Reads a single character from the file handle. If C<var_ref> is provided, stores the character in it and returns C<true> on success or C<false> on failure. Without C<var_ref>, returns the character directly or C<nil> at end of file.
 
 Aliases: I<getc>, I<read_char>
 
@@ -116,7 +116,7 @@ Reads the entire file and returns an Array of individual characters (as Strings)
 
     self.close
 
-Closes the file handle. Returns C<true> on success, C<false> on failure. 
+Closes the file handle. Returns C<true> on success, C<false> on failure.
 
 =cut
 
@@ -124,7 +124,7 @@ Closes the file handle. Returns C<true> on success, C<false> on failure.
 
     self.cp(fh)
 
-Copies the content from this file handle to another FileHandle C<fh>.  Returns C<true> on success, C<false> on failure. 
+Copies the content from this file handle to another FileHandle C<fh>.  Returns C<true> on success, C<false> on failure.
 
 Aliases: I<copy>
 
@@ -160,7 +160,7 @@ Iterates over each character in the file, executing C<code> with each character 
 
     self. eof
 
-Returns C<true> if the file handle is at end of file, C<false> otherwise. 
+Returns C<true> if the file handle is at end of file, C<false> otherwise.
 
 =cut
 
@@ -176,7 +176,7 @@ Performs a file control operation on the file handle. Takes a function code and 
 
     self.file
 
-Returns the parent File object associated with this file handle, or the string buffer if this is a buffer handle. 
+Returns the parent File object associated with this file handle, or the string buffer if this is a buffer handle.
 
 Aliases: I<parent>
 
@@ -186,7 +186,7 @@ Aliases: I<parent>
 
     self. fileno
 
-Returns the file descriptor number (as a Number) for the file handle. 
+Returns the file descriptor number (as a Number) for the file handle.
 
 =cut
 
@@ -194,7 +194,7 @@ Returns the file descriptor number (as a Number) for the file handle.
 
     self. flock(mode)
 
-Applies an advisory lock on the file handle with the specified mode. Returns C<true> on success, C<false> on failure. 
+Applies an advisory lock on the file handle with the specified mode. Returns C<true> on success, C<false> on failure.
 
 =cut
 
@@ -202,7 +202,7 @@ Applies an advisory lock on the file handle with the specified mode. Returns C<t
 
     self.get(var_ref)
 
-Reads a single line from the file handle (with newline removed). If C<var_ref> is provided, stores the line in it and returns C<true> on success or C<false> at end of file.  Without C<var_ref>, returns the line directly or C<nil> at end of file. 
+Reads a single line from the file handle (with newline removed). If C<var_ref> is provided, stores the line in it and returns C<true> on success or C<false> at end of file.  Without C<var_ref>, returns the line directly or C<nil> at end of file.
 
 Aliases: I<line>, I<readln>, I<read_line>, I<readline>
 
@@ -212,7 +212,7 @@ Aliases: I<line>, I<readln>, I<read_line>, I<readline>
 
     self.grep(obj)
 
-Reads all lines from the file and returns an Array containing only the lines for which C<obj> (a Block or Regex) returns true. 
+Reads all lines from the file and returns an Array containing only the lines for which C<obj> (a Block or Regex) returns true.
 
     var matches = fh.grep { |line| line.contains("pattern") }
 
@@ -224,7 +224,7 @@ Aliases: I<select>
 
     self.isatty
 
-Returns C<true> if the file handle is connected to a terminal (TTY), C<false> otherwise. 
+Returns C<true> if the file handle is connected to a terminal (TTY), C<false> otherwise.
 
 Aliases: I<is_on_tty>
 
@@ -234,7 +234,7 @@ Aliases: I<is_on_tty>
 
     self.iter
 
-Returns an iterator Block that yields one line at a time (with newline removed) on each call. Returns C<nil> when end of file is reached. 
+Returns an iterator Block that yields one line at a time (with newline removed) on each call. Returns C<nil> when end of file is reached.
 
     var iter = fh. iter
     while (defined(var line = iter.run)) {
@@ -259,7 +259,7 @@ Aliases: I<read_lines>, I<readlines>
 
     self. lock
 
-Applies an exclusive lock (LOCK_EX) on the file handle.  Returns C<true> on success, C<false> on failure. 
+Applies an exclusive lock (LOCK_EX) on the file handle.  Returns C<true> on success, C<false> on failure.
 
 =cut
 
@@ -275,7 +275,7 @@ Returns a Stat object with information about the file (without following symboli
 
     self.map(block)
 
-Reads all lines from the file and applies C<block> to each line, returning an Array of the transformed results. 
+Reads all lines from the file and applies C<block> to each line, returning an Array of the transformed results.
 
     var upper = fh.map { |line| line. uc }
 
@@ -301,7 +301,7 @@ Aliases: I<new_buffer>
 
     self.print(*args)
 
-Writes the given arguments to the file handle without a trailing newline. Returns C<true> on success, C<false> on failure. 
+Writes the given arguments to the file handle without a trailing newline. Returns C<true> on success, C<false> on failure.
 
 Aliases: I<spurt>, I<write>
 
@@ -321,7 +321,7 @@ Writes formatted output to the file handle using a format string and arguments (
 
     self.read(var_ref, length, offset)
 
-Reads up to C<length> bytes from the file handle into C<var_ref>, optionally at the specified C<offset>. Returns the number of bytes read. 
+Reads up to C<length> bytes from the file handle into C<var_ref>, optionally at the specified C<offset>. Returns the number of bytes read.
 
 =cut
 
@@ -337,7 +337,7 @@ Repositions the file pointer to the beginning of the file. Returns C<true> on su
 
     self.say(*args)
 
-Writes the given arguments to the file handle followed by a newline.  Returns C<true> on success, C<false> on failure. 
+Writes the given arguments to the file handle followed by a newline.  Returns C<true> on success, C<false> on failure.
 
 Aliases: I<println>
 
@@ -347,7 +347,7 @@ Aliases: I<println>
 
     self.sayf(format, *args)
 
-Writes formatted output to the file handle followed by a newline.  Returns C<true> on success, C<false> on failure. 
+Writes formatted output to the file handle followed by a newline.  Returns C<true> on success, C<false> on failure.
 
     fh. sayf("%s:  %d", name, value)
 
@@ -367,7 +367,7 @@ Positions the file pointer at C<pos> bytes relative to C<whence>. The C<whence> 
 
     self.slurp
 
-Reads and returns the entire remaining content of the file as a single String. 
+Reads and returns the entire remaining content of the file as a single String.
 
     var content = fh.slurp
 
@@ -377,7 +377,7 @@ Reads and returns the entire remaining content of the file as a single String.
 
     self.stat
 
-Returns a Stat object with information about the file. 
+Returns a Stat object with information about the file.
 
 =cut
 
@@ -415,7 +415,7 @@ Returns a FileHandle for the standard output stream (STDOUT).
 
     self.sysread(var_ref, length, offset)
 
-Performs a low-level read of up to C<length> bytes from the file handle into C<var_ref>, optionally at the specified C<offset>. Returns the number of bytes read.  This bypasses buffered I/O. 
+Performs a low-level read of up to C<length> bytes from the file handle into C<var_ref>, optionally at the specified C<offset>. Returns the number of bytes read.  This bypasses buffered I/O.
 
 =cut
 
@@ -423,7 +423,7 @@ Performs a low-level read of up to C<length> bytes from the file handle into C<v
 
     self. sysseek(pos, whence)
 
-Performs a low-level seek to position C<pos> relative to C<whence>. Returns C<true> on success, C<false> on failure.  This bypasses buffered I/O. 
+Performs a low-level seek to position C<pos> relative to C<whence>. Returns C<true> on success, C<false> on failure.  This bypasses buffered I/O.
 
 =cut
 
@@ -431,7 +431,7 @@ Performs a low-level seek to position C<pos> relative to C<whence>. Returns C<tr
 
     self.syswrite(scalar, length, offset)
 
-Performs a low-level write of C<scalar> to the file handle, optionally writing only C<length> bytes starting at C<offset>. Returns C<true> on success, C<false> on failure.  This bypasses buffered I/O. 
+Performs a low-level write of C<scalar> to the file handle, optionally writing only C<length> bytes starting at C<offset>. Returns C<true> on success, C<false> on failure.  This bypasses buffered I/O.
 
 =cut
 
@@ -455,7 +455,7 @@ Truncates the file to the specified C<length> in bytes (default 0). Returns C<tr
 
     self. unlock
 
-Releases the advisory lock on the file handle (LOCK_UN). Returns C<true> on success, C<false> on failure. 
+Releases the advisory lock on the file handle (LOCK_UN). Returns C<true> on success, C<false> on failure.
 
 =cut
 
