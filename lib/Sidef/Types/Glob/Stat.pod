@@ -1,18 +1,32 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Glob::Stat
+Sidef::Types::Glob::Stat - File status information interface
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements an interface for retrieving and working with file system status information in Sidef. It provides access to file metadata such as permissions, ownership, timestamps, and size through a convenient object-oriented interface. The Stat class wraps Perl's stat() and lstat() functionality, making file system information easily accessible in Sidef programs.
 
 =head1 SYNOPSIS
 
-var obj = Stat(...)
-
+    # Create a Stat object for a file
+    var stat = Stat('/path/to/file.txt')
+    
+    # Check if file exists and get information
+    if (stat) {
+        say "Size: #{stat.size} bytes"
+        say "Modified: #{stat.mtime}"
+        say "Owner UID: #{stat.uid}"
+        say "Permissions: #{stat.mode}"
+    }
+    
+    # Use lstat for symbolic links (doesn't follow the link)
+    var link_stat = Stat.lstat('/path/to/symlink')
+    
+    # Get all stat information as an array
+    var info = stat.all
+    say "Device: #{info[0]}, Inode: #{info[1]}"
 
 =head1 INHERITS
 
@@ -26,7 +40,15 @@ Inherits methods from:
 
     self.all
 
-Returns the
+Returns an array containing all the file status information in the following order: device number, inode number, mode, number of hard links, user ID, group ID, device identifier (for special files), size in bytes, last access time, last modification time, last status change time, preferred block size, and number of blocks allocated.
+
+This corresponds to the complete output of Perl's stat() function.
+
+Example:
+
+    var stat = Stat('file.txt')
+    var fields = stat.all
+    # fields[0] = device, fields[1] = inode, etc.
 
 =cut
 
@@ -34,7 +56,12 @@ Returns the
 
     self.atime
 
-Returns the
+Returns the last access time of the file as a Unix timestamp (seconds since epoch). This is the time when the file was last read or accessed.
+
+Example:
+
+    var stat = Stat('file.txt')
+    say "Last accessed: #{stat.atime}"
 
 =cut
 
@@ -42,7 +69,12 @@ Returns the
 
     self.blksize
 
-Returns the
+Returns the preferred I/O block size for file system operations on this file, typically 4096 or 8192 bytes on modern systems. This is a hint to the system about optimal buffer sizes for reading and writing.
+
+Example:
+
+    var stat = Stat('file.txt')
+    say "Preferred block size: #{stat.blksize} bytes"
 
 =cut
 
@@ -50,7 +82,12 @@ Returns the
 
     self.blocks
 
-Returns the
+Returns the actual number of file system blocks allocated for this file. This may be less than size/512 for sparse files or more due to file system overhead and metadata.
+
+Example:
+
+    var stat = Stat('file.txt')
+    say "Blocks allocated: #{stat.blocks}"
 
 =cut
 
@@ -58,7 +95,14 @@ Returns the
 
     self.ctime
 
-Returns the
+Returns the last status change time of the file as a Unix timestamp. This is updated when the file's metadata (such as permissions, ownership, or hard link count) changes, not just when the content changes.
+
+Note: On Unix systems, this is not the creation time. Windows systems may interpret this differently.
+
+Example:
+
+    var stat = Stat('file.txt')
+    say "Status changed: #{stat.ctime}"
 
 =cut
 
@@ -66,7 +110,15 @@ Returns the
 
     self.dev
 
-Returns the
+Returns the device number of the file system containing this file. This can be used to determine if two files are on the same file system.
+
+Example:
+
+    var stat1 = Stat('file1.txt')
+    var stat2 = Stat('file2.txt')
+    if (stat1.dev == stat2.dev) {
+        say "Files are on the same device"
+    }
 
 =cut
 
@@ -74,7 +126,12 @@ Returns the
 
     self.gid
 
-Returns the
+Returns the numeric group ID of the file's owner. This identifies which group owns the file for permission purposes.
+
+Example:
+
+    var stat = Stat('file.txt')
+    say "Group ID: #{stat.gid}"
 
 =cut
 
@@ -82,7 +139,12 @@ Returns the
 
     self.ino
 
-Returns the
+Returns the inode number of the file. The inode is a unique identifier for the file within its file system. Multiple filenames (hard links) can refer to the same inode.
+
+Example:
+
+    var stat = Stat('file.txt')
+    say "Inode: #{stat.ino}"
 
 =cut
 
@@ -90,7 +152,22 @@ Returns the
 
     self.lstat(arg, obj)
 
-Returns the
+Static method that creates a new Stat object using lstat() instead of stat(). Unlike stat(), lstat() does not follow symbolic links, so it returns information about the link itself rather than the target file.
+
+Parameters:
+
+=over 4
+
+=item * arg - The file path to examine
+
+=item * obj - Optional parameter for internal use
+
+=back
+
+Example:
+
+    var link_stat = Stat.lstat('/path/to/symlink')
+    say "Link size: #{link_stat.size}"
 
 =cut
 
@@ -98,7 +175,16 @@ Returns the
 
     self.mode
 
-Returns the
+Returns the file mode, which includes both the file type and permissions as a numeric value. The mode is a bitmask that encodes file type (regular file, directory, symbolic link, etc.) and permission bits.
+
+To extract permissions: mode & 0777
+To check file type, use bitwise operations or File type checking methods.
+
+Example:
+
+    var stat = Stat('file.txt')
+    var perms = (stat.mode & 0777)
+    say "Permissions: #{perms.as_oct}"
 
 =cut
 
@@ -106,7 +192,12 @@ Returns the
 
     self.mtime
 
-Returns the
+Returns the last modification time of the file as a Unix timestamp. This is updated whenever the file's content is changed.
+
+Example:
+
+    var stat = Stat('file.txt')
+    say "Last modified: #{stat.mtime}"
 
 =cut
 
@@ -114,7 +205,12 @@ Returns the
 
     self.nlink
 
-Returns the
+Returns the number of hard links to the file. A newly created file has a link count of 1. Directories have at least 2 (the directory itself and the "." entry).
+
+Example:
+
+    var stat = Stat('file.txt')
+    say "Number of hard links: #{stat.nlink}"
 
 =cut
 
@@ -122,7 +218,7 @@ Returns the
 
     self.parent
 
-Returns the
+Returns the parent object or class information. This is primarily used internally for object hierarchy management.
 
 =cut
 
@@ -130,7 +226,14 @@ Returns the
 
     self.rdev
 
-Returns the
+Returns the device identifier for special files (character or block devices). For regular files, this value is undefined or zero. This is only meaningful for device files in /dev.
+
+Example:
+
+    var stat = Stat('/dev/null')
+    if (stat.rdev) {
+        say "Device identifier: #{stat.rdev}"
+    }
 
 =cut
 
@@ -138,7 +241,12 @@ Returns the
 
     self.size
 
-Returns the
+Returns the file size in bytes. For regular files, this is the actual size of the content. For directories, the meaning is system-dependent. For symbolic links (when using lstat), this is the length of the path string.
+
+Example:
+
+    var stat = Stat('file.txt')
+    say "File size: #{stat.size} bytes"
 
 =cut
 
@@ -146,7 +254,22 @@ Returns the
 
     self.stat(arg, obj)
 
-Returns the
+Static method that creates a new Stat object for the given file path. This follows symbolic links, returning information about the target file rather than the link itself.
+
+Parameters:
+
+=over 4
+
+=item * arg - The file path to examine
+
+=item * obj - Optional parameter for internal use
+
+=back
+
+Example:
+
+    var stat = Stat.stat('/path/to/file.txt')
+    say "Size: #{stat.size}"
 
 =cut
 
@@ -154,6 +277,33 @@ Returns the
 
     self.uid
 
-Returns the
+Returns the numeric user ID of the file's owner. This identifies which user owns the file for permission purposes.
+
+Example:
+
+    var stat = Stat('file.txt')
+    say "Owner UID: #{stat.uid}"
+
+=cut
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Glob::File> - File manipulation class
+
+=item * L<Sidef::Types::Glob::Dir> - Directory manipulation class
+
+=item * stat(2) - Unix system call documentation
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut
