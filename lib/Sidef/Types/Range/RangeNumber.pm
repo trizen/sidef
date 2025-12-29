@@ -14,6 +14,7 @@ package Sidef::Types::Range::RangeNumber {
 
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
+    use Sidef::Types::Block::Block;
 
     sub new {
         my (undef, $from, $to, $step) = @_;

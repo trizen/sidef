@@ -58,3 +58,5 @@ assert_eq(
     ^Inf -> lazy.map { _**2 + 1 }.grep { .is_prime }.while { _ < 1000 },
     1..1000.isqrt -> map { _**2 + 1}.grep { .is_prime }
 )
+
+assert_eq(File(__FILE__).open_r.lazy.grep{ .match(/./) }.map{ .uc }.first(5).len, 5)

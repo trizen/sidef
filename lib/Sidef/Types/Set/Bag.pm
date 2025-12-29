@@ -15,6 +15,7 @@ package Sidef::Types::Set::Bag {
       },
       q{""} => \&_dump;
 
+    use Sidef::Types::Block::Block;
     use Sidef::Types::Bool::Bool;
     use Sidef::Types::Number::Number;
 

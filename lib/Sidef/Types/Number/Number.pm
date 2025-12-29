@@ -10435,7 +10435,7 @@ package Sidef::Types::Number::Number {
         my $r_mod = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mod($r_mod, $r, $mod);
         if (Math::GMPz::Rmpz_cmp_ui($r_mod, 0) == 0) {
-            my $t  = int(($e - 1) / $k_ui) + 1;
+            my $t  = CORE::int(($e - 1) / $k_ui) + 1;
             my $pt = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_pow_ui($pt, $p, $t);
             my $cnt = Math::GMPz::Rmpz_init();
@@ -10499,8 +10499,8 @@ package Sidef::Types::Number::Number {
         # Hensel lifting from smaller exponent
         my $half =
           (Math::GMPz::Rmpz_cmp_ui($p, 2) > 0 || $e < 5)
-          ? int(($e + 1) / 2)
-          : int(($e + 3) / 2);
+          ? CORE::int(($e + 1) / 2)
+          : CORE::int(($e + 3) / 2);
 
         my $sub = _roots_mod_prime_power($r, $k, $p, $half, $single_root);
 
@@ -24270,7 +24270,7 @@ package Sidef::Types::Number::Number {
                         push @$factors, @new_factors;
                     }
                     elsif ($factor->is_perfect_power) {
-                        my @perfect = (($factor->perfect_root) x int($factor->perfect_power));
+                        my @perfect = (($factor->perfect_root) x CORE::int($factor->perfect_power));
                         push @arr,      @perfect;
                         push @$factors, @perfect;
                     }
@@ -24287,7 +24287,7 @@ package Sidef::Types::Number::Number {
         my ($n, $mp1, $collector, $factorized_ref) = @_;
 
         my @methods = (
-                       sub { $n->is_perfect_power ? [($n->perfect_root) x int($n->perfect_power)] : undef },
+                       sub { $n->is_perfect_power ? [($n->perfect_root) x CORE::int($n->perfect_power)] : undef },
                        sub { $n->trial_factor($mp1->mul(_set_int(1e5))) },
                        sub { $n->germain_factor },
                        sub { $n->holf_factor($mp1->mul(_set_int(1e4))) },

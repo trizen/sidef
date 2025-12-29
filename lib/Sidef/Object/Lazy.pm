@@ -3,6 +3,9 @@ package Sidef::Object::Lazy {
     use utf8;
     use 5.016;
     ##use overload q{""} => \&to_a;
+    use Sidef::Types::Block::Block;
+    use Sidef::Types::Array::Array;
+    use Sidef::Types::Number::Number;
 
     sub new {
         my (undef, %opt) = @_;

@@ -164,4 +164,27 @@ assert_eq(
 assert_eq(Math.seq(100, {.tail.prev_composite}).first(100).grep{.is_int}.flip, composites(100))
 assert_eq(Math.seq(100.prev_prime, {.tail.prev_prime}).first(100).grep{.is_int}.flip, primes(100))
 
+do {
+    func wordwrap(words, maxwidth) {
+        Enumerator({ |y|
+            var cols = 0
+            words.slice_before { |w|
+                cols += 1 if (cols != 0)
+                cols += w.len
+                if (maxwidth < cols) {
+                    cols = w.len
+                    true
+                } else {
+                    false
+                }
+            }.each { |ws| y(ws) }
+        })
+    }
+
+    var text = "The quick brown fox jumps over the lazy dog"
+    var arr = []
+    wordwrap(text.words, 15).each { |line| arr << line.join(" ") }
+    assert_eq(arr, ["The quick brown", "fox jumps over", "the lazy dog"])
+}
+
 say "** Test passed!"
