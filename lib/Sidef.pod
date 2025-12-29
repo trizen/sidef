@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,7 +6,7 @@ Sidef - The Sidef programming language.
 
 =head1 DESCRIPTION
 
-Sidef is a modern, high-level, general-purpose programming language, inspired by Ruby, Raku and Go.
+Sidef is a powerful programming language inspired by B<Ruby>, B<Raku>, and B<Go>. It is designed to be expressive and flexible, seamlessly blending functional and object-oriented paradigms.
 
 
                 **   **         ****   *           *********   *********
@@ -21,181 +20,129 @@ Sidef is a modern, high-level, general-purpose programming language, inspired by
           **   **               ****   *********   *********   *
 
 
-The main features of Sidef include:
+=head2 Key Features
 
-=over 2
+=over 4
 
-=item * object-oriented programming
+=item * B<Object-Oriented Programming:> Full support for classes, objects, and inheritance.
 
-=item * functional programming
+=item * B<Functional Programming:> Includes functional pattern matching, first-class functions, and lexical closures.
 
-=item * functional pattern matching
+=item * B<Advanced Dispatch:> Supports multiple dispatch and keyword arguments.
 
-=item * optional lazy evaluation
+=item * B<Perl Integration:> Full support for utilizing existing Perl modules directly within Sidef.
 
-=item * multiple dispatch
+=item * B<Rich Math Library:> Native support for arbitrary-precision integers, rationals, floats, and complex numbers.
 
-=item * lexical scoping
+=item * B<Control Flow:> Features optional lazy evaluation and integrated regular expressions.
 
-=item * lexical closures
-
-=item * keyword arguments
-
-=item * regular expressions
-
-=item * support for using Perl modules
-
-=item * optional dynamic type checking
-
-=item * big integers, rationals, floats and complex numbers
+=item * B<Safety & Scoping:> Includes lexical scoping and optional dynamic type checking.
 
 =back
 
 =head1 SYNOPSIS
 
+The C<Sidef> module allows you to interface with the language engine directly from Perl code.
+
     use Sidef;
 
+    # Initialize the Sidef engine
     my $sidef = Sidef->new(
-                           name => 'test',       # name of the program
-                           opt  => {},           # command-line options
-                           parser_opt => {},     # parser options
-                          );
+        name       => 'test',   # name of the program
+        opt        => {},       # command-line options
+        parser_opt => {},       # parser options
+    );
 
-    # Sidef code
+    # Define Sidef source code
     my $code = 'say "1 + 2 = #{1 + 2}"';
 
-    # Execute the code
+    # 1. Execute directly
     $sidef->execute_code($code);
 
-    # Compile the code to Perl
+    # 2. Transpile to Perl
     my $perl = $sidef->compile_code($code, 'Perl');
 
-    # Parse the Sidef code into an AST
-    my $ast = $sidef->parse_code($code);
+    # 3. Advanced AST manipulation
+    my $ast  = $sidef->parse_code($code);          # Generate AST
+    my $oast = $sidef->optimize_ast($ast);         # Optimize (constant-folding)
+    print $sidef->compile_ast($oast, 'Sidef');     # Compile back to Sidef source
 
-    # Optimize the AST by performing constant-folding
-    my $oast = $sidef->optimize_ast($ast);
-
-    # Compile the AST back into Sidef code
-    print $sidef->compile_ast($oast, 'Sidef');
-
-
-=head1 SUBROUTINES/METHODS
+=head1 METHODS
 
 =head2 new
 
     my $s = Sidef->new(name => '...');
 
-Creates a new Sidef object and returns it.
-
-=head2 parse_code
-
-    my $ast = $s->parse_code($code);
-
-Parses a given Sidef code and returns the AST.
-
-=head2 optimize_ast
-
-    my $oast = $s->optimize_ast($ast);
-
-Performs constant-folding and some other optimizations on a given AST.
-
-Returns a new optimized AST.
-
-=head2 compile_ast
-
-    my $ccode = $s->compile_ast($ast, $backend);
-
-Compiles the AST into code and returns it.
-
-Valid values for the backend are: C<'Sidef'>, C<'Perl'>.
-
-=head2 compile_code
-
-    my $ccode = $s->compile_code($code, $backend)
-
-Parses and compiles the given Sidef code into target code and
-returns it.
-
-Valid values for the backend are: C<'Sidef'>, C<'Perl'>.
+Creates and returns a new C<Sidef> object.
 
 =head2 execute_code
 
     my $result = $s->execute_code($code);
 
-Parses, compiles and executes a given Sidef code and returns
-the result of the last statement.
+Parses, compiles, and executes Sidef code. Returns the result of the final statement executed.
+
+=head2 compile_code
+
+    my $compiled_code = $s->compile_code($code, $backend);
+
+Parses and compiles the source string into the target backend format.
+B<Valid backends:> C<'Sidef'>, C<'Perl'>.
+
+=head2 parse_code
+
+    my $ast = $s->parse_code($code);
+
+Parses the source code and returns the Abstract Syntax Tree (AST).
+
+=head2 optimize_ast
+
+    my $oast = $s->optimize_ast($ast);
+
+Performs constant-folding and other optimizations on an AST, returning a new optimized tree.
+
+=head2 compile_ast
+
+    my $compiled_code = $s->compile_ast($ast, $backend);
+
+Compiles an existing AST into code for the specified backend.
+B<Valid backends:> C<'Sidef'>, C<'Perl'>.
 
 =head2 version
 
-    Sidef->version
+    my $version_str = Sidef->version;
 
-Returns the version of Sidef as a String object.
+Returns the Sidef version as a B<String> object.
 
 =head2 numeric_version
 
-    Sidef->numeric_version
+    my $version_num = Sidef->numeric_version;
 
-Returns the version of Sidef as a Number object.
+Returns the Sidef version as a B<Number> object.
 
-=head1 WWW
+=head1 RESOURCES
 
-You can find more info about Sidef, by clicking on the following links:
+=over 4
 
-=over 2
+=item * B<GitHub:> L<https://github.com/trizen/sidef>
 
-=item * GitHub: L<https://github.com/trizen/sidef>
+=item * B<GitBook:> L<https://trizen.gitbook.io/sidef-lang/>
 
-=item * Gitbook: L<https://trizen.gitbook.io/sidef-lang/>
+=item * B<Tutorial:> L<https://codeberg.org/trizen/sidef/wiki>
 
-=item * Tutorial: L<https://codeberg.org/trizen/sidef/wiki>
+=item * B<RosettaCode:> L<https://rosettacode.org/wiki/Sidef>
 
-=item * RosettaCode: L<https://rosettacode.org/wiki/Sidef>
+=item * B<Q&A:> L<https://github.com/trizen/sidef/discussions/categories/q-a>
 
 =back
 
-=head1 QUESTIONS & ANSWERS
-
-Need help with Sidef? Feel free to ask questions here: L<https://github.com/trizen/sidef/discussions/categories/q-a>
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2025 Daniel Șuteu, Ioana Fălcușan
+Copyright (C) 2013-2025 Daniel Șuteu, Ioana Fălcușan.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the B<Artistic License (2.0)>. You may obtain a copy
-of the full license at:
+This program is free software; you can redistribute it and/or modify it under the terms of the B<Artistic License (2.0)>. 
 
-L<https://www.perlfoundation.org/artistic-license-20.html>
+=head2 Disclaimer of Warranty
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW.
 
 =cut
