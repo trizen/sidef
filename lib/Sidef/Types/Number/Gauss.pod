@@ -1,23 +1,33 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Number::Gauss
+Sidef::Types::Number::Gauss - Gaussian integer arithmetic in Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements Gaussian integers, which are complex numbers of the form a + bi where both a and b are integers. Gaussian integers form a unique factorization domain and are useful in number theory, particularly in studying prime factorizations and solving Diophantine equations.
+
+A Gaussian integer can be created using the C<Gauss(a, b)> constructor, which represents the complex number a + bi.
 
 =head1 SYNOPSIS
 
-    var a = Gauss(17,19)
-    var b = Gauss(43,97)
+    var a = Gauss(17, 19)      #=> 17+19i
+    var b = Gauss(43, 97)      #=> 43+97i
 
-    say a+b     #=> (60, 116)
-    say a-b     #=> (-26, -78)
-    say a*b     #=> (-1112, 2466)
-    say a/b     #=> (99/433, -32/433)
+    say a+b                    #=> 60+116i
+    say a-b                    #=> -26-78i
+    say a*b                    #=> -1112+2466i
+    say a/b                    #=> 99/433-32i/433
+
+    say a.norm                 #=> 650 (17² + 19²)
+    say a.conj                 #=> 17-19i
+    
+    var g = Gauss(120, 84)
+    say g.factor               #=> [Gauss(-1,1), Gauss(1,1), Gauss(1,1), Gauss(1,1), Gauss(2,1), Gauss(3,0)]
+    
+    var p = Gauss(3, 2)
+    say p.is_prime             #=> true
 
 =head1 INHERITS
 
@@ -31,7 +41,7 @@ Inherits methods from:
 
     a != b
 
-Returns the
+Returns true if two Gaussian integers are not equal (their real or imaginary parts differ).
 
 Aliases: I<ne>
 
@@ -41,7 +51,7 @@ Aliases: I<ne>
 
     a % b
 
-Returns the
+Returns the remainder when dividing Gaussian integer C<a> by C<b>, using the Euclidean division algorithm for Gaussian integers.
 
 Aliases: I<mod>
 
@@ -51,7 +61,7 @@ Aliases: I<mod>
 
     a & b
 
-Returns the
+Performs bitwise AND operation on the real and imaginary parts separately.
 
 Aliases: I<and>
 
@@ -61,7 +71,7 @@ Aliases: I<and>
 
     a * b
 
-Returns the
+Returns the product of two Gaussian integers. If a = (p+qi) and b = (r+si), then a*b = (pr-qs) + (ps+qr)i.
 
 Aliases: I<mul>
 
@@ -71,7 +81,7 @@ Aliases: I<mul>
 
     a ** b
 
-Returns the
+Returns the Gaussian integer C<a> raised to the power C<b>.
 
 Aliases: I<pow>
 
@@ -81,7 +91,7 @@ Aliases: I<pow>
 
     a + b
 
-Returns the
+Returns the sum of two Gaussian integers by adding their real and imaginary parts separately.
 
 Aliases: I<add>
 
@@ -89,9 +99,9 @@ Aliases: I<add>
 
 =head2 ++
 
-    a ++ b
+    a++
 
-Returns the
+Increments the Gaussian integer by 1 (adds 1 to the real part).
 
 Aliases: I<inc>
 
@@ -101,7 +111,7 @@ Aliases: I<inc>
 
     a - b
 
-Returns the
+Returns the difference of two Gaussian integers by subtracting their real and imaginary parts separately.
 
 Aliases: I<sub>
 
@@ -109,9 +119,9 @@ Aliases: I<sub>
 
 =head2 --
 
-    a -- b
+    a--
 
-Returns the
+Decrements the Gaussian integer by 1 (subtracts 1 from the real part).
 
 Aliases: I<dec>
 
@@ -121,7 +131,7 @@ Aliases: I<dec>
 
     a / b
 
-Returns the
+Returns the quotient when dividing Gaussian integer C<a> by C<b>. The result may have rational real and imaginary parts.
 
 Aliases: I<÷>, I<div>
 
@@ -131,7 +141,7 @@ Aliases: I<÷>, I<div>
 
     a < b
 
-Returns the
+Compares two Gaussian integers by their norms. Returns true if the norm of C<a> is less than the norm of C<b>.
 
 Aliases: I<lt>
 
@@ -141,7 +151,7 @@ Aliases: I<lt>
 
     a << b
 
-Returns the
+Performs left bitwise shift on both real and imaginary parts by C<b> positions.
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -151,7 +161,7 @@ Aliases: I<lsft>, I<shift_left>
 
     a <=> b
 
-Returns the
+Compares two Gaussian integers by their norms. Returns -1 if norm(a) < norm(b), 0 if equal, and 1 if norm(a) > norm(b).
 
 Aliases: I<cmp>
 
@@ -161,7 +171,7 @@ Aliases: I<cmp>
 
     a == b
 
-Returns the
+Returns true if two Gaussian integers are equal (both real and imaginary parts match).
 
 Aliases: I<eq>
 
@@ -171,7 +181,7 @@ Aliases: I<eq>
 
     a > b
 
-Returns the
+Compares two Gaussian integers by their norms. Returns true if the norm of C<a> is greater than the norm of C<b>.
 
 Aliases: I<gt>
 
@@ -181,7 +191,7 @@ Aliases: I<gt>
 
     a >> b
 
-Returns the
+Performs right bitwise shift on both real and imaginary parts by C<b> positions.
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -191,7 +201,7 @@ Aliases: I<rsft>, I<shift_right>
 
     a ^ b
 
-Returns the
+Performs bitwise XOR operation on the real and imaginary parts separately.
 
 Aliases: I<xor>
 
@@ -201,7 +211,7 @@ Aliases: I<xor>
 
     a | b
 
-Returns the
+Performs bitwise OR operation on the real and imaginary parts separately.
 
 Aliases: I<or>
 
@@ -211,7 +221,7 @@ Aliases: I<or>
 
     a ≤ b
 
-Returns the
+Returns true if the norm of C<a> is less than or equal to the norm of C<b>.
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -221,7 +231,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Returns the
+Returns true if the norm of C<a> is greater than or equal to the norm of C<b>.
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -231,7 +241,7 @@ Aliases: I<E<gt>=>, I<ge>
 
     self.a
 
-Returns the
+Returns the real part of the Gaussian integer.
 
 Aliases: I<re>, I<real>
 
@@ -241,7 +251,7 @@ Aliases: I<re>, I<real>
 
     x.abs
 
-Returns the
+Returns the absolute value (magnitude) of the Gaussian integer, which is sqrt(a² + b²) where the Gaussian integer is a+bi.
 
 =cut
 
@@ -249,7 +259,7 @@ Returns the
 
     self.b
 
-Returns the
+Returns the imaginary part of the Gaussian integer.
 
 Aliases: I<im>, I<imag>
 
@@ -259,7 +269,7 @@ Aliases: I<im>, I<imag>
 
     x.ceil
 
-Returns the
+Returns a new Gaussian integer with the ceiling function applied to both the real and imaginary parts.
 
 =cut
 
@@ -267,7 +277,7 @@ Returns the
 
     x.conj
 
-Returns the
+Returns the complex conjugate of the Gaussian integer. If x = a+bi, returns a-bi.
 
 =cut
 
@@ -275,7 +285,7 @@ Returns the
 
     n.divisors
 
-Returns the
+Returns an array of all Gaussian integer divisors of C<n>.
 
 =cut
 
@@ -283,7 +293,7 @@ Returns the
 
     x.dump
 
-Returns the
+Returns a string representation of the Gaussian integer suitable for debugging, showing its internal structure.
 
 =cut
 
@@ -291,7 +301,7 @@ Returns the
 
     x.eval(v)
 
-Returns the
+Evaluates the Gaussian integer in some context, replacing symbolic variables with the value C<v>.
 
 =cut
 
@@ -299,7 +309,7 @@ Returns the
 
     z.factor
 
-Returns the
+Returns an array of Gaussian prime factors of C<z>. Each factor is itself a Gaussian integer.
 
 Aliases: I<factors>
 
@@ -309,7 +319,7 @@ Aliases: I<factors>
 
     z.factor_exp
 
-Returns the
+Returns an array of pairs [prime, exponent] representing the prime factorization of the Gaussian integer C<z>.
 
 =cut
 
@@ -317,7 +327,7 @@ Returns the
 
     x.float
 
-Returns the
+Converts the Gaussian integer to a complex number with floating-point real and imaginary parts.
 
 =cut
 
@@ -325,7 +335,7 @@ Returns the
 
     x.floor
 
-Returns the
+Returns a new Gaussian integer with the floor function applied to both the real and imaginary parts.
 
 =cut
 
@@ -333,7 +343,7 @@ Returns the
 
     n.gcd(k)
 
-Returns the
+Returns the greatest common divisor of two Gaussian integers using the Euclidean algorithm.
 
 =cut
 
@@ -341,7 +351,7 @@ Returns the
 
     n.gcd_norm(k)
 
-Returns the
+Returns the norm (squared magnitude) of the greatest common divisor of two Gaussian integers.
 
 =cut
 
@@ -349,7 +359,7 @@ Returns the
 
     x.i
 
-Returns the
+Returns the imaginary unit multiplied by the Gaussian integer, effectively rotating it 90 degrees in the complex plane.
 
 =cut
 
@@ -357,7 +367,7 @@ Returns the
 
     x.iabs
 
-Returns the
+Returns the squared absolute value (norm) of the Gaussian integer, which is a² + b² for a+bi.
 
 =cut
 
@@ -365,7 +375,7 @@ Returns the
 
     x.inv
 
-Returns the
+Returns the multiplicative inverse of the Gaussian integer, equal to conj(x)/norm(x).
 
 =cut
 
@@ -373,7 +383,7 @@ Returns the
 
     x.invmod(m)
 
-Returns the
+Returns the modular multiplicative inverse of C<x> modulo C<m> in the Gaussian integers, if it exists.
 
 =cut
 
@@ -381,7 +391,7 @@ Returns the
 
     n.is_coprime(k)
 
-Returns the
+Returns true if Gaussian integers C<n> and C<k> are coprime (their GCD is a unit: ±1 or ±i).
 
 =cut
 
@@ -389,7 +399,7 @@ Returns the
 
     x.is_div(y)
 
-Returns the
+Returns true if Gaussian integer C<x> is divisible by C<y> (i.e., x/y is also a Gaussian integer).
 
 Aliases: I<is_divisible>
 
@@ -399,7 +409,7 @@ Aliases: I<is_divisible>
 
     x.is_imag
 
-Returns the
+Returns true if the Gaussian integer is purely imaginary (real part is zero).
 
 =cut
 
@@ -407,7 +417,7 @@ Returns the
 
     x.is_mone
 
-Returns the
+Returns true if the Gaussian integer equals -1.
 
 =cut
 
@@ -415,7 +425,7 @@ Returns the
 
     x.is_one
 
-Returns the
+Returns true if the Gaussian integer equals 1.
 
 =cut
 
@@ -423,7 +433,7 @@ Returns the
 
     x.is_prime
 
-Returns the
+Returns true if the Gaussian integer is a Gaussian prime. A Gaussian integer is prime if it cannot be factored into non-unit Gaussian integers.
 
 =cut
 
@@ -431,7 +441,7 @@ Returns the
 
     x.is_real
 
-Returns the
+Returns true if the Gaussian integer is purely real (imaginary part is zero).
 
 =cut
 
@@ -439,7 +449,7 @@ Returns the
 
     x.is_zero
 
-Returns the
+Returns true if the Gaussian integer equals 0+0i.
 
 =cut
 
@@ -447,7 +457,7 @@ Returns the
 
     x.lift
 
-Returns the
+Converts the Gaussian integer to a standard complex number representation.
 
 =cut
 
@@ -455,15 +465,16 @@ Returns the
 
     x.neg
 
-Returns the
+Returns the negation of the Gaussian integer (multiplies by -1).
 
 =cut
 
 =head2 new
 
-    self.new
+    self.new(a, b)
+    Gauss(a, b)
 
-Returns the
+Creates a new Gaussian integer with real part C<a> and imaginary part C<b>.
 
 Aliases: I<call>
 
@@ -473,7 +484,7 @@ Aliases: I<call>
 
     x.norm
 
-Returns the
+Returns the norm of the Gaussian integer, which is a² + b² for x = a+bi. This is the squared magnitude.
 
 =cut
 
@@ -481,7 +492,7 @@ Returns the
 
     self.parts
 
-Returns the
+Returns an array containing the real and imaginary parts: [a, b] for a+bi.
 
 =cut
 
@@ -489,7 +500,7 @@ Returns the
 
     x.powmod(n, m)
 
-Returns the
+Returns C<x> raised to the power C<n> modulo C<m> in the Gaussian integers.
 
 =cut
 
@@ -497,7 +508,7 @@ Returns the
 
     x.pretty
 
-Returns the
+Returns a human-readable string representation of the Gaussian integer in the form "a+bi" or "a-bi".
 
 Aliases: I<stringify>
 
@@ -507,7 +518,7 @@ Aliases: I<stringify>
 
     self.reals
 
-Returns the
+Returns an array containing both the real and imaginary parts as real numbers.
 
 =cut
 
@@ -515,7 +526,7 @@ Returns the
 
     x.round(r)
 
-Returns the
+Rounds both the real and imaginary parts to C<r> decimal places, returning a new Gaussian integer.
 
 =cut
 
@@ -523,7 +534,7 @@ Returns the
 
     x.sgn
 
-Returns the
+Returns the sign of the Gaussian integer as a unit Gaussian integer (one of 1, -1, i, -i) with the same argument.
 
 =cut
 
@@ -531,7 +542,7 @@ Returns the
 
     x.sqr
 
-Returns the
+Returns the square of the Gaussian integer (x * x).
 
 =cut
 
@@ -539,7 +550,7 @@ Returns the
 
     self.to_c
 
-Returns the
+Converts the Gaussian integer to a complex number.
 
 Aliases: I<to_n>
 
@@ -549,6 +560,44 @@ Aliases: I<to_n>
 
     x.to_s
 
-Returns the
+Converts the Gaussian integer to a string representation.
+
+=cut
+
+=head1 MATHEMATICAL BACKGROUND
+
+Gaussian integers form a unique factorization domain, meaning every Gaussian integer can be uniquely factored into Gaussian primes (up to units and order). The units in the Gaussian integers are {1, -1, i, -i}.
+
+A Gaussian integer a+bi is a Gaussian prime if and only if:
+
+=over 4
+
+=item * a = 0 and |b| is a prime number of the form 4k+3, or
+
+=item * b = 0 and |a| is a prime number of the form 4k+3, or
+
+=item * Both a and b are nonzero and a²+b² is a rational prime
+
+=back
+
+The norm function N(a+bi) = a²+b² is multiplicative: N(zw) = N(z)N(w).
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Number::Number>
+
+=item * L<Sidef::Types::Number::Complex>
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut
