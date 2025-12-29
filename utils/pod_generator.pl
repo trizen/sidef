@@ -15,6 +15,7 @@ use File::Find            qw(find);
 use List::Util            qw(first);
 use File::Basename        qw(basename);
 use File::Spec::Functions qw(curdir splitdir catfile);
+use Pod::Simple::SimpleTree;
 
 my $dir = shift() // die "usage: $0 sidef/lib\n";
 
@@ -74,6 +75,129 @@ find {
 } => curdir();
 
 sub parse_pod_file {
+    my ($file) = @_;
+
+    my %data = (
+                __HEADER__ => '',
+                __FOOTER__ => '',
+               );
+
+    my $parser = Pod::Simple::SimpleTree->new;
+    $parser->preserve_whitespace(1);
+    $parser->accept_targets('*');
+
+    my $root = $parser->parse_file($file)->root;
+
+    my $state          = 'header';    # header | methods | footer
+    my $current_method = undef;
+
+    for my $node (@$root) {
+        next unless ref $node eq 'ARRAY';
+
+        my ($tag, $attrs, @children) = @$node;
+
+        # Detect METHODS section
+        if ($tag eq 'head1') {
+            my $title = _node_raw_text(\@children);
+
+            if ($title =~ /^METHODS\b/i) {
+                $state = 'methods';
+                undef $current_method;
+                next;
+            }
+
+            if ($state eq 'methods') {
+                $state = 'footer';
+            }
+        }
+
+        # HEADER
+        if ($state eq 'header') {
+            $data{__HEADER__} .= _serialize_node($node);
+            next;
+        }
+
+        # METHODS
+        if ($state eq 'methods') {
+
+            if ($tag eq 'head2') {
+                $current_method = _node_raw_text(\@children);
+                $data{$current_method} = _serialize_node($node);
+                next;
+            }
+
+            if (defined $current_method) {
+                $data{$current_method} .= _serialize_node($node);
+            }
+            else {
+                # Text immediately after "=head1 METHODS"
+                $data{__FOOTER__} .= _serialize_node($node);
+            }
+
+            next;
+        }
+
+        # FOOTER
+        if ($state eq 'footer') {
+            $data{__FOOTER__} .= _serialize_node($node);
+        }
+    }
+
+    return \%data;
+}
+
+sub _node_raw_text {
+    my ($children) = @_;
+    my $text = '';
+
+    for my $c (@$children) {
+        if (!ref $c) {
+            $text .= $c;
+        }
+        elsif (ref $c eq 'ARRAY') {
+            $text .= $c->[0] . '<' . _node_raw_text([@$c[2 .. $#$c]]) . '>';
+        }
+    }
+
+    return $text;
+}
+
+sub _serialize_node {
+    my ($node) = @_;
+
+    my ($tag, $attrs, @children) = @$node;
+    my $out = '';
+
+    # Reconstruct POD commands
+    if ($tag =~ /^head(\d)$/) {
+        $out .= "\n=head$1 " . _node_raw_text(\@children) . "\n\n";
+        return $out;
+    }
+
+    if ($tag eq 'Para') {
+        $out .= _node_raw_text(\@children) . "\n\n";
+        return $out;
+    }
+
+    if ($tag eq 'Verbatim') {
+        $out .= _node_raw_text(\@children) . "\n\n";
+        return $out;
+    }
+
+    # Fallback: recurse
+    for my $child (@children) {
+        if (!ref $child) {
+            $out .= $child;
+        }
+        else {
+            $out .= _serialize_node($child);
+        }
+    }
+
+    return $out;
+}
+
+sub parse_pod_file_old {
     my ($file) = @_;
 
     my %data;
@@ -268,8 +392,7 @@ __POD2__
                     $sub =~ s{([<>])}{E<$esc{$1}>}g;
                     "I<$sub>";
                 } @{$value->{aliases}}
-              )
-              . "\n";
+            ) . "\n";
         }
 
         $doc .= "\n=cut\n";
@@ -293,6 +416,11 @@ __POD2__
         $pod_data = parse_pod_file($pod_file);
     };
 
+    #  return if $pod_file eq 'Sidef/Sys/Sig.pod';
+
+    use Data::Dump qw(pp);
+    pp $pod_data;
+
     while (my ($key, $value) = each %subs) {
 
         my $alias;
@@ -311,13 +439,11 @@ __POD2__
     open my $fh, '>', $pod_file;
 
     my $header = $pod_data->{__HEADER__};
+    my $footer = $pod_data->{__FOOTER__};
 
     #if (not defined($header) or $header =~ /^This class implements \.\.\.$/m) {
-    if (not defined($header)) {
+    if (not $header) {
         $header = <<"HEADER";
-
-\=encoding utf8
-
 \=head1 NAME
 
 $module
@@ -346,17 +472,35 @@ HEADER
             $header .= join("\n", map { (" " x 7) . "* $_" } @isa);
             $header .= "\n\n";
         }
-
-        $header .= <<"HEADER";
-\=head1 METHODS
-HEADER
     }
+
+    if (not $footer) {
+        $footer = <<"FOOTER";
+
+\=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+\=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
+
+\=cut
+FOOTER
+    }
+
+    print {$fh} "=encoding utf8\n";
 
     # Print the header
     print {$fh} $header;
+
+    print {$fh} "\n=head1 METHODS\n";
 
     # Print the methods
     foreach my $method (sort_methods_by_name(map { [$_, $_->{name}] } values %subs)) {
         print {$fh} $method->{doc};
     }
+
+    print {$fh} $footer;
 }
