@@ -16,17 +16,17 @@ var obj = Object()
 
 =head1 INHERITS
 
-Inherits methods from: 
+Inherits methods from:
 
        * Sidef::Object::Convert
 
 =head1 METHODS
 
-=head2 ! ~
+=head2 !~
 
     a !~ b
 
-Returns the negation of the smart match operator. Returns C<true> if C<a> does not smart match C<b>. 
+Returns the negation of the smart match operator. Returns C<true> if C<a> does not smart match C<b>.
 
 =cut
 
@@ -34,11 +34,11 @@ Returns the negation of the smart match operator. Returns C<true> if C<a> does n
 
     a && b
 
-Logical AND operator. Returns C<b> if C<a> is true, otherwise returns C<a>. 
+Logical AND operator. Returns C<b> if C<a> is true, otherwise returns C<a>.
 
 =cut
 
-=head2 : 
+=head2 :
 
     a : b
 
@@ -74,7 +74,7 @@ Pipeline operator.  Passes C<a> as the first argument to function or method C<b>
 
     a || b
 
-Logical OR operator. Returns C<a> if C<a> is true, otherwise returns C<b>. 
+Logical OR operator. Returns C<a> if C<a> is true, otherwise returns C<b>.
 
 =cut
 
@@ -82,7 +82,7 @@ Logical OR operator. Returns C<a> if C<a> is true, otherwise returns C<b>.
 
     a ~~ b
 
-Smart match operator.  Performs context-sensitive comparison between C<a> and C<b> based on their types: 
+Smart match operator.  Performs context-sensitive comparison between C<a> and C<b> based on their types:
 
 =over 4
 
@@ -144,7 +144,7 @@ Creates a Pair object from C<a> and C<b>.  Uses the Fullwidth Colon (U+FF1A).
 
     self. alias_method(old, new)
 
-Creates an alias C<new> for the existing method C<old> on the object's class. Dies if the method C<old> does not exist.  Returns the object. 
+Creates an alias C<new> for the existing method C<old> on the object's class. Dies if the method C<old> does not exist.  Returns the object.
 
 =cut
 
@@ -152,7 +152,7 @@ Creates an alias C<new> for the existing method C<old> on the object's class. Di
 
     obj.bless(arg)
 
-Blesses C<arg> into the class of C<obj> and returns the blessed reference. 
+Blesses C<arg> into the class of C<obj> and returns the blessed reference.
 
 =cut
 
@@ -176,7 +176,7 @@ Returns a shallow copy of the object.  For hash-based objects, creates a new has
 
     self.dclone
 
-Returns a deep copy of the object, recursively cloning all nested hash and array structures.  Handles circular references by tracking already-cloned objects. 
+Returns a deep copy of the object, recursively cloning all nested hash and array structures.  Handles circular references by tracking already-cloned objects.
 
 Aliases: I<deep_clone>
 
@@ -194,7 +194,7 @@ Defines a new method with the given C<name> on the object's class.  The C<block>
 
     self.dump
 
-Returns a string representation of the object suitable for debugging. For hash-based objects, includes all key-value pairs in the format C<ClassName(key:  value, ...)>. Handles circular references. 
+Returns a string representation of the object suitable for debugging. For hash-based objects, includes all key-value pairs in the format C<ClassName(key:  value, ...)>. Handles circular references.
 
 =cut
 
@@ -202,7 +202,7 @@ Returns a string representation of the object suitable for debugging. For hash-b
 
     self. interpolate
 
-Creates a new object of the same class by joining the provided arguments into a string. Used for string interpolation. 
+Creates a new object of the same class by joining the provided arguments into a string. Used for string interpolation.
 
 =cut
 
@@ -210,7 +210,7 @@ Creates a new object of the same class by joining the provided arguments into a 
 
     self.is_a(obj)
 
-Returns C<true> if the object is an instance of C<obj> or inherits from C<obj>, otherwise returns C<false>. 
+Returns C<true> if the object is an instance of C<obj> or inherits from C<obj>, otherwise returns C<false>.
 
 Aliases: I<is_an>, I<kind_of>
 
@@ -220,7 +220,7 @@ Aliases: I<is_an>, I<kind_of>
 
     self.is_object
 
-Returns C<true> if the value is an instantiated object (a reference), otherwise returns C<false>. 
+Returns C<true> if the value is an instantiated object (a reference), otherwise returns C<false>.
 
 =cut
 
@@ -228,7 +228,7 @@ Returns C<true> if the value is an instantiated object (a reference), otherwise 
 
     self.is_typename
 
-Returns C<true> if the value is a typename (not an instantiated object), otherwise returns C<false>. 
+Returns C<true> if the value is a typename (not an instantiated object), otherwise returns C<false>.
 
 =cut
 
@@ -236,7 +236,7 @@ Returns C<true> if the value is a typename (not an instantiated object), otherwi
 
     self.lazy
 
-Returns a Lazy object wrapping the current object.  The lazy object defers method calls until the result is actually needed. 
+Returns a Lazy object wrapping the current object.  The lazy object defers method calls until the result is actually needed.
 
 =cut
 
@@ -260,7 +260,7 @@ Returns a Hash of all public methods available on the object.  Each value is a L
 
     self.new
 
-Creates and returns a new empty Object instance. 
+Creates and returns a new empty Object instance.
 
 =cut
 
@@ -276,7 +276,7 @@ Returns an Array of all parent classes (superclasses) that the object's class in
 
     self.print
 
-Prints the object to standard output without a trailing newline. Returns C<true> on success, C<false> on failure. 
+Prints the object to standard output without a trailing newline. Returns C<true> on success, C<false> on failure.
 
 =cut
 
@@ -284,7 +284,7 @@ Prints the object to standard output without a trailing newline. Returns C<true>
 
     obj.ref
 
-Returns the full class name (package name) of the object as a String. For example, C<Sidef:: Types::Number::Number>. 
+Returns the full class name (package name) of the object as a String. For example, C<Sidef:: Types::Number::Number>.
 
 =cut
 
@@ -292,7 +292,7 @@ Returns the full class name (package name) of the object as a String. For exampl
 
     self.refaddr
 
-Returns a Number representing the memory address of the object reference.  Useful for comparing object identity. 
+Returns a Number representing the memory address of the object reference.  Useful for comparing object identity.
 
 Aliases: I<object_id>
 
@@ -320,7 +320,7 @@ Returns C<true> if the object has a method with the given name, otherwise return
 
     self.say
 
-Prints the object to standard output followed by a newline.  Returns C<true> on success, C<false> on failure. 
+Prints the object to standard output followed by a newline.  Returns C<true> on success, C<false> on failure.
 
 Aliases: I<println>
 

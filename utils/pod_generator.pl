@@ -159,7 +159,7 @@ sub _node_raw_text {
                 $text .= $c->[1]{'~orig_content'};
             }
             else {
-                $text .= $c->[0] . '<' . _node_raw_text([@$c[2 .. $#$c]]) . '>';
+                $text .= $c->[0] . '<' . (_node_raw_text([@$c[2 .. $#$c]]) =~ s{([<>])}{$1 eq '<' ? 'E<lt>' : 'E<gt>'}ger) . '>';
             }
         }
     }
