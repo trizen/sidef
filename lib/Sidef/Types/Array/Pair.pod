@@ -8,14 +8,14 @@ Sidef::Types::Array::Pair
 
 This class implements a pair data structure, representing an ordered collection of exactly two elements. A Pair is commonly used to represent key-value associations, coordinate points, or any two related values. Pairs are immutable once created and are often used as building blocks for other data structures like hashes.
 
-In Sidef, pairs can be created using the C<Pair()> constructor or the C<=>> operator (fat comma).
+In Sidef, pairs must be created using the C<Pair()> constructor or the C<Pair.new()> method.
 
 =head1 SYNOPSIS
 
     # Creating pairs
     var pair1 = Pair('key', 'value')
-    var pair2 = ('name' => 'Alice')
-    var pair3 = (10 => 20)
+    var pair2 = Pair('name', 'Alice')
+    var pair3 = Pair(10, 20)
     
     # Accessing elements
     say pair1.key      #=> "key"
@@ -29,7 +29,7 @@ In Sidef, pairs can be created using the C<Pair()> constructor or the C<=>> oper
     
     # Swapping elements
     var swapped = pair3.swap
-    say swapped        #=> (20 => 10)
+    say swapped        #=> Pair(20, 10)
     
     # Using pairs in iterations
     var hash = Hash(a => 1, b => 2, c => 3)
@@ -53,10 +53,10 @@ Inherits methods from:
 Creates and returns a new Pair object with the specified key and value. This is the primary constructor for creating pairs programmatically.
 
     var pair = Pair.new('x', 100)
-    say pair           #=> (x => 100)
+    say pair           #=> Pair(x, 100)
     
     var coords = Pair.new(3.5, 7.2)
-    say coords         #=> (3.5 => 7.2)
+    say coords         #=> Pair(3.5, 7.2)
 
 Aliases: I<call>
 
@@ -68,10 +68,10 @@ Aliases: I<call>
 
 Returns the first element of the pair, conventionally referred to as the "key". This method provides semantic access to the first component when the pair is used to represent key-value associations.
 
-    var pair = ('username' => 'john_doe')
+    var pair = Pair('username', 'john_doe')
     say pair.key       #=> "username"
     
-    var point = (10 => 20)
+    var point = Pair(10, 20)
     say point.key      #=> 10
 
 Aliases: I<first>
@@ -84,10 +84,10 @@ Aliases: I<first>
 
 Returns the second element of the pair, conventionally referred to as the "value". This method provides semantic access to the second component when the pair is used to represent key-value associations.
 
-    var pair = ('username' => 'john_doe')
+    var pair = Pair('username', 'john_doe')
     say pair.value     #=> "john_doe"
     
-    var point = (10 => 20)
+    var point = Pair(10, 20)
     say point.value    #=> 20
 
 Aliases: I<second>
@@ -98,17 +98,16 @@ Aliases: I<second>
 
     self.swap
 
-Returns a new Pair with the key and value positions swapped. The original pair remains unchanged. This is useful for inverting associations or transforming coordinate systems.
+Swaps the key and value positions in place and returns the modified pair. This mutates the original pair object. This is useful for inverting associations or transforming coordinate systems.
 
-    var original = ('name' => 'Alice')
-    var swapped = original.swap
+    var original = Pair('name', 'Alice')
+    original.swap
     
-    say original       #=> (name => "Alice")
-    say swapped        #=> (Alice => "name")
+    say original       #=> Pair(Alice, name)
     
     # Useful for coordinate transformations
-    var point = (3 => 4)
-    var reflected = point.swap    #=> (4 => 3)
+    var point = Pair(3, 4)
+    point.swap         #=> Pair(4, 3)
 
 =cut
 
@@ -118,7 +117,7 @@ Returns a new Pair with the key and value positions swapped. The original pair r
 
 Converts the Pair to a two-element Array containing the key and value in order. This is useful when you need to process the pair as a regular array or pass it to functions expecting array arguments.
 
-    var pair = ('color' => 'blue')
+    var pair = Pair('color', 'blue')
     var array = pair.to_a
     
     say array          #=> ["color", "blue"]
@@ -138,7 +137,7 @@ Aliases: I<to_array>
 
 Converts the Pair to a Hash containing a single key-value entry. This is convenient when you need to create a hash from a pair or merge a pair into existing hash structures.
 
-    var pair = ('age' => 25)
+    var pair = Pair('age', 25)
     var hash = pair.to_h
     
     say hash           #=> Hash(age => 25)
@@ -146,8 +145,8 @@ Converts the Pair to a Hash containing a single key-value entry. This is conveni
     
     # Merging multiple pairs
     var settings = [
-        ('theme' => 'dark'),
-        ('font' => 'monospace')
+        Pair('theme', 'dark'),
+        Pair('font', 'monospace')
     ].map { .to_h }.reduce { |a, b| a + b }
 
 Aliases: I<to_hash>
@@ -158,16 +157,16 @@ Aliases: I<to_hash>
 
     self.to_s
 
-Returns a string representation of the Pair in the format C<(key => value)>. This provides a human-readable serialization of the pair, useful for debugging and display purposes.
+Returns a string representation of the Pair in the format C<Pair(key, value)>. This provides a human-readable serialization of the pair, useful for debugging and display purposes.
 
-    var pair = ('status' => 'active')
-    say pair.to_s      #=> "(status => active)"
+    var pair = Pair('status', 'active')
+    say pair.to_s      #=> "Pair(status, active)"
     
-    var numeric = (42 => 3.14)
-    say numeric.to_s   #=> "(42 => 3.14)"
+    var numeric = Pair(42, 3.14)
+    say numeric.to_s   #=> "Pair(42, 3.14)"
     
     # Automatically called by say/print
-    say pair           #=> (status => active)
+    say pair           #=> Pair(status, active)
 
 Aliases: I<dump>, I<to_str>
 
@@ -196,13 +195,13 @@ Aliases: I<dump>, I<to_str>
 =head2 Coordinate Transformations
 
     var points = [
-        (0 => 0),
-        (3 => 4),
-        (5 => 12)
+        Pair(0, 0),
+        Pair(3, 4),
+        Pair(5, 12)
     ]
     
     # Swap x and y coordinates
-    var reflected = points.map { .swap }
+    var reflected = points.map { |p| p.swap }
     
     # Calculate distances from origin
     var distances = points.map { |p|
@@ -213,17 +212,17 @@ Aliases: I<dump>, I<to_str>
 
     # Create a hash from an array of pairs
     var pairs = [
-        ('apple'  => 1.20),
-        ('banana' => 0.50),
-        ('cherry' => 2.00)
+        Pair('apple',  1.20),
+        Pair('banana', 0.50),
+        Pair('cherry', 2.00)
     ]
     
-    var prices = Hash(pairs...)
+    var prices = Hash(pairs.map{|p| p.to_a}...)
     say prices{:apple}    #=> 1.20
     
     # Invert a hash (swap keys and values)
     var inverted = Hash(
-        prices.map { |k, v| (v => k) }...
+        prices.map { |k, v| Pair(v, k).to_a }...
     )
 
 =head1 SEE ALSO
