@@ -1,19 +1,36 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Number::Polynomial
+Sidef::Types::Number::Polynomial - Univariate polynomial arithmetic and operations
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements univariate polynomials with arbitrary-precision coefficients. 
+Polynomials are represented as mathematical expressions in a single variable (typically 'x') 
+with operations for arithmetic, evaluation, differentiation, root finding, and algebraic manipulation.
+
+The Polynomial class supports both dense and sparse representations, allowing efficient 
+storage and computation for polynomials with many zero coefficients.
 
 =head1 SYNOPSIS
 
     var a = Polynomial(5)                   # monomial: x^5
     var b = Polynomial([1,2,3,4])           # x^3 + 2*x^2 + 3*x + 4
     var c = Polynomial(5 => 3, 2 => 10)     # 3*x^5 + 10*x^2
+    
+    # Polynomial arithmetic
+    var sum = a + b                         # polynomial addition
+    var prod = a * b                        # polynomial multiplication
+    var quot = a / b                        # polynomial division
+    
+    # Evaluation
+    say b.eval(2)                           # evaluate at x=2: 26
+    
+    # Algebraic operations
+    say b.derivative                        # 3*x^2 + 4*x + 3
+    say b.roots                             # find all roots
+    say b.gcd(c)                            # greatest common divisor
 
 =head1 INHERITS
 
@@ -27,7 +44,9 @@ Inherits methods from:
 
     a != b
 
-Returns the
+Returns true if polynomial C<a> is not equal to polynomial C<b>, false otherwise.
+Two polynomials are equal if they have the same degree and all corresponding 
+coefficients are equal.
 
 Aliases: I<ne>
 
@@ -37,7 +56,9 @@ Aliases: I<ne>
 
     a % b
 
-Returns the
+Returns the remainder of polynomial division C<a> divided by C<b>. This computes
+the polynomial C<r> such that C<a = q*b + r> where the degree of C<r> is less than
+the degree of C<b>.
 
 Aliases: I<mod>
 
@@ -47,7 +68,10 @@ Aliases: I<mod>
 
     a * b
 
-Returns the
+Returns the product of polynomials C<a> and C<b>. Performs polynomial multiplication,
+with the resulting degree being the sum of the input degrees.
+
+    Polynomial([1,2,3]) * Polynomial([4,5])  # 4*x^3 + 13*x^2 + 22*x + 15
 
 Aliases: I<mul>
 
@@ -57,7 +81,10 @@ Aliases: I<mul>
 
     a ** b
 
-Returns the
+Returns polynomial C<a> raised to the power C<b>. The exponent C<b> must be a 
+non-negative integer. For large exponents, uses efficient exponentiation algorithms.
+
+    Polynomial([1,1]) ** 3    # (x+1)^3 = x^3 + 3*x^2 + 3*x + 1
 
 Aliases: I<pow>
 
@@ -67,7 +94,10 @@ Aliases: I<pow>
 
     a + b
 
-Returns the
+Returns the sum of polynomials C<a> and C<b>. Adds corresponding coefficients
+and returns a new polynomial.
+
+    Polynomial([1,2]) + Polynomial([3,4])  # 4*x + 6
 
 Aliases: I<add>
 
@@ -75,9 +105,13 @@ Aliases: I<add>
 
 =head2 ++
 
-    a ++ b
+    a++
 
-Returns the
+Increments the polynomial by adding 1 to its constant term. Returns the 
+new polynomial with the constant coefficient increased by one.
+
+    var p = Polynomial([1,2,3])
+    p++  # x^2 + 2*x + 4
 
 Aliases: I<inc>
 
@@ -87,7 +121,10 @@ Aliases: I<inc>
 
     a - b
 
-Returns the
+Returns the difference of polynomials C<a> minus C<b>. Subtracts corresponding
+coefficients and returns a new polynomial.
+
+    Polynomial([1,2,3]) - Polynomial([0,1])  # x^2 + x + 3
 
 Aliases: I<sub>
 
@@ -95,9 +132,13 @@ Aliases: I<sub>
 
 =head2 --
 
-    a -- b
+    a--
 
-Returns the
+Decrements the polynomial by subtracting 1 from its constant term. Returns
+the new polynomial with the constant coefficient decreased by one.
+
+    var p = Polynomial([1,2,3])
+    p--  # x^2 + 2*x + 2
 
 Aliases: I<dec>
 
@@ -107,7 +148,11 @@ Aliases: I<dec>
 
     a / b
 
-Returns the
+Returns the quotient of polynomial division C<a> divided by C<b>. This computes
+the polynomial C<q> such that C<a = q*b + r> where the degree of the remainder
+C<r> is less than the degree of C<b>.
+
+    Polynomial([1,0,-1]) / Polynomial([1,-1])  # x + 1
 
 Aliases: I<÷>, I<div>
 
@@ -117,7 +162,8 @@ Aliases: I<÷>, I<div>
 
     a // b
 
-Returns the
+Returns the integer quotient of polynomial division with specified rounding mode.
+This is similar to division but with options for different rounding behaviors.
 
 Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
 
@@ -127,7 +173,8 @@ Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
 
     a < b
 
-Returns the
+Compares polynomials C<a> and C<b> lexicographically. Returns true if C<a> is
+less than C<b>. Comparison is first by degree, then by leading coefficients.
 
 Aliases: I<lt>
 
@@ -137,7 +184,8 @@ Aliases: I<lt>
 
     a <=> b
 
-Returns the
+Performs a three-way comparison between polynomials C<a> and C<b>. Returns -1 if
+C<a> is less than C<b>, 0 if they are equal, and 1 if C<a> is greater than C<b>.
 
 Aliases: I<cmp>
 
@@ -147,7 +195,8 @@ Aliases: I<cmp>
 
     a == b
 
-Returns the
+Returns true if polynomial C<a> is equal to polynomial C<b>, false otherwise.
+Equality means same degree and all coefficients match.
 
 Aliases: I<eq>
 
@@ -157,7 +206,8 @@ Aliases: I<eq>
 
     a > b
 
-Returns the
+Compares polynomials C<a> and C<b> lexicographically. Returns true if C<a> is
+greater than C<b>.
 
 Aliases: I<gt>
 
@@ -167,7 +217,7 @@ Aliases: I<gt>
 
     a ≤ b
 
-Returns the
+Returns true if polynomial C<a> is less than or equal to polynomial C<b>.
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -177,7 +227,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Returns the
+Returns true if polynomial C<a> is greater than or equal to polynomial C<b>.
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -187,7 +237,9 @@ Aliases: I<E<gt>=>, I<ge>
 
     x.abs
 
-Returns the
+Returns the absolute value of the polynomial. For polynomials, this typically
+returns a polynomial with the absolute value of the leading coefficient, or
+the magnitude measure appropriate for the polynomial ring.
 
 =cut
 
@@ -195,7 +247,9 @@ Returns the
 
     n.binomial(k)
 
-Returns the
+Computes the binomial polynomial or binomial coefficient involving the polynomial.
+This operation depends on the polynomial structure and may compute generalized
+binomial expansions.
 
 =cut
 
@@ -203,15 +257,21 @@ Returns the
 
     x.ceil
 
-Returns the
+Returns a polynomial with each coefficient rounded up to the nearest integer.
+
+    Polynomial([1.5, 2.3]).ceil  # 2*x + 3
 
 =cut
 
 =head2 coeff
 
-    x.coeff(key)
+    x.coeff(k)
 
-Returns the
+Returns the coefficient of the term with degree C<k>. If the polynomial does
+not have a term of degree C<k>, returns 0.
+
+    var p = Polynomial([3,2,1])  # x^2 + 2*x + 3
+    p.coeff(1)                   # returns 2
 
 =cut
 
@@ -219,7 +279,10 @@ Returns the
 
     x.coeffs
 
-Returns the
+Returns an array of all coefficients of the polynomial, ordered from highest
+degree to lowest degree (or lowest to highest depending on representation).
+
+    Polynomial([1,2,3]).coeffs   # [1, 2, 3]
 
 =cut
 
@@ -227,7 +290,10 @@ Returns the
 
     x.cont
 
-Returns the
+Returns the content of the polynomial, which is the greatest common divisor
+of all its coefficients. This is useful for factoring out common factors.
+
+    Polynomial([6,9,12]).cont    # returns 3
 
 Aliases: I<content>
 
@@ -237,7 +303,10 @@ Aliases: I<content>
 
     x.deg
 
-Returns the
+Returns the degree of the polynomial, which is the highest power of the variable
+with a non-zero coefficient. Returns -1 or negative infinity for the zero polynomial.
+
+    Polynomial([1,2,3]).deg      # returns 2
 
 Aliases: I<degree>
 
@@ -247,7 +316,11 @@ Aliases: I<degree>
 
     x.derivative
 
-Returns the
+Returns the derivative of the polynomial with respect to its variable. Uses
+the power rule: the derivative of C<a*x^n> is C<n*a*x^(n-1)>.
+
+    var p = Polynomial([1,0,3,2])    # x^3 + 3*x + 2
+    p.derivative                     # 3*x^2 + 3
 
 =cut
 
@@ -255,7 +328,10 @@ Returns the
 
     x.divmod(y)
 
-Returns the
+Performs polynomial division and returns both the quotient and remainder as
+a pair (array). Equivalent to computing both C<x / y> and C<x % y>.
+
+    var (q, r) = x.divmod(y)
 
 =cut
 
@@ -263,7 +339,8 @@ Returns the
 
     x.dump
 
-Returns the
+Returns a string representation of the polynomial's internal structure, useful
+for debugging. Shows the raw coefficient data and structure.
 
 =cut
 
@@ -271,7 +348,11 @@ Returns the
 
     x.eval(value)
 
-Returns the
+Evaluates the polynomial at the given C<value>. Substitutes C<value> for the
+variable and computes the result using Horner's method for efficiency.
+
+    var p = Polynomial([1,2,3])  # x^2 + 2*x + 3
+    p.eval(5)                    # 5^2 + 2*5 + 3 = 38
 
 =cut
 
@@ -279,7 +360,10 @@ Returns the
 
     x.exponents
 
-Returns the
+Returns an array of all exponents (degrees) that have non-zero coefficients
+in the polynomial. Useful for sparse polynomial representations.
+
+    Polynomial(5 => 3, 2 => 1).exponents  # [5, 2]
 
 =cut
 
@@ -287,7 +371,8 @@ Returns the
 
     x.float
 
-Returns the
+Converts the polynomial to a floating-point representation by converting all
+coefficients to floating-point numbers.
 
 =cut
 
@@ -295,7 +380,9 @@ Returns the
 
     x.floor
 
-Returns the
+Returns a polynomial with each coefficient rounded down to the nearest integer.
+
+    Polynomial([1.8, 2.3]).floor  # x + 2
 
 =cut
 
@@ -303,7 +390,12 @@ Returns the
 
     x.gcd(y)
 
-Returns the
+Computes the greatest common divisor of polynomials C<x> and C<y>. The GCD
+is the highest-degree polynomial that divides both input polynomials.
+
+    var p = Polynomial([1,0,-1])     # x^2 - 1
+    var q = Polynomial([1,-1])       # x - 1
+    p.gcd(q)                         # x - 1
 
 =cut
 
@@ -311,7 +403,9 @@ Returns the
 
     x.gcdext(y)
 
-Returns the
+Extended Euclidean algorithm for polynomials. Returns a triple C<(g, s, t)>
+where C<g> is the GCD of C<x> and C<y>, and C<s>, C<t> are polynomials
+satisfying C<g = s*x + t*y> (Bézout's identity).
 
 =cut
 
@@ -319,7 +413,10 @@ Returns the
 
     x.height
 
-Returns the
+Returns the height of the polynomial, typically defined as the maximum absolute
+value of its coefficients.
+
+    Polynomial([3,-5,2]).height  # returns 5
 
 =cut
 
@@ -327,7 +424,8 @@ Returns the
 
     x.inv
 
-Returns the
+Returns the multiplicative inverse of the polynomial. This is typically only
+meaningful for constant polynomials or in polynomial rings modulo another polynomial.
 
 =cut
 
@@ -335,7 +433,8 @@ Returns the
 
     x.invmod(m)
 
-Returns the
+Computes the multiplicative inverse of polynomial C<x> modulo polynomial C<m>.
+Returns a polynomial C<y> such that C<x * y ≡ 1 (mod m)>, if such an inverse exists.
 
 =cut
 
@@ -343,7 +442,8 @@ Returns the
 
     x.is_inf
 
-Returns the
+Returns true if the polynomial represents positive infinity, false otherwise.
+This is typically used for special polynomial objects.
 
 =cut
 
@@ -351,7 +451,8 @@ Returns the
 
     x.is_mone
 
-Returns the
+Returns true if the polynomial is equal to -1 (the constant polynomial -1),
+false otherwise.
 
 =cut
 
@@ -359,7 +460,8 @@ Returns the
 
     x.is_nan
 
-Returns the
+Returns true if the polynomial represents a "not-a-number" value, false otherwise.
+This typically indicates an invalid or undefined polynomial operation.
 
 =cut
 
@@ -367,7 +469,7 @@ Returns the
 
     x.is_ninf
 
-Returns the
+Returns true if the polynomial represents negative infinity, false otherwise.
 
 =cut
 
@@ -375,7 +477,11 @@ Returns the
 
     x.is_one
 
-Returns the
+Returns true if the polynomial is equal to 1 (the constant polynomial 1),
+false otherwise. The constant 1 is the multiplicative identity for polynomials.
+
+    Polynomial([1]).is_one       # true
+    Polynomial([1,0]).is_one     # false
 
 =cut
 
@@ -383,7 +489,8 @@ Returns the
 
     x.is_real
 
-Returns the
+Returns true if all coefficients of the polynomial are real numbers, false
+if any coefficient is complex.
 
 =cut
 
@@ -391,7 +498,11 @@ Returns the
 
     x.is_squarefree
 
-Returns the
+Returns true if the polynomial is square-free, meaning it has no repeated
+factors. Equivalently, the polynomial and its derivative are coprime.
+
+    Polynomial([1,0,-1]).is_squarefree         # true (x^2-1 = (x-1)(x+1))
+    Polynomial([1,0,0]).is_squarefree          # false (x^2 = x*x)
 
 =cut
 
@@ -399,7 +510,11 @@ Returns the
 
     x.is_zero
 
-Returns the
+Returns true if the polynomial is the zero polynomial (all coefficients are zero),
+false otherwise.
+
+    Polynomial([0,0,0]).is_zero  # true
+    Polynomial([0,0,1]).is_zero  # false
 
 =cut
 
@@ -407,7 +522,10 @@ Returns the
 
     x.lcm(y)
 
-Returns the
+Computes the least common multiple of polynomials C<x> and C<y>. The LCM
+is the lowest-degree polynomial that is divisible by both input polynomials.
+
+    lcm(p, q) = (p * q) / gcd(p, q)
 
 =cut
 
@@ -415,7 +533,10 @@ Returns the
 
     x.leading_coeff
 
-Returns the
+Returns the leading coefficient of the polynomial, which is the coefficient
+of the term with the highest degree.
+
+    Polynomial([3,2,1]).leading_coeff  # returns 3
 
 Aliases: I<leading_coefficient>
 
@@ -425,7 +546,10 @@ Aliases: I<leading_coefficient>
 
     x.leading_monomial
 
-Returns the
+Returns the leading monomial of the polynomial, which is the term with the
+highest degree (with coefficient 1).
+
+    Polynomial([3,2,1]).leading_monomial  # x^2
 
 =cut
 
@@ -433,7 +557,10 @@ Returns the
 
     x.leading_term
 
-Returns the
+Returns the leading term of the polynomial, which is the term with the highest
+degree including its coefficient.
+
+    Polynomial([3,2,1]).leading_term  # 3*x^2
 
 =cut
 
@@ -441,7 +568,9 @@ Returns the
 
     x.lift
 
-Returns the
+Lifts the polynomial from a quotient ring back to the polynomial ring. This
+operation depends on the algebraic context and may convert modular polynomials
+to standard polynomials.
 
 =cut
 
@@ -449,15 +578,21 @@ Returns the
 
     x.neg
 
-Returns the
+Returns the negation of the polynomial. Equivalent to multiplying by -1.
+
+    Polynomial([1,2,3]).neg  # -x^2 - 2*x - 3
 
 =cut
 
 =head2 new
 
-    self.new
+    Polynomial.new(args)
 
-Returns the
+Constructor for creating new polynomial objects. Accepts various argument formats:
+
+    Polynomial(5)                    # monomial x^5
+    Polynomial([1,2,3])              # x^2 + 2*x + 3
+    Polynomial(5 => 3, 2 => 1)       # 3*x^5 + x^2
 
 Aliases: I<call>
 
@@ -465,17 +600,24 @@ Aliases: I<call>
 
 =head2 newton_method
 
-    f.newton_method(x, df)
+    f.newton_method(x0, df)
 
-Returns the
+Applies Newton's method to find a root of polynomial C<f> starting from initial
+guess C<x0>, using derivative C<df>. Iteratively refines the approximation using
+the formula: C<x_{n+1} = x_n - f(x_n)/f'(x_n)>
+
+    var f = Polynomial([1,0,-2])     # x^2 - 2
+    var df = f.derivative
+    f.newton_method(1.5, df)         # approximate sqrt(2)
 
 =cut
 
 =head2 norm
 
-    self.norm
+    x.norm
 
-Returns the
+Returns the norm of the polynomial, which may be defined as the Euclidean norm
+of its coefficient vector or another appropriate norm for the polynomial space.
 
 =cut
 
@@ -483,7 +625,8 @@ Returns the
 
     x.powmod(n, m)
 
-Returns the
+Computes C<x^n mod m> efficiently using modular exponentiation. Returns the
+polynomial C<x> raised to power C<n> and reduced modulo polynomial C<m>.
 
 =cut
 
@@ -491,7 +634,10 @@ Returns the
 
     x.pretty
 
-Returns the
+Returns a human-readable string representation of the polynomial in standard
+mathematical notation.
+
+    Polynomial([1,2,3]).pretty  # "x^2 + 2*x + 3"
 
 =cut
 
@@ -499,7 +645,11 @@ Returns the
 
     x.prim_part
 
-Returns the
+Returns the primitive part of the polynomial, which is the polynomial divided
+by its content (GCD of coefficients). This gives the polynomial with coprime
+integer coefficients.
+
+    Polynomial([6,9,12]).prim_part  # 2*x^2 + 3*x + 4
 
 Aliases: I<primpart>, I<primitive_part>
 
@@ -509,7 +659,8 @@ Aliases: I<primpart>, I<primitive_part>
 
     x.rat
 
-Returns the
+Converts the polynomial to a rational representation, converting all coefficients
+to rational numbers (Sidef Fraction objects).
 
 =cut
 
@@ -517,7 +668,8 @@ Returns the
 
     x.rat_approx
 
-Returns the
+Converts floating-point coefficients to approximate rational numbers. Useful
+for finding simple fractional representations of decimal coefficients.
 
 =cut
 
@@ -525,7 +677,9 @@ Returns the
 
     x.re
 
-Returns the
+Returns the real part of the polynomial. If all coefficients are real, returns
+the polynomial itself. If coefficients are complex, returns a polynomial with
+only the real parts.
 
 Aliases: I<real>
 
@@ -535,7 +689,11 @@ Aliases: I<real>
 
     f.roots
 
-Returns the
+Computes and returns all roots (zeros) of the polynomial. The roots are the
+values where C<f(x) = 0>. Returns an array of root values, which may include
+complex numbers.
+
+    Polynomial([1,0,-1]).roots  # [-1, 1]
 
 =cut
 
@@ -543,7 +701,10 @@ Returns the
 
     x.round(r)
 
-Returns the
+Rounds all coefficients of the polynomial to C<r> decimal places (or to nearest
+integers if C<r> is omitted).
+
+    Polynomial([1.456, 2.789]).round(1)  # 1.5*x + 2.8
 
 =cut
 
@@ -551,7 +712,8 @@ Returns the
 
     x.sgn
 
-Returns the
+Returns the sign of the polynomial, typically determined by the sign of the
+leading coefficient: -1 for negative, 0 for zero, 1 for positive.
 
 =cut
 
@@ -559,7 +721,9 @@ Returns the
 
     x.sqr
 
-Returns the
+Returns the square of the polynomial. Equivalent to C<x * x>.
+
+    Polynomial([1,1]).sqr  # (x+1)^2 = x^2 + 2*x + 1
 
 =cut
 
@@ -567,7 +731,10 @@ Returns the
 
     x.squarefree_part
 
-Returns the
+Returns the square-free part of the polynomial, which is the polynomial divided
+by the product of all its repeated factors. The result has no repeated roots.
+
+    Polynomial([1,0,0]).squarefree_part  # x (removes one factor of x)
 
 =cut
 
@@ -575,15 +742,17 @@ Returns the
 
     x.to_n
 
-Returns the
+Converts the polynomial to a numeric value. For constant polynomials, returns
+the constant. For non-constant polynomials, behavior depends on implementation.
 
 =cut
 
 =head2 to_poly
 
-    self.to_poly
+    x.to_poly
 
-Returns the
+Returns the polynomial object itself or converts an object to a polynomial.
+This is mainly used for type conversion and normalization.
 
 =cut
 
@@ -591,8 +760,75 @@ Returns the
 
     x.to_s
 
-Returns the
+Converts the polynomial to a string representation. Returns a readable string
+showing the polynomial in standard mathematical notation.
+
+    Polynomial([1,2,3]).to_s  # "Polynomial([1, 2, 3])"
 
 Aliases: I<stringify>
+
+=cut
+
+=head1 EXAMPLES
+
+=head2 Basic Polynomial Operations
+
+    # Create polynomials
+    var p = Polynomial([1, -2, 1])    # x^2 - 2*x + 1 = (x-1)^2
+    var q = Polynomial([1, -1])       # x - 1
+    
+    # Arithmetic
+    var sum = p + q                   # x^2 - x
+    var product = p * q               # x^3 - 3*x^2 + 3*x - 1
+    var (quotient, remainder) = p.divmod(q)
+    
+    # Evaluation
+    say p.eval(3)                     # 9 - 6 + 1 = 4
+    say p.eval(1)                     # 0 (1 is a root)
+
+=head2 Calculus Operations
+
+    var p = Polynomial([1, 0, -3, 2])  # x^3 - 3*x + 2
+    
+    # Differentiation
+    var dp = p.derivative              # 3*x^2 - 3
+    var ddp = dp.derivative            # 6*x
+    
+    # Root finding
+    say p.roots                        # find all zeros
+
+=head2 Algebraic Operations
+
+    var p = Polynomial([1, 0, -1])     # x^2 - 1
+    var q = Polynomial([1, -1])        # x - 1
+    
+    # GCD and LCM
+    var g = p.gcd(q)                   # x - 1
+    var l = p.lcm(q)                   # x^2 - 1
+    
+    # Extended GCD
+    var (gcd, s, t) = p.gcdext(q)      # s*p + t*q = gcd
+    
+    # Content and primitive part
+    var r = Polynomial([6, 9, 12])
+    say r.cont                         # 3
+    say r.prim_part                    # 2*x^2 + 3*x + 4
+
+=head2 Properties and Tests
+
+    var p = Polynomial([1, 0, -1])
+    
+    say p.deg                          # 2
+    say p.is_squarefree                # true
+    say p.leading_coeff                # 1
+    say p.height                       # 1
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Number::Number>, L<Sidef::Types::Number::Complex>
+
+=head1 AUTHOR
+
+Daniel Șuteu
 
 =cut
