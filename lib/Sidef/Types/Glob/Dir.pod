@@ -1,18 +1,45 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Glob::Dir
+Sidef::Types::Glob::Dir - Directory manipulation and navigation in Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+The Dir class provides comprehensive directory manipulation capabilities in Sidef, including creation, deletion, navigation, and traversal of directory structures. It inherits from the File class, providing access to all file-related methods while adding directory-specific functionality.
+
+This class handles both simple directory operations (like creating or removing single directories) and complex operations (like recursive directory traversal and tree manipulation). All directory paths are properly encoded/decoded to handle Unicode filenames correctly.
 
 =head1 SYNOPSIS
 
-var obj = Dir(...)
-
+    # Create a Dir object
+    var dir = Dir("/path/to/directory")
+    var home = Dir.home
+    var temp = Dir.tmp
+    
+    # Directory creation
+    dir.make                    # Create single directory
+    dir.mkpath                  # Create directory with parents
+    
+    # Directory navigation
+    Dir.cwd                     # Get current working directory
+    dir.chdir                   # Change to this directory
+    dir.parent                  # Get parent directory
+    dir.up                      # Go up one level
+    
+    # Directory operations
+    dir.is_empty                # Check if directory is empty
+    dir.delete                  # Remove empty directory
+    dir.remove_tree             # Recursively remove directory and contents
+    
+    # Directory traversal
+    dir.find { |file|
+        say file                # Iterate over all files and subdirectories
+    }
+    
+    # Path manipulation
+    var subdir = dir + "subdir" # Concatenate paths
+    var parts = dir.split       # Split path into components
 
 =head1 INHERITS
 
@@ -22,222 +49,382 @@ Inherits methods from:
 
 =head1 METHODS
 
-=head2 +
-
-    a + b
-
-Returns the
-
-Aliases: I<concat>, I<catfile>
-
-=cut
-
-=head2 chdir
-
-    self.chdir
-
-Returns the
-
-=cut
-
-=head2 chroot
-
-    self.chroot
-
-Returns the
-
-=cut
-
-=head2 cwd
-
-    self.cwd
-
-Returns the
-
-=cut
-
-=head2 delete
-
-    self.delete
-
-Returns the
-
-Aliases: I<remove>, I<unlink>
-
-=cut
-
-=head2 dump
-
-    self.dump
-
-Returns the
-
-=cut
-
-=head2 find
-
-    self.find(arg)
-
-Returns the
-
-Aliases: I<browse>
-
-=cut
-
-=head2 home
-
-    self.home
-
-Returns the
-
-=cut
-
-=head2 is_empty
-
-    self.is_empty
-
-Returns the
-
-=cut
-
-=head2 make
-
-    self.make
-
-Returns the
-
-Aliases: I<mkdir>, I<create>
-
-=cut
-
-=head2 mkpath
-
-    self.mkpath
-
-Returns the
-
-Aliases: I<mktree>, I<make_path>, I<make_tree>, I<create_tree>
-
-=cut
-
-=head2 mktemp
-
-    self.mktemp(:opts)
-
-Returns the
-
-Aliases: I<make_tmp>, I<make_temp>
-
-=cut
-
 =head2 new
 
-    self.new
+    Dir.new(path)
+    Dir(path)
+    Dir(part1, part2, ...)
 
-Returns the
+Creates a new Dir object. Can accept a single path string or multiple path components that will be joined using the platform-specific directory separator.
+
+    var dir1 = Dir("/home/user")
+    var dir2 = Dir("home", "user", "documents")
+    var dir3 = Dir(file_obj)  # Convert File object to Dir
+
+Returns a new Dir object representing the specified path.
 
 Aliases: I<call>
 
-=cut
+=head2 +
+
+    dir + name
+
+Concatenates a filename or directory name to the current directory path, returning an appropriate object (File if the name looks like a file, Dir if it's a directory).
+
+    var home = Dir.home
+    var docs = home + "Documents"      # Returns Dir object
+    var file = home + "file.txt"       # Returns File object
+
+Returns a File or Dir object with the concatenated path.
+
+Aliases: I<concat>, I<catfile>
+
+=head2 chdir
+
+    dir.chdir
+
+Changes the current working directory to this directory's path. This affects the process-wide current directory.
+
+    var dir = Dir("/tmp")
+    dir.chdir                          # Current directory is now /tmp
+    
+Returns true if successful, false otherwise.
+
+=head2 chroot
+
+    dir.chroot
+
+Changes the root directory to this directory. This is a restricted operation typically requiring superuser privileges and affects the entire process.
+
+    var dir = Dir("/jail")
+    dir.chroot                         # Root is now /jail
+
+Returns true if successful, false otherwise.
+
+=head2 cwd
+
+    Dir.cwd
+
+Returns a Dir object representing the current working directory (absolute path).
+
+    var current = Dir.cwd
+    say current                        # Prints current directory path
+
+This is a class method that can be called on Dir itself.
+
+=head2 delete
+
+    dir.delete
+
+Removes the directory. The directory must be empty for this operation to succeed. For non-empty directories, use C<remove_tree> instead.
+
+    var dir = Dir("empty_dir")
+    dir.delete                         # Removes the empty directory
+
+Returns true if successful, false otherwise.
+
+Aliases: I<remove>, I<unlink>
+
+=head2 dump
+
+    dir.dump
+
+Returns a string representation of the Dir object suitable for debugging, showing it as a Dir constructor call.
+
+    var dir = Dir("/tmp")
+    say dir.dump                       # Prints: Dir("/tmp")
+
+Returns a String object containing the dump representation.
+
+=head2 find
+
+    dir.find(block)
+    dir.find
+
+Recursively traverses the directory tree. When given a block, calls the block for each file and subdirectory found. When called without arguments, returns an array of all files and subdirectories.
+
+    # Using a block
+    dir.find { |item|
+        say item if item.is_file
+    }
+    
+    # Getting an array
+    var all_items = dir.find
+    say "Found #{all_items.len} items"
+
+The block receives File objects for files and Dir objects for directories.
+
+Returns the Dir object itself when used with a block, or an Array of all items when used without arguments.
+
+Aliases: I<browse>
+
+=head2 home
+
+    Dir.home
+
+Returns a Dir object representing the user's home directory. This method attempts to determine the home directory through various means: the HOME or LOGDIR environment variables, system user database lookup, or the File::HomeDir module.
+
+    var home = Dir.home
+    say home                           # e.g., /home/username
+
+This is a class method.
+
+=head2 is_empty
+
+    dir.is_empty
+
+Checks whether the directory is empty (contains no files or subdirectories, excluding "." and "..").
+
+    var dir = Dir("test")
+    if (dir.is_empty) {
+        say "Directory is empty"
+    }
+
+Returns true if empty, false if not empty, or nil if the directory cannot be opened.
+
+=head2 make
+
+    dir.make
+
+Creates the directory. The parent directory must already exist. For creating directories with parent paths, use C<mkpath> instead.
+
+    var dir = Dir("newdir")
+    dir.make                           # Creates newdir in current directory
+
+Returns true if successful, false otherwise.
+
+Aliases: I<mkdir>, I<create>
+
+=head2 mkpath
+
+    dir.mkpath
+
+Creates the directory along with any necessary parent directories (similar to C<mkdir -p>). If the directory already exists, returns true.
+
+    var dir = Dir("/path/to/deep/nested/dir")
+    dir.mkpath                         # Creates all intermediate directories
+
+Returns true if successful or already exists, false otherwise.
+
+Aliases: I<mktree>, I<make_path>, I<make_tree>, I<create_tree>
+
+=head2 mktemp
+
+    Dir.mktemp(opts)
+
+Creates a temporary directory with a unique name. The directory will be automatically cleaned up when the program exits. Options can be passed as named parameters to customize the temporary directory creation.
+
+    var tmpdir = Dir.mktemp
+    say tmpdir                         # e.g., /tmp/XXXXXXXXXX
+    
+    var custom = Dir.mktemp(TEMPLATE => "myapp_XXXX")
+
+Returns a Dir object representing the temporary directory.
+
+Aliases: I<make_tmp>, I<make_temp>
 
 =head2 open
 
-    self.open(fh_ref, err_ref)
+    dir.open
+    dir.open(fh_ref)
+    dir.open(fh_ref, err_ref)
 
-Returns the
+Opens the directory for reading, returning a DirHandle object. Can optionally store the handle in a reference variable and capture any error message.
+
+    # Simple usage
+    var dh = dir.open
+    
+    # With references
+    var fh_ref = \nil
+    var err_ref = \nil
+    if (dir.open(fh_ref, err_ref)) {
+        # Success - use *fh_ref
+    } else {
+        say "Error: #{*err_ref}"
+    }
+
+Returns a DirHandle object on success, or nil on failure. When called with references, returns true/false and stores the handle/error in the references.
 
 Aliases: I<open_r>
 
-=cut
-
 =head2 open_rw
 
-    self.open_rw
+    dir.open_rw
 
-Returns the
-
-=cut
+Reserved for future implementation. Currently not operational.
 
 =head2 open_w
 
-    self.open_w
+    dir.open_w
 
-Returns the
-
-=cut
+Reserved for future implementation. Currently not operational.
 
 =head2 parent
 
-    self.parent
+    dir.parent
 
-Returns the
+Returns a Dir object representing the parent directory of the current directory.
 
-=cut
+    var dir = Dir("/home/user/documents")
+    var parent = dir.parent            # Dir("/home/user")
+
+Returns a Dir object.
 
 =head2 pwd
 
-    self.pwd
+    Dir.pwd
 
-Returns the
+Returns a Dir object representing the current directory as ".". Unlike C<cwd>, this returns a relative path representation.
 
-=cut
+    var here = Dir.pwd                 # Dir(".")
+
+This is a class method.
 
 =head2 remove_tree
 
-    self.remove_tree
+    dir.remove_tree
 
-Returns the
+Recursively removes the directory and all its contents (files and subdirectories). Use with caution as this operation cannot be undone.
 
-=cut
+    var dir = Dir("old_project")
+    dir.remove_tree                    # Removes directory and everything in it
+
+Returns true if successful, false otherwise.
 
 =head2 root
 
-    self.root
+    Dir.root
 
-Returns the
+Returns a Dir object representing the root directory of the filesystem ("/" on Unix-like systems, or the appropriate root on other platforms).
 
-=cut
+    var root = Dir.root
+    say root                           # Prints: /
+
+This is a class method.
 
 =head2 split
 
-    self.split
+    dir.split
 
-Returns the
+Splits the directory path into its component parts, returning an array of strings.
 
-=cut
+    var dir = Dir("/home/user/documents")
+    var parts = dir.split              # ["", "home", "user", "documents"]
+    
+    var rel = Dir("path/to/dir")
+    var components = rel.split         # ["path", "to", "dir"]
+
+Returns an Array of String objects representing each path component.
 
 =head2 tmp
 
-    self.tmp
+    Dir.tmp
 
-Returns the
+Returns a Dir object representing the system's temporary directory.
+
+    var tmpdir = Dir.tmp
+    say tmpdir                         # e.g., /tmp on Unix, C:\Temp on Windows
+
+This is a class method.
 
 Aliases: I<temp>
 
-=cut
-
 =head2 to_dir
 
-    self.to_dir
+    dir.to_dir
 
-Returns the
+Returns the Dir object itself. Useful for ensuring an object is a Dir type.
 
-=cut
+    var dir = some_object.to_dir
+
+Returns the Dir object.
 
 =head2 to_s
 
-    self.to_s
+    dir.to_s
 
-Returns the
+Converts the Dir object to a String containing the directory path.
+
+    var dir = Dir("/home/user")
+    var path = dir.to_s                # String: "/home/user"
+    say path                           # Prints: /home/user
+
+Returns a String object.
 
 Aliases: I<to_str>
 
-=cut
-
 =head2 up
 
-    self.up
+    dir.up
 
-Returns the
+Returns a Dir object representing one level up from the current directory (equivalent to appending "..").
+
+    var dir = Dir("/home/user/documents")
+    var parent = dir.up                # Dir("/home/user/documents/..")
+    
+    var updir = Dir.up                 # Dir("..")
+
+Can be called as both instance and class method.
+
+=head1 EXAMPLES
+
+=head2 Basic Directory Operations
+
+    # Create and navigate directories
+    var project = Dir("my_project")
+    project.mkpath
+    project.chdir
+    
+    # Create subdirectories
+    var src = project + "src"
+    var lib = project + "lib"
+    src.make
+    lib.make
+
+=head2 Directory Traversal
+
+    # Find all .txt files recursively
+    var docs = Dir("documents")
+    docs.find { |item|
+        if (item.is_file && item.match(/\.txt$/)) {
+            say item
+        }
+    }
+    
+    # Get list of all items
+    var all = docs.find
+    say "Total items: #{all.len}"
+
+=head2 Working with Temporary Directories
+
+    # Create temporary directory for processing
+    var tmpdir = Dir.mktemp
+    say "Using temp directory: #{tmpdir}"
+    
+    # Do work in temp directory
+    tmpdir.chdir
+    # ... operations ...
+    
+    # Temp directory automatically cleaned up on exit
+
+=head2 Directory Cleanup
+
+    # Remove empty directory
+    var old = Dir("obsolete")
+    if (old.is_empty) {
+        old.delete
+    }
+    
+    # Remove directory tree
+    var cache = Dir(".cache")
+    cache.remove_tree  # Removes everything recursively
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Glob::File>, L<Sidef::Types::Glob::DirHandle>
+
+=head1 AUTHOR
+
+Daniel Șuteu
 
 =cut
