@@ -155,7 +155,12 @@ sub _node_raw_text {
             $text .= $c;
         }
         elsif (ref $c eq 'ARRAY') {
-            $text .= $c->[0] . '<' . _node_raw_text([@$c[2 .. $#$c]]) . '>';
+            if (defined($c->[1]{'~orig_content'})) {
+                $text .= $c->[1]{'~orig_content'};
+            }
+            else {
+                $text .= $c->[0] . '<' . _node_raw_text([@$c[2 .. $#$c]]) . '>';
+            }
         }
     }
 
@@ -171,6 +176,15 @@ sub _serialize_node {
     # Reconstruct POD commands
     if ($tag =~ /^head(\d)$/) {
         $out .= "\n=head$1 " . _node_raw_text(\@children) . "\n\n";
+        return $out;
+    }
+
+    if ($tag eq 'over-bullet') {
+        $out .= "=over 4\n\n";
+        foreach my $item (@children) {
+            $out .= '=item ' . _node_raw_text([$item]) . "\n\n";
+        }
+        $out .= "=back\n";
         return $out;
     }
 
@@ -412,14 +426,11 @@ __POD2__
 
     my $pod_data = {};
 
+    #return if $pod_file ne 'Sidef/Object/Convert.pod';
+
     (-e $pod_file) && do {
         $pod_data = parse_pod_file($pod_file);
     };
-
-    #  return if $pod_file eq 'Sidef/Sys/Sig.pod';
-
-    use Data::Dump qw(pp);
-    pp $pod_data;
 
     while (my ($key, $value) = each %subs) {
 
