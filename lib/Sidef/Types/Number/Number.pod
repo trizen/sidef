@@ -7974,9 +7974,12 @@ Example:
 
 =head2 primorial
 
-    x.primorial
+    n.primorial
 
-Returns the
+Returns the product of the primes less than or equal to C<n>.
+
+    say primorial(5)    #=>  30 (2*3*5)
+    say primorial(8)    #=> 210 (2*3*5*7)
 
 =cut
 
