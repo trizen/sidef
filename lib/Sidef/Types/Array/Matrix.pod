@@ -1,13 +1,14 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Array::Matrix
+Sidef::Types::Array::Matrix - Mathematical matrix operations in Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements a mathematical matrix type with support for standard linear algebra operations including addition, subtraction, multiplication, division, inversion, determinants, and solving systems of linear equations. Matrices can be manipulated using both operator overloading and method calls.
+
+The Matrix class provides efficient implementations of common matrix operations and supports both element-wise and matrix-specific computations. It inherits from Array, allowing array methods to be used on matrices when appropriate.
 
 =head1 SYNOPSIS
 
@@ -33,12 +34,24 @@ This class implements ...
     say (A * 42)    # matrix-scalar multiplication
     say (A / 42)    # matrix-scalar division
 
-    say A**20       # matrix exponentation
+    say A**20       # matrix exponentiation
     say A**-1       # matrix inverse: A^-1
     say A**-2       # (A^2)^-1
 
     say B.det             # matrix determinant
     say B.solve([1,2,3])  # solve a system of linear equations
+    
+    # Create special matrices
+    var identity = Matrix.I(3)          # 3×3 identity matrix
+    var zeros = Matrix.zero(2, 3)       # 2×3 zero matrix
+    var random = Matrix.rand(3, 3)      # 3×3 random matrix
+    
+    # Matrix properties and operations
+    say A.transpose         # transpose of A
+    say A.row_len          # number of rows
+    say A.col_len          # number of columns
+    say A.is_square        # check if square matrix
+    say A.diagonal         # extract diagonal elements
 
 =head1 INHERITS
 
@@ -52,7 +65,9 @@ Inherits methods from:
 
     a % b
 
-Returns the
+Returns the element-wise modulo of matrix C<a> with matrix or scalar C<b>. Each element of the result is the modulo of the corresponding elements.
+
+    Matrix([[5, 8], [10, 15]]) % 3  #=> Matrix([[2, 2], [1, 0]])
 
 Aliases: I<mod>
 
@@ -62,7 +77,9 @@ Aliases: I<mod>
 
     a & b
 
-Returns the
+Returns the element-wise bitwise AND of matrix C<a> with matrix or scalar C<b>.
+
+    Matrix([[12, 8], [15, 7]]) & 3  #=> Matrix([[0, 0], [3, 3]])
 
 Aliases: I<and>
 
@@ -72,7 +89,10 @@ Aliases: I<and>
 
     a * b
 
-Returns the
+Returns the matrix product of C<a> and C<b>. If C<b> is a scalar, performs scalar multiplication (each element multiplied by the scalar). If both are matrices, performs standard matrix multiplication.
+
+    Matrix([[1, 2], [3, 4]]) * Matrix([[5, 6], [7, 8]])  # matrix multiplication
+    Matrix([[1, 2], [3, 4]]) * 10                         # scalar multiplication
 
 Aliases: I<mul>
 
@@ -82,7 +102,11 @@ Aliases: I<mul>
 
     a ** b
 
-Returns the
+Returns the matrix C<a> raised to the power C<b>. For positive integers, performs repeated matrix multiplication. For negative integers, computes the inverse first. For C<b = 0>, returns the identity matrix.
+
+    A ** 3      # A * A * A
+    A ** -1     # inverse of A
+    A ** 0      # identity matrix
 
 Aliases: I<pow>
 
@@ -92,7 +116,10 @@ Aliases: I<pow>
 
     a + b
 
-Returns the
+Returns the element-wise sum of matrix C<a> and matrix or scalar C<b>. For two matrices, they must have the same dimensions.
+
+    Matrix([[1, 2], [3, 4]]) + Matrix([[5, 6], [7, 8]])  #=> Matrix([[6, 8], [10, 12]])
+    Matrix([[1, 2], [3, 4]]) + 10                         #=> Matrix([[11, 12], [13, 14]])
 
 Aliases: I<add>
 
@@ -102,7 +129,10 @@ Aliases: I<add>
 
     a - b
 
-Returns the
+Returns the element-wise difference of matrix C<a> and matrix or scalar C<b>. For two matrices, they must have the same dimensions.
+
+    Matrix([[5, 6], [7, 8]]) - Matrix([[1, 2], [3, 4]])  #=> Matrix([[4, 4], [4, 4]])
+    Matrix([[5, 6], [7, 8]]) - 5                          #=> Matrix([[0, 1], [2, 3]])
 
 Aliases: I<sub>
 
@@ -112,7 +142,9 @@ Aliases: I<sub>
 
     a / b
 
-Returns the
+Returns the matrix division of C<a> by C<b>. If C<b> is a matrix, this computes C<a * b^-1> (matrix C<a> multiplied by the inverse of matrix C<b>). If C<b> is a scalar, divides each element by the scalar.
+
+    Matrix([[2, 4], [6, 8]]) / 2  #=> Matrix([[1, 2], [3, 4]])
 
 Aliases: I<÷>, I<div>
 
@@ -122,7 +154,9 @@ Aliases: I<÷>, I<div>
 
     a ^ b
 
-Returns the
+Returns the element-wise bitwise XOR of matrix C<a> with matrix or scalar C<b>.
+
+    Matrix([[12, 8], [15, 7]]) ^ 5  #=> Matrix([[9, 13], [10, 2]])
 
 Aliases: I<xor>
 
@@ -132,7 +166,9 @@ Aliases: I<xor>
 
     Matrix.I(n)
 
-Returns the
+Returns an n×n identity matrix (square matrix with 1s on the main diagonal and 0s elsewhere).
+
+    Matrix.I(3)  #=> Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
 Aliases: I<identity>
 
@@ -142,7 +178,9 @@ Aliases: I<identity>
 
     a | b
 
-Returns the
+Returns the element-wise bitwise OR of matrix C<a> with matrix or scalar C<b>.
+
+    Matrix([[8, 4], [2, 1]]) | 1  #=> Matrix([[9, 5], [3, 1]])
 
 Aliases: I<or>
 
@@ -152,7 +190,9 @@ Aliases: I<or>
 
     m1.abs
 
-Returns the
+Returns a new matrix with the absolute value of each element.
+
+    Matrix([[-1, 2], [-3, -4]]).abs  #=> Matrix([[1, 2], [3, 4]])
 
 =cut
 
@@ -160,7 +200,9 @@ Returns the
 
     self.anti_diagonal
 
-Returns the
+Returns an array containing the elements on the anti-diagonal (secondary diagonal) of the matrix, from top-right to bottom-left.
+
+    Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).anti_diagonal  #=> [3, 5, 7]
 
 =cut
 
@@ -168,7 +210,9 @@ Returns the
 
     Matrix.build(n, m, block)
 
-Returns the
+Returns an n×m matrix where each element at position (i, j) is computed by calling C<block> with arguments C<i> and C<j>.
+
+    Matrix.build(3, 3, {|i,j| i + j })  #=> Matrix([[0, 1, 2], [1, 2, 3], [2, 3, 4]])
 
 =cut
 
@@ -176,7 +220,9 @@ Returns the
 
     self.ceil
 
-Returns the
+Returns a new matrix with each element rounded up to the nearest integer.
+
+    Matrix([[1.2, 2.7], [3.1, 4.9]]).ceil  #=> Matrix([[2, 3], [4, 5]])
 
 =cut
 
@@ -184,7 +230,9 @@ Returns the
 
     self.col(n)
 
-Returns the
+Returns the nth column of the matrix as an array (0-indexed).
+
+    Matrix([[1, 2, 3], [4, 5, 6]]).col(1)  #=> [2, 5]
 
 Aliases: I<column>, I<get_column>
 
@@ -194,7 +242,9 @@ Aliases: I<column>, I<get_column>
 
     A.col_len
 
-Returns the
+Returns the number of columns in matrix C<A>.
+
+    Matrix([[1, 2, 3], [4, 5, 6]]).col_len  #=> 3
 
 Aliases: I<col_size>, I<col_count>, I<column_len>, I<column_size>, I<column_count>
 
@@ -204,7 +254,9 @@ Aliases: I<col_size>, I<col_count>, I<column_len>, I<column_size>, I<column_coun
 
     self.cols(*cols)
 
-Returns the
+Returns a new matrix constructed from the specified column indices of the current matrix.
+
+    Matrix([[1, 2, 3], [4, 5, 6]]).cols(0, 2)  #=> Matrix([[1, 3], [4, 6]])
 
 Aliases: I<columns>, I<from_cols>, I<from_columns>
 
@@ -214,7 +266,9 @@ Aliases: I<columns>, I<from_cols>, I<from_columns>
 
     Matrix.col_vector(*list)
 
-Returns the
+Creates a column vector (n×1 matrix) from the provided list of values.
+
+    Matrix.col_vector(1, 2, 3)  #=> Matrix([[1], [2], [3]])
 
 Aliases: I<column_vector>
 
@@ -224,7 +278,9 @@ Aliases: I<column_vector>
 
     m1.concat(m2)
 
-Returns the
+Returns a new matrix formed by concatenating matrix C<m2> to the right of matrix C<m1>. Both matrices must have the same number of rows.
+
+    Matrix([[1, 2], [3, 4]]).concat(Matrix([[5], [6]]))  #=> Matrix([[1, 2, 5], [3, 4, 6]])
 
 =cut
 
@@ -232,7 +288,9 @@ Returns the
 
     self.det
 
-Returns the
+Returns the determinant of the matrix. The matrix must be square.
+
+    Matrix([[1, 2], [3, 4]]).det  #=> -2
 
 Aliases: I<determinant>
 
@@ -242,7 +300,9 @@ Aliases: I<determinant>
 
     self.det_bareiss
 
-Returns the
+Returns the determinant of the matrix using the Bareiss algorithm, which is efficient for integer matrices and preserves exactness.
+
+    Matrix([[2, 3], [4, 5]]).det_bareiss  #=> -2
 
 =cut
 
@@ -250,7 +310,9 @@ Returns the
 
     self.diagonal
 
-Returns the
+Returns an array containing the elements on the main diagonal of the matrix (from top-left to bottom-right).
+
+    Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]]).diagonal  #=> [1, 5, 9]
 
 =cut
 
@@ -258,7 +320,9 @@ Returns the
 
     self.flip
 
-Returns the
+Returns a new matrix that is the vertical flip (reflection) of the current matrix. Equivalent to reversing the order of rows.
+
+    Matrix([[1, 2], [3, 4], [5, 6]]).flip  #=> Matrix([[5, 6], [3, 4], [1, 2]])
 
 =cut
 
@@ -266,7 +330,9 @@ Returns the
 
     self.floor
 
-Returns the
+Returns a new matrix with each element rounded down to the nearest integer.
+
+    Matrix([[1.7, 2.3], [3.8, 4.2]]).floor  #=> Matrix([[1, 2], [3, 4]])
 
 =cut
 
@@ -274,7 +340,9 @@ Returns the
 
     self.gauss_jordan_invert
 
-Returns the
+Returns the inverse of the matrix using Gauss-Jordan elimination. The matrix must be square and invertible (non-zero determinant).
+
+    Matrix([[1, 2], [3, 4]]).gauss_jordan_invert  #=> Matrix([[-2, 1], [1.5, -0.5]])
 
 =cut
 
@@ -282,7 +350,9 @@ Returns the
 
     self.gauss_jordan_solve(vector)
 
-Returns the
+Solves the system of linear equations Ax = b using Gauss-Jordan elimination, where A is the matrix, x is the unknown vector, and b is the provided vector.
+
+    Matrix([[2, 1], [1, 3]]).gauss_jordan_solve([5, 6])  #=> [1.8, 1.4]
 
 =cut
 
@@ -290,7 +360,9 @@ Returns the
 
     self.horizontal_flip
 
-Returns the
+Returns a new matrix that is the horizontal flip (reflection) of the current matrix. Each row is reversed.
+
+    Matrix([[1, 2, 3], [4, 5, 6]]).horizontal_flip  #=> Matrix([[3, 2, 1], [6, 5, 4]])
 
 =cut
 
@@ -298,7 +370,9 @@ Returns the
 
     self.inv
 
-Returns the
+Returns the inverse of the matrix. The matrix must be square and invertible (have a non-zero determinant).
+
+    Matrix([[1, 2], [3, 4]]).inv  #=> Matrix([[-2, 1], [1.5, -0.5]])
 
 Aliases: I<invert>, I<inverse>
 
@@ -308,7 +382,9 @@ Aliases: I<invert>, I<inverse>
 
     self.invmod(mod)
 
-Returns the
+Returns the modular inverse of the matrix modulo C<mod>. The matrix must be square and have a determinant coprime to C<mod>.
+
+    Matrix([[1, 2], [3, 4]]).invmod(7)  #=> Matrix([[5, 1], [4, 3]])
 
 =cut
 
@@ -316,7 +392,10 @@ Returns the
 
     self.is_square
 
-Returns the
+Returns true if the matrix is square (has the same number of rows and columns), false otherwise.
+
+    Matrix([[1, 2], [3, 4]]).is_square          #=> true
+    Matrix([[1, 2, 3], [4, 5, 6]]).is_square    #=> false
 
 =cut
 
@@ -324,7 +403,9 @@ Returns the
 
     m1.neg
 
-Returns the
+Returns a new matrix with the negation of each element (each element multiplied by -1).
+
+    Matrix([[1, -2], [3, -4]]).neg  #=> Matrix([[-1, 2], [-3, 4]])
 
 =cut
 
@@ -332,7 +413,10 @@ Returns the
 
     self.new
 
-Returns the
+Creates a new matrix from arrays representing rows. Can also be called as C<Matrix(...)>.
+
+    Matrix.new([1, 2], [3, 4])  #=> Matrix([[1, 2], [3, 4]])
+    Matrix([1, 2], [3, 4])      #=> Matrix([[1, 2], [3, 4]])
 
 Aliases: I<call>
 
@@ -342,7 +426,9 @@ Aliases: I<call>
 
     A.powmod(pow, mod)
 
-Returns the
+Returns the matrix C<A> raised to the power C<pow> modulo C<mod>. Useful for modular exponentiation of matrices.
+
+    Matrix([[1, 1], [1, 0]]).powmod(10, 1000)  # Fibonacci matrix exponentiation
 
 =cut
 
@@ -350,7 +436,9 @@ Returns the
 
     A.prod(block)
 
-Returns the
+Returns the product of all elements obtained by applying C<block> to each element of the matrix.
+
+    Matrix([[1, 2], [3, 4]]).prod {|x| x + 1 }  #=> 120  (2*3*4*5)
 
 Aliases: I<prod_by>
 
@@ -360,7 +448,9 @@ Aliases: I<prod_by>
 
     Matrix.rand(n, m)
 
-Returns the
+Returns an n×m matrix with random floating-point values between 0 and 1.
+
+    Matrix.rand(2, 3)  #=> Matrix with 2 rows and 3 columns of random values
 
 =cut
 
@@ -368,7 +458,9 @@ Returns the
 
     self.row(n)
 
-Returns the
+Returns the nth row of the matrix as an array (0-indexed).
+
+    Matrix([[1, 2, 3], [4, 5, 6]]).row(0)  #=> [1, 2, 3]
 
 Aliases: I<get_row>
 
@@ -378,7 +470,9 @@ Aliases: I<get_row>
 
     A.row_len
 
-Returns the
+Returns the number of rows in matrix C<A>.
+
+    Matrix([[1, 2, 3], [4, 5, 6]]).row_len  #=> 2
 
 Aliases: I<row_size>, I<row_count>
 
@@ -388,7 +482,9 @@ Aliases: I<row_size>, I<row_count>
 
     self.rows(*rows)
 
-Returns the
+Returns a new matrix constructed from the specified row indices of the current matrix.
+
+    Matrix([[1, 2], [3, 4], [5, 6]]).rows(0, 2)  #=> Matrix([[1, 2], [5, 6]])
 
 Aliases: I<from_rows>
 
@@ -398,7 +494,9 @@ Aliases: I<from_rows>
 
     Matrix.row_vector(*list)
 
-Returns the
+Creates a row vector (1×n matrix) from the provided list of values.
+
+    Matrix.row_vector(1, 2, 3)  #=> Matrix([[1, 2, 3]])
 
 =cut
 
@@ -406,7 +504,9 @@ Returns the
 
     self.rref
 
-Returns the
+Returns the reduced row echelon form (RREF) of the matrix using Gaussian elimination. Useful for solving systems of linear equations and finding matrix rank.
+
+    Matrix([[2, 1, -1], [1, 3, 2]]).rref  #=> reduced form
 
 Aliases: I<reduced_row_echelon_form>
 
@@ -416,7 +516,9 @@ Aliases: I<reduced_row_echelon_form>
 
     Matrix.scalar(n, value)
 
-Returns the
+Returns an n×n scalar matrix (diagonal matrix with the same value on all diagonal positions).
+
+    Matrix.scalar(3, 5)  #=> Matrix([[5, 0, 0], [0, 5, 0], [0, 0, 5]])
 
 =cut
 
@@ -424,7 +526,10 @@ Returns the
 
     A.set_col(k, col)
 
-Returns the
+Sets the kth column of matrix C<A> to the values in array C<col>. Modifies the matrix in place.
+
+    var m = Matrix([[1, 2], [3, 4]])
+    m.set_col(0, [5, 6])  #=> Matrix([[5, 2], [6, 4]])
 
 Aliases: I<set_column>
 
@@ -434,7 +539,10 @@ Aliases: I<set_column>
 
     A.set_row(k, row)
 
-Returns the
+Sets the kth row of matrix C<A> to the values in array C<row>. Modifies the matrix in place.
+
+    var m = Matrix([[1, 2], [3, 4]])
+    m.set_row(0, [5, 6])  #=> Matrix([[5, 6], [3, 4]])
 
 =cut
 
@@ -442,7 +550,9 @@ Returns the
 
     self.size
 
-Returns the
+Returns an array containing the dimensions of the matrix as [rows, columns].
+
+    Matrix([[1, 2, 3], [4, 5, 6]]).size  #=> [2, 3]
 
 =cut
 
@@ -450,7 +560,9 @@ Returns the
 
     self.solve(vector)
 
-Returns the
+Solves the system of linear equations Ax = b, where A is the matrix, x is the unknown vector, and b is the provided vector. Returns the solution vector x.
+
+    Matrix([[3, 2], [1, 2]]).solve([7, 5])  #=> [1, 2]
 
 =cut
 
@@ -458,7 +570,9 @@ Returns the
 
     A.sum(block)
 
-Returns the
+Returns the sum of all elements obtained by applying C<block> to each element of the matrix.
+
+    Matrix([[1, 2], [3, 4]]).sum {|x| x * x }  #=> 30  (1+4+9+16)
 
 Aliases: I<sum_by>
 
@@ -468,7 +582,9 @@ Aliases: I<sum_by>
 
     matrix.t
 
-Returns the
+Returns the transpose of the matrix (rows and columns swapped).
+
+    Matrix([[1, 2, 3], [4, 5, 6]]).t  #=> Matrix([[1, 4], [2, 5], [3, 6]])
 
 Aliases: I<not>, I<transpose>
 
@@ -478,7 +594,9 @@ Aliases: I<not>, I<transpose>
 
     A.to_a
 
-Returns the
+Returns the matrix as an array of arrays (each inner array represents a row).
+
+    Matrix([[1, 2], [3, 4]]).to_a  #=> [[1, 2], [3, 4]]
 
 Aliases: I<to_array>
 
@@ -488,7 +606,9 @@ Aliases: I<to_array>
 
     self.to_s
 
-Returns the
+Returns a string representation of the matrix suitable for display or debugging.
+
+    Matrix([[1, 2], [3, 4]]).to_s  #=> "Matrix([[1, 2], [3, 4]])"
 
 Aliases: I<dump>, I<to_str>
 
@@ -498,7 +618,9 @@ Aliases: I<dump>, I<to_str>
 
     self.vec_cols
 
-Returns the
+Returns an array of column vectors, where each column of the matrix is represented as a separate column vector (matrix).
+
+    Matrix([[1, 2], [3, 4]]).vec_cols  #=> [Matrix([[1], [3]]), Matrix([[2], [4]])]
 
 Aliases: I<vec_columns>, I<vector_columns>
 
@@ -508,7 +630,9 @@ Aliases: I<vec_columns>, I<vector_columns>
 
     self.vec_rows
 
-Returns the
+Returns an array of row vectors, where each row of the matrix is represented as a separate row vector (matrix).
+
+    Matrix([[1, 2], [3, 4]]).vec_rows  #=> [Matrix([[1, 2]]), Matrix([[3, 4]])]
 
 Aliases: I<vector_rows>
 
@@ -518,7 +642,9 @@ Aliases: I<vector_rows>
 
     self.vertical_flip
 
-Returns the
+Returns a new matrix that is the vertical flip (reflection) of the current matrix. Equivalent to reversing the order of rows.
+
+    Matrix([[1, 2], [3, 4], [5, 6]]).vertical_flip  #=> Matrix([[5, 6], [3, 4], [1, 2]])
 
 =cut
 
@@ -526,6 +652,105 @@ Returns the
 
     Matrix.zero(n, m)
 
-Returns the
+Returns an n×m matrix with all elements set to zero.
+
+    Matrix.zero(2, 3)  #=> Matrix([[0, 0, 0], [0, 0, 0]])
+
+=cut
+
+=head1 EXAMPLES
+
+=head2 Creating Matrices
+
+    # From arrays
+    var A = Matrix([1, 2], [3, 4])
+    
+    # Special matrices
+    var I = Matrix.I(3)              # identity matrix
+    var Z = Matrix.zero(2, 3)        # zero matrix
+    var R = Matrix.rand(3, 3)        # random matrix
+    var S = Matrix.scalar(3, 5)      # scalar matrix
+    
+    # Vectors
+    var col = Matrix.col_vector(1, 2, 3)
+    var row = Matrix.row_vector(1, 2, 3)
+    
+    # Using build
+    var M = Matrix.build(3, 3, {|i,j| i * j })
+
+=head2 Matrix Operations
+
+    var A = Matrix([1, 2], [3, 4])
+    var B = Matrix([5, 6], [7, 8])
+    
+    # Arithmetic
+    var sum = A + B           # element-wise addition
+    var diff = A - B          # element-wise subtraction
+    var prod = A * B          # matrix multiplication
+    var quot = A / B          # matrix division (A * B^-1)
+    
+    # Scalar operations
+    var scaled = A * 10
+    var shifted = A + 5
+    
+    # Powers
+    var squared = A ** 2      # A * A
+    var inverse = A ** -1     # inverse of A
+
+=head2 Linear Algebra
+
+    var A = Matrix([2, 1], [1, 3])
+    var b = [5, 6]
+    
+    # Solve Ax = b
+    var x = A.solve(b)        #=> [1.8, 1.4]
+    
+    # Determinant
+    say A.det                 #=> 5
+    
+    # Inverse
+    var A_inv = A.inv
+    
+    # Transpose
+    var A_t = A.transpose
+
+=head2 Matrix Transformations
+
+    var M = Matrix([1, 2, 3], [4, 5, 6], [7, 8, 9])
+    
+    # Flipping
+    var vflip = M.flip                  # vertical flip
+    var hflip = M.horizontal_flip       # horizontal flip
+    
+    # Extract diagonals
+    var diag = M.diagonal               #=> [1, 5, 9]
+    var anti = M.anti_diagonal          #=> [3, 5, 7]
+    
+    # Select rows/columns
+    var subset = M.rows(0, 2)           # rows 0 and 2
+    var cols = M.cols(1, 2)             # columns 1 and 2
+
+=head2 Modular Arithmetic
+
+    var A = Matrix([1, 2], [3, 4])
+    
+    # Modular inverse
+    var A_inv_mod = A.invmod(7)
+    
+    # Modular exponentiation
+    var result = A.powmod(10, 100)
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Array::Array>
+
+=head1 AUTHOR
+
+Daniel Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
 
 =cut
