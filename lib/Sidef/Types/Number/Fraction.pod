@@ -87,7 +87,8 @@ Aliases: I<add>
 
 =head2 ++
 
-    a ++ b
+    a++
+    ++a
 
 Returns the
 
@@ -107,7 +108,8 @@ Aliases: I<sub>
 
 =head2 --
 
-    a -- b
+    a--
+    --a
 
 Returns the
 
