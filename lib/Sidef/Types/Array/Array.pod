@@ -2400,7 +2400,10 @@ Skips elements from start while block returns true.
 
     arr.skip_last(n)
 
-Returns new array without last n elements.
+Returns a new array without the last n elements.
+
+    say [1,2,3,4,5].skip_last(2)    #=> [1, 2, 3]
+    say [1,2,3].skip_last(5)        #=> []
 
 =cut
 
@@ -2417,21 +2420,32 @@ If C<length> is omitted, returns everything through the end of the array.
 
 If C<length> is negative, leaves that many entries off the end of the array.
 
+    say [1,2,3,4,5].slice(1)        #=> [2, 3, 4, 5]
+    say [1,2,3,4,5].slice(1, 2)     #=> [2, 3]
+    say [1,2,3,4,5].slice(-2)       #=> [4, 5]
+    say [1,2,3,4,5].slice(1, -1)    #=> [2, 3, 4]
+
 =cut
 
 =head2 slice_after
 
-    self.slice_after(block)
+    arr.slice_after { ... }
 
-Returns the
+Returns an array of arrays by slicing after each element for which the given block returns a true value.
+
+    say [1,2,3,4,5,6].slice_after { _ %% 2 }    #=> [[1, 2], [3, 4], [5, 6]]
+    say [1,2,0,3,0,4].slice_after { _ == 0 }    #=> [[1, 2, 0], [3, 0], [4]]
 
 =cut
 
 =head2 slice_before
 
-    self.slice_before(block)
+    arr.slice_before { ... }
 
-Returns the
+Returns an array of arrays by slicing before each element for which the given block returns a true value.
+
+    say [1,2,3,4,5,6].slice_before { _ %% 2 }   #=> [[1], [2, 3], [4, 5], [6]]
+    say [1,2,0,3,0,4].slice_before { _ == 0 }   #=> [[1, 2], [0, 3], [0, 4]]
 
 =cut
 
@@ -2450,9 +2464,12 @@ Aliases: I<map_slice>
 
 =head2 smul
 
-    self.smul(scalar)
+    arr.smul(scalar)
 
-Returns the
+Returns a new array with each element multiplied by the given scalar value.
+
+    say [1,2,3].smul(5)         #=> [5, 10, 15]
+    say [2,4,6].smul(0.5)       #=> [1, 2, 3]
 
 Aliases: I<scalar_mul>
 
@@ -2521,17 +2538,28 @@ Sort an array by mapping each value to the given block.
 
 =head2 splice
 
-    self.splice(offset, length, *objects)
+    arr.splice(offset, length, *objects)
 
-Returns the
+Removes and returns C<length> elements from the array starting at C<offset>, optionally replacing them with C<objects>. Modifies the array in place.
+
+    var arr = [1,2,3,4,5]
+    say arr.splice(1, 2)        #=> [2, 3]
+    say arr                      #=> [1, 4, 5]
+    
+    var arr2 = [1,2,3,4,5]
+    arr2.splice(1, 2, 'a', 'b', 'c')
+    say arr2                     #=> [1, "a", "b", "c", 4, 5]
 
 =cut
 
 =head2 split
 
-    self.split(obj)
+    arr.split(obj)
 
-Returns the
+Splits the array at each occurrence of the given object, returning an array of sub-arrays.
+
+    say [1,2,0,3,0,4].split(0)      #=> [[1, 2], [3], [4]]
+    say %w(a b c b d).split('b')    #=> [["a"], ["c"], ["d"]]
 
 =cut
 
@@ -2547,9 +2575,12 @@ Splits the given array by the objects at which the given block returns a true va
 
 =head2 ssub
 
-    self.ssub(scalar)
+    arr.ssub(scalar)
 
-Returns the
+Returns a new array with the given scalar value subtracted from each element.
+
+    say [5,10,15].ssub(3)       #=> [2, 7, 12]
+    say [1,2,3].ssub(-1)        #=> [2, 3, 4]
 
 Aliases: I<scalar_sub>
 
@@ -2562,9 +2593,9 @@ Aliases: I<scalar_sub>
 
 Groups runs of identical elements.
 
-    say <a a a b b c>.stack     #=> [["a", "a", "a"], ["b", "b"], ["c"]
+    say <a a a b b c>.stack     #=> [["a", "a", "a"], ["b", "b"], ["c"]]
 
-When a block of code is given, the stocking is done based on the mapping of each element to the given block:
+When a block of code is given, the stacking is done based on the mapping of each element to the given block:
 
     say <A B b A b B A>.stack_by { .uc }
 
@@ -2578,17 +2609,26 @@ Aliases: I<stack_by>
 
 =head2 subsets
 
-    self.subsets
+    arr.subsets
+    arr.subsets(k)
 
-Returns the
+Returns all subsets of the array. If C<k> is provided, returns only subsets of size C<k>.
+
+    say [1,2,3].subsets             #=> [[], [1], [2], [3], [1,2], [1,3], [2,3], [1,2,3]]
+    say [1,2,3].subsets(2)          #=> [[1, 2], [1, 3], [2, 3]]
 
 =cut
 
 =head2 sum
 
-    self.sum(arg)
+    arr.sum
+    arr.sum(initial)
 
-Returns the
+Returns the sum of all elements in the array. An optional initial value can be provided.
+
+    say [1,2,3,4].sum           #=> 10
+    say [1,2,3].sum(10)         #=> 16
+    say [].sum                   #=> 0
 
 =cut
 
@@ -2614,49 +2654,65 @@ Sum of an array, by mapping each element to the given block.
 
 =head2 sum_kv
 
-    self.sum_kv(block)
+    arr.sum_kv { ... }
 
-Returns the
+Returns the sum of the array by mapping each key-value pair to the given block.
+
+    say [10,20,30].sum_kv {|k,v| k*v }      #=> 0*10 + 1*20 + 2*30 = 80
 
 =cut
 
 =head2 summod
 
-    self.summod(mod)
+    arr.summod(mod)
 
-Returns the
+Returns the sum of all elements in the array, modulo the given value.
+
+    say [10,20,30,40].summod(17)        #=> 100 % 17 = 15
 
 =cut
 
 =head2 swap
 
-    self.swap(i, j)
+    arr.swap(i, j)
 
-Returns the
+Swaps the elements at indices C<i> and C<j> in the array. Modifies the array in place and returns it.
+
+    var arr = [1,2,3,4]
+    arr.swap(0, 3)
+    say arr                 #=> [4, 2, 3, 1]
 
 =cut
 
 =head2 take_left
 
-    self.take_left(amount)
+    arr.take_left(amount)
 
-Returns the
+Returns the first C<amount> elements from the array.
+
+    say [1,2,3,4,5].take_left(3)        #=> [1, 2, 3]
+    say [1,2,3].take_left(5)            #=> [1, 2, 3]
 
 =cut
 
 =head2 take_right
 
-    self.take_right(amount)
+    arr.take_right(amount)
 
-Returns the
+Returns the last C<amount> elements from the array.
+
+    say [1,2,3,4,5].take_right(3)       #=> [3, 4, 5]
+    say [1,2,3].take_right(5)           #=> [1, 2, 3]
 
 =cut
 
 =head2 to_a
 
-    self.to_a
+    arr.to_a
 
-Returns the
+Returns the array itself (identity operation for arrays).
+
+    say [1,2,3].to_a        #=> [1, 2, 3]
 
 Aliases: I<to_array>
 
@@ -2664,17 +2720,22 @@ Aliases: I<to_array>
 
 =head2 to_bag
 
-    self.to_bag
+    arr.to_bag
 
-Returns the
+Converts the array to a Bag object (multiset), where each unique element is mapped to its frequency count.
+
+    say [1,2,2,3,3,3].to_bag        #=> Bag(1 => 1, 2 => 2, 3 => 3)
 
 =cut
 
 =head2 to_h
 
-    self.to_h
+    arr.to_h
 
-Returns the
+Converts the array to a Hash object. The array should contain key-value pairs.
+
+    say [[1,'a'],[2,'b'],[3,'c']].to_h      #=> Hash(1 => "a", 2 => "b", 3 => "c")
+    say [1,'a',2,'b',3,'c'].to_h            #=> Hash(1 => "a", 2 => "b", 3 => "c")
 
 Aliases: I<to_hash>
 
@@ -2682,9 +2743,11 @@ Aliases: I<to_hash>
 
 =head2 to_m
 
-    self.to_m
+    arr.to_m
 
-Returns the
+Converts the array (assumed to be 2D) to a Matrix object.
+
+    say [[1,2],[3,4]].to_m      #=> Matrix([[1, 2], [3, 4]])
 
 Aliases: I<to_matrix>
 
@@ -2692,9 +2755,11 @@ Aliases: I<to_matrix>
 
 =head2 to_s
 
-    self.to_s
+    arr.to_s
 
-Returns the
+Returns a string representation of the array.
+
+    say [1,2,3].to_s        #=> "[1, 2, 3]"
 
 Aliases: I<dump>, I<to_str>
 
@@ -2702,17 +2767,21 @@ Aliases: I<dump>, I<to_str>
 
 =head2 to_set
 
-    self.to_set
+    arr.to_set
 
-Returns the
+Converts the array to a Set object, removing duplicates.
+
+    say [1,2,2,3,3,3].to_set        #=> Set(1, 2, 3)
 
 =cut
 
 =head2 to_v
 
-    self.to_v
+    arr.to_v
 
-Returns the
+Converts the array to a Vector object.
+
+    say [1,2,3].to_v        #=> Vector(1, 2, 3)
 
 Aliases: I<to_vector>
 
@@ -2720,9 +2789,11 @@ Aliases: I<to_vector>
 
 =head2 tuples
 
-    self.tuples
+    arr.tuples(k)
 
-Returns the
+Returns all k-tuples (variations) of the array elements without repetition.
+
+    say [1,2,3].tuples(2)       #=> [[1,2], [1,3], [2,1], [2,3], [3,1], [3,2]]
 
 Aliases: I<variations>
 
@@ -2730,9 +2801,11 @@ Aliases: I<variations>
 
 =head2 tuples_with_repetition
 
-    self.tuples_with_repetition
+    arr.tuples_with_repetition(k)
 
-Returns the
+Returns all k-tuples (variations) of the array elements with repetition allowed.
+
+    say [1,2].tuples_with_repetition(2)     #=> [[1,1], [1,2], [2,1], [2,2]]
 
 Aliases: I<variations_with_repetition>
 
@@ -2740,9 +2813,13 @@ Aliases: I<variations_with_repetition>
 
 =head2 uniq
 
-    self.uniq(block)
+    arr.uniq
+    arr.uniq { ... }
 
-Returns the
+Returns a new array with duplicate elements removed. When a block is given, uniqueness is determined by the result of the block.
+
+    say [1,2,2,3,3,3].uniq              #=> [1, 2, 3]
+    say [1,-1,2,-2,3].uniq { .abs }     #=> [1, 2, 3]
 
 Aliases: I<unique>, I<distinct>
 
@@ -2750,9 +2827,11 @@ Aliases: I<unique>, I<distinct>
 
 =head2 uniq_by
 
-    self.uniq_by(block)
+    arr.uniq_by { ... }
 
-Returns the
+Returns a new array with duplicate elements removed, where uniqueness is determined by mapping each element to the given block.
+
+    say %w(foo bar baz qux).uniq_by { .len }       #=> ["foo", "qux"]
 
 Aliases: I<unique_by>
 
@@ -2765,7 +2844,7 @@ Aliases: I<unique_by>
 
 It uses the C<next_permutation> method to create all the unique permutations of the self-array.
 
-    say [1,1,2].unique_permutations         #=> [[1, 1, 2], [1, 2, 1], [2, 1, 1]
+    say [1,1,2].unique_permutations         #=> [[1, 1, 2], [1, 2, 1], [2, 1, 1]]
 
 Equivalent with C<arr.permutations.uniq>, but more efficient, as it creates the permutations without duplicates.
 
@@ -2787,9 +2866,12 @@ Aliases: I<unique_permutations>
 
 =head2 uniq_prefs
 
-    self.uniq_prefs(block)
+    arr.uniq_prefs { ... }
 
-Returns the
+Returns an array of unique prefixes based on the given block. Iterates through the array and includes an element only if the block result hasn't been seen before.
+
+    say [1,2,2,3,3,3].uniq_prefs { _ }          #=> [1, 2, 3]
+    say [1,-1,2,-2,3].uniq_prefs { .abs }       #=> [1, 2, 3]
 
 Aliases: I<unique_prefixes>
 
@@ -2797,9 +2879,12 @@ Aliases: I<unique_prefixes>
 
 =head2 unroll_op
 
-    self.unroll_op(operator, arg)
+    arr.unroll_op(operator, arg)
 
-Returns the
+Applies the given operator between consecutive elements of the array, optionally with an initial argument.
+
+    say [1,2,3,4].unroll_op('+')        #=> [1, 3, 6, 10]  (cumulative sum)
+    say [1,2,3,4].unroll_op('*', 1)     #=> [1, 2, 6, 24]  (factorial progression)
 
 Aliases: I<unroll_operator>
 
@@ -2807,25 +2892,32 @@ Aliases: I<unroll_operator>
 
 =head2 unzip_by
 
-    self.unzip_by(block)
+    arr.unzip_by { ... }
 
-Returns the
+Unzips an array by applying the given block to each element, which should return an array. Returns an array where each element is an array of the corresponding positions from all block results.
+
+    say [[1,2],[3,4],[5,6]].unzip_by { _ }      #=> [[1, 3, 5], [2, 4, 6]]
 
 =cut
 
 =head2 weighted_shuffle_by
 
-    self.weighted_shuffle_by(block)
+    arr.weighted_shuffle_by { ... }
 
-Returns the
+Returns a randomly shuffled copy of the array, where the probability of each element appearing earlier is weighted by the result of the given block.
+
+    say [1,2,3,4].weighted_shuffle_by { _ }     # higher numbers more likely to appear first
 
 =cut
 
 =head2 wise_op
 
-    m1.wise_op(operator, m2)
+    arr1.wise_op(operator, arr2)
 
-Returns the
+Applies the given operator element-wise between two arrays.
+
+    say [1,2,3].wise_op('+', [4,5,6])       #=> [5, 7, 9]
+    say [10,20,30].wise_op('*', [2,3,4])    #=> [20, 60, 120]
 
 Aliases: I<wise_operator>
 
@@ -2833,9 +2925,12 @@ Aliases: I<wise_operator>
 
 =head2 zip
 
-    self.zip(block)
+    arr.zip(*arrays)
 
-Returns the
+Zips the array with one or more other arrays, returning an array of arrays where each sub-array contains the corresponding elements from all arrays.
+
+    say [1,2,3].zip([4,5,6])                #=> [[1, 4], [2, 5], [3, 6]]
+    say [1,2,3].zip([4,5,6], [7,8,9])       #=> [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
 
 Aliases: I<transpose>
 
@@ -2843,17 +2938,22 @@ Aliases: I<transpose>
 
 =head2 zip_by
 
-    self.zip_by(block)
+    arr.zip_by { ... } *arrays
 
-Returns the
+Zips multiple arrays together and applies the given block to each group of corresponding elements.
+
+    say [1,2,3].zip_by({|a,b| a+b }, [4,5,6])      #=> [5, 7, 9]
 
 =cut
 
 =head2 zip_op
 
-    self.zip_op(operator, arg)
+    arr.zip_op(operator, *arrays)
 
-Returns the
+Zips one or more arrays together using the given operator on corresponding elements.
+
+    say [1,2,3].zip_op('+', [4,5,6])            #=> [5, 7, 9]
+    say [1,2,3].zip_op('*', [2,3,4], [5,6,7])   #=> [10, 36, 84]
 
 Aliases: I<zip_operator>
 
