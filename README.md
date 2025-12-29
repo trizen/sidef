@@ -1,6 +1,6 @@
 # The Sidef Programming Language
 
-Sidef is a modern, high-level programming language designed for versatile general-purpose applications, drawing inspiration from the principles of Ruby, Raku, and Julia.
+<div align="center">
 
 ```
             **   **         ****   *           *********   *********
@@ -14,35 +14,113 @@ Sidef is a modern, high-level programming language designed for versatile genera
       **   **               ****   *********   *********   *
 ```
 
-- Key features of Sidef include:
+**A modern, high-level programming language for versatile general-purpose applications**
 
-  - Object-oriented programming
-  - Functional programming
-  - Functional pattern matching
-  - Optional lazy evaluation
-  - Multiple dispatch
-  - Lexical scoping
-  - Lexical closures
-  - Keyword arguments
-  - Regular expressions
-  - Seamless integration with Perl modules
-  - Optional dynamic type checking
-  - Robust support for big integers, rationals, floats, and complex numbers
+[Website](https://github.com/trizen/sidef) • [Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) • [Documentation](https://trizen.gitbook.io/sidef-lang/) • [Try Online](https://tio.run/#sidef) • [Discussions](https://github.com/trizen/sidef/discussions)
 
-### Resources
+[![CPAN](https://img.shields.io/badge/CPAN-Sidef-blue)](https://metacpan.org/release/Sidef)
+[![License](https://img.shields.io/badge/License-Artistic%202.0-green.svg)](https://www.perlfoundation.org/artistic-license-20.html)
 
-- [Beginner's Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-tutorial.pdf))
-- [Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-number-theory.pdf))
-- RosettaCode: [Sidef](https://rosettacode.org/wiki/Sidef)
-- Gitbook: [Sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([legacy](https://trizen.gitbooks.io/sidef-lang)) ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-book.pdf))
+</div>
 
-### Questions & Answers
+---
 
-For assistance or inquiries regarding Sidef, please visit the dedicated [discussion forum](https://github.com/trizen/sidef/discussions/categories/q-a).
+## 🌟 Overview
 
-## EXAMPLES
+Sidef is a modern, expressive programming language that combines the elegance of Ruby, the versatility of Raku, and the mathematical capabilities of Julia. Designed for both beginners and advanced programmers, Sidef offers a rich feature set for diverse programming paradigms.
 
-### The [Y combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed-point_combinators_in_lambda_calculus):
+## ✨ Key Features
+
+<table>
+<tr>
+<td>
+
+**Programming Paradigms**
+- Object-oriented programming
+- Functional programming
+- Functional pattern matching
+- Multiple dispatch
+
+</td>
+<td>
+
+**Language Features**
+- Optional lazy evaluation
+- Lexical scoping & closures
+- Keyword arguments
+- Regular expressions
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Integration & Performance**
+- Seamless Perl module integration
+- Optional dynamic type checking
+- Efficient execution model
+
+</td>
+<td>
+
+**Numeric Computing**
+- Big integers
+- Rational numbers
+- Arbitrary precision floats
+- Complex numbers
+
+</td>
+</tr>
+</table>
+
+## 🚀 Quick Start
+
+### Installation
+
+**Via CPAN:**
+```bash
+cpan Sidef
+```
+
+**Platform-specific:**
+- **Arch Linux**: [AUR package](https://aur.archlinux.org/packages/sidef/)
+- **Slackware**: [SlackBuilds](https://slackbuilds.org/repository/15.0/perl/perl-Sidef/)
+- **Other systems**: See [pkgs.org](https://pkgs.org/download/perl-Sidef)
+
+### Hello World
+
+```ruby
+say "Hello, World!"
+```
+
+### Try It Online
+
+Experiment with Sidef instantly at **[Try It Online](https://tio.run/#sidef)** without any installation.
+
+## 📚 Documentation & Learning Resources
+
+### Tutorials
+- **[Beginner's Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-tutorial.pdf)) - Start your Sidef journey
+- **[Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-number-theory.pdf)) - Mathematical programming with Sidef
+
+### Reference Materials
+- **[Sidef GitBook](https://trizen.gitbook.io/sidef-lang/)** ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-book.pdf)) - Comprehensive language guide
+- **[RosettaCode Examples](https://rosettacode.org/wiki/Sidef)** - Practical code examples
+- **[Legacy GitBook](https://trizen.gitbooks.io/sidef-lang)** - Previous documentation version
+
+## 💬 Community & Support
+
+Have questions or need help? Join the conversation:
+
+- **[Discussion Forum](https://github.com/trizen/sidef/discussions/categories/q-a)** - Q&A and community discussions
+- **[GitHub Issues](https://github.com/trizen/sidef/issues)** - Bug reports and feature requests
+
+## 🎯 Code Examples
+
+### The Y Combinator
+
+Demonstrating functional programming with the [Y combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator#Fixed-point_combinators_in_lambda_calculus):
+
 ```ruby
 var y = ->(f) {->(g) {g(g)}(->(g) { f(->(*args) {g(g)(args...)})})}
 
@@ -53,7 +131,10 @@ var fib = ->(f) { ->(n) { n < 2 ? n : (f(n-2) + f(n-1)) } }
 say 10.of { |i| y(fib)(i) }     #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 ```
 
-### ASCII generation of the [Sierpinski triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle):
+### Sierpinski Triangle
+
+ASCII generation of the [Sierpinski triangle](https://en.wikipedia.org/wiki/Sierpinski_triangle):
+
 ```ruby
 func sierpinski_triangle(n) {
     var triangle = ['*']
@@ -67,7 +148,10 @@ func sierpinski_triangle(n) {
 
 say sierpinski_triangle(4)
 ```
-Output:
+
+<details>
+<summary>Show Output</summary>
+
 ```text
                *
               * *
@@ -86,8 +170,12 @@ Output:
  *   *   *   *   *   *   *   *
 * * * * * * * * * * * * * * * *
 ```
+</details>
 
-### ASCII generation of the [Mandelbrot set](https://en.wikipedia.org/wiki/Mandelbrot_set):
+### Mandelbrot Set
+
+ASCII visualization of the [Mandelbrot set](https://en.wikipedia.org/wiki/Mandelbrot_set):
+
 ```ruby
 func mandelbrot(z, r=20) {
     var c = z
@@ -105,7 +193,10 @@ for y in (1 `downto` -1 `by` 0.05) {
     print "\n"
 }
 ```
-Output:
+
+<details>
+<summary>Show Output</summary>
+
 ```text
 
                                                             #
@@ -147,61 +238,61 @@ Output:
                                                             #
 
 ```
+</details>
 
-### Additional Examples
-   * To explore further examples, kindly refer to: [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+### More Examples
 
-### INTERACTIVE MODE
+Explore an extensive collection of Sidef programs at **[github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)**
 
-![sidef](https://user-images.githubusercontent.com/614513/39590990-123bd3ea-4f0b-11e8-9717-abc0ec48622e.png)
+## 🖥️ Interactive Mode
 
-### TRY IT ONLINE
+Sidef includes a REPL (Read-Eval-Print Loop) for interactive programming:
 
-* [https://tio.run/#sidef](https://tio.run/#sidef)
+![Sidef Interactive Mode](https://user-images.githubusercontent.com/614513/39590990-123bd3ea-4f0b-11e8-9717-abc0ec48622e.png)
 
-### AVAILABILITY
+## 📦 Distribution Availability
 
-* **CPAN**: https://metacpan.org/release/Sidef
-* **PKGS**: https://pkgs.org/download/perl-Sidef
-* **Arch Linux**: https://aur.archlinux.org/packages/sidef/
-* **Slackware**: https://slackbuilds.org/repository/15.0/perl/perl-Sidef/
+| Platform | Package | Link |
+|----------|---------|------|
+| **CPAN** | `Sidef` | [metacpan.org](https://metacpan.org/release/Sidef) |
+| **Package Search** | Multiple distributions | [pkgs.org](https://pkgs.org/download/perl-Sidef) |
+| **Arch Linux** | `sidef` (AUR) | [AUR Package](https://aur.archlinux.org/packages/sidef/) |
+| **Slackware** | `perl-Sidef` | [SlackBuilds.org](https://slackbuilds.org/repository/15.0/perl/perl-Sidef/) |
 
-### LICENSE AND COPYRIGHT
+## 🤝 Contributing
 
-* Copyright (C) 2013-2025 Daniel Șuteu, Ioana Fălcușan
+Contributions are welcome! Whether it's:
+- Reporting bugs
+- Suggesting new features
+- Improving documentation
+- Submitting pull requests
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the *Artistic License (2.0)*. You may obtain a copy
-of the full license at:
+Please visit the [GitHub repository](https://github.com/trizen/sidef) to get involved.
 
-[https://www.perlfoundation.org/artistic-license-20.html](https://www.perlfoundation.org/artistic-license-20.html)
+## 📄 License and Copyright
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+**Copyright © 2013-2025 Daniel Șuteu, Ioana Fălcușan**
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
+This program is free software; you can redistribute it and/or modify it under the terms of the **Artistic License (2.0)**.
 
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
+**Full license**: [perlfoundation.org/artistic-license-20.html](https://www.perlfoundation.org/artistic-license-20.html)
 
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
+### Key License Points
 
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- Use, modification, and distribution governed by the Artistic License
+- Modified versions must comply with license requirements
+- No trademark or logo usage rights granted
+- Includes patent license for necessary claims
+- Patent litigation terminates license
+
+**Warranty Disclaimer**: THE PACKAGE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. See full license for details.
+
+---
+
+<div align="center">
+
+**Made with ❤️ by the Sidef community**
+
+[⭐ Star us on GitHub](https://github.com/trizen/sidef) • [📖 Read the docs](https://trizen.gitbook.io/sidef-lang/) • [💬 Join discussions](https://github.com/trizen/sidef/discussions)
+
+</div>
