@@ -143,6 +143,22 @@ package Sidef::Types::Number::Fraction {
         $x->eq(Sidef::Types::Number::Number::MONE);
     }
 
+    sub is_proper {
+        my ($x) = @_;
+        $x->{a}->lt($x->{b});
+    }
+
+    sub is_improper {
+        my ($x) = @_;
+        $x->is_proper->not;
+    }
+
+    sub as_mixed {
+        my ($x) = @_;
+        my ($q, $r) = $x->{a}->divmod($x->{b});
+        Sidef::Types::Array::Array->new([$q, $r, $x->{b}]);
+    }
+
     sub add {
         my ($x, $y) = @_;
 

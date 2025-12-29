@@ -2,27 +2,24 @@
 
 =head1 NAME
 
-Sidef::Types::Number::Fraction - Rational number support for Sidef
+Sidef::Types::Number::Fraction - Symbolic support for fractions
 
 =head1 DESCRIPTION
 
-This class implements support for rational numbers (fractions) in Sidef. 
-It inherits from C<Sidef::Types::Number::Number>.
-
-Fractions are automatically created in Sidef when dividing two integers that result in a non-integer value, provided that floating-point conversion is not enforced.
+This class implements symbolic support for rational values (fractions) in Sidef. It inherits from L<Sidef::Types::Number::Number>.
 
 =head1 SYNOPSIS
 
-    var f = 3/4
-    say f.class         # Sidef::Types::Number::Fraction
+    var f = Fraction(3, 4)
+    say f.class         # Fraction
 
-    var a = 1/2
-    var b = 1/3
+    var a = Fraction(1, 2)
+    var b = Fraction(1, 3)
 
-    say (a + b)         # 5/6
-    say (a - b)         # 1/6
-    say (a * b)         # 1/6
-    say (a / b)         # 3/2
+    say (a + b)         # Fraction(5, 6)
+    say (a - b)         # Fraction(1, 6)
+    say (a * b)         # Fraction(1, 6)
+    say (a / b)         # Fraction(3, 2)
 
     say f.numerator     # 3
     say f.denominator   # 4
@@ -31,17 +28,16 @@ Fractions are automatically created in Sidef when dividing two integers that res
 =head1 INHERITANCE
 
   Sidef::Types::Number::Fraction
-  isa Sidef::Types::Number::Number
-  isa Sidef::Object::Object
+  Sidef::Types::Number::Number
+  Sidef::Object::Object
 
 =head1 METHODS
 
 =head2 new
 
-    Number::Fraction(num, den)
+    Fraction(num, den)
 
-Creates a new Fraction object with the given numerator C<num> and denominator C<den>. 
-The fraction is automatically normalized (reduced to lowest terms) and the sign is applied to the numerator.
+Creates a new Fraction object with the given numerator C<num> and denominator C<den>.
 
 =head2 numerator
 
@@ -192,14 +188,14 @@ Returns true if the absolute value of the fraction is greater than or equal to 1
 
 Returns a list of three elements representing the mixed fraction: integer part, numerator of the remainder, and the denominator.
 
-    var f = 5/3
-    say f.as_mixed.dump   # [1, 2, 3]  (representing 1 2/3)
+    var f = Fraction(5, 3)
+    say f.as_mixed   # [1, 2, 3]  (representing 1 2/3)
 
 =head2 to_s
 
     f.to_s
 
-Returns the string representation of the fraction (e.g., "3/4").
+Returns the string representation of the fraction (e.g., "Fraction(3, 4)").
 
 =head2 dump
 
@@ -247,11 +243,11 @@ Additionally, standard boolean comparison operators (C<==>, C<!=>, C<< < >>, C<<
 
 =head1 AUTHOR
 
-Daniel " Trizen " Șuteu, E<lt>trizen@cpan.orgE<gt>
+Daniel "Trizen" Șuteu, E<lt>trizen@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2025 by Daniel " Trizen " Șuteu
+Copyright (C) 2013-2025 by Daniel "Trizen" Șuteu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.1 or,
