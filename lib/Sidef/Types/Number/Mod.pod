@@ -1,23 +1,38 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Number::Mod
+Sidef::Types::Number::Mod - Modular arithmetic in Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements modular arithmetic operations in Sidef. A Mod object represents an integer modulo some modulus, allowing efficient computation of arithmetic operations in modular rings. This is particularly useful in number theory, cryptography, and computational mathematics.
+
+The Mod class supports standard arithmetic operations (addition, subtraction, multiplication, division, exponentiation) as well as specialized number-theoretic functions (modular square roots, multiplicative order, etc.), all performed modulo a specified modulus.
 
 =head1 SYNOPSIS
 
-    var a = Mod(13, 19)
+    var a = Mod(13, 19)     # 13 modulo 19
 
-    a += 15         # Mod(9, 19)
-    a *= 99         # Mod(17, 19)
-    a /= 17         # Mod(1, 19)
+    a += 15                 # Mod(9, 19)  -- (13 + 15) mod 19
+    a *= 99                 # Mod(17, 19) -- (9 * 99) mod 19
+    a /= 17                 # Mod(1, 19)  -- (17 * 17^(-1)) mod 19
 
-    say a           # Mod(1, 19)
+    say a                   # Mod(1, 19)
+
+    # Modular exponentiation
+    var b = Mod(2, 1000)
+    say b**100              # Mod(376, 1000) -- 2^100 mod 1000
+
+    # Modular inverse
+    var c = Mod(3, 7)
+    say c.inv               # Mod(5, 7)  -- 3 * 5 ≡ 1 (mod 7)
+
+    # Chinese Remainder Theorem
+    var x = Mod(2, 3)
+    var y = Mod(3, 5)
+    var z = Mod(2, 7)
+    say [x, y, z].chinese   # Mod(23, 105)
 
 =head1 INHERITS
 
@@ -27,476 +42,656 @@ Inherits methods from:
 
 =head1 METHODS
 
-=head2 !
+=head2 new
 
-    a ! b
+    Mod(n, m)
+    Mod.new(n, m)
 
-Returns the
+Creates a new Mod object representing the integer B<n> modulo B<m>. The value is automatically reduced so that 0 ≤ n < m.
 
-Aliases: I<factorial>
+    var a = Mod(17, 5)      # Mod(2, 5)
+    var b = Mod(-3, 7)      # Mod(4, 7)
 
-=cut
+If called on an existing Mod object, it evaluates a polynomial at the given point.
 
-=head2 !=
+Aliases: I<call>
 
-    a != b
+=head2 to_n
 
-Returns the
+    x.to_n
 
-Aliases: I<ne>
+Returns the underlying integer value (the residue) of the modular number, without the modulus information.
 
-=cut
+    var a = Mod(17, 5)
+    say a.to_n              # 2
 
-=head2 &
+Aliases: I<lift>
 
-    a & b
+=head2 modulus
 
-Returns the
+    x.modulus
 
-Aliases: I<and>
+Returns the modulus of the modular number.
 
-=cut
+    var a = Mod(17, 5)
+    say a.modulus           # 5
 
-=head2 *
+=head2 re
 
-    a * b
+    x.re
 
-Returns the
+Returns the real part of the modular number. For a non-zero residue, returns the residue itself; for zero, returns the modulus.
 
-Aliases: I<mul>
+    var a = Mod(3, 7)
+    say a.re                # 3
 
-=cut
+    var b = Mod(0, 7)
+    say b.re                # 7
 
-=head2 **
+Aliases: I<real>
 
-    a ** b
+=head2 norm
 
-Returns the
+    x.norm
 
-Aliases: I<pow>
-
-=cut
+Returns the norm (absolute value) of the real part of the modular number.
 
 =head2 +
 
     a + b
 
-Returns the
+Adds two modular numbers or adds an integer to a modular number. The result is reduced modulo the modulus of B<a>.
+
+    var a = Mod(10, 13)
+    say a + 5               # Mod(2, 13)  -- (10 + 5) mod 13
 
 Aliases: I<add>
-
-=cut
-
-=head2 ++
-
-    a ++ b
-
-Returns the
-
-Aliases: I<inc>
-
-=cut
 
 =head2 -
 
     a - b
 
-Returns the
+Subtracts two modular numbers or subtracts an integer from a modular number.
+
+    var a = Mod(3, 10)
+    say a - 5               # Mod(8, 10)  -- (3 - 5) mod 10
 
 Aliases: I<sub>
 
-=cut
+=head2 *
 
-=head2 --
+    a * b
 
-    a -- b
+Multiplies two modular numbers or multiplies a modular number by an integer.
 
-Returns the
+    var a = Mod(7, 13)
+    say a * 4               # Mod(2, 13)  -- (7 * 4) mod 13
 
-Aliases: I<dec>
-
-=cut
+Aliases: I<mul>
 
 =head2 /
 
     a / b
 
-Returns the
+Divides a modular number by another. This computes a * b^(-1) (mod m), where b^(-1) is the modular inverse of b.
+
+    var a = Mod(10, 13)
+    say a / 2               # Mod(5, 13)  -- 10 * 2^(-1) mod 13
+
+Raises an error if B<b> has no modular inverse (i.e., if gcd(b, m) ≠ 1).
 
 Aliases: I<÷>, I<div>
 
-=cut
+=head2 **
 
-=head2 <
+    a ** b
 
-    a < b
+Computes modular exponentiation: a^b (mod m). Uses efficient binary exponentiation.
 
-Returns the
+    var a = Mod(2, 1000)
+    say a ** 100            # Mod(376, 1000)
 
-Aliases: I<lt>
+Aliases: I<pow>
 
-=cut
+=head2 ++
 
-=head2 <<
+    a++
+    ++a
 
-    a << b
+Increments the modular number by 1.
 
-Returns the
+    var a = Mod(12, 13)
+    say ++a                 # Mod(0, 13)
 
-Aliases: I<lsft>, I<shift_left>
+Aliases: I<inc>
 
-=cut
+=head2 --
 
-=head2 <=>
+    a--
+    --a
 
-    a <=> b
+Decrements the modular number by 1.
 
-Returns the
+    var a = Mod(0, 13)
+    say --a                 # Mod(12, 13)
 
-Aliases: I<cmp>
+Aliases: I<dec>
 
-=cut
+=head2 neg
 
-=head2 ==
+    x.neg
+    -x
 
-    a == b
+Returns the additive inverse (negation) of the modular number.
 
-Returns the
-
-Aliases: I<eq>
-
-=cut
-
-=head2 >
-
-    a > b
-
-Returns the
-
-Aliases: I<gt>
-
-=cut
-
-=head2 >>
-
-    a >> b
-
-Returns the
-
-Aliases: I<rsft>, I<shift_right>
-
-=cut
-
-=head2 ^
-
-    a ^ b
-
-Returns the
-
-Aliases: I<xor>
-
-=cut
-
-=head2 |
-
-    a | b
-
-Returns the
-
-Aliases: I<or>
-
-=cut
-
-=head2 ≤
-
-    a ≤ b
-
-Returns the
-
-Aliases: I<E<lt>=>, I<le>
-
-=cut
-
-=head2 ≥
-
-    a ≥ b
-
-Returns the
-
-Aliases: I<E<gt>=>, I<ge>
-
-=cut
+    var a = Mod(3, 7)
+    say a.neg               # Mod(4, 7)  -- (-3) mod 7
 
 =head2 abs
 
     x.abs
 
-Returns the
+Returns the absolute value of the underlying residue (as a regular integer, not a Mod object).
 
-=cut
-
-=head2 chebyshevt
-
-    x.chebyshevt(n)
-
-Returns the
-
-Aliases: I<chebyshevT>
-
-=cut
-
-=head2 chebyshevu
-
-    x.chebyshevu(n)
-
-Returns the
-
-Aliases: I<chebyshevU>
-
-=cut
-
-=head2 chinese
-
-    *values.chinese
-
-Returns the
-
-=cut
-
-=head2 cyclotomic
-
-    x.cyclotomic(n)
-
-Returns the
-
-=cut
-
-=head2 dump
-
-    x.dump
-
-Returns the
-
-=cut
-
-=head2 eval
-
-    x.eval(v)
-
-Returns the
-
-=cut
-
-=head2 fib
-
-    x.fib
-
-Returns the
-
-Aliases: I<fibonacci>
-
-=cut
+    var a = Mod(3, 7)
+    say a.abs               # 3
 
 =head2 inv
 
     x.inv
 
-Returns the
+Returns the multiplicative inverse of the modular number. If x ≡ a (mod m), returns y such that a * y ≡ 1 (mod m).
 
-=cut
+    var a = Mod(3, 7)
+    say a.inv               # Mod(5, 7)  -- 3 * 5 ≡ 1 (mod 7)
 
-=head2 is_inf
-
-    self.is_inf
-
-Returns the
-
-=cut
-
-=head2 is_mone
-
-    x.is_mone
-
-Returns the
-
-=cut
-
-=head2 is_nan
-
-    self.is_nan
-
-Returns the
-
-=cut
-
-=head2 is_neg
-
-    self.is_neg
-
-Returns the
-
-=cut
-
-=head2 is_ninf
-
-    self.is_ninf
-
-Returns the
-
-=cut
-
-=head2 is_one
-
-    x.is_one
-
-Returns the
-
-=cut
-
-=head2 is_pos
-
-    self.is_pos
-
-Returns the
-
-=cut
-
-=head2 is_real
-
-    self.is_real
-
-Returns the
-
-=cut
-
-=head2 is_zero
-
-    x.is_zero
-
-Returns the
-
-=cut
-
-=head2 lucas
-
-    x.lucas
-
-Returns the
-
-=cut
-
-=head2 lucasu
-
-    x.lucasu(P, Q)
-
-Returns the
-
-Aliases: I<lucasU>
-
-=cut
-
-=head2 lucasv
-
-    x.lucasv(P, Q)
-
-Returns the
-
-Aliases: I<lucasV>
-
-=cut
-
-=head2 modulus
-
-    self.modulus
-
-Returns the
-
-=cut
-
-=head2 neg
-
-    x.neg
-
-Returns the
-
-=cut
-
-=head2 new
-
-    self.new
-
-Returns the
-
-Aliases: I<call>
-
-=cut
-
-=head2 norm
-
-    self.norm
-
-Returns the
-
-=cut
-
-=head2 pretty
-
-    x.pretty
-
-Returns the
-
-=cut
-
-=head2 re
-
-    self.re
-
-Returns the
-
-Aliases: I<real>
-
-=cut
+Raises an error if the number has no inverse (i.e., if gcd(a, m) ≠ 1).
 
 =head2 sqr
 
     x.sqr
 
-Returns the
+Returns the square of the modular number.
 
-=cut
+    var a = Mod(5, 13)
+    say a.sqr               # Mod(12, 13)  -- 5^2 mod 13
 
 =head2 sqrt
 
     x.sqrt
 
-Returns the
+Returns a modular square root of the number. If x^2 ≡ a (mod m), returns one value of x.
 
-=cut
+    var a = Mod(4, 13)
+    say a.sqrt              # Mod(2, 13) or Mod(11, 13)
 
-=head2 to_n
+May not return a result if no square root exists modulo m.
 
-    self.to_n
+=head2 !
 
-Returns the
+    x!
+    x.factorial
 
-Aliases: I<lift>
+Computes the factorial of the modular number's residue, reduced modulo m: x! (mod m).
 
-=cut
+    var a = Mod(5, 13)
+    say a!                  # Mod(3, 13)  -- 5! = 120 ≡ 3 (mod 13)
 
-=head2 to_s
+Aliases: I<factorial>
 
-    x.to_s
+=head2 ==
 
-Returns the
+    a == b
 
-=cut
+Tests if two modular numbers are equal (have the same residue modulo the modulus of B<a>).
+
+    var a = Mod(15, 7)
+    var b = Mod(1, 7)
+    say (a == b)            # true  -- 15 ≡ 1 (mod 7)
+
+Aliases: I<eq>
+
+=head2 !=
+
+    a != b
+
+Tests if two modular numbers are not equal.
+
+    var a = Mod(5, 7)
+    var b = Mod(3, 7)
+    say (a != b)            # true
+
+Aliases: I<ne>
+
+=head2 <
+
+    a < b
+
+Compares the underlying residues of two modular numbers.
+
+    var a = Mod(2, 7)
+    var b = Mod(5, 7)
+    say (a < b)             # true
+
+Aliases: I<lt>
+
+=head2 >
+
+    a > b
+
+Compares the underlying residues: returns true if a's residue is greater than b's.
+
+    var a = Mod(6, 11)
+    var b = Mod(3, 11)
+    say (a > b)             # true
+
+Aliases: I<gt>
+
+=head2 ≤
+
+    a ≤ b
+
+Less than or equal comparison of underlying residues.
+
+    var a = Mod(3, 7)
+    var b = Mod(3, 7)
+    say (a ≤ b)             # true
+
+Aliases: I<E<lt>=>, I<le>
+
+=head2 ≥
+
+    a ≥ b
+
+Greater than or equal comparison of underlying residues.
+
+Aliases: I<E<gt>=>, I<ge>
+
+=head2 <=>
+
+    a <=> b
+
+Three-way comparison operator. Returns -1, 0, or 1 depending on whether a's residue is less than, equal to, or greater than b's residue.
+
+    var a = Mod(5, 13)
+    var b = Mod(8, 13)
+    say (a <=> b)           # -1
+
+Aliases: I<cmp>
+
+=head2 &
+
+    a & b
+
+Bitwise AND operation on the underlying residues, with the result reduced modulo a's modulus.
+
+    var a = Mod(12, 100)    # binary: 1100
+    var b = Mod(10, 100)    # binary: 1010
+    say (a & b)             # Mod(8, 100)  -- binary: 1000
+
+Aliases: I<and>
+
+=head2 |
+
+    a | b
+
+Bitwise OR operation on the underlying residues, with the result reduced modulo a's modulus.
+
+    var a = Mod(12, 100)    # binary: 1100
+    var b = Mod(10, 100)    # binary: 1010
+    say (a | b)             # Mod(14, 100)  -- binary: 1110
+
+Aliases: I<or>
+
+=head2 ^
+
+    a ^ b
+
+Bitwise XOR operation on the underlying residues, with the result reduced modulo a's modulus.
+
+    var a = Mod(12, 100)    # binary: 1100
+    var b = Mod(10, 100)    # binary: 1010
+    say (a ^ b)             # Mod(6, 100)  -- binary: 0110
+
+Aliases: I<xor>
+
+=head2 <<
+
+    a << b
+
+Left bit shift operation: multiplies a by 2^b, reduced modulo a's modulus.
+
+    var a = Mod(5, 100)
+    say (a << 3)            # Mod(40, 100)  -- 5 * 2^3
+
+Aliases: I<lsft>, I<shift_left>
+
+=head2 >>
+
+    a >> b
+
+Right bit shift operation: divides a by 2^b, reduced modulo a's modulus.
+
+    var a = Mod(40, 100)
+    say (a >> 3)            # Mod(5, 100)  -- 40 / 2^3
+
+Aliases: I<rsft>, I<shift_right>
+
+=head2 is_zero
+
+    x.is_zero
+
+Returns true if the modular number's residue is zero.
+
+    var a = Mod(0, 7)
+    say a.is_zero           # true
+
+    var b = Mod(7, 7)
+    say b.is_zero           # true  -- 7 ≡ 0 (mod 7)
+
+=head2 is_one
+
+    x.is_one
+
+Returns true if the modular number's residue is one.
+
+    var a = Mod(1, 7)
+    say a.is_one            # true
+
+=head2 is_mone
+
+    x.is_mone
+
+Returns true if the modular number's residue is minus one (or equivalently, m-1).
+
+    var a = Mod(-1, 7)
+    say a.is_mone           # true  -- -1 ≡ 6 (mod 7)
+
+=head2 is_neg
+
+    x.is_neg
+
+Returns true if the underlying residue is considered negative (inherited from the Number class behavior).
+
+=head2 is_pos
+
+    x.is_pos
+
+Returns true if the underlying residue is considered positive (inherited from the Number class behavior).
+
+=head2 is_nan
+
+    x.is_nan
+
+Returns true if the underlying residue is NaN (Not a Number).
+
+=head2 is_inf
+
+    x.is_inf
+
+Returns true if the underlying residue is positive infinity.
+
+=head2 is_ninf
+
+    x.is_ninf
+
+Returns true if the underlying residue is negative infinity.
+
+=head2 is_real
+
+    x.is_real
+
+Returns true if the underlying residue is a real number (typically always true for valid Mod objects).
 
 =head2 znorder
 
     x.znorder
 
-Returns the
+Computes the multiplicative order of x modulo m. This is the smallest positive integer k such that x^k ≡ 1 (mod m).
+
+    var a = Mod(2, 7)
+    say a.znorder           # 3  -- 2^3 ≡ 1 (mod 7)
+
+The element must be coprime to the modulus.
 
 Aliases: I<multiplicative_order>
+
+=head2 chinese
+
+    [m1, m2, m3, ...].chinese
+
+Applies the Chinese Remainder Theorem to solve a system of modular congruences. Given Mod objects representing x ≡ a₁ (mod m₁), x ≡ a₂ (mod m₂), etc., returns a single Mod object representing the solution.
+
+    var a = Mod(2, 3)       # x ≡ 2 (mod 3)
+    var b = Mod(3, 5)       # x ≡ 3 (mod 5)
+    var c = Mod(2, 7)       # x ≡ 2 (mod 7)
+    
+    say [a, b, c].chinese   # Mod(23, 105)
+                            # 23 ≡ 2 (mod 3)
+                            # 23 ≡ 3 (mod 5)
+                            # 23 ≡ 2 (mod 7)
+
+The moduli should be pairwise coprime for a unique solution.
+
+=head2 fib
+
+    x.fib
+
+Computes the x-th Fibonacci number modulo m: F(x) (mod m).
+
+    var a = Mod(10, 100)
+    say a.fib               # Mod(55, 100)  -- F(10) = 55
+
+Aliases: I<fibonacci>
+
+=head2 lucas
+
+    x.lucas
+
+Computes the x-th Lucas number modulo m: L(x) (mod m).
+
+    var a = Mod(10, 1000)
+    say a.lucas             # Mod(123, 1000)  -- L(10) = 123
+
+=head2 lucasu
+
+    x.lucasu(P, Q)
+
+Computes the x-th Lucas U sequence value with parameters P and Q, modulo m: U(P,Q,x) (mod m).
+
+    var a = Mod(10, 1000)
+    say a.lucasu(1, -1)     # Equivalent to Fibonacci
+
+Aliases: I<lucasU>
+
+=head2 lucasv
+
+    x.lucasv(P, Q)
+
+Computes the x-th Lucas V sequence value with parameters P and Q, modulo m: V(P,Q,x) (mod m).
+
+    var a = Mod(10, 1000)
+    say a.lucasv(1, -1)     # Equivalent to Lucas numbers
+
+Aliases: I<lucasV>
+
+=head2 chebyshevt
+
+    x.chebyshevt(n)
+
+Evaluates the n-th Chebyshev polynomial of the first kind at x, modulo m: T_n(x) (mod m).
+
+    var a = Mod(2, 100)
+    say a.chebyshevt(5)     # T_5(2) mod 100
+
+Aliases: I<chebyshevT>
+
+=head2 chebyshevu
+
+    x.chebyshevu(n)
+
+Evaluates the n-th Chebyshev polynomial of the second kind at x, modulo m: U_n(x) (mod m).
+
+    var a = Mod(2, 100)
+    say a.chebyshevu(5)     # U_5(2) mod 100
+
+Aliases: I<chebyshevU>
+
+=head2 cyclotomic
+
+    x.cyclotomic(n)
+
+Evaluates the n-th cyclotomic polynomial at x, modulo m: Φ_n(x) (mod m).
+
+    var a = Mod(2, 100)
+    say a.cyclotomic(5)     # Φ_5(2) mod 100
+
+=head2 eval
+
+    x.eval(v)
+
+Evaluates a polynomial (if x represents one) at the value v, with the result computed modulo m.
+
+This is used when the Mod object contains a polynomial instead of a simple integer.
+
+=head2 to_s
+
+    x.to_s
+
+Returns a string representation of the modular number in the form "Mod(n, m)".
+
+    var a = Mod(17, 5)
+    say a.to_s              # "Mod(2, 5)"
+
+=head2 dump
+
+    x.dump
+
+Returns a detailed string representation of the modular number, including dump representations of both the residue and modulus.
+
+    var a = Mod(17, 5)
+    say a.dump              # "Mod(2, 5)"
+
+=head2 pretty
+
+    x.pretty
+
+Returns a formatted string representation of the modular number.
+
+    var a = Mod(17, 5)
+    say a.pretty            # "Mod(2, 5)"
+
+=head1 MATHEMATICAL BACKGROUND
+
+=head2 Modular Arithmetic
+
+In modular arithmetic, numbers "wrap around" upon reaching a certain value called the modulus. Two integers a and b are said to be congruent modulo m if their difference is divisible by m, written as:
+
+    a ≡ b (mod m)
+
+=head2 Operations
+
+All standard arithmetic operations in the Mod class are performed modulo m:
+
+=over 4
+
+=item * B<Addition>: (a + b) mod m
+
+=item * B<Subtraction>: (a - b) mod m
+
+=item * B<Multiplication>: (a * b) mod m
+
+=item * B<Division>: a * b^(-1) mod m (where b^(-1) is the modular inverse of b)
+
+=item * B<Exponentiation>: a^b mod m
+
+=back
+
+=head2 Modular Inverse
+
+An integer a has a multiplicative inverse modulo m if and only if gcd(a, m) = 1. The inverse a^(-1) satisfies:
+
+    a * a^(-1) ≡ 1 (mod m)
+
+=head2 Chinese Remainder Theorem
+
+If m₁, m₂, ..., m_k are pairwise coprime, then the system of congruences:
+
+    x ≡ a₁ (mod m₁)
+    x ≡ a₂ (mod m₂)
+    ...
+    x ≡ a_k (mod m_k)
+
+has a unique solution modulo M = m₁ * m₂ * ... * m_k.
+
+=head1 EXAMPLES
+
+=head2 Basic Arithmetic
+
+    var a = Mod(7, 12)
+    var b = Mod(5, 12)
+    
+    say a + b               # Mod(0, 12)   -- 7 + 5 = 12 ≡ 0 (mod 12)
+    say a * b               # Mod(11, 12)  -- 7 * 5 = 35 ≡ 11 (mod 12)
+    say a - b               # Mod(2, 12)   -- 7 - 5 = 2
+
+=head2 Modular Exponentiation
+
+    # Compute 2^100 mod 1000
+    var x = Mod(2, 1000)
+    say x ** 100            # Mod(376, 1000)
+
+=head2 Solving Linear Congruences
+
+    # Solve: 3x ≡ 7 (mod 11)
+    var a = Mod(7, 11)
+    var b = Mod(3, 11)
+    say a / b               # Mod(6, 11)  -- solution: x = 6
+    # Verify: 3 * 6 = 18 ≡ 7 (mod 11) ✓
+
+=head2 Finding Multiplicative Order
+
+    # Find the order of 2 modulo 15
+    var a = Mod(2, 15)
+    say a.znorder           # 4  -- 2^4 = 16 ≡ 1 (mod 15)
+
+=head2 Chinese Remainder Theorem
+
+    # Solve the system:
+    # x ≡ 2 (mod 3)
+    # x ≡ 3 (mod 4)
+    # x ≡ 1 (mod 5)
+    
+    var crt = [Mod(2, 3), Mod(3, 4), Mod(1, 5)].chinese
+    say crt                 # Mod(11, 60)
+    # Verify: 11 mod 3 = 2 ✓
+    #         11 mod 4 = 3 ✓
+    #         11 mod 5 = 1 ✓
+
+=head2 Fibonacci Numbers Modulo m
+
+    # Compute F(100) mod 1000
+    var n = Mod(100, 1000)
+    say n.fib               # Mod(..., 1000)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Number::Number>
+
+=item * L<Sidef::Types::Number::Gauss>
+
+=item * L<Sidef::Math::Math>
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut
