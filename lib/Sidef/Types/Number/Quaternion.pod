@@ -1,24 +1,45 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Number::Quaternion
+Sidef::Types::Number::Quaternion - Quaternion number implementation
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements quaternions, which are an extension of complex numbers. A quaternion has four components and can be written as C<a + bi + cj + dk>, where C<a, b, c, d> are real numbers and C<i, j, k> are the fundamental quaternion units satisfying:
+
+    i² = j² = k² = ijk = -1
+
+Quaternions are particularly useful in 3D graphics, robotics, and physics for representing rotations and orientations. Note that quaternion multiplication is non-commutative (C<a*b ≠ b*a> in general).
 
 =head1 SYNOPSIS
 
-    var a = Quaternion(1,2,3,4)
-    var b = Quaternion(5,6,7,8)
+    var a = Quaternion(1, 2, 3, 4)
+    var b = Quaternion(5, 6, 7, 8)
 
     say a+b     #=> Quaternion(6, 8, 10, 12)
     say a-b     #=> Quaternion(-4, -4, -4, -4)
     say a*b     #=> Quaternion(-60, 12, 30, 24)
-    say b*a     #=> Quaternion(-60, 20, 14, 32)
+    say b*a     #=> Quaternion(-60, 20, 14, 32)  # Note: multiplication is non-commutative
     say a/b     #=> Quaternion(35/87, 4/87, 0, 8/87)
+    
+    # Basic operations
+    say a.abs        #=> 5.477225575051661  (magnitude)
+    say a.norm       #=> 30                  (squared magnitude)
+    say a.conj       #=> Quaternion(1, -2, -3, -4)  (conjugate)
+    say a.inv        #=> multiplicative inverse
+    
+    # Component access
+    say a.a          #=> 1  (real part)
+    say a.b          #=> 2  (i coefficient)
+    say a.c          #=> 3  (j coefficient)
+    say a.d          #=> 4  (k coefficient)
+    say a.parts      #=> [1, 2, 3, 4]
+    
+    # Power and modular operations
+    say a**3         #=> a cubed
+    say a.sqr        #=> a squared
+    say a.powmod(5, 100)  #=> (a^5) mod 100
 
 =head1 INHERITS
 
@@ -32,7 +53,7 @@ Inherits methods from:
 
     a != b
 
-Returns the
+Returns true if quaternions C<a> and C<b> are not equal, false otherwise. Two quaternions are equal if all four components are equal.
 
 Aliases: I<ne>
 
@@ -42,7 +63,7 @@ Aliases: I<ne>
 
     a % b
 
-Returns the
+Returns the remainder of C<a> divided by C<b>. When C<b> is a scalar, applies modulo operation to each component. When C<b> is a quaternion, computes C<a - b * floor(a/b)>.
 
 Aliases: I<mod>
 
@@ -52,7 +73,7 @@ Aliases: I<mod>
 
     a & b
 
-Returns the
+Returns the bitwise AND of quaternions C<a> and C<b>. If C<b> is a quaternion, applies AND component-wise. If C<b> is a scalar, applies AND only to the real part.
 
 Aliases: I<and>
 
@@ -62,7 +83,14 @@ Aliases: I<and>
 
     a * b
 
-Returns the
+Returns the product of C<a> and C<b> using quaternion multiplication. Note that quaternion multiplication is non-commutative (C<a*b> may not equal C<b*a>). If C<b> is a scalar, scales all components by C<b>.
+
+The quaternion product formula is:
+    (a₁ + b₁i + c₁j + d₁k)(a₂ + b₂i + c₂j + d₂k) = 
+    (a₁a₂ - b₁b₂ - c₁c₂ - d₁d₂) + 
+    (a₁b₂ + b₁a₂ + c₁d₂ - d₁c₂)i +
+    (a₁c₂ - b₁d₂ + c₁a₂ + d₁b₂)j +
+    (a₁d₂ + b₁c₂ - c₁b₂ + d₁a₂)k
 
 Aliases: I<mul>
 
@@ -72,7 +100,7 @@ Aliases: I<mul>
 
     a ** b
 
-Returns the
+Returns C<a> raised to the power C<b>. For integer exponents, uses efficient binary exponentiation. For non-integer exponents, converts to complex number representation first.
 
 Aliases: I<pow>
 
@@ -82,7 +110,7 @@ Aliases: I<pow>
 
     a + b
 
-Returns the
+Returns the sum of C<a> and C<b>. Addition is performed component-wise. If C<b> is a scalar, adds it only to the real part.
 
 Aliases: I<add>
 
@@ -90,9 +118,9 @@ Aliases: I<add>
 
 =head2 ++
 
-    a ++ b
+    a++
 
-Returns the
+Returns the quaternion C<a> incremented by 1 (adds 1 to the real part only).
 
 Aliases: I<inc>
 
@@ -102,7 +130,7 @@ Aliases: I<inc>
 
     a - b
 
-Returns the
+Returns the difference of C<a> and C<b>. Subtraction is performed component-wise. If C<b> is a scalar, subtracts it only from the real part.
 
 Aliases: I<sub>
 
@@ -110,9 +138,9 @@ Aliases: I<sub>
 
 =head2 --
 
-    a -- b
+    a--
 
-Returns the
+Returns the quaternion C<a> decremented by 1 (subtracts 1 from the real part only).
 
 Aliases: I<dec>
 
@@ -122,7 +150,7 @@ Aliases: I<dec>
 
     a / b
 
-Returns the
+Returns the quotient of C<a> divided by C<b>, computed as C<a * b.inv()>.
 
 Aliases: I<÷>, I<div>
 
@@ -132,7 +160,7 @@ Aliases: I<÷>, I<div>
 
     a < b
 
-Returns the
+Returns true if quaternion C<a> is less than C<b> based on lexicographic ordering (comparing components in order: a, b, c, d).
 
 Aliases: I<lt>
 
@@ -142,7 +170,7 @@ Aliases: I<lt>
 
     a << b
 
-Returns the
+Returns C<a> multiplied by C<2^b> (left shift, equivalent to C<a * 2**b>).
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -152,7 +180,7 @@ Aliases: I<lsft>, I<shift_left>
 
     a <=> b
 
-Returns the
+Returns -1, 0, or 1 depending on whether C<a> is less than, equal to, or greater than C<b> using lexicographic ordering. Returns undef if comparison is not defined.
 
 Aliases: I<cmp>
 
@@ -162,7 +190,7 @@ Aliases: I<cmp>
 
     a == b
 
-Returns the
+Returns true if quaternions C<a> and C<b> are equal (all components match), false otherwise.
 
 Aliases: I<eq>
 
@@ -172,7 +200,7 @@ Aliases: I<eq>
 
     a > b
 
-Returns the
+Returns true if quaternion C<a> is greater than C<b> based on lexicographic ordering.
 
 Aliases: I<gt>
 
@@ -182,7 +210,7 @@ Aliases: I<gt>
 
     a >> b
 
-Returns the
+Returns C<a> divided by C<2^b> (right shift, equivalent to C<a / 2**b>).
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -192,7 +220,7 @@ Aliases: I<rsft>, I<shift_right>
 
     a ^ b
 
-Returns the
+Returns the bitwise XOR of quaternions C<a> and C<b>. If C<b> is a quaternion, applies XOR component-wise. If C<b> is a scalar, applies XOR only to the real part.
 
 Aliases: I<xor>
 
@@ -202,7 +230,7 @@ Aliases: I<xor>
 
     a | b
 
-Returns the
+Returns the bitwise OR of quaternions C<a> and C<b>. If C<b> is a quaternion, applies OR component-wise. If C<b> is a scalar, applies OR only to the real part.
 
 Aliases: I<or>
 
@@ -212,7 +240,7 @@ Aliases: I<or>
 
     a ≤ b
 
-Returns the
+Returns true if quaternion C<a> is less than or equal to C<b> based on lexicographic ordering.
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -222,7 +250,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Returns the
+Returns true if quaternion C<a> is greater than or equal to C<b> based on lexicographic ordering.
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -232,7 +260,9 @@ Aliases: I<E<gt>=>, I<ge>
 
     self.a
 
-Returns the
+Returns the real component (first component) of the quaternion. This is the coefficient of the scalar part.
+
+    Quaternion(1, 2, 3, 4).a  #=> 1
 
 Aliases: I<re>, I<real>
 
@@ -242,7 +272,11 @@ Aliases: I<re>, I<real>
 
     x.abs
 
-Returns the
+Returns the absolute value (magnitude or modulus) of the quaternion, computed as the square root of the norm:
+
+    |q| = √(a² + b² + c² + d²)
+
+    Quaternion(1, 2, 3, 4).abs  #=> 5.477225575051661
 
 =cut
 
@@ -250,7 +284,9 @@ Returns the
 
     self.b
 
-Returns the
+Returns the second component of the quaternion (coefficient of i).
+
+    Quaternion(1, 2, 3, 4).b  #=> 2
 
 =cut
 
@@ -258,7 +294,9 @@ Returns the
 
     self.c
 
-Returns the
+Returns the third component of the quaternion (coefficient of j).
+
+    Quaternion(1, 2, 3, 4).c  #=> 3
 
 =cut
 
@@ -266,7 +304,9 @@ Returns the
 
     x.ceil
 
-Returns the
+Returns a new quaternion with each component rounded up to the nearest integer.
+
+    Quaternion(1.2, 2.7, 3.1, 4.9).ceil  #=> Quaternion(2, 3, 4, 5)
 
 =cut
 
@@ -274,7 +314,13 @@ Returns the
 
     x.conj
 
-Returns the
+Returns the conjugate of the quaternion. The conjugate negates the i, j, and k components while keeping the real part unchanged:
+
+    conj(a + bi + cj + dk) = a - bi - cj - dk
+
+    Quaternion(1, 2, 3, 4).conj  #=> Quaternion(1, -2, -3, -4)
+
+The conjugate is useful for division and finding the inverse.
 
 =cut
 
@@ -282,7 +328,9 @@ Returns the
 
     self.d
 
-Returns the
+Returns the fourth component of the quaternion (coefficient of k).
+
+    Quaternion(1, 2, 3, 4).d  #=> 4
 
 =cut
 
@@ -290,7 +338,9 @@ Returns the
 
     x.dump
 
-Returns the
+Returns a string representation of the quaternion in the form C<"Quaternion(a, b, c, d)">.
+
+    Quaternion(1, 2, 3, 4).dump  #=> "Quaternion(1, 2, 3, 4)"
 
 =cut
 
@@ -298,7 +348,7 @@ Returns the
 
     x.eval(v)
 
-Returns the
+Evaluates the quaternion by substituting value C<v> into each component (useful when components are symbolic expressions or polynomials).
 
 =cut
 
@@ -306,7 +356,7 @@ Returns the
 
     x.float
 
-Returns the
+Returns a new quaternion with each component converted to floating-point representation.
 
 =cut
 
@@ -314,7 +364,9 @@ Returns the
 
     x.floor
 
-Returns the
+Returns a new quaternion with each component rounded down to the nearest integer.
+
+    Quaternion(1.2, 2.7, 3.1, 4.9).floor  #=> Quaternion(1, 2, 3, 4)
 
 =cut
 
@@ -322,7 +374,14 @@ Returns the
 
     x.inv
 
-Returns the
+Returns the multiplicative inverse of the quaternion. The inverse is computed as:
+
+    q⁻¹ = conj(q) / norm(q)
+
+where norm(q) = a² + b² + c² + d².
+
+    var q = Quaternion(1, 2, 3, 4)
+    say q * q.inv  #=> Quaternion(1, 0, 0, 0)  (approximately)
 
 =cut
 
@@ -330,7 +389,7 @@ Returns the
 
     x.invmod(m)
 
-Returns the
+Returns the modular multiplicative inverse of quaternion C<x> modulo C<m>. This finds a quaternion C<y> such that C<(x * y) mod m = 1>.
 
 =cut
 
@@ -338,7 +397,7 @@ Returns the
 
     n.is_coprime(k)
 
-Returns the
+Returns true if quaternions C<n> and C<k> are coprime, meaning C<gcd(norm(n), norm(k)) = 1>.
 
 =cut
 
@@ -346,7 +405,7 @@ Returns the
 
     x.is_mone
 
-Returns the
+Returns true if the quaternion equals -1 (i.e., C<Quaternion(-1, 0, 0, 0)>).
 
 =cut
 
@@ -354,7 +413,7 @@ Returns the
 
     x.is_one
 
-Returns the
+Returns true if the quaternion equals 1 (i.e., C<Quaternion(1, 0, 0, 0)>).
 
 =cut
 
@@ -362,7 +421,7 @@ Returns the
 
     x.is_zero
 
-Returns the
+Returns true if the quaternion equals 0 (i.e., C<Quaternion(0, 0, 0, 0)>).
 
 =cut
 
@@ -370,7 +429,7 @@ Returns the
 
     x.lift
 
-Returns the
+Applies the lift operation to each component of the quaternion (useful for symbolic computations).
 
 =cut
 
@@ -378,15 +437,22 @@ Returns the
 
     x.neg
 
-Returns the
+Returns the negation of the quaternion (negates all four components).
+
+    Quaternion(1, 2, 3, 4).neg  #=> Quaternion(-1, -2, -3, -4)
 
 =cut
 
 =head2 new
 
-    self.new
+    Quaternion.new(a, b, c, d)
+    Quaternion(a, b, c, d)
 
-Returns the
+Creates a new quaternion with components C<a, b, c, d>. All parameters default to 0 if not provided.
+
+    var q1 = Quaternion(1, 2, 3, 4)     # creates 1 + 2i + 3j + 4k
+    var q2 = Quaternion(5)              # creates 5 + 0i + 0j + 0k
+    var q3 = Quaternion()               # creates 0 + 0i + 0j + 0k
 
 Aliases: I<call>
 
@@ -396,7 +462,13 @@ Aliases: I<call>
 
     x.norm
 
-Returns the
+Returns the squared magnitude (norm) of the quaternion:
+
+    norm(q) = a² + b² + c² + d²
+
+    Quaternion(1, 2, 3, 4).norm  #=> 30
+
+Note: C<norm(q) = abs(q)²>
 
 =cut
 
@@ -404,7 +476,9 @@ Returns the
 
     self.parts
 
-Returns the
+Returns an array containing all four components of the quaternion C<[a, b, c, d]>.
+
+    Quaternion(1, 2, 3, 4).parts  #=> [1, 2, 3, 4]
 
 =cut
 
@@ -412,7 +486,7 @@ Returns the
 
     x.powmod(n, m)
 
-Returns the
+Returns C<(x^n) mod m> using efficient modular exponentiation. Uses binary exponentiation algorithm for integer exponents.
 
 =cut
 
@@ -420,7 +494,7 @@ Returns the
 
     x.pretty
 
-Returns the
+Returns a formatted string representation of the quaternion, converting it to Gaussian complex form for display.
 
 Aliases: I<stringify>
 
@@ -430,7 +504,9 @@ Aliases: I<stringify>
 
     self.reals
 
-Returns the
+Returns the four components as a list: C<(a, b, c, d)>.
+
+    var (w, x, y, z) = Quaternion(1, 2, 3, 4).reals
 
 =cut
 
@@ -438,7 +514,9 @@ Returns the
 
     x.round(r)
 
-Returns the
+Returns a new quaternion with each component rounded to C<r> decimal places (or to nearest integer if C<r> is not specified).
+
+    Quaternion(1.234, 2.567, 3.891, 4.123).round(1)  #=> Quaternion(1.2, 2.6, 3.9, 4.1)
 
 =cut
 
@@ -446,7 +524,11 @@ Returns the
 
     x.sgn
 
-Returns the
+Returns the sign (versor) of the quaternion, which is the unit quaternion in the same direction:
+
+    sgn(q) = q / |q|
+
+This is useful for extracting rotation information.
 
 =cut
 
@@ -454,7 +536,9 @@ Returns the
 
     x.sqr
 
-Returns the
+Returns the square of the quaternion (C<x * x>).
+
+    Quaternion(1, 2, 3, 4).sqr  #=> Quaternion(-28, 4, 6, 8)
 
 =cut
 
@@ -462,7 +546,7 @@ Returns the
 
     x.to_c
 
-Returns the
+Converts the quaternion to a complex number representation (via Gaussian integers). Returns a nested complex structure.
 
 Aliases: I<to_n>
 
@@ -472,7 +556,9 @@ Aliases: I<to_n>
 
     x.to_gauss
 
-Returns the
+Converts the quaternion to a representation using Gaussian integers (complex numbers with integer real and imaginary parts):
+
+    Quaternion(a, b, c, d) → Gauss(Gauss(a, b), Gauss(c, d))
 
 =cut
 
@@ -480,6 +566,65 @@ Returns the
 
     x.to_s
 
-Returns the
+Returns a string representation of the quaternion.
+
+=cut
+
+=head1 MATHEMATICAL PROPERTIES
+
+=head2 Quaternion Multiplication
+
+Quaternion multiplication follows these rules for the fundamental units:
+
+    i² = j² = k² = -1
+    ij = k,  jk = i,  ki = j
+    ji = -k, kj = -i, ik = -j
+
+This makes quaternion multiplication non-commutative.
+
+=head2 Norm Properties
+
+    norm(q₁ * q₂) = norm(q₁) * norm(q₂)
+    norm(q) = q * conj(q) = conj(q) * q
+
+=head2 Inverse
+
+    q * q⁻¹ = q⁻¹ * q = 1
+    q⁻¹ = conj(q) / norm(q)
+
+=head1 EXAMPLES
+
+    # Creating quaternions
+    var q1 = Quaternion(1, 0, 0, 0)    # Real quaternion
+    var q2 = Quaternion(0, 1, 0, 0)    # Pure imaginary (i)
+    var q3 = Quaternion(0, 0, 1, 0)    # Pure imaginary (j)
+    var q4 = Quaternion(0, 0, 0, 1)    # Pure imaginary (k)
+    
+    # Verifying fundamental properties
+    say q2**2                           #=> Quaternion(-1, 0, 0, 0)
+    say q2*q3                           #=> Quaternion(0, 0, 0, 1)  (= k)
+    say q3*q2                           #=> Quaternion(0, 0, 0, -1) (= -k)
+    
+    # Unit quaternion (rotation)
+    var angle = 90.deg2rad
+    var axis = [0, 0, 1]  # Z-axis
+    var w = cos(angle/2)
+    var (x, y, z) = axis.map { _ * sin(angle/2) }...
+    var rotation = Quaternion(w, x, y, z)
+    say rotation.norm      #=> 1 (unit quaternion)
+    
+    # Quaternion division
+    var a = Quaternion(1, 2, 3, 4)
+    var b = Quaternion(5, 6, 7, 8)
+    say a/b                #=> Quaternion(35/87, 4/87, 0, 8/87)
+    say (a/b)*b            #=> approximately equal to a
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Number::Number>, L<Sidef::Types::Number::Gauss>, L<Sidef::Types::Number::Complex>
+
+=head1 REFERENCES
+
+L<https://en.wikipedia.org/wiki/Quaternion>
 
 =cut
