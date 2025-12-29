@@ -5344,6 +5344,14 @@ package Sidef::Types::Number::Number {
         bless \__atan2__(_any2mpfr_mpc($$x), _any2mpfr_mpc($$y));
     }
 
+    sub arg {
+        my ($x) = @_;
+        $x->imag->atan2($x->real);
+    }
+
+    *phase = \&arg;
+    *angle = \&arg;
+
     #
     ## sec / sech / asec / asech
     #

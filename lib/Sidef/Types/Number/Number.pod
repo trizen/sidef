@@ -907,6 +907,14 @@ Equivalent with:
 
 =cut
 
+=head2 arg
+
+    z.arg
+    z.angle
+    z.phase
+
+Returns the argument (phase angle) of the complex number in radians.
+
 =head2 as_bin
 
     n.as_bin

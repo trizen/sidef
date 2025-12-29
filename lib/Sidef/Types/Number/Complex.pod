@@ -1,33 +1,283 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Number::Complex
+Sidef::Types::Number::Complex - Complex number support for Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements support for complex numbers in Sidef. It inherits from C<Sidef::Types::Number::Number>.
+
+Complex numbers are typically created using the imaginary unit C<i>, or by explicitly calling the constructor.
 
 =head1 SYNOPSIS
 
-var obj = Complex(...)
+    var z = 3+4i
+    say z.class         # Number
 
+    var a = 1+2i
+    var b = 1-2i
 
-=head1 INHERITS
+    say (a + b)         # 2
+    say (a - b)         # 4i
+    say (a * b)         # 5
+    say (a / b)         # -0.6 + 0.8i
 
-Inherits methods from:
+    say z.real          # 3
+    say z.imag          # 4
+    say z.abs           # 5
 
-       * Sidef::Types::Number::Number
+=head1 INHERITANCE
+
+  Sidef::Types::Number::Complex
+  isa Sidef::Types::Number::Number
+  isa Sidef::Object::Object
 
 =head1 METHODS
 
 =head2 new
 
-    self.new
+    Complex(real, imag)
 
-Returns the
+Creates a new Complex object with the given real part C<real> and imaginary part C<imag>.
 
-Aliases: I<call>
+=head2 real
+
+    z.real
+    z.re
+
+Returns the real part of the complex number.
+
+=head2 imag
+
+    z.imag
+    z.im
+
+Returns the imaginary part of the complex number.
+
+=head2 parts
+
+    z.parts
+
+Returns a list containing the real part and the imaginary part.
+
+    var z = 3+4i
+    var (r, i) = z.parts    # (3, 4)
+
+=head2 abs
+
+    z.abs
+    z.mag
+
+Returns the absolute value (magnitude) of the complex number ($|z| = \sqrt{a^2 + b^2}$).
+
+=head2 arg
+
+    z.arg
+    z.angle
+    z.phase
+
+Returns the argument (phase angle) of the complex number in radians.
+
+=head2 conj
+
+    z.conj
+
+Returns the complex conjugate of the number ($\bar{z} = a - bi$).
+
+=head2 inv
+
+    z.inv
+
+Returns the multiplicative inverse (reciprocal) of the complex number ($1/z$).
+
+=head2 neg
+
+    z.neg
+    -z
+
+Returns the negation of the complex number.
+
+=head2 sign
+
+    z.sign
+
+Returns the complex sign (signum) of the number ($z / |z|$), or 0 if $z$ is 0.
+
+=head2 sqr
+
+    z.sqr
+
+Returns the square of the complex number ($z^2$).
+
+=head2 sqrt
+
+    z.sqrt
+
+Returns the principal square root of the complex number.
+
+=head2 exp
+
+    z.exp
+
+Returns the exponential of the complex number ($e^z$).
+
+=head2 log
+
+    z.log
+
+Returns the natural logarithm of the complex number.
+
+=head2 sin
+
+    z.sin
+
+Returns the sine of the complex number.
+
+=head2 cos
+
+    z.cos
+
+Returns the cosine of the complex number.
+
+=head2 tan
+
+    z.tan
+
+Returns the tangent of the complex number.
+
+=head2 asin
+
+    z.asin
+
+Returns the arc sine of the complex number.
+
+=head2 acos
+
+    z.acos
+
+Returns the arc cosine of the complex number.
+
+=head2 atan
+
+    z.atan
+
+Returns the arc tangent of the complex number.
+
+=head2 sinh
+
+    z.sinh
+
+Returns the hyperbolic sine of the complex number.
+
+=head2 cosh
+
+    z.cosh
+
+Returns the hyperbolic cosine of the complex number.
+
+=head2 tanh
+
+    z.tanh
+
+Returns the hyperbolic tangent of the complex number.
+
+=head2 asinh
+
+    z.asinh
+
+Returns the inverse hyperbolic sine of the complex number.
+
+=head2 acosh
+
+    z.acosh
+
+Returns the inverse hyperbolic cosine of the complex number.
+
+=head2 atanh
+
+    z.atanh
+
+Returns the inverse hyperbolic tangent of the complex number.
+
+=head2 is_real
+
+    z.is_real
+
+Returns true if the imaginary part is zero.
+
+=head2 is_imag
+
+    z.is_imag
+
+Returns true if the real part is zero.
+
+=head2 is_zero
+
+    z.is_zero
+
+Returns true if the complex number is equal to zero.
+
+=head2 is_one
+
+    z.is_one
+
+Returns true if the complex number is equal to one.
+
+=head2 to_s
+
+    z.to_s
+
+Returns the string representation of the complex number (e.g., "3+4i").
+
+=head2 dump
+
+    z.dump
+
+Returns a string representation of the object for debugging purposes.
+
+=head1 OPERATORS
+
+The following operators are overloaded for C<Sidef::Types::Number::Complex>:
+
+=over 4
+
+=item *
+
+C<+> (Addition)
+
+=item *
+
+C<-> (Subtraction)
+
+=item *
+
+C<*> (Multiplication)
+
+=item *
+
+C</> (Division)
+
+=item *
+
+C<**> (Exponentiation)
+
+=item *
+
+C<< <=> >> (Comparison)
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu, E<lt>trizen@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2025 by Daniel "Trizen" Șuteu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.1 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut
