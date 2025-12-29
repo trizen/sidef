@@ -1,18 +1,34 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Number::PolynomialMod
+Sidef::Types::Number::PolynomialMod - Polynomial arithmetic modulo another polynomial
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements polynomial arithmetic in quotient rings, where polynomials are computed modulo another polynomial. This is particularly useful for finite field arithmetic, algebraic number theory, and cryptographic applications.
+
+A PolynomialMod object represents a polynomial reduced modulo a given modulus polynomial, similar to how integers modulo n work but in the polynomial domain.
 
 =head1 SYNOPSIS
 
-var obj = PolynomialMod(...)
-
+    # Create a polynomial mod object
+    var p = PolynomialMod([1, 2, 3], [1, 0, 1])  # (1 + 2x + 3x²) mod (1 + x²)
+    
+    # Arithmetic operations
+    var q = PolynomialMod([2, 1], [1, 0, 1])
+    say p + q      # Addition
+    say p * q      # Multiplication
+    say p ** 3     # Exponentiation
+    
+    # Evaluate at a point
+    say p.eval(2)
+    
+    # Get the modulus
+    say p.modulus
+    
+    # Lift to regular polynomial
+    say p.lift
 
 =head1 INHERITS
 
@@ -26,7 +42,7 @@ Inherits methods from:
 
     a != b
 
-Returns the
+Returns true if polynomial C<a> is not equal to polynomial C<b> modulo their common modulus.
 
 Aliases: I<ne>
 
@@ -36,7 +52,7 @@ Aliases: I<ne>
 
     a % b
 
-Returns the
+Returns the remainder of polynomial C<a> divided by polynomial C<b>, computed modulo the modulus polynomial.
 
 Aliases: I<mod>
 
@@ -46,7 +62,7 @@ Aliases: I<mod>
 
     a * b
 
-Returns the
+Returns the product of polynomials C<a> and C<b>, reduced modulo the modulus polynomial.
 
 Aliases: I<mul>
 
@@ -56,7 +72,7 @@ Aliases: I<mul>
 
     a ** b
 
-Returns the
+Returns polynomial C<a> raised to the power C<b>, computed modulo the modulus polynomial. Supports both positive integers and negative integer exponents (computing modular inverse when needed).
 
 Aliases: I<pow>
 
@@ -66,7 +82,7 @@ Aliases: I<pow>
 
     a + b
 
-Returns the
+Returns the sum of polynomials C<a> and C<b>, reduced modulo the modulus polynomial.
 
 Aliases: I<add>
 
@@ -74,9 +90,9 @@ Aliases: I<add>
 
 =head2 ++
 
-    a ++ b
+    a++
 
-Returns the
+Increments polynomial C<a> by 1 (adds the constant polynomial 1), reducing modulo the modulus polynomial.
 
 Aliases: I<inc>
 
@@ -86,7 +102,7 @@ Aliases: I<inc>
 
     a - b
 
-Returns the
+Returns the difference of polynomials C<a> and C<b>, reduced modulo the modulus polynomial.
 
 Aliases: I<sub>
 
@@ -94,9 +110,9 @@ Aliases: I<sub>
 
 =head2 --
 
-    a -- b
+    a--
 
-Returns the
+Decrements polynomial C<a> by 1 (subtracts the constant polynomial 1), reducing modulo the modulus polynomial.
 
 Aliases: I<dec>
 
@@ -106,7 +122,7 @@ Aliases: I<dec>
 
     a / b
 
-Returns the
+Returns the quotient of polynomial C<a> divided by polynomial C<b>, computed modulo the modulus polynomial. This computes C<a> times the modular inverse of C<b>.
 
 Aliases: I<÷>, I<div>
 
@@ -116,7 +132,7 @@ Aliases: I<÷>, I<div>
 
     a // b
 
-Returns the
+Returns the integer (floor) division of polynomial C<a> by polynomial C<b>, computed modulo the modulus polynomial.
 
 Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
 
@@ -126,7 +142,7 @@ Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
 
     a < b
 
-Returns the
+Compares polynomials C<a> and C<b> lexicographically by their coefficients. Returns true if C<a> is less than C<b>.
 
 Aliases: I<lt>
 
@@ -136,7 +152,7 @@ Aliases: I<lt>
 
     a <=> b
 
-Returns the
+Three-way comparison operator. Returns -1 if C<a> is less than C<b>, 0 if equal, and 1 if greater. Comparison is performed lexicographically on coefficients.
 
 Aliases: I<cmp>
 
@@ -146,7 +162,7 @@ Aliases: I<cmp>
 
     a == b
 
-Returns the
+Returns true if polynomial C<a> equals polynomial C<b> modulo their common modulus.
 
 Aliases: I<eq>
 
@@ -156,7 +172,7 @@ Aliases: I<eq>
 
     a > b
 
-Returns the
+Compares polynomials C<a> and C<b> lexicographically by their coefficients. Returns true if C<a> is greater than C<b>.
 
 Aliases: I<gt>
 
@@ -166,7 +182,7 @@ Aliases: I<gt>
 
     a ≤ b
 
-Returns the
+Returns true if polynomial C<a> is less than or equal to polynomial C<b> lexicographically.
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -176,7 +192,7 @@ Aliases: I<E<lt>=>, I<le>
 
     a ≥ b
 
-Returns the
+Returns true if polynomial C<a> is greater than or equal to polynomial C<b> lexicographically.
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -186,7 +202,7 @@ Aliases: I<E<gt>=>, I<ge>
 
     x.abs
 
-Returns the
+Returns the absolute value of the polynomial. For polynomials, this typically ensures the leading coefficient is positive.
 
 =cut
 
@@ -194,7 +210,7 @@ Returns the
 
     n.binomial(k)
 
-Returns the
+Returns the binomial coefficient C(n, k) computed in the polynomial mod ring. This generalizes the standard binomial coefficient to polynomial quotient rings.
 
 =cut
 
@@ -202,7 +218,7 @@ Returns the
 
     x.ceil
 
-Returns the
+Returns the ceiling of the polynomial. For polynomials with rational or real coefficients, this applies the ceiling function to each coefficient.
 
 =cut
 
@@ -210,7 +226,7 @@ Returns the
 
     *polynomials.chinese
 
-Returns the
+Applies the Chinese Remainder Theorem to solve a system of polynomial congruences. Given polynomials with different moduli, finds a polynomial that satisfies all congruences simultaneously.
 
 =cut
 
@@ -218,7 +234,7 @@ Returns the
 
     x.derivative
 
-Returns the
+Returns the formal derivative of the polynomial with respect to its variable, computed modulo the modulus polynomial.
 
 =cut
 
@@ -226,7 +242,7 @@ Returns the
 
     x.divmod(y)
 
-Returns the
+Returns a pair C<(quotient, remainder)> from dividing polynomial C<x> by polynomial C<y>, computed modulo the modulus polynomial.
 
 =cut
 
@@ -234,7 +250,7 @@ Returns the
 
     x.dump
 
-Returns the
+Returns a detailed string representation of the polynomial mod object, showing its internal structure for debugging purposes.
 
 =cut
 
@@ -242,7 +258,7 @@ Returns the
 
     x.eval(value)
 
-Returns the
+Evaluates the polynomial at the given value by substituting the value for the variable and computing the result modulo the modulus polynomial.
 
 =cut
 
@@ -250,7 +266,7 @@ Returns the
 
     x.float
 
-Returns the
+Converts the polynomial to a floating-point approximation. For polynomials, this typically evaluates at x=1 or converts coefficients to floating-point.
 
 =cut
 
@@ -258,7 +274,7 @@ Returns the
 
     x.floor
 
-Returns the
+Returns the floor of the polynomial. For polynomials with rational or real coefficients, this applies the floor function to each coefficient.
 
 =cut
 
@@ -266,7 +282,7 @@ Returns the
 
     x.gcd(y)
 
-Returns the
+Returns the greatest common divisor of polynomials C<x> and C<y>, computed modulo the modulus polynomial using the Euclidean algorithm.
 
 =cut
 
@@ -274,7 +290,7 @@ Returns the
 
     x.gcdext(y)
 
-Returns the
+Returns the extended GCD of polynomials C<x> and C<y>. Returns a triple C<(g, u, v)> where C<g> is the GCD and C<u>, C<v> are polynomials such that C<u*x + v*y = g> (modulo the modulus polynomial).
 
 =cut
 
@@ -282,7 +298,7 @@ Returns the
 
     x.inv
 
-Returns the
+Returns the multiplicative inverse of polynomial C<x> modulo the modulus polynomial. This exists if and only if C<x> and the modulus are coprime.
 
 =cut
 
@@ -290,7 +306,7 @@ Returns the
 
     x.is_mone
 
-Returns the
+Returns true if the polynomial equals -1 (the constant polynomial with coefficient -1).
 
 =cut
 
@@ -298,7 +314,7 @@ Returns the
 
     x.is_one
 
-Returns the
+Returns true if the polynomial equals 1 (the constant polynomial with coefficient 1), which is the multiplicative identity.
 
 =cut
 
@@ -306,7 +322,7 @@ Returns the
 
     x.is_zero
 
-Returns the
+Returns true if the polynomial is the zero polynomial, which is the additive identity.
 
 =cut
 
@@ -314,7 +330,7 @@ Returns the
 
     x.lcm(y)
 
-Returns the
+Returns the least common multiple of polynomials C<x> and C<y>, computed modulo the modulus polynomial.
 
 =cut
 
@@ -322,7 +338,7 @@ Returns the
 
     self.lift
 
-Returns the
+Returns the underlying polynomial without the modulus constraint, "lifting" it from the quotient ring to the polynomial ring.
 
 Aliases: I<to_poly>
 
@@ -332,7 +348,7 @@ Aliases: I<to_poly>
 
     self.modulus
 
-Returns the
+Returns the modulus polynomial by which all operations in this quotient ring are reduced.
 
 =cut
 
@@ -340,15 +356,20 @@ Returns the
 
     x.neg
 
-Returns the
+Returns the additive inverse (negation) of polynomial C<x>, which when added to C<x> gives zero.
 
 =cut
 
 =head2 new
 
-    self.new
+    self.new(coeffs, modulus)
+    PolynomialMod(coeffs, modulus)
 
-Returns the
+Creates a new PolynomialMod object from a list of coefficients and a modulus polynomial. The coefficients represent the polynomial starting from the constant term.
+
+Example:
+
+    var p = PolynomialMod([1, 2, 3], [1, 0, 1])  # (1 + 2x + 3x²) mod (1 + x²)
 
 Aliases: I<call>
 
@@ -358,7 +379,7 @@ Aliases: I<call>
 
     x.pretty
 
-Returns the
+Returns a human-readable string representation of the polynomial in standard mathematical notation (e.g., "1 + 2x + 3x²").
 
 =cut
 
@@ -366,7 +387,7 @@ Returns the
 
     x.rat
 
-Returns the
+Converts the polynomial to rational form, ensuring all coefficients are represented as exact rational numbers.
 
 =cut
 
@@ -374,7 +395,7 @@ Returns the
 
     x.rat_approx
 
-Returns the
+Returns a rational approximation of the polynomial, converting floating-point coefficients to nearby rational numbers.
 
 =cut
 
@@ -382,7 +403,7 @@ Returns the
 
     x.round(r)
 
-Returns the
+Rounds each coefficient of the polynomial to C<r> decimal places (or to the nearest integer if C<r> is not specified).
 
 =cut
 
@@ -390,7 +411,7 @@ Returns the
 
     x.sqr
 
-Returns the
+Returns the square of polynomial C<x> (equivalent to C<x * x>), computed modulo the modulus polynomial.
 
 =cut
 
@@ -398,8 +419,31 @@ Returns the
 
     x.to_s
 
-Returns the
+Converts the polynomial to a string representation suitable for display.
 
 Aliases: I<stringify>
+
+=cut
+
+=head1 EXAMPLES
+
+    # Working in Q[x]/(x² + 1) - Gaussian integers
+    var i = PolynomialMod([0, 1], [1, 0, 1])  # represents 'i' where i² = -1
+    say i ** 2    # Output: -1
+    say i ** 4    # Output: 1
+    
+    # Arithmetic in finite fields
+    var a = PolynomialMod([1, 1], [1, 1, 1])  # (1 + x) mod (1 + x + x²)
+    var b = PolynomialMod([1, 0, 1], [1, 1, 1])  # (1 + x²) mod (1 + x + x²)
+    say a * b
+    
+    # Finding modular inverses
+    var p = PolynomialMod([1, 2], [1, 0, 0, 1])
+    say p.inv     # Multiplicative inverse
+    say p * p.inv # Should be 1
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Number::Polynomial>
 
 =cut
