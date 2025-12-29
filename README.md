@@ -106,7 +106,6 @@ Experiment with Sidef instantly at **[Try It Online](https://tio.run/#sidef)** w
 ### Reference Materials
 - **[Sidef GitBook](https://trizen.gitbook.io/sidef-lang/)** ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-book.pdf)) - Comprehensive language guide
 - **[RosettaCode Examples](https://rosettacode.org/wiki/Sidef)** - Practical code examples
-- **[Legacy GitBook](https://trizen.gitbooks.io/sidef-lang)** - Previous documentation version
 
 ## 💬 Community & Support
 
