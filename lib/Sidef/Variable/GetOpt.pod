@@ -1,24 +1,278 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Variable::GetOpt
+Sidef::Variable::GetOpt - Command-line argument parsing for Sidef's MAIN function
 
 =head1 DESCRIPTION
 
-This class implements ...
+This class implements command-line argument parsing for Sidef programs using the special C<MAIN> function. The GetOpt class provides an interface to Perl's C<Getopt::Long> module, automatically mapping command-line arguments to function parameters based on their types and names.
+
+The GetOpt class is not typically used directly. Instead, it is invoked automatically when a Sidef program defines a C<MAIN> function that accepts parameters. The command-line arguments passed to the script are parsed and matched against the C<MAIN> function's parameter signature.
 
 =head1 SYNOPSIS
 
-var obj = GetOpt(...)
+    #!/usr/bin/sidef
+    
+    # Simple MAIN function with string parameter
+    func MAIN(name) {
+        say "Hello, #{name}!"
+    }
+    
+    # Execute: sidef script.sf --name=World
+    # Output: Hello, World!
+
+=head1 THE MAIN FUNCTION
+
+The C<MAIN> function is a special function in Sidef that serves as the entry point for command-line scripts. When defined, it automatically receives command-line arguments through the GetOpt parsing mechanism.
+
+=head2 Parameter Types
+
+The GetOpt class recognizes parameter types and generates appropriate option specifications:
+
+=over 4
+
+=item * B<Number> - Accepts numeric values (mapped to C<=f> in Getopt::Long)
+
+=item * B<Bool> - Accepts boolean flags (mapped to C<!> in Getopt::Long)
+
+=item * B<String> (default) - Accepts string values (mapped to C<=s> in Getopt::Long)
+
+=item * B<Slurpy parameters> - Captures remaining arguments as an array
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Basic String Parameter
+
+    func MAIN(file) {
+        say "Processing file: #{file}"
+    }
+    
+    # Execute: sidef script.sf --file=input.txt
+    # Output: Processing file: input.txt
+
+=head2 Typed Parameters
+
+    func MAIN(Number count, Bool verbose) {
+        say "Count: #{count}"
+        say "Verbose mode: #{verbose}"
+    }
+    
+    # Execute: sidef script.sf --count=42 --verbose
+    # Output:
+    # Count: 42
+    # Verbose mode: true
+
+=head2 Mixed Parameters
+
+    func MAIN(String input, String output, Number limit = 100) {
+        say "Input: #{input}"
+        say "Output: #{output}"
+        say "Limit: #{limit}"
+    }
+    
+    # Execute: sidef script.sf --input=data.txt --output=result.txt --limit=50
+
+=head2 Slurpy Parameters
+
+Slurpy parameters capture all remaining command-line arguments that don't match named options:
+
+    func MAIN(Bool verbose, *files) {
+        say "Verbose: #{verbose}"
+        say "Processing files: #{files.join(', ')}"
+    }
+    
+    # Execute: sidef script.sf --verbose file1.txt file2.txt file3.txt
+    # Output:
+    # Verbose: true
+    # Processing files: file1.txt, file2.txt, file3.txt
+
+=head2 Multiple MAIN Function Signatures
+
+Sidef supports multiple C<MAIN> function signatures through function overloading. The GetOpt class will try each signature until it finds one that matches the provided arguments:
+
+    func MAIN(String action, String file) {
+        say "Action: #{action}, File: #{file}"
+    }
+    
+    func MAIN(Number count) {
+        say "Count mode: #{count}"
+    }
+    
+    func MAIN {
+        say "No arguments provided"
+    }
+    
+    # The appropriate function will be called based on the arguments
+
+=head1 ARGUMENT PARSING BEHAVIOR
+
+=head2 Option Names
+
+Option names are derived from the parameter names in the C<MAIN> function. Each parameter becomes a command-line option with the same name:
+
+    func MAIN(input_file, output_file) { ... }
+    
+    # Accepts: --input_file=in.txt --output_file=out.txt
+
+=head2 Boolean Options
+
+Boolean parameters accept the following forms:
+
+    --verbose       # Sets to true
+    --no-verbose    # Sets to false
+    --verbose=1     # Sets to true
+    --verbose=0     # Sets to false
+
+=head2 Numeric Options
+
+Numeric parameters accept any numeric value:
+
+    --count=42
+    --limit=3.14
+    --size=1e6
+
+=head2 String Options
+
+String parameters accept any string value:
+
+    --name=value
+    --file="path with spaces"
+
+=head2 Error Handling
+
+If the command-line arguments don't match any defined C<MAIN> function signature, the GetOpt class will try all available signatures. If none match, an error message is displayed indicating an unknown command-line argument.
+
+=head1 INTERNAL IMPLEMENTATION
+
+The GetOpt class works by:
+
+=over 4
+
+=item 1. Receiving the command-line arguments (argv) and the MAIN function block
+
+=item 2. Iterating through each possible MAIN function signature
+
+=item 3. Building option specifications based on parameter types:
+
+=over 4
+
+=item * C<param_name=f> for Number parameters
+
+=item * C<param_name!> for Bool parameters
+
+=item * C<param_name=s> for String parameters (or untyped parameters)
+
+=back
+
+=item 4. Using C<Getopt::Long::GetOptionsFromArray> to parse arguments
+
+=item 5. Converting parsed values to appropriate Sidef types
+
+=item 6. Creating C<NamedParam> objects for each parsed option
+
+=item 7. Calling the matching MAIN function with the parsed parameters
+
+=back
 
 =head1 METHODS
 
 =head2 new
 
-    self.new
+    GetOpt->new(argv, block)
 
-Returns the
+Creates a new GetOpt object and immediately processes the command-line arguments.
+
+=over 4
+
+=item * B<argv> - Array reference containing command-line arguments
+
+=item * B<block> - The MAIN function block(s) to process
+
+=back
+
+Returns the result of calling the matching MAIN function.
+
+This method is called automatically by the Sidef compiler and should not be invoked directly in user code.
+
+=head1 TYPE CONVERSION
+
+The GetOpt class automatically converts parsed command-line arguments to appropriate Sidef types:
+
+=over 4
+
+=item * Numeric values become C<Sidef::Types::Number::Number> objects
+
+=item * Boolean flags become C<Sidef::Types::Bool::Bool> objects
+
+=item * String values become C<Sidef::Types::String::String> objects
+
+=item * Unmatched arguments (captured by slurpy parameters) become arrays of C<Sidef::Types::String::String> objects
+
+=back
+
+=head1 NAMED PARAMETERS
+
+All command-line options are passed to the MAIN function as named parameters (C<Sidef::Variable::NamedParam> objects). This allows the MAIN function to receive arguments by name rather than by position.
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * All command-line options must be explicitly named (e.g., C<--option=value>)
+
+=item * Short option forms (e.g., C<-o> instead of C<--option>) are not directly supported
+
+=item * Complex option types (arrays, hashes) must be handled manually through string parsing
+
+=item * The GetOpt class suppresses warnings from C<Getopt::Long> during parsing
+
+=back
+
+=head1 INTEGRATION WITH PERL
+
+The GetOpt class uses Perl's C<Getopt::Long> module for the actual parsing. This provides:
+
+=over 4
+
+=item * Robust option parsing
+
+=item * Support for various option styles
+
+=item * Automatic type checking
+
+=item * Flexible option specifications
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Variable::NamedParam> - Named parameter implementation
+
+=item * L<Getopt::Long> - Perl module for parsing command-line options
+
+=item * L<Sidef> - Main Sidef documentation
+
+=item * L<https://github.com/trizen/sidef> - Sidef source code and examples
+
+=back
+
+=head1 AUTHOR
+
+Daniel Șuteu (trizen)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2025 Daniel Șuteu
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<https://www.perlfoundation.org/artistic-license-20.html>
 
 =cut
