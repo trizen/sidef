@@ -868,7 +868,7 @@ Sidef is designed to be expressive and intuitive. Here's a quick taste of the la
 
     var name = "Alice"          # String
     var age = 30                # Integer
-    var pi = 3.14159            # Float
+    var pi = 3.14159f           # Float
     var ratio = 22/7            # Rational (exact fraction)
     var items = [1, 2, 3, 4]    # Array
     var person = Hash(          # Hash
@@ -926,8 +926,8 @@ Sidef is designed to be expressive and intuitive. Here's a quick taste of the la
 =head2 Advanced Features
 
     # Multiple dispatch
-    multi sub process(Number n) { n * 2 }
-    multi sub process(String s) { s.uc }
+    func process(Number n) { n * 2 }
+    func process(String s) { s.uc }
 
     # Lazy evaluation
     var infinite = lazy { 1.. }
@@ -997,7 +997,7 @@ The Sidef module makes it easy to embed Sidef code within larger Perl applicatio
 
     # Generate Sidef functions programmatically
     my $func_name = 'calculate_total';
-    my @operations = ('sum', 'mean', 'median');
+    my @operations = ('sum', 'prod', 'avg');
 
     for my $op (@operations) {
         my $code = qq{
@@ -1521,8 +1521,6 @@ Known limitations:
 
 =over 4
 
-=item * Some advanced Perl features (like XS modules with complex C interfaces) may not be fully accessible
-
 =item * Unicode support depends on Perl's Unicode implementation
 
 =item * Performance for some operations may not match natively compiled languages
@@ -1530,8 +1528,6 @@ Known limitations:
 =item * DBM cache is not thread-safe without external synchronization
 
 =item * Very large source files may exceed DBM record size limits
-
-=item * Windows paths may require special handling in some cases
 
 =back
 
