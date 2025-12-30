@@ -30,14 +30,14 @@ Signal handlers are blocks of code that execute when a specific signal is receiv
     Sig.__WARN__ { |msg| die msg }
 
     # Handle interrupt signal (Ctrl+C)
-    Sig.SIGINT {
+    Sig.INT {
         say "Caught interrupt! Cleaning up..."
         # perform cleanup
         Sys.exit(0)
     }
 
     # Handle termination signal
-    Sig.SIGTERM {
+    Sig.TERM {
         say "Received termination signal"
         # save state and exit gracefully
     }
@@ -49,15 +49,15 @@ Signal handlers are blocks of code that execute when a specific signal is receiv
     }
 
     # Retrieve current handler for a signal
-    var old_handler = Sig.SIGINT
+    var old_handler = Sig.INT
     
     # Set new handler and restore old one later
-    Sig.SIGINT { say "New handler" }
+    Sig.INT { say "New handler" }
     # ... do work ...
-    Sig.SIGINT(old_handler)  # restore
+    Sig.INT(old_handler)  # restore
 
     # Ignore a signal
-    Sig.SIGINT { nil }
+    Sig.INT { nil }
 
 =head1 METHODS
 
@@ -144,9 +144,9 @@ B<Example - Custom error logging:>
         File('error.log').append("#{Time.now}: #{error}")
     }
 
-=head3 SIGINT
+=head3 INT
 
-    Sig.SIGINT { |sig|
+    Sig.INT { |sig|
         # handle interrupt (Ctrl+C)
     }
 
@@ -156,7 +156,7 @@ B<Example - Graceful shutdown:>
 
     var running = true
     
-    Sig.SIGINT {
+    Sig.INT {
         say "\nInterrupt received, shutting down..."
         running = false
     }
@@ -165,9 +165,9 @@ B<Example - Graceful shutdown:>
         # main program loop
     }
 
-=head3 SIGTERM
+=head3 TERM
 
-    Sig.SIGTERM { |sig|
+    Sig.TERM { |sig|
         # handle termination signal
     }
 
@@ -175,16 +175,16 @@ Handles termination signals, typically sent by system shutdown or kill command.
 
 B<Example:>
 
-    Sig.SIGTERM {
+    Sig.TERM {
         say "Termination requested"
         # save state
         # close connections
         Sys.exit(0)
     }
 
-=head3 SIGHUP
+=head3 HUP
 
-    Sig.SIGHUP { |sig|
+    Sig.HUP { |sig|
         # handle hangup signal
     }
 
@@ -192,22 +192,22 @@ Handles hangup signals, traditionally sent when a terminal connection is lost. O
 
 B<Example - Reload configuration:>
 
-    Sig.SIGHUP {
+    Sig.HUP {
         say "Reloading configuration..."
         load_config()
     }
 
-=head3 SIGALRM
+=head3 ALRM
 
-    Sig.SIGALRM { |sig|
+    Sig.ALRM { |sig|
         # handle alarm signal
     }
 
 Handles alarm signals, typically used with alarm() for timeouts.
 
-=head3 SIGCHLD
+=head3 CHLD
 
-    Sig.SIGCHLD { |sig|
+    Sig.CHLD { |sig|
         # handle child process termination
     }
 
@@ -219,17 +219,17 @@ The Sig class supports all signals available on your system. Common ones include
 
 =over 4
 
-=item * SIGQUIT - Quit signal (Ctrl+\)
+=item * QUIT - Quit signal (Ctrl+\)
 
-=item * SIGKILL - Force kill (cannot be caught)
+=item * KILL - Force kill (cannot be caught)
 
-=item * SIGPIPE - Broken pipe
+=item * PIPE - Broken pipe
 
-=item * SIGUSR1, SIGUSR2 - User-defined signals
+=item * USR1, USR2 - User-defined signals
 
-=item * SIGSTOP - Stop process (cannot be caught)
+=item * STOP - Stop process (cannot be caught)
 
-=item * SIGCONT - Continue process
+=item * CONT - Continue process
 
 =back
 
@@ -248,7 +248,7 @@ Consult your system's signal documentation for a complete list.
 
     var should_exit = false
     
-    Sig.SIGINT {
+    Sig.INT {
         say "Shutting down gracefully..."
         should_exit = true
     }
@@ -265,7 +265,7 @@ Consult your system's signal documentation for a complete list.
 
     var timeout_reached = false
     
-    Sig.SIGALRM {
+    Sig.ALRM {
         timeout_reached = true
     }
     
@@ -288,20 +288,20 @@ Consult your system's signal documentation for a complete list.
 =head2 Ignoring Signals
 
     # Ignore interrupt signal
-    Sig.SIGINT { nil }
+    Sig.INT { nil }
     
     # Now Ctrl+C won't terminate the program
 
 =head2 Restoring Default Handlers
 
     # Save original handler
-    var original = Sig.SIGINT
+    var original = Sig.INT
     
     # Set custom handler
-    Sig.SIGINT { say "Custom handler" }
+    Sig.INT { say "Custom handler" }
     
     # Later, restore original
-    Sig.SIGINT(original)
+    Sig.INT(original)
 
 =head1 NOTES
 
