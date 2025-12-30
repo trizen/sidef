@@ -2,11 +2,15 @@
 
 =head1 NAME
 
-Sidef - The Sidef programming language.
+Sidef - The Sidef programming language
+
+=head1 VERSION
+
+This document describes Sidef version 25.12 and later.
 
 =head1 DESCRIPTION
 
-Sidef is a powerful programming language inspired by B<Ruby>, B<Raku>, and B<Go>. It is designed to be expressive and flexible, seamlessly blending functional and object-oriented paradigms.
+Sidef is a modern, expressive programming language that elegantly blends object-oriented and functional programming paradigms. Drawing inspiration from Ruby, Raku, and Go, Sidef provides a powerful and flexible environment for both scripting and complex application development.
 
 
                 **   **         ****   *           *********   *********
@@ -24,114 +28,1542 @@ Sidef is a powerful programming language inspired by B<Ruby>, B<Raku>, and B<Go>
 
 =over 4
 
-=item * B<Object-Oriented Programming:> Full support for classes, objects, and inheritance.
+=item * B<Multi-Paradigm Design>
 
-=item * B<Functional Programming:> Includes functional pattern matching, first-class functions, and lexical closures.
+Seamlessly combines object-oriented and functional programming styles, allowing you to choose the best approach for each problem.
 
-=item * B<Advanced Dispatch:> Supports multiple dispatch and keyword arguments.
+=item * B<Rich Type System>
 
-=item * B<Perl Integration:> Full support for utilizing existing Perl modules directly within Sidef.
+Native support for arbitrary-precision integers, rationals, floating-point numbers, and complex numbers. All numeric types are first-class citizens.
 
-=item * B<Rich Math Library:> Native support for arbitrary-precision integers, rationals, floats, and complex numbers.
+=item * B<Advanced OOP Support>
 
-=item * B<Control Flow:> Features optional lazy evaluation and integrated regular expressions.
+Complete class system with inheritance, multiple dispatch, method overloading, and operator overloading.
 
-=item * B<Safety & Scoping:> Includes lexical scoping and optional dynamic type checking.
+=item * B<Functional Programming>
+
+First-class functions, lexical closures, pattern matching, lazy evaluation, and higher-order functions.
+
+=item * B<Perl Interoperability>
+
+Direct access to the entire Perl ecosystem. Use any CPAN module without wrapper code.
+
+=item * B<Modern Language Features>
+
+Built-in regular expressions, Unicode support, optional type checking, keyword arguments, and destructuring.
+
+=item * B<Code Caching & Optimization>
+
+Intelligent compilation caching with DBM backend for faster repeated execution and multi-level optimization support.
+
+=item * B<Developer-Friendly>
+
+Clear syntax, expressive constructs, and helpful error messages with suggestions make development productive and enjoyable.
 
 =back
 
 =head1 SYNOPSIS
 
-The C<Sidef> module allows you to interface with the language engine directly from Perl code.
+=head2 Basic Usage
+
+The C<Sidef> module provides a programmatic interface to the Sidef language engine, allowing you to parse, compile, and execute Sidef code from Perl.
 
     use Sidef;
 
-    # Initialize the Sidef engine
+    # Create a Sidef engine instance
     my $sidef = Sidef->new(
-        name       => 'test',   # name of the program
-        opt        => {},       # command-line options
-        parser_opt => {},       # parser options
+        name       => 'my_program',    # Program name (for error messages)
+        opt        => {},              # Command-line options
+        parser_opt => {},              # Parser-specific options
     );
 
-    # Define Sidef source code
-    my $code = 'say "1 + 2 = #{1 + 2}"';
-
-    # 1. Execute directly
+    # Execute Sidef code directly
+    my $code = 'say "Hello, World!"';
     $sidef->execute_code($code);
+    # Output: Hello, World!
 
-    # 2. Transpile to Perl
-    my $perl = $sidef->compile_code($code, 'Perl');
+=head2 Using Optimization and Caching
 
-    # 3. Advanced AST manipulation
-    my $ast  = $sidef->parse_code($code);          # Generate AST
-    my $oast = $sidef->optimize_ast($ast);         # Optimize (constant-folding)
-    print $sidef->compile_ast($oast, 'Sidef');     # Compile back to Sidef source
+    # Enable optimization and caching for better performance
+    my $sidef = Sidef->new(
+        name => 'calculator',
+        opt  => {
+            O => 2,    # Optimization level (0, 1, or 2)
+            s => 1,    # Enable code caching with DBM
+        }
+    );
 
-=head1 METHODS
+    my $code = 'func fib(n) { (n < 2) ? n : (fib(n-1) + fib(n-2)) }; fib(20)';
+    
+    # First run: compiles and caches
+    my $result = $sidef->execute_code($code);
+    
+    # Second run: uses cached compiled code (much faster)
+    $result = $sidef->execute_code($code);
+
+=head2 String Interpolation and Expressions
+
+    my $math_code = 'say "The answer is: #{6 * 7}"';
+    $sidef->execute_code($math_code);
+    # Output: The answer is: 42
+
+=head2 Working with Return Values
+
+    my $result = $sidef->execute_code('2 + 2');
+    # $result is a Sidef::Types::Number::Number object
+    say $result;  # Outputs: 4
+
+=head2 Compiling to Perl
+
+Transform Sidef code into Perl source code for inspection or optimization:
+
+    my $sidef_code = q{
+        func fibonacci(n) {
+            (n < 2) ? n : (fibonacci(n-1) + fibonacci(n-2))
+        }
+        fibonacci(10)
+    };
+
+    my $perl_code = $sidef->compile_code($sidef_code, 'Perl');
+    print $perl_code;  # Shows generated Perl code
+
+=head2 AST Manipulation
+
+For advanced use cases, you can work directly with the Abstract Syntax Tree:
+
+    my $code = '2 + 3*4';
+
+    # Parse into AST
+    my $ast = $sidef->parse_code($code);
+
+    # Optimize (performs constant folding and other optimizations)
+    my $optimized_ast = $sidef->optimize_ast($ast);
+
+    # Compile back to Sidef (to see the optimized form)
+    my $optimized_code = $sidef->compile_ast($optimized_ast, 'Sidef');
+    print $optimized_code;  # May show: 14
+
+    # Or compile to Perl
+    my $perl = $sidef->compile_ast($optimized_ast, 'Perl');
+
+=head2 Direct Perl Execution
+
+Execute pre-compiled Perl code directly:
+
+    my $perl_code = $sidef->compile_code('say "Fast execution"', 'Perl');
+    $sidef->execute_perl($perl_code);
+
+=head2 Error Handling
+
+    my $invalid_code = 'say "missing quote';
+
+    eval {
+        $sidef->execute_code($invalid_code);
+    };
+    if ($@) {
+        warn "Sidef error: $@";
+        # Error messages include helpful suggestions for typos
+    }
+
+=head1 CONSTRUCTOR
 
 =head2 new
 
-    my $s = Sidef->new(name => '...');
+    my $sidef = Sidef->new(%options);
 
-Creates and returns a new C<Sidef> object.
+Creates and returns a new C<Sidef> object representing a Sidef language engine instance.
 
-=head2 execute_code
-
-    my $result = $s->execute_code($code);
-
-Parses, compiles, and executes Sidef code. Returns the result of the final statement executed.
-
-=head2 compile_code
-
-    my $compiled_code = $s->compile_code($code, $backend);
-
-Parses and compiles the source string into the target backend format.
-B<Valid backends:> C<'Sidef'>, C<'Perl'>.
-
-=head2 parse_code
-
-    my $ast = $s->parse_code($code);
-
-Parses the source code and returns the Abstract Syntax Tree (AST).
-
-=head2 optimize_ast
-
-    my $oast = $s->optimize_ast($ast);
-
-Performs constant-folding and other optimizations on an AST, returning a new optimized tree.
-
-=head2 compile_ast
-
-    my $compiled_code = $s->compile_ast($ast, $backend);
-
-Compiles an existing AST into code for the specified backend.
-B<Valid backends:> C<'Sidef'>, C<'Perl'>.
-
-=head2 version
-
-    my $version_str = Sidef->version;
-
-Returns the Sidef version as a B<String> object.
-
-=head2 numeric_version
-
-    my $version_num = Sidef->numeric_version;
-
-Returns the Sidef version as a B<Number> object.
-
-=head1 RESOURCES
+B<Parameters:>
 
 =over 4
 
-=item * B<GitHub:> L<https://github.com/trizen/sidef>
+=item * C<name> (optional)
 
-=item * B<GitBook:> L<https://trizen.gitbook.io/sidef-lang/>
+A string identifying the program name. Used in error messages and diagnostics. Defaults to C<'-'>.
 
-=item * B<Tutorial:> L<https://codeberg.org/trizen/sidef/wiki>
+    my $sidef = Sidef->new(name => 'calculator.sf');
 
-=item * B<RosettaCode:> L<https://rosettacode.org/wiki/Sidef>
+=item * C<opt> (optional)
 
-=item * B<Q&A:> L<https://github.com/trizen/sidef/discussions/categories/q-a>
+A hashref of command-line options that affect execution behavior. Defaults to C<{}>.
+
+Common options include:
+
+=over 4
+
+=item * C<O> - Optimization level (0, 1, or 2)
+
+=over 4
+
+=item * C<0> - No optimization (default)
+
+=item * C<1> - Basic constant folding and dead code elimination
+
+=item * C<2> - Advanced optimization: deparse and re-parse for additional optimization passes
+
+=back
+
+=item * C<s> - Enable compilation caching using DBM
+
+When enabled, compiled code is stored in a database for faster subsequent executions. Requires DB_File or GDBM_File.
+
+=item * C<warnings> - Enable/disable warnings
+
+=item * C<strict> - Enable strict mode
+
+=back
+
+Example:
+
+    my $sidef = Sidef->new(
+        opt => {
+            O        => 2,    # Maximum optimization
+            s        => 1,    # Enable caching
+            warnings => 1,
+            strict   => 1,
+        }
+    );
+
+=item * C<parser_opt> (optional)
+
+A hashref of parser-specific options. Defaults to C<{}>.
+
+Example:
+
+    my $sidef = Sidef->new(
+        parser_opt => {
+            interactive => 1,
+        }
+    );
+
+=back
+
+B<Returns:> A new C<Sidef> object.
+
+=head2 call
+
+    my $sidef = Sidef->call(%options);
+
+Alias for C<new()>. Creates and returns a new C<Sidef> object with the same parameters as C<new()>.
+
+B<Example:>
+
+    my $sidef = Sidef->call(name => 'test');
+
+=head1 CORE METHODS
+
+=head2 execute_code
+
+    my $result = $sidef->execute_code($code);
+    my $result = $sidef->execute_code($code, @args);
+
+Parses, compiles, and executes the provided Sidef source code. This is the primary method for running Sidef code from Perl.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$code>
+
+A string containing Sidef source code to execute.
+
+=item * C<@args> (optional)
+
+Arguments to pass to the Sidef program (accessible via the C<ARGV> array in Sidef).
+
+=back
+
+B<Returns:> The result of the last expression evaluated in the Sidef code, as a Sidef object. For statements that don't produce a value, returns C<nil>.
+
+B<Example:>
+
+    # Simple expression
+    my $result = $sidef->execute_code('10 + 20');
+    say $result;  # 30
+
+    # Multiple statements (returns last value)
+    my $result = $sidef->execute_code(q{
+        var x = 10;
+        var y = 20;
+        x + y
+    });
+    say $result;  # 30
+
+=head2 execute_perl
+
+    my $result = $sidef->execute_perl($perl_code);
+
+Executes pre-compiled Perl code that was generated from Sidef source. This is a lower-level method used internally by C<execute_code()>.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$perl_code>
+
+A string containing Perl source code (typically generated by C<compile_code()> or C<compile_ast()>).
+
+=back
+
+B<Returns:> The result of evaluating the Perl code.
+
+B<Example:>
+
+    # Compile once
+    my $perl_code = $sidef->compile_code('2 + 2', 'Perl');
+    
+    # Execute multiple times without re-compilation
+    my $result1 = $sidef->execute_perl($perl_code);
+    my $result2 = $sidef->execute_perl($perl_code);
+
+B<Use Case:> Useful when you want to compile once and execute many times, or when you need fine-grained control over the compilation and execution phases.
+
+=head2 compile_code
+
+    my $compiled = $sidef->compile_code($code, $backend);
+
+Parses the source code and compiles it to the specified backend format without executing it. If caching is enabled (C<opt =E<gt> {s =E<gt> 1}>), the compiled code may be retrieved from or stored to the DBM cache.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$code>
+
+A string containing Sidef source code to compile.
+
+=item * C<$backend>
+
+The target compilation backend. Valid options:
+
+=over 4
+
+=item * C<'Sidef'> - Decompile back to Sidef source (useful for code formatting)
+
+=item * C<'Perl'> - Compile to Perl source code (default)
+
+=back
+
+=back
+
+B<Returns:> A string containing the compiled code in the target language.
+
+B<Implementation Details:>
+
+=over 4
+
+=item * When caching is enabled and code length > 1024 bytes, the compiled code is stored with an MD5 hash as the key
+
+=item * Cached code is compressed using RawDeflate for storage efficiency
+
+=item * The cache automatically sanitizes old entries (older than 3 days) and removes very old entries (older than 2 days)
+
+=item * Code containing C<eval()> is not cached to prevent security issues
+
+=item * Each compilation is wrapped in a unique package namespace (C<Sidef::RuntimeXXXX>) to avoid conflicts
+
+=back
+
+B<Example:>
+
+    my $sidef_code = 'func square(n) { n * n }; square(5)';
+
+    # Compile to Perl
+    my $perl_code = $sidef->compile_code($sidef_code, 'Perl');
+    print $perl_code;
+
+    # Decompile to Sidef (useful for code formatting/normalization)
+    my $formatted = $sidef->compile_code($sidef_code, 'Sidef');
+    print $formatted;
+
+=head2 parse_code
+
+    my $ast = $sidef->parse_code($code);
+
+Parses the provided Sidef source code and returns its Abstract Syntax Tree (AST) representation. The parser is lazily initialized on first use.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$code>
+
+A string containing Sidef source code to parse.
+
+=back
+
+B<Returns:> A Sidef AST object representing the parsed code structure.
+
+B<Automatic Optimization:>
+
+If the C<O> option is set to 1 or higher, the returned AST is automatically optimized:
+
+=over 4
+
+=item * Level 1: Calls C<optimize_ast()> on the parsed tree
+
+=item * Level 2: Performs level 1 optimization, then deparses to Sidef, and re-parses for additional optimization opportunities
+
+=back
+
+B<Example:>
+
+    my $ast = $sidef->parse_code('2 + 2*2');
+    # $ast contains the tree structure representing the expression
+    # You can now pass this to optimize_ast() or compile_ast()
+
+B<Use Cases:>
+
+=over 4
+
+=item * Building code analysis tools
+
+=item * Implementing custom optimizations
+
+=item * Creating code transformation utilities
+
+=item * Developing Sidef IDE features (syntax highlighting, autocomplete)
+
+=item * AST-based code metrics and complexity analysis
+
+=back
+
+=head2 optimize_ast
+
+    my $optimized_ast = $sidef->optimize_ast($ast);
+
+Performs optimization passes on an existing AST, including constant folding, dead code elimination, and other improvements.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$ast>
+
+An AST object obtained from C<parse_code()>.
+
+=back
+
+B<Returns:> A new, optimized AST object.
+
+B<Optimizations Performed:>
+
+=over 4
+
+=item * Constant folding (e.g., C<2 + 3> becomes C<5>)
+
+=item * Dead code elimination
+
+=item * Expression simplification
+
+=item * Redundancy removal
+
+=back
+
+B<Example:>
+
+    my $ast = $sidef->parse_code('2 + 3*4 + 5');
+    my $optimized = $sidef->optimize_ast($ast);
+
+    # See what the optimizer did
+    my $result = $sidef->compile_ast($optimized, 'Sidef');
+    print $result;  # Likely: 19 (constant folded at compile time)
+
+B<Note:> The original AST is not modified; a new optimized tree is returned.
+
+=head2 compile_ast
+
+    my $code = $sidef->compile_ast($ast, $backend);
+
+Compiles an existing AST to the specified backend format. The deparser is lazily initialized on first use.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$ast>
+
+An AST object (from C<parse_code()> or C<optimize_ast()>).
+
+=item * C<$backend>
+
+The target compilation backend: C<'Sidef'> or C<'Perl'>.
+
+=back
+
+B<Returns:> A string containing the compiled code.
+
+B<Example:>
+
+    my $ast = $sidef->parse_code('func add(a, b) { a + b }');
+    my $optimized = $sidef->optimize_ast($ast);
+
+    # Compile to Perl for embedding
+    my $perl_code = $sidef->compile_ast($optimized, 'Perl');
+
+    # Or decompile to Sidef to see optimized form
+    my $sidef_code = $sidef->compile_ast($optimized, 'Sidef');
+
+=head1 UTILITY METHODS
+
+=head2 get_sidef_config_dir
+
+    my $config_dir = $sidef->get_sidef_config_dir();
+
+Returns the path to the Sidef configuration directory. Creates the directory if it doesn't exist.
+
+B<Directory Resolution Order:>
+
+=over 4
+
+=item 1. C<$ENV{SIDEF_CONFIG_DIR}> if set
+
+=item 2. C<$ENV{XDG_CONFIG_DIR}/sidef> if XDG_CONFIG_DIR is set
+
+=item 3. C<$HOME/.config/sidef> on Unix-like systems
+
+=item 4. C<\Local Settings\Application Data\.config\sidef> on Windows
+
+=item 5. Current directory as fallback
+
+=back
+
+B<Returns:> A string containing the absolute path to the config directory.
+
+B<Example:>
+
+    my $config_dir = $sidef->get_sidef_config_dir();
+    print "Config directory: $config_dir\n";
+    # Output: Config directory: /home/user/.config/sidef
+
+B<Use Case:> Store user preferences, cached data, or custom modules.
+
+=head2 get_sidef_vdir
+
+    my $version_dir = $sidef->get_sidef_vdir();
+
+Returns the version-specific subdirectory within the Sidef config directory. This directory is used for version-specific cached compiled code.
+
+B<Returns:> A string containing the path to the version-specific directory (e.g., C<~/.config/sidef/v25.12>).
+
+B<Example:>
+
+    my $vdir = $sidef->get_sidef_vdir();
+    print "Version directory: $vdir\n";
+    # Output: Version directory: /home/user/.config/sidef/v25.12
+
+B<Use Case:> Allows different Sidef versions to maintain separate caches without conflicts.
+
+=head2 has_dbm_driver
+
+    my $has_driver = $sidef->has_dbm_driver();
+
+Checks for the availability of a supported DBM driver for code caching functionality.
+
+B<Supported Drivers (in order of preference):>
+
+=over 4
+
+=item 1. C<DB_File> (Berkeley DB) - returned as C<'bdbm'>
+
+=item 2. C<GDBM_File> (GNU DBM) - returned as C<'gdbm'>
+
+=back
+
+B<Returns:> 
+
+=over 4
+
+=item * The driver name string (C<'bdbm'> or C<'gdbm'>) if a driver is available
+
+=item * C<undef> if no driver is found
+
+=back
+
+B<Example:>
+
+    if (my $driver = $sidef->has_dbm_driver()) {
+        print "Using DBM driver: $driver\n";
+        # Enable caching
+        $sidef->{opt}{s} = 1;
+    } else {
+        warn "No DBM driver available, caching disabled\n";
+    }
+
+B<Note:> A warning is issued if no driver is found, suggesting installation of DB_File or GDBM_File.
+
+=head2 dbm_lookup
+
+    my $cached_code = $sidef->dbm_lookup($backend, $md5_hash);
+
+Low-level method to retrieve compiled code from the DBM cache.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$backend>
+
+The compilation backend (C<'Perl'> or C<'Sidef'>).
+
+=item * C<$md5_hash>
+
+MD5 hash of the source code (used as cache key).
+
+=back
+
+B<Returns:> 
+
+=over 4
+
+=item * The cached compiled code as a string if found
+
+=item * C<undef> if not found or cache is unavailable
+
+=back
+
+B<Cache Management:>
+
+=over 4
+
+=item * Updates the access timestamp if the entry hasn't been accessed for 5 hours
+
+=item * Decompresses the stored code using RawInflate
+
+=item * Decodes from UTF-8
+
+=back
+
+B<Example:>
+
+    use Digest::MD5 qw(md5_hex);
+    use Encode qw(encode_utf8);
+    
+    my $code = 'say "test"';
+    my $md5 = md5_hex(encode_utf8($code));
+    
+    if (my $cached = $sidef->dbm_lookup('Perl', $md5)) {
+        print "Found cached code!\n";
+    }
+
+B<Note:> This is typically used internally by C<compile_code()>. Direct use is rare.
+
+=head2 dbm_store
+
+    $sidef->dbm_store($backend, $md5_hash, $code);
+
+Low-level method to store compiled code in the DBM cache.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$backend>
+
+The compilation backend (C<'Perl'> or C<'Sidef'>).
+
+=item * C<$md5_hash>
+
+MD5 hash of the source code (used as cache key).
+
+=item * C<$code>
+
+The compiled code string to store.
+
+=back
+
+B<Storage Process:>
+
+=over 4
+
+=item * Compresses the code using RawDeflate
+
+=item * Stores with current timestamp
+
+=item * Periodically sanitizes old entries (every 3 days)
+
+=item * Removes entries not accessed for 2+ days during sanitization
+
+=back
+
+B<Example:>
+
+    use Digest::MD5 qw(md5_hex);
+    use Encode qw(encode_utf8);
+    
+    my $code = 'say "test"';
+    my $compiled = $sidef->compile_ast($ast, 'Perl');
+    my $md5 = md5_hex(encode_utf8($code));
+    
+    $sidef->dbm_store('Perl', $md5, encode_utf8($compiled));
+
+B<Note:> This is typically used internally by C<compile_code()>. Direct use is rare.
+
+=head1 CLASS METHODS
+
+=head2 version
+
+    my $version = Sidef->version;
+
+Returns the Sidef version as a Sidef C<String> object.
+
+B<Parameters:> None.
+
+B<Returns:> A C<Sidef::Types::String::String> object representing the version (e.g., C<'v25.12'>).
+
+B<Example:>
+
+    my $v = Sidef->version;
+    say "Running Sidef version: $v";
+    # Output: Running Sidef version: v25.12
+
+=head2 numeric_version
+
+    my $num_version = Sidef->numeric_version;
+
+Returns the Sidef version as a Sidef C<Number> object, suitable for numeric comparisons.
+
+B<Parameters:> None.
+
+B<Returns:> A C<Sidef::Types::Number::Number> object representing the version (e.g., C<25.12>).
+
+B<Example:>
+
+    my $ver = Sidef->numeric_version;
+    if ($ver >= 25.0) {
+        say "Running modern Sidef version";
+    }
+
+=head1 PACKAGE UTILITY FUNCTIONS
+
+These functions are available in the C<Sidef> package namespace but are primarily used internally.
+
+=head2 normalize_type
+
+    my $short_name = Sidef::normalize_type($full_type);
+
+Converts a full Perl package name to a short, readable type name.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$full_type>
+
+A full package name (e.g., C<'Sidef::Types::Number::Number'>).
+
+=back
+
+B<Returns:> The short type name (e.g., C<'Number'>).
+
+B<Example:>
+
+    my $type = Sidef::normalize_type('Sidef::Types::String::String');
+    print $type;  # String
+
+=head2 normalize_method
+
+    my $short_signature = Sidef::normalize_method($full_method);
+
+Converts a full method signature to a short, readable format.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$full_method>
+
+A full method name (e.g., C<'Sidef::Types::Array::Array::length'>).
+
+=back
+
+B<Returns:> The short signature (e.g., C<'Array#length'>).
+
+B<Example:>
+
+    my $sig = Sidef::normalize_method('Sidef::Types::Hash::Hash::keys');
+    print $sig;  # Hash#keys
+
+=head2 jaro
+
+    my $similarity = Sidef::jaro($string1, $string2);
+
+Calculates the Jaro similarity between two strings. Used internally for suggesting method names on typos.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$string1>, C<$string2>
+
+Two strings to compare.
+
+=back
+
+B<Returns:> A number between 0 and 1, where 1 means identical strings.
+
+B<Example:>
+
+    my $sim = Sidef::jaro('hello', 'hallo');
+    print $sim;  # 0.933333333333333
+
+=head2 jaro_winkler
+
+    my $similarity = Sidef::jaro_winkler($string1, $string2);
+
+Calculates the Jaro-Winkler similarity, which gives more weight to strings with matching prefixes. Used for better suggestions on method name typos.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$string1>, C<$string2>
+
+Two strings to compare.
+
+=back
+
+B<Returns:> A number between 0 and 1, where 1 means identical strings.
+
+B<Example:>
+
+    my $sim = Sidef::jaro_winkler('hello', 'hallo');
+    print $sim;  # 0.96 (higher than plain Jaro)
+
+=head2 best_matches
+
+    my @suggestions = Sidef::best_matches($name, \@candidate_list);
+
+Finds the best matching strings from a candidate list for a given name. Returns matches with Jaro-Winkler similarity E<gt>= 0.8.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$name>
+
+The string to match (e.g., a mistyped method name).
+
+=item * C<\@candidate_list>
+
+Array reference containing possible correct names.
+
+=back
+
+B<Returns:> A list of the best matching candidates, sorted by similarity.
+
+B<Example:>
+
+    my @methods = qw(push pop shift unshift length each map);
+    my @matches = Sidef::best_matches('posh', \@methods);
+    print join(', ', @matches);  # push, pop
+
+B<Use Case:> Powers the "Did you mean?" suggestions in error messages.
+
+=head1 LANGUAGE OVERVIEW
+
+Sidef is designed to be expressive and intuitive. Here's a quick taste of the language syntax:
+
+=head2 Variables and Types
+
+    var name = "Alice"          # String
+    var age = 30                # Integer
+    var pi = 3.14159            # Float
+    var ratio = 22/7            # Rational (exact fraction)
+    var items = [1, 2, 3, 4]    # Array
+    var person = Hash(          # Hash
+        name => "Bob",
+        age => 25,
+    )
+
+=head2 Functions
+
+    # Function definition
+    func greet(name) {
+        say "Hello, #{name}!"
+    }
+
+    # Function with multiple parameters and default values
+    func power(base, exp=2) {
+        base ** exp
+    }
+
+    # Lambda expressions
+    var square = { |n| n * n }
+    say square(5)  # 25
+
+=head2 Object-Oriented Programming
+
+    class Person {
+        has String name
+        has Number age
+
+        method greet {
+            say "Hello, I'm #{self.name} and I'm #{self.age} years old."
+        }
+    }
+
+    var alice = Person(name: "Alice", age: 30)
+    alice.greet()
+
+=head2 Functional Programming
+
+    # Map, filter, reduce
+    var numbers = [1..10]
+    var squares = numbers.map { |n| n**2 }
+    var evens = numbers.grep { |n| n.is_even }
+    var sum = numbers.reduce { |a, b| a + b }
+
+    # Pattern matching
+    func factorial(n) {
+        case (n) {
+            when (0) { 1 }
+            when (1) { 1 }
+            else     { n * factorial(n-1) }
+        }
+    }
+
+=head2 Advanced Features
+
+    # Multiple dispatch
+    multi sub process(Number n) { n * 2 }
+    multi sub process(String s) { s.uc }
+
+    # Lazy evaluation
+    var infinite = lazy { 1.. }
+    var first_ten = infinite.first(10)
+
+    # Regular expressions
+    if ("hello@example.com" ~~ /^\w+@\w+\.\w+$/) {
+        say "Valid email!"
+    }
+
+=head1 EMBEDDING SIDEF IN PERL
+
+The Sidef module makes it easy to embed Sidef code within larger Perl applications:
+
+=head2 Example: Using Sidef as a Configuration Language
+
+    use Sidef;
+
+    my $sidef = Sidef->new(name => 'config');
+
+    my $config_code = q{
+        Hash(
+            database => Hash(
+                host => "localhost",
+                port => 5432,
+                name => "myapp"
+            ),
+            features => Hash(
+                caching => true,
+                debug => false
+            )
+        )
+    };
+
+    my $config = $sidef->execute_code($config_code);
+    # $config is now a Sidef Hash object
+    # Access values with Perl syntax:
+    say $config->{database}{host};  # localhost
+
+=head2 Example: Using Sidef for Safe Expression Evaluation
+
+    use Sidef;
+
+    my $calculator = Sidef->new(
+        name => 'calc',
+        opt  => { O => 2, s => 1 }  # Optimize and cache
+    );
+
+    sub safe_eval {
+        my ($expr) = @_;
+        eval {
+            return $calculator->execute_code($expr);
+        } or do {
+            warn "Invalid expression: $@";
+            return undef;
+        };
+    }
+
+    my $result = safe_eval("2 + 2*10");
+    say $result;  # 22
+
+=head2 Example: Code Generation and Metaprogramming
+
+    use Sidef;
+
+    my $sidef = Sidef->new();
+
+    # Generate Sidef functions programmatically
+    my $func_name = 'calculate_total';
+    my @operations = ('sum', 'mean', 'median');
+
+    for my $op (@operations) {
+        my $code = qq{
+            func ${func_name}_$op(numbers) {
+                numbers.$op
+            }
+        };
+        $sidef->execute_code($code);
+    }
+
+=head2 Example: High-Performance Repeated Execution
+
+    use Sidef;
+
+    my $sidef = Sidef->new(
+        name => 'repeated',
+        opt  => { O => 2, s => 1 }
+    );
+
+    my $complex_code = q{
+        func compute(n) {
+            (1..n).sum_by { |k| 1/k**2 }
+        }
+        compute(1000)
+    };
+
+    # First execution: parse, optimize, compile, cache, execute
+    my $start = time;
+    my $result1 = $sidef->execute_code($complex_code);
+    my $time1 = time - $start;
+
+    # Subsequent executions: retrieve from cache, execute
+    $start = time;
+    my $result2 = $sidef->execute_code($complex_code);
+    my $time2 = time - $start;
+
+    print "First run: ${time1}s, Cached run: ${time2}s\n";
+    # Cached run will be significantly faster
+
+=head1 ADVANCED TOPICS
+
+=head2 Performance Considerations
+
+=over 4
+
+=item * B<Enable caching> for production: C<opt =E<gt> {s =E<gt> 1}>
+
+Speeds up repeated execution by caching compiled code.
+
+=item * B<Use optimization> for CPU-intensive code: C<opt =E<gt> {O =E<gt> 2}>
+
+Level 2 optimization provides maximum performance but increases initial compilation time.
+
+=item * B<Compile to Perl> for maximum performance
+
+Generate Perl code once and execute it directly for the fastest runtime performance.
+
+=item * B<Cache Sidef instances> to avoid repeated initialization
+
+Creating a new C<Sidef> object has overhead. Reuse instances when possible.
+
+=item * B<Use lazy evaluation> for large data sets
+
+Sidef's lazy evaluation can significantly reduce memory usage.
+
+=item * B<Consider DBM driver choice>
+
+DB_File (Berkeley DB) generally performs better than GDBM_File for caching.
+
+=back
+
+=head2 Cache Management
+
+The compilation cache provides significant performance benefits but requires understanding:
+
+=over 4
+
+=item * B<Cache location:> C<~/.config/sidef/v25.12/> (version-specific)
+
+=item * B<Storage format:> Two DBM databases (time and code)
+
+=item * B<Compression:> RawDeflate compression for efficient storage
+
+=item * B<Automatic cleanup:> Entries not accessed for 2+ days are removed every 3 days
+
+=item * B<MD5 hashing:> Source code is hashed to create unique cache keys
+
+=item * B<Update interval:> Access timestamps updated every 5 hours
+
+=back
+
+To manually clear the cache:
+
+    rm -rf ~/.config/sidef/v25.12/
+
+=head2 Thread Safety
+
+Each C<Sidef> instance maintains its own state, including parser and deparser objects. For multi-threaded applications:
+
+=over 4
+
+=item * Create separate instances per thread for true parallel execution
+
+=item * Use appropriate locking if sharing a single instance
+
+=item * The DBM cache is not thread-safe; use separate cache directories per thread if needed
+
+=back
+
+=head2 Memory Management
+
+=over 4
+
+=item * Sidef objects are reference-counted through Perl's system
+
+=item * Circular references are handled by Perl's garbage collector
+
+=item * Large data structures are automatically freed when no longer referenced
+
+=item * The parser and deparser are lazily initialized and cached per instance
+
+=item * Use C<undef> to explicitly release large Sidef instances
+
+=back
+
+=head2 Error Handling and Debugging
+
+Sidef provides helpful error messages with suggestions:
+
+    # Typo in method name
+    my $result = $sidef->execute_code('[1,2,3].lnegth');
+    # Error: Undefined method 'Array#lnegth'
+    # [?] Did you mean: length
+
+The AUTOLOAD mechanism:
+
+=over 4
+
+=item * Catches undefined method calls
+
+=item * Uses Jaro-Winkler similarity to suggest corrections
+
+=item * Shows context (calling method/function)
+
+=item * Provides similarity threshold of 0.8 for suggestions
+
+=back
+
+=head1 COMPARISON WITH OTHER LANGUAGES
+
+=head2 Sidef vs Ruby
+
+Sidef draws heavy inspiration from Ruby's elegant syntax but adds:
+
+=over 4
+
+=item * Native arbitrary-precision arithmetic (rationals, big integers)
+
+=item * Stronger Perl interoperability
+
+=item * Built-in optimization and caching
+
+=item * Pattern matching and functional features
+
+=back
+
+=head2 Sidef vs Raku
+
+While Raku focuses on language experimentation and advanced features, Sidef prioritizes:
+
+=over 4
+
+=item * Practical usability with simpler learning curve
+
+=item * Seamless Perl ecosystem integration
+
+=item * Faster development iteration
+
+=item * Performance through Perl compilation
+
+=back
+
+=head2 Sidef vs Python
+
+Sidef offers:
+
+=over 4
+
+=item * More flexible and expressive syntax
+
+=item * Stronger metaprogramming capabilities
+
+=item * Native exact arithmetic (rationals)
+
+=item * Ideal for mathematical and symbolic computation
+
+=item * Ruby-like elegance with functional features
+
+=back
+
+=head1 OPTIMIZATION LEVELS
+
+Understanding the C<O> option values:
+
+=head2 Level 0 (No Optimization)
+
+    my $sidef = Sidef->new(opt => { O => 0 });
+
+=over 4
+
+=item * No optimization passes applied
+
+=item * Fastest compilation time
+
+=item * Suitable for development and debugging
+
+=item * AST used as-is for code generation
+
+=back
+
+=head2 Level 1 (Standard Optimization)
+
+    my $sidef = Sidef->new(opt => { O => 1 });
+
+=over 4
+
+=item * Constant folding: C<2 + 3> becomes C<5>
+
+=item * Dead code elimination
+
+=item * Expression simplification
+
+=item * Recommended for most production use
+
+=item * Good balance of compilation time and runtime performance
+
+=back
+
+=head2 Level 2 (Aggressive Optimization)
+
+    my $sidef = Sidef->new(opt => { O => 2 });
+
+=over 4
+
+=item * Performs level 1 optimizations
+
+=item * Deparses optimized AST back to Sidef source
+
+=item * Re-parses the deparsed code with level 1 optimization
+
+=item * Allows additional optimization opportunities
+
+=item * Longer compilation time but maximum runtime performance
+
+=item * Best for CPU-intensive production code
+
+=back
+
+=head1 TROUBLESHOOTING
+
+=head2 Common Issues
+
+=over 4
+
+=item B<"Undefined method" errors>
+
+Sidef uses C<.> for method calls. Check spelling and capitalization. The error message will suggest similar method names.
+
+Example error:
+
+    [AUTOLOAD] Undefined method 'Array#lnegth' called from main()
+    [?] Did you mean: length
+
+=item B<Type errors>
+
+Enable strict mode for better type checking:
+
+    my $sidef = Sidef->new(opt => { strict => 1 });
+
+=item B<Module not found>
+
+Sidef can use Perl modules via C<require>. Ensure the module is installed:
+
+    cpan Module::Name
+    # or
+    cpanm Module::Name
+
+=item B<Performance issues>
+
+=over 4
+
+=item * Enable optimization: C<opt =E<gt> {O =E<gt> 2}>
+
+=item * Enable caching: C<opt =E<gt> {s =E<gt> 1}>
+
+=item * Install faster math libraries (L<Math::Prime::Util>)
+
+=item * Compile to Perl for production use
+
+=back
+
+=item B<Cache not working>
+
+Check if a DBM driver is installed:
+
+    perl -e 'use DB_File; print "DB_File OK\n"'
+    # or
+    perl -e 'use GDBM_File; print "GDBM_File OK\n"'
+
+Install if missing:
+
+    cpan DB_File
+    # or
+    cpanm DB_File
+
+=item B<Memory usage>
+
+For large data processing:
+
+=over 4
+
+=item * Use lazy evaluation where possible
+
+=item * Process data in chunks
+
+=item * Clear large structures when done
+
+=item * Consider streaming approaches for file processing
+
+=back
+
+=back
+
+=head2 Debugging Tips
+
+=over 4
+
+=item * Use C<warn> statements liberally for debugging
+
+=item * Examine compiled Perl code: C<compile_code($code, 'Perl')>
+
+=item * Inspect optimized AST: C<compile_ast(optimize_ast($ast), 'Sidef')>
+
+=item * Check parser state with C<$sidef-E<gt>{parser}>
+
+=item * Review cache entries in C<~/.config/sidef/v25.12/>
+
+=back
+
+=head1 RESOURCES AND COMMUNITY
+
+=head2 Official Resources
+
+=over 4
+
+=item * B<GitHub Repository:> L<https://github.com/trizen/sidef>
+
+Main source code repository with issue tracking and discussions.
+
+=item * B<Language Documentation:> L<https://trizen.gitbook.io/sidef-lang/>
+
+Comprehensive language reference and tutorial.
+
+=item * B<Wiki and Tutorial:> L<https://codeberg.org/trizen/sidef/wiki>
+
+Community-maintained tutorials and guides.
+
+=item * B<RosettaCode Examples:> L<https://rosettacode.org/wiki/Sidef>
+
+Hundreds of code examples showing Sidef solutions to common programming tasks.
+
+=back
+
+=head2 Getting Help
+
+=over 4
+
+=item * B<Q&A Discussions:> L<https://github.com/trizen/sidef/discussions/categories/q-a>
+
+Ask questions and get help from the community.
+
+=item * B<Issue Tracker:> L<https://github.com/trizen/sidef/issues>
+
+Report bugs and request features.
+
+=item * B<IRC:> Join C<#sidef> on Libera.Chat for real-time discussion.
+
+=back
+
+=head2 Contributing
+
+Contributions are welcome! See the GitHub repository for contribution guidelines. Areas where help is particularly appreciated:
+
+=over 4
+
+=item * Documentation improvements
+
+=item * Bug reports and fixes
+
+=item * Performance optimizations
+
+=item * New library modules
+
+=item * Example programs and tutorials
+
+=item * Porting RosettaCode examples
+
+=back
+
+=head1 DEPENDENCIES
+
+=head2 Required
+
+Sidef requires:
+
+=over 4
+
+=item * B<Perl 5.16.0 or later>
+
+=item * B<List::Util> - Core utility functions
+
+=item * B<File::Spec> - Portable file path operations
+
+=item * B<Encode> - UTF-8 encoding/decoding (for caching)
+
+=item * B<Digest::MD5> - Hash generation (for caching)
+
+=item * B<IO::Compress::RawDeflate> - Compression (for caching)
+
+=item * B<IO::Uncompress::RawInflate> - Decompression (for caching)
+
+=item * Various Sidef type modules (automatically loaded)
+
+=back
+
+=head2 Optional (for enhanced functionality)
+
+=over 4
+
+=item * B<DB_File> or B<GDBM_File> - For compilation caching
+
+Without these, the C<s> option (caching) will not be available.
+
+=item * B<Math::GMPz> - Faster arbitrary-precision integer arithmetic
+
+=item * B<Math::GMPq> - Faster arbitrary-precision rational arithmetic
+
+=item * B<Math::MPFR> - Faster arbitrary-precision floating-point arithmetic
+
+=item * B<Math::MPC> - Faster arbitrary-precision complex arithmetic
+
+=back
+
+These optional math libraries can provide 10-100x speed improvement for mathematical operations.
+
+=head1 CONSTANTS
+
+The Sidef module defines several internal constants:
+
+=over 4
+
+=item * C<UPDATE_SEC> - 18000 seconds (5 hours)
+
+Interval for updating cache access timestamps.
+
+=item * C<DELETE_SEC> - 172800 seconds (2 days)
+
+Age threshold for cache entry deletion.
+
+=item * C<SANITIZE_SEC> - 259200 seconds (3 days)
+
+Interval between cache sanitization runs.
+
+=back
+
+=head1 PACKAGE VARIABLES
+
+=over 4
+
+=item * C<$Sidef::VERSION> - Current version string
+
+=item * C<$Sidef::SPACES> - Current indentation level (for deparsing)
+
+=item * C<$Sidef::SPACES_INCR> - Indentation increment (4 spaces)
+
+=item * C<%Sidef::INCLUDED> - Tracks included modules
+
+=item * C<%Sidef::EVALS> - Information for C<eval()> handling
+
+=item * C<$Sidef::PARSER> - Current parser instance
+
+=item * C<$Sidef::DEPARSER> - Current deparser instance
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Parser> - Sidef parser implementation
+
+=item * L<Sidef::Optimizer> - AST optimization engine
+
+=item * L<Sidef::Deparse::Sidef> - Sidef code generator
+
+=item * L<Sidef::Deparse::Perl> - Perl code generator
+
+=item * L<Sidef::Types::Number::Number> - Arbitrary-precision numbers
+
+=item * L<perl> - The Perl programming language
+
+=item * L<perlapi> - Perl API documentation
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Please report bugs via the GitHub issue tracker at L<https://github.com/trizen/sidef/issues>.
+
+Known limitations:
+
+=over 4
+
+=item * Some advanced Perl features (like XS modules with complex C interfaces) may not be fully accessible
+
+=item * Unicode support depends on Perl's Unicode implementation
+
+=item * Performance for some operations may not match natively compiled languages
+
+=item * DBM cache is not thread-safe without external synchronization
+
+=item * Very large source files may exceed DBM record size limits
+
+=item * Windows paths may require special handling in some cases
+
+=back
+
+=head1 ACKNOWLEDGMENTS
+
+Sidef builds upon decades of programming language research and draws inspiration from many sources:
+
+=over 4
+
+=item * B<Ruby> for elegant syntax and object model
+
+=item * B<Raku> for advanced language features and metaprogramming
+
+=item * B<Go> for design simplicity
+
+=item * B<Perl> for providing the robust foundation
+
+=back
+
+Special thanks to the Perl community for providing the robust foundation upon which Sidef is built, and to all contributors who have helped improve the language.
+
+=head1 AUTHORS
+
+=over 4
+
+=item * B<Daniel Șuteu> (trizen) - Lead developer and maintainer
+
+Primary developer responsible for language design, implementation, and maintenance.
+
+=item * B<Ioana Fălcușan> - Core contributor
+
+Contributions to language features and standard library in the early days of Sidef.
 
 =back
 
@@ -139,10 +1571,14 @@ Returns the Sidef version as a B<Number> object.
 
 Copyright (C) 2013-2025 Daniel Șuteu, Ioana Fălcușan.
 
-This program is free software; you can redistribute it and/or modify it under the terms of the B<Artistic License (2.0)>. 
+This program is free software; you can redistribute it and/or modify it under the terms of the B<Artistic License 2.0>. You may obtain a copy of the Artistic License 2.0 at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
 
 =head2 Disclaimer of Warranty
 
-THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW.
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
 =cut
