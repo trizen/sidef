@@ -1,24 +1,346 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Sys::Sig
+Sidef::Sys::Sig - Signal handling interface for Sidef
 
 =head1 DESCRIPTION
 
-This class implements ...
+The Sig class provides an interface to system signals and special handlers in Sidef. It allows you to set and retrieve signal handlers, including both standard UNIX signals (like SIGINT, SIGTERM) and special pseudo-signals (__WARN__ and __DIE__) that handle warnings and exceptions.
+
+Signal handlers are blocks of code that execute when a specific signal is received. This is useful for:
+
+=over 4
+
+=item * Making warnings fatal
+
+=item * Custom error handling
+
+=item * Graceful shutdown on interrupts
+
+=item * Cleaning up resources on termination
+
+=item * Custom signal processing
+
+=back
 
 =head1 SYNOPSIS
 
-var obj = Sig(...)
+    # Make warnings fatal
+    Sig.__WARN__ { |msg| die msg }
+
+    # Handle interrupt signal (Ctrl+C)
+    Sig.SIGINT {
+        say "Caught interrupt! Cleaning up..."
+        # perform cleanup
+        Sys.exit(0)
+    }
+
+    # Handle termination signal
+    Sig.SIGTERM {
+        say "Received termination signal"
+        # save state and exit gracefully
+    }
+
+    # Custom error handler
+    Sig.__DIE__ { |error|
+        say "Fatal error occurred: #{error}"
+        # log error, send notification, etc.
+    }
+
+    # Retrieve current handler for a signal
+    var old_handler = Sig.SIGINT
+    
+    # Set new handler and restore old one later
+    Sig.SIGINT { say "New handler" }
+    # ... do work ...
+    Sig.SIGINT(old_handler)  # restore
+
+    # Ignore a signal
+    Sig.SIGINT { nil }
 
 =head1 METHODS
 
 =head2 new
 
-    Sig.new
+    var sig = Sig.new
 
-Returns the
+Creates and returns a new Sig object. In practice, you typically use the class methods directly rather than creating an instance.
+
+B<Returns:> A new Sig object
+
+=head2 Signal Methods
+
+The Sig class dynamically provides methods for all available system signals plus the special __WARN__ and __DIE__ handlers. Each signal method can be called in two ways:
+
+=head3 Setting a Handler
+
+    Sig.SIGNAL_NAME { |arg|
+        # handler code
+    }
+
+Sets a handler block for the specified signal. The block receives signal-specific arguments:
+
+=over 4
+
+=item * For __WARN__: receives the warning message string
+
+=item * For __DIE__: receives the error message string
+
+=item * For other signals: receives the signal name
+
+=back
+
+B<Parameters:>
+
+=over 4
+
+=item * C<block> - A code block to execute when the signal is received
+
+=back
+
+B<Returns:> The handler block or value that was set
+
+=head3 Retrieving a Handler
+
+    var handler = Sig.SIGNAL_NAME
+
+Retrieves the current handler for the specified signal.
+
+B<Returns:> The current signal handler (may be nil if no handler is set)
+
+=head2 Common Signals
+
+=head3 __WARN__
+
+    Sig.__WARN__ { |msg|
+        # handle warning
+    }
+
+Special pseudo-signal that handles Perl warnings. Useful for making warnings fatal or logging them.
+
+B<Example - Make warnings fatal:>
+
+    Sig.__WARN__ { |msg| die msg }
+
+B<Example - Log warnings:>
+
+    Sig.__WARN__ { |msg|
+        File('warnings.log').append("#{Time.now}: #{msg}")
+    }
+
+=head3 __DIE__
+
+    Sig.__DIE__ { |error|
+        # handle fatal error
+    }
+
+Special pseudo-signal that handles fatal errors before they terminate the program.
+
+B<Example - Custom error logging:>
+
+    Sig.__DIE__ { |error|
+        say "FATAL: #{error}"
+        File('error.log').append("#{Time.now}: #{error}")
+    }
+
+=head3 SIGINT
+
+    Sig.SIGINT { |sig|
+        # handle interrupt (Ctrl+C)
+    }
+
+Handles interrupt signals, typically sent when the user presses Ctrl+C.
+
+B<Example - Graceful shutdown:>
+
+    var running = true
+    
+    Sig.SIGINT {
+        say "\nInterrupt received, shutting down..."
+        running = false
+    }
+    
+    while (running) {
+        # main program loop
+    }
+
+=head3 SIGTERM
+
+    Sig.SIGTERM { |sig|
+        # handle termination signal
+    }
+
+Handles termination signals, typically sent by system shutdown or kill command.
+
+B<Example:>
+
+    Sig.SIGTERM {
+        say "Termination requested"
+        # save state
+        # close connections
+        Sys.exit(0)
+    }
+
+=head3 SIGHUP
+
+    Sig.SIGHUP { |sig|
+        # handle hangup signal
+    }
+
+Handles hangup signals, traditionally sent when a terminal connection is lost. Often used to reload configuration.
+
+B<Example - Reload configuration:>
+
+    Sig.SIGHUP {
+        say "Reloading configuration..."
+        load_config()
+    }
+
+=head3 SIGALRM
+
+    Sig.SIGALRM { |sig|
+        # handle alarm signal
+    }
+
+Handles alarm signals, typically used with alarm() for timeouts.
+
+=head3 SIGCHLD
+
+    Sig.SIGCHLD { |sig|
+        # handle child process termination
+    }
+
+Handles signals sent when a child process terminates, stops, or resumes.
+
+=head3 Other Signals
+
+The Sig class supports all signals available on your system. Common ones include:
+
+=over 4
+
+=item * SIGQUIT - Quit signal (Ctrl+\)
+
+=item * SIGKILL - Force kill (cannot be caught)
+
+=item * SIGPIPE - Broken pipe
+
+=item * SIGUSR1, SIGUSR2 - User-defined signals
+
+=item * SIGSTOP - Stop process (cannot be caught)
+
+=item * SIGCONT - Continue process
+
+=back
+
+Consult your system's signal documentation for a complete list.
+
+=head1 EXAMPLES
+
+=head2 Making Warnings Fatal
+
+    Sig.__WARN__ { |msg| die msg }
+    
+    # Now warnings become fatal errors
+    var x = "abc" + 0  # Dies instead of just warning
+
+=head2 Graceful Shutdown
+
+    var should_exit = false
+    
+    Sig.SIGINT {
+        say "Shutting down gracefully..."
+        should_exit = true
+    }
+    
+    while (!should_exit) {
+        # process work
+        say "Working..."
+        sleep(1)
+    }
+    
+    say "Cleanup complete"
+
+=head2 Timeout Handler
+
+    var timeout_reached = false
+    
+    Sig.SIGALRM {
+        timeout_reached = true
+    }
+    
+    alarm(5)  # Set 5-second alarm
+    
+    while (!timeout_reached) {
+        # do work
+    }
+    
+    say "Timeout!"
+
+=head2 Custom Error Reporting
+
+    Sig.__DIE__ { |error|
+        var log = File('error_log.txt')
+        log.append("[#{Time.now}] ERROR: #{error}\n")
+        say "An error occurred. Check error_log.txt"
+    }
+
+=head2 Ignoring Signals
+
+    # Ignore interrupt signal
+    Sig.SIGINT { nil }
+    
+    # Now Ctrl+C won't terminate the program
+
+=head2 Restoring Default Handlers
+
+    # Save original handler
+    var original = Sig.SIGINT
+    
+    # Set custom handler
+    Sig.SIGINT { say "Custom handler" }
+    
+    # Later, restore original
+    Sig.SIGINT(original)
+
+=head1 NOTES
+
+=over 4
+
+=item * Signal handlers execute in the context where the signal is received, which may interrupt normal program flow
+
+=item * Some signals (like SIGKILL and SIGSTOP) cannot be caught or handled
+
+=item * Signal handler blocks should be brief and avoid complex operations
+
+=item * The __WARN__ and __DIE__ handlers are Perl-specific pseudo-signals, not UNIX signals
+
+=item * Setting a signal handler to nil effectively ignores that signal
+
+=item * Signal behavior may vary across different operating systems
+
+=item * Be cautious with signal handlers in multi-threaded programs
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Sys::Sys> - System interface
+
+=item * L<perlipc> - Perl interprocess communication (signals)
+
+=item * signal(7) - Linux signal overview
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut
