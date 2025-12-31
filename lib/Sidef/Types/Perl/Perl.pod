@@ -1,103 +1,525 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Types::Perl::Perl
+Sidef::Types::Perl::Perl - Bridge for evaluating Perl code within Sidef
 
 =head1 DESCRIPTION
 
-This class implements support for evaluating arbitrary Perl code inside a Sidef script.
+This class provides a bidirectional bridge between Sidef and Perl, allowing you to:
 
-The result is implicitly converted into a Sidef data structure.
+=over 4
+
+=item * Execute arbitrary Perl code from within Sidef scripts
+
+=item * Convert Perl data structures to Sidef data structures automatically
+
+=item * Access Perl's extensive CPAN ecosystem
+
+=item * Use Perl's tie mechanism for variable binding
+
+=item * Query Perl version information
+
+=back
+
+Results from Perl evaluation are automatically converted into equivalent Sidef data structures,
+enabling seamless interoperability between the two languages.
 
 =head1 SYNOPSIS
 
-    var obj = Perl('my $x = 42; sqrt($x)')
-    var res = obj.eval
+=head2 Basic Usage
+
+    # Simple Perl expression evaluation
+    var result = Perl('42 + 8').eval
+    say result      # => 50
+
+    # Using Perl functions
+    var sqrt_val = Perl('sqrt(144)').eval
+    say sqrt_val    # => 12
+
+=head2 Working with Data Structures
+
+    # Perl arrays become Sidef arrays
+    var arr = Perl('[1, 2, 3, 4, 5]').eval
+    say arr[2]      # => 3
+
+    # Perl hashes become Sidef hashes
+    var hash = Perl('{foo => "bar", baz => 42}').eval
+    say hash{"foo"} # => "bar"
+
+=head2 Using CPAN Modules
+
+    # Require and use Perl modules
+    var json = Perl('
+        use JSON;
+        my $data = {name => "Alice", age => 30};
+        JSON->new->encode($data);
+    ').eval
+    say json        # => {"name":"Alice","age":30}
+
+=head2 Class Method for Direct Evaluation
+
+    # Evaluate without creating an object first
+    var result = Perl.eval('2 ** 10')
+    say result      # => 1024
 
 =head1 METHODS
-
-=head2 code
-
-    obj.code
-
-Returns the Perl code as a String object.
-
-=cut
 
 =head2 new
 
     var obj = Perl(perl_code)
 
-Builds and returns a new Perl object, given a string that contains Perl code.
+Constructs a new Perl object containing the specified Perl code string. The code is not
+executed until one of the evaluation methods (C<eval>, C<run>, or C<execute>) is called.
 
-=cut
+B<Parameters:>
 
-=head2 numeric_version
+=over 4
 
-    Perl.numeric_version
+=item * C<perl_code> - A string containing valid Perl code
 
-Returns the version of Perl as a Number object (e.g.: C<5.036>).
+=back
 
-=cut
+B<Returns:> A new Perl object
+
+B<Example:>
+
+    var perl_obj = Perl('my @nums = (1..10); $nums[5]')
+    var sixth = perl_obj.eval
+    say sixth   # => 6
+
+B<Aliases:> I<call>
+
+=head2 code
+
+    obj.code
+
+Returns the Perl code stored in the object as a Sidef String.
+
+B<Returns:> String object containing the Perl code
+
+B<Example:>
+
+    var obj = Perl('print "Hello"')
+    say obj.code    # => print "Hello"
+
+=head2 eval
+
+    obj.eval
+    Perl.eval(perl_code)
+
+Evaluates the stored Perl code and converts the result into a Sidef data structure.
+This method can be called as both an instance method and a class method.
+
+B<Instance Method Usage:>
+
+    var obj = Perl('42 * 2')
+    var result = obj.eval
+
+B<Class Method Usage:>
+
+    var result = Perl.eval('42 * 2')
+
+B<Returns:> The evaluation result converted to an appropriate Sidef type
+
+B<Data Type Conversions:>
+
+=over 4
+
+=item * Perl scalars → Sidef Number or String (based on content)
+
+=item * Perl arrays → Sidef Array
+
+=item * Perl hashes → Sidef Hash
+
+=item * Perl code references → Sidef Block
+
+=item * Perl regexes → Sidef Regex
+
+=item * Perl Math::* objects → Sidef Number
+
+=item * Blessed Perl objects → Sidef OO objects
+
+=back
+
+B<Aliases:> I<run>, I<execute>
+
+B<Example:>
+
+    # Array conversion
+    var nums = Perl.eval('[(1..5)]')
+    say nums        # => [1, 2, 3, 4, 5]
+
+    # Hash conversion
+    var data = Perl.eval('{x => 10, y => 20}')
+    say data{"x"}   # => 10
+
+    # Using Perl built-ins
+    var sorted = Perl.eval('
+        my @list = (5, 2, 8, 1, 9);
+        [sort {$a <=> $b} @list]
+    ')
+    say sorted      # => [1, 2, 5, 8, 9]
 
 =head2 run
 
     obj.run
-    Perl.eval(perl_code)
 
-Evaluates the Perl code and returns a Sidef data structure.
+Alias for C<eval>. Evaluates the Perl code and returns the converted result.
 
-Aliases: I<eval>, I<execute>
+B<Aliases:> I<eval>, I<execute>
 
-=cut
+=head2 execute
 
-=head2 tie
+    obj.execute
 
-    Perl.tie(variable, class_name, *args)
+Alias for C<eval>. Evaluates the Perl code and returns the converted result.
 
-Binds a variable to a package class and returns the result as an object.
-
-Example:
-
-        require('DB_File')
-        var h = Hash()   # variable of HASH type
-        var o = Perl.tie(h, "DB_File", "file.db", File.O_RDWR | File.O_CREAT, 0666, %perl<$DB_File::DB_HASH>)
-        h{"foo"} = "bar"
-        o.sync
-=cut
-
-=head2 to_s
-
-    obj.to_s
-
-Dumps the Perl object as a String object.
-
-Aliases: I<dump>, I<to_str>
-
-=cut
+B<Aliases:> I<eval>, I<run>
 
 =head2 to_sidef
 
     Perl.to_sidef(perl_structure)
 
-Converts a given a Perl data structure into a Sidef data structure.
+Converts a given Perl data structure into its equivalent Sidef representation.
+This is the underlying method used by C<eval> to perform conversions, but can
+also be called directly when working with Perl data structures obtained through
+other means.
 
-=cut
+B<Parameters:>
+
+=over 4
+
+=item * C<perl_structure> - Any Perl data structure (scalar, array ref, hash ref, etc.)
+
+=back
+
+B<Returns:> Equivalent Sidef data structure
+
+B<Supported Conversions:>
+
+=over 4
+
+=item * C<ARRAY> refs → C<Sidef::Types::Array::Array>
+
+=item * C<HASH> refs → C<Sidef::Types::Hash::Hash>
+
+=item * C<CODE> refs → C<Sidef::Types::Block::Block>
+
+=item * C<Regexp> → C<Sidef::Types::Regex::Regex>
+
+=item * Numeric types (Math::BigInt, Math::BigFloat, etc.) → C<Sidef::Types::Number::Number>
+
+=item * Math::Complex → C<Sidef::Types::Number::Complex>
+
+=item * Blessed objects → C<Sidef::Module::OO>
+
+=item * Scalars → C<Sidef::Types::String::String> or C<Sidef::Types::Number::Number>
+
+=back
+
+B<Note:> Circular references in arrays and hashes are properly handled to avoid
+infinite loops.
+
+B<Example:>
+
+    # Manual conversion
+    var perl_array = Perl.eval('[1, 2, 3]')
+    var sidef_array = Perl.to_sidef(perl_array)
+
+=head2 tie
+
+    Perl.tie(variable, class_name, *args)
+
+Binds a Sidef variable to a Perl package class using Perl's tie mechanism. This allows
+you to use Perl's tied variable interface, such as database file access, persistent
+storage, or custom variable behaviors.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<variable> - A Sidef variable (Hash, Array, or Scalar) to bind
+
+=item * C<class_name> - Name of the Perl class to tie to (as a string)
+
+=item * C<*args> - Optional arguments passed to the class's TIEHASH, TIEARRAY, or TIESCALAR method
+
+=back
+
+B<Returns:> The tie object that can be used to interact with the tied variable
+
+B<Example - Database File Access:>
+
+    require('DB_File')
+    
+    var db = Hash()  # Create a Sidef hash
+    var tie_obj = Perl.tie(
+        db,                                    # Variable to tie
+        "DB_File",                             # Class name
+        "database.db",                         # Filename
+        File.O_RDWR | File.O_CREAT,           # Flags
+        0666,                                  # Permissions
+        %perl<$DB_File::DB_HASH>              # DB type
+    )
+    
+    # Now the hash is tied to the file
+    db{"username"} = "alice"
+    db{"email"} = "alice@example.com"
+    
+    # Sync changes to disk
+    tie_obj.sync
+
+B<Example - Tie::IxHash for Ordered Hash:>
+
+    require('Tie::IxHash')
+    
+    var ordered = Hash()
+    Perl.tie(ordered, "Tie::IxHash")
+    
+    ordered{"first"} = 1
+    ordered{"second"} = 2
+    ordered{"third"} = 3
+    
+    # Keys maintain insertion order
+
+B<Supported Variable Types:>
+
+=over 4
+
+=item * Hash → Uses Perl's TIEHASH interface
+
+=item * Array → Uses Perl's TIEARRAY interface
+
+=item * Scalar → Uses Perl's TIESCALAR interface
+
+=back
 
 =head2 untie
 
     Perl.untie(variable)
 
-Unbinds a tied variable.
+Unbinds a previously tied variable, breaking the connection to the tied class.
+After untying, the variable returns to normal behavior.
 
-=cut
+B<Parameters:>
+
+=over 4
+
+=item * C<variable> - The tied variable to unbind
+
+=back
+
+B<Returns:> The result of the untie operation
+
+B<Example:>
+
+    var db = Hash()
+    var obj = Perl.tie(db, "DB_File", "data.db", File.O_RDWR | File.O_CREAT, 0666)
+    
+    # Use the tied hash
+    db{"key"} = "value"
+    
+    # Clean up by untying
+    Perl.untie(db)
+    
+    # Now db is a regular hash again
 
 =head2 version
 
     Perl.version
 
-Returns the version of Perl as String object (e.g.: C<"v5.36.0">).
+Returns the version of the Perl interpreter as a formatted String object.
+
+B<Returns:> String in the format C<"vX.Y.Z"> (e.g., C<"v5.38.0">)
+
+B<Example:>
+
+    say Perl.version        # => "v5.38.0"
+
+=head2 numeric_version
+
+    Perl.numeric_version
+
+Returns the version of the Perl interpreter as a Number object, suitable for
+numeric comparisons.
+
+B<Returns:> Number representing the Perl version (e.g., C<5.038>)
+
+B<Example:>
+
+    say Perl.numeric_version    # => 5.038
+    
+    if (Perl.numeric_version >= 5.036) {
+        say "Modern Perl features available"
+    }
+
+=head2 dump
+
+    obj.dump
+
+Returns a string representation of the Perl object, showing how it would appear
+in Sidef code (e.g., C<Perl('...')>).
+
+B<Returns:> String representation of the object
+
+B<Aliases:> I<to_s>, I<to_str>
+
+B<Example:>
+
+    var obj = Perl('42 + 8')
+    say obj.dump    # => Perl('42 + 8')
+
+=head2 to_s
+
+    obj.to_s
+
+Alias for C<dump>. Returns a string representation of the Perl object.
+
+B<Aliases:> I<dump>, I<to_str>
+
+=head2 to_str
+
+    obj.to_str
+
+Alias for C<dump>. Returns a string representation of the Perl object.
+
+B<Aliases:> I<dump>, I<to_s>
+
+=head1 ADVANCED EXAMPLES
+
+=head2 Using Perl Modules for Complex Tasks
+
+    # Use DateTime for date manipulation
+    var date_str = Perl.eval('
+        use DateTime;
+        my $dt = DateTime->new(
+            year => 2024,
+            month => 12,
+            day => 25
+        );
+        $dt->add(days => 7)->ymd;
+    ')
+    say date_str    # => 2025-01-01
+
+=head2 Working with Regular Expressions
+
+    # Perl regex to Sidef regex
+    var regex = Perl.eval('qr/\d{3}-\d{2}-\d{4}/')
+    var text = "SSN: 123-45-6789"
+    say text.match(regex)   # => true
+
+=head2 Leveraging Perl Functions as Blocks
+
+    # Create a Sidef block from Perl code
+    var perl_func = Perl.eval('sub { my ($x) = @_; $x * $x }')
+    say perl_func(5)        # => 25
+    say perl_func(12)       # => 144
+
+=head2 Complex Data Structure Handling
+
+    # Nested structures are fully converted
+    var complex = Perl.eval('
+        {
+            users => [
+                {name => "Alice", scores => [85, 92, 88]},
+                {name => "Bob", scores => [78, 84, 91]}
+            ],
+            course => "Mathematics"
+        }
+    ')
+    
+    say complex{"course"}                    # => Mathematics
+    say complex{"users"}[0]{"name"}          # => Alice
+    say complex{"users"}[0]{"scores"}[1]     # => 92
+
+=head2 Accessing CPAN Statistics Module
+
+    # Use List::Util for statistics
+    var stats = Perl.eval('
+        use List::Util qw(sum min max);
+        my @numbers = (23, 45, 12, 67, 89, 34, 56);
+        {
+            sum => sum(@numbers),
+            min => min(@numbers),
+            max => max(@numbers),
+            avg => sum(@numbers) / scalar(@numbers)
+        }
+    ')
+    
+    say "Sum: #{stats{"sum"}}"      # => Sum: 326
+    say "Min: #{stats{"min"}}"      # => Min: 12
+    say "Max: #{stats{"max"}}"      # => Max: 89
+    say "Avg: #{stats{"avg"}}"      # => Avg: 46.571...
+
+=head1 NOTES AND CAVEATS
+
+=over 4
+
+=item * B<Performance:> Crossing the language boundary has overhead. For
+performance-critical code, consider implementing directly in Sidef or Perl
+rather than switching between them frequently.
+
+=item * B<Error Handling:> Perl errors during evaluation will propagate as
+Sidef exceptions. Wrap Perl evaluation in try-catch blocks when appropriate.
+
+=item * B<Variable Scope:> Each call to C<eval> creates a new evaluation
+context. Variables defined in one evaluation are not accessible in another
+unless you use Perl's package variables.
+
+=item * B<String Escaping:> When passing Perl code as strings, be mindful of
+escape sequences. Consider using Sidef's raw strings or triple-quoted strings
+for complex Perl code.
+
+=item * B<Memory:> Converted data structures are independent copies. Modifying
+a Sidef structure won't affect the original Perl data and vice versa (except
+for tied variables).
+
+=back
+
+=head1 SECURITY CONSIDERATIONS
+
+The Perl class executes arbitrary Perl code with the full privileges of the
+Sidef process. This means:
+
+=over 4
+
+=item * Never pass untrusted user input directly to Perl evaluation
+
+=item * Be cautious when evaluating code from external sources
+
+=item * The code has full access to the filesystem, network, and system resources
+
+=item * No sandboxing or security restrictions are applied
+
+=back
+
+Only evaluate Perl code from trusted sources or implement proper input validation
+and sanitization.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Block::Block> - For working with code blocks
+
+=item * L<Sidef::Types::Hash::Hash> - For hash operations
+
+=item * L<Sidef::Types::Array::Array> - For array operations
+
+=item * L<perltie> - Perl documentation on the tie mechanism
+
+=item * L<eval|perlfunc/eval> - Perl's eval function documentation
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
 
 =cut
