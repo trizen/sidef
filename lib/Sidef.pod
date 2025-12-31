@@ -894,9 +894,9 @@ Sidef is designed to be expressive and intuitive. Here's a quick taste of the la
 
 =head2 Object-Oriented Programming
 
-    class Person (String Name, Number age) {
+    class Person (String name, Number age) {
         method greet {
-            say "Hello, I'm #{self.name} and I'm #{self.age} years old."
+            say "Hello, I'm #{name} and I'm #{age} years old."
         }
     }
 
