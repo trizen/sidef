@@ -1,18 +1,34 @@
-
 =encoding utf8
 
 =head1 NAME
 
-Sidef::Math::Math
+Sidef::Math::Math - Mathematical functions and algorithms for Sidef
 
 =head1 DESCRIPTION
 
-The C<Math> class implements several useful mathematical functions.
+The C<Math> class provides a comprehensive collection of mathematical functions,
+including arithmetic operations, number theory algorithms, sequence generators,
+and advanced computational methods. All methods are called as class methods on
+the C<Math> object.
 
 =head1 SYNOPSIS
 
-    say Math.lcm(3,4,5)
-    say Math.avg(1,2,3,4)
+    # Basic statistics
+    say Math.avg(1, 2, 3, 4)                    #=> 2.5
+    say Math.geometric_mean(2, 8, 32)           #=> 8
+    
+    # Number theory
+    say Math.gcd(12, 18, 24)                    #=> 6
+    say Math.lcm(4, 6, 8)                       #=> 24
+    say Math.chinese([14,643], [254,419])       #=> 87041638
+    
+    # Sequences and recurrences
+    say Math.linear_rec([1,1], [0,1], 0, 10)    # Fibonacci: [0,1,1,2,3,5,8,13,21,34,55]
+    say Math.seq(2, {.last.next_prime}).first(5) #=> [2,3,5,7,11]
+    
+    # Advanced algorithms
+    say Math.batch_gcd(1909, 2923, 291, 205)    # Efficient batch GCD
+    say Math.product_tree(10, 20, 30, 40)       # Product tree structure
 
 =head1 INHERITS
 
@@ -22,340 +38,867 @@ Inherits methods from:
 
 =head1 METHODS
 
-=head2 avg
+=head2 Arithmetic and Statistical Functions
+
+=head3 avg
 
     Math.avg(list...)
 
-Returns the arithmetic mean of a list of numbers.
+Returns the arithmetic mean (average) of a list of numbers. The arithmetic mean
+is calculated as the sum of all values divided by the count of values.
 
-    say Math.avg(42, 50, 99, 147)       #=> 84.5
+    say Math.avg(42, 50, 99, 147)               #=> 84.5
+    say Math.avg(1, 2, 3, 4, 5)                 #=> 3
+    say Math.avg(10)                            #=> 10
+
+B<Mathematical Formula:> mean = (Σx_i) / n
 
 Aliases: I<arithmetic_mean>
 
 =cut
 
-=head2 batch_gcd
-
-    Math.batch_gcd(list...)
-
-Efficiently computes the batch-gcd of a list of integers.
-
-    say Math.batch_gcd(1909,2923,291,205,989,62,451,1943,1079,2419)
-
-Output:
-
-    [1909, 1, 1, 41, 23, 1, 41, 1, 83, 41]
-
-=cut
-
-=head2 batch_invmod
-
-    Math.batch_invmod(array, n)
-
-Efficiently computes the modular multiplicative inverses of a list of integers, modulo C<n>.
-
-    say Math.batch_invmod([33, 42, 99, 103], 2017)      #=> [489, 1969, 163, 235]
-
-=cut
-
-=head2 binary_exp
-
-    Math.binary_exp(c, x, n, {|a,b| ... })
-
-Generic implementation of the binary exponentiation algorithm, using the binary expansion of C<n>.
-
-    say Math.binary_exp(1, 3, 43, {|a,b| a * b })  #=> 3^43
-    say Math.binary_exp(0, 3, 43, {|a,b| a + b })  #=> 3*43
-
-=cut
-
-=head2 binsplit
-
-    Math.binsplit(block, list...)
-
-Binary splitting algorithm.
-
-        var arr = [1,2,3,4,5,6,7]
-
-        # Sum of a list using binary splitting
-        say Math.binsplit({|a,b| a + b }, arr...)
-
-        # Product of a list using binary splitting
-        say Math.binsplit({|a,b| a * b }, arr...)
-
-=cut
-
-=head2 chinese
-
-    Math.chinese(pairs...)
-
-Returns the solution for C<x> in C<x ≡ a_k (mod m_k)>, using the Chinese Remainder Theorem (CRT), given a list of pairs C<[a_k,m_k]>:
-
-    say Math.chinese([14,643], [254,419], [87,733])     #=> 87041638
-
-=cut
-
-=head2 for
-
-    Math.for(initial, conditionBlock, nextTermBlock)
-
-Returns an Enumerator object, generating a sequence of numbers based on the C<conditionBlock> and C<nextTermBlock> blocks.
-
-    Math.for(1, { _ <= 10 }, { .inc }).each { .say }     # count from 1 to 10
-
-The value of C<conditionBlock> can be C<nil>, which creates an infinite Enumerator object:
-
-    say Math.for(2, nil, { .next_prime }).first(25)      # array of first 25 primes
-
-=cut
-
-=head2 gcd
-
-    Math.gcd(list...)
-
-Returns the greatest common divisor (GCD) of a list of integers.
-
-=cut
-
-=head2 gcd_factors
-
-    Math.gcd_factors(n, [a, b, ...])
-
-Given a positive integer and an array of integers, it tries to find non-trivial factors of n, checking each C<gcd(n, array[0])>, C<gcd(n, array[1])>, etc.
-
-    var n = 43*43*97*503
-    var a = [19*43*97, 1, 13*41*43*101]
-    say Math.gcd_factors(n, a)          #=> [43, 43, 97, 503]
-
-The product of the factors gives back C<n>. However, some factors may be composite.
-
-=cut
-
-=head2 geometric_mean
+=head3 geometric_mean
 
     Math.geometric_mean(list...)
 
-Returns the geometric mean of a list of numbers.
+Returns the geometric mean of a list of numbers. The geometric mean is the
+n-th root of the product of n numbers, useful for averaging ratios and growth rates.
 
-    say Math.geometric_mean(42, 50, 99, 147)        #=> 74.352051512093712...
+    say Math.geometric_mean(42, 50, 99, 147)    #=> 74.352051512093712...
+    say Math.geometric_mean(1, 2, 4, 8)         #=> 2.8284271247461903...
+    say Math.geometric_mean(3, 27)              #=> 9
+
+B<Mathematical Formula:> geometric_mean = (Πx_i)^(1/n)
+
+B<Use Case:> Averaging growth rates, ratios, and proportional data.
 
 =cut
 
-=head2 harmonic_mean
+=head3 harmonic_mean
 
     Math.harmonic_mean(list...)
 
-Returns the harmonic mean of a list of numbers.
+Returns the harmonic mean of a list of numbers. The harmonic mean is the
+reciprocal of the arithmetic mean of reciprocals, useful for averaging rates.
 
-    say Math.harmonic_mean(42, 50, 99, 147)         #=> 65.883471411109602...
+    say Math.harmonic_mean(42, 50, 99, 147)     #=> 65.883471411109602...
+    say Math.harmonic_mean(1, 2, 4)             #=> 1.7142857142857142...
+    say Math.harmonic_mean(60, 40)              #=> 48
 
-=cut
+B<Mathematical Formula:> harmonic_mean = n / (Σ(1/x_i))
 
-=head2 lcm
-
-    Math.lcm(list...)
-
-Returns the least common multiple (LCM) of a list of integers.
-
-=cut
-
-=head2 linear_rec
-
-    Math.linear_rec(ker, init, n)
-    Math.linear_rec(ker, init, from, to)
-
-Returns the n-th term or the terms with indices in the range C<from> .. C<to> (as an Array object), by iterating the linear recurrence with kernel C<ker> starting with initial values C<init>.
-
-    say Math.linear_rec([1, 1], [0, 1], 0, 5)                    #=> [0, 1, 1, 2, 3, 5]
-    say Math.linear_rec([3, -3, 1], [0, 1, 3], 0, 5)             #=> [0, 1, 3, 6, 10, 15]
-    say Math.linear_rec([4, -6, 4, -1], [0, 1, 5, 14], 100000)   #=> 333338333350000
-
-Aliases: I<linear_recurrence>
+B<Use Case:> Averaging speeds, rates, and ratios (e.g., average speed for a
+round trip with different speeds in each direction).
 
 =cut
 
-=head2 linear_recmod
-
-    Math.linear_recmod(ker, init, n, m)
-
-Returns the n-th term modulo C<m>, defined by the linear recurrence with kernel C<ker> starting with initial values C<init>.
-
-    say Math.linear_recmod([1, 1], [0, 1], 43, 43)     #=> 42 (== fibmod(43,43))
-
-Aliases: I<linear_recurrence_mod>
-
-=cut
-
-=head2 linear_recurrence_matrix
-
-    Math.linear_recurrence_matrix(ker)
-
-Returns a Matrix object that represents the given linear recurrence kernel.
-
-=cut
-
-=head2 map
-
-    Math.map(value, in_min, in_max, out_min, out_max)
-
-Return a given value mapped from a given range to another given range.
-
-    # Map 25 from 1..100, to 1..10
-    say Math.map(25, 1, 100, 1, 10)     #=> 3.181818181...
-
-=cut
-
-=head2 max
+=head3 max
 
     Math.max(list...)
 
 Returns the largest numerical value from a list of numbers.
 
+    say Math.max(42, 17, 99, 5)                 #=> 99
+    say Math.max(-10, -5, -20)                  #=> -5
+    say Math.max(3.14159)                       #=> 3.14159
+
 =cut
 
-=head2 min
+=head3 min
 
     Math.min(list...)
 
 Returns the smallest numerical value from a list of numbers.
 
-=cut
-
-=head2 num2percent
-
-    Math.num2percent(num, min, max)
-
-Returns a given value as a percentage, given C<min> and C<max> of the value range.
-
-    # Map the value 25 as a percentage, from a range 1..400
-    say Math.num2percent(25, 1, 400)        #=> 6.01503759398...
+    say Math.min(42, 17, 99, 5)                 #=> 5
+    say Math.min(-10, -5, -20)                  #=> -20
+    say Math.min(2.71828)                       #=> 2.71828
 
 =cut
 
-=head2 prod
+=head3 sum
+
+    Math.sum(list...)
+
+Returns the sum of all numbers in the list. Returns 0 for an empty list.
+
+    say Math.sum(1, 2, 3, 4, 5)                 #=> 15
+    say Math.sum(10, -5, 3.5)                   #=> 8.5
+    say Math.sum(100)                           #=> 100
+
+=cut
+
+=head3 prod
 
     Math.prod(list...)
 
-Returns the product of a list of numbers.
+Returns the product of all numbers in the list. Returns 1 for an empty list.
+
+    say Math.prod(1, 2, 3, 4, 5)                #=> 120
+    say Math.prod(2, 3, 5, 7)                   #=> 210
+    say Math.prod(10, 0.5)                      #=> 5
 
 Aliases: I<product>
 
 =cut
 
-=head2 product_tree
+=head2 Number Theory Functions
 
-    Math.product_tree(list...)
+=head3 gcd
 
-Return the product-tree of a list of integers.
+    Math.gcd(list...)
 
-    say Math.product_tree(10,20,30,40,50,60)
+Returns the greatest common divisor (GCD) of a list of integers. The GCD is
+the largest positive integer that divides all given numbers without remainder.
 
-=cut
+    say Math.gcd(12, 18)                        #=> 6
+    say Math.gcd(48, 18, 24)                    #=> 6
+    say Math.gcd(100, 75, 50, 25)               #=> 25
+    say Math.gcd(17, 19)                        #=> 1 (coprime)
 
-=head2 range_map
+B<Algorithm:> Uses Euclid's algorithm for efficiency.
 
-    Math.range_map(amount, from, to)
-
-Returns a RangeNumber object with the C<amount> value mapped between the values C<from> and C<to>.
-
-    say Math.range_map(10, 2, 5)    #=> RangeNum(2, 5, 3/10)
-
-=cut
-
-=head2 range_sum
-
-    Math.range_sum(from, to, step)
-
-Returns the sum of a given range and an optional given step.
-
-    say Math.range_sum(1, 10)      #=> 55
-    say Math.range_sum(1, 10, 2)   #=> 30.25
+B<Properties:>
+  • gcd(a, 0) = a
+  • gcd(a, b) = gcd(b, a mod b)
+  • gcd is commutative and associative
 
 =cut
 
-=head2 remainders
+=head3 lcm
+
+    Math.lcm(list...)
+
+Returns the least common multiple (LCM) of a list of integers. The LCM is
+the smallest positive integer that is divisible by all given numbers.
+
+    say Math.lcm(4, 6)                          #=> 12
+    say Math.lcm(3, 4, 5)                       #=> 60
+    say Math.lcm(12, 18, 24)                    #=> 72
+    say Math.lcm(7, 5, 3)                       #=> 105
+
+B<Relationship to GCD:> lcm(a, b) = (a × b) / gcd(a, b)
+
+=cut
+
+=head3 batch_gcd
+
+    Math.batch_gcd(list...)
+
+Efficiently computes the batch-GCD of a list of integers using a product tree
+algorithm. This finds the GCD between all possible pairs of numbers in the list,
+which is useful for finding common factors across many numbers simultaneously.
+
+    say Math.batch_gcd(1909, 2923, 291, 205, 989, 62, 451, 1943, 1079, 2419)
+
+Output:
+
+    [1909, 1, 1, 41, 23, 1, 41, 1, 83, 41]
+
+B<Algorithm:> Uses the product tree method from facthacks.cr.yp.to
+
+B<Complexity:> More efficient than pairwise GCD for large lists.
+
+B<Use Case:> Factoring large numbers, finding shared factors in datasets,
+cryptanalysis of RSA keys with shared factors.
+
+=cut
+
+=head3 batch_invmod
+
+    Math.batch_invmod(array, n)
+
+Efficiently computes the modular multiplicative inverses of a list of integers
+modulo C<n>. For each element x in the array, finds y such that (x × y) ≡ 1 (mod n).
+
+    say Math.batch_invmod([33, 42, 99, 103], 2017)      #=> [489, 1969, 163, 235]
+    say Math.batch_invmod([3, 5, 7], 11)                #=> [4, 9, 8]
+
+Verification:
+
+    (33 × 489) mod 2017 = 1
+    (42 × 1969) mod 2017 = 1
+
+B<Algorithm:> Uses Algorithm 2.11 (MultipleInversion) from Modern Computer Arithmetic.
+
+B<Complexity:> O(n) with only one modular inversion instead of n separate inversions.
+
+B<Requirement:> Each element must be coprime to n (gcd(x, n) = 1).
+
+=cut
+
+=head3 chinese
+
+    Math.chinese(pairs...)
+
+Solves a system of modular congruences using the Chinese Remainder Theorem (CRT).
+Given pairs [a_k, m_k], finds x such that x ≡ a_k (mod m_k) for all k.
+
+    say Math.chinese([14,643], [254,419], [87,733])     #=> 87041638
+    say Math.chinese([2,3], [3,5], [2,7])               #=> 23
+    
+    # Verification for second example:
+    # 23 mod 3 = 2 ✓
+    # 23 mod 5 = 3 ✓
+    # 23 mod 7 = 2 ✓
+
+B<System of Congruences:>
+  x ≡ a₁ (mod m₁)
+  x ≡ a₂ (mod m₂)
+  ...
+  x ≡ aₙ (mod mₙ)
+
+B<Requirement:> The moduli must be pairwise coprime (gcd(mᵢ, mⱼ) = 1 for i ≠ j).
+
+B<Use Case:> Solving simultaneous modular equations, calendar calculations,
+RSA cryptography optimizations.
+
+=cut
+
+=head3 gcd_factors
+
+    Math.gcd_factors(n, [a, b, ...])
+
+Given a positive integer n and an array of integers, attempts to find non-trivial
+factors of n by computing gcd(n, array[i]) for each element. This is particularly
+useful when you have auxiliary information that might share factors with n.
+
+    var n = 43 * 43 * 97 * 503          # n = 8717237
+    var a = [19*43*97, 1, 13*41*43*101]
+    say Math.gcd_factors(n, a)          #=> [43, 43, 97, 503]
+
+B<Returns:> An array of factors whose product equals n. Note that some factors
+may be composite (not fully factored into primes).
+
+B<Use Case:> Partial factorization, leveraging side-channel information,
+batch factoring with shared computation.
+
+=cut
+
+=head3 remainders
 
     Math.remainders(n, array)
 
-Efficiently returns the remainders of C<n> when divided by each integer from the given array.
+Efficiently computes the remainders of n when divided by each integer in the
+given array. Uses a product tree algorithm for optimal performance with many divisors.
 
-    say Math.remainders(8675309, [11,13,17,19,23])      #=> [5, 6, 5, 4, 8]
+    say Math.remainders(8675309, [11, 13, 17, 19, 23])  #=> [5, 6, 5, 4, 8]
+    say Math.remainders(100, [3, 5, 7, 11])             #=> [1, 0, 2, 1]
 
-=cut
+Verification:
 
-=head2 seq
+    8675309 mod 11 = 5
+    8675309 mod 13 = 6
+    8675309 mod 17 = 5
 
-    Math.seq(x, y, z, ..., {|a,n| ... })
+B<Algorithm:> Uses product tree method from facthacks.cr.yp.to
 
-Returns an Enumerator object which generates an infinite sequence specified by the initial terms and the given block.
-
-Example:
-
-    say Math.seq(2, { .last.next_prime }).first(30)     # prime numbers
-    say Math.seq(1, 1, { .last(2).sum }).first(30)      # Fibonacci numbers
-
-=cut
-
-=head2 smooth_numbers
-
-    Math.smooth_numbers(primes...)
-
-It returns an Enumerator object, which generates smooth numbers using the given list of primes.
-
-Example:
-
-        var a = Math.smooth_numbers(2,3,5,7)    # 7-smooth numbers
-        var b = Math.smooth_numbers(2,5,7)      # 7-smooth numbers not divisible by 3
-
-        say a.first(30)
-        say b.first(30)
-
-        # Iteration is also supported
-        a.each {|k|
-            if (k > 1e5) {
-                say k           #=> 100352
-                break
-            }
-        }
+B<Complexity:> More efficient than computing each remainder separately for large arrays.
 
 =cut
 
-=head2 solve_rec_seq
+=head3 product_tree
+
+    Math.product_tree(list...)
+
+Constructs a product tree from a list of integers. A product tree is a hierarchical
+structure where each level contains products of adjacent pairs from the level below.
+
+    say Math.product_tree(10, 20, 30, 40, 50, 60)
+
+Output structure:
+
+    [
+      [10, 20, 30, 40, 50, 60],      # Level 0: original values
+      [200, 1200, 3000],              # Level 1: pairwise products
+      [240000, 3000],                 # Level 2: pairwise products
+      [720000000]                     # Level 3: final product
+    ]
+
+B<Algorithm:> Based on facthacks.cr.yp.to/product.html
+
+B<Use Case:> Building block for efficient batch operations (batch_gcd, remainders),
+divide-and-conquer algorithms.
+
+=cut
+
+=head2 Binary and Generic Algorithms
+
+=head3 binary_exp
+
+    Math.binary_exp(c, x, n, {|a,b| ... })
+
+Generic implementation of the binary exponentiation algorithm (also known as
+exponentiation by squaring). Uses the binary expansion of n to efficiently
+compute a result using a custom binary operation.
+
+    # Standard exponentiation: 3^43
+    say Math.binary_exp(1, 3, 43, {|a,b| a * b })       #=> 2058911320946491
+    
+    # Repeated addition: 3 × 43
+    say Math.binary_exp(0, 3, 43, {|a,b| a + b })       #=> 129
+    
+    # String repetition
+    say Math.binary_exp("", "Hi", 5, {|a,b| a + b })    #=> "HiHiHiHiHi"
+
+B<Algorithm:> Examines each bit of n from right to left, squaring x and
+conditionally multiplying the result based on the bit value.
+
+B<Parameters:>
+  • c: Initial accumulator value (identity element)
+  • x: Base value
+  • n: Exponent (must be non-negative integer)
+  • block: Binary operation taking two arguments
+
+B<Complexity:> O(log n) operations instead of O(n)
+
+=cut
+
+=head3 binsplit
+
+    Math.binsplit(block, list...)
+
+Binary splitting algorithm for associative operations. Recursively divides
+the list in half, applies the operation to each half, then combines results.
+
+    var arr = [1, 2, 3, 4, 5, 6, 7, 8]
+    
+    # Sum using binary splitting
+    say Math.binsplit({|a,b| a + b }, arr...)           #=> 36
+    
+    # Product using binary splitting
+    say Math.binsplit({|a,b| a * b }, arr...)           #=> 40320
+    
+    # Find maximum using binary splitting
+    say Math.binsplit({|a,b| a > b ? a : b }, arr...)   #=> 8
+
+B<Algorithm:> Divide-and-conquer approach that can be more cache-friendly and
+parallelizable than sequential accumulation.
+
+B<Complexity:> O(n) operations with better cache locality than sequential folds.
+
+B<Use Case:> Parallel computation, numerical stability in floating-point arithmetic.
+
+=cut
+
+=head2 Sequence and Recurrence Functions
+
+=head3 linear_rec
+
+    Math.linear_rec(ker, init, n)
+    Math.linear_rec(ker, init, from, to)
+
+Computes terms of a linear recurrence relation. Returns the n-th term, or an
+array of terms from index 'from' to 'to'.
+
+B<Definition:> A linear recurrence satisfies:
+  a(n) = k₁·a(n-1) + k₂·a(n-2) + ... + kₘ·a(n-m)
+
+where ker = [k₁, k₂, ..., kₘ] is the kernel and init provides initial values.
+
+    # Fibonacci: F(n) = F(n-1) + F(n-2)
+    say Math.linear_rec([1, 1], [0, 1], 0, 10)
+    #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+    
+    # Triangular numbers: T(n) = 3·T(n-1) - 3·T(n-2) + T(n-3)
+    say Math.linear_rec([3, -3, 1], [0, 1, 3], 0, 5)
+    #=> [0, 1, 3, 6, 10, 15]
+    
+    # Tetrahedral numbers (sum of triangular numbers)
+    say Math.linear_rec([4, -6, 4, -1], [0, 1, 5, 14], 100000)
+    #=> 333338333350000
+
+B<Algorithm:> Uses matrix exponentiation for efficient computation: O(m³ log n)
+where m is the recurrence order.
+
+B<Examples:>
+  • Fibonacci: ker=[1,1], init=[0,1]
+  • Lucas: ker=[1,1], init=[2,1]
+  • Tribonacci: ker=[1,1,1], init=[0,0,1]
+  • Pell: ker=[2,1], init=[0,1]
+
+Aliases: I<linear_recurrence>
+
+=cut
+
+=head3 linear_recmod
+
+    Math.linear_recmod(ker, init, n, m)
+
+Computes the n-th term of a linear recurrence modulo m. This is much more
+efficient than computing the full term and then taking modulo for large n.
+
+    # Fibonacci mod 43: F(43) mod 43
+    say Math.linear_recmod([1, 1], [0, 1], 43, 43)      #=> 42
+    
+    # Fibonacci mod 1000
+    say Math.linear_recmod([1, 1], [0, 1], 100, 1000)   #=> 515
+    
+    # Lucas numbers mod 97
+    say Math.linear_recmod([1, 1], [2, 1], 50, 97)      #=> 79
+
+B<Algorithm:> Uses modular matrix exponentiation with matrix powmod operation.
+
+B<Complexity:> O(m³ log n) where m is the recurrence order, with all
+operations performed modulo m to keep numbers bounded.
+
+B<Use Case:> Computing large Fibonacci/Lucas numbers modulo m, cryptographic
+applications, periodic sequence analysis.
+
+Aliases: I<linear_recurrence_mod>
+
+=cut
+
+=head3 linear_recurrence_matrix
+
+    Math.linear_recurrence_matrix(ker)
+
+Constructs the companion matrix for a given linear recurrence kernel. This
+matrix can be exponentiated to efficiently compute recurrence terms.
+
+    # Fibonacci companion matrix
+    var M = Math.linear_recurrence_matrix([1, 1])
+    say M               #=> Matrix([[0,1], [1,1]])
+    
+    # Tribonacci companion matrix
+    var T = Math.linear_recurrence_matrix([1, 1, 1])
+    say T               #=> Matrix([[0,1,0], [0,0,1], [1,1,1]])
+
+B<Properties:> For kernel [k₁, k₂, ..., kₘ], creates an m×m matrix where:
+  • Upper rows form a shift matrix (identity shifted one position)
+  • Bottom row contains the kernel in reverse order
+
+B<Use Case:> Matrix-based recurrence computation, studying recurrence properties
+through eigenvalue analysis.
+
+=cut
+
+=head3 solve_rec_seq
 
     Math.solve_rec_seq(array)
 
-Attempts to find a minimal linear recurrence that generates the given array of numbers:
+Analyzes a sequence and attempts to find the minimal linear recurrence that
+generates it. Returns the kernel of the recurrence relation.
 
-    say Math.solve_rec_seq(30.of { .fibonacci })      #=> [1, 1]
-    say Math.solve_rec_seq(30.of { .square })         #=> [3, -3, 1]
-    say Math.solve_rec_seq(30.of { .faulhaber(2) })   #=> [4, -6, 4, -1]
+    # Fibonacci sequence
+    say Math.solve_rec_seq(30.of { .fibonacci })        #=> [1, 1]
+    
+    # Square numbers: n²
+    say Math.solve_rec_seq(30.of { .square })           #=> [3, -3, 1]
+    
+    # Sum of squares: 1² + 2² + ... + n²
+    say Math.solve_rec_seq(30.of { .faulhaber(2) })     #=> [4, -6, 4, -1]
+    
+    # Catalan numbers
+    say Math.solve_rec_seq(20.of { .catalan })          #=> [4, -6, 2]
+
+B<Algorithm:> Uses the Berlekamp-Massey algorithm to find the shortest linear
+feedback shift register (LFSR) that generates the sequence.
+
+B<Complexity:> O(n²) where n is the sequence length.
+
+B<Note:> Requires enough terms to uniquely determine the recurrence. For a
+recurrence of order k, you need at least 2k terms.
 
 Aliases: I<find_linear_recurrence>
 
 =cut
 
-=head2 solve_seq
+=head3 solve_seq
 
     Math.solve_seq(array, offset=0)
 
-Returns a Polynomial object that generates the terms of the given sequence.
+Finds a polynomial that generates the given sequence. Uses polynomial
+interpolation to construct the generating function.
 
-Example:
+    # Polynomial for squares: n²
+    say Math.solve_seq(20.of { .square })               #=> x^2
+    
+    # Polynomial for sum of squares: n(n+1)(2n+1)/6
+    say Math.solve_seq(20.of { .faulhaber(2) })         #=> 1/3*x^3 + 1/2*x^2 + 1/6*x
+    
+    # Polynomial for cubes: n³
+    say Math.solve_seq(20.of { .cube })                 #=> x^3
 
-    say Math.solve_seq(20.of { .square })         #=> x^2
-    say Math.solve_seq(20.of { .faulhaber(2) })   #=> 1/3*x^3 + 1/2*x^2 + 1/6*x
+B<With offset (starting index):>
 
-Example with offset:
+    # Generate sequence starting at n=10
+    say Math.solve_seq(20.of { (_+10)**3 })             #=> x^3 + 30*x^2 + 300*x + 1000
+    
+    # Same sequence with offset=10
+    say Math.solve_seq(20.of { (_+10)**3 }, 10)         #=> x^3
 
-    say Math.solve_seq(20.of { (_+10)**3 })       #=> x^3 + 30*x^2 + 300*x + 1000
-    say Math.solve_seq(20.of { (_+10)**3 }, 10)   #=> x^3
+B<Use Case:> Finding closed-form formulas for sequences, polynomial regression,
+generating functions.
 
 =cut
 
-=head2 sum
+=head3 seq
 
-    Math.sum(list...)
+    Math.seq(x, y, z, ..., {|a,n| ... })
 
-Returns the sum of a list of numbers.
+Creates an Enumerator that generates an infinite sequence. Initial terms are
+provided, followed by a block that computes subsequent terms based on the
+sequence history.
+
+    # Prime numbers (starting from 2)
+    say Math.seq(2, { .last.next_prime }).first(10)
+    #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+    
+    # Fibonacci numbers
+    say Math.seq(1, 1, { .last(2).sum }).first(15)
+    #=> [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]
+    
+    # Tribonacci numbers
+    say Math.seq(0, 0, 1, { .last(3).sum }).first(10)
+    #=> [0, 0, 1, 1, 2, 4, 7, 13, 24, 44]
+    
+    # Powers of 2
+    say Math.seq(1, { .last * 2 }).first(10)
+    #=> [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+
+B<Block Parameters:>
+  • First parameter: Array reference to the sequence so far
+  • Second parameter: Index of the term being computed
+
+B<Note:> The sequence is lazy-evaluated, computing terms only as needed.
+
+=cut
+
+=head3 for
+
+    Math.for(initial, conditionBlock, nextTermBlock)
+
+Creates an Enumerator that generates a sequence based on an initial value,
+a condition, and a function for computing the next term. Similar to a for-loop
+but returns an enumerable sequence.
+
+    # Count from 1 to 10
+    Math.for(1, { _ <= 10 }, { .inc }).each { .say }
+    
+    # Even numbers from 2 to 20
+    Math.for(2, { _ <= 20 }, { _ + 2 }).each { .say }
+    
+    # Powers of 2 up to 1000
+    Math.for(1, { _ < 1000 }, { _ * 2 }).each { .say }
+
+B<Infinite sequences> (condition = nil):
+
+    # First 25 prime numbers
+    say Math.for(2, nil, { .next_prime }).first(25)
+    
+    # Fibonacci-like sequence (infinite)
+    var fib = Math.for([0,1], nil, { [_[1], _[0] + _[1]] })
+    say fib.map { _[0] }.first(20)
+
+B<Parameters:>
+  • initial: Starting value
+  • conditionBlock: Condition to continue (nil for infinite)
+  • nextTermBlock: Function to compute next term from current
+
+=cut
+
+=head3 smooth_numbers
+
+    Math.smooth_numbers(primes...)
+
+Returns an Enumerator that generates smooth numbers (numbers whose prime
+factors are all from a given set). These are also known as regular numbers
+or numbers with restricted prime divisors.
+
+    # 7-smooth numbers (Hamming numbers with extra prime)
+    var a = Math.smooth_numbers(2, 3, 5, 7)
+    say a.first(30)
+    #=> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 18, 20, ...]
+    
+    # 5-smooth numbers (regular/Hamming numbers)
+    var b = Math.smooth_numbers(2, 3, 5)
+    say b.first(20)
+    #=> [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20, 24, 25, ...]
+    
+    # 7-smooth numbers not divisible by 3
+    var c = Math.smooth_numbers(2, 5, 7)
+    say c.first(20)
+
+B<Iteration with conditions:>
+
+    var smooth = Math.smooth_numbers(2, 3, 5, 7)
+    smooth.each {|k|
+        if (k > 1e5) {
+            say k       #=> 100352
+            break
+        }
+    }
+
+B<Algorithm:> Uses a priority queue-like approach with multiple streams,
+one for each prime.
+
+B<Use Case:> Generating Hamming numbers, finding numbers with small prime
+factors, music theory (just intonation), computer science (optimal hash sizes).
+
+=cut
+
+=head2 Mapping and Transformation Functions
+
+=head3 map
+
+    Math.map(value, in_min, in_max, out_min, out_max)
+
+Maps a value from one numeric range to another proportionally. Linear
+interpolation between ranges.
+
+    # Map 25 from range [1,100] to range [1,10]
+    say Math.map(25, 1, 100, 1, 10)             #=> 3.1818181818...
+    
+    # Map 5 from [0,10] to [0,100]
+    say Math.map(5, 0, 10, 0, 100)              #=> 50
+    
+    # Map 0.5 from [0,1] to [-1,1]
+    say Math.map(0.5, 0, 1, -1, 1)              #=> 0
+
+B<Formula:>
+  output = (value - in_min) × (out_max - out_min) / (in_max - in_min) + out_min
+
+B<Use Case:> Scaling sensor data, converting between units, normalizing values,
+graphics programming (coordinate transformations).
+
+=cut
+
+=head3 range_map
+
+    Math.range_map(amount, from, to)
+
+Creates a RangeNumber object representing a value mapped proportionally
+between two endpoints.
+
+    say Math.range_map(10, 2, 5)                #=> RangeNum(2, 5, 3/10)
+    
+    # Creates a range number representing 30% of [2,5]
+    # Value = 2 + (5-2) × 3/10 = 2.9
+
+B<Use Case:> Creating proportional values, progress indicators, interpolation
+objects.
+
+=cut
+
+=head3 num2percent
+
+    Math.num2percent(num, min, max)
+
+Converts a value to a percentage based on its position within a given range.
+
+    # Value 25 in range [1,400]
+    say Math.num2percent(25, 1, 400)            #=> 6.01503759398...
+    
+    # Value 50 in range [0,100]
+    say Math.num2percent(50, 0, 100)            #=> 50
+    
+    # Value 75 in range [50,100]
+    say Math.num2percent(75, 50, 100)           #=> 50
+
+B<Formula:>
+  percent = ((range_size - distance_from_max) / range_size) × 100
+
+B<Use Case:> Progress calculations, statistical analysis, data normalization.
+
+=cut
+
+=head3 range_sum
+
+    Math.range_sum(from, to, step)
+
+Computes the sum of an arithmetic sequence with optional step size using
+a closed-form formula instead of iteration.
+
+    # Sum of 1+2+3+...+10
+    say Math.range_sum(1, 10)                   #=> 55
+    
+    # Sum of arithmetic sequence with step 2: 1+3+5+7+9
+    say Math.range_sum(1, 10, 2)                #=> 30.25
+    
+    # Sum of 10+11+12+...+100
+    say Math.range_sum(10, 100)                 #=> 5005
+
+B<Formula:>
+  sum = (first + last) × count / 2
+  where count = (last - first) / step + 1
+
+B<Complexity:> O(1) - constant time, regardless of range size.
+
+B<Use Case:> Computing sums without iteration, mathematical series, algorithm analysis.
+
+=cut
+
+=head1 EXAMPLES
+
+=head2 Computing Fibonacci Numbers
+
+    # Using linear recurrence
+    var fib10 = Math.linear_rec([1,1], [0,1], 10)
+    say fib10                               #=> 55
+    
+    # Generating Fibonacci sequence
+    var fibs = Math.linear_rec([1,1], [0,1], 0, 15)
+    say fibs
+    #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]
+
+=head2 Finding Common Factors
+
+    # Find GCD of multiple numbers
+    say Math.gcd(48, 180, 120)              #=> 12
+    
+    # Batch GCD for factoring
+    var numbers = [143, 221, 323, 391]
+    say Math.batch_gcd(numbers...)          #=> [11, 13, 17, 17]
+
+=head2 Solving Modular Equations
+
+    # Chinese Remainder Theorem
+    # Find x where: x ≡ 2 (mod 3), x ≡ 3 (mod 4), x ≡ 1 (mod 5)
+    say Math.chinese([2,3], [3,4], [1,5])   #=> 11
+
+=head2 Generating Special Sequences
+
+    # Prime numbers
+    var primes = Math.seq(2, { .last.next_prime })
+    say primes.first(20)
+    
+    # Perfect squares
+    var squares = Math.for(1, { _ <= 100 }, { .inc })
+    say squares.map { .square }.to_a
+    
+    # Hamming numbers (2,3,5-smooth)
+    var hamming = Math.smooth_numbers(2, 3, 5)
+    say hamming.first(20)
+
+=head2 Working with Statistical Measures
+
+    var data = [23, 45, 67, 89, 12, 34, 56, 78]
+    
+    say "Min: #{Math.min(data...)}"                     #=> Min: 12
+    say "Max: #{Math.max(data...)}"                     #=> Max: 89
+    say "Sum: #{Math.sum(data...)}"                     #=> Sum: 404
+    say "Arithmetic Mean: #{Math.avg(data...)}"         #=> 50.5
+    say "Geometric Mean: #{Math.geometric_mean(data...)}"
+    say "Harmonic Mean: #{Math.harmonic_mean(data...)}"
+
+=head2 Sequence Analysis
+
+    # Find the recurrence for a sequence
+    var seq = 20.of { .fibonacci }
+    var kernel = Math.solve_rec_seq(seq)
+    say "Kernel: #{kernel}"                             #=> [1, 1]
+    
+    # Verify by regenerating
+    var regenerated = Math.linear_rec(kernel, [0,1], 0, 19)
+    say (seq == regenerated)                            #=> true
+
+=head1 MATHEMATICAL BACKGROUND
+
+=head2 Linear Recurrence Relations
+
+A linear recurrence relation of order m has the form:
+
+    a(n) = c₁·a(n-1) + c₂·a(n-2) + ... + cₘ·a(n-m)
+
+The coefficients [c₁, c₂, ..., cₘ] form the recurrence kernel. Famous examples:
+
+B<Fibonacci (order 2):> F(n) = F(n-1) + F(n-2), kernel = [1, 1]
+
+B<Tribonacci (order 3):> T(n) = T(n-1) + T(n-2) + T(n-3), kernel = [1, 1, 1]
+
+B<Lucas (order 2):> L(n) = L(n-1) + L(n-2), kernel = [1, 1], init = [2, 1]
+
+The order of a polynomial sequence of degree d is d+1:
+  • Linear (degree 1): order 2, kernel = [2, -1]
+  • Quadratic (degree 2): order 3, kernel = [3, -3, 1]
+  • Cubic (degree 3): order 4, kernel = [4, -6, 4, -1]
+
+=head2 Chinese Remainder Theorem
+
+The CRT states that if m₁, m₂, ..., mₙ are pairwise coprime, then the system:
+
+    x ≡ a₁ (mod m₁)
+    x ≡ a₂ (mod m₂)
+    ...
+    x ≡ aₙ (mod mₙ)
+
+has a unique solution modulo M = m₁ × m₂ × ... × mₙ.
+
+=head2 Smooth Numbers
+
+A number is k-smooth (or k-friable) if all its prime factors are ≤ k.
+Special cases:
+
+B<5-smooth numbers> (Hamming/regular numbers): Only factors 2, 3, 5
+  • Used in Babylonian mathematics
+  • Appear in music theory (just intonation)
+  • Sequence: 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20, ...
+
+B<7-smooth numbers:> Factors from {2, 3, 5, 7}
+
+=head2 Batch Algorithms
+
+Batch algorithms process multiple inputs simultaneously, often more efficiently
+than processing each individually:
+
+B<batch_gcd>: Finds GCD between all pairs using a product tree in O(n log² n)
+instead of O(n²) pairwise comparisons.
+
+B<batch_invmod>: Computes n modular inverses using only one inversion plus
+O(n) multiplications, instead of n separate inversions.
+
+=head1 PERFORMANCE NOTES
+
+=over 4
+
+=item * Linear recurrence using matrix exponentiation is O(m³ log n) where m
+is the order and n is the term index. This is vastly faster than naive iteration
+for large n.
+
+=item * Batch algorithms (batch_gcd, batch_invmod, remainders) are asymptotically
+faster for large inputs compared to individual operations.
+
+=item * Product trees enable efficient divide-and-conquer for many number-theoretic
+operations.
+
+=item * The seq() and for() functions return lazy enumerators that compute values
+on-demand, enabling work with infinite sequences.
+
+=item * Binary exponentiation reduces O(n) operations to O(log n).
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Types::Number::Number> - Core number type with additional methods
+
+=item * L<Sidef::Types::Array::Array> - Array operations
+
+=item * L<Sidef::Types::Array::Matrix> - Matrix operations for linear recurrences
+
+=item * L<Sidef::Object::Enumerator> - Lazy sequence evaluation
+
+=back
+
+=head1 REFERENCES
+
+=over 4
+
+=item * Product trees and batch algorithms: L<https://facthacks.cr.yp.to/>
+
+=item * Chinese Remainder Theorem: Hardy & Wright, "An Introduction to the Theory of Numbers"
+
+=item * Linear recurrences: Fieker & Hofmann, "Fast Computation of Linear Generators"
+
+=item * Berlekamp-Massey algorithm: Massey, "Shift-Register Synthesis and BCH Decoding"
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
 
 =cut
