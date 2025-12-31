@@ -894,10 +894,7 @@ Sidef is designed to be expressive and intuitive. Here's a quick taste of the la
 
 =head2 Object-Oriented Programming
 
-    class Person {
-        has String name
-        has Number age
-
+    class Person (String Name, Number age) {
         method greet {
             say "Hello, I'm #{self.name} and I'm #{self.age} years old."
         }
@@ -930,8 +927,8 @@ Sidef is designed to be expressive and intuitive. Here's a quick taste of the la
     func process(String s) { s.uc }
 
     # Lazy evaluation
-    var infinite = lazy { 1.. }
-    var first_ten = infinite.first(10)
+    var infinite = (1..Inf -> lazy)
+    var first_even_ten = infinite.grep{.is_even}.first(10)
 
     # Regular expressions
     if ("hello@example.com" ~~ /^\w+@\w+\.\w+$/) {
