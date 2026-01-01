@@ -1056,6 +1056,8 @@ __END__
 
 =head1 NAME
 
+sidef - The Sidef Programming Language interpreter
+
                 **   **         ****   *           *********   *********
               * * ** * *        ****   **          ** ** **    ** ** **
                **   **          ****   ***         *********   *  *  *
@@ -1066,263 +1068,846 @@ __END__
          * * ** * *             ****   ** ** **    ** ** **    **
           **   **               ****   *********   *********   *
 
-=cut
-
 =head1 SYNOPSIS
 
-Usage: sidef [switches] [--] [programfile] [arguments]
+    sidef [options] [--] [programfile] [arguments]
 
-  -c            compile the code into a Perl program
-  -C            check syntax only
-  -D            dump the syntax tree of a program
-  -E program    one line of program
-  -H            interactive help
-  -i file       execute a program in interactive mode
-  -k            keep track of potentially incorrect parser interpretations
-  -M mode       set the rounding mode of floating-point numbers
-                valid modes: [near], zero, inf, +inf, -inf, faith
-  -N options    modify class-variables inside the Number class
-                valid format: 'VERBOSE=1; USE_YAFU=1; USE_PRIMECOUNT=1'
-  -o file       file where to dump the output
-  -O level      perform code optimizations before execution
-                valid levels: [0], 1, 2
-  -P int        set the precision of floating-point numbers (default: 48)
-  -r            parse and deparse a Sidef program
-  -R lang       parse and deparse a Sidef program into a given language
-                valid values: sidef, perl
-  -s            save compiled code in a database to reduce boot-time
-  -t            treat all command-line arguments as scripts
-  -v            print version number and exit
-  -w            enable warnings with stack backtrace
-  -W            make warnings fatal (with stack backtrace)
+    # Execute a script
+    sidef script.sf
 
-Run 'sidef' for entering the interactive mode.
+    # Interactive mode (REPL)
+    sidef
+    sidef -i
 
-=head1 HELLO WORLD
+    # One-line program execution
+    sidef -E 'say "Hello, World!"'
 
-A Sidef script can be written in any text editor and, by convention, it has the C<.sf> extension.
+    # Check syntax
+    sidef -C script.sf
 
-The content of a simple I<Hello World> program looks like this:
+    # Compile to Perl
+    sidef -c -o output.pl script.sf
 
-    say "Hello, 世界"
+=head1 DESCRIPTION
 
-If we save the content in a new file called C<hello.sf>, we can execute the code by running:
+Sidef is a modern, high-level programming language designed for writing
+elegant and expressive code. This is the main interpreter for executing
+Sidef programs, providing both script execution and an interactive
+Read-Eval-Print Loop (REPL) environment.
 
-    sidef hello.sf
+Sidef features arbitrary-precision arithmetic, functional programming
+constructs, object-oriented programming, powerful regex support, and
+extensive built-in methods for common tasks. The language emphasizes
+code readability and expressiveness while maintaining strong performance
+through optimization and optional precompilation.
 
-=head1 ONE LINE OF PROGRAM
+=head1 OPTIONS
 
-The C<-E code> command will execute the code specified as a command-line argument:
-
-    sidef -E "say 'hello world'"
-
-Outputs:
-
-    hello world
-
-=head1 ITERACTIVE MODE
-
-The interactive mode (a.k.a. REPL) is available by simply executing the C<sidef> command, or by specifying the C<-i> command-line switch:
-
-    $ sidef -i
-    Sidef 25.12, running on Linux, using Perl v5.42.0.
-    Type "help", "copyright" or "license" for more information.
-    > n = 41
-    #1 = 41
-    > n**2 + n - 1
-    #2 = 1721
-    > is_prime(#2)
-    #3 = true
-    >
-
-=head1 SPECIAL REPL COMMANDS
-
-The REPL supports the following special commands:
+=head2 Execution Options
 
 =over 4
 
-=item * Display the duration it took to execute the previous command:
+=item B<-E> I<program>
 
-    > ##
+Execute a one-line program from the command line. The program is executed
+immediately without requiring a file. This is useful for quick calculations,
+text processing, or testing code snippets.
 
-=item * Refer to a previous output value, using the C<#n> syntax (a negative value for C<n> is also supported):
+    sidef -E 'say "Hello, World!"'
+    sidef -E '10.times { |i| say i**2 }'
+    sidef -E '[1,2,3,4,5].grep{.is_prime}.say'
 
-    > 3+4
-    #1 = 7
-    > sqrt(#1)
+=item B<-e> I<program>
 
-=item * Load a Sidef file inside the REPL, line by line:
+Alias for B<-E>. Execute a one-line program.
 
-    > # load filename.sf
+=item B<-i> [I<file>]
 
-=item * Execute a Sidef file inside the REPL:
+Enter interactive mode (REPL - Read-Eval-Print Loop). If a file is provided,
+its contents are loaded and executed line by line in the interactive session.
+The REPL provides immediate feedback, command history, tab completion, and
+persistent variable state throughout the session.
 
-    > # exec filename.sf
+    sidef -i                    # Start empty REPL
+    sidef -i startup.sf         # Load file into REPL
+    sidef -i < commands.txt     # Pipe commands
 
-=item * Save the code from the REPL inside a file:
+=item B<-t>
 
-    > # save filename.sf
+Test mode. Treat all command-line arguments as script files and execute them
+sequentially. Useful for running test suites. Reports which scripts succeed
+or fail and provides a summary at the end.
 
-=item * Reset the REPL:
+    sidef -t test1.sf test2.sf test3.sf
+    sidef -t tests/*.sf
 
-    > reset
+=item B<-->
 
-=item * Close the REPL:
+End of options marker. Everything after this is treated as a program file or
+arguments, even if it starts with a dash. Useful when script names begin
+with hyphens.
 
-    > quit
+    sidef -- -weird-script-name.sf
 
 =back
 
-=head1 OPTIMIZATION
+=head2 Compilation and Analysis Options
 
-The C<-O level> command-line option controls the level of optimization before the execution begins.
+=over 4
 
-Currently, there are three levels of optimization available:
+=item B<-c>
 
-    0 -- Does nothing. (default)
-    1 -- Does constant folding on the AST. (recommended)
-    2 -- Does constant folding, after which it deparses the AST into Sidef code, parses the code again and does more constant folding on the new AST.
+Compile the Sidef code into a stand-alone Perl program. The output includes
+all necessary Sidef runtime modules embedded in a single file, making it
+distributable without requiring a Sidef installation. The resulting program
+can be executed directly with Perl.
 
-In the end, the code is translated to Perl and is ready to be executed. In the translation process, several other optimizations are also performed.
+    sidef -c -o myprogram.pl script.sf
+    chmod +x myprogram.pl
+    ./myprogram.pl
 
-=head1 NUMBER OPTIONS
+Note: Code using C<eval()> may not compile correctly as it requires
+parse-time information that is lost during compilation.
 
-The C<-N> option can be used for changing the class-variables in the Number class:
+=item B<-C>
 
-    sidef -N 'PREC = 192'               # precision for floating-point numbers
-    sidef -N 'ROUND = 0'                # rounding mode for floating-point numbers
-    sidef -N 'VERBOSE = false'          # true to enable verbose/debug mode
-    sidef -N 'USE_YAFU = false'         # true to use YAFU for factoring large integers
-    sidef -N 'USE_PFGW = false'         # true to use PFGW64 as a primality pretest for large enough n
-    sidef -N 'USE_PARI_GP = false'      # true to use PARI/GP in several methods
-    sidef -N 'USE_FACTORDB = false'     # true to use factordb.com for factoring large integers
-    sidef -N 'USE_PRIMESUM = false'     # true to use Kim Walisch's primesum in prime_sum(n)
-    sidef -N 'USE_PRIMECOUNT = false'   # true to use Kim Walisch's primecount in prime_count(n)
-    sidef -N 'USE_CONJECTURES = false'  # true to use conjectured methods for better performance
-    sidef -N 'SPECIAL_FACTORS = true'   # true to try to find factors of special form in factor(n)
+Check syntax only. Parse the program and report any syntax errors without
+executing the code. Useful for validating code structure before deployment
+or as part of a continuous integration pipeline.
 
-Multiple options can be separated with C<;>, as in:
+    sidef -C script.sf
+    sidef -C *.sf               # Check all scripts
 
-    sidef -N 'VERBOSE = true; USE_FACTORDB = true' -E 'say factor(2**256 + 1)'
+=item B<-D>
 
-The C<-P> option can be used for changing the precision of floating-point numbers:
+Dump the Abstract Syntax Tree (AST) of the program. The AST represents the
+internal structure of the parsed program before execution. Useful for
+debugging parser behavior, understanding how code is interpreted, and
+developing language extensions.
 
-    sidef -P 1024 -E 'say sqrt(2)'
+    sidef -D script.sf > ast.dump
+    sidef -D -E '1 + (2 * 3)' | less
 
-The C<-M> option can be used for changing the rounding-mode for floating-point numbers:
+Requires the C<Data::Dump> Perl module.
 
-    sidef -M 'near'     # round to nearest (default)
-    sidef -M 'zero'     # round towards zero
-    sidef -M 'inf'      # round away from zero
-    sidef -M '+inf'     # round towards +Infinity
-    sidef -M '-inf'     # round towards -Infinity
-    sidef -M 'faith'    # faithful rounding
+=item B<-r>
 
-=head1 PARSER WARNINGS
+Parse and deparse the program back to Sidef code. This shows how the parser
+interpreted your code and can help identify parsing ambiguities, verify
+operator precedence, and understand method call transformations.
 
-Sidef provides the C<-k> option which will keep track of all the possible incorrect parser interpretations.
+    sidef -r script.sf
+    sidef -r -E '1 + 2/3'       # Shows: (1)->+((2)->/(3));
 
-For example, if we declare the following function, but we misspell its name when we call it, Sidef will interpret it as a method call, which is probably not what we want:
+=item B<-R> I<language>
+
+Parse and deparse the program into the specified target language. This
+translates Sidef code into equivalent code in another language while
+preserving semantics. Valid values are:
+
+=over 8
+
+=item * B<sidef> - Deparse to Sidef code (same as -r)
+
+=item * B<perl> - Translate to Perl code with Sidef runtime
+
+=back
+
+    sidef -Rperl script.sf > script.pl
+    perl script.pl
+    
+    sidef -Rsidef script.sf    # Normalize code style
+
+=back
+
+=head2 Optimization Options
+
+=over 4
+
+=item B<-O> I<level>
+
+Perform code optimizations before execution. Higher optimization levels can
+significantly improve runtime performance for computation-heavy scripts by
+evaluating constant expressions at compile time. Valid levels:
+
+=over 8
+
+=item * B<0> - No optimization (default). Code is executed as parsed.
+
+=item * B<1> - Constant folding on AST (recommended for production). Pure
+expressions with constant operands are evaluated at compile time, reducing
+runtime computation.
+
+=item * B<2> - Aggressive optimization with deparse and reparse. Performs
+constant folding, deparses to Sidef code, reparses, and does additional
+constant folding on the new AST. Increases compile time but may provide
+additional optimizations.
+
+=back
+
+    sidef -O0 script.sf         # Default, no optimization
+    sidef -O1 script.sf         # Recommended
+    sidef -O2 compute.sf        # Maximum optimization
+
+Example optimization:
+
+    # Source code
+    var x = (2 + 3*4)
+    
+    # After -O1 optimization
+    var x = 14
+
+=item B<-s>
+
+Enable precompilation caching. Compiled code is saved in a database indexed
+by MD5 hash of the source code. On subsequent runs of the same code, the
+compiled version is loaded from cache, significantly reducing startup time
+for large programs.
+
+    sidef -s large_script.sf    # Slow first run (compiles and caches)
+    sidef -s large_script.sf    # Fast subsequent runs (loads from cache)
+
+The cache is automatically maintained and periodically sanitized. Cache
+location: C<~/.sidef/cache/>
+
+=back
+
+=head2 Number Configuration Options
+
+Sidef provides arbitrary-precision arithmetic through the GMP and MPFR
+libraries. These options control precision and behavior of numeric operations.
+
+=over 4
+
+=item B<-P> I<digits>
+
+Set the precision of floating-point numbers in decimal digits. Higher precision
+allows more accurate calculations but increases memory usage and computation time.
+Default is approximately 58 decimal digits (192 bits).
+
+    sidef -P 50 -E 'say sqrt(2)'          # 50 decimal digits
+    sidef -P 100 -E 'say sqrt(2)'         # 100 decimal digits
+    sidef -P 1000 -E 'say Num.pi'         # 1000 decimal digits
+
+=item B<-M> I<mode>
+
+Set the rounding mode for floating-point operations. Different rounding modes
+are useful for different numerical applications (financial calculations,
+scientific computing, interval arithmetic, etc.). Valid modes:
+
+=over 8
+
+=item * B<near> - Round to nearest (default). Standard rounding mode.
+
+=item * B<zero> - Round towards zero (truncate). Discards fractional part.
+
+=item * B<inf> - Round away from zero. Rounds up for positive, down for negative.
+
+=item * B<+inf> - Round towards positive infinity (ceiling). Always rounds up.
+
+=item * B<-inf> - Round towards negative infinity (floor). Always rounds down.
+
+=item * B<faith> - Faithful rounding. Result is one of the two nearest
+floating-point numbers.
+
+=back
+
+    sidef -M near -E 'say 7/3'            # 2.333... (nearest)
+    sidef -M zero -E 'say 7/3'            # 2.333... (towards zero)
+    sidef -M +inf -E 'say 7/3'            # 2.334... (ceiling)
+    sidef -M -inf -E 'say 7/3'            # 2.333... (floor)
+
+=item B<-N> I<options>
+
+Configure Number class variables for fine-grained control over numeric
+computation behavior. Multiple options can be separated by semicolons.
+Format: C<'NAME1=VALUE1; NAME2=VALUE2'>
+
+Available options:
+
+=over 8
+
+=item * B<PREC> - Floating-point precision in decimal digits (same as -P)
+
+=item * B<ROUND> - Rounding mode as integer: 0=near, 1=zero, 2=inf, 3=+inf, 4=-inf, 5=faith
+
+=item * B<VERBOSE> - Enable verbose/debug mode (true/false). Prints detailed
+information about numeric operations.
+
+=item * B<USE_YAFU> - Use YAFU (Yet Another Factorization Utility) for
+factoring large integers (true/false). Requires YAFU installed.
+
+=item * B<USE_PFGW> - Use PFGW64 (PrimeForm/GW) as a primality pretest for
+large numbers (true/false). Requires PFGW64 installed.
+
+=item * B<USE_PARI_GP> - Use PARI/GP for various number theory operations
+(true/false). Requires PARI/GP installed.
+
+=item * B<USE_FACTORDB> - Use factordb.com web service for factoring large
+integers (true/false). Requires internet connection.
+
+=item * B<USE_PRIMESUM> - Use Kim Walisch's primesum for computing sum of
+primes (true/false). Requires primesum installed.
+
+=item * B<USE_PRIMECOUNT> - Use Kim Walisch's primecount for computing prime
+counting function π(n) (true/false). Requires primecount installed.
+
+=item * B<USE_CONJECTURES> - Use conjectured (unproven but likely correct)
+methods for better performance (true/false).
+
+=item * B<SPECIAL_FACTORS> - Try to find factors of special form (Fermat,
+Mersenne, etc.) when factoring (true/false).
+
+=back
+
+Examples:
+
+    # Enable verbose mode and external factorization
+    sidef -N 'VERBOSE=true; USE_FACTORDB=true' -E 'say factor(2**512 + 1)'
+    
+    # High precision with specific rounding
+    sidef -N 'PREC=400; ROUND=3' script.sf
+    
+    # Use all available external tools
+    sidef -N 'USE_YAFU=true; USE_PARI_GP=true; USE_PRIMECOUNT=true' script.sf
+
+=back
+
+=head2 Debugging and Warning Options
+
+=over 4
+
+=item B<-k>
+
+Keep track of potentially incorrect parser interpretations. Enables warnings
+when the parser makes assumptions that might not match your intent. This is
+especially useful for catching typos in function names that get interpreted
+as method calls.
+
+    sidef -k script.sf
+
+Example warning:
 
     func foo(n) { say n }
-    fo(42)                   # will get interpreted as `42.fo`
-
-When the command-line option C<-k> is specified, the following warning is produced:
-
+    fo(42)                      # Typo in function name
+    
+    # With -k:
     [INFO] `fo` is parsed as a prefix method-call at script.sf line 2
 
-=head1 DEPARSING
+Common cases flagged:
 
-Deparsing is the reverse process of parsing, which translates the AST back into code. Currently, Sidef supports deparsing into two languages with the C<-R lang> command-line switch:
+=over 8
 
-=over 4
+=item * Method calls without an explicit receiver
 
-=item -R perl
+=item * Ambiguous operator precedence interpretations
 
-Deparses the AST into valid Perl code.
-
-=item -R sidef
-
-Deparses the AST into valid Sidef code.
+=item * Potential variable/function name confusion
 
 =back
 
-Example:
+=item B<-w>
 
-    sidef -Rperl script.sf | perl
+Enable warnings with stack backtrace. When a warning occurs, displays a
+complete call stack showing the sequence of function/method calls that led
+to the warning. Useful for debugging complex code paths.
 
-The C<-Rsidef> switch (or simply C<-r>) is useful for verifying how the code is parsed:
+=item B<-W>
 
-    sidef -r -E '1 + 2/3'
-
-outputs:
-
-    (1)->+((2)->/(3));
-
-=head1 DUMPING THE AST
-
-The C<-D> command-line option dumps the abstract syntax tree (AST) of a given Sidef program:
-
-    sidef -D script.sf      # will dump the AST of script.sf
-
-=head1 PRECOMPILATION
-
-Sidef supports experimental precompilation by saving compiled code inside a database, which is updated automatically and sanitized periodically.
-
-This method reduces significantly the boot-time of very large Sidef scripts, and it works as following:
-
-=over 4
-
-=item * it checks the database with the MD5 of the code
-
-=item * if the MD5 exists inside the database, it returns the executable code
+Make warnings fatal (with stack backtrace). The program terminates
+immediately on the first warning, showing a full stack trace. This is
+useful for strict error checking during development or testing.
 
 =back
 
-otherwise:
+=head2 Output Options
 
 =over 4
 
-=item * parses the code and generates the executable code
+=item B<-o> I<file>
 
-=item * stores the executable code inside the database with the MD5 of the code
+Specify output file for compiled or deparsed code. By default, output goes
+to STDOUT. This option is typically used with B<-c>, B<-r>, or B<-R>.
+
+    sidef -c -o program.pl script.sf        # Compile to file
+    sidef -R perl -o script.pl script.sf    # Deparse to file
+    sidef -D -o ast.txt script.sf           # Dump AST to file
 
 =back
 
-Next time when the same code is executed, Sidef will simply retrieve the executable code from the database, without generating it again:
+=head2 Help and Information Options
 
-    sidef -s script.sf             # may load slow the first time
-    sidef -s script.sf             # will load much faster the second time
+=over 4
 
-=head1 COMPILATION
+=item B<-H>
 
-A Sidef script can be compiled to a stand-alone Perl program by using the C<-c> command-line option:
+Enter interactive help mode. Provides access to documentation for Sidef
+objects, methods, and modules. You can enter any expression that evaluates
+to an object, and the help system will display its documentation.
 
-    sidef -o out.pl -c script.sf
+    sidef -H
+    help> Array()
+    help> Hash()
+    help> Number()
+    help> quit
 
-The above command will compile the file C<script.sf> into the Perl script C<out.pl>, which will include the entire implementation code of Sidef.
+=item B<-h>
 
-Currently, Sidef code that contains C<eval()> cannot be compiled correctly to Perl, as it requires some parse-time information for run-time evaluation, which is lost in the compilation process.
+Display help message with usage information and available options, then exit.
 
-=head1 WWW
+=item B<-v>
 
-You can find more info about Sidef, by clicking on the following links:
+Print version information and exit. Shows the Sidef version number.
 
-=over 2
+=back
 
-=item * GitHub: L<https://github.com/trizen/sidef>
+=head1 INTERACTIVE MODE (REPL)
 
-=item * Gitbook: L<https://trizen.gitbook.io/sidef-lang/>
+When invoked without a script file, Sidef enters interactive mode, providing
+a Read-Eval-Print Loop (REPL) for exploring the language, testing code
+snippets, and rapid prototyping.
 
-=item * Tutorial: L<https://codeberg.org/trizen/sidef/wiki>
+=head2 Starting the REPL
 
-=item * RosettaCode: L<https://rosettacode.org/wiki/Sidef>
+    $ sidef
+    Sidef 25.12, running on Linux, using Perl v5.42.0.
+    Type "help", "copyright" or "license" for more information.
+    >
+
+Or explicitly with the C<-i> option:
+
+    $ sidef -i
+    $ sidef -i startup.sf       # Load file first
+
+=head2 REPL Features
+
+=over 4
+
+=item * B<Persistent Variables>
+
+All variables, functions, and classes defined in the REPL persist throughout
+the session.
+
+    > var x = 42
+    #1 = 42
+    > var y = x + 10
+    #2 = 52
+    > func double(n) { n * 2 }
+    > double(x)
+    #3 = 84
+
+=item * B<Result History>
+
+Every expression result is stored and can be referenced using C<#n> notation,
+where C<n> is the result number. Negative indices count from the end.
+
+    > 3 + 4
+    #1 = 7
+    > #1 * 2                    # Reference first result
+    #2 = 14
+    > #-1                       # Last result (same as #2)
+    #3 = 14
+
+=item * B<Multiline Input>
+
+End lines with backslash (C<\>) to continue on the next line, or the REPL
+will automatically continue incomplete expressions. The prompt changes from
+C<E<gt>> to C<  > to indicate continuation mode.
+
+    > func factorial(n) {
+        n == 0 ? 1 : n*factorial(n-1)
+      }
+    > factorial(10)
+    #2 = 3628800
+
+=item * B<Tab Completion>
+
+Press Tab to complete variable/function names, show available methods on
+objects, and navigate command history.
+
+=item * B<Command History>
+
+Use Up/Down arrow keys to navigate previous commands. History persists
+between sessions (saved to C<~/.sidef/sidef_history.txt>).
+
+=back
+
+=head2 Special REPL Commands
+
+=over 4
+
+=item B<##>
+
+Display execution time of the last command. Useful for benchmarking and
+performance analysis.
+
+    > factor(2**128 + 1)
+    #1 = [59649589127497217, 5704689200685129054721]
+    > ##
+      ***   last result computed in 0.364332 seconds
+
+=item B<# load> I<filename>
+
+Load and execute a Sidef file line by line in the REPL. Each line is executed
+as if typed into the REPL.
+
+    > # load mylib.sf
+
+=item B<# exec> I<filename>
+
+Execute an entire Sidef file in the current REPL session. Unlike C<# load>,
+this executes the file as a complete unit, but within the REPL environment
+where variables persist.
+
+    > # exec script.sf
+
+=item B<# save> I<filename>
+
+Save all valid commands from the REPL session to a file. This creates a
+replayable script containing all successfully executed code.
+
+    > # save session.sf
+    ** Created file: session.sf
+
+=item B<reset>
+
+Reset the REPL environment, clearing all variables, functions, and definitions.
+Result history is also cleared.
+
+=item B<help>
+
+Enter interactive help mode to explore documentation.
+
+=item B<copyright>
+
+Display copyright information.
+
+=item B<license>
+
+Display license information (Artistic License 2.0).
+
+=item B<quit>, B<exit>, B<q>
+
+Exit the REPL and return to the shell. Alternatively, press Ctrl+D (EOF).
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Basic Execution
+
+    # Execute a script
+    sidef script.sf
+    
+    # With command-line arguments
+    sidef script.sf arg1 arg2
+    
+    # Read from STDIN
+    cat script.sf | sidef -
+    sidef script.sf < input.txt
+
+=head2 One-Liner Examples
+
+Mathematical calculations:
+
+    # Sum of squares
+    sidef -E '100.of { |i| i**2 }.sum.say'
+    
+    # First 20 primes
+    sidef -E '20.pn_primes.say'
+    
+    # Check if number is prime
+    sidef -E 'say (2**127 - 1 -> is_prime)'
+    
+    # High-precision pi
+    sidef -P 100 -E 'say Num.pi'
+
+Text processing:
+
+    # Convert to uppercase
+    echo "hello" | sidef -E 'STDIN.slurp.uc.print'
+    
+    # Filter lines matching pattern
+    sidef -E 'STDIN.lines.grep(/pattern/).each{.say}' < file.txt
+    
+    # Number lines
+    sidef -E 'STDIN.lines.each_kv{|i,v| say "#{i+1}: #{v}"}' < file.txt
+
+=head2 Development Workflow
+
+Check syntax before running:
+
+    sidef -C script.sf && sidef script.sf
+
+Optimize and execute:
+
+    sidef -O1 script.sf                     # Recommended
+    sidef -O2 computation.sf                # Aggressive
+
+Debug with parser warnings:
+
+    sidef -k -w script.sf                   # Warnings with traces
+    sidef -k -W script.sf                   # Fatal warnings
+
+Enable precompilation for large scripts:
+
+    sidef -s large_project.sf               # Cache compiled code
+
+Combine options for maximum performance:
+
+    sidef -O1 -s script.sf                  # Optimize and cache
+
+=head2 Compilation Examples
+
+Compile to standalone Perl program:
+
+    sidef -c -o myapp.pl script.sf
+    chmod +x myapp.pl
+    ./myapp.pl
+
+Translate to Perl for inspection:
+
+    sidef -R perl script.sf | less
+
+Normalize Sidef code style:
+
+    sidef -r script.sf > normalized.sf
+
+=head2 Number Theory with External Tools
+
+    # Factor with YAFU
+    sidef -N 'USE_YAFU=true' -E 'say factor(2**256 + 1)'
+
+    # Count primes with primecount
+    sidef -N 'USE_PRIMECOUNT=true' -E 'say prime_count(10**12)'
+    
+    # Use FactorDB
+    sidef -N 'USE_FACTORDB=true' -E 'say factor(2**512 + 1)'
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item B<SIDEF_CACHE_DIR>
+
+Override default cache directory for precompiled code. Default:
+C<~/.sidef/cache/>
+
+    export SIDEF_CACHE_DIR=/tmp/sidef_cache
+
+=item B<SIDEF_INC>
+
+Additional directories to search for Sidef modules, separated by colons
+(Unix) or semicolons (Windows).
+
+    export SIDEF_INC=/usr/local/lib/sidef:/opt/sidef/modules
+
+=item B<SIDEF_OPT>
+
+Default options applied to every invocation. Useful for setting project-wide
+defaults.
+
+    export SIDEF_OPT="-O1 -P 100"
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F<~/.sidef/>
+
+User configuration directory. Created automatically on first run.
+
+=item F<~/.sidef/sidef_history.txt>
+
+REPL command history. Persists across sessions.
+
+=item F<~/.sidef/cache/>
+
+Precompiled code cache directory. Used when B<-s> flag is enabled.
+
+=item F</usr/local/lib/sidef/>
+
+System-wide module directory (typical location).
+
+=item F<*.sf>
+
+Sidef source files (conventional extension). Can use any extension or none.
+
+=back
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item B<0>
+
+Successful execution. Program ran without errors.
+
+=item B<1>
+
+General error. Includes syntax errors, runtime errors, unhandled exceptions,
+file not found, and permission denied.
+
+=item B<2>
+
+No input provided when expected.
+
+=back
+
+=head1 DIAGNOSTICS
+
+Common error messages and their meanings:
+
+=over 4
+
+=item B<Can't open sidef script "filename": No such file or directory>
+
+The specified script file does not exist or is not readable. Check file name
+spelling and permissions.
+
+=item B<Syntax error at line N>
+
+Parser encountered invalid syntax at the specified line. Use B<-k> for more
+detailed diagnostics.
+
+=item B<Invalid precision: E<lt>E<lt>valueE<gt>E<gt> (expected a positive integer)>
+
+The value provided to B<-P> must be a positive integer.
+
+=item B<No code specified for -E>
+
+The B<-E> option requires a code argument.
+
+=item B<Invalid format: E<lt>E<lt>optionE<gt>E<gt>!>
+
+The B<-N> option format is incorrect. Expected format:
+C<'NAME1=VALUE1; NAME2=VALUE2'>
+
+=item B<"Data::Dump" is not installed!>
+
+The B<-D> option requires the Perl module Data::Dump. Install with:
+C<cpan Data::Dump> or C<cpanm Data::Dump>
+
+=item B<Variable 'name' is not declared in the current scope>
+
+Attempting to use an undeclared variable. Declare with C<var>, C<global>,
+C<const>, or C<define>.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+=head2 Known Limitations
+
+=over 4
+
+=item * Code using C<eval()> may not compile correctly with B<-c>
+
+=item * Very large precision (>100,000 digits) may cause performance issues
+
+=item * Precompilation cache can grow large with many unique scripts
+
+=item * Some REPL features may not work identically to script execution
+
+=back
+
+=head2 Reporting Bugs
+
+Report bugs on GitHub: L<https://github.com/trizen/sidef/issues>
+
+Please include:
+
+=over 4
+
+=item * Sidef version (C<sidef -v>), OS, and Perl version (C<perl -v>)
+
+=item * Complete error message with stack trace
+
+=item * Minimal code example reproducing the issue
+
+=item * Expected behavior vs. actual behavior
+
+=back
+
+=head1 SEE ALSO
+
+=head2 Official Resources
+
+=over 4
+
+=item * B<GitHub Repository>: L<https://github.com/trizen/sidef>
+
+=item * B<Language Tutorial>: L<https://codeberg.org/trizen/sidef/wiki>
+
+=item * B<Official Documentation>: L<https://trizen.gitbook.io/sidef-lang/>
+
+=item * B<Rosetta Code>: L<https://rosettacode.org/wiki/Sidef>
+
+=back
+
+=head2 Related Tools
+
+=over 4
+
+=item * B<perldoc>(1) - View Perl documentation
+
+=item * B<perl>(1) - Perl interpreter
+
+=item * B<gmp>(3) - GNU Multiple Precision Arithmetic Library
+
+=item * B<mpfr>(3) - Multiple Precision Floating-Point Reliable Library
+
+=back
+
+=head2 Module Documentation
+
+Access documentation for Sidef modules using the interactive help:
+
+    sidef -H
+    help> Array()
+
+Or use C<perldoc> directly:
+
+    perldoc Sidef::Types::Array::Array
+
+=head1 AUTHORS
+
+=over 4
+
+=item * B<Daniel Șuteu> - Primary author and maintainer
+
+=item * B<Ioana Fălcușan> - Contributor
+
+=back
+
+For a complete list of contributors, see:
+L<https://github.com/trizen/sidef/graphs/contributors>
+
+=head1 ACKNOWLEDGMENTS
+
+Sidef builds upon:
+
+=over 4
+
+=item * Perl programming language and ecosystem
+
+=item * GMP (GNU Multiple Precision Arithmetic Library)
+
+=item * MPFR (Multiple Precision Floating-Point Reliable Library)
+
+=item * MPC (Multiple Precision for Complex Arithmetic Library)
+
+=item * Various CPAN modules
+
+=item * Open source community contributions
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2025 Daniel Șuteu, Ioana Fălcușan
+Copyright © 2013-2025 Daniel Șuteu, Ioana Fălcușan. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the B<Artistic License (2.0)>. You may obtain a copy
@@ -1335,24 +1920,8 @@ Versions is governed by this Artistic License. By using, modifying or
 distributing the Package, you accept this license. Do not use, modify,
 or distribute the Package, if you do not accept this license.
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
 Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+AND CONTRIBUTORS "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
 THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
 PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
 YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
