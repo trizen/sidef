@@ -261,27 +261,40 @@ else {
 sub HELP_MESSAGE {
 #<<<
     my %switches = (
-                    '-i file'    => 'execute a program in interactive mode',
-                    '-c'         => 'compile the code into a Perl program',
-                    '-C'         => 'check syntax only',
-                    '-D'         => 'dump the syntax tree of a program',
-                    '-o file'    => 'file where to dump the output',
-                    '-O level'   => ['perform code optimizations before execution',
-                                     'valid levels: [0], 1, 2'],
-                    '-P int'     => 'set the precision of floating-point numbers (default: ' . int($Sidef::Types::Number::Number::PREC / 4) . ')',
-                    '-M mode'    => ['set the rounding mode of floating-point numbers',
-                                     'valid modes: [near], zero, inf, +inf, -inf, faith'],
-                    '-N options' => ['modify class-variables inside the Number class',
-                                     "valid format: 'VERBOSE=1; USE_YAFU=1; USE_PRIMECOUNT=1'"],
+                    '-c'         => 'compile the code into a stand-alone Perl program',
+                    '-C'         => 'check syntax only (parse without execution)',
+                    '-D'         => 'dump the Abstract Syntax Tree (AST) of the program',
+                    '-E program' => 'execute a one-line program from the command line',
+                    '-e program' => 'alias for -E (execute one-line program)',
+                    '-H'         => 'enter interactive help mode for exploring documentation',
+                    '-i [file]'  => 'execute program in interactive mode (REPL)',
                     '-k'         => 'keep track of potentially incorrect parser interpretations',
-                    '-E program' => 'one line of program',
-                    '-H'         => 'interactive help',
-                    '-s'         => 'save compiled code in a database to reduce boot-time',
-                    '-v'         => 'print version number and exit',
-                    '-t'         => 'treat all command-line arguments as scripts',
-                    '-r'         => 'parse and deparse a Sidef program',
-                    '-R lang'    => ['parse and deparse a Sidef program into a given language',
-                                     'valid values: sidef, perl'],
+                    '-M mode'    => ['set the rounding mode for floating-point numbers',
+                                     'valid modes: [near], zero, inf, +inf, -inf, faith',
+                                     '  near  = round to nearest (default)',
+                                     '  zero  = round towards zero',
+                                     '  inf   = round away from zero',
+                                     '  +inf  = round towards positive infinity',
+                                     '  -inf  = round towards negative infinity',
+                                     '  faith = faithful rounding'],
+                    '-N options' => ['configure Number class variables (semicolon-separated)',
+                                     "example: 'VERBOSE=1; USE_YAFU=1; USE_PRIMECOUNT=1'",
+                                     'available options: PREC, ROUND, VERBOSE, USE_YAFU,',
+                                     '  USE_PFGW, USE_PARI_GP, USE_FACTORDB, USE_PRIMESUM,',
+                                     '  USE_PRIMECOUNT, USE_CONJECTURES, SPECIAL_FACTORS'],
+                    '-o file'    => 'specify output file for compiled/deparsed code',
+                    '-O level'   => ['perform code optimizations before execution',
+                                     'valid levels: [0], 1, 2',
+                                     '  0 = no optimization (default)',
+                                     '  1 = constant folding on AST (recommended)',
+                                     '  2 = aggressive optimization with reparse'],
+                    '-P int'     => 'set precision of floating-point numbers in bits',
+                    '-r'         => 'parse and deparse program back to Sidef code',
+                    '-R lang'    => ['parse and deparse program into specified language',
+                                     'valid languages: sidef, perl'],
+                    '-s'         => 'enable precompilation (cache compiled code)',
+                    '-t'         => 'test mode: treat all arguments as script files',
+                    '-v'         => 'display version information and exit',
                     '-w'         => 'enable warnings with stack backtrace',
                     '-W'         => 'make warnings fatal (with stack backtrace)',
     );
@@ -289,11 +302,15 @@ sub HELP_MESSAGE {
     require File::Basename;
     my $basename = File::Basename::basename($0);
 
-    print <<"USAGE";
+    print <<"HEADER";
 
-Usage: $basename [switches] [--] [programfile] [arguments]
+Sidef Programming Language - Version $version
 
-USAGE
+Usage: $basename [options] [--] [programfile] [arguments]
+
+OPTIONS:
+
+HEADER
 
     require List::Util;
     my $max_width = List::Util::max(map { length } keys %switches);
@@ -311,11 +328,69 @@ USAGE
         }
     }
 
-    print <<"END";
+    print <<"EXAMPLES";
 
-Run '$basename' for entering the interactive mode.
+EXAMPLES:
 
-END
+  # Execute a Sidef script
+  $basename script.sf
+
+  # Enter interactive mode (REPL)
+  $basename
+  $basename -i
+
+  # Execute a Sidef script in interactive mode
+  $basename -i script.sf
+
+  # Execute one-line program
+  $basename -E 'say "Hello, World!"'
+  $basename -E '10.of { |i| say i**2 }'
+
+  # Check syntax without execution
+  $basename -C script.sf
+
+  # Compile to stand-alone Perl program
+  $basename -c -o output.pl script.sf
+
+  # Set floating-point precision to 100 digits
+  $basename -P 400 -E 'say sqrt(2)'
+
+  # Enable optimizations
+  $basename -O1 script.sf
+
+  # Parse and display as Sidef code
+  $basename -r script.sf
+
+  # Deparse to Perl code
+  $basename -Rperl script.sf
+
+INTERACTIVE MODE (REPL):
+
+  Run '$basename' without arguments to enter the interactive mode.
+
+  Special REPL commands:
+    ##                - show execution time of last command
+    #n                - refer to nth output value (e.g., #1, #-1)
+    # load file.sf    - load and execute file line by line
+    # exec file.sf    - execute entire file
+    # save file.sf    - save REPL session to file
+    reset             - reset the REPL environment
+    quit, exit, q     - exit REPL
+    help              - display interactive help
+    copyright         - show copyright information
+    license           - show license information
+
+DOCUMENTATION:
+
+  Visit https://github.com/trizen/sidef for comprehensive documentation
+  and tutorials, or use -H for interactive help on specific topics.
+
+COPYRIGHT:
+
+  Copyright © 2013-2025 Daniel Șuteu, Ioana Fălcușan
+  Licensed under the Artistic License 2.0
+
+EXAMPLES
 }
 
 sub VERSION_MESSAGE {
