@@ -1034,12 +1034,12 @@ file.edit { |line|
 ### Modules
 
 ```ruby
-module Math::Utils {
+module math::utils {
     func double(n) { n * 2 }
     func triple(n) { n * 3 }
 }
 
-say Math::Utils::double(21)    # 42
+say math::utils::double(21)    # 42
 ```
 
 ### gather/take
@@ -1077,19 +1077,19 @@ say list    # [2, 3, 5, 7]
 
 ### Common Patterns
 
-**Safe hash access:**
+**Hash with Array values creation:**
 ```ruby
-hash{:key} := []
+var hash = Hash()
+hash{:key} := [] << 1
+hash{:key} := [] << 2
+say hash{:key}  #=> [1, 2]
 ```
 
 **Conditional assignment:**
 ```ruby
-var x := default_value
-```
-
-**Pipeline processing:**
-```ruby
-data |> :parse |> :validate |> :process
+var x = nil
+x := some_func1()
+x := some_func2()   # calls some_func2() if x == nil
 ```
 
 ---
@@ -1098,7 +1098,7 @@ data |> :parse |> :validate |> :process
 
 - **Official Documentation:** [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/)
 - **Source Code:** [https://github.com/trizen/sidef](https://github.com/trizen/sidef)
-- **Example Scripts:** [https://github.com/trizen/sidef/tree/master/scripts](https://github.com/trizen/sidef/tree/master/scripts)
+- **Example Scripts:** [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
 - **MetaCPAN:** [https://metacpan.org/pod/Sidef](https://metacpan.org/pod/Sidef)
 
 ---
