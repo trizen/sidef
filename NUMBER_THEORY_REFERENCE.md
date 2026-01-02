@@ -600,10 +600,9 @@ say map(1..50, { .mu })             # Moebius
 say map(1..50, { .tau })            # Divisor count
 say map(1..50, { .pi })             # Prime counting
 
-say 30.by { .is_perfect }           # Perfect numbers
 say 30.by { .is_abundant }          # Abundant numbers
 say 30.by { .is_semiprime }         # Semiprimes
-say 30.by { .is_carmichael }        # Carmichael numbers
+say 30.by { .is_cyclic }            # Cyclic numbers
 
 say 30.of { .fib }                  # Fibonacci
 say 30.of { .lucas }                # Lucas
@@ -826,15 +825,6 @@ say 50.of { 12 * .hclassno }    # Scaled values
 
 ```ruby
 say map(1..30, { .ramanujan_tau })
-
-# Efficient computation for large n
-func ramanujan_tau_alt(n) {
-    n.factor_prod {|p, e|
-        Math.linear_rec([0, -24, 0, 252, 0, -1472, 0, 4830, 0, -6048, 1],
-                        [0, 1, -24, 252, -1472, 4830, -6048, -16744, 84480],
-                        e*p)
-    }
-}
 ```
 
 ### Example 7: Polygonal and Pyramidal Numbers
@@ -1061,7 +1051,7 @@ func lucas_via_matrix(n) {
 say 30.of { .partitions }
 
 # Restricted partitions
-func partitions_into_k_parts(n, k) {
+func partitions_into_k_parts(n, k) is cached {
     return 1 if (k == 1)
     return 0 if (k > n)
     sum(1 .. n/k, {|j|
@@ -1070,7 +1060,7 @@ func partitions_into_k_parts(n, k) {
 }
 
 # Partitions into distinct parts
-func partitions_distinct(n, k=n) {
+func partitions_distinct(n, k=n) is cached {
     return 1 if (n == 0)
     return 0 if (k <= 0 || n < 0)
     __FUNC__(n-k, k-1) + __FUNC__(n, k-1)
@@ -1128,35 +1118,6 @@ say sqrtmod_all(10, 13)     # All solutions
 
 ## Tips and Tricks
 
-### Memory Management for Large Computations
-
-When working with very large numbers or many iterations:
-
-```ruby
-# Force garbage collection periodically
-for k in (1..10000) {
-    var result = some_heavy_computation(k)
-    say result
-    
-    # Free memory every 1000 iterations
-    if (k %% 1000) {
-        __GC__()
-    }
-}
-```
-
-### Parallel Processing
-
-For independent computations:
-
-```ruby
-# Using multiple cores
-var results = parallel_map(1..1000, {|n|
-    # Compute something expensive
-    n.factor
-})
-```
-
 ### Debugging Number Theory Code
 
 ```ruby
@@ -1164,14 +1125,14 @@ var results = parallel_map(1..1000, {|n|
 Num!VERBOSE = true
 
 # Trace factorizations
-var n = 2**128 + 1
+var n = (2**128 + 1)
 say "Factoring: #{n}"
 say factor(n)
 
 # Profile performance
 var start = Time.now
 var result = compute_something()
-var elapsed = Time.now - start
+var elapsed = (Time.now - start)
 say "Computed in #{elapsed}s"
 ```
 
@@ -1208,10 +1169,10 @@ func format_for_oeis(seq, terms_per_line=10) {
 var cache = Hash()
 
 func cached_factor(n) {
-    cache{n} \\= n.factor
+    cache{n} := n.factor
 }
 
-# Use factor_map for multiplicative functions
+# Use factor_prod { ... } for multiplicative functions
 func my_multiplicative_function(n) {
     n.factor_prod {|p, e|
         # Compute for prime power
@@ -1247,8 +1208,8 @@ is_prov_prime(n)    # Use when proof is required
 ### 3. Modular Arithmetic Pitfalls
 
 ```ruby
-# Wrong: integer division loses precision
-var wrong = (powmod(2, 100, 1000) / 3)
+# Wrong: integer division followed by modulo may not be always correct
+var wrong = ((powmod(2, 100, 1000) / 3) % 1000)
 
 # Right: use modular inverse
 var right = (powmod(2, 100, 1000) * invmod(3, 1000) % 1000)
