@@ -1,84 +1,259 @@
-
+#!/usr/bin/env perl
 use utf8;
 use 5.006;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use Module::Build;
 
-my $builder = Module::Build->new(
+# Sidef Programming Language - Build Configuration
 
-    module_name        => 'Sidef',
-    license            => 'artistic_2',
-    dist_author        => [
-                            q{Daniel Șuteu (<trizen@cpan.org>)},
-                            q{Ioana Fălcușan (<ioanaflavia@gmail.com>)},
-                          ],
-    dist_version_from  => 'lib/Sidef.pm',
-    dist_abstract      => 'The Sidef Programming Language',
-    release_status     => 'stable',
-    configure_requires => {
-                           'Module::Build' => 0,
-                          },
-    build_requires => {
-                       'Test::More' => 0,
-                      },
-
-    sign              => 1,
-    dynamic_config    => 0,
-    extra_manify_args => {utf8 => 1},
-
-    meta_merge => {
-                   resources => {
-                                 bugtracker => "https://github.com/trizen/sidef/issues",
-                                 homepage   => "https://github.com/trizen/sidef",
-                                 repository => "https://github.com/trizen/sidef",
-                                },
-                  },
-
-    requires => {
-        'perl'                     => '5.18.0',
-        'utf8'                     => 0,
-        'parent'                   => 0,
-        'Memoize'                  => 0,
-        'Cwd'                      => 0,
-        'File::Spec'               => 0,
-        'File::Path'               => 0,
-        'File::Copy'               => 0,
-        'File::Basename'           => 0,
-        'List::Util'               => 1.45,
-        'Math::MPFR'               => 3.36,
-        'Math::MPC'                => 0,
-        'Math::GMPq'               => 0.45,
-        'Math::GMPz'               => 0.48,
-        'Socket'                   => 0,
-        'Fcntl'                    => 0,
-        'Encode'                   => 0,
-        'Scalar::Util'             => 0,
-        'Time::Piece'              => 0,
-        'Time::HiRes'              => 0,
-        'Getopt::Std'              => 0,
-        'Term::ReadLine'           => 0,
-        'Math::Prime::Util::GMP'   => 0.52,       # used in many Number methods
-        'Algorithm::Combinatorics' => 0,          # used in some Array methods
-        'Algorithm::Loops'         => 0,          # used in Array#cartesian() and Number#sqrtmod_all()
-        'Data::Dump'               => 0,          # used for `sidef -D`
-        'Data::Dump::Filtered'     => 0,          # used in Block#ffork()
-                },
-
-    recommends => {
-        'forks'               => 0,               # better support for threads in Block.thread()
-        'File::Find'          => 0,               # `sidef -c`
-        'Digest::MD5'         => 0,               # File.md5(), Str.md5()
-        'Digest::SHA'         => 0,               # File.sha*(), Str.sha*()
-        'MIME::Base64'        => 0,               # Str.encode_base64(), Str.decode_base64()
-        'Math::Prime::Util'   => 0.73,            # used in some Number methods, if available
-        'Term::ReadLine::Gnu' => 0,               # better STDIN support (+history)
-        'Text::Balanced'      => 0,               # Str.extract_bracketed(), Str.extract_delimited()
-        'Text::ParseWords'    => 0,               # Str.parse_quotewords()
-                  },
-
-    add_to_cleanup     => ['Sidef-*'],
-    create_makefile_pl => 'traditional',
+my $class = Module::Build->subclass(
+    class => 'Sidef::Builder',
+    code  => q{
+        sub ACTION_test {
+            my $self = shift;
+            $self->SUPER::ACTION_test(@_);
+            $self->notes('test_results' => 'passed');
+        }
+        
+        sub ACTION_authortest {
+            my $self = shift;
+            local $ENV{AUTHOR_TESTING} = 1;
+            $self->depends_on('test');
+        }
+    },
 );
 
+my $builder = $class->new(
+
+    # Core Module Information
+    module_name       => 'Sidef',
+    dist_version_from => 'lib/Sidef.pm',
+    dist_abstract     => 'The Sidef Programming Language - A modern, high-level programming language',
+    license           => 'artistic_2',
+    release_status    => 'stable',
+
+    # Author Information
+    dist_author => [
+        'Daniel Șuteu <trizen@cpan.org>',
+        'Ioana Fălcușan <ioanaflavia@gmail.com>',
+    ],
+
+    # Build Configuration
+    configure_requires => {
+                           'Module::Build' => '0.4224',
+                          },
+
+    build_requires => {
+                       'Test::More' => '1.302',
+                      },
+
+    test_requires => {
+                      'Test::More'      => '1.302',
+                      'Test::Exception' => '0.43',
+                     },
+
+    # Runtime Dependencies - Core Perl Modules
+    requires => {
+        'perl'           => '5.018000',
+        'utf8'           => 0,
+        'strict'         => 0,
+        'warnings'       => 0,
+        'parent'         => 0,
+        'Memoize'        => 0,
+        'Cwd'            => 0,
+        'File::Spec'     => 0,
+        'File::Path'     => '2.09',
+        'File::Copy'     => 0,
+        'File::Basename' => 0,
+        'List::Util'     => '1.45',
+        'Scalar::Util'   => '1.45',
+        'Socket'         => 0,
+        'Fcntl'          => 0,
+        'Encode'         => 0,
+        'Time::Piece'    => 0,
+        'Time::HiRes'    => 0,
+        'Getopt::Std'    => 0,
+        'Term::ReadLine' => 0,
+
+        # Math Libraries (Required)
+        'Math::MPFR'             => '3.36',
+        'Math::MPC'              => '1.09',
+        'Math::GMPq'             => '0.45',
+        'Math::GMPz'             => '0.48',
+        'Math::Prime::Util::GMP' => '0.52',
+
+        # Algorithm Libraries (Required)
+        'Algorithm::Combinatorics' => '0.27',
+        'Algorithm::Loops'         => '1.032',
+
+        # Data Handling (Required)
+        'Data::Dump'           => '1.23',
+        'Data::Dump::Filtered' => '0',
+                },
+
+    # Optional but Recommended Dependencies
+    recommends => {
+
+        # Enhanced Threading Support
+        'forks' => '0.36',
+
+        # File Operations
+        'File::Find' => 0,
+
+        # Cryptographic Functions
+        'Digest::MD5' => '2.55',
+        'Digest::SHA' => '6.02',
+
+        # Encoding/Decoding
+        'MIME::Base64' => '3.15',
+
+        # Enhanced Math Support
+        'Math::Prime::Util' => '0.73',
+
+        # Terminal Enhancement
+        'Term::ReadLine::Gnu' => '1.36',
+
+        # Text Processing
+        'Text::Balanced'   => '2.04',
+        'Text::ParseWords' => '3.30',
+                  },
+
+    # Metadata and Resources
+    meta_merge => {
+        'meta-spec' => {
+                        version => 2,
+                        url     => 'https://metacpan.org/pod/CPAN::Meta::Spec',
+                       },
+
+        dynamic_config => 0,
+
+        resources => {
+                      homepage   => 'https://github.com/trizen/sidef',
+                      repository => {
+                                     type => 'git',
+                                     url  => 'https://github.com/trizen/sidef.git',
+                                     web  => 'https://github.com/trizen/sidef',
+                                    },
+                      bugtracker => {
+                                     web => 'https://github.com/trizen/sidef/issues',
+                                    },
+                     },
+
+        keywords => ['sidef', 'programming language', 'scripting', 'interpreter', 'dynamic language', 'high-level language',],
+
+        prereqs => {
+                    runtime => {
+                                suggests => {
+                                             'JSON::PP'           => 0,
+                                             'LWP::UserAgent'     => 0,
+                                             'HTTP::Tiny'         => 0,
+                                             'DBD::SQLite'        => 0,
+                                             'DBI'                => 0,
+                                             'Regexp::Common'     => 0,
+                                             'DateTime'           => 0,
+                                             'File::Slurp'        => 0,
+                                             'IO::Compress::Gzip' => 0,
+                                            },
+                               },
+                   },
+
+        no_index => {
+                     directory => [qw(t inc examples share)],
+                     file      => [qw(README.md)],
+                    },
+
+        x_contributors => [
+            'Daniel Șuteu <trizen@cpan.org>',
+            'Ioana Fălcușan <ioanaflavia@gmail.com>',
+        ],
+
+        x_authority => 'cpan:TRIZEN',
+    },
+
+    # Additional Configuration
+    sign               => 1,
+    dynamic_config     => 0,
+    extra_manify_args  => {utf8 => 1},
+    add_to_cleanup     => ['Sidef-*', '_build', 'Build', 'MYMETA.*'],
+    create_makefile_pl => 'traditional',
+
+    # Script Installation
+    script_files => ['bin/sidef'],
+);
+
+# Platform-specific checks
+if ($^O eq 'MSWin32') {
+    print STDERR "\nWarning: Some features may have limited support on Windows.\n";
+    print STDERR "Consider using WSL (Windows Subsystem for Linux) for the best experience.\n\n";
+}
+
+# Verify critical dependencies are installable
+eval {
+    require Math::MPFR;
+    require Math::GMPz;
+    require Math::GMPq;
+    1;
+} or do {
+    print STDERR "\n" . ("=" x 70) . "\n";
+    print STDERR "IMPORTANT: Sidef requires GMP, MPFR, and MPC libraries.\n";
+    print STDERR "\nOn Debian/Ubuntu, install with:\n";
+    print STDERR "  sudo apt-get install libgmp-dev libmpfr-dev libmpc-dev\n";
+    print STDERR "\nOn Red Hat/Fedora/CentOS, install with:\n";
+    print STDERR "  sudo yum install gmp-devel mpfr-devel libmpc-devel\n";
+    print STDERR "\nOn macOS with Homebrew, install with:\n";
+    print STDERR "  brew install gmp mpfr libmpc\n";
+    print STDERR "=" x 70 . "\n\n";
+};
+
 $builder->create_build_script();
+
+print "\nBuild.PL completed successfully.\n";
+print "Run './Build' to build, './Build test' to test, and './Build install' to install.\n\n";
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+Build.PL - Build script for the Sidef Programming Language
+
+=head1 DESCRIPTION
+
+This is the build script for Sidef, a modern, high-level programming language.
+It uses Module::Build to handle the installation process.
+
+=head1 SYSTEM REQUIREMENTS
+
+=over 4
+
+=item * Perl 5.18.0 or higher
+
+=item * GMP library (for Math::GMPz and Math::GMPq)
+
+=item * MPFR library (for Math::MPFR)
+
+=item * MPC library (for Math::MPC)
+
+=back
+
+=head1 INSTALLATION
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 AUTHORS
+
+Daniel Șuteu <trizen@cpan.org>
+
+Ioana Fălcușan <ioanaflavia@gmail.com>
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the Artistic License 2.0.
+
+=cut
