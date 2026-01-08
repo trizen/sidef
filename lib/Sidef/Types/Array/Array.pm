@@ -1224,6 +1224,8 @@ package Sidef::Types::Array::Array {
         $res;
     }
 
+    *from_continued_fraction = \&cfrac2num;
+
     sub _min_max_by {
         my ($self, $block, $order) = @_;
 

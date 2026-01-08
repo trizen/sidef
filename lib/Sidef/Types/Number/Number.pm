@@ -4373,6 +4373,18 @@ package Sidef::Types::Number::Number {
         bless \__pow__($$x, $$y);
     }
 
+    sub tetration {
+        my ($x, $y) = @_;
+        _valid(\$y);
+
+        # Base cases
+        return ONE if $y->is_zero;    # a^^0 = 1
+        return $x  if $y->is_one;     # a^^1 = a
+
+        # Recursive case: a^^b = a^(a^^(b-1))
+        $x->pow($x->tetration($y->dec));
+    }
+
     sub ipow {
         my ($x, $y) = @_;
         _valid(\$y);
@@ -9364,6 +9376,30 @@ package Sidef::Types::Number::Number {
 
     *digits_sum = \&sumdigits;
     *sum_digits = \&sumdigits;
+
+    sub is_pandigital {
+        my ($n, $base) = @_;
+
+        if (defined($base)) {
+            _valid(\$base);
+        }
+        else {
+            $base = TEN;
+        }
+
+        my %hash;
+        foreach my $d (@{$n->digits($base)}) {
+            $hash{$d}++;
+        }
+
+        foreach my $i (0 .. $base->numify - 1) {
+            if (not $hash{$i}) {
+                return Sidef::Types::Bool::Bool::FALSE;
+            }
+        }
+
+        return Sidef::Types::Bool::Bool::TRUE;
+    }
 
     sub factorial_power {
         my ($n, $p) = @_;
@@ -19568,6 +19604,7 @@ package Sidef::Types::Number::Number {
             $y = CORE::abs($y) if ($y < 0);
             $y <= 1 and return ZERO;
             my $r = HAS_PRIME_UTIL ? Math::Prime::Util::valuation($x, $y) : Math::Prime::Util::GMP::valuation($x, $y);
+            defined($r) or goto &inf;
             return bless \$r;
         }
 
@@ -34576,6 +34613,11 @@ package Sidef::Types::Number::Number {
         }
 
         return Sidef::Types::Bool::Bool::TRUE;
+    }
+
+    sub is_achilles {
+        my ($n) = @_;
+        $n->is_powerful && !$n->is_power;
     }
 
     sub is_perfect {

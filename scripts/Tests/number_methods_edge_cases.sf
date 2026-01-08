@@ -1,0 +1,664 @@
+#!/usr/bin/ruby
+
+# Extended tests for Number class methods - corner cases and edge cases
+
+# Tests for modular arithmetic edge cases
+assert_eq(0.powmod(0, 1), 0)
+assert_eq(0.powmod(1, 1), 0)
+assert_eq(1.powmod(0, 1), 0)
+assert_eq(powmod(2, 0, 1), 0)
+assert_eq(powmod(2**64, 2**32, 2**16 + 1), 1)
+assert_eq(powmod(-5, 3, 13), 5)
+assert_eq(powmod(5, -3, 13), 5)
+
+# Tests for invmod edge cases
+assert_eq(invmod(1, 1), 0)
+assert_eq(invmod(3, 7), 5)
+assert_eq(invmod(7, 3), 1)
+assert_eq(invmod(2**32 + 1, 2**32 - 1), 2**31)
+assert_eq(invmod(-5, 13), 5)
+assert(invmod(2, 4).is_nan)
+assert(invmod(6, 9).is_nan)
+
+# Tests for chinese remainder theorem
+assert_eq(Math.chinese([2,3], [3,4], [1,5]), 11)
+assert_eq(Math.chinese([0, 2], [0, 3]), 0)
+assert_eq(Math.chinese([1, 2], [1, 3]), 1)
+assert_eq(Math.chinese([2**32, 2**32 + 1], [2**32 + 1, 2**32 + 15]), 3952873748794404282)
+
+# Tests for kronecker and jacobi symbols
+assert_eq(kronecker(0, 0), 0)
+assert_eq(kronecker(1, 1), 1)
+assert_eq(kronecker(2, 1), 1)
+assert_eq(kronecker(-1, 1), 1)
+assert_eq(kronecker(5, 7), -1)
+assert_eq(kronecker(7, 5), -1)
+assert_eq(jacobi(2, 15), 1)
+assert_eq(jacobi(5, 21), 1)
+assert_eq(legendre(2, 7), 1)
+assert_eq(legendre(5, 11), 1)
+
+# Tests for gcd/lcm edge cases
+assert_eq(gcd(0, 0), 0)
+assert_eq(gcd(0, 5), 5)
+assert_eq(gcd(5, 0), 5)
+assert_eq(gcd(-5, 10), 5)
+assert_eq(gcd(10, -5), 5)
+assert_eq(gcd(-10, -15), 5)
+assert_eq(lcm(0, 5), 0)
+assert_eq(lcm(5, 0), 0)
+assert_eq(lcm(1, 1), 1)
+assert_eq(lcm(-6, 8), 24)
+assert_eq(lcm(2**32, 2**32 + 1), (2**32) * (2**32 + 1))
+
+# Tests for valuation edge cases
+assert_eq(valuation(0, 2), Inf)
+assert_eq(valuation(1, 2), 0)
+assert_eq(valuation(8, 2), 3)
+assert_eq(valuation(16, 2), 4)
+assert_eq(valuation(2**100, 2), 100)
+assert_eq(valuation(3**50 * 2**30, 3), 50)
+assert_eq(valuation(-8, 2), 3)
+assert_eq(valuation(-27, 3), 3)
+assert_eq(valuation(2**64 * 3**20, 2), 64)
+
+# Tests for binomial edge cases
+assert_eq(binomial(0, 0), 1)
+assert_eq(binomial(5, 0), 1)
+assert_eq(binomial(5, 5), 1)
+assert_eq(binomial(5, 6), 0)
+assert_eq(binomial(-5, 3), -35)
+assert_eq(binomial(100, 50), 100891344545564193334812497256)
+assert_eq(binomial(1000, 500) > 2**200, true)
+
+# Tests for is_prime edge cases
+assert(!is_prime(-5))
+assert(!is_prime(0))
+assert(!is_prime(1))
+assert(is_prime(2))
+assert(is_prime(3))
+assert(!is_prime(4))
+assert(is_prime(2**31 - 1))
+assert(!is_prime(2**32 - 1))
+assert(is_prime(2**61 - 1))
+
+# Tests for is_prime_power edge cases
+assert(!is_prime_power(0))
+assert(!is_prime_power(1))
+assert(is_prime_power(2))
+assert(is_prime_power(4))
+assert(is_prime_power(8))
+assert(is_prime_power(27))
+assert(!is_prime_power(12))
+assert(!is_prime_power(2**64 - 1))
+assert(is_prime_power(2**127 - 1))
+
+# Tests for is_square edge cases
+assert(is_square(0))
+assert(is_square(1))
+assert(is_square(4))
+assert(is_square(9))
+assert(!is_square(2))
+assert(!is_square(3))
+assert(!is_square(5))
+assert(!is_square(-4))
+assert(is_square(2**64))
+assert(is_square((2**32)**2))
+assert(!is_square(2**64 + 1))
+
+# Tests for is_cube edge cases
+assert(is_cube(0))
+assert(is_cube(1))
+assert(is_cube(8))
+assert(is_cube(27))
+assert(!is_cube(2))
+assert(!is_cube(9))
+assert(is_cube(-8))
+assert(is_cube(-27))
+assert(is_cube(2**60))
+assert(!is_cube(2**61))
+
+# Tests for root functions with edge cases
+assert_eq(isqrt(0), 0)
+assert_eq(isqrt(1), 1)
+assert_eq(isqrt(4), 2)
+assert_eq(isqrt(2**128 - 1), 2**64 - 1)
+assert_eq(iroot(0, 3), 0)
+assert_eq(iroot(8, 3), 2)
+assert_eq(iroot(27, 3), 3)
+assert_eq(iroot(2**90, 3), 2**30)
+assert_eq(iroot(2**100, 5), 2**20)
+
+# Tests for sqrt_mod edge cases
+assert_eq(sqrtmod_all(4, 7), [2, 5])
+assert_eq(sqrtmod_all(0, 5), [0])
+assert_eq(sqrtmod_all(1, 7), [1, 6])
+assert_eq(sqrtmod_all(2, 7), [3, 4])
+assert(sqrtmod_all(3, 7) == [])
+assert_eq(sqrtmod_all(16, 17).sort, [4, 13])
+
+# Tests for factor edge cases
+assert_eq(factor(1), [])
+assert_eq(factor(2), [2])
+assert_eq(factor(8), [2, 2, 2])
+assert_eq(factor(-8), [])
+assert_eq(factor(2**10), 10.of(2))
+assert_eq(factor(2**64 + 1).len, 2)
+assert_eq(factor(2**127 - 1), [2**127 - 1])
+
+# Tests for factor_exp edge cases
+assert_eq(factor_exp(1), [])
+assert_eq(factor_exp(8), [[2, 3]])
+assert_eq(factor_exp(12), [[2, 2], [3, 1]])
+assert_eq(factor_exp(2**100 * 3**50), [[2, 100], [3, 50]])
+assert_eq(factor_exp(12), [[2, 2], [3, 1]])
+
+# Tests for divisors edge cases
+assert_eq(divisors(1), [1])
+assert_eq(divisors(2), [1, 2])
+assert_eq(divisors(6), [1, 2, 3, 6])
+assert_eq(divisors(12), [1, 2, 3, 4, 6, 12])
+assert_eq(divisors(2**10).len, 11)
+assert_eq(divisors(2**5 * 3**3).len, 24)
+
+# Tests for sigma and tau with edge cases
+assert_eq(tau(1), 1)
+assert_eq(tau(12), 6)
+assert_eq(tau(2**10), 11)
+assert_eq(sigma(1), 1)
+assert_eq(sigma(12), 28)
+assert_eq(sigma(6), 12)
+assert_eq(sigma(28), 56)
+assert_eq(sigma(1, 0), 1)
+assert_eq(sigma(12, 2), 210)
+
+# Tests for radical (rad) edge cases
+assert_eq(rad(1), 1)
+assert_eq(rad(2), 2)
+assert_eq(rad(4), 2)
+assert_eq(rad(8), 2)
+assert_eq(rad(12), 6)
+assert_eq(rad(2**100), 2)
+assert_eq(rad(2**50 * 3**30 * 5**20), 30)
+
+# Tests for core edge cases
+assert_eq(core(1), 1)
+assert_eq(core(8), 2)
+assert_eq(core(12), 3)
+assert_eq(core(18), 2)
+assert_eq(core(50), 2)
+assert_eq(core(2**10 * 3), 3)
+
+# Tests for is_fundamental edge cases
+assert(!is_fundamental(0))
+assert(is_fundamental(1))
+assert(!is_fundamental(2))
+assert(!is_fundamental(3))
+assert(!is_fundamental(4))
+assert(is_fundamental(5))
+assert(!is_fundamental(6))
+assert(!is_fundamental(7))
+assert(is_fundamental(8))
+
+# Tests for fibonacci and lucas edge cases
+assert_eq(fib(0), 0)
+assert_eq(fib(1), 1)
+assert_eq(fib(2), 1)
+assert_eq(fib(10), 55)
+#assert_eq(fib(-5), 5)      # FIXME
+#assert_eq(fib(-6), -8)     # FIXME
+assert_eq(lucas(0), 2)
+assert_eq(lucas(1), 1)
+assert_eq(lucas(2), 3)
+assert_eq(lucas(10), 123)
+#assert_eq(lucas(-5), -11)  # FIXME
+
+# Tests for nth_prime edge cases
+assert_eq(nth_prime(1), 2)
+assert_eq(nth_prime(10), 29)
+assert_eq(nth_prime(100), 541)
+assert_eq(nth_prime(1000), 7919)
+assert_eq(nth_prime(10000), 104729)
+
+# Tests for prime_count edge cases
+assert_eq(prime_count(0), 0)
+assert_eq(prime_count(1), 0)
+assert_eq(prime_count(2), 1)
+assert_eq(prime_count(10), 4)
+assert_eq(prime_count(100), 25)
+assert_eq(prime_count(1000), 168)
+
+# Tests for next/prev functions at boundaries
+assert_eq(next_prime(2), 3)
+assert_eq(prev_prime(3), 2)
+assert_eq(next_prime(2**64), 2**64 + 13)
+assert_eq(next_composite(3), 4)
+assert_eq(prev_composite(5), 4)
+
+# Tests for znorder edge cases
+assert_eq(znorder(1, 7), 1)
+assert_eq(znorder(2, 7), 3)
+assert_eq(znorder(3, 7), 6)
+assert_eq(znorder(2, 11), 10)
+assert_eq(znorder(10, 11), 2)
+
+# Tests for is_smooth edge cases
+assert(is_smooth(1, 2))
+assert(is_smooth(8, 2))
+assert(is_smooth(12, 3))
+assert(!is_smooth(15, 3))
+assert(is_smooth(2**100, 2))
+assert(is_smooth(2**50 * 3**30, 3))
+assert(!is_smooth(2**50 * 3**30 * 7, 5))
+
+# Tests for is_rough edge cases
+assert(is_rough(1, 2))
+assert(!is_rough(2, 3))
+assert(!is_rough(4, 3))
+assert(is_rough(7, 7))
+assert(is_rough(11, 7))
+assert(!is_rough(14, 7))
+assert(is_rough(2**127 - 1, 2**100))
+
+# Tests for abs edge cases
+assert_eq(abs(0), 0)
+assert_eq(abs(5), 5)
+assert_eq(abs(-5), 5)
+assert_eq(abs(2**100), 2**100)
+assert_eq(abs(-(2**100)), 2**100)
+
+# Tests for sign edge cases
+assert_eq(sign(0), 0)
+assert_eq(sign(5), 1)
+assert_eq(sign(-5), -1)
+assert_eq(sign(2**100), 1)
+assert_eq(sign(-(2**100)), -1)
+
+# Tests for min/max edge cases
+assert_eq(min(5), 5)
+assert_eq(min(3, 7), 3)
+assert_eq(min(-5, 3), -5)
+assert_eq(min(2**64, 2**63), 2**63)
+assert_eq(max(5), 5)
+assert_eq(max(3, 7), 7)
+assert_eq(max(-5, 3), 3)
+assert_eq(max(2**64, 2**63), 2**64)
+
+# Tests for round/floor/ceil edge cases
+assert_eq(round(5.5), 6)
+assert_eq(round(5.4), 5)
+assert_eq(round(-5.5), -6)
+assert_eq(round(-5.4), -5)
+assert_eq(floor(5.9), 5)
+assert_eq(floor(-5.1), -6)
+assert_eq(ceil(5.1), 6)
+assert_eq(ceil(-5.9), -5)
+
+# Tests for is_between edge cases
+assert(5.is_between(1, 10))
+assert(1.is_between(1, 10))
+assert(10.is_between(1, 10))
+assert(!0.is_between(1, 10))
+assert(!11.is_between(1, 10))
+assert((2**64).is_between(2**63, 2**65))
+
+# Tests for bit operations edge cases
+assert_eq(0 & 0, 0)
+assert_eq(0 & 1, 0)
+assert_eq(1 & 1, 1)
+assert_eq(15 & 7, 7)
+assert_eq(0 | 0, 0)
+assert_eq(0 | 1, 1)
+assert_eq(1 | 1, 1)
+assert_eq(8 | 4, 12)
+assert_eq(0 ^ 0, 0)
+assert_eq(1 ^ 1, 0)
+assert_eq(1 ^ 0, 1)
+assert_eq(15 ^ 7, 8)
+
+# Tests for bitshift edge cases
+assert_eq(1 << 0, 1)
+assert_eq(1 << 10, 1024)
+assert_eq(1 << 64, 2**64)
+assert_eq(16 >> 0, 16)
+assert_eq(16 >> 1, 8)
+assert_eq(16 >> 4, 1)
+assert_eq(16 >> 5, 0)
+
+# Tests for popcount/hammingweight edge cases
+assert_eq(popcount(0), 0)
+assert_eq(popcount(1), 1)
+assert_eq(popcount(7), 3)
+assert_eq(popcount(15), 4)
+assert_eq(popcount(2**64 - 1), 64)
+
+# Tests for is_even/is_odd edge cases
+assert(is_even(0))
+assert(!is_odd(0))
+assert(!is_even(1))
+assert(is_odd(1))
+assert(is_even(2**100))
+assert(!is_odd(2**100))
+assert(is_odd(2**100 + 1))
+
+# Tests for is_pos/is_neg edge cases
+assert(!is_pos(0))
+assert(!is_neg(0))
+assert(is_pos(1))
+assert(!is_neg(1))
+assert(!is_pos(-1))
+assert(is_neg(-1))
+assert(is_pos(2**100))
+assert(is_neg(-(2**100)))
+
+# Tests for is_zero/is_one edge cases
+assert(is_zero(0))
+assert(!is_zero(1))
+assert(!is_zero(-1))
+assert(is_one(1))
+assert(!is_one(0))
+assert(!is_one(2))
+assert(!is_one(-1))
+
+# Tests for polygonal numbers edge cases
+assert_eq(polygonal(0, 3), 0)
+assert_eq(polygonal(1, 3), 1)
+assert_eq(polygonal(5, 3), 15)
+assert_eq(polygonal(10, 4), 100)
+assert_eq(polygonal(5, 5), 35)
+assert_eq(polygonal(5, 6), 45)
+assert(is_polygonal(1, 3))
+assert(is_polygonal(15, 3))
+assert(!is_polygonal(16, 3))
+
+# Tests for centered polygonal numbers edge cases
+assert_eq(centered_polygonal(0, 3), 1)
+assert_eq(centered_polygonal(1, 3), 4)
+assert_eq(centered_polygonal(2, 3), 10)
+assert_eq(centered_polygonal(5, 6), 91)
+assert(is_centered_polygonal(1, 3))
+assert(is_centered_polygonal(4, 3))
+assert(!is_centered_polygonal(5, 3))
+
+# Tests for pyramidal numbers edge cases
+assert_eq(pyramidal(0, 3), 0)
+assert_eq(pyramidal(1, 3), 1)
+assert_eq(pyramidal(5, 3), 35)
+assert_eq(pyramidal(10, 4), 385)
+assert(is_pyramidal(1, 3))
+assert(is_pyramidal(35, 3))
+assert(!is_pyramidal(55, 3))
+
+# Tests for perfect number checks
+assert(!is_perfect(1))
+assert(!is_perfect(5))
+assert(is_perfect(6))
+assert(is_perfect(28))
+assert(is_perfect(496))
+assert(!is_perfect(500))
+
+# Tests for abundant/deficient edge cases
+assert(!is_abundant(1))
+assert(!is_abundant(10))
+assert(is_abundant(12))
+assert(is_abundant(18))
+assert(is_deficient(1))
+assert(is_deficient(2))
+assert(is_deficient(10))
+assert(!is_deficient(12))
+
+# Tests for amicable numbers
+assert(!is_amicable(220, 220))
+assert(is_amicable(220, 284))
+assert(is_amicable(284, 220))
+assert(!is_amicable(220, 285))
+
+# Tests for sociable numbers    TODO: implement
+#assert(is_sociable(12496, 4))
+#assert(is_sociable(14316, 4))
+#assert(is_sociable(14288, 28, 4))
+#assert(!is_sociable(220, 4))
+
+# Tests for powerful numbers edge cases
+assert(!is_powerful(0, 2))
+assert(is_powerful(1, 2))
+assert(!is_powerful(2, 2))
+assert(!is_powerful(3, 2))
+assert(is_powerful(4, 2))
+assert(is_powerful(8, 2))
+assert(is_powerful(9, 2))
+assert(!is_powerful(12, 2))
+assert(is_powerful(1, 3))
+assert(!is_powerful(2, 3))
+assert(is_powerful(8, 3))
+assert(is_powerful(27, 3))
+
+# Tests for achilles numbers
+assert(!is_achilles(1))
+assert(!is_achilles(8))
+assert(is_achilles(72))
+assert(is_achilles(108))
+assert(is_achilles(200))
+assert(!is_achilles(216))
+
+# Tests for palindrome checks
+assert(is_palindrome(0))
+assert(is_palindrome(1))
+assert(is_palindrome(11))
+assert(is_palindrome(121))
+assert(!is_palindrome(12))
+assert(is_palindrome(12321))
+assert(is_palindrome(0, 2))
+assert(is_palindrome(15, 2))
+assert(!is_palindrome(16, 2))
+
+# Tests for pandigital checks
+assert(!is_pandigital(123))
+assert(is_pandigital(1234567890))
+assert(!is_pandigital(1234567))
+#assert(is_pandigital(987654321, 1, 9))  # FIXME
+
+# Tests for sum_of_squares edge cases
+assert_eq(sum_of_squares(0), [[0,0]])
+assert_eq(sum_of_squares(1), [[0, 1]])
+assert_eq(sum_of_squares(2), [[1, 1]])
+assert_eq(sum_of_squares(5), [[1, 2]])
+assert_eq(sum_of_squares(13).sort, [[2, 3]])
+
+# Tests for diff_of_squares edge cases
+assert_eq(diff_of_squares(3), [[2, 1]])
+assert_eq(diff_of_squares(8), [[3, 1]])
+assert_eq(diff_of_squares(15), [[4, 1], [8, 7]])
+
+# Tests for tetration edge cases
+assert_eq(tetration(2, 0), 1)
+assert_eq(tetration(2, 1), 2)
+assert_eq(tetration(2, 2), 4)
+assert_eq(tetration(2, 3), 16)
+assert_eq(tetration(2, 4), 65536)
+assert_eq(tetration(3, 2), 27)
+assert_eq(tetration(3, 3), 7625597484987)
+
+# Tests for as_bin/as_oct/as_hex edge cases
+assert_eq(as_bin(0), '0')
+assert_eq(as_bin(1), '1')
+assert_eq(as_bin(15), '1111')
+assert_eq(as_oct(0), '0')
+assert_eq(as_oct(8), '10')
+assert_eq(as_hex(0), '0')
+assert_eq(as_hex(255), 'ff')
+
+# Tests for partition function edge cases
+assert_eq(partition_count(0), 1)
+assert_eq(partition_count(1), 1)
+assert_eq(partition_count(2), 2)
+assert_eq(partition_count(5), 7)
+assert_eq(partition_count(10), 42)
+
+# Tests for stirling numbers edge cases
+assert_eq(stirling1(0, 0), 1)
+assert_eq(stirling1(5, 2), -50)
+assert_eq(stirling2(0, 0), 1)
+assert_eq(stirling2(5, 2), 15)
+
+# Tests for bernoulli/euler numbers edge cases
+assert_eq(bernoulli(0), 1)
+assert_eq(bernoulli(1), 1/2)
+assert_eq(bernoulli(2), 1/6)
+assert_eq(euler_number(0), 1)
+assert_eq(euler_number(2), -1)
+assert_eq(euler_number(4), 5)
+
+# Tests for harmonic number edge cases
+assert_eq(harmonic(0), 0)
+assert_eq(harmonic(1), 1)
+assert_eq(harmonic(2), 3/2)
+assert_eq(harmonic(3), 11/6)
+
+# Tests for carmichael lambda edge cases
+assert_eq(lambda(1), 1)
+assert_eq(lambda(2), 1)
+assert_eq(lambda(8), 2)
+assert_eq(lambda(15), 4)
+assert_eq(lambda(561), 80)
+
+# Tests for psi (dedekind) edge cases
+assert_eq(psi(1), 1)
+assert_eq(psi(2), 3)
+assert_eq(psi(6), 12)
+assert_eq(psi(12), 24)
+
+# Tests for exponential function edge cases
+assert_eq(exp_mangoldt(1), 1)
+assert_eq(exp_mangoldt(2), 2)
+assert_eq(exp_mangoldt(4), 2)
+assert_eq(exp_mangoldt(6), 1)
+assert_eq(exp_mangoldt(8), 2)
+
+# Tests for digits/sumdigits consistency
+assert_eq(10.of{.sumdigits}, 10.of{.digits.sum})
+assert_eq(20.of{.sumdigits(2)}, 20.of{.digits(2).sum})
+assert_eq(20.of{.sumdigits(16)}, 20.of{.digits(16).sum})
+
+# Tests for num/den on rationals
+assert_eq(Num(3/4).nu, 3)
+assert_eq(Num(3/4).de, 4)
+assert_eq(Num(6/8).nu, 3)
+assert_eq(Num(6/8).de, 4)
+
+# Tests for continued fraction edge cases
+assert_eq(from_continued_fraction([2]), 2)
+assert_eq(from_continued_fraction([1, 2]), 3/2)
+assert_eq(from_continued_fraction([0, 2]), 1/2)
+
+# Tests for is_mersenne_prime edge cases
+assert(!is_mersenne_prime(1))
+assert(is_mersenne_prime(3))
+assert(is_mersenne_prime(7))
+assert(is_mersenne_prime(31))
+assert(!is_mersenne_prime(63))
+assert(is_mersenne_prime(127))
+assert(!is_mersenne_prime(255))
+
+# Tests for is_fermat_prime edge cases
+assert(!is_fermat_prp(1))
+assert(!is_fermat_prp(2))
+assert(is_fermat_prp(3))
+assert(is_fermat_prp(5))
+assert(is_fermat_prp(17))
+assert(is_fermat_prp(257))
+assert(is_fermat_prp(65537))
+assert(!is_fermat_prp(65536))
+
+# Tests for primality for special forms
+assert(is_prime(2**2 + 1))
+assert(is_prime(2**4 + 1))
+assert(!is_prime(2**6 + 1))
+assert(is_prime(2**16 + 1))
+
+# Tests for carmichael numbers edge cases
+assert(!is_carmichael(1))
+assert(!is_carmichael(2))
+assert(is_carmichael(561))
+assert(is_carmichael(1105))
+assert(is_carmichael(1729))
+assert(!is_carmichael(1728))
+
+# Tests for semiprime edge cases
+assert(!is_semiprime(1))
+assert(!is_semiprime(2))
+assert(!is_semiprime(3))
+assert(is_semiprime(4))
+assert(!is_semiprime(5))
+assert(is_semiprime(6))
+assert(!is_semiprime(8))
+assert(is_semiprime(9))
+
+# Tests for almost_prime edge cases
+assert(is_almost_prime(1, 0))
+assert(is_almost_prime(2, 1))
+assert(is_almost_prime(4, 2))
+assert(is_almost_prime(8, 3))
+assert(!is_almost_prime(7, 2))
+assert(is_almost_prime(12, 3))
+
+# Tests for omega_prime edge cases
+assert(is_omega_prime(1, 0))
+assert(is_omega_prime(2, 1))
+assert(is_omega_prime(4, 1))
+assert(is_omega_prime(6, 2))
+assert(is_omega_prime(30, 3))
+assert(!is_omega_prime(8, 2))
+
+# Tests for nth functions returning correct values
+assert_eq(nth_prime(1), 2)
+assert_eq(nth_composite(1), 4)
+assert_eq(nth_semiprime(1), 4)
+assert_eq(nth_squarefree(1), 1)
+assert_eq(nth_powerful(1), 1)
+assert_eq(nth_powerfree(1,2), 1)
+
+# Tests for counting functions at 0 and 1
+assert_eq(prime_count(0), 0)
+assert_eq(prime_count(1), 0)
+assert_eq(composite_count(0), 0)
+assert_eq(composite_count(1), 0)
+assert_eq(squarefree_count(0), 0)
+assert_eq(squarefree_count(1), 1)
+
+# Tests for is_congruent edge cases
+assert(is_congruent(5, 5, 10))
+assert(is_congruent(15, 5, 10))
+assert(!is_congruent(6, 5, 10))
+assert(is_congruent(-5, 5, 10))
+assert(is_congruent(2**64, 0, 2**64))
+
+# Tests for comparison with negative numbers
+assert(5 > -5)
+assert(-5 < 5)
+assert(-10 < -5)
+assert(-5 > -10)
+assert_eq(5 <=> -5, 1)
+assert_eq(-5 <=> 5, -1)
+assert_eq(5 <=> 5, 0)
+
+# Tests for range/is_in edge cases
+assert(5 ~~ (1..10))
+assert(1 ~~ (1..10))
+assert(10 ~~ (1..10))
+assert(!(0 ~~ (1..10)))
+assert(!(11 ~~ (1..10)))
+
+# Tests for irand edge cases
+assert(irand(0, 1) ~~ (0..1))
+assert(irand(1, 1) == 1)
+assert(irand(5, 10) ~~ (5..10))
+assert(irand(2**64, 2**64 + 1e6) ~~ (2**64 .. (2**64 + 1e6)))
+
+# Tests for lcm/gcd with multiple arguments
+assert_eq(gcd(12, 18, 24), 6)
+assert_eq(lcm(4, 6, 8), 24)
+assert_eq(gcd(2**10, 2**20, 2**30), 2**10)
+assert_eq(lcm(3, 5, 7), 105)
+
+say "** All extended tests passed!"

@@ -47,8 +47,23 @@ B<NOTE:> the C<local> scope extends to any other functions or methods that the a
 
 =head1 SYNOPSIS
 
-    var a = Num(string)
-    var b = Number(string, base)
+    # Basic number creation
+    var a = Num("3.14159")
+    var b = Number("1010", 2)      # Binary: 10
+    var c = 42                     # Integer literal
+
+    # Arithmetic operations
+    say (2**100 + 1)               # Large integer arithmetic
+    say as_frac(1/3 + 1/6)         # Rational arithmetic: 1/2
+
+    # Number-theoretic functions
+    say 100.prime                  # 100th prime: 541
+    say 5040.factor                # Prime factorization
+    say euler_phi(100)             # Euler's totient: 40
+
+    # Floating-point with custom precision
+    local Num!PREC = 1024         # set precision to 1024 bits
+    say sqrt(2)                   # High-precision square root
 
 =head1 INHERITS
 
@@ -61,8 +76,13 @@ Inherits methods from:
 =head2 !
 
     n!
+    n.factorial
 
-Factorial of C<n>. (C<1*2*3*...*n>)
+Computes the factorial of C<n>: C<1×2×3×...×n>.
+
+    say 5!              #=> 120
+    say 10.factorial    #=> 3628800
+    say 100!            #=> 93326215443944152681699...
 
 Aliases: I<fac>, I<factorial>
 
@@ -81,8 +101,13 @@ Aliases: I<dfac>, I<dfactorial>, I<double_factorial>
 =head2 %
 
     n % k
+    mod(n, k)
 
-Remainder of C<n/k>.
+Returns the remainder of C<n> divided by C<k>.
+
+    say (17 % 5)          #=> 2
+    say (-17 % 5)         #=> 3
+    say 100.mod(7)        #=> 2
 
 Aliases: I<mod>
 
@@ -101,8 +126,12 @@ Aliases: I<is_div>
 =head2 &
 
     a & b
+    and(a, b)
 
-Bitwise AND operation.
+Performs bitwise AND operation on integers C<a> and C<b>.
+
+    say (0b1100 & 0b1010)     #=> 8 (0b1000)
+    say 12.and(10)            #=> 8
 
 Aliases: I<and>
 
@@ -111,8 +140,12 @@ Aliases: I<and>
 =head2 *
 
     a * b
+    mul(a, b)
 
-Multiplication of C<a> and C<b>.
+Multiplies C<a> and C<b>.
+
+    say (6 * 7)           #=> 42
+    say (2/3 * 3/4)       #=> 1/2
 
 Aliases: I<mul>
 
@@ -120,9 +153,14 @@ Aliases: I<mul>
 
 =head2 **
 
-    a**b
+    a ** b
+    pow(a, b)
 
-Exponentiation: C<a> to power C<b>.
+Raises C<a> to the power C<b>.
+
+    say 2**10           #=> 1024
+    say 5**3            #=> 125
+    say pow(2, 100)     #=> 1267650600228229401496703205376
 
 Aliases: I<pow>
 
@@ -131,8 +169,13 @@ Aliases: I<pow>
 =head2 +
 
     a + b
+    add(a, b)
 
-Addition of C<a> and C<b>.
+Adds two numbers C<a> and C<b>.
+
+    say (42 + 13)       #=> 55
+    say (1/3 + 1/6)     #=> 1/2
+    say add(2.5, 3.7)   #=> 6.2
 
 Aliases: I<add>
 
@@ -144,7 +187,14 @@ Aliases: I<add>
     ++n
     n.inc
 
-Increment C<n> by C<1> and return the result.
+Increments C<n> by 1 and returns the result.
+
+    var x = 5
+    say ++x             #=> 6
+    say x++             #=> 6 (returns 6, x is now 7)
+    say x.inc           #=> 8
+
+The C<inc> method-call does not modify the variable in-place.
 
 Aliases: I<inc>
 
@@ -153,8 +203,12 @@ Aliases: I<inc>
 =head2 -
 
     a - b
+    sub(a, b)
 
-Subtraction of C<a> and C<b>.
+Subtracts C<b> from C<a>.
+
+    say (50 - 8)          #=> 42
+    say (1/2 - 1/3)       #=> 1/6
 
 Aliases: I<sub>
 
@@ -166,7 +220,14 @@ Aliases: I<sub>
     --n
     n.dec
 
-Decrement C<n> by C<1> and return the result.
+Decrements C<n> by 1 and returns the result.
+
+    var x = 5
+    say --x             #=> 4
+    say x--             #=> 4 (returns 4, x is now 3)
+    say x.dec           #=> 2
+
+The C<dec> method-call does not modify the variable in-place.
 
 Aliases: I<dec>
 
@@ -203,8 +264,13 @@ Aliases: I<xto>, I<xupto>
 =head2 /
 
     a / b
+    div(a, b)
 
-Division of C<a> by C<b>.
+Divides C<a> by C<b>.
+
+    say (10 / 3)          #=> 10/3
+    say (15 / 5)          #=> 3
+    say (7.5 / 2.5)       #=> 3
 
 Aliases: I<÷>, I<div>
 
@@ -213,12 +279,13 @@ Aliases: I<÷>, I<div>
 =head2 //
 
     a // b
+    idiv(a, b)
 
-Integer floor-division of C<a> and C<b>.
+Integer floor division. Equivalent to C<floor(a/b)> for integers.
 
-When C<a> and C<b> are integers, this is equivalent with:
-
-    floor(a/b)
+    say (17 // 5)         #=> 3
+    say (-17 // 5)        #=> -4
+    say idiv(100, 7)      #=> 14
 
 Aliases: I<divint>, I<fld>, I<idiv>, I<idiv_floor>
 
@@ -241,8 +308,12 @@ Aliases: I<pair>
 =head2 <
 
     a < b
+    lt(a, b)
 
 Returns true if C<a> is less than C<b>.
+
+    say (3 < 5 )          #=> true
+    say (10 < 7)          #=> false
 
 Aliases: I<lt>
 
@@ -251,10 +322,12 @@ Aliases: I<lt>
 =head2 <<
 
     a << b
+    shift_left(a, b)
 
-Left shift C<a> by C<b> bits, which is equivalent with (assuming C<a> and C<b> are integers):
+Left shifts C<a> by C<b> bits. Equivalent to C<a × 2^b> for integers.
 
-    floor(a * 2**b)
+    say (5 << 3)            #=> 40 (5 × 8)
+    say shift_left(1, 10)   #=> 1024
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -263,8 +336,13 @@ Aliases: I<lsft>, I<shift_left>
 =head2 <=>
 
     a <=> b
+    cmp(a, b)
 
-Comparison of C<a> with C<b>. Returns C<-1> if C<a> is less than C<b>, C<0> if C<a> and C<b> are equal and C<+1> if C<a> is greater than C<b>.
+Three-way comparison: returns -1 if C<a E<lt> b>, 0 if C<a == b>, +1 if C<a E<gt> b>.
+
+    say (5 <=> 10)        #=> -1
+    say (10 <=> 10)       #=> 0
+    say (15 <=> 10)       #=> 1
 
 Aliases: I<cmp>
 
@@ -291,8 +369,12 @@ Aliases: I<approx_cmp>
 =head2 ==
 
     a == b
+    eq(a, b)
 
-Equality check. Returns true if C<a> and C<b> are equal.
+Returns true if C<a> and C<b> are equal.
+
+    say (42 == 42)        #=> true
+    say (1/2 == 0.5)      #=> true
 
 Aliases: I<eq>
 
@@ -301,8 +383,12 @@ Aliases: I<eq>
 =head2 >
 
     a > b
+    gt(a, b)
 
-Returns true if C<a> is greater than C<b>. False otherwise.
+Returns true if C<a> is greater than C<b>.
+
+    say (10 > 7)          #=> true
+    say (3 > 5)           #=> false
 
 Aliases: I<gt>
 
@@ -311,10 +397,12 @@ Aliases: I<gt>
 =head2 >>
 
     a >> b
+    shift_right(a, b)
 
-Right shift C<a> by C<b> bits, which is equivalent with (assuming C<a> and C<b> are integers):
+Right shifts C<a> by C<b> bits. Equivalent to C<floor(a / 2^b)> for integers.
 
-    floor(a / 2**b)
+    say (40 >> 3)              #=> 5 (40 / 8)
+    say shift_right(1024, 10)  #=> 1
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -323,8 +411,12 @@ Aliases: I<rsft>, I<shift_right>
 =head2 ^
 
     a ^ b
+    xor(a, b)
 
-Bitwise XOR operation.
+Performs bitwise XOR operation on integers C<a> and C<b>.
+
+    say (0b1100 ^ 0b1010)   #=> 6 (0b0110)
+    say 12.xor(10)          #=> 6
 
 Aliases: I<xor>
 
@@ -369,8 +461,12 @@ Aliases: I<γ>, I<euler_gamma>
 =head2 |
 
     a | b
+    or(a, b)
 
-Returns the bitwise OR or C<a> and C<b>.
+Performs bitwise OR operation on integers C<a> and C<b>.
+
+    say (0b1100 | 0b1010)   #=> 14 (0b1110)
+    say 12.or(10)           #=> 14
 
 Aliases: I<or>
 
@@ -379,9 +475,12 @@ Aliases: I<or>
 =head2 ~
 
     ~a
-    a.not
+    not(a)
 
-Returns the bitwise NOT of C<a>.
+Returns the bitwise complement of C<a>.
+
+    say as_bin(~0b1010)      #=> -1011
+    say 10.not               #=> -11
 
 Aliases: I<not>
 
@@ -598,9 +697,13 @@ Aliases: I<=~=>, I<approx_eq>
 
 =head2 ≠
 
-    a ≠ b
+    a != b
+    ne(a, b)
 
-Returns true if C<a> and C<b> are different from each other.
+Returns true if C<a> and C<b> are different.
+
+    say (42 != 13)        #=> true
+    say (5 != 5)          #=> false
 
 Aliases: I<!=>, I<ne>
 
@@ -608,9 +711,13 @@ Aliases: I<!=>, I<ne>
 
 =head2 ≤
 
-    a ≤ b
+    a <= b
+    le(a, b)
 
 Returns true if C<a> is less than or equal to C<b>.
+
+    say (3 <= 5)          #=> true
+    say (5 <= 5)          #=> true
 
 Aliases: I<E<lt>=>, I<le>
 
@@ -618,9 +725,13 @@ Aliases: I<E<lt>=>, I<le>
 
 =head2 ≥
 
-    a ≥ b
+    a >= b
+    ge(a, b)
 
 Returns true if C<a> is greater than or equal to C<b>.
+
+    say (10 >= 7)         #=> true
+    say (7 >= 7)          #=> true
 
 Aliases: I<E<gt>=>, I<ge>
 
@@ -3220,11 +3331,13 @@ Aliases: I<f>, I<float>, I<to_float>
     factor(n)
     factor(n, { ... })
 
-Returns an array with the prime factors of C<n>, where C<n> is a positive integer, such that C<n.factor.prod == n>.
+Returns prime factors of C<n> (with repetition), sorted in ascending order.
 
-    say 180.factor  #=> [2, 2, 3, 3, 5]
+    say 180.factor          #=> [2, 2, 3, 3, 5]
+    say 2023.factor         #=> [7, 17, 17]
+    say factor(2**67 - 1)   #=> [193707721, 761838257287]
 
-An optional block can be provided, to use a specific factorization method:
+An optional block can specify custom factorization methods:
 
     say factor(10**120 - 10**40, {|k| k.ecm_factor })
     say factor(10**120 - 10**40, {|k| k.fermat_factor })
@@ -4728,8 +4841,10 @@ Aliases: I<is_lucasV_psp>, I<is_bruckman_lucas_psp>, I<is_lucasV_pseudoprime>, I
 
 Returns true if C<2^p - 1> is a Mersenne prime.
 
-    say 607.is_mersenne_prime       # prints true; (2**607 - 1) is a Mersenne prime.
+    say 31.is_mersenne_prime    #=> true (2^31 - 1 is prime)
+    say 11.is_mersenne_prime    #=> false
 
+Uses the Lucas-Lehmer test for efficiency.
 =cut
 
 =head2 is_mone
@@ -5048,9 +5163,13 @@ Returns true if C<n> is a practical number (OEIS: A005153).
 
 =head2 is_prime
 
-    n.is_prime
-
 Returns true if C<n> is a prime number.
+
+    say 17.is_prime           #=> true
+    say 18.is_prime           #=> false
+    say is_prime(2**127 - 1)  #=> true (Mersenne prime)
+
+For numbers up to 2^64, uses a deterministic Miller-Rabin test. For larger numbers, uses probabilistic B-PSW and additional tests, which have no known counter-examples.
 
 =cut
 
@@ -5084,9 +5203,13 @@ Returns true if C<n> is a primitive root modulo C<m>.
 
 =head2 is_prob_prime
 
-    is_prob_prime(n)
+    n.is_prob_prime
 
-Returns true if C<n> is probably prime. The method does some trial division, then it performs a B-PSW test.
+Returns true if C<n> is probably prime. Performs trial division followed by a B-PSW test.
+
+    say is_prob_prime(1003200318091)   #=> true
+
+Faster than C<is_prime> but may (extremely rarely) give false positives for large numbers.
 
 =cut
 
@@ -6321,7 +6444,11 @@ Returns the next k-powerful (or k-full) number greater than C<n>.
 
     n.next_prime
 
-Returns the next prime larger than C<n>.
+Returns the next prime number greater than C<n>.
+
+    say 10.next_prime           #=> 11
+    say 100.next_prime          #=> 101
+    say (10**20 -> next_prime)  #=> 100000000000000000039
 
 =cut
 
@@ -6524,7 +6651,7 @@ Returns the normalized value of C<x>: C<abs(x)^2>.
 
     n.next_primes(start=2)
 
-Returns an array containing C<n> consecutive primes that are `>= start` (if omitted, then start = 2).
+Returns an array of C<n> consecutive primes starting from C<start> (if omitted, then C<start = 2>).
 
     say 10.next_primes        #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
     say 10.next_primes(1000)  #=> [1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061]
@@ -7554,7 +7681,12 @@ Returns the previous k-powerful (or k-full) number smaller than C<n>.
 
     n.prev_prime
 
-Returns the previous prime smaller than C<n>.
+Returns the previous prime number smaller than C<n>.
+
+    say 11.prev_prime       #=> 7
+    say 100.prev_prime      #=> 97
+
+Returns C<nil> if C<n E<lt>= 2>.
 
 =cut
 
@@ -7627,11 +7759,13 @@ The method returns true when C<n> passes the internal primality pretest (when C<
 =head2 prime
 
     prime(n)
+    nth_prime(n)
 
-Returns the n-th prime number.
+Returns the n-th prime number (1-indexed).
 
-    say prime(100)      #  100th prime: 541
-    say prime(1000)     # 1000th prime: 7919
+    say prime(1)            #=> 2
+    say prime(100)          #=> 541
+    say prime(1000000)      #=> 15485863
 
 Aliases: I<nth_prime>
 
@@ -7671,9 +7805,13 @@ Aliases: I<nth_prime_lower>
 
     pi(n)
     primepi(n)
-    primepi(a,b)
+    primepi(a, b)
 
-Returns the count of primes <= C<n>, or in the range C<a..b>.
+Counts the number of primes <= C<n>, or in the range C<[a,b]>.
+
+    say primepi(100)        #=> 25
+    say primepi(50, 100)    #=> 10
+    say pi(10**12)          #=> 37607912018
 
 Aliases: I<prime_count>, I<count_primes>
 
@@ -7881,9 +8019,12 @@ Returns the prime C<p> if C<n> can be expressed as C<n = p^k> for some prime num
 =head2 primes
 
     primes(n)
-    primes(a,b)
+    primes(a, b)
 
-Returns an array with the prime numbers <= C<n>, or in the range C<a..b>.
+Returns an array of prime numbers <= C<n>, or in the range C<[a,b]>.
+
+    say primes(20)          #=> [2, 3, 5, 7, 11, 13, 17, 19]
+    say primes(10, 20)      #=> [11, 13, 17, 19]
 
 =cut
 
@@ -8238,9 +8379,9 @@ Aliases: I<random_nbit_maurer_prime>
 
     random_nbit_prime(n)
 
-Returns a random n-bit prime.
+Returns a cryptographically-secure random n-bit prime.
 
-    say random_nbit_prime(100)      # 100-bit random prime
+    say random_nbit_prime(128)  #=> 128-bit random prime
 
 =cut
 
@@ -8281,10 +8422,10 @@ Returns a random n-digit prime.
     random_prime(n)
     random_prime(a,b)
 
-Returns a random prime <= C<n>, or in the range C<a..b>.
+Returns a cryptographically-secure random prime <= C<n>, or in C<[a,b]>.
 
-    say random_prime(100)         # random prime in range [2, 100]
-    say random_prime(100, 1000)   # random prime in range [100, 1000]
+    say random_prime(100)       #=> Random prime in [2, 100]
+    say random_prime(100, 200)  #=> Random prime in [100, 200]
 
 =cut
 
