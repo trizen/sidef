@@ -963,6 +963,7 @@ scripts/Tests/nth_number.sf
 scripts/Tests/nth_prime.sf
 scripts/Tests/number_binary_search.sf
 scripts/Tests/number_methods.sf
+scripts/Tests/number_methods_edge_cases.sf
 scripts/Tests/object_copy.sf
 scripts/Tests/object_methods_reflection.sf
 scripts/Tests/objects_init.sf
