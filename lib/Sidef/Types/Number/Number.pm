@@ -9387,13 +9387,14 @@ package Sidef::Types::Number::Number {
             $base = TEN;
         }
 
+        # TODO: Add check for the smallest base-b pandigital number
+        # https://en.wikipedia.org/wiki/Pandigital_number
+
         my %hash;
-        foreach my $d (@{$n->digits($base)}) {
-            $hash{$d}++;
-        }
+        @hash{@{$n->digits($base)}} = ();
 
         foreach my $i (0 .. $base->numify - 1) {
-            if (not $hash{$i}) {
+            if (not exists $hash{$i}) {
                 return Sidef::Types::Bool::Bool::FALSE;
             }
         }
@@ -34617,7 +34618,9 @@ package Sidef::Types::Number::Number {
 
     sub is_achilles {
         my ($n) = @_;
-        $n->is_powerful && !$n->is_power;
+        $n->is_powerful || return Sidef::Types::Bool::Bool::FALSE;
+        $n->is_power && return Sidef::Types::Bool::Bool::FALSE;
+        return Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub is_perfect {
