@@ -285,17 +285,23 @@ package Sidef::Types::Number::PolynomialMod {
         my $r = $x_mod;
         my $c = $y->{$deg_y};                            # lc(y)
 
+        # Calculate modular inverse of the leading coefficient of divisor
+        my $inv_c = $c->invmod($m);
+
+        # If inverse does not exist (e.g. m is not prime), return NaN
+        if ($inv_c->is_nan) {
+            return (__PACKAGE__->new(Sidef::Types::Number::Number::nan(), Sidef::Types::Number::Number::nan()), __PACKAGE__->new($m));
+        }
+
         while ($deg_r >= $deg_y) {
 
-            my $lc = $r->[0]{$deg_r};                    # lc(r)
-            my $t  = $lc->divmod($c, $m);                # lc(r)/c
+            my $lc = $r->[0]{$deg_r};    # lc(r)
 
-            # When the result of division is NaN, the loop never stops
-            if ($t->is_nan) {
-                return (__PACKAGE__->new(Sidef::Types::Number::Number::nan(), Sidef::Types::Number::Number::nan()), __PACKAGE__->new($m));
-            }
+            # Fix: Use modular inverse multiplication instead of integer division
+            # t = lc(r) * inv(c) (mod m)
+            my $t = $lc->mulmod($inv_c, $m);
 
-            # s := lc(r)/c * x^(deg(r)−deg(y))
+            # s := t * x^(deg(r)−deg(y))
             my $s = __PACKAGE__->new(Math::Prime::Util::GMP::subint($deg_r, $deg_y) => $t, $m);
             $q = $q->add($s);
             $r = $r->sub($s->mul($y_mod));
@@ -319,6 +325,23 @@ package Sidef::Types::Number::PolynomialMod {
     sub lcm {
         my ($x, $y) = @_;
         $x->mul($y)->abs->div($x->gcd($y));
+    }
+
+    sub normalize_to_monic {
+        my ($x) = @_;
+        my $deg = $x->degree->numify;
+        return $x if $deg < 0;
+
+        my $lc = $x->[0]{$deg};
+
+        # Already monic
+        return $x if $lc->is_one;
+
+        # Multiply polynomial by inv(lc)
+        my $inv = $lc->invmod($x->[1]);
+        return $x if $inv->is_nan;    # Should not happen in field
+
+        $x->mul($inv);
     }
 
     sub gcd {

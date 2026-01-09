@@ -449,9 +449,8 @@ do {
     var a = (7*z**4 + 21*z**3 + 14*z**2)
     var b = (3*z**3 - 6*z**2 - 9*z)
 
-    # FIXME: gcd() and lcm() does not match the output of PARI/GP
-    assert_eq(gcd(a, b), Polynomial(1 => 105, 2 => 105))
-    assert_eq(lcm(a, b), Polynomial(2 => -6/5, 3 => -7/5, 5 => 1/5))
+    assert_eq(gcd(a,b), Poly("x^2 + x"))
+    assert_eq(lcm(a,b), Poly("21*x^5 - 147*x^3 - 126*x^2"))
 
     var (g, u, v, a1, b1) = gcdext(a,b)
     assert_eq(g, gcd(a,b))
@@ -593,7 +592,7 @@ do {
     var p = Poly("6*x^3 + 3*x + 3")
     assert_eq(content(p), 3)
     assert_eq(prim_part(p), Poly("2*x^3 + x + 1"))
-    assert(!prim_part(p).is_squarefree)
+    assert(prim_part(p).is_squarefree)
 }
 
 say "** Test passed!"

@@ -538,14 +538,16 @@ package Sidef::Types::Number::Polynomial {
         # Reference:
         #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclidean_division
 
-        my $deg_r = List::Util::max(CORE::keys(%$x));    # deg(x)
+        # Get degree of x
+        my $deg_r = List::Util::max(CORE::keys(%$x));
         $deg_r // return (__PACKAGE__->new(), __PACKAGE__->new());
 
         if ($deg_r > ~0) {
             $deg_r = Math::GMPz::Rmpz_init_set_str("$deg_r", 10);
         }
 
-        my $deg_y = List::Util::max(CORE::keys(%$y));    # deg(y)
+        # Get degree of y
+        my $deg_y = List::Util::max(CORE::keys(%$y));
         $deg_y // return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf()), __PACKAGE__->new());
 
         if ($deg_y > ~0) {
@@ -554,24 +556,29 @@ package Sidef::Types::Number::Polynomial {
 
         my $q = __PACKAGE__->new();
         my $r = $x;
-        my $c = $y->{$deg_y};                            # lc(y)
+        my $c = $y->{$deg_y};         # Leading coefficient of y
+
+        # Handle zero or NaN leading coefficient
+        if (!defined($c) || $c->is_zero() || $c->is_nan()) {
+            return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::nan()), __PACKAGE__->new());
+        }
 
         while ($deg_r >= $deg_y) {
 
-            my $lc = $r->{$deg_r};                       # lc(r)
-            my $t  = $lc->div($c);                       # lc(r)/c
+            my $lc = $r->{$deg_r};    # Leading coefficient of r
+            my $t  = $lc->div($c);    # Quotient of leading coefficients
 
-            # When the result of division is NaN, the loop never stops
-            if ($t->is_nan) {
+            # Check for NaN result
+            if ($t->is_nan()) {
                 return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::nan()), __PACKAGE__->new());
             }
 
-            # s := lc(r)/c * x^(deg(r)−deg(y))
+            # s := t * x^(deg(r) - deg(y))
             my $s = __PACKAGE__->new(Math::Prime::Util::GMP::subint($deg_r, $deg_y), $t);
             $q = $q->add($s);
             $r = $r->sub($s->mul($y));
 
-            # Find deg(r) for the new r
+            # Find new degree of r
             $deg_r = List::Util::max(CORE::keys(%$r)) // last;
 
             if ($deg_r > ~0) {
@@ -598,21 +605,47 @@ package Sidef::Types::Number::Polynomial {
         $x->mul($y)->abs->div($x->gcd($y));
     }
 
+    sub normalize_to_monic {
+        my ($x) = @_;
+
+        # Normalize to monic polynomial (leading coefficient = 1)
+        my $deg = List::Util::max(CORE::keys(%$x));
+        if (defined($deg) && exists($x->{$deg})) {
+            my $lc = $x->{$deg};
+            if (!$lc->is_zero() && !$lc->is_one()) {
+                my $normalized = __PACKAGE__->new();
+                for my $d (CORE::keys(%$x)) {
+                    $normalized->{$d} = $x->{$d}->div($lc);
+                }
+                return $normalized;
+            }
+        }
+
+        return $x;
+    }
+
     sub gcd {
         my ($x, $y) = @_;
 
-        # Reference:
-        #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclid's_algorithm
+        # Handle zero polynomials
+        return $y if $x->is_zero();
+        return $x if $y->is_zero();
 
-        my $r0 = $x;
-        my $r1 = $y;
+        # Euclidean algorithm
+        while (!$y->is_zero()) {
+            my ($q, $r) = $x->divmod($y);
 
-        until ($r1->is_zero) {
-            my $r = $r0->mod($r1);
-            ($r0, $r1) = ($r1, $r);
+            # Check if division produced invalid result
+            my $deg_q = List::Util::max(CORE::keys(%$q));
+            if (defined($deg_q) && exists $q->{$deg_q}) {
+                my $coef = $q->{$deg_q};
+                last if ($coef->is_nan() || $coef->is_inf() || $coef->is_ninf);
+            }
+
+            ($x, $y) = ($y, $r);
         }
 
-        return $r0;
+        return $x->normalize_to_monic;
     }
 
     sub gcdext {
@@ -642,12 +675,26 @@ package Sidef::Types::Number::Polynomial {
             ++$i;
         }
 
-        my $g = $r0;
-        my $u = $s0;
-        my $v = $t0;
-
+        my $g  = $r0;
+        my $u  = $s0;
+        my $v  = $t0;
         my $a1 = $t1->mul(Sidef::Types::Number::Number::MONE->ipow(Sidef::Types::Number::Number::_set_int($i - 1)));
         my $b1 = $s1->mul(Sidef::Types::Number::Number::MONE->ipow(Sidef::Types::Number::Number::_set_int($i)));
+
+        # Normalize all outputs
+        my $deg_g = List::Util::max(CORE::keys(%$g));
+
+        if (defined($deg_g) && exists($g->{$deg_g})) {
+            my $lc = $g->{$deg_g};
+
+            if (!$lc->is_zero() && !$lc->is_one()) {
+                $g  = $g->div($lc);
+                $u  = $u->div($lc);
+                $v  = $v->div($lc);
+                $a1 = $a1->mul($lc);
+                $b1 = $b1->mul($lc);
+            }
+        }
 
         return ($g, $u, $v, $a1, $b1);
     }
