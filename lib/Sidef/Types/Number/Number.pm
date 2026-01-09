@@ -9387,17 +9387,27 @@ package Sidef::Types::Number::Number {
             $base = TEN;
         }
 
-        # TODO: Add check for the smallest base-b pandigital number
+        # If a(n) is the smallest pandigital number to base n, then:
+        # a(n) = (n^n-n)/(n-1)^2 + n^(n-2)*(n-1) - 1
         # https://en.wikipedia.org/wiki/Pandigital_number
+
+        my $t = $base->numify;
+
+        if ($n->ilog2->numify < ($t - 2) * (CORE::log($t) / CORE::log(2))) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        # my $smallest = $base->ipow($base)->sub($base)->idiv($base->dec->sqr)->add($base->ipow($base->sub(TWO))->mul($base->dec))->dec;
+
+        # if ($n->lt($smallest)) {
+        #    return Sidef::Types::Bool::Bool::FALSE;
+        # }
 
         my %hash;
         @hash{@{$n->digits($base)}} = ();
 
-        foreach my $i (0 .. $base->numify - 1) {
-            if (not exists $hash{$i}) {
-                return Sidef::Types::Bool::Bool::FALSE;
-            }
-        }
+        scalar(keys %hash) == $t
+          or return Sidef::Types::Bool::Bool::FALSE;
 
         return Sidef::Types::Bool::Bool::TRUE;
     }
