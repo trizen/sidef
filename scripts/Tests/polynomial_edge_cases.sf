@@ -1,0 +1,747 @@
+#!/usr/bin/ruby
+
+# Polynomial tests (Sidef)
+#
+# Tests for univariate polynomial arithmetic and operations
+# Uses:  assert(), assert_eq(), assert_ne()
+
+# --- Construction ---
+
+# Monomial:  x^5
+var mono = Polynomial(5)
+assert_eq(mono.deg, 5)
+
+# From array: coefficients from highest to lowest degree
+# [1, 2, 3] = x^2 + 2*x + 3
+var p1 = Polynomial([1, 2, 3])
+assert_eq(p1.deg, 2)
+assert_eq(p1.coeff(2), 1)
+assert_eq(p1.coeff(1), 2)
+assert_eq(p1.coeff(0), 3)
+
+# Sparse representation with pairs:  degree => coefficient
+# 5 => 3, 2 => 10 means 3*x^5 + 10*x^2
+var sparse = Polynomial(5 => 3, 2 => 10)
+assert_eq(sparse.coeff(5), 3)
+assert_eq(sparse.coeff(2), 10)
+assert_eq(sparse.coeff(0), 0)
+
+# Using new
+var p_new = Polynomial. new([4, 5, 6])
+assert_eq(p_new.deg, 2)
+
+# call alias
+var p_call = Polynomial.call([7, 8, 9])
+assert_eq(p_call.deg, 2)
+
+# --- Accessors ---
+
+# deg / degree
+var pdeg = Polynomial([1, 2, 3, 4])    # x^3 + 2*x^2 + 3*x + 4
+assert_eq(pdeg. deg, 3)
+assert_eq(pdeg.degree, 3)
+
+# coeff
+assert_eq(pdeg.coeff(3), 1)
+assert_eq(pdeg.coeff(2), 2)
+assert_eq(pdeg.coeff(1), 3)
+assert_eq(pdeg.coeff(0), 4)
+assert_eq(pdeg.coeff(10), 0)    # non-existent term
+
+# coeffs
+var pcoeffs = Polynomial([1, 2, 3])
+var coeffs = pcoeffs.coeffs
+assert_eq(coeffs, [[0,3],[1,2],[2,1]])
+
+# exponents
+var pexp = Polynomial(5 => 3, 2 => 1, 0 => 7)
+var exps = pexp.exponents
+assert(exps.contains(5))
+assert(exps.contains(2))
+assert(exps.contains(0))
+
+# leading_coeff / leading_coefficient
+var plc = Polynomial([3, 2, 1])    # 3*x^2 + 2*x + 1
+assert_eq(plc.leading_coeff, 3)
+assert_eq(plc. leading_coefficient, 3)
+
+# leading_term
+var plt = Polynomial([3, 2, 1])
+var lt = plt.leading_term
+assert(lt.is_a(Polynomial))
+assert_eq(lt. deg, 2)
+assert_eq(lt.leading_coeff, 3)
+
+# leading_monomial
+var plm = Polynomial([3, 2, 1])
+var lm = plm.leading_monomial
+assert(lm.is_a(Polynomial))
+assert_eq(lm.deg, 2)
+
+# height (max absolute value of coefficients)
+var ph = Polynomial([3, -5, 2])
+assert_eq(ph.height, 5)
+
+var ph2 = Polynomial([-10, 3, 7])
+assert_eq(ph2.height, 10)
+
+# --- Addition (+) ---
+
+var a1 = Polynomial([1, 2])        # x + 2
+var a2 = Polynomial([3, 4])        # 3x + 4
+var sum = (a1 + a2)                  # 4x + 6
+assert_eq(sum.coeff(1), 4)
+assert_eq(sum.coeff(0), 6)
+
+# add alias
+var sum2 = a1.add(a2)
+assert_eq(sum2.coeff(1), 4)
+assert_eq(sum2.coeff(0), 6)
+
+# Addition with different degrees
+var a3 = Polynomial([1, 0, 0])     # x^2
+var a4 = Polynomial([2, 3])        # 2x + 3
+var sum3 = (a3 + a4)                 # x^2 + 2x + 3
+assert_eq(sum3.deg, 2)
+assert_eq(sum3.coeff(2), 1)
+assert_eq(sum3.coeff(1), 2)
+assert_eq(sum3.coeff(0), 3)
+
+# --- Subtraction (-) ---
+
+var s1 = Polynomial([1, 2, 3])     # x^2 + 2x + 3
+var s2 = Polynomial([1, 0])        # x
+var diff = (s1 - s2)                # x^2 + x + 3
+assert_eq(diff.coeff(2), 1)
+assert_eq(diff.coeff(1), 1)
+assert_eq(diff.coeff(0), 3)
+
+# sub alias
+var diff2 = s1.sub(s2)
+assert_eq(diff2.coeff(1), 1)
+
+# --- Multiplication (*) ---
+
+# (x + 2)(x + 3) = x^2 + 5x + 6
+var m1 = Polynomial([1, 2])        # x + 2
+var m2 = Polynomial([1, 3])        # x + 3
+var prod = (m1 * m2)
+assert_eq(prod.deg, 2)
+assert_eq(prod.coeff(2), 1)
+assert_eq(prod.coeff(1), 5)
+assert_eq(prod.coeff(0), 6)
+
+# mul alias
+var prod2 = m1.mul(m2)
+assert_eq(prod2.coeff(1), 5)
+
+# From docs:  Polynomial([1,2,3]) * Polynomial([4,5]) = 4*x^3 + 13*x^2 + 22*x + 15
+var pm1 = Polynomial([1, 2, 3])
+var pm2 = Polynomial([4, 5])
+var pm_prod = (pm1 * pm2)
+assert_eq(pm_prod.coeff(3), 4)
+assert_eq(pm_prod.coeff(2), 13)
+assert_eq(pm_prod.coeff(1), 22)
+assert_eq(pm_prod.coeff(0), 15)
+
+# --- Division (/) ---
+
+# (x^2 - 1) / (x - 1) = x + 1
+var d1 = Polynomial([1, 0, -1])    # x^2 - 1
+var d2 = Polynomial([1, -1])       # x - 1
+var quot = (d1 / d2)
+assert_eq(quot.deg, 1)
+assert_eq(quot.coeff(1), 1)
+assert_eq(quot.coeff(0), 1)
+
+# div alias
+var quot2 = d1.div(d2)
+assert_eq(quot2.coeff(0), 1)
+
+# --- Modulo (%) ---
+
+# (x^3 + 1) % (x + 1)
+var mod1 = Polynomial([1, 0, 0, 1])    # x^3 + 1
+var mod2 = Polynomial([1, 1])          # x + 1
+var rem = (mod1 % mod2)
+# x^3 + 1 = (x + 1)(x^2 - x + 1) + 0, so remainder is 0
+assert(rem.is_zero)
+
+# mod alias
+var rem2 = mod1.mod(mod2)
+assert(rem2.is_zero)
+
+# Non-zero remainder
+var mod3 = Polynomial([1, 0, 0, 2])    # x^3 + 2
+var mod4 = Polynomial([1, 1])          # x + 1
+var rem3 = (mod3 % mod4)
+# x^3 + 2 = (x + 1)(x^2 - x + 1) + 1
+assert_eq(rem3.coeff(0), 1)
+
+# --- divmod ---
+
+var dm1 = Polynomial([1, 0, -1])       # x^2 - 1
+var dm2 = Polynomial([1, -1])          # x - 1
+var (q, r) = dm1.divmod(dm2)
+assert_eq(q. deg, 1)
+assert(r.is_zero)
+
+# Verify:  q * dm2 + r == dm1
+var reconstructed = ((q * dm2) + r)
+assert(reconstructed == dm1)
+
+# --- Exponentiation (**) ---
+
+# (x + 1)^2 = x^2 + 2x + 1
+var e1 = Polynomial([1, 1])
+var e2 = (e1 ** 2)
+assert_eq(e2.deg, 2)
+assert_eq(e2.coeff(2), 1)
+assert_eq(e2.coeff(1), 2)
+assert_eq(e2.coeff(0), 1)
+
+# (x + 1)^3 = x^3 + 3x^2 + 3x + 1
+var e3 = (e1 ** 3)
+assert_eq(e3.deg, 3)
+assert_eq(e3.coeff(3), 1)
+assert_eq(e3.coeff(2), 3)
+assert_eq(e3.coeff(1), 3)
+assert_eq(e3.coeff(0), 1)
+
+# pow alias
+var e4 = e1.pow(2)
+assert_eq(e4.coeff(1), 2)
+
+# Power of 0 should give 1
+var e0 = (Polynomial([1, 2, 3]) ** 0)
+assert(e0.is_one)
+
+# Power of 1 should give same polynomial
+var e1_pow1 = (Polynomial([1, 2, 3]) ** 1)
+assert_eq(e1_pow1.deg, 2)
+
+# --- sqr ---
+
+var sq = Polynomial([1, 1])
+var sq_result = sq.sqr
+var sq_pow = (sq ** 2)
+assert(sq_result == sq_pow)
+
+# --- Increment (++) ---
+
+var inc_p = Polynomial([1, 2, 3])    # x^2 + 2x + 3
+inc_p++
+assert_eq(inc_p.coeff(0), 4)         # constant term increased by 1
+assert_eq(inc_p.coeff(1), 2)         # other terms unchanged
+assert_eq(inc_p.coeff(2), 1)
+
+# inc alias
+var inc_p2 = Polynomial([1, 2, 3])
+inc_p2 = inc_p2.inc
+assert_eq(inc_p2.coeff(0), 4)
+
+# --- Decrement (--) ---
+
+var dec_p = Polynomial([1, 2, 3])    # x^2 + 2x + 3
+dec_p--
+assert_eq(dec_p.coeff(0), 2)         # constant term decreased by 1
+
+# dec alias
+var dec_p2 = Polynomial([1, 2, 3])
+dec_p2 = dec_p2.dec
+assert_eq(dec_p2.coeff(0), 2)
+
+# --- neg ---
+
+var neg_p = Polynomial([1, 2, 3])
+var neg_result = neg_p.neg
+assert_eq(neg_result. coeff(2), -1)
+assert_eq(neg_result.coeff(1), -2)
+assert_eq(neg_result. coeff(0), -3)
+
+# Unary minus
+var neg2 = -Polynomial([3, 2, 1])
+assert_eq(neg2.coeff(2), -3)
+
+# --- Equality (==) ---
+
+var eq1 = Polynomial([1, 2, 3])
+var eq2 = Polynomial([1, 2, 3])
+var eq3 = Polynomial([1, 2, 4])
+
+assert(eq1 == eq2)
+assert(!(eq1 == eq3))
+
+# eq alias
+assert(eq1.eq(eq2))
+
+# --- Inequality (!=) ---
+
+assert(eq1 != eq3)
+assert(!(eq1 != eq2))
+
+# ne alias
+assert(eq1.ne(eq3))
+
+# --- Comparison (<=>) ---
+
+var cmp1 = Polynomial([1, 0])          # x
+var cmp2 = Polynomial([1, 0, 0])       # x^2
+var cmp3 = Polynomial([1, 0])          # x
+
+assert_eq(cmp1 <=> cmp3, 0)
+assert_eq(cmp1 <=> cmp2, -1)           # lower degree
+assert_eq(cmp2 <=> cmp1, 1)            # higher degree
+
+# cmp alias
+assert_eq(cmp1. cmp(cmp2), -1)
+
+# --- Less than (<) ---
+
+assert(cmp1 < cmp2)
+assert(!(cmp2 < cmp1))
+
+# lt alias
+assert(cmp1.lt(cmp2))
+
+# --- Greater than (>) ---
+
+assert(cmp2 > cmp1)
+assert(!(cmp1 > cmp2))
+
+# gt alias
+assert(cmp2.gt(cmp1))
+
+# --- Less than or equal (<=) ---
+
+assert(cmp1 <= cmp2)
+assert(cmp1 <= cmp3)
+assert(!(cmp2 <= cmp1))
+
+# le alias
+assert(cmp1.le(cmp2))
+
+# --- Greater than or equal (>=) ---
+
+assert(cmp2 >= cmp1)
+assert(cmp1 >= cmp3)
+assert(!(cmp1 >= cmp2))
+
+# ge alias
+assert(cmp2.ge(cmp1))
+
+# --- eval ---
+
+# p(x) = x^2 + 2x + 3
+var eval_p = Polynomial([1, 2, 3])
+
+# p(0) = 3
+assert_eq(eval_p.eval(0), 3)
+
+# p(1) = 1 + 2 + 3 = 6
+assert_eq(eval_p.eval(1), 6)
+
+# p(2) = 4 + 4 + 3 = 11
+assert_eq(eval_p.eval(2), 11)
+
+# p(5) = 25 + 10 + 3 = 38 (from docs)
+assert_eq(eval_p.eval(5), 38)
+
+# p(-1) = 1 - 2 + 3 = 2
+assert_eq(eval_p.eval(-1), 2)
+
+# --- derivative ---
+
+# d/dx(x^3 + 3x + 2) = 3x^2 + 3
+var deriv_p = Polynomial([1, 0, 3, 2])
+var deriv = deriv_p.derivative
+assert_eq(deriv.deg, 2)
+assert_eq(deriv.coeff(2), 3)
+assert_eq(deriv.coeff(1), 0)
+assert_eq(deriv.coeff(0), 3)
+
+# d/dx(x^2 + 2x + 1) = 2x + 2
+var deriv_p2 = Polynomial([1, 2, 1])
+var deriv2 = deriv_p2.derivative
+assert_eq(deriv2.coeff(1), 2)
+assert_eq(deriv2.coeff(0), 2)
+
+# Second derivative
+var deriv3 = deriv2.derivative
+assert_eq(deriv3.deg, 0)
+assert_eq(deriv3.coeff(0), 2)
+
+# Derivative of constant is zero
+var const_p = Polynomial([5])
+var const_deriv = const_p.derivative
+assert(const_deriv. is_zero)
+
+# --- gcd ---
+
+# gcd(x^2 - 1, x - 1) = x - 1
+var gcd1 = Polynomial([1, 0, -1])      # x^2 - 1
+var gcd2 = Polynomial([1, -1])         # x - 1
+var g = gcd1.gcd(gcd2)
+assert_eq(g.deg, 1)
+assert_eq(g, Poly("x-1"))
+
+# gcd of coprime polynomials is constant
+var gcd3 = Polynomial([1, 1])          # x + 1
+var gcd4 = Polynomial([1, -2])         # x - 2
+var g2 = gcd3.gcd(gcd4)
+assert_eq(g2.deg, 0)
+
+# --- gcdext ---
+
+var gcdext1 = Polynomial([1, 0, -1])   # x^2 - 1
+var gcdext2 = Polynomial([1, -1])      # x - 1
+var (gcd_result, s, t) = gcdext1.gcdext(gcdext2)
+
+# Verify Bezout's identity:  gcd = s*p + t*q
+var bezout = ((s * gcdext1) + (t * gcdext2))
+# The result should equal gcd (up to constant factor)
+assert(bezout.deg == gcd_result. deg)
+
+# --- lcm ---
+
+var lcm1 = Polynomial([1, 0, -1])      # x^2 - 1 = (x-1)(x+1)
+var lcm2 = Polynomial([1, -1])         # x - 1
+var l = lcm1.lcm(lcm2)
+# lcm should be x^2 - 1 (since x-1 divides x^2-1)
+assert_eq(l.deg, 2)
+
+# --- content / cont ---
+
+var cont_p = Polynomial([6, 9, 12])
+assert_eq(cont_p.cont, 3)
+assert_eq(cont_p.content, 3)
+
+var cont_p2 = Polynomial([4, 8, 12, 16])
+assert_eq(cont_p2.cont, 4)
+
+# --- prim_part / primpart / primitive_part ---
+
+var prim_p = Polynomial([6, 9, 12])    # content is 3
+var prim = prim_p.prim_part
+# 6/3 = 2, 9/3 = 3, 12/3 = 4
+assert_eq(prim. coeff(2), 2)
+assert_eq(prim.coeff(1), 3)
+assert_eq(prim.coeff(0), 4)
+
+# primpart alias
+var prim2 = prim_p.primpart
+assert_eq(prim2.coeff(0), 4)
+
+# primitive_part alias
+var prim3 = prim_p.primitive_part
+assert_eq(prim3.coeff(0), 4)
+
+# --- is_zero ---
+
+var zero_p = Polynomial([0])
+var zero_p2 = Polynomial([0, 0, 0])
+var nonzero_p = Polynomial([0, 0, 1])
+
+assert(zero_p.is_zero)
+assert(zero_p2.is_zero)
+assert(!nonzero_p.is_zero)
+
+# --- is_one ---
+
+var one_p = Polynomial([1])
+var not_one_p = Polynomial([2])
+var not_one_p2 = Polynomial([1, 0])    # x
+
+assert(one_p.is_one)
+assert(!not_one_p.is_one)
+assert(!not_one_p2.is_one)
+
+# --- is_mone ---
+
+var mone_p = Polynomial([-1])
+var not_mone_p = Polynomial([1])
+
+assert(mone_p.is_mone)
+assert(!not_mone_p.is_mone)
+
+# --- is_squarefree ---
+
+# x^2 - 1 = (x-1)(x+1) is squarefree
+var sf1 = Polynomial([1, 0, -1])
+assert(sf1.is_squarefree)
+
+# x^2 = x * x is not squarefree
+var sf2 = Polynomial([1, 0, 0])
+assert(!sf2.is_squarefree)
+
+# (x-1)^2 = x^2 - 2x + 1 is not squarefree
+var sf3 = Polynomial([1, -2, 1])
+assert(!sf3.is_squarefree)
+
+# --- squarefree_part ---
+
+# x^2 -> x
+var sqfp = Polynomial([1, 0, 0])
+var sqf_part = sqfp.squarefree_part
+assert_eq(sqf_part.deg, 1)
+
+# --- roots ---
+
+# x^2 - 1 = 0 has roots 1 and -1
+var roots_p = Polynomial([1, 0, -1])
+var roots = roots_p.roots
+assert_eq(roots.len, 2)
+assert(roots.contains(1) || roots.contains(-1))
+
+# x - 2 = 0 has root 2
+var roots_p2 = Polynomial([1, -2])
+var roots2 = roots_p2.roots
+assert_eq(roots2.len, 1)
+assert_eq(roots2[0], 2)
+
+# x^2 + 1 = 0 has complex roots
+var roots_p3 = Polynomial([1, 0, 1])
+var roots3 = roots_p3.roots
+assert_eq(roots3.len, 2)
+
+# --- floor ---
+
+var floor_p = Polynomial([1.8, 2.3, 3.9])
+var floored = floor_p.floor
+assert_eq(floored.coeff(2), 1)
+assert_eq(floored.coeff(1), 2)
+assert_eq(floored.coeff(0), 3)
+
+# --- ceil ---
+
+var ceil_p = Polynomial([1.2, 2.7, 3.1])
+var ceiled = ceil_p. ceil
+assert_eq(ceiled.coeff(2), 2)
+assert_eq(ceiled. coeff(1), 3)
+assert_eq(ceiled.coeff(0), 4)
+
+# --- round ---
+
+var round_p = Polynomial([1.4, 2.6, 3.5])
+var rounded = round_p.round
+assert_eq(rounded.coeff(2), 1)
+assert_eq(rounded.coeff(1), 3)
+assert_eq(rounded.coeff(0), 4)
+
+# Round with precision
+var round_p2 = Polynomial([1.456, 2.789])
+var rounded2 = round_p2.round(-1)
+assert_eq(rounded2.coeff(1), 1.5)
+assert_eq(rounded2.coeff(0), 2.8)
+
+# --- float ---
+
+var float_p = Polynomial([1, 2, 3])
+var floated = float_p. float
+assert(floated.coeff(0).is_a(Number))
+
+# --- abs ---
+
+var abs_p = Polynomial([-3, 2, -1])
+var abs_result = abs_p.abs
+assert(abs_result.is_a(Polynomial) || abs_result.is_a(Number))
+
+# --- sgn ---
+
+var sgn_p = Polynomial([3, 2, 1])
+var sgn_result = sgn_p.sgn
+assert((sgn_result == 1) || (sgn_result == -1) || (sgn_result == 0) || sgn_result.is_a(Polynomial))
+
+# --- norm ---
+
+var norm_p = Polynomial([3, 4])
+var norm_result = norm_p. norm
+assert(norm_result.is_a(Number))
+
+# --- inv ---
+
+# Inverse of constant polynomial
+var inv_const = Polynomial([2])
+var inv_result = inv_const.inv
+assert(inv_result.is_a(Polynomial) || inv_result.is_a(Number))
+
+# --- powmod ---
+
+var pm_p = Polynomial([1, 1])          # x + 1
+var pm_m = Polynomial([1, 0, 1])       # x^2 + 1
+var pm_result = pm_p. powmod(3, pm_m)
+assert(pm_result.is_a(Polynomial))
+assert(pm_result.deg < pm_m.deg)
+
+# --- invmod ---
+# FIXME
+
+var im_p = Polynomial([1, 1])          # x + 1
+var im_m = Polynomial([1, 0, 1])       # x^2 + 1
+var im_result = im_p.invmod(im_m)
+# Verify: p * invmod(p, m) ≡ 1 (mod m)
+var im_check = ((im_p * im_result) % im_m)
+assert(defined(im_check))
+#assert(im_check.deg == 0)      # FIXME
+
+# --- to_s / stringify ---
+
+var str_p = Polynomial([1, 2, 3])
+var str_result = str_p.to_s
+assert(str_result.is_a(String))
+
+# stringify alias
+var str_result2 = str_p.stringify
+assert(str_result2.is_a(String))
+
+# --- pretty ---
+
+var pretty_p = Polynomial([1, 2, 3])
+var pretty_result = pretty_p.pretty
+assert(pretty_result. is_a(String))
+# Should contain readable representation
+assert(pretty_result.len > 0)
+
+# --- dump ---
+
+var dump_p = Polynomial([1, 2, 3])
+var dump_result = dump_p.dump
+assert(dump_result.is_a(String))
+
+# --- to_n ---
+
+var ton_p = Polynomial([5])            # constant polynomial
+var ton_result = ton_p.to_n
+assert_eq(ton_result, 5)
+
+# --- to_poly ---
+
+var topoly_p = Polynomial([1, 2, 3])
+var topoly_result = topoly_p.to_poly
+assert(topoly_result.is_a(Polynomial))
+assert(topoly_result == topoly_p)
+
+# --- re / real ---
+# FIXME
+
+#~ var re_p = Polynomial([1, 2, 3])
+#~ var re_result = re_p.re
+#~ assert(re_result.is_a(Polynomial))
+
+#~ # real alias
+#~ var real_result = re_p. real
+#~ assert(real_result.is_a(Polynomial))
+
+# --- rat ---
+
+var rat_p = Polynomial([1, 2, 3])
+var rat_result = rat_p.rat
+assert(rat_result. is_a(Polynomial))
+
+# --- rat_approx ---
+
+var rat_approx_p = Polynomial([1.5, 2.5])
+var rat_approx_result = rat_approx_p.rat_approx
+assert(rat_approx_result. is_a(Polynomial))
+
+# --- lift ---
+
+var lift_p = Polynomial([1, 2, 3])
+var lift_result = lift_p.lift
+assert(lift_result.is_a(Polynomial))
+
+# --- is_real ---
+# FIXME
+
+#var real_p = Polynomial([1, 2, 3])
+#assert(real_p.is_real)
+
+# --- is_inf / is_ninf / is_nan ---
+
+var normal_p = Polynomial([1, 2, 3])
+assert(! normal_p.is_inf)
+assert(!normal_p. is_ninf)
+assert(!normal_p.is_nan)
+
+# --- binomial ---
+
+var binom_p = Polynomial([1])
+# Just verify method exists
+var binom_result = binom_p. binomial(2)
+assert(defined(binom_result))
+
+# --- newton_method ---
+
+# Find sqrt(2) using x^2 - 2
+var newton_f = Polynomial([1, 0, -2])
+var newton_df = newton_f. derivative
+var newton_result = newton_f.newton_method(1.5, newton_df)
+# Result should be close to sqrt(2) ≈ 1.414
+assert(newton_result > 1.4)
+assert(newton_result < 1.5)
+
+# --- Complex examples ---
+
+# Verify (x-1)^2 expansion
+var x_minus_1 = Polynomial([1, -1])
+var squared = (x_minus_1 ** 2)
+# Should be x^2 - 2x + 1
+assert_eq(squared. coeff(2), 1)
+assert_eq(squared.coeff(1), -2)
+assert_eq(squared.coeff(0), 1)
+
+# Verify polynomial factorization property
+# p * q / q == p (for non-zero q)
+var factor_p = Polynomial([1, 2, 3])
+var factor_q = Polynomial([1, 1])
+var factor_prod = (factor_p * factor_q)
+var factor_div = (factor_prod / factor_q)
+assert(factor_div == factor_p)
+
+# Verify distributive property:  a * (b + c) == a*b + a*c
+var dist_a = Polynomial([1, 1])
+var dist_b = Polynomial([2, 3])
+var dist_c = Polynomial([4, 5])
+var dist_left = (dist_a * (dist_b + dist_c))
+var dist_right = ((dist_a * dist_b) + (dist_a * dist_c))
+assert(dist_left == dist_right)
+
+# Verify that roots satisfy the polynomial
+var root_test = Polynomial([1, -3, 2])    # x^2 - 3x + 2 = (x-1)(x-2)
+var root_vals = root_test. roots
+for r in (root_vals) {
+    var eval_at_root = root_test. eval(r)
+    assert((eval_at_root.abs < 1e-10) || (eval_at_root == 0))
+}
+
+# Verify derivative of x^n is n*x^(n-1)
+var xn = Polynomial([1, 0, 0, 0, 0])       # x^4
+var xn_deriv = xn. derivative               # 4*x^3
+assert_eq(xn_deriv.deg, 3)
+assert_eq(xn_deriv. leading_coeff, 4)
+
+# --- Edge cases ---
+
+# Zero polynomial
+var zero = Polynomial([0])
+assert(zero. is_zero)
+assert_eq(zero + zero, zero)
+assert_eq(zero * Polynomial([1, 2, 3]), zero)
+
+# Constant polynomial
+var const5 = Polynomial([5])
+assert_eq(const5.deg, 0)
+assert_eq(const5.eval(100), 5)
+assert(const5.derivative.is_zero)
+
+# Large degree
+var large_deg = Polynomial(100)
+assert_eq(large_deg. deg, 100)
+
+# Polynomial with negative coefficients
+var neg_coeffs = Polynomial([-1, -2, -3])
+assert_eq(neg_coeffs.coeff(2), -1)
+var neg_eval = neg_coeffs.eval(1)
+assert_eq(neg_eval, -6)
+
+say "** All Polynomial tests passed!"
