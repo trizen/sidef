@@ -1251,6 +1251,10 @@ package Sidef::Optimizer {
     sub optimize_expr {
         my ($self, $expr) = @_;
 
+        if (ref($expr) ne 'HASH') {
+            return $expr;    # already an object
+        }
+
         my $obj = $expr->{self};
 
         # Self obj
