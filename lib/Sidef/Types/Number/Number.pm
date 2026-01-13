@@ -19615,7 +19615,7 @@ package Sidef::Types::Number::Number {
             $y = CORE::abs($y) if ($y < 0);
             $y <= 1 and return ZERO;
             my $r = HAS_PRIME_UTIL ? Math::Prime::Util::valuation($x, $y) : Math::Prime::Util::GMP::valuation($x, $y);
-            defined($r) or goto &inf;
+            defined($r) or return ZERO;
             return bless \$r;
         }
 
