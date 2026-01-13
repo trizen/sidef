@@ -6,7 +6,7 @@ Sidef - The Sidef programming language
 
 =head1 VERSION
 
-This document describes Sidef version 25.12 and later.
+This document describes Sidef version 26.01 and later.
 
 =head1 DESCRIPTION
 
@@ -94,10 +94,10 @@ The C<Sidef> module provides a programmatic interface to the Sidef language engi
     );
 
     my $code = 'func fib(n) { (n < 2) ? n : (fib(n-1) + fib(n-2)) }; fib(20)';
-    
+
     # First run: compiles and caches
     my $result = $sidef->execute_code($code);
-    
+
     # Second run: uses cached compiled code (much faster)
     $result = $sidef->execute_code($code);
 
@@ -255,7 +255,6 @@ B<Example:>
 =head2 execute_code
 
     my $result = $sidef->execute_code($code);
-    my $result = $sidef->execute_code($code, @args);
 
 Parses, compiles, and executes the provided Sidef source code. This is the primary method for running Sidef code from Perl.
 
@@ -266,10 +265,6 @@ B<Parameters:>
 =item * C<$code>
 
 A string containing Sidef source code to execute.
-
-=item * C<@args> (optional)
-
-Arguments to pass to the Sidef program (accessible via the C<ARGV> array in Sidef).
 
 =back
 
@@ -311,7 +306,7 @@ B<Example:>
 
     # Compile once
     my $perl_code = $sidef->compile_code('2 + 2', 'Perl');
-    
+
     # Execute multiple times without re-compilation
     my $result1 = $sidef->execute_perl($perl_code);
     my $result2 = $sidef->execute_perl($perl_code);
@@ -368,13 +363,13 @@ B<Example:>
 
     my $sidef_code = 'func square(n) { n * n }; square(5)';
 
-    # Compile to Perl
-    my $perl_code = $sidef->compile_code($sidef_code, 'Perl');
-    print $perl_code;
-
     # Decompile to Sidef (useful for code formatting/normalization)
     my $formatted = $sidef->compile_code($sidef_code, 'Sidef');
     print $formatted;
+
+    # Compile to Perl
+    my $perl_code = $sidef->compile_code($sidef_code, 'Perl');
+    print $perl_code;
 
 =head2 parse_code
 
@@ -570,7 +565,7 @@ B<Supported Drivers (in order of preference):>
 
 =back
 
-B<Returns:> 
+B<Returns:>
 
 =over 4
 
@@ -612,7 +607,7 @@ MD5 hash of the source code (used as cache key).
 
 =back
 
-B<Returns:> 
+B<Returns:>
 
 =over 4
 
@@ -638,10 +633,10 @@ B<Example:>
 
     use Digest::MD5 qw(md5_hex);
     use Encode qw(encode_utf8);
-    
+
     my $code = 'say "test"';
     my $md5 = md5_hex(encode_utf8($code));
-    
+
     if (my $cached = $sidef->dbm_lookup('Perl', $md5)) {
         print "Found cached code!\n";
     }
@@ -690,11 +685,11 @@ B<Example:>
 
     use Digest::MD5 qw(md5_hex);
     use Encode qw(encode_utf8);
-    
+
     my $code = 'say "test"';
     my $compiled = $sidef->compile_ast($ast, 'Perl');
     my $md5 = md5_hex(encode_utf8($code));
-    
+
     $sidef->dbm_store('Perl', $md5, encode_utf8($compiled));
 
 B<Note:> This is typically used internally by C<compile_code()>. Direct use is rare.
@@ -725,7 +720,7 @@ Returns the Sidef version as a Sidef C<Number> object, suitable for numeric comp
 
 B<Parameters:> None.
 
-B<Returns:> A C<Sidef::Types::Number::Number> object representing the version (e.g., C<25.12>).
+B<Returns:> A C<Sidef::Types::Number::Number> object representing the version (e.g., C<26.01>).
 
 B<Example:>
 
@@ -1562,7 +1557,7 @@ Contributions to language features and standard library in the early days of Sid
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2025 Daniel Șuteu, Ioana Fălcușan.
+Copyright (C) 2013-2026 Daniel Șuteu, Ioana Fălcușan.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the B<Artistic License 2.0>. You may obtain a copy of the Artistic License 2.0 at:
 

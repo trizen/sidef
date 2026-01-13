@@ -100,11 +100,11 @@ Experiment with Sidef instantly at **[Try It Online](https://tio.run/#sidef)** w
 ## 📚 Documentation & Learning Resources
 
 ### Tutorials
-- **[Beginner's Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-tutorial.pdf)) - Start your Sidef journey
-- **[Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-number-theory.pdf)) - Mathematical programming with Sidef
+- **[Beginner's Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf)) - Start your Sidef journey
+- **[Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-number-theory.pdf)) - Mathematical programming with Sidef
 
 ### Reference Materials
-- **[Sidef GitBook](https://trizen.gitbook.io/sidef-lang/)** ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-book.pdf)) - Comprehensive language guide
+- **[Sidef GitBook](https://trizen.gitbook.io/sidef-lang/)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-book.pdf)) - Comprehensive language guide
 - **[RosettaCode Examples](https://rosettacode.org/wiki/Sidef)** - Practical code examples
 
 ## 💬 Community & Support
@@ -270,7 +270,7 @@ Please visit the [GitHub repository](https://github.com/trizen/sidef) to get inv
 
 ## 📄 License and Copyright
 
-**Copyright © 2013-2025 Daniel Șuteu, Ioana Fălcușan**
+**Copyright © 2013-2026 Daniel Șuteu, Ioana Fălcușan**
 
 This program is free software; you can redistribute it and/or modify it under the terms of the **Artistic License (2.0)**.
 

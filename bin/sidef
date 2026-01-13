@@ -387,7 +387,7 @@ DOCUMENTATION:
 
 COPYRIGHT:
 
-  Copyright © 2013-2025 Daniel Șuteu, Ioana Fălcușan
+  Copyright © 2013-2026 Daniel Șuteu, Ioana Fălcușan
   Licensed under the Artistic License 2.0
 
 EXAMPLES
@@ -747,7 +747,7 @@ EOT
             }
             elsif ($line eq 'copyright') {
                 print <<'EOT';
-Copyright © 2013-2025 Daniel Șuteu, Ioana Fălcușan
+Copyright © 2013-2026 Daniel Șuteu, Ioana Fălcușan
 All Rights Reserved.
 EOT
                 redo MAINLOOP;
@@ -1215,7 +1215,7 @@ preserving semantics. Valid values are:
 
     sidef -Rperl script.sf > script.pl
     perl script.pl
-    
+
     sidef -Rsidef script.sf    # Normalize code style
 
 =back
@@ -1253,7 +1253,7 @@ Example optimization:
 
     # Source code
     var x = (2 + 3*4)
-    
+
     # After -O1 optimization
     var x = 14
 
@@ -1364,10 +1364,10 @@ Examples:
 
     # Enable verbose mode and external factorization
     sidef -N 'VERBOSE=true; USE_FACTORDB=true' -E 'say factor(2**512 + 1)'
-    
+
     # High precision with specific rounding
     sidef -N 'PREC=400; ROUND=3' script.sf
-    
+
     # Use all available external tools
     sidef -N 'USE_YAFU=true; USE_PARI_GP=true; USE_PRIMECOUNT=true' script.sf
 
@@ -1390,7 +1390,7 @@ Example warning:
 
     func foo(n) { say n }
     fo(42)                      # Typo in function name
-    
+
     # With -k:
     [INFO] `fo` is parsed as a prefix method-call at script.sf line 2
 
@@ -1470,7 +1470,7 @@ snippets, and rapid prototyping.
 =head2 Starting the REPL
 
     $ sidef
-    Sidef 25.12, running on Linux, using Perl v5.42.0.
+    Sidef 26.01, running on Linux, using Perl v5.42.0.
     Type "help", "copyright" or "license" for more information.
     >
 
@@ -1598,10 +1598,10 @@ Exit the REPL and return to the shell. Alternatively, press Ctrl+D (EOF).
 
     # Execute a script
     sidef script.sf
-    
+
     # With command-line arguments
     sidef script.sf arg1 arg2
-    
+
     # Read from STDIN
     cat script.sf | sidef -
     sidef script.sf < input.txt
@@ -1612,13 +1612,13 @@ Mathematical calculations:
 
     # Sum of squares
     sidef -E '100.of { |i| i**2 }.sum.say'
-    
+
     # First 20 primes
     sidef -E '20.pn_primes.say'
-    
+
     # Check if number is prime
     sidef -E 'say (2**127 - 1 -> is_prime)'
-    
+
     # High-precision pi
     sidef -P 100 -E 'say Num.pi'
 
@@ -1626,10 +1626,10 @@ Text processing:
 
     # Convert to uppercase
     echo "hello" | sidef -E 'STDIN.slurp.uc.print'
-    
+
     # Filter lines matching pattern
     sidef -E 'STDIN.lines.grep(/pattern/).each{.say}' < file.txt
-    
+
     # Number lines
     sidef -E 'STDIN.lines.each_kv{|i,v| say "#{i+1}: #{v}"}' < file.txt
 
@@ -1680,7 +1680,7 @@ Normalize Sidef code style:
 
     # Count primes with primecount
     sidef -N 'USE_PRIMECOUNT=true' -E 'say prime_count(10**12)'
-    
+
     # Use FactorDB
     sidef -N 'USE_FACTORDB=true' -E 'say factor(2**512 + 1)'
 
@@ -1907,7 +1907,7 @@ Sidef builds upon:
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright © 2013-2025 Daniel Șuteu, Ioana Fălcușan. All Rights Reserved.
+Copyright © 2013-2026 Daniel Șuteu, Ioana Fălcușan. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the B<Artistic License (2.0)>. You may obtain a copy

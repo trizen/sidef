@@ -32,7 +32,7 @@ Sidef is a modern, high-level programming language designed for versatile genera
 
 **Resources:**
 - [Official Book](https://trizen.gitbook.io/sidef-lang/)
-- [PDF Documentation](https://github.com/trizen/sidef/releases/download/25.12/sidef-book.pdf)
+- [PDF Documentation](https://github.com/trizen/sidef/releases/download/26.01/sidef-book.pdf)
 - [GitHub Repository](https://github.com/trizen/sidef)
 
 ---
@@ -51,7 +51,7 @@ Sidef is a modern, high-level programming language designed for versatile genera
 #### Windows
 
 Download the portable 32-bit executable:
-- [sidef-25.12.exe.zip](https://github.com/trizen/sidef/releases/download/25.12/sidef-25.12.exe.zip)
+- [sidef-26.01.exe.zip](https://github.com/trizen/sidef/releases/download/26.01/sidef-26.01.exe.zip)
 
 #### Linux
 
@@ -864,11 +864,11 @@ say fib(100)    # Fast with memoization
 
 ```ruby
 class Person(name, age) {
-    
+
     method greet {
         say "Hello, I'm #{name} and I'm #{age} years old"
     }
-    
+
     method birthday {
         self.age++
     }
@@ -886,7 +886,7 @@ say person.age    # 31
 class Example(a, b) {
     has c = 3
     has d = (a + c)
-    
+
     method sum {
         a + b + c + d
     }
@@ -898,7 +898,7 @@ class Example(a, b) {
 ```ruby
 class Example(value) {
     has processed
-    
+
     method init {
         processed = (value * 2)
     }

@@ -39,7 +39,7 @@ After installing Sidef, launch the interactive environment:
 
 ```console
 $ sidef
-Sidef 25.12, running on Linux, using Perl v5.42.0.
+Sidef 26.01, running on Linux, using Perl v5.42.0.
 Type "help", "copyright" or "license" for more information.
 >
 ```
@@ -123,8 +123,8 @@ func function_name(a, b, c, ...) {
 }
 
 # Example: custom predicate
-func my_condition(n) { 
-    n.is_composite && n.is_squarefree 
+func my_condition(n) {
+    n.is_composite && n.is_squarefree
 }
 say 10.by(my_condition)     # First 10 squarefree composites
 
@@ -516,10 +516,10 @@ say A.solve([1,2,3])    # Linear system
 Polynomial interpolation for sequences:
 
 ```ruby
-say [0, 1, 4, 9, 16, 25, 36, 49, 64, 81].solve_seq      
+say [0, 1, 4, 9, 16, 25, 36, 49, 64, 81].solve_seq
 # x²
 
-say [0, 1, 33, 276, 1300, 4425, 12201].solve_seq        
+say [0, 1, 33, 276, 1300, 4425, 12201].solve_seq
 # (x^6)/6 + (x^5)/2 + (5x^4)/12 - (x²)/12
 ```
 
@@ -735,7 +735,7 @@ func smallest_pseudoprime(n) {
     return nil if (n < 2)
     var x = pn_primorial(n)
     var y = 2*x
-    
+
     loop {
         var arr = n.fermat_psp(2, x, y)
         return arr[0] if arr
@@ -744,8 +744,8 @@ func smallest_pseudoprime(n) {
     }
 }
 
-for n in (2..100) { 
-    print(smallest_pseudoprime(n), ", ") 
+for n in (2..100) {
+    print(smallest_pseudoprime(n), ", ")
 }
 ```
 
@@ -795,8 +795,8 @@ func generate_from_prefix(p, base, digits) {
     digits.each {|d|
         var n = (p*base + d)
         n.is_prime || next
-        seq += __FUNC__(n, base, digits).grep {|k| 
-            is_left_truncatable_prime(k, base) 
+        seq += __FUNC__(n, base, digits).grep {|k|
+            is_left_truncatable_prime(k, base)
         }
     }
     return seq
@@ -808,8 +808,8 @@ func both_truncatable_primes(base) {
     }.flat.sort
 }
 
-for base in (3..20) { 
-    say "Base #{base}: #{both_truncatable_primes(base).max}" 
+for base in (3..20) {
+    say "Base #{base}: #{both_truncatable_primes(base).max}"
 }
 ```
 
@@ -891,7 +891,7 @@ func dirichlet_conv(n, f, g) {
 }
 
 # Identity: σ = φ * 1
-say 30.of {|n| 
+say 30.of {|n|
     n.dirichlet_convolution({.phi}, {1})
 }
 
@@ -1080,7 +1080,7 @@ func smallest_carmichael(k) {
     return nil if (k < 3)
     var x = pn_primorial(k+1)/2
     var y = 3*x
-    
+
     loop {
         var arr = k.carmichael(x, y)
         return arr[0] if arr
@@ -1147,7 +1147,7 @@ func generate_sequence(limit) {
     for n in (1..limit) {
         var value = compute_term(n)
         results.push(value)
-        
+
         # Early termination if pattern breaks
         break if (value > threshold)
     }
@@ -1249,9 +1249,9 @@ nth_prime(n)        # Not: n.by {.is_prime}[-1]
 
 ### Documentation
 
-- **Full Number class documentation**: [Sidef Number Class](https://metacpan.org/pod/Sidef::Types::Number::Number) ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-number-class-documentation.pdf))
-- **Sidef book**: [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-book.pdf))
-- **Beginner's tutorial**: [TUTORIAL.md](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/25.12/sidef-tutorial.pdf))
+- **Full Number class documentation**: [Sidef Number Class](https://metacpan.org/pod/Sidef::Types::Number::Number) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-number-class-documentation.pdf))
+- **Sidef book**: [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-book.pdf))
+- **Beginner's tutorial**: [TUTORIAL.md](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf))
 
 ### Code Examples
 
