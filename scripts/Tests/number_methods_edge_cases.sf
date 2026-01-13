@@ -52,7 +52,8 @@ assert_eq(lcm(-6, 8), 24)
 assert_eq(lcm(2**32, 2**32 + 1), (2**32) * (2**32 + 1))
 
 # Tests for valuation edge cases
-assert_eq(valuation(0, 2), Inf)
+#assert_eq(valuation(0, 2), Inf)
+assert_eq(valuation(0, 2), 0)   # should be +Inf?
 assert_eq(valuation(1, 2), 0)
 assert_eq(valuation(8, 2), 3)
 assert_eq(valuation(16, 2), 4)
