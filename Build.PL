@@ -15,7 +15,7 @@ my $class = Module::Build->subclass(
             $self->SUPER::ACTION_test(@_);
             $self->notes('test_results' => 'passed');
         }
-        
+
         sub ACTION_authortest {
             my $self = shift;
             local $ENV{AUTHOR_TESTING} = 1;
@@ -45,12 +45,11 @@ my $builder = $class->new(
                           },
 
     build_requires => {
-                       'Test::More' => '1.302',
+                       'Test::More' => '1.0',
                       },
 
     test_requires => {
-                      'Test::More'      => '1.302',
-                      'Test::Exception' => '0.43',
+                      'Test::More'      => '1.0',
                      },
 
     # Runtime Dependencies - Core Perl Modules
@@ -88,7 +87,7 @@ my $builder = $class->new(
         'Algorithm::Loops'         => '1.032',
 
         # Data Handling (Required)
-        'Data::Dump'           => '1.23',
+        'Data::Dump'           => '1.00',
         'Data::Dump::Filtered' => '0',
                 },
 
@@ -102,11 +101,11 @@ my $builder = $class->new(
         'File::Find' => 0,
 
         # Cryptographic Functions
-        'Digest::MD5' => '2.55',
-        'Digest::SHA' => '6.02',
+        'Digest::MD5' => '2.0',
+        'Digest::SHA' => '5.0',
 
         # Encoding/Decoding
-        'MIME::Base64' => '3.15',
+        'MIME::Base64' => '3.00',
 
         # Enhanced Math Support
         'Math::Prime::Util' => '0.73',
@@ -115,8 +114,8 @@ my $builder = $class->new(
         'Term::ReadLine::Gnu' => '1.36',
 
         # Text Processing
-        'Text::Balanced'   => '2.04',
-        'Text::ParseWords' => '3.30',
+        'Text::Balanced'   => '2.00',
+        'Text::ParseWords' => '3.00',
                   },
 
     # Metadata and Resources
