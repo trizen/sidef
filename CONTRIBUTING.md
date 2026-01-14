@@ -64,7 +64,7 @@ Before creating a bug report, please check existing issues to avoid duplicates. 
 - **Error messages**: Complete error output, if any
 
 **Example:**
-```markdown
+````markdown
 ## Bug: Division by zero not properly caught
 
 **Version:** Sidef 25.12
@@ -72,13 +72,14 @@ Before creating a bug report, please check existing issues to avoid duplicates. 
 **Perl:** 5.34.0
 
 **Code:**
-```sidef
+
+```ruby
 say (10 / 0)
 ```
 
 **Expected:** Error message about division by zero
-
-**Actual:** `[paste actual output]`
+**Actual:** [paste actual output]
+````
 
 ### Suggesting Enhancements
 
