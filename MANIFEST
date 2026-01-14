@@ -2,6 +2,7 @@ _config.yml
 bin/sidef
 Build.PL
 Changes
+CONTRIBUTING.md
 lib/Sidef.pm
 lib/Sidef.pod
 lib/Sidef/Deparse/Perl.pm
