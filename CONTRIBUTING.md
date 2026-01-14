@@ -77,6 +77,7 @@ say (10 / 0)
 ```
 
 **Expected:** Error message about division by zero
+
 **Actual:** `[paste actual output]`
 
 ### Suggesting Enhancements
