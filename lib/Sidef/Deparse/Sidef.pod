@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 Sidef::Deparse::Sidef - Deparse Sidef abstract syntax trees back into Sidef source code

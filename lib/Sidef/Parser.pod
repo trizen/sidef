@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 Sidef::Parser - Parser for the Sidef programming language
