@@ -1,0 +1,482 @@
+=head1 NAME
+
+Sidef::Parser - Parser for the Sidef programming language
+
+=head1 SYNOPSIS
+
+    use Sidef::Parser;
+    
+    my $parser = Sidef::Parser->new(
+        file_name   => 'script.sf',
+        script_name => 'script.sf',
+    );
+    
+    my $code = 'say "Hello, World!"';
+    my $ast = $parser->parse_script(code => \$code);
+
+=head1 DESCRIPTION
+
+C<Sidef::Parser> is the main parser for the Sidef programming language. It performs lexical analysis and syntactic parsing of Sidef source code, generating an Abstract Syntax Tree (AST) that can be executed or compiled.
+
+The parser handles:
+
+=over 4
+
+=item * Variable declarations and scoping
+
+=item * Function and method definitions
+
+=item * Class and module declarations
+
+=item * Operators and expressions
+
+=item * Control flow structures
+
+=item * String interpolation and special literals
+
+=item * Regex patterns
+
+=item * Block constructs
+
+=back
+
+=head1 METHODS
+
+=head2 Constructor
+
+=head3 new
+
+    my $parser = Sidef::Parser->new(%options);
+
+Creates a new parser instance. Accepts the following optional parameters:
+
+=over 4
+
+=item * C<line> - Starting line number (default: 1)
+
+=item * C<inc> - Array reference of include paths
+
+=item * C<class> - Current namespace (default: 'main')
+
+=item * C<file_name> - Name of file being parsed (default: '-')
+
+=item * C<script_name> - Name of main script (default: '-')
+
+=item * C<interactive> - Boolean flag for interactive mode
+
+=item * C<eval_mode> - Boolean flag for eval mode
+
+=back
+
+=head2 Core Parsing Methods
+
+=head3 parse_script
+
+    my $ast = $parser->parse_script(code => \$code);
+
+Parses a complete Sidef script and returns the Abstract Syntax Tree. This is the main entry point for parsing.
+
+Parameters:
+
+=over 4
+
+=item * C<code> - Reference to string containing Sidef code
+
+=back
+
+Returns: AST structure (typically a hash reference)
+
+=head3 parse_expr
+
+    my $expr = $parser->parse_expr(code => \$code);
+
+Parses a single expression. Handles literals, variables, operators, function calls, and other expression forms.
+
+=head3 parse_obj
+
+    my $obj = $parser->parse_obj(code => \$code, %options);
+
+Parses an object or value with optional method calls and operators.
+
+Options:
+
+=over 4
+
+=item * C<multiline> - Allow multiline expressions
+
+=back
+
+=head3 parse_block
+
+    my $block = $parser->parse_block(code => \$code, %options);
+
+Parses a code block enclosed in braces C<{...}>.
+
+Options:
+
+=over 4
+
+=item * C<with_vars> - Include variable declarations
+
+=item * C<topic_var> - Create topic variable (C<_>)
+
+=item * C<is_module> - Block is a module definition
+
+=item * C<prev_class> - Previous class context
+
+=back
+
+=head3 parse_arg
+
+    my $arg = $parser->parse_arg(code => \$code);
+
+Parses arguments enclosed in parentheses C<(...)>.
+
+=head3 parse_array
+
+    my $array = $parser->parse_array(code => \$code);
+
+Parses array literals enclosed in brackets C<[...]>.
+
+=head2 Variable and Declaration Parsing
+
+=head3 parse_init_vars
+
+    my $vars = $parser->parse_init_vars(code => \$code, %options);
+
+Parses variable declarations with optional initialization and type annotations.
+
+Options:
+
+=over 4
+
+=item * C<type> - Declaration type ('var', 'global', 'const', 'static', 'del', 'has')
+
+=item * C<private> - Private declaration (not added to symbol table)
+
+=item * C<params> - Parsing function/method parameters
+
+=item * C<callback> - Callback function for each variable
+
+=item * C<ignore_delim> - Hash of delimiters to ignore
+
+=back
+
+=head3 get_init_vars
+
+    my $vars = $parser->get_init_vars(code => \$code, %options);
+
+Similar to C<parse_init_vars> but returns string representations instead of objects.
+
+Options:
+
+=over 4
+
+=item * C<with_vals> - Include values in output
+
+=item * C<type> - Declaration type
+
+=back
+
+=head3 find_var
+
+    my $var = $parser->find_var($var_name, $class_name);
+    my ($var, $is_lexical) = $parser->find_var($var_name, $class_name);
+
+Looks up a variable in the symbol table by name and class.
+
+In scalar context, returns the variable hash or undef.
+In list context, returns the variable hash and a boolean indicating if it's lexical.
+
+=head2 String and Literal Parsing
+
+=head3 get_quoted_string
+
+    my $string = $parser->get_quoted_string(code => \$code, %options);
+
+Extracts a quoted string with support for various delimiter pairs.
+
+Options:
+
+=over 4
+
+=item * C<no_count_line> - Don't count newlines in the string
+
+=back
+
+Supports delimiters: C<'...'>, C<"...">, C<(...)>, C<[...]>, C<{...}>, and many Unicode paired delimiters.
+
+=head3 get_quoted_words
+
+    my $words = $parser->get_quoted_words(code => \$code);
+
+Parses space-separated quoted words, returning an array reference.
+
+=head3 get_method_name
+
+    my ($method, $takes_arg, $type) = $parser->get_method_name(code => \$code);
+
+Extracts a method or operator name from the input.
+
+Returns:
+
+=over 4
+
+=item 1. Method/operator name (or hashref for expression-based names)
+
+=item 2. Boolean indicating if operator requires an argument
+
+=item 3. Operator type (from hyper_ops hash, or 'op', or empty string)
+
+=back
+
+=head2 Whitespace and Comment Handling
+
+=head3 parse_whitespace
+
+    my $found = $parser->parse_whitespace(code => \$code);
+
+Skips whitespace, comments, and handles here-documents. Returns true if whitespace was found.
+
+Handles:
+
+=over 4
+
+=item * Horizontal and vertical whitespace
+
+=item * Single-line comments (C<#...>)
+
+=item * Multi-line C-style comments (C</* ... */>)
+
+=item * Embedded comments (C<#`(...)>)
+
+=item * Here-documents (C<<EOF>, C<<'EOF'>, C<<<-EOF>)
+
+=item * Zero-width spaces
+
+=back
+
+=head3 backtrack_whitespace
+
+    $parser->backtrack_whitespace(code => \$code);
+
+Moves the position backwards past any trailing whitespace that was just parsed.
+
+=head2 Helper Methods
+
+=head3 parse_delim
+
+    my $end_delim = $parser->parse_delim(code => \$code, %options);
+
+Parses a delimiter and returns its corresponding closing delimiter.
+
+Options:
+
+=over 4
+
+=item * C<ignore_delim> - Hash of delimiters to ignore
+
+=back
+
+=head3 get_name_and_class
+
+    my ($name, $class) = $parser->get_name_and_class($var_name);
+
+Splits a potentially qualified variable name into name and class components.
+
+Examples:
+
+    'foo'       => ('foo', 'main')
+    'Foo::bar'  => ('bar', 'Foo')
+
+=head3 check_declarations
+
+    $parser->check_declarations($vars_hash);
+
+Checks variable declarations for unused variables and generates warnings (except in interactive/eval mode).
+
+=head2 Error Handling
+
+=head3 fatal_error
+
+    $parser->fatal_error(
+        error  => "Error message",
+        reason => "Additional context",
+        code   => $code,
+        pos    => $position,
+        line   => $line_number,
+        var    => $var_name,
+    );
+
+Throws a fatal parsing error with detailed context information including:
+
+=over 4
+
+=item * File name and line number
+
+=item * Error position with visual indicator
+
+=item * Error message and reason
+
+=item * Suggestions for similar variable names (if C<var> provided)
+
+=back
+
+=head1 PARSER CONFIGURATION
+
+The parser maintains several configuration hashes:
+
+=head2 postfix_ops
+
+Hash of postfix operators that can appear after an expression:
+
+    '--', '++', '...', '!', '!!'
+
+=head2 hyper_ops
+
+Hash of hyper/meta operators that transform other operators:
+
+    map     => [1, 'map_operator']
+    pam     => [1, 'pam_operator']
+    zip     => [1, 'zip_operator']
+    wise    => [1, 'wise_operator']
+    scalar  => [1, 'scalar_operator']
+    rscalar => [1, 'rscalar_operator']
+    cross   => [1, 'cross_operator']
+    unroll  => [1, 'unroll_operator']
+    reduce  => [0, 'reduce_operator']
+    lmap    => [0, 'map_operator']
+
+Format: C<[takes_args, method_name]>
+
+=head2 built_in_classes
+
+Hash of built-in class names like:
+
+    File, Array, String, Number, Hash, Regex, etc.
+
+=head2 keywords
+
+Hash of reserved keywords:
+
+    if, elsif, else, while, for, foreach, func, class, module, 
+    return, break, next, var, const, static, import, include, etc.
+
+=head2 Delimiters
+
+The parser supports extensive delimiter pairs for strings and grouping:
+
+    ( )   [ ]   { }   < >
+    « »   ‹ ›   " "   ' '
+    And many more Unicode paired delimiters
+
+=head1 SPECIAL FEATURES
+
+=head2 Here-Documents
+
+Support for here-documents with optional indentation:
+
+    <<EOF       # Basic here-doc
+    <<'EOF'     # Non-interpolating
+    <<"EOF"     # Interpolating (default)
+    <<-EOF      # With indentation stripping
+
+=head2 Quote Operators
+
+Variety of quote operators for different types:
+
+    %q/.../     # String (non-interpolating)
+    %Q/.../     # String (interpolating)
+    %w/.../     # Word array
+    %i/.../     # Integer array
+    %r/.../     # Regex
+    %f/.../     # File object
+    %x/.../     # Backtick command
+
+=head2 Magic Variables
+
+Support for Perl-compatible magic variables:
+
+    $.   $?   $$   $!   $@   $/   etc.
+
+=head2 Number Formats
+
+Support for various number literal formats:
+
+    123         # Decimal
+    0b1010      # Binary
+    0o755       # Octal
+    0xFF        # Hexadecimal
+    3.14        # Float
+    1.5e10      # Scientific notation
+    42i         # Imaginary
+    1.23f       # Explicit float
+    ¹²³         # Superscript (for exponents)
+
+=head1 REGULAR EXPRESSIONS
+
+The parser uses several compiled regular expressions for efficiency:
+
+=over 4
+
+=item * C<static_obj_re> - Matches static objects like C<true>, C<false>, C<nil>, built-in types
+
+=item * C<prefix_obj_re> - Matches prefix keywords like C<if>, C<while>, C<return>
+
+=item * C<quote_operators_re> - Matches quote-like operators
+
+=item * C<operators_re> - Matches all operators including symbolic and Unicode
+
+=item * C<var_name_re> - Matches valid variable names
+
+=item * C<method_name_re> - Matches valid method names
+
+=item * C<match_flags_re> - Matches regex modifier flags
+
+=back
+
+=head1 SYMBOL TABLE
+
+The parser maintains a hierarchical symbol table with:
+
+=over 4
+
+=item * C<vars> - Hash of arrays containing variable information per namespace
+
+=item * C<ref_vars_refs> - Referenced variables from outer scopes
+
+=item * C<class> - Current namespace/class context
+
+=back
+
+Each variable entry contains:
+
+    {
+        obj   => $variable_object,
+        name  => $variable_name,
+        count => $usage_count,
+        type  => $declaration_type,
+        line  => $declaration_line,
+    }
+
+=head1 AUTHOR
+
+Daniel "trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef> - The Sidef programming language
+
+=item * L<https://github.com/trizen/sidef> - Sidef on GitHub
+
+=back
+
+=cut
