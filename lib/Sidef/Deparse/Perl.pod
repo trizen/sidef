@@ -1,0 +1,1107 @@
+=head1 NAME
+
+Sidef::Deparse::Perl - Deparse Sidef AST to Perl source code
+
+=head1 VERSION
+
+This documentation refers to Sidef::Deparse::Perl
+
+=head1 SYNOPSIS
+
+    use Sidef::Deparse::Perl;
+    
+    # Create a new deparser instance
+    my $deparser = Sidef::Deparse::Perl->new(
+        opt => {
+            w => 1,      # Enable warnings with stack traces
+            P => 128,    # Set precision for Number operations
+            M => 'zero', # Set rounding mode
+        }
+    );
+    
+    # Deparse a Sidef AST structure to Perl code
+    my $perl_code = $deparser->deparse($ast_structure);
+    
+    # Execute the generated Perl code
+    eval $perl_code;
+
+=head1 DESCRIPTION
+
+Sidef::Deparse::Perl is a core component of the Sidef programming language that 
+converts Sidef Abstract Syntax Tree (AST) structures into executable Perl source 
+code. It acts as a transpiler from Sidef's high-level syntax to Perl, enabling 
+Sidef programs to run on the Perl runtime.
+
+The deparser handles all Sidef language constructs including variables, control 
+flow structures, object-oriented features, operators, and more. It performs 
+optimizations, manages namespaces, handles scoping, and generates efficient Perl 
+code that maintains Sidef's semantics.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $deparser = Sidef::Deparse::Perl->new(%options);
+
+Creates and returns a new deparser instance.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<before> - Code to prepend before the deparsed output (default: '')
+
+=item * C<header> - Header code including pragmas and setup (default: auto-generated)
+
+=item * C<top_program> - Top-level program code (default: '')
+
+=item * C<between> - Separator between statements (default: ';')
+
+=item * C<after> - Code to append after deparsed output (default: ';')
+
+=item * C<opt> - Hash reference of compiler options:
+
+=over 8
+
+=item * C<w> - Enable warnings with Carp::cluck on warn
+
+=item * C<W> - Enable warnings and die handlers with Carp::confess
+
+=item * C<P> - Set numerical precision (e.g., 128 for 512 bits)
+
+=item * C<M> - Set rounding mode ('zero', '+inf', '-inf', 'inf', 'faith')
+
+=item * C<c> - Use __load_sidef_module__ instead of 'use' statements
+
+=item * C<i> - Interactive mode flag
+
+=back
+
+=item * C<environment_name> - Name of the execution environment (default: 'main')
+
+=back
+
+B<Returns:> A blessed Sidef::Deparse::Perl object
+
+=head1 METHODS
+
+=head2 Core Deparsing Methods
+
+=head3 deparse
+
+    my $perl_code = $deparser->deparse($ast_structure);
+
+Main entry point for deparsing. Converts a complete Sidef AST structure into 
+executable Perl source code.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$ast_structure> - Hash reference containing the AST to deparse
+
+=back
+
+B<Returns:> String containing the generated Perl code
+
+=head3 deparse_script
+
+    my @statements = $deparser->deparse_script($struct);
+
+Deparses a script structure into an array of Perl statement strings.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$struct> - Hash reference containing statements organized by class
+
+=back
+
+B<Returns:> Array of deparsed statement strings (in array context) or the last 
+statement (in scalar context)
+
+=head3 deparse_expr
+
+    my $perl_expr = $deparser->deparse_expr($expression);
+
+Deparses a single Sidef expression into Perl code.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$expression> - Hash reference containing the expression AST
+
+=back
+
+B<Returns:> String containing the deparsed Perl expression
+
+=head3 deparse_args
+
+    my $args = $deparser->deparse_args(@arguments);
+
+Deparses a list of arguments into Perl function call syntax.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<@arguments> - List of argument expressions
+
+=back
+
+B<Returns:> String in the format C<(arg1, arg2, ...)>
+
+=head3 deparse_generic
+
+    my $code = $deparser->deparse_generic($before, $sep, $after, @items);
+
+Generic deparsing with customizable delimiters.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$before> - String to prepend
+
+=item * C<$sep> - Separator between items
+
+=item * C<$after> - String to append
+
+=item * C<@items> - Items to deparse
+
+=back
+
+B<Returns:> String with items joined by separator and wrapped
+
+=head2 Block and Scope Management
+
+=head3 deparse_block_with_scope
+
+    my $block_code = $deparser->deparse_block_with_scope($block_obj);
+
+Deparses a code block with proper scoping and variable declarations.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$block_obj> - Block object containing code and scope information
+
+=back
+
+B<Returns:> String containing the block code wrapped in braces
+
+=head3 deparse_bare_block
+
+    my $block = $deparser->deparse_bare_block(@statements);
+
+Deparses statements into a bare block without scope handling.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<@statements> - List of statements
+
+=back
+
+B<Returns:> String containing C<{ statement1; statement2; ... }>
+
+=head3 localize_declarations
+
+    my $decl_code = $deparser->localize_declarations($refaddr);
+
+Localizes variable and function declarations for a specific scope.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$refaddr> - Reference address of the scope
+
+=back
+
+B<Returns:> String containing the declaration code
+
+=head2 Helper Methods
+
+=head3 make_constant
+
+    my $const_ref = $deparser->make_constant(
+        $ref_type, $method, $name,
+        args => \@args,
+        sub  => 1,
+        new  => 0
+    );
+
+Creates a Perl constant for immutable Sidef values.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$ref_type> - The reference type/class
+
+=item * C<$method> - Constructor method name
+
+=item * C<$name> - Base name for the constant
+
+=item * C<args> - Array reference of constructor arguments
+
+=item * C<sub> - Boolean: use '::' instead of '->' (default: 0)
+
+=item * C<new> - Boolean: start a new constant block (default: 0)
+
+=back
+
+B<Returns:> String referencing the created constant
+
+=head3 top_add
+
+    $deparser->top_add($code_line);
+
+Adds code to the top of the generated program (idempotent).
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$code_line> - Line of code to add to the top
+
+=back
+
+=head3 load_mod
+
+    $deparser->load_mod($module_name);
+
+Ensures a Sidef module is loaded in the generated code.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$module_name> - Fully qualified module name
+
+=back
+
+=head2 Type and Metadata Methods
+
+=head3 _get_reftype
+
+    my $type = $deparser->_get_reftype($object);
+
+Determines the reference type of a Sidef object, loading required modules.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$object> - Sidef object
+
+=back
+
+B<Returns:> String containing the type name
+
+=head3 _dump_reftype
+
+    my $quoted_type = $deparser->_dump_reftype($object);
+
+Returns a quoted string representation of an object's type.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$object> - Sidef object
+
+=back
+
+B<Returns:> Quoted string like C<"Sidef::Types::Number::Number">
+
+=head3 _dump_class_name
+
+    my $class_name = $deparser->_dump_class_name($class_obj);
+
+Generates a unique fully-qualified class name.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$class_obj> - Class object
+
+=back
+
+B<Returns:> String like C<main::12345678::ClassName::SubClass>
+
+=head2 Data Structure Dumping
+
+=head3 _dump_string
+
+    my $perl_string = $deparser->_dump_string($string);
+
+Converts a string into properly escaped Perl double-quoted string literal.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$string> - String to dump
+
+=back
+
+B<Returns:> Escaped Perl string literal
+
+=head3 _dump_array
+
+    my $array_code = $deparser->_dump_array($ref_type, $array_ref);
+
+Deparses a Sidef array into Perl blessed array reference.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$ref_type> - Target array type
+
+=item * C<$array_ref> - Array reference containing elements
+
+=back
+
+B<Returns:> String like C<bless([elem1, elem2], 'Type')>
+
+=head3 _dump_var
+
+    my $var_name = $deparser->_dump_var($var_obj, %options);
+
+Generates the Perl variable name from a Sidef variable object.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$var_obj> - Variable object
+
+=item * C<init> - Boolean: include sigil for initialization
+
+=item * C<refaddr> - Reference address to use (optional)
+
+=back
+
+B<Returns:> String containing the variable name (e.g., C<$varname12345>)
+
+=head3 _dump_op_call
+
+    my $op_ref = $deparser->_dump_op_call($method_name);
+
+Creates a reference to an operator method, stored as a top-level variable.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$method_name> - Name of the operator method
+
+=back
+
+B<Returns:> String like C<< ->$main::OP1234 >>
+
+=head2 Variable Initialization
+
+=head3 _dump_init_vars
+
+    my $init_code = $deparser->_dump_init_vars($init_obj);
+
+Generates initialization code for a set of variables.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$init_obj> - Initialization object with vars and optional args
+
+=back
+
+B<Returns:> String containing the initialization code
+
+=head3 _dump_sub_init_vars
+
+    my $param_code = $deparser->_dump_sub_init_vars(@vars);
+
+Generates subroutine parameter initialization code.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<@vars> - List of variable objects
+
+=back
+
+B<Returns:> String containing parameter unpacking code
+
+=head3 _dump_class_attributes
+
+    my $attr_code = $deparser->_dump_class_attributes(@attributes);
+
+Generates code for class attribute initialization.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<@attributes> - List of attribute objects
+
+=back
+
+B<Returns:> String containing attribute setup code
+
+=head3 _dump_static_var
+
+    my $static_code = $deparser->_dump_static_var($var, $refaddr);
+
+Generates code for a static variable with state keyword.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$var> - Variable object
+
+=item * C<$refaddr> - Reference address
+
+=back
+
+B<Returns:> String containing C<state $var = ...>
+
+=head2 Index and Lookup Methods
+
+=head3 _dump_indices
+
+    my $indices = $deparser->_dump_indices($array_ref);
+
+Converts array indices into Perl array access format.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$array_ref> - Array reference of index expressions
+
+=back
+
+B<Returns:> Comma-separated string of indices
+
+=head3 _dump_lookups
+
+    my $keys = $deparser->_dump_lookups($array_ref);
+
+Converts hash keys into Perl hash access format.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$array_ref> - Array reference of key expressions
+
+=back
+
+B<Returns:> Comma-separated string of keys
+
+=head3 _dump_var_attr
+
+    my $attrs = $deparser->_dump_var_attr(@vars);
+
+Generates variable attribute metadata.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<@vars> - List of variable objects
+
+=back
+
+B<Returns:> String containing vars and table metadata
+
+=head2 Inheritance Methods
+
+=head3 _get_inherited_stuff
+
+    my @items = $deparser->_get_inherited_stuff($classes, $callback);
+
+Recursively collects inherited attributes using a callback.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$classes> - Array reference of class objects
+
+=item * C<$callback> - Code reference to extract data from each class
+
+=back
+
+B<Returns:> List of collected items from the inheritance chain
+
+=head1 INTERNAL HANDLER METHODS
+
+The deparser uses a dispatch table to handle different AST node types. Each 
+handler method follows the naming convention C<_deparse_*> and processes a 
+specific type of Sidef construct.
+
+=head2 Variable Handlers
+
+=over 4
+
+=item * C<_deparse_variable> - Standard variables and functions
+
+=item * C<_deparse_local> - Local variable declarations
+
+=item * C<_deparse_class_var> - Class-scoped variables
+
+=item * C<_deparse_define> - Constant definitions with 'define'
+
+=item * C<_deparse_const> - Runtime constants
+
+=item * C<_deparse_static> - Static variables
+
+=item * C<_deparse_const_init> - Constant initialization
+
+=item * C<_deparse_init> - Variable initialization
+
+=item * C<_deparse_class_init> - Class initialization
+
+=item * C<_deparse_ref_ok> - Variable references (handled specially)
+
+=back
+
+=head2 Control Flow Handlers
+
+=over 4
+
+=item * C<_deparse_if> - If/elsif/else conditionals
+
+=item * C<_deparse_while> - While loops
+
+=item * C<_deparse_foreach> - Foreach iterations
+
+=item * C<_deparse_cfor> - C-style for loops
+
+=item * C<_deparse_forin> - For-in loops over iterables
+
+=item * C<_deparse_loop> - Infinite loops
+
+=item * C<_deparse_do> - Do blocks
+
+=item * C<_deparse_break> - Break statements
+
+=item * C<_deparse_next> - Next/continue statements
+
+=item * C<_deparse_return> - Return statements
+
+=item * C<_deparse_continue> - Continue flag in given/when
+
+=back
+
+=head2 Block Handlers
+
+=over 4
+
+=item * C<_deparse_block_init> - Block initialization
+
+=item * C<_deparse_given> - Given/when switch statements
+
+=item * C<_deparse_when> - When clauses
+
+=item * C<_deparse_case> - Case clauses
+
+=item * C<_deparse_default> - Default clauses
+
+=item * C<_deparse_with> - With blocks (defined checks)
+
+=item * C<_deparse_gather> - Gather blocks for lazy collection
+
+=item * C<_deparse_take> - Take statements within gather
+
+=item * C<_deparse_try> - Try/catch exception handling
+
+=back
+
+=head2 Literal and Data Type Handlers
+
+=over 4
+
+=item * C<_deparse_number> - Number literals
+
+=item * C<_deparse_string> - String literals
+
+=item * C<_deparse_array> - Array literals
+
+=item * C<_deparse_vector> - Vector literals
+
+=item * C<_deparse_matrix> - Matrix literals
+
+=item * C<_deparse_hash> - Hash literals
+
+=item * C<_deparse_bool> - Boolean values
+
+=item * C<_deparse_nil> - Nil/undef values
+
+=item * C<_deparse_null> - Null objects
+
+=item * C<_deparse_regex> - Regular expressions
+
+=item * C<_deparse_complex> - Complex numbers
+
+=item * C<_deparse_pair> - Pair objects
+
+=back
+
+=head2 Object-Oriented Handlers
+
+=over 4
+
+=item * C<_deparse_struct> - Struct definitions
+
+=item * C<_deparse_subset> - Subset type definitions
+
+=item * C<_deparse_class_attr_ok> - Class attributes
+
+=item * C<_deparse_module_oo> - Object-oriented module imports
+
+=item * C<_deparse_module_func> - Functional module imports
+
+=back
+
+=head2 Special Construct Handlers
+
+=over 4
+
+=item * C<_deparse_ternary> - Ternary conditional operator
+
+=item * C<_deparse_named_param> - Named function parameters
+
+=item * C<_deparse_prefix_method> - Prefix method calls
+
+=item * C<_deparse_unary_ok> - Unary operators
+
+=item * C<_deparse_eval> - Eval expressions
+
+=item * C<_deparse_assert> - Assertion statements
+
+=item * C<_deparse_error> - Error/die statements
+
+=item * C<_deparse_warning> - Warning statements
+
+=item * C<_deparse_label> - Statement labels
+
+=item * C<_deparse_builtin> - Built-in function calls
+
+=back
+
+=head2 I/O and System Handlers
+
+=over 4
+
+=item * C<_deparse_stdin> - STDIN filehandle
+
+=item * C<_deparse_stdout> - STDOUT filehandle
+
+=item * C<_deparse_stderr> - STDERR filehandle
+
+=item * C<_deparse_argf> - ARGF filehandle
+
+=item * C<_deparse_data> - DATA filehandle
+
+=item * C<_deparse_magic> - Magic variables
+
+=item * C<_deparse_backtick> - Backtick command execution
+
+=item * C<_deparse_pipe> - Pipe objects
+
+=item * C<_deparse_file> - File objects
+
+=item * C<_deparse_dir> - Directory objects
+
+=back
+
+=head2 Metadata Handlers
+
+=over 4
+
+=item * C<_deparse_perl_code> - Embedded Perl code
+
+=item * C<_deparse_parser> - Parser object references
+
+=item * C<_deparse_meta_module> - Module metadata
+
+=item * C<_deparse_included> - Included file handling
+
+=item * C<_deparse_unimplemented> - Unimplemented features
+
+=back
+
+=head1 CONFIGURATION HASHES
+
+The module uses several package-scoped configuration hashes:
+
+=head2 %DEFAULT_OPTS
+
+Default options for the deparser instance.
+
+=head2 %ASSIGNMENT_OPS
+
+Maps Sidef assignment operators to Perl equivalents.
+
+=head2 %LAZY_OPS
+
+Maps lazy evaluation operators (||, &&, //, etc.).
+
+=head2 %OVERLOAD_METHODS
+
+Maps operators to overload method names.
+
+=head2 %REASSIGN_OPS
+
+Maps compound assignment operators (+=, -=, etc.).
+
+=head2 %INC_DEC_OPS
+
+Maps increment/decrement operators to method names.
+
+=head2 %COMPOSITE_CONSTANTS
+
+Defines composite constant types like Range, Gauss, Fraction.
+
+=head2 %DATA_TYPES
+
+Maps old Sidef::DataTypes namespace to new Sidef::Types namespace.
+
+=head2 %handlers
+
+Dispatch table mapping AST node types to handler method names.
+
+=head1 INTERNAL STATE
+
+The deparser maintains several pieces of state during operation:
+
+=over 4
+
+=item * C<current_block> - Reference address of the current block scope
+
+=item * C<current_namespace> - Current namespace context
+
+=item * C<function> - Reference address of current function being deparsed
+
+=item * C<class> - Reference address of current class being deparsed
+
+=item * C<class_name> - Name of the current class
+
+=item * C<package_name> - Name of the current Perl package
+
+=item * C<parent_name> - [$type, $name] of parent construct
+
+=item * C<depth> - Current nesting depth
+
+=item * C<ref_class> - Boolean indicating if in reference class
+
+=item * C<block_declarations> - Array of block-scoped declarations
+
+=item * C<function_declarations> - Array of function declarations
+
+=item * C<inherit> - Inheritance information
+
+=item * C<class_vars> - Class variable definitions
+
+=item * C<class_attributes> - Class attribute definitions
+
+=back
+
+=head1 OPERATOR HANDLING
+
+The deparser handles Sidef operators through several mechanisms:
+
+=head2 Lazy Operators
+
+Operators like C<||>, C<&&>, C<?>, and C<//> are handled specially to preserve 
+short-circuit evaluation semantics.
+
+=head2 Assignment Operators
+
+Simple assignment (C<=>) and compound assignments (C<+=>, C<-=>, etc.) are 
+converted to Perl equivalents, with compound assignments wrapped in lvalue 
+subroutines.
+
+=head2 Increment/Decrement
+
+Pre-increment (C<++$x>) and post-increment (C<$x++>) operators are handled 
+differently to maintain proper semantics and return values.
+
+=head2 Comparison Operators
+
+Comparison operators (C<==>, C<!=>, C<< <=> >>, C<~~>, C<!~>) are converted to 
+appropriate Perl operations, with proper handling of Sidef's Bool objects.
+
+=head2 Unary Operators
+
+Unary operators (C<!>, C<->, C<+>, C<@>, C<~>, etc.) are handled with special 
+cases for constant folding and type conversions.
+
+=head1 CONSTANT OPTIMIZATION
+
+The deparser performs constant optimization for:
+
+=over 4
+
+=item * Number literals (cached to avoid recreation)
+
+=item * String literals (cached and converted to String objects)
+
+=item * Composite constants (Range, Complex, Fraction, etc.)
+
+=item * Negation of number literals (constant folding)
+
+=back
+
+Constants are created using the C<use constant> pragma and stored in the 
+environment namespace for efficient reuse.
+
+=head1 SCOPE AND NAMESPACE MANAGEMENT
+
+=head2 Scope Tracking
+
+The deparser maintains scope information through:
+
+=over 4
+
+=item * Reference addresses (refaddr) for uniqueness
+
+=item * Block nesting depth tracking
+
+=item * Declaration arrays for lexical scoping
+
+=back
+
+=head2 Namespace Handling
+
+=over 4
+
+=item * Global variables use fully-qualified names
+
+=item * Class methods are installed in package symbol tables
+
+=item * Module loading is tracked to avoid duplicates
+
+=item * Environment namespace prefix for constants
+
+=back
+
+=head1 CLASS AND OBJECT HANDLING
+
+=head2 Class Definition
+
+Classes are deparsed into Perl packages with:
+
+=over 4
+
+=item * Parent class relationships via C<use parent>
+
+=item * Constructor methods (new/call)
+
+=item * Accessor methods for attributes
+
+=item * Method overloading support
+
+=item * Symbol table manipulation for method installation
+
+=back
+
+=head2 Struct Types
+
+Structs create lightweight objects with:
+
+=over 4
+
+=item * Blessed hash references
+
+=item * Lvalue accessor methods
+
+=item * Constructor validation
+
+=back
+
+=head2 Subset Types
+
+Subset types create type constraints with:
+
+=over 4
+
+=item * Inheritance from parent types
+
+=item * Custom validation blocks
+
+=item * __subset_validation__ hooks
+
+=back
+
+=head1 MEMORY MANAGEMENT
+
+The deparser uses several caching mechanisms:
+
+=over 4
+
+=item * C<%addr> - Tracks already-deparsed objects by reference address
+
+=item * C<%top_add> - Prevents duplicate top-level code additions
+
+=item * C<%constant_number_cache> - Caches number constant definitions
+
+=item * C<%constant_string_cache> - Caches string constant definitions
+
+=item * C<_reftype_cache> - Caches module loading state
+
+=back
+
+These caches are cleared on each C<new()> call to prevent memory leaks.
+
+=head1 ERROR HANDLING
+
+Error handling constructs are deparsed as follows:
+
+=over 4
+
+=item * C<die> statements include file and line information
+
+=item * C<warn> statements include file and line information
+
+=item * C<assert> generates runtime checks with custom messages
+
+=item * Try/catch blocks use Sidef's exception handling system
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Basic Usage
+
+    use Sidef::Deparse::Perl;
+    use Sidef::Parser;
+    
+    # Parse Sidef code
+    my $parser = Sidef::Parser->new;
+    my $ast = $parser->parse_script(code => 'say "Hello, World!"');
+    
+    # Deparse to Perl
+    my $deparser = Sidef::Deparse::Perl->new;
+    my $perl_code = $deparser->deparse($ast);
+    
+    # Execute
+    eval $perl_code;
+
+=head2 With Compiler Options
+
+    my $deparser = Sidef::Deparse::Perl->new(
+        opt => {
+            w => 1,      # Enable warnings
+            P => 256,    # 1024-bit precision
+            M => 'zero', # Round toward zero
+        }
+    );
+
+=head2 Custom Environment
+
+    my $deparser = Sidef::Deparse::Perl->new(
+        environment_name => 'MyApp',
+        before => 'use strict; use warnings;',
+        after  => 'exit 0;',
+    );
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item * L<Scalar::Util> - For refaddr()
+
+=item * L<Sidef::Types::Number::Number> - Number type operations
+
+=item * Various Sidef::Types::* modules - Loaded dynamically as needed
+
+=back
+
+=head1 PERFORMANCE CONSIDERATIONS
+
+=over 4
+
+=item * Reference addresses are used for uniqueness to avoid string comparisons
+
+=item * Constants are cached to avoid recreation
+
+=item * Module loading is tracked to avoid redundant use statements
+
+=item * Handler dispatch uses a hash table for O(1) lookups
+
+=item * Scope management uses arrays instead of hashes where possible
+
+=back
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * Generated code is not optimized for human readability
+
+=item * Variable names include reference addresses for uniqueness
+
+=item * Some Sidef constructs may generate verbose Perl code
+
+=item * The deparser assumes a working Sidef installation
+
+=back
+
+=head1 DEBUGGING
+
+To debug the deparser:
+
+=over 4
+
+=item * Set C<w> or C<W> options for stack traces
+
+=item * Examine the C<before>, C<header>, and C<top_program> fields
+
+=item * Use Data::Dumper on the AST structure
+
+=item * Check the generated Perl code for syntax errors
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef> - The Sidef programming language
+
+=item * L<Sidef::Parser> - Sidef parser that generates ASTs
+
+=item * L<Sidef::Types::*> - Sidef type system modules
+
+=item * L<B::Deparse> - Perl's built-in deparser
+
+=back
+
+=head1 AUTHOR
+
+Daniel Șuteu (trizen)
+
+=head1 LICENSE AND COPYRIGHT
+
+This module is part of the Sidef programming language.
+
+Copyright (C) 2013-2024 Daniel Șuteu
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License (2.0).
+
+=cut
