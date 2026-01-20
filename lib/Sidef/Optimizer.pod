@@ -1,0 +1,552 @@
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Optimizer - AST optimization and constant folding for Sidef programs
+
+=head1 SYNOPSIS
+
+    use Sidef::Optimizer;
+    
+    my $optimizer = Sidef::Optimizer->new(%options);
+    my %optimized_ast = $optimizer->optimize($ast_struct);
+    my $optimized_expr = $optimizer->optimize_expr($expression);
+
+=head1 DESCRIPTION
+
+The C<Sidef::Optimizer> module provides Abstract Syntax Tree (AST) optimization
+capabilities for the Sidef programming language. It performs constant folding,
+expression simplification, and other compile-time optimizations to improve
+runtime performance.
+
+The optimizer works by traversing the AST and applying transformation rules
+based on the types of objects and operations involved. When expressions can be
+evaluated at compile-time (such as C<2 + 3> or C<"hello".uc>), the optimizer
+replaces them with their computed results.
+
+=head1 METHODS
+
+=head2 new
+
+    my $optimizer = Sidef::Optimizer->new(%options);
+
+Creates a new optimizer instance. The C<%options> hash can contain various
+configuration parameters for the optimization process.
+
+Returns a blessed C<Sidef::Optimizer> object.
+
+=head2 optimize
+
+    my %optimized = $optimizer->optimize($struct);
+    my $optimized_ref = $optimizer->optimize($struct);  # scalar context
+
+Optimizes an entire AST structure. The input C<$struct> is a hash reference
+where keys are class names and values are arrays of expressions.
+
+In list context, returns a hash of optimized expressions grouped by class.
+In scalar context, returns either a hash reference (if multiple expressions)
+or the last optimized expression (if only one).
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$struct> - Hash reference containing the AST structure to optimize
+
+=back
+
+B<Returns:> Optimized AST structure (hash in list context, varies in scalar context)
+
+=head2 optimize_expr
+
+    my $optimized = $optimizer->optimize_expr($expression);
+
+Optimizes a single expression node from the AST. This is the core optimization
+method that handles different node types and applies appropriate transformations.
+
+The method recognizes and optimizes various node types including:
+
+=over 4
+
+=item * Primitive objects (strings, numbers, booleans, etc.)
+
+=item * Variables (local, static, const, define)
+
+=item * Control structures (if/else, loops, try/catch)
+
+=item * Method calls with constant arguments
+
+=item * Block structures
+
+=item * Array and hash indexing operations
+
+=back
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$expr> - Expression hash reference or object to optimize
+
+=back
+
+B<Returns:> Optimized expression (object or hash reference)
+
+=head1 OPTIMIZATION FEATURES
+
+=head2 Constant Folding
+
+The optimizer can evaluate constant expressions at compile-time:
+
+    # Before optimization
+    var x = 2 + (3 * 4);
+    
+    # After optimization (conceptually)
+    var x = 14;
+
+Supported for operations on:
+
+=over 4
+
+=item * Numbers (arithmetic, bitwise, comparison)
+
+=item * Strings (concatenation, case conversion, methods)
+
+=item * Booleans (logical operations)
+
+=item * Arrays (many methods when arguments are constant)
+
+=item * Complex number types (Gaussian integers, fractions, quaternions, etc.)
+
+=back
+
+=head2 Method Call Optimization
+
+When method receivers and arguments are all compile-time constants, the method
+is invoked during optimization:
+
+    # "HELLO" computed at compile-time
+    var greeting = "hello".uc;
+    
+    # 120 computed at compile-time
+    var factorial = 5.factorial;
+
+=head2 Unary Operator Optimization
+
+Special handling for unary operators like negation, sqrt, and logical not:
+
+    # -42 computed at compile-time
+    var x = -42;
+    
+    # 3 computed at compile-time  
+    var y = √9;
+
+=head1 SUPPORTED TYPES AND OPERATIONS
+
+The optimizer maintains extensive rule tables for various Sidef types:
+
+=head2 String Operations
+
+Optimizable string methods include:
+
+=over 4
+
+=item * Case conversion: C<lc>, C<uc>, C<fc>, C<tc>, C<wc>, C<tclc>, C<lcfirst>
+
+=item * Trimming: C<trim>, C<trim_beg>, C<trim_end>, C<chop>, C<chomp>
+
+=item * Inspection: C<chars_len>, C<bytes_len>, C<graphs_len>, C<is_empty>
+
+=item * Transformation: C<reverse>, C<sort>, C<repeat>, C<split>
+
+=item * Comparison: C<eq>, C<ne>, C<lt>, C<gt>, C<le>, C<ge>, C<cmp>
+
+=item * Operations: C<concat>, C<prepend>, C<index>, C<slice>, C<range>
+
+=item * Encoding: C<encode_utf8>, C<decode_utf8>, C<encode>, C<decode>
+
+=item * And many more...
+
+=back
+
+=head2 Number Operations
+
+Optimizable numeric methods include:
+
+=over 4
+
+=item * Arithmetic: C<+>, C<->, C<*>, C</>, C<%>, C<**>
+
+=item * Bitwise: C<&>, C<|>, C<^>, C<<< << >>>, C<<< >> >>>
+
+=item * Comparison: C<==>, C<!=>, C<< < >>, C<< > >>, C<< <= >>, C<< >= >>, C<< <=> >>
+
+=item * Mathematical: C<sqrt>, C<abs>, C<sin>, C<cos>, C<tan>, C<log>, C<exp>
+
+=item * Number theory: C<factorial>, C<is_prime>, C<divisors>, C<sigma>
+
+=item * Conversion: C<int>, C<float>, C<rat>, C<complex>
+
+=item * And extensive other mathematical operations...
+
+=back
+
+=head2 Array Operations
+
+Optimizable array methods include:
+
+=over 4
+
+=item * Access: C<first>, C<last>, C<item>, C<slice>
+
+=item * Modification: C<sort>, C<reverse>, C<unique>, C<flatten>
+
+=item * Inspection: C<len>, C<is_empty>, C<contains>, C<index>
+
+=item * Reduction: C<sum>, C<prod>, C<min>, C<max>, C<reduce>
+
+=item * Generation: C<permutations>, C<combinations>, C<subsets>
+
+=item * And more...
+
+=back
+
+=head2 Complex Number Types
+
+The optimizer supports operations on:
+
+=over 4
+
+=item * B<Gaussian integers> (complex numbers with integer components)
+
+=item * B<Fractions> (rational numbers)
+
+=item * B<Modular numbers> (integers modulo n)
+
+=item * B<Quadratic numbers> (a + b√d form)
+
+=item * B<Quaternions> (4D extension of complex numbers)
+
+=back
+
+Each type has specific optimization rules for their operations.
+
+=head2 Range Objects
+
+Special handling for:
+
+=over 4
+
+=item * B<RangeNumber> - numeric ranges with optional step
+
+=item * B<RangeString> - character/string ranges
+
+=back
+
+Methods like C<first>, C<last>, C<length>, C<reverse> are optimizable.
+
+=head1 INTERNAL FUNCTIONS
+
+=head2 methods
+
+    my @method_refs = methods($package, @method_names);
+
+Helper function that loads a package and returns method references for the
+specified method names. Uses caching to avoid repeated lookups.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$package> - Fully qualified package name
+
+=item * C<@method_names> - List of method names to retrieve
+
+=back
+
+B<Returns:> List of code references
+
+=head2 dtypes
+
+    my @method_refs = dtypes($datatype, @method_names);
+
+Similar to C<methods>, but works with data type to type class mappings.
+Converts data type names to their corresponding type class and retrieves methods.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$datatype> - Data type identifier
+
+=item * C<@method_names> - List of method names to retrieve
+
+=back
+
+B<Returns:> List of code references
+
+=head2 table
+
+    my $table_ref = table(@type_constants);
+
+Creates an array reference from type constants, used in building optimization
+rule tables.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<@type_constants> - List of type constant values
+
+=back
+
+B<Returns:> Array reference
+
+=head2 build_tree
+
+    my $tree = build_tree(@data);
+
+Constructs a hierarchical tree structure for optimization rules. The tree
+enables efficient lookup of optimization opportunities based on object type
+and method signature.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<@data> - Array of rule specifications
+
+=back
+
+B<Returns:> Hash reference representing the rule tree
+
+=head1 OPTIMIZATION RULES
+
+The module maintains a comprehensive C<%rules> hash that maps type classes to
+their optimizable operations. Each rule specifies:
+
+=over 4
+
+=item * The method or operation name
+
+=item * Expected argument type signatures
+
+=item * Conditions for optimization
+
+=back
+
+The rule structure is built hierarchically using nested hashes for efficient
+lookup during optimization.
+
+=head1 TYPE CONSTANTS
+
+The module defines constants for all supported Sidef types:
+
+=over 4
+
+=item * B<STRING> - C<Sidef::Types::String::String>
+
+=item * B<NUMBER> - C<Sidef::Types::Number::Number>
+
+=item * B<BOOL> - C<Sidef::Types::Bool::Bool>
+
+=item * B<ARRAY> - C<Sidef::Types::Array::Array>
+
+=item * B<REGEX> - C<Sidef::Types::Regex::Regex>
+
+=item * B<MOD> - C<Sidef::Types::Number::Mod>
+
+=item * B<GAUSS> - C<Sidef::Types::Number::Gauss>
+
+=item * B<FRACTION> - C<Sidef::Types::Number::Fraction>
+
+=item * B<QUADRATIC> - C<Sidef::Types::Number::Quadratic>
+
+=item * B<QUATERNION> - C<Sidef::Types::Number::Quaternion>
+
+=item * B<RANGENUM> - C<Sidef::Types::Range::RangeNumber>
+
+=item * B<RANGESTR> - C<Sidef::Types::Range::RangeString>
+
+=item * And corresponding data type variants (C<*_DT>)
+
+=back
+
+=head1 CACHING
+
+The optimizer uses several caching mechanisms:
+
+=over 4
+
+=item * B<%cache> - Caches module paths and method lookups
+
+=item * B<%addr> - Tracks processed object addresses to prevent infinite loops
+
+=back
+
+These caches are crucial for performance when optimizing large ASTs.
+
+=head1 SPECIAL NODE TYPES
+
+The optimizer handles various special AST node types:
+
+=head2 Variables
+
+=over 4
+
+=item * C<Sidef::Variable::Variable> - Regular variables
+
+=item * C<Sidef::Variable::Static> - Static variables
+
+=item * C<Sidef::Variable::Const> - Constants
+
+=item * C<Sidef::Variable::Define> - Defined values
+
+=item * C<Sidef::Variable::Init> - Initialization expressions
+
+=item * C<Sidef::Variable::NamedParam> - Named parameters
+
+=back
+
+=head2 Control Structures
+
+=over 4
+
+=item * C<Sidef::Types::Block::If> - If/elsif/else conditionals
+
+=item * C<Sidef::Types::Block::With> - With/else blocks
+
+=item * C<Sidef::Types::Block::While> - While loops
+
+=item * C<Sidef::Types::Block::ForEach> - For-each loops
+
+=item * C<Sidef::Types::Block::ForIn> - For-in loops
+
+=item * C<Sidef::Types::Block::CFor> - C-style for loops
+
+=item * C<Sidef::Types::Block::Try> - Try/catch blocks
+
+=item * C<Sidef::Types::Block::Given> - Given/when constructs
+
+=item * C<Sidef::Types::Block::Loop> - Generic loops
+
+=back
+
+=head2 Other Special Nodes
+
+=over 4
+
+=item * C<Sidef::Types::Bool::Ternary> - Ternary conditional operator
+
+=item * C<Sidef::Types::Array::HCArray> - Hybrid code/array structure
+
+=item * C<Sidef::Meta::Assert> - Assertion expressions
+
+=item * C<Sidef::Meta::Module> - Module definitions
+
+=item * C<Sidef::Meta::Included> - Included code
+
+=item * C<Sidef::Meta::PrefixMethod> - Prefix method calls
+
+=back
+
+=head1 OPTIMIZATION WORKFLOW
+
+The typical optimization workflow:
+
+=over 4
+
+=item 1. Parse source code into AST
+
+=item 2. Create optimizer instance
+
+=item 3. Call C<optimize()> on the AST structure
+
+=item 4. Optimizer recursively processes all nodes
+
+=item 5. Constant expressions are evaluated
+
+=item 6. Method calls on constants are executed
+
+=item 7. Optimized AST is returned
+
+=item 8. Optimized AST is used for code generation
+
+=back
+
+=head1 PERFORMANCE CONSIDERATIONS
+
+=over 4
+
+=item * The optimizer caches method lookups extensively
+
+=item * Address tracking prevents redundant processing of shared nodes
+
+=item * Rule lookup uses hierarchical hashing for O(1) access
+
+=item * Only safe, side-effect-free operations are optimized
+
+=item * Type checking ensures correctness of optimizations
+
+=back
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * Only pure functions with constant arguments are optimized
+
+=item * Methods with side effects are not optimized
+
+=item * Very large constant arrays/strings may not be optimized
+
+=item * User-defined methods are generally not optimized
+
+=item * Some complex control flow may limit optimization
+
+=back
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item * L<utf8> - UTF-8 handling
+
+=item * L<Scalar::Util> - C<refaddr> for object tracking
+
+=item * L<Algorithm::Loops> - C<NestedLoops> for rule tree building
+
+=item * Various C<Sidef::Types::*> modules for type implementations
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef> - The Sidef programming language
+
+=item * L<Sidef::Parser> - Sidef parser that generates the AST
+
+=item * L<Sidef::Deparse> - AST to source code converter
+
+=item * L<Sidef::Types::*> - Sidef type implementations
+
+=back
+
+=head1 AUTHOR
+
+Daniel "trizen" Șuteu
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2026 Daniel Șuteu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
+
+=head1 REPOSITORY
+
+L<https://github.com/trizen/sidef>
+
+=cut
