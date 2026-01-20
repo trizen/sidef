@@ -248,7 +248,7 @@ Converts the current object to the same type as the provided object. This is a d
 
     var x = 42
     var y = "3.14"
-    
+
     say x.to_type(y)    #=> "42" (converted to string)
     say y.to_type(x)    #=> 3 (converted to integer)
 
@@ -287,14 +287,10 @@ Aliases: I<to_vector>
 
 =head1 AUTHOR
 
-Daniel Șuteu, E<lt>trizen@cpan.orgE<gt>
+Daniel "Trizen" Șuteu
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-Copyright (C) 2013-2025 Daniel Șuteu
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.0 or,
-at your option, any later version of Perl 5 you may have available.
+This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

@@ -1150,6 +1150,7 @@ scripts/WWW/socket_inet.sf
 scripts/xiaolin_wu_s_line_algorithm.sf
 scripts/y_combinator.sf
 scripts/zeta_2n.sf
+SIDEF_BEGINNER_GUIDE.md
 t/00-load.t
 t/01-number.t
 t/02-pow.t

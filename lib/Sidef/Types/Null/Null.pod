@@ -14,24 +14,24 @@ The Null object evaluates to false in boolean contexts and can be used for nil-c
 
     # Null is automatically returned by some operations
     var result = [1,2,3].first { _ > 10 }  # returns Null if not found
-    
+
     # Explicit Null creation
     var obj = Null()
     var nothing = Null.new
-    
+
     # Boolean context - Null is falsy
     if (Null) {
         say "This won't execute"
     }
-    
+
     # Checking for Null
     if (result == Null) {
         say "No result found"
     }
-    
+
     # Using Null in conditionals
     var value = some_function() \\ "default"  # Use default if Null
-    
+
     # Converting Null to string
     say Null.to_s  # prints "null"
 
@@ -85,7 +85,7 @@ The Null object evaluates to false in boolean contexts:
     if (Null) {
         # This block never executes
     }
-    
+
     say (Null ? "true" : "false")  # prints: false
     say (!Null)                     # prints: true
 
@@ -137,14 +137,10 @@ Null can be compared with other values:
 
 =head1 AUTHOR
 
-Daniel Șuteu, E<lt>trizen@cpan.orgE<gt>
+Daniel "Trizen" Șuteu
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-Copyright (C) 2013-2025 Daniel Șuteu
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
+This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

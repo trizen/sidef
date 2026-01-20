@@ -14,20 +14,20 @@ The Sys class provides an interface to various system-level operations, includin
     var pid = Sys.fork
     Sys.sleep(2)
     Sys.exit(0)
-    
+
     # I/O operations
     Sys.say("Hello, World!")
     var input = Sys.readln("Enter your name: ")
     Sys.printf("Welcome, %s!\n", input)
-    
+
     # System information
     say Sys.os           # Operating system name
     say Sys.user         # Current username
-    
+
     # File operations
     Sys.open(var fh, '<', 'file.txt')
     Sys.opendir(var dh, '/tmp')
-    
+
     # User/group information
     var user_info = Sys.getpwnam('root')
     var group_info = Sys.getgrnam('wheel')
@@ -547,7 +547,7 @@ Executes an external command and waits for it to complete. Returns true if the c
 
     Sys.run("ls", "-la")
     Sys.run("echo 'Hello World'")
-    
+
     if (Sys.run("command")) {
         say "Command succeeded"
     }
@@ -828,14 +828,10 @@ L<Sidef::Object::Object>
 
 =head1 AUTHOR
 
-Daniel Șuteu, E<lt>trizen@cpan.orgE<gt>
+Daniel "Trizen" Șuteu
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-Copyright (C) 2013-2025 Daniel Șuteu
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.0 or,
-at your option, any later version of Perl 5 you may have available.
+This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut
