@@ -6,6 +6,7 @@ CONTRIBUTING.md
 lib/Sidef.pm
 lib/Sidef.pod
 lib/Sidef/Deparse/Perl.pm
+lib/Sidef/Deparse/Perl.pod
 lib/Sidef/Deparse/Sidef.pm
 lib/Sidef/Deparse/Sidef.pod
 lib/Sidef/Math/Math.pm
@@ -23,6 +24,7 @@ lib/Sidef/Object/LazyMethod.pod
 lib/Sidef/Object/Object.pm
 lib/Sidef/Object/Object.pod
 lib/Sidef/Optimizer.pm
+lib/Sidef/Optimizer.pod
 lib/Sidef/Parser.pm
 lib/Sidef/Parser.pod
 lib/Sidef/Sys/Sig.pm
