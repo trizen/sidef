@@ -7,12 +7,12 @@ Sidef::Parser - Parser for the Sidef programming language
 =head1 SYNOPSIS
 
     use Sidef::Parser;
-    
+
     my $parser = Sidef::Parser->new(
         file_name   => 'script.sf',
         script_name => 'script.sf',
     );
-    
+
     my $code = 'say "Hello, World!"';
     my $ast = $parser->parse_script(code => \$code);
 
@@ -361,7 +361,7 @@ Hash of built-in class names like:
 
 Hash of reserved keywords:
 
-    if, elsif, else, while, for, foreach, func, class, module, 
+    if, elsif, else, while, for, foreach, func, class, module,
     return, break, next, var, const, static, import, include, etc.
 
 =head2 Delimiters
@@ -463,13 +463,11 @@ Each variable entry contains:
 
 =head1 AUTHOR
 
-Daniel "trizen" Șuteu
+Daniel "Trizen" Șuteu
 
 =head1 LICENSE
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.0 or,
-at your option, any later version of Perl 5 you may have available.
+This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =head1 SEE ALSO
 
