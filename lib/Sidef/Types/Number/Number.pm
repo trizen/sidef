@@ -15829,10 +15829,18 @@ package Sidef::Types::Number::Number {
         my ($lower, $upper);
 
         for my $cp (@$primepi_lookup_keys) {
-            if ($cp < $n) {
+
+            my $cmp = $cp <=> $n;
+
+            if ($cmp < 0) {
                 $lower = $cp;
             }
-            elsif ($cp > $n) {
+            elsif ($cmp > 0) {
+                $upper = $cp;
+                last;
+            }
+            else {
+                $lower = $cp;
                 $upper = $cp;
                 last;
             }
