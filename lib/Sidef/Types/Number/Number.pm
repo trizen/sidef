@@ -1351,27 +1351,37 @@ package Sidef::Types::Number::Number {
 
     sub _cached_primorial {
         my ($k, $limit) = @_;
-
-        state %cache;
-
-        if (exists $cache{$k}) {
-            return $cache{$k};
-        }
-
         $limit //= 100;
 
-        # Clear the cache when there are too many values cached
-        if (scalar(keys(%cache)) > $limit) {
-            Math::GMPz::Rmpz_clear($_) for values(%cache);
-            undef %cache;
+        state %primorial_cache;
+        state %access_count;
+
+        if (exists $primorial_cache{$k}) {
+            $access_count{$k}++;
+            return $primorial_cache{$k};
         }
 
-        $cache{$k} //= do {
-            say STDERR "Computing primorial($k)..." if ($k >= 1e6 and $VERBOSE);
-            my $t = Math::GMPz::Rmpz_init_nobless();
-            Math::GMPz::Rmpz_primorial_ui($t, $k);
-            $t;
-        };
+        if (scalar(keys(%primorial_cache)) >= $limit) {
+
+            # Evict least-used entry
+            my $min_key = (
+                           sort { $a->[1] <=> $b->[1] }
+                           map  { [$_, $access_count{$_}] } keys %primorial_cache
+                          )[0][0];
+
+            Math::GMPz::Rmpz_clear($primorial_cache{$min_key});
+            delete $primorial_cache{$min_key};
+            delete $access_count{$min_key};
+        }
+
+        # Compute and cache
+        say STDERR "Computing primorial($k)..." if ($k >= 1e6 and $VERBOSE);
+        my $t = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_primorial_ui($t, $k);
+        $primorial_cache{$k} = $t;
+        $access_count{$k}    = 1;
+
+        return $t;
     }
 
     sub _is_squarefree {
