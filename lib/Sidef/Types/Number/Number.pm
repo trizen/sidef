@@ -15737,8 +15737,12 @@ package Sidef::Types::Number::Number {
 
         my $diff = Math::Prime::Util::GMP::subint($y, $x);
 
+        if ($diff eq '0') {
+            return (_is_prob_prime($x) ? 1 : 0);
+        }
+
         if (HAS_PRIME_UTIL and $diff <= 1e8) {
-            return Math::Prime::Util::prime_count($x, $y);
+            return Math::Prime::Util::prime_count("$x", "$y");
         }
 
         if ($diff <= 1e7) {
@@ -15779,6 +15783,10 @@ package Sidef::Types::Number::Number {
         my $count = $initial_count;
 
         if ($delta <= 1000 and $target < ULONG_MAX) {
+
+            $target     = Math::GMPz::Rmpz_get_ui($target)     if ref($target) eq 'Math::GMPz';
+            $checkpoint = Math::GMPz::Rmpz_get_ui($checkpoint) if ref($checkpoint) eq 'Math::GMPz';
+
             for (my $n = $checkpoint + 1 ; $n <= $target ; $n++) {
                 ++$count
                   if (
@@ -15802,6 +15810,10 @@ package Sidef::Types::Number::Number {
         my $subtract = 0;
 
         if ($delta <= 1000 and $checkpoint < ULONG_MAX) {
+
+            $target     = Math::GMPz::Rmpz_get_ui($target)     if ref($target) eq 'Math::GMPz';
+            $checkpoint = Math::GMPz::Rmpz_get_ui($checkpoint) if ref($checkpoint) eq 'Math::GMPz';
+
             for (my $n = $target + 1 ; $n <= $checkpoint ; $n++) {
                 ++$subtract
                   if (
