@@ -1544,7 +1544,9 @@ package Sidef::Types::Number::Number {
         my ($arr, $func) = @_;
 
         while ($#$arr > 0) {
-            push(@$arr, $func->(splice(@$arr, 0, 2)));
+            my $x = CORE::shift(@$arr);
+            my $y = CORE::shift(@$arr);
+            push(@$arr, $func->($x, $y));
         }
 
         $arr->[0];
