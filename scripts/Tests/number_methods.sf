@@ -1822,4 +1822,22 @@ assert_eq(218196290503625371633066083.factor_upto, %n[3, 135635139683, 536233434
 assert_eq(factor_upto((2**64 + 1)**5), factor(2**64 + 1)*5 -> isort)
 assert_eq(factor_upto((2**128 + 1) * (2**64 + 1), 274177), %n[274177, 22894341011050090868949881974522315437050433829130497])
 
+assert_eq(prime_count(2**30, 2**30 + 1000), 49)
+assert_eq(prime_count(2**31, 2**31 + 1000), 53)
+assert_eq(prime_count(2**32, 2**32 + 1000), 56)
+assert_eq(prime_count(2**33, 2**33 + 1000), 46)
+assert_eq(prime_count(2**62, 2**62 + 1000), 32)
+assert_eq(prime_count(2**63, 2**63 + 1000), 22)
+assert_eq(prime_count(2**64, 2**64 + 1000), 25)
+assert_eq(prime_count(2**65, 2**65 + 1000), 18)
+
+assert_eq(prime_count(2**30 - 1000, 2**30), 42)
+assert_eq(prime_count(2**31 - 1000, 2**31), 47)
+assert_eq(prime_count(2**32 - 1000, 2**32), 36)
+assert_eq(prime_count(2**33 - 1000, 2**33), 47)
+assert_eq(prime_count(2**65 - 1000, 2**65), 22)
+assert_eq(prime_count(2**64 - 1000, 2**64), 21)
+assert_eq(prime_count(2**63 - 1000, 2**63), 23)
+assert_eq(prime_count(2**62 - 1000, 2**62), 29)
+
 say "** Tests passed!"
