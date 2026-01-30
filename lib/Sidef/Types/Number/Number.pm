@@ -15741,7 +15741,7 @@ package Sidef::Types::Number::Number {
             return (_is_prob_prime($x) ? 1 : 0);
         }
 
-        if (HAS_PRIME_UTIL and $diff <= 1e8) {
+        if (HAS_PRIME_UTIL and $diff <= 1e8 and $y < ULONG_MAX) {
             return Math::Prime::Util::prime_count("$x", "$y");
         }
 
@@ -15799,7 +15799,7 @@ package Sidef::Types::Number::Number {
         }
 
         # For larger deltas, use segmented sieve
-        return Math::Prime::Util::GMP::addint($initial_count, _prime_count_range(Math::Prime::Util::GMP::addint($checkpoint, 1), $target));
+        return Math::Prime::Util::GMP::addint($initial_count, _prime_count_range(Math::Prime::Util::GMP::addint($checkpoint, 1), "$target"));
     }
 
     sub _count_primes_backward {
@@ -15824,7 +15824,7 @@ package Sidef::Types::Number::Number {
             }
         }
         else {
-            $subtract = _prime_count_range(Math::Prime::Util::GMP::addint($target, 1), $checkpoint);
+            $subtract = _prime_count_range(Math::Prime::Util::GMP::addint($target, 1), "$checkpoint");
         }
 
         return Math::Prime::Util::GMP::subint($initial_count, $subtract);
@@ -15838,24 +15838,34 @@ package Sidef::Types::Number::Number {
         }
 
         # Search for surrounding checkpoints
-        my ($lower, $upper);
+        my ($left, $right) = (0, $#{$primepi_lookup_keys});
+        my ($lower, $upper, $mid, $cmp);
 
-        for my $cp (@$primepi_lookup_keys) {
+        for (; ;) {
 
-            my $cmp = $cp <=> $n;
+            $mid = int(($left + $right) / 2);
+            $cmp = ($primepi_lookup_keys->[$mid] <=> $n) || do {
+                $lower = ($upper = $primepi_lookup_keys->[$mid]);
+                last;
+            };
 
             if ($cmp < 0) {
-                $lower = $cp;
-            }
-            elsif ($cmp > 0) {
-                $upper = $cp;
-                last;
+                $left = $mid + 1;
+                $left > $right and last;
             }
             else {
-                $lower = $cp;
-                $upper = $cp;
-                last;
+                $right = $mid - 1;
+
+                if ($left > $right) {
+                    $mid -= 1;
+                    last;
+                }
             }
+        }
+
+        if ($mid >= 0) {
+            $lower //= $primepi_lookup_keys->[$mid];
+            $upper //= $primepi_lookup_keys->[$mid + 1];
         }
 
         # No checkpoints found
@@ -16379,6 +16389,8 @@ package Sidef::Types::Number::Number {
             '1299709'         => '100000',
             '1159523'         => '90000',
             '1020379'         => '80000',
+            '2'               => '1',
+            '0'               => '0',
 
             # Number of primes <= 2^n.
             # OEIS: https://oeis.org/A007053
@@ -16613,6 +16625,10 @@ package Sidef::Types::Number::Number {
 
         # Find nearest checkpoint
         my ($checkpoint, $delta, $direction) = _find_prime_count_checkpoint($y, $primepi_lookup_keys);
+
+        if (!defined($checkpoint)) {
+            return _prime_count_range($x, $y);
+        }
 
         say STDERR "π($y): Using incremental from checkpoint $checkpoint (delta=$delta)"
           if $VERBOSE;
