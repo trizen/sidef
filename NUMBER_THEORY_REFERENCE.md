@@ -848,7 +848,7 @@ say 30.of {|n| centered_polygonal(n, 3) }   # Centered triangular
 say 30.of {|n| centered_polygonal(n, 6) }   # Centered hexagonal
 ```
 
-### Example 8: Working with Large Numbers
+### Example 8: Working with Continued Fractions
 
 ```ruby
 # Continued fractions
@@ -859,8 +859,15 @@ say sqrt_cfrac_period_len(61)       # Period length
 var (x, y) = solve_pell(61)
 say "x² - 61y² = 1: x=#{x}, y=#{y}"
 
-# Convergents for rational approximation
-say 10.of { rat_approx(Math.pi) }
+# Convergents for Pi
+say Num.pi.convergents
+
+# Fraction <-> CF conversion
+say as_cfrac(43/97)
+say [0, 2, 3, 1, 10].cfrac2num.as_frac  #=> "43/97"
+
+# Rational approximation
+say rat_approx(0.4432989690721649484536082474f).as_frac  #=> "43/97"
 ```
 
 ### Example 9: Multiplicative Function Inverses
@@ -1215,7 +1222,7 @@ var wrong = ((powmod(2, 100, 1000) / 3) % 1000)
 var right = (powmod(2, 100, 1000) * invmod(3, 1000) % 1000)
 
 # Or use Mod objects
-var m = Mod(powmod(2, 100, 1000), 1000)
+var m = Mod(2, 1000)**100
 say m/3
 ```
 
