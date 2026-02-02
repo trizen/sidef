@@ -15735,13 +15735,40 @@ package Sidef::Types::Number::Number {
     sub _nth_almost_prime_lower {
         my ($n, $k) = @_;
 
-        my $factorial_km1 = 1;
+        # Edge Case: Basic validity
+        return 1 if $n <= 0;
+        return 2 if $n == 1;
 
-        for my $j (2 .. $k - 1) {
-            $factorial_km1 *= $j;
+        # For small n, the asymptotic formula may underestimate
+        return 2 if $n < $k;
+
+        # Case k=1: The Primes
+        # The bound n * ln(n) is a valid lower bound for the nth prime for n >= 1.
+        # (Rosser's Theorem states p_n > n * ln(n))
+        if ($k == 1) {
+            return CORE::int($n * CORE::log($n));
         }
 
-        CORE::int(($n * CORE::log($n)) / ((CORE::log(CORE::log($n))**($k - 1)) / $factorial_km1));
+        # We need ln(ln(n)) > 1 to ensure the divisor doesn't artificially inflate
+        # the result (which would violate the "lower bound" property).
+        # ln(ln(n)) > 1 implies ln(n) > e, or n > e^e (~15.15).
+        # For n < 16, this asymptotic formula is unstable/inaccurate.
+        return 0 if $n < 16;
+
+        # Calculate (k-1)!
+        my $fact_km1 = 1;
+        $fact_km1 *= $_ for 2 .. ($k - 1);
+
+        my $log_n     = CORE::log($n);
+        my $log_log_n = CORE::log($log_n);
+
+        # The asymptotic form is: n * ln(n) * (k-1)! / (ln(ln(n)))^(k-1)
+        # Formula based on the inverse of Landau's approximation for pi_k(x)
+        my $numerator   = $n * $log_n * $fact_km1;
+        my $denominator = $log_log_n**($k - 1);
+
+        # Result is truncated to an integer
+        return CORE::int($numerator / $denominator);
     }
 
     sub _prime_count_range {
@@ -32070,10 +32097,10 @@ package Sidef::Types::Number::Number {
         _generic_each($from, $to, $block, sub {
                 my ($from) = @_;
 
-                my $t    = Math::GMPz::Rmpz_get_d($from);
-                my $step = ($k > 0) ? (_nth_almost_prime_lower($t + CORE::log($t) * 2e4, $k) - _nth_almost_prime_lower($t, $k)) : 0;
+                my $lo   = Math::GMPz::Rmpz_get_d($from);
+                my $step = ($k > 0) ? (_nth_almost_prime_lower($lo + CORE::log($lo) * 5e4, $k) - _nth_almost_prime_lower($lo, $k)) : 0;
 
-                if ($step <= 0 or $step > 1e9) {
+                if ($step <= 0 or $step > 1e14) {
                     $step = 100_000_000 * $k;
                 }
 
