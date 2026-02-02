@@ -15876,60 +15876,55 @@ package Sidef::Types::Number::Number {
             $n = Math::GMPz::Rmpz_init_set_str("$n", 10);
         }
 
-        # Search for surrounding checkpoints
-        my ($left, $right) = (0, $#{$primepi_lookup_keys});
-        my ($lower, $upper, $mid, $cmp);
+        # We want to find the index `i` such that keys[i] <= n < keys[i+1]
+        my $low  = 0;
+        my $high = $#{$primepi_lookup_keys};
 
-        for (; ;) {
+        # Handle Edge Case: Array empty
+        return (undef, undef, undef) if $high < 0;
 
-            $mid = int(($left + $right) / 2);
-            $cmp = ($primepi_lookup_keys->[$mid] <=> $n) || do {
-                $lower = ($upper = $primepi_lookup_keys->[$mid]);
-                last;
-            };
+        my $idx = -1;    # Index of the "lower" bound
 
-            if ($cmp < 0) {
-                $left = $mid + 1;
-                $left > $right and last;
+        while ($low <= $high) {
+            my $mid = int(($low + $high) / 2);
+
+            my $val = $primepi_lookup_keys->[$mid];
+            my $cmp = $val <=> $n;
+
+            if ($cmp == 0) {
+                $idx = $mid;
+                last;    # Exact match found
+            }
+            elsif ($cmp < 0) {
+                $idx = $mid;       # This is a candidate for lower bound
+                $low = $mid + 1;
             }
             else {
-                $right = $mid - 1;
-
-                if ($left > $right) {
-                    $mid -= 1;
-                    last;
-                }
+                $high = $mid - 1;
             }
         }
 
-        if ($mid >= 0) {
-            $lower //= $primepi_lookup_keys->[$mid];
-            $upper //= $primepi_lookup_keys->[$mid + 1];
-        }
+        # Determine Lower and Upper neighbors
+        my $lower = ($idx >= 0)                       ? $primepi_lookup_keys->[$idx]     : undef;
+        my $upper = ($idx < $#{$primepi_lookup_keys}) ? $primepi_lookup_keys->[$idx + 1] : undef;
 
-        # No checkpoints found
-        if (!defined($lower) and !defined($upper)) {
-            return (undef, undef, undef);
-        }
-
-        # Choose the closer one
+        # Select the Closest Checkpoint
         if (defined($lower) && defined($upper)) {
             my $d_lower = $n - $lower;
             my $d_upper = $upper - $n;
 
-            return (
-                      ($d_lower <= $d_upper)
-                    ? ($lower, $d_lower, 'above')
-                    : ($upper, $d_upper, 'below')
-                   );
+            return ($d_lower <= $d_upper)
+              ? ($lower, $d_lower, 'above')     # Checkpoint is below, count UP (above)
+              : ($upper, $d_upper, 'below');    # Checkpoint is above, count DOWN (below)
+        }
+        elsif (defined($lower)) {
+            return ($lower, $n - $lower, 'above');
+        }
+        elsif (defined($upper)) {
+            return ($upper, $upper - $n, 'below');
         }
 
-        # Only one checkpoint available
-        return (
-                defined($lower)
-                ? ($lower, $n - $lower, 'above')
-                : ($upper, $upper - $n, 'below')
-               );
+        return (undef, undef, undef);
     }
 
     sub _prime_count {
@@ -16428,8 +16423,6 @@ package Sidef::Types::Number::Number {
             '1299709'         => '100000',
             '1159523'         => '90000',
             '1020379'         => '80000',
-            '2'               => '1',
-            '0'               => '0',
 
             # Number of primes <= 2^n.
             # OEIS: https://oeis.org/A007053
