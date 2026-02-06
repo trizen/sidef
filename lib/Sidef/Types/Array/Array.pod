@@ -1359,6 +1359,33 @@ Aliases: I<first>
 
 =cut
 
+=head2 huffman
+
+    arr.huffman
+
+Builds a Huffman code table, given an array of Number objects.
+
+This method analyzes the frequency of each distinct element in the array,
+constructs a Huffman tree, and returns a hash mapping each element to its
+corresponding Huffman code.
+
+The resulting codes are canonical Huffman codes, meaning that symbols with
+shorter code lengths receive lexicographically smaller binary codes, as
+described in RFC 1951.
+
+Each Huffman code is represented as a String object of C<0> and C<1> characters.
+
+    var arr = [1, 1, 1, 2, 2, 3]
+    var codes = arr.huffman
+
+    say codes{1}   # e.g. "0"
+    say codes{2}   # e.g. "10"
+    say codes{3}   # e.g. "11"
+
+(The exact codes depend on symbol frequencies.)
+
+=cut
+
 =head2 imax
 
     arr.imax
@@ -2331,7 +2358,7 @@ Splits array at specified indices.
 
 Splits array before elements where block returns true.
 
-    [1, 2, 5, 6, 3, 7].segment_by { .is_prime }    
+    [1, 2, 5, 6, 3, 7].segment_by { .is_prime }
     #=> [[1, 2], [5], [6], [3], [7]]
 
 =cut
@@ -2545,7 +2572,7 @@ Removes and returns C<length> elements from the array starting at C<offset>, opt
     var arr = [1,2,3,4,5]
     say arr.splice(1, 2)        #=> [2, 3]
     say arr                      #=> [1, 4, 5]
-    
+
     var arr2 = [1,2,3,4,5]
     arr2.splice(1, 2, 'a', 'b', 'c')
     say arr2                     #=> [1, "a", "b", "c", 4, 5]
