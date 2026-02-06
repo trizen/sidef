@@ -368,6 +368,12 @@ package Sidef::Object::Object {
         $sub->($_[0]);
     }
 
+    sub to_json {
+        my ($self) = @_;
+        state $x = require JSON;
+        Sidef::Types::String::String->new(scalar JSON::to_json($self->get_value));
+    }
+
     {
         no strict 'refs';
 

@@ -120,6 +120,14 @@ package Sidef::Types::Perl::Perl {
                 return Sidef::Types::String::String->new($val);
             }
 
+            if ($ref eq 'JSON::PP::Boolean') {
+                return (
+                        $val
+                        ? Sidef::Types::Bool::Bool::TRUE
+                        : Sidef::Types::Bool::Bool::FALSE
+                       );
+            }
+
             # Return an OO object when $val is blessed
             if (defined Scalar::Util::blessed($val)) {
                 return Sidef::Module::OO->__NEW__($val);

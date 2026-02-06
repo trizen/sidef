@@ -1,0 +1,15 @@
+#!/usr/bin/ruby
+
+# Tests for various String methods
+
+do {
+
+    var json = '{"a":42, "c":{"d":["foo", "bar", true, false, 42.9, 1234]}}'
+    var hash = json.from_json
+    var json2 = hash.to_json
+    var hash2 = json2.from_json
+
+    assert_eq(hash, hash2)
+}
+
+say "** Tests passed!"

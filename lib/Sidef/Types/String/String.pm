@@ -1460,6 +1460,12 @@ package Sidef::Types::String::String {
         bless \$output;
     }
 
+    sub from_json {
+        my ($self) = @_;
+        state $x = require JSON;
+        Sidef::Types::Perl::Perl->to_sidef(scalar JSON::from_json($$self));
+    }
+
     sub _require {
         my ($self) = @_;
 

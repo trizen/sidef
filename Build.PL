@@ -34,10 +34,7 @@ my $builder = $class->new(
     release_status    => 'stable',
 
     # Author Information
-    dist_author => [
-        'Daniel Șuteu <trizen@cpan.org>',
-        'Ioana Fălcușan <ioanaflavia@gmail.com>',
-    ],
+    dist_author => ['Daniel Șuteu', 'Ioana Fălcușan',],
 
     # Build Configuration
     configure_requires => {
@@ -49,7 +46,7 @@ my $builder = $class->new(
                       },
 
     test_requires => {
-                      'Test::More'      => '1.0',
+                      'Test::More' => '1.0',
                      },
 
     # Runtime Dependencies - Core Perl Modules
@@ -116,6 +113,17 @@ my $builder = $class->new(
         # Text Processing
         'Text::Balanced'   => '2.00',
         'Text::ParseWords' => '3.00',
+
+        # String compression methods (.gzip, .defalte, etc)
+        'IO::Compress::Gzip'       => 0,
+        'IO::Compress::RawDeflate' => 0,
+
+        # factordb.com support inside the Number class (with `Number!USE_FACTORDB = true`)
+        'HTTP::Tiny' => 0,
+        'JSON::PP'   => 0,
+
+        # String .from_json and Object .to_json
+        'JSON' => 0,
                   },
 
     # Metadata and Resources
@@ -141,31 +149,12 @@ my $builder = $class->new(
 
         keywords => ['sidef', 'programming language', 'scripting', 'interpreter', 'dynamic language', 'high-level language',],
 
-        prereqs => {
-                    runtime => {
-                                suggests => {
-                                             'JSON::PP'           => 0,
-                                             'LWP::UserAgent'     => 0,
-                                             'HTTP::Tiny'         => 0,
-                                             'DBD::SQLite'        => 0,
-                                             'DBI'                => 0,
-                                             'Regexp::Common'     => 0,
-                                             'DateTime'           => 0,
-                                             'File::Slurp'        => 0,
-                                             'IO::Compress::Gzip' => 0,
-                                            },
-                               },
-                   },
-
         no_index => {
                      directory => [qw(t inc examples share)],
                      file      => [qw(README.md)],
                     },
 
-        x_contributors => [
-            'Daniel Șuteu <trizen@cpan.org>',
-            'Ioana Fălcușan <ioanaflavia@gmail.com>',
-        ],
+        x_contributors => ['Daniel Șuteu', 'Ioana Fălcușan',],
 
         x_authority => 'cpan:TRIZEN',
     },
@@ -246,9 +235,9 @@ It uses Module::Build to handle the installation process.
 
 =head1 AUTHORS
 
-Daniel Șuteu <trizen@cpan.org>
+Daniel Șuteu
 
-Ioana Fălcușan <ioanaflavia@gmail.com>
+Ioana Fălcușan
 
 =head1 LICENSE
 

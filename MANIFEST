@@ -1082,6 +1082,7 @@ scripts/Tests/squarefree.sf
 scripts/Tests/static_const_lazy_init.sf
 scripts/Tests/string_encodings.sf
 scripts/Tests/string_escapes.sf
+scripts/Tests/string_methods.sf
 scripts/Tests/string_to_number.sf
 scripts/Tests/strip_chars_from_str.sf
 scripts/Tests/strip_non_ascii_chars.sf

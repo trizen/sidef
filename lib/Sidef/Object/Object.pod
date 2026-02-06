@@ -326,9 +326,25 @@ Aliases: I<println>
 
 =cut
 
+=head2 to_json
+
+    self.to_json
+
+Converts a Sidef object into a JSON string.
+
+    say Hash(
+        "active" => true,
+        "name" => "Sidef",
+        "year" => 2013,
+    ).to_json
+
+Output:
+
+    {"name":"Sidef","active":true,"year":2013}
+
 =head2 undef_method
 
-    self. undef_method(name)
+    self.undef_method(name)
 
 Removes the method with the given C<name> from the object's class. Returns the object.
 
