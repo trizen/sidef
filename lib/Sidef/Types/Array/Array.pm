@@ -1974,37 +1974,106 @@ package Sidef::Types::Array::Array {
     sub _huffman_walk_tree {
         my ($node, $code, $h) = @_;
 
+        # Node structure: [ content, frequency ]
+        # If content is a reference, it's an internal node: [left_child, right_child]
+        # If content is a scalar, it's a leaf: 'symbol'
+
         my $c = $node->[0] // return $h;
-        if (ref $c) { __SUB__->($c->[$_], $code . $_, $h) for ('0', '1') }
-        else        { $h->{$c} = $code }
+
+        if (ref $c) {
+
+            # Recurse: Left adds '0', Right adds '1'
+            __SUB__->($c->[$_], $code . $_, $h) for ('0', '1');
+        }
+        else {
+            # Leaf node found
+            $h->{$c} = $code;
+        }
 
         return $h;
+    }
+
+    sub _heap_insert {
+        my ($heap, $node) = @_;
+        push @$heap, $node;
+        my $i = $#$heap;
+
+        # Sift Up
+        while ($i > 0) {
+            my $p = int(($i - 1) / 2);
+
+            # Compare frequencies (index 1)
+            last if $heap->[$p][1] <= $heap->[$i][1];
+            @$heap[$i, $p] = @$heap[$p, $i];
+            $i = $p;
+        }
+    }
+
+    sub _heap_extract {
+        my ($heap) = @_;
+        return unless @$heap;
+
+        # Swap root with last element and pop
+        my $min  = $heap->[0];
+        my $last = pop @$heap;
+
+        if (@$heap) {
+            $heap->[0] = $last;
+            my $i   = 0;
+            my $cnt = scalar @$heap;
+
+            # Sift Down
+            while (1) {
+                my $c1 = 2 * $i + 1;
+                my $c2 = 2 * $i + 2;
+                last if $c1 >= $cnt;
+
+                # Find smaller child
+                my $swap = ($c2 < $cnt && $heap->[$c2][1] < $heap->[$c1][1]) ? $c2 : $c1;
+
+                last if $heap->[$i][1] <= $heap->[$swap][1];
+
+                @$heap[$i, $swap] = @$heap[$swap, $i];
+                $i = $swap;
+            }
+        }
+        return $min;
     }
 
     sub huffman {
         my ($self) = @_;
 
+        # 1. Count Frequencies
         my %freq;
         foreach my $item (@$self) {
             ++$freq{$item};
         }
 
-        my @nodes = CORE::map { [$_, $freq{$_}] } CORE::sort { $a <=> $b } CORE::keys(%freq);
+        # 2. Initialize Heap
+        # Structure: [ [symbol_or_children], frequency ]
+        my @heap;
+        foreach my $k (CORE::keys %freq) {
+            _heap_insert(\@heap, [$k, $freq{$k}]);
+        }
 
-        do {    # poor man's priority queue
-            @nodes = CORE::sort { $a->[1] <=> $b->[1] } @nodes;
-            my ($x, $y) = CORE::splice(@nodes, 0, 2);
-            if (defined($x)) {
-                if (defined($y)) {
-                    push @nodes, [[$x, $y], $x->[1] + $y->[1]];
-                }
-                else {
-                    push @nodes, [[$x], $x->[1]];
-                }
-            }
-        } while (@nodes > 1);
+        # Edge case: If only 1 distinct item exists, wrap it to ensure a code length > 0.
+        if (@heap == 1) {
+            my $only = _heap_extract(\@heap);
+            _heap_insert(\@heap, [[$only], $only->[1]]);
+        }
 
-        my $h = _huffman_walk_tree($nodes[0], '', {});
+        # 3. Build Huffman Tree
+        while (@heap > 1) {
+            my $x = _heap_extract(\@heap);
+            my $y = _heap_extract(\@heap);
+
+            # Create new internal node
+            # Content is [child_x, child_y], Frequency is sum
+            _heap_insert(\@heap, [[$x, $y], $x->[1] + $y->[1]]);
+        }
+
+        # 4. Generate Codes
+        my $h = _huffman_walk_tree($heap[0], '', {});
 
         my %code_lengths;
         foreach my $i (CORE::keys %freq) {
