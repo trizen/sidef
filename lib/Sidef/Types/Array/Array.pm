@@ -2001,8 +2001,6 @@ package Sidef::Types::Array::Array {
         # Sift Up
         while ($i > 0) {
             my $p = int(($i - 1) / 2);
-
-            # Compare frequencies (index 1)
             last if $heap->[$p][1] <= $heap->[$i][1];
             @$heap[$i, $p] = @$heap[$p, $i];
             $i = $p;
@@ -2011,7 +2009,8 @@ package Sidef::Types::Array::Array {
 
     sub _heap_extract {
         my ($heap) = @_;
-        return unless @$heap;
+
+        @$heap || return;
 
         # Swap root with last element and pop
         my $min  = $heap->[0];
@@ -2058,8 +2057,8 @@ package Sidef::Types::Array::Array {
 
         # Edge case: If only 1 distinct item exists, wrap it to ensure a code length > 0.
         if (@heap == 1) {
-            my $only = _heap_extract(\@heap);
-            _heap_insert(\@heap, [[$only], $only->[1]]);
+            my $item = $heap[0];
+            return _huffman_from_code_lengths(scalar {$item->[0] => 1});
         }
 
         # 3. Build Huffman Tree
