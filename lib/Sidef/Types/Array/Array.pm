@@ -2001,7 +2001,7 @@ package Sidef::Types::Array::Array {
         # Sift Up
         while ($i > 0) {
             my $p = int(($i - 1) / 2);
-            last if $heap->[$p][1] <= $heap->[$i][1];
+            last if ($heap->[$p][1] <= $heap->[$i][1]);
             @$heap[$i, $p] = @$heap[$p, $i];
             $i = $p;
         }
@@ -2030,7 +2030,7 @@ package Sidef::Types::Array::Array {
                 # Find smaller child
                 my $swap = ($c2 < $cnt && $heap->[$c2][1] < $heap->[$c1][1]) ? $c2 : $c1;
 
-                last if $heap->[$i][1] <= $heap->[$swap][1];
+                last if ($heap->[$i][1] <= $heap->[$swap][1]);
 
                 @$heap[$i, $swap] = @$heap[$swap, $i];
                 $i = $swap;
@@ -2048,10 +2048,12 @@ package Sidef::Types::Array::Array {
             ++$freq{$item};
         }
 
+        my @symbols = CORE::sort CORE::keys %freq;
+
         # 2. Initialize Heap
         # Structure: [ [symbol_or_children], frequency ]
         my @heap;
-        foreach my $k (CORE::keys %freq) {
+        foreach my $k (@symbols) {
             _heap_insert(\@heap, [$k, $freq{$k}]);
         }
 
@@ -2075,7 +2077,7 @@ package Sidef::Types::Array::Array {
         my $h = _huffman_walk_tree($heap[0], '', {});
 
         my %code_lengths;
-        foreach my $i (CORE::keys %freq) {
+        foreach my $i (@symbols) {
             $code_lengths{$i} = CORE::length($h->{$i});
         }
 
