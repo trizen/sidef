@@ -1993,50 +1993,36 @@ package Sidef::Types::Array::Array {
         return $h;
     }
 
-    sub _heap_insert {
-        my ($heap, $node) = @_;
-        push @$heap, $node;
+    sub _heap_push {
+        my ($heap, $item) = @_;
+        CORE::push(@$heap, $item);
         my $i = $#$heap;
-
-        # Sift Up
         while ($i > 0) {
-            my $p = int(($i - 1) / 2);
+            my $p = ($i - 1) >> 1;
             last if ($heap->[$p][1] <= $heap->[$i][1]);
-            @$heap[$i, $p] = @$heap[$p, $i];
+            @{$heap}[$p, $i] = @{$heap}[$i, $p];
             $i = $p;
         }
     }
 
-    sub _heap_extract {
+    sub _heap_pop {
         my ($heap) = @_;
-
-        @$heap || return;
-
-        # Swap root with last element and pop
-        my $min  = $heap->[0];
-        my $last = pop @$heap;
-
-        if (@$heap) {
-            $heap->[0] = $last;
-            my $i   = 0;
-            my $cnt = scalar @$heap;
-
-            # Sift Down
-            while (1) {
-                my $c1 = 2 * $i + 1;
-                my $c2 = 2 * $i + 2;
-                last if $c1 >= $cnt;
-
-                # Find smaller child
-                my $swap = ($c2 < $cnt && $heap->[$c2][1] < $heap->[$c1][1]) ? $c2 : $c1;
-
-                last if ($heap->[$i][1] <= $heap->[$swap][1]);
-
-                @$heap[$i, $swap] = @$heap[$swap, $i];
-                $i = $swap;
-            }
+        return CORE::pop(@$heap) if (@$heap == 1);
+        my $top = $heap->[0];
+        $heap->[0] = CORE::pop @$heap;
+        my $n = scalar @$heap;
+        my $i = 0;
+        while (1) {
+            my $s = $i;
+            my $l = 2 * $i + 1;
+            my $r = $l + 1;
+            $s = $l if ($l < $n && $heap->[$l][1] < $heap->[$s][1]);
+            $s = $r if ($r < $n && $heap->[$r][1] < $heap->[$s][1]);
+            last if $s == $i;
+            @{$heap}[$i, $s] = @{$heap}[$s, $i];
+            $i = $s;
         }
-        return $min;
+        return $top;
     }
 
     sub huffman {
@@ -2054,23 +2040,18 @@ package Sidef::Types::Array::Array {
         # Structure: [ [symbol_or_children], frequency ]
         my @heap;
         foreach my $k (@symbols) {
-            _heap_insert(\@heap, [$k, $freq{$k}]);
-        }
-
-        # Edge case: If only 1 distinct item exists, wrap it to ensure a code length > 0.
-        if (@heap == 1) {
-            my $item = $heap[0];
-            return _huffman_from_code_lengths(scalar {$item->[0] => 1});
+            _heap_push(\@heap, [$k, $freq{$k}]);
         }
 
         # 3. Build Huffman Tree
         while (@heap > 1) {
-            my $x = _heap_extract(\@heap);
-            my $y = _heap_extract(\@heap);
+            my $x = _heap_pop(\@heap);
+            my $y = _heap_pop(\@heap);
+            _heap_push(\@heap, [[$x, $y], $x->[1] + $y->[1]]);
+        }
 
-            # Create new internal node
-            # Content is [child_x, child_y], Frequency is sum
-            _heap_insert(\@heap, [[$x, $y], $x->[1] + $y->[1]]);
+        if (@heap == 1 && !ref $heap[0][0]) {
+            @heap = ([[$heap[0]], $heap[0][1]]);
         }
 
         # 4. Generate Codes

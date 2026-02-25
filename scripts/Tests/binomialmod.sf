@@ -66,4 +66,12 @@ assert_eq(binomialmod(-50, 4, -50), binomial(-50, 4) % -50)
 #~ assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) + 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) + 1)**2));
 #~ assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) - 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) - 1)**2));
 
+assert_eq([binomialmod(400,343,1777),
+           binomialmod(-400,343,1777),
+           binomialmod(-14,343,1777),
+           binomialmod(400,-343,1777),
+           binomialmod(-400,-343,1777),
+           binomialmod(-14,-343,1777)],
+           [977, 251, 421, 0, 0, 647])
+
 say("binomial(10^10, 10^5) mod 13! = ", binomialmod(1e10, 1e5, factorial(13)));
