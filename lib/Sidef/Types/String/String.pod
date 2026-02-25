@@ -14,17 +14,17 @@ Sidef strings are Unicode-aware and support a rich set of operations including r
 
     var str = String("hello")
     var str = "hello"                  # String literal
-    
+
     # String operations
     say str.uc                          #=> "HELLO"
     say str * 3                         #=> "hellohellohello"
     say str + " world"                  #=> "hello world"
     say str.chars                       #=> ["h", "e", "l", "l", "o"]
-    
+
     # Pattern matching
     str =~ /l+/ && say "Match found!"
     str.gsub(/l/, 'L')                  #=> "heLLo"
-    
+
     # Encoding operations
     say str.encode_utf8.bytes_len       # Length in bytes
 
@@ -247,7 +247,7 @@ Example:
 
     var m = ("hello world" =~ /w\w+/)
     m && say m[0]                      #=> "world"
-    
+
     "testing" =~ /(\w+)ing/ && say $1  #=> "test"
 
 Aliases: I<match>
@@ -531,6 +531,28 @@ Example:
     say "€".encode_utf8.bytes_len    #=> 3
 
 Aliases: I<bytes_length>
+
+=head2 bwt_encode
+
+    str.bwt_encode
+
+Applies the Burrows–Wheeler transform (BWT) to the invocant string and returns a pair consisting of the transformed string and the primary index.
+
+The primary index is required for decoding with C<bwt_decode>.
+
+    var (bwt, idx) = "banana".bwt_encode
+
+=cut
+
+=head2 bwt_decode
+
+    bwt.bwt_decode(idx)
+
+Reverses the Burrows–Wheeler transform and reconstructs the original string.
+
+This method takes a BWT-transformed string and its associated primary index (as returned by C<bwt_encode>) and reconstructs the original string using the standard LF-mapping technique.
+
+    var original = bwt.bwt_decode(idx)
 
 =cut
 

@@ -12,4 +12,11 @@ do {
     assert_eq(hash, hash2)
 }
 
+do {
+
+    assert_eq(bwt_decode(bwt_encode("abracadabra")), "abracadabra")
+    assert_eq(bwt_decode(bwt_encode("banana")), "banana")
+
+}
+
 say "** Tests passed!"

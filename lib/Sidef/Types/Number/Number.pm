@@ -15886,7 +15886,7 @@ package Sidef::Types::Number::Number {
         my $idx = -1;    # Index of the "lower" bound
 
         while ($low <= $high) {
-            my $mid = int(($low + $high) / 2);
+            my $mid = CORE::int(($low + $high) / 2);
 
             my $val = $primepi_lookup_keys->[$mid];
             my $cmp = $val <=> $n;
