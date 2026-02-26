@@ -1511,7 +1511,7 @@ package Sidef::Types::String::String {
         $LOOKAHEAD_LEN //= 128;
 
         my $len      = CORE::length($s);
-        my $double_s = $s . $s;          # Pre-compute doubled string
+        my $double_s = $s . $s;            # Pre-compute doubled string
 
         # Schwartzian transform with optimized sorting
         return [
@@ -1519,10 +1519,10 @@ package Sidef::Types::String::String {
             sort {
                 ($a->[0] cmp $b->[0])
                   || do {
-                    my ($cmp, $s_len);
-                    for (my $i = 1 ; ; ++$i) {
-                        $s_len = $LOOKAHEAD_LEN << $i;
+                    my ($cmp, $s_len) = (0, $LOOKAHEAD_LEN << 2);
+                    while (1) {
                         ($cmp = CORE::substr($double_s, $a->[1], $s_len) cmp CORE::substr($double_s, $b->[1], $s_len)) && last;
+                        $s_len <<= 1;
                     }
                     $cmp;
                 }

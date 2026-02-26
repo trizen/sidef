@@ -23796,68 +23796,64 @@ package Sidef::Types::Number::Number {
         my $dlp_bsgs = sub {
             my ($a, $g, $p, $n) = @_;
 
-            # Algorithm from Math::Prime::Util::PP
+            # Calculate m = ceil(sqrt(n))
+            state $m = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_sqrt($m, $n);
+            Math::GMPz::Rmpz_add_ui($m, $m, 1);
 
-            my $invg = Math::GMPz::Rmpz_init();
-            my $maxm = Math::GMPz::Rmpz_init();
+            my $limit = 4_000_000;
+            my $m_ui  = (Math::GMPz::Rmpz_cmp_ui($m, $limit) <= 0 ? Math::GMPz::Rmpz_get_ui($m) : $limit) << 1;
 
+            # Calculate inverse of g
+            state $invg = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_invert($invg, $g, $p) || return undef;
 
-            Math::GMPz::Rmpz_sqrt($maxm, $n);
-            Math::GMPz::Rmpz_add_ui($maxm, $maxm, 1);
+            state $gm            = Math::GMPz::Rmpz_init_nobless();
+            state $current_baby  = Math::GMPz::Rmpz_init_nobless();
+            state $current_giant = Math::GMPz::Rmpz_init_nobless();
 
-            my $b = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_add($b, $p, $maxm);
-            Math::GMPz::Rmpz_sub_ui($b, $b, 1);
-            Math::GMPz::Rmpz_div($b, $b, $maxm);
+            for (my $max_m = 1 ; $max_m <= $m_ui ; $max_m <<= 1) {    # TODO: improve this
 
-            # Limit for time and space.
-            $b    = (Math::GMPz::Rmpz_cmp_ui($b,    4_000_000) <= 0) ? Math::GMPz::Rmpz_get_ui($b) : 4_000_000;
-            $maxm = (Math::GMPz::Rmpz_cmp_ui($maxm, $b) > 0)         ? $b                          : Math::GMPz::Rmpz_get_ui($maxm);
+                my %baby_steps;
+                Math::GMPz::Rmpz_set_ui($current_baby, 1);
 
-            my %hash;
-            my $gm  = Math::GMPz::Rmpz_init();
-            my $am  = Math::GMPz::Rmpz_init_set_ui(1);
-            my $key = Math::GMPz::Rmpz_init_set($a);
+                # Phase 1: Baby Steps
+                # Calculate g^j mod p for 0 <= j < m
+                for my $j (0 .. $max_m - 1) {
 
-            Math::GMPz::Rmpz_powm_ui($gm, $invg, $maxm, $p);
+                    my $key = Math::GMPz::Rmpz_get_str($current_baby, 62);
 
-            foreach my $m (0 .. $b) {
+                    # Keep the smallest j for a given value to ensure minimal exponent
+                    $baby_steps{$key} = $j if not exists $baby_steps{$key};
 
-                # Baby Step
-                if ($m <= $maxm) {
-                    my $am_key = Math::GMPz::Rmpz_get_str($am, 10);
-                    if (exists($hash{$am_key})) {
-                        my $r = $hash{$am_key};
-                        my $t = Math::GMPz::Rmpz_init_set_ui($maxm);
-                        Math::GMPz::Rmpz_mul_ui($t, $t, $r);
-                        Math::GMPz::Rmpz_add_ui($t, $t, $m);
-                        Math::GMPz::Rmpz_mod($t, $t, $p);
-                        return $t;
-                    }
-                    $hash{$am_key} = $m;
-                    Math::GMPz::Rmpz_mul($am, $am, $g);
-                    Math::GMPz::Rmpz_mod($am, $am, $p);
-                    if ($am == $a) {
-                        return Math::GMPz::Rmpz_init_set_ui($m + 1);
-                    }
+                    Math::GMPz::Rmpz_mul($current_baby, $current_baby, $g);
+                    Math::GMPz::Rmpz_mod($current_baby, $current_baby, $p);
                 }
 
-                my $key_str = Math::GMPz::Rmpz_get_str($key, 10);
+                # Phase 2: Giant Steps setup
+                # Calculate gm = g^{-m} mod p
+                Math::GMPz::Rmpz_powm_ui($gm, $invg, $max_m, $p);
+                Math::GMPz::Rmpz_set($current_giant, $a);
 
-                # Giant Step
-                if (exists $hash{$key_str}) {
-                    my $r = $hash{$key_str};
-                    my $t = Math::GMPz::Rmpz_init_set_ui($maxm);
-                    Math::GMPz::Rmpz_mul_ui($t, $t, $m);
-                    Math::GMPz::Rmpz_add_ui($t, $t, $r);
-                    Math::GMPz::Rmpz_mod($t, $t, $p);
-                    return $t;
+                # Calculate a * (g^{-m})^i mod p for 0 <= i < m
+                for my $i (0 .. $max_m - 1) {
+                    my $key = Math::GMPz::Rmpz_get_str($current_giant, 62);
+
+                    if (exists $baby_steps{$key}) {
+                        my $j = $baby_steps{$key};
+
+                        # Result = i * m + j
+                        my $result = Math::GMPz::Rmpz_init_set_ui($i);
+                        Math::GMPz::Rmpz_mul_ui($result, $result, $max_m);
+                        Math::GMPz::Rmpz_add_ui($result, $result, $j);
+                        Math::GMPz::Rmpz_mod($result, $result, $n);
+
+                        return $result;
+                    }
+
+                    Math::GMPz::Rmpz_mul($current_giant, $current_giant, $gm);
+                    Math::GMPz::Rmpz_mod($current_giant, $current_giant, $p);
                 }
-
-                $hash{$key_str} = $m if ($m <= $maxm);
-                Math::GMPz::Rmpz_mul($key, $key, $gm);
-                Math::GMPz::Rmpz_mod($key, $key, $p);
             }
 
             return undef;
@@ -23866,8 +23862,6 @@ package Sidef::Types::Number::Number {
         sub znlog {
             my ($a, $g, $n) = @_;
             _valid(\$g, \$n);
-
-            # Algorithm from Math::Prime::Util::PP
 
             $a = _any2mpz($$a) // goto &nan;
             $g = _any2mpz($$g) // goto &nan;
