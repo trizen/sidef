@@ -23802,7 +23802,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_add_ui($m, $m, 1);
 
             my $limit = 4_000_000;
-            my $m_ui  = (Math::GMPz::Rmpz_cmp_ui($m, $limit) <= 0 ? Math::GMPz::Rmpz_get_ui($m) : $limit) << 1;
+            my $m_ui  = Math::GMPz::Rmpz_cmp_ui($m, $limit) <= 0 ? Math::GMPz::Rmpz_get_ui($m) : $limit;
 
             # Calculate inverse of g
             state $invg = Math::GMPz::Rmpz_init_nobless();
@@ -23812,7 +23812,7 @@ package Sidef::Types::Number::Number {
             state $current_baby  = Math::GMPz::Rmpz_init_nobless();
             state $current_giant = Math::GMPz::Rmpz_init_nobless();
 
-            for (my $max_m = 1 ; $max_m <= $m_ui ; $max_m <<= 1) {    # TODO: improve this
+            for (my $max_m = 1 ; ; $max_m <<= 1) {    # TODO: improve this
 
                 my %baby_steps;
                 Math::GMPz::Rmpz_set_ui($current_baby, 1);
@@ -23854,6 +23854,8 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_mul($current_giant, $current_giant, $gm);
                     Math::GMPz::Rmpz_mod($current_giant, $current_giant, $p);
                 }
+
+                last if $max_m >= $m_ui;
             }
 
             return undef;
