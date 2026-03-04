@@ -927,6 +927,7 @@ scripts/Tests/method_aliases.sf
 scripts/Tests/method_expressions.sf
 scripts/Tests/miller_rabin_primality_test.sf
 scripts/Tests/mod_class.sf
+scripts/Tests/modular_k-th_root_all_solutions_znlog.sf
 scripts/Tests/modular_quadratic_formula.sf
 scripts/Tests/Module/Bar.sm
 scripts/Tests/Module/Fact.sm
@@ -1131,6 +1132,7 @@ scripts/Tests/with_statement.sf
 scripts/Tests/word_processing.sf
 scripts/Tests/word_roots.sf
 scripts/Tests/word_wrap_enumerator.sf
+scripts/Tests/znlog.sf
 scripts/towers_of_hanoi.sf
 scripts/tree_traversal.sf
 scripts/unique_prefixes.sf
