@@ -2,12 +2,24 @@
 
 <div align="center">
 
+```
+            **   **         ****   *           *********   *********
+          * * ** * *        ****   **          ** ** **    ** ** **
+           **   **          ****   ***         *********   *  *  *
+  **        **        **    ****   *  *        ******      ******
+* * *     * * *     * * *   ****   ** **       ** **       ** **
+ **        **        **     ****   ******      ******      *  *
+       **   **              ****   *  *  *     *********   ***
+     * * ** * *             ****   ** ** **    ** ** **    **
+      **   **               ****   *********   *********   *
+```
+
 **A modern, high-level programming language for versatile general-purpose applications**
 
 [Website](https://github.com/trizen/sidef) • [Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) • [Documentation](https://trizen.gitbook.io/sidef-lang/) • [Try Online](https://tio.run/#sidef) • [Discussions](https://github.com/trizen/sidef/discussions)
 
 [![CPAN](https://img.shields.io/badge/CPAN-Sidef-blue)](https://metacpan.org/release/Sidef)
-[![Perl](https://img.shields.io/badge/Perl-5.16%2B-blue)](https://www.perl.org/)
+[![Perl](https://img.shields.io/badge/Perl-5.18%2B-blue)](https://www.perl.org/)
 [![License](https://img.shields.io/badge/License-Artistic%202.0-green.svg)](https://www.perlfoundation.org/artistic-license-20.html)
 
 </div>
@@ -20,10 +32,10 @@ Sidef is a modern, expressive programming language that combines the elegance of
 
 ```ruby
 # Exact rational arithmetic — no floating-point surprises
-say 1/3 + 1/6          #=> 1/2
+say (1/3 + 1/6)        #=> 1/2
 
 # Built-in number theory
-say 2**127 - 1          #=> 170141183460469231731687303715884105727 (Mersenne prime)
+say (2**127 - 1)        #=> 170141183460469231731687303715884105727 (Mersenne prime)
 say factor(2**64 - 1)   #=> [3, 5, 17, 257, 641, 65537, 6700417]
 
 # Expressive, concise syntax
@@ -54,7 +66,7 @@ say 71.primes           #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
 
 ### Prerequisites
 
-Sidef requires **Perl 5.16+** and the following C libraries:
+Sidef requires **Perl 5.18+** and the following C libraries:
 
 | Library | Purpose |
 |---------|---------|
@@ -114,11 +126,12 @@ Experiment with Sidef instantly at **[Try It Online](https://tio.run/#sidef)** w
 ### Variables and Types
 
 ```ruby
-var name   = "Sidef"       # String
-var n      = 42            # Number (exact integer)
-var ratio  = 3/7           # Rational (exact)
-var arr    = [1, 2, 3]     # Array
-var h      = {a: 1, b: 2}  # Hash
+var name   = "Sidef"               # String
+var num    = 42                    # Number (exact integer)
+var ratio  = 3/7                   # Rational (exact)
+var arr    = [1, 2, 3]             # Array
+var hash   = Hash(a => 1, b => 2)  # Hash
+var block  = {|n| n.is_prime }     # Block
 ```
 
 ### Functions and Pattern Matching
@@ -209,11 +222,11 @@ sidef [options] [script.sf] [script-arguments]
 
 **Examples:**
 ```bash
-sidef -E 'say 10.of { |i| i**2 }'          # one-liner
+sidef -E 'say 10.of { |i| i**2 }'            # one-liner
 sidef -i                                     # start REPL
 sidef -C script.sf                           # syntax check
-sidef -c -o output.pl script.sf             # compile to Perl
-sidef -P 400 -E 'say sqrt(2)'               # 400-bit precision
+sidef -c -o output.pl script.sf              # compile to Perl
+sidef -P 400 -E 'say sqrt(2)'                # 400-bit precision
 sidef -O1 script.sf                          # with optimization
 sidef -r script.sf                           # deparse to Sidef
 sidef -t tests/*.sf                          # run test files
@@ -227,14 +240,13 @@ Start the REPL with `sidef -i`:
 $ sidef -i
 sidef> say "Hello!"
 Hello!
-sidef> var x = 2**64
-sidef> say x
+sidef> x = 2**64
 18446744073709551616
-sidef> say x.is_prime
+sidef> x.is_prime
 false
-sidef> say 2**127 - 1 |> is_prime
+sidef> is_prime(2**127 - 1)
 true
-sidef> say [1..10].map { .square }.sum
+sidef> [1..10].map { .square }.sum
 385
 sidef> quit
 ```
@@ -270,24 +282,24 @@ Rectangle(4, 6).describe  #=> I am a Rectangle with area 24
 
 ```ruby
 # FizzBuzz in one line
-say 1..20 -> map { |n|
-    n%%15 ? "FizzBuzz" : n%%3 ? "Fizz" : n%%5 ? "Buzz" : n
-}
+say (1..20 -> map { |n|
+    n%%15 ? "FizzBuzz" : (n%%3 ? "Fizz" : (n%%5 ? "Buzz" : n))
+})
 
 # Pipeline style
-[1..50].grep { .is_prime }
-       .map  { .square }
-       .first(5)
+(1..50).grep { .is_prime } \
+       .map  { .square } \
+       .first(5) \
        .say    #=> [4, 9, 25, 49, 121]
 ```
 
 ### Number Theory One-Liners
 
 ```ruby
-say 100.of { .is_prime }.grep { _ }  # truthy entries from [0.is_prime, 1.is_prime, ..., 99.is_prime]
+say 100.by { .is_prime }              # first 100 primes
 say sum(1..100)                       #=> 5050
 say prod(1..10)                       #=> 3628800  (10!)
-say 1..10 -> map { euler_phi(_) }    #=> [1, 1, 2, 2, 4, 2, 6, 4, 6, 4]
+say { .euler_phi }.map(1..10)         #=> [1, 1, 2, 2, 4, 2, 6, 4, 6, 4]
 ```
 
 ### The Y Combinator
