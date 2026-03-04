@@ -19,70 +19,88 @@
 [Website](https://github.com/trizen/sidef) • [Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) • [Documentation](https://trizen.gitbook.io/sidef-lang/) • [Try Online](https://tio.run/#sidef) • [Discussions](https://github.com/trizen/sidef/discussions)
 
 [![CPAN](https://img.shields.io/badge/CPAN-Sidef-blue)](https://metacpan.org/release/Sidef)
+[![Perl](https://img.shields.io/badge/Perl-5.18%2B-blue)](https://www.perl.org/)
 [![License](https://img.shields.io/badge/License-Artistic%202.0-green.svg)](https://www.perlfoundation.org/artistic-license-20.html)
 
 </div>
 
 ---
 
-## 🌟 Overview
+## 🌟 Why Sidef?
 
-Sidef is a modern, expressive programming language that combines the elegance of Ruby, the versatility of Raku, and the mathematical capabilities of Julia. Designed for both beginners and advanced programmers, Sidef offers a rich feature set for diverse programming paradigms.
+Sidef is a modern, expressive programming language that combines the elegance of Ruby, the versatility of Raku, and the mathematical power of a built-in computer algebra system. It features **exact rational arithmetic by default**, an extensive **number theory library** (1,000+ functions), and seamless **Perl module integration** — making it equally at home for scripting, mathematical research, and general-purpose programming.
+
+```ruby
+# Exact rational arithmetic — no floating-point surprises
+say (1/3 + 1/6)        #=> 1/2
+
+# Built-in number theory
+say (2**127 - 1)        #=> 170141183460469231731687303715884105727 (Mersenne prime)
+say factor(2**64 - 1)   #=> [3, 5, 17, 257, 641, 65537, 6700417]
+
+# Expressive, concise syntax
+say 71.primes           #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71]
+```
 
 ## ✨ Key Features
 
-<table>
-<tr>
-<td>
-
 **Programming Paradigms**
-- Object-oriented programming
-- Functional programming
-- Functional pattern matching
-- Multiple dispatch
-
-</td>
-<td>
-
-**Language Features**
-- Optional lazy evaluation
-- Lexical scoping & closures
-- Keyword arguments
-- Regular expressions
-
-</td>
-</tr>
-<tr>
-<td>
-
-**Integration & Performance**
-- Seamless Perl module integration
-- Optional dynamic type checking
-- Efficient execution model
-
-</td>
-<td>
+- Object-oriented programming with multiple dispatch
+- Functional programming and pattern matching
+- Lexical scoping and closures
+- Keyword arguments and optional lazy evaluation
 
 **Numeric Computing**
-- Big integers
-- Rational numbers
-- Arbitrary precision floats
-- Complex numbers
+- Exact rational numbers by default
+- Arbitrary-precision integers, floats, and complex numbers
+- 1,000+ built-in number theory functions (backed by GMP, MPFR, MPC)
+- Gaussian integers, quaternions, matrices, polynomials
 
-</td>
-</tr>
-</table>
+**Language & Integration**
+- Regular expressions and string interpolation
+- Optional dynamic type checking
+- Seamless Perl module integration
+- REPL with interactive help (`-H` flag)
 
 ## 🚀 Quick Start
 
-### Installation
+### Prerequisites
 
-**Via CPAN:**
+Sidef requires **Perl 5.18+** and the following C libraries:
+
+| Library | Purpose |
+|---------|---------|
+| [GMP](https://gmplib.org/) | Big integers and rationals |
+| [MPFR](https://www.mpfr.org/) | Arbitrary-precision floats |
+| [MPC](https://www.multiprecision.org/mpc/) | Arbitrary-precision complex numbers |
+
+**Debian/Ubuntu:**
 ```bash
-cpan Sidef
+sudo apt-get install libgmp-dev libmpfr-dev libmpc-dev
 ```
 
-**Platform-specific:**
+**Arch Linux:**
+```bash
+sudo pacman -S gmp mpfr libmpc
+```
+
+### Installation
+
+**Via CPAN (recommended):**
+```bash
+cpan -T Sidef
+```
+
+**Build from source:**
+```bash
+git clone https://github.com/trizen/sidef.git
+cd sidef
+perl Build.PL
+./Build
+./Build install
+```
+
+**Platform packages:**
 - **Arch Linux**: [AUR package](https://aur.archlinux.org/packages/sidef/)
 - **Slackware**: [SlackBuilds](https://slackbuilds.org/repository/15.0/perl/perl-Sidef/)
 - **Other systems**: See [pkgs.org](https://pkgs.org/download/perl-Sidef)
@@ -93,28 +111,197 @@ cpan Sidef
 say "Hello, World!"
 ```
 
+```bash
+sidef hello.sf        # run a script
+sidef -E 'say "Hello, World!"'   # one-liner
+sidef -i              # start the REPL
+```
+
 ### Try It Online
 
 Experiment with Sidef instantly at **[Try It Online](https://tio.run/#sidef)** without any installation.
 
-## 📚 Documentation & Learning Resources
+## 🔤 Language at a Glance
 
-### Tutorials
-- **[Beginner's Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf)) - Start your Sidef journey
-- **[Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-number-theory.pdf)) - Mathematical programming with Sidef
+### Variables and Types
 
-### Reference Materials
-- **[Sidef GitBook](https://trizen.gitbook.io/sidef-lang/)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-book.pdf)) - Comprehensive language guide
-- **[RosettaCode Examples](https://rosettacode.org/wiki/Sidef)** - Practical code examples
+```ruby
+var name   = "Sidef"               # String
+var num    = 42                    # Number (exact integer)
+var ratio  = 3/7                   # Rational (exact)
+var arr    = [1, 2, 3]             # Array
+var hash   = Hash(a => 1, b => 2)  # Hash
+var block  = {|n| n.is_prime }     # Block
+```
 
-## 💬 Community & Support
+### Functions and Pattern Matching
 
-Have questions or need help? Join the conversation:
+```ruby
+func greet(name) { "Hello, #{name}!" }
+say greet("world")    #=> Hello, world!
 
-- **[Discussion Forum](https://github.com/trizen/sidef/discussions/categories/q-a)** - Q&A and community discussions
-- **[GitHub Issues](https://github.com/trizen/sidef/issues)** - Bug reports and feature requests
+# Multi-dispatch / pattern matching
+func fib(0) { 0 }
+func fib(1) { 1 }
+func fib(n) { fib(n-1) + fib(n-2) }
+
+say fib(10)    #=> 55
+```
+
+### Object-Oriented Programming
+
+```ruby
+class Animal(name, sound) {
+    method speak { say "#{name} says #{sound}!" }
+}
+
+class Dog(name) < Animal(name, "woof") {
+    method fetch { say "#{name} fetches the ball!" }
+}
+
+var d = Dog("Rex")
+d.speak    #=> Rex says woof!
+d.fetch    #=> Rex fetches the ball!
+```
+
+### Functional Programming
+
+```ruby
+var nums = 1..10   # Range object
+
+# Map, filter, reduce
+var evens   = nums.grep { .is_even }              #=> [2, 4, 6, 8, 10]
+var squares = nums.map  { |n| n**2 }              #=> [1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+var total   = nums.reduce { |a, b| a + b }        #=> 55
+
+say evens
+say squares
+say total
+```
+
+### Number Theory
+
+```ruby
+say primes(50, 100)          # array of primes in range [50, 100]
+say prrime_count(10**9)      # number of primes up to 10^9
+say prime(100)               # 100th prime => 541
+say 12.divisors              # [1, 2, 3, 4, 6, 12]
+say euler_phi(100)           # Euler's totient => 40
+say gcd(48, 18)              # => 6
+say is_prime(2**521 - 1)     # Mersenne prime check => true
+```
+
+### Lazy Evaluation
+
+```ruby
+# Infinite lazy list of primes
+var lazy_primes = (2..Inf -> lazy.grep { .is_prime })
+say lazy_primes.first(10)    #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+```
+
+## ⌨️ Command-Line Reference
+
+```
+sidef [options] [script.sf] [script-arguments]
+```
+
+| Flag | Description |
+|------|-------------|
+| `-E 'code'` | Execute a one-line program |
+| `-e 'code'` | Alias for `-E` |
+| `-i [file]` | Start the interactive REPL (optionally loading a file) |
+| `-c` | Compile script to a stand-alone Perl program |
+| `-C` | Check syntax only (parse without execution) |
+| `-r` | Deparse program back to Sidef code |
+| `-R lang` | Deparse to another language (`perl`, `sidef`) |
+| `-P int` | Set floating-point precision in bits (default: 192) |
+| `-O level` | Optimization level: `0` (none), `1` (recommended), `2` (max) |
+| `-s` | Enable precompilation (cache compiled code) |
+| `-t` | Test mode: treat all arguments as script files |
+| `-D` | Dump the Abstract Syntax Tree (AST) |
+| `-H` | Interactive help mode for exploring documentation |
+
+**Examples:**
+```bash
+sidef -E 'say 10.of { |i| i**2 }'            # one-liner
+sidef -i                                     # start REPL
+sidef -C script.sf                           # syntax check
+sidef -c -o output.pl script.sf              # compile to Perl
+sidef -P 400 -E 'say sqrt(2)'                # 400-bit precision
+sidef -O1 script.sf                          # with optimization
+sidef -r script.sf                           # deparse to Sidef
+sidef -t tests/*.sf                          # run test files
+```
+
+## 🖥️ Interactive Mode (REPL)
+
+Start the REPL with `sidef -i`:
+
+```
+$ sidef -i
+sidef> say "Hello!"
+Hello!
+sidef> x = 2**64
+18446744073709551616
+sidef> x.is_prime
+false
+sidef> is_prime(2**127 - 1)
+true
+sidef> 1..10 -> map { .square }.sum
+385
+sidef> quit
+```
+
+Use `-H` to open interactive documentation help:
+```bash
+sidef -H
+```
 
 ## 🎯 Code Examples
+
+### Classes and Inheritance
+
+```ruby
+class Shape {
+    method area { die "Not implemented" }
+    method describe { say "I am a #{self.class} with area #{self.area}" }
+}
+
+class Circle(r) < Shape {
+    method area { Num.pi * r**2 }
+}
+
+class Rectangle(w, h) < Shape {
+    method area { w * h }
+}
+
+Circle(5).describe        #=> I am a Circle with area 78.539...
+Rectangle(4, 6).describe  #=> I am a Rectangle with area 24
+```
+
+### Functional Array Processing
+
+```ruby
+# FizzBuzz in one line
+say (1..20 -> map { |n|
+    n%%15 ? "FizzBuzz" : (n%%3 ? "Fizz" : (n%%5 ? "Buzz" : n))
+})
+
+# Pipeline style
+(1..50).grep { .is_prime } \
+       .map  { .square } \
+       .first(5) \
+       .say    #=> [4, 9, 25, 49, 121]
+```
+
+### Number Theory One-Liners
+
+```ruby
+say 100.by { .is_prime }              # first 100 primes
+say sum(1..100)                       #=> 5050
+say prod(1..10)                       #=> 3628800  (10!)
+say { .euler_phi }.map(1..10)         #=> [1, 1, 2, 2, 4, 2, 6, 4, 6, 4]
+```
 
 ### The Y Combinator
 
@@ -243,11 +430,23 @@ for y in (1 `downto` -1 `by` 0.05) {
 
 Explore an extensive collection of Sidef programs at **[github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)**
 
-## 🖥️ Interactive Mode
+## 📚 Documentation & Learning Resources
 
-Sidef includes a REPL (Read-Eval-Print Loop) for interactive programming:
+| Resource | Description |
+|----------|-------------|
+| **[Beginner's Guide](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_BEGINNER_GUIDE.md)** | Start here if you're new to Sidef |
+| **[Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf)) | Comprehensive language tutorial |
+| **[Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-number-theory.pdf)) | Mathematical programming with Sidef |
+| **[Number Theory Reference](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_REFERENCE.md)** | Complete function reference for number theory |
+| **[Sidef GitBook](https://trizen.gitbook.io/sidef-lang/)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-book.pdf)) | Full language guide |
+| **[RosettaCode Examples](https://rosettacode.org/wiki/Sidef)** | Practical code examples across many tasks |
 
-![Sidef Interactive Mode](https://user-images.githubusercontent.com/614513/39590990-123bd3ea-4f0b-11e8-9717-abc0ec48622e.png)
+## 💬 Community & Support
+
+Have questions or need help? Join the conversation:
+
+- **[Discussion Forum](https://github.com/trizen/sidef/discussions/categories/q-a)** - Q&A and community discussions
+- **[GitHub Issues](https://github.com/trizen/sidef/issues)** - Bug reports and feature requests
 
 ## 📦 Distribution Availability
 
@@ -260,13 +459,12 @@ Sidef includes a REPL (Read-Eval-Print Loop) for interactive programming:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Whether it's:
-- Reporting bugs
-- Suggesting new features
-- Improving documentation
-- Submitting pull requests
+Contributions of all kinds are welcome — bug reports, feature suggestions, documentation improvements, and pull requests. Please read **[CONTRIBUTING.md](CONTRIBUTING.md)** for guidelines on:
 
-Please visit the [GitHub repository](https://github.com/trizen/sidef) to get involved.
+- Reporting bugs and suggesting features
+- Setting up a development environment
+- Code style and commit message conventions
+- The pull request review process
 
 ## 📄 License and Copyright
 
@@ -275,16 +473,6 @@ Please visit the [GitHub repository](https://github.com/trizen/sidef) to get inv
 This program is free software; you can redistribute it and/or modify it under the terms of the **Artistic License (2.0)**.
 
 **Full license**: [perlfoundation.org/artistic-license-20.html](https://www.perlfoundation.org/artistic-license-20.html)
-
-### Key License Points
-
-- Use, modification, and distribution governed by the Artistic License
-- Modified versions must comply with license requirements
-- No trademark or logo usage rights granted
-- Includes patent license for necessary claims
-- Patent litigation terminates license
-
-**Warranty Disclaimer**: THE PACKAGE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND. See full license for details.
 
 ---
 
