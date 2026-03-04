@@ -10,19 +10,7 @@ This document describes Sidef version 26.01 and later.
 
 =head1 DESCRIPTION
 
-Sidef is a modern, expressive programming language that elegantly blends object-oriented and functional programming paradigms. Drawing inspiration from Ruby, Raku, and Go, Sidef provides a powerful and flexible environment for both scripting and complex application development.
-
-
-                **   **         ****   *           *********   *********
-              * * ** * *        ****   **          ** ** **    ** ** **
-               **   **          ****   ***         *********   *  *  *
-      **        **        **    ****   *  *        ******      ******
-    * * *     * * *     * * *   ****   ** **       ** **       ** **
-     **        **        **     ****   ******      ******      *  *
-           **   **              ****   *  *  *     *********   ***
-         * * ** * *             ****   ** ** **    ** ** **    **
-          **   **               ****   *********   *********   *
-
+Sidef is a modern, expressive programming language that elegantly blends object-oriented and functional programming paradigms. Drawing inspiration from Ruby, Raku, Go, and Julia, Sidef provides a powerful and flexible environment for both scripting and complex application development.
 
 =head2 Key Features
 
@@ -61,6 +49,66 @@ Intelligent compilation caching with DBM backend for faster repeated execution a
 Clear syntax, expressive constructs, and helpful error messages with suggestions make development productive and enjoyable.
 
 =back
+
+=head1 INSTALLATION
+
+=head2 Prerequisites
+
+Sidef requires the following C libraries to be installed before the Perl modules:
+
+=over 4
+
+=item * B<GMP> - GNU Multiple Precision Arithmetic Library (L<https://gmplib.org/>)
+
+=item * B<MPFR> - Multiple Precision Floating-Point Reliable Library (L<http://www.mpfr.org/>)
+
+=item * B<MPC> - Multiple Precision Complex Library (L<http://www.multiprecision.org/>)
+
+=back
+
+=head2 Platform-Specific Instructions
+
+=head3 Debian / Ubuntu / Linux Mint
+
+    sudo apt install libgmp-dev libmpfr-dev libmpc-dev libc-dev cpanminus
+    cpanm --sudo -n Sidef
+
+=head3 Arch Linux
+
+    trizen -S sidef
+
+=head3 Windows
+
+Download the portable 32-bit executable from the GitHub releases page:
+
+L<https://github.com/trizen/sidef/releases/download/26.01/sidef-26.01.exe.zip>
+
+=head3 Android (Termux)
+
+    pkg install perl make clang libgmp libmpfr libmpc
+    cpan -T Sidef
+
+=head3 From CPAN (any platform with prerequisites installed)
+
+    cpan Sidef
+    # or (skip tests for faster install):
+    cpan -T Sidef
+    # or with cpanminus:
+    cpanm Sidef
+
+=head3 From Source
+
+    wget 'https://github.com/trizen/sidef/archive/master.zip' -O master.zip
+    unzip master.zip
+    cd sidef-master
+    perl Build.PL
+    sudo ./Build installdeps
+    sudo ./Build install
+
+=head2 Verification
+
+    sidef -v    # print version
+    sidef -e 'say "Hello, World!"'
 
 =head1 SYNOPSIS
 
@@ -164,6 +212,49 @@ Execute pre-compiled Perl code directly:
         warn "Sidef error: $@";
         # Error messages include helpful suggestions for typos
     }
+
+=head1 COMMAND-LINE USAGE
+
+The C<sidef> command-line tool is the primary way to run Sidef programs. Run C<perldoc sidef> for full option details.
+
+=head2 Running a Script
+
+    sidef script.sf
+
+By convention, Sidef scripts use the C<.sf> file extension.
+
+=head2 One-Liners
+
+    sidef -e 'say "Hello, World!"'
+    sidef -E '10.of { |i| say i**2 }'
+
+Both C<-e> and C<-E> accept a code string and execute it directly.
+
+=head2 Interactive REPL
+
+Start the REPL by running C<sidef> with no arguments (or C<sidef -i>):
+
+    $ sidef
+    Sidef 26.01, running on Linux, using Perl v5.42.0.
+    Type "help", "copyright" or "license" for more information.
+    > say "Hello!"
+    Hello!
+
+Special REPL commands: C<reset>, C<quit>/C<exit>/C<q>, C<# load file.sf>, C<# save file.sf>.
+
+=head2 Compiling to Perl
+
+    sidef -c -o output.pl script.sf   # compile to standalone Perl script
+    sidef -Rperl script.sf            # print generated Perl code and exit
+
+=head2 Optimization
+
+    sidef -O1 script.sf    # standard optimization
+    sidef -O2 script.sf    # aggressive optimization
+
+=head2 Try It Online
+
+Experiment with Sidef in your browser at L<https://tio.run/#sidef>.
 
 =head1 CONSTRUCTOR
 
@@ -539,13 +630,13 @@ B<Use Case:> Store user preferences, cached data, or custom modules.
 
 Returns the version-specific subdirectory within the Sidef config directory. This directory is used for version-specific cached compiled code.
 
-B<Returns:> A string containing the path to the version-specific directory (e.g., C<~/.config/sidef/v25.12>).
+B<Returns:> A string containing the path to the version-specific directory (e.g., C<~/.config/sidef/v26.01>).
 
 B<Example:>
 
     my $vdir = $sidef->get_sidef_vdir();
     print "Version directory: $vdir\n";
-    # Output: Version directory: /home/user/.config/sidef/v25.12
+    # Output: Version directory: /home/user/.config/sidef/v26.01
 
 B<Use Case:> Allows different Sidef versions to maintain separate caches without conflicts.
 
@@ -591,108 +682,13 @@ B<Note:> A warning is issued if no driver is found, suggesting installation of D
 
     my $cached_code = $sidef->dbm_lookup($backend, $md5_hash);
 
-Low-level method to retrieve compiled code from the DBM cache.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<$backend>
-
-The compilation backend (C<'Perl'> or C<'Sidef'>).
-
-=item * C<$md5_hash>
-
-MD5 hash of the source code (used as cache key).
-
-=back
-
-B<Returns:>
-
-=over 4
-
-=item * The cached compiled code as a string if found
-
-=item * C<undef> if not found or cache is unavailable
-
-=back
-
-B<Cache Management:>
-
-=over 4
-
-=item * Updates the access timestamp if the entry hasn't been accessed for 5 hours
-
-=item * Decompresses the stored code using RawInflate
-
-=item * Decodes from UTF-8
-
-=back
-
-B<Example:>
-
-    use Digest::MD5 qw(md5_hex);
-    use Encode qw(encode_utf8);
-
-    my $code = 'say "test"';
-    my $md5 = md5_hex(encode_utf8($code));
-
-    if (my $cached = $sidef->dbm_lookup('Perl', $md5)) {
-        print "Found cached code!\n";
-    }
-
-B<Note:> This is typically used internally by C<compile_code()>. Direct use is rare.
+B<Internal.> Retrieves compiled code from the DBM cache by backend (C<'Perl'> or C<'Sidef'>) and MD5 hash of the source. Returns the decompressed code string, or C<undef> if not found. Updates the access timestamp if older than 5 hours. Used internally by C<compile_code()>.
 
 =head2 dbm_store
 
     $sidef->dbm_store($backend, $md5_hash, $code);
 
-Low-level method to store compiled code in the DBM cache.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<$backend>
-
-The compilation backend (C<'Perl'> or C<'Sidef'>).
-
-=item * C<$md5_hash>
-
-MD5 hash of the source code (used as cache key).
-
-=item * C<$code>
-
-The compiled code string to store.
-
-=back
-
-B<Storage Process:>
-
-=over 4
-
-=item * Compresses the code using RawDeflate
-
-=item * Stores with current timestamp
-
-=item * Periodically sanitizes old entries (every 3 days)
-
-=item * Removes entries not accessed for 2+ days during sanitization
-
-=back
-
-B<Example:>
-
-    use Digest::MD5 qw(md5_hex);
-    use Encode qw(encode_utf8);
-
-    my $code = 'say "test"';
-    my $compiled = $sidef->compile_ast($ast, 'Perl');
-    my $md5 = md5_hex(encode_utf8($code));
-
-    $sidef->dbm_store('Perl', $md5, encode_utf8($compiled));
-
-B<Note:> This is typically used internally by C<compile_code()>. Direct use is rare.
+B<Internal.> Stores compiled code in the DBM cache, compressed with RawDeflate. Periodically removes entries not accessed for 2+ days. Used internally by C<compile_code()>.
 
 =head1 CLASS METHODS
 
@@ -704,13 +700,13 @@ Returns the Sidef version as a Sidef C<String> object.
 
 B<Parameters:> None.
 
-B<Returns:> A C<Sidef::Types::String::String> object representing the version (e.g., C<'v25.12'>).
+B<Returns:> A C<Sidef::Types::String::String> object representing the version (e.g., C<'v26.01'>).
 
 B<Example:>
 
     my $v = Sidef->version;
     say "Running Sidef version: $v";
-    # Output: Running Sidef version: v25.12
+    # Output: Running Sidef version: v26.01
 
 B<Note:> Can be called as either a class method (C<Sidef-E<gt>version>) or an instance method (C<$sidef-E<gt>version>).
 
@@ -733,163 +729,119 @@ B<Example:>
 
 B<Note:> Can be called as either a class method (C<Sidef-E<gt>numeric_version>) or an instance method (C<$sidef-E<gt>numeric_version>).
 
-=head1 PACKAGE UTILITY FUNCTIONS
+=head1 INTERNAL UTILITY FUNCTIONS
 
-These functions are available in the C<Sidef> package namespace but are primarily used internally.
+These functions are in the C<Sidef> package namespace but are intended for internal use.
 
 =head2 normalize_type
 
     my $short_name = Sidef::normalize_type($full_type);
 
-Converts a full Perl package name to a short, readable type name.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<$full_type>
-
-A full package name (e.g., C<'Sidef::Types::Number::Number'>).
-
-=back
-
-B<Returns:> The short type name (e.g., C<'Number'>).
-
-B<Example:>
-
-    my $type = Sidef::normalize_type('Sidef::Types::String::String');
-    print $type;  # String
+Converts a full Perl package name to a short type name (e.g. C<'Sidef::Types::Number::Number'> → C<'Number'>).
 
 =head2 normalize_method
 
-    my $short_signature = Sidef::normalize_method($full_method);
+    my $short_sig = Sidef::normalize_method($full_method);
 
-Converts a full method signature to a short, readable format.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<$full_method>
-
-A full method name (e.g., C<'Sidef::Types::Array::Array::length'>).
-
-=back
-
-B<Returns:> The short signature (e.g., C<'Array#length'>).
-
-B<Example:>
-
-    my $sig = Sidef::normalize_method('Sidef::Types::Hash::Hash::keys');
-    print $sig;  # Hash#keys
+Converts a full method name to a short signature (e.g. C<'Sidef::Types::Array::Array::length'> → C<'Array#length'>).
 
 =head2 jaro
 
     my $similarity = Sidef::jaro($string1, $string2);
 
-Calculates the Jaro similarity between two strings. Used internally for suggesting method names on typos.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<$string1>, C<$string2>
-
-Two strings to compare.
-
-=back
-
-B<Returns:> A number between 0 and 1, where 1 means identical strings.
-
-B<Example:>
-
-    my $sim = Sidef::jaro('hello', 'hallo');
-    print $sim;  # 0.933333333333333
+Computes the Jaro similarity between two strings (0–1). Used internally for method-name suggestions.
 
 =head2 jaro_winkler
 
     my $similarity = Sidef::jaro_winkler($string1, $string2);
 
-Calculates the Jaro-Winkler similarity, which gives more weight to strings with matching prefixes. Used for better suggestions on method name typos.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<$string1>, C<$string2>
-
-Two strings to compare.
-
-=back
-
-B<Returns:> A number between 0 and 1, where 1 means identical strings.
-
-B<Example:>
-
-    my $sim = Sidef::jaro_winkler('hello', 'hallo');
-    print $sim;  # 0.96 (higher than plain Jaro)
+Computes the Jaro-Winkler similarity, giving extra weight to matching prefixes. Used internally for "Did you mean?" suggestions.
 
 =head2 best_matches
 
-    my @suggestions = Sidef::best_matches($name, \@candidate_list);
+    my @suggestions = Sidef::best_matches($name, \@candidates);
 
-Finds the best matching strings from a candidate list for a given name. Returns matches with Jaro-Winkler similarity E<gt>= 0.8.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<$name>
-
-The string to match (e.g., a mistyped method name).
-
-=item * C<\@candidate_list>
-
-Array reference containing possible correct names.
-
-=back
-
-B<Returns:> A list of the best matching candidates, sorted by similarity.
-
-B<Example:>
-
-    my @methods = qw(push pop shift unshift length each map);
-    my @matches = Sidef::best_matches('posh', \@methods);
-    print join(', ', @matches);  # push, pop
-
-B<Use Case:> Powers the "Did you mean?" suggestions in error messages.
+Returns candidates from C<@candidates> with Jaro-Winkler similarity ≥ 0.8 against C<$name>, sorted by similarity. Powers the "Did you mean?" hints in error messages.
 
 =head1 LANGUAGE OVERVIEW
 
-Sidef is designed to be expressive and intuitive. Here's a quick taste of the language syntax:
+Sidef is designed to be expressive and intuitive. Here is a tour of its key features:
 
 =head2 Variables and Types
 
-    var name = "Alice"          # String
-    var age = 30                # Integer
-    var pi = 3.14159f           # Float
-    var ratio = 22/7            # Rational (exact fraction)
+    var name  = "Alice"          # String
+    var age   = 30               # Integer
+    var pi    = 3.14159f         # Float
+    var ratio = 22/7             # Rational (exact fraction)
     var items = [1, 2, 3, 4]    # Array
-    var person = Hash(          # Hash
+    var person = Hash(           # Hash
         name => "Bob",
-        age => 25,
+        age  => 25,
     )
+
+=head2 Control Flow
+
+    # if / elsif / else
+    if (age < 13) {
+        say "Child"
+    }
+    elsif (age < 20) {
+        say "Teenager"
+    }
+    else {
+        say "Adult"
+    }
+
+    # Ternary operator
+    var label = (age >= 18 ? "Adult" : "Minor")
+
+    # given / when (pattern matching)
+    given (age) {
+        when (13) { say "Thirteen" }
+        when (/^\d+$/) { say "Some number" }
+        else { say "Something else" }
+    }
+
+    # for loop
+    for i in (1..5) { say i }
+
+    # while loop
+    var n = 0
+    while (n < 5) { say n; n++ }
 
 =head2 Functions
 
-    # Function definition
-    func greet(name) {
-        say "Hello, #{name}!"
-    }
-
-    # Function with multiple parameters and default values
+    # Named function with optional default
     func power(base, exp=2) {
         base ** exp
     }
 
-    # Lambda expressions
+    # Lambda / anonymous function
     var square = { |n| n * n }
-    say square(5)  # 25
+    say square(5)    # 25
+
+    # Arrow-style lambda
+    var double = ->(n) { n * 2 }
+
+=head2 Error Handling
+
+    try {
+        die "Something went wrong!" if (condition)
+    }
+    catch { |msg|
+        say "Caught: #{msg}"
+    }
+
+=head2 Closures
+
+    func make_counter(start = 0) {
+        var count = start
+        func { ++count }
+    }
+
+    var counter = make_counter(10)
+    say counter()    # 11
+    say counter()    # 12
 
 =head2 Object-Oriented Programming
 
@@ -900,39 +852,103 @@ Sidef is designed to be expressive and intuitive. Here's a quick taste of the la
     }
 
     var alice = Person(name: "Alice", age: 30)
-    alice.greet()
+    alice.greet
 
 =head2 Functional Programming
 
-    # Map, filter, reduce
     var numbers = [1..10]
-    var squares = numbers.map { |n| n**2 }
-    var evens = numbers.grep { |n| n.is_even }
-    var sum = numbers.reduce { |a, b| a + b }
+    var squares = numbers.map  { |n| n**2 }
+    var evens   = numbers.grep { |n| n.is_even }
+    var total   = numbers.reduce { |a, b| a + b }
 
-    # Pattern matching
-    func factorial(n) {
-        case (n) {
-            when (0) { 1 }
-            when (1) { 1 }
-            else     { n * factorial(n-1) }
+=head2 Multiple Dispatch and Pattern Matching
+
+    # Multiple dispatch on type
+    func process(String s) { say "String: #{s}" }
+    func process(Number n) { say "Number: #{n}" }
+
+    process("hi")    # String: hi
+    process(42)      # Number: 42
+
+    # Pattern matching on value
+    func fib ((0)) { 0 }
+    func fib ((1)) { 1 }
+    func fib  (n)  { fib(n-1) + fib(n-2) }
+
+=head2 Method Caching
+
+    func fib(n) is cached {
+        n <= 1 ? n : fib(n-1) + fib(n-2)
+    }
+    say fib(50)    # fast — results are memoized automatically
+
+=head2 Lazy Evaluation and gather/take
+
+    # Lazy infinite sequence
+    var first_primes = (^Inf -> lazy).grep{.is_prime}.first(10)
+    say first_primes    # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+
+    # gather / take
+    var primes_under_20 = gather {
+        for i in (1..20) {
+            take(i) if i.is_prime
         }
     }
+    say primes_under_20    # [2, 3, 5, 7, 11, 13, 17, 19]
 
-=head2 Advanced Features
+    # Enumerator (lazy infinite iterator)
+    var primes = Enumerator({ |yield|
+        for n in (2..Inf) { yield(n) if n.is_prime }
+    })
+    say primes.first(5)    # [2, 3, 5, 7, 11]
 
-    # Multiple dispatch
-    func process(Number n) { n * 2 }
-    func process(String s) { s.uc }
+=head2 Regular Expressions
 
-    # Lazy evaluation
-    var infinite = (1..Inf -> lazy)
-    var first_even_ten = infinite.grep{.is_even}.first(10)
-
-    # Regular expressions
     if ("hello@example.com" ~~ /^\w+@\w+\.\w+$/) {
         say "Valid email!"
     }
+
+    var text = "I have a cat and a dog"
+    while (var m = text.match(/\ba\h+(\w+)/g)) {
+        say m[0]    # cat, dog
+    }
+
+=head2 Ranges, Sets, and Bags
+
+    var r = 1..10              # Range (inclusive)
+    say r.sum                  # 55
+
+    var s = Set(1, 2, 3, 2)   # Set — unique elements
+    say s                      # {1, 2, 3}
+
+    var b = Bag(1, 2, 2, 3)   # Bag — counted multiset
+    say b.count(2)             # 2
+
+=head2 Structs, Subsets, and Enumerations
+
+    # Struct
+    struct Point { Number x, Number y }
+    var p = Point(x: 3, y: 4)
+    say p.x    # 3
+
+    # Subset (refined type)
+    subset Positive < Number { |n| n.is_pos }
+    func sqrt_pos(Positive n) { n.sqrt }
+
+    # Enumeration
+    enum { Red, Green, Blue }    # Red=0, Green=1, Blue=2
+    say Green                    # 1
+
+=head2 Perl Module Integration
+
+    # Object-oriented module
+    var http = require('HTTP::Tiny').new
+    var resp = http.get('https://example.com')
+    say resp{:content} if resp{:success}
+
+    # Functional module
+    var posix = frequire('POSIX')
+    say posix.ceil(3.14)    # 4
 
 =head1 EMBEDDING SIDEF IN PERL
 
@@ -1071,7 +1087,7 @@ The compilation cache provides significant performance benefits but requires und
 
 =over 4
 
-=item * B<Cache location:> C<~/.config/sidef/v25.12/> (version-specific)
+=item * B<Cache location:> C<~/.config/sidef/v26.01/> (version-specific)
 
 =item * B<Storage format:> Two DBM databases (time and code)
 
@@ -1087,7 +1103,7 @@ The compilation cache provides significant performance benefits but requires und
 
 To manually clear the cache:
 
-    rm -rf ~/.config/sidef/v25.12/
+    rm -rf ~/.config/sidef/v26.01/
 
 =head2 Thread Safety
 
@@ -1148,51 +1164,47 @@ Sidef also installs C<UNIVERSAL::get_value>, which unwraps C<Sidef::Module::OO> 
 
 =head2 Sidef vs Ruby
 
-Sidef draws heavy inspiration from Ruby's elegant syntax but adds:
+Sidef draws syntax inspiration from Ruby and adds:
 
 =over 4
 
-=item * Native arbitrary-precision arithmetic (rationals, big integers)
+=item * Native arbitrary-precision integers, rationals, and complex numbers
 
-=item * Stronger Perl interoperability
+=item * Perl ecosystem access (any CPAN module available without wrapper code)
 
-=item * Built-in optimization and caching
+=item * Built-in compilation caching and multi-level optimization
 
-=item * Pattern matching and functional features
+=item * Multiple dispatch and value-level pattern matching
 
 =back
 
 =head2 Sidef vs Raku
 
-While Raku focuses on language experimentation and advanced features, Sidef prioritizes:
+Raku and Sidef share some surface-level features (C<given/when>, grammars, lazy lists). Key differences:
 
 =over 4
 
-=item * Practical usability with simpler learning curve
+=item * Sidef compiles to Perl and runs on standard Perl infrastructure
 
-=item * Seamless Perl ecosystem integration
+=item * Sidef integrates directly with CPAN modules via C<require>/C<frequire>
 
-=item * Faster development iteration
-
-=item * Performance through Perl compilation
+=item * Raku has a more elaborate type system and grammar engine; Sidef focuses on scripting ergonomics
 
 =back
 
 =head2 Sidef vs Python
 
-Sidef offers:
+Objective feature differences:
 
 =over 4
 
-=item * More flexible and expressive syntax
+=item * Native exact rational arithmetic (C<22/7> is a fraction, not floating-point division)
 
-=item * Stronger metaprogramming capabilities
+=item * Arbitrary-precision integers by default
 
-=item * Native exact arithmetic (rationals)
+=item * Multiple dispatch on types and on specific values
 
-=item * Ideal for mathematical and symbolic computation
-
-=item * Ruby-like elegance with functional features
+=item * Lazy evaluation and infinite sequences built into the core
 
 =back
 
@@ -1341,7 +1353,7 @@ For large data processing:
 
 =item * Check parser state with C<$sidef-E<gt>{parser}>
 
-=item * Review cache entries in C<~/.config/sidef/v25.12/>
+=item * Review cache entries in C<~/.config/sidef/v26.01/>
 
 =back
 
@@ -1350,6 +1362,14 @@ For large data processing:
 =head2 Official Resources
 
 =over 4
+
+=item * B<Try It Online:> L<https://tio.run/#sidef>
+
+Run Sidef code in your browser without installing anything.
+
+=item * B<MetaCPAN:> L<https://metacpan.org/pod/Sidef>
+
+CPAN module page with documentation and download links.
 
 =item * B<GitHub Repository:> L<https://github.com/trizen/sidef>
 
@@ -1451,43 +1471,35 @@ Without these, the C<s> option (caching) will not be available.
 
 These optional math libraries can provide 10-100x speed improvement for mathematical operations.
 
-=head1 CONSTANTS
+=head1 INTERNALS
 
-The Sidef module defines several internal constants:
+=head2 Constants and Package Variables
+
+Cache timing constants:
 
 =over 4
 
-=item * C<UPDATE_SEC> - 18000 seconds (5 hours)
+=item * C<UPDATE_SEC> - 18000 s (5 h) — interval for updating cache access timestamps
 
-Interval for updating cache access timestamps.
+=item * C<DELETE_SEC> - 172800 s (2 days) — age threshold for cache entry deletion
 
-=item * C<DELETE_SEC> - 172800 seconds (2 days)
-
-Age threshold for cache entry deletion.
-
-=item * C<SANITIZE_SEC> - 259200 seconds (3 days)
-
-Interval between cache sanitization runs.
+=item * C<SANITIZE_SEC> - 259200 s (3 days) — interval between cache sanitization runs
 
 =back
 
-=head1 PACKAGE VARIABLES
+Package variables:
 
 =over 4
 
 =item * C<$Sidef::VERSION> - Current version string
 
-=item * C<$Sidef::SPACES> - Current indentation level (for deparsing)
+=item * C<$Sidef::SPACES> / C<$Sidef::SPACES_INCR> - Indentation state for the deparser
 
-=item * C<$Sidef::SPACES_INCR> - Indentation increment (4 spaces)
+=item * C<%Sidef::INCLUDED> - Tracks included source files
 
-=item * C<%Sidef::INCLUDED> - Tracks included modules
+=item * C<%Sidef::EVALS> - Metadata for C<eval()> handling
 
-=item * C<%Sidef::EVALS> - Information for C<eval()> handling
-
-=item * C<$Sidef::PARSER> - Current parser instance
-
-=item * C<$Sidef::DEPARSER> - Current deparser instance
+=item * C<$Sidef::PARSER> / C<$Sidef::DEPARSER> - Current parser/deparser instances
 
 =back
 
@@ -1540,6 +1552,8 @@ Sidef builds upon decades of programming language research and draws inspiration
 =item * B<Raku> for advanced language features and metaprogramming
 
 =item * B<Go> for design simplicity
+
+=item * B<Julia> for numerical computing and language design ideas
 
 =item * B<Perl> for providing the robust foundation
 
