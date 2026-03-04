@@ -1130,7 +1130,7 @@ arbitrary precision:
     say 2**1000            # exact large integer
     say 355/113            # rational, stored exactly
     say sqrt(2.0)          # arbitrary-precision float
-    say 1 + 2i             # complex arithmetic
+    say (1 + 2i)           # complex arithmetic
 
 =head2 Functional Programming
 
@@ -1543,10 +1543,6 @@ Display help message with usage information and available options, then exit.
 
 Print version information and exit. Shows the Sidef version number.
 
-=item B<-b>
-
-Reserved for future use.
-
 =back
 
 =head1 INTERACTIVE MODE (REPL)
@@ -1578,7 +1574,7 @@ the session.
 
     > var x = 42
     #1 = 42
-    > var y = x + 10
+    > var y = (x + 10)
     #2 = 52
     > func double(n) { n * 2 }
     > double(x)
