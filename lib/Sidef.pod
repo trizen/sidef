@@ -333,9 +333,9 @@ The target compilation backend. Valid options:
 
 =over 4
 
-=item * C<'Sidef'> - Decompile back to Sidef source (useful for code formatting)
+=item * C<'Sidef'> - Decompile back to Sidef source (useful for code formatting) (default)
 
-=item * C<'Perl'> - Compile to Perl source code (default)
+=item * C<'Perl'> - Compile to Perl source code
 
 =back
 
@@ -347,11 +347,11 @@ B<Implementation Details:>
 
 =over 4
 
-=item * When caching is enabled and code length > 1024 bytes, the compiled code is stored with an MD5 hash as the key
+=item * When caching is enabled, the compiled code is stored with an MD5 hash as the key
 
 =item * Cached code is compressed using RawDeflate for storage efficiency
 
-=item * The cache automatically sanitizes old entries (older than 3 days) and removes very old entries (older than 2 days)
+=item * The cache sanitization runs every 3 days; during sanitization, entries not accessed for 2+ days are removed
 
 =item * Code containing C<eval()> is not cached to prevent security issues
 
@@ -712,6 +712,8 @@ B<Example:>
     say "Running Sidef version: $v";
     # Output: Running Sidef version: v25.12
 
+B<Note:> Can be called as either a class method (C<Sidef-E<gt>version>) or an instance method (C<$sidef-E<gt>version>).
+
 =head2 numeric_version
 
     my $num_version = Sidef->numeric_version;
@@ -728,6 +730,8 @@ B<Example:>
     if ($ver >= 25.0) {
         say "Running modern Sidef version";
     }
+
+B<Note:> Can be called as either a class method (C<Sidef-E<gt>numeric_version>) or an instance method (C<$sidef-E<gt>numeric_version>).
 
 =head1 PACKAGE UTILITY FUNCTIONS
 
@@ -1137,6 +1141,8 @@ The AUTOLOAD mechanism:
 =item * Provides similarity threshold of 0.8 for suggestions
 
 =back
+
+Sidef also installs C<UNIVERSAL::get_value>, which unwraps C<Sidef::Module::OO> and C<Sidef::Module::Func> objects to their underlying module value, and falls back to returning the object itself for all other types.
 
 =head1 COMPARISON WITH OTHER LANGUAGES
 
