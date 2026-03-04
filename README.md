@@ -88,7 +88,7 @@ sudo pacman -S gmp mpfr libmpc
 
 **Via CPAN (recommended):**
 ```bash
-cpan Sidef
+cpan -T Sidef
 ```
 
 **Build from source:**
@@ -167,7 +167,7 @@ d.fetch    #=> Rex fetches the ball!
 ### Functional Programming
 
 ```ruby
-var nums = [1..10]
+var nums = 1..10   # Range object
 
 # Map, filter, reduce
 var evens   = nums.grep { .is_even }              #=> [2, 4, 6, 8, 10]
@@ -182,7 +182,8 @@ say total
 ### Number Theory
 
 ```ruby
-say 1000.primes.len          # number of primes up to 1000 => 168
+say primes(50, 100)          # array of primes in range [50, 100]
+say prrime_count(10**9)      # number of primes up to 10^9
 say prime(100)               # 100th prime => 541
 say 12.divisors              # [1, 2, 3, 4, 6, 12]
 say euler_phi(100)           # Euler's totient => 40
@@ -194,7 +195,7 @@ say is_prime(2**521 - 1)     # Mersenne prime check => true
 
 ```ruby
 # Infinite lazy list of primes
-var lazy_primes = (2..Inf).lazy.grep { .is_prime }
+var lazy_primes = (2..Inf -> lazy.grep { .is_prime })
 say lazy_primes.first(10)    #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 ```
 
