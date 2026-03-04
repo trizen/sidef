@@ -1058,16 +1058,6 @@ __END__
 
 sidef - The Sidef Programming Language interpreter
 
-                **   **         ****   *           *********   *********
-              * * ** * *        ****   **          ** ** **    ** ** **
-               **   **          ****   ***         *********   *  *  *
-      **        **        **    ****   *  *        ******      ******
-    * * *     * * *     * * *   ****   ** **       ** **       ** **
-     **        **        **     ****   ******      ******      *  *
-           **   **              ****   *  *  *     *********   ***
-         * * ** * *             ****   ** ** **    ** ** **    **
-          **   **               ****   *********   *********   *
-
 =head1 SYNOPSIS
 
     sidef [options] [--] [programfile] [arguments]
@@ -1100,6 +1090,97 @@ constructs, object-oriented programming, powerful regex support, and
 extensive built-in methods for common tasks. The language emphasizes
 code readability and expressiveness while maintaining strong performance
 through optimization and optional precompilation.
+
+=head1 INSTALLATION
+
+=head2 From CPAN
+
+    cpan Sidef
+    cpanm Sidef
+
+=head2 From Source
+
+    git clone https://github.com/trizen/sidef.git
+    cd sidef
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=head2 Dependencies
+
+Sidef requires Perl 5.16 or later, and depends on several CPAN modules
+including Math::GMPz, Math::GMPq, Math::MPFR, and Math::MPC for
+arbitrary-precision arithmetic. The installation process will
+automatically resolve and install these dependencies.
+
+=head1 LANGUAGE OVERVIEW
+
+=head2 Objects and Method Chaining
+
+Everything in Sidef is an object. Methods can be chained fluently:
+
+    [1,2,3,4,5].grep{ .is_prime }.map{ _ ** 2 }.say
+
+=head2 Arbitrary-Precision Numbers
+
+Sidef supports integers, rationals, floats, and complex numbers with
+arbitrary precision:
+
+    say 2**1000            # exact large integer
+    say 355/113            # rational, stored exactly
+    say sqrt(2.0)          # arbitrary-precision float
+    say (1 + 2i)           # complex arithmetic
+
+=head2 Functional Programming
+
+Closures, higher-order functions, and lazy evaluation are built in:
+
+    var add = func(x) { func(y) { x + y } }
+    say add(3)(4)          # 7
+
+    [1..10].lazy.grep{ .is_prime }.first(3).say
+
+=head2 Object-Oriented Programming
+
+Classes with inheritance and method overloading:
+
+    class Animal(name) {
+        method speak { "..." }
+    }
+    class Dog(name) < Animal(name) {
+        method speak { "Woof, I am #{name}!" }
+    }
+    say Dog("Rex").speak
+
+=head2 Regular Expressions and String Interpolation
+
+    var str = "Hello, World!"
+    say str.gsub(/[aeiou]/i, "*")   # replace vowels
+    say "1 + 1 = #{1 + 1}"          # string interpolation
+
+=head2 Built-in Collections
+
+Arrays, hashes, sets, and ranges are native types:
+
+    var h = Hash(a => 1, b => 2)
+    say h{:a}
+    say (1..100 -> sum)
+
+=head2 Number Theory
+
+An extensive library of number theory functions is built in:
+
+    say 12.factor           # [2, 2, 3]
+    say 1000.nth_prime      # 7919
+    say prime_count(10**6)  # 78498
+
+=head2 Unicode Support
+
+Sidef supports Unicode throughout — identifiers, strings, and I/O:
+
+    var π = Num.pi
+    say "π ≈ #{π}"
 
 =head1 OPTIONS
 
@@ -1279,15 +1360,18 @@ libraries. These options control precision and behavior of numeric operations.
 
 =over 4
 
-=item B<-P> I<digits>
+=item B<-P> I<precision>
 
-Set the precision of floating-point numbers in decimal digits. Higher precision
-allows more accurate calculations but increases memory usage and computation time.
-Default is approximately 58 decimal digits (192 bits).
+Set the precision of floating-point numbers as approximately the number
+of decimal digits. Internally the value is converted to bits (multiplied
+by approximately 3.32), so C<-P 50> gives roughly 50 decimal digits of
+precision. Higher precision allows more accurate calculations but increases
+memory usage and computation time. Default is approximately 58 decimal
+digits (192 bits).
 
-    sidef -P 50 -E 'say sqrt(2)'          # 50 decimal digits
-    sidef -P 100 -E 'say sqrt(2)'         # 100 decimal digits
-    sidef -P 1000 -E 'say Num.pi'         # 1000 decimal digits
+    sidef -P 50 -E 'say sqrt(2)'          # ~50 decimal digits
+    sidef -P 100 -E 'say sqrt(2)'         # ~100 decimal digits
+    sidef -P 1000 -E 'say Num.pi'         # ~1000 decimal digits
 
 =item B<-M> I<mode>
 
@@ -1435,7 +1519,7 @@ to STDOUT. This option is typically used with B<-c>, B<-r>, or B<-R>.
 
 =back
 
-=head2 Help and Information Options
+=head2 Information Options
 
 =over 4
 
@@ -1490,7 +1574,7 @@ the session.
 
     > var x = 42
     #1 = 42
-    > var y = x + 10
+    > var y = (x + 10)
     #2 = 52
     > func double(n) { n * 2 }
     > double(x)
@@ -1688,26 +1772,38 @@ Normalize Sidef code style:
 
 =over 4
 
-=item B<SIDEF_CACHE_DIR>
+=item B<SIDEF_CONFIG_DIR>
 
-Override default cache directory for precompiled code. Default:
-C<~/.sidef/cache/>
+Override the default user configuration directory. Default:
+C<~/.config/sidef/>
 
-    export SIDEF_CACHE_DIR=/tmp/sidef_cache
+    export SIDEF_CONFIG_DIR=/path/to/config
 
-=item B<SIDEF_INC>
+=item B<HOME>
 
-Additional directories to search for Sidef modules, separated by colons
-(Unix) or semicolons (Windows).
+Used to determine the user's home directory for the default configuration
+path (C<~/.config/sidef/>). Also consulted via C<LOGDIR> as a fallback on
+some systems.
 
-    export SIDEF_INC=/usr/local/lib/sidef:/opt/sidef/modules
+=item B<XDG_CONFIG_DIR>
 
-=item B<SIDEF_OPT>
+If set, used instead of C<HOME> to locate the configuration directory,
+following the XDG Base Directory specification.
 
-Default options applied to every invocation. Useful for setting project-wide
-defaults.
+=item B<PERL5LIB>
 
-    export SIDEF_OPT="-O1 -P 100"
+Colon-separated list of directories prepended to Perl's C<@INC>. Affects
+which Sidef and CPAN modules are loaded.
+
+    export PERL5LIB=/path/to/extra/lib
+
+=item B<PERL5OPT>
+
+Default options passed to the Perl interpreter when running Sidef.
+
+=item B<TERM>
+
+Terminal type; affects readline behavior in the interactive REPL.
 
 =back
 
@@ -1772,7 +1868,7 @@ spelling and permissions.
 Parser encountered invalid syntax at the specified line. Use B<-k> for more
 detailed diagnostics.
 
-=item B<Invalid precision: E<lt>E<lt>valueE<gt>E<gt> (expected a positive integer)>
+=item B<Invalid precision: C<< <<value>> >> (expected a positive integer)>
 
 The value provided to B<-P> must be a positive integer.
 
@@ -1780,7 +1876,7 @@ The value provided to B<-P> must be a positive integer.
 
 The B<-E> option requires a code argument.
 
-=item B<Invalid format: E<lt>E<lt>optionE<gt>E<gt>!>
+=item B<Invalid format: C<< <<option>> >>!>
 
 The B<-N> option format is incorrect. Expected format:
 C<'NAME1=VALUE1; NAME2=VALUE2'>
@@ -1794,6 +1890,30 @@ C<cpan Data::Dump> or C<cpanm Data::Dump>
 
 Attempting to use an undeclared variable. Declare with C<var>, C<global>,
 C<const>, or C<define>.
+
+=item B<Stopped by user...>
+
+The user interrupted execution (e.g., Ctrl+C) during test mode (B<-t>).
+
+=item B<[ERROR] Can't parse the script `filename`: ...>
+
+Test mode (B<-t>) failed to parse the named script. The error detail
+follows the colon.
+
+=item B<[ERROR] Error encountered on script `filename`: ...>
+
+Test mode (B<-t>) encountered a runtime error while executing the named
+script. The error detail follows the colon.
+
+=item B<Can't open file C<< <<filename>> >> for reading: ...>
+
+A file I/O operation failed because the file could not be opened for
+reading. Check that the file exists and is readable.
+
+=item B<Can't open file C<< <<filename>> >> for writing: ...>
+
+A file I/O operation failed because the file could not be opened for
+writing. Check directory permissions.
 
 =back
 
@@ -1831,11 +1951,78 @@ Please include:
 
 =back
 
+=head1 PERFORMANCE TIPS
+
+=over 4
+
+=item * B<Use C<-O1> for production scripts>
+
+Constant folding evaluates pure constant expressions at compile time,
+often giving a noticeable speedup with no code changes:
+
+    sidef -O1 script.sf
+
+=item * B<Use C<-s> for scripts run repeatedly>
+
+Precompilation caching skips the parse/compile phase on subsequent runs
+of unchanged code:
+
+    sidef -s script.sf
+
+=item * B<Combine C<-O1 -s> for best results>
+
+    sidef -O1 -s script.sf
+
+=item * B<Use external tools via C<-N> for heavy number theory>
+
+For computationally expensive operations such as large-integer
+factorization or prime counting, enabling external programs like
+C<yafu>, C<primecount>, or C<pari-gp> can dramatically reduce
+runtime:
+
+    sidef -N 'USE_PRIMECOUNT=true; USE_YAFU=true' script.sf
+
+=item * B<REPL overhead>
+
+The interactive REPL has per-line compilation overhead. For
+performance-sensitive work, prefer executing a script file directly
+over typing the same code interactively.
+
+=back
+
+=head1 HISTORY
+
+Sidef was started in 2013 by Daniel Șuteu as a personal language
+experiment and has been actively maintained and extended since then.
+Major milestones:
+
+=over 4
+
+=item * B<2013> - Project started; core parser and object system.
+
+=item * B<2015> - Arbitrary-precision arithmetic (GMP/MPFR/MPC).
+
+=item * B<2016> - First CPAN release.
+
+=item * B<2018+> - Extensive number theory library; external tool
+integrations (YAFU, PARI/GP, primecount).
+
+=item * B<Present> - Ongoing improvements to the standard library,
+optimiser, and REPL.
+
+=back
+
+Full release history: L<https://github.com/trizen/sidef/releases>
+
 =head1 SEE ALSO
+
+L<Sidef> - Main Sidef module documentation.
 
 =head2 Official Resources
 
 =over 4
+
+=item * B<CPAN>: L<https://metacpan.org/dist/Sidef>
 
 =item * B<GitHub Repository>: L<https://github.com/trizen/sidef>
 
@@ -1858,6 +2045,8 @@ Please include:
 =item * B<gmp>(3) - GNU Multiple Precision Arithmetic Library
 
 =item * B<mpfr>(3) - Multiple Precision Floating-Point Reliable Library
+
+=item * B<mpc>(3) - Multiple Precision for Complex Arithmetic
 
 =back
 
