@@ -2,15 +2,17 @@
 
 ## Table of Contents
 
-- [Introduction](#introduction)
-- [Installation](#installation)
-- [Getting Started](#getting-started)
-- [Language Fundamentals](#language-fundamentals)
-- [Data Types](#data-types)
-- [Control Flow](#control-flow)
-- [Functions and Methods](#functions-and-methods)
-- [Object-Oriented Programming](#object-oriented-programming)
-- [Advanced Features](#advanced-features)
+1. [Introduction](#introduction)
+2. [Installation](#installation)
+3. [Getting Started](#getting-started)
+4. [Language Fundamentals](#language-fundamentals)
+5. [Data Types](#data-types)
+6. [Control Flow](#control-flow)
+7. [Functions and Methods](#functions-and-methods)
+8. [Object-Oriented Programming](#object-oriented-programming)
+9. [Advanced Features](#advanced-features)
+10. [Best Practices](#best-practices)
+11. [Resources](#resources)
 
 ---
 
@@ -121,27 +123,61 @@ sidef hello.sf
 
 By convention, Sidef scripts use the `.sf` extension.
 
+### One-liners
+
+Use `-e` to run code directly from the command line:
+
+```bash
+sidef -e 'say "Hello, World!"'
+```
+
+### Interactive REPL
+
+Start the interactive Read-Eval-Print Loop by running `sidef` with no arguments:
+
+```
+$ sidef
+Sidef 26.01, running on Linux, using Perl v5.42.0.
+Type "help", "copyright" or "license" for more information.
+> say "Hello!"
+Hello!
+```
+
+### Try It Online
+
+You can try Sidef in your browser at [https://tio.run/#sidef](https://tio.run/#sidef).
+
 ---
 
 ## Language Fundamentals
+
+### Comments
+
+```ruby
+# Single-line comment
+
+/*
+   Multi-line
+   comment
+*/
+```
 
 ### Syntax Overview
 
 #### Operator Precedence
 
-Sidef handles operator precedence uniquely—whitespace controls precedence:
+Sidef uses **whitespace-sensitive method chaining** rather than traditional operator precedence. The rule is simple: **no spaces bind tighter than spaces**. When operators are written without spaces around them, they are grouped first; when spaces are present, the expression is chained left-to-right.
 
 ```ruby
-1+2 * 3+4       # means: (1+2) * (3+4) = 21
-1 + 2 * 3       # means: ((1 + 2) * 3) = 9
-1+2*3           # means: (1 + (2 * 3)) = 7
+1+2 * 3+4       # means: (1+2) * (3+4)  = 21   (spaces chain left-to-right)
+1+2*3           # means: 1 + (2*3)      = 7    (no spaces bind tighter)
 ```
 
-**Best practices:**
+**Best practice — use parentheses to make intent explicit:**
+
 ```ruby
-var n = 1 + 2       # WRONG: parsed as (var n = 1) + 2
-var n = 1+2         # correct
-var n = (1 + 2)     # better - explicit grouping
+var n = (1 + 2)     # explicit grouping — always clear
+var n = 1+2         # also correct (no spaces: 1+2 is one unit)
 ```
 
 #### Controlling Precedence
@@ -175,9 +211,9 @@ Core language keywords:
 - `module` - module
 - `subset` - subset type
 - `struct` - structure
-- `const` - runtime dynamic constant
-- `static` - runtime static variable
-- `define` - compile-time static constant
+- `const` - runtime constant (evaluated once, never reassigned)
+- `static` - runtime static variable (persists across calls, but can be reassigned)
+- `define` - compile-time constant (value known at parse time)
 - `enum` - enumeration
 
 **Control Flow:**
@@ -200,11 +236,31 @@ Core language keywords:
 - `nil` - undefined value
 - `true`, `false` - boolean values
 
+### define, const, and static
+
+| Keyword  | When evaluated | Can be reassigned | Use case |
+|----------|---------------|-------------------|----------|
+| `define` | Compile time  | No                | Compile-time constants (e.g., `define PI = 3.14159`) |
+| `const`  | Runtime, once | No                | Runtime constants evaluated once |
+| `static` | Runtime, once | Yes               | Variables that persist across function calls |
+
+```ruby
+define PI = 3.14159         # compile-time constant
+const  TAX_RATE = 0.07      # runtime constant (evaluated once)
+
+func counter {
+    static count = 0        # persists between calls
+    ++count
+}
+say counter()    # 1
+say counter()    # 2
+```
+
 ### Prefix Operators
 
 ```ruby
->               # alias for 'say'
->>              # alias for 'print'
+>               # alias for 'say' (print with newline)
+>>              # alias for 'print' (print without newline)
 +               # scalar context
 -               # negative value
 ++, --          # increment/decrement
@@ -255,6 +311,7 @@ Core types in Sidef:
 - `Pair` - two-element tuple
 - `Vector`, `Matrix` - mathematical vectors/matrices
 - `Range`, `RangeNum`, `RangeStr` - ranges
+- `Enumerator` - lazy iterator/generator
 
 **Text:**
 - `String` (Str) - text strings
@@ -854,6 +911,23 @@ func fib(n) is cached {
 say fib(100)    # Fast with memoization
 ```
 
+### Lambdas / Anonymous Functions
+
+Blocks can be assigned to variables and called as functions:
+
+```ruby
+# Block syntax
+var double = { |n| n * 2 }
+say double(5)    # 10
+
+# Arrow function syntax (alternative)
+var triple = ->(n) { n * 3 }
+say triple(5)    # 15
+
+var add = { |a, b| a + b }
+say add(3, 4)    # 7
+```
+
 ---
 
 ## Object-Oriented Programming
@@ -927,6 +1001,32 @@ var p = Point(x: 10, y: 20)
 say p.x    # 10
 ```
 
+### Class Inheritance
+
+Use `< ParentClass` to inherit from another class. Child classes inherit all methods and can override them:
+
+```ruby
+class Animal(String name, Number age) {
+    method speak { "..." }
+}
+
+class Dog(String color) < Animal {
+    method speak { "woof" }
+    method ageHumanYears { self.age * 7 }
+}
+
+class Cat < Animal {
+    method speak { "meow" }
+}
+
+var dog = Dog(name: "Sparky", age: 6, color: "white")
+say dog.speak           # woof
+say dog.ageHumanYears   # 42
+
+var cat = Cat(name: "Mitten", age: 3)
+say cat.speak           # meow
+```
+
 ### Subsets
 
 Type refinement:
@@ -938,6 +1038,31 @@ subset Positive < Integer { |n| n.is_pos }
 func square_root(Positive n) {
     n.sqrt
 }
+```
+
+### Enumerations
+
+`enum` assigns sequential integer values to named constants:
+
+```ruby
+enum {a, b, c}        # a=0, b=1, c=2
+enum {x=10, y, z}     # x=10, y=11, z=12
+
+say a    # 0
+say y    # 11
+```
+
+### Type Checking
+
+Use `is_a` (or its alias `kind_of`) to check the type of an object at runtime:
+
+```ruby
+say 42.is_a(Number)     # true
+say "hi".is_a(String)   # true
+say 42.is_a(String)     # false
+
+var p = Person(name: "Alice", age: 30)
+say p.is_a(Person)      # true
 ```
 
 ---
@@ -1055,6 +1180,67 @@ var list = gather {
 say list    # [2, 3, 5, 7]
 ```
 
+### Enumerators
+
+`Enumerator` creates a lazy iterator that can represent infinite sequences without using memory for all elements:
+
+```ruby
+var primes = Enumerator({ |yield|
+    for n in (2..Inf) {
+        yield(n) if n.is_prime
+    }
+})
+say primes.first(10)    # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+say primes.nth(100)     # the 100th prime
+```
+
+### Perl Module Integration
+
+Sidef can use any CPAN Perl module directly via `require` (object-oriented) or `frequire` (functional):
+
+```ruby
+# Object-oriented modules
+var json = require('JSON')
+var encoded = json.encode(Hash(name => "Alice", age => 30))
+say encoded
+
+# Functional modules
+var posix = frequire('POSIX')
+say posix.ceil(3.14)    # 4
+```
+
+### FizzBuzz
+
+```ruby
+for i in (1..100) {
+    say (
+        i%15 == 0 ? "FizzBuzz" :
+        i%3  == 0 ? "Fizz"     :
+        i%5  == 0 ? "Buzz"     :
+        i
+    )
+}
+```
+
+### Prime Numbers
+
+Sidef has rich built-in support for number theory:
+
+```ruby
+say 17.is_prime          # true
+say 10.primes            # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+say primes(1, 50)        # primes in range [1, 50]
+say factor(2**128 + 1)   # prime factorization
+```
+
+### Sorting with Custom Comparator
+
+```ruby
+var words = %w(banana apple cherry date)
+say words.sort              # lexicographic: ["apple", "banana", "cherry", "date"]
+say words.sort_by { .len }  # by length: ["date", "apple", "banana", "cherry"]
+```
+
 ---
 
 ## Best Practices
@@ -1096,9 +1282,14 @@ x := some_func2()   # calls some_func2() if x == nil
 
 ## Resources
 
-- **Official Documentation:** [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/)
+- **Official Book (GitBook):** [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/)
+- **PDF Documentation:** [https://github.com/trizen/sidef/releases](https://github.com/trizen/sidef/releases)
+- **Number Theory Tutorial:** [NUMBER_THEORY_TUTORIAL.md](NUMBER_THEORY_TUTORIAL.md)
 - **Source Code:** [https://github.com/trizen/sidef](https://github.com/trizen/sidef)
 - **Example Scripts:** [https://github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+- **RosettaCode Examples:** [https://rosettacode.org/wiki/Sidef](https://rosettacode.org/wiki/Sidef)
+- **Try It Online:** [https://tio.run/#sidef](https://tio.run/#sidef)
+- **GitHub Discussions:** [https://github.com/trizen/sidef/discussions](https://github.com/trizen/sidef/discussions)
 - **MetaCPAN:** [https://metacpan.org/pod/Sidef](https://metacpan.org/pod/Sidef)
 
 ---
