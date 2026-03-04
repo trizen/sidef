@@ -247,7 +247,7 @@ sidef> x.is_prime
 false
 sidef> is_prime(2**127 - 1)
 true
-sidef> [1..10].map { .square }.sum
+sidef> 1..10 -> map { .square }.sum
 385
 sidef> quit
 ```
