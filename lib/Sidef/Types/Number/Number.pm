@@ -23910,29 +23910,6 @@ package Sidef::Types::Number::Number {
 
         state $invdb = Math::GMPz::Rmpz_init_nobless();
 
-        # Floyd's cycle detection
-        my $iter = sub {
-            my ($a, $b, $x) = @_;
-            my $r = Math::GMPz::Rmpz_mod_ui($tmp, $x, 3);
-            if ($r == 0) {
-                Math::GMPz::Rmpz_add_ui($a, $a, 1);
-                Math::GMPz::Rmpz_mul($x, $x, $g);
-                Math::GMPz::Rmpz_mod($x, $x, $n);
-            }
-            elsif ($r == 1) {
-                Math::GMPz::Rmpz_add_ui($b, $b, 1);
-                Math::GMPz::Rmpz_mul($x, $x, $h);
-                Math::GMPz::Rmpz_mod($x, $x, $n);
-            }
-            else {
-                Math::GMPz::Rmpz_mul_2exp($a, $a, 1);
-                Math::GMPz::Rmpz_mul_2exp($b, $b, 1);
-                Math::GMPz::Rmpz_mod($a, $a, $p);
-                Math::GMPz::Rmpz_mod($b, $b, $p);
-                Math::GMPz::Rmpz_powm_ui($x, $x, 2, $n);
-            }
-        };
-
         foreach my $attempt (1 .. $max_tries) {
 
             # Random starting point (a,b) with X = g^a * h^b
@@ -23950,12 +23927,47 @@ package Sidef::Types::Number::Number {
 
             while (1) {
 
-                # Tortoise step
-                $iter->($a1, $b1, $x1);
+                # Tortoise step (Inlined)
+                my $r1 = Math::GMPz::Rmpz_mod_ui($tmp, $x1, 3);
+                if ($r1 == 0) {
+                    Math::GMPz::Rmpz_add_ui($a1, $a1, 1);
+                    Math::GMPz::Rmpz_mul($x1, $x1, $g);
+                    Math::GMPz::Rmpz_mod($x1, $x1, $n);
+                }
+                elsif ($r1 == 1) {
+                    Math::GMPz::Rmpz_add_ui($b1, $b1, 1);
+                    Math::GMPz::Rmpz_mul($x1, $x1, $h);
+                    Math::GMPz::Rmpz_mod($x1, $x1, $n);
+                }
+                else {
+                    Math::GMPz::Rmpz_mul_2exp($a1, $a1, 1);
+                    Math::GMPz::Rmpz_mul_2exp($b1, $b1, 1);
+                    Math::GMPz::Rmpz_mod($a1, $a1, $p);
+                    Math::GMPz::Rmpz_mod($b1, $b1, $p);
+                    Math::GMPz::Rmpz_powm_ui($x1, $x1, 2, $n);
+                }
 
-                # Hare step (two iterations)
-                $iter->($a2, $b2, $x2);
-                $iter->($a2, $b2, $x2);
+                # Hare step (Inlined, two iterations)
+                for (1 .. 2) {
+                    my $r2 = Math::GMPz::Rmpz_mod_ui($tmp, $x2, 3);
+                    if ($r2 == 0) {
+                        Math::GMPz::Rmpz_add_ui($a2, $a2, 1);
+                        Math::GMPz::Rmpz_mul($x2, $x2, $g);
+                        Math::GMPz::Rmpz_mod($x2, $x2, $n);
+                    }
+                    elsif ($r2 == 1) {
+                        Math::GMPz::Rmpz_add_ui($b2, $b2, 1);
+                        Math::GMPz::Rmpz_mul($x2, $x2, $h);
+                        Math::GMPz::Rmpz_mod($x2, $x2, $n);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_mul_2exp($a2, $a2, 1);
+                        Math::GMPz::Rmpz_mul_2exp($b2, $b2, 1);
+                        Math::GMPz::Rmpz_mod($a2, $a2, $p);
+                        Math::GMPz::Rmpz_mod($b2, $b2, $p);
+                        Math::GMPz::Rmpz_powm_ui($x2, $x2, 2, $n);
+                    }
+                }
 
                 if (Math::GMPz::Rmpz_cmp($x1, $x2) == 0) {
 
@@ -24017,10 +24029,12 @@ package Sidef::Types::Number::Number {
         state $sub_g = Math::GMPz::Rmpz_init();
         state $sub_a = Math::GMPz::Rmpz_init();
 
+        Math::GMPz::Rmpz_pow_ui($tmp, $p, $e - 1);
+        Math::GMPz::Rmpz_powm($sub_g, $g0, $tmp, $n);
+
         foreach my $i (0 .. $e - 1) {
 
             Math::GMPz::Rmpz_pow_ui($tmp, $p, $e - $i - 1);    # p^(e-1-i)
-            Math::GMPz::Rmpz_powm($sub_g, $cur_g, $tmp, $n);
             Math::GMPz::Rmpz_powm($sub_a, $cur_a, $tmp, $n);
 
             my $d = _znlog_pollard_rho($sub_g, $sub_a, $p, $n) // return undef;
@@ -24094,7 +24108,7 @@ package Sidef::Types::Number::Number {
     sub _znlog_pohlig_hellman {
         my ($a, $g, $n, $order) = @_;
 
-        state $tmp = Math::GMPz::Rmpz_init_nobless();
+        my $tmp = Math::GMPz::Rmpz_init();
 
         Math::GMPz::Rmpz_gcd($tmp, $g, $n);
 
@@ -24159,9 +24173,9 @@ package Sidef::Types::Number::Number {
         # Composite n: solve g^x = a (mod p^e) for each prime-power factor, then CRT
         my @residues = ();
 
-        state $pe  = Math::GMPz::Rmpz_init();
-        state $g_i = Math::GMPz::Rmpz_init();
-        state $a_i = Math::GMPz::Rmpz_init();
+        my $pe  = Math::GMPz::Rmpz_init();
+        my $g_i = Math::GMPz::Rmpz_init();
+        my $a_i = Math::GMPz::Rmpz_init();
 
         foreach my $pp (@n_factors) {
             my ($p, $e) = @$pp;
@@ -24180,10 +24194,9 @@ package Sidef::Types::Number::Number {
         my $x = Math::GMPz::Rmpz_init_set_str((Math::Prime::Util::GMP::chinese(@residues) // return undef), 10);
 
         # Verify the result
-        Math::GMPz::Rmpz_set_str($tmp, $x, 10);
-        Math::GMPz::Rmpz_powm($tmp, $g, $tmp, $n);
+        Math::GMPz::Rmpz_powm($tmp, $g, $x, $n);
         if (Math::GMPz::Rmpz_cmp($tmp, $a) == 0) {
-            return Math::GMPz::Rmpz_init_set_str($x, 10);
+            return $x;
         }
 
         return undef;
