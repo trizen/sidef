@@ -112,9 +112,9 @@ say "Hello, World!"
 ```
 
 ```bash
-sidef hello.sf        # run a script
-sidef -E 'say "Hello, World!"'   # one-liner
-sidef -i              # start the REPL
+sidef hello.sf
+sidef -E 'say "Hello, World!"'
+sidef -i            # start the REPL
 ```
 
 ### Try It Online
@@ -141,8 +141,8 @@ func greet(name) { "Hello, #{name}!" }
 say greet("world")    #=> Hello, world!
 
 # Multi-dispatch / pattern matching
-func fib(0) { 0 }
-func fib(1) { 1 }
+func fib({|n| n == 0 }) { 0 }
+func fib({|n| n == 1 }) { 1 }
 func fib(n) { fib(n-1) + fib(n-2) }
 
 say fib(10)    #=> 55
@@ -225,6 +225,7 @@ sidef [options] [script.sf] [script-arguments]
 ```bash
 sidef -E 'say 10.of { |i| i**2 }'            # one-liner
 sidef -i                                     # start REPL
+sidef -i script.sf                           # run script in REPL
 sidef -C script.sf                           # syntax check
 sidef -c -o output.pl script.sf              # compile to Perl
 sidef -P 400 -E 'say sqrt(2)'                # 400-bit precision
