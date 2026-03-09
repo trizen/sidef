@@ -32,7 +32,7 @@ Sidef is a modern, expressive programming language that combines the elegance of
 
 ```ruby
 # Exact rational arithmetic — no floating-point surprises
-say (1/3 + 1/6)        #=> 1/2
+say (1/3 + 1/6)         #=> 1/2
 
 # Built-in number theory
 say (2**127 - 1)        #=> 170141183460469231731687303715884105727 (Mersenne prime)
@@ -84,20 +84,35 @@ sudo apt-get install libgmp-dev libmpfr-dev libmpc-dev
 sudo pacman -S gmp mpfr libmpc
 ```
 
+**Termux:**
+```bash
+pkg install perl make clang libgmp libmpfr libmpc
+```
+
 ### Installation
 
-**Via CPAN (recommended):**
+**Via CPAN:**
 ```bash
+cpan Sidef
+# or (skip tests for faster install):
 cpan -T Sidef
+# or with cpanminus:
+cpanm Sidef
 ```
 
 **Build from source:**
 ```bash
 git clone https://github.com/trizen/sidef.git
 cd sidef
-perl Build.PL
-./Build
-./Build install
+perl Makefile.PL
+make
+make test
+make install
+```
+
+**Via AUR:**
+```bash
+trizen -S sidef
 ```
 
 **Platform packages:**
