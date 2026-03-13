@@ -105,7 +105,7 @@ my $builder = $class->new(
         'MIME::Base64' => '3.00',
 
         # Enhanced Math Support
-        'Math::Prime::Util' => '0.73',
+        'Math::Prime::Util' => '0.74',
 
         # Terminal Enhancement
         'Term::ReadLine::Gnu' => '1.36',
