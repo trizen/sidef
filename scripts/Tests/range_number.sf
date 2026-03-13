@@ -107,6 +107,16 @@ do {
                  predicate  => func(k) { func(n) { n.is_almost_prime(k) } },
                 ),
                 :(
+                 arr_name   => 'carmichael',
+                 each_name  => 'each_carmichael',
+                 predicate  => func(k) { func(n) { n.is_carmichael && n.is_omega_prime(k) } },
+                ),
+                :(
+                 arr_name   => 'lucas_carmichael',
+                 each_name  => 'each_lucas_carmichael',
+                 predicate  => func(k) { func(n) { n.is_lucas_carmichael && n.is_omega_prime(k) } },
+                ),
+                :(
                  arr_name   => 'powerful',
                  each_name  => 'each_powerful',
                  count_name => 'powerful_count',
@@ -137,8 +147,8 @@ do {
                 ),
             ]
 
-    var a = irand(50, 100)
-    var b = (a + 200.irand)
+    var a = irand(50, 1000)
+    var b = (a + 2000.irand)
     var r = [2,3].rand
     var k = [2,3].rand
 
