@@ -31571,7 +31571,7 @@ package Sidef::Types::Number::Number {
                     my $lo = $args{from};
                     my $hi = $args{upto};
 
-                    $hi = $m if ($m < $hi);    # the last prime p_k must be <= m
+                    $hi = $m if ($carmichael and $m < $hi);    # the last prime p_k must be <= m
 
                     if (defined($max_p) and $max_p < $hi) {
                         $hi = $max_p;
@@ -31823,7 +31823,7 @@ package Sidef::Types::Number::Number {
                         my $lo = $args{from};
                         my $hi = $args{upto};
 
-                        $hi = Math::GMPz::Rmpz_get_ui($m) if (Math::GMPz::Rmpz_cmp_ui($m, $hi) < 0);
+                        $hi = Math::GMPz::Rmpz_get_ui($m) if ($carmichael and Math::GMPz::Rmpz_cmp_ui($m, $hi) < 0);
 
                         if (defined($max_p) and $max_p < $hi) {
                             $hi = $max_p;
