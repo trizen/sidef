@@ -34352,10 +34352,13 @@ package Sidef::Types::Number::Number {
                     sub {
                         my ($n, $x) = @_;
 
-                        my $key = "$n,$x";
+                        # Meissel-Lehmer truncation (The Sublinear Secret)
+                        if ($P[$x - 1]**2 > $n) {
+                            return _prime_count($n) - $x + 1;
+                        }
 
-                        return $cache{$key}
-                          if exists $cache{$key};
+                        return $cache{$x}{$n}
+                          if exists $cache{$x}{$n};
 
                         # Initial count: odd numbers ≤ n
                         my $count = $n - ($n >> 1);
@@ -34373,16 +34376,16 @@ package Sidef::Types::Number::Number {
                                                );
                         }
 
-                        $cache{$key} = $count;
+                        $cache{$x}{$n} = $count;
                       }
                       ->($n, $x)
                 );
             }
 
-            my $key = join(",", Math::GMPz::Rmpz_get_str($n, 10), $x);
+            my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
 
-            return $cache{$key}
-              if exists $cache{$key};
+            return $cache{$x}{$n_str}
+              if exists $cache{$x}{$n_str};
 
             # Initial count: odd numbers ≤ n
             my $count = Math::GMPz::Rmpz_init_set($n);
@@ -34403,7 +34406,7 @@ package Sidef::Types::Number::Number {
                   : Math::GMPz::Rmpz_sub_ui($count, $count, $r);
             }
 
-            $cache{$key} =
+            $cache{$x}{$n_str} =
                 Math::GMPz::Rmpz_fits_ulong_p($count)
               ? Math::GMPz::Rmpz_get_ui($count)
               : $count;
