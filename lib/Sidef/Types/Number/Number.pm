@@ -59,8 +59,9 @@ package Sidef::Types::Number::Number {
         SMALL_NUMBER_MAX_BITS  => 110,                                   # in bits (numbers that can be factorized fast)
         MEDIUM_NUMBER_MAX_BITS => 150,                                   # in bits (numbers that can be factorized moderately fast)
 
-        # Check if we have a recent enough version of Math::Prime::Util
-        # HAS_NEW_PRIME_UTIL   => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::is_perfect_power)) // 0,
+        # Check if we have a recent enough version of Math::Prime::Util (>= 0.75)
+        HAS_NEW_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::sopfr)) // 0,
+
         # HAS_NEWER_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::nth_powerfree))    // 0,
 
         # Check if we have a recent enough version of Math::Prime::Util::GMP
@@ -20771,6 +20772,14 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
+        if (HAS_NEW_PRIME_UTIL and !ref($n)) {
+            return (
+                    Math::Prime::Util::is_safe_prime($n)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
+
         if (ref($n) ne 'Math::GMPz') {
             __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
             $n = _any2mpz($n, 0) // return Sidef::Types::Bool::Bool::FALSE;
@@ -24187,7 +24196,7 @@ package Sidef::Types::Number::Number {
             push @residues, [$r, $ord_i];
         }
 
-        my $x = Math::GMPz::Rmpz_init_set_str((Math::Prime::Util::GMP::chinese(@residues) // return undef), 10);
+        my $x = _any2mpz(Math::Prime::Util::GMP::chinese(@residues) // return undef);
 
         # Verify the result
         Math::GMPz::Rmpz_powm($tmp, $g, $x, $n);
@@ -30180,6 +30189,10 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
+        if (HAS_NEW_PRIME_UTIL and !defined($k) and !ref($n) and $n < (ULONG_MAX >> 3)) {
+            return _set_int(Math::Prime::Util::aliquot_sum($n));
+        }
+
         if (ref($n) ne 'Math::GMPz') {
             $n = _any2mpz($n, 0) // goto &nan;
         }
@@ -30200,6 +30213,7 @@ package Sidef::Types::Number::Number {
         _set_int($s);
     }
 
+    *aliquot_sum  = \&aliquot;
     *proper_sigma = \&aliquot;
 
     sub proper_divisor_count {
@@ -30285,7 +30299,14 @@ package Sidef::Types::Number::Number {
 
     sub sopf {    # OEIS: A008472
         my ($n) = @_;
+
         $n = $$n;
+
+        if (HAS_NEW_PRIME_UTIL and !ref($n) and $n >= 0) {
+            my $r = Math::Prime::Util::sopf($n);
+            return bless \$r;
+        }
+
         if (ref($n)) {
             $n = _big2uistr($n) // goto &nan;
         }
@@ -30298,7 +30319,14 @@ package Sidef::Types::Number::Number {
 
     sub sopfr {    # OEIS: A001414
         my ($n) = @_;
+
         $n = $$n;
+
+        if (HAS_NEW_PRIME_UTIL and !ref($n) and $n >= 0) {
+            my $r = Math::Prime::Util::sopfr($n);
+            return bless \$r;
+        }
+
         if (ref($n)) {
             $n = _big2uistr($n) // goto &nan;
         }
@@ -36033,14 +36061,34 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (ref($n) ne 'Math::GMPz') {
-            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
-            $n = _any2mpz($n, 5) // return Sidef::Types::Bool::Bool::FALSE;
+        if (HAS_NEW_PRIME_UTIL and !ref($n) and $n >= 0) {
+
+            if (!defined($k)) {
+                return (
+                        Math::Prime::Util::is_palindrome($n)
+                        ? Sidef::Types::Bool::Bool::TRUE
+                        : Sidef::Types::Bool::Bool::FALSE
+                       );
+            }
+
+            _valid(\$k);
+            if (!ref($$k) and $$k < 2147483647 and $$k >= 2) {
+                return (
+                        Math::Prime::Util::is_palindrome($n, $$k)
+                        ? Sidef::Types::Bool::Bool::TRUE
+                        : Sidef::Types::Bool::Bool::FALSE
+                       );
+            }
         }
 
         if (defined($k)) {
             _valid(\$k);
             $k = _any2mpz($$k, 6) // return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (ref($n) ne 'Math::GMPz') {
+            __is_int__($n) || return Sidef::Types::Bool::Bool::FALSE;
+            $n = _any2mpz($n, 5) // return Sidef::Types::Bool::Bool::FALSE;
         }
 
         Math::GMPz::Rmpz_sgn($n) >= 0
