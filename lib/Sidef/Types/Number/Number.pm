@@ -25132,6 +25132,29 @@ package Sidef::Types::Number::Number {
 
     *factors_exp = \&factor_exp;
 
+    sub prime_signature {
+        my ($n) = @_;
+
+        $n = $$n;
+
+        if (ref($n)) {
+            $n = _big2pistr($n) // return Sidef::Types::Array::Array->new;
+        }
+        else {
+            $n > 0 or return Sidef::Types::Array::Array->new;
+        }
+
+        if (HAS_NEW_PRIME_UTIL and $n < ULONG_MAX) {
+            my @exp = Math::Prime::Util::prime_signature($n);
+            @exp = map { bless \$_ } @exp;
+            return Sidef::Types::Array::Array->new(\@exp);
+        }
+
+        my @exp = sort { $b <=> $a } map { $_->[1] } _factor_exp($n);
+        @exp = map { bless \$_ } @exp;
+        Sidef::Types::Array::Array->new(\@exp);
+    }
+
     sub _factor_remainder {
         my ($r, $size, $ecm_table) = @_;
 

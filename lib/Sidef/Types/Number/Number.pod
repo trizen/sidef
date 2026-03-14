@@ -8028,6 +8028,19 @@ Returns an array of prime numbers <= C<n>, or in the range C<[a,b]>.
 
 =cut
 
+=head2 prime_signature
+
+    n.prime_signature
+
+Given a non-negative integer C<n>, returns the prime signature of C<n>.
+
+This is the exponents of the prime-power factorization of C<n>, sorted in descending order.
+
+    say prime_signature(324)                                      #=> [4, 2]  (324 = 2^2 * 3^4)
+    say 30.of { .prime_signature.prod_kv{|k,v| prime(k+1)**v } }  #=> OEIS: A046523
+
+=cut
+
 =head2 prime_sigma
 
     n.prime_sigma(k=1)
