@@ -27681,7 +27681,7 @@ package Sidef::Types::Number::Number {
         # N = a positive integer
         # d = a divisor of N
         # u = temporary Math::GMPz object
-        # D = array ref with divisors of N
+        # D = array ref with divisors of N, assumed sorted ascending
 
         Math::GMPz::Rmpz_divexact($u, $N, $d);
 
@@ -27696,26 +27696,40 @@ package Sidef::Types::Number::Number {
             return _divisors($u);
         }
 
-        # Otherwise, select the divisors of N/d from the divisors of N
-        my @divisors;
         my $d_str = Math::GMPz::Rmpz_get_str($d, 10);
+        my $u_str = Math::GMPz::Rmpz_get_str($u, 10);
+
+        state $limit = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_sqrt($u, $u);
+        Math::GMPz::Rmpz_mul($limit, $u, $d);
+
+        my (@front, @back);
 
         foreach my $k (@$D) {
 
             if ($k < ULONG_MAX) {
+                last if Math::GMPz::Rmpz_cmp_ui($limit, $k) < 0;
                 Math::GMPz::Rmpz_gcd_ui($u, $d, $k);
             }
             else {
                 Math::GMPz::Rmpz_set_str($u, $k, 10);
+                last if Math::GMPz::Rmpz_cmp($limit, $u) < 0;
                 Math::GMPz::Rmpz_gcd($u, $u, $d);
             }
 
             if (Math::GMPz::Rmpz_cmp($u, $d) == 0) {
-                push @divisors, Math::Prime::Util::GMP::divint($k, $d_str);
+
+                # We found x. Immediately calculate its pair y.
+                my $x = Math::Prime::Util::GMP::divint($k,     $d_str);
+                my $y = Math::Prime::Util::GMP::divint($u_str, $x);
+
+                push @front, $x;
+                unshift @back, $y if $x ne $y;
             }
         }
 
-        return @divisors;
+        # Return combined halves to naturally maintain the ascending sorted order
+        return (@front, @back);
     }
 
     sub _dynamic_preimage {
