@@ -13816,20 +13816,6 @@ package Sidef::Types::Number::Number {
 
     *nok = \&binomial;
 
-    sub _factorial_valuation {
-        my ($n, $p) = @_;
-        my $count  = 0;
-        my $temp_n = $n;
-
-        # Legendre's formula
-        while ($temp_n >= $p) {
-            $temp_n = Math::Prime::Util::GMP::divint($temp_n, $p);
-            $count += $temp_n;
-        }
-
-        return $count;
-    }
-
     sub _factorial_without_prime {
         my ($n, $p, $pk, $from, $count, $res) = @_;
 
@@ -13938,68 +13924,6 @@ package Sidef::Types::Number::Number {
         }
 
         return $ans;
-    }
-
-    sub _small_k_binomialmod2 {
-        my ($n, $k, $m) = @_;
-
-        $n = Math::GMPz::Rmpz_init_set_str($n, 10) if !ref($n);
-        $m = Math::GMPz::Rmpz_init_set_str($m, 10) if !ref($m);
-
-        # say "Small k: ($n, $k, $m)";
-
-        if ($k <= 1e7) {
-            my $bin = Math::GMPz::Rmpz_init();
-            if (Math::GMPz::Rmpz_fits_ulong_p($n) and Math::GMPz::Rmpz_cmp_ui($n, 1e5) <= 0) {
-                Math::GMPz::Rmpz_bin_uiui($bin, Math::GMPz::Rmpz_get_ui($n), $k);
-            }
-            else {
-                # This is fast only with recent versions of GMP
-                Math::GMPz::Rmpz_bin_ui($bin, $n, $k);
-            }
-            Math::GMPz::Rmpz_mod($bin, $bin, $m);
-            return $bin;
-        }
-
-        # TODO: find a faster algorithm
-
-        my $t   = Math::GMPz::Rmpz_init();
-        my $u   = Math::GMPz::Rmpz_init();
-        my $bin = Math::GMPz::Rmpz_init_set_ui(1);
-
-        my %kp;
-
-        for (my $i = $n - $k + 1 ; Math::GMPz::Rmpz_cmp($i, $n) <= 0 ; Math::GMPz::Rmpz_add_ui($i, $i, 1)) {
-
-            Math::GMPz::Rmpz_set($t, $i);
-            my (undef, @factors) = _primorial_trial_factor($i, $k);
-
-            foreach my $p (List::Util::uniq(@factors)) {
-
-                next if ((my $e = ($kp{$p} //= _factorial_valuation($k, $p))) == 0);
-
-                Math::GMPz::Rmpz_set_ui($u, $p);
-                my $v = Math::GMPz::Rmpz_remove($t, $t, $u);
-
-                if ($v >= $e) {
-
-                    if ($v > $e) {
-                        Math::GMPz::Rmpz_pow_ui($u, $u, $v - $e) if ($v - $e > 1);
-                        Math::GMPz::Rmpz_mul($t, $t, $u);
-                    }
-
-                    $kp{$p} = 0;
-                }
-                else {
-                    $kp{$p} -= $v;
-                }
-            }
-
-            Math::GMPz::Rmpz_mul($bin, $bin, $t);
-            Math::GMPz::Rmpz_mod($bin, $bin, $m);
-        }
-
-        return $bin;
     }
 
     sub _is_small_k_binomialmod {
@@ -31969,7 +31893,7 @@ package Sidef::Types::Number::Number {
                         Math::GMPz::Rmpz_invert($v, $m, $L);
                         Math::GMPz::Rmpz_sub($v, $L, $v) if $lucas_carmichael;
 
-                        if ($v > $hi) {
+                        if (Math::GMPz::Rmpz_cmp_ui($v, $hi) > 0) {
                             return;
                         }
 
@@ -31980,7 +31904,6 @@ package Sidef::Types::Number::Number {
                         Math::GMPz::Rmpz_fits_ulong_p($v) || die "Too large value!";
 
                         my $t = Math::GMPz::Rmpz_get_ui($v);
-                        $t > $hi && return;
 
                         if ($t < $lo) {
                             my ($j, $r) = (
