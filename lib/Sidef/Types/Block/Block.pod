@@ -29,21 +29,21 @@ Blocks in Sidef support:
     # Simple block creation
     var square = {|n| n * n }
     say square(5)           #=> 25
-    
+
     # Block with multiple parameters
     var add = {|a, b| a + b }
     say add(3, 7)           #=> 10
-    
+
     # Blocks as iterators
     var nums = [1, 2, 3, 4, 5]
     nums << {|n| say n }    # Print each number
-    
+
     # Functional composition
     var double = {|x| x * 2 }
     var inc = {|x| x + 1 }
     var f = (double ∘ inc)
     say f(5)                #=> 12  # (5+1)*2
-    
+
     # Memoization
     var fib = {|n|
         n <= 1 ? n : (fib(n-1) + fib(n-2))
@@ -127,7 +127,7 @@ Calculates the product of all values returned by calling the block for each valu
 
     var factorial = {|n| n }
     say factorial.Π(1..5)      #=> 120  # 1*2*3*4*5
-    
+
     var prod = {|n| n**2 }
     say prod.Π(1..4)            #=> 576  # 1*4*9*16
 
@@ -143,7 +143,7 @@ Calculates the sum of all values returned by calling the block for each value in
 
     var identity = {|n| n }
     say identity.Σ(1..10)       #=> 55  # Sum of 1 to 10
-    
+
     var squares = {|n| n**2 }
     say squares.Σ(1..5)         #=> 55  # 1+4+9+16+25
 
@@ -161,7 +161,7 @@ Returns a new block that represents the composition of two blocks. The result is
     var square = {|x| x ** 2 }
     var f = (double ∘ square)
     say f(5)            #=> 50  # double(square(5)) = double(25) = 50
-    
+
     # Multiple composition
     var inc = {|x| x + 1 }
     var g = (square ∘ double ∘ inc)
@@ -237,7 +237,7 @@ Returns a memoized version of the block that caches results based on input argum
         say "Computing fib(#{n})"
         n <= 1 ? n : (expensive(n-1) + expensive(n-2))
     }.cache
-    
+
     say expensive(5)    # Computes only once per unique input
     say expensive(5)    # Returns cached result
 
@@ -251,7 +251,7 @@ Calls the block with the provided arguments and returns the result.
 
     var multiply = {|a, b| a * b }
     say multiply.call(6, 7)     #=> 42
-    
+
     # Equivalent to:
     say multiply(6, 7)          #=> 42
 
@@ -279,12 +279,12 @@ Aliases: I<capture>
 
 Executes the block without arguments and returns the result. Useful for immediate execution of parameterless blocks.
 
-    var result = { 
+    var result = {
         var x = 5
         var y = 10
-        x + y 
+        x + y
     }.do
-    
+
     say result          #=> 15
 
 Aliases: I<run>
@@ -312,7 +312,7 @@ Forks a new process and executes the block in the child process. Returns a futur
         # Heavy computation
         (1..n).sum
     }
-    
+
     var future = compute.ffork(1000000)
     # Do other work...
     say future.wait     # Wait for and get result
@@ -338,11 +338,11 @@ Returns the first n values from evaluating the block over the range.
 
 Clears the memoization cache for a cached block, forcing recomputation on subsequent calls.
 
-    var block = {|n| 
+    var block = {|n|
         say "Computing..."
-        n * 2 
+        n * 2
     }.cache
-    
+
     block(5)            # Prints "Computing..."
     block(5)            # Uses cache
     block.flush_cache
@@ -360,7 +360,7 @@ Forks a new process and executes the block in the child process with the given a
         say "Child process: #{$$ }"
         # Do work in child
     }.fork
-    
+
     say "Parent process: #{$$ }, child PID: #{pid}"
 
 =cut
@@ -397,7 +397,7 @@ Returns true if the block is an identity function (returns its input unchanged),
 
     var id = {|x| x }
     say id.is_identity          #=> true
-    
+
     var double = {|x| x * 2 }
     say double.is_identity      #=> false
 
@@ -421,7 +421,7 @@ Returns an identity block that returns its arguments as a list. Used internally 
 Executes the block in an infinite loop until a break or return statement is encountered.
 
     var counter = 0
-    { 
+    {
         say counter++
         counter >= 5 && break
     }.loop
@@ -437,7 +437,7 @@ Applies the block n times, using the result of each application as input for the
 
     var double = {|x| x * 2 }
     say double.nest(3, 5)       #=> 40  # 5 -> 10 -> 20 -> 40
-    
+
     var inc = {|x| x + 1 }
     say inc.nest(10, 0)         #=> 10
 
@@ -485,7 +485,7 @@ Executes the block in a new thread with the given arguments. Returns a thread ob
     var compute = {|n|
         (1..n).sum
     }
-    
+
     var thread = compute.thr(1000)
     # Do other work...
     say thread.join     # Wait for thread and get result
@@ -504,7 +504,7 @@ Measures and returns the execution time of the block in seconds.
         # Some computation
         1000.times { |i| i**2 }
     }.time
-    
+
     say "Execution took #{duration} seconds"
 
 =cut
@@ -555,11 +555,11 @@ Executes the block repeatedly as long as the condition block returns true.
 
     # Map, filter, and reduce operations
     var numbers = (1..10)
-    
+
     var evens = numbers.grep{|n| n.is_even }
     var doubled = evens.map{|n| n * 2 }
     var sum = doubled.sum
-    
+
     say sum             #=> 60
 
 =head2 Closures and Scope
@@ -570,10 +570,10 @@ Executes the block repeatedly as long as the condition block returns true.
             ++count
         }
     }
-    
+
     var counter1 = make_counter()
     var counter2 = make_counter()
-    
+
     say counter1()      #=> 1
     say counter1()      #=> 2
     say counter2()      #=> 1  # Independent counter
@@ -585,7 +585,7 @@ Executes the block repeatedly as long as the condition block returns true.
     var threads = data.map{|n|
         { n**3 }.thr
     }
-    
+
     var results = threads.map{|t| t.join }
     say results         #=> [1, 8, 27, 64, 125, 216, 343, 512]
 
@@ -595,7 +595,7 @@ Executes the block repeatedly as long as the condition block returns true.
     var fib = {|n|
         n <= 1 ? n : (fib(n-1) + fib(n-2))
     }.cache
-    
+
     say fib(100)        # Computes efficiently
 
 =head1 SEE ALSO
@@ -614,11 +614,8 @@ Executes the block repeatedly as long as the condition block returns true.
 
 Daniel Șuteu (trizen)
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-Copyright (C) 2013-2025
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Sidef itself.
+This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

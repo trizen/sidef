@@ -7,7 +7,7 @@ Sidef::Optimizer - AST optimization and constant folding for Sidef programs
 =head1 SYNOPSIS
 
     use Sidef::Optimizer;
-    
+
     my $optimizer = Sidef::Optimizer->new(%options);
     my %optimized_ast = $optimizer->optimize($ast_struct);
     my $optimized_expr = $optimizer->optimize_expr($expression);
@@ -100,7 +100,7 @@ The optimizer can evaluate constant expressions at compile-time:
 
     # Before optimization
     var x = 2 + (3 * 4);
-    
+
     # After optimization (conceptually)
     var x = 14;
 
@@ -127,7 +127,7 @@ is invoked during optimization:
 
     # "HELLO" computed at compile-time
     var greeting = "hello".uc;
-    
+
     # 120 computed at compile-time
     var factorial = 5.factorial;
 
@@ -137,8 +137,8 @@ Special handling for unary operators like negation, sqrt, and logical not:
 
     # -42 computed at compile-time
     var x = -42;
-    
-    # 3 computed at compile-time  
+
+    # 3 computed at compile-time
     var y = √9;
 
 =head1 SUPPORTED TYPES AND OPERATIONS
@@ -536,17 +536,10 @@ The typical optimization workflow:
 
 =head1 AUTHOR
 
-Daniel "trizen" Șuteu
+Daniel Șuteu (trizen)
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-Copyright (C) 2013-2026 Daniel Șuteu
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Sidef itself.
-
-=head1 REPOSITORY
-
-L<https://github.com/trizen/sidef>
+This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

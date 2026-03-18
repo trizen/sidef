@@ -13,12 +13,12 @@ The GetOpt class is not typically used directly. Instead, it is invoked automati
 =head1 SYNOPSIS
 
     #!/usr/bin/sidef
-    
+
     # Simple MAIN function with string parameter
     func MAIN(name) {
         say "Hello, #{name}!"
     }
-    
+
     # Execute: sidef script.sf --name=World
     # Output: Hello, World!
 
@@ -49,7 +49,7 @@ The GetOpt class recognizes parameter types and generates appropriate option spe
     func MAIN(file) {
         say "Processing file: #{file}"
     }
-    
+
     # Execute: sidef script.sf --file=input.txt
     # Output: Processing file: input.txt
 
@@ -59,7 +59,7 @@ The GetOpt class recognizes parameter types and generates appropriate option spe
         say "Count: #{count}"
         say "Verbose mode: #{verbose}"
     }
-    
+
     # Execute: sidef script.sf --count=42 --verbose
     # Output:
     # Count: 42
@@ -72,7 +72,7 @@ The GetOpt class recognizes parameter types and generates appropriate option spe
         say "Output: #{output}"
         say "Limit: #{limit}"
     }
-    
+
     # Execute: sidef script.sf --input=data.txt --output=result.txt --limit=50
 
 =head2 Slurpy Parameters
@@ -83,7 +83,7 @@ Slurpy parameters capture all remaining command-line arguments that don't match 
         say "Verbose: #{verbose}"
         say "Processing files: #{files.join(', ')}"
     }
-    
+
     # Execute: sidef script.sf --verbose file1.txt file2.txt file3.txt
     # Output:
     # Verbose: true
@@ -96,15 +96,15 @@ Sidef supports multiple C<MAIN> function signatures through function overloading
     func MAIN(String action, String file) {
         say "Action: #{action}, File: #{file}"
     }
-    
+
     func MAIN(Number count) {
         say "Count mode: #{count}"
     }
-    
+
     func MAIN {
         say "No arguments provided"
     }
-    
+
     # The appropriate function will be called based on the arguments
 
 =head1 ARGUMENT PARSING BEHAVIOR
@@ -114,7 +114,7 @@ Sidef supports multiple C<MAIN> function signatures through function overloading
 Option names are derived from the parameter names in the C<MAIN> function. Each parameter becomes a command-line option with the same name:
 
     func MAIN(input_file, output_file) { ... }
-    
+
     # Accepts: --input_file=in.txt --output_file=out.txt
 
 =head2 Boolean Options
@@ -265,14 +265,8 @@ The GetOpt class uses Perl's C<Getopt::Long> module for the actual parsing. This
 
 Daniel Șuteu (trizen)
 
-=head1 COPYRIGHT AND LICENSE
+=head1 LICENSE
 
-Copyright (C) 2013-2025 Daniel Șuteu
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<https://www.perlfoundation.org/artistic-license-20.html>
+This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

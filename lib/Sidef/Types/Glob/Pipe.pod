@@ -31,12 +31,12 @@ Sidef::Types::Glob::Pipe - Interface for creating and managing pipe handles
 
 =head1 DESCRIPTION
 
-The C<Pipe> class provides an interface for working with Unix-style pipes in Sidef. 
-Pipes allow bidirectional communication between your Sidef program and external commands 
-or processes, enabling data to flow from your program to a command (write mode) or from 
+The C<Pipe> class provides an interface for working with Unix-style pipes in Sidef.
+Pipes allow bidirectional communication between your Sidef program and external commands
+or processes, enabling data to flow from your program to a command (write mode) or from
 a command to your program (read mode).
 
-This class wraps the underlying system pipe mechanisms and provides a clean, 
+This class wraps the underlying system pipe mechanisms and provides a clean,
 object-oriented interface for pipe operations.
 
 =head1 INHERITS
@@ -94,7 +94,7 @@ B<Example:>
 
     pipe.open(mode, var_ref)
 
-Opens the pipe in the specified mode and assigns the resulting filehandle 
+Opens the pipe in the specified mode and assigns the resulting filehandle
 to the variable reference provided.
 
 B<Parameters:>
@@ -113,7 +113,7 @@ B<Example:>
 
     var pipe = Pipe("grep pattern file.txt")
     pipe.open('<', \var fh)    # open for reading
-    
+
     var output_pipe = Pipe("sort")
     output_pipe.open('>', \var out)  # open for writing
 
@@ -127,7 +127,7 @@ B<Note:> The mode parameter follows Perl/Unix conventions:
 
     pipe.open_r(var_ref)
 
-Opens the pipe in read mode, allowing your program to read output from the command. 
+Opens the pipe in read mode, allowing your program to read output from the command.
 This is equivalent to C<open('<', var_ref)>.
 
 B<Parameters:>
@@ -144,13 +144,13 @@ B<Example:>
 
     var pipe = Pipe("ps aux | grep sidef")
     pipe.open_r(\var fh)
-    
+
     fh.each { |line|
         say "Process: #{line}"
     }
     fh.close
 
-B<Use Case:> Use this when you want to capture and process output from 
+B<Use Case:> Use this when you want to capture and process output from
 a shell command within your Sidef program.
 
 B<Aliases:> I<open_read>
@@ -161,7 +161,7 @@ B<Aliases:> I<open_read>
 
     pipe.open_w(var_ref)
 
-Opens the pipe in write mode, allowing your program to send data to the command's 
+Opens the pipe in write mode, allowing your program to send data to the command's
 standard input. This is equivalent to C<open('>', var_ref)>.
 
 B<Parameters:>
@@ -178,12 +178,12 @@ B<Example:>
 
     var pipe = Pipe("mail -s 'Report' user@example.com")
     pipe.open_w(\var fh)
-    
+
     fh.say("This is the report content.")
     fh.say("Generated at: #{Time.local}")
     fh.close
 
-B<Use Case:> Use this when you want to pipe data from your Sidef program 
+B<Use Case:> Use this when you want to pipe data from your Sidef program
 into another command for processing.
 
 B<Aliases:> I<open_write>
@@ -194,7 +194,7 @@ B<Aliases:> I<open_write>
 
     pipe.to_s
 
-Returns a string representation of the Pipe object, typically showing 
+Returns a string representation of the Pipe object, typically showing
 the command it encapsulates.
 
 B<Returns:> String representation of the Pipe object
@@ -216,14 +216,14 @@ B<Aliases:> I<dump>, I<to_str>
     # Execute a command and read its output line by line
     var pipe = Pipe("find /etc -name '*.conf'")
     pipe.open_r(\var fh)
-    
+
     var count = 0
     fh.each { |line|
         say line.trim
         ++count
     }
     fh.close
-    
+
     say "Found #{count} configuration files"
 
 =head2 Writing to a Pipe
@@ -232,7 +232,7 @@ B<Aliases:> I<dump>, I<to_str>
     var data = %w(zebra apple mango banana kiwi)
     var pipe = Pipe("sort -r")
     pipe.open_w(\var fh)
-    
+
     data.each { |item|
         fh.say(item)
     }
@@ -243,7 +243,7 @@ B<Aliases:> I<dump>, I<to_str>
     # Chain multiple commands together
     var pipe = Pipe("ps aux | awk '{print $2, $11}' | sort -n")
     pipe.open_r(\var fh)
-    
+
     say "PID\tCommand"
     say "=" * 40
     fh.each { |line|
@@ -255,7 +255,7 @@ B<Aliases:> I<dump>, I<to_str>
 
     # Always check if pipe operations succeed
     var pipe = Pipe("some-command")
-    
+
     try {
         pipe.open_r(\var fh)
         fh.each { |line| say line }
@@ -266,20 +266,20 @@ B<Aliases:> I<dump>, I<to_str>
 
 =head1 COMPARISON WITH FILE OPERATIONS
 
-While C<FileHandle> deals with regular files on disk, C<Pipe> works with 
+While C<FileHandle> deals with regular files on disk, C<Pipe> works with
 commands and processes:
 
     # File operations
     var file = File("data.txt")
     file.open_r(\var fh)
     # reads from file
-    
-    # Pipe operations  
+
+    # Pipe operations
     var pipe = Pipe("cat data.txt")
     pipe.open_r(\var fh)
     # reads from command output
 
-The key difference: Pipes execute commands and stream data to/from them, 
+The key difference: Pipes execute commands and stream data to/from them,
 while FileHandles access data stored in files.
 
 =head1 TECHNICAL NOTES
@@ -330,8 +330,6 @@ Daniel Șuteu (trizen)
 
 =head1 LICENSE
 
-This code is distributed under the terms of the Artistic License 2.0.
-For more details, see the full license text at:
-L<https://www.perlfoundation.org/artistic-license-20.html>
+This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut
