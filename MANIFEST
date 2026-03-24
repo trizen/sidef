@@ -2,6 +2,7 @@ _config.yml
 bin/sidef
 Build.PL
 Changes
+COMPUTATIONAL_ALGEBRA_GUIDE.md
 CONTRIBUTING.md
 lib/Sidef.pm
 lib/Sidef.pod
