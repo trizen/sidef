@@ -49,7 +49,7 @@ Beyond just running `sidef script.sf`, there are several useful flags worth know
 sidef -e 'say 10.primes'
 
 # Set floating-point precision to 50 decimal places
-sidef -P50 -e 'say pi'
+sidef -P50 -e 'say Num.pi'
 
 # Print the parsed representation of a script (useful for debugging precedence)
 sidef -r script.sf
@@ -67,7 +67,7 @@ In the REPL, you can inspect any value just by typing it — no `say` needed:
 $ sidef
 > 2**100
 1267650600228229401496703205376
-> 100.factorial.digits.len
+> 100.factorial.len
 158
 > "hello".chars.reverse.join
 olleh
@@ -153,10 +153,10 @@ func greet(name = "World", punct = "!") {
     say "Hello, #{name}#{punct}"
 }
 
-greet()                       # Hello, World!
-greet("Alice")                # Hello, Alice!
+greet()                        # Hello, World!
+greet("Alice")                 # Hello, Alice!
 greet(name: "Bob", punct: ".") # Hello, Bob.
-greet(punct: "?")             # Hello, World?
+greet(punct: "?")              # Hello, World?
 ```
 
 ### Variadic Functions
@@ -312,8 +312,8 @@ Apply an operator or method to every element:
 [1,2,3,4] »*» 10    # [10, 20, 30, 40]
 [1,2,3,4] «*« 10    # [10, 20, 30, 40]
 
-["hello","world"] ».uc    # ["HELLO", "WORLD"]
-[1,4,9,16] ».sqrt         # [1, 2, 3, 4]
+["hello","world"] >>uc()>>    # ["HELLO", "WORLD"]
+[1,4,9,16] >>sqrt()>>         # [1, 2, 3, 4]
 ```
 
 ### Reduce: `«OP»`
@@ -329,7 +329,7 @@ Fold an array with an operator:
 ### Cross Product: `~X`
 
 ```ruby
-[1,2] ~X~  [3,4]     # [[1,3],[1,4],[2,3],[2,4]]
+[1,2] ~X   [3,4]     # [[1,3],[1,4],[2,3],[2,4]]
 [1,2] ~X+  [3,4]     # [4, 5, 5, 6]   (cross with +)
 [1,2] ~X*  [3,4]     # [3, 4, 6, 8]   (cross with *)
 ```
@@ -337,7 +337,7 @@ Fold an array with an operator:
 ### Zip: `~Z`
 
 ```ruby
-[1,2,3] ~Z~ [4,5,6]    # [[1,4],[2,5],[3,6]]
+[1,2,3] ~Z  [4,5,6]    # [[1,4],[2,5],[3,6]]
 [1,2,3] ~Z+ [4,5,6]    # [5, 7, 9]
 ```
 
@@ -362,7 +362,7 @@ say dot([1,2,3], [4,5,6])    # 32  (= 1*4 + 2*5 + 3*6)
 Sets hold unique elements and support standard set operations:
 
 ```ruby
-var evens = Set(2, 4, 6, 8, 10)
+var evens  = Set(2, 4, 6, 8, 10)
 var primes = Set(2, 3, 5, 7, 11)
 
 say (evens & primes)    # Set(2)          — intersection
@@ -445,10 +445,10 @@ for x in ((0..1).by(0.1)) {
 }
 # 0 0.1 0.2 ... 1
 
-for x in ((10^..1).by(-3)) {
+for x in ((10 ^.. 1).by(3)) {
     print "#{x} "
 }
-# 10 7 4 1
+# 9 6 3
 ```
 
 ### `upto` / `downto` / `by` Chaining
@@ -462,8 +462,8 @@ for x in ((10^..1).by(-3)) {
 ### Range Methods
 
 ```ruby
-(1..100).sum           # 5050
-(1..10).prod           # 3628800  (10!)
+(1..100).sum                # 5050
+(1..10).prod                # 3628800  (10!)
 (1..20).grep { .is_prime }  # [2,3,5,7,11,13,17,19]
 (1..Inf).lazy.grep { .is_prime }.first(10)  # first 10 primes
 ```
@@ -478,12 +478,12 @@ Lazy evaluation is one of Sidef's most powerful features for handling large or i
 
 ```ruby
 # First 10 numbers that are both a perfect square and have digit sum 10
-var result = (1..Inf).lazy
-    .map { _**2 }
-    .grep { .digits.sum == 10 }
+var result = (1..Inf).lazy \
+    .map { _**2 } \
+    .grep { .digits.sum == 10 } \
     .first(5)
 
-say result    # [1, 100, 10000, 10201, 12100]  (or similar)
+say result    # [64, 361, 1225, 2116, 3025]
 ```
 
 ### gather/take
@@ -493,7 +493,7 @@ say result    # [1, 100, 10000, 10201, 12100]  (or similar)
 ```ruby
 # Collect twin prime pairs up to 100
 var twins = gather {
-    for p in primes(3, 100) {
+    for p in (primes(3, 100)) {
         take([p, p+2]) if (p+2).is_prime
     }
 }
@@ -509,7 +509,7 @@ var pascal = gather {
     var row = [1]
     10.times {
         take(row.clone)
-        row = [1, (row ~Z+ row[1..row.end])..., 1]
+        row = [1, (row ~Z+ row.slice(1))..., 1]
     }
 }
 pascal.each { |row| say row.join(" ") }
@@ -530,14 +530,15 @@ var fibs = Enumerator({ |yield|
 })
 
 say fibs.first(10)    # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
-say fibs.nth(50)      # 12586269025  (0-indexed)
+say fibs.nth(51)      # 12586269025  (1-indexed)
 ```
 
-Enumerators support the full range of lazy methods:
+Enumerators supports various methods with conditional blocks, such as:
 
 ```ruby
-var fib_primes = fibs.lazy.grep { .is_prime }
-say fib_primes.first(8)    # [2, 3, 5, 13, 89, 233, 1597, 28657]
+say fibs.first(8, { .is_prime })  # [2, 3, 5, 13, 89, 233, 1597, 28657]
+say fibs.nth(5, { .is_even })     # 144
+say fibs.while { _ <= 1000 }      # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987]
 ```
 
 Collatz sequence as an enumerator:
@@ -547,25 +548,13 @@ func collatz_seq(n) {
     Enumerator({ |yield|
         while (n != 1) {
             yield(n)
-            n = (n.is_even ? n/2 : 3*n+1)
+            n = (n.is_even ? (n>>1) : (3*n + 1))
         }
         yield(1)
     })
 }
 
 say collatz_seq(27).to_a.len    # steps to reach 1: 112
-```
-
-### Lazy Pipeline with the `|>` Operator
-
-```ruby
-var result = 1..Inf       \
-    |> :lazy              \
-    |> { .grep { .is_prime } }  \
-    |> { .map { _ ** 2 } }      \
-    |> { .first(5) }
-
-say result    # [4, 9, 25, 49, 121]
 ```
 
 ---
@@ -582,18 +571,18 @@ class Circle(Number radius) {
     has circumference
 
     method init {
-        area          = Num.pi * radius**2
-        circumference = 2 * Num.pi * radius
+        area          = (Num.pi * radius**2)
+        circumference = (2 * Num.pi * radius)
     }
 
     method scale(Number factor) {
-        Circle(radius: radius * factor)
+        Circle(radius * factor)
     }
 }
 
 var c = Circle(5)
-say c.area.round(4)           # 78.5398
-say c.scale(2).circumference.round(4)    # 62.8318
+say c.area.round(-4)                    # 78.5398
+say c.scale(2).circumference.round(-4)  # 62.8319
 ```
 
 ### Method Overriding and `super`
@@ -708,9 +697,9 @@ say v2.magnitude     # 5
 var a = Mod(13, 19)
 var b = Mod(7,  19)
 
-say a + b     # Mod(1, 19)   (13+7 = 20 ≡ 1 mod 19)
-say a * b     # Mod(15, 19)
-say a**100    # Mod(?, 19)   — fast modular exponentiation
+say (a + b)     # Mod(1, 19)   (13+7 = 20 ≡ 1 mod 19)
+say (a * b)     # Mod(15, 19)
+say a**100      # Mod(6, 19)   — fast modular exponentiation
 
 # Modular inverse
 say a.inv     # Mod(3, 19)  since 13*3 = 39 ≡ 1 mod 19
@@ -733,8 +722,8 @@ Gaussian integers are complex numbers `a + bi` where both `a` and `b` are intege
 var g1 = Gauss(3, 4)
 var g2 = Gauss(1, -2)
 
-say g1 + g2     # Gauss(4, 2)
-say g1 * g2     # Gauss(11, -2)   (= 3-6i+4i+8 = 11-2i)
+say (g1 + g2)   # Gauss(4, 2)
+say (g1 * g2)   # Gauss(11, -2)   (= 3-6i+4i+8 = 11-2i)
 say g1.norm     # 25              (= 3² + 4²)
 say g1.conj     # Gauss(3, -4)
 
@@ -746,9 +735,9 @@ say Gauss(5, 0).factor    # Gauss(2+i) * Gauss(2-i)
 
 ```ruby
 var p = Poly([1, -3, 2])     # x² - 3x + 2
-var q = Poly([1, 1])          # x + 1
+var q = Poly([1, 1])         # x + 1
 
-say p * q                    # x³ - 2x² - x + 2
+say (p * q)                  # x³ - 2x² - x + 2
 say p.eval(0)                # 2
 say p.eval(1)                # 0   (1 is a root)
 say p.eval(2)                # 0   (2 is a root)
@@ -768,7 +757,7 @@ Polynomials over a finite field:
 var p = PolyMod([1, 0, 1], 2)     # x² + 1 over GF(2)
 var q = PolyMod([1, 1],    2)     # x + 1  over GF(2)
 
-say p * q    # x³ + x² + x + 1 (mod 2)
+say (p * q)    # x³ + x² + x + 1 (mod 2)
 ```
 
 ### Quaternions
@@ -777,8 +766,8 @@ say p * q    # x³ + x² + x + 1 (mod 2)
 var q1 = Quaternion(1, 2, 3, 4)    # 1 + 2i + 3j + 4k
 var q2 = Quaternion(5, 6, 7, 8)
 
-say q1 + q2    # Quaternion(6, 8, 10, 12)
-say q1 * q2    # Quaternion(-60, 12, 30, 24)
+say (q1 + q2)  # Quaternion(6, 8, 10, 12)
+say (q1 * q2)  # Quaternion(-60, 12, 30, 24)
 say q1.norm    # sqrt(1+4+9+16) = sqrt(30)
 say q1.conj    # Quaternion(1, -2, -3, -4)
 ```
@@ -792,8 +781,8 @@ Sidef has exceptional built-in support for number-theoretic functions — far be
 ### Primality and Prime Generation
 
 ```ruby
-say 2**31 - 1               # 2147483647
-say (2**31 - 1).is_prime    # true (Mersenne prime)
+say (2**31 - 1)               # 2147483647
+say (2**31 - 1 -> is_prime)   # true (Mersenne prime)
 
 # nth prime
 say 1000.prime    # 7919
@@ -837,8 +826,8 @@ say gcd(48, 18)         # 6
 say lcm(4, 6)           # 12
 say gcd(0, 7)           # 7
 
-# Extended Euclidean algorithm: returns (gcd, x, y) where gcd = a*x + b*y
-var (g, x, y) = 48.gcdext(18)
+# Extended Euclidean algorithm: returns (x, y, gcd) where gcd = a*x + b*y
+var (x, y, g) = 48.gcdext(18)
 say "#{g} = 48*#{x} + 18*#{y}"    # 6 = 48*(-1) + 18*3
 
 # Modular inverse: x such that a*x ≡ 1 (mod m)
@@ -894,7 +883,7 @@ say sieve(50)    # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]
 ```ruby
 func miller_rabin(n, witnesses) {
     return false if (n < 2)
-    return true  if (n == 2 || n == 3)
+    return true  if ((n == 2) || (n == 3))
     return false if (n.is_even)
 
     # Write n-1 as 2^r * d
@@ -904,7 +893,7 @@ func miller_rabin(n, witnesses) {
     for a in witnesses {
         next if (a >= n)
         var x = powmod(a, d, n)
-        next if (x == 1 || x == n-1)
+        next if ((x == 1) || (x == n-1))
 
         var composite = true
         (r-1).times {
@@ -922,7 +911,8 @@ func is_prime_mr(n) {
 }
 
 say is_prime_mr(104729)     # true
-say is_prime_mr(104730)     # false
+say is_prime_mr(104731)     # false
+say 25.by(is_prime_mr)      # first 25 primes
 ```
 
 ### Chinese Remainder Theorem
@@ -935,10 +925,10 @@ say crt([2, 3, 2], [3, 5, 7])    # 23  (23≡2 mod 3, 23≡3 mod 5, 23≡2 mod 7
 
 # Manual CRT for two congruences
 func crt2(a1, m1, a2, m2) {
-    var (g, u, _) = m1.gcdext(m2)
+    var (u, _, g) = m1.gcdext(m2)
     die "No solution" if ((a2 - a1) % g != 0)
     var lcm = m1.lcm(m2)
-    ((a1 + m1 * u * ((a2 - a1) / g)) % lcm + lcm) % lcm
+    ((a1 + (m1 * u * ((a2 - a1) / g))) % lcm + lcm) % lcm
 }
 
 say crt2(3, 5, 5, 7)    # 33  (33≡3 mod 5, 33≡5 mod 7)
@@ -962,8 +952,8 @@ say bigomega(12)    # 3   (with multiplicity: 2,2,3)
 
 # Sum over divisors
 var n = 100
-say divisors(n).sum             # 217  (sigma(100))
-say divisors(n).map{euler_phi(_)}.sum    # == n   (Gauss identity)
+say divisors(n).sum               # 217  (sigma(100))
+say divisors(n).sum{.euler_phi}   # == n   (Gauss identity)
 ```
 
 ---
@@ -992,7 +982,7 @@ say r.denominator              # 113
 # Dynamic precision change (local scope)
 local Num!PREC = 1000.numify    # 1000 bits ≈ 301 decimal places
 
-say pi            # π to 300+ places
+say Num.pi        # π to 300+ places
 say exp(1)        # e to 300+ places
 say sqrt(2)       # √2 to 300+ places
 ```
@@ -1011,15 +1001,15 @@ The arithmetic-geometric mean converges doubly-exponentially to π:
 local Num!PREC = 200.numify
 
 func agm_pi {
-    var a = 1.float
-    var b = (1 / sqrt(2.float))
-    var t = 0.25.float
-    var p = 1.float
+    var a = 1
+    var b = (1 / sqrt(2))
+    var t = 0.25
+    var p = 1f
 
     64.times {
-        var a1 = (a + b) / 2
-        var b1 = (a * b).sqrt
-        var t1 = t - p * (a - a1)**2
+        var a1 = ((a + b) / 2)
+        var b1 = sqrt(a * b)
+        var t1 = (t - (p * (a - a1)**2))
         (a, b, t, p) = (a1, b1, t1, p*2)
     }
 
@@ -1033,7 +1023,7 @@ say agm_pi()
 
 ```ruby
 # Represent a number as a continued fraction
-say (355/113).continued_fraction     # [3, 7, 16]
+say (355/113 -> cfrac)     # [3, 7, 16]
 
 # Convergents of √2
 var sqrt2_cf = Enumerator({ |yield|
@@ -1042,7 +1032,7 @@ var sqrt2_cf = Enumerator({ |yield|
     loop {
         var (a, b) = (p1 + p0, q1 + q0)
         # Determine next coefficient via the actual CF expansion of √2
-        var coeff = ((a.float / b.float) > sqrt(2.float)) ? 1 : 2
+        var coeff = (((a.float / b.float) > sqrt(2.float)) ? 1 : 2)
         (p0, p1) = (p1, coeff*p1 + p0)
         (q0, q1) = (q1, coeff*q1 + q0)
         yield(p1/q1)
