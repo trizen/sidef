@@ -14,7 +14,7 @@ In this tutorial we're going to look how we can use [Sidef](https://github.com/t
       **   **               ****   *********   *********   *
 ```
 
-To initiate your journey with Sidef and installation instructions, refer to the [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf)).
+To initiate your journey with Sidef and installation instructions, refer to the [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_BEGINNER_GUIDE.md) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf)).
 
 Over time, Sidef has integrated numerous mathematical functions, many based on Dana Jacobsen's [Math::Prime::Util](https://github.com/danaj/Math-Prime-Util) and [Math::Prime::Util::GMP](https://github.com/danaj/Math-Prime-Util-GMP) awesome Perl modules. These modules significantly enhance performance in tasks like integer factorization, primality testing, and prime counting.
 
@@ -26,7 +26,7 @@ Sidef has built-in support for big integers, rationals, Gaussian integers, Quate
 
 # Basic usage
 
-After [installing Sidef](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md), we can start the REPL by executing the `sidef` command in a console:
+After [installing Sidef](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_BEGINNER_GUIDE.md), we can start the REPL by executing the `sidef` command in a console:
 
 ```
 $ sidef

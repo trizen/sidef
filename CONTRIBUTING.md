@@ -31,7 +31,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 ## Getting Started
 
 1. **Familiarize yourself with Sidef:**
-   - Read the [Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md)
+   - Read the [Beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_BEGINNER_GUIDE.md)
    - Browse the [Documentation](https://trizen.gitbook.io/sidef-lang/)
    - Try examples at [Try It Online](https://tio.run/#sidef)
    - Explore [RosettaCode examples](https://rosettacode.org/wiki/Sidef)
@@ -389,7 +389,7 @@ Contributors are recognized in:
 ## Resources
 
 - **Documentation:** [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/)
-- **Tutorial:** [Beginner's Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md)
+- **Tutorial:** [Advanced Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_ADVANCED_GUIDE.md)
 - **Examples:** [sidef-scripts repository](https://github.com/trizen/sidef-scripts)
 - **Try Online:** [TIO Platform](https://tio.run/#sidef)
 - **RosettaCode:** [Sidef examples](https://rosettacode.org/wiki/Sidef)

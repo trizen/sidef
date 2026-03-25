@@ -95,7 +95,7 @@ Reading conventions used throughout this document:
 
 ## 2. Getting Started
 
-For installation instructions and basic language features, refer to the [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf)).
+For installation instructions and basic language features, refer to the [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_BEGINNER_GUIDE.md) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf)).
 
 ### Starting the REPL
 
@@ -2459,7 +2459,7 @@ n.is_omega_prime(3)
 ### Official Documentation
 
 - **Sidef book**: [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-book.pdf))
-- **Beginner's tutorial**: [TUTORIAL.md](https://codeberg.org/trizen/sidef/src/branch/master/TUTORIAL.md) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf))
+- **Advanced tutorial**: [SIDEF_ADVANCED_TUTORIAL.md](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_ADVANCED_GUIDE.md) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf))
 - **Full Number class documentation**: [Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-number-class-documentation.pdf))
 - **Source code**: [codeberg.org/trizen/sidef](https://codeberg.org/trizen/sidef/src/master/lib/Sidef/Types/Number/Number.pm)
 
