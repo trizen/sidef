@@ -49,10 +49,10 @@
 29. [Worked Problems](#29-worked-problems)
 30. [Quick-Reference Cheat Sheet](#30-quick-reference-cheat-sheet)
 31. [Sieve Algorithms](#31-sieve-algorithms)
-32. [Primality Testing — Algorithm Deep Dives](#32-primality-testing--algorithm-deep-dives)
+32. [Primality Testing — Algorithm Deep Dives](#32-primality-testing-algorithm-deep-dives)
 33. [Factorization Algorithm Deep Dives](#33-factorization-algorithm-deep-dives)
 34. [Discrete Logarithms and Related Problems](#34-discrete-logarithms-and-related-problems)
-35. [Chinese Remainder Theorem — Extended Applications](#35-chinese-remainder-theorem--extended-applications)
+35. [Chinese Remainder Theorem — Extended Applications](#35-chinese-remainder-theorem-extended-applications)
 36. [Quadratic Reciprocity and Residue Theory](#36-quadratic-reciprocity-and-residue-theory)
 37. [The Prime Number Theorem and Analytic Methods](#37-the-prime-number-theorem-and-analytic-methods)
 38. [Smooth Numbers, Factor Bases, and Subexponential Factorization](#38-smooth-numbers-factor-bases-and-subexponential-factorization)
@@ -2684,7 +2684,7 @@ say fast_factor(831600, LPF)    # [2, 2, 2, 2, 3, 3, 5, 5, 7, 11] — instant
 
 ---
 
-## 32. Primality Testing — Algorithm Deep Dives
+## 32. Primality Testing - Algorithm Deep Dives
 
 ### Trial Division with Wheel Factorization
 
@@ -3175,7 +3175,7 @@ say "mod 7^5: #{hensel_lift({|x| x*x - 2}, {|x| 2*x}, r0, 7, 5)}"
 
 ---
 
-## 35. Chinese Remainder Theorem — Extended Applications
+## 35. Chinese Remainder Theorem - Extended Applications
 
 ### Basic CRT and Garner's Algorithm
 
