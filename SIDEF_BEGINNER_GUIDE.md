@@ -22,10 +22,10 @@
 8. [Strings](#8-strings)
 9. [Booleans](#9-booleans)
 10. [Operators and Expressions](#10-operators-and-expressions)
-11. [Operator Precedence — The Most Important Rule](#11-operator-precedence--the-most-important-rule)
+11. [Operator Precedence — The Most Important Rule](#11-operator-precedence-the-most-important-rule)
 12. [Printing Output](#12-printing-output)
 13. [Getting Input](#13-getting-input)
-14. [Control Flow — Making Decisions](#14-control-flow--making-decisions)
+14. [Control Flow — Making Decisions](#14-control-flow-making-decisions)
 15. [Loops](#15-loops)
 16. [Functions](#16-functions)
 17. [Arrays](#17-arrays)
@@ -540,7 +540,7 @@ say ("banana" gt "apple")   # true  (alphabetically greater than)
 
 ---
 
-## 11. Operator Precedence — The Most Important Rule
+## 11. Operator Precedence - The Most Important Rule
 
 > ⚠️ **This is the single most important rule to understand in Sidef.** Get this wrong and your programs will produce surprising results.
 
@@ -683,7 +683,7 @@ if (age >= 18) {
 
 ---
 
-## 14. Control Flow — Making Decisions
+## 14. Control Flow - Making Decisions
 
 ### if / elsif / else
 
