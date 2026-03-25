@@ -14184,7 +14184,7 @@ package Sidef::Types::Number::Number {
                 }
             };
 
-            if (($p > 2 or $rq < 3) and $q <= scalar(@e)) {
+            if (($p > 2 or $rq < 3) and $rq <= scalar(@e)) {
                 $v = Math::Prime::Util::GMP::mulmod($v, (($e[$rq - 1] % 2 == 0) ? 1 : -1), $pq);
             }
 
