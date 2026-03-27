@@ -182,16 +182,16 @@ assert_eq(binomialmod(5, -2, 100), binomial(5, 7) % 100, "C(5,-2) -> C(5,7) % 10
 # ----------------------------------------------------------------------
 # Small k path (k <= 1e4 or heuristic)
 # ----------------------------------------------------------------------
-assert_eq(binomialmod(10**7, 10, 10**9+7), binomial(10**7, 10) % (10**9+7),
+assert_eq(binomialmod(1e7, 10, 1e9+7), binomial(1e7, 10) % (1e9+7),
           "Small k (k=10) with large n")
-assert_eq(binomialmod(10**8, 1000, 123456789), 10119783,
+assert_eq(binomialmod(1e8, 1000, 123456789), 10119783,
           "Small k (k=1000) with large n")
 
 # ----------------------------------------------------------------------
 # Lucas theorem for prime modulus
 # ----------------------------------------------------------------------
 assert_eq(binomialmod(100, 30, 101), binomial(100, 30) % 101, "Prime modulus 101 (Lucas)")
-assert_eq(binomialmod(10**6, 500000, 10007), 0,
+assert_eq(binomialmod(1e6, 500000, 10007), 0,
           "Large n, prime modulus 10007 (Lucas)")
 
 # ----------------------------------------------------------------------
@@ -225,9 +225,9 @@ assert_eq(binomialmod(27, 9, 27), 3, "v_p(C(n,k)) >= e -> 0 (p=3, e=3)")  # know
 # ----------------------------------------------------------------------
 # For large n, m, and small k, the heuristic decides to use _small_k_binomialmod
 # We'll test with n=1e9, k=1e4, m=1e9+7 (prime), expecting the fast path.
-assert_eq(binomialmod(10**9, 10000, 10**9+7),
-          2526743562400000,
+assert_eq(binomialmod(1e9, 1e4, 1e16), 2526743562400000,
           "Heuristic: small k (1e4) with large n and prime m")
+assert_eq(binomialmod(1e9, 1e4, 1e9+7), 514182778)
 
 # ----------------------------------------------------------------------
 # Cases where p > n (so binomial mod p^e reduces to direct computation)
@@ -244,9 +244,9 @@ assert_eq(binomialmod(30, 15, 4), binomial(30, 15) % 4, "Fallback: p=2, e=2 (p²
 # Very large inputs (stress the algorithm)
 # ----------------------------------------------------------------------
 # These are computationally heavy but should pass. We'll only run a few.
-assert_eq(binomialmod(10**6, 500000, 1000003), 375001,
+assert_eq(binomialmod(1e6, 500000, 1000003), 375001,
           "Very large n, medium k, prime modulus")
-assert_eq(binomialmod(10**7, 10**6, 999983), 472109,
+assert_eq(binomialmod(1e7, 1e6, 999983), 472109,
           "Very large n, k, prime modulus")
 
 # ----------------------------------------------------------------------
