@@ -60,11 +60,11 @@ assert_eq(binomialmod(1234567, 1e4, factorial(20)),      binomial(1234567, 1e4) 
 assert_eq(binomialmod(-10, -10, -10), binomial(-10, -10) % -10)
 assert_eq(binomialmod(-50, 4, -50), binomial(-50, 4) % -50)
 
-#~ assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) + 1), binomial(1e6, 1e3) % (ipow(2, 128) + 1));
-#~ assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) - 1), binomial(1e6, 1e3) % (ipow(2, 128) - 1));
+assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) + 1), binomial(1e6, 1e3) % (ipow(2, 128) + 1));
+assert_eq(binomialmod(1e6, 1e3, ipow(2, 128) - 1), binomial(1e6, 1e3) % (ipow(2, 128) - 1));
 
-#~ assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) + 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) + 1)**2));
-#~ assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) - 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) - 1)**2));
+assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) + 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) + 1)**2));
+assert_eq(binomialmod(1e6, 1e4, (ipow(2, 128) - 1)**2), binomial(1e6, 1e4) % ((ipow(2, 128) - 1)**2));
 
 assert_eq([binomialmod(400,343,1777),
            binomialmod(-400,343,1777),
@@ -73,5 +73,34 @@ assert_eq([binomialmod(400,343,1777),
            binomialmod(-400,-343,1777),
            binomialmod(-14,-343,1777)],
            [977, 251, 421, 0, 0, 647])
+
+# Tests from Math::Prime::Util
+assert_eq(binomialmod(0,0,7), 1)
+assert_eq(binomialmod(0,1,7), 0)
+assert_eq(binomialmod(0,2,7), 0)
+assert_eq(binomialmod(3,0,7), 1)
+assert_eq(binomialmod(7,5,11), 10)
+assert_eq(binomialmod(950,100,123456), 24942)
+assert_eq(binomialmod(950,100,7), 2)
+assert_eq(binomialmod(8100,4000,1155), 924)
+assert_eq(binomialmod(950,100,1000000007), 640644226)
+assert_eq(binomialmod(189,34,877), 81)
+assert_eq(binomialmod(189,34,253009), 47560)
+assert_eq(binomialmod(189,34,36481), 14169)
+assert_eq(binomialmod(1900,17,41), 0)
+assert_eq(binomialmod(5000,654,101223721), 59171352)
+assert_eq(binomialmod(-112,5,351), 313)
+assert_eq(binomialmod(-189,34,877), 141)
+assert_eq(binomialmod(-23,-29,377), 117)
+assert_eq(binomialmod(189,-34,877), 0)
+assert_eq(binomialmod(100000000,87654321,1005973), 937361)
+assert_eq(binomialmod(100000000,7654321,1299709), 582708)
+assert_eq(binomialmod(100000000,7654321,12345678), 4152168)
+assert_eq(binomialmod(100000,7654,32768), 12288)
+assert_eq(binomialmod(100000,7654,196608), 110592)
+assert_eq(binomialmod(100000,7654,101223721), 5918452)
+assert_eq(binomialmod(100000000,7654321,32768), 24576)
+assert_eq(binomialmod(100000000,7654321,196608), 122880)
+assert_eq(binomialmod(100000000,7654321,101223721), 5463123)
 
 say("binomial(10^10, 10^5) mod 13! = ", binomialmod(1e10, 1e5, factorial(13)));
