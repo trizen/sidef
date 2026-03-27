@@ -74,6 +74,51 @@ assert_eq([binomialmod(400,343,1777),
            binomialmod(-14,-343,1777)],
            [977, 251, 421, 0, 0, 647])
 
+# --- 1. Edge Cases & Base Constraints ---
+assert_eq(binomialmod(10, 5, 1), 0)
+assert_eq(binomialmod(10, -5, 7), 0)
+assert_eq(binomialmod(-5, -2, 7), 0)
+assert_eq(binomialmod(-10, 5, 17), 4)
+assert_eq(binomialmod(-10, 4, 17), 1)
+assert_eq(binomialmod(5, 10, 7), 0)
+assert_eq(binomialmod(10, 0, 13), 1)
+assert_eq(binomialmod(10, 10, 13), 1)
+assert_eq(binomialmod(10, 1, 13), 10)
+assert_eq(binomialmod(10, 9, 13), 10)
+assert_eq(binomialmod(20, 17, 11), binomial(20, 3) % 11)
+
+# --- 2. Algorithmic Fast Paths ---
+# k <= 10^4 (bypasses prime factorization)
+assert_eq(binomialmod(10**6, 5000, 10**9 + 7), binomial(10**6, 5000) % (10**9 + 7))
+
+# Square-free m (triggers Lucas Theorem directly)
+assert_eq(binomialmod(10**7, 10**5 + 1, 2310), binomial(10**7, 10**5 + 1) % 2310)
+
+# n < p^q (triggers small_k routine directly on prime power)
+assert_eq(binomialmod(5000, 2500, 101**3), binomial(5000, 2500) % 101**3)
+
+# e_0 >= q (correctly evaluates to 0 mod p^q)
+assert_eq(binomialmod(343, 7, 49), 0)
+
+# --- 3. Prime Power Generalizations (Granville) ---
+# p^2 optimization path
+assert_eq(binomialmod(10**7, 10**4 + 5, 1009**2), binomial(10**7, 10**4 + 5) % 1009**2)
+
+# p^e (e >= 3) polynomial fast path
+assert_eq(binomialmod(10**6, 10**4 + 3, 11**3), binomial(10**6, 10**4 + 3) % 11**3)
+assert_eq(binomialmod(10**7, 10**4 + 1, 5**5), binomial(10**7, 10**4 + 1) % 5**5)
+
+# Deep p^e (e = 10) polynomial expansion holding precision
+assert_eq(binomialmod(10**8, 10**4 + 7, 3**10), binomial(10**8, 10**4 + 7) % 3**10)
+
+# --- 4. Composite Modulus / Chinese Remainder Theorem ---
+# CRT successfully recombines Lucas, p^2, and p^e results
+assert_eq(binomialmod(10**7, 10**4 + 11, 11**3 * 13**2 * 17 * 19), binomial(10**7, 10**4 + 11) % (11**3 * 13**2 * 17 * 19))
+
+# --- 5. The "Buggy Block" Edge Case Check ---
+# Safely handles sign carry adjustments when q is vastly larger than the base-p representation of n
+assert_eq(binomialmod(100, 50, 2**40), binomial(100, 50) % 2**40)
+
 # Tests from Math::Prime::Util
 assert_eq(binomialmod(0,0,7), 1)
 assert_eq(binomialmod(0,1,7), 0)
