@@ -89,9 +89,9 @@ for n in (-upto .. upto), k in (-upto .. upto), m in (-upto .. upto) {
 assert_eq(binomialmod(2*4514260853041 - 1, 4514260853041 - 1, 4514260853041.isqrt), 1)
 assert_eq(binomialmod(2*283686649 - 1, 283686649, 283686649.isqrt), 1)
 
-#assert_eq(binomialmod(2*283686649 - 1, 283686649, 283686649), 1)                       # this takes 3.5s
-#assert_eq(binomialmod(2*283686649 - 1, 283686649, 283686649**2), 1)                    # this takes 7.5s
-#assert_eq(binomialmod(2*4514260853041 - 1, 4514260853041 - 1, 4514260853041), 1)       # FIXME: this takes a lot of time
+assert_eq(binomialmod(2*283686649 - 1, 283686649, 283686649), 1)
+assert_eq(binomialmod(2*283686649 - 1, 283686649, 283686649**2), 1)
+assert_eq(binomialmod(2*4514260853041 - 1, 4514260853041 - 1, 4514260853041), 1)
 
 assert_eq(binomialmod(2*16843 - 1, 16843-1, 16843**4), 1)
 assert_eq(binomialmod(2*2124679 - 1, 2124679-1, 2124679**2), 1)
