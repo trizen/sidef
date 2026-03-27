@@ -14068,7 +14068,11 @@ package Sidef::Types::Number::Number {
         $n_val = Math::GMPz::Rmpz_init_set_str($n_val, 10) if !ref($n_val);
         $m_val = Math::GMPz::Rmpz_init_set_str($m_val, 10) if !ref($m_val);
 
-        if (!$p or $k_val <= 1e5) {
+        if (!$p and (my $exp = Math::Prime::Util::GMP::is_prime_power($m_val))) {
+            $p = Math::Prime::Util::GMP::rootint($m_val, $exp);
+        }
+
+        if (!$p or $k_val <= 1e4) {
             my $bin = Math::GMPz::Rmpz_init();
             if (Math::GMPz::Rmpz_fits_ulong_p($n_val) and Math::GMPz::Rmpz_cmp_ui($n_val, 1e5) <= 0) {
                 Math::GMPz::Rmpz_bin_uiui($bin, Math::GMPz::Rmpz_get_ui($n_val), $k_val);
@@ -14088,21 +14092,24 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_set_ui($num_mult, 1);
         Math::GMPz::Rmpz_set_ui($den_mult, 1);
-        Math::GMPz::Rmpz_set_ui($p_z,      $p) if $p;
+        Math::GMPz::Rmpz_set_ui($p_z,      $p);
 
         for my $i (0 .. $k_val - 1) {
             Math::GMPz::Rmpz_sub_ui($temp, $n_val, $i);
-            if ($p && Math::GMPz::Rmpz_divisible_ui_p($temp, $p)) {
+            if (Math::GMPz::Rmpz_divisible_ui_p($temp, $p)) {
                 $v += Math::GMPz::Rmpz_remove($temp, $temp, $p_z);
             }
             Math::GMPz::Rmpz_mul($num_mult, $num_mult, $temp);
             Math::GMPz::Rmpz_mod($num_mult, $num_mult, $m_val);
 
             my $den = $i + 1;
-            if ($p && $den % $p == 0) {
-                Math::GMPz::Rmpz_set_ui($temp, $den);
-                $v -= Math::GMPz::Rmpz_remove($temp, $temp, $p_z);
-                $den = Math::GMPz::Rmpz_get_ui($temp);
+            while ($den % $p == 0) {
+                $den = (
+                        HAS_PRIME_UTIL
+                        ? Math::Prime::Util::divint($den, $p)
+                        : Math::Prime::Util::GMP::divint($den, $p)
+                       );
+                $v -= 1;
             }
 
             Math::GMPz::Rmpz_mul_ui($den_mult, $den_mult, $den);
@@ -14172,7 +14179,7 @@ package Sidef::Types::Number::Number {
             my $rp = Math::Prime::Util::GMP::subint($np, $kp);
 
             if (_is_small_k_binomialmod($np, $kp, $p)) {
-                my $bin = _small_k_binomialmod($np, $kp, $p);
+                my $bin = _small_k_binomialmod($np, $kp, $p, $p);
                 $r = Math::Prime::Util::GMP::mulmod($r, $bin, $p);
             }
             else {
@@ -14286,7 +14293,7 @@ package Sidef::Types::Number::Number {
             my $prq = Math::Prime::Util::GMP::powint($p, $rq);
 
             if (_is_small_k_binomialmod($n, $k, $pq)) {
-                my $bin = _small_k_binomialmod($n, $k, $pq);
+                my $bin = _small_k_binomialmod($n, $k, $pq, $p);
                 push @F, [$bin, $pq];
                 next;
             }
