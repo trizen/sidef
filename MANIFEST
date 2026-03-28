@@ -748,6 +748,7 @@ scripts/Tests/best_shuffle.sf
 scripts/Tests/binary_search.sf
 scripts/Tests/binary_search_recursive.sf
 scripts/Tests/binomialmod.sf
+scripts/Tests/binomialmod_2.sf
 scripts/Tests/bitonic_sorter.sf
 scripts/Tests/block_identities.sf
 scripts/Tests/block_return.sf

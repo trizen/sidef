@@ -1,0 +1,343 @@
+#!/usr/bin/ruby
+
+# Comprehensive test suite for binomialmod(n, k, m)
+#
+# Covers every branch of the Granville-based implementation, including:
+#   – All early-exit guards in _modular_binomial
+#   – Lucas' theorem (prime modulus, q = 1)
+#   – Granville's generalisation (prime-power modulus, q >= 2)
+#   – _factorial_without_prime sub-paths (n<=1, p>n, cache hit, p^2 fast
+#     path, e>=3 polynomial D&C, O(n) fallback)
+#   – _get_P divide-and-conquer recursion (base cases q=0 and q=1, even q,
+#     odd q)
+#   – _poly_mul and _poly_shift (exercised by any e>=3 prime-power test)
+#   – _is_small_k_binomialmod optimisation (inside Lucas and prime-power loops)
+#   – The Granville sign-adjustment fix  ($rq <= scalar(@e), not $q)
+#   – CRT combination of multiple prime-power components
+
+
+# =========================================================================
+# BRANCH: m == 1  →  always 0
+# =========================================================================
+assert_eq(binomialmod(0,   0,   1), 0)
+assert_eq(binomialmod(10,  3,   1), 0)
+assert_eq(binomialmod(100, 50,  1), 0)
+assert_eq(binomialmod(10**18, 10**9, 1), 0)
+
+
+# =========================================================================
+# BRANCH: k < 0
+#   First transform: k = n – k
+#   If k is still < 0 afterwards  →  0
+#   If n >= 0 and new k > n       →  0  (caught by k>n guard below)
+# =========================================================================
+
+# n >= 0, k < 0  →  k becomes n + |k| > n  →  0
+assert_eq(binomialmod(10,  -1, 13), 0)   # k → 11 > 10
+assert_eq(binomialmod(10,  -3, 13), 0)   # k → 13 > 10
+assert_eq(binomialmod(5,   -5,  7), 0)   # k → 10 > 5
+assert_eq(binomialmod(0,   -1,  5), 0)   # k → 1  > 0
+
+# n < 0, k < 0, n > k (n less-negative): n – k < 0  →  still negative  →  0
+assert_eq(binomialmod(-3,  -1,  7), 0)   # k → -3–(–1) = –2 < 0
+
+# n < 0, k < 0, n < k (n more-negative): n – k > 0  →  continues to n<0 branch
+# C(–3, –5): k → –3–(–5) = 2.  n<0: (–1)^2 · C(4, 2) = 6
+assert_eq(binomialmod(-3,  -5,  7), 6)
+# C(–5, –8): k → –5–(–8) = 3.  n<0: (–1)^3 · C(7, 3) = –35 ≡ 9 (mod 11)
+assert_eq(binomialmod(-5,  -8, 11), 9)
+
+
+# =========================================================================
+# BRANCH: n < 0  →  upper-negation identity
+#   C(n, k) = (–1)^k · C(–n + k – 1, k)
+# =========================================================================
+
+# C(–1, 1) = (–1)^1 · C(1, 1) = –1 ≡ m–1
+assert_eq(binomialmod(-1,  1,  7), 6)
+assert_eq(binomialmod(-1,  1, 11), 10)
+
+# C(–1, 2) = (–1)^2 · C(2, 2) = 1
+assert_eq(binomialmod(-1,  2,  7), 1)
+
+# C(–2, 1) = –2
+assert_eq(binomialmod(-2,  1,  7), 5)   # –2 mod 7 = 5
+
+# C(–2, 3) = (–1)^3 · C(4, 3) = –4
+assert_eq(binomialmod(-2,  3,  7), 3)   # –4 mod 7 = 3
+
+# C(–5, 2) = (–1)^2 · C(6, 2) = 15
+assert_eq(binomialmod(-5,  2,  7), 1)   # 15 mod 7  = 1
+assert_eq(binomialmod(-5,  2, 11), 4)   # 15 mod 11 = 4
+
+# C(–5, 3) = (–1)^3 · C(7, 3) = –35
+assert_eq(binomialmod(-5,  3, 11), 9)   # –35 mod 11 = 9  (–35 + 44 = 9)
+assert_eq(binomialmod(-5,  3,  8), 5)   # –35 mod  8 = 5  (–35 + 40 = 5)
+
+# C(–10, 3) = (–1)^3 · C(12, 3) = –220
+assert_eq(binomialmod(-10, 3, 13), 1)   # –220 mod 13 = 1  (220 ≡ 12, –12 ≡ 1)
+
+# C(–10, 4) = (–1)^4 · C(13, 4) = 715
+assert_eq(binomialmod(-10, 4, 100), 15) # 715 mod 100 = 15
+
+# Large negative n, exercising recursive call back into _modular_binomial
+assert_eq(binomialmod(-10**10, 10**5, 4233330243), 2865877173)
+assert_eq(binomialmod(-10**10, 10**4, 6227020800), 4151347200)   # 6227020800 = 13!
+assert_eq(binomialmod(-10**10, 10**5, 6227020800), 1037836800)
+assert_eq(binomialmod(-10**10, 10**6, 6227020800), 2075673600)
+
+
+# =========================================================================
+# BRANCH: k > n  →  0
+# =========================================================================
+assert_eq(binomialmod(0,   1,   5), 0)
+assert_eq(binomialmod(3,   4,   7), 0)
+assert_eq(binomialmod(5,  10,  13), 0)
+assert_eq(binomialmod(100, 101, 97), 0)
+
+
+# =========================================================================
+# BRANCH: k == 0 or k == n  →  1 mod m
+# =========================================================================
+assert_eq(binomialmod(0,   0,   7), 1)
+assert_eq(binomialmod(5,   0,  13), 1)
+assert_eq(binomialmod(5,   5,  13), 1)
+assert_eq(binomialmod(100, 0,  97), 1)
+assert_eq(binomialmod(100, 100, 97), 1)
+assert_eq(binomialmod(1e18, 0,  13), 1)
+assert_eq(binomialmod(1e18, 1e18, 13), 1)
+
+
+# =========================================================================
+# BRANCH: k == 1 or k == n–1  →  n mod m
+# =========================================================================
+assert_eq(binomialmod(10,  1,   7), 3)    # 10 mod 7 = 3
+assert_eq(binomialmod(100, 1,  13), 9)    # 100 mod 13 = 9
+assert_eq(binomialmod(10,  9,   7), 3)    # C(10,9) = C(10,1) = 10
+assert_eq(binomialmod(100, 99, 13), 9)
+assert_eq(binomialmod(3,   1,   9), 3)    # C(3,1) = 3, k<=1e4 path but also tests k=1
+assert_eq(binomialmod(4,   1,  16), 4)    # C(4,1) = 4
+assert_eq(binomialmod(5**20, 1, 5**3), 0) # 5^20 mod 5^3 = 0
+assert_eq(binomialmod(5**3 + 1, 1, 5**3), 1)# 126 mod 125 = 1
+
+
+# =========================================================================
+# BRANCH: Symmetry — n–k < k  →  replace k with n–k before proceeding
+#   (tested by choosing k > n/2 for otherwise non-trivial cases)
+# =========================================================================
+# C(10,7) = C(10,3) = 120;  120 mod 13 = 3
+assert_eq(binomialmod(10,  7, 13), 3)
+assert_eq(binomialmod(10,  3, 13), 3)   # same result, k already minimal
+
+# C(10,8) = C(10,2) = 45;  45 mod 43 = 2
+assert_eq(binomialmod(10,  8, 43), 2)
+assert_eq(binomialmod(10,  2, 43), 2)
+
+# C(10,8) = 45;  45 mod 24 = 21
+assert_eq(binomialmod(10,  8, 24), 21)
+assert_eq(binomialmod(10,  2, 24), 21)
+
+# Symmetry kicks in for large k as well (large n)
+# C(8589935272, 4294968452) = C(8589935272, 4294966820)  (n–k = 4294966820 < k)
+# Both must return the same value
+assert_eq(binomialmod(8589935272, 4294968452, 97656250000000000),
+          binomialmod(8589935272, 4294966820, 97656250000000000))
+
+
+# =========================================================================
+# BRANCH: k <= 10^4  →  _small_k_binomialmod (direct computation)
+#   Boundary: k = 10^4 exactly is included in this path.
+# =========================================================================
+assert_eq(binomialmod(12,   5,   100000),  792)
+assert_eq(binomialmod(16,   4,   100000),  1820)
+assert_eq(binomialmod(100,  42,  43),       binomial(100, 42) % 43)
+assert_eq(binomialmod(100,  50,  139),      71)
+assert_eq(binomialmod(1000, 10,  1243),     848)
+assert_eq(binomialmod(124,  42,  1234567),  395154)
+
+# k = 10^4 exactly — last value that takes the small-k shortcut
+assert_eq(binomialmod(10**9, 10**4, 1234567), 833120)
+
+
+# =========================================================================
+# BRANCH: Prime modulus (q = 1 in factor_exp)  →  _lucas_theorem
+#   Exercises:
+#     • Normal digit-by-digit product (C(np, kp) via factorialmod)
+#     • _is_small_k_binomialmod optimisation for a large digit value
+#     • Lucas returning 0 when some kp > np
+# =========================================================================
+
+# Standard Lucas path with a single prime modulus
+assert_eq(binomialmod(10**10, 10**5, 1234567),  589372)
+
+# Composite modulus, each prime factor handled by Lucas independently
+assert_eq(binomialmod(10**9,  10**5, 43*97*503), 585492)
+
+# Lucas returning 0: at digit position 14 of n=5^15 in base 5, the digit is 0
+# but the corresponding digit of k=5^14 is 1  →  Lucas returns 0 immediately.
+# Verification: C(5^15, 5^14) = C(5^15, 1) by symmetry = 5^15 ≡ 0 (mod 5).
+assert_eq(binomialmod(5**15, 5**14, 5), 0)
+
+# Lucas returning 0 for a larger prime: C(n,k) mod p = 0 when k carries
+# past a digit of n.  Using a prime large enough to bypass the k<=1e4 guard.
+# p = 100003 (prime); n = 2*100003, k = 100003+1:
+#   in base p: n = 20, k = 11, digit-0 of k (1) <= digit-0 of n (0)?  No → 0.
+# C(200006, 100004) mod 100003 must be 0 (digit carry in base 100003).
+assert_eq(binomialmod(2*100003, 100003+1, 100003), 0)
+
+
+# =========================================================================
+# BRANCH: Prime-power modulus, q >= 2, p > n
+#   When the prime p itself exceeds n, _small_k_binomialmod is used directly
+#   for that prime-power component (no Granville expansion needed).
+#   Requires k > 1e4 so the top-level small-k guard does not fire first.
+# =========================================================================
+
+# p = next prime after 10^5; n = 10^5 – 1 < p; k = 3*10^4 > 1e4; q = 2.
+# The factor loop sees p > n and falls back to _small_k_binomialmod(n, k, p^2).
+var p_gt_n := 100003   # first prime > 10^5
+assert_eq(binomialmod(p_gt_n - 1, 30000, p_gt_n**2),
+          binomial(p_gt_n - 1, 30000) % (p_gt_n**2))
+
+
+# =========================================================================
+# BRANCH: Prime-power modulus, e[0] >= q  →  result is 0 mod p^q
+#   (Kummer: v_p(C(n,k)) >= q means the binomial is divisible by the full
+#    prime power in m.)
+#
+#   Requires k > 1e4 so the top-level small-k guard does not fire first,
+#   and _is_small_k_binomialmod must also return false.
+# =========================================================================
+
+# n = 2^16 + 2^15 = 98304, k = 2^14 + 2^15 = 49152.
+# Kummer (base 2): adding 49152 + 49152 produces exactly 2 carries
+#   (position 14 and position 15), so v_2(C(98304, 49152)) = 2 = q.
+# m = 4 = 2^2, hence e[0] = 2 >= q = 2  →  0.
+assert_eq(binomialmod(98304, 49152, 4), 0)
+
+# Triple the exponent to make it unambiguous.
+# n = 2^17, k = 3*2^14 = 49152.  Kummer again: v_2 >= q = 3 → 0 mod 8.
+# (C(131072, 49152) is divisible by 8 because Legendre gives v_2 >= 3.)
+assert_eq(binomialmod(2**17, 3*(2**14), 8), 0)
+
+
+# =========================================================================
+# BRANCH: _is_small_k_binomialmod optimisation inside the prime-power loop
+#   Fires when n >= 1e7, m >= 1e7, k <= 1e6  (fast exact computation
+#   replaces the full Granville machinery for that prime-power component).
+# =========================================================================
+
+# k = 10^5 <= 1e6, n = 10^9 >= 1e7; m = 5041689707 (prime^1, hits Lucas,
+# but with _is_small_k for digit binomials inside Lucas)
+assert_eq(binomialmod(10**9, 10**6, 5041689707), 15262431)
+
+# Pure prime-power example: n=10^9, k=10^5, m=13^2*5^6.
+# For the 5^6 component: n,k large, rq will be > 0, and _is_small_k_binomialmod
+# may fire for the prime-power factor, exercising that branch.
+assert_eq(binomialmod(10**9, 10**5, 13**2 * 5**6), 755625)
+
+
+# =========================================================================
+# BRANCH: Granville main path — _factorial_without_prime sub-cases
+#
+#   (a) O(n) fallback  — p = 2, pk = 2 (prq = 2 because rq = 1);
+#       neither the p>2 fast path nor e>=3 path apply, so sequential loop runs.
+#       Test: m = 4 = 2^2, e[0] = 1 < 2, rq = 1, prq = 2.
+#       C(65536, 32768): v_2 = 1 (one carry at bit 15), so result = 2 mod 4.
+assert_eq(binomialmod(65536, 32768, 4), 2)
+
+#   (b) p^2 fast path  — p > 2 and pk = p^2 exactly.
+#       m = 4182119424 = 2^10 * 3^5 * 7^5.  For the 3^5 component:
+#       e[0] for p=3 produces rq=2, so _factorial_without_prime is called
+#       with pk = 3^2 = 9 and p = 3 > 2  →  the closed-form p^2 branch.
+assert_eq(binomialmod(8589934703, 4294966460, 4182119424), 4133348352)
+
+#   (c) e >= 3 polynomial D&C path  — _factorial_without_prime_pe
+#       m = 52521875 = 5^5 * 7^5; both prime powers have exponent 5 >= 3.
+#       _get_P is called recursively, exercising the q=0 (base), q=1 (base),
+#       even-q, and odd-q arms of the divide-and-conquer.
+assert_eq(binomialmod(8589934823, 4294966769, 52521875), 26643750)
+
+#       Additional e>=3 cases with varying exponents
+assert_eq(binomialmod(10**7, 10**5, 43**2 * 97**3 * 13**4), 1778017500428)
+assert_eq(binomialmod(10**7, 10**5, 42**2 * 97**3 * 13**4), 10015143223176)
+assert_eq(binomialmod(10**9, 10**5, 12345678910),           4517333900)
+
+#   (d) Small-N shortcut inside _factorial_without_prime_pe
+#       Fires when the argument to the pe-factorial is itself smaller than p.
+#       This occurs for the lowest-layer recursive calls when n mod p is small.
+#       Covered implicitly by the e>=3 tests above; isolated here with a
+#       composite modulus where 13^4 forces small-N calls at depth.
+assert_eq(binomialmod(10**10, 10**5, 6227020800), 1556755200)  # m = 13!
+assert_eq(binomialmod(10**10, 10**4, 6227020800), 1845043200)
+assert_eq(binomialmod(10**10, 10**6, 6227020800), 5748019200)
+
+
+# =========================================================================
+# BRANCH: Granville sign adjustment   (($p > 2 or $rq < 3) and $rq <= @e)
+#   The FIXED condition uses $rq (residual exponent = q – e[0]),
+#   NOT $q (the raw exponent from factor_exp).
+#
+#   Bug manifestation: when $q > scalar(@e) but $rq <= scalar(@e), the
+#   old code skipped the sign entirely; the fix applies it correctly.
+#   For n ≈ 8.5×10^9 and p = 5: logint(n, 5) = 14, so @e has 16 entries.
+#   With q = 20 (in 5^20 | m) but e[0] ≥ 5:  old $q=20 > 16 → skip;
+#   new $rq = 20 – e[0] ≤ 15 ≤ 16 → apply sign.
+# =========================================================================
+
+# m = 5^20 * 2^10 = 97656250000000000
+# Tests the sign=-1 arm: e[$rq-1] is odd → factor (–1) must be applied.
+assert_eq(binomialmod(8589935272, 4294966820, 97656250000000000), 55077260000000000)
+
+# Different k values over the same modulus — exercises sign=+1 and sign=-1
+# arms separately, and also different depths of the @e prefix-sum array.
+assert_eq(binomialmod(8589935272, 429496,      97656250000000000), 57900778336640000)
+assert_eq(binomialmod(8589935272, 4294965,     97656250000000000), 96886205280000000)
+assert_eq(binomialmod(8589935272, 42949658,    97656250000000000), 46773145040000000)
+
+
+# =========================================================================
+# BRANCH: CRT combination of multiple prime-power components
+#   (Math::Prime::Util::GMP::chinese over the @F list)
+# =========================================================================
+
+# m = 43 * 97 * 503 — three distinct primes, all q=1
+assert_eq(binomialmod(10**9, 10**5, 43*97*503), 585492)
+
+# m = 43^2 * 97^3 * 13^4 — mixed prime powers, each using Granville
+assert_eq(binomialmod(10**7, 10**5, 43**2 * 97**3 * 13**4), 1778017500428)
+
+# m = 42^2 * 97^3 * 13^4 — non-prime base 42=2*3*7 produces more components
+assert_eq(binomialmod(10**7, 10**5, 42**2 * 97**3 * 13**4), 10015143223176)
+
+# m = 10^10 composite — many prime factors combined via CRT
+assert_eq(binomialmod(10**10, 10**5, 4233330243), 3403056024)
+
+# m = 13! = 6227020800  (13 prime factors with various exponents)
+assert_eq(binomialmod(10**10, 10**5, 6227020800), 1556755200)
+
+
+# =========================================================================
+# MISCELLANEOUS EDGE CASES
+# =========================================================================
+
+# n = k = 0
+assert_eq(binomialmod(0, 0, 1), 0)   # m=1 path
+assert_eq(binomialmod(0, 0, 7), 1)   # k=0 path
+
+# n very small, m a prime power larger than n (p > n branch in factor loop)
+assert_eq(binomialmod(10, 2, 43),  2)   # C(10,2)=45, 45 mod 43=2
+assert_eq(binomialmod(10, 2, 24), 21)   # C(10,2)=45, 45 mod 24=21
+
+# k == n–1 adjacent to a prime power boundary
+assert_eq(binomialmod(5**3 + 1, 5**3, 5**3), 126 % (5**3))  # C(126,125)=126 mod 125=1
+
+# n=k=1
+assert_eq(binomialmod(1, 0, 7), 1)
+assert_eq(binomialmod(1, 1, 7), 1)
+
+# Verify that C(n,k) == C(n, n-k) symmetry holds for large inputs
+assert_eq(binomialmod(10**9, 10**9 - 10**5, 43*97*503),
+          binomialmod(10**9, 10**5,         43*97*503))
+
+say "** All tests passed."
