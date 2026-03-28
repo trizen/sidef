@@ -14292,7 +14292,7 @@ package Sidef::Types::Number::Number {
             my $rq  = $q - $e[0];
             my $prq = Math::Prime::Util::GMP::powint($p, $rq);
 
-            if (_is_small_k_binomialmod($n, $k, $pq)) {
+            if (_is_small_k_binomialmod($n, $k, Math::Prime::Util::GMP::mulint($p, $q))) {
                 my $bin = _small_k_binomialmod($n, $k, $pq, $p);
                 push @F, [$bin, $pq];
                 next;
