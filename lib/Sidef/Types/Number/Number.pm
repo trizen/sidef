@@ -13816,77 +13816,86 @@ package Sidef::Types::Number::Number {
 
     *nok = \&binomial;
 
-    # Helper: Multiply two polynomials modulo p^e, truncating safely to degree e-1
+    # Multiply two polynomials modulo p^e, truncating safely to degree e-1
     sub _poly_mul {
         my ($A, $B, $pk, $e) = @_;
         my @C = (0) x $e;
         for my $i (0 .. $e - 1) {
             next unless $A->[$i];
-            for my $j (0 .. $e - 1 - $i) {
+            for my $j (0 .. $e - $i - 1) {
                 next unless $B->[$j];
-                my $term = Math::Prime::Util::GMP::mulmod($A->[$i], $B->[$j], $pk);
-                $C[$i + $j] = Math::Prime::Util::GMP::addmod($C[$i + $j], $term, $pk);
+                my $term =
+                  HAS_PRIME_UTIL
+                  ? Math::Prime::Util::mulmod($A->[$i], $B->[$j], $pk)
+                  : Math::Prime::Util::GMP::mulmod($A->[$i], $B->[$j], $pk);
+                $C[$i + $j] =
+                  HAS_PRIME_UTIL
+                  ? Math::Prime::Util::addmod($C[$i + $j], $term, $pk)
+                  : Math::Prime::Util::GMP::addmod($C[$i + $j], $term, $pk);
             }
         }
         return \@C;
     }
 
-    # Helper: Shift a polynomial B(x) = A(x + h) modulo p^e
+    # Shift a polynomial B(x) = A(x + h) modulo p^e
     sub _poly_shift {
         my ($A, $h_str, $pk, $e) = @_;
         my @B = (0) x $e;
-
         for my $j (0 .. $e - 1) {
             next unless $A->[$j];
             my $h_pow = 1;
-            for my $m (CORE::reverse 0 .. $j) {
-
-                my $bin = (
-                           HAS_PRIME_UTIL
-                           ? Math::Prime::Util::binomial($j, $m)
-                           : Math::Prime::Util::GMP::binomial($j, $m)
-                          );
-                my $term = Math::Prime::Util::GMP::mulmod($bin, $h_pow, $pk);
-                $term  = Math::Prime::Util::GMP::mulmod($term, $A->[$j], $pk);
-                $B[$m] = Math::Prime::Util::GMP::addmod($B[$m], $term, $pk);
+            for (my $m = $j ; $m >= 0 ; --$m) {
+                my $bin =
+                  HAS_PRIME_UTIL
+                  ? Math::Prime::Util::binomial($j, $m)
+                  : Math::Prime::Util::GMP::binomial($j, $m);
+                my $term =
+                  HAS_PRIME_UTIL
+                  ? Math::Prime::Util::mulmod($bin, $h_pow, $pk)
+                  : Math::Prime::Util::GMP::mulmod($bin, $h_pow, $pk);
+                $term =
+                  HAS_PRIME_UTIL
+                  ? Math::Prime::Util::mulmod($term, $A->[$j], $pk)
+                  : Math::Prime::Util::GMP::mulmod($term, $A->[$j], $pk);
+                $B[$m] =
+                  HAS_PRIME_UTIL
+                  ? Math::Prime::Util::addmod($B[$m], $term, $pk)
+                  : Math::Prime::Util::GMP::addmod($B[$m], $term, $pk);
 
                 if ($m > 0) {
-                    $h_pow = Math::Prime::Util::GMP::mulmod($h_pow, $h_str, $pk);
+                    $h_pow =
+                      HAS_PRIME_UTIL
+                      ? Math::Prime::Util::mulmod($h_pow, $h_str, $pk)
+                      : Math::Prime::Util::GMP::mulmod($h_pow, $h_str, $pk);
                 }
             }
         }
         return \@B;
     }
 
-    # Helper: Divide and conquer recursive evaluation of P(x, q)
-    sub _get_P {
-        my ($q_str, $Poly, $pk, $e) = @_;
+    # Divide and conquer recursive evaluation of P(x, q)
+    sub _build_polynomial {
+        my ($q_str, $poly, $pk, $e) = @_;
 
-        if ("$q_str" eq "0") {
+        if ($q_str eq "0") {
             my @res = (0) x $e;
             $res[0] = 1;
             return \@res;
         }
-        if ("$q_str" eq "1") {
-            return $Poly;
+        if ($q_str eq "1") {
+            return $poly;
         }
 
-        my $q = Math::GMPz->new("$q_str");
-        my $h = Math::GMPz->new(0);
-        Math::GMPz::Rmpz_fdiv_q_2exp($h, $q, 1);    # h = floor(q / 2)
-        my $h_str = Math::GMPz::Rmpz_get_str($h, 10);
+        my $h_str = Math::Prime::Util::GMP::rshiftint($q_str, 1);    # floor(q/2)
 
-        my $P_h = _get_P($h_str, $Poly, $pk, $e);
-
+        my $P_h         = __SUB__->($h_str, $poly, $pk, $e);
         my $P_h_shifted = _poly_shift($P_h, $h_str, $pk, $e);
         my $P_2h        = _poly_mul($P_h, $P_h_shifted, $pk, $e);
 
-        if (Math::GMPz::Rmpz_odd_p($q)) {
-            my $two_h = Math::GMPz->new("$h_str");
-            Math::GMPz::Rmpz_mul_ui($two_h, $two_h, 2);
-            my $two_h_str    = Math::GMPz::Rmpz_get_str($two_h, 10);
-            my $Poly_shifted = _poly_shift($Poly, $two_h_str, $pk, $e);
-            return _poly_mul($P_2h, $Poly_shifted, $pk, $e);
+        if (Math::Prime::Util::GMP::modint($q_str, 2) == 1) {
+            my $two_h_str    = Math::Prime::Util::GMP::lshiftint($h_str, 1);
+            my $poly_shifted = _poly_shift($poly, $two_h_str, $pk, $e);
+            return _poly_mul($P_2h, $poly_shifted, $pk, $e);
         }
 
         return $P_2h;
@@ -13895,60 +13904,64 @@ package Sidef::Types::Number::Number {
     sub _factorial_without_prime_pe {
         my ($n, $p, $e, $pk) = @_;
 
-        if (Math::Prime::Util::GMP::cmpint($n, $p) < 0) {
-            my $res = 1;
-            for my $v (1 .. $n) {
-                $res = (
-                        HAS_PRIME_UTIL
-                        ? Math::Prime::Util::mulmod($res, $v, $pk)
-                        : Math::Prime::Util::GMP::mulmod($res, $v, $pk)
-                       );
-            }
-            return $res;
+        if ($p > $n) {
+            return (
+                    (HAS_PRIME_UTIL and $pk < ULONG_MAX)
+                    ? Math::Prime::Util::factorialmod($n, $pk)
+                    : Math::Prime::Util::GMP::factorialmod($n, $pk)
+                   );
         }
 
         my $fact = 1;
         my @c    = (1, (0) x ($e - 1));
 
         for my $j (1 .. $p - 1) {
-            $fact = (
-                     HAS_PRIME_UTIL
-                     ? Math::Prime::Util::mulmod($fact, $j, $pk)
-                     : Math::Prime::Util::GMP::mulmod($fact, $j, $pk)
-                    );
-            my $inv = (
-                       HAS_PRIME_UTIL
-                       ? Math::Prime::Util::invmod($j, $pk)
-                       : Math::Prime::Util::GMP::invmod($j, $pk)
-                      );
-            for my $k (CORE::reverse 1 .. $e - 1) {
+
+            $fact =
+              HAS_PRIME_UTIL
+              ? Math::Prime::Util::mulmod($fact, $j, $pk)
+              : Math::Prime::Util::GMP::mulmod($fact, $j, $pk);
+
+            my $inv =
+              HAS_PRIME_UTIL
+              ? Math::Prime::Util::invmod($j, $pk)
+              : Math::Prime::Util::GMP::invmod($j, $pk);
+
+            for (my $k = $e - 1 ; $k >= 1 ; --$k) {
                 if ($c[$k - 1]) {
-                    my $term = (
-                                HAS_PRIME_UTIL
-                                ? Math::Prime::Util::mulmod($c[$k - 1], $inv, $pk)
-                                : Math::Prime::Util::GMP::mulmod($c[$k - 1], $inv, $pk)
-                               );
-                    $c[$k] = (
-                              HAS_PRIME_UTIL
-                              ? Math::Prime::Util::addmod($c[$k], $term, $pk)
-                              : Math::Prime::Util::GMP::addmod($c[$k], $term, $pk)
-                             );
+                    my $term =
+                      HAS_PRIME_UTIL
+                      ? Math::Prime::Util::mulmod($c[$k - 1], $inv, $pk)
+                      : Math::Prime::Util::GMP::mulmod($c[$k - 1], $inv, $pk);
+                    $c[$k] =
+                      HAS_PRIME_UTIL
+                      ? Math::Prime::Util::addmod($c[$k], $term, $pk)
+                      : Math::Prime::Util::GMP::addmod($c[$k], $term, $pk);
                 }
             }
         }
 
-        my @Poly  = (0) x $e;
+        my @poly  = (0) x $e;
         my $p_pow = 1;
         for my $k (0 .. $e - 1) {
-            my $coeff = Math::Prime::Util::GMP::mulmod($c[$k], $fact, $pk);
-            $Poly[$k] = Math::Prime::Util::GMP::mulmod($coeff, $p_pow, $pk);
-            $p_pow = Math::Prime::Util::GMP::mulmod($p_pow, $p, $pk);
+            my $coeff =
+              HAS_PRIME_UTIL
+              ? Math::Prime::Util::mulmod($c[$k], $fact, $pk)
+              : Math::Prime::Util::GMP::mulmod($c[$k], $fact, $pk);
+            $poly[$k] =
+              HAS_PRIME_UTIL
+              ? Math::Prime::Util::mulmod($coeff, $p_pow, $pk)
+              : Math::Prime::Util::GMP::mulmod($coeff, $p_pow, $pk);
+            $p_pow =
+              HAS_PRIME_UTIL
+              ? Math::Prime::Util::mulmod($p_pow, $p, $pk)
+              : Math::Prime::Util::GMP::mulmod($p_pow, $p, $pk);
         }
 
         my $q = Math::Prime::Util::GMP::divint($n, $p);
         my $r = Math::Prime::Util::GMP::modint($n, $p);
 
-        my $P_q = _get_P("$q", \@Poly, $pk, $e);
+        my $P_q = _build_polynomial($q, \@poly, $pk, $e);
         my $res = $P_q->[0];
 
         my $pq = Math::Prime::Util::GMP::mulint($q, $p);
@@ -13971,7 +13984,7 @@ package Sidef::Types::Number::Number {
     }
 
     sub _factorial_without_prime {
-        my ($n, $p, $pk, $from, $res) = @_;
+        my ($n, $p, $e, $pk, $from, $res) = @_;
 
         return 1 if ($n <= 1);
 
@@ -13994,29 +14007,31 @@ package Sidef::Types::Number::Number {
 
         my $q2_pk = Math::Prime::Util::GMP::mulint($p, $p);
         if ($p > 2 && Math::Prime::Util::GMP::cmpint($pk, $q2_pk) == 0) {
-            my $a              = Math::Prime::Util::GMP::divint($n, $p);
-            my $b              = Math::Prime::Util::GMP::modint($n, $p);
-            my $p_minus_1_fact = Math::Prime::Util::GMP::factorialmod(Math::Prime::Util::GMP::subint($p, 1), $pk);
-            my $b_fact         = Math::Prime::Util::GMP::factorialmod($b,                                    $pk);
+            my $a = Math::Prime::Util::GMP::divint($n, $p);
+            my $b = Math::Prime::Util::GMP::modint($n, $p);
+
+            my $pm1_fact =
+              (HAS_PRIME_UTIL and $pk < ULONG_MAX)
+              ? Math::Prime::Util::factorialmod(Math::Prime::Util::subint($p, 1), $pk)
+              : Math::Prime::Util::GMP::factorialmod(Math::Prime::Util::GMP::subint($p, 1), $pk);
+
+            my $b_fact =
+              (HAS_PRIME_UTIL and $pk < ULONG_MAX)
+              ? Math::Prime::Util::factorialmod($b, $pk)
+              : Math::Prime::Util::GMP::factorialmod($b, $pk);
 
             my $Hb = 0;
-            if ($b > 0) {
-                my $sum = 0;
-                for my $j (1 .. $b) {
-                    $sum = (
-                            HAS_PRIME_UTIL
-                            ? Math::Prime::Util::addmod($sum, Math::Prime::Util::invmod($j, $p), $p)
-                            : Math::Prime::Util::GMP::addmod($sum, Math::Prime::Util::GMP::invmod($j, $p), $p)
-                           );
-                }
-                $Hb = $sum;
-
+            for my $j (1 .. $b) {
+                $Hb =
+                  HAS_PRIME_UTIL
+                  ? Math::Prime::Util::addmod($Hb, Math::Prime::Util::invmod($j, $p), $p)
+                  : Math::Prime::Util::GMP::addmod($Hb, Math::Prime::Util::GMP::invmod($j, $p), $p);
             }
 
-            my $res_q2 = Math::Prime::Util::GMP::powmod($p_minus_1_fact, $a, $pk);
+            my $res_q2 = Math::Prime::Util::GMP::powmod($pm1_fact, $a, $pk);
             $res_q2 = Math::Prime::Util::GMP::mulmod($res_q2, $b_fact, $pk);
 
-            if ($a > 0 && "$Hb" ne '0') {
+            if ($a > 0 && $Hb > 0) {
                 my $ap   = Math::Prime::Util::GMP::mulmod($a,  $p,  $pk);
                 my $apHb = Math::Prime::Util::GMP::mulmod($ap, $Hb, $pk);
                 my $term = Math::Prime::Util::GMP::addmod(1, $apHb, $pk);
@@ -14028,38 +14043,11 @@ package Sidef::Types::Number::Number {
             return $res_q2;
         }
 
-        my $e   = 0;
-        my $tmp = Math::GMPz->new("$pk");
-        my $p_z = Math::GMPz->new("$p");
-        while (Math::GMPz::Rmpz_divisible_p($tmp, $p_z)) {
-            Math::GMPz::Rmpz_divexact($tmp, $tmp, $p_z);
-            $e++;
-        }
+        my $r_pe = _factorial_without_prime_pe($n, $p, $e, $pk);
 
-        if ($e >= 3 && Math::GMPz::Rmpz_cmp_ui($tmp, 1) == 0) {
-            my $r_pe = _factorial_without_prime_pe($n, $p, $e, $pk);
-
-            $$res  = $r_pe;
-            $$from = $n;
-            return $r_pe;
-        }
-
-        my $r = $$res;
-
-        foreach my $v ($$from + 1 .. $n) {
-            if ($v % $p) {
-                $r = (
-                      HAS_PRIME_UTIL
-                      ? Math::Prime::Util::mulmod($r, $v, $pk)
-                      : Math::Prime::Util::GMP::mulmod($r, $v, $pk)
-                     );
-            }
-        }
-
-        $$res  = $r;
+        $$res  = $r_pe;
         $$from = $n;
-
-        return $r;
+        return $r_pe;
     }
 
     sub _small_k_binomialmod {
@@ -14088,32 +14076,39 @@ package Sidef::Types::Number::Number {
         state $num_mult = Math::GMPz::Rmpz_init_nobless();
         state $den_mult = Math::GMPz::Rmpz_init_nobless();
         state $temp     = Math::GMPz::Rmpz_init_nobless();
+        state $nmi      = Math::GMPz::Rmpz_init_nobless();
         state $p_z      = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_set_ui($num_mult, 1);
         Math::GMPz::Rmpz_set_ui($den_mult, 1);
         Math::GMPz::Rmpz_set_ui($p_z,      $p);
 
+        Math::GMPz::Rmpz_set($nmi, $n_val);
+
         for my $i (0 .. $k_val - 1) {
-            Math::GMPz::Rmpz_sub_ui($temp, $n_val, $i);
-            if (Math::GMPz::Rmpz_divisible_ui_p($temp, $p)) {
-                $v += Math::GMPz::Rmpz_remove($temp, $temp, $p_z);
+
+            if (Math::GMPz::Rmpz_divisible_ui_p($nmi, $p)) {
+                $v += Math::GMPz::Rmpz_remove($temp, $nmi, $p_z);
+                Math::GMPz::Rmpz_mul($num_mult, $num_mult, $temp);
             }
-            Math::GMPz::Rmpz_mul($num_mult, $num_mult, $temp);
+            else {
+                Math::GMPz::Rmpz_mul($num_mult, $num_mult, $nmi);
+            }
+
             Math::GMPz::Rmpz_mod($num_mult, $num_mult, $m_val);
 
             my $den = $i + 1;
             while ($den % $p == 0) {
-                $den = (
-                        HAS_PRIME_UTIL
-                        ? Math::Prime::Util::divint($den, $p)
-                        : Math::Prime::Util::GMP::divint($den, $p)
-                       );
+                $den =
+                  HAS_PRIME_UTIL
+                  ? Math::Prime::Util::divint($den, $p)
+                  : Math::Prime::Util::GMP::divint($den, $p);
                 $v -= 1;
             }
 
             Math::GMPz::Rmpz_mul_ui($den_mult, $den_mult, $den);
             Math::GMPz::Rmpz_mod($den_mult, $den_mult, $m_val);
+            Math::GMPz::Rmpz_sub_ui($nmi, $nmi, 1);
         }
 
         Math::GMPz::Rmpz_invert($temp, $den_mult, $m_val);
@@ -14289,9 +14284,6 @@ package Sidef::Types::Number::Number {
                 next;
             }
 
-            my $rq  = $q - $e[0];
-            my $prq = Math::Prime::Util::GMP::powint($p, $rq);
-
             if (_is_small_k_binomialmod($n, $k, Math::Prime::Util::GMP::mulint($p, $q))) {
                 my $bin = _small_k_binomialmod($n, $k, $pq, $p);
                 push @F, [$bin, $pq];
@@ -14303,9 +14295,12 @@ package Sidef::Types::Number::Number {
                 next;
             }
 
+            my $rq  = $q - $e[0];
+            my $prq = Math::Prime::Util::GMP::powint($p, $rq);
+
             my (@N, @K, @R);
 
-            do {
+            {
                 my $pi = 1;
                 my $r  = Math::Prime::Util::GMP::subint($n, $k);
                 foreach my $i (0 .. $d) {
@@ -14314,7 +14309,7 @@ package Sidef::Types::Number::Number {
                     push @R, Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::divint($r, $pi), $prq);
                     $pi = Math::Prime::Util::GMP::mulint($pi, $p);
                 }
-            };
+            }
 
             my @NKR = (
                        sort { $a->[3] <=> $b->[3] }
@@ -14331,11 +14326,10 @@ package Sidef::Types::Number::Number {
             if ($prq < ULONG_MAX and $p < $n) {
                 foreach my $k (1 .. List::Util::min(List::Util::max(@N, @K, @R), 1e3)) {
                     if ($k % $p) {
-                        $nfac = (
-                                 HAS_PRIME_UTIL
-                                 ? Math::Prime::Util::mulmod($nfac, $k, $prq)
-                                 : Math::Prime::Util::GMP::mulmod($nfac, $k, $prq)
-                                );
+                        $nfac =
+                          HAS_PRIME_UTIL
+                          ? Math::Prime::Util::mulmod($nfac, $k, $prq)
+                          : Math::Prime::Util::GMP::mulmod($nfac, $k, $prq);
                     }
                     push @acc, $nfac;
                 }
@@ -14343,7 +14337,7 @@ package Sidef::Types::Number::Number {
 
             my $v = Math::Prime::Util::GMP::powmod($p, $e[0], $pq);
 
-            do {
+            {
                 my $from = 0;
                 my $res  = 1;
 
@@ -14357,14 +14351,14 @@ package Sidef::Types::Number::Number {
                     ($z = $acc[$R[$j]]) // push(@pairs, [\$z, $R[$j]]);
 
                     foreach my $pair (sort { $a->[1] <=> $b->[1] } @pairs) {
-                        ${$pair->[0]} = _factorial_without_prime($pair->[1], $p, $prq, \$from, \$res);
+                        ${$pair->[0]} = _factorial_without_prime($pair->[1], $p, $rq, $prq, \$from, \$res);
                     }
 
                     $y = Math::Prime::Util::GMP::mulmod($y, $z, $pq);
                     $x = Math::Prime::Util::GMP::divmod($x, $y, $pq) if ($y ne '1');
                     $v = Math::Prime::Util::GMP::mulmod($v, $x, $pq);
                 }
-            };
+            }
 
             if ($p > 2 or $rq < 3) {
                 $v = Math::Prime::Util::GMP::mulmod($v, ((($e[$rq - 1] // 0) % 2 == 0) ? 1 : -1), $pq);
