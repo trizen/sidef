@@ -74,10 +74,10 @@ my $builder = $class->new(
 
         # Math Libraries (Required)
         'Math::MPFR'             => '3.36',
-        'Math::MPC'              => '1.09',
+        'Math::MPC'              => '1.40',
         'Math::GMPq'             => '0.45',
         'Math::GMPz'             => '0.48',
-        'Math::Prime::Util::GMP' => '0.52',
+        'Math::Prime::Util::GMP' => '0.53',
 
         # Algorithm Libraries (Required)
         'Algorithm::Combinatorics' => '0.27',

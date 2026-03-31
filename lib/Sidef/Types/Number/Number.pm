@@ -2568,8 +2568,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPFR__Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_fr($r, $x, $ROUND);
-            Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
+            Math::MPC::Rmpc_fr_sub($r, $x, $y, $ROUND);
             return $r;
         }
 
@@ -2584,8 +2583,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPC__Math_MPFR: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_fr($r, $y, $ROUND);
-            Math::MPC::Rmpc_sub($r, $x, $r, $ROUND);
+            Math::MPC::Rmpc_sub_fr($r, $x, $y, $ROUND);
             return $r;
         }
 
@@ -3130,8 +3128,7 @@ package Sidef::Types::Number::Number {
 
       Math_MPFR__Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_fr($r, $x, $ROUND);
-            Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
+            Math::MPC::Rmpc_fr_div($r, $x, $y, $ROUND);
             return $r;
         }
 
