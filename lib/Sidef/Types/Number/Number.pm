@@ -13974,11 +13974,11 @@ package Sidef::Types::Number::Number {
                    );
         }
 
-        if ($$from == $n) {
+        if (Math::Prime::Util::GMP::cmpint($$from, $n) == 0) {
             return $$res;
         }
 
-        if ($$from > $n) {
+        if (Math::Prime::Util::GMP::cmpint($$from, $n) > 0) {
             $$from = 0;
             $$res  = 1;
         }
@@ -14301,7 +14301,7 @@ package Sidef::Types::Number::Number {
             my @acc  = (1);
             my $nfac = 1;
 
-            if ($prq < ULONG_MAX and $p < $n) {
+            if ($prq < ULONG_MAX and Math::Prime::Util::GMP::cmpint($p, $n) < 0) {
                 foreach my $k (1 .. List::Util::min(List::Util::max(@N, @K, @R), 1e3)) {
                     if ($k % $p) {
                         $nfac =
@@ -14328,7 +14328,7 @@ package Sidef::Types::Number::Number {
                     ($y = $acc[$K[$j]]) // push(@pairs, [\$y, $K[$j]]);
                     ($z = $acc[$R[$j]]) // push(@pairs, [\$z, $R[$j]]);
 
-                    foreach my $pair (sort { $a->[1] <=> $b->[1] } @pairs) {
+                    foreach my $pair (sort { Math::Prime::Util::GMP::cmpint($a->[1], $b->[1]) } @pairs) {
                         ${$pair->[0]} = _factorial_without_prime($pair->[1], $p, $rq, $prq, \$from, \$res);
                     }
 
