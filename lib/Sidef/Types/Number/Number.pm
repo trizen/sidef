@@ -2100,7 +2100,7 @@ package Sidef::Types::Number::Number {
 
         my $phi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_set_ui($phi, 5, $ROUND);
-        Math::MPFR::Rmpfr_div_2ui($phi, $phi, 2, $ROUND);   # phi=5/4
+        Math::MPFR::Rmpfr_div_2ui($phi, $phi, 2, $ROUND);    # phi=5/4
         Math::MPFR::Rmpfr_sqrt($phi, $phi, $ROUND);
         Math::MPFR::Rmpfr_add_d($phi, $phi, 0.5, $ROUND);
 
@@ -13839,14 +13839,10 @@ package Sidef::Types::Number::Number {
             next unless $A->[$i];
             for my $j (0 .. $e - $i - 1) {
                 next unless $B->[$j];
-                my $term =
-                  HAS_PRIME_UTIL
-                  ? Math::Prime::Util::mulmod($A->[$i], $B->[$j], $pk)
-                  : Math::Prime::Util::GMP::mulmod($A->[$i], $B->[$j], $pk);
                 $C[$i + $j] =
-                  HAS_PRIME_UTIL
-                  ? Math::Prime::Util::addmod($C[$i + $j], $term, $pk)
-                  : Math::Prime::Util::GMP::addmod($C[$i + $j], $term, $pk);
+                  (HAS_PRIME_UTIL and $pk < ULONG_MAX)
+                  ? Math::Prime::Util::muladdmod($A->[$i], $B->[$j], $C[$i + $j], $pk)
+                  : Math::Prime::Util::GMP::muladdmod($A->[$i], $B->[$j], $C[$i + $j], $pk);
             }
         }
         return \@C;
@@ -13865,21 +13861,17 @@ package Sidef::Types::Number::Number {
                   ? Math::Prime::Util::binomial($j, $m)
                   : Math::Prime::Util::GMP::binomial($j, $m);
                 my $term =
-                  HAS_PRIME_UTIL
+                  (HAS_PRIME_UTIL and $pk < ULONG_MAX)
                   ? Math::Prime::Util::mulmod($bin, $h_pow, $pk)
                   : Math::Prime::Util::GMP::mulmod($bin, $h_pow, $pk);
-                $term =
-                  HAS_PRIME_UTIL
-                  ? Math::Prime::Util::mulmod($term, $A->[$j], $pk)
-                  : Math::Prime::Util::GMP::mulmod($term, $A->[$j], $pk);
                 $B[$m] =
-                  HAS_PRIME_UTIL
-                  ? Math::Prime::Util::addmod($B[$m], $term, $pk)
-                  : Math::Prime::Util::GMP::addmod($B[$m], $term, $pk);
+                  (HAS_PRIME_UTIL and $pk < ULONG_MAX)
+                  ? Math::Prime::Util::muladdmod($term, $A->[$j], $B[$m], $pk)
+                  : Math::Prime::Util::GMP::muladdmod($term, $A->[$j], $B[$m], $pk);
 
                 if ($m > 0) {
                     $h_pow =
-                      HAS_PRIME_UTIL
+                      (HAS_PRIME_UTIL and $pk < ULONG_MAX)
                       ? Math::Prime::Util::mulmod($h_pow, $h_str, $pk)
                       : Math::Prime::Util::GMP::mulmod($h_pow, $h_str, $pk);
                 }
@@ -13932,45 +13924,22 @@ package Sidef::Types::Number::Number {
 
         for my $j (1 .. $p - 1) {
 
-            $fact =
-              HAS_PRIME_UTIL
-              ? Math::Prime::Util::mulmod($fact, $j, $pk)
-              : Math::Prime::Util::GMP::mulmod($fact, $j, $pk);
-
-            my $inv =
-              HAS_PRIME_UTIL
-              ? Math::Prime::Util::invmod($j, $pk)
-              : Math::Prime::Util::GMP::invmod($j, $pk);
+            $fact = Math::Prime::Util::GMP::mulmod($fact, $j, $pk);
+            my $inv = Math::Prime::Util::GMP::invmod($j, $pk);
 
             for (my $k = $e - 1 ; $k >= 1 ; --$k) {
                 if ($c[$k - 1]) {
-                    my $term =
-                      HAS_PRIME_UTIL
-                      ? Math::Prime::Util::mulmod($c[$k - 1], $inv, $pk)
-                      : Math::Prime::Util::GMP::mulmod($c[$k - 1], $inv, $pk);
-                    $c[$k] =
-                      HAS_PRIME_UTIL
-                      ? Math::Prime::Util::addmod($c[$k], $term, $pk)
-                      : Math::Prime::Util::GMP::addmod($c[$k], $term, $pk);
+                    $c[$k] = Math::Prime::Util::GMP::muladdmod($c[$k - 1], $inv, $c[$k], $pk);
                 }
             }
         }
 
-        my @poly  = (0) x $e;
+        my @poly;
         my $p_pow = 1;
         for my $k (0 .. $e - 1) {
-            my $coeff =
-              HAS_PRIME_UTIL
-              ? Math::Prime::Util::mulmod($c[$k], $fact, $pk)
-              : Math::Prime::Util::GMP::mulmod($c[$k], $fact, $pk);
-            $poly[$k] =
-              HAS_PRIME_UTIL
-              ? Math::Prime::Util::mulmod($coeff, $p_pow, $pk)
-              : Math::Prime::Util::GMP::mulmod($coeff, $p_pow, $pk);
-            $p_pow =
-              HAS_PRIME_UTIL
-              ? Math::Prime::Util::mulmod($p_pow, $p, $pk)
-              : Math::Prime::Util::GMP::mulmod($p_pow, $p, $pk);
+            my $coeff = Math::Prime::Util::GMP::mulmod($c[$k], $fact, $pk);
+            push @poly, Math::Prime::Util::GMP::mulmod($coeff, $p_pow, $pk);
+            $p_pow = Math::Prime::Util::GMP::mulmod($p_pow, $p, $pk);
         }
 
         my $q = Math::Prime::Util::GMP::divint($n, $p);
@@ -13982,16 +13951,10 @@ package Sidef::Types::Number::Number {
         my $pq = Math::Prime::Util::GMP::mulint($q, $p);
         if ($r > 0) {
             for my $j (1 .. $r) {
-                my $term = (
-                            HAS_PRIME_UTIL
-                            ? Math::Prime::Util::addint($pq, $j)
-                            : Math::Prime::Util::GMP::addint($pq, $j)
-                           );
-                $res = (
-                        HAS_PRIME_UTIL
-                        ? Math::Prime::Util::mulmod($res, $term, $pk)
-                        : Math::Prime::Util::GMP::mulmod($res, $term, $pk)
-                       );
+                $res =
+                  (HAS_PRIME_UTIL and $pk < ULONG_MAX)
+                  ? Math::Prime::Util::mulmod($res, Math::Prime::Util::addint($pq, $j), $pk)
+                  : Math::Prime::Util::GMP::mulmod($res, Math::Prime::Util::GMP::addint($pq, $j), $pk);
             }
         }
 
@@ -14327,8 +14290,8 @@ package Sidef::Types::Number::Number {
             }
 
             my @NKR = (
-                       sort { $a->[3] <=> $b->[3] }
-                       map  { [$N[$_], $K[$_], $R[$_], $N[$_] + $K[$_] + $R[$_]] } 0 .. $#N
+                       sort { Math::Prime::Util::GMP::cmpint($a->[3], $b->[3]) }
+                       map  { [$N[$_], $K[$_], $R[$_], Math::Prime::Util::GMP::vecsum($N[$_], $K[$_], $R[$_])] } 0 .. $#N
                       );
 
             @N = map { $_->[0] } @NKR;
