@@ -13911,7 +13911,7 @@ package Sidef::Types::Number::Number {
     sub _factorial_without_prime_pe {
         my ($n, $p, $e, $pk) = @_;
 
-        if ($p > $n) {
+        if (Math::Prime::Util::GMP::cmpint($p, $n) > 0) {
             return (
                     (HAS_PRIME_UTIL and $pk < ULONG_MAX)
                     ? Math::Prime::Util::factorialmod($n, $pk)
@@ -13964,9 +13964,9 @@ package Sidef::Types::Number::Number {
     sub _factorial_without_prime {
         my ($n, $p, $e, $pk, $from, $res) = @_;
 
-        return 1 if ($n <= 1);
+        return 1 if (Math::Prime::Util::GMP::cmpint($n, 1) <= 0);
 
-        if ($p > $n) {
+        if (Math::Prime::Util::GMP::cmpint($p, $n) > 0) {
             return (
                     (HAS_PRIME_UTIL and $pk < ULONG_MAX)
                     ? Math::Prime::Util::factorialmod($n, $pk)
@@ -14238,14 +14238,14 @@ package Sidef::Types::Number::Number {
 
             my (@np, @kp);
 
-            do {
+            {
                 my $pi = 1;
                 foreach my $i (0 .. $d) {
                     push @np, Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::divint($n, $pi), $p);
                     push @kp, Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::divint($k, $pi), $p);
                     $pi = Math::Prime::Util::GMP::mulint($pi, $p);
                 }
-            };
+            }
 
             my @e;
 
@@ -14298,7 +14298,7 @@ package Sidef::Types::Number::Number {
             @K = map { $_->[1] } @NKR;
             @R = map { $_->[2] } @NKR;
 
-            my @acc  = (1);
+            my %acc  = ('0' => 1);
             my $nfac = 1;
 
             if ($prq < ULONG_MAX and Math::Prime::Util::GMP::cmpint($p, $n) < 0) {
@@ -14309,7 +14309,7 @@ package Sidef::Types::Number::Number {
                           ? Math::Prime::Util::mulmod($nfac, $k, $prq)
                           : Math::Prime::Util::GMP::mulmod($nfac, $k, $prq);
                     }
-                    push @acc, $nfac;
+                    $acc{$k} = $nfac;
                 }
             }
 
@@ -14324,9 +14324,9 @@ package Sidef::Types::Number::Number {
                     my @pairs;
                     my ($x, $y, $z);
 
-                    ($x = $acc[$N[$j]]) // push(@pairs, [\$x, $N[$j]]);
-                    ($y = $acc[$K[$j]]) // push(@pairs, [\$y, $K[$j]]);
-                    ($z = $acc[$R[$j]]) // push(@pairs, [\$z, $R[$j]]);
+                    ($x = $acc{$N[$j]}) // push(@pairs, [\$x, $N[$j]]);
+                    ($y = $acc{$K[$j]}) // push(@pairs, [\$y, $K[$j]]);
+                    ($z = $acc{$R[$j]}) // push(@pairs, [\$z, $R[$j]]);
 
                     foreach my $pair (sort { Math::Prime::Util::GMP::cmpint($a->[1], $b->[1]) } @pairs) {
                         ${$pair->[0]} = _factorial_without_prime($pair->[1], $p, $rq, $prq, \$from, \$res);
