@@ -29,3 +29,57 @@ say [a, b].sum
 
 say %i(1 2 3).sum
 %n(1 2 3).sum == 6 || die "error"
+
+# Special trigonometric functions tests
+
+for f in (%w(sec cot csc tan sin cos)) {
+
+    var f_inverse = "a#{f}"   # e.g.: asin
+    var fh = "#{f}h"          # e.g.: sinh
+    var fh_inverse = "a#{fh}" # e.g.: asinh
+
+    var t = (rand(1,3) + rand(1,10).i).round(-40)
+    say "#{f}(#{t})"
+
+    if (f !~ [:cot, :csc, :tan, :sin]) {
+        assert_eq(t.(f).(f_inverse).round(-40), t, [f, f_inverse])
+        assert_eq(t.real.(f).(f_inverse).round(-40), t.real, [f, f_inverse])
+    }
+
+    assert_eq(t.(f_inverse).(f).round(-40), t, [f, f_inverse])
+    assert_eq(t.real.(f_inverse).(f).round(-40), t.real, [f, f_inverse])
+
+    if (fh !~ [:sech, :coth, :csch, :tanh, :sinh, :cosh]) {
+        assert_eq(t.(fh).(fh_inverse).round(-40), t, [fh, fh_inverse])
+    }
+
+    assert_eq(t.(fh_inverse).(fh).round(-40), t, [fh, fh_inverse])
+    assert_eq(t.real.(fh_inverse).(fh).round(-40), t.real, [fh, fh_inverse])
+}
+
+
+for f in (%w(sec cot csc tan sin cos)) {
+
+    var f_inverse = "a#{f}"     # e.g.: asin
+    var fh = "#{f}h"            # e.g.: sinh
+    var fh_inverse = "a#{fh}"   # e.g.: asinh
+
+    var t = (rand(1) - rand(1).i).round(-40)
+    say "#{f}(#{t})"
+
+    assert_eq(t.(f).(f_inverse).round(-40), t)
+    assert_eq(t.(f_inverse).(f).round(-40), t)
+    assert_eq(t.(fh).(fh_inverse).round(-40), t)
+    assert_eq(t.(fh_inverse).(fh).round(-40), t)
+
+    assert_eq(t.real.(f).(f_inverse).round(-40), t.real)
+    assert_eq(t.real.(f_inverse).(f).round(-40), t.real)
+    assert_eq(t.real.(fh).(fh_inverse).round(-40), t.real)
+    assert_eq(t.real.(fh_inverse).(fh).round(-40), t.real)
+
+    assert_eq(t.imag.(f_inverse).(f).round(-40), t.imag)
+    assert_eq(t.imag.(fh_inverse).(fh).round(-40), t.imag)
+}
+
+assert_eq(((3 + 4i) / sqrt(2)) *  sqrt(2) -> round(-40), 3+4i)
+assert_eq((sqrt(2) / (3 + 4i)) * (3 + 4i) -> round(-40), sqrt(2).round(-40))

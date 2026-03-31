@@ -33,6 +33,8 @@ package Sidef::Types::Number::Number {
     state $TWO  = Math::GMPz::Rmpz_init_set_ui( 2);
     state $TEN  = Math::GMPz::Rmpz_init_set_ui(10);
 
+    state $MPC_VERSION = Math::MPC::MPC_VERSION();
+
     use constant {
 
         ONE   => bless(\(my $one   = 1)),
@@ -2073,24 +2075,20 @@ package Sidef::Types::Number::Number {
     sub i {
         my ($x) = @_;
 
-        state $i = do {
-            my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_set_ui_ui($c, 0, 1, $ROUND);
-            $c;
-        };
+        my $i = Math::MPC::Rmpc_init2(CORE::int($PREC));
+        Math::MPC::Rmpc_set_ui_ui($i, 0, 1, $ROUND);
 
         if (ref($x)) {
-            bless \__mul__($i, $$x);
+            return bless \__mul__($i, $$x);
         }
-        else {
-            state $obj = bless \$i;
-        }
+
+        bless \$i;
     }
 
     sub e {
-        state $one_f = (Math::MPFR::Rmpfr_init_set_ui_nobless(1, $ROUND))[0];
         my $e = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        Math::MPFR::Rmpfr_exp($e, $one_f, $ROUND);
+        Math::MPFR::Rmpfr_set_ui($e, 1, $ROUND);
+        Math::MPFR::Rmpfr_exp($e, $e, $ROUND);
         bless \$e;
     }
 
@@ -2100,10 +2098,10 @@ package Sidef::Types::Number::Number {
             goto &euler_phi;
         }
 
-        state $five4_f = (Math::MPFR::Rmpfr_init_set_d_nobless(1.25, $ROUND))[0];
-
         my $phi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        Math::MPFR::Rmpfr_sqrt($phi, $five4_f, $ROUND);
+        Math::MPFR::Rmpfr_set_ui($phi, 5, $ROUND);
+        Math::MPFR::Rmpfr_div_2ui($phi, $phi, 2, $ROUND);   # phi=5/4
+        Math::MPFR::Rmpfr_sqrt($phi, $phi, $ROUND);
         Math::MPFR::Rmpfr_add_d($phi, $phi, 0.5, $ROUND);
 
         bless \$phi;
@@ -2464,12 +2462,9 @@ package Sidef::Types::Number::Number {
 
       Scalar__Math_MPC: {
             my $r = Math::MPC::Rmpc_init2($PREC);
-            ($x < 0)
-              ? do {
-                Math::MPC::Rmpc_add_ui($r, $y, -$x, $ROUND);
-                Math::MPC::Rmpc_neg($r, $r, $ROUND);
-              }
-              : Math::MPC::Rmpc_ui_sub($r, $x, $y, $ROUND);
+            Math::MPC::Rmpc_set_ui($r, (($x < 0) ? (-$x) : $x), $ROUND);
+            Math::MPC::Rmpc_neg($r, $r, $ROUND) if ($x < 0);
+            Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
             return $r;
         }
 
@@ -2986,25 +2981,19 @@ package Sidef::Types::Number::Number {
 
       Math_MPC__Scalar: {
             my $r = Math::MPC::Rmpc_init2($PREC);
-            if ($y < 0) {
-                Math::MPC::Rmpc_div_ui($r, $x, -$y, $ROUND);
-                Math::MPC::Rmpc_neg($r, $r, $ROUND);
-            }
-            else {
-                Math::MPC::Rmpc_div_ui($r, $x, $y, $ROUND);
-            }
+            Math::MPC::Rmpc_set_ui($r, (($y < 0) ? (-$y) : $y), $ROUND);
+            Math::MPC::Rmpc_neg($r, $r, $ROUND) if ($y < 0);
+            Math::MPC::Rmpc_div($r, $x, $r, $ROUND);
             return $r;
         }
 
       Scalar__Math_MPC: {
+
+            # XXX: don't use Rmpc_ui_div(), as it is broken in mpc=1.4.0
             my $r = Math::MPC::Rmpc_init2($PREC);
-            if ($x < 0) {
-                Math::MPC::Rmpc_ui_div($r, -$x, $y, $ROUND);
-                Math::MPC::Rmpc_neg($r, $r, $ROUND);
-            }
-            else {
-                Math::MPC::Rmpc_ui_div($r, $x, $y, $ROUND);
-            }
+            Math::MPC::Rmpc_set_ui($r, (($x < 0) ? (-$x) : $x), $ROUND);
+            Math::MPC::Rmpc_neg($r, $r, $ROUND) if ($x < 0);
+            Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
             return $r;
         }
 
@@ -3127,8 +3116,11 @@ package Sidef::Types::Number::Number {
         }
 
       Math_MPFR__Math_MPC: {
+
+            # XXX: don't use Rmpc_fr_div(), as it is broken in mpc=1.4.0
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_fr_div($r, $x, $y, $ROUND);
+            Math::MPC::Rmpc_set_fr($r, $x, $ROUND);
+            Math::MPC::Rmpc_div($r, $r, $y, $ROUND);
             return $r;
         }
 
@@ -3887,7 +3879,8 @@ package Sidef::Types::Number::Number {
 
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+            Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
             return $r;
         }
     }
@@ -4498,11 +4491,17 @@ package Sidef::Types::Number::Number {
         }
 
       Math_MPC: {
-            my $ln2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_log($r, $x, $ROUND);
-            Math::MPC::Rmpc_div_fr($r, $r, $ln2, $ROUND);
+
+            if ($MPC_VERSION >= 66560) {    # available only in mpc>=1.4.0
+                Math::MPC::Rmpc_log2($r, $x, $ROUND);
+            }
+            else {
+                my $ln2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+                Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
+                Math::MPC::Rmpc_log($r, $x, $ROUND);
+                Math::MPC::Rmpc_div_fr($r, $r, $ln2, $ROUND);
+            }
             return $r;
         }
     }
@@ -4526,8 +4525,6 @@ package Sidef::Types::Number::Number {
         }
 
       Math_MPC: {
-            state $MPC_VERSION = Math::MPC::MPC_VERSION();
-
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
 
             if ($MPC_VERSION >= 65536) {    # available only in mpc>=1.0.0
@@ -5391,8 +5388,10 @@ package Sidef::Types::Number::Number {
         # sec(x) = 1/cos(x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
             Math::MPC::Rmpc_cos($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+            Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
             return $r;
         }
     }
@@ -5415,8 +5414,10 @@ package Sidef::Types::Number::Number {
         # sech(x) = 1/cosh(x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
             Math::MPC::Rmpc_cosh($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+            Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
             return $r;
         }
     }
@@ -5449,7 +5450,8 @@ package Sidef::Types::Number::Number {
         # asec(x) = acos(1/x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+            Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
             Math::MPC::Rmpc_acos($r, $r, $ROUND);
             return $r;
         }
@@ -5485,7 +5487,8 @@ package Sidef::Types::Number::Number {
         # asech(x) = acosh(1/x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+            Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
             Math::MPC::Rmpc_acosh($r, $r, $ROUND);
             return $r;
         }
@@ -5515,8 +5518,10 @@ package Sidef::Types::Number::Number {
         # csc(x) = 1/sin(x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
             Math::MPC::Rmpc_sin($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+            Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
             return $r;
         }
     }
@@ -5539,8 +5544,10 @@ package Sidef::Types::Number::Number {
         # csch(x) = 1/sinh(x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
             Math::MPC::Rmpc_sinh($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+            Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
             return $r;
         }
     }
@@ -5573,7 +5580,8 @@ package Sidef::Types::Number::Number {
         # acsc(x) = asin(1/x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+            Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
             Math::MPC::Rmpc_asin($r, $r, $ROUND);
             return $r;
         }
@@ -5601,7 +5609,8 @@ package Sidef::Types::Number::Number {
         # acsch(x) = asinh(1/x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+            Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
             Math::MPC::Rmpc_asinh($r, $r, $ROUND);
             return $r;
         }
@@ -5631,8 +5640,10 @@ package Sidef::Types::Number::Number {
         # cot(x) = 1/tan(x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
             Math::MPC::Rmpc_tan($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+            Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
             return $r;
         }
     }
@@ -5655,8 +5666,10 @@ package Sidef::Types::Number::Number {
         # coth(x) = 1/tanh(x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            my $t = Math::MPC::Rmpc_init2(CORE::int($PREC));
             Math::MPC::Rmpc_tanh($r, $x, $ROUND);
-            Math::MPC::Rmpc_ui_div($r, 1, $r, $ROUND);
+            Math::MPC::Rmpc_set_ui($t, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $t, $r, $ROUND);
             return $r;
         }
     }
@@ -5681,7 +5694,8 @@ package Sidef::Types::Number::Number {
         # acot(x) = atan(1/x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+            Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
             Math::MPC::Rmpc_atan($r, $r, $ROUND);
             return $r;
         }
@@ -5717,7 +5731,8 @@ package Sidef::Types::Number::Number {
         # acoth(x) = atanh(1/x)
       Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_ui_div($r, 1, $x, $ROUND);
+            Math::MPC::Rmpc_set_ui($r, 1, $ROUND);
+            Math::MPC::Rmpc_div($r, $r, $x, $ROUND);
             Math::MPC::Rmpc_atanh($r, $r, $ROUND);
             return $r;
         }
@@ -8164,6 +8179,9 @@ package Sidef::Types::Number::Number {
             my $imag_1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             my $imag_2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
+            my $one = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            Math::MPC::Rmpc_set_ui($one, 1, $ROUND);
+
             Math::MPC::Rmpc_set($c, $x, $ROUND);
 
             for (1 .. $n) {
@@ -8194,7 +8212,7 @@ package Sidef::Types::Number::Number {
                 && last;
 #>>>
 
-                Math::MPC::Rmpc_ui_div($c, 1, $c, $ROUND);
+                Math::MPC::Rmpc_div($c, $one, $c, $ROUND);
             }
 
             return Sidef::Types::Array::Array->new(\@cfrac);
@@ -14059,7 +14077,7 @@ package Sidef::Types::Number::Number {
 
         if (!$p or $k_val <= 1e4) {
             my $bin = Math::GMPz::Rmpz_init();
-            if (Math::GMPz::Rmpz_fits_ulong_p($n_val) and Math::GMPz::Rmpz_cmp_ui($n_val, 1e5) <= 0) {
+            if (Math::GMPz::Rmpz_cmp_ui($n_val, 1e5) <= 0) {
                 Math::GMPz::Rmpz_bin_uiui($bin, Math::GMPz::Rmpz_get_ui($n_val), $k_val);
             }
             else {
