@@ -1,0 +1,38 @@
+#!/usr/bin/ruby
+
+# Daniel "Trizen" Șuteu
+# Date: 11 October 2019
+# https://github.com/trizen
+
+# Convergents of roots of unity, listed as sequences of numerators and denominators of real and imaginary parts.
+
+# OEIS:
+#   https://oeis.org/A011922 -- a(n) = 15*a(n-1) - 15*a(n-2) + a(n-3).
+#   https://oeis.org/A103974 -- Smaller sides (a) in (a,a,a+1)-integer triangle with integer area.
+
+# See also:
+#   https://www.youtube.com/watch?v=o5C1OyQbrEs
+#   https://en.wikipedia.org/wiki/Root_of_unity
+#   https://en.wikipedia.org/wiki/Eisenstein_integer
+
+func roots_of_unity(n) {
+    n.of { |j|
+        exp(2i * Num.pi / n * j)
+    }
+}
+
+for k in (3..4 -> primes) {
+
+    say "\n=> Roots of unity of #{k}:"
+
+    for r in (roots_of_unity(k)) {
+        next if (r == 1)
+        say "x = #{r}"
+        var C = r.convergents(15)
+        say ("Nu(Re(x)) = ", C.map{.re.rat_approx.nu})
+        say ("De(Re(x)) = ", C.map{.re.rat_approx.de})
+        say ("Nu(Im(x)) = ", C.map{.im.rat_approx.nu})
+        say ("De(Im(x)) = ", C.map{.im.rat_approx.de})
+        say ''
+    }
+}

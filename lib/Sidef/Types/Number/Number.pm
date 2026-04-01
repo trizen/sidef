@@ -8181,7 +8181,7 @@ package Sidef::Types::Number::Number {
             my $imag_1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             my $imag_2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-            my $one = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            my $one = Math::MPC::Rmpc_init2(CORE::int($PREC));
             Math::MPC::Rmpc_set_ui($one, 1, $ROUND);
 
             Math::MPC::Rmpc_set($c, $x, $ROUND);

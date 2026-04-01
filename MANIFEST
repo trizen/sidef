@@ -1043,6 +1043,7 @@ scripts/Tests/roman_numerals_encoding.sf
 scripts/Tests/roman_numerals_encoding_2.sf
 scripts/Tests/root_mean_square.sf
 scripts/Tests/rootmod.sf
+scripts/Tests/roots_of_unity_convergents.sf
 scripts/Tests/roots_on_the_rise.sf
 scripts/Tests/round_half_to_even.sf
 scripts/Tests/roundf.sf
@@ -1199,6 +1200,7 @@ utils/find_invalid_types.pl
 utils/find_undefined_methods.pl
 utils/gource-video.sh
 utils/grep_errors.sh
+utils/make_pdfs.sh
 utils/pod_generator.pl
 utils/sidef2bin.sh
 utils/sidef2exe.txt
