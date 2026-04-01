@@ -2563,7 +2563,8 @@ package Sidef::Types::Number::Number {
 
       Math_MPFR__Math_MPC: {
             my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-            Math::MPC::Rmpc_fr_sub($r, $x, $y, $ROUND);
+            Math::MPC::Rmpc_set_fr($r, $x, $ROUND);
+            Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
             return $r;
         }
 
@@ -4140,6 +4141,7 @@ package Sidef::Types::Number::Number {
                     }
                 }
                 my $r = Math::GMPz::Rmpz_init();
+                $y < ULONG_MAX or goto &_nan;
                 Math::GMPz::Rmpz_ui_pow_ui($r, $x, $y);
                 return $r;
             }

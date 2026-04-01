@@ -1554,7 +1554,7 @@ snippets, and rapid prototyping.
 =head2 Starting the REPL
 
     $ sidef
-    Sidef 26.01, running on Linux, using Perl v5.42.0.
+    Sidef 26.04, running on Linux, using Perl v5.42.1.
     Type "help", "copyright" or "license" for more information.
     >
 

@@ -16,7 +16,7 @@
 
 **A modern, high-level programming language for versatile general-purpose applications**
 
-[Website](https://github.com/trizen/sidef) • [Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_BEGINNER_GUIDE.md) • [Documentation](https://trizen.gitbook.io/sidef-lang/) • [Try Online](https://tio.run/#sidef) • [Discussions](https://github.com/trizen/sidef/discussions)
+[Website](https://github.com/trizen/sidef) • [Tutorial](https://github.com/trizen/sidef/blob/master/SIDEF_BEGINNER_GUIDE.md) • [Documentation](https://trizen.gitbook.io/sidef-lang/) • [Try Online](https://tio.run/#sidef) • [Discussions](https://github.com/trizen/sidef/discussions)
 
 [![CPAN](https://img.shields.io/badge/CPAN-Sidef-blue)](https://metacpan.org/release/Sidef)
 [![Perl](https://img.shields.io/badge/Perl-5.18%2B-blue)](https://www.perl.org/)
@@ -450,13 +450,13 @@ Explore an extensive collection of Sidef programs at **[github.com/trizen/sidef-
 
 | Resource | Description |
 |----------|-------------|
-| **[Beginner's Guide](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_BEGINNER_GUIDE.md)** | Start here if you're new to Sidef |
-| **[Advanced Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_ADVANCED_GUIDE.md)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf)) | Comprehensive language tutorial |
-| **[Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-number-theory.pdf)) | Mathematical programming with Sidef |
-| **[Number Theory Reference](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_REFERENCE.md)** | Complete function reference for number theory |
-| **[Number Theory Guide](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_GUIDE.md)** | Complete guide for computational number theory |
-| **[Computational Algebra Guide](https://codeberg.org/trizen/sidef/src/branch/master/COMPUTATIONAL_ALGEBRA_GUIDE.md)** | Complete guide for computational algebra |
-| **[Sidef GitBook](https://trizen.gitbook.io/sidef-lang/)** ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-book.pdf)) | Full language guide |
+| **[Beginner's Guide](https://github.com/trizen/sidef/blob/master/SIDEF_BEGINNER_GUIDE.md)** | Start here if you're new to Sidef |
+| **[Advanced Tutorial](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md)** | Comprehensive language tutorial |
+| **[Number Theory Tutorial](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_TUTORIAL.md)** | Mathematical programming with Sidef |
+| **[Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md)** | Complete function reference for number theory |
+| **[Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md)** | Complete guide for computational number theory |
+| **[Computational Algebra Guide](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md)** | Complete guide for computational algebra |
+| **[Sidef GitBook](https://trizen.gitbook.io/sidef-lang/)** | Full language guide |
 | **[RosettaCode Examples](https://rosettacode.org/wiki/Sidef)** | Practical code examples across many tasks |
 
 ## 💬 Community & Support

@@ -95,7 +95,7 @@ Reading conventions used throughout this document:
 
 ## 2. Getting Started
 
-For installation instructions and basic language features, refer to the [beginner's tutorial](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_BEGINNER_GUIDE.md) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf)).
+For installation instructions and basic language features, refer to the [beginner's tutorial](https://github.com/trizen/sidef/blob/master/SIDEF_BEGINNER_GUIDE.md).
 
 ### Starting the REPL
 
@@ -103,7 +103,7 @@ After installing Sidef, launch the interactive environment with the `sidef` comm
 
 ```console
 $ sidef
-Sidef 26.01, running on Linux, using Perl v5.42.0.
+Sidef 26.04, running on Linux, using Perl v5.42.1.
 Type "help", "copyright" or "license" for more information.
 >
 ```
@@ -301,7 +301,7 @@ say Num.pi             # Back to default 192-bit precision
 
 ## 6. Number-Theoretic Function Reference
 
-Below is a broad reference of functions used in computational number theory. For the full documentation, see: [Sidef Number Class](https://metacpan.org/pod/Sidef::Types::Number::Number) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-number-class-documentation.pdf)).
+Below is a broad reference of functions used in computational number theory. For the full documentation, see: [Sidef Number Class](https://metacpan.org/pod/Sidef::Types::Number::Number).
 
 ### Primality and Compositeness
 
@@ -2355,135 +2355,6 @@ say verify_factorization(5040)      #=> true
 
 ---
 
-## Appendix A: Common Recipes
-
-### Sanity-Check a Factorization
-
-```ruby
-func verify_factorization(n) {
-    n.factor_exp.map_2d {|p, e| p**e }.prod == n
-}
-
-say verify_factorization(5040)      #=> true
-```
-
-### Fast Primality Triage
-
-```ruby
-func triage(n) {
-    return "not prime"              if (n < 2)
-    return "prime"                  if (n.is_prime)
-    return "perfect power, not prime" if (n.is_perfect_power)
-    return "composite"
-}
-
-say triage(2**127 - 1)
-```
-
-### Modular Accumulation Loop
-
-```ruby
-var m = 1_000_000_007
-var a = 2
-var s = 0
-
-for n in (1..1000) {
-    s = addmod(s, powmod(a, n, m), m)
-}
-say s
-```
-
-### Find a Nearby Prime
-
-```ruby
-func next_prime_at_least(n) {
-    n.is_prime ? n : n.next_prime
-}
-
-say next_prime_at_least(10**12)
-```
-
-### Möbius Inversion
-
-```ruby
-func moebius_invert(g, n) {
-    n.divisors.sum {|d| mu(n/d) * g(d) }
-}
-
-say moebius_invert({|d| sigma(d) }, 12)   # Should be 12
-```
-
-### Generating Abundant Numbers Efficiently
-
-```ruby
-say 30.by { .is_abundant }          # first 30 abundant numbers
-say 30.by { .is_odd && .is_abundant } # first 30 odd abundant numbers
-```
-
----
-
-## Appendix B: Performance Benchmarks
-
-### Comparison with Other Systems
-
-Selected benchmarks (approximate, hardware-dependent):
-
-| Operation | Sidef | PARI/GP | Mathematica |
-|---|---|---|---|
-| factor(2^128+1) | 0.5s | 0.5s | 0.6s |
-| pi(10^10) | 0.2s | 0.2s | 0.3s |
-| binomialmod(10^10, 10^5, 2^127-1) | 0.08s | N/A | 0.15s |
-| is_prime(2^1000+1) | 0.01s | 0.01s | 0.02s |
-
-### Scaling Behavior
-
-```ruby
-# Prime counting scales well
-pi(10**6)       # < 0.01s
-pi(10**9)       # ~0.2s
-pi(10**12)      # ~5s (with primecount)
-
-# Factorization depends on number structure
-factor(2**128 - 1)           # 0.01s (special form)
-factor(nextprime(2**64)**2)  # 0.01s (small factors)
-
-# k-Almost prime tests: ~10^6 per second for 100-digit n
-n.is_almost_prime(3)
-n.is_omega_prime(3)
-```
-
----
-
-## Appendix C: Further Reading and Resources
-
-### Official Documentation
-
-- **Sidef book**: [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-book.pdf))
-- **Advanced tutorial**: [SIDEF_ADVANCED_TUTORIAL.md](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_ADVANCED_GUIDE.md) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-tutorial.pdf))
-- **Full Number class documentation**: [Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number) ([PDF](https://github.com/trizen/sidef/releases/download/26.01/sidef-number-class-documentation.pdf))
-- **Source code**: [codeberg.org/trizen/sidef](https://codeberg.org/trizen/sidef/src/master/lib/Sidef/Types/Number/Number.pm)
-
-### Code Examples
-
-- **Sidef scripts repository**: [github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
-- **OEIS autoload**: [github.com/trizen/oeis-autoload](https://github.com/trizen/oeis-autoload)
-- **Special-purpose factorization**: [trizenx.blogspot.com](https://trizenx.blogspot.com/2019/08/special-purpose-factorization-algorithms.html)
-
-### Mathematical References
-
-- **OEIS**: [oeis.org](https://oeis.org) — Online Encyclopedia of Integer Sequences
-- **Math::Prime::Util**: [github.com/danaj/Math-Prime-Util](https://github.com/danaj/Math-Prime-Util)
-- **Max Alekseyev's papers**: [Inverse of multiplicative functions](https://cs.uwaterloo.ca/journals/JIS/VOL19/Alekseyev/alek5.html)
-
-### Community
-
-- **Questions and discussions**: [GitHub Discussions](https://github.com/trizen/sidef/discussions/categories/q-a)
-- **Issue tracker**: [GitHub Issues](https://github.com/trizen/sidef/issues)
-
----
-
----
-
 ## 31. Sieve Algorithms
 
 Sieves are among the oldest and most important tools in computational number theory. They systematically eliminate composite numbers to identify primes or compute arithmetic functions over entire ranges in bulk.
@@ -2527,7 +2398,7 @@ func segmented_sieve(L, R) {
 
     for p in (small) {
         var start = max(p*p, idiv_ceil(L, p) * p)
-        var k = start - L
+        var k = (start - L)
         while (k < size) {
             sieve[k] = false
             k += p
@@ -2555,7 +2426,7 @@ func linear_sieve(n) {
             primes.push(i)
         }
         for p in (primes) {
-            break if (p > lpf[i] || i*p > n)
+            break if ((p > lpf[i]) || (i*p > n))
             lpf[i*p] = p
         }
     }
@@ -2585,17 +2456,17 @@ Once the LPF table is built, any multiplicative function can be evaluated in bul
 ```ruby
 # Euler's totient via sieve
 func sieve_phi(n) {
-    var phi = (n+1).irange
+    var phi = (n+1).range.to_a
     for i in (2..n) {
         next if (phi[i] != i)    # i is composite — already adjusted
         for j in (i .. n `by` i) {
-            phi[j] -= phi[j] / i
+            phi[j] -= (phi[j] / i)
         }
     }
     phi
 }
 
-say sieve_phi(50)[1..50]
+say sieve_phi(50)
 
 # Divisor sum sigma(n) via sieve
 func sieve_sigma(n) {
@@ -2608,7 +2479,7 @@ func sieve_sigma(n) {
     sigma
 }
 
-say sieve_sigma(50)[1..50]
+say sieve_sigma(50)
 
 # Count Omega(k) for all k in 1..n
 func big_omega_sieve(n) {
@@ -2624,7 +2495,7 @@ func big_omega_sieve(n) {
 }
 
 var om = big_omega_sieve(100)
-say (2..100).grep {|k| om[k] == 2 }    # semiprimes up to 100
+say +(2..100).grep {|k| om[k] == 2 }    # semiprimes up to 100
 ```
 
 ### Lucy Hedgehog / Meissel-Lehmer Prime Counter
@@ -2641,7 +2512,7 @@ func prime_counting_sieve(n) {
     vals = vals.uniq.sort
 
     var S = Hash()
-    vals.each {|v| S{v} = v - 1 }
+    vals.each {|v| S{v} = (v - 1) }
 
     for p in (2 .. isqrt(n)) {
         next if (S{p} == S{p-1})    # p is composite
@@ -4243,7 +4114,132 @@ detect_pattern([1, 3, 7, 15, 31, 63, 127])        # 2^n - 1
 # 4. Contribute new terms back to OEIS
 ```
 
+---
+
+
+## Appendix A: Common Recipes
+
+### Sanity-Check a Factorization
+
+```ruby
+func verify_factorization(n) {
+    n.factor_exp.map_2d {|p, e| p**e }.prod == n
+}
+
+say verify_factorization(5040)      #=> true
+```
+
+### Fast Primality Triage
+
+```ruby
+func triage(n) {
+    return "not prime"              if (n < 2)
+    return "prime"                  if (n.is_prime)
+    return "perfect power, not prime" if (n.is_perfect_power)
+    return "composite"
+}
+
+say triage(2**127 - 1)
+```
+
+### Modular Accumulation Loop
+
+```ruby
+var m = 1_000_000_007
+var a = 2
+var s = 0
+
+for n in (1..1000) {
+    s = addmod(s, powmod(a, n, m), m)
+}
+say s
+```
+
+### Find a Nearby Prime
+
+```ruby
+func next_prime_at_least(n) {
+    n.is_prime ? n : n.next_prime
+}
+
+say next_prime_at_least(10**12)
+```
+
+### Möbius Inversion
+
+```ruby
+func moebius_invert(g, n) {
+    n.divisors.sum {|d| mu(n/d) * g(d) }
+}
+
+say moebius_invert({|d| sigma(d) }, 12)   # Should be 12
+```
+
+### Generating Abundant Numbers Efficiently
+
+```ruby
+say 30.by { .is_abundant }          # first 30 abundant numbers
+say 30.by { .is_odd && .is_abundant } # first 30 odd abundant numbers
+```
 
 ---
 
-*This document covers the `Sidef::Types::Number::Number` class and the core language features relevant to computational number theory — from elementary sieves and primality proofs to elliptic curves, p-adic arithmetic, and cryptographic applications. For additional functionality related to arrays, strings, and other types, consult the full Sidef documentation at [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/).*
+## Appendix B: Performance Benchmarks
+
+### Comparison with Other Systems
+
+Selected benchmarks (approximate, hardware-dependent):
+
+| Operation | Sidef | PARI/GP | Mathematica |
+|---|---|---|---|
+| factor(2^128+1) | 0.5s | 0.5s | 0.6s |
+| pi(10^10) | 0.2s | 0.2s | 0.3s |
+| binomialmod(10^10, 10^5, 2^127-1) | 0.08s | N/A | 0.15s |
+| is_prime(2^1000+1) | 0.01s | 0.01s | 0.02s |
+
+### Scaling Behavior
+
+```ruby
+# Prime counting scales well
+pi(10**6)       # < 0.01s
+pi(10**9)       # ~0.2s
+pi(10**12)      # ~5s (with primecount)
+
+# Factorization depends on number structure
+factor(2**128 - 1)           # 0.01s (special form)
+factor(nextprime(2**64)**2)  # 0.01s (small factors)
+
+# k-Almost prime tests: ~10^6 per second for 100-digit n
+n.is_almost_prime(3)
+n.is_omega_prime(3)
+```
+
+---
+
+## Appendix C: Further Reading and Resources
+
+### Official Documentation
+
+- **Sidef book**: [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.04/sidef-book.pdf))
+- **Advanced tutorial**: [SIDEF_ADVANCED_TUTORIAL.md](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md)
+- **Computational Algebra Guide**: [COMPUTATIONAL_ALGEBRA_GUIDE.md](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md)
+- **Full Number class documentation**: [Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number)
+
+### Code Examples
+
+- **Sidef scripts repository**: [github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
+- **OEIS autoload**: [github.com/trizen/oeis-autoload](https://github.com/trizen/oeis-autoload)
+- **Special-purpose factorization**: [trizenx.blogspot.com](https://trizenx.blogspot.com/2019/08/special-purpose-factorization-algorithms.html)
+
+### Mathematical References
+
+- **OEIS**: [oeis.org](https://oeis.org) — Online Encyclopedia of Integer Sequences
+- **Math::Prime::Util**: [github.com/danaj/Math-Prime-Util](https://github.com/danaj/Math-Prime-Util)
+- **Max Alekseyev's papers**: [Inverse of multiplicative functions](https://cs.uwaterloo.ca/journals/JIS/VOL19/Alekseyev/alek5.html)
+
+### Community
+
+- **Questions and discussions**: [GitHub Discussions](https://github.com/trizen/sidef/discussions/categories/q-a)
+- **Issue tracker**: [GitHub Issues](https://github.com/trizen/sidef/issues)
+
+---

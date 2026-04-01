@@ -921,7 +921,7 @@ Find `x` such that `x ≡ a₁ (mod m₁)` and `x ≡ a₂ (mod m₂)`, etc.:
 
 ```ruby
 # Built-in CRT
-say crt([2, 3, 2], [3, 5, 7])    # 23  (23≡2 mod 3, 23≡3 mod 5, 23≡2 mod 7)
+say Math.chinese([2,3], [3,5], [2, 7])    # 23  (23≡2 mod 3, 23≡3 mod 5, 23≡2 mod 7)
 
 # Manual CRT for two congruences
 func crt2(a1, m1, a2, m2) {
@@ -1041,7 +1041,7 @@ var sqrt2_cf = Enumerator({ |yield|
 
 # Best rational approximations to √2
 sqrt2_cf.first(8).each { |r|
-    say "#{r}  ≈  #{r.as_float.round(8)}"
+    say "#{r.as_frac}\t≈  #{r.round(-8)}"
 }
 ```
 
@@ -1054,7 +1054,7 @@ sqrt2_cf.first(8).each { |r|
 ```ruby
 func compose(*fns) {
     func(x) {
-        fns.reverse.reduce(x, { |acc, f| f(acc) })
+        fns.reverse.reduce({ |acc, f| f(acc) }, x)
     }
 }
 
@@ -1074,7 +1074,7 @@ Cache is automatically invalidated per unique argument tuple:
 ```ruby
 func count_partitions(n, k = n) is cached {
     return 1 if (n == 0)
-    return 0 if (n < 0 || k == 0)
+    return 0 if ((n < 0) || (k == 0))
     count_partitions(n - k, k) + count_partitions(n, k - 1)
 }
 
@@ -1109,7 +1109,7 @@ say flatten_deep([1, [2, [3, [4, [5]]]], 6])    # [1, 2, 3, 4, 5, 6]
 
 ```ruby
 # Composable pipeline using closures
-func filtering(pred) { func(acc, x) { pred(x) ? acc << x : acc } }
+func filtering(pred) { func(acc, x) { pred(x) ? (acc << x) : acc } }
 func mapping(f)      { func(acc, x) { acc << f(x) } }
 
 var xform = [
@@ -1119,9 +1119,9 @@ var xform = [
 ]
 
 var input = 1..10
-var result = input.reduce([], { |acc, x|
-    xform.reduce(acc, { |a, f| f(a, x) })
-})
+var result = input.reduce({ |acc, x|
+    xform.reduce({ |a, f| f(a, x) }, acc)
+}, [])
 
 say result    # [16, 25, 36, 49, 64, 81]
 ```
@@ -1828,8 +1828,8 @@ model.keys.sort.each { |c|
 ### Official Documentation
 
 - 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) — Complete language reference
-- 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.01/sidef-book.pdf) — Offline reading
-- 🔢 [Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md) — Deep dive into Sidef's mathematical functions
+- 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.04/sidef-book.pdf) — Offline reading
+- 🔢 [Number Theory Tutorial](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_TUTORIAL.md) — Deep dive into Sidef's mathematical functions
 
 ### Example Script Collections
 

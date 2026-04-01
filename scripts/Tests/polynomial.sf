@@ -595,4 +595,13 @@ do {
     assert(prim_part(p).is_squarefree)
 }
 
+do {
+    var p = Polynomial([1, 0, -5, 0, 4])    # x⁴ - 5x² + 4 = (x-1)(x+1)(x-2)(x+2)
+    var q = Polynomial([1, 0, -1])          # x² - 1 = (x-1)(x+1)
+
+    assert_eq(p.gcd(q).pretty, "x^2 - 1")
+    assert_eq(p/q -> pretty, "x^2 - 4")
+    assert(p.is_squarefree)
+}
+
 say "** Test passed!"

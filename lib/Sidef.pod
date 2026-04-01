@@ -6,7 +6,7 @@ Sidef - The Sidef programming language
 
 =head1 VERSION
 
-This document describes Sidef version 26.01 and later.
+This document describes Sidef version 26.04 and later.
 
 =head1 DESCRIPTION
 
@@ -81,7 +81,7 @@ Sidef requires the following C libraries to be installed before the Perl modules
 
 Download the portable 32-bit executable from the GitHub releases page:
 
-L<https://github.com/trizen/sidef/releases/download/26.01/sidef-26.01.exe.zip>
+L<https://github.com/trizen/sidef/releases/download/26.04/sidef-26.04.exe.zip>
 
 =head3 Android (Termux)
 
@@ -235,7 +235,7 @@ Both C<-e> and C<-E> accept a code string and execute it directly.
 Start the REPL by running C<sidef> with no arguments (or C<sidef -i>):
 
     $ sidef
-    Sidef 26.01, running on Linux, using Perl v5.42.0.
+    Sidef 26.04, running on Linux, using Perl v5.42.0.
     Type "help", "copyright" or "license" for more information.
     > say "Hello!"
     Hello!
@@ -630,13 +630,13 @@ B<Use Case:> Store user preferences, cached data, or custom modules.
 
 Returns the version-specific subdirectory within the Sidef config directory. This directory is used for version-specific cached compiled code.
 
-B<Returns:> A string containing the path to the version-specific directory (e.g., C<~/.config/sidef/v26.01>).
+B<Returns:> A string containing the path to the version-specific directory (e.g., C<~/.config/sidef/v26.04>).
 
 B<Example:>
 
     my $vdir = $sidef->get_sidef_vdir();
     print "Version directory: $vdir\n";
-    # Output: Version directory: /home/user/.config/sidef/v26.01
+    # Output: Version directory: /home/user/.config/sidef/v26.04
 
 B<Use Case:> Allows different Sidef versions to maintain separate caches without conflicts.
 
@@ -700,13 +700,13 @@ Returns the Sidef version as a Sidef C<String> object.
 
 B<Parameters:> None.
 
-B<Returns:> A C<Sidef::Types::String::String> object representing the version (e.g., C<'v26.01'>).
+B<Returns:> A C<Sidef::Types::String::String> object representing the version (e.g., C<'v26.04'>).
 
 B<Example:>
 
     my $v = Sidef->version;
     say "Running Sidef version: $v";
-    # Output: Running Sidef version: v26.01
+    # Output: Running Sidef version: v26.04
 
 B<Note:> Can be called as either a class method (C<Sidef-E<gt>version>) or an instance method (C<$sidef-E<gt>version>).
 
@@ -718,7 +718,7 @@ Returns the Sidef version as a Sidef C<Number> object, suitable for numeric comp
 
 B<Parameters:> None.
 
-B<Returns:> A C<Sidef::Types::Number::Number> object representing the version (e.g., C<26.01>).
+B<Returns:> A C<Sidef::Types::Number::Number> object representing the version (e.g., C<26.04>).
 
 B<Example:>
 
@@ -1087,7 +1087,7 @@ The compilation cache provides significant performance benefits but requires und
 
 =over 4
 
-=item * B<Cache location:> C<~/.config/sidef/v26.01/> (version-specific)
+=item * B<Cache location:> C<~/.config/sidef/v26.04/> (version-specific)
 
 =item * B<Storage format:> Two DBM databases (time and code)
 
@@ -1103,7 +1103,7 @@ The compilation cache provides significant performance benefits but requires und
 
 To manually clear the cache:
 
-    rm -rf ~/.config/sidef/v26.01/
+    rm -rf ~/.config/sidef/v26.04/
 
 =head2 Thread Safety
 
@@ -1353,7 +1353,7 @@ For large data processing:
 
 =item * Check parser state with C<$sidef-E<gt>{parser}>
 
-=item * Review cache entries in C<~/.config/sidef/v26.01/>
+=item * Review cache entries in C<~/.config/sidef/v26.04/>
 
 =back
 

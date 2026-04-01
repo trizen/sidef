@@ -150,4 +150,31 @@ do {
     assert_eq(chinese(PolyMod(x**2 + x + 2, 3), PolyMod(x-1, 5)), PolyMod(10*x**2 + x + 14, 15))    # from PARI/GP
 }
 
+do {
+    var f = PolynomialMod([1, 0, 1], Poly([1, 0, 0, 1]))   # x²+1 mod x³+1
+    var g = PolynomialMod([1, 1],    Poly([1, 0, 0, 1]))   # x+1  mod x³+1
+
+    assert_eq(f.gcd(g).lift, 2)   # GCD of f and g in the quotient ring
+    var (d, u, v) = f.gcdext(g)   # d = u*f + v*g
+    assert(u*f + v*g == d)        # true
+}
+
+do {
+    # In Q[x]/(x²+1), the element x satisfies x² = -1, so x plays the role of i
+    var i = PolynomialMod([1, 0], Poly([1, 0, 1]))
+
+    assert_eq((i ** 2).lift, -1)  # -1   — because x² ≡ -1 mod (x²+1)
+    assert_eq((i ** 4).lift, 1)   # 1
+    assert_eq((i ** 8).lift, 1)   # 1
+
+    # Arithmetic in the ring
+    var a = PolynomialMod([0, 3], Poly([1, 0, 1]))   # 3
+    var b = PolynomialMod([4, 0], Poly([1, 0, 1]))   # 4i
+    assert_eq((a + b)**2, PolyMod([24, -7], Poly([1, 0, 1])))   # (3+4i)² = -7+24i  (norm-preserving!)
+}
+
+assert_eq(PolynomialMod([3, 2, 1], Poly([1, 0, 1])).pretty, "2*x - 2 (mod x^2 + 1)")
+assert_eq(PolynomialMod([1, 0, 3, 1], Poly([1, 0, 0, 0, 1])).derivative.pretty, "3*x^2 + 3 (mod x^4 + 1)")
+assert_eq(PolynomialMod([1, 0], [1, 0, 1])**2 -> pretty, "-1 (mod x^2 + 1)")
+
 say "** Test passed!"

@@ -82,9 +82,9 @@ say Mod(2, 15).znorder  # 4  — because 2⁴ = 16 ≡ 1 (mod 15)
 say chinese(Mod(2,3), Mod(3,5), Mod(2,7))  # Mod(23, 105)
 
 # Verify
-say 23 % 3   # 2 ✓
-say 23 % 5   # 3 ✓
-say 23 % 7   # 2 ✓
+say (23 % 3)   # 2 ✓
+say (23 % 5)   # 3 ✓
+say (23 % 7)   # 2 ✓
 
 # Another CRT example
 say chinese(Mod(2,3), Mod(3,4), Mod(1,5))  # Mod(11, 60)
@@ -126,10 +126,10 @@ say Mod(5, 13)!         # Mod(3, 13)  — 5! = 120 ≡ 3 (mod 13)
 var a = Gauss(17, 19)   # 17+19i
 var b = Gauss(43, 97)   # 43+97i
 
-say a + b               # Gauss(60, 116)   — component-wise addition
-say a - b               # Gauss(-26, -78)
-say a * b               # Gauss(-1112, 2466)  — (pr-qs) + (ps+qr)i
-say a / b               # rational result: 99/433 - 32i/433
+say (a + b)               # Gauss(60, 116)   — component-wise addition
+say (a - b)               # Gauss(-26, -78)
+say (a * b)               # Gauss(-1112, 2466)  — (pr-qs) + (ps+qr)i
+say (a / b)               # rational result: 99/433 - 32i/433
 ```
 
 ### Norm, Conjugate & Absolute Value
@@ -141,7 +141,7 @@ say z.norm              # 25   — 3² + 4² (squared magnitude)
 say z.abs               # 5    — sqrt(norm)
 say z.conj              # Gauss(3, -4)
 say z.inv               # conj(z) / norm(z)
-say z * z.conj          # Gauss(25, 0)   — norm as a Gaussian integer
+say (z * z.conj)        # Gauss(25, 0)   — norm as a Gaussian integer
 ```
 
 ### Primality & Factorization
@@ -211,10 +211,10 @@ var z = Quadratic(3, 4, -1)    # 3 + 4i  (Gaussian integer via Quadratic)
 var a = Quadratic(3, 4, 5)
 var b = Quadratic(1, 2, 5)     # must share same w for direct arithmetic
 
-say a + b   # Quadratic(4,  6, 5)  — (3+1) + (4+2)√5
-say a - b   # Quadratic(2,  2, 5)
-say a * b   # (ac+bdw) + (ad+bc)√w = (3+40) + (6+4)√5 = Quadratic(43, 10, 5)
-say a / b   # multiply by inverse
+say (a + b)   # Quadratic(4,  6, 5)  — (3+1) + (4+2)√5
+say (a - b)   # Quadratic(2,  2, 5)
+say (a * b)   # (ac+bdw) + (ad+bc)√w = (3+40) + (6+4)√5 = Quadratic(43, 10, 5)
+say (a / b)   # multiply by inverse
 ```
 
 ### Norm, Conjugate & Inverse
@@ -222,10 +222,10 @@ say a / b   # multiply by inverse
 ```ruby
 var q = Quadratic(3, 4, 5)
 
-say q.norm      # a² - b²w = 9 - 80 = -71
-say q.conj      # Quadratic(3, -4, 5)  — a - b√w
-say q.inv       # a/(a²-b²w) - b/(a²-b²w)√w
-say q * q.inv   # Quadratic(1, 0, 5)  — the identity
+say q.norm        # a² - b²w = 9 - 80 = -71
+say q.conj        # Quadratic(3, -4, 5)  — a - b√w
+say q.inv         # a/(a²-b²w) - b/(a²-b²w)√w
+say (q * q.inv)   # Quadratic(1, 0, 5)  — the identity
 ```
 
 ### Powers and Pell Equations
@@ -234,7 +234,7 @@ say q * q.inv   # Quadratic(1, 0, 5)  — the identity
 # Pell equation x² - 2y² = ±1 : solutions grow via powers of (1+√2)
 var pell = Quadratic(1, 1, 2)
 say pell**2     # Quadratic(3, 2, 2)  — 3² - 2·2² = 1 ✓
-say pell**5     # Quadratic(29, 20, 2) — 29² - 2·20² = 841-800 = 41... 
+say pell**5     # Quadratic(29, 20, 2) — 29² - 2·20² = 841-800 = 41...
 say pell**10    # Quadratic(577, 408, 2)
 
 # Large exponents efficiently
@@ -251,7 +251,7 @@ say q.invmod(97)        # modular inverse mod 97
 
 # Verify inverse
 var inv = q.invmod(97)
-say (q * inv) % 97      # should equal Quadratic(1, 0, 5)
+say ((q * inv) % 97)    # should equal Quadratic(1, 0, 5)
 ```
 
 ### Quadratic Fields: Real vs Imaginary
@@ -287,8 +287,8 @@ say q.pretty    # "3 + (4)*sqrt(5)"
 
 ```ruby
 var q  = Quaternion(1, 2, 3, 4)   # 1 + 2i + 3j + 4k
-var q2 = Quaternion(5)             # 5 + 0i + 0j + 0k  (scalar quaternion)
-var q3 = Quaternion()              # 0 (zero quaternion)
+var q2 = Quaternion(5)            # 5 + 0i + 0j + 0k  (scalar quaternion)
+var q3 = Quaternion()             # 0 (zero quaternion)
 ```
 
 ### Non-Commutative Multiplication
@@ -297,19 +297,19 @@ var q3 = Quaternion()              # 0 (zero quaternion)
 var a = Quaternion(1, 2, 3, 4)
 var b = Quaternion(5, 6, 7, 8)
 
-say a * b     # Quaternion(-60, 12, 30, 24)
-say b * a     # Quaternion(-60, 20, 14, 32)  ← different! order matters
+say (a * b)     # Quaternion(-60, 12, 30, 24)
+say (b * a)     # Quaternion(-60, 20, 14, 32)  ← different! order matters
 
 # Fundamental unit relationships: i²=j²=k²=ijk=-1
 var i = Quaternion(0, 1, 0, 0)
 var j = Quaternion(0, 0, 1, 0)
 var k = Quaternion(0, 0, 0, 1)
 
-say i * i     # Quaternion(-1, 0, 0, 0)  — i² = -1
-say i * j     # Quaternion(0,  0, 0, 1)  — ij = k
-say j * i     # Quaternion(0,  0, 0,-1)  — ji = -k
-say j * k     # Quaternion(0,  1, 0, 0)  — jk = i
-say k * i     # Quaternion(0,  0, 1, 0)  — ki = j
+say (i * i)     # Quaternion(-1, 0, 0, 0)  — i² = -1
+say (i * j)     # Quaternion(0,  0, 0, 1)  — ij = k
+say (j * i)     # Quaternion(0,  0, 0,-1)  — ji = -k
+say (j * k)     # Quaternion(0,  1, 0, 0)  — jk = i
+say (k * i)     # Quaternion(0,  0, 1, 0)  — ki = j
 ```
 
 ### Norm, Conjugate & Inverse
@@ -321,12 +321,12 @@ say q.norm      # 30    — a²+b²+c²+d² = 1+4+9+16
 say q.abs       # ~5.48 — √norm (magnitude)
 say q.conj      # Quaternion(1, -2, -3, -4)   — negate i,j,k parts
 say q.inv       # conj(q) / norm(q)
-say q * q.inv   # Quaternion(1, 0, 0, 0)      — the identity
+say (q * q.inv) # Quaternion(1, 0, 0, 0)      — the identity
 
 # Norm is multiplicative: norm(a*b) = norm(a)*norm(b)
 var a = Quaternion(1, 2, 3, 4)
 var b = Quaternion(5, 6, 7, 8)
-say (a * b).norm == a.norm * b.norm   # true
+say ((a * b).norm == (a.norm*b.norm))   # true
 ```
 
 ### Arithmetic
@@ -335,11 +335,11 @@ say (a * b).norm == a.norm * b.norm   # true
 var a = Quaternion(1, 2, 3, 4)
 var b = Quaternion(5, 6, 7, 8)
 
-say a + b     # Quaternion(6, 8, 10, 12)
-say a - b     # Quaternion(-4, -4, -4, -4)
-say a / b     # Quaternion(35/87, 4/87, 0, 8/87)  — a * b.inv
-say a ** 3    # a cubed via binary exponentiation
-say a.sqr     # Quaternion(-28, 4, 6, 8)
+say (a + b)     # Quaternion(6, 8, 10, 12)
+say (a - b)     # Quaternion(-4, -4, -4, -4)
+say (a / b)     # Quaternion(35/87, 4/87, 0, 8/87)  — a * b.inv
+say a**3        # a cubed via binary exponentiation
+say a.sqr       # Quaternion(-28, 4, 6, 8)
 ```
 
 ### Component Access
@@ -362,8 +362,8 @@ var (w, x, y, z) = q.reals   # destructure all four components
 # Represent a 90° rotation around the Z-axis
 # q = cos(θ/2) + sin(θ/2)·k
 var angle = 90.deg2rad
-var w = angle.half.cos
-var s = angle.half.sin
+var w = angle.div(2).cos
+var s = angle.div(2).sin
 
 var rotation = Quaternion(w, 0, 0, s)
 say rotation.norm    # 1.0 — unit quaternion (required for rotations)
@@ -393,7 +393,7 @@ say q.is_coprime(Quaternion(5, 6, 7, 8))
 ```ruby
 # From coefficient array (highest degree first)
 var p = Polynomial([1, -2, 1])      # x² - 2x + 1  = (x-1)²
-var q = Polynomial([1, 0, -1])      # x² - 1        = (x-1)(x+1)
+var q = Polynomial([1, 0, -1])      # x² - 1       = (x-1)(x+1)
 
 # Monomial: single term x^n
 var m = Polynomial(5)               # x⁵
@@ -408,15 +408,15 @@ var s = Polynomial(5 => 3, 2 => 10) # 3x⁵ + 10x²
 var p = Polynomial([1, 0, -1])   # x² - 1
 var q = Polynomial([1, -1])      # x - 1
 
-say p + q   # x² + x - 2        — add coefficients
-say p - q   # x² - x            — subtract
-say p * q   # x³ - x² - x + 1  — multiply (degrees sum)
-say p / q   # x + 1             — exact division
-say p % q   # 0                 — remainder
+say (p + q)   # x² + x - 2        — add coefficients
+say (p - q)   # x² - x            — subtract
+say (p * q)   # x³ - x² - x + 1   — multiply (degrees sum)
+say (p / q)   # x + 1             — exact division
+say (p % q)   # 0                 — remainder
 
 # Squaring efficiently
-say Polynomial([1, 1]).sqr          # x² + 2x + 1
-say Polynomial([1, 1]) ** 4         # (x+1)⁴ = x⁴ + 4x³ + 6x² + 4x + 1
+say Polynomial([1, 1]).sqr         # x² + 2x + 1
+say Polynomial([1, 1])**4          # (x+1)⁴ = x⁴ + 4x³ + 6x² + 4x + 1
 ```
 
 ### Evaluation
@@ -504,26 +504,26 @@ say remainder   # 0
 
 ```ruby
 # (1 + 2x + 3x²) mod (1 + x²)
-var p = PolynomialMod([1, 2, 3], [1, 0, 1])
+var p = PolynomialMod([3, 2, 1], Poly([1, 0, 1]))       # 2*x - 2 (mod x^2 + 1)
 
 # Represent 'x' in the ring Q[x]/(x²+1)
-var x = PolynomialMod([0, 1], [1, 0, 1])
+var x = PolynomialMod([1,0], Poly([1, 0, 1]))
 ```
 
 ### Simulating Gaussian Integers via Q[x]/(x²+1)
 
 ```ruby
 # In Q[x]/(x²+1), the element x satisfies x² = -1, so x plays the role of i
-var i = PolynomialMod([0, 1], [1, 0, 1])
+var i = PolynomialMod([1, 0], Poly([1, 0, 1]))
 
-say i ** 2   # -1   — because x² ≡ -1 mod (x²+1)
-say i ** 4   # 1
-say i ** 8   # 1
+say (i ** 2)   # -1   — because x² ≡ -1 mod (x²+1)
+say (i ** 4)   # 1
+say (i ** 8)   # 1
 
 # Arithmetic in the ring
-var a = PolynomialMod([3, 0], [1, 0, 1])   # 3
-var b = PolynomialMod([0, 4], [1, 0, 1])   # 4i
-say (a + b) ** 2   # (3+4i)² = -7+24i  (norm-preserving!)
+var a = PolynomialMod([0, 3], Poly([1, 0, 1]))   # 3
+var b = PolynomialMod([4, 0], Poly([1, 0, 1]))   # 4i
+say ((a + b)**2)   # (3+4i)² = -7+24i  (norm-preserving!)
 ```
 
 ### Finite Field Arithmetic GF(p^n)
@@ -531,56 +531,53 @@ say (a + b) ** 2   # (3+4i)² = -7+24i  (norm-preserving!)
 ```ruby
 # GF(4) = GF(2)[x]/(x²+x+1) — field with 4 elements
 # Elements: {0, 1, x, x+1}
-var mod_poly = [1, 1, 1]   # x² + x + 1 over GF(2)
+var mod_poly = Poly([1, 1, 1])   # x² + x + 1 over GF(2)
 
-var alpha = PolynomialMod([0, 1], mod_poly)   # generator element x
-var one   = PolynomialMod([1, 0], mod_poly)
+var alpha = PolynomialMod([1, 0], mod_poly)   # generator element x
+var one   = PolynomialMod([0, 1], mod_poly)
 
-say alpha ** 1   # x
-say alpha ** 2   # x+1  (reduced: x² ≡ x+1 mod x²+x+1)
-say alpha ** 3   # 1    — ord(α) = 3, so α is a primitive element
-
-# Inverses in a finite field always exist (for non-zero elements)
-say alpha.inv
-say (alpha * alpha.inv)   # 1
+say (alpha ** 1)   # x
+say (alpha ** 2)   # x+1  (reduced: x² ≡ x+1 mod x²+x+1)
+say (alpha ** 3)   # 1    — ord(α) = 3, so α is a primitive element
 ```
 
 ### Exponentiation & Inverse
 
 ```ruby
-var p = PolynomialMod([1, 2], [1, 0, 0, 1])   # (1+2x) mod (x³+1)
+var p = PolynomialMod([1, 2], Poly([1, 0, 0, 1]))   # (1+2x) mod (x³+1)
 
-say p ** 3       # p³ reduced mod (x³+1)
-say p ** (-1)    # modular inverse (negative exponent)
-say p.inv        # same as p**(-1)
-say p * p.inv    # 1
+say (p ** 3)       # p³ reduced mod (x³+1)
+say (p ** (-1))    # modular inverse (negative exponent)
+say (p.inv)        # same as p**(-1)
+say (p * p.inv)    # 1
 
 # High-power exponentiation is efficient via binary method
-say p ** 1000
+say (p ** 1000)
 ```
 
 ### GCD and Modular Inverse via gcdext
 
 ```ruby
-var f = PolynomialMod([1, 0, 1], [1, 0, 0, 1])   # x²+1 mod x³+1
-var g = PolynomialMod([1, 1],   [1, 0, 0, 1])    # x+1  mod x³+1
+var f = PolynomialMod([1, 0, 1], Poly([1, 0, 0, 1]))   # x²+1 mod x³+1
+var g = PolynomialMod([1, 1],    Poly([1, 0, 0, 1]))   # x+1  mod x³+1
 
 say f.gcd(g)                  # GCD of f and g in the quotient ring
 var (d, u, v) = f.gcdext(g)   # d = u*f + v*g
+say (u*f + v*g == d)          # true
 ```
 
 ### Derivative in Quotient Rings
 
 ```ruby
 # Formal derivative, computed mod the modulus polynomial
-var p = PolynomialMod([1, 0, 3, 1], [1, 0, 0, 0, 1])  # mod x⁴+1
+var p = PolynomialMod([1, 0, 3, 1], Poly([1, 0, 0, 0, 1]))  # mod x⁴+1
 say p.derivative    # derivative reduced mod x⁴+1
 ```
 
 ### Lifting Back to Polynomial Ring
 
 ```ruby
-var p = PolynomialMod([1, 2, 3], [1, 0, 1])
+var p = PolynomialMod([1, 2, 3], Poly([1, 0, 1]))
 
 var lifted = p.lift    # returns an ordinary Polynomial object
 say lifted             # 1 + 2x + 3x²  (no modulus constraint)
@@ -626,15 +623,15 @@ All three types share the same underlying idea: arithmetic in a quotient ring `R
 
 # 1. Using Gauss directly
 var g = Gauss(0, 1)
-say g * g    # Gauss(-1, 0)
+say (g * g)    # Gauss(-1, 0)
 
 # 2. Using Quadratic with w = -1
 var q = Quadratic(0, 1, -1)
-say q * q    # Quadratic(-1, 0, -1)
+say (q * q)    # Quadratic(-1, 0, -1)
 
 # 3. Using PolynomialMod in Q[x]/(x²+1)
-var p = PolynomialMod([0, 1], [1, 0, 1])
-say p * p    # -1 in the quotient ring
+var p = PolynomialMod([1, 0], [1, 0, 1])
+say (p * p)    # -1 in the quotient ring
 ```
 
 ### CRT with Multiple Moduli
@@ -642,8 +639,8 @@ say p * p    # -1 in the quotient ring
 ```ruby
 # Chinese Remainder Theorem reconstructs a number from its residues
 func reconstruct(n) {
-    var mods = [97, 101, 103, 107].map { Mod(n % _, _) }
-    say chinese(*mods)   # should recover Mod(n, 97*101*103*107)
+    var mods = [97, 101, 103, 107].map {|m| Mod(n, m) }
+    say chinese(mods...)   # should recover Mod(n, 97*101*103*107)
 }
 reconstruct(123456789)
 ```
@@ -657,10 +654,10 @@ reconstruct(123456789)
 var q1 = Quaternion(1, 2, 3, 4)
 var q2 = Quaternion(5, 6, 7, 8)
 
-say q1.norm * q2.norm == (q1 * q2).norm   # true
-say q1.norm   # 30  = 1+4+9+16
-say q2.norm   # 174 = 25+36+49+64
-say (q1*q2).norm  # 5220 = 30 * 174
+say (q1.norm*q2.norm == (q1 * q2).norm)   # true
+say q1.norm         # 30  = 1+4+9+16
+say q2.norm         # 174 = 25+36+49+64
+say ((q1*q2).norm)  # 5220 = 30 * 174
 ```
 
 ### Polynomial GCD & Resultant Workflow
@@ -672,7 +669,7 @@ var q = Polynomial([1, 0, -1])          # x² - 1 = (x-1)(x+1)
 
 say p.gcd(q)                             # x² - 1
 say (p / q)                              # x² - 4
-say (p / q).roots                        # [-2, 2]
+say ((p / q).roots)                      # [-2, 2]
 say p.is_squarefree                      # true
 say p.roots                              # [-2, -1, 1, 2]
 ```
@@ -701,10 +698,10 @@ say alpha.norm                     # 1 - 2 = -1   (norm is in Z ✓)
 
 # Verify: alpha satisfies x² - 2x - 1 = 0
 # norm(a + b√2) = a² - 2b²
-say alpha**2 - alpha*2 - Quadratic(1,0,2)   # should be 0
+say (alpha**2 - alpha*2 - Quadratic(1,0,2))   # should be 0
 
 # Z[(1+√5)/2]: d=5, d ≡ 1 mod 4 — the golden ratio φ = (1+√5)/2 is an integer!
-var phi = Quadratic(Fraction(1,2), Fraction(1,2), 5)  # (1+√5)/2
+var phi = Quadratic(1/2, 1/2, 5)  # (1+√5)/2
 say phi.norm    # (1/4) - (1/4)*5 = -1   — norm is in Z ✓
 say phi**2      # φ² = φ + 1  (the defining property of the golden ratio)
 
@@ -742,7 +739,7 @@ var a = Quadratic(1,  1, -5)    # 1 + √-5,  norm = 6
 var b = Quadratic(1, -1, -5)    # 1 - √-5,  norm = 6
 say a.norm        # 6
 say b.norm        # 6
-say a * b         # Quadratic(6, 0, -5)  = 6  ✓ — product is 6
+say (a * b)       # Quadratic(6, 0, -5)  = 6  ✓ — product is 6
 say Quadratic(2,0,-5).norm  # 4  — norm of 2
 say Quadratic(3,0,-5).norm  # 9  — norm of 3
 # Neither 2 nor 3 divides (1±√-5), confirming non-unique factorization
@@ -762,17 +759,17 @@ var eps3 = Quadratic(2, 1, 3)
 say eps3.norm           # 4 - 3 = 1  — unit of norm +1
 
 # Q(√5): fundamental unit is (1+√5)/2 = φ (norm = -1)
-var eps5 = Quadratic(Fraction(1,2), Fraction(1,2), 5)
+var eps5 = Quadratic(1/2, 1/2, 5)
 say eps5.norm           # 1/4 - 5/4 = -1  — unit of norm -1
 
 # Generating all units by powering the fundamental unit
 var u = Quadratic(1, 1, 2)   # fundamental unit of Q(√2)
-say u**1    # Quadratic(1, 1, 2)       = 1+√2
-say u**2    # Quadratic(3, 2, 2)       = 3+2√2
-say u**3    # Quadratic(7, 5, 2)       = 7+5√2
-say u**4    # Quadratic(17, 12, 2)     = 17+12√2
-say u**(-1) # Quadratic(-1, 1, 2)... wait — the inverse has norm (-1)⁻¹ = -1
-say u * u.conj  # norm: (1+√2)(1-√2) = 1-2 = -1  ✓
+say u**1          # Quadratic(1, 1, 2)       = 1+√2
+say u**2          # Quadratic(3, 2, 2)       = 3+2√2
+say u**3          # Quadratic(7, 5, 2)       = 7+5√2
+say u**4          # Quadratic(17, 12, 2)     = 17+12√2
+say u**(-1)       # Quadratic(-1, 1, 2)      = -1+√2
+say (u * u.conj)  # norm: (1+√2)(1-√2) = 1-2 = -1  ✓
 ```
 
 ---
@@ -788,10 +785,10 @@ For `α = a + b√d` in a quadratic field, the **norm** and **trace** are the tw
 ```ruby
 var alpha = Quadratic(3, 4, 5)   # 3 + 4√5
 
-say alpha.norm          # 9 - 80 = -71
-say alpha.conj          # Quadratic(3, -4, 5)  — conjugate ᾱ = 3 - 4√5
-say alpha + alpha.conj  # Quadratic(6, 0, 5)   — trace = 6
-say alpha * alpha.conj  # Quadratic(-71, 0, 5) — norm as a Quadratic = -71
+say alpha.norm            # 9 - 80 = -71
+say alpha.conj            # Quadratic(3, -4, 5)  — conjugate ᾱ = 3 - 4√5
+say (alpha + alpha.conj)  # Quadratic(6, 0, 5)   — trace = 6
+say (alpha * alpha.conj)  # Quadratic(-71, 0, 5) — norm as a Quadratic = -71
 
 # The minimal polynomial of alpha is x² - 6x - 71
 # Verify: alpha² - 6*alpha - 71 = 0
@@ -800,7 +797,7 @@ say min_poly.eval(alpha.to_n)              # ≈ 0  ✓
 
 # Norm is multiplicative: N(αβ) = N(α)·N(β)
 var beta  = Quadratic(1, 2, 5)
-say (alpha * beta).norm == alpha.norm * beta.norm   # true
+say ((alpha * beta).norm == alpha.norm*beta.norm)   # true
 ```
 
 ---
@@ -833,7 +830,7 @@ var v = Quadratic(1, 1, 5)   # 1 + √5, norm = -4
 say v**1    # norm -4 (solution to x² - 5y² = -4)
 say v**2    # Quadratic(6, 2, 5),  norm = 36 - 20 = 16... hmm, not ±1
 # The fundamental unit of Z[√5] is (1+√5)/2 with norm -1
-var phi = Quadratic(Fraction(1,2), Fraction(1,2), 5)
+var phi = Quadratic(1/2, 1/2, 5)
 say phi.norm    # -1  (solution to the Pell-like equation)
 say phi**2      # Quadratic(3/2, 1/2, 5), norm = 1 — first positive solution
 
@@ -887,7 +884,7 @@ say Gauss(2, 0).factor   # 2 = -i(1+i)² — ramified (2 | disc(Z[i]))  ✓
 # Verify the split: 5 = (2+i)(2-i)
 var pi  = Gauss(2, 1)
 var pic = Gauss(2,-1)
-say pi * pic              # Gauss(5, 0)  ✓
+say (pi * pic)            # Gauss(5, 0)  ✓
 say pi.is_prime           # true — 2+i is a Gaussian prime
 say pic.is_prime          # true
 
@@ -910,7 +907,7 @@ say pi.norm   # 4 + 1 = 5  — prime ✓
 # Try: 4² - 5·1² = 16 - 5 = 11 ✓
 var pi11 = Quadratic(4, 1, 5)
 var pi11c = pi11.conj    # Quadratic(4, -1, 5)
-say pi11 * pi11c         # Quadratic(11, 0, 5) = 11  ✓
+say (pi11 * pi11c)       # Quadratic(11, 0, 5) = 11  ✓
 say pi11.norm            # 16 - 5 = 11  ✓
 
 # p = 19: 19 ≡ 4 (mod 5) — should split  ((5/19): 5^9 mod 19 = 1 ✓)
@@ -937,12 +934,12 @@ Every prime `p ≡ 1 (mod 4)` is a sum of two squares: `p = a² + b²`. The Gaus
 
 func two_squares(p) {
     # Step 1: find x such that x² ≡ -1 (mod p)
-    var x = Mod(-1, p).sqrt.to_n
+    var x = Mod(-1, p).sqrt.lift
 
     # Step 2: compute gcd(x+i, p) in the Gaussian integers
     var g = Gauss(x, 1).gcd(Gauss(p, 0))
 
-    var (a, b) = g.parts.map{.abs}
+    var (a, b) = g.parts.map{.abs}...
     say "#{p} = #{a}² + #{b}² = #{a*a} + #{b*b}"
 }
 
@@ -966,15 +963,17 @@ two_squares(101)  # 101 = 1² + 10² = 1 + 100
 
 var z1 = Gauss(2, 3)   # norm = 4+9  = 13
 var z2 = Gauss(1, 4)   # norm = 1+16 = 17
-var z3 = z1 * z2
+var z3 = (z1 * z2)
 
-var (a, b) = z3.parts
+var (a, b) = z3.parts.map{.abs}...
 say "13 * 17 = 221 = #{a}² + #{b}² = #{a*a} + #{b*b}"
 # 221 = 10² + 11² (since (2+3i)(1+4i) = 2+8i+3i+12i² = -10+11i)
+
 # OR use the conjugate product:
-var z4 = z1 * z2.conj
-var (c, d) = z4.parts
+var z4 = (z1 * z2.conj)
+var (c, d) = z4.parts.map{.abs}...
 say "221 = #{c}² + #{d}² = #{c*c} + #{d*d}"
+
 # Both representations of 221 as a sum of two squares appear this way
 ```
 
@@ -989,7 +988,7 @@ Every positive integer is a sum of four perfect squares (Lagrange's four-square 
 # (a₁²+b₁²+c₁²+d₁²)(a₂²+b₂²+c₂²+d₂²) = N(q₁·q₂)
 
 func four_squares_product(q1, q2) {
-    var prod = q1 * q2
+    var prod = (q1 * q2)
     var (a, b, c, d) = prod.reals
     say "N(q1)*N(q2) = #{q1.norm}*#{q2.norm} = #{prod.norm}"
     say "= #{a}² + #{b}² + #{c}² + #{d}²"
@@ -1011,7 +1010,7 @@ say q15.norm   # 9+4+1+1 = 15  ✓
 # if we can write p and q as four squares, their product is also four squares
 var qa = Quaternion(2, 1, 1, 1)   # norm 7
 var qb = Quaternion(3, 1, 1, 0)   # norm 11
-say (qa * qb).norm    # 77 = 7 * 11
+say ((qa * qb).norm)    # 77 = 7 * 11
 var (a, b, c, d) = (qa * qb).reals
 say "77 = #{a}²+#{b}²+#{c}²+#{d}² = #{a**2}+#{b**2}+#{c**2}+#{d**2}"
 ```
@@ -1036,8 +1035,8 @@ The **Hurwitz quaternions** — quaternions `a + bi + cj + dk` where `a,b,c,d` a
 # The number of ways to write n = a²+b²+c²+d² is 8·Σ_{d|n, 4∤d} d
 var p = 5
 var q = Quaternion(2, 1, 0, 0)    # 2²+1²+0²+0² = 5
-say q.norm    # 5  ✓
-say q * q.conj  # Quaternion(5,0,0,0) — norm via conjugate product
+say q.norm        # 5  ✓
+say (q * q.conj)  # Quaternion(5,0,0,0) — norm via conjugate product
 
 # Quaternion GCD (left and right GCDs differ for non-commutative ring)
 var q1 = Quaternion(2, 1, 3, 0)
@@ -1061,11 +1060,12 @@ Many classical Diophantine equations reduce to norm equations `N(α) = n` in a s
 # Solve a² + b² = n by factoring n in Z[i]
 func sum_of_two_squares(n) {
     var g = Gauss(n, 0)
-    if g.is_prime {
+    if (g.is_prime) {
         say "#{n} is a Gaussian prime — cannot be written as sum of two non-trivial squares"
-    } else {
+    }
+    else {
         say "Gaussian factorization of #{n}:"
-        g.factor.each { say "  " + _.pretty }
+        g.factor.each { say ("  " + _.pretty) }
     }
 }
 
@@ -1077,7 +1077,7 @@ sum_of_two_squares(65)   # = 1²+8², 4²+7² (two distinct representations)
 var reps_65 = 0
 for a in (0..8) {
     for b in (a..8) {
-        if a*a + b*b == 65 { ++reps_65; say "65 = #{a}²+#{b}²" }
+        if (a*a + b*b == 65) { ++reps_65; say "65 = #{a}²+#{b}²" }
     }
 }
 ```
@@ -1091,9 +1091,9 @@ for a in (0..8) {
 var alpha = Quadratic(1, 1, -5)    # 1 + √-5
 var beta  = Quadratic(1, -1, -5)   # 1 - √-5
 
-say alpha.norm    # 1 + 5 = 6
-say beta.norm     # 1 + 5 = 6
-say alpha * beta  # Quadratic(6, 0, -5) = 6
+say alpha.norm      # 1 + 5 = 6
+say beta.norm       # 1 + 5 = 6
+say (alpha * beta)  # Quadratic(6, 0, -5) = 6
 
 # Both 2 and 3 are "irreducible" in Z[√-5] but NOT prime (they don't satisfy
 # the prime divisibility property π|αβ ⟹ π|α or π|β)
@@ -1104,8 +1104,8 @@ say three.norm  # 9  — irreducible (no element of norm 3 exists in Z[√-5])
 
 # Demonstrate non-unique factorization:
 # 6 = 2·3 = (1+√-5)(1-√-5)  — two genuinely different factorizations
-say two * three   # Quadratic(6, 0, -5)  ✓
-say alpha * beta  # Quadratic(6, 0, -5)  ✓  (same product, different factors!)
+say (two * three)   # Quadratic(6, 0, -5)  ✓
+say (alpha * beta)  # Quadratic(6, 0, -5)  ✓  (same product, different factors!)
 ```
 
 #### Pythagorean Triples via Gaussian Integers
@@ -1118,9 +1118,9 @@ say alpha * beta  # Quadratic(6, 0, -5)  ✓  (same product, different factors!)
 func pythagorean_triple(m, n) {
     var z = Gauss(m, n)
     var c = z.norm
-    var a = m*m - n*n
+    var a = (m*m - n*n)
     var b = 2*m*n
-    say "(#{a}, #{b}, #{c}): #{a}²+#{b}²=#{a*a+b*b}, c²=#{c*c}"
+    say "(#{a}, #{b}, #{c}): #{a}²+#{b}²=#{a**2 + b**2}, c²=#{c**2}"
 }
 
 pythagorean_triple(2, 1)    # (3, 4, 5)
@@ -1133,8 +1133,8 @@ pythagorean_triple(5, 4)    # (9, 40, 41)
 # Gaussian product formula for combining triples:
 var z1 = Gauss(2, 1)   # gives (3,4,5)
 var z2 = Gauss(3, 2)   # gives (5,12,13)
-var z3 = z1 * z2       # Gauss(4, 7)  — gives (4²-7², 2·4·7, 4²+7²)
-var (re, im) = z3.parts
+var z3 = (z1 * z2)     # Gauss(4, 7)  — gives (4²-7², 2·4·7, 4²+7²)
+var (re, im) = z3.parts...
 say "(#{re*re - im*im}, #{2*re*im}, #{z3.norm})"  # a new triple!
 ```
 
@@ -1151,7 +1151,7 @@ The **cyclotomic field** `Q(ζₙ)` is generated by a primitive `n`-th root of u
 
 # Q(ζ₃): cube roots of unity, Φ₃(x) = x²+x+1
 # ζ₃ satisfies ζ³ = 1 and ζ²+ζ+1 = 0 — these are the Eisenstein integers!
-var zeta3 = PolynomialMod([0, 1], [1, 1, 1])   # ζ₃ in Q[x]/(x²+x+1)
+var zeta3 = PolynomialMod([1,0], [1, 1, 1])   # ζ₃ in Q[x]/(x²+x+1)
 
 say zeta3**1   # ζ
 say zeta3**2   # ζ²  (= -ζ-1 after reduction)
@@ -1159,28 +1159,28 @@ say zeta3**3   # 1   — ζ₃ has order 3 ✓
 say zeta3**6   # 1
 
 # Sum of all primitive 3rd roots of unity = -1 (coefficient of x in Φ₃)
-say zeta3 + zeta3**2   # should equal -1  (= -(ζ+ζ²) = -(−1) = 1... wait)
+say (zeta3 + zeta3**2)   # should equal -1
 # ζ + ζ² = -1  (from Φ₃: ζ²+ζ+1=0 → ζ+ζ² = -1) ✓
 
 # Q(ζ₄) = Q(i): 4th roots of unity, Φ₄(x) = x²+1
-var zeta4 = PolynomialMod([0, 1], [1, 0, 1])   # i in Q[x]/(x²+1)
+var zeta4 = PolynomialMod([1, 0], [1, 0, 1])   # i in Q[x]/(x²+1)
 say zeta4**1   # i
 say zeta4**2   # -1  ✓
 say zeta4**4   # 1   ✓
 
 # Q(ζ₅): 5th roots of unity, Φ₅(x) = x⁴+x³+x²+x+1 (degree 4)
-var zeta5 = PolynomialMod([0, 1], [1, 1, 1, 1, 1])
+var zeta5 = PolynomialMod([1, 0], [1, 1, 1, 1, 1])
 say zeta5**5   # 1  ✓
-say zeta5**4 + zeta5**3 + zeta5**2 + zeta5 + PolynomialMod([1],[1,1,1,1,1])
+say (zeta5**4 + zeta5**3 + zeta5**2 + zeta5 + PolynomialMod([1],[1,1,1,1,1]))
 # = 0  (since ζ satisfies Φ₅) ✓
 
 # Q(ζ₈): 8th roots of unity, Φ₈(x) = x⁴+1 — contains √2 and i!
-var zeta8 = PolynomialMod([0, 1], [1, 0, 0, 0, 1])
+var zeta8 = PolynomialMod([1, 0], [1, 0, 0, 0, 1])
 say zeta8**2    # ζ₈² = ζ₄ = i  (since (e^{2πi/8})² = e^{2πi/4})
 say zeta8**4    # -1  ✓
 say zeta8**8    # 1   ✓
 # √2 = ζ₈ + ζ₈⁷ = ζ₈ + ζ₈⁻¹ (real part of ζ₈ doubled)
-say zeta8 + zeta8**7   # represents √2 in this ring
+say (zeta8 + zeta8**7)   # represents √2 in this ring
 ```
 
 #### Galois Action on Cyclotomic Fields
@@ -1190,7 +1190,7 @@ say zeta8 + zeta8**7   # represents √2 in this ring
 
 # For Q(ζ₅)/Q: Gal ≅ (Z/5Z)* = {1,2,3,4} ≅ Z/4Z — cyclic of order 4
 var mod5 = [1, 1, 1, 1, 1]   # Φ₅(x)
-var zeta = PolynomialMod([0, 1], mod5)
+var zeta = PolynomialMod([1, 0], mod5)
 
 # The four Galois automorphisms σₖ: ζ ↦ ζᵏ
 for k in (1, 2, 3, 4) {
@@ -1200,8 +1200,14 @@ for k in (1, 2, 3, 4) {
 
 # The quadratic subfield of Q(ζ₅) is Q(√5) — fixed by σ₄ (complex conjugation)
 # √5 = 2ζ+2ζ⁴+1  (a known algebraic identity)
-var sqrt5_rep = zeta*2 + zeta**4 * 2 + PolynomialMod([1], mod5)
+var sqrt5_rep = (zeta*2 + (2 * zeta**4) + PolynomialMod([1], mod5))
 say sqrt5_rep**2   # should equal 5  (the constant polynomial 5)
+
+__END__
+σ_1(ζ) = ζ^1 = x (mod x^4 + x^3 + x^2 + x + 1)
+σ_2(ζ) = ζ^2 = x^2 (mod x^4 + x^3 + x^2 + x + 1)
+σ_3(ζ) = ζ^3 = x^3 (mod x^4 + x^3 + x^2 + x + 1)
+σ_4(ζ) = ζ^4 = -x^3 - x^2 - x - 1 (mod x^4 + x^3 + x^2 + x + 1)
 ```
 
 ---
@@ -1217,7 +1223,7 @@ A minimal polynomial of an algebraic number `α` over `Q` is the monic polynomia
 # α⁴ + 2α² + 1 = 12α²  →  α⁴ - 10α² + 1 = 0
 
 var min_poly_alpha = Polynomial([1, 0, -10, 0, 1])   # x⁴ - 10x² + 1
-var alpha_val = 2.sqrt + 3.sqrt                        # numerical value
+var alpha_val = (2.sqrt + 3.sqrt)                        # numerical value
 say min_poly_alpha.eval(alpha_val)   # ≈ 0  ✓
 say min_poly_alpha.roots             # ±√2±√3 (all four conjugates)
 say min_poly_alpha.is_squarefree     # true — no repeated roots ✓
@@ -1226,7 +1232,7 @@ say min_poly_alpha.is_squarefree     # true — no repeated roots ✓
 # φ satisfies x² - x - 1 = 0
 var min_poly_phi = Polynomial([1, -1, -1])    # x² - x - 1
 say min_poly_phi.roots    # [(1+√5)/2, (1-√5)/2]  ✓
-say min_poly_phi.eval(Fraction(1,2) + 5.sqrt/2)  # ≈ 0  ✓
+say min_poly_phi.eval(1/2 + 5.sqrt/2)  # ≈ 0  ✓
 
 # Minimal polynomial of a primitive cube root of unity ω = (-1+√-3)/2
 # ω satisfies x² + x + 1 = 0  (the 3rd cyclotomic polynomial)
@@ -1249,8 +1255,8 @@ In `GF(pⁿ) = GF(p)[x]/(f(x))`, the **Frobenius** map `φ: α ↦ αᵖ` is the
 # Elements are polynomials a+bx+cx² with a,b,c in {0,1}
 # Frobenius: α ↦ α²
 
-var f = [1, 1, 0, 1]   # x³ + x + 1  over GF(2) (coefficients mod 2)
-var alpha = PolynomialMod([0, 1], f)   # generator α
+var f = [1, 0, 1, 1]   # x³ + x + 1  over GF(2) (coefficients mod 2)
+var alpha = PolynomialMod([1, 0], f)   # generator α
 
 say alpha**1    # α
 say alpha**2    # α² (Frobenius image)
@@ -1268,7 +1274,7 @@ say "Frobenius orbit: α, α², α⁴ are the 3 roots of x³+x+1 over GF(2)"
 
 # GF(3²) = GF(3)[x]/(x²+1) — irreducible over GF(3) since -1 is not a square mod 3
 var g = [1, 0, 1]    # x² + 1 over GF(3)
-var beta = PolynomialMod([0, 1], g)
+var beta = PolynomialMod([1, 0], g)
 say beta**3     # Frobenius image β³ in GF(9)
 say beta**9     # β⁹ = β  (Frobenius has order 2) — back to start ✓
 say beta**8     # 1  (|GF(9)*| = 8)  ✓
@@ -1291,7 +1297,7 @@ func legendre(a, p) {
 # Check which numbers are QRs mod 7
 for a in (1..6) {
     var sym = legendre(a, 7)
-    say "#{a} is " + (sym == Mod(1,7) ?? "a QR" !! "a NQR") + " mod 7"
+    say ("#{a} is " + (sym == Mod(1,7) ? "a QR" : "a NQR") + " mod 7")
 }
 # QRs mod 7 are: 1 (=1²), 2 (=3²), 4 (=2²) — exactly (7-1)/2 = 3 residues ✓
 
@@ -1335,7 +1341,7 @@ say z.invmod(13)        # inverse of 3+4i mod 13
 
 # Verify: z * z.invmod(13) ≡ 1 mod 13
 var inv = z.invmod(13)
-say (z * inv) % 13    # Gauss(1, 0)  ✓
+say ((z * inv) % 13)    # Gauss(1, 0)  ✓
 
 # Quadratic field arithmetic mod p is fundamental to elliptic curve cryptography
 # and the Miller-Rabin primality test over extensions
@@ -1344,16 +1350,13 @@ var large_n = 1000000007   # a prime
 
 say q.powmod(large_n - 1, large_n)   # Fermat-like test in Q(√5)
 
-# Computing Fibonacci numbers via Quadratic powmod
-# F(n) is related to ((1+√5)/2)^n — the Binet formula
-# More directly: Quadratic(1, 1, 5)^n gives (L(n), F(n), 5) up to scaling
-# where L(n) is the Lucas number and F(n) is the Fibonacci number
+# Computing Fibonacci numbers via Quadratic powers
 func fib_via_quadratic(n) {
-    var result = Quadratic(1, 1, 5)**n   # (1+√5)^n = L(n)*2^(n-1) + F(n)*√5*2^(n-1)... 
-    # Simpler: use the matrix method via Quadratic(0,1,5) = √5
-    # The standard approach: Quadratic(1,1,5) represents 1+√5
-    result
+    var phi = (1 + sqrtQ(5))/2
+    (phi**n - phi**-n) / sqrtQ(5)
 }
+
+say fib_via_quadratic(100)      #=> Quadratic(354224848179261915075, 0, 5)
 ```
 
 ---
@@ -1458,7 +1461,7 @@ hensel_lift(f, 3, 7, 4)
 
 # Verify units in Q(√-3) — the Eisenstein integers
 # ω = (-1+√-3)/2 has norm = 1/4 + 3/4 = 1 ✓
-var omega = Quadratic(Fraction(-1,2), Fraction(1,2), -3)
+var omega = Quadratic(-1/2, 1/2, -3)
 say omega.norm    # 1  — ω is a unit ✓
 say omega**2      # ω² = (-1-√-3)/2  — another unit ✓
 say omega**3      # 1  — ω has order 3 ✓
@@ -1470,7 +1473,7 @@ say eps.norm      # -1  — unit of norm -1
 
 # The regulator of Q(√d) is log|ε| where ε is the fundamental unit
 # Larger regulator means more spread-out units
-var eps5  = Quadratic(Fraction(1,2), Fraction(1,2), 5)   # fundamental unit of Q(√5)
+var eps5  = Quadratic(1/2, 1/2, 5)   # fundamental unit of Q(√5)
 var eps13 = Quadratic(649, 180, 13)  # fundamental unit of Q(√13) — much larger!
 say eps5.to_n     # ≈ 1.618  (golden ratio)
 say eps13.to_n    # ≈ 649 + 180·√13 — very large regulator
@@ -1494,8 +1497,8 @@ In rings where unique factorization of *elements* fails (like `Z[√-5]`), uniqu
 # Searching for elements of small norm
 for a in (0..6) {
     for b in (0..3) {
-        var n = a*a + 5*b*b
-        if n <= 20 {
+        var n = (a*a + 5*b*b)
+        if (n <= 20) {
             say "N(#{a}+#{b}√-5) = #{n}"
         }
     }
@@ -1503,7 +1506,7 @@ for a in (0..6) {
 # Norm 1: (1,0) — unit
 # Norm 4: (2,0) — but NOT a product of elements of norm 2!
 # Norm 6: (1,1) and (1,-1) — elements of norm 6, product = 6 via alpha*alpha.conj
-# Norm 9: (3,0) and (2,1) 
+# Norm 9: (3,0) and (2,1)
 # There is NO element of norm 2 or norm 3 in Z[√-5] — ideal divisors are not principal!
 
 # The class group of Z[√-5] has order 2 (class number h(-20) = 2)
@@ -1531,14 +1534,7 @@ The number of ways to write `n = a² + b²` (or as other quadratic forms) is giv
 # r₂(n) = 4(d₁(n) - d₃(n)) where d₁,d₃ count divisors ≡ 1,3 mod 4
 
 func r2(n) {
-    var count = 0
-    for a in ((-n.sqrt).ceil .. n.sqrt.floor) {
-        var rem = n - a*a
-        if rem >= 0 && rem.sqrt.round == rem.sqrt {
-            ++count
-        }
-    }
-    count
+    squares_r(n, 2)
 }
 
 for n in (1..20) {
@@ -1576,10 +1572,10 @@ var g = Polynomial([1, -1])       # x - 1
 
 var (d, s, t) = f.gcdext(g)
 say "gcd = #{d.pretty}"           # x - 1
-say "s   = #{s.pretty}"           # 1 (coefficient polynomial)
-say "t   = #{t.pretty}"           # ?
+say "s   = #{s.pretty}"           # 0 (coefficient polynomial)
+say "t   = #{t.pretty}"           # 1
 # Verify: s*(x²-1) + t*(x-1) = x-1
-say (s*f + t*g).pretty            # should equal gcd = x-1
+say ((s*f + t*g).pretty)          # should equal gcd = x-1
 
 # Partial fraction decomposition via extended GCD
 # 1/((x-1)(x+1)) = A/(x-1) + B/(x+1)

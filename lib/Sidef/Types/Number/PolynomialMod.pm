@@ -28,6 +28,10 @@ package Sidef::Types::Number::PolynomialMod {
 
         my $mod = pop @args;
 
+        if (ref($mod) eq 'Sidef::Types::Array::Array') {
+            $mod = __PACKAGE__->SUPER::new($mod);
+        }
+
         if (scalar(@args) == 0 and ref($_[0]) eq __PACKAGE__) {
             return $_[0]->eval($mod);
         }
@@ -96,7 +100,7 @@ package Sidef::Types::Number::PolynomialMod {
         my ($x) = @_;
         my $m = $x->[1];
         $x = $x->[0];
-        __PACKAGE__->new((map { (Math::Prime::Util::GMP::subint($_, 1), $x->{$_}->mulmod(Sidef::Types::Number::Number::_set_int($_), $m)) } CORE::keys(%$x)),
+        __PACKAGE__->new((map { (Math::Prime::Util::GMP::subint($_, 1), $x->{$_}->mul(Sidef::Types::Number::Number::_set_int($_))->mod($m)) } CORE::keys(%$x)),
                          $m);
     }
 
@@ -109,8 +113,9 @@ package Sidef::Types::Number::PolynomialMod {
         CORE::keys(%$x) || return Sidef::Types::Number::Number::ZERO;
 
         $value = $value->mod($m);
-        Sidef::Types::Number::Number::sum(map { $value->powmod(Sidef::Types::Number::Number::_set_int($_), $m)->mulmod($x->{$_}->eval($value), $m) }
-                                          CORE::keys(%$x))->mod($m);
+        Sidef::Types::Number::Number::sum(
+                 map { Sidef::Types::Number::Mod->new($value, $m)->pow(Sidef::Types::Number::Number::_set_int($_))->lift->mul($x->{$_}->eval($value))->mod($m) }
+                   CORE::keys(%$x))->mod($m);
     }
 
     sub binomial {
@@ -141,7 +146,7 @@ package Sidef::Types::Number::PolynomialMod {
             my $poly = $polynomials[$i];
             my $n    = $moduli[$i];
             my $t    = $m->idiv($n);
-            my $u    = $t->mul($t->invmod($n));
+            my $u    = $t->mul($t->inv->mod($n));
             $c = $c->add(__PACKAGE__->new($poly->lift, $m)->mul($u));
         }
 
@@ -158,7 +163,7 @@ package Sidef::Types::Number::PolynomialMod {
             return
               __PACKAGE__->new(
                                (
-                                (map { $_ => (exists($y->{$_}) ? $x->{$_}->addmod($y->{$_}, $m) : $x->{$_}) } CORE::keys %$x),
+                                (map { $_ => (exists($y->{$_}) ? $x->{$_}->add($y->{$_})->mod($m) : $x->{$_}) } CORE::keys %$x),
                                 (map { exists($x->{$_}) ? () : ($_ => $y->{$_}) } CORE::keys(%$y))
                                ),
                                $m
@@ -174,7 +179,7 @@ package Sidef::Types::Number::PolynomialMod {
 
         $y = $y->mod($m);
 
-        __PACKAGE__->new((map { $_ => (($_ eq '0') ? $x->{$_}->addmod($y, $m) : $x->{$_}) } CORE::keys(%$x)), $m);
+        __PACKAGE__->new((map { $_ => (($_ eq '0') ? $x->{$_}->add($y)->mod($m) : $x->{$_}) } CORE::keys(%$x)), $m);
     }
 
     sub sub {
@@ -187,7 +192,7 @@ package Sidef::Types::Number::PolynomialMod {
             return
               __PACKAGE__->new(
                                (
-                                (map { $_ => (exists($y->{$_}) ? $x->{$_}->submod($y->{$_}, $m) : $x->{$_}) } CORE::keys %$x),
+                                (map { $_ => (exists($y->{$_}) ? $x->{$_}->sub($y->{$_})->mod($m) : $x->{$_}) } CORE::keys %$x),
                                 (map { exists($x->{$_}) ? () : ($_ => $y->{$_}->neg) } CORE::keys(%$y))
                                ),
                                $m
@@ -203,7 +208,7 @@ package Sidef::Types::Number::PolynomialMod {
 
         $y = $y->mod($m);
 
-        __PACKAGE__->new((map { $_ => (($_ eq '0') ? $x->{$_}->submod($y, $m) : $x->{$_}) } CORE::keys(%$x)), $m);
+        __PACKAGE__->new((map { $_ => (($_ eq '0') ? $x->{$_}->sub($y)->mod($m) : $x->{$_}) } CORE::keys(%$x)), $m);
     }
 
     sub mul {
@@ -223,11 +228,11 @@ package Sidef::Types::Number::PolynomialMod {
             foreach my $key_x (@keys_x) {
                 foreach my $key_y (@keys_y) {
 
-                    my $coeff = $x->{$key_x}->mulmod($y->{$key_y}, $m);
+                    my $coeff = $x->{$key_x}->mul($y->{$key_y})->mod($m);
                     my $key_z = Math::Prime::Util::GMP::addint($key_x, $key_y);
 
                     if (exists $poly{$key_z}) {
-                        $poly{$key_z} = $poly{$key_z}->addmod($coeff, $m);
+                        $poly{$key_z} = $poly{$key_z}->add($coeff)->mod($m);
                     }
                     else {
                         $poly{$key_z} = $coeff;
@@ -240,7 +245,7 @@ package Sidef::Types::Number::PolynomialMod {
 
         $y = $y->mod($x->[1]);
 
-        __PACKAGE__->new((map { $_ => $x->[0]{$_}->mulmod($y, $x->[1]) } CORE::keys(%{$x->[0]})), $x->[1]);
+        __PACKAGE__->new((map { $_ => $x->[0]{$_}->mul($y)->mod($x->[1]) } CORE::keys(%{$x->[0]})), $x->[1]);
     }
 
     sub sqr {
@@ -286,7 +291,7 @@ package Sidef::Types::Number::PolynomialMod {
         my $c = $y->{$deg_y};                            # lc(y)
 
         # Calculate modular inverse of the leading coefficient of divisor
-        my $inv_c = $c->invmod($m);
+        my $inv_c = $c->inv->mod($m);
 
         # If inverse does not exist (e.g. m is not prime), return NaN
         if ($inv_c->is_nan) {
@@ -299,7 +304,7 @@ package Sidef::Types::Number::PolynomialMod {
 
             # Fix: Use modular inverse multiplication instead of integer division
             # t = lc(r) * inv(c) (mod m)
-            my $t = $lc->mulmod($inv_c, $m);
+            my $t = $lc->mul($inv_c)->mod($m);
 
             # s := t * x^(deg(r)−deg(y))
             my $s = __PACKAGE__->new(Math::Prime::Util::GMP::subint($deg_r, $deg_y) => $t, $m);
@@ -338,7 +343,7 @@ package Sidef::Types::Number::PolynomialMod {
         return $x if $lc->is_one;
 
         # Multiply polynomial by inv(lc)
-        my $inv = $lc->invmod($x->[1]);
+        my $inv = $lc->inv->mod($x->[1]);
         return $x if $inv->is_nan;    # Should not happen in field
 
         $x->mul($inv);
@@ -443,7 +448,7 @@ package Sidef::Types::Number::PolynomialMod {
         $x = $x->[0];
         $y = $y->mod($m);
 
-        __PACKAGE__->new((map { $_ => $x->{$_}->divmod($y, $m) } CORE::keys(%$x)), $m);
+        __PACKAGE__->new((map { $_ => $x->{$_}->div($y)->mod($m) } CORE::keys(%$x)), $m);
     }
 
     sub neg {
@@ -503,6 +508,11 @@ package Sidef::Types::Number::PolynomialMod {
 
     sub inv {
         my ($x) = @_;
+
+        # TODO: implement modular inverse
+        # In PARI/GP, we have: Mod(1+2*x, x^3+1)^(-1) = Mod(-4/7*x^2 + 2/7*x - 1/7, x^3 + 1)
+        # In Sidef, this would be: PolyMod("1+2*x", Poly("x^3+1"))**(-1)
+
         Sidef::Types::Number::Fraction->new(Sidef::Types::Number::Number::ONE, $x);
     }
 

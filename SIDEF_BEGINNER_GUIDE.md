@@ -159,11 +159,6 @@ sidef -v    # Print version
 sidef -h    # Print help
 ```
 
-You should see something like:
-```
-Sidef 26.01, running on Linux, using Perl v5.38.2
-```
-
 ---
 
 ## 3. Your First Program
@@ -212,7 +207,7 @@ Run `sidef` with no arguments to enter the interactive prompt, where you type ex
 
 ```
 $ sidef
-Sidef 26.01, running on Linux, using Perl v5.38.2
+Sidef 26.04, running on Linux, using Perl v5.42.1.
 Type "help", "copyright" or "license" for more information.
 > say "Hello!"
 Hello!
@@ -254,65 +249,395 @@ say "After the comment block."
 
 ## 6. Variables
 
-A **variable** is a named container that holds a value. In Sidef, you declare variables with the `var` keyword.
+Variables store values that your program can use and manipulate. The standard way to declare a variable in Sidef is with the `var` keyword:
 
 ```ruby
-var name = "Alice"
-var age  = 25
-var pi   = 3.14159
+var num  = 42
+var str  = "42"
+var bool = true
 ```
 
-Variable names can contain letters, numbers, and underscores, but must start with a letter or underscore. By convention, use lowercase with underscores for multiple words:
+---
+
+### Variable Types
+
+Sidef has four kinds of variables, each with different scoping and lifetime behavior.
+
+#### Lexical Variables
+
+The most common type. Lexical variables are block-scoped — they exist only within the block `{ }` where they are declared.
 
 ```ruby
-var first_name = "Bob"
-var item_count = 42
+var x = 42
+say x         # prints: 42
 ```
 
-### Reassigning variables
+#### Static Variables
 
-You can change a variable's value at any time:
+Static variables are also block-scoped, but they are only initialized **once**, no matter how many times the block runs.
 
 ```ruby
-var score = 0
-say score    # 0
-
-score = 10
-say score    # 10
-
-score = (score + 5)
-say score    # 15
+for k in (1..10) {
+    static x = (41 + k)   # assigned only on the first iteration (k=1)
+    say x                 # always prints: 42
+}
 ```
+
+#### Global Variables
+
+Global variables are accessible from anywhere in your program. Use them sparingly — local or lexical variables are usually a better choice.
+
+```ruby
+global x = 42
+say x         # prints: 42
+```
+
+#### Local Variables
+
+Local variables temporarily override a global variable within a specific block. Once the block ends, the global value is restored.
+
+```ruby
+global x = 42
+do {
+    local x = 100
+    say x         # prints: 100  (local value)
+}
+say x             # prints: 42   (global value restored)
+```
+
+---
+
+### Variable Scoping
+
+All variables in Sidef are block-scoped. Inner blocks can see variables from outer blocks, but not the other way around. Declaring a variable with the same name in an inner block **shadows** the outer one — it does not overwrite it.
+
+```ruby
+var x = 'o'
+
+do {
+    say x          # o  (outer x)
+    var x = 'm'
+    say x          # m  (middle x)
+    do {
+        say x      # m  (still middle x)
+        var x = 'b'
+        say x      # b  (inner x)
+    }
+    say x          # m  (inner x is gone)
+}
+
+say x              # o  (back to outer x)
+```
+
+---
+
+### Declaring Multiple Variables
+
+You can declare several variables at once using parentheses:
+
+```ruby
+var (x, y, z) = (3.14, false, "foo")
+```
+
+You can also provide **default values**. If the right-hand side is shorter than the left-hand side, the remaining variables keep their defaults:
+
+```ruby
+var (x, y=755, z=777) = (666, 655)
+
+say x    # 666
+say y    # 655  (overridden by the assignment)
+say z    # 777  (default kept, nothing assigned)
+```
+
+It's also valid to skip the right-hand side entirely, leaving all variables at their declared defaults:
+
+```ruby
+var (
+    a = 42,
+   *b = (1,2,3,4),          # slurpy array (see below)
+   :c = (x => 1, y => 2),   # slurpy hash  (see below)
+)
+
+say a   #=> 42
+say b   #=> [1,2,3,4]
+say c   #=> Hash(x => 1, y => 2)
+```
+
+A previously declared variable can even be referenced as a default value for a later one in the same declaration:
+
+```ruby
+var (
+    a = 42,
+    b = (10 + a)    # refers to a above
+)
+
+say a   #=> 42
+say b   #=> 52
+```
+
+---
+
+### Slurpy Variables
+
+Prefixing a variable name with `*` makes it collect a list into an **Array**, and `:` makes it collect key-value pairs into a **Hash**:
+
+```ruby
+var *arr  = (1,2,3)              # Array
+var :hash = (a => 1, b => 2)     # Hash
+
+say arr    # [1,2,3]
+say hash   # Hash(a => 1, b => 2)
+```
+
+---
+
+### Working with Variables
+
+Any method called on a variable applies to the value it holds. The variable itself is not changed:
+
+```ruby
+var x = 'sidef'
+say x.uc    # SIDEF
+say x       # sidef  (unchanged)
+```
+
+To **modify the variable in place**, append `!` to the method name:
+
+```ruby
+var x = 'sidef'
+x.uc!
+say x       # SIDEF
+```
+
+Arithmetic assignment operators also modify variables in place:
+
+```ruby
+var x = 5
+x += 10
+say x       # 15
+```
+
+#### The Defined-Or Assignment Operator (`:=`)
+
+`:=` assigns a value only if the variable is currently `nil`. It's commonly used to provide fallback values:
+
+```ruby
+var x = nil
+x := 42     # x is nil, so it gets assigned 42
+x := 99     # x is already defined, so this is ignored
+say x       # 42
+```
+
+This is especially useful when building a hash of arrays:
+
+```ruby
+var hash = Hash()
+hash{:key} := [] << (1,2)
+hash{:key} := [] << 3
+say hash{:key}    #=> [1,2,3]
+```
+
+The `:=` operator also returns an **lvalue**, so you can chain further method calls on the result:
+
+```ruby
+var hash = Hash()
+hash{:key} := 0 -> max!(10)
+hash{:key} := 0 -> max!(42)
+say hash{:key}    #=> 42
+```
+
+#### The Defined-Or Operator (`\\`)
+
+`\\` checks whether a value is defined, without assigning anything:
+
+```ruby
+var x = nil
+x \\ say "x is not defined"    # prints: x is not defined
+```
+
+---
+
+### Deleting Variables
+
+Use the `del` keyword to permanently remove a variable. Any attempt to use it afterward causes a parse-time error:
+
+```ruby
+var foo = 42
+del foo
+say foo    # parse-time error: attempt to use deleted identifier
+```
+
+---
+
+### The Topic Variable (`_`)
+
+Every block in Sidef has a pre-declared variable `_` (underscore) that holds the current element being iterated over. You rarely need to write `_` explicitly, because the unary dot (`.`) operator is shorthand for `_.method`:
+
+```ruby
+[25, 36, 49].map { .sqrt }
+            .each { .log.say }
+```
+
+Here `.sqrt` means `_.sqrt`, and `.log.say` means `_.log.say`. You can also use `_` directly to index into arrays or hashes stored in the topic variable:
+
+```ruby
+say [[41,'a'], [42,'b'], [43,'c']].map { .[0] }
+#=> [41, 42, 43]
+
+say [Hash(a=>41), Hash(a=>42), Hash(a=>43)].map { .{:a} }
+#=> [41, 42, 43]
+```
+
+---
+
+### Special Variables
+
+Two built-in variables are always available:
+
+- `ARGV` — command-line arguments passed to the script
+- `ENV` — environment variables
+
+```ruby
+ARGV.each { |arg| say arg }
+say ENV{:HOME}
+```
+
+---
+
+### Magic Variables
+
+Sidef exposes some of Perl's special "magic" variables for low-level control over I/O behavior:
+
+```perl
+local $/ = nil       # change the input record separator
+local $\ = "\n"      # change the output record separator
+local $, = "\n"      # change the field separator
+say $^PERL           # path to the Perl executable
+say $^SIDEF          # path to the Sidef executable
+```
+
+---
+
+### File-Handle Constants
+
+These look like variables but are actually I/O handles:
+
+```ruby
+STDERR.say("Some error!")
+STDOUT.say("Some output...")
+STDIN.readline()    # reads one line from standard input
+```
+
+`ARGF` reads lines from files passed as arguments, or from standard input if none are given — useful for writing `cat`-like utilities:
+
+```ruby
+ARGF.each { |line| say line }
+```
+
+`DATA` reads content placed after `__END__` or `__DATA__` in the same file:
+
+```ruby
+DATA.each { |line| say "=>> #{line}" }
+
+__DATA__
+here are
+some data
+lines
+```
+
+---
 
 ### Constants
 
-Use `const` for values that should never change after being set:
+Sidef provides three ways to declare constants.
+
+#### `const` — Runtime Constants
+
+Declared and initialized at runtime. Once set, they cannot be changed.
 
 ```ruby
-const MAX_SIZE  = 100
-const SITE_NAME = "My Website"
+const pi = 3.14
+say pi      # 3.14
 ```
 
-Use `define` for values that are known at the time the code is parsed (compile-time):
+When declared inside a function, a `const` is re-created on each call, but remains immutable within that call:
 
 ```ruby
-define PI     = 3.14159265358979
-define GOLDEN = 1.61803398874989
-```
-
-### `static` — persistent across function calls
-
-```ruby
-func count_calls {
-    static n = 0    # initialized once, persists between calls
-    ++n
-    say "Called #{n} times"
+func f(a) {
+    const x = a
+    return (x + 2)
 }
 
-count_calls()    # Called 1 times
-count_calls()    # Called 2 times
-count_calls()    # Called 3 times
+say f(40)   #=> 42
+say f(50)   #=> 52
 ```
+
+#### `define` — Compile-Time Constants
+
+Evaluated at compile time. The value must be a standalone constant expression. These are the most efficient kind of constant.
+
+```ruby
+define PHI =  (1.25.sqrt + 0.5)
+define IHP = -(1.25.sqrt - 0.5)
+
+say (PHI**12 - IHP**12 / (PHI-IHP))   #=> 144
+```
+
+Attempting to reassign a `define` constant produces a **compile-time** error (vs. `const`, which gives a runtime error).
+
+#### `enum` — Enumerated Constants
+
+`enum` declares a sequence of constants with automatically incrementing values (starting at 0):
+
+```ruby
+enum |Black, White|
+say Black   # 0
+say White   # 1
+```
+
+You can specify a starting value. Each subsequent constant is produced by calling `.inc` on the previous one:
+
+```ruby
+enum |α="a", β|
+say α   # 'a'
+say β   # 'b'
+```
+
+All three constant types support the same multi-declaration syntax:
+
+```ruby
+const (        # or: define ( ... ) or static ( ... )
+    a = 42,
+   *b = (1,2,3,4),
+   :c = (x => 1, y => 2),
+)
+```
+
+---
+
+### Variable References
+
+You can take a reference to a variable with `\` and dereference it with `*`:
+
+```ruby
+var name = "sidef"
+var ref      = \name    # take a reference
+var original = *ref     # dereference
+```
+
+References are most useful for passing variables into functions so the function can assign a new value to them:
+
+```ruby
+func assign2ref(ref, value) {
+    *ref = value
+}
+
+var x = 10
+assign2ref(\x, 20)
+say x    # 20
+```
+
+The `Ref` type can be used in type signatures to indicate that a parameter should be a variable reference.
 
 ---
 
@@ -1803,9 +2128,9 @@ You've covered the fundamentals! Here's where to go next.
 | Resource | Description |
 |----------|-------------|
 | 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
-| 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.01/sidef-book.pdf) | The full book in PDF format for offline reading |
-| 📝 [Advanced Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
-| 🔢 [Number Theory Tutorial](https://codeberg.org/trizen/sidef/src/branch/master/NUMBER_THEORY_TUTORIAL.md) | Deep dive into Sidef's mathematical superpowers |
+| 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.04/sidef-book.pdf) | The full book in PDF format for offline reading |
+| 📝 [Advanced Tutorial](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
+| 🔢 [Number Theory Tutorial](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_TUTORIAL.md) | Deep dive into Sidef's mathematical superpowers |
 
 ### Example Code
 
