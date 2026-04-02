@@ -50,7 +50,7 @@ package Sidef::Types::Number::Number {
         # ULONG_MAX => 4294967295,
         # LONG_MIN  => -2147483647,
 
-        HAS_PRIME_UTIL => eval { require Math::Prime::Util; 1 } // 0,    # version >= 0.74 required
+        HAS_PRIME_UTIL => eval { require Math::Prime::Util; $Math::Prime::Util::VERSION >= 0.74 } // 0,    # version >= 0.74 required
     };
 
     use constant {
