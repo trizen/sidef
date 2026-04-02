@@ -2,335 +2,132 @@
 
 =head1 NAME
 
-Sidef::Types::Number::PolynomialMod - Polynomial arithmetic modulo another polynomial
+Sidef::Types::Number::PolynomialMod - Polynomial arithmetic in quotient rings
 
 =head1 DESCRIPTION
 
-This class implements polynomial arithmetic in quotient rings, where polynomials are computed modulo another polynomial. This is particularly useful for finite field arithmetic, algebraic number theory, and cryptographic applications.
+This class implements polynomial arithmetic in quotient rings of the form
+R[x]/(m(x)), where polynomials are reduced modulo a fixed modulus polynomial
+C<m(x)>. This mirrors how integers modulo n work (via C<Sidef::Types::Number::Mod>),
+but in the polynomial domain.
 
-A PolynomialMod object represents a polynomial reduced modulo a given modulus polynomial, similar to how integers modulo n work but in the polynomial domain.
+A C<PolynomialMod> object is a pair C<[poly, modulus]> where C<poly> is the
+residue polynomial (already reduced) and C<modulus> is the polynomial by which
+all results are reduced. All arithmetic operations automatically reduce their
+result modulo the shared modulus.
+
+Internally, polynomials are stored as a hash mapping integer exponents to
+their coefficients (C<Sidef::Types::Number::Number> objects). Zero coefficients
+are not stored.
+
+Typical use cases include:
+
+=over 4
+
+=item * Finite field arithmetic (e.g., GF(2^8) for AES)
+
+=item * Algebraic number fields (e.g., Q[x]/(x^2+1) ≅ Gaussian integers)
+
+=item * Cyclotomic fields and rings of algebraic integers
+
+=item * Factoring polynomials over finite fields
+
+=back
 
 =head1 SYNOPSIS
 
-    # Create a polynomial mod object
-    var p = PolynomialMod([1, 2, 3], [1, 0, 1])  # (1 + 2x + 3x²) mod (1 + x²)
-    
-    # Arithmetic operations
-    var q = PolynomialMod([2, 1], [1, 0, 1])
+    # Create polynomials mod (1 + x^2) — working in Q[x]/(x^2 + 1)
+    var i = PolynomialMod([0, 1], [1, 0, 1])   # represents the element x (i.e. sqrt(-1))
+    say i ** 2     # Output: -1 (mod x^2 + 1)
+    say i ** 4     # Output: 1 (mod x^2 + 1)
+
+    # General arithmetic
+    var p = PolynomialMod([1, 2, 3], [1, 0, 1])   # (3x^2 + 2x + 1) mod (x^2 + 1)
+    var q = PolynomialMod([1, 2],   [1, 0, 1])    # (2x + 1) mod (x^2 + 1)
     say p + q      # Addition
-    say p * q      # Multiplication
-    say p ** 3     # Exponentiation
-    
-    # Evaluate at a point
+    say p - q      # Subtraction
+    say p * q      # Multiplication, reduced mod (x^2 + 1)
+    say p ** 3     # Exponentiation via square-and-multiply
+
+    # Division (exact when the inverse exists)
+    say p / q
+
+    # Polynomial GCD and extended GCD
+    var (g, u, v) = p.gcdext(q)
+
+    # Evaluate the polynomial at a point
     say p.eval(2)
-    
-    # Get the modulus
-    say p.modulus
-    
-    # Lift to regular polynomial
-    say p.lift
+
+    # Retrieve parts
+    say p.modulus      # The modulus polynomial: x^2 + 1
+    say p.lift         # The underlying Polynomial (without modulus)
+
+    # CRT reconstruction
+    var r = PolynomialMod.chinese(p, q)
+
+=head1 COEFFICIENT ORDER IN ARRAY CONSTRUCTORS
+
+When constructing from an array, coefficients are given in B<descending>
+degree order (highest-degree coefficient first):
+
+    PolynomialMod([a_n, a_{n-1}, ..., a_1, a_0], modulus)
+    # represents a_n*x^n + a_{n-1}*x^{n-1} + ... + a_1*x + a_0
+
+Examples:
+
+    PolynomialMod([1, 0, 1], [1, 0, 0, 1])
+    # polynomial:  x^2 + 1
+    # modulus:     x^3 + 1
+
+    PolynomialMod([0, 1], [1, 0, 1])
+    # polynomial:  x
+    # modulus:     x^2 + 1
+
+The same descending convention applies when constructing the modulus array.
 
 =head1 INHERITS
 
 Inherits methods from:
 
-       * Sidef::Types::Number::Polynomial
+    Sidef::Types::Number::Polynomial
+
+Many methods not overridden here (such as C<degree>, C<coeffs>, C<exponents>,
+C<content>, C<leading_coefficient>, C<height>, etc.) are provided by the
+parent class and operate on the I<lifted> polynomial without the modulus
+constraint.
 
 =head1 METHODS
 
-=head2 !=
+=head2 new
 
-    a != b
+    PolynomialMod(array_ref, modulus_array_ref)
+    PolynomialMod(array_ref, modulus_poly)
+    PolynomialMod(poly,      modulus)
+    self.new(...)
 
-Returns true if polynomial C<a> is not equal to polynomial C<b> modulo their common modulus.
+Constructs a new C<PolynomialMod> object. The last argument is always the
+modulus; everything before it specifies the polynomial residue.
 
-Aliases: I<ne>
+The modulus may be given as an array reference or as an existing
+C<Sidef::Types::Number::Polynomial> object. The residue polynomial is reduced
+modulo the modulus upon construction.
 
-=cut
+    # From coefficient arrays (descending degree order)
+    var p = PolynomialMod([3, 2, 1], [1, 0, 1])   # (3x^2 + 2x + 1) mod (x^2 + 1)
 
-=head2 %
+    # From an existing Polynomial object
+    var m = Polynomial([1, 0, 1])
+    var p = PolynomialMod([3, 2, 1], m)
 
-    a % b
+    # Instance-method form (creates new object with same class)
+    var q = p.new([1, 2], [1, 0, 1])
 
-Returns the remainder of polynomial C<a> divided by polynomial C<b>, computed modulo the modulus polynomial.
+B<Special case — instance call with one argument:> when called as an instance
+method with a single argument (no coefficients before the modulus), it
+evaluates the polynomial at that argument rather than constructing a new
+object. See L</eval>.
 
-Aliases: I<mod>
-
-=cut
-
-=head2 *
-
-    a * b
-
-Returns the product of polynomials C<a> and C<b>, reduced modulo the modulus polynomial.
-
-Aliases: I<mul>
-
-=cut
-
-=head2 **
-
-    a ** b
-
-Returns polynomial C<a> raised to the power C<b>, computed modulo the modulus polynomial. Supports both positive integers and negative integer exponents (computing modular inverse when needed).
-
-Aliases: I<pow>
-
-=cut
-
-=head2 +
-
-    a + b
-
-Returns the sum of polynomials C<a> and C<b>, reduced modulo the modulus polynomial.
-
-Aliases: I<add>
-
-=cut
-
-=head2 ++
-
-    a++
-
-Increments polynomial C<a> by 1 (adds the constant polynomial 1), reducing modulo the modulus polynomial.
-
-Aliases: I<inc>
-
-=cut
-
-=head2 -
-
-    a - b
-
-Returns the difference of polynomials C<a> and C<b>, reduced modulo the modulus polynomial.
-
-Aliases: I<sub>
-
-=cut
-
-=head2 --
-
-    a--
-
-Decrements polynomial C<a> by 1 (subtracts the constant polynomial 1), reducing modulo the modulus polynomial.
-
-Aliases: I<dec>
-
-=cut
-
-=head2 /
-
-    a / b
-
-Returns the quotient of polynomial C<a> divided by polynomial C<b>, computed modulo the modulus polynomial. This computes C<a> times the modular inverse of C<b>.
-
-Aliases: I<÷>, I<div>
-
-=cut
-
-=head2 //
-
-    a // b
-
-Returns the integer (floor) division of polynomial C<a> by polynomial C<b>, computed modulo the modulus polynomial.
-
-Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
-
-=cut
-
-=head2 <
-
-    a < b
-
-Compares polynomials C<a> and C<b> lexicographically by their coefficients. Returns true if C<a> is less than C<b>.
-
-Aliases: I<lt>
-
-=cut
-
-=head2 <=>
-
-    a <=> b
-
-Three-way comparison operator. Returns -1 if C<a> is less than C<b>, 0 if equal, and 1 if greater. Comparison is performed lexicographically on coefficients.
-
-Aliases: I<cmp>
-
-=cut
-
-=head2 ==
-
-    a == b
-
-Returns true if polynomial C<a> equals polynomial C<b> modulo their common modulus.
-
-Aliases: I<eq>
-
-=cut
-
-=head2 >
-
-    a > b
-
-Compares polynomials C<a> and C<b> lexicographically by their coefficients. Returns true if C<a> is greater than C<b>.
-
-Aliases: I<gt>
-
-=cut
-
-=head2 ≤
-
-    a ≤ b
-
-Returns true if polynomial C<a> is less than or equal to polynomial C<b> lexicographically.
-
-Aliases: I<E<lt>=>, I<le>
-
-=cut
-
-=head2 ≥
-
-    a ≥ b
-
-Returns true if polynomial C<a> is greater than or equal to polynomial C<b> lexicographically.
-
-Aliases: I<E<gt>=>, I<ge>
-
-=cut
-
-=head2 abs
-
-    x.abs
-
-Returns the absolute value of the polynomial. For polynomials, this typically ensures the leading coefficient is positive.
-
-=cut
-
-=head2 binomial
-
-    n.binomial(k)
-
-Returns the binomial coefficient C(n, k) computed in the polynomial mod ring. This generalizes the standard binomial coefficient to polynomial quotient rings.
-
-=cut
-
-=head2 ceil
-
-    x.ceil
-
-Returns the ceiling of the polynomial. For polynomials with rational or real coefficients, this applies the ceiling function to each coefficient.
-
-=cut
-
-=head2 chinese
-
-    *polynomials.chinese
-
-Applies the Chinese Remainder Theorem to solve a system of polynomial congruences. Given polynomials with different moduli, finds a polynomial that satisfies all congruences simultaneously.
-
-=cut
-
-=head2 derivative
-
-    x.derivative
-
-Returns the formal derivative of the polynomial with respect to its variable, computed modulo the modulus polynomial.
-
-=cut
-
-=head2 divmod
-
-    x.divmod(y)
-
-Returns a pair C<(quotient, remainder)> from dividing polynomial C<x> by polynomial C<y>, computed modulo the modulus polynomial.
-
-=cut
-
-=head2 dump
-
-    x.dump
-
-Returns a detailed string representation of the polynomial mod object, showing its internal structure for debugging purposes.
-
-=cut
-
-=head2 eval
-
-    x.eval(value)
-
-Evaluates the polynomial at the given value by substituting the value for the variable and computing the result modulo the modulus polynomial.
-
-=cut
-
-=head2 float
-
-    x.float
-
-Converts the polynomial to a floating-point approximation. For polynomials, this typically evaluates at x=1 or converts coefficients to floating-point.
-
-=cut
-
-=head2 floor
-
-    x.floor
-
-Returns the floor of the polynomial. For polynomials with rational or real coefficients, this applies the floor function to each coefficient.
-
-=cut
-
-=head2 gcd
-
-    x.gcd(y)
-
-Returns the greatest common divisor of polynomials C<x> and C<y>, computed modulo the modulus polynomial using the Euclidean algorithm.
-
-=cut
-
-=head2 gcdext
-
-    x.gcdext(y)
-
-Returns the extended GCD of polynomials C<x> and C<y>. Returns a triple C<(g, u, v)> where C<g> is the GCD and C<u>, C<v> are polynomials such that C<u*x + v*y = g> (modulo the modulus polynomial).
-
-=cut
-
-=head2 inv
-
-    x.inv
-
-Returns the multiplicative inverse of polynomial C<x> modulo the modulus polynomial. This exists if and only if C<x> and the modulus are coprime.
-
-=cut
-
-=head2 is_mone
-
-    x.is_mone
-
-Returns true if the polynomial equals -1 (the constant polynomial with coefficient -1).
-
-=cut
-
-=head2 is_one
-
-    x.is_one
-
-Returns true if the polynomial equals 1 (the constant polynomial with coefficient 1), which is the multiplicative identity.
-
-=cut
-
-=head2 is_zero
-
-    x.is_zero
-
-Returns true if the polynomial is the zero polynomial, which is the additive identity.
-
-=cut
-
-=head2 lcm
-
-    x.lcm(y)
-
-Returns the least common multiple of polynomials C<x> and C<y>, computed modulo the modulus polynomial.
+Aliases: I<call>
 
 =cut
 
@@ -338,7 +135,12 @@ Returns the least common multiple of polynomials C<x> and C<y>, computed modulo 
 
     self.lift
 
-Returns the underlying polynomial without the modulus constraint, "lifting" it from the quotient ring to the polynomial ring.
+Returns the underlying C<Sidef::Types::Number::Polynomial> object, i.e. the
+reduced residue polynomial stripped of its modulus. The returned value is a
+plain C<Polynomial> in the free ring R[x].
+
+    var p = PolynomialMod([1, 2, 3], [1, 0, 1])
+    say p.lift    # Polynomial: 2x + (1 - 3) = -2 + 2x (after reduction)
 
 Aliases: I<to_poly>
 
@@ -348,62 +150,71 @@ Aliases: I<to_poly>
 
     self.modulus
 
-Returns the modulus polynomial by which all operations in this quotient ring are reduced.
+Returns the modulus polynomial by which all arithmetic in this quotient ring
+is reduced. The return value is a C<Sidef::Types::Number::Polynomial>.
+
+    var p = PolynomialMod([1, 2], [1, 0, 1])
+    say p.modulus   # x^2 + 1
 
 =cut
 
-=head2 neg
+=head2 +
 
-    x.neg
+    a + b
 
-Returns the additive inverse (negation) of polynomial C<x>, which when added to C<x> gives zero.
+Returns the sum of C<a> and C<b>, reduced modulo the shared modulus. Both
+operands must share the same modulus polynomial. If C<b> is a scalar
+(non-PolynomialMod), it is added to the constant term after reduction.
 
-=cut
-
-=head2 new
-
-    self.new(coeffs, modulus)
-    PolynomialMod(coeffs, modulus)
-
-Creates a new PolynomialMod object from a list of coefficients and a modulus polynomial. The coefficients represent the polynomial starting from the constant term.
-
-Example:
-
-    var p = PolynomialMod([1, 2, 3], [1, 0, 1])  # (1 + 2x + 3x²) mod (1 + x²)
-
-Aliases: I<call>
+Aliases: I<add>
 
 =cut
 
-=head2 pretty
+=head2 ++
 
-    x.pretty
+    a++
 
-Returns a human-readable string representation of the polynomial in standard mathematical notation (e.g., "1 + 2x + 3x²").
+Increments C<a> by 1 (adds the constant polynomial 1) and reduces modulo the
+modulus. Equivalent to C<a + 1>.
 
-=cut
-
-=head2 rat
-
-    x.rat
-
-Converts the polynomial to rational form, ensuring all coefficients are represented as exact rational numbers.
+Aliases: I<inc>
 
 =cut
 
-=head2 rat_approx
+=head2 -
 
-    x.rat_approx
+    a - b
 
-Returns a rational approximation of the polynomial, converting floating-point coefficients to nearby rational numbers.
+Returns the difference C<a - b>, reduced modulo the shared modulus. If C<b>
+is a scalar, it is subtracted from the constant term after reduction.
+
+Aliases: I<sub>
 
 =cut
 
-=head2 round
+=head2 --
 
-    x.round(r)
+    a--
 
-Rounds each coefficient of the polynomial to C<r> decimal places (or to the nearest integer if C<r> is not specified).
+Decrements C<a> by 1 (subtracts the constant polynomial 1) and reduces
+modulo the modulus.
+
+Aliases: I<dec>
+
+=cut
+
+=head2 *
+
+    a * b
+
+Returns the product of C<a> and C<b>, reduced modulo the shared modulus.
+Coefficient multiplication is also reduced modulo the modulus at each step,
+keeping intermediate values small.
+
+If C<b> is a scalar, each coefficient of C<a> is multiplied by C<b> (after
+reducing C<b> mod the modulus) without a full polynomial multiplication.
+
+Aliases: I<mul>
 
 =cut
 
@@ -411,7 +222,436 @@ Rounds each coefficient of the polynomial to C<r> decimal places (or to the near
 
     x.sqr
 
-Returns the square of polynomial C<x> (equivalent to C<x * x>), computed modulo the modulus polynomial.
+Returns the square of C<x> modulo the modulus. Equivalent to C<x * x>.
+
+=cut
+
+=head2 **
+
+    a ** n
+
+Returns C<a> raised to the integer power C<n>, computed modulo the modulus
+polynomial using the binary (square-and-multiply) method. C<n> may be:
+
+=over 4
+
+=item * A non-negative integer — standard modular exponentiation.
+
+=item * A negative integer — computes C<(a^|n|)^{-1}> via L</inv>.
+
+=back
+
+    var i = PolynomialMod([0, 1], [1, 0, 1])   # x mod (x^2 + 1)
+    say i ** 2    # -1 mod (x^2 + 1)
+    say i ** 4    # 1  mod (x^2 + 1)
+
+Aliases: I<pow>
+
+=cut
+
+=head2 /
+
+    a / b
+
+Divides C<a> by C<b> in the quotient ring.
+
+=over 4
+
+=item * If C<b> is a C<PolynomialMod> with the same modulus, polynomial
+Euclidean division is attempted. If the division is exact, the quotient is
+returned. If not exact, a C<Sidef::Types::Number::Fraction> object is
+returned.
+
+=item * If C<b> is zero, returns a polynomial with an infinite coefficient.
+
+=item * If C<b> is a scalar, each coefficient of C<a> is divided by C<b>
+(after reducing C<b> mod the modulus).
+
+=back
+
+Note that exact division in a polynomial quotient ring requires the leading
+coefficient of C<b> to be invertible modulo the coefficient ring (e.g., the
+modulus is prime for GF(p)[x] arithmetic). If the inverse does not exist
+(e.g. working over a non-field), the result is NaN.
+
+Aliases: I<div>, I<÷>
+
+=cut
+
+=head2 //
+
+    a // b
+
+Returns the integer quotient from Euclidean division of C<a> by C<b>,
+discarding the remainder. Equivalent to the quotient component of L</divmod>.
+
+Note: The rounding variants (C<idiv_ceil>, C<idiv_floor>, C<idiv_round>,
+C<idiv_trunc>) are all currently aliased to the same integer-quotient
+behaviour.
+
+Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
+
+=cut
+
+=head2 %
+
+    a % b
+
+When C<b> is a C<PolynomialMod> with the B<same> modulus as C<a>, returns the
+remainder from Euclidean polynomial division (i.e. the second component of
+L</divmod>).
+
+When C<b> is a different polynomial (or has a different modulus), B<reinterprets>
+C<b> as the new modulus and returns a new C<PolynomialMod> object with the same
+residue polynomial but reduced under the new modulus. This is the primary way
+to change the modulus of an existing polynomial.
+
+    var p = PolynomialMod([1, 2, 3], [1, 0, 1])
+    var q = PolynomialMod([1, 1],   [1, 0, 1])
+    say p % q      # remainder of p divided by q, mod (x^2 + 1)
+
+Aliases: I<mod>
+
+=cut
+
+=head2 divmod
+
+    x.divmod(y)
+
+Performs Euclidean polynomial division of C<x> by C<y> within the quotient
+ring, using the standard long-division algorithm. The leading coefficient of
+C<y> must be invertible in the coefficient ring (its modular inverse is
+computed and used at each step).
+
+Returns a list of two C<PolynomialMod> objects C<(quotient, remainder)>
+satisfying C<x == quotient * y + remainder> with C<deg(remainder) < deg(y)>.
+
+If C<x> and C<y> have different moduli, both quotient and remainder are NaN.
+If the leading coefficient of C<y> has no modular inverse, returns NaN.
+
+=cut
+
+=head2 neg
+
+    x.neg
+
+Returns the additive inverse of C<x>: the polynomial whose coefficients are
+all negated. Adding C<x> and C<x.neg> yields the zero polynomial.
+
+=cut
+
+=head2 abs
+
+    x.abs
+
+Returns C<x> multiplied by the sign of its leading coefficient, ensuring the
+leading coefficient is positive. Equivalent to C<x * x.sgn>.
+
+=cut
+
+=head2 inv
+
+    x.inv
+
+Returns a C<Sidef::Types::Number::Fraction> representing C<1/x> in the
+quotient ring. This is the current implementation path for the multiplicative
+inverse; a dedicated modular-inverse algorithm (as in PARI/GP's C<Mod()^(-1)>)
+is planned but not yet implemented.
+
+B<Note:> For exact modular inverse computation over a field (e.g. GF(p)[x]/(m(x))
+where m is irreducible over GF(p)), use L</gcdext> and extract the Bézout
+coefficient. The identity C<x * x.inv> may not simplify to C<1> with the current
+implementation except in special cases.
+
+=cut
+
+=head2 gcd
+
+    x.gcd(y)
+
+Returns the greatest common divisor of polynomials C<x> and C<y> in the
+quotient ring, using the polynomial Euclidean algorithm (repeated
+remainder computation):
+
+    r0 = x, r1 = y
+    loop: (r0, r1) = (r1, r0 mod r1) until r1 is zero
+    return r0
+
+Both C<x> and C<y> must share the same modulus. The result is the GCD as a
+C<PolynomialMod> in the same ring.
+
+Reference: L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclid's_algorithm>
+
+=cut
+
+=head2 gcdext
+
+    x.gcdext(y)
+
+Extended Euclidean algorithm for polynomials in the quotient ring. Returns a
+list of B<five> values:
+
+    (g, u, v, a1, b1)
+
+where C<g = gcd(x, y)> and C<u>, C<v> are Bézout coefficients satisfying:
+
+    u*x + v*y == g
+
+The additional values C<a1> and C<b1> (the final remainders scaled by a sign
+factor) are also returned; they relate to the last non-trivial step of the
+extended Euclidean recursion.
+
+Example:
+
+    var (g, u, v) = p.gcdext(q)
+    say u*p + v*q == g    # True
+
+Reference: L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#B%C3%A9zout's_identity_and_extended_GCD_algorithm>
+
+=cut
+
+=head2 lcm
+
+    x.lcm(y)
+
+Returns the least common multiple of polynomials C<x> and C<y>, computed as:
+
+    lcm(x, y) = abs(x * y) / gcd(x, y)
+
+=cut
+
+=head2 normalize_to_monic
+
+    x.normalize_to_monic
+
+Returns a monic version of C<x> (leading coefficient equal to 1) by
+multiplying each coefficient by the modular inverse of the leading coefficient.
+If the leading coefficient is already 1, C<x> is returned unchanged. If the
+inverse does not exist (e.g. the coefficient ring is not a field), returns
+C<x> unchanged.
+
+=cut
+
+=head2 derivative
+
+    x.derivative
+
+Returns the formal derivative of C<x> with respect to the polynomial variable,
+reduced modulo the modulus. Each term C<c_k * t^k> maps to C<k * c_k * t^{k-1}>,
+with the coefficient also reduced modulo the modulus polynomial.
+
+    var p = PolynomialMod([1, 3, 1], [1, 0, 1])   # x^2 + 3x + 1 mod (x^2+1)
+    say p.derivative   # 3 + 2x, reduced mod (x^2 + 1)
+
+=cut
+
+=head2 eval
+
+    x.eval(value)
+
+Evaluates the polynomial at C<value> by Horner-style substitution, using
+modular arithmetic throughout. The value is first reduced modulo the modulus
+polynomial, and powers of the value are computed as C<Sidef::Types::Number::Mod>
+elements to keep results in the quotient ring.
+
+Returns a scalar (C<Sidef::Types::Number::Number>).
+
+    var p = PolynomialMod([1, 2, 3], [1, 0, 1])
+    say p.eval(2)     # evaluates (3*4 + 2*2 + 1) mod ... = 17 mod (x^2+1)
+
+If the polynomial is the zero polynomial, returns 0 directly.
+
+=cut
+
+=head2 binomial
+
+    n.binomial(k)
+
+Computes the generalised binomial coefficient C(n, k) where C<n> is a
+C<PolynomialMod> and C<k> is an integer. Uses the falling-factorial definition:
+
+    C(n, k) = n * (n-1) * ... * (n-k+1) / k!
+
+The product is computed via binary splitting for efficiency, and the division
+by C<k!> is performed via L</div>.
+
+    var x = PolynomialMod([1, 0], [1, 0, 1])   # x mod (x^2+1)
+    say x.binomial(2)   # x*(x-1)/2 mod (x^2+1)
+
+=cut
+
+=head2 chinese
+
+    *polynomials.chinese
+
+Applies the Chinese Remainder Theorem (CRT) to a list of C<PolynomialMod>
+objects that may have different moduli. Finds a single polynomial congruent to
+each input modulo its respective modulus. The combined modulus is the LCM of
+all individual moduli.
+
+    var a = PolynomialMod([1, 2], [1, 0, 1])   # 2x+1 mod (x^2+1)
+    var b = PolynomialMod([3, 1], [1, 1, 1])   # x+3 mod (x^2+x+1)
+    var c = PolynomialMod.chinese(a, b)
+
+=cut
+
+=head2 ==
+
+    a == b
+
+Returns true if C<a> and C<b> are equal as elements of the same quotient ring.
+Two C<PolynomialMod> objects are equal if and only if their moduli are equal
+and their residue polynomials are equal (coefficient by coefficient). When
+comparing against a non-C<PolynomialMod> value, the value is reduced modulo
+C<a>'s modulus before comparison.
+
+Aliases: I<eq>
+
+=cut
+
+=head2 !=
+
+    a != b
+
+Returns true if C<a> is not equal to C<b>. Implemented as the logical negation
+of L</==>. See L</==> for the equality semantics.
+
+Aliases: I<ne>
+
+=cut
+
+=head2 <=>
+
+    a <=> b
+
+Three-way comparison. When both arguments are C<PolynomialMod> objects, the
+moduli are compared first; if they differ, that result is returned. Otherwise
+the residue polynomials are compared lexicographically (highest-degree
+coefficient first, then lower degrees). Returns -1, 0, or 1.
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 <
+
+    a < b
+
+Returns true if C<a> is strictly less than C<b> under the lexicographic
+ordering defined by L</<=>>. 
+
+Aliases: I<lt>
+
+=cut
+
+=head2 >
+
+    a > b
+
+Returns true if C<a> is strictly greater than C<b>.
+
+Aliases: I<gt>
+
+=cut
+
+=head2 ≤
+
+    a ≤ b
+
+Returns true if C<a> is less than or equal to C<b>.
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+    a ≥ b
+
+Returns true if C<a> is greater than or equal to C<b>.
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
+=head2 is_zero
+
+    x.is_zero
+
+Returns true if C<x> is the zero polynomial (the additive identity). Uses
+L</==> against 0.
+
+=cut
+
+=head2 is_one
+
+    x.is_one
+
+Returns true if C<x> is the polynomial 1 (the multiplicative identity). Uses
+L</==> against 1.
+
+=cut
+
+=head2 is_mone
+
+    x.is_mone
+
+Returns true if C<x> equals the constant polynomial -1. Uses L</==> against -1.
+
+=cut
+
+=head2 float
+
+    x.float
+
+Returns a new C<PolynomialMod> with each coefficient converted to a
+floating-point approximation, preserving the modulus.
+
+=cut
+
+=head2 rat
+
+    x.rat
+
+Returns a new C<PolynomialMod> with each coefficient converted to an exact
+rational number (C<Math::GMPq>), preserving the modulus.
+
+=cut
+
+=head2 rat_approx
+
+    x.rat_approx
+
+Returns a new C<PolynomialMod> with each floating-point coefficient replaced
+by a nearby rational approximation, preserving the modulus.
+
+=cut
+
+=head2 floor
+
+    x.floor
+
+Returns a new C<PolynomialMod> with C<floor()> applied to each coefficient,
+preserving the modulus.
+
+=cut
+
+=head2 ceil
+
+    x.ceil
+
+Returns a new C<PolynomialMod> with C<ceil()> applied to each coefficient,
+preserving the modulus.
+
+=cut
+
+=head2 round
+
+    x.round(r)
+
+Returns a new C<PolynomialMod> with each coefficient rounded to C<r> decimal
+places (or to the nearest integer when C<r> is zero/unspecified), preserving
+the modulus.
 
 =cut
 
@@ -419,31 +659,124 @@ Returns the square of polynomial C<x> (equivalent to C<x * x>), computed modulo 
 
     x.to_s
 
-Converts the polynomial to a string representation suitable for display.
+Returns a C<Sidef::Types::String::String> representation of the polynomial in
+the form:
+
+    <polynomial expression> (mod <modulus expression>)
+
+For example: C<2*x + 1 (mod x^2 + 1)>.
 
 Aliases: I<stringify>
 
 =cut
 
+=head2 pretty
+
+    x.pretty
+
+Like L</to_s> but uses the C<pretty> display method from the parent class,
+which renders Unicode superscripts and cleaner coefficient notation.
+
+=cut
+
+=head2 dump
+
+    x.dump
+
+Returns a C<Sidef::Types::String::String> containing a round-trippable
+representation of the C<PolynomialMod> object:
+
+    PolynomialMod(<exponent> => <coeff>, ..., <modulus>)
+
+This mirrors the internal sparse storage format and is suitable for debugging.
+
+=cut
+
+=head1 BOOLEAN CONTEXT
+
+In boolean context (C<if>, C<while>, etc.), a C<PolynomialMod> is truthy if
+its constant term (coefficient of x^0) is truthy, and falsy if zero or absent.
+
 =head1 EXAMPLES
 
-    # Working in Q[x]/(x² + 1) - Gaussian integers
-    var i = PolynomialMod([0, 1], [1, 0, 1])  # represents 'i' where i² = -1
-    say i ** 2    # Output: -1
-    say i ** 4    # Output: 1
-    
-    # Arithmetic in finite fields
-    var a = PolynomialMod([1, 1], [1, 1, 1])  # (1 + x) mod (1 + x + x²)
-    var b = PolynomialMod([1, 0, 1], [1, 1, 1])  # (1 + x²) mod (1 + x + x²)
-    say a * b
-    
-    # Finding modular inverses
-    var p = PolynomialMod([1, 2], [1, 0, 0, 1])
-    say p.inv     # Multiplicative inverse
-    say p * p.inv # Should be 1
+=head2 Gaussian integers via Q[x]/(x² + 1)
+
+    var i = PolynomialMod([0, 1], [1, 0, 1])   # x ≡ i
+    say i ** 2    # -1 (mod x^2 + 1)
+    say i ** 4    # 1  (mod x^2 + 1)
+
+    var a = PolynomialMod([3, 2], [1, 0, 1])   # 2x + 3 ≡ 3 + 2i
+    var b = PolynomialMod([1, 4], [1, 0, 1])   # 4x + 1 ≡ 1 + 4i
+    say a * b   # (3+2i)(1+4i) = 3+12i+2i+8i^2 = (3-8) + 14i = -5 + 14i
+                # Output: 14*x - 5 (mod x^2 + 1)
+
+=head2 GCD and Bézout coefficients
+
+    var p = PolynomialMod([1, 0, 1], [1, 0, 0, 1])  # x^2+1 mod x^3+1
+    var q = PolynomialMod([1, 1],   [1, 0, 0, 1])   # x+1   mod x^3+1
+    var (g, u, v) = p.gcdext(q)
+    say g             # gcd
+    say u*p + v*q     # should equal g
+
+=head2 Finite field GF(2)[x]/(x^4 + x + 1) — an irreducible polynomial over GF(2)
+
+    var m = [1, 0, 0, 1, 1]    # x^4 + x + 1
+    var a = PolynomialMod([1, 1, 0, 1], m)  # x^3 + x + 1
+    var b = PolynomialMod([1, 0, 1, 1], m)  # x^3 + x^2 + 1
+    say a * b    # product in GF(2^4)
+
+=head2 Chinese Remainder Theorem
+
+    var a = PolynomialMod([2, 1], [1, 0, 1])   # 2x+1 mod (x^2+1)
+    var b = PolynomialMod([1, 3], [1, 1, 1])   # x+3  mod (x^2+x+1)
+    var c = PolynomialMod.chinese(a, b)
+    say c         # polynomial congruent to both a and b mod their respective moduli
+
+=head2 Derivative in a quotient ring
+
+    var p = PolynomialMod([1, 0, 3, 2], [1, 0, 1])  # 3x^2 + 2x (after reduction)
+    say p.derivative   # formal derivative reduced mod (x^2 + 1)
+
+=head1 NOTES
+
+=over 4
+
+=item *
+
+B<Operand compatibility:> Most binary operations (C<+>, C<->, C<*>, C<gcd>,
+C<divmod>, etc.) require both operands to share the same modulus polynomial.
+Mixing operands with different moduli will either give wrong results or return
+NaN.
+
+=item *
+
+B<Coefficient ring:> Coefficients are general C<Sidef::Types::Number::Number>
+objects (arbitrary precision). For finite-field semantics (e.g. GF(p)[x]),
+you should use a modulus polynomial whose coefficients are already in GF(p) and
+ensure your input coefficients are also reduced mod p.
+
+=item *
+
+B<Modular inverse:> The C<inv> method currently delegates to
+C<Sidef::Types::Number::Fraction>. For proper modular polynomial inversion in
+a field (via the extended Euclidean algorithm), use C<gcdext> and extract the
+Bézout coefficient C<u> from C<(g, u, v) = p.gcdext(modulus)> when C<g == 1>.
+
+=item *
+
+B<Inherited methods:> Methods not overridden here (C<degree>, C<coeffs>,
+C<exponents>, C<leading_coefficient>, C<content>, C<primitive_part>,
+C<height>, C<is_squarefree>, C<squarefree_part>, C<roots>, C<powmod>,
+C<invmod>, C<newton_method>, etc.) are inherited from
+C<Sidef::Types::Number::Polynomial> and operate on the lifted polynomial
+without the modulus.
+
+=back
 
 =head1 SEE ALSO
 
-L<Sidef::Types::Number::Polynomial>
+L<Sidef::Types::Number::Polynomial>,
+L<Sidef::Types::Number::Mod>,
+L<Sidef::Types::Number::Fraction>
 
 =cut
