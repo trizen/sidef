@@ -38,19 +38,19 @@ Typical use cases include:
 
     # Create polynomials mod (1 + x^2) — working in Q[x]/(x^2 + 1)
     var i = PolynomialMod([0, 1], [1, 0, 1])   # represents the element x (i.e. sqrt(-1))
-    say i ** 2     # Output: -1 (mod x^2 + 1)
-    say i ** 4     # Output: 1 (mod x^2 + 1)
+    say i**2     # Output: -1 (mod x^2 + 1)
+    say i**4     # Output: 1 (mod x^2 + 1)
 
     # General arithmetic
     var p = PolynomialMod([1, 2, 3], [1, 0, 1])   # (3x^2 + 2x + 1) mod (x^2 + 1)
     var q = PolynomialMod([1, 2],   [1, 0, 1])    # (2x + 1) mod (x^2 + 1)
-    say p + q      # Addition
-    say p - q      # Subtraction
-    say p * q      # Multiplication, reduced mod (x^2 + 1)
-    say p ** 3     # Exponentiation via square-and-multiply
+    say (p + q)      # Addition
+    say (p - q)      # Subtraction
+    say (p * q)      # Multiplication, reduced mod (x^2 + 1)
+    say (p ** 3)     # Exponentiation via square-and-multiply
 
     # Division (exact when the inverse exists)
-    say p / q
+    say (p / q)
 
     # Polynomial GCD and extended GCD
     var (g, u, v) = p.gcdext(q)
@@ -353,15 +353,31 @@ leading coefficient is positive. Equivalent to C<x * x.sgn>.
 
     x.inv
 
-Returns a C<Sidef::Types::Number::Fraction> representing C<1/x> in the
-quotient ring. This is the current implementation path for the multiplicative
-inverse; a dedicated modular-inverse algorithm (as in PARI/GP's C<Mod()^(-1)>)
-is planned but not yet implemented.
+Compute the multiplicative inverse of a PolynomialMod element.
 
-B<Note:> For exact modular inverse computation over a field (e.g. GF(p)[x]/(m(x))
-where m is irreducible over GF(p)), use L</gcdext> and extract the Bézout
-coefficient. The identity C<x * x.inv> may not simplify to C<1> with the current
-implementation except in special cases.
+In the quotient ring C<R[x]/(m(x))>, the inverse of C<f(x)> exists if and only
+if C<gcd(f, m) = 1>. When it exists, the extended Euclidean algorithm gives
+polynomials C<u> and C<v> such that:
+
+  u(x)*f(x) + v(x)*m(x) = 1
+
+which means C<u(x)*f(x) ≡ 1 (mod m(x))>, so C<u> is the inverse.
+
+We use C<Polynomial::gcdext> on the I<lifted> polynomials (plain polynomial
+ring arithmetic), which normalizes the GCD to monic. If the result is
+the constant polynomial C<1>, the Bézout coefficient C<u> is the inverse.
+The C<PolynomialMod> constructor automatically reduces C<u> modulo C<m>.
+
+=head3 Reference
+
+L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#B%C3%A9zout's_identity_and_extended_GCD_algorithm>
+
+=head3 Example
+
+  # Matches PARI/GP: Mod(1+2*x, x^3+1)^(-1)
+  var p = PolynomialMod([2, 1], [1, 0, 0, 1])   # (2x+1) mod (x^3+1)
+  say(p.inv)    # -4/7*x^2 + 2/7*x - 1/7  (mod x^3+1)
+  say((p * p.inv) == 1)   # true
 
 =cut
 
@@ -399,6 +415,7 @@ where C<g = gcd(x, y)> and C<u>, C<v> are Bézout coefficients satisfying:
 
 The additional values C<a1> and C<b1> (the final remainders scaled by a sign
 factor) are also returned; they relate to the last non-trivial step of the
+
 extended Euclidean recursion.
 
 Example:

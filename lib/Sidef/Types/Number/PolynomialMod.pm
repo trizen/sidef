@@ -506,14 +506,48 @@ package Sidef::Types::Number::PolynomialMod {
     #~ __PACKAGE__->new((map { $_ => $x->[0]{$_}->lift } CORE::keys %{$x->[0]}), $x->[1]);
     #~ }
 
+    # Compute the multiplicative inverse of a PolynomialMod element.
+    #
+    # In the quotient ring R[x]/(m(x)), the inverse of f(x) exists if and only
+    # if gcd(f, m) = 1.  When it exists, the extended Euclidean algorithm gives
+    # polynomials u, v such that:
+    #
+    #   u(x)*f(x) + v(x)*m(x) = 1
+    #
+    # which means u(x)*f(x) ≡ 1 (mod m(x)), so u is the inverse.
+    #
+    # We use Polynomial::gcdext on the *lifted* polynomials (plain polynomial
+    # ring arithmetic), which normalises the GCD to monic.  If the result is
+    # the constant polynomial 1, the Bézout coefficient u is the inverse.
+    # The PolynomialMod constructor automatically reduces u modulo m.
+    #
+    # Reference:
+    #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#B%C3%A9zout's_identity_and_extended_GCD_algorithm
+    #
+    # Example (matches PARI/GP: Mod(1+2*x, x^3+1)^(-1)):
+    #   var p = PolynomialMod([2, 1], [1, 0, 0, 1])   # (2x+1) mod (x^3+1)
+    #   say(p.inv)    # -4/7*x^2 + 2/7*x - 1/7  (mod x^3+1)
+    #   say((p * p.inv) == 1)   # true
+
     sub inv {
         my ($x) = @_;
 
-        # TODO: implement modular inverse
-        # In PARI/GP, we have: Mod(1+2*x, x^3+1)^(-1) = Mod(-4/7*x^2 + 2/7*x - 1/7, x^3 + 1)
-        # In Sidef, this would be: PolyMod("1+2*x", Poly("x^3+1"))**(-1)
+        my $m = $x->[1];     # modulus polynomial (a Polynomial)
+        my $f = $x->lift;    # residue polynomial (a plain Polynomial)
 
-        Sidef::Types::Number::Fraction->new(Sidef::Types::Number::Number::ONE, $x);
+        # Run the extended Euclidean algorithm on the plain polynomials.
+        # Returns (g, u, v, ...) satisfying: u*f + v*m = g,
+        # with g normalised to monic by Polynomial::gcdext.
+        my ($g, $u) = $f->gcdext($m);
+
+        # The inverse exists iff gcd(f, m) = 1.
+        # If g is not the constant polynomial 1, f is not invertible mod m.
+        $g->is_one
+          || return __PACKAGE__->new(0 => Sidef::Types::Number::Number::nan(), $m);
+
+        # u*f ≡ 1 (mod m).
+        # PolynomialMod::new reduces u modulo m automatically.
+        __PACKAGE__->new($u, $m);
     }
 
     sub is_zero {
