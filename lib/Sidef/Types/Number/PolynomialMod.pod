@@ -774,13 +774,6 @@ ensure your input coefficients are also reduced mod p.
 
 =item *
 
-B<Modular inverse:> The C<inv> method currently delegates to
-C<Sidef::Types::Number::Fraction>. For proper modular polynomial inversion in
-a field (via the extended Euclidean algorithm), use C<gcdext> and extract the
-Bézout coefficient C<u> from C<(g, u, v) = p.gcdext(modulus)> when C<g == 1>.
-
-=item *
-
 B<Inherited methods:> Methods not overridden here (C<degree>, C<coeffs>,
 C<exponents>, C<leading_coefficient>, C<content>, C<primitive_part>,
 C<height>, C<is_squarefree>, C<squarefree_part>, C<roots>, C<powmod>,
