@@ -55,11 +55,11 @@ package Sidef::Types::Number::Number {
 
     use constant {
 
-        YAFU_MIN               => 49,                                    # in decimal digits
-        FACTORDB_MIN           => 65,                                    # in decimal digits
-        SPECIAL_FACTORS_MIN    => 36,                                    # in decimal digits (must be greater than SMALL_NUMBER_MAX_BITS)
-        SMALL_NUMBER_MAX_BITS  => 110,                                   # in bits (numbers that can be factorized fast)
-        MEDIUM_NUMBER_MAX_BITS => 150,                                   # in bits (numbers that can be factorized moderately fast)
+        YAFU_MIN               => 49,     # in decimal digits
+        FACTORDB_MIN           => 65,     # in decimal digits
+        SPECIAL_FACTORS_MIN    => 36,     # in decimal digits (must be greater than SMALL_NUMBER_MAX_BITS)
+        SMALL_NUMBER_MAX_BITS  => 110,    # in bits (numbers that can be factorized fast)
+        MEDIUM_NUMBER_MAX_BITS => 150,    # in bits (numbers that can be factorized moderately fast)
 
         # Check if we have a recent enough version of Math::Prime::Util (>= 0.75)
         HAS_NEW_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::sopfr)) // 0,
@@ -34498,6 +34498,33 @@ package Sidef::Types::Number::Number {
         _set_int($count);
     }
 
+    # Finds the smallest m >= 0 such that count_func(m) >= target
+    # Uses exponential search + binary search for efficiency (logarithmic number of count evaluations)
+    sub inverse_count {
+        my ($n, $count_func, $bsearch_method) = @_;
+        $bsearch_method //= 'bsearch_min';
+
+        goto &nan if $n->is_neg;
+
+        my $lo = _set_int(0);
+        my $hi = _set_int(1);
+
+        # Exponential search to find a sufficient upper bound
+        while ($count_func->($hi)->lt($n)) {
+            $lo = $hi;
+            $hi = $hi->mul(TWO);
+        }
+
+        $lo->$bsearch_method(
+            $hi,
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $count_func->($_[0])->cmp($n);
+                }
+            )
+        );
+    }
+
     sub rough_count {
         my ($k, $from, $to) = @_;
 
@@ -34627,6 +34654,64 @@ package Sidef::Types::Number::Number {
         }
 
         _set_int($result);
+    }
+
+    sub nth_smooth {
+        my ($n, $k) = @_;
+
+        my $n_z = _any2mpz($$n, 0) // goto &nan;
+        my $k_z = _any2mpz($$k, 1) // goto &nan;
+
+        if (   Math::GMPz::Rmpz_sgn($n_z) <= 0
+            or Math::GMPz::Rmpz_cmp_ui($k_z, 1) <= 0) {
+            goto &nan;
+        }
+
+        $n->inverse_count(sub { $k->smooth_count($_[0]) }, 'bsearch_min');
+    }
+
+    sub nth_rough {
+        my ($n, $k) = @_;
+
+        my $n_z = _any2mpz($$n, 0) // goto &nan;
+
+        if (Math::GMPz::Rmpz_sgn($n_z) <= 0) {
+            goto &nan;
+        }
+
+        $n->inverse_count(sub { $k->rough_count($_[0]) }, 'bsearch_min');
+    }
+
+    sub next_smooth {
+        my ($n, $k) = @_;
+        $n->is_zero && return ONE;
+        my $count = $k->smooth_count($n);
+        $count = $count->inc if $n->is_smooth($k);
+        $count->nth_smooth($k);
+    }
+
+    sub next_rough {
+        my ($n, $k) = @_;
+        $n->is_zero && return ONE;
+        my $count = $k->rough_count($n);
+        $count = $count->inc if $n->is_rough($k);
+        $count->nth_rough($k);
+    }
+
+    sub prev_smooth {
+        my ($n, $k) = @_;
+        $n->le(ONE) && goto &nan;
+        my $count = $k->smooth_count($n);
+        $count = $count->dec if $n->is_smooth($k);
+        $count->nth_smooth($k);
+    }
+
+    sub prev_rough {
+        my ($n, $k) = @_;
+        $n->le(ONE) && goto &nan;
+        my $count = $k->rough_count($n);
+        $count = $count->dec if $n->is_rough($k);
+        $count->nth_rough($k);
     }
 
     sub legendre_phi {

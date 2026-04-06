@@ -1857,4 +1857,24 @@ assert_eq(prime_count(5000000000000000 + 1000), 142377417196393)
 assert_eq(prime_count(123456, 5000000000000000 + 1000), 142377417184792)
 assert_eq(prime_count(123456, 5000000000000000 - 1000), 142377417184733)
 
+assert_eq(nth_rough(100, 13), 481)
+assert_eq(nth_smooth(100, 13), 210)
+assert_eq(inverse_count(25, { .prime_count }), 97)
+
+do {
+    var n = 0; var k = irand(2, 20);
+    100.times { n = next_smooth(n, k) }
+    assert_eq(n, nth_smooth(100, k))
+    50.times { n = prev_smooth(n, k) }
+    assert_eq(n, nth_smooth(50, k))
+}
+
+do {
+    var n = 0; var k = irand(2, 20);
+    100.times { n = next_rough(n, k) }
+    assert_eq(n, nth_rough(100, k))
+    50.times { n = prev_rough(n, k) }
+    assert_eq(n, nth_rough(50, k))
+}
+
 say "** Tests passed!"

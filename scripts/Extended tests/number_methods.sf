@@ -192,4 +192,22 @@ assert(998032357356412591777676213773404801168359155639300810254677.is_omega_pri
 assert(1000000000000000000000000000000000000000239299329230617529590083.is_almost_prime(5))
 assert(1000000000000000000000000000000000000000239299329230617529590083.is_omega_prime(5))
 
+assert_eq(  # A394580
+    gather {
+        for n in (1..7) {
+            take(nth_smooth(n.prime.smooth_count(pn_primorial(n+1)), n.prime))
+        }
+    },
+    %n[4, 27, 200, 2304, 30000, 510300, 9696375]
+)
+
+assert_eq(  # A394581
+    gather {
+        for n in (1..7) {
+            take(nth_smooth(n.prime.smooth_count(pn_primorial(n+1))+1, n.prime))
+        }
+    },
+    %n[8, 32, 216, 2352, 30184, 511056, 9702000]
+)
+
 say ":: Test passed!"
