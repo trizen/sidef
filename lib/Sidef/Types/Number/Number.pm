@@ -34442,64 +34442,57 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
+        # Array of all primes up to $k
+        my @P = (HAS_PRIME_UTIL ? @{Math::Prime::Util::primes($k)} : Math::Prime::Util::GMP::sieve_primes(2, $k));
+
+        # ========================================================================
+        # TIER 1 – native (UV) arithmetic
+        # psi_small($x, $i): count of P[$i]-smooth numbers ≤ $x,  $x a plain UV
+        # ========================================================================
+        my @ms;
+        my $psi_small = sub {
+            my ($x, $i) = @_;    # $x is a native UV
+
+            if (HAS_PRIME_UTIL) {
+                return Math::Prime::Util::smooth_count($x, $P[$i]);
+            }
+
+            $x || return 0;
+
+            # Count powers of 2 in [1..$x] = number of bits in $x.
+            $i || return 1 + (HAS_PRIME_UTIL ? Math::Prime::Util::logint($x, 2) : Math::Prime::Util::GMP::logint($x, 2));
+
+            ($x < $P[$i])
+              ? $x
+              : ($ms[$i]{$x} //= __SUB__->($x, $i - 1) + __SUB__->(int($x / $P[$i]), $i));
+        };
+
+        # ========================================================================
+        # TIER 2 – Math::GMPz arithmetic
+        # psi_big($x, $i): same, but $x is a Math::GMPz (x > ULONG_MAX)
+        # ========================================================================
+        my @mb;
         my $count = sub {
-            my ($n, $k) = @_;
+            my ($x, $i) = @_;    # $x is a Math::GMPz
 
-            if (!ref($n) or Math::GMPz::Rmpz_fits_slong_p($n)) {
-
-                if (ref($n)) {
-                    $k == 2 and return Math::GMPz::Rmpz_sizeinbase($n, 2);
-                    $n = Math::GMPz::Rmpz_get_ui($n);
-                }
-
-                if ($k == 2) {
-                    return 1 + (HAS_PRIME_UTIL ? Math::Prime::Util::logint($n, 2) : Math::Prime::Util::GMP::logint($n, 2));
-                }
-
-                my $q   = _prev_prime($k);
-                my $sum = 0;
-
-                for (my $t = 1 ; ; $t *= $k) {
-                    my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::divint($n, $t) : Math::Prime::Util::GMP::divint($n, $t));
-                    if ($r <= $q) {
-                        $sum += $r;
-                        last;
-                    }
-                    $sum += __SUB__->($r, $q);
-                }
-
-                return $sum;
+            # Hand off to the fast native tier as soon as possible
+            if ($x < ULONG_MAX) {
+                return $psi_small->($x, $i);
             }
 
-            my $sum = Math::GMPz::Rmpz_sizeinbase($n, 2);
+            $x || return 0;
 
-            if ($k == 2) {
-                return $sum;
-            }
+            # sizeinbase($x, 2) = floor(log2 $x) + 1 = # of 2-smooth numbers ≤ $x.
+            $i || return 1 + Math::Prime::Util::GMP::logint($x, 2);
 
-            my $t = Math::GMPz::Rmpz_init();
-
-            for (my $p = 3 ; $p <= $k ; $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
-
-                Math::GMPz::Rmpz_div_ui($t, $n, $p);
-
-                if (Math::GMPz::Rmpz_cmp_ui($t, $p) <= 0) {
-                    $sum += Math::GMPz::Rmpz_get_ui($t);
-                }
-                else {
-                    $sum += __SUB__->($t, $p);
-                }
-            }
-
-            $sum;
+            $mb[$i]{$x} //= Math::Prime::Util::GMP::addint(__SUB__->($x, $i - 1), __SUB__->(Math::Prime::Util::GMP::divint($x, $P[$i]), $i));
           }
-          ->($n, _prev_prime($k + 1));
+          ->(Math::GMPz::Rmpz_get_str($n, 10), $#P);
 
         _set_int($count);
     }
 
     # Finds the smallest m >= 0 such that count_func(m) >= target
-    # Uses exponential search + binary search for efficiency (logarithmic number of count evaluations)
     sub inverse_count {
         my ($n, $count_func, $bsearch_method) = @_;
         $bsearch_method //= 'bsearch_min';
