@@ -4,7 +4,8 @@ package Sidef::Types::Block::Block {
     use 5.016;
     use parent qw(Sidef::Object::Object);
 
-    use List::Util qw();
+    use List::Util   qw();
+    use Scalar::Util qw();
     use Sidef::Types::Number::Number;
 
     use overload
@@ -17,31 +18,34 @@ package Sidef::Types::Block::Block {
         my $addr = Scalar::Util::refaddr($self);
 
         my @vars = map {
-                (defined($_->{type}) ? (Sidef::normalize_type($_->{type}) . ' ') : '')
-              . ($_->{slurpy}        ? ($_->{array} ? '*' : ':')                 : '')
-              . Sidef::normalize_type($_->{name})
-              . (defined($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
-              . ($_->{has_value}       ? ' = nil'                                      : '')
-        } @{$self->{vars}};
+            my $v   = $_;
+            my $str = defined($v->{type}) ? Sidef::normalize_type($v->{type}) . ' ' : '';
+            $str .= $v->{slurpy} ? ($v->{array} ? '*' : ':') : '';
+            $str .= Sidef::normalize_type($v->{name});
+            $str .= defined($v->{subset}) ? ' < ' . Sidef::normalize_type($v->{subset}) : '';
+            $str .= $v->{has_value}       ? ' = nil'                                    : '';
+            $str;
+        } @{$self->{vars} // []};
 
-        (
-         $self->{type} eq 'block'
-         ? ('{' . (@vars ? ('|' . join(',', @vars) . '|') : ''))
-         : ('func (' . join(', ', @vars) . ') {')
-        )
-          . " #`($name|$addr) ... }";
+        my $sig = @vars ? join(', ', @vars) : '';
+
+        my $prefix =
+          $self->{type} eq 'block'
+          ? '{' . ($sig ? "|$sig|" : '')
+          : "func ($sig) {";
+
+        return "$prefix #`($name|$addr) ... }";
       };
 
     sub _name {
         my ($self) = @_;
-        $self->{_name} //= Sidef::normalize_type(
-                                                 (
-                                                    exists($self->{class})     ? ($self->{class} . '.')
-                                                  : exists($self->{namespace}) ? ($self->{namespace} . '::')
-                                                  :                              ''
-                                                 )
-                                                 . ($self->{name} // '__FUNC__')
-                                                );
+        $self->{_name} //= do {
+            my $prefix =
+                exists($self->{class})     ? "$self->{class}."
+              : exists($self->{namespace}) ? "$self->{namespace}::"
+              :                              '';
+            Sidef::normalize_type($prefix . ($self->{name} // '__FUNC__'));
+        };
     }
 
     sub new {
@@ -359,7 +363,7 @@ package Sidef::Types::Block::Block {
     sub call {
         my ($block, @args) = @_;
 
-        # Handle block calls
+        # Fast block call routing
         if ($block->{type} eq 'block') {
             shift @_;
             goto $block->{code};
@@ -371,22 +375,17 @@ package Sidef::Types::Block::Block {
         if (exists $self->{returns}) {
 
             if ($#{$self->{returns}} != $#objs) {
-                die qq{[ERROR] Wrong number of return values from $self->{type} `}
-                  . $self->_name
-                  . "`: got "
-                  . scalar(@objs)
-                  . ", but expected "
-                  . scalar(@{$self->{returns}}) . "\n";
+                die sprintf("[ERROR] Wrong number of return values from %s `%s`: got %d, but expected %d\n",
+                            $self->{type}, $self->_name, scalar(@objs), scalar(@{$self->{returns}}));
             }
 
             foreach my $i (0 .. $#{$self->{returns}}) {
-                if (not(ref($objs[$i]) eq ($self->{returns}[$i]) or UNIVERSAL::isa($objs[$i], $self->{returns}[$i]))) {
-                    die qq{[ERROR] Invalid return-type for value[$i] from $self->{type} `}
-                      . $self->_name
-                      . "`: got `"
-                      . Sidef::normalize_type(ref($objs[$i]))
-                      . qq{`, but expected `}
-                      . Sidef::normalize_type($self->{returns}[$i]) . "`\n";
+                my $ret_type = $self->{returns}[$i];
+                if (!(ref($objs[$i]) eq $ret_type or UNIVERSAL::isa($objs[$i], $ret_type))) {
+                    die sprintf("[ERROR] Invalid return-type for value[%d] from %s `%s`: got `%s`, but expected `%s`\n",
+                                $i, $self->{type}, $self->_name,
+                                Sidef::normalize_type(ref($objs[$i])),
+                                Sidef::normalize_type($ret_type));
                 }
             }
         }
@@ -402,7 +401,7 @@ package Sidef::Types::Block::Block {
             sub {
                 my @args = @_;
                 local *UNIVERSAL::AUTOLOAD = $ref;
-                if (defined($a) || defined($b)) { push @args, $a, $b }
+                if (defined($a) or defined($b)) { push @args, $a, $b }
                 elsif (defined($_)) { unshift @args, $_ }
                 $self->call(map { Sidef::Types::Perl::Perl->to_sidef($_) } @args);
             };
@@ -493,41 +492,26 @@ package Sidef::Types::Block::Block {
 
         if ($ref eq 'Sidef::Types::Number::Number') {
             my ($type, $str) = $obj->_dump();
-
-            if ($type eq 'int') {
-                return scalar {dump => ($ref . "::_set_int('${str}')")};
-            }
-
-            return scalar {dump => ($ref . "::_set_str('${type}', '${str}')")};
+            return
+              scalar {
+                      dump => $type eq 'int'
+                      ? "${ref}::_set_int('${str}')"
+                      : "${ref}::_set_str('${type}', '${str}')"
+                     };
         }
 
         if ($ref eq 'Sidef::Module::OO' or $ref eq 'Sidef::Module::Func') {
 
-            my $module = (
-                          ref($obj->{module})
-                          ? Data::Dump::Filtered::dump_filtered($obj->{module}, __SUB__)
-                          : qq{"$obj->{module}"}
-                         );
+            my $module =
+              ref($obj->{module})
+              ? Data::Dump::Filtered::dump_filtered($obj->{module}, __SUB__)
+              : qq{"$obj->{module}"};
 
             my $module_name = ref($obj->{module}) || $obj->{module};
-
-            my $code = {
-                dump => qq{
-                    do {
-                        use $ref;
-                        eval "require $module_name";
-                        bless({ module => $module }, "$ref");
-                    }
-                }
-            };
-
-            return $code;
+            return scalar {dump => qq{do { use $ref; eval "require $module_name"; bless({ module => $module }, "$ref"); }}};
         }
 
-        if ($ref eq 'Sidef::Types::Block::Block') {
-            die "[ERROR] Blocks cannot be serialized!";
-        }
-
+        die "[ERROR] Blocks cannot be serialized!" if $ref eq 'Sidef::Types::Block::Block';
         return;
     }
 
@@ -578,15 +562,7 @@ package Sidef::Types::Block::Block {
             *threads::wait = \&threads::join;
             1;
         };
-        Sidef::Module::OO->__NEW__(
-                                   threads->create(
-                                                   {
-                                                    'context' => 'list',
-                                                    'exit'    => 'thread_only'
-                                                   },
-                                                   sub { $self->call(@args) }
-                                                  )
-                                  );
+        Sidef::Module::OO->__NEW__(threads->create({'context' => 'list', 'exit' => 'thread_only'}, sub { $self->call(@args) }));
     }
 
     *thr = \&thread;
@@ -600,7 +576,7 @@ package Sidef::Types::Block::Block {
 
             my $sub = (ref($obj) && UNIVERSAL::can($obj, 'iter')) || do {
                 my $arr = eval { ref($obj) ? $obj->to_a : Sidef::Types::Array::Array->new($obj) };
-                ref($arr) ? do { $obj = $arr; UNIVERSAL::can($obj, 'iter') } : ();
+                ref($arr) ? do { $obj = $arr; UNIVERSAL::can($obj, 'iter') } : undef;
             };
 
             my $break;
@@ -608,13 +584,10 @@ package Sidef::Types::Block::Block {
 
             while (1) {
                 $break = 1;
-                $callback->(
-                            $iter->run // do { undef $break; last }
-                           );
+                $callback->($iter->run // do { undef $break; last });
                 undef $break;
             }
-
-            return if $break;
+            return if $break;    # Sidef block-exit control flow
         }
 
         return 1;
@@ -625,8 +598,7 @@ package Sidef::Types::Block::Block {
         require Time::HiRes;
         my $t0 = [Time::HiRes::gettimeofday()];
         $self->run;
-        my $elapsed = Time::HiRes::tv_interval($t0);
-        Sidef::Types::Number::Number->new($elapsed);
+        Sidef::Types::Number::Number->new(scalar Time::HiRes::tv_interval($t0));
     }
 
     sub for {
@@ -642,14 +614,7 @@ package Sidef::Types::Block::Block {
         my ($self, @objs) = @_;
 
         my @array;
-
-        _iterate(
-            sub {
-                push @array, $self->run(@_);
-            },
-            @objs
-        );
-
+        _iterate(sub { push @array, $self->run(@_) }, @objs);
         Sidef::Types::Array::Array->new(\@array);
     }
 
@@ -657,16 +622,7 @@ package Sidef::Types::Block::Block {
         my ($self, @objs) = @_;
 
         my @array;
-
-        _iterate(
-            sub {
-                if ($self->run(@_)) {
-                    push @array, @_;
-                }
-            },
-            @objs
-        );
-
+        _iterate(sub { push @array, @_ if $self->run(@_) }, @objs);
         Sidef::Types::Array::Array->new(\@array);
     }
 
@@ -706,7 +662,7 @@ package Sidef::Types::Block::Block {
         my $nth = undef;
 
         $n = CORE::int($n);
-        $n > 0 || return undef;
+        $n > 0 or return undef;
 
         _iterate(
             sub {
@@ -721,18 +677,9 @@ package Sidef::Types::Block::Block {
         return $nth;
     }
 
-    sub sum {
-        my ($self, $range) = @_;
-        $range->sum_by($self);
-    }
-
+    sub sum { $_[1]->sum_by($_[0]) }
     *Σ = \&sum;
-
-    sub prod {
-        my ($self, $range) = @_;
-        $range->prod_by($self);
-    }
-
+    sub prod { $_[1]->prod_by($_[0]) }
     *Π = \&prod;
 
     sub cache {
