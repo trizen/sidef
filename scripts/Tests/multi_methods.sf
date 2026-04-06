@@ -31,7 +31,7 @@ class Fib {
         return n
     }
 
-    method nth(n) {
+    method nth(Number n) {
         self.nth(n-1) + self.nth(n-2)
     }
 }
@@ -39,6 +39,7 @@ class Fib {
 var f = Fib();
 assert_eq(f.nth(), 0);
 assert_eq(f.nth(12), 144);
+assert_eq(try { f.nth("foo") } catch { "fail" }, "fail")
 
 
 #

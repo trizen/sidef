@@ -87,218 +87,273 @@ package Sidef::Types::Block::Block {
 
     *do = \&run;
 
-    sub _multiple_dispatch {
-        my ($self, @args) = @_;
+    # Recursively walks the ISA hierarchy to discover additional method candidates
+    # from parent classes, appending them (with their kids/fallback) to @$methods.
+    sub _collect_inherited_methods {
+        my ($self, $methods) = @_;
 
-#<<<
-        my @methods = (
-            $self,
-            (exists($self->{kids})     ? @{$self->{kids}}  : ()),
-            (exists($self->{fallback}) ? $self->{fallback} : ())
-        );
-#>>>
+        my $limit = 4096;
+        my %visited;
 
-        if (defined($self->{class}) and defined($self->{name})) {
+        sub {
+            my ($block) = @_;
 
-            my $limit = 4096;
+            my $name = $block->{name};
+            my @isa  = do {
+                no strict 'refs';
+                @{$block->{class} . '::ISA'};
+            };
 
-            sub {
-                my ($block) = @_;
+            foreach my $class (@isa) {
+                next if $visited{$class}++;
+                substr($class, 0, 14) eq 'Sidef::Runtime' or next;
 
-                my $name = $block->{name};
-
-                my @isa = do {
+                my $method = do {
                     no strict 'refs';
-                    @{$block->{class} . '::' . 'ISA'};
+                    ${$class . '::__SIDEF_CLASS_METHODS__'}{$name};
                 };
 
-                foreach my $class (@isa) {
+                defined($method) or next;
 
-                    (substr($class, 0, 14) eq 'Sidef::Runtime')
-                      || next;
+                push @$methods, $method;
+                push @$methods, @{$method->{kids}}  if exists $method->{kids};
+                push @$methods, $method->{fallback} if exists $method->{fallback};
 
-                    my $method = do {
-                        no strict 'refs';
-                        ${$class . '::' . '__SIDEF_CLASS_METHODS__'}{$name};
-                    };
-
-                    if (defined($method)) {
-                        push @methods, $method;
-
-                        if (exists($method->{kids})) {
-                            push @methods, @{$method->{kids}};
-                        }
-
-                        if (exists($method->{fallback})) {
-                            push @methods, $method->{fallback};
-                        }
-
-                        if (--$limit == 0) {
-                            die "[ERROR] Too deep or cyclic class inheritance!";
-                        }
-
-                        __SUB__->($method);
-                    }
+                if (--$limit == 0) {
+                    die "[ERROR] Too deep or cyclic class inheritance!";
                 }
-              }
-              ->($self);
+
+                __SUB__->($method);
+            }
+          }
+          ->($self);
+    }
+
+    # Builds the full list of candidate methods: self, kids, fallback, and any
+    # candidates found by walking the class inheritance hierarchy.
+    sub _collect_candidate_methods {
+        my ($self) = @_;
+
+        my @methods = ($self);
+
+        if (exists $self->{kids}) {
+            push @methods, @{$self->{kids}};
         }
 
-      OUTER: foreach my $method (@methods) {
+        if (exists $self->{fallback}) {
+            push @methods, $self->{fallback};
+        }
 
-            if ($method->{type} eq 'block') {
-                return ($method, $method->{code}(@args));
-            }
+        if (defined $self->{class} and defined $self->{name}) {
+            $self->_collect_inherited_methods(\@methods);
+        }
 
-            my $table = $self->{table};
+        return @methods;
+    }
 
-            my %seen;
-            my @left_args;
-            my @vars = exists($method->{vars}) ? @{$method->{vars}} : ();
+    # Validates type and subset constraints for each parameter and assembles the
+    # final positional argument list for the call. Returns an \@pos_args arrayref,
+    # or undef if any constraint check fails.
+    sub _build_pos_args {
+        my ($method, $seen, $vars) = @_;
 
-            foreach my $arg (@args) {
-                if (ref($arg) eq 'Sidef::Variable::NamedParam') {
-                    if (exists $table->{$arg->{name}}) {
-                        my $info = $vars[$table->{$arg->{name}}];
-                        if (exists $info->{slurpy}) {
-                            $seen{$arg->{name}} = $arg->{value};
-                        }
-                        else {
-                            $seen{$arg->{name}} = $arg->{value}[-1];
-                        }
-                    }
-                    else {
-                        next OUTER;
-                    }
-                }
-                else {
-                    push @left_args, $arg;
-                }
-            }
+        my @pos_args;
 
-            foreach my $var (@vars) {
-                exists($seen{$var->{name}}) && next;
-                @left_args || last;
-                if (exists($var->{slurpy})) {
-                    $seen{$var->{name}} = [splice(@left_args)];
-                    last;
-                }
-                else {
-                    $seen{$var->{name}} = shift(@left_args);
-                }
-            }
+        foreach my $var (@$vars) {
+            if (exists($var->{type}) or exists($var->{subset})) {
 
-            @left_args && next;
+                if (exists $seen->{$var->{name}}) {
+                    my $value = $seen->{$var->{name}};
 
-            my @pos_args;
-            foreach my $var (@vars) {
-                if (exists($var->{type}) or exists($var->{subset})) {
-
-                    if (exists $seen{$var->{name}}) {
-                        my $value = $seen{$var->{name}};
-
-                        if (exists($var->{type})) {
-                            (ref($value) eq $var->{type} or UNIVERSAL::isa($value, $var->{type})) || next OUTER;
-
-                            if (exists($var->{where_block})) {
-                                $var->{where_block}($value) || next OUTER;
-                            }
-                            elsif (exists $var->{where_expr}) {
-                                $value eq $var->{where_expr} or next OUTER;
-                            }
-                        }
-
-                        if (exists($var->{subset})) {
-
-                            if (UNIVERSAL::isa($var->{subset}, 'Sidef::Object::Object')) {
-                                UNIVERSAL::isa($var->{subset}, ref($value)) || next OUTER;
-                            }
-
-                            if (exists($var->{where_block})) {
-                                $var->{where_block}($value) || next OUTER;
-                            }
-                            elsif (exists $var->{where_expr}) {
-                                $value eq $var->{where_expr} or next OUTER;
-                            }
-
-                            my $sub = UNIVERSAL::can($var->{subset}, '__subset_validation__');
-                            ($sub ? $sub->($value) : 1) || next OUTER;
-                        }
-
-                        push @pos_args, $value;
-                    }
-                    elsif (exists $var->{has_value}) {
-                        push @pos_args, undef;
-                    }
-                    else {
-                        next OUTER;
-                    }
-                }
-                elsif (exists $seen{$var->{name}}) {
-                    if (exists($var->{where_block}) or exists($var->{subset_blocks})) {
-
-                        my $value =
-                          exists($var->{slurpy})
-                          ? Sidef::Types::Array::Array->new([@{$seen{$var->{name}}}])
-                          : $seen{$var->{name}};
+                    if (exists $var->{type}) {
+                        (ref($value) eq $var->{type} or UNIVERSAL::isa($value, $var->{type}))
+                          or return undef;
 
                         if (exists $var->{where_block}) {
-                            $var->{where_block}($value) || next OUTER;
+                            $var->{where_block}($value) or return undef;
+                        }
+                        elsif (exists $var->{where_expr}) {
+                            $value eq $var->{where_expr} or return undef;
                         }
                     }
-                    elsif (exists $var->{where_expr}) {
-                        $var->{where_expr} eq $seen{$var->{name}} or next OUTER;
+
+                    if (exists $var->{subset}) {
+                        if (UNIVERSAL::isa($var->{subset}, 'Sidef::Object::Object')) {
+                            UNIVERSAL::isa($var->{subset}, ref($value)) or return undef;
+                        }
+
+                        if (exists $var->{where_block}) {
+                            $var->{where_block}($value) or return undef;
+                        }
+                        elsif (exists $var->{where_expr}) {
+                            $value eq $var->{where_expr} or return undef;
+                        }
+
+                        my $sub = UNIVERSAL::can($var->{subset}, '__subset_validation__');
+                        ($sub ? $sub->($value) : 1) or return undef;
                     }
 
-                    push @pos_args, exists($var->{slurpy}) ? @{$seen{$var->{name}}} : $seen{$var->{name}};
-                }
-                elsif (exists $var->{slurpy}) {
-                    ## ok
+                    push @pos_args, $value;
                 }
                 elsif (exists $var->{has_value}) {
                     push @pos_args, undef;
                 }
                 else {
-                    next OUTER;
+                    return undef;
                 }
-            }
 
-            return ($method, $method->{code}->(@pos_args));
+            }
+            elsif (exists $seen->{$var->{name}}) {
+
+                if (exists($var->{where_block})) {
+                    my $value =
+                      exists($var->{slurpy})
+                      ? Sidef::Types::Array::Array->new([@{$seen->{$var->{name}}}])
+                      : $seen->{$var->{name}};
+
+                    if (exists $var->{where_block}) {
+                        $var->{where_block}($value) or return undef;
+                    }
+                }
+                elsif (exists $var->{where_expr}) {
+                    $var->{where_expr} eq $seen->{$var->{name}} or return undef;
+                }
+
+                push @pos_args, exists($var->{slurpy})
+                  ? @{$seen->{$var->{name}}}
+                  : $seen->{$var->{name}};
+            }
+            elsif (exists $var->{slurpy}) {
+                ## ok - slurpy with no args supplied is valid
+            }
+            elsif (exists $var->{has_value}) {
+                push @pos_args, undef;
+            }
+            else {
+                return undef;
+            }
         }
 
-        my $name = $self->_name;
+        return \@pos_args;
+    }
 
-        die "[ERROR] $self->{type} `$name` does not match $name("
-          . join(', ', map { ref($_) ? Sidef::normalize_type(ref($_)) : defined($_) ? Sidef::normalize_type($_) : 'nil' } @args)
-          . "), invoked as "
-          . $name . '('
-          . join(
-            ', ',
-            map {
-                    ref($_) && UNIVERSAL::can($_, 'dump') ? $_->dump
-                  : ref($_)                               ? Sidef::normalize_type(ref($_))
-                  : defined($_)                           ? Sidef::normalize_type($_)
-                  : 'nil'
-              } @args
-          )
-          . ')'
+    # Partitions @$args into named and positional arguments, then binds them to the
+    # method's parameter list in order. Returns a \%seen hashref mapping variable
+    # names to their bound values, or undef if the method signature does not match.
+    sub _resolve_args {
+        my ($self, $method, $args, $vars) = @_;
+
+        my $table = $self->{table};
+        my %seen;
+        my @left_args;
+
+        # Separate named params from positional args, validating named params exist.
+        foreach my $arg (@$args) {
+            if (ref($arg) eq 'Sidef::Variable::NamedParam') {
+                exists($table->{$arg->{name}}) or return undef;
+                my $info = $vars->[$table->{$arg->{name}}];
+                $seen{$arg->{name}} =
+                  exists($info->{slurpy})
+                  ? $arg->{value}
+                  : $arg->{value}[-1];
+            }
+            else {
+                push @left_args, $arg;
+            }
+        }
+
+        # Bind remaining positional args to unbound parameters, in declaration order.
+        foreach my $var (@$vars) {
+            next if exists $seen{$var->{name}};
+            last unless @left_args;
+
+            if (exists $var->{slurpy}) {
+                $seen{$var->{name}} = [splice(@left_args)];
+                last;
+            }
+            else {
+                $seen{$var->{name}} = shift(@left_args);
+            }
+        }
+
+        # Any leftover positional args mean this method does not match.
+        return undef if @left_args;
+
+        return \%seen;
+    }
+
+    # Main entry point: finds and dispatches to the first matching method candidate.
+    sub _multiple_dispatch {
+        my ($self, @args) = @_;
+
+        my @methods = $self->_collect_candidate_methods;
+
+        foreach my $method (@methods) {
+
+            if ($method->{type} eq 'block') {
+                return ($method, $method->{code}(@args));
+            }
+
+            my $vars     = exists($method->{vars}) ? $method->{vars} : [];
+            my $seen     = $self->_resolve_args($method, \@args, $vars) // next;
+            my $pos_args = _build_pos_args($method, $seen, $vars)       // next;
+
+            return ($method, $method->{code}->(@$pos_args));
+        }
+
+        _dispatch_error($self, \@methods, \@args);
+    }
+
+    # Returns the display type string for an argument (used in the error header line).
+    sub _arg_type_str {
+        my ($arg) = @_;
+        return
+            ref($arg)     ? Sidef::normalize_type(ref($arg))
+          : defined($arg) ? Sidef::normalize_type($arg)
+          :                 'nil';
+    }
+
+    # Returns the display value string for an argument (used in the "invoked as" line).
+    sub _arg_value_str {
+        my ($arg) = @_;
+        return
+            ref($arg) && UNIVERSAL::can($arg, 'dump') ? $arg->dump
+          : ref($arg)                                 ? Sidef::normalize_type(ref($arg))
+          : defined($arg)                             ? Sidef::normalize_type($arg)
+          :                                             'nil';
+    }
+
+    # Formats a single parameter's signature fragment, e.g. "*SomeType varname < SubType".
+    sub _param_str {
+        my ($var) = @_;
+        return
+            (exists($var->{slurpy}) ? '*'                                       : '')
+          . (exists($var->{type})   ? Sidef::normalize_type($var->{type}) . ' ' : '')
+          . $var->{name}
+          . (exists($var->{subset}) ? ' < ' . Sidef::normalize_type($var->{subset}) : '');
+    }
+
+    # Formats a complete method signature string, e.g. "methodName(TypeA a, *B b)".
+    sub _method_signature_str {
+        my ($method) = @_;
+        my @params = map { _param_str($_) } @{$method->{vars} // []};
+        return $method->_name . '(' . join(', ', @params) . ')';
+    }
+
+    # Dies with a detailed message describing the failed dispatch and all candidates.
+    sub _dispatch_error {
+        my ($self, $methods, $args) = @_;
+
+        my $name       = $self->_name;
+        my $arg_types  = join(', ',     map { _arg_type_str($_) } @$args);
+        my $arg_values = join(', ',     map { _arg_value_str($_) } @$args);
+        my $candidates = join("\n    ", map { _method_signature_str($_) } @$methods);
+
+        die "[ERROR] $self->{type} `$name` does not match $name($arg_types)"
+          . ", invoked as $name($arg_values)"
           . "\n\nPossible candidates are: "
           . "\n    "
-          . join(
-            "\n    ",
-            map {
-                $_->_name . '(' . join(
-                    ', ',
-                    map {
-                            (exists($_->{slurpy}) ? '*'                                       : '')
-                          . (exists($_->{type})   ? (Sidef::normalize_type($_->{type}) . ' ') : '')
-                          . $_->{name}
-                          . (exists($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
-                    } @{$_->{vars}}
-                  )
-                  . ')'
-              } @methods
-          ) . "\n\n";
+          . $candidates . "\n\n";
     }
 
     sub call {
