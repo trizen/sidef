@@ -379,20 +379,98 @@ package Sidef::Types::Number::Polynomial {
     sub roots {
         my ($f) = @_;
 
-        my $degree         = $f->degree;
-        my @roots_of_unity = @{$degree->roots_of_unity};
+        my $degree_obj     = $f->degree;
+        my @roots_of_unity = @{$degree_obj->roots_of_unity};
 
         @roots_of_unity || return Sidef::Types::Array::Array->new;
 
         my $df = $f->derivative;
 
-        my $prec     = Sidef::Types::Number::Number::_set_int(-((CORE::int($Sidef::Types::Number::Number::PREC) >> 2) - 1));
-        my $prec_min = Sidef::Types::Number::Number::_set_int(-(CORE::int($Sidef::Types::Number::Number::PREC) >> 3));
+        my $prec_bits = CORE::int($Sidef::Types::Number::Number::PREC);
+        my $prec      = Sidef::Types::Number::Number::_set_int(-(($prec_bits >> 2) - 1));
+        my $prec_min  = Sidef::Types::Number::Number::_set_int(-($prec_bits >> 3));
 
+        my $degree = CORE::int($degree_obj);
+
+        # '1' and '0' using the Sidef Number objects
+        state $one  = Sidef::Types::Number::Number::ONE;
+        state $zero = Sidef::Types::Number::Number::ZERO;
+
+        # PHASE 1: Aberth-Ehrlich Initialization
+        # We slightly scale and rotate the roots of unity to break perfect symmetry.
+        # Newton methods easily stall on axes when handling symmetric biquadratic polynomials.
+        my $perturbation = Sidef::Types::Number::Complex->new(Sidef::Types::Number::Number->new('1.1'), Sidef::Types::Number::Number->new('0.2'));  # 1.1 + 0.2i
+        my @z            = map { $perturbation->mul($_) } @roots_of_unity;
+
+        my $I = Sidef::Types::Number::Complex->new($zero, $one);
+
+        # Calculate dynamic max_iter
+        # Example: Base 50 + (2 * degree) + log2(precision)
+        my $log2_prec = CORE::log($prec_bits > 0 ? $prec_bits : 2) / CORE::log(2);
+        my $max_iter  = 50 + (2 * $degree) + CORE::int($log2_prec);
+
+        # PHASE 2: Aberth-Ehrlich Simultaneous Iteration
+        for my $iter (1 .. $max_iter) {
+            my $all_converged = 1;
+            my @z_next;
+
+            for my $i (0 .. $#z) {
+                my $zi = $z[$i];
+
+                my $pz = $f->eval($zi);
+                if ($pz->round($prec)->is_zero) {
+                    push @z_next, $zi;
+                    next;
+                }
+
+                my $dpz = $df->eval($zi);
+                if ($dpz->round($prec)->is_zero) {
+                    $zi  = $zi->add($I);     # Perturb slightly to avoid division by zero
+                    $pz  = $f->eval($zi);
+                    $dpz = $df->eval($zi);
+                }
+
+                my $w   = $pz->div($dpz);    # Standard Newton step
+                my $sum = $zero;
+
+                # Electrostatic repulsion term from all other roots
+                for my $j (0 .. $#z) {
+                    next if $i == $j;
+                    my $diff = $zi->sub($z[$j]);
+                    if (!$diff->round($prec)->is_zero) {
+                        $sum = $sum->add($diff->inv);
+                    }
+                }
+
+                my $denom = $one->sub($w->mul($sum));
+                my $step;
+
+                if ($denom->round($prec)->is_zero) {
+                    $step = $w;    # Fallback to standard Newton if repulsion cancels out
+                }
+                else {
+                    $step = $w->div($denom);
+                }
+
+                my $zi_new = $zi->sub($step);
+                push @z_next, $zi_new;
+
+                if (!$step->round($prec)->is_zero) {
+                    $all_converged = 0;
+                }
+            }
+
+            @z = @z_next;
+            last if $all_converged;
+        }
+
+        # PHASE 3: Polish and Verify
+        # We run the separated roots through the original Newton polisher
+        # to guarantee they meet Sidef's exact deduplication and precision standards.
         my %seen;
         my @polygonal_roots;
 
-        foreach my $root (@roots_of_unity) {
+        foreach my $root (@z) {
             my $solution = $f->newton_method($root, $df);
             if (defined($solution)) {
                 my $key = join('', $solution->round($prec));
@@ -403,12 +481,9 @@ package Sidef::Types::Number::Polynomial {
             }
         }
 
-        $degree = CORE::int($degree);
-
-        # TODO: find a more efficient approach for inputs like:
-        #       x = Poly(1); roots(5*x**4 + 11*x**2 + 100)
-        #       x = Poly(1); roots(5*x**4 + 9*x**3 + 11*x**2 + 100)
-        #       x = Poly(1); roots(12*x**4 + 11*x**2 + 4171)
+        # PHASE 4: Safety Fallback
+        # In the incredibly rare case Aberth misses a root, we retain the old transformation
+        # fallback to ensure this implementation is strictly >= in success rate to the original.
         if (scalar(@polygonal_roots) != $degree) {
 
             my @transformations = (
@@ -423,24 +498,20 @@ package Sidef::Types::Number::Polynomial {
                                   );
 
             while (@transformations) {
-
                 my $transform = CORE::shift(@transformations);
                 @roots_of_unity = map { $transform->($_) } @roots_of_unity;
 
                 foreach my $root (@roots_of_unity) {
                     my $solution = $f->newton_method($root, $df);
                     if (defined($solution)) {
-
                         my $key = join('', $solution->round($prec));
                         if (!exists($seen{$key}) and $f->eval($solution)->round($prec_min)->is_zero) {
                             push @polygonal_roots, $solution;
                             $seen{$key} = 1;
                         }
-
                         last if (scalar(@polygonal_roots) == $degree);
                     }
                 }
-
                 last if (scalar(@polygonal_roots) == $degree);
             }
         }
