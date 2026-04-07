@@ -163,7 +163,7 @@ greet(punct: "?")              # Hello, World?
 
 ```ruby
 func sum(*nums) {
-    nums.reduce(0, '+')
+    nums.reduce('+', 0)
 }
 say sum(1, 2, 3, 4, 5)    # 15
 
@@ -1363,7 +1363,7 @@ Sidef makes it easy to implement and compare classic algorithms.
 ```ruby
 func quicksort(arr) {
     return arr if (arr.len <= 1)
-    var pivot = arr[arr.len / 2]
+    var pivot = arr[arr.len >> 1]
     var left  = arr.grep { _ < pivot }
     var mid   = arr.grep { _ == pivot }
     var right = arr.grep { _ > pivot }
@@ -1386,8 +1386,8 @@ func merge(a, b) {
 
 func mergesort(arr) {
     return arr if (arr.len <= 1)
-    var mid = arr.len / 2
-    merge(mergesort(arr[0 .. mid-1]), mergesort(arr[mid .. arr.end]))
+    var mid = arr.len>>1
+    merge(mergesort(arr.slice(0, mid)), mergesort(arr.slice(mid)))
 }
 
 say mergesort([5, 2, 8, 1, 9, 3])    # [1, 2, 3, 5, 8, 9]
@@ -1404,7 +1404,7 @@ func radix_sort(arr, base = 10) {
     while (max_val / exp >= 1) {
         var buckets = base.of { [] }
         arr.each { |n|
-            buckets[(n / exp) % base] << n
+            buckets[(n // exp) % base] << n
         }
         arr = buckets.flat
         exp *= base
@@ -1422,9 +1422,9 @@ say radix_sort([170, 45, 75, 90, 802, 24, 2, 66])
 # Sort strings by their vowel count (efficient — compute key once)
 var words = %w(programming sidef beautiful algorithm lazy quick)
 
-var sorted = words
-    .map { |w| [w, w.count("aeiou")] }
-    .sort_by { _[1] }
+var sorted = words \
+    .map { |w| [w, w.count(/[aeiou]/)] } \
+    .sort_by { _[1] } \
     .map { _[0] }
 
 say sorted    # sorted from fewest to most vowels
@@ -1438,46 +1438,46 @@ say sorted    # sorted from fewest to most vowels
 
 ```ruby
 func lcs(String a, String b) is cached {
-    return ""  if (!a || !b)
+    return ""  if (a.is_empty || b.is_empty)
     if (a[-1] == b[-1]) {
-        lcs(a[0..-2], b[0..-2]) + a[-1]
+        lcs(a.slice(0, -1), b.slice(0, -1)) + a[-1]
     } else {
-        var s1 = lcs(a[0..-2], b)
-        var s2 = lcs(a, b[0..-2])
+        var s1 = lcs(a.slice(0, -1), b)
+        var s2 = lcs(a, b.slice(0, -1))
         s1.len >= s2.len ? s1 : s2
     }
 }
 
-say lcs("ABCBDAB", "BDCABA")    # BDAB (or BCAB, BCBA — one LCS)
+say lcs("ABCBDAB", "BDCABA")    # BCBA
 ```
 
 ### Edit Distance (Levenshtein)
 
 ```ruby
 func edit_distance(String a, String b) is cached {
-    return b.len if (!a)
-    return a.len if (!b)
+    return b.len if a.is_empty
+    return a.len if b.is_empty
 
     if (a[0] == b[0]) {
-        edit_distance(a[1..], b[1..])
+        edit_distance(a.slice(1), b.slice(1))
     } else {
         1 + [
-            edit_distance(a[1..], b),       # delete
-            edit_distance(a, b[1..]),       # insert
-            edit_distance(a[1..], b[1..]),  # replace
+            edit_distance(a.slice(1), b),           # delete
+            edit_distance(a, b.slice(1)),           # insert
+            edit_distance(a.slice(1), b.slice(1)),  # replace
         ].min
     }
 }
 
 say edit_distance("kitten", "sitting")    # 3
-say edit_distance("Sunday", "Saturday")  # 3
+say edit_distance("Sunday", "Saturday")   # 3
 ```
 
 ### 0/1 Knapsack Problem
 
 ```ruby
 func knapsack(capacity, weights, values, n) is cached {
-    return 0 if (n == 0 || capacity == 0)
+    return 0 if ((n == 0) || (capacity == 0))
 
     if (weights[n-1] > capacity) {
         knapsack(capacity, weights, values, n-1)
@@ -1506,8 +1506,8 @@ say knapsack(capacity, weights, values, weights.len)    # 10
 var A = Matrix([[1,2],[3,4]])
 var B = Matrix([[5,6],[7,8]])
 
-say A + B     # [[6,8],[10,12]]
-say A * B     # [[19,22],[43,50]]
+say A+B       # [[6,8],[10,12]]
+say A*B       # [[19,22],[43,50]]
 say A.T       # transpose: [[1,3],[2,4]]
 say A.det     # determinant: -2
 say A.inv     # inverse
@@ -1522,7 +1522,7 @@ func matmul(A, B) {
     var n = A.len
     n.of { |i|
         n.of { |j|
-            (0..n-1).map { |k| A[i][k] * B[k][j] }.sum
+            ^n -> sum { |k| A[i][k] * B[k][j] }
         }
     }
 }
@@ -1547,10 +1547,10 @@ say fib_fast(1000)   # (a very large number)
 
 ```ruby
 # Ax = b  →  x = A⁻¹ b
-var A = Matrix([[2, 1], [5, 7]])
-var b = Matrix([[11], [13]])
+var A = Matrix([2, 1], [5, 7])
+var b = Matrix([11], [13])
 
-var x = A.inv * b
+var x = (A.inv * b)
 say x    # [[3], [-1]]  — solution: x₁=3, x₂=-1
 ```
 
@@ -1568,7 +1568,7 @@ func rle_encode(String s) {
         while (i < chars.len) {
             var c = chars[i]
             var count = 1
-            while (i+count < chars.len && chars[i+count] == c) {
+            while ((i+count < chars.len) && (chars[i+count] == c)) {
                 ++count
             }
             take([c, count])
@@ -1592,7 +1592,7 @@ say rle_decode(encoded)    # aaabbbccddddee
 func caesar_encrypt(String text, Number shift) {
     text.chars.map { |c|
         if (c =~ /[a-zA-Z]/) {
-            var base = c =~ /[A-Z]/ ? 'A'.ord : 'a'.ord
+            var base = (c =~ /[A-Z]/ ? 'A'.ord : 'a'.ord)
             ((c.ord - base + shift) % 26 + base).chr
         } else {
             c
@@ -1628,7 +1628,7 @@ var key        = "SECRET"
 var ciphertext = xor_crypt(plaintext, key)
 var recovered  = xor_crypt(ciphertext, key)
 
-say recovered == plaintext    # true
+say (recovered == plaintext)    # true
 ```
 
 ### RSA Key Generation Sketch
@@ -1637,12 +1637,12 @@ say recovered == plaintext    # true
 # Generate two random primes
 var p = random_prime(10**50, 10**51)
 var q = random_prime(10**50, 10**51)
-var n = p * q
-var phi = (p-1) * (q-1)
+var n = (p * q)
+var phi = ((p-1) * (q-1))
 
 # Public exponent
 var e = 65537
-die "Bad e" if gcd(e, phi) != 1
+die "Bad e" if (gcd(e, phi) != 1)
 
 # Private exponent
 var d = invmod(e, phi)
@@ -1652,7 +1652,7 @@ var msg        = 42
 var ciphertext = powmod(msg, e, n)
 var decrypted  = powmod(ciphertext, d, n)
 
-say decrypted == msg    # true
+say (decrypted == msg)    # true
 ```
 
 ---
@@ -1674,7 +1674,7 @@ func twin_primes(limit) {
     }
 }
 
-twin_primes(200).each_with_index { |pair, i|
+twin_primes(200).each_kv { |i,pair|
     say "#{ '%3d' % (i+1) }. (#{pair[0]}, #{pair[1]})"
 }
 ```
@@ -1686,8 +1686,9 @@ Every even integer greater than 2 is the sum of two primes:
 ```ruby
 func goldbach(n) {
     return nil if (n <= 2 || n.is_odd)
-    primes(2, n/2).first { |p| (n - p).is_prime }
-        .then { |p| [p, n - p] }
+    with (primes(2, n/2).first { |p| (n - p).is_prime }) {|p|
+        [p, n-p]
+    }
 }
 
 for n in (4..50 `by` 2) {
@@ -1707,10 +1708,10 @@ func game_of_life(grid, generations) {
         var count = 0
         for dr in (-1..1) {
             for dc in (-1..1) {
-                next if (dr == 0 && dc == 0)
-                var nr = r + dr
-                var nc = c + dc
-                if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                next if ([dr,dc] == [0,0])
+                var nr = (r + dr)
+                var nc = (c + dc)
+                if ((nr >= 0) && (nr < rows) && (nc >= 0) && (nc < cols)) {
                     count += grid[nr][nc]
                 }
             }
@@ -1763,15 +1764,15 @@ func dijkstra(graph, source) {
 
     loop {
         # Pick unvisited vertex with smallest distance
-        var u = graph.keys
-            .grep { !visited.has(_) && dist{_} < Inf }
+        var u = graph.keys \
+            .grep { !visited.has(_) && (dist{_} < Inf) } \
             .min_by { dist{_} }
 
         break if (u == nil)
         visited.add(u)
 
         graph{u}.each { |v, weight|
-            var alt = dist{u} + weight
+            var alt = (dist{u} + weight)
             dist{v} = alt if (alt < dist{v})
         }
     }
@@ -1806,9 +1807,9 @@ func build_model(String text) {
     var total = text.len
 
     var model = Hash()
-    var cumul = 0r
+    var cumul = 0
     freq.keys.sort.each { |c|
-        var p = freq{c} / total
+        var p = (freq{c} / total)
         model{c} = [cumul, cumul + p]
         cumul += p
     }
@@ -1817,7 +1818,7 @@ func build_model(String text) {
 
 var model = build_model("aabbbc")
 model.keys.sort.each { |c|
-    say "#{c}: [#{model{c}[0].as_float.round(4)}, #{model{c}[1].as_float.round(4)})"
+    say "#{c}: [#{model{c}[0].round(-4)}, #{model{c}[1].round(-4)})"
 }
 ```
 
