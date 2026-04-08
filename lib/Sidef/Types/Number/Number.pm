@@ -8,8 +8,8 @@ package Sidef::Types::Number::Number {
     use Math::MPFR qw();
     use Math::MPC  qw();
 
-    use List::Util             qw();
-    use Math::Prime::Util::GMP qw();
+    use List::Util qw();
+    use Math::Prime::Util::GMP 0.53 qw();
 
     our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_PRIMESUM, $USE_PARI_GP, $USE_YAFU, $USE_PFGW, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS, $USE_CONJECTURES);
 
@@ -67,7 +67,7 @@ package Sidef::Types::Number::Number {
         # HAS_NEWER_PRIME_UTIL => (HAS_PRIME_UTIL and defined(&Math::Prime::Util::nth_powerfree))    // 0,
 
         # Check if we have a recent enough version of Math::Prime::Util::GMP
-        HAS_NEW_PRIME_UTIL_GMP => defined(&Math::Prime::Util::GMP::nth_powerfree) // 0,
+        # HAS_NEW_PRIME_UTIL_GMP => defined(&Math::Prime::Util::GMP::nth_powerfree) // 0,
 
         IS_PRIME_CACHE_SIZE   => 1e5,    # how many entries to cache
         PRIMALITY_PRETEST_MIN => 500,    # in decimal digits
@@ -3289,8 +3289,8 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $m = $$m;
 
-        if ((HAS_PRIME_UTIL || HAS_NEW_PRIME_UTIL_GMP) and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
-            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::submod($x, $y, $m) : Math::Prime::Util::GMP::submod($x, $y, $m));
+        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
+            my $r = Math::Prime::Util::submod($x, $y, $m);
             return bless \$r;
         }
 
@@ -12294,12 +12294,7 @@ package Sidef::Types::Number::Number {
                 }
             }
             else {
-                if (HAS_NEW_PRIME_UTIL_GMP) {
-                    eval { $U = Math::Prime::Util::GMP::lucasumod($P, $Q, $n, $m) };
-                }
-                else {
-                    eval { ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($m, $P, $Q, $n) };
-                }
+                eval { $U = Math::Prime::Util::GMP::lucasumod($P, $Q, $n, $m) };
             }
             defined($U) && return _str2obj($U);
         }
@@ -12360,12 +12355,7 @@ package Sidef::Types::Number::Number {
                 }
             }
             else {
-                if (HAS_NEW_PRIME_UTIL_GMP) {
-                    eval { $V = Math::Prime::Util::GMP::lucasvmod($P, $Q, $n, $m) };
-                }
-                else {
-                    eval { ($U, $V) = Math::Prime::Util::GMP::lucas_sequence($m, $P, $Q, $n) };
-                }
+                eval { $V = Math::Prime::Util::GMP::lucasvmod($P, $Q, $n, $m) };
             }
             defined($V) && return _str2obj($V);
         }
@@ -15303,45 +15293,7 @@ package Sidef::Types::Number::Number {
             return _set_int(_native_squarefree_count(Math::GMPz::Rmpz_get_ui($n)));
         }
 
-        if (HAS_NEW_PRIME_UTIL_GMP) {
-            return _set_int(Math::Prime::Util::GMP::powerfree_count(Math::GMPz::Rmpz_get_str($n, 10), $k));
-        }
-
-        my $c = Math::GMPz::Rmpz_init_set_ui(0);
-        state $t = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_root($t, $n, $k);
-        Math::GMPz::Rmpz_fits_ulong_p($t) || goto &nan;    # too large
-
-        my $s = Math::GMPz::Rmpz_get_ui($t);
-
-        if (HAS_PRIME_UTIL) {
-            Math::Prime::Util::forsquarefree(
-                sub {
-                    Math::GMPz::Rmpz_ui_pow_ui($t, $_, $k);
-                    Math::GMPz::Rmpz_div($t, $n, $t);
-                    (scalar(@_) & 1)
-                      ? Math::GMPz::Rmpz_sub($c, $c, $t)
-                      : Math::GMPz::Rmpz_add($c, $c, $t);
-                },
-                $s
-            );
-        }
-        else {
-            # TODO: segment 1..s into multiple [a,b] ranges and use moebius(a,b)
-            my $m;
-            for (my $v = 1 ; $v <= $s ; ++$v) {
-                if ($m = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($v) : Math::Prime::Util::GMP::moebius($v))) {
-                    Math::GMPz::Rmpz_ui_pow_ui($t, $v, $k);
-                    Math::GMPz::Rmpz_div($t, $n, $t);
-                    ($m == 1)
-                      ? Math::GMPz::Rmpz_add($c, $c, $t)
-                      : Math::GMPz::Rmpz_sub($c, $c, $t);
-                }
-            }
-        }
-
-        bless \$c;
+        _set_int(Math::Prime::Util::GMP::powerfree_count(Math::GMPz::Rmpz_get_str($n, 10), $k));
     }
 
     sub squarefree_count {
@@ -19068,57 +19020,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        if (HAS_NEW_PRIME_UTIL_GMP) {
-            return _set_int(Math::Prime::Util::GMP::nth_powerfree(Math::GMPz::Rmpz_get_str($n, 10), $k));
-        }
-
-        my $prec   = Math::GMPz::Rmpz_sizeinbase($n, 2) + 2;
-        my $approx = Math::MPFR::Rmpfr_init2($prec);
-
-        Math::MPFR::Rmpfr_zeta_ui($approx, $k, $ROUND);
-        Math::MPFR::Rmpfr_mul_z($approx, $approx, $n, $ROUND);
-
-        my $v     = _any2mpz($approx) // goto &nan;
-        my $k_obj = bless \$k;
-        my $v_obj = bless \$v;
-
-        my $count;
-
-        while (1) {
-
-            $count =
-              (HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
-              ? Math::GMPz::Rmpz_init_set_ui(Math::Prime::Util::powerfree_count(Math::GMPz::Rmpz_get_ui($v), $k))
-              : ${$k_obj->powerfree_count($v_obj)};
-
-            last if Math::GMPz::Rmpz_sizeinbase($n, 10) <= 30;    # stop early for small numbers
-
-            my $diff = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_sub($diff, $n, $count);
-            last if Math::GMPz::Rmpz_cmpabs_ui($diff, 0) <= 0;
-            Math::GMPz::Rmpz_add($v, $v, $diff);
-        }
-
-        until ($v_obj->is_powerfree($k_obj)) {
-            Math::GMPz::Rmpz_sub_ui($v, $v, 1);
-        }
-
-        my $cmp = __cmp__($n, $count);
-        while ($cmp && __ne__($n, $count)) {
-            do {
-                ($cmp > 0)
-                  ? Math::GMPz::Rmpz_add_ui($v, $v, 1)
-                  : Math::GMPz::Rmpz_sub_ui($v, $v, 1);
-              }
-              until (
-                     (HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($v))
-                     ? Math::Prime::Util::is_powerfree(Math::GMPz::Rmpz_get_ui($v), $k)
-                     : $v_obj->is_powerfree($k_obj)
-                    );
-            $count += $cmp;
-        }
-
-        $v_obj;
+        _set_int(Math::Prime::Util::GMP::nth_powerfree(Math::GMPz::Rmpz_get_str($n, 10), $k));
     }
 
     sub nth_cubefree {
@@ -35262,61 +35164,7 @@ package Sidef::Types::Number::Number {
             return bless \$r;
         }
 
-        if (HAS_NEW_PRIME_UTIL_GMP) {
-            return _set_int(Math::Prime::Util::GMP::powerful_count(Math::GMPz::Rmpz_get_str($n, 10), $k));
-        }
-
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        my $count = Math::GMPz::Rmpz_init_set_ui(0);
-
-        sub {
-            my ($m, $r) = @_;
-
-            Math::GMPz::Rmpz_div($t, $n, $m);
-            Math::GMPz::Rmpz_root($t, $t, $r);
-
-            if ($r <= $k) {
-                Math::GMPz::Rmpz_add($count, $count, $t);
-                return;
-            }
-
-            Math::GMPz::Rmpz_fits_ulong_p($t) or die "Too large value!";
-
-            my $z  = Math::GMPz::Rmpz_init();
-            my $hi = Math::GMPz::Rmpz_get_ui($t);
-
-            if (HAS_PRIME_UTIL and $hi > 3 and $hi < 1e7) {
-
-                my $v = 1;
-                foreach my $mu (
-                                HAS_PRIME_UTIL
-                                ? Math::Prime::Util::moebius(1, $hi)
-                                : Math::Prime::Util::GMP::moebius(1, $hi)
-                  ) {
-                    if ($mu and ($k == 2 or Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1)) {
-                        Math::GMPz::Rmpz_ui_pow_ui($z, $v, $r);
-                        Math::GMPz::Rmpz_mul($z, $z, $m);
-                        __SUB__->($z, $r - 1);
-                    }
-                    ++$v;
-                }
-                return;
-            }
-
-            foreach my $v (1 .. $hi) {
-
-                Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $v) == 1                                        or next;
-                (HAS_PRIME_UTIL ? Math::Prime::Util::is_square_free($v) : Math::Prime::Util::GMP::moebius($v)) or next;
-
-                Math::GMPz::Rmpz_ui_pow_ui($z, $v, $r);
-                Math::GMPz::Rmpz_mul($z, $z, $m);
-                __SUB__->($z, $r - 1);
-            }
-          }
-          ->($ONE, 2 * $k - 1);
-
-        $count = Math::GMPz::Rmpz_get_ui($count) if Math::GMPz::Rmpz_fits_ulong_p($count);
-        bless \$count;
+        _set_int(Math::Prime::Util::GMP::powerful_count(Math::GMPz::Rmpz_get_str($n, 10), $k));
     }
 
     sub squarefull_count {
