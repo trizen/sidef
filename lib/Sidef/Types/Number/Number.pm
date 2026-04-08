@@ -13796,6 +13796,12 @@ package Sidef::Types::Number::Number {
         $y = _any2si($y) // (goto &nan) if ref($y);
 
         if (!ref($x) and $x <= 1e6 and $x >= 0 and $y >= 0) {
+
+            if (HAS_PRIME_UTIL and $x <= ((INTSIZE == 32) ? 33 : 66)) {
+                my $r = Math::Prime::Util::binomial($x, $y);
+                return bless \$r;
+            }
+
             state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_bin_uiui($r, $x, $y);
             my $r2 =
@@ -14026,6 +14032,10 @@ package Sidef::Types::Number::Number {
         $n_val = Math::GMPz::Rmpz_init_set_str($n_val, 10) if !ref($n_val);
         $m_val = Math::GMPz::Rmpz_init_set_str($m_val, 10) if !ref($m_val);
 
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n_val) and Math::GMPz::Rmpz_cmpabs_ui($m_val, 1e7) <= 0) {
+            return Math::Prime::Util::binomialmod($n_val, $k_val, $m_val);
+        }
+
         if (!$p and (my $exp = Math::Prime::Util::GMP::is_prime_power($m_val))) {
             $p = Math::Prime::Util::GMP::rootint($m_val, $exp);
         }
@@ -14181,7 +14191,7 @@ package Sidef::Types::Number::Number {
         if (Math::GMPz::Rmpz_sgn($n) < 0) {
             my $x = Math::GMPz::Rmpz_even_p($k) ? 1 : -1;
             $x = Math::Prime::Util::GMP::mulint($x, __SUB__->(-$n + $k - 1, $k, $m));
-            return Math::Prime::Util::GMP::modint($x, $m);
+            return $x;
         }
 
         if (Math::GMPz::Rmpz_cmp($k, $n) > 0) {
@@ -14189,19 +14199,23 @@ package Sidef::Types::Number::Number {
         }
 
         if (Math::GMPz::Rmpz_sgn($k) == 0 or Math::GMPz::Rmpz_cmp($k, $n) == 0) {
-            return Math::Prime::Util::GMP::modint(1, $m);
+            return 1;
         }
 
         if (Math::GMPz::Rmpz_cmp_ui($k, 1) == 0 or $k == $n - 1) {
-            return Math::Prime::Util::GMP::modint($n, $m);
+            return $n;
         }
 
         if (Math::GMPz::Rmpz_cmp($n - $k, $k) < 0) {
             $k = $n - $k;
         }
 
+        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n) and Math::GMPz::Rmpz_cmpabs_ui($m, 1e7) <= 0) {
+            return Math::Prime::Util::binomialmod($n, $k, $m);
+        }
+
         if (Math::GMPz::Rmpz_cmp_ui($k, 1e4) <= 0) {
-            return Math::Prime::Util::GMP::modint(_small_k_binomialmod($n, $k, $m), $m);
+            return _small_k_binomialmod($n, $k, $m);
         }
 
         my @F;
@@ -14260,7 +14274,7 @@ package Sidef::Types::Number::Number {
                 next;
             }
 
-            if (HAS_PRIME_UTIL and $n < ULONG_MAX and $pq < 1e6) {
+            if (HAS_PRIME_UTIL and $n < ULONG_MAX and $pq < 1e7) {
                 push @F, [Math::Prime::Util::binomialmod($n, $k, $pq), $pq];
                 next;
             }
@@ -14337,7 +14351,7 @@ package Sidef::Types::Number::Number {
             push @F, [$v, $pq];
         }
 
-        Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::chinese(@F), $m);
+        Math::Prime::Util::GMP::chinese(@F);
     }
 
     sub binomialmod {
@@ -14345,13 +14359,23 @@ package Sidef::Types::Number::Number {
 
         _valid(\$k, \$m);
 
-        $n = _any2mpz($$n, 0) // (goto &nan);
-        $k = _any2mpz($$k, 1) // (goto &nan);
-        $m = _any2mpz($$m, 2) // (goto &nan);
+        $n = $$n;
+        $k = $$k;
+        $m = $$m;
+
+        if (HAS_PRIME_UTIL and !ref($n) and !ref($k) and !ref($m) and CORE::abs($m) <= 1e7) {
+            $m || goto &nan;
+            my $r = Math::Prime::Util::GMP::modint(Math::Prime::Util::binomialmod($n, $k, $m), $m);
+            return bless \$r;
+        }
+
+        $n = _any2mpz($n, 0) // (goto &nan);
+        $k = _any2mpz($k, 1) // (goto &nan);
+        $m = _any2mpz($m, 2) // (goto &nan);
 
         Math::GMPz::Rmpz_sgn($m) || goto &nan;
 
-        _set_int(_modular_binomial($n, $k, $m));
+        _set_int(Math::Prime::Util::GMP::modint(_modular_binomial($n, $k, $m), $m));
     }
 
     sub totient_range {
