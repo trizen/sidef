@@ -34375,7 +34375,6 @@ package Sidef::Types::Number::Number {
         # TIER 1 – native (UV) arithmetic
         # psi_small($x, $i): count of P[$i]-smooth numbers ≤ $x,  $x a plain UV
         # ========================================================================
-        my @ms;
         my $psi_small = sub {
             my ($x, $i) = @_;    # $x is a native UV
 
@@ -34386,18 +34385,17 @@ package Sidef::Types::Number::Number {
             $x || return 0;
 
             # Count powers of 2 in [1..$x] = number of bits in $x.
-            $i || return 1 + (HAS_PRIME_UTIL ? Math::Prime::Util::logint($x, 2) : Math::Prime::Util::GMP::logint($x, 2));
+            $i || return 1 + Math::Prime::Util::GMP::logint($x, 2);
 
-            ($x < $P[$i])
+            ($x <= $P[$i])
               ? $x
-              : ($ms[$i]{$x} //= __SUB__->($x, $i - 1) + __SUB__->(int($x / $P[$i]), $i));
+              : (__SUB__->($x, $i - 1) + __SUB__->(Math::Prime::Util::GMP::divint($x, $P[$i]), $i));
         };
 
         # ========================================================================
         # TIER 2 – Math::GMPz arithmetic
         # psi_big($x, $i): same, but $x is a Math::GMPz (x > ULONG_MAX)
         # ========================================================================
-        my @mb;
         my $count = sub {
             my ($x, $i) = @_;    # $x is a Math::GMPz
 
@@ -34408,10 +34406,10 @@ package Sidef::Types::Number::Number {
 
             $x || return 0;
 
-            # sizeinbase($x, 2) = floor(log2 $x) + 1 = # of 2-smooth numbers ≤ $x.
+            # floor(log2 $x) + 1 = # of 2-smooth numbers ≤ $x.
             $i || return 1 + Math::Prime::Util::GMP::logint($x, 2);
 
-            $mb[$i]{$x} //= Math::Prime::Util::GMP::addint(__SUB__->($x, $i - 1), __SUB__->(Math::Prime::Util::GMP::divint($x, $P[$i]), $i));
+            Math::Prime::Util::GMP::addint(__SUB__->($x, $i - 1), __SUB__->(Math::Prime::Util::GMP::divint($x, $P[$i]), $i));
           }
           ->(Math::GMPz::Rmpz_get_str($n, 10), $#P);
 
