@@ -6952,7 +6952,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         ref($y) ne __PACKAGE__
-          and return Sidef::Types::Bool::Bool::FALSE;
+          and return $y->eq($x);
 
         __eq__($$x, $$y)
           ? (Sidef::Types::Bool::Bool::TRUE)
@@ -7131,7 +7131,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         ref($y) ne __PACKAGE__
-          and return Sidef::Types::Bool::Bool::TRUE;
+          and return $y->ne($x);
 
         __ne__($$x, $$y)
           ? (Sidef::Types::Bool::Bool::TRUE)
@@ -7397,6 +7397,12 @@ package Sidef::Types::Number::Number {
 
     sub cmp {
         my ($x, $y) = @_;
+
+        ref($y) ne __PACKAGE__
+          and return do {
+            ($y->cmp($x) // return undef)->neg;
+          };
+
         _valid(\$y);
         my $cmp = __cmp__($$x, $$y) // return undef;
         !$cmp ? ZERO : ($cmp > 0) ? ONE : MONE;
@@ -23903,7 +23909,7 @@ package Sidef::Types::Number::Number {
                 my $key = Math::GMPz::Rmpz_get_str($current_baby, 62);
 
                 # Keep the smallest j for a given value to ensure minimal exponent
-                $baby_steps{$key} = $j if not exists $baby_steps{$key};
+                $baby_steps{$key} = $j if !exists $baby_steps{$key};
 
                 Math::GMPz::Rmpz_mul($current_baby, $current_baby, $g);
                 Math::GMPz::Rmpz_mod($current_baby, $current_baby, $p);

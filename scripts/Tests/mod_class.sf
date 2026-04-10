@@ -47,6 +47,7 @@ do {
     assert_eq(Mod(182398124/123124124, 4171)**(-5), Mod(3635, 4171))
 
     assert_eq(chinese(Mod(43, 19), Mod(13, 41)), Mod(423, 779))   # Mod(423, 779)
+    assert_eq(chinese(Mod(11, 43), Mod(25, 97), Mod(13, 127)), Mod(453403, 529717))
 
     with (1e10.irand, 1e10.irand) {|n, m|
         assert_eq(

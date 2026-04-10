@@ -604,4 +604,10 @@ do {
     assert(p.is_squarefree)
 }
 
+assert_eq(Poly([Poly([43]), Poly([97])]), Poly([43, 97]))
+assert_eq(Poly([43, 97]), Poly([Poly([43]), Poly([97])]))
+
+assert(Polynomial(0 => Polynomial(0 => 1)) == Polynomial(0 => 1))
+assert(Polynomial(0 => 1) == Polynomial(0 => Polynomial(0 => 1)))
+
 say "** Test passed!"

@@ -241,11 +241,23 @@ polynomial using the binary (square-and-multiply) method. C<n> may be:
 
 =back
 
-    var i = PolynomialMod([0, 1], [1, 0, 1])   # x mod (x^2 + 1)
-    say i ** 2    # -1 mod (x^2 + 1)
-    say i ** 4    # 1  mod (x^2 + 1)
+    var i = PolynomialMod([1, 0], [1, 0, 1])   # x mod (x^2 + 1)
+    say i**2    # -1 mod (x^2 + 1)
+    say i**4    #  1 mod (x^2 + 1)
 
 Aliases: I<pow>
+
+=cut
+
+=head2 powmod
+
+    base.powmod(exp, poly_mod)
+
+Computes C<base^exp mod poly_mod> using binary (square-and-multiply),
+reducing modulo C<poly_mod> after every multiplication to keep the
+degree below C<deg(poly_mod)>.
+
+Returns a C<PolynomialMod> object, representing the modular exponentiation result.
 
 =cut
 
@@ -555,7 +567,7 @@ Aliases: I<cmp>
     a < b
 
 Returns true if C<a> is strictly less than C<b> under the lexicographic
-ordering defined by L</<=>>. 
+ordering defined by L</<=>>.
 
 Aliases: I<lt>
 
@@ -614,6 +626,54 @@ L</==> against 1.
     x.is_mone
 
 Returns true if C<x> equals the constant polynomial -1. Uses L</==> against -1.
+
+=cut
+
+=head2 factor_exp
+
+    poly.factor_exp
+
+Performs complete Cantor-Zassenhaus factorization of a polynomial over C<GF(p)[x]>.
+
+The result includes multiplicities and is returned as an array of
+C<[factor, exponent]> pairs.
+
+Each irreducible factor is returned as a monic C<PolynomialMod> object with
+scalar modulus C<p>. The first entry in the result is the leading coefficient of
+the original polynomial, represented as a C<[lc, 1]> pair.
+
+=head3 Algorithm
+
+=over 4
+
+=item 1. Preprocessing
+
+The polynomial is normalized to monic form, then made squarefree by dividing
+by C<gcd(f, f'>). This removes one copy of each repeated factor.
+
+=item 2. DDF
+
+Distinct Degree Factorization groups irreducible factors by degree.
+
+=item 3. EDF
+
+Each DDF group is split into irreducible factors using Cantor-Zassenhaus.
+
+=item 4. Multiplicity recovery
+
+Each irreducible factor is repeatedly divided into the original polynomial to
+determine its multiplicity.
+
+=back
+
+=cut
+
+=head2 factor
+
+    poly.factor
+
+Returns the factorization as a flat array of factors, with each irreducible
+factor repeated according to its multiplicity.
 
 =cut
 
@@ -718,14 +778,14 @@ its constant term (coefficient of x^0) is truthy, and falsy if zero or absent.
 
 =head2 Gaussian integers via Q[x]/(x² + 1)
 
-    var i = PolynomialMod([0, 1], [1, 0, 1])   # x ≡ i
-    say i ** 2    # -1 (mod x^2 + 1)
-    say i ** 4    # 1  (mod x^2 + 1)
+    var i = PolynomialMod([1, 0], [1, 0, 1])   # x ≡ i
+    say i**2    # -1 (mod x^2 + 1)
+    say i**4    # 1  (mod x^2 + 1)
 
     var a = PolynomialMod([3, 2], [1, 0, 1])   # 2x + 3 ≡ 3 + 2i
     var b = PolynomialMod([1, 4], [1, 0, 1])   # 4x + 1 ≡ 1 + 4i
-    say a * b   # (3+2i)(1+4i) = 3+12i+2i+8i^2 = (3-8) + 14i = -5 + 14i
-                # Output: 14*x - 5 (mod x^2 + 1)
+    say (a * b)   # (3+2i)(1+4i) = 3+12i+2i+8i^2 = (3-8) + 14i = -5 + 14i
+                  # Output: 14*x - 5 (mod x^2 + 1)
 
 =head2 GCD and Bézout coefficients
 
@@ -733,14 +793,14 @@ its constant term (coefficient of x^0) is truthy, and falsy if zero or absent.
     var q = PolynomialMod([1, 1],   [1, 0, 0, 1])   # x+1   mod x^3+1
     var (g, u, v) = p.gcdext(q)
     say g             # gcd
-    say u*p + v*q     # should equal g
+    say (u*p + v*q)   # should equal g
 
 =head2 Finite field GF(2)[x]/(x^4 + x + 1) — an irreducible polynomial over GF(2)
 
     var m = [1, 0, 0, 1, 1]    # x^4 + x + 1
     var a = PolynomialMod([1, 1, 0, 1], m)  # x^3 + x + 1
     var b = PolynomialMod([1, 0, 1, 1], m)  # x^3 + x^2 + 1
-    say a * b    # product in GF(2^4)
+    say (a * b)    # product in GF(2^4)
 
 =head2 Chinese Remainder Theorem
 
@@ -753,6 +813,20 @@ its constant term (coefficient of x^0) is truthy, and falsy if zero or absent.
 
     var p = PolynomialMod([1, 0, 3, 2], [1, 0, 1])  # 3x^2 + 2x (after reduction)
     say p.derivative   # formal derivative reduced mod (x^2 + 1)
+
+=head1 REFERENCES
+
+=over 4
+
+=item * D. G. Cantor, H. Zassenhaus (1981), I<A new algorithm for factoring polynomials over finite fields>, Math. Comp. 36, pp. 587-592.
+
+=item * L<https://en.wikipedia.org/wiki/Cantor%E2%80%93Zassenhaus_algorithm>
+
+=item * Lecture 15, Week 8 - Polynomial factorization
+
+=item * L<https://youtube.com/watch?v=tMqKqsMb-Ro>
+
+=back
 
 =head1 NOTES
 
@@ -771,15 +845,6 @@ B<Coefficient ring:> Coefficients are general C<Sidef::Types::Number::Number>
 objects (arbitrary precision). For finite-field semantics (e.g. GF(p)[x]),
 you should use a modulus polynomial whose coefficients are already in GF(p) and
 ensure your input coefficients are also reduced mod p.
-
-=item *
-
-B<Inherited methods:> Methods not overridden here (C<degree>, C<coeffs>,
-C<exponents>, C<leading_coefficient>, C<content>, C<primitive_part>,
-C<height>, C<is_squarefree>, C<squarefree_part>, C<roots>, C<powmod>,
-C<invmod>, C<newton_method>, etc.) are inherited from
-C<Sidef::Types::Number::Polynomial> and operate on the lifted polynomial
-without the modulus.
 
 =back
 

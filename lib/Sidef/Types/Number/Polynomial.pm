@@ -871,7 +871,7 @@ package Sidef::Types::Number::Polynomial {
 
     sub inv {
         my ($x) = @_;
-        Sidef::Types::Number::Fraction->new(Sidef::Types::Number::Number::ONE, $x);
+        __PACKAGE__->new(0 => Sidef::Types::Number::Number::ONE)->div($x);
     }
 
     sub invmod {

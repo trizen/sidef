@@ -150,6 +150,10 @@ do {
     assert_eq(chinese(PolyMod(x**2 + x + 2, 3), PolyMod(x-1, 5)), PolyMod(10*x**2 + x + 14, 15))    # from PARI/GP
 }
 
+assert_eq(chinese(PolyMod(11, 43), PolyMod(25, 97), PolyMod(13, 127)), PolynomialMod(11 => 505079, 13 => 79249, 25 => 475107, 529717))
+assert_eq(chinese(PolyMod([11], 43), PolyMod([25], 97), PolyMod([13], 127)), PolyMod([453403], 529717))
+assert_eq(chinese(PolyMod([17, 11], 43), PolyMod([19, 43], 97)), PolynomialMod(0 => 140, 1 => 3414, 4171))
+
 do {
     var f = PolynomialMod([1, 0, 1], Poly([1, 0, 0, 1]))   # x²+1 mod x³+1
     var g = PolynomialMod([1, 1],    Poly([1, 0, 0, 1]))   # x+1  mod x³+1
@@ -176,5 +180,33 @@ do {
 assert_eq(PolynomialMod([3, 2, 1], Poly([1, 0, 1])).pretty, "2*x - 2 (mod x^2 + 1)")
 assert_eq(PolynomialMod([1, 0, 3, 1], Poly([1, 0, 0, 0, 1])).derivative.pretty, "3*x^2 + 3 (mod x^4 + 1)")
 assert_eq(PolynomialMod([1, 0], [1, 0, 1])**2 -> pretty, "-1 (mod x^2 + 1)")
+
+do {
+    for f in (
+        PolyMod("8*x^4", 101),
+        PolyMod("8*x^4 + 18*x^3 - 63*x^2 - 162*x - 81", 5),
+        PolyMod("7*x^3 + 2*x^2 + 8*x + 1", 17)*PolyMod("x^2+x+1", 17)
+    ) {
+
+        say "\nFactoring: #{f} in Z_#{f.modulus}[x]:"
+
+        var F = factor_exp(f)
+
+        assert_eq(F.map_2d{|a,b| [a]*b }.flat.prod, f)
+
+        F.each_2d{|factor, exp|
+            if (exp > 1) {
+                say "(#{factor})^#{exp}"
+            }
+            else {
+                say factor
+            }
+        }
+    }
+}
+
+assert_eq(powmod(PolyMod("x", 17), 17, PolyMod("x^5 + 11*x^4 + 4*x^2 + 11*x + 5", 17)).pretty, "11*x^4 + 5*x^3 + 7*x^2 + 12*x + 1 (mod 17)")
+assert_eq(lift(powmod(PolyMod("x", 17), 17, PolyMod("x^5 + 11*x^4 + 4*x^2 + 11*x + 5", 17))), lift(PolyMod("x", Mod(Poly("x^5 + 11*x^4 + 4*x^2 + 11*x + 5"), 17))**17))
+assert_eq(chinese(PolyMod([97], [503, 0]), PolyMod([43], [127,0])), PolyMod([140], [63881, 0]))
 
 say "** Test passed!"

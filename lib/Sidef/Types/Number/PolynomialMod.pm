@@ -64,6 +64,7 @@ package Sidef::Types::Number::PolynomialMod {
         my ($x) = @_;
         my $str = join('', $x->[0]->dump);
         $str =~ s{^Polynomial}{PolynomialMod};
+        $str =~ s{\(\)}{\(0\)};
         $str =~ s{\)\z}{, $x->[1])};
         return $str;
     }
@@ -139,13 +140,18 @@ package Sidef::Types::Number::PolynomialMod {
         my (@polynomials) = @_;
 
         my @moduli = map { $_->modulus } @polynomials;
-        my $m      = Sidef::Types::Number::Number::lcm(@moduli);
-        my $c      = __PACKAGE__->new($m);
+
+        my $m = $moduli[0];
+        foreach my $i (1 .. $#moduli) {
+            $m = $m->lcm($moduli[$i]);
+        }
+
+        my $c = __PACKAGE__->new($m);
 
         foreach my $i (0 .. $#polynomials) {
             my $poly = $polynomials[$i];
             my $n    = $moduli[$i];
-            my $t    = $m->idiv($n);
+            my $t    = $m->div($n);
             my $u    = $t->mul($t->inv->mod($n));
             $c = $c->add(__PACKAGE__->new($poly->lift, $m)->mul($u));
         }
@@ -364,6 +370,11 @@ package Sidef::Types::Number::PolynomialMod {
         }
 
         return $r0;
+    }
+
+    sub monic_gcd {
+        my ($x, $y) = @_;
+        $x->gcd($y)->normalize_to_monic;
     }
 
     sub gcdext {
@@ -627,6 +638,223 @@ package Sidef::Types::Number::PolynomialMod {
     sub ne {
         my ($x, $y) = @_;
         $x->eq($y)->not;
+    }
+
+    sub powmod {
+        my ($base, $exp, $poly_mod) = @_;
+
+        my $p = $base->[1];    # scalar prime (Number)
+
+        $base = $base->mod($poly_mod);
+
+        my $result = __PACKAGE__->new(0 => Sidef::Types::Number::Number::ONE, $p);
+
+        foreach my $bit (reverse split(//, $exp->as_bin)) {
+            $result = $result->mul($base)->mod($poly_mod) if $bit;
+            $base   = $base->mul($base)->mod($poly_mod);
+        }
+
+        return $result;
+    }
+
+    # ------------------------------------------------------------------
+    # Internal helper: Distinct Degree Factorization (DDF)
+    #
+    # Given a monic squarefree polynomial f in GF(p)[x], returns a list
+    # of PolynomialMod objects @g where $g[k] is the product of every
+    # monic irreducible factor of f whose degree is exactly (k+1).
+    # (Factors of the wrong degree produce the constant 1 at that slot.)
+    #
+    # Algorithm:
+    #   Set w = x.  For k = 1, 2, ...:
+    #     w ← w^p mod f        (Frobenius: w accumulates x^(p^k) mod f)
+    #     g_k = gcd(w − x, f)  (captures all degree-k irreducibles of f)
+    #     f ← f / g_k
+    #   Stop when f = 1.
+    #
+    # Correctness: x^(p^k) − x is divisible by every monic irreducible
+    # over GF(p) of degree d whenever d | k.  After removing factors of
+    # degree 1,...,k−1, the gcd isolates factors of degree exactly k.
+    # ------------------------------------------------------------------
+    my $_pm_ddf = sub {
+        my ($f, $p) = @_;
+
+        my $ONE    = Sidef::Types::Number::Number::ONE;
+        my $x_poly = __PACKAGE__->new(1 => $ONE, $p);     # monomial x
+        my $w      = $x_poly;
+        my @factors;
+
+        my $deg_f = CORE::int($f->degree->numify);
+
+        for my $k (1 .. $deg_f) {
+            $w = $w->powmod($p, $f);    # w = x^(p^k) mod f
+
+            my $diff = $w->sub($x_poly);
+            my $gk   = $diff->monic_gcd($f);
+            push @factors, [$k, $gk];
+
+            $f = $f->div($gk);          # exact division; remove all degree-k factors
+            last if $f->is_one;
+        }
+
+        # Safety net for non-squarefree or degenerate input: if f is still
+        # non-trivial after the loop its remaining irreducible factors all
+        # have the same degree equal to deg(f) itself.
+        push @factors, [CORE::int($f->degree->numify), $f] unless $f->is_one;
+
+        return @factors;    # list of [degree, product_of_that_degree_irreducibles]
+    };
+
+    # ------------------------------------------------------------------
+    # Internal helper: Equal Degree Factorization (CZ splitting)
+    #
+    # Given a monic squarefree f in GF(p)[x] that is a product of m
+    # distinct monic irreducibles each of degree d, returns the list of
+    # those irreducibles.
+    #
+    # For odd p, uses the quadratic-residue (Euler-criterion) split:
+    #   pick random t, compute h = t^((p^d−1)/2) − 1 mod f,
+    #   then g = gcd(h, f).
+    # A random t falls on each side of the QR/non-QR split for roughly
+    # half the irreducible factors of f, giving a non-trivial g with
+    # probability ≥ 1 − 2^(1−m).
+    #
+    # For p = 2, uses the absolute trace map instead:
+    #   h = t + t^2 + t^(2^2) + ... + t^(2^(d−1)) mod f.
+    # ------------------------------------------------------------------
+    my $_pm_edf = sub {
+        my ($f, $d, $p) = @_;
+
+        my $deg_f = CORE::int($f->degree->numify);
+
+        return ()   if $deg_f == 0;
+        return ($f) if $deg_f == $d;    # already a single irreducible
+
+        my $ONE      = Sidef::Types::Number::Number::ONE;
+        my $is_char2 = $p->eq(Sidef::Types::Number::Number::TWO);
+        my $d_num    = Sidef::Types::Number::Number::_set_int($d);
+
+        # Exponent (p^d − 1) / 2 — only used for odd p.
+        my $exp =
+          $is_char2
+          ? undef
+          : $p->pow($d_num)->dec->idiv(Sidef::Types::Number::Number::TWO);
+
+        my ($g, $h);
+
+        for (1 .. 200) {    # retry up to 200 times (expected O(1) per call)
+
+            # --- Generate a random non-zero polynomial of degree < deg_f
+            #     with coefficients drawn uniformly from {0 ... p−1}.
+            my %terms;
+            for my $k (0 .. $deg_f - 1) {
+                my $c = $p->irand;
+                $terms{$k} = $c if $c;
+            }
+            my $t = __PACKAGE__->new(%terms, $p);
+            next if $t->is_zero;
+
+            if ($is_char2) {
+
+                # --- Characteristic 2: absolute trace map
+                # T(t) = t + t^2 + t^(2^2) + ... + t^(2^(d−1))  mod f
+                $h = $t->mod($f);
+                my $ti = $h;
+                for my $i (1 .. $d - 1) {
+                    $ti = $ti->powmod($p, $f);     # t^(2^i) mod f
+                    $h  = $h->add($ti)->mod($f);
+                }
+            }
+            else {
+                # --- Odd characteristic: quadratic-residue split
+                # h = t^((p^d−1)/2) − 1  mod f
+                $h = $t->powmod($exp, $f)->sub(__PACKAGE__->new(0 => $ONE, $p));
+            }
+
+            $g = $h->monic_gcd($f);
+
+            # Non-trivial split found
+            last if (!$g->is_one && !$g->eq($f));
+        }
+
+        # If we exhausted retries without a split (should not happen for
+        # valid squarefree input with a prime p), return f as-is.
+        return ($f) unless (defined($g) && !$g->is_one && !$g->eq($f));
+
+        # Recurse on both halves.
+        my $f_over_g = $f->div($g);
+        return (__SUB__->($g, $d, $p), __SUB__->($f_over_g, $d, $p),);
+    };
+
+    sub factor_exp {
+        my ($original) = @_;
+
+        my $p   = $original->[1];                      # scalar prime (Number)
+        my $ONE = Sidef::Types::Number::Number::ONE;
+
+        # -------------------------------------------------------------------
+        # Stage 1 – Preprocessing
+        # Extract leading coefficient, make monic, then squarefree.
+        # -------------------------------------------------------------------
+        my $lc = $original->lift->leading_coefficient;    # Number
+
+        my $f = $original->normalize_to_monic;
+
+        # Squarefree part:  f / gcd(f, f′)
+        # Any repeated irreducible factor h^k (k ≥ 2) contributes h^(k−1)
+        # to the GCD, so dividing once strips exactly one copy of each
+        # repeated factor.
+        my $df = $f->derivative;
+        my $sq = $f->monic_gcd($df);    # = product of (irred ^ (mult−1))
+        $f = $f->div($sq);
+
+        # Renormalize to monic (the division may shift the leading coeff
+        # slightly due to coefficient arithmetic).
+        $f = $f->normalize_to_monic unless $f->is_zero || $f->is_one;
+
+        # -------------------------------------------------------------------
+        # Stage 2 – Distinct Degree Factorization
+        # @ddf_groups is a list of [degree, poly] pairs.
+        # -------------------------------------------------------------------
+        my @ddf_groups = $f->is_one ? () : $_pm_ddf->($f, $p);
+
+        # -------------------------------------------------------------------
+        # Stage 3 – Equal Degree Factorization (Cantor-Zassenhaus)
+        # Collect all monic irreducible factors (without multiplicities yet).
+        # -------------------------------------------------------------------
+        my @irreducibles;
+        for my $pair (@ddf_groups) {
+            my ($d, $fk) = @$pair;
+            next if $fk->is_one;
+            push @irreducibles, $_pm_edf->($fk, $d, $p);
+        }
+
+        # -------------------------------------------------------------------
+        # Stage 4 – Compute multiplicities in the *original* polynomial.
+        # For each monic irreducible h, count the largest e such that
+        # h^e divides the original.
+        # -------------------------------------------------------------------
+        my $remainder = $original;
+        my @factors;
+
+        for my $irred (@irreducibles) {
+            my $e = 0;
+            while (1) {
+                my ($q, $r) = $remainder->divmod($irred);
+                last unless $r->is_zero;
+                $e++;
+                $remainder = $q;
+            }
+            ($e > 0) or next;
+            push @factors, Sidef::Types::Array::Array->new([$irred, Sidef::Types::Number::Number::_set_int($e)]);
+        }
+
+        Sidef::Types::Array::Array->new([Sidef::Types::Array::Array->new([$lc, $ONE]), @factors])->sort;
+    }
+
+    sub factor {
+        my ($self) = @_;
+        Sidef::Types::Array::Array->new([map { ($_->[0]) x CORE::int($_->[1]) } @{$self->factor_exp}]);
     }
 
     {
