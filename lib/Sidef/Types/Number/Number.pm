@@ -15197,7 +15197,7 @@ package Sidef::Types::Number::Number {
             return Math::Prime::Util::powerfree_count($n, 2);
         }
 
-        my $s = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($n) : Math::Prime::Util::GMP::sqrtint($n));
+        my $s = Math::Prime::Util::GMP::sqrtint($n);
 
         if ($n < ((~0) >> 1)) {
 
@@ -15206,8 +15206,8 @@ package Sidef::Types::Number::Number {
 
             use integer;
 
-            my $I = (HAS_PRIME_UTIL ? Math::Prime::Util::rootint($n, 5)   : Math::Prime::Util::GMP::rootint($n, 5));
-            my $D = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($n / $I) : Math::Prime::Util::GMP::sqrtint($n / $I));
+            my $I = Math::Prime::Util::GMP::rootint($n, 5);
+            my $D = Math::Prime::Util::GMP::sqrtint($n / $I);
 
             my $S1 = $n;
 
@@ -15215,11 +15215,7 @@ package Sidef::Types::Number::Number {
             my @M       = (0, 1);
             my $mertens = 1;
 
-            foreach my $mu (
-                            HAS_PRIME_UTIL
-                            ? Math::Prime::Util::moebius(2, $D)
-                            : Math::Prime::Util::GMP::moebius(2, $D)
-              ) {
+            foreach my $mu (Math::Prime::Util::GMP::moebius(2, $D)) {
                 if ($mu) {
                     $S1      += $mu * ($n / ($k * $k));
                     $mertens += $mu;
@@ -15234,8 +15230,8 @@ package Sidef::Types::Number::Number {
             for (my $i = $I - 1 ; $i > 0 ; --$i) {
 
                 my $Mxi = 1;
-                my $xi  = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($n / $i) : Math::Prime::Util::GMP::sqrtint($n / $i));
-                my $L   = (HAS_PRIME_UTIL ? Math::Prime::Util::sqrtint($xi)     : Math::Prime::Util::GMP::sqrtint($xi));
+                my $xi  = Math::Prime::Util::GMP::sqrtint($n / $i);
+                my $L   = Math::Prime::Util::GMP::sqrtint($xi);
 
                 foreach my $j (1 .. ($xi / ($L + 1))) {
                     $Mxi -= $M[$j] * (($xi / $j) - ($xi / ($j + 1)));
@@ -15257,11 +15253,7 @@ package Sidef::Types::Number::Number {
 
             my ($count, $k) = (0, 0);
 
-            foreach my $m (
-                           HAS_PRIME_UTIL
-                           ? Math::Prime::Util::moebius(1, $s)
-                           : Math::Prime::Util::GMP::moebius(1, $s)
-              ) {
+            foreach my $m (Math::Prime::Util::GMP::moebius(1, $s)) {
                 ++$k;
                 $count += $m * CORE::int($n / ($k * $k)) if $m;
             }
@@ -15273,21 +15265,11 @@ package Sidef::Types::Number::Number {
 
         my $count = 0;
 
-        if (HAS_PRIME_UTIL) {
-            Math::Prime::Util::forsquarefree(
-                sub {
-                    $count += ((scalar(@_) & 1) ? -1 : 1) * CORE::int($n / ($_ * $_));
-                },
-                $s
-            );
-        }
-        else {
-            # TODO: segment 1..s into multiple [a,b] ranges and use moebius(a,b)
-            my $m;
-            foreach my $k (1 .. $s) {
-                if ($m = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k))) {
-                    $count += $m * CORE::int($n / ($k * $k));
-                }
+        # TODO: segment 1..s into multiple [a,b] ranges and use moebius(a,b)
+        my $m;
+        foreach my $k (1 .. $s) {
+            if ($m = Math::Prime::Util::GMP::moebius($k)) {
+                $count += $m * CORE::int($n / ($k * $k));
             }
         }
 
