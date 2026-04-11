@@ -19525,6 +19525,141 @@ package Sidef::Types::Number::Number {
         return $prod1;
     }
 
+    # --- Isolated helper for k=12 prime evaluation ---
+    sub _compute_b_prime {
+        my ($p) = @_;
+
+        $p < ULONG_MAX || die "Too large value!";
+
+        # M = (p - 1) / 2
+        my $M = ref($p) ? Math::GMPz::Rmpz_get_ui($p) : $p;
+        $M = ($M - 1) >> 1;
+
+        my @S2 = (0) x ($M + 1);
+        my @A;
+
+        # Generate the sparse theta series A(q) up to degree M
+        my $k = 0;
+        while (1) {
+            my $Tk = ($k * ($k + 1)) >> 1;
+            last if $Tk > $M;
+            my $val = 2 * $k + 1;
+            $val = -$val if $k % 2 != 0;
+            push @A, [$Tk, $val];
+            $k++;
+        }
+
+        # Compute A(q)^2 in O(M) time due to sparsity
+        for my $i (0 .. $#A) {
+            my ($T1, $v1) = @{$A[$i]};
+            for my $j (0 .. $#A) {
+                my ($T2, $v2) = @{$A[$j]};
+                my $sum_T = $T1 + $T2;
+                last if $sum_T > $M;
+                $S2[$sum_T] += $v1 * $v2;
+            }
+        }
+
+        # Find the coefficient of q^M in (A(q)^2)^2
+        my $ans    = Math::GMPz::Rmpz_init_set_ui(0);
+        my $term   = Math::GMPz::Rmpz_init();
+        my $z_s2_i = Math::GMPz::Rmpz_init();
+        my $z_s2_j = Math::GMPz::Rmpz_init();
+
+        for my $i (0 .. $M) {
+            my $j = $M - $i;
+            if ($S2[$i] && $S2[$j]) {
+                Math::GMPz::Rmpz_set_str($z_s2_i, "$S2[$i]", 10);
+                Math::GMPz::Rmpz_set_str($z_s2_j, "$S2[$j]", 10);
+                Math::GMPz::Rmpz_mul($term, $z_s2_i, $z_s2_j);
+                Math::GMPz::Rmpz_add($ans, $ans, $term);
+            }
+        }
+
+        return $ans;
+    }
+
+    sub _sos_k12 {
+        my ($n) = @_;
+
+        # r_12(n) = A000145(n) = A029751(n) + 16*A000735(n)
+        #         = 8*σ_5​(n) - 512*σ_5​(n/4) + 16*b(n)
+        #
+        # where b(n) is strongly multiplicative with:
+        #   b(p^e) = b(p) * b(p^(e−1)) - p^5 * b(p^(e-2)), for odd prime p.
+        #   b(2^e) = 1
+        #
+        # b(p) is the coefficient of q^((p−1)/2) in A(q)^4, where:
+        #    A(q) = Sum_{k>=0} ​(−1)^k * (2*k+1) * q^(k*(k+1)/2).
+
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
+        return ZERO if $sgn < 0;
+        return ONE  if $sgn == 0;
+
+        # Part 1: Compute 8 * sigma_5(n)
+        my $A = Math::Prime::Util::GMP::sigma($n, 5);
+        $A = Math::Prime::Util::GMP::mulint($A, 8);
+        my $termA = Math::GMPz::Rmpz_init_set_str("$A", 10);
+
+        # Part 2: Compute 512 * sigma_5(n/4) if 4|n
+        my $termB = Math::GMPz::Rmpz_init_set_ui(0);
+        if (Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
+            my $n_over_4 = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_fdiv_q_2exp($n_over_4, $n, 2);
+
+            my $B = Math::Prime::Util::GMP::sigma($n_over_4, 5);
+            $B = Math::Prime::Util::GMP::mulint($B, 512);
+            Math::GMPz::Rmpz_set_str($termB, "$B", 10);
+        }
+
+        my $ans = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub($ans, $termA, $termB);
+
+        Math::GMPz::Rmpz_odd_p($n) || return $ans;
+
+        # Part 3: Apply the sequence logic + 16*b(n) for odd numbers
+        my $b_n = Math::GMPz::Rmpz_init_set_ui(1);
+
+        state %b_prime_cache;
+        undef %b_prime_cache if scalar(keys(%b_prime_cache)) > 1e5;
+
+        foreach my $pp (_factor_exp($n)) {
+            my ($p, $e) = @$pp;
+
+            my $b_p = ($b_prime_cache{$p} //= _compute_b_prime($p));
+
+            if ($e == 1) {
+                Math::GMPz::Rmpz_mul($b_n, $b_n, $b_p);
+                next;
+            }
+
+            # Handle Multiplicative Prime Powers: b(p^e) = b(p)*b(p^{e-1}) - p^5*b(p^{e-2})
+            my $b_prev = Math::GMPz::Rmpz_init_set_ui(1);
+            my $b_curr = Math::GMPz::Rmpz_init_set($b_p);
+
+            my $p_pow5 = Math::GMPz::Rmpz_init_set_str($p, 10);
+            Math::GMPz::Rmpz_pow_ui($p_pow5, $p_pow5, 5);
+
+            my $b_next = Math::GMPz::Rmpz_init();
+            my $term   = Math::GMPz::Rmpz_init();
+
+            for my $k (2 .. $e) {
+                Math::GMPz::Rmpz_mul($b_next, $b_p,    $b_curr);
+                Math::GMPz::Rmpz_mul($term,   $p_pow5, $b_prev);
+                Math::GMPz::Rmpz_sub($b_next, $b_next, $term);
+
+                Math::GMPz::Rmpz_set($b_prev, $b_curr);
+                Math::GMPz::Rmpz_set($b_curr, $b_next);
+            }
+            Math::GMPz::Rmpz_mul($b_n, $b_n, $b_curr);
+        }
+
+        Math::GMPz::Rmpz_mul_ui($b_n, $b_n, 16);
+        Math::GMPz::Rmpz_add($ans, $ans, $b_n);
+
+        return $ans;
+    }
+
     # Core computation and caching engine
     sub _compute_sos_count {
         my ($n, $k) = @_;
@@ -19555,12 +19690,8 @@ package Sidef::Types::Number::Number {
                                   6  => \&_sos_k6,
                                   8  => \&_sos_k8,
                                   10 => \&_sos_k10,
+                                  12 => \&_sos_k12,
                                  );
-
-        # For k = 12, we have:
-        #   r_12(n) = A029751(n) + 16*A000735(n)
-
-        # TODO: find a fast method for computing A000735(n).
 
         if (exists $optimized_handlers{$k}) {
 
