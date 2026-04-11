@@ -9543,9 +9543,7 @@ Returns an array with the subsets of the integers in the range C<0..n-1>, or ite
 
     sum_of_squares(n)
 
-Returns an array of C<[a,b]> pairs, with C<a> <= C<b>, containing all the positive solutions to the equation:
-
-    n = a^2 + b^2
+Returns all representations C<n = x² + y²> with C<0 ≤ x ≤ y>, as an array of C<[x, y]> arrays, sorted by x.
 
 Example:
 

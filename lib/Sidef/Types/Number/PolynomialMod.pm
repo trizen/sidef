@@ -684,16 +684,14 @@ package Sidef::Types::Number::PolynomialMod {
         my $w      = $x_poly;
         my @factors;
 
-        my $deg_f = CORE::int($f->degree->numify);
-
-        for my $k (1 .. $deg_f) {
-            $w = $w->powmod($p, $f);    # w = x^(p^k) mod f
+        for my $k (1 .. CORE::int($f->degree->numify)) {
+            $w = $w->powmod($p, $f);                      # w = x^(p^k) mod f
 
             my $diff = $w->sub($x_poly);
             my $gk   = $diff->monic_gcd($f);
             push @factors, [$k, $gk];
 
-            $f = $f->div($gk);          # exact division; remove all degree-k factors
+            $f = $f->div($gk);                            # exact division; remove all degree-k factors
             last if $f->is_one;
         }
 
@@ -783,7 +781,7 @@ package Sidef::Types::Number::PolynomialMod {
 
         # Recurse on both halves.
         my $f_over_g = $f->div($g);
-        return (__SUB__->($g, $d, $p), __SUB__->($f_over_g, $d, $p),);
+        return (__SUB__->($g, $d, $p), __SUB__->($f_over_g, $d, $p));
     };
 
     sub factor_exp {
@@ -849,7 +847,7 @@ package Sidef::Types::Number::PolynomialMod {
             push @factors, Sidef::Types::Array::Array->new([$irred, Sidef::Types::Number::Number::_set_int($e)]);
         }
 
-        Sidef::Types::Array::Array->new([Sidef::Types::Array::Array->new([$lc, $ONE]), @factors])->sort;
+        Sidef::Types::Array::Array->new(\@factors)->sort->unshift(Sidef::Types::Array::Array->new([$lc, $ONE]));
     }
 
     sub factor {

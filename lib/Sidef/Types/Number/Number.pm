@@ -10757,147 +10757,151 @@ package Sidef::Types::Number::Number {
     sub _primitive_sum_of_two_squares {
         my ($p) = @_;
 
-        if ($p == 2) {
+        # Trivial case: 2 = 1² + 1²
+        if (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0) {
             return (1, 1);
         }
 
-        my $s = Math::GMPz::Rmpz_init_set_str((Math::Prime::Util::GMP::sqrtmod(-1, $p) // die "error"), 10);
-        my $q = Math::GMPz::Rmpz_init_set($p);
+        # Step 1: s ← sqrt(-1) mod p
+        my $s = Math::GMPz::Rmpz_init_set_str((Math::Prime::Util::GMP::sqrtmod(-1, Math::GMPz::Rmpz_get_str($p, 10)) // die "error"), 10);
+        my $q = Math::GMPz::Rmpz_init_set($p);    # q ← p  (previous remainder)
 
-        my $t = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();    # scratch
 
+        # Step 2: Euclidean reduction — stop when s² ≤ p
         while (1) {
+            Math::GMPz::Rmpz_mul($t, $s, $s);             # t = s²
+            last if Math::GMPz::Rmpz_cmp($t, $p) <= 0;    # s² ≤ p → done
 
-            # While s^2 > p
-            Math::GMPz::Rmpz_mul($t, $s, $s);
-            Math::GMPz::Rmpz_cmp($t, $p) > 0 or last;
-
+            # One Euclidean step: (q, s) ← (s, q mod s)
             Math::GMPz::Rmpz_set($t, $s);
-            Math::GMPz::Rmpz_mod($s, $q, $s);
-            Math::GMPz::Rmpz_set($q, $t);
+            Math::GMPz::Rmpz_mod($s, $q, $s);             # s ← old_q mod old_s
+            Math::GMPz::Rmpz_set($q, $t);                 # q ← old_s
         }
 
-        Math::GMPz::Rmpz_mod($q, $q, $s);
+        # Step 3: b = (previous remainder) mod a
+        Math::GMPz::Rmpz_mod($q, $q, $s);                 # q ← q mod s  →  b
 
         return ($s, $q);
     }
 
-    # Multiply two representations (a,b) and (c,d),
-    # return all distinct sign/ordering variations.
     sub _combine_pairs {
-        my ($A, $B, $C, $D) = @_;
-#<<<
-        return (
-                [$A * $C - $B * $D, $A * $D + $B * $C],
-                [$A * $C + $B * $D, $A * $D - $B * $C],
-               );
-#>>>
+        my ($A,  $B,  $C,  $D)  = @_;
+        my ($AC, $BD, $AD, $BC) = ($A * $C, $B * $D, $A * $D, $B * $C);
+        return ([$AC - $BD, $AD + $BC], [$AC + $BD, $AD - $BC]);
     }
 
-    # Multiply two *sets* of representations
     sub _multiply_sets {
         my ($A, $B) = @_;
-        my (@new, %seen);
+        my (@result, %seen);
+
         for my $p (@$A) {
             for my $q (@$B) {
                 for my $r (_combine_pairs(@$p, @$q)) {
                     my ($x, $y) = @$r;
 
-                    $x = -$x if ($x < 0);
-                    $y = -$y if ($y < 0);
+                    # Canonicalise: ensure non-negative and x ≤ y
+                    $x = -$x if $x < 0;
+                    $y = -$y if $y < 0;
 
-                    if ($x > $y) {
-                        ($x, $y) = ($y, $x);
+                    ($x, $y) = ($y, $x) if $x > $y;
+
+                    if (!$seen{$x}{$y}++) {
+                        push @result, [$x, $y];
                     }
-
-                    next if $seen{"$x,$y"}++;
-                    push @new, [$x, $y];
                 }
             }
         }
-        return @new;
+        return @result;
     }
 
     sub sum_of_squares {
         my ($n) = @_;
 
+        # ── Normalise input ───────────────────────────────────────────────────────
         $n = _any2mpz($$n, 0) // return Sidef::Types::Array::Array->new;
 
         Math::GMPz::Rmpz_sgn($n) >= 0
           or return Sidef::Types::Array::Array->new;
 
+        # ── Trivial cases ─────────────────────────────────────────────────────────
         if (Math::GMPz::Rmpz_sgn($n) == 0) {
             return Sidef::Types::Array::Array->new(Sidef::Types::Array::Array->new([ZERO, ZERO]));
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-
-        my @factor_exp = _factor_exp($n);
-
-        foreach my $pp (@factor_exp) {
-            my ($p, $k) = @$pp;
-            if ($k % 2 != 0
-                and ($p < ULONG_MAX ? ($p % 4 == 3) : (Math::Prime::Util::GMP::modint($p, 4) == 3))) {
-                return Sidef::Types::Array::Array->new;    # no solutions
-            }
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+            return Sidef::Types::Array::Array->new(Sidef::Types::Array::Array->new([ZERO, ONE]));
         }
 
-        @factor_exp = map {
-            my ($p, $e) = @$_;
-            $p =
-              ($p < ULONG_MAX)
-              ? Math::GMPz::Rmpz_init_set_ui($p)
-              : Math::GMPz::Rmpz_init_set_str("$p", 10);
-            [$p, $e]
-        } @factor_exp;
+        # ── Factorise n ───────────────────────────────────────────────────────────
+        my @factor_exp = _factor_exp($n);
 
-        # Start with representation of 1
-        my @reps = ([0, 1]);    # (0^2 + 1^2 = 1)
+        # ── Feasibility check (Legendre's three-square theorem) ───────────────────
+        # A prime factor p ≡ 3 (mod 4) must appear to an even power;
+        # if any such prime appears to an odd power, no representation exists.
+        for my $pp (@factor_exp) {
+            my ($p, $k) = @$pp;
+            next if ($k % 2 == 0);
+            my $mod4 =
+                ($p < ULONG_MAX)
+              ? ($p % 4)
+              : Math::Prime::Util::GMP::modint($p, 4);
+            return Sidef::Types::Array::Array->new if ($mod4 == 3);
+        }
 
-        # Handle primes p ≡ 3 (mod 4) with even exponent: they contribute as a perfect square factor s^2.
-        # Multiply each (x,y) by s where s = product p^{e/2} over such primes.
+        # ── Build representations prime-by-prime ──────────────────────────────────
+        # Start from the trivial identity 1 = 0² + 1², then fold in each factor.
+        my @reps         = ([0, 1]);
         my $square_scale = Math::GMPz::Rmpz_init_set_ui(1);
 
-        foreach my $pp (@factor_exp) {
-            my ($p, $k) = @$pp;
+        state $p = Math::GMPz::Rmpz_init_nobless();
 
-            # Handle primes 3 mod 4
+        for my $pp (@factor_exp) {
+            my ($p_raw, $k) = @$pp;
+
+            # Convert p to GMPz for all subsequent arithmetic
+            ($p_raw < ULONG_MAX)
+              ? Math::GMPz::Rmpz_set_ui($p, $p_raw)
+              : Math::GMPz::Rmpz_set_str($p, "$p_raw", 10);
+
+            # Primes p ≡ 3 (mod 4) appear only to even powers (guaranteed above).
+            # p^(2t) = (p^t)² is a perfect square; it scales both coordinates
+            # uniformly by p^(k/2) without changing the number of representations.
             if (Math::GMPz::Rmpz_congruent_ui_p($p, 3, 4)) {
-
-                # p^{2t} contributes factor (p^t)^2 which is a square; doesn't change reps aside from scaling
-                # We multiply by p^{k/2} as a scaling factor on both coordinates.
-                Math::GMPz::Rmpz_pow_ui($t, $p, $k >> 1);
-                Math::GMPz::Rmpz_mul($square_scale, $square_scale, $t);
+                Math::GMPz::Rmpz_pow_ui($p, $p, $k >> 1);    # p = p^(k/2)
+                Math::GMPz::Rmpz_mul($square_scale, $square_scale, $p);
                 next;
             }
 
-            # Representation of p = x^2 + y^2
+            # p = 2 or p ≡ 1 (mod 4): obtain the primitive representation p = a² + b²
             my ($x, $y) = _primitive_sum_of_two_squares($p);
 
-            # Use binary exponentiation to get representations for p^k
-            my @acc   = ([0, 1]);
-            my @base  = ([$x, $y]);
-            my $exp_k = $k;
-            while ($exp_k > 0) {
-                if ($exp_k & 1) {
-                    @acc = _multiply_sets(\@acc, \@base);
-                }
-                @base = _multiply_sets(\@base, \@base);
-                $exp_k >>= 1;
+            # Lift p → p^k via binary exponentiation over representation sets.
+            # @acc accumulates the running product starting from 1 = 0² + 1²;
+            # @base holds the current power-of-two of p's representation.
+            my @acc  = ([0, 1]);
+            my @base = ([$x, $y]);
+            my $exp  = $k;
+
+            while ($exp > 0) {
+                @acc = _multiply_sets(\@acc, \@base) if $exp & 1;
+                $exp >>= 1;
+                @base = _multiply_sets(\@base, \@base) if $exp > 0;    # skip final squaring
             }
 
             @reps = _multiply_sets(\@reps, \@acc);
         }
 
+        # ── Apply the p ≡ 3 (mod 4) scale factor ─────────────────────────────────
         if (Math::GMPz::Rmpz_cmp_ui($square_scale, 1) > 0) {
             @reps = map { [$_->[0] * $square_scale, $_->[1] * $square_scale] } @reps;
         }
 
-        # Sort final reps
+        # ── Sort into canonical order (x ascending) and wrap for return ───────────
         @reps = sort { $a->[0] <=> $b->[0] }
           map { ($_->[0] > $_->[1]) ? [$_->[1], $_->[0]] : $_ } @reps;
 
-        Sidef::Types::Array::Array->new(
+        return Sidef::Types::Array::Array->new(
             [
              map {
                  Sidef::Types::Array::Array->new([map { _set_int($_) } @$_])
