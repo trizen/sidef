@@ -19245,9 +19245,383 @@ package Sidef::Types::Number::Number {
         return bless \$h;
     }
 
+    sub _sos_k2 {    # OEIS: A004018
+        my ($n, $t, $v) = @_;
+        return 0 if Math::GMPz::Rmpz_congruent_ui_p($t, 3, 4);
+
+        my $count = Math::GMPz::Rmpz_init_set_ui(4);
+        foreach my $pp (_factor_exp($t)) {
+            my ($p, $e) = @$pp;
+            my $r = ($p < ULONG_MAX) ? ($p % 4) : Math::Prime::Util::GMP::modint($p, 4);
+
+            if ($r == 3) {
+                return 0 unless $e % 2 == 0;
+            }
+            if ($r == 1) {
+                Math::GMPz::Rmpz_mul_ui($count, $count, $e + 1);
+            }
+        }
+        return $count;
+    }
+
+    sub _sos_k3 {    # OEIS: A005875
+        my ($n, $t, $v) = @_;
+
+        ((($v & 1) == 1) || !Math::GMPz::Rmpz_congruent_ui_p($t, 7, 8)) || return 0;
+
+        if (_is_squarefree($n)) {
+            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+                my $count = 0;
+                if (Math::GMPz::Rmpz_congruent_ui_p($n, 3, 8)) {
+                    $count = eval { Math::Prime::Util::GMP::mulint(Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($n)), 2); };
+                }
+                else {
+                    my $tmp_n = $n << 2;
+                    $count =
+                      Math::GMPz::Rmpz_fits_ulong_p($tmp_n)
+                      ? eval { Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($tmp_n)) }
+                      : undef;
+                }
+                return Math::GMPz::Rmpz_init_set_str("$count", 10) if defined($count);
+            }
+
+            my $h;
+            my $count = Math::GMPz::Rmpz_init();
+            if (Math::GMPz::Rmpz_congruent_ui_p($n, 3, 8)) {
+                $h = ${(bless \$n)->hclassno->mul(_set_int(24))};
+            }
+            else {
+                $h = ${(bless \$n)->mul(_set_int(4))->hclassno->mul(_set_int(12))};
+            }
+
+            $h = _any2mpz($h, 0) if !ref($h);
+            (ref($h) eq 'Math::GMPq')
+              ? Math::GMPz::Rmpz_set_q($count, $h)
+              : Math::GMPz::Rmpz_set($count, $h);
+
+            return $count;
+        }
+
+        return undef;
+    }
+
+    sub _sos_k4 {    # OEIS: A000118
+        my ($n, $t, $v) = @_;
+        my $count = Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::sigma(($v >= 1) ? ($t << 1) : $t), 8);
+        return Math::GMPz::Rmpz_init_set_str($count, 10);
+    }
+
+    sub _sos_k6 {    # OEIS: A000141
+        my ($n, $t, $v) = @_;
+
+        # A000141: a(n) = 4( Sum_{ d|n, d == 3 mod 4} d^2 - Sum_{ d|n, d == 1 mod 4} d^2 )
+        #              + 16( Sum_{ d|n, n/d == 1 mod 4} d^2 - Sum_{ d|n, n/d == 3 mod 4} d^2 )
+
+        # a(n) = 16*A050470(n) - 4*A002173(n).
+
+        # Multiplicative formulas by Jianing Song, where Chi = A101455:
+        #   A050470: Multiplicative with a(p^e) = ((p^2)^(e+1) - Chi(p)^(e+1))/(p^2 - Chi(p)).
+        #   A002173: Multiplicative with a(p^e) = ((p^2*Chi(p))^(e+1) - 1)/(p^2*Chi(p) - 1).
+
+        my $prod1 = Math::GMPz::Rmpz_init_set_ui(1);
+        my $prod2 = Math::GMPz::Rmpz_init_set_ui(1);
+        my ($p1, $p2, $u1, $u2) = map { Math::GMPz::Rmpz_init() } 1 .. 4;
+
+        foreach my $pp (_factor_exp($t)) {
+            my ($p, $e) = @$pp;
+            ($p < ULONG_MAX) ? Math::GMPz::Rmpz_set_ui($p1, $p) : Math::GMPz::Rmpz_set_str($p1, $p, 10);
+
+            Math::GMPz::Rmpz_pow_ui($u1, $p1, 2 * ($e + 1));
+            Math::GMPz::Rmpz_set($u2, $u1);
+
+            my $congr1_4 = Math::GMPz::Rmpz_congruent_ui_p($p1, 1, 4);
+
+            if ($congr1_4 or $e % 2 == 1) {
+                Math::GMPz::Rmpz_sub_ui($u1, $u1, 1);
+                Math::GMPz::Rmpz_sub_ui($u2, $u2, 1);
+            }
+            else {
+                Math::GMPz::Rmpz_add_ui($u1, $u1, 1);
+                Math::GMPz::Rmpz_neg($u2, $u2);
+                Math::GMPz::Rmpz_sub_ui($u2, $u2, 1);
+            }
+
+            Math::GMPz::Rmpz_mul($p1, $p1, $p1);
+            Math::GMPz::Rmpz_set($p2, $p1);
+
+            if ($congr1_4) {
+                Math::GMPz::Rmpz_sub_ui($p1, $p1, 1);
+            }
+            else {
+                Math::GMPz::Rmpz_add_ui($p1, $p1, 1);
+                Math::GMPz::Rmpz_neg($p2, $p2);
+            }
+            Math::GMPz::Rmpz_sub_ui($p2, $p2, 1);
+
+            Math::GMPz::Rmpz_divexact($u1, $u1, $p1);
+            Math::GMPz::Rmpz_divexact($u2, $u2, $p2);
+
+            Math::GMPz::Rmpz_mul($prod1, $prod1, $u1);
+            Math::GMPz::Rmpz_mul($prod2, $prod2, $u2);
+        }
+
+        Math::GMPz::Rmpz_mul_2exp($prod1, $prod1, 4 + 2 * $v);
+        Math::GMPz::Rmpz_mul_2exp($prod2, $prod2, 2);
+        Math::GMPz::Rmpz_sub($prod1, $prod1, $prod2);
+
+        return $prod1;
+    }
+
+    sub _sos_k8 {    # OEIS: A000143
+        my ($n, $t, $v) = @_;
+
+        # A138503: a(n) is multiplicative with a(2^e) = -(8^(e+1) - 15) / 7, a(p^e) = ((p^3)^(e+1) - 1) / (p^3 - 1).
+        # A138503: Let n = 2^k * m, with m odd, then a(n) = -(8^(k+1) - 15)/7 * sigma_3(m).
+        # r_8(n) = 16 * (-1)^n * -A138503(n)
+
+        my $prod = Math::GMPz::Rmpz_init_set_ui(16);
+
+        if ($v > 0) {
+            my $s = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_ui_pow_ui($s, 8, $v + 1);
+            Math::GMPz::Rmpz_sub_ui($s, $s, 15);
+            Math::GMPz::Rmpz_divexact_ui($s, $s, 7);
+            Math::GMPz::Rmpz_mul($prod, $prod, $s);
+        }
+
+        my $count = Math::Prime::Util::GMP::mulint($prod, Math::Prime::Util::GMP::sigma($t, 3));
+        return Math::GMPz::Rmpz_init_set_str($count, 10);
+    }
+
+    sub _sos_k10 {    # OEIS: A000144
+        my ($n, $t, $v) = @_;
+
+        # Efficient formula for k = 10, due to Michael Somos:
+        # r_10(n) = 4/5 * (A050456(n) + 16*A050468(n) + 8*A030212(n))
+
+        # A050456 is multiplicative with:
+        #   a(2^e) = 1
+        #   a(p^e) = ((p^4)^(e+1) - 1) / (p^4 - 1)  if p == 1 (mod 4)
+        #   a(p^e) = (1 - (-p^4)^(e+1)) / (1 + p^4) if p == 3 (mod 4)
+
+        # A050468 is multiplicative with:
+        #   a(2^e) = 16^e
+        #   a(p^e) = ((p^4)^(e+1) - 1) / (p^4 - 1)          if p == 1 (mod 4)
+        #   a(p^e) = ((p^4)^(e+1) - (-1)^(e+1)) / (p^4 + 1) if p == 3 (mod 4)
+
+        # A030212 is multiplicative with:
+        #   a(2^e) = (-4)^e
+        #   a(p^e) = p^(2*e) * (1 + (-1)^e)/2             if p == 3 (mod 4)
+        #   a(p^e) = a(p) * a(p^(e-1)) - p^4 * a(p^(e-2)) if p == 1 (mod 4)
+        # where a(p) = 2 * Re( (x + i*y)^4 ) and p = x^2 + y^2 with even x.
+
+        state %sos_cache;
+        undef %sos_cache if scalar(keys(%sos_cache)) > 1e5;    # Scoped cache limit for chi_4
+
+        # Internal helper isolated for k=10
+        my $sum_of_squares_solution = sub {
+            my ($p) = @_;
+
+            my $key = Math::GMPz::Rmpz_get_str($p, 10);
+
+            return $sos_cache{$key}
+              if exists $sos_cache{$key};
+
+            # a(p) = 2 * Re( (x + i*y)^4 ) and p = x^2 + y^2.
+            my ($x,  $y)  = _primitive_sum_of_two_squares($p);
+            my ($re, $im) = _set_int($x)->complex_ipow(_set_int($y), _set_int(4));
+            $sos_cache{$key} = _any2mpz(__add__($$re, $$re));
+        };
+
+        my $prod1 = Math::GMPz::Rmpz_init_set_ui(1);
+        my $prod2 = Math::GMPz::Rmpz_init_set_ui(1);
+        my $p1    = Math::GMPz::Rmpz_init();
+        my $u1    = Math::GMPz::Rmpz_init();
+        my $u2    = Math::GMPz::Rmpz_init();
+
+        my @factors = _factor_exp($t);
+
+        state %chi_cache;
+        undef %chi_cache if scalar(keys(%chi_cache)) > 1e5;    # Scoped cache limit for chi_4
+
+        my $chi_4 = sub {
+            my (@f) = @_;
+            return $ONE if scalar(@f) == 0;
+
+            my $key = join('*', map { join('^', @$_) } @f);
+            return $chi_cache{$key} if exists $chi_cache{$key};
+
+            if (scalar(@f) == 1 and $f[0][1] == 1) {
+                Math::GMPz::Rmpz_set_str($p1, $f[0][0], 10);
+                return $ZERO unless Math::GMPz::Rmpz_congruent_ui_p($p1, 1, 4);
+                return $sum_of_squares_solution->($p1);
+            }
+
+            my $p2    = Math::GMPz::Rmpz_init();
+            my $prod3 = Math::GMPz::Rmpz_init_set_ui(1);
+
+            foreach my $pp (@f) {
+                my ($p, $e) = @$pp;
+                ($p < ULONG_MAX) ? Math::GMPz::Rmpz_set_ui($p2, $p) : Math::GMPz::Rmpz_set_str($p2, $p, 10);
+
+                if (Math::GMPz::Rmpz_congruent_ui_p($p2, 3, 4)) {
+                    return $chi_cache{$key} = $ZERO if $e % 2 == 1;
+                    Math::GMPz::Rmpz_pow_ui($p2, $p2, 2 * $e);
+                    Math::GMPz::Rmpz_mul($prod3, $prod3, $p2);
+                    next;
+                }
+
+                my $s1 = (($e - 1 == 0) ? 1 : (($e - 1 < 0) ? 0 : __SUB__->([$p, $e - 1])));
+                my $s2 = (($e - 2 == 0) ? 1 : (($e - 2 < 0) ? 0 : __SUB__->([$p, $e - 2])));
+
+                my $x = $sum_of_squares_solution->($p2) * $s1;
+                my $y = 0;
+
+                if ($e - 2 >= 0) {
+                    Math::GMPz::Rmpz_pow_ui($p2, $p2, 4);
+                    $y = $p2 * $s2;
+                }
+                Math::GMPz::Rmpz_mul($prod3, $prod3, $x - $y);
+            }
+            $chi_cache{$key} = $prod3;
+          }
+          ->(@factors);
+
+        my $prod3 = Math::GMPz::Rmpz_init_set($chi_4);
+
+        if ($v >= 1) {
+            Math::GMPz::Rmpz_mul_2exp($prod3, $prod3, 2 * $v);
+            Math::GMPz::Rmpz_neg($prod3, $prod3) if ($v % 2 == 1);
+        }
+
+        foreach my $pp (@factors) {
+            my ($p, $e) = @$pp;
+
+            ($p < ULONG_MAX) ? Math::GMPz::Rmpz_set_ui($p1, $p) : Math::GMPz::Rmpz_set_str($p1, $p, 10);
+
+            Math::GMPz::Rmpz_pow_ui($u1, $p1, 4 * ($e + 1));
+            my $congr1_4 = Math::GMPz::Rmpz_congruent_ui_p($p1, 1, 4);
+            Math::GMPz::Rmpz_pow_ui($p1, $p1, 4);
+
+            if ($congr1_4) {
+                Math::GMPz::Rmpz_sub_ui($p1, $p1, 1);
+                Math::GMPz::Rmpz_divexact($u1, $u1, $p1);
+                Math::GMPz::Rmpz_mul($prod1, $prod1, $u1);
+                Math::GMPz::Rmpz_mul($prod2, $prod2, $u1);
+                next;
+            }
+
+            # Here, we have: p == 3 (mod 4)
+
+            Math::GMPz::Rmpz_set($u2, $u1);
+            Math::GMPz::Rmpz_add_ui($p1, $p1, 1);
+
+            if ($e % 2 == 1) {
+                Math::GMPz::Rmpz_neg($u1, $u1);
+                Math::GMPz::Rmpz_sub_ui($u2, $u2, 1);
+            }
+            else {
+                Math::GMPz::Rmpz_add_ui($u2, $u2, 1);
+            }
+
+            Math::GMPz::Rmpz_add_ui($u1, $u1, 1);
+            Math::GMPz::Rmpz_divexact($u1, $u1, $p1);
+            Math::GMPz::Rmpz_divexact($u2, $u2, $p1);
+
+            Math::GMPz::Rmpz_mul($prod1, $prod1, $u1);
+            Math::GMPz::Rmpz_mul($prod2, $prod2, $u2);
+        }
+
+        Math::GMPz::Rmpz_mul_2exp($prod2, $prod2, 4 * $v) if ($v > 0);
+        Math::GMPz::Rmpz_mul_2exp($prod2, $prod2, 4);
+        Math::GMPz::Rmpz_mul_2exp($prod3, $prod3, 3);
+        Math::GMPz::Rmpz_add($prod1, $prod1, $prod2);
+        Math::GMPz::Rmpz_add($prod1, $prod1, $prod3);
+        Math::GMPz::Rmpz_mul_2exp($prod1, $prod1, 2);
+        Math::GMPz::Rmpz_divexact_ui($prod1, $prod1, 5);
+
+        return $prod1;
+    }
+
+    # Core computation and caching engine
+    sub _compute_sos_count {
+        my ($n, $k) = @_;
+
+        my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+        $sgn < 0  and return 0;
+        $sgn == 0 and return 1;
+
+        return 0 if ($k <= 0);
+
+        if ($k == 1) {
+            return 2 if Math::GMPz::Rmpz_perfect_square_p($n);
+            return 0;
+        }
+
+        # r_3(4*n) = r_3(n)
+        if ($k == 3 and Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
+            $n = Math::GMPz::Rmpz_init_set($n);    # copy
+            Math::GMPz::Rmpz_div_2exp($n, $n, 2);
+        }
+
+        # Dispatch to optimized hardcoded formulas for known k
+        my %optimized_handlers = (
+                                  2  => \&_sos_k2,
+                                  3  => \&_sos_k3,
+                                  4  => \&_sos_k4,
+                                  6  => \&_sos_k6,
+                                  8  => \&_sos_k8,
+                                  10 => \&_sos_k10,
+                                 );
+
+        # For k = 12, we have:
+        #   r_12(n) = A029751(n) + 16*A000735(n)
+
+        # TODO: find a fast method for computing A000735(n).
+
+        if (exists $optimized_handlers{$k}) {
+
+            my $t   = Math::GMPz::Rmpz_init_set($n);
+            my $v   = Math::GMPz::Rmpz_remove($t, $t, $TWO);
+            my $res = $optimized_handlers{$k}->($n, $t, $v);
+
+            if (defined($res)) {
+                return $res;
+            }
+            else {
+                # Fallback otherwise
+            }
+        }
+
+        # General Fallback (Arbitrary k) with bounds-checked cache
+        state %cache;
+        undef %cache if scalar(keys(%cache)) > 1e6;
+
+        my $key = "$n $k";
+        return $cache{$key} if exists $cache{$key};
+
+        my $count = Math::GMPz::Rmpz_init_set_ui(0);
+        my $tmp   = Math::GMPz::Rmpz_init_set($n);
+
+        foreach my $v (0 .. Math::Prime::Util::GMP::sqrtint($n)) {
+            my $u = _compute_sos_count($tmp, $k - 1);
+
+            ref($u)
+              ? Math::GMPz::Rmpz_addmul_ui($count, $u, (($v == 0) ? 1 : 2))
+              : Math::GMPz::Rmpz_add_ui($count, $count, $u * (($v == 0) ? 1 : 2));
+
+            Math::GMPz::Rmpz_sub_ui($tmp, $tmp, 2 * $v + 1);
+        }
+
+        return $cache{$key} = $count;
+    }
+
+    # Main entry point
     sub sum_of_squares_count {
         my ($n, $k) = @_;
 
+        # 1. Validation and Setup
         if (defined($k)) {
             _valid(\$k);
             $k = _any2ui($$k) // goto &nan;
@@ -19272,404 +19646,9 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        state %cache;
-
-        if (scalar(keys(%cache)) > 1e6) {
-            undef %cache;
-        }
-
-        my $result = sub {
-            my ($n, $k) = @_;
-
-            my $sgn = Math::GMPz::Rmpz_sgn($n);
-
-            $sgn < 0  and return 0;
-            $sgn == 0 and return 1;
-
-            return 0 if ($k <= 0);
-
-            if ($k == 1) {
-                return 2 if Math::GMPz::Rmpz_perfect_square_p($n);
-                return 0;
-            }
-
-            # r_3(4*n) = r_3(n)
-            if ($k == 3 and Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
-                $n = Math::GMPz::Rmpz_init_set($n);    # copy
-                Math::GMPz::Rmpz_div_2exp($n, $n, 2);
-            }
-
-            my $t = Math::GMPz::Rmpz_init_set($n);
-            my $v = Math::GMPz::Rmpz_remove($t, $t, $TWO);
-
-            if ($k == 2) {    # OEIS: A004018
-                Math::GMPz::Rmpz_congruent_ui_p($t, 3, 4) && return 0;
-
-                my $count = Math::GMPz::Rmpz_init_set_ui(4);
-
-                foreach my $pp (_factor_exp($t)) {
-                    my ($p, $e) = @$pp;
-
-                    my $r = ($p < ULONG_MAX) ? ($p % 4) : Math::Prime::Util::GMP::modint($p, 4);
-
-                    if ($r == 3) {
-                        $e % 2 == 0 or return 0;
-                    }
-
-                    if ($r == 1) {
-                        Math::GMPz::Rmpz_mul_ui($count, $count, $e + 1);
-                    }
-                }
-
-                return $count;
-            }
-
-            if ($k == 3) {    # OEIS: A005875
-
-                ((($v & 1) == 1) || !Math::GMPz::Rmpz_congruent_ui_p($t, 7, 8)) || return 0;
-
-                if (_is_squarefree($n)) {
-
-                    if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                        my $count = 0;
-
-                        if (Math::GMPz::Rmpz_congruent_ui_p($n, 3, 8)) {
-                            $count = eval { Math::Prime::Util::GMP::mulint(Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($n)), 2); };
-                        }
-                        else {
-                            my $t = $n << 2;    # n is a Math::GMPz object
-                            $count =
-                              Math::GMPz::Rmpz_fits_ulong_p($t)
-                              ? eval { Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($t)) }
-                              : undef;
-                        }
-
-                        if (defined($count)) {
-                            return Math::GMPz::Rmpz_init_set_str("$count", 10);
-                        }
-                    }
-
-                    my $h;
-                    my $count = Math::GMPz::Rmpz_init();
-
-                    if (Math::GMPz::Rmpz_congruent_ui_p($n, 3, 8)) {
-                        $h = ${(bless \$n)->hclassno->mul(_set_int(24))};
-                    }
-                    else {
-                        $h = ${(bless \$n)->mul(_set_int(4))->hclassno->mul(_set_int(12))};
-                    }
-
-                    $h = _any2mpz($h, 0) if !ref($h);
-
-                    (ref($h) eq 'Math::GMPq')
-                      ? Math::GMPz::Rmpz_set_q($count, $h)
-                      : Math::GMPz::Rmpz_set($count, $h);
-
-                    return $count;
-                }
-            }
-
-            if ($k == 4) {    # OEIS: A000118
-                my $count =
-                  Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::sigma(($v >= 1) ? ($t << 1) : $t), 8);
-                return Math::GMPz::Rmpz_init_set_str($count, 10);
-            }
-
-            if ($k == 6) {    # OEIS: A000141
-
-                # A000141: a(n) = 4( Sum_{ d|n, d == 3 mod 4} d^2 - Sum_{ d|n, d == 1 mod 4} d^2 )
-                #              + 16( Sum_{ d|n, n/d == 1 mod 4} d^2 - Sum_{ d|n, n/d == 3 mod 4} d^2 )
-
-                # a(n) = 16*A050470(n) - 4*A002173(n).
-
-                # Multiplicative formulas by Jianing Song, where Chi = A101455:
-                #   A050470: Multiplicative with a(p^e) = ((p^2)^(e+1) - Chi(p)^(e+1))/(p^2 - Chi(p)).
-                #   A002173: Multiplicative with a(p^e) = ((p^2*Chi(p))^(e+1) - 1)/(p^2*Chi(p) - 1).
-
-                my $prod1 = Math::GMPz::Rmpz_init_set_ui(1);
-                my $prod2 = Math::GMPz::Rmpz_init_set_ui(1);
-
-                my $p1 = Math::GMPz::Rmpz_init();
-                my $p2 = Math::GMPz::Rmpz_init();
-
-                my $u1 = Math::GMPz::Rmpz_init();
-                my $u2 = Math::GMPz::Rmpz_init();
-
-                foreach my $pp (_factor_exp($t)) {
-                    my ($p, $e) = @$pp;
-
-                    ($p < ULONG_MAX)
-                      ? Math::GMPz::Rmpz_set_ui($p1, $p)
-                      : Math::GMPz::Rmpz_set_str($p1, $p, 10);
-
-                    Math::GMPz::Rmpz_pow_ui($u1, $p1, 2 * ($e + 1));
-                    Math::GMPz::Rmpz_set($u2, $u1);
-
-                    my $congr1_4 = Math::GMPz::Rmpz_congruent_ui_p($p1, 1, 4);
-
-                    if ($congr1_4 or $e % 2 == 1) {
-                        Math::GMPz::Rmpz_sub_ui($u1, $u1, 1);
-                        Math::GMPz::Rmpz_sub_ui($u2, $u2, 1);
-                    }
-                    else {
-                        Math::GMPz::Rmpz_add_ui($u1, $u1, 1);
-                        Math::GMPz::Rmpz_neg($u2, $u2);
-                        Math::GMPz::Rmpz_sub_ui($u2, $u2, 1);
-                    }
-
-                    Math::GMPz::Rmpz_mul($p1, $p1, $p1);
-                    Math::GMPz::Rmpz_set($p2, $p1);
-
-                    if ($congr1_4) {
-                        Math::GMPz::Rmpz_sub_ui($p1, $p1, 1);
-                    }
-                    else {
-                        Math::GMPz::Rmpz_add_ui($p1, $p1, 1);
-                        Math::GMPz::Rmpz_neg($p2, $p2);
-                    }
-
-                    Math::GMPz::Rmpz_sub_ui($p2, $p2, 1);
-
-                    Math::GMPz::Rmpz_divexact($u1, $u1, $p1);
-                    Math::GMPz::Rmpz_divexact($u2, $u2, $p2);
-
-                    Math::GMPz::Rmpz_mul($prod1, $prod1, $u1);
-                    Math::GMPz::Rmpz_mul($prod2, $prod2, $u2);
-                }
-
-                Math::GMPz::Rmpz_mul_2exp($prod1, $prod1, 4 + 2 * $v);
-                Math::GMPz::Rmpz_mul_2exp($prod2, $prod2, 2);
-                Math::GMPz::Rmpz_sub($prod1, $prod1, $prod2);
-
-                return $prod1;
-            }
-
-            if ($k == 8) {    # OEIS: A000143
-
-                # A138503: a(n) is multiplicative with a(2^e) = -(8^(e+1) - 15) / 7, a(p^e) = ((p^3)^(e+1) - 1) / (p^3 - 1).
-                # A138503: Let n = 2^k * m, with m odd, then a(n) = -(8^(k+1) - 15)/7 * sigma_3(m).
-                # r_8(n) = 16 * (-1)^n * -A138503(n)
-
-                my $prod = Math::GMPz::Rmpz_init_set_ui(16);
-
-                if ($v > 0) {
-                    my $s = Math::GMPz::Rmpz_init();
-                    Math::GMPz::Rmpz_ui_pow_ui($s, 8, $v + 1);
-                    Math::GMPz::Rmpz_sub_ui($s, $s, 15);
-                    Math::GMPz::Rmpz_divexact_ui($s, $s, 7);
-                    Math::GMPz::Rmpz_mul($prod, $prod, $s);
-                }
-
-                my $count = Math::Prime::Util::GMP::mulint($prod, Math::Prime::Util::GMP::sigma($t, 3));
-                return Math::GMPz::Rmpz_init_set_str($count, 10);
-            }
-
-            if ($k == 10) {    # OEIS: A000144
-
-                # Efficient formula for k = 10, due to Michael Somos:
-                # r_10(n) = 4/5 * (A050456(n) + 16*A050468(n) + 8*A030212(n))
-
-                # A050456 is multiplicative with:
-                #   a(2^e) = 1
-                #   a(p^e) = ((p^4)^(e+1) - 1) / (p^4 - 1)  if p == 1 (mod 4)
-                #   a(p^e) = (1 - (-p^4)^(e+1)) / (1 + p^4) if p == 3 (mod 4)
-
-                # A050468 is multiplicative with:
-                #   a(2^e) = 16^e
-                #   a(p^e) = ((p^4)^(e+1) - 1) / (p^4 - 1)          if p == 1 (mod 4)
-                #   a(p^e) = ((p^4)^(e+1) - (-1)^(e+1)) / (p^4 + 1) if p == 3 (mod 4)
-
-                # A030212 is multiplicative with:
-                #   a(2^e) = (-4)^e
-                #   a(p^e) = p^(2*e) * (1 + (-1)^e)/2             if p == 3 (mod 4)
-                #   a(p^e) = a(p) * a(p^(e-1)) - p^4 * a(p^(e-2)) if p == 1 (mod 4)
-                # where a(p) = 2 * Re( (x + i*y)^4 ) and p = x^2 + y^2 with even x.
-
-                my $sum_of_squares_solution = sub {
-                    my ($p) = @_;    # p is congruent to 1 mod 4
-
-                    # a(p) = 2 * Re( (x + i*y)^4 ) and p = x^2 + y^2.
-
-                    # ref($p) eq 'Math::GMPz' or die "error";
-
-                    my $u = $p;
-                    my $s = Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::sqrtmod(-1, $u), 10);
-                    my $q = $u;
-
-                    while ($s * $s > $u) {
-                        ($s, $q) = ($q % $s, $s);
-                    }
-
-                    my ($x, $y) = ($s, $q % $s);
-
-                    # ($x*$x + $y*$y == $p)
-                    #    or die "Error: $x^2 + $y^2 != $p";
-
-                    my ($re, $im) = _set_int($x)->complex_ipow(_set_int($y), _set_int(4));
-                    _any2mpz(__add__($$re, $$re));
-                };
-
-                my $prod1 = Math::GMPz::Rmpz_init_set_ui(1);
-                my $prod2 = Math::GMPz::Rmpz_init_set_ui(1);
-
-                my $p1 = Math::GMPz::Rmpz_init();
-
-                my $u1 = Math::GMPz::Rmpz_init();
-                my $u2 = Math::GMPz::Rmpz_init();
-
-                my @factors = _factor_exp($t);
-
-                my $chi_4 = sub {
-                    my (@f) = @_;
-
-                    if (scalar(@f) == 0) {
-                        return $ONE;
-                    }
-
-                    my $key = join('*', map { join('^', @$_) } @f);
-
-                    if (exists $cache{$key}) {
-                        return $cache{$key};
-                    }
-
-                    if (scalar(@f) == 1 and $f[0][1] == 1) {
-                        Math::GMPz::Rmpz_set_str($p1, $f[0][0], 10);
-                        Math::GMPz::Rmpz_congruent_ui_p($p1, 1, 4) || return $ZERO;
-                        return $sum_of_squares_solution->($p1);
-                    }
-
-                    my $p2    = Math::GMPz::Rmpz_init();
-                    my $prod3 = Math::GMPz::Rmpz_init_set_ui(1);
-
-                    foreach my $pp (@f) {
-                        my ($p, $e) = @$pp;
-
-                        ($p < ULONG_MAX)
-                          ? Math::GMPz::Rmpz_set_ui($p2, $p)
-                          : Math::GMPz::Rmpz_set_str($p2, $p, 10);
-
-                        my $congr3_4 = Math::GMPz::Rmpz_congruent_ui_p($p2, 3, 4);
-
-                        if ($congr3_4) {
-
-                            if ($e % 2 == 1) {
-                                $cache{$key} = $ZERO;
-                                return $ZERO;
-                            }
-
-                            Math::GMPz::Rmpz_pow_ui($p2, $p2, 2 * $e);
-                            Math::GMPz::Rmpz_mul($prod3, $prod3, $p2);
-                            next;
-                        }
-
-                        # Here, we have: p == 1 (mod 4)
-
-                        my $s1 = (($e - 1 == 0) ? 1 : (($e - 1 < 0) ? 0 : __SUB__->([$p, $e - 1])));
-                        my $s2 = (($e - 2 == 0) ? 1 : (($e - 2 < 0) ? 0 : __SUB__->([$p, $e - 2])));
-
-                        my $x = $sum_of_squares_solution->($p2) * $s1;
-                        my $y = 0;
-
-                        if ($e - 2 >= 0) {
-                            Math::GMPz::Rmpz_pow_ui($p2, $p2, 4);
-                            $y = $p2 * $s2;
-                        }
-
-                        Math::GMPz::Rmpz_mul($prod3, $prod3, $x - $y);
-                    }
-
-                    $cache{$key} = $prod3;
-                  }
-                  ->(@factors);
-
-                my $prod3 = Math::GMPz::Rmpz_init_set($chi_4);
-
-                if ($v >= 1) {
-                    Math::GMPz::Rmpz_mul_2exp($prod3, $prod3, 2 * $v);
-                    Math::GMPz::Rmpz_neg($prod3, $prod3) if ($v % 2 == 1);
-                }
-
-                foreach my $pp (@factors) {
-                    my ($p, $e) = @$pp;
-
-                    ($p < ULONG_MAX)
-                      ? Math::GMPz::Rmpz_set_ui($p1, $p)
-                      : Math::GMPz::Rmpz_set_str($p1, $p, 10);
-
-                    Math::GMPz::Rmpz_pow_ui($u1, $p1, 4 * ($e + 1));
-
-                    my $congr1_4 = Math::GMPz::Rmpz_congruent_ui_p($p1, 1, 4);
-
-                    Math::GMPz::Rmpz_pow_ui($p1, $p1, 4);
-
-                    if ($congr1_4) {
-                        Math::GMPz::Rmpz_sub_ui($p1, $p1, 1);
-                        Math::GMPz::Rmpz_divexact($u1, $u1, $p1);
-                        Math::GMPz::Rmpz_mul($prod1, $prod1, $u1);
-                        Math::GMPz::Rmpz_mul($prod2, $prod2, $u1);
-                        next;
-                    }
-
-                    # Here, we have: p == 3 (mod 4)
-
-                    Math::GMPz::Rmpz_set($u2, $u1);
-                    Math::GMPz::Rmpz_add_ui($p1, $p1, 1);
-
-                    if ($e % 2 == 1) {
-                        Math::GMPz::Rmpz_neg($u1, $u1);
-                        Math::GMPz::Rmpz_sub_ui($u2, $u2, 1);
-                    }
-                    else {
-                        Math::GMPz::Rmpz_add_ui($u2, $u2, 1);
-                    }
-
-                    Math::GMPz::Rmpz_add_ui($u1, $u1, 1);
-                    Math::GMPz::Rmpz_divexact($u1, $u1, $p1);
-                    Math::GMPz::Rmpz_divexact($u2, $u2, $p1);
-
-                    Math::GMPz::Rmpz_mul($prod1, $prod1, $u1);
-                    Math::GMPz::Rmpz_mul($prod2, $prod2, $u2);
-                }
-
-                Math::GMPz::Rmpz_mul_2exp($prod2, $prod2, 4 * $v) if ($v > 0);
-
-                Math::GMPz::Rmpz_mul_2exp($prod2, $prod2, 4);
-                Math::GMPz::Rmpz_mul_2exp($prod3, $prod3, 3);
-
-                Math::GMPz::Rmpz_add($prod1, $prod1, $prod2);
-                Math::GMPz::Rmpz_add($prod1, $prod1, $prod3);
-
-                Math::GMPz::Rmpz_mul_2exp($prod1, $prod1, 2);
-                Math::GMPz::Rmpz_divexact_ui($prod1, $prod1, 5);
-
-                return $prod1;
-            }
-
-            my $key = "$n $k";
-
-            if (exists $cache{$key}) {
-                return $cache{$key};
-            }
-
-            my $count = Math::GMPz::Rmpz_init_set_ui(0);
-            my $tmp   = Math::GMPz::Rmpz_init_set($n);
-
-            foreach my $v (0 .. Math::Prime::Util::GMP::sqrtint($n)) {
-
-                my $u = __SUB__->($tmp, $k - 1);
-
-                ref($u)
-                  ? Math::GMPz::Rmpz_addmul_ui($count, $u, (($v == 0) ? 1 : 2))
-                  : Math::GMPz::Rmpz_add_ui($count, $count, $u * (($v == 0) ? 1 : 2));
-
-                Math::GMPz::Rmpz_sub_ui($tmp, $tmp, 2 * $v + 1);
-            }
-
-            $cache{$key} = $count;
-          }
-          ->($n, $k);
-
-        _set_int($result);
+        # 2. Delegate to the recursive computation engine
+        my $result_val = _compute_sos_count($n, $k);
+        return _set_int($result_val);
     }
 
     *squares_r = \&sum_of_squares_count;
