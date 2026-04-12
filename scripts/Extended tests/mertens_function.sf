@@ -12,7 +12,13 @@ assert_eq(mertens(1e9+5), -226)
     #~ moebius(a, b).sum
 #~ }
 
-require('ntheory')
+try {
+    require('ntheory')
+}
+catch {
+    Perl.eval('use lib qw(/usr/lib/perl5/5.42/site_perl/)')
+    require('ntheory')
+}
 
 func my_mertens(a, b) {
     return 0 if (b < a)

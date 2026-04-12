@@ -1,6 +1,12 @@
 #!/usr/bin/ruby
 
-require('ntheory')
+try {
+    require('ntheory')
+}
+catch {
+    Perl.eval('use lib qw(/usr/lib/perl5/5.42/site_perl/)')
+    require('ntheory')
+}
 
 var table = []
 

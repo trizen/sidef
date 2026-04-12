@@ -24,7 +24,13 @@
 #    a(10^14) = 3204942420923
 #    a(10^15) = 29844572385358
 
-require('ntheory')
+try {
+    require('ntheory')
+}
+catch {
+    Perl.eval('use lib qw(/usr/lib/perl5/5.42/site_perl/)')
+    require('ntheory')
+}
 
 func my_pp_count(a, b) {
 
