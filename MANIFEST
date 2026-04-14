@@ -208,6 +208,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/combinatorics.sf'
 'scripts/Extended tests/digits2num.pl'
 'scripts/Extended tests/elementary.sf'
+'scripts/Extended tests/factorization_methods.sf'
 'scripts/Extended tests/fermat_pseudoprimes.sf'
 'scripts/Extended tests/fermat_pseudoprimes_to_base_n.sf'
 'scripts/Extended tests/fermat_with_n_factors.sf'
