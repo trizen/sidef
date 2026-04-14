@@ -24430,6 +24430,7 @@ package Sidef::Types::Number::Number {
                        sub { $n->germain_factor },
                        sub { $n->holf_factor($mp1->mul(_set_int(1e4))) },
                        sub { $n->fermat_factor($mp1->mul(_set_int(1e3))) },
+                       ($n->len->lt(_set_int(500)) ? sub { $n->flt_factor($mp1->mul(_set_int(1e2))) } : ()),
                        sub { $n->phi_finder_factor($mp1->mul(_set_int(1e3))) },
                        sub { $n->dop_factor($mp1->mul($n->ilog2->isqrt)->mul(TWO)) },
                        sub { $n->miller_factor($mp1->mul(_set_int(5))) },
@@ -24470,19 +24471,20 @@ package Sidef::Types::Number::Number {
         my ($m) = @_;
 
         return (
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e4))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(5e2))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_random_prime(1e4)), $m->mul(_set_int(1e4))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(20000)), $m->mul(_set_int(200000))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(600)),  $m->mul(_set_int(20))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(2000)), $m->mul(_set_int(10))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(5e4))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(5e3))) }),
-                Sidef::Types::Block::Block->new(code => sub { $_[0]->phi_finder_factor($m->mul(_set_int(1e3))) }),
-               );
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->fermat_factor($m->mul(_set_int(1e3))) }),
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->holf_factor($m->mul(_set_int(1e4))) }),
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->pell_factor($m->mul(_set_int(5e2))) }),
+
+            #Sidef::Types::Block::Block->new(code => sub { $_[0]->flt_factor(_set_int(_random_prime(1e4)), $m->mul(_set_int(1e2))) }),
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(20000)), $m->mul(_set_int(200000))) }),
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(600)),  $m->mul(_set_int(20))) }),
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->ecm_factor($m->mul(_set_int(2000)), $m->mul(_set_int(10))) }),
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->pm1_factor($m->mul(_set_int(1e5))) }),
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->pp1_factor($m->mul(_set_int(5e4))) }),
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->pbrent_factor($m->mul(_set_int(1e5))) }),
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->chebyshev_factor($m->mul(_set_int(5e3))) }),
+            Sidef::Types::Block::Block->new(code => sub { $_[0]->phi_finder_factor($m->mul(_set_int(1e2))) }),
+        );
     }
 
     sub _apply_recursive_methods {
