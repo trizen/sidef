@@ -15017,86 +15017,108 @@ package Sidef::Types::Number::Number {
     sub cyclotomic_factor {
         my ($n, @bases) = @_;
 
+        # ── Input validation and normalisation ─────────────────────────────────────
         $n = _any2mpz($$n) // return _array();
-
-        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
-          or return _array();
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0 or return _array();
 
         if (@bases) {
             _valid(\(@bases));
-            @bases = grep { defined($_) } map { _any2mpz($$_) } @bases;
+            @bases = grep { defined } map { _any2mpz($$_) } @bases;
         }
         else {
             @bases = map { _any2mpz($_) } (2 .. __ilog__($n, 2));
         }
 
-        my $cyclotomicmod = sub {
-            my ($n, $x, $m) = @_;
+        $n = Math::GMPz::Rmpz_init_set($n);    # take a mutable copy
 
-            # Generate the squarefree divisors of n, along
-            # with the number of prime factors of each divisor
+        # ── Squarefree-divisor cache ────────────────────────────────────────────────
+        #
+        # The Möbius product formula for the cyclotomic polynomial is:
+        #
+        #   Φ_k(x) = ∏_{d | k}  (x^(k/d) − 1)^{μ(d)}
+        # ───────────────────────────────────────────────────────────────────────────
+        my %sd_cache;
+        my $squarefree_divisors_of = sub {
+            my ($k) = @_;
+            return $sd_cache{$k} if exists $sd_cache{$k};
+
             my @sd;
-            foreach my $pp (_factor_exp($n)) {
+            for my $pp (_factor_exp($k)) {
                 my $p = $pp->[0];
                 push @sd, map { [$_->[0] * $p, $_->[1] + 1] } @sd;
                 push @sd, [$p, 1];
             }
+            push @sd, [1, 0];    # trivial divisor d=1, ω(1)=0
+            $sd_cache{$k} = \@sd;
+        };
 
-            push @sd, [$ONE, 0];
+        my $t    = Math::GMPz::Rmpz_init();    # holds x^(k/d) − 1 (mod m)
+        my $tsav = Math::GMPz::Rmpz_init();    # saves $t before a potentially failing invert
+        my $prod = Math::GMPz::Rmpz_init();    # Möbius product accumulator
+        my $g    = Math::GMPz::Rmpz_init();    # GCD / factor scratch
 
-            my $prod = Math::GMPz::Rmpz_init_set_ui(1);
+        # ── Compute Φ_k(x) mod m
+        my $cyclotomicmod = sub {
+            my ($k, $x, $m) = @_;
 
-            foreach my $pair (@sd) {
-                my ($d, $c) = @$pair;
+            Math::GMPz::Rmpz_set_ui($prod, 1);
 
-                my $base = Math::GMPz::Rmpz_init();
-                my $exp  = CORE::int($n / $d);
+            for my $pair (@{$squarefree_divisors_of->($k)}) {
+                my ($d, $omega) = @$pair;
 
-                Math::GMPz::Rmpz_powm_ui($base, $x, $exp, $m);    # x^(n/d) mod m
-                Math::GMPz::Rmpz_sub_ui($base, $base, 1);
+                # t ← x^(k/d) − 1  (mod m)
+                Math::GMPz::Rmpz_powm_ui($t, $x, CORE::int($k / $d), $m);
+                Math::GMPz::Rmpz_sub_ui($t, $t, 1);
 
-                if ($c % 2 == 1) {
-                    Math::GMPz::Rmpz_invert($base, $base, $m) || return $base;
+                if ($omega & 1) {    # μ(d) = −1 → need modular inverse
+                    Math::GMPz::Rmpz_set($tsav, $t);    # preserve $t before invert overwrites it
+                    unless (Math::GMPz::Rmpz_invert($t, $t, $m)) {
+
+                        # $t is not invertible mod $m.
+                        # gcd($tsav, $m) > 1 is a non-trivial factor; store in $g for caller.
+                        Math::GMPz::Rmpz_gcd($g, $tsav, $m);
+                        return undef;
+                    }
                 }
 
-                Math::GMPz::Rmpz_mul($prod, $prod, $base);
+                Math::GMPz::Rmpz_mul($prod, $prod, $t);
                 Math::GMPz::Rmpz_mod($prod, $prod, $m);
             }
 
             $prod;
         };
 
-        $n = Math::GMPz::Rmpz_init_set($n);    # copy
-
         my @factors;
-        state $g = Math::GMPz::Rmpz_init_nobless();
 
-      OUTER: foreach my $x (@bases) {
+      OUTER: for my $x (@bases) {
             my $limit = 1 + __ilog__($n, $x);
 
-            foreach my $k (3 .. $limit) {
-                my $c = $cyclotomicmod->($k, $x, $n);
+            for (my $k = 3 ; $k <= $limit ; ++$k) {
+                my $phi = $cyclotomicmod->($k, $x, $n);
 
-                Math::GMPz::Rmpz_gcd($g, $n, $c);
-                if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0 and Math::GMPz::Rmpz_cmp($g, $n) < 0) {
+                # If cyclotomicmod returned undef, a non-trivial gcd was already
+                # written into $g; otherwise compute gcd(Φ_k(x), n) now.
+                Math::GMPz::Rmpz_gcd($g, $n, $phi) if defined $phi;
 
-                    my $valuation = Math::GMPz::Rmpz_remove($n, $n, $g);
-                    push(@factors, (Math::GMPz::Rmpz_init_set($g)) x $valuation);
+                # Skip trivial (= 1) or full (= n) GCDs.
+                next if Math::GMPz::Rmpz_cmp_ui($g, 1) == 0;
+                next if Math::GMPz::Rmpz_cmp($g, $n) == 0;
 
-                    if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0 or _is_prob_prime($n, 1)) {
-                        last OUTER;
-                    }
-                }
+                # Extract all copies of the factor from n.
+                my $f = Math::GMPz::Rmpz_init_set($g);         # own copy before $g is reused
+                my $v = Math::GMPz::Rmpz_remove($n, $n, $f);
+                push @factors, ($f) x $v;
+
+                last OUTER if (   Math::GMPz::Rmpz_cmp_ui($n, 1) == 0
+                               or _is_prob_prime($n, 1));
             }
         }
 
-        if (Math::GMPz::Rmpz_cmp_ui($n, 1) > 0) {
-            push @factors, $n;
-        }
+        # If n was not fully factored, the remainder is a (probable) prime factor.
+        Math::GMPz::Rmpz_cmp_ui($n, 1) > 0 and push @factors, $n;
 
         @factors = sort { Math::GMPz::Rmpz_cmp($a, $b) } @factors;
-        @factors = map  { bless \$_ } @factors;
-        _array(\@factors);
+        _array([map { bless \$_ } @factors]);
     }
 
     sub powerfree_sum {
