@@ -998,6 +998,17 @@ package Sidef::Types::Number::Number {
         $n;
     }
 
+    sub _normalize_numeric_type {
+        my ($n) = @_;
+        ref($n) eq 'Math::GMPz'
+          ? (
+               Math::GMPz::Rmpz_fits_ulong_p($n)
+             ? Math::GMPz::Rmpz_get_ui($n)
+             : Math::GMPz::Rmpz_get_str($n, 10)
+            )
+          : $n;
+    }
+
     sub _execute_pari_gp {
         my ($code) = @_;
         say STDERR ":: Executing PARI/GP with: $code" if $VERBOSE;
@@ -1030,12 +1041,7 @@ package Sidef::Types::Number::Number {
     sub _is_prob_prime {
         my ($n, $cache) = @_;
 
-        if (ref($n) eq 'Math::GMPz') {
-            $n =
-                Math::GMPz::Rmpz_fits_ulong_p($n)
-              ? Math::GMPz::Rmpz_get_ui($n)
-              : Math::GMPz::Rmpz_get_str($n, 10);
-        }
+        $n = _normalize_numeric_type($n);
 
         state %internal_cache;
         state $internal_cache_size = 0;
@@ -1069,37 +1075,193 @@ package Sidef::Types::Number::Number {
         $r;
     }
 
-    sub _factor {
-        my ($n) = @_;
+    # --- Helper Methods ---
 
-        if (ref($n) eq 'Math::GMPz') {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                $n = Math::GMPz::Rmpz_get_ui($n);
+    sub _sort_gmp_factors {
+        return map { $_->[0] }
+          sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
+          map { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @_;
+    }
+
+    sub _factor_via_prime_util {
+        my ($n) = @_;
+        (HAS_PRIME_UTIL and $n < ULONG_MAX)
+          ? Math::Prime::Util::factor($n)
+          : Math::Prime::Util::GMP::factor($n);
+    }
+
+    # --- Specific Factorization Strategies ---
+
+    sub _factor_special {
+        my ($n) = @_;
+        local $SPECIAL_FACTORS = 0;
+        say STDERR "Looking for special factors: $n" if $VERBOSE;
+
+        my @special_factors;
+        my $composite_factors = 0;
+        my $limit             = (CORE::length($n) <= YAFU_MIN) ? ZERO : ();
+
+        foreach my $p (@{_set_int($n)->special_factors($limit)}) {
+            if (_is_prob_prime($$p, 1)) {
+                push @special_factors, "$$p";
             }
             else {
-                $n = Math::GMPz::Rmpz_get_str($n, 10);
+                say STDERR "Recursively factoring: $$p" if $VERBOSE;
+                $composite_factors = 1;
+                push @special_factors, _factor($$p);
             }
         }
 
-        if ($n < ULONG_MAX) {    # return faster for native n
-            return (
-                    HAS_PRIME_UTIL
-                    ? Math::Prime::Util::factor($n)
-                    : Math::Prime::Util::GMP::factor($n)
-                   );
+        return () unless @special_factors;
+        return $composite_factors ? _sort_gmp_factors(@special_factors) : @special_factors;
+    }
+
+    sub _factor_factordb {
+        my ($n) = @_;
+        say STDERR "FactorDB: factoring $n" if $VERBOSE;
+
+        require HTTP::Tiny;
+        my $http     = HTTP::Tiny->new;
+        my $response = $http->get("http://factordb.com/api?query=$n");
+
+        return () unless $response->{success};
+
+        my $data = eval { require JSON::PP; JSON::PP::decode_json($response->{content}) };
+        return () unless (defined($data) && ref($data) eq 'HASH' && ref($data->{factors}) eq 'ARRAY');
+
+        my @factordb_factors;
+        my @unknown_factors;
+
+        foreach my $pp (@{$data->{factors}}) {
+            my ($p, $e) = @$pp;
+
+            if (_is_prob_prime($p, 1)) {
+                push @factordb_factors, ($p) x Math::Prime::Util::GMP::valuation($n, $p);
+            }
+            else {
+                say STDERR "FactorDB: composite factor $p" if $VERBOSE;
+                local $USE_FACTORDB = 0;
+                my @arr = _factor($p);
+                push @unknown_factors, @arr;
+                push @factordb_factors, (@arr) x Math::Prime::Util::GMP::valuation($n, $p);
+            }
         }
 
-        my @factors;
+        if (@unknown_factors) {
+            say STDERR "FactorDB: sending new factors to factordb.com" if $VERBOSE;
+            my $resp = $http->post_form("http://factordb.com/report.php", {msub => "$n = " . join(' * ', @unknown_factors)});
+            if ($VERBOSE) {
+                say STDERR (
+                            $resp->{success}
+                            ? (
+                               $resp->{content} =~ /Thank you/
+                               ? "FactorDB: thank you for your contribution!"
+                               : "FactorDB: sent factors successfully!"
+                              )
+                            : "FactorDB: failed to send the new factors..."
+                           );
+            }
+        }
+
+        my $factors_prod = Math::Prime::Util::GMP::vecprod(@factordb_factors);
+
+        if ($factors_prod ne $n and Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
+            say STDERR "FactorDB: recursively factoring the remainder." if $VERBOSE;
+            my $r = Math::Prime::Util::GMP::divint($n, $factors_prod);
+            local $USE_FACTORDB = 0;
+            push @factordb_factors, _factor($r);
+            $factors_prod = Math::Prime::Util::GMP::mulint($factors_prod, $r);
+        }
+
+        if ($factors_prod eq $n) {
+            say STDERR "FactorDB: successful factorization." if $VERBOSE;
+            return _sort_gmp_factors(@factordb_factors);
+        }
+
+        return ();
+    }
+
+    sub _factor_yafu {
+        my ($n) = @_;
+        say STDERR "YAFU: factoring $n" if $VERBOSE;
+
+        my ($yafu_output, $exit_code) = _execute_in_tmpdir("yafu $n");
+        return () unless ($exit_code == 0 and defined($yafu_output));
+
+        my @yafu_factors;
+        while ($yafu_output =~ /^([PC])\d+\s*=\s*([0-9]+)/gm) {
+            my ($status, $factor) = ($1, $2);
+            if ($status eq 'P') {
+                push @yafu_factors, $factor;
+            }
+            else {
+                local $USE_YAFU = 0;
+                push @yafu_factors, _factor($factor);
+            }
+        }
+
+        # Ensure all factors are prime, otherwise recurse
+        if (grep { !_is_prob_prime($_, 1) } List::Util::uniq(@yafu_factors)) {
+            say STDERR "YAFU: not all factors are prime." if $VERBOSE;
+            local $USE_YAFU = 0;
+            @yafu_factors = map { _factor($_) } @yafu_factors;
+        }
+
+        my $factors_prod = Math::Prime::Util::GMP::vecprod(@yafu_factors);
+
+        if ($factors_prod ne $n) {
+            say STDERR "YAFU: factors do not multiply to n." if $VERBOSE;
+            if (Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
+                say STDERR "YAFU: recomputing multiplicities..." if $VERBOSE;
+
+                my @corrected_factors;
+                foreach my $p (List::Util::uniq(@yafu_factors)) {
+                    next if $n eq $p;
+                    my $v = Math::Prime::Util::GMP::valuation($n, $p);
+                    push(@corrected_factors, ($p) x $v) if $v > 0;
+                }
+
+                @yafu_factors = @corrected_factors;
+                $factors_prod = Math::Prime::Util::GMP::vecprod(@yafu_factors);
+
+                if ($factors_prod ne $n and Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
+                    say STDERR "YAFU: recursively factoring the remainder." if $VERBOSE;
+                    my $r = Math::Prime::Util::GMP::divint($n, $factors_prod);
+                    local $USE_YAFU = 0;
+                    push @yafu_factors, _factor($r);
+                    $factors_prod = Math::Prime::Util::GMP::mulint($factors_prod, $r);
+                }
+            }
+            else {
+                say STDERR "YAFU: product of factors do not divide n." if $VERBOSE;
+            }
+        }
+
+        if ($factors_prod eq $n) {
+            say STDERR "YAFU: successful factorization: @yafu_factors" if $VERBOSE;
+            return _sort_gmp_factors(@yafu_factors);
+        }
+
+        return ();
+    }
+
+    sub _factor {
+        my ($n) = @_;
         my $orig_n = $n;
 
-        if (CORE::length($n) > 500) {
+        $n = _normalize_numeric_type($n);
 
+        # Fast path for small native numbers
+        return _factor_via_prime_util($n) if $n < ULONG_MAX;
+
+        my @factors;
+
+        # Adaptive trial factorization for exceptionally large numbers
+        if (CORE::length($n) > 500) {
             ($n, @factors) = _adaptive_trial_factor($n);
 
             if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
-                    return @factors;
-                }
+                return @factors if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
                 $n = Math::GMPz::Rmpz_get_ui($n);
             }
             else {
@@ -1107,230 +1269,43 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        if (CORE::length($n) >= SPECIAL_FACTORS_MIN and $SPECIAL_FACTORS) {
-
+        # Centralized prime check for large remaining composites
+        my $len = CORE::length($n);
+        if ($len >= SPECIAL_FACTORS_MIN || $len >= FACTORDB_MIN || $len >= YAFU_MIN) {
             if (_is_prob_prime($n, 1)) {
                 push @factors, $n;
                 return @factors;
             }
+        }
+
+        # 1. Special Factors Strategy
+        if ($len >= SPECIAL_FACTORS_MIN and $SPECIAL_FACTORS) {
 
             # Throw away the small factors (if any)
-            ($n, @factors) = ($orig_n);
-
-            local $SPECIAL_FACTORS = 0;
-            say STDERR "Looking for special factors: $n" if $VERBOSE;
-
-            my @special_factors;
-            my $composite_factors = 0;
-
-            foreach my $p (@{_set_int($n)->special_factors((CORE::length($n) <= YAFU_MIN ? ZERO : ()))}) {
-                if (_is_prob_prime($$p, 1)) {
-                    push @special_factors, "$$p";
-                }
-                else {
-                    say STDERR "Recursively factoring: $$p" if $VERBOSE;
-                    $composite_factors = 1;
-                    push @special_factors, _factor($$p);
-                }
-            }
-
-            if ($composite_factors) {
-                @special_factors =
-                  map  { $_->[0] }
-                  sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
-                  map  { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @special_factors;
-            }
-
-            push @factors, @special_factors;
-            return @factors;
+            my @special = _factor_special($orig_n);
+            return @special if @special;
         }
 
-        if (CORE::length($n) >= FACTORDB_MIN and $USE_FACTORDB) {
-
-            if (_is_prob_prime($n, 1)) {
-                push @factors, $n;
+        # 2. FactorDB Strategy
+        if ($len >= FACTORDB_MIN and $USE_FACTORDB) {
+            my @fdb = _factor_factordb($n);
+            if (@fdb) {
+                push @factors, @fdb;
                 return @factors;
             }
-
-            say STDERR "FactorDB: factoring $n" if $VERBOSE;
-
-            require HTTP::Tiny;
-
-            my $http     = HTTP::Tiny->new;
-            my $response = $http->get("http://factordb.com/api?query=$n");
-
-            if ($response->{success}) {
-                my $json = $response->{content};
-                my $data = eval { require JSON::PP; JSON::PP::decode_json($json) };
-
-                if (    defined($data)
-                    and ref($data) eq 'HASH'
-                    and exists($data->{factors})
-                    and ref($data->{factors}) eq 'ARRAY') {
-
-                    my @factordb_factors;
-                    my @unknown_factors;
-
-                    my @factor_exp = @{$data->{factors}};
-
-                    foreach my $pp (@factor_exp) {
-                        my ($p, $e) = @$pp;
-
-                        if (_is_prob_prime($p, 1)) {
-                            push @factordb_factors, ($p) x Math::Prime::Util::GMP::valuation($n, $p);
-                        }
-                        else {
-                            say STDERR "FactorDB: composite factor $p" if $VERBOSE;
-                            local $USE_FACTORDB = 0;
-                            my @arr = _factor($p);
-                            push @unknown_factors, @arr;
-                            foreach my $i (1 .. Math::Prime::Util::GMP::valuation($n, $p)) {
-                                push @factordb_factors, @arr;
-                            }
-                        }
-                    }
-
-                    if (@unknown_factors) {
-                        say STDERR "FactorDB: sending new factors to factordb.com" if $VERBOSE;
-                        my $form_data  = "$n = " . join(' * ', @unknown_factors);
-                        my $report_url = "http://factordb.com/report.php";
-                        my $resp       = $http->post_form($report_url, {msub => $form_data});
-                        if ($resp->{success}) {
-                            if ($VERBOSE) {
-                                if ($resp->{content} =~ /Thank you for your contribution/) {
-                                    say STDERR "FactorDB: thank you for your contribution!";
-                                }
-                                else {
-                                    say STDERR "FactorDB: sent factors successfully!";
-                                }
-                            }
-                        }
-                        else {
-                            say STDERR "FactorDB: failed to send the new factors..." if $VERBOSE;
-                        }
-                    }
-
-                    my $factors_prod = Math::Prime::Util::GMP::vecprod(@factordb_factors);
-
-                    if ($factors_prod ne $n and Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
-                        say STDERR "FactorDB: recursively factoring the remainder." if $VERBOSE;
-                        my $r = Math::Prime::Util::GMP::divint($n, $factors_prod);
-                        local $USE_FACTORDB = 0;
-                        push @factordb_factors, _factor($r);
-                        $factors_prod = Math::Prime::Util::GMP::mulint($factors_prod, $r);
-                    }
-
-                    # The prime factors must multiply back to n
-                    if ($factors_prod eq $n) {
-                        say STDERR "FactorDB: successful factorization." if $VERBOSE;
-                        @factordb_factors =
-                          map  { $_->[0] }
-                          sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
-                          map  { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @factordb_factors;
-                        push @factors, @factordb_factors;
-                        return @factors;
-                    }
-                }
-            }
         }
 
-        if (CORE::length($n) >= YAFU_MIN and $USE_YAFU and -t STDIN) {
-
-            if (_is_prob_prime($n, 1)) {
-                push @factors, $n;
+        # 3. YAFU Strategy
+        if ($len >= YAFU_MIN and $USE_YAFU and -t STDIN) {
+            my @yafu = _factor_yafu($n);
+            if (@yafu) {
+                push @factors, @yafu;
                 return @factors;
             }
-
-            say STDERR "YAFU: factoring $n" if $VERBOSE;
-
-            my ($yafu_output, $exit_code) = _execute_in_tmpdir("yafu $n");
-
-            # Parse the YAFU output
-            if ($exit_code == 0 and defined($yafu_output)) {
-
-                my @yafu_factors;
-                while ($yafu_output =~ /^([PC])\d+\s*=\s*([0-9]+)/gm) {
-                    my ($status, $factor) = ($1, $2);
-
-                    if ($status eq 'P') {
-                        push @yafu_factors, $factor;
-                    }
-                    else {
-                        local $USE_YAFU = 0;
-                        push @yafu_factors, _factor($factor);
-                    }
-                }
-
-                # Make sure all factors are prime
-                my $all_prime = 1;
-                foreach my $p (List::Util::uniq(@yafu_factors)) {
-                    if (!_is_prob_prime($p, 1)) {
-                        $all_prime = 0;
-                        last;
-                    }
-                }
-
-                # If some factors are not prime, then factor them without using YAFU
-                if (!$all_prime) {
-                    say STDERR "YAFU: not all factors are prime." if $VERBOSE;
-                    local $USE_YAFU = 0;
-                    @yafu_factors = map { _factor($_) } @yafu_factors;
-                }
-
-                my $factors_prod = Math::Prime::Util::GMP::vecprod(@yafu_factors);
-
-                # Workaround for when factors do not multiple back to n.
-                if ($factors_prod ne $n) {
-                    say STDERR "YAFU: factors do not multiply to n." if $VERBOSE;
-                    if (Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
-
-                        say STDERR "YAFU: recomputing multiplicities..." if $VERBOSE;
-
-                        my @corrected_factors;
-                        foreach my $p (List::Util::uniq(@yafu_factors)) {
-                            next if ($n eq $p);
-                            my $v = Math::Prime::Util::GMP::valuation($n, $p);
-                            if ($v > 0) {
-                                push(@corrected_factors, ($p) x $v);
-                            }
-                        }
-
-                        @yafu_factors = @corrected_factors;
-                        $factors_prod = Math::Prime::Util::GMP::vecprod(@yafu_factors);
-
-                        if ($factors_prod ne $n and Math::Prime::Util::GMP::modint($n, $factors_prod) eq '0') {
-                            say STDERR "YAFU: recursively factoring the remainder." if $VERBOSE;
-                            my $r = Math::Prime::Util::GMP::divint($n, $factors_prod);
-                            local $USE_YAFU = 0;
-                            push @yafu_factors, _factor($r);
-                            $factors_prod = Math::Prime::Util::GMP::mulint($factors_prod, $r);
-                        }
-                    }
-                    else {
-                        say STDERR "YAFU: product of factors do not divide n." if $VERBOSE;
-                    }
-                }
-
-                # The prime factors must multiply back to n
-                if ($factors_prod eq $n) {
-                    say STDERR "YAFU: successful factorization: @yafu_factors" if $VERBOSE;
-                    @yafu_factors =
-                      map  { $_->[0] }
-                      sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) }
-                      map  { [$_, Math::GMPz::Rmpz_init_set_str($_, 10)] } @yafu_factors;
-                    push @factors, @yafu_factors;
-                    return @factors;
-                }
-            }
         }
 
-        push @factors,
-          (
-            (HAS_PRIME_UTIL and $n < ULONG_MAX)
-            ? Math::Prime::Util::factor($n)
-            : Math::Prime::Util::GMP::factor($n)
-          );
-
+        # 4. Fallback Strategy
+        push @factors, _factor_via_prime_util($n);
         return @factors;
     }
 
@@ -1338,14 +1313,7 @@ package Sidef::Types::Number::Number {
     sub _factor_exp {
         my ($n) = @_;
 
-        if (ref($n) eq 'Math::GMPz') {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                $n = Math::GMPz::Rmpz_get_ui($n);
-            }
-            else {
-                $n = Math::GMPz::Rmpz_get_str($n, 10);
-            }
-        }
+        $n = _normalize_numeric_type($n);
 
         if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
             return Math::Prime::Util::factor_exp($n);
@@ -1372,14 +1340,7 @@ package Sidef::Types::Number::Number {
     sub _divisors {
         my ($n) = @_;
 
-        if (ref($n) eq 'Math::GMPz') {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                $n = Math::GMPz::Rmpz_get_ui($n);
-            }
-            else {
-                $n = Math::GMPz::Rmpz_get_str($n, 10);
-            }
-        }
+        $n = _normalize_numeric_type($n);
 
         if (CORE::length($n) >= SPECIAL_FACTORS_MIN) {
             my $t = _set_int($n);
@@ -1436,14 +1397,7 @@ package Sidef::Types::Number::Number {
     sub _is_squarefree {
         my ($n) = @_;
 
-        if (ref($n) eq 'Math::GMPz') {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                $n = Math::GMPz::Rmpz_get_ui($n);
-            }
-            else {
-                $n = Math::GMPz::Rmpz_get_str($n, 10);
-            }
-        }
+        $n = _normalize_numeric_type($n);
 
         if (CORE::length($n) >= SPECIAL_FACTORS_MIN) {
             my @factors = _factor($n);
@@ -1464,14 +1418,7 @@ package Sidef::Types::Number::Number {
     sub _next_prime {
         my ($n) = @_;
 
-        if (ref($n) eq 'Math::GMPz') {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                $n = Math::GMPz::Rmpz_get_ui($n);
-            }
-            else {
-                $n = Math::GMPz::Rmpz_get_str($n, 10);
-            }
-        }
+        $n = _normalize_numeric_type($n);
 
         (HAS_PRIME_UTIL and $n < (ULONG_MAX - 2000))
           ? Math::Prime::Util::next_prime($n)
@@ -1481,14 +1428,7 @@ package Sidef::Types::Number::Number {
     sub _prev_prime {
         my ($n) = @_;
 
-        if (ref($n) eq 'Math::GMPz') {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-                $n = Math::GMPz::Rmpz_get_ui($n);
-            }
-            else {
-                $n = Math::GMPz::Rmpz_get_str($n, 10);
-            }
-        }
+        $n = _normalize_numeric_type($n);
 
         (HAS_PRIME_UTIL and $n < ULONG_MAX)
           ? Math::Prime::Util::prev_prime($n)
