@@ -10759,6 +10759,15 @@ package Sidef::Types::Number::Number {
             return (1, 1);
         }
 
+        state %sos_cache;
+        undef %sos_cache if scalar(keys(%sos_cache)) > 1e5;
+
+        my $key = Math::GMPz::Rmpz_get_str($p, 10);
+
+        if (exists $sos_cache{$key}) {
+            return @{$sos_cache{$key}};
+        }
+
         # Step 1: s ← sqrt(-1) mod p
         my $s = Math::GMPz::Rmpz_init_set_str((Math::Prime::Util::GMP::sqrtmod(-1, Math::GMPz::Rmpz_get_str($p, 10)) // die "error"), 10);
         my $q = Math::GMPz::Rmpz_init_set($p);    # q ← p  (previous remainder)
@@ -10779,7 +10788,8 @@ package Sidef::Types::Number::Number {
         # Step 3: b = (previous remainder) mod a
         Math::GMPz::Rmpz_mod($q, $q, $s);                 # q ← q mod s  →  b
 
-        return ($s, $q);
+        $sos_cache{$key} = [$q, $s];
+        return ($q, $s);
     }
 
     sub _combine_pairs {
@@ -10809,6 +10819,7 @@ package Sidef::Types::Number::Number {
                 }
             }
         }
+
         return @result;
     }
 
@@ -10817,9 +10828,7 @@ package Sidef::Types::Number::Number {
 
         # ── Normalise input ───────────────────────────────────────────────────────
         $n = _any2mpz($$n, 0) // return _array();
-
-        Math::GMPz::Rmpz_sgn($n) >= 0
-          or return _array();
+        Math::GMPz::Rmpz_sgn($n) >= 0 or return _array();
 
         # ── Trivial cases ─────────────────────────────────────────────────────────
         if (Math::GMPz::Rmpz_sgn($n) == 0) {
@@ -19394,7 +19403,11 @@ package Sidef::Types::Number::Number {
         state $u1 = Math::GMPz::Rmpz_init_nobless();
         state $u2 = Math::GMPz::Rmpz_init_nobless();
 
-        foreach my $factor (@factors) {
+        if (Math::GMPz::Rmpz_congruent_ui_p($t, 3, 4)) {
+            Math::GMPz::Rmpz_set_ui($prod3, 0);
+        }
+
+        foreach my $factor (Math::GMPz::Rmpz_sgn($prod3) == 0 ? () : @factors) {
             my ($p_str, $e) = @$factor;
 
             Math::GMPz::Rmpz_set_str($p, $p_str, 10);
@@ -19456,7 +19469,7 @@ package Sidef::Types::Number::Number {
         }
 
         # Finally, apply the 2^v component: a(2^v) = (-4)^v
-        if ($v >= 1) {
+        if ($v >= 1 and Math::GMPz::Rmpz_sgn($prod3)) {
             Math::GMPz::Rmpz_mul_2exp($prod3, $prod3, 2 * $v);
             Math::GMPz::Rmpz_neg($prod3, $prod3) if ($v % 2 == 1);
         }
