@@ -8552,11 +8552,17 @@ Aliases: I<to_r>, I<to_rat>
 =head2 rat_approx
 
     x.rat_approx
+    x.rat_approx(max_den)
 
 Given a real number C<x>, it returns a very good (sometimes exact) rational approximation to C<n>, computed with continued fractions.
 
     say rat_approx(3.14).as_frac        #=> 22/7
     say rat_approx(zeta(-5)).as_frac    #=> -1/252
+
+It also accepts and optional argument C<max_den>, returning the best rational approximation to C<<x>> with denominator C<<< q <= max_den >>>.
+
+    say rat_approx(Num.pi, 1e4).as_frac    #=> 355/113
+    say rat_approx(Num.pi, 1e9).as_frac    #=> 2549491779/811528438
 
 Returns C<NaN> when C<x> is not a real number.
 

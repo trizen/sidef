@@ -1877,4 +1877,35 @@ do {
     assert_eq(n, nth_rough(50, k))
 }
 
+assert_eq(rat_approx(0), 0)
+assert_eq(rat_approx(1), 1)
+assert_eq(rat_approx(42), 42)
+assert_eq(rat_approx(-0.3), -3/10)
+assert_eq(rat_approx(-0.33), -1/3)
+assert_eq(rat_approx(-0.333), -1/3)
+assert_eq(rat_approx(-0.3333), -1/3)
+assert_eq(rat_approx(-0.33333), -1/3)
+assert_eq(rat_approx(3.141), 245/78)
+assert_eq(rat_approx(3.14), 22/7)
+assert_eq(rat_approx(0.3333f), 1/3)
+assert_eq(rat_approx(0.333f), 1/3)
+assert_eq(rat_approx(0.33f), 1/3)
+assert_eq(rat_approx(0.3f), 3/10)
+assert_eq(rat_approx(zeta(-5)), -1/252)
+
+assert_eq(0.443298969f.rat_approx, 43/97)
+assert_eq(2.25581395348f.rat_approx, 97/43)
+assert_eq(0.4432989690721649484536082474f.rat_approx, 43/97)
+assert_eq(0.443298969072164948453608247422680412371134020619f.rat_approx, 43/97)
+assert_eq(2.25581395348837209302325581395348837209302325581f.rat_approx, 97/43)
+assert_eq(0.58285f.rat_approx, 503/863)
+assert_eq(0.58285052f.rat_approx, 503/863)
+assert_eq(0.58285052143684820f.rat_approx, 503/863)
+assert_eq(0.582850521436848203939745075318655851680185399768f.rat_approx, 503/863)
+
+assert_eq(
+    10.of{|n| Num.pi.rat_approx(10**n) },
+    [3, 22/7, 311/99, 355/113, 355/113, 312689/99532, 3126535/995207, 5419351/1725033, 245850922/78256779, 2549491779/811528438]
+)
+
 say "** Tests passed!"

@@ -1857,54 +1857,133 @@ package Sidef::Types::Number::Number {
     }
 
     sub rat_approx {
-        my ($x) = @_;
+        my ($x_ref, $max_den) = @_;
 
-        $x = _any2mpfr($$x);
+        # Algorithm from Math::Prime::Util
 
-        Math::MPFR::Rmpfr_number_p($x) || goto &nan;
-
-        my $n1 = Math::GMPz::Rmpz_init_set_ui(0);
-        my $n2 = Math::GMPz::Rmpz_init_set_ui(1);
-
-        my $d1 = Math::GMPz::Rmpz_init_set_ui(1);
-        my $d2 = Math::GMPz::Rmpz_init_set_ui(0);
-
-        my $q = Math::GMPq::Rmpq_init();
-        my $z = Math::GMPz::Rmpz_init();
-
-        my $s = __stringify__($x);
-
-        my $f1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        my $f2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        my $f3 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-
-        Math::MPFR::Rmpfr_set($f1, $x, $ROUND);
-
-        while (1) {
-            Math::MPFR::Rmpfr_floor($f2, $f1);
-            Math::MPFR::Rmpfr_get_z($z, $f2, $ROUND);
-
-            Math::GMPz::Rmpz_addmul($n1, $n2, $z);    # n1 += n2 * z
-            Math::GMPz::Rmpz_addmul($d1, $d2, $z);    # d1 += d2 * z
-
-            ($n1, $n2) = ($n2, $n1);
-            ($d1, $d2) = ($d2, $d1);
-
-            # q = n2 / d2
-            Math::GMPq::Rmpq_set_num($q, $n2);
-            Math::GMPq::Rmpq_set_den($q, $d2);
-            Math::GMPq::Rmpq_canonicalize($q);
-
-            Math::MPFR::Rmpfr_set_q($f3, $q, $ROUND);
-            CORE::index(__stringify__($f3), $s) == 0 and last;
-
-            # f1 = 1 / (f1 - f2)
-            Math::MPFR::Rmpfr_sub($f1, $f1, $f2, $ROUND);
-            Math::MPFR::Rmpfr_zero_p($f1) && last;
-            Math::MPFR::Rmpfr_ui_div($f1, 1, $f1, $ROUND);
+        if (defined($max_den)) {
+            $max_den = _any2mpz($$max_den, 0) // goto &nan;
         }
 
-        bless \$q;
+        my $x = _any2mpfr($$x_ref);
+        Math::MPFR::Rmpfr_number_p($x) || goto &nan;
+
+        # 1. Count decimal places
+        if (!defined($max_den)) {
+            my $input_str      = __stringify__($x);
+            my $decimal_places = (length($input_str) - index($input_str, '.'));
+            $max_den = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_ui_pow_ui($max_den, 10, $decimal_places >> 1);
+        }
+
+        # Extract sign and work strictly with absolute value
+        my $sign = Math::MPFR::Rmpfr_sgn($x);
+        my $xabs = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_abs($xabs, $x, $ROUND);
+
+        # Initialize previous state (p0, q0)
+        state $p0 = Math::GMPz::Rmpz_init_nobless();
+        state $q0 = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_ui($p0, 1);
+        Math::GMPz::Rmpz_set_ui($q0, 0);
+
+        # Initialize current state (p1, q1)
+        state $p1 = Math::GMPz::Rmpz_init_nobless();
+        state $q1 = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_ui($q1, 1);
+
+        my $temp_f1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $temp_f2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        # p1 = floor(xabs)
+        Math::MPFR::Rmpfr_floor($temp_f1, $xabs);
+        Math::MPFR::Rmpfr_get_z($p1, $temp_f1, $ROUND);
+
+        # remainder = xabs - p1
+        my $remainder = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_sub_z($remainder, $xabs, $p1, $ROUND);
+
+        # Working variables allocated once outside the loop
+        state $m           = Math::GMPz::Rmpz_init_nobless();
+        state $candidate_p = Math::GMPz::Rmpz_init_nobless();
+        state $candidate_q = Math::GMPz::Rmpz_init_nobless();
+        state $t           = Math::GMPz::Rmpz_init_nobless();
+
+        while (Math::MPFR::Rmpfr_cmp_ui($remainder, 0) > 0) {
+
+            # inv_remainder = 1 / remainder
+            Math::MPFR::Rmpfr_ui_div($temp_f2, 1, $remainder, $ROUND);
+
+            # m = floor(inv_remainder)
+            Math::MPFR::Rmpfr_floor($temp_f1, $temp_f2);
+            Math::MPFR::Rmpfr_get_z($m, $temp_f1, $ROUND);
+
+            last if Math::GMPz::Rmpz_sgn($m) == 0;
+
+            # remainder = inv_remainder - a
+            Math::MPFR::Rmpfr_sub_z($remainder, $temp_f2, $m, $ROUND);
+
+            # t = (max_den - q0) / q1   (Integer Division)
+            Math::GMPz::Rmpz_sub($t, $max_den, $q0);
+            Math::GMPz::Rmpz_tdiv_q($t, $t, $q1);
+
+            if (Math::GMPz::Rmpz_cmp($m, $t) > 0) {
+
+                if (Math::GMPz::Rmpz_cmp_ui($t, 1) >= 0) {
+
+                    # candidate_p = (t * p1) + p0
+                    Math::GMPz::Rmpz_mul($candidate_p, $t, $p1);
+                    Math::GMPz::Rmpz_add($candidate_p, $candidate_p, $p0);
+
+                    # candidate_q = (t * q1) + q0
+                    Math::GMPz::Rmpz_mul($candidate_q, $t, $q1);
+                    Math::GMPz::Rmpz_add($candidate_q, $candidate_q, $q0);
+
+                    # Calculate candidate_error = abs(candidate_p - (xabs * candidate_q)) * q1
+                    Math::MPFR::Rmpfr_mul_z($temp_f1, $xabs, $candidate_q, $ROUND);       # xabs * candidate_q
+                    Math::MPFR::Rmpfr_z_sub($temp_f1, $candidate_p, $temp_f1, $ROUND);    # candidate_p - ...
+                    Math::MPFR::Rmpfr_abs($temp_f1, $temp_f1, $ROUND);                    # abs(...)
+                    Math::MPFR::Rmpfr_mul_z($temp_f2, $temp_f1, $q1, $ROUND);
+
+                    # Calculate current_error = abs(p1 - (xabs * q1)) * candidate_q
+                    Math::MPFR::Rmpfr_mul_z($temp_f1, $xabs, $q1, $ROUND);                # xabs * q1
+                    Math::MPFR::Rmpfr_z_sub($temp_f1, $p1, $temp_f1, $ROUND);             # p1 - ...
+                    Math::MPFR::Rmpfr_abs($temp_f1, $temp_f1, $ROUND);                    # abs(...)
+                    Math::MPFR::Rmpfr_mul_z($temp_f1, $temp_f1, $candidate_q, $ROUND);
+
+                    # if candidate_error < current_error
+                    if (Math::MPFR::Rmpfr_cmp($temp_f2, $temp_f1) < 0) {
+                        Math::GMPz::Rmpz_set($p1, $candidate_p);
+                        Math::GMPz::Rmpz_set($q1, $candidate_q);
+                    }
+                }
+                last;
+            }
+
+            # (m * p1) + p0
+            Math::GMPz::Rmpz_mul($t, $m, $p1);
+            Math::GMPz::Rmpz_add($t, $t, $p0);
+            Math::GMPz::Rmpz_set($p0, $p1);
+            Math::GMPz::Rmpz_set($p1, $t);
+
+            # (m * q1) + q0
+            Math::GMPz::Rmpz_mul($t, $m, $q1);
+            Math::GMPz::Rmpz_add($t, $t, $q0);
+            Math::GMPz::Rmpz_set($q0, $q1);
+            Math::GMPz::Rmpz_set($q1, $t);
+        }
+
+        # Restore negative sign if required
+        Math::GMPz::Rmpz_neg($p1, $p1) if $sign < 0;
+
+        my $ans_q = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_num($ans_q, $p1);
+        Math::GMPq::Rmpq_set_den($ans_q, $q1);
+        Math::GMPq::Rmpq_canonicalize($ans_q);
+
+        bless \$ans_q;
     }
 
     sub pair {
@@ -18547,21 +18626,23 @@ package Sidef::Types::Number::Number {
         }
 
         if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            return _set_int(Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($n)))->div(_set_int(12));
+            state $twelve = _set_int(12);
+            return _set_int(Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($n)))->div($twelve);
         }
 
         my $square = 0;
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
+        # Pre-allocate all temporary variables to avoid loop allocation overhead
+        state $t   = Math::GMPz::Rmpz_init_nobless();
+        state $lim = Math::GMPz::Rmpz_init_nobless();
+        state $d_z = Math::GMPz::Rmpz_init_nobless();    # For divisor conversion
 
-        my $h = Math::GMPz::Rmpz_init_set_ui(0);
-        my $B = Math::GMPz::Rmpz_init_set_ui(Math::GMPz::Rmpz_odd_p($n) ? 1 : 0);
-
+        my $h  = Math::GMPz::Rmpz_init_set_ui(0);
+        my $B  = Math::GMPz::Rmpz_init_set_ui(Math::GMPz::Rmpz_odd_p($n) ? 1 : 0);
         my $B2 = Math::GMPz::Rmpz_init_set($n);
+
         Math::GMPz::Rmpz_add_ui($B2, $B2, 1);
         Math::GMPz::Rmpz_div_2exp($B2, $B2, 2);
-
-        my $lim = Math::GMPz::Rmpz_init();
 
         if (Math::GMPz::Rmpz_sgn($B) == 0) {
             Math::GMPz::Rmpz_sqrt($lim, $B2);
@@ -18571,16 +18652,11 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_sub_ui($lim, $lim, 1);
             }
 
-            my $count = 0;
-            foreach my $d (_divisors($B2)) {
-                if ($d < ULONG_MAX) {
-                    (Math::GMPz::Rmpz_cmp_ui($lim, $d) >= 0) ? ++$count : last;
-                }
-                else {
-                    Math::GMPz::Rmpz_set_str($t, $d, 10);
-                    (Math::GMPz::Rmpz_cmp($lim, $t) >= 0) ? ++$count : last;
-                }
-            }
+            my $count = (
+                         HAS_PRIME_UTIL
+                         ? Math::Prime::Util::divisor_sum($B2, 0)
+                         : Math::Prime::Util::GMP::sigma($B2, 0)
+                        ) >> 1;
 
             Math::GMPz::Rmpz_add_ui($h, $h, $count);
 
@@ -18609,19 +18685,22 @@ package Sidef::Types::Number::Number {
             my $count = 0;
             foreach my $d (_divisors($B2)) {
                 if ($d < ULONG_MAX) {
-                    Math::GMPz::Rmpz_cmp_ui($lim, $d) >= 0 or last;
-                    ++$count if (Math::GMPz::Rmpz_cmp_ui($B, $d) < 0);
+                    last     if Math::GMPz::Rmpz_cmp_ui($lim, $d) < 0;
+                    ++$count if Math::GMPz::Rmpz_cmp_ui($B,   $d) < 0;
                 }
                 else {
-                    Math::GMPz::Rmpz_set_str($t, $d, 10);
-                    Math::GMPz::Rmpz_cmp($lim, $t) >= 0 or last;
-                    ++$count if (Math::GMPz::Rmpz_cmp($B, $t) < 0);
+                    Math::GMPz::Rmpz_set_str($d_z, "$d", 10);
+                    last     if Math::GMPz::Rmpz_cmp($d_z, $lim) > 0;
+                    ++$count if Math::GMPz::Rmpz_cmp($d_z, $B) > 0;
                 }
             }
 
             Math::GMPz::Rmpz_add_ui($h, $h, 2 * $count) if ($count > 0);
+
+            # B = B + 2
             Math::GMPz::Rmpz_add_ui($B, $B, 2);
 
+            # B2 = (B^2 + n) / 4
             Math::GMPz::Rmpz_mul($B2, $B, $B);
             Math::GMPz::Rmpz_add($B2, $B2, $n);
             Math::GMPz::Rmpz_div_2exp($B2, $B2, 2);
@@ -18634,6 +18713,7 @@ package Sidef::Types::Number::Number {
         if ($square or Math::GMPz::Rmpz_cmp($t, $n) == 0) {
             Math::GMPz::Rmpz_mul_ui($h, $h, $m);
             Math::GMPz::Rmpz_add_ui($h, $h, 1);
+
             my $q = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_ui($q, 1, $m);
             Math::GMPq::Rmpq_mul_z($q, $q, $h);
