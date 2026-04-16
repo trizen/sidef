@@ -30343,480 +30343,492 @@ package Sidef::Types::Number::Number {
         $n->prev_powerful(THREE);
     }
 
+    # =============================================================================
+    # Helper: Strong Fermat condition check for a prime (power) p.
+    #
+    # Returns true iff:
+    #   v2(p-1) > k_exp   AND
+    #   base^((p-1) >> (v2(p-1) - k_exp))  ≡  congr  (mod p)
+    #
+    # Dispatches to Math::Prime::Util or Math::Prime::Util::GMP as available.
+    # p must fit in a native unsigned long (always the case when called from the
+    # sieve generator, where p is iterated with next_prime from a small lower
+    # bound).
+    # =============================================================================
+    sub _strong_fermat_check {
+        my ($p, $base, $k_exp, $congr) = @_;
+
+        my $val =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::valuation($p - 1, 2)
+          : Math::Prime::Util::GMP::valuation($p - 1, 2);
+
+        return 0 unless $val > $k_exp;
+
+        my $pm =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powmod($base, ($p - 1) >> ($val - $k_exp), $p)
+          : Math::Prime::Util::GMP::powmod($base, ($p - 1) >> ($val - $k_exp), $p);
+
+        $pm == ($congr % $p);
+    }
+
+    # =============================================================================
+    # Brute-force sieve for k-omega primes in [$from, $to].
+    # Used when the interval is so small that iterating every integer is faster
+    # than the recursive generator: |B - A| < B^(1/(k+1)).
+    # =============================================================================
+    sub _sieve_small_range {
+        my ($from, $to, $k, $fermat, $strong) = @_;
+
+        my $v        = Math::GMPz::Rmpz_init_set($from);
+        my $o        = bless \$v;                          # Sidef::Types::Number::Number
+        my $k_obj    = bless \$k;
+        my $base_obj = bless \$fermat;                     # only used when $fermat is truthy
+
+        my @arr;
+        for (; Math::GMPz::Rmpz_cmp($v, $to) <= 0 ; Math::GMPz::Rmpz_add_ui($v, $v, 1)) {
+            if ($fermat) {
+                next unless $strong
+                  ? $o->is_strong_fermat_psp($base_obj)
+                  : $o->is_fermat_psp($base_obj);
+            }
+            if ($k == 1) {
+                $o->is_prime_power || next;
+            }
+            else {
+                $o->is_omega_prime($k_obj) || next;
+            }
+            push @arr, Math::GMPz::Rmpz_init_set($v);
+        }
+        return \@arr;
+    }
+
+    # =============================================================================
+    # Sieve for k-omega (Fermat) primes using native unsigned-long arithmetic.
+    # Pre-conditions: HAS_PRIME_UTIL is true AND $to fits in an unsigned long.
+    # =============================================================================
+    sub _sieve_omega_ulong {
+        my ($from, $to, $k, $fermat, $strong) = @_;
+
+        my $A = Math::GMPz::Rmpz_get_ui($from);
+        my $B = Math::GMPz::Rmpz_get_ui($to);
+
+        # Raise A to at least the k-th primorial so the smallest possible
+        # product of k distinct primes is always in range.
+        $A = Math::Prime::Util::vecmax($A, Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10),);
+        return [] if $A > $B;
+
+        my @omega_primes;
+        my %znorder;    # memoised multiplicative orders: p -> ord_{p}(fermat)
+
+        my $generator;
+        $generator = sub {
+            my ($m, $lo, $j, %args) = @_;
+
+            my $hi = Math::Prime::Util::rootint(Math::Prime::Util::divint($B, $m), $j,);
+            return if $lo > $hi;
+
+            # ------------------------------------------------------------------
+            # Base case j == 1: choose the final prime factor.
+            # ------------------------------------------------------------------
+            if ($j == 1) {
+                my $lambda = $args{lambda};
+
+                # Fast path: no Fermat filter, or lambda == 1 (no congruence
+                # constraint on p beyond being prime).
+                if (!$fermat or $lambda == 1) {
+                    for (my $p = Math::Prime::Util::next_prime($lo - 1) ; $p <= $hi ; $p = Math::Prime::Util::next_prime($p)) {
+                        next if ($fermat and $fermat % $p == 0);
+                        next if ($strong and !_strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr}));
+
+                        # When m==1 and we have a Fermat filter, start from p^2
+                        # so every candidate n = p^e has at least two prime
+                        # factors counted with multiplicity.
+                        my $v = ($fermat and $m == 1) ? $p * $p : $m * $p;
+                        for (; $v - 1 < $B ; $v *= $p) {
+                            next unless $v >= $A;
+                            if ($fermat) {
+                                last unless Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1;
+                            }
+                            push @omega_primes, $v;
+                        }
+                    }
+                    return;
+                }
+
+                # Fermat path with lambda > 1: valid prime powers must satisfy
+                # p ≡ m^{-1} (mod lambda).
+                my $t = Math::Prime::Util::invmod($m, $lambda);
+                return                                                        if $t > $hi;
+                $t += Math::Prime::Util::cdivint($lo - $t, $lambda) * $lambda if $t < $lo;
+                return                                                        if $t > $hi;
+
+                for (my $p = $t ; $p <= $hi ; $p += $lambda) {
+                    next
+                      unless Math::Prime::Util::is_prime_power($p)
+                      && Math::Prime::Util::gcd($m,      $p) == 1
+                      && Math::Prime::Util::gcd($fermat, $p) == 1;
+                    next if ($strong and !_strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr}));
+
+                    my $v = $m * $p;
+                    next unless $v >= $A;
+
+                    # k==1 composites that happen to be prime are excluded.
+                    next if ($k == 1 and Math::Prime::Util::is_prime($v));
+                    next unless (($v - 1) % ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p)) == 0);
+                    push @omega_primes, $v;
+                }
+                return;
+            }
+
+            # ------------------------------------------------------------------
+            # Recursive case j > 1: choose one prime factor and recurse.
+            # ------------------------------------------------------------------
+            my $lambda = $args{lambda};
+
+            for (my ($p, $r, $L) = ($lo) ; $p <= $hi ; $p = $r) {
+                $r = Math::Prime::Util::next_prime($p);
+                next if ($fermat and $fermat % $p == 0);
+                next if ($strong and !_strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr}));
+
+                my $z;
+                if ($fermat) {
+                    $z = ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p));
+                    next unless Math::Prime::Util::gcd($m, $z) == 1;
+                    $L = Math::Prime::Util::lcm($lambda, $z);
+                }
+
+                # Iterate over prime powers of p: p, p^2, p^3, ...
+                for (my ($pk, $v) = ($p, $m * $p) ; $v - 1 < $B ; ($pk, $v) = ($pk * $p, $v * $p)) {
+
+                    # For p^e with e >= 2, verify the Fermat order condition
+                    # extends to the higher power before recursing.
+                    last if ($fermat and $pk > $p and Math::Prime::Util::powmod($fermat, $z, $pk) != 1);
+
+                    if ($v * $r - 1 < $B) {
+                        $generator->($v, $r, $j - 1, %args, (defined $L ? (lambda => $L) : ()));
+                    }
+                }
+            }
+        };
+
+        # ------------------------------------------------------------------
+        # Kick off the generator.
+        # ------------------------------------------------------------------
+        if ($strong) {
+
+            # Case where base^d ≡ 1 (mod p), d = odd part of p-1.
+            $generator->(1, 2, $k, lambda => 1, k_exp => 0, congr => 1);
+
+            # Cases where base^(d·2^v) ≡ -1 (mod p), for v = 0 .. floor(log2 B).
+            for my $v (0 .. Math::Prime::Util::logint($B, 2)) {
+                $generator->(1, 2, $k, lambda => 1, k_exp => $v, congr => -1);
+            }
+        }
+        else {
+            $generator->(1, 2, $k, ($fermat ? (lambda => 1) : ()));
+        }
+
+        undef %znorder;
+        undef $generator;    # break circular reference
+
+        @omega_primes = sort { $a <=> $b } @omega_primes;
+
+        $fermat
+          ? [List::Util::uniq(@omega_primes)]
+          : \@omega_primes;
+    }
+
+    # =============================================================================
+    # Sieve for k-omega (Fermat) primes using GMP big-integer arithmetic.
+    # Used when $to does not fit in an unsigned long.
+    #
+    # Design notes on GMPz allocation strategy
+    # -----------------------------------------
+    # * $su / $sv are scratch variables captured by the closure and reused across
+    #   every j==1 base-case call.  This is safe because j==1 never recurses.
+    # * The j>1 recursive case allocates its own per-frame $lv / $lu / $lcm so
+    #   that recursive frames do not alias each other's loop variables.
+    # * $lcm is passed to the recursive call by reference (no copy).  The callee
+    #   returns before the caller overwrites $lcm for the next prime, so there is
+    #   no aliasing hazard in single-threaded Perl.
+    # =============================================================================
+    sub _sieve_omega_gmp {
+        my ($from, $to, $k, $fermat, $strong) = @_;
+
+        my $A = Math::GMPz::Rmpz_init_set($from);
+        my $B = Math::GMPz::Rmpz_init_set($to);
+
+        # Raise A to at least the k-th primorial.
+        {
+            my $primorial = _cached_pn_primorial($k);
+            if (Math::GMPz::Rmpz_cmp($primorial, $A) > 0) {
+                Math::GMPz::Rmpz_set($A, $primorial);
+            }
+        }
+        return [] if Math::GMPz::Rmpz_cmp($A, $B) > 0;
+
+        # Closure-captured scratch variables (j==1 base case only; never aliased
+        # by recursive j>1 frames).
+        my $su = Math::GMPz::Rmpz_init();
+        my $sv = Math::GMPz::Rmpz_init();
+        my $sw = Math::GMPz::Rmpz_init_set_ui($fermat // 0);    # Fermat base
+
+        my @omega_primes;
+        my %seen;                                               # dedup guard (used only when $fermat is set)
+        my %znorder;                                            # memoised multiplicative orders: p -> ord_{p}(fermat)
+
+        # Hoist dispatch outside the closure.
+        my $next_prime =
+          HAS_PRIME_UTIL
+          ? \&Math::Prime::Util::next_prime
+          : \&Math::Prime::Util::GMP::next_prime;
+
+        my $znorder_fn =
+          HAS_PRIME_UTIL
+          ? \&Math::Prime::Util::znorder
+          : \&Math::Prime::Util::GMP::znorder;
+
+        my $is_prime_power_fn =
+          HAS_PRIME_UTIL
+          ? \&Math::Prime::Util::is_prime_power
+          : \&Math::Prime::Util::GMP::is_prime_power;
+
+        my $gcd_fn =
+          HAS_PRIME_UTIL
+          ? \&Math::Prime::Util::gcd
+          : \&Math::Prime::Util::GMP::gcd;
+
+        my $powmod_fn =
+          HAS_PRIME_UTIL
+          ? \&Math::Prime::Util::powmod
+          : \&Math::Prime::Util::GMP::powmod;
+
+        my $generator;
+        $generator = sub {
+            my ($m, $lo, $j, %args) = @_;
+
+            # hi = floor( floor(B / m)^(1/j) )
+            Math::GMPz::Rmpz_tdiv_q($su, $B, $m);
+            Math::GMPz::Rmpz_root($su, $su, $j);
+            Math::GMPz::Rmpz_fits_ulong_p($su) || die "Too large value!";
+            my $hi = Math::GMPz::Rmpz_get_ui($su);
+
+            return if $lo > $hi;
+
+            # ------------------------------------------------------------------
+            # Base case j == 1: choose the final prime factor.
+            # ------------------------------------------------------------------
+            if ($j == 1) {
+                my $L = $args{lambda};
+
+                # Fast path: no Fermat filter, or lambda == 1.
+                if (!$fermat or Math::GMPz::Rmpz_cmp_ui($L, 1) == 0) {
+
+                    for (my $p = $next_prime->($lo - 1) ; $p <= $hi ; $p = $next_prime->($p)) {
+                        next if ($fermat and $fermat % $p == 0);
+                        next if ($strong and !_strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr}));
+
+                        # Starting value: p^2 when (fermat && m==1), else m*p.
+                        if ($fermat and Math::GMPz::Rmpz_cmp_ui($m, 1) == 0) {
+                            Math::GMPz::Rmpz_set_ui($sv, $p);
+                        }
+                        else {
+                            Math::GMPz::Rmpz_set($sv, $m);
+                        }
+
+                        for (Math::GMPz::Rmpz_mul_ui($sv, $sv, $p) ; Math::GMPz::Rmpz_cmp($sv, $B) <= 0 ; Math::GMPz::Rmpz_mul_ui($sv, $sv, $p)) {
+                            next unless Math::GMPz::Rmpz_cmp($sv, $A) >= 0;
+
+                            if ($fermat) {
+
+                                # Check: base^(v-1) ≡ 1 (mod v)
+                                Math::GMPz::Rmpz_sub_ui($su, $sv, 1);
+                                Math::GMPz::Rmpz_powm($su, $sw, $su, $sv);
+                                last unless Math::GMPz::Rmpz_cmp_ui($su, 1) == 0;
+                            }
+
+                            my $val =
+                                Math::GMPz::Rmpz_fits_ulong_p($sv)
+                              ? Math::GMPz::Rmpz_get_ui($sv)
+                              : Math::GMPz::Rmpz_init_set($sv);
+
+                            push @omega_primes, $val
+                              unless $fermat && $seen{$val}++;
+                        }
+                    }
+                    return;
+                }
+
+                # Fermat path with lambda > 1: candidates satisfy
+                # p ≡ m^{-1} (mod lambda).
+                Math::GMPz::Rmpz_invert($sv, $m, $L);
+                return if Math::GMPz::Rmpz_cmp_ui($sv, $hi) > 0;
+
+                Math::GMPz::Rmpz_fits_ulong_p($L)  || die "Too large value!";
+                Math::GMPz::Rmpz_fits_ulong_p($sv) || die "Too large value!";
+                my $step = Math::GMPz::Rmpz_get_ui($L);
+                my $t    = Math::GMPz::Rmpz_get_ui($sv);
+                return if $t > $hi;
+                $t += $step while $t < $lo;
+                return if $t > $hi;
+
+                for (my $p = $t ; $p <= $hi ; $p += $step) {
+                    next
+                      unless $is_prime_power_fn->($p)
+                      && Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $p) == 1
+                      && $gcd_fn->($fermat, $p) == 1;
+                    next if ($strong and !_strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr}));
+
+                    Math::GMPz::Rmpz_mul_ui($sv, $m, $p);
+
+                    if ($k == 1 and _is_prob_prime($p) and Math::GMPz::Rmpz_cmp_ui($m, 1) == 0) {
+
+                        # Single-prime case handled by outer k==1 logic; skip.
+                    }
+                    elsif (Math::GMPz::Rmpz_cmp($sv, $A) >= 0) {
+                        Math::GMPz::Rmpz_sub_ui($su, $sv, 1);
+                        my $z = ($znorder{$p} //= $znorder_fn->($fermat, $p));
+                        if (Math::GMPz::Rmpz_divisible_ui_p($su, $z)) {
+                            my $val =
+                                Math::GMPz::Rmpz_fits_ulong_p($sv)
+                              ? Math::GMPz::Rmpz_get_ui($sv)
+                              : Math::GMPz::Rmpz_init_set($sv);
+                            push @omega_primes, $val unless $seen{$val}++;
+                        }
+                    }
+                }
+                return;
+            }
+
+            # ------------------------------------------------------------------
+            # Recursive case j > 1: choose one prime factor and recurse.
+            # Per-frame GMPz objects prevent aliasing across recursive calls.
+            # ------------------------------------------------------------------
+            my $lambda = $args{lambda};
+            my $lv     = Math::GMPz::Rmpz_init();    # m * p^e  (loop variable)
+            my ($lu, $lcm);
+            if ($fermat) {
+                $lu  = Math::GMPz::Rmpz_init();      # p^e  (for Fermat power check)
+                $lcm = Math::GMPz::Rmpz_init();
+            }
+
+            for (my ($p, $r) = ($lo) ; $p <= $hi ; $p = $r) {
+                $r = $next_prime->($p);
+                next if ($fermat and $fermat % $p == 0);
+                next if ($strong and !_strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr}));
+
+                my $z;
+                if ($fermat) {
+                    Math::GMPz::Rmpz_set_ui($lu, $p);
+                    $z = ($znorder{$p} //= $znorder_fn->($fermat, $p));
+                    next unless Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $z) == 1;
+                    Math::GMPz::Rmpz_lcm_ui($lcm, $lambda, $z);
+                }
+
+                for (Math::GMPz::Rmpz_mul_ui($lv, $m, $p) ; Math::GMPz::Rmpz_cmp($lv, $B) <= 0 ; Math::GMPz::Rmpz_mul_ui($lv, $lv, $p)) {
+                    $generator->($lv, $r, $j - 1, %args, (defined $lcm ? (lambda => $lcm) : ()),);
+
+                    if ($fermat) {
+                        Math::GMPz::Rmpz_mul_ui($lu, $lu, $p);
+                        last unless $powmod_fn->($fermat, $z, $lu) == 1;
+                    }
+                }
+            }
+        };
+
+        # ------------------------------------------------------------------
+        # Kick off the generator.
+        # ------------------------------------------------------------------
+        if ($strong) {
+            $generator->(
+                         Math::GMPz::Rmpz_init_set_ui(1), 2, $k,
+                         lambda => Math::GMPz::Rmpz_init_set_ui(1),
+                         k_exp  => 0,
+                         congr  => 1,
+                        );
+            for my $v (0 .. Math::Prime::Util::GMP::logint($B, 2)) {
+                $generator->(
+                             Math::GMPz::Rmpz_init_set_ui(1), 2, $k,
+                             lambda => Math::GMPz::Rmpz_init_set_ui(1),
+                             k_exp  => $v,
+                             congr  => -1,
+                            );
+            }
+        }
+        else {
+            $generator->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, ($fermat ? (lambda => Math::GMPz::Rmpz_init_set_ui(1)) : ()),);
+        }
+
+        undef %znorder;
+        undef $generator;    # break circular reference
+
+        @omega_primes = sort { $a <=> $b } @omega_primes;
+        return \@omega_primes;
+    }
+
+    # =============================================================================
+    # Main entry point: sieve for k-omega primes in the interval [$from, $to].
+    #
+    # Strategy selection:
+    #   (a) Trivial base cases.
+    #   (b) Math::Prime::Util::prime_powers  — k==1, no Fermat, ulong range.
+    #   (c) _sieve_small_range               — |B-A| < B^(1/(k+1)).
+    #   (d) Math::Prime::Util::omega_primes  — no Fermat, ulong range.
+    #   (e) _sieve_omega_ulong               — Fermat, ulong range.
+    #   (f) _sieve_omega_gmp                 — any, bignum range.
+    # =============================================================================
     sub _sieve_omega_primes {
         my ($from, $to, $k, %opt) = @_;
 
         my $fermat = $opt{fermat};
         my $strong = $opt{strong};
 
-        if ($fermat) {
-            return [] if ($k < 1);
+        # ------------------------------------------------------------------
+        # 1. Base cases
+        # ------------------------------------------------------------------
+        return []  if $fermat and $k < 1;
+        return [1] if $k == 0 and $to >= 1 and $from <= 1;
+        return []  if $k == 0;
+
+        # Computed once; used by both the fast path and the dispatch below.
+        my $fits_ulong = Math::GMPz::Rmpz_fits_ulong_p($to);
+
+        # ------------------------------------------------------------------
+        # 2. Fast path: prime powers via Math::Prime::Util
+        # ------------------------------------------------------------------
+        if (HAS_PRIME_UTIL and $k == 1 and !$fermat and $fits_ulong) {
+            return scalar Math::Prime::Util::prime_powers(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to),);
         }
 
-        return [1] if ($k == 0 and $to >= 1 and $from <= 1);
-        return []  if ($k == 0);
-
-        if (HAS_PRIME_UTIL and $k == 1 and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {    # prime powers
-            return scalar Math::Prime::Util::prime_powers(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
-        }
-
-        my @omega_primes;
-
+        # ------------------------------------------------------------------
+        # 3. Small-range optimisation: brute-force when |B-A| < B^(1/(k+1))
+        # ------------------------------------------------------------------
         {
-            # Optimization when A and B are close to each other.
-            # If |A-B| < B^(1/(k+1)), then just iterate over the range A..B and grep the k-omega primes.
-            state $t = Math::GMPz::Rmpz_init_nobless();
-            state $u = Math::GMPz::Rmpz_init_nobless();
-
-            Math::GMPz::Rmpz_sub($t, $to, $from);
-            Math::GMPz::Rmpz_root($u, $to, $k + 1);
-
-            if (Math::GMPz::Rmpz_cmp($t, $u) < 0) {
-
+            state $dt = Math::GMPz::Rmpz_init_nobless();
+            state $du = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_sub($dt, $to, $from);
+            Math::GMPz::Rmpz_root($du, $to, $k + 1);
+            if (Math::GMPz::Rmpz_cmp($dt, $du) < 0) {
                 $VERBOSE && say STDERR "omega_primes: small range: ($from, $to) with k = $k";
-
-                my $v        = Math::GMPz::Rmpz_init_set($from);
-                my $o        = bless \$v;
-                my $k_obj    = bless \$k;
-                my $base_obj = bless \$fermat;
-
-                my @arr;
-                for (; Math::GMPz::Rmpz_cmp($v, $to) <= 0 ; Math::GMPz::Rmpz_add_ui($v, $v, 1)) {
-                    if ($fermat) {
-                        if ($strong) {
-                            $o->is_strong_fermat_psp($base_obj) || next;
-                        }
-                        else {
-                            $o->is_fermat_psp($base_obj) || next;
-                        }
-                    }
-                    if ($k == 1) {
-                        $o->is_prime_power || next;
-                    }
-                    else {
-                        $o->is_omega_prime($k_obj) || next;
-                    }
-                    push @arr, Math::GMPz::Rmpz_init_set($v);
-                }
-                return \@arr;
+                return _sieve_small_range($from, $to, $k, $fermat, $strong);
             }
         }
 
-        if (HAS_PRIME_UTIL and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+        # ------------------------------------------------------------------
+        # 4. Dispatch to the appropriate sieve
+        # ------------------------------------------------------------------
+        if (HAS_PRIME_UTIL and $fits_ulong) {
+            unless ($fermat) {
 
-            # XXX: Out of memory for: omega_primes(12, 1e13)
-            # https://github.com/danaj/Math-Prime-Util/issues/67
-            return Math::Prime::Util::omega_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
-        }
-        elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-
-            my $A = Math::GMPz::Rmpz_get_ui($from);
-            my $B = Math::GMPz::Rmpz_get_ui($to);
-
-            $A = Math::Prime::Util::vecmax($A, Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
-
-            if ($A > $B) {
-                return [];
+                # Direct library call for the common case.
+                return Math::Prime::Util::omega_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to),);
             }
-
-            my %znorder;
-
-            my $generator = sub {
-                my ($m, $lo, $j, %args) = @_;
-
-                my $hi = Math::Prime::Util::rootint(
-                                                    (
-                                                     HAS_PRIME_UTIL
-                                                     ? Math::Prime::Util::divint($B, $m)
-                                                     : Math::Prime::Util::GMP::divint($B, $m)
-                                                    ),
-                                                    $j
-                                                   );
-
-                if ($lo > $hi) {
-                    return;
-                }
-
-                if ($j == 1) {
-
-                    my $lambda = $args{lambda};
-
-                    if (!$fermat or $lambda == 1) {
-
-                        for (my $p = Math::Prime::Util::next_prime($lo - 1) ; $p <= $hi ; $p = Math::Prime::Util::next_prime($p)) {
-
-                            if ($fermat and $fermat % $p == 0) {
-                                next;
-                            }
-
-                            if ($strong) {
-                                my $val = Math::Prime::Util::valuation($p - 1, 2);
-                                $val > $args{k_exp}                                                                              or next;
-                                Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
-                            }
-
-                            for (my $v = (($fermat and $m == 1) ? ($p * $p) : ($m * $p)) ; $v - 1 < $B ; $v *= $p) {
-                                if ($v >= $A) {
-                                    if ($fermat) {
-                                        Math::Prime::Util::powmod($fermat, $v - 1, $v) == 1 or last;
-                                    }
-                                    push @omega_primes, $v;
-                                }
-                            }
-                        }
-
-                        return;
-                    }
-
-                    my $t = Math::Prime::Util::invmod($m, $lambda);
-
-                    $t > $hi && return;
-
-                    if ($t < $lo) {
-                        my $j =
-                          HAS_PRIME_UTIL
-                          ? Math::Prime::Util::cdivint($lo - $t, $lambda)
-                          : Math::Prime::Util::GMP::cdivint($lo - $t, $lambda);
-                        $t += $j * $lambda;
-                    }
-
-                    $t > $hi && return;
-
-                    for (my $p = $t ; $p <= $hi ; $p += $lambda) {
-                        if (    Math::Prime::Util::is_prime_power($p)
-                            and Math::Prime::Util::gcd($m,      $p) == 1
-                            and Math::Prime::Util::gcd($fermat, $p) == 1) {
-
-                            if ($strong) {
-                                my $val = Math::Prime::Util::valuation($p - 1, 2);
-                                $val > $args{k_exp}                                                                              or next;
-                                Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
-                            }
-
-                            my $v = $m * $p;
-                            $v >= $A or next;
-                            $k == 1 and Math::Prime::Util::is_prime($v) and next;
-                            ($v - 1) % ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p)) == 0 or next;
-                            push(@omega_primes, $v);
-                        }
-                    }
-
-                    return;
-                }
-
-                my $lambda = $args{lambda};
-
-                for (my ($p, $r, $L) = ($lo) ; $p <= $hi ; $p = $r) {
-
-                    $r = Math::Prime::Util::next_prime($p);
-
-                    if ($fermat and $fermat % $p == 0) {
-                        next;
-                    }
-
-                    if ($strong) {
-                        my $val = Math::Prime::Util::valuation($p - 1, 2);
-                        $val > $args{k_exp}                                                                              or next;
-                        Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
-                    }
-
-                    my $z;
-
-                    if ($fermat) {
-                        $z = ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p));
-                        Math::Prime::Util::gcd($m, $z) == 1 or next;
-                        $L = Math::Prime::Util::lcm($lambda, $z);
-                    }
-
-                    for (my ($pk, $v) = ($p, $m * $p) ; $v - 1 < $B ; ($pk, $v) = ($pk * $p, $v * $p)) {
-
-                        if ($fermat) {
-                            if ($pk > $p) {
-                                Math::Prime::Util::powmod($fermat, $z, $pk) == 1 or last;
-                            }
-                        }
-
-                        if ($v * $r - 1 < $B) {
-                            __SUB__->($v, $r, $j - 1, %args, (defined($L) ? (lambda => $L) : ()));
-                        }
-                    }
-                }
-            };
-
-            if ($strong) {
-
-                # Case where 2^d == 1 (mod p), where d is the odd part of p-1.
-                $generator->(1, 2, $k, lambda => 1, k_exp => 0, congr => 1);
-
-                # Cases where 2^(d * 2^v) == -1 (mod p), for some v >= 0.
-                foreach my $v (0 .. Math::Prime::Util::logint($B, 2)) {
-                    $generator->(1, 2, $k, lambda => 1, k_exp => $v, congr => -1);
-                }
-            }
-            else {
-                $generator->(1, 2, $k, ($fermat ? (lambda => 1) : ()));
-            }
-
-            undef %znorder;
-            undef $generator;
-
-            @omega_primes = sort { $a <=> $b } @omega_primes;
-
-            if ($fermat) {
-                @omega_primes = List::Util::uniq(@omega_primes);
-            }
-        }
-        else {
-
-            my $A = Math::GMPz::Rmpz_init_set($from);
-            my $B = Math::GMPz::Rmpz_init_set($to);
-
-            my $u = Math::GMPz::Rmpz_init();
-            my $v = Math::GMPz::Rmpz_init();
-            my $w = Math::GMPz::Rmpz_init_set_ui($fermat // 0);
-
-            Math::GMPz::Rmpz_set($u, _cached_pn_primorial($k));
-
-            # A = max(A, u)
-            if (Math::GMPz::Rmpz_cmp($u, $A) > 0) {
-                Math::GMPz::Rmpz_set($A, $u);
-            }
-
-            # Return early when A > B
-            if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
-                return [];
-            }
-
-            my %seen;
-            my %znorder;
-
-            my $generator = sub {
-                my ($m, $lo, $j, %args) = @_;
-
-                Math::GMPz::Rmpz_tdiv_q($u, $B, $m);
-                Math::GMPz::Rmpz_root($u, $u, $j);
-
-                Math::GMPz::Rmpz_fits_ulong_p($u) || die "Too large value!";
-
-                my $hi = Math::GMPz::Rmpz_get_ui($u);
-
-                if ($lo > $hi) {
-                    return;
-                }
-
-                if ($j == 1) {
-
-                    my $L = $args{lambda};
-
-                    if (!$fermat or Math::GMPz::Rmpz_cmp_ui($L, 1) == 0) {
-
-                        for (my $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($lo - 1) : Math::Prime::Util::GMP::next_prime($lo - 1)) ;
-                             $p <= $hi ;
-                             $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p))) {
-
-                            if ($fermat and $fermat % $p == 0) {
-                                next;
-                            }
-
-#<<<
-                            if ($strong) {
-                                my $val = HAS_PRIME_UTIL
-                                    ? Math::Prime::Util::valuation($p - 1, 2)
-                                    : Math::Prime::Util::GMP::valuation($p - 1, 2);
-                                $val > $args{k_exp} or next;
-                                (HAS_PRIME_UTIL
-                                 ? Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)
-                                 : Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)) == ($args{congr} % $p) or next;
-                            }
-#>>>
-
-                            if ($fermat and Math::GMPz::Rmpz_cmp_ui($m, 1) == 0) {
-                                Math::GMPz::Rmpz_set_ui($v, $p);
-                            }
-                            else {
-                                Math::GMPz::Rmpz_set($v, $m);
-                            }
-
-                            for (Math::GMPz::Rmpz_mul_ui($v, $v, $p) ; Math::GMPz::Rmpz_cmp($v, $B) <= 0 ; Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
-
-                                if (Math::GMPz::Rmpz_cmp($v, $A) >= 0) {
-
-                                    if ($fermat) {
-                                        Math::GMPz::Rmpz_sub_ui($u, $v, 1);
-                                        Math::GMPz::Rmpz_powm($u, $w, $u, $v);
-                                        Math::GMPz::Rmpz_cmp_ui($u, 1) == 0 or last;
-                                    }
-
-                                    my $value =
-                                        Math::GMPz::Rmpz_fits_ulong_p($v)
-                                      ? Math::GMPz::Rmpz_get_ui($v)
-                                      : Math::GMPz::Rmpz_init_set($v);
-
-                                    if ($fermat ? (!$seen{$value}++) : 1) {
-                                        push @omega_primes, $value;
-                                    }
-                                }
-                            }
-                        }
-
-                        return;
-                    }
-
-                    Math::GMPz::Rmpz_invert($v, $m, $L);
-
-                    if (Math::GMPz::Rmpz_cmp_ui($v, $hi) > 0) {
-                        return;
-                    }
-
-                    if (Math::GMPz::Rmpz_fits_ulong_p($L)) {
-                        $L = Math::GMPz::Rmpz_get_ui($L);
-                    }
-
-                    Math::GMPz::Rmpz_fits_ulong_p($v) || die "Too large value!";
-
-                    my $t = Math::GMPz::Rmpz_get_ui($v);
-                    $t > $hi && return;
-                    $t += $L while ($t < $lo);
-
-                    for (my $p = $t ; $p <= $hi ; $p += $L) {
-
-                        if (    (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($p) : Math::Prime::Util::GMP::is_prime_power($p))
-                            and Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $p) == 1
-                            and (HAS_PRIME_UTIL ? (Math::Prime::Util::gcd($fermat, $p) == 1) : (Math::Prime::Util::GMP::gcd($fermat, $p) == 1))) {
-#<<<
-                            if ($strong) {
-                                my $val = HAS_PRIME_UTIL
-                                    ? Math::Prime::Util::valuation($p - 1, 2)
-                                    : Math::Prime::Util::GMP::valuation($p - 1, 2);
-                                $val > $args{k_exp} or next;
-                                (HAS_PRIME_UTIL
-                                 ? Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)
-                                 : Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)) == ($args{congr} % $p) or next;
-                            }
-#>>>
-                            Math::GMPz::Rmpz_mul_ui($v, $m, $p);
-
-                            if ($k == 1 and _is_prob_prime($p) and Math::GMPz::Rmpz_cmp_ui($m, 1) == 0) {
-                                ## ok
-                            }
-                            elsif (Math::GMPz::Rmpz_cmp($v, $A) >= 0) {
-                                Math::GMPz::Rmpz_sub_ui($u, $v, 1);
-                                my $z = (
-                                         $znorder{$p} //=
-                                           HAS_PRIME_UTIL
-                                         ? Math::Prime::Util::znorder($fermat, $p)
-                                         : Math::Prime::Util::GMP::znorder($fermat, $p)
-                                        );
-                                if (Math::GMPz::Rmpz_divisible_ui_p($u, $z)) {
-
-                                    my $value =
-                                        Math::GMPz::Rmpz_fits_ulong_p($v)
-                                      ? Math::GMPz::Rmpz_get_ui($v)
-                                      : Math::GMPz::Rmpz_init_set($v);
-
-                                    if (!$seen{$value}++) {
-                                        push @omega_primes, $value;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    return;
-                }
-
-                my ($v, $u, $lcm, $lambda) = (Math::GMPz::Rmpz_init());
-
-                if ($fermat) {
-                    $u      = Math::GMPz::Rmpz_init();
-                    $lcm    = Math::GMPz::Rmpz_init();
-                    $lambda = $args{lambda};
-                }
-
-                for (my ($p, $r) = ($lo) ; $p <= $hi ; $p = $r) {
-
-                    $r =
-                      HAS_PRIME_UTIL
-                      ? Math::Prime::Util::next_prime($p)
-                      : Math::Prime::Util::GMP::next_prime($p);
-
-                    if ($fermat and $fermat % $p == 0) {
-                        next;
-                    }
-
-#<<<
-                    if ($strong) {
-                        my $val = HAS_PRIME_UTIL
-                            ? Math::Prime::Util::valuation($p - 1, 2)
-                            : Math::Prime::Util::GMP::valuation($p - 1, 2);
-                        $val > $args{k_exp} or next;
-                        (HAS_PRIME_UTIL
-                            ? Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)
-                            : Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)) == ($args{congr} % $p) or next;
-                    }
-#>>>
-
-                    my $z;
-
-                    if ($fermat) {
-                        Math::GMPz::Rmpz_set_ui($u, $p);
-                        $z = (
-                              $znorder{$p} //=
-                                HAS_PRIME_UTIL
-                              ? Math::Prime::Util::znorder($fermat, $p)
-                              : Math::Prime::Util::GMP::znorder($fermat, $p)
-                             );
-                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $z) == 1 or next;
-                        Math::GMPz::Rmpz_lcm_ui($lcm, $lambda, $z);
-                    }
-
-                    for (Math::GMPz::Rmpz_mul_ui($v, $m, $p) ; Math::GMPz::Rmpz_cmp($v, $B) <= 0 ; Math::GMPz::Rmpz_mul_ui($v, $v, $p)) {
-
-                        __SUB__->($v, $r, $j - 1, %args, (defined($lcm) ? (lambda => $lcm) : ()));
-
-                        if ($fermat) {
-                            Math::GMPz::Rmpz_mul_ui($u, $u, $p);
-                            (
-                             HAS_PRIME_UTIL
-                             ? Math::Prime::Util::powmod($fermat, $z, $u)
-                             : Math::Prime::Util::GMP::powmod($fermat, $z, $u)
-                            ) == 1 or last;
-                        }
-                    }
-                }
-            };
-
-            if ($strong) {
-
-                # Case where 2^d == 1 (mod p), where d is the odd part of p-1.
-                $generator->(
-                             Math::GMPz::Rmpz_init_set_ui(1), 2, $k,
-                             lambda => Math::GMPz::Rmpz_init_set_ui(1),
-                             k_exp  => 0,
-                             congr  => 1
-                            );
-
-                # Cases where 2^(d * 2^v) == -1 (mod p), for some v >= 0.
-                foreach my $v (0 .. Math::Prime::Util::GMP::logint($B, 2)) {
-                    $generator->(
-                                 Math::GMPz::Rmpz_init_set_ui(1), 2, $k,
-                                 lambda => Math::GMPz::Rmpz_init_set_ui(1),
-                                 k_exp  => $v,
-                                 congr  => -1
-                                );
-                }
-            }
-            else {
-                $generator->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, ($fermat ? (lambda => Math::GMPz::Rmpz_init_set_ui(1)) : ()));
-            }
-
-            undef %znorder;
-            undef $generator;
-
-            @omega_primes = sort { $a <=> $b } @omega_primes;
+            return _sieve_omega_ulong($from, $to, $k, $fermat, $strong);
         }
 
-        return \@omega_primes;
+        return _sieve_omega_gmp($from, $to, $k, $fermat, $strong);
     }
 
     sub omega_prime_divisors {
@@ -31053,6 +31065,553 @@ package Sidef::Types::Number::Number {
 
     *each_prime_power = \&prime_powers_each;
 
+    # =============================================================================
+    # Note: _strong_fermat_check is defined in _sieve_omega_primes's companion
+    # refactoring and is shared across both sieves.  Signature:
+    #   _strong_fermat_check($p, $base, $k_exp, $congr)
+    # Returns true iff v2(p-1) > k_exp  AND
+    #   base^((p-1) >> (v2(p-1)-k_exp)) ≡ congr (mod p).
+    # =============================================================================
+
+    # =============================================================================
+    # Brute-force sieve for k-almost primes in [$from, $to].
+    # Used when the interval is small enough that iterating every integer is faster
+    # than the recursive generator: |B - A| < B^(1/k).
+    # =============================================================================
+    sub _almost_prime_small_range {
+        my ($from, $to, $k, $fermat, $strong, $carmichael, $lucas_carmichael, $squarefree) = @_;
+
+        my $v        = Math::GMPz::Rmpz_init_set($from);
+        my $o        = bless \$v;                          # Sidef::Types::Number::Number
+        my $base_obj = bless \$fermat;
+        my $k_obj    = bless \$k;
+
+        my @arr;
+        for (; Math::GMPz::Rmpz_cmp($v, $to) <= 0 ; Math::GMPz::Rmpz_add_ui($v, $v, 1)) {
+
+            if ($fermat) {
+                next unless $strong
+                  ? $o->is_strong_fermat_psp($base_obj)
+                  : $o->is_fermat_psp($base_obj);
+            }
+            next unless !$carmichael       || $o->is_carmichael;
+            next unless !$lucas_carmichael || $o->is_lucas_carmichael;
+
+            if ($squarefree) {
+                if    ($k == 1) { next unless $o->is_prime }
+                elsif ($k == 2) { next unless $o->is_squarefree_semiprime }
+                else            { next unless $o->is_squarefree_almost_prime($k_obj) }
+            }
+            else {
+                if    ($k == 1) { next unless $o->is_prime }
+                elsif ($k == 2) { next unless $o->is_semiprime }
+                else            { next unless $o->is_almost_prime($k_obj) }
+            }
+            push @arr, Math::GMPz::Rmpz_init_set($v);
+        }
+        return \@arr;
+    }
+
+    # =============================================================================
+    # Sieve for k-almost primes using native unsigned-long arithmetic.
+    # Pre-conditions: HAS_PRIME_UTIL is true AND $to fits in an unsigned long.
+    # =============================================================================
+    sub _almost_prime_ulong {
+        my ($from, $to, $k, $fermat, $strong, $carmichael, $lucas_carmichael, $squarefree) = @_;
+
+        my $A = Math::GMPz::Rmpz_get_ui($from);
+        my $B = Math::GMPz::Rmpz_get_ui($to);
+
+        # Compute the effective lower bound A and the optional ceiling on the
+        # largest prime factor (max_p), depending on which filter is active.
+        my $max_p = undef;
+
+        if ($squarefree) {
+            if ($carmichael or $lucas_carmichael) {
+                $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::divint(Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k + 1), 10), 2),);
+                if ($carmichael) {
+
+                    # For n = p1*…*pk, the largest factor satisfies
+                    # p_k ≤ (1 + sqrt(8n+1)) / 4.
+                    $max_p = (1 + Math::Prime::Util::GMP::sqrtint(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint(8, $B), 1))) >> 2;
+                }
+                elsif ($lucas_carmichael) {
+                    $max_p = Math::Prime::Util::sqrtint($B);
+                }
+            }
+            else {
+                $A = Math::Prime::Util::vecmax($A, Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10),);
+            }
+        }
+        else {
+            # Smallest k-almost prime is 2^k.
+            $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::powint(2, $k));
+        }
+
+        return [] if $A > $B;
+
+        my @almost_primes;
+        my %znorder;    # memoised multiplicative orders: p -> ord_p(fermat)
+
+        my $generator;
+        $generator = sub {
+            my ($m, $p, $k, %args) = @_;
+            my $lambda = $args{lambda};
+
+            # ------------------------------------------------------------------
+            # Base case k == 1: choose the final prime factor.
+            # ------------------------------------------------------------------
+            if ($k == 1) {
+                my $lo = $args{from};
+                my $hi = $args{upto};
+
+                # Carmichael constraint: the largest prime factor p_k must be ≤ m
+                # (the product of all smaller factors), otherwise (p_k - 1) cannot
+                # divide (n - 1).
+                $hi = $m     if ($carmichael     && $m < $hi);
+                $hi = $max_p if (defined($max_p) && $max_p < $hi);
+
+                return if $lo > $hi;
+
+                if ($carmichael) {
+
+                    # Valid primes satisfy p ≡ m^{-1} (mod lambda) so that
+                    # (m*p - 1) ≡ 0 (mod (p - 1)).
+                    my $L = $args{lambda};
+                    my $t = Math::Prime::Util::invmod($m, $L);
+                    return                                              if $t > $hi;
+                    $t += Math::Prime::Util::cdivint($lo - $t, $L) * $L if $t < $lo;
+                    return                                              if $t > $hi;
+
+                    for (my $p = $t ; $p <= $hi ; $p += $L) {
+                        my $n = $m * $p;
+                        if (($n - 1) % ($p - 1) == 0 && Math::Prime::Util::is_prime($p)) {
+                            if ($strong) {
+                                next unless _strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr});
+                            }
+                            push @almost_primes, $n;
+                        }
+                    }
+                }
+                elsif ($lucas_carmichael) {
+
+                    # Valid primes satisfy p ≡ -m^{-1} (mod lambda) so that
+                    # (m*p + 1) ≡ 0 (mod (p + 1)).
+                    my $L = $args{lambda};
+                    my $t = $L - Math::Prime::Util::invmod($m, $L);
+                    return                                              if $t > $hi;
+                    $t += Math::Prime::Util::cdivint($lo - $t, $L) * $L if $t < $lo;
+                    return                                              if $t > $hi;
+
+                    for (my $p = $t ; $p <= $hi ; $p += $L) {
+                        my $n = $m * $p;
+                        push(@almost_primes, $n)
+                          if (($n + 1) % ($p + 1) == 0 && Math::Prime::Util::is_prime($p));
+                    }
+                }
+                elsif ($fermat) {
+
+                    # Valid primes satisfy p ≡ m^{-1} (mod lambda) so that
+                    # ord_p(base) | (m*p - 1).
+                    my $L = $args{lambda};
+                    my $t = Math::Prime::Util::invmod($m, $L);
+                    return                                              if $t > $hi;
+                    $t += Math::Prime::Util::cdivint($lo - $t, $L) * $L if $t < $lo;
+                    return                                              if $t > $hi;
+
+                    for (my $p = $t ; $p <= $hi ; $p += $L) {
+                        next unless Math::Prime::Util::is_prime($p);
+                        next if $fermat % $p == 0;
+
+                        my $n = $m * $p;
+                        if (($n - 1) % ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p)) == 0) {
+                            if ($strong) {
+                                next unless _strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr});
+                            }
+                            push @almost_primes, $n;
+                        }
+                    }
+                }
+                else {
+                    # Plain almost primes: any prime in [lo, hi].
+                    Math::Prime::Util::forprimes(sub { push @almost_primes, $m * $_ }, $lo, $hi);
+                }
+
+                return;
+            }
+
+            # ------------------------------------------------------------------
+            # Recursive case k > 1: choose one prime factor and recurse.
+            # ------------------------------------------------------------------
+            my $hi = Math::Prime::Util::rootint(Math::Prime::Util::divint($B, $m), $k);
+            my $L;
+
+            for (my $r ; $p <= $hi ; $p = $r) {
+                $r = Math::Prime::Util::next_prime($p);
+
+                # Strong Fermat filter on each chosen intermediate prime.
+                if ($strong && $fermat) {
+                    next if $fermat % $p == 0;
+                    next unless _strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr});
+                }
+
+                # Accumulate lambda (LCM of group orders seen so far) so the
+                # final prime can be found by an arithmetic-progression sieve.
+                if ($carmichael) {
+                    next unless Math::Prime::Util::gcd($m, $p >> 1) == 1;
+                    $L = Math::Prime::Util::lcm($lambda, $p - 1);
+                }
+                elsif ($lucas_carmichael) {
+                    next unless Math::Prime::Util::gcd($m, ($p >> 1) + 1) == 1;
+                    $L = Math::Prime::Util::lcm($lambda, $p + 1);
+                }
+                elsif ($fermat) {
+                    next if $fermat % $p == 0;
+                    my $z = ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p));
+                    next unless Math::Prime::Util::gcd($m, $z) == 1;
+                    $L = Math::Prime::Util::lcm($lambda, $z);
+                }
+
+                my $t = $m * $p;
+                my $u = Math::Prime::Util::divint($A, $t);
+                my $v = Math::Prime::Util::divint($B, $t);
+                ++$u if $t * $u < $A;
+
+                unless ($u > $v) {
+                    $p = $r if $squarefree;          # enforce strictly increasing primes
+                    $u = $p if $k == 2 && $p > $u;
+                    $generator->($t, $p, $k - 1, %args, ($k == 2 ? (from => $u, upto => $v) : ()), (defined($L) ? (lambda => $L) : ()),);
+                }
+            }
+        };
+
+        # ------------------------------------------------------------------
+        # Kick off the generator.
+        # ------------------------------------------------------------------
+        if ($strong) {
+
+            # Case where base^d ≡ 1 (mod p), d = odd part of p-1.
+            $generator->(1, 2, $k, lambda => 1, k_exp => 0, congr => 1);
+
+            # Cases where base^(d·2^v) ≡ -1 (mod p), for v = 0 .. floor(log2 B).
+            for my $v (0 .. Math::Prime::Util::logint($B, 2)) {
+                $generator->(1, 2, $k, lambda => 1, k_exp => $v, congr => -1);
+            }
+        }
+        else {
+            $generator->(1, ($carmichael || $lucas_carmichael) ? 3 : 2, $k, lambda => 1,);
+        }
+
+        undef %znorder;
+        undef $generator;    # break circular reference
+
+        @almost_primes = sort { $a <=> $b } @almost_primes;
+        return \@almost_primes;
+    }
+
+    # =============================================================================
+    # Sieve for k-almost primes using GMP big-integer arithmetic.
+    # Used when $to does not fit in an unsigned long.
+    #
+    # Allocation strategy
+    # -------------------
+    # $su / $sv: shared scratch captured by the closure.  Safe because:
+    #   * The k==1 base case never recurses.
+    #   * The k>1 recursive case extracts plain-scalar values from $su/$sv with
+    #     Rmpz_get_ui / Rmpz_get_str before each recursive call, so recursive
+    #     frames cannot alias the caller's live values.
+    # $x / $L:  allocated fresh per k>1 frame; $L is passed to the callee by
+    #            reference (no copy) — safe because the callee returns before the
+    #            caller overwrites $L for the next prime.
+    # =============================================================================
+    sub _almost_prime_gmp {
+        my ($from, $to, $k, $fermat, $strong, $carmichael, $lucas_carmichael, $squarefree) = @_;
+
+        my $A = Math::GMPz::Rmpz_init_set($from);
+        my $B = Math::GMPz::Rmpz_init_set($to);
+
+        # Closure-captured scratch variables (see allocation strategy above).
+        my $su = Math::GMPz::Rmpz_init();
+        my $sv = Math::GMPz::Rmpz_init();
+
+        my $max_p = undef;
+
+        if ($squarefree) {
+            if ($carmichael or $lucas_carmichael) {
+                Math::GMPz::Rmpz_set_str($su, Math::Prime::Util::GMP::divint(Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k + 1), 10), 2), 10,);
+
+                if ($carmichael) {
+
+                    # max_p = floor((1 + sqrt(8*B + 1)) / 4)
+                    $max_p = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul_2exp($max_p, $B, 3);
+                    Math::GMPz::Rmpz_add_ui($max_p, $max_p, 1);
+                    Math::GMPz::Rmpz_sqrt($max_p, $max_p);
+                    Math::GMPz::Rmpz_add_ui($max_p, $max_p, 1);
+                    Math::GMPz::Rmpz_div_2exp($max_p, $max_p, 2);
+                    $max_p = Math::GMPz::Rmpz_get_ui($max_p)
+                      if Math::GMPz::Rmpz_fits_ulong_p($max_p);
+                }
+                elsif ($lucas_carmichael) {
+                    $max_p = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_sqrt($max_p, $B);
+                    $max_p = Math::GMPz::Rmpz_get_ui($max_p)
+                      if Math::GMPz::Rmpz_fits_ulong_p($max_p);
+                }
+            }
+            else {
+                Math::GMPz::Rmpz_set($su, _cached_pn_primorial($k));
+            }
+        }
+        else {
+            # su = 2^k  (smallest k-almost prime)
+            Math::GMPz::Rmpz_set_ui($su, 0);
+            Math::GMPz::Rmpz_setbit($su, $k);
+        }
+
+        # A = max(A, su)
+        Math::GMPz::Rmpz_set($A, $su) if Math::GMPz::Rmpz_cmp($su, $A) > 0;
+        return []                     if Math::GMPz::Rmpz_cmp($A,  $B) > 0;
+
+        my @almost_primes;
+        my %znorder;    # memoised multiplicative orders: p -> ord_p(fermat)
+
+        # Hoist dispatch outside the closure.
+        my $next_prime  = HAS_PRIME_UTIL ? \&Math::Prime::Util::next_prime : \&Math::Prime::Util::GMP::next_prime;
+        my $is_prime_fn = HAS_PRIME_UTIL ? \&Math::Prime::Util::is_prime   : \&Math::Prime::Util::GMP::is_prime;
+        my $znorder_fn  = HAS_PRIME_UTIL ? \&Math::Prime::Util::znorder    : \&Math::Prime::Util::GMP::znorder;
+        my $cdivint     = HAS_PRIME_UTIL ? \&Math::Prime::Util::cdivint    : \&Math::Prime::Util::GMP::cdivint;
+
+        # Unified prime-range iterator returning a flat list.
+        my $sieve_primes_fn =
+          HAS_PRIME_UTIL
+          ? sub { @{Math::Prime::Util::primes($_[0], $_[1])} }
+          : sub { Math::Prime::Util::GMP::sieve_primes($_[0], $_[1]) };
+
+        my $generator;
+        $generator = sub {
+            my ($m, $lo, $k, %args) = @_;
+            my $lambda = $args{lambda};
+
+            # ------------------------------------------------------------------
+            # Base case k == 1: choose the final prime factor.
+            # ------------------------------------------------------------------
+            if ($k == 1) {
+
+                if ($carmichael || $fermat || $lucas_carmichael) {
+
+                    my $from_p = $args{from};
+                    my $to_p   = $args{upto};
+
+                    # Carmichael: the largest prime factor must not exceed m.
+                    $to_p = Math::GMPz::Rmpz_get_ui($m)
+                      if ($carmichael && Math::GMPz::Rmpz_cmp_ui($m, $to_p) < 0);
+
+                    $to_p = $max_p if defined($max_p) && $max_p < $to_p;
+
+                    return if $from_p > $to_p;
+
+                    # Starting point of the arithmetic progression.
+                    # Carmichael / Fermat: p ≡  m^{-1}  (mod lambda)
+                    # Lucas-Carmichael:    p ≡ -m^{-1}  (mod lambda)
+                    Math::GMPz::Rmpz_invert($sv, $m, $lambda);
+                    Math::GMPz::Rmpz_sub($sv, $lambda, $sv) if $lucas_carmichael;
+
+                    return if Math::GMPz::Rmpz_cmp_ui($sv, $to_p) > 0;
+
+                    Math::GMPz::Rmpz_fits_ulong_p($lambda) || die "Too large value!";
+                    Math::GMPz::Rmpz_fits_ulong_p($sv)     || die "Too large value!";
+
+                    my $step = Math::GMPz::Rmpz_get_ui($lambda);
+                    my $t    = Math::GMPz::Rmpz_get_ui($sv);
+                    $t += $cdivint->($from_p - $t, $step) * $step if $t < $from_p;
+                    return                                        if $t > $to_p;
+
+                    for (my $p = $t ; $p <= $to_p ; $p += $step) {
+                        next unless $is_prime_fn->($p);
+                        next if ($fermat && $fermat % $p == 0);
+
+                        if ($strong && $fermat) {
+                            next unless _strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr});
+                        }
+
+                        # Compute n = m * p and n ± 1 for the divisibility test.
+                        Math::GMPz::Rmpz_mul_ui($sv, $m, $p);
+                        $lucas_carmichael
+                          ? Math::GMPz::Rmpz_add_ui($su, $sv, 1)
+                          : Math::GMPz::Rmpz_sub_ui($su, $sv, 1);
+
+                        my $ok =
+                            $lucas_carmichael ? Math::GMPz::Rmpz_divisible_ui_p($su, $p + 1)
+                          : $carmichael       ? Math::GMPz::Rmpz_divisible_ui_p($su, $p - 1)
+                          : do {
+                            my $ord = ($znorder{$p} //= $znorder_fn->($fermat, $p));
+                            Math::GMPz::Rmpz_divisible_ui_p($su, $ord);
+                          };
+
+                        if ($ok) {
+                            push @almost_primes, Math::GMPz::Rmpz_fits_ulong_p($sv)
+                              ? Math::GMPz::Rmpz_get_ui($sv)
+                              : Math::GMPz::Rmpz_init_set($sv);
+                        }
+                    }
+                }
+                else {
+                    # Plain almost primes: any prime q in [from, upto], push m*q.
+                    for my $q ($sieve_primes_fn->($args{from}, $args{upto})) {
+                        Math::GMPz::Rmpz_mul_ui($su, $m, $q);
+                        push @almost_primes, Math::GMPz::Rmpz_fits_ulong_p($su)
+                          ? Math::GMPz::Rmpz_get_ui($su)
+                          : Math::GMPz::Rmpz_init_set($su);
+                    }
+                }
+
+                return;
+            }
+
+            # ------------------------------------------------------------------
+            # Recursive case k > 1: choose one prime factor and recurse.
+            # $su is repurposed here for rootint scratch (safe: written before
+            # each read, and no interleaving with k==1 branch).
+            # ------------------------------------------------------------------
+            Math::GMPz::Rmpz_tdiv_q($su, $B, $m);
+            Math::GMPz::Rmpz_root($su, $su, $k);
+
+            my $hi =
+                Math::GMPz::Rmpz_fits_ulong_p($su)
+              ? Math::GMPz::Rmpz_get_ui($su)
+              : Math::GMPz::Rmpz_get_str($su, 10);
+
+            return if $lo > $hi;
+
+            # Per-frame allocations prevent aliasing across recursive calls.
+            my $x = Math::GMPz::Rmpz_init();
+            my $L =
+              ($carmichael || $lucas_carmichael || $fermat)
+              ? Math::GMPz::Rmpz_init()
+              : undef;
+
+            for (my ($p, $r) = ($lo) ; $p <= $hi ; $p = $r) {
+                $r = $next_prime->($p);
+
+                if ($strong && $fermat) {
+                    next if $fermat % $p == 0;
+                    next unless _strong_fermat_check($p, $fermat, $args{k_exp}, $args{congr});
+                }
+
+                if ($carmichael) {
+                    next unless Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $p >> 1) == 1;
+                    Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p - 1);
+                }
+                elsif ($lucas_carmichael) {
+                    next unless Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, ($p >> 1) + 1) == 1;
+                    Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p + 1);
+                }
+                elsif ($fermat) {
+                    next if $fermat % $p == 0;
+                    my $ord = ($znorder{$p} //= $znorder_fn->($fermat, $p));
+                    next unless Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $ord) == 1;
+                    Math::GMPz::Rmpz_lcm_ui($L, $lambda, $ord);
+                }
+
+                # x = m * p; su = ceil(A/x); sv = floor(B/x).
+                Math::GMPz::Rmpz_mul_ui($x, $m, $p);
+                Math::GMPz::Rmpz_cdiv_q($su, $A, $x);
+                Math::GMPz::Rmpz_div($sv, $B, $x);
+
+                if (Math::GMPz::Rmpz_cmp($su, $sv) <= 0) {
+
+                    $p = $r if $squarefree;    # enforce strictly increasing primes
+
+                    # For k==2, raise the lower bound for the next prime to at
+                    # least p (prevents double-counting pairs).
+                    if ($k == 2 && Math::GMPz::Rmpz_cmp_ui($su, $p) < 0) {
+                        Math::GMPz::Rmpz_set_ui($su, $p);
+                    }
+
+                    # Extract plain scalars before the recursive call so that
+                    # $su/$sv can be safely overwritten inside the callee.
+                    $generator->(
+                                 $x, $p,
+                                 $k - 1,
+                                 %args,
+                                 (
+                                  $k == 2
+                                  ? (
+                                     from => (
+                                                Math::GMPz::Rmpz_fits_ulong_p($su)
+                                              ? Math::GMPz::Rmpz_get_ui($su)
+                                              : Math::GMPz::Rmpz_get_str($su, 10)
+                                             ),
+                                     upto => (
+                                                Math::GMPz::Rmpz_fits_ulong_p($sv)
+                                              ? Math::GMPz::Rmpz_get_ui($sv)
+                                              : Math::GMPz::Rmpz_get_str($sv, 10)
+                                             ),
+                                    )
+                                  : ()
+                                 ),
+                                 (defined($L) ? (lambda => $L) : ()),
+                                );
+                }
+            }
+        };
+
+        # ------------------------------------------------------------------
+        # Kick off the generator.
+        # ------------------------------------------------------------------
+        if ($strong && $fermat) {
+
+            # Case where base^d ≡ 1 (mod p), d = odd part of p-1.
+            $generator->(
+                         Math::GMPz::Rmpz_init_set_ui(1), 2, $k,
+                         lambda => Math::GMPz::Rmpz_init_set_ui(1),
+                         k_exp  => 0,
+                         congr  => 1,
+                        );
+
+            # Cases where base^(d·2^v) ≡ -1 (mod p), for v = 0 .. floor(log2 B).
+            for my $v (0 .. Math::Prime::Util::GMP::logint($B, 2)) {
+                $generator->(
+                             Math::GMPz::Rmpz_init_set_ui(1), 2, $k,
+                             lambda => Math::GMPz::Rmpz_init_set_ui(1),
+                             k_exp  => $v,
+                             congr  => -1,
+                            );
+            }
+        }
+        else {
+            $generator->(
+                         Math::GMPz::Rmpz_init_set_ui(1),
+                         ($carmichael || $lucas_carmichael) ? 3 : 2,
+                         $k,
+                         (
+                            ($carmichael || $lucas_carmichael || $fermat)
+                          ? (lambda => Math::GMPz::Rmpz_init_set_ui(1))
+                          : ()
+                         ),
+                        );
+        }
+
+        undef %znorder;
+        undef $generator;    # break circular reference
+
+        @almost_primes = sort { $a <=> $b } @almost_primes;
+        return \@almost_primes;
+    }
+
+    # =============================================================================
+    # Main entry point: sieve for k-almost primes in the interval [$from, $to].
+    #
+    # Strategy selection:
+    #   (a) Trivial base cases.
+    #   (b) Primes (k==1) — direct library sieve.
+    #   (c) _almost_prime_small_range  — |B-A| < B^(1/k).
+    #   (d) Math::Prime::Util::almost_primes — no filters, ulong range.
+    #   (e) Math::Prime::Util::semi_primes  — k==2, no Fermat, ulong range.
+    #   (f) _almost_prime_ulong  — general, ulong range.
+    #   (g) _almost_prime_gmp    — general, bignum range.
+    # =============================================================================
     sub _sieve_almost_primes {
         my ($from, $to, $k, %opt) = @_;
 
@@ -31061,643 +31620,73 @@ package Sidef::Types::Number::Number {
         my $carmichael       = $opt{carmichael};
         my $lucas_carmichael = $opt{lucas_carmichael};
 
-        if ($carmichael or $lucas_carmichael) {
-            return [] if ($k < 3);
-        }
-        elsif ($fermat) {
-            return [] if ($k < 2);
-        }
-
-        return [1] if ($k == 0 and $to >= 1 and $from <= 1);
+        # ------------------------------------------------------------------
+        # 1. Base cases
+        # ------------------------------------------------------------------
+        return []  if (($carmichael || $lucas_carmichael) && $k < 3);
+        return []  if ($fermat                            && $k < 2);
+        return [1] if ($k == 0                            && $to >= 1 && $from <= 1);
         return []  if ($k == 0);
 
+        # ------------------------------------------------------------------
+        # 2. k == 1: return primes directly — no almost-prime sieve needed.
+        # ------------------------------------------------------------------
         if ($k == 1) {
-            if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-                return Math::Prime::Util::primes(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
+            if (HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($to)) {
+                return Math::Prime::Util::primes(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to),);
             }
             return [Math::Prime::Util::GMP::sieve_primes($from, $to)];
         }
 
         my $squarefree = $opt{squarefree};
 
+        # Computed once; referenced in both the small-range check and the dispatch.
+        my $fits_ulong = Math::GMPz::Rmpz_fits_ulong_p($to);
+
+        # ------------------------------------------------------------------
+        # 3. Small-range optimisation: brute-force when |B-A| < B^(1/k).
+        # ------------------------------------------------------------------
         {
-            # Optimization when A and B are close to each other.
-            # If |A-B| < B^(1/k), then just iterate over the range A..B and grep the k-almost primes.
-            state $t = Math::GMPz::Rmpz_init_nobless();
-            state $u = Math::GMPz::Rmpz_init_nobless();
-
-            Math::GMPz::Rmpz_sub($t, $to, $from);
-            Math::GMPz::Rmpz_root($u, $to, $k);
-
-            if (Math::GMPz::Rmpz_cmp($t, $u) < 0) {
-
+            state $dt = Math::GMPz::Rmpz_init_nobless();
+            state $du = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_sub($dt, $to, $from);
+            Math::GMPz::Rmpz_root($du, $to, $k);
+            if (Math::GMPz::Rmpz_cmp($dt, $du) < 0) {
                 $VERBOSE and say STDERR "almost_primes: small range: ($from, $to) with k = $k";
-
-                my $v        = Math::GMPz::Rmpz_init_set($from);
-                my $o        = bless \$v;
-                my $base_obj = bless \$fermat;
-                my $k_obj    = bless \$k;
-
-                my @arr;
-                for (; Math::GMPz::Rmpz_cmp($v, $to) <= 0 ; Math::GMPz::Rmpz_add_ui($v, $v, 1)) {
-                    if ($fermat) {
-                        if ($strong) {
-                            $o->is_strong_fermat_psp($base_obj) || next;
-                        }
-                        else {
-                            $o->is_fermat_psp($base_obj) || next;
-                        }
-                    }
-                    if ($carmichael) {
-                        $o->is_carmichael || next;
-                    }
-                    if ($lucas_carmichael) {
-                        $o->is_lucas_carmichael || next;
-                    }
-                    if ($squarefree) {
-                        if ($k == 1) {
-                            $o->is_prime || next;
-                        }
-                        elsif ($k == 2) {
-                            $o->is_squarefree_semiprime || next;
-                        }
-                        else {
-                            $o->is_squarefree_almost_prime($k_obj) || next;
-                        }
-                    }
-                    else {
-                        if ($k == 1) {
-                            $o->is_prime || next;
-                        }
-                        elsif ($k == 2) {
-                            $o->is_semiprime || next;
-                        }
-                        else {
-                            $o->is_almost_prime($k_obj) || next;
-                        }
-                    }
-                    push @arr, Math::GMPz::Rmpz_init_set($v);
-                }
-                return \@arr;
+                return _almost_prime_small_range($from, $to, $k, $fermat, $strong, $carmichael, $lucas_carmichael, $squarefree,);
             }
         }
 
-        if (    HAS_PRIME_UTIL
-            and !$squarefree
-            and !$fermat
-            and !$carmichael
-            and !$lucas_carmichael
-            and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-            return Math::Prime::Util::almost_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to));
-        }
-        elsif (HAS_PRIME_UTIL and $k == 2 and !$fermat and Math::GMPz::Rmpz_fits_ulong_p($to)) {
+        # ------------------------------------------------------------------
+        # 4. Library fast paths (ulong range only).
+        # ------------------------------------------------------------------
+        if (HAS_PRIME_UTIL && $fits_ulong) {
 
-            $from = Math::GMPz::Rmpz_get_ui($from);
-            $to   = Math::GMPz::Rmpz_get_ui($to);
-
-            my $arr = Math::Prime::Util::semi_primes($from, $to);
-            if ($squarefree) {
-                @$arr = grep { !Math::Prime::Util::is_square($_) } @$arr;
-            }
-            return $arr;
-        }
-
-        my @almost_primes;
-
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-
-            my $A = Math::GMPz::Rmpz_get_ui($from);
-            my $B = Math::GMPz::Rmpz_get_ui($to);
-
-            my $max_p = undef;
-
-            if ($squarefree) {
-                if ($carmichael or $lucas_carmichael) {
-                    $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::divint(Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k + 1), 10), 2));
-
-                    if ($carmichael) {
-                        $max_p = (1 + Math::Prime::Util::GMP::sqrtint(Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::mulint(8, $B), 1))) >> 2;
-                    }
-                    elsif ($lucas_carmichael) {
-                        $max_p = Math::Prime::Util::sqrtint($B);
-                    }
-                }
-                else {
-                    $A = Math::Prime::Util::vecmax($A, Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
-                }
-            }
-            else {
-                $A = Math::Prime::Util::vecmax($A, Math::Prime::Util::GMP::powint(2, $k));
+            # Cleanest case: no filter at all — library handles everything.
+            if (!$squarefree && !$fermat && !$carmichael && !$lucas_carmichael) {
+                return Math::Prime::Util::almost_primes($k, Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to),);
             }
 
-            if ($A > $B) {
-                return [];
+            # k==2 without Fermat/Carmichael: semi_primes is fastest.
+            # (carmichael/lucas with k==2 already returned [] above.)
+            if ($k == 2 && !$fermat && !$carmichael && !$lucas_carmichael) {
+                my $A   = Math::GMPz::Rmpz_get_ui($from);
+                my $B   = Math::GMPz::Rmpz_get_ui($to);
+                my $arr = Math::Prime::Util::semi_primes($A, $B);
+
+                # Squarefree semiprimes = semiprimes that are not perfect squares.
+                @$arr = grep { !Math::Prime::Util::is_square($_) } @$arr if $squarefree;
+                return $arr;
             }
-
-            my %znorder;
-
-            my $generator = sub {
-                my ($m, $p, $k, %args) = @_;
-
-                my $lambda = $args{lambda};
-
-                if ($k == 1) {
-
-                    my $lo = $args{from};
-                    my $hi = $args{upto};
-
-                    $hi = $m if ($carmichael and $m < $hi);    # the last prime p_k must be <= m
-
-                    if (defined($max_p) and $max_p < $hi) {
-                        $hi = $max_p;
-                    }
-
-                    $lo > $hi && return;
-
-                    if ($carmichael) {
-
-                        my $L = $args{lambda};
-                        my $t = Math::Prime::Util::invmod($m, $L);
-                        $t > $hi && return;
-
-                        if ($t < $lo) {
-                            my $j =
-                              HAS_PRIME_UTIL
-                              ? Math::Prime::Util::cdivint($lo - $t, $L)
-                              : Math::Prime::Util::GMP::cdivint($lo - $t, $L);
-                            $t += $j * $L;
-                        }
-
-                        $t > $hi && return;
-
-                        for (my $p = $t ; $p <= $hi ; $p += $L) {
-                            my $n = $m * $p;
-                            if (($n - 1) % ($p - 1) == 0 and Math::Prime::Util::is_prime($p)) {
-
-                                if ($strong) {
-                                    my $val = Math::Prime::Util::valuation($p - 1, 2);
-                                    $val > $args{k_exp}                                                                              or next;
-                                    Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
-                                }
-
-                                push(@almost_primes, $n);
-                            }
-                        }
-                    }
-                    elsif ($lucas_carmichael) {
-
-                        my $L = $args{lambda};
-                        my $t = $L - Math::Prime::Util::invmod($m, $L);
-                        $t > $hi && return;
-
-                        if ($t < $lo) {
-                            my $j =
-                              HAS_PRIME_UTIL
-                              ? Math::Prime::Util::cdivint($lo - $t, $L)
-                              : Math::Prime::Util::GMP::cdivint($lo - $t, $L);
-                            $t += $j * $L;
-                        }
-
-                        $t > $hi && return;
-
-                        for (my $p = $t ; $p <= $hi ; $p += $L) {
-                            my $n = $m * $p;
-                            if (($n + 1) % ($p + 1) == 0 and Math::Prime::Util::is_prime($p)) {
-                                push(@almost_primes, $n);
-                            }
-                        }
-                    }
-                    elsif ($fermat) {
-
-                        my $L = $args{lambda};
-                        my $t = Math::Prime::Util::invmod($m, $L);
-                        $t > $hi && return;
-
-                        if ($t < $lo) {
-                            my $j =
-                              HAS_PRIME_UTIL
-                              ? Math::Prime::Util::cdivint($lo - $t, $L)
-                              : Math::Prime::Util::GMP::cdivint($lo - $t, $L);
-                            $t += $j * $L;
-                        }
-
-                        $t > $hi && return;
-
-                        for (my $p = $t ; $p <= $hi ; $p += $L) {
-
-                            Math::Prime::Util::is_prime($p) || next;
-                            $fermat % $p == 0 and next;
-
-                            my $n = $m * $p;
-                            if (($n - 1) % ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p)) == 0) {
-
-                                if ($strong) {
-                                    my $val = Math::Prime::Util::valuation($p - 1, 2);
-                                    $val > $args{k_exp}                                                                              or next;
-                                    Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
-                                }
-
-                                push(@almost_primes, $n);
-                            }
-                        }
-                    }
-                    else {
-                        Math::Prime::Util::forprimes(sub { push(@almost_primes, $m * $_) }, $lo, $hi);
-                    }
-
-                    return;
-                }
-
-                my $L;
-                my $hi = Math::Prime::Util::rootint(
-                                                    (
-                                                     HAS_PRIME_UTIL
-                                                     ? Math::Prime::Util::divint($B, $m)
-                                                     : Math::Prime::Util::GMP::divint($B, $m)
-                                                    ),
-                                                    $k
-                                                   );
-
-                for (my $r ; $p <= $hi ; $p = $r) {
-
-                    $r =
-                      HAS_PRIME_UTIL
-                      ? Math::Prime::Util::next_prime($p)
-                      : Math::Prime::Util::GMP::next_prime($p);
-
-                    if ($strong and $fermat) {
-                        $fermat % $p == 0 and next;
-                        my $val = Math::Prime::Util::valuation($p - 1, 2);
-                        $val > $args{k_exp}                                                                              or next;
-                        Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p) == ($args{congr} % $p) or next;
-                    }
-
-                    if ($carmichael) {
-                        Math::Prime::Util::gcd($m, $p >> 1) == 1 or next;
-                        $L = Math::Prime::Util::lcm($lambda, $p - 1);
-                    }
-                    elsif ($lucas_carmichael) {
-                        Math::Prime::Util::gcd($m, ($p >> 1) + 1) == 1 or next;
-                        $L = Math::Prime::Util::lcm($lambda, $p + 1);
-                    }
-                    elsif ($fermat) {
-                        $fermat % $p == 0 and next;
-                        my $z = ($znorder{$p} //= Math::Prime::Util::znorder($fermat, $p));
-                        Math::Prime::Util::gcd($m, $z) == 1 or next;
-                        $L = Math::Prime::Util::lcm($lambda, $z);
-                    }
-
-                    my $t = $m * $p;
-
-                    my $u =
-                      HAS_PRIME_UTIL
-                      ? Math::Prime::Util::divint($A, $t)
-                      : Math::Prime::Util::GMP::divint($A, $t);
-
-                    my $v =
-                      HAS_PRIME_UTIL
-                      ? Math::Prime::Util::divint($B, $t)
-                      : Math::Prime::Util::GMP::divint($B, $t);
-
-                    ++$u if ($t * $u < $A);
-
-                    if (!($u > $v)) {
-                        $p = $r if $squarefree;
-                        $u = $p if ($k == 2 and $p > $u);
-                        __SUB__->(
-                                  $t, $p,
-                                  $k - 1,
-                                  %args,
-                                  (
-                                   ($k == 2)
-                                   ? (
-                                      from => $u,
-                                      upto => $v
-                                     )
-                                   : ()
-                                  ),
-                                  (defined($L) ? (lambda => $L) : ()),
-                                 );
-                    }
-                }
-            };
-
-            if ($strong) {
-
-                # Case where 2^d == 1 (mod p), where d is the odd part of p-1.
-                $generator->(1, 2, $k, lambda => 1, k_exp => 0, congr => 1);
-
-                # Cases where 2^(d * 2^v) == -1 (mod p), for some v >= 0.
-                foreach my $v (0 .. Math::Prime::Util::logint($B, 2)) {
-                    $generator->(1, 2, $k, lambda => 1, k_exp => $v, congr => -1);
-                }
-            }
-            else {
-                $generator->(1, (($carmichael || $lucas_carmichael) ? 3 : 2), $k, lambda => 1);
-            }
-
-            undef %znorder;
-            undef $generator;
-
-            @almost_primes = sort { $a <=> $b } @almost_primes;
-        }
-        else {
-
-            my $A = Math::GMPz::Rmpz_init_set($from);
-            my $B = Math::GMPz::Rmpz_init_set($to);
-
-            my $u = Math::GMPz::Rmpz_init();
-            my $v = Math::GMPz::Rmpz_init();
-
-            my $max_p = undef;
-
-            if ($squarefree) {
-                if ($carmichael or $lucas_carmichael) {
-                    Math::GMPz::Rmpz_set_str($u, Math::Prime::Util::GMP::divint(Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k + 1), 10), 2), 10);
-
-                    if ($carmichael) {
-
-                        # max_p = floor((1 + sqrt(8*B + 1))/4)
-                        $max_p = Math::GMPz::Rmpz_init();
-                        Math::GMPz::Rmpz_mul_2exp($max_p, $B, 3);
-                        Math::GMPz::Rmpz_add_ui($max_p, $max_p, 1);
-                        Math::GMPz::Rmpz_sqrt($max_p, $max_p);
-                        Math::GMPz::Rmpz_add_ui($max_p, $max_p, 1);
-                        Math::GMPz::Rmpz_div_2exp($max_p, $max_p, 2);
-                        $max_p = Math::GMPz::Rmpz_get_ui($max_p) if Math::GMPz::Rmpz_fits_ulong_p($max_p);
-                    }
-                    elsif ($lucas_carmichael) {
-                        $max_p = Math::GMPz::Rmpz_init();
-                        Math::GMPz::Rmpz_sqrt($max_p, $B);
-                        $max_p = Math::GMPz::Rmpz_get_ui($max_p) if Math::GMPz::Rmpz_fits_ulong_p($max_p);
-                    }
-                }
-                else {
-                    Math::GMPz::Rmpz_set($u, _cached_pn_primorial($k));
-                }
-            }
-            else {
-                Math::GMPz::Rmpz_set_ui($u, 0);
-                Math::GMPz::Rmpz_setbit($u, $k);    # u = ipow(2, k)
-            }
-
-            # A = max(A, u)
-            if (Math::GMPz::Rmpz_cmp($u, $A) > 0) {
-                Math::GMPz::Rmpz_set($A, $u);
-            }
-
-            # Return early when A > B
-            if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
-                return [];
-            }
-
-            my %znorder;
-
-            my $generator = sub {
-                my ($m, $lo, $k, %args) = @_;
-
-                my $lambda = $args{lambda};
-
-                if ($k == 1) {
-
-                    if ($carmichael || $fermat || $lucas_carmichael) {
-
-                        my $lo = $args{from};
-                        my $hi = $args{upto};
-
-                        $hi = Math::GMPz::Rmpz_get_ui($m) if ($carmichael and Math::GMPz::Rmpz_cmp_ui($m, $hi) < 0);
-
-                        if (defined($max_p) and $max_p < $hi) {
-                            $hi = $max_p;
-                        }
-
-                        if ($lo > $hi) {
-                            return;
-                        }
-
-                        my $L = $args{lambda};
-
-                        Math::GMPz::Rmpz_invert($v, $m, $L);
-                        Math::GMPz::Rmpz_sub($v, $L, $v) if $lucas_carmichael;
-
-                        if (Math::GMPz::Rmpz_cmp_ui($v, $hi) > 0) {
-                            return;
-                        }
-
-                        if (Math::GMPz::Rmpz_fits_ulong_p($L)) {
-                            $L = Math::GMPz::Rmpz_get_ui($L);
-                        }
-
-                        Math::GMPz::Rmpz_fits_ulong_p($v) || die "Too large value!";
-
-                        my $t = Math::GMPz::Rmpz_get_ui($v);
-
-                        if ($t < $lo) {
-                            my $j =
-                              HAS_PRIME_UTIL
-                              ? Math::Prime::Util::cdivint($lo - $t, $L)
-                              : Math::Prime::Util::GMP::cdivint($lo - $t, $L);
-                            $t += $j * $L;
-                        }
-
-                        $t > $hi && return;
-
-                        for (my $p = $t ; $p <= $hi ; $p += $L) {
-
-                            (
-                             HAS_PRIME_UTIL
-                             ? Math::Prime::Util::is_prime($p)
-                             : Math::Prime::Util::GMP::is_prime($p)
-                            )
-                              || next;
-
-                            if ($fermat) {
-                                $fermat % $p == 0 and next;
-                            }
-
-#<<<
-                            if ($strong and $fermat) {
-                                my $val = HAS_PRIME_UTIL
-                                           ? Math::Prime::Util::valuation($p - 1, 2)
-                                           : Math::Prime::Util::GMP::valuation($p - 1, 2);
-                                $val > $args{k_exp} or next;
-                                (HAS_PRIME_UTIL
-                                    ? Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)
-                                    : Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)) == ($args{congr} % $p) or next;
-                            }
-#>>>
-
-                            Math::GMPz::Rmpz_mul_ui($v, $m, $p);
-
-                            $lucas_carmichael ? Math::GMPz::Rmpz_add_ui($u, $v, 1) : Math::GMPz::Rmpz_sub_ui($u, $v, 1);
-
-                            if (
-                                  $lucas_carmichael ? Math::GMPz::Rmpz_divisible_ui_p($u, $p + 1)
-                                : $carmichael       ? Math::GMPz::Rmpz_divisible_ui_p($u, $p - 1)
-                                : $fermat           ? do {
-                                    my $order = (
-                                                 $znorder{$p} //=
-                                                   HAS_PRIME_UTIL
-                                                 ? Math::Prime::Util::znorder($fermat, $p)
-                                                 : Math::Prime::Util::GMP::znorder($fermat, $p)
-                                                );
-                                    Math::GMPz::Rmpz_divisible_ui_p($u, $order);
-                                  }
-                                : die "bug"
-                              ) {
-                                push @almost_primes,
-                                  (
-                                      Math::GMPz::Rmpz_fits_ulong_p($v)
-                                    ? Math::GMPz::Rmpz_get_ui($v)
-                                    : Math::GMPz::Rmpz_init_set($v)
-                                  );
-                            }
-                        }
-                    }
-                    else {
-                        foreach my $q (
-                                       HAS_PRIME_UTIL
-                                       ? @{Math::Prime::Util::primes($args{from}, $args{upto})}
-                                       : Math::Prime::Util::GMP::sieve_primes($args{from}, $args{upto})
-                          ) {
-                            Math::GMPz::Rmpz_mul_ui($u, $m, $q);
-                            push @almost_primes,
-                              (
-                                  Math::GMPz::Rmpz_fits_ulong_p($u)
-                                ? Math::GMPz::Rmpz_get_ui($u)
-                                : Math::GMPz::Rmpz_init_set($u)
-                              );
-                        }
-                    }
-
-                    return;
-                }
-
-                Math::GMPz::Rmpz_tdiv_q($u, $B, $m);
-                Math::GMPz::Rmpz_root($u, $u, $k);
-
-                my $hi =
-                    Math::GMPz::Rmpz_fits_ulong_p($u)
-                  ? Math::GMPz::Rmpz_get_ui($u)
-                  : Math::GMPz::Rmpz_get_str($u, 10);
-
-                if ($lo > $hi) {
-                    return;
-                }
-
-                my $x = Math::GMPz::Rmpz_init();
-
-                my $L;
-                if ($carmichael || $lucas_carmichael || $fermat) {
-                    $L = Math::GMPz::Rmpz_init();
-                }
-
-                for (my ($p, $r) = ($lo) ; $p <= $hi ; $p = $r) {
-
-                    $r =
-                      HAS_PRIME_UTIL
-                      ? Math::Prime::Util::next_prime($p)
-                      : Math::Prime::Util::GMP::next_prime($p);
-
-                    if ($fermat) {
-                        $fermat % $p == 0 and next;
-                    }
-#<<<
-                    if ($strong and $fermat) {
-                        my $val = HAS_PRIME_UTIL
-                            ? Math::Prime::Util::valuation($p - 1, 2)
-                            : Math::Prime::Util::GMP::valuation($p - 1, 2);
-                        $val > $args{k_exp} or next;
-                        (HAS_PRIME_UTIL
-                            ? Math::Prime::Util::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)
-                            : Math::Prime::Util::GMP::powmod($fermat, ($p - 1) >> ($val - $args{k_exp}), $p)) == ($args{congr} % $p) or next;
-                    }
-#>>>
-                    if ($carmichael) {
-                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $p >> 1) == 1 or next;
-                        Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p - 1);
-                    }
-                    elsif ($lucas_carmichael) {
-                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, ($p >> 1) + 1) == 1 or next;
-                        Math::GMPz::Rmpz_lcm_ui($L, $lambda, $p + 1);
-                    }
-                    elsif ($fermat) {
-                        my $order = (
-                                     $znorder{$p} //=
-                                       HAS_PRIME_UTIL
-                                     ? Math::Prime::Util::znorder($fermat, $p)
-                                     : Math::Prime::Util::GMP::znorder($fermat, $p)
-                                    );
-                        Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $m, $order) == 1 or next;
-                        Math::GMPz::Rmpz_lcm_ui($L, $lambda, $order);
-                    }
-
-                    Math::GMPz::Rmpz_mul_ui($x, $m, $p);
-                    Math::GMPz::Rmpz_cdiv_q($u, $A, $x);
-                    Math::GMPz::Rmpz_div($v, $B, $x);
-
-                    if (Math::GMPz::Rmpz_cmp($u, $v) <= 0) {
-
-                        $p = $r if $squarefree;
-
-                        # u = max(u, p)
-                        if ($k == 2 and Math::GMPz::Rmpz_cmp_ui($u, $p) < 0) {
-                            Math::GMPz::Rmpz_set_ui($u, $p);
-                        }
-
-                        __SUB__->(
-                                  $x, $p,
-                                  $k - 1,
-                                  %args,
-                                  (
-                                   ($k == 2)
-                                   ? (
-                                      from => (Math::GMPz::Rmpz_fits_ulong_p($u) ? Math::GMPz::Rmpz_get_ui($u) : Math::GMPz::Rmpz_get_str($u, 10)),
-                                      upto => (Math::GMPz::Rmpz_fits_ulong_p($v) ? Math::GMPz::Rmpz_get_ui($v) : Math::GMPz::Rmpz_get_str($v, 10)),
-                                     )
-                                   : ()
-                                  ),
-                                  (defined($L) ? (lambda => $L) : ())
-                                 );
-                    }
-                }
-            };
-
-            if ($strong and $fermat) {
-
-                # Case where 2^d == 1 (mod p), where d is the odd part of p-1.
-                $generator->(
-                             Math::GMPz::Rmpz_init_set_ui(1), 2, $k,
-                             lambda => Math::GMPz::Rmpz_init_set_ui(1),
-                             k_exp  => 0,
-                             congr  => 1
-                            );
-
-                # Cases where 2^(d * 2^v) == -1 (mod p), for some v >= 0.
-                foreach my $v (0 .. Math::Prime::Util::GMP::logint($B, 2)) {
-                    $generator->(
-                                 Math::GMPz::Rmpz_init_set_ui(1), 2, $k,
-                                 lambda => Math::GMPz::Rmpz_init_set_ui(1),
-                                 k_exp  => $v,
-                                 congr  => -1
-                                );
-                }
-            }
-            else {
-                $generator->(
-                             Math::GMPz::Rmpz_init_set_ui(1),
-                             (($carmichael || $lucas_carmichael) ? 3 : 2),
-                             $k, (($carmichael || $lucas_carmichael || $fermat) ? (lambda => Math::GMPz::Rmpz_init_set_ui(1)) : ())
-                            );
-            }
-
-            undef %znorder;
-            undef $generator;
-
-            @almost_primes = sort { $a <=> $b } @almost_primes;
         }
 
-        return \@almost_primes;
+        # ------------------------------------------------------------------
+        # 5. Full recursive sieve.
+        # ------------------------------------------------------------------
+        if (HAS_PRIME_UTIL && $fits_ulong) {
+            return _almost_prime_ulong($from, $to, $k, $fermat, $strong, $carmichael, $lucas_carmichael, $squarefree,);
+        }
+        return _almost_prime_gmp($from, $to, $k, $fermat, $strong, $carmichael, $lucas_carmichael, $squarefree,);
     }
 
     sub almost_prime_divisors {
