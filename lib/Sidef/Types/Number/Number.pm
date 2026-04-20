@@ -19096,10 +19096,6 @@ package Sidef::Types::Number::Number {
         # b(p) is the coefficient of q^((p−1)/2) in A(q)^4, where:
         #    A(q) = Sum_{k>=0} ​(−1)^k * (2*k+1) * q^(k*(k+1)/2).
 
-        my $sgn = Math::GMPz::Rmpz_sgn($n);
-        return ZERO if $sgn < 0;
-        return ONE  if $sgn == 0;
-
         # Part 1: Compute 8 * sigma_5(n)
         my $A = Math::Prime::Util::GMP::sigma($n, 5);
         $A = Math::Prime::Util::GMP::mulint($A, 8);
@@ -19164,6 +19160,47 @@ package Sidef::Types::Number::Number {
         return $ans;
     }
 
+    sub _sos_k24 {
+        my ($n) = @_;
+
+        # r_24(n) = A000156(n)
+        #         = (2^4*(sigma_{11}(n)- 2*sigma_{11}(n/2) + 2^{12}*sigma_{11}(n/4)) - 2^7*259*(-1)^n*tau(n) - 2^16*tau(n/2))/691
+
+        # Sigma_{11}(x) terms (A013959)
+        # They evaluate to 0 if the argument x is not an integer
+        my $sigma_n   = Math::Prime::Util::GMP::sigma($n, 11);
+        my $sigma_n_2 = Math::GMPz::Rmpz_divisible_ui_p($n, 2) ? Math::Prime::Util::GMP::sigma($n >> 1, 11) : 0;
+        my $sigma_n_4 = Math::GMPz::Rmpz_divisible_ui_p($n, 4) ? Math::Prime::Util::GMP::sigma($n >> 2, 11) : 0;
+
+        # Ramanujan's tau(x) terms (A000594)
+        # They evaluate to 0 if the argument x is not an integer
+        my $tau_n   = Math::Prime::Util::GMP::ramanujan_tau($n);
+        my $tau_n_2 = Math::GMPz::Rmpz_even_p($n) ? Math::Prime::Util::GMP::ramanujan_tau($n >> 1) : 0;
+
+        # Determine the parity sign for (-1)^n
+        my $sign = Math::GMPz::Rmpz_even_p($n) ? 1 : -1;
+
+        # Term 1: 2^4 * (sigma_{11}(n) - 2*sigma_{11}(n/2) + 2^{12}*sigma_{11}(n/4))
+        my $t1    = Math::Prime::Util::GMP::mulint(2,    $sigma_n_2);
+        my $t2    = Math::Prime::Util::GMP::mulint(4096, $sigma_n_4);
+        my $t3    = Math::Prime::Util::GMP::subint($sigma_n, $t1);
+        my $t4    = Math::Prime::Util::GMP::addint($t3, $t2);
+        my $term1 = Math::Prime::Util::GMP::mulint(16, $t4);
+
+        # Term 2: 2^7 * 259 * (-1)^n * tau(n)
+        my $term2 = Math::Prime::Util::GMP::vecprod(33152, $sign, $tau_n);
+
+        # Term 3: 2^16 * tau(n/2)
+        my $term3 = Math::Prime::Util::GMP::mulint(65536, $tau_n_2);
+
+        # Final Assembly
+        my $t5  = Math::Prime::Util::GMP::subint($term1, $term2);
+        my $t6  = Math::Prime::Util::GMP::subint($t5,    $term3);
+        my $a_n = Math::Prime::Util::GMP::divint($t6, 691);
+
+        Math::GMPz::Rmpz_init_set_str($a_n, 10);
+    }
+
     # Core computation and caching engine
     sub _compute_sos_count {
         my ($n, $k) = @_;
@@ -19195,6 +19232,7 @@ package Sidef::Types::Number::Number {
                                   8  => \&_sos_k8,
                                   10 => \&_sos_k10,
                                   12 => \&_sos_k12,
+                                  24 => \&_sos_k24,
                                  );
 
         if (exists $optimized_handlers{$k}) {
@@ -25553,6 +25591,52 @@ package Sidef::Types::Number::Number {
         _array(bless \$n);
     }
 
+    sub _extract_divisors {
+        my ($n, $params, $seen_divisor) = @_;
+
+        my ($r1, $e1, $r2, $e2) = @$params;
+
+        my @d1 = _divisors($e1);
+        my @d2 = _divisors($e2);
+
+        @d1 = map {
+            my $x = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_pow_ui($x, $r1, $_);
+            $x;
+        } @d1;
+
+        @d2 = map {
+            my $y = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_pow_ui($y, $r2, $_);
+            $y;
+        } @d2;
+
+        state $g = Math::GMPz::Rmpz_init_nobless();
+
+        my @factors;
+
+        foreach my $x (@d1) {
+            foreach my $y (@d2) {
+                foreach my $j (-1, 1) {
+
+                    ($j == 1)
+                      ? Math::GMPz::Rmpz_sub($g, $x, $y)
+                      : Math::GMPz::Rmpz_add($g, $x, $y);
+
+                    Math::GMPz::Rmpz_gcd($g, $g, $n);
+
+                    if (    Math::GMPz::Rmpz_cmp_ui($g, 1) > 0
+                        and Math::GMPz::Rmpz_cmp($g, $n) < 0
+                        and !$seen_divisor->{Math::GMPz::Rmpz_get_str($g, 16)}++) {
+                        push @factors, Math::GMPz::Rmpz_init_set($g);
+                    }
+                }
+            }
+        }
+
+        @factors;
+    }
+
     # Congruence of powers factorization method
     sub cop_factor {
         my ($n, $upto) = @_;
@@ -25566,52 +25650,6 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return _array();
-
-        my %seen_divisor;
-
-        my $congr_powers = sub {
-            my ($r1, $e1, $r2, $e2) = @_;
-
-            my @d1 = _divisors($e1);
-            my @d2 = _divisors($e2);
-
-            @d1 = map {
-                my $x = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_pow_ui($x, $r1, $_);
-                $x;
-            } @d1;
-
-            @d2 = map {
-                my $y = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_pow_ui($y, $r2, $_);
-                $y;
-            } @d2;
-
-            state $g = Math::GMPz::Rmpz_init_nobless();
-
-            my @factors;
-
-            foreach my $x (@d1) {
-                foreach my $y (@d2) {
-                    foreach my $j (-1, 1) {
-
-                        ($j == 1)
-                          ? Math::GMPz::Rmpz_sub($g, $x, $y)
-                          : Math::GMPz::Rmpz_add($g, $x, $y);
-
-                        Math::GMPz::Rmpz_gcd($g, $g, $n);
-
-                        if (    Math::GMPz::Rmpz_cmp_ui($g, 1) > 0
-                            and Math::GMPz::Rmpz_cmp($g, $n) < 0
-                            and !$seen_divisor{Math::GMPz::Rmpz_get_str($g, 10)}++) {
-                            push @factors, Math::GMPz::Rmpz_init_set($g);
-                        }
-                    }
-                }
-            }
-
-            @factors;
-        };
 
         my @congr_powers_params;
 
@@ -25651,7 +25689,7 @@ package Sidef::Types::Number::Number {
             $n_log2 = $upto;
         }
 
-        my @range = reverse(2 .. $n_log2);
+        my @range = CORE::reverse(2 .. $n_log2);
 
         for my $e (@range) {
             my $r = Math::GMPz::Rmpz_init();
@@ -25668,9 +25706,10 @@ package Sidef::Types::Number::Number {
         @congr_powers_params = grep { !$seen_param{join(' ', @$_)}++ } @congr_powers_params;
 
         my @divisors;
+        my %seen_divisor;
 
         foreach my $args (@congr_powers_params) {
-            push @divisors, $congr_powers->(@$args);
+            push @divisors, _extract_divisors($n, $args, \%seen_divisor);
         }
 
         (bless \$n)->gcd_factors(_array([map { bless \$_ } @divisors]));
@@ -25689,56 +25728,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
           or return _array();
 
-        my %seen_divisor;
         my @diff_powers_params;
-
-        #
-        ## Difference of powers factorization method
-        #
-
-        my $diff_powers = sub {
-            my ($r1, $e1, $r2, $e2) = @_;
-
-            my @d1 = _divisors($e1);
-            my @d2 = _divisors($e2);
-
-            @d1 = map {
-                my $x = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_pow_ui($x, $r1, $_);
-                $x;
-            } @d1;
-
-            @d2 = map {
-                my $y = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_pow_ui($y, $r2, $_);
-                $y;
-            } @d2;
-
-            state $g = Math::GMPz::Rmpz_init_nobless();
-
-            my @factors;
-
-            foreach my $x (@d1) {
-                foreach my $y (@d2) {
-                    foreach my $j (1, -1) {
-
-                        ($j == 1)
-                          ? Math::GMPz::Rmpz_sub($g, $x, $y)
-                          : Math::GMPz::Rmpz_add($g, $x, $y);
-
-                        Math::GMPz::Rmpz_gcd($g, $g, $n);
-
-                        if (    Math::GMPz::Rmpz_cmp_ui($g, 1) > 0
-                            and Math::GMPz::Rmpz_cmp($g, $n) < 0
-                            and !$seen_divisor{Math::GMPz::Rmpz_get_str($g, 10)}++) {
-                            push @factors, Math::GMPz::Rmpz_init_set($g);
-                        }
-                    }
-                }
-            }
-
-            @factors;
-        };
 
         my $diff_power_check = sub {
             my ($r1, $e1) = @_;
@@ -25796,9 +25786,10 @@ package Sidef::Types::Number::Number {
         }
 
         my @divisors;
+        my %seen_divisor;
 
         foreach my $args (@diff_powers_params) {
-            push @divisors, $diff_powers->(@$args);
+            push @divisors, _extract_divisors($n, $args, \%seen_divisor);
         }
 
         (bless \$n)->gcd_factors(_array([map { bless \$_ } @divisors]));
