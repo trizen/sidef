@@ -10738,7 +10738,7 @@ package Sidef::Types::Number::Number {
             return _array();
         }
 
-        my $D = $_[0]->divisors($_[0]->isqrt);
+        my $D = (bless \$n)->divisors($_[0]->isqrt);
 
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init();
@@ -15523,12 +15523,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -15856,12 +15856,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -16628,7 +16628,7 @@ package Sidef::Types::Number::Number {
             return $_[1]->semiprime_count;
         }
 
-        my $n = _any2mpz($$from, 0) // return ZERO;
+        my $n = _any2mpz($$from) // return ZERO;
 
         if (Math::GMPz::Rmpz_cmp_ui($n, $k) <= 0) {
             return ZERO;
@@ -16982,7 +16982,7 @@ package Sidef::Types::Number::Number {
             return $_[1]->prime_sum;
         }
 
-        my $n = _any2mpz($$from, 0) // return ZERO;
+        my $n = _any2mpz($$from) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
@@ -17067,7 +17067,7 @@ package Sidef::Types::Number::Number {
             return $_[1]->prime_count;
         }
 
-        my $n = _any2mpz($$from, 0) // return ZERO;
+        my $n = _any2mpz($$from) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
@@ -17170,7 +17170,7 @@ package Sidef::Types::Number::Number {
             return $_[1]->prime_sum;
         }
 
-        my $n = _any2mpz($$from, 0) // return ZERO;
+        my $n = _any2mpz($$from) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
@@ -17262,7 +17262,7 @@ package Sidef::Types::Number::Number {
             return $_[1]->prime_power_count;
         }
 
-        my $n = _any2mpz($$from, 0) // return ZERO;
+        my $n = _any2mpz($$from) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
@@ -17390,7 +17390,7 @@ package Sidef::Types::Number::Number {
             return $_[1]->prime_power_sum;
         }
 
-        my $n = _any2mpz($$from, 0) // return ZERO;
+        my $n = _any2mpz($$from) // return ZERO;
 
         Math::GMPz::Rmpz_sgn($n) > 0
           or return ZERO;
@@ -18334,7 +18334,7 @@ package Sidef::Types::Number::Number {
             return $to->composite_count->sub($from->dec->composite_count);
         }
 
-        my $n = _any2mpz($$from, 0) // goto &nan;
+        my $n = _any2mpz($$from) // goto &nan;
 
         Math::GMPz::Rmpz_cmp_ui($n, 4) >= 0
           or return ZERO;
@@ -18364,7 +18364,7 @@ package Sidef::Types::Number::Number {
             return $from->composite_count;
         }
 
-        my $n = _any2mpz($$from, 0) // goto &nan;
+        my $n = _any2mpz($$from) // goto &nan;
 
         Math::GMPz::Rmpz_cmp_ui($n, 4) >= 0
           or return ZERO;
@@ -22154,12 +22154,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return undef;
-            $to   = _any2mpz($$to,   1) // return undef;
+            $from = _any2mpz($$from) // return undef;
+            $to   = _any2mpz($$to)   // return undef;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return undef;
+            $to    = _any2mpz($$from) // return undef;
             $from  = $TWO;
         }
 
@@ -22194,12 +22194,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return undef;
-            $to   = _any2mpz($$to,   1) // return undef;
+            $from = _any2mpz($$from) // return undef;
+            $to   = _any2mpz($$to)   // return undef;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return undef;
+            $to    = _any2mpz($$from) // return undef;
             $from  = $TWO + $TWO;
         }
 
@@ -30179,12 +30179,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -31024,12 +31024,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -32016,12 +32016,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -32078,7 +32078,7 @@ package Sidef::Types::Number::Number {
         my $k_obj = _set_int($k);
         my $n_obj = $n;
 
-        $n = _any2mpz($$n, 0) // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
 
         Math::GMPz::Rmpz_sgn($n) > 0 or do {
             return ONE if (Math::GMPz::Rmpz_sgn($n) == 0);    # not k-almost prime, but...
@@ -32170,7 +32170,7 @@ package Sidef::Types::Number::Number {
         my $n_obj = $n;
         my $k_obj = bless \$k;
 
-        $n = _any2mpz($$n, 0) // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
 
         if (Math::GMPz::Rmpz_sgn($n) < 0) {
             goto &nan;
@@ -32234,7 +32234,7 @@ package Sidef::Types::Number::Number {
         my $n_obj = $n;
         my $k_obj = bless \$k;
 
-        $n = _any2mpz($$n, 0) // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
 
         if (Math::GMPz::Rmpz_sgn($n) < 0) {
             goto &nan;
@@ -32324,12 +32324,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -32363,12 +32363,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -32413,12 +32413,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -32475,12 +32475,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -32525,12 +32525,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -32576,12 +32576,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -32635,12 +32635,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -32686,12 +32686,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -32773,11 +32773,11 @@ package Sidef::Types::Number::Number {
 
         if (defined($to)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return _array();
-            $to   = _any2mpz($$to,   1) // return _array();
+            $from = _any2mpz($$from) // return _array();
+            $to   = _any2mpz($$to)   // return _array();
         }
         else {
-            $to   = _any2mpz($$from, 0) // return _array();
+            $to   = _any2mpz($$from) // return _array();
             $from = $ONE;
         }
 
@@ -32803,12 +32803,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$to);
-            $from = _any2mpz($$from, 0) // return ZERO;
-            $to   = _any2mpz($$to,   1) // return ZERO;
+            $from = _any2mpz($$from) // return ZERO;
+            $to   = _any2mpz($$to)   // return ZERO;
         }
         else {
             $block = $to;
-            $to    = _any2mpz($$from, 0) // return ZERO;
+            $to    = _any2mpz($$from) // return ZERO;
             $from  = $ONE;
         }
 
@@ -33873,8 +33873,8 @@ package Sidef::Types::Number::Number {
     sub nth_smooth {
         my ($n, $k) = @_;
 
-        my $n_z = _any2mpz($$n, 0) // goto &nan;
-        my $k_z = _any2mpz($$k, 1) // goto &nan;
+        my $n_z = _any2mpz($$n) // goto &nan;
+        my $k_z = _any2mpz($$k) // goto &nan;
 
         if (   Math::GMPz::Rmpz_sgn($n_z) <= 0
             or Math::GMPz::Rmpz_cmp_ui($k_z, 1) <= 0) {
@@ -33887,7 +33887,7 @@ package Sidef::Types::Number::Number {
     sub nth_rough {
         my ($n, $k) = @_;
 
-        my $n_z = _any2mpz($$n, 0) // goto &nan;
+        my $n_z = _any2mpz($$n) // goto &nan;
 
         if (Math::GMPz::Rmpz_sgn($n_z) <= 0) {
             goto &nan;
@@ -34307,7 +34307,7 @@ package Sidef::Types::Number::Number {
             return $n->ipow($k);
         }
 
-        my $z = _any2mpz($$n, 0) // goto &nan;
+        my $z = _any2mpz($$n) // goto &nan;
 
         if (Math::GMPz::Rmpz_sgn($z) < 0) {
             goto &nan;
@@ -36112,12 +36112,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$right);
-            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left,  0) // return undef);
-            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right, 1) // return undef);
+            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left)  // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right) // return undef);
         }
         else {
             $block = $right;
-            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left, 0) // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
             $left  = Math::GMPz::Rmpz_init_set_ui(0);
         }
 
@@ -36147,12 +36147,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$right);
-            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left,  0) // return undef);
-            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right, 1) // return undef);
+            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left)  // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right) // return undef);
         }
         else {
             $block = $right;
-            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left, 0) // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
             $left  = Math::GMPz::Rmpz_init_set_ui(0);
         }
 
@@ -36188,12 +36188,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$right);
-            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left,  0) // return undef);
-            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right, 1) // return undef);
+            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left)  // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right) // return undef);
         }
         else {
             $block = $right;
-            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left, 0) // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
             $left  = Math::GMPz::Rmpz_init_set_ui(0);
         }
 
@@ -36228,12 +36228,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$right);
-            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left,  0) // return undef);
-            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right, 1) // return undef);
+            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left)  // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right) // return undef);
         }
         else {
             $block = $right;
-            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left, 0) // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
             $left  = Math::GMPz::Rmpz_init_set_ui(0);
         }
 
@@ -36263,12 +36263,12 @@ package Sidef::Types::Number::Number {
 
         if (defined($block)) {
             _valid(\$right);
-            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left,  0) // return undef);
-            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right, 1) // return undef);
+            $left  = Math::GMPz::Rmpz_init_set(_any2mpz($$left)  // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$right) // return undef);
         }
         else {
             $block = $right;
-            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left, 0) // return undef);
+            $right = Math::GMPz::Rmpz_init_set(_any2mpz($$left) // return undef);
             $left  = Math::GMPz::Rmpz_init_set_ui(0);
         }
 
