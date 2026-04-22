@@ -7858,6 +7858,19 @@ Aliases: I<sieve_prime_cluster>
 
 =cut
 
+=head2 prime_signature_numbers
+
+    prime_signature_numbers(lo, hi, prime_signature)
+
+Returns an array of numbers in range C<[lo, hi]> that have a given prime signature.
+
+    say prime_signature_numbers(1, 1e3, [1])        #=> prime numbers
+    say prime_signature_numbers(1, 1e3, [2])        #=> squares of numbers
+    say prime_signature_numbers(1, 1e3, [2,1])      #=> squares of primes times another prime
+    say prime_signature_numbers(1, 1e3, [2,1,1])    #=> numbers of the form p^2*q*r
+
+=cut
+
 =head2 prime_divisors
 
     prime_divisors(n)

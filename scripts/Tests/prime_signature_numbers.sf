@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+do {
+    var prime_signature = [3,2,2]
+
+    var A = 2000
+    var B = 10000
+
+    var arr = prime_signature_numbers(A, B, prime_signature)
+    assert_eq(arr, %n[2700, 3528, 4500, 5292, 8712, 9800])
+}
+
+func A395379(n) {
+
+    var A = prime(n-1)**7
+    var B = (prime(n)**7 - 1)
+
+    var term_1 = prime_signature_numbers(A, B, [7]).len
+    var term_2 = prime_signature_numbers(A, B, [3,1]).len
+    var term_3 = 3.squarefree_almost_prime_count(A, B)
+
+    term_1 + term_2 + term_3
+}
+
+assert_eq(A395379.map(1..5), %n[15, 408, 16838, 167649, 4140037])
+
+say "** Test passed!"

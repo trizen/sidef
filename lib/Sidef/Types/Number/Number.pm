@@ -31806,6 +31806,179 @@ package Sidef::Types::Number::Number {
         _array(\@almost_primes);
     }
 
+    sub _sieve_prime_sig_numbers {
+        my ($from, $to, $prime_signature) = @_;
+
+        my $A = Math::GMPz::Rmpz_init_set($from);
+        my $B = Math::GMPz::Rmpz_init_set($to);
+
+        # Handle empty prime signature
+        if (!@$prime_signature) {
+            return ($A <= 1 and 1 <= $B) ? [1] : [];
+        }
+
+        # A = max(prime_signature.len.pn_primorial, A)
+        my $primorial = _cached_pn_primorial(scalar @$prime_signature);
+        if (Math::GMPz::Rmpz_cmp($primorial, $A) > 0) {
+            Math::GMPz::Rmpz_set($A, $primorial);
+        }
+
+        # Early exit if A is out of bounds bounds
+        if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
+            return [];
+        }
+
+        # Hoist function pointer to avoid branching inside the iterators
+        my $next_prime =
+          HAS_PRIME_UTIL
+          ? \&Math::Prime::Util::next_prime
+          : \&Math::Prime::Util::GMP::next_prime;
+
+        my $sieve_primes_fn =
+          HAS_PRIME_UTIL
+          ? sub { @{Math::Prime::Util::primes($_[0], $_[1])} }
+          : sub { Math::Prime::Util::GMP::sieve_primes($_[0], $_[1]) };
+
+        # Pre-allocate GMP scratchpads to avoid memory churn during recursive generation
+        state $t_gmp   = Math::GMPz::Rmpz_init_nobless();
+        state $u_gmp   = Math::GMPz::Rmpz_init_nobless();
+        state $hi_gmp  = Math::GMPz::Rmpz_init_nobless();
+        state $lo_gmp  = Math::GMPz::Rmpz_init_nobless();
+        state $p_pow_e = Math::GMPz::Rmpz_init_nobless();
+        state $val     = Math::GMPz::Rmpz_init_nobless();
+
+        my @results;
+
+        my $generate = sub {
+            my ($m, $lo, $k, $P) = @_;
+
+            my $e = $P->[$k - 1];
+            Math::GMPz::Rmpz_tdiv_q($hi_gmp, $B, $m);
+            Math::GMPz::Rmpz_root($hi_gmp, $hi_gmp, ($k > $e ? $k : $e));
+
+            if (Math::GMPz::Rmpz_cmp_ui($hi_gmp, $lo) < 0) {
+                return;
+            }
+
+            Math::GMPz::Rmpz_fits_ulong_p($hi_gmp) || die "Too large!";
+
+            my $hi = Math::GMPz::Rmpz_get_ui($hi_gmp);
+
+            # Base case for recursion
+            if ($k == 1) {
+
+                Math::GMPz::Rmpz_cdiv_q($lo_gmp, $A, $m);
+                my $exact_root = Math::GMPz::Rmpz_root($lo_gmp, $lo_gmp, $e);
+                Math::GMPz::Rmpz_add_ui($lo_gmp, $lo_gmp, 1) if !$exact_root;
+
+                if (Math::GMPz::Rmpz_cmp_ui($lo_gmp, $lo) > 0) {
+                    $lo = Math::GMPz::Rmpz_get_ui($lo_gmp);
+                }
+
+                if ($lo > $hi) {
+                    return;
+                }
+
+                foreach my $p ($sieve_primes_fn->($lo, $hi)) {
+                    Math::GMPz::Rmpz_ui_pow_ui($p_pow_e, $p, $e);
+                    Math::GMPz::Rmpz_mul($val, $m, $p_pow_e);
+                    push @results,
+                      (
+                          Math::GMPz::Rmpz_fits_ulong_p($val)
+                        ? Math::GMPz::Rmpz_get_ui($val)
+                        : Math::GMPz::Rmpz_init_set($val)
+                      );
+                }
+
+                return;
+            }
+
+            # Prime Iteration block for k > 1
+            my $p = $next_prime->($lo - 1);
+
+            while ($p <= $hi) {
+
+                # t = (m * ipow(p,e))
+                Math::GMPz::Rmpz_ui_pow_ui($p_pow_e, $p, $e);
+                Math::GMPz::Rmpz_mul($t_gmp, $m, $p_pow_e);
+
+                # u = idiv(B,t).iroot(P[k-2])
+                Math::GMPz::Rmpz_tdiv_q($u_gmp, $B, $t_gmp);
+                Math::GMPz::Rmpz_root($u_gmp, $u_gmp, $P->[$k - 2]);
+
+                last if (Math::GMPz::Rmpz_cmp_ui($u_gmp, $p) <= 0);
+
+                my $t_pass = Math::GMPz::Rmpz_init_set($t_gmp);
+                __SUB__->($t_pass, $p + 1, $k - 1, $P);
+                $p = $next_prime->($p);
+            }
+        };
+
+        # Optimized Unique Permutation DFS without explicit key tracking
+        # Recursively branches unique factors only at each depth.
+        sub {
+            my ($items, $current_perm) = @_;
+
+            if (!@$items) {
+                my $m_start = Math::GMPz::Rmpz_init_set_ui(1);
+                $generate->($m_start, 2, scalar(@$current_perm), $current_perm);
+                return;
+            }
+
+            my %level_seen;
+            for my $i (0 .. $#$items) {
+                my $item = $items->[$i];
+
+                # Skip iterations for duplicate elements in the same level
+                next if $level_seen{$item}++;
+
+                my @new_items = @$items;
+                splice(@new_items, $i, 1);
+
+                my @new_perm = (@$current_perm, $item);
+                __SUB__->(\@new_items, \@new_perm);
+            }
+          }
+          ->($prime_signature, []);
+
+        @results = sort { $a <=> $b } @results;
+
+        return \@results;
+    }
+
+    sub prime_signature_numbers {
+        my ($from, $to, $signature) = @_;
+
+        my @sig = map { "$_" } @$signature;
+        _valid(\$from);
+
+        if (defined($to)) {
+            _valid(\$to);
+            $from = _any2mpz($$from, 0) // return _array();
+            $to   = _any2mpz($$to,   1) // return _array();
+        }
+        else {
+            $to   = _any2mpz($$from, 0) // return _array();
+            $from = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($from) <= 0) {
+            $from = $ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sgn($to) < 0) {
+            $to = $ZERO;
+        }
+
+#<<<
+        my @numbers = map {
+            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
+        } @{_sieve_prime_sig_numbers($from, $to, \@sig)};
+#>>>
+
+        _array(\@numbers);
+    }
+
     sub semiprimes {
         (TWO)->almost_primes(@_);
     }
