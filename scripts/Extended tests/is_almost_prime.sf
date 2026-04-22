@@ -251,6 +251,9 @@ do {
     assert(is_almost_prime(51403227993662852987455497928, 7))
     assert(is_almost_prime(2011545292777067446258687026, 5))
     assert(is_almost_prime(4810554005148753711362794456, 6))
+    assert(is_almost_prime(29951**19 + 1, 19))
+    assert(is_almost_prime(6272**18 + 1, 18))
+    assert(is_almost_prime(206874667**16 + 1, 16))
 }
 
 say "** Test passed!"

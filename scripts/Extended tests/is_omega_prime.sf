@@ -149,6 +149,9 @@ do {
     assert(is_omega_prime(63625815508153350513817311207, 4))
     assert(is_omega_prime(2468336534484213369852218139, 4))
     assert(is_omega_prime(307764215443043830937725274, 3))
+
+    assert(is_omega_prime(206874667**16 + 1, 16))
+    assert(is_omega_prime(3258569**20 + 1, 20))
 }
 
 say "** Test passed!"
