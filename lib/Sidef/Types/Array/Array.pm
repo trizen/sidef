@@ -3761,30 +3761,65 @@ package Sidef::Types::Array::Array {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
+    sub _unique_permutations {
+        my ($array, $callback) = @_;
+
+        sub {
+            my ($items, $current_perm) = @_;
+
+            if (!@$items) {
+                $callback->($current_perm);
+                return;
+            }
+
+            my %level_seen;
+            for my $i (0 .. $#$items) {
+                my $item = $items->[$i];
+
+                # Skip iterations for duplicate elements in the same level
+                next if $level_seen{$item}++;
+
+                my @new_items = @$items;
+                CORE::splice(@new_items, $i, 1);
+
+                my @new_perm = (@$current_perm, $item);
+                __SUB__->(\@new_items, \@new_perm);
+            }
+          }
+          ->($array, []);
+    }
+
     sub unique_permutations {
         my ($self, $block) = @_;
-        my $vals = bless([@$self]);
+
+        my $vals = $self->sort;
+
+        if (!defined($block)) {
+            my @results;
+            _unique_permutations(
+                $vals,
+                sub {
+                    my ($perm) = @_;
+                    push @results, bless $perm;
+                }
+            );
+            return bless \@results;
+        }
 
         my $break = 1;
-        my @results;
-
         foreach my $n (1, 2) {
             if ($n == 1) {
-                defined($block)
-                  ? $block->run(@$vals)
-                  : CORE::push(@results, bless([@$vals]));
+                $block->run(@$vals);
             }
             $break = 0;
             last;
         }
 
         while (!$break and $vals->next_permutation) {
-            defined($block)
-              ? $block->run(@$vals)
-              : CORE::push(@results, bless([@$vals]));
+            $block->run(@$vals);
         }
 
-        defined($block) ? $block : bless(\@results);
+        $block;
     }
 
     *uniq_permutations = \&unique_permutations;

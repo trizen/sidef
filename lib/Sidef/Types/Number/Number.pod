@@ -7858,19 +7858,6 @@ Aliases: I<sieve_prime_cluster>
 
 =cut
 
-=head2 prime_signature_numbers
-
-    prime_signature_numbers(lo, hi, prime_signature)
-
-Returns an array of numbers in range C<[lo, hi]> that have a given prime signature.
-
-    say prime_signature_numbers(1, 1e3, [1])        #=> prime numbers
-    say prime_signature_numbers(1, 1e3, [2])        #=> squares of numbers
-    say prime_signature_numbers(1, 1e3, [2,1])      #=> squares of primes times another prime
-    say prime_signature_numbers(1, 1e3, [2,1,1])    #=> numbers of the form p^2*q*r
-
-=cut
-
 =head2 prime_divisors
 
     prime_divisors(n)
@@ -8126,6 +8113,31 @@ This is the exponents of the prime-power factorization of C<n>, sorted in descen
 
     say prime_signature(324)                                      #=> [4, 2]  (324 = 2^2 * 3^4)
     say 30.of { .prime_signature.prod_kv{|k,v| prime(k+1)**v } }  #=> OEIS: A046523
+
+=cut
+
+=head2 prime_signature_numbers
+
+    prime_signature_numbers(lo, hi, prime_signature)
+
+Returns an array of numbers in range C<[lo, hi]> that have a given prime signature.
+
+    say prime_signature_numbers(1, 1e3, [1])        #=> prime numbers
+    say prime_signature_numbers(1, 1e3, [2])        #=> squares of numbers
+    say prime_signature_numbers(1, 1e3, [2,1])      #=> squares of primes times another prime
+    say prime_signature_numbers(1, 1e3, [2,1,1])    #=> numbers of the form p^2*q*r
+
+=cut
+
+=head2 prime_signature_count
+
+    prime_signature_count(lo, hi, prime_signature)
+
+Count numbers in range C<[lo, hi]> that have a given prime signature.
+
+    say 10.of {|n| prime_signature_count(1, 10**n, [1]) }      # prime number count
+    say 10.of {|n| prime_signature_count(1, 10**n, [1,1]) }    # A036351
+    say 10.of {|n| prime_signature_count(1, 10**n, [1,1,1]) }  # A215218
 
 =cut
 

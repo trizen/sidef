@@ -10,18 +10,45 @@ do {
     assert_eq(arr, %n[2700, 3528, 4500, 5292, 8712, 9800])
 }
 
-func A395379(n) {
+do {
+    func A395379(n) {
 
-    var A = prime(n-1)**7
-    var B = (prime(n)**7 - 1)
+        var A = prime(n-1)**7
+        var B = (prime(n)**7 - 1)
 
-    var term_1 = prime_signature_numbers(A, B, [7]).len
-    var term_2 = prime_signature_numbers(A, B, [3,1]).len
-    var term_3 = 3.squarefree_almost_prime_count(A, B)
+        var term_1 = prime_signature_numbers(A, B, [7]).len
+        var term_2 = prime_signature_numbers(A, B, [3,1]).len
+        var term_3 = 3.squarefree_almost_prime_count(A, B)
 
-    term_1 + term_2 + term_3
+        term_1 + term_2 + term_3
+    }
+
+    assert_eq(A395379.map(1..5), %n[15, 408, 16838, 167649, 4140037])
 }
 
-assert_eq(A395379.map(1..5), %n[15, 408, 16838, 167649, 4140037])
+do {
+    func A395379(n) {
+
+        var A = prime(n-1)**7
+        var B = (prime(n)**7 - 1)
+
+        var term_1 = prime_signature_count(A, B, [7])
+        var term_2 = prime_signature_count(A, B, [3,1])
+        var term_3 = 3.squarefree_almost_prime_count(A, B)
+
+        term_1 + term_2 + term_3
+    }
+
+    assert_eq(A395379.map(1..5), %n[15, 408, 16838, 167649, 4140037])
+}
+
+assert_eq(prime_signature_numbers(1, 100, [1]), 100.primes)
+assert_eq(prime_signature_numbers(1, 100, [2]), 100.isqrt.primes.map{.sqr})
+assert_eq(prime_signature_numbers(1, 100, [2,1]), %n[12, 18, 20, 28, 44, 45, 50, 52, 63, 68, 75, 76, 92, 98, 99])
+assert_eq(prime_signature_numbers(1, 100, [2,1,1]), %n[60, 84, 90])
+
+assert_eq(10.of {|n| prime_signature_count(1, 10**n, [1]) }, 10.of {|n| prime_count(10**n) })
+assert_eq(6.of {|n| prime_signature_count(1, 10**n, [1,1]) }, 6.of {|n| 2.squarefree_almost_prime_count(10**n) })
+assert_eq(6.of {|n| prime_signature_count(1, 10**n, [1,1,1]) }, 6.of {|n| 3.squarefree_almost_prime_count(10**n) })
 
 say "** Test passed!"

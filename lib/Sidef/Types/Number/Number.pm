@@ -17839,6 +17839,10 @@ package Sidef::Types::Number::Number {
             goto &nan;
         }
 
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) <= $k) {
+            goto &nan;
+        }
+
         my $r = Math::GMPz::Rmpz_init_set(_cached_pn_primorial($k));
 
         # The smallest squarefree k-almost prime is primorial(p_k)
@@ -30397,7 +30401,8 @@ package Sidef::Types::Number::Number {
 
         # Raise A to at least the k-th primorial so the smallest possible
         # product of k distinct primes is always in range.
-        $A = Math::Prime::Util::vecmax($A, Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10),);
+        $A = Math::Prime::Util::vecmax($A, Math::GMPz::Rmpz_get_str(_cached_pn_primorial($k), 10));
+
         return [] if $A > $B;
 
         my @omega_primes;
@@ -31914,32 +31919,13 @@ package Sidef::Types::Number::Number {
             }
         };
 
-        # Optimized Unique Permutation DFS without explicit key tracking
-        # Recursively branches unique factors only at each depth.
-        sub {
-            my ($items, $current_perm) = @_;
-
-            if (!@$items) {
-                my $m_start = Math::GMPz::Rmpz_init_set_ui(1);
-                $generate->($m_start, 2, scalar(@$current_perm), $current_perm);
-                return;
+        my $k = scalar(@$prime_signature);
+        Sidef::Types::Array::Array::_unique_permutations(
+            $prime_signature,
+            sub {
+                $generate->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, $_[0]);
             }
-
-            my %level_seen;
-            for my $i (0 .. $#$items) {
-                my $item = $items->[$i];
-
-                # Skip iterations for duplicate elements in the same level
-                next if $level_seen{$item}++;
-
-                my @new_items = @$items;
-                splice(@new_items, $i, 1);
-
-                my @new_perm = (@$current_perm, $item);
-                __SUB__->(\@new_items, \@new_perm);
-            }
-          }
-          ->($prime_signature, []);
+        );
 
         @results = sort { $a <=> $b } @results;
 
@@ -31949,18 +31935,15 @@ package Sidef::Types::Number::Number {
     sub prime_signature_numbers {
         my ($from, $to, $signature) = @_;
 
-        my @sig = map { "$_" } @$signature;
-        _valid(\$from);
+        ref($signature) eq 'Sidef::Types::Array::Array'
+          or die "usage: prime_signature_numbers(A, B, [...])";
 
-        if (defined($to)) {
-            _valid(\$to);
-            $from = _any2mpz($$from, 0) // return _array();
-            $to   = _any2mpz($$to,   1) // return _array();
-        }
-        else {
-            $to   = _any2mpz($$from, 0) // return _array();
-            $from = $ONE;
-        }
+        my @sig = map { "$_" } @$signature;
+
+        _valid(\$to);
+
+        $from = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$to,   1) // return _array();
 
         if (Math::GMPz::Rmpz_sgn($from) <= 0) {
             $from = $ONE;
@@ -31977,6 +31960,102 @@ package Sidef::Types::Number::Number {
 #>>>
 
         _array(\@numbers);
+    }
+
+    sub prime_signature_count {
+        my ($from, $to, $signature) = @_;
+
+        ref($signature) eq 'Sidef::Types::Array::Array'
+          or die "usage: prime_signature_count(A, B, [...])";
+
+        my @sig = map { "$_" } @$signature;
+
+        _valid(\$to);
+
+        return ZERO if $to->lt($from);
+
+        if ($from->gt(ONE)) {
+            return ((ONE)->prime_signature_count($to, $signature)->sub((ONE)->prime_signature_count($from->dec, $signature)));
+        }
+
+        my $n = _any2mpz($$to) // return ZERO;
+
+        Math::GMPz::Rmpz_sgn($n) > 0
+          or return ZERO;
+
+        my $k = scalar(@sig);
+
+        if ($k == 0) {
+            return ONE;
+        }
+
+        if (Math::GMPz::Rmpz_sizeinbase($n, 2) <= $k) {
+            return ZERO;
+        }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
+
+        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+            return ZERO;
+        }
+
+        my $count = Math::GMPz::Rmpz_init_set_ui(0);
+
+        my $generate = sub {
+            my ($m, $p, $k, $P, $j) = @_;
+
+            my $e = $P->[$k - 1];
+            Math::GMPz::Rmpz_tdiv_q($t, $n, $m);
+            Math::GMPz::Rmpz_root($t, $t, ($k > $e ? $k : $e));
+
+            Math::GMPz::Rmpz_fits_ulong_p($t) || die "Too large!";
+
+            my $hi = Math::GMPz::Rmpz_get_ui($t);
+
+            if ($k == 1) {
+
+                my $pi =
+                  (HAS_PRIME_UTIL and $hi < PRIMECOUNT_MIN)
+                  ? Math::Prime::Util::prime_count($hi)
+                  : _prime_count($hi);
+
+                if ($pi < ULONG_MAX) {
+                    Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
+                }
+                else {
+                    Math::GMPz::Rmpz_set_str($t, "$pi", 10);
+                    Math::GMPz::Rmpz_sub_ui($t, $t, $j);
+                    Math::GMPz::Rmpz_add($count, $count, $t);
+                }
+
+                return;
+            }
+
+            for (; $p <= $hi ; ++$j) {
+                my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
+                Math::GMPz::Rmpz_mul($t, $t, $m);
+                Math::GMPz::Rmpz_tdiv_q($u, $n, $t);
+                Math::GMPz::Rmpz_root($u, $u, $P->[$k - 2]);
+                if (Math::GMPz::Rmpz_cmp_ui($u, $r) < 0) {
+                    last;
+                }
+                __SUB__->(Math::GMPz::Rmpz_init_set($t), $r, $k - 1, $P, $j + 1);
+                $p = $r;
+            }
+        };
+
+        Sidef::Types::Array::Array::_unique_permutations(
+            \@sig,
+            sub {
+                $generate->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, $_[0], 0);
+            }
+        );
+
+        bless \$count;
     }
 
     sub semiprimes {
