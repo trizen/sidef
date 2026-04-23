@@ -16928,18 +16928,18 @@ package Sidef::Types::Number::Number {
         sub {
             my ($m, $p, $k, $j) = @_;
 
-            my $s = do {
-                Math::GMPz::Rmpz_div($t, $n, $m);
-                Math::GMPz::Rmpz_root($t, $t, $k);
-                Math::GMPz::Rmpz_get_ui($t);
-            };
+            Math::GMPz::Rmpz_div($t, $n, $m);
+            Math::GMPz::Rmpz_root($t, $t, $k);
+
+            Math::GMPz::Rmpz_fits_ulong_p($t) || die "Too large value!";
+            my $hi = Math::GMPz::Rmpz_get_ui($t);
 
             if ($k == 2) {
 
                 foreach my $q (
                                HAS_PRIME_UTIL
-                               ? @{Math::Prime::Util::primes($p, $s)}
-                               : Math::Prime::Util::GMP::sieve_primes($p, $s)
+                               ? @{Math::Prime::Util::primes($p, $hi)}
+                               : Math::Prime::Util::GMP::sieve_primes($p, $hi)
                   ) {
 
                     Math::GMPz::Rmpz_mul_ui($t, $m, $q);
@@ -16963,7 +16963,7 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            for (my $q = $p ; $q <= $s ; $q = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($q) : Math::Prime::Util::GMP::next_prime($q))) {
+            for (my $q = $p ; $q <= $hi ; $q = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($q) : Math::Prime::Util::GMP::next_prime($q))) {
                 __SUB__->($m * $q, $q, $k - 1, $j++);
             }
           }
@@ -17102,18 +17102,18 @@ package Sidef::Types::Number::Number {
         sub {
             my ($m, $p, $k, $j) = @_;
 
-            my $s = do {
-                Math::GMPz::Rmpz_div($t, $n, $m);
-                Math::GMPz::Rmpz_root($t, $t, $k);
-                Math::GMPz::Rmpz_get_ui($t);
-            };
+            Math::GMPz::Rmpz_div($t, $n, $m);
+            Math::GMPz::Rmpz_root($t, $t, $k);
+
+            Math::GMPz::Rmpz_fits_ulong_p($t) || die "Too large value!";
+            my $hi = Math::GMPz::Rmpz_get_ui($t);
 
             if ($k == 2) {
 
                 foreach my $q (
                                HAS_PRIME_UTIL
-                               ? @{Math::Prime::Util::primes($p, $s)}
-                               : Math::Prime::Util::GMP::sieve_primes($p, $s)
+                               ? @{Math::Prime::Util::primes($p, $hi)}
+                               : Math::Prime::Util::GMP::sieve_primes($p, $hi)
                   ) {
 
                     Math::GMPz::Rmpz_mul_ui($t, $m, $q);
@@ -17137,7 +17137,7 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            for (; $p <= $s ; ++$j) {
+            for (; $p <= $hi ; ++$j) {
                 my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
                 __SUB__->($m * $p, $r, $k - 1, $j + 1);
                 $p = $r;
@@ -31865,12 +31865,11 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            Math::GMPz::Rmpz_fits_ulong_p($hi_gmp) || die "Too large!";
-
-            my $hi = Math::GMPz::Rmpz_get_ui($hi_gmp);
-
             # Base case for recursion
             if ($k == 1) {
+
+                Math::GMPz::Rmpz_fits_ulong_p($hi_gmp) || die "Too large value!";
+                my $hi = Math::GMPz::Rmpz_get_ui($hi_gmp);
 
                 Math::GMPz::Rmpz_cdiv_q($lo_gmp, $A, $m);
                 my $exact_root = Math::GMPz::Rmpz_root($lo_gmp, $lo_gmp, $e);
@@ -31899,9 +31898,10 @@ package Sidef::Types::Number::Number {
             }
 
             # Prime Iteration block for k > 1
-            my $p = $next_prime->($lo - 1);
+            my $p  = $next_prime->($lo - 1);
+            my $e2 = $P->[$k - 2];
 
-            while ($p <= $hi) {
+            while (Math::GMPz::Rmpz_cmp_ui($hi_gmp, $p) >= 0) {
 
                 # t = (m * ipow(p,e))
                 Math::GMPz::Rmpz_ui_pow_ui($p_pow_e, $p, $e);
@@ -31909,7 +31909,7 @@ package Sidef::Types::Number::Number {
 
                 # u = idiv(B,t).iroot(P[k-2])
                 Math::GMPz::Rmpz_tdiv_q($u_gmp, $B, $t_gmp);
-                Math::GMPz::Rmpz_root($u_gmp, $u_gmp, $P->[$k - 2]);
+                Math::GMPz::Rmpz_root($u_gmp, $u_gmp, ($k - 1 > $e2 ? $k - 1 : $e2));
 
                 last if (Math::GMPz::Rmpz_cmp_ui($u_gmp, $p) <= 0);
 
@@ -31993,8 +31993,9 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $t  = Math::GMPz::Rmpz_init_nobless();
+        state $u  = Math::GMPz::Rmpz_init_nobless();
+        state $hi = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
 
@@ -32009,18 +32010,14 @@ package Sidef::Types::Number::Number {
 
             my $e = $P->[$k - 1];
             Math::GMPz::Rmpz_tdiv_q($t, $n, $m);
-            Math::GMPz::Rmpz_root($t, $t, ($k > $e ? $k : $e));
-
-            Math::GMPz::Rmpz_fits_ulong_p($t) || die "Too large!";
-
-            my $hi = Math::GMPz::Rmpz_get_ui($t);
+            Math::GMPz::Rmpz_root($hi, $t, ($k > $e ? $k : $e));
 
             if ($k == 1) {
 
                 my $pi =
-                  (HAS_PRIME_UTIL and $hi < PRIMECOUNT_MIN)
-                  ? Math::Prime::Util::prime_count($hi)
-                  : _prime_count($hi);
+                  (HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($hi, PRIMECOUNT_MIN) < 0)
+                  ? Math::Prime::Util::prime_count(Math::GMPz::Rmpz_get_str($hi, 10))
+                  : _prime_count(Math::GMPz::Rmpz_get_str($hi, 10));
 
                 if ($pi < ULONG_MAX) {
                     Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
@@ -32034,12 +32031,48 @@ package Sidef::Types::Number::Number {
                 return;
             }
 
-            for (; $p <= $hi ; ++$j) {
+            if ($k == 2) {
+
+                my $e2 = $P->[0];
+                for (; Math::GMPz::Rmpz_cmp_ui($hi, $p) >= 0 ;) {
+                    my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
+
+                    Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
+                    Math::GMPz::Rmpz_mul($t, $t, $m);
+                    Math::GMPz::Rmpz_tdiv_q($u, $n, $t);
+                    Math::GMPz::Rmpz_root($u, $u, $e2) if ($e2 > 1);
+
+                    if (Math::GMPz::Rmpz_cmp_ui($u, $r) < 0) {
+                        last;
+                    }
+
+                    my $pi =
+                      (HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($u, PRIMECOUNT_MIN) < 0)
+                      ? Math::Prime::Util::prime_count(Math::GMPz::Rmpz_get_str($u, 10))
+                      : _prime_count(Math::GMPz::Rmpz_get_str($u, 10));
+
+                    if ($pi < ULONG_MAX) {
+                        Math::GMPz::Rmpz_add_ui($count, $count, $pi - ++$j);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_set_str($t, "$pi", 10);
+                        Math::GMPz::Rmpz_sub_ui($t, $t, ++$j);
+                        Math::GMPz::Rmpz_add($count, $count, $t);
+                    }
+
+                    $p = $r;
+                }
+
+                return;
+            }
+
+            my $e2 = $P->[$k - 2];
+            for (; Math::GMPz::Rmpz_cmp_ui($hi, $p) >= 0 ; ++$j) {
                 my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
                 Math::GMPz::Rmpz_mul($t, $t, $m);
                 Math::GMPz::Rmpz_tdiv_q($u, $n, $t);
-                Math::GMPz::Rmpz_root($u, $u, $P->[$k - 2]);
+                Math::GMPz::Rmpz_root($u, $u, (($e2 > $k - 1) ? $e2 : ($k - 1)));
                 if (Math::GMPz::Rmpz_cmp_ui($u, $r) < 0) {
                     last;
                 }

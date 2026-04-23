@@ -47,6 +47,14 @@ assert_eq(prime_signature_numbers(1, 100, [2]), 100.isqrt.primes.map{.sqr})
 assert_eq(prime_signature_numbers(1, 100, [2,1]), %n[12, 18, 20, 28, 44, 45, 50, 52, 63, 68, 75, 76, 92, 98, 99])
 assert_eq(prime_signature_numbers(1, 100, [2,1,1]), %n[60, 84, 90])
 
+assert_eq(prime_signature_count(1, 10000000, [3, 3, 3, 2]), 10)
+assert_eq(prime_signature_numbers(1, 10000000, [3, 3, 3, 2]), %n[1323000, 1852200, 3087000, 3267000, 4563000, 4630500, 7187400, 7803000, 8964648, 9747000])
+
+if (Number.HAS_PRIME_UTIL) {
+    assert_eq(prime_signature_count(1, 2**64, [3,2,2]), 543608053)
+    assert_eq(prime_signature_count(1, 2**70, [3,3,2]), 543423632)
+}
+
 assert_eq(10.of {|n| prime_signature_count(1, 10**n, [1]) }, 10.of {|n| prime_count(10**n) })
 assert_eq(6.of {|n| prime_signature_count(1, 10**n, [1,1]) }, 6.of {|n| 2.squarefree_almost_prime_count(10**n) })
 assert_eq(6.of {|n| prime_signature_count(1, 10**n, [1,1,1]) }, 6.of {|n| 3.squarefree_almost_prime_count(10**n) })
