@@ -31834,11 +31834,6 @@ package Sidef::Types::Number::Number {
         }
 
         # Hoist function pointer to avoid branching inside the iterators
-        my $next_prime =
-          HAS_PRIME_UTIL
-          ? \&Math::Prime::Util::next_prime
-          : \&Math::Prime::Util::GMP::next_prime;
-
         my $sieve_primes_fn =
           HAS_PRIME_UTIL
           ? sub { @{Math::Prime::Util::primes($_[0], $_[1])} }
@@ -31898,10 +31893,11 @@ package Sidef::Types::Number::Number {
             }
 
             # Prime Iteration block for k > 1
-            my $p  = $next_prime->($lo - 1);
+            my $p  = $lo;
             my $e2 = $P->[$k - 2];
 
             while (Math::GMPz::Rmpz_cmp_ui($hi_gmp, $p) >= 0) {
+                my $r = HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p);
 
                 # t = (m * ipow(p,e))
                 Math::GMPz::Rmpz_ui_pow_ui($p_pow_e, $p, $e);
@@ -31911,11 +31907,11 @@ package Sidef::Types::Number::Number {
                 Math::GMPz::Rmpz_tdiv_q($u_gmp, $B, $t_gmp);
                 Math::GMPz::Rmpz_root($u_gmp, $u_gmp, ($k - 1 > $e2 ? $k - 1 : $e2));
 
-                last if (Math::GMPz::Rmpz_cmp_ui($u_gmp, $p) <= 0);
+                last if (Math::GMPz::Rmpz_cmp_ui($u_gmp, $r) < 0);
 
                 my $t_pass = Math::GMPz::Rmpz_init_set($t_gmp);
-                __SUB__->($t_pass, $p + 1, $k - 1, $P);
-                $p = $next_prime->($p);
+                __SUB__->($t_pass, $r, $k - 1, $P);
+                $p = $r;
             }
         };
 
