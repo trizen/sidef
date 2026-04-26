@@ -31989,9 +31989,8 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        state $t  = Math::GMPz::Rmpz_init_nobless();
-        state $u  = Math::GMPz::Rmpz_init_nobless();
-        state $hi = Math::GMPz::Rmpz_init_nobless();
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
 
@@ -32005,15 +32004,27 @@ package Sidef::Types::Number::Number {
             my ($m, $p, $k, $P, $j) = @_;
 
             my $e = $P->[$k - 1];
+
+            # Aggressive Math Pruning: Sum of all remaining exponents
+            my $sum_e = 0;
+            $sum_e += $_ for @{$P}[0 .. $k - 1];
+
             Math::GMPz::Rmpz_tdiv_q($t, $n, $m);
-            Math::GMPz::Rmpz_root($hi, $t, ($k > $e ? $k : $e));
+
+            # Avoid expensive root computation if n = 1
+            if ($sum_e > 1) {
+                Math::GMPz::Rmpz_root($t, $t, $sum_e);
+            }
+
+            Math::GMPz::Rmpz_fits_ulong_p($t) || die "Too large value!";
+            my $hi = Math::GMPz::Rmpz_get_ui($t);
 
             if ($k == 1) {
 
                 my $pi =
-                  (HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($hi, PRIMECOUNT_MIN) < 0)
-                  ? Math::Prime::Util::prime_count(Math::GMPz::Rmpz_get_str($hi, 10))
-                  : _prime_count(Math::GMPz::Rmpz_get_str($hi, 10));
+                  (HAS_PRIME_UTIL and $hi < PRIMECOUNT_MIN)
+                  ? Math::Prime::Util::prime_count($hi)
+                  : _prime_count($hi);
 
                 if ($pi < ULONG_MAX) {
                     Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
@@ -32028,17 +32039,16 @@ package Sidef::Types::Number::Number {
             }
 
             if ($k == 2) {
-
                 my $e2 = $P->[0];
-                for (; Math::GMPz::Rmpz_cmp_ui($hi, $p) >= 0 ;) {
-                    my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
 
+                for (; $p <= $hi ;) {
                     Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
                     Math::GMPz::Rmpz_mul($t, $t, $m);
                     Math::GMPz::Rmpz_tdiv_q($u, $n, $t);
                     Math::GMPz::Rmpz_root($u, $u, $e2) if ($e2 > 1);
 
-                    if (Math::GMPz::Rmpz_cmp_ui($u, $r) < 0) {
+                    # Lookahead Optimization: Break if current prime >= next max limit
+                    if (Math::GMPz::Rmpz_cmp_ui($u, $p) <= 0) {
                         last;
                     }
 
@@ -32056,22 +32066,31 @@ package Sidef::Types::Number::Number {
                         Math::GMPz::Rmpz_add($count, $count, $t);
                     }
 
-                    $p = $r;
+                    # Calculate next prime only if continuing
+                    $p = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
                 }
 
                 return;
             }
 
-            my $e2 = $P->[$k - 2];
-            for (; Math::GMPz::Rmpz_cmp_ui($hi, $p) >= 0 ; ++$j) {
-                my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
+            # General recursive case for k > 2
+            my $sum_e_next = $sum_e - $e;
+
+            for (; $p <= $hi ; ++$j) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
                 Math::GMPz::Rmpz_mul($t, $t, $m);
                 Math::GMPz::Rmpz_tdiv_q($u, $n, $t);
-                Math::GMPz::Rmpz_root($u, $u, (($e2 > $k - 1) ? $e2 : ($k - 1)));
-                if (Math::GMPz::Rmpz_cmp_ui($u, $r) < 0) {
+
+                Math::GMPz::Rmpz_root($u, $u, $sum_e_next) if ($sum_e_next > 1);
+
+                # Lookahead Optimization: Break if current prime >= next max limit
+                if (Math::GMPz::Rmpz_cmp_ui($u, $p) <= 0) {
                     last;
                 }
+
+                # Fetch next prime only after ensuring we haven't breached the limit
+                my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
+
                 __SUB__->(Math::GMPz::Rmpz_init_set($t), $r, $k - 1, $P, $j + 1);
                 $p = $r;
             }
