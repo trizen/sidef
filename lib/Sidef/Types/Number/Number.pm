@@ -31828,7 +31828,7 @@ package Sidef::Types::Number::Number {
             Math::GMPz::Rmpz_set($A, $primorial);
         }
 
-        # Early exit if A is out of bounds bounds
+        # Early exit if A is out of bounds
         if (Math::GMPz::Rmpz_cmp($A, $B) > 0) {
             return [];
         }
@@ -31853,18 +31853,27 @@ package Sidef::Types::Number::Number {
             my ($m, $lo, $k, $P) = @_;
 
             my $e = $P->[$k - 1];
-            Math::GMPz::Rmpz_tdiv_q($hi_gmp, $B, $m);
-            Math::GMPz::Rmpz_root($hi_gmp, $hi_gmp, ($k > $e ? $k : $e));
 
-            if (Math::GMPz::Rmpz_cmp_ui($hi_gmp, $lo) < 0) {
+            # Aggressive Math Pruning: Sum of all remaining exponents
+            my $sum_e = 0;
+            $sum_e += $_ for @{$P}[0 .. $k - 1];
+
+            Math::GMPz::Rmpz_tdiv_q($hi_gmp, $B, $m);
+
+            # Avoid expensive root computation if identity map
+            if ($sum_e > 1) {
+                Math::GMPz::Rmpz_root($hi_gmp, $hi_gmp, $sum_e);
+            }
+
+            Math::GMPz::Rmpz_fits_ulong_p($hi_gmp) || die "Too large value!";
+            my $hi = Math::GMPz::Rmpz_get_ui($hi_gmp);
+
+            if ($lo > $hi) {
                 return;
             }
 
             # Base case for recursion
             if ($k == 1) {
-
-                Math::GMPz::Rmpz_fits_ulong_p($hi_gmp) || die "Too large value!";
-                my $hi = Math::GMPz::Rmpz_get_ui($hi_gmp);
 
                 Math::GMPz::Rmpz_cdiv_q($lo_gmp, $A, $m);
                 my $exact_root = Math::GMPz::Rmpz_root($lo_gmp, $lo_gmp, $e);
@@ -31872,10 +31881,6 @@ package Sidef::Types::Number::Number {
 
                 if (Math::GMPz::Rmpz_cmp_ui($lo_gmp, $lo) > 0) {
                     $lo = Math::GMPz::Rmpz_get_ui($lo_gmp);
-                }
-
-                if ($lo > $hi) {
-                    return;
                 }
 
                 foreach my $p ($sieve_primes_fn->($lo, $hi)) {
@@ -31893,24 +31898,31 @@ package Sidef::Types::Number::Number {
             }
 
             # Prime Iteration block for k > 1
-            my $p  = $lo;
-            my $e2 = $P->[$k - 2];
+            my $p          = $lo;
+            my $sum_e_next = $sum_e - $e;
 
-            while (Math::GMPz::Rmpz_cmp_ui($hi_gmp, $p) >= 0) {
-                my $r = HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p);
+            while ($p <= $hi) {
 
                 # t = (m * ipow(p,e))
                 Math::GMPz::Rmpz_ui_pow_ui($p_pow_e, $p, $e);
                 Math::GMPz::Rmpz_mul($t_gmp, $m, $p_pow_e);
 
-                # u = idiv(B,t).iroot(P[k-2])
+                # u = idiv(B,t).iroot(sum_e_next)
                 Math::GMPz::Rmpz_tdiv_q($u_gmp, $B, $t_gmp);
-                Math::GMPz::Rmpz_root($u_gmp, $u_gmp, ($k - 1 > $e2 ? $k - 1 : $e2));
 
-                last if (Math::GMPz::Rmpz_cmp_ui($u_gmp, $r) < 0);
+                if ($sum_e_next > 1) {
+                    Math::GMPz::Rmpz_root($u_gmp, $u_gmp, $sum_e_next);
+                }
 
-                my $t_pass = Math::GMPz::Rmpz_init_set($t_gmp);
-                __SUB__->($t_pass, $r, $k - 1, $P);
+                # Lookahead Optimization: Break if current prime >= next max limit
+                if (Math::GMPz::Rmpz_cmp_ui($u_gmp, $p) <= 0) {
+                    last;
+                }
+
+                # Fetch next prime only after ensuring we haven't breached the limit
+                my $r = HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p);
+
+                __SUB__->(Math::GMPz::Rmpz_init_set($t_gmp), $r, $k - 1, $P);
                 $p = $r;
             }
         };
