@@ -10,6 +10,22 @@ do {
     assert_eq(arr, %n[2700, 3528, 4500, 5292, 8712, 9800])
 }
 
+assert_eq(prime_signature_numbers(2700, 9800, [3,2,2]), %n[2700, 3528, 4500, 5292, 8712, 9800])
+assert_eq(prime_signature_numbers(2700, 2700, [3,2,2]), %n[2700])
+assert_eq(prime_signature_numbers(2700, 3528, [3,2,2]), %n[2700, 3528])
+assert_eq(prime_signature_numbers(2700+1, 3528, [3,2,2]), %n[3528])
+assert_eq(prime_signature_numbers(2700, 3528-1, [3,2,2]), %n[2700])
+assert_eq(prime_signature_numbers(2700+1, 3528-1, [3,2,2]), %n[])
+assert_eq(prime_signature_numbers(2700-1, 3528-1, [3,2,2]), %n[2700])
+
+assert_eq(prime_signature_count(2700, 9800, [3,2,2]), 6)
+assert_eq(prime_signature_count(2700, 2700, [3,2,2]), 1)
+assert_eq(prime_signature_count(2700, 3528, [3,2,2]), 2)
+assert_eq(prime_signature_count(2700+1, 3528, [3,2,2]), 1)
+assert_eq(prime_signature_count(2700, 3528-1, [3,2,2]), 1)
+assert_eq(prime_signature_count(2700+1, 3528-1, [3,2,2]), 0)
+assert_eq(prime_signature_count(2700-1, 3528-1, [3,2,2]), 1)
+
 do {
     func A395379(n) {
 
