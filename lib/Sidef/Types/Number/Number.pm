@@ -8852,15 +8852,19 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_sgn($n) || return ZERO;
 
-        my $r = Math::GMPz::Rmpz_init();
-        my $t = Math::GMPz::Rmpz_init();
+        state $r = Math::GMPz::Rmpz_init_nobless();
+        state $t = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_sub_ui($r, $n,    1);
         Math::GMPz::Rmpz_sub_ui($t, $base, 1);
         Math::GMPz::Rmpz_mod($r, $r, $t);
         Math::GMPz::Rmpz_add_ui($r, $r, 1);
 
-        bless \$r;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($r)
+          ? Math::GMPz::Rmpz_get_ui($r)
+          : Math::GMPz::Rmpz_init_set($r);
+        bless \$r2;
     }
 
     sub expnorm {
@@ -31839,13 +31843,9 @@ package Sidef::Types::Number::Number {
         my @results;
 
         my $generate = sub {
-            my ($m, $lo, $k, $P) = @_;
+            my ($m, $lo, $k, $P, $sum_e) = @_;
 
             my $e = $P->[$k - 1];
-
-            # Aggressive Math Pruning: Sum of all remaining exponents
-            my $sum_e = List::Util::sum(@{$P}[0 .. $k - 1]);
-
             Math::GMPz::Rmpz_tdiv_q($t, $B, $m);
             Math::GMPz::Rmpz_root($t, $t, $sum_e) if ($sum_e > 1);
 
@@ -31900,16 +31900,18 @@ package Sidef::Types::Number::Number {
                 }
 
                 my $r = HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p);
-                __SUB__->($u, $r, $k - 1, $P);
+                __SUB__->($u, $r, $k - 1, $P, $sum_e - $e);
                 $p = $r;
             }
         };
 
-        my $k = scalar(@$prime_signature);
+        my $k     = scalar(@$prime_signature);
+        my $sum_e = List::Util::sum(@$prime_signature);
+
         Sidef::Types::Array::Array::_unique_permutations(
             $prime_signature,
             sub {
-                $generate->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, $_[0]);
+                $generate->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, $_[0], $sum_e);
             }
         );
 
@@ -31990,13 +31992,9 @@ package Sidef::Types::Number::Number {
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
         my $generate = sub {
-            my ($m, $lo, $k, $P, $j) = @_;
+            my ($m, $lo, $k, $P, $sum_e, $j) = @_;
 
             my $e = $P->[$k - 1];
-
-            # Aggressive Math Pruning: Sum of all remaining exponents
-            my $sum_e = List::Util::sum(@{$P}[0 .. $k - 1]);
-
             Math::GMPz::Rmpz_tdiv_q($t, $n, $m);
             Math::GMPz::Rmpz_root($t, $t, $sum_e) if ($sum_e > 1);
 
@@ -32044,7 +32042,7 @@ package Sidef::Types::Number::Number {
 
                     my $pi =
                       (HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($t, PRIMECOUNT_MIN) < 0)
-                      ? Math::Prime::Util::prime_count(Math::GMPz::Rmpz_get_str($t, 10))
+                      ? Math::Prime::Util::prime_count(Math::GMPz::Rmpz_get_ui($t))
                       : _prime_count(Math::GMPz::Rmpz_get_str($t, 10));
 
                     if ($pi < ULONG_MAX) {
@@ -32071,15 +32069,17 @@ package Sidef::Types::Number::Number {
                     Math::GMPz::Rmpz_mul($u, $t, $m);
                 }
                 my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
-                __SUB__->($u, $r, $k - 1, $P, $j + 1);
+                __SUB__->($u, $r, $k - 1, $P, $sum_e - $e, $j + 1);
                 $p = $r;
             }
         };
 
+        my $sum_e = List::Util::sum(@sig);
+
         Sidef::Types::Array::Array::_unique_permutations(
             \@sig,
             sub {
-                $generate->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, $_[0], 0);
+                $generate->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, $_[0], $sum_e, 0);
             }
         );
 
