@@ -10859,7 +10859,7 @@ package Sidef::Types::Number::Number {
             }
         }
 
-        return @result;
+        return \@result;
     }
 
     sub sum_of_squares {
@@ -10893,7 +10893,7 @@ package Sidef::Types::Number::Number {
 
         # ── Build representations prime-by-prime ──────────────────────────────────
         # Start from the trivial identity 1 = 0² + 1², then fold in each factor.
-        my @reps         = ([0, 1]);
+        my $reps         = [[0, 1]];
         my $square_scale = Math::GMPz::Rmpz_init_set_ui(1);
 
         state $p = Math::GMPz::Rmpz_init_nobless();
@@ -10921,32 +10921,32 @@ package Sidef::Types::Number::Number {
             # Lift p → p^k via binary exponentiation over representation sets.
             # @acc accumulates the running product starting from 1 = 0² + 1²;
             # @base holds the current power-of-two of p's representation.
-            my @acc  = ([0, 1]);
-            my @base = ([$x, $y]);
+            my $acc  = [[0, 1]];
+            my $base = [[$x, $y]];
             my $exp  = $k;
 
             while ($exp > 0) {
-                @acc = _multiply_sets(\@acc, \@base) if $exp & 1;
+                $acc = _multiply_sets($acc, $base) if $exp & 1;
                 $exp >>= 1;
-                @base = _multiply_sets(\@base, \@base) if $exp > 0;    # skip final squaring
+                $base = _multiply_sets($base, $base) if $exp > 0;    # skip final squaring
             }
 
-            @reps = _multiply_sets(\@reps, \@acc);
+            $reps = _multiply_sets($reps, $acc);
         }
 
         # ── Apply the p ≡ 3 (mod 4) scale factor ─────────────────────────────────
         if (Math::GMPz::Rmpz_cmp_ui($square_scale, 1) > 0) {
-            @reps = map { [$_->[0] * $square_scale, $_->[1] * $square_scale] } @reps;
+            @$reps = map { [$_->[0] * $square_scale, $_->[1] * $square_scale] } @$reps;
         }
 
         # ── Sort into canonical order (x ascending) and wrap for return ───────────
-        @reps = sort { $a->[0] <=> $b->[0] } map { ($_->[0] > $_->[1]) ? [$_->[1], $_->[0]] : $_ } @reps;
+        @$reps = sort { $a->[0] <=> $b->[0] } map { ($_->[0] > $_->[1]) ? [$_->[1], $_->[0]] : $_ } @$reps;
 
         _array(
             [
              map {
                  _array([map { _set_int($_) } @$_])
-               } @reps
+               } @$reps
             ]
         );
     }
