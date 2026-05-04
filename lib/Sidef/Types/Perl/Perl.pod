@@ -221,12 +221,6 @@ B<Supported Conversions:>
 B<Note:> Circular references in arrays and hashes are properly handled to avoid
 infinite loops.
 
-B<Example:>
-
-    # Manual conversion
-    var perl_array = Perl.eval('[1, 2, 3]')
-    var sidef_array = Perl.to_sidef(perl_array)
-
 =head2 tie
 
     Perl.tie(variable, class_name, *args)
@@ -252,35 +246,35 @@ B<Returns:> The tie object that can be used to interact with the tied variable
 B<Example - Database File Access:>
 
     require('DB_File')
-    
+
     var db = Hash()  # Create a Sidef hash
     var tie_obj = Perl.tie(
         db,                                    # Variable to tie
         "DB_File",                             # Class name
         "database.db",                         # Filename
-        File.O_RDWR | File.O_CREAT,           # Flags
+        File.O_RDWR | File.O_CREAT,            # Flags
         0666,                                  # Permissions
-        %perl<$DB_File::DB_HASH>              # DB type
+        %perl<$DB_File::DB_HASH>               # DB type
     )
-    
+
     # Now the hash is tied to the file
     db{"username"} = "alice"
     db{"email"} = "alice@example.com"
-    
+
     # Sync changes to disk
     tie_obj.sync
 
 B<Example - Tie::IxHash for Ordered Hash:>
 
     require('Tie::IxHash')
-    
+
     var ordered = Hash()
     Perl.tie(ordered, "Tie::IxHash")
-    
+
     ordered{"first"} = 1
     ordered{"second"} = 2
     ordered{"third"} = 3
-    
+
     # Keys maintain insertion order
 
 B<Supported Variable Types:>
@@ -314,15 +308,17 @@ B<Returns:> The result of the untie operation
 
 B<Example:>
 
+    require('DB_File')
+
     var db = Hash()
     var obj = Perl.tie(db, "DB_File", "data.db", File.O_RDWR | File.O_CREAT, 0666)
-    
+
     # Use the tied hash
     db{"key"} = "value"
-    
+
     # Clean up by untying
     Perl.untie(db)
-    
+
     # Now db is a regular hash again
 
 =head2 version
@@ -348,8 +344,8 @@ B<Returns:> Number representing the Perl version (e.g., C<5.038>)
 
 B<Example:>
 
-    say Perl.numeric_version    # => 5.038
-    
+    say Perl.numeric_version    # => # => 5.042002
+
     if (Perl.numeric_version >= 5.036) {
         say "Modern Perl features available"
     }
@@ -428,7 +424,7 @@ B<Aliases:> I<dump>, I<to_s>
             course => "Mathematics"
         }
     ')
-    
+
     say complex{"course"}                    # => Mathematics
     say complex{"users"}[0]{"name"}          # => Alice
     say complex{"users"}[0]{"scores"}[1]     # => 92
@@ -446,11 +442,11 @@ B<Aliases:> I<dump>, I<to_s>
             avg => sum(@numbers) / scalar(@numbers)
         }
     ')
-    
-    say "Sum: #{stats{"sum"}}"      # => Sum: 326
-    say "Min: #{stats{"min"}}"      # => Min: 12
-    say "Max: #{stats{"max"}}"      # => Max: 89
-    say "Avg: #{stats{"avg"}}"      # => Avg: 46.571...
+
+    say "Sum: #{stats{:sum}}"      # => Sum: 326
+    say "Min: #{stats{:min}}"      # => Min: 12
+    say "Max: #{stats{:max}}"      # => Max: 89
+    say "Avg: #{stats{:avg}}"      # => Avg: 46.571...
 
 =head1 NOTES AND CAVEATS
 
