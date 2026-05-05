@@ -1829,7 +1829,7 @@ model.keys.sort.each { |c|
 ### Official Documentation
 
 - 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) — Complete language reference
-- 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.04/sidef-book.pdf) — Offline reading
+- 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.05/sidef-book.pdf) — Offline reading
 - 🔢 [Number Theory Tutorial](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_TUTORIAL.md) — Deep dive into Sidef's mathematical functions
 
 ### Example Script Collections

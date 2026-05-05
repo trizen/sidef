@@ -103,7 +103,7 @@ After installing Sidef, launch the interactive environment with the `sidef` comm
 
 ```console
 $ sidef
-Sidef 26.04, running on Linux, using Perl v5.42.1.
+Sidef 26.05, running on Linux, using Perl v5.42.1.
 Type "help", "copyright" or "license" for more information.
 >
 ```
@@ -4220,7 +4220,7 @@ n.is_omega_prime(3)
 
 ### Official Documentation
 
-- **Sidef book**: [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.04/sidef-book.pdf))
+- **Sidef book**: [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.05/sidef-book.pdf))
 - **Advanced tutorial**: [SIDEF_ADVANCED_TUTORIAL.md](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md)
 - **Computational Algebra Guide**: [COMPUTATIONAL_ALGEBRA_GUIDE.md](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md)
 - **Full Number class documentation**: [Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number)

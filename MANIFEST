@@ -1187,6 +1187,7 @@ t/smart_word_wrap.t
 TODO
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
+utils/bump_version_number.sf
 utils/Concepts/sidef_concept.jl
 utils/Concepts/sidef_concept.pl
 utils/Concepts/sidef_executor.jl

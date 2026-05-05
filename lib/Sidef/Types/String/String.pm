@@ -1838,8 +1838,8 @@ package Sidef::Types::String::String {
     *to_s = \&to_str;
 
     sub to_int {
-        my ($self) = @_;
-        Sidef::Types::Number::Number->new($$self)->int;
+        my ($self, $base) = @_;
+        Sidef::Types::Number::Number->new($$self, (defined($base) ? $base : ()))->int;
     }
 
     *to_i = \&to_int;

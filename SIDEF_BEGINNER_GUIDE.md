@@ -68,7 +68,7 @@ say (0.1 + 0.2 == 0.3)    # true
 say 100!
 
 # Sum all numbers from 1 to 100
-say (1..100).sum
+say sum(1..100)
 ```
 
 ---
@@ -133,7 +133,11 @@ If you have Perl installed, you can always install via CPAN:
 
 ```bash
 cpan Sidef
-# Or skip the test suite for a faster install:
+```
+
+Or skip the test suite for a faster install:
+
+```bash
 cpan -T Sidef
 ```
 
@@ -207,16 +211,19 @@ Run `sidef` with no arguments to enter the interactive prompt, where you type ex
 
 ```
 $ sidef
-Sidef 26.04, running on Linux, using Perl v5.42.1.
+Sidef 26.05, running on Linux, using Perl v5.42.1.
 Type "help", "copyright" or "license" for more information.
-> say "Hello!"
-Hello!
-> (2 + 3)
-5
+> "Hello!"
+#1 = "Hello!"
+> 2 + 3
+#2 = 5
 > 10.primes
-[2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
-> 100!
-93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000
+#3 = [2, 3, 5, 7]
+> #3.reverse
+#4 = [7, 5, 3, 2]
+> is_prime(2**127 - 1)
+#5 = true
+>
 ```
 
 The REPL is great for exploring the language and testing ideas. Press `Ctrl+D` or type `exit` to quit.
@@ -471,10 +478,10 @@ say foo    # parse-time error: attempt to use deleted identifier
 
 ### The Topic Variable (`_`)
 
-Every block in Sidef has a pre-declared variable `_` (underscore) that holds the current element being iterated over. You rarely need to write `_` explicitly, because the unary dot (`.`) operator is shorthand for `_.method`:
+Every block in Sidef has a pre-declared variable `_` (underscore) that holds the current element being iterated over. You rarely need to write `_` explicitly, because the unary dot (`.`) operator followed by the method name (`.method`) is shorthand for `_.method`:
 
 ```ruby
-[25, 36, 49].map { .sqrt }
+[25, 36, 49].map { .sqrt } \
             .each { .log.say }
 ```
 
@@ -580,7 +587,7 @@ Evaluated at compile time. The value must be a standalone constant expression. T
 define PHI =  (1.25.sqrt + 0.5)
 define IHP = -(1.25.sqrt - 0.5)
 
-say (PHI**12 - IHP**12 / (PHI-IHP))   #=> 144
+say ((PHI**12 - IHP**12) / (PHI-IHP))   #=> 144
 ```
 
 Attempting to reassign a `define` constant produces a **compile-time** error (vs. `const`, which gives a runtime error).
@@ -683,7 +690,7 @@ say 100!              # a 158-digit number (! is factorial postfix)
 ```ruby
 say 42.is_even        # true
 say 43.is_odd         # true
-say (-5).abs          # 5
+say abs(-5)           # 5
 say 3.14.floor        # 3
 say 3.14.ceil         # 4
 say 3.75.round        # 4
@@ -781,6 +788,7 @@ say is_sunny      # false
 ### Falsy values
 
 In Sidef, the following values are **falsy** (treated as false in conditions):
+
 - `false`
 - `nil` (the absence of a value)
 - `0`
@@ -802,12 +810,15 @@ if ("hello") {
 
 ```ruby
 var x = nil
-say x.is_nil    # true
+say defined(x)    # false
+say (x == nil)    # true
 
 # Conditional assignment: only assign if currently nil
 var result = nil
 result := compute_value()    # only called if result is nil
 ```
+
+**Note:** `nil` is not an object, therefore it's not possible to call methods on it.
 
 ---
 
@@ -859,8 +870,8 @@ n--     # n is now 5
 ```ruby
 say ("apple" == "apple")    # true
 say ("apple" != "banana")   # true
-say ("apple" lt "banana")   # true  (alphabetically less than)
-say ("banana" gt "apple")   # true  (alphabetically greater than)
+say ("apple" < "banana")    # true  (alphabetically less than)
+say ("banana" > "apple")    # true  (alphabetically greater than)
 ```
 
 ---
@@ -943,8 +954,8 @@ say ""                    # prints a blank line
 ### Printing multiple values
 
 ```ruby
-say "Name: ", "Alice"        # Name: Alice
-say 1, 2, 3                  # 123
+say ("Name: ", "Alice")      # Name: Alice
+say (1, 2, 3)                # 123
 say [1, 2, 3]                # [1, 2, 3]
 ```
 
@@ -966,7 +977,7 @@ say "Player: #{name}, Score: #{score}"
 # Player: Alice, Score: 98.5
 
 # Formatting numbers
-say "Pi ≈ #{Num.pi.round(4)}"    # Pi ≈ 3.1416
+say "Pi ≈ #{Num.pi.round(-4)}"    # Pi ≈ 3.1416
 say "Big: #{(10**20).commify}"   # Big: 100,000,000,000,000,000,000
 ```
 
@@ -1045,13 +1056,6 @@ A compact way to pick one of two values:
 var age    = 20
 var status = (age >= 18 ? "adult" : "minor")
 say status    # adult
-```
-
-### unless (opposite of if)
-
-```ruby
-var logged_in = false
-say "Please log in." unless logged_in
 ```
 
 ### given / when (pattern matching)
@@ -1139,7 +1143,7 @@ for i in (1..5) {
 
 ```ruby
 var fruits = ["apple", "banana", "cherry"]
-for fruit in fruits {
+for fruit in (fruits) {
     say "I like #{fruit}"
 }
 ```
@@ -1201,7 +1205,7 @@ for i in ((0..20).by(5)) {
     say i    # 0, 5, 10, 15, 20
 }
 
-for i in ((10^..1).by(-1)) {
+for i in ((10..1).by(-1)) {
     say i    # 10, 9, 8, ..., 1
 }
 ```
@@ -1209,8 +1213,8 @@ for i in ((10^..1).by(-1)) {
 ### Counting upward: .upto / downward: .downto
 
 ```ruby
-1.upto(5) { |i| say i }     # 1 2 3 4 5
-5.downto(1) { |i| say i }   # 5 4 3 2 1
+1.upto(5).each { |i| say i }     # 1 2 3 4 5
+5.downto(1).each { |i| say i }   # 5 4 3 2 1
 ```
 
 ---
@@ -1278,7 +1282,7 @@ make_box(width: 10, depth: 5, height: 3)
 
 ```ruby
 func sum(*numbers) {
-    numbers.reduce(0, { |acc, n| (acc + n) })
+    numbers.reduce({ |acc, n| acc + n }, 0)
 }
 
 say sum(1, 2, 3)          # 6
@@ -1311,7 +1315,7 @@ A function can call itself — this is called **recursion**:
 ```ruby
 func factorial(n) {
     return 1 if (n <= 1)
-    (n * factorial((n - 1)))
+    n * factorial(n - 1)
 }
 
 say factorial(5)    # 120
@@ -1325,7 +1329,7 @@ say factorial(10)   # 3628800
 ```ruby
 func fib(n) is cached {
     return n if (n <= 1)
-    (fib((n - 1)) + fib((n - 2)))
+    fib(n - 1) + fib(n - 2)
 }
 
 say fib(10)     # 55
@@ -1340,9 +1344,9 @@ Without `is cached`, `fib(50)` would take an impossibly long time.
 Functions can be stored in variables:
 
 ```ruby
-var double = { |n| (n * 2) }
-var square = { |n| (n ** 2) }
-var add    = { |a, b| (a + b) }
+var double = { |n| 2*n }
+var square = { |n| n**2 }
+var add    = { |a, b| a + b }
 
 say double(5)      # 10
 say square(4)      # 16
@@ -1452,7 +1456,7 @@ var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 var evens  = numbers.grep { .is_even }
 var odds   = numbers.grep { .is_odd }
-var big    = numbers.grep { |n| (n > 5) }
+var big    = numbers.grep { |n| n > 5 }
 
 say evens    # [2, 4, 6, 8, 10]
 say odds     # [1, 3, 5, 7, 9]
@@ -1464,8 +1468,8 @@ say big      # [6, 7, 8, 9, 10]
 ```ruby
 var numbers = [1, 2, 3, 4, 5]
 
-var sum     = numbers.reduce(0, { |acc, n| (acc + n) })
-var product = numbers.reduce(1, { |acc, n| (acc * n) })
+var sum     = numbers.sum
+var product = numbers.prod
 
 say sum       # 15
 say product   # 120
@@ -1479,11 +1483,11 @@ say product   # 120
 }
 ```
 
-**`each_with_index`** — loop with both index and value:
+**`each_kv`** — loop with both index and value:
 
 ```ruby
-["a", "b", "c"].each_with_index { |val, i|
-    say "#{i}: #{val}"
+["a", "b", "c"].each_kv { |k,v|
+    say "#{k}: #{v}"
 }
 # 0: a
 # 1: b
@@ -1508,9 +1512,9 @@ var fruits = %w(apple banana cherry)
 ```ruby
 var arr = [10, 20, 30, 40, 50]
 
-say arr[1..3]      # [20, 30, 40]  (indices 1 to 3)
-say arr[0..^3]     # [10, 20, 30]  (indices 0 to 2, exclusive end)
-say arr[2..]       # [30, 40, 50]  (from index 2 to the end)
+say arr.slice(1,3)      # [20, 30, 40]  (indices 1 to 3)
+say arr.slice(0, -2)    # [10, 20, 30]  (indices 0 to 2 from the end)
+say arr.slice(2)        # [30, 40, 50]  (from index 2 to the end)
 ```
 
 ### Checking membership
@@ -1526,8 +1530,9 @@ say fruits.index("cherry")       # 2  (position of element)
 ### Ranges as arrays
 
 ```ruby
-say (1..5).to_a           # [1, 2, 3, 4, 5]
-say (1..10).grep { .is_prime }.to_a    # [2, 3, 5, 7]
+say (1..5)          # RangeNum(1, 5, 1)
+say @(1..5)         # [1, 2, 3, 4, 5]
+say (1..5 -> to_a)  # [1, 2, 3, 4, 5]
 ```
 
 ---
@@ -1660,10 +1665,8 @@ say parts.join(" | ")    # Alice | 30 | London
 
 ```ruby
 var s = "Hello, World!"
-
-say s[0..4]       # Hello
-say s[7..11]      # World
-say s[0, 5]       # Hello  (start, length)
+say s.substr(0,5)     # Hello  (start, length)
+say s.substr(7,5)     # World  (start, length)
 ```
 
 ### Regular expressions (pattern matching)
@@ -1689,10 +1692,12 @@ say "Day:   #{match[2]}"    # 15
 
 ```ruby
 say "42".to_i       # converts string to integer: 42
-say "3.14".to_r     # converts string to number:  3.14
+say "3.14".to_r     # converts string to rational:  3.14
+say "3+4i".to_n     # converts string to number:  3 + 4i
+say "3/4".to_n      # converts string to number:  3/4
 say 42.to_s         # converts number to string: "42"
-say 255.to_s(16)    # convert to hex string: "ff"
-say 255.to_s(2)     # convert to binary string: "11111111"
+say 255.base(16)    # convert to hex string: "ff"
+say 255.base(2)     # convert to binary string: "11111111"
 ```
 
 ---
@@ -1703,16 +1708,16 @@ say 255.to_s(2)     # convert to binary string: "11111111"
 
 ```ruby
 # Read the entire file as a string
-var content = File("myfile.txt").read
+var content = File("myfile.txt").read(:utf8)
 say content
 
 # Read line by line (memory efficient for large files)
-File("myfile.txt").each_line { |line|
-    say line.trim
+var i = 0; File("myfile.txt").open_r.each { |line|
+    say "#{'%2d' % ++i}. #{line}"
 }
 
 # Read all lines into an array
-var lines = File("myfile.txt").lines
+var lines = File("myfile.txt").open_r.lines
 say "File has #{lines.len} lines."
 ```
 
@@ -1734,6 +1739,7 @@ var f = File("data.txt")
 if (f.exists) {
     say "File found! Size: #{f.size} bytes."
     var content = f.read
+    say content.len
 } else {
     say "File not found."
 }
@@ -1747,7 +1753,7 @@ var list = ["apples", "bread", "milk", "eggs"]
 File("shopping.txt").write(list.join("\n") + "\n")
 
 say "Saved shopping list. Reading it back:"
-File("shopping.txt").each_line { |line|
+File("shopping.txt").open_r.each { |line|
     say "- #{line.trim}"
 }
 ```
@@ -1760,8 +1766,7 @@ Use `try` and `catch` to handle errors gracefully:
 
 ```ruby
 try {
-    var result = (10 / 0)
-    say result
+    die "something wrong"
 }
 catch { |error|
     say "An error occurred: #{error}"
@@ -1845,16 +1850,16 @@ say sqrt(2)             # √2 ≈ 1.41421356237309...
 say sin(Num.pi / 2)     # 1
 say cos(0)              # 1
 say log(Num.e)          # 1
-say (2.718281828).log   # ≈ 1  (natural log)
+say log(2.718281828)    # ≈ 1  (natural log)
 ```
 
 ### Number bases
 
 ```ruby
-say 255.to_s(2)     # "11111111"  (binary)
-say 255.to_s(16)    # "ff"        (hexadecimal)
-say 255.to_s(8)     # "377"       (octal)
-say "ff".to_i(16)   # 255         (hex string to integer)
+say 255.base(2)       # "11111111"  (binary)
+say 255.base(16)      # "ff"        (hexadecimal)
+say 255.base(8)       # "377"       (octal)
+say "ff".to_num(16)   # 255         (hex string to integer)
 ```
 
 ---
@@ -1879,8 +1884,8 @@ func fahrenheit_to_celsius(f) {
 print "Enter temperature in Celsius: "
 var c = read(Number)
 
-say "#{c}°C = #{celsius_to_fahrenheit(c).round(2)}°F"
-say "#{c}°C = #{(c + 273.15).round(2)} K"
+say "#{c}°C = #{celsius_to_fahrenheit(c).round(-2)}°F"
+say "#{c}°C = #{(c + 273.15).round(-2)} K"
 ```
 
 ---
@@ -1891,12 +1896,12 @@ A classic exercise: for each number 1–100, print "Fizz" if divisible by 3, "Bu
 
 ```ruby
 for i in (1..100) {
-    say (
-        ((i % 15) == 0) ? "FizzBuzz" :
-        ((i % 3)  == 0) ? "Fizz"     :
-        ((i % 5)  == 0) ? "Buzz"     :
-        i
-    )
+    say given (i) {
+        case (i%15 == 0) { "FizzBuzz" }
+        case (i%5  == 0) { "Buzz" }
+        case (i%3  == 0) { "Fizz" }
+        else { i }
+    }
 }
 ```
 
@@ -1981,11 +1986,11 @@ func stats(data) {
     Hash(
         count   => n,
         sum     => data.sum,
-        mean    => mean.round(4),
+        mean    => mean.round(-4),
         median  => median,
         min     => data.min,
         max     => data.max,
-        std_dev => std_dev.round(4),
+        std_dev => std_dev.round(-4),
     )
 }
 
@@ -2009,17 +2014,17 @@ say "Std Dev: #{s{:std_dev}}"
 # Method 1: Simple recursive with caching
 func fib(n) is cached {
     return n if (n <= 1)
-    (fib((n - 1)) + fib((n - 2)))
+    fib(n - 1) + fib(n - 2)
 }
 
 say "First 15 Fibonacci numbers:"
-say (0..14).map { |n| fib(n) }
+say fib.map(0..14)
 
 # Method 2: Iterative
 func fib_sequence(count) {
     var result = [0, 1]
     while (result.len < count) {
-        result.push((result[-1] + result[-2]))
+        result.push(result[-1] + result[-2])
     }
     result.first(count)
 }
@@ -2037,12 +2042,12 @@ say ""
 
 # First 20 primes
 say "First 20 primes:"
-say 20.primes
+say 20.pn_primes
 say ""
 
 # Check if numbers are prime
 [2, 7, 13, 25, 97, 100, 101].each { |n|
-    var status = n.is_prime ? "prime" : "not prime"
+    var status = (n.is_prime ? "prime" : "not prime")
     say "#{n} is #{status}"
 }
 say ""
@@ -2080,16 +2085,15 @@ var words = text.lc.split(/\W+/).grep { .len > 0 }
 var freq  = Hash()
 
 words.each { |w|
-    freq{w} := 0
-    freq{w}++
+    freq{w} := 0 ++
 }
 
 say "Word frequencies (sorted by count, descending):"
-say "=" * 35
+say ("=" * 35)
 
-freq.keys
-    .sort_by { |k| -freq{k} }
-    .first(10)
+freq.keys \
+    .sort_by { |k| -freq{k} } \
+    .first(10) \
     .each { |word|
         var count = freq{word}
         var bar   = "█" * count
@@ -2128,7 +2132,7 @@ You've covered the fundamentals! Here's where to go next.
 | Resource | Description |
 |----------|-------------|
 | 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
-| 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.04/sidef-book.pdf) | The full book in PDF format for offline reading |
+| 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.05/sidef-book.pdf) | The full book in PDF format for offline reading |
 | 📝 [Advanced Tutorial](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
 | 🔢 [Number Theory Tutorial](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_TUTORIAL.md) | Deep dive into Sidef's mathematical superpowers |
 

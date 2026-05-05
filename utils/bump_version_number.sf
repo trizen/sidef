@@ -1,0 +1,21 @@
+#!/usr/bin/ruby
+
+ARGV.len == 2 || do {
+    STDERR.print("Usage: ../bin/sidef #{File(__MAIN__).basename} [old version] [new version]\n")
+    Sys.exit(1)
+}
+
+var old_version = ARGV[0]
+var new_version = ARGV[1]
+
+File(__MAIN__).dir.up.chdir     # switch directory to main Sidef dir
+
+var regex = Regex('(?<=\D|^)' + old_version.escape + '(?=\D|$)')
+var files = `ag -l #{old_version.escape.escape}`.lines              # requires "the_silver_searcher"
+
+files.each {|file|
+    say "Editing: #{file}"
+    File(file).edit {|line|
+        line.contains(old_version) ? line.gsub(regex, new_version) : line
+    }
+}
