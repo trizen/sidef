@@ -308,8 +308,6 @@ Sidef Programming Language - Version $version
 
 Usage: $basename [options] [--] [programfile] [arguments]
 
-OPTIONS:
-
 HEADER
 
     require List::Util;
@@ -328,69 +326,7 @@ HEADER
         }
     }
 
-    print <<"EXAMPLES";
-
-EXAMPLES:
-
-  # Execute a Sidef script
-  $basename script.sf
-
-  # Enter interactive mode (REPL)
-  $basename
-  $basename -i
-
-  # Execute a Sidef script in interactive mode
-  $basename -i script.sf
-
-  # Execute one-line program
-  $basename -E 'say "Hello, World!"'
-  $basename -E '10.of { |i| say i**2 }'
-
-  # Check syntax without execution
-  $basename -C script.sf
-
-  # Compile to stand-alone Perl program
-  $basename -c -o output.pl script.sf
-
-  # Set floating-point precision to 100 digits
-  $basename -P 400 -E 'say sqrt(2)'
-
-  # Enable optimizations
-  $basename -O1 script.sf
-
-  # Parse and display as Sidef code
-  $basename -r script.sf
-
-  # Deparse to Perl code
-  $basename -Rperl script.sf
-
-INTERACTIVE MODE (REPL):
-
-  Run '$basename' without arguments to enter the interactive mode.
-
-  Special REPL commands:
-    ##                - show execution time of last command
-    #n                - refer to nth output value (e.g., #1, #-1)
-    # load file.sf    - load and execute file line by line
-    # exec file.sf    - execute entire file
-    # save file.sf    - save REPL session to file
-    reset             - reset the REPL environment
-    quit, exit, q     - exit REPL
-    help              - display interactive help
-    copyright         - show copyright information
-    license           - show license information
-
-DOCUMENTATION:
-
-  Visit https://github.com/trizen/sidef for comprehensive documentation
-  and tutorials, or use -H for interactive help on specific topics.
-
-COPYRIGHT:
-
-  Copyright © 2013-2026 Daniel Șuteu, Ioana Fălcușan
-  Licensed under the Artistic License 2.0
-
-EXAMPLES
+    print "\nRun '${basename}' without arguments to enter the interactive mode.\n\n";
 }
 
 sub VERSION_MESSAGE {
@@ -422,6 +358,9 @@ Welcome to $name $version! This is the interactive help utility.
 Enter the name of any object, keyword, or topic to get help on writing
 $name programs and using $name modules.  To quit this help utility, just
 type "quit".
+
+Visit https://github.com/trizen/sidef for comprehensive documentation
+and tutorials.
 
 HELP
 
@@ -1062,21 +1001,54 @@ sidef - The Sidef Programming Language interpreter
 
     sidef [options] [--] [programfile] [arguments]
 
-    # Execute a script
+    # Execute a Sidef script
     sidef script.sf
 
-    # Interactive mode (REPL)
+    # Enter interactive mode (REPL)
     sidef
     sidef -i
 
-    # One-line program execution
-    sidef -E 'say "Hello, World!"'
+    # Execute a Sidef script in interactive mode
+    sidef -i script.sf
 
-    # Check syntax
+    # Execute one-line program
+    sidef -E 'say "Hello, World!"'
+    sidef -E '10.of { |i| say i**2 }'
+
+    # Check syntax without execution
     sidef -C script.sf
 
-    # Compile to Perl
+    # Compile to stand-alone Perl program
     sidef -c -o output.pl script.sf
+
+    # Set floating-point precision to 100 digits
+    sidef -P 400 -E 'say sqrt(2)'
+
+    # Enable optimizations
+    sidef -O1 script.sf
+
+    # Parse and display as Sidef code
+    sidef -r script.sf
+
+    # Deparse to Perl code
+    sidef -Rperl script.sf
+
+=head2 INTERACTIVE MODE (REPL)
+
+Run 'sidef' without arguments to enter the interactive mode.
+
+Special REPL commands:
+
+     ##                - show execution time of last command
+     #n                - refer to nth output value (e.g., #1, #-1)
+     # load file.sf    - load and execute file line by line
+     # exec file.sf    - execute entire file
+     # save file.sf    - save REPL session to file
+     reset             - reset the REPL environment
+     quit, exit, q     - exit REPL
+     help              - display interactive help
+     copyright         - show copyright information
+     license           - show license information
 
 =head1 DESCRIPTION
 
