@@ -58,8 +58,8 @@ Sidef is a **modern, high-level programming language** that runs on top of Perl.
 ### A quick taste
 
 ```ruby
-# Print the first 10 prime numbers
-say 10.primes
+# Print the prime numbers <= 100
+say 100.primes
 
 # Exact decimal math (no floating-point surprises!)
 say (0.1 + 0.2 == 0.3)    # true

@@ -46,7 +46,7 @@ Beyond just running `sidef script.sf`, there are several useful flags worth know
 
 ```bash
 # Run a one-liner
-sidef -e 'say 10.primes'
+sidef -e 'say 100.primes'
 
 # Set floating-point precision to 50 decimal places
 sidef -P50 -e 'say Num.pi'
@@ -54,11 +54,12 @@ sidef -P50 -e 'say Num.pi'
 # Print the parsed representation of a script (useful for debugging precedence)
 sidef -r script.sf
 
-# Run with warnings enabled
-sidef -W script.sf
+# Compile to Perl (advanced: inspect generated Perl code)
+sidef -Rperl script.sf
+sidef -Rperl script.sf | perltidy
 
-# Compile to Perl (advanced: inspect generated code)
-sidef -C script.sf
+# Profile a Sidef script with Devel::NYTProf
+sidef -Rperl script.sf | perl -d:NYTProf && nytprofhtml --open -m
 ```
 
 In the REPL, you can inspect any value just by typing it — no `say` needed:
@@ -286,7 +287,7 @@ var double = 2.method('*')
 say [1, 2, 3, 4].map(double)    # [2, 4, 6, 8]
 
 var inc = 1.method('+')
-say (1..5).map(inc).to_a        # [2, 3, 4, 5, 6]
+say (1..5 -> map(inc))          # [2, 3, 4, 5, 6]
 ```
 
 ---
@@ -300,7 +301,7 @@ Sidef has powerful array metaoperators that eliminate most explicit loops.
 Apply an operator between two arrays element by element:
 
 ```ruby
-[1,2,3] »+«  [10,20,30]    # [11, 22, 33]
+[1,2,3] »+«  [10,20,30]          # [11, 22, 33]
 [4,9,16] »**« [0.5, 0.5, 0.5]    # [2, 3, 4]  (sqrt)
 ```
 
@@ -377,7 +378,7 @@ say evens.len           # 5
 Convert back to sorted array:
 
 ```ruby
-say (evens | primes).to_a.sort    # [2, 3, 4, 5, 6, 7, 8, 10, 11]
+say (evens | primes -> to_a.sort)   # [2, 3, 4, 5, 6, 7, 8, 10, 11]
 ```
 
 ### Bags (Multisets)
@@ -416,11 +417,6 @@ A `Pair` is a lightweight two-element tuple:
 var p = Pair("key", "value")
 say p.first     # key
 say p.second    # value
-
-# Pairs are returned by hash iteration:
-Hash(a => 1, b => 2).each_pair { |pair|
-    say "#{pair.first} => #{pair.second}"
-}
 ```
 
 ---
@@ -494,7 +490,7 @@ say result    # [64, 361, 1225, 2116, 3025]
 # Collect twin prime pairs up to 100
 var twins = gather {
     for p in (primes(3, 100)) {
-        take([p, p+2]) if (p+2).is_prime
+        take([p, p+2]) if ((p+2).is_prime)
     }
 }
 say twins
@@ -1803,7 +1799,7 @@ A simplified arithmetic coder demonstrates how frequency models are used in comp
 ```ruby
 func build_model(String text) {
     var freq = Hash()
-    text.chars.each { |c| freq{c} := 0; freq{c}++ }
+    text.chars.each { |c| freq{c} := 0 ++ }
     var total = text.len
 
     var model = Hash()
