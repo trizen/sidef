@@ -11,7 +11,7 @@ var new_version = ARGV[1]
 File(__MAIN__).dir.up.chdir     # switch directory to main Sidef dir
 
 var regex = Regex('(?<=\D|^)' + old_version.escape + '(?=\D|$)')
-var files = `ag -l #{old_version.escape.escape}`.lines              # requires "the_silver_searcher"
+var files = `rg -l #{old_version.escape.escape}`.lines              # requires "ripgrep"
 
 files.each {|file|
     say "Editing: #{file}"
