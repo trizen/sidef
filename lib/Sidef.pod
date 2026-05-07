@@ -79,9 +79,9 @@ Sidef requires the following C libraries to be installed before the Perl modules
 
 =head3 Windows
 
-Download the portable 32-bit executable from the GitHub releases page:
+Download a portable executable from the GitHub releases page:
 
-L<https://github.com/trizen/sidef/releases/download/26.05/sidef-26.05.exe.zip>
+L<https://github.com/trizen/sidef/releases>
 
 =head3 Android (Termux)
 

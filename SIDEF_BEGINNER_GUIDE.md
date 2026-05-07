@@ -123,7 +123,7 @@ cpan -T Sidef
 
 ### Windows
 
-Download the ready-to-run executable from the [GitHub Releases page](https://github.com/trizen/sidef/releases). Unzip and run `sidef.exe` from the command prompt.
+Download the ready-to-run executable from the [GitHub Releases page](https://github.com/trizen/sidef/releases).
 
 ---
 
