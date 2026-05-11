@@ -23848,13 +23848,22 @@ package Sidef::Types::Number::Number {
     sub rad {    # A007947
         my ($n) = @_;
         $n = $$n;
+
         if (ref($n)) {
             $n = _big2uistr($n) // goto &nan;
         }
-        else {
+        else {    # native integer
+
             $n < 0 and goto &nan;
+
+            if (HAS_PRIME_UTIL) {
+                $n || return ZERO;
+                my $r = Math::Prime::Util::vecprod(map { $_->[0] } Math::Prime::Util::factor_exp($n));
+                return bless \$r;
+            }
         }
-        $n eq '0' and return ZERO;
+
+        $n || return ZERO;
         _set_int(Math::Prime::Util::GMP::vecprod(map { $_->[0] } _factor_exp($n)));
     }
 
@@ -27061,7 +27070,13 @@ package Sidef::Types::Number::Number {
         my @d;
         foreach my $pk (_factor_exp($n)) {
             my $p = $pk->[0];
-            push @d, _set_int($p);
+            if ($p < ULONG_MAX) {
+                push @d, bless \$p;
+            }
+            else {
+                $p = Math::GMPz::Rmpz_init_set_str("$p", 10);
+                push @d, bless \$p;
+            }
         }
 
         _array(\@d);
