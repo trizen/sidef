@@ -26453,7 +26453,7 @@ package Sidef::Types::Number::Number {
             $k = Math::GMPz::Rmpz_init_set($n);
         }
 
-        if (Math::GMPz::Rmpz_cmp_ui($n, ULONG_MAX) < 0) {
+        if (Math::GMPz::Rmpz_cmp_ui($n, ULONG_MAX >> 1) < 0) {
             return _divisors_bounded_native(Math::GMPz::Rmpz_get_ui($n), Math::GMPz::Rmpz_get_ui($k));
         }
 
@@ -29944,6 +29944,76 @@ package Sidef::Types::Number::Number {
         _array(\@array);
     }
 
+    sub _divisors_lazy {
+        my ($n, $callback) = @_;
+
+        $n = $$n;
+
+        if (ref($n)) {
+            $n = _big2pistr($n) // return;
+        }
+        else {
+            $n >= 1 or return;
+        }
+
+        my @factors = _factor_exp($n);
+
+        if (!@factors) {
+            $callback->(ONE);
+            return;
+        }
+
+        my @primes    = map { $_->[0] } @factors;
+        my @exps      = map { $_->[1] } @factors;
+        my $max_depth = scalar(@primes);
+
+        if ($n < ULONG_MAX) {    # native divisors
+            return sub {
+                my ($idx, $prod) = @_;
+                if ($idx == $max_depth) {
+                    $callback->(bless \$prod);
+                    return;
+                }
+                my $p = $primes[$idx];
+                my $e = $exps[$idx];
+                my $m = 1;
+                foreach my $i (1 .. $e + 1) {
+                    __SUB__->($idx + 1, $prod * $m);
+                    $m *= $p;
+                }
+              }
+              ->(0, 1);
+        }
+
+        @primes = map { Math::GMPz::Rmpz_init_set_str($_, 10) } @primes;
+
+        sub {
+            my ($idx, $prod) = @_;
+            if ($idx == $max_depth) {
+                my $r = Math::GMPz::Rmpz_init_set($prod);
+                $callback->(bless \$r);
+                return;
+            }
+            my $p = $primes[$idx];
+            my $e = $exps[$idx];
+            my $m = Math::GMPz::Rmpz_init_set_ui(1);
+            my $t = Math::GMPz::Rmpz_init();
+            foreach my $i (1 .. $e + 1) {
+                Math::GMPz::Rmpz_mul($t, $prod, $m);
+                __SUB__->($idx + 1, $t);
+                Math::GMPz::Rmpz_mul($m, $m, $p);
+            }
+          }
+          ->(0, Math::GMPz::Rmpz_init_set_ui(1));
+    }
+
+    sub divisor_each {
+        my ($n, $block) = @_;
+        _divisors_lazy($n, $block);
+    }
+
+    *divisors_each = \&divisor_each;
+
     sub divisor_map {
         my ($n, $block) = @_;
 
@@ -29956,6 +30026,8 @@ package Sidef::Types::Number::Number {
 
         _array(\@array);
     }
+
+    *divisors_map = \&divisor_map;
 
     sub divisor_sum {
         my ($n, $block) = @_;

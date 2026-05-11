@@ -1060,19 +1060,6 @@ say squarefree_sigma(5040)
 say prime_sigma(100!)     # sum over distinct prime divisors
 ```
 
-### Divisor Iteration
-
-For performance, prefer `divisor_sum` and `divisor_prod` over generating the full list:
-
-```ruby
-# Preferred for performance
-n.divisor_sum {|d| process(d) }    # if summing results
-n.divisor_prod {|d| process(d) }   # if multiplying results
-
-# Generate all divisors only when you need them all
-n.divisors.each {|d| process(d) }
-```
-
 ### Inverse Functions
 
 These solve $f(x) = n$ for the given arithmetic function $f$:

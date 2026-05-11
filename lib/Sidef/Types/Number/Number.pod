@@ -2652,27 +2652,57 @@ Returns true if C<a> divides C<b>.
 
 =cut
 
-=head2 divisor_map
+=head2 divisors_each
 
-    n.divisor_map {|d| ... }
+    n.divisors_each {|d| ... }
 
-Maps the divisors of C<n> to the given block.
+Lazily iterate over the divisors C<d> of C<n>. (not in sorted order)
 
-    say 24.divisor_map {|d| 1/d }  #=> [1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/12, 1/24]
+    24.divisors_each {|d| say d }
+
+Aliases: I<divisor_each>
 
 =cut
 
-=head2 divisor_prod
+=head2 divisors_map
 
-    n.divisor_prod {|d| ... }
+    n.divisors_map {|d| ... }
+
+Maps the divisors of C<n> to the given block.
+
+    say 24.divisors_map {|d| 1/d }  #=> [1, 1/2, 1/3, 1/4, 1/6, 1/8, 1/12, 1/24]
+
+Aliases: I<divisor_map>
+
+=cut
+
+=head2 divisors_sum
+
+    n.divisors_sum {|d| ... }
+
+Sum of the mapping of the positive divisors of C<n>.
+
+    say 5040.divisors_sum {|d| euler_phi(d)**2 }     #=> 2217854
+
+Equivalent with:
+
+    n.divisors_map {|d| ... }.sum
+
+Aliases: I<divisor_sum>
+
+=cut
+
+=head2 divisors_prod
+
+    n.divisors_prod {|d| ... }
 
 Product of the mapping of the positive divisors of C<n>.
 
 Equivalent with:
 
-    n.divisor_map {|d| ... }.prod
+    n.divisors_map {|d| ... }.prod
 
-Aliases: I<divisors_prod>
+Aliases: I<divisor_prod>
 
 =cut
 
@@ -2684,22 +2714,6 @@ Return an array with the positive divisors of C<n> that are less than or equal t
 
     say 120.divisors        #=> [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120]
     say 120.divisors(13)    #=> [1, 2, 3, 4, 5, 6, 8, 10, 12]
-
-=cut
-
-=head2 divisor_sum
-
-    n.divisor_sum {|d| ... }
-
-Sum of the mapping of the positive divisors of C<n>.
-
-    say 5040.divisor_sum {|d| euler_phi(d)**2 } #=> 2217854
-
-Equivalent with:
-
-    n.divisor_map {|d| ... }.sum
-
-Aliases: I<divisors_sum>
 
 =cut
 

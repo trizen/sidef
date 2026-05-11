@@ -407,4 +407,8 @@ assert_eq(divisors(next_prime((2**64) / 5) * 5, 2**64 - 1), %n[1, 5, 36893488147
 assert_eq(usigma0(100!), 33554432)
 assert_eq(usigma0(500!), 39614081257132168796771975168)
 
+for n in ([-43, 0, 1, 503, 1234, 5040, 2**32 - 1, (2**32 + 1)**2, 2**128 - 1, 18447363200000000000]) {
+    assert_eq(gather { n.divisors_each {|d| take(d) } }.sort, divisors(n))
+}
+
 say "** Test passed!"
