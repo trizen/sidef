@@ -4,7 +4,7 @@ package Sidef::Types::Number::QuadraticElement {
     use 5.016;
 
     use parent qw(
-        Sidef::Types::Number::Number
+      Sidef::Types::Number::Number
     );
 
     use overload
@@ -33,36 +33,26 @@ package Sidef::Types::Number::QuadraticElement {
         $p = Sidef::Types::Number::Number->new($p) if !UNIVERSAL::isa($p, 'Sidef::Types::Number::Number');
         $q = Sidef::Types::Number::Number->new($q) if !UNIVERSAL::isa($q, 'Sidef::Types::Number::Number');
 
-        bless { a => $A, b => $B, p => $p, q => $q };
+        bless {a => $A, b => $B, p => $p, q => $q};
     }
 
     *call = \&new;
 
     sub with_value {
-        my ($self, $value) = @_;
-        __PACKAGE__->new($value, undef, $self->{p}, $self->{q});
+        my ($self, $value_1, $value_2) = @_;
+        __PACKAGE__->new($value_1, $value_2, $self->{p}, $self->{q});
     }
 
     # Evaluate as a polynomial at $x (replace t by $x)
     sub eval {
         my ($self, $x) = @_;
-        __PACKAGE__->new(
-            $self->{a}->eval($x),
-            $self->{b}->eval($x),
-            $self->{p}->eval($x),
-            $self->{q}->eval($x)
-        );
+        __PACKAGE__->new($self->{a}->eval($x), $self->{b}->eval($x), $self->{p}->eval($x), $self->{q}->eval($x));
     }
 
     # Lift coefficients (used by modular arithmetic)
     sub lift {
         my ($self) = @_;
-        __PACKAGE__->new(
-            $self->{a}->lift,
-            $self->{b}->lift,
-            $self->{p}->lift,
-            $self->{q}->lift
-        );
+        __PACKAGE__->new($self->{a}->lift, $self->{b}->lift, $self->{p}->lift, $self->{q}->lift);
     }
 
     # Accessors
@@ -97,12 +87,13 @@ package Sidef::Types::Number::QuadraticElement {
         state $two  = Sidef::Types::Number::Number::TWO;
         state $four = $two->add($two);
 
-        my $D = $self->{q}->sqr->add($self->{p}->mul($four));      # discriminant q^2 + 4p
-        my $sqrt_D = ($type eq 'number') ? $D->sqrt                # complex if D<0, real otherwise
-                                         : ($type eq 'quadratic') ? $D->sqrtQ
-                                         : die "invalid type: <<$type>>";
+        my $D      = $self->{q}->sqr->add($self->{p}->mul($four));    # discriminant q^2 + 4p
+        my $sqrt_D = ($type eq 'number')
+          ? $D->sqrt                                                  # complex if D<0, real otherwise
+          : ($type eq 'quadratic') ? $D->sqrtQ
+          :                          die "invalid type: <<$type>>";
 
-        my $t = $self->{q}->add($sqrt_D)->div($two);               # principal root (q + sqrt(D))/2
+        my $t   = $self->{q}->add($sqrt_D)->div($two);                # principal root (q + sqrt(D))/2
         my $val = $self->{a}->add($self->{b}->mul($t));
 
         return $val;
@@ -131,8 +122,7 @@ package Sidef::Types::Number::QuadraticElement {
 
     sub __stringify__ {
         my ($self) = @_;
-        sprintf("QuadraticElement(%s, %s, %s, %s)",
-            $self->{a}->to_s, $self->{b}->to_s, $self->{p}->to_s, $self->{q}->to_s);
+        sprintf("QuadraticElement(%s, %s, %s, %s)", $self->{a}->to_s, $self->{b}->to_s, $self->{p}->to_s, $self->{q}->to_s);
     }
 
     sub stringify {
@@ -156,6 +146,7 @@ package Sidef::Types::Number::QuadraticElement {
         if (ref($y) eq __PACKAGE__ and $x->{p}->eq($y->{p}) and $x->{q}->eq($y->{q})) {
             return __PACKAGE__->new($x->{a}->add($y->{a}), $x->{b}->add($y->{b}), $x->{p}, $x->{q});
         }
+
         # Scalar addition: treat other as a+0*t
         return __PACKAGE__->new($x->{a}->add($y), $x->{b}, $x->{p}, $x->{q});
     }
@@ -171,13 +162,16 @@ package Sidef::Types::Number::QuadraticElement {
     sub mul {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__ and $x->{p}->eq($y->{p}) and $x->{q}->eq($y->{q})) {
-            my $A = $x->{a}; my $B = $x->{b};
-            my $C = $y->{a}; my $D = $y->{b};
-            my $BD = $B->mul($D);
+            my $A     = $x->{a};
+            my $B     = $x->{b};
+            my $C     = $y->{a};
+            my $D     = $y->{b};
+            my $BD    = $B->mul($D);
             my $new_a = $A->mul($C)->add($BD->mul($x->{p}));
             my $new_b = $A->mul($D)->add($B->mul($C))->add($BD->mul($x->{q}));
             return __PACKAGE__->new($new_a, $new_b, $x->{p}, $x->{q});
         }
+
         # Scalar multiplication
         return __PACKAGE__->new($x->{a}->mul($y), $x->{b}->mul($y), $x->{p}, $x->{q});
     }
@@ -189,6 +183,7 @@ package Sidef::Types::Number::QuadraticElement {
             my $num  = $x->mul($y->conj);
             return __PACKAGE__->new($num->{a}->div($norm), $num->{b}->div($norm), $x->{p}, $x->{q});
         }
+
         # Scalar division
         return __PACKAGE__->new($x->{a}->div($y), $x->{b}->div($y), $x->{p}, $x->{q});
     }
@@ -246,7 +241,7 @@ package Sidef::Types::Number::QuadraticElement {
 
     # --- Euclidean division ---
 
-     # Euclidean division with rounding to nearest (gives better behaviour for Euclidean algorithm)
+    # Euclidean division with rounding to nearest (gives better behaviour for Euclidean algorithm)
     sub divmod {
         my ($self, $other) = @_;
         my $q = $self->mul($other->inv)->round;
@@ -290,23 +285,19 @@ package Sidef::Types::Number::QuadraticElement {
 
     sub pow {
         my ($x, $n) = @_;
-        $n->is_int || return $x->to_n->pow($n);   # non‑integer -> complex embedding
+        $n->is_int || return $x->to_n->pow($n);    # non‑integer -> complex embedding
 
         my $negative_power = 0;
         if ($n->is_neg) {
-            $n = $n->abs;
+            $n              = $n->abs;
             $negative_power = 1;
         }
 
-        my $c = __PACKAGE__->new(
-            Sidef::Types::Number::Number::ONE,
-            Sidef::Types::Number::Number::ZERO,
-            $x->{p}, $x->{q}
-        );
+        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO, $x->{p}, $x->{q});
 
         my $base = $x;
         foreach my $bit (reverse split(//, $n->as_bin)) {
-            $c = $c->mul($base) if $bit;
+            $c    = $c->mul($base) if $bit;
             $base = $base->sqr;
         }
 
@@ -318,19 +309,15 @@ package Sidef::Types::Number::QuadraticElement {
         $x = $x->mod($m);
         my $negative_power = 0;
         if ($n->is_neg) {
-            $n = $n->abs;
+            $n              = $n->abs;
             $negative_power = 1;
         }
 
-        my $c = __PACKAGE__->new(
-            Sidef::Types::Number::Number::ONE,
-            Sidef::Types::Number::Number::ZERO,
-            $x->{p}, $x->{q}
-        );
+        my $c = __PACKAGE__->new(Sidef::Types::Number::Number::ONE, Sidef::Types::Number::Number::ZERO, $x->{p}, $x->{q});
 
         my $base = $x;
         foreach my $bit (reverse split(//, $n->as_bin)) {
-            $c = $c->mul($base)->mod($m) if $bit;
+            $c    = $c->mul($base)->mod($m) if $bit;
             $base = $base->sqr->mod($m);
         }
 
@@ -341,29 +328,22 @@ package Sidef::Types::Number::QuadraticElement {
 
     sub conj {
         my ($x) = @_;
-        __PACKAGE__->new(
-            $x->{a}->add($x->{b}->mul($x->{q})),
-            $x->{b}->neg,
-            $x->{p}, $x->{q}
-        );
+        __PACKAGE__->new($x->{a}->add($x->{b}->mul($x->{q})), $x->{b}->neg, $x->{p}, $x->{q});
     }
 
     sub norm {
         my ($x) = @_;
-        $x->{a}->sqr
-          ->add($x->{a}->mul($x->{b})->mul($x->{q}))
-          ->sub($x->{b}->sqr->mul($x->{p}));
+        $x->{a}->sqr->add($x->{a}->mul($x->{b})->mul($x->{q}))->sub($x->{b}->sqr->mul($x->{p}));
     }
 
     sub trace {
         my ($x) = @_;
-        $x->{a}->mul(Sidef::Types::Number::Number::TWO)
-               ->add($x->{b}->mul($x->{q}));
+        $x->{a}->mul(Sidef::Types::Number::Number::TWO)->add($x->{b}->mul($x->{q}));
     }
 
     sub inv {
-        my ($x) = @_;
-        my $norm = $x->norm;
+        my ($x)    = @_;
+        my $norm   = $x->norm;
         my $conj_a = $x->{a}->add($x->{b}->mul($x->{q}));
         my $conj_b = $x->{b}->neg;
         __PACKAGE__->new($conj_a->div($norm), $conj_b->div($norm), $x->{p}, $x->{q});
@@ -372,7 +352,7 @@ package Sidef::Types::Number::QuadraticElement {
     sub invmod {
         my ($x, $m) = @_;
         $x = $x->mod($m);
-        my $norm = $x->norm->invmod($m);
+        my $norm   = $x->norm->invmod($m);
         my $conj_a = $x->{a}->add($x->{b}->mul($x->{q}));
         my $conj_b = $x->{b}->neg;
         __PACKAGE__->new($conj_a->mul($norm)->mod($m), $conj_b->mul($norm)->mod($m), $x->{p}, $x->{q});
@@ -416,6 +396,7 @@ package Sidef::Types::Number::QuadraticElement {
 
     sub is_prime {
         my ($x) = @_;
+
         # sufficient condition: norm is a prime integer (not necessary though)
         $x->norm->abs->is_prime;
     }
@@ -437,11 +418,7 @@ package Sidef::Types::Number::QuadraticElement {
     sub lcm {
         my ($self, $other) = @_;
         if ($self->is_zero || $other->is_zero) {
-            return __PACKAGE__->new(
-                Sidef::Types::Number::Number::ZERO,
-                Sidef::Types::Number::Number::ZERO,
-                $self->{p}, $self->{q}
-            );
+            return __PACKAGE__->new(Sidef::Types::Number::Number::ZERO, Sidef::Types::Number::Number::ZERO, $self->{p}, $self->{q});
         }
         $self->mul($other)->div($self->gcd($other));
     }
@@ -459,6 +436,7 @@ package Sidef::Types::Number::QuadraticElement {
             $cmp and return $cmp;
             return $x->{q}->cmp($y->{q});
         }
+
         # Compare with a plain number: a vs. $y, then b vs. 0
         my $cmp = $x->{a}->cmp($y) // return undef;
         return $cmp if $cmp;
@@ -469,7 +447,8 @@ package Sidef::Types::Number::QuadraticElement {
         my ($x, $y) = @_;
         if (ref($y) eq __PACKAGE__) {
             $x->{a}->eq($y->{a}) && $x->{b}->eq($y->{b}) && $x->{p}->eq($y->{p}) && $x->{q}->eq($y->{q});
-        } else {
+        }
+        else {
             $x->{a}->eq($y) && $x->{b}->is_zero;
         }
     }
@@ -495,12 +474,9 @@ package Sidef::Types::Number::QuadraticElement {
             *{__PACKAGE__ . '::' . $method} = sub {
                 my ($x, $y) = @_;
                 if (ref($y) eq __PACKAGE__ and $x->{p}->eq($y->{p}) and $x->{q}->eq($y->{q})) {
-                    return __PACKAGE__->new(
-                        $x->{a}->$method($y->{a}),
-                        $x->{b}->$method($y->{b}),
-                        $x->{p}, $x->{q}
-                    );
+                    return __PACKAGE__->new($x->{a}->$method($y->{a}), $x->{b}->$method($y->{b}), $x->{p}, $x->{q});
                 }
+
                 # Treat $y as scalar with same ring
                 return __PACKAGE__->new($x->{a}->$method($y), $x->{b}, $x->{p}, $x->{q});
             };

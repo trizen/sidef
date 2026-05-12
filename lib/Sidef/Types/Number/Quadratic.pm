@@ -38,8 +38,8 @@ package Sidef::Types::Number::Quadratic {
     *call = \&new;
 
     sub with_value {
-        my ($self, $value) = @_;
-        __PACKAGE__->new($value, undef, $self->{w});
+        my ($self, $value_1, $value_2) = @_;
+        __PACKAGE__->new($value_1, $value_2, $self->{w});
     }
 
     sub eval {

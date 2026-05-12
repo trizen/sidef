@@ -40,8 +40,8 @@ package Sidef::Types::Number::Quaternion {
     *call = \&new;
 
     sub with_value {
-        my ($self, $value) = @_;
-        __PACKAGE__->new($value);
+        my ($self, $value_1, $value_2, $value_3, $value_4) = @_;
+        __PACKAGE__->new($value_1, $value_2, $value_3, $value_4);
     }
 
     sub eval {

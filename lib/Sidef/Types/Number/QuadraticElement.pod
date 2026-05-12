@@ -39,11 +39,16 @@ L<https://en.wikipedia.org/wiki/Lucas_sequence>.
     say t**10   #=> QuadraticElement(55, 89, 1, 1)   (Fibonacci / Lucas numbers)
     say t**20   #=> QuadraticElement(6765, 10946, 1, 1)
 
+    # Eisenstein integers
+    var w = QuadraticElement(0, 1, -1, -1)
+    var z = (3 + 4*w)
+    say z.to_n          #=> 1 + 3.46410161513775[...]i
+
     # p=1, q=0  =>  t^2 = 1
     var u = QuadraticElement(3, 4, 1, 0)
-    say u.norm          #=> 5   (= 3^2 - 4^2 * 1)
+    say u.norm          #=> -7   (= 3^2 - 4^2 * 1)
     say u.conj          #=> QuadraticElement(3, -4, 1, 0)
-    say u * u.conj      #=> QuadraticElement(5, 0, 1, 0)
+    say (u * u.conj)    #=> QuadraticElement(-7, 0, 1, 0)
 
     # Modular exponentiation
     var v = QuadraticElement(1, 1, 1, 1)
@@ -91,25 +96,18 @@ Aliases: I<call>
 
 =head2 with_value
 
-    self.with_value(value)
+    self.with_value(a)
+    self.with_value(a, b)
 
-Creates a new element in the same ring (same C<p> and C<q>) but with C<a = value>
-and C<b = 0>.
+Creates a new element in the same ring (same C<p> and C<q>), with specified values.
 
-B<Parameters:>
-
-=over 4
-
-=item * C<value> - The new constant part.
-
-=back
-
-B<Returns:> QuadraticElement C<(value, 0, p, q)>.
+B<Returns:> QuadraticElement C<(a, b, p, q)>.
 
 B<Example:>
 
     var t = QuadraticElement(3, 4, 1, 1)
-    say t.with_value(7)     #=> QuadraticElement(7, 0, 1, 1)
+    say t.with_value(7)        #=> QuadraticElement(7, 0, 1, 1)
+    say t.with_value(7, 5)     #=> QuadraticElement(7, 5, 1, 1)
 
 =cut
 
@@ -965,7 +963,7 @@ Aliases: I<eq>
 
     a != b
 
-Inequality test — negation of C<==>. 
+Inequality test — negation of C<==>.
 
 B<Returns:> Bool
 
@@ -1172,6 +1170,14 @@ of QuadraticElement gives Lucas U/V sequences in C<O(log n)> multiplications.
     }
     say fib(10)     #=> 55
     say fib(20)     #=> 6765
+
+    # Eisenstein integers
+    func Eisenstein(a, b) {
+        QuadraticElement(a, b, -1, -1)
+    }
+
+    var w = Eisenstein(0, 1)
+    say 10.by {|n| (1 - w)**n - 1 -> norm.is_prime }
 
     # Lucas numbers (same ring, different starting point)
     func luc(n) {

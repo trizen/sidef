@@ -36,6 +36,18 @@ with (QuadraticElement(1, 1, 2, 0)) {|q|
     )
 }
 
+func Eisenstein(a, b) {
+    QuadraticElement(a, b, -1, -1)
+}
+
+do {
+    var w = Eisenstein(0, 1)
+    assert_eq(
+        10.by {|n| (1 - w)**n - 1 -> norm.is_prime },   # A066408
+        %n[2, 5, 7, 11, 17, 19, 79, 163, 193, 239]
+    )
+}
+
 # Determine if a given number is probably a prime number.
 func is_quadratic_pseudoprime (n) {
 
