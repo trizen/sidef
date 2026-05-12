@@ -90,8 +90,6 @@ lib/Sidef/Types/Number/PolynomialMod.pm
 lib/Sidef/Types/Number/PolynomialMod.pod
 lib/Sidef/Types/Number/Quadratic.pm
 lib/Sidef/Types/Number/Quadratic.pod
-lib/Sidef/Types/Number/QuadraticElement.pm
-lib/Sidef/Types/Number/QuadraticElement.pod
 lib/Sidef/Types/Number/Quaternion.pm
 lib/Sidef/Types/Number/Quaternion.pod
 lib/Sidef/Types/Perl/Perl.pm

@@ -1,18 +1,16 @@
 #!/usr/bin/ruby
 
-var x = QuadraticElement(3, 4, -1, 0)
-var y = QuadraticElement(1, -2, -1, 0)
+var x = Quadratic(3, 4, -1, 0)
+var y = Quadratic(1, -2, -1, 0)
 
 assert_eq(x.to_n, 3+4i)
 assert_eq(y.to_n, 1 - 2i)
-assert_eq(x.to_quadratic, Quadratic(3, 2, -4))
-assert_eq(y.to_quadratic, Quadratic(1, -1, -4))
 
 var g = x.gcd(y)
 assert_eq(g.to_n, 1 - 2i)
 assert_eq(g, y)
 
-var t = QuadraticElement(0, 1, 1, 1)
+var t = Quadratic(0, 1, 1, 1)
 
 assert_eq(t**10, t.pow(10))
 assert_eq((t**-10)%97, t.powmod(-10, 97))
@@ -25,7 +23,7 @@ assert_eq(
     10.of { .fib }
 )
 
-with (QuadraticElement(1, 1, 2, 0)) {|q|
+with (Quadratic(1, 1, 2, 0)) {|q|
     assert_eq(
         15.of { q.pow(_).a }        #=> A001333
         %n[1, 1, 3, 7, 17, 41, 99, 239, 577, 1393, 3363, 8119, 19601, 47321, 114243]
@@ -37,7 +35,7 @@ with (QuadraticElement(1, 1, 2, 0)) {|q|
 }
 
 func Eisenstein(a, b) {
-    QuadraticElement(a, b, -1, -1)
+    Quadratic(a, b, -1, -1)
 }
 
 do {
@@ -56,11 +54,11 @@ func is_quadratic_pseudoprime (n) {
 
     for r in ([-5, -3]) {
 
-        var x = QuadraticElement(r, 1, r+2, 1-r).powmod(n, n)
+        var x = Quadratic(r, 1, r+2, 1-r).powmod(n, n)
 
         (x.a + x.b == n) || (x.a + r.abs == n) || return false
 
-        var y = QuadraticElement(r, -1, r+2, 1-r).powmod(n, n)
+        var y = Quadratic(r, -1, r+2, 1-r).powmod(n, n)
 
         (x.b + y.b == n) || return false
     }
@@ -75,7 +73,7 @@ do {
     var n = (274177-1)
     var m = (2**64 + 1)
 
-    with (QuadraticElement(3, 4, 2, 0)) {|q|
+    with (Quadratic(3, 4, 2, 0)) {|q|
         var r = q.powmod(n, m)
         assert_eq(gcd(r.a-1, m), 274177)
         assert_eq(gcd(r.b, m), 274177)
@@ -83,8 +81,8 @@ do {
 }
 
 do {
-    var a = QuadraticElement(5, 8, 13, -3)
-    var b = QuadraticElement(3, 9, 13, -3)
+    var a = Quadratic(5, 8, 13, -3)
+    var b = Quadratic(3, 9, 13, -3)
 
     assert(a > b)
     assert(!(a < b))
@@ -111,13 +109,13 @@ do {
     assert_eq(a.p, 13)
     assert_eq(a.q, -3)
 
-    assert_eq(a+5, QuadraticElement(a.a+5, a.b, a.p, a.q))
-    assert_eq(a-5, QuadraticElement(a.a-5, a.b, a.p, a.q))
-    assert_eq(a*5, QuadraticElement(a.a*5, a.b*5, a.p, a.q))
-    assert_eq(a/5, QuadraticElement(a.a/5, a.b/5, a.p, a.q))
+    assert_eq(a+5, Quadratic(a.a+5, a.b, a.p, a.q))
+    assert_eq(a-5, Quadratic(a.a-5, a.b, a.p, a.q))
+    assert_eq(a*5, Quadratic(a.a*5, a.b*5, a.p, a.q))
+    assert_eq(a/5, Quadratic(a.a/5, a.b/5, a.p, a.q))
 
-    assert_eq(a+b, QuadraticElement(a.a + b.a, a.b + b.b, a.p, a.q))
-    assert_eq(a*b, QuadraticElement(a.a*b.a + a.b*b.b*a.p, a.a*b.b + a.b*b.a + a.b*b.b*a.q, a.p, a.q))
+    assert_eq(a+b, Quadratic(a.a + b.a, a.b + b.b, a.p, a.q))
+    assert_eq(a*b, Quadratic(a.a*b.a + a.b*b.b*a.p, a.a*b.b + a.b*b.a + a.b*b.b*a.q, a.p, a.q))
 
     assert_eq(a.inv, a**(-1))
     assert_eq(b.inv, b**(-1))
@@ -132,157 +130,5 @@ do {
     assert_eq(a*b -> to_n.round(-30), a.to_n*b.to_n -> round(-30))
     assert_eq(a/b -> to_n.round(-30), a.to_n/b.to_n -> round(-30))
 }
-
-
-func Gaussian(a,b=0) {
-    QuadraticElement(a, b, -1, 0)
-}
-
-var r = (-2 .. 2)
-
-for a in (r), b in (r), c in (r), d in (r) {
-
-    assert_eq([Gaussian(a,b) + Gaussian(c,d) -> reals], [cadd(a,b,c,d)])
-    assert_eq([Gaussian(a,b) - Gaussian(c,d) -> reals], [csub(a,b,c,d)])
-    assert_eq([Gaussian(a,b) * Gaussian(c,d) -> reals], [cmul(a,b,c,d)])
-
-    if (c*c + d*d != 0) {
-        assert_eq([Gaussian(a,b) / Gaussian(c,d) -> reals], [cdiv(a,b,c,d)])
-    }
-}
-
-for a in (r), b in (r) {
-
-    var n = irand(0, 100)
-    var m = irand(100, 1000)
-
-    assert_eq([Gaussian(a,b)**n -> reals], [cpow(a,b,n)])
-    assert_eq([Gaussian(a,b)**n -> reals].map { .mod(m) } , [cpowmod(a,b,n,m)])
-}
-
-do {
-    var m = 10001
-    var a = 43
-    var b = 97
-
-    assert_eq(Gaussian(1,0) / Gaussian(a, b), Gaussian(a,b).inv)
-    assert_eq(Mod(Gaussian(a, b), m).inv * Gaussian(a,b), Mod(Gaussian(1,0), m))
-    assert_eq(Mod(Gaussian(a, b), m).inv * Gaussian(a,b) -> lift, Gaussian(1,0))
-    assert_eq(Mod(Gaussian(a, b), m)**(-1) * Gaussian(a,b) -> lift, Gaussian(1,0))
-
-    assert_eq([cdiv(1, 0, a, b)], [a / (a*a + b*b), -b / (a*a + b*b)])
-    assert_eq([a * invmod(a*a + b*b, m), -b * invmod(a*a + b*b, m)].map{.mod(m)}, [complex_invmod(a, b, m)])
-    assert_eq([cmod(cmul(a, b, complex_invmod(a, b, m)), m)], [1, 0])
-}
-
-assert(Gaussian(3,4) == Gaussian(3,4))
-assert(!(Gaussian(3,4) == Gaussian(3,3)))
-assert(!(Gaussian(3,3) == Gaussian(3,4)))
-
-assert(Gaussian(3,3) != Gaussian(3,4))
-assert(Gaussian(3,4) != Gaussian(3,3))
-assert(!(Gaussian(3,4) != Gaussian(3,4)))
-
-assert_eq(Gaussian(4,5) <=> Gaussian(3,4), 1)
-assert_eq(Gaussian(3,4) <=> Gaussian(3,4), 0)
-assert_eq(Gaussian(3,4) <=> Gaussian(3,5), -1)
-
-assert(Gaussian(4,5) >  Gaussian(3,4))
-assert(Gaussian(4,5) >  Gaussian(4,4))
-assert(Gaussian(4,5) >= Gaussian(3,4))
-assert(Gaussian(3,4) >= Gaussian(3,4))
-assert(Gaussian(3,4) <= Gaussian(3,4))
-
-assert(!(Gaussian(3,4) > Gaussian(3,5)))
-assert(!(Gaussian(3,4) > Gaussian(4,5)))
-assert(!(Gaussian(3,4) < Gaussian(3,4)))
-assert(!(Gaussian(3,4) < Gaussian(3,1)))
-assert(!(Gaussian(3,4) < Gaussian(2,1)))
-assert(!(Gaussian(3,4) <= Gaussian(3,3)))
-assert(!(Gaussian(2,1) >= Gaussian(2,2)))
-
-for a in (r), b in (r) {
-    var y = irand(2, 100)
-    var x = Gaussian(a,b)
-    assert_eq(x - floor(x/y)*y, x % y)
-}
-
-func gaussian_sum_2(n) {
-
-    var i     = Gaussian(0, 1)
-    var total = Gaussian(0)
-
-    for k in (1..n) {
-        total += (i**(k-1) / k)
-    }
-
-    total * n!
-}
-
-assert_eq(
-    10.of(gaussian_sum_2),
-    [Gaussian(0, 0), Gaussian(1, 0), Gaussian(2, 1), Gaussian(4, 3), Gaussian(16, 6), Gaussian(104, 30), Gaussian(624, 300), Gaussian(3648, 2100), Gaussian(29184, 11760), Gaussian(302976, 105840)]
-)
-
-assert_eq(powmod(Gaussian(3,4), 1000, 1e6), Gaussian(585313, 426784))
-assert_eq([Mod(Gaussian(3,4), 1e6)**1000 -> lift.reals], [585313, 426784])
-assert_eq(Mod(Gaussian(3,4), 1e6)**1000, Mod(Gaussian(585313, 426784), 1e6))
-assert(Mod(Gaussian(3,4), 1e6)**1000 == Mod(Gaussian(585313, 426784), 1e6))
-
-assert_eq(Mod(43, 97).to_n, 43)
-assert_eq(Gaussian(3,4).to_n, Gaussian(3,4).to_n)
-assert_eq(Gaussian(3,4).to_c, 3+4i)
-
-assert_eq(Gaussian(42).invmod(2017), Gaussian(1969, 0))
-assert_eq(Gaussian(3,4).invmod(2017), Gaussian(1291, 968))
-assert_eq(Gaussian(91,23).invmod(2017), Gaussian(590, 405))
-assert_eq(Gaussian(43, 99).invmod(2017), Gaussian(1709,1272))
-assert_eq(Gaussian(43, 99).invmod(1234567), Gaussian(1019551, 667302))
-
-assert_eq(Mod(Gaussian(42), 2017).inv, Mod(Gaussian(1969, 0), 2017))
-assert_eq(Mod(Gaussian(3,4), 2017)**(-1), Mod(Gaussian(1291, 968), 2017))
-assert_eq(Mod(Gaussian(91,23), 2017)**(-1), Mod(Gaussian(590, 405), 2017))
-assert_eq(Mod(Gaussian(43, 99), 2017).inv, Mod(Gaussian(1709,1272), 2017))
-assert_eq(Mod(Gaussian(43, 99), 1234567)**(-2), Mod(Gaussian(1019551, 667302)**2, 1234567))
-assert_eq(Mod(Gaussian(43, 99), 1234567)**(-5), Mod(Gaussian(1019551, 667302)**5, 1234567))
-
-assert_eq(powmod(Gaussian(43, 99), -4, 1234567), invmod(Gaussian(43, 99)**4 % 1234567, 1234567))
-assert_eq(powmod(Gaussian(43, 99), -5, 1234567), invmod(Gaussian(43, 99)**5 % Gaussian(1234567), 1234567))
-assert_eq(powmod(Gaussian(43, 99), -5, 1234567), invmod(Gaussian(43, 99)**5, 1234567))
-
-assert_eq(powmod(Gaussian(43, 99), -4, 1234567), invmod(powmod(Gaussian(43, 99), 4, 1234567), 1234567))
-assert_eq(powmod(Gaussian(43, 99), -5, 1234567), invmod(powmod(Gaussian(43, 99), 5, 1234567), 1234567))
-
-assert_eq(Quadratic(Gauss(3,4), Gauss(5,6), 2).powmod(43, 97), Quadratic(Gauss(52, 44), Gauss(92, 8), 2))
-
-assert_eq(Gaussian(43, 97)**(-5), (Gaussian(43,97)**5)**(-1))
-assert_eq(Gaussian(43, 97)**(-5), (Gaussian(43,97)**5).inv)
-assert_eq(Gaussian(43, 97)**(-5), (Gaussian(43,97).inv)**5)
-assert_eq(Gaussian(43, 97)**(-5), (Gaussian(43,97)**(-1))**5)
-
-assert_eq(Mod(Gaussian(43, 97), 1234567)**(-5),  Mod(Gaussian(43, 97), 1234567)**5 -> inv)
-assert_eq(Mod(Gaussian(43, 97), 1234567)**(-5), (Mod(Gaussian(43, 97), 1234567)->inv)**5)
-
-assert_eq(Mod(Gaussian(43, 97), 1234567)**(-1234),  Mod(Gaussian(43, 97), 1234567)**1234 -> inv)
-assert_eq(Mod(Gaussian(43, 97), 1234567)**(-1234), (Mod(Gaussian(43, 97), 1234567)->inv)**1234)
-assert_eq(Mod(Gaussian(3,4), 1234567)**1234 -> lift, powmod(Gaussian(3,4), 1234, 1234567))
-assert_eq(Mod(Gaussian(3,4), 1234567)**-1234 -> lift, powmod(Gaussian(3,4), -1234, 1234567))
-
-assert_eq(Gaussian(3/5,11/4)**(-27), Gaussian(3/5,11/4)**27 -> inv)
-assert_eq(Gaussian(3/5,11/4)**(-27), Gaussian(3/5,11/4).inv**27)
-
-assert_eq(Gaussian(Gaussian(3,4), Gaussian(17,19)).to_n.to_n, -16 + 21i)
-assert_eq(Gaussian(Mod(13, 97), Mod(43, 97)).to_n.to_n, 13+43i)
-assert_eq(Gaussian(Mod(13, 97), Mod(43, 97)), Gaussian(Mod(13, 97), Mod(43, 97)))
-assert_eq(Mod(Gaussian(3, 4), 97)*1234, Mod(Gaussian(16, 86), 97))
-assert_eq(Mod(Gaussian(3/4, 5/6), 1234567)**10 * Mod(Gaussian(3/4, 5/6), 1234567)**-10, Mod(Gaussian(1,0), 1234567))
-
-assert_eq((Mod(Gaussian(43/3, 97/5), 127)**(-11) * Mod(Gaussian(43/3, 97/5), 127))**+9, Mod(Gaussian(52, 73), 127))
-assert_eq((Mod(Gaussian(43/3, 97/5), 127)**(-11) * Mod(Gaussian(43/3, 97/5), 127))**-9, Mod(Gaussian(81, 89), 127))
-
-assert_eq((3 + Gaussian(4, 5)), Gaussian(7, 5))
-assert_eq((3 - Gaussian(4, 5)), Gaussian(-1, -5))
-assert_eq((3 * Gaussian(4, 5)), Gaussian(12, 15))
-assert_eq((3 / Gaussian(4, 5)), Gaussian(12/41, -15/41))
 
 say "** Tests passed!"

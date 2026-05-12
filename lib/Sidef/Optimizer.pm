@@ -5,36 +5,34 @@ package Sidef::Optimizer {
     use Scalar::Util qw(refaddr);
 
     use constant {
-                  STRING               => 'Sidef::Types::String::String',
-                  NUMBER               => 'Sidef::Types::Number::Number',
-                  MOD                  => 'Sidef::Types::Number::Mod',
-                  GAUSS                => 'Sidef::Types::Number::Gauss',
-                  FRACTION             => 'Sidef::Types::Number::Fraction',
-                  QUADRATIC            => 'Sidef::Types::Number::Quadratic',
-                  QUADRATIC_ELEMENT    => 'Sidef::Types::Number::QuadraticElement',
-                  QUATERNION           => 'Sidef::Types::Number::Quaternion',
-                  REGEX                => 'Sidef::Types::Regex::Regex',
-                  BOOL                 => 'Sidef::Types::Bool::Bool',
-                  ARRAY                => 'Sidef::Types::Array::Array',
-                  RANGENUM             => 'Sidef::Types::Range::RangeNumber',
-                  RANGESTR             => 'Sidef::Types::Range::RangeString',
-                  DIR_DT               => 'Sidef::DataTypes::Glob::Dir',
-                  FILE_DT              => 'Sidef::DataTypes::Glob::File',
-                  PIPE_DT              => 'Sidef::DataTypes::Glob::Pipe',
-                  NUMBER_DT            => 'Sidef::DataTypes::Number::Number',
-                  STRING_DT            => 'Sidef::DataTypes::String::String',
-                  COMPLEX_DT           => 'Sidef::DataTypes::Number::Complex',
-                  REGEX_DT             => 'Sidef::DataTypes::Regex::Regex',
-                  GAUSS_DT             => 'Sidef::DataTypes::Number::Gauss',
-                  MOD_DT               => 'Sidef::DataTypes::Number::Mod',
-                  FRACTION_DT          => 'Sidef::DataTypes::Number::Fraction',
-                  QUADRATIC_DT         => 'Sidef::DataTypes::Number::Quadratic',
-                  QUADRATIC_ELEMENT_DT => 'Sidef::DataTypes::Number::QuadraticElement',
-                  QUATERNION_DT        => 'Sidef::DataTypes::Number::Quaternion',
-                  RANGENUM_DT          => 'Sidef::DataTypes::Range::RangeNumber',
-                  RANGESTR_DT          => 'Sidef::DataTypes::Range::RangeString',
-                  BACKTICK_DT          => 'Sidef::DataTypes::Glob::Backtick',
-                  PERL_DT              => 'Sidef::DataTypes::Perl::Perl',
+                  STRING        => 'Sidef::Types::String::String',
+                  NUMBER        => 'Sidef::Types::Number::Number',
+                  MOD           => 'Sidef::Types::Number::Mod',
+                  GAUSS         => 'Sidef::Types::Number::Gauss',
+                  FRACTION      => 'Sidef::Types::Number::Fraction',
+                  QUADRATIC     => 'Sidef::Types::Number::Quadratic',
+                  QUATERNION    => 'Sidef::Types::Number::Quaternion',
+                  REGEX         => 'Sidef::Types::Regex::Regex',
+                  BOOL          => 'Sidef::Types::Bool::Bool',
+                  ARRAY         => 'Sidef::Types::Array::Array',
+                  RANGENUM      => 'Sidef::Types::Range::RangeNumber',
+                  RANGESTR      => 'Sidef::Types::Range::RangeString',
+                  DIR_DT        => 'Sidef::DataTypes::Glob::Dir',
+                  FILE_DT       => 'Sidef::DataTypes::Glob::File',
+                  PIPE_DT       => 'Sidef::DataTypes::Glob::Pipe',
+                  NUMBER_DT     => 'Sidef::DataTypes::Number::Number',
+                  STRING_DT     => 'Sidef::DataTypes::String::String',
+                  COMPLEX_DT    => 'Sidef::DataTypes::Number::Complex',
+                  REGEX_DT      => 'Sidef::DataTypes::Regex::Regex',
+                  GAUSS_DT      => 'Sidef::DataTypes::Number::Gauss',
+                  MOD_DT        => 'Sidef::DataTypes::Number::Mod',
+                  FRACTION_DT   => 'Sidef::DataTypes::Number::Fraction',
+                  QUADRATIC_DT  => 'Sidef::DataTypes::Number::Quadratic',
+                  QUATERNION_DT => 'Sidef::DataTypes::Number::Quaternion',
+                  RANGENUM_DT   => 'Sidef::DataTypes::Range::RangeNumber',
+                  RANGESTR_DT   => 'Sidef::DataTypes::Range::RangeString',
+                  BACKTICK_DT   => 'Sidef::DataTypes::Glob::Backtick',
+                  PERL_DT       => 'Sidef::DataTypes::Perl::Perl',
                  };
 
     my %dt_table = (
@@ -54,7 +52,6 @@ package Sidef::Optimizer {
           Sidef::DataTypes::Number::Gauss         Sidef::Types::Number::Gauss
           Sidef::DataTypes::Number::Mod           Sidef::Types::Number::Mod
           Sidef::DataTypes::Number::Quadratic     Sidef::Types::Number::Quadratic
-          Sidef::DataTypes::Number::QuadraticElement     Sidef::Types::Number::QuadraticElement
           Sidef::DataTypes::Number::Quaternion    Sidef::Types::Number::Quaternion
           Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
           Sidef::DataTypes::Range::RangeString    Sidef::Types::Range::RangeString
@@ -448,49 +445,44 @@ package Sidef::Optimizer {
             ),
         ),
 
-        (
-            map {
-                my $class = $_;
-                ($class) => build_tree(
+        (QUADRATIC) => build_tree(
 
-                    # Quadratic.method()
-                    (
-                        map { [$_, []] } methods(
-                            $class, qw(
-                              a b abs ceil conj dump
-                              float floor inv inc dec not
-                              is_mone is_one is_zero eval
-                              lift neg norm parts trace
-                              pretty round sgn sqr to_c to_s
-                              )
-                        )
-                    ),
-
-                    # Quadratic.method(Quadratic | Number)
-                    (
-                        map { [$_, [table($class, NUMBER)]] } methods(
-                            $class, qw(
-                              + - / * % ** << >>
-
-                              lt gt le ge cmp
-                              eq ne
-                              and or xor
-
-                              eval invmod is_coprime round divmod
-                              )
-                        )
-                    ),
-
-                    # Quadratic.method(Number, Number)
-                    (
-                        map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
-                            $class, qw(
-                              powmod
-                              )
-                        )
-                    ),
+            # Quadratic.method()
+            (
+                map { [$_, []] } methods(
+                    QUADRATIC, qw(
+                      a b abs ceil conj dump
+                      float floor inv inc dec not
+                      is_mone is_one is_zero eval
+                      lift neg norm parts trace
+                      pretty round sgn sqr to_c to_s
+                      )
                 )
-            } (QUADRATIC, QUADRATIC_ELEMENT)
+            ),
+
+            # Quadratic.method(Quadratic | Number)
+            (
+                map { [$_, [table(QUADRATIC, NUMBER)]] } methods(
+                    QUADRATIC, qw(
+                      + - / * % ** << >>
+
+                      lt gt le ge cmp
+                      eq ne
+                      and or xor
+
+                      eval invmod is_coprime round divmod
+                      )
+                )
+            ),
+
+            # Quadratic.method(Number, Number)
+            (
+                map { [$_, [table(NUMBER), table(NUMBER)]] } methods(
+                    QUADRATIC, qw(
+                      powmod
+                      )
+                )
+            ),
         ),
 
         (QUATERNION) => build_tree(
@@ -1130,11 +1122,8 @@ package Sidef::Optimizer {
                       )
                 )
             ),
-        ),
 
-        (QUADRATIC_ELEMENT_DT) => build_tree(
-
-            # QuadraticElement.method(NUMBER, NUMBER, NUMBER, NUMBER)
+            # Quadratic.method(NUMBER, NUMBER, NUMBER, NUMBER)
             (
                 map {
                     [$_,
@@ -1143,7 +1132,7 @@ package Sidef::Optimizer {
                      ]
                     ]
                 } dtypes(
-                    QUADRATIC_ELEMENT_DT, qw(
+                    QUADRATIC_DT, qw(
                       new call
                       )
                 )

@@ -27,7 +27,6 @@ package Sidef::Deparse::Sidef {
       Sidef::DataTypes::Number::Mod                  Mod
       Sidef::DataTypes::Number::Gauss                Gauss
       Sidef::DataTypes::Number::Quadratic            Quadratic
-      Sidef::DataTypes::Number::QuadraticElement     QuadraticElement
       Sidef::DataTypes::Number::Quaternion           Quaternion
       Sidef::DataTypes::Number::Complex              Complex
       Sidef::DataTypes::Number::Polynomial           Polynomial

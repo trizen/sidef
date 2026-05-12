@@ -44,14 +44,13 @@ package Sidef::Types::Number::Number {
     my @SMALL_PRIMES_20 = (3, 5, 7, 11, 13, 17, 19);
 
     my %NUMBER_CLASSES = (
-                          'Sidef::Types::Number::Mod'              => 1,
-                          'Sidef::Types::Number::Gauss'            => 1,
-                          'Sidef::Types::Number::Fraction'         => 1,
-                          'Sidef::Types::Number::Quadratic'        => 1,
-                          'Sidef::Types::Number::QuadraticElement' => 1,
-                          'Sidef::Types::Number::Quaternion'       => 1,
-                          'Sidef::Types::Number::Polynomial'       => 1,
-                          'Sidef::Types::Number::PolynomialMod'    => 1,
+                          'Sidef::Types::Number::Mod'           => 1,
+                          'Sidef::Types::Number::Gauss'         => 1,
+                          'Sidef::Types::Number::Fraction'      => 1,
+                          'Sidef::Types::Number::Quadratic'     => 1,
+                          'Sidef::Types::Number::Quaternion'    => 1,
+                          'Sidef::Types::Number::Polynomial'    => 1,
+                          'Sidef::Types::Number::PolynomialMod' => 1,
                          );
 
     use constant {
