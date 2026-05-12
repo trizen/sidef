@@ -23,7 +23,7 @@ where C<t^2 = t + 1> (the golden-ratio recurrence).
 
 =item * Eisenstein integers: C<Quadratic(a, b, -1, -1)> which represents C<a + b*w> where C<w = (-1 + i*sqrt(3))/2>.
 
-=item Quadratic integers of the form C<a + b*sqrt(w)> are represented by C<Quadratic(a, b, w)>.
+=item * Quadratic integers of the form C<a + b*sqrt(w)> are represented by C<Quadratic(a, b, w)>.
 
 =item * Gaussian-like integers: choosing C<p = -1, q = 0> gives C<t^2 = -1>, i.e. C<t = i>.
 
