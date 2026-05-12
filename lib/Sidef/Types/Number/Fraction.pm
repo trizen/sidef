@@ -29,6 +29,11 @@ package Sidef::Types::Number::Fraction {
 
     *call = \&new;
 
+    sub with_value {
+        my ($self, $value) = @_;
+        __PACKAGE__->new($value);
+    }
+
     sub stringify {
         my ($x) = @_;
         Sidef::Types::String::String->new(join('/', join('', '(', $x->{a}->stringify, ')'), join('', '(', $x->{b}->stringify, ')')));

@@ -50,6 +50,11 @@ package Sidef::Types::Number::PolynomialMod {
 
     *call = \&new;
 
+    sub with_value {
+        my ($self, $value) = @_;
+        __PACKAGE__->new(0 => $value, $self->[1]);
+    }
+
     sub to_poly {
         $_[0][0];
     }

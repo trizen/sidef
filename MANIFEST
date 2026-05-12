@@ -90,6 +90,8 @@ lib/Sidef/Types/Number/PolynomialMod.pm
 lib/Sidef/Types/Number/PolynomialMod.pod
 lib/Sidef/Types/Number/Quadratic.pm
 lib/Sidef/Types/Number/Quadratic.pod
+lib/Sidef/Types/Number/QuadraticElement.pm
+lib/Sidef/Types/Number/QuadraticElement.pod
 lib/Sidef/Types/Number/Quaternion.pm
 lib/Sidef/Types/Number/Quaternion.pod
 lib/Sidef/Types/Perl/Perl.pm
@@ -1011,6 +1013,7 @@ scripts/Tests/prime_signature_numbers.sf
 scripts/Tests/problem_of_apollonius.sf
 scripts/Tests/pseudoprimes.sf
 scripts/Tests/pythagorean_means.sf
+scripts/Tests/quadratic_element.sf
 scripts/Tests/quadratic_integers.sf
 scripts/Tests/quadratic_nonresidue.sf
 scripts/Tests/quaternion_integers.sf

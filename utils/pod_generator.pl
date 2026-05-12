@@ -16,13 +16,16 @@ use List::Util            qw(first);
 use File::Basename        qw(basename);
 use File::Spec::Functions qw(curdir splitdir catfile);
 use Pod::Simple::SimpleTree;
+use Getopt::Std qw(getopt);
 
-my $dir = shift() // die "usage: $0 sidef/lib\n";
+my $dir = shift() // die "usage: $0 [-r] sidef/lib\n";
 
 my %esc = (
            '>' => 'gt',
            '<' => 'lt',
           );
+
+getopt('r', \my %opts);
 
 my %ignored_subs = map { $_ => 1 } qw<
   BEGIN
@@ -422,11 +425,14 @@ __POD2__
 
     my $pod_file = catfile(@parts) . '.pod';
 
+    if (-e $pod_file and !$opts{r}) {
+        say "** Skipping: $pod_file (use -r to overwrite)";
+        return;
+    }
+
     say "** Writing: $pod_file";
 
     my $pod_data = {};
-
-    #return if $pod_file ne 'Sidef/Object/Convert.pod';
 
     (-e $pod_file) && do {
         $pod_data = parse_pod_file($pod_file);

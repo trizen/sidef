@@ -1,0 +1,557 @@
+=encoding utf8
+=head1 NAME
+
+Sidef::Types::Number::QuadraticElement
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+var obj = QuadraticElement(...)
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+       * Sidef::Types::Number::Number
+
+
+=head1 METHODS
+
+=head2 !=
+
+    a != b
+
+Returns the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 %
+
+    a % b
+
+Returns the
+
+Aliases: I<mod>
+
+=cut
+
+=head2 &
+
+    a & b
+
+Returns the
+
+Aliases: I<and>
+
+=cut
+
+=head2 *
+
+    a * b
+
+Returns the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 **
+
+    a ** b
+
+Returns the
+
+Aliases: I<pow>
+
+=cut
+
+=head2 +
+
+    a + b
+
+Returns the
+
+Aliases: I<add>
+
+=cut
+
+=head2 ++
+
+    a ++ b
+
+Returns the
+
+Aliases: I<inc>
+
+=cut
+
+=head2 -
+
+    a - b
+
+Returns the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 --
+
+    a -- b
+
+Returns the
+
+Aliases: I<dec>
+
+=cut
+
+=head2 /
+
+    a / b
+
+Returns the
+
+Aliases: I<÷>, I<div>
+
+=cut
+
+=head2 <
+
+    a < b
+
+Returns the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <<
+
+    a << b
+
+Returns the
+
+Aliases: I<lsft>, I<shift_left>
+
+=cut
+
+=head2 <=>
+
+    a <=> b
+
+Returns the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+    a == b
+
+Returns the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+    a > b
+
+Returns the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 >>
+
+    a >> b
+
+Returns the
+
+Aliases: I<rsft>, I<shift_right>
+
+=cut
+
+=head2 ^
+
+    a ^ b
+
+Returns the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 |
+
+    a | b
+
+Returns the
+
+Aliases: I<or>
+
+=cut
+
+=head2 ≤
+
+    a ≤ b
+
+Returns the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+    a ≥ b
+
+Returns the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
+=head2 a
+
+    self.a
+
+Returns the
+
+Aliases: I<re>, I<real>
+
+=cut
+
+=head2 abs
+
+    x.abs
+
+Returns the
+
+=cut
+
+=head2 b
+
+    self.b
+
+Returns the
+
+Aliases: I<im>, I<imag>
+
+=cut
+
+=head2 ceil
+
+    x.ceil
+
+Returns the
+
+=cut
+
+=head2 conj
+
+    x.conj
+
+Returns the
+
+=cut
+
+=head2 divmod
+
+    self.divmod(other)
+
+Returns the
+
+=cut
+
+=head2 eval
+
+    self.eval(x)
+
+Returns the
+
+=cut
+
+=head2 float
+
+    x.float
+
+Returns the
+
+=cut
+
+=head2 floor
+
+    x.floor
+
+Returns the
+
+=cut
+
+=head2 gcd
+
+    self.gcd(other)
+
+Returns the
+
+=cut
+
+=head2 idiv
+
+    self.idiv(other)
+
+Returns the
+
+=cut
+
+=head2 inv
+
+    x.inv
+
+Returns the
+
+=cut
+
+=head2 invmod
+
+    x.invmod(m)
+
+Returns the
+
+=cut
+
+=head2 is_associate
+
+    x.is_associate(y)
+
+Returns the
+
+=cut
+
+=head2 is_coprime
+
+    x.is_coprime(y)
+
+Returns the
+
+=cut
+
+=head2 is_int
+
+    self.is_int
+
+Returns the
+
+=cut
+
+=head2 is_mone
+
+    x.is_mone
+
+Returns the
+
+=cut
+
+=head2 is_one
+
+    x.is_one
+
+Returns the
+
+=cut
+
+=head2 is_prime
+
+    x.is_prime
+
+Returns the
+
+=cut
+
+=head2 is_unit
+
+    x.is_unit
+
+Returns the
+
+=cut
+
+=head2 is_zero
+
+    x.is_zero
+
+Returns the
+
+=cut
+
+=head2 lcm
+
+    self.lcm(other)
+
+Returns the
+
+=cut
+
+=head2 lift
+
+    self.lift
+
+Returns the
+
+=cut
+
+=head2 neg
+
+    x.neg
+
+Returns the
+
+=cut
+
+=head2 new
+
+    self.new
+
+Returns the
+
+Aliases: I<call>
+
+=cut
+
+=head2 norm
+
+    x.norm
+
+Returns the
+
+=cut
+
+=head2 p
+
+    self.p
+
+Returns the
+
+=cut
+
+=head2 parts
+
+    self.parts
+
+Returns the
+
+=cut
+
+=head2 powmod
+
+    x.powmod(n, m)
+
+Returns the
+
+=cut
+
+=head2 pretty
+
+    x.pretty
+
+Returns the
+
+Aliases: I<stringify>
+
+=cut
+
+=head2 q
+
+    self.q
+
+Returns the
+
+=cut
+
+=head2 reals
+
+    self.reals
+
+Returns the
+
+=cut
+
+=head2 round
+
+    x.round(r)
+
+Returns the
+
+=cut
+
+=head2 sqr
+
+    x.sqr
+
+Returns the
+
+=cut
+
+=head2 to_c
+
+    self.to_c
+
+Returns the
+
+Aliases: I<to_n>
+
+=cut
+
+=head2 to_quadratic
+
+    self.to_quadratic
+
+Returns the
+
+=cut
+
+=head2 to_s
+
+    x.to_s
+
+Returns the
+
+Aliases: I<dump>
+
+=cut
+
+=head2 trace
+
+    x.trace
+
+Returns the
+
+=cut
+
+=head2 with_value
+
+    self.with_value(value)
+
+Returns the
+
+=cut
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
+
+=cut

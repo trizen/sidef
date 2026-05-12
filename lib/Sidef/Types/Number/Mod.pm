@@ -47,6 +47,11 @@ package Sidef::Types::Number::Mod {
 
     *call = \&new;
 
+    sub with_value {
+        my ($self, $value) = @_;
+        __PACKAGE__->new($value, $self->{m});
+    }
+
     sub to_n {
         $_[0]->{n};
     }
@@ -139,6 +144,11 @@ package Sidef::Types::Number::Mod {
     sub pretty {
         my ($x) = @_;
         Sidef::Types::String::String->new(join('', "Mod(", join(', ', $x->{n}->pretty, $x->{m}->pretty), ')'));
+    }
+
+    sub mod {
+        my ($x, $y) = @_;
+        __PACKAGE__->new($x->lift, $y->lift);
     }
 
     sub div {
@@ -332,6 +342,7 @@ package Sidef::Types::Number::Mod {
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '+'}   = \&add;
         *{__PACKAGE__ . '::' . '-'}   = \&sub;
+        *{__PACKAGE__ . '::' . '%'}   = \&mod;
         *{__PACKAGE__ . '::' . '**'}  = \&pow;
         *{__PACKAGE__ . '::' . '++'}  = \&inc;
         *{__PACKAGE__ . '::' . '--'}  = \&dec;

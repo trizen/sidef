@@ -6,12 +6,12 @@ Sidef::Types::Number::Quadratic - Quadratic integer arithmetic
 
 =head1 DESCRIPTION
 
-This class implements quadratic integers of the form C<a + b√w>, where C<a> and C<b> 
-are rational numbers and C<w> is a square-free integer (the discriminant). Quadratic 
+This class implements quadratic integers of the form C<a + b√w>, where C<a> and C<b>
+are rational numbers and C<w> is a square-free integer (the discriminant). Quadratic
 integers are an extension of the rational numbers that include square roots.
 
-The class provides arithmetic operations, modular arithmetic, and various utility 
-methods for working with quadratic integers. Common applications include algebraic 
+The class provides arithmetic operations, modular arithmetic, and various utility
+methods for working with quadratic integers. Common applications include algebraic
 number theory, cryptography, and solving Pell equations.
 
 For more information, see: L<https://en.wikipedia.org/wiki/Quadratic_integer>
@@ -31,12 +31,12 @@ For more information, see: L<https://en.wikipedia.org/wiki/Quadratic_integer>
     var sum = x + y         # addition
     var prod = x * y        # multiplication
     var quot = x / y        # division
-    
+
     # Properties
     say x.norm              # compute the norm: a² - b²w
     say x.conj              # conjugate: a - b√w
     say x.abs               # absolute value: sqrt(norm)
-    
+
     # Modular arithmetic
     say x.powmod(100, 97)   # modular exponentiation
 
@@ -51,7 +51,6 @@ Inherits methods from:
 =head2 new
 
     Quadratic(a, b, w)
-    Quadratic.new(a, b, w)
 
 Constructs a new quadratic integer representing C<a + b√w>.
 
@@ -182,7 +181,7 @@ Aliases: I<sub>
 
 Multiplication of quadratic integers or multiplication with a scalar.
 
-For quadratics with the same discriminant: 
+For quadratics with the same discriminant:
 C<(a + b√w)(c + d√w) = (ac + bdw) + (ad + bc)√w>
 
 B<Returns:> Quadratic - the product
@@ -197,7 +196,7 @@ Aliases: I<mul>
 
 Division of quadratic integers or division by a scalar.
 
-For division by a number, divides both components. For division by another 
+For division by a number, divides both components. For division by another
 quadratic, multiplies by the multiplicative inverse.
 
 B<Returns:> Quadratic - the quotient
@@ -219,8 +218,8 @@ B<Returns:> Quadratic or Number - the result of exponentiation
 B<Example:>
 
     var q = Quadratic(3, 4, 5)
-    say q**2        # (49, 24, 5)  = 49 + 24√5
-    say q**10       # very large result
+    say q**2        # Quadratic(89, 24, 5)
+    say q**10       # Quadratic(29578174649, 13203129720, 5)
 
 Aliases: I<pow>
 
@@ -444,7 +443,7 @@ B<Example:>
 
 Computes the norm of the quadratic integer.
 
-For C<a + b√w>, the norm is C<a² - b²w>. This is equal to the 
+For C<a + b√w>, the norm is C<a² - b²w>. This is equal to the
 product of the quadratic with its conjugate.
 
 B<Returns:> Number - the norm
@@ -499,8 +498,8 @@ B<Returns:> Quadratic - the multiplicative inverse
 B<Example:>
 
     var q = Quadratic(3, 4, 5)
-    say q.inv       # 1/q
-    say q * q.inv   # Quadratic(1, 0, w) ≈ 1
+    say q.inv         # 1/q
+    say (q * q.inv)   # Quadratic(1, 0, w)
 
 =cut
 
@@ -552,7 +551,7 @@ B<Returns:> Quadratic - the result of C<q^n mod m>
 B<Example:>
 
     var q = Quadratic(3, 4, 5)
-    say q.powmod(100, 97)   # (83, 42, 5)
+    say q.powmod(100, 97)   # Quadratic(83, 42, 5)
 
 =cut
 
@@ -576,7 +575,7 @@ B<Example:>
 
     var q = Quadratic(3, 4, 5)
     var inv = q.invmod(97)
-    say (q * inv) % 97      # should be ≈ 1
+    say ((q * inv) % 97)      # Quadratic(1, 0, 5)
 
 =cut
 
@@ -793,7 +792,7 @@ For a quadratic integer C<q = a + b√w>:
 
 =head2 Arithmetic
 
-Quadratic integers form a ring under addition and multiplication when they share 
+Quadratic integers form a ring under addition and multiplication when they share
 the same discriminant w. The operations are:
 
 =over 4
@@ -811,15 +810,15 @@ the same discriminant w. The operations are:
     # Golden ratio powers using Quadratic(0, 1, 5)
     var phi = Quadratic(0, 1, 5)  # √5
     say phi**2      # Quadratic(5, 0, 5) = 5
-    
+
     # Pell equation solutions
     var x = Quadratic(1, 1, 2)    # 1 + √2
     say x**2        # Quadratic(3, 2, 2) = 3 + 2√2
-    
+
     # Modular arithmetic
     var a = Quadratic(3, 4, 5)
     say a.powmod(1000, 100)  # efficient modular exponentiation
-    
+
     # Working with Gaussian integers (w=-1)
     var z = Quadratic(3, 4, -1)   # 3 + 4i
     say z.norm      # 25 (= 3² + 4²)

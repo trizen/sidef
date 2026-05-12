@@ -17,27 +17,32 @@ package Sidef::Types::Number::Quaternion {
       q{${}}  => \&to_n;
 
     sub new {
-        my (undef, $a, $b, $c, $d) = @_;
+        my (undef, $A, $B, $C, $D) = @_;
 
         # Handle evaluation of polynomials
         if (ref($_[0]) eq __PACKAGE__) {
-            return $_[0]->eval($a);
+            return $_[0]->eval($A);
         }
 
-        $a //= Sidef::Types::Number::Number::ZERO;
-        $b //= Sidef::Types::Number::Number::ZERO;
-        $c //= Sidef::Types::Number::Number::ZERO;
-        $d //= Sidef::Types::Number::Number::ZERO;
+        $A //= Sidef::Types::Number::Number::ZERO;
+        $B //= Sidef::Types::Number::Number::ZERO;
+        $C //= Sidef::Types::Number::Number::ZERO;
+        $D //= Sidef::Types::Number::Number::ZERO;
 
-        $a = Sidef::Types::Number::Number->new($a) if !UNIVERSAL::isa($a, 'Sidef::Types::Number::Number');
-        $b = Sidef::Types::Number::Number->new($b) if !UNIVERSAL::isa($b, 'Sidef::Types::Number::Number');
-        $c = Sidef::Types::Number::Number->new($c) if !UNIVERSAL::isa($c, 'Sidef::Types::Number::Number');
-        $d = Sidef::Types::Number::Number->new($d) if !UNIVERSAL::isa($d, 'Sidef::Types::Number::Number');
+        $A = Sidef::Types::Number::Number->new($A) if !UNIVERSAL::isa($A, 'Sidef::Types::Number::Number');
+        $B = Sidef::Types::Number::Number->new($B) if !UNIVERSAL::isa($B, 'Sidef::Types::Number::Number');
+        $C = Sidef::Types::Number::Number->new($C) if !UNIVERSAL::isa($C, 'Sidef::Types::Number::Number');
+        $D = Sidef::Types::Number::Number->new($D) if !UNIVERSAL::isa($D, 'Sidef::Types::Number::Number');
 
-        bless {a => $a, b => $b, c => $c, d => $d};
+        bless {a => $A, b => $B, c => $C, d => $D};
     }
 
     *call = \&new;
+
+    sub with_value {
+        my ($self, $value) = @_;
+        __PACKAGE__->new($value);
+    }
 
     sub eval {
         my ($x, $v) = @_;

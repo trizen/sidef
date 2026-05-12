@@ -35,6 +35,11 @@ package Sidef::Types::Number::Gauss {
 
     *call = \&new;
 
+    sub with_value {
+        my ($self, $value) = @_;
+        __PACKAGE__->new($value);
+    }
+
     sub eval {
         my ($x, $v) = @_;
         __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v));

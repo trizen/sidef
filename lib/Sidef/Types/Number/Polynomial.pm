@@ -128,6 +128,11 @@ package Sidef::Types::Number::Polynomial {
 
     *call = \&new;
 
+    sub with_value {
+        my ($self, $value) = @_;
+        __PACKAGE__->new(0 => $value);
+    }
+
     sub to_poly {
         $_[0];
     }

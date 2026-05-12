@@ -75,6 +75,7 @@ package Sidef::Parser {
                      | Mod\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Mod') })
                      | Gauss\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Gauss') })
                      | Quadratic\b                    (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quadratic') })
+                     | QuadraticElement\b             (?{ state $x = bless({}, 'Sidef::DataTypes::Number::QuadraticElement') })
                      | Quaternion\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Quaternion') })
                      | Poly(?:nomial)?\b              (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Polynomial') })
                      | Poly(?:nomial)?Mod\b           (?{ state $x = bless({}, 'Sidef::DataTypes::Number::PolynomialMod') })
@@ -221,6 +222,7 @@ package Sidef::Parser {
                   Mod
                   Gauss
                   Quadratic
+                  QuadraticElement
                   Quaternion
                   Range
                   RangeStr RangeString

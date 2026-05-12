@@ -3,6 +3,8 @@ package Sidef::Types::Number::Number {
     use utf8;
     use 5.016;
 
+    use Sidef::Types::Bool::Bool;
+
     use Math::GMPz qw();
     use Math::GMPq qw();
     use Math::MPFR qw();
@@ -40,6 +42,17 @@ package Sidef::Types::Number::Number {
 
     my %PRIMEPI_LOOKUP;    # lookup table for prime_count()
     my @SMALL_PRIMES_20 = (3, 5, 7, 11, 13, 17, 19);
+
+    my %NUMBER_CLASSES = (
+                          'Sidef::Types::Number::Mod'              => 1,
+                          'Sidef::Types::Number::Gauss'            => 1,
+                          'Sidef::Types::Number::Fraction'         => 1,
+                          'Sidef::Types::Number::Quadratic'        => 1,
+                          'Sidef::Types::Number::QuadraticElement' => 1,
+                          'Sidef::Types::Number::Quaternion'       => 1,
+                          'Sidef::Types::Number::Polynomial'       => 1,
+                          'Sidef::Types::Number::PolynomialMod'    => 1,
+                         );
 
     use constant {
 
@@ -146,10 +159,7 @@ package Sidef::Types::Number::Number {
             return _set_int($num);
         }
 
-        if (   $ref eq 'Sidef::Types::Number::Mod'
-            or $ref eq 'Sidef::Types::Number::Gauss'
-            or $ref eq 'Sidef::Types::Number::Quadratic'
-            or $ref eq 'Sidef::Types::Number::Quaternion') {
+        if (exists($NUMBER_CLASSES{$ref})) {
             $num = $num->to_n;
         }
         elsif ($ref eq 'Sidef::Types::Bool::Bool') {
@@ -243,6 +253,11 @@ package Sidef::Types::Number::Number {
     }
 
     *call = \&new;
+
+    sub with_value {
+        my ($self, $value) = @_;
+        ref($self)->new($value);
+    }
 
     sub run { $_[1] }
 
@@ -2426,13 +2441,7 @@ package Sidef::Types::Number::Number {
 
         my $ref = ref($y);
 
-        if (   $ref eq 'Sidef::Types::Number::Mod'
-            or $ref eq 'Sidef::Types::Number::Gauss'
-            or $ref eq 'Sidef::Types::Number::Fraction'
-            or $ref eq 'Sidef::Types::Number::Quadratic'
-            or $ref eq 'Sidef::Types::Number::Quaternion'
-            or $ref eq 'Sidef::Types::Number::Polynomial'
-            or $ref eq 'Sidef::Types::Number::PolynomialMod') {
+        if (exists $NUMBER_CLASSES{$ref}) {
             return $y->add($x);
         }
 
@@ -2667,26 +2676,8 @@ package Sidef::Types::Number::Number {
 
         my $ref = ref($y);
 
-        if ($ref eq 'Sidef::Types::Number::Mod') {
-            return $ref->new($x, $y->{m})->sub($y);
-        }
-
-        if (   $ref eq 'Sidef::Types::Number::Gauss'
-            or $ref eq 'Sidef::Types::Number::Quaternion'
-            or $ref eq 'Sidef::Types::Number::Fraction') {
-            return $ref->new($x)->sub($y);
-        }
-
-        if ($ref eq 'Sidef::Types::Number::Quadratic') {
-            return $ref->new($x, ZERO, $y->{w})->sub($y);
-        }
-
-        if ($ref eq 'Sidef::Types::Number::Polynomial') {
-            return $ref->new(0 => $x)->sub($y);
-        }
-
-        if ($ref eq 'Sidef::Types::Number::PolynomialMod') {
-            return $ref->new(0 => $x, $y->[1])->sub($y);
+        if (exists $NUMBER_CLASSES{$ref}) {
+            return $y->with_value($x)->sub($y);
         }
 
         _valid(\$y);
@@ -2890,15 +2881,7 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         my $ref = ref($y);
-
-        if (   $ref eq 'Sidef::Types::Number::Mod'
-            or $ref eq 'Sidef::Types::Number::Gauss'
-            or $ref eq 'Sidef::Types::Number::Fraction'
-            or $ref eq 'Sidef::Types::Number::Quadratic'
-            or $ref eq 'Sidef::Types::Number::Quaternion'
-            or $ref eq 'Sidef::Types::Number::Polynomial'
-            or $ref eq 'Sidef::Types::Number::PolynomialMod'
-            or $ref eq 'Sidef::Types::Array::Matrix') {
+        if (exists $NUMBER_CLASSES{$ref}) {
             return $y->mul($x);
         }
 
@@ -3226,27 +3209,8 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         my $ref = ref($y);
-
-        if ($ref eq 'Sidef::Types::Number::Mod') {
-            return $ref->new($x, $y->{m})->div($y);
-        }
-
-        if ($ref eq 'Sidef::Types::Number::Quadratic') {
-            return $ref->new($x, ZERO, $y->{w})->div($y);
-        }
-
-        if (   $ref eq 'Sidef::Types::Number::Gauss'
-            or $ref eq 'Sidef::Types::Number::Fraction'
-            or $ref eq 'Sidef::Types::Number::Quaternion') {
-            return $ref->new($x)->div($y);
-        }
-
-        if ($ref eq 'Sidef::Types::Number::Polynomial') {
-            return $ref->new(0 => $x)->div($y);
-        }
-
-        if ($ref eq 'Sidef::Types::Number::PolynomialMod') {
-            return $ref->new(0 => $x, $y->[1])->div($y);
+        if (exists $NUMBER_CLASSES{$ref}) {
+            return $y->with_value($x)->div($y);
         }
 
         _valid(\$y);
@@ -10064,19 +10028,8 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         my $ref = ref($y);
-
-        if (   $ref eq 'Sidef::Types::Number::Gauss'
-            or $ref eq 'Sidef::Types::Number::Quaternion'
-            or $ref eq 'Sidef::Types::Number::Fraction') {
-            return $ref->new($x)->mod($y);
-        }
-
-        if ($ref eq 'Sidef::Types::Number::Quadratic') {
-            return $ref->new($x, ZERO, $y->{w})->mod($y);
-        }
-
-        if ($ref eq 'Sidef::Types::Number::Polynomial') {
-            return $ref->new(0 => $x)->mod($y);
+        if (exists $NUMBER_CLASSES{$ref}) {
+            return $y->with_value($x)->mod($y);
         }
 
         _valid(\$y);
