@@ -1811,7 +1811,7 @@ One of Sidef's greatest strengths is its built-in mathematical capabilities. Her
 
 ```ruby
 say 17.is_prime           # true
-say 10.primes             # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+say 30.primes             # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 say primes(100, 150)      # all primes between 100 and 150
 say 1000.prime            # 7919  (the 1000th prime)
 say prime_count(10**6)    # 78498 (number of primes up to a million)

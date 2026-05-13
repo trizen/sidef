@@ -6,20 +6,15 @@ Sidef::Types::Number::Quadratic - Elements of a quadratic ring Z[t] / (t^2 - q*t
 
 =head1 DESCRIPTION
 
-This class implements elements of a quadratic ring of the form C<a + b*t>, where C<a> and
-C<b> are rational numbers and C<t> is a root of the characteristic polynomial C<t^2 = p + q*t>
-(equivalently, C<t^2 - q*t - p = 0>).
+This class implements elements of a quadratic ring of the form C<a + b*t>, where C<a> and C<b> are real numbers and C<t> is a root of the characteristic polynomial C<t^2 = p + q*t> (equivalently, C<t^2 - q*t - p = 0>).
 
-The ring is parameterised by two integers C<p> and C<q>, so each element carries four
-components: C<(a, b, p, q)>. Arithmetic in the ring reduces products of C<t> using the
-relation C<t^2 = p + q*t>, keeping everything as a degree-1 polynomial in C<t>.
+The ring is parameterised by two integers C<p> and C<q>, so each element carries four components: C<(a, b, p, q)>. Arithmetic in the ring reduces products of C<t> using the relation C<t^2 = p + q*t>, keeping everything as a degree-1 polynomial in C<t>.
 
 Common special cases include:
 
 =over 4
 
-=item * Lucas / Fibonacci sequences: C<Quadratic(0, 1, 1, 1)> gives the element C<t>
-where C<t^2 = t + 1> (the golden-ratio recurrence).
+=item * Lucas / Fibonacci sequences: C<Quadratic(0, 1, 1, 1)> gives the element C<t> where C<t^2 = t + 1> (the golden-ratio recurrence).
 
 =item * Eisenstein integers: C<Quadratic(a, b, -1, -1)> which represents C<a + b*w> where C<w = (-1 + i*sqrt(3))/2>.
 
@@ -82,8 +77,7 @@ Inherits methods from:
 
     Quadratic(a, b, p, q)
 
-Constructs a new element of the quadratic ring representing C<a + b*t>, where
-C<t^2 = p + q*t>.
+Constructs a new element of the quadratic ring representing C<a + b*t>, where C<t^2 = p + q*t>.
 
 B<Parameters:>
 
@@ -93,7 +87,7 @@ B<Parameters:>
 
 =item * C<b> - The coefficient of C<t> (default: 0)
 
-=item * C<p> - The constant term of the minimal polynomial C<t^2 - q*t - p = 0> (default: 0)
+=item * C<p> - The constant term of the minimal polynomial C<t^2 - q*t - p = 0> (default: 1)
 
 =item * C<q> - The linear term of the minimal polynomial (default: 0)
 
@@ -131,8 +125,7 @@ B<Example:>
 
     self.eval(x)
 
-Evaluates the element as a polynomial by substituting C<x> for C<t>. All four
-components (C<a>, C<b>, C<p>, C<q>) are individually evaluated at C<x>.
+Evaluates the element as a polynomial by substituting C<x> for C<t>. All four components (C<a>, C<b>, C<p>, C<q>) are individually evaluated at C<x>.
 
 B<Parameters:>
 
@@ -146,8 +139,8 @@ B<Returns:> Quadratic after substitution.
 
 B<Example:>
 
-    var e = Quadratic(1, 2, 3, 4)
-    say e.eval(5)   # substitutes 5 everywhere
+    var e = Quadratic(Poly([9,0,6]), Poly([3,4,5]), 3, 4)
+    say e.eval(5)   # substitutes x with 5 in the Poly objects
 
 =cut
 
@@ -155,15 +148,13 @@ B<Example:>
 
     self.lift
 
-Lifts the element by applying C<lift> to each of the four components. This is
-primarily useful after modular arithmetic to recover the representative in a
-larger ring.
+Lifts the element by applying C<lift> to each of the four components. This is primarily useful after modular arithmetic to recover the representative in a larger ring.
 
 B<Returns:> Quadratic with lifted components.
 
 B<Example:>
 
-    var e = Quadratic(3, 4, 1, 1) % 7
+    var e = Quadratic(Mod(3, 97), Mod(4, 97), 1, 1)
     say e.lift      # lift residues back
 
 =cut
@@ -174,11 +165,9 @@ B<Example:>
 
 Returns the constant part C<a> of the element C<a + b*t>.
 
-B<Returns:> Number
-
 B<Example:>
 
-    say Quadratic(3, 4, 1, 1).a      #=> 3
+    say Quadratic(3, 4, 5, 6).a      #=> 3
 
 Aliases: I<re>, I<real>
 
@@ -190,11 +179,9 @@ Aliases: I<re>, I<real>
 
 Returns the coefficient C<b> of the C<t> part of the element C<a + b*t>.
 
-B<Returns:> Number
-
 B<Example:>
 
-    say Quadratic(3, 4, 1, 1).b      #=> 4
+    say Quadratic(3, 4, 5, 6).b      #=> 4
 
 Aliases: I<im>, I<imag>
 
@@ -206,11 +193,9 @@ Aliases: I<im>, I<imag>
 
 Returns the parameter C<p> that defines the ring relation C<t^2 = p + q*t>.
 
-B<Returns:> Number
-
 B<Example:>
 
-    say Quadratic(3, 4, 1, 1).p      #=> 1
+    say Quadratic(3, 4, 5, 6).p      #=> 5
 
 =cut
 
@@ -220,11 +205,9 @@ B<Example:>
 
 Returns the parameter C<q> that defines the ring relation C<t^2 = p + q*t>.
 
-B<Returns:> Number
-
 B<Example:>
 
-    say Quadratic(3, 4, 1, 1).q      #=> 1
+    say Quadratic(3, 4, 5, 6).q      #=> 6
 
 =cut
 
@@ -260,11 +243,11 @@ B<Example:>
 
     a + b
 
-Addition of two Quadratic values in the same ring, or addition of a
-Quadratic and a scalar.
+Addition of two Quadratic values in the same ring, or addition of a Quadratic and a scalar.
 
 For elements sharing the same C<(p, q)>:
-C<(a + b*t) + (c + d*t) = (a+c) + (b+d)*t>
+
+    (a + b*t) + (c + d*t) = (a+c) + (b+d)*t
 
 For scalar C<y>: adds C<y> to the constant part only.
 
@@ -274,8 +257,8 @@ B<Example:>
 
     var x = Quadratic(1, 2, 1, 1)
     var y = Quadratic(3, 4, 1, 1)
-    say x + y       #=> Quadratic(4, 6, 1, 1)
-    say x + 10      #=> Quadratic(11, 2, 1, 1)
+    say (x + y)       #=> Quadratic(4, 6, 1, 1)
+    say (x + 10)      #=> Quadratic(11, 2, 1, 1)
 
 Aliases: I<add>
 
@@ -289,7 +272,8 @@ Subtraction of two Quadratic values in the same ring, or subtraction of
 a scalar from a Quadratic.
 
 For elements sharing the same C<(p, q)>:
-C<(a + b*t) - (c + d*t) = (a-c) + (b-d)*t>
+
+    (a + b*t) - (c + d*t) = (a-c) + (b-d)*t
 
 For scalar C<y>: subtracts C<y> from the constant part only.
 
@@ -299,7 +283,7 @@ B<Example:>
 
     var x = Quadratic(5, 6, 1, 1)
     var y = Quadratic(1, 2, 1, 1)
-    say x - y       #=> Quadratic(4, 4, 1, 1)
+    say (x - y)       #=> Quadratic(4, 4, 1, 1)
 
 Aliases: I<sub>
 
@@ -312,7 +296,8 @@ Aliases: I<sub>
 Multiplication in the ring, using the reduction rule C<t^2 = p + q*t>.
 
 For elements sharing the same C<(p, q)>:
-C<(a + b*t)(c + d*t) = (ac + bd*p) + (ad + bc + bd*q)*t>
+
+    (a + b*t)(c + d*t) = (ac + bd*p) + (ad + bc + bd*q)*t
 
 For scalar C<y>: multiplies both components by C<y>.
 
@@ -321,7 +306,7 @@ B<Returns:> Quadratic — the product.
 B<Example:>
 
     var x = Quadratic(1, 1, 1, 1)    # 1 + t,  t^2 = 1 + t
-    say x * x       #=> Quadratic(2, 3, 1, 1)   (= (1+t)^2 = 2 + 3t)
+    say (x * x)       #=> Quadratic(2, 3, 1, 1)   (= (1+t)^2 = 2 + 3t)
 
 Aliases: I<mul>
 
@@ -335,6 +320,7 @@ Division of two Quadratic values in the same ring, or division of a
 Quadratic by a scalar.
 
 For ring elements, computes C<x * conj(y) / norm(y)>.
+
 For scalar C<y>: divides both components by C<y>.
 
 B<Returns:> Quadratic — the quotient.
@@ -342,8 +328,8 @@ B<Returns:> Quadratic — the quotient.
 B<Example:>
 
     var x = Quadratic(3, 4, 1, 0)
-    var y = Quadratic(1, 1, 1, 0)
-    say (x / y)       # exact quotient in the ring
+    var y = Quadratic(7, 5, 1, 0)
+    say (x / y)       #=> Quadratic(1/24, 13/24, 1, 0)
 
 Aliases: I<÷>, I<div>
 
@@ -354,9 +340,9 @@ Aliases: I<÷>, I<div>
     a ** b
 
 Raises the element to an integer power using binary (square-and-multiply)
-exponentiation. For non-integer exponents the element is first converted to a
-regular number via C<to_n>. Negative integer exponents compute the
-multiplicative inverse first.
+exponentiation.
+
+Negative integer exponents compute the multiplicative inverse first.
 
 B<Returns:> Quadratic (or Number for non-integer exponent).
 
@@ -380,18 +366,20 @@ Aliases: I<pow>
 
 Modulo operation.
 
-When C<b> is a plain Number, reduces both components C<a> and C<b>
-component-wise modulo C<b>.
+When C<b> is a plain Number, reduces both components C<a> and C<b> component-wise modulo C<b>.
 
-When C<b> is a Quadratic in the same ring, computes the Euclidean
-remainder via C<divmod>.
+When C<b> is a Quadratic in the same ring, computes the Euclidean remainder via C<divmod>.
 
 B<Returns:> Quadratic — the remainder.
 
 B<Example:>
 
+    var a = Quadratic(5, 3, -1, -1)
+    var b = Quadratic(4, 7, -1, -1)
+    say (a % b)       #=> Quadratic(-2, 0, -1, -1)
+
     var e = Quadratic(13, 27, 1, 1)
-    say e % 7       #=> Quadratic(6, 6, 1, 1)
+    say (e % 7)       #=> Quadratic(6, 6, 1, 1)
 
 Aliases: I<mod>
 
@@ -418,8 +406,7 @@ Aliases: I<inc>
 
     --a
 
-Decrement: subtracts 1 from the constant part C<a>, leaving C<b>, C<p>, C<q>
-unchanged.
+Decrement: subtracts 1 from the constant part C<a>, leaving C<b>, C<p>, C<q> unchanged.
 
 B<Returns:> Quadratic — decremented value.
 
@@ -481,8 +468,7 @@ B<Example:>
 
     x.float
 
-Converts both the C<a> and C<b> components to floating-point numbers,
-preserving C<p> and C<q>.
+Converts both the C<a> and C<b> components to floating-point numbers, preserving C<p> and C<q>.
 
 B<Returns:> Quadratic with floating-point components.
 
@@ -550,9 +536,9 @@ B<Example:>
 
     self.divmod(other)
 
-Euclidean division with rounding to the nearest element. Computes the quotient
-C<q> and remainder C<r> such that C<self = q * other + r> and the norm of C<r>
-is minimised.
+Euclidean division with rounding to the nearest element.
+
+Computes the quotient C<q> and remainder C<r> such that C<self = q * other + r> and the norm of C<r> is minimised.
 
 B<Returns:> (Quadratic, Quadratic) — the pair C<(quotient, remainder)>.
 
@@ -593,7 +579,7 @@ B<Returns:> Quadratic — result after left shift.
 B<Example:>
 
     var e = Quadratic(1, 1, 1, 1)
-    say e << 3      #=> Quadratic(8, 8, 1, 1)  (= e * 8)
+    say (e << 3)      #=> Quadratic(8, 8, 1, 1)  (= e * 8)
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -610,7 +596,7 @@ B<Returns:> Quadratic — result after right shift.
 B<Example:>
 
     var e = Quadratic(8, 8, 1, 1)
-    say e >> 3      #=> Quadratic(1, 1, 1, 1)  (= e / 8)
+    say (e >> 3)      #=> Quadratic(1, 1, 1, 1)  (= e / 8)
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -620,8 +606,7 @@ Aliases: I<rsft>, I<shift_right>
 
     x.powmod(n, m)
 
-Modular exponentiation: computes C<x^n mod m> efficiently using binary
-exponentiation, reducing modulo C<m> at every step to keep components small.
+Modular exponentiation: computes C<x^n mod m> efficiently using binary exponentiation, reducing modulo C<m> at every step to keep components small.
 
 Supports negative exponents by first computing the modular inverse.
 
@@ -654,17 +639,19 @@ B<Example:>
 Returns the conjugate of the element.
 
 For C<a + b*t>, the conjugate uses the other root C<t' = q - t> of the
-minimal polynomial. Concretely:
-C<conj(a + b*t) = (a + b*q) + (-b)*t>.
+minimal polynomial.
+
+Concretely:
+
+    conj(a + b*t) = (a + b*q) + (-b)*t
 
 B<Returns:> Quadratic — the conjugate.
 
 B<Example:>
 
     var e = Quadratic(3, 4, 1, 1)
-    say e.conj      #=> Quadratic(7, -4, 1, 1)   # a + b*q = 3 + 4*1 = 7
-
-    say e * e.conj  # = norm(e) as a scalar element
+    say e.conj        #=> Quadratic(7, -4, 1, 1)
+    say (e * e.conj)  #=> Quadratic(5, 0, 1, 1)
 
 =cut
 
@@ -674,18 +661,17 @@ B<Example:>
 
 Computes the norm of the element.
 
-For C<a + b*t>, the norm is C<a^2 + a*b*q - b^2*p>. This equals the product
-of the element with its conjugate and is always a plain number (the C<b>
-component of the result is zero).
+For C<a + b*t>, the norm is C<a^2 + a*b*q - b^2*p>.
+
+This equals the product of the element with its conjugate and is always a plain number (the C<b> component of the result is zero).
 
 B<Returns:> Number — the norm.
 
 B<Example:>
 
     var e = Quadratic(3, 4, 1, 1)
-    say e.norm      # 3^2 + 3*4*1 - 4^2*1 = 9 + 12 - 16 = 5
-
-    say e.norm == (e * e.conj).a    #=> true
+    say e.norm      # 3^2 + 3*4*1 - 4^2*1 = 5
+    say (e.norm == (e * e.conj).a)    #=> true
 
 =cut
 
@@ -696,7 +682,8 @@ B<Example:>
 Computes the trace of the element: C<2*a + b*q>.
 
 The trace is the sum of the element and its conjugate:
-C<trace(a + b*t) = (a + b*t) + conj(a + b*t) = 2*a + b*q>.
+
+    trace(a + b*t) = (a + b*t) + conj(a + b*t) = 2*a + b*q
 
 B<Returns:> Number — the trace.
 
@@ -714,7 +701,8 @@ B<Example:>
 Computes the multiplicative inverse of the element.
 
 For C<a + b*t> with norm C<N = a^2 + a*b*q - b^2*p>:
-C<inv(x) = conj(x) / N>.
+
+    inv(x) = conj(x) / N
 
 B<Returns:> Quadratic — the multiplicative inverse.
 
@@ -881,6 +869,7 @@ B<Example:>
     x.is_prime
 
 Returns true if the norm of the element (in absolute value) is a prime integer.
+
 This is a sufficient but not necessary condition for the element to be
 irreducible in the ring.
 
@@ -897,8 +886,7 @@ B<Example:>
 
     self.gcd(other)
 
-Computes the greatest common divisor of two elements using the Euclidean
-algorithm in the ring (via repeated C<divmod>).
+Computes the greatest common divisor of two elements using the Euclidean algorithm in the ring (via repeated C<divmod>).
 
 B<Parameters:>
 
@@ -922,8 +910,11 @@ B<Example:>
 
     self.lcm(other)
 
-Computes the least common multiple of two elements as
-C<self * other / gcd(self, other)>. Returns zero if either argument is zero.
+Computes the least common multiple of two elements as:
+
+     self * other / gcd(self, other)
+
+Returns zero if either argument is zero.
 
 B<Parameters:>
 
@@ -947,8 +938,7 @@ B<Example:>
 
     a <=> b
 
-Three-way (spaceship) comparison. Compares lexicographically first by C<a>,
-then C<b>, then C<p>, then C<q>.
+Three-way (spaceship) comparison. Compares lexicographically first by C<a>, then C<b>, then C<p>, then C<q>.
 
 B<Returns:> Number — C<-1>, C<0>, or C<1>.
 
@@ -960,9 +950,9 @@ Aliases: I<cmp>
 
     a == b
 
-Equality test. Two Quadratic values are equal if all four components
-C<(a, b, p, q)> are equal. A Quadratic equals a plain number if C<b = 0>
-and C<a> equals that number.
+Equality test. Two Quadratic values are equal if all four components C<(a, b, p, q)> are equal.
+
+A Quadratic equals a plain number if C<b = 0> and C<a> equals that number.
 
 B<Returns:> Bool
 
@@ -1041,8 +1031,9 @@ Aliases: I<E<gt>=>, I<ge>
 
 Bitwise AND applied component-wise to C<a> and C<b>.
 
-For two elements in the same ring, applies AND to each pair of matching
-components. For a scalar, applies AND to the C<a> component only.
+For two elements in the same ring, applies AND to each pair of matching components.
+
+For a scalar, applies AND to the C<a> component only.
 
 B<Returns:> Quadratic
 
@@ -1078,8 +1069,9 @@ Aliases: I<xor>
 
     self.to_n
 
-Converts the element to a regular Number (or Complex) by evaluating
-C<a + b*t> at the principal root C<t = (q + sqrt(q^2 + 4*p)) / 2>.
+Converts the element to a regular Number (or Complex) by evaluating C<a + b*t> at the principal root:
+
+     t = (q + sqrt(q^2 + 4*p)) / 2
 
 When the discriminant C<q^2 + 4*p> is negative, the result is complex.
 
@@ -1104,8 +1096,8 @@ B<Returns:> String
 
 B<Example:>
 
-    say Quadratic(3, 4, 1, 1).to_s
-    #=> "Quadratic(3, 4, 1, 1)"
+    var e = Quadratic(3, 4, 1, 1)
+    say e.to_s   #=> "Quadratic(3, 4, 1, 1)"
 
 Aliases: I<dump>
 
@@ -1152,15 +1144,15 @@ C<t' = q - t>. For C<e = a + b*t>:
 
 =back
 
-The norm and trace are always plain numbers (the C<t> part cancels), which
-is why they play a central role in divisibility and primality tests.
+The norm and trace are always plain numbers (the C<t> part cancels), which is why they play a central role in divisibility and primality tests.
 
 =head2 Connection to Linear Recurrences
 
 If C<U(n)> is the second-order linear recurrence defined by
-C<U(n) = q*U(n-1) + p*U(n-2)> with C<U(0)=0, U(1)=1>, then the element
-C<t^n> has components C<(p*U(n-1), U(n))>. This means fast exponentiation
-of Quadratic gives Lucas U/V sequences in C<O(log n)> multiplications.
+
+    U(n) = q*U(n-1) + p*U(n-2) with U(0)=0, U(1)=1
+
+then the element C<t^n> has components C<(p*U(n-1), U(n))>. This means fast exponentiation of Quadratic gives Lucas U/V sequences in C<O(log n)> multiplications.
 
 =head1 EXAMPLES
 
