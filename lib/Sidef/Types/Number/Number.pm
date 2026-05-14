@@ -70,11 +70,13 @@ package Sidef::Types::Number::Number {
         # ULONG_MAX => 4294967295,
         # LONG_MIN  => -2147483647,
 
+        FAST_MODE => 1,    # true to use fast paths for native integers
+
         HAS_PRIME_UTIL => eval {
             require Math::Prime::Util;
             $Math::Prime::Util::VERSION >= 0.74
               and Math::Prime::Util::prime_get_config()->{'xs'};
-        } // 0,    # version >= 0.74 + XS required
+        } // 0,            # version >= 0.74 + XS required
     };
 
     use constant {
@@ -3229,7 +3231,7 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $m = $$m;
 
-        if (!ref($m) and $m > 0 and !ref($x) and !ref($y)) {
+        if (FAST_MODE and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::addmod($x, $y, $m)
@@ -3261,7 +3263,7 @@ package Sidef::Types::Number::Number {
         $z = $$z;
         $m = $$m;
 
-        if (!ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
+        if (FAST_MODE and !ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::addmod($x, Math::Prime::Util::mulmod($y, $z, $m), $m)
@@ -3292,7 +3294,7 @@ package Sidef::Types::Number::Number {
         $z = $$z;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
+        if (FAST_MODE and HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
             my $r = Math::Prime::Util::submod($x, Math::Prime::Util::mulmod($y, $z, $m), $m);
             return bless \$r;
         }
@@ -3319,7 +3321,7 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
+        if (FAST_MODE and HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
             my $r = Math::Prime::Util::submod($x, $y, $m);
             return bless \$r;
         }
@@ -3345,7 +3347,7 @@ package Sidef::Types::Number::Number {
         $y = $$y;
         $m = $$m;
 
-        if (!ref($m) and $m > 0 and !ref($x) and !ref($y)) {
+        if (FAST_MODE and !ref($m) and $m > 0 and !ref($x) and !ref($y)) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::mulmod($x, $y, $m)
@@ -3375,7 +3377,7 @@ package Sidef::Types::Number::Number {
         $z = $$z;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
+        if (FAST_MODE and HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
             my $r = Math::Prime::Util::muladdmod($x, $y, $z, $m);
             return bless \$r;
         }
@@ -3403,7 +3405,7 @@ package Sidef::Types::Number::Number {
         $z = $$z;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
+        if (FAST_MODE and HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($x) and !ref($y) and !ref($z)) {
             my $r = Math::Prime::Util::mulsubmod($x, $y, $z, $m);
             return bless \$r;
         }
@@ -3433,7 +3435,7 @@ package Sidef::Types::Number::Number {
         $z = $$z;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($w) and !ref($x) and !ref($y) and !ref($z)) {
+        if (FAST_MODE and HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($w) and !ref($x) and !ref($y) and !ref($z)) {
             my $r = Math::Prime::Util::muladdmod($w, $x, Math::Prime::Util::mulmod($y, $z, $m), $m);
             return bless \$r;
         }
@@ -3464,7 +3466,7 @@ package Sidef::Types::Number::Number {
         $z = $$z;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($w) and !ref($x) and !ref($y) and !ref($z)) {
+        if (FAST_MODE and HAS_PRIME_UTIL and !ref($m) and $m > 0 and !ref($w) and !ref($x) and !ref($y) and !ref($z)) {
             my $r = Math::Prime::Util::mulsubmod($w, $x, Math::Prime::Util::mulmod($y, $z, $m), $m);
             return bless \$r;
         }
@@ -3496,7 +3498,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y)) {
+        if (FAST_MODE and !ref($x) and !ref($y)) {
             return bless \__add__($x, $y);
         }
 
@@ -3518,7 +3520,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y)) {
+        if (FAST_MODE and !ref($x) and !ref($y)) {
             return bless \__sub__($x, $y);
         }
 
@@ -3540,7 +3542,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y)) {
+        if (FAST_MODE and !ref($x) and !ref($y)) {
             return bless \__mul__($x, $y);
         }
 
@@ -3562,7 +3564,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y)) {
+        if (FAST_MODE and !ref($x) and !ref($y)) {
             return bless \__mod__($x, $y);
         }
 
@@ -3595,7 +3597,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y) and $x >= 0 and $y > 0) {
+        if (FAST_MODE and !ref($x) and !ref($y) and $x >= 0 and $y > 0) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::divint($x, $y)
@@ -3605,7 +3607,7 @@ package Sidef::Types::Number::Number {
 
         $x = _any2mpz($x, 0) // (goto &nan);
 
-        if (!ref($y) and $y > 0) {
+        if (FAST_MODE and !ref($y) and $y > 0) {
             state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_div_ui($r, $x, $y);
             my $r2 =
@@ -3654,7 +3656,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y) and $x >= 0 and $y > 0) {
+        if (FAST_MODE and !ref($x) and !ref($y) and $x >= 0 and $y > 0) {
             my ($q, $r) =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::divrem($x, $y)
@@ -3665,7 +3667,7 @@ package Sidef::Types::Number::Number {
 
         $x = _any2mpz($x, 0) // (goto &nan);
 
-        if (!ref($y) and $y > 0) {
+        if (FAST_MODE and !ref($y) and $y > 0) {
             state $r = Math::GMPz::Rmpz_init_nobless();
             Math::GMPz::Rmpz_cdiv_q_ui($r, $x, $y);
             my $r2 =
@@ -4057,7 +4059,7 @@ package Sidef::Types::Number::Number {
 
         $y = _any2si($y) // (goto &nan) if ref($y);
 
-        if ($y >= 1 and !ref($x) and $x >= 0) {
+        if (FAST_MODE and $y >= 1 and !ref($x) and $x >= 0) {
             if ($y == 1) {
                 return bless \$x;
             }
@@ -4088,7 +4090,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x) and $x >= 0) {
+        if (FAST_MODE and !ref($x) and $x >= 0) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::sqrtint($x)
@@ -4115,7 +4117,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x) and $x >= 0) {
+        if (FAST_MODE and !ref($x) and $x >= 0) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::rootint($x, 3)
@@ -4464,7 +4466,7 @@ package Sidef::Types::Number::Number {
 
         $y = _any2si($y) // (goto &nan) if ref($y);
 
-        if ($y >= 0 and !ref($x) and $x >= 0) {
+        if (FAST_MODE and $y >= 0 and !ref($x) and $x >= 0) {
 
             if ($x > 0 and CORE::log($x) * $y < CORE::log(ULONG_MAX)) {
                 my $r =
@@ -4483,7 +4485,7 @@ package Sidef::Types::Number::Number {
             return bless \$r2;
         }
 
-        if (!ref($x) and $x == -1) {
+        if (FAST_MODE and !ref($x) and $x == -1) {
             return (($y % 2 == 0) ? ONE : MONE);
         }
 
@@ -4698,7 +4700,7 @@ package Sidef::Types::Number::Number {
           ) >= 0
           or return 0;
 
-        if (!ref($y) and Math::GMPz::Rmpz_fits_ulong_p($x)) {
+        if (FAST_MODE and !ref($y) and Math::GMPz::Rmpz_fits_ulong_p($x)) {
             return (
                     HAS_PRIME_UTIL
                     ? Math::Prime::Util::logint(Math::GMPz::Rmpz_get_ui($x), $y)
@@ -4759,7 +4761,7 @@ package Sidef::Types::Number::Number {
             $x = $$x;
             $y = $$y;
 
-            if (!ref($x) and !ref($y) and $x > 0 and $y > 1) {
+            if (FAST_MODE and !ref($x) and !ref($y) and $x > 0 and $y > 1) {
 
                 if ($y > $x) {
                     return ZERO;
@@ -4786,7 +4788,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x) and $x > 0) {
+        if (FAST_MODE and !ref($x) and $x > 0) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::logint($x, 2)
@@ -4802,7 +4804,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x) and $x > 0) {
+        if (FAST_MODE and !ref($x) and $x > 0) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::logint($x, 10)
@@ -7712,7 +7714,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             return (($x % 2 == 0) ? ($TRUE) : ($FALSE));
         }
 
@@ -7724,7 +7726,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             return (($x % 2 == 1) ? ($TRUE) : ($FALSE));
         }
 
@@ -7739,7 +7741,7 @@ package Sidef::Types::Number::Number {
         $k = $$k;
         $m = $$m;
 
-        if (!ref($n) and !ref($k) and !ref($m)) {
+        if (FAST_MODE and !ref($n) and !ref($k) and !ref($m)) {
             $m || return $FALSE;
             return ((($k % $m) == ($n % $m)) ? ($TRUE) : ($FALSE));
         }
@@ -7759,14 +7761,14 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y)) {
+        if (FAST_MODE and !ref($x) and !ref($y)) {
             $y == 0 and return $FALSE;
             return (($x % $y == 0) ? ($TRUE) : ($FALSE));
         }
 
         if (ref($x) eq 'Math::GMPz') {
 
-            if (!ref($y)) {
+            if (FAST_MODE and !ref($y)) {
                 $y == 0 and return $FALSE;
                 return (Math::GMPz::Rmpz_divisible_ui_p($x, CORE::abs($y)) ? ($TRUE) : ($FALSE));
             }
@@ -7789,7 +7791,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             $x == 0 and return $FALSE;
             if (!ref($y)) {
                 return (($y % $x == 0) ? ($TRUE) : ($FALSE));
@@ -7889,7 +7891,7 @@ package Sidef::Types::Number::Number {
         my ($native_sum, $new_sum, $sum) = (0, 0, undef);
 
         foreach my $n (@numbers) {
-            if (!ref($n)) {
+            if (FAST_MODE and !ref($n)) {
                 $new_sum = $native_sum + $n;
 
                 if ($new_sum < ULONG_MAX and $new_sum > LONG_MIN) {
@@ -8752,7 +8754,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             return Sidef::Types::String::String->new((($x < 0) ? '-' : '') . CORE::sprintf('%b', CORE::abs($x)));
         }
 
@@ -8764,7 +8766,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             return Sidef::Types::String::String->new((($x < 0) ? '-' : '') . CORE::sprintf('%o', CORE::abs($x)));
         }
 
@@ -8776,7 +8778,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             return Sidef::Types::String::String->new((($x < 0) ? '-' : '') . CORE::sprintf('%x', CORE::abs($x)));
         }
 
@@ -8788,7 +8790,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             return _array([map { $_ ? ONE : ZERO } split(//, CORE::sprintf('%b', CORE::abs($x)))]);
         }
 
@@ -8906,7 +8908,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!defined($k) and !ref($n)) {
+        if (FAST_MODE and !defined($k) and !ref($n)) {
             $n == 0 and return _array([ZERO]);
             my @digits = CORE::reverse(
                                        HAS_PRIME_UTIL
@@ -8921,7 +8923,7 @@ package Sidef::Types::Number::Number {
 
             $k = $$k;
 
-            if (!ref($k) and !ref($n)) {
+            if (FAST_MODE and !ref($k) and !ref($n)) {
 
                 $n = CORE::abs($n);
 
@@ -9126,7 +9128,7 @@ package Sidef::Types::Number::Number {
 
         if ($all_native) {
             foreach my $digit (@digits) {
-                if (!ref($digit) and $digit >= 0 and $digit < $base) {
+                if (FAST_MODE and !ref($digit) and $digit >= 0 and $digit < $base) {
                     ## ok
                 }
                 else {
@@ -9269,7 +9271,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!defined($k) and !ref($n)) {
+        if (FAST_MODE and !defined($k) and !ref($n)) {
             $n == 0 and return ZERO;
             return
               bless \(
@@ -9286,7 +9288,7 @@ package Sidef::Types::Number::Number {
 
             $k = $$k;
 
-            if (!ref($k) and !ref($n)) {
+            if (FAST_MODE and !ref($k) and !ref($n)) {
 
                 $n = CORE::abs($n);
 
@@ -9479,7 +9481,7 @@ package Sidef::Types::Number::Number {
         # Formula for prime p:
         #   (n - sumdigits(n,p)) / (p-1)
 
-        if (!ref($n) and !ref($p) and $p < 2147483647 and $n > 0 and $p > 1) {
+        if (FAST_MODE and !ref($n) and !ref($p) and $p < 2147483647 and $n > 0 and $p > 1) {
 
             my $sum =
               HAS_PRIME_UTIL
@@ -9505,7 +9507,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!defined($y) and !ref($x)) {
+        if (FAST_MODE and !defined($y) and !ref($x)) {
             my $len = CORE::length($x) - (($x < 0) ? 1 : 0);
             return bless \$len;
         }
@@ -10932,7 +10934,7 @@ package Sidef::Types::Number::Number {
         $k = $$k;
         $m = $$m;
 
-        if (!ref($m) and !ref($n) and !ref($k) and $m > 0) {
+        if (FAST_MODE and !ref($m) and !ref($n) and !ref($k) and $m > 0) {
             my $r = (
                      HAS_PRIME_UTIL
                      ? Math::Prime::Util::powmod($n, $k, $m)
@@ -11340,7 +11342,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($y) and !ref($x) and $x != 0) {
+        if (FAST_MODE and !ref($y) and !ref($x) and $x != 0) {
             my $r = (
                      HAS_PRIME_UTIL
                      ? Math::Prime::Util::invmod($x, $y)
@@ -11372,7 +11374,7 @@ package Sidef::Types::Number::Number {
             $y = $$y;
             $m = $$m;
 
-            if (!ref($m) and $m > 0 and !ref($y) and $y > 1 and !ref($x)) {
+            if (FAST_MODE and !ref($m) and $m > 0 and !ref($y) and $y > 1 and !ref($x)) {
                 my $r =
                   HAS_PRIME_UTIL
                   ? Math::Prime::Util::divmod($x, $y, $m)
@@ -11404,7 +11406,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($y) and $y > 0 and !ref($x)) {
+        if (FAST_MODE and !ref($y) and $y > 0 and !ref($x)) {
             my ($q, $r) = (
                            HAS_PRIME_UTIL
                            ? Math::Prime::Util::divrem($x, $y)
@@ -11436,7 +11438,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if ((!ref($x) && $x >= 0) and (!ref($y) && $y >= 0)) {
+        if (FAST_MODE and (!ref($x) && $x >= 0) and (!ref($y) && $y >= 0)) {
             my $r = $x & $y;
             return bless \$r;
         }
@@ -11461,7 +11463,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if ((!ref($x) && $x >= 0) and (!ref($y) && $y >= 0)) {
+        if (FAST_MODE and (!ref($x) && $x >= 0) and (!ref($y) && $y >= 0)) {
             my $r = $x | $y;
             return bless \$r;
         }
@@ -11486,7 +11488,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if ((!ref($x) && $x >= 0) and (!ref($y) && $y >= 0)) {
+        if (FAST_MODE and (!ref($x) && $x >= 0) and (!ref($y) && $y >= 0)) {
             my $r = $x ^ $y;
             return bless \$r;
         }
@@ -12218,7 +12220,10 @@ package Sidef::Types::Number::Number {
         if (    (ref($P) ? (Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($P) < $LUCAS_PQ_LIMIT))
             and (ref($Q) ? (Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($Q) < $LUCAS_PQ_LIMIT))) {
             my ($U, $V);
-            if (HAS_PRIME_UTIL and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m)) and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
+            if (    FAST_MODE
+                and HAS_PRIME_UTIL
+                and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m))
+                and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
                 eval {
                     ($U, $V) =
                       Math::Prime::Util::lucas_sequence(
@@ -12266,7 +12271,10 @@ package Sidef::Types::Number::Number {
         if (    (ref($P) ? (Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($P) < $LUCAS_PQ_LIMIT))
             and (ref($Q) ? (Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($Q) < $LUCAS_PQ_LIMIT))) {
             my ($U, $V);
-            if (HAS_PRIME_UTIL and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m)) and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
+            if (    FAST_MODE
+                and HAS_PRIME_UTIL
+                and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m))
+                and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
                 if (HAS_PRIME_UTIL) {
                     eval {
                         $U =
@@ -12327,7 +12335,10 @@ package Sidef::Types::Number::Number {
         if (    (ref($P) ? (Math::GMPz::Rmpz_cmpabs_ui($P, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($P) < $LUCAS_PQ_LIMIT))
             and (ref($Q) ? (Math::GMPz::Rmpz_cmpabs_ui($Q, $LUCAS_PQ_LIMIT) < 0) : (CORE::abs($Q) < $LUCAS_PQ_LIMIT))) {
             my ($U, $V);
-            if (HAS_PRIME_UTIL and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m)) and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
+            if (    FAST_MODE
+                and HAS_PRIME_UTIL
+                and (!ref($m) or Math::GMPz::Rmpz_fits_ulong_p($m))
+                and (!ref($n) or Math::GMPz::Rmpz_fits_ulong_p($n))) {
                 if (HAS_PRIME_UTIL) {
                     eval {
                         $V =
@@ -13785,7 +13796,7 @@ package Sidef::Types::Number::Number {
 
         $y = _any2si($y) // (goto &nan) if ref($y);
 
-        if (!ref($x) and $x <= 1e6 and $x >= 0 and $y >= 0) {
+        if (FAST_MODE and !ref($x) and $x <= 1e6 and $x >= 0 and $y >= 0) {
 
             if (HAS_PRIME_UTIL and $x <= ((INTSIZE == 32) ? 33 : 66)) {
                 my $r = Math::Prime::Util::binomial($x, $y);
@@ -14353,7 +14364,7 @@ package Sidef::Types::Number::Number {
         $k = $$k;
         $m = $$m;
 
-        if (HAS_PRIME_UTIL and !ref($n) and !ref($k) and !ref($m) and CORE::abs($m) <= 1e7) {
+        if (FAST_MODE and HAS_PRIME_UTIL and !ref($n) and !ref($k) and !ref($m) and CORE::abs($m) <= 1e7) {
             $m || goto &nan;
             my $r = Math::Prime::Util::GMP::modint(Math::Prime::Util::binomialmod($n, $k, $m), $m);
             return bless \$r;
@@ -14414,7 +14425,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         my $m =
-          (HAS_PRIME_UTIL and !ref($n) and $n >= 0)
+          (FAST_MODE and HAS_PRIME_UTIL and !ref($n) and $n >= 0)
           ? Math::Prime::Util::moebius($n)
           : Math::Prime::Util::GMP::moebius(_big2uistr($n) // goto &nan);
 
@@ -18560,7 +18571,7 @@ package Sidef::Types::Number::Number {
 
         my $s;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             if (!ref($y)) {
                 $s = (HAS_PRIME_UTIL ? Math::Prime::Util::kronecker($x, $y) : Math::Prime::Util::GMP::kronecker($x, $y));
             }
@@ -18571,7 +18582,7 @@ package Sidef::Types::Number::Number {
                 $s = Math::GMPz::Rmpz_si_kronecker($x, _any2mpz($y, 0) // (goto &nan));
             }
         }
-        elsif (!ref($y)) {
+        elsif (FAST_MODE and !ref($y)) {
             if ($y >= 0) {
                 $s = Math::GMPz::Rmpz_kronecker_ui(_any2mpz($x, 0) // (goto &nan), $y);
             }
@@ -19309,7 +19320,7 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             $x > 1 or return $FALSE;
 
             my $res;
@@ -19350,7 +19361,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             my $r = (!ref($y)) ? ((HAS_PRIME_UTIL ? Math::Prime::Util::gcd($x, $y) : Math::Prime::Util::GMP::gcd($x, $y)) == 1) : do {
                 $y = _sanitize_mpz($y, 0) // return $FALSE;
                 Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $y, CORE::abs($x)) == 1;
@@ -19407,14 +19418,14 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x)) {
+        if (FAST_MODE and !ref($x)) {
             if (!ref($y)) {
                 return bless(\(my $g = (HAS_PRIME_UTIL ? Math::Prime::Util::gcd($x, $y) : Math::Prime::Util::GMP::gcd($x, $y))));
             }
             $y = _sanitize_mpz($y, 0) // goto &nan;
             return bless(\(my $g = Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $y, CORE::abs($x))));
         }
-        elsif (!ref($y)) {
+        elsif (FAST_MODE and !ref($y)) {
             $x = _sanitize_mpz($x, 0) // goto &nan;
             return bless(\(my $g = Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $x, CORE::abs($y))));
         }
@@ -19518,7 +19529,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y) and CORE::abs($x) * CORE::abs($y) < ULONG_MAX) {
+        if (FAST_MODE and !ref($x) and !ref($y) and CORE::abs($x) * CORE::abs($y) < ULONG_MAX) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::lcm($x, $y)
@@ -19560,7 +19571,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y)) {
+        if (FAST_MODE and !ref($x) and !ref($y)) {
             $y = CORE::abs($y) if ($y < 0);
             $y <= 1 and return ZERO;
             my $r =
@@ -19591,7 +19602,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($x) and !ref($y)) {
+        if (FAST_MODE and !ref($x) and !ref($y)) {
 
             CORE::abs($y) <= 1 and return bless \$x;
 
@@ -19836,9 +19847,15 @@ package Sidef::Types::Number::Number {
 
         $x = $$x;
 
-        if (!ref($x)) {
-            my $r =
-              ($x >= 4 and (HAS_PRIME_UTIL ? Math::Prime::Util::is_semiprime($x) : Math::Prime::Util::GMP::is_semiprime($x)));
+        if (FAST_MODE and !ref($x)) {
+            my $r = (
+                     $x >= 4
+                       and (
+                            HAS_PRIME_UTIL
+                            ? Math::Prime::Util::is_semiprime($x)
+                            : Math::Prime::Util::GMP::is_semiprime($x)
+                           )
+                    );
             return ($r ? $TRUE : $FALSE);
         }
 
@@ -20187,7 +20204,7 @@ package Sidef::Types::Number::Number {
     sub _primality_pretest {
         my ($n) = @_;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             $n > 1 or return;
 
             if ($n % 2 == 0) {
@@ -20210,8 +20227,8 @@ package Sidef::Types::Number::Number {
 
         $n = _sanitize_mpz($n, 0) // return;
 
-        # Must be positive (first check -- don't change the order)
-        (Math::GMPz::Rmpz_sgn($n) > 0) || return;
+        # Must be greater than 1 (first check)
+        (Math::GMPz::Rmpz_cmp_ui($n, 1) > 0) || return;
 
         # Check for divisibility by 2
         if (Math::GMPz::Rmpz_even_p($n)) {
@@ -20323,8 +20340,7 @@ package Sidef::Types::Number::Number {
         _valid(\(@vals));
 
         foreach my $n (@vals) {
-            _primality_pretest($$n)
-              || return $FALSE;
+            _primality_pretest($$n) || return $FALSE;
         }
 
         my @strs;
@@ -20376,7 +20392,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -20414,7 +20430,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($n)) {
+        if (FAST_MODE and HAS_NEW_PRIME_UTIL and !ref($n)) {
             return (Math::Prime::Util::is_safe_prime($n) ? $TRUE : $FALSE);
         }
 
@@ -20427,8 +20443,7 @@ package Sidef::Types::Number::Number {
         Math::GMPz::Rmpz_sub_ui($t, $n, 1);
         Math::GMPz::Rmpz_div_2exp($t, $t, 1);
 
-        _primality_pretest($t)
-          || return $FALSE;
+        _primality_pretest($t) || return $FALSE;
 
         (   Math::Prime::Util::GMP::is_strong_pseudoprime($t, 2)
          && Math::Prime::Util::GMP::is_strong_pseudoprime($n, 2)
@@ -20784,7 +20799,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -20812,7 +20827,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -20853,7 +20868,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n <= 3
@@ -20902,7 +20917,7 @@ package Sidef::Types::Number::Number {
             @bases = (2);
         }
 
-        if (!ref($n) and HAS_PRIME_UTIL) {    # optimization
+        if (FAST_MODE and HAS_PRIME_UTIL and !ref($n)) {    # optimization
             foreach my $base (@bases) {
 
                 $base == 1 && next;
@@ -21174,7 +21189,7 @@ package Sidef::Types::Number::Number {
             @bases = (2);
         }
 
-        if (!ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
+        if (FAST_MODE and !ref($n) and scalar(@bases) == 1 and $bases[0] > 1 and $bases[0] < ULONG_MAX) {
             return (
                     (
                      $n > 1
@@ -21186,7 +21201,7 @@ package Sidef::Types::Number::Number {
                     ) ? $TRUE : $FALSE
                    );
         }
-        elsif (HAS_PRIME_UTIL and !ref($n) and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
+        elsif (FAST_MODE and HAS_PRIME_UTIL and !ref($n) and scalar(grep { $_ > 1 and $_ < ULONG_MAX } @bases) == scalar(@bases)) {
             return (($n > 1 and Math::Prime::Util::is_euler_pseudoprime($n, @bases)) ? $TRUE : $FALSE);
         }
 
@@ -21220,7 +21235,7 @@ package Sidef::Types::Number::Number {
             @bases = (2);
         }
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
 
             $n < 1 and return $FALSE;
 
@@ -21742,7 +21757,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -21769,7 +21784,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -21796,7 +21811,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -21824,7 +21839,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -21849,7 +21864,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -21877,7 +21892,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -21920,7 +21935,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -21948,7 +21963,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -22198,7 +22213,7 @@ package Sidef::Types::Number::Number {
 
                 my @list;
 
-                if (HAS_PRIME_UTIL and !ref($to)) {
+                if (FAST_MODE and HAS_PRIME_UTIL and !ref($to)) {
                     Math::Prime::Util::forcomposites(sub { push @list, $_ }, $from, $to);
                     return \@list;
                 }
@@ -22691,7 +22706,7 @@ package Sidef::Types::Number::Number {
 
         my @list;
 
-        if (HAS_PRIME_UTIL and !ref($to)) {
+        if (FAST_MODE and HAS_PRIME_UTIL and !ref($to)) {
             Math::Prime::Util::forcomposites(
                 sub {
                     push(@list, bless(\(my $o = $_)));
@@ -23016,7 +23031,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             $n > 2 or goto &nan;
             return
               _set_int(
@@ -23037,7 +23052,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n) and $n >= 0) {
+        if (FAST_MODE and !ref($n) and $n >= 0) {
             return
               _set_int(
                        HAS_PRIME_UTIL
@@ -23060,7 +23075,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         # Optimization for native integers
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             $n <= 4 and goto &nan;
             $n = $n - 1;
             return (bless \$n) if (($n & 1) == 0);
@@ -23121,7 +23136,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         # Optimization for native integers
-        if (!ref($n) and $n >= 0 and $n < (ULONG_MAX >> 1)) {
+        if (FAST_MODE and !ref($n) and $n >= 0 and $n < (ULONG_MAX >> 1)) {
             ++$n;
             until (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($n) : Math::Prime::Util::GMP::is_prime_power($n)) {
                 ++$n;
@@ -23336,7 +23351,7 @@ package Sidef::Types::Number::Number {
         $x = $$x;
         $y = $$y;
 
-        if (!ref($y) and !ref($x)) {
+        if (FAST_MODE and !ref($y) and !ref($x)) {
             my $r = (
                      HAS_PRIME_UTIL
                      ? Math::Prime::Util::znorder($x, $y)
@@ -24041,7 +24056,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n) and $n < 0xffffffff) {
             $n >= 0 or goto &nan;
             return _set_int($n) if ($n <= 1);
             my @f = _factor($n);
@@ -26444,7 +26459,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         # Fast path: Unbounded, native integer
-        if (!ref($n) and !defined($k)) {
+        if (FAST_MODE and !ref($n) and !defined($k)) {
             $n > 0 or return _array();
             my @divs =
               HAS_PRIME_UTIL
@@ -27166,7 +27181,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::euler_phi($n)
@@ -28199,7 +28214,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n) and $n >= 0) {
+        if (FAST_MODE and !ref($n) and $n >= 0) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::carmichael_lambda($n)
@@ -28234,7 +28249,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n) and $n > 0) {
+        if (FAST_MODE and !ref($n) and $n > 0) {
             my $r =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::liouville($n)
@@ -29665,7 +29680,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and $k == 1 and !ref($n) and $n > 0 and $n < (ULONG_MAX >> 3)) {
+        if (FAST_MODE and HAS_PRIME_UTIL and $k == 1 and !ref($n) and $n > 0 and $n < (ULONG_MAX >> 3)) {
             return _set_int(Math::Prime::Util::divisor_sum($n));
         }
 
@@ -29676,10 +29691,10 @@ package Sidef::Types::Number::Number {
 
         $n = Math::GMPz::Rmpz_get_str($n, 10);
 
-        if (HAS_PRIME_UTIL and CORE::abs($k) == 1 and $n < (ULONG_MAX >> 3)) {
+        if (FAST_MODE and HAS_PRIME_UTIL and CORE::abs($k) == 1 and $n < (ULONG_MAX >> 3)) {
             $r = Math::Prime::Util::divisor_sum($n);
         }
-        elsif (CORE::length($n) < SPECIAL_FACTORS_MIN) {
+        elsif (FAST_MODE and CORE::length($n) < SPECIAL_FACTORS_MIN) {
             $r = Math::Prime::Util::GMP::sigma($n, CORE::abs($k));
         }
         else {
@@ -29826,7 +29841,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and !defined($k) and !ref($n) and $n < (ULONG_MAX >> 3)) {
+        if (FAST_MODE and HAS_NEW_PRIME_UTIL and !defined($k) and !ref($n) and $n < (ULONG_MAX >> 3)) {
             return _set_int(Math::Prime::Util::aliquot_sum($n));
         }
 
@@ -29838,7 +29853,7 @@ package Sidef::Types::Number::Number {
         }
 
         my $s =
-          (HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($n, ULONG_MAX >> 3) <= 0)
+          (FAST_MODE and HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($n, ULONG_MAX >> 3) <= 0)
           ? Math::Prime::Util::divisor_sum(Math::GMPz::Rmpz_get_ui($n))
           : ${_set_int($n)->sigma};
 
@@ -29887,7 +29902,7 @@ package Sidef::Types::Number::Number {
         $n->is_abundant || return $FALSE;
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             foreach my $pp (_factor_exp($n)) {
                 my $t =
                   HAS_PRIME_UTIL
@@ -29929,7 +29944,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($n) and $n >= 0) {
+        if (FAST_MODE and HAS_NEW_PRIME_UTIL and !ref($n) and $n >= 0) {
             my $r = Math::Prime::Util::sopf($n);
             return bless \$r;
         }
@@ -29949,7 +29964,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($n) and $n >= 0) {
+        if (FAST_MODE and HAS_NEW_PRIME_UTIL and !ref($n) and $n >= 0) {
             my $r = Math::Prime::Util::sopfr($n);
             return bless \$r;
         }
@@ -33281,7 +33296,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 0
@@ -33327,11 +33342,11 @@ package Sidef::Types::Number::Number {
         $k = _any2ui($$k) || return $FALSE;
         $n = $$n;
 
-        if (HAS_PRIME_UTIL and !ref($n)) {
+        if (FAST_MODE and HAS_PRIME_UTIL and !ref($n)) {
             return (($n > 0 and Math::Prime::Util::is_powerfree($n, $k)) ? $TRUE : $FALSE);
         }
 
-        if ($k == 2 and !ref($n)) {
+        if (FAST_MODE and $k == 2 and !ref($n)) {
             return (
                     (
                      $n > 0
@@ -33504,7 +33519,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
 
             $n <= 0 and return $FALSE;
 
@@ -33646,7 +33661,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         # Fast path for native integers
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     HAS_PRIME_UTIL
                     ? Math::Prime::Util::is_carmichael($n)
@@ -33740,7 +33755,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
 
         # Fast path for native integers
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             (
              HAS_PRIME_UTIL
              ? (Math::Prime::Util::is_carmichael($n) && Math::Prime::Util::is_euler_pseudoprime($n, 2))
@@ -33879,7 +33894,7 @@ package Sidef::Types::Number::Number {
         # ---------------------------------------------------------
         # Fast path for native integers
         # ---------------------------------------------------------
-        if (!ref($n) and $n < ULONG_MAX) {
+        if (FAST_MODE and !ref($n) and $n < ULONG_MAX) {
 
             return $FALSE unless $n >= 399 && $n % 2 != 0;
 
@@ -34245,7 +34260,7 @@ package Sidef::Types::Number::Number {
             my ($n, $x) = @_;
 
             # Optimization for native n
-            if (!ref($n) or Math::GMPz::Rmpz_fits_slong_p($n)) {
+            if (FAST_MODE and (!ref($n) or Math::GMPz::Rmpz_fits_slong_p($n))) {
 
                 $n = Math::GMPz::Rmpz_get_ui($n) if ref($n);
 
@@ -34578,7 +34593,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
 
             if (defined($k)) {
                 _valid(\$k);
@@ -34648,7 +34663,7 @@ package Sidef::Types::Number::Number {
     sub is_square {
         my ($n, $k) = @_;
 
-        if (!ref($$n)) {
+        if (FAST_MODE and !ref($$n)) {
             $n = $$n;
             $n < 0 and return $FALSE;
             my $r = (
@@ -34983,7 +34998,7 @@ package Sidef::Types::Number::Number {
             $k = 2;
         }
 
-        if (!ref($n) and $n < (ULONG_MAX >> 5)) {
+        if (FAST_MODE and !ref($n) and $n < (ULONG_MAX >> 5)) {
             $n > 0 or return $FALSE;
 
             if (HAS_PRIME_UTIL) {
@@ -35127,7 +35142,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (!ref($n)) {
+        if (FAST_MODE and !ref($n)) {
             return (
                     (
                      $n > 1
@@ -35290,7 +35305,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
         $k = $$k;
 
-        if (!ref($n) and !ref($k) and $k >= 3) {
+        if (FAST_MODE and !ref($n) and !ref($k) and $k >= 3) {
             return (
                     (
                      HAS_PRIME_UTIL
@@ -35407,7 +35422,7 @@ package Sidef::Types::Number::Number {
         $n = $$n;
         $k = $$k;
 
-        if (!ref($n) and !ref($k)) {
+        if (FAST_MODE and !ref($n) and !ref($k)) {
             my $t = $n * ($n * $k - $k - 2 * $n + 4);
             if ($t < ULONG_MAX and $t > LONG_MIN) {
                 return
@@ -35857,7 +35872,7 @@ package Sidef::Types::Number::Number {
 
         $n = $$n;
 
-        if (HAS_NEW_PRIME_UTIL and !ref($n) and $n >= 0) {
+        if (FAST_MODE and HAS_NEW_PRIME_UTIL and !ref($n) and $n >= 0) {
 
             if (!defined($k)) {
                 return (Math::Prime::Util::is_palindrome($n) ? $TRUE : $FALSE);
@@ -36046,7 +36061,7 @@ package Sidef::Types::Number::Number {
             return bless \$x;
         }
 
-        if ($y >= 0 and !ref($x) and $x >= 0) {
+        if (FAST_MODE and $y >= 0 and !ref($x) and $x >= 0) {
 
             if ($x == 0) {
                 return bless \$x;
@@ -36081,7 +36096,7 @@ package Sidef::Types::Number::Number {
 
         $y = _any2si($y) // (goto &nan) if ref($y);
 
-        if ($y >= 0 and !ref($x) and $x >= 0) {
+        if (FAST_MODE and $y >= 0 and !ref($x) and $x >= 0) {
 
             if ($y >= $x) {
                 return ZERO;
