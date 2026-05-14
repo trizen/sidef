@@ -32037,7 +32037,7 @@ package Sidef::Types::Number::Number {
     sub prime_signature_numbers {
         my ($from, $to, $signature) = @_;
 
-        ref($signature) eq 'Sidef::Types::Array::Array'
+        Scalar::Util::reftype($signature) eq 'ARRAY'
           or die "usage: prime_signature_numbers(A, B, [...])";
 
         my @sig = map { my $v = "$_"; $v <= 0 and die "invalid prime signature (entry: $v)"; $v } @$signature;
@@ -32061,31 +32061,10 @@ package Sidef::Types::Number::Number {
 
     *prime_signature_inverse = \&prime_signature_numbers;
 
-    sub tau_inverse {
-        my ($from, $to, $n) = @_;
-
-        _valid(\$to, \$n);
-
-        my @signatures = map {
-            [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
-        } @{$n->multiplicative_partitions};
-
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
-
-        my @list;
-        foreach my $sig (@signatures) {
-            push @list, @{_sieve_prime_sig_numbers($from, $to, $sig)};
-        }
-
-        @list = map { bless \$_ } sort { $a <=> $b } @list;
-        _array(\@list);
-    }
-
     sub prime_signature_count {
         my ($from, $to, $signature) = @_;
 
-        ref($signature) eq 'Sidef::Types::Array::Array'
+        Scalar::Util::reftype($signature) eq 'ARRAY'
           or die "usage: prime_signature_count(A, B, [...])";
 
         my @sig = map { my $v = "$_"; $v <= 0 and die "invalid prime signature (entry: $v)"; $v } @$signature;
@@ -32219,6 +32198,50 @@ package Sidef::Types::Number::Number {
     }
 
     *prime_signature_inverse_len = \&prime_signature_count;
+
+    sub tau_inverse {
+        my ($from, $to, $n) = @_;
+
+        _valid(\$to, \$n);
+
+        my @signatures = map {
+            [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
+        } @{$n->multiplicative_partitions};
+
+        $from = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$to,   1) // return _array();
+
+        my @list;
+        foreach my $sig (@signatures) {
+            push @list, @{_sieve_prime_sig_numbers($from, $to, $sig)};
+        }
+
+        @list = map { bless \$_ } sort { $a <=> $b } @list;
+        _array(\@list);
+    }
+
+    sub tau_inverse_len {
+        my ($from, $to, $n) = @_;
+
+        _valid(\$to, \$n);
+
+        my @signatures = map {
+            [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
+        } @{$n->multiplicative_partitions};
+
+        $from = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$to,   1) // return _array();
+
+        my $from_obj = bless \$from;
+        my $to_obj   = bless \$to;
+
+        my @list;
+        foreach my $sig (@signatures) {
+            push @list, Sidef::Types::Number::Number::prime_signature_count($from_obj, $to_obj, $sig);
+        }
+
+        Sidef::Types::Number::Number::sum(@list);
+    }
 
     sub semiprimes {
         (TWO)->almost_primes(@_);
