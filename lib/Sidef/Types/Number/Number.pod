@@ -9721,6 +9721,15 @@ Hyperbolic tangent function.
 
 =cut
 
+=head2 tau_inverse
+
+    tau_inverse(A, B, n)
+
+Generate the numbers C<k> in the range C<[A, B]> such that C<tau(k) = n>, where C<tau(k)> is the number of positive divisors of C<k> (i.e.: C<sigma_0(k)>).
+
+    say tau_inverse(1, 100, 6)          # numbers with exactly 6 divisors in range [1, 100]
+    say tau_inverse(1, 2**40, 5040)     # numbers with exactly 5040 divisors in range [1, 2^40]
+
 =head2 times
 
     n.times {|k| ... }

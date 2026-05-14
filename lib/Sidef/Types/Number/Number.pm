@@ -32031,8 +32031,6 @@ package Sidef::Types::Number::Number {
             }
         );
 
-        @results = sort { $a <=> $b } @results;
-
         return \@results;
     }
 
@@ -32057,16 +32055,32 @@ package Sidef::Types::Number::Number {
             $to = $ZERO;
         }
 
-#<<<
-        my @numbers = map {
-            (ref($_) or $_ < ULONG_MAX) ? (bless \$_) : _set_int($_)
-        } @{_sieve_prime_sig_numbers($from, $to, \@sig)};
-#>>>
-
+        my @numbers = map { bless \$_ } sort { $a <=> $b } @{_sieve_prime_sig_numbers($from, $to, \@sig)};
         _array(\@numbers);
     }
 
     *prime_signature_inverse = \&prime_signature_numbers;
+
+    sub tau_inverse {
+        my ($from, $to, $n) = @_;
+
+        _valid(\$to, \$n);
+
+        my @signatures = map {
+            [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
+        } @{$n->multiplicative_partitions};
+
+        $from = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$to,   1) // return _array();
+
+        my @list;
+        foreach my $sig (@signatures) {
+            push @list, @{_sieve_prime_sig_numbers($from, $to, $sig)};
+        }
+
+        @list = map { bless \$_ } sort { $a <=> $b } @list;
+        _array(\@list);
+    }
 
     sub prime_signature_count {
         my ($from, $to, $signature) = @_;
