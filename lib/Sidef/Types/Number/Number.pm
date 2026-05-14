@@ -16931,6 +16931,12 @@ package Sidef::Types::Number::Number {
     *pi_k           = \&almost_prime_count;
     *almost_primepi = \&almost_prime_count;
 
+    sub bigomega_inverse_len {
+        my ($from, $to, $k) = @_;
+        _valid(\$to, \$k);
+        $k->almost_prime_count($from, $to);
+    }
+
     sub almost_prime_sum {
         my ($k, $from, $to) = @_;
 
@@ -17014,6 +17020,12 @@ package Sidef::Types::Number::Number {
           ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
 
         bless \$total;
+    }
+
+    sub bigomega_inverse_sum {
+        my ($from, $to, $k) = @_;
+        _valid(\$to, \$k);
+        $k->almost_prime_sum($from, $to);
     }
 
     sub squarefree_almost_prime_count {
@@ -17339,6 +17351,12 @@ package Sidef::Types::Number::Number {
 
     *omega_primepi = \&omega_prime_count;
 
+    sub omega_inverse_len {
+        my ($from, $to, $k) = @_;
+        _valid(\$to, \$k);
+        $k->omega_prime_count($from, $to);
+    }
+
     sub omega_prime_sum {
         my ($k, $from, $to) = @_;
 
@@ -17459,6 +17477,12 @@ package Sidef::Types::Number::Number {
           ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 0);
 
         bless \$total;
+    }
+
+    sub omega_inverse_sum {
+        my ($from, $to, $k) = @_;
+        _valid(\$to, \$k);
+        $k->omega_prime_sum($from, $to);
     }
 
     sub nth_omega_prime {
@@ -30973,6 +30997,12 @@ package Sidef::Types::Number::Number {
         _array(\@omega_primes);
     }
 
+    sub omega_inverse {
+        my ($from, $to, $k) = @_;
+        _valid(\$to, \$k);
+        $k->omega_primes($from, $to);
+    }
+
     sub fermat_psp {
         my ($k, $base, $from, $to) = @_;
 
@@ -31854,6 +31884,12 @@ package Sidef::Types::Number::Number {
         _array(\@almost_primes);
     }
 
+    sub bigomega_inverse {
+        my ($from, $to, $k) = @_;
+        _valid(\$to, \$k);
+        $k->almost_primes($from, $to);
+    }
+
     sub _sieve_prime_sig_numbers {
         my ($from, $to, $prime_signature) = @_;
 
@@ -31988,6 +32024,8 @@ package Sidef::Types::Number::Number {
 
         _array(\@numbers);
     }
+
+    *prime_signature_inverse = \&prime_signature_numbers;
 
     sub prime_signature_count {
         my ($from, $to, $signature) = @_;
@@ -32124,6 +32162,8 @@ package Sidef::Types::Number::Number {
 
         bless \$count;
     }
+
+    *prime_signature_inverse_len = \&prime_signature_count;
 
     sub semiprimes {
         (TWO)->almost_primes(@_);
