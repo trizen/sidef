@@ -2,6 +2,7 @@ package Sidef::Types::Perl::Perl {
 
     use utf8;
     use 5.016;
+    use Scalar::Util qw();
 
     use parent qw(
       Sidef::Object::Object
@@ -149,7 +150,6 @@ package Sidef::Types::Perl::Perl {
 
     sub tie {
         my ($self, $variable, $class_name, @args) = @_;
-        state $x = require Scalar::Util;
         my $type = Scalar::Util::reftype($variable);
         __PACKAGE__->to_sidef(
                               CORE::tie(
@@ -162,7 +162,6 @@ package Sidef::Types::Perl::Perl {
 
     sub untie {
         my ($self, $variable) = @_;
-        state $x = require Scalar::Util;
         my $type = Scalar::Util::reftype($variable);
         __PACKAGE__->to_sidef(CORE::untie($type eq 'ARRAY' ? (@$variable) : $type eq 'HASH' ? %$variable : $variable));
     }

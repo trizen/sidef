@@ -10,7 +10,9 @@ package Sidef::Types::Number::Number {
     use Math::MPFR qw();
     use Math::MPC  qw();
 
-    use List::Util qw();
+    use List::Util   qw();
+    use Scalar::Util qw();
+
     use Math::Prime::Util::GMP 0.53 qw();
 
     our ($ROUND, $PREC, $USE_PRIMECOUNT, $USE_PRIMESUM, $USE_PARI_GP, $USE_YAFU, $USE_PFGW, $USE_FACTORDB, $VERBOSE, $SPECIAL_FACTORS, $USE_CONJECTURES);
@@ -2140,7 +2142,7 @@ package Sidef::Types::Number::Number {
     }
 
     *γ           = \&EulerGamma;
-    *Y           = \&EulerGamma;
+    *y           = \&EulerGamma;
     *euler_gamma = \&EulerGamma;
 
     sub CatalanG {
@@ -27609,6 +27611,7 @@ package Sidef::Types::Number::Number {
     }
 
     *inverse_phi       = \&inverse_totient;
+    *phi_inverse       = \&inverse_totient;
     *inverse_euler_phi = \&inverse_totient;
 
     sub inverse_totient_len {
@@ -27633,6 +27636,7 @@ package Sidef::Types::Number::Number {
         _set_int($r);
     }
 
+    *phi_inverse_len       = \&inverse_totient_len;
     *inverse_phi_len       = \&inverse_totient_len;
     *inverse_euler_phi_len = \&inverse_totient_len;
 
@@ -27650,8 +27654,9 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
-    *inverse_totient_min = \&inverse_euler_phi_min;
+    *phi_inverse_min     = \&inverse_euler_phi_min;
     *inverse_phi_min     = \&inverse_euler_phi_min;
+    *inverse_totient_min = \&inverse_euler_phi_min;
 
     sub inverse_euler_phi_max {
         my ($n) = @_;
@@ -27667,8 +27672,9 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
-    *inverse_totient_max = \&inverse_euler_phi_max;
+    *phi_inverse_max     = \&inverse_euler_phi_max;
     *inverse_phi_max     = \&inverse_euler_phi_max;
+    *inverse_totient_max = \&inverse_euler_phi_max;
 
     sub _cook_dedekind_psi {
         my ($N, $k) = @_;
@@ -27725,6 +27731,7 @@ package Sidef::Types::Number::Number {
         _array([map { bless \$_ } sort { $a <=> $b } @$result]);
     }
 
+    *psi_inverse = \&inverse_dedekind_psi;
     *inverse_psi = \&inverse_dedekind_psi;
 
     sub inverse_dedekind_psi_len {
@@ -27741,6 +27748,7 @@ package Sidef::Types::Number::Number {
         _set_int($r);
     }
 
+    *psi_inverse_len = \&inverse_dedekind_psi_len;
     *inverse_psi_len = \&inverse_dedekind_psi_len;
 
     sub inverse_dedekind_psi_min {
@@ -27757,6 +27765,7 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *psi_inverse_min = \&inverse_dedekind_psi_min;
     *inverse_psi_min = \&inverse_dedekind_psi_min;
 
     sub inverse_dedekind_psi_max {
@@ -27773,6 +27782,7 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *psi_inverse_max = \&inverse_dedekind_psi_max;
     *inverse_psi_max = \&inverse_dedekind_psi_max;
 
     sub _cook_usigma {
@@ -27814,6 +27824,8 @@ package Sidef::Types::Number::Number {
         _array([map { bless \$_ } sort { $a <=> $b } @$result]);
     }
 
+    *usigma_inverse = \&inverse_usigma;
+
     sub _cook_uphi {
         my ($N) = @_;
 
@@ -27852,6 +27864,8 @@ package Sidef::Types::Number::Number {
         my $result = _dynamic_preimage($n, _cook_uphi($n), unitary => 1);
         _array([map { bless \$_ } sort { $a <=> $b } @$result]);
     }
+
+    *uphi_inverse = \&inverse_uphi;
 
     sub _cook_sigma {
         my ($N, $k) = @_;
@@ -27926,6 +27940,8 @@ package Sidef::Types::Number::Number {
         _array([map { bless \$_ } sort { $a <=> $b } @$result]);
     }
 
+    *sigma_inverse = \&inverse_sigma;
+
     sub inverse_sigma_len {
         my ($n, $k) = @_;
 
@@ -27940,6 +27956,8 @@ package Sidef::Types::Number::Number {
         my $r = _dynamic_preimage_len($n, _cook_sigma($n, $k));
         _set_int($r);
     }
+
+    *sigma_inverse_len = \&inverse_sigma_len;
 
     sub inverse_sigma_min {
         my ($n, $k) = @_;
@@ -27956,6 +27974,8 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    *sigma_inverse_min = \&inverse_sigma_min;
+
     sub inverse_sigma_max {
         my ($n, $k) = @_;
 
@@ -27970,6 +27990,8 @@ package Sidef::Types::Number::Number {
         my $r = _dynamic_preimage_minmax($n, _cook_sigma($n, $k), min => 0) // return undef;
         bless \$r;
     }
+
+    *sigma_inverse_max = \&inverse_sigma_max;
 
     sub jordan_totient {
         my ($n, $k) = @_;
@@ -32060,6 +32082,7 @@ package Sidef::Types::Number::Number {
     }
 
     *prime_signature_inverse = \&prime_signature_numbers;
+    *inverse_prime_signature = \&prime_signature_numbers;
 
     sub prime_signature_count {
         my ($from, $to, $signature) = @_;
@@ -32198,6 +32221,7 @@ package Sidef::Types::Number::Number {
     }
 
     *prime_signature_inverse_len = \&prime_signature_count;
+    *inverse_prime_signature_len = \&prime_signature_count;
 
     sub tau_inverse {
         my ($from, $to, $n) = @_;
@@ -32219,6 +32243,8 @@ package Sidef::Types::Number::Number {
         @list = map { bless \$_ } sort { $a <=> $b } @list;
         _array(\@list);
     }
+
+    *inverse_tau = \&tau_inverse;
 
     sub tau_inverse_len {
         my ($from, $to, $n) = @_;
@@ -32242,6 +32268,8 @@ package Sidef::Types::Number::Number {
 
         Sidef::Types::Number::Number::sum(@list);
     }
+
+    *inverse_tau_len = \&tau_inverse_len;
 
     sub semiprimes {
         (TWO)->almost_primes(@_);

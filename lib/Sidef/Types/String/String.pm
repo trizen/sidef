@@ -3,7 +3,8 @@ package Sidef::Types::String::String {
     use utf8;
     use 5.016;
 
-    use parent qw(Sidef::Object::Object);
+    use List::Util qw();
+    use parent     qw(Sidef::Object::Object);
 
     use overload
       q{bool} => \&get_value,
@@ -810,7 +811,6 @@ package Sidef::Types::String::String {
 
     sub unique {
         my ($self) = @_;
-        require List::Util;
         $self->new(CORE::join('', List::Util::uniq(CORE::split(//, $$self))));
     }
 
@@ -1197,8 +1197,6 @@ package Sidef::Types::String::String {
         my $len1 = scalar(@s);
         my $len2 = scalar(@t);
 
-        require List::Util;
-
         my @d = ([0 .. $len2], map { [$_] } 1 .. $len1);
         foreach my $i (1 .. $len1) {
             foreach my $j (1 .. $len2) {
@@ -1227,8 +1225,6 @@ package Sidef::Types::String::String {
         if ($s_len == 0 and $t_len == 0) {
             return 1;
         }
-
-        require List::Util;
 
         my $match_distance = int(List::Util::max($s_len, $t_len) / 2) - 1;
 
@@ -1600,7 +1596,6 @@ package Sidef::Types::String::String {
         $$self =~ /\\|#\{/ || return $self;    # return faster
 
         require Encode;
-        require List::Util;
 
         my $str = $$self;
 

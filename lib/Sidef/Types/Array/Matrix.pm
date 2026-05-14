@@ -2,12 +2,13 @@ package Sidef::Types::Array::Matrix {
 
     use utf8;
     use 5.016;
+    use List::Util qw();
 
-    use parent qw(Sidef::Types::Array::Array);
+    use parent qw(
+      Sidef::Types::Array::Array
+    );
 
     use overload q{""} => \&_dump;
-
-    require List::Util;
 
     sub _is_matrix {
         my ($self) = @_;

@@ -7,7 +7,8 @@ package Sidef::Types::Array::Vector {
 
     use overload q{""} => \&_dump;
 
-    require List::Util;
+    use List::Util   qw();
+    use Scalar::Util qw();
 
     sub _is_vector {
         my ($self) = @_;

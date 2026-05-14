@@ -2,12 +2,12 @@ package Sidef::Math::Math {
 
     use utf8;
     use 5.016;
+    use List::Util qw();
 
     use parent qw(
       Sidef::Object::Object
     );
 
-    require List::Util;
     use Sidef::Types::Number::Number;
 
     sub new {

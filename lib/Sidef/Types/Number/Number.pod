@@ -58,7 +58,7 @@ B<NOTE:> the C<local> scope extends to any other functions or methods that the a
 
     # Number-theoretic functions
     say 100.prime                  # 100th prime: 541
-    say 5040.factor                # Prime factorization
+    say factor(2**64 + 1)          # Prime factorization
     say euler_phi(100)             # Euler's totient: 40
 
     # Floating-point with custom precision
@@ -73,99 +73,6 @@ Inherits methods from:
 
 =head1 METHODS
 
-=head2 !
-
-    n!
-    n.factorial
-
-Computes the factorial of C<n>: C<1×2×3×...×n>.
-
-    say 5!              #=> 120
-    say 10.factorial    #=> 3628800
-    say 100!            #=> 93326215443944152681699...
-
-Aliases: I<fac>, I<factorial>
-
-=cut
-
-=head2 !!
-
-    n!!
-
-Double-factorial of C<n>.
-
-Aliases: I<dfac>, I<dfactorial>, I<double_factorial>
-
-=cut
-
-=head2 %
-
-    n % k
-    mod(n, k)
-
-Returns the remainder of C<n> divided by C<k>.
-
-    say (17 % 5)          #=> 2
-    say (-17 % 5)         #=> 3
-    say 100.mod(7)        #=> 2
-
-Aliases: I<mod>
-
-=cut
-
-=head2 %%
-
-    n %% k
-
-Returns true if C<n> is divisible by C<k>. False otherwise.
-
-Aliases: I<is_div>
-
-=cut
-
-=head2 &
-
-    a & b
-    and(a, b)
-
-Performs bitwise AND operation on integers C<a> and C<b>.
-
-    say (0b1100 & 0b1010)     #=> 8 (0b1000)
-    say 12.and(10)            #=> 8
-
-Aliases: I<and>
-
-=cut
-
-=head2 *
-
-    a * b
-    mul(a, b)
-
-Multiplies C<a> and C<b>.
-
-    say (6 * 7)           #=> 42
-    say (2/3 * 3/4)       #=> 1/2
-
-Aliases: I<mul>
-
-=cut
-
-=head2 **
-
-    a ** b
-    pow(a, b)
-
-Raises C<a> to the power C<b>.
-
-    say 2**10           #=> 1024
-    say 5**3            #=> 125
-    say pow(2, 100)     #=> 1267650600228229401496703205376
-
-Aliases: I<pow>
-
-=cut
-
 =head2 +
 
     a + b
@@ -178,25 +85,6 @@ Adds two numbers C<a> and C<b>.
     say add(2.5, 3.7)   #=> 6.2
 
 Aliases: I<add>
-
-=cut
-
-=head2 ++
-
-    n++
-    ++n
-    n.inc
-
-Increments C<n> by 1 and returns the result.
-
-    var x = 5
-    say ++x             #=> 6
-    say x++             #=> 6 (returns 6, x is now 7)
-    say x.inc           #=> 8
-
-The C<inc> method-call does not modify the variable in-place.
-
-Aliases: I<inc>
 
 =cut
 
@@ -214,50 +102,17 @@ Aliases: I<sub>
 
 =cut
 
-=head2 --
+=head2 *
 
-    n--
-    --n
-    n.dec
+    a * b
+    mul(a, b)
 
-Decrements C<n> by 1 and returns the result.
+Multiplies C<a> and C<b>.
 
-    var x = 5
-    say --x             #=> 4
-    say x--             #=> 4 (returns 4, x is now 3)
-    say x.dec           #=> 2
+    say (6 * 7)           #=> 42
+    say (2/3 * 3/4)       #=> 1/2
 
-The C<dec> method-call does not modify the variable in-place.
-
-Aliases: I<dec>
-
-=cut
-
-=head2 ..
-
-    a .. b
-
-Create an inclusive-inclusive C<RangeNum> object, from C<a> to C<b>.
-
-Equivalent with:
-
-    RangeNum(a, b)
-
-Aliases: I<to>, I<upto>
-
-=cut
-
-=head2 ..^
-
-    a ..^ b
-
-Create an inclusive-exclusive C<RangeNum> object, from C<a> to C<b-1>.
-
-Equivalent with:
-
-    RangeNum(a, b-1)
-
-Aliases: I<xto>, I<xupto>
+Aliases: I<mul>
 
 =cut
 
@@ -291,17 +146,56 @@ Aliases: I<divint>, I<fld>, I<idiv>, I<idiv_floor>
 
 =cut
 
-=head2 :
+=head2 **
 
-    a : b
+    a ** b
+    pow(a, b)
 
-Create a new complex number.
+Raises C<a> to the power C<b>.
 
-Equivalent with:
+    say 2**10           #=> 1024
+    say 5**3            #=> 125
+    say pow(2, 100)     #=> 1267650600228229401496703205376
 
-    Complex(a, b)
+Aliases: I<pow>
 
-Aliases: I<pair>
+=cut
+
+=head2 ++
+
+    n++
+    ++n
+    n.inc
+
+Increments C<n> by 1 and returns the result.
+
+    var x = 5
+    say ++x             #=> 6
+    say x++             #=> 6 (returns 6, x is now 7)
+    say x.inc           #=> 8
+
+The C<inc> method-call does not modify the variable in-place.
+
+Aliases: I<inc>
+
+=cut
+
+=head2 --
+
+    n--
+    --n
+    n.dec
+
+Decrements C<n> by 1 and returns the result.
+
+    var x = 5
+    say --x             #=> 4
+    say x--             #=> 4 (returns 4, x is now 3)
+    say x.dec           #=> 2
+
+The C<dec> method-call does not modify the variable in-place.
+
+Aliases: I<dec>
 
 =cut
 
@@ -319,17 +213,45 @@ Aliases: I<lt>
 
 =cut
 
-=head2 <<
+=head2 <=
 
-    a << b
-    shift_left(a, b)
+    a <= b
+    le(a, b)
 
-Left shifts C<a> by C<b> bits. Equivalent to C<a × 2^b> for integers.
+Returns true if C<a> is less than or equal to C<b>.
 
-    say (5 << 3)            #=> 40 (5 × 8)
-    say shift_left(1, 10)   #=> 1024
+    say (3 <= 5)          #=> true
+    say (5 <= 5)          #=> true
 
-Aliases: I<lsft>, I<shift_left>
+Aliases: I<≤>, I<le>
+
+=cut
+
+=head2 >
+
+    a > b
+    gt(a, b)
+
+Returns true if C<a> is greater than C<b>.
+
+    say (10 > 7)          #=> true
+    say (3 > 5)           #=> false
+
+Aliases: I<gt>
+
+=cut
+
+=head2 >=
+
+    a >= b
+    ge(a, b)
+
+Returns true if C<a> is greater than or equal to C<b>.
+
+    say (10 >= 7)         #=> true
+    say (7 >= 7)          #=> true
+
+Aliases: I<≥>, I<ge>
 
 =cut
 
@@ -380,45 +302,55 @@ Aliases: I<eq>
 
 =cut
 
-=head2 >
+=head2 !=
 
-    a > b
-    gt(a, b)
+    a != b
+    ne(a, b)
 
-Returns true if C<a> is greater than C<b>.
+Returns true if C<a> and C<b> are different.
 
-    say (10 > 7)          #=> true
-    say (3 > 5)           #=> false
+    say (42 != 13)        #=> true
+    say (5 != 5)          #=> false
 
-Aliases: I<gt>
-
-=cut
-
-=head2 >>
-
-    a >> b
-    shift_right(a, b)
-
-Right shifts C<a> by C<b> bits. Equivalent to C<floor(a / 2^b)> for integers.
-
-    say (40 >> 3)              #=> 5 (40 / 8)
-    say shift_right(1024, 10)  #=> 1
-
-Aliases: I<rsft>, I<shift_right>
+Aliases: I<≠>, I<ne>
 
 =cut
 
-=head2 ^
+=head2 =~=
 
-    a ^ b
-    xor(a, b)
+    a =~= b
 
-Performs bitwise XOR operation on integers C<a> and C<b>.
+Returns true if C<a> and C<b> are approximately equal to each other.
 
-    say (0b1100 ^ 0b1010)   #=> 6 (0b0110)
-    say 12.xor(10)          #=> 6
+Aliases: I<≅>, I<approx_eq>
 
-Aliases: I<xor>
+=cut
+
+=head2 ..
+
+    a .. b
+
+Create an inclusive-inclusive C<RangeNum> object, from C<a> to C<b>.
+
+Equivalent with:
+
+    RangeNum(a, b)
+
+Aliases: I<to>, I<upto>
+
+=cut
+
+=head2 ..^
+
+    a ..^ b
+
+Create an inclusive-exclusive C<RangeNum> object, from C<a> to C<b-1>.
+
+Equivalent with:
+
+    RangeNum(a, b-1)
+
+Aliases: I<xto>, I<xupto>
 
 =cut
 
@@ -436,25 +368,17 @@ Aliases: I<xdownto>
 
 =cut
 
-=head2 C
+=head2 &
 
-    Num.C
-    Num.catalan_G
+    a & b
+    and(a, b)
 
-Returns the Catalan constant: 0.915965594177...
+Performs bitwise AND operation on integers C<a> and C<b>.
 
-Aliases: I<catalan_G>
+    say (0b1100 & 0b1010)     #=> 8 (0b1000)
+    say 12.and(10)            #=> 8
 
-=cut
-
-=head2 Y
-
-    Num.Y
-    Num.EulerGamma
-
-Returns the Euler–Mascheroni constant: 0.5772156649...
-
-Aliases: I<γ>, I<euler_gamma>
+Aliases: I<and>
 
 =cut
 
@@ -472,6 +396,20 @@ Aliases: I<or>
 
 =cut
 
+=head2 ^
+
+    a ^ b
+    xor(a, b)
+
+Performs bitwise XOR operation on integers C<a> and C<b>.
+
+    say (0b1100 ^ 0b1010)   #=> 6 (0b0110)
+    say 12.xor(10)          #=> 6
+
+Aliases: I<xor>
+
+=cut
+
 =head2 ~
 
     ~a
@@ -486,254 +424,31 @@ Aliases: I<not>
 
 =cut
 
-=head2 Γ
+=head2 <<
 
-    Γ(n)
-    gamma(n)
-    Num.gamma
+    a << b
+    shift_left(a, b)
 
-When called as C<Num.gamma>, it returns the Euler-Mascheroni constant:
+Left shifts C<a> by C<b> bits. Equivalent to C<a × 2^b> for integers.
 
-    say Num.gamma   #=> 0.5772156...
+    say (5 << 3)            #=> 40 (5 × 8)
+    say shift_left(1, 10)   #=> 1024
 
-When given a numeric real value, it computes the gamma function (as a floating-point value), which has the identity:
-
-    gamma(n) = (n-1)!
-
-Aliases: I<gamma>
+Aliases: I<lsft>, I<shift_left>
 
 =cut
 
-=head2 δ
+=head2 >>
 
-    δ(a,b)
+    a >> b
+    shift_right(a, b)
 
-The Kronecker delta function, which returns 1 iff C<a==b> and 0 otherwise.
+Right shifts C<a> by C<b> bits. Equivalent to C<floor(a / 2^b)> for integers.
 
-Aliases: I<kronecker_delta>
+    say (40 >> 3)              #=> 5 (40 / 8)
+    say shift_right(1024, 10)  #=> 1
 
-=cut
-
-=head2 ζ
-
-    ζ(s)
-    zeta(s)
-
-The Riemann Zeta function.
-
-Aliases: I<zeta>
-
-=cut
-
-=head2 η
-
-    η(s)
-    eta(s)
-
-The Dirichlet eta function, defined as:
-
-    eta(s) = (1 - 2^(1-s)) * zeta(s)
-
-Aliases: I<eta>
-
-=cut
-
-=head2 μ
-
-    μ(n)
-    mu(n)
-    moebius(n)
-
-The Möbius function: μ(n).
-
-Aliases: I<mu>, I<mobius>, I<möbius>, I<moebius>
-
-=cut
-
-=head2 Π
-
-    Π(...)
-    prod(...)
-
-Returns the product of a given list of numbers.
-
-Aliases: I<prod>, I<vecprod>
-
-=cut
-
-=head2 π
-
-    π(n)
-    π(a,b)
-    Num.π
-
-Returns the C<PI> numerical value:
-
-    say Num.pi      #=> 3.1415...
-
-When applied on a Number object (as C<n.pi> or C<pi(n)>), it returns the number of primes <= C<n>:
-
-    say 100.pi      #=> number of primes <= 100
-    say pi(100)     #=> 25
-
-When an additional argument is given, it returns the number of primes in the range C<a..b>:
-
-    say pi(50, 100)     # number of primes in the range 50..100
-
-Aliases: I<pi>
-
-=cut
-
-=head2 Σ
-
-    Σ(...)
-    sum(...)
-
-Returns the sum of a given list of numbers.
-
-Aliases: I<sum>, I<vecsum>
-
-=cut
-
-=head2 σ
-
-    σ(n,k=1)
-    sigma(n,k=1)
-
-Returns the sum of the positive divisors of C<n>, each raised to the power C<k>.
-
-Aliases: I<sigma>
-
-=cut
-
-=head2 τ
-
-    Num.τ
-    Num.tau
-
-    τ(n)
-    tau(n)
-
-Returns the C<TAU> constant (C<2*PI>), or the number of positive divisors of C<n>.
-
-    say Num.tau     #=> 6.283185307179...
-    say tau(120)    #=> 16
-
-Aliases: I<tau>
-
-=cut
-
-=head2 φ
-
-    Num.φ
-    Num.phi
-
-    φ(n)
-    phi(n,k=1)
-
-Returns the golden ratio constant C<PHI>, or the Euler totient of C<n>.
-
-    say Num.phi       #=> 1.618033988749...
-    say phi(180)      #=> 48
-
-Aliases: I<phi>
-
-=cut
-
-=head2 Ψ
-
-    Ψ(x)
-    digamma(x)
-
-The digamma function, defined as:
-
-     Γ'(x)
-    -------
-     Γ(x)
-
-Aliases: I<digamma>
-
-=cut
-
-=head2 Ω
-
-    Ω(n,k=0)
-    bigomega(n,k=0)
-
-For C<k = 0>, it returns the number of prime factors of C<n> (counted with multiplicity).
-
-In general, is equivalent with:
-
-    n.prime_power_divisors.sum {|d| n**k / d**k }
-
-Aliases: I<bigomega>
-
-=cut
-
-=head2 ω
-
-    ω(n,k=0)
-    omega(n,k=0)
-
-For C<k = 0>, it returns the number of distinct prime factors of C<n>.
-
-In general, is equivalent with:
-
-    n.prime_divisors.sum {|d| n**k / d**k }
-
-Aliases: I<omega>
-
-=cut
-
-=head2 ≅
-
-    a ≅ b
-
-Returns true if C<a> and C<b> are approximately equal to each other.
-
-Aliases: I<=~=>, I<approx_eq>
-
-=cut
-
-=head2 ≠
-
-    a != b
-    ne(a, b)
-
-Returns true if C<a> and C<b> are different.
-
-    say (42 != 13)        #=> true
-    say (5 != 5)          #=> false
-
-Aliases: I<!=>, I<ne>
-
-=cut
-
-=head2 ≤
-
-    a <= b
-    le(a, b)
-
-Returns true if C<a> is less than or equal to C<b>.
-
-    say (3 <= 5)          #=> true
-    say (5 <= 5)          #=> true
-
-Aliases: I<E<lt>=>, I<le>
-
-=cut
-
-=head2 ≥
-
-    a >= b
-    ge(a, b)
-
-Returns true if C<a> is greater than or equal to C<b>.
-
-    say (10 >= 7)         #=> true
-    say (7 >= 7)          #=> true
-
-Aliases: I<E<gt>=>, I<ge>
+Aliases: I<rsft>, I<shift_right>
 
 =cut
 
@@ -1323,6 +1038,20 @@ Defined as:
 
 =cut
 
+=head2 bigomega
+
+    bigomega(n,k=0)
+
+For C<k = 0>, it returns the number of prime factors of C<n> (counted with multiplicity).
+
+In general, is equivalent with:
+
+    n.prime_power_divisors.sum {|d| n**k / d**k }
+
+Aliases: I<Ω>
+
+=cut
+
 =head2 bigomega_inverse
 
 =head2 bigomega_inverse_len
@@ -1651,6 +1380,16 @@ Aliases: I<carmichael_strong_psp_each>, I<each_carmichael_strong_psp>, I<each_ca
 Returns the n-th Catalan number.
 
 If two arguments are provided, it returns the C<C(n,k)> entry in Catalan's triangle.
+
+=cut
+
+=head2 CatalanG
+
+    Num.CatalanG
+
+Returns the Catalan constant: 0.915965594177...
+
+Aliases: I<C>
 
 =cut
 
@@ -2611,6 +2350,20 @@ Returns an array of C<[a,b]> pairs with all the possible solutions to the equati
 
 =cut
 
+=head2 digamma
+
+    digamma(x)
+
+The digamma function, defined as:
+
+     Γ'(x)
+    -------
+     Γ(x)
+
+Aliases: I<Ψ>
+
+=cut
+
 =head2 digit
 
     n.digit(k, b=10)
@@ -2931,6 +2684,28 @@ Returns the count of the exponential divisors (or e-divisors) of C<n>. (L<OEIS A
 
 =cut
 
+=head2 eta
+
+    eta(s)
+
+The Dirichlet eta function, defined as:
+
+    eta(s) = (1 - 2^(1-s)) * zeta(s)
+
+Aliases: I<η>
+
+=cut
+
+=head2 EulerGamma
+
+    Num.EulerGamma
+
+Returns the Euler–Mascheroni constant: 0.5772156649...
+
+Aliases: I<γ>, I<y>
+
+=cut
+
 =head2 euler
 
     euler(n)
@@ -3152,6 +2927,32 @@ Returns an array of pairs C<[p,k]> factors C<p^k> of C<n>.
     say 180.factor_exp  #=> [[2, 2], [3, 2], [5, 1]]
 
 Aliases: I<factors_exp>
+
+=cut
+
+=head2 factorial
+
+    n!
+    n.factorial
+
+Computes the factorial of C<n>: C<1×2×3×...×n>.
+
+    say 5!              #=> 120
+    say 10.factorial    #=> 3628800
+    say 100!            #=> 93326215443944152681699...
+
+Aliases: I<!>, I<fac>
+
+=cut
+
+=head2 double_factorial
+
+    n!!
+    double_factorial(n)
+
+Double-factorial of C<n>. (L<OEIS A006882|https://oeis.org/A006882>)
+
+Aliases: I<!!>, I<dfac>, I<dfactorial>
 
 =cut
 
@@ -3504,6 +3305,23 @@ Returns an array containing the Fubini numbers with indices in the range C<0..n>
 Returns the n-th term in Stern's diatomic series (or Stern-Brocot sequence). (L<OEIS A002487|https://oeis.org/A002487>)
 
     say 30.of { .fusc }     #=> OEIS: A002487
+
+=cut
+
+=head2 gamma
+
+    gamma(n)
+    Num.gamma
+
+When called as C<Num.gamma>, it returns the Euler-Mascheroni constant:
+
+    say Num.gamma   #=> 0.5772156...
+
+When given a numeric real value, it computes the gamma function (as a floating-point value), which has the identity:
+
+    gamma(n) = (n-1)!
+
+Aliases: I<Γ>
 
 =cut
 
@@ -3910,205 +3728,6 @@ The complexity is logarithmic relative to the value of the result, making it sui
 
 =cut
 
-=head2 inverse_phi
-
-    n.inverse_phi
-
-Returns all the solutions C<x> to the Euler totient function: C<phi(x) = n>.
-
-Aliases: I<inverse_totient>
-
-=cut
-
-=head2 inverse_phi_len
-
-    n.inverse_phi_len
-
-Returns the number of solutions to the Euler totient function: C<phi(x) = n>.
-
-Equivalent with:
-
-    n.inverse_phi.len
-
-Aliases: I<inverse_totient_len>
-
-=cut
-
-=head2 inverse_phi_max
-
-    n.inverse_phi_max
-
-Returns the largest solution x to the Euler totient function: C<phi(x) = n>.
-
-Equivalent with:
-
-    n.inverse_phi.max
-
-Returns C<nil> if there are no solutions.
-
-Aliases: I<inverse_euler_phi_max>
-
-=cut
-
-=head2 inverse_phi_min
-
-    n.inverse_phi_min
-
-Returns the smallest solution x to the Euler totient function: C<phi(x) = n>.
-
-Equivalent with:
-
-    n.inverse_phi.min
-
-Returns C<nil> if there are no solutions.
-
-Aliases: I<inverse_euler_phi_min>
-
-=cut
-
-=head2 inverse_polygonal
-
-    polygonal_inverse(n)
-
-Returns an array of pairs C<[r,k]> such that C<polygonal(r,k) = n>.
-
-    say polygonal_inverse(4012)   #=> [[2, 4012], [4, 670], [8, 145], [4012, 2]]
-
-Aliases: I<polygonal_inverse>
-
-=cut
-
-=head2 inverse_psi
-
-    n.inverse_psi
-
-Returns all the solutions C<x> to Dedekind's psi function: C<psi(x) = n>.
-
-    say inverse_psi(120)    #=> [75, 76, 87, 95]
-
-Aliases: I<inverse_dedekind_psi>
-
-=cut
-
-=head2 inverse_psi_len
-
-    n.inverse_psi_len
-
-Returns the number of solutions to Dedekind's psi function: C<psi(x) = n>.
-
-Equivalent to C<n.inverse_psi.len>, but much faster.
-
-Aliases: I<inverse_dedekind_psi_len>
-
-=cut
-
-=head2 inverse_psi_max
-
-    n.inverse_psi_max
-
-Returns the largest solution C<x> to Dedekind's psi function: C<psi(x) = n>.
-
-Equivalent with:
-
-    n.inverse_psi.max
-
-Returns C<nil> if there are no solutions.
-
-Aliases: I<inverse_dedekind_psi_max>
-
-=cut
-
-=head2 inverse_psi_min
-
-    n.inverse_psi_min
-
-Returns the smallest solution C<x> to Dedekind's psi function: C<psi(x) = n>.
-
-Equivalent with:
-
-    n.inverse_psi.min
-
-Returns C<nil> if there are no solutions.
-
-Aliases: I<inverse_dedekind_psi_min>
-
-=cut
-
-=head2 inverse_sigma
-
-    n.inverse_sigma(k=1)
-
-The method returns all the numbers C<m> for which C<sigma(m,k) = n>, where C<n> is given.
-
-    say inverse_sigma(42)           # [20, 26, 41]
-    say inverse_sigma(22100, 2)     # [120, 130, 141]
-
-Also works with arbitrary large integers:
-
-    say inverse_sigma(9325257382230393314439814176)
-
-=cut
-
-=head2 inverse_sigma_len
-
-    n.inverse_sigma_len(k=1)
-
-Returns the number of solutions to the sigma sum of divisors function: C<sigma_k(x) = n>.
-
-Equivalent with:
-
-    n.inverse_sigma(k).len
-
-=cut
-
-=head2 inverse_sigma_max
-
-    n.inverse_sigma_max(k=1)
-
-Returns the largest solution x to the sum of divisors function: C<sigma_k(x) = n>.
-
-Equivalent with:
-
-    n.inverse_sigma(k).max
-
-Returns C<nil> if there are no solutions.
-
-=cut
-
-=head2 inverse_sigma_min
-
-    n.inverse_sigma_min(k=1)
-
-Returns the smallest solution x to the sum of divisors function: C<sigma_k(x) = n>.
-
-Equivalent with:
-
-    n.inverse_sigma(k).min
-
-Returns C<nil> if there are no solutions.
-
-=cut
-
-=head2 inverse_uphi
-
-    n.inverse_uphi
-
-Returns an array with all the solutions C<x> to C<uphi(x) = n>.
-
-    say inverse_uphi(120)       #=> [121, 143, 144, 155, 164, 183, 220, 231, 240, 242, 286, 310, 366, 462]
-
-=cut
-
-=head2 inverse_usigma
-
-    n.inverse_usigma
-
-Returns an array with all the possible solutions C<x> to C<usigma(x) = n>.
-
-    say inverse_usigma(120)                         #=> [60, 87, 92, 95, 99]
-
-=cut
-
 =head2 invmod
 
     n.invmod(m)
@@ -4435,6 +4054,17 @@ Returns true when C<gcd(phi(n), n) = 1>, where C<phi(n)> is the Euler totient fu
 Returns true if C<n> is a deficient number, else false.
 
 A deficient number is greater than the sum of its positive proper divisors.
+
+=cut
+
+=head2 is_divisible
+
+    n %% k
+    n.is_divisible(k)
+
+Returns true if C<n> is divisible by C<k>. False otherwise.
+
+Aliases: I<%%>, I<is_divisible_by>, I<is_div>
 
 =cut
 
@@ -5406,6 +5036,16 @@ Returns the Kronecker symbol: C<(a|n)>.
 
 =cut
 
+=head2 kronecker_delta
+
+    kronecker_delta(a,b)
+
+The Kronecker delta function, which returns 1 iff C<a==b> and 0 otherwise.
+
+Aliases: I<δ>
+
+=cut
+
 =head2 laguerre
 
     laguerre(n)
@@ -5900,6 +5540,17 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 =cut
 
+=head2 moebius
+
+    mu(n)
+    moebius(n)
+
+The Möbius function: μ(n). (L<OEIS A008683|https://oeis.org/A008683>)
+
+Aliases: I<μ>, I<mu>, I<mobius>, I<möbius>
+
+=cut
+
 =head2 mertens
 
     mertens(n)
@@ -5961,6 +5612,21 @@ Return true if C<n> passes the Miller-Rabin primality test with C<k> random base
 Returns the smallest value from a list of numbers.
 
 Aliases: I<vecmin>
+
+=cut
+
+=head2 mod
+
+    n % k
+    mod(n, k)
+
+Returns the remainder of C<n> divided by C<k>.
+
+    say (17 % 5)          #=> 2
+    say (-17 % 5)         #=> 3
+    say 100.mod(7)        #=> 2
+
+Aliases: I<%>
 
 =cut
 
@@ -6837,6 +6503,20 @@ Returns an array with C<n> elements mapped to the given block. The block is call
 
 =cut
 
+=head2 omega
+
+    omega(n,k=0)
+
+For C<k = 0>, it returns the number of distinct prime factors of C<n>.
+
+In general, is equivalent with:
+
+    n.prime_divisors.sum {|d| n**k / d**k }
+
+Aliases: I<ω>
+
+=cut
+
 =head2 omega_inverse
 
 =head2 omega_inverse_len
@@ -6951,6 +6631,20 @@ Returns the 1 value.
 
 =cut
 
+=head2 pair
+
+    a.pair(b)
+
+Create a new complex number.
+
+Equivalent with:
+
+    Complex(a, b)
+
+Aliases: I<:>, I<pair>
+
+=cut
+
 =head2 partition_count
 
     partition_count(n)
@@ -7055,6 +6749,72 @@ Returns an array of arrays with the permutations of the integers in the range C<
 
 =cut
 
+=head2 phi
+
+    Num.phi
+    phi(n,k=1)
+
+Returns the golden ratio constant C<PHI>, or the Euler totient of C<n>.
+
+    say Num.phi                #=> 1.618033988749...
+    say 30.of {|n| phi(n) }    #=> OEIS: A000010
+
+Aliases: I<φ>
+
+=cut
+
+=head2 phi_inverse
+
+    n.phi_inverse
+
+Returns an array with all the solutions C<x> to the Euler totient function: C<phi(x) = n>.
+
+    say phi_inverse(24)     #=> [35, 39, 45, 52, 56, 70, 72, 78, 84, 90]
+
+Aliases: I<inverse_phi>, I<inverse_totient>
+
+=cut
+
+=head2 phi_inverse_len
+
+    n.phi_inverse_len
+
+Returns the number of solutions to the Euler totient function: C<phi(x) = n>.
+
+Equivalent to C<n.phi_inverse.len>, but much faster.
+
+Aliases: I<inverse_phi_len>, I<inverse_totient_len>
+
+=cut
+
+=head2 phi_inverse_max
+
+    n.phi_inverse_max
+
+Returns the largest solution C<x> to the Euler totient function: C<phi(x) = n>.
+
+Equivalent to C<n.phi_inverse.max>, but much faster.
+
+Returns C<nil> if there are no solutions.
+
+Aliases: I<inverse_phi_max>, I<inverse_euler_phi_max>
+
+=cut
+
+=head2 phi_inverse_min
+
+    n.phi_inverse_min
+
+Returns the smallest solution C<x> to the Euler totient function: C<phi(x) = n>.
+
+Equivalent to C<n.phi_inverse.min>, but much faster.
+
+Returns C<nil> if there are no solutions.
+
+Aliases: I<inverse_phi_min>, I<inverse_euler_phi_min>
+
+=cut
+
 =head2 phi_finder_factor
 
     n.phi_finder_factor(tries=1e4)
@@ -7069,6 +6829,29 @@ Example:
     say phi_finder_factor(132750061135361, 1e5)     #=> [9369673, 14168057]
 
 The product of the factors will give back C<n>. However, some factors may be composite.
+
+=cut
+
+=head2 pi
+
+    pi(n)
+    pi(a,b)
+    Num.pi
+
+Returns the C<PI> numerical value:
+
+    say Num.pi      #=> 3.1415...
+
+When applied on a Number object (as C<n.pi> or C<pi(n)>), it returns the number of primes <= C<n>:
+
+    say 100.pi      #=> number of primes <= 100
+    say pi(100)     #=> 25
+
+When an additional argument is given, it returns the number of primes in the range C<a..b>:
+
+    say pi(50, 100)     # number of primes in the range 50..100
+
+Aliases: I<π>
 
 =cut
 
@@ -7149,6 +6932,18 @@ Returns the n-th k-gonal number. When C<n> is negative, it returns the second k-
    say 10.of {|n| polygonal( n, 3) }  # triangular numbers
    say 10.of {|n| polygonal( n, 5) }  # pentagonal numbers
    say 10.of {|n| polygonal(-n, 5) }  # second pentagonal numbers
+
+=cut
+
+=head2 polygonal_inverse
+
+    polygonal_inverse(n)
+
+Returns an array of pairs C<[r,k]> such that C<polygonal(r,k) = n>.
+
+    say polygonal_inverse(4012)   #=> [[2, 4012], [4, 670], [8, 145], [4012, 2]]
+
+Aliases: I<inverse_polygonal>
 
 =cut
 
@@ -8235,6 +8030,16 @@ The method also accepts C<n> to be a fraction, which is computed as:
 
 =cut
 
+=head2 prod
+
+    prod(...)
+
+Returns the product of a given list of numbers.
+
+Aliases: I<Π>, I<vecprod>
+
+=cut
+
 =head2 proper_divisors
 
     n.proper_divisors
@@ -8262,12 +8067,64 @@ Aliases: I<proper_divisor_count>
     n.psi(k=1)
     dedekind_psi(n,k=1)
 
-Dedekind psi function.
+Dedekind psi function. (L<OEIS A001615|https://oeis.org/A001615>)
 
     say 10.of { .dedekind_psi    }   #=> [0, 1, 3, 4, 6, 6, 12, 8, 12, 12]
     say 10.of { .dedekind_psi(2) }   #=> [0, 1, 5, 10, 20, 26, 50, 50, 80, 90]
 
 Aliases: I<dedekind_psi>
+
+=cut
+
+=head2 psi_inverse
+
+    n.psi_inverse
+
+Returns an array with all the solutions C<x> to Dedekind's psi function: C<psi(x) = n>.
+
+    say psi_inverse(120)    #=> [75, 76, 87, 95]
+
+Aliases: I<inverse_psi>, I<inverse_dedekind_psi>
+
+=cut
+
+=head2 psi_inverse_len
+
+    n.psi_inverse_len
+
+Returns the number of solutions to Dedekind's psi function: C<psi(x) = n>.
+
+Equivalent to C<n.psi_inverse.len>, but much faster.
+
+Aliases: I<inverse_psi_len>, I<inverse_dedekind_psi_len>
+
+=cut
+
+=head2 psi_inverse_max
+
+    n.psi_inverse_max
+
+Returns the largest solution C<x> to Dedekind's psi function: C<psi(x) = n>.
+
+Equivalent to C<n.psi_inverse.max>, but much faster.
+
+Returns C<nil> if there are no solutions.
+
+Aliases: I<inverse_psi_max>, I<inverse_dedekind_psi_max>
+
+=cut
+
+=head2 psi_inverse_min
+
+    n.psi_inverse_min
+
+Returns the smallest solution C<x> to Dedekind's psi function: C<psi(x) = n>.
+
+Equivalent to C<n.psi_inverse.min>, but much faster.
+
+Returns C<nil> if there are no solutions.
+
+Aliases: I<inverse_psi_min>, I<inverse_dedekind_psi_min>
 
 =cut
 
@@ -8857,6 +8714,73 @@ Defined as:
     x / abs(x)
 
 Aliases: I<sign>
+
+=cut
+
+=head2 sigma
+
+    sigma(n,k=1)
+
+Returns the sum of the positive divisors of C<n>, each raised to the power C<k>.
+
+Aliases: I<σ>
+
+=cut
+
+=head2 sigma_inverse
+
+    n.sigma_inverse(k=1)
+
+Returns an array with all the solutions C<x> to the sigma sum of divisors function: C<sigma(x,k) = n>.
+
+    say sigma_inverse(42)           #=> [20, 26, 41]
+    say sigma_inverse(22100, 2)     #=> [120, 130, 141]
+
+Also works with arbitrary large integers:
+
+    say sigma_inverse(9325257382230393314439814176)
+
+Aliases: I<inverse_sigma>
+
+=cut
+
+=head2 sigma_inverse_len
+
+    n.sigma_inverse_len(k=1)
+
+Returns the number of solutions to the sigma sum of divisors function: C<sigma_k(x) = n>.
+
+Equivalent to C<n.sigma_inverse(k).len>, but much faster.
+
+Aliases: I<inverse_sigma_len>
+
+=cut
+
+=head2 sigma_inverse_max
+
+    n.sigma_inverse_max(k=1)
+
+Returns the largest solution C<x> to the sum of divisors function: C<sigma_k(x) = n>.
+
+Equivalent to C<n.sigma_inverse(k).max>, but much faster.
+
+Returns C<nil> if there are no solutions.
+
+Aliases: C<inverse_sigma_max>
+
+=cut
+
+=head2 sigma_inverse_min
+
+    n.sigma_inverse_min(k=1)
+
+Returns the smallest solution C<x> to the sum of divisors function: C<sigma_k(x) = n>.
+
+Equivalent to C<n.sigma_inverse(k).min>, but much faster.
+
+Returns C<nil> if there are no solutions.
+
+Aliases: C<inverse_sigma_min>
 
 =cut
 
@@ -9648,6 +9572,16 @@ Returns an array with the subsets of the integers in the range C<0..n-1>, or ite
 
 =cut
 
+=head2 sum
+
+    sum(...)
+
+Returns the sum of a given list of numbers.
+
+Aliases: I<Σ>, I<vecsum>
+
+=cut
+
 =head2 sum_of_squares
 
     sum_of_squares(n)
@@ -9718,6 +9652,20 @@ Returns the n-th tangent/zag number. (L<OEIS A000182|https://oeis.org/A000182>)
     tanh(x)
 
 Hyperbolic tangent function.
+
+=cut
+
+=head2 tau
+
+    Num.tau
+    tau(n)
+
+Returns the C<TAU> constant (C<2*PI>), or the number of positive divisors of C<n> (i.e.: C<sigma_0(n)>).
+
+    say Num.tau     #=> 6.283185307179...
+    say tau(120)    #=> 16
+
+Aliases: I<τ>
 
 =cut
 
@@ -9884,6 +9832,18 @@ The unitary totient function. (L<OEIS A047994|https://oeis.org/A047994>)
 
 =cut
 
+=head2 uphi_inverse
+
+    n.uphi_inverse
+
+Returns an array with all the solutions C<x> to C<uphi(x) = n>.
+
+    say uphi_inverse(120)       #=> [121, 143, 144, 155, 164, 183, 220, 231, 240, 242, 286, 310, 366, 462]
+
+Aliases: I<inverse_uphi>
+
+=cut
+
 =head2 urand
 
     urand(n)
@@ -9910,6 +9870,18 @@ Aliases: I<urandomm>
     usigma(n, k=1)
 
 Returns the sum of the unitary divisors of C<n>, each divisor raised to the power C<k>.
+
+=cut
+
+=head2 usigma_inverse
+
+    n.usigma_inverse
+
+Returns an array with all the solutions C<x> to C<usigma(x) = n>.
+
+    say usigma_inverse(120)      #=> [60, 87, 92, 95, 99]
+
+Aliases: I<inverse_usigma>
 
 =cut
 
@@ -9942,6 +9914,16 @@ Returns the number of times C<n> is divisible by C<k>.
     Num.zero
 
 Returns the number 0.
+
+=cut
+
+=head2 zeta
+
+    zeta(s)
+
+The Euler–Riemann zeta function. (currently, defined only for real numbers)
+
+Aliases: I<ζ>
 
 =cut
 

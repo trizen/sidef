@@ -8,7 +8,8 @@ package Sidef::Types::Number::Polynomial {
     use utf8;
     use 5.016;
 
-    require List::Util;
+    use List::Util   qw();
+    use Scalar::Util qw();
 
     use parent qw(
       Sidef::Types::Number::Number
@@ -93,12 +94,12 @@ package Sidef::Types::Number::Polynomial {
                 return __PACKAGE__->new(%pairs);
             }
 
-            if (UNIVERSAL::isa($value, 'Sidef::Types::Array::Array')) {
+            if (Scalar::Util::reftype($value) eq 'ARRAY') {
                 my $end = $#{$value};
                 return __PACKAGE__->new(
                     map {
                         my $t = $value->[$_];
-                        UNIVERSAL::isa($t, 'Sidef::Types::Array::Array') ? (($t->[0], $t->[1])) : (($end - $_) => $t)
+                        (Scalar::Util::reftype($t) eq 'ARRAY') ? (($t->[0], $t->[1])) : (($end - $_) => $t)
                       } 0 .. $end
                 );
             }

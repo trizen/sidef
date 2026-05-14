@@ -10,7 +10,8 @@ package Sidef::Types::Number::PolynomialMod {
     use utf8;
     use 5.016;
 
-    require List::Util;
+    use List::Util   qw();
+    use Scalar::Util qw();
 
     use parent qw(
       Sidef::Types::Number::Polynomial
@@ -28,7 +29,7 @@ package Sidef::Types::Number::PolynomialMod {
 
         my $mod = pop @args;
 
-        if (ref($mod) eq 'Sidef::Types::Array::Array') {
+        if (Scalar::Util::reftype($mod) eq 'ARRAY') {
             $mod = __PACKAGE__->SUPER::new($mod);
         }
 

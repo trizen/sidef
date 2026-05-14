@@ -2,6 +2,7 @@ package Sidef::Object::Object {
 
     use utf8;
     use 5.016;
+
     use Scalar::Util qw();
 
     use Sidef;
@@ -625,7 +626,7 @@ package Sidef::Object::Object {
         *{__PACKAGE__ . '::' . '|>'} = sub {
             my ($arg, $func, @args) = @_;
 
-            if (CORE::ref($func) eq 'Sidef::Types::Array::Array') {
+            if (Scalar::Util::reftype($func) eq 'ARRAY') {
                 @args = @$func;
                 $func = shift(@args);
             }
