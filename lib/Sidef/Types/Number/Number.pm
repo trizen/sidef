@@ -26464,6 +26464,47 @@ package Sidef::Types::Number::Number {
         _array([map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } _divisors($n)]);
     }
 
+    sub multiplicative_partitions {
+        my ($n) = @_;
+
+        # See also:
+        #   https://oeis.org/A001055
+
+        $n = _big2uistr($$n) // return _array();
+
+        my @divs = _divisors($n);
+        CORE::shift(@divs);    # remove divisor '1'
+
+        my @results;
+        my $end       = $#divs;
+        my @divs_objs = map { _set_int($_) } @divs;
+
+        sub {
+            my ($target, $min_idx, $path) = @_;
+
+            if ($target == 1) {
+                CORE::push(@results, _array($path));
+                return;
+            }
+
+            for my $i ($min_idx .. $end) {
+                my $d = $divs[$i];
+
+                # Prune branch if the divisor exceeds the remaining target
+                last if $d > $target;
+
+                if (Math::Prime::Util::GMP::modint($target, $d) eq '0') {
+                    __SUB__->(Math::Prime::Util::GMP::divint($target, $d), $i, [@$path, $divs_objs[$i]]);
+                }
+            }
+          }
+          ->($n, 0, []);
+
+        @results = map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [$_, scalar(@$_)] } @results;
+
+        return _array(\@results);
+    }
+
     sub antidivisors {
         my ($n) = @_;
 

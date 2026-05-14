@@ -1434,7 +1434,7 @@ Returns C<nil> if C<n> cannot be truncated to an integer or if C<k> is negative.
 
     bphi(n)
 
-The bi-unitary analog of Euler's totient function of C<n>. (OEIS: A116550)
+The bi-unitary analog of Euler's totient function of C<n>. (L<OEIS A116550|https://oeis.org/A116550>)
 
 =cut
 
@@ -1546,7 +1546,7 @@ Aliases: I<bsearch_inverse>
 
     bsigma(n, k=1)
 
-Returns the sum of the bi-unitary divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the bi-unitary divisors of C<n>, each divisor raised to the k-th power. (L<OEIS A188999|https://oeis.org/A188999>)
 
     say 20.of { .bsigma }    #=> OEIS: A188999
 
@@ -1558,7 +1558,7 @@ Aliases: I<biusigma>
 
     bsigma0(n)
 
-Returns the count of the bi-unitary divisors of C<n>.
+Returns the count of the bi-unitary divisors of C<n>. (L<OEIS A286324|https://oeis.org/A286324>)
 
     say 20.of { .bsigma0 }   #=> OEIS: A286324
 
@@ -2004,7 +2004,7 @@ Complex integer exponentiation: returns C<(x,y)> such that C<x+y*i = (a+b*i)^n>.
 
     n.composite
 
-Returns the n-th composite number (OEIS: A002808).
+Returns the n-th composite number. (L<OEIS A002808|https://oeis.org/A002808>)
 
     say composite(10**9)        #=> 1053422339
 
@@ -2154,7 +2154,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
     core(n)
 
-Squarefree part of C<n>.
+Squarefree part of C<n>. (L<OEIS A007913|https://oeis.org/A007913>)
 
     say 30.of { .core }     #=> OEIS: A007913
 
@@ -2635,7 +2635,7 @@ It also supports negative indices:
 
     digital_root(n, b=10)
 
-Returns the digital root of C<n>, with respect to base C<b>.
+Returns the digital root of C<n>, with respect to base C<b>. (L<OEIS A010888|https://oeis.org/A010888>)
 
     say 30.of { .digital_root }               #=> OEIS: A010888
     say 30.of { .digital_root(.isqrt+1) }     #=> OEIS: A122197
@@ -2915,7 +2915,7 @@ The complementary error function.
 
     esigma(n, k=1)
 
-Returns the sum of the exponential divisors (or e-divisors) of C<n>, each divisor raised to k-th power.
+Returns the sum of the exponential divisors (or e-divisors) of C<n>, each divisor raised to k-th power. (L<OEIS A051377|https://oeis.org/A051377>)
 
     say 20.of { .esigma }       #=> OEIS: A051377
 
@@ -2925,7 +2925,7 @@ Returns the sum of the exponential divisors (or e-divisors) of C<n>, each diviso
 
     esigma0(n)
 
-Returns the count of the exponential divisors (or e-divisors) of C<n>.
+Returns the count of the exponential divisors (or e-divisors) of C<n>. (L<OEIS A049419|https://oeis.org/A049419>)
 
     say 20.of { .esigma0 }      #=> OEIS: A049419
 
@@ -3185,7 +3185,7 @@ Aliases: I<factorial_power>
 
     factorial_sum(n)
 
-Left factorial of C<n>, defined as:
+Left factorial of C<n> (L<OEIS A003422|https://oeis.org/A003422>), defined as:
 
     Sum_{k=0..n-1} k!
 
@@ -3479,7 +3479,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
     fubini(n)
 
-Returns the n-th Fubini number.
+Returns the n-th Fubini number. (L<OEIS A000670|https://oeis.org/A000670>)
 
     say 10.of { .fubini }    #=> OEIS: A000670
 
@@ -3501,7 +3501,7 @@ Returns an array containing the Fubini numbers with indices in the range C<0..n>
 
     fusc(n)
 
-Returns the n-th term in Stern's diatomic series (or Stern-Brocot sequence).
+Returns the n-th term in Stern's diatomic series (or Stern-Brocot sequence). (L<OEIS A002487|https://oeis.org/A002487>)
 
     say 30.of { .fusc }     #=> OEIS: A002487
 
@@ -3609,7 +3609,7 @@ Example:
     gpf_sum(n)
     gpf_sum(a,b)
 
-Returns the sum of largest prime factors of numbers from C<1> to C<n>, or in the range C<a..b>.
+Returns the sum of largest prime factors of numbers from C<1> to C<n>, or in the range C<a..b>. (L<OEIS A088822|https://oeis.org/A088822>)
 
     say 30.of { .gpf_sum }   #=> OEIS: A088822
 
@@ -4121,7 +4121,7 @@ Returns the modular inverse of C<n> modulo C<m>.
 
     iphi(n, k=1)
 
-Infinitary analog of Euler's phi function. (OEIS: A091732)
+Infinitary analog of Euler's phi function. (L<OEIS A091732|https://oeis.org/A091732>)
 
 =cut
 
@@ -4231,7 +4231,7 @@ Equivalent with:
 
     n.is_abs_euler_psp
 
-Returns true if C<n> is an absolute Euler pseudoprime: C<p-1 | (n-1)/2> for every C<p|n>, where C<n> is a squarefree composite integer.
+Returns true if C<n> is an absolute Euler pseudoprime: C<p-1 | (n-1)/2> for every C<p|n>, where C<n> is a squarefree composite integer. (L<OEIS A033181|https://oeis.org/A033181>)
 
     say 10.by { .is_abs_euler_psp }     #=> OEIS: A033181
 
@@ -4243,7 +4243,7 @@ Aliases: I<is_absolute_euler_psp>
 
     n.is_abundant
 
-Returns true if C<n> is an abundant number, else false.
+Returns true if C<n> is an abundant number, else false. (L<OEIS A005101|https://oeis.org/A005101>)
 
     say 20.by { .is_abundant }  #=> OEIS: A005101
 
@@ -4345,7 +4345,7 @@ Returns true if C<n> is a centered k-gonal number.
 
     n.is_chebyshev
 
-Returns true if C<n> is an odd composite Chebyshev pseudoprime, as defined by OEIS A175530.
+Returns true if C<n> is an odd composite Chebyshev pseudoprime, as defined by L<OEIS A175530|https://oeis.org/A175530>.
 
 Aliases: I<is_chebyshev_psp>, I<is_chebyshev_pseudoprime>
 
@@ -4422,7 +4422,7 @@ Returns true if C<n> is divisible by the cubes of all its prime factors.
 
     n.is_cyclic
 
-Returns true when C<gcd(phi(n), n) = 1>, where C<phi(n)> is the Euler totient function.
+Returns true when C<gcd(phi(n), n) = 1>, where C<phi(n)> is the Euler totient function. (L<OEIS A003277|https://oeis.org/A003277>)
 
     say 30.by { .is_cyclic }    # OEIS: A003277
 
@@ -4543,7 +4543,7 @@ Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
     isigma(n, k=1)
 
-Returns the sum of the infinitary divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the infinitary divisors of C<n>, each divisor raised to the k-th power. (L<OEIS A049417|https://oeis.org/A049417>)
 
     say 20.of { .isigma }       #=> OEIS: A049417
 
@@ -4553,7 +4553,7 @@ Returns the sum of the infinitary divisors of C<n>, each divisor raised to the k
 
     isigma0(n)
 
-Returns the count of the infinitary divisors of C<n>.
+Returns the count of the infinitary divisors of C<n>. (L<OEIS A037445|https://oeis.org/A037445>)
 
     say 20.of { .isigma0 }      #=> OEIS: A037445
 
@@ -4575,7 +4575,7 @@ Returns true if C<x> is an imaginary number.
 
     n.is_imprimitive_carmichael
 
-Returns true if C<n> is an imprimitive Carmichael numbers, as defined by OEIS: A328935.
+Returns true if C<n> is an imprimitive Carmichael numbers, as defined by L<OEIS A328935|https://oeis.org/A328935>.
 
     say 325533792014488126487416882038879701391121.is_imprimitive_carmichael   # true
 
@@ -4641,7 +4641,7 @@ Returns true if C<n> is a Lucas number. False otherwise.
 
     n.is_lucas_carmichael
 
-Returns true if C<n> is a Lucas-Carmichael number.
+Returns true if C<n> is a Lucas-Carmichael number. (L<OEIS A006972|https://oeis.org/A006972>)
 
     say 10.by(:is_lucas_carmichael)                               # OEIS: A006972
     say is_lucas_carmichael(58735331016965175152455996272482303)  # true
@@ -4840,7 +4840,7 @@ Aliases: I<is_palindromic>
 
     n.is_pell_lucas_psp
 
-It returns true if C<V_n(2, -1) = 2 (mod n)>.
+It returns true if C<V_n(2, -1) = 2 (mod n)>. (L<OEIS A270342|https://oeis.org/A270342>)
 
     say 20.by { .is_pell_lucas_pseudoprime }                               #=> OEIS: A270342
     say 20.by { .is_pell_lucas_pseudoprime && .is_composite }              #=> OEIS: A335668
@@ -4981,7 +4981,7 @@ Aliases: I<is_power>, I<is_perfect_power>
 
     n.is_practical
 
-Returns true if C<n> is a practical number (OEIS: A005153).
+Returns true if C<n> is a practical number. (L<OEIS A005153|https://oeis.org/A005153>)
 
     say 20.by { .is_practical }
 
@@ -5011,7 +5011,7 @@ Returns true if C<n> is a power of some prime.
 
     n.is_primitive_abundant
 
-Returns true if C<n> is a primitive abundant number, else false.
+Returns true if C<n> is a primitive abundant number, else false. (L<OEIS A091191|https://oeis.org/A091191>)
 
     say 20.by { .is_primitive_abundant }    #=> OEIS: A091191
 
@@ -5158,7 +5158,7 @@ Returns true if all prime factors of C<n> are >= C<k>.
 
     n.is_safe_prime
 
-It returns true if both C<n> and C<(n-1)/2> are prime.
+It returns true if both C<n> and C<(n-1)/2> are prime. (L<OEIS A005385|https://oeis.org/A005385>)
 
     say 30.by { .is_safe_prime }    #=> OEIS: A005385
 
@@ -5361,7 +5361,7 @@ Aliases: I<is_underwood_pseudoprime>, I<is_frobenius_underwood_psp>, I<is_froben
 
 Returns true if C<n> passes the Lucas-V BFW test: C<V_{n+1} == 2*Q (mod n)> for carefully chosen values of C<P> and C<Q>.
 
-The composite numbers that pass this test are extremely rare (OEIS A365514).
+The composite numbers that pass this test are extremely rare. (L<OEIS A365514|https://oeis.org/A365514>)
 
 When combined with a strong Fermat pseudoprime test to base 2, there are no known composites that pass both tests.
 
@@ -5720,7 +5720,7 @@ Example:
     lpf_sum(n)
     lpf_sum(a,b)
 
-Returns the sum of least prime factors of numbers from C<1> to C<n>, or in the range C<a..b>.
+Returns the sum of least prime factors of numbers from C<1> to C<n>, or in the range C<a..b>. (L<OEIS A088821|https://oeis.org/A088821>)
 
     say 30.of { .lpf_sum }     #=> OEIS: A088821
 
@@ -5988,7 +5988,7 @@ Returns the -1 value.
 
     motzkin(n)
 
-Returns the n-th Motzkin number. (OEIS: A001006)
+Returns the n-th Motzkin number. (L<OEIS A001006|https://oeis.org/A001006>)
 
     say 10.of { .motzkin }   #=> [1, 1, 2, 4, 9, 21, 51, 127, 323, 835]
 
@@ -6056,6 +6056,20 @@ The multinomial coefficient, given a list of native integers.
 
 =cut
 
+=head2 multiplicative_partitions
+
+    multiplicative_partitions(n)
+
+Returns a multiset (array of arrays) of integers > 1 whose product is C<n>.
+
+    say multiplicative_partitions(6)        #=> [[6], [2, 3]]
+    say multiplicative_partitions(8)        #=> [[8], [2, 4], [2, 2, 2]]
+    say multiplicative_partitions(30)       #=> [[30], [2, 15], [3, 10], [5, 6], [2, 3, 5]]
+
+The number of such partitions is given by L<OEIS A001055|https://oeis.org/A001055>.
+
+=cut
+
 =head2 nan
 
     Num.nan
@@ -6068,7 +6082,7 @@ Returns the Not-a-Number special value (C<NaN>).
 
     nbsigma(n, k=1)
 
-Returns the sum of the non-bi-unitary divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the non-bi-unitary divisors of C<n>, each divisor raised to the k-th power. (L<OEIS A319072|https://oeis.org/A319072>)
 
     say 30.of { .nbsigma }      #=> OEIS: A319072
 
@@ -6128,7 +6142,7 @@ Negates the sign of C<x> (equivalent with: C<-x>).
 
     nesigma(n, k=1)
 
-Returns the sum of the nonexponential divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the nonexponential divisors of C<n>, each divisor raised to the k-th power. (L<OEIS A160135|https://oeis.org/A160135>)
 
     say 30.of { .nesigma }      #=> OEIS: A160135
 
@@ -6138,7 +6152,7 @@ Returns the sum of the nonexponential divisors of C<n>, each divisor raised to t
 
     nesigma0(n)
 
-Returns the count of the nonexponential divisors of C<n>.
+Returns the count of the nonexponential divisors of C<n>. (L<OEIS A160097|https://oeis.org/A160097>)
 
     say 30.of { .nesigma0 }     #=> OEIS: A160097
 
@@ -6378,7 +6392,7 @@ Returns the negative infinity special value (C<-Inf>).
 
     nisigma(n, k=1)
 
-Returns the sum of the noninfinitary divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the noninfinitary divisors of C<n>, each divisor raised to the k-th power. (L<OEIS A348271|https://oeis.org/A348271>)
 
     say 30.of { .nisigma }      #=> OEIS: A348271
 
@@ -6388,7 +6402,7 @@ Returns the sum of the noninfinitary divisors of C<n>, each divisor raised to th
 
     nisigma0(n)
 
-Returns the count of the noninfinitary divisors of C<n>.
+Returns the count of the noninfinitary divisors of C<n>. (L<OEIS A348341|https://oeis.org/A348341>)
 
     say 30.of { .nisigma0 }     #=> OEIS: A348341
 
@@ -6699,7 +6713,7 @@ Returns C<NaN> if C<<< n <= 0 >>> or C<<< k <= 1 >>>.
 
     nth_squarefree(n)
 
-Returns the n-th squarefree number. (OEIS: A005117)
+Returns the n-th squarefree number. (L<OEIS A005117|https://oeis.org/A005117>)
 
     say nth_squarefree(1e14)    #=> 164493406685659
 
@@ -6788,7 +6802,7 @@ Although this may or may not be actually faster.
 
     nuphi(n)
 
-The nonunitary totient function. (OEIS: A254503)
+The nonunitary totient function. (L<OEIS A254503|https://oeis.org/A254503>)
 
 =cut
 
@@ -6796,7 +6810,7 @@ The nonunitary totient function. (OEIS: A254503)
 
     nusigma(n, k=1)
 
-Returns the sum of the nonunitary divisors of C<n>, each divisor raised to the k-th power.
+Returns the sum of the nonunitary divisors of C<n>, each divisor raised to the k-th power. (L<OEIS A048146|https://oeis.org/A048146>)
 
     say 30.of { .nusigma }     #=> OEIS: A048146
 
@@ -6806,7 +6820,7 @@ Returns the sum of the nonunitary divisors of C<n>, each divisor raised to the k
 
     nusigma0(n)
 
-Returns the count of the nonunitary divisors of C<n>.
+Returns the count of the nonunitary divisors of C<n>. (L<OEIS A048105|https://oeis.org/A048105>)
 
     say 30.of { .nusigma0 }    #=> OEIS: A048105
 
@@ -7062,7 +7076,7 @@ The product of the factors will give back C<n>. However, some factors may be com
 
     pillai(n, k=1)
 
-Pillai's arithmetical function: C<Sum_{k=1..n} gcd(k, n)>. (OEIS: A018804)
+Pillai's arithmetical function: C<Sum_{k=1..n} gcd(k, n)>. (L<OEIS A018804|https://oeis.org/A018804>)
 
 Generalized as:
 
@@ -8741,7 +8755,7 @@ Trigonometric secant function.
 
     secant_number(n)
 
-Return the n-th secant/zig number. (OEIS: A000364)
+Return the n-th secant/zig number. (L<OEIS A000364|https://oeis.org/A000364>)
 
 =cut
 
@@ -8765,7 +8779,7 @@ Re-seed the C<rand()> function. The value for C<n> can be any arbitrary large in
 
     semiprime(n)
 
-Returns the n-th semiprime number.
+Returns the n-th semiprime number. (L<OEIS A001358|https://oeis.org/A001358>)
 
     say 10.of {|k| semiprime(10**k) }    #=> OEIS: A114125
 
@@ -8778,7 +8792,7 @@ Aliases: I<nth_semiprime>
     semiprime_count(n)
     semiprime_count(a,b)
 
-Counts the number of semiprimes <= C<n> (OEIS: A072000), or in the range C<a..b>.
+Counts the number of semiprimes <= C<n> (L<OEIS A072000|https://oeis.org/A072000>), or in the range C<a..b>.
 
     say 20.of {|k| semiprime_count(2**k) }
 
@@ -8998,7 +9012,7 @@ Not all solutions may be returned. Returns an empty array if there are no soluti
 
     sopf(n)
 
-Sum of the distinct primes dividing C<n>.
+Sum of the distinct primes dividing C<n>. (L<OEIS A008472|https://oeis.org/A008472>)
 
     say 30.of { .sopf }     #=> OEIS: A008472
 
@@ -9008,7 +9022,7 @@ Sum of the distinct primes dividing C<n>.
 
     sopfr(n)
 
-Sum of the primes dividing C<n> (with repetition).
+Sum of the primes dividing C<n> (with repetition). (L<OEIS A001414|https://oeis.org/A001414>)
 
     say 30.of { .sopfr }    #=> OEIS: A001414
 
@@ -9090,7 +9104,7 @@ Iterate over the period of the expansion of the continued fraction for square ro
 
     n.sqrt_cfrac_period_len
 
-Returns the length of the period of continued fraction for square root of C<n>. (OEIS: A003285)
+Returns the length of the period of continued fraction for square root of C<n>. (L<OEIS A003285|https://oeis.org/A003285>)
 
 =cut
 
@@ -9293,7 +9307,7 @@ Aliases: I<squarefree_almost_primepi>, I<squarefree_pi_k>
     squarefree_semiprime_count(n)
     squarefree_semiprime_count(a,b)
 
-Counts the number of squarefree semiprimes <= C<n> (OEIS: A072613), or in the range C<a..b>.
+Counts the number of squarefree semiprimes <= C<n> (L<OEIS A072613|https://oeis.org/A072613>), or in the range C<a..b>.
 
     say 10.of {|k| squarefree_semiprime_count(10**k) }  # OEIS: A036351
 
@@ -9380,7 +9394,7 @@ Aliases: I<each_squarefree_strong_fermat_psp>
     squarefree_sum(n)
     squarefree_sum(a,b)
 
-Returns the sum of squarefree numbers <= C<n> or in the range C<a..b>. (OEIS: A066779)
+Returns the sum of squarefree numbers <= C<n> or in the range C<a..b>. (L<OEIS A066779|https://oeis.org/A066779>)
 
     say squarefree_sum(1e12)    #=> 303963551353876732927386
     say squarefree_sum(1e13)    #=> 30396355090144154315002969
@@ -9667,7 +9681,7 @@ Negative values of C<v> are also supported.
 
     superfactorial(n)
 
-Returns the product of first C<n> factorials.
+Returns the product of first C<n> factorials. (L<OEIS A000178|https://oeis.org/A000178>)
 
     say 10.of { .superfactorial }   #=> OEIS: A000178
 
@@ -9677,7 +9691,7 @@ Returns the product of first C<n> factorials.
 
     superprimorial(n)
 
-Returns the product of first C<n> primorials.
+Returns the product of first C<n> primorials. (L<OEIS A006939|https://oeis.org/A006939>)
 
     say 10.of { .superprimorial }   #=> OEIS: A006939
 
@@ -9695,7 +9709,7 @@ Trigonometric tangent function.
 
     tangent_number(n)
 
-Returns the n-th tangent/zag number. (OEIS: A000182).
+Returns the n-th tangent/zag number. (L<OEIS A000182|https://oeis.org/A000182>)
 
 =cut
 
@@ -9851,7 +9865,7 @@ Aliases: I<unitary_divisors>
 
     uphi(n,k=1)
 
-The unitary totient function. (OEIS: A047994)
+The unitary totient function. (L<OEIS A047994|https://oeis.org/A047994>)
 
 =cut
 
