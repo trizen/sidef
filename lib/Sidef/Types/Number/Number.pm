@@ -26517,6 +26517,44 @@ package Sidef::Types::Number::Number {
         return _array(\@results);
     }
 
+    sub multisets {
+        my ($n, $k, $max_sum) = @_;
+
+        _valid(\$k);
+
+        $n = _any2ui($$n) // return _array();
+        $k = _any2ui($$k) // return _array();
+
+        if (defined($max_sum)) {
+            _valid(\$max_sum);
+            $max_sum = _any2ui($$max_sum) // return _array();
+        }
+
+        my @results;
+        my @path;
+
+        sub {
+            my ($pos, $max_value, $sum) = @_;
+
+            if ($pos == $n) {
+                push @results, _array([@path]);
+                return;
+            }
+
+            for my $v (1 .. $max_value) {
+                if (defined $max_sum) {
+                    last if ($sum + $v > $max_sum);
+                }
+                push @path, bless \$v;
+                __SUB__->($pos + 1, $v, $sum + $v);
+                pop @path;    # backtrack
+            }
+          }
+          ->(0, $k, 0);
+
+        return _array(\@results);
+    }
+
     sub multiplicative_partitions {
         my ($n, $max_value, $max_sum) = @_;
 

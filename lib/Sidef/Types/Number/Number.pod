@@ -5746,6 +5746,25 @@ When the C<max_sum> argument is provided, it generates only the partitions whose
 
 =cut
 
+=head2 multisets
+
+    multisets(n, k)
+    multisets(n, k, max_sum)
+
+Returns an array of arrays of integers of size C<n>, with integers in the range C<1..k>.
+
+    say multisets(3, 2)
+    #=> [[1, 1, 1], [2, 1, 1], [2, 2, 1], [2, 2, 2]]
+
+When the C<max_sum> argument is provided, it generates only the multisets whose sum is <= C<max_sum>.
+
+    say multisets(3, 4, 6)
+    #=> [[1, 1, 1], [2, 1, 1], [2, 2, 1], [2, 2, 2], [3, 1, 1], [3, 2, 1], [4, 1, 1]]
+
+B<NOTE>: these are also called "combinations with replacements".
+
+=cut
+
 =head2 nan
 
     Num.nan
