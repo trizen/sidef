@@ -17075,7 +17075,7 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $t     = Math::GMPz::Rmpz_init_nobless();
         state $count = Math::GMPz::Rmpz_init_nobless();
 
         Math::GMPz::Rmpz_set_ui($count, 0);
@@ -17126,9 +17126,10 @@ package Sidef::Types::Number::Number {
           }
           ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 1);
 
-        my $r2 = Math::GMPz::Rmpz_fits_ulong_p($count)
-            ? Math::GMPz::Rmpz_get_ui($count)
-            : Math::GMPz::Rmpz_init_set($count);
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($count)
+          ? Math::GMPz::Rmpz_get_ui($count)
+          : Math::GMPz::Rmpz_init_set($count);
 
         bless \$r2;
     }
@@ -26477,6 +26478,42 @@ package Sidef::Types::Number::Number {
 
         # Fallback: unbounded
         _array([map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } _divisors($n)]);
+    }
+
+    sub partitions {
+        my ($n, $max_part) = @_;
+
+        $n = _any2ui($$n) // return _array();
+
+        if (defined($max_part)) {
+            _valid(\$max_part);
+            $max_part = _any2ui($$max_part) // return _array();
+        }
+        else {
+            $max_part = $n;
+        }
+
+        my @results;
+
+        sub {
+            my ($n, $max_part, $current) = @_;
+
+            if ($n == 0) {
+                unshift @results, _array([@$current]);
+                return;
+            }
+
+            my $upper = ($n < $max_part ? $n : $max_part);
+
+            for my $part (1 .. $upper) {
+                push @$current, bless \$part;
+                __SUB__->($n - $part, $part, $current);
+                pop @$current;    # backtrack
+            }
+          }
+          ->($n, $max_part, []);
+
+        return _array(\@results);
     }
 
     sub multiplicative_partitions {

@@ -6655,6 +6655,21 @@ Aliases: I<:>, I<pair>
 
 =cut
 
+=head2 partitions
+
+    partitions(n)
+    partitions(n, max_value)
+
+Return an array of arrays with the additive partitions of C<n>, such that their sum equals C<n>.
+
+    say partitions(4)       #=> [[4], [3, 1], [2, 2], [2, 1, 1], [1, 1, 1, 1]]
+
+When the C<max_value> argument is provided, it returns only the partitions with value <= C<max_value>.
+
+    say partitions(4, 2)    #=> [[2, 2], [2, 1, 1], [1, 1, 1, 1]]
+
+It uses the "Mathematica" ordering of the partitions (graded reverse lexicographic ordering).
+
 =head2 partition_count
 
     partition_count(n)
