@@ -3,6 +3,10 @@ package Sidef::Types::Number::Number {
     use utf8;
     use 5.016;
 
+    use parent qw(
+      Sidef::Object::Object
+    );
+
     use Sidef::Types::Bool::Bool;
 
     use Math::GMPz qw();
@@ -125,14 +129,10 @@ package Sidef::Types::Number::Number {
 
     state $LUCAS_PQ_LIMIT = CORE::int(CORE::sqrt(ULONG_MAX >> 2));
 
-    use parent qw(Sidef::Object::Object);
-
     use overload
       q{bool} => sub { (@_) = (${$_[0]}); goto &__boolify__ },
       q{0+}   => sub { (@_) = (${$_[0]}); goto &__numify__ },
       q{""}   => sub { (@_) = (${$_[0]}); goto &__stringify__ };
-
-    use Sidef::Types::Bool::Bool;
 
     sub new {
         my (undef, $num, $base) = @_;
@@ -17071,14 +17071,14 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+        if (Math::GMPz::Rmpz_cmp($n, _cached_pn_primorial($k)) < 0) {
             return ZERO;
         }
 
-        my $count = Math::GMPz::Rmpz_init_set_ui(0);
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $count = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_ui($count, 0);
 
         sub {
             my ($m, $p, $k, $j) = @_;
@@ -17126,7 +17126,11 @@ package Sidef::Types::Number::Number {
           }
           ->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, 1);
 
-        bless \$count;
+        my $r2 = Math::GMPz::Rmpz_fits_ulong_p($count)
+            ? Math::GMPz::Rmpz_get_ui($count)
+            : Math::GMPz::Rmpz_init_set($count);
+
+        bless \$r2;
     }
 
     *squarefree_pi_k           = \&squarefree_almost_prime_count;
@@ -17174,14 +17178,12 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+        if (Math::GMPz::Rmpz_cmp($n, _cached_pn_primorial($k)) < 0) {
             return ZERO;
         }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
 
         my $total = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -17266,19 +17268,17 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-        state $u = Math::GMPz::Rmpz_init_nobless();
-        state $v = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+        if (Math::GMPz::Rmpz_cmp($n, _cached_pn_primorial($k)) < 0) {
             return ZERO;
         }
 
         if ((HAS_PRIME_UTIL or (HAS_PRIME_UTIL and $k < 15)) and Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return _set_int(Math::Prime::Util::omega_prime_count($k, Math::GMPz::Rmpz_get_ui($n)));
         }
+
+        state $t = Math::GMPz::Rmpz_init_nobless();
+        state $u = Math::GMPz::Rmpz_init_nobless();
+        state $v = Math::GMPz::Rmpz_init_nobless();
 
         my $count = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -17400,15 +17400,13 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
+        if (Math::GMPz::Rmpz_cmp($n, _cached_pn_primorial($k)) < 0) {
+            return ZERO;
+        }
+
         state $t = Math::GMPz::Rmpz_init_nobless();
         state $u = Math::GMPz::Rmpz_init_nobless();
         state $v = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
-            return ZERO;
-        }
 
         my $total = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -26482,12 +26480,22 @@ package Sidef::Types::Number::Number {
     }
 
     sub multiplicative_partitions {
-        my ($n) = @_;
+        my ($n, $max_value, $max_sum) = @_;
 
         # See also:
         #   https://oeis.org/A001055
 
         $n = _big2uistr($$n) // return _array();
+
+        if (defined($max_value)) {
+            _valid(\$max_value);
+            $max_value = _big2pistr($$max_value) // return _array();
+        }
+
+        if (defined($max_sum)) {
+            _valid(\$max_sum);
+            $max_sum = _big2pistr($$max_sum) // return _array();
+        }
 
         my @divs = _divisors($n);
         CORE::shift(@divs);    # remove divisor '1'
@@ -26497,7 +26505,7 @@ package Sidef::Types::Number::Number {
         my @divs_objs = map { _set_int($_) } @divs;
 
         sub {
-            my ($target, $min_idx, $path) = @_;
+            my ($target, $min_idx, $curr_sum, $path) = @_;
 
             if ($target == 1) {
                 CORE::push(@results, _array($path));
@@ -26508,14 +26516,24 @@ package Sidef::Types::Number::Number {
                 my $d = $divs[$i];
 
                 # Prune branch if the divisor exceeds the remaining target
-                last if $d > $target;
+                last if Math::Prime::Util::GMP::cmpint($d, $target) > 0;
+
+                if (defined($max_value)) {
+                    last if Math::Prime::Util::GMP::cmpint($d, $max_value) > 0;
+                }
+
+                my $new_sum;
+                if (defined($max_sum)) {
+                    $new_sum = Math::Prime::Util::GMP::addint($curr_sum, $d);
+                    last if Math::Prime::Util::GMP::cmpint($new_sum, $max_sum) > 0;
+                }
 
                 if (Math::Prime::Util::GMP::modint($target, $d) eq '0') {
-                    __SUB__->(Math::Prime::Util::GMP::divint($target, $d), $i, [@$path, $divs_objs[$i]]);
+                    __SUB__->(Math::Prime::Util::GMP::divint($target, $d), $i, $new_sum, [@$path, $divs_objs[$i]]);
                 }
             }
           }
-          ->($n, 0, []);
+          ->($n, 0, 0, []);
 
         @results = map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [$_, scalar(@$_)] } @results;
 
@@ -32059,12 +32077,19 @@ package Sidef::Types::Number::Number {
         };
 
         my $k     = scalar(@$prime_signature);
-        my $sum_e = List::Util::sum(@$prime_signature);
+        my $sum_e = List::Util::sum(@$prime_signature) || return [];
+
+        if ($sum_e >= Math::GMPz::Rmpz_sizeinbase($B, 2)) {
+            return [];
+        }
+
+        state $m = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_set_ui($m, 1);
 
         Sidef::Types::Array::Array::_unique_permutations(
             $prime_signature,
             sub {
-                $generate->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, $_[0], $sum_e);
+                $generate->($m, 2, $k, $_[0], $sum_e);
             }
         );
 
@@ -32130,15 +32155,14 @@ package Sidef::Types::Number::Number {
             return ZERO;
         }
 
-        state $t = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_set($t, _cached_pn_primorial($k));
-
-        if (Math::GMPz::Rmpz_cmp($n, $t) < 0) {
+        if (Math::GMPz::Rmpz_cmp($n, _cached_pn_primorial($k)) < 0) {
             return ZERO;
         }
 
-        my $count = Math::GMPz::Rmpz_init_set_ui(0);
+        state $t     = Math::GMPz::Rmpz_init_nobless();
+        state $count = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_ui($count, 0);
 
         my $generate = sub {
             my ($m, $lo, $k, $P, $sum_e, $j) = @_;
@@ -32223,16 +32247,28 @@ package Sidef::Types::Number::Number {
             }
         };
 
-        my $sum_e = List::Util::sum(@sig);
+        my $sum_e = List::Util::sum(@sig) || return ZERO;
+
+        if ($sum_e >= Math::GMPz::Rmpz_sizeinbase($n, 2)) {
+            return ZERO;
+        }
+
+        state $m = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_set_ui($m, 1);
 
         Sidef::Types::Array::Array::_unique_permutations(
             \@sig,
             sub {
-                $generate->(Math::GMPz::Rmpz_init_set_ui(1), 2, $k, $_[0], $sum_e, 0);
+                $generate->($m, 2, $k, $_[0], $sum_e, 0);
             }
         );
 
-        bless \$count;
+        my $r2 =
+            Math::GMPz::Rmpz_fits_ulong_p($count)
+          ? Math::GMPz::Rmpz_get_ui($count)
+          : Math::GMPz::Rmpz_init_set($count);
+
+        bless \$r2;
     }
 
     *prime_signature_inverse_len = \&prime_signature_count;
@@ -32245,7 +32281,7 @@ package Sidef::Types::Number::Number {
 
         my @signatures = map {
             [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
-        } @{$n->multiplicative_partitions};
+        } @{$n->multiplicative_partitions(undef, $to->ilog2)};
 
         $from = _any2mpz($$from, 0) // return _array();
         $to   = _any2mpz($$to,   1) // return _array();
@@ -32268,7 +32304,7 @@ package Sidef::Types::Number::Number {
 
         my @signatures = map {
             [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
-        } @{$n->multiplicative_partitions};
+        } @{$n->multiplicative_partitions(undef, $to->ilog2)};
 
         $from = _any2mpz($$from, 0) // return _array();
         $to   = _any2mpz($$to,   1) // return _array();

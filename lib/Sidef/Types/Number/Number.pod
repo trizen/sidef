@@ -5725,14 +5725,24 @@ The multinomial coefficient, given a list of native integers.
 =head2 multiplicative_partitions
 
     multiplicative_partitions(n)
+    multiplicative_partitions(n, max_value)
+    multiplicative_partitions(n, max_value, max_sum)
 
-Returns a multiset (array of arrays) of integers > 1 whose product is C<n>.
+Returns an array of arrays of integers > 1 whose product is C<n>.
 
     say multiplicative_partitions(6)        #=> [[6], [2, 3]]
     say multiplicative_partitions(8)        #=> [[8], [2, 4], [2, 2, 2]]
     say multiplicative_partitions(30)       #=> [[30], [2, 15], [3, 10], [5, 6], [2, 3, 5]]
 
 The number of such partitions is given by L<OEIS A001055|https://oeis.org/A001055>.
+
+When the C<max_value> argument is provided, it generates only the partitions with values <= C<max_value>.
+
+    say multiplicative_partitions(30, 10)        #=> [[3, 10], [5, 6], [2, 3, 5]]
+
+When the C<max_sum> argument is provided, it generates only the partitions whose sum is <= C<max_sum>.
+
+    say multiplicative_partitions(30, nil, 11)   #=> [[5, 6], [2, 3, 5]]
 
 =cut
 
