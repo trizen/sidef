@@ -26481,37 +26481,38 @@ package Sidef::Types::Number::Number {
     }
 
     sub partitions {
-        my ($n, $max_part) = @_;
+        my ($n, $max_value) = @_;
 
         $n = _any2ui($$n) // return _array();
 
-        if (defined($max_part)) {
-            _valid(\$max_part);
-            $max_part = _any2ui($$max_part) // return _array();
+        if (defined($max_value)) {
+            _valid(\$max_value);
+            $max_value = _any2ui($$max_value) // return _array();
         }
         else {
-            $max_part = $n;
+            $max_value = $n;
         }
 
         my @results;
+        my @path;
 
         sub {
-            my ($n, $max_part, $current) = @_;
+            my ($n, $max_part) = @_;
 
             if ($n == 0) {
-                unshift @results, _array([@$current]);
+                unshift @results, _array([@path]);
                 return;
             }
 
-            my $upper = ($n < $max_part ? $n : $max_part);
+            my $upper = ($n < $max_value ? $n : $max_value);
 
             for my $part (1 .. $upper) {
-                push @$current, bless \$part;
-                __SUB__->($n - $part, $part, $current);
-                pop @$current;    # backtrack
+                push @path, bless \$part;
+                __SUB__->($n - $part, $part);
+                pop @path;    # backtrack
             }
           }
-          ->($n, $max_part, []);
+          ->($n, $max_value);
 
         return _array(\@results);
     }
@@ -26540,12 +26541,13 @@ package Sidef::Types::Number::Number {
         my @results;
         my $end       = $#divs;
         my @divs_objs = map { _set_int($_) } @divs;
+        my @path;
 
         sub {
-            my ($target, $min_idx, $curr_sum, $path) = @_;
+            my ($target, $min_idx, $curr_sum) = @_;
 
             if ($target == 1) {
-                CORE::push(@results, _array($path));
+                CORE::push(@results, _array([@path]));
                 return;
             }
 
@@ -26566,11 +26568,13 @@ package Sidef::Types::Number::Number {
                 }
 
                 if (Math::Prime::Util::GMP::modint($target, $d) eq '0') {
-                    __SUB__->(Math::Prime::Util::GMP::divint($target, $d), $i, $new_sum, [@$path, $divs_objs[$i]]);
+                    push @path, $divs_objs[$i];
+                    __SUB__->(Math::Prime::Util::GMP::divint($target, $d), $i, $new_sum);
+                    pop @path;    # backtrack
                 }
             }
           }
-          ->($n, 0, 0, []);
+          ->($n, 0, 0);
 
         @results = map { $_->[0] } sort { $a->[1] <=> $b->[1] } map { [$_, scalar(@$_)] } @results;
 
