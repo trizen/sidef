@@ -32360,7 +32360,7 @@ package Sidef::Types::Number::Number {
 
         my @signatures = map {
             [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
-        } @{$n->multiplicative_partitions(undef, $to->ilog2)};
+        } @{$n->multiplicative_partitions(undef, $to->ilog2->inc)};
 
         $from = _any2mpz($$from, 0) // return _array();
         $to   = _any2mpz($$to,   1) // return _array();
@@ -32383,7 +32383,7 @@ package Sidef::Types::Number::Number {
 
         my @signatures = map {
             [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
-        } @{$n->multiplicative_partitions(undef, $to->ilog2)};
+        } @{$n->multiplicative_partitions(undef, $to->ilog2->inc)};
 
         $from = _any2mpz($$from, 0) // return _array();
         $to   = _any2mpz($$to,   1) // return _array();
