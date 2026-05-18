@@ -32203,39 +32203,26 @@ package Sidef::Types::Number::Number {
     *prime_signature_inverse = \&prime_signature_numbers;
     *inverse_prime_signature = \&prime_signature_numbers;
 
-    sub prime_signature_count {
-        my ($from, $to, $signature) = @_;
+    sub _prime_sig_count {
+        my ($n, $prime_sig) = @_;
 
-        Scalar::Util::reftype($signature) eq 'ARRAY'
-          or die "usage: prime_signature_count(A, B, [...])";
-
-        my @sig = map { my $v = "$_"; $v <= 0 and die "invalid prime signature (entry: $v)"; $v } @$signature;
-
-        _valid(\$to);
-
-        return ZERO if $to->lt($from);
-
-        if ($from->gt(ONE)) {
-            return ((ONE)->prime_signature_count($to, $signature)->sub((ONE)->prime_signature_count($from->dec, $signature)));
-        }
-
-        my $n = _any2mpz($$to) // return ZERO;
+        my @sig = @$prime_sig;
 
         Math::GMPz::Rmpz_sgn($n) > 0
-          or return ZERO;
+          or return 0;
 
         my $k = scalar(@sig);
 
         if ($k == 0) {
-            return ONE;
+            return 1;
         }
 
         if (Math::GMPz::Rmpz_sizeinbase($n, 2) <= $k) {
-            return ZERO;
+            return 0;
         }
 
         if (Math::GMPz::Rmpz_cmp($n, _cached_pn_primorial($k)) < 0) {
-            return ZERO;
+            return 0;
         }
 
         state $t     = Math::GMPz::Rmpz_init_nobless();
@@ -32326,10 +32313,10 @@ package Sidef::Types::Number::Number {
             }
         };
 
-        my $sum_e = List::Util::sum(@sig) || return ZERO;
+        my $sum_e = List::Util::sum(@sig) || return 0;
 
         if ($sum_e >= Math::GMPz::Rmpz_sizeinbase($n, 2)) {
-            return ZERO;
+            return 0;
         }
 
         state $m = Math::GMPz::Rmpz_init_nobless();
@@ -32342,25 +32329,44 @@ package Sidef::Types::Number::Number {
             }
         );
 
-        my $r2 =
-            Math::GMPz::Rmpz_fits_ulong_p($count)
+        Math::GMPz::Rmpz_fits_ulong_p($count)
           ? Math::GMPz::Rmpz_get_ui($count)
           : Math::GMPz::Rmpz_init_set($count);
+    }
 
-        bless \$r2;
+    sub prime_signature_count {
+        my ($from, $to, $signature) = @_;
+
+        Scalar::Util::reftype($signature) eq 'ARRAY'
+          or die "usage: prime_signature_count(A, B, [...])";
+
+        my @sig = map { my $v = "$_"; $v <= 0 and die "invalid prime signature (entry: $v)"; $v } @$signature;
+
+        _valid(\$to);
+
+        return ZERO if $to->lt($from);
+
+        if ($from->gt(ONE)) {
+            return ((ONE)->prime_signature_count($to, $signature)->sub((ONE)->prime_signature_count($from->dec, $signature)));
+        }
+
+        my $n = _any2mpz($$to) // return ZERO;
+        my $r = _prime_sig_count($n, \@sig);
+
+        bless \$r;
     }
 
     *prime_signature_inverse_len = \&prime_signature_count;
     *inverse_prime_signature_len = \&prime_signature_count;
 
     sub tau_inverse {
-        my ($from, $to, $n) = @_;
+        my ($from, $to, $k) = @_;
 
-        _valid(\$to, \$n);
+        _valid(\$to, \$k);
 
         my @signatures = map {
             [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
-        } @{$n->multiplicative_partitions(undef, $to->ilog2->inc)};
+        } @{$k->multiplicative_partitions($to->ilog2->inc)};
 
         $from = _any2mpz($$from, 0) // return _array();
         $to   = _any2mpz($$to,   1) // return _array();
@@ -32377,29 +32383,69 @@ package Sidef::Types::Number::Number {
     *inverse_tau = \&tau_inverse;
 
     sub tau_inverse_len {
-        my ($from, $to, $n) = @_;
+        my ($from, $to, $k) = @_;
 
-        _valid(\$to, \$n);
+        _valid(\$to, \$k);
+
+        return ZERO if $to->lt($from);
+
+        if ($from->gt(ONE)) {
+            return ((ONE)->tau_inverse_len($to, $k)->sub((ONE)->tau_inverse_len($from->dec, $k)));
+        }
 
         my @signatures = map {
             [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
-        } @{$n->multiplicative_partitions(undef, $to->ilog2->inc)};
+        } @{$k->multiplicative_partitions($to->ilog2->inc)};
 
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
-
-        my $from_obj = bless \$from;
-        my $to_obj   = bless \$to;
+        my $n = _any2mpz($$to) // return 0;
 
         my @list;
         foreach my $sig (@signatures) {
-            push @list, Sidef::Types::Number::Number::prime_signature_count($from_obj, $to_obj, $sig);
+            push @list, _prime_sig_count($n, $sig);
         }
 
-        Sidef::Types::Number::Number::sum(@list);
+        _set_int(Math::Prime::Util::GMP::vecsum(@list));
     }
 
     *inverse_tau_len = \&tau_inverse_len;
+
+    sub nth_tau_inverse {
+        my ($n, $k) = @_;
+
+        _valid(\$k);
+
+        my $n_z = _any2mpz($$n) // goto &nan;
+        my $k_z = _any2mpz($$k) // goto &nan;
+
+        if (   Math::GMPz::Rmpz_sgn($n_z) <= 0
+            or Math::GMPz::Rmpz_sgn($k_z) <= 0) {
+            goto &nan;
+        }
+
+        if (Math::GMPz::Rmpz_cmp_ui($k_z, 1) == 0 and Math::GMPz::Rmpz_cmp_ui($n_z, 1) > 0) {
+            goto &nan;
+        }
+
+        $n->inverse_count(sub { Sidef::Types::Number::Number::tau_inverse_len(ONE, $_[0], $k) }, 'bsearch_min');
+    }
+
+    sub next_tau_inverse {
+        my ($n, $k) = @_;
+        _valid(\$k);
+        $n->is_zero && return ONE;
+        my $count = Sidef::Types::Number::Number::tau_inverse_len(ONE, $n, $k);
+        $count = $count->inc;
+        $count->nth_tau_inverse($k);
+    }
+
+    sub prev_tau_inverse {
+        my ($n, $k) = @_;
+        _valid(\$k);
+        $n->le(ONE) && goto &nan;
+        my $count = Sidef::Types::Number::Number::tau_inverse_len(ONE, $n, $k);
+        $count = $count->dec if $n->tau->eq($k);
+        $count->nth_tau_inverse($k);
+    }
 
     sub semiprimes {
         (TWO)->almost_primes(@_);
@@ -34457,6 +34503,7 @@ package Sidef::Types::Number::Number {
 
     sub nth_smooth {
         my ($n, $k) = @_;
+        _valid(\$k);
 
         my $n_z = _any2mpz($$n) // goto &nan;
         my $k_z = _any2mpz($$k) // goto &nan;
@@ -34471,6 +34518,7 @@ package Sidef::Types::Number::Number {
 
     sub nth_rough {
         my ($n, $k) = @_;
+        _valid(\$k);
 
         my $n_z = _any2mpz($$n) // goto &nan;
 
@@ -34483,22 +34531,25 @@ package Sidef::Types::Number::Number {
 
     sub next_smooth {
         my ($n, $k) = @_;
+        _valid(\$k);
         $n->is_zero && return ONE;
         my $count = $k->smooth_count($n);
-        $count = $count->inc if $n->is_smooth($k);
+        $count = $count->inc;
         $count->nth_smooth($k);
     }
 
     sub next_rough {
         my ($n, $k) = @_;
+        _valid(\$k);
         $n->is_zero && return ONE;
         my $count = $k->rough_count($n);
-        $count = $count->inc if $n->is_rough($k);
+        $count = $count->inc;
         $count->nth_rough($k);
     }
 
     sub prev_smooth {
         my ($n, $k) = @_;
+        _valid(\$k);
         $n->le(ONE) && goto &nan;
         my $count = $k->smooth_count($n);
         $count = $count->dec if $n->is_smooth($k);
@@ -34507,6 +34558,7 @@ package Sidef::Types::Number::Number {
 
     sub prev_rough {
         my ($n, $k) = @_;
+        _valid(\$k);
         $n->le(ONE) && goto &nan;
         my $count = $k->rough_count($n);
         $count = $count->dec if $n->is_rough($k);

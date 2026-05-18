@@ -106,4 +106,24 @@ assert_eq(
 assert_eq(A279911(2**32 + 1), 9209004043637119617)
 assert_eq(A279911(2**64 + 1), 170140562910373477101584758078694588417)
 
+assert_eq(next_smooth(324-1, 3), 324)
+assert_eq(next_smooth(324, 3), 384)
+assert_eq(next_smooth(324+1, 3), 384)
+assert_eq(next_smooth(384-1, 3), 384)
+
+assert_eq(prev_smooth(384, 3), 324)
+assert_eq(prev_smooth(384+1, 3), 384)
+assert_eq(prev_smooth(384-1, 3), 324)
+assert_eq(prev_smooth(324+1, 3), 324)
+
+assert_eq(next_rough(683, 503), 691)
+assert_eq(next_rough(683+1, 503), 691)
+assert_eq(next_rough(683-1, 503), 683)
+assert_eq(next_rough(691-1, 503), 691)
+
+assert_eq(prev_rough(683, 503), 677)
+assert_eq(prev_rough(683+1, 503), 683)
+assert_eq(prev_rough(683-1, 503), 677)
+assert_eq(prev_rough(677+1, 503), 677)
+
 say "** Test passed!"

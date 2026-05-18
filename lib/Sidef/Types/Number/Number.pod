@@ -5872,11 +5872,27 @@ Returns the next k-almost prime greater than C<n>.
 
 =cut
 
+=head2 prev_almost_prime
+
+    n.prev_almost_prime(k=2)
+
+Returns the previous k-almost prime smaller than C<n>.
+
+=cut
+
 =head2 next_composite
 
     n.next_composite
 
 Given a nonnegative integer C<n>, returns the next composite number greater than C<n>.
+
+=cut
+
+=head2 prev_composite
+
+    prev_composite(n)
+
+Returns the previous composite number smaller than C<n>.
 
 =cut
 
@@ -5888,11 +5904,27 @@ Returns the next cubefree number greater than C<n>.
 
 =cut
 
+=head2 prev_cubefree
+
+    n.prev_cubefree
+
+Returns the previous cubefree number smaller than C<n>.
+
+=cut
+
 =head2 next_cubefull
 
     n.next_cubefull
 
 Returns the next cubefull (or 2-full) number greater than C<n>.
+
+=cut
+
+=head2 prev_cubefull
+
+    n.prev_cubefull
+
+Returns the previous cubefull or (3-full) number smaller than C<n>.
 
 =cut
 
@@ -5904,11 +5936,27 @@ Returns the next noncubefree number greater than C<n>.
 
 =cut
 
+=head2 prev_noncubefree
+
+    n.prev_noncubefree
+
+Returns the previous noncubefree number smaller than C<n>.
+
+=cut
+
 =head2 next_nonpowerfree
 
     n.next_nonpowerfree(k=2)
 
 Returns the next k-nonpowerfree number greater than C<n>.
+
+=cut
+
+=head2 prev_nonpowerfree
+
+    n.prev_nonpowerfree(k)
+
+Returns the previous k-nonpowerfree number smaller than C<n>.
 
 =cut
 
@@ -5920,11 +5968,27 @@ Returns the next nonsquarefree number greater than C<n>.
 
 =cut
 
+=head2 prev_nonsquarefree
+
+    n.prev_nonsquarefree
+
+Returns the previous nonsquarefree number smaller than C<n>.
+
+=cut
+
 =head2 next_omega_prime
 
     n.next_omega_prime(k=2)
 
 Returns the next k-omega prime greater than C<n>.
+
+=cut
+
+=head2 prev_omega_prime
+
+    n.prev_omega_prime(k=2)
+
+Returns the previous k-omega prime smaller than C<n>.
 
 =cut
 
@@ -5956,6 +6020,21 @@ When C<k> is given, it returns the next k-perfect-power greater than C<n>.
 
 =cut
 
+=head2 prev_perfect_power
+
+    prev_perfect_power(n)
+    prev_perfect_power(n,k)
+
+Returns the previous perfect power smaller than C<n>.
+
+    say prev_perfect_power(1e6)     #=> 998001
+
+When C<k> is given, it returns the previous k-perfect-power smaller than C<n>.
+
+    say prev_perfect_power(1e6,3)   #=> 970299
+
+=cut
+
 =head2 next_pow
 
     n.next_pow(b)
@@ -5973,6 +6052,19 @@ Aliases: I<next_power>
 
 =cut
 
+=head2 prev_pow
+
+    n.prev_pow(b)
+
+Returns the previous perfect power smaller than C<n>, with base C<b>. Returns NaN when C<n> is <= 1.
+
+    say 65.prev_pow(2)      #=> 64
+    say 64.prev_pow(2)      #=> 32
+
+Aliases: I<prev_power>
+
+=cut
+
 =head2 next_powerfree
 
     n.next_powerfree(k=2)
@@ -5981,11 +6073,27 @@ Returns the next k-powerfree number greater than C<n>.
 
 =cut
 
+=head2 prev_powerfree
+
+    n.prev_powerfree(k=2)
+
+Returns the previous k-powerfree number smaller than C<n>.
+
+=cut
+
 =head2 next_powerful
 
     n.next_powerful(k=2)
 
 Returns the next k-powerful (or k-full) number greater than C<n>.
+
+=cut
+
+=head2 prev_powerful
+
+    n.prev_powerful(k=2)
+
+Returns the previous k-powerful (or k-full) number smaller than C<n>.
 
 =cut
 
@@ -6001,11 +6109,32 @@ Returns the next prime number greater than C<n>.
 
 =cut
 
+=head2 prev_prime
+
+    n.prev_prime
+
+Returns the previous prime number smaller than C<n>.
+
+    say 11.prev_prime       #=> 7
+    say 100.prev_prime      #=> 97
+
+Returns C<nil> if C<n E<lt>= 2>.
+
+=cut
+
 =head2 next_prime_power
 
     n.next_prime_power
 
 Given a nonnegative integer C<n>, returns the next prime power (C<p^k> with k >= 1) greater than C<n>.
+
+=cut
+
+=head2 prev_prime_power
+
+    n.prev_prime_power
+
+Returns the previous prime power smaller than C<n>.
 
 =cut
 
@@ -6017,11 +6146,27 @@ If C<n> is zero, it returns C<1>.
 
 =cut
 
+=head2 prev_rough(n, k)
+
+Returns the largest C<k>-rough integer strictly less than C<n>.
+
+Returns C<NaN> if C<<< n <= 1 >>>.
+
+=cut
+
 =head2 next_smooth(n, k)
 
 Returns the smallest C<k>-smooth integer strictly greater than C<n>.
 
 If C<n> is zero, it returns C<1>.
+
+=cut
+
+=head2 prev_smooth(n, k)
+
+Returns the largest C<k>-smooth integer strictly less than C<n>.
+
+Returns C<NaN> if C<<< n <= 1 >>>.
 
 =cut
 
@@ -6033,11 +6178,27 @@ Returns the next semiprime greater than C<n>.
 
 =cut
 
+=head2 prev_semiprime
+
+    n.prev_semiprime
+
+Returns the previous semiprime smaller than C<n>.
+
+=cut
+
 =head2 next_squarefree
 
     n.next_squarefree
 
 Returns the next squarefree number greater than C<n>.
+
+=cut
+
+=head2 prev_squarefree
+
+    n.prev_squarefree
+
+Returns the previous squarefree number smaller than C<n>.
 
 =cut
 
@@ -6049,6 +6210,14 @@ Returns the next squarefree k-almost prime greater than C<n>.
 
 =cut
 
+=head2 prev_squarefree_almost_prime
+
+    n.prev_squarefree_almost_prime(k=2)
+
+Returns the previous squarefree k-almost prime smaller than C<n>.
+
+=cut
+
 =head2 next_squarefree_semiprime
 
     n.next_squarefree_semiprime
@@ -6057,11 +6226,43 @@ Returns the next squarefree semiprime greater than C<n>.
 
 =cut
 
+=head2 prev_squarefree_semiprime
+
+    n.prev_squarefree_semiprime
+
+Returns the previous squarefree semiprime smaller than C<n>.
+
+=cut
+
 =head2 next_squarefull
 
     n.next_squarefull
 
 Returns the next squarefull (or 2-full) number greater than C<n>.
+
+=cut
+
+=head2 prev_squarefull
+
+    n.prev_squarefull
+
+Returns the previous squarefull (or 2-full) number smaller than C<n>.
+
+=cut
+
+=head2 next_tau_inverse
+
+    next_tau_inverse(n, k)
+
+Returns the next number, greater than C<n>, that has exactly C<k> divisors.
+
+=cut
+
+=head2 prev_tau_inverse
+
+    prev_tau_inverse(n, k)
+
+Returns the previous number, smaller than C<n>, that has exactly C<k> divisors.
 
 =cut
 
@@ -6431,6 +6632,16 @@ Returns the n-th squarefree k-almost prime.
     n.nth_squarefull
 
 Returns the n-th squarefull (or 2-full) number.
+
+=cut
+
+=head2 nth_tau_inverse
+
+    nth_tau_inverse(n, k)
+
+Returns the n-th number with exactly C<k> divisors.
+
+    say {|n| nth_tau_inverse(n, n) }.map(1..20)    #=> OEIS: A073916
 
 =cut
 
@@ -7380,22 +7591,6 @@ Aliases: I<perfect_power_udivisors>, I<perfect_power_unitary_divisors>
 
 =cut
 
-=head2 prev_almost_prime
-
-    n.prev_almost_prime(k=2)
-
-Returns the previous k-almost prime smaller than C<n>.
-
-=cut
-
-=head2 prev_composite
-
-    prev_composite(n)
-
-Returns the previous composite number smaller than C<n>.
-
-=cut
-
 =head2 prev_composites
 
     n.prev_composites(start)
@@ -7407,119 +7602,6 @@ Returns an array with C<n> consecutive decreasing composite numbers starting fro
 
 =cut
 
-=head2 prev_cubefree
-
-    n.prev_cubefree
-
-Returns the previous cubefree number smaller than C<n>.
-
-=cut
-
-=head2 prev_cubefull
-
-    n.prev_cubefull
-
-Returns the previous cubefull or (3-full) number smaller than C<n>.
-
-=cut
-
-=head2 prev_noncubefree
-
-    n.prev_noncubefree
-
-Returns the previous noncubefree number smaller than C<n>.
-
-=cut
-
-=head2 prev_nonpowerfree
-
-    n.prev_nonpowerfree(k)
-
-Returns the previous k-nonpowerfree number smaller than C<n>.
-
-=cut
-
-=head2 prev_nonsquarefree
-
-    n.prev_nonsquarefree
-
-Returns the previous nonsquarefree number smaller than C<n>.
-
-=cut
-
-=head2 prev_omega_prime
-
-    n.prev_omega_prime(k=2)
-
-Returns the previous k-omega prime smaller than C<n>.
-
-=cut
-
-=head2 prev_perfect_power
-
-    prev_perfect_power(n)
-    prev_perfect_power(n,k)
-
-Returns the previous perfect power smaller than C<n>.
-
-    say prev_perfect_power(1e6)     #=> 998001
-
-When C<k> is given, it returns the previous k-perfect-power smaller than C<n>.
-
-    say prev_perfect_power(1e6,3)   #=> 970299
-
-=cut
-
-=head2 prev_pow
-
-    n.prev_pow(b)
-
-Returns the previous perfect power smaller than C<n>, with base C<b>. Returns NaN when C<n> is <= 1.
-
-    say 65.prev_pow(2)      #=> 64
-    say 64.prev_pow(2)      #=> 32
-
-Aliases: I<prev_power>
-
-=cut
-
-=head2 prev_powerfree
-
-    n.prev_powerfree(k=2)
-
-Returns the previous k-powerfree number smaller than C<n>.
-
-=cut
-
-=head2 prev_powerful
-
-    n.prev_powerful(k=2)
-
-Returns the previous k-powerful (or k-full) number smaller than C<n>.
-
-=cut
-
-=head2 prev_prime
-
-    n.prev_prime
-
-Returns the previous prime number smaller than C<n>.
-
-    say 11.prev_prime       #=> 7
-    say 100.prev_prime      #=> 97
-
-Returns C<nil> if C<n E<lt>= 2>.
-
-=cut
-
-=head2 prev_prime_power
-
-    n.prev_prime_power
-
-Returns the previous prime power smaller than C<n>.
-
-=cut
-
 =head2 prev_primes
 
     n.prev_primes(start)
@@ -7527,62 +7609,6 @@ Returns the previous prime power smaller than C<n>.
 Returns an array with C<n> consecutive decreasing prime numbers starting from C<start>.
 
     say 5.prev_primes(100)  #=> [97, 89, 83, 79, 73]
-
-=cut
-
-=head2 prev_rough(n, k)
-
-Returns the largest C<k>-rough integer strictly less than C<n>.
-
-Returns C<NaN> if C<<< n <= 1 >>>.
-
-=cut
-
-=head2 prev_smooth(n, k)
-
-Returns the largest C<k>-smooth integer strictly less than C<n>.
-
-Returns C<NaN> if C<<< n <= 1 >>>.
-
-=cut
-
-=head2 prev_semiprime
-
-    n.prev_semiprime
-
-Returns the previous semiprime smaller than C<n>.
-
-=cut
-
-=head2 prev_squarefree
-
-    n.prev_squarefree
-
-Returns the previous squarefree number smaller than C<n>.
-
-=cut
-
-=head2 prev_squarefree_almost_prime
-
-    n.prev_squarefree_almost_prime(k=2)
-
-Returns the previous squarefree k-almost prime smaller than C<n>.
-
-=cut
-
-=head2 prev_squarefree_semiprime
-
-    n.prev_squarefree_semiprime
-
-Returns the previous squarefree semiprime smaller than C<n>.
-
-=cut
-
-=head2 prev_squarefull
-
-    n.prev_squarefull
-
-Returns the previous squarefull (or 2-full) number smaller than C<n>.
 
 =cut
 
