@@ -113,6 +113,7 @@ package Sidef::Types::Number::Number {
     };
 
     if (HAS_PRIME_UTIL) {
+        Math::Prime::Util::prime_precalc(1e7);
         eval { Math::Prime::Util::prime_set_config(bigint => 'Math::GMPz') };
     }
 
