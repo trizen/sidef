@@ -16123,7 +16123,7 @@ package Sidef::Types::Number::Number {
 
         return undef if $delta > $threshold;
 
-        say STDERR "π($y): incremental from checkpoint $checkpoint (delta=$delta)"
+        say STDERR "prime_count($y): incremental from checkpoint $checkpoint (delta=$delta)"
           if $VERBOSE;
 
         my $count = $lookup->{"$checkpoint"};
@@ -32433,6 +32433,21 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
         _valid(\$k);
         $n->is_zero && return ONE;
+
+        my $N = _big2uistr($$n) // goto &nan;
+        my $K = _big2uistr($$k) // goto &nan;
+
+        foreach my $i (1 .. Math::Prime::Util::GMP::sigma($K, 0)**2) {
+            my $v = Math::Prime::Util::GMP::addint($N, $i);
+            my $tau =
+              (HAS_PRIME_UTIL and $v < ULONG_MAX)
+              ? Math::Prime::Util::divisor_sum($v, 0)
+              : Math::Prime::Util::GMP::sigma($v, 0);
+            if ($tau == $K) {
+                return _set_int($v);
+            }
+        }
+
         my $count = Sidef::Types::Number::Number::tau_inverse_len(ONE, $n, $k);
         $count = $count->inc;
         $count->nth_tau_inverse($k);
@@ -32442,6 +32457,21 @@ package Sidef::Types::Number::Number {
         my ($n, $k) = @_;
         _valid(\$k);
         $n->le(ONE) && goto &nan;
+
+        my $N = _big2uistr($$n) // goto &nan;
+        my $K = _big2uistr($$k) // goto &nan;
+
+        foreach my $i (1 .. Math::Prime::Util::GMP::sigma($K, 0)**2) {
+            my $v = Math::Prime::Util::GMP::subint($N, $i) || last;
+            my $tau =
+              (HAS_PRIME_UTIL and $v < ULONG_MAX)
+              ? Math::Prime::Util::divisor_sum($v, 0)
+              : Math::Prime::Util::GMP::sigma($v, 0);
+            if ($tau == $K) {
+                return _set_int($v);
+            }
+        }
+
         my $count = Sidef::Types::Number::Number::tau_inverse_len(ONE, $n, $k);
         $count = $count->dec if $n->tau->eq($k);
         $count->nth_tau_inverse($k);
