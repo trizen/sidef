@@ -1,47 +1,45 @@
-package Sidef::Types::Block::Try {
+package Sidef::Types::Block::Try;
 
-    use utf8;
-    use 5.016;
+use utf8;
+use 5.016;
 
-    use parent qw(
-      Sidef::Object::Object
-    );
+use parent qw(
+  Sidef::Object::Object
+);
 
-    sub new {
-        bless {catch => 0}, __PACKAGE__;
+sub new {
+    bless {catch => 0}, __PACKAGE__;
+}
+
+sub try {
+    my ($self, $block) = @_;
+
+    my $error = 0;
+    local $SIG{__DIE__} = sub { $self->{msg} = $_[0]; $error = 1 };
+
+    $self->{val} = [eval { $block->run }];
+
+    if ($@ || $error) {
+        $self->{catch} = 1;
     }
 
-    sub try {
-        my ($self, $block) = @_;
+    $self;
+}
 
-        my $error = 0;
-        local $SIG{__DIE__} = sub { $self->{msg} = $_[0]; $error = 1 };
+sub catch {
+    my ($self, $block) = @_;
 
-        $self->{val} = [eval { $block->run }];
+    my @ret;
 
-        if ($@ || $error) {
-            $self->{catch} = 1;
-        }
-
-        $self;
+    if (defined($block) and $self->{catch}) {
+        chomp(my $msg = $self->{msg});
+        @ret = $block->run(Sidef::Types::String::String->new($msg));
+    }
+    else {
+        @ret = @{$self->{val}};
     }
 
-    sub catch {
-        my ($self, $block) = @_;
-
-        my @ret;
-
-        if (defined($block) and $self->{catch}) {
-            chomp(my $msg = $self->{msg});
-            @ret = $block->run(Sidef::Types::String::String->new($msg));
-        }
-        else {
-            @ret = @{$self->{val}};
-        }
-
-        wantarray ? @ret : $ret[-1];
-    }
-
-};
+    wantarray ? @ret : $ret[-1];
+}
 
 1

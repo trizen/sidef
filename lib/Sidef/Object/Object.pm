@@ -1,688 +1,687 @@
-package Sidef::Object::Object {
+package Sidef::Object::Object;
 
-    use utf8;
-    use 5.016;
+use utf8;
+use 5.016;
 
-    use Scalar::Util qw();
+use Scalar::Util qw();
 
-    use Sidef;
-    use Sidef::Types::Bool::Bool;
+use Sidef;
+use Sidef::Types::Bool::Bool;
 
-    use parent qw(Sidef::Object::Convert);
+use parent qw(Sidef::Object::Convert);
 
-    use overload
-      q{bool} => sub {
-        if (defined(my $sub = UNIVERSAL::can($_[0], 'to_b'))) {
-            @_ = ($_[0]);
-            goto $sub;
-        }
-        $_[0];
-      },
-      q{0+} => sub {
-        if (defined(my $sub = UNIVERSAL::can($_[0], 'to_n'))) {
-            @_ = ($_[0]);
-            goto $sub;
-        }
-        $_[0];
-      },
-      q{""} => sub {
-        if (defined(my $sub = UNIVERSAL::can($_[0], 'to_s'))) {
-            @_ = ($_[0]);
-            goto $sub;
-        }
-        $_[0];
-      },
-      q{cmp} => sub {
-        my ($obj1, $obj2, $swapped) = @_;
+use overload
+  q{bool} => sub {
+    if (defined(my $sub = UNIVERSAL::can($_[0], 'to_b'))) {
+        @_ = ($_[0]);
+        goto $sub;
+    }
+    $_[0];
+  },
+  q{0+} => sub {
+    if (defined(my $sub = UNIVERSAL::can($_[0], 'to_n'))) {
+        @_ = ($_[0]);
+        goto $sub;
+    }
+    $_[0];
+  },
+  q{""} => sub {
+    if (defined(my $sub = UNIVERSAL::can($_[0], 'to_s'))) {
+        @_ = ($_[0]);
+        goto $sub;
+    }
+    $_[0];
+  },
+  q{cmp} => sub {
+    my ($obj1, $obj2, $swapped) = @_;
 
-        if ($swapped) {
-            ($obj1, $obj2) = ($obj2, $obj1);
-        }
+    if ($swapped) {
+        ($obj1, $obj2) = ($obj2, $obj1);
+    }
 
-        # Optimization for identical objects
-        if (CORE::ref($obj1) eq CORE::ref($obj2)) {
-            if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
-                my $r = join(' ', (CORE::ref($$obj1) || 'Scalar'), (CORE::ref($$obj2) || 'Scalar'));
-                if ($r eq 'Math::GMPz Math::GMPz') {
-                    return Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
-                }
-                elsif ($r eq 'Scalar Scalar') {
-                    return ($$obj1 <=> $$obj2);
-                }
-                elsif ($r eq 'Math::GMPz Scalar') {
-                    return (
-                            ($$obj2 < 0)
-                            ? Math::GMPz::Rmpz_cmp_si($$obj1, $$obj2)
-                            : Math::GMPz::Rmpz_cmp_ui($$obj1, $$obj2)
-                           );
-                }
-                elsif ($r eq 'Scalar Math::GMPz') {
-                    return
-                      -(
-                        ($$obj1 < 0)
-                        ? Math::GMPz::Rmpz_cmp_si($$obj2, $$obj1)
-                        : Math::GMPz::Rmpz_cmp_ui($$obj2, $$obj1)
-                       );
-                }
+    # Optimization for identical objects
+    if (CORE::ref($obj1) eq CORE::ref($obj2)) {
+        if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
+            my $r = join(' ', (CORE::ref($$obj1) || 'Scalar'), (CORE::ref($$obj2) || 'Scalar'));
+            if ($r eq 'Math::GMPz Math::GMPz') {
+                return Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
             }
-            elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
-                return 0;
+            elsif ($r eq 'Scalar Scalar') {
+                return ($$obj1 <=> $$obj2);
             }
-        }
-
-        if (   CORE::ref($obj1) eq CORE::ref($obj2)
-            or CORE::ref($obj1) && UNIVERSAL::isa($obj1, CORE::ref($obj2))
-            or CORE::ref($obj2) && UNIVERSAL::isa($obj2, CORE::ref($obj1))) {
-            if (defined(my $sub = UNIVERSAL::can($obj1, '<=>'))) {
-                @_ = ($obj1, $obj2);
-                goto $sub;
-            }
-        }
-
-        (CORE::ref($obj1) eq CORE::ref($obj2))
-          ? (Scalar::Util::refaddr($obj1) <=> Scalar::Util::refaddr($obj2))
-          : (CORE::ref($obj1) cmp CORE::ref($obj2));
-      },
-      q{eq} => sub {
-        my ($obj1, $obj2) = @_;
-
-        # Optimization for identical objects
-        if (CORE::ref($obj1) eq CORE::ref($obj2)) {
-            if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
-                my $r = join(' ', (CORE::ref($$obj1) || 'Scalar'), (CORE::ref($$obj2) || 'Scalar'));
-                if ($r eq 'Math::GMPz Math::GMPz') {
-                    return !Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
-                }
-                elsif ($r eq 'Scalar Scalar') {
-                    return ($$obj1 == $$obj2);
-                }
-                elsif ($r eq 'Math::GMPz Scalar') {
-                    return
-                      !(
+            elsif ($r eq 'Math::GMPz Scalar') {
+                return (
                         ($$obj2 < 0)
                         ? Math::GMPz::Rmpz_cmp_si($$obj1, $$obj2)
                         : Math::GMPz::Rmpz_cmp_ui($$obj1, $$obj2)
                        );
-                }
-                elsif ($r eq 'Scalar Math::GMPz') {
-                    return
-                      !(
-                        ($$obj1 < 0)
-                        ? Math::GMPz::Rmpz_cmp_si($$obj2, $$obj1)
-                        : Math::GMPz::Rmpz_cmp_ui($$obj2, $$obj1)
-                       );
-                }
             }
-            elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
-                return 1;
+            elsif ($r eq 'Scalar Math::GMPz') {
+                return
+                  -(
+                    ($$obj1 < 0)
+                    ? Math::GMPz::Rmpz_cmp_si($$obj2, $$obj1)
+                    : Math::GMPz::Rmpz_cmp_ui($$obj2, $$obj1)
+                   );
             }
         }
+        elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+            return 0;
+        }
+    }
 
-#<<<
-        (
-             CORE::ref($obj1) eq CORE::ref($obj2)                ||
-             UNIVERSAL::isa($obj1, CORE::ref($obj2) || return 0) ||
-             UNIVERSAL::isa($obj2, CORE::ref($obj1) || return 0)
-        ) || return 0;
-#>>>
-
-        if (defined(my $sub = UNIVERSAL::can($obj1, '=='))) {
+    if (   CORE::ref($obj1) eq CORE::ref($obj2)
+        or CORE::ref($obj1) && UNIVERSAL::isa($obj1, CORE::ref($obj2))
+        or CORE::ref($obj2) && UNIVERSAL::isa($obj2, CORE::ref($obj1))) {
+        if (defined(my $sub = UNIVERSAL::can($obj1, '<=>'))) {
             @_ = ($obj1, $obj2);
             goto $sub;
         }
-
-        !CORE::int($obj1 cmp $obj2);
-      };
-
-    sub new {
-        bless {}, __PACKAGE__;
     }
 
-    sub say {
-        (CORE::say @_)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
+    (CORE::ref($obj1) eq CORE::ref($obj2))
+      ? (Scalar::Util::refaddr($obj1) <=> Scalar::Util::refaddr($obj2))
+      : (CORE::ref($obj1) cmp CORE::ref($obj2));
+  },
+  q{eq} => sub {
+    my ($obj1, $obj2) = @_;
+
+    # Optimization for identical objects
+    if (CORE::ref($obj1) eq CORE::ref($obj2)) {
+        if (CORE::ref($obj1) eq 'Sidef::Types::Number::Number') {
+            my $r = join(' ', (CORE::ref($$obj1) || 'Scalar'), (CORE::ref($$obj2) || 'Scalar'));
+            if ($r eq 'Math::GMPz Math::GMPz') {
+                return !Math::GMPz::Rmpz_cmp($$obj1, $$obj2);
+            }
+            elsif ($r eq 'Scalar Scalar') {
+                return ($$obj1 == $$obj2);
+            }
+            elsif ($r eq 'Math::GMPz Scalar') {
+                return
+                  !(
+                    ($$obj2 < 0)
+                    ? Math::GMPz::Rmpz_cmp_si($$obj1, $$obj2)
+                    : Math::GMPz::Rmpz_cmp_ui($$obj1, $$obj2)
+                   );
+            }
+            elsif ($r eq 'Scalar Math::GMPz') {
+                return
+                  !(
+                    ($$obj1 < 0)
+                    ? Math::GMPz::Rmpz_cmp_si($$obj2, $$obj1)
+                    : Math::GMPz::Rmpz_cmp_ui($$obj2, $$obj1)
+                   );
+            }
+        }
+        elsif (Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
+            return 1;
+        }
     }
 
-    *println = \&say;
+#<<<
+    (
+         CORE::ref($obj1) eq CORE::ref($obj2)                ||
+         UNIVERSAL::isa($obj1, CORE::ref($obj2) || return 0) ||
+         UNIVERSAL::isa($obj2, CORE::ref($obj1) || return 0)
+    ) || return 0;
+#>>>
 
-    sub print {
-        (CORE::print @_)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
+    if (defined(my $sub = UNIVERSAL::can($obj1, '=='))) {
+        @_ = ($obj1, $obj2);
+        goto $sub;
     }
 
-    sub lazy {
-        my ($self) = @_;
-        Sidef::Object::Lazy->new(obj => $self);
+    !CORE::int($obj1 cmp $obj2);
+  };
+
+sub new {
+    bless {}, __PACKAGE__;
+}
+
+sub say {
+    (CORE::say @_)
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+*println = \&say;
+
+sub print {
+    (CORE::print @_)
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub lazy {
+    my ($self) = @_;
+    Sidef::Object::Lazy->new(obj => $self);
+}
+
+sub method {
+    my ($self, $method, @args) = @_;
+    Sidef::Object::LazyMethod->new({obj => $self, method => "$method", args => \@args});
+}
+
+sub object_id {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::_set_int(Scalar::Util::refaddr($self));
+}
+
+*refaddr = \&object_id;
+
+sub object_type {
+    my ($self) = @_;
+    Sidef::Types::String::String->new(Scalar::Util::reftype($self));
+}
+
+*reftype = \&object_type;
+
+sub class {
+    my ($obj) = @_;
+    my $ref = CORE::ref($obj) || $obj;
+
+    my $rindex = rindex($ref, '::');
+    Sidef::Types::String::String->new($rindex == -1 ? $ref : substr($ref, $rindex + 2));
+}
+
+sub ref {
+    my ($obj) = @_;
+    Sidef::Types::String::String->new(CORE::ref($obj) || $obj);
+}
+
+sub bless {
+    my ($obj, $arg) = @_;
+    CORE::bless($arg, (CORE::ref($obj) || $obj));
+}
+
+sub clone {
+    my ($obj) = @_;
+
+    my $class   = CORE::ref($obj);
+    my $reftype = Scalar::Util::reftype($obj);
+
+    if ($reftype eq 'HASH') {
+        CORE::bless {%$obj}, $class;
     }
-
-    sub method {
-        my ($self, $method, @args) = @_;
-        Sidef::Object::LazyMethod->new({obj => $self, method => "$method", args => \@args});
+    elsif ($reftype eq 'ARRAY') {
+        CORE::bless [@$obj], $class;
     }
-
-    sub object_id {
-        my ($self) = @_;
-        Sidef::Types::Number::Number::_set_int(Scalar::Util::refaddr($self));
+    else {
+        $obj;
     }
+}
 
-    *refaddr = \&object_id;
+sub dclone {
+    my %addr;    # keeps track of cloned objects
 
-    sub object_type {
-        my ($self) = @_;
-        Sidef::Types::String::String->new(Scalar::Util::reftype($self));
-    }
+    sub {
+        my ($obj, $reftype) = @_;
 
-    *reftype = \&object_type;
+        my $refaddr = Scalar::Util::refaddr($obj);
 
-    sub class {
-        my ($obj) = @_;
-        my $ref = CORE::ref($obj) || $obj;
+        exists($addr{$refaddr})
+          and return $addr{$refaddr};
 
-        my $rindex = rindex($ref, '::');
-        Sidef::Types::String::String->new($rindex == -1 ? $ref : substr($ref, $rindex + 2));
-    }
+        my $class = Scalar::Util::blessed($obj);
 
-    sub ref {
-        my ($obj) = @_;
-        Sidef::Types::String::String->new(CORE::ref($obj) || $obj);
-    }
-
-    sub bless {
-        my ($obj, $arg) = @_;
-        CORE::bless($arg, (CORE::ref($obj) || $obj));
-    }
-
-    sub clone {
-        my ($obj) = @_;
-
-        my $class   = CORE::ref($obj);
-        my $reftype = Scalar::Util::reftype($obj);
+        if (defined($class) and not UNIVERSAL::isa($class, 'Sidef::Object::Object')) {
+            $addr{$refaddr} = $obj;
+            return $obj;
+        }
 
         if ($reftype eq 'HASH') {
-            CORE::bless {%$obj}, $class;
+            my $o = defined($class) ? CORE::bless({}, $class) : {};
+            $addr{$refaddr} = $o;
+            %$o = (
+                map {
+                    my $v = $obj->{$_};
+                    my $r = Scalar::Util::reftype($v) // '';
+                    ($_ => ($r eq 'HASH' || $r eq 'ARRAY' ? __SUB__->($v, $r) : $v))
+                } CORE::keys(%{$obj})
+            );
+            $o;
         }
         elsif ($reftype eq 'ARRAY') {
-            CORE::bless [@$obj], $class;
+            my $o = defined($class) ? CORE::bless([], $class) : [];
+            $addr{$refaddr} = $o;
+            @$o = (
+                map {
+                    my $r = Scalar::Util::reftype($_) // '';
+                    $r eq 'ARRAY' || $r eq 'HASH' ? __SUB__->($_, $r) : $_
+                } @{$obj}
+            );
+            $o;
         }
         else {
             $obj;
         }
-    }
+      }
+      ->($_[0], Scalar::Util::reftype($_[0]));
+}
 
-    sub dclone {
-        my %addr;    # keeps track of cloned objects
+*deep_clone = \&dclone;
 
-        sub {
-            my ($obj, $reftype) = @_;
+sub respond_to {
+    my ($self, $method) = @_;
+    UNIVERSAL::can($self, "$method")
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-            my $refaddr = Scalar::Util::refaddr($obj);
+sub is_a {
+    my ($self, $obj) = @_;
+    UNIVERSAL::isa($self, "$obj")
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-            exists($addr{$refaddr})
-              and return $addr{$refaddr};
+*is_an   = \&is_a;
+*kind_of = \&is_a;
 
-            my $class = Scalar::Util::blessed($obj);
+sub is_object {
+    my ($self) = @_;
+    CORE::ref($self)
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-            if (defined($class) and not UNIVERSAL::isa($class, 'Sidef::Object::Object')) {
-                $addr{$refaddr} = $obj;
-                return $obj;
+sub is_typename {
+    my ($self) = @_;
+    CORE::ref($self)
+      ? (Sidef::Types::Bool::Bool::FALSE)
+      : (Sidef::Types::Bool::Bool::TRUE);
+}
+
+sub parent_classes {
+    my ($obj) = @_;
+
+    no strict 'refs';
+
+    my %seen;
+    my $extract_parents;
+    $extract_parents = sub {
+        my ($ref) = @_;
+
+        my @parents = @{${$ref . '::'}{ISA}};
+
+        if (@parents) {
+            foreach my $parent (@parents) {
+                next if $seen{$parent}++;
+                push @parents, $extract_parents->($parent);
             }
+        }
 
-            if ($reftype eq 'HASH') {
-                my $o = defined($class) ? CORE::bless({}, $class) : {};
-                $addr{$refaddr} = $o;
-                %$o = (
-                    map {
-                        my $v = $obj->{$_};
-                        my $r = Scalar::Util::reftype($v) // '';
-                        ($_ => ($r eq 'HASH' || $r eq 'ARRAY' ? __SUB__->($v, $r) : $v))
-                    } CORE::keys(%{$obj})
-                );
-                $o;
-            }
-            elsif ($reftype eq 'ARRAY') {
-                my $o = defined($class) ? CORE::bless([], $class) : [];
-                $addr{$refaddr} = $o;
-                @$o = (
-                    map {
-                        my $r = Scalar::Util::reftype($_) // '';
-                        $r eq 'ARRAY' || $r eq 'HASH' ? __SUB__->($_, $r) : $_
-                    } @{$obj}
-                );
-                $o;
-            }
-            else {
-                $obj;
-            }
-          }
-          ->($_[0], Scalar::Util::reftype($_[0]));
-    }
+        @parents;
+    };
 
-    *deep_clone = \&dclone;
+    Sidef::Types::Array::Array->new([$extract_parents->(CORE::ref($obj) || $obj)]);
+}
 
-    sub respond_to {
-        my ($self, $method) = @_;
-        UNIVERSAL::can($self, "$method")
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
+sub interpolate {
+    my $self = shift(@_);
+    $self->new(CORE::join('', @_));
+}
 
-    sub is_a {
-        my ($self, $obj) = @_;
-        UNIVERSAL::isa($self, "$obj")
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
+sub dump {
+    my %addr;    # keep track of dumped objects
 
-    *is_an   = \&is_a;
-    *kind_of = \&is_a;
-
-    sub is_object {
-        my ($self) = @_;
-        CORE::ref($self)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub is_typename {
-        my ($self) = @_;
-        CORE::ref($self)
-          ? (Sidef::Types::Bool::Bool::FALSE)
-          : (Sidef::Types::Bool::Bool::TRUE);
-    }
-
-    sub parent_classes {
+    my $sub = sub {
         my ($obj) = @_;
 
-        no strict 'refs';
+        my $refaddr = Scalar::Util::refaddr($obj);
 
-        my %seen;
-        my $extract_parents;
-        $extract_parents = sub {
-            my ($ref) = @_;
+        exists($addr{$refaddr})
+          and return $addr{$refaddr};
 
-            my @parents = @{${$ref . '::'}{ISA}};
+        my $type = Sidef::normalize_type(CORE::ref($obj) || $obj);
+        Scalar::Util::reftype($obj) eq 'HASH' or return $type;
+        my @keys = CORE::sort(CORE::keys(%{$obj}));
 
-            if (@parents) {
-                foreach my $parent (@parents) {
-                    next if $seen{$parent}++;
-                    push @parents, $extract_parents->($parent);
-                }
-            }
+        my $str = Sidef::Types::String::String->new($type . "(#`($refaddr)...)");
 
-            @parents;
+        $addr{$refaddr} = $str;
+
+        my $s;
+        $$str = (
+            "$type(" . CORE::join(
+                ', ',
+                map {
+                    my $str = (
+                               defined($obj->{$_})
+                               ? (
+                                  (CORE::ref($obj->{$_}) && ($s = UNIVERSAL::can($obj->{$_}, 'dump')))
+                                  ? $s->($obj->{$_})
+                                  : "$obj->{$_}"
+                                 )
+                               : 'nil'
+                              );
+                    "$_: $str";
+                  } @keys
+              )
+              . ')'
+        );
+
+        $str;
+    };
+
+    no warnings 'redefine';
+    local *Sidef::Object::Object::dump = $sub;
+    $sub->($_[0]);
+}
+
+sub to_json {
+    my ($self) = @_;
+    state $x = require JSON;
+    Sidef::Types::String::String->new(scalar JSON::to_json($self->get_value));
+}
+
+{
+    no strict 'refs';
+
+    sub def_method {
+        my ($self, $name, $block) = @_;
+        *{(CORE::ref($self) || $self) . '::' . $name} = sub {
+            $block->call(@_);
         };
-
-        Sidef::Types::Array::Array->new([$extract_parents->(CORE::ref($obj) || $obj)]);
+        $self;
     }
 
-    sub interpolate {
-        my $self = shift(@_);
-        $self->new(CORE::join('', @_));
+    sub undef_method {
+        my ($self, $name) = @_;
+        delete ${(CORE::ref($self) || $self) . '::'}{$name};
+        $self;
     }
 
-    sub dump {
-        my %addr;    # keep track of dumped objects
+    sub alias_method {
+        my ($self, $old, $new) = @_;
 
-        my $sub = sub {
-            my ($obj) = @_;
+        my $ref = (CORE::ref($self) || $self);
+        my $to  = \&{$ref . '::' . $old};
 
-            my $refaddr = Scalar::Util::refaddr($obj);
+        if (not defined &$to) {
+            die "[ERROR] Can't alias the nonexistent method `$old` as `$new`!";
+        }
 
-            exists($addr{$refaddr})
-              and return $addr{$refaddr};
-
-            my $type = Sidef::normalize_type(CORE::ref($obj) || $obj);
-            Scalar::Util::reftype($obj) eq 'HASH' or return $type;
-            my @keys = CORE::sort(CORE::keys(%{$obj}));
-
-            my $str = Sidef::Types::String::String->new($type . "(#`($refaddr)...)");
-
-            $addr{$refaddr} = $str;
-
-            my $s;
-            $$str = (
-                "$type(" . CORE::join(
-                    ', ',
-                    map {
-                        my $str = (
-                                   defined($obj->{$_})
-                                   ? (
-                                      (CORE::ref($obj->{$_}) && ($s = UNIVERSAL::can($obj->{$_}, 'dump')))
-                                      ? $s->($obj->{$_})
-                                      : "$obj->{$_}"
-                                     )
-                                   : 'nil'
-                                  );
-                        "$_: $str";
-                      } @keys
-                  )
-                  . ')'
-            );
-
-            $str;
-        };
-
-        no warnings 'redefine';
-        local *Sidef::Object::Object::dump = $sub;
-        $sub->($_[0]);
+        *{$ref . '::' . $new} = $to;
     }
 
-    sub to_json {
-        my ($self) = @_;
-        state $x = require JSON;
-        Sidef::Types::String::String->new(scalar JSON::to_json($self->get_value));
+    sub methods {
+        my ($self, @args) = @_;
+
+        my %alias;
+        my %methods;
+
+        my $ref = CORE::ref($self) || $self;
+
+        foreach my $method (grep { $_ !~ /^[(_]/ and defined(&{$ref . '::' . $_}) } keys %{$ref . '::'}) {
+            $methods{$method} = (
+                                 $alias{\&{$ref . '::' . $method}} //=
+                                   Sidef::Object::LazyMethod->new(
+                                                                  {
+                                                                   obj    => $self,
+                                                                   method => $method,
+                                                                   args   => \@args,
+                                                                  }
+                                                                 )
+                                );
+        }
+
+        Sidef::Types::Hash::Hash->new(\%methods);
     }
 
-    {
-        no strict 'refs';
+    # Smart match operator
+    sub smartmatch {
+        my ($first, $second) = @_;
 
-        sub def_method {
-            my ($self, $name, $block) = @_;
-            *{(CORE::ref($self) || $self) . '::' . $name} = sub {
-                $block->call(@_);
-            };
-            $self;
+        if (!defined($first) and !defined($second)) {
+            return Sidef::Types::Bool::Bool::TRUE;
         }
 
-        sub undef_method {
-            my ($self, $name) = @_;
-            delete ${(CORE::ref($self) || $self) . '::'}{$name};
-            $self;
-        }
+        # Second is not an object (assuming it is a typename)
+        # Return true if `typeof(first)` is a subclass of `second`
+        if (defined($second) and !CORE::ref($second)) {
 
-        sub alias_method {
-            my ($self, $old, $new) = @_;
-
-            my $ref = (CORE::ref($self) || $self);
-            my $to  = \&{$ref . '::' . $old};
-
-            if (not defined &$to) {
-                die "[ERROR] Can't alias the nonexistent method `$old` as `$new`!";
-            }
-
-            *{$ref . '::' . $new} = $to;
-        }
-
-        sub methods {
-            my ($self, @args) = @_;
-
-            my %alias;
-            my %methods;
-
-            my $ref = CORE::ref($self) || $self;
-
-            foreach my $method (grep { $_ !~ /^[(_]/ and defined(&{$ref . '::' . $_}) } keys %{$ref . '::'}) {
-                $methods{$method} = (
-                                     $alias{\&{$ref . '::' . $method}} //=
-                                       Sidef::Object::LazyMethod->new(
-                                                                      {
-                                                                       obj    => $self,
-                                                                       method => $method,
-                                                                       args   => \@args,
-                                                                      }
-                                                                     )
-                                    );
-            }
-
-            Sidef::Types::Hash::Hash->new(\%methods);
-        }
-
-        # Smart match operator
-        sub smartmatch {
-            my ($first, $second) = @_;
-
-            if (!defined($first) and !defined($second)) {
-                return Sidef::Types::Bool::Bool::TRUE;
-            }
-
-            # Second is not an object (assuming it is a typename)
-            # Return true if `typeof(first)` is a subclass of `second`
-            if (defined($second) and !CORE::ref($second)) {
-
-                if (defined($first) and !CORE::ref($first)) {
-                    return (
-                            ($first eq $second)
-                            ? Sidef::Types::Bool::Bool::TRUE
-                            : Sidef::Types::Bool::Bool::FALSE
-                           );
-                }
-
-                return (
-                        UNIVERSAL::isa(CORE::ref($first), $second)
-                        ? Sidef::Types::Bool::Bool::TRUE
-                        : Sidef::Types::Bool::Bool::FALSE
-                       );
-            }
-
-            # First is not an object (assuming it is a typename)
-            # Return true if `first` is a subclass of `typeof(second)`
             if (defined($first) and !CORE::ref($first)) {
                 return (
-                        UNIVERSAL::isa($first, CORE::ref($second))
+                        ($first eq $second)
                         ? Sidef::Types::Bool::Bool::TRUE
                         : Sidef::Types::Bool::Bool::FALSE
                        );
             }
 
-            # First is String
-            if (UNIVERSAL::isa($first, 'Sidef::Types::String::String')) {
+            return (
+                    UNIVERSAL::isa(CORE::ref($first), $second)
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
 
-                # String ~~ RangeString
-                if (UNIVERSAL::isa($second, 'Sidef::Types::Range::RangeString')) {
-                    return $second->contains($first);
-                }
+        # First is not an object (assuming it is a typename)
+        # Return true if `first` is a subclass of `typeof(second)`
+        if (defined($first) and !CORE::ref($first)) {
+            return (
+                    UNIVERSAL::isa($first, CORE::ref($second))
+                    ? Sidef::Types::Bool::Bool::TRUE
+                    : Sidef::Types::Bool::Bool::FALSE
+                   );
+        }
 
-                # String ~~ String
-                if (CORE::ref($first) eq CORE::ref($second)) {
-                    return $second->eq($first);
-                }
-            }
+        # First is String
+        if (UNIVERSAL::isa($first, 'Sidef::Types::String::String')) {
 
-            # First is Number
-            if (UNIVERSAL::isa($first, 'Sidef::Types::Number::Number')) {
-
-                # Number ~~ RangeNumber
-                if (UNIVERSAL::isa($second, 'Sidef::Types::Range::RangeNumber')) {
-                    return $second->contains($first);
-                }
-            }
-
-            # First is RangeNumber
-            if (UNIVERSAL::isa($first, 'Sidef::Types::Range::RangeNumber')) {
-
-                # RangeNumber ~~ Number
-                if (UNIVERSAL::isa($second, 'Sidef::Types::Number::Number')) {
-                    return $first->contains($second);
-                }
-            }
-
-            # First is RangeString
-            if (UNIVERSAL::isa($first, 'Sidef::Types::Range::RangeString')) {
-
-                # RangeString ~~ String
-                if (UNIVERSAL::isa($second, 'Sidef::Types::String::String')) {
-                    return $first->contains($second);
-                }
-            }
-
-            # First is Array
-            if (UNIVERSAL::isa($first, 'Sidef::Types::Array::Array')) {
-
-                # Array ~~ Array
-                if (CORE::ref($first) eq CORE::ref($second)) {
-                    return $first->eq($second);
-                }
-
-                # Array ~~ Regex
-                if (UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
-                    return $first->match($second);
-                }
-
-                # Array ~~ Hash
-                if (UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
-                    return $second->keys->contains_all($first);
-                }
-
-                # Array ~~ Any
-                if (!UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
-                    return $first->contains($second);
-                }
-            }
-
-            # First is Hash
-            if (UNIVERSAL::isa($first, 'Sidef::Types::Hash::Hash')) {
-
-                # Hash ~~ Array
-                if (UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
-                    return $second->contains_all($first->keys);
-                }
-
-                # Hash ~~ Hash
-                if (CORE::ref($first) eq CORE::ref($second)) {
-                    return $second->eq($first);
-                }
-
-                # Hash ~~ Regex
-                if (UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
-                    return $first->keys->match($second);
-                }
-
-                # Hash ~~ Any
-                if (!UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
-                    return $first->exists($second);
-                }
-            }
-
-            # First is Regex
-            if (UNIVERSAL::isa($first, 'Sidef::Types::Regex::Regex')) {
-
-                # Regex ~~ Regex
-                if (CORE::ref($first) eq CORE::ref($second)) {
-                    return $first->eq($second);
-                }
-
-                # Regex ~~ Array
-                if (UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
-                    return $second->match($first);
-                }
-
-                # Regex ~~ Hash
-                if (UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
-                    return $second->keys->match($first);
-                }
-
-                # Regex ~~ Any
-                if (!UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
-                    return $first->match($second)->is_successful;
-                }
-            }
-
-            # Second is Array
-            if (UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
-
-                # Any ~~ Array
+            # String ~~ RangeString
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Range::RangeString')) {
                 return $second->contains($first);
             }
 
-            # Second is Hash
-            if (UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
-
-                # Any ~~ Hash
-                return $second->exists($first);
+            # String ~~ String
+            if (CORE::ref($first) eq CORE::ref($second)) {
+                return $second->eq($first);
             }
-
-            # Second is Regex
-            if (UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
-                return $second->match($first)->is_successful;
-            }
-
-            # Second is Block
-            if (UNIVERSAL::isa($second, 'Sidef::Types::Block::Block')) {
-                if (!UNIVERSAL::isa($first, 'Sidef::Types::Block::Block')) {
-                    return $second->run($first);
-                }
-            }
-
-            if (defined($first) and !defined($second)) {
-                return Sidef::Types::Bool::Bool::FALSE;
-            }
-
-            if (defined($second) and !defined($first)) {
-                return Sidef::Types::Bool::Bool::FALSE;
-            }
-
-            my $bool = $first eq $second;
-#<<<
-            CORE::ref($bool) ? $bool : (
-                       $bool ? Sidef::Types::Bool::Bool::TRUE
-                             : Sidef::Types::Bool::Bool::FALSE
-            );
-#>>>
         }
 
-        # Pipeline operator
-        *{__PACKAGE__ . '::' . '|>'} = sub {
-            my ($arg, $func, @args) = @_;
+        # First is Number
+        if (UNIVERSAL::isa($first, 'Sidef::Types::Number::Number')) {
 
-            if (Scalar::Util::reftype($func) eq 'ARRAY') {
-                @args = @$func;
-                $func = shift(@args);
+            # Number ~~ RangeNumber
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Range::RangeNumber')) {
+                return $second->contains($first);
+            }
+        }
+
+        # First is RangeNumber
+        if (UNIVERSAL::isa($first, 'Sidef::Types::Range::RangeNumber')) {
+
+            # RangeNumber ~~ Number
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Number::Number')) {
+                return $first->contains($second);
+            }
+        }
+
+        # First is RangeString
+        if (UNIVERSAL::isa($first, 'Sidef::Types::Range::RangeString')) {
+
+            # RangeString ~~ String
+            if (UNIVERSAL::isa($second, 'Sidef::Types::String::String')) {
+                return $first->contains($second);
+            }
+        }
+
+        # First is Array
+        if (UNIVERSAL::isa($first, 'Sidef::Types::Array::Array')) {
+
+            # Array ~~ Array
+            if (CORE::ref($first) eq CORE::ref($second)) {
+                return $first->eq($second);
             }
 
-            if (CORE::ref($func) eq 'Sidef::Types::String::String') {
-                return $arg->$$func(@args);
+            # Array ~~ Regex
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
+                return $first->match($second);
             }
 
-            $func->call($arg, @args);
-        };
+            # Array ~~ Hash
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
+                return $second->keys->contains_all($first);
+            }
 
-        # Deprecated pair method: ASCII colon; U+3A
-        *{__PACKAGE__ . '::' . ':'} = sub {
-            Sidef::Types::Array::Pair->new($_[0], $_[1]);
-        };
+            # Array ~~ Any
+            if (!UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
+                return $first->contains($second);
+            }
+        }
 
-        # Pair method: Fullwidth Colon; U+FF1A
-        *{__PACKAGE__ . '::' . '：'} = sub {
-            Sidef::Types::Array::Pair->new($_[0], $_[1]);
-        };
+        # First is Hash
+        if (UNIVERSAL::isa($first, 'Sidef::Types::Hash::Hash')) {
 
-        # NamedParam method: Triple Colon Operator; U+2AF6
-        *{__PACKAGE__ . '::' . '⫶'} = sub {
-            Sidef::Variable::NamedParam->new($_[0], $_[1]);
-        };
+            # Hash ~~ Array
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
+                return $second->contains_all($first->keys);
+            }
 
-        # Logical AND
-        *{__PACKAGE__ . '::' . '&&'} = sub {
-            $_[0] ? $_[1] : $_[0];
-        };
+            # Hash ~~ Hash
+            if (CORE::ref($first) eq CORE::ref($second)) {
+                return $second->eq($first);
+            }
 
-        # Logical OR
-        *{__PACKAGE__ . '::' . '||'} = sub {
-            $_[0] ? $_[0] : $_[1];
-        };
+            # Hash ~~ Regex
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
+                return $first->keys->match($second);
+            }
 
-        # Logical XOR
-        *{__PACKAGE__ . '::' . '^'} = sub {
-            ($_[0] xor $_[1])
-              ? (Sidef::Types::Bool::Bool::TRUE)
-              : (Sidef::Types::Bool::Bool::FALSE);
-        };
+            # Hash ~~ Any
+            if (!UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
+                return $first->exists($second);
+            }
+        }
 
-        # Defined-OR
-        *{__PACKAGE__ . '::' . '\\\\'} = sub {
-            defined($_[0]) ? $_[1] : $_[0];
-        };
+        # First is Regex
+        if (UNIVERSAL::isa($first, 'Sidef::Types::Regex::Regex')) {
 
-        # Smartmatch operator
-        *{__PACKAGE__ . '::' . '~~'} = \&smartmatch;
+            # Regex ~~ Regex
+            if (CORE::ref($first) eq CORE::ref($second)) {
+                return $first->eq($second);
+            }
 
-        # Negation of smartmatch
-        *{__PACKAGE__ . '::' . '!~'} = sub {
-            Sidef::Object::Object::smartmatch($_[0], $_[1])->neg;
-        };
+            # Regex ~~ Array
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
+                return $second->match($first);
+            }
+
+            # Regex ~~ Hash
+            if (UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
+                return $second->keys->match($first);
+            }
+
+            # Regex ~~ Any
+            if (!UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
+                return $first->match($second)->is_successful;
+            }
+        }
+
+        # Second is Array
+        if (UNIVERSAL::isa($second, 'Sidef::Types::Array::Array')) {
+
+            # Any ~~ Array
+            return $second->contains($first);
+        }
+
+        # Second is Hash
+        if (UNIVERSAL::isa($second, 'Sidef::Types::Hash::Hash')) {
+
+            # Any ~~ Hash
+            return $second->exists($first);
+        }
+
+        # Second is Regex
+        if (UNIVERSAL::isa($second, 'Sidef::Types::Regex::Regex')) {
+            return $second->match($first)->is_successful;
+        }
+
+        # Second is Block
+        if (UNIVERSAL::isa($second, 'Sidef::Types::Block::Block')) {
+            if (!UNIVERSAL::isa($first, 'Sidef::Types::Block::Block')) {
+                return $second->run($first);
+            }
+        }
+
+        if (defined($first) and !defined($second)) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        if (defined($second) and !defined($first)) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my $bool = $first eq $second;
+#<<<
+        CORE::ref($bool) ? $bool : (
+                   $bool ? Sidef::Types::Bool::Bool::TRUE
+                         : Sidef::Types::Bool::Bool::FALSE
+        );
+#>>>
     }
+
+    # Pipeline operator
+    *{__PACKAGE__ . '::' . '|>'} = sub {
+        my ($arg, $func, @args) = @_;
+
+        if (Scalar::Util::reftype($func) eq 'ARRAY') {
+            @args = @$func;
+            $func = shift(@args);
+        }
+
+        if (CORE::ref($func) eq 'Sidef::Types::String::String') {
+            return $arg->$$func(@args);
+        }
+
+        $func->call($arg, @args);
+    };
+
+    # Deprecated pair method: ASCII colon; U+3A
+    *{__PACKAGE__ . '::' . ':'} = sub {
+        Sidef::Types::Array::Pair->new($_[0], $_[1]);
+    };
+
+    # Pair method: Fullwidth Colon; U+FF1A
+    *{__PACKAGE__ . '::' . '：'} = sub {
+        Sidef::Types::Array::Pair->new($_[0], $_[1]);
+    };
+
+    # NamedParam method: Triple Colon Operator; U+2AF6
+    *{__PACKAGE__ . '::' . '⫶'} = sub {
+        Sidef::Variable::NamedParam->new($_[0], $_[1]);
+    };
+
+    # Logical AND
+    *{__PACKAGE__ . '::' . '&&'} = sub {
+        $_[0] ? $_[1] : $_[0];
+    };
+
+    # Logical OR
+    *{__PACKAGE__ . '::' . '||'} = sub {
+        $_[0] ? $_[0] : $_[1];
+    };
+
+    # Logical XOR
+    *{__PACKAGE__ . '::' . '^'} = sub {
+        ($_[0] xor $_[1])
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    };
+
+    # Defined-OR
+    *{__PACKAGE__ . '::' . '\\\\'} = sub {
+        defined($_[0]) ? $_[1] : $_[0];
+    };
+
+    # Smartmatch operator
+    *{__PACKAGE__ . '::' . '~~'} = \&smartmatch;
+
+    # Negation of smartmatch
+    *{__PACKAGE__ . '::' . '!~'} = sub {
+        Sidef::Object::Object::smartmatch($_[0], $_[1])->neg;
+    };
 }
 
 1;

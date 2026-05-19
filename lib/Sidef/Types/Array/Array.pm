@@ -1,3365 +1,3321 @@
-package Sidef::Types::Array::Array {
+package Sidef::Types::Array::Array;
 
-    use utf8;
-    use 5.016;
+use utf8;
+use 5.016;
 
-    use List::Util qw();
+use List::Util qw();
 
-    use parent qw(
-      Sidef::Object::Object
-    );
+use parent qw(
+  Sidef::Object::Object
+);
 
-    use overload
-      q{""}   => \&_dump,
-      q{0+}   => sub { scalar(@{$_[0]}) },
-      q{bool} => sub { scalar(@{$_[0]}) };
+use overload
+  q{""}   => \&_dump,
+  q{0+}   => sub { scalar(@{$_[0]}) },
+  q{bool} => sub { scalar(@{$_[0]}) };
 
-    use Sidef::Types::Number::Number;
-    use Sidef::Types::Block::Block;
+use Sidef::Types::Number::Number;
+use Sidef::Types::Block::Block;
 
-    sub new {
-        (@_ == 2 && ref($_[1]) eq 'ARRAY')
-          ? bless($_[1])
-          : do {
-            shift(@_);
-            bless [@_];
-          };
+sub new {
+    (@_ == 2 && ref($_[1]) eq 'ARRAY')
+      ? bless($_[1])
+      : do {
+        shift(@_);
+        bless [@_];
+      };
+}
+
+*call = \&new;
+
+sub get_value {
+    my %addr;
+
+    my $sub = sub {
+        my ($obj) = @_;
+
+        my $refaddr = Scalar::Util::refaddr($obj);
+
+        exists($addr{$refaddr})
+          && return $addr{$refaddr};
+
+        my @array;
+        $addr{$refaddr} = \@array;
+
+        foreach my $item (@$obj) {
+            if (CORE::index(ref($item), 'Sidef::') == 0) {
+                CORE::push(@array, $item->get_value);
+            }
+            else {
+                CORE::push(@array, $item);
+            }
+        }
+
+        $addr{$refaddr};
+    };
+
+    no warnings 'redefine';
+    local *Sidef::Types::Array::Array::get_value = $sub;
+    $sub->($_[0]);
+}
+
+sub unroll_operator {
+    my ($self, $operator, $arg) = @_;
+
+    if (ref($arg) ne ref($self)) {
+        $arg = $arg->to_a;
     }
 
-    *call = \&new;
+    $operator = "$operator" if ref($operator);
 
-    sub get_value {
-        my %addr;
+    my @array;
 
-        my $sub = sub {
-            my ($obj) = @_;
+    my @arg  = @$arg;
+    my @self = @$self;
 
-            my $refaddr = Scalar::Util::refaddr($obj);
+    (my $argc = @arg) || return bless(\@self, ref($self));
+    my $selfc = @self;
 
-            exists($addr{$refaddr})
-              && return $addr{$refaddr};
+    my $max = $argc > $selfc ? $argc - 1 : $selfc - 1;
 
-            my @array;
-            $addr{$refaddr} = \@array;
+    foreach my $i (0 .. $max) {
+        CORE::push(@array, $self[$i % $selfc]->$operator($arg[$i % $argc]));
+    }
 
-            foreach my $item (@$obj) {
-                if (CORE::index(ref($item), 'Sidef::') == 0) {
-                    CORE::push(@array, $item->get_value);
+    bless \@array, ref($self);
+}
+
+*unroll_op = \&unroll_operator;
+
+sub map_operator {
+    my ($self, $operator, @args) = @_;
+
+    $operator = "$operator" if ref($operator);
+
+    my @array;
+    foreach my $i (0 .. $#$self) {
+        CORE::push(@array, $self->[$i]->$operator(@args));
+    }
+
+    bless \@array, ref($self);
+}
+
+*map_op = \&map_operator;
+
+sub pam_operator {
+    my ($self, $operator, $arg) = @_;
+
+    $operator = "$operator" if ref($operator);
+
+    my @array;
+    foreach my $i (0 .. $#$self) {
+        CORE::push(@array, $arg->$operator($self->[$i]));
+    }
+
+    bless \@array, ref($self);
+}
+
+*pam_op = \&pam_operator;
+
+sub reduce_operator {
+    my ($self, $operator, $initial) = @_;
+
+    $operator = "$operator" if ref($operator);
+
+    my ($from, $x) = (
+                      defined($initial)
+                      ? (0, $initial)
+                      : (1, $self->[0])
+                     );
+
+    foreach my $i ($from .. $#$self) {
+        $x = $x->$operator($self->[$i]);
+    }
+    $x;
+}
+
+*reduce_op = \&reduce_operator;
+
+sub cross_operator {
+    my ($self, $operator, $arg) = @_;
+
+    if (ref($arg) ne ref($self)) {
+        $arg = $arg->to_a;
+    }
+
+    $operator = "$operator" if ref($operator);
+
+    my @arg = @$arg;
+
+    my @array;
+    if ($operator eq '') {
+        foreach my $i (@$self) {
+            foreach my $j (@arg) {
+                CORE::push(@array, bless [$i, $j]);
+            }
+        }
+    }
+    else {
+        foreach my $i (@$self) {
+            foreach my $j (@arg) {
+                CORE::push(@array, $i->$operator($j));
+            }
+        }
+    }
+
+    bless \@array, ref($self);
+}
+
+*cross_op = \&cross_operator;
+
+sub zip_operator {
+    my ($self, $operator, $arg) = @_;
+
+    if (ref($arg) ne ref($self)) {
+        $arg = $arg->to_a;
+    }
+
+    $operator = "$operator" if ref($operator);
+
+    my @arg  = @$arg;
+    my @self = @$self;
+
+    my $self_len = $#self;
+    my $arg_len  = $#arg;
+    my $min      = $self_len < $arg_len ? $self_len : $arg_len;
+
+    my @array;
+    if ($operator eq '') {
+        foreach my $i (0 .. $min) {
+            CORE::push(@array, bless [$self[$i], $arg[$i]]);
+        }
+    }
+    else {
+        foreach my $i (0 .. $min) {
+            CORE::push(@array, $self[$i]->$operator($arg[$i]));
+        }
+    }
+
+    bless \@array, ref($self);
+}
+
+*zip_op = \&zip_operator;
+
+sub scalar_operator {
+    my ($self, $operator, $scalar) = @_;
+
+    $operator = "$operator" if ref($operator);
+
+    my %addr;    # support for cyclic references
+
+    sub {
+        my ($obj) = @_;
+
+        my $refaddr = Scalar::Util::refaddr($obj);
+
+        exists($addr{$refaddr})
+          && return $addr{$refaddr};
+
+        my @array;
+        $addr{$refaddr} = bless(\@array, ref($obj));
+
+        foreach my $item (@$obj) {
+            if (ref($item) eq __PACKAGE__ or UNIVERSAL::isa($item, __PACKAGE__)) {
+                CORE::push(@array, __SUB__->($item));
+            }
+            else {
+                if ($operator eq '') {
+                    CORE::push(@array, bless [$item, $scalar]);
                 }
                 else {
-                    CORE::push(@array, $item);
+                    CORE::push(@array, $item->$operator($scalar));
                 }
             }
-
-            $addr{$refaddr};
-        };
-
-        no warnings 'redefine';
-        local *Sidef::Types::Array::Array::get_value = $sub;
-        $sub->($_[0]);
-    }
-
-    sub unroll_operator {
-        my ($self, $operator, $arg) = @_;
-
-        if (ref($arg) ne ref($self)) {
-            $arg = $arg->to_a;
         }
 
-        $operator = "$operator" if ref($operator);
+        $addr{$refaddr};
+      }
+      ->($self);
+}
+
+*scalar_op = \&scalar_operator;
+
+sub rscalar_operator {
+    my ($self, $operator, $scalar) = @_;
+
+    $operator = "$operator" if ref($operator);
+
+    my %addr;    # support for cyclic references
+
+    sub {
+        my ($obj) = @_;
+
+        my $refaddr = Scalar::Util::refaddr($obj);
+
+        exists($addr{$refaddr})
+          && return $addr{$refaddr};
 
         my @array;
+        $addr{$refaddr} = bless(\@array, ref($self));
 
-        my @arg  = @$arg;
-        my @self = @$self;
-
-        (my $argc = @arg) || return bless(\@self, ref($self));
-        my $selfc = @self;
-
-        my $max = $argc > $selfc ? $argc - 1 : $selfc - 1;
-
-        foreach my $i (0 .. $max) {
-            CORE::push(@array, $self[$i % $selfc]->$operator($arg[$i % $argc]));
-        }
-
-        bless \@array, ref($self);
-    }
-
-    *unroll_op = \&unroll_operator;
-
-    sub map_operator {
-        my ($self, $operator, @args) = @_;
-
-        $operator = "$operator" if ref($operator);
-
-        my @array;
-        foreach my $i (0 .. $#$self) {
-            CORE::push(@array, $self->[$i]->$operator(@args));
-        }
-
-        bless \@array, ref($self);
-    }
-
-    *map_op = \&map_operator;
-
-    sub pam_operator {
-        my ($self, $operator, $arg) = @_;
-
-        $operator = "$operator" if ref($operator);
-
-        my @array;
-        foreach my $i (0 .. $#$self) {
-            CORE::push(@array, $arg->$operator($self->[$i]));
-        }
-
-        bless \@array, ref($self);
-    }
-
-    *pam_op = \&pam_operator;
-
-    sub reduce_operator {
-        my ($self, $operator, $initial) = @_;
-
-        $operator = "$operator" if ref($operator);
-
-        my ($from, $x) = (
-                          defined($initial)
-                          ? (0, $initial)
-                          : (1, $self->[0])
-                         );
-
-        foreach my $i ($from .. $#$self) {
-            $x = $x->$operator($self->[$i]);
-        }
-        $x;
-    }
-
-    *reduce_op = \&reduce_operator;
-
-    sub cross_operator {
-        my ($self, $operator, $arg) = @_;
-
-        if (ref($arg) ne ref($self)) {
-            $arg = $arg->to_a;
-        }
-
-        $operator = "$operator" if ref($operator);
-
-        my @arg = @$arg;
-
-        my @array;
-        if ($operator eq '') {
-            foreach my $i (@$self) {
-                foreach my $j (@arg) {
-                    CORE::push(@array, bless [$i, $j]);
+        foreach my $item (@$obj) {
+            if (ref($item) eq __PACKAGE__ or UNIVERSAL::isa($item, __PACKAGE__)) {
+                CORE::push(@array, __SUB__->($item));
+            }
+            else {
+                if ($operator eq '') {
+                    CORE::push(@array, bless [$scalar, $item]);
+                }
+                else {
+                    CORE::push(@array, $scalar->$operator($item));
                 }
             }
+        }
+
+        $addr{$refaddr};
+      }
+      ->($self);
+}
+
+*rscalar_op = \&rscalar_operator;
+
+sub wise_operator {
+    my ($m1, $operator, $m2) = @_;
+
+    if (ref($m2) ne ref($m1)) {
+        $m2 = $m2->to_a;
+    }
+
+    $operator = "$operator" if ref($operator);
+
+    my %addr;    # support for cyclic references
+
+    sub {
+        my ($obj1, $obj2) = @_;
+
+        my $refaddr1 = Scalar::Util::refaddr($obj1);
+
+        exists($addr{$refaddr1})
+          && return $addr{$refaddr1};
+
+        my @array;
+
+        $addr{$refaddr1} = bless(\@array, ref($obj1));
+
+        for my $i (0 .. $#{$obj1}) {
+            if (ref($obj1->[$i]) eq __PACKAGE__ or UNIVERSAL::isa($obj1->[$i], __PACKAGE__)) {
+                CORE::push(@array, __SUB__->($obj1->[$i], $obj2->[$i]));
+            }
+            else {
+                if ($operator eq '') {
+                    CORE::push(@array, bless [$obj1->[$i], $obj2->[$i]]);
+                }
+                else {
+                    CORE::push(@array, $obj1->[$i]->$operator($obj2->[$i]));
+                }
+            }
+        }
+
+        $addr{$refaddr1};
+      }
+      ->($m1, $m2);
+}
+
+*wise_op = \&wise_operator;
+
+sub combine {
+    my ($self, $block) = @_;
+
+    my %addr;    # support for cyclic references
+
+    sub {
+        my (@arrays) = @_;
+
+        my @array;
+        my $blessed_array = bless \@array, ref($self);
+
+        # Check any references already computed
+        foreach my $obj (@arrays) {
+            my $refaddr = Scalar::Util::refaddr($obj);
+            exists($addr{$refaddr}) && return $addr{$refaddr};
+        }
+
+        # Store the references of each object
+        foreach my $obj (@arrays) {
+            my $refaddr = Scalar::Util::refaddr($obj);
+            $addr{$refaddr} = $blessed_array;
+        }
+
+        @arrays || return $blessed_array;
+
+        my $first = $arrays[0];
+
+        foreach my $i (0 .. $#{$first}) {
+            if (ref($first->[$i]) eq __PACKAGE__ or UNIVERSAL::isa($first->[$i], __PACKAGE__)) {
+                CORE::push(@array, __SUB__->(map { $_->[$i] } @arrays));
+            }
+            else {
+                CORE::push(@array, $block->run(map { $_->[$i] } @arrays));
+            }
+        }
+
+        $blessed_array;
+      }
+      ->(@$self);
+}
+
+sub mul {
+    my ($self, $num) = @_;
+    bless [(@$self) x CORE::int($num)];
+}
+
+sub div {
+    my ($self, $num) = @_;
+
+    my @obj = @$self;
+
+    $num = CORE::int($num);
+    $num > 0 or return undef;
+
+    my @array;
+    my $len = CORE::int(scalar(@obj) / $num);
+
+    $len || return undef;
+
+    my $i   = 1;
+    my $pos = $len;
+    while (@obj) {
+        my $j = $pos - $i * CORE::int($len);
+        $pos -= $j if $j >= 1;
+        CORE::push(@array, bless [CORE::splice(@obj, 0, $len + $j)]);
+        $pos += $len;
+        $i++;
+    }
+
+    bless \@array;
+}
+
+sub part {
+    my ($self, $num) = @_;
+
+    my @first  = @$self;
+    my @second = splice(@first, CORE::int($num));
+
+    (bless(\@first), bless(\@second));
+}
+
+*partition = \&part;
+
+sub segment {
+    my ($self, @indices) = @_;
+
+    my @parts;
+    my $prev_i = 0;
+    my $end    = $#{$self};
+
+    foreach my $i (@indices) {
+        $i = CORE::int($i);
+        $i = $end          if ($i > $end);
+        $i = $end + $i + 1 if ($i < 0);
+        CORE::push(@parts, bless [@{$self}[$prev_i .. $i]]);
+        $prev_i = $i + 1;
+    }
+
+    if ($prev_i <= $end) {
+        CORE::push(@parts, bless [@{$self}[$prev_i .. $end]]);
+    }
+
+    bless \@parts;
+}
+
+sub segment_by {
+    my ($self, $block) = @_;
+
+    my @indices;
+    foreach my $i (0 .. $#$self) {
+        if ($block->run($self->[$i])) {
+            CORE::push(@indices, $i);
+        }
+    }
+
+    $self->segment(@indices);
+}
+
+sub split_by {
+    my ($self, $block) = @_;
+
+    my @tmp;
+    my @array;
+
+    foreach my $item (@$self) {
+        if ($block->run($item)) {
+            CORE::push(@array, [CORE::splice(@tmp)]);
         }
         else {
-            foreach my $i (@$self) {
-                foreach my $j (@arg) {
-                    CORE::push(@array, $i->$operator($j));
-                }
-            }
+            CORE::push(@tmp, $item);
         }
-
-        bless \@array, ref($self);
     }
 
-    *cross_op = \&cross_operator;
+    if (@tmp) {
+        CORE::push(@array, \@tmp);
+    }
 
-    sub zip_operator {
-        my ($self, $operator, $arg) = @_;
+    @array = map { bless $_ } @array;
+    bless \@array;
+}
 
-        if (ref($arg) ne ref($self)) {
-            $arg = $arg->to_a;
-        }
+sub split {
+    my ($self, $obj) = @_;
 
-        $operator = "$operator" if ref($operator);
+    if (ref($obj) eq 'Sidef::Types::Block::Block') {
+        goto &split_by;
+    }
 
-        my @arg  = @$arg;
-        my @self = @$self;
+    my @tmp;
+    my @array;
 
-        my $self_len = $#self;
-        my $arg_len  = $#arg;
-        my $min      = $self_len < $arg_len ? $self_len : $arg_len;
-
-        my @array;
-        if ($operator eq '') {
-            foreach my $i (0 .. $min) {
-                CORE::push(@array, bless [$self[$i], $arg[$i]]);
-            }
+    foreach my $item (@$self) {
+        if ($item eq $obj) {
+            CORE::push(@array, [CORE::splice(@tmp)]);
         }
         else {
-            foreach my $i (0 .. $min) {
-                CORE::push(@array, $self[$i]->$operator($arg[$i]));
-            }
+            CORE::push(@tmp, $item);
         }
-
-        bless \@array, ref($self);
     }
 
-    *zip_op = \&zip_operator;
-
-    sub scalar_operator {
-        my ($self, $operator, $scalar) = @_;
-
-        $operator = "$operator" if ref($operator);
-
-        my %addr;    # support for cyclic references
-
-        sub {
-            my ($obj) = @_;
-
-            my $refaddr = Scalar::Util::refaddr($obj);
-
-            exists($addr{$refaddr})
-              && return $addr{$refaddr};
-
-            my @array;
-            $addr{$refaddr} = bless(\@array, ref($obj));
-
-            foreach my $item (@$obj) {
-                if (ref($item) eq __PACKAGE__ or UNIVERSAL::isa($item, __PACKAGE__)) {
-                    CORE::push(@array, __SUB__->($item));
-                }
-                else {
-                    if ($operator eq '') {
-                        CORE::push(@array, bless [$item, $scalar]);
-                    }
-                    else {
-                        CORE::push(@array, $item->$operator($scalar));
-                    }
-                }
-            }
-
-            $addr{$refaddr};
-          }
-          ->($self);
+    if (@tmp) {
+        CORE::push(@array, \@tmp);
     }
 
-    *scalar_op = \&scalar_operator;
+    @array = map { bless $_ } @array;
+    bless \@array;
+}
 
-    sub rscalar_operator {
-        my ($self, $operator, $scalar) = @_;
+sub or {
+    my ($self, $array) = @_;
 
-        $operator = "$operator" if ref($operator);
-
-        my %addr;    # support for cyclic references
-
-        sub {
-            my ($obj) = @_;
-
-            my $refaddr = Scalar::Util::refaddr($obj);
-
-            exists($addr{$refaddr})
-              && return $addr{$refaddr};
-
-            my @array;
-            $addr{$refaddr} = bless(\@array, ref($self));
-
-            foreach my $item (@$obj) {
-                if (ref($item) eq __PACKAGE__ or UNIVERSAL::isa($item, __PACKAGE__)) {
-                    CORE::push(@array, __SUB__->($item));
-                }
-                else {
-                    if ($operator eq '') {
-                        CORE::push(@array, bless [$scalar, $item]);
-                    }
-                    else {
-                        CORE::push(@array, $scalar->$operator($item));
-                    }
-                }
-            }
-
-            $addr{$refaddr};
-          }
-          ->($self);
+    if (ref($array) ne ref($self)) {
+        $array = $array->to_a;
     }
 
-    *rscalar_op = \&rscalar_operator;
+    #$self->and($array)->concat($self->xor($array));
+    #$self->concat($array)->uniq;
 
-    sub wise_operator {
-        my ($m1, $operator, $m2) = @_;
+    my @x = CORE::sort { $a cmp $b } @$self;
+    my @y = CORE::sort { $a cmp $b } @$array;
 
-        if (ref($m2) ne ref($m1)) {
-            $m2 = $m2->to_a;
+    my $endx = $#x;
+    my $endy = $#y;
+
+    my $i = 0;
+    my $j = 0;
+
+    my ($cmp, @new);
+
+    while (1) {
+
+        $cmp = CORE::int($x[$i] cmp $y[$j]);
+
+        if ($cmp < 0) {
+            CORE::push @new, $x[$i];
+            ++$i;
+        }
+        elsif ($cmp > 0) {
+            CORE::push @new, $y[$j];
+            ++$j;
+        }
+        else {
+            CORE::push @new, $x[$i];
+            ++$i;
+            ++$j;
         }
 
-        $operator = "$operator" if ref($operator);
-
-        my %addr;    # support for cyclic references
-
-        sub {
-            my ($obj1, $obj2) = @_;
-
-            my $refaddr1 = Scalar::Util::refaddr($obj1);
-
-            exists($addr{$refaddr1})
-              && return $addr{$refaddr1};
-
-            my @array;
-
-            $addr{$refaddr1} = bless(\@array, ref($obj1));
-
-            for my $i (0 .. $#{$obj1}) {
-                if (ref($obj1->[$i]) eq __PACKAGE__ or UNIVERSAL::isa($obj1->[$i], __PACKAGE__)) {
-                    CORE::push(@array, __SUB__->($obj1->[$i], $obj2->[$i]));
-                }
-                else {
-                    if ($operator eq '') {
-                        CORE::push(@array, bless [$obj1->[$i], $obj2->[$i]]);
-                    }
-                    else {
-                        CORE::push(@array, $obj1->[$i]->$operator($obj2->[$i]));
-                    }
-                }
-            }
-
-            $addr{$refaddr1};
-          }
-          ->($m1, $m2);
+        if ($i > $endx) {
+            CORE::push @new, @y[$j .. $endy];
+            last;
+        }
+        elsif ($j > $endy) {
+            CORE::push @new, @x[$i .. $endx];
+            last;
+        }
     }
 
-    *wise_op = \&wise_operator;
+    bless \@new;
+}
 
-    sub combine {
-        my ($self, $block) = @_;
+sub xor {
+    my ($self, $array) = @_;
 
-        my %addr;    # support for cyclic references
-
-        sub {
-            my (@arrays) = @_;
-
-            my @array;
-            my $blessed_array = bless \@array, ref($self);
-
-            # Check any references already computed
-            foreach my $obj (@arrays) {
-                my $refaddr = Scalar::Util::refaddr($obj);
-                exists($addr{$refaddr}) && return $addr{$refaddr};
-            }
-
-            # Store the references of each object
-            foreach my $obj (@arrays) {
-                my $refaddr = Scalar::Util::refaddr($obj);
-                $addr{$refaddr} = $blessed_array;
-            }
-
-            @arrays || return $blessed_array;
-
-            my $first = $arrays[0];
-
-            foreach my $i (0 .. $#{$first}) {
-                if (ref($first->[$i]) eq __PACKAGE__ or UNIVERSAL::isa($first->[$i], __PACKAGE__)) {
-                    CORE::push(@array, __SUB__->(map { $_->[$i] } @arrays));
-                }
-                else {
-                    CORE::push(@array, $block->run(map { $_->[$i] } @arrays));
-                }
-            }
-
-            $blessed_array;
-          }
-          ->(@$self);
+    if (ref($array) ne ref($self)) {
+        $array = $array->to_a;
     }
 
-    sub mul {
-        my ($self, $num) = @_;
-        bless [(@$self) x CORE::int($num)];
+    my @x = CORE::sort { $a cmp $b } @$self;
+    my @y = CORE::sort { $a cmp $b } @$array;
+
+    my $endx = $#x;
+    my $endy = $#y;
+
+    my $i = 0;
+    my $j = 0;
+
+    my ($cmp, @new);
+
+    while (1) {
+
+        $cmp = CORE::int($x[$i] cmp $y[$j]);
+
+        if ($cmp < 0) {
+            CORE::push @new, $x[$i];
+            ++$i;
+        }
+        elsif ($cmp > 0) {
+            CORE::push @new, $y[$j];
+            ++$j;
+        }
+        else {
+            #my $k = $i;
+            #do { ++$i } while ($i <= $endx and $x[$i] eq $y[$j]);
+            #do { ++$j } while ($j <= $endy and $x[$k] eq $y[$j]);
+
+            ++$i;
+            ++$j;
+        }
+
+        if ($i > $endx) {
+            CORE::push @new, @y[$j .. $endy];
+            last;
+        }
+        elsif ($j > $endy) {
+            CORE::push @new, @x[$i .. $endx];
+            last;
+        }
     }
 
-    sub div {
-        my ($self, $num) = @_;
+    bless \@new;
+}
 
-        my @obj = @$self;
+sub and {
+    my ($self, $array) = @_;
 
-        $num = CORE::int($num);
-        $num > 0 or return undef;
-
-        my @array;
-        my $len = CORE::int(scalar(@obj) / $num);
-
-        $len || return undef;
-
-        my $i   = 1;
-        my $pos = $len;
-        while (@obj) {
-            my $j = $pos - $i * CORE::int($len);
-            $pos -= $j if $j >= 1;
-            CORE::push(@array, bless [CORE::splice(@obj, 0, $len + $j)]);
-            $pos += $len;
-            $i++;
-        }
-
-        bless \@array;
+    if (ref($array) ne ref($self)) {
+        $array = $array->to_a;
     }
 
-    sub part {
-        my ($self, $num) = @_;
+    my @x = CORE::sort { $a cmp $b } @$self;
+    my @y = CORE::sort { $a cmp $b } @$array;
 
-        my @first  = @$self;
-        my @second = splice(@first, CORE::int($num));
+    my $i = 0;
+    my $j = 0;
 
-        (bless(\@first), bless(\@second));
+    my $end1 = @x;
+    my $end2 = @y;
+
+    my ($cmp, @new);
+    while ($i < $end1 and $j < $end2) {
+
+        $cmp = CORE::int($x[$i] cmp $y[$j]);
+
+        if ($cmp < 0) {
+            ++$i;
+        }
+        elsif ($cmp > 0) {
+            ++$j;
+        }
+        else {
+            CORE::push @new, $x[$i];
+            ++$i;
+            ++$j;
+        }
     }
 
-    *partition = \&part;
+    bless \@new;
+}
 
-    sub segment {
-        my ($self, @indices) = @_;
+sub diff {
+    my ($self, $array) = @_;
 
-        my @parts;
-        my $prev_i = 0;
-        my $end    = $#{$self};
-
-        foreach my $i (@indices) {
-            $i = CORE::int($i);
-            $i = $end          if ($i > $end);
-            $i = $end + $i + 1 if ($i < 0);
-            CORE::push(@parts, bless [@{$self}[$prev_i .. $i]]);
-            $prev_i = $i + 1;
-        }
-
-        if ($prev_i <= $end) {
-            CORE::push(@parts, bless [@{$self}[$prev_i .. $end]]);
-        }
-
-        bless \@parts;
+    if (ref($array) ne ref($self)) {
+        $array = $array->to_a;
     }
 
-    sub segment_by {
-        my ($self, $block) = @_;
+    my @x = CORE::sort { $a cmp $b } @$self;
+    my @y = CORE::sort { $a cmp $b } @$array;
 
-        my @indices;
-        foreach my $i (0 .. $#$self) {
-            if ($block->run($self->[$i])) {
-                CORE::push(@indices, $i);
-            }
+    my $i = 0;
+    my $j = 0;
+
+    my $end1 = @x;
+    my $end2 = @y;
+
+    my ($cmp, @new);
+    while ($i < $end1 and $j < $end2) {
+
+        $cmp = CORE::int($x[$i] cmp $y[$j]);
+
+        if ($cmp < 0) {
+            CORE::push @new, $x[$i];
+            ++$i;
         }
-
-        $self->segment(@indices);
+        elsif ($cmp > 0) {
+            ++$j;
+        }
+        else {
+            # 1 while (++$i < $end1 and $x[$i] eq $y[$j]);
+            ++$i;
+            ++$j;
+        }
     }
 
-    sub split_by {
-        my ($self, $block) = @_;
-
-        my @tmp;
-        my @array;
-
-        foreach my $item (@$self) {
-            if ($block->run($item)) {
-                CORE::push(@array, [CORE::splice(@tmp)]);
-            }
-            else {
-                CORE::push(@tmp, $item);
-            }
-        }
-
-        if (@tmp) {
-            CORE::push(@array, \@tmp);
-        }
-
-        @array = map { bless $_ } @array;
-        bless \@array;
+    if ($i < $end1) {
+        CORE::push @new, @x[$i .. $#x];
     }
 
-    sub split {
-        my ($self, $obj) = @_;
+    bless \@new;
+}
 
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            goto &split_by;
-        }
+*sub = \&diff;
 
-        my @tmp;
-        my @array;
+sub concat {
+    my ($self, $arg) = @_;
 
-        foreach my $item (@$self) {
-            if ($item eq $obj) {
-                CORE::push(@array, [CORE::splice(@tmp)]);
-            }
-            else {
-                CORE::push(@tmp, $item);
-            }
-        }
+    ref($self) eq ref($arg)
+      ? bless([@$self, @$arg])
+      : bless([@$self, $arg]);
+}
 
-        if (@tmp) {
-            CORE::push(@array, \@tmp);
-        }
+*add = \&concat;
 
-        @array = map { bless $_ } @array;
-        bless \@array;
+sub levenshtein {
+    my ($self, $arg) = @_;
+
+    if (ref($arg) ne ref($self)) {
+        $arg = $arg->to_a;
     }
 
-    sub or {
-        my ($self, $array) = @_;
+    my @s = @$self;
+    my @t = @$arg;
 
-        if (ref($array) ne ref($self)) {
-            $array = $array->to_a;
+    my $len1 = scalar(@s);
+    my $len2 = scalar(@t);
+
+    my @d = ([0 .. $len2], map { [$_] } 1 .. $len1);
+    foreach my $i (1 .. $len1) {
+        foreach my $j (1 .. $len2) {
+            $d[$i][$j] =
+                $s[$i - 1] eq $t[$j - 1]
+              ? $d[$i - 1][$j - 1]
+              : List::Util::min($d[$i - 1][$j], $d[$i][$j - 1], $d[$i - 1][$j - 1]) + 1;
         }
-
-        #$self->and($array)->concat($self->xor($array));
-        #$self->concat($array)->uniq;
-
-        my @x = CORE::sort { $a cmp $b } @$self;
-        my @y = CORE::sort { $a cmp $b } @$array;
-
-        my $endx = $#x;
-        my $endy = $#y;
-
-        my $i = 0;
-        my $j = 0;
-
-        my ($cmp, @new);
-
-        while (1) {
-
-            $cmp = CORE::int($x[$i] cmp $y[$j]);
-
-            if ($cmp < 0) {
-                CORE::push @new, $x[$i];
-                ++$i;
-            }
-            elsif ($cmp > 0) {
-                CORE::push @new, $y[$j];
-                ++$j;
-            }
-            else {
-                CORE::push @new, $x[$i];
-                ++$i;
-                ++$j;
-            }
-
-            if ($i > $endx) {
-                CORE::push @new, @y[$j .. $endy];
-                last;
-            }
-            elsif ($j > $endy) {
-                CORE::push @new, @x[$i .. $endx];
-                last;
-            }
-        }
-
-        bless \@new;
     }
 
-    sub xor {
-        my ($self, $array) = @_;
+    Sidef::Types::Number::Number->new($d[-1][-1]);
+}
 
-        if (ref($array) ne ref($self)) {
-            $array = $array->to_a;
-        }
+*lev   = \&levenshtein;
+*leven = \&levenshtein;
 
-        my @x = CORE::sort { $a cmp $b } @$self;
-        my @y = CORE::sort { $a cmp $b } @$array;
+sub jaro {
+    my ($self, $arg, $winkler) = @_;
 
-        my $endx = $#x;
-        my $endy = $#y;
-
-        my $i = 0;
-        my $j = 0;
-
-        my ($cmp, @new);
-
-        while (1) {
-
-            $cmp = CORE::int($x[$i] cmp $y[$j]);
-
-            if ($cmp < 0) {
-                CORE::push @new, $x[$i];
-                ++$i;
-            }
-            elsif ($cmp > 0) {
-                CORE::push @new, $y[$j];
-                ++$j;
-            }
-            else {
-                #my $k = $i;
-                #do { ++$i } while ($i <= $endx and $x[$i] eq $y[$j]);
-                #do { ++$j } while ($j <= $endy and $x[$k] eq $y[$j]);
-
-                ++$i;
-                ++$j;
-            }
-
-            if ($i > $endx) {
-                CORE::push @new, @y[$j .. $endy];
-                last;
-            }
-            elsif ($j > $endy) {
-                CORE::push @new, @x[$i .. $endx];
-                last;
-            }
-        }
-
-        bless \@new;
+    if (ref($arg) ne ref($self)) {
+        $arg = $arg->to_a;
     }
 
-    sub and {
-        my ($self, $array) = @_;
+    my @s = @$self;
+    my @t = @$arg;
 
-        if (ref($array) ne ref($self)) {
-            $array = $array->to_a;
-        }
+    my $s_len = @s;
+    my $t_len = @t;
 
-        my @x = CORE::sort { $a cmp $b } @$self;
-        my @y = CORE::sort { $a cmp $b } @$array;
-
-        my $i = 0;
-        my $j = 0;
-
-        my $end1 = @x;
-        my $end2 = @y;
-
-        my ($cmp, @new);
-        while ($i < $end1 and $j < $end2) {
-
-            $cmp = CORE::int($x[$i] cmp $y[$j]);
-
-            if ($cmp < 0) {
-                ++$i;
-            }
-            elsif ($cmp > 0) {
-                ++$j;
-            }
-            else {
-                CORE::push @new, $x[$i];
-                ++$i;
-                ++$j;
-            }
-        }
-
-        bless \@new;
+    if ($s_len == 0 and $t_len == 0) {
+        return 1;
     }
 
-    sub diff {
-        my ($self, $array) = @_;
+    my $match_distance = CORE::int(List::Util::max($s_len, $t_len) / 2) - 1;
 
-        if (ref($array) ne ref($self)) {
-            $array = $array->to_a;
+    my @s_matches;
+    my @t_matches;
+
+    my $matches = 0;
+    foreach my $i (0 .. $#s) {
+
+        my $start = List::Util::max(0, $i - $match_distance);
+        my $end   = List::Util::min($i + $match_distance + 1, $t_len);
+
+        foreach my $j ($start .. $end - 1) {
+            $t_matches[$j] and next;
+            $s[$i] eq $t[$j] or next;
+            $s_matches[$i] = 1;
+            $t_matches[$j] = 1;
+            $matches++;
+            last;
         }
-
-        my @x = CORE::sort { $a cmp $b } @$self;
-        my @y = CORE::sort { $a cmp $b } @$array;
-
-        my $i = 0;
-        my $j = 0;
-
-        my $end1 = @x;
-        my $end2 = @y;
-
-        my ($cmp, @new);
-        while ($i < $end1 and $j < $end2) {
-
-            $cmp = CORE::int($x[$i] cmp $y[$j]);
-
-            if ($cmp < 0) {
-                CORE::push @new, $x[$i];
-                ++$i;
-            }
-            elsif ($cmp > 0) {
-                ++$j;
-            }
-            else {
-                # 1 while (++$i < $end1 and $x[$i] eq $y[$j]);
-                ++$i;
-                ++$j;
-            }
-        }
-
-        if ($i < $end1) {
-            CORE::push @new, @x[$i .. $#x];
-        }
-
-        bless \@new;
     }
 
-    *sub = \&diff;
+    return Sidef::Types::Number::Number::ZERO if $matches == 0;
 
-    sub concat {
-        my ($self, $arg) = @_;
+    my $k              = 0;
+    my $transpositions = 0;
 
-        ref($self) eq ref($arg)
-          ? bless([@$self, @$arg])
-          : bless([@$self, $arg]);
+    foreach my $i (0 .. $#s) {
+        $s_matches[$i] or next;
+        until ($t_matches[$k]) { ++$k }
+        $s[$i] eq $t[$k] or ++$transpositions;
+        ++$k;
     }
 
-    *add = \&concat;
+    my $jaro = (($matches / $s_len) + ($matches / $t_len) + (($matches - $transpositions / 2) / $matches)) / 3;
 
-    sub levenshtein {
-        my ($self, $arg) = @_;
+    $winkler || return Sidef::Types::Number::Number->new($jaro);    # return the Jaro similarity instead of Jaro-Winkler
 
-        if (ref($arg) ne ref($self)) {
-            $arg = $arg->to_a;
-        }
-
-        my @s = @$self;
-        my @t = @$arg;
-
-        my $len1 = scalar(@s);
-        my $len2 = scalar(@t);
-
-        my @d = ([0 .. $len2], map { [$_] } 1 .. $len1);
-        foreach my $i (1 .. $len1) {
-            foreach my $j (1 .. $len2) {
-                $d[$i][$j] =
-                    $s[$i - 1] eq $t[$j - 1]
-                  ? $d[$i - 1][$j - 1]
-                  : List::Util::min($d[$i - 1][$j], $d[$i][$j - 1], $d[$i - 1][$j - 1]) + 1;
-            }
-        }
-
-        Sidef::Types::Number::Number->new($d[-1][-1]);
+    my $prefix = 0;
+    foreach my $i (0 .. List::Util::min(3, $#t, $#s)) {
+        $s[$i] eq $t[$i] ? ++$prefix : last;
     }
 
-    *lev   = \&levenshtein;
-    *leven = \&levenshtein;
+    Sidef::Types::Number::Number->new($jaro + $prefix * 0.1 * (1 - $jaro));
+}
 
-    sub jaro {
-        my ($self, $arg, $winkler) = @_;
+sub count_by {
+    my ($self, $block) = @_;
 
-        if (ref($arg) ne ref($self)) {
-            $arg = $arg->to_a;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my $counter = 0;
+
+    foreach my $item (@$self) {
+        if ($block->run($item)) {
+            ++$counter;
         }
-
-        my @s = @$self;
-        my @t = @$arg;
-
-        my $s_len = @s;
-        my $t_len = @t;
-
-        if ($s_len == 0 and $t_len == 0) {
-            return 1;
-        }
-
-        my $match_distance = CORE::int(List::Util::max($s_len, $t_len) / 2) - 1;
-
-        my @s_matches;
-        my @t_matches;
-
-        my $matches = 0;
-        foreach my $i (0 .. $#s) {
-
-            my $start = List::Util::max(0, $i - $match_distance);
-            my $end   = List::Util::min($i + $match_distance + 1, $t_len);
-
-            foreach my $j ($start .. $end - 1) {
-                $t_matches[$j] and next;
-                $s[$i] eq $t[$j] or next;
-                $s_matches[$i] = 1;
-                $t_matches[$j] = 1;
-                $matches++;
-                last;
-            }
-        }
-
-        return Sidef::Types::Number::Number::ZERO if $matches == 0;
-
-        my $k              = 0;
-        my $transpositions = 0;
-
-        foreach my $i (0 .. $#s) {
-            $s_matches[$i] or next;
-            until ($t_matches[$k]) { ++$k }
-            $s[$i] eq $t[$k] or ++$transpositions;
-            ++$k;
-        }
-
-        my $jaro = (($matches / $s_len) + ($matches / $t_len) + (($matches - $transpositions / 2) / $matches)) / 3;
-
-        $winkler || return Sidef::Types::Number::Number->new($jaro);    # return the Jaro similarity instead of Jaro-Winkler
-
-        my $prefix = 0;
-        foreach my $i (0 .. List::Util::min(3, $#t, $#s)) {
-            $s[$i] eq $t[$i] ? ++$prefix : last;
-        }
-
-        Sidef::Types::Number::Number->new($jaro + $prefix * 0.1 * (1 - $jaro));
     }
 
-    sub count_by {
-        my ($self, $block) = @_;
+    Sidef::Types::Number::Number::_set_int($counter);
+}
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+sub count {
+    my ($self, $obj) = @_;
 
-        my $counter = 0;
-
-        foreach my $item (@$self) {
-            if ($block->run($item)) {
-                ++$counter;
-            }
-        }
-
-        Sidef::Types::Number::Number::_set_int($counter);
+    if (ref($obj) eq 'Sidef::Types::Block::Block') {
+        goto &count_by;
     }
 
-    sub count {
-        my ($self, $obj) = @_;
-
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            goto &count_by;
+    my $counter = 0;
+    foreach my $item (@$self) {
+        if ($item eq $obj) {
+            ++$counter;
         }
-
-        my $counter = 0;
-        foreach my $item (@$self) {
-            if ($item eq $obj) {
-                ++$counter;
-            }
-        }
-
-        Sidef::Types::Number::Number::_set_int($counter);
     }
 
-    sub cmp {
-        my ($self, $array) = @_;
+    Sidef::Types::Number::Number::_set_int($counter);
+}
 
-        my %addr;    # support for cyclic references
+sub cmp {
+    my ($self, $array) = @_;
 
-        my $sub = sub {
-            my ($a1, $a2) = @_;
+    my %addr;    # support for cyclic references
 
-            my $l1 = $#$a1;
-            my $l2 = $#$a2;
+    my $sub = sub {
+        my ($a1, $a2) = @_;
 
-            my $min = $l1 < $l2 ? $l1 : $l2;
+        my $l1 = $#$a1;
+        my $l2 = $#$a2;
 
-            my $refaddr1 = Scalar::Util::refaddr($a1);
-            my $refaddr2 = Scalar::Util::refaddr($a2);
+        my $min = $l1 < $l2 ? $l1 : $l2;
 
-            if ($refaddr1 == $refaddr2) {
-                return Sidef::Types::Number::Number::ZERO;
-            }
+        my $refaddr1 = Scalar::Util::refaddr($a1);
+        my $refaddr2 = Scalar::Util::refaddr($a2);
 
-            exists($addr{$refaddr1})
-              and return $addr{$refaddr1};
+        if ($refaddr1 == $refaddr2) {
+            return Sidef::Types::Number::Number::ZERO;
+        }
 
-            exists($addr{$refaddr2})
-              and return $addr{$refaddr2};
+        exists($addr{$refaddr1})
+          and return $addr{$refaddr1};
 
-            my $cmp1 = $refaddr1 <=> $refaddr2;
-            my $cmp2 = $refaddr2 <=> $refaddr1;
+        exists($addr{$refaddr2})
+          and return $addr{$refaddr2};
 
-            $addr{$refaddr1} = (
-                                  $cmp1 == $cmp2 ? Sidef::Types::Number::Number::ZERO
-                                : $cmp1 < 0      ? Sidef::Types::Number::Number::MONE
-                                :                  Sidef::Types::Number::Number::ONE
-                               );
+        my $cmp1 = $refaddr1 <=> $refaddr2;
+        my $cmp2 = $refaddr2 <=> $refaddr1;
 
-            $addr{$refaddr2} = (
-                                  $cmp1 == $cmp2 ? Sidef::Types::Number::Number::ZERO
-                                : $cmp2 < 0      ? Sidef::Types::Number::Number::MONE
-                                :                  Sidef::Types::Number::Number::ONE
-                               );
-
-            foreach my $i (0 .. $min) {
-                if (my $cmp = CORE::int($a1->[$i] cmp $a2->[$i])) {
-                    return (
-                            $cmp < 0
-                            ? Sidef::Types::Number::Number::MONE
-                            : Sidef::Types::Number::Number::ONE
+        $addr{$refaddr1} = (
+                              $cmp1 == $cmp2 ? Sidef::Types::Number::Number::ZERO
+                            : $cmp1 < 0      ? Sidef::Types::Number::Number::MONE
+                            :                  Sidef::Types::Number::Number::ONE
                            );
-                }
-            }
 
-                $l1 == $l2 ? Sidef::Types::Number::Number::ZERO
-              : $l1 < $l2  ? Sidef::Types::Number::Number::MONE
-              :              Sidef::Types::Number::Number::ONE;
-        };
+        $addr{$refaddr2} = (
+                              $cmp1 == $cmp2 ? Sidef::Types::Number::Number::ZERO
+                            : $cmp2 < 0      ? Sidef::Types::Number::Number::MONE
+                            :                  Sidef::Types::Number::Number::ONE
+                           );
 
-        no strict 'refs';
-        no warnings 'redefine';
-
-        local *Sidef::Types::Array::Array::cmp = $sub;
-        local *{'Sidef::Types::Array::Array::<=>'} = $sub;
-        $sub->($self, $array);
-    }
-
-    sub lt {
-        my ($self, $array) = @_;
-        $self->cmp($array)->lt(Sidef::Types::Number::Number::ZERO)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    sub le {
-        my ($self, $array) = @_;
-        $self->cmp($array)->le(Sidef::Types::Number::Number::ZERO)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    sub gt {
-        my ($self, $array) = @_;
-        $self->cmp($array)->gt(Sidef::Types::Number::Number::ZERO)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    sub ge {
-        my ($self, $array) = @_;
-        $self->cmp($array)->ge(Sidef::Types::Number::Number::ZERO)
-          ? Sidef::Types::Bool::Bool::TRUE
-          : Sidef::Types::Bool::Bool::FALSE;
-    }
-
-    sub eq {
-        my ($self, $array) = @_;
-
-        my %addr;    # support for cyclic references
-
-        my $sub = sub {
-            my ($a1, $a2) = @_;
-
-            if ($#$a1 != $#$a2) {
-                return Sidef::Types::Bool::Bool::FALSE;
-            }
-
-            my $refaddr1 = Scalar::Util::refaddr($a1);
-            my $refaddr2 = Scalar::Util::refaddr($a2);
-
-            if ($refaddr1 == $refaddr2) {
-                return Sidef::Types::Bool::Bool::TRUE;
-            }
-
-            exists($addr{$refaddr1})
-              and return $addr{$refaddr1};
-
-            exists($addr{$refaddr2})
-              and return $addr{$refaddr2};
-
-            $addr{$refaddr1} = Sidef::Types::Bool::Bool::FALSE;
-            $addr{$refaddr2} = Sidef::Types::Bool::Bool::FALSE;
-
-            my $i = -1;
-            foreach my $item (@$a1) {
-                ($item eq $a2->[++$i])
-                  or return Sidef::Types::Bool::Bool::FALSE;
-            }
-
-            (Sidef::Types::Bool::Bool::TRUE);
-        };
-
-        no strict 'refs';
-        no warnings 'redefine';
-
-        local *Sidef::Types::Array::Array::eq = $sub;
-        local *{'Sidef::Types::Array::Array::=='} = $sub;
-        $sub->($self, $array);
-    }
-
-    sub ne {
-        my ($self, $array) = @_;
-        $self->eq($array)->not;
-    }
-
-    sub make {
-        my ($self, $size, $obj) = @_;
-        bless([($obj) x $size]);
-    }
-
-    sub make_by {
-        my ($self, $size, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @arr;
-        foreach my $i (0 .. CORE::int($size) - 1) {
-            CORE::push(@arr, $block->run(Sidef::Types::Number::Number::_set_int($i)));
-        }
-
-        bless \@arr;
-    }
-
-    sub _int_min_max {
-        my ($self, $order) = @_;
-
-        @$self || return undef;
-
-        my $item = $self->[0];
-
-        foreach my $i (1 .. $#$self) {
-            my $value = $self->[$i];
-            $item = $value if (($$value <=> $$item) == $order);
-        }
-
-        $item;
-    }
-
-    sub imax {
-        @_ = ($_[0], 1);
-        goto &_int_min_max;
-    }
-
-    sub imin {
-        @_ = ($_[0], -1);
-        goto &_int_min_max;
-    }
-
-    sub iminmax {
-        my ($self) = @_;
-        ($self->imin, $self->imax);
-    }
-
-    sub _min_max {
-        my ($self, $order) = @_;
-
-        @$self || return undef;
-
-        my $item = $self->[0];
-
-        foreach my $i (1 .. $#$self) {
-            my $value = $self->[$i];
-            $item = $value if (CORE::int($value cmp $item) == $order);
-        }
-
-        $item;
-    }
-
-    sub max {
-        @_ = ($_[0], 1);
-        goto &_min_max;
-    }
-
-    sub min {
-        @_ = ($_[0], -1);
-        goto &_min_max;
-    }
-
-    sub minmax {
-        my ($self) = @_;
-        ($self->min, $self->max);
-    }
-
-    sub collapse {
-        my ($self, $initial) = @_;
-        $self->reduce_operator('+', $initial);
-    }
-
-    sub _reduce_by {
-        my ($self, $method, $result, $callback) = @_;
-
-        my @list;
-        my $count = 0;
-
-        foreach my $k (0 .. $#$self) {
-            CORE::push(@list, $callback->($k, $self->[$k]));
-
-            if (++$count > 1e5) {
-                $count  = 0;
-                $result = $result->$method(CORE::splice(@list));
+        foreach my $i (0 .. $min) {
+            if (my $cmp = CORE::int($a1->[$i] cmp $a2->[$i])) {
+                return (
+                        $cmp < 0
+                        ? Sidef::Types::Number::Number::MONE
+                        : Sidef::Types::Number::Number::ONE
+                       );
             }
         }
 
-        if (@list) {
+            $l1 == $l2 ? Sidef::Types::Number::Number::ZERO
+          : $l1 < $l2  ? Sidef::Types::Number::Number::MONE
+          :              Sidef::Types::Number::Number::ONE;
+    };
+
+    no strict 'refs';
+    no warnings 'redefine';
+
+    local *Sidef::Types::Array::Array::cmp = $sub;
+    local *{'Sidef::Types::Array::Array::<=>'} = $sub;
+    $sub->($self, $array);
+}
+
+sub lt {
+    my ($self, $array) = @_;
+    $self->cmp($array)->lt(Sidef::Types::Number::Number::ZERO)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub le {
+    my ($self, $array) = @_;
+    $self->cmp($array)->le(Sidef::Types::Number::Number::ZERO)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub gt {
+    my ($self, $array) = @_;
+    $self->cmp($array)->gt(Sidef::Types::Number::Number::ZERO)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub ge {
+    my ($self, $array) = @_;
+    $self->cmp($array)->ge(Sidef::Types::Number::Number::ZERO)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub eq {
+    my ($self, $array) = @_;
+
+    my %addr;    # support for cyclic references
+
+    my $sub = sub {
+        my ($a1, $a2) = @_;
+
+        if ($#$a1 != $#$a2) {
+            return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        my $refaddr1 = Scalar::Util::refaddr($a1);
+        my $refaddr2 = Scalar::Util::refaddr($a2);
+
+        if ($refaddr1 == $refaddr2) {
+            return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        exists($addr{$refaddr1})
+          and return $addr{$refaddr1};
+
+        exists($addr{$refaddr2})
+          and return $addr{$refaddr2};
+
+        $addr{$refaddr1} = Sidef::Types::Bool::Bool::FALSE;
+        $addr{$refaddr2} = Sidef::Types::Bool::Bool::FALSE;
+
+        my $i = -1;
+        foreach my $item (@$a1) {
+            ($item eq $a2->[++$i])
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+
+        (Sidef::Types::Bool::Bool::TRUE);
+    };
+
+    no strict 'refs';
+    no warnings 'redefine';
+
+    local *Sidef::Types::Array::Array::eq = $sub;
+    local *{'Sidef::Types::Array::Array::=='} = $sub;
+    $sub->($self, $array);
+}
+
+sub ne {
+    my ($self, $array) = @_;
+    $self->eq($array)->not;
+}
+
+sub make {
+    my ($self, $size, $obj) = @_;
+    bless([($obj) x $size]);
+}
+
+sub make_by {
+    my ($self, $size, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my @arr;
+    foreach my $i (0 .. CORE::int($size) - 1) {
+        CORE::push(@arr, $block->run(Sidef::Types::Number::Number::_set_int($i)));
+    }
+
+    bless \@arr;
+}
+
+sub _int_min_max {
+    my ($self, $order) = @_;
+
+    @$self || return undef;
+
+    my $item = $self->[0];
+
+    foreach my $i (1 .. $#$self) {
+        my $value = $self->[$i];
+        $item = $value if (($$value <=> $$item) == $order);
+    }
+
+    $item;
+}
+
+sub imax {
+    @_ = ($_[0], 1);
+    goto &_int_min_max;
+}
+
+sub imin {
+    @_ = ($_[0], -1);
+    goto &_int_min_max;
+}
+
+sub iminmax {
+    my ($self) = @_;
+    ($self->imin, $self->imax);
+}
+
+sub _min_max {
+    my ($self, $order) = @_;
+
+    @$self || return undef;
+
+    my $item = $self->[0];
+
+    foreach my $i (1 .. $#$self) {
+        my $value = $self->[$i];
+        $item = $value if (CORE::int($value cmp $item) == $order);
+    }
+
+    $item;
+}
+
+sub max {
+    @_ = ($_[0], 1);
+    goto &_min_max;
+}
+
+sub min {
+    @_ = ($_[0], -1);
+    goto &_min_max;
+}
+
+sub minmax {
+    my ($self) = @_;
+    ($self->min, $self->max);
+}
+
+sub collapse {
+    my ($self, $initial) = @_;
+    $self->reduce_operator('+', $initial);
+}
+
+sub _reduce_by {
+    my ($self, $method, $result, $callback) = @_;
+
+    my @list;
+    my $count = 0;
+
+    foreach my $k (0 .. $#$self) {
+        CORE::push(@list, $callback->($k, $self->[$k]));
+
+        if (++$count > 1e5) {
+            $count  = 0;
             $result = $result->$method(CORE::splice(@list));
         }
-
-        $result;
     }
 
-    sub sum_by {
-        my ($self, $block) = @_;
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_reduce_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
+    if (@list) {
+        $result = $result->$method(CORE::splice(@list));
     }
 
-    sub sum_kv {
-        my ($self, $block) = @_;
-        $self->_reduce_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
+    $result;
+}
+
+sub sum_by {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    $self->_reduce_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
+}
+
+sub sum_kv {
+    my ($self, $block) = @_;
+    $self->_reduce_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
+}
+
+sub sum_2d {
+    my ($self, $block) = @_;
+    $self->map_2d($block)->sum;
+}
+
+sub prod_2d {
+    my ($self, $block) = @_;
+    $self->map_2d($block)->prod;
+}
+
+sub sum {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &sum_by;
     }
 
-    sub sum_2d {
-        my ($self, $block) = @_;
-        $self->map_2d($block)->sum;
+    Sidef::Types::Number::Number::sum(@$self);
+}
+
+sub summod {
+    my ($self, $mod) = @_;
+
+    my $sum = Sidef::Types::Number::Number::ZERO;
+    foreach my $k (@$self) {
+        $sum = $sum->addmod($k, $mod);
+    }
+    return $sum->mod($mod);
+}
+
+sub avg_by {
+    my ($self, $block) = @_;
+    $self->sum_by($block)->div($self->len);
+}
+
+sub avg {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &avg_by;
     }
 
-    sub prod_2d {
-        my ($self, $block) = @_;
-        $self->map_2d($block)->prod;
+    $self->sum->div($self->len);
+}
+
+sub prod_by {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    $self->_reduce_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
+}
+
+sub prod_kv {
+    my ($self, $block) = @_;
+    $self->_reduce_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
+}
+
+sub prod {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &prod_by;
     }
 
-    sub sum {
-        my ($self, $arg) = @_;
+    Sidef::Types::Number::Number::prod(@$self);
+}
 
-        if (defined($arg)) {
-            goto &sum_by;
+sub prodmod {
+    my ($self, $mod) = @_;
+
+    my $prod = Sidef::Types::Number::Number::ONE;
+    foreach my $k (@$self) {
+        $prod = $prod->mulmod($k, $mod);
+    }
+    return $prod->mod($mod);
+}
+
+sub gcd_by {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    $self->_reduce_by('gcd', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
+}
+
+sub gcud_by {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    $self->_reduce_by('gcud', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
+}
+
+sub gcd {
+    my ($self, $block) = @_;
+
+    if (defined($block)) {
+        goto &gcd_by;
+    }
+
+    Sidef::Types::Number::Number::gcd(@$self);
+}
+
+sub gcud {
+    my ($self, $block) = @_;
+
+    if (defined($block)) {
+        goto &gcud_by;
+    }
+
+    Sidef::Types::Number::Number::gcud(@$self);
+}
+
+sub lcm_by {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    $self->_reduce_by('lcm', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
+}
+
+sub lcm {
+    my ($self, $block) = @_;
+
+    if (defined($block)) {
+        goto &lcm_by;
+    }
+
+    Sidef::Types::Number::Number::lcm(@$self);
+}
+
+sub all_prime {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::all_prime(@$self);
+}
+
+sub all_composite {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::all_composite(@$self);
+}
+
+sub digits2num {
+    my ($self, $base) = @_;
+    state $ten = Sidef::Types::Number::Number::_set_int(10);
+    $base //= $ten;
+    Sidef::Types::Number::Number::digits2num($base, $self);
+}
+
+*from_digits = \&digits2num;
+
+sub cfrac2num {
+    my ($self) = @_;
+
+    my $res = $self->[-1];
+    my $end = $#{$self};
+
+    for my $k (1 .. $end) {
+        $res = $res->inv->add($self->[$end - $k]);
+    }
+
+    $res;
+}
+
+*from_continued_fraction = \&cfrac2num;
+
+sub _min_max_by {
+    my ($self, $block, $order) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    @$self || return undef;
+
+    my $minmax  = $self->[0];
+    my $old_key = $block->run($minmax);
+
+    foreach my $i (1 .. $#$self) {
+
+        my $value   = $self->[$i];
+        my $new_key = $block->run($value);
+
+        if (CORE::int($new_key cmp $old_key) == $order) {
+            $minmax  = $value;
+            $old_key = $new_key;
+        }
+    }
+
+    $minmax;
+}
+
+sub max_by {
+    @_ = (@_[0, 1], 1);
+    goto &_min_max_by;
+}
+
+sub min_by {
+    @_ = (@_[0, 1], -1);
+    goto &_min_max_by;
+}
+
+sub swap {
+    my ($self, $i, $j) = @_;
+    @$self[$i, $j] = @$self[$j, $i];
+    $self;
+}
+
+sub change_to {
+    my ($self, $arg) = @_;
+    @$self = @$arg;
+    $self;
+}
+
+sub _flatten {
+    my %addr;    # keeps track of seen objects
+
+    my $sub = sub {
+        my ($obj) = @_;
+
+        my $class   = ref($obj);
+        my $refaddr = Scalar::Util::refaddr($obj);
+
+        exists($addr{$refaddr})
+          and return @{$addr{$refaddr}};
+
+        my @flat;
+        $addr{$refaddr} = \@flat;
+
+        foreach my $item (@$obj) {
+            CORE::push(@flat, ((ref($item) eq $class or UNIVERSAL::isa($item, __PACKAGE__)) ? $item->flatten : $item));
         }
 
-        Sidef::Types::Number::Number::sum(@$self);
+        @flat;
+    };
+
+    no warnings 'redefine';
+    local *Sidef::Types::Array::Array::flatten = $sub;
+    $sub->($_[0]);
+}
+
+sub flatten {
+    my ($self) = @_;
+    bless [$self->_flatten];
+}
+
+*flat = \&flatten;
+
+sub exists {
+    my ($self, $index) = @_;
+    exists($self->[$index])
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+*has_index = \&exists;
+
+sub defined {
+    my ($self, $index) = @_;
+    defined($self->[$index])
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub items {
+    my ($self, @indices) = @_;
+    bless([map { exists($self->[$_]) ? $self->[$_] : undef } @indices]);
+}
+
+sub item {
+    my ($self, $index) = @_;
+    exists($self->[$index]) ? $self->[$index] : undef;
+}
+
+sub fetch {
+    my ($self, $index, $default) = @_;
+    exists($self->[$index]) ? $self->[$index] : $default;
+}
+
+sub dig {
+    my ($self, $key, @keys) = @_;
+
+    my $value = $self->fetch($key) // return undef;
+
+    foreach my $key (@keys) {
+        $value = $value->fetch($key) // return undef;
     }
 
-    sub summod {
-        my ($self, $mod) = @_;
+    $value;
+}
 
-        my $sum = Sidef::Types::Number::Number::ZERO;
-        foreach my $k (@$self) {
-            $sum = $sum->addmod($k, $mod);
-        }
-        return $sum->mod($mod);
+sub _slice {
+    my ($self, $pos1, $len) = @_;
+
+    $pos1 = defined($pos1) ? CORE::int($pos1) : 0;
+    $len  = defined($len)  ? CORE::int($len)  : undef;
+
+    my $curlen = @$self;
+
+    my $pos2 = 0;
+
+    if ($pos1 < 0) {
+        $pos1 += $curlen;
     }
 
-    sub avg_by {
-        my ($self, $block) = @_;
-        $self->sum_by($block)->div($self->len);
+    if ($pos1 > 0 and $pos1 > $curlen) {
+        return;
     }
 
-    sub avg {
-        my ($self, $arg) = @_;
-
-        if (defined($arg)) {
-            goto &avg_by;
-        }
-
-        $self->sum->div($self->len);
-    }
-
-    sub prod_by {
-        my ($self, $block) = @_;
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_reduce_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
-    }
-
-    sub prod_kv {
-        my ($self, $block) = @_;
-        $self->_reduce_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run(Sidef::Types::Number::Number::_set_int($_[0]), $_[1]) });
-    }
-
-    sub prod {
-        my ($self, $arg) = @_;
-
-        if (defined($arg)) {
-            goto &prod_by;
-        }
-
-        Sidef::Types::Number::Number::prod(@$self);
-    }
-
-    sub prodmod {
-        my ($self, $mod) = @_;
-
-        my $prod = Sidef::Types::Number::Number::ONE;
-        foreach my $k (@$self) {
-            $prod = $prod->mulmod($k, $mod);
-        }
-        return $prod->mod($mod);
-    }
-
-    sub gcd_by {
-        my ($self, $block) = @_;
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_reduce_by('gcd', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
-    }
-
-    sub gcud_by {
-        my ($self, $block) = @_;
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_reduce_by('gcud', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
-    }
-
-    sub gcd {
-        my ($self, $block) = @_;
-
-        if (defined($block)) {
-            goto &gcd_by;
-        }
-
-        Sidef::Types::Number::Number::gcd(@$self);
-    }
-
-    sub gcud {
-        my ($self, $block) = @_;
-
-        if (defined($block)) {
-            goto &gcud_by;
-        }
-
-        Sidef::Types::Number::Number::gcud(@$self);
-    }
-
-    sub lcm_by {
-        my ($self, $block) = @_;
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-        $self->_reduce_by('lcm', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
-    }
-
-    sub lcm {
-        my ($self, $block) = @_;
-
-        if (defined($block)) {
-            goto &lcm_by;
-        }
-
-        Sidef::Types::Number::Number::lcm(@$self);
-    }
-
-    sub all_prime {
-        my ($self) = @_;
-        Sidef::Types::Number::Number::all_prime(@$self);
-    }
-
-    sub all_composite {
-        my ($self) = @_;
-        Sidef::Types::Number::Number::all_composite(@$self);
-    }
-
-    sub digits2num {
-        my ($self, $base) = @_;
-        state $ten = Sidef::Types::Number::Number::_set_int(10);
-        $base //= $ten;
-        Sidef::Types::Number::Number::digits2num($base, $self);
-    }
-
-    *from_digits = \&digits2num;
-
-    sub cfrac2num {
-        my ($self) = @_;
-
-        my $res = $self->[-1];
-        my $end = $#{$self};
-
-        for my $k (1 .. $end) {
-            $res = $res->inv->add($self->[$end - $k]);
-        }
-
-        $res;
-    }
-
-    *from_continued_fraction = \&cfrac2num;
-
-    sub _min_max_by {
-        my ($self, $block, $order) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        @$self || return undef;
-
-        my $minmax  = $self->[0];
-        my $old_key = $block->run($minmax);
-
-        foreach my $i (1 .. $#$self) {
-
-            my $value   = $self->[$i];
-            my $new_key = $block->run($value);
-
-            if (CORE::int($new_key cmp $old_key) == $order) {
-                $minmax  = $value;
-                $old_key = $new_key;
-            }
-        }
-
-        $minmax;
-    }
-
-    sub max_by {
-        @_ = (@_[0, 1], 1);
-        goto &_min_max_by;
-    }
-
-    sub min_by {
-        @_ = (@_[0, 1], -1);
-        goto &_min_max_by;
-    }
-
-    sub swap {
-        my ($self, $i, $j) = @_;
-        @$self[$i, $j] = @$self[$j, $i];
-        $self;
-    }
-
-    sub change_to {
-        my ($self, $arg) = @_;
-        @$self = @$arg;
-        $self;
-    }
-
-    sub _flatten {
-        my %addr;    # keeps track of seen objects
-
-        my $sub = sub {
-            my ($obj) = @_;
-
-            my $class   = ref($obj);
-            my $refaddr = Scalar::Util::refaddr($obj);
-
-            exists($addr{$refaddr})
-              and return @{$addr{$refaddr}};
-
-            my @flat;
-            $addr{$refaddr} = \@flat;
-
-            foreach my $item (@$obj) {
-                CORE::push(@flat, ((ref($item) eq $class or UNIVERSAL::isa($item, __PACKAGE__)) ? $item->flatten : $item));
-            }
-
-            @flat;
-        };
-
-        no warnings 'redefine';
-        local *Sidef::Types::Array::Array::flatten = $sub;
-        $sub->($_[0]);
-    }
-
-    sub flatten {
-        my ($self) = @_;
-        bless [$self->_flatten];
-    }
-
-    *flat = \&flatten;
-
-    sub exists {
-        my ($self, $index) = @_;
-        exists($self->[$index])
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *has_index = \&exists;
-
-    sub defined {
-        my ($self, $index) = @_;
-        defined($self->[$index])
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub items {
-        my ($self, @indices) = @_;
-        bless([map { exists($self->[$_]) ? $self->[$_] : undef } @indices]);
-    }
-
-    sub item {
-        my ($self, $index) = @_;
-        exists($self->[$index]) ? $self->[$index] : undef;
-    }
-
-    sub fetch {
-        my ($self, $index, $default) = @_;
-        exists($self->[$index]) ? $self->[$index] : $default;
-    }
-
-    sub dig {
-        my ($self, $key, @keys) = @_;
-
-        my $value = $self->fetch($key) // return undef;
-
-        foreach my $key (@keys) {
-            $value = $value->fetch($key) // return undef;
-        }
-
-        $value;
-    }
-
-    sub _slice {
-        my ($self, $pos1, $len) = @_;
-
-        $pos1 = defined($pos1) ? CORE::int($pos1) : 0;
-        $len  = defined($len)  ? CORE::int($len)  : undef;
-
-        my $curlen = @$self;
-
-        my $pos2 = 0;
-
-        if ($pos1 < 0) {
-            $pos1 += $curlen;
-        }
-
-        if ($pos1 > 0 and $pos1 > $curlen) {
-            return;
-        }
-
-        if (defined($len)) {
-            if ($len < 0) {
-                $pos2 = $curlen + $len;
-            }
-            elsif ($pos1 < 0) {
-                $pos2 = $pos1 + $len;
-            }
-            elsif ($len > $curlen - $pos1) {
-                $pos2 = $curlen;
-            }
-            else {
-                $pos2 = $pos1 + $len;
-            }
-        }
-        else {
-            $pos2 = $curlen;
-        }
-
-        if ($pos2 < 0) {
-            if ($pos1 < 0) {
-                return;
-            }
-            $pos2 = 0;
+    if (defined($len)) {
+        if ($len < 0) {
+            $pos2 = $curlen + $len;
         }
         elsif ($pos1 < 0) {
-            $pos1 = 0;
+            $pos2 = $pos1 + $len;
         }
-
-        if ($pos2 < $pos1) {
-            $pos2 = $pos1;
-        }
-        if ($pos2 > $curlen) {
+        elsif ($len > $curlen - $pos1) {
             $pos2 = $curlen;
         }
-
-        @$self[$pos1 .. $pos2 - 1];
-    }
-
-    sub slice {
-        bless [_slice(@_)];
-    }
-
-    sub _ft {
-        my ($self, $pos1, $pos2) = @_;
-
-        $pos1 = defined($pos1) ? CORE::int($pos1) : 0;
-        $pos2 = defined($pos2) ? CORE::int($pos2) : undef;
-
-        my $curlen = scalar(@$self);
-
-        if ($pos1 < 0) {
-            $pos1 += $curlen;
+        else {
+            $pos2 = $pos1 + $len;
         }
+    }
+    else {
+        $pos2 = $curlen;
+    }
 
-        if ($pos1 > 0 and $pos1 > $curlen) {
+    if ($pos2 < 0) {
+        if ($pos1 < 0) {
             return;
         }
+        $pos2 = 0;
+    }
+    elsif ($pos1 < 0) {
+        $pos1 = 0;
+    }
 
-        if (defined($pos2)) {
-            if ($pos2 < 0) {
-                $pos2 += $curlen;
-            }
-            elsif ($pos1 < 0) {
-                $pos2 = $pos1 + $pos2;
-            }
-        }
-        else {
-            $pos2 = $curlen - 1;
-        }
+    if ($pos2 < $pos1) {
+        $pos2 = $pos1;
+    }
+    if ($pos2 > $curlen) {
+        $pos2 = $curlen;
+    }
 
+    @$self[$pos1 .. $pos2 - 1];
+}
+
+sub slice {
+    bless [_slice(@_)];
+}
+
+sub _ft {
+    my ($self, $pos1, $pos2) = @_;
+
+    $pos1 = defined($pos1) ? CORE::int($pos1) : 0;
+    $pos2 = defined($pos2) ? CORE::int($pos2) : undef;
+
+    my $curlen = scalar(@$self);
+
+    if ($pos1 < 0) {
+        $pos1 += $curlen;
+    }
+
+    if ($pos1 > 0 and $pos1 > $curlen) {
+        return;
+    }
+
+    if (defined($pos2)) {
         if ($pos2 < 0) {
-            if ($pos1 < 0) {
-                return;
-            }
+            $pos2 += $curlen;
         }
         elsif ($pos1 < 0) {
-            $pos1 = 0;
+            $pos2 = $pos1 + $pos2;
         }
-
-        if ($pos2 >= $curlen) {
-            $pos2 = $curlen - 1;
-        }
-
-        @$self[$pos1 .. $pos2];
+    }
+    else {
+        $pos2 = $curlen - 1;
     }
 
-    sub ft {
-        bless [_ft(@_)];
+    if ($pos2 < 0) {
+        if ($pos1 < 0) {
+            return;
+        }
+    }
+    elsif ($pos1 < 0) {
+        $pos1 = 0;
     }
 
-    sub each {
-        my ($self, $block) = @_;
-
-        foreach my $item (@$self) {
-            $block->run($item);
-        }
-
-        $self;
+    if ($pos2 >= $curlen) {
+        $pos2 = $curlen - 1;
     }
 
-    *for     = \&each;
-    *foreach = \&each;
+    @$self[$pos1 .. $pos2];
+}
 
-    sub each_2d {
-        my ($self, $block) = @_;
+sub ft {
+    bless [_ft(@_)];
+}
 
-        foreach my $item (@$self) {
-            $block->run(@$item);
-        }
+sub each {
+    my ($self, $block) = @_;
 
-        $self;
+    foreach my $item (@$self) {
+        $block->run($item);
     }
 
-    sub each_slice {
-        my ($self, $n, $block) = @_;
+    $self;
+}
 
-        $n = CORE::int($n);
+*for     = \&each;
+*foreach = \&each;
 
-        my @copy = @$self;
-        while (my @slice = CORE::splice(@copy, 0, $n)) {
-            $block->run(@slice);
-        }
+sub each_2d {
+    my ($self, $block) = @_;
 
-        $self;
+    foreach my $item (@$self) {
+        $block->run(@$item);
     }
 
-    sub slice_before {
-        my ($self, $block) = @_;
+    $self;
+}
 
-        my @new;
-        my $i = 0;
-        foreach my $item (@$self) {
-            if ($block->run($item)) {
-                ++$i if @new;
-            }
-            push @{$new[$i]}, $item;
-        }
+sub each_slice {
+    my ($self, $n, $block) = @_;
 
-        bless([map { bless($_) } @new]);
+    $n = CORE::int($n);
+
+    my @copy = @$self;
+    while (my @slice = CORE::splice(@copy, 0, $n)) {
+        $block->run(@slice);
     }
 
-    sub slice_after {
-        my ($self, $block) = @_;
+    $self;
+}
 
-        my @new;
-        my $i = 0;
-        foreach my $item (@$self) {
-            CORE::push(@{$new[$i]}, $item);
-            ++$i if $block->run($item);
+sub slice_before {
+    my ($self, $block) = @_;
+
+    my @new;
+    my $i = 0;
+    foreach my $item (@$self) {
+        if ($block->run($item)) {
+            ++$i if @new;
         }
-
-        bless [map { bless($_) } @new];
+        push @{$new[$i]}, $item;
     }
 
-    sub each_cons {
-        my ($self, $n, $block) = @_;
+    bless([map { bless($_) } @new]);
+}
 
-        $n = CORE::int($n);
+sub slice_after {
+    my ($self, $block) = @_;
 
-        my @values;
-        my $count = 0;
-
-        foreach my $item (@$self) {
-            if (++$count > $n) {
-                CORE::shift(@values);
-                --$count;
-            }
-
-            CORE::push(@values, $item);
-
-            if ($count == $n) {
-                $block->run(@values);
-            }
-        }
-
-        $self;
+    my @new;
+    my $i = 0;
+    foreach my $item (@$self) {
+        CORE::push(@{$new[$i]}, $item);
+        ++$i if $block->run($item);
     }
 
-    sub map_cons {
-        my ($self, $n, $block) = @_;
+    bless [map { bless($_) } @new];
+}
 
-        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+sub each_cons {
+    my ($self, $n, $block) = @_;
 
-        $n = CORE::int($n);
+    $n = CORE::int($n);
 
-        my @result;
-        my @values;
-        my $count = 0;
+    my @values;
+    my $count = 0;
 
-        foreach my $item (@$self) {
-            if (++$count > $n) {
-                CORE::shift(@values);
-                --$count;
-            }
-
-            CORE::push(@values, $item);
-
-            if ($count == $n) {
-                CORE::push(@result, $block->run(@values));
-            }
+    foreach my $item (@$self) {
+        if (++$count > $n) {
+            CORE::shift(@values);
+            --$count;
         }
 
-        bless \@result;
+        CORE::push(@values, $item);
+
+        if ($count == $n) {
+            $block->run(@values);
+        }
     }
 
-    *cons = \&map_cons;
+    $self;
+}
 
-    sub map_slice {
-        my ($self, $n, $block) = @_;
+sub map_cons {
+    my ($self, $n, $block) = @_;
 
-        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+    $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
 
-        $n = CORE::int($n);
+    $n = CORE::int($n);
 
-        my @result;
-        my @copy = @$self;
+    my @result;
+    my @values;
+    my $count = 0;
 
-        while (my @slice = CORE::splice(@copy, 0, $n)) {
-            CORE::push(@result, $block->run(@slice));
+    foreach my $item (@$self) {
+        if (++$count > $n) {
+            CORE::shift(@values);
+            --$count;
         }
 
-        bless \@result;
+        CORE::push(@values, $item);
+
+        if ($count == $n) {
+            CORE::push(@result, $block->run(@values));
+        }
     }
 
-    *slices = \&map_slice;
+    bless \@result;
+}
 
-    sub each_index {
-        my ($self, $block) = @_;
+*cons = \&map_cons;
 
-        foreach my $i (0 .. $#$self) {
-            $block->run(Sidef::Types::Number::Number::_set_int($i));
-        }
+sub map_slice {
+    my ($self, $n, $block) = @_;
 
-        $self;
+    $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
+    $n = CORE::int($n);
+
+    my @result;
+    my @copy = @$self;
+
+    while (my @slice = CORE::splice(@copy, 0, $n)) {
+        CORE::push(@result, $block->run(@slice));
     }
 
-    *each_k   = \&each_index;
-    *each_key = \&each_index;
+    bless \@result;
+}
 
-    sub each_kv {
-        my ($self, $block) = @_;
+*slices = \&map_slice;
 
-        foreach my $i (0 .. $#$self) {
-            $block->run(Sidef::Types::Number::Number::_set_int($i), $self->[$i]);
-        }
+sub each_index {
+    my ($self, $block) = @_;
 
-        $self;
+    foreach my $i (0 .. $#$self) {
+        $block->run(Sidef::Types::Number::Number::_set_int($i));
     }
 
-    sub expand {
-        my ($self, $block) = @_;
+    $self;
+}
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+*each_k   = \&each_index;
+*each_key = \&each_index;
 
-        my @new;
-        my @copy = @$self;
+sub each_kv {
+    my ($self, $block) = @_;
 
-        foreach my $item (@copy) {
-            my $res = $block->run($item);
-
-            if (ref($res) eq __PACKAGE__ or UNIVERSAL::isa($res, __PACKAGE__)) {
-                CORE::push(@copy, @$res);
-            }
-            else {
-                CORE::push(@new, $res);
-            }
-        }
-
-        bless \@new;
+    foreach my $i (0 .. $#$self) {
+        $block->run(Sidef::Types::Number::Number::_set_int($i), $self->[$i]);
     }
 
-    *expand_by = \&expand;
+    $self;
+}
 
-    sub recmap {
-        my ($self, $block) = @_;
+sub expand {
+    my ($self, $block) = @_;
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
 
-        my @copy = @$self;
+    my @new;
+    my @copy = @$self;
 
-        foreach my $item (@copy) {
-            my $res = $block->run($item);
+    foreach my $item (@copy) {
+        my $res = $block->run($item);
 
-            if (ref($res) eq __PACKAGE__ or UNIVERSAL::isa($res, __PACKAGE__)) {
-                CORE::push(@copy, @$res);
-            }
-        }
-
-        bless \@copy;
-    }
-
-    sub map {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @array;
-        foreach my $item (@$self) {
-            CORE::push(@array, $block->run($item));
-        }
-
-        bless \@array, ref($self);
-    }
-
-    *collect = \&map;
-
-    sub map_2d {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
-
-        my @array;
-        foreach my $item (@$self) {
-            CORE::push(@array, $block->run(@$item));
-        }
-
-        bless \@array, ref($self);
-    }
-
-    sub map_kv {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
-
-        my @arr;
-        foreach my $i (0 .. $#$self) {
-            CORE::push(@arr, $block->run(Sidef::Types::Number::Number::_set_int($i), $self->[$i]));
-        }
-
-        bless \@arr, ref($self);
-    }
-
-    *collect_kv = \&map_kv;
-
-    sub flat_map {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
-
-        my @array;
-        foreach my $item (@$self) {
-            CORE::push(@array, @{scalar $block->run($item)});
-        }
-
-        bless \@array;
-    }
-
-    sub grep {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @array;
-        foreach my $item (@$self) {
-            CORE::push(@array, $item) if $block->run($item);
-        }
-
-        bless \@array, ref($self);
-    }
-
-    *select = \&grep;
-
-    sub grep_2d {
-        my ($self, $block) = @_;
-
-        my @array;
-        foreach my $item (@$self) {
-            CORE::push(@array, $item) if $block->run(@$item);
-        }
-
-        bless \@array, ref($self);
-    }
-
-    sub grep_kv {
-        my ($self, $block) = @_;
-
-        my @array;
-        foreach my $i (0 .. $#$self) {
-            CORE::push(@array, $self->[$i]) if $block->run(Sidef::Types::Number::Number::_set_int($i), $self->[$i]);
-        }
-
-        bless \@array, ref($self);
-    }
-
-    *select_kv = \&grep_kv;
-
-    sub group {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my %hash;
-        foreach my $item (@$self) {
-            CORE::push(@{$hash{$block->run($item)}}, $item);
-        }
-
-        foreach my $value (CORE::values(%hash)) {
-            bless $value;
-        }
-
-        Sidef::Types::Hash::Hash->new(\%hash);
-    }
-
-    *group_by = \&group;
-
-    sub stack {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-        @$self || return bless [];
-
-        my @result     = bless [$self->[0]];
-        my $prev_value = $block->run($self->[0]);
-
-        foreach my $i (1 .. $#{$self}) {
-
-            my $item       = $self->[$i];
-            my $curr_value = $block->run($item);
-
-            if (!($curr_value eq $prev_value)) {
-                CORE::push(@result, bless []);
-            }
-
-            CORE::push(@{$result[-1]}, $item);
-            $prev_value = $curr_value;
-        }
-
-        bless \@result;
-    }
-
-    *stack_by = \&stack;
-
-    sub run_length {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-        @$self || return bless [];
-
-        my @result     = bless [$self->[0], 1];
-        my $prev_value = $block->run($self->[0]);
-
-        foreach my $i (1 .. $#{$self}) {
-
-            my $item       = $self->[$i];
-            my $curr_value = $block->run($item);
-
-            if ($curr_value eq $prev_value) {
-                ++$result[-1][1];
-            }
-            else {
-                CORE::push(@result, bless [$item, 1]);
-            }
-
-            $prev_value = $curr_value;
-        }
-
-        foreach my $pair (@result) {
-            $pair->[1] = Sidef::Types::Number::Number::_set_int($pair->[1]);
-        }
-
-        bless \@result;
-    }
-
-    *run_length_by = \&run_length;
-
-    sub match {
-        my ($self, $regex) = @_;
-
-        my %addr;
-
-        my $sub = sub {
-            my ($obj) = @_;
-
-            my $refaddr = Scalar::Util::refaddr($obj);
-
-            exists($addr{$refaddr})
-              && return Sidef::Types::Bool::Bool::FALSE;
-
-            undef $addr{$refaddr};
-
-            foreach my $item (@$obj) {
-                if (defined(my $sub = UNIVERSAL::can($item, 'match'))) {
-                    $sub->($item, $regex)
-                      && return Sidef::Types::Bool::Bool::TRUE;
-                }
-                elsif ($regex->run($item)) {
-                    return Sidef::Types::Bool::Bool::TRUE;
-                }
-            }
-
-            Sidef::Types::Bool::Bool::FALSE;
-        };
-
-        no warnings 'redefine';
-        local *Sidef::Types::Array::Array::match = $sub;
-        $sub->($_[0]);
-    }
-
-    sub iter {
-        my ($self) = @_;
-
-        my $i = 0;
-        Sidef::Types::Block::Block->new(
-            code => sub {
-                $self->[$i++];
-            }
-        );
-    }
-
-    sub freq_by {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my %hash;
-        foreach my $item (@$self) {
-            my $r = $hash{$block->run($item)} //= {
-                                                   count => 0,
-                                                   items => [],
-                                                  };
-            CORE::push(@{$r->{items}}, $item);
-            ++$r->{count};
-        }
-
-        my %freq;
-        foreach my $key (CORE::keys(%hash)) {
-            my $r = $hash{$key};
-            my $n = Sidef::Types::Number::Number::_set_int($r->{count});
-            @freq{@{$r->{items}}} = ($n) x scalar(@{$r->{items}});
-        }
-
-        Sidef::Types::Hash::Hash->new(\%freq);
-    }
-
-    sub freq {
-        my ($self, $block) = @_;
-
-        if (defined($block)) {
-            goto &freq_by;
-        }
-
-        my %hash;
-        foreach my $item (@$self) {
-            ++$hash{$item};
-        }
-
-        foreach my $key (CORE::keys(%hash)) {
-            $hash{$key} = Sidef::Types::Number::Number::_set_int($hash{$key});
-        }
-
-        Sidef::Types::Hash::Hash->new(\%hash);
-    }
-
-    sub _huffman_from_code_lengths {
-        my ($code_lengths_table) = @_;
-
-        # This algorithm is based on the pseudocode in RFC 1951 (Section 3.2.2)
-        # (Steps are numbered as in the RFC)
-
-        my @code_lengths = map { [$_, $code_lengths_table->{$_}] } CORE::sort { $a <=> $b } CORE::keys %$code_lengths_table;
-
-        # Step 1: Count the number of codes for each length
-        my $max_length    = List::Util::max(map { $_->[1] } @code_lengths) // 0;
-        my @length_counts = (0) x ($max_length + 1);
-
-        foreach my $length (map { $_->[1] } @code_lengths) {
-
-            # Treat undef or negative lengths as 0 (unused)
-            if (defined($length) and $length > 0) {
-                ++$length_counts[$length];
-            }
-        }
-
-        # Step 2: Generate the starting numerical value for each length
-        my $code = 0;
-        $length_counts[0] = 0;
-        my @next_code = (0) x ($max_length + 1);
-
-        foreach my $bits (1 .. $max_length) {
-            $code = ($code + $length_counts[$bits - 1]) << 1;
-            $next_code[$bits] = $code;
-        }
-
-        # Step 3: Assign numerical values to all codes
-        my %dict;
-        foreach my $pair (@code_lengths) {
-            my ($key, $length) = @$pair;
-
-            # Skip zero-length codes (unused symbols)
-            if (defined($length) and $length != 0) {
-
-                # Format the integer code as a binary string with $length bits
-                my $binary_code = sprintf('%0*b', $length, $next_code[$length]);
-
-                $dict{$key} = bless(\$binary_code, 'Sidef::Types::String::String');
-
-                # Increment the code for the next symbol of this length
-                ++$next_code[$length];
-            }
-        }
-
-        Sidef::Types::Hash::Hash->new(\%dict);
-    }
-
-    sub _huffman_walk_tree {
-        my ($node, $code, $h) = @_;
-
-        # Node structure: [ content, frequency ]
-        # If content is a reference, it's an internal node: [left_child, right_child]
-        # If content is a scalar, it's a leaf: 'symbol'
-
-        my $c = $node->[0] // return $h;
-
-        if (ref $c) {
-
-            # Recurse: Left adds '0', Right adds '1'
-            __SUB__->($c->[$_], $code . $_, $h) for ('0', '1');
+        if (ref($res) eq __PACKAGE__ or UNIVERSAL::isa($res, __PACKAGE__)) {
+            CORE::push(@copy, @$res);
         }
         else {
-            # Leaf node found
-            $h->{$c} = $code;
-        }
-
-        return $h;
-    }
-
-    sub _heap_push {
-        my ($heap, $item) = @_;
-        CORE::push(@$heap, $item);
-        my $i = $#$heap;
-        while ($i > 0) {
-            my $p = ($i - 1) >> 1;
-            last if ($heap->[$p][1] <= $heap->[$i][1]);
-            @{$heap}[$p, $i] = @{$heap}[$i, $p];
-            $i = $p;
+            CORE::push(@new, $res);
         }
     }
 
-    sub _heap_pop {
-        my ($heap) = @_;
-        return CORE::pop(@$heap) if (@$heap == 1);
-        my $top = $heap->[0];
-        $heap->[0] = CORE::pop @$heap;
-        my $n = scalar @$heap;
-        my $i = 0;
-        while (1) {
-            my $s = $i;
-            my $l = 2 * $i + 1;
-            my $r = $l + 1;
-            $s = $l if ($l < $n && $heap->[$l][1] < $heap->[$s][1]);
-            $s = $r if ($r < $n && $heap->[$r][1] < $heap->[$s][1]);
-            last if $s == $i;
-            @{$heap}[$i, $s] = @{$heap}[$s, $i];
-            $i = $s;
+    bless \@new;
+}
+
+*expand_by = \&expand;
+
+sub recmap {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my @copy = @$self;
+
+    foreach my $item (@copy) {
+        my $res = $block->run($item);
+
+        if (ref($res) eq __PACKAGE__ or UNIVERSAL::isa($res, __PACKAGE__)) {
+            CORE::push(@copy, @$res);
         }
-        return $top;
     }
 
-    sub huffman {
-        my ($self) = @_;
+    bless \@copy;
+}
 
-        # 1. Count Frequencies
-        my %freq;
-        foreach my $item (@$self) {
-            ++$freq{$item};
-        }
+sub map {
+    my ($self, $block) = @_;
 
-        my @symbols = CORE::sort CORE::keys %freq;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
 
-        # 2. Initialize Heap
-        # Structure: [ [symbol_or_children], frequency ]
-        my @heap;
-        foreach my $k (@symbols) {
-            _heap_push(\@heap, [$k, $freq{$k}]);
-        }
-
-        # 3. Build Huffman Tree
-        while (@heap > 1) {
-            my $x = _heap_pop(\@heap);
-            my $y = _heap_pop(\@heap);
-            _heap_push(\@heap, [[$x, $y], $x->[1] + $y->[1]]);
-        }
-
-        if (@heap == 1 && !ref $heap[0][0]) {
-            @heap = ([[$heap[0]], $heap[0][1]]);
-        }
-
-        # 4. Generate Codes
-        my $h = _huffman_walk_tree($heap[0], '', {});
-
-        my %code_lengths;
-        foreach my $i (@symbols) {
-            $code_lengths{$i} = CORE::length($h->{$i});
-        }
-
-        _huffman_from_code_lengths(\%code_lengths);
+    my @array;
+    foreach my $item (@$self) {
+        CORE::push(@array, $block->run($item));
     }
 
-    sub first_by {
-        my ($self, $block) = @_;
+    bless \@array, ref($self);
+}
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+*collect = \&map;
 
-        foreach my $val (@$self) {
-            return $val if $block->run($val);
-        }
+sub map_2d {
+    my ($self, $block) = @_;
 
-        return undef;
+    $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
+    my @array;
+    foreach my $item (@$self) {
+        CORE::push(@array, $block->run(@$item));
     }
 
-    *find = \&first_by;
+    bless \@array, ref($self);
+}
 
-    sub first {
-        my ($self, $arg) = @_;
+sub map_kv {
+    my ($self, $block) = @_;
 
-        if (defined $arg) {
+    $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
 
-            if (ref($arg) eq 'Sidef::Types::Block::Block') {
-                goto &first_by;
-            }
-
-            my $end = $#$self;
-
-            $arg = CORE::int($arg) || return bless([], ref($self));
-            $arg += $end + 1 if $arg < 0;
-            $arg -= 1;
-
-            return bless([@$self[0 .. ($arg > $end ? $end : $arg)]], ref($self));
-        }
-
-        @$self ? $self->[0] : undef;
+    my @arr;
+    foreach my $i (0 .. $#$self) {
+        CORE::push(@arr, $block->run(Sidef::Types::Number::Number::_set_int($i), $self->[$i]));
     }
 
-    *head = \&first;
+    bless \@arr, ref($self);
+}
 
-    sub last_by {
-        my ($self, $block) = @_;
+*collect_kv = \&map_kv;
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+sub flat_map {
+    my ($self, $block) = @_;
 
-        for (my $i = $#$self ; $i >= 0 ; --$i) {
-            return $self->[$i] if $block->run($self->[$i]);
-        }
+    $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
 
-        return undef;
+    my @array;
+    foreach my $item (@$self) {
+        CORE::push(@array, @{scalar $block->run($item)});
     }
 
-    sub last {
-        my ($self, $arg) = @_;
+    bless \@array;
+}
 
-        if (defined $arg) {
+sub grep {
+    my ($self, $block) = @_;
 
-            if (ref($arg) eq 'Sidef::Types::Block::Block') {
-                goto &last_by;
-            }
+    $block //= Sidef::Types::Block::Block::IDENTITY;
 
-            my $end = $#$self;
-
-            $arg = CORE::int($arg) || return bless([], ref($self));
-            $arg += $end + 1 if $arg < 0;
-
-            my $from = $end - $arg + 1;
-
-            return bless([@$self[($from < 0 ? 0 : $from) .. $end]], ref($self));
-        }
-
-        @$self ? $self->[-1] : undef;
+    my @array;
+    foreach my $item (@$self) {
+        CORE::push(@array, $item) if $block->run($item);
     }
 
-    *tail = \&last;
+    bless \@array, ref($self);
+}
 
-    sub skip_by {
-        my ($self, $block) = @_;
+*select = \&grep;
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+sub grep_2d {
+    my ($self, $block) = @_;
 
-        my @array;
-        foreach my $item (@$self) {
-            $block->run($item) || CORE::push(@array, $item);
-        }
-
-        bless \@array, ref($self);
+    my @array;
+    foreach my $item (@$self) {
+        CORE::push(@array, $item) if $block->run(@$item);
     }
 
-    sub skip {
-        my ($self, $n) = @_;
+    bless \@array, ref($self);
+}
 
-        if (defined($n) and ref($n) eq 'Sidef::Types::Block::Block') {
-            goto &skip_by;
-        }
+sub grep_kv {
+    my ($self, $block) = @_;
 
-        $n = defined($n) ? CORE::int($n) : 1;
-        $n == 0 and return $self->clone;
-
-        $self->last(-$n);
+    my @array;
+    foreach my $i (0 .. $#$self) {
+        CORE::push(@array, $self->[$i]) if $block->run(Sidef::Types::Number::Number::_set_int($i), $self->[$i]);
     }
 
-    *skip_first = \&skip;
+    bless \@array, ref($self);
+}
 
-    sub skip_last {
-        my ($self, $n) = @_;
+*select_kv = \&grep_kv;
 
-        if (defined($n) and ref($n) eq 'Sidef::Types::Block::Block') {
-            goto &skip_by;
-        }
+sub group {
+    my ($self, $block) = @_;
 
-        $n = defined($n) ? CORE::int($n) : 1;
-        $n == 0 and return $self->clone;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
 
-        $self->first(-$n);
+    my %hash;
+    foreach my $item (@$self) {
+        CORE::push(@{$hash{$block->run($item)}}, $item);
     }
 
-    sub any {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        foreach my $val (@$self) {
-            $block->run($val)
-              && return (Sidef::Types::Bool::Bool::TRUE);
-        }
-
-        (Sidef::Types::Bool::Bool::FALSE);
+    foreach my $value (CORE::values(%hash)) {
+        bless $value;
     }
 
-    sub all {
-        my ($self, $block) = @_;
+    Sidef::Types::Hash::Hash->new(\%hash);
+}
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+*group_by = \&group;
 
-        foreach my $val (@$self) {
-            $block->run($val)
-              || return (Sidef::Types::Bool::Bool::FALSE);
+sub stack {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    @$self || return bless [];
+
+    my @result     = bless [$self->[0]];
+    my $prev_value = $block->run($self->[0]);
+
+    foreach my $i (1 .. $#{$self}) {
+
+        my $item       = $self->[$i];
+        my $curr_value = $block->run($item);
+
+        if (!($curr_value eq $prev_value)) {
+            CORE::push(@result, bless []);
         }
 
-        (Sidef::Types::Bool::Bool::TRUE);
+        CORE::push(@{$result[-1]}, $item);
+        $prev_value = $curr_value;
     }
 
-    sub none {
-        my ($self, $block) = @_;
+    bless \@result;
+}
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+*stack_by = \&stack;
 
-        foreach my $val (@$self) {
-            $block->run($val)
-              && return (Sidef::Types::Bool::Bool::FALSE);
-        }
+sub run_length {
+    my ($self, $block) = @_;
 
-        (Sidef::Types::Bool::Bool::TRUE);
-    }
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    @$self || return bless [];
 
-    sub bindex_by {
-        my ($self, $obj) = @_;
+    my @result     = bless [$self->[0], 1];
+    my $prev_value = $block->run($self->[0]);
 
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
+    foreach my $i (1 .. $#{$self}) {
 
-        while ($left <= $right) {
+        my $item       = $self->[$i];
+        my $curr_value = $block->run($item);
 
-            $middle = (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number::_set_int($middle);
-
-            if ($cmp > 0) {
-                $right = $middle - 1;
-            }
-            else {
-                $left = $middle + 1;
-            }
-        }
-
-        Sidef::Types::Number::Number::MONE;
-    }
-
-    *bsearch_index_by = \&bindex_by;
-
-    sub bindex {
-        my ($self, $obj) = @_;
-
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            goto &bindex_by;
-        }
-
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
-
-        while ($left <= $right) {
-            $middle = (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number::_set_int($middle);
-
-            if ($cmp > 0) {
-                $right = $middle - 1;
-            }
-            else {
-                $left = $middle + 1;
-            }
-        }
-
-        Sidef::Types::Number::Number::MONE;
-    }
-
-    *bsearch_index = \&bindex;
-
-    sub bsearch {
-        my ($self, $obj) = @_;
-        my $index = $self->bindex($obj);
-        $index->is_mone ? undef : $self->[CORE::int($index)];
-    }
-
-    *bsearch_by = \&bsearch;
-
-    sub bindex_ge_by {
-        my ($self, $obj) = @_;
-
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
-
-        while (1) {
-
-            $middle = (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number::_set_int($middle);
-
-            if ($cmp < 0) {
-                $left = $middle + 1;
-                if ($left > $right) {
-                    ++$middle;
-                    last;
-                }
-            }
-            else {
-                $right = $middle - 1;
-                $left > $right && last;
-            }
-        }
-
-        Sidef::Types::Number::Number::_set_int($middle);
-    }
-
-    sub bindex_ge {
-        my ($self, $obj) = @_;
-
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            goto &bindex_ge_by;
-        }
-
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
-
-        while (1) {
-
-            $middle = (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number::_set_int($middle);
-
-            if ($cmp < 0) {
-                $left = $middle + 1;
-                if ($left > $right) {
-                    ++$middle;
-                    last;
-                }
-            }
-            else {
-                $right = $middle - 1;
-                $left > $right && last;
-            }
-        }
-
-        Sidef::Types::Number::Number::_set_int($middle);
-    }
-
-    sub bindex_le_by {
-        my ($self, $obj) = @_;
-
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
-
-        while (1) {
-
-            $middle = (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number::_set_int($middle);
-
-            if ($cmp < 0) {
-                $left = $middle + 1;
-                $left > $right && last;
-            }
-            else {
-                $right = $middle - 1;
-                if ($left > $right) {
-                    --$middle;
-                    last;
-                }
-            }
-        }
-
-        Sidef::Types::Number::Number::_set_int($middle);
-    }
-
-    sub bindex_le {
-        my ($self, $obj) = @_;
-
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            goto &bindex_le_by;
-        }
-
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
-
-        while (1) {
-
-            $middle = (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number::_set_int($middle);
-
-            if ($cmp < 0) {
-                $left = $middle + 1;
-                $left > $right && last;
-            }
-            else {
-                $right = $middle - 1;
-                if ($left > $right) {
-                    --$middle;
-                    last;
-                }
-            }
-        }
-
-        Sidef::Types::Number::Number::_set_int($middle);
-    }
-
-    sub bindex_min_by {
-        my ($self, $block) = @_;
-
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
-
-        while ($left < $right) {
-
-            $middle = (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($block->run($item));
-
-            if ($cmp < 0) {
-                $left = $middle + 1;
-            }
-            else {
-                $right = $middle;
-            }
-        }
-
-        Sidef::Types::Number::Number::_set_int($left);
-    }
-
-    sub bindex_min {
-        my ($self, $obj) = @_;
-
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            goto &bindex_min_by;
-        }
-
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
-
-        while ($left < $right) {
-
-            $middle = (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj);
-
-            if ($cmp < 0) {
-                $left = $middle + 1;
-            }
-            else {
-                $right = $middle;
-            }
-        }
-
-        Sidef::Types::Number::Number::_set_int($left);
-    }
-
-    sub bindex_max_by {
-        my ($self, $block) = @_;
-
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
-
-        while ($left < $right) {
-
-            $middle = 1 + (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($block->run($item));
-
-            if ($cmp > 0) {
-                $right = $middle - 1;
-            }
-            else {
-                $left = $middle;
-            }
-        }
-
-        Sidef::Types::Number::Number::_set_int($right);
-    }
-
-    sub bindex_max {
-        my ($self, $obj) = @_;
-
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            goto &bindex_max_by;
-        }
-
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
-
-        while ($left < $right) {
-
-            $middle = 1 + (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj);
-
-            if ($cmp > 0) {
-                $right = $middle - 1;
-            }
-            else {
-                $left = $middle;
-            }
-        }
-
-        Sidef::Types::Number::Number::_set_int($right);
-    }
-
-    sub bsearch_min {
-        my ($self, $obj) = @_;
-        my $index = $self->bindex_min($obj);
-        $index->is_mone ? undef : $self->[CORE::int($index)];
-    }
-
-    sub bsearch_max {
-        my ($self, $obj) = @_;
-        my $index = $self->bindex_max($obj);
-        $index->is_mone ? undef : $self->[CORE::int($index)];
-    }
-
-    sub bsearch_le {
-        my ($self, $obj) = @_;
-        my $index = $self->bindex_le($obj);
-        $index->is_mone ? undef : $self->[CORE::int($index)];
-    }
-
-    *bsearch_le_by = \&bsearch_le;
-
-    sub bsearch_ge {
-        my ($self, $obj) = @_;
-        my $index = $self->bindex_ge($obj);
-        $index->is_mone ? undef : $self->[CORE::int($index)];
-    }
-
-    *bsearch_ge_by = \&bsearch_ge;
-
-    sub index {
-        my ($self, $obj) = @_;
-
-        if (@_ > 1) {
-
-            if (ref($obj) eq 'Sidef::Types::Block::Block') {
-                foreach my $i (0 .. $#$self) {
-                    $obj->run($self->[$i])
-                      && return Sidef::Types::Number::Number::_set_int($i);
-                }
-                return Sidef::Types::Number::Number::MONE;
-            }
-
-            foreach my $i (0 .. $#$self) {
-                $self->[$i] eq $obj
-                  and return Sidef::Types::Number::Number::_set_int($i);
-            }
-
-            return Sidef::Types::Number::Number::MONE;
-        }
-
-        @$self
-          ? Sidef::Types::Number::Number::ZERO
-          : Sidef::Types::Number::Number::MONE;
-    }
-
-    *index_by       = \&index;
-    *first_index    = \&index;
-    *first_index_by = \&index;
-
-    sub rindex {
-        my ($self, $obj) = @_;
-
-        if (@_ > 1) {
-            if (ref($obj) eq 'Sidef::Types::Block::Block') {
-                for (my $i = $#$self ; $i >= 0 ; $i--) {
-                    $obj->run($self->[$i])
-                      && return Sidef::Types::Number::Number::_set_int($i);
-                }
-
-                return Sidef::Types::Number::Number::MONE;
-            }
-
-            for (my $i = $#$self ; $i >= 0 ; $i--) {
-                $self->[$i] eq $obj
-                  and return Sidef::Types::Number::Number::_set_int($i);
-            }
-
-            return Sidef::Types::Number::Number::MONE;
-        }
-
-        $self->end;
-    }
-
-    *rindex_by     = \&rindex;
-    *last_index    = \&rindex;
-    *last_index_by = \&rindex;
-
-    sub pairmap {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
-
-        my $end = @$self;
-
-        my @array;
-        for (my $i = 1 ; $i < $end ; $i += 2) {
-            CORE::push(@array, $block->run(@$self[$i - 1, $i]));
-        }
-
-        bless \@array;
-    }
-
-    *pair_map = \&pairmap;
-
-    sub shuffle {
-        my ($self) = @_;
-        bless [List::Util::shuffle(@$self)], ref($self);
-    }
-
-    sub weighted_shuffle_by {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-#<<<
-        my @weights = map {
-            Sidef::Types::Number::Number::__numify__(${Sidef::Types::Number::Number->new(scalar $block->run($_))})
-        } @$self;
-#>>>
-
-        my @vals  = @$self;
-        my $total = List::Util::sum(@weights);
-
-        my @shuffled;
-        while (@vals > 1) {
-            my $select = CORE::int(CORE::rand($total));
-
-            my $idx = 0;
-            while ($select >= $weights[$idx]) {
-                $select -= $weights[$idx++];
-            }
-
-            CORE::push(@shuffled, CORE::splice(@vals, $idx, 1));
-            $total -= CORE::splice(@weights, $idx, 1);
-        }
-
-        CORE::push(@shuffled, @vals) if @vals;
-        bless \@shuffled, ref($self);
-    }
-
-    sub best_shuffle {
-        my ($s) = @_;
-        my ($t) = $s->shuffle;
-
-        my $end = $#$s;
-
-        foreach my $i (0 .. $end) {
-            foreach my $j (0 .. $end) {
-                $i != $j
-                  && !($t->[$i] eq $s->[$j])
-                  && !($t->[$j] eq $s->[$i])
-                  && do {
-                    @$t[$i, $j] = @$t[$j, $i];
-                    last;
-                }
-            }
-        }
-
-        $t;
-    }
-
-    *bshuffle = \&best_shuffle;
-
-    sub accumulate_by {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @acc;
-        my $prev;
-
-        foreach my $item (@$self) {
-            if (defined($prev)) {
-                CORE::push(@acc, $prev = $prev->add($block->run($item)));
-            }
-            else {
-                CORE::push(@acc, $prev = $block->run($item));
-            }
-        }
-
-        bless \@acc, ref($self);
-    }
-
-    *acc_by = \&accumulate_by;
-
-    sub accumulate {
-        my ($self, $block) = @_;
-
-        if (defined($block)) {
-            goto &accumulate_by;
-        }
-
-        my @acc;
-        my $prev;
-
-        foreach my $item (@$self) {
-            if (defined($prev)) {
-                CORE::push(@acc, $prev = $prev->add($item));
-            }
-            else {
-                CORE::push(@acc, $prev = $item);
-            }
-        }
-
-        bless \@acc, ref($self);
-    }
-
-    *acc = \&accumulate;
-
-    sub differences {
-        my ($self, $n) = @_;
-
-        if (defined($n)) {
-            $n = CORE::int($n);
+        if ($curr_value eq $prev_value) {
+            ++$result[-1][1];
         }
         else {
-            $n = 1;
+            CORE::push(@result, bless [$item, 1]);
         }
 
-        my @diffs = @$self;
+        $prev_value = $curr_value;
+    }
 
-        foreach my $i (1 .. $n) {
-            my @tmp;
-            my $prev = shift(@diffs);
+    foreach my $pair (@result) {
+        $pair->[1] = Sidef::Types::Number::Number::_set_int($pair->[1]);
+    }
 
-            while (@diffs) {
-                my $curr = shift(@diffs);
-                CORE::push(@tmp, $curr->sub($prev));
-                $prev = $curr;
+    bless \@result;
+}
+
+*run_length_by = \&run_length;
+
+sub match {
+    my ($self, $regex) = @_;
+
+    my %addr;
+
+    my $sub = sub {
+        my ($obj) = @_;
+
+        my $refaddr = Scalar::Util::refaddr($obj);
+
+        exists($addr{$refaddr})
+          && return Sidef::Types::Bool::Bool::FALSE;
+
+        undef $addr{$refaddr};
+
+        foreach my $item (@$obj) {
+            if (defined(my $sub = UNIVERSAL::can($item, 'match'))) {
+                $sub->($item, $regex)
+                  && return Sidef::Types::Bool::Bool::TRUE;
             }
-            @diffs = @tmp;
-        }
-
-        bless \@diffs, ref($self);
-    }
-
-    *deltas          = \&differences;
-    *diffs           = \&differences;
-    *nth_differences = \&differences;
-
-    sub solve_seq {
-        my ($self, $offset) = @_;
-
-        $offset //= Sidef::Types::Number::Number::ZERO;
-
-        my $poly    = Sidef::Types::Number::Polynomial->new();
-        my $x       = Sidef::Types::Number::Polynomial->new(1 => Sidef::Types::Number::Number::ONE)->sub($offset);
-        my $is_zero = Sidef::Types::Block::Block->new(code => sub { $_[0]->is_zero });
-
-        @$self || return $poly;
-
-        for (my $k = 0 ; ; ++$k) {
-            $poly = $poly->add($x->binomial(Sidef::Types::Number::Number::_set_int($k))->mul($self->[0]));
-            $self = $self->differences;
-            last if $self->all($is_zero);
-        }
-
-        $poly;
-    }
-
-    sub solve_rec_seq {
-        my ($self) = @_;
-
-        # Reference:
-        #   https://yewtu.be/watch?v=NO1_-qptr6c
-
-        my $x = Sidef::Types::Number::Polynomial->new(Sidef::Types::Number::Number::ONE);
-
-        my @seq = @$self;
-        my @A   = (Sidef::Types::Number::Number::ONE) x scalar(@seq);
-        my @B   = map { $seq[$_ + 1]->sub($x->mul($seq[$_])) } 0 .. $#seq - 1;
-
-        for (; ;) {
-
-            my @C;
-            my $all_zero = 1;
-
-            foreach my $i (1 .. $#B - 1) {
-
-                $A[$i]     // next;
-                $B[$i]     // next;
-                $B[$i + 1] // next;
-                $B[$i - 1] // next;
-
-                if ($A[$i]->is_zero) {    # division by zero
-                    next;
-                }
-
-                my $entry = $B[$i - 1]->mul($B[$i + 1])->sub($B[$i]->sqr)->div($A[$i]->neg);
-
-                if ($entry->is_nan) {
-                    next;
-                }
-
-                if ($all_zero) {
-                    $entry->is_zero or do {
-                        $all_zero = 0;
-                    }
-                }
-
-                $C[$i - 1] = $entry;
-            }
-
-            if ($all_zero) {
-                my $poly = (grep { defined($_) && ref($_) eq 'Sidef::Types::Number::Polynomial' } @B)[0];
-
-                if (!defined($poly)) {
-                    return Sidef::Types::Array::Array->new;
-                }
-
-                my $degree = CORE::int($poly->degree);
-
-                my @cf = @{$poly->coeffs};
-                my $d  = (CORE::pop(@cf) // [0, Sidef::Types::Number::Number::ZERO])->[1];
-                my $fc = Sidef::Types::Number::Polynomial->new(map { @$_ } @cf)->div($d->neg)->coeffs;
-
-                my %lookup = (map { @$_ } @$fc);
-                return Sidef::Types::Array::Array->new([map { $lookup{$_} // Sidef::Types::Number::Number::ZERO } CORE::reverse(0 .. $degree - 1)]);
-            }
-
-            @A = @B;
-            @B = @C;
-
-            CORE::pop(@A);
-            CORE::shift(@A);
-        }
-    }
-
-    *find_linear_recurrence = \&solve_rec_seq;
-
-    sub binsplit {
-        my ($self, $block) = @_;
-        Sidef::Types::Number::Number::_binsplit([@$self], $block);
-    }
-
-    sub reduce {
-        my ($self, $obj, $initial) = @_;
-
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-
-            my ($from, $x) = (
-                              defined($initial)
-                              ? (0, $initial)
-                              : (1, $self->[0])
-                             );
-
-            foreach my $i ($from .. $#$self) {
-                $x = $obj->run($x, $self->[$i]);
-            }
-
-            return $x;
-        }
-
-        $self->reduce_operator("$obj", $initial);
-    }
-
-    *inject = \&reduce;
-
-    sub map_reduce {
-        my ($self, $obj, $initial) = @_;
-
-        my ($from, $x) = (
-                          defined($initial)
-                          ? (0, $initial)
-                          : (1, $self->[0])
-                         );
-
-        my @list = ($x);
-        foreach my $i ($from .. $#$self) {
-            $x = $obj->run($x, $self->[$i]);
-            CORE::push(@list, $x);
-        }
-
-        bless \@list, ref($self);
-    }
-
-    *reduce_map = \&map_reduce;
-
-    sub length {
-        Sidef::Types::Number::Number::_set_int(scalar @{$_[0]});
-    }
-
-    *len  = \&length;    # alias
-    *size = \&length;
-
-    sub end {
-        Sidef::Types::Number::Number::_set_int($#{$_[0]});
-    }
-
-    *offset = \&end;
-
-    sub resize {
-        my ($self, $num) = @_;
-        $#$self = $num;
-        $self;
-    }
-
-    *resize_to = \&resize;
-
-    sub pick {
-        my ($self, $amount) = @_;
-
-        if (defined $amount) {
-            $amount = CORE::int($amount);
-
-            my $len = @$self;
-            if ($amount >= $len) {
-                return bless([List::Util::shuffle(@$self)], ref($self));
-            }
-
-            my @result;
-            for (my ($i, $amount_left) = (0, $len) ; $amount > 0 ; ++$i, --$amount_left) {
-                my $rand = CORE::int(CORE::rand($amount_left));
-                if ($rand < $amount) {
-                    CORE::push(@result, $self->[$i]);
-                    $amount--;
-                }
-            }
-
-            return bless([List::Util::shuffle(@result)], ref($self));
-        }
-
-        $self->[CORE::rand(scalar @$self)];
-    }
-
-    sub rand {
-        my ($self, $amount) = @_;
-
-        if (defined $amount) {
-            $amount = CORE::int($amount);
-
-            my $len = @$self;
-            return (
-                    $len > 0
-                    ? bless([map { $self->[CORE::rand($len)] } 1 .. $amount], ref($self))
-                    : bless([],                                               ref($self))
-                   );
-        }
-
-        $self->[CORE::rand(scalar @$self)];
-    }
-
-    *sample = \&rand;
-
-    sub range {
-        my ($self) = @_;
-        Sidef::Types::Range::RangeNumber->new(Sidef::Types::Number::Number::ZERO,
-                                              Sidef::Types::Number::Number::_set_int($#$self),
-                                              Sidef::Types::Number::Number::ONE,
-                                             );
-    }
-
-    sub indices_by {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @indices;
-        foreach my $i (0 .. $#$self) {
-            if ($block->run($self->[$i])) {
-                CORE::push(@indices, Sidef::Types::Number::Number::_set_int($i));
+            elsif ($regex->run($item)) {
+                return Sidef::Types::Bool::Bool::TRUE;
             }
         }
 
-        bless \@indices;
+        Sidef::Types::Bool::Bool::FALSE;
+    };
+
+    no warnings 'redefine';
+    local *Sidef::Types::Array::Array::match = $sub;
+    $sub->($_[0]);
+}
+
+sub iter {
+    my ($self) = @_;
+
+    my $i = 0;
+    Sidef::Types::Block::Block->new(
+        code => sub {
+            $self->[$i++];
+        }
+    );
+}
+
+sub freq_by {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my %hash;
+    foreach my $item (@$self) {
+        my $r = $hash{$block->run($item)} //= {
+                                               count => 0,
+                                               items => [],
+                                              };
+        CORE::push(@{$r->{items}}, $item);
+        ++$r->{count};
     }
 
-    *keys_by = \&indices_by;
-
-    sub indices_of {
-        my ($self, $arg) = @_;
-
-        my @indices;
-        foreach my $i (0 .. $#$self) {
-            if ($self->[$i] eq $arg) {
-                CORE::push(@indices, Sidef::Types::Number::Number::_set_int($i));
-            }
-        }
-
-        bless \@indices;
+    my %freq;
+    foreach my $key (CORE::keys(%hash)) {
+        my $r = $hash{$key};
+        my $n = Sidef::Types::Number::Number::_set_int($r->{count});
+        @freq{@{$r->{items}}} = ($n) x scalar(@{$r->{items}});
     }
 
-    *keys_of = \&indices_of;
+    Sidef::Types::Hash::Hash->new(\%freq);
+}
 
-    sub indices {
-        my ($self, $arg) = @_;
+sub freq {
+    my ($self, $block) = @_;
 
-        if (defined($arg)) {
-            goto &indices_by;
-        }
-
-        bless [map { Sidef::Types::Number::Number::_set_int($_) } 0 .. $#$self];
+    if (defined($block)) {
+        goto &freq_by;
     }
 
-    *keys = \&indices;
-
-    sub pairs {
-        my ($self) = @_;
-        bless [map { Sidef::Types::Array::Pair->new(Sidef::Types::Number::Number::_set_int($_), $self->[$_]) } 0 .. $#$self];
+    my %hash;
+    foreach my $item (@$self) {
+        ++$hash{$item};
     }
 
-    *kv          = \&pairs;
-    *zip_indices = \&pairs;
-
-    sub insert {
-        my ($self, $i, @objects) = @_;
-
-        $i = CORE::int($i);
-
-        if ($#$self < $i) {
-            $#$self = $i - 1;
-        }
-
-        CORE::splice(@$self, $i, 0, @objects);
-        $self;
+    foreach my $key (CORE::keys(%hash)) {
+        $hash{$key} = Sidef::Types::Number::Number::_set_int($hash{$key});
     }
 
-    sub binsert {
-        my ($self, $obj) = @_;
+    Sidef::Types::Hash::Hash->new(\%hash);
+}
 
-        my $left  = 0;
-        my $right = $#$self;
-        my ($middle, $item, $cmp);
+sub _huffman_from_code_lengths {
+    my ($code_lengths_table) = @_;
 
-        if ($right < 0) {
-            CORE::push(@$self, $obj);
-            return $self;
+    # This algorithm is based on the pseudocode in RFC 1951 (Section 3.2.2)
+    # (Steps are numbered as in the RFC)
+
+    my @code_lengths = map { [$_, $code_lengths_table->{$_}] } CORE::sort { $a <=> $b } CORE::keys %$code_lengths_table;
+
+    # Step 1: Count the number of codes for each length
+    my $max_length    = List::Util::max(map { $_->[1] } @code_lengths) // 0;
+    my @length_counts = (0) x ($max_length + 1);
+
+    foreach my $length (map { $_->[1] } @code_lengths) {
+
+        # Treat undef or negative lengths as 0 (unused)
+        if (defined($length) and $length > 0) {
+            ++$length_counts[$length];
         }
-
-        while (1) {
-            $middle = (($right + $left) >> 1);
-            $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj) || last;
-
-            if ($cmp < 0) {
-                $left = $middle + 1;
-                if ($left > $right) {
-                    ++$middle;
-                    last;
-                }
-            }
-            else {
-                $right = $middle - 1;
-                $left > $right && last;
-            }
-        }
-
-        CORE::splice(@$self, $middle, 0, $obj);
-        $self;
     }
 
-    sub compact {
-        my ($self) = @_;
-        bless [grep { defined($_) } @$self], ref($self);
+    # Step 2: Generate the starting numerical value for each length
+    my $code = 0;
+    $length_counts[0] = 0;
+    my @next_code = (0) x ($max_length + 1);
+
+    foreach my $bits (1 .. $max_length) {
+        $code = ($code + $length_counts[$bits - 1]) << 1;
+        $next_code[$bits] = $code;
     }
 
-    sub unique {
-        my ($self, $block) = @_;
+    # Step 3: Assign numerical values to all codes
+    my %dict;
+    foreach my $pair (@code_lengths) {
+        my ($key, $length) = @$pair;
 
-        if (defined($block)) {
-            return $self->uniq_by($block);
+        # Skip zero-length codes (unused symbols)
+        if (defined($length) and $length != 0) {
+
+            # Format the integer code as a binary string with $length bits
+            my $binary_code = sprintf('%0*b', $length, $next_code[$length]);
+
+            $dict{$key} = bless(\$binary_code, 'Sidef::Types::String::String');
+
+            # Increment the code for the next symbol of this length
+            ++$next_code[$length];
         }
-
-        my @sorted = do {
-
-            my @arr;
-            my $numeric = 1;
-
-            foreach my $i (0 .. $#$self) {
-
-                CORE::push(@arr, [$i, $self->[$i]]);
-
-                if ($numeric and (ref($self->[$i]) ne 'Sidef::Types::Number::Number' or ref(${$self->[$i]}) eq 'Math::MPC')) {
-                    $numeric = 0;
-                }
-            }
-
-            if ($numeric) {
-                return $self->iuniq;
-            }
-
-            CORE::sort { $a->[1] cmp $b->[1] } @arr;
-        };
-
-        my @unique;
-        my $max = $#sorted;
-
-        for (my $i = 0 ; $i <= $max ; $i++) {
-            $unique[$sorted[$i][0]] = $sorted[$i][1];
-            ++$i while ($i < $max and $sorted[$i][1] eq $sorted[$i + 1][1]);
-        }
-
-        bless [grep { defined($_) } @unique], ref($self);
     }
 
-    *uniq     = \&unique;
-    *distinct = \&unique;
+    Sidef::Types::Hash::Hash->new(\%dict);
+}
 
-    sub iuniq {
-        my ($self) = @_;
+sub _huffman_walk_tree {
+    my ($node, $code, $h) = @_;
 
-        my @sorted = do {
-            my @arr;
-            foreach my $i (0 .. $#$self) {
-                CORE::push(@arr, [$i, $self->[$i], ${$self->[$i]}]);
-            }
-            CORE::sort { $a->[2] <=> $b->[2] } @arr;
-        };
+    # Node structure: [ content, frequency ]
+    # If content is a reference, it's an internal node: [left_child, right_child]
+    # If content is a scalar, it's a leaf: 'symbol'
 
-        my @unique;
-        my $max = $#sorted;
+    my $c = $node->[0] // return $h;
 
-        for (my $i = 0 ; $i <= $max ; $i++) {
-            $unique[$sorted[$i][0]] = $sorted[$i][1];
-            ++$i while ($i < $max and $sorted[$i][2] == $sorted[$i + 1][2]);
-        }
+    if (ref $c) {
 
-        bless [grep { defined($_) } @unique], ref($self);
+        # Recurse: Left adds '0', Right adds '1'
+        __SUB__->($c->[$_], $code . $_, $h) for ('0', '1');
+    }
+    else {
+        # Leaf node found
+        $h->{$c} = $code;
     }
 
-    sub last_unique {
-        my ($self) = @_;
+    return $h;
+}
 
-        my @sorted = do {
-            my @arr;
-            foreach my $i (0 .. $#$self) {
-                CORE::push(@arr, [$i, $self->[$i]]);
-            }
-            CORE::sort { $a->[1] cmp $b->[1] } @arr;
-        };
+sub _heap_push {
+    my ($heap, $item) = @_;
+    CORE::push(@$heap, $item);
+    my $i = $#$heap;
+    while ($i > 0) {
+        my $p = ($i - 1) >> 1;
+        last if ($heap->[$p][1] <= $heap->[$i][1]);
+        @{$heap}[$p, $i] = @{$heap}[$i, $p];
+        $i = $p;
+    }
+}
 
-        my @unique;
-        my $max = $#sorted;
+sub _heap_pop {
+    my ($heap) = @_;
+    return CORE::pop(@$heap) if (@$heap == 1);
+    my $top = $heap->[0];
+    $heap->[0] = CORE::pop @$heap;
+    my $n = scalar @$heap;
+    my $i = 0;
+    while (1) {
+        my $s = $i;
+        my $l = 2 * $i + 1;
+        my $r = $l + 1;
+        $s = $l if ($l < $n && $heap->[$l][1] < $heap->[$s][1]);
+        $s = $r if ($r < $n && $heap->[$r][1] < $heap->[$s][1]);
+        last if $s == $i;
+        @{$heap}[$i, $s] = @{$heap}[$s, $i];
+        $i = $s;
+    }
+    return $top;
+}
 
-        for (my $i = 0 ; $i <= $max ; $i++) {
-            ++$i while ($i < $max and $sorted[$i][1] eq $sorted[$i + 1][1]);
-            $unique[$sorted[$i][0]] = $sorted[$i][1];
-        }
+sub huffman {
+    my ($self) = @_;
 
-        bless [grep { defined($_) } @unique], ref($self);
+    # 1. Count Frequencies
+    my %freq;
+    foreach my $item (@$self) {
+        ++$freq{$item};
     }
 
-    *last_uniq = \&last_unique;
+    my @symbols = CORE::sort CORE::keys %freq;
 
-    sub uniq_by {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @sorted = do {
-            my @arr;
-            my $i = -1;
-            foreach my $item (@$self) {
-                CORE::push(@arr, [++$i, $item, scalar $block->run($item)]);
-            }
-            CORE::sort { $a->[2] cmp $b->[2] } @arr;
-        };
-
-        my @unique;
-        my $max = $#sorted;
-
-        for (my $i = 0 ; $i <= $max ; $i++) {
-            $unique[$sorted[$i][0]] = $sorted[$i][1];
-            ++$i while ($i < $max and $sorted[$i][2] eq $sorted[$i + 1][2]);
-        }
-
-        bless [grep { defined } @unique], ref($self);
+    # 2. Initialize Heap
+    # Structure: [ [symbol_or_children], frequency ]
+    my @heap;
+    foreach my $k (@symbols) {
+        _heap_push(\@heap, [$k, $freq{$k}]);
     }
 
-    *unique_by = \&uniq_by;
-
-    sub last_uniq_by {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        my @sorted = do {
-            my @arr;
-            my $i = -1;
-            foreach my $item (@$self) {
-                CORE::push(@arr, [++$i, $item, scalar $block->run($item)]);
-            }
-            CORE::sort { $a->[2] cmp $b->[2] } @arr;
-        };
-
-        my @unique;
-        my $max = $#sorted;
-
-        for (my $i = 0 ; $i <= $max ; $i++) {
-            ++$i while ($i < $max and $sorted[$i][2] eq $sorted[$i + 1][2]);
-            $unique[$sorted[$i][0]] = $sorted[$i][1];
-        }
-
-        bless [grep { defined } @unique], ref($self);
+    # 3. Build Huffman Tree
+    while (@heap > 1) {
+        my $x = _heap_pop(\@heap);
+        my $y = _heap_pop(\@heap);
+        _heap_push(\@heap, [[$x, $y], $x->[1] + $y->[1]]);
     }
 
-    *last_unique_by = \&last_uniq_by;
-
-    sub abbrev {
-        my ($self, $pattern) = @_;
-
-        if (defined($pattern)) {
-            if (ref($pattern) eq 'Sidef::Types::Regex::Regex') {
-                $pattern = $pattern->get_value;
-            }
-            else {
-                $pattern = qr/\Q$pattern\E/;
-            }
-        }
-
-        my (%seen, %table);
-        foreach my $item (@$self) {
-            my $word   = "$item";
-            my $length = CORE::length($word) || next;
-
-            for (my $len = $length ; $len >= 1 ; --$len) {
-                my $abbrev = substr($word, 0, $len);
-
-                if (defined($pattern)) {
-                    ($abbrev =~ $pattern) || next;
-                }
-
-                my $count = ++$seen{$abbrev};
-
-                if ($count == 1) {
-                    $table{$abbrev} = $item;
-                }
-                elsif ($count == 2) {
-                    CORE::delete($table{$abbrev});
-                }
-                else {
-                    last;
-                }
-            }
-        }
-
-        foreach my $item (@$self) {
-            my $word = "$item";
-
-            if (defined($pattern)) {
-                ($word =~ $pattern) || next;
-            }
-
-            $table{$word} = $item;
-        }
-
-        Sidef::Types::Hash::Hash->new(\%table);
+    if (@heap == 1 && !ref $heap[0][0]) {
+        @heap = ([[$heap[0]], $heap[0][1]]);
     }
 
-    *abbreviations = \&abbrev;
+    # 4. Generate Codes
+    my $h = _huffman_walk_tree($heap[0], '', {});
 
-    sub uniq_prefs {
-        my ($self, $block) = @_;
-
-        my $tail     = {};                # some unique value
-        my $callback = defined($block);
-
-        my %table;
-        foreach my $sub_array (@$self) {
-            my $ref = \%table;
-            foreach my $item (@$sub_array) {
-                $ref = $ref->{$item} //= {};
-            }
-            $ref->{$tail} = $sub_array;
-        }
-
-        my @abbrev;
-        sub {
-            my ($hash) = @_;
-
-            foreach my $key (my @keys = CORE::sort(keys(%{$hash}))) {
-                next if $key eq $tail;
-                __SUB__->($hash->{$key});
-
-                if ($#keys > 0) {
-                    my $count = 0;
-                    my $ref   = delete $hash->{$key};
-                    while (my ($key) = CORE::each %{$ref}) {
-                        if ($key eq $tail) {
-
-                            if ($callback) {
-                                $block->run(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]);
-                            }
-                            else {
-                                CORE::push(@abbrev, bless([@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]]));
-                            }
-
-                            last;
-                        }
-                        $ref = $ref->{$key};
-                        $count++;
-                    }
-                }
-            }
-          }
-          ->(\%table);
-
-        bless \@abbrev;
+    my %code_lengths;
+    foreach my $i (@symbols) {
+        $code_lengths{$i} = CORE::length($h->{$i});
     }
 
-    *unique_prefixes = \&uniq_prefs;
+    _huffman_from_code_lengths(\%code_lengths);
+}
 
-    sub contains {
-        my ($self, $obj, @extra) = @_;
+sub first_by {
+    my ($self, $block) = @_;
 
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-            foreach my $item (@$self) {
-                if ($obj->run($item)) {
-                    return (Sidef::Types::Bool::Bool::TRUE);
-                }
-            }
+    $block //= Sidef::Types::Block::Block::IDENTITY;
 
-            return (Sidef::Types::Bool::Bool::FALSE);
+    foreach my $val (@$self) {
+        return $val if $block->run($val);
+    }
+
+    return undef;
+}
+
+*find = \&first_by;
+
+sub first {
+    my ($self, $arg) = @_;
+
+    if (defined $arg) {
+
+        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+            goto &first_by;
         }
 
         my $end = $#$self;
 
-        foreach my $i (0 .. $end) {
-            if ($self->[$i] eq $obj) {
+        $arg = CORE::int($arg) || return bless([], ref($self));
+        $arg += $end + 1 if $arg < 0;
+        $arg -= 1;
 
-                my $ok = 1;
-                my $j  = $i;
+        return bless([@$self[0 .. ($arg > $end ? $end : $arg)]], ref($self));
+    }
 
-                foreach my $obj (@extra) {
-                    if (++$j <= $end and $self->[$j] eq $obj) {
-                        ## ok
-                    }
-                    else {
-                        $ok = 0;
-                        last;
-                    }
+    @$self ? $self->[0] : undef;
+}
+
+*head = \&first;
+
+sub last_by {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    for (my $i = $#$self ; $i >= 0 ; --$i) {
+        return $self->[$i] if $block->run($self->[$i]);
+    }
+
+    return undef;
+}
+
+sub last {
+    my ($self, $arg) = @_;
+
+    if (defined $arg) {
+
+        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+            goto &last_by;
+        }
+
+        my $end = $#$self;
+
+        $arg = CORE::int($arg) || return bless([], ref($self));
+        $arg += $end + 1 if $arg < 0;
+
+        my $from = $end - $arg + 1;
+
+        return bless([@$self[($from < 0 ? 0 : $from) .. $end]], ref($self));
+    }
+
+    @$self ? $self->[-1] : undef;
+}
+
+*tail = \&last;
+
+sub skip_by {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my @array;
+    foreach my $item (@$self) {
+        $block->run($item) || CORE::push(@array, $item);
+    }
+
+    bless \@array, ref($self);
+}
+
+sub skip {
+    my ($self, $n) = @_;
+
+    if (defined($n) and ref($n) eq 'Sidef::Types::Block::Block') {
+        goto &skip_by;
+    }
+
+    $n = defined($n) ? CORE::int($n) : 1;
+    $n == 0 and return $self->clone;
+
+    $self->last(-$n);
+}
+
+*skip_first = \&skip;
+
+sub skip_last {
+    my ($self, $n) = @_;
+
+    if (defined($n) and ref($n) eq 'Sidef::Types::Block::Block') {
+        goto &skip_by;
+    }
+
+    $n = defined($n) ? CORE::int($n) : 1;
+    $n == 0 and return $self->clone;
+
+    $self->first(-$n);
+}
+
+sub any {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    foreach my $val (@$self) {
+        $block->run($val)
+          && return (Sidef::Types::Bool::Bool::TRUE);
+    }
+
+    (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub all {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    foreach my $val (@$self) {
+        $block->run($val)
+          || return (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    (Sidef::Types::Bool::Bool::TRUE);
+}
+
+sub none {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    foreach my $val (@$self) {
+        $block->run($val)
+          && return (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    (Sidef::Types::Bool::Bool::TRUE);
+}
+
+sub bindex_by {
+    my ($self, $obj) = @_;
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    while ($left <= $right) {
+
+        $middle = (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number::_set_int($middle);
+
+        if ($cmp > 0) {
+            $right = $middle - 1;
+        }
+        else {
+            $left = $middle + 1;
+        }
+    }
+
+    Sidef::Types::Number::Number::MONE;
+}
+
+*bsearch_index_by = \&bindex_by;
+
+sub bindex {
+    my ($self, $obj) = @_;
+
+    if (ref($obj) eq 'Sidef::Types::Block::Block') {
+        goto &bindex_by;
+    }
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    while ($left <= $right) {
+        $middle = (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number::_set_int($middle);
+
+        if ($cmp > 0) {
+            $right = $middle - 1;
+        }
+        else {
+            $left = $middle + 1;
+        }
+    }
+
+    Sidef::Types::Number::Number::MONE;
+}
+
+*bsearch_index = \&bindex;
+
+sub bsearch {
+    my ($self, $obj) = @_;
+    my $index = $self->bindex($obj);
+    $index->is_mone ? undef : $self->[CORE::int($index)];
+}
+
+*bsearch_by = \&bsearch;
+
+sub bindex_ge_by {
+    my ($self, $obj) = @_;
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    while (1) {
+
+        $middle = (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number::_set_int($middle);
+
+        if ($cmp < 0) {
+            $left = $middle + 1;
+            if ($left > $right) {
+                ++$middle;
+                last;
+            }
+        }
+        else {
+            $right = $middle - 1;
+            $left > $right && last;
+        }
+    }
+
+    Sidef::Types::Number::Number::_set_int($middle);
+}
+
+sub bindex_ge {
+    my ($self, $obj) = @_;
+
+    if (ref($obj) eq 'Sidef::Types::Block::Block') {
+        goto &bindex_ge_by;
+    }
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    while (1) {
+
+        $middle = (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number::_set_int($middle);
+
+        if ($cmp < 0) {
+            $left = $middle + 1;
+            if ($left > $right) {
+                ++$middle;
+                last;
+            }
+        }
+        else {
+            $right = $middle - 1;
+            $left > $right && last;
+        }
+    }
+
+    Sidef::Types::Number::Number::_set_int($middle);
+}
+
+sub bindex_le_by {
+    my ($self, $obj) = @_;
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    while (1) {
+
+        $middle = (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number::_set_int($middle);
+
+        if ($cmp < 0) {
+            $left = $middle + 1;
+            $left > $right && last;
+        }
+        else {
+            $right = $middle - 1;
+            if ($left > $right) {
+                --$middle;
+                last;
+            }
+        }
+    }
+
+    Sidef::Types::Number::Number::_set_int($middle);
+}
+
+sub bindex_le {
+    my ($self, $obj) = @_;
+
+    if (ref($obj) eq 'Sidef::Types::Block::Block') {
+        goto &bindex_le_by;
+    }
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    while (1) {
+
+        $middle = (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number::_set_int($middle);
+
+        if ($cmp < 0) {
+            $left = $middle + 1;
+            $left > $right && last;
+        }
+        else {
+            $right = $middle - 1;
+            if ($left > $right) {
+                --$middle;
+                last;
+            }
+        }
+    }
+
+    Sidef::Types::Number::Number::_set_int($middle);
+}
+
+sub bindex_min_by {
+    my ($self, $block) = @_;
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    while ($left < $right) {
+
+        $middle = (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($block->run($item));
+
+        if ($cmp < 0) {
+            $left = $middle + 1;
+        }
+        else {
+            $right = $middle;
+        }
+    }
+
+    Sidef::Types::Number::Number::_set_int($left);
+}
+
+sub bindex_min {
+    my ($self, $obj) = @_;
+
+    if (ref($obj) eq 'Sidef::Types::Block::Block') {
+        goto &bindex_min_by;
+    }
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    while ($left < $right) {
+
+        $middle = (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($item cmp $obj);
+
+        if ($cmp < 0) {
+            $left = $middle + 1;
+        }
+        else {
+            $right = $middle;
+        }
+    }
+
+    Sidef::Types::Number::Number::_set_int($left);
+}
+
+sub bindex_max_by {
+    my ($self, $block) = @_;
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    while ($left < $right) {
+
+        $middle = 1 + (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($block->run($item));
+
+        if ($cmp > 0) {
+            $right = $middle - 1;
+        }
+        else {
+            $left = $middle;
+        }
+    }
+
+    Sidef::Types::Number::Number::_set_int($right);
+}
+
+sub bindex_max {
+    my ($self, $obj) = @_;
+
+    if (ref($obj) eq 'Sidef::Types::Block::Block') {
+        goto &bindex_max_by;
+    }
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    while ($left < $right) {
+
+        $middle = 1 + (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($item cmp $obj);
+
+        if ($cmp > 0) {
+            $right = $middle - 1;
+        }
+        else {
+            $left = $middle;
+        }
+    }
+
+    Sidef::Types::Number::Number::_set_int($right);
+}
+
+sub bsearch_min {
+    my ($self, $obj) = @_;
+    my $index = $self->bindex_min($obj);
+    $index->is_mone ? undef : $self->[CORE::int($index)];
+}
+
+sub bsearch_max {
+    my ($self, $obj) = @_;
+    my $index = $self->bindex_max($obj);
+    $index->is_mone ? undef : $self->[CORE::int($index)];
+}
+
+sub bsearch_le {
+    my ($self, $obj) = @_;
+    my $index = $self->bindex_le($obj);
+    $index->is_mone ? undef : $self->[CORE::int($index)];
+}
+
+*bsearch_le_by = \&bsearch_le;
+
+sub bsearch_ge {
+    my ($self, $obj) = @_;
+    my $index = $self->bindex_ge($obj);
+    $index->is_mone ? undef : $self->[CORE::int($index)];
+}
+
+*bsearch_ge_by = \&bsearch_ge;
+
+sub index {
+    my ($self, $obj) = @_;
+
+    if (@_ > 1) {
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            foreach my $i (0 .. $#$self) {
+                $obj->run($self->[$i])
+                  && return Sidef::Types::Number::Number::_set_int($i);
+            }
+            return Sidef::Types::Number::Number::MONE;
+        }
+
+        foreach my $i (0 .. $#$self) {
+            $self->[$i] eq $obj
+              and return Sidef::Types::Number::Number::_set_int($i);
+        }
+
+        return Sidef::Types::Number::Number::MONE;
+    }
+
+    @$self
+      ? Sidef::Types::Number::Number::ZERO
+      : Sidef::Types::Number::Number::MONE;
+}
+
+*index_by       = \&index;
+*first_index    = \&index;
+*first_index_by = \&index;
+
+sub rindex {
+    my ($self, $obj) = @_;
+
+    if (@_ > 1) {
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            for (my $i = $#$self ; $i >= 0 ; $i--) {
+                $obj->run($self->[$i])
+                  && return Sidef::Types::Number::Number::_set_int($i);
+            }
+
+            return Sidef::Types::Number::Number::MONE;
+        }
+
+        for (my $i = $#$self ; $i >= 0 ; $i--) {
+            $self->[$i] eq $obj
+              and return Sidef::Types::Number::Number::_set_int($i);
+        }
+
+        return Sidef::Types::Number::Number::MONE;
+    }
+
+    $self->end;
+}
+
+*rindex_by     = \&rindex;
+*last_index    = \&rindex;
+*last_index_by = \&rindex;
+
+sub pairmap {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
+    my $end = @$self;
+
+    my @array;
+    for (my $i = 1 ; $i < $end ; $i += 2) {
+        CORE::push(@array, $block->run(@$self[$i - 1, $i]));
+    }
+
+    bless \@array;
+}
+
+*pair_map = \&pairmap;
+
+sub shuffle {
+    my ($self) = @_;
+    bless [List::Util::shuffle(@$self)], ref($self);
+}
+
+sub weighted_shuffle_by {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+#<<<
+    my @weights = map {
+        Sidef::Types::Number::Number::__numify__(${Sidef::Types::Number::Number->new(scalar $block->run($_))})
+    } @$self;
+#>>>
+
+    my @vals  = @$self;
+    my $total = List::Util::sum(@weights);
+
+    my @shuffled;
+    while (@vals > 1) {
+        my $select = CORE::int(CORE::rand($total));
+
+        my $idx = 0;
+        while ($select >= $weights[$idx]) {
+            $select -= $weights[$idx++];
+        }
+
+        CORE::push(@shuffled, CORE::splice(@vals, $idx, 1));
+        $total -= CORE::splice(@weights, $idx, 1);
+    }
+
+    CORE::push(@shuffled, @vals) if @vals;
+    bless \@shuffled, ref($self);
+}
+
+sub best_shuffle {
+    my ($s) = @_;
+    my ($t) = $s->shuffle;
+
+    my $end = $#$s;
+
+    foreach my $i (0 .. $end) {
+        foreach my $j (0 .. $end) {
+            $i != $j
+              && !($t->[$i] eq $s->[$j])
+              && !($t->[$j] eq $s->[$i])
+              && do {
+                @$t[$i, $j] = @$t[$j, $i];
+                last;
+            }
+        }
+    }
+
+    $t;
+}
+
+*bshuffle = \&best_shuffle;
+
+sub accumulate_by {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my @acc;
+    my $prev;
+
+    foreach my $item (@$self) {
+        if (defined($prev)) {
+            CORE::push(@acc, $prev = $prev->add($block->run($item)));
+        }
+        else {
+            CORE::push(@acc, $prev = $block->run($item));
+        }
+    }
+
+    bless \@acc, ref($self);
+}
+
+*acc_by = \&accumulate_by;
+
+sub accumulate {
+    my ($self, $block) = @_;
+
+    if (defined($block)) {
+        goto &accumulate_by;
+    }
+
+    my @acc;
+    my $prev;
+
+    foreach my $item (@$self) {
+        if (defined($prev)) {
+            CORE::push(@acc, $prev = $prev->add($item));
+        }
+        else {
+            CORE::push(@acc, $prev = $item);
+        }
+    }
+
+    bless \@acc, ref($self);
+}
+
+*acc = \&accumulate;
+
+sub differences {
+    my ($self, $n) = @_;
+
+    if (defined($n)) {
+        $n = CORE::int($n);
+    }
+    else {
+        $n = 1;
+    }
+
+    my @diffs = @$self;
+
+    foreach my $i (1 .. $n) {
+        my @tmp;
+        my $prev = shift(@diffs);
+
+        while (@diffs) {
+            my $curr = shift(@diffs);
+            CORE::push(@tmp, $curr->sub($prev));
+            $prev = $curr;
+        }
+        @diffs = @tmp;
+    }
+
+    bless \@diffs, ref($self);
+}
+
+*deltas          = \&differences;
+*diffs           = \&differences;
+*nth_differences = \&differences;
+
+sub solve_seq {
+    my ($self, $offset) = @_;
+
+    $offset //= Sidef::Types::Number::Number::ZERO;
+
+    my $poly    = Sidef::Types::Number::Polynomial->new();
+    my $x       = Sidef::Types::Number::Polynomial->new(1 => Sidef::Types::Number::Number::ONE)->sub($offset);
+    my $is_zero = Sidef::Types::Block::Block->new(code => sub { $_[0]->is_zero });
+
+    @$self || return $poly;
+
+    for (my $k = 0 ; ; ++$k) {
+        $poly = $poly->add($x->binomial(Sidef::Types::Number::Number::_set_int($k))->mul($self->[0]));
+        $self = $self->differences;
+        last if $self->all($is_zero);
+    }
+
+    $poly;
+}
+
+sub solve_rec_seq {
+    my ($self) = @_;
+
+    # Reference:
+    #   https://yewtu.be/watch?v=NO1_-qptr6c
+
+    my $x = Sidef::Types::Number::Polynomial->new(Sidef::Types::Number::Number::ONE);
+
+    my @seq = @$self;
+    my @A   = (Sidef::Types::Number::Number::ONE) x scalar(@seq);
+    my @B   = map { $seq[$_ + 1]->sub($x->mul($seq[$_])) } 0 .. $#seq - 1;
+
+    for (; ;) {
+
+        my @C;
+        my $all_zero = 1;
+
+        foreach my $i (1 .. $#B - 1) {
+
+            $A[$i]     // next;
+            $B[$i]     // next;
+            $B[$i + 1] // next;
+            $B[$i - 1] // next;
+
+            if ($A[$i]->is_zero) {    # division by zero
+                next;
+            }
+
+            my $entry = $B[$i - 1]->mul($B[$i + 1])->sub($B[$i]->sqr)->div($A[$i]->neg);
+
+            if ($entry->is_nan) {
+                next;
+            }
+
+            if ($all_zero) {
+                $entry->is_zero or do {
+                    $all_zero = 0;
                 }
+            }
 
-                $ok && return (Sidef::Types::Bool::Bool::TRUE);
+            $C[$i - 1] = $entry;
+        }
+
+        if ($all_zero) {
+            my $poly = (grep { defined($_) && ref($_) eq 'Sidef::Types::Number::Polynomial' } @B)[0];
+
+            if (!defined($poly)) {
+                return Sidef::Types::Array::Array->new;
+            }
+
+            my $degree = CORE::int($poly->degree);
+
+            my @cf = @{$poly->coeffs};
+            my $d  = (CORE::pop(@cf) // [0, Sidef::Types::Number::Number::ZERO])->[1];
+            my $fc = Sidef::Types::Number::Polynomial->new(map { @$_ } @cf)->div($d->neg)->coeffs;
+
+            my %lookup = (map { @$_ } @$fc);
+            return Sidef::Types::Array::Array->new([map { $lookup{$_} // Sidef::Types::Number::Number::ZERO } CORE::reverse(0 .. $degree - 1)]);
+        }
+
+        @A = @B;
+        @B = @C;
+
+        CORE::pop(@A);
+        CORE::shift(@A);
+    }
+}
+
+*find_linear_recurrence = \&solve_rec_seq;
+
+sub binsplit {
+    my ($self, $block) = @_;
+    Sidef::Types::Number::Number::_binsplit([@$self], $block);
+}
+
+sub reduce {
+    my ($self, $obj, $initial) = @_;
+
+    if (ref($obj) eq 'Sidef::Types::Block::Block') {
+
+        my ($from, $x) = (
+                          defined($initial)
+                          ? (0, $initial)
+                          : (1, $self->[0])
+                         );
+
+        foreach my $i ($from .. $#$self) {
+            $x = $obj->run($x, $self->[$i]);
+        }
+
+        return $x;
+    }
+
+    $self->reduce_operator("$obj", $initial);
+}
+
+*inject = \&reduce;
+
+sub map_reduce {
+    my ($self, $obj, $initial) = @_;
+
+    my ($from, $x) = (
+                      defined($initial)
+                      ? (0, $initial)
+                      : (1, $self->[0])
+                     );
+
+    my @list = ($x);
+    foreach my $i ($from .. $#$self) {
+        $x = $obj->run($x, $self->[$i]);
+        CORE::push(@list, $x);
+    }
+
+    bless \@list, ref($self);
+}
+
+*reduce_map = \&map_reduce;
+
+sub length {
+    Sidef::Types::Number::Number::_set_int(scalar @{$_[0]});
+}
+
+*len  = \&length;    # alias
+*size = \&length;
+
+sub end {
+    Sidef::Types::Number::Number::_set_int($#{$_[0]});
+}
+
+*offset = \&end;
+
+sub resize {
+    my ($self, $num) = @_;
+    $#$self = $num;
+    $self;
+}
+
+*resize_to = \&resize;
+
+sub pick {
+    my ($self, $amount) = @_;
+
+    if (defined $amount) {
+        $amount = CORE::int($amount);
+
+        my $len = @$self;
+        if ($amount >= $len) {
+            return bless([List::Util::shuffle(@$self)], ref($self));
+        }
+
+        my @result;
+        for (my ($i, $amount_left) = (0, $len) ; $amount > 0 ; ++$i, --$amount_left) {
+            my $rand = CORE::int(CORE::rand($amount_left));
+            if ($rand < $amount) {
+                CORE::push(@result, $self->[$i]);
+                $amount--;
             }
         }
 
-        (Sidef::Types::Bool::Bool::FALSE);
+        return bless([List::Util::shuffle(@result)], ref($self));
     }
 
-    *has      = \&contains;
-    *contain  = \&contains;
-    *include  = \&contains;
-    *includes = \&contains;
+    $self->[CORE::rand(scalar @$self)];
+}
 
-    sub contains_type {
-        my ($self, $obj) = @_;
+sub rand {
+    my ($self, $amount) = @_;
 
-        my $ref = ref($obj);
+    if (defined $amount) {
+        $amount = CORE::int($amount);
 
+        my $len = @$self;
+        return (
+                $len > 0
+                ? bless([map { $self->[CORE::rand($len)] } 1 .. $amount], ref($self))
+                : bless([],                                               ref($self))
+               );
+    }
+
+    $self->[CORE::rand(scalar @$self)];
+}
+
+*sample = \&rand;
+
+sub range {
+    my ($self) = @_;
+    Sidef::Types::Range::RangeNumber->new(Sidef::Types::Number::Number::ZERO,
+                                          Sidef::Types::Number::Number::_set_int($#$self),
+                                          Sidef::Types::Number::Number::ONE,
+                                         );
+}
+
+sub indices_by {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my @indices;
+    foreach my $i (0 .. $#$self) {
+        if ($block->run($self->[$i])) {
+            CORE::push(@indices, Sidef::Types::Number::Number::_set_int($i));
+        }
+    }
+
+    bless \@indices;
+}
+
+*keys_by = \&indices_by;
+
+sub indices_of {
+    my ($self, $arg) = @_;
+
+    my @indices;
+    foreach my $i (0 .. $#$self) {
+        if ($self->[$i] eq $arg) {
+            CORE::push(@indices, Sidef::Types::Number::Number::_set_int($i));
+        }
+    }
+
+    bless \@indices;
+}
+
+*keys_of = \&indices_of;
+
+sub indices {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &indices_by;
+    }
+
+    bless [map { Sidef::Types::Number::Number::_set_int($_) } 0 .. $#$self];
+}
+
+*keys = \&indices;
+
+sub pairs {
+    my ($self) = @_;
+    bless [map { Sidef::Types::Array::Pair->new(Sidef::Types::Number::Number::_set_int($_), $self->[$_]) } 0 .. $#$self];
+}
+
+*kv          = \&pairs;
+*zip_indices = \&pairs;
+
+sub insert {
+    my ($self, $i, @objects) = @_;
+
+    $i = CORE::int($i);
+
+    if ($#$self < $i) {
+        $#$self = $i - 1;
+    }
+
+    CORE::splice(@$self, $i, 0, @objects);
+    $self;
+}
+
+sub binsert {
+    my ($self, $obj) = @_;
+
+    my $left  = 0;
+    my $right = $#$self;
+    my ($middle, $item, $cmp);
+
+    if ($right < 0) {
+        CORE::push(@$self, $obj);
+        return $self;
+    }
+
+    while (1) {
+        $middle = (($right + $left) >> 1);
+        $item   = $self->[$middle];
+        $cmp    = CORE::int($item cmp $obj) || last;
+
+        if ($cmp < 0) {
+            $left = $middle + 1;
+            if ($left > $right) {
+                ++$middle;
+                last;
+            }
+        }
+        else {
+            $right = $middle - 1;
+            $left > $right && last;
+        }
+    }
+
+    CORE::splice(@$self, $middle, 0, $obj);
+    $self;
+}
+
+sub compact {
+    my ($self) = @_;
+    bless [grep { defined($_) } @$self], ref($self);
+}
+
+sub unique {
+    my ($self, $block) = @_;
+
+    if (defined($block)) {
+        return $self->uniq_by($block);
+    }
+
+    my @sorted = do {
+
+        my @arr;
+        my $numeric = 1;
+
+        foreach my $i (0 .. $#$self) {
+
+            CORE::push(@arr, [$i, $self->[$i]]);
+
+            if ($numeric and (ref($self->[$i]) ne 'Sidef::Types::Number::Number' or ref(${$self->[$i]}) eq 'Math::MPC')) {
+                $numeric = 0;
+            }
+        }
+
+        if ($numeric) {
+            return $self->iuniq;
+        }
+
+        CORE::sort { $a->[1] cmp $b->[1] } @arr;
+    };
+
+    my @unique;
+    my $max = $#sorted;
+
+    for (my $i = 0 ; $i <= $max ; $i++) {
+        $unique[$sorted[$i][0]] = $sorted[$i][1];
+        ++$i while ($i < $max and $sorted[$i][1] eq $sorted[$i + 1][1]);
+    }
+
+    bless [grep { defined($_) } @unique], ref($self);
+}
+
+*uniq     = \&unique;
+*distinct = \&unique;
+
+sub iuniq {
+    my ($self) = @_;
+
+    my @sorted = do {
+        my @arr;
+        foreach my $i (0 .. $#$self) {
+            CORE::push(@arr, [$i, $self->[$i], ${$self->[$i]}]);
+        }
+        CORE::sort { $a->[2] <=> $b->[2] } @arr;
+    };
+
+    my @unique;
+    my $max = $#sorted;
+
+    for (my $i = 0 ; $i <= $max ; $i++) {
+        $unique[$sorted[$i][0]] = $sorted[$i][1];
+        ++$i while ($i < $max and $sorted[$i][2] == $sorted[$i + 1][2]);
+    }
+
+    bless [grep { defined($_) } @unique], ref($self);
+}
+
+sub last_unique {
+    my ($self) = @_;
+
+    my @sorted = do {
+        my @arr;
+        foreach my $i (0 .. $#$self) {
+            CORE::push(@arr, [$i, $self->[$i]]);
+        }
+        CORE::sort { $a->[1] cmp $b->[1] } @arr;
+    };
+
+    my @unique;
+    my $max = $#sorted;
+
+    for (my $i = 0 ; $i <= $max ; $i++) {
+        ++$i while ($i < $max and $sorted[$i][1] eq $sorted[$i + 1][1]);
+        $unique[$sorted[$i][0]] = $sorted[$i][1];
+    }
+
+    bless [grep { defined($_) } @unique], ref($self);
+}
+
+*last_uniq = \&last_unique;
+
+sub uniq_by {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my @sorted = do {
+        my @arr;
+        my $i = -1;
         foreach my $item (@$self) {
-            if (ref($item) eq $ref || UNIVERSAL::isa($item, $ref)) {
+            CORE::push(@arr, [++$i, $item, scalar $block->run($item)]);
+        }
+        CORE::sort { $a->[2] cmp $b->[2] } @arr;
+    };
+
+    my @unique;
+    my $max = $#sorted;
+
+    for (my $i = 0 ; $i <= $max ; $i++) {
+        $unique[$sorted[$i][0]] = $sorted[$i][1];
+        ++$i while ($i < $max and $sorted[$i][2] eq $sorted[$i + 1][2]);
+    }
+
+    bless [grep { defined } @unique], ref($self);
+}
+
+*unique_by = \&uniq_by;
+
+sub last_uniq_by {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my @sorted = do {
+        my @arr;
+        my $i = -1;
+        foreach my $item (@$self) {
+            CORE::push(@arr, [++$i, $item, scalar $block->run($item)]);
+        }
+        CORE::sort { $a->[2] cmp $b->[2] } @arr;
+    };
+
+    my @unique;
+    my $max = $#sorted;
+
+    for (my $i = 0 ; $i <= $max ; $i++) {
+        ++$i while ($i < $max and $sorted[$i][2] eq $sorted[$i + 1][2]);
+        $unique[$sorted[$i][0]] = $sorted[$i][1];
+    }
+
+    bless [grep { defined } @unique], ref($self);
+}
+
+*last_unique_by = \&last_uniq_by;
+
+sub abbrev {
+    my ($self, $pattern) = @_;
+
+    if (defined($pattern)) {
+        if (ref($pattern) eq 'Sidef::Types::Regex::Regex') {
+            $pattern = $pattern->get_value;
+        }
+        else {
+            $pattern = qr/\Q$pattern\E/;
+        }
+    }
+
+    my (%seen, %table);
+    foreach my $item (@$self) {
+        my $word   = "$item";
+        my $length = CORE::length($word) || next;
+
+        for (my $len = $length ; $len >= 1 ; --$len) {
+            my $abbrev = substr($word, 0, $len);
+
+            if (defined($pattern)) {
+                ($abbrev =~ $pattern) || next;
+            }
+
+            my $count = ++$seen{$abbrev};
+
+            if ($count == 1) {
+                $table{$abbrev} = $item;
+            }
+            elsif ($count == 2) {
+                CORE::delete($table{$abbrev});
+            }
+            else {
+                last;
+            }
+        }
+    }
+
+    foreach my $item (@$self) {
+        my $word = "$item";
+
+        if (defined($pattern)) {
+            ($word =~ $pattern) || next;
+        }
+
+        $table{$word} = $item;
+    }
+
+    Sidef::Types::Hash::Hash->new(\%table);
+}
+
+*abbreviations = \&abbrev;
+
+sub uniq_prefs {
+    my ($self, $block) = @_;
+
+    my $tail     = {};                # some unique value
+    my $callback = defined($block);
+
+    my %table;
+    foreach my $sub_array (@$self) {
+        my $ref = \%table;
+        foreach my $item (@$sub_array) {
+            $ref = $ref->{$item} //= {};
+        }
+        $ref->{$tail} = $sub_array;
+    }
+
+    my @abbrev;
+    sub {
+        my ($hash) = @_;
+
+        foreach my $key (my @keys = CORE::sort(keys(%{$hash}))) {
+            next if $key eq $tail;
+            __SUB__->($hash->{$key});
+
+            if ($#keys > 0) {
+                my $count = 0;
+                my $ref   = delete $hash->{$key};
+                while (my ($key) = CORE::each %{$ref}) {
+                    if ($key eq $tail) {
+
+                        if ($callback) {
+                            $block->run(@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]);
+                        }
+                        else {
+                            CORE::push(@abbrev, bless([@{$ref->{$key}}[0 .. $#{$ref->{$key}} - $count]]));
+                        }
+
+                        last;
+                    }
+                    $ref = $ref->{$key};
+                    $count++;
+                }
+            }
+        }
+      }
+      ->(\%table);
+
+    bless \@abbrev;
+}
+
+*unique_prefixes = \&uniq_prefs;
+
+sub contains {
+    my ($self, $obj, @extra) = @_;
+
+    if (ref($obj) eq 'Sidef::Types::Block::Block') {
+        foreach my $item (@$self) {
+            if ($obj->run($item)) {
                 return (Sidef::Types::Bool::Bool::TRUE);
             }
         }
@@ -3367,297 +3323,279 @@ package Sidef::Types::Array::Array {
         return (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    sub contains_any {
-        my ($self, $array) = @_;
+    my $end = $#$self;
 
-        if (ref($array) ne __PACKAGE__) {
-            $array = $array->to_a;
-        }
+    foreach my $i (0 .. $end) {
+        if ($self->[$i] eq $obj) {
 
-        foreach my $item (@$array) {
-            if ($self->contains($item)) {
-                return (Sidef::Types::Bool::Bool::TRUE);
-            }
-        }
+            my $ok = 1;
+            my $j  = $i;
 
-        (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub contains_all {
-        my ($self, $array) = @_;
-
-        if (ref($array) ne __PACKAGE__) {
-            $array = $array->to_a;
-        }
-
-        foreach my $item (@$array) {
-            unless ($self->contains($item)) {
-                return (Sidef::Types::Bool::Bool::FALSE);
-            }
-        }
-
-        (Sidef::Types::Bool::Bool::TRUE);
-    }
-
-    sub shift {
-        my ($self, $num) = @_;
-
-        if (defined $num) {
-            return bless([CORE::splice(@$self, 0, $num)], ref($self));
-        }
-
-        shift(@$self);
-    }
-
-    *drop_first = \&shift;
-    *drop_left  = \&shift;
-
-    sub shift_while {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        while (@$self and $block->run($self->[0])) {
-            CORE::shift(@$self);
-        }
-
-        $self;
-    }
-
-    sub pop {
-        my ($self, $num) = @_;
-
-        if (defined $num) {
-            $num = CORE::int($num);
-            $num = $num > $#$self ? 0 : @$self - $num;
-            return bless([CORE::splice(@$self, $num)], ref($self));
-        }
-
-        pop(@$self);
-    }
-
-    *drop_last  = \&pop;
-    *drop_right = \&pop;
-
-    sub pop_while {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        while (@$self and $block->run($self->[-1])) {
-            CORE::pop(@$self);
-        }
-
-        $self;
-    }
-
-    sub pop_rand {
-        my ($self) = @_;
-        $#$self > -1 || return undef;
-        CORE::splice(@$self, CORE::rand(scalar @$self), 1);
-    }
-
-    sub delete_index {
-        my ($self, $offset) = @_;
-        CORE::splice(@$self, $offset, 1);
-    }
-
-    *pop_at    = \&delete_index;
-    *delete_at = \&delete_index;
-
-    sub splice {
-        my ($self, $offset, $length, @objects) = @_;
-
-        $offset = defined($offset) ? CORE::int($offset) : 0;
-        $length = defined($length) ? CORE::int($length) : scalar(@$self);
-
-        bless [CORE::splice(@$self, $offset, $length, @objects)], ref($self);
-    }
-
-    sub take_right {
-        my ($self, $amount) = @_;
-
-        my $end = $#$self;
-        $amount = CORE::int($amount);
-        $amount = $end > ($amount - 1) ? $amount - 1 : $end;
-
-        bless [@$self[$end - $amount .. $end]], ref($self);
-    }
-
-    sub take_left {
-        my ($self, $amount) = @_;
-
-        my $end = $#$self;
-        $amount = CORE::int($amount);
-        $amount = $end > ($amount - 1) ? $amount - 1 : $end;
-
-        bless [@$self[0 .. $amount]], ref($self);
-    }
-
-    sub is_empty {
-        my ($self) = @_;
-        ($#$self < 0)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub clear {
-        my ($self) = @_;
-        @$self = ();
-        $self;
-    }
-
-    sub sort {
-        my ($self, $block) = @_;
-
-        if (defined $block) {
-            return bless [CORE::sort { scalar $block->run($a, $b) } @$self], ref($self);
-        }
-
-        my $numeric = 1;
-
-        foreach my $item (@$self) {
-            if (ref($item) ne 'Sidef::Types::Number::Number' or ref($$item) eq 'Math::MPC') {
-                $numeric = 0;
-                last;
-            }
-        }
-
-        if ($numeric) {
-            return $self->isort;
-        }
-
-        bless [CORE::sort { $a cmp $b } @$self], ref($self);
-    }
-
-    sub isort {
-        my ($self) = @_;
-        bless [CORE::sort { $$a <=> $$b } @$self], ref($self);
-    }
-
-    sub sort_by {
-        my ($self, $block) = @_;
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-        my @keys = map { scalar $block->run($_) } @$self;
-        bless [@{$self}[CORE::sort { $keys[$a] cmp $keys[$b] } 0 .. $#$self]], ref($self);
-    }
-
-    sub isort_by {
-        my ($self, $block) = @_;
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-        my @keys = map { ${$block->run($_)} } @$self;
-        bless [@{$self}[CORE::sort { $keys[$a] <=> $keys[$b] } 0 .. $#$self]], ref($self);
-    }
-
-    foreach my $name (
-                      qw(
-                      derangements
-                      permutations
-                      circular_permutations
-                      )
-      ) {
-
-        no strict 'refs';
-
-        *{__PACKAGE__ . '::' . $name} = sub {
-            my ($self, $block) = @_;
-
-            require Algorithm::Combinatorics;
-            my $iter = &{'Algorithm::Combinatorics::' . $name}([@$self]);
-
-            if (defined($block)) {
-                while (defined(my $arr = $iter->next)) {
-                    $block->run(@$arr);
+            foreach my $obj (@extra) {
+                if (++$j <= $end and $self->[$j] eq $obj) {
+                    ## ok
                 }
-                return $self;
-            }
-
-            my @result;
-            while (defined(my $arr = $iter->next)) {
-                push @result, bless [@$arr];
-            }
-
-            bless \@result;
-        };
-    }
-
-    *complete_permutations = \&derangements;
-
-    foreach my $name (
-                      qw(
-                      variations
-                      variations_with_repetition
-                      combinations
-                      combinations_with_repetition
-                      subsets
-                      )
-      ) {
-
-        no strict 'refs';
-
-        *{__PACKAGE__ . '::' . $name} = sub {
-            my ($self, $k, $block) = @_;
-
-            require Algorithm::Combinatorics;
-
-            if (not defined($block) and ref($k) eq 'Sidef::Types::Block::Block') {
-                ($block, $k) = ($k, undef);
-            }
-
-            my $iter = do {
-                local $SIG{__WARN__} = sub { };
-                &{'Algorithm::Combinatorics::' . $name}([@$self], defined($k) ? CORE::int($k) : ());
-            };
-
-            if (defined($block)) {
-                while (defined(my $arr = $iter->next)) {
-                    $block->run(@$arr);
+                else {
+                    $ok = 0;
+                    last;
                 }
-                return $self;
             }
 
-            my @result;
-            while (defined(my $arr = $iter->next)) {
-                push @result, bless [@$arr];
-            }
-
-            bless \@result;
-        };
+            $ok && return (Sidef::Types::Bool::Bool::TRUE);
+        }
     }
 
-    *tuples                 = \&variations;
-    *tuples_with_repetition = \&variations_with_repetition;
+    (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub partitions {
-        my ($self, $k, $block) = @_;
+*has      = \&contains;
+*contain  = \&contains;
+*include  = \&contains;
+*includes = \&contains;
+
+sub contains_type {
+    my ($self, $obj) = @_;
+
+    my $ref = ref($obj);
+
+    foreach my $item (@$self) {
+        if (ref($item) eq $ref || UNIVERSAL::isa($item, $ref)) {
+            return (Sidef::Types::Bool::Bool::TRUE);
+        }
+    }
+
+    return (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub contains_any {
+    my ($self, $array) = @_;
+
+    if (ref($array) ne __PACKAGE__) {
+        $array = $array->to_a;
+    }
+
+    foreach my $item (@$array) {
+        if ($self->contains($item)) {
+            return (Sidef::Types::Bool::Bool::TRUE);
+        }
+    }
+
+    (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub contains_all {
+    my ($self, $array) = @_;
+
+    if (ref($array) ne __PACKAGE__) {
+        $array = $array->to_a;
+    }
+
+    foreach my $item (@$array) {
+        unless ($self->contains($item)) {
+            return (Sidef::Types::Bool::Bool::FALSE);
+        }
+    }
+
+    (Sidef::Types::Bool::Bool::TRUE);
+}
+
+sub shift {
+    my ($self, $num) = @_;
+
+    if (defined $num) {
+        return bless([CORE::splice(@$self, 0, $num)], ref($self));
+    }
+
+    shift(@$self);
+}
+
+*drop_first = \&shift;
+*drop_left  = \&shift;
+
+sub shift_while {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    while (@$self and $block->run($self->[0])) {
+        CORE::shift(@$self);
+    }
+
+    $self;
+}
+
+sub pop {
+    my ($self, $num) = @_;
+
+    if (defined $num) {
+        $num = CORE::int($num);
+        $num = $num > $#$self ? 0 : @$self - $num;
+        return bless([CORE::splice(@$self, $num)], ref($self));
+    }
+
+    pop(@$self);
+}
+
+*drop_last  = \&pop;
+*drop_right = \&pop;
+
+sub pop_while {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    while (@$self and $block->run($self->[-1])) {
+        CORE::pop(@$self);
+    }
+
+    $self;
+}
+
+sub pop_rand {
+    my ($self) = @_;
+    $#$self > -1 || return undef;
+    CORE::splice(@$self, CORE::rand(scalar @$self), 1);
+}
+
+sub delete_index {
+    my ($self, $offset) = @_;
+    CORE::splice(@$self, $offset, 1);
+}
+
+*pop_at    = \&delete_index;
+*delete_at = \&delete_index;
+
+sub splice {
+    my ($self, $offset, $length, @objects) = @_;
+
+    $offset = defined($offset) ? CORE::int($offset) : 0;
+    $length = defined($length) ? CORE::int($length) : scalar(@$self);
+
+    bless [CORE::splice(@$self, $offset, $length, @objects)], ref($self);
+}
+
+sub take_right {
+    my ($self, $amount) = @_;
+
+    my $end = $#$self;
+    $amount = CORE::int($amount);
+    $amount = $end > ($amount - 1) ? $amount - 1 : $end;
+
+    bless [@$self[$end - $amount .. $end]], ref($self);
+}
+
+sub take_left {
+    my ($self, $amount) = @_;
+
+    my $end = $#$self;
+    $amount = CORE::int($amount);
+    $amount = $end > ($amount - 1) ? $amount - 1 : $end;
+
+    bless [@$self[0 .. $amount]], ref($self);
+}
+
+sub is_empty {
+    my ($self) = @_;
+    ($#$self < 0)
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub clear {
+    my ($self) = @_;
+    @$self = ();
+    $self;
+}
+
+sub sort {
+    my ($self, $block) = @_;
+
+    if (defined $block) {
+        return bless [CORE::sort { scalar $block->run($a, $b) } @$self], ref($self);
+    }
+
+    my $numeric = 1;
+
+    foreach my $item (@$self) {
+        if (ref($item) ne 'Sidef::Types::Number::Number' or ref($$item) eq 'Math::MPC') {
+            $numeric = 0;
+            last;
+        }
+    }
+
+    if ($numeric) {
+        return $self->isort;
+    }
+
+    bless [CORE::sort { $a cmp $b } @$self], ref($self);
+}
+
+sub isort {
+    my ($self) = @_;
+    bless [CORE::sort { $$a <=> $$b } @$self], ref($self);
+}
+
+sub sort_by {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    my @keys = map { scalar $block->run($_) } @$self;
+    bless [@{$self}[CORE::sort { $keys[$a] cmp $keys[$b] } 0 .. $#$self]], ref($self);
+}
+
+sub isort_by {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    my @keys = map { ${$block->run($_)} } @$self;
+    bless [@{$self}[CORE::sort { $keys[$a] <=> $keys[$b] } 0 .. $#$self]], ref($self);
+}
+
+foreach my $name (
+                  qw(
+                  derangements
+                  permutations
+                  circular_permutations
+                  )
+  ) {
+
+    no strict 'refs';
+
+    *{__PACKAGE__ . '::' . $name} = sub {
+        my ($self, $block) = @_;
 
         require Algorithm::Combinatorics;
-
-        if (not defined($block) and ref($k) eq 'Sidef::Types::Block::Block') {
-            ($block, $k) = ($k, undef);
-        }
-
-        my $iter = do {
-            local $SIG{__WARN__} = sub { };
-            Algorithm::Combinatorics::partitions([@$self], defined($k) ? CORE::int($k) : ());
-        };
+        my $iter = &{'Algorithm::Combinatorics::' . $name}([@$self]);
 
         if (defined($block)) {
             while (defined(my $arr = $iter->next)) {
-                $block->run(map { bless $_ } @$arr);
+                $block->run(@$arr);
             }
             return $self;
         }
 
         my @result;
         while (defined(my $arr = $iter->next)) {
-            push @result, bless [map { bless $_ } @$arr];
+            push @result, bless [@$arr];
         }
 
         bless \@result;
-    }
+    };
+}
 
-    sub ordered_partitions {
+*complete_permutations = \&derangements;
+
+foreach my $name (
+                  qw(
+                  variations
+                  variations_with_repetition
+                  combinations
+                  combinations_with_repetition
+                  subsets
+                  )
+  ) {
+
+    no strict 'refs';
+
+    *{__PACKAGE__ . '::' . $name} = sub {
         my ($self, $k, $block) = @_;
 
         require Algorithm::Combinatorics;
@@ -3668,834 +3606,894 @@ package Sidef::Types::Array::Array {
 
         my $iter = do {
             local $SIG{__WARN__} = sub { };
-            Algorithm::Combinatorics::subsets([0 .. $#{$self} - 1], (defined($k) ? (CORE::int($k) - 1) : ()));
+            &{'Algorithm::Combinatorics::' . $name}([@$self], defined($k) ? CORE::int($k) : ());
         };
 
         if (defined($block)) {
-            while (defined(my $indices = $iter->next)) {
-                $block->run(@{$self->segment(@$indices)});
+            while (defined(my $arr = $iter->next)) {
+                $block->run(@$arr);
             }
             return $self;
         }
 
         my @result;
-        while (defined(my $indices = $iter->next)) {
-            push @result, $self->segment(@$indices);
+        while (defined(my $arr = $iter->next)) {
+            push @result, bless [@$arr];
         }
 
         bless \@result;
+    };
+}
+
+*tuples                 = \&variations;
+*tuples_with_repetition = \&variations_with_repetition;
+
+sub partitions {
+    my ($self, $k, $block) = @_;
+
+    require Algorithm::Combinatorics;
+
+    if (not defined($block) and ref($k) eq 'Sidef::Types::Block::Block') {
+        ($block, $k) = ($k, undef);
     }
 
-    sub nth_permutation {
-        my ($self, $n) = @_;
+    my $iter = do {
+        local $SIG{__WARN__} = sub { };
+        Algorithm::Combinatorics::partitions([@$self], defined($k) ? CORE::int($k) : ());
+    };
 
-        my @perm;
-        my @arr = @$self;
-
-        if (ref($n) ne 'Sidef::Types::Number::Number') {
-            $n = Sidef::Types::Number::Number->new($n);
+    if (defined($block)) {
+        while (defined(my $arr = $iter->next)) {
+            $block->run(map { bless $_ } @$arr);
         }
-
-        $n = $n->int;
-        $n = Sidef::Types::Number::Number::_any2mpz($$n) // return undef;
-
-        my $sgn = Math::GMPz::Rmpz_sgn($n);
-
-        if ($sgn < 0) {
-            Math::GMPz::Rmpz_neg($n, $n);
-            @arr = CORE::reverse(@arr);
-        }
-        elsif ($sgn == 0) {
-            return bless \@arr;
-        }
-
-        state $f = Math::GMPz::Rmpz_init_nobless();
-        state $q = Math::GMPz::Rmpz_init_nobless();
-
-        Math::GMPz::Rmpz_fac_ui($f, scalar(@arr));    # f = factorial(len)
-
-        while (my $len = scalar(@arr)) {
-            Math::GMPz::Rmpz_divexact_ui($f, $f, $len);    # f = f/len
-            Math::GMPz::Rmpz_divmod($q, $n, $n, $f);       # q = n//f ;; n = n%f
-            Math::GMPz::Rmpz_mod_ui($q, $q, $len);         # q = q%len
-            CORE::push(@perm, CORE::splice(@arr, Math::GMPz::Rmpz_get_ui($q), 1));
-        }
-
-        bless \@perm;
+        return $self;
     }
 
-    *nth_perm = \&nth_permutation;
-
-    sub random_permutation {
-        my ($self) = @_;
-        $self->nth_permutation($self->len->factorial->irand);
+    my @result;
+    while (defined(my $arr = $iter->next)) {
+        push @result, bless [map { bless $_ } @$arr];
     }
 
-    *rand_perm = \&random_permutation;
+    bless \@result;
+}
 
-    sub next_permutation {
-        my ($self) = @_;
+sub ordered_partitions {
+    my ($self, $k, $block) = @_;
 
-        my $k = $#$self;
-        return Sidef::Types::Bool::Bool::FALSE if ($k < 0);
+    require Algorithm::Combinatorics;
 
-        my $i = $k - 1;
-        while ($i >= 0 and $self->[$i]->ge($self->[$i + 1])) {
-            --$i;
-        }
-
-        if ($i == -1) {
-            @$self = CORE::reverse(@$self);
-            return Sidef::Types::Bool::Bool::FALSE;
-        }
-
-        if ($self->[$i + 1]->gt($self->[$k])) {
-            @{$self}[$i + 1 .. $k] = CORE::reverse(@{$self}[$i + 1 .. $k]);
-        }
-
-        my $j = $i + 1;
-        while ($self->[$i]->ge($self->[$j])) {
-            ++$j;
-        }
-        @{$self}[$i, $j] = @{$self}[$j, $i];
-        return Sidef::Types::Bool::Bool::TRUE;
+    if (not defined($block) and ref($k) eq 'Sidef::Types::Block::Block') {
+        ($block, $k) = ($k, undef);
     }
 
-    sub _unique_permutations {
-        my ($array, $callback) = @_;
+    my $iter = do {
+        local $SIG{__WARN__} = sub { };
+        Algorithm::Combinatorics::subsets([0 .. $#{$self} - 1], (defined($k) ? (CORE::int($k) - 1) : ()));
+    };
 
-        sub {
-            my ($items, $current_perm) = @_;
+    if (defined($block)) {
+        while (defined(my $indices = $iter->next)) {
+            $block->run(@{$self->segment(@$indices)});
+        }
+        return $self;
+    }
 
-            if (!@$items) {
-                $callback->($current_perm);
-                return;
+    my @result;
+    while (defined(my $indices = $iter->next)) {
+        push @result, $self->segment(@$indices);
+    }
+
+    bless \@result;
+}
+
+sub nth_permutation {
+    my ($self, $n) = @_;
+
+    my @perm;
+    my @arr = @$self;
+
+    if (ref($n) ne 'Sidef::Types::Number::Number') {
+        $n = Sidef::Types::Number::Number->new($n);
+    }
+
+    $n = $n->int;
+    $n = Sidef::Types::Number::Number::_any2mpz($$n) // return undef;
+
+    my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+    if ($sgn < 0) {
+        Math::GMPz::Rmpz_neg($n, $n);
+        @arr = CORE::reverse(@arr);
+    }
+    elsif ($sgn == 0) {
+        return bless \@arr;
+    }
+
+    state $f = Math::GMPz::Rmpz_init_nobless();
+    state $q = Math::GMPz::Rmpz_init_nobless();
+
+    Math::GMPz::Rmpz_fac_ui($f, scalar(@arr));    # f = factorial(len)
+
+    while (my $len = scalar(@arr)) {
+        Math::GMPz::Rmpz_divexact_ui($f, $f, $len);    # f = f/len
+        Math::GMPz::Rmpz_divmod($q, $n, $n, $f);       # q = n//f ;; n = n%f
+        Math::GMPz::Rmpz_mod_ui($q, $q, $len);         # q = q%len
+        CORE::push(@perm, CORE::splice(@arr, Math::GMPz::Rmpz_get_ui($q), 1));
+    }
+
+    bless \@perm;
+}
+
+*nth_perm = \&nth_permutation;
+
+sub random_permutation {
+    my ($self) = @_;
+    $self->nth_permutation($self->len->factorial->irand);
+}
+
+*rand_perm = \&random_permutation;
+
+sub next_permutation {
+    my ($self) = @_;
+
+    my $k = $#$self;
+    return Sidef::Types::Bool::Bool::FALSE if ($k < 0);
+
+    my $i = $k - 1;
+    while ($i >= 0 and $self->[$i]->ge($self->[$i + 1])) {
+        --$i;
+    }
+
+    if ($i == -1) {
+        @$self = CORE::reverse(@$self);
+        return Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    if ($self->[$i + 1]->gt($self->[$k])) {
+        @{$self}[$i + 1 .. $k] = CORE::reverse(@{$self}[$i + 1 .. $k]);
+    }
+
+    my $j = $i + 1;
+    while ($self->[$i]->ge($self->[$j])) {
+        ++$j;
+    }
+    @{$self}[$i, $j] = @{$self}[$j, $i];
+    return Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub _unique_permutations {
+    my ($array, $callback) = @_;
+
+    sub {
+        my ($items, $current_perm) = @_;
+
+        if (!@$items) {
+            $callback->($current_perm);
+            return;
+        }
+
+        my %level_seen;
+        for my $i (0 .. $#$items) {
+            my $item = $items->[$i];
+
+            # Skip iterations for duplicate elements in the same level
+            next if $level_seen{$item}++;
+
+            my @new_items = @$items;
+            CORE::splice(@new_items, $i, 1);
+
+            my @new_perm = (@$current_perm, $item);
+            __SUB__->(\@new_items, \@new_perm);
+        }
+      }
+      ->($array, []);
+}
+
+sub unique_permutations {
+    my ($self, $block) = @_;
+
+    my $vals = $self->sort;
+
+    if (!defined($block)) {
+        my @results;
+        _unique_permutations(
+            $vals,
+            sub {
+                my ($perm) = @_;
+                push @results, bless $perm;
             }
-
-            my %level_seen;
-            for my $i (0 .. $#$items) {
-                my $item = $items->[$i];
-
-                # Skip iterations for duplicate elements in the same level
-                next if $level_seen{$item}++;
-
-                my @new_items = @$items;
-                CORE::splice(@new_items, $i, 1);
-
-                my @new_perm = (@$current_perm, $item);
-                __SUB__->(\@new_items, \@new_perm);
-            }
-          }
-          ->($array, []);
+        );
+        return bless \@results;
     }
 
-    sub unique_permutations {
-        my ($self, $block) = @_;
-
-        my $vals = $self->sort;
-
-        if (!defined($block)) {
-            my @results;
-            _unique_permutations(
-                $vals,
-                sub {
-                    my ($perm) = @_;
-                    push @results, bless $perm;
-                }
-            );
-            return bless \@results;
-        }
-
-        my $break = 1;
-        foreach my $n (1, 2) {
-            if ($n == 1) {
-                $block->run(@$vals);
-            }
-            $break = 0;
-            last;
-        }
-
-        while (!$break and $vals->next_permutation) {
+    my $break = 1;
+    foreach my $n (1, 2) {
+        if ($n == 1) {
             $block->run(@$vals);
         }
-
-        $block;
+        $break = 0;
+        last;
     }
 
-    *uniq_permutations = \&unique_permutations;
-
-    sub perm2num {
-        my ($self) = @_;
-        Sidef::Types::Number::Number::_set_int(Math::Prime::Util::GMP::permtonum([map { CORE::int($_) } @$self]) // return undef);
+    while (!$break and $vals->next_permutation) {
+        $block->run(@$vals);
     }
 
-    sub det_bareiss {
-        my ($self) = @_;
-        $self->to_matrix->det_bareiss;
+    $block;
+}
+
+*uniq_permutations = \&unique_permutations;
+
+sub perm2num {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::_set_int(Math::Prime::Util::GMP::permtonum([map { CORE::int($_) } @$self]) // return undef);
+}
+
+sub det_bareiss {
+    my ($self) = @_;
+    $self->to_matrix->det_bareiss;
+}
+
+# Reduced row echelon form
+sub rref {
+    my ($self) = @_;
+    $self->to_matrix->rref;
+}
+
+*reduced_row_echelon_form = \&rref;
+
+sub gauss_jordan_invert {
+    my ($self) = @_;
+    $self->to_matrix->gauss_jordan_invert;
+}
+
+sub gauss_jordan_solve {
+    my ($self, $vector) = @_;
+    $self->to_matrix->gauss_jordan_solve($vector);
+}
+
+sub matrix_solve {
+    my ($self, $vector) = @_;
+    $self->to_matrix->solve($vector);
+}
+
+*msolve = \&matrix_solve;
+
+sub invert {
+    my ($self) = @_;
+    $self->to_matrix->invert;
+}
+
+*inv     = \&invert;
+*inverse = \&invert;
+
+sub determinant {
+    my ($self) = @_;
+    $self->to_matrix->det;
+}
+
+*det = \&determinant;
+
+sub matrix_add {
+    my ($m1, $m2) = @_;
+    $m1->wise_operator('+', $m2);
+}
+
+*madd = \&matrix_add;
+
+sub matrix_sub {
+    my ($m1, $m2) = @_;
+    $m1->wise_operator('-', $m2);
+}
+
+*msub = \&matrix_sub;
+
+sub matrix_mul {
+    my ($m1, $m2) = @_;
+    $m1->to_matrix->mul($m2);
+}
+
+*mmul = \&matrix_mul;
+
+sub matrix_div {
+    my ($m1, $m2) = @_;
+    $m1->matrix_mul($m2->to_matrix->inv);
+}
+
+*mdiv = \&matrix_div;
+
+sub scalar_add {
+    my ($self, $scalar) = @_;
+    $self->scalar_operator('+', $scalar);
+}
+
+*sadd = \&scalar_add;
+
+sub scalar_sub {
+    my ($self, $scalar) = @_;
+    $self->scalar_operator('-', $scalar);
+}
+
+*ssub = \&scalar_sub;
+
+sub scalar_mul {
+    my ($self, $scalar) = @_;
+    $self->scalar_operator('*', $scalar);
+}
+
+*smul = \&scalar_mul;
+
+sub scalar_div {
+    my ($self, $scalar) = @_;
+    $self->scalar_operator('/', $scalar);
+}
+
+*sdiv = \&scalar_div;
+
+sub matrix_pow {
+    my ($A, $pow) = @_;
+    $A->to_matrix->pow($pow);
+}
+
+*mpow = \&matrix_pow;
+
+sub _pipeline_op_call {
+    my ($obj, $callback) = @_;
+
+    my @args;
+
+    if (ref($callback) eq __PACKAGE__) {
+        @args     = @$callback;
+        $callback = CORE::shift(@args);
     }
 
-    # Reduced row echelon form
-    sub rref {
-        my ($self) = @_;
-        $self->to_matrix->rref;
+    if (ref($callback) eq 'Sidef::Types::Block::Block') {
+        return $callback->call($obj, @args);
+    }
+    elsif (ref($callback) eq 'Sidef::Types::String::String') {
+        return $obj->$$callback(@args);
     }
 
-    *reduced_row_echelon_form = \&rref;
+    die "[ERROR] Invalid callback object: expected Block or String, but got <<", ref($callback), ">>";
+}
 
-    sub gauss_jordan_invert {
-        my ($self) = @_;
-        $self->to_matrix->gauss_jordan_invert;
-    }
+sub pipeline_cross_op {
+    my ($self, @callbacks) = @_;
 
-    sub gauss_jordan_solve {
-        my ($self, $vector) = @_;
-        $self->to_matrix->gauss_jordan_solve($vector);
-    }
-
-    sub matrix_solve {
-        my ($self, $vector) = @_;
-        $self->to_matrix->solve($vector);
-    }
-
-    *msolve = \&matrix_solve;
-
-    sub invert {
-        my ($self) = @_;
-        $self->to_matrix->invert;
-    }
-
-    *inv     = \&invert;
-    *inverse = \&invert;
-
-    sub determinant {
-        my ($self) = @_;
-        $self->to_matrix->det;
-    }
-
-    *det = \&determinant;
-
-    sub matrix_add {
-        my ($m1, $m2) = @_;
-        $m1->wise_operator('+', $m2);
-    }
-
-    *madd = \&matrix_add;
-
-    sub matrix_sub {
-        my ($m1, $m2) = @_;
-        $m1->wise_operator('-', $m2);
-    }
-
-    *msub = \&matrix_sub;
-
-    sub matrix_mul {
-        my ($m1, $m2) = @_;
-        $m1->to_matrix->mul($m2);
-    }
-
-    *mmul = \&matrix_mul;
-
-    sub matrix_div {
-        my ($m1, $m2) = @_;
-        $m1->matrix_mul($m2->to_matrix->inv);
-    }
-
-    *mdiv = \&matrix_div;
-
-    sub scalar_add {
-        my ($self, $scalar) = @_;
-        $self->scalar_operator('+', $scalar);
-    }
-
-    *sadd = \&scalar_add;
-
-    sub scalar_sub {
-        my ($self, $scalar) = @_;
-        $self->scalar_operator('-', $scalar);
-    }
-
-    *ssub = \&scalar_sub;
-
-    sub scalar_mul {
-        my ($self, $scalar) = @_;
-        $self->scalar_operator('*', $scalar);
-    }
-
-    *smul = \&scalar_mul;
-
-    sub scalar_div {
-        my ($self, $scalar) = @_;
-        $self->scalar_operator('/', $scalar);
-    }
-
-    *sdiv = \&scalar_div;
-
-    sub matrix_pow {
-        my ($A, $pow) = @_;
-        $A->to_matrix->pow($pow);
-    }
-
-    *mpow = \&matrix_pow;
-
-    sub _pipeline_op_call {
-        my ($obj, $callback) = @_;
-
-        my @args;
-
-        if (ref($callback) eq __PACKAGE__) {
-            @args     = @$callback;
-            $callback = CORE::shift(@args);
-        }
-
-        if (ref($callback) eq 'Sidef::Types::Block::Block') {
-            return $callback->call($obj, @args);
-        }
-        elsif (ref($callback) eq 'Sidef::Types::String::String') {
-            return $obj->$$callback(@args);
-        }
-
-        die "[ERROR] Invalid callback object: expected Block or String, but got <<", ref($callback), ">>";
-    }
-
-    sub pipeline_cross_op {
-        my ($self, @callbacks) = @_;
-
-        my @list;
-        foreach my $item (@$self) {
-            foreach my $callback (@callbacks) {
-                push @list, _pipeline_op_call($item, $callback);
-            }
-        }
-
-        bless \@list, ref($self);
-    }
-
-    sub pipeline_map_op {
-        my ($self, $callback, @args) = @_;
-
-        if (@args) {
-            $callback = bless [$callback, @args];
-        }
-
-        my @list;
-
-        foreach my $item (@$self) {
+    my @list;
+    foreach my $item (@$self) {
+        foreach my $callback (@callbacks) {
             push @list, _pipeline_op_call($item, $callback);
         }
-
-        bless \@list, ref($self);
     }
 
-    sub pipeline_zip_op {
-        my ($self, @callbacks) = @_;
+    bless \@list, ref($self);
+}
 
-        my $argc = scalar(@callbacks);
-        my @copy = @$self;
+sub pipeline_map_op {
+    my ($self, $callback, @args) = @_;
 
-        my @list;
-
-        while (1) {
-
-            (my @tmp = CORE::splice(@copy, 0, $argc)) == $argc or last;
-
-            for my $i (0 .. $argc - 1) {
-                push @list, _pipeline_op_call($tmp[$i], $callbacks[$i]);
-            }
-        }
-
-        bless \@list, ref($self);
+    if (@args) {
+        $callback = bless [$callback, @args];
     }
 
-    sub cartesian {
-        my ($self, $block) = @_;
+    my @list;
 
-        if (!defined($block) and Sidef::Types::Number::Number::HAS_PRIME_UTIL) {
-            my @result;
+    foreach my $item (@$self) {
+        push @list, _pipeline_op_call($item, $callback);
+    }
 
-            Math::Prime::Util::forsetproduct(
-                sub {
-                    push @result, bless [@_];    # don't bless \@_
-                },
-                map { [@$_] } @$self
-            );
+    bless \@list, ref($self);
+}
 
-            return bless \@result;
+sub pipeline_zip_op {
+    my ($self, @callbacks) = @_;
+
+    my $argc = scalar(@callbacks);
+    my @copy = @$self;
+
+    my @list;
+
+    while (1) {
+
+        (my @tmp = CORE::splice(@copy, 0, $argc)) == $argc or last;
+
+        for my $i (0 .. $argc - 1) {
+            push @list, _pipeline_op_call($tmp[$i], $callbacks[$i]);
         }
+    }
 
-        require Algorithm::Loops;
+    bless \@list, ref($self);
+}
 
-        my $iter = Algorithm::Loops::NestedLoops([map { [@$_] } @$self]);
+sub cartesian {
+    my ($self, $block) = @_;
+
+    if (!defined($block) and Sidef::Types::Number::Number::HAS_PRIME_UTIL) {
+        my @result;
+
+        Math::Prime::Util::forsetproduct(
+            sub {
+                push @result, bless [@_];    # don't bless \@_
+            },
+            map { [@$_] } @$self
+        );
+
+        return bless \@result;
+    }
+
+    require Algorithm::Loops;
+
+    my $iter = Algorithm::Loops::NestedLoops([map { [@$_] } @$self]);
+
+    if (defined($block)) {
+        while (my @arr = $iter->()) {
+            $block->run(@arr);
+        }
+        return $self;
+    }
+
+    my @result;
+    while (my @arr = $iter->()) {
+        push @result, bless \@arr;
+    }
+    bless \@result;
+}
+
+sub zip {
+    my ($self, $block) = @_;
+
+    my @arrays = @$self;
+    my $min    = List::Util::min(map { scalar @$_ } @arrays);
+
+    my @new_array;
+    foreach my $i (0 .. $min - 1) {
+
+        my @tmp = (map { $_->[$i] } @arrays);
 
         if (defined($block)) {
-            while (my @arr = $iter->()) {
-                $block->run(@arr);
-            }
-            return $self;
+            $block->run(@tmp);
+        }
+        else {
+            CORE::push(@new_array, bless \@tmp);
+        }
+    }
+
+    defined($block) ? $self : bless \@new_array;
+}
+
+*transpose = \&zip;
+
+sub zip_by {
+    my ($self, $block) = @_;
+
+    $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+
+    my @arrays = @$self;
+    my $min    = List::Util::min(map { scalar @$_ } @arrays);
+
+    my @new_array;
+    foreach my $i (0 .. $min - 1) {
+        CORE::push(@new_array, $block->run(map { $_->[$i] } @arrays));
+    }
+
+    bless \@new_array;
+}
+
+sub unzip_by {
+    my ($self, $block) = @_;
+
+    my @matrix;
+    foreach my $i (0 .. $#$self) {
+
+        my @tmp = $block->run($self->[$i]);
+
+        if (@tmp < @matrix) {
+            $#tmp = $#matrix;
         }
 
-        my @result;
-        while (my @arr = $iter->()) {
-            push @result, bless \@arr;
+        foreach my $j (0 .. $#tmp) {
+            $matrix[$j][$i] = $tmp[$j];
         }
-        bless \@result;
     }
 
-    sub zip {
-        my ($self, $block) = @_;
+    bless $_ for @matrix;
+    bless \@matrix;
+}
 
-        my @arrays = @$self;
-        my $min    = List::Util::min(map { scalar @$_ } @arrays);
+sub pack {
+    my ($self, $format) = @_;
+    Sidef::Types::String::String->new(CORE::pack("$format", @$self));
+}
 
-        my @new_array;
-        foreach my $i (0 .. $min - 1) {
+sub push {
+    my ($self, @args) = @_;
+    CORE::push(@$self, @args);
+    $self;
+}
 
-            my @tmp = (map { $_->[$i] } @arrays);
+*append = \&push;
 
-            if (defined($block)) {
-                $block->run(@tmp);
-            }
-            else {
-                CORE::push(@new_array, bless \@tmp);
-            }
+sub unshift {
+    my ($self, @args) = @_;
+    CORE::unshift(@$self, @args);
+    $self;
+}
+
+*prepend = \&unshift;
+
+sub rotate {
+    my ($self, $num) = @_;
+
+    my $len = $#$self + 1;
+    return bless([]) if $len == 0;
+    $num = CORE::int($num) % $len;
+    return bless([@$self], ref($self)) if $num == 0;
+
+    my @array = @$self;
+    CORE::unshift(@array, CORE::splice(@array, $num));
+    bless \@array, ref($self);
+}
+
+sub join {
+    my ($self, $delim, $block) = @_;
+    $delim = defined($delim) ? "$delim" : '';
+
+    if (defined $block) {
+        return Sidef::Types::String::String->new(CORE::join($delim, map { scalar $block->run($_) } @$self));
+    }
+
+    Sidef::Types::String::String->new(CORE::join($delim, @$self));
+}
+
+sub join_bytes {
+    my ($self, $encoding) = @_;
+    state $x = require Encode;
+    $encoding = defined($encoding) ? "$encoding" : 'UTF-8';
+    Sidef::Types::String::String->new(eval { Encode::decode($encoding, CORE::pack('C*', @$self)) } // return);
+}
+
+*chrs   = \&join_bytes;
+*decode = \&join_bytes;
+
+sub join_insert {
+    my ($self, $obj) = @_;
+
+    my @array;
+    foreach my $item (@$self) {
+        CORE::push(@array, $item, $obj);
+    }
+
+    CORE::pop(@array);
+    bless \@array;
+}
+
+sub reverse {
+    my ($self) = @_;
+    bless [CORE::reverse @$self], ref($self);
+}
+
+*flip = \&reverse;
+
+sub delete_first {
+    my ($self, $obj) = @_;
+
+    foreach my $i (0 .. $#$self) {
+        if ($self->[$i] eq $obj) {
+            CORE::splice(@$self, $i, 1);
+            return (Sidef::Types::Bool::Bool::TRUE);
         }
-
-        defined($block) ? $self : bless \@new_array;
     }
 
-    *transpose = \&zip;
+    (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub zip_by {
-        my ($self, $block) = @_;
+*remove_first = \&delete_first;
 
-        $block //= Sidef::Types::Block::Block::ARRAY_IDENTITY;
+sub delete_last {
+    my ($self, $obj) = @_;
 
-        my @arrays = @$self;
-        my $min    = List::Util::min(map { scalar @$_ } @arrays);
-
-        my @new_array;
-        foreach my $i (0 .. $min - 1) {
-            CORE::push(@new_array, $block->run(map { $_->[$i] } @arrays));
+    for (my $i = $#$self ; $i >= 0 ; $i--) {
+        if ($self->[$i] eq $obj) {
+            CORE::splice(@$self, $i, 1);
+            return (Sidef::Types::Bool::Bool::TRUE);
         }
-
-        bless \@new_array;
     }
 
-    sub unzip_by {
-        my ($self, $block) = @_;
+    (Sidef::Types::Bool::Bool::FALSE);
+}
 
-        my @matrix;
-        foreach my $i (0 .. $#$self) {
+*remove_last = \&delete_last;
 
-            my @tmp = $block->run($self->[$i]);
+sub delete {
+    my ($self, $obj) = @_;
 
-            if (@tmp < @matrix) {
-                $#tmp = $#matrix;
-            }
-
-            foreach my $j (0 .. $#tmp) {
-                $matrix[$j][$i] = $tmp[$j];
-            }
+    for (my $i = $#$self ; $i >= 0 ; --$i) {
+        if ($self->[$i] eq $obj) {
+            CORE::splice(@$self, $i, 1);
         }
-
-        bless $_ for @matrix;
-        bless \@matrix;
     }
 
-    sub pack {
-        my ($self, $format) = @_;
-        Sidef::Types::String::String->new(CORE::pack("$format", @$self));
-    }
+    $self;
+}
 
-    sub push {
-        my ($self, @args) = @_;
-        CORE::push(@$self, @args);
-        $self;
-    }
+*remove = \&delete;
 
-    *append = \&push;
+sub delete_if {
+    my ($self, $block) = @_;
 
-    sub unshift {
-        my ($self, @args) = @_;
-        CORE::unshift(@$self, @args);
-        $self;
-    }
+    $block //= Sidef::Types::Block::Block::IDENTITY;
 
-    *prepend = \&unshift;
-
-    sub rotate {
-        my ($self, $num) = @_;
-
-        my $len = $#$self + 1;
-        return bless([]) if $len == 0;
-        $num = CORE::int($num) % $len;
-        return bless([@$self], ref($self)) if $num == 0;
-
-        my @array = @$self;
-        CORE::unshift(@array, CORE::splice(@array, $num));
-        bless \@array, ref($self);
-    }
-
-    sub join {
-        my ($self, $delim, $block) = @_;
-        $delim = defined($delim) ? "$delim" : '';
-
-        if (defined $block) {
-            return Sidef::Types::String::String->new(CORE::join($delim, map { scalar $block->run($_) } @$self));
+    for (my $i = 0 ; $i <= $#$self ; $i++) {
+        if ($block->run($self->[$i])) {
+            CORE::splice(@$self, $i--, 1);
         }
-
-        Sidef::Types::String::String->new(CORE::join($delim, @$self));
     }
 
-    sub join_bytes {
-        my ($self, $encoding) = @_;
-        state $x = require Encode;
-        $encoding = defined($encoding) ? "$encoding" : 'UTF-8';
-        Sidef::Types::String::String->new(eval { Encode::decode($encoding, CORE::pack('C*', @$self)) } // return);
-    }
+    $self;
+}
 
-    *chrs   = \&join_bytes;
-    *decode = \&join_bytes;
+*remove_if = \&delete_if;
+*remove_by = \&delete_if;
+*delete_by = \&delete_if;
 
-    sub join_insert {
-        my ($self, $obj) = @_;
+sub extract_by {
+    my ($self, $block) = @_;
 
-        my @array;
-        foreach my $item (@$self) {
-            CORE::push(@array, $item, $obj);
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my @extracted;
+    for (my $i = 0 ; $i <= $#$self ; $i++) {
+        if ($block->run($self->[$i])) {
+            CORE::push(@extracted, CORE::splice(@$self, $i--, 1));
         }
-
-        CORE::pop(@array);
-        bless \@array;
     }
 
-    sub reverse {
-        my ($self) = @_;
-        bless [CORE::reverse @$self], ref($self);
-    }
+    bless \@extracted;
+}
 
-    *flip = \&reverse;
+sub extract_first_by {
+    my ($self, $block) = @_;
 
-    sub delete_first {
-        my ($self, $obj) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
 
-        foreach my $i (0 .. $#$self) {
-            if ($self->[$i] eq $obj) {
-                CORE::splice(@$self, $i, 1);
-                return (Sidef::Types::Bool::Bool::TRUE);
-            }
+    foreach my $i (0 .. $#$self) {
+        if ($block->run($self->[$i])) {
+            return CORE::splice(@$self, $i--, 1);
         }
-
-        (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    *remove_first = \&delete_first;
+    return undef;
+}
 
-    sub delete_last {
-        my ($self, $obj) = @_;
+sub extract_last_by {
+    my ($self, $block) = @_;
 
-        for (my $i = $#$self ; $i >= 0 ; $i--) {
-            if ($self->[$i] eq $obj) {
-                CORE::splice(@$self, $i, 1);
-                return (Sidef::Types::Bool::Bool::TRUE);
-            }
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    for (my $i = $#$self ; $i >= 0 ; --$i) {
+        if ($block->run($self->[$i])) {
+            return CORE::splice(@$self, $i, 1);
         }
-
-        (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    *remove_last = \&delete_last;
+    return undef;
+}
 
-    sub delete {
-        my ($self, $obj) = @_;
+sub delete_first_if {
+    my ($self, $block) = @_;
 
-        for (my $i = $#$self ; $i >= 0 ; --$i) {
-            if ($self->[$i] eq $obj) {
-                CORE::splice(@$self, $i, 1);
-            }
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    foreach my $i (0 .. $#$self) {
+        if ($block->run($self->[$i])) {
+            CORE::splice(@$self, $i, 1);
+            return (Sidef::Types::Bool::Bool::TRUE);
         }
-
-        $self;
     }
 
-    *remove = \&delete;
+    (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub delete_if {
-        my ($self, $block) = @_;
+*remove_first_if = \&delete_first_if;
+*remove_first_by = \&delete_first_if;
+*delete_first_by = \&delete_first_if;
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+sub delete_last_if {
+    my ($self, $block) = @_;
 
-        for (my $i = 0 ; $i <= $#$self ; $i++) {
-            if ($block->run($self->[$i])) {
-                CORE::splice(@$self, $i--, 1);
-            }
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    for (my $i = $#$self ; $i >= 0 ; --$i) {
+        if ($block->run($self->[$i])) {
+            CORE::splice(@$self, $i, 1);
+            return (Sidef::Types::Bool::Bool::TRUE);
         }
-
-        $self;
     }
 
-    *remove_if = \&delete_if;
-    *remove_by = \&delete_if;
-    *delete_by = \&delete_if;
+    (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub extract_by {
-        my ($self, $block) = @_;
+*remove_last_if = \&delete_last_if;
+*remove_last_by = \&delete_last_if;
+*delete_last_by = \&delete_last_if;
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+sub to_list { @{$_[0]} }
 
-        my @extracted;
-        for (my $i = 0 ; $i <= $#$self ; $i++) {
-            if ($block->run($self->[$i])) {
-                CORE::push(@extracted, CORE::splice(@$self, $i--, 1));
-            }
-        }
+sub getopt {
+    my ($self, %opts) = @_;
 
-        bless \@extracted;
-    }
+    @$self or return Sidef::Types::Array::Array->new;
 
-    sub extract_first_by {
-        my ($self, $block) = @_;
+    state $x = require Getopt::Long;
+    Getopt::Long::Configure('no_ignore_case');
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+    my @argv = map { "$_" } @$self;
+    my @opts = CORE::keys %opts;
 
-        foreach my $i (0 .. $#$self) {
-            if ($block->run($self->[$i])) {
-                return CORE::splice(@$self, $i--, 1);
-            }
-        }
+    my %parsed;
+    Getopt::Long::GetOptionsFromArray(\@argv, \%parsed, @opts);
 
-        return undef;
-    }
+    my %lookup = map {
+        my ($name) = Getopt::Long::ParseOptionSpec($_, \my %info);
+        defined($name) ? ($name => {obj => $opts{$_}, type => $info{$name}[0]}) : ();
+    } @opts;
 
-    sub extract_last_by {
-        my ($self, $block) = @_;
+    foreach my $key (CORE::keys %parsed) {
 
-        $block //= Sidef::Types::Block::Block::IDENTITY;
+        my $rec  = $lookup{$key};
+        my $obj  = $rec->{obj};
+        my $type = $rec->{type};
 
-        for (my $i = $#$self ; $i >= 0 ; --$i) {
-            if ($block->run($self->[$i])) {
-                return CORE::splice(@$self, $i, 1);
-            }
-        }
+        if (ref($obj) eq 'REF' or ref($obj) eq 'SCALAR') {
+            my $ref = ref($$obj);
 
-        return undef;
-    }
-
-    sub delete_first_if {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        foreach my $i (0 .. $#$self) {
-            if ($block->run($self->[$i])) {
-                CORE::splice(@$self, $i, 1);
-                return (Sidef::Types::Bool::Bool::TRUE);
-            }
-        }
-
-        (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *remove_first_if = \&delete_first_if;
-    *remove_first_by = \&delete_first_if;
-    *delete_first_by = \&delete_first_if;
-
-    sub delete_last_if {
-        my ($self, $block) = @_;
-
-        $block //= Sidef::Types::Block::Block::IDENTITY;
-
-        for (my $i = $#$self ; $i >= 0 ; --$i) {
-            if ($block->run($self->[$i])) {
-                CORE::splice(@$self, $i, 1);
-                return (Sidef::Types::Bool::Bool::TRUE);
-            }
-        }
-
-        (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *remove_last_if = \&delete_last_if;
-    *remove_last_by = \&delete_last_if;
-    *delete_last_by = \&delete_last_if;
-
-    sub to_list { @{$_[0]} }
-
-    sub getopt {
-        my ($self, %opts) = @_;
-
-        @$self or return Sidef::Types::Array::Array->new;
-
-        state $x = require Getopt::Long;
-        Getopt::Long::Configure('no_ignore_case');
-
-        my @argv = map { "$_" } @$self;
-        my @opts = CORE::keys %opts;
-
-        my %parsed;
-        Getopt::Long::GetOptionsFromArray(\@argv, \%parsed, @opts);
-
-        my %lookup = map {
-            my ($name) = Getopt::Long::ParseOptionSpec($_, \my %info);
-            defined($name) ? ($name => {obj => $opts{$_}, type => $info{$name}[0]}) : ();
-        } @opts;
-
-        foreach my $key (CORE::keys %parsed) {
-
-            my $rec  = $lookup{$key};
-            my $obj  = $rec->{obj};
-            my $type = $rec->{type};
-
-            if (ref($obj) eq 'REF' or ref($obj) eq 'SCALAR') {
-                my $ref = ref($$obj);
-
-                # Determine the type for undefined references
-                if ($ref eq '') {
-                    if ($type eq 'i' or $type eq 'f') {
-                        $ref = 'Sidef::Types::Number::Number';
-                    }
-                    elsif ($type eq '') {
-                        $ref = 'Sidef::Types::Bool::Bool';
-                    }
-                    else {
-                        $ref = 'Sidef::Types::String::String';
-                    }
+            # Determine the type for undefined references
+            if ($ref eq '') {
+                if ($type eq 'i' or $type eq 'f') {
+                    $ref = 'Sidef::Types::Number::Number';
                 }
-
-                if (   $ref eq 'Sidef::Types::String::String'
-                    or $ref eq 'Sidef::Types::Number::Number') {
-                    $$obj = $ref->new($parsed{$key});
-                }
-                elsif ($ref eq 'Sidef::Types::Bool::Bool') {
-                    $$obj =
-                      $parsed{$key}
-                      ? Sidef::Types::Bool::Bool::TRUE
-                      : Sidef::Types::Bool::Bool::FALSE;
+                elsif ($type eq '') {
+                    $ref = 'Sidef::Types::Bool::Bool';
                 }
                 else {
-                    if ($type eq '') {
-                        $$obj = $ref->new(
-                                          $parsed{$key}
-                                          ? Sidef::Types::Bool::Bool::TRUE
-                                          : Sidef::Types::Bool::Bool::FALSE
-                                         );
-                    }
-                    elsif ($type eq 'i' or $type eq 'f') {
-                        $$obj = $ref->new(Sidef::Types::Number::Number->new($parsed{$key}));
-                    }
-                    else {
-                        $$obj = $ref->new(Sidef::Types::String::String->new($parsed{$key}));
-                    }
+                    $ref = 'Sidef::Types::String::String';
                 }
             }
+
+            if (   $ref eq 'Sidef::Types::String::String'
+                or $ref eq 'Sidef::Types::Number::Number') {
+                $$obj = $ref->new($parsed{$key});
+            }
+            elsif ($ref eq 'Sidef::Types::Bool::Bool') {
+                $$obj =
+                  $parsed{$key}
+                  ? Sidef::Types::Bool::Bool::TRUE
+                  : Sidef::Types::Bool::Bool::FALSE;
+            }
             else {
-                $obj->call();
+                if ($type eq '') {
+                    $$obj = $ref->new(
+                                      $parsed{$key}
+                                      ? Sidef::Types::Bool::Bool::TRUE
+                                      : Sidef::Types::Bool::Bool::FALSE
+                                     );
+                }
+                elsif ($type eq 'i' or $type eq 'f') {
+                    $$obj = $ref->new(Sidef::Types::Number::Number->new($parsed{$key}));
+                }
+                else {
+                    $$obj = $ref->new(Sidef::Types::String::String->new($parsed{$key}));
+                }
             }
         }
-
-        bless [map { Sidef::Types::String::String->new($_) } @argv];
+        else {
+            $obj->call();
+        }
     }
 
-    sub _dump {
-        my %addr;    # keeps track of dumped objects
+    bless [map { Sidef::Types::String::String->new($_) } @argv];
+}
 
-        my $sub = sub {
-            my ($obj) = @_;
+sub _dump {
+    my %addr;    # keeps track of dumped objects
 
-            my $refaddr = Scalar::Util::refaddr($obj);
+    my $sub = sub {
+        my ($obj) = @_;
 
-            exists($addr{$refaddr})
-              and return $addr{$refaddr};
+        my $refaddr = Scalar::Util::refaddr($obj);
 
-            $addr{$refaddr} = "Array(#`($refaddr)...)";
+        exists($addr{$refaddr})
+          and return $addr{$refaddr};
 
-            my $s;
+        $addr{$refaddr} = "Array(#`($refaddr)...)";
 
-            '[' . CORE::join(', ', map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : ($_ // 'nil') } @$obj) . ']';
-        };
+        my $s;
 
-        no warnings 'redefine';
-        local *Sidef::Types::Array::Array::dump = $sub;
-        $sub->($_[0]);
-    }
+        '[' . CORE::join(', ', map { ref($_) && ($s = UNIVERSAL::can($_, 'dump')) ? $s->($_) : ($_ // 'nil') } @$obj) . ']';
+    };
 
-    sub dump {
-        Sidef::Types::String::String->new($_[0]->_dump);
-    }
+    no warnings 'redefine';
+    local *Sidef::Types::Array::Array::dump = $sub;
+    $sub->($_[0]);
+}
 
-    *to_s   = \&dump;
-    *to_str = \&dump;
+sub dump {
+    Sidef::Types::String::String->new($_[0]->_dump);
+}
 
-    sub to_hash {
-        my ($self) = @_;
-        Sidef::Types::Hash::Hash->new(@$self);
-    }
+*to_s   = \&dump;
+*to_str = \&dump;
 
-    *to_h = \&to_hash;
+sub to_hash {
+    my ($self) = @_;
+    Sidef::Types::Hash::Hash->new(@$self);
+}
 
-    sub to_a {
-        ref($_[0]) ? $_[0] : __PACKAGE__->new($_[0]);
-    }
+*to_h = \&to_hash;
 
-    *to_array = \&to_a;
+sub to_a {
+    ref($_[0]) ? $_[0] : __PACKAGE__->new($_[0]);
+}
 
-    sub to_set {
-        my ($self) = @_;
-        Sidef::Types::Set::Set->new(@$self);
-    }
+*to_array = \&to_a;
 
-    sub to_bag {
-        my ($self) = @_;
-        Sidef::Types::Set::Bag->new(@$self);
-    }
+sub to_set {
+    my ($self) = @_;
+    Sidef::Types::Set::Set->new(@$self);
+}
 
-    sub to_matrix {
-        my ($self) = @_;
-        Sidef::Types::Array::Matrix->new(@$self);
-    }
+sub to_bag {
+    my ($self) = @_;
+    Sidef::Types::Set::Bag->new(@$self);
+}
 
-    *to_m = \&to_matrix;
+sub to_matrix {
+    my ($self) = @_;
+    Sidef::Types::Array::Matrix->new(@$self);
+}
 
-    sub to_vector {
-        my ($self) = @_;
-        Sidef::Types::Array::Vector->new(@$self);
-    }
+*to_m = \&to_matrix;
 
-    *to_v = \&to_vector;
+sub to_vector {
+    my ($self) = @_;
+    Sidef::Types::Array::Vector->new(@$self);
+}
 
-    {
-        no strict 'refs';
+*to_v = \&to_vector;
 
-        *{__PACKAGE__ . '::' . '&'}   = \&and;
-        *{__PACKAGE__ . '::' . '*'}   = \&mul;
-        *{__PACKAGE__ . '::' . '**'}  = \&mpow;
-        *{__PACKAGE__ . '::' . '<<'}  = \&push;
-        *{__PACKAGE__ . '::' . '«'}   = \&push;
-        *{__PACKAGE__ . '::' . '>>'}  = \&pop;
-        *{__PACKAGE__ . '::' . '»'}   = \&pop;
-        *{__PACKAGE__ . '::' . '|Z>'} = \&pipeline_zip_op;
-        *{__PACKAGE__ . '::' . '|X>'} = \&pipeline_cross_op;
-        *{__PACKAGE__ . '::' . '|>>'} = \&pipeline_map_op;
-        *{__PACKAGE__ . '::' . '|'}   = \&or;
-        *{__PACKAGE__ . '::' . '^'}   = \&xor;
-        *{__PACKAGE__ . '::' . '+'}   = \&add;
-        *{__PACKAGE__ . '::' . '-'}   = \&diff;
-        *{__PACKAGE__ . '::' . '=='}  = \&eq;
-        *{__PACKAGE__ . '::' . '<'}   = \&lt;
-        *{__PACKAGE__ . '::' . '<='}  = \&le;
-        *{__PACKAGE__ . '::' . '≤'}   = \&le;
-        *{__PACKAGE__ . '::' . '>'}   = \&gt;
-        *{__PACKAGE__ . '::' . '≥'}   = \&ge;
-        *{__PACKAGE__ . '::' . '>='}  = \&ge;
-        *{__PACKAGE__ . '::' . '!='}  = \&ne;
-        *{__PACKAGE__ . '::' . '≠'}   = \&ne;
-        *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
-        *{__PACKAGE__ . '::' . '/'}   = \&div;
-        *{__PACKAGE__ . '::' . '÷'}   = \&div;
-        *{__PACKAGE__ . '::' . '...'} = \&to_list;
-        *{__PACKAGE__ . '::' . '∋'}   = \&contains;
-        *{__PACKAGE__ . '::' . '∌'}   = sub { $_[0]->contains($_[1])->not };
-    }
+{
+    no strict 'refs';
 
-};
+    *{__PACKAGE__ . '::' . '&'}   = \&and;
+    *{__PACKAGE__ . '::' . '*'}   = \&mul;
+    *{__PACKAGE__ . '::' . '**'}  = \&mpow;
+    *{__PACKAGE__ . '::' . '<<'}  = \&push;
+    *{__PACKAGE__ . '::' . '«'}   = \&push;
+    *{__PACKAGE__ . '::' . '>>'}  = \&pop;
+    *{__PACKAGE__ . '::' . '»'}   = \&pop;
+    *{__PACKAGE__ . '::' . '|Z>'} = \&pipeline_zip_op;
+    *{__PACKAGE__ . '::' . '|X>'} = \&pipeline_cross_op;
+    *{__PACKAGE__ . '::' . '|>>'} = \&pipeline_map_op;
+    *{__PACKAGE__ . '::' . '|'}   = \&or;
+    *{__PACKAGE__ . '::' . '^'}   = \&xor;
+    *{__PACKAGE__ . '::' . '+'}   = \&add;
+    *{__PACKAGE__ . '::' . '-'}   = \&diff;
+    *{__PACKAGE__ . '::' . '=='}  = \&eq;
+    *{__PACKAGE__ . '::' . '<'}   = \&lt;
+    *{__PACKAGE__ . '::' . '<='}  = \&le;
+    *{__PACKAGE__ . '::' . '≤'}   = \&le;
+    *{__PACKAGE__ . '::' . '>'}   = \&gt;
+    *{__PACKAGE__ . '::' . '≥'}   = \&ge;
+    *{__PACKAGE__ . '::' . '>='}  = \&ge;
+    *{__PACKAGE__ . '::' . '!='}  = \&ne;
+    *{__PACKAGE__ . '::' . '≠'}   = \&ne;
+    *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
+    *{__PACKAGE__ . '::' . '/'}   = \&div;
+    *{__PACKAGE__ . '::' . '÷'}   = \&div;
+    *{__PACKAGE__ . '::' . '...'} = \&to_list;
+    *{__PACKAGE__ . '::' . '∋'}   = \&contains;
+    *{__PACKAGE__ . '::' . '∌'}   = sub { $_[0]->contains($_[1])->not };
+}
 
 1

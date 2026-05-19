@@ -1,83 +1,82 @@
-package Sidef::Time::Time {
+package Sidef::Time::Time;
 
-    use utf8;
-    use 5.016;
-    use parent qw(Sidef::Object::Object);
+use utf8;
+use 5.016;
+use parent qw(Sidef::Object::Object);
 
-    use overload
-      q{""}   => \&get_value,
-      q{bool} => \&get_value,
-      q{0+}   => \&get_value;
+use overload
+  q{""}   => \&get_value,
+  q{bool} => \&get_value,
+  q{0+}   => \&get_value;
 
-    sub new {
-        my (undef, $sec) = @_;
+sub new {
+    my (undef, $sec) = @_;
 
-        if (defined $sec) {
-            $sec = CORE::int($sec) if ref($sec);
-        }
-        else {
-            $sec = time;
-        }
-
-        bless {sec => $sec,};
+    if (defined $sec) {
+        $sec = CORE::int($sec) if ref($sec);
+    }
+    else {
+        $sec = time;
     }
 
-    *call = \&new;
+    bless {sec => $sec,};
+}
 
-    sub get_value {
+*call = \&new;
 
-        if (ref($_[0]) ne __PACKAGE__) {
-            return CORE::time;
-        }
+sub get_value {
 
-        $_[0]->{sec} // CORE::time;
+    if (ref($_[0]) ne __PACKAGE__) {
+        return CORE::time;
     }
 
-    sub time {
-        my ($self) = @_;
-        Sidef::Types::Number::Number->new($self->get_value);
-    }
+    $_[0]->{sec} // CORE::time;
+}
 
-    *sec = \&time;
+sub time {
+    my ($self) = @_;
+    Sidef::Types::Number::Number->new($self->get_value);
+}
 
-    sub now {
-        Sidef::Types::Number::Number->new(CORE::time);
-    }
+*sec = \&time;
 
-    sub micro {
-        my ($self) = @_;
-        state $x = require Time::HiRes;
-        Sidef::Types::Number::Number->new(scalar Time::HiRes::gettimeofday());
-    }
+sub now {
+    Sidef::Types::Number::Number->new(CORE::time);
+}
 
-    *micro_sec     = \&micro;
-    *micro_seconds = \&micro;
+sub micro {
+    my ($self) = @_;
+    state $x = require Time::HiRes;
+    Sidef::Types::Number::Number->new(scalar Time::HiRes::gettimeofday());
+}
 
-    sub localtime {
-        my ($self) = @_;
-        Sidef::Time::Date->localtime($self->get_value);
-    }
+*micro_sec     = \&micro;
+*micro_seconds = \&micro;
 
-    *local = \&localtime;
+sub localtime {
+    my ($self) = @_;
+    Sidef::Time::Date->localtime($self->get_value);
+}
 
-    sub gmtime {
-        my ($self) = @_;
-        Sidef::Time::Date->gmtime($self->get_value);
-    }
+*local = \&localtime;
 
-    *gmt = \&gmtime;
+sub gmtime {
+    my ($self) = @_;
+    Sidef::Time::Date->gmtime($self->get_value);
+}
 
-    sub dump {
-        my ($self) = @_;
-        Sidef::Types::String::String->new('Time(' . $self->get_value . ')');
-    }
+*gmt = \&gmtime;
 
-    sub to_str {
-        my ($self) = @_;
-        Sidef::Types::String::String->new($self->get_value);
-    }
+sub dump {
+    my ($self) = @_;
+    Sidef::Types::String::String->new('Time(' . $self->get_value . ')');
+}
 
-    *to_s = \&to_str;
-};
+sub to_str {
+    my ($self) = @_;
+    Sidef::Types::String::String->new($self->get_value);
+}
 
-1;
+*to_s = \&to_str;
+
+1

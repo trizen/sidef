@@ -1,31 +1,32 @@
-package Sidef::Types::Null::Null {
+package Sidef::Types::Null::Null;
 
-    use utf8;
-    use 5.016;
+use utf8;
+use 5.016;
 
-    use overload
-      q{bool} => sub { },
-      q{0+}   => sub { 0 },
-      q{""}   => sub { '' };
+use overload
+  q{bool} => sub { },
+  q{0+}   => sub { 0 },
+  q{""}   => sub { '' };
 
-    use parent qw(Sidef::Object::Object);
+use parent qw(
+  Sidef::Object::Object
+);
 
-    sub new {
-        bless \(my $nil = undef), __PACKAGE__;
-    }
+sub new {
+    bless \(my $nil = undef), __PACKAGE__;
+}
 
-    *call = \&new;
+*call = \&new;
 
-    sub get_value {
-        undef;
-    }
+sub get_value {
+    undef;
+}
 
-    sub dump {
-        Sidef::Types::String::String->new('null');
-    }
+sub dump {
+    Sidef::Types::String::String->new('null');
+}
 
-    *to_s   = \&dump;
-    *to_str = \&dump;
-};
+*to_s   = \&dump;
+*to_str = \&dump;
 
 1

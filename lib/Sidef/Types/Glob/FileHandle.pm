@@ -1,450 +1,448 @@
-package Sidef::Types::Glob::FileHandle {
+package Sidef::Types::Glob::FileHandle;
 
-    use utf8;
-    use 5.016;
+use utf8;
+use 5.016;
 
-    use parent qw(
-      Sidef::Object::Object
+use parent qw(
+  Sidef::Object::Object
+);
+
+use Sidef::Types::Bool::Bool;
+
+sub new {
+    my (undef, $fh, $file) = @_;
+
+    bless {
+           fh     => $fh,
+           parent => $file,
+          },
+      __PACKAGE__;
+}
+
+*call = \&new;
+
+sub get_value {
+    $_[0]{fh};
+}
+
+sub parent {
+    $_[0]{parent};
+}
+
+*file = \&parent;
+
+sub new_buf {
+    my ($self, $mode, $initial_string) = @_;
+
+    $mode           //= 'raw';
+    $initial_string //= '';
+    $mode = "$mode" if (ref($mode) ne '');
+
+    my $str = "$initial_string";
+
+    if ($mode ne 'raw' and $str ne '') {
+        require Encode;
+        $str = Encode::encode($mode, $str);
+    }
+
+    CORE::open(my $fh, "+<:$mode", \$str) or return undef;
+    CORE::seek($fh, CORE::length($str), 0) if ($str ne '');
+    my $str_obj = bless(\$str, 'Sidef::Types::String::String');
+    my $fh_obj  = __PACKAGE__->new($fh, $str_obj);
+    wantarray ? ($fh_obj, $str_obj) : $fh_obj;
+}
+
+*new_buffer = \&new_buf;
+
+sub is_on_tty {
+    (-t $_[0]{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+*isatty = \&is_on_tty;
+
+sub stdout {
+    __PACKAGE__->new(\*STDOUT);
+}
+
+sub stderr {
+    __PACKAGE__->new(\*STDERR);
+}
+
+sub stdin {
+    __PACKAGE__->new(\*STDIN);
+}
+
+sub autoflush {
+    my ($self, $bool) = @_;
+    select((select($self->{fh}), $| = $bool ? 1 : 0)[0]);
+    $self;
+}
+
+sub binmode {
+    my ($self, $encoding) = @_;
+    CORE::binmode($self->{fh}, "$encoding");
+    $self;
+}
+
+sub syswrite {
+    my ($self, $scalar, $length, $offset) = @_;
+    (
+       defined($offset) ? (CORE::syswrite $self->{fh}, $scalar, $length, $offset)
+     : defined($length) ? (CORE::syswrite $self->{fh}, $scalar, $length)
+     :                    (CORE::syswrite $self->{fh}, $scalar)
+    ) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub print {
+    my ($self, @args) = @_;
+    (CORE::print {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+*write = \&print;
+*spurt = \&print;
+
+sub println {
+    my ($self, @args) = @_;
+    (CORE::say {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+*say = \&println;
+
+sub printf {
+    my ($self, @args) = @_;
+    (CORE::printf {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub printlnf {
+    my ($self, $format, @args) = @_;
+    $self->printf("$format\n", @args);
+}
+
+*sayf = \&printlnf;
+
+sub iter {
+    my ($self) = @_;
+    Sidef::Types::Block::Block->new(
+        code => sub {
+            my $line = CORE::readline($self->{fh}) // return undef;
+            chomp($line);
+            Sidef::Types::String::String->new($line);
+        }
     );
+}
 
-    use Sidef::Types::Bool::Bool;
+sub fcntl {
+    my ($self, $func, $flags) = @_;
+    CORE::fcntl($self->{fh}, CORE::int($func), CORE::int($flags))
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub new {
-        my (undef, $fh, $file) = @_;
+sub read {
+    my ($self, $var_ref, $length, $offset) = @_;
 
-        bless {
-               fh     => $fh,
-               parent => $file,
-              },
-          __PACKAGE__;
-    }
+    my $chunk = "$$var_ref";
+    my $size = Sidef::Types::Number::Number::_set_int(
+                                                      defined($offset)
+                                                      ? CORE::read($self->{fh}, $chunk, $length, $offset)
+                                                      : CORE::read($self->{fh}, $chunk, $length)
+                                                     );
 
-    *call = \&new;
+    $$var_ref = Sidef::Types::String::String->new($chunk);
 
-    sub get_value {
-        $_[0]{fh};
-    }
+    return $size;
+}
 
-    sub parent {
-        $_[0]{parent};
-    }
+sub sysread {
+    my ($self, $var_ref, $length, $offset) = @_;
 
-    *file = \&parent;
+    my $chunk = "$$var_ref";
+    my $size = Sidef::Types::Number::Number::_set_int(
+                                                      defined($offset)
+                                                      ? CORE::sysread($self->{fh}, $chunk, $length, $offset)
+                                                      : CORE::sysread($self->{fh}, $chunk, $length)
+                                                     );
 
-    sub new_buf {
-        my ($self, $mode, $initial_string) = @_;
+    $$var_ref = Sidef::Types::String::String->new($chunk);
 
-        $mode           //= 'raw';
-        $initial_string //= '';
-        $mode = "$mode" if (ref($mode) ne '');
+    return $size;
+}
 
-        my $str = "$initial_string";
-
-        if ($mode ne 'raw' and $str ne '') {
-            require Encode;
-            $str = Encode::encode($mode, $str);
+sub slurp {
+    my ($self) = @_;
+    Sidef::Types::String::String->new(
+        do {
+            local $/;
+            CORE::readline($self->{fh});
         }
+    );
+}
 
-        CORE::open(my $fh, "+<:$mode", \$str) or return undef;
-        CORE::seek($fh, CORE::length($str), 0) if ($str ne '');
-        my $str_obj = bless(\$str, 'Sidef::Types::String::String');
-        my $fh_obj  = __PACKAGE__->new($fh, $str_obj);
-        wantarray ? ($fh_obj, $str_obj) : $fh_obj;
-    }
+sub read_line {
+    my ($self, $var_ref) = @_;
 
-    *new_buffer = \&new_buf;
+    my $line = CORE::readline($self->{fh});
 
-    sub is_on_tty {
-        (-t $_[0]{fh}) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *isatty = \&is_on_tty;
-
-    sub stdout {
-        __PACKAGE__->new(\*STDOUT);
-    }
-
-    sub stderr {
-        __PACKAGE__->new(\*STDERR);
-    }
-
-    sub stdin {
-        __PACKAGE__->new(\*STDIN);
-    }
-
-    sub autoflush {
-        my ($self, $bool) = @_;
-        select((select($self->{fh}), $| = $bool ? 1 : 0)[0]);
-        $self;
-    }
-
-    sub binmode {
-        my ($self, $encoding) = @_;
-        CORE::binmode($self->{fh}, "$encoding");
-        $self;
-    }
-
-    sub syswrite {
-        my ($self, $scalar, $length, $offset) = @_;
-        (
-           defined($offset) ? (CORE::syswrite $self->{fh}, $scalar, $length, $offset)
-         : defined($length) ? (CORE::syswrite $self->{fh}, $scalar, $length)
-         :                    (CORE::syswrite $self->{fh}, $scalar)
-        ) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub print {
-        my ($self, @args) = @_;
-        (CORE::print {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *write = \&print;
-    *spurt = \&print;
-
-    sub println {
-        my ($self, @args) = @_;
-        (CORE::say {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *say = \&println;
-
-    sub printf {
-        my ($self, @args) = @_;
-        (CORE::printf {$self->{fh}} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub printlnf {
-        my ($self, $format, @args) = @_;
-        $self->printf("$format\n", @args);
-    }
-
-    *sayf = \&printlnf;
-
-    sub iter {
-        my ($self) = @_;
-        Sidef::Types::Block::Block->new(
-            code => sub {
-                my $line = CORE::readline($self->{fh}) // return undef;
-                chomp($line);
-                Sidef::Types::String::String->new($line);
-            }
-        );
-    }
-
-    sub fcntl {
-        my ($self, $func, $flags) = @_;
-        CORE::fcntl($self->{fh}, CORE::int($func), CORE::int($flags))
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub read {
-        my ($self, $var_ref, $length, $offset) = @_;
-
-        my $chunk = "$$var_ref";
-        my $size = Sidef::Types::Number::Number::_set_int(
-                                                          defined($offset)
-                                                          ? CORE::read($self->{fh}, $chunk, $length, $offset)
-                                                          : CORE::read($self->{fh}, $chunk, $length)
-                                                         );
-
-        $$var_ref = Sidef::Types::String::String->new($chunk);
-
-        return $size;
-    }
-
-    sub sysread {
-        my ($self, $var_ref, $length, $offset) = @_;
-
-        my $chunk = "$$var_ref";
-        my $size = Sidef::Types::Number::Number::_set_int(
-                                                          defined($offset)
-                                                          ? CORE::sysread($self->{fh}, $chunk, $length, $offset)
-                                                          : CORE::sysread($self->{fh}, $chunk, $length)
-                                                         );
-
-        $$var_ref = Sidef::Types::String::String->new($chunk);
-
-        return $size;
-    }
-
-    sub slurp {
-        my ($self) = @_;
-        Sidef::Types::String::String->new(
-            do {
-                local $/;
-                CORE::readline($self->{fh});
-            }
-        );
-    }
-
-    sub read_line {
-        my ($self, $var_ref) = @_;
-
-        my $line = CORE::readline($self->{fh});
-
-        if (defined $var_ref) {
-            $line // return Sidef::Types::Bool::Bool::FALSE;
-            chomp($line);
-            $$var_ref = Sidef::Types::String::String->new($line);
-            return Sidef::Types::Bool::Bool::TRUE;
-        }
-
-        $line // return undef;
+    if (defined $var_ref) {
+        $line // return Sidef::Types::Bool::Bool::FALSE;
         chomp($line);
-        Sidef::Types::String::String->new($line);
+        $$var_ref = Sidef::Types::String::String->new($line);
+        return Sidef::Types::Bool::Bool::TRUE;
     }
 
-    *readln   = \&read_line;
-    *readline = \&read_line;
-    *get      = \&read_line;
-    *line     = \&read_line;
+    $line // return undef;
+    chomp($line);
+    Sidef::Types::String::String->new($line);
+}
 
-    sub read_char {
-        my ($self, $var_ref) = @_;
+*readln   = \&read_line;
+*readline = \&read_line;
+*get      = \&read_line;
+*line     = \&read_line;
 
-        my $char = CORE::getc($self->{fh});
+sub read_char {
+    my ($self, $var_ref) = @_;
 
-        if (defined $var_ref) {
-            $$var_ref = Sidef::Types::String::String->new($char // return Sidef::Types::Bool::Bool::FALSE);
-            return Sidef::Types::Bool::Bool::TRUE;
-        }
+    my $char = CORE::getc($self->{fh});
 
-        Sidef::Types::String::String->new($char // return undef);
+    if (defined $var_ref) {
+        $$var_ref = Sidef::Types::String::String->new($char // return Sidef::Types::Bool::Bool::FALSE);
+        return Sidef::Types::Bool::Bool::TRUE;
     }
 
-    *char = \&read_char;
-    *getc = \&read_char;
+    Sidef::Types::String::String->new($char // return undef);
+}
 
-    sub read_byte {
-        my ($self, $var_ref) = @_;
+*char = \&read_char;
+*getc = \&read_char;
 
-        my $byte = CORE::ord(CORE::getc($self->{fh}));
+sub read_byte {
+    my ($self, $var_ref) = @_;
 
-        if (defined $var_ref) {
-            $$var_ref = Sidef::Types::Number::Number::_set_int($byte // return Sidef::Types::Bool::Bool::FALSE);
-            return Sidef::Types::Bool::Bool::TRUE;
-        }
+    my $byte = CORE::ord(CORE::getc($self->{fh}));
 
-        Sidef::Types::Number::Number::_set_int($byte // return undef);
+    if (defined $var_ref) {
+        $$var_ref = Sidef::Types::Number::Number::_set_int($byte // return Sidef::Types::Bool::Bool::FALSE);
+        return Sidef::Types::Bool::Bool::TRUE;
     }
 
-    *getb = \&read_byte;
-    *byte = \&read_byte;
+    Sidef::Types::Number::Number::_set_int($byte // return undef);
+}
 
-    sub read_lines {
-        my ($self) = @_;
-        Sidef::Types::Array::Array->new([map { chomp($_); Sidef::Types::String::String->new($_) } CORE::readline($self->{fh})]);
+*getb = \&read_byte;
+*byte = \&read_byte;
+
+sub read_lines {
+    my ($self) = @_;
+    Sidef::Types::Array::Array->new([map { chomp($_); Sidef::Types::String::String->new($_) } CORE::readline($self->{fh})]);
+}
+
+*readlines = \&read_lines;
+*lines     = \&read_lines;
+
+sub grep {
+    my ($self, $obj) = @_;
+
+    my @array;
+
+    while (defined(my $line = CORE::readline($self->{fh}))) {
+        chomp($line);
+        my $string = Sidef::Types::String::String->new($line);
+        push @array, $string if $obj->run($string);
     }
 
-    *readlines = \&read_lines;
-    *lines     = \&read_lines;
+    Sidef::Types::Array::Array->new(\@array);
+}
 
-    sub grep {
-        my ($self, $obj) = @_;
+*select = \&grep;
 
-        my @array;
+sub map {
+    my ($self, $block) = @_;
 
-        while (defined(my $line = CORE::readline($self->{fh}))) {
-            chomp($line);
-            my $string = Sidef::Types::String::String->new($line);
-            push @array, $string if $obj->run($string);
-        }
+    my @array;
+    while (defined(my $line = CORE::readline($self->{fh}))) {
+        chomp($line);
+        push @array, $block->run(Sidef::Types::String::String->new($line));
+    }
+    Sidef::Types::Array::Array->new(\@array);
+}
 
-        Sidef::Types::Array::Array->new(\@array);
+*collect = \&map;
+
+sub words {
+    my ($self) = @_;
+    Sidef::Types::Array::Array->new(
+        [
+         map {
+             map  { Sidef::Types::String::String->new($_) }
+             grep { $_ ne '' }
+               split(' ', $_)
+         } CORE::readline($self->{fh})
+        ]
+    );
+}
+
+sub chars {
+    my ($self) = @_;
+    Sidef::Types::Array::Array->new(
+        [
+         map { Sidef::Types::String::String->new($_) } do {
+             local $/;
+             split(//, scalar CORE::readline($self->{fh}));
+         }
+        ]
+    );
+}
+
+sub each {
+    my ($self, $code) = @_;
+
+    while (defined(my $line = CORE::readline($self->{fh}))) {
+        chomp($line);
+        $code->run(Sidef::Types::String::String->new($line));
     }
 
-    *select = \&grep;
+    $self;
+}
 
-    sub map {
-        my ($self, $block) = @_;
+*each_line = \&each;
 
-        my @array;
-        while (defined(my $line = CORE::readline($self->{fh}))) {
-            chomp($line);
-            push @array, $block->run(Sidef::Types::String::String->new($line));
-        }
-        Sidef::Types::Array::Array->new(\@array);
+sub each_char {
+    my ($self, $code) = @_;
+
+    while (defined(my $char = CORE::getc($self->{fh}))) {
+        $code->run(Sidef::Types::String::String->new($char));
     }
 
-    *collect = \&map;
+    $self;
+}
 
-    sub words {
-        my ($self) = @_;
-        Sidef::Types::Array::Array->new(
-            [
-             map {
-                 map  { Sidef::Types::String::String->new($_) }
-                 grep { $_ ne '' }
-                   split(' ', $_)
-             } CORE::readline($self->{fh})
-            ]
-        );
+sub eof {
+    my ($self) = @_;
+    CORE::eof($self->{fh})
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub tell {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::_set_int(CORE::tell($self->{fh}));
+}
+
+sub rewind {
+    my ($self) = @_;
+    CORE::seek($self->{fh}, 0, 0)
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub seek {
+    my ($self, $pos, $whence) = @_;
+    CORE::seek($self->{fh}, $pos, $whence)
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub sysseek {
+    my ($self, $pos, $whence) = @_;
+    CORE::sysseek($self->{fh}, $pos, $whence)
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub fileno {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::_set_int(CORE::fileno($self->{fh}));
+}
+
+sub lock {
+    my ($self) = @_;
+
+    state $x = require Fcntl;
+    $self->flock(&Fcntl::LOCK_EX);
+}
+
+sub unlock {
+    my ($self) = @_;
+
+    state $x = require Fcntl;
+    $self->flock(&Fcntl::LOCK_UN);
+}
+
+sub flock {
+    my ($self, $mode) = @_;
+    CORE::flock($self->{fh}, $mode)
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub close {
+    my ($self) = @_;
+    CORE::close($self->{fh})
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub stat {
+    my ($self) = @_;
+    Sidef::Types::Glob::Stat->stat($self->{fh}, $self);
+}
+
+sub lstat {
+    my ($self) = @_;
+    Sidef::Types::Glob::Stat->lstat($self->{fh}, $self);
+}
+
+sub truncate {
+    my ($self, $length) = @_;
+    CORE::truncate($self->{fh}, $length // 0)
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub read_to {
+    my ($self, $var_ref) = @_;
+
+    my $line = CORE::readline($self->{fh});
+
+    if (defined($line)) {
+        chomp($line);
+        $$var_ref = Sidef::Types::String::String->new($line);
+    }
+    else {
+        undef $$var_ref;
     }
 
-    sub chars {
-        my ($self) = @_;
-        Sidef::Types::Array::Array->new(
-            [
-             map { Sidef::Types::String::String->new($_) } do {
-                 local $/;
-                 split(//, scalar CORE::readline($self->{fh}));
-             }
-            ]
-        );
+    $self;
+}
+
+sub write_from {
+    my ($self, @args) = @_;
+    CORE::print {$self->{fh}} @args;
+    $self;
+}
+
+sub copy {
+    my ($self, $fh) = @_;
+
+    if (ref($fh) ne __PACKAGE__) {
+        return;
     }
 
-    sub each {
-        my ($self, $code) = @_;
+    state $x = require File::Copy;
+    File::Copy::copy($self->{fh}, $fh->{fh})
+      ? (Sidef::Types::Bool::Bool::TRUE)
+      : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-        while (defined(my $line = CORE::readline($self->{fh}))) {
-            chomp($line);
-            $code->run(Sidef::Types::String::String->new($line));
-        }
+*cp = \&copy;
 
-        $self;
-    }
-
-    *each_line = \&each;
-
-    sub each_char {
-        my ($self, $code) = @_;
-
-        while (defined(my $char = CORE::getc($self->{fh}))) {
-            $code->run(Sidef::Types::String::String->new($char));
-        }
-
-        $self;
-    }
-
-    sub eof {
-        my ($self) = @_;
-        CORE::eof($self->{fh})
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub tell {
-        my ($self) = @_;
-        Sidef::Types::Number::Number::_set_int(CORE::tell($self->{fh}));
-    }
-
-    sub rewind {
-        my ($self) = @_;
-        CORE::seek($self->{fh}, 0, 0)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub seek {
-        my ($self, $pos, $whence) = @_;
-        CORE::seek($self->{fh}, $pos, $whence)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub sysseek {
-        my ($self, $pos, $whence) = @_;
-        CORE::sysseek($self->{fh}, $pos, $whence)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub fileno {
-        my ($self) = @_;
-        Sidef::Types::Number::Number::_set_int(CORE::fileno($self->{fh}));
-    }
-
-    sub lock {
-        my ($self) = @_;
-
-        state $x = require Fcntl;
-        $self->flock(&Fcntl::LOCK_EX);
-    }
-
-    sub unlock {
-        my ($self) = @_;
-
-        state $x = require Fcntl;
-        $self->flock(&Fcntl::LOCK_UN);
-    }
-
-    sub flock {
-        my ($self, $mode) = @_;
-        CORE::flock($self->{fh}, $mode)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub close {
-        my ($self) = @_;
-        CORE::close($self->{fh})
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub stat {
-        my ($self) = @_;
-        Sidef::Types::Glob::Stat->stat($self->{fh}, $self);
-    }
-
-    sub lstat {
-        my ($self) = @_;
-        Sidef::Types::Glob::Stat->lstat($self->{fh}, $self);
-    }
-
-    sub truncate {
-        my ($self, $length) = @_;
-        CORE::truncate($self->{fh}, $length // 0)
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub read_to {
-        my ($self, $var_ref) = @_;
-
-        my $line = CORE::readline($self->{fh});
-
-        if (defined($line)) {
-            chomp($line);
-            $$var_ref = Sidef::Types::String::String->new($line);
-        }
-        else {
-            undef $$var_ref;
-        }
-
-        $self;
-    }
-
-    sub write_from {
-        my ($self, @args) = @_;
-        CORE::print {$self->{fh}} @args;
-        $self;
-    }
-
-    sub copy {
-        my ($self, $fh) = @_;
-
-        if (ref($fh) ne __PACKAGE__) {
-            return;
-        }
-
-        state $x = require File::Copy;
-        File::Copy::copy($self->{fh}, $fh->{fh})
-          ? (Sidef::Types::Bool::Bool::TRUE)
-          : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *cp = \&copy;
-
-    {
-        no strict 'refs';
-        *{__PACKAGE__ . '::' . '>>'} = \&read_to;
-        *{__PACKAGE__ . '::' . '»'}  = \&read_to;
-        *{__PACKAGE__ . '::' . '<<'} = \&write_from;
-        *{__PACKAGE__ . '::' . '«'}  = \&write_from;
-    }
-
-};
+{
+    no strict 'refs';
+    *{__PACKAGE__ . '::' . '>>'} = \&read_to;
+    *{__PACKAGE__ . '::' . '»'}  = \&read_to;
+    *{__PACKAGE__ . '::' . '<<'} = \&write_from;
+    *{__PACKAGE__ . '::' . '«'}  = \&write_from;
+}
 
 1

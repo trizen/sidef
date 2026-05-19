@@ -1,479 +1,477 @@
-package Sidef::Sys::Sys {
+package Sidef::Sys::Sys;
 
-    use utf8;
-    use 5.016;
-    use parent qw(
-      Sidef::Object::Object
-    );
+use utf8;
+use 5.016;
+use parent qw(
+  Sidef::Object::Object
+);
 
-    use Sidef::Types::Bool::Bool;
+use Sidef::Types::Bool::Bool;
 
-    sub new {
-        CORE::bless {}, __PACKAGE__;
-    }
-
-    sub exit {
-        my ($self, $code) = @_;
-        CORE::exit($code // 0);
-    }
-
-    sub kill {
-        my ($self, $signal, @list) = @_;
-        Sidef::Types::Number::Number->new(CORE::kill("$signal", map { CORE::int($_) } @list));
-    }
-
-    sub wait {
-        my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::wait);
-    }
-
-    sub fork {
-        my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::fork() // return undef);
-    }
-
-    sub alarm {
-        my ($self, $sec) = @_;
-
-        state $x = require Time::HiRes;
-        (Time::HiRes::alarm($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub ualarm {
-        my ($self, $sec) = @_;
-
-        state $x = require Time::HiRes;
-        (Time::HiRes::ualarm($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *micro_alarm = \&ualarm;
-
-    sub sleep {
-        my ($self, $sec) = @_;
-
-        state $x = require Time::HiRes;
-        (Time::HiRes::sleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub nanosleep {
-        my ($self, $sec) = @_;
-
-        state $x = require Time::HiRes;
-        (Time::HiRes::nanosleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *nano_sleep = \&nanosleep;
-
-    sub usleep {
-        my ($self, $sec) = @_;
-
-        state $x = require Time::HiRes;
-        (Time::HiRes::usleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *micro_sleep = \&usleep;
-
-    sub osname {
-        my ($self) = @_;
-        Sidef::Types::String::String->new($^O);
-    }
-
-    *os = \&osname;
-
-    sub user {
-        my ($self) = @_;
-        Sidef::Types::String::String->new(CORE::getlogin);
-    }
-
-    *getlogin = \&user;
-
-    sub umask {
-        my ($self, $mode) = @_;
-
-        if (defined($mode)) {
-            return Sidef::Types::Number::Number->new(CORE::umask($mode));
-        }
-
-        Sidef::Types::Number::Number->new(CORE::umask);
-    }
-
-    sub ref {
-        my ($self, $obj) = @_;
-        Sidef::Types::String::String->new(CORE::ref $obj);
-    }
-
-    sub defined {
-        my ($self, $obj) = @_;
-        (defined $obj) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub class_name {
-        my ($self, $obj) = @_;
-        my $ref = CORE::ref($obj);
-
-        my $rindex = rindex($ref, '::');
-        Sidef::Types::String::String->new($rindex == -1 ? $ref : substr($ref, $rindex + 2));
-    }
-
-    sub sidef {
-        my ($self) = @_;
-
-        state $x = require File::Spec;
-        Sidef::Types::String::String->new(File::Spec->rel2abs($0));
-    }
-
-    sub die {
-        my ($self, @args) = @_;
-        CORE::die(@args, "\n");
-    }
-
-    *raise = \&die;
-
-    sub warn {
-        my ($self, @args) = @_;
-        CORE::warn(@args, "\n");
-    }
-
-    sub print {
-        my ($self, @args) = @_;
-        (CORE::print(@args)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub printf {
-        my ($self, @args) = @_;
-        (CORE::printf(@args)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub printh {
-        my ($self, $fh, @args) = @_;
-
-        if (CORE::ref($fh) eq 'GLOB') {
-            return (CORE::print {$fh} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-        }
-
-        $fh->print(@args);
-    }
-
-    sub println {
-        my ($self, @args) = @_;
-        (CORE::say @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    *say = \&println;
-
-    sub scanln {
-        my ($self, $text) = @_;
-        $self->read($text, 'Sidef::Types::String::String');
-    }
+sub new {
+    CORE::bless {}, __PACKAGE__;
+}
 
-    *readln   = \&scanln;
-    *readline = \&scanln;
+sub exit {
+    my ($self, $code) = @_;
+    CORE::exit($code // 0);
+}
 
-    sub read {
-        my ($self, $type, $opt_arg) = @_;
+sub kill {
+    my ($self, $signal, @list) = @_;
+    Sidef::Types::Number::Number->new(CORE::kill("$signal", map { CORE::int($_) } @list));
+}
 
-        my $message = '';
+sub wait {
+    my ($self) = @_;
+    Sidef::Types::Number::Number->new(CORE::wait);
+}
 
-        if (defined($opt_arg)) {
-            $message = "$type";
-            $type    = $opt_arg;
-        }
+sub fork {
+    my ($self) = @_;
+    Sidef::Types::Number::Number->new(CORE::fork() // return undef);
+}
 
-        state $term = do {
-            require Term::ReadLine;
-            Term::ReadLine->new("$0");
-        };
+sub alarm {
+    my ($self, $sec) = @_;
 
-        my $input = $term->readline($message) // return undef;
+    state $x = require Time::HiRes;
+    (Time::HiRes::alarm($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-        defined($type)
-          ? $type->new($input)
-          : Sidef::Types::String::String->new($input);
-    }
-
-    sub open {
-        my ($self, $var, $mode, $filename) = @_;
-        $filename->to_file->open($mode, $var);
-    }
-
-    sub stdin {
-        Sidef::Types::Glob::FileHandle->stdin;
-    }
-
-    sub stdout {
-        Sidef::Types::Glob::FileHandle->stdout;
-    }
-
-    sub stderr {
-        Sidef::Types::Glob::FileHandle->stderr;
-    }
-
-    sub opendir {
-        my ($self, $var, $dirname) = @_;
-        $dirname->to_dir->open($var);
-    }
-
-    sub eval {
-        my ($self, $code) = @_;
-        Sidef::Types::Perl::Perl->new($code)->eval;
-    }
-
-    sub bless {
-        my ($self, $obj, $class) = @_;
-        CORE::bless $obj, $class;
-    }
-
-    sub refaddr {
-        my ($self, $obj) = @_;
-        Sidef::Types::Number::Number::_set_int(Scalar::Util::refaddr($obj));
-    }
-
-    sub reftype {
-        my ($self, $obj) = @_;
-        Sidef::Types::String::String->new(Scalar::Util::reftype($obj));
-    }
-
-    sub weaken {
-        my ($self, $obj) = @_;
-        (Scalar::Util::weaken($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub isweak {
-        my ($self, $obj) = @_;
-        (Scalar::Util::isweak($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub unweaken {
-        my ($self, $obj) = @_;
-        (Scalar::Util::unweaken($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
-
-    sub select {
-        my ($self, $fh) = @_;
-        CORE::select(CORE::ref($fh) eq 'GLOB' ? $fh : $fh->get_value);
-    }
-
-    sub system {
-        my ($self, @args) = @_;
-        Sidef::Types::Number::Number::_set_int(scalar CORE::system(@args));
-    }
-
-    *run = \&system;
-
-    sub exec {
-        my ($self, @args) = @_;
-        CORE::exec(@args);
-    }
-
-    sub __GETPW__ {
-        my ($self, $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell) = @_;
-        $name // return undef;
-        Sidef::Types::Array::Array->new(
-                                        Sidef::Types::String::String->new($name),  Sidef::Types::String::String->new($passwd),
-                                        Sidef::Types::Number::Number->new($uid),   Sidef::Types::Number::Number->new($gid),
-                                        Sidef::Types::String::String->new($quota), Sidef::Types::String::String->new($comment),
-                                        Sidef::Types::String::String->new($gcos),  Sidef::Types::String::String->new($shell),
-                                       );
-    }
+sub ualarm {
+    my ($self, $sec) = @_;
 
-    sub setpwent {
-        my ($self) = @_;
-        (CORE::setpwent) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
+    state $x = require Time::HiRes;
+    (Time::HiRes::ualarm($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub getpwuid {
-        my ($self, $uid) = @_;
-        $self->__GETPW__(CORE::getpwuid($uid));
-    }
+*micro_alarm = \&ualarm;
 
-    sub getpwnam {
-        my ($self, $name) = @_;
-        $self->__GETPW__(CORE::getpwnam($name));
-    }
+sub sleep {
+    my ($self, $sec) = @_;
 
-    sub getpwent {
-        my ($self) = @_;
-        $self->__GETPW__(CORE::getpwent);
-    }
+    state $x = require Time::HiRes;
+    (Time::HiRes::sleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub __GETGR__ {
-        my ($self, $name, $passwd, $gid, $members) = @_;
-        $name // return
-          Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name),
-                                          Sidef::Types::String::String->new($passwd),
-                                          Sidef::Types::Number::Number->new($gid),
-                                          Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } split(' ', $members)),
-                                         );
-    }
+sub nanosleep {
+    my ($self, $sec) = @_;
 
-    sub setgrent {
-        my ($self) = @_;
-        (CORE::setgrent) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
+    state $x = require Time::HiRes;
+    (Time::HiRes::nanosleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub getgrent {
-        my ($self) = @_;
-        $self->__GETGR__(CORE::getgrent);
-    }
+*nano_sleep = \&nanosleep;
 
-    sub getgrgid {
-        my ($self, $gid) = @_;
-        $self->__GETGR__(CORE::getgrgid($gid));
-    }
+sub usleep {
+    my ($self, $sec) = @_;
 
-    sub getgrnam {
-        my ($self, $name) = @_;
-        $self->__GETGR__(CORE::getgrnam($name));
-    }
+    state $x = require Time::HiRes;
+    (Time::HiRes::usleep($sec)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub __GETHOST__ {
-        my ($self, $name, $aliases, $addrtype, $length, @addrs) = @_;
-        $name // return undef;
-        Sidef::Types::Array::Array->new(
-                                        Sidef::Types::String::String->new($name),
-                                        Sidef::Types::String::String->new($aliases),
-                                        Sidef::Types::String::String->new($addrtype),
-                                        Sidef::Types::Number::Number->new($length),
-                                        Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } @addrs),
-                                       );
-    }
+*micro_sleep = \&usleep;
 
-    sub sethostent {
-        my ($self, $stayopen) = @_;
-        (CORE::sethostent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
+sub osname {
+    my ($self) = @_;
+    Sidef::Types::String::String->new($^O);
+}
 
-    sub gethostbyaddr {
-        my ($self, $addr, $addrtype) = @_;
-        $self->__GETHOST__(CORE::gethostbyaddr($addr, $addrtype));
-    }
+*os = \&osname;
 
-    sub gethostbyname {
-        my ($self, $name) = @_;
-        $self->__GETHOST__(CORE::gethostbyname($name));
-    }
+sub user {
+    my ($self) = @_;
+    Sidef::Types::String::String->new(CORE::getlogin);
+}
 
-    sub gethostent {
-        my ($self) = @_;
-        $self->__GETHOST__(CORE::gethostent);
-    }
+*getlogin = \&user;
 
-    sub __GETNET__ {
-        my ($self, $name, $aliases, $addrtype, $net) = @_;
-        $name // return undef;
-        Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name),     Sidef::Types::String::String->new($aliases),
-                                        Sidef::Types::String::String->new($addrtype), Sidef::Types::String::String->new($net),);
-    }
+sub umask {
+    my ($self, $mode) = @_;
 
-    sub setnetent {
-        my ($self, $stayopen) = @_;
-        (CORE::setnetent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+    if (defined($mode)) {
+        return Sidef::Types::Number::Number->new(CORE::umask($mode));
     }
 
-    sub getnetbyaddr {
-        my ($self, $addr, $addrtype) = @_;
-        $self->__GETNET__(CORE::getnetbyaddr($addr, $addrtype));
-    }
+    Sidef::Types::Number::Number->new(CORE::umask);
+}
 
-    sub getnetbyname {
-        my ($self, $name) = @_;
-        $self->__GETNET__(CORE::getnetbyname($name));
-    }
+sub ref {
+    my ($self, $obj) = @_;
+    Sidef::Types::String::String->new(CORE::ref $obj);
+}
 
-    sub getnetent {
-        my ($self) = @_;
-        $self->__GETNET__(CORE::getnetent);
-    }
+sub defined {
+    my ($self, $obj) = @_;
+    (defined $obj) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub __GETPROTO__ {
-        my ($self, $name, $aliases, $proto) = @_;
-        $name // return undef;
-        Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name),
-                                        Sidef::Types::String::String->new($aliases),
-                                        Sidef::Types::String::String->new($proto),
-                                       );
-    }
+sub class_name {
+    my ($self, $obj) = @_;
+    my $ref = CORE::ref($obj);
 
-    sub setprotoent {
-        my ($self, $stayopen) = @_;
-        (CORE::setprotoent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
+    my $rindex = rindex($ref, '::');
+    Sidef::Types::String::String->new($rindex == -1 ? $ref : substr($ref, $rindex + 2));
+}
 
-    sub getprotobyname {
-        my ($self, $name) = @_;
-        $self->__GETPROTO__(CORE::getprotobyname($name));
-    }
+sub sidef {
+    my ($self) = @_;
 
-    sub getprotobynumber {
-        my ($self, $num) = @_;
-        $self->__GETPROTO__(CORE::getprotobynumber($num));
-    }
+    state $x = require File::Spec;
+    Sidef::Types::String::String->new(File::Spec->rel2abs($0));
+}
 
-    sub getprotoent {
-        my ($self) = @_;
-        $self->__GETPROTO__(CORE::getprotoent);
-    }
+sub die {
+    my ($self, @args) = @_;
+    CORE::die(@args, "\n");
+}
 
-    sub __GETSERV__ {
-        my ($self, $name, $aliases, $port, $proto) = @_;
-        $name // return undef;
-        Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name), Sidef::Types::String::String->new($aliases),
-                                        Sidef::Types::Number::Number->new($port), Sidef::Types::String::String->new($proto),);
-    }
+*raise = \&die;
 
-    sub setservent {
-        my ($self, $stayopen) = @_;
-        (CORE::setservent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
-    }
+sub warn {
+    my ($self, @args) = @_;
+    CORE::warn(@args, "\n");
+}
 
-    sub getservbyname {
-        my ($self, $name, $proto) = @_;
-        $self->__GETSERV__(CORE::getservbyname($name, $proto));
-    }
+sub print {
+    my ($self, @args) = @_;
+    (CORE::print(@args)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub getservbyport {
-        my ($self, $port, $proto) = @_;
-        $self->__GETSERV__(CORE::getservbyport($port, $proto));
-    }
+sub printf {
+    my ($self, @args) = @_;
+    (CORE::printf(@args)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    sub getservent {
-        my ($self) = @_;
-        $self->__GETSERV__(CORE::getservent);
-    }
+sub printh {
+    my ($self, $fh, @args) = @_;
 
-    #
-    ## get/set priority
-    #
-    sub getpriority {
-        my ($self, $which, $who) = @_;
-        Sidef::Types::Number::Number->new(CORE::getpriority($which, $who));
+    if (CORE::ref($fh) eq 'GLOB') {
+        return (CORE::print {$fh} @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
     }
 
-    sub setpriority {
-        my ($self, $which, $who, $priority) = @_;
-        Sidef::Types::Number::Number->new(CORE::setpriority($which, $who, $priority));
-    }
+    $fh->print(@args);
+}
 
-    sub getppid {
-        my ($self) = @_;
-        Sidef::Types::Number::Number->new(CORE::getppid);
-    }
+sub println {
+    my ($self, @args) = @_;
+    (CORE::say @args) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
 
-    #
-    ## get/set the process group of a process
-    #
-    sub getpgrp {
-        my ($self, $pid) = @_;
-        Sidef::Types::Number::Number->new(CORE::getpgrp(defined($pid) ? $pid : ()));
-    }
+*say = \&println;
 
-    sub setpgrp {
-        my ($self, $pid, $pgrp) = @_;
-        $pid  //= 0;
-        $pgrp //= 0;
-        Sidef::Types::Number::Number->new(CORE::setpgrp($pid, $pgrp));
-    }
+sub scanln {
+    my ($self, $text) = @_;
+    $self->read($text, 'Sidef::Types::String::String');
+}
 
-};
+*readln   = \&scanln;
+*readline = \&scanln;
+
+sub read {
+    my ($self, $type, $opt_arg) = @_;
+
+    my $message = '';
+
+    if (defined($opt_arg)) {
+        $message = "$type";
+        $type    = $opt_arg;
+    }
+
+    state $term = do {
+        require Term::ReadLine;
+        Term::ReadLine->new("$0");
+    };
+
+    my $input = $term->readline($message) // return undef;
+
+    defined($type)
+      ? $type->new($input)
+      : Sidef::Types::String::String->new($input);
+}
+
+sub open {
+    my ($self, $var, $mode, $filename) = @_;
+    $filename->to_file->open($mode, $var);
+}
+
+sub stdin {
+    Sidef::Types::Glob::FileHandle->stdin;
+}
+
+sub stdout {
+    Sidef::Types::Glob::FileHandle->stdout;
+}
+
+sub stderr {
+    Sidef::Types::Glob::FileHandle->stderr;
+}
+
+sub opendir {
+    my ($self, $var, $dirname) = @_;
+    $dirname->to_dir->open($var);
+}
+
+sub eval {
+    my ($self, $code) = @_;
+    Sidef::Types::Perl::Perl->new($code)->eval;
+}
+
+sub bless {
+    my ($self, $obj, $class) = @_;
+    CORE::bless $obj, $class;
+}
+
+sub refaddr {
+    my ($self, $obj) = @_;
+    Sidef::Types::Number::Number::_set_int(Scalar::Util::refaddr($obj));
+}
+
+sub reftype {
+    my ($self, $obj) = @_;
+    Sidef::Types::String::String->new(Scalar::Util::reftype($obj));
+}
+
+sub weaken {
+    my ($self, $obj) = @_;
+    (Scalar::Util::weaken($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub isweak {
+    my ($self, $obj) = @_;
+    (Scalar::Util::isweak($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub unweaken {
+    my ($self, $obj) = @_;
+    (Scalar::Util::unweaken($obj)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub select {
+    my ($self, $fh) = @_;
+    CORE::select(CORE::ref($fh) eq 'GLOB' ? $fh : $fh->get_value);
+}
+
+sub system {
+    my ($self, @args) = @_;
+    Sidef::Types::Number::Number::_set_int(scalar CORE::system(@args));
+}
+
+*run = \&system;
+
+sub exec {
+    my ($self, @args) = @_;
+    CORE::exec(@args);
+}
+
+sub __GETPW__ {
+    my ($self, $name, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell) = @_;
+    $name // return undef;
+    Sidef::Types::Array::Array->new(
+                                    Sidef::Types::String::String->new($name),  Sidef::Types::String::String->new($passwd),
+                                    Sidef::Types::Number::Number->new($uid),   Sidef::Types::Number::Number->new($gid),
+                                    Sidef::Types::String::String->new($quota), Sidef::Types::String::String->new($comment),
+                                    Sidef::Types::String::String->new($gcos),  Sidef::Types::String::String->new($shell),
+                                   );
+}
+
+sub setpwent {
+    my ($self) = @_;
+    (CORE::setpwent) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub getpwuid {
+    my ($self, $uid) = @_;
+    $self->__GETPW__(CORE::getpwuid($uid));
+}
+
+sub getpwnam {
+    my ($self, $name) = @_;
+    $self->__GETPW__(CORE::getpwnam($name));
+}
+
+sub getpwent {
+    my ($self) = @_;
+    $self->__GETPW__(CORE::getpwent);
+}
+
+sub __GETGR__ {
+    my ($self, $name, $passwd, $gid, $members) = @_;
+    $name // return
+      Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name),
+                                      Sidef::Types::String::String->new($passwd),
+                                      Sidef::Types::Number::Number->new($gid),
+                                      Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } split(' ', $members)),
+                                     );
+}
+
+sub setgrent {
+    my ($self) = @_;
+    (CORE::setgrent) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub getgrent {
+    my ($self) = @_;
+    $self->__GETGR__(CORE::getgrent);
+}
+
+sub getgrgid {
+    my ($self, $gid) = @_;
+    $self->__GETGR__(CORE::getgrgid($gid));
+}
+
+sub getgrnam {
+    my ($self, $name) = @_;
+    $self->__GETGR__(CORE::getgrnam($name));
+}
+
+sub __GETHOST__ {
+    my ($self, $name, $aliases, $addrtype, $length, @addrs) = @_;
+    $name // return undef;
+    Sidef::Types::Array::Array->new(
+                                    Sidef::Types::String::String->new($name),
+                                    Sidef::Types::String::String->new($aliases),
+                                    Sidef::Types::String::String->new($addrtype),
+                                    Sidef::Types::Number::Number->new($length),
+                                    Sidef::Types::Array::Array->new(map { Sidef::Types::String::String->new($_) } @addrs),
+                                   );
+}
+
+sub sethostent {
+    my ($self, $stayopen) = @_;
+    (CORE::sethostent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub gethostbyaddr {
+    my ($self, $addr, $addrtype) = @_;
+    $self->__GETHOST__(CORE::gethostbyaddr($addr, $addrtype));
+}
+
+sub gethostbyname {
+    my ($self, $name) = @_;
+    $self->__GETHOST__(CORE::gethostbyname($name));
+}
+
+sub gethostent {
+    my ($self) = @_;
+    $self->__GETHOST__(CORE::gethostent);
+}
+
+sub __GETNET__ {
+    my ($self, $name, $aliases, $addrtype, $net) = @_;
+    $name // return undef;
+    Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name),     Sidef::Types::String::String->new($aliases),
+                                    Sidef::Types::String::String->new($addrtype), Sidef::Types::String::String->new($net),);
+}
+
+sub setnetent {
+    my ($self, $stayopen) = @_;
+    (CORE::setnetent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub getnetbyaddr {
+    my ($self, $addr, $addrtype) = @_;
+    $self->__GETNET__(CORE::getnetbyaddr($addr, $addrtype));
+}
+
+sub getnetbyname {
+    my ($self, $name) = @_;
+    $self->__GETNET__(CORE::getnetbyname($name));
+}
+
+sub getnetent {
+    my ($self) = @_;
+    $self->__GETNET__(CORE::getnetent);
+}
+
+sub __GETPROTO__ {
+    my ($self, $name, $aliases, $proto) = @_;
+    $name // return undef;
+    Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name),
+                                    Sidef::Types::String::String->new($aliases),
+                                    Sidef::Types::String::String->new($proto),
+                                   );
+}
+
+sub setprotoent {
+    my ($self, $stayopen) = @_;
+    (CORE::setprotoent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub getprotobyname {
+    my ($self, $name) = @_;
+    $self->__GETPROTO__(CORE::getprotobyname($name));
+}
+
+sub getprotobynumber {
+    my ($self, $num) = @_;
+    $self->__GETPROTO__(CORE::getprotobynumber($num));
+}
+
+sub getprotoent {
+    my ($self) = @_;
+    $self->__GETPROTO__(CORE::getprotoent);
+}
+
+sub __GETSERV__ {
+    my ($self, $name, $aliases, $port, $proto) = @_;
+    $name // return undef;
+    Sidef::Types::Array::Array->new(Sidef::Types::String::String->new($name), Sidef::Types::String::String->new($aliases),
+                                    Sidef::Types::Number::Number->new($port), Sidef::Types::String::String->new($proto),);
+}
+
+sub setservent {
+    my ($self, $stayopen) = @_;
+    (CORE::setservent($stayopen)) ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub getservbyname {
+    my ($self, $name, $proto) = @_;
+    $self->__GETSERV__(CORE::getservbyname($name, $proto));
+}
+
+sub getservbyport {
+    my ($self, $port, $proto) = @_;
+    $self->__GETSERV__(CORE::getservbyport($port, $proto));
+}
+
+sub getservent {
+    my ($self) = @_;
+    $self->__GETSERV__(CORE::getservent);
+}
+
+#
+## get/set priority
+#
+sub getpriority {
+    my ($self, $which, $who) = @_;
+    Sidef::Types::Number::Number->new(CORE::getpriority($which, $who));
+}
+
+sub setpriority {
+    my ($self, $which, $who, $priority) = @_;
+    Sidef::Types::Number::Number->new(CORE::setpriority($which, $who, $priority));
+}
+
+sub getppid {
+    my ($self) = @_;
+    Sidef::Types::Number::Number->new(CORE::getppid);
+}
+
+#
+## get/set the process group of a process
+#
+sub getpgrp {
+    my ($self, $pid) = @_;
+    Sidef::Types::Number::Number->new(CORE::getpgrp(defined($pid) ? $pid : ()));
+}
+
+sub setpgrp {
+    my ($self, $pid, $pgrp) = @_;
+    $pid  //= 0;
+    $pgrp //= 0;
+    Sidef::Types::Number::Number->new(CORE::setpgrp($pid, $pgrp));
+}
 
 1
