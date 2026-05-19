@@ -90,7 +90,7 @@ say 100.euler_phi        #=> 40
 
 ```ruby
 # Generate the first 10 Fibonacci numbers
-say 10.of { .fib }      #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+say 10.of { .fib }       #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 
 # Sum of primes up to 100
 say prime_sum(100)       #=> 1060
@@ -123,7 +123,7 @@ var f = Number("ff",    16)   # Hex    "ff"     = 255
 Sidef performs exact rational arithmetic automatically. Use `as_frac` or `as_rat` to inspect the rational representation.
 
 ```ruby
-say (1/3 + 1/6)           #=> 1/2
+say (1/3 + 1/6)            #=> 1/2
 say as_frac(355/113)       #=> 355/113
 say (22/7 - Num.pi)        # Small floating-point difference
 ```
@@ -1041,14 +1041,23 @@ say 30.of { .squares_r(2) }  # OEIS: A004018
 say 30.of { .squares_r(4) }  # OEIS: A000118
 ```
 
-### Quadratic Equations over Integers
+### Solving Equations
 
 ```ruby
+# Real solutions to a*x^2 + b*x + c = 0
+say [quadratic_formula(13, -42, -34)]    #=> [3.9011..., -0.6704...]
+
 # Integer solutions to a*x^2 + b*x + c = 0
 say [iquadratic_formula(13, -42, -34)]    #=> [3, -1]
 
 # Cubic formula (complex solutions)
-say cubic_formula(1, -6, 11, -6)  # x^3 - 6x^2 + 11x - 6 = 0 → [1, 2, 3]
+say [cubic_formula(1, -6, 11, -6)]  # x^3 - 6x^2 + 11x - 6 = 0 → [1, 2, 3]
+
+# Modular solutions to x^2 + (2*162 + 1)*x + 162^2 == 0 (mod 10^27)
+say modular_quadratic_formula(1, 2*162 + 1, 162**2, 10**27)
+
+# Solve Pell equation: x^2 - 863*y^2 = 1:
+say [solve_pell(863)]   #=> [18524026608, 630565199]
 ```
 
 ### Polygonal Numbers
@@ -1123,7 +1132,6 @@ say chebyshevTmod(n, x, m)           # T_n(x) mod m
 say zeta(2)             # ζ(2) = π²/6 ≈ 1.6449...
 say zeta(4)             # ζ(4) = π⁴/90
 say eta(1)              # Dirichlet eta η(1) = ln 2
-say zeta(0.5 + 14.1i)   # Riemann zeta at a complex point
 
 # Log of the n-th prime using Mangoldt function
 say exp_mangoldt(8)     # p if 8 = p^k, else 1
@@ -1270,7 +1278,7 @@ for n in (4..1000 `by` 2) {
 **Problem:** Numerically verify that Π_{p prime} 1/(1 − p^−2) = π²/6.
 
 ```ruby
-var product = primes(1e6).prod {|p| (1f / (1 - 1/p**2)) }
+var product = primes(1e6).prod {|p| (1 / (1 - 1f/p**2)) }
 say product
 say (Num.pi**2 / 6)    # Should be very close
 ```
@@ -1311,12 +1319,10 @@ say flt_factor(n, 3, 1e6)
 
 ### Problem 6 — Solving a Quadratic Congruence
 
-**Problem:** Find all x such that x² ≡ 7 (mod 55).
+**Problem:** Find all x such that x² ≡ 289 (mod 5040).
 
 ```ruby
-say sqrtmod_all(7, 55)
-# Try legendre to check QR status first
-say jacobi(7, 55)
+say sqrtmod_all(289, 5040)
 ```
 
 ---
