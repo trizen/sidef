@@ -2133,8 +2133,9 @@ You've covered the fundamentals! Here's where to go next.
 |----------|-------------|
 | 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
 | 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.05/sidef-book.pdf) | The full book in PDF format for offline reading |
-| 📝 [Advanced Tutorial](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
-| 🔢 [Number Theory Tutorial](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_TUTORIAL.md) | Deep dive into Sidef's mathematical superpowers |
+| 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
+| 🔢 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
+| 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) | Complete function reference for number theory |
 
 ### Example Code
 

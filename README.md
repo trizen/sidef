@@ -451,13 +451,19 @@ Explore an extensive collection of Sidef programs at **[github.com/trizen/sidef-
 | Resource | Description |
 |----------|-------------|
 | **[Beginner's Guide](https://github.com/trizen/sidef/blob/master/SIDEF_BEGINNER_GUIDE.md)** | Start here if you're new to Sidef |
-| **[Advanced Tutorial](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md)** | Comprehensive language tutorial |
-| **[Number Theory Tutorial](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_TUTORIAL.md)** | Mathematical programming with Sidef |
+| **[Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md)** | Comprehensive language tutorial |
+| **[Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md)** | Mathematical programming with Sidef |
 | **[Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md)** | Complete function reference for number theory |
-| **[Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md)** | Complete guide for computational number theory |
 | **[Computational Algebra Guide](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md)** | Complete guide for computational algebra |
+| **[Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number)** | Full Number class documentation |
 | **[Sidef GitBook](https://trizen.gitbook.io/sidef-lang/)** | Full language guide |
-| **[RosettaCode Examples](https://rosettacode.org/wiki/Sidef)** | Practical code examples across many tasks |
+
+### Example Code
+
+| Resource | Description |
+|----------|-------------|
+| 📂 [sidef-scripts](https://github.com/trizen/sidef-scripts) | Hundreds of real Sidef programs — the best way to learn by reading |
+| 🌹 [RosettaCode — Sidef](https://rosettacode.org/wiki/Sidef) | Classic programming tasks solved in Sidef, side-by-side with other languages |
 
 ## 💬 Community & Support
 
