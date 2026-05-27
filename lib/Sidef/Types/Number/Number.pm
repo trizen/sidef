@@ -26503,7 +26503,7 @@ sub partitions {
             return;
         }
 
-        my $upper = ($n < $max_value ? $n : $max_value);
+        my $upper = ($n < $max_part ? $n : $max_part);
 
         for my $part (1 .. $upper) {
             push @path, bless \$part;
