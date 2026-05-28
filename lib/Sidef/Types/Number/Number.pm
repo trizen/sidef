@@ -32228,12 +32228,12 @@ sub prime_signature_numbers {
 *inverse_prime_signature = \&prime_signature_numbers;
 
 sub _prime_sig_count {
-    my ($n, $prime_sig) = @_;
+    my ($n, $prime_signature) = @_;
 
     Math::GMPz::Rmpz_sgn($n) > 0
       or return 0;
 
-    my $k = scalar(@$prime_sig);
+    my $k = scalar(@$prime_signature);
 
     if ($k == 0) {
         return 1;
@@ -32247,7 +32247,7 @@ sub _prime_sig_count {
         return 0;
     }
 
-    my $sum_e = List::Util::sum(@$prime_sig) || return 0;
+    my $sum_e = List::Util::sum(@$prime_signature) || return 0;
 
     if ($sum_e >= Math::GMPz::Rmpz_sizeinbase($n, 2)) {
         return 0;
@@ -32360,7 +32360,7 @@ sub _prime_sig_count {
             $m;
         },
         2,
-        $prime_sig,
+        $prime_signature,
         $sum_e
       );
 
@@ -32394,17 +32394,59 @@ sub prime_signature_count {
 *prime_signature_inverse_len = \&prime_signature_count;
 *inverse_prime_signature_len = \&prime_signature_count;
 
+sub _tau_partitions {
+    my ($n, $max_sum_e) = @_;
+
+    my @results;
+    my @divs = _divisors($n);
+
+    shift(@divs);    # remove divisor '1'
+
+    my $end = $#divs;
+    my @path;
+
+    sub {
+        my ($target, $min_idx, $curr_sum_e) = @_;
+
+        if ($target == 1) {
+            push @results, [@path];
+            return;
+        }
+
+        for my $i ($min_idx .. $end) {
+            my $d = $divs[$i];
+            my $e = $d - 1;
+
+            last if $d > $target;
+            last if ($curr_sum_e + $e > $max_sum_e);
+
+            if ($target % $d == 0) {
+                push @path, $e;
+                my $t =
+                  HAS_PRIME_UTIL
+                  ? Math::Prime::Util::divint($target, $d)
+                  : Math::Prime::Util::GMP::divint($target, $d);
+                __SUB__->($t, $i, $curr_sum_e + $e);
+                pop @path;
+            }
+        }
+      }
+      ->($n, 0, 0);
+
+    return @results;
+}
+
 sub tau_inverse {
     my ($from, $to, $k) = @_;
 
     _valid(\$to, \$k);
 
-    my @signatures = map {
-        [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
-    } @{$k->multiplicative_partitions($to->ilog2->inc)};
+    $k = _any2ui($$k) // return _array();
 
     $from = _any2mpz($$from, 0) // return _array();
     $to   = _any2mpz($$to,   1) // return _array();
+
+    my @signatures = _tau_partitions($k, Math::GMPz::Rmpz_sizeinbase($to, 2) - 1);
 
     my @list;
     foreach my $sig (@signatures) {
@@ -32428,11 +32470,9 @@ sub tau_inverse_len {
         return ((ONE)->tau_inverse_len($to, $k)->sub((ONE)->tau_inverse_len($from->dec, $k)));
     }
 
-    my @signatures = map {
-        [map { Math::Prime::Util::GMP::subint("$_", 1) } @$_]
-    } @{$k->multiplicative_partitions($to->ilog2->inc)};
-
-    my $n = _any2mpz($$to) // return 0;
+    $k = _any2ui($$k) // return ZERO;
+    my $n = _any2mpz($$to, 0) // return ZERO;
+    my @signatures = _tau_partitions($k, Math::GMPz::Rmpz_sizeinbase($n, 2) - 1);
 
     my @list;
     foreach my $sig (@signatures) {
