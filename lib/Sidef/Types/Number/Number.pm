@@ -499,7 +499,7 @@ sub _str2obj {
     }
 
     # Performance improvement for Perl integers
-    if (CORE::int($s) eq $s and $s > LONG_MIN and $s < ULONG_MAX) {
+    if (FAST_MODE and CORE::int($s) eq $s and $s > LONG_MIN and $s < ULONG_MAX) {
         return $s + 0;
 
 #<<<
@@ -515,7 +515,7 @@ sub _str2obj {
     if ($s =~ tr/e.// and $s =~ /^([+-]?+(?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)\z/) {
         my $frac = _str2frac($1);
 
-        if (CORE::int($frac) eq $frac and $frac > LONG_MIN and $frac < ULONG_MAX) {
+        if (FAST_MODE and CORE::int($frac) eq $frac and $frac > LONG_MIN and $frac < ULONG_MAX) {
             return $frac + 0;
         }
 
@@ -661,7 +661,7 @@ sub _any2mpc {
 
     if (!ref($x)) {
         my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
-        if ($x < ULONG_MAX and $x > LONG_MIN) {
+        if (FAST_MODE and $x < ULONG_MAX and $x > LONG_MIN) {
             ($x < 0)
               ? Math::MPC::Rmpc_set_si($r, $x, $ROUND)
               : Math::MPC::Rmpc_set_ui($r, $x, $ROUND);
@@ -687,7 +687,7 @@ sub _any2mpfr {
 
     if (!ref($x)) {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        if ($x < ULONG_MAX and $x > LONG_MIN) {
+        if (FAST_MODE and $x < ULONG_MAX and $x > LONG_MIN) {
             ($x < 0)
               ? Math::MPFR::Rmpfr_set_si($r, $x, $ROUND)
               : Math::MPFR::Rmpfr_set_ui($r, $x, $ROUND);
@@ -742,7 +742,7 @@ sub _any2mpz {
         if (defined($k)) {
             state @table;
             my $mpz = ($table[$k] //= Math::GMPz::Rmpz_init());
-            ($x < ULONG_MAX and $x > LONG_MIN)
+            (FAST_MODE and $x < ULONG_MAX and $x > LONG_MIN)
               ? (
                  ($x < 0)
                  ? Math::GMPz::Rmpz_set_si($mpz, $x)
@@ -753,7 +753,7 @@ sub _any2mpz {
         }
 
         return (
-                ($x < ULONG_MAX and $x > LONG_MIN)
+                (FAST_MODE and $x < ULONG_MAX and $x > LONG_MIN)
                 ? (
                    ($x < 0)
                    ? Math::GMPz::Rmpz_init_set_si($x)
@@ -787,7 +787,7 @@ sub _any2mpq {
 
     if (!ref($x)) {
         my $q = Math::GMPq::Rmpq_init();
-        if ($x < ULONG_MAX and $x > LONG_MIN) {
+        if (FAST_MODE and $x < ULONG_MAX and $x > LONG_MIN) {
             ($x < 0)
               ? Math::GMPq::Rmpq_set_si($q, $x, 1)
               : Math::GMPq::Rmpq_set_ui($q, $x, 1);
@@ -1271,7 +1271,7 @@ sub _factor {
     $n = _normalize_numeric_type($n);
 
     # Fast path for small native numbers
-    return _factor_via_prime_util($n) if $n < ULONG_MAX;
+    return _factor_via_prime_util($n) if (FAST_MODE and $n < ULONG_MAX);
 
     my @factors;
 
@@ -2017,7 +2017,7 @@ sub __norm__ {
 
   Scalar: {
         my $r = $x * $x;
-        if ($r < ULONG_MAX and $r > LONG_MIN) {
+        if (FAST_MODE and $r < ULONG_MAX and $r > LONG_MIN) {
             return $r;
         }
         $x = _any2mpz($x);
@@ -2259,7 +2259,7 @@ sub __add__ {
     #
   Scalar__Scalar: {
         my $r = $x + $y;
-        if ($r < ULONG_MAX and $r > LONG_MIN) {
+        if (FAST_MODE and $r < ULONG_MAX and $r > LONG_MIN) {
             return $r;
         }
         $r =
@@ -2460,7 +2460,7 @@ sub __sub__ {
 
   Scalar__Scalar: {
         my $r = $x - $y;
-        if ($r < ULONG_MAX and $r > LONG_MIN) {
+        if (FAST_MODE and $r < ULONG_MAX and $r > LONG_MIN) {
             return $r;
         }
         $r =
@@ -2698,7 +2698,7 @@ sub __mul__ {
     #
   Scalar__Scalar: {
         my $r = $x * $y;
-        if ($r < ULONG_MAX and $r > LONG_MIN) {
+        if (FAST_MODE and $r < ULONG_MAX and $r > LONG_MIN) {
             return $r;
         }
         $r =
@@ -2907,7 +2907,7 @@ sub __div__ {
               HAS_PRIME_UTIL
               ? Math::Prime::Util::divint($x, $y)
               : Math::Prime::Util::GMP::divint($x, $y);
-            if ($r < ULONG_MAX and $r > LONG_MIN) {
+            if (FAST_MODE and $r < ULONG_MAX and $r > LONG_MIN) {
                 return $r;
             }
         }
@@ -3784,7 +3784,7 @@ sub __neg__ {
 
   Scalar: {
         my $r = -$x;
-        if ($r < ULONG_MAX and $r > LONG_MIN) {
+        if (FAST_MODE and $r < ULONG_MAX and $r > LONG_MIN) {
             return $r;
         }
         $r =
@@ -4201,7 +4201,7 @@ sub __pow__ {
                   HAS_PRIME_UTIL
                   ? Math::Prime::Util::powint($x, $y)
                   : Math::Prime::Util::GMP::powint($x, $y);
-                if ($r < ULONG_MAX and $r > LONG_MIN) {
+                if (FAST_MODE and $r < ULONG_MAX and $r > LONG_MIN) {
                     return $r;
                 }
             }
@@ -4219,7 +4219,7 @@ sub __pow__ {
                   HAS_PRIME_UTIL
                   ? Math::Prime::Util::powint($x, $y)
                   : Math::Prime::Util::GMP::powint($x, $y);
-                if ($r < ULONG_MAX and $r > LONG_MIN) {
+                if (FAST_MODE and $r < ULONG_MAX and $r > LONG_MIN) {
                     return $r;
                 }
             }
@@ -7895,7 +7895,7 @@ sub sum {
         if (FAST_MODE and !ref($n)) {
             $new_sum = $native_sum + $n;
 
-            if ($new_sum < ULONG_MAX and $new_sum > LONG_MIN) {
+            if (FAST_MODE and $new_sum < ULONG_MAX and $new_sum > LONG_MIN) {
                 $native_sum = $new_sum;
             }
             else {
@@ -9646,7 +9646,7 @@ sub __inc__ {
 
   Scalar: {
         my $r = $x + 1;
-        if ($r < ULONG_MAX and $r > LONG_MIN) {
+        if (FAST_MODE and $r < ULONG_MAX and $r > LONG_MIN) {
             return $r;
         }
         $x = _any2mpz($x);
@@ -9693,7 +9693,7 @@ sub __dec__ {
 
   Scalar: {
         my $r = $x - 1;
-        if ($r < ULONG_MAX and $r > LONG_MIN) {
+        if (FAST_MODE and $r < ULONG_MAX and $r > LONG_MIN) {
             return $r;
         }
         $x = _any2mpz($x);
@@ -10859,7 +10859,7 @@ sub sum_of_squares {
         my ($p_raw, $k) = @$pp;
 
         # Convert p to GMPz for all subsequent arithmetic
-        ($p_raw < ULONG_MAX)
+        (FAST_MODE and $p_raw < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($p, $p_raw)
           : Math::GMPz::Rmpz_set_str($p, "$p_raw", 10);
 
@@ -11635,11 +11635,11 @@ sub ramanujan_sum {
     my $phi_k = Math::Prime::Util::GMP::totient($k_str);
     my $phi_r = Math::Prime::Util::GMP::totient($r_str);
 
-    ($phi_k < ULONG_MAX)
+    (FAST_MODE and $phi_k < ULONG_MAX)
       ? Math::GMPz::Rmpz_set_ui($r, $phi_k)
       : Math::GMPz::Rmpz_set_str($r, $phi_k, 10);
 
-    if ($phi_r < ULONG_MAX) {
+    if (FAST_MODE and $phi_r < ULONG_MAX) {
         Math::GMPz::Rmpz_divexact_ui($r, $r, $phi_r);
     }
     else {
@@ -12042,7 +12042,7 @@ sub primorial_deflation {    # A319626(n) / A319627(n)
         my $q = ($p <= 2) ? 1 : _prev_prime($p);
         my $t = Math::GMPq::Rmpq_init();
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPq::Rmpq_set_ui($t, $p, $q);
         }
         else {
@@ -14309,7 +14309,7 @@ sub _modular_binomial {
         my %acc  = ('0' => 1);
         my $nfac = 1;
 
-        if ($prq < ULONG_MAX and Math::Prime::Util::GMP::cmpint($p, $n) < 0) {
+        if (FAST_MODE and $prq < ULONG_MAX and Math::Prime::Util::GMP::cmpint($p, $n) < 0) {
             foreach my $k (1 .. List::Util::min(List::Util::max(@N, @K, @R), 1e3)) {
                 if ($k % $p) {
                     $nfac =
@@ -14804,7 +14804,7 @@ sub liouville_sum {
         my $M =
           ($t <= 103)
           ? $mertens_table->[$t]
-          : ${(($t < ULONG_MAX) ? (bless \$t) : _set_int($t))->mertens};
+          : ${((FAST_MODE and $t < ULONG_MAX) ? (bless \$t) : _set_int($t))->mertens};
 
         $L += $f * (ref($M) ? Math::GMPz::Rmpz_get_si($M) : $M);
         $k += $f;
@@ -14988,7 +14988,7 @@ sub cyclotomicmod {
         my ($p) = @$pe;
 
         $p =
-          ($p < ULONG_MAX)
+          (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_init_set_ui($p)
           : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
@@ -15955,7 +15955,7 @@ sub _prime_count_range {
     }
 
     # Fast path: native Math::Prime::Util handles small ranges up to ULONG_MAX
-    if (HAS_PRIME_UTIL && $y < ULONG_MAX) {
+    if (HAS_PRIME_UTIL and $y < ULONG_MAX) {
         return Math::Prime::Util::prime_count("$x", "$y");
     }
 
@@ -15998,7 +15998,7 @@ sub _count_primes_forward {
     my $add   = 0;
     my $delta = $target - $checkpoint;
 
-    if ($delta <= NAIVE_LOOP_MAX && $target < ULONG_MAX) {
+    if (FAST_MODE and $delta <= NAIVE_LOOP_MAX and $target < ULONG_MAX) {
 
         # Convert to native integers once, before the inner loop
         my $n  = ref($target)     ? Math::GMPz::Rmpz_get_ui($target)     : $target;
@@ -16032,7 +16032,7 @@ sub _count_primes_backward {
     my $subtract = 0;
     my $delta    = $checkpoint - $target;
 
-    if ($delta <= NAIVE_LOOP_MAX && $checkpoint < ULONG_MAX) {
+    if (FAST_MODE and $delta <= NAIVE_LOOP_MAX and $checkpoint < ULONG_MAX) {
 
         # Convert to native integers once, before the inner loop
         my $n  = ref($target)     ? Math::GMPz::Rmpz_get_ui($target)     : $target;
@@ -16179,7 +16179,7 @@ sub _prime_count {
     state $primepi_lookup = \%PRIMEPI_LOOKUP;
 
     state $primepi_lookup_keys = [sort { Math::GMPz::Rmpz_cmp($a, $b) }
-                                  map  { $_ < ULONG_MAX ? Math::GMPz::Rmpz_init_set_ui($_) : Math::GMPz::Rmpz_init_set_str($_, 10) }
+                                  map  { (FAST_MODE and $_ < ULONG_MAX) ? Math::GMPz::Rmpz_init_set_ui($_) : Math::GMPz::Rmpz_init_set_str($_, 10) }
                                     keys %PRIMEPI_LOOKUP
                                  ];
 
@@ -16266,7 +16266,7 @@ sub _prime_count {
     # ----------------------------------------------------------------
     # Large path 3: native Math::Prime::Util for sub-ULONG ranges
     # ----------------------------------------------------------------
-    if (HAS_PRIME_UTIL && $y < ULONG_MAX) {
+    if (HAS_PRIME_UTIL and $y < ULONG_MAX) {
         return Math::Prime::Util::prime_count($x_str, $y_str);
     }
 
@@ -16918,7 +16918,7 @@ sub almost_prime_count {
                 my $w  = Math::GMPz::Rmpz_fits_ulong_p($t)        ? Math::GMPz::Rmpz_get_ui($t)        : Math::GMPz::Rmpz_get_str($t, 10);
                 my $pi = (HAS_PRIME_UTIL and $w < PRIMECOUNT_MIN) ? Math::Prime::Util::prime_count($w) : _prime_count($w);
 
-                if ($pi < ULONG_MAX) {
+                if (FAST_MODE and $pi < ULONG_MAX) {
                     Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
                 }
                 else {
@@ -17009,7 +17009,7 @@ sub almost_prime_sum {
                 my $w  = Math::GMPz::Rmpz_fits_ulong_p($u)      ? Math::GMPz::Rmpz_get_ui($u)       : Math::GMPz::Rmpz_get_str($u, 10);
                 my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
 
-                if ($ps < ULONG_MAX) {
+                if (FAST_MODE and $ps < ULONG_MAX) {
                     Math::GMPz::Rmpz_addmul_ui($total, $t, $ps - $j);
                 }
                 else {
@@ -17104,7 +17104,7 @@ sub squarefree_almost_prime_count {
                 my $w  = Math::GMPz::Rmpz_fits_ulong_p($t)        ? Math::GMPz::Rmpz_get_ui($t)        : Math::GMPz::Rmpz_get_str($t, 10);
                 my $pi = (HAS_PRIME_UTIL and $w < PRIMECOUNT_MIN) ? Math::Prime::Util::prime_count($w) : _prime_count($w);
 
-                if ($pi < ULONG_MAX) {
+                if (FAST_MODE and $pi < ULONG_MAX) {
                     Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
                 }
                 else {
@@ -17213,7 +17213,7 @@ sub squarefree_almost_prime_sum {
                 my $w  = Math::GMPz::Rmpz_fits_ulong_p($u)      ? Math::GMPz::Rmpz_get_ui($u)       : Math::GMPz::Rmpz_get_str($u, 10);
                 my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
 
-                if ($ps < ULONG_MAX) {
+                if (FAST_MODE and $ps < ULONG_MAX) {
                     Math::GMPz::Rmpz_addmul_ui($total, $t, $ps - $j);
                 }
                 else {
@@ -17310,7 +17310,7 @@ sub omega_prime_count {
                     my $w  = Math::GMPz::Rmpz_fits_ulong_p($t)        ? Math::GMPz::Rmpz_get_ui($t)        : Math::GMPz::Rmpz_get_str($t, 10);
                     my $pi = (HAS_PRIME_UTIL and $w < PRIMECOUNT_MIN) ? Math::Prime::Util::prime_count($w) : _prime_count($w);
 
-                    if ($pi < ULONG_MAX) {
+                    if (FAST_MODE and $pi < ULONG_MAX) {
                         Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
                     }
                     else {
@@ -17439,7 +17439,7 @@ sub omega_prime_sum {
                     my $w  = Math::GMPz::Rmpz_fits_ulong_p($u)      ? Math::GMPz::Rmpz_get_ui($u)       : Math::GMPz::Rmpz_get_str($u, 10);
                     my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
 
-                    if ($ps < ULONG_MAX) {
+                    if (FAST_MODE and $ps < ULONG_MAX) {
                         Math::GMPz::Rmpz_addmul_ui($total, $v, $ps - $j);
                     }
                     else {
@@ -18047,7 +18047,7 @@ sub prime_power_sum {
         Math::GMPz::Rmpz_ui_pow_ui($u, $p, $l + 1);
         Math::GMPz::Rmpz_sub_ui($u, $u, 1);
         Math::GMPz::Rmpz_divexact_ui($u, $u, $p - 1);
-        if ($p * $p + $p + 1 < ULONG_MAX) {
+        if (FAST_MODE and $p * $p + $p + 1 < ULONG_MAX) {
             Math::GMPz::Rmpz_sub_ui($u, $u, $p * $p + $p + 1);
         }
         else {    # for very large n (>10^28 on 64-bit and >10^14 on 32-bit)
@@ -18691,7 +18691,7 @@ sub hclassno {
 
         my $count = 0;
         foreach my $d (_divisors($B2)) {
-            if ($d < ULONG_MAX) {
+            if (FAST_MODE and $d < ULONG_MAX) {
                 last     if Math::GMPz::Rmpz_cmp_ui($lim, $d) < 0;
                 ++$count if Math::GMPz::Rmpz_cmp_ui($B,   $d) < 0;
             }
@@ -18737,7 +18737,7 @@ sub _sos_k2 {    # OEIS: A004018
     my $count = Math::GMPz::Rmpz_init_set_ui(4);
     foreach my $pp (_factor_exp($t)) {
         my ($p, $e) = @$pp;
-        my $r = ($p < ULONG_MAX) ? ($p % 4) : Math::Prime::Util::GMP::modint($p, 4);
+        my $r = (FAST_MODE and $p < ULONG_MAX) ? ($p % 4) : Math::Prime::Util::GMP::modint($p, 4);
 
         if ($r == 3) {
             return 0 unless $e % 2 == 0;
@@ -18815,7 +18815,7 @@ sub _sos_k6 {    # OEIS: A000141
     foreach my $pp (_factor_exp($t)) {
         my ($p, $e) = @$pp;
 
-        ($p < ULONG_MAX)
+        (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($p1, $p)
           : Math::GMPz::Rmpz_set_str($p1, $p, 10);
 
@@ -18987,7 +18987,7 @@ sub _sos_k10 {    # OEIS: A000144
     foreach my $pp (@factors) {
         my ($p_str, $e) = @$pp;
 
-        ($p_str < ULONG_MAX)
+        (FAST_MODE and $p_str < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($p, $p_str)
           : Math::GMPz::Rmpz_set_str($p, $p_str, 10);
 
@@ -19765,7 +19765,7 @@ sub irand {
     }
 
     my $r =
-      ($n == 0 and $m < ULONG_MAX) ? ($m + 1)
+      (FAST_MODE and $n == 0 and $m < ULONG_MAX) ? ($m + 1)
       : (
          HAS_PRIME_UTIL ? Math::Prime::Util::addint(Math::Prime::Util::subint($m, $n), 1)
          : Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::subint($m, $n), 1)
@@ -21343,7 +21343,7 @@ sub is_chebyshev_pseudoprime {    # OEIS: A175530
 
     foreach my $p (@factors) {
 
-        ($p < ULONG_MAX)
+        (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($v, $p)
           : Math::GMPz::Rmpz_set_str($v, $p, 10);
 
@@ -21543,7 +21543,7 @@ sub is_strong_fibonacci_pseudoprime {
             return $FALSE;
         }
 
-        ($p < ULONG_MAX)
+        (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($v, $p)
           : Math::GMPz::Rmpz_set_str($v, $p, 10);
 
@@ -21920,11 +21920,15 @@ sub is_frobenius_pseudoprime {
     $n = $$n;
 
     __is_int__($n)
-      && Math::Prime::Util::GMP::is_frobenius_pseudoprime(
-                                                          _big2uistr($n) // (return $FALSE),
-                                                          (defined($k) ? _big2istr($$k) // () : ()),
-                                                          (defined($m) ? _big2istr($$m) // () : ()),
-                                                         ) ? $TRUE : $FALSE;
+      && (
+          defined($k)
+          ? Math::Prime::Util::GMP::is_frobenius_pseudoprime(
+                                                             _big2uistr($n) // (return $FALSE),
+                                                             (defined($k) ? _big2istr($$k) // () : ()),
+                                                             (defined($m) ? _big2istr($$m) // () : ()),
+                                                            )
+          : Math::Prime::Util::GMP::is_frobenius_pseudoprime(_big2uistr($n) // (return $FALSE))
+         ) ? $TRUE : $FALSE;
 }
 
 *is_frobenius_psp = \&is_frobenius_pseudoprime;
@@ -23998,7 +24002,7 @@ sub arithmetic_derivative {
 
             # a(n) = Sum_{p^k|n} (n*k)/p
 
-            if ($p < ULONG_MAX) {
+            if (FAST_MODE and $p < ULONG_MAX) {
                 Math::GMPz::Rmpz_divexact_ui($u, $n, $p);
             }
             else {
@@ -24140,7 +24144,7 @@ sub lpf_sum {    # sum of lpf(k)
           ? Math::Prime::Util::legendre_phi($d, $pi)
           : ${(bless \$p)->rough_count(_set_int($d))};
         my $w = Math::Prime::Util::GMP::mulint($r, $p);
-        if ($w < ULONG_MAX) {
+        if (FAST_MODE and $w < ULONG_MAX) {
             Math::GMPz::Rmpz_add_ui($sum, $sum, $w);
         }
         else {
@@ -24232,7 +24236,7 @@ sub gpf_sum {    # sum of gpf(k)
           ? Math::Prime::Util::smooth_count($d, $p)
           : ${(bless \$p)->smooth_count(_set_int($d))};
         my $w = Math::Prime::Util::GMP::mulint($r, $p);
-        if ($w < ULONG_MAX) {
+        if (FAST_MODE and $w < ULONG_MAX) {
             Math::GMPz::Rmpz_add_ui($sum, $sum, $w);
         }
         else {
@@ -24253,7 +24257,7 @@ sub gpf_sum {    # sum of gpf(k)
 
         my $w = Math::Prime::Util::GMP::mulint($u, _set_int($p)->sum_primes(_set_int($r)));
 
-        if ($w < ULONG_MAX) {
+        if (FAST_MODE and $w < ULONG_MAX) {
             Math::GMPz::Rmpz_add_ui($sum, $sum, $w);
         }
         else {
@@ -26057,7 +26061,7 @@ sub dirichlet_convolution {
     foreach my $d (_divisors($n)) {
 
         my $t =
-          ($d < ULONG_MAX)
+          (FAST_MODE and $d < ULONG_MAX)
           ? Math::GMPz::Rmpz_init_set_ui($d)
           : Math::GMPz::Rmpz_init_set_str("$d", 10);
 
@@ -26663,7 +26667,7 @@ sub udivisors {
 
         if ($e <= 2) {    # p^e where e <= 2
 
-            if ($p < ULONG_MAX) {
+            if (FAST_MODE and $p < ULONG_MAX) {
                 $pp = Math::GMPz::Rmpz_init_set_ui($p);
             }
             else {
@@ -26678,7 +26682,7 @@ sub udivisors {
 
             $pp = Math::GMPz::Rmpz_init();
 
-            if ($p < ULONG_MAX) {
+            if (FAST_MODE and $p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
             }
             else {
@@ -26723,7 +26727,7 @@ sub edivisors {    # OEIS: A322791
         my @t;
         foreach my $k (_divisors($e)) {
 
-            if ($p < ULONG_MAX) {
+            if (FAST_MODE and $p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($r, $p, $k);
             }
             else {
@@ -26761,7 +26765,7 @@ sub idivisors {    # OEIS: A077609
         my ($p, $e) = @$pe;
 
         $p =
-          ($p < ULONG_MAX)
+          (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_init_set_ui($p)
           : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
@@ -26806,7 +26810,7 @@ sub biudivisors {    # OEIS: A222266
         my ($p, $e) = @$pe;
 
         $p =
-          ($p < ULONG_MAX)
+          (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_init_set_ui($p)
           : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
@@ -26852,7 +26856,7 @@ sub prime_power_divisors {
         my ($p, $e) = @$pe;
 
         $p =
-          ($p < ULONG_MAX)
+          (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_init_set_ui($p)
           : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
@@ -26886,7 +26890,7 @@ sub prime_power_udivisors {
 
         if ($e <= 2) {    # p^e where e <= 2
 
-            if ($p < ULONG_MAX) {
+            if (FAST_MODE and $p < ULONG_MAX) {
                 $pp = Math::GMPz::Rmpz_init_set_ui($p);
             }
             else {
@@ -26901,7 +26905,7 @@ sub prime_power_udivisors {
 
             $pp = Math::GMPz::Rmpz_init();
 
-            if ($p < ULONG_MAX) {
+            if (FAST_MODE and $p < ULONG_MAX) {
                 Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
             }
             else {
@@ -26941,7 +26945,7 @@ sub powerfree_divisors {
         my ($p, $e) = @$pe;
 
         $p =
-          ($p < ULONG_MAX)
+          (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_init_set_ui($p)
           : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
@@ -26992,7 +26996,7 @@ my $power_divisors_func = sub {
         my ($p, $e) = @$pe;
 
         $p =
-          ($p < ULONG_MAX)
+          (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_init_set_ui($p)
           : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
@@ -27066,7 +27070,7 @@ my $power_udivisors_func = sub {
         my ($p, $e) = @$pe;
 
         my $pp =
-          ($p < ULONG_MAX)
+          (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_init_set_ui($p)
           : Math::GMPz::Rmpz_init_set_str("$p", 10);
 
@@ -27157,7 +27161,7 @@ sub powerfree_udivisors {
 
         my $r = Math::GMPz::Rmpz_init();
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($r, $p, $e);
         }
         else {
@@ -27200,7 +27204,7 @@ sub prime_divisors {
     my @d;
     foreach my $pk (_factor_exp($n)) {
         my $p = $pk->[0];
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             push @d, bless \$p;
         }
         else {
@@ -27299,7 +27303,7 @@ sub euler_phi {
 
         # Multiplicative with a(p^e) = (p - 1)*p^(e-1)
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             push @terms, $p - 1;
 
             if ($e >= 2) {
@@ -27404,7 +27408,7 @@ sub _n_over_d_divisors {
 
     foreach my $k (@$D) {
 
-        if ($k < ULONG_MAX) {
+        if (FAST_MODE and $k < ULONG_MAX) {
             last if Math::GMPz::Rmpz_cmp_ui($limit, $k) < 0;
             Math::GMPz::Rmpz_gcd_ui($u, $d, $k);
         }
@@ -27452,10 +27456,12 @@ sub _dynamic_preimage {
 
             foreach my $d (_n_over_d_divisors($N, $x, $u, $D)) {
 
-                ($d < ULONG_MAX) ? Math::GMPz::Rmpz_mul_ui($u, $x, $d) : do {
+                (FAST_MODE and $d < ULONG_MAX)
+                  ? Math::GMPz::Rmpz_mul_ui($u, $x, $d)
+                  : do {
                     Math::GMPz::Rmpz_set_str($u, $d, 10);
                     Math::GMPz::Rmpz_mul($u, $u, $x);
-                };
+                  };
 
                 # Only track operations that lead to needed values
                 if (exists $needed{Math::GMPz::Rmpz_get_str($u, 10)}) {
@@ -27534,10 +27540,12 @@ sub _dynamic_preimage_minmax {
             foreach my $d (_n_over_d_divisors($N, $x, $u, $D)) {
                 if (exists $R{$d}) {
 
-                    ($d < ULONG_MAX) ? Math::GMPz::Rmpz_mul_ui($u, $x, $d) : do {
+                    (FAST_MODE and $d < ULONG_MAX)
+                      ? Math::GMPz::Rmpz_mul_ui($u, $x, $d)
+                      : do {
                         Math::GMPz::Rmpz_set_str($u, $d, 10);
                         Math::GMPz::Rmpz_mul($u, $u, $x);
-                    };
+                      };
 
                     my $key = Math::GMPz::Rmpz_get_str($u, 10);
 
@@ -27592,10 +27600,12 @@ sub _dynamic_preimage_len_bigint {
             foreach my $d (_n_over_d_divisors($N, $x, $u, $D)) {
                 if (exists $R{$d}) {
 
-                    ($d < ULONG_MAX) ? Math::GMPz::Rmpz_mul_ui($u, $x, $d) : do {
+                    (FAST_MODE and $d < ULONG_MAX)
+                      ? Math::GMPz::Rmpz_mul_ui($u, $x, $d)
+                      : do {
                         Math::GMPz::Rmpz_set_str($u, $d, 10);
                         Math::GMPz::Rmpz_mul($u, $u, $x);
-                    };
+                      };
 
                     my $key = Math::GMPz::Rmpz_get_str($u, 10);
 
@@ -27641,10 +27651,12 @@ sub _dynamic_preimage_len {
             foreach my $d (_n_over_d_divisors($N, $x, $u, $D)) {
                 if (exists $R{$d}) {
 
-                    ($d < ULONG_MAX) ? Math::GMPz::Rmpz_mul_ui($u, $x, $d) : do {
+                    (FAST_MODE and $d < ULONG_MAX)
+                      ? Math::GMPz::Rmpz_mul_ui($u, $x, $d)
+                      : do {
                         Math::GMPz::Rmpz_set_str($u, $d, 10);
                         Math::GMPz::Rmpz_mul($u, $u, $x);
-                    };
+                      };
 
                     $t{Math::GMPz::Rmpz_get_str($u, 10)} += $R{$d};
                 }
@@ -27674,7 +27686,7 @@ sub _cook_euler_phi {
 
         Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::addint($d, 1)) || next;
 
-        ($d < ULONG_MAX)
+        (FAST_MODE and $d < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($p, $d)
           : Math::GMPz::Rmpz_set_str($p, $d, 10);
 
@@ -27800,7 +27812,7 @@ sub _cook_dedekind_psi {
 
         Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::subint($d, 1)) || next;
 
-        ($d < ULONG_MAX)
+        (FAST_MODE and $d < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($p, $d)
           : Math::GMPz::Rmpz_set_str($p, $d, 10);
 
@@ -27909,7 +27921,7 @@ sub _cook_usigma {
         my $u = Math::GMPz::Rmpz_init();
         my $v = Math::GMPz::Rmpz_init();
 
-        ($d < ULONG_MAX)
+        (FAST_MODE and $d < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($u, $d)
           : Math::GMPz::Rmpz_set_str($u, $d, 10);
 
@@ -27950,7 +27962,7 @@ sub _cook_uphi {
         my $u = Math::GMPz::Rmpz_init();
         my $v = Math::GMPz::Rmpz_init();
 
-        ($d < ULONG_MAX)
+        (FAST_MODE and $d < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($u, $d)
           : Math::GMPz::Rmpz_set_str($u, $d, 10);
 
@@ -27995,13 +28007,13 @@ sub _cook_sigma {
 
         next if ($d == 1);
 
-        ($d < ULONG_MAX)
+        (FAST_MODE and $d < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($u, $d)
           : Math::GMPz::Rmpz_set_str($u, $d, 10);
 
         foreach my $p (map { $_->[0] } _factor_exp(Math::Prime::Util::GMP::subint($d, 1))) {
 
-            ($p < ULONG_MAX)
+            (FAST_MODE and $p < ULONG_MAX)
               ? Math::GMPz::Rmpz_set_ui($s, $p)
               : Math::GMPz::Rmpz_set_str($s, $p, 10);
 
@@ -28144,7 +28156,7 @@ sub jordan_totient {
 
         if ($e == 1) {
 
-            if ($p < ULONG_MAX) {
+            if (FAST_MODE and $p < ULONG_MAX) {
 
                 Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
                 Math::GMPz::Rmpz_sub_ui($t, $t, 1);
@@ -28164,7 +28176,7 @@ sub jordan_totient {
             next;
         }
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
             Math::GMPz::Rmpz_pow_ui($u, $t, $e - 1);
             Math::GMPz::Rmpz_mul($t, $t, $u);
@@ -28222,7 +28234,7 @@ sub dedekind_psi {
 
         if ($e == 1) {
 
-            if ($p < ULONG_MAX) {
+            if (FAST_MODE and $p < ULONG_MAX) {
 
                 if ($k == 1) {
                     push @terms, $p + 1;
@@ -28247,7 +28259,7 @@ sub dedekind_psi {
             next;
         }
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
             Math::GMPz::Rmpz_pow_ui($u, $t, $e - 1);
             Math::GMPz::Rmpz_mul($t, $t, $u);
@@ -28325,7 +28337,7 @@ sub carmichael_lambda {
         foreach my $pp (_factor_exp($n)) {
             my ($p, $e) = @$pp;
             if ($e == 1) {
-                push @lambdas, (($p < ULONG_MAX) ? ($p - 1) : Math::Prime::Util::GMP::subint($p, 1));
+                push @lambdas, ((FAST_MODE and $p < ULONG_MAX) ? ($p - 1) : Math::Prime::Util::GMP::subint($p, 1));
             }
             else {
                 push @lambdas, Math::Prime::Util::GMP::carmichael_lambda(Math::Prime::Util::GMP::powint($p, $e));
@@ -28412,7 +28424,7 @@ sub bigomega {
     foreach my $pp (_factor_exp($n)) {
         my ($p, $k) = @$pp;
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($u, $p, $m);    # u = p^m
         }
         else {
@@ -28532,7 +28544,7 @@ sub omega {
 
         my $p = $pe->[0];
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($t, $p, $m);
         }
         else {
@@ -28647,7 +28659,7 @@ sub usigma {
 
         my ($p, $e) = @$pe;
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
 
             if ($e == 1 and $k == 1) {    # optimization
                 push @terms, $p + 1;
@@ -28728,7 +28740,7 @@ sub bsigma {    # A188999: Bi-unitary sigma: sum of the bi-unitary divisors of n
 
         my ($p, $e) = @$pe;
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k);
             Math::GMPz::Rmpz_pow_ui($t, $u, $e + 1);
         }
@@ -28813,7 +28825,7 @@ sub isigma {    # A049417: sum of infinitary divisors of n
     foreach my $pe (_factor_exp($n)) {
         my ($p, $e) = @$pe;
 
-        ($p < ULONG_MAX)
+        (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($t, $p)
           : Math::GMPz::Rmpz_set_str($t, "$p", 10);
 
@@ -28889,7 +28901,7 @@ sub esigma {    # A051377: sum of exponential divisors (or e-divisors) of n
 
         Math::GMPz::Rmpz_set_ui($t, 1);
 
-        ($p < ULONG_MAX)
+        (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($t, $p)
           : Math::GMPz::Rmpz_set_str($t, $p, 10);
 
@@ -28955,7 +28967,7 @@ sub uphi {    # OEIS: A047994
 
         my ($p, $e) = @$pe;
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
 
             if ($e == 1 and $k == 1) {    # optimization
                 push @terms, $p - 1;
@@ -29010,7 +29022,7 @@ sub nuphi {    # OEIS: A254503
 
         my ($p, $e) = @$pe;
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
 
             if ($e == 1) {
                 push @terms, $p;
@@ -29068,7 +29080,7 @@ sub iphi {    # OEIS: A091732 -- infinitary analog of Euler's phi function
     foreach my $pe (_factor_exp($n)) {
         my ($p, $e) = @$pe;
 
-        ($p < ULONG_MAX)
+        (FAST_MODE and $p < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($t, $p)
           : Math::GMPz::Rmpz_set_str($t, "$p", 10);
 
@@ -29161,7 +29173,7 @@ sub pillai {    # OEIS: A018804 -- Pillai's arithmetical function: Sum_{k=1..n} 
 
         my ($p, $e) = @$pe;
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_set_ui($u, $p);
             Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * ($e - 1));
         }
@@ -29253,7 +29265,7 @@ sub prime_power_sigma {
 
         my ($p, $e) = @$pe;
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             ($k == 1)
               ? Math::GMPz::Rmpz_set_ui($u, $p)
               : Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k);
@@ -29295,7 +29307,7 @@ sub prime_power_usigma {
 
         my ($p, $e) = @$pe;
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $e);
         }
         else {
@@ -29386,7 +29398,7 @@ sub power_sigma {
 
         next if ($e < $k);
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * $j);
         }
         else {
@@ -29476,7 +29488,7 @@ sub power_usigma {
 
         $e % $k == 0 or next;
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e * $j);
         }
         else {
@@ -29557,7 +29569,7 @@ sub powerfree_sigma {
 
         $e = $k - 1 if ($e >= $k);
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($t, $p, $j);
         }
         else {
@@ -29633,7 +29645,7 @@ sub powerfree_usigma {
 
         $e < $k or next;
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
 
             if ($e == 1 and $j == 1) {    # optimization
                 push @terms, $p + 1;
@@ -29683,7 +29695,7 @@ sub prime_sigma {
 
         my $p = $pe->[0];
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
         }
         else {
@@ -29727,7 +29739,7 @@ sub prime_usigma {
 
         my $p = $pe->[0];
 
-        if ($p < ULONG_MAX) {
+        if (FAST_MODE and $p < ULONG_MAX) {
             Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
         }
         else {
@@ -29805,7 +29817,7 @@ sub sigma {
         foreach my $pp (_factor_exp($n)) {
             my ($p, $e) = @$pp;
 
-            if ($p < ULONG_MAX) {
+            if (FAST_MODE and $p < ULONG_MAX) {
 
                 if ($e == 1 and CORE::abs($k) == 1) {    # optimization
                     push @terms, $p + 1;
@@ -30013,7 +30025,7 @@ sub is_primitive_abundant {
 
     my $t = Math::GMPz::Rmpz_init();
     foreach my $pp (_factor_exp($n)) {
-        if ($pp->[0] < ULONG_MAX) {
+        if (FAST_MODE and $pp->[0] < ULONG_MAX) {
             Math::GMPz::Rmpz_divexact_ui($t, $n, $pp->[0]);
         }
         else {
@@ -30117,7 +30129,7 @@ sub _divisors_lazy {
     my @exps      = map { $_->[1] } @factors;
     my $max_depth = scalar(@primes);
 
-    if ($n < ULONG_MAX) {    # native divisors
+    if (FAST_MODE and $n < ULONG_MAX) {    # native divisors
         return sub {
             my ($idx, $prod) = @_;
             if ($idx == $max_depth) {
@@ -32070,13 +32082,14 @@ sub _sieve_prime_sig_numbers {
     my $A = Math::GMPz::Rmpz_init_set($from);
     my $B = Math::GMPz::Rmpz_init_set($to);
 
+    my $k = scalar(@$prime_signature);
+
     # Handle empty prime signature
-    if (!@$prime_signature) {
+    if ($k == 0) {
         return ($A <= 1 and 1 <= $B) ? [1] : [];
     }
 
-    # A = max(prime_signature.len.pn_primorial, A)
-    my $primorial = _cached_pn_primorial(scalar @$prime_signature);
+    my $primorial = _cached_pn_primorial($k);
     if (Math::GMPz::Rmpz_cmp($primorial, $A) > 0) {
         Math::GMPz::Rmpz_set($A, $primorial);
     }
@@ -32086,90 +32099,102 @@ sub _sieve_prime_sig_numbers {
         return [];
     }
 
-    my $k     = scalar(@$prime_signature);
     my $sum_e = List::Util::sum(@$prime_signature) || return [];
 
     if ($sum_e >= Math::GMPz::Rmpz_sizeinbase($B, 2)) {
         return [];
     }
 
-    # Pre-allocate GMP scratchpads to avoid memory churn during recursive generation
     state $t = Math::GMPz::Rmpz_init_nobless();
 
     my @results;
 
-    my $generate = sub {
-        my ($m, $lo, $k, $P, $sum_e) = @_;
+    sub {
+        my ($m, $lo, $rem_sig, $rem_sum) = @_;
 
-        my $e = $P->[$k - 1];
         Math::GMPz::Rmpz_tdiv_q($t, $B, $m);
-        Math::GMPz::Rmpz_root($t, $t, $sum_e) if ($sum_e > 1);
+        Math::GMPz::Rmpz_root($t, $t, $rem_sum) if ($rem_sum > 1);
 
         if (Math::GMPz::Rmpz_cmp_ui($t, $lo) < 0) {
             return;
         }
 
         Math::GMPz::Rmpz_fits_ulong_p($t) || die "Too large value!";
+
+        my $k  = scalar(@$rem_sig);
         my $hi = Math::GMPz::Rmpz_get_ui($t);
 
-        # Base case for recursion
-        if ($k == 1) {
+        my %seen;
+        foreach my $i (0 .. $k - 1) {
+            my $e = $rem_sig->[$i];
 
-            Math::GMPz::Rmpz_cdiv_q($t, $A, $m);
-            my $exact_root = Math::GMPz::Rmpz_root($t, $t, $e);
-            Math::GMPz::Rmpz_add_ui($t, $t, 1) if !$exact_root;
+            next if $seen{$e}++;
 
-            if (Math::GMPz::Rmpz_cmp_ui($t, $lo) > 0) {
-                $lo = Math::GMPz::Rmpz_get_ui($t);
-            }
+            my @new_sig = @$rem_sig;
+            splice(@new_sig, $i, 1);
 
-            foreach my $p (HAS_PRIME_UTIL ? @{Math::Prime::Util::primes($lo, $hi)} : Math::Prime::Util::GMP::sieve_primes($lo, $hi)) {
+            # Base case for recursion
+            if ($k == 1) {
 
-                if ($e == 1) {
-                    Math::GMPz::Rmpz_mul_ui($t, $m, $p);
+                Math::GMPz::Rmpz_cdiv_q($t, $A, $m);
+                my $exact_root = Math::GMPz::Rmpz_root($t, $t, $e);
+                Math::GMPz::Rmpz_add_ui($t, $t, 1) if !$exact_root;
+
+                if (Math::GMPz::Rmpz_cmp_ui($t, $lo) > 0) {
+                    $lo = Math::GMPz::Rmpz_get_ui($t);
                 }
-                else {
-                    Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
-                    Math::GMPz::Rmpz_mul($t, $m, $t);
+
+                foreach my $p (HAS_PRIME_UTIL ? @{Math::Prime::Util::primes($lo, $hi)} : Math::Prime::Util::GMP::sieve_primes($lo, $hi)) {
+
+                    if ($e == 1) {
+                        Math::GMPz::Rmpz_mul_ui($t, $m, $p);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
+                        Math::GMPz::Rmpz_mul($t, $m, $t);
+                    }
+                    push @results,
+                      (
+                          Math::GMPz::Rmpz_fits_ulong_p($t)
+                        ? Math::GMPz::Rmpz_get_ui($t)
+                        : Math::GMPz::Rmpz_init_set($t)
+                      );
                 }
-                push @results,
-                  (
-                      Math::GMPz::Rmpz_fits_ulong_p($t)
-                    ? Math::GMPz::Rmpz_get_ui($t)
-                    : Math::GMPz::Rmpz_init_set($t)
-                  );
-            }
 
-            return;
-        }
-
-        my $u = Math::GMPz::Rmpz_init();
-
-        for (my $p = $lo ; $p <= $hi ;) {
-
-            if ($e == 1) {
-                Math::GMPz::Rmpz_mul_ui($u, $m, $p);
+                return;
             }
             else {
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
-                Math::GMPz::Rmpz_mul($u, $m, $t);
+
+                my $u       = Math::GMPz::Rmpz_init();
+                my $new_sum = $rem_sum - $e;
+
+                for (my $p = $lo ; $p <= $hi ;) {
+
+                    if ($e == 1) {
+                        Math::GMPz::Rmpz_mul_ui($u, $m, $p);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
+                        Math::GMPz::Rmpz_mul($u, $m, $t);
+                    }
+
+                    my $r = HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p);
+                    __SUB__->($u, $r, \@new_sig, $new_sum);
+                    $p = $r;
+                }
             }
-
-            my $r = HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p);
-            __SUB__->($u, $r, $k - 1, $P, $sum_e - $e);
-            $p = $r;
         }
-    };
-
-    state $m = Math::GMPz::Rmpz_init_nobless();
-    Math::GMPz::Rmpz_set_ui($m, 1);
-
-    Sidef::Types::Array::Array::_unique_permutations(
+      }
+      ->(
+        do {
+            state $m = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_set_ui($m, 1);
+            $m;
+        },
+        2,
         $prime_signature,
-        sub {
-            $generate->($m, 2, $k, $_[0], $sum_e);
-        }
-    );
+        $sum_e
+      );
 
     return \@results;
 }
@@ -32205,12 +32230,10 @@ sub prime_signature_numbers {
 sub _prime_sig_count {
     my ($n, $prime_sig) = @_;
 
-    my @sig = @$prime_sig;
-
     Math::GMPz::Rmpz_sgn($n) > 0
       or return 0;
 
-    my $k = scalar(@sig);
+    my $k = scalar(@$prime_sig);
 
     if ($k == 0) {
         return 1;
@@ -32224,7 +32247,7 @@ sub _prime_sig_count {
         return 0;
     }
 
-    my $sum_e = List::Util::sum(@sig) || return 0;
+    my $sum_e = List::Util::sum(@$prime_sig) || return 0;
 
     if ($sum_e >= Math::GMPz::Rmpz_sizeinbase($n, 2)) {
         return 0;
@@ -32235,18 +32258,19 @@ sub _prime_sig_count {
 
     Math::GMPz::Rmpz_set_ui($count, 0);
 
-    my $generate = sub {
-        my ($m, $lo, $k, $P, $sum_e, $j) = @_;
+    sub {
+        my ($m, $lo, $rem_sig, $rem_sum, $j) = @_;
 
-        my $e = $P->[$k - 1];
         Math::GMPz::Rmpz_tdiv_q($t, $n, $m);
-        Math::GMPz::Rmpz_root($t, $t, $sum_e) if ($sum_e > 1);
+        Math::GMPz::Rmpz_root($t, $t, $rem_sum) if ($rem_sum > 1);
 
         if (Math::GMPz::Rmpz_cmp_ui($t, $lo) < 0) {
             return;
         }
 
         Math::GMPz::Rmpz_fits_ulong_p($t) || die "Too large value!";
+
+        my $k  = scalar(@$rem_sig);
         my $hi = Math::GMPz::Rmpz_get_ui($t);
 
         if ($k == 1) {
@@ -32256,7 +32280,7 @@ sub _prime_sig_count {
               ? Math::Prime::Util::prime_count($hi)
               : _prime_count($hi);
 
-            if ($pi < ULONG_MAX) {
+            if (FAST_MODE and $pi < ULONG_MAX) {
                 Math::GMPz::Rmpz_add_ui($count, $count, $pi - $j);
             }
             else {
@@ -32268,65 +32292,77 @@ sub _prime_sig_count {
             return;
         }
 
-        if ($k == 2) {
-            my $e2 = $P->[0];
+        my %seen;
+        for my $i (0 .. $k - 1) {
 
-            foreach my $p (HAS_PRIME_UTIL ? @{Math::Prime::Util::primes($lo, $hi)} : Math::Prime::Util::GMP::sieve_primes($lo, $hi)) {
+            my $e = $rem_sig->[$i];
+            next if $seen{$e}++;
 
-                if ($e == 1) {
-                    Math::GMPz::Rmpz_mul_ui($t, $m, $p);
+            my $local_j = $j;
+            my @new_sig = @$rem_sig;
+            splice(@new_sig, $i, 1);
+
+            if ($k == 2) {
+                my $e2 = $new_sig[0];
+
+                foreach my $p (HAS_PRIME_UTIL ? @{Math::Prime::Util::primes($lo, $hi)} : Math::Prime::Util::GMP::sieve_primes($lo, $hi)) {
+
+                    if ($e == 1) {
+                        Math::GMPz::Rmpz_mul_ui($t, $m, $p);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
+                        Math::GMPz::Rmpz_mul($t, $t, $m);
+                    }
+
+                    Math::GMPz::Rmpz_tdiv_q($t, $n, $t);
+                    Math::GMPz::Rmpz_root($t, $t, $e2) if ($e2 > 1);
+
+                    my $pi =
+                      (HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($t, PRIMECOUNT_MIN) < 0)
+                      ? Math::Prime::Util::prime_count(Math::GMPz::Rmpz_get_ui($t))
+                      : _prime_count(Math::GMPz::Rmpz_get_str($t, 10));
+
+                    if (FAST_MODE and $pi < ULONG_MAX) {
+                        Math::GMPz::Rmpz_add_ui($count, $count, $pi - ++$local_j);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_set_str($t, "$pi", 10);
+                        Math::GMPz::Rmpz_sub_ui($t, $t, ++$local_j);
+                        Math::GMPz::Rmpz_add($count, $count, $t);
+                    }
                 }
-                else {
-                    Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
-                    Math::GMPz::Rmpz_mul($t, $t, $m);
-                }
-
-                Math::GMPz::Rmpz_tdiv_q($t, $n, $t);
-                Math::GMPz::Rmpz_root($t, $t, $e2) if ($e2 > 1);
-
-                my $pi =
-                  (HAS_PRIME_UTIL and Math::GMPz::Rmpz_cmp_ui($t, PRIMECOUNT_MIN) < 0)
-                  ? Math::Prime::Util::prime_count(Math::GMPz::Rmpz_get_ui($t))
-                  : _prime_count(Math::GMPz::Rmpz_get_str($t, 10));
-
-                if ($pi < ULONG_MAX) {
-                    Math::GMPz::Rmpz_add_ui($count, $count, $pi - ++$j);
-                }
-                else {
-                    Math::GMPz::Rmpz_set_str($t, "$pi", 10);
-                    Math::GMPz::Rmpz_sub_ui($t, $t, ++$j);
-                    Math::GMPz::Rmpz_add($count, $count, $t);
-                }
-            }
-
-            return;
-        }
-
-        my $u = Math::GMPz::Rmpz_init();
-
-        for (my $p = $lo ; $p <= $hi ; ++$j) {
-            if ($e == 1) {
-                Math::GMPz::Rmpz_mul_ui($u, $m, $p);
             }
             else {
-                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
-                Math::GMPz::Rmpz_mul($u, $t, $m);
+
+                my $u       = Math::GMPz::Rmpz_init();
+                my $new_sum = $rem_sum - $e;
+
+                for (my $p = $lo ; $p <= $hi ;) {
+                    if ($e == 1) {
+                        Math::GMPz::Rmpz_mul_ui($u, $m, $p);
+                    }
+                    else {
+                        Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e);
+                        Math::GMPz::Rmpz_mul($u, $t, $m);
+                    }
+                    my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
+                    __SUB__->($u, $r, \@new_sig, $new_sum, ++$local_j);
+                    $p = $r;
+                }
             }
-            my $r = (HAS_PRIME_UTIL ? Math::Prime::Util::next_prime($p) : Math::Prime::Util::GMP::next_prime($p));
-            __SUB__->($u, $r, $k - 1, $P, $sum_e - $e, $j + 1);
-            $p = $r;
         }
-    };
-
-    state $m = Math::GMPz::Rmpz_init_nobless();
-    Math::GMPz::Rmpz_set_ui($m, 1);
-
-    Sidef::Types::Array::Array::_unique_permutations(
-        \@sig,
-        sub {
-            $generate->($m, 2, $k, $_[0], $sum_e, 0);
-        }
-    );
+      }
+      ->(
+        do {
+            state $m = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_set_ui($m, 1);
+            $m;
+        },
+        2,
+        $prime_sig,
+        $sum_e
+      );
 
     Math::GMPz::Rmpz_fits_ulong_p($count)
       ? Math::GMPz::Rmpz_get_ui($count)
@@ -33885,7 +33921,7 @@ sub is_carmichael {    # OEIS: A002997
                 Math::GMPz::Rmpz_sub_ui($pm1, $p, 1);
                 Math::GMPz::Rmpz_divisible_p($nm1, $pm1) || return 0;
             }
-            elsif ($p < ULONG_MAX) {
+            elsif (FAST_MODE and $p < ULONG_MAX) {
                 Math::GMPz::Rmpz_divisible_ui_p($nm1, $p - 1) || return 0;
             }
             else {
@@ -33981,7 +34017,7 @@ sub is_absolute_euler_psp {    # OEIS: A033181
                 Math::GMPz::Rmpz_sub_ui($pm1, $p, 1);
                 Math::GMPz::Rmpz_divisible_p($nm1d2, $pm1) || return 0;
             }
-            elsif ($p < ULONG_MAX) {
+            elsif (FAST_MODE and $p < ULONG_MAX) {
                 Math::GMPz::Rmpz_divisible_ui_p($nm1d2, $p - 1) || return 0;
             }
             else {
@@ -34150,7 +34186,7 @@ sub is_lucas_carmichael {    # OEIS: A006972
                 Math::GMPz::Rmpz_add_ui($pp1, $p, 1);
                 Math::GMPz::Rmpz_divisible_p($np1, $pp1) || return 0;
             }
-            elsif ($p < ULONG_MAX) {
+            elsif (FAST_MODE and $p < ULONG_MAX) {
                 Math::GMPz::Rmpz_divisible_ui_p($np1, $p + 1) || return 0;
             }
             else {
@@ -34349,7 +34385,7 @@ sub smooth_count {
         my ($x, $i) = @_;    # $x is a Math::GMPz
 
         # Hand off to the fast native tier as soon as possible
-        if ($x < ULONG_MAX) {
+        if (FAST_MODE and $x < ULONG_MAX) {
             return $psi_small->($x, $i);
         }
 
@@ -35615,7 +35651,7 @@ sub polygonal {
 
     if (FAST_MODE and !ref($n) and !ref($k)) {
         my $t = $n * ($n * $k - $k - 2 * $n + 4);
-        if ($t < ULONG_MAX and $t > LONG_MIN) {
+        if (FAST_MODE and $t < ULONG_MAX and $t > LONG_MIN) {
             return
               _set_int(
                        HAS_PRIME_UTIL
@@ -35876,7 +35912,7 @@ sub polygonal_inverse {
 
     foreach my $divisor (@divisors) {
 
-        ($divisor < ULONG_MAX)
+        (FAST_MODE and $divisor < ULONG_MAX)
           ? Math::GMPz::Rmpz_set_ui($u, $divisor)
           : Math::GMPz::Rmpz_set_str($u, $divisor, 10);
 
