@@ -10766,9 +10766,9 @@ sub _primitive_sum_of_two_squares {
 
     # Step 1: s ← sqrt(-1) mod p
     my $s = Math::GMPz::Rmpz_init_set_str((Math::Prime::Util::GMP::sqrtmod(-1, Math::GMPz::Rmpz_get_str($p, 10)) // die "error"), 10);
-    my $q = Math::GMPz::Rmpz_init_set($p);    # q ← p  (previous remainder)
+    my $q = Math::GMPz::Rmpz_init_set($p);
 
-    state $t = Math::GMPz::Rmpz_init_nobless();    # scratch
+    state $t = Math::GMPz::Rmpz_init_nobless();
 
     # Step 2: Euclidean reduction — stop when s² ≤ p
     while (1) {
@@ -10777,12 +10777,12 @@ sub _primitive_sum_of_two_squares {
 
         # One Euclidean step: (q, s) ← (s, q mod s)
         Math::GMPz::Rmpz_set($t, $s);
-        Math::GMPz::Rmpz_mod($s, $q, $s);             # s ← old_q mod old_s
-        Math::GMPz::Rmpz_set($q, $t);                 # q ← old_s
+        Math::GMPz::Rmpz_mod($s, $q, $s);
+        Math::GMPz::Rmpz_set($q, $t);
     }
 
     # Step 3: b = (previous remainder) mod a
-    Math::GMPz::Rmpz_mod($q, $q, $s);                 # q ← q mod s  →  b
+    Math::GMPz::Rmpz_mod($q, $q, $s);
 
     $sos_cache{$key} = [$q, $s];
     return ($q, $s);
@@ -10822,11 +10822,9 @@ sub _multiply_sets {
 sub sum_of_squares {
     my ($n) = @_;
 
-    # ── Normalise input ───────────────────────────────────────────────────────
     $n = _any2mpz($$n, 0) // return _array();
     Math::GMPz::Rmpz_sgn($n) >= 0 or return _array();
 
-    # ── Trivial cases ─────────────────────────────────────────────────────────
     if (Math::GMPz::Rmpz_sgn($n) == 0) {
         return _array(_array([ZERO, ZERO]));
     }
@@ -10835,10 +10833,9 @@ sub sum_of_squares {
         return _array(_array([ZERO, ONE]));
     }
 
-    # ── Factorise n ───────────────────────────────────────────────────────────
     my @factor_exp = _factor_exp($n);
 
-    # ── Feasibility check (Legendre's three-square theorem) ───────────────────
+    # Feasibility check (Legendre's three-square theorem)
     # A prime factor p ≡ 3 (mod 4) must appear to an even power;
     # if any such prime appears to an odd power, no representation exists.
     for my $pp (@factor_exp) {
@@ -10848,7 +10845,7 @@ sub sum_of_squares {
         return _array() if ($mod4 == 3);
     }
 
-    # ── Build representations prime-by-prime ──────────────────────────────────
+    # Build representations prime-by-prime
     # Start from the trivial identity 1 = 0² + 1², then fold in each factor.
     my $reps         = [[0, 1]];
     my $square_scale = Math::GMPz::Rmpz_init_set_ui(1);
@@ -10891,19 +10888,122 @@ sub sum_of_squares {
         $reps = _multiply_sets($reps, $acc);
     }
 
-    # ── Apply the p ≡ 3 (mod 4) scale factor ─────────────────────────────────
+    # Apply the p ≡ 3 (mod 4) scale factor
     if (Math::GMPz::Rmpz_cmp_ui($square_scale, 1) > 0) {
         @$reps = map { [$_->[0] * $square_scale, $_->[1] * $square_scale] } @$reps;
     }
 
-    # ── Sort into canonical order (x ascending) and wrap for return ───────────
-    @$reps = sort { $a->[0] <=> $b->[0] } map { ($_->[0] > $_->[1]) ? [$_->[1], $_->[0]] : $_ } @$reps;
+    # Sort into canonical order (x ascending) and wrap for return
+    @$reps = sort { $a->[0] <=> $b->[0] } @$reps;
 
     _array(
         [
          map {
              _array([map { _set_int($_) } @$_])
            } @$reps
+        ]
+    );
+}
+
+# Sum of two k-gonal numbers
+sub sum_of_polygonals {
+    my ($n, $k) = @_;
+
+    _valid(\$k);
+
+    $n = _any2mpz($$n, 0) // return _array();
+    $k = _any2mpz($$k, 1) // return _array();
+
+    Math::GMPz::Rmpz_sgn($n) >= 0 or return _array();
+
+    # Defined only for k >= 3
+    if (Math::GMPz::Rmpz_cmp_ui($k, 3) < 0) {
+        return _array();
+    }
+
+    if (Math::GMPz::Rmpz_cmp_ui($k, 4) == 0) {
+        return ((bless \$n)->sum_of_squares);
+    }
+
+    my $k_minus_2 = Math::GMPz::Rmpz_init();
+    my $k_minus_4 = Math::GMPz::Rmpz_init();
+
+    Math::GMPz::Rmpz_sub_ui($k_minus_2, $k, 2);
+    Math::GMPz::Rmpz_sub_ui($k_minus_4, $k, 4);
+
+    my $x = Math::GMPz::Rmpz_init();
+    my $y = Math::GMPz::Rmpz_init();
+
+    # Calculate N = 8 * (k - 2) * n + 2 * (k - 4)^2
+    my $N = Math::GMPz::Rmpz_init_set($n);
+    Math::GMPz::Rmpz_mul_2exp($N, $N, 3);
+    Math::GMPz::Rmpz_mul($N, $N,         $k_minus_2);
+    Math::GMPz::Rmpz_mul($x, $k_minus_4, $k_minus_4);
+    Math::GMPz::Rmpz_addmul_ui($N, $x, 2);
+
+    # Retrieve all base square representations
+    my @sq_sols = @{(bless \$N)->sum_of_squares};
+
+    my @results;
+    my %seen;
+
+    my $den = Math::GMPz::Rmpz_init_set($k_minus_2);
+    Math::GMPz::Rmpz_mul_2exp($den, $den, 1);
+
+    for my $sol (@sq_sols) {
+
+        my $X = _any2mpz(${$sol->[0]}, 2);
+        my $Y = _any2mpz(${$sol->[1]}, 3);
+
+        my @cand_X = ($X);
+        push @cand_X, -$X if Math::GMPz::Rmpz_sgn($X) != 0;
+
+        my @cand_Y = ($Y);
+        push @cand_Y, -$Y if Math::GMPz::Rmpz_sgn($Y) != 0;
+
+        my @pairs;
+        for my $cx (@cand_X) {
+            for my $cy (@cand_Y) {
+                push @pairs, [$cx, $cy];
+                push @pairs, [$cy, $cx] if Math::GMPz::Rmpz_cmp($X, $Y) != 0;
+            }
+        }
+
+        # Validate configurations that map back to valid integers
+        for my $pair (@pairs) {
+            my ($A, $B) = @$pair;
+
+            Math::GMPz::Rmpz_add($x, $A, $k_minus_4);
+            Math::GMPz::Rmpz_add($y, $B, $k_minus_4);
+
+            if (    Math::GMPz::Rmpz_divisible_p($x, $den)
+                and Math::GMPz::Rmpz_divisible_p($y, $den)) {
+                Math::GMPz::Rmpz_divexact($x, $x, $den);
+                Math::GMPz::Rmpz_divexact($y, $y, $den);
+
+                if (Math::GMPz::Rmpz_sgn($x) >= 0 and Math::GMPz::Rmpz_sgn($y) >= 0) {
+
+                    if (Math::GMPz::Rmpz_cmp($y, $x) < 0) {
+                        ($x, $y) = ($y, $x);
+                    }
+
+                    my $key = join(';', Math::GMPz::Rmpz_get_str($x, 10), Math::GMPz::Rmpz_get_str($y, 10),);
+
+                    if (!$seen{$key}++) {
+                        push @results, [Math::GMPz::Rmpz_init_set($x), Math::GMPz::Rmpz_init_set($y)];
+                    }
+                }
+            }
+        }
+    }
+
+    @results = sort { $a->[0] <=> $b->[0] } @results;
+
+    _array(
+        [
+         map {
+             _array([map { _set_int($_) } @$_])
+           } @results
         ]
     );
 }

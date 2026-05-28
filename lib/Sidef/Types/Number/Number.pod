@@ -9652,11 +9652,23 @@ Aliases: I<Σ>, I<vecsum>
 
 =cut
 
+=head2 sum_of_polygonals
+
+    sum_of_polygonals(n, k)
+
+Returns all representations as a sum of two k-gonal numbers: C<n = P(x,k) + P(y,k)> with C<0 ≤ x ≤ y>, as an array of C<[x, y]> arrays, sorted by x.
+
+Example:
+
+    say sum_of_polygonals(18736, 3)      # sums of two triangular numbers
+    say sum_of_polygonals(99025, 4)      # sums of two squares numbers
+    say sum_of_polygonals(10622, 5)      # sums of two pentagonal numbers
+
 =head2 sum_of_squares
 
     sum_of_squares(n)
 
-Returns all representations C<n = x² + y²> with C<0 ≤ x ≤ y>, as an array of C<[x, y]> arrays, sorted by x.
+Returns all representations as a sum of two squares: C<n = x² + y²> with C<0 ≤ x ≤ y>, as an array of C<[x, y]> arrays, sorted by x.
 
 Example:
 

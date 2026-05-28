@@ -136,4 +136,8 @@ for n in (1..Inf) {
     break
 }
 
+assert_eq(sum_of_polygonals(18736, 3), [[5, 193], [79, 176], [93, 169], [120, 151]])
+assert_eq(sum_of_polygonals(99025, 4), [[41, 312], [48, 311], [95, 300], [104, 297], [183, 256], [220, 225]])
+assert_eq(sum_of_polygonals(10622, 5), [[15, 83], [44, 72], [55, 64]])
+
 say "** Test passed!"
