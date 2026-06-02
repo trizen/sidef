@@ -1499,8 +1499,8 @@ sub _adaptive_trial_factor {
     my ($n, $F, $L, $R) = @_;
 
     $F //= 2;
-    $L //= 5e4;
-    $R //= 1e6;
+    $L //= 1e6;
+    $R //= 2e6;
 
     if (ref($n) eq 'Math::GMPz') {
         $n = Math::GMPz::Rmpz_init_set($n);    # copy
