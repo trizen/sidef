@@ -168,4 +168,31 @@ for n in (1e6, 1e7, 1e8, 1e9) {
     assert_eq(squarefree_omega_total, squarefree_count(lo, hi))
 }
 
+for i in (1..6) {
+
+    var lim = 10+irand(10**i)
+    var k = irand(2, lim.ilog2)
+    say "\nTesting: omega_inverse(1, #{lim}, #{k})"
+    say "Count:   #{omega_inverse_len(1, lim, k)}"
+
+    assert_eq(
+        multisets(k, lim.ilog2 - k + 1, lim.ilog2).map{|p|
+            prime_signature_numbers(1, lim, p)...
+        }.isort,
+        omega_inverse(1, lim, k),
+        "Failed for omega_inverse(1, #{lim}, #{k})"
+    )
+
+    say "Testing: bigomega_inverse(1, #{lim}, #{k})"
+    say "Count:   #{bigomega_inverse_len(1, lim, k)}"
+
+    assert_eq(
+        partitions(k).map{|p|
+            prime_signature_numbers(1, lim, p)...
+        }.isort,
+        bigomega_inverse(1, lim, k),
+        "Failed for bigomega_inverse(1, #{lim}, #{k})"
+    )
+}
+
 say "** Test passed!"

@@ -26722,6 +26722,8 @@ sub multiplicative_partitions {
     return _array(\@results);
 }
 
+*mpartitions = \&multiplicative_partitions;
+
 sub antidivisors {
     my ($n) = @_;
 

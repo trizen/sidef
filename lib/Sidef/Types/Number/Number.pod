@@ -5744,6 +5744,8 @@ When the C<max_sum> argument is provided, it generates only the partitions whose
 
     say multiplicative_partitions(30, nil, 11)   #=> [[5, 6], [2, 3, 5]]
 
+Aliases: I<mpartitions>
+
 =cut
 
 =head2 multisets
