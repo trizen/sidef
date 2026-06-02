@@ -24717,16 +24717,18 @@ sub _apply_recursive_methods {
         $composite = [map { @{$_->factor($block)} } @$composite];
     }
 
-    # Apply cyclotomic factorization for m >= 2
-    if ($m->ge(TWO)) {
-        $composite = [
-            map {
-                _is_prob_prime($$_, 1)
-                  ? $_
-                  : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(5))))}
-              } @$composite
-        ];
-    }
+    # Apply cyclotomic factorization for m >= 2 (however, it's too slow)
+#<<<
+    #~ if ($m->ge(TWO)) {
+        #~ $composite = [
+            #~ map {
+                #~ _is_prob_prime($$_, 1)
+                  #~ ? $_
+                  #~ : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(5))))}
+              #~ } @$composite
+        #~ ];
+    #~ }
+#>>>
 
     return $composite;
 }
