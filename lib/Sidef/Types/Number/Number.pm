@@ -13617,6 +13617,14 @@ sub solve_quadratic_form {
     # returns an array with `[x,y]` solutions to the equation:
     #   x^2 + d*y^2 = n
 
+    if ($d->is_one) {
+        return $n->sum_of_squares;
+    }
+
+    if ($d->is_neg) {
+        return _array();
+    }
+
     my $D = $d->neg;
 
     # Helper to find primitive solutions using Cornacchia-style method
