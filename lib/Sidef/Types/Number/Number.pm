@@ -20649,7 +20649,7 @@ sub _check_remainder_special {
         return Math::Prime::Util::is_prime_power(Math::GMPz::Rmpz_get_ui($remainder));
     }
 
-    return Math::Prime::Util::GMP::is_prime_power(Math::GMPz::Rmpz_get_str($remainder, 10));
+    return _prime_power_factor($remainder);
 }
 
 # Helper function to consolidate size threshold checks
@@ -24939,14 +24939,14 @@ sub _factor_remainder {
     }
 
     # Check prime power
-    if (my $k = Math::Prime::Util::GMP::is_prime_power($r)) {
+    if (my $k = _prime_power_factor($r)) {
         my $base = Math::Prime::Util::GMP::rootint($r, $k);
         say STDERR "is_prime_power(r): $base^$k" if $VERBOSE;
         return (($base) x $k);
     }
 
     # Check perfect power
-    if (my $k = Math::Prime::Util::GMP::is_power($r)) {
+    if (my $k = _power_factor($r)) {
         my $base = Math::Prime::Util::GMP::rootint($r, $k);
         say STDERR "is_power(r): $base^$k" if $VERBOSE;
         return ((_factor_remainder($base, $size, $ecm_table)) x $k);
@@ -25819,7 +25819,7 @@ sub cop_factor {
 
                 if (Math::GMPz::Rmpz_perfect_power_p($z)) {
 
-                    my $t = Math::Prime::Util::GMP::is_power(Math::GMPz::Rmpz_get_str($z, 10)) || 1;
+                    my $t = _power_factor($z) || 1;
 
                     if ($t > 1) {
                         my $r = Math::GMPz::Rmpz_init();
@@ -25892,7 +25892,7 @@ sub dop_factor {
 
         if (Math::GMPz::Rmpz_perfect_power_p($dx)) {
 
-            my $e2 = Math::Prime::Util::GMP::is_power(Math::GMPz::Rmpz_get_str($dx, 10)) || 1;
+            my $e2 = _power_factor(Math::GMPz::Rmpz_init_set($dx)) || 1;
             my $r2 = Math::GMPz::Rmpz_init();
 
             Math::GMPz::Rmpz_root($r2, $dx, $e2);
@@ -35075,6 +35075,27 @@ sub is_power {
 *is_pow           = \&is_power;
 *is_perfect_power = \&is_power;
 
+sub is_prime_power {
+    my ($n) = @_;
+
+    $n = $$n;
+
+    if (FAST_MODE and !ref($n)) {
+        return (
+                (
+                 $n > 1
+                   and (
+                        HAS_PRIME_UTIL
+                        ? Math::Prime::Util::is_prime_power($n)
+                        : Math::Prime::Util::GMP::is_prime_power($n)
+                       )
+                ) ? $TRUE : $FALSE
+               );
+    }
+
+    (__is_int__($n) && _prime_power_factor($n)) ? $TRUE : $FALSE;
+}
+
 sub is_square {
     my ($n, $k) = @_;
 
@@ -35483,7 +35504,7 @@ sub is_powerful {
         return $TRUE;
     }
 
-    if (my $exp = Math::Prime::Util::GMP::is_power($rem)) {
+    if (my $exp = _power_factor($rem)) {
         return (($exp >= $k) ? $TRUE : $FALSE);
     }
 
@@ -35552,67 +35573,141 @@ sub is_perfect {
     _set_int($v + 1)->is_mersenne_prime;
 }
 
-sub is_prime_power {
+sub _power_factor {
     my ($n) = @_;
 
-    $n = $$n;
+    $n = _any2mpz($n);
+    Math::GMPz::Rmpz_sgn($n) < 0 and return 0;
 
-    if (FAST_MODE and !ref($n)) {
-        return (
-                (
-                 $n > 1
-                   and (
-                        HAS_PRIME_UTIL
-                        ? Math::Prime::Util::is_prime_power($n)
-                        : Math::Prime::Util::GMP::is_prime_power($n)
-                       )
-                ) ? $TRUE : $FALSE
-               );
+    if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+        return Math::Prime::Util::is_power(Math::GMPz::Rmpz_get_ui($n));
     }
 
-    __is_int__($n)
-      && Math::Prime::Util::GMP::is_prime_power(_big2uistr($n) // return $FALSE) ? $TRUE : $FALSE;
+    my $e = 0;
+    if (Math::GMPz::Rmpz_sizeinbase($n, 2) > 1e4) {
+
+        $n = Math::GMPz::Rmpz_init_set($n);    # copy
+
+        foreach my $i (1 .. 26) {
+
+            my $B = _cached_primorial(1 << $i);
+
+            state $g = Math::GMPz::Rmpz_init_nobless();
+            Math::GMPz::Rmpz_gcd($g, $n, $B);
+
+            if (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) {
+
+                local $USE_YAFU        = 0;
+                local $USE_FACTORDB    = 0;
+                local $SPECIAL_FACTORS = 0;
+
+                my @factors = _factor(Math::GMPz::Rmpz_get_str($g, 10));
+                my @exponents;
+
+                foreach my $f (@factors) {
+                    Math::GMPz::Rmpz_set_ui($g, $f);
+                    push @exponents, Math::GMPz::Rmpz_remove($n, $n, $g);
+                }
+
+                $e =
+                  HAS_PRIME_UTIL
+                  ? (Math::Prime::Util::gcd($e, @exponents))
+                  : (Math::Prime::Util::GMP::gcd($e, @exponents));
+
+                $e == 1 and return 0;
+
+                if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+                    return $e;
+                }
+
+                if (Math::GMPz::Rmpz_sizeinbase($n, 2) < 1e4) {
+                    last;
+                }
+            }
+
+            last if (Math::GMPz::Rmpz_cmp($B, $n) > 0);
+        }
+    }
+
+    my $e2 = Math::Prime::Util::GMP::is_power(Math::GMPz::Rmpz_get_str($n, 10));
+    $e2 = Math::Prime::Util::GMP::gcd($e2, $e) if $e > 0;
+    return $e2;
+}
+
+sub _prime_power_factor {
+    my ($n) = @_;
+
+    $n = _any2mpz($n);
+    Math::GMPz::Rmpz_sgn($n) < 0 and return 0;
+
+    if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
+        return Math::Prime::Util::is_prime_power(Math::GMPz::Rmpz_get_ui($n));
+    }
+
+    if (Math::GMPz::Rmpz_even_p($n)) {
+        my $k = Math::GMPz::Rmpz_scan1($n, 0);
+        if ($k + 1 == Math::GMPz::Rmpz_sizeinbase($n, 2)) {
+            return $k;
+        }
+        return 0;
+    }
+
+    if (_is_prob_prime($n, 1)) {
+        return 1;
+    }
+
+    my $pow = _power_factor($n) || return 0;
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_root($t, $n, $pow);
+    if (_is_prob_prime(Math::GMPz::Rmpz_get_str($t, 10), 1)) {
+        return $pow;
+    }
+    return 0;
 }
 
 sub prime_root {
     my ($n) = @_;
 
-    my $str = _big2uistr($$n) // return $n;
-    my $pow = Math::Prime::Util::GMP::is_prime_power($str) || return $n;
+    my $t   = _any2mpz($$n) // return $n;
+    my $pow = _prime_power_factor($t) || return $n;
 
     $pow == 1 and return $n;
 
-    my $t = _any2mpz($$n, 0) // return $n;
     my $r = Math::GMPz::Rmpz_init();
 
-    $pow == 2 ? Math::GMPz::Rmpz_sqrt($r, $t) : Math::GMPz::Rmpz_root($r, $t, $pow);
+    $pow == 2
+      ? Math::GMPz::Rmpz_sqrt($r, $t)
+      : Math::GMPz::Rmpz_root($r, $t, $pow);
 
     bless \$r;
 }
 
 sub prime_power {
     my ($n) = @_;
-    my $pow = Math::Prime::Util::GMP::is_prime_power(_big2uistr($$n) // return ONE) || return ONE;
-    $pow eq '1' ? ONE : _set_int($pow);
+    my $pow = _prime_power_factor($$n) || 1;
+    $pow eq '1' ? ONE : (bless \$pow);
 }
 
 sub perfect_root {
     my ($n) = @_;
 
-    my $t = _any2mpz($$n, 0) // return $n;
+    my $t = _any2mpz($$n) // return $n;
     Math::GMPz::Rmpz_perfect_power_p($t) || return $n;
 
-    my $pow = Math::Prime::Util::GMP::is_power(Math::GMPz::Rmpz_get_str($t, 10)) || return $n;
+    my $pow = _power_factor($t) || return $n;
     my $r   = Math::GMPz::Rmpz_init();
 
-    $pow == 2 ? Math::GMPz::Rmpz_sqrt($r, $t) : Math::GMPz::Rmpz_root($r, $t, $pow);
+    $pow == 2
+      ? Math::GMPz::Rmpz_sqrt($r, $t)
+      : Math::GMPz::Rmpz_root($r, $t, $pow);
 
     bless \$r;
 }
 
 sub perfect_power {
     my ($n) = @_;
-    _set_int(Math::Prime::Util::GMP::is_power(_big2istr($$n) // return ONE) || return ONE);
+    my $pow = _power_factor($$n) || return ONE;
+    bless \$pow;
 }
 
 sub next_pow {
