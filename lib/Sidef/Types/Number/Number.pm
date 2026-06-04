@@ -13613,33 +13613,69 @@ sub solve_quadratic_form {
     my ($d, $n) = @_;
     _valid(\$n);
 
+    # Given a positive integer `n` and a positive integer `d`,
+    # returns an array with `[x,y]` solutions to the equation:
+    #   x^2 + d*y^2 = n
+
     my $D = $d->neg;
 
-    if ($D->kronecker($n)->is_mone && _is_prob_prime($$n)) {
-        return _array();
-    }
+    # Helper to find primitive solutions using Cornacchia-style method
+    my $primitive_solutions = sub {
+        my ($dd, $nn, $DD) = @_;
 
-    my @solutions;
-
-    foreach my $x (@{$D->sqrtmod_all($n)}) {
-
-        my ($A, $B, $C) = ($n, $x, $n->isqrt);
-
-        while (__cmp__($$B, $$C) > 0) {
-            ($A, $B) = ($B, $A->mod($B));
+        if ($DD->kronecker($nn)->is_mone && _is_prob_prime($$nn)) {
+            return [];
         }
 
-        my $t = $n->sub($B->sqr);
+        my @prim;
+        foreach my $x (@{$DD->sqrtmod_all($nn)}) {
+            my ($A, $B, $C) = ($nn, $x, $nn->isqrt);
 
-        $d->divides($t) || next;
-        my $q = $t->idiv($d);
-        $q->is_square || next;
+            while (__cmp__($$B, $$C) > 0) {
+                ($A, $B) = ($B, $A->mod($B));
+            }
 
-        push @solutions, _array([$B, $q->isqrt]);
+            my $t = $nn->sub($B->sqr);
+            next unless $dd->divides($t);
+
+            my $q = $t->idiv($dd);
+            next unless $q->is_square;
+
+            push @prim, [$B, $q->isqrt];
+        }
+        return \@prim;
+    };
+
+    # Handle all solutions via scaling primitive ones
+    my @solutions;
+
+    foreach my $s (@{$n->square_divisors}) {
+        my $g = $s->isqrt;
+        my $m = $n->idiv($s);
+
+        my $prim_sols = $primitive_solutions->($d, $m, $D);
+
+        foreach my $p (@$prim_sols) {
+            my ($x1, $y1) = @$p;
+            push @solutions, [$g->mul($x1), $g->mul($y1)];
+        }
     }
 
-    return _array(\@solutions)->uniq;
+    # Also include the trivial y=0 case if applicable
+    if ($n->is_square) {
+        push @solutions, [$n->isqrt, ZERO];
+    }
+
+    my %seen;
+
+    @solutions = grep { !$seen{"${$_->[0]};${$_->[1]}"}++ } @solutions;
+    @solutions = sort { ${$a->[0]} <=> ${$b->[0]} } @solutions;
+    @solutions = map  { _array($_) } @solutions;
+
+    return _array(\@solutions);
 }
+
+*cornacchia = \&solve_quadratic_form;
 
 sub geometric_sum {
     my ($n, $r) = @_;
