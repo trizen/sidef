@@ -24989,6 +24989,11 @@ sub _factor_remainder {
         $r = Math::GMPz::Rmpz_get_str($r, 10);
     }
 
+    # Check primality
+    if (_is_prob_prime($r, 1)) {
+        return ($r);
+    }
+
     # Recalculate size for remainder
     my $max_size = (Math::Prime::Util::GMP::logint($r, 2) >> 1) + 1;
     if ($size > $max_size) {
@@ -25012,13 +25017,6 @@ sub _factor_remainder {
         }
     }
 
-    # Check prime power
-    if (my $k = _prime_power_factor($r)) {
-        my $base = Math::Prime::Util::GMP::rootint($r, $k);
-        say STDERR "is_prime_power(r): $base^$k" if $VERBOSE;
-        return (($base) x $k);
-    }
-
     # Check perfect power
     if (my $k = _power_factor($r)) {
         my $base = Math::Prime::Util::GMP::rootint($r, $k);
@@ -25032,7 +25030,7 @@ sub _factor_remainder {
         my @f;
 
         # Early termination for primes
-        if (_is_prob_prime($r)) {
+        if (_is_prob_prime($r, 1)) {
             last;
         }
 
