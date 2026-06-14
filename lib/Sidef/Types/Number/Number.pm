@@ -20878,7 +20878,15 @@ sub _is_k_prime {
                     }
                     else {
                         my $r_obj = _set_int($r);
-                        $trial_limit = $r_obj->iroot(_set_int($k - $count))->inc;
+                        my $lim   = $r_obj->iroot(_set_int($k - $count))->inc;
+                        if (CORE::length("$lim") <= 25) {
+                            $trial_limit = $lim;
+                        }
+                        else {
+                            $trial_limit = _set_int($trial_limit)->sqr;
+                        }
+
+                        say STDERR "ECM trial limit: $trial_limit" if $VERBOSE;
 
                         my $f   = $r_obj->factor_upto($trial_limit);
                         my $rem = ${$f->pop};
