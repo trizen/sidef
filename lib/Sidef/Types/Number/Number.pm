@@ -23302,17 +23302,15 @@ sub sum_primes {
         return ((TWO)->sum_primes(_set_int($to), _set_int($k))->sub((TWO)->sum_primes(_set_int($from)->dec, _set_int($k))));
     }
 
+    my $n = $to + 0;
+
     # Simple implementation of the prime-summation function:
     #   Sum_{p prime <= n} p^k, for fixed k >= 0.
-
-    my $n = $to + 0;
 
     $n > ~0 and goto &nan;
     $n <= 1 and return ZERO;
 
     my $r = Math::Prime::Util::GMP::sqrtint($n);
-    my @V = map { CORE::int($n / $_) } 1 .. $r;
-    push @V, CORE::reverse(1 .. $V[-1] - 1);
 
     my $t = Math::GMPz::Rmpz_init_set_ui(0);
     my $u = Math::GMPz::Rmpz_init();
@@ -23320,26 +23318,41 @@ sub sum_primes {
     my $t_obj = bless \$t;
     my $k_obj = _set_int($k);
 
-    my %S;
-    @S{@V} = map {
-        Math::GMPz::Rmpz_set_str($t, $_, 10);
-        _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
-    } @V;
+    my (@S_small, @S_large);
 
-    foreach my $p (2 .. $r) {
-        if ($S{$p} > $S{$p - 1}) {
-            my $cp = $S{$p - 1};
-            my $p2 = $p * $p;
-            Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
-            foreach my $v (@V) {
-                last if ($v < $p2);
-                Math::GMPz::Rmpz_sub($u, $S{CORE::int($v / $p)}, $cp);
-                Math::GMPz::Rmpz_submul($S{$v}, $u, $t);
-            }
+    # Fast initialization using native UV assignment
+    for (my $i = 1 ; $i <= $r ; $i++) {
+        Math::GMPz::Rmpz_set_str($t, CORE::int($n / $i), 10);
+        $S_large[$i] = _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
+    }
+
+    for my $v (1 .. $r) {
+        Math::GMPz::Rmpz_set_ui($t, $v);
+        $S_small[$v] = _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
+    }
+
+    foreach my $p (@{_primes(2, $r)}) {
+        my $p2 = $p * $p;
+        my $cp = $S_small[$p - 1];
+        Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+
+        my $max_i = CORE::int($n / $p2);
+        $max_i = $r if $max_i > $r;
+
+        for (my $i = 1 ; $i <= $max_i ; $i++) {
+            my $ip     = $i * $p;
+            my $target = ($ip <= $r) ? $S_large[$ip] : $S_small[CORE::int($n / $ip)];
+            Math::GMPz::Rmpz_sub($u, $target, $cp);
+            Math::GMPz::Rmpz_submul($S_large[$i], $u, $t);
+        }
+
+        for (my $v = $r ; $v >= $p2 ; $v--) {
+            Math::GMPz::Rmpz_sub($u, $S_small[CORE::int($v / $p)], $cp);
+            Math::GMPz::Rmpz_submul($S_small[$v], $u, $t);
         }
     }
 
-    _set_int($S{$n} - 1);
+    _set_int($S_large[1] - 1);
 }
 
 *prime_sum  = \&sum_primes;
