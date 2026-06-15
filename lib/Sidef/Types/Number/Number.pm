@@ -8252,6 +8252,111 @@ sub as_float {
 
 *as_dec = \&as_float;
 
+sub _solve_seq {    # Newton's forward difference formula
+    my ($offset, @sequence) = @_;
+
+    _valid(\$offset);
+    _valid(\(@sequence));
+
+    my $N = scalar(@sequence);
+
+    if ($N == 0) {
+        return Sidef::Types::Number::Polynomial->new();
+    }
+
+    # Extract sequence into raw Math::GMPq objects for speed
+    my @S = map { _any2mpq($$_) // return Sidef::Types::Number::Polynomial->new() } @sequence;
+    my @c;
+
+    for my $k (0 .. $N - 1) {
+
+        my $all_zero = 1;
+        for my $i (0 .. $N - 1 - $k) {
+            if (Math::GMPq::Rmpq_sgn($S[$i]) != 0) {
+                $all_zero = 0;
+                last;
+            }
+        }
+
+        last if $all_zero;
+
+        # Capture the leading delta coefficient for the current degree
+        $c[$k] = Math::GMPq->new($S[0]);
+
+        # Generate next difference tier within the same buffer
+        for my $i (0 .. $N - 2 - $k) {
+            Math::GMPq::Rmpq_sub($S[$i], $S[$i + 1], $S[$i]);
+        }
+    }
+
+    # If all terms were zero, return an empty polynomial
+    return Sidef::Types::Number::Polynomial->new() if !@c;
+
+    my @master_poly;
+    my @P          = (Math::GMPq->new(1));
+    my $fact       = Math::GMPz::Rmpz_init_set_ui(1);
+    my $offset_mpz = defined($offset) ? _any2mpz($$offset) : Math::GMPz::Rmpz_init_set_ui(0);
+
+    # Pre-allocate mathematical scratchpads
+    my $f_k   = Math::GMPq::Rmpq_init();
+    my $term  = Math::GMPq::Rmpq_init();
+    my $alpha = Math::GMPq::Rmpq_init();
+    my $tmp   = Math::GMPq::Rmpq_init();
+
+    for my $k (0 .. $#c) {
+        my $ck = $c[$k];
+
+        if (Math::GMPq::Rmpq_sgn($ck) != 0) {
+
+            # f_k = c_k / k!
+            Math::GMPq::Rmpq_div_z($f_k, $ck, $fact);
+
+            # Accumulate current basis expansion into master polynomial
+            for my $i (0 .. $#P) {
+                $master_poly[$i] //= Math::GMPq::Rmpq_init();
+                Math::GMPq::Rmpq_mul($term, $f_k, $P[$i]);
+                Math::GMPq::Rmpq_add($master_poly[$i], $master_poly[$i], $term);
+            }
+        }
+
+        # Progressively build the binomial basis: P_{k+1}(x) = P_k(x) * (x - (offset + k))
+        if ($k < $#c) {
+
+            # fact = fact * (k + 1)
+            Math::GMPz::Rmpz_mul_ui($fact, $fact, $k + 1);
+
+            # alpha = offset + k
+            Math::GMPz::Rmpz_add_ui($alpha, $offset_mpz, $k);
+
+            my @next_P;
+
+            # next_P[0] = -alpha * P[0]
+            $next_P[0] = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_mul_z($next_P[0], $P[0], $alpha);
+            Math::GMPq::Rmpq_neg($next_P[0], $next_P[0]);
+
+            # Linear combinations for intermediate polynomial indices
+            for my $i (1 .. $k) {
+                $next_P[$i] = $P[$i - 1];
+                Math::GMPq::Rmpq_mul_z($tmp, $P[$i], $alpha);
+                Math::GMPq::Rmpq_sub($next_P[$i], $next_P[$i], $tmp);
+            }
+
+            # Shift the highest degree term up: next_P[k+1] = P[k] * x
+            $next_P[$k + 1] = $P[$k];
+            @P = @next_P;
+        }
+    }
+
+    my @poly_args;
+    for my $i (0 .. $#master_poly) {
+        next if (!defined $master_poly[$i] or Math::GMPq::Rmpq_sgn($master_poly[$i]) == 0);
+        push(@poly_args, $i, Sidef::Types::Number::Number->new($master_poly[$i]));
+    }
+
+    return Sidef::Types::Number::Polynomial->new(@poly_args);
+}
+
 # Solution in integers to `x^2 - d*y^2 = n`
 # where `d` and `n` are provided (n=1 by default).
 
