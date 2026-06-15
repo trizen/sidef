@@ -20879,7 +20879,7 @@ sub _is_k_prime {
                     else {
                         my $r_obj = _set_int($r);
                         my $lim   = $r_obj->iroot(_set_int($k - $count))->inc;
-                        if (CORE::length("$lim") <= 25) {
+                        if (CORE::length("$lim") <= 20) {
                             $trial_limit = $lim;
                         }
                         else {
@@ -25008,19 +25008,23 @@ sub _factor_remainder {
         $size = $max_size;
     }
 
-    my $limit_isqrt = 1 << (($size >> 1) + 1);
-    my ($B1, $curves) = (2858117139, 63461);
-
+    my $limit_isqrt = Math::Prime::Util::GMP::powint(2, (($size >> 1) + 1));
     $limit_isqrt = 100 if ($limit_isqrt < 100);
+
+    my @ecm_params;
 
     # ECM parameter selection
     foreach my $i (0 .. CORE::int(@$ecm_table / 3 - 1)) {
-        if ($ecm_table->[3 * $i] >= $size) {
-            ($B1, $curves) = (@{$ecm_table}[3 * $i + 1, 3 * $i + 2]);
 
-            # Scale curves with difficulty
-            my $scale_factor = ($size > 100) ? 2.5 : 2.0;
-            $curves = CORE::int($curves * $scale_factor);
+        my ($B1, $curves) = (@{$ecm_table}[3 * $i + 1, 3 * $i + 2]);
+
+        # Scale curves with difficulty
+        my $scale_factor = ($size > 100) ? 2.5 : 2.0;
+        $curves = CORE::int($curves * $scale_factor);
+
+        push @ecm_params, [$B1, $curves];
+
+        if ($ecm_table->[3 * $i] >= $size) {
             last;
         }
     }
@@ -25055,7 +25059,7 @@ sub _factor_remainder {
         elsif ($size < 20) {
 
             # Very small: use Pollard Rho
-            my $effort = 2 * $limit_isqrt;
+            my $effort = Math::Prime::Util::GMP::mulint(2, $limit_isqrt);
             @f = Math::Prime::Util::GMP::prho_factor($r, $effort);
             $r = pop @f;
             say STDERR "prho_factor(r, $effort): @f" if (@f && $VERBOSE);
@@ -25063,7 +25067,7 @@ sub _factor_remainder {
         elsif ($size < 35) {
 
             # Small to medium: try Brent first, then Rho
-            my $effort = 2 * $limit_isqrt;
+            my $effort = Math::Prime::Util::GMP::mulint(2, $limit_isqrt);
             @f = Math::Prime::Util::GMP::pbrent_factor($r, $effort);
             $r = pop @f;
             say STDERR "pbrent_factor(r, $effort): @f" if (@f && $VERBOSE);
@@ -25075,12 +25079,19 @@ sub _factor_remainder {
             }
         }
         else {
-            # Large: use ECM
-            # Dynamic effort multiplier
-            my $effort_multiplier = ($size < 60) ? 2 : ($size < 100) ? 3 : 5;
-            @f = Math::Prime::Util::GMP::ecm_factor($r, $effort_multiplier * $B1, $curves);
-            $r = pop @f;
-            say STDERR "ecm_factor(r, ", $effort_multiplier * $B1, ", $curves): @f" if (@f && $VERBOSE);
+            while (defined(my $ecm_param = shift(@ecm_params))) {
+                my ($B1, $curves) = @$ecm_param;
+                say STDERR "Trying ecm_factor(r, $B1, $curves)" if $VERBOSE;
+                my @tmp_f = Math::Prime::Util::GMP::ecm_factor($r, $B1, $curves);
+
+                if (scalar(@tmp_f) >= 2) {
+                    unshift(@ecm_params, $ecm_param);
+                    @f = @tmp_f;
+                    $r = pop @f;
+                    say STDERR "ecm_factor(r, $B1, $curves): @f" if (@f && $VERBOSE);
+                    last;
+                }
+            }
         }
 
         if (!@f) {
@@ -25094,7 +25105,6 @@ sub _factor_remainder {
                 push @new_factors, $factor;
             }
             else {
-                # Only recurse if not prime
                 push @new_factors, _factor($factor);
             }
         }
