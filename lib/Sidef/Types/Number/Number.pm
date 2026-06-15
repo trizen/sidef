@@ -1372,6 +1372,16 @@ sub _divisors {
       : Math::Prime::Util::GMP::divisors($n);
 }
 
+sub _primes {
+    my ($lo, $hi) = @_;
+
+    if (HAS_PRIME_UTIL and $hi < ULONG_MAX) {
+        return Math::Prime::Util::primes("$lo", "$hi");
+    }
+
+    [Math::Prime::Util::GMP::sieve_primes("$lo", "$hi")];
+}
+
 sub _cached_pn_primorial {
     my ($k) = @_;
     state @pn_primorial;
@@ -1525,11 +1535,7 @@ sub _adaptive_trial_factor {
             last;
         }
 
-        foreach my $p (
-                       HAS_PRIME_UTIL
-                       ? @{Math::Prime::Util::primes($F, $L)}
-                       : Math::Prime::Util::GMP::sieve_primes($F, $L)
-          ) {
+        foreach my $p (@{_primes($F, $L)}) {
             if (Math::GMPz::Rmpz_divisible_ui_p($g, $p)) {
 
                 Math::GMPz::Rmpz_set_ui($t, $p);
@@ -11995,7 +12001,7 @@ sub superprimorial {    # A006939
     my @terms;
     my $k = 1;
 
-    foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, ${$_[0]->nth_prime})) {
+    foreach my $p (@{_primes(2, ${$_[0]->nth_prime})}) {
         my $z = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_ui_pow_ui($z, $p, $n - $k + 1);
         push @terms, $z;
@@ -12016,7 +12022,7 @@ sub lnsuperprimorial {
     Math::MPFR::Rmpfr_set_ui($r, 0, $ROUND);
 
     my $k = 1;
-    foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, ${$_[0]->nth_prime})) {
+    foreach my $p (@{_primes(2, ${$_[0]->nth_prime})}) {
         Math::MPFR::Rmpfr_set_ui($t, $p, $ROUND);
         Math::MPFR::Rmpfr_log($t, $t, $ROUND);
         Math::MPFR::Rmpfr_mul_ui($t, $t, $n - $k + 1, $ROUND);
@@ -16470,7 +16476,7 @@ sub _build_pi_table {
     my $k     = 0;
     my $count = 0;
 
-    foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $limit)) {
+    foreach my $p (@{_primes(2, $limit)}) {
         splice(@pi, $k, $p - $k + 1, ($count) x ($p - $k + 1));
         $k = $p;
         ++$count;
@@ -17229,11 +17235,7 @@ sub almost_prime_count {
 
         if ($k == 2) {
 
-            foreach my $q (
-                           HAS_PRIME_UTIL
-                           ? @{Math::Prime::Util::primes($p, $hi)}
-                           : Math::Prime::Util::GMP::sieve_primes($p, $hi)
-              ) {
+            foreach my $q (@{_primes($p, $hi)}) {
 
                 Math::GMPz::Rmpz_mul_ui($t, $m, $q);
                 Math::GMPz::Rmpz_div($t, $n, $t);
@@ -17320,11 +17322,7 @@ sub almost_prime_sum {
 
         if ($k == 2) {
 
-            foreach my $q (
-                           HAS_PRIME_UTIL
-                           ? @{Math::Prime::Util::primes($p, $s)}
-                           : Math::Prime::Util::GMP::sieve_primes($p, $s)
-              ) {
+            foreach my $q (@{_primes($p, $s)}) {
 
                 Math::GMPz::Rmpz_mul_ui($t, $m, $q);
                 Math::GMPz::Rmpz_div($u, $n, $t);
@@ -17415,11 +17413,7 @@ sub squarefree_almost_prime_count {
 
         if ($k == 2) {
 
-            foreach my $q (
-                           HAS_PRIME_UTIL
-                           ? @{Math::Prime::Util::primes($p, $hi)}
-                           : Math::Prime::Util::GMP::sieve_primes($p, $hi)
-              ) {
+            foreach my $q (@{_primes($p, $hi)}) {
 
                 Math::GMPz::Rmpz_mul_ui($t, $m, $q);
                 Math::GMPz::Rmpz_div($t, $n, $t);
@@ -17523,11 +17517,7 @@ sub squarefree_almost_prime_sum {
 
         if ($k == 2) {
 
-            foreach my $q (
-                           HAS_PRIME_UTIL
-                           ? @{Math::Prime::Util::primes($p, $s)}
-                           : Math::Prime::Util::GMP::sieve_primes($p, $s)
-              ) {
+            foreach my $q (@{_primes($p, $s)}) {
 
                 $j += $q;
                 Math::GMPz::Rmpz_mul_ui($t, $m, $q);
@@ -18357,11 +18347,7 @@ sub prime_power_sum {
     my $z  = Math::GMPz::Rmpz_init_set_str("$n", 10);
     my $pp = Math::GMPz::Rmpz_init_set_ui(0);
 
-    foreach my $p (
-                   HAS_PRIME_UTIL
-                   ? @{Math::Prime::Util::primes(2, $cr)}
-                   : Math::Prime::Util::GMP::sieve_primes(2, $cr)
-      ) {
+    foreach my $p (@{_primes(2, $cr)}) {
 
         # f(p) = sum(3..n.ilog(p), {|k| p**k })
         #      = (p**(n.ilog(p)+1) - 1)/(p-1) - p**2 - p - 1
@@ -18564,7 +18550,7 @@ sub nth_prime {
 
     if (@table < $n) {
         $table[0] = 2;
-        push @table, Math::Prime::Util::GMP::sieve_primes($table[-1] + 1, $limit);
+        push @table, @{_primes($table[-1] + 1, $limit)};
     }
 
     _set_int($table[$n - 1]);
@@ -20285,7 +20271,7 @@ sub _semiprime_count {
     my $s = Math::Prime::Util::GMP::sqrtint($n);
 
     my $count = 0;
-    foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $s)) {
+    foreach my $p (@{_primes(2, $s)}) {
         if (INTSIZE <= 32) {
             $count = Math::Prime::Util::GMP::addint($count, Math::Prime::Util::GMP::subint(_prime_count(Math::Prime::Util::GMP::divint($n, $p)), ++$t - 1));
         }
@@ -22507,7 +22493,7 @@ sub primes_each {
 
             $step;
         },
-        sub { [Math::Prime::Util::GMP::sieve_primes($_[0], $_[1])] }
+        sub { _primes($_[0], $_[1]) }
     );
 #>>>
 }
@@ -22597,7 +22583,7 @@ sub primes {
     Math::Prime::Util::GMP::subint($y, $x) < ULONG_MAX
       or return undef;    # too large range
 
-    _array([map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } Math::Prime::Util::GMP::sieve_primes($x, $y)]);
+    _array([map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } @{_primes($x, $y)}]);
 }
 
 sub prime_cluster {
@@ -23258,7 +23244,7 @@ sub sum_primes {
         my $k   = 0;
         my $sum = 0;
 
-        foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $table_len)) {
+        foreach my $p (@{_primes(2, $table_len)}) {
             splice(@prime_sums, $k, $p - $k + 1, ($sum) x ($p - $k + 1));
             $k = $p;
             $sum += $p;
@@ -23310,7 +23296,7 @@ sub sum_primes {
     if ($from > 2) {
 
         if ($from / $to >= 0.999) {
-            return _set_int(Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::powint($_, $k) } Math::Prime::Util::GMP::sieve_primes($from, $to)));
+            return _set_int(Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::powint($_, $k) } @{_primes($from, $to)}));
         }
 
         return ((TWO)->sum_primes(_set_int($to), _set_int($k))->sub((TWO)->sum_primes(_set_int($from)->dec, _set_int($k))));
@@ -24468,7 +24454,7 @@ sub lpf_sum {    # sum of lpf(k)
     my $pi  = 0;
     my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
-    foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $s)) {
+    foreach my $p (@{_primes(2, $s)}) {
         my $d = Math::Prime::Util::GMP::divint($n, $p);
         my $r =
           (HAS_PRIME_UTIL and $d < ULONG_MAX)
@@ -24560,7 +24546,7 @@ sub gpf_sum {    # sum of gpf(k)
 
     my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
-    foreach my $p (Math::Prime::Util::GMP::sieve_primes(2, $s)) {
+    foreach my $p (@{_primes(2, $s)}) {
         my $d = Math::Prime::Util::GMP::divint($n, $p);
         my $r =
           (HAS_PRIME_UTIL and $d < ULONG_MAX)
@@ -25500,11 +25486,7 @@ sub chebyshev_factor {
     my $lnB   = CORE::log($B);
     my $sqrtB = Math::Prime::Util::GMP::sqrtint($B);
 
-    foreach my $p (
-                   HAS_PRIME_UTIL
-                   ? @{Math::Prime::Util::primes($sqrtB)}
-                   : Math::Prime::Util::GMP::sieve_primes(2, $sqrtB)
-      ) {
+    foreach my $p (@{_primes(2, $sqrtB)}) {
         $chebyshevTmod->($p**CORE::int($lnB / CORE::log($p)), $x);
     }
 
@@ -30456,6 +30438,113 @@ sub sopfr {    # OEIS: A001414
     _set_int($s);
 }
 
+sub sopf_sum {
+    my ($self) = @_;
+
+    my $n_gmp = _any2mpz($$self) // return ZERO;
+
+    if (Math::GMPz::Rmpz_cmp_ui($n_gmp, 2) < 0) {
+        return ZERO;
+    }
+
+    if (FAST_MODE and HAS_PRIME_UTIL and $n_gmp < PRIMESUM_MIN) {
+
+        my $f = sub { 1 };
+        my $g = sub { Math::Prime::Util::is_prime(${$_[0]}) ? $_[0] : 0 };
+
+        my $F = sub { $_[0] };
+        my $G = sub { Math::Prime::Util::sum_primes(${$_[0]}) };
+
+        return ((bless \$n_gmp)->dirichlet_hyperbola($f, $g, $F, $G));
+    }
+
+    my $m_gmp = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sqrt($m_gmp, $n_gmp);
+    my $m = Math::GMPz::Rmpz_get_ui($m_gmp);
+
+    my @S_small;
+    my @S_large;
+
+    my $v_gmp = Math::GMPz::Rmpz_init();
+    for my $v (1 .. $m) {
+        my $res = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_ui($v_gmp, $v);
+        Math::GMPz::Rmpz_add_ui($res, $v_gmp, 1);
+        Math::GMPz::Rmpz_mul($res, $res, $v_gmp);
+        Math::GMPz::Rmpz_tdiv_q_2exp($res, $res, 1);
+        Math::GMPz::Rmpz_sub_ui($res, $res, 1);
+        $S_small[$v] = $res;
+    }
+
+    for my $k (1 .. $m) {
+        my $res = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_tdiv_q_ui($v_gmp, $n_gmp, $k);
+        Math::GMPz::Rmpz_add_ui($res, $v_gmp, 1);
+        Math::GMPz::Rmpz_mul($res, $res, $v_gmp);
+        Math::GMPz::Rmpz_tdiv_q_2exp($res, $res, 1);
+        Math::GMPz::Rmpz_sub_ui($res, $res, 1);
+        $S_large[$k] = $res;
+    }
+
+    my $scratch   = Math::GMPz::Rmpz_init();
+    my $k_max_gmp = Math::GMPz::Rmpz_init();
+    my $p2        = Math::GMPz::Rmpz_init();
+
+    foreach my $p_ui (@{_primes(2, $m)}) {
+        Math::GMPz::Rmpz_set_ui($p2, $p_ui);
+        Math::GMPz::Rmpz_mul_ui($p2, $p2, $p_ui);
+
+        Math::GMPz::Rmpz_tdiv_q($k_max_gmp, $n_gmp, $p2);
+        my $k_max = Math::GMPz::Rmpz_get_ui($k_max_gmp);
+        $k_max = $m if $k_max > $m;
+
+        my $sp_minus_1 = $S_small[$p_ui - 1];
+        my $kp         = $p_ui;
+
+        for (my $k = 1 ; $k <= $k_max ; $k++) {
+            my $sw;
+            if ($kp <= $m) {
+                $sw = $S_large[$kp];
+            }
+            else {
+                Math::GMPz::Rmpz_tdiv_q_ui($scratch, $n_gmp, $kp);
+                $sw = $S_small[Math::GMPz::Rmpz_get_ui($scratch)];
+            }
+
+            Math::GMPz::Rmpz_sub($scratch, $sw, $sp_minus_1);
+            Math::GMPz::Rmpz_mul_ui($scratch, $scratch, $p_ui);
+            Math::GMPz::Rmpz_sub($S_large[$k], $S_large[$k], $scratch);
+            $kp += $p_ui;
+        }
+
+        for (my $v = $m ; $v >= $p2 ; $v--) {
+            my $sw = $S_small[CORE::int($v / $p_ui)];
+            Math::GMPz::Rmpz_sub($scratch, $sw, $sp_minus_1);
+            Math::GMPz::Rmpz_mul_ui($scratch, $scratch, $p_ui);
+            Math::GMPz::Rmpz_sub($S_small[$v], $S_small[$v], $scratch);
+        }
+    }
+
+    my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+    for my $k (1 .. $m) {
+        Math::GMPz::Rmpz_add($sum, $sum, $S_large[$k]);
+    }
+
+    Math::GMPz::Rmpz_mul_ui($scratch, $S_large[$m], $m);
+    Math::GMPz::Rmpz_sub($sum, $sum, $scratch);
+
+    Math::GMPz::Rmpz_tdiv_q_ui($scratch, $n_gmp, $m);
+    my $limit = Math::GMPz::Rmpz_get_ui($scratch);
+
+    foreach my $p_ui (@{_primes(2, $limit)}) {
+        Math::GMPz::Rmpz_tdiv_q_ui($scratch, $n_gmp, $p_ui);
+        Math::GMPz::Rmpz_mul_ui($scratch, $scratch, $p_ui);
+        Math::GMPz::Rmpz_add($sum, $sum, $scratch);
+    }
+
+    bless \$sum;
+}
+
 sub factor_map {
     my ($n, $block) = @_;
 
@@ -31996,12 +32085,6 @@ sub _almost_prime_gmp {
     my $znorder_fn  = HAS_PRIME_UTIL ? \&Math::Prime::Util::znorder    : \&Math::Prime::Util::GMP::znorder;
     my $cdivint     = HAS_PRIME_UTIL ? \&Math::Prime::Util::cdivint    : \&Math::Prime::Util::GMP::cdivint;
 
-    # Unified prime-range iterator returning a flat list.
-    my $sieve_primes_fn =
-      HAS_PRIME_UTIL
-      ? sub { @{Math::Prime::Util::primes($_[0], $_[1])} }
-      : sub { Math::Prime::Util::GMP::sieve_primes($_[0], $_[1]) };
-
     my $generator;
     $generator = sub {
         my ($m, $lo, $k, %args) = @_;
@@ -32072,7 +32155,7 @@ sub _almost_prime_gmp {
             }
             else {
                 # Plain almost primes: any prime q in [from, upto], push m*q.
-                for my $q ($sieve_primes_fn->($args{from}, $args{upto})) {
+                for my $q (@{_primes($args{from}, $args{upto})}) {
                     Math::GMPz::Rmpz_mul_ui($su, $m, $q);
                     push @almost_primes, Math::GMPz::Rmpz_fits_ulong_p($su)
                       ? Math::GMPz::Rmpz_get_ui($su)
@@ -32246,10 +32329,7 @@ sub _sieve_almost_primes {
     # 2. k == 1: return primes directly — no almost-prime sieve needed.
     # ------------------------------------------------------------------
     if ($k == 1) {
-        if (HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($to)) {
-            return Math::Prime::Util::primes(Math::GMPz::Rmpz_get_ui($from), Math::GMPz::Rmpz_get_ui($to),);
-        }
-        return [Math::Prime::Util::GMP::sieve_primes($from, $to)];
+        return _primes($from, $to);
     }
 
     my $squarefree = $opt{squarefree};
@@ -32513,7 +32593,7 @@ sub _sieve_prime_sig_numbers {
                     $lo = Math::GMPz::Rmpz_get_ui($t);
                 }
 
-                foreach my $p (HAS_PRIME_UTIL ? @{Math::Prime::Util::primes($lo, $hi)} : Math::Prime::Util::GMP::sieve_primes($lo, $hi)) {
+                foreach my $p (@{_primes($lo, $hi)}) {
 
                     if ($e == 1) {
                         Math::GMPz::Rmpz_mul_ui($t, $m, $p);
@@ -32674,7 +32754,7 @@ sub _prime_sig_count {
             if ($k == 2) {
                 my $e2 = $new_sig[0];
 
-                foreach my $p (HAS_PRIME_UTIL ? @{Math::Prime::Util::primes($lo, $hi)} : Math::Prime::Util::GMP::sieve_primes($lo, $hi)) {
+                foreach my $p (@{_primes($lo, $hi)}) {
 
                     if ($e == 1) {
                         Math::GMPz::Rmpz_mul_ui($t, $m, $p);
@@ -34760,10 +34840,7 @@ sub smooth_count {
     }
 
     # Array of all primes up to $k
-    my @P =
-      HAS_PRIME_UTIL
-      ? @{Math::Prime::Util::primes($k)}
-      : Math::Prime::Util::GMP::sieve_primes(2, $k);
+    my @P = @{_primes(2, $k)};
 
     # ========================================================================
     # TIER 1 – native (UV) arithmetic
@@ -34881,10 +34958,7 @@ sub rough_count {
     }
 
     my %cache;
-    my @P =
-      HAS_PRIME_UTIL
-      ? @{Math::Prime::Util::primes($k - 1)}
-      : Math::Prime::Util::GMP::sieve_primes(2, $k - 1);
+    my @P = @{_primes(2, $k - 1)};
 
     my $result = sub {
         my ($n, $x) = @_;

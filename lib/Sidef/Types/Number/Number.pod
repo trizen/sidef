@@ -9039,6 +9039,17 @@ Sum of the distinct primes dividing C<n>. (L<OEIS A008472|https://oeis.org/A0084
 
 =cut
 
+=head2 sopf_sum
+
+    sopf_sum(n)
+
+Sum of all distinct prime factors composing numbers from 2 to C<n>. (L<OEIS A024924|https://oeis.org/A024924>)
+
+    say 20.of { .sopf_sum }     #=> OEIS: A024924
+    say sopf_sum(1e9)           #=> 41986415795828892
+
+=cut
+
 =head2 sopfr
 
     sopfr(n)

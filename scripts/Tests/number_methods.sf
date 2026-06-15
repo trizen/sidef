@@ -1943,4 +1943,9 @@ do {
 
 assert_eq(10.by { solve_pell(_, 2) }, %n[2, 7, 14, 23, 31, 34, 46, 47, 62, 71])
 
+assert_eq(
+    20.of { .sopf_sum },
+    20.of { .sopf }.acc
+)
+
 say "** Tests passed!"

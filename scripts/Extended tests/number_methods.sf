@@ -210,4 +210,7 @@ assert_eq(  # A394581
     %n[8, 32, 216, 2352, 30184, 511056, 9702000]
 )
 
+assert_eq(sopf_sum(1e8 + 1), 476028431141545)
+assert_eq(sopf_sum(1e8 - 1), 476028425259168)
+
 say ":: Test passed!"
