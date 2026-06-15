@@ -23322,7 +23322,7 @@ sub sum_primes {
 
     my %S;
     @S{@V} = map {
-        Math::GMPz::Rmpz_set_ui($t, $_);
+        Math::GMPz::Rmpz_set_str($t, $_, 10);
         _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
     } @V;
 
@@ -30540,6 +30540,118 @@ sub sopf_sum {
         Math::GMPz::Rmpz_tdiv_q_ui($scratch, $n_gmp, $p_ui);
         Math::GMPz::Rmpz_mul_ui($scratch, $scratch, $p_ui);
         Math::GMPz::Rmpz_add($sum, $sum, $scratch);
+    }
+
+    bless \$sum;
+}
+
+sub sopfr_sum {
+    my ($self) = @_;
+
+    my $n_gmp = _any2mpz($$self) // return ZERO;
+
+    if (Math::GMPz::Rmpz_cmp_ui($n_gmp, 2) < 0) {
+        return ZERO;
+    }
+
+    my $m_gmp = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sqrt($m_gmp, $n_gmp);
+    my $m = Math::GMPz::Rmpz_get_ui($m_gmp);
+
+    my @S_small;
+    my @S_large;
+
+    my $v_gmp = Math::GMPz::Rmpz_init();
+    for my $v (1 .. $m) {
+        my $res = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_set_ui($v_gmp, $v);
+        Math::GMPz::Rmpz_add_ui($res, $v_gmp, 1);
+        Math::GMPz::Rmpz_mul($res, $res, $v_gmp);
+        Math::GMPz::Rmpz_tdiv_q_2exp($res, $res, 1);
+        Math::GMPz::Rmpz_sub_ui($res, $res, 1);
+        $S_small[$v] = $res;
+    }
+
+    for my $k (1 .. $m) {
+        my $res = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_tdiv_q_ui($v_gmp, $n_gmp, $k);
+        Math::GMPz::Rmpz_add_ui($res, $v_gmp, 1);
+        Math::GMPz::Rmpz_mul($res, $res, $v_gmp);
+        Math::GMPz::Rmpz_tdiv_q_2exp($res, $res, 1);
+        Math::GMPz::Rmpz_sub_ui($res, $res, 1);
+        $S_large[$k] = $res;
+    }
+
+    my $scratch   = Math::GMPz::Rmpz_init();
+    my $k_max_gmp = Math::GMPz::Rmpz_init();
+    my $p2        = Math::GMPz::Rmpz_init();
+
+    my $m_primes = _primes(2, $m);
+
+    foreach my $p_ui (@$m_primes) {
+        Math::GMPz::Rmpz_set_ui($p2, $p_ui);
+        Math::GMPz::Rmpz_mul_ui($p2, $p2, $p_ui);
+
+        Math::GMPz::Rmpz_tdiv_q($k_max_gmp, $n_gmp, $p2);
+        my $k_max = Math::GMPz::Rmpz_get_ui($k_max_gmp);
+        $k_max = $m if $k_max > $m;
+
+        my $sp_minus_1 = $S_small[$p_ui - 1];
+        my $kp         = $p_ui;
+
+        for (my $k = 1 ; $k <= $k_max ; $k++) {
+            my $sw;
+            if ($kp <= $m) {
+                $sw = $S_large[$kp];
+            }
+            else {
+                Math::GMPz::Rmpz_tdiv_q_ui($scratch, $n_gmp, $kp);
+                $sw = $S_small[Math::GMPz::Rmpz_get_ui($scratch)];
+            }
+
+            Math::GMPz::Rmpz_sub($scratch, $sw, $sp_minus_1);
+            Math::GMPz::Rmpz_mul_ui($scratch, $scratch, $p_ui);
+            Math::GMPz::Rmpz_sub($S_large[$k], $S_large[$k], $scratch);
+            $kp += $p_ui;
+        }
+
+        for (my $v = $m ; $v >= $p2 ; $v--) {
+            my $sw = $S_small[CORE::int($v / $p_ui)];
+            Math::GMPz::Rmpz_sub($scratch, $sw, $sp_minus_1);
+            Math::GMPz::Rmpz_mul_ui($scratch, $scratch, $p_ui);
+            Math::GMPz::Rmpz_sub($S_small[$v], $S_small[$v], $scratch);
+        }
+    }
+
+    my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+    for my $k (1 .. $m) {
+        Math::GMPz::Rmpz_add($sum, $sum, $S_large[$k]);
+    }
+
+    Math::GMPz::Rmpz_mul_ui($scratch, $S_large[$m], $m);
+    Math::GMPz::Rmpz_sub($sum, $sum, $scratch);
+
+    Math::GMPz::Rmpz_tdiv_q_ui($scratch, $n_gmp, $m);
+    my $limit = Math::GMPz::Rmpz_get_ui($scratch);
+
+    foreach my $p_ui (@{_primes(2, $limit)}) {
+        Math::GMPz::Rmpz_tdiv_q_ui($scratch, $n_gmp, $p_ui);
+        Math::GMPz::Rmpz_mul_ui($scratch, $scratch, $p_ui);
+        Math::GMPz::Rmpz_add($sum, $sum, $scratch);
+    }
+
+    my $p_pow = Math::GMPz::Rmpz_init();
+    foreach my $p_ui (@$m_primes) {
+
+        Math::GMPz::Rmpz_set_ui($p_pow, $p_ui);
+        Math::GMPz::Rmpz_mul_ui($p_pow, $p_pow, $p_ui);
+
+        while (Math::GMPz::Rmpz_cmp($p_pow, $n_gmp) <= 0) {
+            Math::GMPz::Rmpz_tdiv_q($scratch, $n_gmp, $p_pow);
+            Math::GMPz::Rmpz_mul_ui($scratch, $scratch, $p_ui);
+            Math::GMPz::Rmpz_add($sum, $sum, $scratch);
+            Math::GMPz::Rmpz_mul_ui($p_pow, $p_pow, $p_ui);
+        }
     }
 
     bless \$sum;

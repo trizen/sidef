@@ -213,4 +213,7 @@ assert_eq(  # A394581
 assert_eq(sopf_sum(1e8 + 1), 476028431141545)
 assert_eq(sopf_sum(1e8 - 1), 476028425259168)
 
+assert_eq(sopfr_sum(1e7 - 1), 5495532284132)
+assert_eq(sopfr_sum(1e7 + 1), 5495533193283)
+
 say ":: Test passed!"

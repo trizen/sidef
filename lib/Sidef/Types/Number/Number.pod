@@ -7931,6 +7931,17 @@ Returns an array of prime numbers <= C<n>, or in the range C<[a,b]>.
 
 =cut
 
+=head2 primes_sum
+
+    primes_sum(n)
+    primes_sum(a,b,k=1)
+
+Sum of the prime numbers <= C<n>, or in the range C<a..b>, each prime raised to the k-th power.
+
+Aliases: I<prime_sum>, I<sum_primes>
+
+=cut
+
 =head2 primes_each
 
     n.primes_each {...}
@@ -8010,17 +8021,6 @@ Returns the count of prime divisors of C<n>.
 Equivalent with:
 
     omega(n)
-
-=cut
-
-=head2 prime_sum
-
-    prime_sum(n)
-    prime_sum(a,b,k=1)
-
-Sum of the prime numbers <= C<n>, or in the range C<a..b>, each prime raised to the k-th power.
-
-Aliases: I<primes_sum>, I<sum_primes>
 
 =cut
 
@@ -9043,7 +9043,7 @@ Sum of the distinct primes dividing C<n>. (L<OEIS A008472|https://oeis.org/A0084
 
     sopf_sum(n)
 
-Sum of all distinct prime factors composing numbers from 2 to C<n>. (L<OEIS A024924|https://oeis.org/A024924>)
+Partial sums of the C<sopf(k)> function: sum of all distinct prime factors of C<k> for C<k = 2..n>. (L<OEIS A024924|https://oeis.org/A024924>)
 
     say 20.of { .sopf_sum }     #=> OEIS: A024924
     say sopf_sum(1e9)           #=> 41986415795828892
@@ -9057,6 +9057,17 @@ Sum of all distinct prime factors composing numbers from 2 to C<n>. (L<OEIS A024
 Sum of the primes dividing C<n> (with repetition). (L<OEIS A001414|https://oeis.org/A001414>)
 
     say 30.of { .sopfr }    #=> OEIS: A001414
+
+=cut
+
+=head2 sopfr_sum
+
+    sopfr_sum(n)
+
+Partial sums of the C<sopfr(k)> function: sum of primes dividing C<k> (with repetition) for C<k = 2..n>. (L<OEIS A025281|https://oeis.org/A025281>)
+
+    say 20.of { .sopfr_sum }     #=> OEIS: A025281
+    say sopfr_sum(1e9)           #=> 41986419147434739
 
 =cut
 
