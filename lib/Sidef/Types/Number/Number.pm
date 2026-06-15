@@ -23318,17 +23318,17 @@ sub sum_primes {
     my $t_obj = bless \$t;
     my $k_obj = _set_int($k);
 
-    my (@S_small, @S_large);
+    my @S_small = (0);
+    my @S_large = (0);
 
-    # Fast initialization using native UV assignment
-    for (my $i = 1 ; $i <= $r ; $i++) {
+    for my $i (1 .. $r) {
         Math::GMPz::Rmpz_set_str($t, CORE::int($n / $i), 10);
-        $S_large[$i] = _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
+        push @S_large, _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
     }
 
     for my $v (1 .. $r) {
         Math::GMPz::Rmpz_set_ui($t, $v);
-        $S_small[$v] = _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
+        push @S_small, _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
     }
 
     foreach my $p (@{_primes(2, $r)}) {
@@ -23339,7 +23339,7 @@ sub sum_primes {
         my $max_i = CORE::int($n / $p2);
         $max_i = $r if $max_i > $r;
 
-        for (my $i = 1 ; $i <= $max_i ; $i++) {
+        for my $i (1 .. $max_i) {
             my $ip     = $i * $p;
             my $target = ($ip <= $r) ? $S_large[$ip] : $S_small[CORE::int($n / $ip)];
             Math::GMPz::Rmpz_sub($u, $target, $cp);
