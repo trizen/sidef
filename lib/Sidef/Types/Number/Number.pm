@@ -25216,31 +25216,28 @@ sub factor_upto {
         $size = $max_size;
     }
 
+    my @factors;
+
     # Trial division first for small factors
     if ($size > 13) {
         my $trial_limit = ($size > 16) ? (1 << 16) : (1 << $size);
 
-        ($r, (my @small_factors)) = _primorial_trial_factor($r, $trial_limit);
+        ($r, @factors) = _primorial_trial_factor($r, $trial_limit);
 
-        if (@small_factors > 0) {
+        if (@factors > 0) {
 
             # If fully factored, return result
             if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0) {
-                return _array([map { bless \$_ } @small_factors]);
+                return _array([map { bless \$_ } @factors]);
             }
-
-            my @factors = ((map { bless \$_ } @small_factors), (map { _set_int($_) } _factor_remainder($r, $size, $ecm_table)));
-
-            return _array(\@factors)->isort;
         }
     }
-
-    if ($size <= 13) {
+    else {
         return $n->trial_factor(_set_int(1 << $size));
     }
 
     # Factor the remainder
-    my @factors = _factor_remainder($r, $size, $ecm_table);
+    push @factors, _factor_remainder($r, $size, $ecm_table);
     _array([map { _set_int($_) } @factors])->isort;
 }
 
