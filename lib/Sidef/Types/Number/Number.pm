@@ -8258,6 +8258,96 @@ sub as_float {
 
 *as_dec = \&as_float;
 
+sub _solve_rec_seq {    # Berlekamp-Massey algorithm
+    my (@seq) = @_;
+
+    # Reference:
+    #   https://youtube.com/watch?v=NO1_-qptr6c
+
+    _valid(\(@seq));
+
+    my $n = scalar(@seq);
+    return _array() if ($n == 0);
+
+    my $from_mpq = sub {
+        my ($q) = @_;
+
+        if (Math::GMPq::Rmpq_integer_p($q)) {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPq::Rmpq_get_num($z, $q);
+            return bless \$z;
+        }
+
+        return bless \$q;
+    };
+
+    my @s = map { _any2mpq($$_) // return _array() } @seq;
+
+    my @C = (Math::GMPq->new(1));    # connection polynomial coefficients
+    my @B = (Math::GMPq->new(1));    # B from the last length-increase step
+    my $L = 0;                       # LFSR length
+    my $m = 1;                       # steps since last length increase
+    my $b = Math::GMPq->new(1);      # discrepancy at last length increase
+
+    my $tmp   = Math::GMPq::Rmpq_init();
+    my $coeff = Math::GMPq::Rmpq_init();
+
+    for my $i (0 .. $n - 1) {
+
+        my $d = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set($d, $s[$i]);
+
+        for my $j (1 .. $L) {
+            Math::GMPq::Rmpq_mul($tmp, $C[$j], $s[$i - $j]);
+            Math::GMPq::Rmpq_add($d, $d, $tmp);
+        }
+
+        # Zero discrepancy — C already explains this term.
+        if (Math::GMPq::Rmpq_sgn($d) == 0) {
+            ++$m;
+            next;
+        }
+
+        # δ = d / b
+        Math::GMPq::Rmpq_div($coeff, $d, $b);
+
+        my @T = map {
+            my $q = Math::GMPq::Rmpq_init();
+            Math::GMPq::Rmpq_set($q, $_);
+            $q
+        } @C;
+
+        # Ensure C has enough slots: highest index touched = ($#B + $m).
+        my $need = @B + $m;
+        push @C, Math::GMPq::Rmpq_init() while (scalar(@C) < $need);
+
+        # C(x) ← C(x) − δ · xᵐ · B(x)
+        for my $j (0 .. $#B) {
+            Math::GMPq::Rmpq_mul($tmp, $coeff, $B[$j]);
+            Math::GMPq::Rmpq_sub($C[$j + $m], $C[$j + $m], $tmp);
+        }
+
+        if (2 * $L <= $i) {
+            $L = $i + 1 - $L;
+            @B = @T;
+            Math::GMPq::Rmpq_set($b, $d);
+            $m = 1;
+        }
+        else {
+            ++$m;
+        }
+    }
+
+    my @result;
+    for my $k (1 .. $L) {
+        my $q = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_neg($q, $C[$k]);
+        push @result, $from_mpq->($q);
+    }
+
+    _array(\@result);
+}
+
 sub _solve_seq {    # Newton's forward difference formula
     my ($offset, @sequence) = @_;
 

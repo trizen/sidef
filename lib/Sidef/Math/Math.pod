@@ -16,16 +16,16 @@ the C<Math> object.
     # Basic statistics
     say Math.avg(1, 2, 3, 4)                    #=> 2.5
     say Math.geometric_mean(2, 8, 32)           #=> 8
-    
+
     # Number theory
     say Math.gcd(12, 18, 24)                    #=> 6
     say Math.lcm(4, 6, 8)                       #=> 24
     say Math.chinese([14,643], [254,419])       #=> 87041638
-    
+
     # Sequences and recurrences
     say Math.linear_rec([1,1], [0,1], 0, 10)    # Fibonacci: [0,1,1,2,3,5,8,13,21,34,55]
     say Math.seq(2, {.last.next_prime}).first(5) #=> [2,3,5,7,11]
-    
+
     # Advanced algorithms
     say Math.batch_gcd(1909, 2923, 291, 205)    # Efficient batch GCD
     say Math.product_tree(10, 20, 30, 40)       # Product tree structure
@@ -236,7 +236,7 @@ Given pairs [a_k, m_k], finds x such that x ≡ a_k (mod m_k) for all k.
 
     say Math.chinese([14,643], [254,419], [87,733])     #=> 87041638
     say Math.chinese([2,3], [3,5], [2,7])               #=> 23
-    
+
     # Verification for second example:
     # 23 mod 3 = 2 ✓
     # 23 mod 5 = 3 ✓
@@ -334,10 +334,10 @@ compute a result using a custom binary operation.
 
     # Standard exponentiation: 3^43
     say Math.binary_exp(1, 3, 43, {|a,b| a * b })       #=> 2058911320946491
-    
+
     # Repeated addition: 3 × 43
     say Math.binary_exp(0, 3, 43, {|a,b| a + b })       #=> 129
-    
+
     # String repetition
     say Math.binary_exp("", "Hi", 5, {|a,b| a + b })    #=> "HiHiHiHiHi"
 
@@ -362,13 +362,13 @@ Binary splitting algorithm for associative operations. Recursively divides
 the list in half, applies the operation to each half, then combines results.
 
     var arr = [1, 2, 3, 4, 5, 6, 7, 8]
-    
+
     # Sum using binary splitting
     say Math.binsplit({|a,b| a + b }, arr...)           #=> 36
-    
+
     # Product using binary splitting
     say Math.binsplit({|a,b| a * b }, arr...)           #=> 40320
-    
+
     # Find maximum using binary splitting
     say Math.binsplit({|a,b| a > b ? a : b }, arr...)   #=> 8
 
@@ -399,11 +399,11 @@ where ker = [k₁, k₂, ..., kₘ] is the kernel and init provides initial valu
     # Fibonacci: F(n) = F(n-1) + F(n-2)
     say Math.linear_rec([1, 1], [0, 1], 0, 10)
     #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
-    
+
     # Triangular numbers: T(n) = 3·T(n-1) - 3·T(n-2) + T(n-3)
     say Math.linear_rec([3, -3, 1], [0, 1, 3], 0, 5)
     #=> [0, 1, 3, 6, 10, 15]
-    
+
     # Tetrahedral numbers (sum of triangular numbers)
     say Math.linear_rec([4, -6, 4, -1], [0, 1, 5, 14], 100000)
     #=> 333338333350000
@@ -430,10 +430,10 @@ efficient than computing the full term and then taking modulo for large n.
 
     # Fibonacci mod 43: F(43) mod 43
     say Math.linear_recmod([1, 1], [0, 1], 43, 43)      #=> 42
-    
+
     # Fibonacci mod 1000
     say Math.linear_recmod([1, 1], [0, 1], 100, 1000)   #=> 515
-    
+
     # Lucas numbers mod 97
     say Math.linear_recmod([1, 1], [2, 1], 50, 97)      #=> 79
 
@@ -459,7 +459,7 @@ matrix can be exponentiated to efficiently compute recurrence terms.
     # Fibonacci companion matrix
     var M = Math.linear_recurrence_matrix([1, 1])
     say M               #=> Matrix([[0,1], [1,1]])
-    
+
     # Tribonacci companion matrix
     var T = Math.linear_recurrence_matrix([1, 1, 1])
     say T               #=> Matrix([[0,1,0], [0,0,1], [1,1,1]])
@@ -482,15 +482,12 @@ generates it. Returns the kernel of the recurrence relation.
 
     # Fibonacci sequence
     say Math.solve_rec_seq(30.of { .fibonacci })        #=> [1, 1]
-    
+
     # Square numbers: n²
     say Math.solve_rec_seq(30.of { .square })           #=> [3, -3, 1]
-    
+
     # Sum of squares: 1² + 2² + ... + n²
     say Math.solve_rec_seq(30.of { .faulhaber(2) })     #=> [4, -6, 4, -1]
-    
-    # Catalan numbers
-    say Math.solve_rec_seq(20.of { .catalan })          #=> [4, -6, 2]
 
 B<Algorithm:> Uses the Berlekamp-Massey algorithm to find the shortest linear
 feedback shift register (LFSR) that generates the sequence.
@@ -513,10 +510,10 @@ interpolation to construct the generating function.
 
     # Polynomial for squares: n²
     say Math.solve_seq(20.of { .square })               #=> x^2
-    
+
     # Polynomial for sum of squares: n(n+1)(2n+1)/6
     say Math.solve_seq(20.of { .faulhaber(2) })         #=> 1/3*x^3 + 1/2*x^2 + 1/6*x
-    
+
     # Polynomial for cubes: n³
     say Math.solve_seq(20.of { .cube })                 #=> x^3
 
@@ -524,7 +521,7 @@ B<With offset (starting index):>
 
     # Generate sequence starting at n=10
     say Math.solve_seq(20.of { (_+10)**3 })             #=> x^3 + 30*x^2 + 300*x + 1000
-    
+
     # Same sequence with offset=10
     say Math.solve_seq(20.of { (_+10)**3 }, 10)         #=> x^3
 
@@ -544,15 +541,15 @@ sequence history.
     # Prime numbers (starting from 2)
     say Math.seq(2, { .last.next_prime }).first(10)
     #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
-    
+
     # Fibonacci numbers
     say Math.seq(1, 1, { .last(2).sum }).first(15)
     #=> [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]
-    
+
     # Tribonacci numbers
     say Math.seq(0, 0, 1, { .last(3).sum }).first(10)
     #=> [0, 0, 1, 1, 2, 4, 7, 13, 24, 44]
-    
+
     # Powers of 2
     say Math.seq(1, { .last * 2 }).first(10)
     #=> [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
@@ -575,10 +572,10 @@ but returns an enumerable sequence.
 
     # Count from 1 to 10
     Math.for(1, { _ <= 10 }, { .inc }).each { .say }
-    
+
     # Even numbers from 2 to 20
     Math.for(2, { _ <= 20 }, { _ + 2 }).each { .say }
-    
+
     # Powers of 2 up to 1000
     Math.for(1, { _ < 1000 }, { _ * 2 }).each { .say }
 
@@ -586,7 +583,7 @@ B<Infinite sequences> (condition = nil):
 
     # First 25 prime numbers
     say Math.for(2, nil, { .next_prime }).first(25)
-    
+
     # Fibonacci-like sequence (infinite)
     var fib = Math.for([0,1], nil, { [_[1], _[0] + _[1]] })
     say fib.map { _[0] }.first(20)
@@ -610,12 +607,12 @@ or numbers with restricted prime divisors.
     var a = Math.smooth_numbers(2, 3, 5, 7)
     say a.first(30)
     #=> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 18, 20, ...]
-    
+
     # 5-smooth numbers (regular/Hamming numbers)
     var b = Math.smooth_numbers(2, 3, 5)
     say b.first(20)
     #=> [1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20, 24, 25, ...]
-    
+
     # 7-smooth numbers not divisible by 3
     var c = Math.smooth_numbers(2, 5, 7)
     say c.first(20)
@@ -649,10 +646,10 @@ interpolation between ranges.
 
     # Map 25 from range [1,100] to range [1,10]
     say Math.map(25, 1, 100, 1, 10)             #=> 3.1818181818...
-    
+
     # Map 5 from [0,10] to [0,100]
     say Math.map(5, 0, 10, 0, 100)              #=> 50
-    
+
     # Map 0.5 from [0,1] to [-1,1]
     say Math.map(0.5, 0, 1, -1, 1)              #=> 0
 
@@ -672,7 +669,7 @@ Creates a RangeNumber object representing a value mapped proportionally
 between two endpoints.
 
     say Math.range_map(10, 2, 5)                #=> RangeNum(2, 5, 3/10)
-    
+
     # Creates a range number representing 30% of [2,5]
     # Value = 2 + (5-2) × 3/10 = 2.9
 
@@ -689,10 +686,10 @@ Converts a value to a percentage based on its position within a given range.
 
     # Value 25 in range [1,400]
     say Math.num2percent(25, 1, 400)            #=> 6.01503759398...
-    
+
     # Value 50 in range [0,100]
     say Math.num2percent(50, 0, 100)            #=> 50
-    
+
     # Value 75 in range [50,100]
     say Math.num2percent(75, 50, 100)           #=> 50
 
@@ -712,10 +709,10 @@ a closed-form formula instead of iteration.
 
     # Sum of 1+2+3+...+10
     say Math.range_sum(1, 10)                   #=> 55
-    
+
     # Sum of arithmetic sequence with step 2: 1+3+5+7+9
     say Math.range_sum(1, 10, 2)                #=> 30.25
-    
+
     # Sum of 10+11+12+...+100
     say Math.range_sum(10, 100)                 #=> 5005
 
@@ -736,7 +733,7 @@ B<Use Case:> Computing sums without iteration, mathematical series, algorithm an
     # Using linear recurrence
     var fib10 = Math.linear_rec([1,1], [0,1], 10)
     say fib10                               #=> 55
-    
+
     # Generating Fibonacci sequence
     var fibs = Math.linear_rec([1,1], [0,1], 0, 15)
     say fibs
@@ -746,7 +743,7 @@ B<Use Case:> Computing sums without iteration, mathematical series, algorithm an
 
     # Find GCD of multiple numbers
     say Math.gcd(48, 180, 120)              #=> 12
-    
+
     # Batch GCD for factoring
     var numbers = [143, 221, 323, 391]
     say Math.batch_gcd(numbers...)          #=> [11, 13, 17, 17]
@@ -762,11 +759,11 @@ B<Use Case:> Computing sums without iteration, mathematical series, algorithm an
     # Prime numbers
     var primes = Math.seq(2, { .last.next_prime })
     say primes.first(20)
-    
+
     # Perfect squares
     var squares = Math.for(1, { _ <= 100 }, { .inc })
     say squares.map { .square }.to_a
-    
+
     # Hamming numbers (2,3,5-smooth)
     var hamming = Math.smooth_numbers(2, 3, 5)
     say hamming.first(20)
@@ -774,7 +771,7 @@ B<Use Case:> Computing sums without iteration, mathematical series, algorithm an
 =head2 Working with Statistical Measures
 
     var data = [23, 45, 67, 89, 12, 34, 56, 78]
-    
+
     say "Min: #{Math.min(data...)}"                     #=> Min: 12
     say "Max: #{Math.max(data...)}"                     #=> Max: 89
     say "Sum: #{Math.sum(data...)}"                     #=> Sum: 404
@@ -788,7 +785,7 @@ B<Use Case:> Computing sums without iteration, mathematical series, algorithm an
     var seq = 20.of { .fibonacci }
     var kernel = Math.solve_rec_seq(seq)
     say "Kernel: #{kernel}"                             #=> [1, 1]
-    
+
     # Verify by regenerating
     var regenerated = Math.linear_rec(kernel, [0,1], 0, 19)
     say (seq == regenerated)                            #=> true
