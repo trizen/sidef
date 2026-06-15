@@ -5722,6 +5722,54 @@ The multinomial coefficient, given a list of native integers.
 
 =cut
 
+=head2 partitions
+
+    partitions(n)
+    partitions(n, max_value)
+
+Return an array of arrays with the additive partitions of C<n>, such that their sum equals C<n>.
+
+    say partitions(4)       #=> [[4], [3, 1], [2, 2], [2, 1, 1], [1, 1, 1, 1]]
+
+When the C<max_value> argument is provided, it returns only the partitions with value <= C<max_value>.
+
+    say partitions(4, 2)    #=> [[2, 2], [2, 1, 1], [1, 1, 1, 1]]
+
+It uses the "Mathematica" ordering of the partitions (graded reverse lexicographic ordering).
+
+=head2 partition_count
+
+    partition_count(n)
+
+Returns the number of partitions of C<n>.
+
+Aliases: I<partition_number>
+
+=cut
+
+=head2 partition_count
+
+    partition_count(n)
+
+Returns the number of partitions of C<n>.
+
+Aliases: I<partition_number>
+
+=cut
+
+=head2 strict_partitions
+
+    strict_partitions(n)
+    strict_partitions(n, max_value)
+
+Return an array of arrays with the additive B<strict> partitions of C<n> (partitions where all integers in a single partition are strictly unique/different), such that their sum equals C<n>.
+
+    say strict_partitions(6)       #=> [[6], [5, 1], [4, 2], [3, 2, 1]]
+
+When the C<max_value> argument is provided, it returns only the strict partitions with value <= C<max_value>.
+
+    say strict_partitions(12, 5)   #=> [[5, 4, 3], [5, 4, 2, 1]]
+
 =head2 multiplicative_partitions
 
     multiplicative_partitions(n)
@@ -6884,31 +6932,6 @@ Equivalent with:
     Complex(a, b)
 
 Aliases: I<:>, I<pair>
-
-=cut
-
-=head2 partitions
-
-    partitions(n)
-    partitions(n, max_value)
-
-Return an array of arrays with the additive partitions of C<n>, such that their sum equals C<n>.
-
-    say partitions(4)       #=> [[4], [3, 1], [2, 2], [2, 1, 1], [1, 1, 1, 1]]
-
-When the C<max_value> argument is provided, it returns only the partitions with value <= C<max_value>.
-
-    say partitions(4, 2)    #=> [[2, 2], [2, 1, 1], [1, 1, 1, 1]]
-
-It uses the "Mathematica" ordering of the partitions (graded reverse lexicographic ordering).
-
-=head2 partition_count
-
-    partition_count(n)
-
-Returns the number of partitions of C<n>.
-
-Aliases: I<partition_number>
 
 =cut
 

@@ -25002,6 +25002,13 @@ sub _factor_remainder {
         return ($r);
     }
 
+    # Check perfect power
+    if (my $k = _power_factor($r)) {
+        my $base = Math::Prime::Util::GMP::rootint($r, $k);
+        say STDERR "is_power(r): $base^$k" if $VERBOSE;
+        return ((_factor_remainder($base, $size, $ecm_table)) x $k);
+    }
+
     # Recalculate size for remainder
     my $max_size = (Math::Prime::Util::GMP::logint($r, 2) >> 1) + 1;
     if ($size > $max_size) {
@@ -25027,13 +25034,6 @@ sub _factor_remainder {
         if ($ecm_table->[3 * $i] >= $size) {
             last;
         }
-    }
-
-    # Check perfect power
-    if (my $k = _power_factor($r)) {
-        my $base = Math::Prime::Util::GMP::rootint($r, $k);
-        say STDERR "is_power(r): $base^$k" if $VERBOSE;
-        return ((_factor_remainder($base, $size, $ecm_table)) x $k);
     }
 
     my @factors;
@@ -26750,6 +26750,35 @@ sub partitions {
       }
       ->($n, $max_value);
 
+    return _array(\@results);
+}
+
+sub strict_partitions {
+    my ($n, $max_value) = @_;
+    $n = _any2ui($$n) // return _array();
+    if (defined($max_value)) {
+        _valid(\$max_value);
+        $max_value = _any2ui($$max_value) // return _array();
+    }
+    else {
+        $max_value = $n;
+    }
+    my @results;
+    my @path;
+    sub {
+        my ($n, $max_part) = @_;
+        if ($n == 0) {
+            unshift @results, _array([@path]);
+            return;
+        }
+        my $upper = ($n < $max_part ? $n : $max_part);
+        for my $part (1 .. $upper) {
+            push @path, bless \$part;
+            __SUB__->($n - $part, $part - 1);
+            pop @path;    # backtrack
+        }
+      }
+      ->($n, $max_value);
     return _array(\@results);
 }
 
