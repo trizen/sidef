@@ -4700,19 +4700,23 @@ sub __ilog__ {
     Math::GMPz::Rmpz_sgn($x) <= 0 and return;
 
     # ilog(x,y) = 0, when y > x
-    (
-     ref($y)
-     ? Math::GMPz::Rmpz_cmp($x, $y)
-     : Math::GMPz::Rmpz_cmp_ui($x, $y)
-      ) >= 0
+    (ref($y) ? Math::GMPz::Rmpz_cmp($x, $y) : Math::GMPz::Rmpz_cmp_ui($x, $y)) >= 0
       or return 0;
 
-    if (FAST_MODE and !ref($y) and Math::GMPz::Rmpz_fits_ulong_p($x)) {
-        return (
-                HAS_PRIME_UTIL
-                ? Math::Prime::Util::logint(Math::GMPz::Rmpz_get_ui($x), $y)
-                : Math::Prime::Util::GMP::logint(Math::GMPz::Rmpz_get_ui($x), $y)
-               );
+    if (!ref($y)) {
+
+        # Return faster for y = 2
+        if ($y == 2) {
+            return Math::GMPz::Rmpz_sizeinbase($x, 2) - 1;
+        }
+
+        if (FAST_MODE and Math::GMPz::Rmpz_fits_ulong_p($x)) {
+            return (
+                    HAS_PRIME_UTIL
+                    ? Math::Prime::Util::logint(Math::GMPz::Rmpz_get_ui($x), $y)
+                    : Math::Prime::Util::GMP::logint(Math::GMPz::Rmpz_get_ui($x), $y)
+                   );
+        }
     }
 
     # Return faster for y <= 62
@@ -18329,14 +18333,10 @@ sub prime_power_count {
                 return $pp_count;
             }
 
-            my $x_pp_count = _set_int($x)->prime_power_count;
+            my $x_pp_count = _set_int($x - 1)->prime_power_count;
             my $y_pp_count = _set_int($y)->prime_power_count;
 
             my $pp_count = $y_pp_count->sub($x_pp_count);
-
-            if (Math::Prime::Util::GMP::is_prime_power($x)) {
-                $pp_count = $pp_count->inc;
-            }
 
             return $pp_count;
         }
@@ -18410,14 +18410,10 @@ sub prime_power_count {
         $count;
     };
 
-    my $x_pp_count = ($x == 2 ? 1 : $pp_count->($x));
+    my $x_pp_count = ($x == 2 ? 0 : $pp_count->($x - 1));
     my $y_pp_count = $pp_count->($y);
 
     my $count = $y_pp_count - $x_pp_count;
-
-    if ($x == 2 or (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime_power($x) : Math::Prime::Util::GMP::is_prime_power($x))) {
-        ++$count;
-    }
 
     bless \$count;
 }
@@ -27715,7 +27711,7 @@ sub exp_mangoldt {
     if (ref($n)) {
         $n = _big2uistr($n) // goto &nan;
     }
-    else {   # native integer
+    else {    # native integer
 
         $n < 0 and goto &nan;
 
