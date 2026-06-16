@@ -4646,6 +4646,8 @@ Returns true if C<n> is a practical number. (L<OEIS A005153|https://oeis.org/A00
 
 =head2 is_prime
 
+    n.is_prime
+
 Returns true if C<n> is a prime number.
 
     say 17.is_prime           #=> true
@@ -4653,6 +4655,17 @@ Returns true if C<n> is a prime number.
     say is_prime(2**127 - 1)  #=> true (Mersenne prime)
 
 For numbers up to 2^64, uses a deterministic Miller-Rabin test. For larger numbers, uses probabilistic B-PSW and additional tests, which have no known counter-examples.
+
+=cut
+
+=head2 is_emirp
+
+    n.is_emirp(base = 10)
+
+Returns true if C<n> is prime and its reversal is a different prime (in the given base). Also known as emirps.
+
+    say 10.by { .is_emirp }        #=> decimal emirps (OEIS: A006567)
+    say 10.by { .is_emirp(2) }     #=> binary emirps (OEIS: A080790)
 
 =cut
 

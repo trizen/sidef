@@ -20821,6 +20821,20 @@ sub is_prime {
       && Math::Prime::Util::GMP::is_prime(_big2uistr($n) // return $FALSE) ? $TRUE : $FALSE;
 }
 
+sub is_emirp {
+    my ($n, $base) = @_;
+
+    $base //= TEN;
+    my $n_rev = $n->flip($base);
+
+    # Must not be a palindrome
+    if ($n_rev->eq($n)) {
+        return $FALSE;
+    }
+
+    $n_rev->all_prime($n);
+}
+
 sub is_gaussian_prime {
     my ($x, $y) = @_;
 
