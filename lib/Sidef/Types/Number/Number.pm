@@ -18273,6 +18273,21 @@ sub prev_squarefree_almost_prime {
     $count->nth_squarefree_almost_prime($k_obj);
 }
 
+sub nth_sphenic {
+    my ($n) = @_;
+    $n->nth_squarefree_almost_prime(THREE);
+}
+
+sub next_sphenic {
+    my ($n) = @_;
+    $n->next_squarefree_almost_prime(THREE);
+}
+
+sub prev_sphenic {
+    my ($n) = @_;
+    $n->prev_squarefree_almost_prime(THREE);
+}
+
 sub prime_power_count {
     my ($x, $y) = @_;
 
@@ -33716,6 +33731,16 @@ sub squarefree_semiprimes {
     (TWO)->squarefree_almost_primes(@_);
 }
 
+sub sphenic {
+    (THREE)->squarefree_almost_primes(@_);
+}
+
+*sphenic_numbers = \&sphenic;
+
+sub sphenic_count {
+    (THREE)->squarefree_almost_prime_count(@_);
+}
+
 sub squarefree_almost_primes_each {
     my ($k, $from, $to, $block) = @_;
 
@@ -33754,6 +33779,10 @@ sub squarefree_semiprimes_each {
 }
 
 *each_squarefree_semiprime = \&squarefree_semiprimes_each;
+
+sub sphenic_each {
+    (THREE)->squarefree_almost_primes_each(@_);
+}
 
 sub carmichael_each {
     my ($k, $from, $to, $block) = @_;

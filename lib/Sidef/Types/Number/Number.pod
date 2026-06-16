@@ -1798,6 +1798,19 @@ Returns an array with the composite numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
+=head2 next_composites
+
+    n.next_composites(start=4)
+
+Returns an array with C<n> consecutive composite numbers starting from C<start>.
+
+    say 5.next_composites        #=> [4, 6, 8, 9, 10]
+    say 5.next_composites(50)    #=> [50, 51, 52, 54, 55]
+
+Aliases: I<ncomposites>, I<n_composites>
+
+=cut
+
 =head2 composites_each
 
     n.composites_each { ... }
@@ -5841,19 +5854,6 @@ Returns the count of the non-bi-unitary divisors of C<n>.
 
 =cut
 
-=head2 next_composites
-
-    n.next_composites(start=4)
-
-Returns an array with C<n> consecutive composite numbers starting from C<start>.
-
-    say 5.next_composites        #=> [4, 6, 8, 9, 10]
-    say 5.next_composites(50)    #=> [50, 51, 52, 54, 55]
-
-Aliases: I<ncomposites>, I<n_composites>
-
-=cut
-
 =head2 nd
 
     n.st({...})
@@ -6233,6 +6233,22 @@ Returns the next semiprime greater than C<n>.
     n.prev_semiprime
 
 Returns the previous semiprime smaller than C<n>.
+
+=cut
+
+=head2 next_sphenic
+
+    n.next_sphenic
+
+Returns the next number that is the product of three distinct primes.
+
+=cut
+
+=head2 prev_sphenic
+
+    n.prev_sphenic
+
+Returns the previous number that is the product of three distinct primes.
 
 =cut
 
@@ -6674,6 +6690,16 @@ Returns the n-th squarefree k-almost prime.
     say nth_squarefree_almost_prime(1e7, 2)     #=> 56173891
     say nth_squarefree_almost_prime(1e7, 3)     #=> 48108421
     say nth_squarefree_almost_prime(1e7, 4)     #=> 81556446
+
+=cut
+
+=head2 nth_sphenic
+
+    nth_sphenic(n)
+
+Returns the n-th number that is the product of three distinct primes. (L<OEIS A007304|https://oeis.org/A007304>)
+
+    say nth_sphenic(1e7)     #=> 48108421
 
 =cut
 
@@ -9086,6 +9112,42 @@ The method returns an array with the factors of C<n>:
 The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<special_factors>
+
+=cut
+
+=head2 sphenic
+
+    sphenic(n)
+    sphenic(a, b)
+
+Returns an array with the numbers with exactly three distinct prime factors <= C<n> or in range C<a..b>.  (L<OEIS A007304|https://oeis.org/A007304>)
+
+    say sphenic(200)    #=> OEIS: A007304
+
+Aliases: I<sphenic_numbers>
+
+=cut
+
+=head2 sphenic_count
+
+    sphenic_count(n)
+    sphenic_count(a,b)
+
+Count of the numbers with exactly three distinct prime factors <= C<n> or in range C<a..b>.  (L<OEIS A215218|https://oeis.org/A215218>)
+
+    say sphenic_count(1e10)      #=> 1997171674
+    say sphenic_count(1e11)      #=> 19522428788
+
+=cut
+
+=head2 sphenic_each
+
+    sphenic_each(n, {|k| ... })
+    sphenic_each(a, b, {|k| ... })
+
+Iterate over the numbers with exactly three distinct prime factors <= C<n> or in range C<a..b>.
+
+    sphenic_each(500, 1000, {|k| say k })
 
 =cut
 
