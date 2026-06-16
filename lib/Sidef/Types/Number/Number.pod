@@ -2816,7 +2816,21 @@ Partial sums of the C<exp_bigomega()> function.
 
     exp_mangoldt(n)
 
-Returns exp(Λ(n)); the exponential of the Mangoldt function.
+Returns exp(Λ(n)): the exponential of the Mangoldt function.
+
+    say 30.of { .exp_mangoldt }     #=> OEIS: A014963
+
+=cut
+
+=head2 exp_mangoldt_sum
+
+    exp_mangoldt_sum(n)
+
+Partial sums of the exponential of the Mangoldt function.
+
+    say 30.of { .exp_mangoldt_sum }     #=> OEIS: A072107
+    say exp_mangoldt_sum(1e10)          #=> 2220822442581396891
+    say exp_mangoldt_sum(1e11)          #=> 201467077843736717398
 
 =cut
 
@@ -9715,6 +9729,8 @@ Number of derangements of a set with C<n> elements having exactly C<k> fixed poi
 
     say 20.of { .subfactorial }        #=> OEIS: A000166
     say 20.of { .subfactorial(2) }     #=> OEIS: A000387
+
+Aliases: I<rencontres>
 
 =cut
 

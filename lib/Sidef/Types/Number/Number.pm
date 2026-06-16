@@ -12073,6 +12073,8 @@ sub subfactorial {    # OEIS: A000166
     bless \$z;
 }
 
+*rencontres = \&subfactorial;
+
 sub factorial_sum {
     my ($n) = @_;
     $n = _any2ui($$n) // goto &nan;
@@ -24277,6 +24279,7 @@ sub znlog {
 
 sub rad {    # A007947
     my ($n) = @_;
+
     $n = $$n;
 
     if (ref($n)) {
@@ -27706,13 +27709,51 @@ sub prime_udivisors {
 
 sub exp_mangoldt {
     my ($n) = @_;
-    $n = Math::Prime::Util::GMP::exp_mangoldt(_big2uistr($$n) || return ONE);
+
+    $n = $$n;
+
+    if (ref($n)) {
+        $n = _big2uistr($n) // goto &nan;
+    }
+    else {   # native integer
+
+        $n < 0 and goto &nan;
+
+        if (HAS_PRIME_UTIL) {
+            $n || return ZERO;
+            $n = Math::Prime::Util::exp_mangoldt($n);
+            $n == 1 and return ONE;
+            return bless \$n;
+        }
+    }
+
+    $n || return ZERO;
+    $n = Math::Prime::Util::GMP::exp_mangoldt($n);
     $n eq '1' and return ONE;
     _set_int($n);
 }
 
 sub mangoldt {
     $_[0]->exp_mangoldt->log;
+}
+
+sub exp_mangoldt_sum {
+    my ($n) = @_;
+
+    # Formula:
+    #   exp_mangoldt_sum(n) = n - prime_power_count(n) + Sum_{k=1..floor(log_2(n))} prime_sum(floor(n^(1/k)))
+
+    my $z     = _any2mpz($$n, 0);
+    my $t     = Math::GMPz::Rmpz_init();
+    my @terms = $n->prime_power_count->neg;
+    my $t_obj = bless \$t;
+
+    foreach my $k (1 .. Math::GMPz::Rmpz_sizeinbase($z, 2) - 1) {
+        Math::GMPz::Rmpz_root($t, $z, $k);
+        push @terms, $t_obj->prime_sum;
+    }
+
+    Sidef::Types::Number::Number::sum($n, @terms);
 }
 
 sub primitive_part {
