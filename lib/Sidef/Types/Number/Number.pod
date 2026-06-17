@@ -3183,37 +3183,57 @@ Aliases: I<each_fermat_psp>
 
 =cut
 
-=head2 fib
+=head2 fibonacci
 
-    fib(n)
-    fib(n,k)
+    fibonacci(n)
+    fibonacci(n,k)
 
-Returns the n-th Fibonacci number.
+Returns the n-th Fibonacci number. (L<OEIS A000045|https://oeis.org/A000045>)
 
-    say 10.of { .fib }      #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+    say 10.of { .fibonacci }      #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 
 When an additional is provided, it returns the n-th Fibonacci number of k-th order.
 
-    say 20.of { .fib(3) }   #=> Tribonacci numbers
-    say 20.of { .fib(4) }   #=> Tetranacci numbers
-    say 20.of { .fib(5) }   #=> Pentanacci numbers
+    say 20.of { .fibonacci(3) }   #=> Tribonacci numbers
+    say 20.of { .fibonacci(4) }   #=> Tetranacci numbers
+    say 20.of { .fibonacci(5) }   #=> Pentanacci numbers
 
-Aliases: I<fibonacci>
+Aliases: I<fib>
 
 =cut
 
-=head2 fib_factor
+=head2 tribonacci
 
-    n.fib_factor(upto = 2*n.ilog2)
+    tribonacci(n)
+
+Returns the n-th Tribonacci number. (L<OEIS A000073|https://oeis.org/A000073>)
+
+Alias for: C<fibonacci(n, 3)>.
+
+=cut
+
+=head2 tetranacci
+
+    tetranacci(n)
+
+Returns the n-th Tetranacci number. (L<OEIS A000078|https://oeis.org/A000078>)
+
+Alias for: C<fibonacci(n,4)>.
+
+=cut
+
+=head2 fibonacci_factor
+
+    n.fibonacci_factor(upto = 2*n.ilog2)
 
 Tries to find special factors of a Fibonacci-like number.
 
-    say fib_factor(480.fib)
-    say fib_factor(480.lucas)
+    say fibonacci_factor(480.fib)
+    say fibonacci_factor(480.lucas)
 
 The product of the factors will give back C<n>. However, some factors may be composite.
 
-Aliases: I<fibonacci_factor>
+Aliases: I<fib_factor>
 
 =cut
 

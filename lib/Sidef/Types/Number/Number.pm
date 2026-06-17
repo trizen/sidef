@@ -13440,6 +13440,16 @@ sub fibonacci {
 *fib       = \&fibonacci;
 *Fibonacci = \&fibonacci;
 
+sub tribonacci {
+    my ($n) = @_;
+    $n->fibonacci(THREE);
+}
+
+sub tetranacci {
+    my ($n) = @_;
+    $n->fibonacci(FOUR);
+}
+
 sub fibonorial {
     my ($n) = @_;
 
