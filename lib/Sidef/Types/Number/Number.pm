@@ -2012,6 +2012,8 @@ sub rat_approx {
     bless \$ans_q;
 }
 
+*best_rational_approx = \&rat_approx;
+
 sub pair {
     my ($x, $y) = @_;
     Sidef::Types::Number::Complex->new($x, $y);
@@ -13448,6 +13450,33 @@ sub tribonacci {
 sub tetranacci {
     my ($n) = @_;
     $n->fibonacci(FOUR);
+}
+
+sub fibbinary {    # A003714: Fibbinary numbers
+    my ($n) = @_;
+
+    $n = _any2mpz($$n, 0);
+    $n = Math::GMPz::Rmpz_init_set($n);    # copy
+
+    my $s    = Math::GMPz::Rmpz_init_set_ui(0);
+    my @list = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set_ui(1));
+
+    while (1) {
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add($t, $list[0], $list[1]);
+        last if (Math::GMPz::Rmpz_cmp($t, $n) > 0);
+        unshift @list, $t;
+    }
+
+    foreach my $d (@list) {
+        Math::GMPz::Rmpz_mul_2exp($s, $s, 1);
+        if (Math::GMPz::Rmpz_cmp($d, $n) <= 0) {
+            Math::GMPz::Rmpz_add_ui($s, $s, 1);
+            Math::GMPz::Rmpz_sub($n, $n, $d);
+        }
+    }
+
+    bless \$s;
 }
 
 sub fibonorial {

@@ -3222,6 +3222,17 @@ Alias for: C<fibonacci(n,4)>.
 
 =cut
 
+=head2 fibbinary
+
+    fibbinary(n)
+
+Returns the n-th Fibbinary number. (L<OEIS A003714|https://oeis.org/A003714>)
+
+    say 10.of { .fibbinary }            # [0, 1, 2, 4, 5, 8, 9, 10, 16, 17]
+    say 30.of { .fibbinary.as_bin }     # Zeckendorf representation of n (OEIS: A014417)
+
+=cut
+
 =head2 fibonacci_factor
 
     n.fibonacci_factor(upto = 2*n.ilog2)
@@ -8576,6 +8587,8 @@ It also accepts and optional argument C<max_den>, returning the best rational ap
     say rat_approx(Num.pi, 1e9).as_frac    #=> 2549491779/811528438
 
 Returns C<NaN> when C<x> is not a real number.
+
+Aliases: I<best_rational_approx>
 
 =cut
 
