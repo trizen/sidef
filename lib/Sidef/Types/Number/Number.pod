@@ -3342,6 +3342,18 @@ Aliases: I<Γ>
 
 =cut
 
+=head2 genocchi
+
+    genocchi(n)
+
+Returns the n-th Genocchi number (of first kind). (L<OEIS A001469|https://oeis.org/A001469>)
+
+Defined as:
+
+    gennochi(n) = 2*(1 - 4^n) * bernoulli(2*n)
+
+=cut
+
 =head2 gcd
 
     gcd(...)

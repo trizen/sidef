@@ -64,6 +64,7 @@ use constant {
     ONE   => bless(\(my $one   = 1)),
     TWO   => bless(\(my $two   = 2)),
     THREE => bless(\(my $three = 3)),
+    FOUR  => bless(\(my $four  = 4)),
     TEN   => bless(\(my $ten   = 10)),
     ZERO  => bless(\(my $zero  = 0)),
     MONE  => bless(\(my $mone  = -1)),
@@ -6404,6 +6405,11 @@ sub bernfrac {
 *Bernoulli        = \&bernfrac;
 *BernoulliB       = \&bernfrac;
 *bernoulli_number = \&bernfrac;
+
+sub genocchi {
+    my ($n) = @_;
+    (TWO)->mul(ONE->sub((FOUR)->ipow($n)))->mul($n->add($n)->bernoulli);
+}
 
 sub faulhaber_polynomial {
     my ($n, $x) = @_;
@@ -13674,14 +13680,12 @@ sub quadratic_formulaQ {
 
     _valid(\$B, \$C);
 
-    state $FOUR = _set_int(4);
-
     #
     ## (-b ± sqrt(b^2 - 4ac)) / (2a)
     #
 
     my $u = $B->mul($B);                                                     # b^2
-    my $t = $A->mul($C)->mul($FOUR);                                         # 4ac
+    my $t = $A->mul($C)->mul(FOUR);                                          # 4ac
     my $s = Sidef::Types::Number::Quadratic->new(ZERO, ONE, $u->sub($t));    # sqrt(b^2 - 4ac)
 
     my $n1 = $s->sub($B);                                                    #   sqrt(b^2 - 4ac) - b
