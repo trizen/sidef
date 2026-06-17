@@ -5133,6 +5133,26 @@ Returns the Jacobi symbol: C<(a|n)>.
 
 =cut
 
+=head2 jacobsthal
+
+    jacobsthal(n)
+
+Returns the n-th Jacobsthal number. (L<OEIS A001045|https://oeis.org/A001045>)
+
+Equivalent to: C<lucasU(1, -2, n)>.
+
+=cut
+
+=head2 jacobsthal_lucas
+
+    jacobsthal_lucas(n)
+
+Returns the n-th Jacobsthal-Lucas number. (L<OEIS A014551|https://oeis.org/A014551>)
+
+Equivalent to: C<lucasV(1, -2, n)>.
+
+=cut
+
 =head2 jordan_totient
 
     jordan_totient(n,k)
@@ -5842,6 +5862,27 @@ Modular operation: C<(a*b - c*d) % m>.
 The multinomial coefficient, given a list of native integers.
 
     say multinomial(1, 4, 4, 2)     #=> 34650
+
+=cut
+
+=head2 padovan
+
+    padovan(n)
+
+Returns the n-th Padovan number (L<OEIS A000931|https://oeis.org/A000931>), defined as:
+
+    a(0) = 1
+    a(1) = 0
+    a(2) = 0
+    a(n) = a(n-2) + a(n-3)
+
+=cut
+
+=head2 padovanmod
+
+    padovanmod(n,m)
+
+Returns the n-th Padovan number, modulo C<m>.
 
 =cut
 
@@ -7091,6 +7132,26 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 =cut
 
+=head2 pell
+
+    pell(n)
+
+Returns the n-th Pell number. (L<OEIS A000129|https://oeis.org/A000129>)
+
+Equivalent to: C<lucasU(2, -1, n)>.
+
+=cut
+
+=head2 pell_lucas
+
+    pell_lucas(n)
+
+Returns the n-th Pell-Lucas number. (L<OEIS A002203|https://oeis.org/A002203>)
+
+Equivalent to: C<lucasV(2, -1, n)>.
+
+=cut
+
 =head2 pell_factor
 
     n.pell_factor(tries=1e4)
@@ -7102,6 +7163,33 @@ This method is particularly effective for numbers that have factors close to C<s
     say pell_factor(10**120 - 10**40)
 
 The product of the factors will give back C<n>. However, some factors may be composite.
+
+=cut
+
+=head2 perrin
+
+    perrin(n)
+
+Returns the n-th Perrin number (L<OEIS A001608|https://oeis.org/A001608>), defined as:
+
+    a(0) = 3
+    a(1) = 0
+    a(2) = 2
+    a(n) = a(n-2) + a(n-3)
+
+=cut
+
+=head2 perrinmod
+
+    perrinmod(n,m)
+
+Returns the n-th Perrin number, modulo C<m>.
+
+This function can be used as a pseudo-primality test for n > 1:
+
+    perrinmod(n, n) == 0    #=> n is a prime number or a Perrin pseudoprime
+
+The list of Perrin pseudoprimes is given by L<OEIS A013998|https://oeis.org/A013998>.
 
 =cut
 
@@ -8483,6 +8571,8 @@ Returns the radical of C<n>, which is the largest squarefree divisor of C<n>.
 Equivalent to:
 
     n.factor.uniq.prod
+
+Aliases: I<squarefree_kernel>
 
 =cut
 

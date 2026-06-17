@@ -2,7 +2,7 @@ package Sidef::Math::Math;
 
 use utf8;
 use 5.016;
-use List::Util qw();
+use List::Util qw(all);
 
 use parent qw(
   Sidef::Object::Object
@@ -129,6 +129,12 @@ sub linear_recurrence_matrix {
 sub linear_recurrence {
     my ($self, $ker, $init, $n_min, $n_max) = @_;
 
+    # Fast path for integers
+    if ($n_min->ge(Sidef::Types::Number::Number::ZERO)
+        and (all { $_->is_int } (@$ker, @$init))) {
+        return Sidef::Types::Number::Number::_linear_recurrence_mpz($ker, $init, $n_min, $n_max);
+    }
+
     my $want_array = 1;
 
     if (!defined($n_max)) {
@@ -165,6 +171,12 @@ sub linear_recurrence {
 
 sub linear_recurrence_mod {
     my ($self, $ker, $init, $n, $m) = @_;
+
+    # Fast path for integers
+    if ($n->ge(Sidef::Types::Number::Number::ZERO)
+        and (all { $_->is_int } (@$ker, @$init))) {
+        return Sidef::Types::Number::Number::_linear_recurrence_mod_mpz($ker, $init, $n, $m);
+    }
 
     my @init_terms = @$init;
 

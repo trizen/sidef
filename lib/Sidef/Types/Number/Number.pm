@@ -8270,6 +8270,209 @@ sub as_float {
 
 *as_dec = \&as_float;
 
+# Utility: Polynomial multiplication modulo P(x) (Fiduccia's algorithm core)
+sub _poly_mul_mod {
+    my ($A, $B, $ker, $k, $mod) = @_;
+
+    my @C;
+    for (my $i = 0 ; $i < $k ; $i++) {
+        next unless defined($A->[$i]) && Math::GMPz::Rmpz_sgn($A->[$i]);
+        for (my $j = 0 ; $j < $k ; $j++) {
+            next unless defined($B->[$j]) && Math::GMPz::Rmpz_sgn($B->[$j]);
+            my $idx = $i + $j;
+            $C[$idx] //= Math::GMPz::Rmpz_init_set_ui(0);
+            Math::GMPz::Rmpz_addmul($C[$idx], $A->[$i], $B->[$j]);
+        }
+    }
+
+    if (defined $mod) {
+        for my $c (@C) {
+            Math::GMPz::Rmpz_mod($c, $c, $mod) if defined $c;
+        }
+    }
+
+    # Reduce modulo characteristic polynomial P(x)
+    for (my $i = $#C ; $i >= $k ; $i--) {
+        next unless defined($C[$i]) && Math::GMPz::Rmpz_sgn($C[$i]);
+        for (my $j = 1 ; $j <= $k ; $j++) {
+            my $idx = $i - $j;
+            $C[$idx] //= Math::GMPz::Rmpz_init_set_ui(0);
+            Math::GMPz::Rmpz_addmul($C[$idx], $C[$i], $ker->[$j - 1]);
+        }
+        if (defined $mod) {
+            for (my $j = 1 ; $j <= $k ; $j++) {
+                my $idx = $i - $j;
+                Math::GMPz::Rmpz_mod($C[$idx], $C[$idx], $mod) if defined $C[$idx];
+            }
+        }
+    }
+
+    $#C = $k - 1;    # Truncate
+    for (my $i = 0 ; $i < $k ; $i++) {
+        $C[$i] //= Math::GMPz::Rmpz_init_set_ui(0);
+    }
+
+    return \@C;
+}
+
+# Utility: Polynomial exponentiation modulo P(x)
+sub _poly_pow_mod {
+    my ($n, $ker, $k, $mod) = @_;
+
+    my @res  = (Math::GMPz::Rmpz_init_set_ui(1));
+    my @base = (Math::GMPz::Rmpz_init_set_ui(0), Math::GMPz::Rmpz_init_set_ui(1));    # x^1
+
+    # Edge case for degree 1 reduction
+    if ($k == 1) {
+        @base = (Math::GMPz::Rmpz_init_set($ker->[0]));
+        Math::GMPz::Rmpz_mod($base[0], $base[0], $mod) if defined $mod;
+    }
+
+    my $exp = Math::GMPz::Rmpz_init_set($n);
+
+    while (Math::GMPz::Rmpz_sgn($exp) > 0) {
+        if (Math::GMPz::Rmpz_odd_p($exp)) {
+            @res = @{_poly_mul_mod(\@res, \@base, $ker, $k, $mod)};
+        }
+        Math::GMPz::Rmpz_fdiv_q_2exp($exp, $exp, 1);
+        if (Math::GMPz::Rmpz_sgn($exp) > 0) {
+            @base = @{_poly_mul_mod(\@base, \@base, $ker, $k, $mod)};
+        }
+    }
+
+    for (my $i = 0 ; $i < $k ; $i++) {
+        $res[$i] //= Math::GMPz::Rmpz_init_set_ui(0);
+    }
+
+    return \@res;
+}
+
+sub _linear_recurrence_mpz {
+    my ($ker, $init, $n_min, $n_max) = @_;
+
+    my $want_array = 1;
+    if (!defined($n_max)) {
+        $n_max      = $n_min;
+        $want_array = 0;
+    }
+
+    my $k = scalar(@$ker);
+
+    if ($k == 0) {
+        return $want_array
+          ? Sidef::Types::Array::Array->new([])
+          : Sidef::Types::Number::Number::ZERO;
+    }
+
+    my @gmp_ker    = map { _any2mpz($$_) // goto &nan } @$ker;
+    my @init_terms = map { _any2mpz($$_) // goto &nan } @$init[0 .. ($#$init > $#$ker ? $#$ker : $#$init)];
+
+    while (@init_terms < $k) {
+        push @init_terms, Math::GMPz::Rmpz_init_set_ui(0);
+    }
+
+    my $n   = _any2mpz($$n_min) // goto &nan;
+    my $res = _poly_pow_mod($n, \@gmp_ker, $k, undef);
+
+    # Fast-path for scalar calculation
+    if (!$want_array) {
+        my $val = Math::GMPz::Rmpz_init_set_ui(0);
+        for (my $i = 0 ; $i < $k ; $i++) {
+            next unless defined $res->[$i];
+            Math::GMPz::Rmpz_addmul($val, $res->[$i], $init_terms[$i]);
+        }
+        return bless \$val;
+    }
+
+    my $count = Math::GMPz::Rmpz_init_set(_any2mpz($$n_max) // return _array());
+    Math::GMPz::Rmpz_sub($count, $count, $n);
+    return _array() if Math::GMPz::Rmpz_sgn($count) < 0;
+
+    my $total_terms = Math::GMPz::Rmpz_get_ui($count) + 1;
+    my @window;
+
+    # Extract the state vector for the sequence starting at n_min
+    for my $step (0 .. $k - 1) {
+        my $val = Math::GMPz::Rmpz_init_set_ui(0);
+        for (my $i = 0 ; $i < $k ; $i++) {
+            next unless defined $res->[$i];
+            Math::GMPz::Rmpz_addmul($val, $res->[$i], $init_terms[$i]);
+        }
+        push @window, $val;
+
+        # Multiply R(x) by x mod P(x) for sequential state steps
+        if ($step < $k - 1) {
+            my $top = $res->[$k - 1] // Math::GMPz::Rmpz_init_set_ui(0);
+            for (my $i = $k - 1 ; $i >= 1 ; $i--) {
+                $res->[$i] = $res->[$i - 1] // Math::GMPz::Rmpz_init_set_ui(0);
+                if (Math::GMPz::Rmpz_sgn($top)) {
+                    Math::GMPz::Rmpz_addmul($res->[$i], $top, $gmp_ker[$k - 1 - $i]);
+                }
+            }
+            $res->[0] = Math::GMPz::Rmpz_init_set_ui(0);
+            if (Math::GMPz::Rmpz_sgn($top)) {
+                Math::GMPz::Rmpz_addmul($res->[0], $top, $gmp_ker[$k - 1]);
+            }
+        }
+    }
+
+    # LFSR progression for the requested slice
+    my @result_seq;
+    for (my $i = 0 ; $i < $total_terms ; $i++) {
+        if ($i < $k) {
+            push @result_seq, $window[$i];
+        }
+        else {
+            my $next_val = Math::GMPz::Rmpz_init_set_ui(0);
+            for (my $j = 0 ; $j < $k ; $j++) {
+                Math::GMPz::Rmpz_addmul($next_val, $gmp_ker[$j], $window[$k - 1 - $j]);
+            }
+            push @window, $next_val;
+            shift @window;
+            push @result_seq, $next_val;
+        }
+    }
+
+    _array([map { bless \$_ } @result_seq]);
+}
+
+sub _linear_recurrence_mod_mpz {
+    my ($ker, $init, $n, $m) = @_;
+
+    my $k = scalar(@$ker);
+    return Sidef::Types::Number::Number::ZERO if $k == 0;
+
+    my $gmp_m = _any2mpz($$m) // goto &nan;
+    Math::GMPz::Rmpz_sgn($gmp_m) || goto &nan;
+
+    my @gmp_ker = map {
+        my $z = _any2mpz($$_) // goto &nan;
+        Math::GMPz::Rmpz_mod($z, $z, $gmp_m);
+        $z;
+    } @$ker;
+
+    my @init_terms = map {
+        my $z = _any2mpz($$_) // goto &nan;
+        Math::GMPz::Rmpz_mod($z, $z, $gmp_m);
+        $z;
+    } @$init[0 .. ($#$init > $#$ker ? $#$ker : $#$init)];
+
+    while (@init_terms < $k) {
+        push @init_terms, $ZERO;
+    }
+
+    my $gmp_n = _any2mpz($$n) // goto &nan;
+    my $res   = _poly_pow_mod($gmp_n, \@gmp_ker, $k, $gmp_m);
+
+    my $val = Math::GMPz::Rmpz_init_set_ui(0);
+    for (my $i = 0 ; $i < $k ; $i++) {
+        next unless defined $res->[$i];
+        Math::GMPz::Rmpz_addmul($val, $res->[$i], $init_terms[$i]);
+    }
+    Math::GMPz::Rmpz_mod($val, $val, $gmp_m);
+    bless \$val;
+}
+
 sub _solve_rec_seq {    # Berlekamp-Massey algorithm
     my (@seq) = @_;
 
@@ -12260,7 +12463,7 @@ sub kempner {
 
         # Build the Kempner expansion coefficients array: a_j = (p^j - 1)/(p - 1)
         # and store the corresponding powers of p to avoid redundant exponentiations.
-        my @a = (1);
+        my @a     = (1);
         my @p_pow = ($p);
 
         if (Math::GMPz::Rmpz_cmp_ui($p, $k) < 0) {
@@ -12286,9 +12489,9 @@ sub kempner {
         my $rem_k = $k;
         Math::GMPz::Rmpz_set_ui($m, 0);
 
-        for (my $i = $#a; $i >= 0; $i--) {
+        for (my $i = $#a ; $i >= 0 ; $i--) {
             my $ai = $a[$i];
-            my $c = CORE::int($rem_k / $ai);
+            my $c  = CORE::int($rem_k / $ai);
 
             if ($c > 0) {
                 $rem_k -= $c * $ai;
@@ -12578,6 +12781,50 @@ sub lucasv {
 
 *lucasV = \&lucasv;
 *LucasV = \&lucasv;
+
+sub pell {
+    my ($n) = @_;
+    Sidef::Types::Number::Number::lucasu(TWO, MONE, $n);
+}
+
+sub pell_lucas {
+    my ($n) = @_;
+    Sidef::Types::Number::Number::lucasv(TWO, MONE, $n);
+}
+
+sub jacobsthal {
+    my ($n) = @_;
+    state $TWO_NEG = (TWO)->neg;
+    Sidef::Types::Number::Number::lucasu(ONE, $TWO_NEG, $n);
+}
+
+sub jacobsthal_lucas {
+    my ($n) = @_;
+    state $TWO_NEG = (TWO)->neg;
+    Sidef::Types::Number::Number::lucasv(ONE, $TWO_NEG, $n);
+}
+
+sub padovan {
+    my ($n) = @_;
+    Sidef::Math::Math->linear_rec(_array([ZERO, ONE, ONE]), _array([ONE, ZERO, ZERO]), $n);
+}
+
+sub padovanmod {
+    my ($n, $m) = @_;
+    _valid(\$m);
+    Sidef::Math::Math->linear_recmod(_array([ZERO, ONE, ONE]), _array([ONE, ZERO, ZERO]), $n, $m);
+}
+
+sub perrin {
+    my ($n) = @_;
+    Sidef::Math::Math->linear_rec(_array([ZERO, ONE, ONE]), _array([THREE, ZERO, TWO]), $n);
+}
+
+sub perrinmod {
+    my ($n, $m) = @_;
+    _valid(\$m);
+    Sidef::Math::Math->linear_recmod(_array([ZERO, ONE, ONE]), _array([THREE, ZERO, TWO]), $n, $m);
+}
 
 sub __lucasUVmod__ {
     my ($P, $Q, $n, $m) = @_;
@@ -24475,6 +24722,8 @@ sub rad {    # A007947
     $n || return ZERO;
     _set_int(Math::Prime::Util::GMP::vecprod(map { $_->[0] } _factor_exp($n)));
 }
+
+*squarefree_kernel = \&rad;
 
 sub powerfree_part {
     my ($k, $n) = @_;
