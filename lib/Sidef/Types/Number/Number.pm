@@ -30420,6 +30420,12 @@ sub sigma_sum {
     $n->dirichlet_hyperbola($f, $g, $F, $G);
 }
 
+sub tau_sum {
+    $_[0]->sigma_sum(ZERO);
+}
+
+*sigma0_sum = \&tau_sum;
+
 sub antidivisor_count {    # OEIS: A066272
     my ($n) = @_;
 

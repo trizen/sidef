@@ -2269,16 +2269,6 @@ It returns NaN when C<moebius(d) = -1> and C<gcd(n/d, m) != 1>, for some C<d|n>.
 
 =cut
 
-=head2 d
-
-    d(n)
-    tau(n)
-    sigma0(n)
-
-Returns the count of positive divisors of C<n>.
-
-=cut
-
 =head2 dconv
 
     n.dconv(f,g)
@@ -8875,6 +8865,41 @@ Aliases: I<σ>
 
 =cut
 
+=head2 sigma_sum
+
+    sigma_sum(n, k=1, j=0)
+
+Returns the sum of C<m^j * sigma_k(m)>, for C<m=1..n>, computed in C<O(sqrt(n))> steps.
+
+    say sigma_sum(100, 0)      #=> 482
+    say sigma_sum(100, 1)      #=> 8299
+    say sigma_sum(100, 2)      #=> 407819
+    say sigma_sum(100, 2, 3)   #=> 207528104123
+
+=cut
+
+=head2 sigma0
+
+    sigma0(n)
+
+Returns the count of positive divisors of C<n>.
+
+Aliases: I<d>, I<tau>
+
+=cut
+
+=head2 sigma0_sum
+
+    sigma0_sum(n)
+
+Sum of the C<sigma_0(k)> function, for C<k = 1..n>.
+
+    say 30.of { .sigma0_sum }   #=> OEIS: A006218
+
+Aliases: I<tau_sum>
+
+=cut
+
 =head2 sigma_inverse
 
     n.sigma_inverse(k=1)
@@ -8929,19 +8954,6 @@ Equivalent to C<n.sigma_inverse(k).min>, but much faster.
 Returns C<nil> if there are no solutions.
 
 Aliases: C<inverse_sigma_min>
-
-=cut
-
-=head2 sigma_sum
-
-    sigma_sum(n, k=1, j=0)
-
-Returns the sum of C<m^j * sigma_k(m)>, for C<m=1..n>, computed in C<O(sqrt(n))> steps.
-
-    say sigma_sum(100, 0)      #=> 482
-    say sigma_sum(100, 1)      #=> 8299
-    say sigma_sum(100, 2)      #=> 407819
-    say sigma_sum(100, 2, 3)   #=> 207528104123
 
 =cut
 
