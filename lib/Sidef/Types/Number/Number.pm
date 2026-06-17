@@ -22758,12 +22758,6 @@ sub prime_cluster {
 
     @diffs = map { _big2uistr($$_) // return undef } @diffs;
 
-    if (!HAS_PRIME_UTIL and $hi <= 100) {
-
-        # Workaround for https://github.com/danaj/Math-Prime-Util-GMP/issues/51
-        return $_[0]->linear_forms_primes($_[1], _array([ONE, ZERO]), map { _array([ONE, _set_int($_)]) } @diffs);
-    }
-
     my @primes = map { _set_int($_) } (
                                        HAS_PRIME_UTIL
                                        ? Math::Prime::Util::sieve_prime_cluster($lo, $hi, @diffs)
@@ -23262,7 +23256,7 @@ sub smooth_numbers {
     return _array(\@h);
 }
 
-sub n_primes {
+sub next_primes {
     my ($n, $start) = @_;
 
     $start = defined($start) ? do { _valid(\$start); _big2uistr($$start) // 0 } : 2;
@@ -23272,7 +23266,8 @@ sub n_primes {
 
     if (HAS_PRIME_UTIL and $start < (ULONG_MAX >> 1)) {
         for (my $it = Math::Prime::Util::prime_iterator($start) ; $n > 0 ; --$n) {
-            push @primes, _set_int($it->());
+            my $p = $it->();
+            push @primes, bless \$p;
         }
         return _array(\@primes);
     }
@@ -23291,10 +23286,7 @@ sub n_primes {
     _array(\@primes);
 }
 
-*nprimes     = \&n_primes;
-*next_primes = \&n_primes;
-
-sub n_composites {
+sub next_composites {
     my ($n, $start) = @_;
 
     $n = _any2ui($$n) // return _array();
@@ -23315,9 +23307,6 @@ sub n_composites {
 
     _array(\@composites);
 }
-
-*ncomposites     = \&n_composites;
-*next_composites = \&n_composites;
 
 sub prev_primes {
     my ($n, $start) = @_;
@@ -23559,6 +23548,61 @@ sub next_prime {
 sub next_twin_prime {
     my ($n) = @_;
     _set_int(Math::Prime::Util::GMP::next_twin_prime(_big2uistr($$n) // goto &nan) || goto &nan);
+}
+
+sub twin_primes {
+    my ($lo, $hi) = @_;
+
+    if (!defined($hi)) {
+        $hi = $lo;
+        $lo = THREE;
+    }
+
+    $lo->prime_cluster($hi, TWO);
+}
+
+sub is_twin_prime {
+    my ($n) = @_;
+    $n->add(TWO)->all_prime($n);
+}
+
+sub is_sexy_prime {
+    my ($n) = @_;
+    state $SIX = _set_int(6);
+    $n->add($SIX)->all_prime($n);
+}
+
+sub is_sophie_germain {
+    my ($n) = @_;
+    $n->mul(TWO)->inc->all_prime($n);
+}
+
+*is_sophie_germain_prime = \&is_sophie_germain;
+
+sub is_balanced_prime {
+    my ($n, $order) = @_;
+
+    $order //= ONE;
+    $order = _any2ui($$order) // return $FALSE;
+
+    $n->is_prime || return $FALSE;
+    $order       || return $TRUE;
+
+    if ($order > 1) {
+        my $order_obj = bless \$order;
+
+        my $prev = $order_obj->prev_primes($n->dec);
+        my $next = $order_obj->next_primes($n->inc);
+
+        scalar(@$prev) == scalar(@$next) or return $FALSE;
+        my $sum = Sidef::Types::Number::Number::sum(@$prev, @$next);
+        return $sum->div(_set_int(2 * $order))->eq($n);
+    }
+
+    my $prev = $n->prev_prime;
+    my $next = $n->next_prime;
+
+    $n->sub($prev)->eq($next->sub($n));
 }
 
 sub prev_composite {

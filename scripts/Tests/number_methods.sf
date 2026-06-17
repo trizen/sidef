@@ -1962,4 +1962,9 @@ assert_eq(10.by { .is_emirp },    %n[13, 17, 31, 37, 71, 73, 79, 97, 107, 113]) 
 assert_eq(10.by { .is_emirp(2) }, %n[11, 13, 23, 29, 37, 41, 43, 47, 53, 61])      # OEIS: A080790
 assert_eq(10.by { .is_emirp(3) }, %n[5, 7, 11, 19, 31, 37, 41, 47, 53, 61])
 
+assert_eq(10.by { .is_balanced_prime }, %n[5, 53, 157, 173, 211, 257, 263, 373, 563, 593])              # OEIS: A006562
+assert_eq(10.by { .is_balanced_prime(2) }, %n[79, 281, 349, 439, 643, 677, 787, 1171, 1733, 1811])      # OEIS: A082077
+assert_eq(10.by { .is_balanced_prime(3) }, %n[17, 53, 157, 173, 193, 229, 349, 439, 607, 659])          # OEIS: A082078
+assert_eq(10.of {|n| 1.st { .is_balanced_prime(n) } }, %n[2, 5, 79, 17, 491, 53, 71, 29, 37, 983])      # OEIS: A082080
+
 say "** Tests passed!"

@@ -1807,8 +1807,6 @@ Returns an array with C<n> consecutive composite numbers starting from C<start>.
     say 5.next_composites        #=> [4, 6, 8, 9, 10]
     say 5.next_composites(50)    #=> [50, 51, 52, 54, 55]
 
-Aliases: I<ncomposites>, I<n_composites>
-
 =cut
 
 =head2 composites_each
@@ -4702,6 +4700,48 @@ Returns true if C<n> is prime and its reversal is a different prime (in the give
 
 =cut
 
+=head2 is_twin_prime
+
+    is_twin_prime(n)
+
+Returns true if C<n> and C<n+2> are both prime numbers.
+
+=cut
+
+=head2 is_sexy_prime
+
+    is_sexy_prime(n)
+
+Returns true if C<n> and C<n+6> are both prime numbers.
+
+=cut
+
+=head2 is_sophie_germain
+
+    is_sophie_germain(n)
+
+Returns true if C<n> and C<2*n + 1> are both prime numbers.
+
+Aliases: I<is_sophie_germain_prime>
+
+=cut
+
+=head2 is_balanced_prime
+
+    is_balanced_prime(n, order=1)
+
+Returns true if C<n> is a balanced prime of a given order.
+
+    say 10.by { .is_balanced_prime }       #=> OEIS: A006562
+    say 10.by { .is_balanced_prime(2) }    #=> OEIS: A082077
+    say 10.by { .is_balanced_prime(3) }    #=> OEIS: A082078
+
+A prime number C<p_k> is a balanced prime, of order C<n>, iff the following equality holds:
+
+    p_k = 1/(2*n) * Sum_{i=1..n} (p_{k-i} + p_{k+i})
+
+=cut
+
 =head2 is_prime_power
 
     n.is_prime_power
@@ -6588,8 +6628,6 @@ The value for C<start> can be any arbitrarily large integer:
 
     say 10.next_primes(2**128 + 1)    # first 10 primes >= 2^128
 
-Aliases: I<nprimes>, I<n_primes>
-
 =cut
 
 =head2 nth_almost_prime
@@ -7755,6 +7793,18 @@ Returns an array of primes C<p> such that C<p+diffs[0]>, C<p+diffs[1]>, etc, are
     say prime_cluster(1, 100, 2)    # twin primes <= 100
 
 Aliases: I<sieve_prime_cluster>
+
+=cut
+
+=head2 twin_primes
+
+    twin_primes(n)
+    twin_primes(a,b)
+
+Returns an array of primes C<p> such that C<p+2> is also prime, where p <= n or in range C<a..b>.
+
+    say twin_primes(100)        #=> [3, 5, 11, 17, 29, 41, 59, 71]
+    say twin_primes(50, 200)    #=> [59, 71, 101, 107, 137, 149, 179, 191, 197]
 
 =cut
 
