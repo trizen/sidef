@@ -5141,6 +5141,16 @@ Jordan's totient C<J_k(n)>, which is a generalization of Euler's totient functio
 
 =cut
 
+=head2 kempner
+
+    kempner(n)
+
+Returns the smallest positive integer C<m> such that C<n> divides C<factorial(m)>.
+
+    say 30.of { .kempner }      #=> OEIS: A002034
+
+Aliases: I<smarandache>
+
 =head2 kronecker
 
     kronecker(a,n)

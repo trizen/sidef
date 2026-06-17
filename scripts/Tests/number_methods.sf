@@ -1967,4 +1967,9 @@ assert_eq(10.by { .is_balanced_prime(2) }, %n[79, 281, 349, 439, 643, 677, 787, 
 assert_eq(10.by { .is_balanced_prime(3) }, %n[17, 53, 157, 173, 193, 229, 349, 439, 607, 659])          # OEIS: A082078
 assert_eq(10.of {|n| 1.st { .is_balanced_prime(n) } }, %n[2, 5, 79, 17, 491, 53, 71, 29, 37, 983])      # OEIS: A082080
 
+assert_eq(10!.kempner, 10)
+assert_eq(kempner(2**128 - 1), 67280421310721)
+assert_eq(kempner(2**128), 130)
+assert_eq(30.of { .kempner }, %n[1, 1, 2, 3, 4, 5, 3, 7, 4, 6, 5, 11, 4, 13, 7, 5, 6, 17, 6, 19, 5, 7, 11, 23, 4, 10, 13, 9, 7, 29])
+
 say "** Tests passed!"

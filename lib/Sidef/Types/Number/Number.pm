@@ -12229,6 +12229,85 @@ sub factorial {
 
 *fac = \&factorial;
 
+sub kempner {
+    my ($n) = @_;
+
+    my $v = _big2pistr($$n) // return ONE;
+
+    # The Smarandache/Kempner function is defined for positive integers.
+    # For n <= 1, S(n) = 1.
+    if ($v eq '1') {
+        return ONE;
+    }
+
+    # Identity: S(p) = p for prime numbers
+    if (_is_prob_prime($v)) {
+        return _set_int($v);
+    }
+
+    my @factors = _factor_exp($v);
+
+    # Track the maximum S(p^k) across all prime factors
+    my $max_m = Math::GMPz::Rmpz_init_set_ui(0);
+
+    state $p = Math::GMPz::Rmpz_init_nobless();
+    state $m = Math::GMPz::Rmpz_init_nobless();
+    state $t = Math::GMPz::Rmpz_init_nobless();
+
+    foreach my $pp (@factors) {
+        my $k = $pp->[1];
+        Math::GMPz::Rmpz_set_str($p, $pp->[0], 10);
+
+        # Build the Kempner expansion coefficients array: a_j = (p^j - 1)/(p - 1)
+        # and store the corresponding powers of p to avoid redundant exponentiations.
+        my @a = (1);
+        my @p_pow = ($p);
+
+        if (Math::GMPz::Rmpz_cmp_ui($p, $k) < 0) {
+
+            my $p_ui = Math::GMPz::Rmpz_get_ui($p);
+
+            while (1) {
+
+                my $next_a = $a[-1] * $p_ui + 1;
+
+                if ($next_a > $k) {
+                    last;
+                }
+
+                push @a, $next_a;
+                my $next_p = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($next_p, $p_pow[-1], $p);
+                push @p_pow, $next_p;
+            }
+        }
+
+        # Greedy decomposition of the exponent k
+        my $rem_k = $k;
+        Math::GMPz::Rmpz_set_ui($m, 0);
+
+        for (my $i = $#a; $i >= 0; $i--) {
+            my $ai = $a[$i];
+            my $c = CORE::int($rem_k / $ai);
+
+            if ($c > 0) {
+                $rem_k -= $c * $ai;
+                Math::GMPz::Rmpz_mul_ui($t, $p_pow[$i], $c);
+                Math::GMPz::Rmpz_add($m, $m, $t);
+            }
+        }
+
+        # Maximize: S(n) = max( S(p_i^e_i) )
+        if (Math::GMPz::Rmpz_cmp($m, $max_m) > 0) {
+            Math::GMPz::Rmpz_set($max_m, $m);
+        }
+    }
+
+    bless \$max_m;
+}
+
+*smarandache = \&kempner;
+
 sub factorialmod {
     my ($n, $m) = @_;
     _valid(\$m);
