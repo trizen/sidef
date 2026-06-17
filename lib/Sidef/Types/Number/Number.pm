@@ -8275,9 +8275,9 @@ sub _poly_mul_mod {
     my ($A, $B, $ker, $k, $mod) = @_;
 
     my @C;
-    for (my $i = 0 ; $i < $k ; $i++) {
+    for my $i (0 .. $k - 1) {
         next unless defined($A->[$i]) && Math::GMPz::Rmpz_sgn($A->[$i]);
-        for (my $j = 0 ; $j < $k ; $j++) {
+        for my $j (0 .. $k - 1) {
             next unless defined($B->[$j]) && Math::GMPz::Rmpz_sgn($B->[$j]);
             my $idx = $i + $j;
             $C[$idx] //= Math::GMPz::Rmpz_init_set_ui(0);
@@ -8294,13 +8294,13 @@ sub _poly_mul_mod {
     # Reduce modulo characteristic polynomial P(x)
     for (my $i = $#C ; $i >= $k ; $i--) {
         next unless defined($C[$i]) && Math::GMPz::Rmpz_sgn($C[$i]);
-        for (my $j = 1 ; $j <= $k ; $j++) {
+        for my $j (1 .. $k) {
             my $idx = $i - $j;
             $C[$idx] //= Math::GMPz::Rmpz_init_set_ui(0);
             Math::GMPz::Rmpz_addmul($C[$idx], $C[$i], $ker->[$j - 1]);
         }
         if (defined $mod) {
-            for (my $j = 1 ; $j <= $k ; $j++) {
+            for my $j (1 .. $k) {
                 my $idx = $i - $j;
                 Math::GMPz::Rmpz_mod($C[$idx], $C[$idx], $mod) if defined $C[$idx];
             }
@@ -8308,7 +8308,7 @@ sub _poly_mul_mod {
     }
 
     $#C = $k - 1;    # Truncate
-    for (my $i = 0 ; $i < $k ; $i++) {
+    for my $i (0 .. $k - 1) {
         $C[$i] //= Math::GMPz::Rmpz_init_set_ui(0);
     }
 
@@ -8340,7 +8340,7 @@ sub _poly_pow_mod {
         }
     }
 
-    for (my $i = 0 ; $i < $k ; $i++) {
+    for my $i (0 .. $k - 1) {
         $res[$i] //= Math::GMPz::Rmpz_init_set_ui(0);
     }
 
@@ -8359,9 +8359,7 @@ sub _linear_recurrence_mpz {
     my $k = scalar(@$ker);
 
     if ($k == 0) {
-        return $want_array
-          ? Sidef::Types::Array::Array->new([])
-          : Sidef::Types::Number::Number::ZERO;
+        return $want_array ? _array() : ZERO;
     }
 
     my @gmp_ker    = map { _any2mpz($$_) // goto &nan } @$ker;
@@ -8377,7 +8375,7 @@ sub _linear_recurrence_mpz {
     # Fast-path for scalar calculation
     if (!$want_array) {
         my $val = Math::GMPz::Rmpz_init_set_ui(0);
-        for (my $i = 0 ; $i < $k ; $i++) {
+        for my $i (0 .. $k - 1) {
             next unless defined $res->[$i];
             Math::GMPz::Rmpz_addmul($val, $res->[$i], $init_terms[$i]);
         }
@@ -8394,7 +8392,7 @@ sub _linear_recurrence_mpz {
     # Extract the state vector for the sequence starting at n_min
     for my $step (0 .. $k - 1) {
         my $val = Math::GMPz::Rmpz_init_set_ui(0);
-        for (my $i = 0 ; $i < $k ; $i++) {
+        for my $i (0 .. $k - 1) {
             next unless defined $res->[$i];
             Math::GMPz::Rmpz_addmul($val, $res->[$i], $init_terms[$i]);
         }
@@ -8418,13 +8416,13 @@ sub _linear_recurrence_mpz {
 
     # LFSR progression for the requested slice
     my @result_seq;
-    for (my $i = 0 ; $i < $total_terms ; $i++) {
+    for my $i (0 .. $total_terms - 1) {
         if ($i < $k) {
             push @result_seq, $window[$i];
         }
         else {
             my $next_val = Math::GMPz::Rmpz_init_set_ui(0);
-            for (my $j = 0 ; $j < $k ; $j++) {
+            for my $j (0 .. $k - 1) {
                 Math::GMPz::Rmpz_addmul($next_val, $gmp_ker[$j], $window[$k - 1 - $j]);
             }
             push @window, $next_val;
@@ -8465,7 +8463,7 @@ sub _linear_recurrence_mod_mpz {
     my $res   = _poly_pow_mod($gmp_n, \@gmp_ker, $k, $gmp_m);
 
     my $val = Math::GMPz::Rmpz_init_set_ui(0);
-    for (my $i = 0 ; $i < $k ; $i++) {
+    foreach my $i (0 .. $k - 1) {
         next unless defined $res->[$i];
         Math::GMPz::Rmpz_addmul($val, $res->[$i], $init_terms[$i]);
     }
@@ -26366,7 +26364,7 @@ sub fermat_factor {
     Math::GMPz::Rmpz_sqrtrem($p, $q, $n);
     Math::GMPz::Rmpz_neg($q, $q);
 
-    for (my $j = 1 ; $j <= $k ; ++$j) {
+    foreach my $j (1 .. $k) {
 
         Math::GMPz::Rmpz_addmul_ui($q, $p, 2);
 
@@ -26695,7 +26693,7 @@ sub flt_factor {
         return _array([bless \$n]);
     }
 
-    for (my $j = 1 ; $j <= $reps ; $j += 1) {
+    foreach my $j (1 .. $reps) {
 
         Math::GMPz::Rmpz_mul_ui($t, $t, $multiplier);
         Math::GMPz::Rmpz_mod($t, $t, $n) if ($j % 10 == 0);
@@ -31091,7 +31089,7 @@ sub sopf_sum {
         my $sp_minus_1 = $S_small[$p_ui - 1];
         my $kp         = $p_ui;
 
-        for (my $k = 1 ; $k <= $k_max ; $k++) {
+        foreach my $k (1 .. $k_max) {
             my $sw;
             if ($kp <= $m) {
                 $sw = $S_large[$kp];
@@ -31189,7 +31187,7 @@ sub sopfr_sum {
         my $sp_minus_1 = $S_small[$p_ui - 1];
         my $kp         = $p_ui;
 
-        for (my $k = 1 ; $k <= $k_max ; $k++) {
+        foreach my $k (1 .. $k_max) {
             my $sw;
             if ($kp <= $m) {
                 $sw = $S_large[$kp];
@@ -37931,7 +37929,7 @@ sub of {
 
     if (ref($obj) eq 'Sidef::Types::Block::Block') {
         my @array;
-        for (my $i = 0 ; $i < $x ; ++$i) {
+        for my $i (0 .. $x - 1) {
             push @array, $obj->run(bless(\(my $o = $i)));
         }
         return _array(\@array);
@@ -37985,7 +37983,7 @@ sub times {
 
     $x = CORE::int(__numify__($$x));
 
-    for (my $i = 0 ; $i < $x ; ++$i) {
+    for my $i (0 .. $x - 1) {
         $block->run(bless(\(my $o = $i)));
     }
 
