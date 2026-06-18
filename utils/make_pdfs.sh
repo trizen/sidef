@@ -1,7 +1,7 @@
 #!/bin/bash
 
 markdown2pdf='markdown2pdf.pl'
-version=26.05
+version=26.06
 
 which $markdown2pdf
 echo $version

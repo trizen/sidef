@@ -38041,7 +38041,7 @@ sub of {
 
     if (ref($obj) eq 'Sidef::Types::Block::Block') {
         my @array;
-        for my $i (0 .. $x - 1) {
+        for (my $i = 0 ; $i < $x ; ++$i) {
             push @array, $obj->run(bless(\(my $o = $i)));
         }
         return _array(\@array);
@@ -38095,7 +38095,7 @@ sub times {
 
     $x = CORE::int(__numify__($$x));
 
-    for my $i (0 .. $x - 1) {
+    for (my $i = 0 ; $i < $x ; ++$i) {
         $block->run(bless(\(my $o = $i)));
     }
 
