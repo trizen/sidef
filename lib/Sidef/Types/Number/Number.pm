@@ -8274,43 +8274,55 @@ sub as_float {
 sub _poly_mul_mod {
     my ($A, $B, $ker, $k, $mod) = @_;
 
-    my @C;
+    # Pre-allocate result array to avoid dynamic resizing
+    my @C = map { Math::GMPz::Rmpz_init_set_ui(0) } (0 .. 2 * $k - 2);
+
+    # Polynomial multiplication (schoolbook)
     for my $i (0 .. $k - 1) {
-        next unless defined($A->[$i]) && Math::GMPz::Rmpz_sgn($A->[$i]);
+        my $a = $A->[$i] // next;
+        Math::GMPz::Rmpz_sgn($a) || next;
+
         for my $j (0 .. $k - 1) {
-            next unless defined($B->[$j]) && Math::GMPz::Rmpz_sgn($B->[$j]);
+            my $b = $B->[$j] // next;
+            Math::GMPz::Rmpz_sgn($b) || next;
+
             my $idx = $i + $j;
-            $C[$idx] //= Math::GMPz::Rmpz_init_set_ui(0);
-            Math::GMPz::Rmpz_addmul($C[$idx], $A->[$i], $B->[$j]);
+            Math::GMPz::Rmpz_addmul($C[$idx], $a, $b);
         }
     }
 
+    # Apply mod if provided
     if (defined $mod) {
         for my $c (@C) {
-            Math::GMPz::Rmpz_mod($c, $c, $mod) if defined $c;
+            Math::GMPz::Rmpz_mod($c, $c, $mod);
         }
     }
 
     # Reduce modulo characteristic polynomial P(x)
     for (my $i = $#C ; $i >= $k ; $i--) {
-        next unless defined($C[$i]) && Math::GMPz::Rmpz_sgn($C[$i]);
+        my $c = $C[$i];
+        Math::GMPz::Rmpz_sgn($c) || next;
+
+        # Multiply and subtract: C -= c * ker * x^{i-k}
         for my $j (1 .. $k) {
             my $idx = $i - $j;
-            $C[$idx] //= Math::GMPz::Rmpz_init_set_ui(0);
-            Math::GMPz::Rmpz_addmul($C[$idx], $C[$i], $ker->[$j - 1]);
+            Math::GMPz::Rmpz_addmul($C[$idx], $c, $ker->[$j - 1]);
         }
+
+        # Apply mod if provided (only to updated indices)
         if (defined $mod) {
             for my $j (1 .. $k) {
                 my $idx = $i - $j;
-                Math::GMPz::Rmpz_mod($C[$idx], $C[$idx], $mod) if defined $C[$idx];
+                Math::GMPz::Rmpz_mod($C[$idx], $C[$idx], $mod);
             }
         }
+
+        # Zero out the reduced coefficient
+        Math::GMPz::Rmpz_set_ui($C[$i], 0);
     }
 
-    $#C = $k - 1;    # Truncate
-    for my $i (0 .. $k - 1) {
-        $C[$i] //= Math::GMPz::Rmpz_init_set_ui(0);
-    }
+    # Truncate to degree k-1
+    $#C = $k - 1;
 
     return \@C;
 }
@@ -8319,12 +8331,18 @@ sub _poly_mul_mod {
 sub _poly_pow_mod {
     my ($n, $ker, $k, $mod) = @_;
 
-    my @res  = (Math::GMPz::Rmpz_init_set_ui(1));
-    my @base = (Math::GMPz::Rmpz_init_set_ui(0), Math::GMPz::Rmpz_init_set_ui(1));    # x^1
+    # Pre-allocate result and base
+    my @res = map { Math::GMPz::Rmpz_init_set_ui(0) } (0 .. $k - 1);
+    $res[0] //= Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_set_ui($res[0], 1);    # Start with 1
 
-    # Edge case for degree 1 reduction
+    my @base = map { Math::GMPz::Rmpz_init_set_ui(0) } (0 .. $k - 1);
+    $base[1] //= Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_set_ui($base[1], 1);    # x^1
+
+    # Edge case: degree 1 reduction (P(x) = a0 + a1*x)
     if ($k == 1) {
-        @base = (Math::GMPz::Rmpz_init_set($ker->[0]));
+        Math::GMPz::Rmpz_set($base[0], $ker->[0]);
         Math::GMPz::Rmpz_mod($base[0], $base[0], $mod) if defined $mod;
     }
 
@@ -8334,14 +8352,12 @@ sub _poly_pow_mod {
         if (Math::GMPz::Rmpz_odd_p($exp)) {
             @res = @{_poly_mul_mod(\@res, \@base, $ker, $k, $mod)};
         }
+
         Math::GMPz::Rmpz_fdiv_q_2exp($exp, $exp, 1);
+
         if (Math::GMPz::Rmpz_sgn($exp) > 0) {
             @base = @{_poly_mul_mod(\@base, \@base, $ker, $k, $mod)};
         }
-    }
-
-    for my $i (0 .. $k - 1) {
-        $res[$i] //= Math::GMPz::Rmpz_init_set_ui(0);
     }
 
     return \@res;
@@ -8357,22 +8373,23 @@ sub _linear_recurrence_mpz {
     }
 
     my $k = scalar(@$ker);
+    return $want_array ? _array() : ZERO if $k == 0;
 
-    if ($k == 0) {
-        return $want_array ? _array() : ZERO;
-    }
-
+    # Convert kernel and initial terms to GMPz
     my @gmp_ker    = map { _any2mpz($$_) // goto &nan } @$ker;
     my @init_terms = map { _any2mpz($$_) // goto &nan } @$init[0 .. ($#$init > $#$ker ? $#$ker : $#$init)];
 
+    # Pad initial terms with zeros if needed
     while (@init_terms < $k) {
-        push @init_terms, Math::GMPz::Rmpz_init_set_ui(0);
+        push @init_terms, $ZERO;
     }
 
-    my $n   = _any2mpz($$n_min) // goto &nan;
+    my $n = _any2mpz($$n_min) // goto &nan;
+
+    # Compute x^n mod P(x)
     my $res = _poly_pow_mod($n, \@gmp_ker, $k, undef);
 
-    # Fast-path for scalar calculation
+    # Fast-path: single value
     if (!$want_array) {
         my $val = Math::GMPz::Rmpz_init_set_ui(0);
         for my $i (0 .. $k - 1) {
@@ -8382,56 +8399,56 @@ sub _linear_recurrence_mpz {
         return bless \$val;
     }
 
+    # Compute the range
     my $count = Math::GMPz::Rmpz_init_set(_any2mpz($$n_max) // return _array());
     Math::GMPz::Rmpz_sub($count, $count, $n);
     return _array() if Math::GMPz::Rmpz_sgn($count) < 0;
 
     my $total_terms = Math::GMPz::Rmpz_get_ui($count) + 1;
+    my @result_seq;
     my @window;
 
-    # Extract the state vector for the sequence starting at n_min
+    # Compute initial window: [x^{n_min} * init, x^{n_min+1} * init, ..., x^{n_min+k-1} * init]
     for my $step (0 .. $k - 1) {
         my $val = Math::GMPz::Rmpz_init_set_ui(0);
         for my $i (0 .. $k - 1) {
-            next unless defined $res->[$i];
-            Math::GMPz::Rmpz_addmul($val, $res->[$i], $init_terms[$i]);
+            Math::GMPz::Rmpz_addmul($val, $res->[$i], $init_terms[$i]) if Math::GMPz::Rmpz_sgn($res->[$i]);
         }
         push @window, $val;
 
         # Multiply R(x) by x mod P(x) for sequential state steps
         if ($step < $k - 1) {
-            my $top = $res->[$k - 1] // Math::GMPz::Rmpz_init_set_ui(0);
+            my $top     = $res->[$k - 1];
+            my $sgn_top = Math::GMPz::Rmpz_sgn($top);
             for (my $i = $k - 1 ; $i >= 1 ; $i--) {
-                $res->[$i] = $res->[$i - 1] // Math::GMPz::Rmpz_init_set_ui(0);
-                if (Math::GMPz::Rmpz_sgn($top)) {
-                    Math::GMPz::Rmpz_addmul($res->[$i], $top, $gmp_ker[$k - 1 - $i]);
-                }
+                $res->[$i] = Math::GMPz::Rmpz_init_set($res->[$i - 1]);
+                Math::GMPz::Rmpz_addmul($res->[$i], $top, $gmp_ker[$k - 1 - $i]) if $sgn_top;
             }
-            $res->[0] = Math::GMPz::Rmpz_init_set_ui(0);
-            if (Math::GMPz::Rmpz_sgn($top)) {
-                Math::GMPz::Rmpz_addmul($res->[0], $top, $gmp_ker[$k - 1]);
-            }
+            Math::GMPz::Rmpz_set_ui($res->[0], 0);
+            Math::GMPz::Rmpz_addmul($res->[0], $top, $gmp_ker[$k - 1]) if $sgn_top;
         }
     }
 
-    # LFSR progression for the requested slice
-    my @result_seq;
+    # LFSR: generate terms from n_min to n_max
     for my $i (0 .. $total_terms - 1) {
         if ($i < $k) {
-            push @result_seq, $window[$i];
+            my $val = $window[$i];
+            push @result_seq, bless \$val;
         }
         else {
+            # Compute next term: sum_{j=0}^{k-1} ker[j] * window[k-1-j]
             my $next_val = Math::GMPz::Rmpz_init_set_ui(0);
             for my $j (0 .. $k - 1) {
                 Math::GMPz::Rmpz_addmul($next_val, $gmp_ker[$j], $window[$k - 1 - $j]);
             }
-            push @window, $next_val;
+
             shift @window;
-            push @result_seq, $next_val;
+            push @window,     $next_val;
+            push @result_seq, bless \$next_val;
         }
     }
 
-    _array([map { bless \$_ } @result_seq]);
+    return _array(\@result_seq);
 }
 
 sub _linear_recurrence_mod_mpz {
@@ -8443,18 +8460,22 @@ sub _linear_recurrence_mod_mpz {
     my $gmp_m = _any2mpz($$m) // goto &nan;
     Math::GMPz::Rmpz_sgn($gmp_m) || goto &nan;
 
+    # Pre-allocate kernel and initial terms with mod applied
     my @gmp_ker = map {
         my $z = _any2mpz($$_) // goto &nan;
-        Math::GMPz::Rmpz_mod($z, $z, $gmp_m);
-        $z;
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($t, $z, $gmp_m);
+        $t;
     } @$ker;
 
     my @init_terms = map {
         my $z = _any2mpz($$_) // goto &nan;
-        Math::GMPz::Rmpz_mod($z, $z, $gmp_m);
-        $z;
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($t, $z, $gmp_m);
+        $t;
     } @$init[0 .. ($#$init > $#$ker ? $#$ker : $#$init)];
 
+    # Pad with zeros
     while (@init_terms < $k) {
         push @init_terms, $ZERO;
     }
@@ -8462,13 +8483,15 @@ sub _linear_recurrence_mod_mpz {
     my $gmp_n = _any2mpz($$n) // goto &nan;
     my $res   = _poly_pow_mod($gmp_n, \@gmp_ker, $k, $gmp_m);
 
+    # Compute dot product: res · init_terms
     my $val = Math::GMPz::Rmpz_init_set_ui(0);
-    foreach my $i (0 .. $k - 1) {
+    for my $i (0 .. $k - 1) {
         next unless defined $res->[$i];
         Math::GMPz::Rmpz_addmul($val, $res->[$i], $init_terms[$i]);
     }
     Math::GMPz::Rmpz_mod($val, $val, $gmp_m);
-    bless \$val;
+
+    return bless \$val;
 }
 
 sub _solve_rec_seq {    # Berlekamp-Massey algorithm
