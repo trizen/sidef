@@ -149,7 +149,7 @@ say n.valuation(3)   # v_3(720) = 2
 say n.valuation(7)   # v_7(720) = 0
 
 # valuation(n, k) generalises to composite k:
-say (2**32).valuation(4)   # 16 — how many times 4 divides 2^32
+say valuation(2**32, 4)   # 16 — how many times 4 divides 2^32
 
 # sopf and sopfr:
 say 360.sopf    # A008472: sum of *distinct* prime factors = 2+3+5 = 10
@@ -205,10 +205,10 @@ say 12.primorial_deflation    # A319626(12)/A319627(12) — inverse operation
 ### Sublinear Partial Sums of Pointwise Functions
 
 ```ruby
-say (10**6).lpf_sum    # Σ_{k=1}^{10^6} lpf(k)  (A088821)
-say (10**6).gpf_sum    # Σ_{k=1}^{10^6} gpf(k)  (A088822)
-say (10**6).sopf_sum   # Σ_{k=1}^{10^6} sopf(k) (A024924)
-say (10**6).sopfr_sum  # Σ_{k=1}^{10^6} sopfr(k)(A025281)
+say lpf_sum(10**6)    # Σ_{k=1}^{10^6} lpf(k)  (A088821)
+say gpf_sum(10**6)    # Σ_{k=1}^{10^6} gpf(k)  (A088822)
+say sopf_sum(10**6)   # Σ_{k=1}^{10^6} sopf(k) (A024924)
+say sopfr_sum(10**6)  # Σ_{k=1}^{10^6} sopfr(k)(A025281)
 ```
 
 ---
@@ -375,7 +375,7 @@ say 36.euler_phi    # φ(36) = 12    (aliases: phi, totient, eulerphi)
 # Multiplicativity for gcd(m, n) = 1:
 var m = 9
 var n = 16
-say (m*n).euler_phi == m.euler_phi * n.euler_phi   # true
+say (euler_phi(m*n) == m.euler_phi * n.euler_phi)   # true
 
 # The fundamental identity Σ_{d|n} φ(d) = n:
 say 60.divisors_sum {|d| d.euler_phi }   # = 60
@@ -384,7 +384,7 @@ say 60.divisors_sum {|d| d.euler_phi }   # = 60
 say totient_range(7, 17)   #=> [6, 4, 6, 4, 10, 4, 12, 6, 8, 8, 16]
 
 # Sublinear partial sum Σ_{k=1}^n φ(k) ≈ 3n²/π² (A002088):
-say (10**9).totient_sum
+say totient_sum(10**9)
 ```
 
 ### Inverse Totient
@@ -434,7 +434,8 @@ var n = 60
 say n.divisors_sum {|d| d.jordan_totient(2) } == n**2   # true
 
 # Sublinear partial sum Σ_{m=1}^n J_k(m):
-say (10**6).jordan_totient_sum(2)   # alias: totient_sum(10^6, 2)
+say jordan_totient_sum(10**6, 2)   # alias: totient_sum(10^6, 2)
+say jordan_totient_sum(10**6, 3)
 ```
 
 ### Dedekind's ψ
@@ -445,7 +446,7 @@ say (10**6).jordan_totient_sum(2)   # alias: totient_sum(10^6, 2)
 say 12.dedekind_psi    # ψ(12) = 12 · 3/2 · 4/3 = 24   (alias: psi)
 
 # Identity: ψ(n) = Σ_{d|n} |μ(d)| · d  (Dirichlet convolution of |μ| and id)
-say (10**6).dedekind_psi_sum   # sublinear   (alias: psi_sum)
+say psi_sum(10**6)   # sublinear   (alias: dedekind_psi_sum)
 
 # Inverse:
 say 24.psi_inverse        # all x with ψ(x) = 24
@@ -498,7 +499,7 @@ say 12.liouville   # (−1)^3 = −1   (12 = 2^2·3, Ω=3)
 say 15.liouville   # (−1)^2 =  1   (15 = 3·5,   Ω=2)
 
 # L(n) = Σ λ(k). Also: exp_bigomega_sum(n, -1):
-say (10**9).liouville_sum
+say liouville_sum(10**9)
 
 # Pólya's conjecture that L(n) ≤ 0 for n ≥ 2 is FALSE:
 say 906180359.liouville_sum   #=> 1  (first n with L(n) > 0)
@@ -543,7 +544,7 @@ say 5.ramanujan_sum(5)    # c_5(5) = φ(5) = 4
 # Identity: c_q(n) = μ(q/gcd(q,n)) · φ(q) / φ(q/gcd(q,n)):
 var q = 12; var n = 8
 var g = q.gcd(n)
-say (q/g).moebius * q.euler_phi / (q/g).euler_phi == q.ramanujan_sum(n)   # true
+say (moebius(q/g) * q.euler_phi / euler_phi(q/g) == q.ramanujan_sum(n))   # true
 ```
 
 ### Verifying Multiplicative Identities
@@ -566,18 +567,18 @@ say n.divisors_sum {|d| d.euler_phi }   # = 360 ✓
 ### π(n) — Exact, Range, and Approximate
 
 ```ruby
-say (10**6).prime_count    # π(10^6) = 78498 — exact, sublinear
+say prime_count(10**6)     # π(10^6) = 78498 — exact, sublinear
                            # aliases: primepi, count_primes, pi (the method)
 
 say primepi(10**12)        #=> 37607912018
 
 # Range: π(b) − π(a−1):
-say (10**6).prime_count(2 * 10**6)   # primes in (10^6, 2·10^6]
+say prime_count(10**6, 2 * 10**6)    # primes in (10^6, 2·10^6]
 say primepi(10**6, 2*10**6)          # same
 
 # Proven bounds: prime_count_lower ≤ π(n) ≤ prime_count_upper:
-say (10**9).prime_count_lower
-say (10**9).prime_count_upper
+say prime_count_lower(10**9)
+say prime_count_upper(10**9)
 ```
 
 ### nth Prime and Bounds
@@ -620,7 +621,7 @@ say prime_cluster(1, 1000, 4, 6, 10)  # p, p+4, p+6, p+10 all prime
 ### Prime Sum
 
 ```ruby
-say (10**9).prime_sum   # Σ_{p≤n} p — sublinear  (aliases: primes_sum, sum_primes)
+say prime_sum(10**9)   # Σ_{p≤n} p — sublinear  (aliases: primes_sum, sum_primes)
 
 # With exponent k: Σ p^k over primes p ≤ n
 say primes_sum(1, 10**6, 2)   # Σ_{p≤10^6} p^2
@@ -631,7 +632,7 @@ say primes_sum(1, 10**6, 2)   # Σ_{p≤10^6} p^2
 ```ruby
 # Finds smallest m ≥ 0 with count_func(m) ≥ target
 say inverse_count(25, { .prime_count })          # ≈ 97 (25th prime ≈ 97)
-say inverse_count(100, { |n| 10.smooth_count(n) })
+say inverse_count(100, { |n| smooth_count(10, n) })
 ```
 
 ### Almost-Prime Counting π_k(n)
@@ -643,6 +644,33 @@ say 1.almost_prime_count(100)       # = prime_count(100) = 25
 say 2.almost_prime_count(100)       # semiprimes ≤ 100 = 34
 say 2.almost_prime_count(50, 100)   # semiprimes in [50, 100]
 say 3.almost_prime_count(100)
+```
+
+### Composite Numbers
+
+`composite(n)` (alias: `nth_composite`) returns the n-th composite.
+`composite_count(n)` counts composites ≤ n; `composite_sum(n)` sums them.
+
+```ruby
+say composite(10**9)              # 1053422339 — 10^9-th composite
+
+say composite_count(100)          # composites ≤ 100 = 74
+say composite_count(50, 100)      # composites in [50, 100]
+say composite_count_lower(10**9)  # proven lower bound
+say composite_count_upper(10**9)  # proven upper bound
+
+say composite_sum(100)            # sum of composites ≤ 100
+say composite_sum(50, 100)        # sum of composites in [50, 100]
+say composite_sum(1, 100, 2)      # Σ c^2 over composites c ≤ 100
+
+say composites(100)               # array of all composites ≤ 100
+say composites(50, 100)           # array in range [50, 100]
+
+composites_each(100, 200, {|c| say c })   # iterate over composites in [100, 200]
+
+say 10.next_composite    # next composite after 10 = 12
+say 10.prev_composite    # previous composite before 10 = 9
+say 5.next_composites    # [4, 6, 8, 9, 10] — first 5 composites
 ```
 
 ---
@@ -717,7 +745,7 @@ specific algebraic structures.
 ### Trial Division
 
 ```ruby
-say (17 * 19 * 100003).trial_factor(200)   # finds 17 and 19
+say ((17 * 19 * 100003).trial_factor(200))   # finds 17 and 19
 ```
 
 ### Fermat and Hart
@@ -725,7 +753,7 @@ say (17 * 19 * 100003).trial_factor(200)   # finds 17 and 19
 Effective when the factors are close (n = a² − b² with small a − b):
 
 ```ruby
-say (1000003 * 1000033).fermat_factor   # fast — factors differ by 30
+say ((1000003 * 1000033).fermat_factor)   # fast — factors differ by 30
 say n.holf_factor                        # Hart's OLF variant
 say n.holf_factor(5000)                  # with explicit tries limit
 ```
@@ -766,7 +794,7 @@ say n.qs_factor       # Pomerance's Quadratic Sieve
 ### Algebraic and Special Factorizations
 
 ```ruby
-say (2**12 - 1).cyclotomic_factor      # exploits Φ_d(2) for various d
+say ((2**12 - 1).cyclotomic_factor)    # exploits Φ_d(2) for various d
 say n.dop_factor                       # difference-of-powers: x^n − y^n
 say n.cop_factor                       # congruence-of-powers
 say n.chebyshev_factor                 # Chebyshev polynomial factoring
@@ -800,8 +828,8 @@ say full_factor(2**128 + 1)
 ### Basic Operations
 
 ```ruby
-say (2).powmod(1000, 1000000007)   # 2^1000 mod 10^9+7  (alias: expmod)
-say (17).invmod(100)               # 17^{-1} mod 100 = 53
+say powmod(2, 1000, 1000000007)   # 2^1000 mod 10^9+7  (alias: expmod)
+say invmod(17, 100)               # 17^{-1} mod 100 = 53
 
 # Verify 17·53 ≡ 1 (mod 100):
 say 17*53 % 100   # 1
@@ -828,7 +856,7 @@ say mulsubmulmod(2, 3, 4, 5, 127)  # (2·3 − 4·5) % 127
 ```ruby
 say znorder(2, 13)          # ord_13(2) = 12 — 2 is a primitive root mod 13
 say znorder(2, 15)          # 4
-say (2).is_primitive_root(13)   # true
+say is_primitive_root(2, 13)   # true
 say 13.znprimroot          # 2 — smallest primitive root mod 13
 
 # n has a primitive root iff n ∈ {1, 2, 4, p^k, 2p^k}:
@@ -844,7 +872,7 @@ say znlog(3, 2, 13)     # 4  — since 2^4 ≡ 3 (mod 13)
 say znlog(5, 3, 7)      # 5  — since 3^5 ≡ 5 (mod 7)
 
 var k = znlog(3, 2, 13)
-say (2).powmod(k, 13) == 3   # true ✓
+say (powmod(2, k, 13) == 3)   # true ✓
 ```
 
 ### Linear Congruences and CRT
@@ -896,14 +924,14 @@ say geometric_summod(5, 8, 10007) # same mod 10007
 ### Symbol Functions
 
 ```ruby
-say (3).legendre(11)    #  1  — QR mod 11  (Legendre symbol)
-say (3).legendre(7)     # -1  — QNR mod 7
+say legendre(3, 11)    #  1  — QR mod 11  (Legendre symbol)
+say legendre(3, 7)     # -1  — QNR mod 7
 
-say (7).jacobi(15)      # (7/15) = (7/3)·(7/5) = 1·(−1) = −1  (Jacobi symbol)
-say (2).jacobi(9)       #  1  — but 2 is NOT a QR mod 9
+say jacobi(7, 15)      # (7/15) = (7/3)·(7/5) = 1·(−1) = −1  (Jacobi symbol)
+say jacobi(2, 9)       #  1  — but 2 is NOT a QR mod 9
 
-say (2).kronecker(-1)   # Kronecker symbol extension
-say (-1).kronecker(5)   # (−1)^{(5−1)/2} = 1
+say kronecker(2, -1)   # Kronecker symbol extension
+say kronecker(-1, 5)   # (−1)^{(5−1)/2} = 1
 ```
 
 The Jacobi symbol (a/n) = 1 does **not** imply a is a QR mod n — only the Legendre
@@ -930,7 +958,7 @@ for p in (primes(5, 50)) {
 
 # 2 is a QR mod p iff p ≡ ±1 (mod 8):
 for p in (primes(3, 50)) {
-    var sym      = (2).legendre(p)
+    var sym      = legendre(2, p)
     var expected = (p%8 == 1 || p%8 == 7) ? 1 : -1
     say "(2/#{p}) = #{sym}: #{sym == expected}"
 }
@@ -1175,21 +1203,21 @@ hyperbola methods.
 ### Divisor Function Sums
 
 ```ruby
-say (10**9).tau_sum     # Σ τ(k) ~ n log n + (2γ−1)n   (A006218; alias: sigma0_sum)
-say (10**9).sigma_sum   # Σ σ(k) ~ π²n²/12
+say tau_sum(10**9)     # Σ τ(k) ~ n log n + (2γ−1)n   (A006218; alias: sigma0_sum)
+say sigma_sum(10**9)   # Σ σ(k) ~ π²n²/12
 ```
 
 ### Totient, Möbius, Liouville
 
 ```ruby
-say (10**9).totient_sum       # Σ φ(k) ~ 3n²/π²          (alias: euler_phi_sum)
-say (10**9).mertens           # M(n) = Σ μ(k);  also: mertens(a, b) for ranges
-say (10**9).liouville_sum     # L(n) = Σ λ(k)
-say (10**6).dedekind_psi_sum  # Σ ψ(k)                    (alias: psi_sum)
+say totient_sum(10**9)       # Σ φ(k) ~ 3n²/π²          (alias: euler_phi_sum)
+say mertens(10**9)           # M(n) = Σ μ(k);  also: mertens(a, b) for ranges
+say liouville_sum(10**9)     # L(n) = Σ λ(k)
+say psi_sum(10**6)           # Σ ψ(k)                    (alias: dedekind_psi_sum)
 
 # Jordan totient partial sums Σ J_k(m) = totient_sum with parameter:
-say (10**6).jordan_totient_sum(2)   # alias: totient_sum(n, 2)
-say (10**6).jordan_totient_sum(3)
+say jordan_totient_sum(10**6, 2)   # alias: totient_sum(10^6, 2)
+say jordan_totient_sum(10**6, 3)
 ```
 
 ### Chebyshev ψ̃ (Integer Version)
@@ -1201,7 +1229,7 @@ say 10000.exp_mangoldt_sum   # Σ_{k≤n} exp_mangoldt(k) — integer ψ̃
 ### Prime Sums
 
 ```ruby
-say (10**9).prime_sum   # Σ_{p≤n} p — sublinear
+say prime_sum(10**9)   # Σ_{p≤n} p — sublinear
 
 # With exponent:
 say primes_sum(1, 10**6, 2)   # Σ_{p≤10^6} p^2
@@ -1210,19 +1238,19 @@ say primes_sum(1, 10**6, 2)   # Σ_{p≤10^6} p^2
 ### Omega Partial Sums
 
 ```ruby
-say (10**6).omega_sum        # Σ ω(k) ~ n log log n
-say (10**6).bigomega_sum     # Σ Ω(k)
+say omega_sum(10**6)        # Σ ω(k) ~ n log log n
+say bigomega_sum(10**6)     # Σ Ω(k)
 
 # exp_omega_sum(n, base) and exp_bigomega_sum(n, base) — base is the accumulation factor:
-say (10**5).exp_omega_sum(2)       # Σ 2^{ω(k)}
-say (10**5).exp_bigomega_sum(2)    # Σ 2^{Ω(k)}
-say (10**9).exp_bigomega_sum(-1)   # = liouville_sum (since λ(k) = (−1)^Ω(k))
+say exp_omega_sum(10**5, 2)       # Σ 2^{ω(k)}
+say exp_bigomega_sum(10**5, 2)    # Σ 2^{Ω(k)}
+say exp_bigomega_sum(10**9, -1)   # = liouville_sum (since λ(k) = (−1)^Ω(k))
 ```
 
 ### Pillai and Sum of Remainders
 
 ```ruby
-say (10**5).pillai_sum   # Σ_{k≤n} pillai(k)
+say pillai_sum(10**5)   # Σ_{k≤n} pillai(k)
 
 # sum_remainders(n, v) = Σ_{k=1}^n (v mod k) in O(√v) steps:
 say 20.of {|n| sum_remainders(n, n) }           # A004125
@@ -1233,8 +1261,8 @@ say 20.of {|n| sum_remainders(n, n.prime) }     # A099726
 
 ```ruby
 var n = 10**8
-say (n.tau_sum / (n * n.log)).as_float       # → 1  (dominant term)
-say (n.totient_sum / (3*n**2 / Num.pi**2)).as_float   # → 1
+say ((n.tau_sum / (n * n.log)).as_float)                   # → 1  (dominant term)
+say ((n.totient_sum / (3*n**2 / Num.pi**2)).as_float)      # → 1
 ```
 
 ---
@@ -1245,14 +1273,20 @@ say (n.totient_sum / (3*n**2 / Num.pi**2)).as_float   # → 1
 
 ```ruby
 say 720.is_smooth(5)         # all prime factors ≤ 5 ✓
-say 7.smooth_count(1000)     # count of 7-smooth numbers ≤ 1000
+say smooth_count(7, 1000)    # count of 7-smooth numbers ≤ 1000
 say 1000.smooth_numbers(7.primes)   # full list
 
-say 5.smooth_part(720)       # largest 5-smooth divisor of 720
-say 5.smooth_part(105)       # 105 = 3·5·7 → 15
+say smooth_part(5, 720)       # largest 5-smooth divisor of 720
+say smooth_part(5, 105)       # 105 = 3·5·7 → 15
 
-say 1000.rough_count(7)
+say 100.next_smooth(5)        # next 5-smooth number after 100
+say 100.prev_smooth(5)        # previous 5-smooth number before 100
+
+say rough_count(7, 1000)      # count of 7-rough numbers ≤ 1000
 say 1000.rough_numbers(7)
+
+say 100.next_rough(7)         # next 7-rough number after 100
+say 100.prev_rough(7)         # previous 7-rough number before 100
 ```
 
 ### Perfect Powers and Powerful Numbers
@@ -1265,8 +1299,8 @@ say  64.is_power            # true: 2^6 = 4^3 = 8^2
 say  64.perfect_root        # 2 — smallest base
 say  64.is_power_of(2)      # true
 
-say (10**6).next_perfect_power     # 1002001 = 1001^2
-say (10**6).next_perfect_power(3)  # 1030301 = 101^3
+say next_perfect_power(10**6)      # 1002001 = 1001^2
+say next_perfect_power(10**6, 3)   # 1030301 = 101^3
 ```
 
 ### Squarefree Numbers
@@ -1279,7 +1313,7 @@ say 1000.squarefree_count   # ≈ 6n/π² ≈ 608
 say 1000.squarefree_sum
 say 50.next_squarefree
 say 50.prev_squarefree
-say 100.nth_squarefree
+say nth_squarefree(100)
 ```
 
 ### k-Free and k-Full Numbers
@@ -1302,7 +1336,7 @@ say 100.semiprime_count                # = 2.almost_prime_count(100)
 say 2.almost_prime_count(50, 100)      # semiprimes in [50, 100]
 say 50.next_semiprime
 say 50.prev_semiprime
-say 100.nth_semiprime
+say nth_semiprime(100)
 say 1000.semiprime_sum
 
 say 100.squarefree_semiprime_count     # A072613
@@ -1326,6 +1360,57 @@ say 12.is_sphenic    # false — 12 = 2^2·3
 say 100.sphenic_count
 say 30.next_sphenic
 say 30.prev_sphenic
+```
+
+### nth-Indexed Sequences
+
+All functions here return the n-th element of the corresponding integer sequence.
+
+```ruby
+# Smooth and rough numbers:
+say nth_smooth(100, 5)              # 100th 5-smooth number
+say nth_rough(1000, 7)             # 1000th 7-rough number
+
+# Composites:
+say composite(1000)                 # 1000th composite  (alias: nth_composite)
+
+# Perfect powers:
+say nth_perfect_power(1000)         # 1000th perfect power
+say nth_perfect_power(1000, 2)      # 1000th perfect square
+
+# Powers of a specific type:
+say nth_prime_power(1000)           # 1000th prime power p^k (k ≥ 1)
+
+# Squarefree and squarefull:
+say nth_squarefree(1000)            # 1000th squarefree number
+say nth_squarefull(100)             # 100th squarefull (2-full) number
+
+# k-powerfree and k-powerful:
+say nth_powerfree(1000, 2)          # 1000th squarefree (2-powerfree) number
+say nth_powerfree(1000, 3)          # 1000th cubefree number
+say nth_powerful(100, 2)            # 100th powerful (2-powerful) number
+say nth_powerful(100, 3)            # 100th 3-powerful number
+
+# Cubefree and cubefull:
+say nth_cubefree(1000)              # 1000th cubefree number
+say nth_cubefull(100)               # 100th cubefull (3-full) number
+
+# Non-free variants:
+say nth_nonsquarefree(1000)         # 1000th non-squarefree number
+say nth_noncubefree(1000)           # 1000th non-cubefree number
+say nth_nonpowerfree(1000, 2)       # 1000th non-squarefree number
+
+# Almost primes and ω-primes:
+say nth_almost_prime(1000, 2)       # 1000th semiprime
+say nth_almost_prime(1000, 3)       # 1000th 3-almost prime
+say nth_squarefree_almost_prime(1000, 2)   # 1000th squarefree semiprime
+say nth_omega_prime(1000, 2)        # 1000th 2-omega prime (ω(n) = 2)
+
+# Sphenic numbers (product of 3 distinct primes):
+say nth_sphenic(1000)               # 1000th sphenic number
+
+# tau-inverse (exactly k divisors):
+say nth_tau_inverse(100, 6)         # 100th integer with exactly 6 divisors
 ```
 
 ### Practical Numbers
@@ -1414,7 +1499,7 @@ func korselt(n) {
 }
 say korselt(561)   # true
 
-say (561-1) % 561.carmichael_lambda == 0   # true — λ(n) | n−1 ✓
+say ((561-1) % 561.carmichael_lambda == 0)   # true — λ(n) | n−1 ✓
 
 # Enumerate; receiver is the factor-count k:
 say 3.carmichael(100000)                                    # 3-prime-factor Carmichaels ≤ 100000
@@ -1843,6 +1928,63 @@ n.omega_sum                #=> Σ ω(k)
 n.exp_bigomega_sum(base)   #=> Σ base^{Ω(k)}  (base=-1 gives liouville_sum)
 n.exp_omega_sum(base)      #=> Σ base^{ω(k)}
 sum_remainders(n, v)       #=> Σ_{k=1}^n (v mod k),  O(√v)
+
+#── Integer sequences — counting ────────────────────────────────────────
+prime_count(n)             #=> π(n)   aliases: primepi, count_primes
+composite_count(n)         #=> number of composites ≤ n
+semiprime_count(n)         #=> semiprimes ≤ n  = 2.almost_prime_count(n)
+k.almost_prime_count(n)    #=> k-almost primes ≤ n
+squarefree_count(n)        #=> squarefree integers ≤ n
+squarefull_count(n)        #=> squarefull integers ≤ n
+cubefree_count(n)          #=> cubefree integers ≤ n
+cubefull_count(n)          #=> cubefull integers ≤ n
+powerfree_count(k, n)      #=> k-powerfree integers ≤ n
+powerful_count(k, n)       #=> k-powerful integers ≤ n
+perfect_power_count(n)     #=> perfect powers ≤ n
+prime_power_count(n)       #=> prime powers ≤ n
+sphenic_count(n)           #=> sphenic numbers ≤ n
+k.omega_prime_count(n)     #=> k-omega primes ≤ n
+smooth_count(k, n)         #=> k-smooth integers ≤ n
+rough_count(k, n)          #=> k-rough integers ≤ n
+
+#── Integer sequences — nth element ─────────────────────────────────────
+prime(n)                   #=> n-th prime   aliases: nth_prime
+composite(n)               #=> n-th composite   alias: nth_composite
+nth_squarefree(n)          #=> n-th squarefree number
+nth_squarefull(n)          #=> n-th squarefull number
+nth_cubefree(n)            #=> n-th cubefree number
+nth_cubefull(n)            #=> n-th cubefull number
+nth_powerfree(n, k=2)      #=> n-th k-powerfree number
+nth_powerful(n, k=2)       #=> n-th k-powerful number
+nth_nonsquarefree(n)       #=> n-th non-squarefree number
+nth_noncubefree(n)         #=> n-th non-cubefree number
+nth_nonpowerfree(n, k)     #=> n-th k-non-powerfree number
+nth_almost_prime(n, k=2)   #=> n-th k-almost prime
+nth_squarefree_almost_prime(n, k=2)  #=> n-th squarefree k-almost prime
+nth_omega_prime(n, k=2)    #=> n-th k-omega prime
+nth_sphenic(n)             #=> n-th sphenic number
+nth_prime_power(n)         #=> n-th prime power
+nth_perfect_power(n)       #=> n-th perfect power
+nth_smooth(n, k)           #=> n-th k-smooth number
+nth_rough(n, k)            #=> n-th k-rough number
+nth_tau_inverse(n, k)      #=> n-th integer with exactly k divisors
+
+#── Integer sequences — next/prev ───────────────────────────────────────
+n.next_prime               # n.prev_prime
+n.next_composite           # n.prev_composite
+n.next_squarefree          # n.prev_squarefree
+n.next_squarefull          # n.prev_squarefull
+n.next_cubefree            # n.prev_cubefree
+n.next_cubefull            # n.prev_cubefull
+n.next_semiprime           # n.prev_semiprime
+n.next_sphenic             # n.prev_sphenic
+n.next_smooth(k)           # n.prev_smooth(k)
+n.next_rough(k)            # n.prev_rough(k)
+n.next_prime_power         # n.prev_prime_power
+n.next_perfect_power       # n.prev_perfect_power
+n.next_powerfree(k)        # n.prev_powerfree(k)
+n.next_powerful(k)         # n.prev_powerful(k)
+n.next_omega_prime(k)      # n.prev_omega_prime(k)
 
 #── Continued fractions ─────────────────────────────────────────────────
 n.sqrt_cfrac_period
