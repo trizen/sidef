@@ -632,7 +632,7 @@ say primes_sum(1, 10**6, 2)   # Σ_{p≤10^6} p^2
 ```ruby
 # Finds smallest m ≥ 0 with count_func(m) ≥ target
 say inverse_count(25, { .prime_count })          # ≈ 97 (25th prime ≈ 97)
-say inverse_count(100, { |n| smooth_count(10, n) })
+say inverse_count(100, { |n| 10.smooth_count(n) })
 ```
 
 ### Almost-Prime Counting π_k(n)
@@ -1273,16 +1273,16 @@ say ((n.totient_sum / (3*n**2 / Num.pi**2)).as_float)      # → 1
 
 ```ruby
 say 720.is_smooth(5)         # all prime factors ≤ 5 ✓
-say smooth_count(7, 1000)    # count of 7-smooth numbers ≤ 1000
+say 7.smooth_count(1000)     # count of 7-smooth numbers ≤ 1000
 say 1000.smooth_numbers(7.primes)   # full list
 
-say smooth_part(5, 720)       # largest 5-smooth divisor of 720
-say smooth_part(5, 105)       # 105 = 3·5·7 → 15
+say 5.smooth_part(720)        # largest 5-smooth divisor of 720
+say 5.smooth_part(105)        # 105 = 3·5·7 → 15
 
 say 100.next_smooth(5)        # next 5-smooth number after 100
 say 100.prev_smooth(5)        # previous 5-smooth number before 100
 
-say rough_count(7, 1000)      # count of 7-rough numbers ≤ 1000
+say 7.rough_count(1000)       # count of 7-rough numbers ≤ 1000
 say 1000.rough_numbers(7)
 
 say 100.next_rough(7)         # next 7-rough number after 100
@@ -1938,14 +1938,14 @@ squarefree_count(n)        #=> squarefree integers ≤ n
 squarefull_count(n)        #=> squarefull integers ≤ n
 cubefree_count(n)          #=> cubefree integers ≤ n
 cubefull_count(n)          #=> cubefull integers ≤ n
-powerfree_count(k, n)      #=> k-powerfree integers ≤ n
-powerful_count(k, n)       #=> k-powerful integers ≤ n
+k.powerfree_count(n)       #=> k-powerfree integers ≤ n
+k.powerful_count(n)        #=> k-powerful integers ≤ n
 perfect_power_count(n)     #=> perfect powers ≤ n
 prime_power_count(n)       #=> prime powers ≤ n
 sphenic_count(n)           #=> sphenic numbers ≤ n
 k.omega_prime_count(n)     #=> k-omega primes ≤ n
-smooth_count(k, n)         #=> k-smooth integers ≤ n
-rough_count(k, n)          #=> k-rough integers ≤ n
+k.smooth_count(n)          #=> k-smooth integers ≤ n
+k.rough_count(n)           #=> k-rough integers ≤ n
 
 #── Integer sequences — nth element ─────────────────────────────────────
 prime(n)                   #=> n-th prime   aliases: nth_prime
