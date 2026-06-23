@@ -6124,6 +6124,36 @@ Negates the sign of C<x> (equivalent with: C<-x>).
 
 =cut
 
+=head2 necklaces
+
+    necklaces(n,k)
+
+Number of n-bead necklaces with k colors when turning over is not allowed.
+
+    say 30.of { .necklaces(2) }     #=> OEIS: A000031
+
+Defined as:
+
+    (1/n)*Sum_{d|n} phi(n/d)*k^d
+
+=cut
+
+=head2 necklaces_aperiodic
+
+    necklaces_aperiodic(n,k)
+
+Number of n-bead necklaces with beads of C<k> colors when turning over is not allowed and with primitive period C<n>.
+
+    say 30.of { .necklaces_aperiodic(2) }   #=> OEIS: A001037
+
+Also number of degree-n irreducible polynomials over C<GF(k)>.
+
+Defined as:
+
+    (1/n) * Sum_{d|n} mu(n/d) * k^d
+
+=cut
+
 =head2 nesigma
 
     nesigma(n, k=1)

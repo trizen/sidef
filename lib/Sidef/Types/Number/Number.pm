@@ -8941,7 +8941,7 @@ sub linear_congruence {
 sub sqrt_cfrac_period_each {
     my ($n, $block, $max) = @_;
 
-    $n   = _any2mpz($$n, 0) // return ZERO;
+    $n   = _any2mpz($$n) // return ZERO;
     $max = defined($max) ? CORE::int($max) : (0 + 'inf');
 
     Math::GMPz::Rmpz_sgn($n) < 0
@@ -14606,6 +14606,46 @@ sub catalan {
 }
 
 *Catalan = \&catalan;
+
+sub necklaces {
+    my ($n, $k) = @_;
+
+    # (1/n)*sum_{d|n} phi(n/d)*k^d
+
+    $n->is_zero && return ONE;
+    $n->dirichlet_convolution(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $_[0]->euler_phi;
+            }
+        ),
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $k->ipow($_[0]);
+            }
+        )
+    )->idiv($n);
+}
+
+sub necklaces_aperiodic {
+    my ($n, $k) = @_;
+
+    # (1/n) * sum_{d|n} mu(d) * k^(n/d)
+
+    $n->is_zero && return ONE;
+    $n->dirichlet_convolution(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $_[0]->moebius;
+            }
+        ),
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $k->ipow($_[0]);
+            }
+        )
+    )->idiv($n);
+}
 
 sub binomial {
     my ($x, $y) = @_;
@@ -27097,7 +27137,7 @@ sub qs_factor {
 sub dirichlet_convolution {
     my ($n, $f, $g) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
     $f //= Sidef::Types::Block::Block->new(code => sub { ONE });
@@ -27127,7 +27167,7 @@ sub dirichlet_convolution {
 sub dirichlet_hyperbola {
     my ($n, $f, $g, $F, $G) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
     $f //= Sidef::Types::Block::Block->new(code => sub { ONE });
@@ -28400,7 +28440,8 @@ sub exp_mangoldt_sum {
 sub primitive_part {
     my ($n, $f) = @_;
     $f // return $n->exp_mangoldt;
-    my $z = _any2mpz($$n, 5) // goto &nan;
+
+    my $z = _any2mpz($$n) // goto &nan;
 
     my (@u, @v);
 
