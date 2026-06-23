@@ -2161,6 +2161,14 @@ Returns an array with the cubefull numbers <= C<n>, or in the range C<a..b>.
 
 =cut
 
+=head2 cubefull_part
+
+    cubefull_part(n)
+
+Largest divisor of C<n> that is a cubefull (3-powerful) number. (L<OEIS  A360540|https://oeis.org/ A360540>)
+
+=cut
+
 =head2 cubefull_count
 
     cubefull_count(n)
@@ -7739,6 +7747,17 @@ Returns an array with the k-powerful (or k-full) numbers <= C<n>, or in the rang
 
 =cut
 
+=head2 powerful_part
+
+    k.powerful_part(n)
+
+The k-powerful part of n: largest k-powerful number dividing C<n>.
+
+    say 2.powerful_part(n)      # squarefull part of n (OEIS: A057521)
+    say 3.powerful_part(n)      # cubefull part of n (OEIS: A360540)
+
+=cut
+
 =head2 powerful_each
 
     k.powerful_each(n, { ... })
@@ -9833,6 +9852,14 @@ Returns the number of unitary squarefree divisors of C<n>.
     squarefull(a,b)
 
 Returns an array with the squarefull numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 squarefull_part
+
+    squarefull_part(n)
+
+Largest divisor of C<n> that is a squarefull (2-powerful) number. (L<OEIS A057521|https://oeis.org/A057521>)
 
 =cut
 

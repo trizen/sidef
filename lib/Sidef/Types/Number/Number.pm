@@ -24851,7 +24851,38 @@ sub powerfree_kernel {
     $n = _big2uistr($$n) // goto &nan;
 
     $n || return ZERO;
-    _set_int(Math::Prime::Util::GMP::vecprod(map { Math::Prime::Util::GMP::powint($_->[0], List::Util::min($k - 1, $_->[1])) } _factor_exp($n)));
+
+    _set_int(
+             Math::Prime::Util::GMP::vecprod(map { ($_->[1] == 1) ? $_->[0] : Math::Prime::Util::GMP::powint($_->[0], $_->[1]) }
+                                             map { [$_->[0], List::Util::min($k - 1, $_->[1])] } _factor_exp($n))
+            );
+}
+
+sub powerful_part {
+    my ($k, $n) = @_;
+
+    # Multiplicative with:
+    #   a(p^e, k) = p^e, where e >= k
+
+    _valid(\$n);
+
+    $k = _any2ui($$k) || goto &nan;
+    $n = _big2uistr($$n) // goto &nan;
+
+    $n || return ZERO;
+
+    _set_int(
+             Math::Prime::Util::GMP::vecprod(map  { Math::Prime::Util::GMP::powint($_->[0], $_->[1]) }
+                                             grep { $_->[1] >= $k } _factor_exp($n))
+            );
+}
+
+sub squarefull_part {
+    (TWO)->powerful_part($_[0]);
+}
+
+sub cubefull_part {
+    (THREE)->powerful_part($_[0]);
 }
 
 sub powerfree_part {
@@ -24862,11 +24893,10 @@ sub powerfree_part {
 
     _valid(\$n);
 
-    $k = _any2ui($$k)    // goto &nan;
+    $k = _any2ui($$k) || goto &nan;
     $n = _big2uistr($$n) // goto &nan;
 
-    $k <= 0   and goto &nan;
-    $n eq '0' and return ZERO;
+    $n || return ZERO;
 
     _set_int(
              Math::Prime::Util::GMP::vecprod(map { ($_->[1] == 1) ? $_->[0] : Math::Prime::Util::GMP::powint($_->[0], $_->[1]) }
