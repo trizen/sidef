@@ -7615,6 +7615,17 @@ Returns the largest k-th power dividing C<n>.
 
 =cut
 
+=head2 powerfree_kernel
+
+    k.powerfree_kernel(n)
+
+Returns the largest k-powerfree divisor of C<n>.
+
+    say 2.powerfree_kernel(n)       # rad(n)
+    say 3.powerfree_kernel(n)       # largest cubefree number dividing n (OEIS: A007948)
+
+=cut
+
 =head2 powerfree_part
 
     k.powerfree_part(n)

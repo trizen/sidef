@@ -275,6 +275,10 @@ sub _valid {
          my $tmp = (
              defined($sub) ? __PACKAGE__->new($sub->($$_)) : do {
                  my (undef, undef, undef, $caller) = caller(1);
+                 if (($$_ // '') eq '') {
+                     my ($func_name) = $caller =~ /::([^:]+)\z/;
+                     print STDERR "[ERROR] Probably not enough arguments provided to $func_name()?\n";
+                 }
                  die "[ERROR] Value <<$$_>> cannot be implicitly converted to a number, inside <<$caller>>!\n";
              }
          );
@@ -24834,6 +24838,21 @@ sub rad {    # A007947
 }
 
 *squarefree_kernel = \&rad;
+
+sub powerfree_kernel {
+    my ($k, $n) = @_;
+
+    # Multiplicative with:
+    #   a(p^e) = p^(min(e, k-1))
+
+    _valid(\$n);
+
+    $k = _any2ui($$k) || goto &nan;
+    $n = _big2uistr($$n) // goto &nan;
+
+    $n || return ZERO;
+    _set_int(Math::Prime::Util::GMP::vecprod(map { Math::Prime::Util::GMP::powint($_->[0], List::Util::min($k - 1, $_->[1])) } _factor_exp($n)));
+}
 
 sub powerfree_part {
     my ($k, $n) = @_;
