@@ -2193,6 +2193,30 @@ Largest divisor of C<n> that is a cubefull (3-powerful) number. (L<OEIS  A360540
 
 =cut
 
+=head2 cubefull_divisors
+
+    cubefull_divisors(n)
+
+Return an array with the cubefull (3-powerful) divisors of C<n>.
+
+=cut
+
+=head2 cubefull_sigma
+
+    cubefull_sigma(n, j=1)
+
+Sum of the cubefull (3-powerful) divisors of C<n>, each divisor raised to the power C<j>.
+
+=cut
+
+=head2 cubefull_sigma0
+
+    cubefull_sigma0(n)
+
+Count of the cubefull (3-powerful) divisors of C<n>.
+
+=cut
+
 =head2 cubefull_count
 
     cubefull_count(n)
@@ -7796,6 +7820,9 @@ Returns an array with the k-powerful divisors of C<n>.
 
 Sum of the k-powerful divisors of C<n>, each divisor raised to the power C<j>.
 
+    say 2.powerful_sigma(n)     # OEIS: A183097
+    say 3.powerful_sigma(n)     # OEIS: A385005
+
 =cut
 
 =head2 powerful_sigma0
@@ -9908,6 +9935,30 @@ Returns an array with the squarefull numbers <= C<n>, or in the range C<a..b>.
     squarefull_part(n)
 
 Largest divisor of C<n> that is a squarefull (2-powerful) number. (L<OEIS A057521|https://oeis.org/A057521>)
+
+=cut
+
+=head2 squarefull_divisors
+
+    squarefull_divisors(n)
+
+Return an array with the squarefull (2-powerful) divisors of C<n>.
+
+=cut
+
+=head2 squarefull_sigma
+
+    squarefull_sigma(n, j=1)
+
+Sum of the squarefull (2-powerful) divisors of C<n>, each divisor raised to the power C<j>.
+
+=cut
+
+=head2 squarefull_sigma0
+
+    squarefull_sigma0(n)
+
+Count of the squarefull (2-powerful) divisors of C<n>.
 
 =cut
 

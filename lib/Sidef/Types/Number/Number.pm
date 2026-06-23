@@ -28090,6 +28090,14 @@ sub powerful_divisors {
     _array(\@d);
 }
 
+sub squarefull_divisors {
+    (TWO)->powerful_divisors($_[0]);
+}
+
+sub cubefull_divisors {
+    (THREE)->powerful_divisors($_[0]);
+}
+
 my $power_divisors_func = sub {
     my ($k, $factor_exp) = @_;
 
@@ -30481,36 +30489,6 @@ sub prime_power_usigma {
     bless \$r;
 }
 
-sub squarefree_usigma0 {
-    (TWO)->powerfree_usigma0($_[0]);
-}
-
-sub cubefree_usigma0 {
-    (THREE)->powerfree_usigma0($_[0]);
-}
-
-sub squarefree_usigma {
-    (TWO)->powerfree_usigma($_[0], $_[1]);
-}
-
-sub cubefree_usigma {
-    (THREE)->powerfree_usigma($_[0], $_[1]);
-}
-
-*squarefree_sigma0 = \&usigma0;
-
-sub cubefree_sigma0 {
-    (THREE)->powerfree_sigma0($_[0]);
-}
-
-sub squarefree_sigma {
-    (TWO)->powerfree_sigma($_[0], $_[1]);
-}
-
-sub cubefree_sigma {
-    (THREE)->powerfree_sigma($_[0], $_[1]);
-}
-
 sub power_sigma0 {
     my ($k, $n) = @_;
 
@@ -30763,6 +30741,22 @@ sub powerful_sigma {
     bless \_binsplit(\@terms, \&__mul__);
 }
 
+sub squarefull_sigma0 {
+    (TWO)->powerful_sigma0($_[0]);
+}
+
+sub cubefull_sigma0 {
+    (THREE)->powerful_sigma0($_[0]);
+}
+
+sub squarefull_sigma {
+    (TWO)->powerful_sigma($_[0], $_[1]);
+}
+
+sub cubefull_sigma {
+    (THREE)->powerful_sigma($_[0], $_[1]);
+}
+
 sub powerfree_sigma0 {
     my ($k, $n) = @_;
 
@@ -30834,6 +30828,20 @@ sub powerfree_sigma {
 
     @terms || return ONE;
     bless \_binsplit(\@terms, \&__mul__);
+}
+
+*squarefree_sigma0 = \&usigma0;
+
+sub cubefree_sigma0 {
+    (THREE)->powerfree_sigma0($_[0]);
+}
+
+sub squarefree_sigma {
+    (TWO)->powerfree_sigma($_[0], $_[1]);
+}
+
+sub cubefree_sigma {
+    (THREE)->powerfree_sigma($_[0], $_[1]);
 }
 
 sub powerfree_usigma0 {
@@ -30914,6 +30922,22 @@ sub powerfree_usigma {
 
     @terms || return ONE;
     bless \_binsplit(\@terms, \&__mul__);
+}
+
+sub squarefree_usigma0 {
+    (TWO)->powerfree_usigma0($_[0]);
+}
+
+sub cubefree_usigma0 {
+    (THREE)->powerfree_usigma0($_[0]);
+}
+
+sub squarefree_usigma {
+    (TWO)->powerfree_usigma($_[0], $_[1]);
+}
+
+sub cubefree_usigma {
+    (THREE)->powerfree_usigma($_[0], $_[1]);
 }
 
 sub prime_sigma {
