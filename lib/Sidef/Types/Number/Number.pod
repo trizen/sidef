@@ -10514,18 +10514,6 @@ Returns the sum of the unitary divisors of C<n>, each divisor raised to the powe
 
 =cut
 
-=head2 usigma_inverse
-
-    n.usigma_inverse
-
-Returns an array with all the solutions C<x> to C<usigma(x) = n>.
-
-    say usigma_inverse(120)      #=> [60, 87, 92, 95, 99]
-
-Aliases: I<inverse_usigma>
-
-=cut
-
 =head2 usigma0
 
     usigma0(n)
@@ -10537,6 +10525,39 @@ Equivalently, the count of squarefree divisors of C<n>.
     say usigma0(5040)   #=> 16
 
 Aliases: I<squarefree_sigma0>
+
+=cut
+
+=head2 usigma_sum
+
+    usigma_sum(n, k=1)
+
+Sum of the C<usigma(x,k)> function, for C<x = 1..n>.
+
+    say 30.of { .usigma_sum }       #=> OEIS: A064609
+    say 30.of { .usigma_sum(0) }    #=> OEIS: A064608
+
+=cut
+
+=head2 usigma0_sum
+
+    usigma0_sum(n)
+
+Sum of number of unitary divisors from C<1> to C<n>.
+
+    say 30.of { .usigma0_sum }    #=> OEIS: A064608
+
+=cut
+
+=head2 usigma_inverse
+
+    n.usigma_inverse
+
+Returns an array with all the solutions C<x> to C<usigma(x) = n>.
+
+    say usigma_inverse(120)      #=> [60, 87, 92, 95, 99]
+
+Aliases: I<inverse_usigma>
 
 =cut
 

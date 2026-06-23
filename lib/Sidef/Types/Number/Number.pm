@@ -15543,6 +15543,10 @@ sub exp_omega_sum {
 
     my $n_obj = bless \$n;
 
+    if (!HAS_PRIME_UTIL and $k->eq(TWO)) {
+        return $n_obj->usigma_sum(ZERO);
+    }
+
     my @terms;
     foreach my $i (0 .. CORE::int($n_obj->lgrt->numify) + 1) {
         my $i_obj = _set_int($i);
@@ -27170,11 +27174,11 @@ sub dirichlet_hyperbola {
     $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
-    $f //= Sidef::Types::Block::Block->new(code => sub { ONE });
-    $g //= Sidef::Types::Block::Block->new(code => sub { ONE });
+    $f //= sub { 1 };
+    $g //= sub { 1 };
 
-    $F //= Sidef::Types::Block::Block->new(code => sub { $_[0] });
-    $G //= Sidef::Types::Block::Block->new(code => sub { $_[0] });
+    $F //= sub { $_[0] };
+    $G //= sub { $_[0] };
 
     my $s = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_sqrt($s, $n);
@@ -29889,6 +29893,75 @@ sub usigma {
 
     @terms || return ONE;
     bless \_binsplit(\@terms, \&__mul__);
+}
+
+sub usigma_sum {
+    my ($n, $k) = @_;
+
+    # usigma_sum(n,k) = Sum_{d=1..floor(sqrt(n))} d^k * mu(d) * sigma_sum(floor(n/d^2), k)
+
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $n = _big2uistr($$n) // goto &nan;
+
+    my $k_obj = bless \$k;
+
+    my $f = sub { $_[0]->ipow($k_obj) };
+    my $g = sub { 1 };
+
+    my $F = sub { $_[0]->faulhaber_sum($k_obj) };
+    my $G = sub { $_[0] };
+
+    if ($k == 0) {
+
+        if (HAS_PRIME_UTIL) {
+            return _set_int($n)->exp_omega_sum(TWO);
+        }
+
+        $f = sub { 1 };
+        $g = sub { 1 };
+        $F = sub { $_[0] };
+        $G = sub { $_[0] };
+    }
+    elsif ($k == 1) {
+        $f = sub { $_[0] };
+    }
+    elsif ($k == 2) {
+        $f = sub { $_[0]->sqr };
+    }
+
+    my $sum    = 0;
+    my $prev   = 0;
+    my $prev_S = 0;
+
+    foreach my $d (1 .. Math::Prime::Util::GMP::sqrtint($n)) {
+
+        my $mu =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::moebius($d)
+          : Math::Prime::Util::GMP::moebius($d);
+
+        $mu || next;
+
+        my $d2   = Math::Prime::Util::GMP::mulint($d, $d);
+        my $nod2 = Math::Prime::Util::GMP::divint($n, $d2);
+
+        my $dk = ($k == 1) ? $d : ($k == 2) ? $d2 : Math::Prime::Util::GMP::powint($d, $k);
+        my $S  = ($prev eq $nod2) ? $prev_S : ${_set_int($nod2)->dirichlet_hyperbola($f, $g, $F, $G)};
+
+        $dk  = "-$dk" if ($mu == -1);
+        $sum = Math::Prime::Util::GMP::addint($sum, Math::Prime::Util::GMP::mulint($dk, $S));
+
+        if ($prev ne $nod2) {
+            $prev   = $nod2;
+            $prev_S = $S;
+        }
+    }
+
+    _set_int($sum);
+}
+
+sub usigma0_sum {
+    $_[0]->usigma_sum(ZERO);
 }
 
 sub nisigma0 {    # A348341: count non-infinitary divisors of n
