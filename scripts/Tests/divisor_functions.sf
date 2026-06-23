@@ -28,6 +28,9 @@ var h2 = Hash(
     power_divisors => 'power_sigma',
     power_udivisors => 'power_usigma',
 
+    powerful_divisors => 'powerful_sigma',
+    #powerful_udivisors => 'powerful_usigma',   # TODO
+
     powerfree_divisors => 'powerfree_sigma',
     powerfree_udivisors => 'powerfree_usigma',
 )

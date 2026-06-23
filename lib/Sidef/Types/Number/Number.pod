@@ -7782,6 +7782,30 @@ The k-powerful part of n: largest k-powerful number dividing C<n>.
 
 =cut
 
+=head2 powerful_divisors
+
+    k.powerful_divisors(n)
+
+Returns an array with the k-powerful divisors of C<n>.
+
+=cut
+
+=head2 powerful_sigma
+
+    k.powerful_sigma(n, j=1)
+
+Sum of the k-powerful divisors of C<n>, each divisor raised to the power C<j>.
+
+=cut
+
+=head2 powerful_sigma0
+
+    k.powerful_sigma0
+
+Count the number of k-powerful divisors of C<n>.
+
+=cut
+
 =head2 powerful_each
 
     k.powerful_each(n, { ... })
