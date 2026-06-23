@@ -2040,6 +2040,14 @@ Returns the cube of C<x>. Equivalent with C<x**3>.
 
 =cut
 
+=head2 cube_part
+
+    cube_part(n)
+
+Largest cube dividing C<n>. (L<OEIS  A008834|https://oeis.org/A008834>)
+
+=cut
+
 =head2 cube_divisors
 
     n.cube_divisors
@@ -2060,6 +2068,22 @@ Equivalent with:
     cubefree(a,b)
 
 Returns an array with the cubefree numbers <= C<n>, or in the range C<a..b>.
+
+=cut
+
+=head2 cubefree_part
+
+    cubefree_part(n)
+
+Cubefree part of C<n>. (L<OEIS  A050985|https://oeis.org/A050985>)
+
+=cut
+
+=head2 cubefree_kernel
+
+    cubefree_kernel(n)
+
+Largest cubefree number dividing C<n>. (L<OEIS  A007948|https://oeis.org/A007948>)
 
 =cut
 
@@ -2165,7 +2189,7 @@ Returns an array with the cubefull numbers <= C<n>, or in the range C<a..b>.
 
     cubefull_part(n)
 
-Largest divisor of C<n> that is a cubefull (3-powerful) number. (L<OEIS  A360540|https://oeis.org/ A360540>)
+Largest divisor of C<n> that is a cubefull (3-powerful) number. (L<OEIS  A360540|https://oeis.org/A360540>)
 
 =cut
 

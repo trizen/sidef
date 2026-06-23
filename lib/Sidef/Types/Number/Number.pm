@@ -24858,6 +24858,10 @@ sub powerfree_kernel {
             );
 }
 
+sub cubefree_kernel {
+    (THREE)->powerfree_kernel($_[0]);
+}
+
 sub powerful_part {
     my ($k, $n) = @_;
 
@@ -24910,9 +24914,8 @@ sub core {    # A007913
 
 *squarefree_part = \&core;
 
-sub square_part {
-    $_[0]->is_zero && return ZERO;
-    $_[0]->div((TWO)->powerfree_part($_[0]));
+sub cubefree_part {    # A050985
+    (THREE)->powerfree_part($_[0]);
 }
 
 sub power_part {
@@ -24920,6 +24923,14 @@ sub power_part {
     _valid(\$n);
     $n->is_zero && return ZERO;
     $n->div($k->powerfree_part($n));
+}
+
+sub square_part {
+    (TWO)->power_part($_[0]);
+}
+
+sub cube_part {
+    (THREE)->power_part($_[0]);
 }
 
 sub powerfree_part_sum {
