@@ -1914,6 +1914,28 @@ Aliases: I<squarefree_part>
 
 =cut
 
+=head2 cototient
+
+    cototient(n, k=1)
+
+Generalized cototient function:
+
+    n^k - J_k(n)
+
+where C<J_k(n)> is the Jordan totient function.
+
+For C<k=1>, it equals: C<n - phi(n)>.
+
+=cut
+
+=head2 cototient_sum
+
+    cototient_sum(n, k=1)
+
+Partial sums of the generalized cototient function, equivalent to:
+
+    faulhaber_sum(n, k) - totient_sum(n, k)
+
 =head2 cos
 
     cos(x)

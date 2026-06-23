@@ -28421,6 +28421,23 @@ sub totient_sum {
 *euler_phi_sum      = \&totient_sum;
 *jordan_totient_sum = \&totient_sum;
 
+sub cototient {
+    my ($n, $k) = @_;
+
+    if (!defined($k)) {
+        return $n->sub($n->euler_phi);
+    }
+
+    $k //= ONE;
+    $n->ipow($k)->sub($n->jordan_totient($k));
+}
+
+sub cototient_sum {
+    my ($n, $k) = @_;
+    $k //= ONE;
+    $n->faulhaber_sum($k)->sub($n->totient_sum($k));
+}
+
 sub _n_over_d_divisors {
     my ($N, $d, $u, $D) = @_;
 
