@@ -1900,6 +1900,16 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 =cut
 
+=head2 square_part
+
+    square_part(n)
+
+Largest square dividing C<n>. (L<OEIS A008833|https://oeis.org/A008833>)
+
+    say 30.of { .square_part }      #=> OEIS: A008833
+
+=cut
+
 =head2 core
 
     core(n)
@@ -1935,6 +1945,8 @@ For C<k=1>, it equals: C<n - phi(n)>.
 Partial sums of the generalized cototient function, equivalent to:
 
     faulhaber_sum(n, k) - totient_sum(n, k)
+
+=cut
 
 =head2 cos
 
@@ -7589,6 +7601,17 @@ Returns an array with the k-powerfree divisors of C<n>.
 
     say 2.powerfree_divisors(5040)      # squarefree divisors of 5040
     say 3.powerfree_divisors(5040)      # cubefree divisors of 5040
+
+=cut
+
+=head2 power_part
+
+    k.power_part(n)
+
+Returns the largest k-th power dividing C<n>.
+
+    say 2.power_part(n)     # largest square dividing n
+    say 3.power_part(n)     # largest cube dividing n
 
 =cut
 

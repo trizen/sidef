@@ -24861,6 +24861,18 @@ sub core {    # A007913
 
 *squarefree_part = \&core;
 
+sub square_part {
+    $_[0]->is_zero && return ZERO;
+    $_[0]->div((TWO)->powerfree_part($_[0]));
+}
+
+sub power_part {
+    my ($k, $n) = @_;
+    _valid(\$n);
+    $n->is_zero && return ZERO;
+    $n->div($k->powerfree_part($n));
+}
+
 sub powerfree_part_sum {
     my ($k, $from, $to) = @_;
 
