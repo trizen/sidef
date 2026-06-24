@@ -2373,6 +2373,18 @@ Aliases: I<dirichlet_convolution>
 
 =cut
 
+=head2 dinv
+
+    n.dinv(f)
+
+The Dirichlet inverse of a function C<f>.
+
+    say 30.of { .dinv { .sigma } }      # Dirichlet inverse of sigma function (OEIS: A046692)
+
+Aliases: I<dirichlet_inverse>
+
+=cut
+
 =head2 de
 
     r.de
@@ -5781,6 +5793,22 @@ The product of the factors will give back C<n>. However, some factors may be com
 The Möbius function: μ(n). (L<OEIS A008683|https://oeis.org/A008683>)
 
 Aliases: I<μ>, I<mu>, I<mobius>, I<möbius>
+
+=cut
+
+=head2 moebius_inverse
+
+    n.moebius_inverse(f)
+
+The Möbius transform (inversion) of a function C<f>, defined as:
+
+    Sum_{d|n} mu(d) * f(n/d)
+
+Example:
+
+    say 30.of { .moebius_inverse { .psi } }   # Möbius transform of Dedekind psi function (OEIS: A063659)
+
+Aliases: I<moebius_transform>
 
 =cut
 
@@ -10395,7 +10423,7 @@ Returns the sum of the Jordan totient function C<J_k(j)>, for C<j=1..n>.
     say totient_sum(100, 1)      #=> 3044
     say totient_sum(100, 2)      #=> 280608
 
-Aliases: I<euler_phi_sum>, I<jordan_totient_sum>
+Aliases: I<phi_sum>, I<euler_phi_sum>, I<jordan_totient_sum>
 
 =cut
 

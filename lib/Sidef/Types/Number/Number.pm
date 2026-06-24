@@ -3895,6 +3895,7 @@ sub __inv__ {
     goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
 
   Scalar: {
+        CORE::abs($x) == 1 and return $x;
         $x = _any2mpz($x);
         goto Math_GMPz;
     }
@@ -3925,6 +3926,9 @@ sub __inv__ {
             $x = _mpz2mpfr($x);
             goto Math_MPFR;
         };
+
+        Math::GMPz::Rmpz_cmpabs_ui($x, 1) == 0
+          and return $x;
 
         my $r = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_z($r, $x);
@@ -27168,6 +27172,90 @@ sub dirichlet_convolution {
 
 *dconv = \&dirichlet_convolution;
 
+sub dirichlet_inverse {
+    my ($n, $f) = @_;
+
+    $n = _any2mpz($$n) // goto &nan;
+
+    if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+        return ZERO;
+    }
+
+    my @D = map { _any2mpz($_) } _divisors($n);
+
+    my @g;
+    my $f1 = ${$f->run(ONE)};
+    $g[0] = __inv__($f1);
+
+    ref($g[0]) eq 'Math::MPFR' and goto &nan;
+    ref($g[0]) eq 'Math::MPC'  and goto &nan;
+
+    my $q   = Math::GMPz::Rmpz_init();
+    my $sum = Math::GMPz::Rmpz_init();
+
+    foreach my $i (1 .. $#D) {
+        my $d = $D[$i];
+        Math::GMPz::Rmpz_set_ui($sum, 0);
+
+        foreach my $j (0 .. $i - 1) {
+            my $c = $D[$j];
+
+            if (Math::GMPz::Rmpz_divisible_p($d, $c)) {
+                Math::GMPz::Rmpz_divexact($q, $d, $c);
+                my $f_val = ${$f->run(_set_int($q))};
+                $sum += $g[$j] * $f_val;
+            }
+        }
+
+        $g[$i] = -$sum / $f1;
+    }
+
+    my $r = $g[-1];
+    bless \$r;
+}
+
+*dinv = \&dirichlet_inverse;
+
+sub moebius_inverse {
+    my ($n, $f) = @_;
+
+    $n = _big2uistr($$n) // goto &nan;
+
+    my $q   = Math::GMPz::Rmpz_init();
+    my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+
+    my $native_n = (HAS_PRIME_UTIL and $n < ULONG_MAX);
+
+    for my $d (map { $$_ } @{_set_int($n)->squarefree_divisors}) {
+
+        $d = Math::GMPz::Rmpz_get_ui($d)
+          if (ref($d) and Math::GMPz::Rmpz_fits_ulong_p($d));
+
+        my $mu =
+          (HAS_PRIME_UTIL and $d < ULONG_MAX)
+          ? Math::Prime::Util::moebius($d)
+          : Math::Prime::Util::GMP::moebius($d);
+
+        my $q =
+          $native_n
+          ? Math::Prime::Util::divint($n, $d)
+          : Math::Prime::Util::GMP::divint($n, $d);
+
+        my $f_val = ${$f->run(_set_int($q))};
+
+        if ($mu == 1) {
+            $sum += $f_val;
+        }
+        else {
+            $sum -= $f_val;
+        }
+    }
+
+    bless \$sum;
+}
+
+*moebius_transform = \&moebius_inverse;
+
 sub dirichlet_hyperbola {
     my ($n, $f, $g, $F, $G) = @_;
 
@@ -28569,6 +28657,7 @@ sub totient_sum {
     $n->dirichlet_hyperbola($f, $g, $F, $G);
 }
 
+*phi_sum            = \&totient_sum;
 *euler_phi_sum      = \&totient_sum;
 *jordan_totient_sum = \&totient_sum;
 
@@ -29933,14 +30022,15 @@ sub usigma_sum {
     my $prev   = 0;
     my $prev_S = 0;
 
-    foreach my $d (1 .. Math::Prime::Util::GMP::sqrtint($n)) {
+    my $s = Math::Prime::Util::GMP::sqrtint($n);
 
-        my $mu =
-          HAS_PRIME_UTIL
-          ? Math::Prime::Util::moebius($d)
-          : Math::Prime::Util::GMP::moebius($d);
+    my @moebius = HAS_PRIME_UTIL
+        ? Math::Prime::Util::moebius(0, $s)
+        : Math::Prime::Util::GMP::moebius(0, $s);
 
-        $mu || next;
+    foreach my $d (1 .. $s) {
+
+        my $mu = $moebius[$d] || next;
 
         my $d2   = Math::Prime::Util::GMP::mulint($d, $d);
         my $nod2 = Math::Prime::Util::GMP::divint($n, $d2);
