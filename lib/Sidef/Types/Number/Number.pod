@@ -10501,6 +10501,16 @@ The unitary totient function. (L<OEIS A047994|https://oeis.org/A047994>)
 
 =cut
 
+=head2 uphi_sum
+
+    uphi_sum(n,k=1)
+
+Partial sums of the unitary totient function C<uphi(x,k)> for C<x=1..n>.
+
+    say 30.of { .uphi_sum }     #=> OEIS: A177754
+
+=cut
+
 =head2 uphi_inverse
 
     n.uphi_inverse

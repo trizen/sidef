@@ -28639,6 +28639,10 @@ sub totient_sum {
 
     $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
+    if (HAS_PRIME_UTIL and $k == 1) {
+        return _set_int(Math::Prime::Util::sumtotient($$n));
+    }
+
     my $k_obj = bless \$k;
 
     my $f = sub { $_[0]->ipow($k_obj) };
@@ -30024,9 +30028,10 @@ sub usigma_sum {
 
     my $s = Math::Prime::Util::GMP::sqrtint($n);
 
-    my @moebius = HAS_PRIME_UTIL
-        ? Math::Prime::Util::moebius(0, $s)
-        : Math::Prime::Util::GMP::moebius(0, $s);
+    my @moebius =
+      HAS_PRIME_UTIL
+      ? Math::Prime::Util::moebius(0, $s)
+      : Math::Prime::Util::GMP::moebius(0, $s);
 
     foreach my $d (1 .. $s) {
 
@@ -30365,6 +30370,83 @@ sub uphi {    # OEIS: A047994
 
     @terms || return ONE;
     bless \_binsplit(\@terms, \&__mul__);
+}
+
+sub _squarefull_aux {
+    my ($n, $k) = @_;
+
+    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+        return Math::Prime::Util::vecprod(
+            map {
+                my ($p, $e) = @$_;
+                Math::Prime::Util::mulint(
+                                          ($e - 1),
+                                          (
+                                             ($k == 1)
+                                           ? ($p - 1)
+                                           : Math::Prime::Util::subint(Math::Prime::Util::powint($p, $k), 1)
+                                          )
+                                         )
+            } grep { $_->[1] >= 2 } Math::Prime::Util::factor_exp($n)
+        );
+    }
+
+    Math::Prime::Util::GMP::vecprod(
+        map {
+            my ($p, $e) = @$_;
+            Math::Prime::Util::GMP::mulint(($e - 1),
+                                           ($k == 1)
+                                           ? Math::Prime::Util::GMP::subint($p,                                     1)
+                                           : Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::powint($p, $k), 1))
+        } grep { $_->[1] >= 2 } _factor_exp($n)
+    );
+}
+
+sub uphi_sum {
+    my ($n, $j) = @_;
+
+    $n = _big2uistr($$n) // return ZERO;
+    $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+
+    my $s = Math::Prime::Util::GMP::sqrtint($n);
+    my $P = HAS_PRIME_UTIL ? Math::Prime::Util::powerful_numbers(1, $n) : [map { $$_ } @{_set_int($n)->squarefull}];
+    my @F = (map { _squarefull_aux($_, $j) } @$P);
+    my @S = (0);
+
+    foreach my $i (0 .. $#F) {
+        $S[$i+1] = $S[$i] + $F[$i];
+    }
+
+    my $j_obj = bless \$j;
+
+    my @terms;
+    foreach my $i (0 .. $#$P) {
+        my $k = $P->[$i];
+        last if ($k > $s);
+        my $fk = $F[$i];
+        push @terms, Math::Prime::Util::GMP::mulint($fk, ${_set_int(Math::Prime::Util::GMP::divint($n, $k))->phi_sum($j_obj)});
+    }
+
+    foreach my $k (1 .. $s) {
+        my $t =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divint($n, $k)
+          : Math::Prime::Util::GMP::divint($n, $k);
+        my $c =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powerful_count($t)
+          : Math::Prime::Util::GMP::powerful_count($t);
+        my $Jk =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::jordan_totient($j, $k)
+          : Math::Prime::Util::GMP::jordan_totient($j, $k);
+        push @terms, Math::Prime::Util::GMP::mulint($Jk, $S[$c]);
+    }
+
+    my $A = Math::Prime::Util::GMP::vecsum(@terms);
+    my $B = Math::Prime::Util::GMP::mulint(${_set_int($s)->phi_sum($j_obj)}, $S[Math::Prime::Util::GMP::powerful_count($s)]);
+
+    _set_int(Math::Prime::Util::GMP::subint($A, $B));
 }
 
 sub nuphi {    # OEIS: A254503

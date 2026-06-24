@@ -1582,6 +1582,11 @@ assert_eq([0]+20.of{ .usigma_sum(1) }.diffs, 20.of { .usigma(1) })
 assert_eq([0]+20.of{ .usigma_sum(2) }.diffs, 20.of { .usigma(2) })
 assert_eq([0]+20.of{ .usigma_sum(3) }.diffs, 20.of { .usigma(3) })
 
+assert_eq([0]+20.of{ .uphi_sum }.diffs, 20.of { .uphi })
+assert_eq([0]+20.of{ .uphi_sum(1) }.diffs, 20.of { .uphi(1) })
+assert_eq([0]+20.of{ .uphi_sum(2) }.diffs, 20.of { .uphi(2) })
+assert_eq([0]+20.of{ .uphi_sum(3) }.diffs, 20.of { .uphi(3) })
+
 assert_eq([0]+20.of{ .sigma_sum }.diffs, 20.of { .sigma })
 assert_eq([0]+20.of{ .sigma_sum(0,1) }.diffs, 20.of { .tau * _ })
 assert_eq([0]+20.of{ .sigma_sum(1,1) }.diffs, 20.of { .sigma * _ })
