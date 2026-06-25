@@ -30702,20 +30702,20 @@ sub pillai_sum {
         $f = sub { $_[0]->mul($_[0]->tau) };
     }
 
-#<<<
-    # Alternative formula (slightly slower)
-    #~ my $f = sub { $_[0]->jordan_totient($k_obj) };
-    #~ my $g = sub { $_[0]->ipow($k_obj) };
+    # Alternative convolution:
+    if (HAS_PRIME_UTIL and $k == 1) {
+        $f = sub { $_[0]->jordan_totient($k_obj) };
+        $g = sub { $_[0]->ipow($k_obj) };
 
-    #~ my $F = sub { $_[0]->totient_sum($k_obj) };
-    #~ my $G = sub { $_[0]->faulhaber_sum($k_obj) };
+        $F = sub { $_[0]->totient_sum($k_obj) };
+        $G = sub { $_[0]->faulhaber_sum($k_obj) };
 
-    #~ if ($k == 1) {
-        #~ $g = sub { $_[0] };
-        #~ $f = sub { $_[0]->euler_phi };
-        #~ $F = sub { $_[0]->totient_sum };
-    #~ }
-#>>>
+        if ($k == 1) {
+            $g = sub { $_[0] };
+            $f = sub { $_[0]->euler_phi };
+            $F = sub { $_[0]->totient_sum };
+        }
+    }
 
     $n->dirichlet_hyperbola($f, $g, $F, $G);
 }
