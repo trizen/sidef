@@ -27286,9 +27286,8 @@ sub dirichlet_hyperbola {
         $q_obj = bless \(my $value = Math::GMPz::Rmpz_init_set_ui(0));
     }
 
-    my $sum = 0;
-
     my ($f_r, $g_r, $F_r, $G_r);
+    my @terms;
 
     foreach my $k (1 .. Math::GMPz::Rmpz_get_ui($s)) {
 
@@ -27329,10 +27328,21 @@ sub dirichlet_hyperbola {
         $F_r = $$F_r if ref($F_r);
         $G_r = $$G_r if ref($G_r);
 
-        $sum = __add__($sum, __add__(__mul__($f_r, $G_r), __mul__($g_r, $F_r)));
+        push @terms,
+          (
+            (
+             HAS_PRIME_UTIL ? Math::Prime::Util::mulint($f_r, $G_r)
+             : Math::Prime::Util::GMP::mulint($f_r, $G_r)
+            ),
+            (
+             HAS_PRIME_UTIL ? Math::Prime::Util::mulint($g_r, $F_r)
+             : Math::Prime::Util::GMP::mulint($g_r, $F_r)
+            )
+          );
     }
 
-    my $s_obj = _set_int($s);
+    my $sum   = Math::Prime::Util::GMP::vecsum(@terms);
+    my $s_obj = bless \$s;
 
     $F_r = $F->($s_obj);
     $G_r = $G->($s_obj);
@@ -27340,8 +27350,8 @@ sub dirichlet_hyperbola {
     $F_r = $$F_r if ref($F_r);
     $G_r = $$G_r if ref($G_r);
 
-    $sum = __sub__($sum, __mul__($F_r, $G_r));
-    bless \$sum;
+    $sum = Math::Prime::Util::GMP::subint($sum, Math::Prime::Util::GMP::mulint($F_r, $G_r));
+    _set_int($sum);
 }
 
 *dirichlet_sum = \&dirichlet_hyperbola;
@@ -28653,7 +28663,7 @@ sub totient_sum {
     my $f = sub { $_[0]->ipow($k_obj) };
     my $g = sub { $_[0]->moebius };
 
-    my $F = sub { $_[0]->faulhaber_sum($k_obj) };
+    my $F = sub { _set_int(Math::Prime::Util::GMP::powersum(${$_[0]}, $k)) };
     my $G = sub { $_[0]->mertens };
 
     if ($k == 1) {
@@ -29610,7 +29620,7 @@ sub dedekind_psi_sum {
     my $g = sub { $_[0]->ipow($k_obj) };
 
     my $F = sub { $_[0]->squarefree_count };
-    my $G = sub { $_[0]->faulhaber_sum($k_obj) };
+    my $G = sub { _set_int(Math::Prime::Util::GMP::powersum(${$_[0]}, $k)) };
 
     if ($k == 0) {
         $g = sub { 1 };
@@ -30001,12 +30011,10 @@ sub usigma_sum {
     $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
     $n = _big2uistr($$n) // goto &nan;
 
-    my $k_obj = bless \$k;
-
-    my $f = sub { $_[0]->ipow($k_obj) };
+    my $f = sub { _set_int(Math::Prime::Util::GMP::powint(${$_[0]}, $k)) };
     my $g = sub { 1 };
 
-    my $F = sub { $_[0]->faulhaber_sum($k_obj) };
+    my $F = sub { _set_int(Math::Prime::Util::GMP::powersum(${$_[0]}, $k)) };
     my $G = sub { $_[0] };
 
     if ($k == 0) {
@@ -30415,19 +30423,29 @@ sub uphi_sum {
 
     my $s = Math::Prime::Util::GMP::sqrtint($n);
     my $P = HAS_PRIME_UTIL ? Math::Prime::Util::powerful_numbers(1, $n) : [map { $$_ } @{_set_int($n)->squarefull}];
-    my @F = (map { _squarefull_aux($_, $j) } @$P);
+
+    my @F = ();
     my @S = (0);
 
-    foreach my $i (0 .. $#F) {
-        $S[$i + 1] = $S[$i] + $F[$i];
+    foreach my $i (0 .. $#$P) {
+        my $k = $P->[$i];
+        my $t = _squarefull_aux($k, $j);
+        push(@F, $t) if !($k > $s);
+        push @S, HAS_PRIME_UTIL
+          ? Math::Prime::Util::GMP::addint($S[-1], $t)
+          : Math::Prime::Util::GMP::addint($S[-1], $t);
     }
 
     my $j_obj = bless \$j;
 
+    my $sc =
+      HAS_PRIME_UTIL
+      ? Math::Prime::Util::powerful_count($s)
+      : Math::Prime::Util::GMP::powerful_count($s);
+
     my @terms;
-    foreach my $i (0 .. $#$P) {
-        my $k = $P->[$i];
-        last if ($k > $s);
+    foreach my $i (0 .. $sc - 1) {
+        my $k  = $P->[$i];
         my $fk = $F[$i];
         push @terms, Math::Prime::Util::GMP::mulint($fk, ${_set_int(Math::Prime::Util::GMP::divint($n, $k))->phi_sum($j_obj)});
     }
@@ -30445,7 +30463,9 @@ sub uphi_sum {
           HAS_PRIME_UTIL
           ? Math::Prime::Util::jordan_totient($j, $k)
           : Math::Prime::Util::GMP::jordan_totient($j, $k);
-        push @terms, Math::Prime::Util::GMP::mulint($Jk, $S[$c]);
+        push @terms, HAS_PRIME_UTIL
+          ? Math::Prime::Util::mulint($Jk, $S[$c])
+          : Math::Prime::Util::GMP::mulint($Jk, $S[$c]);
     }
 
     my $A = Math::Prime::Util::GMP::vecsum(@terms);
@@ -31429,8 +31449,8 @@ sub sigma_sum {
     my $f = sub { $_[0]->ipow($k_obj) };
     my $g = sub { $_[0]->ipow($j_obj) };
 
-    my $F = sub { $_[0]->faulhaber_sum($k_obj) };
-    my $G = sub { $_[0]->faulhaber_sum($j_obj) };
+    my $F = sub { _set_int(Math::Prime::Util::GMP::powersum(${$_[0]}, $k)) };
+    my $G = sub { _set_int(Math::Prime::Util::GMP::powersum(${$_[0]}, $j)) };
 
     if ($k == 0) {
         $f = sub { 1 };
