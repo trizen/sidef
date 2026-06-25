@@ -14449,12 +14449,30 @@ sub faulhaber_sum {
 
     _valid(\$p);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $p = _any2ui($$p)     // goto &nan;
+    $p = $$p;
+
+    if (ref($p)) {
+        $p = _any2ui($p) // goto &nan;
+    }
 
     if ($p == 0) {
-        return _set_int($n);
+        return $n->max(ZERO);
     }
+    elsif ($p < 0) {
+        goto &nan;
+    }
+
+    $n = $$n;
+
+    if (FAST_MODE and !ref($n) and $n >= 0) {
+        if (HAS_PRIME_UTIL and $n**($p + 1) < ULONG_MAX) {
+            return _set_int(Math::Prime::Util::powersum($n, $p));
+        }
+        return _set_int(Math::Prime::Util::GMP::powersum($n, $p));
+    }
+
+    $n = _any2mpz($n, 0) // goto &nan;
+    Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
     if ($p == 1 or $p == 3) {
         state $r = Math::GMPz::Rmpz_init_nobless();
@@ -23764,29 +23782,23 @@ sub _prime_sum_mpz {
         return ZERO;
     }
 
-    my $r = Math::Prime::Util::GMP::sqrtint(Math::GMPz::Rmpz_get_str($n, 10));
+    my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
+    my $r     = Math::Prime::Util::GMP::sqrtint($n_str);
 
     goto &nan if ($r > ULONG_MAX);
 
-    my $t = Math::GMPz::Rmpz_init_set_ui(0);
+    state $t  = Math::GMPz::Rmpz_init_nobless();
     state $u  = Math::GMPz::Rmpz_init_nobless();
     state $p2 = Math::GMPz::Rmpz_init_nobless();
     state $ip = Math::GMPz::Rmpz_init_nobless();
-
-    my $t_obj = bless \$t;
-    my $k_obj = _set_int($k);
 
     my @S_small = (0);
     my @S_large = (0);
 
     for my $i (1 .. $r) {
-        Math::GMPz::Rmpz_tdiv_q_ui($t, $n, $i);
-        push @S_large, _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
-    }
-
-    for my $v (1 .. $r) {
-        Math::GMPz::Rmpz_set_ui($t, $v);
-        push @S_small, _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
+        my $q = Math::Prime::Util::GMP::divint($n_str, $i);
+        push @S_large, Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::powersum($q, $k), 10);
+        push @S_small, Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::powersum($i, $k), 10);
     }
 
     my ($target, $max_i);
@@ -23842,23 +23854,15 @@ sub _prime_sum_native {
 
     goto &nan if ($r > ULONG_MAX);
 
-    my $t = Math::GMPz::Rmpz_init_set_ui(0);
+    state $t = Math::GMPz::Rmpz_init_nobless();
     state $u = Math::GMPz::Rmpz_init_nobless();
-
-    my $t_obj = bless \$t;
-    my $k_obj = _set_int($k);
 
     my @S_small = (0);
     my @S_large = (0);
 
     for my $i (1 .. $r) {
-        Math::GMPz::Rmpz_set_ui($t, CORE::int($n / $i));
-        push @S_large, _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
-    }
-
-    for my $v (1 .. $r) {
-        Math::GMPz::Rmpz_set_ui($t, $v);
-        push @S_small, _any2mpz(${$t_obj->faulhaber_sum($k_obj)});
+        push @S_large, Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::powersum(CORE::int($n / $i), $k), 10);
+        push @S_small, Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::powersum($i,                 $k), 10);
     }
 
     my ($target, $max_i, $p2, $ip, $cp);
@@ -28640,7 +28644,8 @@ sub totient_sum {
     $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
     if (HAS_PRIME_UTIL and $k == 1) {
-        return _set_int(Math::Prime::Util::sumtotient($$n));
+        $n = _big2uistr($$n) // return ZERO;
+        return _set_int(Math::Prime::Util::sumtotient($n));
     }
 
     my $k_obj = bless \$k;
@@ -30414,7 +30419,7 @@ sub uphi_sum {
     my @S = (0);
 
     foreach my $i (0 .. $#F) {
-        $S[$i+1] = $S[$i] + $F[$i];
+        $S[$i + 1] = $S[$i] + $F[$i];
     }
 
     my $j_obj = bless \$j;
@@ -36815,10 +36820,12 @@ sub perfect_power_sum {
     my $t = Math::GMPz::Rmpz_init();
     my $r = Math::GMPz::Rmpz_init_set_ui(0);
 
+    my $t_obj = bless \$t;
+
     foreach my $k (2 .. __ilog__($n, 2)) {
         my $mu = (HAS_PRIME_UTIL ? Math::Prime::Util::moebius($k) : Math::Prime::Util::GMP::moebius($k)) || next;
         Math::GMPz::Rmpz_root($t, $n, $k);
-        my $f = ${(bless \$t)->faulhaber_sum(bless \$k)} - 1;
+        my $f = ${$t_obj->faulhaber_sum(bless \$k)} - 1;
         if (ref($f)) {
             ($mu == 1)
               ? Math::GMPz::Rmpz_add($r, $r, $f)
@@ -37004,6 +37011,8 @@ sub powerful_sum {    # sum of k-powerful numbers
     my $t   = Math::GMPz::Rmpz_init();
     my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
+    my $t_obj = bless \$t;
+
     sub {
         my ($m, $r) = @_;
 
@@ -37011,7 +37020,7 @@ sub powerful_sum {    # sum of k-powerful numbers
         Math::GMPz::Rmpz_root($t, $t, $r);
 
         if ($r <= $k) {
-            my $w = ${(bless \$t)->faulhaber_sum(bless \$r)};
+            my $w = ${$t_obj->faulhaber_sum(bless \$r)};
             if (ref($w) eq 'Math::GMPz') {
                 Math::GMPz::Rmpz_addmul($sum, $m, $w);
             }
