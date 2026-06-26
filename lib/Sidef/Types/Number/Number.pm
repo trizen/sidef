@@ -28095,32 +28095,14 @@ sub prime_power_udivisors {
     foreach my $pe (_factor_exp($n)) {
         my ($p, $e) = @$pe;
 
-        my $pp;
+        my $pp = Math::GMPz::Rmpz_init();
 
-        if ($e <= 2) {    # p^e where e <= 2
-
-            if (FAST_MODE and $p < ULONG_MAX) {
-                $pp = Math::GMPz::Rmpz_init_set_ui($p);
-            }
-            else {
-                $pp = Math::GMPz::Rmpz_init_set_str("$p", 10);
-            }
-
-            if ($e == 2) {
-                Math::GMPz::Rmpz_mul($pp, $pp, $pp);
-            }
+        if (FAST_MODE and $p < ULONG_MAX) {
+            Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
         }
-        else {    # p^e where e >= 3
-
-            $pp = Math::GMPz::Rmpz_init();
-
-            if (FAST_MODE and $p < ULONG_MAX) {
-                Math::GMPz::Rmpz_ui_pow_ui($pp, $p, $e);
-            }
-            else {
-                Math::GMPz::Rmpz_set_str($pp, $p, 10);
-                Math::GMPz::Rmpz_pow_ui($pp, $pp, $e);
-            }
+        else {
+            Math::GMPz::Rmpz_set_str($pp, "$p", 10);
+            Math::GMPz::Rmpz_pow_ui($pp, $pp, $e) if ($e > 1);
         }
 
         push @d, $pp;
@@ -28147,7 +28129,7 @@ sub powerfree_divisors {
         return _array([ONE]);
     }
 
-    my $r = Math::GMPz::Rmpz_init();
+    state $r = Math::GMPz::Rmpz_init_nobless();
 
     my @d;
     foreach my $pe (_factor_exp($n)) {
@@ -28202,8 +28184,8 @@ sub powerful_divisors {
     $n = _big2pistr($$n) // return _array();
     $k = _any2ui($$k) || return _array();
 
-    my $r = Math::GMPz::Rmpz_init();
-    my $p = Math::GMPz::Rmpz_init();
+    state $r = Math::GMPz::Rmpz_init_nobless();
+    state $p = Math::GMPz::Rmpz_init_nobless();
 
     my @d;
     foreach my $pe (_factor_exp($n)) {
@@ -28250,8 +28232,8 @@ sub powerful_udivisors {
     $n = _big2pistr($$n) // return _array();
     $k = _any2ui($$k) || return _array();
 
-    my $r = Math::GMPz::Rmpz_init();
-    my $p = Math::GMPz::Rmpz_init();
+    state $r = Math::GMPz::Rmpz_init_nobless();
+    state $p = Math::GMPz::Rmpz_init_nobless();
     my @d;
 
     foreach my $pe (_factor_exp($n)) {
@@ -28289,9 +28271,15 @@ sub squarefull_udivisors {
     (TWO)->powerful_udivisors($_[0]);
 }
 
+*squarefull_unitary_divisors = \&squarefull_udivisors;
+*unitary_squarefull_divisors = \&squarefull_udivisors;
+
 sub cubefull_udivisors {
     (THREE)->powerful_udivisors($_[0]);
 }
+
+*cubefull_unitary_divisors = \&cubefull_udivisors;
+*unitary_cubefull_divisors = \&cubefull_udivisors;
 
 my $power_divisors_func = sub {
     my ($k, $factor_exp) = @_;
@@ -31115,6 +31103,91 @@ sub squarefull_sigma {
 
 sub cubefull_sigma {
     (THREE)->powerful_sigma($_[0], $_[1]);
+}
+
+sub powerful_usigma0 {
+    my ($k, $n) = @_;
+
+    # Multiplicative with:
+    #   a(p^e) = 1 if e < k
+    #   a(p^e) = 2 if e >= k
+
+    _valid(\$n);
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $n = _big2uistr($$n) // goto &nan;
+    $k > 0 or return ZERO;
+    $n eq '0' and return ZERO;
+
+    # Each prime power with e >= k contributes exactly a factor of 2
+    _set_int(Math::Prime::Util::GMP::powint(2, scalar grep { $_->[1] >= $k } _factor_exp($n)));
+}
+
+sub powerful_usigma {
+    my ($k, $n, $j) = @_;
+
+    # Multiplicative with:
+    #   a(p^e, k, j) = 1 if e < k
+    #   a(p^e, k, j) = p^(j*e) + 1 if e >= k
+
+    _valid(\$n);
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+    $k > 0 or return ZERO;
+
+    if ($j == 0) {
+        goto &powerful_usigma0;
+    }
+
+    $n = _big2uistr($$n) // goto &nan;
+    $n eq '0' and return ZERO;
+
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    state $u = Math::GMPz::Rmpz_init_nobless();
+    my @terms;
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($p, $e) = @$pe;
+        next if ($e < $k);
+
+        # Compute t = p^j
+        if (FAST_MODE and $p < ULONG_MAX) {
+            Math::GMPz::Rmpz_ui_pow_ui($t, $p, $j);
+        }
+        else {
+            Math::GMPz::Rmpz_set_str($t, $p, 10);
+            Math::GMPz::Rmpz_pow_ui($t, $t, $j) if ($j > 1);
+        }
+
+        # Compute: p^(j*e) + 1  =>  (p^j)^e + 1  =>  t^e + 1
+        Math::GMPz::Rmpz_pow_ui($u, $t, $e);    # u = t^e
+        Math::GMPz::Rmpz_add_ui($u, $u, 1);     # u = u + 1
+
+        push @terms,
+          (
+              Math::GMPz::Rmpz_fits_ulong_p($u)
+            ? Math::GMPz::Rmpz_get_ui($u)
+            : Math::GMPz::Rmpz_init_set($u)
+          );
+    }
+
+    @terms || return ONE;
+    bless \_binsplit(\@terms, \&__mul__);
+}
+
+sub squarefull_usigma0 {
+    (TWO)->powerful_usigma0($_[0]);
+}
+
+sub cubefull_usigma0 {
+    (THREE)->powerful_usigma0($_[0]);
+}
+
+sub squarefull_usigma {
+    (TWO)->powerful_usigma($_[0], $_[1]);
+}
+
+sub cubefull_usigma {
+    (THREE)->powerful_usigma($_[0], $_[1]);
 }
 
 sub powerfree_sigma0 {

@@ -2225,6 +2225,22 @@ Count of the cubefull (3-powerful) divisors of C<n>.
 
 =cut
 
+=head2 cubefull_usigma
+
+    cubefull_usigma(n, j=1)
+
+Sum of the unitary cubefull (3-powerful) divisors of C<n>, each divisor raised to the power C<j>.
+
+=cut
+
+=head2 cubefull_usigma0
+
+    cubefull_usigma0(n)
+
+Count of the unitary cubefull (3-powerful) divisors of C<n>.
+
+=cut
+
 =head2 cubefull_count
 
     cubefull_count(n)
@@ -7903,9 +7919,28 @@ Sum of the k-powerful divisors of C<n>, each divisor raised to the power C<j>.
 
 =head2 powerful_sigma0
 
-    k.powerful_sigma0
+    k.powerful_sigma0(n)
 
 Count the number of k-powerful divisors of C<n>.
+
+=cut
+
+=head2 powerful_usigma
+
+    k.powerful_usigma(n, j=1)
+
+Sum of the unitary k-powerful divisors of C<n>, each divisor raised to the power C<j>.
+
+    say 30.of{|n| 2.powerful_usigma(n) }    # OEIS: A360720
+    say 30.of{|n| 3.powerful_usigma(n) }    # OEIS: A385048
+
+=cut
+
+=head2 powerful_usigma0
+
+    k.powerful_usigma0(n)
+
+Count the number of unitary k-powerful divisors of C<n>.
 
 =cut
 
@@ -10043,6 +10078,22 @@ Sum of the squarefull (2-powerful) divisors of C<n>, each divisor raised to the 
     squarefull_sigma0(n)
 
 Count of the squarefull (2-powerful) divisors of C<n>.
+
+=cut
+
+=head2 squarefull_usigma
+
+    squarefull_usigma(n, j=1)
+
+Sum of the unitary squarefull (2-powerful) divisors of C<n>, each divisor raised to the power C<j>.
+
+=cut
+
+=head2 squarefull_usigma0
+
+    squarefull_usigma0(n)
+
+Count of the unitary squarefull (2-powerful) divisors of C<n>.
 
 =cut
 
