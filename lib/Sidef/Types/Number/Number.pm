@@ -28244,6 +28244,55 @@ sub cubefull_divisors {
     (THREE)->powerful_divisors($_[0]);
 }
 
+sub powerful_udivisors {
+    my ($k, $n) = @_;
+    _valid(\$n);
+    $n = _big2pistr($$n) // return _array();
+    $k = _any2ui($$k) || return _array();
+
+    my $r = Math::GMPz::Rmpz_init();
+    my $p = Math::GMPz::Rmpz_init();
+    my @d;
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        next if ($e < $k);    # cannot be k-powerful if e < k
+
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        Math::GMPz::Rmpz_pow_ui($r, $p, $e);
+
+        my @t;
+        foreach my $d (@d) {
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($t, $r, $d);
+            push @t, $t;
+        }
+        push @t, Math::GMPz::Rmpz_init_set($r);
+        push @d, @t;
+    }
+
+    @d = sort { Math::GMPz::Rmpz_cmp($a, $b) } @d;
+    @d = map  { bless \$_ } @d;
+    unshift @d, ONE;
+
+    _array(\@d);
+}
+
+*unitary_powerful_divisors = \&powerful_udivisors;
+*powerful_unitary_divisors = \&powerful_udivisors;
+
+sub squarefull_udivisors {
+    (TWO)->powerful_udivisors($_[0]);
+}
+
+sub cubefull_udivisors {
+    (THREE)->powerful_udivisors($_[0]);
+}
+
 my $power_divisors_func = sub {
     my ($k, $factor_exp) = @_;
 

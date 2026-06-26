@@ -2201,6 +2201,14 @@ Return an array with the cubefull (3-powerful) divisors of C<n>.
 
 =cut
 
+=head2 cubefull_udivisors
+
+    cubefull_udivisors(n)
+
+Return an array with the unitary cubefull (3-powerful) divisors of C<n>.
+
+=cut
+
 =head2 cubefull_sigma
 
     cubefull_sigma(n, j=1)
@@ -7872,6 +7880,16 @@ Returns an array with the k-powerful divisors of C<n>.
 
 =cut
 
+=head2 powerful_udivisors
+
+    k.powerful_udivisors(n)
+
+Returns an array with the unitary k-powerful divisors of C<n>.
+
+Aliases: I<unitary_powerful_divisors>, I<powerful_unitary_divisors>
+
+=cut
+
 =head2 powerful_sigma
 
     k.powerful_sigma(n, j=1)
@@ -10001,6 +10019,14 @@ Largest divisor of C<n> that is a squarefull (2-powerful) number. (L<OEIS A05752
     squarefull_divisors(n)
 
 Return an array with the squarefull (2-powerful) divisors of C<n>.
+
+=cut
+
+=head2 squarefull_udivisors
+
+    squarefull_udivisors(n)
+
+Return an array with the unitary squarefull (2-powerful) divisors of C<n>.
 
 =cut
 
