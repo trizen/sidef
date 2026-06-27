@@ -30076,9 +30076,8 @@ sub usigma_sum {
               : Math::Prime::Util::GMP::powersum($x_div_i, $k);
 
             my $ik = ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
-            push @terms, (HAS_PRIME_UTIL and $k <= 2)
-              ? Math::Prime::Util::mulint($ik, $x_div_i)
-              : Math::Prime::Util::GMP::mulint($ik, $x_div_i);
+            push @terms, $ik * $x_div_i;
+            $terms[-1] = Math::Prime::Util::GMP::mulint($ik, $x_div_i) if ($terms[-1] > ULONG_MAX);
         }
 
         my $total = Math::Prime::Util::GMP::vecsum(@terms);
