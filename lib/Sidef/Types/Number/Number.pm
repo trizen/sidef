@@ -30043,66 +30043,93 @@ sub usigma {
 sub usigma_sum {
     my ($n, $k) = @_;
 
-    # usigma_sum(n,k) = Sum_{d=1..floor(sqrt(n))} d^k * mu(d) * sigma_sum(floor(n/d^2), k)
-
     $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
     $n = _big2uistr($$n) // goto &nan;
 
-    my $f = sub { _set_int(Math::Prime::Util::GMP::powint(${$_[0]}, $k)) };
-    my $g = sub { 1 };
+    # Fast sublinear path for k=0: sum_{i=1..n} 2^omega(i)
+    if (HAS_PRIME_UTIL and $k == 0) {
+        return _set_int($n)->exp_omega_sum(TWO);
+    }
 
-    my $F = sub { _set_int(Math::Prime::Util::GMP::powersum(${$_[0]}, $k)) };
-    my $G = sub { $_[0] };
+    # Explicit inline closure for sigma_sum
+    my $sigma_sum = sub {
+        my ($x)   = @_;
+        my $total = 0;
+        my $sx    = Math::Prime::Util::GMP::sqrtint($x);
 
-    if ($k == 0) {
-
-        if (HAS_PRIME_UTIL) {
-            return _set_int($n)->exp_omega_sum(TWO);
+        if ($k == 0) {
+            for my $i (1 .. $sx) {
+                $total = Math::Prime::Util::GMP::addint($total, Math::Prime::Util::GMP::divint($x, $i));
+            }
+            return Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::mulint(2, $total), Math::Prime::Util::GMP::mulint($sx, $sx));
         }
 
-        $f = sub { 1 };
-        $g = sub { 1 };
-        $F = sub { $_[0] };
-        $G = sub { $_[0] };
-    }
-    elsif ($k == 1) {
-        $f = sub { $_[0] };
-    }
-    elsif ($k == 2) {
-        $f = sub { $_[0]->sqr };
-    }
+        for my $i (1 .. $sx) {
+            my $x_div_i = Math::Prime::Util::GMP::divint($x, $i);
+            $total = Math::Prime::Util::GMP::addint($total, Math::Prime::Util::GMP::powersum($x_div_i, $k));
 
-    my $sum    = 0;
-    my $prev   = 0;
-    my $prev_S = 0;
+            my $ik = ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
+            $total = Math::Prime::Util::GMP::addint($total, Math::Prime::Util::GMP::mulint($ik, $x_div_i));
+        }
 
-    my $s = Math::Prime::Util::GMP::sqrtint($n);
+        return Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sx, Math::Prime::Util::GMP::powersum($sx, $k)));
+    };
+
+    my $s  = Math::Prime::Util::GMP::sqrtint($n);
+    my $ss = Math::Prime::Util::GMP::sqrtint($s);
+
+    my @M = (0);
+    my @F = (0);
 
     my @moebius =
       HAS_PRIME_UTIL
       ? Math::Prime::Util::moebius(0, $s)
       : Math::Prime::Util::GMP::moebius(0, $s);
 
-    foreach my $d (1 .. $s) {
+    # Precompute F(i) = mu(i) * i^k and its prefix sums M(i)
+    for my $i (1 .. $s) {
+        my $mu = $moebius[$i];
 
-        my $mu = $moebius[$d] || next;
-
-        my $d2   = Math::Prime::Util::GMP::mulint($d, $d);
-        my $nod2 = Math::Prime::Util::GMP::divint($n, $d2);
-
-        my $dk = ($k == 1) ? $d : ($k == 2) ? $d2 : Math::Prime::Util::GMP::powint($d, $k);
-        my $S  = ($prev eq $nod2) ? $prev_S : ${_set_int($nod2)->dirichlet_hyperbola($f, $g, $F, $G)};
-
-        $dk  = "-$dk" if ($mu == -1);
-        $sum = Math::Prime::Util::GMP::addint($sum, Math::Prime::Util::GMP::mulint($dk, $S));
-
-        if ($prev ne $nod2) {
-            $prev   = $nod2;
-            $prev_S = $S;
+        if ($mu == 0) {
+            push @F, 0;
+            push @M, $M[-1];
+            next;
         }
+
+        my $ik = ($k == 0) ? 1 : ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
+        my $t  = $mu == -1 ? "-$ik" : $ik;
+
+        push @F, $t;
+        push @M, Math::Prime::Util::GMP::addint($M[-1], $t);
     }
 
-    _set_int($sum);
+    # Compute Part A: Sum_{i=1..ss} F[i] * sigma_sum(floor(n / i^2), k)
+    my $A = 0;
+    for my $i (1 .. $ss) {
+        $F[$i] || next;
+
+        my $i2   = Math::Prime::Util::GMP::mulint($i, $i);
+        my $nod2 = Math::Prime::Util::GMP::divint($n, $i2);
+
+        $A = Math::Prime::Util::GMP::addint($A, Math::Prime::Util::GMP::mulint($F[$i], $sigma_sum->($nod2)));
+    }
+
+    # Compute Part B: Sum_{i=1..s} sigma_k(i) * M[floor(sqrt(floor(n / i)))]
+    my $B = 0;
+    for my $i (1 .. $s) {
+        my $div_sum =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divisor_sum($i, $k)
+          : Math::Prime::Util::GMP::sigma($i, $k);
+
+        my $m_idx = Math::Prime::Util::GMP::sqrtint(Math::Prime::Util::GMP::divint($n, $i));
+        $B = Math::Prime::Util::GMP::addint($B, Math::Prime::Util::GMP::mulint($div_sum, $M[$m_idx]));
+    }
+
+    # Final result: A + B - sigma_sum(s, k) * M[ss]
+    my $total = Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::addint($A, $B), Math::Prime::Util::GMP::mulint($sigma_sum->($s), $M[$ss]));
+
+    _set_int($total);
 }
 
 sub usigma0_sum {
