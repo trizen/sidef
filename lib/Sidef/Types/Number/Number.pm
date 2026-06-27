@@ -30449,7 +30449,7 @@ sub uphi {    # OEIS: A047994
     bless \_binsplit(\@terms, \&__mul__);
 }
 
-sub _squarefull_aux {
+sub _squarefull_aux {    # OEIS: A396336
     my ($n, $k) = @_;
 
     if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
@@ -30491,27 +30491,19 @@ sub uphi_sum {
     my @F = ();
     my @S = (0);
 
-    foreach my $i (0 .. $#$P) {
-        my $k = $P->[$i];
+    foreach my $k (@$P) {
         my $t = _squarefull_aux($k, $j);
         push(@F, $t) if !($k > $s);
         push @S, HAS_PRIME_UTIL
-          ? Math::Prime::Util::GMP::addint($S[-1], $t)
+          ? Math::Prime::Util::addint($S[-1], $t)
           : Math::Prime::Util::GMP::addint($S[-1], $t);
     }
 
     my $j_obj = bless \$j;
 
-    my $sc =
-      HAS_PRIME_UTIL
-      ? Math::Prime::Util::powerful_count($s)
-      : Math::Prime::Util::GMP::powerful_count($s);
-
     my @terms;
-    foreach my $i (0 .. $sc - 1) {
-        my $k  = $P->[$i];
-        my $fk = $F[$i];
-        push @terms, Math::Prime::Util::GMP::mulint($fk, ${_set_int(Math::Prime::Util::GMP::divint($n, $k))->phi_sum($j_obj)});
+    foreach my $i (0 .. $#F) {
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], ${_set_int(Math::Prime::Util::GMP::divint($n, $P->[$i]))->phi_sum($j_obj)});
     }
 
     foreach my $k (1 .. $s) {
