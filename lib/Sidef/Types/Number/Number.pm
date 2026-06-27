@@ -30139,7 +30139,7 @@ sub usigma_sum {
     my $total = Math::Prime::Util::GMP::vecsum(@terms);
 
     # Final result: A + B - sigma_sum(s, k) * M[ss]
-    my $total = Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sigma_sum->($s), $M[$ss]));
+    $total = Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sigma_sum->($s), $M[$ss]));
 
     _set_int($total);
 }
