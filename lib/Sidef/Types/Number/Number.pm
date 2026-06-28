@@ -30541,15 +30541,14 @@ sub uphi_sum {
     _set_int(Math::Prime::Util::GMP::subint($A, $B));
 }
 
-sub nuphi {    # OEIS: A254503
-    my ($n) = @_;
-
-    # TODO: generalize for k > 1.
+sub nuphi {    # OEIS: A254503 (Generalized for k)
+    my ($n, $k) = @_;
 
     # Multiplicative with:
-    #   a(p) = p
-    #   a(p^e) = phi(p^e) = (p-1) * p^(e-1), for e > 1.
+    #   a(p, k) = p^k
+    #   a(p^e, k) = J_k(p^e) = (p^k - 1) * p^(k*(e-1)), for e > 1.
 
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
     $n = $$n;
 
     if (ref($n)) {
@@ -30570,21 +30569,41 @@ sub nuphi {    # OEIS: A254503
 
         if (FAST_MODE and $p < ULONG_MAX) {
 
-            if ($e == 1) {
+            if ($e == 1 and $k == 1) {    # Optimization for e=1, k=1
                 push @terms, $p;
                 next;
             }
 
-            Math::GMPz::Rmpz_ui_pow_ui($t, $p, $e - 1);
-            Math::GMPz::Rmpz_mul_ui($t, $t, $p - 1);
+            if ($e == 1) {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k);
+            }
+            else {
+                Math::GMPz::Rmpz_ui_pow_ui($t, $p, $k * ($e - 1));
+                if ($k == 1) {
+                    Math::GMPz::Rmpz_mul_ui($t, $t, $p - 1);
+                }
+                else {
+                    Math::GMPz::Rmpz_ui_pow_ui($u, $p, $k);
+                    Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+                    Math::GMPz::Rmpz_mul($t, $t, $u);
+                }
+            }
         }
         elsif ($e == 1) {
             Math::GMPz::Rmpz_set_str($t, "$p", 10);
+            Math::GMPz::Rmpz_pow_ui($t, $t, $k) if $k > 1;
         }
         else {
             Math::GMPz::Rmpz_set_str($u, "$p", 10);
-            Math::GMPz::Rmpz_pow_ui($t, $u, $e - 1);
-            Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            Math::GMPz::Rmpz_pow_ui($t, $u, $k * ($e - 1));
+
+            if ($k == 1) {
+                Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            }
+            else {
+                Math::GMPz::Rmpz_pow_ui($u, $u, $k);
+                Math::GMPz::Rmpz_sub_ui($u, $u, 1);
+            }
             Math::GMPz::Rmpz_mul($t, $t, $u);
         }
 
