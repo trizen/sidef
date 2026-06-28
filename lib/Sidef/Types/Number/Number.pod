@@ -7103,9 +7103,19 @@ Although this may or may not be actually faster.
 
 =head2 nuphi
 
-    nuphi(n)
+    nuphi(n, k=1)
 
-The nonunitary totient function. (L<OEIS A254503|https://oeis.org/A254503>)
+The generalized nonunitary totient function (also called C<nphi>). (L<OEIS A254503|https://oeis.org/A254503>)
+
+Multiplicative with:
+
+       a(p, k) = p^k
+       a(p^e, k) = J_k(p^e) = (p^k - 1) * p^(k*(e-1)), for e > 1.
+
+Example:
+
+    say 30.of { .nuphi }        # OEIS: A254503
+    say 30.of { .nuphi(2) }     # OEIS: A254520
 
 =cut
 
