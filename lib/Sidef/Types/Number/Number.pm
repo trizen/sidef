@@ -6346,6 +6346,17 @@ sub bernoulli_polynomial {
         }
     }
 
+    if (!$polynomial and __eq__($x, 0)) {
+        return _set_int($n)->bernfrac;
+    }
+    elsif (!$polynomial and __eq__($x, 1)) {
+        if ($n == 1) {
+            state $r = _str2obj('1/2');
+            return bless \$r;
+        }
+        return _set_int($n)->bernfrac;
+    }
+
     my @B = _bernoulli_numbers($n);
 
     my $u = $n + 1;
@@ -6389,8 +6400,7 @@ sub bernfrac {
     }
 
     if ($n == 1) {
-        my $q = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set_ui($q, 1, 2);
+        state $q = _str2obj('-1/2');
         return bless \$q;
     }
 

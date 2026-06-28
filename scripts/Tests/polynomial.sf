@@ -4,7 +4,7 @@
 
 func faulhaber_formula(p) {
     (p+1).of { |j|
-        Poly(p - j + 1) * bernoulli(j) * binomial(p+1, j)
+        Poly(p - j + 1) * bernoulli(j, 1) * binomial(p+1, j)
     }.sum / (p+1)
 }
 

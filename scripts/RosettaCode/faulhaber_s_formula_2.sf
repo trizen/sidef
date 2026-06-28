@@ -7,7 +7,7 @@
 func faulhaber_s_formula(p) {
     "1/#{p + 1} * (" + gather {
       { |j|
-         take "#{binomial(p+1, j) * j.bernfrac -> as_rat}*n^#{p+1 - j}"
+         take "#{binomial(p+1, j) * bern(j,1) -> as_rat}*n^#{p+1 - j}"
       } << 0..p
     }.join(' + ') + ")"
 }

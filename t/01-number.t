@@ -18,8 +18,8 @@ sub re($) {
 
 my $o = 'Sidef::Types::Number::Number';
 
-my $zero = $o->new(0);
-my $one  = $o->new(1);
+my $zero = $o->new( 0);
+my $one  = $o->new( 1);
 my $mone = $o->new(-1);
 
 {
@@ -222,7 +222,7 @@ my $mone = $o->new(-1);
 {
     my %results = qw(
       0   1
-      1   1/2
+      1   -1/2
       2   1/6
       3   0
       4   -1/30
@@ -253,9 +253,9 @@ my $mone = $o->new(-1);
     my $r = $o->new(10);
     is("${\($o->new(-2)->bernreal)}", "NaN");    # check negative values
 
-    is($o->new(1)->bernreal->get_value,                0.5);
-    is($o->new(0)->bernreal->get_value,                1);
-    is($o->new(3)->bernreal->get_value,                0);
+    is($o->new(1)->bernreal->get_value,                -0.5);
+    is($o->new(0)->bernreal->get_value,                 1);
+    is($o->new(3)->bernreal->get_value,                 0);
     is($o->new(2)->bernreal->as_float($r)->get_value,  '0.1666666667');
     is($o->new(52)->bernreal->as_float($r)->get_value, '-5.038778101e26');
 }

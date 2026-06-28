@@ -8,7 +8,7 @@ func Rational(a,b) {
 }
 
 assert(bernoulli(0) == 1)
-assert(bernoulli(1) == Rational(1, 2))
+assert(bernoulli(1) == Rational(-1, 2))
 assert(bernoulli(2) == Rational(1, 6))
 assert(bernoulli(3) == 0)
 assert(bernoulli(4) == Rational(-1, 30))
@@ -68,7 +68,7 @@ func genocchi(n) {
     2 * (1 - 2**n) * bernoulli(n)
 }
 
-assert_eq(9.of(genocchi), %n[0, -1, -1, 0, 1, 0, -3, 0, 17])
+assert_eq(9.of(genocchi), %n[0, 1, -1, 0, 1, 0, -3, 0, 17])
 
 with (Poly(1)) {|x|
     assert(genocchi(0, x) == 0)

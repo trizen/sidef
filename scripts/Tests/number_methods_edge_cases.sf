@@ -504,7 +504,7 @@ assert_eq(stirling2(5, 2), 15)
 
 # Tests for bernoulli/euler numbers edge cases
 assert_eq(bernoulli(0), 1)
-assert_eq(bernoulli(1), 1/2)
+assert_eq(bernoulli(1), -1/2)
 assert_eq(bernoulli(2), 1/6)
 assert_eq(euler_number(0), 1)
 assert_eq(euler_number(2), -1)
