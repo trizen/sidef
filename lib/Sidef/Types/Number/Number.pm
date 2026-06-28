@@ -6625,98 +6625,291 @@ sub tangent_number {
     bless \$r;
 }
 
-# TODO: add support for an optional argument and return B_n(x)
 sub bernreal {
-    my ($n) = @_;
+    my ($n_ref, $x_ref) = @_;
 
-    $n = _any2ui($$n) // goto &nan;
+    my $n = _any2ui($$n_ref) // goto &nan;
 
-    # |B(n)| = zeta(n) * n! / 2^(n-1) / pi^n
+    # Fast O(1) path for Bernoulli number B_n (when x is omitted)
+    if (!defined($x_ref)) {
+        $n == 0 and return ONE;
+        $n == 1 and return do {
+            my $half = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            Math::MPFR::Rmpfr_set_d($half, -0.5, $ROUND);
+            bless \$half;
+        };
+        $n % 2 and return ZERO;    # B_n = 0 for odd n > 1
 
-    $n == 0 and return ONE;
-    $n == 1 and return do { state $x = bless(\_str2obj('1/2')) };
-    $n % 2  and return ZERO;                                        # Bn = 0 for odd n>1
+        my $B_n = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $t   = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
-    #local $PREC = CORE::int($n*CORE::log($n)+1);
+        Math::MPFR::Rmpfr_zeta_ui($B_n, $n, $ROUND);      # zeta(n)
+        Math::MPFR::Rmpfr_set_ui($t, $n + 1, $ROUND);
+        Math::MPFR::Rmpfr_gamma($t, $t, $ROUND);          # gamma(n+1) = n!
+        Math::MPFR::Rmpfr_mul($B_n, $B_n, $t, $ROUND);    # zeta(n) * n!
 
-    my $f = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    my $p = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_const_pi($t, $ROUND);           # pi
+        Math::MPFR::Rmpfr_mul_ui($t, $t, 2, $ROUND);      # 2*pi
+        Math::MPFR::Rmpfr_pow_ui($t, $t, $n, $ROUND);     # (2*pi)^n
 
-    Math::MPFR::Rmpfr_zeta_ui($f, $n, $ROUND);                      # f = zeta(n)
-    Math::MPFR::Rmpfr_set_ui($p, $n + 1, $ROUND);                   # p = n+1
-    Math::MPFR::Rmpfr_gamma($p, $p, $ROUND);                        # p = gamma(p)
+        Math::MPFR::Rmpfr_div($B_n, $B_n, $t, $ROUND);    # (zeta(n)*n!) / (2*pi)^n
+        Math::MPFR::Rmpfr_mul_ui($B_n, $B_n, 2, $ROUND);  # 2 * ...
 
-    Math::MPFR::Rmpfr_mul($f, $f, $p, $ROUND);                      # f = f * p
+        Math::MPFR::Rmpfr_neg($B_n, $B_n, $ROUND) if $n % 4 == 0;
 
-    Math::MPFR::Rmpfr_const_pi($p, $ROUND);                         # p = PI
-    Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND);                   # p = p^n
+        return bless \$B_n;
+    }
 
-    Math::MPFR::Rmpfr_div_2ui($f, $f, $n - 1, $ROUND);              # f = f / 2^(n-1)
+    # Evaluate Bernoulli Polynomial B_n(x)
+    my $x_fr = _any2mpfr($$x_ref) // goto &nan;
 
-    Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);                      # f = f/p
-    Math::MPFR::Rmpfr_neg($f, $f, $ROUND) if $n % 4 == 0;
+    my $sum  = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    my $term = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    my $B_j  = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    my $t    = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    my $z    = Math::GMPz::Rmpz_init();
 
-    bless \$f;
+    Math::MPFR::Rmpfr_set_ui($sum, 0, $ROUND);
+
+    foreach my $j (0 .. $n) {
+        if ($j == 0) {
+            Math::MPFR::Rmpfr_set_ui($B_j, 1, $ROUND);
+        }
+        elsif ($j == 1) {
+            Math::MPFR::Rmpfr_set_d($B_j, -0.5, $ROUND);
+        }
+        elsif ($j % 2 != 0) {
+            next;    # B_j = 0 for odd j > 1
+        }
+        else {
+            # Compute B_j using Zeta and Gamma
+            Math::MPFR::Rmpfr_zeta_ui($B_j, $j, $ROUND);    # zeta(j)
+            Math::MPFR::Rmpfr_set_ui($t, $j + 1, $ROUND);
+            Math::MPFR::Rmpfr_gamma($t, $t, $ROUND);        # gamma(j+1)
+            Math::MPFR::Rmpfr_mul($B_j, $B_j, $t, $ROUND);
+
+            Math::MPFR::Rmpfr_const_pi($t, $ROUND);
+            Math::MPFR::Rmpfr_mul_ui($t, $t, 2, $ROUND);
+            Math::MPFR::Rmpfr_pow_ui($t, $t, $j, $ROUND);    # (2*pi)^j
+
+            Math::MPFR::Rmpfr_div($B_j, $B_j, $t, $ROUND);
+            Math::MPFR::Rmpfr_mul_ui($B_j, $B_j, 2, $ROUND);
+            Math::MPFR::Rmpfr_neg($B_j, $B_j, $ROUND) if $j % 4 == 0;
+        }
+
+        # term = binom(n, j) * B_j
+        Math::GMPz::Rmpz_bin_uiui($z, $n, $j);
+        Math::MPFR::Rmpfr_mul_z($term, $B_j, $z, $ROUND);
+
+        # term *= x^(n-j)
+        if ($n - $j > 0) {
+            Math::MPFR::Rmpfr_pow_ui($t, $x_fr, $n - $j, $ROUND);
+            Math::MPFR::Rmpfr_mul($term, $term, $t, $ROUND);
+        }
+
+        Math::MPFR::Rmpfr_add($sum, $sum, $term, $ROUND);
+    }
+
+    return bless \$sum;
 }
 
-# TODO: add support for an optional argument and return log(B_n(x))
 sub lnbernreal {
-    my ($n) = @_;
+    my ($n_ref, $x_ref) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    # Fast O(1) path for ln(B_n) when x is omitted
+    if (!defined($x_ref)) {
+        my $n = _any2mpz($$n_ref, 0) // goto &nan;
+        (Math::GMPz::Rmpz_sgn($n) || return ZERO) < 0 and goto &nan;
 
-    # log(|B(n)|) = (1 - n)*log(2) - n*log(π) + log(zeta(n)) + log(n!)
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+            my $L = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            Math::MPFR::Rmpfr_const_log2($L, $ROUND);
+            Math::MPFR::Rmpfr_neg($L, $L, $ROUND);
 
-    (Math::GMPz::Rmpz_sgn($n) || return ZERO) < 0 and goto &nan;
+            my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+            Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
 
-    my $L = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_const_log2($L, $ROUND);
+            my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            Math::MPC::Rmpc_set_fr_fr($c, $L, $pi, $ROUND);
+            return bless \$c;
+        }
 
-    if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
-        Math::MPFR::Rmpfr_neg($L, $L, $ROUND);
+        Math::GMPz::Rmpz_odd_p($n) && goto &ninf;
+
+        my $L  = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $t  = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+        Math::MPFR::Rmpfr_const_log2($t, $ROUND);
+        Math::MPFR::Rmpfr_set($L, $t, $ROUND);
+
+        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+        Math::MPFR::Rmpfr_mul_ui($t, $pi, 2, $ROUND);
+        Math::MPFR::Rmpfr_log($t, $t, $ROUND);
+        Math::MPFR::Rmpfr_mul_z($t, $t, $n, $ROUND);
+        Math::MPFR::Rmpfr_sub($L, $L, $t, $ROUND);
+
+        if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
+            Math::MPFR::Rmpfr_zeta_ui($t, Math::GMPz::Rmpz_get_ui($n), $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_set_z($t, $n, $ROUND);
+            Math::MPFR::Rmpfr_zeta($t, $t, $ROUND);
+        }
+        Math::MPFR::Rmpfr_log($t, $t, $ROUND);
+        Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);
+
+        my $s = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add_ui($s, $n, 1);
+        Math::MPFR::Rmpfr_set_z($t, $s, $ROUND);
+        Math::MPFR::Rmpfr_lngamma($t, $t, $ROUND);
+        Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);
+
+        if (Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
+            my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
+            Math::MPC::Rmpc_set_fr_fr($c, $L, $pi, $ROUND);
+            return bless \$c;
+        }
+
         return bless \$L;
     }
 
-    Math::GMPz::Rmpz_odd_p($n) && goto &ninf;    # log(Bn) = -Inf for odd n>1
+    _valid(\$x_ref);
 
-    my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_const_pi($pi, $ROUND);     # pi = π
+    # Explicit calculation of ln(B_n(x)) using Log-Sum-Exp
+    my $n = _any2ui($$n_ref) // goto &nan;
 
-    my $t = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_log($t, $pi, $ROUND);         # t = log(π)
-    Math::MPFR::Rmpfr_mul_z($t, $t, $n, $ROUND);    # t = n*log(π)
+    my $x_fr = _any2mpfr($$x_ref) // goto &nan;
 
-    my $s = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_ui_sub($s, 1, $n);             # s = 1-n
-
-    Math::MPFR::Rmpfr_mul_z($L, $L, $s, $ROUND);    # L = (1 - n)*log(2)
-    Math::MPFR::Rmpfr_sub($L, $L, $t, $ROUND);      # L -= n*log(π)
-
-    if (Math::GMPz::Rmpz_fits_ulong_p($n)) {        # n is a native unsigned integer
-        Math::MPFR::Rmpfr_zeta_ui($t, Math::GMPz::Rmpz_get_ui($n), $ROUND);
-    }
-    else {
-        Math::MPFR::Rmpfr_set_z($t, $n, $ROUND);    # t = n
-        Math::MPFR::Rmpfr_zeta($t, $t, $ROUND);     # t = zeta(n)
+    # Edge case: B_n(0) = B_n
+    if (Math::MPFR::Rmpfr_zero_p($x_fr)) {
+        return lnbernreal($n_ref);
     }
 
-    Math::MPFR::Rmpfr_log($t, $t, $ROUND);          # t = log(zeta(n))
-    Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);      # L += log(zeta(n))
+    my $log_x = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_abs($log_x, $x_fr, $ROUND);
+    Math::MPFR::Rmpfr_log($log_x, $log_x, $ROUND);
 
-    Math::GMPz::Rmpz_add_ui($s, $n, 1);             # s = n+1
-    Math::MPFR::Rmpfr_set_z($t, $s, $ROUND);        # t = n+1
-    Math::MPFR::Rmpfr_lngamma($t, $t, $ROUND);      # t = log(gamma(n+1)) = log(n!)
+    my $sgn_x = Math::MPFR::Rmpfr_sgn($x_fr);
 
-    Math::MPFR::Rmpfr_add($L, $L, $t, $ROUND);      # L += log(n!)
+    my $ln_n_fact = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_set_ui($ln_n_fact, $n + 1, $ROUND);
+    Math::MPFR::Rmpfr_lngamma($ln_n_fact, $ln_n_fact, $ROUND);    # ln(n!)
 
-    # If 4|n, then B_n is negative; log(-Re(x)) = log(Re(x)) + π*i, for x>0
-    if (Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
+    my $ln_2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_const_log2($ln_2, $ROUND);
+
+    my $ln_2pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_const_pi($ln_2pi, $ROUND);
+    Math::MPFR::Rmpfr_mul_ui($ln_2pi, $ln_2pi, 2, $ROUND);
+    Math::MPFR::Rmpfr_log($ln_2pi, $ln_2pi, $ROUND);              # ln(2π)
+
+    my @L;                                                        # Stores ln|T_k|
+    my @S;                                                        # Stores sign of T_k
+
+    my $t1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+
+    foreach my $k (0 .. $n) {
+        next if ($k > 1 && $k % 2 != 0);
+
+        my $L_k  = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $sign = 1;
+
+        # Sign from x^(n-k)
+        $sign = -$sign if ($sgn_x < 0 && ($n - $k) % 2 != 0);
+
+        if ($k == 0) {
+
+            # L_0 = n * ln|x|
+            Math::MPFR::Rmpfr_mul_ui($L_k, $log_x, $n, $ROUND);
+        }
+        elsif ($k == 1) {
+
+            # B_1 = -1/2 -> sign is negative
+            $sign = -$sign;
+
+            # L_1 = ln(n) - ln(2) + (n-1)*ln|x|
+            Math::MPFR::Rmpfr_set_ui($t1, $n, $ROUND);
+            Math::MPFR::Rmpfr_log($t1, $t1, $ROUND);
+            Math::MPFR::Rmpfr_sub($L_k, $t1, $ln_2, $ROUND);
+
+            if ($n - 1 > 0) {
+                Math::MPFR::Rmpfr_mul_ui($t1, $log_x, $n - 1, $ROUND);
+                Math::MPFR::Rmpfr_add($L_k, $L_k, $t1, $ROUND);
+            }
+        }
+        else {
+            # Sign from B_k (negative for k = 4, 8, 12, ...)
+            $sign = -$sign if ($k % 4 == 0);
+
+            # L_k = ln(n!) - ln((n-k)!) + ln(2) - k*ln(2π) + ln(zeta(k)) + (n-k)*ln|x|
+            Math::MPFR::Rmpfr_set($L_k, $ln_n_fact, $ROUND);
+
+            Math::MPFR::Rmpfr_set_ui($t1, $n - $k + 1, $ROUND);
+            Math::MPFR::Rmpfr_lngamma($t1, $t1, $ROUND);
+            Math::MPFR::Rmpfr_sub($L_k, $L_k, $t1, $ROUND);
+
+            Math::MPFR::Rmpfr_add($L_k, $L_k, $ln_2, $ROUND);
+
+            Math::MPFR::Rmpfr_mul_ui($t1, $ln_2pi, $k, $ROUND);
+            Math::MPFR::Rmpfr_sub($L_k, $L_k, $t1, $ROUND);
+
+            Math::MPFR::Rmpfr_zeta_ui($t1, $k, $ROUND);
+            Math::MPFR::Rmpfr_log($t1, $t1, $ROUND);
+            Math::MPFR::Rmpfr_add($L_k, $L_k, $t1, $ROUND);
+
+            if ($n - $k > 0) {
+                Math::MPFR::Rmpfr_mul_ui($t1, $log_x, $n - $k, $ROUND);
+                Math::MPFR::Rmpfr_add($L_k, $L_k, $t1, $ROUND);
+            }
+        }
+
+        push @L, $L_k;
+        push @S, $sign;
+    }
+
+    # Log-Sum-Exp Accumulator
+    my $L_max = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_set($L_max, $L[0], $ROUND);
+    for my $i (1 .. $#L) {
+        Math::MPFR::Rmpfr_set($L_max, $L[$i], $ROUND) if (Math::MPFR::Rmpfr_cmp($L[$i], $L_max) > 0);
+    }
+
+    my $inner_sum = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_set_ui($inner_sum, 0, $ROUND);
+
+    for my $i (0 .. $#L) {
+        Math::MPFR::Rmpfr_sub($t1, $L[$i], $L_max, $ROUND);
+        Math::MPFR::Rmpfr_exp($t1, $t1, $ROUND);
+        if ($S[$i] < 0) {
+            Math::MPFR::Rmpfr_sub($inner_sum, $inner_sum, $t1, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_add($inner_sum, $inner_sum, $t1, $ROUND);
+        }
+    }
+
+    # Extremely rare exact cancellation across terms
+    goto &ninf if Math::MPFR::Rmpfr_zero_p($inner_sum);
+
+    my $sign_inner = Math::MPFR::Rmpfr_sgn($inner_sum);
+    Math::MPFR::Rmpfr_abs($inner_sum, $inner_sum, $ROUND);
+    Math::MPFR::Rmpfr_log($inner_sum, $inner_sum, $ROUND);
+
+    my $result = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+    Math::MPFR::Rmpfr_add($result, $L_max, $inner_sum, $ROUND);
+
+    # log(-Re(x)) = log(Re(x)) + i*π
+    if ($sign_inner < 0) {
+        my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+
         my $c = Math::MPC::Rmpc_init2(CORE::int($PREC));
-        Math::MPC::Rmpc_set_fr_fr($c, $L, $pi, $ROUND);
+        Math::MPC::Rmpc_set_fr_fr($c, $result, $pi, $ROUND);
         return bless \$c;
     }
 
-    bless \$L;
+    return bless \$result;
 }
 
 *lnbern        = \&lnbernreal;

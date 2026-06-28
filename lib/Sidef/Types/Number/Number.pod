@@ -1004,9 +1004,14 @@ When C<x> is omitted, a Polynomial object is returned.
 
 =head2 bernreal
 
-    n.bernreal
+    bernreal(n)
+    bernreal(n,x)
 
 Return an approximation to the n-th Bernoulli number as a floating-point number.
+
+When a second argument C<x> is given, it return the n-th Bernoulli polynomial evaluated at C<x>:
+
+    B_n(x)      # as a floating-point number
 
 =cut
 
@@ -5535,8 +5540,15 @@ Returns the natural logarithm of 2 constant.
 =head2 lnbern
 
     lnbern(n)
+    lnbern(n,x)
 
 Returns the natural logarithm of the n-th Bernoulli number.
+
+When a second argument C<x> is given, it returns the natural logarithm of the n-th Bernoulli polynomial, evaluated at C<x>:
+
+    log(B_n(x))     # as a floating-point number
+
+This is usually faster than C<log(bernreal(n,x))> for large C<n>, but it may be inaccurate in precision in the least significant digits for certain inputs.
 
 Aliases: I<bern_log>, I<lnbernreal>, I<bernoulli_log>
 
