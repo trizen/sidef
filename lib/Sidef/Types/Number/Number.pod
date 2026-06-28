@@ -971,10 +971,14 @@ Returns the n-th Bell number modulo C<m>.
     bernoulli(n)
     bernoulli(n, x)
 
-Returns the n-th Bernoulli number. When an additional argument is provided, it returns the n-th Bernoulli polynomial evaluated at C<x>.
+Returns the n-th Bernoulli number of the first kind (with C<B_1 = -1/2>). When an additional argument is provided, it returns the n-th Bernoulli polynomial evaluated at C<x>.
 
     say bernoulli(10).as_rat       # B_10    = 5/66
     say bernoulli(10, 2).as_rat    # B_10(2) = 665/66
+
+For Bernoulli numbers of second kind (with C<B_1 = 1/2>) use:
+
+    bernoulli(n, 1)     # here B_1 = 1/2
 
 Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
