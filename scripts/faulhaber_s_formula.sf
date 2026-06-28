@@ -8,19 +8,13 @@ func faulhaber_s_formula(p) {
 
     var formula = gather {
         { |j|
-            take "(#{binomial(p+1, j) * bern(j,1) -> as_rat})*n^#{p+1 - j}"
+            take "#{binomial(p+1, j) * bern(j,1) -> as_rat}*x^#{p+1 - j}"
         } << 0..p
     }
 
-    #return Poly(formula.join(' + ').gsub(/n/, 'x'))  # FIXME
-
-    formula.grep! { !.contains('(0)*') }.join!(' + ')
-
-    formula -= /\(1\)\*/g
-    formula -= /\^1\b/g
-    formula.gsub!(/\(([^+]*?)\)/, { _ })
-
-    "1/#{p + 1} * (#{formula})"
+    var str = Poly(formula.join(' + ')).to_s
+    str = "1/#{p+1} * (#{str})"
+    return str
 }
 
 { |p|
