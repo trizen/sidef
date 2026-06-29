@@ -1304,6 +1304,27 @@ Aliases: I<biusigma0>
 
 =cut
 
+=head2 bsigma_sum
+
+    bsigma_sum(n,k=0)
+
+Sum of the C<bsigma(x,k)> function, for C<x = 1..n>.
+
+    say 30.of { .bsigma_sum(0) }   # OEIS: A306069
+    say 30.of { .bsigma_sum    }   # OEIS: A307159
+
+=cut
+
+=head2 bsigma0_sum
+
+    bsigma0_sum(n)
+
+Sum of number of bi-unitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .bsigma0_sum }    #=> OEIS: A306069
+
+=cut
+
 =head2 by
 
     n.by { ... }
@@ -4386,10 +4407,20 @@ Returns the count of the infinitary divisors of C<n>. (L<OEIS A037445|https://oe
 
     isigma_sum(n, k=1)
 
-Partial sums of the C<isigma(x,k)> function, for C<x=1..n>.
+Sum of the C<isigma(x,k)> function, for C<x=1..n>.
 
     say 30.of { .isigma_sum(0) }   # OEIS: A327573
     say 30.of { .isigma_sum }      # OEIS: A327566
+
+=cut
+
+=head2 isigma0_sum
+
+    isigma0_sum(n)
+
+Sum of number of infinitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .isigma0_sum }    #=> OEIS: A327573
 
 =cut
 
@@ -10695,7 +10726,7 @@ Sum of the C<usigma(x,k)> function, for C<x = 1..n>.
 
     usigma0_sum(n)
 
-Sum of number of unitary divisors from C<1> to C<n>.
+Sum of number of unitary divisors of C<k> for C<k=1..n>.
 
     say 30.of { .usigma0_sum }    #=> OEIS: A064608
 

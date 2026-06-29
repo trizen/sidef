@@ -30442,7 +30442,108 @@ sub bsigma {    # A188999: Bi-unitary sigma: sum of the bi-unitary divisors of n
 
 *biusigma = \&bsigma;
 
-sub nbsigma0 {    # Axxxxxx: count of non-bi-unitary divisors of n
+sub _bsigma_squarefull_aux {
+    my ($n, $k) = @_;
+
+    Math::Prime::Util::GMP::vecprod(
+        map {
+            my ($p, $e) = @$_;
+            $e == 2           ? ('-' . Math::Prime::Util::GMP::powint($p, $k))
+              : ($e % 2 == 0) ? Math::Prime::Util::GMP::mulint(-2, Math::Prime::Util::GMP::powint($p, $k * ($e >> 1)))
+              :   Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::powint($p, $k * (($e >> 1) + 1)), Math::Prime::Util::GMP::powint($p, ($e >> 1) * $k));
+        } grep { $_->[1] >= 2 } _factor_exp($n)
+    );
+}
+
+sub bsigma_sum {
+    my ($n, $k) = @_;
+
+    $n = _big2uistr($$n) // return ZERO;
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+    # Explicit inline closure for sigma_sum, placed inside to inherently capture $k
+    my $sigma_sum = sub {
+        my ($x) = @_;
+        my $sx = Math::Prime::Util::GMP::sqrtint($x);
+
+        if ($k == 0) {
+            my @terms;
+            for my $i (1 .. $sx) {
+                push @terms, Math::Prime::Util::GMP::divint($x, $i);
+            }
+            my $total = Math::Prime::Util::GMP::vecsum(@terms);
+            return Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::mulint(2, $total), Math::Prime::Util::GMP::mulint($sx, $sx));
+        }
+
+        my @terms;
+        for my $i (1 .. $sx) {
+            my $x_div_i =
+              HAS_PRIME_UTIL
+              ? Math::Prime::Util::divint($x, $i)
+              : Math::Prime::Util::GMP::divint($x, $i);
+            push @terms, (HAS_PRIME_UTIL and $k <= 2)
+              ? Math::Prime::Util::powersum($x_div_i, $k)
+              : Math::Prime::Util::GMP::powersum($x_div_i, $k);
+
+            my $ik = ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
+            push @terms, $ik * $x_div_i;
+            $terms[-1] = Math::Prime::Util::GMP::mulint($ik, $x_div_i) if ($terms[-1] > ULONG_MAX);
+        }
+
+        my $total = Math::Prime::Util::GMP::vecsum(@terms);
+
+        return Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sx, Math::Prime::Util::GMP::powersum($sx, $k)));
+    };
+
+    my $s = Math::Prime::Util::GMP::sqrtint($n);
+    my $P = HAS_PRIME_UTIL ? Math::Prime::Util::powerful_numbers(1, $n) : [map { $$_ } @{_set_int($n)->squarefull}];
+
+    my @F = ();
+    my @S = (0);
+
+    foreach my $m (@$P) {
+        my $t = _bsigma_squarefull_aux($m, $k);
+        push(@F, $t) if !($m > $s);
+        push @S, HAS_PRIME_UTIL
+          ? Math::Prime::Util::addint($S[-1], $t)
+          : Math::Prime::Util::GMP::addint($S[-1], $t);
+    }
+
+    my @terms;
+    foreach my $i (0 .. $#F) {
+        my $n_div_p = Math::Prime::Util::GMP::divint($n, $P->[$i]);
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], $sigma_sum->($n_div_p));
+    }
+
+    foreach my $m (1 .. $s) {
+        my $t =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divint($n, $m)
+          : Math::Prime::Util::GMP::divint($n, $m);
+        my $c =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powerful_count($t)
+          : Math::Prime::Util::GMP::powerful_count($t);
+        my $sig_k_m =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divisor_sum($m, $k)
+          : Math::Prime::Util::GMP::divisor_sum($m, $k);
+        push @terms, HAS_PRIME_UTIL
+          ? Math::Prime::Util::mulint($sig_k_m, $S[$c])
+          : Math::Prime::Util::GMP::mulint($sig_k_m, $S[$c]);
+    }
+
+    my $A = Math::Prime::Util::GMP::vecsum(@terms);
+    my $B = Math::Prime::Util::GMP::mulint($sigma_sum->($s), $S[Math::Prime::Util::GMP::powerful_count($s)]);
+
+    _set_int(Math::Prime::Util::GMP::subint($A, $B));
+}
+
+sub bsigma0_sum {
+    $_[0]->bsigma_sum(ZERO);
+}
+
+sub nbsigma0 {    # A390957: count of non-bi-unitary divisors of n
     my ($n) = @_;
     $n->sigma0->sub($n->bsigma0);
 }
@@ -30557,7 +30658,8 @@ sub _isigma_h_pe {
         return $ans;
     };
 
-    my $pk = ($k == 1) ? $p
+    my $pk =
+      ($k == 1) ? $p
       : (
          $gmp ? Math::Prime::Util::GMP::powint($p, $k)
          : Math::Prime::Util::powint($p, $k)
@@ -30685,6 +30787,10 @@ sub isigma_sum {
     my $B = Math::Prime::Util::GMP::mulint($sigma_sum->($s), $S[Math::Prime::Util::GMP::powerful_count($s)]);
 
     _set_int(Math::Prime::Util::GMP::subint($A, $B));
+}
+
+sub isigma0_sum {
+    $_[0]->isigma_sum(ZERO);
 }
 
 sub esigma0 {    # A049419: count of exponential divisors (or e-divisors) of n.
