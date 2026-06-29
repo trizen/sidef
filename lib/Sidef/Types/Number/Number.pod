@@ -4382,6 +4382,17 @@ Returns the count of the infinitary divisors of C<n>. (L<OEIS A037445|https://oe
 
 =cut
 
+=head2 isigma_sum
+
+    isigma_sum(n, k=1)
+
+Partial sums of the C<isigma(x,k)> function, for C<x=1..n>.
+
+    say 30.of { .isigma_sum(0) }   # OEIS: A327573
+    say 30.of { .isigma_sum }      # OEIS: A327566
+
+=cut
+
 =head2 is_imag
 
     x.is_imag

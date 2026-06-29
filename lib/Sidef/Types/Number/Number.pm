@@ -30517,6 +30517,176 @@ sub isigma {    # A049417: sum of infinitary divisors of n
     bless \_binsplit(\@terms, \&__mul__);
 }
 
+# Helper subroutine to explicitly compute H_k(p^e) for the isigma_k convolution
+sub _isigma_h_pe {
+    my ($p, $e, $k, $gmp) = @_;
+
+    # Inline closure to compute isigma_k(p^e) based on binary representation of e
+    my $isig = sub {
+        my ($exp) = @_;
+        return 1 if $exp == 0;
+        my $ans = 1;
+        my $i   = 0;
+        while ($exp > 0) {
+            if ($exp & 1) {
+                my $pow;
+                if ($k == 1 && $i == 0) {
+                    $pow = $p;
+                }
+                else {
+                    my $exp_k = $k * (1 << $i);
+                    $pow =
+                      $gmp
+                      ? Math::Prime::Util::GMP::powint($p, $exp_k)
+                      : Math::Prime::Util::powint($p, $exp_k);
+                }
+
+                my $term =
+                  $gmp
+                  ? Math::Prime::Util::GMP::addint($pow, 1)
+                  : Math::Prime::Util::addint($pow, 1);
+
+                $ans =
+                  $gmp
+                  ? Math::Prime::Util::GMP::mulint($ans, $term)
+                  : Math::Prime::Util::mulint($ans, $term);
+            }
+            $exp >>= 1;
+            $i++;
+        }
+        return $ans;
+    };
+
+    my $pk = ($k == 1) ? $p
+      : (
+         $gmp ? Math::Prime::Util::GMP::powint($p, $k)
+         : Math::Prime::Util::powint($p, $k)
+        );
+
+    my $pk_plus_1 =
+      $gmp
+      ? Math::Prime::Util::GMP::addint($pk, 1)
+      : Math::Prime::Util::addint($pk, 1);
+
+    # Evaluate convolution: isigma_k(p^e) - (p^k + 1)*isigma_k(p^{e-1}) + p^k * isigma_k(p^{e-2})
+    my $t1 = $isig->($e);
+    my $t2 =
+      $gmp
+      ? Math::Prime::Util::GMP::mulint($pk_plus_1, $isig->($e - 1))
+      : Math::Prime::Util::mulint($pk_plus_1, $isig->($e - 1));
+    my $t3 =
+      $gmp
+      ? Math::Prime::Util::GMP::mulint($pk, $isig->($e - 2))
+      : Math::Prime::Util::mulint($pk, $isig->($e - 2));
+
+    return $gmp
+      ? Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::subint($t1, $t2), $t3)
+      : Math::Prime::Util::addint(Math::Prime::Util::subint($t1, $t2), $t3);
+}
+
+sub _isigma_squarefull_aux {
+    my ($n, $k) = @_;
+
+    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+        return Math::Prime::Util::vecprod(
+            map {
+                my ($p, $e) = @$_;
+                _isigma_h_pe($p, $e, $k, 0);
+            } grep { $_->[1] >= 2 } Math::Prime::Util::factor_exp($n)
+        );
+    }
+
+    Math::Prime::Util::GMP::vecprod(
+        map {
+            my ($p, $e) = @$_;
+            _isigma_h_pe($p, $e, $k, 1);
+        } grep { $_->[1] >= 2 } _factor_exp($n)
+    );
+}
+
+sub isigma_sum {
+    my ($n, $k) = @_;
+
+    $n = _big2uistr($$n) // return ZERO;
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+
+    my $sigma_sum = sub {
+        my ($x) = @_;
+        my $sx = Math::Prime::Util::GMP::sqrtint($x);
+
+        if ($k == 0) {
+            my @terms;
+            for my $i (1 .. $sx) {
+                push @terms, Math::Prime::Util::GMP::divint($x, $i);
+            }
+            my $total = Math::Prime::Util::GMP::vecsum(@terms);
+            return Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::mulint(2, $total), Math::Prime::Util::GMP::mulint($sx, $sx));
+        }
+
+        my @terms;
+        for my $i (1 .. $sx) {
+            my $x_div_i =
+              HAS_PRIME_UTIL
+              ? Math::Prime::Util::divint($x, $i)
+              : Math::Prime::Util::GMP::divint($x, $i);
+            push @terms, (HAS_PRIME_UTIL and $k <= 2)
+              ? Math::Prime::Util::powersum($x_div_i, $k)
+              : Math::Prime::Util::GMP::powersum($x_div_i, $k);
+
+            my $ik = ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
+            push @terms, $ik * $x_div_i;
+            $terms[-1] = Math::Prime::Util::GMP::mulint($ik, $x_div_i) if ($terms[-1] > ULONG_MAX);
+        }
+
+        my $total = Math::Prime::Util::GMP::vecsum(@terms);
+
+        return Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sx, Math::Prime::Util::GMP::powersum($sx, $k)));
+    };
+
+    my $s = Math::Prime::Util::GMP::sqrtint($n);
+    my $P = HAS_PRIME_UTIL ? Math::Prime::Util::powerful_numbers(1, $n) : [map { $$_ } @{_set_int($n)->squarefull}];
+
+    my @F = ();
+    my @S = (0);
+
+    foreach my $m (@$P) {
+        my $t = _isigma_squarefull_aux($m, $k);
+        push(@F, $t) if !($m > $s);
+        push @S, HAS_PRIME_UTIL
+          ? Math::Prime::Util::addint($S[-1], $t)
+          : Math::Prime::Util::GMP::addint($S[-1], $t);
+    }
+
+    my @terms;
+    foreach my $i (0 .. $#F) {
+        my $n_div_p = Math::Prime::Util::GMP::divint($n, $P->[$i]);
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], $sigma_sum->($n_div_p));
+    }
+
+    foreach my $m (1 .. $s) {
+        my $t =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divint($n, $m)
+          : Math::Prime::Util::GMP::divint($n, $m);
+        my $c =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powerful_count($t)
+          : Math::Prime::Util::GMP::powerful_count($t);
+        my $sig_k_m =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divisor_sum($m, $k)
+          : Math::Prime::Util::GMP::divisor_sum($m, $k);
+        push @terms, HAS_PRIME_UTIL
+          ? Math::Prime::Util::mulint($sig_k_m, $S[$c])
+          : Math::Prime::Util::GMP::mulint($sig_k_m, $S[$c]);
+    }
+
+    my $A = Math::Prime::Util::GMP::vecsum(@terms);
+    my $B = Math::Prime::Util::GMP::mulint($sigma_sum->($s), $S[Math::Prime::Util::GMP::powerful_count($s)]);
+
+    _set_int(Math::Prime::Util::GMP::subint($A, $B));
+}
+
 sub esigma0 {    # A049419: count of exponential divisors (or e-divisors) of n.
     my ($n) = @_;
 
@@ -30663,7 +30833,7 @@ sub uphi {    # OEIS: A047994
     bless \_binsplit(\@terms, \&__mul__);
 }
 
-sub _squarefull_aux {    # OEIS: A396336
+sub _uphi_squarefull_aux {    # OEIS: A396336
     my ($n, $k) = @_;
 
     if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
@@ -30706,7 +30876,7 @@ sub uphi_sum {
     my @S = (0);
 
     foreach my $k (@$P) {
-        my $t = _squarefull_aux($k, $j);
+        my $t = _uphi_squarefull_aux($k, $j);
         push(@F, $t) if !($k > $s);
         push @S, HAS_PRIME_UTIL
           ? Math::Prime::Util::addint($S[-1], $t)
