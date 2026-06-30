@@ -28125,6 +28125,92 @@ sub udivisors {
 
 *unitary_divisors = \&udivisors;
 
+sub nudivisors {
+    my ($n) = @_;
+    _valid(\$n);
+    $n = _big2pistr($$n) // return _array();
+
+    my @uni;
+    my @non_uni;
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        my $p = Math::GMPz::Rmpz_init();
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        # Pre-compute all powers of p: p^1, p^2, ..., p^e
+        my @powers;
+        my $curr = Math::GMPz::Rmpz_init_set($p);
+        push @powers, $curr;
+        for my $i (2 .. $e) {
+            my $next_p = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($next_p, $powers[-1], $p);
+            push @powers, $next_p;
+        }
+
+        # Elements carrying over by multiplying with p^0 (which is 1)
+        my @next_uni     = map { Math::GMPz::Rmpz_init_set($_) } @uni;
+        my @next_non_uni = map { Math::GMPz::Rmpz_init_set($_) } @non_uni;
+
+        # 1. Handle intermediate (impure) powers: p^1 ... p^(e-1)
+        # Any multiplication here transitions a combination into being non-unitary
+        for my $i (1 .. $e - 1) {
+            my $pw = $powers[$i - 1];
+
+            # pw * 1 (implicit base)
+            push @next_non_uni, Math::GMPz::Rmpz_init_set($pw);
+
+            # pw * uni
+            foreach my $d (@uni) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($t, $pw, $d);
+                push @next_non_uni, $t;
+            }
+
+            # pw * non_uni
+            foreach my $d (@non_uni) {
+                my $t = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($t, $pw, $d);
+                push @next_non_uni, $t;
+            }
+        }
+
+        # 2. Handle the full (pure) power: p^e
+        # Multiplication here maintains the state (uni stays uni, non_uni stays non_uni)
+        my $pw_e = $powers[$e - 1];
+
+        # pw_e * 1 (implicit base)
+        push @next_uni, Math::GMPz::Rmpz_init_set($pw_e);
+
+        # pw_e * uni
+        foreach my $d (@uni) {
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($t, $pw_e, $d);
+            push @next_uni, $t;
+        }
+
+        # pw_e * non_uni
+        foreach my $d (@non_uni) {
+            my $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($t, $pw_e, $d);
+            push @next_non_uni, $t;
+        }
+
+        @uni     = @next_uni;
+        @non_uni = @next_non_uni;
+    }
+
+    @non_uni = sort { Math::GMPz::Rmpz_cmp($a, $b) } @non_uni;
+    @non_uni = map  { bless \$_ } @non_uni;
+
+    _array(\@non_uni);
+}
+
+*non_unitary_divisors = \&nudivisors;
+
 sub edivisors {    # OEIS: A322791
     my ($n) = @_;
 

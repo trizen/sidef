@@ -7177,6 +7177,26 @@ Example:
 
 =cut
 
+=head2 nudivisors
+
+    nudivisors(n)
+
+Returns an array with the non-unitary divisors of C<n>.
+
+    say 120.nudivisors   #=> [2, 4, 6, 10, 12, 20, 30, 60]
+
+Equivalent to the set difference between the divisors and the unitary-divisors:
+
+    divisors(n) - udivisors(n) == nudivisors(n)
+
+These are divisors C<d> of C<n> that satisfy:
+
+    gcd(n/d, d) != 1
+
+Aliases: I<non_unitary_divisors>
+
+=cut
+
 =head2 nusigma
 
     nusigma(n, k=1)

@@ -20,6 +20,8 @@ var h = Hash(
     cubefull_udivisors => 'cubefull_usigma',
 
     udivisors => 'usigma',
+    nudivisors => 'nusigma',
+
     prime_udivisors => 'prime_usigma',
     prime_power_udivisors => 'prime_power_usigma',
 
