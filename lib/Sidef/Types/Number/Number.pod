@@ -6187,6 +6187,27 @@ Returns the Not-a-Number special value (C<NaN>).
 
 =cut
 
+=head2 nbdivisors
+
+    nbdivisors(n)
+
+Returns an array with the non-bi-unitary divisors of C<n>.
+
+    say 720.nbdivisors   #=> [3, 4, 6, 12, 15, 20, 24, 30, 36, 48, 60, 120, 180, 240]
+
+Equivalent to the set difference between the divisors and the
+bi-unitary-divisors:
+
+    divisors(n) - bdivisors(n) == nbdivisors(n)
+
+These are divisors C<d> of C<n> that satisfy:
+
+    gcud(n/d, d) != 1
+
+Aliases: I<non_bi_unitary_divisors>, I<nbiudivisors>
+
+=cut
+
 =head2 nbsigma
 
     nbsigma(n, k=1)

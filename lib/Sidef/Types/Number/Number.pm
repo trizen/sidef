@@ -28342,6 +28342,83 @@ sub biudivisors {    # OEIS: A222266
 *bdivisors           = \&biudivisors;
 *bi_unitary_divisors = \&biudivisors;
 
+sub nbdivisors {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n, 0) // return _array();
+    Math::GMPz::Rmpz_sgn($n) > 0 or return _array();
+
+    my @biu = ($ONE);
+    my @non_biu;
+
+    my $r = Math::GMPz::Rmpz_init();
+    my $w = Math::GMPz::Rmpz_init();
+    my $p = Math::GMPz::Rmpz_init();
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        # Save the current incoming states for this prime factor stage
+        my @curr_biu     = @biu;
+        my @curr_non_biu = @non_biu;
+
+        # Initialize next states with k = 0 (equivalent to multiplying by p^0 = 1)
+        @biu     = map { Math::GMPz::Rmpz_init_set($_) } @curr_biu;
+        @non_biu = map { Math::GMPz::Rmpz_init_set($_) } @curr_non_biu;
+
+        Math::GMPz::Rmpz_set($r, $p);
+
+        foreach my $k (1 .. $e) {
+            Math::GMPz::Rmpz_divexact($w, $n, $r);
+
+            if ((bless \$w)->gcud(bless \$r)->is_one) {
+
+                # Safe component choice (Bi-unitary)
+                # Maintains the state classification of the multiplying factor
+                foreach my $u (@curr_biu) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @biu, $t;
+                }
+                foreach my $u (@curr_non_biu) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_biu, $t;
+                }
+            }
+            else {
+                # Forbidden component choice (Non-bi-unitary)
+                # Any factor multiplied by this choice becomes non-bi-unitary
+                foreach my $u (@curr_biu) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_biu, $t;
+                }
+                foreach my $u (@curr_non_biu) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_biu, $t;
+                }
+            }
+
+            Math::GMPz::Rmpz_mul($r, $r, $p) if ($k < $e);
+        }
+    }
+
+    # Sort, bless into Sidef internal numbers, and return
+    @non_biu = sort { Math::GMPz::Rmpz_cmp($a, $b) } @non_biu;
+    @non_biu = map  { bless \$_ } @non_biu;
+
+    _array(\@non_biu);
+}
+
+*non_bi_unitary_divisors = \&nbdivisors;
+*nbiudivisors            = \&nbdivisors;
+
 sub prime_power_divisors {
     my ($n) = @_;
 
