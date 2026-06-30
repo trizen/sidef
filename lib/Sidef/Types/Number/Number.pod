@@ -6752,6 +6752,22 @@ Returns the negative infinity special value (C<-Inf>).
 
 =cut
 
+=head2 nidivisors
+
+    nidivisors(n)
+
+Returns an array with the noninfinitary divisors of C<n>.
+
+    say 240.nidivisors   #=> [2, 4, 6, 8, 10, 12, 20, 24, 30, 40, 60, 120]
+
+Equivalent to the set difference between the divisors and the infinitary divisors:
+
+    divisors(n) - idivisors(n) == nidivisors(n)
+
+Aliases: I<non_infinitary_divisors>
+
+=cut
+
 =head2 nisigma
 
     nisigma(n, k=1)

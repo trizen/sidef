@@ -32,7 +32,10 @@ var h = Hash(
     cubefree_udivisors => 'cubefree_usigma',
 
     edivisors => 'esigma',
+
     idivisors => 'isigma',
+    nidivisors => 'nisigma',
+
     bdivisors => 'bsigma',
     nbdivisors => 'nbsigma',
 )

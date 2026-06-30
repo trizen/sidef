@@ -28294,6 +28294,79 @@ sub idivisors {    # OEIS: A077609
 
 *infinitary_divisors = \&idivisors;
 
+sub nidivisors {
+    my ($n) = @_;
+
+    $n = _big2pistr($$n) // return _array();
+
+    my @inf = ($ONE);
+    my @non_inf;
+
+    my $r = Math::GMPz::Rmpz_init();
+    my $p = Math::GMPz::Rmpz_init();
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        # Save the current incoming states from previous prime factor stages
+        my @curr_inf     = @inf;
+        my @curr_non_inf = @non_inf;
+
+        # Initialize next states with k = 0 (p^0 = 1 is always an infinitary choice)
+        @inf     = map { Math::GMPz::Rmpz_init_set($_) } @curr_inf;
+        @non_inf = map { Math::GMPz::Rmpz_init_set($_) } @curr_non_inf;
+
+        Math::GMPz::Rmpz_set($r, $p);
+
+        foreach my $k (1 .. $e) {
+
+            if (($e & $k) == $k) {
+
+                # Safe component choice (Infinitary)
+                # Maintains the state classification of the multiplying factor
+                foreach my $u (@curr_inf) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @inf, $t;
+                }
+                foreach my $u (@curr_non_inf) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_inf, $t;
+                }
+            }
+            else {
+                # Forbidden component choice (Non-infinitary)
+                # Any factor multiplied by this choice transitions to non-infinitary
+                foreach my $u (@curr_inf) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_inf, $t;
+                }
+                foreach my $u (@curr_non_inf) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @non_inf, $t;
+                }
+            }
+
+            Math::GMPz::Rmpz_mul($r, $r, $p) if ($k < $e);
+        }
+    }
+
+    # Sort, bless into Sidef internal numbers, and return
+    @non_inf = sort { Math::GMPz::Rmpz_cmp($a, $b) } @non_inf;
+    @non_inf = map  { bless \$_ } @non_inf;
+
+    _array(\@non_inf);
+}
+
+*non_infinitary_divisors = \&nidivisors;
+
 sub biudivisors {    # OEIS: A222266
     my ($n) = @_;
 
