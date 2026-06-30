@@ -6285,6 +6285,23 @@ Defined as:
 
 =cut
 
+=head2 nedivisors
+
+    nedivisors(n)
+
+Returns an array with the nonexponential divisors of C<n>.
+
+    say 120.nedivisors   #=> [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 40, 60]
+
+Equivalent to the set difference between the divisors and the exponential
+divisors:
+
+    divisors(n) - edivisors(n) == nedivisors(n)
+
+Aliases: I<non_exponential_divisors>
+
+=cut
+
 =head2 nesigma
 
     nesigma(n, k=1)

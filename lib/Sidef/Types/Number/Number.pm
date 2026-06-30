@@ -28216,21 +28216,27 @@ sub edivisors {    # OEIS: A322791
 
     $n = _big2pistr($$n) // return _array();
 
-    my @d = (Math::GMPz::Rmpz_init_set_ui(1));
-    my $r = Math::GMPz::Rmpz_init();
+    my @d     = (Math::GMPz::Rmpz_init_set_ui(1));
+    my $r     = Math::GMPz::Rmpz_init();
+    my $p_gmp = Math::GMPz::Rmpz_init();
 
     foreach my $pe (_factor_exp($n)) {
         my ($p, $e) = @$pe;
 
+        my $is_fast = (FAST_MODE and $p < ULONG_MAX);
+
+        if (!$is_fast) {
+            Math::GMPz::Rmpz_set_str($p_gmp, $p, 10);
+        }
+
         my @t;
         foreach my $k (_divisors($e)) {
 
-            if (FAST_MODE and $p < ULONG_MAX) {
+            if ($is_fast) {
                 Math::GMPz::Rmpz_ui_pow_ui($r, $p, $k);
             }
             else {
-                Math::GMPz::Rmpz_set_str($r, $p, 10);
-                Math::GMPz::Rmpz_pow_ui($r, $r, $k) if ($k > 1);
+                Math::GMPz::Rmpz_pow_ui($r, $p_gmp, $k);
             }
 
             foreach my $u (@d) {
@@ -28250,6 +28256,82 @@ sub edivisors {    # OEIS: A322791
 }
 
 *exponential_divisors = \&edivisors;
+
+sub nedivisors {
+    my ($n) = @_;
+
+    $n = _big2pistr($$n) // return _array();
+
+    my @exp = (Math::GMPz::Rmpz_init_set_ui(1));
+    my @non_exp;
+
+    my $p = Math::GMPz::Rmpz_init();
+
+    foreach my $pe (_factor_exp($n)) {
+        my ($q, $e) = @$pe;
+
+        (FAST_MODE and $q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $q)
+          : Math::GMPz::Rmpz_set_str($p, "$q", 10);
+
+        # Save current states from previous prime stages
+        my @curr_exp     = @exp;
+        my @curr_non_exp = @non_exp;
+
+        my @next_exp;
+        my @next_non_exp;
+
+        # Initialize r = p^0 = 1
+        my $r = Math::GMPz::Rmpz_init_set_ui(1);
+
+        for my $k (0 .. $e) {
+            my $is_safe = ($k > 0 && $e % $k == 0);
+
+            if ($is_safe) {
+
+                # Safe exponent choice (Exponential)
+                # Tracks maintain their current classification
+                foreach my $u (@curr_exp) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @next_exp, $t;
+                }
+                foreach my $u (@curr_non_exp) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @next_non_exp, $t;
+                }
+            }
+            else {
+                # Forbidden exponent choice (Non-exponential)
+                # Anything multiplied by this choice becomes non-exponential
+                foreach my $u (@curr_exp) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @next_non_exp, $t;
+                }
+                foreach my $u (@curr_non_exp) {
+                    my $t = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($t, $u, $r);
+                    push @next_non_exp, $t;
+                }
+            }
+
+            # Progressively multiply to get the next power: r = r * p
+            Math::GMPz::Rmpz_mul($r, $r, $p) if ($k < $e);
+        }
+
+        @exp     = @next_exp;
+        @non_exp = @next_non_exp;
+    }
+
+    @non_exp = sort { Math::GMPz::Rmpz_cmp($a, $b) } @non_exp;
+    @non_exp = map  { bless \$_ } @non_exp;
+
+    _array(\@non_exp);
+}
+
+*non_exponential_divisors = \&nedivisors;
 
 sub idivisors {    # OEIS: A077609
     my ($n) = @_;
@@ -28358,7 +28440,6 @@ sub nidivisors {
         }
     }
 
-    # Sort, bless into Sidef internal numbers, and return
     @non_inf = sort { Math::GMPz::Rmpz_cmp($a, $b) } @non_inf;
     @non_inf = map  { bless \$_ } @non_inf;
 
@@ -28482,7 +28563,6 @@ sub nbdivisors {
         }
     }
 
-    # Sort, bless into Sidef internal numbers, and return
     @non_biu = sort { Math::GMPz::Rmpz_cmp($a, $b) } @non_biu;
     @non_biu = map  { bless \$_ } @non_biu;
 
