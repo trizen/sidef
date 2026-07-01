@@ -31381,56 +31381,50 @@ sub iphi {    # OEIS: A091732 -- infinitary analog of Euler's phi function
 sub _iphi_squarefull_aux {
     my ($n, $k) = @_;
 
-    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-        return Math::Prime::Util::vecprod(
-            map {
-                my ($p, $e) = @$_;
-                my @h = (1, 0);    # h(1)=1, h(p)=0
-                for my $i (2 .. $e) {
-                    my $iphi = 1;
-                    for (my ($temp_i, $bit) = ($i, 0) ; $temp_i > 0 ; ($temp_i >>= 1, $bit++)) {
-                        if ($temp_i & 1) {
-                            my $term = Math::Prime::Util::subint(Math::Prime::Util::powint($p, $k * (1 << $bit)), 1);
-                            $iphi = Math::Prime::Util::mulint($iphi, $term);
-                        }
-                    }
-                    my $sum = 0;
-                    for my $m (1 .. $i) {
-                        next if !$h[$i - $m];
-                        my $Jk = Math::Prime::Util::mulint(Math::Prime::Util::powint($p, $k * ($m - 1)),
-                                                           Math::Prime::Util::subint(Math::Prime::Util::powint($p, $k), 1));
-                        $sum = Math::Prime::Util::addint($sum, Math::Prime::Util::mulint($Jk, $h[$i - $m]));
-                    }
-                    push @h, Math::Prime::Util::subint($iphi, $sum);
-                }
-                $h[$e];
-            } grep { $_->[1] >= 2 } Math::Prime::Util::factor_exp($n)
-        );
+    state %cache;
+
+    if (scalar(%cache) > 1e6) {
+        undef %cache;
     }
 
     Math::Prime::Util::GMP::vecprod(
         map {
             my ($p, $e) = @$_;
-            my @h = ("1", "0");
-            for my $i (2 .. $e) {
-                my $iphi = "1";
-                for (my ($temp_i, $bit) = ($i, 0) ; $temp_i > 0 ; ($temp_i >>= 1, $bit++)) {
-                    if ($temp_i & 1) {
-                        my $term = Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::powint($p, $k * (1 << $bit)), 1);
-                        $iphi = Math::Prime::Util::GMP::mulint($iphi, $term);
+
+            $cache{$p}{$e}{$k} //= do {
+                my $pk = Math::Prime::Util::GMP::powint($p, $k);
+
+                my @P = ($pk);
+                my @T = (Math::Prime::Util::GMP::subint($pk, "1"));
+                my @h = ("1", "0");
+                my @J = ("0", $T[0]);
+
+                for my $i (2 .. $e) {
+                    my $iphi = "1";
+                    for (my ($temp_i, $bit) = ($i, 0) ; $temp_i > 0 ; ($temp_i >>= 1, $bit++)) {
+                        if ($temp_i & 1) {
+                            while (@P <= $bit) {
+                                push @P, Math::Prime::Util::GMP::mulint($P[-1], $P[-1]);
+                                push @T, Math::Prime::Util::GMP::subint($P[-1], "1");
+                            }
+                            $iphi = Math::Prime::Util::GMP::mulint($iphi, $T[$bit]);
+                        }
                     }
+
+                    my @terms;
+                    for my $m (1 .. $i) {
+                        next if $h[$i - $m] eq "0";
+                        while (@J <= $m) {
+                            push @J, Math::Prime::Util::GMP::mulint($J[-1], $pk);
+                        }
+                        push @terms, Math::Prime::Util::GMP::mulint($J[$m], $h[$i - $m]);
+                    }
+                    my $sum = Math::Prime::Util::GMP::vecsum(@terms);
+                    push @h, Math::Prime::Util::GMP::subint($iphi, $sum);
                 }
-                my $sum = "0";
-                for my $m (1 .. $i) {
-                    next if $h[$i - $m] eq "0";
-                    my $Jk = Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::powint($p, $k * ($m - 1)),
-                                                            Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::powint($p, $k), 1));
-                    $sum = Math::Prime::Util::GMP::addint($sum, Math::Prime::Util::GMP::mulint($Jk, $h[$i - $m]));
-                }
-                push @h, Math::Prime::Util::GMP::subint($iphi, $sum);
-            }
-            $h[$e];
-        } grep { $_->[1] >= 2 } _factor_exp($n)
+                $h[$e];
+            };
+        } grep { $_->[1] >= 2 } (HAS_PRIME_UTIL ? Math::Prime::Util::factor_exp($n) : _factor_exp($n))
     );
 }
 
@@ -31439,6 +31433,11 @@ sub iphi_sum {
 
     $n = _big2uistr($$n) // return ZERO;
     $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+
+    if ($j == 0) {
+        $n eq '0' and return ZERO;
+        return ONE;
+    }
 
     my $s = Math::Prime::Util::GMP::sqrtint($n);
     my $P =
