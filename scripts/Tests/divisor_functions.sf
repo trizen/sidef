@@ -52,6 +52,44 @@ var h2 = Hash(
     powerfree_udivisors => 'powerfree_usigma',
 )
 
+# Functions with two arguments
+var h3 = Hash(
+    usigma_sum => 'usigma',
+    sigma_sum => 'sigma',
+    isigma_sum => 'isigma',
+    bsigma_sum => 'bsigma',
+
+    uphi_sum => 'uphi',
+    phi_sum => 'phi',
+    pillai_sum => 'pillai',
+    omega_sum => 'omega',
+    bigomega_sum => 'bigomega',
+    exp_mangoldt_sum => 'exp_mangoldt',
+    cototient_sum => 'cototient',
+    psi_sum => 'psi',
+
+    exp_omega_sum => 'exp_omega',
+    exp_bigomega_sum => 'exp_bigomega',
+    exp_squarefree_omega_sum => 'exp_squarefree_omega',
+)
+
+# Functions with a single argument, only
+var h4 = Hash(
+    liouville_sum => 'liouville',
+    moebius_sum => 'moebius',
+    sopf_sum => 'sopf',
+    sopfr_sum => 'sopfr',
+    tau_sum => 'tau',
+
+    sigma0_sum => 'sigma0',
+    usigma0_sum => 'usigma0',
+    isigma0_sum => 'isigma0',
+    bsigma0_sum => 'bsigma0',
+
+    #lpf_sum => 'lpf',
+    #gpf_sum => 'gpf',
+)
+
 with([irand(3,10)!, 340282366920938463942989953348216553641, 92971590131496140210160].rand) {|n|
 
     h.each {|a,b|
@@ -71,6 +109,18 @@ with([irand(3,10)!, 340282366920938463942989953348216553641, 9297159013149614021
             assert_eq(D.len, k.(b+'0')(n), "#{a}.len != #{b+'0'} for n=#{n}, k=#{k}")
         }
     }
+}
+
+h3.each {|a,b|
+    for k in (0..3) {
+        var n = 1e2.irand
+        assert_eq(n.of { .(a)(k) }, n.of { .(b)(k) }.acc)
+    }
+}
+
+h4.each {|a,b|
+    var n = 1e2.irand
+    assert_eq(n.of { .(a) }, n.of { .(b) }.acc)
 }
 
 with (irand(5, 10)!) {|n|

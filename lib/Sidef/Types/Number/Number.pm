@@ -29239,6 +29239,10 @@ sub totient_sum {
 sub cototient {
     my ($n, $k) = @_;
 
+    if ($n->is_zero) {
+        return ZERO;
+    }
+
     if (!defined($k)) {
         return $n->sub($n->euler_phi);
     }
@@ -30570,40 +30574,6 @@ sub usigma_sum {
         return _set_int($n)->exp_omega_sum(TWO);
     }
 
-    # Explicit inline closure for sigma_sum
-    my $sigma_sum = sub {
-        my ($x) = @_;
-        my $sx = Math::Prime::Util::GMP::sqrtint($x);
-
-        if ($k == 0) {
-            my @terms;
-            for my $i (1 .. $sx) {
-                push @terms, Math::Prime::Util::GMP::divint($x, $i);
-            }
-            my $total = Math::Prime::Util::GMP::vecsum(@terms);
-            return Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::mulint(2, $total), Math::Prime::Util::GMP::mulint($sx, $sx));
-        }
-
-        my @terms;
-        for my $i (1 .. $sx) {
-            my $x_div_i =
-              HAS_PRIME_UTIL
-              ? Math::Prime::Util::divint($x, $i)
-              : Math::Prime::Util::GMP::divint($x, $i);
-            push @terms, (HAS_PRIME_UTIL and $k <= 2)
-              ? Math::Prime::Util::powersum($x_div_i, $k)
-              : Math::Prime::Util::GMP::powersum($x_div_i, $k);
-
-            my $ik = ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
-            push @terms, $ik * $x_div_i;
-            $terms[-1] = Math::Prime::Util::GMP::mulint($ik, $x_div_i) if ($terms[-1] > ULONG_MAX);
-        }
-
-        my $total = Math::Prime::Util::GMP::vecsum(@terms);
-
-        return Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sx, Math::Prime::Util::GMP::powersum($sx, $k)));
-    };
-
     my $s  = Math::Prime::Util::GMP::sqrtint($n);
     my $ss = Math::Prime::Util::GMP::sqrtint($s);
 
@@ -30640,7 +30610,7 @@ sub usigma_sum {
         my $i2   = Math::Prime::Util::GMP::mulint($i, $i);
         my $nod2 = Math::Prime::Util::GMP::divint($n, $i2);
 
-        push @terms, Math::Prime::Util::GMP::mulint($F[$i], $sigma_sum->($nod2));
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], _sigma_sum($nod2, $k));
     }
 
     # Compute Part B: Sum_{i=1..s} sigma_k(i) * M[floor(sqrt(floor(n / i)))]
@@ -30657,7 +30627,7 @@ sub usigma_sum {
     my $total = Math::Prime::Util::GMP::vecsum(@terms);
 
     # Final result: A + B - sigma_sum(s, k) * M[ss]
-    $total = Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sigma_sum->($s), $M[$ss]));
+    $total = Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint(_sigma_sum($s, $k), $M[$ss]));
 
     _set_int($total);
 }
@@ -30761,10 +30731,21 @@ sub bsigma {    # A188999: Bi-unitary sigma: sum of the bi-unitary divisors of n
 sub _bsigma_squarefull_aux {
     my ($n, $k) = @_;
 
+    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+        return Math::Prime::Util::vecprod(
+            map {
+                my ($p, $e) = @$_;
+                $e == 2           ? ($k == 1 ? (-$p) : join('', '-', Math::Prime::Util::GMP::powint($p, $k)))
+                  : ($e % 2 == 0) ? Math::Prime::Util::mulint(-2, Math::Prime::Util::powint($p, $k * ($e >> 1)))
+                  :   Math::Prime::Util::addint(Math::Prime::Util::powint($p, $k * (($e >> 1) + 1)), Math::Prime::Util::powint($p, ($e >> 1) * $k));
+            } grep { $_->[1] >= 2 } Math::Prime::Util::factor_exp($n)
+        );
+    }
+
     Math::Prime::Util::GMP::vecprod(
         map {
             my ($p, $e) = @$_;
-            $e == 2           ? ('-' . Math::Prime::Util::GMP::powint($p, $k))
+            $e == 2           ? (($k == 1) ? "-$p" : ('-' . Math::Prime::Util::GMP::powint($p, $k)))
               : ($e % 2 == 0) ? Math::Prime::Util::GMP::mulint(-2, Math::Prime::Util::GMP::powint($p, $k * ($e >> 1)))
               :   Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::powint($p, $k * (($e >> 1) + 1)), Math::Prime::Util::GMP::powint($p, ($e >> 1) * $k));
         } grep { $_->[1] >= 2 } _factor_exp($n)
@@ -30776,40 +30757,6 @@ sub bsigma_sum {
 
     $n = _big2uistr($$n) // return ZERO;
     $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
-
-    # Explicit inline closure for sigma_sum, placed inside to inherently capture $k
-    my $sigma_sum = sub {
-        my ($x) = @_;
-        my $sx = Math::Prime::Util::GMP::sqrtint($x);
-
-        if ($k == 0) {
-            my @terms;
-            for my $i (1 .. $sx) {
-                push @terms, Math::Prime::Util::GMP::divint($x, $i);
-            }
-            my $total = Math::Prime::Util::GMP::vecsum(@terms);
-            return Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::mulint(2, $total), Math::Prime::Util::GMP::mulint($sx, $sx));
-        }
-
-        my @terms;
-        for my $i (1 .. $sx) {
-            my $x_div_i =
-              HAS_PRIME_UTIL
-              ? Math::Prime::Util::divint($x, $i)
-              : Math::Prime::Util::GMP::divint($x, $i);
-            push @terms, (HAS_PRIME_UTIL and $k <= 2)
-              ? Math::Prime::Util::powersum($x_div_i, $k)
-              : Math::Prime::Util::GMP::powersum($x_div_i, $k);
-
-            my $ik = ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
-            push @terms, $ik * $x_div_i;
-            $terms[-1] = Math::Prime::Util::GMP::mulint($ik, $x_div_i) if ($terms[-1] > ULONG_MAX);
-        }
-
-        my $total = Math::Prime::Util::GMP::vecsum(@terms);
-
-        return Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sx, Math::Prime::Util::GMP::powersum($sx, $k)));
-    };
 
     my $s = Math::Prime::Util::GMP::sqrtint($n);
     my $P = HAS_PRIME_UTIL ? Math::Prime::Util::powerful_numbers(1, $n) : [map { $$_ } @{_set_int($n)->squarefull}];
@@ -30828,7 +30775,7 @@ sub bsigma_sum {
     my @terms;
     foreach my $i (0 .. $#F) {
         my $n_div_p = Math::Prime::Util::GMP::divint($n, $P->[$i]);
-        push @terms, Math::Prime::Util::GMP::mulint($F[$i], $sigma_sum->($n_div_p));
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], _sigma_sum($n_div_p, $k));
     }
 
     foreach my $m (1 .. $s) {
@@ -30843,14 +30790,14 @@ sub bsigma_sum {
         my $sig_k_m =
           HAS_PRIME_UTIL
           ? Math::Prime::Util::divisor_sum($m, $k)
-          : Math::Prime::Util::GMP::divisor_sum($m, $k);
+          : Math::Prime::Util::GMP::sigma($m, $k);
         push @terms, HAS_PRIME_UTIL
           ? Math::Prime::Util::mulint($sig_k_m, $S[$c])
           : Math::Prime::Util::GMP::mulint($sig_k_m, $S[$c]);
     }
 
     my $A = Math::Prime::Util::GMP::vecsum(@terms);
-    my $B = Math::Prime::Util::GMP::mulint($sigma_sum->($s), $S[Math::Prime::Util::GMP::powerful_count($s)]);
+    my $B = Math::Prime::Util::GMP::mulint(_sigma_sum($s, $k), $S[Math::Prime::Util::GMP::powerful_count($s)]);
 
     _set_int(Math::Prime::Util::GMP::subint($A, $B));
 }
@@ -31028,39 +30975,6 @@ sub isigma_sum {
     $n = _big2uistr($$n) // return ZERO;
     $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
-    my $sigma_sum = sub {
-        my ($x) = @_;
-        my $sx = Math::Prime::Util::GMP::sqrtint($x);
-
-        if ($k == 0) {
-            my @terms;
-            for my $i (1 .. $sx) {
-                push @terms, Math::Prime::Util::GMP::divint($x, $i);
-            }
-            my $total = Math::Prime::Util::GMP::vecsum(@terms);
-            return Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::mulint(2, $total), Math::Prime::Util::GMP::mulint($sx, $sx));
-        }
-
-        my @terms;
-        for my $i (1 .. $sx) {
-            my $x_div_i =
-              HAS_PRIME_UTIL
-              ? Math::Prime::Util::divint($x, $i)
-              : Math::Prime::Util::GMP::divint($x, $i);
-            push @terms, (HAS_PRIME_UTIL and $k <= 2)
-              ? Math::Prime::Util::powersum($x_div_i, $k)
-              : Math::Prime::Util::GMP::powersum($x_div_i, $k);
-
-            my $ik = ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
-            push @terms, $ik * $x_div_i;
-            $terms[-1] = Math::Prime::Util::GMP::mulint($ik, $x_div_i) if ($terms[-1] > ULONG_MAX);
-        }
-
-        my $total = Math::Prime::Util::GMP::vecsum(@terms);
-
-        return Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sx, Math::Prime::Util::GMP::powersum($sx, $k)));
-    };
-
     my $s = Math::Prime::Util::GMP::sqrtint($n);
     my $P = HAS_PRIME_UTIL ? Math::Prime::Util::powerful_numbers(1, $n) : [map { $$_ } @{_set_int($n)->squarefull}];
 
@@ -31078,7 +30992,7 @@ sub isigma_sum {
     my @terms;
     foreach my $i (0 .. $#F) {
         my $n_div_p = Math::Prime::Util::GMP::divint($n, $P->[$i]);
-        push @terms, Math::Prime::Util::GMP::mulint($F[$i], $sigma_sum->($n_div_p));
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], _sigma_sum($n_div_p, $k));
     }
 
     foreach my $m (1 .. $s) {
@@ -31093,14 +31007,14 @@ sub isigma_sum {
         my $sig_k_m =
           HAS_PRIME_UTIL
           ? Math::Prime::Util::divisor_sum($m, $k)
-          : Math::Prime::Util::GMP::divisor_sum($m, $k);
+          : Math::Prime::Util::GMP::sigma($m, $k);
         push @terms, HAS_PRIME_UTIL
           ? Math::Prime::Util::mulint($sig_k_m, $S[$c])
           : Math::Prime::Util::GMP::mulint($sig_k_m, $S[$c]);
     }
 
     my $A = Math::Prime::Util::GMP::vecsum(@terms);
-    my $B = Math::Prime::Util::GMP::mulint($sigma_sum->($s), $S[Math::Prime::Util::GMP::powerful_count($s)]);
+    my $B = Math::Prime::Util::GMP::mulint(_sigma_sum($s, $k), $S[Math::Prime::Util::GMP::powerful_count($s)]);
 
     _set_int(Math::Prime::Util::GMP::subint($A, $B));
 }
@@ -31522,7 +31436,9 @@ sub pillai {    # OEIS: A018804 -- Pillai's arithmetical function: Sum_{k=1..n} 
     else {
         $n < 0 and goto &nan;
     }
+
     $n eq '0' and return ZERO;
+    $k == 0   and return ONE;
 
     state $t = Math::GMPz::Rmpz_init_nobless();
     state $u = Math::GMPz::Rmpz_init_nobless();
@@ -32401,11 +32317,53 @@ sub sigma {
 
 *σ = \&sigma;
 
+# Fast summation of the sigma_k(n) function for n=1..x
+sub _sigma_sum {
+    my ($x, $k) = @_;
+
+    my $sx = Math::Prime::Util::GMP::sqrtint($x);
+
+    if ($k == 0) {
+        my @terms;
+        for my $i (1 .. $sx) {
+            push @terms, HAS_PRIME_UTIL
+              ? Math::Prime::Util::divint($x, $i)
+              : Math::Prime::Util::GMP::divint($x, $i);
+        }
+        my $total = Math::Prime::Util::GMP::vecsum(@terms);
+        return Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::mulint(2, $total), Math::Prime::Util::GMP::mulint($sx, $sx));
+    }
+
+    my @terms;
+    for my $i (1 .. $sx) {
+        my $x_div_i =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divint($x, $i)
+          : Math::Prime::Util::GMP::divint($x, $i);
+
+        push @terms, (HAS_PRIME_UTIL and $k <= 2)
+          ? Math::Prime::Util::powersum($x_div_i, $k)
+          : Math::Prime::Util::GMP::powersum($x_div_i, $k);
+
+        my $ik = ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
+        push @terms, $ik * $x_div_i;
+        $terms[-1] = Math::Prime::Util::GMP::mulint($ik, $x_div_i) if ($terms[-1] > ULONG_MAX);
+    }
+
+    my $total = Math::Prime::Util::GMP::vecsum(@terms);
+    return Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint($sx, Math::Prime::Util::GMP::powersum($sx, $k)));
+}
+
 sub sigma_sum {
     my ($n, $k, $j) = @_;
 
     $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
     $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 0;
+
+    if (FAST_MODE and $j == 0) {
+        $n = _big2uistr($$n) // return ZERO;
+        return _set_int(_sigma_sum($n, $k));
+    }
 
     $k += $j;
 
