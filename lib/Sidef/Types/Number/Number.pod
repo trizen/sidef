@@ -2612,14 +2612,25 @@ This method computes the following sum in C<O(sqrt(n))> steps:
 
 where C<F> and C<G> are the partial sums of C<f> and C<g>, respectively.
 
-    say dirichlet_sum(1e6,
-            { .is_squarefree ? 1 : 0 },
-            { .square },
-            { .squarefree_count },
-            { .faulhaber(2) }
-    )
+Computing C<Sum_{k=1..n} Sum_{d|k, d is squarefree} (n/d)^2>:
 
-Aliases: I<dirichlet_hyperbola>
+    var f = { .is_squarefree ? 1 : 0 }
+    var g = { .square }
+    var F = { .squarefree_count }
+    var G = { .faulhaber_sum(2) }
+
+    say 30.of {|n| dirichlet_sum(n, f, g, F, G) }   # OEIS: A321973
+
+Computing C<Sum_{k=1..n} Sum_{d|k} n * mu(k/d)>:
+
+    var f = {|n| n }
+    var g = {|n| mu(n) }
+    var F = {|n| n*(n+1)/2 }
+    var G = {|n| mertens(n) }
+
+    say 30.of {|n| dirichlet_sum(n, f, g, F, G) }   # OEIS: A002088
+
+Aliases: I<dirichlet_hyperbola>, I<dsum>
 
 =cut
 
@@ -7238,6 +7249,14 @@ Example:
 
     say 30.of { .nuphi }        # OEIS: A254503
     say 30.of { .nuphi(2) }     # OEIS: A254520
+
+=cut
+
+=head2 nuphi_sum
+
+    nuphi_sum(n,k=1)
+
+Partial sums of the nonunitary totient function C<nuphi(x,k)> for C<x=1..n>.
 
 =cut
 

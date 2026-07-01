@@ -27557,6 +27557,7 @@ sub dirichlet_hyperbola {
     _set_int($sum);
 }
 
+*dsum          = \&dirichlet_hyperbola;
 *dirichlet_sum = \&dirichlet_hyperbola;
 
 sub sum_remainders {
@@ -31328,6 +31329,66 @@ sub nuphi {    # OEIS: A254503 (Generalized for k)
     bless \_binsplit(\@terms, \&__mul__);
 }
 
+sub nuphi_sum {
+    my ($n, $k) = @_;
+
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
+    $n = _big2uistr($$n) // goto &nan;
+
+    my $s  = Math::Prime::Util::GMP::sqrtint($n);
+    my $ss = Math::Prime::Util::GMP::sqrtint($s);
+
+    my @M = (0);
+    my @F = (0);
+
+    my @moebius =
+      HAS_PRIME_UTIL
+      ? Math::Prime::Util::moebius(0, $s)
+      : Math::Prime::Util::GMP::moebius(0, $s);
+
+    # Precompute F(i) = mu(i) * i^k and its prefix sums M(i)
+    for my $i (1 .. $s) {
+        my $mu = $moebius[$i];
+
+        if ($mu == 0) {
+            push @F, 0;
+            push @M, $M[-1];
+            next;
+        }
+
+        my $ik = ($k == 0) ? 1 : ($k == 1) ? $i : ($k == 2) ? Math::Prime::Util::GMP::mulint($i, $i) : Math::Prime::Util::GMP::powint($i, $k);
+        my $t  = $mu == -1 ? "-$ik" : $ik;
+
+        push @F, $t;
+        push @M, Math::Prime::Util::GMP::addint($M[-1], $t);
+    }
+
+    my @terms;
+    for my $i (1 .. $ss) {
+        $F[$i] || next;
+
+        my $i2   = Math::Prime::Util::GMP::mulint($i, $i);
+        my $nod2 = Math::Prime::Util::GMP::divint($n, $i2);
+
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], Math::Prime::Util::GMP::powersum($nod2, $k));
+    }
+
+    for my $i (1 .. $s) {
+        my $div_sum =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powint($i, $k)
+          : Math::Prime::Util::GMP::powint($i, $k);
+
+        my $m_idx = Math::Prime::Util::GMP::sqrtint(Math::Prime::Util::GMP::divint($n, $i));
+        push @terms, Math::Prime::Util::GMP::mulint($div_sum, $M[$m_idx]);
+    }
+
+    my $total = Math::Prime::Util::GMP::vecsum(@terms);
+    $total = Math::Prime::Util::GMP::subint($total, Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::powersum($s, $k), $M[$ss]));
+
+    _set_int($total);
+}
+
 sub iphi {    # OEIS: A091732 -- infinitary analog of Euler's phi function
     my ($n, $k) = @_;
 
@@ -31404,10 +31465,17 @@ sub _iphi_squarefull_aux {
                     for (my ($temp_i, $bit) = ($i, 0) ; $temp_i > 0 ; ($temp_i >>= 1, $bit++)) {
                         if ($temp_i & 1) {
                             while (@P <= $bit) {
-                                push @P, Math::Prime::Util::GMP::mulint($P[-1], $P[-1]);
-                                push @T, Math::Prime::Util::GMP::subint($P[-1], "1");
+                                push @P, HAS_PRIME_UTIL
+                                  ? Math::Prime::Util::mulint($P[-1], $P[-1])
+                                  : Math::Prime::Util::GMP::mulint($P[-1], $P[-1]);
+                                push @T, HAS_PRIME_UTIL
+                                  ? Math::Prime::Util::subint($P[-1], 1)
+                                  : Math::Prime::Util::GMP::subint($P[-1], "1");
                             }
-                            $iphi = Math::Prime::Util::GMP::mulint($iphi, $T[$bit]);
+                            $iphi =
+                              HAS_PRIME_UTIL
+                              ? Math::Prime::Util::mulint($iphi, $T[$bit])
+                              : Math::Prime::Util::GMP::mulint($iphi, $T[$bit]);
                         }
                     }
 
@@ -31415,12 +31483,21 @@ sub _iphi_squarefull_aux {
                     for my $m (1 .. $i) {
                         next if $h[$i - $m] eq "0";
                         while (@J <= $m) {
-                            push @J, Math::Prime::Util::GMP::mulint($J[-1], $pk);
+                            push @J, HAS_PRIME_UTIL
+                              ? Math::Prime::Util::mulint($J[-1], $pk)
+                              : Math::Prime::Util::GMP::mulint($J[-1], $pk);
                         }
-                        push @terms, Math::Prime::Util::GMP::mulint($J[$m], $h[$i - $m]);
+                        push @terms, HAS_PRIME_UTIL
+                          ? Math::Prime::Util::mulint($J[$m], $h[$i - $m])
+                          : Math::Prime::Util::GMP::mulint($J[$m], $h[$i - $m]);
                     }
-                    my $sum = Math::Prime::Util::GMP::vecsum(@terms);
-                    push @h, Math::Prime::Util::GMP::subint($iphi, $sum);
+                    my $sum =
+                      HAS_PRIME_UTIL
+                      ? Math::Prime::Util::vecsum(@terms)
+                      : Math::Prime::Util::GMP::vecsum(@terms);
+                    push @h, HAS_PRIME_UTIL
+                      ? Math::Prime::Util::subint($iphi, $sum)
+                      : Math::Prime::Util::GMP::subint($iphi, $sum);
                 }
                 $h[$e];
             };

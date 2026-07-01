@@ -60,6 +60,7 @@ var h3 = Hash(
     bsigma_sum => 'bsigma',
 
     uphi_sum => 'uphi',
+    nuphi_sum => 'nuphi',
     iphi_sum => 'iphi',
     phi_sum => 'phi',
     pillai_sum => 'pillai',
