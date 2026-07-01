@@ -3958,6 +3958,16 @@ Infinitary analog of Euler's phi function. (L<OEIS A091732|https://oeis.org/A091
 
 =cut
 
+=head2 iphi_sum
+
+    iphi_sum(n,k=1)
+
+Partial sums of the infinitary totient function C<iphi(x,k)> for C<x=1..n>.
+
+    say 30.of { .iphi_sum }     #=> OEIS: A327572
+
+=cut
+
 =head2 ipolygonal_root
 
     ipolygonal_root(n,k)

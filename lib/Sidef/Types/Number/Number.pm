@@ -31378,6 +31378,116 @@ sub iphi {    # OEIS: A091732 -- infinitary analog of Euler's phi function
     bless \_binsplit(\@terms, \&__mul__);
 }
 
+sub _iphi_squarefull_aux {
+    my ($n, $k) = @_;
+
+    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+        return Math::Prime::Util::vecprod(
+            map {
+                my ($p, $e) = @$_;
+                my @h = (1, 0);    # h(1)=1, h(p)=0
+                for my $i (2 .. $e) {
+                    my $iphi = 1;
+                    for (my ($temp_i, $bit) = ($i, 0) ; $temp_i > 0 ; ($temp_i >>= 1, $bit++)) {
+                        if ($temp_i & 1) {
+                            my $term = Math::Prime::Util::subint(Math::Prime::Util::powint($p, $k * (1 << $bit)), 1);
+                            $iphi = Math::Prime::Util::mulint($iphi, $term);
+                        }
+                    }
+                    my $sum = 0;
+                    for my $m (1 .. $i) {
+                        next if !$h[$i - $m];
+                        my $Jk = Math::Prime::Util::mulint(Math::Prime::Util::powint($p, $k * ($m - 1)),
+                                                           Math::Prime::Util::subint(Math::Prime::Util::powint($p, $k), 1));
+                        $sum = Math::Prime::Util::addint($sum, Math::Prime::Util::mulint($Jk, $h[$i - $m]));
+                    }
+                    push @h, Math::Prime::Util::subint($iphi, $sum);
+                }
+                $h[$e];
+            } grep { $_->[1] >= 2 } Math::Prime::Util::factor_exp($n)
+        );
+    }
+
+    Math::Prime::Util::GMP::vecprod(
+        map {
+            my ($p, $e) = @$_;
+            my @h = ("1", "0");
+            for my $i (2 .. $e) {
+                my $iphi = "1";
+                for (my ($temp_i, $bit) = ($i, 0) ; $temp_i > 0 ; ($temp_i >>= 1, $bit++)) {
+                    if ($temp_i & 1) {
+                        my $term = Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::powint($p, $k * (1 << $bit)), 1);
+                        $iphi = Math::Prime::Util::GMP::mulint($iphi, $term);
+                    }
+                }
+                my $sum = "0";
+                for my $m (1 .. $i) {
+                    next if $h[$i - $m] eq "0";
+                    my $Jk = Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::powint($p, $k * ($m - 1)),
+                                                            Math::Prime::Util::GMP::subint(Math::Prime::Util::GMP::powint($p, $k), 1));
+                    $sum = Math::Prime::Util::GMP::addint($sum, Math::Prime::Util::GMP::mulint($Jk, $h[$i - $m]));
+                }
+                push @h, Math::Prime::Util::GMP::subint($iphi, $sum);
+            }
+            $h[$e];
+        } grep { $_->[1] >= 2 } _factor_exp($n)
+    );
+}
+
+sub iphi_sum {
+    my ($n, $j) = @_;
+
+    $n = _big2uistr($$n) // return ZERO;
+    $j = defined($j) ? do { _valid(\$j); _any2ui($$j) // goto &nan } : 1;
+
+    my $s = Math::Prime::Util::GMP::sqrtint($n);
+    my $P =
+      HAS_PRIME_UTIL
+      ? Math::Prime::Util::powerful_numbers(1, $n)
+      : [map { $$_ } @{_set_int($n)->squarefull}];
+
+    my @F = ();
+    my @S = (0);
+
+    foreach my $k (@$P) {
+        my $t = _iphi_squarefull_aux($k, $j);
+        push(@F, $t) if !($k > $s);
+        push @S, HAS_PRIME_UTIL
+          ? Math::Prime::Util::addint($S[-1], $t)
+          : Math::Prime::Util::GMP::addint($S[-1], $t);
+    }
+
+    my $j_obj = bless \$j;
+
+    my @terms;
+    foreach my $i (0 .. $#F) {
+        push @terms, Math::Prime::Util::GMP::mulint($F[$i], ${_set_int(Math::Prime::Util::GMP::divint($n, $P->[$i]))->phi_sum($j_obj)});
+    }
+
+    foreach my $k (1 .. $s) {
+        my $t =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::divint($n, $k)
+          : Math::Prime::Util::GMP::divint($n, $k);
+        my $c =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::powerful_count($t)
+          : Math::Prime::Util::GMP::powerful_count($t);
+        my $Jk =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::jordan_totient($j, $k)
+          : Math::Prime::Util::GMP::jordan_totient($j, $k);
+        push @terms, HAS_PRIME_UTIL
+          ? Math::Prime::Util::mulint($Jk, $S[$c])
+          : Math::Prime::Util::GMP::mulint($Jk, $S[$c]);
+    }
+
+    my $A = Math::Prime::Util::GMP::vecsum(@terms);
+    my $B = Math::Prime::Util::GMP::mulint(${_set_int($s)->phi_sum($j_obj)}, $S[Math::Prime::Util::GMP::powerful_count($s)]);
+
+    _set_int(Math::Prime::Util::GMP::subint($A, $B));
+}
+
 sub bphi {    # OEIS: A116550 -- bi-unitary analog of Euler's totient function of n.
     my ($n) = @_;
 
