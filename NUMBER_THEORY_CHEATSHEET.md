@@ -1189,8 +1189,8 @@ say 20.of {|n| lucasV(2, -1, n) }   # Pell-Lucas numbers
 say 20.of {|n| lucasU(1, -2, n) }   # Jacobsthal numbers  (P=1, Q=-2)
 
 # Fast modular evaluation for large indices:
-say lucasumod(1, -1, 10**18, 10**9+7)
-say fibonaccimod(10**18, 10**9+7)
+say lucasumod(1, -1, 10**18, 10**9 + 7)
+say fibonaccimod(10**18, 10**9 + 7)
 ```
 
 ---
@@ -1656,9 +1656,9 @@ say cyclotomic(6, 2)    # Φ_6(2) = 3
 
 # Product identity x^n − 1 = ∏_{d|n} Φ_d(x):
 say 12.divisors_prod {|d| cyclotomic(d, 2) }   # = 2^12 − 1 = 4095
-say 2**12 - 1   # 4095 ✓
+say (2**12 - 1)   # 4095 ✓
 
-say cyclotomicmod(12, 2, 10**9+7)   # Φ_{12}(2) mod 10^9+7
+say cyclotomicmod(12, 2, 10**9 + 7)   # Φ_{12}(2) mod 10^9+7
 ```
 
 ### Bernoulli Numbers
@@ -1691,23 +1691,12 @@ say irregular.first(10)   #=> [37, 59, 67, 101, 103, 131, 149, 157, 233, 257]
 Σ_{k=1}^n k^p exactly, via Bernoulli numbers:
 
 ```ruby
-say faulhaber_sum(1, 100)       # Σ k   = 5050
-say faulhaber_sum(2, 100)       # Σ k^2 = 338350
-say faulhaber_sum(3, 100)       # Σ k^3 = 25502500 = 5050^2 ✓
+say faulhaber_sum(100, 1)       # Σ k   = 5050
+say faulhaber_sum(100, 2)       # Σ k^2 = 338350
+say faulhaber_sum(100, 3)       # Σ k^3 = 25502500 = 5050^2 ✓
 
 # Range sum Σ_{k=a}^b k^p:
 say faulhaber_range(50, 100, 2)  # Σ_{k=50}^100 k^2
-```
-
-### Genocchi Numbers
-
-G_n = 2(1 − 2^n) B_n:
-
-```ruby
-for n in (1..10) {
-    say "G_#{n} = #{n.genocchi}"
-}
-#=> G_1=1, G_2=-1, G_3=0, G_4=1, G_5=0, G_6=-3, G_7=0, G_8=17, ...
 ```
 
 ### Bell, Catalan, Motzkin, Fubini
@@ -1715,13 +1704,13 @@ for n in (1..10) {
 ```ruby
 say  5.bell_number     # B_5 = 52      set partitions of a 5-element set
 say 10.bell_number     # B_10 = 115975
-say bellmod(100, 10**9+7)   # B_100 mod 10^9+7
+say bellmod(100, 10**9 + 7)   # B_100 mod 10^9+7
 
 say  5.catalan    # C_5  = 42
 say 10.catalan    # C_10 = 16796
 
 say  5.motzkin    # M_5  = 21    (A001006)
-say 10.motzkin    # M_10 = 4862
+say 10.motzkin    # M_10 = 2188
 
 say 4.fubini          # 75    ordered set partitions  (A000670)
 say 5.fubini          # 541
@@ -1731,11 +1720,11 @@ say fubini_numbers(5) #=> [1, 1, 3, 13, 75, 541]
 ### Harmonic Numbers
 
 ```ruby
-# harmfrac(n): H_n = 1 + 1/2 + … + 1/n as exact rational:
-say 10.harmfrac   # 7381/2520
+# harmonic(n): H_n = 1 + 1/2 + … + 1/n as exact rational:
+say 10.harmonic      # 7381/2520
 
-# Generalised H_{n,k} = Σ_{j=1}^n j^{-k}:
-say 5.harmfrac(2)   # 5765/3600
+# N-th Harmonic number of k-th order:
+say 10.harmonic(2)   # 55991/2520
 ```
 
 ### Subfactorial / Derangements
@@ -1752,7 +1741,7 @@ for p in (primes(3, 50)) {
 }
 
 # First Perrin pseudoprime: 271441 = 521^2
-say 271441.is_prime          # false
+say 271441.is_prime           # false
 say perrinmod(271441, 271441) # 0 — passes despite being composite
 ```
 
@@ -1762,7 +1751,7 @@ A(0)=1, A(1)=0, A(2)=0, A(n) = A(n−2) + A(n−3) (A000931):
 
 ```ruby
 say 20.of {|n| padovan(n) }
-say padovanmod(1000, 10**9+7)
+say padovanmod(1000, 10**9 + 7)
 ```
 
 ### Tangent and Secant Numbers
@@ -1799,7 +1788,7 @@ func a(n) { n.primitive_part(f) }
 
 say 20.of {|n| a(n) }
 # Verify: f(n) = ∏_{d|n} a(d)
-say 12.divisors_prod {|d| a(d) } == f(12)   # true ✓
+say (12.divisors_prod {|d| a(d) } == f(12))   # true ✓
 ```
 
 ---
@@ -1836,14 +1825,22 @@ n.aliquot_sum         #=> σ(n) − n    aliases: aliquot, proper_sigma
 n.proper_sigma0       #=> τ(n) − 1
 n.divisors_sum {|d|}  #=> Σ_{d|n} f(d)
 n.divisors_prod {|d|} #=> ∏_{d|n} f(d)
-n.usigma              #=> unitary sigma     (A034448)
-n.bsigma              #=> bi-unitary sigma  (A188999)
-n.isigma              #=> infinitary sigma  (A049417)
-n.esigma              #=> exponential sigma (A051377)
+n.usigma(k)           #=> unitary sigma     (A034448)
+n.bsigma(k)           #=> bi-unitary sigma  (A188999)
+n.isigma(k)           #=> infinitary sigma  (A049417)
+n.esigma(k)           #=> exponential sigma (A051377)
+n.nusigma(k)          #=> non-unitary sigma
+n.nbsigma(k)          #=> non-bi-unitary sigma
+n.nisigma(k)          #=> noninfinitary sigma
+n.nesigma(k)          #=> nonexponential sigma
 n.udivisors           #=> unitary divisors
 n.bdivisors           #=> bi-unitary divisors  alias: biudivisors
 n.idivisors           #=> infinitary divisors
 n.edivisors           #=> exponential divisors
+n.nudivisors          #=> nonunitary divisors
+n.nbdivisors          #=> non-bi-unitary divisors  alias: biudivisors
+n.nidivisors          #=> noninfinitary divisors
+n.nedivisors          #=> nonexponential divisors
 n.sigma_inverse       #=> {m : σ(m) = n}
 tau_inverse(lo,hi,k)  #=> {m ∈ [lo,hi] : τ(m) = k}
 nth_tau_inverse(lo,k) #=> smallest m ≥ lo with τ(m) = k
@@ -1914,15 +1911,21 @@ n.prime_count              #=> π(n)  aliases: primepi, count_primes
 n.prime_sum                #=> Σ_{p≤n} p  aliases: primes_sum, sum_primes
 n.mertens                  #=> M(n) = Σ μ(k);  mertens(a,b) for range
 n.liouville_sum            #=> L(n) = Σ λ(k)
-n.totient_sum              #=> Σ_{k≤n} φ(k)   alias: euler_phi_sum
+n.phi_sum                  #=> Σ_{k≤n} φ(k)    alias: totient_sum(n)
 n.jordan_totient_sum(k)    #=> Σ_{m≤n} J_k(m)  alias: totient_sum(n,k)
-n.sigma_sum                #=> Σ_{k≤n} σ(k)
-n.tau_sum                  #=> Σ_{k≤n} τ(k)   alias: sigma0_sum
-n.dedekind_psi_sum         #=> Σ_{k≤n} ψ(k)   alias: psi_sum
+n.uphi_sum(k)              #=> Σ_{m≤n} uphi_k(m)
+n.nuphi_sum(k)             #=> Σ_{m≤n} nuphi_k(m)
+n.iphi_sum(k)              #=> Σ_{m≤n} iphi_k(m)
+n.sigma_sum(k)             #=> Σ_{m≤n} σ_k(m)
+n.usigma_sum(k)            #=> Σ_{m≤n} usigma_k(m)
+n.tau_sum                  #=> Σ_{k≤n} τ(k)     alias: sigma0_sum
+n.dedekind_psi_sum(k)      #=> Σ_{m≤n} ψ_k(m)   alias: psi_sum
 n.exp_mangoldt_sum         #=> integer Chebyshev ψ̃(n)
-n.pillai_sum               #=> Σ_{k≤n} pillai(k)
+n.pillai_sum(k)            #=> Σ_{k≤n} pillai_k(m)
 n.gpf_sum                  #=> Σ gpf(k)    (A088822)
 n.lpf_sum                  #=> Σ lpf(k)
+n.sopf_sum                 #=> Σ sopf(k)
+n.sopfr_sum                #=> Σ sopfr(k)
 n.bigomega_sum             #=> Σ Ω(k)
 n.omega_sum                #=> Σ ω(k)
 n.exp_bigomega_sum(base)   #=> Σ base^{Ω(k)}  (base=-1 gives liouville_sum)

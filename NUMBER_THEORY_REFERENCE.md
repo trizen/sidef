@@ -30,7 +30,7 @@ After [installing Sidef](https://github.com/trizen/sidef/blob/master/SIDEF_BEGIN
 
 ```
 $ sidef
-Sidef 26.06, running on Linux, using Perl v5.42.1.
+Sidef 26.07, running on Linux, using Perl v5.42.1.
 Type "help", "copyright" or "license" for more information.
 >
 ```
@@ -362,7 +362,7 @@ for n in (0..30) {
 
 This section briefly describes the built-in classes related to computational number theory.
 
-For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.06/sidef-book.pdf)).
+For the documentation of other built-in classes, please see: [https://trizen.gitbook.io/sidef-lang/](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.07/sidef-book.pdf)).
 
 ## Mod class
 

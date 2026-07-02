@@ -101,7 +101,7 @@ After installing Sidef, launch the interactive environment with the `sidef` comm
 
 ```console
 $ sidef
-Sidef 26.06, running on Linux, using Perl v5.42.1.
+Sidef 26.07, running on Linux, using Perl v5.42.1.
 Type "help", "copyright" or "license" for more information.
 >
 ```
@@ -3105,7 +3105,7 @@ say moebius_invert({|d| sigma(d) }, 12)   # should be 12
 
 ### Official Documentation
 
-- **Sidef book**: [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.06/sidef-book.pdf))
+- **Sidef book**: [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.07/sidef-book.pdf))
 - **Advanced tutorial**: [SIDEF_ADVANCED_GUIDE.md](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md)
 - **Computational Algebra Guide**: [COMPUTATIONAL_ALGEBRA_GUIDE.md](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md)
 - **Function reference for number theory**: [NUMBER_THEORY_REFERENCE.md](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md)

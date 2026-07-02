@@ -211,7 +211,7 @@ Run `sidef` with no arguments to enter the interactive prompt, where you type ex
 
 ```
 $ sidef
-Sidef 26.06, running on Linux, using Perl v5.42.1.
+Sidef 26.07, running on Linux, using Perl v5.42.1.
 Type "help", "copyright" or "license" for more information.
 > "Hello!"
 #1 = "Hello!"
@@ -2132,7 +2132,7 @@ You've covered the fundamentals! Here's where to go next.
 | Resource | Description |
 |----------|-------------|
 | 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
-| 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.06/sidef-book.pdf) | The full book in PDF format for offline reading |
+| 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.07/sidef-book.pdf) | The full book in PDF format for offline reading |
 | 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
 | 🔢 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
 | 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) | Complete function reference for number theory |

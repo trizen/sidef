@@ -1825,7 +1825,7 @@ model.keys.sort.each { |c|
 ### Official Documentation
 
 - 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) — Complete language reference
-- 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.06/sidef-book.pdf) — Offline reading
+- 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.07/sidef-book.pdf) — Offline reading
 - 🔢 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) — Deep dive into Sidef's mathematical functions
 - 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) — Complete function reference for number theory
 

@@ -29200,7 +29200,7 @@ sub euler_phi {
 *euler_totient = \&euler_phi;
 *totient       = \&euler_phi;
 
-sub totient_sum {
+sub phi_sum {
     my ($n, $k) = @_;
 
     # TODO: use a faster formula
@@ -29233,9 +29233,9 @@ sub totient_sum {
     $n->dirichlet_hyperbola($f, $g, $F, $G);
 }
 
-*phi_sum            = \&totient_sum;
-*euler_phi_sum      = \&totient_sum;
-*jordan_totient_sum = \&totient_sum;
+*totient_sum            = \&phi_sum;
+*euler_phi_sum      = \&phi_sum;
+*jordan_totient_sum = \&phi_sum;
 
 sub cototient {
     my ($n, $k) = @_;
@@ -29255,7 +29255,7 @@ sub cototient {
 sub cototient_sum {
     my ($n, $k) = @_;
     $k //= ONE;
-    $n->faulhaber_sum($k)->sub($n->totient_sum($k));
+    $n->faulhaber_sum($k)->sub($n->phi_sum($k));
 }
 
 sub _n_over_d_divisors {
@@ -31683,13 +31683,13 @@ sub pillai_sum {
         $f = sub { $_[0]->jordan_totient($k_obj) };
         $g = sub { $_[0]->ipow($k_obj) };
 
-        $F = sub { $_[0]->totient_sum($k_obj) };
+        $F = sub { $_[0]->phi_sum($k_obj) };
         $G = sub { $_[0]->faulhaber_sum($k_obj) };
 
         if ($k == 1) {
             $g = sub { $_[0] };
             $f = sub { $_[0]->euler_phi };
-            $F = sub { $_[0]->totient_sum };
+            $F = sub { $_[0]->phi_sum };
         }
     }
 
