@@ -30673,7 +30673,7 @@ sub nusigma_sum {
 }
 
 sub nusigma0_sum {
-    my($n) = @_;
+    my ($n) = @_;
     $n->sigma0_sum->sub($n->usigma0_sum);
 }
 
@@ -30843,7 +30843,7 @@ sub nbsigma_sum {
 }
 
 sub nbsigma0_sum {
-    my($n) = @_;
+    my ($n) = @_;
     $n->sigma0_sum->sub($n->bsigma0_sum);
 }
 
@@ -30912,91 +30912,54 @@ sub isigma {    # A049417: sum of infinitary divisors of n
     bless \_binsplit(\@terms, \&__mul__);
 }
 
-# Helper subroutine to explicitly compute H_k(p^e) for the isigma_k convolution
-sub _isigma_h_pe {
-    my ($p, $e, $k, $gmp) = @_;
-
-    # Inline closure to compute isigma_k(p^e) based on binary representation of e
-    my $isig = sub {
-        my ($exp) = @_;
-        return 1 if $exp == 0;
-        my $ans = 1;
-        my $i   = 0;
-        while ($exp > 0) {
-            if ($exp & 1) {
-                my $pow;
-                if ($k == 1 && $i == 0) {
-                    $pow = $p;
-                }
-                else {
-                    my $exp_k = $k * (1 << $i);
-                    $pow =
-                      $gmp
-                      ? Math::Prime::Util::GMP::powint($p, $exp_k)
-                      : Math::Prime::Util::powint($p, $exp_k);
-                }
-
-                my $term =
-                  $gmp
-                  ? Math::Prime::Util::GMP::addint($pow, 1)
-                  : Math::Prime::Util::addint($pow, 1);
-
-                $ans =
-                  $gmp
-                  ? Math::Prime::Util::GMP::mulint($ans, $term)
-                  : Math::Prime::Util::mulint($ans, $term);
-            }
-            $exp >>= 1;
-            $i++;
-        }
-        return $ans;
-    };
-
-    my $pk =
-      ($k == 1) ? $p
-      : (
-         $gmp ? Math::Prime::Util::GMP::powint($p, $k)
-         : Math::Prime::Util::powint($p, $k)
-        );
-
-    my $pk_plus_1 =
-      $gmp
-      ? Math::Prime::Util::GMP::addint($pk, 1)
-      : Math::Prime::Util::addint($pk, 1);
-
-    # Evaluate convolution: isigma_k(p^e) - (p^k + 1)*isigma_k(p^{e-1}) + p^k * isigma_k(p^{e-2})
-    my $t1 = $isig->($e);
-    my $t2 =
-      $gmp
-      ? Math::Prime::Util::GMP::mulint($pk_plus_1, $isig->($e - 1))
-      : Math::Prime::Util::mulint($pk_plus_1, $isig->($e - 1));
-    my $t3 =
-      $gmp
-      ? Math::Prime::Util::GMP::mulint($pk, $isig->($e - 2))
-      : Math::Prime::Util::mulint($pk, $isig->($e - 2));
-
-    return $gmp
-      ? Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::subint($t1, $t2), $t3)
-      : Math::Prime::Util::addint(Math::Prime::Util::subint($t1, $t2), $t3);
-}
-
 sub _isigma_squarefull_aux {
     my ($n, $k) = @_;
 
-    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-        return Math::Prime::Util::vecprod(
-            map {
-                my ($p, $e) = @$_;
-                _isigma_h_pe($p, $e, $k, 0);
-            } grep { $_->[1] >= 2 } Math::Prime::Util::factor_exp($n)
-        );
+    state %cache;
+
+    if (scalar(%cache) > 1e6) {
+        undef %cache;
     }
 
     Math::Prime::Util::GMP::vecprod(
         map {
             my ($p, $e) = @$_;
-            _isigma_h_pe($p, $e, $k, 1);
-        } grep { $_->[1] >= 2 } _factor_exp($n)
+
+            $cache{$p}{$e}{$k} //= do {
+                my $pk        = ($k == 1) ? $p : Math::Prime::Util::GMP::powint($p, $k);
+                my $pk_plus_1 = Math::Prime::Util::GMP::addint($pk, 1);
+
+                my @pow_vals = ($pk);
+                my @isig_res;
+
+                for my $exp ($e, $e - 1, $e - 2) {
+                    if ($exp == 0) {
+                        push @isig_res, 1;
+                        next;
+                    }
+                    my $ans  = 1;
+                    my $i    = 0;
+                    my $temp = $exp;
+                    while ($temp > 0) {
+                        if ($temp & 1) {
+                            while (@pow_vals <= $i) {
+                                push @pow_vals, Math::Prime::Util::GMP::mulint($pow_vals[-1], $pow_vals[-1]);
+                            }
+                            $ans = Math::Prime::Util::GMP::mulint($ans, Math::Prime::Util::GMP::addint($pow_vals[$i], 1));
+                        }
+                        $temp >>= 1;
+                        $i++;
+                    }
+                    push @isig_res, $ans;
+                }
+
+                my ($t1, $t2_raw, $t3_raw) = @isig_res;
+                my $t2 = Math::Prime::Util::GMP::mulint($pk_plus_1, $t2_raw);
+                my $t3 = Math::Prime::Util::GMP::mulint($pk,        $t3_raw);
+
+                Math::Prime::Util::GMP::addint(Math::Prime::Util::GMP::subint($t1, $t2), $t3);
+            };
+        } grep { $_->[1] >= 2 } (HAS_PRIME_UTIL ? Math::Prime::Util::factor_exp($n) : _factor_exp($n))
     );
 }
 
