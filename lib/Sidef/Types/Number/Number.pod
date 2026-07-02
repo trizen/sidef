@@ -1096,6 +1096,22 @@ Returns the sum of the generalized Omega function C<Ω_k(j)>, for C<j=1..n>.
 
 =cut
 
+=head2 binomial
+
+    binomial(n,k)
+
+Returns the binomial coefficient C<n> over C<k>, also called the "choose" function.
+
+Equivalent to:
+
+                        n!
+    binomial(n, k) = --------
+                     k!(n-k)!
+
+Aliases: I<nok>
+
+=cut
+
 =head2 binomialmod
 
     binomialmod(n, k, m)
@@ -1306,7 +1322,7 @@ Aliases: I<biusigma0>
 
 =head2 bsigma_sum
 
-    bsigma_sum(n,k=0)
+    bsigma_sum(n,k=1)
 
 Sum of the C<bsigma(x,k)> function, for C<x = 1..n>.
 
@@ -6247,6 +6263,27 @@ Returns the count of the non-bi-unitary divisors of C<n>.
 
 =cut
 
+=head2 nbsigma_sum
+
+    nbsigma_sum(n,k=1)
+
+Sum of the C<nbsigma(x,k)> function, for C<x = 1..n>.
+
+    say 30.of { .nbsigma_sum(0) }   # Partial sums of OEIS A390957
+    say 30.of { .nbsigma_sum    }   # Partial sums of OEIS A319072
+
+=cut
+
+=head2 nbsigma0_sum
+
+    nbsigma0_sum(n)
+
+Sum of number of non-bi-unitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .nbsigma0_sum }    # Partial sums of OEIS A390957
+
+=cut
+
 =head2 nd
 
     n.st({...})
@@ -6826,20 +6863,24 @@ Returns the count of the noninfinitary divisors of C<n>. (L<OEIS A348341|https:/
 
 =cut
 
-=head2 nok
+=head2 nisigma_sum
 
-    nok(n,k)
-    binomial(n,k)
+    nisigma_sum(n,k=1)
 
-Returns the binomial coefficient C<n> over C<k>, also called the "choose" function.
+Sum of the C<nisigma(x,k)> function, for C<x = 1..n>.
 
-Equivalent to:
+    say 30.of { .nisigma_sum(0) }   # Partial sums of OEIS A348341
+    say 30.of { .nisigma_sum    }   # Partial sums of OEIS A348271
 
-                        n!
-    binomial(n, k) = --------
-                     k!(n-k)!
+=cut
 
-Aliases: I<binomial>
+=head2 nisigma0_sum
+
+    nisigma0_sum(n)
+
+Sum of number of noninfinitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .nisigma0_sum }    # Partial sums of OEIS A348341
 
 =cut
 
@@ -7297,6 +7338,27 @@ Returns the sum of the nonunitary divisors of C<n>, each divisor raised to the k
 Returns the count of the nonunitary divisors of C<n>. (L<OEIS A048105|https://oeis.org/A048105>)
 
     say 30.of { .nusigma0 }    #=> OEIS: A048105
+
+=cut
+
+=head2 nusigma_sum
+
+    nusigma_sum(n,k=1)
+
+Sum of the C<nusigma(x,k)> function, for C<x = 1..n>.
+
+    say 30.of { .nusigma_sum(0) }   # Partial sums of OEIS A048105
+    say 30.of { .nusigma_sum    }   # Partial sums of OEIS A048146
+
+=cut
+
+=head2 nusigma0_sum
+
+    nusigma0_sum(n)
+
+Sum of number of nonunitary divisors of C<k> for C<k=1..n>.
+
+    say 30.of { .nusigma0_sum }    # Partial sums of OEIS A048105
 
 =cut
 

@@ -30647,6 +30647,16 @@ sub nisigma {    # A348271: sum of non-infinitary divisors of n
     $n->sigma($k)->sub($n->isigma($k));
 }
 
+sub nisigma_sum {
+    my ($n, $k) = @_;
+    $n->sigma_sum($k)->sub($n->isigma_sum($k));
+}
+
+sub nisigma0_sum {
+    my ($n) = @_;
+    $n->sigma0_sum->sub($n->isigma0_sum);
+}
+
 sub nusigma0 {    # A048105: count of non-unitary divisors of n
     my ($n) = @_;
     $n->sigma0->sub($n->usigma0);
@@ -30655,6 +30665,16 @@ sub nusigma0 {    # A048105: count of non-unitary divisors of n
 sub nusigma {    # A048146: sum of non-unitary divisors of n
     my ($n, $k) = @_;
     $n->sigma($k)->sub($n->usigma($k));
+}
+
+sub nusigma_sum {
+    my ($n, $k) = @_;
+    $n->sigma_sum($k)->sub($n->usigma_sum($k));
+}
+
+sub nusigma0_sum {
+    my($n) = @_;
+    $n->sigma0_sum->sub($n->usigma0_sum);
 }
 
 sub bsigma0 {    # A286324: count of bi-unitary divisors of n.
@@ -30815,6 +30835,16 @@ sub nbsigma0 {    # A390957: count of non-bi-unitary divisors of n
 sub nbsigma {    # A319072: sum of non-bi-unitary divisors of n.
     my ($n, $k) = @_;
     $n->sigma($k)->sub($n->bsigma($k));
+}
+
+sub nbsigma_sum {
+    my ($n, $k) = @_;
+    $n->sigma_sum($k)->sub($n->bsigma_sum($k));
+}
+
+sub nbsigma0_sum {
+    my($n) = @_;
+    $n->sigma0_sum->sub($n->bsigma0_sum);
 }
 
 sub isigma0 {    # A037445: count of infinitary divisors (or i-divisors) of n

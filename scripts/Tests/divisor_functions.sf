@@ -59,6 +59,10 @@ var h3 = Hash(
     isigma_sum => 'isigma',
     bsigma_sum => 'bsigma',
 
+    nusigma_sum => 'nusigma',
+    nisigma_sum => 'nisigma',
+    nbsigma_sum => 'nbsigma',
+
     uphi_sum => 'uphi',
     nuphi_sum => 'nuphi',
     iphi_sum => 'iphi',
@@ -87,6 +91,10 @@ var h4 = Hash(
     usigma0_sum => 'usigma0',
     isigma0_sum => 'isigma0',
     bsigma0_sum => 'bsigma0',
+
+    nusigma0_sum => 'nusigma0',
+    nisigma0_sum => 'nisigma0',
+    nbsigma0_sum => 'nbsigma0',
 
     #lpf_sum => 'lpf',
     #gpf_sum => 'gpf',
