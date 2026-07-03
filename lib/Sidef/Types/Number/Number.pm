@@ -29233,7 +29233,7 @@ sub phi_sum {
     $n->dirichlet_hyperbola($f, $g, $F, $G);
 }
 
-*totient_sum            = \&phi_sum;
+*totient_sum        = \&phi_sum;
 *euler_phi_sum      = \&phi_sum;
 *jordan_totient_sum = \&phi_sum;
 
@@ -31563,35 +31563,72 @@ sub bphi {    # OEIS: A116550 -- bi-unitary analog of Euler's totient function o
     # Formula:
     #   a(n) = Sum{d|n, d is unitary} (-1)^omega(d) * Sum{k|d, k is squarefree, k <= n/d} mu(k) * floor(n/(d*k)).
 
-    my @final_terms;
-
-    foreach my $v (@{$n->udivisors}) {
-        my $sign = (-1)**(scalar _factor_exp($$v));
-        my $x    = $n->idiv($v);
-        my $nod  = "$$x";
-
-        if ($nod eq '1') {
-            push @final_terms, $sign;
-            next;
-        }
-
-        my @terms;
-        foreach my $u (@{$v->squarefree_divisors}) {
-            my $k   = $$u;
-            my $div = Math::Prime::Util::GMP::divint($nod, $k);
-            last if ($div eq '0');
-            my $mu =
-              (HAS_PRIME_UTIL and !ref($k))
-              ? Math::Prime::Util::moebius($k)
-              : Math::Prime::Util::GMP::moebius($k);
-            push @terms, Math::Prime::Util::GMP::mulint($mu, $div);
-        }
-
-        push @final_terms, Math::Prime::Util::GMP::mulint($sign, ((scalar(@terms) == 1) ? $terms[0] : Math::Prime::Util::GMP::vecsum(@terms)));
+    my $n_str = _big2uistr($$n) // goto &nan;
+    if ($n_str eq '1') {
+        return ONE;
     }
 
-    @final_terms || return ZERO;
-    _set_int(Math::Prime::Util::GMP::vecsum(@final_terms));
+    my @factors =
+      (HAS_PRIME_UTIL and $n_str < ULONG_MAX)
+      ? Math::Prime::Util::factor_exp($n_str)
+      : _factor_exp($n_str);
+
+    # Generate choices for each prime factor: [1, p^e, p^{e+1}]
+    my @choices;
+    foreach my $f (@factors) {
+        my ($p, $e) = @$f;
+
+        my $pe  = Math::Prime::Util::GMP::powint($p, $e);
+        my $pe1 = Math::Prime::Util::GMP::mulint($pe, $p);
+
+        # Format: [ [value, weight], ... ]
+        push @choices, [['1', 1], [$pe, -1], [$pe1, 1],];
+    }
+
+    # Sort to maximize DFS pruning (evaluate largest p^e limits first)
+    @choices = sort { Math::Prime::Util::GMP::cmpint($b->[1][0], $a->[1][0]) } @choices;
+
+    my $total_sum = '0';
+
+    # Depth-First Search closure
+    sub {
+        my ($idx, $current_c, $current_w) = @_;
+
+        # Base case: All prime factors have been evaluated
+        if ($idx == scalar(@choices)) {
+            my $div = Math::Prime::Util::GMP::divint($n_str, $current_c);
+            if ($current_w == -1) {
+                $total_sum = Math::Prime::Util::GMP::subint($total_sum, $div);
+            }
+            else {
+                $total_sum = Math::Prime::Util::GMP::addint($total_sum, $div);
+            }
+            return;
+        }
+
+        # Branching
+        foreach my $choice (@{$choices[$idx]}) {
+            my ($val, $wt) = @$choice;
+
+            my $next_c;
+            if ($val eq '1') {
+                $next_c = $current_c;
+            }
+            else {
+                $next_c = Math::Prime::Util::GMP::mulint($current_c, $val);
+            }
+
+            # Crucial Optimization: Prune search space early if c > n
+            # Since choices are [1, p^e, p^{e+1}], if multiplying by the current
+            # value exceeds 'n', subsequent choices in this loop will also exceed 'n'.
+            last if Math::Prime::Util::GMP::cmpint($next_c, $n_str) > 0;
+
+            __SUB__->($idx + 1, $next_c, $current_w * $wt);
+        }
+      }
+      ->(0, '1', 1);
+
+    _set_int($total_sum);
 }
 
 sub pillai {    # OEIS: A018804 -- Pillai's arithmetical function: Sum_{k=1..n} gcd(k, n).
