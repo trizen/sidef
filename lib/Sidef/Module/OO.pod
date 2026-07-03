@@ -1,0 +1,180 @@
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Module::OO - Object-oriented interface to Perl modules in Sidef
+
+=head1 SYNOPSIS
+
+    # In Sidef code, using the %O sigil:
+    var LWP = %O<LWP::UserAgent>;
+    var ua  = LWP.new(timeout => 10);
+    say ua.get("https://example.com").decoded_content;
+
+    # Via the Perl API:
+    use Sidef::Module::OO;
+    my $wrapper = Sidef::Module::OO->__NEW__('LWP::UserAgent');
+    my $ua = $wrapper->new(timeout => 10);
+
+=head1 DESCRIPTION
+
+C<Sidef::Module::OO> is an internal Sidef wrapper that enables Sidef programs
+to use Perl modules through an object-oriented interface. It is the runtime
+representation of the C<%O> (object-oriented module) sigil in the Sidef
+language.
+
+When Sidef code references a Perl module with C<%O<Module::Name>>, the parser
+creates a C<Sidef::Module::OO> instance that wraps the module name (or a
+blessed Perl object returned from subsequent method calls). All method
+invocations on such a wrapper are forwarded to the underlying Perl module or
+object via Perl's C<AUTOLOAD> mechanism.
+
+Arguments passed to methods are automatically converted from Sidef types to
+their native Perl equivalents. Return values are similarly converted back into
+appropriate Sidef types using L<Sidef::Types::Perl::Perl>'s C<to_sidef>
+function. When a method returns a blessed Perl object, the result is
+automatically wrapped in a new C<Sidef::Module::OO> instance so that further
+method chaining works transparently.
+
+The key difference between C<Sidef::Module::OO> and L<Sidef::Module::Func> is
+that C<Sidef::Module::OO> dispatches calls as OO method calls
+(C<< $obj->method(@args) >>), while C<Sidef::Module::Func> calls functions
+using the fully-qualified package name (C<< Package::function(@args) >>).
+
+=head1 SIDEF SYNTAX
+
+The C<%O> sigil (and its single-quoted variant C<%Os>) is used to obtain an
+OO module handle:
+
+    var DateTime = %O<DateTime>;
+    var now = DateTime.now;
+    say now.ymd;             # e.g. "2024-07-03"
+
+    var IO = %Os"IO::File";
+    var fh = IO.new("file.txt", "r");
+
+=head1 METHODS
+
+=head2 __NEW__
+
+    my $wrapper = Sidef::Module::OO->__NEW__($module);
+
+Creates a new C<Sidef::Module::OO> wrapper object. C<$module> may be either a
+plain string containing a fully-qualified Perl package name, or an already
+blessed Perl object.
+
+The Sidef parser calls this method automatically when it encounters a C<%O>
+module literal. It is also called internally by L<Sidef::Types::Perl::Perl>'s
+C<to_sidef> function whenever a Perl method returns a blessed object.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$module> - A Perl package name (string) or a blessed Perl object.
+
+=back
+
+B<Returns:> A blessed C<Sidef::Module::OO> object.
+
+=head2 AUTOLOAD
+
+    $wrapper->some_method(@sidef_args);
+
+Intercepts every method call on the wrapper that does not have an explicit
+implementation and forwards it to the underlying module or object.
+
+The dispatch process is:
+
+=over 4
+
+=item 1. Extract the method name from C<$AUTOLOAD>.
+
+=item 2. Convert each Sidef argument to a native Perl value:
+
+=over 4
+
+=item * C<Sidef::Module::OO> wrappers are unwrapped to their inner C<{module}>.
+
+=item * Other Sidef objects (those in the C<Sidef::*> namespace) are converted
+via C<get_value>.
+
+=item * Plain Perl values are passed through unchanged.
+
+=back
+
+=item 3. Call C<< $self->{module}->$method(@args) >> in the appropriate context
+(list or scalar).
+
+=item 4. Convert each result back to a Sidef type using
+C<< Sidef::Types::Perl::Perl->to_sidef >>.
+
+=item 5. Return a single Sidef value, or an
+C<Sidef::Types::Array::Array> when multiple values are returned.
+
+=back
+
+Void-context calls (C<wantarray> is C<undef>) return immediately without
+converting results.
+
+=head2 DESTROY
+
+Empty destructor. Defined to prevent C<AUTOLOAD> from intercepting the
+implicit C<DESTROY> call that Perl issues when an object is garbage-collected.
+
+=head1 STRING OVERLOADING
+
+C<Sidef::Module::OO> overloads the C<""> (stringification) operator. When the
+wrapper is used in a string context, it delegates to the underlying module's
+own stringification if the module is itself an overloaded or blessed object;
+otherwise it falls back to the default Perl reference string
+(C<overload::StrVal>).
+
+=head1 INTERNAL STRUCTURE
+
+A C<Sidef::Module::OO> object is a hash reference with a single key:
+
+=over 4
+
+=item * C<module> - The wrapped Perl package name (string) or blessed object.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item * L<utf8> - UTF-8 source encoding.
+
+=item * L<overload> - Operator overloading for stringification.
+
+=item * L<Sidef::Types::Perl::Perl> - Used at runtime for C<to_sidef> conversion.
+
+=item * L<Sidef::Types::Array::Array> - Used at runtime to wrap multiple return values.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Module::Func> - Functional (non-OO) Perl module interface.
+
+=item * L<Sidef::Types::Perl::Perl> - Perl value conversion utilities.
+
+=item * L<Sidef::Parser> - Sidef parser that emits C<Sidef::Module::OO> objects.
+
+=item * L<Sidef> - The Sidef programming language.
+
+=back
+
+=head1 AUTHOR
+
+Daniel Șuteu (trizen)
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Sidef itself.
+
+=cut

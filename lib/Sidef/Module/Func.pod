@@ -1,0 +1,165 @@
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Module::Func - Functional interface to Perl modules in Sidef
+
+=head1 SYNOPSIS
+
+    # In Sidef code, using the %S sigil:
+    var FF = %S<File::Find>;
+    FF.find(Hash(no_chdir => true, wanted => func(f) {
+        say f if File(f).is_file
+    }), ".");
+
+    # Using a POSIX function directly:
+    var POSIX = %S<POSIX>;
+    say POSIX.floor(3.7);    # prints 3
+
+    # Via the Perl API:
+    use Sidef::Module::Func;
+    my $wrapper = Sidef::Module::Func->__NEW__('POSIX');
+    my $result  = $wrapper->floor(3.7);
+
+=head1 DESCRIPTION
+
+C<Sidef::Module::Func> is an internal Sidef wrapper that enables Sidef programs
+to call exported or fully-qualified functions from Perl packages. It is the
+runtime representation of the C<%S> (subroutine/functional module) sigil in
+the Sidef language.
+
+When Sidef code references a Perl package with C<%S<Module::Name>>, the parser
+creates a C<Sidef::Module::Func> instance that remembers the package name. Any
+subsequent "method" call on the wrapper is translated into a call to the fully-
+qualified function C<< Module::Name::function_name(@args) >> using a symbolic
+code reference (i.e. C<no strict 'refs'>). This means the target function is
+looked up by name at call time rather than imported into the current namespace.
+
+Arguments are automatically converted from Sidef types to native Perl values,
+and return values are converted back to Sidef types using
+L<Sidef::Types::Perl::Perl>'s C<to_sidef> function.
+
+The key difference between C<Sidef::Module::Func> and L<Sidef::Module::OO> is
+the call convention: C<Sidef::Module::Func> calls functions as plain
+subroutines (C<< Module::func(@args) >>), while C<Sidef::Module::OO> uses OO
+method dispatch (C<< $obj->method(@args) >>). Use C<Sidef::Module::Func> when
+you need to access procedural functions from a Perl module; use
+C<Sidef::Module::OO> when working with Perl objects and methods.
+
+=head1 SIDEF SYNTAX
+
+The C<%S> sigil is used to obtain a functional module handle:
+
+    var Cwd  = %S<Cwd>;
+    say Cwd.getcwd;          # prints current working directory
+
+    var Math = %S<POSIX>;
+    say Math.ceil(1.2);      # prints 2
+    say Math.floor(1.9);     # prints 1
+
+=head1 METHODS
+
+=head2 __NEW__
+
+    my $wrapper = Sidef::Module::Func->__NEW__($module_name);
+
+Creates a new C<Sidef::Module::Func> wrapper object. C<$module_name> must be a
+plain string containing a fully-qualified Perl package name.
+
+The Sidef parser calls this method automatically when it encounters a C<%S>
+module literal.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$module_name> - A fully-qualified Perl package name (string).
+
+=back
+
+B<Returns:> A blessed C<Sidef::Module::Func> object.
+
+=head2 AUTOLOAD
+
+    $wrapper->some_function(@sidef_args);
+
+Intercepts every call on the wrapper and forwards it to the corresponding
+fully-qualified function in the wrapped package.
+
+The dispatch process is:
+
+=over 4
+
+=item 1. Extract the function name from C<$AUTOLOAD>.
+
+=item 2. Convert each Sidef argument to a native Perl value by calling
+C<get_value> on any object in the C<Sidef::*> namespace; plain Perl
+scalars are passed through unchanged.
+
+=item 3. Call C<< ($module . '::' . $func)->(@args) >> in the appropriate
+context (list or scalar), with C<no strict 'refs'> in effect so that the
+function name is resolved dynamically.
+
+=item 4. Convert each result back to a Sidef type using
+C<< Sidef::Types::Perl::Perl->to_sidef >>.
+
+=item 5. Return a single Sidef value, or an
+C<Sidef::Types::Array::Array> when multiple values are returned.
+
+=back
+
+Void-context calls (C<wantarray> is C<undef>) return immediately without
+converting results.
+
+=head2 DESTROY
+
+Empty destructor. Defined to prevent C<AUTOLOAD> from intercepting the
+implicit C<DESTROY> call that Perl issues when an object is garbage-collected.
+
+=head1 INTERNAL STRUCTURE
+
+A C<Sidef::Module::Func> object is a hash reference with a single key:
+
+=over 4
+
+=item * C<module> - The Perl package name (string) whose functions will be
+called.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item * L<utf8> - UTF-8 source encoding.
+
+=item * L<Sidef::Types::Perl::Perl> - Used at runtime for C<to_sidef> conversion.
+
+=item * L<Sidef::Types::Array::Array> - Used at runtime to wrap multiple return values.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Module::OO> - Object-oriented Perl module interface.
+
+=item * L<Sidef::Types::Perl::Perl> - Perl value conversion utilities.
+
+=item * L<Sidef::Parser> - Sidef parser that emits C<Sidef::Module::Func> objects.
+
+=item * L<Sidef> - The Sidef programming language.
+
+=back
+
+=head1 AUTHOR
+
+Daniel Șuteu (trizen)
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Sidef itself.
+
+=cut
