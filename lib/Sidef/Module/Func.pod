@@ -168,7 +168,7 @@ B<Example:>
     var values = [5, 2, 8, 1, 9, 3]
     say list_util.max(values...)    # => 9
     say list_util.min(values...)    # => 1
-    say file_spec.catfile('/tmp', 'sidef.txt')
+    say file_spec.catfile(file_spec.tmpdir, 'sidef.txt')
 
 =head2 Using Data::Dumper for Debugging
 

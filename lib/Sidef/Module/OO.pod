@@ -128,7 +128,7 @@ individual Sidef values in list context
 B<Example:>
 
     var file_spec = require('File::Spec')
-    var path = file_spec.catfile('/tmp', 'sidef.txt')
+    var path = file_spec.catfile(file_spec.tmpdir, 'sidef.txt')
     say path
 
 =head1 ADVANCED EXAMPLES
@@ -151,7 +151,9 @@ B<Example:>
 =head2 Returning Multiple Values
 
     # In list context, multiple return values become individual Sidef values
-    var (volume, directories, file) = require('File::Spec').splitpath('/tmp/sidef.txt')
+    var file_spec = require('File::Spec')
+    var temp_file = file_spec.catfile(file_spec.tmpdir, 'sidef.txt')
+    var (volume, directories, file) = file_spec.splitpath(temp_file)
 
 =head2 Objects Returned from Perl Evaluation
 
