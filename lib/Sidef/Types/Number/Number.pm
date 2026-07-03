@@ -31557,16 +31557,19 @@ sub iphi_sum {
     _set_int(Math::Prime::Util::GMP::subint($A, $B));
 }
 
-sub bphi {    # OEIS: A116550 -- bi-unitary analog of Euler's totient function of n.
-    my ($n) = @_;
+sub bphi {    # OEIS: A116550 -- bi-unitary analog of Euler's totient
+    my ($n, $k) = @_;
 
+    # Generalized bi-unitary analog of Jordan's totient function J_k(n).
     # Formula:
-    #   a(n) = Sum{d|n, d is unitary} (-1)^omega(d) * Sum{k|d, k is squarefree, k <= n/d} mu(k) * floor(n/(d*k)).
+    #   a(n) = Sum_c w(c) * floor(n/c)^k
 
     my $n_str = _big2uistr($$n) // goto &nan;
     if ($n_str eq '1') {
         return ONE;
     }
+
+    $k = defined($k) ? do { _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
     my @factors =
       (HAS_PRIME_UTIL and $n_str < ULONG_MAX)
@@ -31597,6 +31600,12 @@ sub bphi {    # OEIS: A116550 -- bi-unitary analog of Euler's totient function o
         # Base case: All prime factors have been evaluated
         if ($idx == scalar(@choices)) {
             my $div = Math::Prime::Util::GMP::divint($n_str, $current_c);
+
+            # Apply the Jordan Totient generalization: raise to the power of k
+            if ($k != 1) {
+                $div = Math::Prime::Util::GMP::powint($div, $k);
+            }
+
             if ($current_w == -1) {
                 $total_sum = Math::Prime::Util::GMP::subint($total_sum, $div);
             }
