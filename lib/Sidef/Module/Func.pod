@@ -1,0 +1,202 @@
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Module::Func - Functional interface for Perl modules used from Sidef
+
+=head1 DESCRIPTION
+
+This class provides a functional (non-OO) bridge between Sidef and Perl modules, enabling
+Sidef code to call Perl functions exported by a module as if they were methods on an object.
+It is the underlying mechanism that powers Sidef's C<frequire()> built-in function and
+the C<%S> module literal syntax.
+
+When a Perl module is loaded with C<frequire()>, the resulting object is an instance of
+C<Sidef::Module::Func>. Any method call on that object is intercepted by C<AUTOLOAD> and
+dispatched as a fully-qualified function call into the module's namespace
+(i.e., C<Module::Name::function_name(@args)>), with arguments and return values
+transparently converted between Sidef and Perl types.
+
+This is distinct from C<Sidef::Module::OO>, which wraps a Perl object and dispatches
+method calls on it. C<Sidef::Module::Func> instead calls free functions (package functions)
+in the module's namespace directly, making it suitable for functional-style Perl modules
+such as C<POSIX>, C<List::Util>, C<Scalar::Util>, and similar.
+
+=head1 SYNOPSIS
+
+=head2 Loading a Functional Perl Module
+
+    # frequire() returns a Sidef::Module::Func wrapper around the module name
+    var posix = frequire('POSIX')
+
+    say posix.floor(3.7)    # => 3
+    say posix.ceil(3.2)     # => 4
+    say posix.fmod(10, 3)   # => 1
+
+=head2 Shorthand Syntax
+
+    # %S is syntactic sugar for frequire() in the Sidef language
+    var posix = %S<POSIX>
+    say posix.floor(4.9)    # => 4
+
+=head2 Using List::Util Functions
+
+    var lu = frequire('List::Util')
+
+    var nums = [3, 1, 4, 1, 5, 9, 2, 6]
+    say lu.sum(nums...)     # => 31
+    say lu.min(nums...)     # => 1
+    say lu.max(nums...)     # => 9
+
+=head2 Using Scalar::Util Functions
+
+    var su = frequire('Scalar::Util')
+
+    var val = 42
+    say su.looks_like_number(val)   # => 1
+    say su.blessed(val)             # => (empty / undef)
+
+=head1 METHODS
+
+=head2 __NEW__
+
+    Sidef::Module::Func->__NEW__($module)
+
+Constructs a new C<Sidef::Module::Func> wrapper around the given Perl module name.
+The module must already be loaded (C<require>d) before or during construction.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$module> - A Perl module name (string), e.g. C<"POSIX"> or C<"List::Util">
+
+=back
+
+B<Returns:> A new C<Sidef::Module::Func> object
+
+B<Note:> This constructor is used internally by the Sidef runtime. In Sidef code, use
+C<frequire()> or the C<%S> syntax instead of calling C<__NEW__> directly.
+
+=head2 AUTOLOAD
+
+    $func_obj->some_function(@args)
+
+All method calls on a C<Sidef::Module::Func> object are intercepted by C<AUTOLOAD> and
+forwarded as function calls into the wrapped module's namespace. For example, calling
+C<$obj-E<gt>floor(3.7)> on a C<Sidef::Module::Func> wrapping C<"POSIX"> results in
+C<POSIX::floor(3.7)> being called.
+
+Arguments are automatically converted from Sidef types to plain Perl values before
+the call, and return values are automatically converted back to Sidef types using
+C<Sidef::Types::Perl::Perl-E<gt>to_sidef>.
+
+B<Argument Conversion:>
+
+=over 4
+
+=item * Sidef objects (C<Sidef::*>) → the underlying Perl value via C<get_value>
+
+=item * Plain Perl values → passed through unchanged
+
+=back
+
+B<Return Value Conversion:>
+
+=over 4
+
+=item * Perl arrays → C<Sidef::Types::Array::Array>
+
+=item * Perl hashes → C<Sidef::Types::Hash::Hash>
+
+=item * Perl code refs → C<Sidef::Types::Block::Block>
+
+=item * Numeric scalars → C<Sidef::Types::Number::Number>
+
+=item * String scalars → C<Sidef::Types::String::String>
+
+=item * Blessed Perl objects → C<Sidef::Module::OO>
+
+=item * Multiple return values → C<Sidef::Types::Array::Array> in scalar context,
+individual Sidef values in list context
+
+=back
+
+B<Example:>
+
+    var lu = frequire('List::Util')
+    var total = lu.sum(1, 2, 3, 4, 5)
+    say total   # => 15
+
+=head1 ADVANCED EXAMPLES
+
+=head2 Working with POSIX Functions
+
+    var posix = frequire('POSIX')
+
+    say posix.floor(2.9)        # => 2
+    say posix.ceil(2.1)         # => 3
+    say posix.round(2.5)        # => 3
+    say posix.fabs(-3.14)       # => 3.14
+    say posix.pow(2, 10)        # => 1024
+
+=head2 Using List::Util Reductions
+
+    var lu = frequire('List::Util')
+
+    var words = ['banana', 'apple', 'cherry']
+    var longest = lu.reduce({ |a, b| a.len > b.len ? a : b }, words...)
+    say longest     # => banana
+
+    say lu.any({ _ > 5 }, 1, 3, 7, 2)   # => true
+    say lu.all({ _ > 0 }, 1, 2, 3)       # => true
+    say lu.none({ _ < 0 }, 1, 2, 3)      # => true
+
+=head2 Calling Module Functions with Sidef Values
+
+    # Sidef values are automatically converted to their underlying Perl representations
+    var su = frequire('Scalar::Util')
+    var num = 3.14
+    say su.looks_like_number(num)   # => 1
+
+=head2 Combining frequire with require
+
+    # Load a functional module and an OO module together
+    var list_util = frequire('List::Util')
+    var file_spec = require('File::Spec')
+
+    var values = [5, 2, 8, 1, 9, 3]
+    say list_util.max(values...)    # => 9
+    say list_util.min(values...)    # => 1
+    say file_spec.catfile(file_spec.tmpdir, 'sidef.txt')
+
+=head2 Using Data::Dumper for Debugging
+
+    var dd = frequire('Data::Dumper')
+    var data = [1, [2, 3], {key => 'value'}]
+    say dd.Dumper(data)
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Module::OO> - Object-oriented interface for Perl modules
+
+=item * L<Sidef::Types::Perl::Perl> - Evaluating Perl code and converting data structures
+
+=item * L<Sidef::Object::Convert> - Conversion helpers (C<to_caller> / C<to_fcaller>)
+
+=item * L<Sidef::Types::String::String> - The C<require> and C<frequire> string methods
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
+
+=cut
