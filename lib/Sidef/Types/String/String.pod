@@ -495,7 +495,7 @@ Aliases: I<wordcase>
 
     str.is_lc
 
-Returns true if all alphabetic characters in the string are lowercase and there is at least one alphabetic character, false otherwise.
+Returns true if the string is non-empty and consists entirely of lowercase letters, false otherwise. Any non-letter character (including digits or whitespace) causes it to return false.
 
 Example:
 
@@ -511,7 +511,7 @@ Aliases: I<is_lowercase>
 
     str.is_uc
 
-Returns true if all alphabetic characters in the string are uppercase and there is at least one alphabetic character, false otherwise.
+Returns true if the string is non-empty and consists entirely of uppercase letters, false otherwise. Any non-letter character (including digits or whitespace) causes it to return false.
 
 Example:
 
@@ -559,7 +559,7 @@ Example:
 
     str.is_ascii
 
-Returns true if all characters in the string are ASCII characters (code points 0-127), false otherwise.
+Returns true if all characters in the string are ASCII characters (code points 0-127) and the string is not empty, false otherwise.
 
 Example:
 
@@ -572,12 +572,12 @@ Example:
 
     str.is_blank
 
-Returns true if the string contains only whitespace characters or is empty, false otherwise.
+Returns true if the string is non-empty and consists entirely of blank characters (space or tab), false otherwise. Note that other whitespace characters (such as newlines) are not considered blank.
 
 Example:
 
     say "   ".is_blank        #=> true
-    say "".is_blank           #=> true
+    say "".is_blank           #=> false
     say "  a  ".is_blank      #=> false
 
 =cut
@@ -895,7 +895,7 @@ Example:
 
     str1.overlaps(str2)
 
-Checks whether C<str1> and C<str2> share a matching character at the same position (index). Returns C<true> as soon as one such position is found, C<false> otherwise. Only the positions up to the length of the shorter string are compared.
+Checks whether C<str1> and C<str2> share a matching character at the same position (index). Returns C<true> as soon as one such position is found, C<false> otherwise. The two strings are XOR-ed together with the shorter one padded with NUL bytes, so positions beyond the shorter string are also considered (and can match if the longer string contains a NUL character there).
 
 Example:
 
@@ -1044,7 +1044,7 @@ Example:
 
     str.char(pos)
 
-Returns the character at the specified position in the string. Position indexing starts at 0. Returns nil if the position is out of bounds.
+Returns the character at the specified position in the string. Position indexing starts at 0. Returns an empty string if the position is out of bounds.
 
 Example:
 
@@ -1059,7 +1059,7 @@ Aliases: I<char_at>
 
     str.ord
 
-Returns the Unicode code point value of the first character in the string.
+Returns the Unicode code point value of the first character in the string. Returns nil if the string is empty.
 
 Example:
 
@@ -1073,7 +1073,7 @@ Example:
 
     str.byte(pos)
 
-Returns the byte value at the specified position in the string. Position indexing starts at 0.
+Returns the byte value at the specified position in the string. Position indexing starts at 0. Returns nil if the position is out of bounds.
 
 Example:
 
@@ -1218,7 +1218,7 @@ Example:
 
     str.pop
 
-Returns the last character of the string. If the string is empty, returns nil.
+Returns the last character of the string. If the string is empty, returns an empty string.
 
 Example:
 
