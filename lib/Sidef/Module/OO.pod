@@ -129,7 +129,7 @@ B<Example:>
 
     var file_spec = require('File::Spec')
     var path = file_spec.catfile('/tmp', 'sidef.txt')
-    say path        # => /tmp/sidef.txt
+    say path
 
 =head1 ADVANCED EXAMPLES
 
