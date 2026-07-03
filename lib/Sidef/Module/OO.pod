@@ -1,0 +1,194 @@
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Module::OO - Object-oriented interface for Perl modules used from Sidef
+
+=head1 DESCRIPTION
+
+This class provides a transparent object-oriented bridge between Sidef and Perl, allowing
+blessed Perl objects to be used naturally within Sidef code. It is the underlying mechanism
+that powers Sidef's C<require()> built-in function and the C<%O> / C<%s> module literal syntax.
+
+When a Perl module is loaded with C<require()>, the resulting object is an instance of
+C<Sidef::Module::OO>. Any method call on that object is automatically dispatched via
+C<AUTOLOAD> to the underlying Perl object, with arguments and return values transparently
+converted between Sidef and Perl types.
+
+The class also handles Perl objects returned by C<Sidef::Types::Perl::Perl>'s C<to_sidef>
+conversion: any blessed reference that has no special-cased Sidef equivalent is automatically
+wrapped in a C<Sidef::Module::OO> instance.
+
+=head1 SYNOPSIS
+
+=head2 Loading an OO Perl Module
+
+    # require() returns a Sidef::Module::OO wrapper around the module name
+    var lwp = require('LWP::UserAgent')
+
+    # Call new() on the module to get an instance
+    var ua = lwp.new
+    var resp = ua.get('https://example.com')
+
+=head2 Shorthand Syntax
+
+    # %O and %s are syntactic sugar for require() in the Sidef language
+    var ua = %O<LWP::UserAgent>.new
+
+=head2 Calling Methods
+
+    var ua = require('LWP::UserAgent').new
+    ua.agent('MyScraper/1.0')
+    var resp = ua.get('https://example.com')
+
+    if (resp.is_success) {
+        say resp.decoded_content
+    }
+
+=head2 Working with Blessed Objects from Perl
+
+    # Blessed Perl objects returned through Perl.eval are also wrapped automatically
+    var dt = Perl.eval('
+        use DateTime;
+        DateTime->new(year => 2024, month => 6, day => 1)
+    ')
+
+    say dt.year     # => 2024
+    say dt.month    # => 6
+
+=head2 String Representation
+
+    var mod = require('HTTP::Tiny')
+    say mod          # stringifies using the wrapped object's own stringification
+
+=head1 METHODS
+
+=head2 __NEW__
+
+    Sidef::Module::OO->__NEW__($module)
+
+Constructs a new C<Sidef::Module::OO> wrapper around the given Perl value. The argument may
+be either a module name (string) or any blessed Perl object.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<$module> - A Perl module name (string) or blessed Perl object to wrap
+
+=back
+
+B<Returns:> A new C<Sidef::Module::OO> object
+
+B<Note:> This constructor is used internally by the Sidef runtime. In Sidef code, use
+C<require()> or the C<%O>/ C<%s> syntax instead of calling C<__NEW__> directly.
+
+=head2 AUTOLOAD
+
+    $oo_obj->some_method(@args)
+
+All method calls on a C<Sidef::Module::OO> object are intercepted by C<AUTOLOAD> and
+forwarded to the wrapped Perl object. Arguments are automatically converted from their
+Sidef types to Perl values before the call, and the return values are automatically
+converted back to Sidef types using C<Sidef::Types::Perl::Perl-E<gt>to_sidef>.
+
+B<Argument Conversion:>
+
+=over 4
+
+=item * Other C<Sidef::Module::OO> objects → the unwrapped Perl object they contain
+
+=item * Sidef objects (C<Sidef::*>) → the underlying Perl value via C<get_value>
+
+=item * Plain Perl values → passed through unchanged
+
+=back
+
+B<Return Value Conversion:>
+
+=over 4
+
+=item * Perl arrays → C<Sidef::Types::Array::Array>
+
+=item * Perl hashes → C<Sidef::Types::Hash::Hash>
+
+=item * Perl code refs → C<Sidef::Types::Block::Block>
+
+=item * Numeric scalars → C<Sidef::Types::Number::Number>
+
+=item * String scalars → C<Sidef::Types::String::String>
+
+=item * Blessed Perl objects → C<Sidef::Module::OO>
+
+=item * Multiple return values → C<Sidef::Types::Array::Array> in scalar context,
+individual Sidef values in list context
+
+=back
+
+B<Example:>
+
+    var posix = require('POSIX')
+    var result = posix.floor(3.7)
+    say result      # => 3
+
+=head1 ADVANCED EXAMPLES
+
+=head2 Using an OO Module with Chained Calls
+
+    var ua = require('LWP::UserAgent').new
+    ua.timeout(10)
+    ua.agent('MyClient/1.0')
+    var resp = ua.get('https://httpbin.org/get')
+    say resp.code       # => 200
+    say resp.message    # => OK
+
+=head2 Passing Sidef Values to Perl Methods
+
+    var file_obj = require('IO::File').new('/etc/hostname', 'r')
+    var line = file_obj.getline
+    say line.chomp      # => myhostname
+
+=head2 Returning Multiple Values
+
+    # In list context, multiple return values become individual Sidef values
+    var (sec, min, hour) = require('POSIX').strftime('%S %M %H', 0, 0, 0, 1, 0, 124).split(' ')
+
+=head2 Objects Returned from Perl Evaluation
+
+    var obj = Perl.eval('
+        package Counter;
+        sub new  { bless { count => 0 }, shift }
+        sub inc  { $_[0]{count}++ }
+        sub get  { $_[0]{count} }
+        Counter->new
+    ')
+
+    obj.inc
+    obj.inc
+    obj.inc
+    say obj.get     # => 3
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Sidef::Module::Func> - Functional (non-OO) interface for Perl modules
+
+=item * L<Sidef::Types::Perl::Perl> - Evaluating Perl code and converting data structures
+
+=item * L<Sidef::Object::Convert> - Conversion helpers (C<to_caller> / C<to_fcaller>)
+
+=item * L<Sidef::Types::String::String> - The C<require> and C<frequire> string methods
+
+=back
+
+=head1 AUTHOR
+
+Daniel "Trizen" Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
+
+=cut
