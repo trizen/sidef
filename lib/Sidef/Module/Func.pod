@@ -163,11 +163,12 @@ B<Example:>
 
     # Load a functional module and an OO module together
     var list_util = frequire('List::Util')
-    var date_mod  = require('POSIX')
+    var file_spec = require('File::Spec')
 
     var values = [5, 2, 8, 1, 9, 3]
     say list_util.max(values...)    # => 9
     say list_util.min(values...)    # => 1
+    say file_spec.catfile('/tmp', 'sidef.txt')
 
 =head2 Using Data::Dumper for Debugging
 

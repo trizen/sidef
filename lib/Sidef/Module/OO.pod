@@ -127,9 +127,9 @@ individual Sidef values in list context
 
 B<Example:>
 
-    var posix = require('POSIX')
-    var result = posix.floor(3.7)
-    say result      # => 3
+    var file_spec = require('File::Spec')
+    var path = file_spec.catfile('/tmp', 'sidef.txt')
+    say path        # => /tmp/sidef.txt
 
 =head1 ADVANCED EXAMPLES
 
@@ -151,7 +151,7 @@ B<Example:>
 =head2 Returning Multiple Values
 
     # In list context, multiple return values become individual Sidef values
-    var (sec, min, hour) = require('POSIX').strftime('%S %M %H', 0, 0, 0, 1, 0, 124).split(' ')
+    var (volume, directories, file) = require('File::Spec').splitpath('/tmp/sidef.txt')
 
 =head2 Objects Returned from Perl Evaluation
 
