@@ -34,7 +34,24 @@ Inherits methods from:
 
        * Sidef::Object::Object
 
-=head1 METHODS
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    Str(args...)
+
+Creates a new string, by concatenating together a given list of objects. Each object is converted to its string representation.
+
+Example:
+
+    say Str("hello", " ", "world")    #=> "hello world"
+    say Str(1, 2, 3)                  #=> "123"
+
+Aliases: I<call>
+
+=cut
+
+=head1 OPERATORS
 
 =head2 %
 
@@ -371,151 +388,368 @@ Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
-=head2 apply_escapes
+=head1 CASE CONVERSION
 
-    str.apply_escapes
+=head2 lc
 
-Interprets escape sequences in the string and returns a new string with the escapes applied. This processes backslash escape sequences like \n, \t, \r, etc.
+    str.lc
+
+Returns a new string with all alphabetic characters converted to lowercase.
 
 Example:
 
-    say "hello\\nworld".apply_escapes    #=> "hello\nworld" (with actual newline)
+    say "HELLO World".lc    #=> "hello world"
+
+Aliases: I<lower>, I<downcase>, I<lowercase>
 
 =cut
 
-=head2 ascii2bin
+=head2 uc
 
-    str.ascii2bin
+    str.uc
 
-Takes a string of ASCII characters as input and returns a string of binary digits representing the ASCII values of the characters. Each character is converted to its binary representation.
+Convert all the characters in a string to uppercase. It takes a string as an input and returns the same string with all the characters converted to uppercase.
 
 Example:
 
-    say "Hi".ascii2bin    #=> "0100100001101001"
+    say "hello world".uc    #=> "HELLO WORLD"
+    say "test".uc           #=> "TEST"
+
+Aliases: I<upper>, I<upcase>
 
 =cut
 
-=head2 ascii2bits
+=head2 fc
 
-    str.ascii2bits
+    str.fc
 
-Takes a string of ASCII characters as input and returns a string of bits representing the ASCII values of the characters. Each character is converted to its 8-bit binary representation.
+Returns a copy of the input string with all uppercase characters converted to their lowercase equivalents using casefolding.
+
+Casefolding is the process of mapping strings to a form where case differences are erased; comparing two strings in their casefolded form is effectively a way of asking if two strings are equal, regardless of case.
 
 Example:
 
-    say "A".ascii2bits    #=> "01000001"
+    say "HELLO".fc == "hello".fc    #=> true
+    say "Straße".fc                  #=> "strasse" (German ß folds to ss)
+
+Aliases: I<foldcase>
 
 =cut
 
-=head2 backtick
+=head2 lcfirst
 
-    str.backtick
+    str.lcfirst
 
-Executes the string as a shell command and returns the output. This is equivalent to running the string in backticks or using qx{}.
+Returns a new string with the first character of the string converted to lowercase.
 
 Example:
 
-    say "echo hello".backtick    #=> "hello\n"
-
-Warning: Use with caution as it executes arbitrary shell commands.
+    say "Hello World".lcfirst    #=> "hello World"
 
 =cut
 
-=head2 base64_decode
+=head2 tc
 
-    str.base64_decode
+    str.tc
 
-Decodes a base64 encoded string into its original form.
-
-Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format by translating it into a radix-64 representation. The encoded string can be safely transferred or stored without any data loss or corruption. The C<base64_decode()> method reverses the encoding process and converts the base64 string back to its original binary form.
+Returns a new string with the first character converted to uppercase. The rest of the string is left unchanged. This is the counterpart of C<lcfirst>. To title-case every word in a string, use C<wc> instead.
 
 Example:
 
-    say "SGVsbG8gV29ybGQ=".base64_decode    #=> "Hello World"
+    say "hello world".tc    #=> "Hello world"
+    say "test CASE".tc      #=> "Test CASE"
 
-Aliases: I<decode_base64>
+Aliases: I<ucfirst>, I<titlecase>
 
 =cut
 
-=head2 base64_encode
+=head2 tclc
 
-    str.base64_encode
+    str.tclc
 
-Encodes a string in base64 format. Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format by translating it into a radix-64 representation. The encoded string can be safely transferred or stored without any data loss or corruption. The C<base64_encode()> method encodes the input string in base64 format.
+Returns the string with the first character capitalized and the remaining characters in lower case.
 
 Example:
 
-    say "Hello World".base64_encode    #=> "SGVsbG8gV29ybGQ="
+    say "hello WORLD".tclc    #=> "Hello world"
 
-Aliases: I<encode_base64>
+Aliases: I<capitalize>
 
 =cut
 
-=head2 begins_with
+=head2 wc
 
-    str.begins_with(prefix)
+    str.wc
 
-Check whether a string starts with a given prefix string or not. It takes a string as an input and checks whether the string starts with the prefix string specified as an argument. If the string starts with the specified prefix, it returns True, otherwise, it returns False.
+Change the case of words in a string. It takes a string as an input and returns the same string with the case of each word modified, making the first letter uppercase and the other letters lowercase.
 
 Example:
 
-    say "hello".begins_with("he")     #=> true
-    say "hello".begins_with("lo")     #=> false
+    say "hello WORLD test".wc    #=> "Hello World Test"
 
-Aliases: I<starts_with>
+Aliases: I<wordcase>
 
 =cut
 
-=head2 bin
+=head2 is_lc
 
-    str.bin
+    str.is_lc
 
-Converts a binary string (consisting of 0s and 1s) to a Number object. The string is interpreted as a base-2 number.
+Returns true if all alphabetic characters in the string are lowercase and there is at least one alphabetic character, false otherwise.
 
 Example:
 
-    say "1010".bin         #=> 10
-    say "11111111".bin     #=> 255
+    say "hello".is_lc         #=> true
+    say "Hello".is_lc         #=> false
+    say "123".is_lc           #=> false
+
+Aliases: I<is_lowercase>
 
 =cut
 
-=head2 bin2ascii
+=head2 is_uc
 
-    str.bin2ascii
+    str.is_uc
 
-Converts a binary string into its equivalent ASCII string representation. It takes a binary string as an input and returns the equivalent ASCII string representation of the binary string.
+Returns true if all alphabetic characters in the string are uppercase and there is at least one alphabetic character, false otherwise.
 
 Example:
 
-    say "0100100001101001".bin2ascii    #=> "Hi"
+    say "HELLO".is_uc          #=> true
+    say "Hello".is_uc          #=> false
+    say "123".is_uc            #=> false
+
+Aliases: I<is_uppercase>
 
 =cut
 
-=head2 byte
+=head1 TESTING & CLASSIFICATION
 
-    str.byte(pos)
+=head2 is_alnum
 
-Returns the byte value at the specified position in the string. Position indexing starts at 0.
+    str.is_alnum
+
+Returns true if all characters in the string are alphanumeric (letters or digits) and the string is not empty, false otherwise.
 
 Example:
 
-    say "hello".byte(0)    #=> 104 (ASCII value of 'h')
-    say "hello".byte(1)    #=> 101 (ASCII value of 'e')
+    say "abc123".is_alnum     #=> true
+    say "abc 123".is_alnum    #=> false (contains space)
+    say "test".is_alnum       #=> true
 
-Aliases: I<byte_at>
+Aliases: I<is_alphanum>
 
 =cut
 
-=head2 bytes
+=head2 is_alpha
 
-    str.bytes
+    str.is_alpha
 
-Convert a string into an Array of bytes, ranging from C<0> to C<255>. Each byte represents the numeric value of the corresponding byte in the string's encoding.
+Returns true if all characters in the string are alphabetic letters and the string is not empty, false otherwise.
 
 Example:
 
-    say "Hi".bytes         #=> [72, 105]
-    say "€".encode_utf8.bytes    #=> [226, 130, 172]
+    say "hello".is_alpha      #=> true
+    say "hello123".is_alpha   #=> false
+    say "test".is_alpha       #=> true
+
+=cut
+
+=head2 is_ascii
+
+    str.is_ascii
+
+Returns true if all characters in the string are ASCII characters (code points 0-127), false otherwise.
+
+Example:
+
+    say "hello".is_ascii      #=> true
+    say "café".is_ascii       #=> false (é is not ASCII)
+
+=cut
+
+=head2 is_blank
+
+    str.is_blank
+
+Returns true if the string contains only whitespace characters or is empty, false otherwise.
+
+Example:
+
+    say "   ".is_blank        #=> true
+    say "".is_blank           #=> true
+    say "  a  ".is_blank      #=> false
+
+=cut
+
+=head2 is_control
+
+    str.is_control
+
+Returns true if all characters in the string are control characters and the string is not empty, false otherwise.
+
+Example:
+
+    say "\n\t".is_control     #=> true
+    say "test".is_control     #=> false
+
+=cut
+
+=head2 is_digit
+
+    str.is_digit
+
+Returns true if all characters in the string are digits and the string is not empty, false otherwise.
+
+Example:
+
+    say "12345".is_digit      #=> true
+    say "123a".is_digit       #=> false
+    say "".is_digit           #=> false
+
+=cut
+
+=head2 is_empty
+
+    str.is_empty
+
+Determine if a given string is empty or not. It takes a string as an input and returns True if the string is empty, False otherwise.
+
+Example:
+
+    say "".is_empty           #=> true
+    say "hello".is_empty      #=> false
+    say "   ".is_empty        #=> false
+
+=cut
+
+=head2 is_graph
+
+    str.is_graph
+
+Returns true if all characters in the string are graphical characters (visible characters, not whitespace) and the string is not empty, false otherwise.
+
+Example:
+
+    say "hello!".is_graph     #=> true
+    say "hello ".is_graph     #=> false (contains space)
+
+=cut
+
+=head2 is_numeric
+
+    str.is_numeric
+
+Checks whether a given string looks like a number or not. It checks if the string can be converted to a number without raising an exception.
+
+Example:
+
+    say "123".is_numeric       #=> true
+    say "123.45".is_numeric    #=> true
+    say "-42".is_numeric       #=> true
+    say "abc".is_numeric       #=> false
+
+Aliases: I<looks_like_number>
+
+=cut
+
+=head2 is_palindrome
+
+    str.is_palindrome
+
+Checks whether a given string is a palindrome or not. A palindrome is a word, phrase, number, or other sequence of characters that reads the same backward as forward.
+
+Example:
+
+    say "racecar".is_palindrome    #=> true
+    say "hello".is_palindrome      #=> false
+    say "noon".is_palindrome       #=> true
+
+=cut
+
+=head2 is_printable
+
+    str.is_printable
+
+Returns true if all characters in the string are printable and the string is not empty, false otherwise. Printable characters include letters, digits, punctuation, and spaces.
+
+Example:
+
+    say "hello world".is_printable    #=> true
+    say "test\n".is_printable         #=> false (contains newline)
+
+=cut
+
+=head2 is_punct
+
+    str.is_punct
+
+Returns true if all characters in the string are punctuation characters and the string is not empty, false otherwise.
+
+Example:
+
+    say "!@#".is_punct         #=> true
+    say "hello!".is_punct      #=> false
+
+Aliases: I<is_punctuation>
+
+=cut
+
+=head2 is_space
+
+    str.is_space
+
+Returns true if all characters in the string are whitespace characters and the string is not empty, false otherwise.
+
+Example:
+
+    say "   ".is_space         #=> true
+    say " \t\n".is_space       #=> true
+    say " a ".is_space         #=> false
+
+=cut
+
+=head2 is_word
+
+    str.is_word
+
+Returns true if all characters in the string are word characters (letters, digits, or underscores) and the string is not empty, false otherwise.
+
+Example:
+
+    say "hello_123".is_word    #=> true
+    say "hello world".is_word  #=> false (contains space)
+
+=cut
+
+=head2 is_xdigit
+
+    str.is_xdigit
+
+Returns true if all characters in the string are hexadecimal digits (0-9, a-f, A-F) and the string is not empty, false otherwise.
+
+Example:
+
+    say "1A2B".is_xdigit       #=> true
+    say "xyz".is_xdigit        #=> false
+
+=cut
+
+=head1 LENGTH
+
+=head2 len
+
+    str.len
+
+Returns the length of the string in characters (not bytes).
+
+Example:
+
+    say "hello".len      #=> 5
+    say "€".len          #=> 1
+    say "café".len       #=> 4
+
+Aliases: I<size>, I<length>, I<chars_len>, I<chars_length>
 
 =cut
 
@@ -532,68 +766,223 @@ Example:
 
 Aliases: I<bytes_length>
 
-=head2 bwt_encode
-
-    str.bwt_encode
-
-Applies the Burrows–Wheeler transform (BWT) to the invocant string and returns a pair consisting of the transformed string and the primary index.
-
-The primary index is required for decoding with C<bwt_decode>.
-
-    var (bwt, idx) = "banana".bwt_encode
-
 =cut
 
-=head2 bwt_decode
+=head2 graphs_len
 
-    bwt.bwt_decode(idx)
+    str.graphs_len
 
-Reverses the Burrows–Wheeler transform and reconstructs the original string.
-
-This method takes a BWT-transformed string and its associated primary index (as returned by C<bwt_encode>) and reconstructs the original string using the standard LF-mapping technique.
-
-    var original = bwt.bwt_decode(idx)
-
-=cut
-
-=head2 center
-
-    str.center(width, padstr=" ")
-
-Centers the string within a field of the given width, padding with the specified padding string (default is space). If the string is already longer than the width, it is returned unchanged.
+Returns the number of grapheme clusters in the input string. This represents the number of user-perceived characters.
 
 Example:
 
-    say "hi".center(10)         #=> "    hi    "
-    say "test".center(10, "-")  #=> "---test---"
+    say "hello".graphs_len    #=> 5
+    say "café".graphs_len     #=> 4
+
+Aliases: I<graphs_length>
 
 =cut
 
-=head2 char
+=head1 SEARCHING & COMPARISON
 
-    str.char(pos)
+=head2 begins_with
 
-Returns the character at the specified position in the string. Position indexing starts at 0. Returns nil if the position is out of bounds.
+    str.begins_with(prefix)
+
+Check whether a string starts with a given prefix string or not. It takes a string as an input and checks whether the string starts with the prefix string specified as an argument. If the string starts with the specified prefix, it returns True, otherwise, it returns False.
 
 Example:
 
-    say "hello".char(0)    #=> "h"
-    say "hello".char(4)    #=> "o"
+    say "hello".begins_with("he")     #=> true
+    say "hello".begins_with("lo")     #=> false
 
-Aliases: I<char_at>
+Aliases: I<starts_with>
 
 =cut
 
-=head2 chars
+=head2 ends_with
 
-    str.chars
+    str.ends_with(suffix)
 
-Convert a string into an Array of characters.
+Checks if a string ends with a specified suffix and returns a boolean value.
+
+Parameters:
+
+    suffix : A string that represents the suffix to be searched for at the end of the input string.
 
 Example:
 
-    say "foo".chars     #=> ["f", "o", "o"]
-    say "€".chars       #=> ["€"]
+    say "hello".ends_with("lo")    #=> true
+    say "hello".ends_with("he")    #=> false
+
+=cut
+
+=head2 has
+
+    str.has(substr, pos=0)
+    str.has(regex, pos=0)
+
+Checks if a substring exists within the input string starting from a given position.
+
+Parameters:
+
+    substr  : A string that represents the substring to search for.
+    pos     : An integer that represents the starting position from where to search for the substring. The default value is 0.
+
+When a regular expression is given, it checks if the regular expression pattern matches within the input string starting from a given position.
+
+Example:
+
+    say "hello world".has("world")      #=> true
+    say "hello world".has("world", 10)  #=> false
+    say "testing".has(/\d+/)            #=> false
+
+Aliases: I<contain>, I<include>, I<contains>, I<includes>
+
+=cut
+
+=head2 index
+
+    str.index(substr, pos=0)
+
+Returns the index of the first occurrence of a substring in a given string starting from a specified position. Returns -1 if the substring is not found.
+
+Parameters:
+
+    str        : The original string in which the substring is to be searched.
+    substring  : The substring to be searched in the original string.
+    pos        : The position in the original string from where the search is to begin. The default value is 0.
+
+Example:
+
+    say "hello world".index("world")     #=> 6
+    say "hello world".index("o")         #=> 4
+    say "hello world".index("o", 5)      #=> 7
+    say "hello world".index("xyz")       #=> -1
+
+=cut
+
+=head2 rindex
+
+    str.rindex(substr, pos)
+
+Returns the index of the last occurrence of a substring in the string, searching backwards from the specified position. Returns -1 if not found.
+
+Example:
+
+    say "hello world".rindex("o")       #=> 7
+    say "hello world".rindex("o", 6)    #=> 4
+    say "hello world".rindex("xyz")     #=> -1
+
+=cut
+
+=head2 count
+
+    str.count(substr)
+    str.count(regex)
+
+Returns the number of non-overlapping occurrences of the substring or pattern in the string.
+
+Example:
+
+    say "hello world".count("l")    #=> 3
+    say "aaa".count("aa")           #=> 1 (non-overlapping)
+    say "foo bar baz".count(/ba/)   #=> 2
+
+=cut
+
+=head2 overlaps
+
+    str1.overlaps(str2)
+
+Checks whether C<str1> and C<str2> share a matching character at the same position (index). Returns C<true> as soon as one such position is found, C<false> otherwise. Only the positions up to the length of the shorter string are compared.
+
+Example:
+
+    say "hello".overlaps("world")    #=> true (both have 'l' at index 3)
+    say "abc".overlaps("xyz")        #=> false
+
+=cut
+
+=head2 jaro
+
+    str1.jaro(str2, winkler=false)
+
+Calculates the Jaro similarity between two strings. The Jaro distance is a measure of similarity between two strings, based on the number of matching characters and transpositions. The result is a value between 0 and 1, where 1 indicates identical strings.
+
+When the C<winkler> argument is true, it returns the Jaro-Winkler similarity score instead, which gives more weight to strings that match from the beginning.
+
+Example:
+
+    say "accommodate".jaro("accomodate")         #=> 0.96969696969697
+    say "accommodate".jaro("accomodate", true)   #=> 0.981818181818182
+
+=cut
+
+=head2 lev
+
+    str1.lev(str2)
+
+Calculates the Levenshtein distance between two strings, which is the minimum number of single-character edits (insertions, deletions, or substitutions) required to transform one string into the other.
+
+Example:
+
+    say "kitten".lev("sitting")    #=> 3
+    say "hello".lev("hallo")       #=> 1
+
+Aliases: I<leven>, I<levenshtein>
+
+=cut
+
+=head1 TRIMMING & PADDING
+
+=head2 trim
+
+    str.trim
+    str.trim(regex)
+
+Removes whitespace (or characters matching the regex) from both the beginning and end of the string.
+
+Example:
+
+    say "  hello  ".trim         #=> "hello"
+    say "xxxhelloxxx".trim(/x+/) #=> "hello"
+
+Aliases: I<strip>
+
+=cut
+
+=head2 ltrim
+
+    str.ltrim
+    str.ltrim(regex)
+
+Takes a regular expression regex and removes any substring from the beginning of the string str that matches the regular expression. The resulting string is returned.
+
+When no argument is given, it strips whitespace characters from the beginning of the string.
+
+Example:
+
+    say "  hello  ".ltrim          #=> "hello  "
+    say "xxxhello".ltrim(/x+/)     #=> "hello"
+
+Aliases: I<lstrip>, I<trim_beg>, I<strip_beg>, I<trim_left>, I<strip_left>
+
+=cut
+
+=head2 rtrim
+
+    str.rtrim
+    str.rtrim(regex)
+
+Removes any substring from the end of the string that matches the given regular expression. When no argument is given, it strips whitespace characters from the end of the string.
+
+Example:
+
+    say "  hello  ".rtrim          #=> "  hello"
+    say "helloxxx".rtrim(/x+/)     #=> "hello"
+
+Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
 
 =cut
 
@@ -623,16 +1012,101 @@ Example:
 
 =cut
 
+=head2 center
+
+    str.center(width, padstr=" ")
+
+Centers the string within a field of the given width, padding with the specified padding string (default is space). If the string is already longer than the width, it is returned unchanged.
+
+Example:
+
+    say "hi".center(10)         #=> "    hi    "
+    say "test".center(10, "-")  #=> "---test---"
+
+=cut
+
 =head2 clear
 
     str.clear
 
-Clears the content of the string, making it empty. Returns an empty string.
+Returns an empty string, regardless of the content of the invocant.
 
 Example:
 
     var s = "hello"
     say s.clear         #=> ""
+
+=cut
+
+=head1 ACCESSING CHARACTERS & SUBSTRINGS
+
+=head2 char
+
+    str.char(pos)
+
+Returns the character at the specified position in the string. Position indexing starts at 0. Returns nil if the position is out of bounds.
+
+Example:
+
+    say "hello".char(0)    #=> "h"
+    say "hello".char(4)    #=> "o"
+
+Aliases: I<char_at>
+
+=cut
+
+=head2 ord
+
+    str.ord
+
+Returns the Unicode code point value of the first character in the string.
+
+Example:
+
+    say "A".ord        #=> 65
+    say "€".ord        #=> 8364
+    say "hello".ord    #=> 104
+
+=cut
+
+=head2 byte
+
+    str.byte(pos)
+
+Returns the byte value at the specified position in the string. Position indexing starts at 0.
+
+Example:
+
+    say "hello".byte(0)    #=> 104 (ASCII value of 'h')
+    say "hello".byte(1)    #=> 101 (ASCII value of 'e')
+
+Aliases: I<byte_at>
+
+=cut
+
+=head2 chars
+
+    str.chars
+
+Convert a string into an Array of characters.
+
+Example:
+
+    say "foo".chars     #=> ["f", "o", "o"]
+    say "€".chars       #=> ["€"]
+
+=cut
+
+=head2 bytes
+
+    str.bytes
+
+Convert a string into an Array of bytes, ranging from C<0> to C<255>. Each byte represents the numeric value of the corresponding byte in the string's encoding.
+
+Example:
+
+    say "Hi".bytes         #=> [72, 105]
+    say "€".encode_utf8.bytes    #=> [226, 130, 172]
 
 =cut
 
@@ -652,18 +1126,141 @@ Aliases: I<code_points>
 
 =cut
 
-=head2 collect
+=head2 graphs
 
-    str.collect(regex)
+    str.graphs
 
-Collects all matches of the given regular expression in the string and returns them as an Array. This is similar to the global match operation.
+Returns an Array of grapheme clusters in the input string. A grapheme cluster is a sequence of one or more Unicode code points that represents a single user-perceived character.
 
 Example:
 
-    say "foo bar baz".collect(/b\w+/)    #=> ["bar", "baz"]
-    say "123 456 789".collect(/\d+/)     #=> ["123", "456", "789"]
+    say "hello".graphs    #=> ["h", "e", "l", "l", "o"]
+    say "é".graphs        #=> ["é"] (even if composed of multiple code points)
 
-Aliases: I<find_all>, I<findall>
+Aliases: I<graphemes>
+
+=cut
+
+=head2 digits
+
+    str.digits
+
+Returns an Array with the individual digits found in the string, as numbers.
+
+Example:
+
+    say "abc123def456".digits    #=> [1, 2, 3, 4, 5, 6]
+    say "no digits here".digits  #=> []
+
+=cut
+
+=head2 ints
+
+    str.ints
+
+Returns an Array of integers extracted from the string. This method finds all integer values (positive and negative) in the string.
+
+Example:
+
+    say "test 123 and -456".ints    #=> [123, -456]
+    say "no numbers".ints           #=> []
+
+Aliases: I<integers>
+
+=cut
+
+=head2 nums
+
+    str.nums
+
+Returns a list of numbers that were found in the string. The function splits the string by whitespace, and collects every word that looks like a number. The numbers in the returned list will be in the same order that they appeared in the string.
+
+Example:
+
+    say "test 123 and 456".nums    #=> [123, 456]
+    say "1.5 -2.3 test".nums       #=> [1.5, -2.3]
+
+Aliases: I<numbers>
+
+=cut
+
+=head2 first
+
+    str.first(n)
+
+Returns the first C<n> characters of the input string, where C<n> is an integer.
+
+Parameters:
+
+    n : An integer that represents the number of characters to be returned from the beginning of the input string.
+
+Example:
+
+    say "hello world".first(5)    #=> "hello"
+    say "test".first(2)           #=> "te"
+
+=cut
+
+=head2 last
+
+    str.last(n)
+
+Returns the last n characters of a string.
+
+Example:
+
+    say "hello world".last(5)    #=> "world"
+    say "test".last(2)           #=> "st"
+
+=cut
+
+=head2 pop
+
+    str.pop
+
+Returns the last character of the string. If the string is empty, returns nil.
+
+Example:
+
+    say "hello".pop    #=> "o"
+    say "test".pop     #=> "t"
+
+=cut
+
+=head2 slice
+
+    str.slice(offset)
+    str.slice(offset, length)
+
+Extracts a substring out of the string and returns it. First character is at offset zero.
+
+If C<offset> is negative, starts that far back from the end of the string.
+
+If C<length> is omitted, returns everything through the end of the string.
+
+If C<length> is negative, leaves that many characters off the end of the string.
+
+Example:
+
+    say "hello world".slice(0, 5)     #=> "hello"
+    say "hello world".slice(6)        #=> "world"
+    say "hello world".slice(-5)       #=> "world"
+    say "hello world".slice(0, -6)    #=> "hello"
+
+Aliases: I<substr>, I<substring>
+
+=cut
+
+=head2 slices
+
+    str.slices(n)
+
+Takes a string and divides it into slices of a specified length. The length of the slice is specified by the integer parameter C<n>. If the length of the string is not evenly divisible by C<n>, the last slice will be shorter than C<n> characters.
+
+Example:
+
+    say "abcdefgh".slices(3)    #=> ["abc", "def", "gh"]
+    say "test".slices(2)        #=> ["te", "st"]
 
 =cut
 
@@ -680,98 +1277,126 @@ Example:
 
 =cut
 
-=head2 count
+=head1 SPLITTING, JOINING & SORTING
 
-    str.count(substr)
-    str.count(regex)
+=head2 split
 
-Returns the number of non-overlapping occurrences of the substring or pattern in the string.
+    str.split(sep, limit)
+
+Splits the string into an array of substrings using the specified separator. The C<sep> can be a string or a regular expression. If C<limit> is specified, the array will contain at most C<limit> elements.
 
 Example:
 
-    say "hello world".count("l")    #=> 3
-    say "aaa".count("aa")           #=> 1 (non-overlapping)
-    say "foo bar baz".count(/ba/)   #=> 2
+    say "a,b,c".split(',')         #=> ["a", "b", "c"]
+    say "hello world".split(' ')   #=> ["hello", "world"]
+    say "one:two:three".split(':', 2)    #=> ["one", "two:three"]
 
 =cut
 
-=head2 crypt
+=head2 lines
 
-    str.crypt(salt)
+    str.lines
 
-Encrypts the string using the crypt(3) function with the specified salt. This is typically used for password hashing. The salt determines the encryption algorithm used.
+Returns an array of the lines in a string. A line is defined as a sequence of characters terminated by a newline character ("\n") or a carriage return character followed by a newline character ("\r\n").
 
 Example:
 
-    say "password".crypt('$6$somesalt')    # SHA-512 based hash
+    say "line1\nline2\nline3".lines    #=> ["line1", "line2", "line3"]
 
 =cut
 
-=head2 decode
+=head2 words
 
-    str.decode(encoding)
+    str.words
 
-Decodes a string using a specified character encoding and returns the corresponding Unicode string.
-
-Parameters:
-
-    encoding : A string that specifies the character encoding used to encode the input string (e.g., "utf8", "utf16", "latin1", etc.).
+Split a string into words. It takes a string as an input and returns an Array of words in the string. A word is defined as a sequence of characters separated by whitespace characters.
 
 Example:
 
-    var bytes = "café".encode("utf8")
-    say bytes.decode("utf8")    #=> "café"
+    say "hello world test".words    #=> ["hello", "world", "test"]
+    say "one  two   three".words    #=> ["one", "two", "three"]
 
 =cut
 
-=head2 decode_utf8
+=head2 join
 
-    str.decode_utf8
+    delim.join(strings...)
 
-Decodes a UTF-8 encoded string and returns the corresponding Unicode string. This is equivalent to decode("utf8").
+Concatenates a list of strings and returns a single string, using the caller string as a delimiter between each pair of strings.
 
 Example:
 
-    var utf8_bytes = "\xc3\xa9"    # UTF-8 bytes for "é"
-    say utf8_bytes.decode_utf8     #=> "é"
+    say ", ".join("apple", "banana", "cherry")    #=> "apple, banana, cherry"
+    say "-".join("a", "b", "c")                   #=> "a-b-c"
 
 =cut
 
-=head2 deflate
+=head2 sort
 
-    str.deflate
+    str.sort
+    str.sort { |a, b| ... }
 
-Compresses the string using the DEFLATE compression algorithm and returns the compressed data.
+Returns a new string with the characters sorted. When a block is provided, it's used as the comparison function.
 
 Example:
 
-    var compressed = "hello world".deflate
-    say compressed.len < "hello world".len    #=> true (usually)
+    say "dcba".sort           #=> "abcd"
+    say "hello".sort          #=> "ehllo"
 
 =cut
 
-=head2 die
+=head2 uniq
 
-    str.die
+    str.uniq
 
-Prints the string to STDERR and terminates the program with a non-zero exit code.
+Returns a new string with duplicate characters removed, keeping only the first occurrence of each character.
 
 Example:
 
-    "Error: file not found".die    # Prints error and exits
+    say "hello".uniq        #=> "helo"
+    say "aabbcc".uniq       #=> "abc"
+
+Aliases: I<unique>, I<distinct>
 
 =cut
 
-=head2 digits
+=head2 flip
 
-    str.digits
+    str.flip
 
-Returns an Array of the digit characters found in the string.
+Returns a copy of the input string with the order of its characters reversed.
 
 Example:
 
-    say "abc123def456".digits    #=> ["1", "2", "3", "4", "5", "6"]
-    say "no digits here".digits  #=> []
+    say "hello".flip    #=> "olleh"
+    say "12345".flip    #=> "54321"
+
+Aliases: I<reverse>
+
+=cut
+
+=head2 rotate
+
+    str.rotate(n)
+
+Rotates the characters in the string by n positions. Positive values rotate right, negative values rotate left.
+
+Example:
+
+    say "abcde".rotate(2)     #=> "deabc"
+    say "abcde".rotate(-1)    #=> "bcdea"
+
+=cut
+
+=head2 range
+
+    from.range(to, step=1)
+
+Returns an iterator that produces strings from C<from> to C<to> with the specified step. This is similar to the C<..> operator but returns an iterator instead of an array.
+
+Example:
+
+    say 'a'.range('e').to_a    #=> ["a", "b", "c", "d", "e"]
 
 =cut
 
@@ -788,20 +1413,7 @@ Example:
 
 =cut
 
-=head2 dump
-
-    str.dump
-
-Returns a string representation of the string that shows its internal structure, with special characters escaped. Useful for debugging.
-
-Example:
-
-    say "hello\nworld".dump    #=> "hello\\nworld"
-    say "test".dump            #=> "test"
-
-Aliases: I<inspect>
-
-=cut
+=head1 ITERATION
 
 =head2 each
 
@@ -917,48 +1529,132 @@ Example:
 
 =cut
 
-=head2 encode
+=head2 iter
 
-    str.encode(encoding)
+    str.iter
 
-Encodes a string into a specified character encoding and returns a new string object.
-
-Parameters:
-
-    encoding : A string that specifies the character encoding to be used for encoding the input string (e.g., "utf8", "utf16", "latin1", etc.).
+Returns an iterator object that can be used to iterate through the characters of the string one at a time.
 
 Example:
 
-    say "café".encode("utf8").bytes    # Shows UTF-8 byte representation
+    var it = "hello".iter
+    say it.next    #=> "h"
+    say it.next    #=> "e"
 
 =cut
 
-=head2 encode_utf8
+=head1 SUBSTITUTION & MODIFICATION
 
-    str.encode_utf8
+=head2 sub
 
-Encodes a Unicode string using the UTF-8 character encoding and returns a new string object.
+    str.sub(regex, replacement)
+
+Performs a substitution, replacing the first match of the regular expression with the replacement string.
 
 Example:
 
-    say "€".encode_utf8.bytes    #=> [226, 130, 172]
+    say "hello world".sub(/l/, "L")    #=> "heLlo world"
+    say "foo bar".sub(/o/, "0")        #=> "f0o bar"
+
+Aliases: I<replace>
 
 =cut
 
-=head2 ends_with
+=head2 gsub
 
-    str.ends_with(suffix)
+    str.gsub(regex, replacement)
 
-Checks if a string ends with a specified suffix and returns a boolean value.
-
-Parameters:
-
-    suffix : A string that represents the suffix to be searched for at the end of the input string.
+Performs global substitution, replacing all matches of the regular expression with the replacement string.
 
 Example:
 
-    say "hello".ends_with("lo")    #=> true
-    say "hello".ends_with("he")    #=> false
+    say "hello world".gsub(/l/, "L")    #=> "heLLo worLd"
+    say "foo bar".gsub(/o/, "0")        #=> "f00 bar"
+
+Aliases: I<replace_all>
+
+=cut
+
+=head2 esub
+
+    str.esub(regex) { |match| ... }
+
+Performs a substitution on the first match of the regular expression, evaluating the block for the match and replacing it with the block's return value.
+
+Example:
+
+    say "hello world".esub(/\w+/, { |m| m.uc })    #=> "HELLO world"
+
+=cut
+
+=head2 gesub
+
+    str.gesub(regex) { |match| ... }
+
+Performs global substitution on all matches of the regular expression, evaluating the block for each match and replacing it with the block's return value.
+
+Example:
+
+    say "hello world".gesub(/\w+/, { |m| m.uc })    #=> "HELLO WORLD"
+
+=cut
+
+=head2 tr
+
+    str.tr(orig, repl, modes='')
+
+Transliterates characters in the string. Replaces all occurrences of characters in C<orig> with corresponding characters in C<repl>. The C<modes> parameter can include options like 'c' for complement, 'd' for delete, or 's' for squeeze.
+
+Example:
+
+    say "hello".tr('el', 'ip')       #=> "hippo"
+    say "hello".tr('aeiou', '')      #=> "hll" (delete vowels)
+
+Aliases: I<translit>
+
+=cut
+
+=head2 trans
+
+    str.trans(orig, repl)
+
+Similar to C<tr>, but performs character-by-character translation from C<orig> to C<repl>.
+
+Example:
+
+    say "hello".trans('elo', 'xyz')    #=> "hxyxz"
+
+=cut
+
+=head2 insert
+
+    str.insert(substring, pos, len=0)
+
+Inserts a substring into a given string at a specified position, optionally replacing C<len> characters.
+
+Parameters:
+
+    str        : The original string into which the substring is to be inserted.
+    substring  : The substring to be inserted into the original string.
+    pos        : The position in the original string where the insertion is to begin.
+    len        : The length of the portion to replace. If 0, performs simple insertion without replacement. Default is 0.
+
+Example:
+
+    say "hello world".insert("beautiful ", 6)       #=> "hello beautiful world"
+    say "hello world".insert("X", 6, 5)             #=> "hello X"
+
+=cut
+
+=head2 prepend
+
+    str.prepend(prefix)
+
+Returns a new string with the C<prefix> added to the beginning of the C<str>.
+
+Example:
+
+    say "world".prepend("hello ")    #=> "hello world"
 
 =cut
 
@@ -977,15 +1673,69 @@ Aliases: I<quotemeta>
 
 =cut
 
-=head2 esub
+=head2 unescape
 
-    str.esub(regex) { |match| ... }
+    str.unescape
 
-Performs a substitution on the first match of the regular expression, evaluating the block for the match and replacing it with the block's return value.
+Removes backslash escapes from a string. The reverse of the C<str.escape> method.
 
 Example:
 
-    say "hello world".esub(/\w+/, { |m| m.uc })    #=> "HELLO world"
+    say "hello\\.world".unescape    #=> "hello.world"
+    say "\\(test\\)".unescape       #=> "(test)"
+
+=cut
+
+=head2 apply_escapes
+
+    str.apply_escapes
+
+Interprets escape sequences in the string and returns a new string with the escapes applied. This processes backslash escape sequences like \n, \t, \r, etc.
+
+Example:
+
+    say "hello\\nworld".apply_escapes    #=> "hello\nworld" (with actual newline)
+
+=cut
+
+=head1 PATTERN MATCHING & PARSING
+
+=head2 gmatch
+
+    str.gmatch(regex, pos=0)
+
+Performs a global match operation, finding all matches of the regular expression in the string starting from the specified position. Returns an Array of match objects.
+
+Example:
+
+    say "foo bar baz".gmatch(/\w+/)    #=> Returns array of all word matches
+
+=cut
+
+=head2 scan
+
+    str.scan(regex)
+
+Scans the string for matches of the given regular expression and returns an array of all matches. This is similar to the C<collect> method.
+
+Example:
+
+    say "foo bar baz".scan(/\w+/)    #=> ["foo", "bar", "baz"]
+
+=cut
+
+=head2 collect
+
+    str.collect(regex)
+
+Collects all matches of the given regular expression in the string and returns them as an Array. This is similar to the global match operation.
+
+Example:
+
+    say "foo bar baz".collect(/b\w+/)    #=> ["bar", "baz"]
+    say "123 456 789".collect(/\d+/)     #=> ["123", "456", "789"]
+
+Aliases: I<find_all>, I<findall>
 
 =cut
 
@@ -1049,208 +1799,36 @@ Example:
 
 =cut
 
-=head2 fc
+=head2 parse_quotewords
 
-    str.fc
+    str.parse_quotewords(delim=' ', keep=false)
 
-Returns a copy of the input string with all uppercase characters converted to their lowercase equivalents using casefolding.
+Parse a string into an Array of words or phrases. It takes a string as an input and returns an Array of words or phrases parsed from the input string. The function can also handle quoted phrases, allowing users to specify phrases containing delimiters.
 
-Casefolding is the process of mapping strings to a form where case differences are erased; comparing two strings in their casefolded form is effectively a way of asking if two strings are equal, regardless of case.
+The method takes three parameters:
+
+    str     : A string that needs to be split into words.
+    delim   : A string that represents the delimiter to be used while splitting the string. The default value is a space character (' ').
+    keep    : A Boolean value that indicates whether to keep the quotes around quoted words or not. The default value is False.
 
 Example:
 
-    say "HELLO".fc == "hello".fc    #=> true
-    say "Straße".fc                  #=> "strasse" (German ß folds to ss)
-
-Aliases: I<foldcase>
+    say "one two 'three four'".parse_quotewords    #=> ["one", "two", "three four"]
 
 =cut
 
-=head2 first
+=head1 NUMERIC CONVERSION
 
-    str.first(n)
+=head2 bin
 
-Returns the first C<n> characters of the input string, where C<n> is an integer.
+    str.bin
 
-Parameters:
-
-    n : An integer that represents the number of characters to be returned from the beginning of the input string.
+Converts a binary string (consisting of 0s and 1s) to a Number object. The string is interpreted as a base-2 number.
 
 Example:
 
-    say "hello world".first(5)    #=> "hello"
-    say "test".first(2)           #=> "te"
-
-=cut
-
-=head2 flip
-
-    str.flip
-
-Returns a copy of the input string with the order of its characters reversed.
-
-Example:
-
-    say "hello".flip    #=> "olleh"
-    say "12345".flip    #=> "54321"
-
-Aliases: I<reverse>
-
-=cut
-
-=head2 format
-
-    format_str.format(args...)
-
-Formats the string using the provided arguments. This is similar to sprintf-style formatting.
-
-Example:
-
-    say "%s has %d apples".format("Alice", 5)    #=> "Alice has 5 apples"
-
-=cut
-
-=head2 frequire
-
-    str.frequire
-
-Loads and executes a Sidef source file specified by the string. The 'f' stands for "file require". Returns true if successful.
-
-Example:
-
-    "mylib.sf".frequire    # Loads mylib.sf
-
-=cut
-
-=head2 gesub
-
-    str.gesub(regex) { |match| ... }
-
-Performs global substitution on all matches of the regular expression, evaluating the block for each match and replacing it with the block's return value.
-
-Example:
-
-    say "hello world".gesub(/\w+/, { |m| m.uc })    #=> "HELLO WORLD"
-
-=cut
-
-=head2 glob
-
-    str.glob
-
-Expands the string as a filename pattern and returns an Array of matching filenames. Uses shell-style wildcards.
-
-Example:
-
-    say "*.txt".glob    # Returns array of all .txt files in current directory
-
-=cut
-
-=head2 gmatch
-
-    str.gmatch(regex, pos=0)
-
-Performs a global match operation, finding all matches of the regular expression in the string starting from the specified position. Returns an Array of match objects.
-
-Example:
-
-    say "foo bar baz".gmatch(/\w+/)    #=> Returns array of all word matches
-
-=cut
-
-=head2 graphs
-
-    str.graphs
-
-Returns an Array of grapheme clusters in the input string. A grapheme cluster is a sequence of one or more Unicode code points that represents a single user-perceived character.
-
-Example:
-
-    say "hello".graphs    #=> ["h", "e", "l", "l", "o"]
-    say "é".graphs        #=> ["é"] (even if composed of multiple code points)
-
-Aliases: I<graphemes>
-
-=cut
-
-=head2 graphs_len
-
-    str.graphs_len
-
-Returns the number of grapheme clusters in the input string. This represents the number of user-perceived characters.
-
-Example:
-
-    say "hello".graphs_len    #=> 5
-    say "café".graphs_len     #=> 4
-
-Aliases: I<graphs_length>
-
-=cut
-
-=head2 gsub
-
-    str.gsub(regex, replacement)
-
-Performs global substitution, replacing all matches of the regular expression with the replacement string.
-
-Example:
-
-    say "hello world".gsub(/l/, "L")    #=> "heLLo worLd"
-    say "foo bar".gsub(/o/, "0")        #=> "f00 bar"
-
-Aliases: I<replace_all>
-
-=cut
-
-=head2 gunzip
-
-    str.gunzip
-
-Decompresses a gzip-compressed string and returns the original data.
-
-Example:
-
-    var original = "hello world"
-    var compressed = original.gzip
-    say compressed.gunzip    #=> "hello world"
-
-=cut
-
-=head2 gzip
-
-    str.gzip
-
-Compresses the string using gzip compression and returns the compressed data.
-
-Example:
-
-    var compressed = "hello world hello world".gzip
-    say (compressed.len < "hello world hello world".len)    #=> true
-
-=cut
-
-=head2 has
-
-    str.has(substr, pos=0)
-    str.has(regex, pos=0)
-
-Checks if a substring exists within the input string starting from a given position.
-
-Parameters:
-
-    substr  : A string that represents the substring to search for.
-    pos     : An integer that represents the starting position from where to search for the substring. The default value is 0.
-
-When a regular expression is given, it checks if the regular expression pattern matches within the input string starting from a given position.
-
-Example:
-
-    say "hello world".has("world")      #=> true
-    say "hello world".has("world", 10)  #=> false
-    say "testing".has(/\d+/)            #=> false
-
-Aliases: I<contain>, I<include>, I<contains>, I<includes>
+    say "1010".bin         #=> 10
+    say "11111111".bin     #=> 255
 
 =cut
 
@@ -1265,6 +1843,105 @@ Example:
     say "FF".hex         #=> 255
     say "0x1A".hex       #=> 26
     say "10".hex         #=> 16
+
+=cut
+
+=head2 oct
+
+    str.oct
+
+Converts an octal string to a Number object. The string is interpreted as a base-8 number. The "0o" or "0O" prefix is optional.
+
+Example:
+
+    say "10".oct       #=> 8
+    say "0o77".oct     #=> 63
+    say "777".oct      #=> 511
+
+=cut
+
+=head2 num
+
+    str.num(base=10)
+
+Returns the numeric representation of the string according to the specified base.
+
+Parameters:
+
+    base : An integer representing the numeric base to use for conversion. Valid values for base are between 2 and 62 (inclusive). If not specified, base defaults to 10.
+
+Example:
+
+    say "123".num         #=> 123
+    say "FF".num(16)      #=> 255
+    say "1010".num(2)     #=> 10
+
+Aliases: I<to_n>, I<to_num>
+
+=cut
+
+=head2 to_i
+
+    str.to_i
+
+Converts the string to an integer. This is equivalent to calling C<num()> with base 10.
+
+Example:
+
+    say "123".to_i     #=> 123
+    say "-456".to_i    #=> -456
+
+Aliases: I<to_int>
+
+=cut
+
+=head2 to_s
+
+    str.to_s
+
+Returns the string itself. Since the object is already a string, this is an identity operation.
+
+Example:
+
+    say "hello".to_s    #=> "hello"
+
+Aliases: I<to_str>
+
+=cut
+
+=head2 ascii2bin
+
+    str.ascii2bin
+
+Takes a string of ASCII characters as input and returns a string of binary digits representing the ASCII values of the characters. Each character is converted to its binary representation.
+
+Example:
+
+    say "Hi".ascii2bin    #=> "0100100001101001"
+
+=cut
+
+=head2 ascii2bits
+
+    str.ascii2bits
+
+Takes a string of ASCII characters as input and returns a string of bits representing the ASCII values of the characters. Each character is converted to its 8-bit binary representation.
+
+Example:
+
+    say "A".ascii2bits    #=> "01000001"
+
+=cut
+
+=head2 bin2ascii
+
+    str.bin2ascii
+
+Converts a binary string into its equivalent ASCII string representation. It takes a binary string as an input and returns the equivalent ASCII string representation of the binary string.
+
+Example:
+
+    say "0100100001101001".bin2ascii    #=> "Hi"
 
 =cut
 
@@ -1296,24 +1973,108 @@ Aliases: I<ascii2hex>
 
 =cut
 
-=head2 index
+=head1 ENCODING & DECODING
 
-    str.index(substr, pos=0)
+=head2 encode
 
-Returns the index of the first occurrence of a substring in a given string starting from a specified position. Returns -1 if the substring is not found.
+    str.encode(encoding)
+
+Encodes a string into a specified character encoding and returns a new string object.
 
 Parameters:
 
-    str        : The original string in which the substring is to be searched.
-    substring  : The substring to be searched in the original string.
-    pos        : The position in the original string from where the search is to begin. The default value is 0.
+    encoding : A string that specifies the character encoding to be used for encoding the input string (e.g., "utf8", "utf16", "latin1", etc.).
 
 Example:
 
-    say "hello world".index("world")     #=> 6
-    say "hello world".index("o")         #=> 4
-    say "hello world".index("o", 5)      #=> 7
-    say "hello world".index("xyz")       #=> -1
+    say "café".encode("utf8").bytes    # Shows UTF-8 byte representation
+
+=cut
+
+=head2 decode
+
+    str.decode(encoding)
+
+Decodes a string using a specified character encoding and returns the corresponding Unicode string.
+
+Parameters:
+
+    encoding : A string that specifies the character encoding used to encode the input string (e.g., "utf8", "utf16", "latin1", etc.).
+
+Example:
+
+    var bytes = "café".encode("utf8")
+    say bytes.decode("utf8")    #=> "café"
+
+=cut
+
+=head2 encode_utf8
+
+    str.encode_utf8
+
+Encodes a Unicode string using the UTF-8 character encoding and returns a new string object.
+
+Example:
+
+    say "€".encode_utf8.bytes    #=> [226, 130, 172]
+
+=cut
+
+=head2 decode_utf8
+
+    str.decode_utf8
+
+Decodes a UTF-8 encoded string and returns the corresponding Unicode string. This is equivalent to decode("utf8").
+
+Example:
+
+    var utf8_bytes = "\xc3\xa9"    # UTF-8 bytes for "é"
+    say utf8_bytes.decode_utf8     #=> "é"
+
+=cut
+
+=head2 base64_encode
+
+    str.base64_encode
+
+Encodes a string in base64 format. Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format by translating it into a radix-64 representation. The encoded string can be safely transferred or stored without any data loss or corruption. The C<base64_encode()> method encodes the input string in base64 format.
+
+Example:
+
+    say "Hello World".base64_encode    #=> "SGVsbG8gV29ybGQ="
+
+Aliases: I<encode_base64>
+
+=cut
+
+=head2 base64_decode
+
+    str.base64_decode
+
+Decodes a base64 encoded string into its original form.
+
+Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format by translating it into a radix-64 representation. The encoded string can be safely transferred or stored without any data loss or corruption. The C<base64_decode()> method reverses the encoding process and converts the base64 string back to its original binary form.
+
+Example:
+
+    say "SGVsbG8gV29ybGQ=".base64_decode    #=> "Hello World"
+
+Aliases: I<decode_base64>
+
+=cut
+
+=head1 COMPRESSION
+
+=head2 deflate
+
+    str.deflate
+
+Compresses the string using the DEFLATE compression algorithm and returns the compressed data.
+
+Example:
+
+    var compressed = "hello world".deflate
+    say compressed.len < "hello world".len    #=> true (usually)
 
 =cut
 
@@ -1331,424 +2092,58 @@ Example:
 
 =cut
 
-=head2 insert
+=head2 gzip
 
-    str.insert(substring, pos, len=0)
+    str.gzip
 
-Inserts a substring into a given string at a specified position, optionally replacing C<len> characters.
-
-Parameters:
-
-    str        : The original string into which the substring is to be inserted.
-    substring  : The substring to be inserted into the original string.
-    pos        : The position in the original string where the insertion is to begin.
-    len        : The length of the portion to replace. If 0, performs simple insertion without replacement. Default is 0.
+Compresses the string using gzip compression and returns the compressed data.
 
 Example:
 
-    say "hello world".insert("beautiful ", 6)       #=> "hello beautiful world"
-    say "hello world".insert("X", 6, 5)             #=> "hello X"
+    var compressed = "hello world hello world".gzip
+    say (compressed.len < "hello world hello world".len)    #=> true
 
 =cut
 
-=head2 ints
+=head2 gunzip
 
-    str.ints
+    str.gunzip
 
-Returns an Array of integers extracted from the string. This method finds all integer values (positive and negative) in the string.
+Decompresses a gzip-compressed string and returns the original data.
 
 Example:
 
-    say "test 123 and -456".ints    #=> [123, -456]
-    say "no numbers".ints           #=> []
-
-Aliases: I<integers>
-
-=cut
-
-=head2 is_alnum
-
-    str.is_alnum
-
-Returns true if all characters in the string are alphanumeric (letters or digits) and the string is not empty, false otherwise.
-
-Example:
-
-    say "abc123".is_alnum     #=> true
-    say "abc 123".is_alnum    #=> false (contains space)
-    say "test".is_alnum       #=> true
-
-Aliases: I<is_alphanum>
+    var original = "hello world"
+    var compressed = original.gzip
+    say compressed.gunzip    #=> "hello world"
 
 =cut
 
-=head2 is_alpha
+=head2 bwt_encode
 
-    str.is_alpha
+    str.bwt_encode
 
-Returns true if all characters in the string are alphabetic letters and the string is not empty, false otherwise.
+Applies the Burrows–Wheeler transform (BWT) to the invocant string and returns a pair consisting of the transformed string and the primary index.
 
-Example:
+The primary index is required for decoding with C<bwt_decode>.
 
-    say "hello".is_alpha      #=> true
-    say "hello123".is_alpha   #=> false
-    say "test".is_alpha       #=> true
+    var (bwt, idx) = "banana".bwt_encode
 
 =cut
 
-=head2 is_ascii
+=head2 bwt_decode
 
-    str.is_ascii
+    bwt.bwt_decode(idx)
 
-Returns true if all characters in the string are ASCII characters (code points 0-127), false otherwise.
+Reverses the Burrows–Wheeler transform and reconstructs the original string.
 
-Example:
+This method takes a BWT-transformed string and its associated primary index (as returned by C<bwt_encode>) and reconstructs the original string using the standard LF-mapping technique.
 
-    say "hello".is_ascii      #=> true
-    say "café".is_ascii       #=> false (é is not ASCII)
-
-=cut
-
-=head2 is_blank
-
-    str.is_blank
-
-Returns true if the string contains only whitespace characters or is empty, false otherwise.
-
-Example:
-
-    say "   ".is_blank        #=> true
-    say "".is_blank           #=> true
-    say "  a  ".is_blank      #=> false
+    var original = bwt.bwt_decode(idx)
 
 =cut
 
-=head2 is_control
-
-    str.is_control
-
-Returns true if all characters in the string are control characters and the string is not empty, false otherwise.
-
-Example:
-
-    say "\n\t".is_control     #=> true
-    say "test".is_control     #=> false
-
-=cut
-
-=head2 is_digit
-
-    str.is_digit
-
-Returns true if all characters in the string are digits and the string is not empty, false otherwise.
-
-Example:
-
-    say "12345".is_digit      #=> true
-    say "123a".is_digit       #=> false
-    say "".is_digit           #=> false
-
-=cut
-
-=head2 is_empty
-
-    str.is_empty
-
-Determine if a given string is empty or not. It takes a string as an input and returns True if the string is empty, False otherwise.
-
-Example:
-
-    say "".is_empty           #=> true
-    say "hello".is_empty      #=> false
-    say "   ".is_empty        #=> false
-
-=cut
-
-=head2 is_graph
-
-    str.is_graph
-
-Returns true if all characters in the string are graphical characters (visible characters, not whitespace) and the string is not empty, false otherwise.
-
-Example:
-
-    say "hello!".is_graph     #=> true
-    say "hello ".is_graph     #=> false (contains space)
-
-=cut
-
-=head2 is_lc
-
-    str.is_lc
-
-Returns true if all alphabetic characters in the string are lowercase and there is at least one alphabetic character, false otherwise.
-
-Example:
-
-    say "hello".is_lc         #=> true
-    say "Hello".is_lc         #=> false
-    say "123".is_lc           #=> false
-
-Aliases: I<is_lowercase>
-
-=cut
-
-=head2 is_numeric
-
-    str.is_numeric
-
-Checks whether a given string looks like a number or not. It checks if the string can be converted to a number without raising an exception.
-
-Example:
-
-    say "123".is_numeric       #=> true
-    say "123.45".is_numeric    #=> true
-    say "-42".is_numeric       #=> true
-    say "abc".is_numeric       #=> false
-
-Aliases: I<looks_like_number>
-
-=cut
-
-=head2 is_palindrome
-
-    str.is_palindrome
-
-Checks whether a given string is a palindrome or not. A palindrome is a word, phrase, number, or other sequence of characters that reads the same backward as forward.
-
-Example:
-
-    say "racecar".is_palindrome    #=> true
-    say "hello".is_palindrome      #=> false
-    say "noon".is_palindrome       #=> true
-
-=cut
-
-=head2 is_printable
-
-    str.is_printable
-
-Returns true if all characters in the string are printable and the string is not empty, false otherwise. Printable characters include letters, digits, punctuation, and spaces.
-
-Example:
-
-    say "hello world".is_printable    #=> true
-    say "test\n".is_printable         #=> false (contains newline)
-
-=cut
-
-=head2 is_punct
-
-    str.is_punct
-
-Returns true if all characters in the string are punctuation characters and the string is not empty, false otherwise.
-
-Example:
-
-    say "!@#".is_punct         #=> true
-    say "hello!".is_punct      #=> false
-
-Aliases: I<is_punctuation>
-
-=cut
-
-=head2 is_space
-
-    str.is_space
-
-Returns true if all characters in the string are whitespace characters and the string is not empty, false otherwise.
-
-Example:
-
-    say "   ".is_space         #=> true
-    say " \t\n".is_space       #=> true
-    say " a ".is_space         #=> false
-
-=cut
-
-=head2 is_uc
-
-    str.is_uc
-
-Returns true if all alphabetic characters in the string are uppercase and there is at least one alphabetic character, false otherwise.
-
-Example:
-
-    say "HELLO".is_uc          #=> true
-    say "Hello".is_uc          #=> false
-    say "123".is_uc            #=> false
-
-Aliases: I<is_uppercase>
-
-=cut
-
-=head2 is_word
-
-    str.is_word
-
-Returns true if all characters in the string are word characters (letters, digits, or underscores) and the string is not empty, false otherwise.
-
-Example:
-
-    say "hello_123".is_word    #=> true
-    say "hello world".is_word  #=> false (contains space)
-
-=cut
-
-=head2 is_xdigit
-
-    str.is_xdigit
-
-Returns true if all characters in the string are hexadecimal digits (0-9, a-f, A-F) and the string is not empty, false otherwise.
-
-Example:
-
-    say "1A2B".is_xdigit       #=> true
-    say "xyz".is_xdigit        #=> false
-
-=cut
-
-=head2 iter
-
-    str.iter
-
-Returns an iterator object that can be used to iterate through the characters of the string one at a time.
-
-Example:
-
-    var it = "hello".iter
-    say it.next    #=> "h"
-    say it.next    #=> "e"
-
-=cut
-
-=head2 jaro
-
-    jaro(str1, str2, winkler=false)
-
-Calculates the Jaro similarity between two strings. Jaro distance is a measure of similarity between two strings, based on the number of matching characters and transpositions. The result is a value between 0 and 1, where 1 indicates identical strings.
-
-When the third argument is true, it returns the Jaro-Winkler similarity score, which gives more weight to strings that match from the beginning.
-
-Example:
-
-    say jaro("accommodate", "accomodate")         #=> 0.96969696969697
-    say jaro("accommodate", "accomodate", true)   #=> 0.981818181818182
-
-=cut
-
-=head2 join
-
-    delim.join(strings...)
-
-Concatenates a list of strings and returns a single string, using the caller string as a delimiter between each pair of strings.
-
-Example:
-
-    say ", ".join("apple", "banana", "cherry")    #=> "apple, banana, cherry"
-    say "-".join("a", "b", "c")                   #=> "a-b-c"
-
-=cut
-
-=head2 last
-
-    str.last(n)
-
-Returns the last n characters of a string.
-
-Example:
-
-    say "hello world".last(5)    #=> "world"
-    say "test".last(2)           #=> "st"
-
-=cut
-
-=head2 lc
-
-    str.lc
-
-Returns a new string with all alphabetic characters converted to lowercase.
-
-Example:
-
-    say "HELLO World".lc    #=> "hello world"
-
-Aliases: I<lower>, I<downcase>, I<lowercase>
-
-=cut
-
-=head2 lcfirst
-
-    str.lcfirst
-
-Returns a new string with the first character of the string converted to lowercase.
-
-Example:
-
-    say "Hello World".lcfirst    #=> "hello World"
-
-=cut
-
-=head2 len
-
-    str.len
-
-Returns the length of the string in characters (not bytes).
-
-Example:
-
-    say "hello".len      #=> 5
-    say "€".len          #=> 1
-    say "café".len       #=> 4
-
-Aliases: I<size>, I<length>, I<chars_len>, I<chars_length>
-
-=cut
-
-=head2 lev
-
-    levenshtein(str1, str2)
-
-Calculates the Levenshtein distance between two strings, which is the minimum number of single-character edits (insertions, deletions, or substitutions) required to transform one string into the other.
-
-Example:
-
-    say levenshtein("kitten", "sitting")    #=> 3
-    say levenshtein("hello", "hallo")       #=> 1
-
-Aliases: I<leven>, I<levenshtein>
-
-=cut
-
-=head2 lines
-
-    str.lines
-
-Returns an array of the lines in a string. A line is defined as a sequence of characters terminated by a newline character ("\n") or a carriage return character followed by a newline character ("\r\n").
-
-Example:
-
-    say "line1\nline2\nline3".lines    #=> ["line1", "line2", "line3"]
-
-=cut
-
-=head2 ltrim
-
-    str.ltrim
-    str.ltrim(regex)
-
-Takes a regular expression regex and removes any substring from the beginning of the string str that matches the regular expression. The resulting string is returned.
-
-When no argument is given, it strips whitespace characters from the beginning of the string.
-
-Example:
-
-    say "  hello  ".ltrim          #=> "hello  "
-    say "xxxhello".ltrim(/x+/)     #=> "hello"
-
-Aliases: I<lstrip>, I<trim_beg>, I<strip_beg>, I<trim_left>, I<strip_left>
-
-=cut
+=head1 HASHING & CRYPTOGRAPHY
 
 =head2 md5
 
@@ -1759,296 +2154,6 @@ Returns the MD5 digest for the given string in hexadecimal form. MD5 is a widely
 Example:
 
     say "hello".md5    #=> "5d41402abc4b2a76b9719d911017c592"
-
-=cut
-
-=head2 new
-
-    Str(args...)
-
-Creates a new string, by concatenating together a given list of objects. Each object is converted to its string representation.
-
-Example:
-
-    say Str("hello", " ", "world")    #=> "hello world"
-    say Str(1, 2, 3)                  #=> "123"
-
-Aliases: I<call>
-
-=cut
-
-=head2 num
-
-    str.num(base=10)
-
-Returns the numeric representation of the string according to the specified base.
-
-Parameters:
-
-    base : An integer representing the numeric base to use for conversion. Valid values for base are between 2 and 62 (inclusive). If not specified, base defaults to 10.
-
-Example:
-
-    say "123".num         #=> 123
-    say "FF".num(16)      #=> 255
-    say "1010".num(2)     #=> 10
-
-Aliases: I<to_n>, I<to_num>
-
-=cut
-
-=head2 nums
-
-    str.nums
-
-Returns a list of numbers that were found in the string. The function splits the string by whitespace, and collects every word that looks like a number. The numbers in the returned list will be in the same order that they appeared in the string.
-
-Example:
-
-    say "test 123 and 456".nums    #=> [123, 456]
-    say "1.5 -2.3 test".nums       #=> [1.5, -2.3]
-
-Aliases: I<numbers>
-
-=cut
-
-=head2 oct
-
-    str.oct
-
-Converts an octal string to a Number object. The string is interpreted as a base-8 number. The "0o" or "0O" prefix is optional.
-
-Example:
-
-    say "10".oct       #=> 8
-    say "0o77".oct     #=> 63
-    say "777".oct      #=> 511
-
-=cut
-
-=head2 open_r
-
-    str.open_r(mode='<')
-
-Opens a file with the name specified by the string and returns a file handle for reading or writing. The mode parameter specifies how the file should be opened.
-
-Example:
-
-    var fh = "myfile.txt".open_r
-    say fh.readline
-
-=cut
-
-=head2 ord
-
-    str.ord
-
-Returns the Unicode code point value of the first character in the string.
-
-Example:
-
-    say "A".ord        #=> 65
-    say "€".ord        #=> 8364
-    say "hello".ord    #=> 104
-
-=cut
-
-=head2 overlaps
-
-    overlaps(str1, str2)
-
-Checks whether there is any overlap between two strings, i.e., whether they have any characters in common. It returns True if there is any overlap, and False otherwise.
-
-Example:
-
-    say overlaps("hello", "world")    #=> true (both have 'o' and 'l')
-    say overlaps("abc", "xyz")        #=> false
-
-=cut
-
-=head2 pack
-
-    str.pack(*list)
-
-Creates a binary string from a list of values according to a template format specified by the string. This is similar to Perl's pack function.
-
-Example:
-
-    say "A*".pack("hello")         # Pack as ASCII string
-    say "C*".pack(72, 105)         # Pack as unsigned chars
-
-=cut
-
-=head2 parse_quotewords
-
-    str.parse_quotewords(delim=' ', keep=false)
-
-Parse a string into an Array of words or phrases. It takes a string as an input and returns an Array of words or phrases parsed from the input string. The function can also handle quoted phrases, allowing users to specify phrases containing delimiters.
-
-The method takes three parameters:
-
-    str     : A string that needs to be split into words.
-    delim   : A string that represents the delimiter to be used while splitting the string. The default value is a space character (' ').
-    keep    : A Boolean value that indicates whether to keep the quotes around quoted words or not. The default value is False.
-
-Example:
-
-    say "one two 'three four'".parse_quotewords    #=> ["one", "two", "three four"]
-
-=cut
-
-=head2 pipe
-
-    str.pipe
-
-Executes the string as a shell command and opens a pipe to it, returning a file handle for reading from or writing to the command.
-
-Example:
-
-    var fh = "ls -l".pipe
-    say fh.slurp
-
-=cut
-
-=head2 pop
-
-    str.pop
-
-Returns the last character of the string. If the string is empty, returns nil.
-
-Example:
-
-    say "hello".pop    #=> "o"
-    say "test".pop     #=> "t"
-
-=cut
-
-=head2 prepend
-
-    str.prepend(prefix)
-
-Returns a new string with the C<prefix> added to the beginning of the C<str>.
-
-Example:
-
-    say "world".prepend("hello ")    #=> "hello world"
-
-=cut
-
-=head2 printf
-
-    str.printf(*arguments)
-
-Formats and prints the string using the provided arguments. This is similar to C's printf function.
-
-Example:
-
-    "%s has %d apples".printf("Alice", 5)    # Prints: Alice has 5 apples
-
-=cut
-
-=head2 range
-
-    from.range(to, step=1)
-
-Returns an iterator that produces strings from C<from> to C<to> with the specified step. This is similar to the C<..> operator but returns an iterator instead of an array.
-
-Example:
-
-    say 'a'.range('e').to_a    #=> ["a", "b", "c", "d", "e"]
-
-=cut
-
-=head2 require
-
-    str.require
-
-Loads a Sidef module specified by the string. Returns true if successful.
-
-Example:
-
-    "MyModule".require    # Loads MyModule
-
-=cut
-
-=head2 rindex
-
-    str.rindex(substr, pos)
-
-Returns the index of the last occurrence of a substring in the string, searching backwards from the specified position. Returns -1 if not found.
-
-Example:
-
-    say "hello world".rindex("o")       #=> 7
-    say "hello world".rindex("o", 6)    #=> 4
-    say "hello world".rindex("xyz")     #=> -1
-
-=cut
-
-=head2 rotate
-
-    str.rotate(n)
-
-Rotates the characters in the string by n positions. Positive values rotate right, negative values rotate left.
-
-Example:
-
-    say "abcde".rotate(2)     #=> "deabc"
-    say "abcde".rotate(-1)    #=> "bcdea"
-
-=cut
-
-=head2 rtrim
-
-    str.rtrim
-    str.rtrim(regex)
-
-Removes any substring from the end of the string that matches the given regular expression. When no argument is given, it strips whitespace characters from the end of the string.
-
-Example:
-
-    say "  hello  ".rtrim          #=> "  hello"
-    say "helloxxx".rtrim(/x+/)     #=> "hello"
-
-Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
-
-=cut
-
-=head2 run
-
-    method.run(str, *args)
-
-Dynamically invokes a method on the string. The method name is given as a string, and additional arguments are passed to the method.
-
-Example:
-
-    "uc".run("hello")    #=> "HELLO"
-
-=cut
-
-=head2 sayf
-
-    str.sayf(*arguments)
-
-Formats and prints the string using the provided arguments, followed by a newline.
-
-Example:
-
-    "%s has %d apples".sayf("Alice", 5)    # Prints: Alice has 5 apples\n
-
-Aliases: I<printlnf>
-
-=cut
-
-=head2 scan
-
-    str.scan(regex)
-
-Scans the string for matches of the given regular expression and returns an array of all matches. This is similar to the C<collect> method.
-
-Example:
-
-    say "foo bar baz".scan(/\w+/)    #=> ["foo", "bar", "baz"]
 
 =cut
 
@@ -2088,68 +2193,55 @@ Example:
 
 =cut
 
-=head2 slice
+=head2 crypt
 
-    str.slice(offset)
-    str.slice(offset, length)
+    str.crypt(salt)
 
-Extracts a substring out of the string and returns it. First character is at offset zero.
-
-If C<offset> is negative, starts that far back from the end of the string.
-
-If C<length> is omitted, returns everything through the end of the string.
-
-If C<length> is negative, leaves that many characters off the end of the string.
+Encrypts the string using the crypt(3) function with the specified salt. This is typically used for password hashing. The salt determines the encryption algorithm used.
 
 Example:
 
-    say "hello world".slice(0, 5)     #=> "hello"
-    say "hello world".slice(6)        #=> "world"
-    say "hello world".slice(-5)       #=> "world"
-    say "hello world".slice(0, -6)    #=> "hello"
-
-Aliases: I<substr>, I<substring>
+    say "password".crypt('$6$somesalt')    # SHA-512 based hash
 
 =cut
 
-=head2 slices
+=head1 FORMATTING & OUTPUT
 
-    str.slices(n)
+=head2 format
 
-Takes a string and divides it into slices of a specified length. The length of the slice is specified by the integer parameter C<n>. If the length of the string is not evenly divisible by C<n>, the last slice will be shorter than C<n> characters.
+    str.format
+
+Interprets the invocant as a Perl "format" declaration (the same syntax used with Perl's built-in C<write> function) and returns the generated output as a new string. This is unrelated to sprintf-style formatting; for that, see C<%>.
 
 Example:
 
-    say "abcdefgh".slices(3)    #=> ["abc", "def", "gh"]
-    say "test".slices(2)        #=> ["te", "st"]
+    say "Hello, World!".format    #=> "Hello, World!"
 
 =cut
 
-=head2 sort
+=head2 printf
 
-    str.sort
-    str.sort { |a, b| ... }
+    str.printf(*arguments)
 
-Returns a new string with the characters sorted. When a block is provided, it's used as the comparison function.
+Formats and prints the string using the provided arguments. This is similar to C's printf function.
 
 Example:
 
-    say "dcba".sort           #=> "abcd"
-    say "hello".sort          #=> "ehllo"
+    "%s has %d apples".printf("Alice", 5)    # Prints: Alice has 5 apples
 
 =cut
 
-=head2 split
+=head2 sayf
 
-    str.split(sep, limit)
+    str.sayf(*arguments)
 
-Splits the string into an array of substrings using the specified separator. The C<sep> can be a string or a regular expression. If C<limit> is specified, the array will contain at most C<limit> elements.
+Formats and prints the string using the provided arguments, followed by a newline.
 
 Example:
 
-    say "a,b,c".split(',')         #=> ["a", "b", "c"]
-    say "hello world".split(' ')   #=> ["hello", "world"]
-    say "one:two:three".split(':', 2)    #=> ["one", "two:three"]
+    "%s has %d apples".sayf("Alice", 5)    # Prints: Alice has 5 apples\n
+
+Aliases: I<printlnf>
 
 =cut
 
@@ -2166,174 +2258,110 @@ Example:
 
 =cut
 
-=head2 sub
+=head2 dump
 
-    str.sub(regex, replacement)
+    str.dump
 
-Performs a substitution, replacing the first match of the regular expression with the replacement string.
+Returns a string representation of the string that shows its internal structure, with special characters escaped. Useful for debugging.
 
 Example:
 
-    say "hello world".sub(/l/, "L")    #=> "heLlo world"
-    say "foo bar".sub(/o/, "0")        #=> "f0o bar"
+    say "hello\nworld".dump    #=> "hello\\nworld"
+    say "test".dump            #=> "test"
 
-Aliases: I<replace>
+Aliases: I<inspect>
 
 =cut
 
-=head2 tc
+=head1 BINARY PACKING
 
-    str.tc
+=head2 pack
 
-Returns a new string where each word in the input string C<str> is capitalized (first letter uppercase, rest lowercase).
+    str.pack(*list)
 
-Example:
-
-    say "hello world".tc    #=> "Hello World"
-    say "test CASE".tc      #=> "Test Case"
-
-Aliases: I<ucfirst>, I<titlecase>
-
-=cut
-
-=head2 tclc
-
-    str.tclc
-
-Returns the string with the first character capitalized and the remaining characters in lower case.
+Creates a binary string from a list of values according to a template format specified by the string. This is similar to Perl's pack function.
 
 Example:
 
-    say "hello WORLD".tclc    #=> "Hello world"
-
-Aliases: I<capitalize>
-
-=cut
-
-=head2 to_i
-
-    str.to_i
-
-Converts the string to an integer. This is equivalent to calling C<num()> with base 10.
-
-Example:
-
-    say "123".to_i     #=> 123
-    say "-456".to_i    #=> -456
-
-Aliases: I<to_int>
-
-=cut
-
-=head2 to_s
-
-    str.to_s
-
-Returns the string itself. Since the object is already a string, this is an identity operation.
-
-Example:
-
-    say "hello".to_s    #=> "hello"
-
-Aliases: I<to_str>
-
-=cut
-
-=head2 tr
-
-    str.tr(orig, repl, modes='')
-
-Transliterates characters in the string. Replaces all occurrences of characters in C<orig> with corresponding characters in C<repl>. The C<modes> parameter can include options like 'c' for complement, 'd' for delete, or 's' for squeeze.
-
-Example:
-
-    say "hello".tr('el', 'ip')       #=> "hippo"
-    say "hello".tr('aeiou', '')      #=> "hll" (delete vowels)
-
-Aliases: I<translit>
-
-=cut
-
-=head2 trans
-
-    str.trans(orig, repl)
-
-Similar to C<tr>, but performs character-by-character translation from C<orig> to C<repl>.
-
-Example:
-
-    say "hello".trans('elo', 'xyz')    #=> "hxyxz"
-
-=cut
-
-=head2 trim
-
-    str.trim
-    str.trim(regex)
-
-Removes whitespace (or characters matching the regex) from both the beginning and end of the string.
-
-Example:
-
-    say "  hello  ".trim         #=> "hello"
-    say "xxxhelloxxx".trim(/x+/) #=> "hello"
-
-Aliases: I<strip>
-
-=cut
-
-=head2 uc
-
-    str.uc
-
-Convert all the characters in a string to uppercase. It takes a string as an input and returns the same string with all the characters converted to uppercase.
-
-Example:
-
-    say "hello world".uc    #=> "HELLO WORLD"
-    say "test".uc           #=> "TEST"
-
-Aliases: I<upper>, I<upcase>
-
-=cut
-
-=head2 unescape
-
-    str.unescape
-
-Removes backslash escapes from a string. The reverse of the C<str.escape> method.
-
-Example:
-
-    say "hello\\.world".unescape    #=> "hello.world"
-    say "\\(test\\)".unescape       #=> "(test)"
-
-=cut
-
-=head2 uniq
-
-    str.uniq
-
-Returns a new string with duplicate characters removed, keeping only the first occurrence of each character.
-
-Example:
-
-    say "hello".uniq        #=> "helo"
-    say "aabbcc".uniq       #=> "abc"
-
-Aliases: I<unique>, I<distinct>
+    say "A*".pack("hello")         # Pack as ASCII string
+    say "C*".pack(72, 105)         # Pack as unsigned chars
 
 =cut
 
 =head2 unpack
 
-    str.unpack(template)
+    template.unpack(str)
 
-Extracts values from a binary string according to a template format. This is the reverse of the C<pack> operation.
+Extracts values from C<str> according to the template format specified by the invocant. This is the reverse of the C<pack> operation.
 
 Example:
 
-    say "Hi".unpack("C*")    #=> [72, 105]
+    say "C*".unpack("Hi")    #=> [72, 105]
+
+=cut
+
+=head1 SYSTEM & EXECUTION
+
+=head2 backtick
+
+    str.backtick
+
+Executes the string as a shell command and returns the output. This is equivalent to running the string in backticks or using qx{}.
+
+Example:
+
+    say "echo hello".backtick    #=> "hello\n"
+
+Warning: Use with caution as it executes arbitrary shell commands.
+
+=cut
+
+=head2 run
+
+    method.run(str, *args)
+
+Dynamically invokes a method on the string. The method name is given as a string, and additional arguments are passed to the method.
+
+Example:
+
+    "uc".run("hello")    #=> "HELLO"
+
+=cut
+
+=head2 pipe
+
+    str.pipe
+
+Executes the string as a shell command and opens a pipe to it, returning a file handle for reading from or writing to the command.
+
+Example:
+
+    var fh = "ls -l".pipe
+    say fh.slurp
+
+=cut
+
+=head2 require
+
+    str.require
+
+Loads a Sidef module specified by the string. Returns true if successful.
+
+Example:
+
+    "MyModule".require    # Loads MyModule
+
+=cut
+
+=head2 frequire
+
+    str.frequire
+
+Loads and executes a Sidef source file specified by the string. The 'f' stands for "file require". Returns true if successful.
+
+Example:
+
+    "mylib.sf".frequire    # Loads mylib.sf
 
 =cut
 
@@ -2349,6 +2377,43 @@ Example:
 
 =cut
 
+=head2 open_r
+
+    str.open_r(mode='<')
+
+Opens a file with the name specified by the string and returns a file handle for reading or writing. The mode parameter specifies how the file should be opened.
+
+Example:
+
+    var fh = "myfile.txt".open_r
+    say fh.readline
+
+=cut
+
+=head2 glob
+
+    str.glob
+
+Expands the string as a filename pattern and returns an Array of matching filenames. Uses shell-style wildcards.
+
+Example:
+
+    say "*.txt".glob    # Returns array of all .txt files in current directory
+
+=cut
+
+=head2 die
+
+    str.die
+
+Prints the string to STDERR and terminates the program with a non-zero exit code.
+
+Example:
+
+    "Error: file not found".die    # Prints error and exits
+
+=cut
+
 =head2 warn
 
     str.warn
@@ -2358,33 +2423,6 @@ Prints the string to STDERR as a warning message but does not terminate the prog
 Example:
 
     "Warning: something might be wrong".warn    # Prints warning to STDERR
-
-=cut
-
-=head2 wc
-
-    str.wc
-
-Change the case of words in a string. It takes a string as an input and returns the same string with the case of each word modified, making the first letter uppercase and the other letters lowercase.
-
-Example:
-
-    say "hello WORLD test".wc    #=> "Hello World Test"
-
-Aliases: I<wordcase>
-
-=cut
-
-=head2 words
-
-    str.words
-
-Split a string into words. It takes a string as an input and returns an Array of words in the string. A word is defined as a sequence of characters separated by whitespace characters.
-
-Example:
-
-    say "hello world test".words    #=> ["hello", "world", "test"]
-    say "one  two   three".words    #=> ["one", "two", "three"]
 
 =cut
 
