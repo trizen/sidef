@@ -8,17 +8,20 @@ Sidef::Types::Array::Array
 
 This class implements arrays in Sidef: ordered, mutable, zero-indexed collections of values. Arrays can hold elements of any type and provide operators plus methods for querying, searching, transforming, grouping, randomization, combinatorics, and matrix-oriented work.
 
-=head1 SYNOPSIS
+=head1 SYNOPSYS
 
-    var arr = Array(1, 2, 3)
-    var arr = [1, 2, 3]
-    var arr = %w(a b c)
+    var nums = Array(1, 2, 3, 4)
+    var nums = [1, 2, 3, 4]
+    var words = %w(alpha beta gamma)
 
-    arr[0]           #=> first element
-    arr[-1]          #=> last element
-    arr.len          #=> length
-    arr.push(4)      #=> append element
-    arr.map{_**2}    #=> transform elements
+    nums[0]              #=> 1
+    nums[-1]             #=> 4
+    nums.len             #=> 4
+
+    nums.push(5)         #=> [1, 2, 3, 4, 5]
+    nums.map { _**2 }    #=> [1, 4, 9, 16, 25]
+    nums.grep { _.is_even }   #=> [2, 4]
+    nums.sum             #=> 15
 
 =head1 INHERITS
 
@@ -32,9 +35,9 @@ The Array class exposes a large operator and method surface. The entries below a
 
 Within each category, methods are listed alphabetically, except for operators, which are grouped by related behavior.
 
-=head2 Operators
+=head1 Operators
 
-=head3 +
+=head2 +
 
     a + b
 
@@ -46,7 +49,7 @@ Aliases: I<add>, I<concat>
 
 =cut
 
-=head3 -
+=head2 -
 
     a - b
 
@@ -58,7 +61,7 @@ Aliases: I<sub>, I<diff>
 
 =cut
 
-=head3 *
+=head2 *
 
     a * n
 
@@ -70,7 +73,7 @@ Aliases: I<mul>
 
 =cut
 
-=head3 /
+=head2 /
 
     a / n
 
@@ -85,7 +88,7 @@ Aliases: I<÷>, I<div>
 
 =cut
 
-=head3 **
+=head2 **
 
     a ** n
 
@@ -101,7 +104,7 @@ Aliases: I<mpow>, I<matrix_pow>
 
 =cut
 
-=head3 &
+=head2 &
 
     a & b
 
@@ -113,7 +116,7 @@ Aliases: I<and>
 
 =cut
 
-=head3 |
+=head2 |
 
     a | b
 
@@ -125,7 +128,7 @@ Aliases: I<or>
 
 =cut
 
-=head3 ^
+=head2 ^
 
     a ^ b
 
@@ -137,7 +140,7 @@ Aliases: I<xor>
 
 =cut
 
-=head3 <=>
+=head2 <=>
 
     a <=> b
 
@@ -151,7 +154,7 @@ Aliases: I<cmp>
 
 =cut
 
-=head3 ==
+=head2 ==
 
     a == b
 
@@ -161,7 +164,7 @@ Aliases: I<eq>
 
 =cut
 
-=head3 ≠
+=head2 ≠
 
     a ≠ b
 
@@ -171,7 +174,7 @@ Aliases: I<!=>, I<ne>
 
 =cut
 
-=head3 <
+=head2 <
 
     a < b
 
@@ -181,7 +184,7 @@ Aliases: I<lt>
 
 =cut
 
-=head3 ≤
+=head2 ≤
 
     a ≤ b
 
@@ -191,7 +194,7 @@ Aliases: I<E<lt>=>, I<le>
 
 =cut
 
-=head3 >
+=head2 >
 
     a > b
 
@@ -201,7 +204,7 @@ Aliases: I<gt>
 
 =cut
 
-=head3 ≥
+=head2 ≥
 
     a ≥ b
 
@@ -211,7 +214,7 @@ Aliases: I<E<gt>=>, I<ge>
 
 =cut
 
-=head3 |>>
+=head2 |>>
 
     a |>> b
 
@@ -223,7 +226,7 @@ Aliases: I<pipeline_map_op>
 
 =cut
 
-=head3 |X>
+=head2 |X>
 
     a |X> (block1, block2, ...)
 
@@ -235,7 +238,7 @@ Aliases: I<pipeline_cross_op>
 
 =cut
 
-=head3 |Z>
+=head2 |Z>
 
     a |Z> (block1, block2, ...)
 
@@ -247,7 +250,7 @@ Aliases: I<pipeline_zip_op>
 
 =cut
 
-=head3 ...
+=head2 ...
 
     a...
 
@@ -259,7 +262,7 @@ Aliases: I<to_list>
 
 =cut
 
-=head3 «
+=head2 «
 
     a « b
 
@@ -272,7 +275,7 @@ Aliases: I<E<lt>E<lt>>, I<push>, I<append>
 
 =cut
 
-=head3 »
+=head2 »
 
     a » n
 
@@ -285,7 +288,7 @@ Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
 
 =cut
 
-=head3 ∋
+=head2 ∋
 
     a ∋ b
 
@@ -298,7 +301,7 @@ Aliases: I<has>, I<contain>, I<include>, I<contains>, I<includes>
 
 =cut
 
-=head3 ∌
+=head2 ∌
 
     a ∌ b
 
@@ -309,9 +312,9 @@ Returns true if array C<a> does NOT contain element C<b> (negation of ∋).
 
 =cut
 
-=head2 Construction & Basic Info
+=head1 Construction & Basic Info
 
-=head3 end
+=head2 end
 
     arr.end
 
@@ -323,7 +326,7 @@ Aliases: I<offset>
 
 =cut
 
-=head3 is_empty
+=head2 is_empty
 
     arr.is_empty
 
@@ -334,7 +337,7 @@ Returns true if the array has no elements.
 
 =cut
 
-=head3 iter
+=head2 iter
 
     arr.iter
 
@@ -345,7 +348,7 @@ Returns an iterator object for the array.
 
 =cut
 
-=head3 keys
+=head2 keys
 
     arr.keys
 
@@ -357,7 +360,7 @@ Aliases: I<indices>
 
 =cut
 
-=head3 keys_by
+=head2 keys_by
 
     arr.keys_by { ... }
 
@@ -370,7 +373,7 @@ Aliases: I<indices_by>
 
 =cut
 
-=head3 keys_of
+=head2 keys_of
 
     arr.keys_of(obj)
 
@@ -382,7 +385,7 @@ Aliases: I<indices_of>
 
 =cut
 
-=head3 kv
+=head2 kv
 
     arr.kv
 
@@ -394,7 +397,7 @@ Aliases: I<pairs>, I<zip_indices>
 
 =cut
 
-=head3 len
+=head2 len
 
     arr.len
 
@@ -406,7 +409,7 @@ Aliases: I<size>, I<length>
 
 =cut
 
-=head3 make
+=head2 make
 
     Array.make(size, obj)
 
@@ -416,7 +419,7 @@ Creates an array of given size filled with object.
 
 =cut
 
-=head3 make_by
+=head2 make_by
 
     Array.make_by(size) { |i| ... }
 
@@ -426,7 +429,7 @@ Creates an array by calling block for each index.
 
 =cut
 
-=head3 new
+=head2 new
 
     Array.new
     Array.new(*elements)
@@ -439,7 +442,7 @@ Aliases: I<call>
 
 =cut
 
-=head3 range
+=head2 range
 
     arr.range
 
@@ -449,9 +452,9 @@ Returns the valid index range of the array, from C<0> to C<arr.end>.
 
 =cut
 
-=head2 Element Access, Slicing & Partitioning
+=head1 Element Access, Slicing & Partitioning
 
-=head3 dig
+=head2 dig
 
     arr.dig(index, *more_indices)
 
@@ -461,7 +464,7 @@ Traverses nested arrays/hashes to retrieve a deeply nested value.
 
 =cut
 
-=head3 fetch
+=head2 fetch
 
     arr.fetch(index, default)
 
@@ -473,7 +476,7 @@ Fetches a value at the given index. Returns default if index doesn't exist.
 
 =cut
 
-=head3 ft
+=head2 ft
 
     arr.ft(from)
     arr.ft(from, to)
@@ -485,7 +488,7 @@ Returns the slice from index C<from> through index C<to>, inclusive. Negative in
 
 =cut
 
-=head3 head
+=head2 head
 
     arr.head
     arr.head(n)
@@ -499,7 +502,7 @@ Aliases: I<first>
 
 =cut
 
-=head3 item
+=head2 item
 
     arr.item(index)
 
@@ -509,7 +512,7 @@ Returns the element at the given index. Alias for arr[index].
 
 =cut
 
-=head3 items
+=head2 items
 
     arr.items(*indices)
 
@@ -519,7 +522,7 @@ Returns an array of elements at the specified indices.
 
 =cut
 
-=head3 last
+=head2 last
 
     arr.last
     arr.last(n)
@@ -533,7 +536,7 @@ Aliases: I<tail>
 
 =cut
 
-=head3 part
+=head2 part
 
     arr.part(n)
 
@@ -545,7 +548,7 @@ Aliases: I<partition>
 
 =cut
 
-=head3 rotate
+=head2 rotate
 
     arr.rotate(n)
 
@@ -556,7 +559,7 @@ Rotates array n positions left (negative for right).
 
 =cut
 
-=head3 segment
+=head2 segment
 
     arr.segment(*indices)
 
@@ -566,7 +569,7 @@ Splits array at specified indices.
 
 =cut
 
-=head3 segment_by
+=head2 segment_by
 
     arr.segment_by { ... }
 
@@ -577,7 +580,7 @@ Splits array before elements where block returns true.
 
 =cut
 
-=head3 skip
+=head2 skip
 
     arr.skip(n)
 
@@ -589,7 +592,7 @@ Aliases: I<skip_first>
 
 =cut
 
-=head3 skip_by
+=head2 skip_by
 
     arr.skip_by { ... }
 
@@ -599,7 +602,7 @@ Skips elements from start while block returns true.
 
 =cut
 
-=head3 skip_last
+=head2 skip_last
 
     arr.skip_last(n)
 
@@ -610,7 +613,7 @@ Returns a new array without the last n elements.
 
 =cut
 
-=head3 slice
+=head2 slice
 
     arr.slice(offset)
     arr.slice(offset, length)
@@ -630,7 +633,7 @@ If C<length> is negative, that many elements are left off the end of the array.
 
 =cut
 
-=head3 slice_after
+=head2 slice_after
 
     arr.slice_after { ... }
 
@@ -641,7 +644,7 @@ Returns an array of arrays by slicing after each element for which the given blo
 
 =cut
 
-=head3 slice_before
+=head2 slice_before
 
     arr.slice_before { ... }
 
@@ -652,7 +655,7 @@ Returns an array of arrays by slicing before each element for which the given bl
 
 =cut
 
-=head3 slices
+=head2 slices
 
     array.slices(n)
 
@@ -665,7 +668,7 @@ Aliases: I<map_slice>
 
 =cut
 
-=head3 split
+=head2 split
 
     arr.split(obj)
 
@@ -676,7 +679,7 @@ Splits the array at each occurrence of the given object, returning an array of s
 
 =cut
 
-=head3 split_by
+=head2 split_by
 
     arr.split_by { ... }
 
@@ -686,7 +689,7 @@ Splits the given array by the objects at which the given block returns a true va
 
 =cut
 
-=head3 take_left
+=head2 take_left
 
     arr.take_left(amount)
 
@@ -697,7 +700,7 @@ Returns the first C<amount> elements from the array.
 
 =cut
 
-=head3 take_right
+=head2 take_right
 
     arr.take_right(amount)
 
@@ -708,9 +711,9 @@ Returns the last C<amount> elements from the array.
 
 =cut
 
-=head2 Mutation & Deletion
+=head1 Mutation & Deletion
 
-=head3 binsert
+=head2 binsert
 
     arr.binsert(obj)
 
@@ -722,7 +725,7 @@ Inserts an element into a sorted array maintaining sort order. Modifies the arra
 
 =cut
 
-=head3 change_to
+=head2 change_to
 
     arr.change_to(new_array)
 
@@ -734,7 +737,7 @@ Replaces all elements of the array with elements from C<new_array>, modifying it
 
 =cut
 
-=head3 clear
+=head2 clear
 
     arr.clear
 
@@ -746,7 +749,7 @@ Removes all elements from the array, making it empty. Modifies in-place.
 
 =cut
 
-=head3 delete
+=head2 delete
 
     arr.delete(obj)
 
@@ -760,7 +763,7 @@ Aliases: I<remove>
 
 =cut
 
-=head3 delete_by
+=head2 delete_by
 
     arr.delete_by { ... }
 
@@ -774,7 +777,7 @@ Aliases: I<delete_if>, I<remove_by>, I<remove_if>
 
 =cut
 
-=head3 delete_first
+=head2 delete_first
 
     arr.delete_first(obj)
 
@@ -788,7 +791,7 @@ Aliases: I<remove_first>
 
 =cut
 
-=head3 delete_first_by
+=head2 delete_first_by
 
     arr.delete_first_by { ... }
 
@@ -802,7 +805,7 @@ Aliases: I<delete_first_if>, I<remove_first_by>, I<remove_first_if>
 
 =cut
 
-=head3 delete_last
+=head2 delete_last
 
     arr.delete_last(obj)
 
@@ -816,7 +819,7 @@ Aliases: I<remove_last>
 
 =cut
 
-=head3 delete_last_by
+=head2 delete_last_by
 
     arr.delete_last_by { ... }
 
@@ -830,7 +833,7 @@ Aliases: I<delete_last_if>, I<remove_last_by>, I<remove_last_if>
 
 =cut
 
-=head3 extract_by
+=head2 extract_by
 
     arr.extract_by { ... }
 
@@ -843,7 +846,7 @@ Removes and returns all elements for which the block returns true.
 
 =cut
 
-=head3 extract_first_by
+=head2 extract_first_by
 
     arr.extract_first_by { ... }
 
@@ -856,7 +859,7 @@ Removes and returns the first element for which the block returns true.
 
 =cut
 
-=head3 extract_last_by
+=head2 extract_last_by
 
     arr.extract_last_by { ... }
 
@@ -869,7 +872,7 @@ Removes and returns the last element for which the block returns true.
 
 =cut
 
-=head3 insert
+=head2 insert
 
     arr.insert(index, *objects)
 
@@ -881,7 +884,7 @@ Inserts objects at the specified index. Modifies in-place.
 
 =cut
 
-=head3 pop_at
+=head2 pop_at
 
     arr.pop_at(index)
 
@@ -895,7 +898,7 @@ Aliases: I<delete_at>, I<delete_index>
 
 =cut
 
-=head3 pop_rand
+=head2 pop_rand
 
     arr.pop_rand
 
@@ -906,7 +909,7 @@ Removes and returns a random element.
 
 =cut
 
-=head3 pop_while
+=head2 pop_while
 
     arr.pop_while { ... }
 
@@ -918,7 +921,7 @@ Removes elements from the end while condition is true.
 
 =cut
 
-=head3 prepend
+=head2 prepend
 
     arr.prepend(*objects)
 
@@ -932,7 +935,7 @@ Aliases: I<unshift>
 
 =cut
 
-=head3 resize
+=head2 resize
 
     arr.resize(new_size)
 
@@ -946,7 +949,7 @@ Aliases: I<resize_to>
 
 =cut
 
-=head3 shift
+=head2 shift
 
     arr.shift
     arr.shift(n)
@@ -962,7 +965,7 @@ Aliases: I<drop_left>, I<drop_first>
 
 =cut
 
-=head3 shift_while
+=head2 shift_while
 
     arr.shift_while { ... }
 
@@ -974,7 +977,7 @@ Removes elements from beginning while condition is true.
 
 =cut
 
-=head3 splice
+=head2 splice
 
     arr.splice(offset, length, *objects)
 
@@ -990,7 +993,7 @@ Removes and returns C<length> elements from the array starting at C<offset>, opt
 
 =cut
 
-=head3 swap
+=head2 swap
 
     arr.swap(i, j)
 
@@ -1002,9 +1005,9 @@ Swaps the elements at indices C<i> and C<j> in the array. Modifies the array in 
 
 =cut
 
-=head2 Searching, Membership & Binary Search
+=head1 Searching, Membership & Binary Search
 
-=head3 all
+=head2 all
 
     arr.all { ... }
 
@@ -1015,7 +1018,7 @@ Returns true if all elements satisfy the condition given in the block.
 
 =cut
 
-=head3 any
+=head2 any
 
     arr.any { ... }
 
@@ -1026,7 +1029,7 @@ Returns true if any element satisfies the condition given in the block.
 
 =cut
 
-=head3 bindex
+=head2 bindex
 
     arr.bindex(obj)
 
@@ -1043,7 +1046,7 @@ Aliases: I<bsearch_index>
 
 =cut
 
-=head3 bindex_by
+=head2 bindex_by
 
     arr.bindex_by { |elem| ... }
 
@@ -1060,7 +1063,7 @@ Aliases: I<bsearch_index_by>
 
 =cut
 
-=head3 bindex_ge
+=head2 bindex_ge
 
     arr.bindex_ge(obj)
 
@@ -1071,7 +1074,7 @@ Binary search returning the index of the smallest element that is greater than o
 
 =cut
 
-=head3 bindex_ge_by
+=head2 bindex_ge_by
 
     arr.bindex_ge_by { |elem| ... }
 
@@ -1079,7 +1082,7 @@ Binary search with a comparison block, returning the index of the smallest eleme
 
 =cut
 
-=head3 bindex_le
+=head2 bindex_le
 
     arr.bindex_le(obj)
 
@@ -1090,7 +1093,7 @@ Binary search returning the index of the largest element that is less than or eq
 
 =cut
 
-=head3 bindex_le_by
+=head2 bindex_le_by
 
     arr.bindex_le_by { |elem| ... }
 
@@ -1098,7 +1101,7 @@ Binary search with a comparison block, returning the index of the largest elemen
 
 =cut
 
-=head3 bindex_max
+=head2 bindex_max
 
     arr.bindex_max(obj)
 
@@ -1108,7 +1111,7 @@ Binary search returning the highest index at which C<obj> appears in a sorted ar
 
 =cut
 
-=head3 bindex_max_by
+=head2 bindex_max_by
 
     arr.bindex_max_by { ... }
 
@@ -1116,7 +1119,7 @@ Binary search with a comparison block, returning the highest index matching the 
 
 =cut
 
-=head3 bindex_min
+=head2 bindex_min
 
     arr.bindex_min(obj)
 
@@ -1126,7 +1129,7 @@ Binary search returning the lowest index at which C<obj> appears in a sorted arr
 
 =cut
 
-=head3 bindex_min_by
+=head2 bindex_min_by
 
     arr.bindex_min_by { ... }
 
@@ -1134,7 +1137,7 @@ Binary search with a comparison block, returning the lowest index matching the s
 
 =cut
 
-=head3 bsearch
+=head2 bsearch
 
     arr.bsearch { |elem| ... }
 
@@ -1146,7 +1149,7 @@ Aliases: I<bsearch_by>
 
 =cut
 
-=head3 bsearch_ge
+=head2 bsearch_ge
 
     arr.bsearch_ge(obj)
 
@@ -1158,7 +1161,7 @@ Aliases: I<bsearch_ge_by>
 
 =cut
 
-=head3 bsearch_le
+=head2 bsearch_le
 
     arr.bsearch_le(obj)
 
@@ -1170,7 +1173,7 @@ Aliases: I<bsearch_le_by>
 
 =cut
 
-=head3 bsearch_max
+=head2 bsearch_max
 
     arr.bsearch_max(obj)
 
@@ -1180,7 +1183,7 @@ Binary search returning the last occurrence of C<obj> in a sorted array with dup
 
 =cut
 
-=head3 bsearch_min
+=head2 bsearch_min
 
     arr.bsearch_min(obj)
 
@@ -1190,7 +1193,7 @@ Binary search returning the first occurrence of C<obj> in a sorted array with du
 
 =cut
 
-=head3 contains_all
+=head2 contains_all
 
     arr.contains_all(other_arr)
 
@@ -1201,7 +1204,7 @@ Returns true if the array contains all elements from C<other_arr>.
 
 =cut
 
-=head3 contains_any
+=head2 contains_any
 
     arr.contains_any(other_arr)
 
@@ -1212,7 +1215,7 @@ Returns true if the array contains any element from C<other_arr>.
 
 =cut
 
-=head3 contains_type
+=head2 contains_type
 
     arr.contains_type(Type)
 
@@ -1223,7 +1226,7 @@ Returns true if the array contains any element of the given type.
 
 =cut
 
-=head3 count
+=head2 count
 
     arr.count(obj)
 
@@ -1233,7 +1236,7 @@ Returns the number of times C<obj> appears in the array.
 
 =cut
 
-=head3 count_by
+=head2 count_by
 
     arr.count_by { ... }
 
@@ -1243,7 +1246,7 @@ Returns the number of elements for which the block returns true.
 
 =cut
 
-=head3 defined
+=head2 defined
 
     arr.defined(index)
 
@@ -1254,7 +1257,7 @@ Returns true if the element at the given index is defined (not nil).
 
 =cut
 
-=head3 exists
+=head2 exists
 
     arr.exists(index)
 
@@ -1267,7 +1270,7 @@ Aliases: I<has_index>
 
 =cut
 
-=head3 find
+=head2 find
 
     arr.find { ... }
 
@@ -1279,7 +1282,7 @@ Aliases: I<first_by>
 
 =cut
 
-=head3 index
+=head2 index
 
     arr.index(obj)
     arr.index { ... }
@@ -1293,7 +1296,7 @@ Aliases: I<index_by>, I<first_index>, I<first_index_by>
 
 =cut
 
-=head3 last_by
+=head2 last_by
 
     arr.last_by { ... }
 
@@ -1303,7 +1306,7 @@ Returns the last element for which block returns true.
 
 =cut
 
-=head3 match
+=head2 match
 
     arr.match(/regex/)
 
@@ -1313,7 +1316,7 @@ Recursively matches array elements against regex.
 
 =cut
 
-=head3 none
+=head2 none
 
     arr.none { ... }
 
@@ -1324,7 +1327,7 @@ Returns true if no elements satisfy the condition.
 
 =cut
 
-=head3 rindex
+=head2 rindex
 
     arr.rindex(obj)
     arr.rindex { ... }
@@ -1337,9 +1340,9 @@ Aliases: I<rindex_by>, I<last_index>, I<last_index_by>
 
 =cut
 
-=head2 Iteration, Mapping & Reduction
+=head1 Iteration, Mapping & Reduction
 
-=head3 acc
+=head2 acc
 
     arr.acc
     arr.acc { ... }
@@ -1353,7 +1356,7 @@ Aliases: I<accumulate>
 
 =cut
 
-=head3 acc_by
+=head2 acc_by
 
     arr.acc_by { ... }
 
@@ -1365,7 +1368,7 @@ Aliases: I<accumulate_by>
 
 =cut
 
-=head3 collapse
+=head2 collapse
 
     arr.collapse(initial)
 
@@ -1375,7 +1378,7 @@ Returns the sum of the array, starting from C<initial>. This is equivalent to C<
 
 =cut
 
-=head3 cons
+=head2 cons
 
     arr.cons(n)
 
@@ -1387,7 +1390,7 @@ Aliases: I<map_cons>
 
 =cut
 
-=head3 each_2d
+=head2 each_2d
 
     arr.each_2d { |a, b, c, ...| ... }
 
@@ -1399,7 +1402,7 @@ Iterates over a 2D array, unpacking each sub-array.
 
 =cut
 
-=head3 each_cons
+=head2 each_cons
 
     arr.each_cons(n) { |*elements| ... }
 
@@ -1410,7 +1413,7 @@ Iterates over consecutive n-element windows.
 
 =cut
 
-=head3 each_k
+=head2 each_k
 
     arr.each_k { |index| ... }
 
@@ -1422,7 +1425,7 @@ Aliases: I<each_key>, I<each_index>
 
 =cut
 
-=head3 each_kv
+=head2 each_kv
 
     arr.each_kv { |index, value| ... }
 
@@ -1432,7 +1435,7 @@ Iterates over index-value pairs.
 
 =cut
 
-=head3 each_slice
+=head2 each_slice
 
     arr.each_slice(n) { |*slice| ... }
 
@@ -1443,7 +1446,7 @@ Iterates over non-overlapping slices of size n.
 
 =cut
 
-=head3 expand
+=head2 expand
 
     arr.expand { ... }
 
@@ -1455,7 +1458,7 @@ Aliases: I<expand_by>
 
 =cut
 
-=head3 flat
+=head2 flat
 
     arr.flat
 
@@ -1467,7 +1470,7 @@ Aliases: I<flatten>
 
 =cut
 
-=head3 flat_map
+=head2 flat_map
 
     arr.flat_map { ... }
 
@@ -1477,7 +1480,7 @@ Maps each element through the block and flattens the result by one level.
 
 =cut
 
-=head3 for
+=head2 for
 
     arr.for { |elem| ... }
 
@@ -1489,7 +1492,7 @@ Aliases: I<each>, I<foreach>
 
 =cut
 
-=head3 inject
+=head2 inject
 
     arr.inject { |a, b| ... }
     arr.inject({ |a, b| ... }, initial)
@@ -1503,7 +1506,7 @@ Aliases: I<reduce>
 
 =cut
 
-=head3 map
+=head2 map
 
     arr.map { ... }
 
@@ -1515,7 +1518,7 @@ Aliases: I<collect>
 
 =cut
 
-=head3 map_2d
+=head2 map_2d
 
     arr.map_2d { |a, b, c, ...| ... }
 
@@ -1525,7 +1528,7 @@ Maps over a 2D array, unpacking each sub-array.
 
 =cut
 
-=head3 map_kv
+=head2 map_kv
 
     arr.map_kv { |index, value| ... }
 
@@ -1537,7 +1540,7 @@ Aliases: I<collect_kv>
 
 =cut
 
-=head3 map_reduce
+=head2 map_reduce
 
     arr.map_reduce { |a, b| ... }
 
@@ -1549,7 +1552,7 @@ Aliases: I<reduce_map>
 
 =cut
 
-=head3 pair_map
+=head2 pair_map
 
     arr.pair_map { |a, b| ... }
 
@@ -1561,7 +1564,7 @@ Aliases: I<pairmap>
 
 =cut
 
-=head3 recmap
+=head2 recmap
 
     arr.recmap { ... }
 
@@ -1571,7 +1574,7 @@ Recursively maps nested structures, replacing elements based on block.
 
 =cut
 
-=head3 reduce_op
+=head2 reduce_op
 
     arr.reduce_op(operator)
     arr.reduce_op(operator, initial)
@@ -1585,7 +1588,7 @@ Aliases: I<reduce_operator>
 
 =cut
 
-=head3 unzip_by
+=head2 unzip_by
 
     arr.unzip_by { ... }
 
@@ -1595,9 +1598,9 @@ Unzips an array by applying the given block to each element, which should return
 
 =cut
 
-=head2 Filtering, Grouping & Uniqueness
+=head1 Filtering, Grouping & Uniqueness
 
-=head3 compact
+=head2 compact
 
     arr.compact
 
@@ -1607,7 +1610,7 @@ Removes all undefined (nil) values from the array, returning a new array.
 
 =cut
 
-=head3 freq
+=head2 freq
 
     arr.freq
 
@@ -1617,7 +1620,7 @@ Returns a frequency Hash counting occurrences of each element.
 
 =cut
 
-=head3 freq_by
+=head2 freq_by
 
     arr.freq_by { ... }
 
@@ -1627,7 +1630,7 @@ Returns a frequency Hash by mapping elements through the block first.
 
 =cut
 
-=head3 grep
+=head2 grep
 
     arr.grep { ... }
 
@@ -1639,7 +1642,7 @@ Aliases: I<select>
 
 =cut
 
-=head3 grep_2d
+=head2 grep_2d
 
     arr.grep_2d { |a, b, c, ...| ... }
 
@@ -1649,7 +1652,7 @@ Filters a 2D array using a block that receives unpacked sub-arrays.
 
 =cut
 
-=head3 grep_kv
+=head2 grep_kv
 
     arr.grep_kv { |index, value| ... }
 
@@ -1661,7 +1664,7 @@ Aliases: I<select_kv>
 
 =cut
 
-=head3 group
+=head2 group
 
     arr.group { ... }
 
@@ -1673,7 +1676,7 @@ Aliases: I<group_by>
 
 =cut
 
-=head3 iuniq
+=head2 iuniq
 
     arr.iuniq
 
@@ -1685,7 +1688,7 @@ Removes duplicates from the array in-place. Returns the array.
 
 =cut
 
-=head3 last_uniq
+=head2 last_uniq
 
     arr.last_uniq
 
@@ -1697,7 +1700,7 @@ Aliases: I<last_unique>
 
 =cut
 
-=head3 last_uniq_by
+=head2 last_uniq_by
 
     arr.last_uniq_by { ... }
 
@@ -1709,7 +1712,7 @@ Aliases: I<last_unique_by>
 
 =cut
 
-=head3 run_length
+=head2 run_length
 
     arr.run_length
     arr.run_length { ... }
@@ -1722,7 +1725,7 @@ Aliases: I<run_length_by>
 
 =cut
 
-=head3 stack
+=head2 stack
 
     arr.stack
     arr.stack { ... }
@@ -1743,7 +1746,7 @@ Aliases: I<stack_by>
 
 =cut
 
-=head3 uniq
+=head2 uniq
 
     arr.uniq
     arr.uniq { ... }
@@ -1757,7 +1760,7 @@ Aliases: I<unique>, I<distinct>
 
 =cut
 
-=head3 uniq_by
+=head2 uniq_by
 
     arr.uniq_by { ... }
 
@@ -1769,7 +1772,7 @@ Aliases: I<unique_by>
 
 =cut
 
-=head3 uniq_prefs
+=head2 uniq_prefs
 
     arr.uniq_prefs { ... }
 
@@ -1782,9 +1785,9 @@ Aliases: I<unique_prefixes>
 
 =cut
 
-=head2 Sorting & Ordering
+=head1 Sorting & Ordering
 
-=head3 flip
+=head2 flip
 
     arr.flip
 
@@ -1796,7 +1799,7 @@ Aliases: I<reverse>
 
 =cut
 
-=head3 imax
+=head2 imax
 
     arr.imax
 
@@ -1806,7 +1809,7 @@ Returns the index of the maximum element.
 
 =cut
 
-=head3 imin
+=head2 imin
 
     arr.imin
 
@@ -1816,7 +1819,7 @@ Returns the index of the minimum element.
 
 =cut
 
-=head3 iminmax
+=head2 iminmax
 
     arr.iminmax
 
@@ -1826,7 +1829,7 @@ Returns a pair [min_index, max_index].
 
 =cut
 
-=head3 isort
+=head2 isort
 
     arr.isort
 
@@ -1838,7 +1841,7 @@ Sorts the array in-place. Returns the array.
 
 =cut
 
-=head3 isort_by
+=head2 isort_by
 
     arr.isort_by { ... }
 
@@ -1850,7 +1853,7 @@ Sorts the array in-place using a mapping block.
 
 =cut
 
-=head3 max
+=head2 max
 
     arr.max
 
@@ -1860,7 +1863,7 @@ Returns the maximum element.
 
 =cut
 
-=head3 max_by
+=head2 max_by
 
     arr.max_by { ... }
 
@@ -1870,7 +1873,7 @@ Returns element that gives maximum when passed through block.
 
 =cut
 
-=head3 min
+=head2 min
 
     arr.min
 
@@ -1880,7 +1883,7 @@ Returns the minimum element.
 
 =cut
 
-=head3 min_by
+=head2 min_by
 
     arr.min_by { ... }
 
@@ -1890,7 +1893,7 @@ Returns element that gives minimum when passed through block.
 
 =cut
 
-=head3 minmax
+=head2 minmax
 
     arr.minmax
 
@@ -1900,7 +1903,7 @@ Returns pair [minimum, maximum].
 
 =cut
 
-=head3 sort
+=head2 sort
 
     arr.sort
     arr.sort {|a,b| ... }
@@ -1917,7 +1920,7 @@ An optional comparison block can be given, which is called with two elements C<a
 
 =cut
 
-=head3 sort_by
+=head2 sort_by
 
     arr.sort_by { ... }
 
@@ -1929,9 +1932,9 @@ Sorts the array by mapping each value through the given block and ordering by th
 
 =cut
 
-=head2 Aggregation, Statistics & Number Theory
+=head1 Aggregation, Statistics & Number Theory
 
-=head3 all_composite
+=head2 all_composite
 
     arr.all_composite
 
@@ -1942,7 +1945,7 @@ Returns true if all elements in the array are composite numbers.
 
 =cut
 
-=head3 all_prime
+=head2 all_prime
 
     arr.all_prime
 
@@ -1953,7 +1956,7 @@ Returns true if all elements in the array are prime numbers.
 
 =cut
 
-=head3 avg
+=head2 avg
 
     arr.avg
 
@@ -1963,7 +1966,7 @@ Returns the arithmetic mean (average) of a list of numbers.
 
 =cut
 
-=head3 avg_by
+=head2 avg_by
 
     arr.avg_by { ... }
 
@@ -1973,7 +1976,7 @@ Returns the average of a list of numbers, by mapping each value to the given blo
 
 =cut
 
-=head3 cfrac2num
+=head2 cfrac2num
 
     arr.cfrac2num
 
@@ -1984,7 +1987,7 @@ Converts a continued fraction expansion array to a rational number.
 
 =cut
 
-=head3 digits2num
+=head2 digits2num
 
     arr.digits2num
     arr.digits2num(base)
@@ -1999,7 +2002,7 @@ Aliases: I<from_digits>
 
 =cut
 
-=head3 gcd
+=head2 gcd
 
     arr.gcd
 
@@ -2009,7 +2012,7 @@ Returns the greatest common divisor of all array elements.
 
 =cut
 
-=head3 gcd_by
+=head2 gcd_by
 
     arr.gcd_by { ... }
 
@@ -2019,7 +2022,7 @@ Returns the GCD of all elements after mapping through the block.
 
 =cut
 
-=head3 gcud
+=head2 gcud
 
     arr.gcud
 
@@ -2029,7 +2032,7 @@ Returns the greatest common unitary divisor of all array elements.
 
 =cut
 
-=head3 gcud_by
+=head2 gcud_by
 
     arr.gcud_by { ... }
 
@@ -2037,7 +2040,7 @@ Returns the GCUD after mapping elements through the block.
 
 =cut
 
-=head3 lcm
+=head2 lcm
 
     arr.lcm
 
@@ -2047,7 +2050,7 @@ Returns the least common multiple of all elements.
 
 =cut
 
-=head3 lcm_by
+=head2 lcm_by
 
     arr.lcm_by { ... }
 
@@ -2057,7 +2060,7 @@ Returns LCM after mapping elements through block.
 
 =cut
 
-=head3 prod
+=head2 prod
 
     arr.prod
 
@@ -2067,7 +2070,7 @@ Returns the product of all elements.
 
 =cut
 
-=head3 prod_2d
+=head2 prod_2d
 
     arr.prod_2d { |a, b, c, ...| ... }
 
@@ -2077,7 +2080,7 @@ Product over 2D array after mapping each row.
 
 =cut
 
-=head3 prod_by
+=head2 prod_by
 
     arr.prod_by { ... }
 
@@ -2087,7 +2090,7 @@ Product after mapping each element.
 
 =cut
 
-=head3 prod_kv
+=head2 prod_kv
 
     arr.prod_kv { |index, value| ... }
 
@@ -2097,7 +2100,7 @@ Product using both index and value in block.
 
 =cut
 
-=head3 prodmod
+=head2 prodmod
 
     arr.prodmod(modulus)
 
@@ -2107,7 +2110,7 @@ Returns product modulo a number.
 
 =cut
 
-=head3 sum
+=head2 sum
 
     arr.sum
     arr.sum(initial)
@@ -2120,7 +2123,7 @@ Returns the sum of all elements in the array. An optional initial value can be p
 
 =cut
 
-=head3 sum_2d
+=head2 sum_2d
 
     arr.sum_2d {|a,b,c,...| ... }
 
@@ -2130,7 +2133,7 @@ Sum of a 2D array, by mapping each row to the given block.
 
 =cut
 
-=head3 sum_by
+=head2 sum_by
 
     arr.sum_by { ... }
 
@@ -2140,7 +2143,7 @@ Sum of an array, by mapping each element to the given block.
 
 =cut
 
-=head3 sum_kv
+=head2 sum_kv
 
     arr.sum_kv { ... }
 
@@ -2150,7 +2153,7 @@ Returns the sum of the array by mapping each key-value pair to the given block.
 
 =cut
 
-=head3 summod
+=head2 summod
 
     arr.summod(mod)
 
@@ -2160,9 +2163,9 @@ Returns the sum of all elements in the array, modulo the given value.
 
 =cut
 
-=head2 Combinatorics & Randomization
+=head1 Combinatorics & Randomization
 
-=head3 bshuffle
+=head2 bshuffle
 
     arr.bshuffle
 
@@ -2174,7 +2177,7 @@ Aliases: I<best_shuffle>
 
 =cut
 
-=head3 cartesian
+=head2 cartesian
 
     arr.cartesian
     arr.cartesian { |*c| ... }
@@ -2189,7 +2192,7 @@ When a block is given, it's called with each combination:
 
 =cut
 
-=head3 circular_permutations
+=head2 circular_permutations
 
     arr.circular_permutations
     arr.circular_permutations { |*perm| ... }
@@ -2200,7 +2203,7 @@ Generates all circular (rotational) permutations of the array.
 
 =cut
 
-=head3 combinations
+=head2 combinations
 
     arr.combinations
     arr.combinations(k)
@@ -2212,7 +2215,7 @@ Generates all k-combinations (subsets of size k) of the array.
 
 =cut
 
-=head3 combinations_with_repetition
+=head2 combinations_with_repetition
 
     arr.combinations_with_repetition(k)
 
@@ -2222,7 +2225,7 @@ Generates all k-combinations with repetition allowed.
 
 =cut
 
-=head3 derangements
+=head2 derangements
 
     arr.derangements
     arr.derangements { |*d| ... }
@@ -2235,7 +2238,7 @@ Aliases: I<complete_permutations>
 
 =cut
 
-=head3 next_permutation
+=head2 next_permutation
 
     arr.next_permutation
 
@@ -2247,7 +2250,7 @@ Modifies array in-place to next lexicographic permutation. Returns true if more 
 
 =cut
 
-=head3 nth_perm
+=head2 nth_perm
 
     arr.nth_perm(n)
 
@@ -2259,7 +2262,7 @@ Aliases: I<nth_permutation>
 
 =cut
 
-=head3 ordered_partitions
+=head2 ordered_partitions
 
     arr.ordered_partitions
     arr.ordered_partitions(k)
@@ -2271,7 +2274,7 @@ Generates ordered partitions where concatenation equals original array.
 
 =cut
 
-=head3 partitions
+=head2 partitions
 
     arr.partitions
     arr.partitions(k)
@@ -2283,7 +2286,7 @@ Generates all ways to partition array into k non-empty subsets.
 
 =cut
 
-=head3 perm2num
+=head2 perm2num
 
     arr.perm2num
 
@@ -2293,7 +2296,7 @@ Converts a permutation array to its lexicographic index.
 
 =cut
 
-=head3 permutations
+=head2 permutations
 
     arr.permutations
     arr.permutations(k)
@@ -2306,7 +2309,7 @@ Generates all permutations (or k-permutations).
 
 =cut
 
-=head3 pick
+=head2 pick
 
     arr.pick
     arr.pick(n)
@@ -2317,7 +2320,7 @@ Returns one random element, or C<n> distinct random elements.
 
 =cut
 
-=head3 rand
+=head2 rand
 
     arr.rand
     arr.rand(n)
@@ -2331,7 +2334,7 @@ Aliases: I<sample>
 
 =cut
 
-=head3 rand_perm
+=head2 rand_perm
 
     arr.rand_perm
 
@@ -2343,7 +2346,7 @@ Aliases: I<random_permutation>
 
 =cut
 
-=head3 shuffle
+=head2 shuffle
 
     arr.shuffle
 
@@ -2353,7 +2356,7 @@ Returns randomly shuffled copy of array.
 
 =cut
 
-=head3 subsets
+=head2 subsets
 
     arr.subsets
     arr.subsets(k)
@@ -2365,7 +2368,7 @@ Returns all subsets of the array. If C<k> is provided, returns only subsets of s
 
 =cut
 
-=head3 tuples
+=head2 tuples
 
     arr.tuples(k)
 
@@ -2377,7 +2380,7 @@ Aliases: I<variations>
 
 =cut
 
-=head3 tuples_with_repetition
+=head2 tuples_with_repetition
 
     arr.tuples_with_repetition(k)
 
@@ -2389,7 +2392,7 @@ Aliases: I<variations_with_repetition>
 
 =cut
 
-=head3 uniq_permutations
+=head2 uniq_permutations
 
     arr.uniq_permutations
     arr.uniq_permutations { ... }
@@ -2416,7 +2419,7 @@ Aliases: I<unique_permutations>
 
 =cut
 
-=head3 weighted_shuffle_by
+=head2 weighted_shuffle_by
 
     arr.weighted_shuffle_by { ... }
 
@@ -2426,9 +2429,9 @@ Returns a randomly shuffled copy of the array, where the probability of each ele
 
 =cut
 
-=head2 Sequence Analysis, Similarity & Compression
+=head1 Sequence Analysis, Similarity & Compression
 
-=head3 abbrev
+=head2 abbrev
 
     arr.abbrev
     arr.abbrev(/pattern/)
@@ -2455,7 +2458,7 @@ Aliases: I<abbreviations>
 
 =cut
 
-=head3 binsplit
+=head2 binsplit
 
     arr.binsplit { |a,b| ... }
 
@@ -2465,7 +2468,7 @@ Applies binary splitting algorithm to the array, recursively combining elements 
 
 =cut
 
-=head3 diffs
+=head2 diffs
 
     arr.diffs
     arr.diffs(n)
@@ -2479,7 +2482,7 @@ Aliases: I<differences>, I<nth_differences>
 
 =cut
 
-=head3 huffman
+=head2 huffman
 
     arr.huffman
 
@@ -2506,7 +2509,7 @@ Each Huffman code is represented as a String object of C<0> and C<1> characters.
 
 =cut
 
-=head3 jaro
+=head2 jaro
 
     jaro(arr1, arr2)
     jaro(arr1, arr2, winkler)
@@ -2518,7 +2521,7 @@ Calculates Jaro (or Jaro-Winkler) similarity between two arrays.
 
 =cut
 
-=head3 lev
+=head2 lev
 
     arr1.lev(arr2)
 
@@ -2530,7 +2533,7 @@ Aliases: I<leven>, I<levenshtein>
 
 =cut
 
-=head3 solve_rec_seq
+=head2 solve_rec_seq
 
     arr.solve_rec_seq
 
@@ -2544,7 +2547,7 @@ Aliases: I<find_linear_recurrence>
 
 =cut
 
-=head3 solve_seq
+=head2 solve_seq
 
     arr.solve_seq(offset=0)
 
@@ -2562,9 +2565,9 @@ Example with offset:
 
 =cut
 
-=head2 Operator Helpers, Zipping & Element-wise Operations
+=head1 Operator Helpers, Zipping & Element-wise Operations
 
-=head3 combine
+=head2 combine
 
     arr.combine { |a,b| ... }
 
@@ -2574,7 +2577,7 @@ Recursively combines corresponding elements from nested arrays using the given b
 
 =cut
 
-=head3 cross_op
+=head2 cross_op
 
     arr.cross_op(operator, other_arr)
 
@@ -2586,7 +2589,7 @@ Aliases: I<cross_operator>
 
 =cut
 
-=head3 map_op
+=head2 map_op
 
     arr.map_op(operator, *args)
 
@@ -2598,7 +2601,7 @@ Aliases: I<map_operator>
 
 =cut
 
-=head3 pam_op
+=head2 pam_op
 
     arr.pam_op(operator, obj)
 
@@ -2610,7 +2613,7 @@ Aliases: I<pam_operator>
 
 =cut
 
-=head3 rscalar_op
+=head2 rscalar_op
 
     arr.rscalar_op(operator, scalar)
 
@@ -2622,7 +2625,7 @@ Aliases: I<rscalar_operator>
 
 =cut
 
-=head3 sadd
+=head2 sadd
 
     arr.sadd(scalar)
 
@@ -2634,7 +2637,7 @@ Aliases: I<scalar_add>
 
 =cut
 
-=head3 scalar_op
+=head2 scalar_op
 
     arr.scalar_op(operator, scalar)
 
@@ -2646,7 +2649,7 @@ Aliases: I<scalar_operator>
 
 =cut
 
-=head3 sdiv
+=head2 sdiv
 
     arr.sdiv(scalar)
 
@@ -2658,7 +2661,7 @@ Aliases: I<scalar_div>
 
 =cut
 
-=head3 smul
+=head2 smul
 
     arr.smul(scalar)
 
@@ -2671,7 +2674,7 @@ Aliases: I<scalar_mul>
 
 =cut
 
-=head3 ssub
+=head2 ssub
 
     arr.ssub(scalar)
 
@@ -2684,7 +2687,7 @@ Aliases: I<scalar_sub>
 
 =cut
 
-=head3 unroll_op
+=head2 unroll_op
 
     arr.unroll_op(operator, arg)
 
@@ -2697,7 +2700,7 @@ Aliases: I<unroll_operator>
 
 =cut
 
-=head3 wise_op
+=head2 wise_op
 
     arr1.wise_op(operator, arr2)
 
@@ -2710,7 +2713,7 @@ Aliases: I<wise_operator>
 
 =cut
 
-=head3 zip
+=head2 zip
 
     arrays.zip
     arrays.zip { |*items| ... }
@@ -2724,7 +2727,7 @@ Aliases: I<transpose>
 
 =cut
 
-=head3 zip_by
+=head2 zip_by
 
     arrays.zip_by { ... }
 
@@ -2734,7 +2737,7 @@ Zips an array of arrays together and applies the given block to each group of co
 
 =cut
 
-=head3 zip_op
+=head2 zip_op
 
     arr.zip_op(operator, other_arr)
 
@@ -2746,9 +2749,9 @@ Aliases: I<zip_operator>
 
 =cut
 
-=head2 Matrix & Linear Algebra
+=head1 Matrix & Linear Algebra
 
-=head3 det
+=head2 det
 
     matrix.det
 
@@ -2760,7 +2763,7 @@ Aliases: I<determinant>
 
 =cut
 
-=head3 det_bareiss
+=head2 det_bareiss
 
     matrix.det_bareiss
 
@@ -2770,7 +2773,7 @@ Computes the determinant using Bareiss algorithm (integer-preserving method).
 
 =cut
 
-=head3 gauss_jordan_invert
+=head2 gauss_jordan_invert
 
     matrix.gauss_jordan_invert
 
@@ -2780,7 +2783,7 @@ Inverts a matrix using Gauss-Jordan elimination.
 
 =cut
 
-=head3 gauss_jordan_solve
+=head2 gauss_jordan_solve
 
     matrix.gauss_jordan_solve(vector)
 
@@ -2792,7 +2795,7 @@ Solves a system of linear equations Ax = b using Gauss-Jordan elimination.
 
 =cut
 
-=head3 inv
+=head2 inv
 
     matrix.inv
 
@@ -2804,7 +2807,7 @@ Aliases: I<invert>, I<inverse>
 
 =cut
 
-=head3 madd
+=head2 madd
 
     matrix1.madd(matrix2)
 
@@ -2816,7 +2819,7 @@ Aliases: I<matrix_add>
 
 =cut
 
-=head3 mdiv
+=head2 mdiv
 
     matrix1.mdiv(matrix2)
 
@@ -2828,7 +2831,7 @@ Aliases: I<matrix_div>
 
 =cut
 
-=head3 mmul
+=head2 mmul
 
     matrix1.mmul(matrix2)
 
@@ -2840,7 +2843,7 @@ Aliases: I<matrix_mul>
 
 =cut
 
-=head3 msolve
+=head2 msolve
 
     matrix.msolve(vector)
 
@@ -2852,7 +2855,7 @@ Aliases: I<matrix_solve>
 
 =cut
 
-=head3 msub
+=head2 msub
 
     matrix1.msub(matrix2)
 
@@ -2864,7 +2867,7 @@ Aliases: I<matrix_sub>
 
 =cut
 
-=head3 rref
+=head2 rref
 
     matrix.rref
 
@@ -2876,9 +2879,9 @@ Aliases: I<reduced_row_echelon_form>
 
 =cut
 
-=head2 Conversion, Joining & Encoding
+=head1 Conversion, Joining & Encoding
 
-=head3 chrs
+=head2 chrs
 
     arr.chrs
     arr.chrs(encoding)
@@ -2891,7 +2894,7 @@ Aliases: I<decode>, I<join_bytes>
 
 =cut
 
-=head3 join
+=head2 join
 
     arr.join
     arr.join(delimiter)
@@ -2904,7 +2907,7 @@ Joins array elements into a string with an optional delimiter. When a block is g
 
 =cut
 
-=head3 join_insert
+=head2 join_insert
 
     arr.join_insert(obj)
 
@@ -2914,7 +2917,7 @@ Inserts object between every element. Returns new array.
 
 =cut
 
-=head3 pack
+=head2 pack
 
     arr.pack(template)
 
@@ -2924,7 +2927,7 @@ Packs array elements into binary string using template.
 
 =cut
 
-=head3 to_a
+=head2 to_a
 
     arr.to_a
 
@@ -2936,7 +2939,7 @@ Aliases: I<to_array>
 
 =cut
 
-=head3 to_bag
+=head2 to_bag
 
     arr.to_bag
 
@@ -2946,7 +2949,7 @@ Converts the array to a Bag object (multiset), where each unique element is mapp
 
 =cut
 
-=head3 to_h
+=head2 to_h
 
     arr.to_h
 
@@ -2959,7 +2962,7 @@ Aliases: I<to_hash>
 
 =cut
 
-=head3 to_m
+=head2 to_m
 
     arr.to_m
 
@@ -2971,7 +2974,7 @@ Aliases: I<to_matrix>
 
 =cut
 
-=head3 to_s
+=head2 to_s
 
     arr.to_s
 
@@ -2983,7 +2986,7 @@ Aliases: I<dump>, I<to_str>
 
 =cut
 
-=head3 to_set
+=head2 to_set
 
     arr.to_set
 
@@ -2993,7 +2996,7 @@ Converts the array to a Set object, removing duplicates.
 
 =cut
 
-=head3 to_v
+=head2 to_v
 
     arr.to_v
 
@@ -3005,9 +3008,9 @@ Aliases: I<to_vector>
 
 =cut
 
-=head2 Miscellaneous Utilities
+=head1 Miscellaneous Utilities
 
-=head3 getopt
+=head2 getopt
 
     arr.getopt(...)
 
@@ -3022,5 +3025,32 @@ Parses command-line style arguments with automatic type conversion.
         'length=i' => \length,
         'verbose!' => \verbose,
     )
+
+=head1 EXAMPLES
+
+    # Group words by length
+    var grouped = %w(a aa bbb ccc dd).group_by { _.len }
+    say grouped
+
+    # Build 2-element chunks
+    var chunks = [1,2,3,4,5,6].segment(2)
+    say chunks         #=> [[1,2], [3,4], [5,6]]
+
+    # Keep unique values in order
+    var uniq = [3,1,3,2,1,4].uniq
+    say uniq           #=> [3,1,2,4]
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Array::Matrix>, L<Sidef::Types::Array::Vector>, L<Sidef::Types::Hash::Hash>, L<Sidef::Types::Set::Set>
+
+=head1 AUTHOR
+
+Daniel Șuteu
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Sidef itself.
 
 =cut
