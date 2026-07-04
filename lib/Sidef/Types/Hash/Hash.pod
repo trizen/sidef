@@ -304,13 +304,13 @@ Missing keys produce Pair objects with nil values.
 
     hash.slice(keys...)
 
-Returns a new hash containing only the specified keys and their values from the original hash. Keys that do not exist in the original hash are included in the result with nil values.
+Returns a new hash containing only the specified keys. Keys that exist in the original hash keep their values, and keys that do not exist are included in the result with nil values.
 
     var h = Hash(a => 1, b => 2, c => 3, d => 4)
     var subset = h.slice(:a, :c, :z)
     say subset  #=> Hash(a => 1, c => 3, z => nil)
 
-Note: Missing keys are preserved with nil values. See C<lsel> for the Array/to_list variant of this operation.
+Note: Missing keys are included with nil values. See C<lsel> for the Array/to_list variant of this operation.
 
 =cut
 
