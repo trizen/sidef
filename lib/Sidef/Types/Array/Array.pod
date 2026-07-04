@@ -8,7 +8,7 @@ Sidef::Types::Array::Array
 
 This class implements arrays in Sidef: ordered, mutable, zero-indexed collections of values. Arrays can hold elements of any type and provide operators plus methods for querying, searching, transforming, grouping, randomization, combinatorics, and matrix-oriented work.
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
     var nums = Array(1, 2, 3, 4)
     var nums = [1, 2, 3, 4]
