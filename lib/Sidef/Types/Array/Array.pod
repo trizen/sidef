@@ -3048,6 +3048,10 @@ L<Sidef::Types::Array::Matrix>, L<Sidef::Types::Array::Vector>, L<Sidef::Types::
 
 Daniel Șuteu
 
+=head1 COPYRIGHT
+
+Copyright (C) 2013-2026 Daniel Șuteu
+
 =head1 LICENSE
 
 This library is free software; you can redistribute it and/or modify
