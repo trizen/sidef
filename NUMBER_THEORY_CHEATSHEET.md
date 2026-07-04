@@ -20,24 +20,33 @@ say (3 + 5*6 + 7)  # means: say(3 + (5*6) + 7)  — '*' is tight, '+' is loose
 ## Table of Contents
 
 1. [Configuration and Precision](#1-configuration-and-precision)
-2. [Factorization and Prime Structure](#2-factorization-and-prime-structure)
-3. [Divisor Functions](#3-divisor-functions)
-4. [Euler's Totient and Variants](#4-eulers-totient-and-variants)
-5. [Möbius Function and Multiplicative Structure](#5-möbius-function-and-multiplicative-structure)
-6. [Prime Counting and Distribution](#6-prime-counting-and-distribution)
-7. [Primality Testing](#7-primality-testing)
-8. [Integer Factorization Algorithms](#8-integer-factorization-algorithms)
-9. [Modular Arithmetic](#9-modular-arithmetic)
-10. [Quadratic Residues and Congruences](#10-quadratic-residues-and-congruences)
-11. [Dirichlet Convolution](#11-dirichlet-convolution)
-12. [Arithmetic Derivative](#12-arithmetic-derivative)
-13. [Continued Fractions and Pell's Equation](#13-continued-fractions-and-pells-equation)
-14. [Sublinear Summation](#14-sublinear-summation)
-15. [Integer Classifications and Sequences](#15-integer-classifications-and-sequences)
-16. [Pseudoprimes and Carmichael Numbers](#16-pseudoprimes-and-carmichael-numbers)
-17. [Combinatorics and Partitions](#17-combinatorics-and-partitions)
-18. [Special Arithmetic Functions](#18-special-arithmetic-functions)
-19. [Quick Reference](#19-quick-reference)
+2. [Type Conversion, Formatting & Number Bases](#2-type-conversion-formatting-number-bases)
+3. [Rounding, Roots, Powers & Logarithms](#3-rounding-roots-powers-logarithms)
+4. [Bitwise Operations](#4-bitwise-operations)
+5. [Ranges, Iteration & Searching](#5-ranges-iteration-searching)
+6. [Factorization and Prime Structure](#6-factorization-and-prime-structure)
+7. [Divisor Functions](#7-divisor-functions)
+8. [Euler's Totient and Variants](#8-eulers-totient-and-variants)
+9. [Möbius Function and Multiplicative Structure](#9-möbius-function-and-multiplicative-structure)
+10. [Prime Counting and Distribution](#10-prime-counting-and-distribution)
+11. [Primality Testing](#11-primality-testing)
+12. [Integer Factorization Algorithms](#12-integer-factorization-algorithms)
+13. [Modular Arithmetic](#13-modular-arithmetic)
+14. [Quadratic Residues and Congruences](#14-quadratic-residues-and-congruences)
+15. [Dirichlet Convolution](#15-dirichlet-convolution)
+16. [Arithmetic Derivative](#16-arithmetic-derivative)
+17. [Continued Fractions and Pell's Equation](#17-continued-fractions-and-pells-equation)
+18. [Sublinear Summation](#18-sublinear-summation)
+19. [Integer Classifications and Sequences](#19-integer-classifications-and-sequences)
+20. [Pseudoprimes and Carmichael Numbers](#20-pseudoprimes-and-carmichael-numbers)
+21. [Combinatorics and Partitions](#21-combinatorics-and-partitions)
+22. [Special Arithmetic Functions & Polynomial Sequences](#22-special-arithmetic-functions-polynomial-sequences)
+23. [Trigonometric & Hyperbolic Functions](#23-trigonometric-hyperbolic-functions)
+24. [Special Functions & Mathematical Constants](#24-special-functions-mathematical-constants)
+25. [Complex Numbers](#25-complex-numbers)
+26. [Random Number Generation](#26-random-number-generation)
+27. [Numeric Predicates & Classification](#27-numeric-predicates-classification)
+28. [Quick Reference](#28-quick-reference)
 
 ---
 
@@ -83,7 +92,255 @@ say as_frac(1/3 + 1/6)       # "1/2" as a string
 
 ---
 
-## 2. Factorization and Prime Structure
+## 2. Type Conversion, Formatting & Number Bases
+
+### Creating and Converting Numbers
+
+```ruby
+var a = Num("3.14159")       # from decimal string
+var b = Number("1010", 2)    # from string in base 2: b = 10
+say (1/3 + 1/6)              # exact rational arithmetic: 1/2
+
+say 42.to_s        # "42"
+say 42.to_n         # numify a string/object back into a Number
+say 42.to_f         # floating-point value
+say (1/3).to_poly   # lift a rational into a Polynomial-compatible form
+```
+
+### String Representations in Arbitrary Bases
+
+```ruby
+say 42.as_bin     # "101011"     — base 2
+say 42.as_oct     # "52"         — base 8
+say 42.as_hex     # "2a"         — base 16
+say (1/17).as_dec(10)   # "0.05882352941"   — decimal expansion to k places (alias: as_float)
+
+# General base, 2..62:
+say 1234.base(36)      # alias: in_base
+say Number("2az", 36)  # parse back from base 36
+
+say 1000.commify           # "1,000"        — thousands separators
+say (-12345.678).commify   # "-12,345.678"
+```
+
+### Digits
+
+```ruby
+say 1234.digits        #=> [4, 3, 2, 1]        — least-significant digit first
+say 1234.digits(20)    #=> [14, 1, 3]          — digits in base 20
+say 10.digits2num([4, 3, 2, 1])   #=> 1234     — inverse of .digits    (alias: from_digits)
+
+say 1119.digit(0)      # 9  — k-th digit (0-indexed from the right)
+say 9111.digit(-1)     # 9  — negative indices count from the left
+
+say 1234.digits_sum    #=> 10                  (aliases: sum_digits, sumdigits)
+say digital_root(1234) #=> 1                    — repeated digit sum (A010888)
+
+say 20.of { .flip }       # reversal of digits in base 10  (A004086; alias: reverse)
+say 20.of { .flip(2) }    # reversal of binary digits      (A030101)
+
+say 5040.len       #=> 4     — number of base-10 digits    (aliases: size, length)
+say 5040.len(2)     #=> 13    — number of binary digits
+```
+
+### Egyptian Fractions
+
+```ruby
+# Greedy (Fibonacci-Sylvester) algorithm for unit-fraction decomposition:
+say egypt_greedy(9/10)     #=> [2, 3, 15]
+say egypt_greedy(5/121)    #=> [25, 757, 763309, ...]
+# egypt_greedy(p/q).sum {|d| 1/d } == p/q
+```
+
+---
+## 3. Rounding, Roots, Powers & Logarithms
+
+### Rounding
+
+```ruby
+say floor(2.5)      #  2     # towards -Infinity
+say floor(-2.5)     # -3
+say 2.5.ceil         #  3     # towards +Infinity  (alias: ceiling)
+
+say round(1234.567)       #=> 1235       — nearest integer
+say round(1234.567, 2)    #=> 1200       — positive k: round before decimal point
+say round(3.123, -2)      #=> 3.12       — negative k: round after decimal point (alias: roundf)
+```
+
+### Integer Division Modes
+
+```ruby
+say idiv_ceil(7, 2)     # 4   — ceil(a/b)             (alias: cld)
+say idiv_round(7, 2)    # 4   — floor(a/b + 1/2)       (alias: rdd)
+say idiv_trunc(-7, 2)   # -3  — truncate towards 0      (alias: trd)
+```
+
+### Roots
+
+```ruby
+say sqr(7)      # 49   — x*x                (alias: square)
+say cube(7)     # 343  — x**3
+
+say 100.isqrt    # 10   — integer square root  (alias: sqrtint)
+say 100.icbrt    # 4    — integer cube root    (alias: cbrtint)
+say n.iroot(5)   # integer k-th root           (alias: rootint)
+
+say 100.isqrtrem   # [10, 0]  — (isqrt(n), remainder)
+say n.irootrem(5)  # [iroot(n,5), remainder]
+
+say 7.sqrt    # 2.6457513...   — floating-point square root
+say 7.cbrt    # 1.9129311...   — floating-point cube root
+say root(100, 3)   # 100**(1/3)
+say 15**5.perfect_root   # 15 — smallest r with n = r^k for some k
+
+say sqrtQ(2)   # a Quadratic object representing √2 exactly
+```
+
+### Integer Exponentiation and Logarithms
+
+```ruby
+say ipow(3, 40)     # 3^40 exactly           (alias: powint)
+say ipow2(64)       # 2^64
+say ipow10(20)      # 10^20
+
+say ilog(1000, 3)   # 6   — largest k with 3^k <= 1000    (alias: logint)
+say ilog2(1000)     # 9
+say ilog10(1000)    # 3
+
+say lgrt(100)       # 3.597...   — "logarithm-root": x satisfying x^x =~= 100
+```
+
+### Exponential and Logarithmic Functions
+
+```ruby
+say exp(1)         # e^1 = 2.71828...
+say exp(2, 10)      # 2^10 = 1024   — two-argument form: base^x
+say exp2(10)        # 1024
+say exp10(3)         # 1000
+
+say log(100)        # natural log
+say log(100, 10)    # log base 10
+say ln(Num.e)        # 1
+say log2(1024)       # 10
+say log10(1000)      # 3
+
+# expnorm(n, b): exp(n) normalized into [0, 1) w.r.t. base b:
+say expnorm(log(10!))      # 0.36288
+```
+
+---
+## 4. Bitwise Operations
+
+### Testing and Modifying Bits
+
+```ruby
+say getbit(0b1001, 0)     # 1     — bit k set?   (aliases: bit, testbit)
+say getbit(0b1000, 0)     # 0
+
+say setbit(0b1000, 0).as_bin     # "1001"  — set bit k to 1
+say clearbit(0b1001, 0).as_bin   # "1000"  — set bit k to 0
+say flipbit(0b1000, 0).as_bin    # "1001"  — toggle bit k
+```
+
+### Bit Scanning
+
+```ruby
+say 1234.bits    #=> [1,0,0,1,1,0,1,0,0,1,0]   — MSB to LSB; equivalent to n.digits(2).flip
+
+say 0b110010101111000000.lsb   # 6    — index of least-significant set bit
+say 0b110010101111000000.msb   # 17   — index of most-significant bit
+
+say n.bit_scan0(k)   # first 0-bit at or after position k
+say n.bit_scan1(k)   # first 1-bit at or after position k
+```
+
+### Population Count and Hamming Distance
+
+```ruby
+say 0b10110.popcount   # 3   — number of 1-bits (Hamming weight; alias: hammingweight)
+say hamdist(0b1010, 0b1100)   # 2 — number of differing bit positions
+```
+
+### Digit / Bit Rotation
+
+```ruby
+# rotate(n, k, b=10): rotate the base-b digits of n left by k (or right if k<0):
+say rotate(12345, 2)    #=> 34512
+say rotate(12345, -1)   #=> 51234
+say rotate(0b1011, 1, 2)   # rotate binary digits
+```
+
+---
+## 5. Ranges, Iteration & Searching
+
+### Generating and Filtering Sequences
+
+```ruby
+say 10.of {|k| k*k }     # first 10 squares, block called with k = 0..9
+say 10.of { .fib }       # first 10 Fibonacci numbers
+
+5.times {|k| say "k = #{k}" }    # call a block n times with k = 0..n-1
+
+say 10.by { .is_prime }    # first 10 values >= 0 satisfying the block: first 10 primes
+say 10.by { .is_square }   # first 10 perfect squares
+```
+
+### The `th` Idiom, Revisited
+
+```ruby
+say 100.th { .is_prime }   # 100th value satisfying the block (0-indexed count)
+say   1.st { .is_prime }   # aliases: st, nd, rd, th — all identical, chosen for readability
+say   2.nd { .is_prime }
+say   3.rd { .is_prime }
+```
+
+### Ranges
+
+```ruby
+say range(10)         # RangeNum(0, 9, 1)
+say range(1, 10)      # RangeNum(1, 10, 1)
+say range(1, 10, 2)   # RangeNum(1, 10, 2)   — with step
+
+say 10.downto(1)       # reverse range 10, 9, ..., 1
+say 10.downto(1, 2)    # 10, 8, 6, ..., with step 2
+```
+
+### Binary Search
+
+`bsearch` and its variants perform binary search over arbitrarily large integer
+ranges using a comparison block, without needing the range materialized:
+
+```ruby
+# Exact root: find k with f(k) == 0
+say bsearch(20, {|k| k*k <=> 49 })          # 7  (7*7 = 49)
+say bsearch(3, 1000, {|k| k**k <=> 3125 })  # 5  (5**5 = 3125)
+
+# First k with f(k) >= 0 :
+say bsearch_ge(1e6, { .exp <=> 1e9 })       # 21
+
+# Last k with f(k) <= 0:
+say bsearch_le(1e6, { .exp <=> 1e9 })       # 20
+
+# Smallest / largest integer in [a,b] satisfying a monotone predicate:
+say bsearch_min(1, 1e6, {|k| pi(k) <=> 100 })   # 541 — smallest n with π(n) >= 100
+say bsearch_max(1, 1e6, {|k| pi(k) <=> 100 })   # 546 — largest n with π(n) <= 100
+
+# Inverting a continuous function (use approx comparison for floats):
+say bsearch_solve(100, {|x| x**2 <=> 43 })   # solves x^2 = 43
+```
+
+### Polynomial-style Divmod Chains
+
+```ruby
+# polymod(...) successively divmods by a list of moduli — handy for mixed-radix
+# conversions such as seconds -> (sec, min, hours, days):
+say [120.polymod(10)]       # (0, 12)
+say [120.polymod(10, 10)]   # [0, 2, 1]
+var (sec, min, hours, days) = seconds.polymod(60, 60, 24)
+```
+
+---
+## 6. Factorization and Prime Structure
 
 ### Complete Factorization
 
@@ -213,7 +470,7 @@ say sopfr_sum(10**6)  # Σ_{k=1}^{10^6} sopfr(k)(A025281)
 
 ---
 
-## 3. Divisor Functions
+## 7. Divisor Functions
 
 ### σ_k and τ
 
@@ -365,7 +622,7 @@ say 12.is_practical           # every m ≤ σ(12) is a sum of distinct divisors
 
 ---
 
-## 4. Euler's Totient and Variants
+## 8. Euler's Totient and Variants
 
 ### φ(n) and Its Partial Sum
 
@@ -468,7 +725,7 @@ say 120.uphi_inverse     # all x with uphi(x) = 120
 
 ---
 
-## 5. Möbius Function and Multiplicative Structure
+## 9. Möbius Function and Multiplicative Structure
 
 ### μ(n) and Mertens M(n)
 
@@ -562,7 +819,7 @@ say n.divisors_sum {|d| d.euler_phi }   # = 360 ✓
 
 ---
 
-## 6. Prime Counting and Distribution
+## 10. Prime Counting and Distribution
 
 ### π(n) — Exact, Range, and Approximate
 
@@ -675,7 +932,7 @@ say 5.next_composites    # [4, 6, 8, 9, 10] — first 5 composites
 
 ---
 
-## 7. Primality Testing
+## 11. Primality Testing
 
 ### Deterministic Tests
 
@@ -737,7 +994,7 @@ say   2.nd { .is_prime }    # 3
 
 ---
 
-## 8. Integer Factorization Algorithms
+## 12. Integer Factorization Algorithms
 
 `factor(n)` dispatches automatically. The individual methods below let you target
 specific algebraic structures.
@@ -823,7 +1080,7 @@ say full_factor(2**128 + 1)
 
 ---
 
-## 9. Modular Arithmetic
+## 13. Modular Arithmetic
 
 ### Basic Operations
 
@@ -917,9 +1174,19 @@ say geometric_sum(5, 8)           # 8^0 + … + 8^5 = 37449
 say geometric_summod(5, 8, 10007) # same mod 10007
 ```
 
+### Congruence Testing and Linear Congruential Solving
+
+```ruby
+say 99923.is_congruent(-2, 5)    # true — n ≡ a (mod m); also works for rationals/floats/complex
+
+# solve_lcg(n, r, m): smallest x satisfying n*x ≡ r (mod m); NaN if no solution:
+say solve_lcg(143, 44, 231)    # 10    (alias: solve_linear_congruence)
+```
+
+
 ---
 
-## 10. Quadratic Residues and Congruences
+## 14. Quadratic Residues and Congruences
 
 ### Symbol Functions
 
@@ -996,7 +1263,7 @@ say solve_quadratic_form(1, 0, 1, 5)   # x^2 + y^2 = 5
 
 ---
 
-## 11. Dirichlet Convolution
+## 15. Dirichlet Convolution
 
 (f * g)(n) = Σ_{d|n} f(d) g(n/d):
 
@@ -1060,7 +1327,7 @@ say 1000.dirichlet_sum {|k| k.euler_phi }  # = totient_sum(1000)
 
 ---
 
-## 12. Arithmetic Derivative
+## 16. Arithmetic Derivative
 
 The arithmetic derivative n' is uniquely determined by 1' = 0, p' = 1 for all primes,
 and (ab)' = a'b + ab'. For n = ∏ p_i^{e_i}: n' = n · Σ_{p^e || n} e/p.
@@ -1101,7 +1368,7 @@ say 27.arithmetic_derivative == 27  # true  — 3^3
 
 ---
 
-## 13. Continued Fractions and Pell's Equation
+## 17. Continued Fractions and Pell's Equation
 
 ### Continued Fraction Expansions
 
@@ -1195,7 +1462,7 @@ say fibonaccimod(10**18, 10**9 + 7)
 
 ---
 
-## 14. Sublinear Summation
+## 18. Sublinear Summation
 
 All functions here run in O(n^{1/2}) or O(n^{2/3}) time via sieve or
 hyperbola methods.
@@ -1267,7 +1534,7 @@ say ((n.totient_sum / (3*n**2 / Num.pi**2)).as_float)      # → 1
 
 ---
 
-## 15. Integer Classifications and Sequences
+## 19. Integer Classifications and Sequences
 
 ### Smooth and Rough Numbers
 
@@ -1456,7 +1723,7 @@ for n in (1..100) {
 
 ---
 
-## 16. Pseudoprimes and Carmichael Numbers
+## 20. Pseudoprimes and Carmichael Numbers
 
 ### Fermat Pseudoprimes
 
@@ -1536,7 +1803,7 @@ say 271441.is_perrin_pseudoprime   # true — 271441 = 521^2 passes but is compo
 
 ---
 
-## 17. Combinatorics and Partitions
+## 21. Combinatorics and Partitions
 
 ### Additive Partitions
 
@@ -1608,9 +1875,53 @@ say 10.pyramidal(3)          # 10th tetrahedral = 220
 say multinomial(1, 4, 4, 2)   # 11!/(1!4!4!2!) = 34650
 ```
 
+### Permutations, Derangements, and Rank/Unrank
+
+```ruby
+5.permutations {|*a| say a }         # all permutations of {0..4}
+5.derangements {|*a| say a }         # permutations with no fixed points (alias: complete_permutations)
+
+# num2perm(n, k): the rank-k lexicographic permutation of n elements (k mod n!):
+say num2perm(5, 43)   #=> [1, 4, 0, 3, 2]
+# Array#perm2num is the inverse operation.
+```
+
+### Multisets and Tuples with Repetition
+
+```ruby
+say multisets(3, 2)
+#=> [[1,1,1], [2,1,1], [2,2,1], [2,2,2]]   — size-3 multisets over {1,2}
+
+5.tuples_with_repetition(2, {|*a| say a })   # k-tuples with repetition  (alias: variations_with_repetition)
+```
+
+### Necklaces
+
+```ruby
+say 30.of { .necklaces(2) }             # n-bead necklaces, k colors     (A000031)
+say 30.of { .necklaces_aperiodic(2) }   # aperiodic necklaces = irreducible polys over GF(k)  (A001037)
+```
+
+### Generalized Factorials
+
+```ruby
+say double_factorial(9)      # 9!! = 9*7*5*3*1 = 945          (aliases: !!, dfac, dfactorial)
+say 15.of { .mfac(3) }       # triple-factorials               (aliases: mfactorial, multi_factorial)
+
+say rising_factorial(5, 3)    # 5*6*7 = 210      = binomial(7,3)*3!
+say falling_factorial(5, 3)   # 5*4*3 = 60       = binomial(5,3)*3!
+
+say factorial_sum(10)          # Σ_{k=0}^{9} k!               (alias: left_factorial, A003422)
+say 100.factorial_valuation(5)   # v_5(100!) — same as valuation(100!, 5)  (alias: factorial_power)
+
+say factorialmod(1000, 10**9+7)          # 1000! mod 10^9+7, without computing 1000!
+say binomialmod(1e10, 1e5, 20!)           # C(10^10, 10^5) mod 20!
+```
+
+
 ---
 
-## 18. Special Arithmetic Functions
+## 22. Special Arithmetic Functions & Polynomial Sequences
 
 ### Ramanujan's τ Function
 
@@ -1729,7 +2040,7 @@ say 10.harmonic(2)   # 55991/2520
 
 ### Subfactorial / Derangements
 
-See Section 17. `subfactorial(n, k)` = D(n, k) (rencontres numbers).
+See Section 21. `subfactorial(n, k)` = D(n, k) (rencontres numbers).
 
 ### Perrin Sequence
 
@@ -1791,9 +2102,430 @@ say 20.of {|n| a(n) }
 say (12.divisors_prod {|d| a(d) } == f(12))   # true ✓
 ```
 
+### Classical Orthogonal Polynomials
+
+All of the following, when called without the evaluation point `x`, return a
+`Polynomial` object; supplying `x` evaluates the polynomial directly.
+
+```ruby
+say chebyshevT(5)         # T_5(x) as a Polynomial          (alias: chebyshevt)
+say chebyshevT(5, 2)       # T_5(2), evaluated
+say chebyshevU(5, 2)        # Chebyshev polynomial of the second kind, U_5(2)
+
+say hermiteH(4, 1)          # physicists' Hermite polynomial H_4(1)
+say hermiteHe(4, 1)          # probabilists' Hermite polynomial He_4(1)
+say legendreP(4, 0.5)          # Legendre polynomial P_4(0.5)   (alias: legendre_polynomial)
+say laguerre(4, 1)               # Laguerre polynomial L_4(1)
+
+say cyclotomicmod(12, 2, 10**9+7)   # Φ_12(2) mod 10^9+7
+```
+
+### Genocchi and Euler Numbers/Polynomials
+
+```ruby
+say genocchi(4)            # 4th Genocchi number: 2(1-4^n)·B_{2n}   (A001469)
+say euler_numbers(9)         # [1, 0, -1, 0, 5, 0, -61, 0, 1385, 0]
+say euler_polynomial(3, 1)     # 3rd Euler polynomial evaluated at x=1
+```
+
+### Stern-Brocot and Fibbinary Sequences
+
+```ruby
+say 30.of { .fusc }            # Stern's diatomic sequence     (A002487)
+say 10.of { .fibbinary }        # Fibbinary numbers: no two adjacent 1-bits  (A003714)
+say 30.of { .fibbinary.as_bin }  # equals the Zeckendorf representation of n  (A014417)
+```
+
+### Jacobsthal, Pell, Tribonacci & Tetranacci Families
+
+All defined in terms of `lucasU`/`lucasV`, or generalized Fibonacci with more terms:
+
+```ruby
+say 20.of { .jacobsthal }         # A001045: lucasU(1, -2, n)
+say 20.of { .jacobsthal_lucas }    # A014551: lucasV(1, -2, n)
+
+say 20.of { .pell }                  # A000129: lucasU(2, -1, n)
+say 20.of { .pell_lucas }             # A002203: lucasV(2, -1, n)
+
+say 20.of { .tribonacci }              # A000073: fibonacci(n, 3)
+say 20.of { .tetranacci }               # A000078: fibonacci(n, 4)
+```
+
+### Quadratic and Cubic Formulas
+
+```ruby
+say [quadratic_formula(13, -42, -34)]   # roots of 13x²-42x-34=0: [3.901..., -0.670...]
+say [cubic_formula(1, -6, 11, -6)]       # roots of x³-6x²+11x-6=0 (possibly complex)
+```
+
+### Second-Kind and Inverse Polygonal Numbers
+
+```ruby
+say is_polygonal2(155, 5)          # true  — 155 is a "second pentagonal" number
+say polygonal_root2(155, 5)         # the second k-gonal root
+say ipolygonal_root2(155, 5)          # its integer form (nil if not exact)
+
+say polygonal_inverse(4012)             # [[r,k], ...] pairs with polygonal(r,k) = 4012
+say sum_of_polygonals(18736, 3)          # representations as a sum of two triangular numbers
+```
+
+### Pyramidal and Centered-Pyramidal Numbers
+
+```ruby
+say 15.by { .is_pyramidal(3) }      # tetrahedral numbers
+say pyramidal_root(pyramidal(1234, 3), 3)   # 1234 — inverse of pyramidal(n,k)
+
+say 10.centered_pyramidal(6)           # 10th centered hexagonal pyramidal number
+say n.centered_pyramidal_root(6)         # its inverse
+```
+
+### Fibonacci/Lucas/Chebyshev Pseudoprime Detectors
+
+```ruby
+say n.is_fib          # is n a Fibonacci number?          (alias: is_fibonacci)
+say n.is_lucas          # is n a Lucas number?
+say n.is_chebyshev        # odd composite Chebyshev pseudoprime (A175530)  (alias: is_chebyshev_psp)
+```
+
+
 ---
 
-## 19. Quick Reference
+## 23. Trigonometric & Hyperbolic Functions
+
+Sidef provides the full complement of circular and hyperbolic functions and their
+inverses, all operating in radians and extending naturally to complex arguments.
+
+### Circular Functions
+
+```ruby
+say sin(Num.pi/2)     # 1
+say cos(0)            # 1
+say tan(Num.pi/4)     # 1
+
+say sin_cos(Num.pi/6)   # (sin, cos) as a pair — avoids computing both separately
+
+say sec(0)    # 1     — secant = 1/cos
+say csc(Num.pi/2)   # 1     — cosecant = 1/sin
+say cot(Num.pi/4)   # 1     — cotangent = 1/tan
+```
+
+### Inverse Circular Functions
+
+```ruby
+say 1.asin     # π/2
+say 1.acos     # 0
+say 1.atan     # π/4
+say atan2(1, 1)   # π/4  — four-quadrant inverse tangent
+
+say 1.asec
+say 1.acsc
+say 1.acot
+```
+
+### Hyperbolic Functions
+
+```ruby
+say sinh(1)     # 1.1752...
+say cosh(1)     # 1.5430...
+say tanh(1)     # 0.7615...
+
+say sech(1)
+say csch(1)
+say coth(1)
+```
+
+### Inverse Hyperbolic Functions
+
+```ruby
+say 1.asinh
+say 2.acosh
+say 0.5.atanh
+
+say 2.asech
+say 1.acsch
+say 2.acoth
+```
+
+### Degrees and Radians
+
+```ruby
+say deg2rad(180)      # π
+say rad2deg(Num.pi)    # 180
+```
+
+---
+## 24. Special Functions & Mathematical Constants
+
+### Mathematical Constants
+
+```ruby
+say Num.pi          # 3.14159...              (alias: π)
+say Num.e           # 2.71828...
+say Num.EulerGamma   # 0.5772156649...   Euler-Mascheroni constant (aliases: γ, y)
+say Num.CatalanG     # 0.915965594...    Catalan's constant        (alias: C)
+say Num.ln2          # 0.6931471...      natural log of 2
+say Num.inf          # +Infinity
+say Num.ninf         # -Infinity
+say Num.nan          # NaN
+say Num.one          # 1
+say Num.zero         # 0
+say Num.mone         # -1
+```
+
+### The Gamma Family
+
+```ruby
+say gamma(6)      # 120 = 5!     — Γ(n) = (n−1)! for positive integers   (alias: Γ)
+say gamma(1/2)    # 1.7724538... = √π
+
+say lgamma(100)   # ln(|Γ(100)|)                 (alias: gamma_abs_log)
+say digamma(1)    # -γ  — logarithmic derivative Γ'(x)/Γ(x)   (alias: Ψ)
+
+say beta(2, 3)    # Γ(2)Γ(3)/Γ(5) = 1/12   — Euler integral of the first kind
+```
+
+### Zeta and Related Dirichlet Series
+
+```ruby
+say zeta(2)    # π²/6 = 1.644934...    (alias: ζ)
+say zeta(4)    # π⁴/90 = 1.082323...
+
+say eta(2)     # Dirichlet eta: (1 − 2^(1−s))·ζ(s)   (alias: η)
+```
+
+### Exponential and Logarithmic Integrals
+
+```ruby
+say li(100)     # logarithmic integral: 30.126141...
+say li2(0.5)     # dilogarithm: ∫₀ˣ −log(1−t)/t dt
+say ei(1)        # exponential integral   (alias: eint)
+
+say erf(1)       # Gauss error function
+say erfc(1)      # complementary error function: 1 − erf(x)
+```
+
+### Bessel Functions
+
+```ruby
+say bessel_j(1, 0)   # J_0(1) — first-kind Bessel function
+say bessel_y(1, 0)   # Y_0(1) — second-kind Bessel function
+```
+
+### Arithmetic-Geometric Mean and Lambert W
+
+```ruby
+say agm(1, sqrt(2))    # arithmetic-geometric mean
+
+say lambert_w(1)       # Ω ≈ 0.5671432904...  — solves x·e^x = 1
+say lambert_w(-1)       # complex result when x < -1/e
+```
+
+### Harmonic Numbers as Special Functions
+
+```ruby
+say harmonic(10)         # H_10 = 7381/2520, exact rational   (aliases: harmfrac, harmonic_number)
+say harmonic(10, 2)       # generalized (order-2) harmonic number
+
+# Floating-point evaluation via digamma: harmreal(n) = digamma(n+1) + γ
+say harmreal(10)
+```
+
+### Prime Counting via `pi`
+
+```ruby
+# pi(n), applied to an integer receiver, counts primes <= n (distinct from Num.pi):
+say pi(100)        # 25   — same as prime_count(100)   (alias: π)
+say pi(50, 100)    # primes in the range [50, 100]
+```
+
+---
+## 25. Complex Numbers
+
+### Construction and Basic Access
+
+```ruby
+say complex(3, 4)     # 3+4i     — equivalent to Complex(3, 4)
+say 5.complex          # 5+0i     — real number lifted to complex
+
+say (3+4i).re     # 3   — real part           (alias: real)
+say (3+4i).im     # 4   — imaginary part       (aliases: imag, imaginary)
+say (3+4i).parts   # [3, 4]
+say reals(3+4i)     # (3, 4) as a list
+
+say (3+4i).pair(0)   # combine via a.pair(b) == Complex(a, b)
+```
+
+### Magnitude, Argument, Conjugate
+
+```ruby
+say (3+4i).abs     # 5   — modulus
+say norm(3+4i)      # 25  — abs(x)^2
+say (3+4i).arg      # phase angle in radians   (aliases: angle, phase)
+say (3+4i).conj      # 3-4i  — complex conjugate (fixed point for reals)
+
+say cis(Num.pi/2)     # cos(x) + sin(x)i  — Euler's formula, i
+```
+
+### Classification
+
+```ruby
+say is_complex(3+4i)   # true  — has both nonzero real and imaginary parts
+say is_complex(4)       # false — purely real
+say is_complex(4i)      # false — purely imaginary
+
+say is_real(3+4i)      # false
+say is_imag(4i)         # true    (alias: is_imag)
+```
+
+### Complex Arithmetic on Component Pairs
+
+These operate directly on real/imaginary component pairs `(a, b)` representing
+`a + bi`, useful for high-performance code that avoids allocating Complex objects:
+
+```ruby
+say [cadd(2, 3, 1, 1)]    # (3, 4)                       (alias: complex_add)
+say [csub(2, 3, 1, 1)]    # (1, 2)                       (alias: complex_sub)
+say [cmul(2, 3, 1, 1)]    # (a*x-b*y, a*y+b*x) = (-1, 5)  (alias: complex_mul)
+say [cdiv(2, 3, 1, 1)]    # complex division              (alias: complex_div)
+say [cmod(7, 9, 5)]        # (2, 4)  — componentwise mod    (alias: complex_mod)
+say [cpow(3, 4, 10)]        # (3+4i)^10, as (re, im)         (alias: complex_pow)
+say [complex_ipow(3, 4, 5)]  # integer-exponent variant
+say complex_cmp(2, 3, 2, 3)   # (a<=>x) || (b<=>y)
+```
+
+### Complex Modular Arithmetic
+
+```ruby
+say [cpowmod(3, 4, 1000, 1e6)]   # (3+4i)^1000 mod 10^6, as (re, im)  (alias: complex_powmod)
+say [cinvmod(3, 4, 1000000007)]   # complex modular inverse            (alias: complex_invmod)
+```
+
+### Roots of Unity and Congruences
+
+```ruby
+say roots_of_unity(4)   # the 4th roots of 1: [1, i, -1, -i]
+
+# is_congruent also extends naturally to complex numbers, rationals, and floats:
+say is_congruent(124, 1/4, 3/4)   # true
+say kronecker_delta(3, 3)         # 1     (alias: δ)
+say kronecker_delta(3, 4)         # 0
+```
+
+---
+## 26. Random Number Generation
+
+All of Sidef's integer random-number facilities are backed by a cryptographically
+secure ISAAC-32 CSPRNG.
+
+### Random Integers and Floats
+
+```ruby
+say irand(10)        # random integer in [0, 10]   (ISAAC-32 CSPRNG)
+say irand(10, 20)     # random integer in [10, 20]
+
+say urand(100)         # random unsigned integer in [0, 99]     (alias: urandomm)
+say urand(100, 110)     # random unsigned integer in [100, 110]
+
+say rand(1.0)      # random float in [0, 1)
+say rand(10, 20)    # random float in [10, 20)
+```
+
+### Seeding
+
+```ruby
+seed(12345)          # re-seed the rand() generator
+useed(random_bytes(32).digits2num(256))   # re-seed the CSPRNG (ISAAC-32) with entropy
+```
+
+### Random Bytes and Strings
+
+```ruby
+say 16.random_bytes    # 16 random byte values in [0, 255]
+say 20.random_string    # 20 random characters
+```
+
+### Random Primes
+
+```ruby
+say random_prime(100)        # random prime <= 100
+say random_prime(100, 200)    # random prime in [100, 200]
+
+say random_nbit_prime(128)             # random 128-bit prime
+say random_ndigit_prime(50)            # random 50-digit prime
+say random_maurer_nbit_prime(256)      # provably-prime, via Maurer's algorithm  (alias: random_nbit_maurer_prime)
+say random_nbit_safe_prime(512)         # random 512-bit safe prime (p and (p-1)/2 both prime)
+say random_nbit_strong_prime(512)       # random 512-bit strong prime  (alias: random_strong_nbit_prime)
+```
+
+### Probabilistic Testing
+
+```ruby
+say n.miller_rabin_random(20)   # 20 independent random-base Miller-Rabin rounds
+```
+
+---
+## 27. Numeric Predicates & Classification
+
+### Numeric Type Checks
+
+```ruby
+say 42.is_int      # true
+say 4.2.is_float     # true
+say (1/3).is_rat      # true
+say (3+4i).is_complex  # true
+say (0/0).is_nan       # true
+say (1/0).is_inf        # true
+say (-1/0).is_ninf       # true
+```
+
+### Sign and Special Values
+
+```ruby
+say 5.is_pos     # true    (alias: is_positive)
+say (-5).is_neg    # true    (alias: is_negative)
+say 0.is_zero       # true
+say 1.is_one         # true
+say (-1).is_mone      # true
+```
+
+### Parity and Elementary Shape
+
+```ruby
+say 4.is_even
+say 5.is_odd
+say 5.is_odd_composite    # odd and composite
+say 9.is_square            # perfect square
+say 8.is_cube                # perfect cube
+say 8.is_pow                  # perfect power (any exponent >= 2)
+say 8.is_power_of(2)           # is a power of a specific base
+```
+
+### Comparisons, Ranges, and Palindromes
+
+```ruby
+say 5.is_between(1, 10)     # inclusive range test
+say 5.is_coprime(9)           # gcd(5,9) == 1
+say 121.is_palindrome           # reads the same forwards/backwards in base 10
+say 121.is_palindrome(3)         # palindrome test in base 3
+```
+
+### Approximate Comparisons (Floating-Point Safe)
+
+```ruby
+# The <~> operator and approx_* methods compare floats within a numerical tolerance,
+# which is essential when comparing results of transcendental functions:
+say (0.1 + 0.2 <~> 0.3)         # 0  — considered equal within tolerance
+say (0.1 + 0.2).approx_eq(0.3)     # true   (aliases: approx_ge, approx_gt, approx_le, approx_lt, approx_ne)
+```
+
+### Evaluating Expressions
+
+```ruby
+say eval("2 + 3 * 4")   # 14 — evaluate a Sidef expression from a string at runtime
+```
+
+---
+## 28. Quick Reference
 
 ```ruby
 #── Factorization ───────────────────────────────────────────────────────
@@ -2008,4 +2740,163 @@ stirling(n, k)             #=> Stirling first kind
 stirling2(n, k)            #=> Stirling second kind
 stirling3(n, k)            #=> Lah numbers
 multinomial(...)
+n.permutations {|*a|}      #=> all permutations of 0..n-1
+n.derangements {|*a|}      #=> permutations with no fixed points  alias: complete_permutations
+num2perm(n, k)             #=> rank-k lexicographic permutation of n elements
+multisets(n, k)            #=> size-n multisets over 1..k
+n.tuples_with_repetition(k){} #=> k-tuples with repetition  alias: variations_with_repetition
+n.necklaces(k)             #=> n-bead necklaces, k colors        (A000031)
+n.necklaces_aperiodic(k)   #=> aperiodic necklaces                (A001037)
+double_factorial(n)        #=> n!!   aliases: !!, dfac, dfactorial
+n.mfac(k)                  #=> generalized multi-factorial       aliases: mfactorial
+rising_factorial(n, k)     #=> n*(n+1)*...*(n+k-1)
+falling_factorial(n, k)    #=> n*(n-1)*...*(n-k+1)
+factorial_sum(n)           #=> Σ_{k<n} k!   (A003422)             alias: left_factorial
+n.factorial_valuation(k)   #=> v_k(n!)                             alias: factorial_power
+factorialmod(n, m)         #=> n! mod m
+binomialmod(n, k, m)       #=> C(n,k) mod m
+
+#── Special sequences & polynomials ─────────────────────────────────────
+chebyshevT(n, x)           #=> Chebyshev poly, 1st kind    alias: chebyshevt
+chebyshevU(n, x)           #=> Chebyshev poly, 2nd kind    alias: chebyshevu
+hermiteH(n, x)             #=> physicists' Hermite polynomial
+hermiteHe(n, x)            #=> probabilists' Hermite polynomial
+legendreP(n, x)            #=> Legendre polynomial          alias: legendre_polynomial
+laguerre(n, x)             #=> Laguerre polynomial          alias: laguerreL
+genocchi(n)                #=> n-th Genocchi number         (A001469)
+euler_numbers(n)           #=> array of Euler numbers 0..n
+euler_polynomial(n, x)     #=> n-th Euler polynomial at x
+fusc(n)                    #=> Stern's diatomic sequence    (A002487)
+fibbinary(n)                #=> n-th Fibbinary number        (A003714)
+jacobsthal(n)                #=> = lucasU(1,-2,n)              (A001045)
+jacobsthal_lucas(n)           #=> = lucasV(1,-2,n)              (A014551)
+tribonacci(n)                  #=> = fibonacci(n, 3)             (A000073)
+tetranacci(n)                   #=> = fibonacci(n, 4)             (A000078)
+pell(n)                          #=> = lucasU(2,-1,n)              (A000129)
+pell_lucas(n)                     #=> = lucasV(2,-1,n)              (A002203)
+quadratic_formula(a,b,c)          #=> roots of ax²+bx+c=0
+cubic_formula(a,b,c,d)             #=> roots of ax³+bx²+cx+d=0
+is_polygonal2(n, k)                 #=> 2nd k-gonal number test
+polygonal_root2(n, k)                #=> 2nd k-gonal root
+ipolygonal_root2(n, k)                 #=> integer 2nd k-gonal root
+polygonal_inverse(n)                    #=> [r,k] pairs: polygonal(r,k)=n
+sum_of_polygonals(n, k)                  #=> reps as sum of two k-gonal numbers
+n.is_pyramidal(k)                          #=> k-gonal pyramidal test
+n.pyramidal_root(k)                          #=> k-gonal pyramidal root
+n.centered_pyramidal(k)                       #=> centered k-gonal pyramidal number
+n.centered_pyramidal_root(k)                    #=> its inverse
+n.is_fib                                          #=> Fibonacci number test  alias: is_fibonacci
+n.is_lucas                                          #=> Lucas number test
+n.is_chebyshev                                        #=> Chebyshev pseudoprime (A175530)
+
+#── Type conversion, formatting & bases ─────────────────────────────────
+n.as_bin / as_oct / as_hex   #=> string in base 2 / 8 / 16
+n.as_dec(k)                  #=> decimal expansion to k places  alias: as_float
+n.base(b)                    #=> string in base b (2..62)         alias: in_base
+n.commify                    #=> "1,234,567" with thousands separators
+n.digits(b=10)                #=> digits, least-significant first
+n.digit(k, b=10)               #=> k-th digit (negative k from the left)
+b.digits2num(digits)             #=> inverse of .digits             alias: from_digits
+n.digits_sum(b=10)                 #=> sum of digits                 aliases: sumdigits
+digital_root(n, b=10)                #=> repeated digit sum          (A010888)
+n.flip(b=10)                           #=> digit-reversal of n         alias: reverse
+n.len(b=10)                              #=> number of digits            aliases: size, length
+egypt_greedy(p/q)                          #=> Egyptian fraction denominators
+
+#── Rounding, roots, powers & logs ──────────────────────────────────────
+n.floor / n.ceil            #=> round towards -Inf / +Inf
+round(x, k=0)                #=> round to k-th decimal place        alias: roundf
+idiv_ceil/idiv_round/idiv_trunc(a,b)  #=> integer division modes    aliases: cld/rdd/trd
+n.isqrt / n.icbrt / n.iroot(k)  #=> integer roots                   aliases: sqrtint/cbrtint/rootint
+n.isqrtrem / n.irootrem(k)        #=> integer root + remainder
+ipow(b, n) / ipow2(n) / ipow10(n)   #=> exact integer exponentiation  alias: powint
+ilog(n, b) / ilog2(n) / ilog10(n)     #=> integer logarithm             alias: logint
+lgrt(x)                                 #=> "logarithm-root": x^x =~= n
+exp(x) / exp2(x) / exp10(x)               #=> exponential functions
+log(x,b) / ln(x) / log2(x) / log10(x)       #=> logarithms
+expnorm(n, b=10)                              #=> exp(n) normalized into [0,1)
+n.perfect_root                                  #=> smallest r: n=r^k
+sqrtQ(n)                                          #=> exact Quadratic object for √n
+
+#── Bitwise operations ──────────────────────────────────────────────────
+n.getbit(k)                #=> bit k of n              aliases: bit, testbit
+setbit(n,k) / clearbit(n,k) / flipbit(n,k)  #=> set/clear/toggle bit k
+n.bits                       #=> binary digits, MSB first
+n.bit_scan0(k) / n.bit_scan1(k)  #=> scan for next 0-bit / 1-bit from k
+lsb(n) / msb(n)                    #=> index of least/most significant set bit
+n.popcount                           #=> Hamming weight        alias: hammingweight
+hamdist(a, b)                          #=> Hamming distance between a, b
+rotate(n, k, b=10)                       #=> rotate digits of n in base b
+
+#── Ranges, iteration & searching ───────────────────────────────────────
+n.of {|k|}                  #=> array of n elements, k=0..n-1
+n.times {|k|}                 #=> call block n times
+n.by {|x|}                      #=> first n values >= 0 satisfying block
+n.th{}/n.st{}/n.nd{}/n.rd{}       #=> n-th value (0-indexed) satisfying block
+range(a,b,step)                     #=> RangeNum object
+a.downto(b, step=1)                   #=> reverse range
+bsearch(a, b, {})                       #=> find k with f(k)=0
+bsearch_ge(a,b,{}) / bsearch_le(a,b,{})   #=> first f(k)>=0 / last f(k)<=0
+bsearch_min(a,b,{}) / bsearch_max(a,b,{})  #=> smallest/largest k satisfying predicate
+bsearch_solve(a,b,{})                        #=> invert a continuous function
+n.polymod(m1, m2, ...)                         #=> mixed-radix divmod chain
+
+#── Trigonometric & hyperbolic functions ────────────────────────────────
+sin/cos/tan(x)               #=> circular functions       (+ sec/csc/cot)
+asin/acos/atan(x)              #=> inverse circular         (+ asec/acsc/acot)
+atan2(a, b)                      #=> four-quadrant inverse tangent
+sin_cos(x)                          #=> (sin(x), cos(x)) pair
+sinh/cosh/tanh(x)                     #=> hyperbolic          (+ sech/csch/coth)
+asinh/acosh/atanh(x)                    #=> inverse hyperbolic  (+ asech/acsch/acoth)
+deg2rad(x) / rad2deg(x)                    #=> degree ↔ radian conversion
+
+#── Special functions & constants ───────────────────────────────────────
+Num.pi / Num.e / Num.EulerGamma / Num.CatalanG / Num.ln2  #=> mathematical constants
+Num.inf / Num.ninf / Num.nan / Num.one / Num.zero / Num.mone  #=> special values
+gamma(x)                    #=> Γ(x); Γ(n)=(n-1)! for integers  alias: Γ
+lgamma(x) / digamma(x)        #=> ln|Γ(x)| / Γ'(x)/Γ(x)             aliases: Ψ
+beta(a, b)                      #=> Euler integral of the first kind
+zeta(s) / eta(s)                  #=> Riemann zeta / Dirichlet eta   aliases: ζ, η
+li(x) / li2(x) / ei(x)               #=> log-integral / dilog / exp-integral
+erf(x) / erfc(x)                       #=> Gauss error function & complement
+bessel_j(x, n) / bessel_y(x, n)          #=> Bessel functions, 1st/2nd kind
+agm(a, b)                                  #=> arithmetic-geometric mean
+lambert_w(x)                                 #=> Lambert-W function
+harmonic(n, k=1) / harmreal(n, k=1)            #=> Harmonic numbers, exact/float
+pi(n) / pi(a, b)                                 #=> prime count π(n)   alias: π
+
+#── Complex numbers ──────────────────────────────────────────────────────
+complex(a, b) / n.complex     #=> construct a complex number
+z.re / z.im                     #=> real / imaginary part      aliases: real / imag
+z.parts / reals(z)                #=> [re, im] pair
+z.abs / norm(z) / z.arg / z.conj    #=> modulus / |z|² / phase / conjugate
+cis(x)                                #=> cos(x) + sin(x)i
+is_real(z) / is_imag(z) / is_complex(z) #=> component classification
+cadd/csub/cmul/cdiv(a,b,x,y)             #=> componentwise complex arithmetic
+cmod(a,b,m) / cpow(a,b,n) / complex_ipow(a,b,n)  #=> complex mod / integer power
+cpowmod(a,b,n,m) / cinvmod(a,b,m)                  #=> complex modular power / inverse
+roots_of_unity(n)                                    #=> the n-th roots of 1
+is_congruent(n, a, m) / kronecker_delta(a, b)          #=> congruence / Kronecker delta  alias: δ
+
+#── Random number generation ────────────────────────────────────────────
+irand(n) / irand(a,b)        #=> random integer (ISAAC-32 CSPRNG)
+urand(n) / urand(a,b)          #=> random unsigned integer          alias: urandomm
+rand(n) / rand(a,b)              #=> random float
+seed(n) / useed(n)                 #=> reseed rand() / the CSPRNG
+n.random_bytes / n.random_string     #=> random bytes / characters
+random_prime(n) / random_prime(a,b)    #=> random prime
+random_nbit_prime(n) / random_ndigit_prime(n) #=> random n-bit / n-digit prime
+random_maurer_nbit_prime(n)                     #=> provable random prime  alias: random_nbit_maurer_prime
+random_nbit_safe_prime(n) / random_nbit_strong_prime(n)  #=> safe / strong prime
+n.miller_rabin_random(k)                                    #=> k random-base MR rounds
+
+#── Numeric predicates & classification ─────────────────────────────────
+n.is_int / is_float / is_rat / is_complex     #=> type predicates
+n.is_nan / is_inf / is_ninf                     #=> special-value predicates
+n.is_pos / is_neg / is_zero / is_one / is_mone    #=> sign & fixed-value predicates
+n.is_even / is_odd / is_odd_composite               #=> parity predicates
+n.is_square / is_cube / is_pow / is_power_of(b)        #=> perfect-power predicates
+n.is_between(a, b) / is_coprime(m)                       #=> range / coprimality tests
+n.is_palindrome(b=10)                                       #=> digit-palindrome test
+eval(str)                                                     #=> evaluate a Sidef expression
 ```
