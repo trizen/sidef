@@ -783,7 +783,7 @@ Converts the hash's keys to a Bag object. The hash values are ignored.
 
     hash.as_tree(root)
 
-Returns the hash as a tree structure represented as nested Pairs, using the given C<root> as the tree's root label. Nested hashes are recursively converted to sub-trees.
+Returns the hash as a tree structure represented as nested Pairs, using the given C<root> as the tree's root label. Nested hashes are recursively converted to sub-trees. Non-hash leaf values are represented as Pairs with an empty array C<[]>; only the key hierarchy is preserved, not the leaf values themselves.
 
     var h = Hash(
         a => Hash(b => 1),
