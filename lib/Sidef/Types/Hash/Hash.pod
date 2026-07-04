@@ -304,13 +304,13 @@ Missing keys produce Pair objects with nil values.
 
     hash.slice(keys...)
 
-Returns a new hash containing only the specified keys and their values from the original hash. Keys that do not exist in the original hash are omitted from the result.
+Returns a new hash containing only the specified keys and their values from the original hash. Keys that do not exist in the original hash are included in the result with nil values.
 
     var h = Hash(a => 1, b => 2, c => 3, d => 4)
     var subset = h.slice(:a, :c, :z)
-    say subset  #=> Hash(a => 1, c => 3)
+    say subset  #=> Hash(a => 1, c => 3, z => nil)
 
-Note: Key C<:z> was omitted because it does not exist in the original hash. See C<lsel> for a version that includes nil values for missing keys.
+Note: Missing keys are preserved with nil values. See C<lsel> for the Array/to_list variant of this operation.
 
 =cut
 
@@ -318,7 +318,7 @@ Note: Key C<:z> was omitted because it does not exist in the original hash. See 
 
     hash.lsel(keys_array)
 
-Performs a linear selection: returns a new hash containing the keys specified in C<keys_array>. Unlike C<slice>, keys that do not exist in the original hash are included in the result with nil values.
+Performs a linear selection: returns a new hash containing the keys specified in C<keys_array>, including missing keys with nil values. The main difference from C<slice> is the argument shape: C<lsel> takes an Array (or any object responding to C<to_list>), while C<slice> takes variadic keys.
 
     var h = Hash(a => 1, b => 2)
     var selected = h.lsel([:a, :c])
