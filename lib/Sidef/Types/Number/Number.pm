@@ -14189,8 +14189,6 @@ sub bell {
 sub bellmod {
     my ($n, $m) = @_;
 
-    # TODO: find a faster method.
-
     _valid(\$m);
 
     $n = _any2ui($$n)     // goto &nan;
@@ -14198,16 +14196,48 @@ sub bellmod {
 
     Math::GMPz::Rmpz_sgn($m) || goto &nan;
 
-    # For small n, it's faster to just use bell(n) % m
+    # For small n, Stirling numbers via Math::Prime::Util::GMP (in C) are ultra fast
+    if ($n < 100) {
+        return $_[0]->bell->mod($_[1]);
+    }
+
+    # Check if m fits into a native unsigned long and is safe from addition overflow
+    if (Math::GMPz::Rmpz_fits_ulong_p($m)) {
+        my $m_ui = Math::GMPz::Rmpz_get_ui($m);
+        if ($m_ui < (~0 >> 1)) {
+            my @row1    = (0) x ($n + 1);
+            my @row2    = (0) x ($n + 1);
+            my $bell_ui = 1;
+
+            my ($curr, $next) = (\@row1, \@row2);
+            my $acc_size = 0;
+
+            for my $k (1 .. $n) {
+                my $t = $bell_ui;
+                for my $i (0 .. $acc_size - 1) {
+                    $t += $curr->[$i];
+                    $t -= $m_ui if $t >= $m_ui;    # Fast conditional modulo
+                    $next->[$i + 1] = $t;
+                }
+                $next->[0] = $bell_ui;
+                $bell_ui = $t if $acc_size > 0;
+                $acc_size++;
+                ($curr, $next) = ($next, $curr);
+            }
+
+            return bless \$bell_ui;
+        }
+    }
+
+    # Fallback for massive m: For small n, computing exact bell(n) % m avoids modular overhead
     if ($n < 1000) {
         return $_[0]->bell->mod($_[1]);
     }
 
     my @acc;
 
-    my $t    = Math::GMPz::Rmpz_init();
-    my $bell = Math::GMPz::Rmpz_init_set_ui(1);
-
+    my $t        = Math::GMPz::Rmpz_init();
+    my $bell     = Math::GMPz::Rmpz_init_set_ui(1);
     my $native_m = 0;
 
     if (Math::GMPz::Rmpz_fits_ulong_p($m)) {
@@ -14216,9 +14246,7 @@ sub bellmod {
     }
 
     foreach my $k (1 .. $n) {
-
         Math::GMPz::Rmpz_set($t, $bell);
-
         foreach my $item (@acc) {
             Math::GMPz::Rmpz_add($t, $t, $item);
             $native_m
