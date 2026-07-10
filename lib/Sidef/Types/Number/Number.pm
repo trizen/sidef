@@ -6561,18 +6561,30 @@ sub euler_numbers {
 sub _fubini_numbers {
     my ($n) = @_;
 
+    # Cache for the sequence of Fubini numbers
     state $F = [Math::GMPz::Rmpz_init_set_ui(1)];
-    state $t = Math::GMPz::Rmpz_init_nobless();
+
+    # State cache for the dynamic programming row
+    state $row = [Math::GMPz::Rmpz_init_set_ui(1)];
 
     foreach my $i ($#{$F} + 1 .. $n) {
-        my $w = Math::GMPz::Rmpz_init_set_ui(0);
-        Math::GMPz::Rmpz_set_ui($t, 1);
-        foreach my $k (0 .. $i - 1) {
-            Math::GMPz::Rmpz_addmul($w, $F->[$k], $t);
-            Math::GMPz::Rmpz_mul_ui($t, $t, $i - $k);
-            Math::GMPz::Rmpz_divexact_ui($t, $t, $k + 1);
+
+        # Expand the row array for the current iteration
+        push @{$row}, Math::GMPz::Rmpz_init_set_ui(0);
+
+        # Process the row backwards to prevent overwriting values we still need
+        for (my $k = $i ; $k > 0 ; $k--) {
+            Math::GMPz::Rmpz_add($row->[$k], $row->[$k], $row->[$k - 1]);
+            Math::GMPz::Rmpz_mul_ui($row->[$k], $row->[$k], $k);
         }
-        $F->[$i] = $w;
+        Math::GMPz::Rmpz_set_ui($row->[0], 0);
+
+        # Sum the current row to get the i-th Fubini number
+        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+        foreach my $k (1 .. $i) {
+            Math::GMPz::Rmpz_add($sum, $sum, $row->[$k]);
+        }
+        $F->[$i] = $sum;
     }
 
     return $F;
@@ -6580,7 +6592,6 @@ sub _fubini_numbers {
 
 sub fubini_numbers {    # OEIS: A000670
     my ($n) = @_;
-
     $n = _any2ui($$n) // return _array();
 
     my @F = @{_fubini_numbers($n)};
@@ -6591,6 +6602,7 @@ sub fubini_numbers {    # OEIS: A000670
 sub fubini {    # OEIS: A000670
     my ($n) = @_;
     $n = _any2ui($$n) // goto &nan;
+
     my $r = _fubini_numbers($n)->[$n];
     bless \$r;
 }
