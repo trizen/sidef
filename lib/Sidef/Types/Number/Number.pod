@@ -6901,9 +6901,11 @@ Returns the number of antidivisors of C<n>.
 
 =head2 antidivisor_sum
 
-    antidivisor_sum(n)
+    antidivisor_sum(n, k=1)
 
 Returns the sum of anti-divisors of C<n>.
+
+When C<k> is specified, it computes the sum of C<d**k> for all antidivisors d of C<n>.
 
 Aliases: I<antidivisor_sigma>
 

@@ -32756,11 +32756,10 @@ sub antidivisor_count {    # OEIS: A066272
 
 *antidivisor_sigma0 = \&antidivisor_count;
 
-sub antidivisor_sigma {    # OEIS: A066417
-    my ($n) = @_;
+sub antidivisor_sigma {    # OEIS: A066417 (k=1)
+    my ($n, $k) = @_;
 
-    # TODO: find a formula for computing:
-    #   antidivisors(n).sum {|d| d**k }, for k > 1
+    # Generalization: computes the sum of d**k for all antidivisors d of n
 
     $n = $$n;
 
@@ -32768,14 +32767,33 @@ sub antidivisor_sigma {    # OEIS: A066417
         return ZERO;
     }
 
-    my $n2 = __add__($n, $n);
+    # Default to k = 1 if not provided
+    my $k_obj = defined($k) ? $k : ONE;
+    my $n2    = __add__($n, $n);
 
     my $v = (bless \$n)->valuation(TWO);
-    my $x = (bless \__inc__($n2))->sigma;
-    my $y = (bless \__dec__($n2))->sigma;
-    my $z = (bless \$n)->remove(TWO)->sigma->shift_left(bless \__inc__($$v));
 
-    bless \__sub__(__sub__(__add__(__add__($$x, $$y), $$z), __mul__($n, 6)), 2);
+    # Compute generalized sigma for odd boundaries
+    my $x = (bless \__inc__($n2))->sigma($k_obj);
+    my $y = (bless \__dec__($n2))->sigma($k_obj);
+
+    # Compute generalized sigma for the even terms: sigma_k(m) * 2**(k * (v + 1))
+    my $m_sigma = (bless \$n)->remove(TWO)->sigma($k_obj);
+    my $v_inc   = bless \__inc__($$v);
+    my $power   = $k_obj->mul($v_inc);
+    my $two_pow = (TWO)->pow($power);
+    my $z       = $m_sigma->mul($two_pow);
+
+    # Compute the k-th powers of the terms that fall outside the range 1 < d < n
+    my $t1 = (bless \__inc__($n2))->pow($k_obj);    # (2n+1)**k
+    my $t2 = (bless \__dec__($n2))->pow($k_obj);    # (2n-1)**k
+    my $t3 = (bless \$n2)->pow($k_obj);             # (2n)**k
+
+    # Sum up the total invalid components to subtract
+    my $excl = __add__(__add__(__add__($$t1, $$t2), $$t3), 2);
+
+    # Final result: (x + y + z) - (t1 + t2 + t3 + 2)
+    bless \__sub__(__add__(__add__($$x, $$y), $$z), $excl);
 }
 
 *antidivisor_sum = \&antidivisor_sigma;
