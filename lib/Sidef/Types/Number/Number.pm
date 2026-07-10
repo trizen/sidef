@@ -9729,14 +9729,23 @@ sub digits {
             return _array([map { bless \$_ } CORE::reverse(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B))]);
         }
 
-        # Find r such that B^(2r - 2) <= A < B^(2r)
-        my $r = (__ilog__($A, $B) >> 1) + 1;
+        # Power Tree Precomputation
+        # We precompute a minimal list of successive squares: B, B^2, B^4, B^8, ...
+        my @powers;
+        my $p = Math::GMPz::Rmpz_init_set_ui($B);
+        while (Math::GMPz::Rmpz_cmp($p, $A) <= 0) {
+            push @powers, $p;
+            my $next_p = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($next_p, $p, $p);
+            $p = $next_p;
+        }
+        push @powers, $p if !@powers;
 
         state $Q = Math::GMPz::Rmpz_init_nobless();
         state $R = Math::GMPz::Rmpz_init_nobless();
 
-        my @digits = map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } sub {
-            my ($A, $r) = @_;
+        my @digits = map { bless \$_ } sub {
+            my ($A, $k) = @_;
 
             # Cut the recursion early
             if (Math::GMPz::Rmpz_fits_ulong_p($A)) {
@@ -9752,25 +9761,24 @@ sub digits {
                 return @digits;
             }
 
-            my $t = Math::GMPz::Rmpz_init();
-            Math::GMPz::Rmpz_ui_pow_ui($t, $B, 2 * ($r - 1));    # can this be optimized away?
-
-            if (Math::GMPz::Rmpz_cmp($t, $A) > 0) {
-                --$r;
+            # Trace down the precomputed base-power index
+            while ($k > 0 and Math::GMPz::Rmpz_cmp($powers[$k], $A) > 0) {
+                $k--;
             }
 
-            Math::GMPz::Rmpz_ui_pow_ui($t, $B, $r);
-            Math::GMPz::Rmpz_divmod($Q, $R, $A, $t);
+            Math::GMPz::Rmpz_divmod($Q, $R, $A, $powers[$k]);
 
-            my $w = ($r + 1) >> 1;
-            Math::GMPz::Rmpz_set($t, $Q);
+            my $expected_digits = 1 << $k;
 
-            my @right = __SUB__->($R, $w);
-            my @left  = __SUB__->($t, $w);
+            my $t = Math::GMPz::Rmpz_init_set($Q);
 
-            (@right, (0) x ($r - scalar(@right)), @left);
+            my @right = __SUB__->($R, $k - 1);
+            my @left  = __SUB__->($t, $k - 1);
+
+            push @right, (0) x ($expected_digits - scalar(@right));
+            (@right, @left);
           }
-          ->($A, $r);
+          ->($A, $#powers);
 
         return _array(\@digits);
     }
@@ -22886,7 +22894,9 @@ sub is_bfsw_psp {    # a slightly stronger and faster BFW test
     Math::GMPz::Rmpz_set_ui($Q1, 1);
     Math::GMPz::Rmpz_set_ui($Q2, 1);
 
-    foreach my $bit (split(//, Math::GMPz::Rmpz_get_str($t, 2))) {
+    my $nbits = Math::GMPz::Rmpz_sizeinbase($t, 2);
+    for (my $i = $nbits - 1 ; $i >= 0 ; $i--) {
+        my $bit = Math::GMPz::Rmpz_tstbit($t, $i);
 
         Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
         Math::GMPz::Rmpz_mod($Q1, $Q1, $n);
