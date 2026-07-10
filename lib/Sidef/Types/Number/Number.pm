@@ -9741,8 +9741,8 @@ sub digits {
         }
         push @powers, $p if !@powers;
 
-        state $Q = Math::GMPz::Rmpz_init_nobless();
-        state $R = Math::GMPz::Rmpz_init_nobless();
+        my @Q_pool = map { Math::GMPz::Rmpz_init() } 0 .. $#powers;
+        my @R_pool = map { Math::GMPz::Rmpz_init() } 0 .. $#powers;
 
         my @digits = map { bless \$_ } sub {
             my ($A, $k) = @_;
@@ -9766,14 +9766,14 @@ sub digits {
                 $k--;
             }
 
+            my $Q = $Q_pool[$k];
+            my $R = $R_pool[$k];
             Math::GMPz::Rmpz_divmod($Q, $R, $A, $powers[$k]);
 
             my $expected_digits = 1 << $k;
 
-            my $t = Math::GMPz::Rmpz_init_set($Q);
-
             my @right = __SUB__->($R, $k - 1);
-            my @left  = __SUB__->($t, $k - 1);
+            my @left  = __SUB__->($Q, $k - 1);
 
             push @right, (0) x ($expected_digits - scalar(@right));
             (@right, @left);
@@ -10151,14 +10151,26 @@ sub sumdigits {
             return _set_int(List::Util::sum(Math::Prime::Util::GMP::todigits(Math::GMPz::Rmpz_get_str($n, 10), $B)));
         }
 
-        # Find r such that B^(2r - 2) <= A < B^(2r)
-        my $r = (__ilog__($A, $B) >> 1) + 1;
+        # Power Tree Precomputation
+        # Precompute successive squares of the base B up to the magnitude of A.
+        my @powers;
+        my $p = Math::GMPz::Rmpz_init_set_ui($B);
+        while (Math::GMPz::Rmpz_cmp($p, $A) <= 0) {
+            push @powers, $p;
+            my $next_p = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($next_p, $p, $p);
+            $p = $next_p;
+        }
+        push @powers, $p if !@powers;
 
-        state $Q = Math::GMPz::Rmpz_init_nobless();
-        state $R = Math::GMPz::Rmpz_init_nobless();
+        # Preallocated Scratchpad Pool for Zero Tree Allocations
+        # Since the recursion depth matches the number of precomputed powers, we can
+        # instantiate unblessed temporary variables before entering the recursion tree.
+        my @Q_pool = map { Math::GMPz::Rmpz_init() } 0 .. $#powers;
+        my @R_pool = map { Math::GMPz::Rmpz_init() } 0 .. $#powers;
 
         my $total = sub {
-            my ($A, $r) = @_;
+            my ($A, $k) = @_;
 
             # Cut the recursion early
             if (Math::GMPz::Rmpz_fits_ulong_p($A)) {
@@ -10174,16 +10186,18 @@ sub sumdigits {
                 return $sum;
             }
 
-            my $w = ($r + 1) >> 1;
-            my $t = Math::GMPz::Rmpz_init();
+            while ($k > 0 and Math::GMPz::Rmpz_cmp($powers[$k], $A) > 0) {
+                $k--;
+            }
 
-            Math::GMPz::Rmpz_ui_pow_ui($t, $B, $r);
-            Math::GMPz::Rmpz_divmod($Q, $R, $A, $t);
-            Math::GMPz::Rmpz_set($t, $Q);
+            # Map to the specific preallocated scratchpad variables for this depth level
+            my $Q = $Q_pool[$k];
+            my $R = $R_pool[$k];
+            Math::GMPz::Rmpz_divmod($Q, $R, $A, $powers[$k]);
 
-            __SUB__->($R, $w) + __SUB__->($t, $w);
+            __SUB__->($R, $k - 1) + __SUB__->($Q, $k - 1);
           }
-          ->($A, $r);
+          ->($A, $#powers);
 
         ($total < ULONG_MAX)
           && return _set_int($total);
@@ -10191,7 +10205,7 @@ sub sumdigits {
 
     # This algorithm will be used only for very large bases,
     # base > ULONG_MAX, or when the sum of digits exceeds ULONG_MAX.
-    my $m   = Math::GMPz::Rmpz_init();
+    state $m = Math::GMPz::Rmpz_init_nobless();
     my $sum = Math::GMPz::Rmpz_init_set_ui(0);
 
     $n = Math::GMPz::Rmpz_init_set($n);    # copy
