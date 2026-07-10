@@ -31693,7 +31693,7 @@ sub bphi {    # OEIS: A116550 -- bi-unitary analog of Euler's totient
     # Sort to maximize DFS pruning (evaluate largest p^e limits first)
     @choices = sort { Math::Prime::Util::GMP::cmpint($b->[1][0], $a->[1][0]) } @choices;
 
-    my $total_sum = '0';
+    my @terms;
 
     # Depth-First Search closure
     sub {
@@ -31709,10 +31709,10 @@ sub bphi {    # OEIS: A116550 -- bi-unitary analog of Euler's totient
             }
 
             if ($current_w == -1) {
-                $total_sum = Math::Prime::Util::GMP::subint($total_sum, $div);
+                push @terms, "-$div";
             }
             else {
-                $total_sum = Math::Prime::Util::GMP::addint($total_sum, $div);
+                push @terms, $div;
             }
             return;
         }
@@ -31739,6 +31739,7 @@ sub bphi {    # OEIS: A116550 -- bi-unitary analog of Euler's totient
       }
       ->(0, '1', 1);
 
+    my $total_sum = Math::Prime::Util::GMP::vecsum(@terms);
     _set_int($total_sum);
 }
 
