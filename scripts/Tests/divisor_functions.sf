@@ -124,7 +124,7 @@ with([irand(3,10)!, 340282366920938463942989953348216553641, 9297159013149614021
 h3.each {|a,b|
     for k in (0..3) {
         var n = 1e2.irand
-        assert_eq(n.of { .(a)(k) }, n.of { .(b)(k) }.acc)
+        assert_eq(n.of { .(a)(k) }, n.of { .(b)(k) }.acc, "error for #{a} and #{b} with k = #{k}")
     }
 }
 

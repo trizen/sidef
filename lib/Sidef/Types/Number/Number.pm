@@ -9826,29 +9826,65 @@ sub __digits2num__ {
         return $r;
     }
 
-    my @d = map { Math::GMPz::Rmpz_init_set_ui($_) } @D;
-    my $B = Math::GMPz::Rmpz_init_set_ui($base);
-    my $L = \@d;
-
-    for (my $k = $len ; $k > 1 ; $k = ($k >> 1) + ($k & 1)) {
-
-        my @T;
-        for (0 .. ($k >> 1) - 1) {
-            my $t = $L->[2 * $_];
-            Math::GMPz::Rmpz_addmul($t, $L->[2 * $_ + 1], $B);
-            push(@T, $t);
-        }
-
-        push(@T, $L->[-1]) if ($k & 1);
-        $L = \@T;
-        Math::GMPz::Rmpz_mul($B, $B, $B);
+    # Digit Chunking
+    # Find the maximum number of digits (K) that safely pack into a single native unsigned integer.
+    # This prevents creating individual Math::GMPz objects for every single digit.
+    my $K          = 1;
+    my $chunk_base = $base;
+    my $max_val    = CORE::int(ULONG_MAX / $base);
+    while ($chunk_base < $max_val) {
+        $chunk_base *= $base;
+        $K++;
     }
 
-    $L->[0];
+    my @d;
+    my $B;
+    if ($K > 1 and $len > $K) {
+        for (my $i = 0 ; $i < $len ; $i += $K) {
+            my $r     = 0;
+            my $b     = 1;
+            my $limit = $i + $K < $len ? $i + $K : $len;
+            for my $j ($i .. $limit - 1) {
+                $r += $D[$j] * $b;
+                $b *= $base;
+            }
+            push @d, Math::GMPz::Rmpz_init_set_ui($r);
+        }
+        $B = Math::GMPz::Rmpz_init_set_ui($chunk_base);
+    }
+    else {
+        @d = map { Math::GMPz::Rmpz_init_set_ui($_) } @D;
+        $B = Math::GMPz::Rmpz_init_set_ui($base);
+    }
+
+    # Subquadratic Algorithm 1.25 FastIntegerInput from "Modern Computer Arithmetic v0.5.9"
+
+    my $L = \@d;
+    my $T = [];
+    my $k = scalar(@$L);
+
+    while ($k > 1) {
+        @$T = ();
+        my $limit = ($k >> 1) - 1;
+        for my $i (0 .. $limit) {
+            my $t = $L->[2 * $i];
+            Math::GMPz::Rmpz_addmul($t, $L->[2 * $i + 1], $B);
+            push(@$T, $t);
+        }
+
+        push(@$T, $L->[-1]) if ($k & 1);
+        ($L, $T) = ($T, $L);
+        $k = ($k >> 1) + ($k & 1);
+        Math::GMPz::Rmpz_mul($B, $B, $B) if $k > 1;
+    }
+
+    return $L->[0];
 }
 
 sub digits2num {
     my ($base, $D) = @_;
+
+    # Subquadratic Algorithm 1.25 FastIntegerInput from "Modern Computer Arithmetic v0.5.9"
 
     my @digits = @$D;
     @digits || return ZERO;
@@ -9915,19 +9951,27 @@ sub digits2num {
 
         my $B = Math::GMPz::Rmpz_init_set($base);
 
-        # Subquadratic Algorithm 1.25 FastIntegerInput from "Modern Computer Arithmetic v0.5.9"
-        for (my $k = scalar(@digits) ; $k > 1 ; $k = ($k >> 1) + ($k & 1)) {
+        # Selective In-Place Modification & Buffer Reuse
+        # Elements are only cloned on the first pass to avoid mutating the user's input.
+        # Subsequent iterations safely reuse scratchpad intermediate objects, saving ~50% of allocations.
+        my $T          = [];
+        my $k          = scalar(@digits);
+        my $first_pass = 1;
 
-            my @T;
-            for (0 .. ($k >> 1) - 1) {
-                my $t = Math::GMPz::Rmpz_init_set($L->[2 * $_]);
-                Math::GMPz::Rmpz_addmul($t, $L->[2 * $_ + 1], $B);
-                push(@T, $t);
+        while ($k > 1) {
+            @$T = ();
+            my $limit = ($k >> 1) - 1;
+            for my $i (0 .. $limit) {
+                my $t = $first_pass ? Math::GMPz::Rmpz_init_set($L->[2 * $i]) : $L->[2 * $i];
+                Math::GMPz::Rmpz_addmul($t, $L->[2 * $i + 1], $B);
+                push(@$T, $t);
             }
 
-            push(@T, $L->[-1]) if ($k & 1);
-            $L = \@T;
-            Math::GMPz::Rmpz_mul($B, $B, $B);
+            push(@$T, $L->[-1]) if ($k & 1);
+            ($L, $T) = ($T, $L);
+            $k          = ($k >> 1) + ($k & 1);
+            $first_pass = 0;
+            Math::GMPz::Rmpz_mul($B, $B, $B) if $k > 1;
         }
 
         return bless \($L->[0]);
@@ -9935,17 +9979,19 @@ sub digits2num {
 
     my $B = $base;
 
-    # Subquadratic Algorithm 1.25 FastIntegerInput from "Modern Computer Arithmetic v0.5.9"
-    for (my $k = scalar(@digits) ; $k > 1 ; $k = ($k >> 1) + ($k & 1)) {
-
-        my @T;
-        for (0 .. ($k >> 1) - 1) {
-            push(@T, __add__($L->[2 * $_], __mul__($B, $L->[2 * $_ + 1])));
+    my $T = [];
+    my $k = scalar(@digits);
+    while ($k > 1) {
+        @$T = ();
+        my $limit = ($k >> 1) - 1;
+        for my $i (0 .. $limit) {
+            push(@$T, __add__($L->[2 * $i], __mul__($B, $L->[2 * $i + 1])));
         }
 
-        push(@T, $L->[-1]) if ($k & 1);
-        $L = \@T;
-        $B = __mul__($B, $B);
+        push(@$T, $L->[-1]) if ($k & 1);
+        ($L, $T) = ($T, $L);
+        $k = ($k >> 1) + ($k & 1);
+        $B = __mul__($B, $B) if $k > 1;
     }
 
     bless \($L->[0]);
@@ -13086,7 +13132,9 @@ sub __lucasUVmod__ {
 
     Math::GMPz::Rmpz_div_2exp($t, $n, $s + 1);
 
-    foreach my $bit (split(//, Math::GMPz::Rmpz_get_str($t, 2))) {
+    my $nbits = Math::GMPz::Rmpz_sizeinbase($t, 2);
+    for (my $i = $nbits - 1 ; $i >= 0 ; $i--) {
+        my $bit = Math::GMPz::Rmpz_tstbit($t, $i);
 
         Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
         Math::GMPz::Rmpz_mod($Q1, $Q1, $m);
@@ -13146,7 +13194,9 @@ sub __lucasVmod__ {
     my ($V1, $V2) = (Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set($P));
     my ($Q1, $Q2) = (Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(1));
 
-    foreach my $bit (split(//, Math::GMPz::Rmpz_get_str($n, 2))) {
+    my $nbits = Math::GMPz::Rmpz_sizeinbase($n, 2);
+    for (my $i = $nbits - 1 ; $i >= 0 ; $i--) {
+        my $bit = Math::GMPz::Rmpz_tstbit($n, $i);
 
         Math::GMPz::Rmpz_mul($Q1, $Q1, $Q2);
         Math::GMPz::Rmpz_mod($Q1, $Q1, $m);
@@ -27941,14 +27991,14 @@ sub partitions {
         my ($n, $max_part) = @_;
 
         if ($n == 0) {
-            unshift @results, _array([@path]);
+            unshift @results, _array([map { bless \$_ } @path]);
             return;
         }
 
         my $upper = ($n < $max_part ? $n : $max_part);
 
         for my $part (1 .. $upper) {
-            push @path, bless \$part;
+            push @path, $part;
             __SUB__->($n - $part, $part);
             pop @path;    # backtrack
         }
@@ -31328,7 +31378,7 @@ sub nuphi {    # OEIS: A254503 (Generalized for k)
         }
         elsif ($e == 1) {
             Math::GMPz::Rmpz_set_str($t, "$p", 10);
-            Math::GMPz::Rmpz_pow_ui($t, $t, $k) if $k > 1;
+            Math::GMPz::Rmpz_pow_ui($t, $t, $k);
         }
         else {
             Math::GMPz::Rmpz_set_str($u, "$p", 10);
