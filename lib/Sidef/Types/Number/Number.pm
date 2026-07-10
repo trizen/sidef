@@ -33334,9 +33334,8 @@ sub _sieve_powerful {
                 if ($from > $m) {
                     my $t =
                       HAS_PRIME_UTIL
-                      ? Math::Prime::Util::divint($from, $m)
-                      : Math::Prime::Util::GMP::divint($from, $m);
-                    $t++ if ($from % $m != 0);
+                      ? Math::Prime::Util::cdivint($from, $m)
+                      : Math::Prime::Util::GMP::cdivint($from, $m);
                     $lo = Math::Prime::Util::rootint($t, $r);
                     $lo++
                       if (
