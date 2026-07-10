@@ -6580,11 +6580,10 @@ sub _fubini_numbers {
         Math::GMPz::Rmpz_set_ui($row->[0], 0);
 
         # Sum the current row to get the i-th Fubini number
-        my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+        my $sum = ($F->[$i] = Math::GMPz::Rmpz_init_set_ui(0));
         foreach my $k (1 .. $i) {
             Math::GMPz::Rmpz_add($sum, $sum, $row->[$k]);
         }
-        $F->[$i] = $sum;
     }
 
     return $F;
@@ -14007,7 +14006,7 @@ sub fibonacci {
     if (defined($k)) {
         _valid(\$k);
 
-        $k = _any2ui($$k) // (goto &nan);
+        $k = (_any2ui($$k) // (goto &nan)) || return ONE;
 
         if ($k == 2) {
             my $z = Math::GMPz::Rmpz_init();
@@ -14019,42 +14018,15 @@ sub fibonacci {
             return ZERO;
         }
 
-        state $crosspoints = {
-                              3  => 6144,
-                              4  => 14911,
-                              5  => 32767,
-                              6  => 65535,
-                              7  => 98304,
-                              8  => 196607,
-                              9  => 339967,
-                              10 => 465843,
-                              11 => 729595,
-                             };
+        my $limit = CORE::int(3 * ($k**3) * CORE::log($k) / CORE::log(2));
 
-        if ($n >= 1e6 and !exists($crosspoints->{$k}) and $k <= 50) {
-
-            my $w = 0.0834627296565757;
-            my $x = 1.07324642799115;
-            my $y = 6.39808475499695;
-            my $z = -6.14170531832506;
-
-            my ($f1, $f2, $f3, $f4) = (@{$crosspoints}{qw(3 4 5 6)});
-
-            for (1 .. ($k - 6)) {
-                ($f1, $f2, $f3, $f4) = ($f2, $f3, $f4, $f1 * $z + $f2 * $y + $f3 * $x + $f4 * $w);
-            }
-
-            $crosspoints->{$k} = CORE::abs(CORE::int($f4));
-        }
-
-        # Use a sublinear algorithm, when it's faster, with time-complexity based on k.
-        if (exists($crosspoints->{$k}) and $n > $crosspoints->{$k}) {
+        if ($n > $limit) {
             return Sidef::Math::Math->linear_rec(_array([(ONE) x $k]), _array([(ZERO) x ($k - 1), ONE]), (bless \$n));
         }
 
         # Algorithm due to M. F. Hasler, running in linear time with respect to n.
         # From: https://oeis.org/A302990
-
+        my $K = $k + 1;
         my @f = map {
             ($_ < $k)
               ? do {
@@ -14063,16 +14035,25 @@ sub fibonacci {
                 $z;
               }
               : Math::GMPz::Rmpz_init_set_ui(1)
-        } 1 .. ($k + 1);
+        } 1 .. $K;
 
-        my $t = Math::GMPz::Rmpz_init();
+        state $t = Math::GMPz::Rmpz_init_nobless();
 
-        foreach my $i (2 * ++$k - 2 .. $n) {
-            Math::GMPz::Rmpz_mul_2exp($t, $f[($i - 1) % $k], 1);
-            Math::GMPz::Rmpz_sub($f[$i % $k], $t, $f[$i % $k]);
+        my $start = 2 * $K - 2;
+        my $curr  = $start % $K;
+        my $prev  = ($curr == 0) ? $K - 1 : $curr - 1;
+
+        for my $i ($start .. $n) {
+            Math::GMPz::Rmpz_mul_2exp($t, $f[$prev], 1);
+            Math::GMPz::Rmpz_sub($f[$curr], $t, $f[$curr]);
+
+            $prev = $curr;
+            if (++$curr == $K) {
+                $curr = 0;
+            }
         }
 
-        my $r = $f[$n % $k];
+        my $r = $f[$n % $K];
         return bless \$r;
     }
 
