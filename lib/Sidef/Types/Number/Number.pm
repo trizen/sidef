@@ -1507,7 +1507,7 @@ sub _primorial_trial_factor {
         return ($r, @prime_factors);
     }
 
-    return ($n);
+    return Math::GMPz::Rmpz_init_set($n);
 }
 
 sub _adaptive_trial_factor {
@@ -37358,7 +37358,7 @@ sub is_rough {
     state $g = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_gcd($g, $n, $B);
 
-    (Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) ? return $FALSE : return $TRUE;
+    return ((Math::GMPz::Rmpz_cmp_ui($g, 1) > 0) ? $FALSE : $TRUE);
 }
 
 sub smooth_count {
@@ -38295,10 +38295,12 @@ sub is_powerful {
                     return $FALSE;
                 }
                 if ($k > 2) {
-                    my $v =
-                      HAS_PRIME_UTIL
-                      ? Math::Prime::Util::valuation($n, $p)
-                      : Math::Prime::Util::GMP::valuation($n, $p);
+                    my $v    = 2;
+                    my $temp = CORE::int($n / ($p * $p));
+                    while ($temp % $p == 0) {
+                        $v++;
+                        $temp = CORE::int($temp / $p);
+                    }
                     if ($v < $k) {
                         return $FALSE;
                     }
@@ -38318,34 +38320,58 @@ sub is_powerful {
     Math::GMPz::Rmpz_sgn($n) > 0
       or return $FALSE;
 
-    Math::GMPz::Rmpz_divisible_2exp_p($n, 1)
-      and !Math::GMPz::Rmpz_divisible_2exp_p($n, $k)
-      and return $FALSE;
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    state $u = Math::GMPz::Rmpz_init_nobless();
 
-    foreach my $p (3, 5, 7, 11, 13) {
-        Math::GMPz::Rmpz_divisible_ui_p($n, $p)
-          and !Math::GMPz::Rmpz_divisible_ui_p($n, $p * $p)
-          and return $FALSE;
+    Math::GMPz::Rmpz_set($t, $n);
+
+    my $v2 = Math::GMPz::Rmpz_scan1($t, 0);
+    if ($v2 > 0) {
+        $v2 < $k and return $FALSE;
+        Math::GMPz::Rmpz_tdiv_q_2exp($t, $t, $v2);
     }
 
-    state $t = Math::GMPz::Rmpz_init_nobless();
-    Math::GMPz::Rmpz_root($t, $n, 2 * $k + 1);
+    foreach my $p (3, 5, 7, 11, 13) {
+        if (Math::GMPz::Rmpz_divisible_ui_p($t, $p)) {
+            Math::GMPz::Rmpz_set_ui($u, $p);
+            my $v = Math::GMPz::Rmpz_remove($t, $t, $u);
+            $v < $k and return $FALSE;
+        }
+    }
+
+    if (Math::GMPz::Rmpz_cmp_ui($t, 1) == 0) {
+        return $TRUE;
+    }
+
+    Math::GMPz::Rmpz_root($u, $t, 2 * $k + 1);
 
     my $trial_limit = 1e6;
-    if (Math::GMPz::Rmpz_fits_ulong_p($t)) {
-        $trial_limit = Math::GMPz::Rmpz_get_ui($t);
-        $trial_limit = 10**(1 + CORE::int(CORE::log($trial_limit) / CORE::log(10)));
+    if (Math::GMPz::Rmpz_fits_ulong_p($u)) {
+        $trial_limit = Math::GMPz::Rmpz_get_ui($u);
+        $trial_limit = 10**CORE::length(CORE::int($trial_limit));
         $trial_limit = 1e2 if ($trial_limit < 1e2);
         $trial_limit = 1e6 if ($trial_limit > 1e6);
     }
 
-    my ($rem, @f) = _primorial_trial_factor($n, $trial_limit);
+    my ($rem, @f) = _primorial_trial_factor($t, $trial_limit);
 
-    my %factors;
-    ++$factors{$_} for @f;
+    if (@f) {
+        my $current_factor = $f[0];
+        my $count          = 0;
 
-    foreach my $e (values %factors) {
-        $e < $k and return $FALSE;
+        foreach my $factor (@f) {
+            if ($factor == $current_factor) {
+                $count++;
+            }
+            else {
+                $count < $k and return $FALSE;
+                $current_factor = $factor;
+                $count          = 1;
+            }
+        }
+
+        # Catch the final block's count
+        $count < $k and return $FALSE;
     }
 
     if (Math::GMPz::Rmpz_cmp_ui($rem, 1) == 0) {
