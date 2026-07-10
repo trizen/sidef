@@ -7,6 +7,8 @@ var h = Hash(
     prime_divisors => 'prime_sigma',
     prime_power_divisors => 'prime_power_sigma',
 
+    antidivisors => 'antidivisor_sigma',
+
     square_divisors => 'square_sigma',
     cube_divisors => 'cube_sigma',
 
@@ -379,8 +381,23 @@ do {    # infinitary divisors
     )
 
     assert_eq(
+        30.of { .antidivisors.sum { .pow(2) } },
+        30.of { .antidivisor_sum(2) },
+    )
+
+    assert_eq(
+        30.of { .antidivisors.sum { .pow(-5) } },
+        30.of { .antidivisor_sum(-5) },
+    )
+
+    assert_eq(
         30.of { .antidivisors.len },
         30.of { .antidivisor_count },
+    )
+
+    assert_eq(
+        30.of { .antidivisors.len },
+        30.of { .antidivisor_sigma(0) },
     )
 }
 
