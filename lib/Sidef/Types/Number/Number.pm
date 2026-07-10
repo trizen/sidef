@@ -13924,9 +13924,12 @@ sub fibonaccimod {
             $k = 1;
         }
 
-        if (    1e3 * $k * $k < ULONG_MAX
+        # Asymptotic crossover limit based on k^2 * log_2(k)
+        my $limit = ($k == 1) ? 1000 : CORE::int(4 * $k * $k * CORE::log($k) / CORE::log(2));
+
+        if (    $limit < ULONG_MAX
             and Math::GMPz::Rmpz_fits_ulong_p($n)
-            and Math::GMPz::Rmpz_cmp_ui($n, 1e3 * $k * $k) <= 0) {
+            and Math::GMPz::Rmpz_cmp_ui($n, $limit) <= 0) {
 
             $n = Math::GMPz::Rmpz_get_ui($n);
 
@@ -13937,6 +13940,7 @@ sub fibonaccimod {
             # Algorithm due to M. F. Hasler, running in linear time with respect to n.
             # From: https://oeis.org/A302990
 
+            my $K = $k + 1;
             my @f = map {
                 ($_ < $k)
                   ? do {
@@ -13945,17 +13949,26 @@ sub fibonaccimod {
                     $z;
                   }
                   : Math::GMPz::Rmpz_init_set_ui(1)
-            } 1 .. ($k + 1);
+            } 1 .. $K;
 
-            my $t = Math::GMPz::Rmpz_init();
+            state $t = Math::GMPz::Rmpz_init_nobless();
 
-            foreach my $i (2 * ++$k - 2 .. $n) {
-                Math::GMPz::Rmpz_mul_2exp($t, $f[($i - 1) % $k], 1);
-                Math::GMPz::Rmpz_sub($f[$i % $k], $t, $f[$i % $k]);
-                Math::GMPz::Rmpz_mod($f[$i % $k], $f[$i % $k], $m);
+            my $start = 2 * $K - 2;
+            my $curr  = $start % $K;
+            my $prev  = ($curr == 0) ? $K - 1 : $curr - 1;
+
+            for my $i ($start .. $n) {
+                Math::GMPz::Rmpz_mul_2exp($t, $f[$prev], 1);
+                Math::GMPz::Rmpz_sub($f[$curr], $t, $f[$curr]);
+                Math::GMPz::Rmpz_mod($f[$curr], $f[$curr], $m);
+
+                $prev = $curr;
+                if (++$curr == $K) {
+                    $curr = 0;
+                }
             }
 
-            my $r = $f[$n % $k];
+            my $r = $f[$n % $K];
             return bless \$r;
         }
 
