@@ -30321,9 +30321,6 @@ sub bigomega {
         if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
             $r = Math::Prime::Util::prime_bigomega($n);
         }
-        elsif (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-            $r = scalar Math::Prime::Util::factor($n);
-        }
         else {
             my @factors = _factor($n);
             $r = scalar @factors;
@@ -30442,9 +30439,6 @@ sub omega {
         my $r;
         if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
             $r = Math::Prime::Util::prime_omega($n);
-        }
-        elsif (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-            $r = scalar Math::Prime::Util::factor_exp($n);
         }
         else {
             $r = scalar _factor_exp($n);
@@ -32268,7 +32262,7 @@ sub powerfree_sigma {
         }
         else {
             Math::GMPz::Rmpz_set_str($t, $p, 10);
-            Math::GMPz::Rmpz_pow_ui($t, $t, $j);
+            Math::GMPz::Rmpz_pow_ui($t, $t, $j) if ($j > 1);
         }
 
         Math::GMPz::Rmpz_pow_ui($u, $t, $e + 1);
@@ -36476,17 +36470,6 @@ sub _sieve_squarefree {
            Math::GMPz::Rmpz_get_ui($from),
            Math::GMPz::Rmpz_get_ui($to)
         );
-    }
-    elsif (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($to)) {
-
-        $from = Math::GMPz::Rmpz_get_ui($from);
-        $to   = Math::GMPz::Rmpz_get_ui($to);
-
-        my @mu = Math::Prime::Util::moebius($from, $to);
-        for (my $i = -1 ; $from < $to ; ++$from) {
-            push(@squarefree, $from) if $mu[++$i];
-        }
-        push(@squarefree, $to) if $mu[-1];
     }
     else {
 
