@@ -46,6 +46,9 @@ state $MPC_VERSION = Math::MPC::MPC_VERSION();
 state $TRUE  = Sidef::Types::Bool::Bool::TRUE;
 state $FALSE = Sidef::Types::Bool::Bool::FALSE;
 
+my %FACTOR_EXP_CACHE;
+my @FACTOR_EXP_QUEUE;
+
 my %PRIMEPI_LOOKUP;    # lookup table for prime_count()
 my @SMALL_PRIMES_20 = (3, 5, 7, 11, 13, 17, 19);
 
@@ -119,6 +122,8 @@ use constant {
     SIEVE_INLINE_MAX => 1e7,                                                                  # use GMP::sieve_primes directly up to this diff
     SIEVE_UTIL_MAX   => 1e8,                                                                  # hand off to Math::Prime::Util up to this diff
     NAIVE_LOOP_MAX   => 1000,                                                                 # walk primes one-by-one for deltas this small
+
+    FACTOR_EXP_CACHE_SIZE => 100,
 };
 
 if (HAS_PRIME_UTIL) {
@@ -1075,6 +1080,10 @@ sub _is_prob_prime {
 
     $n = _normalize_numeric_type($n);
 
+    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+        return Math::Prime::Util::is_prime($n);
+    }
+
     state %internal_cache;
     state $internal_cache_size = 0;
 
@@ -1347,26 +1356,43 @@ sub _factor_exp {
 
     $n = _normalize_numeric_type($n);
 
+    # Fast cache return
+    if (my $cached = $FACTOR_EXP_CACHE{$n}) {
+        return @$cached;
+    }
+
+    my @factor_exp;
     if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-        return Math::Prime::Util::factor_exp($n);
+        @factor_exp = Math::Prime::Util::factor_exp($n);
+    }
+    else {
+
+        my @factors    = _factor($n);
+        my $prev_value = shift(@factors) // return;
+
+        my $current_pair = [$prev_value, 1];
+        @factor_exp = ($current_pair);
+
+        foreach my $curr_value (@factors) {
+            if ($curr_value eq $prev_value) {
+                $current_pair->[1]++;    # Direct reference modification
+            }
+            else {
+                $current_pair = [$curr_value, 1];
+                push(@factor_exp, $current_pair);
+                $prev_value = $curr_value;
+            }
+        }
     }
 
-    my @factors = _factor($n);
-
-    my $prev_value = shift(@factors) // return;
-    my @factor_exp = [$prev_value, 1];
-
-    foreach my $curr_value (@factors) {
-        if ($curr_value eq $prev_value) {
-            ++$factor_exp[-1][1];
-        }
-        else {
-            CORE::push(@factor_exp, [$curr_value, 1]);
-        }
-        $prev_value = $curr_value;
+    # LRU Cache management
+    if (@FACTOR_EXP_QUEUE >= FACTOR_EXP_CACHE_SIZE) {
+        delete $FACTOR_EXP_CACHE{shift @FACTOR_EXP_QUEUE};
     }
+    push @FACTOR_EXP_QUEUE, $n;
+    $FACTOR_EXP_CACHE{$n} = \@factor_exp;
 
-    @factor_exp;
+    return @factor_exp;
 }
 
 sub _divisors {
@@ -1389,7 +1415,7 @@ sub _primes {
     my ($lo, $hi) = @_;
 
     if (HAS_PRIME_UTIL and $hi < ULONG_MAX) {
-        return Math::Prime::Util::primes("$lo", "$hi");
+        return Math::Prime::Util::primes($lo, $hi);
     }
 
     [Math::Prime::Util::GMP::sieve_primes("$lo", "$hi")];
@@ -1442,11 +1468,9 @@ sub _is_squarefree {
     $n = _normalize_numeric_type($n);
 
     if (CORE::length($n) >= SPECIAL_FACTORS_MIN) {
-        my @factors = _factor($n);
-        my %seen;
-        foreach my $f (@factors) {
-            if ($seen{$f}++) {
-                return 0;
+        foreach my $pp (_factor_exp($n)) {
+            if ($pp->[1] > 1) {
+                return;
             }
         }
         return 1;
@@ -7749,6 +7773,12 @@ sub icmp {
 sub cmp {
     my ($x, $y) = @_;
 
+    # Fast path for native scalar comparisons
+    if (!ref($$x) && ref($y) eq __PACKAGE__ && !ref($$y)) {
+        my $c = $$x <=> $$y;
+        return !$c ? ZERO : ($c > 0) ? ONE : MONE;
+    }
+
     ref($y) ne __PACKAGE__
       and return do {
         ($y->cmp($x) // return undef)->neg;
@@ -12777,6 +12807,17 @@ sub lnhyperfactorial {
 sub factorial {
     my ($n) = @_;
     $n = _any2ui($$n) // goto &nan;
+
+    state @FAC_CACHE;
+    if ($n <= 2000) {
+        return $FAC_CACHE[$n] //= do {
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_fac_ui($r, $n);
+            $r = Math::GMPz::Rmpz_get_ui($r) if ($n <= ((INTSIZE <= 32) ? 12 : 20));
+            bless \$r, __PACKAGE__;
+        };
+    }
+
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_fac_ui($r, $n);
     $r = Math::GMPz::Rmpz_get_ui($r) if ($n <= ((INTSIZE <= 32) ? 12 : 20));
@@ -14110,6 +14151,15 @@ sub fibonacci {
 
         my $r = $f[$n % $K];
         return bless \$r;
+    }
+
+    state @FIB_CACHE;
+    if ($n <= 5000) {
+        return $FIB_CACHE[$n] //= do {
+            my $z = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_fib_ui($z, $n);
+            bless \$z, __PACKAGE__;
+        };
     }
 
     my $z = Math::GMPz::Rmpz_init();
@@ -17435,7 +17485,7 @@ sub _prime_count {
     # Fast path 2: exact match in the precomputed lookup
     # ----------------------------------------------------------------
     if ($x eq '2') {
-        if (defined(my $val = $primepi_lookup->{"$y"})) {
+        if (defined(my $val = $primepi_lookup->{$y})) {
             return $val;
         }
     }
