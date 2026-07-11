@@ -856,7 +856,7 @@ sub _get_slong {
 #
 sub _any2ui {
     my ($x) = @_;
-    goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
         return (($x < 0) ? undef : $x);
@@ -913,7 +913,7 @@ sub _any2ui {
 #
 sub _any2si {
     my ($x) = @_;
-    goto((ref($x) || return $x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x) || return $x});
 
   Math_GMPz: {
 
@@ -1647,7 +1647,7 @@ sub _generic_each {
 
 sub __boolify__ {
     my ($x) = @_;
-    goto((ref($x) || return !!$x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x) || return !!$x});
 
   Math_MPFR: {
         return !!Math::MPFR::Rmpfr_sgn($x);
@@ -1673,7 +1673,7 @@ sub __boolify__ {
 
 sub __numify__ {
     my ($x) = @_;
-    goto((ref($x) || return $x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x) || return $x});
 
   Math_GMPz: {
 
@@ -1727,7 +1727,7 @@ sub numify {
 
 sub __stringify__ {
     my ($x) = @_;
-    goto((ref($x) || return $x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x) || return $x});
 
   Math_GMPz: {
         return Math::GMPz::Rmpz_get_str($x, 10);
@@ -2033,8 +2033,7 @@ sub pair {
 
 sub __norm__ {
     my ($x) = @_;
-
-    goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
         my $r = $x * $x;
@@ -3801,7 +3800,7 @@ sub idiv_round {
 sub __neg__ {
     my ($x) = @_;
 
-    goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
         my $r = -$x;
@@ -3855,7 +3854,7 @@ sub ineg {
 
 sub __abs__ {
     my ($x) = @_;
-    goto((ref($x) || return CORE::abs($x)) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x) || return CORE::abs($x)});
 
   Math_GMPz: {
         Math::GMPz::Rmpz_sgn($x) >= 0 and return $x;
@@ -3900,7 +3899,7 @@ sub iabs {
 sub __inv__ {
     my ($x) = @_;
 
-    goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
         CORE::abs($x) == 1 and return $x;
@@ -3972,7 +3971,7 @@ sub cube {
 sub __sqrt__ {
     my ($x) = @_;
 
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
@@ -4008,7 +4007,7 @@ sub sqrtQ {
 sub __cbrt__ {
     my ($x) = @_;
 
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
@@ -4579,7 +4578,7 @@ sub ipow10 {
 sub __log2__ {
     my ($x) = @_;
 
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
@@ -4613,7 +4612,7 @@ sub __log2__ {
 sub __log10__ {
     my ($x) = @_;
 
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
@@ -4649,7 +4648,7 @@ sub __log10__ {
 sub __log__ {
     my ($x) = @_;
 
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
     #
     ## MPFR
@@ -4911,7 +4910,7 @@ sub __lgrt__ {
     my $p = Math::MPFR::Rmpfr_init2($PREC);
     Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
 
-    goto(ref($c) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($c)});
 
   Math_MPFR: {
 
@@ -4996,7 +4995,7 @@ sub __LambertW__ {
     my $p = Math::MPFR::Rmpfr_init2($PREC);
     Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
 
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
@@ -5072,7 +5071,7 @@ sub lambert_w {
 
 sub __exp__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5114,7 +5113,7 @@ sub exp10 {
 
 sub __sin__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5136,7 +5135,7 @@ sub sin {
 
 sub __sinh__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5158,7 +5157,7 @@ sub sinh {
 
 sub __asin__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
@@ -5191,7 +5190,7 @@ sub asin {
 
 sub __asinh__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5219,7 +5218,7 @@ sub asinh {
 
 sub __cos__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5241,7 +5240,7 @@ sub cos {
 
 sub __cosh__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5263,7 +5262,7 @@ sub cosh {
 
 sub __acos__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
@@ -5296,7 +5295,7 @@ sub acos {
 
 sub __acosh__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
@@ -5332,7 +5331,7 @@ sub acosh {
 
 sub __tan__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5354,7 +5353,7 @@ sub tan {
 
 sub __tanh__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5376,7 +5375,7 @@ sub tanh {
 
 sub __atan__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5400,7 +5399,7 @@ sub atan {
 
 sub __atanh__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
@@ -5496,7 +5495,7 @@ sub arg {
 
 sub __sec__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5522,7 +5521,7 @@ sub sec {
 
 sub __sech__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5548,7 +5547,7 @@ sub sech {
 
 sub __asec__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
     # asec(x) = acos(1/x)
   Math_MPFR: {
@@ -5585,7 +5584,7 @@ sub asec {
 
 sub __asech__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
     # asech(x) = acosh(1/x)
   Math_MPFR: {
@@ -5626,7 +5625,7 @@ sub asech {
 
 sub __csc__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5652,7 +5651,7 @@ sub csc {
 
 sub __csch__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5678,7 +5677,7 @@ sub csch {
 
 sub __acsc__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
     # acsc(x) = asin(1/x)
   Math_MPFR: {
@@ -5715,7 +5714,7 @@ sub acsc {
 
 sub __acsch__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
     # acsch(x) = asinh(1/x)
   Math_MPFR: {
@@ -5748,7 +5747,7 @@ sub acsch {
 
 sub __cot__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5774,7 +5773,7 @@ sub cot {
 
 sub __coth__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5800,7 +5799,7 @@ sub coth {
 
 sub __acot__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
     # acot(x) = atan(1/x)
   Math_MPFR: {
@@ -5829,7 +5828,7 @@ sub acot {
 
 sub __acoth__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
     # acoth(x) = atanh(1/x)
   Math_MPFR: {
@@ -5866,7 +5865,7 @@ sub acoth {
 
 sub __cis__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
@@ -5919,7 +5918,7 @@ sub roots_of_unity {
 
 sub __sin_cos__ {
     my ($x) = @_;
-    goto(ref($x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
         my $cos = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -7790,7 +7789,7 @@ sub is_negative {
 
 sub __sgn__ {
     my ($x) = @_;
-    goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
         return 1  if ($x > 0);
@@ -8279,7 +8278,7 @@ sub as_int {
 
 sub __base__ {
     my ($x, $base) = @_;
-    goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
         $x = _any2mpz($x, 0);
@@ -8379,7 +8378,7 @@ sub as_cfrac {
     $x = $$x;
     $n = defined($n) ? do { _valid(\$n); _any2ui($$n) // 0 } : ($p >> 1);
 
-    goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Math_GMPq: {
         my @cfrac;
@@ -10341,7 +10340,7 @@ sub length {
 
 sub __floor__ {
     my ($x) = @_;
-    goto((ref($x) || return $x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x) || return $x});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -10395,7 +10394,7 @@ sub floor {
 
 sub __ceil__ {
     my ($x) = @_;
-    goto((ref($x) || return $x) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x) || return $x});
 
   Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -10451,7 +10450,7 @@ sub ceil {
 
 sub __inc__ {
     my ($x) = @_;
-    goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
         my $r = $x + 1;
@@ -10498,7 +10497,7 @@ sub inc {
 
 sub __dec__ {
     my ($x) = @_;
-    goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
         my $r = $x - 1;
@@ -39656,7 +39655,7 @@ sub chr {
 sub __round__ {
     my ($x, $prec) = @_;
 
-    goto((ref($x) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
         $x = _any2mpz($x);
