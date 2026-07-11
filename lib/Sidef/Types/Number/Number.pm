@@ -49,6 +49,14 @@ state $FALSE = Sidef::Types::Bool::Bool::FALSE;
 my %PRIMEPI_LOOKUP;    # lookup table for prime_count()
 my @SMALL_PRIMES_20 = (3, 5, 7, 11, 13, 17, 19);
 
+my %DISPATCH_TAG = (
+                    ''           => 'Scalar',
+                    'Math::GMPz' => 'Math_GMPz',
+                    'Math::GMPq' => 'Math_GMPq',
+                    'Math::MPFR' => 'Math_MPFR',
+                    'Math::MPC'  => 'Math_MPC',
+                   );
+
 my %NUMBER_CLASSES = (
                       'Sidef::Types::Number::Mod'           => 1,
                       'Sidef::Types::Number::Gauss'         => 1,
@@ -2265,7 +2273,7 @@ sub ninf {
 sub __add__ {
     my ($x, $y) = @_;
 
-    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
     #
     ## Scalar
@@ -2469,7 +2477,7 @@ sub add {
 sub __sub__ {
     my ($x, $y) = @_;
 
-    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
   Scalar__Scalar: {
         my $r = $x - $y;
@@ -2704,7 +2712,7 @@ sub sub {
 sub __mul__ {
     my ($x, $y) = @_;
 
-    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
     #
     ## Scalar
@@ -2909,7 +2917,7 @@ sub mul {
 sub __div__ {
     my ($x, $y) = @_;
 
-    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
     #
     ## Scalar
@@ -4201,7 +4209,7 @@ sub irootrem {
 sub __pow__ {
     my ($x, $y) = @_;
 
-    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
     #
     ## Scalar
@@ -5425,7 +5433,7 @@ sub atanh {
 
 sub __atan2__ {
     my ($x, $y) = @_;
-    goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
   Math_MPFR__Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -5944,7 +5952,7 @@ sub sin_cos {
 
 sub __agm__ {
     my ($x, $y) = @_;
-    goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
   Math_MPFR__Math_MPFR: {
         if (   Math::MPFR::Rmpfr_sgn($x) < 0
@@ -6025,7 +6033,7 @@ sub __hypot__ {
 
     # hypot(x, y) = sqrt(x^2 + y^2)
 
-    goto(join('__', ref($x), ref($y)) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
   Math_MPFR__Math_MPFR: {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -7112,7 +7120,7 @@ sub li2 {
 sub __eq__ {
     my ($x, $y) = @_;
 
-    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
     #
     ## Scalar
@@ -7288,7 +7296,7 @@ sub eq {
 sub __ne__ {
     my ($x, $y) = @_;
 
-    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
     #
     ## Scalar
@@ -7530,7 +7538,7 @@ sub approx_ne {
 sub __cmp__ {
     my ($x, $y) = @_;
 
-    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
     #
     ## Scalar
@@ -10537,7 +10545,7 @@ sub dec {
 
 sub __mod__ {
     my ($x, $y) = @_;
-    goto(join('__', ref($x) || 'Scalar', ref($y) || 'Scalar') =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($x)} . '__' . $DISPATCH_TAG{ref($y)});
 
     #
     ## Scalar
@@ -39170,7 +39178,7 @@ sub polygonal_inverse {
 
 sub __polygonal_root__ {
     my ($n, $k, $second) = @_;
-    goto(join('__', ref($n), ref($k)) =~ tr/:/_/rs);
+    goto($DISPATCH_TAG{ref($n)} . '__' . $DISPATCH_TAG{ref($k)});
 
     # polygonal_root(n, k)
     #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
