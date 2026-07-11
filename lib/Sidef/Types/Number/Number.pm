@@ -2293,6 +2293,7 @@ sub __add__ {
     }
 
   Math_GMPz__Scalar: {
+        $y || return Math::GMPz::Rmpz_init_set($x);
         my $r = Math::GMPz::Rmpz_init();
         ($y < 0)
           ? Math::GMPz::Rmpz_sub_ui($r, $x, -$y)
@@ -2302,6 +2303,8 @@ sub __add__ {
     }
 
   Math_GMPq__Scalar: {
+
+        # $y || return $x;
         my $r = Math::GMPq::Rmpq_init();
         ($y < 0)
           ? Math::GMPq::Rmpq_set_si($r, $y, 1)
@@ -2311,6 +2314,8 @@ sub __add__ {
     }
 
   Math_MPFR__Scalar: {
+
+        # $y || return $x;
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         ($y < 0)
           ? Math::MPFR::Rmpfr_sub_ui($r, $x, -$y, $ROUND)
@@ -2319,6 +2324,8 @@ sub __add__ {
     }
 
   Math_MPC__Scalar: {
+
+        # $y || return $x;
         my $r = Math::MPC::Rmpc_init2($PREC);
         ($y < 0)
           ? Math::MPC::Rmpc_sub_ui($r, $x, -$y, $ROUND)
@@ -2494,6 +2501,7 @@ sub __sub__ {
     }
 
   Math_GMPz__Scalar: {
+        $y || return Math::GMPz::Rmpz_init_set($x);
         state $r = Math::GMPz::Rmpz_init_nobless();
         ($y < 0)
           ? Math::GMPz::Rmpz_add_ui($r, $x, -$y)
@@ -2506,6 +2514,8 @@ sub __sub__ {
     }
 
   Math_GMPq__Scalar: {
+
+        # $y || return $x;
         my $r = Math::GMPq::Rmpq_init();
         ($y < 0)
           ? Math::GMPq::Rmpq_set_si($r, $y, 1)
@@ -2515,6 +2525,8 @@ sub __sub__ {
     }
 
   Math_MPFR__Scalar: {
+
+        # $y || return $x;
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         ($y < 0)
           ? Math::MPFR::Rmpfr_add_ui($r, $x, -$y, $ROUND)
@@ -2523,6 +2535,8 @@ sub __sub__ {
     }
 
   Math_MPC__Scalar: {
+
+        # $y || return $x;
         my $r = Math::MPC::Rmpc_init2($PREC);
         ($y < 0)
           ? Math::MPC::Rmpc_add_ui($r, $x, -$y, $ROUND)
@@ -2733,6 +2747,7 @@ sub __mul__ {
 
   Math_GMPz__Scalar: {
         $y || return 0;
+        $y == 1 and return Math::GMPz::Rmpz_init_set($x);
         my $r = Math::GMPz::Rmpz_init();
         ($y < 0)
           ? Math::GMPz::Rmpz_mul_si($r, $x, $y)
@@ -2743,6 +2758,8 @@ sub __mul__ {
 
   Math_GMPq__Scalar: {
         $y || return 0;
+
+        # $y == 1 and return $x;
         my $r = Math::GMPq::Rmpq_init();
         ($y < 0)
           ? Math::GMPq::Rmpq_set_si($r, $y, 1)
@@ -2752,6 +2769,8 @@ sub __mul__ {
     }
 
   Math_MPFR__Scalar: {
+
+        # $y == 1 and return $x;
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         ($y < 0)
           ? Math::MPFR::Rmpfr_mul_si($r, $x, $y, $ROUND)
@@ -2760,6 +2779,8 @@ sub __mul__ {
     }
 
   Math_MPC__Scalar: {
+
+        # $y == 1 and return $x;
         my $r = Math::MPC::Rmpc_init2($PREC);
         ($y < 0)
           ? Math::MPC::Rmpc_mul_si($r, $x, $y, $ROUND)
@@ -2937,6 +2958,8 @@ sub __div__ {
 
   Math_GMPz__Scalar: {
 
+        $y == 1 and return Math::GMPz::Rmpz_init_set($x);
+
         # Check for division by zero
         $y || do {
             $y = _any2mpz($y);
@@ -2999,6 +3022,8 @@ sub __div__ {
 
   Math_GMPq__Scalar: {
 
+        # $y == 1 and return $x;
+
         # Check for division by zero
         $y || do {
             $y = _any2mpz($y);
@@ -3039,6 +3064,8 @@ sub __div__ {
     }
 
   Math_MPFR__Scalar: {
+
+        # $y == 1 and return $x;
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         ($y < 0)
           ? Math::MPFR::Rmpfr_div_si($r, $x, $y, $ROUND)
@@ -3055,6 +3082,8 @@ sub __div__ {
     }
 
   Math_MPC__Scalar: {
+
+        # $y == 1 and return $x;
         my $r = Math::MPC::Rmpc_init2($PREC);
         Math::MPC::Rmpc_set_ui($r, (($y < 0) ? (-$y) : $y), $ROUND);
         Math::MPC::Rmpc_neg($r, $r, $ROUND) if ($y < 0);
