@@ -49,6 +49,12 @@ state $FALSE = Sidef::Types::Bool::Bool::FALSE;
 my %FACTOR_EXP_CACHE;
 my @FACTOR_EXP_QUEUE;
 
+my %FACTOR_CACHE;
+my @FACTOR_QUEUE;
+
+my %IS_PRIME_CACHE;
+my @IS_PRIME_QUEUE;
+
 my %PRIMEPI_LOOKUP;    # lookup table for prime_count()
 my @SMALL_PRIMES_20 = (3, 5, 7, 11, 13, 17, 19);
 
@@ -111,8 +117,11 @@ use constant {
     # Check if we have a recent enough version of Math::Prime::Util::GMP
     # HAS_NEW_PRIME_UTIL_GMP => defined(&Math::Prime::Util::GMP::nth_powerfree) // 0,
 
-    IS_PRIME_CACHE_SIZE   => 1e5,    # how many entries to cache
-    PRIMALITY_PRETEST_MIN => 500,    # in decimal digits
+    FACTOR_EXP_CACHE_SIZE => 1000,
+    FACTOR_CACHE_SIZE     => 1000,
+
+    IS_PRIME_CACHE_SIZE   => 1000,    # how many entries to cache
+    PRIMALITY_PRETEST_MIN => 500,     # in decimal digits
 
     INTSIZE        => List::Util::max(32, CORE::int(CORE::log(ULONG_MAX) / CORE::log(2))),    # size of ULONG_MAX in base 2
     PRIMECOUNT_MIN => List::Util::min(ULONG_MAX,       (HAS_PRIME_UTIL ? 1e10 : 1e7)),        # absolute value
@@ -122,8 +131,6 @@ use constant {
     SIEVE_INLINE_MAX => 1e7,                                                                  # use GMP::sieve_primes directly up to this diff
     SIEVE_UTIL_MAX   => 1e8,                                                                  # hand off to Math::Prime::Util up to this diff
     NAIVE_LOOP_MAX   => 1000,                                                                 # walk primes one-by-one for deltas this small
-
-    FACTOR_EXP_CACHE_SIZE => 100,
 };
 
 if (HAS_PRIME_UTIL) {
@@ -1078,21 +1085,19 @@ sub _execute_in_tmpdir {
 sub _is_prob_prime {
     my ($n, $cache) = @_;
 
-    $n = _normalize_numeric_type($n);
+    $n = _normalize_numeric_type($n) if ref($n);
 
-    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-        return Math::Prime::Util::is_prime($n);
+    if ($n < ULONG_MAX) {
+        return HAS_PRIME_UTIL
+          ? Math::Prime::Util::is_prime($n)
+          : Math::Prime::Util::GMP::is_prime($n);
     }
 
-    state %internal_cache;
-    state $internal_cache_size = 0;
-
-    if (exists($internal_cache{$n})) {
-        ## say "Prime cache hit: $n (entries: $internal_cache_size)";
-        return $internal_cache{$n};
+    if (exists($IS_PRIME_CACHE{$n})) {
+        return $IS_PRIME_CACHE{$n};
     }
 
-    my $r = (HAS_PRIME_UTIL and $n < ULONG_MAX) ? Math::Prime::Util::is_prime($n) : do {
+    my $r = do {
         (
          (CORE::length($n) > PRIMALITY_PRETEST_MIN)
          ? do {
@@ -1105,14 +1110,13 @@ sub _is_prob_prime {
           && Math::Prime::Util::GMP::is_prime($n);
     };
 
-    if ($cache) {
-        if (++$internal_cache_size > IS_PRIME_CACHE_SIZE) {
-            $internal_cache_size = 1;
-            undef %internal_cache;
-        }
-        $internal_cache{$n} = $r;
+    # FIFO Cache management
+    if (@IS_PRIME_QUEUE >= IS_PRIME_CACHE_SIZE) {
+        delete $IS_PRIME_CACHE{shift @IS_PRIME_QUEUE};
     }
 
+    push @IS_PRIME_QUEUE, $n;
+    $IS_PRIME_CACHE{$n} = $r;
     $r;
 }
 
@@ -1286,14 +1290,9 @@ sub _factor_yafu {
     return ();
 }
 
-sub _factor {
+sub _factor_impl {
     my ($n) = @_;
     my $orig_n = $n;
-
-    $n = _normalize_numeric_type($n);
-
-    # Fast path for small native numbers
-    return _factor_via_prime_util($n) if (FAST_MODE and $n < ULONG_MAX);
 
     my @factors;
 
@@ -1350,42 +1349,64 @@ sub _factor {
     return @factors;
 }
 
+sub _factor {
+    my ($n) = @_;
+
+    $n = _normalize_numeric_type($n) if ref($n);
+
+    # Fast path for native integers
+    return _factor_via_prime_util($n) if (FAST_MODE and $n < ULONG_MAX);
+
+    # Fast cache return
+    if (my $cached = $FACTOR_CACHE{$n}) {
+        return @$cached;
+    }
+
+    my @factors = _factor_impl($n);
+
+    # FIFO Cache management
+    if (@FACTOR_QUEUE >= FACTOR_CACHE_SIZE) {
+        delete $FACTOR_CACHE{shift @FACTOR_QUEUE};
+    }
+    push @FACTOR_QUEUE, $n;
+    $FACTOR_CACHE{$n} = \@factors;
+
+    return @factors;
+}
+
 # Prime factorization in [p,k] form, where k is the multiplicity of p.
 sub _factor_exp {
     my ($n) = @_;
 
-    $n = _normalize_numeric_type($n);
+    $n = _normalize_numeric_type($n) if ref($n);
+
+    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
+        return Math::Prime::Util::factor_exp($n);
+    }
 
     # Fast cache return
     if (my $cached = $FACTOR_EXP_CACHE{$n}) {
         return @$cached;
     }
 
-    my @factor_exp;
-    if (HAS_PRIME_UTIL and $n < ULONG_MAX) {
-        @factor_exp = Math::Prime::Util::factor_exp($n);
-    }
-    else {
+    my @factors    = _factor($n);
+    my $prev_value = shift(@factors) // return;
 
-        my @factors    = _factor($n);
-        my $prev_value = shift(@factors) // return;
+    my $current_pair = [$prev_value, 1];
+    my @factor_exp   = ($current_pair);
 
-        my $current_pair = [$prev_value, 1];
-        @factor_exp = ($current_pair);
-
-        foreach my $curr_value (@factors) {
-            if ($curr_value eq $prev_value) {
-                $current_pair->[1]++;    # Direct reference modification
-            }
-            else {
-                $current_pair = [$curr_value, 1];
-                push(@factor_exp, $current_pair);
-                $prev_value = $curr_value;
-            }
+    foreach my $curr_value (@factors) {
+        if ($curr_value eq $prev_value) {
+            $current_pair->[1]++;
+        }
+        else {
+            $current_pair = [$curr_value, 1];
+            push(@factor_exp, $current_pair);
+            $prev_value = $curr_value;
         }
     }
 
-    # LRU Cache management
+    # FIFO Cache management
     if (@FACTOR_EXP_QUEUE >= FACTOR_EXP_CACHE_SIZE) {
         delete $FACTOR_EXP_CACHE{shift @FACTOR_EXP_QUEUE};
     }
@@ -1398,7 +1419,7 @@ sub _factor_exp {
 sub _divisors {
     my ($n) = @_;
 
-    $n = _normalize_numeric_type($n);
+    $n = _normalize_numeric_type($n) if ref($n);
 
     if (CORE::length($n) >= SPECIAL_FACTORS_MIN) {
         my $t = _set_int($n);
@@ -1465,7 +1486,7 @@ sub _cached_primorial {
 sub _is_squarefree {
     my ($n) = @_;
 
-    $n = _normalize_numeric_type($n);
+    $n = _normalize_numeric_type($n) if ref($n);
 
     if (CORE::length($n) >= SPECIAL_FACTORS_MIN) {
         foreach my $pp (_factor_exp($n)) {
@@ -1484,7 +1505,7 @@ sub _is_squarefree {
 sub _next_prime {
     my ($n) = @_;
 
-    $n = _normalize_numeric_type($n);
+    $n = _normalize_numeric_type($n) if ref($n);
 
     (HAS_PRIME_UTIL and $n < (ULONG_MAX - 2000))
       ? Math::Prime::Util::next_prime($n)
@@ -1494,7 +1515,7 @@ sub _next_prime {
 sub _prev_prime {
     my ($n) = @_;
 
-    $n = _normalize_numeric_type($n);
+    $n = _normalize_numeric_type($n) if ref($n);
 
     (HAS_PRIME_UTIL and $n < ULONG_MAX)
       ? Math::Prime::Util::prev_prime($n)
@@ -7822,29 +7843,64 @@ sub le {
 
 sub is_zero {
     my ($x) = @_;
-    __eq__($$x, 0) ? ($TRUE) : ($FALSE);
+    my $v = $$x;
+    if (!ref($v)) {
+        return $v == 0 ? $TRUE : $FALSE;
+    }
+    if (ref($v) eq 'Math::GMPz') {
+        return Math::GMPz::Rmpz_sgn($v) == 0 ? $TRUE : $FALSE;
+    }
+    __eq__($v, 0) ? $TRUE : $FALSE;
 }
 
 sub is_one {
     my ($x) = @_;
-    __eq__($$x, 1) ? ($TRUE) : ($FALSE);
+    my $v = $$x;
+    if (!ref($v)) {
+        return $v == 1 ? $TRUE : $FALSE;
+    }
+    if (ref($v) eq 'Math::GMPz') {
+        return Math::GMPz::Rmpz_cmp_ui($v, 1) == 0 ? $TRUE : $FALSE;
+    }
+    __eq__($v, 1) ? $TRUE : $FALSE;
 }
 
 sub is_mone {
     my ($x) = @_;
-    __eq__($$x, -1) ? ($TRUE) : ($FALSE);
+    my $v = $$x;
+    if (!ref($v)) {
+        return $v == -1 ? $TRUE : $FALSE;
+    }
+    if (ref($v) eq 'Math::GMPz') {
+        return Math::GMPz::Rmpz_cmp_si($v, -1) == 0 ? $TRUE : $FALSE;
+    }
+    __eq__($v, -1) ? ($TRUE) : ($FALSE);
 }
 
 sub is_positive {
     my ($x) = @_;
-    ((__cmp__($$x, 0) // return undef) > 0) ? ($TRUE) : ($FALSE);
+    my $v = $$x;
+    if (!ref($v)) {
+        return $v > 0 ? $TRUE : $FALSE;
+    }
+    if (ref($v) eq 'Math::GMPz') {
+        return Math::GMPz::Rmpz_sgn($v) > 0 ? $TRUE : $FALSE;
+    }
+    ((__cmp__($v, 0) // return undef) > 0) ? $TRUE : $FALSE;
 }
 
 *is_pos = \&is_positive;
 
 sub is_negative {
     my ($x) = @_;
-    ((__cmp__($$x, 0) // return undef) < 0) ? ($TRUE) : ($FALSE);
+    my $v = $$x;
+    if (!ref($v)) {
+        return $v < 0 ? $TRUE : $FALSE;
+    }
+    if (ref($v) eq 'Math::GMPz') {
+        return Math::GMPz::Rmpz_sgn($v) < 0 ? $TRUE : $FALSE;
+    }
+    ((__cmp__($v, 0) // return undef) < 0) ? ($TRUE) : ($FALSE);
 }
 
 *is_neg = \&is_negative;
