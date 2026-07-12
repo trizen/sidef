@@ -1424,7 +1424,7 @@ sub _divisors {
 
     $n = _normalize_numeric_type($n) if ref($n);
 
-    if ($n < ULONG_MAX) {
+    if (FAST_MODE and $n < ULONG_MAX) {
         return HAS_PRIME_UTIL
           ? Math::Prime::Util::divisors($n)
           : Math::Prime::Util::GMP::divisors($n);
@@ -20757,14 +20757,25 @@ sub gcd {
     }
 
     if (@vals > 2) {
-
-        my @terms = map { _any2mpz($$_) // goto &nan } @vals;
         state $r = Math::GMPz::Rmpz_init_nobless();
-        Math::GMPz::Rmpz_set($r, shift(@terms));
 
-        foreach my $z (@terms) {
-            Math::GMPz::Rmpz_gcd($r, $r, $z);
-            last if (Math::GMPz::Rmpz_cmp_ui($r, 1) == 0);
+        # Initialize accumulator with first element
+        my $first = shift(@vals);
+        Math::GMPz::Rmpz_set($r, _any2mpz($$first, 0) // goto &nan);
+
+        foreach my $val (@vals) {
+            my $v = $$val;
+
+            # Fast-track native integers to avoid GMP object allocation
+            if (FAST_MODE && !ref($v)) {
+                Math::GMPz::Rmpz_gcd_ui($r, $r, CORE::abs($v));
+            }
+            else {
+                my $z = _any2mpz($v, 0) // goto &nan;
+                Math::GMPz::Rmpz_gcd($r, $r, $z);
+            }
+
+            last if Math::GMPz::Rmpz_cmp_ui($r, 1) == 0;
         }
 
         my $r2 =
@@ -20862,8 +20873,23 @@ sub gcdext {
 
 sub __lcm__ {
     my ($n, $k) = @_;
+
+    if (!ref($n)) {
+        ($n, $k) = ($k, $n);
+    }
+
+    if (!ref($n)) {
+        if (HAS_PRIME_UTIL and $n * $k < ULONG_MAX) {
+            return Math::Prime::Util::lcm($n, $k);
+        }
+        my $t = Math::Prime::Util::GMP::lcm($n, $k);
+        $t < ULONG_MAX and return $t;
+        return Math::GMPz::Rmpz_init_set_str($t, 10);
+    }
     my $r = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_lcm($r, $n, $k);
+    ref($k)
+      ? Math::GMPz::Rmpz_lcm($r, $n, $k)
+      : Math::GMPz::Rmpz_lcm_ui($r, $n, CORE::abs($k));
     $r;
 }
 
@@ -20880,9 +20906,9 @@ sub lcm {
     }
 
     if (@vals > 2) {
-        my @terms = map { _any2mpz($$_) // goto &nan } @vals;
+        my @terms = map { ref($_) ? (_any2mpz($_) // goto &nan) : $_ } map { $$_ } @vals;
         my $r     = _binsplit(\@terms, \&__lcm__);
-        $r = Math::GMPz::Rmpz_get_ui($r) if Math::GMPz::Rmpz_fits_ulong_p($r);
+        $r = Math::GMPz::Rmpz_get_ui($r) if (ref($r) and Math::GMPz::Rmpz_fits_ulong_p($r));
         return bless \$r;
     }
 
