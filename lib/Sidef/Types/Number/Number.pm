@@ -52,6 +52,9 @@ my @FACTOR_EXP_QUEUE;
 my %FACTOR_CACHE;
 my @FACTOR_QUEUE;
 
+my %DIVISORS_CACHE;
+my @DIVISORS_QUEUE;
+
 my %IS_PRIME_CACHE;
 my @IS_PRIME_QUEUE;
 
@@ -119,6 +122,7 @@ use constant {
 
     FACTOR_EXP_CACHE_SIZE => 1000,
     FACTOR_CACHE_SIZE     => 1000,
+    DIVISORS_CACHE_SIZE   => 100,
 
     IS_PRIME_CACHE_SIZE   => 1000,    # how many entries to cache
     PRIMALITY_PRETEST_MIN => 500,     # in decimal digits
@@ -1384,7 +1388,6 @@ sub _factor_exp {
         return Math::Prime::Util::factor_exp($n);
     }
 
-    # Fast cache return
     if (my $cached = $FACTOR_EXP_CACHE{$n}) {
         return @$cached;
     }
@@ -1421,15 +1424,37 @@ sub _divisors {
 
     $n = _normalize_numeric_type($n) if ref($n);
 
-    if (CORE::length($n) >= SPECIAL_FACTORS_MIN) {
-        my $t = _set_int($n);
-        my $D = $t->divisors($t);
-        return map { (ref($$_) eq 'Math::GMPz') ? Math::GMPz::Rmpz_get_str($$_, 10) : $$_ } @$D;
+    if ($n < ULONG_MAX) {
+        return HAS_PRIME_UTIL
+          ? Math::Prime::Util::divisors($n)
+          : Math::Prime::Util::GMP::divisors($n);
     }
 
-    (HAS_PRIME_UTIL and $n < ULONG_MAX)
-      ? Math::Prime::Util::divisors($n)
-      : Math::Prime::Util::GMP::divisors($n);
+    my @divisors;
+
+    if (my $cached = $DIVISORS_CACHE{$n}) {
+        return @$cached;
+    }
+
+    if (CORE::length($n) >= SPECIAL_FACTORS_MIN) {
+
+        my $t = _set_int($n);
+        my $D = $t->divisors($t);
+        @divisors = map { (ref($$_) eq 'Math::GMPz') ? Math::GMPz::Rmpz_get_str($$_, 10) : $$_ } @$D;
+    }
+    else {
+        @divisors = Math::Prime::Util::GMP::divisors($n);
+    }
+
+    # FIFO Cache management
+    if (@DIVISORS_QUEUE >= DIVISORS_CACHE_SIZE) {
+        delete $DIVISORS_CACHE{shift @DIVISORS_QUEUE};
+    }
+
+    push @DIVISORS_QUEUE, $n;
+    $DIVISORS_CACHE{$n} = \@divisors;
+
+    return @divisors;
 }
 
 sub _primes {
@@ -1460,6 +1485,8 @@ sub _cached_primorial {
         return $primorial_cache{$k};
     }
 
+    my $t;
+
     if (scalar(keys(%primorial_cache)) >= $limit) {
 
         # Evict least-used entry
@@ -1468,14 +1495,15 @@ sub _cached_primorial {
                        map  { [$_, $access_count{$_}] } keys %primorial_cache
                       )[0][0];
 
-        Math::GMPz::Rmpz_clear($primorial_cache{$min_key});
-        delete $primorial_cache{$min_key};
+        $t = delete $primorial_cache{$min_key};
         delete $access_count{$min_key};
+    }
+    else {
+        $t = Math::GMPz::Rmpz_init_nobless();
     }
 
     # Compute and cache
     say STDERR "Computing primorial($k)..." if ($k >= 1e6 and $VERBOSE);
-    my $t = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_primorial_ui($t, $k);
     $primorial_cache{$k} = $t;
     $access_count{$k}    = 1;
