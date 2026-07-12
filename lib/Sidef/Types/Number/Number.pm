@@ -8270,14 +8270,12 @@ sub sum {
         if (ref($value) eq __PACKAGE__) {
             push @numbers, $$value;
         }
+        elsif (exists $NUMBER_CLASSES{ref($value)}) {
+            push @extra, $value;
+        }
         else {
-            if (UNIVERSAL::isa($value, 'Sidef::Types::Number::Number')) {
-                push @extra, $value;
-            }
-            else {
-                _valid(\$value);
-                push @numbers, $$value;
-            }
+            _valid(\$value);
+            push @numbers, $$value;
         }
     }
 
@@ -8350,14 +8348,12 @@ sub prod {
         if (ref($value) eq __PACKAGE__) {
             push @numbers, $$value;
         }
+        elsif (exists $NUMBER_CLASSES{ref($value)}) {
+            push @unknown, $value;
+        }
         else {
-            if (UNIVERSAL::isa($value, 'Sidef::Types::Number::Number')) {
-                push @unknown, $value;
-            }
-            else {
-                _valid(\$value);
-                push @numbers, $$value;
-            }
+            _valid(\$value);
+            push @numbers, $$value;
         }
     }
 
@@ -8377,15 +8373,26 @@ sub max {
     my (@vals) = @_;
     _valid(\(@vals));
 
-    my $max = shift(@vals);
+    my $max   = shift(@vals) // return undef;
+    my $v_max = $$max;
 
     foreach my $curr (@vals) {
-        if ((__cmp__($$curr, $$max) // return undef) > 0) {
-            $max = $curr;
+        my $v_curr = $$curr;
+
+        # Native fast-path
+        if (!ref($v_curr) && !ref($v_max)) {
+            if ($v_curr > $v_max) {
+                $max   = $curr;
+                $v_max = $v_curr;
+            }
+        }
+        elsif ((__cmp__($v_curr, $v_max) // return undef) > 0) {
+            $max   = $curr;
+            $v_max = $v_curr;
         }
     }
 
-    $max;
+    return $max;
 }
 
 *vecmax = \&max;
@@ -8394,15 +8401,26 @@ sub min {
     my (@vals) = @_;
     _valid(\(@vals));
 
-    my $min = shift(@vals);
+    my $min   = shift(@vals) // return undef;
+    my $v_min = $$min;
 
     foreach my $curr (@vals) {
-        if ((__cmp__($$curr, $$min) // return undef) < 0) {
-            $min = $curr;
+        my $v_curr = $$curr;
+
+        # Native fast-path
+        if (!ref($v_curr) && !ref($v_min)) {
+            if ($v_curr < $v_min) {
+                $min   = $curr;
+                $v_min = $v_curr;
+            }
+        }
+        elsif ((__cmp__($v_curr, $v_min) // return undef) < 0) {
+            $min   = $curr;
+            $v_min = $v_curr;
         }
     }
 
-    $min;
+    return $min;
 }
 
 *vecmin = \&min;
