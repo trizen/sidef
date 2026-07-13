@@ -20081,6 +20081,16 @@ sub hclassno {
         return ZERO;
     }
 
+    # PARI/GP for massive discriminants
+    if ($USE_PARI_GP and Math::GMPz::Rmpz_sizeinbase($n, 2) >= 32) {
+        my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
+        my $res   = _execute_pari_gp("qfbhclassno($n_str)");
+        if (defined($res) and $res =~ /[0-9]/) {
+            my $q = _str2obj($res);
+            return bless \$q;
+        }
+    }
+
     if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
         state $twelve = _set_int(12);
         return _set_int(Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($n)))->div($twelve);
