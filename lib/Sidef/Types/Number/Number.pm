@@ -2199,42 +2199,60 @@ sub parts {
 #
 
 sub pi {
-
     if (ref($_[0])) {
         goto &prime_count;
     }
 
-    my $pi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
-    bless \$pi;
+    state %CACHE;
+    my $p = CORE::int($PREC);
+
+    return $CACHE{$p} //= do {
+        my $pi = Math::MPFR::Rmpfr_init2($p);
+        Math::MPFR::Rmpfr_const_pi($pi, $ROUND);
+        bless \$pi;
+    };
 }
 
 *π = \&pi;
 
 sub tau {
-
     if (ref($_[0])) {
         goto &sigma0;
     }
 
-    my $tau = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_const_pi($tau, $ROUND);
-    Math::MPFR::Rmpfr_mul_2ui($tau, $tau, 1, $ROUND);
-    bless \$tau;
+    state %CACHE;
+    my $p = CORE::int($PREC);
+
+    return $CACHE{$p} //= do {
+        my $tau = Math::MPFR::Rmpfr_init2($p);
+        Math::MPFR::Rmpfr_const_pi($tau, $ROUND);
+        Math::MPFR::Rmpfr_mul_2ui($tau, $tau, 1, $ROUND);
+        bless \$tau;
+    };
 }
 
 *τ = \&tau;
 
 sub ln2 {
-    my $ln2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
-    bless \$ln2;
+    state %CACHE;
+    my $p = CORE::int($PREC);
+
+    return $CACHE{$p} //= do {
+        my $ln2 = Math::MPFR::Rmpfr_init2($p);
+        Math::MPFR::Rmpfr_const_log2($ln2, $ROUND);
+        bless \$ln2;
+    };
 }
 
 sub EulerGamma {
-    my $euler = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_const_euler($euler, $ROUND);
-    bless \$euler;
+    state %CACHE;
+    my $p = CORE::int($PREC);
+
+    return $CACHE{$p} //= do {
+        my $euler = Math::MPFR::Rmpfr_init2($p);
+        Math::MPFR::Rmpfr_const_euler($euler, $ROUND);
+        bless \$euler;
+    };
 }
 
 *γ           = \&EulerGamma;
@@ -2242,9 +2260,14 @@ sub EulerGamma {
 *euler_gamma = \&EulerGamma;
 
 sub CatalanG {
-    my $catalan = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_const_catalan($catalan, $ROUND);
-    bless \$catalan;
+    state %CACHE;
+    my $p = CORE::int($PREC);
+
+    return $CACHE{$p} //= do {
+        my $catalan = Math::MPFR::Rmpfr_init2($p);
+        Math::MPFR::Rmpfr_const_catalan($catalan, $ROUND);
+        bless \$catalan;
+    };
 }
 
 *C = \&CatalanG;
@@ -2252,36 +2275,50 @@ sub CatalanG {
 sub i {
     my ($x) = @_;
 
-    my $i = Math::MPC::Rmpc_init2(CORE::int($PREC));
-    Math::MPC::Rmpc_set_ui_ui($i, 0, 1, $ROUND);
+    state %CACHE;
+    my $p = CORE::int($PREC);
+
+    my $i_obj = $CACHE{$p} //= do {
+        my $i = Math::MPC::Rmpc_init2($p);
+        Math::MPC::Rmpc_set_ui_ui($i, 0, 1, $ROUND);
+        bless \$i;
+    };
 
     if (ref($x)) {
-        return bless \__mul__($i, $$x);
+        return bless \__mul__($$i_obj, $$x);
     }
 
-    bless \$i;
+    return $i_obj;
 }
 
 sub e {
-    my $e = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_set_ui($e, 1, $ROUND);
-    Math::MPFR::Rmpfr_exp($e, $e, $ROUND);
-    bless \$e;
+    state %CACHE;
+    my $p = CORE::int($PREC);
+
+    return $CACHE{$p} //= do {
+        my $e = Math::MPFR::Rmpfr_init2($p);
+        Math::MPFR::Rmpfr_set_ui($e, 1, $ROUND);
+        Math::MPFR::Rmpfr_exp($e, $e, $ROUND);
+        bless \$e;
+    };
 }
 
 sub phi {
-
     if (ref($_[0])) {
         goto &euler_phi;
     }
 
-    my $phi = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-    Math::MPFR::Rmpfr_set_ui($phi, 5, $ROUND);
-    Math::MPFR::Rmpfr_div_2ui($phi, $phi, 2, $ROUND);    # phi=5/4
-    Math::MPFR::Rmpfr_sqrt($phi, $phi, $ROUND);
-    Math::MPFR::Rmpfr_add_d($phi, $phi, 0.5, $ROUND);
+    state %CACHE;
+    my $p = CORE::int($PREC);
 
-    bless \$phi;
+    return $CACHE{$p} //= do {
+        my $phi = Math::MPFR::Rmpfr_init2($p);
+        Math::MPFR::Rmpfr_set_ui($phi, 5, $ROUND);
+        Math::MPFR::Rmpfr_div_2ui($phi, $phi, 2, $ROUND);    # phi=5/4
+        Math::MPFR::Rmpfr_sqrt($phi, $phi, $ROUND);
+        Math::MPFR::Rmpfr_add_d($phi, $phi, 0.5, $ROUND);
+        bless \$phi;
+    };
 }
 
 *φ = \&phi;
@@ -2290,7 +2327,7 @@ sub _nan {
     state $nan = do {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_set_nan($r);
-        $r;
+        $r;    # Unblessed for internal use
     };
 }
 
@@ -2308,7 +2345,7 @@ sub _inf {
     state $inf = do {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_set_inf($r, 1);
-        $r;
+        $r;    # Unblessed for internal use
     };
 }
 
@@ -2326,7 +2363,7 @@ sub _ninf {
     state $ninf = do {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
         Math::MPFR::Rmpfr_set_inf($r, -1);
-        $r;
+        $r;    # Unblessed for internal use
     };
 }
 
@@ -2341,6 +2378,10 @@ sub ninf {
 *zero = \&ZERO;
 *one  = \&ONE;
 *mone = \&MONE;
+
+#
+## Arithmetic operations
+#
 
 sub __add__ {
     my ($x, $y) = @_;
