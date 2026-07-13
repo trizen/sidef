@@ -9292,39 +9292,54 @@ sub linear_congruence {
     my ($n, $r, $m) = @_;
 
     if ($n->is_div($m)) {
-        if ($r->is_div($m)) {
-            return $m->range->to_a;
-        }
-        else {
-            return _array();
-        }
+        return $r->is_div($m) ? $m->range->to_a : _array();
     }
-
-    # TODO: rewrite for better performance
 
     $n = _big2istr($$n) // return _array();
     $r = _big2istr($$r) // return _array();
     $m = _big2istr($$m) // return _array();
 
-    my ($u, $v, $g) = Math::Prime::Util::GMP::gcdext($n, $m);
+    my ($u_str, $v_str, $g_str) = Math::Prime::Util::GMP::gcdext($n, $m);
 
-    if (Math::Prime::Util::GMP::modint($r, $g) ne '0') {
+    if (Math::Prime::Util::GMP::modint($r, $g_str) ne '0') {
         return _array();
     }
 
-    my $orig_m = $m;
+    my $orig_m = Math::GMPz::Rmpz_init_set_str($m,     10);
+    my $g_val  = Math::GMPz::Rmpz_init_set_str($g_str, 10);
 
-    $r = Math::Prime::Util::GMP::divint($r, $g);
-    $m = Math::Prime::Util::GMP::divint($m, $g);
+    my $r_val = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_set_str($r_val, $r, 10);
+    Math::GMPz::Rmpz_divexact($r_val, $r_val, $g_val);
 
-    my $z = Math::Prime::Util::GMP::mulint($u, $r);
+    my $m_val = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_set_str($m_val, $m, 10);
+    Math::GMPz::Rmpz_divexact($m_val, $m_val, $g_val);
+
+    my $u_val = Math::GMPz::Rmpz_init_set_str($u_str, 10);
+    my $z     = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($z, $u_val, $r_val);
 
     my @solutions;
-    for my $t (0 .. $g - 1) {
-        push @solutions, _set_int(Math::Prime::Util::GMP::modint(Math::Prime::Util::GMP::addint($z, Math::Prime::Util::GMP::mulint($m, $t)), $orig_m));
+    my $limit = Math::GMPz::Rmpz_get_ui($g_val);    # Safe assuming g isn't cryptographically huge
+
+    # Pre-allocate loop variables
+    state $term = Math::GMPz::Rmpz_init_nobless();
+
+    for my $t (0 .. $limit - 1) {
+        Math::GMPz::Rmpz_mul_ui($term, $m_val, $t);
+        Math::GMPz::Rmpz_add($term, $z, $term);
+        Math::GMPz::Rmpz_mod($term, $term, $orig_m);
+
+        # Clone the result into the Sidef object
+        my $r =
+            Math::GMPz::Rmpz_fits_ulong_p($term)
+          ? Math::GMPz::Rmpz_get_ui($term)
+          : Math::GMPz::Rmpz_init_set($term);
+        push @solutions, $r;
     }
 
-    return _array(\@solutions)->isort;
+    _array([map { bless \$_ } sort { $a <=> $b } @solutions]);
 }
 
 sub sqrt_cfrac_period_each {
@@ -29557,7 +29572,7 @@ sub phi_sum {
 
     $k = defined($k) ? do { ref($k) eq __PACKAGE__ or _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
-    if (0 and HAS_PRIME_UTIL and $k == 1) {
+    if (HAS_PRIME_UTIL and $k == 1) {
         $n = _big2uistr($$n) // return ZERO;
         return _set_int(Math::Prime::Util::sumtotient($n));
     }
