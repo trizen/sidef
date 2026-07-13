@@ -16657,28 +16657,22 @@ sub _native_squarefree_count {
         return $S1 + $S2;
     }
 
-    # Using moebius(1, sqrt(n)) for values of n <= 2^50
-    if ($n < ~0 and $n <= 1125899906842624) {
+    # Using segmented moebius(a, b)
+    my $count      = 0;
+    my $chunk_size = 1_000_000;
 
-        my ($count, $k) = (0, 0);
+    for (my $start = 1 ; $start <= $s ; $start += $chunk_size) {
+        my $end = $start + $chunk_size - 1;
+        $end = $s if $end > $s;
 
-        foreach my $m (Math::Prime::Util::GMP::moebius(1, $s)) {
-            ++$k;
-            $count += $m * CORE::int($n / ($k * $k)) if $m;
-        }
+        my @mu_chunk = Math::Prime::Util::GMP::moebius($start, $end);
 
-        return $count;
-    }
-
-    # Linear counting up to sqrt(n)
-
-    my $count = 0;
-
-    # TODO: segment 1..s into multiple [a,b] ranges and use moebius(a,b)
-    my $m;
-    foreach my $k (1 .. $s) {
-        if ($m = Math::Prime::Util::GMP::moebius($k)) {
-            $count += $m * CORE::int($n / ($k * $k));
+        for my $i (0 .. $#mu_chunk) {
+            my $m = $mu_chunk[$i];
+            if ($m) {
+                my $k = $start + $i;
+                $count += $m * CORE::int($n / ($k * $k));
+            }
         }
     }
 
@@ -29563,7 +29557,7 @@ sub phi_sum {
 
     $k = defined($k) ? do { ref($k) eq __PACKAGE__ or _valid(\$k); _any2ui($$k) // goto &nan } : 1;
 
-    if (HAS_PRIME_UTIL and $k == 1) {
+    if (0 and HAS_PRIME_UTIL and $k == 1) {
         $n = _big2uistr($$n) // return ZERO;
         return _set_int(Math::Prime::Util::sumtotient($n));
     }
