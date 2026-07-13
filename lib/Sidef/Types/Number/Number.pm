@@ -17000,9 +17000,12 @@ sub nonpowerfree_count {
     my ($k, $from, $to) = @_;
 
     if (defined($to)) {
-        ref($to) eq __PACKAGE__ or _valid(\$to);
+        ref($to) eq __PACKAGE__   or _valid(\$to);
+        ref($from) eq __PACKAGE__ or _valid(\$from);
+
         return ZERO if $to->lt($from);
-        return $k->nonpowerfree_count($to)->sub($k->nonpowerfree_count($from->dec));
+
+        return $to->sub($from)->inc->sub($k->powerfree_count($to)->sub($k->powerfree_count($from->dec)));
     }
 
     ref($from) eq __PACKAGE__ or _valid(\$from);
