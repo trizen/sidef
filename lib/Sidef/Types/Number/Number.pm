@@ -1060,10 +1060,62 @@ sub _normalize_numeric_type {
 sub _execute_pari_gp {
     my ($code) = @_;
     say STDERR ":: Executing PARI/GP with: $code" if $VERBOSE;
-    my $res = `$^X -e 'print \$ARGV[0]' \Q$code\E | gp -q -f --default parisizemax=500000000`;
-    (defined($res) and $? == 0) or return undef;
-    chomp($res);
-    $res eq '' and return undef;
+
+    state $_x = require IPC::Open2;
+
+    # Maintain persistent handles for the lifetime of the interpreter
+    state ($gp_in, $gp_out, $gp_pid);
+
+    state $gp_cmd = 'gp -q -f --default parisizemax=500000000';
+
+    # Lazy initialization: only spawn the process on the first call
+    if (!$gp_pid) {
+        $gp_pid = IPC::Open2::open2($gp_out, $gp_in, $gp_cmd);
+
+        # Disable buffering on the input handle to ensure GP gets commands immediately
+        my $old_fh = select($gp_in);
+        $| = 1;
+        select($old_fh);
+    }
+
+    # Unique sentinel to mark the end of the GP output stream
+    my $sentinel = "---END_OF_OUTPUT---";
+
+    # Protect against script crashes if the GP process was killed externally
+    local $SIG{PIPE} = 'IGNORE';
+
+    # Send the code.
+    # The sentinel is sent on a new line so that even if $code triggers
+    # a GP syntax error, the sentinel is still evaluated and prevents a deadlock.
+    my $write_ok = print $gp_in "$code\nprint(\"$sentinel\");\n";
+
+    # Handle GP process death and auto-restart
+    if (!$write_ok) {
+        say STDERR "[WARNING] PARI/GP pipe broke, restarting..." if $VERBOSE;
+        close $gp_in                                             if $gp_in;
+        close $gp_out                                            if $gp_out;
+        undef $gp_pid;
+
+        # Re-initialize and retry exactly once
+        $gp_pid = IPC::Open2::open2($gp_out, $gp_in, $gp_cmd);
+        my $old_fh = select($gp_in);
+        $| = 1;
+        select($old_fh);
+
+        print $gp_in "$code\nprint(\"$sentinel\");\n" or return undef;
+    }
+
+    my @output;
+    while (my $line = <$gp_out>) {
+        chomp $line;
+        last if $line eq $sentinel;
+        push @output, $line;
+    }
+
+    # GP errors are printed to STDERR natively, bypassing @output.
+    # If $code fails or returns nothing, @output will be safely empty.
+    my $res = join("\n", @output);
+    return undef if $res eq '';
     return $res;
 }
 
