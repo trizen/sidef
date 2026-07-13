@@ -10420,25 +10420,41 @@ sub is_pandigital {
     # a(n) = (n^n-n)/(n-1)^2 + n^(n-2)*(n-1) - 1
     # https://en.wikipedia.org/wiki/Pandigital_number
 
-    my $t = $base->numify;
+    my $b_val = $base->numify;
 
-    if ($n->ilog2->numify < ($t - 2) * (CORE::log($t) / CORE::log(2))) {
+    $b_val < 1 and return $FALSE;
+
+    if ($n->ilog2->numify < ($b_val - 2) * (CORE::log($b_val) / CORE::log(2))) {
         return $FALSE;
     }
 
-    # my $smallest = $base->ipow($base)->sub($base)->idiv($base->dec->sqr)->add($base->ipow($base->sub(TWO))->mul($base->dec))->dec;
+    # Extremely fast bitmasking for bases up to INTSIZE (usually 64)
+    # Avoids object creation, array allocation, and hash lookups entirely.
+    if ($b_val < INTSIZE) {
+        state $q = Math::GMPz::Rmpz_init_nobless();
 
-    # if ($n->lt($smallest)) {
-    #    return $FALSE;
-    # }
+        # Safely copy into scratchpad so we don't mutate the user's object
+        Math::GMPz::Rmpz_set($q, _any2mpz($$n, 0) // return $FALSE);
+        Math::GMPz::Rmpz_abs($q, $q) if Math::GMPz::Rmpz_sgn($q) < 0;
 
+        my $mask   = 0;
+        my $target = (1 << $b_val) - 1;
+
+        while (Math::GMPz::Rmpz_sgn($q) > 0) {
+
+            # Rmpz_fdiv_q_ui modifies $q and returns the remainder
+            my $rem = Math::GMPz::Rmpz_fdiv_q_ui($q, $q, $b_val);
+            $mask |= (1 << $rem);
+            return $TRUE if $mask == $target;
+        }
+
+        return $FALSE;
+    }
+
+    # Fallback for massive bases (> 64)
     my %hash;
     @hash{@{$n->digits($base)}} = ();
-
-    scalar(keys %hash) == $t
-      or return $FALSE;
-
-    return $TRUE;
+    scalar(keys %hash) == $b_val ? $TRUE : $FALSE;
 }
 
 sub factorial_power {
