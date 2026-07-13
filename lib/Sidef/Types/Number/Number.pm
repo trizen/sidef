@@ -25369,8 +25369,6 @@ sub znlog {
     my ($a, $g, $n) = @_;
     _valid(\$g, \$n);
 
-    # TODO: add also the "index calculus" advanced method for solving the discrete logarithm
-
     $a = _any2mpz($$a, 1) // goto &nan;
     $g = _any2mpz($$g, 2) // goto &nan;
     $n = _any2mpz($$n, 3) // goto &nan;
@@ -25397,6 +25395,28 @@ sub znlog {
         return ZERO;
     }
 
+    # Pipe into PARI/GP for cryptographic-scale inputs
+    # We bypass the system() overhead for small numbers (<= 64 bits)
+    if ($USE_PARI_GP && Math::GMPz::Rmpz_sizeinbase($n, 2) > 64) {
+        my $a_str = Math::GMPz::Rmpz_get_str($a, 10);
+        my $g_str = Math::GMPz::Rmpz_get_str($g, 10);
+        my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
+
+        # We use iferr() so PARI doesn't crash the pipeline if no solution exists.
+        # znlog natively triggers the index calculus/NFS backend based on the Mod() sizes.
+        my $code = "iferr(znlog(Mod($a_str, $n_str), Mod($g_str, $n_str)), E, \"\")";
+
+        if (my $res = _execute_pari_gp($code)) {
+            if ($res =~ /^-?[0-9]+\z/) {
+                return _set_int($res);
+            }
+
+            # If PARI returns empty, the discrete logarithm does not exist.
+            goto &nan;
+        }
+    }
+
+    # Fallback to pure Perl Pohlig-Hellman/Rho/BSGS for small numbers or if PARI is disabled
     _set_int(_znlog_pohlig_hellman($a, $g, $n) // goto &nan);
 }
 
