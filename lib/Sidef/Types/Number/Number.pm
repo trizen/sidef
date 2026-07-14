@@ -104,9 +104,15 @@ use constant {
     } // 0,            # version >= 0.74 + XS required
 };
 
-my @SMALL_INTS = (ZERO, ONE, TWO, THREE, FOUR, (map { bless \$_ } (5 .. 256)), MONE);
+my @SMALL_INTS;
+
+BEGIN {
+    @SMALL_INTS = (ZERO, ONE, TWO, THREE, FOUR, (map { bless \$_ } (5 .. 256)), MONE);
+}
 
 use constant {
+
+    SMALL_INTS_SIZE => $#SMALL_INTS,
 
     YAFU_MIN               => 49,     # in decimal digits
     FACTORDB_MIN           => 65,     # in decimal digits
@@ -346,7 +352,7 @@ sub _set_int {
         return bless \(my $value = Math::GMPz::Rmpz_init_set($_[0]));
     }
     (!ref($_[0]) and $_[0] < ULONG_MAX and $_[0] > LONG_MIN)
-      ? (($_[0] >= -1 and $_[0] < $#SMALL_INTS) ? $SMALL_INTS[$_[0]] : (bless \(my $o = 0 + $_[0])))
+      ? (($_[0] >= -1 and $_[0] < SMALL_INTS_SIZE) ? $SMALL_INTS[$_[0]] : (bless \(my $o = 0 + $_[0])))
       : (bless \(my $value = Math::GMPz::Rmpz_init_set_str($_[0], 10)));
 }
 
@@ -40431,7 +40437,7 @@ sub of {
     if (ref($obj) eq 'Sidef::Types::Block::Block') {
         my @array;
         for (my $i = 0 ; $i < $x ; ++$i) {
-            push @array, $obj->run($i < $#SMALL_INTS ? $SMALL_INTS[$i] : bless(\(my $o = $i)));
+            push @array, $obj->run($i < SMALL_INTS_SIZE ? $SMALL_INTS[$i] : bless(\(my $o = $i)));
         }
         return _array(\@array);
     }
@@ -40450,7 +40456,7 @@ sub by {
 
     my @items;
     for (my ($i, $j) = (0, 0) ; $j < $x ; ++$i) {
-        my $k = $i < $#SMALL_INTS ? $SMALL_INTS[$i] : bless(\(my $o = $i));
+        my $k = $i < SMALL_INTS_SIZE ? $SMALL_INTS[$i] : bless(\(my $o = $i));
         if ($block->run($k)) {
             push @items, $k;
             ++$j;
@@ -40472,7 +40478,7 @@ sub defs {
 
     my @items;
     for (my ($i, $j) = (0, 0) ; $j < $x ; ++$i) {
-        push @items, $block->run($i < $#SMALL_INTS ? $SMALL_INTS[$i] : bless(\(my $o = $i))) // next;
+        push @items, $block->run($i < SMALL_INTS_SIZE ? $SMALL_INTS[$i] : bless(\(my $o = $i))) // next;
         ++$j;
     }
 
@@ -40485,7 +40491,7 @@ sub times {
     $x = CORE::int(__numify__($$x));
 
     for (my $i = 0 ; $i < $x ; ++$i) {
-        $block->run($i < $#SMALL_INTS ? $SMALL_INTS[$i] : bless(\(my $o = $i)));
+        $block->run($i < SMALL_INTS_SIZE ? $SMALL_INTS[$i] : bless(\(my $o = $i)));
     }
 
     return $_[0];
@@ -40515,7 +40521,7 @@ foreach my $name (
     no strict 'refs';
     *{__PACKAGE__ . '::' . $name} = sub {
         my ($n, $block) = @_;
-        _array([map { $_ < $#SMALL_INTS ? $SMALL_INTS[$_] : bless \$_ } 0 .. __numify__($$n) - 1])->$name($block);
+        _array([map { $_ < SMALL_INTS_SIZE ? $SMALL_INTS[$_] : bless \$_ } 0 .. __numify__($$n) - 1])->$name($block);
     };
 }
 
@@ -40533,7 +40539,7 @@ foreach my $name (
     no strict 'refs';
     *{__PACKAGE__ . '::' . $name} = sub {
         my ($n, $k, $block) = @_;
-        _array([map { $_ < $#SMALL_INTS ? $SMALL_INTS[$_] : bless \$_ } 0 .. __numify__($$n) - 1])->$name($k, $block);
+        _array([map { $_ < SMALL_INTS_SIZE ? $SMALL_INTS[$_] : bless \$_ } 0 .. __numify__($$n) - 1])->$name($k, $block);
     };
 }
 
