@@ -9286,6 +9286,56 @@ sub _solve_seq {    # Newton's forward difference formula
 # Solution in integers to `x^2 - d*y^2 = n`
 # where `d` and `n` are provided (n=1 by default).
 
+sub _pell_bounded_search {
+    my ($d, $n, $U) = @_;
+
+    # Max bounds according to Nagell: Y_max = floor( sqrt( |n| * (U -/+ 1) / 2d ) )
+    my $Y_max = Math::GMPz::Rmpz_init();
+    my $n_abs = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_abs($n_abs, $n);
+
+    my $u_mod = Math::GMPz::Rmpz_init_set($U);
+    if (Math::GMPz::Rmpz_sgn($n) > 0) {
+        Math::GMPz::Rmpz_sub_ui($u_mod, $u_mod, 1);
+    }
+    else {
+        Math::GMPz::Rmpz_add_ui($u_mod, $u_mod, 1);
+    }
+
+    Math::GMPz::Rmpz_mul($Y_max, $n_abs, $u_mod);
+    my $twod = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul_2exp($twod, $d, 1);
+
+    Math::GMPz::Rmpz_tdiv_q($Y_max, $Y_max, $twod);
+    Math::GMPz::Rmpz_sqrt($Y_max, $Y_max);
+
+    my $Y     = Math::GMPz::Rmpz_init_set_ui(0);
+    my $limit = Math::GMPz::Rmpz_init_set($Y_max);
+
+    my $X_sq = Math::GMPz::Rmpz_init();
+    my $X    = Math::GMPz::Rmpz_init();
+
+    # Iterate Y up to the upper limit
+    while (Math::GMPz::Rmpz_cmp($Y, $limit) <= 0) {
+
+        # X^2 = n + d * Y^2
+        Math::GMPz::Rmpz_mul($X_sq, $Y,    $Y);
+        Math::GMPz::Rmpz_mul($X_sq, $X_sq, $d);
+        Math::GMPz::Rmpz_add($X_sq, $X_sq, $n);
+
+        if (Math::GMPz::Rmpz_sgn($X_sq) >= 0 && Math::GMPz::Rmpz_perfect_square_p($X_sq)) {
+            Math::GMPz::Rmpz_sqrt($X, $X_sq);
+
+            my $ret_x = Math::GMPz::Rmpz_init_set($X);
+            my $ret_y = Math::GMPz::Rmpz_init_set($Y);
+            return ((bless \$ret_x), (bless \$ret_y));
+        }
+        Math::GMPz::Rmpz_add_ui($Y, $Y, 1);
+    }
+
+    return (undef, undef);
+}
+
 sub solve_pell {
     my ($d, $n) = @_;
 
@@ -9308,6 +9358,44 @@ sub solve_pell {
     # No solutions to `x^2 - d*y^2 = n` if `d` is a perfect square
     if (Math::GMPz::Rmpz_perfect_square_p($d)) {
         return (undef, undef);
+    }
+
+    # Fast path for large discriminants: get the fundamental solution to
+    # x^2 - d*y^2 = 1 from PARI/GP's quadunit(), which computes the
+    # fundamental unit of the real quadratic order directly, instead of
+    # walking the full O(sqrt(d)*log(d))-length continued fraction period
+    # ourselves. quadunit(4d) always returns a+b*sqrt(d) (using 4d avoids
+    # any ambiguity about which order we're in when d = 1 mod 4); its norm
+    # a^2-d*b^2 is +-1, and squaring it once flips a norm of -1 into +1.
+    if ($USE_PARI_GP and $d >= 10000) {
+        my $d_str = Math::GMPz::Rmpz_get_str($d, 10);
+        my $code  = "my(u=quadunit(4*$d_str));my(p=u.pol);my(a=polcoef(p,0));my(b=polcoef(p,1));[a,b]";
+
+        if (my $res = _execute_pari_gp($code)) {
+            if (my ($x_str, $y_str) = $res =~ /^\[(-?\d+),\s+(-?\d+)\]\z/) {
+                my $U = Math::GMPz::Rmpz_init_set_str($x_str, 10);
+                my $V = Math::GMPz::Rmpz_init_set_str($y_str, 10);
+
+                my $r = $U**2 - $d * $V**2;
+
+                if ($r == $n) {
+                    return ((bless \$U), (bless \$V));
+                }
+
+                if ($r == -1) {
+                    ($U, $V) = ($U**2 + $d * $V**2, 2 * $U * $V);
+                }
+
+                if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
+                    return ((bless \$U), (bless \$V));
+                }
+
+                return _pell_bounded_search($d, $n, $U);
+            }
+        }
+
+        # Fall through to the continued-fraction method below if PARI/GP
+        # wasn't available, failed, or returned something unparseable.
     }
 
     my $a0 = Math::GMPz::Rmpz_init();
@@ -9400,50 +9488,7 @@ sub solve_pell {
 
     # Bounded search for Generalized Pell Equation
     if (defined $U && Math::GMPz::Rmpz_cmp_ui($n, 1) != 0) {
-
-        # Max bounds according to Nagell: Y_max = floor( sqrt( |n| * (U -/+ 1) / 2d ) )
-        my $Y_max = Math::GMPz::Rmpz_init();
-        my $n_abs = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_abs($n_abs, $n);
-
-        my $u_mod = Math::GMPz::Rmpz_init_set($U);
-        if (Math::GMPz::Rmpz_sgn($n) > 0) {
-            Math::GMPz::Rmpz_sub_ui($u_mod, $u_mod, 1);
-        }
-        else {
-            Math::GMPz::Rmpz_add_ui($u_mod, $u_mod, 1);
-        }
-
-        Math::GMPz::Rmpz_mul($Y_max, $n_abs, $u_mod);
-        my $twod = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mul_2exp($twod, $d, 1);
-
-        Math::GMPz::Rmpz_tdiv_q($Y_max, $Y_max, $twod);
-        Math::GMPz::Rmpz_sqrt($Y_max, $Y_max);
-
-        my $Y     = Math::GMPz::Rmpz_init_set_ui(0);
-        my $limit = Math::GMPz::Rmpz_init_set($Y_max);
-
-        my $X_sq = Math::GMPz::Rmpz_init();
-        my $X    = Math::GMPz::Rmpz_init();
-
-        # Iterate Y up to the upper limit
-        while (Math::GMPz::Rmpz_cmp($Y, $limit) <= 0) {
-
-            # X^2 = n + d * Y^2
-            Math::GMPz::Rmpz_mul($X_sq, $Y,    $Y);
-            Math::GMPz::Rmpz_mul($X_sq, $X_sq, $d);
-            Math::GMPz::Rmpz_add($X_sq, $X_sq, $n);
-
-            if (Math::GMPz::Rmpz_sgn($X_sq) >= 0 && Math::GMPz::Rmpz_perfect_square_p($X_sq)) {
-                Math::GMPz::Rmpz_sqrt($X, $X_sq);
-
-                my $ret_x = Math::GMPz::Rmpz_init_set($X);
-                my $ret_y = Math::GMPz::Rmpz_init_set($Y);
-                return ((bless \$ret_x), (bless \$ret_y));
-            }
-            Math::GMPz::Rmpz_add_ui($Y, $Y, 1);
-        }
+        return _pell_bounded_search($d, $n, $U);
     }
 
     # No solution could be found
