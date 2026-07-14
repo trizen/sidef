@@ -10623,16 +10623,17 @@ sub is_pandigital {
     # https://en.wikipedia.org/wiki/Pandigital_number
 
     my $b_val = $base->numify;
-
     $b_val < 1 and return $FALSE;
 
-    if ($n->ilog2->numify < ($b_val - 2) * (CORE::log($b_val) / CORE::log(2))) {
+    my $n_ilog2 = $n->ilog2->numify;
+
+    if ($n_ilog2 < ($b_val - 2) * (CORE::log($b_val) / CORE::log(2))) {
         return $FALSE;
     }
 
     # Extremely fast bitmasking for bases up to INTSIZE (usually 64)
     # Avoids object creation, array allocation, and hash lookups entirely.
-    if ($b_val < INTSIZE) {
+    if ($b_val < INTSIZE and $n_ilog2 < 1000) {
         state $q = Math::GMPz::Rmpz_init_nobless();
 
         # Safely copy into scratchpad so we don't mutate the user's object
