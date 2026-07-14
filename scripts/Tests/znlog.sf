@@ -45,6 +45,7 @@ assert_eq(znlog(67741, 90737, 120309), 146)
 assert_eq(znlog(12, 42, 122), 13)
 assert_eq(znlog(36, 44, 50), 2)
 assert_eq(znlog(34, 170,187), 5)
+assert_eq(znlog(568881, 1233021, 159514), 16588)
 
 # Small modulus cycles
 

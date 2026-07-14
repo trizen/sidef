@@ -3537,7 +3537,9 @@ sub addmulmod {
 
     # r = (x + y*z) % m
 
-    _valid(\$y, \$z, \$m);
+    ref($y) eq __PACKAGE__ or _valid(\$y);
+    ref($z) eq __PACKAGE__ or _valid(\$z);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $x = $$x;
     $y = $$y;
@@ -3568,7 +3570,9 @@ sub addmulmod {
 sub submulmod {
     my ($x, $y, $z, $m) = @_;
 
-    _valid(\$y, \$z, \$m);
+    ref($y) eq __PACKAGE__ or _valid(\$y);
+    ref($z) eq __PACKAGE__ or _valid(\$z);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $x = $$x;
     $y = $$y;
@@ -3653,7 +3657,9 @@ sub mulmod {
 sub muladdmod {
     my ($x, $y, $z, $m) = @_;
 
-    _valid(\$y, \$z, \$m);
+    ref($y) eq __PACKAGE__ or _valid(\$y);
+    ref($z) eq __PACKAGE__ or _valid(\$z);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $x = $$x;
     $y = $$y;
@@ -3681,7 +3687,9 @@ sub muladdmod {
 sub mulsubmod {
     my ($x, $y, $z, $m) = @_;
 
-    _valid(\$y, \$z, \$m);
+    ref($y) eq __PACKAGE__ or _valid(\$y);
+    ref($z) eq __PACKAGE__ or _valid(\$z);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $x = $$x;
     $y = $$y;
@@ -3710,7 +3718,10 @@ sub mulsubmod {
 sub muladdmulmod {
     my ($w, $x, $y, $z, $m) = @_;
 
-    _valid(\$x, \$y, \$z, \$m);
+    ref($x) eq __PACKAGE__ or _valid(\$x);
+    ref($y) eq __PACKAGE__ or _valid(\$y);
+    ref($z) eq __PACKAGE__ or _valid(\$z);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $w = $$w;
     $x = $$x;
@@ -3741,7 +3752,10 @@ sub muladdmulmod {
 sub mulsubmulmod {
     my ($w, $x, $y, $z, $m) = @_;
 
-    _valid(\$x, \$y, \$z, \$m);
+    ref($x) eq __PACKAGE__ or _valid(\$x);
+    ref($y) eq __PACKAGE__ or _valid(\$y);
+    ref($z) eq __PACKAGE__ or _valid(\$z);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $w = $$w;
     $x = $$x;
@@ -4339,6 +4353,7 @@ sub __iroot__ {
 
 sub iroot {
     my ($x, $y) = @_;
+
     ref($y) eq __PACKAGE__ or _valid(\$y);
 
     $x = $$x;
@@ -8258,7 +8273,8 @@ sub is_complex {
 
 sub is_between {
     my ($x, $min, $max) = @_;
-    _valid(\$min, \$max);
+    ref($min) eq __PACKAGE__ or _valid(\$min);
+    ref($max) eq __PACKAGE__ or _valid(\$max);
     (__cmp__($$x, $$min) >= 0 and __cmp__($$x, $$max) <= 0) ? ($TRUE) : ($FALSE);
 }
 
@@ -8288,7 +8304,9 @@ sub is_odd {
 
 sub is_congruent {
     my ($n, $k, $m) = @_;
-    _valid(\$k, \$m);
+
+    ref($k) eq __PACKAGE__ or _valid(\$k);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $n = $$n;
     $k = $$k;
@@ -8309,6 +8327,7 @@ sub is_congruent {
 
 sub is_div {
     my ($x, $y) = @_;
+
     ref($y) eq __PACKAGE__ or _valid(\$y);
 
     $x = $$x;
@@ -8339,6 +8358,7 @@ sub is_div {
 
 sub divides {
     my ($x, $y) = @_;
+
     ref($y) eq __PACKAGE__ or _valid(\$y);
 
     $x = $$x;
@@ -9413,7 +9433,8 @@ sub solve_lcg {
 
     # Solve: n*x == r (mod m)
 
-    _valid(\$r, \$m);
+    ref($r) eq __PACKAGE__ or _valid(\$r);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $n = _any2mpz($$n, 0) // goto &nan;
     $r = _any2mpz($$r, 1) // goto &nan;
@@ -12191,7 +12212,8 @@ sub _modular_rational {
 sub powmod {
     my ($n, $k, $m) = @_;
 
-    _valid(\$k, \$m);
+    ref($k) eq __PACKAGE__ or _valid(\$k);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $n = $$n;
     $k = $$k;
@@ -12247,7 +12269,9 @@ sub complex_cmp {
     $y_re //= ZERO;
     $y_im //= ZERO;
 
-    _valid(\$x_im, \$y_re, \$y_im);
+    ref($x_im) eq __PACKAGE__ or _valid(\$x_im);
+    ref($y_re) eq __PACKAGE__ or _valid(\$y_re);
+    ref($y_im) eq __PACKAGE__ or _valid(\$y_im);
 
 #<<<
     my $cmp = (
@@ -12275,7 +12299,10 @@ sub complex_add {
     $y_re //= ZERO;
     $y_im //= ZERO;
 
-    _valid(\$x_im, \$y_re, \$y_im);
+    ref($x_im) eq __PACKAGE__ or _valid(\$x_im);
+    ref($y_re) eq __PACKAGE__ or _valid(\$y_re);
+    ref($y_im) eq __PACKAGE__ or _valid(\$y_im);
+
     ((bless \__add__($$x_re, $$y_re)), (bless \__add__($$x_im, $$y_im)));
 }
 
@@ -12288,7 +12315,10 @@ sub complex_sub {
     $y_re //= ZERO;
     $y_im //= ZERO;
 
-    _valid(\$x_im, \$y_re, \$y_im);
+    ref($x_im) eq __PACKAGE__ or _valid(\$x_im);
+    ref($y_re) eq __PACKAGE__ or _valid(\$y_re);
+    ref($y_im) eq __PACKAGE__ or _valid(\$y_im);
+
     ((bless \__sub__($$x_re, $$y_re)), (bless \__sub__($$x_im, $$y_im)));
 }
 
@@ -12303,7 +12333,9 @@ sub complex_mul {
     $y_re //= ZERO;
     $y_im //= ZERO;
 
-    _valid(\$x_im, \$y_re, \$y_im);
+    ref($x_im) eq __PACKAGE__ or _valid(\$x_im);
+    ref($y_re) eq __PACKAGE__ or _valid(\$y_re);
+    ref($y_im) eq __PACKAGE__ or _valid(\$y_im);
 
 #<<<
     (
@@ -12328,7 +12360,9 @@ sub complex_div {
     $y_re //= ZERO;
     $y_im //= ZERO;
 
-    _valid(\$x_im, \$y_re, \$y_im);
+    ref($x_im) eq __PACKAGE__ or _valid(\$x_im);
+    ref($y_re) eq __PACKAGE__ or _valid(\$y_re);
+    ref($y_im) eq __PACKAGE__ or _valid(\$y_im);
 
     my $den = __add__(__mul__($$y_re, $$y_re), __mul__($$y_im, $$y_im));
 
@@ -12346,7 +12380,8 @@ sub complex_inv {
     my ($re, $im) = @_;
 
     $im //= ZERO;
-    _valid(\$im);
+
+    ref($im) eq __PACKAGE__ or _valid(\$im);
 
     my $den = __add__(__mul__($$re, $$re), __mul__($$im, $$im));
 
@@ -12397,7 +12432,8 @@ sub complex_invmod {
 sub complex_ipow {
     my ($x, $y, $n) = @_;
 
-    _valid(\$y, \$n);
+    ref($y) eq __PACKAGE__ or _valid(\$y);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
 
     $x = _any2mpz($$x, 0) // return (nan(), nan());
     $y = _any2mpz($$y, 1) // return (nan(), nan());
@@ -12446,7 +12482,8 @@ sub complex_ipow {
 sub complex_pow {
     my ($x, $y, $n) = @_;
 
-    _valid(\$y, \$n);
+    ref($y) eq __PACKAGE__ or _valid(\$y);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
 
     if (__is_int__($$x) and __is_int__($$y)) {
         return complex_ipow($x, $y, $n);
@@ -12493,7 +12530,9 @@ sub complex_pow {
 sub complex_powmod {
     my ($x, $y, $n, $m) = @_;
 
-    _valid(\$y, \$n, \$m);
+    ref($y) eq __PACKAGE__ or _valid(\$y);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $x = $$x;
     $y = $$y;
@@ -13441,7 +13480,8 @@ sub lucas {
 sub lucasu {
     my ($p, $q, $n) = @_;
 
-    _valid(\$q, \$n);
+    ref($q) eq __PACKAGE__ or _valid(\$q);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
 
     $p = _big2istr($$p)  // goto &nan;
     $q = _big2istr($$q)  // goto &nan;
@@ -13456,7 +13496,8 @@ sub lucasu {
 sub lucasv {
     my ($p, $q, $n) = @_;
 
-    _valid(\$q, \$n);
+    ref($q) eq __PACKAGE__ or _valid(\$q);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
 
     $p = _big2istr($$p)  // goto &nan;
     $q = _big2istr($$q)  // goto &nan;
@@ -13785,7 +13826,9 @@ sub _modular_lucas_V {
 sub lucasumod {
     my ($P, $Q, $n, $m) = @_;
 
-    _valid(\$Q, \$n, \$m);
+    ref($Q) eq __PACKAGE__ or _valid(\$Q);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $P = _any2mpz($$P, 0) // goto &nan;
     $Q = _any2mpz($$Q, 1) // goto &nan;
@@ -13810,7 +13853,9 @@ sub lucasumod {
 sub lucasvmod {
     my ($P, $Q, $n, $m) = @_;
 
-    _valid(\$Q, \$n, \$m);
+    ref($Q) eq __PACKAGE__ or _valid(\$Q);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $P = _any2mpz($$P, 0) // goto &nan;
     $Q = _any2mpz($$Q, 1) // goto &nan;
@@ -13832,7 +13877,9 @@ sub lucasvmod {
 sub lucasuvmod {
     my ($P, $Q, $n, $m) = @_;
 
-    _valid(\$Q, \$n, \$m);
+    ref($Q) eq __PACKAGE__ or _valid(\$Q);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $P = _any2mpz($$P, 0) // goto &nan;
     $Q = _any2mpz($$Q, 1) // goto &nan;
@@ -13971,7 +14018,9 @@ sub chebyshevu {
 sub chebyshevTmod {
     my ($n, $x, $m) = @_;
 
-    _valid(\$n, \$x, \$m);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
+    ref($x) eq __PACKAGE__ or _valid(\$x);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $n = _any2mpz($$n, 5) // goto &nan;
     $x = $$x;
@@ -14001,7 +14050,9 @@ sub chebyshevTmod {
 sub chebyshevUmod {
     my ($n, $x, $m) = @_;
 
-    _valid(\$x, \$m);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
+    ref($x) eq __PACKAGE__ or _valid(\$x);
+    ref($m) eq __PACKAGE__ or _valid(\$m);
 
     $n = _any2mpz($$n, 5) // goto &nan;
     $x = $$x;
@@ -23027,8 +23078,8 @@ sub is_lucasU_pseudoprime {    # true if U_n(P,Q) == 0 mod n
 
     __is_int__($$n) || return $FALSE;
 
-    $P = defined($P) ? do { _valid(\$P); _any2mpz($$P) // return $FALSE } : +1;
-    $Q = defined($Q) ? do { _valid(\$Q); _any2mpz($$Q) // return $FALSE } : -1;
+    $P = defined($P) ? do { ref($P) eq __PACKAGE__ or _valid(\$P); _any2mpz($$P) // return $FALSE } : +1;
+    $Q = defined($Q) ? do { ref($Q) eq __PACKAGE__ or _valid(\$Q); _any2mpz($$Q) // return $FALSE } : -1;
 
     $n = _any2mpz($$n) // return $FALSE;
 
@@ -23065,8 +23116,8 @@ sub is_lucasV_pseudoprime {    # true if V_n(P,Q) == P mod n
 
     __is_int__($$n) || return $FALSE;
 
-    $P = defined($P) ? do { _valid(\$P); _any2mpz($$P) // return $FALSE } : 1;
-    $Q = defined($Q) ? do { _valid(\$Q); _any2mpz($$Q) // return $FALSE } : -1;
+    $P = defined($P) ? do { ref($P) eq __PACKAGE__ or _valid(\$P); _any2mpz($$P) // return $FALSE } : 1;
+    $Q = defined($Q) ? do { ref($Q) eq __PACKAGE__ or _valid(\$Q); _any2mpz($$Q) // return $FALSE } : -1;
 
     $n = _any2mpz($$n) // return $FALSE;
 
@@ -23575,7 +23626,10 @@ sub is_perrin_pseudoprime {
 sub is_frobenius_pseudoprime {
     my ($n, $k, $m) = @_;
 
-    _valid(\$k, \$m) if defined($k);
+    if (defined($k)) {
+        ref($k) eq __PACKAGE__ or _valid(\$k);
+        ref($m) eq __PACKAGE__ or _valid(\$m);
+    }
 
     $n = $$n;
 
@@ -25618,7 +25672,9 @@ sub _znlog_pohlig_hellman {
 
 sub znlog {
     my ($a, $g, $n) = @_;
-    _valid(\$g, \$n);
+
+    ref($g) eq __PACKAGE__ or _valid(\$g);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
 
     $a = _any2mpz($$a, 1) // goto &nan;
     $g = _any2mpz($$g, 2) // goto &nan;
@@ -26977,7 +27033,7 @@ sub pminus1_factor {
 
 sub pplus1_factor {
     my ($n, $B1) = @_;
-    _valid(\$B1) if defined($B1);
+    (ref($B1) eq __PACKAGE__ or _valid(\$B1)) if defined($B1);
     _array(
            [map { _set_int($_) }
               Math::Prime::Util::GMP::pplus1_factor(_big2pistr($$n) // (return _array()), (defined($B1) ? (_big2pistr($$B1) || return _array($n)) : ()))
@@ -26998,8 +27054,15 @@ sub chebyshev_factor {
     Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
       or return _array();
 
-    $B = defined($B) ? do { ref($B) eq __PACKAGE__ or _valid(\$B); _any2ui($$B) || return _array(bless \$n) } : 1e5;
-    $x = defined($x) ? do { _valid(\$x); Math::GMPz::Rmpz_init_set(_any2mpz($$x) // $TWO) } : Math::GMPz::Rmpz_init_set_ui(CORE::int(CORE::rand(1e9)));
+    $B =
+      defined($B)
+      ? do { ref($B) eq __PACKAGE__ or _valid(\$B); _any2ui($$B) || return _array(bless \$n) }
+      : 1e5;
+
+    $x =
+      defined($x)
+      ? do { ref($x) eq __PACKAGE__ or _valid(\$x); Math::GMPz::Rmpz_init_set(_any2mpz($$x) // $TWO) }
+      : Math::GMPz::Rmpz_init_set_ui(CORE::int(CORE::rand(1e9)));
 
     my $i = Math::GMPz::Rmpz_init_set_ui(2);
 
@@ -27204,7 +27267,7 @@ sub miller_factor {
     Math::GMPz::Rmpz_sgn($n) > 0 or return _array();
 
     if (defined($tries)) {
-        _valid(\$tries);
+        ref($tries) eq __PACKAGE__ or _valid(\$tries);
         $tries = _any2ui($$tries) || return _array([_set_int($n)]);
     }
 
@@ -27691,8 +27754,8 @@ sub flt_factor {
     Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
       or return _array();
 
-    $base = defined($base) ? do { _valid(\$base); _any2ui($$base) // 2 }                        : 2;
-    $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) || return _array(bless \$n) } : 1e4;
+    $base = defined($base) ? do { ref($base) eq __PACKAGE__ or _valid(\$base); _any2ui($$base) // 2 }                        : 2;
+    $reps = defined($reps) ? do { ref($reps) eq __PACKAGE__ or _valid(\$reps); _any2ui($$reps) || return _array(bless \$n) } : 1e4;
 
     state $z = Math::GMPz::Rmpz_init_nobless();
     state $t = Math::GMPz::Rmpz_init_nobless();
@@ -27748,7 +27811,7 @@ sub pell_factor {
     # Efficient for numbers that have factors relatively close to sqrt(n)
 
     $n    = _any2mpz($$n, 0) // return _array();
-    $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) || return _array([_set_int($n)]) } : 1e4;
+    $reps = defined($reps) ? do { ref($reps) eq __PACKAGE__ or _valid(\$reps); _any2ui($$reps) || return _array([_set_int($n)]) } : 1e4;
 
     Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
       or return _array();
@@ -27844,7 +27907,7 @@ sub mbe_factor {
     Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
       or return _array();
 
-    $reps = defined($reps) ? do { _valid(\$reps); _any2ui($$reps) || return _array([_set_int($n)]) } : 10;
+    $reps = defined($reps) ? do { ref($reps) eq __PACKAGE__ or _valid(\$reps); _any2ui($$reps) || return _array([_set_int($n)]) } : 10;
 
     state $t = Math::GMPz::Rmpz_init_nobless();
     state $g = Math::GMPz::Rmpz_init_nobless();
@@ -27912,8 +27975,8 @@ sub squfof_factor {
 sub ecm_factor {
     my ($n, $B1, $curves) = @_;
 
-    _valid(\$B1)     if defined($B1);
-    _valid(\$curves) if defined($curves);
+    (ref($B1) eq __PACKAGE__     or _valid(\$B1))     if defined($B1);
+    (ref($curves) eq __PACKAGE__ or _valid(\$curves)) if defined($curves);
 
     _array(
            [map { _set_int($_) }
@@ -28147,7 +28210,7 @@ sub sum_remainders {
 
     # a(n,v) = Sum_{k=1..n} v % k
 
-    _valid(\$v);
+    ref($v) eq __PACKAGE__ or _valid(\$v);
 
     $n = _any2mpz($$n, 0) // goto &nan;
     $v = _any2mpz($$v, 1) // goto &nan;
@@ -40259,7 +40322,7 @@ sub round {
     my $nth = (
         defined($prec)
         ? do {
-            _valid(\$prec);
+            ref($prec) eq __PACKAGE__ or _valid(\$prec);
             _any2si($$prec) // (goto &nan);
           }
         : 0
@@ -40471,7 +40534,7 @@ sub bsearch_inverse {
     my $middle = Math::MPFR::Rmpfr_init2($prec);
 
     if (defined($block)) {
-        _valid(\$max);
+        ref($max) eq __PACKAGE__ or _valid(\$max);
         Math::MPFR::Rmpfr_set($left,  (_any2mpfr($$min) // return undef), $ROUND);
         Math::MPFR::Rmpfr_set($right, (_any2mpfr($$max) // return undef), $ROUND);
     }
