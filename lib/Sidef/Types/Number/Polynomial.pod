@@ -607,6 +607,8 @@ such term exists.
     say(p.coeff(2))                 # 3  (coefficient of x^2)
     say(p.coeff(5))                 # 0  (absent term)
 
+Alias: I<coefficient>
+
 =cut
 
 =head2 coeffs
@@ -620,6 +622,8 @@ sorted in B<ascending> order by exponent (lowest degree first).
     say(p.coeffs)
     # [[0, 3], [1, 2], [2, 1]]
     # (constant term first, highest-degree term last)
+
+Alias: I<coefficients>
 
 =cut
 
@@ -969,7 +973,7 @@ Aliases: I<cmp>
     a < b
 
 Returns true if C<a> is strictly less than C<b> under the ordering defined
-by L</<=>>. 
+by L</<=>>.
 
 Aliases: I<lt>
 

@@ -269,7 +269,7 @@ with (Poly(1 => 1)) {|x|
     assert_eq(binomial(x, 10), Polynomial(1 => -1/10, 2 => 7129/25200, 3 => -1303/4032, 4 => 4523/22680, 5 => -19/256, 6 => 3013/172800, 7 => -1/384, 8 => 29/120960, 9 => -1/80640, 10 => 1/3628800))
 }
 
-for n in (0..10) {
+for n in (0..20) {
     var x = irand(50, 100)
 
     assert_eq(chebyshevT(n).eval(x), chebyshevT(n, x))

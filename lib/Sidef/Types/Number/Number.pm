@@ -1139,7 +1139,7 @@ sub _execute_in_tmpdir {
 }
 
 sub _is_prob_prime {
-    my ($n, $cache) = @_;
+    my ($n) = @_;
 
     $n = _normalize_numeric_type($n) if ref($n);
 
@@ -1153,18 +1153,16 @@ sub _is_prob_prime {
         return $IS_PRIME_CACHE{$n};
     }
 
-    my $r = do {
-        (
-         (CORE::length($n) > PRIMALITY_PRETEST_MIN)
-         ? do {
-             state $t = Math::GMPz::Rmpz_init();
-             Math::GMPz::Rmpz_set_str($t, "$n", 10);
-             _primality_pretest($t);
-           }
-         : 1
-        )
-          && Math::Prime::Util::GMP::is_prime($n);
-    };
+    my $r = (
+        (CORE::length($n) > PRIMALITY_PRETEST_MIN)
+        ? do {
+            state $t = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_set_str($t, "$n", 10);
+            _primality_pretest($t);
+          }
+        : 1
+      )
+      && Math::Prime::Util::GMP::is_prime($n);
 
     # FIFO Cache management
     if (@IS_PRIME_QUEUE >= IS_PRIME_CACHE_SIZE) {
@@ -1203,7 +1201,7 @@ sub _factor_special {
     my $limit             = (CORE::length($n) <= YAFU_MIN) ? ZERO : ();
 
     foreach my $p (@{_set_int($n)->special_factors($limit)}) {
-        if (_is_prob_prime($$p, 1)) {
+        if (_is_prob_prime($$p)) {
             push @special_factors, "$$p";
         }
         else {
@@ -1236,7 +1234,7 @@ sub _factor_factordb {
     foreach my $pp (@{$data->{factors}}) {
         my ($p, $e) = @$pp;
 
-        if (_is_prob_prime($p, 1)) {
+        if (_is_prob_prime($p)) {
             push @factordb_factors, ($p) x Math::Prime::Util::GMP::valuation($n, $p);
         }
         else {
@@ -1302,7 +1300,7 @@ sub _factor_yafu {
     }
 
     # Ensure all factors are prime, otherwise recurse
-    if (grep { !_is_prob_prime($_, 1) } List::Util::uniq(@yafu_factors)) {
+    if (grep { !_is_prob_prime($_) } List::Util::uniq(@yafu_factors)) {
         say STDERR "YAFU: not all factors are prime." if $VERBOSE;
         local $USE_YAFU = 0;
         @yafu_factors = map { _factor($_) } @yafu_factors;
@@ -1346,10 +1344,10 @@ sub _factor_yafu {
     return ();
 }
 
-sub _factor_impl {
+sub _factor_generic {
     my ($n) = @_;
-    my $orig_n = $n;
 
+    my $orig_n = $n;
     my @factors;
 
     # Adaptive trial factorization for exceptionally large numbers
@@ -1357,7 +1355,7 @@ sub _factor_impl {
         ($n, @factors) = _adaptive_trial_factor($n);
 
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            return @factors if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+            return \@factors if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
             $n = Math::GMPz::Rmpz_get_ui($n);
         }
         else {
@@ -1368,9 +1366,9 @@ sub _factor_impl {
     # Centralized prime check for large remaining composites
     my $len = CORE::length($n);
     if ($len >= SPECIAL_FACTORS_MIN || $len >= FACTORDB_MIN || $len >= YAFU_MIN) {
-        if (_is_prob_prime($n, 1)) {
+        if (_is_prob_prime($n)) {
             push @factors, $n;
-            return @factors;
+            return \@factors;
         }
     }
 
@@ -1379,7 +1377,7 @@ sub _factor_impl {
 
         # Throw away the small factors (if any)
         my @special = _factor_special($orig_n);
-        return @special if @special;
+        return \@special if @special;
     }
 
     # 2. FactorDB Strategy
@@ -1387,7 +1385,7 @@ sub _factor_impl {
         my @fdb = _factor_factordb($n);
         if (@fdb) {
             push @factors, @fdb;
-            return @factors;
+            return \@factors;
         }
     }
 
@@ -1396,13 +1394,13 @@ sub _factor_impl {
         my @yafu = _factor_yafu($n);
         if (@yafu) {
             push @factors, @yafu;
-            return @factors;
+            return \@factors;
         }
     }
 
     # 4. Fallback Strategy
     push @factors, _factor_via_prime_util($n);
-    return @factors;
+    return \@factors;
 }
 
 sub _factor {
@@ -1418,16 +1416,16 @@ sub _factor {
         return @$cached;
     }
 
-    my @factors = _factor_impl($n);
+    my $factors = _factor_generic($n);
 
     # FIFO Cache management
     if (@FACTOR_QUEUE >= FACTOR_CACHE_SIZE) {
         delete $FACTOR_CACHE{shift @FACTOR_QUEUE};
     }
     push @FACTOR_QUEUE, $n;
-    $FACTOR_CACHE{$n} = \@factors;
+    $FACTOR_CACHE{$n} = $factors;
 
-    return @factors;
+    return @$factors;
 }
 
 # Prime factorization in [p,k] form, where k is the multiplicity of p.
@@ -1489,7 +1487,6 @@ sub _divisors {
     }
 
     if (CORE::length($n) >= SPECIAL_FACTORS_MIN) {
-
         my $t = _set_int($n);
         my $D = $t->divisors($t);
         @divisors = map { (ref($$_) eq 'Math::GMPz') ? Math::GMPz::Rmpz_get_str($$_, 10) : $$_ } @$D;
@@ -2469,9 +2466,13 @@ sub __add__ {
     }
 
   Math_GMPq__Scalar: {
-
-        # $y || return $x;
         my $r = Math::GMPq::Rmpq_init();
+
+        if ($y == 0) {
+            Math::GMPq::Rmpq_set($r, $x);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::GMPq::Rmpq_set_si($r, $y, 1)
           : Math::GMPq::Rmpq_set_ui($r, $y, 1);
@@ -2480,9 +2481,13 @@ sub __add__ {
     }
 
   Math_MPFR__Scalar: {
-
-        # $y || return $x;
         my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+        if ($y == 0) {
+            Math::MPFR::Rmpfr_set($r, $x, $ROUND);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::MPFR::Rmpfr_sub_ui($r, $x, -$y, $ROUND)
           : Math::MPFR::Rmpfr_add_ui($r, $x, $y, $ROUND);
@@ -2490,9 +2495,13 @@ sub __add__ {
     }
 
   Math_MPC__Scalar: {
-
-        # $y || return $x;
         my $r = Math::MPC::Rmpc_init2($PREC);
+
+        if ($y == 0) {
+            Math::MPC::Rmpc_set($r, $x, $ROUND);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::MPC::Rmpc_sub_ui($r, $x, -$y, $ROUND)
           : Math::MPC::Rmpc_add_ui($r, $x, $y, $ROUND);
@@ -2680,9 +2689,13 @@ sub __sub__ {
     }
 
   Math_GMPq__Scalar: {
-
-        # $y || return $x;
         my $r = Math::GMPq::Rmpq_init();
+
+        if ($y == 0) {
+            Math::GMPq::Rmpq_set($r, $x);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::GMPq::Rmpq_set_si($r, $y, 1)
           : Math::GMPq::Rmpq_set_ui($r, $y, 1);
@@ -2691,9 +2704,13 @@ sub __sub__ {
     }
 
   Math_MPFR__Scalar: {
-
-        # $y || return $x;
         my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+        if ($y == 0) {
+            Math::MPFR::Rmpfr_set($r, $x, $ROUND);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::MPFR::Rmpfr_add_ui($r, $x, -$y, $ROUND)
           : Math::MPFR::Rmpfr_sub_ui($r, $x, $y, $ROUND);
@@ -2701,9 +2718,13 @@ sub __sub__ {
     }
 
   Math_MPC__Scalar: {
-
-        # $y || return $x;
         my $r = Math::MPC::Rmpc_init2($PREC);
+
+        if ($y == 0) {
+            Math::MPC::Rmpc_set($r, $x, $ROUND);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::MPC::Rmpc_add_ui($r, $x, -$y, $ROUND)
           : Math::MPC::Rmpc_sub_ui($r, $x, $y, $ROUND);
@@ -2712,6 +2733,12 @@ sub __sub__ {
 
   Scalar__Math_GMPz: {
         my $r = Math::GMPz::Rmpz_init();
+
+        if ($x == 0) {
+            Math::GMPz::Rmpz_neg($r, $y);
+            return $r;
+        }
+
         ($x < 0)
           ? do {
             Math::GMPz::Rmpz_add_ui($r, $y, -$x);
@@ -2723,6 +2750,12 @@ sub __sub__ {
 
   Scalar__Math_GMPq: {
         my $r = Math::GMPq::Rmpq_init();
+
+        if ($x == 0) {
+            Math::GMPq::Rmpq_neg($r, $y);
+            return $r;
+        }
+
         ($x < 0)
           ? Math::GMPq::Rmpq_set_si($r, $x, 1)
           : Math::GMPq::Rmpq_set_ui($r, $x, 1);
@@ -2740,6 +2773,12 @@ sub __sub__ {
 
   Scalar__Math_MPC: {
         my $r = Math::MPC::Rmpc_init2($PREC);
+
+        if ($x == 0) {
+            Math::MPC::Rmpc_neg($r, $y, $ROUND);
+            return $r;
+        }
+
         Math::MPC::Rmpc_set_ui($r, (($x < 0) ? (-$x) : $x), $ROUND);
         Math::MPC::Rmpc_neg($r, $r, $ROUND) if ($x < 0);
         Math::MPC::Rmpc_sub($r, $r, $y, $ROUND);
@@ -2925,8 +2964,13 @@ sub __mul__ {
   Math_GMPq__Scalar: {
         $y || return 0;
 
-        # $y == 1 and return $x;
         my $r = Math::GMPq::Rmpq_init();
+
+        if ($y == 1) {
+            Math::GMPq::Rmpq_set($r, $x);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::GMPq::Rmpq_set_si($r, $y, 1)
           : Math::GMPq::Rmpq_set_ui($r, $y, 1);
@@ -2935,9 +2979,13 @@ sub __mul__ {
     }
 
   Math_MPFR__Scalar: {
-
-        # $y == 1 and return $x;
         my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+        if ($y == 1) {
+            Math::MPFR::Rmpfr_set($r, $x, $ROUND);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::MPFR::Rmpfr_mul_si($r, $x, $y, $ROUND)
           : Math::MPFR::Rmpfr_mul_ui($r, $x, $y, $ROUND);
@@ -2945,9 +2993,13 @@ sub __mul__ {
     }
 
   Math_MPC__Scalar: {
-
-        # $y == 1 and return $x;
         my $r = Math::MPC::Rmpc_init2($PREC);
+
+        if ($y == 1) {
+            Math::MPC::Rmpc_set($r, $x, $ROUND);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::MPC::Rmpc_mul_si($r, $x, $y, $ROUND)
           : Math::MPC::Rmpc_mul_ui($r, $x, $y, $ROUND);
@@ -3188,8 +3240,6 @@ sub __div__ {
 
   Math_GMPq__Scalar: {
 
-        # $y == 1 and return $x;
-
         # Check for division by zero
         $y || do {
             $y = _any2mpz($y);
@@ -3197,6 +3247,12 @@ sub __div__ {
         };
 
         my $r = Math::GMPq::Rmpq_init();
+
+        if ($y == 1) {
+            Math::GMPq::Rmpq_set($r, $x);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::GMPq::Rmpq_set_si($r, -1, -$y)
           : Math::GMPq::Rmpq_set_ui($r, 1, $y);
@@ -3230,9 +3286,13 @@ sub __div__ {
     }
 
   Math_MPFR__Scalar: {
-
-        # $y == 1 and return $x;
         my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+        if ($y == 1) {
+            Math::MPFR::Rmpfr_set($r, $x, $ROUND);
+            return $r;
+        }
+
         ($y < 0)
           ? Math::MPFR::Rmpfr_div_si($r, $x, $y, $ROUND)
           : Math::MPFR::Rmpfr_div_ui($r, $x, $y, $ROUND);
@@ -3248,9 +3308,13 @@ sub __div__ {
     }
 
   Math_MPC__Scalar: {
-
-        # $y == 1 and return $x;
         my $r = Math::MPC::Rmpc_init2($PREC);
+
+        if ($y == 1) {
+            Math::MPC::Rmpc_set($r, $x, $ROUND);
+            return $r;
+        }
+
         Math::MPC::Rmpc_set_ui($r, (($y < 0) ? (-$y) : $y), $ROUND);
         Math::MPC::Rmpc_neg($r, $r, $ROUND) if ($y < 0);
         Math::MPC::Rmpc_div($r, $x, $r, $ROUND);
@@ -6545,9 +6609,9 @@ sub bernoulli_polynomial {
 
     $n = _any2ui($$n) // goto &nan;
 
-    if ($polynomial and $n >= 4500 and $USE_PARI_GP) {
+    if ($polynomial and $n >= 6000 and $USE_PARI_GP) {
         if (my $res = _execute_pari_gp("bernpol($n)")) {
-            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
+            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res))->eval($x);
         }
     }
 
@@ -6581,7 +6645,7 @@ sub bernoulli_polynomial {
             push @terms, $x->pow(_set_int($k))->mul(bless \$q);
         }
         else {
-            push @terms, __mul__(($k ? __pow__($x, $k) : 1), $q);
+            push @terms, __mul__($q, ($k ? __pow__($x, $k) : 1));
         }
     }
 
@@ -6609,7 +6673,7 @@ sub bernfrac {
         return bless \$q;
     }
 
-    if ($n >= 5000 and $USE_PARI_GP) {
+    if ($n >= 2000 and $USE_PARI_GP) {
         if (my $res = _execute_pari_gp("bernfrac($n)")) {
             my $q = Math::GMPq::Rmpq_init();
             Math::GMPq::Rmpq_set_str($q, $res, 10);
@@ -6660,6 +6724,7 @@ sub euler_polynomial {
     #
 
     my $polynomial = 0;
+    my $orig_x;
 
     if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
         ref($x) eq __PACKAGE__ or _valid(\$x);
@@ -6669,14 +6734,15 @@ sub euler_polynomial {
     else {
         $polynomial = 1;
         $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
-        $x = $x->add($x)->dec;
+        $orig_x = $x;
+        $x      = $x->add($x)->dec;
     }
 
     $n = _any2ui($$n) // goto &nan;
 
-    if ($polynomial and $n >= 25 and $USE_PARI_GP) {
+    if ($polynomial and $n >= 10 and $USE_PARI_GP) {
         if (my $res = _execute_pari_gp("eulerpol($n)")) {
-            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
+            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res))->eval($orig_x);
         }
     }
 
@@ -8379,7 +8445,7 @@ sub sum {
         if (FAST_MODE and !ref($n)) {
             $new_sum = $native_sum + $n;
 
-            if (FAST_MODE and $new_sum < ULONG_MAX and $new_sum > LONG_MIN) {
+            if ($new_sum < ULONG_MAX and $new_sum > LONG_MIN) {
                 $native_sum = $new_sum;
             }
             else {
@@ -13801,10 +13867,13 @@ sub chebyshevt {
     $n = -$n                        if $n < 0;
     $n == 0 and return ONE;
 
+    my $polynomial = 0;
+
     if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
         ref($x) eq __PACKAGE__ or _valid(\$x);
     }
     else {
+        $polynomial = 1;
         $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
     }
 
@@ -13812,7 +13881,13 @@ sub chebyshevt {
 
     if (ref($x) eq __PACKAGE__) {
         if (ref($$x) eq 'Math::GMPz' or (__is_rat__($$x) and __is_int__($$x))) {
-            return _set_int(Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::lucasv(2 * $$x, 1, $n), 2));
+            return _set_int(Math::Prime::Util::GMP::divint(Math::Prime::Util::GMP::lucasv(__mul__(2, $$x), 1, $n), 2));
+        }
+    }
+
+    if ($polynomial and $n >= 10 and $USE_PARI_GP) {
+        if (my $res = _execute_pari_gp("polchebyshev($n,1)")) {
+            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res))->eval($x);
         }
     }
 
@@ -13852,18 +13927,27 @@ sub chebyshevu {
         $negative = 1;
     }
 
+    my $polynomial = 0;
+
     if (defined($x) and ref($x) ne 'Sidef::Types::Number::Polynomial') {
         ref($x) eq __PACKAGE__ or _valid(\$x);
     }
     else {
+        $polynomial = 1;
         $x //= Sidef::Types::Number::Polynomial->new(1 => ONE);
     }
 
     if (ref($x) eq __PACKAGE__) {
         if (ref($$x) eq 'Math::GMPz' or (__is_rat__($$x) and __is_int__($$x))) {
-            my $r = _set_int(Math::Prime::Util::GMP::lucasu(2 * $$x, 1, $n + 1));
+            my $r = _set_int(Math::Prime::Util::GMP::lucasu(__mul__($$x, 2), 1, $n + 1));
             $r = $r->neg if $negative;
             return $r;
+        }
+    }
+
+    if ($polynomial and $n >= 10 and $USE_PARI_GP) {
+        if (my $res = _execute_pari_gp("polchebyshev($n,2)")) {
+            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res))->eval($x);
         }
     }
 
@@ -13976,9 +14060,9 @@ sub legendre_polynomial {
     $n == 0 && return ONE;
     $n == 1 && return $x;
 
-    if ($polynomial and $n >= 15 and $USE_PARI_GP) {
+    if ($polynomial and $n >= 10 and $USE_PARI_GP) {
         if (my $res = _execute_pari_gp("pollegendre($n)")) {
-            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
+            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res))->eval($x);
         }
     }
 
@@ -14044,9 +14128,9 @@ sub hermiteH {
 
     $n = _any2ui($$n) // goto &nan;
 
-    if ($polynomial and $n >= 250 and $USE_PARI_GP) {
+    if ($polynomial and $n >= 15 and $USE_PARI_GP) {
         if (my $res = _execute_pari_gp("polhermite($n)")) {
-            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
+            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res))->eval($x);
         }
     }
 
@@ -14111,6 +14195,15 @@ sub hermiteHe {
 
     $n = _any2ui($$n) // goto &nan;
 
+    if ($polynomial and $n >= 15 and $USE_PARI_GP) {
+        if (my $res = _execute_pari_gp("polhermite($n)")) {
+            my $poly   = Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
+            my @coeffs = @{$poly->coeffs};
+            @coeffs = map { [$_->[0], $_->[1]->shift_right(_set_int(($n + ${$_->[0]}) >> 1))] } @coeffs;
+            return Sidef::Types::Number::Polynomial->new(\@coeffs)->eval($x);
+        }
+    }
+
     $n == 0 && return ONE;
     $n == 1 && return $x;
 
@@ -14172,6 +14265,12 @@ sub laguerreL {
 
     $n = _any2ui($$n) // goto &nan;
     $n || return ONE;
+
+    if ($polynomial and $n >= 50 and $USE_PARI_GP) {
+        if (my $res = _execute_pari_gp("pollaguerre($n)")) {
+            return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res))->eval($x);
+        }
+    }
 
     my $t = Math::GMPz::Rmpz_init();
     my $u = Math::GMPz::Rmpz_init_set_ui(1);
@@ -16344,7 +16443,7 @@ sub cyclotomic_polynomial {
             return Sidef::Types::Number::Polynomial->new(ONE)->dec;
         }
 
-        if ($n >= 150 and $USE_PARI_GP) {
+        if ($n >= 100 and $USE_PARI_GP) {
             if (my $res = _execute_pari_gp("polcyclo($n)")) {
                 return Sidef::Types::Number::Polynomial->new(Sidef::Types::String::String->new($res));
             }
@@ -16628,7 +16727,7 @@ sub cyclotomic_factor {
             push @factors, ($f) x $v;
 
             last OUTER if (   Math::GMPz::Rmpz_cmp_ui($n, 1) == 0
-                           or _is_prob_prime($n, 1));
+                           or _is_prob_prime($n));
         }
     }
 
@@ -20134,7 +20233,7 @@ sub hclassno {
     }
 
     # PARI/GP for massive discriminants
-    if ($USE_PARI_GP and Math::GMPz::Rmpz_sizeinbase($n, 2) >= 32) {
+    if ($USE_PARI_GP and Math::GMPz::Rmpz_sizeinbase($n, 2) >= 24) {
         my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
         my $res   = _execute_pari_gp("qfbhclassno($n_str)");
         if (defined($res) and $res =~ /[0-9]/) {
@@ -22018,7 +22117,7 @@ sub _pollard_rho_factor {
 
         if (@f) {
             say STDERR "pbrent_factor(r, $reps): @f" if $VERBOSE;
-            @new_factors = map { _is_prob_prime($_, 1) ? $_ : _factor($_) } @f;
+            @new_factors = map { _is_prob_prime($_) ? $_ : _factor($_) } @f;
             push @factors, @new_factors;
         }
 
@@ -22035,7 +22134,7 @@ sub _pollard_rho_factor {
             $r = 1;
             last;
         }
-        elsif ($reps >= 1e4 and _is_prob_prime($r, 1)) {
+        elsif ($reps >= 1e4 and _is_prob_prime($r)) {
             push @factors, $r;
             $r = 1;
             last;
@@ -22050,7 +22149,7 @@ sub _pollard_rho_factor {
 sub _check_remainder_special {
     my ($remainder, $type) = @_;
 
-    return _is_prob_prime($remainder, 1) if $type eq 'almost';
+    return _is_prob_prime($remainder) if $type eq 'almost';
 
     if (HAS_PRIME_UTIL && Math::GMPz::Rmpz_fits_ulong_p($remainder)) {
         return Math::Prime::Util::is_prime_power(Math::GMPz::Rmpz_get_ui($remainder));
@@ -22087,7 +22186,7 @@ sub _process_special_factors {
 
     # Separate prime and composite factors
     foreach my $f (@gcd_factors) {
-        if (_is_prob_prime($$f, 1)) {
+        if (_is_prob_prime($$f)) {
             push @prime_factors, $f;
         }
         elsif (Math::GMPz::Rmpz_sizeinbase(_any2mpz($$f), 2) <= MEDIUM_NUMBER_MAX_BITS) {
@@ -22589,7 +22688,7 @@ sub is_super_pseudoprime {
                   or return $FALSE;
             }
 
-            if (_is_prob_prime($f, 1)) {
+            if (_is_prob_prime($f)) {
                 push @primes, $f;
             }
             else {
@@ -22706,7 +22805,7 @@ sub is_over_pseudoprime {
                   or return $FALSE;
             }
 
-            if (_is_prob_prime($f, 1)) {
+            if (_is_prob_prime($f)) {
                 push @primes, $f;
             }
             else {
@@ -22872,7 +22971,7 @@ sub is_chebyshev_pseudoprime {    # OEIS: A175530
             return $FALSE;
         }
 
-        if ($i == 1 and _is_prob_prime($nstr, 1)) {
+        if ($i == 1 and _is_prob_prime($nstr)) {
             return $FALSE;
         }
     }
@@ -23067,7 +23166,7 @@ sub is_strong_fibonacci_pseudoprime {
             return $FALSE;
         }
 
-        if ($i == 1 and _is_prob_prime($nstr, 1)) {
+        if ($i == 1 and _is_prob_prime($nstr)) {
             return $FALSE;
         }
     }
@@ -25359,7 +25458,7 @@ sub _znlog_coprime_prime_power {
 
     # Pipe into PARI/GP for cryptographic-scale inputs
     # We bypass the system() overhead for small numbers
-    if ($USE_PARI_GP && Math::GMPz::Rmpz_sizeinbase($n, 2) >= 24) {
+    if ($USE_PARI_GP && Math::GMPz::Rmpz_sizeinbase($n, 2) >= 20) {
         my $a_str = Math::GMPz::Rmpz_get_str($a, 10);
         my $g_str = Math::GMPz::Rmpz_get_str($g, 10);
         my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
@@ -26282,7 +26381,7 @@ sub _get_recursive_factors {
 
 sub _is_trivial_factor {
     my ($factor) = @_;
-    return (!ref($$factor) or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= SMALL_NUMBER_MAX_BITS or _is_prob_prime($$factor, 1));
+    return (!ref($$factor) or Math::GMPz::Rmpz_sizeinbase($$factor, 2) <= SMALL_NUMBER_MAX_BITS or _is_prob_prime($$factor));
 }
 
 sub _create_collector {
@@ -26355,7 +26454,7 @@ sub _separate_factors {
     my (@prime, @composite);
 
     for my $f (@$factors) {
-        if (_is_prob_prime($$f, 1)) {
+        if (_is_prob_prime($$f)) {
             push @prime, $f;
         }
         elsif (!ref($$f) or Math::GMPz::Rmpz_sizeinbase($$f, 2) <= SMALL_NUMBER_MAX_BITS) {
@@ -26405,7 +26504,7 @@ sub _apply_recursive_methods {
     #~ if ($m->ge(TWO)) {
         #~ $composite = [
             #~ map {
-                #~ _is_prob_prime($$_, 1)
+                #~ _is_prob_prime($$_)
                   #~ ? $_
                   #~ : @{$_->cyclotomic_factor(map { _set_int($_) } 2 .. CORE::int($m->mul(_set_int(5))))}
               #~ } @$composite
@@ -26441,7 +26540,7 @@ sub special_factors {
     return _factorize_small($z) if _is_small_number($z);
 
     # Handle prime numbers
-    return _array([bless \$z]) if _is_prob_prime($z, 1);
+    return _array([bless \$z]) if _is_prob_prime($z);
 
     # Main factorization
     my (@factors, %rec_tried, $factorized);
@@ -26476,7 +26575,7 @@ sub factor {
             Sidef::Types::Block::Block->new(
                 code => sub {
                     my ($n) = @_;
-                    _is_prob_prime($$n, 1) ? _array() : do {
+                    _is_prob_prime($$n) ? _array() : do {
                         my $factors = do { $cache{"$n"} //= $block->run($n) };
                         $factors->first(-1)->concat($factors->last(-1))->iuniq;
                     };
@@ -26555,7 +26654,7 @@ sub _factor_remainder {
     }
 
     # Check primality
-    if (_is_prob_prime($r, 1)) {
+    if (_is_prob_prime($r)) {
         return ($r);
     }
 
@@ -26599,7 +26698,7 @@ sub _factor_remainder {
         my @f;
 
         # Early termination for primes
-        if (_is_prob_prime($r, 1)) {
+        if (_is_prob_prime($r)) {
             last;
         }
 
@@ -27003,7 +27102,7 @@ sub _miller_factor {
         return _factor(Math::GMPz::Rmpz_get_ui($n));
     }
 
-    if (_is_prob_prime($n, 1)) {
+    if (_is_prob_prime($n)) {
         return ($n);
     }
 
@@ -27049,13 +27148,13 @@ sub _miller_factor {
                 Math::GMPz::Rmpz_gcd($t, $N, $g);
 
                 if (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0 and Math::GMPz::Rmpz_cmp($t, $N) < 0) {
-                    if (_is_prob_prime($t, 1)) {
+                    if (_is_prob_prime($t)) {
                         Math::GMPz::Rmpz_remove($N, $N, $t);
                         push @all_factors, Math::GMPz::Rmpz_init_set($t);
                     }
                     else {
                         Math::GMPz::Rmpz_divexact($t, $N, $t);
-                        if (_is_prob_prime($t, 1)) {
+                        if (_is_prob_prime($t)) {
                             Math::GMPz::Rmpz_remove($N, $N, $t);
                             push @all_factors, Math::GMPz::Rmpz_init_set($t);
                         }
@@ -27064,15 +27163,15 @@ sub _miller_factor {
 
                 push @all_factors, Math::GMPz::Rmpz_init_set($g);
 
-                if (scalar(@all_factors) >= 10 or Math::GMPz::Rmpz_fits_ulong_p($N) or _is_prob_prime(Math::GMPz::Rmpz_get_str($N, 10), 1)) {
+                if (scalar(@all_factors) >= 10 or Math::GMPz::Rmpz_fits_ulong_p($N) or _is_prob_prime(Math::GMPz::Rmpz_get_str($N, 10))) {
                     return map { $$_ } @{((bless \$n)->gcd_factors(_array([map { bless \$_ } @all_factors])))};
                 }
 
                 # Recursive approach
                 #~ Math::GMPz::Rmpz_divexact($t, $n, $g);
 
-                #~ my @g_factors = (_is_prob_prime($g, 1) ? Math::GMPz::Rmpz_init_set($g) : __SUB__->(Math::GMPz::Rmpz_init_set($g)));
-                #~ my @t_factors = (_is_prob_prime($t, 1) ? Math::GMPz::Rmpz_init_set($t) : __SUB__->(Math::GMPz::Rmpz_init_set($t)));
+                #~ my @g_factors = (_is_prob_prime($g) ? Math::GMPz::Rmpz_init_set($g) : __SUB__->(Math::GMPz::Rmpz_init_set($g)));
+                #~ my @t_factors = (_is_prob_prime($t) ? Math::GMPz::Rmpz_init_set($t) : __SUB__->(Math::GMPz::Rmpz_init_set($t)));
 
                 #~ return (@g_factors, @t_factors);
             }
@@ -27090,7 +27189,7 @@ sub _miller_factor {
 
     if (scalar(@holf_factors) > 1) {
         return (
-                map { _is_prob_prime($_, 1) ? $_ : __SUB__->($_) }
+                map { _is_prob_prime($_) ? $_ : __SUB__->($_) }
                 map { Math::GMPz::Rmpz_init_set_str($_, 10) } @holf_factors
                );
     }
@@ -27127,13 +27226,13 @@ sub _lucas_factor {
         return _factor(Math::GMPz::Rmpz_get_ui($n));
     }
 
-    if (_is_prob_prime($n, 1)) {
+    if (_is_prob_prime($n)) {
         return ($n);
     }
 
     if (!defined($j)) {
         my @factors = __SUB__->($n, 1, $tries);
-        @factors = map { _is_prob_prime($_, 1) ? $_ : __SUB__->($_, -1, $tries) } @factors;
+        @factors = map { _is_prob_prime($_) ? $_ : __SUB__->($_, -1, $tries) } @factors;
         return @factors;
     }
 
@@ -27198,13 +27297,13 @@ sub _lucas_factor {
                     Math::GMPz::Rmpz_gcd($t, $N, $g);
 
                     if (Math::GMPz::Rmpz_cmp_ui($t, 1) > 0 and Math::GMPz::Rmpz_cmp($t, $N) < 0) {
-                        if (_is_prob_prime($t, 1)) {
+                        if (_is_prob_prime($t)) {
                             Math::GMPz::Rmpz_remove($N, $N, $t);
                             push @all_factors, Math::GMPz::Rmpz_init_set($t);
                         }
                         else {
                             Math::GMPz::Rmpz_divexact($t, $N, $t);
-                            if (_is_prob_prime($t, 1)) {
+                            if (_is_prob_prime($t)) {
                                 Math::GMPz::Rmpz_remove($N, $N, $t);
                                 push @all_factors, Math::GMPz::Rmpz_init_set($t);
                             }
@@ -27213,15 +27312,15 @@ sub _lucas_factor {
 
                     push @all_factors, Math::GMPz::Rmpz_init_set($g);
 
-                    if (scalar(@all_factors) >= 5 or Math::GMPz::Rmpz_fits_ulong_p($N) or _is_prob_prime(Math::GMPz::Rmpz_get_str($N, 10), 1)) {
+                    if (scalar(@all_factors) >= 5 or Math::GMPz::Rmpz_fits_ulong_p($N) or _is_prob_prime(Math::GMPz::Rmpz_get_str($N, 10))) {
                         return map { $$_ } @{((bless \$n)->gcd_factors(_array([map { bless \$_ } @all_factors])))};
                     }
 
                     # Recursive approach
                     #~ Math::GMPz::Rmpz_divexact($t, $n, $g);
 
-                    #~ my @g_factors = (_is_prob_prime($g, 1) ? Math::GMPz::Rmpz_init_set($g) : __SUB__->(Math::GMPz::Rmpz_init_set($g)));
-                    #~ my @t_factors = (_is_prob_prime($t, 1) ? Math::GMPz::Rmpz_init_set($t) : __SUB__->(Math::GMPz::Rmpz_init_set($t)));
+                    #~ my @g_factors = (_is_prob_prime($g) ? Math::GMPz::Rmpz_init_set($g) : __SUB__->(Math::GMPz::Rmpz_init_set($g)));
+                    #~ my @t_factors = (_is_prob_prime($t) ? Math::GMPz::Rmpz_init_set($t) : __SUB__->(Math::GMPz::Rmpz_init_set($t)));
 
                     #~ return (@g_factors, @t_factors);
                 }
@@ -27242,7 +27341,7 @@ sub _lucas_factor {
     my @holf_factors = Math::Prime::Util::GMP::holf_factor($nstr, 10_000);
 
     if (scalar(@holf_factors) > 1) {
-        return (map { _is_prob_prime($_, 1) ? $_ : __SUB__->($_, $j) } map { Math::GMPz::Rmpz_init_set_str($_, 10) } @holf_factors);
+        return (map { _is_prob_prime($_) ? $_ : __SUB__->($_, $j) } map { Math::GMPz::Rmpz_init_set_str($_, 10) } @holf_factors);
     }
 
     return ($n);
@@ -33677,7 +33776,7 @@ sub partition_count {
 
     $n = _big2uistr($$n) // goto &nan;
 
-    if ($n >= 1e4 and $USE_PARI_GP) {
+    if ($n >= 1e3 and $USE_PARI_GP) {
         if (my $res = _execute_pari_gp("numbpart($n)")) {
             return _set_int($res);
         }
@@ -37353,7 +37452,7 @@ sub _verify_heavy_factors {
         foreach my $f (@factors) {
             return 0 if $seen{$f}++;    # not squarefree
 
-            if (_is_prob_prime($f, 1)) {
+            if (_is_prob_prime($f)) {
                 $check_conditions->($f) || return 0;
                 ++$$omega_ref;
             }
@@ -37368,7 +37467,7 @@ sub _verify_heavy_factors {
 
     # Factorize remaining composites
     foreach my $method (@$factor_methods, sub { _factor($_[0]) }) {
-        @factors = map { _is_prob_prime($_, 1) ? $_ : $method->($_) } @factors;
+        @factors = map { _is_prob_prime($_) ? $_ : $method->($_) } @factors;
     }
 
     $$omega_ref += scalar(@factors);
@@ -38984,14 +39083,14 @@ sub _prime_power_factor {
         return 0;
     }
 
-    if (_is_prob_prime($n, 1)) {
+    if (_is_prob_prime($n)) {
         return 1;
     }
 
     my $pow = _power_factor($n) || return 0;
     state $t = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_root($t, $n, $pow);
-    if (_is_prob_prime(Math::GMPz::Rmpz_get_str($t, 10), 1)) {
+    if (_is_prob_prime(Math::GMPz::Rmpz_get_str($t, 10))) {
         return $pow;
     }
     return 0;

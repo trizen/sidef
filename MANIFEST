@@ -13,7 +13,9 @@ lib/Sidef/Deparse/Sidef.pod
 lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
 lib/Sidef/Module/Func.pm
+lib/Sidef/Module/Func.pod
 lib/Sidef/Module/OO.pm
+lib/Sidef/Module/OO.pod
 lib/Sidef/Object/Convert.pm
 lib/Sidef/Object/Convert.pod
 lib/Sidef/Object/Enumerator.pm

@@ -124,6 +124,9 @@ my $builder = $class->new(
 
         # String .from_json and Object .to_json
         'JSON' => 0,
+
+        # For executing PARI/GP (with `Number!USE_PARI_GP = true`)
+        'IPC::Open2' => 0,
                   },
 
     # Metadata and Resources

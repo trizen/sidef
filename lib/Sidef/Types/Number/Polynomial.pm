@@ -341,7 +341,15 @@ sub derivative {
 
 sub eval {
     my ($x, $value) = @_;
+
     CORE::keys(%$x) || return Sidef::Types::Number::Number::ZERO;
+
+    if (ref($value) eq __PACKAGE__ and exists($value->{'1'}) and $value->{'1'}->is_one) {
+        if (scalar(keys %$value) == 1) {    # evaluation at x
+            return $x;
+        }
+    }
+
     Sidef::Types::Number::Number::sum(map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}->eval($value)) } CORE::keys %$x);
 }
 
@@ -355,6 +363,8 @@ sub coeff {
     $x->{$key} // Sidef::Types::Number::Number::ZERO;
 }
 
+*coefficient = \&coeff;
+
 sub coeffs {
     my ($x) = @_;
     Sidef::Types::Array::Array->new(
@@ -363,6 +373,8 @@ sub coeffs {
                                     ]
                                    );
 }
+
+*coefficients = \&coeffs;
 
 sub newton_method {
     my ($f, $x, $df) = @_;
