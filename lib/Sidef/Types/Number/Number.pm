@@ -11926,6 +11926,10 @@ sub rootmod_all {
         return _array([map { bless \$_ } @roots]);
     }
 
+    $A = Math::GMPz::Rmpz_init_set($A);    # copy
+    $k = Math::GMPz::Rmpz_init_set($k);    # copy
+    $n = Math::GMPz::Rmpz_init_set($n);    # copy
+
     Math::GMPz::Rmpz_abs($n, $n);
     return _array() if (Math::GMPz::Rmpz_cmp_ui($n, 0) == 0);
 
