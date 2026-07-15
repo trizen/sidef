@@ -31072,6 +31072,64 @@ sub jordan_totient {
 
 *JordanTotient = \&jordan_totient;
 
+sub dedekind_sum {
+    my ($h, $k) = @_;
+    ref($k) eq __PACKAGE__ or _valid(\$k);
+
+    $h = _any2mpz($$h) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
+
+    Math::GMPz::Rmpz_sgn($k) > 0 or goto &nan;
+
+    my $sum = Math::GMPq::Rmpq_init();
+    Math::GMPq::Rmpq_set_ui($sum, 0, 1);
+
+    state $H = Math::GMPz::Rmpz_init_nobless();
+    state $K = Math::GMPz::Rmpz_init_nobless();
+
+    Math::GMPz::Rmpz_set($K, $k);
+    Math::GMPz::Rmpz_mod($H, $h, $K);
+
+    my $sign = 1;
+    state $t1   = Math::GMPz::Rmpz_init_nobless();
+    state $t2   = Math::GMPz::Rmpz_init_nobless();
+    state $term = Math::GMPq::Rmpq_init_nobless();
+
+    while (Math::GMPz::Rmpz_sgn($H) > 0) {
+
+        # num = H^2 + K^2 + 1 - 3HK
+        Math::GMPz::Rmpz_mul($t1, $H, $H);
+        Math::GMPz::Rmpz_mul($t2, $K, $K);
+        Math::GMPz::Rmpz_add($t1, $t1, $t2);
+        Math::GMPz::Rmpz_add_ui($t1, $t1, 1);
+
+        Math::GMPz::Rmpz_mul($t2, $H, $K);
+        Math::GMPz::Rmpz_mul_ui($t2, $t2, 3);
+        Math::GMPz::Rmpz_sub($t1, $t1, $t2);
+
+        # den = 12HK
+        Math::GMPz::Rmpz_mul($t2, $H, $K);
+        Math::GMPz::Rmpz_mul_ui($t2, $t2, 12);
+
+        Math::GMPq::Rmpq_set_num($term, $t1);
+        Math::GMPq::Rmpq_set_den($term, $t2);
+        Math::GMPq::Rmpq_canonicalize($term);
+
+        if ($sign == 1) {
+            Math::GMPq::Rmpq_add($sum, $sum, $term);
+        }
+        else {
+            Math::GMPq::Rmpq_sub($sum, $sum, $term);
+        }
+        $sign = -$sign;
+
+        Math::GMPz::Rmpz_set($t1, $H);
+        Math::GMPz::Rmpz_mod($H, $K, $H);
+        Math::GMPz::Rmpz_set($K, $t1);
+    }
+    return bless \$sum;
+}
+
 sub dedekind_psi {
     my ($n, $k) = @_;
 

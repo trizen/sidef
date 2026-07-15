@@ -2934,6 +2934,29 @@ Returns true if C<n> is a primitive root modulo C<m>.
 
 =cut
 
+=head2 dedekind_sum
+
+    dedekind_sum(h, k)
+
+Returns the Dedekind sum C<s(h, k)> as an exact rational number.
+
+The Dedekind sum is defined by
+
+    s(h, k) = Σ ((n/k)) * ((hn/k))
+
+where the sum is taken over C<n = 1, 2, ..., k-1>, and the sawtooth function is:
+
+    ((x)) = x - floor(x) - 1/2    if x is not an integer
+          = 0                     otherwise
+
+The second argument C<k> must be a positive integer.
+
+    say dedekind_sum(1, 4)    # s(1,4) = 1/8
+    say dedekind_sum(1, 5)    # s(1,5) = 1/5
+    say dedekind_sum(2, 3)    # s(2,3) = -1/18
+
+=cut
+
 =head2 jacobi
 
     jacobi(a,n)
