@@ -114,7 +114,7 @@ use constant {
 
     SMALL_INTS_SIZE => $#SMALL_INTS,
 
-    PARI_GP_MIN            => 50,     # in decimal digits
+    PARI_GP_MIN            => 40,     # in decimal digits
     YAFU_MIN               => 49,     # in decimal digits
     FACTORDB_MIN           => 65,     # in decimal digits
     SPECIAL_FACTORS_MIN    => 36,     # in decimal digits (must be greater than SMALL_NUMBER_MAX_BITS)
