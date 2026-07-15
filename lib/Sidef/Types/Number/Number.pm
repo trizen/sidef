@@ -20534,6 +20534,55 @@ sub nth_cubefree {
     $n->nth_powerfree(THREE);
 }
 
+sub hilbert_symbol {
+    my ($n, $k, $p) = @_;
+
+    ref($k) eq __PACKAGE__ or _valid(\$k);
+    ref($p) eq __PACKAGE__ or _valid(\$p);
+
+    $n = _any2mpz($$n) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
+    $p = _any2mpz($$p) // goto &nan;
+
+    Math::GMPz::Rmpz_sgn($n) == 0 and return ZERO;
+    Math::GMPz::Rmpz_sgn($k) == 0 and return ZERO;
+    Math::GMPz::Rmpz_sgn($p) <= 0 and return ZERO;
+
+    # Explicit valuation and Kronecker evaluation
+    state $A = Math::GMPz::Rmpz_init_nobless();
+    state $B = Math::GMPz::Rmpz_init_nobless();
+    my $alpha = Math::GMPz::Rmpz_remove($A, $n, $p);
+    my $beta  = Math::GMPz::Rmpz_remove($B, $k, $p);
+
+    if (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0) {
+        my $A_mod8 = Math::GMPz::Rmpz_fdiv_ui($A, 8);
+        my $B_mod8 = Math::GMPz::Rmpz_fdiv_ui($B, 8);
+
+        my $eps_A = ($A_mod8 - 1) >> 1;
+        my $eps_B = ($B_mod8 - 1) >> 1;
+        my $omg_A = (($A_mod8 * $A_mod8 - 1) >> 3) & 1;
+        my $omg_B = (($B_mod8 * $B_mod8 - 1) >> 3) & 1;
+
+        my $pow = ($eps_A * $eps_B + $alpha * $omg_B + $beta * $omg_A) % 2;
+        return $pow ? MONE : ONE;
+    }
+
+    my $p_mod4 = Math::GMPz::Rmpz_fdiv_ui($p, 4);
+    my $eps_p  = ($p_mod4 - 1) >> 1;
+    my $sgn    = (($alpha * $beta * $eps_p) % 2) ? -1 : 1;
+
+    my $krA = Math::GMPz::Rmpz_jacobi($A, $p);
+    my $krB = Math::GMPz::Rmpz_jacobi($B, $p);
+
+    $krA = 1 if $beta % 2 == 0;
+    $krB = 1 if $alpha % 2 == 0;
+
+    my $res = $sgn * $krA * $krB;
+    return (($res == -1) ? MONE : ONE);
+}
+
+*hilbert = \&hilbert_symbol;
+
 sub legendre {
     my ($x, $y) = @_;
     ref($y) eq __PACKAGE__ or _valid(\$y);

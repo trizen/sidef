@@ -2957,6 +2957,14 @@ The second argument C<k> must be a positive integer.
 
 =cut
 
+=head2 legendre
+
+    legendre(a,p)
+
+Returns the Legendre symbol: C<(a|p)>.
+
+=cut
+
 =head2 jacobi
 
     jacobi(a,n)
@@ -2970,6 +2978,41 @@ Returns the Jacobi symbol: C<(a|n)>.
     kronecker(a,n)
 
 Returns the Kronecker symbol: C<(a|n)>.
+
+=cut
+
+=head2 hilbert
+
+    hilbert(a, b, p)
+
+Returns the Hilbert symbol C<(a, b)_p>, whose value is either C<1> or C<-1>.
+
+For a prime C<p>, the Hilbert symbol determines whether the quadratic equation
+
+    z² = ax² + by²
+
+has a nontrivial solution over the field of C<p>-adic numbers C<Q_p>. It is
+a fundamental invariant in algebraic number theory, quadratic forms, and
+local class field theory.
+
+The arguments C<a> and C<b> must be nonzero, and C<p> must be a positive prime.
+If either C<a> or C<b> is zero, or if C<<< p <= 0 >>>, the function returns C<0>.
+
+    say hilbert(2, 3, 5)     # => 1
+    say hilbert(2, 3, 2)     # => -1
+    say hilbert(-1, -1, 2)   # => -1
+    say hilbert(-1, -1, 5)   # => 1
+
+The Hilbert symbol is symmetric:
+
+    hilbert(a, b, p) == hilbert(b, a, p)
+
+and satisfies the multiplicative identities
+
+    (ab, c)_p = (a, c)_p * (b, c)_p
+    (a, bc)_p = (a, b)_p * (a, c)_p
+
+Aliases: I<hilbert_symbol>
 
 =cut
 
@@ -8758,14 +8801,6 @@ Carmichael lambda function: C<λ(n)>, defined as the smallest positive integer C
 for every integer C<a> between C<1> and C<n> that is coprime to C<n>.
 
 Alias: I<carmichael_lambda>.
-
-=cut
-
-=head2 legendre
-
-    legendre(a,p)
-
-Returns the Legendre symbol: C<(a|p)>.
 
 =cut
 
