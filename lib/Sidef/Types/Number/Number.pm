@@ -20601,6 +20601,47 @@ sub kronecker_delta {
 *δ              = \&kronecker_delta;
 *KroneckerDelta = \&kronecker_delta;
 
+sub coredisc {
+    my ($n) = @_;
+
+    $n = _big2istr($$n) // goto &nan;
+
+    my $sgn = Math::Prime::Util::GMP::cmpint($n, 0);
+
+    if ($sgn == 0) {
+        return ZERO;
+    }
+
+    my $c = ${(bless \$n)->abs->core};
+    $c = __mul__($c, $sgn) if $sgn != 1;
+    $c = _any2mpz($c);
+
+    state $r = Math::GMPz::Rmpz_init_nobless();
+
+    my $mod4;
+    if (FAST_MODE and Math::GMPz::Rmpz_fits_slong_p($c)) {
+        my $v = Math::GMPz::Rmpz_get_si($c);
+        $mod4 = $v % 4;
+        $mod4 += 4 if $mod4 < 0;
+    }
+    else {
+        $mod4 = Math::GMPz::Rmpz_mod_ui($r, $c, 4);
+    }
+
+    if ($mod4 == 1) {
+        return bless \$c;
+    }
+
+    Math::GMPz::Rmpz_mul_ui($r, $c, 4);
+    my $r2 =
+        Math::GMPz::Rmpz_fits_slong_p($r)
+      ? Math::GMPz::Rmpz_get_si($r)
+      : Math::GMPz::Rmpz_init_set($r);
+    return bless \$r2;
+}
+
+*fundamental_discriminant = \&coredisc;
+
 sub hclassno {
     my ($n) = @_;
 

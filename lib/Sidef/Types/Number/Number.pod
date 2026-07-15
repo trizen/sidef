@@ -9437,6 +9437,26 @@ Aliases: I<squarefree_part>
 
 =cut
 
+=head2 coredisc
+
+    coredisc(n)
+
+Returns the fundamental discriminant associated with C<n>. The result is obtained from the squarefree kernel of C<n>, preserving the sign of C<n>:
+
+    D = core(n)      if core(n) ≡ 1 (mod 4)
+      = 4*core(n)    otherwise
+
+The returned value is the discriminant of the quadratic field C<Q(sqrt(n))>, making it useful in algebraic number theory and quadratic forms.
+
+    say coredisc(12)    #=> 12
+    say coredisc(20)    #=> 5
+    say coredisc(-5)    #=> -20
+    say coredisc(-12)   #=> -3
+
+Aliases: I<fundamental_discriminant>
+
+=cut
+
 =head2 cube_part
 
     cube_part(n)
