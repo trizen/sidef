@@ -9360,42 +9360,50 @@ sub solve_pell {
         return (undef, undef);
     }
 
-    # Fast path for large discriminants: get the fundamental solution to
-    # x^2 - d*y^2 = 1 from PARI/GP's quadunit(), which computes the
-    # fundamental unit of the real quadratic order directly, instead of
-    # walking the full O(sqrt(d)*log(d))-length continued fraction period
-    # ourselves. quadunit(4d) always returns a+b*sqrt(d) (using 4d avoids
-    # any ambiguity about which order we're in when d = 1 mod 4); its norm
-    # a^2-d*b^2 is +-1, and squaring it once flips a norm of -1 into +1.
-    if ($USE_PARI_GP and $d >= 10000) {
+    # Use PARI/GP for large Pell equations
+    if ($USE_PARI_GP && Math::GMPz::Rmpz_sizeinbase($d, 2) > 16) {
         my $d_str = Math::GMPz::Rmpz_get_str($d, 10);
-        my $code  = "my(u=quadunit(4*$d_str));my(p=u.pol);my(a=polcoef(p,0));my(b=polcoef(p,1));[a,b]";
 
-        if (my $res = _execute_pari_gp($code)) {
-            if (my ($x_str, $y_str) = $res =~ /^\[(-?\d+),\s+(-?\d+)\]\z/) {
-                my $U = Math::GMPz::Rmpz_init_set_str($x_str, 10);
-                my $V = Math::GMPz::Rmpz_init_set_str($y_str, 10);
+        if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
 
-                my $r = $U**2 - $d * $V**2;
-
-                if ($r == $n) {
+            # Fundamental unit approach for n = 1
+            my $code =
+"iferr(my(u=quadunit(4*$d_str)); my(p=u.pol); my(a=polcoef(p,0)); my(b=polcoef(p,1)); if(a^2-$d_str*b^2==-1, u=u^2; a=polcoef(u.pol,0); b=polcoef(u.pol,1)); [a,b], E, \"\")";
+            if (my $res = _execute_pari_gp($code)) {
+                if (my ($x_str, $y_str) = $res =~ /^\[(-?\d+),\s+(-?\d+)\]\z/) {
+                    my $U = Math::GMPz::Rmpz_init_set_str($x_str, 10);
+                    my $V = Math::GMPz::Rmpz_init_set_str($y_str, 10);
+                    Math::GMPz::Rmpz_abs($U, $U);
+                    Math::GMPz::Rmpz_abs($V, $V);
                     return ((bless \$U), (bless \$V));
                 }
-
-                if ($r == -1) {
-                    ($U, $V) = ($U**2 + $d * $V**2, 2 * $U * $V);
-                }
-
-                if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
-                    return ((bless \$U), (bless \$V));
-                }
-
-                return _pell_bounded_search($d, $n, $U);
             }
         }
+        else {
+            # Generalized Pell for n != 1 using indefinite forms
+            my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
+            my $code  = "iferr(my(v=qfbsolve(Qfb(1,0,-$d_str), $n_str)); if(#v, v, \"\"), E, \"\")";
 
-        # Fall through to the continued-fraction method below if PARI/GP
-        # wasn't available, failed, or returned something unparseable.
+            if (my $res = _execute_pari_gp($code)) {
+                return (undef, undef) if $res eq '';    # No solution exists
+
+                my @sols;
+                while ($res =~ /\[(-?\d+),\s*(-?\d+)\]/g) {
+                    my $x = Math::GMPz::Rmpz_init_set_str($1, 10);
+                    my $y = Math::GMPz::Rmpz_init_set_str($2, 10);
+                    Math::GMPz::Rmpz_abs($x, $x);
+                    Math::GMPz::Rmpz_abs($y, $y);
+                    push @sols, [$x, $y];
+                }
+
+                if (@sols) {
+
+                    # Sort to guarantee the minimal positive solution is returned
+                    @sols = sort { Math::GMPz::Rmpz_cmp($a->[1], $b->[1]) } @sols;
+                    return (bless(\$sols[0][0]), bless(\$sols[0][1]));
+                }
+            }
+        }
     }
 
     my $a0 = Math::GMPz::Rmpz_init();
