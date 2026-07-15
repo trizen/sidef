@@ -1088,7 +1088,7 @@ sub _execute_pari_gp {
     # Maintain persistent handles for the lifetime of the interpreter
     state ($gp_in, $gp_out, $gp_pid);
 
-    state $gp_cmd = 'gp -q -f --default parisizemax=500000000';
+    state $gp_cmd = 'gp -q -f --default parisize=500M --default parisizemax=0 --default threadsizemax=0';
 
     # Lazy initialization: only spawn the process on the first call
     if (!$gp_pid) {
@@ -12977,7 +12977,22 @@ sub bit_scan1 {
 
 sub ramanujan_tau {
     my ($n) = @_;
-    _set_int(Math::Prime::Util::GMP::ramanujan_tau(_big2uistr($$n) // goto &nan));
+    $n = _big2uistr($$n) // goto &nan;
+
+    if ($n > 1e5 and $USE_PARI_GP) {
+
+        my @terms;
+        foreach my $pp (_factor_exp($n)) {
+            my ($p, $e) = @$pp;
+            my $pe = ($e == 1)  ? $p                                    : Math::Prime::Util::GMP::powint($p, $e);
+            my $r  = ($p > 1e5) ? _execute_pari_gp("ramanujantau($pe)") : Math::Prime::Util::GMP::ramanujan_tau($pe);
+            push @terms, $r;
+        }
+
+        return _set_int(Math::Prime::Util::GMP::vecprod(@terms));
+    }
+
+    _set_int(Math::Prime::Util::GMP::ramanujan_tau($n));
 }
 
 *RamanujanTau = \&ramanujan_tau;
@@ -21048,8 +21063,8 @@ sub _sos_k24 {
 
     # Ramanujan's tau(x) terms (A000594)
     # They evaluate to 0 if the argument x is not an integer
-    my $tau_n   = Math::Prime::Util::GMP::ramanujan_tau($n);
-    my $tau_n_2 = Math::GMPz::Rmpz_even_p($n) ? Math::Prime::Util::GMP::ramanujan_tau($n >> 1) : 0;
+    my $tau_n   = ${_set_int($n)->ramanujan_tau};
+    my $tau_n_2 = Math::GMPz::Rmpz_even_p($n) ? ${_set_int($n >> 1)->ramanujan_tau} : 0;
 
     # Determine the parity sign for (-1)^n
     my $sign = Math::GMPz::Rmpz_even_p($n) ? 1 : -1;
