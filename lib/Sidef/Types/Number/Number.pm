@@ -786,22 +786,9 @@ sub _any2mpfr_mpc {
 ## Any to GMPz (integer)
 #
 sub _any2mpz {
-    my ($x, $k) = @_;
+    my ($x) = @_;
 
     if (!ref($x)) {
-
-        if (defined($k)) {
-            state @table;
-            my $mpz = ($table[$k] //= Math::GMPz::Rmpz_init());
-            (FAST_MODE and $x < ULONG_MAX and $x > LONG_MIN)
-              ? (
-                 ($x < 0)
-                 ? Math::GMPz::Rmpz_set_si($mpz, $x)
-                 : Math::GMPz::Rmpz_set_ui($mpz, $x)
-                )
-              : Math::GMPz::Rmpz_set_str($mpz, $x, 10);
-            return $mpz;
-        }
 
         return (
                 (FAST_MODE and $x < ULONG_MAX and $x > LONG_MIN)
@@ -2044,7 +2031,7 @@ sub rat_approx {
     # Algorithm from Math::Prime::Util
 
     if (defined($max_den)) {
-        $max_den = _any2mpz($$max_den, 0) // goto &nan;
+        $max_den = _any2mpz($$max_den) // goto &nan;
     }
 
     my $x = _any2mpfr($$x_ref);
@@ -3542,9 +3529,9 @@ sub addmod {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
-    $m = _any2mpz($m, 2) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
@@ -3576,10 +3563,10 @@ sub addmulmod {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
-    $z = _any2mpz($z, 2) // goto &nan;
-    $m = _any2mpz($m, 3) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
+    $z = _any2mpz($z) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
@@ -3606,10 +3593,10 @@ sub submulmod {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
-    $z = _any2mpz($z, 2) // goto &nan;
-    $m = _any2mpz($m, 3) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
+    $z = _any2mpz($z) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
@@ -3634,9 +3621,9 @@ sub submod {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
-    $m = _any2mpz($m, 2) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
@@ -3664,9 +3651,9 @@ sub mulmod {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
-    $m = _any2mpz($m, 2) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
@@ -3693,10 +3680,10 @@ sub muladdmod {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
-    $z = _any2mpz($z, 2) // goto &nan;
-    $m = _any2mpz($m, 3) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
+    $z = _any2mpz($z) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
@@ -3723,10 +3710,10 @@ sub mulsubmod {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
-    $z = _any2mpz($z, 2) // goto &nan;
-    $m = _any2mpz($m, 3) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
+    $z = _any2mpz($z) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
@@ -3756,11 +3743,11 @@ sub muladdmulmod {
         return bless \$r;
     }
 
-    $w = _any2mpz($w, 0) // goto &nan;
-    $x = _any2mpz($x, 1) // goto &nan;
-    $y = _any2mpz($y, 2) // goto &nan;
-    $z = _any2mpz($z, 3) // goto &nan;
-    $m = _any2mpz($m, 4) // goto &nan;
+    $w = _any2mpz($w) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
+    $z = _any2mpz($z) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
@@ -3790,11 +3777,11 @@ sub mulsubmulmod {
         return bless \$r;
     }
 
-    $w = _any2mpz($w, 0) // goto &nan;
-    $x = _any2mpz($x, 1) // goto &nan;
-    $y = _any2mpz($y, 2) // goto &nan;
-    $z = _any2mpz($z, 3) // goto &nan;
-    $m = _any2mpz($m, 4) // goto &nan;
+    $w = _any2mpz($w) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
+    $z = _any2mpz($z) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
 
@@ -3821,8 +3808,8 @@ sub iadd {
         return bless \__add__($x, $y);
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
-    $y = _any2mpz($y, 1) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
+    $y = _any2mpz($y) // (goto &nan);
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_add($r, $x, $y);
@@ -3843,8 +3830,8 @@ sub isub {
         return bless \__sub__($x, $y);
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
-    $y = _any2mpz($y, 1) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
+    $y = _any2mpz($y) // (goto &nan);
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_sub($r, $x, $y);
@@ -3865,8 +3852,8 @@ sub imul {
         return bless \__mul__($x, $y);
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
-    $y = _any2mpz($y, 1) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
+    $y = _any2mpz($y) // (goto &nan);
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_mul($r, $x, $y);
@@ -3887,8 +3874,8 @@ sub imod {
         return bless \__mod__($x, $y);
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
-    $y = _any2mpz($y, 1) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
+    $y = _any2mpz($y) // (goto &nan);
 
     my $sign_y = Math::GMPz::Rmpz_sgn($y)
       || goto &nan;
@@ -3924,7 +3911,7 @@ sub idiv {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
 
     if (FAST_MODE and !ref($y) and $y > 0) {
         state $r = Math::GMPz::Rmpz_init_nobless();
@@ -3936,7 +3923,7 @@ sub idiv {
         return bless \$r2;
     }
 
-    $y = _any2mpz($y, 1) // (goto &nan);
+    $y = _any2mpz($y) // (goto &nan);
 
     # Detect division by zero
     Math::GMPz::Rmpz_sgn($y) || do {
@@ -3984,7 +3971,7 @@ sub idiv_ceil {
         return bless \$q;
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
 
     if (FAST_MODE and !ref($y) and $y > 0) {
         state $r = Math::GMPz::Rmpz_init_nobless();
@@ -3996,7 +3983,7 @@ sub idiv_ceil {
         return bless \$r2;
     }
 
-    $y = _any2mpz($y, 1) // (goto &nan);
+    $y = _any2mpz($y) // (goto &nan);
 
     # Detect division by zero
     Math::GMPz::Rmpz_sgn($y) || do {
@@ -4029,8 +4016,8 @@ sub idiv_trunc {
 
     ref($y) eq __PACKAGE__ or _valid(\$y);
 
-    $x = _any2mpz($$x, 0) // (goto &nan);
-    $y = _any2mpz($$y, 1) // (goto &nan);
+    $x = _any2mpz($$x) // (goto &nan);
+    $y = _any2mpz($$y) // (goto &nan);
 
     # Detect division by zero
     Math::GMPz::Rmpz_sgn($y) || do {
@@ -4063,8 +4050,8 @@ sub idiv_round {
 
     ref($y) eq __PACKAGE__ or _valid(\$y);
 
-    $x = _any2mpz($$x, 0) // (goto &nan);
-    $y = _any2mpz($$y, 1) // (goto &nan);
+    $x = _any2mpz($$x) // (goto &nan);
+    $y = _any2mpz($$y) // (goto &nan);
 
     # Detect division by zero
     Math::GMPz::Rmpz_sgn($y) || do {
@@ -4394,7 +4381,7 @@ sub iroot {
         return bless \$r;
     }
 
-    bless \__iroot__(_any2mpz($x, 0) // (goto &nan), $y);
+    bless \__iroot__(_any2mpz($x) // (goto &nan), $y);
 }
 
 *rootint = \&iroot;
@@ -4422,7 +4409,7 @@ sub isqrt {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
     Math::GMPz::Rmpz_sgn($x) < 0 and goto &nan;
 
     state $r = Math::GMPz::Rmpz_init_nobless();
@@ -4449,7 +4436,7 @@ sub icbrt {
         return bless \$r;
     }
 
-    bless \__iroot__(_any2mpz($x, 0) // (goto &nan), 3);
+    bless \__iroot__(_any2mpz($x) // (goto &nan), 3);
 }
 
 *cbrtint = \&icbrt;
@@ -4457,7 +4444,7 @@ sub icbrt {
 sub isqrtrem {
     my ($x) = @_;
 
-    $x = _any2mpz($$x, 0) // goto &nan;
+    $x = _any2mpz($$x) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($x) < 0
       and return ((nan()) x 2);
@@ -4474,7 +4461,7 @@ sub irootrem {
 
     ref($y) eq __PACKAGE__ or _valid(\$y);
 
-    $x = _any2mpz($$x, 0) // (goto &nan);
+    $x = _any2mpz($$x) // (goto &nan);
     $y = $$y;
 
     $y = _any2si($y) // (goto &nan) if ref($y);
@@ -4813,7 +4800,7 @@ sub ipow {
         return (($y % 2 == 0) ? ONE : MONE);
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_pow_ui($r, $x, CORE::abs($y));
@@ -5102,7 +5089,7 @@ sub ilog {
             return bless \$r;
         }
 
-        _set_int(__ilog__((_any2mpz($x, 0) // goto &nan), (_any2mpz($y, 1) // goto &nan)) // goto &nan);
+        _set_int(__ilog__((_any2mpz($x) // goto &nan), (_any2mpz($y) // goto &nan)) // goto &nan);
     }
     else {
         bless \(_any2mpz(__log__(_any2mpfr_mpc($$x))) // goto &nan);
@@ -5124,7 +5111,7 @@ sub ilog2 {
         return bless \$r;
     }
 
-    _set_int(__ilog__((_any2mpz($x, 0) // goto &nan), 2) // goto &nan);
+    _set_int(__ilog__((_any2mpz($x) // goto &nan), 2) // goto &nan);
 }
 
 sub ilog10 {
@@ -5140,13 +5127,13 @@ sub ilog10 {
         return bless \$r;
     }
 
-    _set_int(__ilog__((_any2mpz($x, 0) // goto &nan), 10) // goto &nan);
+    _set_int(__ilog__((_any2mpz($x) // goto &nan), 10) // goto &nan);
 }
 
 sub msb {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return undef;
+    $n = _any2mpz($$n) // return undef;
     Math::GMPz::Rmpz_sgn($n) || return undef;
 
     _set_int(Math::GMPz::Rmpz_sizeinbase($n, 2) - 1);
@@ -5155,7 +5142,7 @@ sub msb {
 sub lsb {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return undef;
+    $n = _any2mpz($$n) // return undef;
     Math::GMPz::Rmpz_sgn($n) || return undef;
 
     _set_int(Math::GMPz::Rmpz_scan1($n, 0));
@@ -5164,7 +5151,7 @@ sub lsb {
 sub fusc {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_sgn($n) >= 0 or goto &nan;
 
     if (Math::GMPz::Rmpz_even_p($n)) {
@@ -7047,7 +7034,7 @@ sub lnbernreal {
 
     # Fast O(1) path for ln(B_n) when x is omitted
     if (!defined($x_ref)) {
-        my $n = _any2mpz($$n_ref, 0) // goto &nan;
+        my $n = _any2mpz($$n_ref) // goto &nan;
         (Math::GMPz::Rmpz_sgn($n) || return ZERO) < 0 and goto &nan;
 
         if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
@@ -8180,7 +8167,7 @@ sub sign {
 
 sub popcount {
     my ($x) = @_;
-    my $z = _any2mpz($$x, 0) // return undef;
+    my $z = _any2mpz($$x) // return undef;
 
     if (Math::GMPz::Rmpz_sgn($z) < 0) {
         my $t = Math::GMPz::Rmpz_init();
@@ -8199,8 +8186,8 @@ sub hamdist {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // return undef;
-    $k = _any2mpz($$k, 1) // return undef;
+    $n = _any2mpz($$n) // return undef;
+    $k = _any2mpz($$k) // return undef;
 
     _set_int(Math::GMPz::Rmpz_hamdist($n, $k));
 }
@@ -8309,7 +8296,7 @@ sub is_even {
         return (($x % 2 == 0) ? ($TRUE) : ($FALSE));
     }
 
-    (__is_int__($x) && Math::GMPz::Rmpz_even_p(_any2mpz($x, 0) // (return $FALSE))) ? ($TRUE) : ($FALSE);
+    (__is_int__($x) && Math::GMPz::Rmpz_even_p(_any2mpz($x) // (return $FALSE))) ? ($TRUE) : ($FALSE);
 }
 
 sub is_odd {
@@ -8321,7 +8308,7 @@ sub is_odd {
         return (($x % 2 == 1) ? ($TRUE) : ($FALSE));
     }
 
-    (__is_int__($x) && Math::GMPz::Rmpz_odd_p(_any2mpz($x, 0) // (return $FALSE))) ? ($TRUE) : ($FALSE);
+    (__is_int__($x) && Math::GMPz::Rmpz_odd_p(_any2mpz($x) // (return $FALSE))) ? ($TRUE) : ($FALSE);
 }
 
 sub is_congruent {
@@ -8638,7 +8625,7 @@ sub as_int {
         }
     }
 
-    Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($$x, 0) // return undef), $base));
+    Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($$x) // return undef), $base));
 }
 
 sub __base__ {
@@ -8646,7 +8633,7 @@ sub __base__ {
     goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
-        $x = _any2mpz($x, 0);
+        $x = _any2mpz($x);
         goto Math_GMPz;
     }
 
@@ -9339,11 +9326,11 @@ sub _pell_bounded_search {
 sub solve_pell {
     my ($d, $n) = @_;
 
-    $d = _any2mpz($$d, 0) // return (undef, undef);
+    $d = _any2mpz($$d) // return (undef, undef);
 
     if (defined($n)) {
         ref($n) eq __PACKAGE__ or _valid(\$n);
-        $n = _any2mpz($$n, 1) // return (undef, undef);
+        $n = _any2mpz($$n) // return (undef, undef);
     }
     else {
         $n = $ONE;
@@ -9511,9 +9498,9 @@ sub solve_lcg {
     ref($r) eq __PACKAGE__ or _valid(\$r);
     ref($m) eq __PACKAGE__ or _valid(\$m);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $r = _any2mpz($$r, 1) // goto &nan;
-    $m = _any2mpz($$m, 2) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $r = _any2mpz($$r) // goto &nan;
+    $m = _any2mpz($$m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) || goto &nan;
 
@@ -9702,7 +9689,7 @@ sub sqrt_cfrac_period {
 sub sqrt_cfrac_period_len {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     return ZERO if Math::GMPz::Rmpz_perfect_square_p($n);
 
@@ -9806,8 +9793,8 @@ sub farey {
 sub farey_neighbors {
     my ($n, $pq) = @_;
 
-    $n  = _any2mpz($$n, 0) // return (undef, undef);
-    $pq = _any2mpq($$pq)   // return (undef, undef);
+    $n  = _any2mpz($$n)  // return (undef, undef);
+    $pq = _any2mpq($$pq) // return (undef, undef);
 
     Math::GMPq::Rmpq_sgn($pq) > 0          or return (undef, undef);
     Math::GMPq::Rmpq_cmp_ui($pq, 1, 1) < 0 or return (undef, undef);
@@ -9933,7 +9920,7 @@ sub as_bin {
         return Sidef::Types::String::String->new((($x < 0) ? '-' : '') . CORE::sprintf('%b', CORE::abs($x)));
     }
 
-    Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($x, 0) // return undef), 2));
+    Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($x) // return undef), 2));
 }
 
 sub as_oct {
@@ -9945,7 +9932,7 @@ sub as_oct {
         return Sidef::Types::String::String->new((($x < 0) ? '-' : '') . CORE::sprintf('%o', CORE::abs($x)));
     }
 
-    Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($x, 0) // return undef), 8));
+    Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($x) // return undef), 8));
 }
 
 sub as_hex {
@@ -9957,7 +9944,7 @@ sub as_hex {
         return Sidef::Types::String::String->new((($x < 0) ? '-' : '') . CORE::sprintf('%x', CORE::abs($x)));
     }
 
-    Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($x, 0) // return undef), 16));
+    Sidef::Types::String::String->new(Math::GMPz::Rmpz_get_str((_any2mpz($x) // return undef), 16));
 }
 
 sub bits {
@@ -9969,7 +9956,7 @@ sub bits {
         return _array([map { $_ ? ONE : ZERO } split(//, CORE::sprintf('%b', CORE::abs($x)))]);
     }
 
-    $x = _any2mpz($x, 0) // return _array();
+    $x = _any2mpz($x) // return _array();
     my $bin = Math::GMPz::Rmpz_get_str($x, 2);
     $bin = substr($bin, 1) if substr($bin, 0, 1) eq '-';
     _array([map { $_ ? ONE : ZERO } split(//, $bin)]);
@@ -9981,11 +9968,11 @@ sub digital_root {
     # Formula:
     #   digital_root(n,b) = n - (b-1)*floor((n-1)/(b-1))
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     if (defined($base)) {
         ref($base) eq __PACKAGE__ or _valid(\$base);
-        $base = _any2mpz($$base, 1) // goto &nan;
+        $base = _any2mpz($$base) // goto &nan;
         Math::GMPz::Rmpz_cmp_ui($base, 1) > 0 or goto &nan;
     }
     else {
@@ -10126,7 +10113,7 @@ sub digits {
             }
         }
 
-        $k = _any2mpz($k, 0) // return _array();
+        $k = _any2mpz($k) // return _array();
 
         # Not defined for k <= 1
         if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
@@ -10134,7 +10121,7 @@ sub digits {
         }
     }
 
-    $n = _any2mpz($n, 1) // return _array();
+    $n = _any2mpz($n) // return _array();
 
     my $sgn = Math::GMPz::Rmpz_sgn($n);
 
@@ -10452,7 +10439,7 @@ sub digit {
 
     ref($i) eq __PACKAGE__ or _valid(\$i);
 
-    $n = _any2mpz($$n, 0) // (return undef);
+    $n = _any2mpz($$n) // (return undef);
     $i = $$i;
 
     $i = _any2si($i) // (return undef) if ref($i);
@@ -10460,7 +10447,7 @@ sub digit {
     if (defined($k)) {
         ref($k) eq __PACKAGE__ or _valid(\$k);
 
-        $k = _any2mpz($$k, 1) // return undef;
+        $k = _any2mpz($$k) // return undef;
 
         # Not defined for k <= 1
         if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
@@ -10542,7 +10529,7 @@ sub sumdigits {
             }
         }
 
-        $k = _any2mpz($k, 0) // return undef;
+        $k = _any2mpz($k) // return undef;
 
         # Not defined for k <= 1
         if (Math::GMPz::Rmpz_cmp_ui($k, 1) <= 0) {
@@ -10550,7 +10537,7 @@ sub sumdigits {
         }
     }
 
-    $n = _any2mpz($n, 1) // return undef;
+    $n = _any2mpz($n) // return undef;
 
     my $sgn = Math::GMPz::Rmpz_sgn($n);
 
@@ -10690,7 +10677,7 @@ sub is_pandigital {
         state $q = Math::GMPz::Rmpz_init_nobless();
 
         # Safely copy into scratchpad so we don't mutate the user's object
-        Math::GMPz::Rmpz_set($q, _any2mpz($$n, 0) // return $FALSE);
+        Math::GMPz::Rmpz_set($q, _any2mpz($$n) // return $FALSE);
         Math::GMPz::Rmpz_abs($q, $q) if Math::GMPz::Rmpz_sgn($q) < 0;
 
         my $mask   = 0;
@@ -10772,11 +10759,11 @@ sub length {
         return bless \$len;
     }
 
-    $x = _any2mpz($x, 0) // return undef;
+    $x = _any2mpz($x) // return undef;
 
     my $neg = ((Math::GMPz::Rmpz_sgn($x) || return ONE) < 0) ? 1 : 0;
 
-    $y = defined($y) ? do { _valid(\$y); _any2mpz($$y, 1) // return undef } : 10;
+    $y = defined($y) ? do { _valid(\$y); _any2mpz($$y) // return undef } : 10;
 
     if ($neg) {
         $x = Math::GMPz::Rmpz_init_set($x);
@@ -11338,7 +11325,7 @@ sub quadratic_nonresidue {
     # Least quadratic non-residue of n. (OEIS: A020649)
     # Inspired by Dana Jacobsen's code from Math::Prime::Util::PP.
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_cmp_ui($n, 2) <= 0) {
         return _set_int($n);
@@ -11400,8 +11387,8 @@ sub sqrtmod {
         }
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
 
     my $y_sgn = Math::GMPz::Rmpz_sgn($y) || goto &nan;
 
@@ -11890,9 +11877,9 @@ sub _roots_mod_composite {
 sub rootmod_all {
     my ($A, $k, $n, $single_root) = @_;
 
-    $A = _any2mpz($$A, 0) // return _array();
-    $k = _any2mpz($$k, 1) // return _array();
-    $n = _any2mpz($$n, 2) // return _array();
+    $A = _any2mpz($$A) // return _array();
+    $k = _any2mpz($$k) // return _array();
+    $n = _any2mpz($$n) // return _array();
 
     if (HAS_PRIME_UTIL and !$single_root and Math::GMPz::Rmpz_fits_ulong_p($n)) {
         $A = Math::GMPz::Rmpz_get_str($A, 10);
@@ -11961,7 +11948,7 @@ sub rootmod {
 sub difference_of_squares {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
 
     # No solutions when n == 2 (mod 4). See: A016825.
     if (Math::GMPz::Rmpz_congruent_ui_p($n, 2, 4)) {
@@ -12017,7 +12004,7 @@ sub _primitive_sum_of_two_squares {
     state %sos_cache;
     undef %sos_cache if scalar(keys(%sos_cache)) > 1e5;
 
-    my $key = Math::GMPz::Rmpz_get_str($p, 10);
+    my $key = Math::GMPz::Rmpz_get_str($p, 16);
 
     if (exists $sos_cache{$key}) {
         return @{$sos_cache{$key}};
@@ -12081,7 +12068,7 @@ sub _multiply_sets {
 sub sum_of_squares {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
     Math::GMPz::Rmpz_sgn($n) >= 0 or return _array();
 
     if (Math::GMPz::Rmpz_sgn($n) == 0) {
@@ -12170,8 +12157,8 @@ sub sum_of_polygonals {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // return _array();
-    $k = _any2mpz($$k, 1) // return _array();
+    $n = _any2mpz($$n) // return _array();
+    $k = _any2mpz($$k) // return _array();
 
     Math::GMPz::Rmpz_sgn($n) >= 0 or return _array();
 
@@ -12211,8 +12198,8 @@ sub sum_of_polygonals {
 
     for my $sol (@sq_sols) {
 
-        my $X = _any2mpz(${$sol->[0]}, 2);
-        my $Y = _any2mpz(${$sol->[1]}, 3);
+        my $X = _any2mpz(${$sol->[0]});
+        my $Y = _any2mpz(${$sol->[1]});
 
         my @cand_X = ($X);
         push @cand_X, -$X if Math::GMPz::Rmpz_sgn($X) != 0;
@@ -12246,7 +12233,7 @@ sub sum_of_polygonals {
                         ($x, $y) = ($y, $x);
                     }
 
-                    my $key = join(';', Math::GMPz::Rmpz_get_str($x, 10), Math::GMPz::Rmpz_get_str($y, 10),);
+                    my $key = join(';', Math::GMPz::Rmpz_get_str($x, 16), Math::GMPz::Rmpz_get_str($y, 16));
 
                     if (!$seen{$key}++) {
                         push @results, [Math::GMPz::Rmpz_init_set($x), Math::GMPz::Rmpz_init_set($y)];
@@ -12304,14 +12291,14 @@ sub powmod {
         return bless \$r;
     }
 
-    $k = _any2mpz($k, 0) // goto &nan;
-    $m = _any2mpz($m, 1) // goto &nan;
+    $k = _any2mpz($k) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) || goto &nan;
 
     if (ref($n) ne 'Math::GMPz') {
         if (__is_int__($n)) {
-            $n = _any2mpz($n, 2) // goto &nan;
+            $n = _any2mpz($n) // goto &nan;
         }
         else {
             $n = _modular_rational($n, $m) // goto &nan;
@@ -12477,9 +12464,9 @@ sub complex_invmod {
     ref($y) eq __PACKAGE__ or _valid(\$y);
     ref($m) eq __PACKAGE__ or _valid(\$m);
 
-    $x = _any2mpz($$x, 0) // return (nan(), nan());
-    $y = _any2mpz($$y, 1) // return (nan(), nan());
-    $m = _any2mpz($$m, 2) // return (nan(), nan());
+    $x = _any2mpz($$x) // return (nan(), nan());
+    $y = _any2mpz($$y) // return (nan(), nan());
+    $m = _any2mpz($$m) // return (nan(), nan());
 
     my $t = Math::GMPz::Rmpz_init();
 
@@ -12511,9 +12498,9 @@ sub complex_ipow {
     ref($y) eq __PACKAGE__ or _valid(\$y);
     ref($n) eq __PACKAGE__ or _valid(\$n);
 
-    $x = _any2mpz($$x, 0) // return (nan(), nan());
-    $y = _any2mpz($$y, 1) // return (nan(), nan());
-    $n = _any2mpz($$n, 2) // return (nan(), nan());
+    $x = _any2mpz($$x) // return (nan(), nan());
+    $y = _any2mpz($$y) // return (nan(), nan());
+    $n = _any2mpz($$n) // return (nan(), nan());
 
     my $c0 = Math::GMPz::Rmpz_init_set_ui(1);
     my $c1 = Math::GMPz::Rmpz_init_set_ui(0);
@@ -12567,7 +12554,7 @@ sub complex_pow {
 
     $x = $$x;
     $y = $$y;
-    $n = _any2mpz($$n, 0) // return (nan(), nan());
+    $n = _any2mpz($$n) // return (nan(), nan());
 
     my $neg = 0;
     if (Math::GMPz::Rmpz_sgn($n) < 0) {
@@ -12613,8 +12600,8 @@ sub complex_powmod {
     $x = $$x;
     $y = $$y;
 
-    $n = _any2mpz($$n, 0) // return (nan(), nan());
-    $m = _any2mpz($$m, 1) // return (nan(), nan());
+    $n = _any2mpz($$n) // return (nan(), nan());
+    $m = _any2mpz($$m) // return (nan(), nan());
 
     Math::GMPz::Rmpz_sgn($m) || return (nan(), nan());
 
@@ -12627,7 +12614,7 @@ sub complex_powmod {
 
     if (ref($x) ne 'Math::GMPz') {
         if (__is_int__($x)) {
-            $x = _any2mpz($x, 2) // return (nan(), nan());
+            $x = _any2mpz($x) // return (nan(), nan());
         }
         else {
             $x = _modular_rational($x, $m) // return (nan(), nan());
@@ -12636,15 +12623,15 @@ sub complex_powmod {
 
     if (ref($y) ne 'Math::GMPz') {
         if (__is_int__($y)) {
-            $y = _any2mpz($y, 3) // return (nan(), nan());
+            $y = _any2mpz($y) // return (nan(), nan());
         }
         else {
             $y = _modular_rational($y, $m) // return (nan(), nan());
         }
     }
 
-    $x = _any2mpz($x, 2) // return (nan(), nan());
-    $y = _any2mpz($y, 3) // return (nan(), nan());
+    $x = _any2mpz($x) // return (nan(), nan());
+    $y = _any2mpz($y) // return (nan(), nan());
 
     my $c0 = Math::GMPz::Rmpz_init_set_ui(1);
     my $c1 = Math::GMPz::Rmpz_init_set_ui(0);
@@ -12731,8 +12718,8 @@ sub invmod {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
-    $y = _any2mpz($y, 1) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
+    $y = _any2mpz($y) // (goto &nan);
 
     state $r = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_invert($r, $x, $y) || (goto &nan);
@@ -12765,9 +12752,9 @@ sub divmod {
             }
         }
 
-        $x = _any2mpz($x, 0) // goto &nan;
-        $y = _any2mpz($y, 1) // goto &nan;
-        $m = _any2mpz($m, 2) // goto &nan;
+        $x = _any2mpz($x) // goto &nan;
+        $y = _any2mpz($y) // goto &nan;
+        $m = _any2mpz($m) // goto &nan;
 
         my $r = Math::GMPz::Rmpz_init();
 
@@ -12796,8 +12783,8 @@ sub divmod {
         return (_set_int($q), _set_int($r));
     }
 
-    $x = _any2mpz($x, 0) // return (nan(), nan());
-    $y = _any2mpz($y, 1) // return (nan(), nan());
+    $x = _any2mpz($x) // return (nan(), nan());
+    $y = _any2mpz($y) // return (nan(), nan());
 
     Math::GMPz::Rmpz_sgn($y)
       || return (nan(), nan());
@@ -12824,8 +12811,8 @@ sub and {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
-    $y = _any2mpz($y, 1) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
+    $y = _any2mpz($y) // (goto &nan);
 
     state $r = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_and($r, $x, $y);
@@ -12849,8 +12836,8 @@ sub or {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
-    $y = _any2mpz($y, 1) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
+    $y = _any2mpz($y) // (goto &nan);
 
     state $r = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_ior($r, $x, $y);
@@ -12874,8 +12861,8 @@ sub xor {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
-    $y = _any2mpz($y, 1) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
+    $y = _any2mpz($y) // (goto &nan);
 
     state $r = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_xor($r, $x, $y);
@@ -12889,7 +12876,7 @@ sub xor {
 sub not {
     my ($x) = @_;
 
-    $x = _any2mpz($$x, 0) // (goto &nan);
+    $x = _any2mpz($$x) // (goto &nan);
 
     state $r = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_com($r, $x);
@@ -12905,8 +12892,8 @@ sub bit {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $x = _any2mpz($$x, 0) // return undef;
-    $k = _any2ui($$k)     // return undef;
+    $x = _any2mpz($$x) // return undef;
+    $k = _any2ui($$k)  // return undef;
 
     Math::GMPz::Rmpz_tstbit($x, $k) ? ONE : ZERO;
 }
@@ -12919,8 +12906,8 @@ sub setbit {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $x = _any2mpz($$x, 0) // return undef;
-    $k = _any2ui($$k)     // return undef;
+    $x = _any2mpz($$x) // return undef;
+    $k = _any2ui($$k)  // return undef;
 
     my $r = Math::GMPz::Rmpz_init_set($x);
     Math::GMPz::Rmpz_setbit($r, $k);
@@ -12932,8 +12919,8 @@ sub flipbit {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $x = _any2mpz($$x, 0) // return undef;
-    $k = _any2ui($$k)     // return undef;
+    $x = _any2mpz($$x) // return undef;
+    $k = _any2ui($$k)  // return undef;
 
     my $r = Math::GMPz::Rmpz_init_set($x);
 
@@ -12949,8 +12936,8 @@ sub clearbit {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $x = _any2mpz($$x, 0) // return undef;
-    $k = _any2ui($$k)     // return undef;
+    $x = _any2mpz($$x) // return undef;
+    $k = _any2ui($$k)  // return undef;
 
     my $r = Math::GMPz::Rmpz_init_set($x);
     Math::GMPz::Rmpz_clrbit($r, $k);
@@ -12961,7 +12948,7 @@ sub bit_scan0 {
     my ($n, $k) = @_;
 
     $k = defined($k) ? do { ref($k) eq __PACKAGE__ or _valid(\$k); _any2ui($$k) // return undef } : 0;
-    $n = _any2mpz($$n, 0) // return undef;
+    $n = _any2mpz($$n) // return undef;
 
     _set_int(Math::GMPz::Rmpz_scan0($n, $k));
 }
@@ -12970,7 +12957,7 @@ sub bit_scan1 {
     my ($n, $k) = @_;
 
     $k = defined($k) ? do { ref($k) eq __PACKAGE__ or _valid(\$k); _any2ui($$k) // return undef } : 0;
-    $n = _any2mpz($$n, 0) // return undef;
+    $n = _any2mpz($$n) // return undef;
 
     _set_int(Math::GMPz::Rmpz_scan1($n, $k));
 }
@@ -13006,8 +12993,8 @@ sub ramanujan_sum {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $k = _any2mpz($$k, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
 
     # Make `k` positive if it is negative
     if (Math::GMPz::Rmpz_sgn($k) < 0) {
@@ -13339,8 +13326,8 @@ sub factorialmod {
         return bless \$r;
     }
 
-    $n = _any2mpz($n, 0) // goto &nan;
-    $m = _any2mpz($m, 1) // goto &nan;
+    $n = _any2mpz($n) // goto &nan;
+    $m = _any2mpz($m) // goto &nan;
 
     my $r;
 
@@ -13387,7 +13374,7 @@ sub falling_factorial {
     my ($x, $y) = @_;
     ref($y) eq __PACKAGE__ or _valid(\$y);
 
-    $x = _any2mpz($$x, 0) // (goto &nan);
+    $x = _any2mpz($$x) // (goto &nan);
     $y = $$y;
 
     $y = _any2si($y) // (goto &nan) if ref($y);
@@ -13427,7 +13414,7 @@ sub rising_factorial {
     my ($x, $y) = @_;
     ref($y) eq __PACKAGE__ or _valid(\$y);
 
-    $x = _any2mpz($$x, 0) // (goto &nan);
+    $x = _any2mpz($$x) // (goto &nan);
     $y = $$y;
 
     $y = _any2si($y) // (goto &nan) if ref($y);
@@ -13778,10 +13765,10 @@ sub _modular_lucas_UV {
         defined($U) && defined($V) && return (map { _str2obj($_) } ($U, $V));
     }
 
-    $P = _any2mpz($P, 0) if !ref($P);
-    $Q = _any2mpz($Q, 1) if !ref($Q);
-    $n = _any2mpz($n, 2) if !ref($n);
-    $m = _any2mpz($m, 3) if !ref($m);
+    $P = _any2mpz($P) if !ref($P);
+    $Q = _any2mpz($Q) if !ref($Q);
+    $n = _any2mpz($n) if !ref($n);
+    $m = _any2mpz($m) if !ref($m);
 
     state $D = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_mul($D, $P, $P);
@@ -13842,10 +13829,10 @@ sub _modular_lucas_U {
         defined($U) && return _str2obj($U);
     }
 
-    $P = _any2mpz($P, 0) if !ref($P);
-    $Q = _any2mpz($Q, 1) if !ref($Q);
-    $n = _any2mpz($n, 2) if !ref($n);
-    $m = _any2mpz($m, 3) if !ref($m);
+    $P = _any2mpz($P) if !ref($P);
+    $Q = _any2mpz($Q) if !ref($Q);
+    $n = _any2mpz($n) if !ref($n);
+    $m = _any2mpz($m) if !ref($m);
 
     state $D = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_mul($D, $P, $P);
@@ -13906,10 +13893,10 @@ sub _modular_lucas_V {
         defined($V) && return _str2obj($V);
     }
 
-    $P = _any2mpz($P, 0) if !ref($P);
-    $Q = _any2mpz($Q, 1) if !ref($Q);
-    $n = _any2mpz($n, 2) if !ref($n);
-    $m = _any2mpz($m, 3) if !ref($m);
+    $P = _any2mpz($P) if !ref($P);
+    $Q = _any2mpz($Q) if !ref($Q);
+    $n = _any2mpz($n) if !ref($n);
+    $m = _any2mpz($m) if !ref($m);
 
     (__lucasVmod__($P, $Q, $n, $m))[0];
 }
@@ -13921,10 +13908,10 @@ sub lucasumod {
     ref($n) eq __PACKAGE__ or _valid(\$n);
     ref($m) eq __PACKAGE__ or _valid(\$m);
 
-    $P = _any2mpz($$P, 0) // goto &nan;
-    $Q = _any2mpz($$Q, 1) // goto &nan;
-    $n = _any2mpz($$n, 2) // goto &nan;
-    $m = _any2mpz($$m, 3) // goto &nan;
+    $P = _any2mpz($$P) // goto &nan;
+    $Q = _any2mpz($$Q) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $m = _any2mpz($$m) // goto &nan;
 
     # undefined for m=0
     Math::GMPz::Rmpz_sgn($m) || goto &nan;
@@ -13948,10 +13935,10 @@ sub lucasvmod {
     ref($n) eq __PACKAGE__ or _valid(\$n);
     ref($m) eq __PACKAGE__ or _valid(\$m);
 
-    $P = _any2mpz($$P, 0) // goto &nan;
-    $Q = _any2mpz($$Q, 1) // goto &nan;
-    $n = _any2mpz($$n, 2) // goto &nan;
-    $m = _any2mpz($$m, 3) // goto &nan;
+    $P = _any2mpz($$P) // goto &nan;
+    $Q = _any2mpz($$Q) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $m = _any2mpz($$m) // goto &nan;
 
     # undefined for m=0
     Math::GMPz::Rmpz_sgn($m) || goto &nan;
@@ -13972,10 +13959,10 @@ sub lucasuvmod {
     ref($n) eq __PACKAGE__ or _valid(\$n);
     ref($m) eq __PACKAGE__ or _valid(\$m);
 
-    $P = _any2mpz($$P, 0) // goto &nan;
-    $Q = _any2mpz($$Q, 1) // goto &nan;
-    $n = _any2mpz($$n, 2) // goto &nan;
-    $m = _any2mpz($$m, 3) // goto &nan;
+    $P = _any2mpz($$P) // goto &nan;
+    $Q = _any2mpz($$Q) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $m = _any2mpz($$m) // goto &nan;
 
     # undefined for m=0
     Math::GMPz::Rmpz_sgn($m) || return (nan(), nan());
@@ -14113,9 +14100,9 @@ sub chebyshevTmod {
     ref($x) eq __PACKAGE__ or _valid(\$x);
     ref($m) eq __PACKAGE__ or _valid(\$m);
 
-    $n = _any2mpz($$n, 5) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     $x = $$x;
-    $m = _any2mpz($$m, 6) // goto &nan;
+    $m = _any2mpz($$m) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($n) < 0) {
         $n = Math::GMPz::Rmpz_init_set($n);    # copy
@@ -14145,9 +14132,9 @@ sub chebyshevUmod {
     ref($x) eq __PACKAGE__ or _valid(\$x);
     ref($m) eq __PACKAGE__ or _valid(\$m);
 
-    $n = _any2mpz($$n, 5) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     $x = $$x;
-    $m = _any2mpz($$m, 6) // goto &nan;
+    $m = _any2mpz($$m) // goto &nan;
 
     my $negative = 0;
 
@@ -14462,8 +14449,8 @@ sub fibonaccimod {
             return $n->fibmod($m);
         }
 
-        $n = _any2mpz($$n, 0) // goto &nan;
-        $m = _any2mpz($$m, 1) // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        $m = _any2mpz($$m) // goto &nan;
 
         Math::GMPz::Rmpz_sgn($n) >= 0 or goto &nan;
         Math::GMPz::Rmpz_sgn($m) > 0  or goto &nan;
@@ -14530,8 +14517,8 @@ sub fibonaccimod {
         $m = $k;
     }
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $m = _any2mpz($$m, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $m = _any2mpz($$m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
     Math::GMPz::Rmpz_sgn($m) > 0 or goto &nan;
@@ -14650,7 +14637,7 @@ sub tetranacci {
 sub fibbinary {    # A003714: Fibbinary numbers
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0);
+    $n = _any2mpz($$n);
     $n = Math::GMPz::Rmpz_init_set($n);    # copy
 
     my $s    = Math::GMPz::Rmpz_init_set_ui(0);
@@ -14704,7 +14691,7 @@ sub pisano_period {
     $n = $$n;
 
     if (ref($n)) {
-        $n = _any2mpz($n, 0) // goto &nan;
+        $n = _any2mpz($n) // goto &nan;
         Math::GMPz::Rmpz_sgn($n) <= 0 and return ZERO;
         Math::GMPz::Rmpz_cmp_ui($n, 1) == 0 and return ONE;
     }
@@ -14828,8 +14815,8 @@ sub bellmod {
 
     ref($m) eq __PACKAGE__ or _valid(\$m);
 
-    $n = _any2ui($$n)     // goto &nan;
-    $m = _any2mpz($$m, 0) // goto &nan;
+    $n = _any2ui($$n)  // goto &nan;
+    $m = _any2mpz($$m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) || goto &nan;
 
@@ -15028,9 +15015,9 @@ sub iquadratic_formula {
 
     _valid(\$B, \$C);
 
-    $A = _any2mpz($$A, 0) // return (&nan, &nan);
-    $B = _any2mpz($$B, 1) // return (&nan, &nan);
-    $C = _any2mpz($$C, 2) // return (&nan, &nan);
+    $A = _any2mpz($$A) // return (&nan, &nan);
+    $B = _any2mpz($$B) // return (&nan, &nan);
+    $C = _any2mpz($$C) // return (&nan, &nan);
 
     if (Math::GMPz::Rmpz_sgn($A) == 0) {    # detect division by zero
         return (&nan, &nan);
@@ -15172,7 +15159,30 @@ sub solve_quadratic_form {
         return _array();
     }
 
-    my $D = $d->neg;
+    # FAST PATH: PARI/GP General Quadratic Form Solver
+    if ($USE_PARI_GP and Math::GMPz::Rmpz_sizeinbase(_any2mpz($$n), 2) > 64) {
+        my $d_str = Math::GMPz::Rmpz_get_str(_any2mpz($$d), 10);
+        my $n_str = Math::GMPz::Rmpz_get_str(_any2mpz($$n), 10);
+
+        my $code = "iferr(my(v=qfbsolve(Qfb(1,0,$d_str), $n_str, 3)); if(#v, v, \"\"), E, \"\")";
+        if (my $res = _execute_pari_gp($code)) {
+            return _array() if $res eq '';
+            my @solutions;
+            while ($res =~ /\[(-?\d+),\s*(-?\d+)\]/g) {
+                my $x = Math::GMPz::Rmpz_init_set_str($1, 10);
+                my $y = Math::GMPz::Rmpz_init_set_str($2, 10);
+                Math::GMPz::Rmpz_abs($x, $x);
+                Math::GMPz::Rmpz_abs($y, $y);
+                push @solutions, _array([bless(\$x), bless(\$y)]);
+            }
+            if (@solutions) {
+                my %seen;
+                @solutions = grep { !$seen{"${$_->[0]};${$_->[1]}"}++ } @solutions;
+                @solutions = sort { ${$a->[0]} <=> ${$b->[0]} } @solutions;
+                return _array(\@solutions);
+            }
+        }
+    }
 
     # Helper to find primitive solutions using Cornacchia-style method
     my $primitive_solutions = sub {
@@ -15203,6 +15213,7 @@ sub solve_quadratic_form {
 
     # Handle all solutions via scaling primitive ones
     my @solutions;
+    my $D = $d->neg;
 
     foreach my $s (@{$n->square_divisors}) {
         my $g = $s->isqrt;
@@ -15240,10 +15251,10 @@ sub solve_ternary_quadratic_form {
     ref($C) eq __PACKAGE__ or _valid(\$C);
     ref($n) eq __PACKAGE__ or _valid(\$n);
 
-    my $a_z = _any2mpz($$A, 0) // return _array();
-    my $b_z = _any2mpz($$B, 1) // return _array();
-    my $c_z = _any2mpz($$C, 2) // return _array();
-    my $n_z = _any2mpz($$n, 3) // return _array();
+    my $a_z = _any2mpz($$A) // return _array();
+    my $b_z = _any2mpz($$B) // return _array();
+    my $c_z = _any2mpz($$C) // return _array();
+    my $n_z = _any2mpz($$n) // return _array();
 
     my $a_sgn = Math::GMPz::Rmpz_sgn($a_z);
     my $b_sgn = Math::GMPz::Rmpz_sgn($b_z);
@@ -15295,6 +15306,56 @@ sub solve_ternary_quadratic_form {
     my @solutions;
     my %seen;
 
+    # FAST PATH: PARI/GP executes the entire loop internally to avoid pipe latency
+    if (0 and $USE_PARI_GP and Math::GMPz::Rmpz_sizeinbase($n_z, 2) >= 32) {
+        my $a_str = Math::GMPz::Rmpz_get_str($a_z, 10);
+        my $b_str = Math::GMPz::Rmpz_get_str($b_z, 10);
+        my $c_str = Math::GMPz::Rmpz_get_str($c_z, 10);
+        my $n_str = Math::GMPz::Rmpz_get_str($n_z, 10);
+
+        my $code = <<"GP" =~ s/\n/ /gr;
+iferr(
+    my(res=List());
+    my(a=$a_str, b=$b_str, c=$c_str, n=$n_str);
+    my(z_limit=sqrtint(n\\c));
+    for(z=0, z_limit,
+        my(rem = n - c*z^2);
+        my(v = qfbsolve(Qfb(a,0,b), rem, 3));
+        if (#v,
+            for(i=1, #v,
+                listput(res, [abs(v[i][1]), abs(v[i][2]), z]);
+            )
+        );
+    );
+    Vec(res),
+E, "")
+GP
+
+        if (my $res = _execute_pari_gp($code)) {
+            return _array() if $res eq '';
+
+            while ($res =~ /\[(-?\d+),\s*(-?\d+),\s*(-?\d+)\]/g) {
+                my $x_val = Math::GMPz::Rmpz_init_set_str($1, 10);
+                my $y_val = Math::GMPz::Rmpz_init_set_str($2, 10);
+                my $z_val = Math::GMPz::Rmpz_init_set_str($3, 10);
+
+                # Enforce canonical ordering for identical coefficients
+                if (Math::GMPz::Rmpz_cmp($a_z, $b_z) == 0 && Math::GMPz::Rmpz_cmp($x_val, $y_val) > 0) {
+                    ($x_val, $y_val) = ($y_val, $x_val);
+                }
+
+                my $key = join(';', Math::GMPz::Rmpz_get_str($x_val, 16), Math::GMPz::Rmpz_get_str($y_val, 16), Math::GMPz::Rmpz_get_str($z_val, 16));
+                if (!$seen{$key}++) {
+                    push @solutions, _array([bless(\$x_val), bless(\$y_val), bless(\$z_val)]);
+                }
+            }
+            if (@solutions) {
+                @solutions = sort { ${$a->[0]} <=> ${$b->[0]} || ${$a->[1]} <=> ${$b->[1]} || ${$a->[2]} <=> ${$b->[2]} } @solutions;
+                return _array(\@solutions);
+            }
+        }
+    }
+
     # FALLBACK: Pure-Perl loop using Cornacchia reduction
     my $z_limit = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_tdiv_q($z_limit, $n_z, $c_z);
@@ -15318,7 +15379,7 @@ sub solve_ternary_quadratic_form {
         Math::GMPz::Rmpz_sub($rem, $n_z, $cz2);
 
         if (Math::GMPz::Rmpz_sgn($rem) == 0) {
-            my $key = "0;0;" . Math::GMPz::Rmpz_get_str($z_mpz, 10);
+            my $key = join(';', '0', '0', Math::GMPz::Rmpz_get_str($z_mpz, 16));
             if (!$seen{$key}++) {
                 my $z_copy = Math::GMPz::Rmpz_init_set($z_mpz);
                 push @solutions, _array([ZERO, ZERO, bless(\$z_copy)]);
@@ -15329,13 +15390,14 @@ sub solve_ternary_quadratic_form {
             my $M_obj = bless \$M_z;
 
             # Call existing binary quadratic form solver
-            my $sols = solve_quadratic_form($D_obj, $M_obj);
+            my $sols = $D_obj->solve_quadratic_form($M_obj);
 
             foreach my $sol (@$sols) {
-                my $X_val = _any2mpz(${$sol->[0]});
+                my $X_val = Math::GMPz::Rmpz_init_set(_any2mpz(${$sol->[0]}));
 
                 # We need x = X / a to be a perfect integer
                 if (Math::GMPz::Rmpz_divisible_p($X_val, $a_z)) {
+
                     Math::GMPz::Rmpz_divexact($X_mpz, $X_val, $a_z);
 
                     my $x_copy = Math::GMPz::Rmpz_init_set($X_mpz);
@@ -15346,7 +15408,7 @@ sub solve_ternary_quadratic_form {
                         ($x_copy, $y_copy) = ($y_copy, $x_copy);
                     }
 
-                    my $key = Math::GMPz::Rmpz_get_str($x_copy, 10) . ";" . Math::GMPz::Rmpz_get_str($y_copy, 10) . ";" . Math::GMPz::Rmpz_get_str($z_copy, 10);
+                    my $key = join(';', Math::GMPz::Rmpz_get_str($x_copy, 16), Math::GMPz::Rmpz_get_str($y_copy, 16), Math::GMPz::Rmpz_get_str($z_copy, 16));
 
                     if (!$seen{$key}++) {
                         push @solutions, _array([bless(\$x_copy), bless(\$y_copy), bless(\$z_copy)]);
@@ -15380,9 +15442,9 @@ sub geometric_summod {
 
     # (r^(n+1) - 1) * invmod(r-1, m) (mod m)
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $r = _any2mpz($$r, 1) // goto &nan;
-    $m = _any2mpz($$m, 2) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $r = _any2mpz($$r) // goto &nan;
+    $m = _any2mpz($$m) // goto &nan;
 
     state $t = Math::GMPz::Rmpz_init_nobless();
     state $u = Math::GMPz::Rmpz_init_nobless();
@@ -15470,7 +15532,7 @@ sub faulhaber_sum {
         return _set_int(Math::Prime::Util::GMP::powersum($n, $p));
     }
 
-    $n = _any2mpz($n, 0) // goto &nan;
+    $n = _any2mpz($n) // goto &nan;
     Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
     if ($p == 1 or $p == 3) {
@@ -15569,7 +15631,7 @@ sub faulhaber_sum {
 sub multinomial {
     my ($n, @mset) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     my $bin  = Math::GMPz::Rmpz_init();
     my $sum  = Math::GMPz::Rmpz_init_set($n);
@@ -15602,8 +15664,8 @@ sub catalan {
     if (defined($k)) {
         ref($k) eq __PACKAGE__ or _valid(\$k);
 
-        $n = _any2mpz($$n, 0) // goto &nan;
-        $k = _any2ui($$k)     // goto &nan;
+        $n = _any2mpz($$n) // goto &nan;
+        $k = _any2ui($$k)  // goto &nan;
 
         my $t = Math::GMPz::Rmpz_init();
         my $u = Math::GMPz::Rmpz_init();
@@ -15693,7 +15755,7 @@ sub binomial {
         return bless \$r2;
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
 
     state $r = Math::GMPz::Rmpz_init_nobless();
 
@@ -16251,9 +16313,9 @@ sub binomialmod {
         return bless \$r;
     }
 
-    $n = _any2mpz($n, 0) // (goto &nan);
-    $k = _any2mpz($k, 1) // (goto &nan);
-    $m = _any2mpz($m, 2) // (goto &nan);
+    $n = _any2mpz($n) // (goto &nan);
+    $k = _any2mpz($k) // (goto &nan);
+    $m = _any2mpz($m) // (goto &nan);
 
     Math::GMPz::Rmpz_sgn($m) || goto &nan;
 
@@ -16823,15 +16885,15 @@ sub cyclotomicmod {
 
     my $M = $m;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     $x = $$x;
-    $m = _any2mpz($$m, 1) // goto &nan;
+    $m = _any2mpz($$m) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($m) || goto &nan;
 
     if (ref($x) ne 'Math::GMPz') {
         if (__is_int__($x)) {
-            $x = _any2mpz($x, 2) // goto &nan;
+            $x = _any2mpz($x) // goto &nan;
         }
         else {
             $x = _modular_rational($x, $m) // goto &nan;
@@ -17021,7 +17083,7 @@ sub powerfree_sum {
 
     ref($from) eq __PACKAGE__ or _valid(\$from);
 
-    my $n = _any2mpz($$from, 0) // return ZERO;
+    my $n = _any2mpz($$from) // return ZERO;
     $k = _any2ui($$k) // return ZERO;
 
     Math::GMPz::Rmpz_sgn($n) > 0
@@ -17185,7 +17247,7 @@ sub powerfree_count {
 
     ref($from) eq __PACKAGE__ or _valid(\$from);
 
-    my $n = _any2mpz($$from, 0) // return ZERO;
+    my $n = _any2mpz($$from) // return ZERO;
     $k = _any2ui($$k) // return ZERO;
 
     Math::GMPz::Rmpz_sgn($n) > 0
@@ -17338,11 +17400,11 @@ sub nonpowerfree {
     ref($A) eq __PACKAGE__ or _valid(\$A);
 
     $k = _any2ui($$k) || return _array();
-    $A = _any2mpz($$A, 0) // return _array();
+    $A = _any2mpz($$A) // return _array();
 
     if (defined($B)) {
         ref($B) eq __PACKAGE__ or _valid(\$B);
-        $B = _any2mpz($$B, 1) // return _array();
+        $B = _any2mpz($$B) // return _array();
     }
     else {
         $B = $A;
@@ -17674,11 +17736,11 @@ sub powerfree {
     ref($A) eq __PACKAGE__ or _valid(\$A);
 
     $k = _any2ui($$k) || return _array();
-    $A = _any2mpz($$A, 0) // return _array();
+    $A = _any2mpz($$A) // return _array();
 
     if (defined($B)) {
         ref($B) eq __PACKAGE__ or _valid(\$B);
-        $B = _any2mpz($$B, 1) // return _array();
+        $B = _any2mpz($$B) // return _array();
     }
     else {
         $B = $A;
@@ -18200,7 +18262,7 @@ sub prime_count_lower {
         return _set_int(Math::Prime::Util::prime_count_lower(_get_ulong($n)));
     }
 
-    $n = _any2mpz($n, 0) // return ZERO;
+    $n = _any2mpz($n) // return ZERO;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ZERO;
@@ -18220,7 +18282,7 @@ sub prime_count_upper {
         return _set_int(Math::Prime::Util::prime_count_upper(_get_ulong($n)));
     }
 
-    $n = _any2mpz($n, 0) // return ZERO;
+    $n = _any2mpz($n) // return ZERO;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ZERO;
@@ -18240,7 +18302,7 @@ sub prime_power_count_lower {
         return _set_int(Math::Prime::Util::prime_power_count_lower(_get_ulong($n)));
     }
 
-    $n = _any2mpz($n, 0) // return ZERO;
+    $n = _any2mpz($n) // return ZERO;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ZERO;
@@ -18269,7 +18331,7 @@ sub prime_power_count_upper {
         return _set_int(Math::Prime::Util::prime_power_count_upper(_get_ulong($n)));
     }
 
-    $n = _any2mpz($n, 0) // return ZERO;
+    $n = _any2mpz($n) // return ZERO;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ZERO;
@@ -18318,7 +18380,7 @@ sub _nth_composite_upper_bound {
 sub nth_composite_lower {
     my ($n) = @_;
 
-    my $z = _any2mpz($$n, 0) // goto &nan;
+    my $z = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($z) <= 0) {
         return ZERO;
@@ -18344,7 +18406,7 @@ sub nth_composite_lower {
 sub nth_composite_upper {
     my ($n) = @_;
 
-    my $z = _any2mpz($$n, 0) // goto &nan;
+    my $z = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($z) < 0) {
         return ZERO;
@@ -18382,7 +18444,7 @@ sub _nth_prime_upper_bound {
 sub nth_prime_lower {
     my ($n) = @_;
 
-    my $z = _any2mpz($$n, 0) // goto &nan;
+    my $z = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_cmp_ui($z, 10) <= 0) {
         return $n->nth_prime;
@@ -18404,7 +18466,7 @@ sub nth_prime_lower {
 sub nth_prime_upper {
     my ($n) = @_;
 
-    my $z = _any2mpz($$n, 0) // goto &nan;
+    my $z = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_cmp_ui($z, 10) <= 0) {
         return $n->nth_prime;
@@ -18426,7 +18488,7 @@ sub nth_prime_upper {
 sub nth_prime_power_lower {
     my ($n) = @_;
 
-    my $z = _any2mpz($$n, 0) // goto &nan;
+    my $z = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($z) <= 0) {
         return ZERO;
@@ -18448,7 +18510,7 @@ sub nth_prime_power_lower {
 sub nth_prime_power_upper {
     my ($n) = @_;
 
-    my $z = _any2mpz($$n, 0) // goto &nan;
+    my $z = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($z) <= 0) {
         return ZERO;
@@ -19386,7 +19448,7 @@ sub nth_omega_prime {
     my $k_obj = bless \$k;
     my $n_obj = $n;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($n) > 0 or do {
         return ONE if (Math::GMPz::Rmpz_sgn($n) == 0);    # not k-omega prime, but...
@@ -19457,7 +19519,7 @@ sub next_omega_prime {
     my $n_obj = $n;
     my $k_obj = bless \$k;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($n) < 0) {
         goto &nan;
@@ -19513,7 +19575,7 @@ sub prev_omega_prime {
     my $n_obj = $n;
     my $k_obj = bless \$k;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($n) < 0) {
         goto &nan;
@@ -19572,7 +19634,7 @@ sub nth_squarefree_almost_prime {
     my $k_obj = _set_int($k);
     my $n_obj = $n;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($n) > 0 or do {
         return ONE if (Math::GMPz::Rmpz_sgn($n) == 0);    # not k-almost prime, but...
@@ -19636,7 +19698,7 @@ sub next_squarefree_almost_prime {
     my $n_obj = $n;
     my $k_obj = bless \$k;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($n) < 0) {
         goto &nan;
@@ -19695,7 +19757,7 @@ sub prev_squarefree_almost_prime {
     my $n_obj = $n;
     my $k_obj = bless \$k;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($n) < 0) {
         goto &nan;
@@ -20349,7 +20411,7 @@ sub nth_composite {
 sub nth_squarefree {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     Math::GMPz::Rmpz_fits_slong_p($n)
       or return ((bless \$n)->nth_powerfree(TWO));
@@ -20389,7 +20451,7 @@ sub nth_powerfree {
     my ($n, $k) = @_;
 
     $k = defined($k) ? do { ref($k) eq __PACKAGE__ or _valid(\$k); _any2ui($$k) // goto &nan } : 2;
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     $k >= 2 or goto &nan;
     Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
@@ -20417,7 +20479,7 @@ sub nth_cubefree {
 sub legendre {
     my ($x, $y) = @_;
     ref($y) eq __PACKAGE__ or _valid(\$y);
-    my $s = Math::GMPz::Rmpz_legendre(_any2mpz($$x, 0) // (goto &nan), _any2mpz($$y, 1) // (goto &nan));
+    my $s = Math::GMPz::Rmpz_legendre(_any2mpz($$x) // (goto &nan), _any2mpz($$y) // (goto &nan));
     $s ? (($s == 1) ? ONE : MONE) : ZERO;
 }
 
@@ -20427,7 +20489,7 @@ sub legendre {
 sub jacobi {
     my ($x, $y) = @_;
     ref($y) eq __PACKAGE__ or _valid(\$y);
-    my $s = Math::GMPz::Rmpz_jacobi(_any2mpz($$x, 0) // (goto &nan), _any2mpz($$y, 1) // (goto &nan));
+    my $s = Math::GMPz::Rmpz_jacobi(_any2mpz($$x) // (goto &nan), _any2mpz($$y) // (goto &nan));
     $s ? (($s == 1) ? ONE : MONE) : ZERO;
 }
 
@@ -20448,22 +20510,22 @@ sub kronecker {
             $s = (HAS_PRIME_UTIL ? Math::Prime::Util::kronecker($x, $y) : Math::Prime::Util::GMP::kronecker($x, $y));
         }
         elsif ($x >= 0) {
-            $s = Math::GMPz::Rmpz_ui_kronecker($x, _any2mpz($y, 0) // (goto &nan));
+            $s = Math::GMPz::Rmpz_ui_kronecker($x, _any2mpz($y) // (goto &nan));
         }
         else {
-            $s = Math::GMPz::Rmpz_si_kronecker($x, _any2mpz($y, 0) // (goto &nan));
+            $s = Math::GMPz::Rmpz_si_kronecker($x, _any2mpz($y) // (goto &nan));
         }
     }
     elsif (FAST_MODE and !ref($y)) {
         if ($y >= 0) {
-            $s = Math::GMPz::Rmpz_kronecker_ui(_any2mpz($x, 0) // (goto &nan), $y);
+            $s = Math::GMPz::Rmpz_kronecker_ui(_any2mpz($x) // (goto &nan), $y);
         }
         else {
-            $s = Math::GMPz::Rmpz_kronecker_si(_any2mpz($x, 0) // (goto &nan), $y);
+            $s = Math::GMPz::Rmpz_kronecker_si(_any2mpz($x) // (goto &nan), $y);
         }
     }
     else {
-        $s = Math::GMPz::Rmpz_kronecker(_any2mpz($x, 0) // (goto &nan), _any2mpz($y, 1) // (goto &nan));
+        $s = Math::GMPz::Rmpz_kronecker(_any2mpz($x) // (goto &nan), _any2mpz($y) // (goto &nan));
     }
 
     $s ? (($s == 1) ? ONE : MONE) : ZERO;
@@ -20486,7 +20548,7 @@ sub hclassno {
 
     # Algorithm from Math::Prime::Util::PP
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     my $sgn = Math::GMPz::Rmpz_sgn($n);
 
@@ -20661,7 +20723,7 @@ sub _sos_k3 {    # OEIS: A005875
             $h = ${(bless \$n)->mul(_set_int(4))->hclassno->mul(_set_int(12))};
         }
 
-        $h = _any2mpz($h, 0) if !ref($h);
+        $h = _any2mpz($h) if !ref($h);
         (ref($h) eq 'Math::GMPq')
           ? Math::GMPz::Rmpz_set_q($count, $h)
           : Math::GMPz::Rmpz_set($count, $h);
@@ -21174,7 +21236,7 @@ sub sum_of_squares_count {
         $k = 2;
     }
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     my $sgn = Math::GMPz::Rmpz_sgn($n);
 
@@ -21281,7 +21343,7 @@ sub gcd {
 
         # Initialize accumulator with first element
         my $first = shift(@vals);
-        Math::GMPz::Rmpz_set($r, _any2mpz($$first, 0) // goto &nan);
+        Math::GMPz::Rmpz_set($r, _any2mpz($$first) // goto &nan);
 
         foreach my $val (@vals) {
             my $v = $$val;
@@ -21291,7 +21353,7 @@ sub gcd {
                 Math::GMPz::Rmpz_gcd_ui($r, $r, CORE::abs($v));
             }
             else {
-                my $z = _any2mpz($v, 0) // goto &nan;
+                my $z = _any2mpz($v) // goto &nan;
                 Math::GMPz::Rmpz_gcd($r, $r, $z);
             }
 
@@ -21379,8 +21441,8 @@ sub gcdext {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // return (nan(), nan());
-    $k = _any2mpz($$k, 1) // return (nan(), nan());
+    $n = _any2mpz($$n) // return (nan(), nan());
+    $k = _any2mpz($$k) // return (nan(), nan());
 
     my $g = Math::GMPz::Rmpz_init();
     my $u = Math::GMPz::Rmpz_init();
@@ -21445,8 +21507,8 @@ sub lcm {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
 
     state $r = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_lcm($r, $x, $y);
@@ -21490,8 +21552,8 @@ sub valuation {
         return bless \$r;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
 
     Math::GMPz::Rmpz_cmpabs_ui($y, 1) <= 0 and return ZERO;
 
@@ -21538,8 +21600,8 @@ sub remove {
         return bless \$q;
     }
 
-    $x = _any2mpz($x, 0) // goto &nan;
-    $y = _any2mpz($y, 1) // goto &nan;
+    $x = _any2mpz($x) // goto &nan;
+    $y = _any2mpz($y) // goto &nan;
 
     Math::GMPz::Rmpz_cmpabs_ui($y, 1) <= 0 and return $_[0];
 
@@ -21555,8 +21617,8 @@ sub make_coprime {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $k = _any2mpz($$k, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($n) == 0) {
         return _set_int($n);
@@ -21990,7 +22052,7 @@ sub nth_semiprime {
 sub next_semiprime {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
     Math::GMPz::Rmpz_cmp_ui($n, 4) < 0 and return _set_int(4);
@@ -22017,7 +22079,7 @@ sub next_semiprime {
 sub prev_semiprime {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_cmp_ui($n, 4) <= 0 and goto &nan;
 
     # Optimization for native integers
@@ -22042,7 +22104,7 @@ sub prev_semiprime {
 sub next_squarefree_semiprime {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
     Math::GMPz::Rmpz_cmp_ui($n, 6) < 0 and return _set_int(6);
@@ -22078,7 +22140,7 @@ sub next_squarefree_semiprime {
 sub prev_squarefree_semiprime {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_cmp_ui($n, 6) <= 0 and goto &nan;
 
     # Optimization for native integers
@@ -22862,7 +22924,7 @@ sub is_fermat_pseudoprime {
         }
     }
 
-    $n = _any2mpz($n, 0);
+    $n = _any2mpz($n);
 
     Math::GMPz::Rmpz_sgn($n) > 0
       or return $FALSE;
@@ -22908,7 +22970,7 @@ sub is_super_pseudoprime {
     $n = $$n;
     __is_int__($n) || return $FALSE;
 
-    my $z = _any2mpz($n, 0) // return $FALSE;
+    my $z = _any2mpz($n) // return $FALSE;
     $n = _big2uistr($n) // return $FALSE;
 
     Math::Prime::Util::GMP::is_pseudoprime(
@@ -22996,7 +23058,7 @@ sub is_over_pseudoprime {
     $n = $$n;
     __is_int__($n) || return $FALSE;
 
-    my $z = _any2mpz($n, 0) // return $FALSE;
+    my $z = _any2mpz($n) // return $FALSE;
     $n = _big2uistr($n) // return $FALSE;
 
     Math::Prime::Util::GMP::is_strong_pseudoprime(
@@ -23512,7 +23574,7 @@ sub is_bfw_psp {    # OEIS: A365514
     #   https://arxiv.org/abs/2006.14425
 
     __is_int__($$n) || return $FALSE;
-    $n = _any2mpz($$n, 0) // return $FALSE;
+    $n = _any2mpz($$n) // return $FALSE;
 
     Math::GMPz::Rmpz_sgn($n) <= 0
       && return $FALSE;
@@ -23581,7 +23643,7 @@ sub is_bfsw_psp {    # a slightly stronger and faster BFW test
     #   https://arxiv.org/abs/2006.14425
 
     __is_int__($$n) || return $FALSE;
-    $n = _any2mpz($$n, 0) // return $FALSE;
+    $n = _any2mpz($$n) // return $FALSE;
 
     Math::GMPz::Rmpz_sgn($n) <= 0
       && return $FALSE;
@@ -23958,8 +24020,8 @@ sub is_llr_prime {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2ui($$n)     // return undef;
-    $k = _any2mpz($$k, 0) // return $FALSE;
+    $n = _any2ui($$n)  // return undef;
+    $k = _any2mpz($$k) // return $FALSE;
 
     my $t = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_setbit($t, $n);
@@ -23993,8 +24055,8 @@ sub is_proth_prime {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2ui($$n)     // return undef;
-    $k = _any2mpz($$k, 0) // return $FALSE;
+    $n = _any2ui($$n)  // return undef;
+    $k = _any2mpz($$k) // return $FALSE;
 
     my $t = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_setbit($t, $n);
@@ -24174,11 +24236,11 @@ sub primes {
 
     if (defined($y)) {
         ref($y) eq __PACKAGE__ or _valid(\$y);
-        $x = _any2mpz($$x, 0) // return _array();
-        $y = _any2mpz($$y, 1) // return _array();
+        $x = _any2mpz($$x) // return _array();
+        $y = _any2mpz($$y) // return _array();
     }
     else {
-        $x = _any2mpz($$x, 0) // return _array();
+        $x = _any2mpz($$x) // return _array();
         $y = $x;
         $x = 2;
     }
@@ -24611,11 +24673,11 @@ sub composites {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = 4;
     }
 
@@ -25152,7 +25214,7 @@ sub prev_composite {
         return bless \$n;
     }
 
-    $n = _any2mpz($n, 0) // goto &nan;
+    $n = _any2mpz($n) // goto &nan;
     Math::GMPz::Rmpz_cmp_ui($n, 4) <= 0 and goto &nan;
 
     my $r = Math::GMPz::Rmpz_init();
@@ -25172,7 +25234,7 @@ sub prev_composite {
 sub next_composite {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
     Math::GMPz::Rmpz_cmp_ui($n, 3) <= 0 and return _set_int(4);
@@ -25213,7 +25275,7 @@ sub next_prime_power {
         return bless \$n;
     }
 
-    $n = _any2mpz($n, 0) // goto &nan;
+    $n = _any2mpz($n) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($n) < 0 and goto &nan;
 
@@ -25239,7 +25301,7 @@ sub next_prime_power {
 sub prev_prime_power {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_cmp_ui($n, 2) <= 0 and goto &nan;
 
     # Optimization for native integers
@@ -25264,7 +25326,7 @@ sub prev_prime_power {
 sub next_squarefree {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     my $sgn = Math::GMPz::Rmpz_sgn($n);
     $sgn < 0  and goto &nan;
@@ -25294,7 +25356,7 @@ sub next_squarefree {
 sub prev_squarefree {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0 and goto &nan;
 
     # Optimization for native integers
@@ -25334,7 +25396,7 @@ sub next_powerfree {
         return $n->next_squarefree;
     }
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     my $sgn = Math::GMPz::Rmpz_sgn($n);
     $sgn < 0  and goto &nan;
@@ -25383,7 +25445,7 @@ sub prev_powerfree {
         return $n->prev_squarefree;
     }
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_cmp_ui($n, 1) <= 0 and goto &nan;
 
     # Optimization for native integers
@@ -25897,9 +25959,9 @@ sub znlog {
     ref($g) eq __PACKAGE__ or _valid(\$g);
     ref($n) eq __PACKAGE__ or _valid(\$n);
 
-    $a = _any2mpz($$a, 1) // goto &nan;
-    $g = _any2mpz($$g, 2) // goto &nan;
-    $n = _any2mpz($$n, 3) // goto &nan;
+    $a = _any2mpz($$a) // goto &nan;
+    $g = _any2mpz($$g) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     my $sgn = Math::GMPz::Rmpz_sgn($n) || goto &nan;
 
@@ -26449,11 +26511,11 @@ sub gcd_factors {
     foreach my $k (@$arr) {
         ref($k) eq __PACKAGE__ or _valid(\$k);
         my $m = _any2mpz($$k) // next;
-        next if $seen_k{Math::GMPz::Rmpz_get_str($m, 10)}++;
+        next if $seen_k{Math::GMPz::Rmpz_get_str($m, 16)}++;
         Math::GMPz::Rmpz_gcd($t, $z, $m);
         Math::GMPz::Rmpz_cmp_ui($t, 1) > 0 or next;
         Math::GMPz::Rmpz_cmp($t, $z) < 0   or next;
-        if (!$seen_gcd{Math::GMPz::Rmpz_get_str($t, 10)}++) {
+        if (!$seen_gcd{Math::GMPz::Rmpz_get_str($t, 16)}++) {
             push @gcds, Math::GMPz::Rmpz_init_set($t);
         }
     }
@@ -27191,8 +27253,8 @@ sub trial_factor {
     ref($k) eq __PACKAGE__ or _valid(\$k);
     __is_int__($$n) || return _array();
 
-    $n = _any2mpz($$n, 0) // return _array();
-    $k = _any2ui($$k)     // return _array();
+    $n = _any2mpz($$n) // return _array();
+    $k = _any2ui($$k)  // return _array();
 
     return _array()               if Math::GMPz::Rmpz_sgn($n) <= 0;
     return _array([_set_int($n)]) if $k <= 0;
@@ -27484,7 +27546,7 @@ sub _miller_factor {
 sub miller_factor {
     my ($n, $tries) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
     Math::GMPz::Rmpz_sgn($n) > 0 or return _array();
 
     if (defined($tries)) {
@@ -27634,7 +27696,7 @@ sub _lucas_factor {
 sub lucas_factor {
     my ($n, $j, $tries) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
     Math::GMPz::Rmpz_sgn($n) > 0 or return _array();
 
     if (defined($j)) {
@@ -27657,7 +27719,7 @@ sub lucas_factor {
 sub fermat_factor {
     my ($n, $k) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
     $k = defined($k) ? do { ref($k) eq __PACKAGE__ or _valid(\$k); _any2ui($$k) || return _array([_set_int($n)]) } : 1e4;
 
     Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
@@ -28031,7 +28093,7 @@ sub pell_factor {
     # Simple version of the continued-fraction factorization method.
     # Efficient for numbers that have factors relatively close to sqrt(n)
 
-    $n    = _any2mpz($$n, 0) // return _array();
+    $n    = _any2mpz($$n) // return _array();
     $reps = defined($reps) ? do { ref($reps) eq __PACKAGE__ or _valid(\$reps); _any2ui($$reps) || return _array([_set_int($n)]) } : 1e4;
 
     Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
@@ -28123,7 +28185,7 @@ sub pell_factor {
 sub mbe_factor {
     my ($n, $reps) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
 
     Math::GMPz::Rmpz_cmp_ui($n, 1) > 0
       or return _array();
@@ -28433,8 +28495,8 @@ sub sum_remainders {
 
     ref($v) eq __PACKAGE__ or _valid(\$v);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $v = _any2mpz($$v, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $v = _any2mpz($$v) // goto &nan;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ZERO;
@@ -28704,7 +28766,7 @@ sub _divisors_bounded {
 
     ref($k_ref) eq __PACKAGE__ or _valid(\$k_ref);
 
-    my $k = _any2mpz($$k_ref, 1) // return _array();
+    my $k = _any2mpz($$k_ref) // return _array();
     Math::GMPz::Rmpz_sgn($k) > 0 or return _array();
 
     # When k > n, cap k at n
@@ -28735,7 +28797,7 @@ sub divisors {
     }
 
     # Validate and convert $n to GMPz
-    $n = _any2mpz($n, 0) // return _array();
+    $n = _any2mpz($n) // return _array();
     Math::GMPz::Rmpz_sgn($n) > 0 or return _array();
 
     # Branch to Bounded divisors if $k is defined
@@ -29318,7 +29380,7 @@ sub nidivisors {
 sub biudivisors {    # OEIS: A222266
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
     Math::GMPz::Rmpz_sgn($n) > 0 or return _array();
 
     my @d = ($ONE);
@@ -29366,7 +29428,7 @@ sub biudivisors {    # OEIS: A222266
 sub nbdivisors {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
     Math::GMPz::Rmpz_sgn($n) > 0 or return _array();
 
     my @biu = ($ONE);
@@ -29953,7 +30015,7 @@ sub exp_mangoldt_sum {
     # Formula:
     #   exp_mangoldt_sum(n) = n - prime_power_count(n) + Sum_{k=1..floor(log_2(n))} prime_sum(floor(n^(1/k)))
 
-    my $z     = _any2mpz($$n, 0);
+    my $z     = _any2mpz($$n);
     my $t     = Math::GMPz::Rmpz_init();
     my @terms = $n->prime_power_count->neg;
     my $t_obj = bless \$t;
@@ -30466,7 +30528,7 @@ sub inverse_totient {
 
     # Algorithm "invphi" from invphi.gp ver. 2.1 by Max Alekseyev.
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return _array(ZERO) if !Math::GMPz::Rmpz_sgn($n);
@@ -30488,7 +30550,7 @@ sub inverse_totient {
 sub inverse_totient_len {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return ZERO;
+    $n = _any2mpz($$n) // return ZERO;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ONE if !Math::GMPz::Rmpz_sgn($n);
@@ -30514,7 +30576,7 @@ sub inverse_totient_len {
 sub inverse_euler_phi_min {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return undef;
+    $n = _any2mpz($$n) // return undef;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ZERO if !Math::GMPz::Rmpz_sgn($n);
@@ -30532,7 +30594,7 @@ sub inverse_euler_phi_min {
 sub inverse_euler_phi_max {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return undef;
+    $n = _any2mpz($$n) // return undef;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ZERO if !Math::GMPz::Rmpz_sgn($n);
@@ -30591,7 +30653,7 @@ sub _cook_dedekind_psi {
 sub inverse_dedekind_psi {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return _array(ZERO) if !Math::GMPz::Rmpz_sgn($n);
@@ -30608,7 +30670,7 @@ sub inverse_dedekind_psi {
 sub inverse_dedekind_psi_len {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return ZERO;
+    $n = _any2mpz($$n) // return ZERO;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ONE if !Math::GMPz::Rmpz_sgn($n);
@@ -30625,7 +30687,7 @@ sub inverse_dedekind_psi_len {
 sub inverse_dedekind_psi_min {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return undef;
+    $n = _any2mpz($$n) // return undef;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ZERO if !Math::GMPz::Rmpz_sgn($n);
@@ -30642,7 +30704,7 @@ sub inverse_dedekind_psi_min {
 sub inverse_dedekind_psi_max {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return undef;
+    $n = _any2mpz($$n) // return undef;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return ZERO if !Math::GMPz::Rmpz_sgn($n);
@@ -30684,7 +30746,7 @@ sub _cook_usigma {
 sub inverse_usigma {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return _array(ZERO) if !Math::GMPz::Rmpz_sgn($n);
@@ -30725,7 +30787,7 @@ sub _cook_uphi {
 sub inverse_uphi {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return _array(ZERO) if !Math::GMPz::Rmpz_sgn($n);
@@ -30799,7 +30861,7 @@ sub inverse_sigma {
 
     # Algorithm "invsigma" from invphi.gp ver. 2.1 by Max Alekseyev.
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
     $k = defined($k) ? do { ref($k) eq __PACKAGE__ or _valid(\$k); _any2ui($$k) // return _array() } : 1;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
@@ -30816,7 +30878,7 @@ sub inverse_sigma {
 sub inverse_sigma_len {
     my ($n, $k) = @_;
 
-    $n = _any2mpz($$n, 0) // return ZERO;
+    $n = _any2mpz($$n) // return ZERO;
     $k = defined($k) ? do { ref($k) eq __PACKAGE__ or _valid(\$k); _any2ui($$k) // return ZERO } : 1;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
@@ -30833,7 +30895,7 @@ sub inverse_sigma_len {
 sub inverse_sigma_min {
     my ($n, $k) = @_;
 
-    $n = _any2mpz($$n, 0) // return undef;
+    $n = _any2mpz($$n) // return undef;
     $k = defined($k) ? do { ref($k) eq __PACKAGE__ or _valid(\$k); _any2ui($$k) // return undef } : 1;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
@@ -30850,7 +30912,7 @@ sub inverse_sigma_min {
 sub inverse_sigma_max {
     my ($n, $k) = @_;
 
-    $n = _any2mpz($$n, 0) // return undef;
+    $n = _any2mpz($$n) // return undef;
     $k = defined($k) ? do { ref($k) eq __PACKAGE__ or _valid(\$k); _any2ui($$k) // return undef } : 1;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
@@ -31228,7 +31290,7 @@ sub prime_power_sigma0 {
 sub collatz {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     $n = Math::GMPz::Rmpz_init_set($n);    # copy
 
     state $two = Math::GMPz::Rmpz_init_set_ui(2);
@@ -33634,7 +33696,7 @@ sub is_primitive_abundant {
         return $TRUE;
     }
 
-    $n = _any2mpz($n, 0) // return $FALSE;
+    $n = _any2mpz($n) // return $FALSE;
 
     my $t = Math::GMPz::Rmpz_init();
     foreach my $pp (_factor_exp($n)) {
@@ -34215,11 +34277,11 @@ sub powerful {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -34305,7 +34367,7 @@ sub nth_powerful {
     my $k_obj = bless \$k;
     my $n_obj = $n;
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($n) > 0 or do {
         return ZERO if (Math::GMPz::Rmpz_sgn($n) == 0);    # not k-powerful, but...
@@ -34917,7 +34979,7 @@ sub omega_prime_divisors {
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
     $k = _any2ui($$k) // return _array();
-    my $z = _any2mpz($$n, 0) // return _array();
+    my $z = _any2mpz($$n) // return _array();
 
     if ($k == 0) {
         return _array([ONE]);
@@ -34987,11 +35049,11 @@ sub omega_primes {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -35029,11 +35091,11 @@ sub fermat_psp {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -35069,11 +35131,11 @@ sub strong_fermat_psp {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -35775,7 +35837,7 @@ sub almost_prime_divisors {
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
     $k = _any2ui($$k) // return _array();
-    my $z = _any2mpz($$n, 0) // return _array();
+    my $z = _any2mpz($$n) // return _array();
 
     if ($k == 0) {
         return _array([ONE]);
@@ -35868,11 +35930,11 @@ sub almost_primes {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -36035,8 +36097,8 @@ sub prime_signature_numbers {
 
     ref($to) eq __PACKAGE__ or _valid(\$to);
 
-    $from = _any2mpz($$from, 0) // return _array();
-    $to   = _any2mpz($$to,   1) // return _array();
+    $from = _any2mpz($$from) // return _array();
+    $to   = _any2mpz($$to)   // return _array();
 
     if (Math::GMPz::Rmpz_sgn($from) <= 0) {
         $from = $ONE;
@@ -36270,8 +36332,8 @@ sub tau_inverse {
 
     $k = _any2ui($$k) // return _array();
 
-    $from = _any2mpz($$from, 0) // return _array();
-    $to   = _any2mpz($$to,   1) // return _array();
+    $from = _any2mpz($$from) // return _array();
+    $to   = _any2mpz($$to)   // return _array();
 
     my @signatures = _tau_partitions($k, Math::GMPz::Rmpz_sizeinbase($to, 2) - 1);
 
@@ -36299,7 +36361,7 @@ sub tau_inverse_len {
     }
 
     $k = _any2ui($$k) // return ZERO;
-    my $n = _any2mpz($$to, 0) // return ZERO;
+    my $n = _any2mpz($$to) // return ZERO;
     my @signatures = _tau_partitions($k, Math::GMPz::Rmpz_sizeinbase($n, 2) - 1);
 
     my @list;
@@ -36391,11 +36453,11 @@ sub carmichael {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -36426,11 +36488,11 @@ sub strong_fermat_carmichael {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -36469,11 +36531,11 @@ sub lucas_carmichael {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -36504,11 +36566,11 @@ sub squarefree_fermat_psp {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -36544,11 +36606,11 @@ sub squarefree_strong_fermat_psp {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -36852,11 +36914,11 @@ sub squarefree_almost_primes {
 
     if (defined($to)) {
         ref($to) eq __PACKAGE__ or _valid(\$to);
-        $from = _any2mpz($$from, 0) // return _array();
-        $to   = _any2mpz($$to,   1) // return _array();
+        $from = _any2mpz($$from) // return _array();
+        $to   = _any2mpz($$to)   // return _array();
     }
     else {
-        $to   = _any2mpz($$from, 0) // return _array();
+        $to   = _any2mpz($$from) // return _array();
         $from = $ONE;
     }
 
@@ -38608,8 +38670,8 @@ sub is_prob_squarefree {
     ref($k) eq __PACKAGE__ or _valid(\$k);
     __is_int__($$n) || return $FALSE;
 
-    $n = _any2mpz($$n, 0) // return $FALSE;
-    $k = _any2ui($$k)     // return $FALSE;
+    $n = _any2mpz($$n) // return $FALSE;
+    $k = _any2ui($$k)  // return $FALSE;
 
     return $FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
     return $FALSE if $k <= 0;
@@ -38808,7 +38870,7 @@ sub is_cube {
 sub perfect_power_count {    # OEIS: A069623
     my ($n, $k) = @_;
 
-    $n = _any2mpz($$n, 0) // return ZERO;
+    $n = _any2mpz($$n) // return ZERO;
     Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
     if (defined($k)) {
@@ -38851,7 +38913,7 @@ sub perfect_power_count {    # OEIS: A069623
 sub perfect_power_sum {
     my ($n, $k) = @_;
 
-    $n = _any2mpz($$n, 5) // return ZERO;
+    $n = _any2mpz($$n) // return ZERO;
     Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
     if (defined($k)) {
@@ -38927,7 +38989,7 @@ sub next_perfect_power {
         return $n->iroot($k)->inc->ipow($k);
     }
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_sgn($n) >= 0 or goto &nan;
 
     state $t = Math::GMPz::Rmpz_init_nobless();
@@ -38956,7 +39018,7 @@ sub prev_perfect_power {
         return $n->iroot($k)->dec->ipow($k);
     }
 
-    $n = _any2mpz($$n, 0) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
     Math::GMPz::Rmpz_sgn($n) > 0 or goto &nan;
 
     state $t = Math::GMPz::Rmpz_init_nobless();
@@ -39013,7 +39075,7 @@ sub powerful_count {    # count of k-powerful numbers
         return $k->powerful_count($to)->sub($k->powerful_count($from->dec));
     }
 
-    my $n = _any2mpz($$from, 5) // return ZERO;
+    my $n = _any2mpz($$from) // return ZERO;
     Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
     $k = _any2ui($$k) // return ZERO;
@@ -39049,7 +39111,7 @@ sub powerful_sum {    # sum of k-powerful numbers
         return $k->powerful_sum($to)->sub($k->powerful_sum($from->dec));
     }
 
-    my $n = _any2mpz($$from, 5) // return ZERO;
+    my $n = _any2mpz($$from) // return ZERO;
     Math::GMPz::Rmpz_sgn($n) > 0 or return ZERO;
 
     $k = _any2ui($$k) // return ZERO;
@@ -39430,8 +39492,8 @@ sub next_pow {
 
     ref($y) eq __PACKAGE__ or _valid(\$y);
 
-    $x = _any2mpz($$x, 0) // goto &nan;
-    $y = _any2mpz($$y, 1) // goto &nan;
+    $x = _any2mpz($$x) // goto &nan;
+    $y = _any2mpz($$y) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($x) <= 0 and return ONE;
 
@@ -39453,8 +39515,8 @@ sub prev_pow {
 
     ref($y) eq __PACKAGE__ or _valid(\$y);
 
-    $x = _any2mpz($$x, 0) // goto &nan;
-    $y = _any2mpz($$y, 1) // goto &nan;
+    $x = _any2mpz($$x) // goto &nan;
+    $y = _any2mpz($$y) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($x) <= 0 and goto &nan;
 
@@ -39610,8 +39672,8 @@ sub ipolygonal_root {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $k = _any2mpz($$k, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
 
     bless \__ipolygonal_root__($n, $k);
 }
@@ -39627,8 +39689,8 @@ sub ipolygonal_root2 {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $k = _any2mpz($$k, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
 
     bless \__ipolygonal_root__($n, $k, 1);
 }
@@ -39659,8 +39721,8 @@ sub polygonal {
         }
     }
 
-    $n = _any2mpz($n, 0) // goto &nan;
-    $k = _any2mpz($k, 1) // goto &nan;
+    $n = _any2mpz($n) // goto &nan;
+    $k = _any2mpz($k) // goto &nan;
 
     # polygonal(n, k) = n * (n*k - k - 2*n + 4) / 2
 
@@ -39689,8 +39751,8 @@ sub centered_polygonal {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $k = _any2mpz($$k, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
 
     # centered_polygonal(n, k) = k*n*(n+1)/2 + 1
 
@@ -39716,8 +39778,8 @@ sub is_centered_polygonal {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $k = _any2mpz($$k, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
 
     state $t = Math::GMPz::Rmpz_init_nobless();
 
@@ -39776,8 +39838,8 @@ sub pyramidal {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $k = _any2mpz($$k, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
 
     # pyramidal(n, k) = (n*(n+1) * (n*(k-2) - (k-5)))/6
 
@@ -39809,8 +39871,8 @@ sub centered_pyramidal {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $k = _any2mpz($$k, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
 
     # centered_pyramidal(n, k) = (k-1)*(n-1)*n*(n+1)/6 + n = n*(k*n^2 - k - n^2 + 7)/6
 
@@ -39837,8 +39899,8 @@ sub is_pyramidal {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _any2mpz($$n, 0) // goto &nan;
-    $k = _any2mpz($$k, 1) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
+    $k = _any2mpz($$k) // goto &nan;
 
     if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
         return $TRUE;
@@ -39892,7 +39954,7 @@ sub is_pyramidal {
 sub polygonal_inverse {
     my ($n) = @_;
 
-    $n = _any2mpz($$n, 0) // return _array();
+    $n = _any2mpz($$n) // return _array();
     Math::GMPz::Rmpz_sgn($n) > 0 or return _array();
 
     state $t = Math::GMPz::Rmpz_init_nobless();
@@ -40111,7 +40173,7 @@ sub is_palindrome {
 
     if (defined($k)) {
         ref($k) eq __PACKAGE__ or _valid(\$k);
-        $k = _any2mpz($$k, 6) // return $FALSE;
+        $k = _any2mpz($$k) // return $FALSE;
     }
 
     $n = _sanitize_mpz($n, 5) // return $FALSE;
@@ -40149,7 +40211,7 @@ sub next_palindrome {
     $base = defined($base) ? do { ref($base) eq __PACKAGE__ or _valid(\$base); _any2ui($$base) // goto &nan } : 10;
     $base <= 1 and goto &nan;
 
-    $n = _any2mpz($$n, 5) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     Math::GMPz::Rmpz_sgn($n) >= 0
       or goto &nan;
@@ -40229,11 +40291,11 @@ sub next_palindrome {
 sub reverse {
     my ($n, $k) = @_;
 
-    $n = _any2mpz($$n, 5) // goto &nan;
+    $n = _any2mpz($$n) // goto &nan;
 
     if (defined($k)) {
         ref($k) eq __PACKAGE__ or _valid(\$k);
-        $k = _any2mpz($$k, 6) // goto &nan;
+        $k = _any2mpz($$k) // goto &nan;
     }
 
     # Optimization for bases <= 62
@@ -40298,7 +40360,7 @@ sub shift_left {
         }
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
 
     my $r = Math::GMPz::Rmpz_init();
 
@@ -40343,7 +40405,7 @@ sub shift_right {
         }
     }
 
-    $x = _any2mpz($x, 0) // (goto &nan);
+    $x = _any2mpz($x) // (goto &nan);
 
     state $r = Math::GMPz::Rmpz_init_nobless();
 
