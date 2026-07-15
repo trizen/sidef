@@ -114,6 +114,7 @@ use constant {
 
     SMALL_INTS_SIZE => $#SMALL_INTS,
 
+    PARI_GP_MIN            => 50,     # in decimal digits
     YAFU_MIN               => 49,     # in decimal digits
     FACTORDB_MIN           => 65,     # in decimal digits
     SPECIAL_FACTORS_MIN    => 36,     # in decimal digits (must be greater than SMALL_NUMBER_MAX_BITS)
@@ -1353,6 +1354,22 @@ sub _factor_yafu {
     return ();
 }
 
+sub _factor_pari {
+    my ($n) = @_;
+
+    # Extract flat space-separated factors from the PARI factorization matrix
+    my $code = "iferr(my(f=factorint($n)); for(i=1, matsize(f)[1], for(j=1, f[i,2], print1(f[i,1], \" \"))), E, \"\")";
+    if (my $res = _execute_pari_gp($code)) {
+        my @pari_factors = split(' ', $res);
+        if (@pari_factors) {
+            say STDERR "PARI/GP factorint(r): @pari_factors" if $VERBOSE;
+            return @pari_factors;
+        }
+    }
+
+    return ();
+}
+
 sub _factor_generic {
     my ($n) = @_;
 
@@ -1366,19 +1383,18 @@ sub _factor_generic {
         if (Math::GMPz::Rmpz_fits_ulong_p($n)) {
             return \@factors if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
             $n = Math::GMPz::Rmpz_get_ui($n);
+            push @factors, _factor_via_prime_util($n);
+            return \@factors;
         }
         else {
             $n = Math::GMPz::Rmpz_get_str($n, 10);
         }
     }
 
-    # Centralized prime check for large remaining composites
     my $len = CORE::length($n);
-    if ($len >= SPECIAL_FACTORS_MIN || $len >= FACTORDB_MIN || $len >= YAFU_MIN) {
-        if (_is_prob_prime($n)) {
-            push @factors, $n;
-            return \@factors;
-        }
+    if ($len >= SPECIAL_FACTORS_MIN and _is_prob_prime($n)) {
+        push @factors, $n;
+        return \@factors;
     }
 
     # 1. Special Factors Strategy
@@ -1393,8 +1409,12 @@ sub _factor_generic {
     if ($len >= FACTORDB_MIN and $USE_FACTORDB) {
         my @fdb = _factor_factordb($n);
         if (@fdb) {
+            say STDERR "FactorDB: Success!" if $VERBOSE;
             push @factors, @fdb;
             return \@factors;
+        }
+        else {
+            say STDERR "FactorDB: Failed!" if $VERBOSE;
         }
     }
 
@@ -1402,12 +1422,29 @@ sub _factor_generic {
     if ($len >= YAFU_MIN and $USE_YAFU and -t STDIN) {
         my @yafu = _factor_yafu($n);
         if (@yafu) {
+            say STDERR "YAFU: Success!" if $VERBOSE;
             push @factors, @yafu;
             return \@factors;
         }
+        else {
+            say STDERR "YAFU: Failed!" if $VERBOSE;
+        }
     }
 
-    # 4. Fallback Strategy
+    # 4. PARI Strategy
+    if ($len >= PARI_GP_MIN and $USE_PARI_GP) {
+        my @pari = _factor_pari($n);
+        if (@pari) {
+            say STDERR "PARI/GP: Success!" if $VERBOSE;
+            push @factors, @pari;
+            return \@factors;
+        }
+        else {
+            say STDERR "PARI/GP: Failed!" if $VERBOSE;
+        }
+    }
+
+    # 5. Fallback Strategy
     push @factors, _factor_via_prime_util($n);
     return \@factors;
 }
