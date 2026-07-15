@@ -20691,6 +20691,68 @@ sub coredisc {
 
 *fundamental_discriminant = \&coredisc;
 
+sub ellcard {
+    my ($A, $B, $p) = @_;
+
+    ref($B) eq __PACKAGE__ or _valid(\$B);
+    ref($p) eq __PACKAGE__ or _valid(\$p);
+
+    $A = _any2mpz($$A) // goto &nan;
+    $B = _any2mpz($$B) // goto &nan;
+    $p = _any2mpz($$p) // goto &nan;
+
+    Math::GMPz::Rmpz_sgn($p) > 0 or goto &nan;
+
+    # FAST PATH: PARI/GP Schoof's algorithm
+    if ($USE_PARI_GP && Math::GMPz::Rmpz_sizeinbase($p, 2) >= 16) {
+        my $A_str = Math::GMPz::Rmpz_get_str($A, 10);
+        my $B_str = Math::GMPz::Rmpz_get_str($B, 10);
+        my $p_str = Math::GMPz::Rmpz_get_str($p, 10);
+
+        my $code = "iferr(ellcard(ellinit(Mod([$A_str, $B_str], $p_str))), E, \"\")";
+
+        if (my $res = _execute_pari_gp($code)) {
+            if ($res =~ /^\d+$/) {
+                return _set_int($res);
+            }
+        }
+    }
+
+    # FALLBACK: Legendre symbol summation O(p)
+    # card = 1 + p + \sum_{x=0}^{p-1} Legendre(x^3 + ax + b, p)
+    my $card = Math::GMPz::Rmpz_init_set($p);
+    Math::GMPz::Rmpz_add_ui($card, $card, 1);
+
+    state $x = Math::GMPz::Rmpz_init_nobless();
+    state $t = Math::GMPz::Rmpz_init_nobless();
+
+    Math::GMPz::Rmpz_set_ui($x, 0);
+
+    while (Math::GMPz::Rmpz_cmp($x, $p) < 0) {
+
+        # t = x^3 + ax + b
+        Math::GMPz::Rmpz_mul($t, $x, $x);
+        Math::GMPz::Rmpz_add($t, $t, $A);
+        Math::GMPz::Rmpz_mul($t, $t, $x);
+        Math::GMPz::Rmpz_add($t, $t, $B);
+        Math::GMPz::Rmpz_mod($t, $t, $p);
+
+        my $kr = Math::GMPz::Rmpz_kronecker($t, $p);
+
+        if ($kr == 1) {
+            Math::GMPz::Rmpz_add_ui($card, $card, 1);
+        }
+        elsif ($kr == -1) {
+            Math::GMPz::Rmpz_sub_ui($card, $card, 1);
+        }
+        Math::GMPz::Rmpz_add_ui($x, $x, 1);
+    }
+
+    return bless \$card;
+}
+
+*elliptic_curve_cardinality = \&ellcard;
+
 sub hclassno {
     my ($n) = @_;
 

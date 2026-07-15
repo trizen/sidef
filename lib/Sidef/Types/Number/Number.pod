@@ -2419,11 +2419,31 @@ Returns the Hurwitz-Kronecker class number.
 
 =cut
 
-=head2 inf
+=head2 ellcard
 
-    Num.inf
+    ellcard(A, B, p)
 
-Returns the positive Infinity special floating-point value.
+Returns the number of points on the elliptic curve
+
+    E : y² = x³ + Ax + B
+
+over the finite field C<F_p>, including the point at infinity.
+
+The modulus C<p> must be a positive prime. The curve is assumed to be nonsingular, that is,
+
+    4A³ + 27B² ≠ 0 (mod p).
+
+Example:
+
+    say ellcard(2, 3, 5)      # => 7
+    say ellcard(2, 3, 7)      # => 6
+    say ellcard(0, 1, 11)     # => 12
+
+By Hasse's theorem, the returned value always satisfies:
+
+    |#E(F_p) - (p + 1)| ≤ 2√p
+
+Aliases: I<elliptic_curve_cardinality>
 
 =cut
 
@@ -2510,6 +2530,14 @@ Returns the -1 value.
     Num.nan
 
 Returns the Not-a-Number special value (C<NaN>).
+
+=cut
+
+=head2 inf
+
+    Num.inf
+
+Returns the positive Infinity special floating-point value (C<Inf>).
 
 =cut
 
