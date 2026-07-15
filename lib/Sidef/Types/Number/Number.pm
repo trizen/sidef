@@ -15306,8 +15306,41 @@ sub solve_ternary_quadratic_form {
     my @solutions;
     my %seen;
 
+    my $store_solution = sub {
+        my ($x, $y, $z) = @_;
+
+        if (Math::GMPz::Rmpz_cmp($a_z, $b_z) == 0) {
+            if (Math::GMPz::Rmpz_cmp($a_z, $c_z) == 0) {
+                ($x, $y, $z) = sort { Math::GMPz::Rmpz_cmp($a, $b) } ($x, $y, $z);
+            }
+            elsif (Math::GMPz::Rmpz_cmp($x, $y) > 0) {
+                ($x, $y) = ($y, $x);
+            }
+        }
+        elsif (Math::GMPz::Rmpz_cmp($b_z, $c_z) == 0) {
+            if (Math::GMPz::Rmpz_cmp($y, $z) > 0) {
+                ($y, $z) = ($z, $y);
+            }
+        }
+        elsif (Math::GMPz::Rmpz_cmp($a_z, $c_z) == 0) {
+            if (Math::GMPz::Rmpz_cmp($x, $z) > 0) {
+                ($x, $z) = ($z, $x);
+            }
+        }
+
+        my $key = join(';', Math::GMPz::Rmpz_get_str($x, 16), Math::GMPz::Rmpz_get_str($y, 16), Math::GMPz::Rmpz_get_str($z, 16));
+
+        if (!$seen{$key}++) {
+            push @solutions, _array([bless(\$x), bless(\$y), bless(\$z)]);
+        }
+    };
+
+    my $sort_solutions = sub {
+        @solutions = sort { ${$a->[0]} <=> ${$b->[0]} || ${$a->[1]} <=> ${$b->[1]} || ${$a->[2]} <=> ${$b->[2]} } @solutions;
+    };
+
     # FAST PATH: PARI/GP executes the entire loop internally to avoid pipe latency
-    if (0 and $USE_PARI_GP and Math::GMPz::Rmpz_sizeinbase($n_z, 2) >= 32) {
+    if ($USE_PARI_GP and Math::GMPz::Rmpz_sizeinbase($n_z, 2) >= 20) {
         my $a_str = Math::GMPz::Rmpz_get_str($a_z, 10);
         my $b_str = Math::GMPz::Rmpz_get_str($b_z, 10);
         my $c_str = Math::GMPz::Rmpz_get_str($c_z, 10);
@@ -15335,22 +15368,15 @@ GP
             return _array() if $res eq '';
 
             while ($res =~ /\[(-?\d+),\s*(-?\d+),\s*(-?\d+)\]/g) {
+
                 my $x_val = Math::GMPz::Rmpz_init_set_str($1, 10);
                 my $y_val = Math::GMPz::Rmpz_init_set_str($2, 10);
                 my $z_val = Math::GMPz::Rmpz_init_set_str($3, 10);
 
-                # Enforce canonical ordering for identical coefficients
-                if (Math::GMPz::Rmpz_cmp($a_z, $b_z) == 0 && Math::GMPz::Rmpz_cmp($x_val, $y_val) > 0) {
-                    ($x_val, $y_val) = ($y_val, $x_val);
-                }
-
-                my $key = join(';', Math::GMPz::Rmpz_get_str($x_val, 16), Math::GMPz::Rmpz_get_str($y_val, 16), Math::GMPz::Rmpz_get_str($z_val, 16));
-                if (!$seen{$key}++) {
-                    push @solutions, _array([bless(\$x_val), bless(\$y_val), bless(\$z_val)]);
-                }
+                $store_solution->($x_val, $y_val, $z_val);
             }
             if (@solutions) {
-                @solutions = sort { ${$a->[0]} <=> ${$b->[0]} || ${$a->[1]} <=> ${$b->[1]} || ${$a->[2]} <=> ${$b->[2]} } @solutions;
+                $sort_solutions->();
                 return _array(\@solutions);
             }
         }
@@ -15404,23 +15430,14 @@ GP
                     my $y_copy = Math::GMPz::Rmpz_init_set(_any2mpz(${$sol->[1]}));
                     my $z_copy = Math::GMPz::Rmpz_init_set($z_mpz);
 
-                    if (Math::GMPz::Rmpz_cmp($a_z, $b_z) == 0 && Math::GMPz::Rmpz_cmp($x_copy, $y_copy) > 0) {
-                        ($x_copy, $y_copy) = ($y_copy, $x_copy);
-                    }
-
-                    my $key = join(';', Math::GMPz::Rmpz_get_str($x_copy, 16), Math::GMPz::Rmpz_get_str($y_copy, 16), Math::GMPz::Rmpz_get_str($z_copy, 16));
-
-                    if (!$seen{$key}++) {
-                        push @solutions, _array([bless(\$x_copy), bless(\$y_copy), bless(\$z_copy)]);
-                    }
+                    $store_solution->($x_copy, $y_copy, $z_copy);
                 }
             }
         }
         Math::GMPz::Rmpz_add_ui($z_mpz, $z_mpz, 1);
     }
 
-    @solutions = sort { ${$a->[0]} <=> ${$b->[0]} || ${$a->[1]} <=> ${$b->[1]} || ${$a->[2]} <=> ${$b->[2]} } @solutions;
-
+    $sort_solutions->();
     _array(\@solutions);
 }
 
