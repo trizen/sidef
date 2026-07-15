@@ -2423,13 +2423,13 @@ Returns the Hurwitz-Kronecker class number.
 
     ellcard(A, B, p)
 
-Returns the number of points on the elliptic curve
+Returns the number of points on the elliptic curve:
 
     E : y² = x³ + Ax + B
 
 over the finite field C<F_p>, including the point at infinity.
 
-The modulus C<p> must be a positive prime. The curve is assumed to be nonsingular, that is,
+The modulus C<p> must be a positive prime. The curve is assumed to be nonsingular, that is:
 
     4A³ + 27B² ≠ 0 (mod p).
 
@@ -3302,12 +3302,6 @@ Returns the n-th Bell number modulo C<m>.
 
 Returns the binomial coefficient for choosing C<k> objects from C<n> objects, also called the "choose" function.
 
-Equivalent to:
-
-                    n!
-    binomial(n, k) = --------
-                 k!(n-k)!
-
 For the usual case of nonnegative integers, it counts the number of ways to choose C<k> objects from C<n> objects.
 
     say binomial(5, 2)    #=> 10
@@ -3329,6 +3323,29 @@ Returns the binomial coefficient C<binomial(n,k)> modulo C<m>.
 Equivalent with (but much faster):
 
     binomial(n,k) % m
+
+=cut
+
+=head2 eulerian
+
+    eulerian(n, k)
+
+Returns the Eulerian number C<A(n, k)>, which counts the number of permutations of C<{1, 2, ..., n}> having exactly C<k> ascents (equivalently, exactly C<k> descents).
+
+    say 30.of {|n| eulerian(n, 1) }                     #=> OEIS: A000295
+    say 30.of {|n| eulerian(n, 2) }                     #=> OEIS: A000460
+    say 10.of {|n| ^n->map {|k| eulerian(n,k) }.flat }  #=> OEIS: A008292
+
+The first few rows of the Eulerian triangle are:
+
+    1
+    1
+    1 1
+    1 4 1
+    1 11 11 1
+    1 26 66 26 1
+
+Aliases: I<eulerian_number>
 
 =cut
 

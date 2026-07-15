@@ -15831,6 +15831,41 @@ sub binomial {
 
 *nok = \&binomial;
 
+sub eulerian_number {
+    my ($n, $k) = @_;
+
+    ref($k) eq __PACKAGE__ or _valid(\$k);
+
+    $n = _any2ui($$n) // goto &nan;
+    $k = _any2ui($$k) // goto &nan;
+
+    if ($k >= $n || $n == 0) {
+        return ($k == 0 && $n == 0) ? ONE : ZERO;
+    }
+
+    # Inclusion-Exclusion Loop
+    my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+    state $term = Math::GMPz::Rmpz_init_nobless();
+    state $bin  = Math::GMPz::Rmpz_init_nobless();
+
+    for my $j (0 .. $k + 1) {
+        Math::GMPz::Rmpz_bin_uiui($bin, $n + 1, $j);
+        Math::GMPz::Rmpz_ui_pow_ui($term, $k + 1 - $j, $n);
+        Math::GMPz::Rmpz_mul($term, $term, $bin);
+
+        if ($j % 2 == 1) {
+            Math::GMPz::Rmpz_sub($sum, $sum, $term);
+        }
+        else {
+            Math::GMPz::Rmpz_add($sum, $sum, $term);
+        }
+    }
+
+    return bless \$sum;
+}
+
+*eulerian = \&eulerian_number;
+
 # Multiply two polynomials modulo p^e, truncating safely to degree e-1
 sub _poly_mul {
     my ($A, $B, $pk, $e) = @_;
