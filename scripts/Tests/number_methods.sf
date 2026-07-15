@@ -1989,4 +1989,13 @@ assert_eq(
     %n[1, 1, 1, 1, 4, 1, 1, 11, 11, 1, 1, 26, 66, 26, 1, 1, 57, 302, 302, 57, 1, 1, 120, 1191, 2416, 1191, 120, 1, 1, 247, 4293, 15619, 15619, 4293, 247, 1, 1, 502, 14608, 88234, 156190, 88234, 14608, 502, 1]
 )
 
+assert_eq(reduce_quadratic_form(5, 6, 5), [4, 4, 5])
+assert_eq(reduce_quadratic_form(7, 10, 4), [1, 0, 3])
+assert_eq(reduce_quadratic_form(112**2, 43**2, 104), %n[104, 23, 4327])
+assert_eq(reduce_quadratic_form(112**2, 43**2, 5040.isqrt), %n[70, -29, 337])
+assert_eq(reduce_quadratic_form(112**2, 43**2, 5040), %n[5040, -1849, 12544])
+assert_eq(reduce_quadratic_form(112, -43, 5040), %n[112, -43, 5040])
+assert_eq(reduce_quadratic_form(5, 7, 12), %n[5, -3, 10])
+assert_eq(reduce_quadratic_form(2**127 + 5, 2**32 + 5, 10!), %n[3628800, 1531899, 170141183460469231731687302445027226741])
+
 say "** Tests passed!"

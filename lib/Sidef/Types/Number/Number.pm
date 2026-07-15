@@ -15284,6 +15284,95 @@ sub solve_quadratic_form {
 
 *cornacchia = \&solve_quadratic_form;
 
+sub reduce_quadratic_form {
+    my ($A, $B, $C) = @_;
+
+    ref($B) eq __PACKAGE__ or _valid(\$B);
+    ref($C) eq __PACKAGE__ or _valid(\$C);
+
+    $A = _any2mpz($$A) // return _array();
+    $B = _any2mpz($$B) // return _array();
+    $C = _any2mpz($$C) // return _array();
+
+    # Positive definite check (b^2 - 4ac < 0 and a > 0)
+    state $disc = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_mul($disc, $B, $B);
+
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_mul($t, $A, $C);
+    Math::GMPz::Rmpz_mul_ui($t, $t, 4);
+    Math::GMPz::Rmpz_sub($disc, $disc, $t);
+
+    if (Math::GMPz::Rmpz_sgn($disc) >= 0 || Math::GMPz::Rmpz_sgn($A) <= 0) {
+        return _array();    # Not positive definite
+    }
+
+    # PARI/GP
+    if (0 and $USE_PARI_GP) {
+        my $a_str = Math::GMPz::Rmpz_get_str($A, 10);
+        my $b_str = Math::GMPz::Rmpz_get_str($B, 10);
+        my $c_str = Math::GMPz::Rmpz_get_str($C, 10);
+
+        my $code = "iferr(Vec(qfbred(Qfb($a_str, $b_str, $c_str))), E, \"\")";
+        if (my $res = _execute_pari_gp($code)) {
+            if ($res =~ /^\[(-?\d+),\s*(-?\d+),\s*(-?\d+)\]$/) {
+                my $ra = Math::GMPz::Rmpz_init_set_str($1, 10);
+                my $rb = Math::GMPz::Rmpz_init_set_str($2, 10);
+                my $rc = Math::GMPz::Rmpz_init_set_str($3, 10);
+                return _array([bless(\$ra), bless(\$rb), bless(\$rc)]);
+            }
+        }
+    }
+
+    # Gauss's Reduction Algorithm
+    my $ra = Math::GMPz::Rmpz_init_set($A);
+    my $rb = Math::GMPz::Rmpz_init_set($B);
+    my $rc = Math::GMPz::Rmpz_init_set($C);
+
+    state $q = Math::GMPz::Rmpz_init_nobless();
+    state $u = Math::GMPz::Rmpz_init_nobless();
+
+    while (1) {
+
+        # Ensure -a < b <= a
+        Math::GMPz::Rmpz_mul_2exp($t, $ra, 1);    # t = 2a
+        Math::GMPz::Rmpz_add($u, $rb, $ra);       # u = b + a
+
+        # Floor division
+        Math::GMPz::Rmpz_fdiv_q($q, $u, $t);
+        Math::GMPz::Rmpz_submul($rb, $q, $t);     # b = b - 2a*q
+
+        # c = (b^2 - D) / 4a
+        Math::GMPz::Rmpz_mul($rc, $rb, $rb);
+        Math::GMPz::Rmpz_sub($rc, $rc, $disc);
+        Math::GMPz::Rmpz_div($rc, $rc, $t);
+        Math::GMPz::Rmpz_div_2exp($rc, $rc, 1);
+
+        # Apply S transformation if a > c
+        if (Math::GMPz::Rmpz_cmp($ra, $rc) > 0) {
+            Math::GMPz::Rmpz_swap($ra, $rc);
+            Math::GMPz::Rmpz_neg($rb, $rb);
+        }
+
+        # Apply transformation if a == c and b < 0
+        elsif (Math::GMPz::Rmpz_cmp($ra, $rc) == 0 && Math::GMPz::Rmpz_sgn($rb) < 0) {
+            Math::GMPz::Rmpz_neg($rb, $rb);
+            last;
+        }
+        else {
+            last;
+        }
+    }
+
+    # Boundary condition: if a == -b, shift to b = a
+    Math::GMPz::Rmpz_neg($t, $ra);
+    if (Math::GMPz::Rmpz_cmp($rb, $t) == 0) {
+        Math::GMPz::Rmpz_set($rb, $ra);
+    }
+
+    return _array([bless(\$ra), bless(\$rb), bless(\$rc)]);
+}
+
 sub solve_ternary_quadratic_form {
     my ($A, $B, $C, $n) = @_;
 

@@ -3044,6 +3044,59 @@ Aliases: I<hilbert_symbol>
 
 =cut
 
+=head2 coredisc
+
+    coredisc(n)
+
+Returns the fundamental discriminant associated with C<n>. The result is obtained from the squarefree kernel of C<n>, preserving the sign of C<n>:
+
+    D = core(n)      if core(n) ≡ 1 (mod 4)
+      = 4*core(n)    otherwise
+
+The returned value is the discriminant of the quadratic field C<Q(sqrt(n))>, making it useful in algebraic number theory and quadratic forms.
+
+    say coredisc(12)    #=> 12
+    say coredisc(20)    #=> 5
+    say coredisc(-5)    #=> -20
+    say coredisc(-12)   #=> -3
+
+Aliases: I<fundamental_discriminant>
+
+=cut
+
+=head2 reduce_quadratic_form
+
+    reduce_quadratic_form(A, B, C)
+
+Returns the Gauss-reduced form equivalent to the positive definite binary quadratic form
+
+    Ax² + Bxy + Cy²
+
+The input form must be positive definite, that is,
+
+    A > 0
+    B² - 4AC < 0
+
+If these conditions are not satisfied, the function returns an empty array.
+
+The returned form C<(a, b, c)> is properly equivalent to the input form and satisfies the classical reduction conditions:
+
+    |b| ≤ a ≤ c,
+
+with the additional tie-breaking rules
+
+    b ≥ 0    if |b| = a
+    b ≥ 0    if a = c
+
+Thus, each equivalence class of positive definite binary quadratic forms has a unique reduced representative.
+
+    say reduce_quadratic_form(5, 6, 5)    #=> [4, 4, 5]
+    say reduce_quadratic_form(7, 10, 4)   #=> [1, 0, 3]
+
+Reduced quadratic forms play a central role in the theory of binary quadratic forms, ideal class groups, and quadratic fields.
+
+=cut
+
 =head2 kronecker_delta
 
     kronecker_delta(a,b)
@@ -9514,26 +9567,6 @@ Squarefree part of C<n>. (L<OEIS A007913|https://oeis.org/A007913>)
 Equivalent to PARI/GP C<core(n)> function.
 
 Aliases: I<squarefree_part>
-
-=cut
-
-=head2 coredisc
-
-    coredisc(n)
-
-Returns the fundamental discriminant associated with C<n>. The result is obtained from the squarefree kernel of C<n>, preserving the sign of C<n>:
-
-    D = core(n)      if core(n) ≡ 1 (mod 4)
-      = 4*core(n)    otherwise
-
-The returned value is the discriminant of the quadratic field C<Q(sqrt(n))>, making it useful in algebraic number theory and quadratic forms.
-
-    say coredisc(12)    #=> 12
-    say coredisc(20)    #=> 5
-    say coredisc(-5)    #=> -20
-    say coredisc(-12)   #=> -3
-
-Aliases: I<fundamental_discriminant>
 
 =cut
 
