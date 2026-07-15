@@ -15209,6 +15209,136 @@ sub solve_quadratic_form {
 
 *cornacchia = \&solve_quadratic_form;
 
+sub solve_ternary_quadratic_form {
+    my ($A, $B, $C, $n) = @_;
+
+    ref($A) eq __PACKAGE__ or _valid(\$A);
+    ref($B) eq __PACKAGE__ or _valid(\$B);
+    ref($C) eq __PACKAGE__ or _valid(\$C);
+    ref($n) eq __PACKAGE__ or _valid(\$n);
+
+    my $a_z = _any2mpz($$A, 0) // return _array();
+    my $b_z = _any2mpz($$B, 1) // return _array();
+    my $c_z = _any2mpz($$C, 2) // return _array();
+    my $n_z = _any2mpz($$n, 3) // return _array();
+
+    my $a_sgn = Math::GMPz::Rmpz_sgn($a_z);
+    my $b_sgn = Math::GMPz::Rmpz_sgn($b_z);
+    my $c_sgn = Math::GMPz::Rmpz_sgn($c_z);
+
+    # Reject degenerate forms where a coefficient is zero: this is no
+    # longer a (nondegenerate) ternary quadratic form.
+    if ($a_sgn == 0 || $b_sgn == 0 || $c_sgn == 0) {
+        return _array();
+    }
+
+    if ($a_sgn < 0 && $b_sgn < 0 && $c_sgn < 0) {
+
+        # Negative definite form: a*x^2 + b*y^2 + c*z^2 = n has exactly
+        # the same solutions (x,y,z) as (-a)*x^2 + (-b)*y^2 + (-c)*z^2 = -n,
+        # which is positive definite. Flip signs once here and let the
+        # rest of the routine handle it exactly like any other
+        # positive-definite input.
+        my $pa = Math::GMPz::Rmpz_init();
+        my $pb = Math::GMPz::Rmpz_init();
+        my $pc = Math::GMPz::Rmpz_init();
+        my $pn = Math::GMPz::Rmpz_init();
+
+        Math::GMPz::Rmpz_neg($pa, $a_z);
+        Math::GMPz::Rmpz_neg($pb, $b_z);
+        Math::GMPz::Rmpz_neg($pc, $c_z);
+        Math::GMPz::Rmpz_neg($pn, $n_z);
+
+        ($a_z, $b_z, $c_z, $n_z) = ($pa, $pb, $pc, $pn);
+    }
+    elsif ($a_sgn < 0 || $b_sgn < 0 || $c_sgn < 0) {
+
+        # Mixed-sign (indefinite) ternary form. Unlike the definite case,
+        # an indefinite form can represent a given n with infinitely many
+        # solutions (e.g. x^2 + y^2 - z^2 = 1 has a solution for every z),
+        # so there is no bound to search up to and no finite list to
+        # return in general. This solver only handles definite forms.
+        return _array();
+    }
+
+    # From here on, $a_z, $b_z, $c_z are all strictly positive (either
+    # they started that way, or were just made that way above), so
+    # everything below is exactly the original positive-definite solver.
+
+    if (Math::GMPz::Rmpz_sgn($n_z) < 0) {
+        return _array();
+    }
+
+    my @solutions;
+    my %seen;
+
+    # FALLBACK: Pure-Perl loop using Cornacchia reduction
+    my $z_limit = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_tdiv_q($z_limit, $n_z, $c_z);
+    Math::GMPz::Rmpz_sqrt($z_limit, $z_limit);
+
+    my $z_mpz = Math::GMPz::Rmpz_init_set_ui(0);
+    my $rem   = Math::GMPz::Rmpz_init();
+    my $cz2   = Math::GMPz::Rmpz_init();
+
+    my $D_z = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($D_z, $a_z, $b_z);
+    my $D_obj = bless \$D_z;
+
+    my $M_z   = Math::GMPz::Rmpz_init();
+    my $X_mpz = Math::GMPz::Rmpz_init();
+
+    while (Math::GMPz::Rmpz_cmp($z_mpz, $z_limit) <= 0) {
+
+        Math::GMPz::Rmpz_mul($cz2, $z_mpz, $z_mpz);
+        Math::GMPz::Rmpz_mul($cz2, $cz2,   $c_z);
+        Math::GMPz::Rmpz_sub($rem, $n_z, $cz2);
+
+        if (Math::GMPz::Rmpz_sgn($rem) == 0) {
+            my $key = "0;0;" . Math::GMPz::Rmpz_get_str($z_mpz, 10);
+            if (!$seen{$key}++) {
+                my $z_copy = Math::GMPz::Rmpz_init_set($z_mpz);
+                push @solutions, _array([ZERO, ZERO, bless(\$z_copy)]);
+            }
+        }
+        else {
+            Math::GMPz::Rmpz_mul($M_z, $a_z, $rem);
+            my $M_obj = bless \$M_z;
+
+            # Call existing binary quadratic form solver
+            my $sols = solve_quadratic_form($D_obj, $M_obj);
+
+            foreach my $sol (@$sols) {
+                my $X_val = _any2mpz(${$sol->[0]});
+
+                # We need x = X / a to be a perfect integer
+                if (Math::GMPz::Rmpz_divisible_p($X_val, $a_z)) {
+                    Math::GMPz::Rmpz_divexact($X_mpz, $X_val, $a_z);
+
+                    my $x_copy = Math::GMPz::Rmpz_init_set($X_mpz);
+                    my $y_copy = Math::GMPz::Rmpz_init_set(_any2mpz(${$sol->[1]}));
+                    my $z_copy = Math::GMPz::Rmpz_init_set($z_mpz);
+
+                    if (Math::GMPz::Rmpz_cmp($a_z, $b_z) == 0 && Math::GMPz::Rmpz_cmp($x_copy, $y_copy) > 0) {
+                        ($x_copy, $y_copy) = ($y_copy, $x_copy);
+                    }
+
+                    my $key = Math::GMPz::Rmpz_get_str($x_copy, 10) . ";" . Math::GMPz::Rmpz_get_str($y_copy, 10) . ";" . Math::GMPz::Rmpz_get_str($z_copy, 10);
+
+                    if (!$seen{$key}++) {
+                        push @solutions, _array([bless(\$x_copy), bless(\$y_copy), bless(\$z_copy)]);
+                    }
+                }
+            }
+        }
+        Math::GMPz::Rmpz_add_ui($z_mpz, $z_mpz, 1);
+    }
+
+    @solutions = sort { ${$a->[0]} <=> ${$b->[0]} || ${$a->[1]} <=> ${$b->[1]} || ${$a->[2]} <=> ${$b->[2]} } @solutions;
+
+    _array(\@solutions);
+}
+
 sub geometric_sum {
     my ($n, $r) = @_;
     _valid(\$r);
