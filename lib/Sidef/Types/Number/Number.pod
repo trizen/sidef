@@ -3712,6 +3712,23 @@ Defined as:
 
 =cut
 
+=head2 frobenius_number
+
+    var g = frobenius_number(a, b, ...)
+
+Returns the Frobenius number of a set of positive integers.
+
+The Frobenius number is the largest integer that cannot be expressed as a non-negative integer linear combination of the given values.
+
+The input values must be positive and have greatest common divisor equal to C<1>. Otherwise, the Frobenius number is undefined and the function returns C<NaN>.
+
+    say frobenius_number(4, 7)        # => 17
+    say frobenius_number(5, 8)        # => 27
+    say frobenius_number(6, 9, 20)    # => 43
+    say frobenius_number(1)           # => -1
+
+=cut
+
 =head2 num2perm
 
     num2perm(n,k)

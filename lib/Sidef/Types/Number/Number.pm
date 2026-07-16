@@ -29321,6 +29321,98 @@ sub divisors {
     _array([map { ($_ < ULONG_MAX) ? (bless \$_) : _set_int($_) } _divisors($n)]);
 }
 
+sub frobenius_number {
+    my (@coins) = @_;
+    _valid(\(@coins));
+
+    my @A = map { _any2mpz($$_) // goto &nan } @coins;
+
+    # Filter out zeros, negatives, and sort
+    @A = sort { Math::GMPz::Rmpz_cmp($a, $b) } grep { Math::GMPz::Rmpz_sgn($_) > 0 } @A;
+
+    goto &nan if @A < 1;
+
+    # Frobenius number for a single coin 'a' is undefined (or -1 if a=1)
+    if (@A == 1) {
+        return MONE if Math::GMPz::Rmpz_cmp_ui($A[0], 1) == 0;
+        goto &nan;
+    }
+
+    # Verify that the GCD of the entire set is exactly 1
+    state $g = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_set($g, $A[0]);
+    for my $i (1 .. $#A) {
+        Math::GMPz::Rmpz_gcd($g, $g, $A[$i]);
+    }
+    goto &nan if Math::GMPz::Rmpz_cmp_ui($g, 1) > 0;
+
+    # O(1) Fast path for exactly 2 variables: a*b - a - b
+    if (@A == 2) {
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($r, $A[0], $A[1]);
+        Math::GMPz::Rmpz_sub($r, $r, $A[0]);
+        Math::GMPz::Rmpz_sub($r, $r, $A[1]);
+        return bless \$r;
+    }
+
+    # SPFA algorithm over the residue classes of A[0]
+    my $m =
+        Math::GMPz::Rmpz_fits_ulong_p($A[0])
+      ? Math::GMPz::Rmpz_get_ui($A[0])
+      : die "[ERROR] frobenius_number: smallest denomination exceeds native unsigned long capacity.";
+
+    my @d;
+    my @in_q = (0) x $m;
+    my @q    = (0);
+
+    $d[0]    = Math::GMPz::Rmpz_init_set_ui(0);
+    $in_q[0] = 1;
+
+    state $new_dist = Math::GMPz::Rmpz_init_nobless();
+
+    while (@q) {
+        my $u = shift @q;
+        $in_q[$u] = 0;
+
+        for my $i (1 .. $#A) {
+            my $w = $A[$i];
+
+            # w_mod = w % m
+            my $w_mod;
+            if (Math::GMPz::Rmpz_fits_ulong_p($w)) {
+                $w_mod = Math::GMPz::Rmpz_get_ui($w) % $m;
+            }
+            else {
+                state $t_mod = Math::GMPz::Rmpz_init_nobless();
+                Math::GMPz::Rmpz_mod_ui($t_mod, $w, $m);
+                $w_mod = Math::GMPz::Rmpz_get_ui($t_mod);
+            }
+
+            my $v = ($u + $w_mod) % $m;
+            Math::GMPz::Rmpz_add($new_dist, $d[$u], $w);
+
+            if (!defined($d[$v]) or Math::GMPz::Rmpz_cmp($new_dist, $d[$v]) < 0) {
+                $d[$v] = Math::GMPz::Rmpz_init_set($new_dist);
+                if (!$in_q[$v]) {
+                    push @q, $v;
+                    $in_q[$v] = 1;
+                }
+            }
+        }
+    }
+
+    # Frobenius number = max(d) - A[0]
+    my $max_dist = Math::GMPz::Rmpz_init_set_ui(0);
+    for my $i (0 .. $m - 1) {
+        if (defined($d[$i]) and Math::GMPz::Rmpz_cmp($d[$i], $max_dist) > 0) {
+            Math::GMPz::Rmpz_set($max_dist, $d[$i]);
+        }
+    }
+
+    Math::GMPz::Rmpz_sub($max_dist, $max_dist, $A[0]);
+    return bless \$max_dist;
+}
+
 sub partitions {
     my ($n, $max_value) = @_;
 
