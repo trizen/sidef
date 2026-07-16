@@ -318,7 +318,7 @@ Example with shell features:
     var os = `uname -s`.trim
     var kernel = `uname -r`.trim
     var arch = `uname -m`.trim
-    
+
     say "OS: #{os}"
     say "Kernel: #{kernel}"
     say "Architecture: #{arch}"
@@ -369,7 +369,7 @@ B<Unsafe example> (VULNERABLE):
     # DANGEROUS - DO NOT USE
     var filename = readln              # User input
     var content = `cat #{filename}`    # EXPLOITABLE!
-    
+
     # If user enters: file.txt; rm -rf /
     # The command becomes: cat file.txt; rm -rf /
 
@@ -649,14 +649,5 @@ Debugging tips:
 =item * POSIX shell command substitution C<$(...)>
 
 =back
-
-=head1 AUTHOR
-
-Daniel "trizen" Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Sidef itself.
 
 =cut

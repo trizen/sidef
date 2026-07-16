@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Number::Polynomial - Univariate polynomial arithmetic and operations
+Sidef::Types::Number::Polynomial - Polynomial type supporting symbolic manipulation and algebraic operations.
 
 =head1 DESCRIPTION
 
@@ -58,9 +58,7 @@ set a coefficient at an explicit degree:
 
 =head1 INHERITS
 
-Inherits methods from:
-
-    Sidef::Types::Number::Number
+Inherits methods from L<Sidef::Types::Number::Number>.
 
 =head1 METHODS
 
@@ -1179,9 +1177,5 @@ L<Sidef::Types::Number::Number>,
 L<Sidef::Types::Number::PolynomialMod>,
 L<Sidef::Types::Number::Fraction>,
 L<Sidef::Types::Number::Mod>
-
-=head1 AUTHOR
-
-Daniel Șuteu
 
 =cut

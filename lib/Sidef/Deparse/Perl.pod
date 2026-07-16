@@ -1087,18 +1087,6 @@ To debug the deparser:
 
 =item * L<Sidef::Parser> - Sidef parser that generates ASTs
 
-=item * L<Sidef::Types::*> - Sidef type system modules
-
-=item * L<B::Deparse> - Perl's built-in deparser
-
 =back
-
-=head1 AUTHOR
-
-Daniel Șuteu (trizen)
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

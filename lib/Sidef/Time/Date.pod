@@ -2,399 +2,131 @@
 
 =head1 NAME
 
-Sidef::Time::Date
+Sidef::Time::Date - Date and time object with parsing, formatting, arithmetic, and calendar operations.
 
 =head1 DESCRIPTION
 
-This class implements date and time manipulation functionality in Sidef. It provides methods for creating, parsing, formatting, and performing arithmetic operations on dates and times. The Date class wraps time values and provides convenient methods for working with various date components like year, month, day, hour, minute, and second.
+This class implements date and time manipulation functionality in Sidef. It provides methods for creating, parsing, formatting, and performing arithmetic operations on dates and times. The Date class wraps a L<Time::Piece> object and exposes convenient methods for working with individual date/time components (year, month, day, hour, minute, second), for converting between local time and GMT/UTC, for formatting and parsing dates with C<strftime>/C<strptime>-style patterns, and for comparing and doing arithmetic on dates.
+
+Internally, a C<Date> object stores its value as seconds since the Unix epoch (January 1, 1970, 00:00:00 UTC). Numification (C<0+>) returns this epoch value, and stringification (C<"">) returns the C<ctime>-style representation of the date.
 
 =head1 SYNOPSIS
 
-    var obj = Date()                    # Current date/time
-    var date = Date(2024, 12, 25)      # Specific date
+    var now    = Date()                           # Current date/time
+    var now2   = Date.now                         # Same as above
+    var epoch  = Date(1735084800)                 # Date from a Unix timestamp
     var parsed = Date.parse("2024-12-25", "%Y-%m-%d")
+
+    say now.year
+    say now.ymd
+    say now.add_days(7)
 
 =head1 INHERITS
 
-Inherits methods from:
+Inherits methods from L<Sidef::Object::Object>.
 
-       * Sidef::Object::Object
+=head1 CONSTRUCTION
 
-=head1 METHODS
+=head2 new
 
-=head2 !=
+    Date(sec)
+    Date.new(sec)
 
-    a != b
+Creates a new C<Date> object. If C<sec> is given, it is used as the number of seconds since the Unix epoch (a plain number, or anything that stringifies/numifies to one); otherwise, the current time is used.
 
-Returns true if two dates are not equal, false otherwise. Compares the date/time values to determine inequality.
-
-Aliases: I<ne>
-
-=cut
-
-=head2 +
-
-    a + b
-
-Returns a new Date object with the specified number of seconds added to the current date. The parameter C<b> should be a numeric value representing seconds.
-
-Aliases: I<add>, I<add_seconds>
-
-=cut
-
-=head2 -
-
-    a - b
-
-Returns a new Date object with the specified number of seconds subtracted from the current date, or the difference in seconds between two dates if C<b> is a Date object.
-
-Aliases: I<sub>, I<subtract>
-
-=cut
-
-=head2 <
-
-    a < b
-
-Returns true if date C<a> is earlier than date C<b>, false otherwise. Performs chronological comparison.
-
-Aliases: I<lt>
-
-=cut
-
-=head2 <=
-
-    a <= b
-
-Returns true if date C<a> is earlier than or equal to date C<b>, false otherwise.
-
-Aliases: I<le>
-
-=cut
-
-=head2 <=>
-
-    a <=> b
-
-Returns -1 if C<a> is earlier than C<b>, 0 if they are equal, or 1 if C<a> is later than C<b>. Standard three-way comparison operator.
-
-Aliases: I<cmp>
-
-=cut
-
-=head2 ==
-
-    a == b
-
-Returns true if two dates represent the same moment in time, false otherwise.
-
-Aliases: I<eq>
-
-=cut
-
-=head2 >
-
-    a > b
-
-Returns true if date C<a> is later than date C<b>, false otherwise.
-
-Aliases: I<gt>
-
-=cut
-
-=head2 >=
-
-    a >= b
-
-Returns true if date C<a> is later than or equal to date C<b>, false otherwise.
-
-Aliases: I<ge>
-
-=cut
-
-=head2 add_days
-
-    self.add_days(days)
-
-Returns a new Date object with the specified number of days added to the current date. Accepts both positive and negative values.
-
-=cut
-
-=head2 add_months
-
-    self.add_months(months)
-
-Returns a new Date object with the specified number of months added to the current date. Handles month overflow correctly (e.g., adding 1 month to January 31 results in February 28/29).
-
-=cut
-
-=head2 add_years
-
-    self.add_years(years)
-
-Returns a new Date object with the specified number of years added to the current date. Preserves the month and day where possible.
+Aliases: I<call>
 
 =cut
 
 =head2 call
 
-    self.call
+    Date(sec)
 
-Returns the current date/time as a new Date object. Allows Date to be called as a function.
-
-=cut
-
-=head2 date
-
-    self.date
-
-Returns the date portion of the Date object, typically as a formatted string or date-only representation.
+Allows a C<Date> class to be invoked directly as a function/callable, equivalent to L</new>.
 
 =cut
 
-=head2 day
+=head2 now
 
-    self.day
+    Date.now
 
-Returns the day of the month (1-31) for the current Date object.
+Returns a new C<Date> object representing the current date and time.
 
-Aliases: I<mday>, I<month_day>
-
-=cut
-
-=head2 dmy
-
-    self.dmy
-
-Returns the date in day-month-year format as a string (e.g., "25-12-2024").
+Aliases: I<today>
 
 =cut
 
-=head2 dump
+=head2 today
 
-    self.dump
+    Date.today
 
-Returns a string representation of the Date object suitable for debugging, showing its internal structure.
+Returns a new C<Date> object representing the current date and time.
 
-=cut
-
-=head2 epoch
-
-    self.epoch
-
-Returns the Unix epoch time (number of seconds since January 1, 1970, 00:00:00 UTC) as a number.
-
-=cut
-
-=head2 format
-
-    self.format(format)
-
-Returns a formatted string representation of the date according to the specified format string. Uses strftime-style format specifiers (e.g., "%Y-%m-%d %H:%M:%S").
-
-Aliases: I<strftime>
-
-=cut
-
-=head2 fullmonth
-
-    self.fullmonth
-
-Returns the full name of the month (e.g., "January", "February", "December").
-
-=cut
-
-=head2 gmt
-
-    self.gmt(sec)
-
-Returns a new Date object representing the specified number of seconds since the Unix epoch, interpreted as GMT/UTC time.
-
-Aliases: I<gmtime>
-
-=cut
-
-=head2 hour
-
-    self.hour
-
-Returns the hour component (0-23) of the Date object.
-
-=cut
-
-=head2 isdst
-
-    self.isdst
-
-Returns true if daylight saving time is in effect for this date, false otherwise.
-
-Aliases: I<daylight_savings>
-
-=cut
-
-=head2 julian_day
-
-    self.julian_day
-
-Returns the Julian Day Number, which is the continuous count of days since the beginning of the Julian Period (January 1, 4713 BC).
+Aliases: I<now>
 
 =cut
 
 =head2 local
 
     self.local(sec)
+    Date.local(sec)
 
-Returns a new Date object representing the specified number of seconds since the Unix epoch, interpreted as local time.
+Returns a new C<Date> object for the given number of seconds since the Unix epoch, interpreted in the local timezone. If C<sec> is omitted, the epoch of C<self> is used.
 
 Aliases: I<localtime>
 
 =cut
 
-=head2 mdy
+=head2 localtime
 
-    self.mdy
+    self.localtime(sec)
 
-Returns the date in month-day-year format as a string (e.g., "12-25-2024").
+Returns a new C<Date> object for the given number of seconds since the Unix epoch, interpreted in the local timezone. If C<sec> is omitted, the epoch of C<self> is used.
 
-=cut
-
-=head2 min
-
-    self.min
-
-Returns the minute component (0-59) of the Date object.
-
-Aliases: I<minute>
+Aliases: I<local>
 
 =cut
 
-=head2 mon
+=head2 gmt
 
-    self.mon
+    self.gmt(sec)
+    Date.gmt(sec)
 
-Returns the month number (1-12) of the Date object, where 1 is January and 12 is December.
+Returns a new C<Date> object for the given number of seconds since the Unix epoch, interpreted as GMT/UTC. If C<sec> is omitted, the epoch of C<self> is used.
 
-Aliases: I<month>
-
-=cut
-
-=head2 monname
-
-    self.monname
-
-Returns the abbreviated name of the month (e.g., "Jan", "Feb", "Dec").
+Aliases: I<gmtime>
 
 =cut
 
-=head2 month_last_day
+=head2 gmtime
 
-    self.month_last_day
+    self.gmtime(sec)
 
-Returns the last day of the month for the current Date object (e.g., 28, 29, 30, or 31 depending on the month and year).
+Returns a new C<Date> object for the given number of seconds since the Unix epoch, interpreted as GMT/UTC. If C<sec> is omitted, the epoch of C<self> is used.
 
-=cut
-
-=head2 now
-
-    self.now
-
-Returns a new Date object representing the current date and time.
-
-Aliases: I<today>
+Aliases: I<gmt>
 
 =cut
+
+=head1 PARSING AND VALIDATION
 
 =head2 parse
 
-    self.parse(string, format)
+    Date.parse(string, format)
 
-Returns a new Date object by parsing the given string according to the specified format. Uses strptime-style format specifiers.
+Parses C<string> according to the given C<strptime>-style C<format> and returns a new C<Date> object representing the resulting date/time.
 
 Aliases: I<strptime>
 
 =cut
 
-=head2 sec
+=head2 strptime
 
-    self.sec
+    Date.strptime(string, format)
 
-Returns the seconds component (0-59) of the Date object.
+Parses C<string> according to the given C<strptime>-style C<format> and returns a new C<Date> object representing the resulting date/time.
 
-Aliases: I<second>
-
-=cut
-
-=head2 time
-
-    self.time
-
-Returns the time portion of the Date object as a formatted string or time representation.
-
-=cut
-
-=head2 to_s
-
-    self.to_s
-
-Returns a string representation of the Date object in a standard format (typically "Day Mon DD HH:MM:SS YYYY").
-
-Aliases: I<cdate>, I<ctime>, I<to_str>
-
-=cut
-
-=head2 truncate_to_day
-
-    self.truncate_to_day
-
-Returns a new Date object with the time components (hours, minutes, seconds) set to zero, keeping only the date portion.
-
-=cut
-
-=head2 truncate_to_hour
-
-    self.truncate_to_hour
-
-Returns a new Date object with the minutes and seconds set to zero, preserving the date and hour.
-
-=cut
-
-=head2 truncate_to_minute
-
-    self.truncate_to_minute
-
-Returns a new Date object with the seconds set to zero, preserving the date, hour, and minute.
-
-=cut
-
-=head2 truncate_to_month
-
-    self.truncate_to_month
-
-Returns a new Date object truncated to the first day of the month at midnight (day set to 1, time components set to zero).
-
-=cut
-
-=head2 truncate_to_quarter
-
-    self.truncate_to_quarter
-
-Returns a new Date object truncated to the first day of the quarter (January 1, April 1, July 1, or October 1) at midnight.
-
-=cut
-
-=head2 truncate_to_second
-
-    self.truncate_to_second
-
-Returns a new Date object with subsecond precision removed (if any), keeping only whole seconds.
-
-=cut
-
-=head2 truncate_to_year
-
-    self.truncate_to_year
-
-Returns a new Date object truncated to January 1 of the current year at midnight.
+Aliases: I<parse>
 
 =cut
 
@@ -402,9 +134,143 @@ Returns a new Date object truncated to January 1 of the current year at midnight
 
     self.valid(string, format)
 
-Returns true if the given string represents a valid date according to the specified format, false otherwise. Useful for validation before parsing.
+Returns C<true> if C<string> is a valid date/time representation according to the given C<format> (i.e., parsing it and re-formatting it with C<format> reproduces C<string> exactly), otherwise returns C<false>. Useful for validating user input before calling L</parse>.
 
 Aliases: I<valid_date>
+
+=cut
+
+=head2 valid_date
+
+    self.valid_date(string, format)
+
+Returns C<true> if C<string> is a valid date/time representation according to the given C<format>, otherwise returns C<false>.
+
+Aliases: I<valid>
+
+=cut
+
+=head1 COMPONENT ACCESSORS
+
+=head2 year
+
+    self.year
+
+Returns the four-digit year of the date.
+
+=cut
+
+=head2 yy
+
+    self.yy
+
+Returns the two-digit (last two digits) representation of the year (e.g., C<24> for 2024).
+
+=cut
+
+=head2 mon
+
+    self.mon
+
+Returns the month number (1-12), where 1 is January and 12 is December.
+
+Aliases: I<month>
+
+=cut
+
+=head2 month
+
+    self.month
+
+Returns the month number (1-12).
+
+Aliases: I<mon>
+
+=cut
+
+=head2 day
+
+    self.day
+
+Returns the day of the month (1-31).
+
+Aliases: I<mday>, I<month_day>
+
+=cut
+
+=head2 mday
+
+    self.mday
+
+Returns the day of the month (1-31).
+
+Aliases: I<day>, I<month_day>
+
+=cut
+
+=head2 month_day
+
+    self.month_day
+
+Returns the day of the month (1-31).
+
+Aliases: I<day>, I<mday>
+
+=cut
+
+=head2 hour
+
+    self.hour
+
+Returns the hour component (0-23).
+
+=cut
+
+=head2 min
+
+    self.min
+
+Returns the minute component (0-59).
+
+Aliases: I<minute>
+
+=cut
+
+=head2 minute
+
+    self.minute
+
+Returns the minute component (0-59).
+
+Aliases: I<min>
+
+=cut
+
+=head2 sec
+
+    self.sec
+
+Returns the seconds component (0-59).
+
+Aliases: I<second>
+
+=cut
+
+=head2 second
+
+    self.second
+
+Returns the seconds component (0-59).
+
+Aliases: I<sec>
+
+=cut
+
+=head2 epoch
+
+    self.epoch
+
+Returns the Unix epoch time (the number of seconds since January 1, 1970, 00:00:00 UTC) as a number.
 
 =cut
 
@@ -412,25 +278,19 @@ Aliases: I<valid_date>
 
     self.wday
 
-Returns the day of the week (0-6) where 0 is Sunday and 6 is Saturday.
+Returns the day of the week as a number (1-7, where 1 is Sunday and 7 is Saturday, per L<Time::Piece>).
 
 Aliases: I<week_day>
 
 =cut
 
-=head2 wdayname
+=head2 week_day
 
-    self.wdayname
+    self.week_day
 
-Returns the name of the day of the week (e.g., "Monday", "Tuesday", "Sunday").
+Returns the day of the week as a number.
 
-=cut
-
-=head2 week
-
-    self.week
-
-Returns the week number of the year (typically 1-53) according to ISO 8601 or similar week numbering system.
+Aliases: I<wday>
 
 =cut
 
@@ -444,63 +304,455 @@ Aliases: I<year_day>
 
 =cut
 
-=head2 year
+=head2 year_day
 
-    self.year
+    self.year_day
 
-Returns the four-digit year of the Date object.
+Returns the day of the year (1-366).
+
+Aliases: I<yday>
+
+=cut
+
+=head2 isdst
+
+    self.isdst
+
+Returns C<true> if daylight saving time is in effect for this date, otherwise C<false>.
+
+Aliases: I<daylight_savings>
+
+=cut
+
+=head2 daylight_savings
+
+    self.daylight_savings
+
+Returns C<true> if daylight saving time is in effect for this date, otherwise C<false>.
+
+Aliases: I<isdst>
+
+=cut
+
+=head2 julian_day
+
+    self.julian_day
+
+Returns the Julian Day Number: the continuous count of days since the beginning of the Julian Period (January 1, 4713 BC).
+
+=cut
+
+=head2 week
+
+    self.week
+
+Returns the week number of the year, as computed by L<Time::Piece>.
+
+=cut
+
+=head2 month_last_day
+
+    self.month_last_day
+
+Returns the last day of the month for this date (28, 29, 30, or 31, depending on the month and whether the year is a leap year).
+
+=cut
+
+=head1 STRING REPRESENTATIONS
+
+=head2 monname
+
+    self.monname
+
+Returns the abbreviated name of the month (e.g., C<"Jan">, C<"Feb">, C<"Dec">).
+
+=cut
+
+=head2 fullmonth
+
+    self.fullmonth
+
+Returns the full name of the month (e.g., C<"January">, C<"February">, C<"December">).
+
+=cut
+
+=head2 wdayname
+
+    self.wdayname
+
+Returns the abbreviated name of the day of the week (e.g., C<"Mon">, C<"Tue">, C<"Sun">).
+
+=cut
+
+=head2 date
+
+    self.date
+
+Returns the date in C<YYYY-MM-DD> format as a string. Equivalent to L</ymd> with the default separator.
 
 =cut
 
 =head2 ymd
 
-    self.ymd
+    self.ymd(sep=nil)
 
-Returns the date in year-month-day format as a string (e.g., "2024-12-25").
+Returns the date in year-month-day format as a string (e.g., C<"2024-12-25">). An optional C<sep> argument overrides the default C<"-"> separator.
+
+=cut
+
+=head2 mdy
+
+    self.mdy(sep=nil)
+
+Returns the date in month-day-year format as a string (e.g., C<"12-25-2024">). An optional C<sep> argument overrides the default C<"-"> separator.
 
 =cut
 
-=head2 yy
+=head2 dmy
 
-    self.yy
+    self.dmy(sep=nil)
 
-Returns the two-digit year representation (e.g., "24" for 2024).
+Returns the date in day-month-year format as a string (e.g., C<"25-12-2024">). An optional C<sep> argument overrides the default C<"-"> separator.
 
 =cut
+
+=head2 format
+
+    self.format(format)
+
+Returns a formatted string representation of the date according to the given C<strftime>-style C<format> string (e.g., C<"%Y-%m-%d %H:%M:%S">).
+
+Aliases: I<strftime>
+
+=cut
+
+=head2 strftime
+
+    self.strftime(format)
+
+Returns a formatted string representation of the date according to the given C<strftime>-style C<format> string.
+
+Aliases: I<format>
+
+=cut
+
+=head2 to_s
+
+    self.to_s
+
+Returns a string representation of the date in standard C<ctime> format (e.g., C<"Wed Dec 25 00:00:00 2024">).
+
+Aliases: I<cdate>, I<ctime>, I<to_str>
+
+=cut
+
+=head2 ctime
+
+    self.ctime
+
+Returns a string representation of the date in standard C<ctime> format. Also invoked implicitly when a C<Date> object is stringified (e.g., interpolated in a string).
+
+Aliases: I<cdate>, I<to_s>, I<to_str>
+
+=cut
+
+=head2 cdate
+
+    self.cdate
+
+Returns a string representation of the date in standard C<ctime> format.
+
+Aliases: I<ctime>, I<to_s>, I<to_str>
+
+=cut
+
+=head2 to_str
+
+    self.to_str
+
+Returns a string representation of the date in standard C<ctime> format.
+
+Aliases: I<cdate>, I<ctime>, I<to_s>
+
+=cut
+
+=head2 dump
+
+    self.dump
+
+Returns a debugging string representation of the C<Date> object, showing its underlying epoch value (e.g., C<"Date(1735084800)">).
+
+=cut
+
+=head1 ARITHMETIC
+
+=head2 add_seconds
+
+    self.add_seconds(sec)
+    self + sec
+
+Returns a new C<Date> object with C<sec> seconds added to it. Accepts both positive and negative values.
+
+Aliases: I<add>, operator C<+>
+
+=cut
+
+=head2 add
+
+    self.add(sec)
+
+Returns a new C<Date> object with C<sec> seconds added to it.
+
+Aliases: I<add_seconds>, operator C<+>
+
+=cut
+
+=head2 add_days
+
+    self.add_days(days)
+
+Returns a new C<Date> object with C<days> days added to it. Accepts both positive and negative values.
+
+=cut
+
+=head2 add_months
+
+    self.add_months(months)
+
+Returns a new C<Date> object with C<months> months added to it. Handles month-end overflow correctly (e.g., adding 1 month to January 31 results in the last day of February).
+
+=cut
+
+=head2 add_years
+
+    self.add_years(years)
+
+Returns a new C<Date> object with C<years> years added to it. Preserves the month and day where possible.
+
+=cut
+
+=head2 subtract
+
+    self.subtract(that)
+    self - that
+
+If C<that> is another C<Date> object, returns the difference between the two dates, in seconds, as a C<Number>. Otherwise, C<that> is treated as a number of seconds, and a new C<Date> object with that many seconds subtracted is returned.
+
+Aliases: I<sub>, operator C<->
+
+=cut
+
+=head2 sub
+
+    self.sub(that)
+
+If C<that> is another C<Date> object, returns the difference between the two dates in seconds. Otherwise, returns a new C<Date> object with C<that> seconds subtracted.
+
+Aliases: I<subtract>, operator C<->
+
+=cut
+
+=head1 TRUNCATION
+
+=head2 truncate_to_year
+
+    self.truncate_to_year
+
+Returns a new C<Date> object truncated to January 1st of the current year, at midnight.
+
+=cut
+
+=head2 truncate_to_quarter
+
+    self.truncate_to_quarter
+
+Returns a new C<Date> object truncated to the first day of the current quarter (January 1, April 1, July 1, or October 1), at midnight.
+
+=cut
+
+=head2 truncate_to_month
+
+    self.truncate_to_month
+
+Returns a new C<Date> object truncated to the first day of the current month, at midnight.
+
+=cut
+
+=head2 truncate_to_day
+
+    self.truncate_to_day
+
+Returns a new C<Date> object with the time-of-day components (hour, minute, second) set to zero, keeping only the date portion.
+
+=cut
+
+=head2 truncate_to_hour
+
+    self.truncate_to_hour
+
+Returns a new C<Date> object with the minutes and seconds set to zero, preserving the date and hour.
+
+=cut
+
+=head2 truncate_to_minute
+
+    self.truncate_to_minute
+
+Returns a new C<Date> object with the seconds set to zero, preserving the date, hour, and minute.
+
+=cut
+
+=head2 truncate_to_second
+
+    self.truncate_to_second
+
+Returns a new C<Date> object truncated to whole-second precision (a no-op for this class, since C<Date> objects already have second precision).
+
+=cut
+
+=head1 COMPARISON
+
+=head2 cmp
+
+    self.cmp(that)
+    self <=> that
+
+Performs a three-way comparison between two dates (by epoch value), returning C<-1>, C<0>, or C<1> depending on whether C<self> is earlier than, equal to, or later than C<that>.
+
+Aliases: operator C<< <=> >>
+
+=cut
+
+=head2 eq
+
+    self.eq(that)
+    self == that
+
+Returns C<true> if C<self> and C<that> represent the same moment in time, otherwise C<false>.
+
+Aliases: operator C<==>
+
+=cut
+
+=head2 ne
+
+    self.ne(that)
+    self != that
+
+Returns C<true> if C<self> and C<that> do not represent the same moment in time, otherwise C<false>.
+
+Aliases: operator C<!=>
+
+=cut
+
+=head2 lt
+
+    self.lt(that)
+    self < that
+
+Returns C<true> if C<self> is chronologically earlier than C<that>, otherwise C<false>.
+
+Aliases: operator C<< < >>
+
+=cut
+
+=head2 le
+
+    self.le(that)
+    self <= that
+
+Returns C<true> if C<self> is earlier than or equal to C<that>, otherwise C<false>.
+
+Aliases: operator C<< <= >>
+
+=cut
+
+=head2 gt
+
+    self.gt(that)
+    self > that
+
+Returns C<true> if C<self> is chronologically later than C<that>, otherwise C<false>.
+
+Aliases: operator C<< > >>
+
+=cut
+
+=head2 ge
+
+    self.ge(that)
+    self >= that
+
+Returns C<true> if C<self> is later than or equal to C<that>, otherwise C<false>.
+
+Aliases: operator C<< >= >>
+
+=cut
+
+=head1 CONVERSION
+
+=head2 time
+
+    self.time
+
+Returns a L<Sidef::Time::Time> object constructed from the epoch of this C<Date>.
+
+=cut
+
+=head1 OVERLOADED OPERATORS
+
+C<Date> objects overload the following Perl operators:
+
+    ""    ctime            # stringification
+    0+    epoch            # numification
+    bool  true if defined  # boolean context
+    +     add_seconds
+    -     subtract
+    <=>   cmp
+    ==    eq
+    !=    ne
+    <     lt
+    <=    le
+    >     gt
+    >=    ge
 
 =head1 EXAMPLES
 
     # Create a date object
     var now = Date.now
-    say now.year        # Current year
-    say now.month       # Current month
-    say now.day         # Current day
+    say(now.year)         # Current year
+    say(now.month)        # Current month
+    say(now.day)          # Current day
 
     # Format dates
-    say now.format("%Y-%m-%d %H:%M:%S")
-    say now.ymd         # ISO date format
-    say now.dmy         # Day-Month-Year
+    say(now.format("%Y-%m-%d %H:%M:%S"))
+    say(now.ymd)          # ISO date format
+    say(now.dmy)          # Day-Month-Year
 
     # Date arithmetic
-    var tomorrow = now.add_days(1)
+    var tomorrow   = now.add_days(1)
     var next_month = now.add_months(1)
-    var last_year = now.add_years(-1)
+    var last_year  = now.add_years(-1)
 
-    # Parse dates
+    # Parse and validate dates
     var date = Date.parse("2024-12-25", "%Y-%m-%d")
-    say date.wdayname   # Day of week name
+    say(date.wdayname)                        # Day of week name
+    say(Date.valid("2024-12-25", "%Y-%m-%d")) # true
 
     # Compare dates
     if (date1 < date2) {
-        say "date1 is earlier"
+        say("date1 is earlier")
     }
 
+    # Difference between two dates, in seconds
+    say(date2 - date1)
+
     # Truncate dates
-    var start_of_day = now.truncate_to_day
+    var start_of_day   = now.truncate_to_day
     var start_of_month = now.truncate_to_month
 
 =head1 SEE ALSO
 
-L<Sidef::Object::Object>
+L<Sidef::Object::Object>, L<Sidef::Time::Time>, L<Time::Piece>
 
 =cut

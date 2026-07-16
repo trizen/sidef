@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Object::Lazy
+Sidef::Object::Lazy - Lazy evaluation wrapper that computes values only when needed.
 
 =head1 DESCRIPTION
 
@@ -24,9 +24,7 @@ var obj = Lazy(...)
 
 =head1 INHERITS
 
-Inherits methods from: 
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -34,7 +32,7 @@ Inherits methods from:
 
     self.each(block)
 
-Returns the Lazy object after iterating over each element and executing the given block.  The block receives each element as an argument. 
+Returns the Lazy object after iterating over each element and executing the given block.  The block receives each element as an argument.
 
     (1..10).lazy.grep{ .is_prime }.each { say _ }
 
@@ -44,7 +42,7 @@ Returns the Lazy object after iterating over each element and executing the give
 
     self.first(n)
 
-Returns the first I<n> elements from the lazy iterator as an Array.  If I<n> is not provided, returns only the first element.  If I<n> is a Block, it behaves like C<first_by>. 
+Returns the first I<n> elements from the lazy iterator as an Array.  If I<n> is not provided, returns only the first element.  If I<n> is a Block, it behaves like C<first_by>.
 
     say (^Inf -> lazy.grep{ . is_prime }.first(5))      #=> [2, 3, 5, 7, 11]
     say (^Inf -> lazy.grep{ .is_prime }.first)         #=> 2
@@ -55,7 +53,7 @@ Returns the first I<n> elements from the lazy iterator as an Array.  If I<n> is 
 
     self.first_by(block)
 
-Returns the first element for which the block returns a true value. 
+Returns the first element for which the block returns a true value.
 
     say (1..100).lazy.first_by { . is_prime && (_ > 50) }   #=> 53
 
@@ -65,7 +63,7 @@ Returns the first element for which the block returns a true value.
 
     self.grep(block)
 
-Returns a new Lazy object that filters elements, keeping only those for which the block returns a true value.  The filtering is performed lazily. 
+Returns a new Lazy object that filters elements, keeping only those for which the block returns a true value.  The filtering is performed lazily.
 
     (1..100).lazy.grep{ .is_even }.first(5).say    #=> [2, 4, 6, 8, 10]
 
@@ -100,7 +98,7 @@ Returns the Lazy object itself.  This method is idempotent and allows chaining.
 
     self. map(block)
 
-Returns a new Lazy object that transforms each element by applying the given block.  The transformation is performed lazily. 
+Returns a new Lazy object that transforms each element by applying the given block.  The transformation is performed lazily.
 
     (1.. 5).lazy.map{ _**2 }. to_a. say    #=> [1, 4, 9, 16, 25]
 
@@ -164,7 +162,7 @@ Reduces the lazy sequence using the given operator (as a string or Block), with 
 
     self.reduce_by(block, result)
 
-Reduces the lazy sequence using a custom block. The block receives the accumulator and the current element.  If no initial result is provided, the first element is used. 
+Reduces the lazy sequence using a custom block. The block receives the accumulator and the current element.  If no initial result is provided, the first element is used.
 
     say (1..5).lazy.reduce_by { |acc, v| acc + v }         #=> 15
     say (1..5).lazy.reduce_by({ |acc, v| acc + v }, 10)    #=> 25

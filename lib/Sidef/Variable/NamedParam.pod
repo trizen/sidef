@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-Sidef::Variable::NamedParam
+Sidef::Variable::NamedParam - Represents a named parameter used in function and method calls.
 
 =head1 DESCRIPTION
 
-This class implements named parameters (also known as keyword arguments) in Sidef. 
+This class implements named parameters (also known as keyword arguments) in Sidef.
 A NamedParam object stores a name-value pair, where the name is a String and the
 value is an Array containing one or more arguments.  Named parameters allow functions
 to be called with arguments in any order by specifying the parameter name.
@@ -28,9 +28,7 @@ to be called with arguments in any order by specifying the parameter name.
 
 =head1 INHERITS
 
-Inherits methods from: 
-
-       * Sidef::Types::Hash::Hash
+Inherits methods from L<Sidef::Types::Hash::Hash>.
 
 =head1 METHODS
 
@@ -61,7 +59,7 @@ Returns the name of the named parameter as a String.
     NamedParam(name, value1, value2, ...)
     self.new
 
-Creates a new NamedParam object with the given name and one or more values. 
+Creates a new NamedParam object with the given name and one or more values.
 The values are stored as an Array internally.
 
     var np = NamedParam("arg", 42)

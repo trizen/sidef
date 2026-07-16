@@ -40,12 +40,12 @@ The Matrix class provides efficient implementations of common matrix operations 
 
     say B.det             # matrix determinant
     say B.solve([1,2,3])  # solve a system of linear equations
-    
+
     # Create special matrices
     var identity = Matrix.I(3)          # 3×3 identity matrix
     var zeros = Matrix.zero(2, 3)       # 2×3 zero matrix
     var random = Matrix.rand(3, 3)      # 3×3 random matrix
-    
+
     # Matrix properties and operations
     say A.transpose         # transpose of A
     say A.row_len          # number of rows
@@ -55,9 +55,7 @@ The Matrix class provides efficient implementations of common matrix operations 
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Array::Array
+Inherits methods from L<Sidef::Types::Array::Array>.
 
 =head1 METHODS
 
@@ -664,17 +662,17 @@ Returns an n×m matrix with all elements set to zero.
 
     # From arrays
     var A = Matrix([1, 2], [3, 4])
-    
+
     # Special matrices
     var I = Matrix.I(3)              # identity matrix
     var Z = Matrix.zero(2, 3)        # zero matrix
     var R = Matrix.rand(3, 3)        # random matrix
     var S = Matrix.scalar(3, 5)      # scalar matrix
-    
+
     # Vectors
     var col = Matrix.col_vector(1, 2, 3)
     var row = Matrix.row_vector(1, 2, 3)
-    
+
     # Using build
     var M = Matrix.build(3, 3, {|i,j| i * j })
 
@@ -682,17 +680,17 @@ Returns an n×m matrix with all elements set to zero.
 
     var A = Matrix([1, 2], [3, 4])
     var B = Matrix([5, 6], [7, 8])
-    
+
     # Arithmetic
     var sum = A + B           # element-wise addition
     var diff = A - B          # element-wise subtraction
     var prod = A * B          # matrix multiplication
     var quot = A / B          # matrix division (A * B^-1)
-    
+
     # Scalar operations
     var scaled = A * 10
     var shifted = A + 5
-    
+
     # Powers
     var squared = A ** 2      # A * A
     var inverse = A ** -1     # inverse of A
@@ -701,31 +699,31 @@ Returns an n×m matrix with all elements set to zero.
 
     var A = Matrix([2, 1], [1, 3])
     var b = [5, 6]
-    
+
     # Solve Ax = b
     var x = A.solve(b)        #=> [1.8, 1.4]
-    
+
     # Determinant
     say A.det                 #=> 5
-    
+
     # Inverse
     var A_inv = A.inv
-    
+
     # Transpose
     var A_t = A.transpose
 
 =head2 Matrix Transformations
 
     var M = Matrix([1, 2, 3], [4, 5, 6], [7, 8, 9])
-    
+
     # Flipping
     var vflip = M.flip                  # vertical flip
     var hflip = M.horizontal_flip       # horizontal flip
-    
+
     # Extract diagonals
     var diag = M.diagonal               #=> [1, 5, 9]
     var anti = M.anti_diagonal          #=> [3, 5, 7]
-    
+
     # Select rows/columns
     var subset = M.rows(0, 2)           # rows 0 and 2
     var cols = M.cols(1, 2)             # columns 1 and 2
@@ -733,24 +731,15 @@ Returns an n×m matrix with all elements set to zero.
 =head2 Modular Arithmetic
 
     var A = Matrix([1, 2], [3, 4])
-    
+
     # Modular inverse
     var A_inv_mod = A.invmod(7)
-    
+
     # Modular exponentiation
     var result = A.powmod(10, 100)
 
 =head1 SEE ALSO
 
 L<Sidef::Types::Array::Array>
-
-=head1 AUTHOR
-
-Daniel Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Sidef itself.
 
 =cut

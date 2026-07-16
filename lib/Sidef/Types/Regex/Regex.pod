@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Regex::Regex
+Sidef::Types::Regex::Regex - Regular expression type for pattern matching, searching, and text substitution.
 
 =head1 DESCRIPTION
 
@@ -30,9 +30,7 @@ Regular expressions in Sidef support standard Perl-compatible regular expression
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -340,13 +338,5 @@ Here are some commonly used regex patterns in Sidef:
 =item * L<Sidef::Types::Array::Array> - Array operations for processing matches
 
 =back
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

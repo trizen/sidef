@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Range::RangeNumber
+Sidef::Types::Range::RangeNumber - Numeric range object supporting iteration, slicing, and lazy sequences.
 
 =head1 DESCRIPTION
 
@@ -18,10 +18,7 @@ This class represents numerical ranges in Sidef, providing functionality for ite
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Range::Range
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Types::Range::Range>.
 
 =head1 METHODS
 

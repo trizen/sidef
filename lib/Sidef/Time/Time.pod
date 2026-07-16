@@ -15,38 +15,36 @@ The Time class is useful for timestamping events, measuring elapsed time, and wo
     # Create a Time object for the current moment
     var current_time = Time()
     say current_time              #=> Time(1735401600)
-    
+
     # Create a Time object from a specific Unix timestamp
     var past_time = Time(1234567890)
     say past_time                 #=> Time(1234567890)
-    
+
     # Get the current Unix epoch seconds
     var now = Time.now
     say now                       #=> 1735401600
-    
+
     # Convert to local time representation
     var local_date = current_time.local
     say local_date                #=> Date object in local timezone
-    
+
     # Convert to GMT/UTC representation
     var gmt_date = current_time.gmt
     say gmt_date                  #=> Date object in GMT/UTC
-    
+
     # Get high-resolution time with microseconds
     var precise_time = Time.micro
     say precise_time              #=> 1735401600.123456
-    
+
     # Convert to string
     say current_time.to_s         #=> "1735401600"
-    
+
     # Get the underlying seconds value
     say current_time.sec          #=> 1735401600
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -89,7 +87,7 @@ B<Examples:>
 
     var timestamp = Time.now
     say timestamp                  #=> 1735401600
-    
+
     # Useful for benchmarking
     var start = Time.now
     # ... some operation ...
@@ -110,7 +108,7 @@ B<Examples:>
 
     var t = Time(1234567890)
     say t.sec                      #=> 1234567890
-    
+
     # Compare two times
     var t1 = Time(1000000)
     var t2 = Time(2000000)
@@ -135,7 +133,7 @@ B<Examples:>
     var precise_end = Time.micro
     var microseconds = (precise_end - precise_start) * 1e6
     say "Operation took #{microseconds} microseconds"
-    
+
     # High-precision timestamp
     say Time.micro                 #=> 1735401600.123456
 
@@ -157,7 +155,7 @@ B<Examples:>
     var local_date = t.local
     say local_date.hour            # Hour in local timezone
     say local_date.mday            # Day of month in local timezone
-    
+
     # Current time in local representation
     var now_local = Time().local
     say now_local
@@ -180,7 +178,7 @@ B<Examples:>
     var gmt_date = t.gmt
     say gmt_date.hour              # Hour in GMT/UTC
     say gmt_date.year              # Year in GMT/UTC
-    
+
     # Compare local and GMT times
     var now = Time()
     say "Local: #{now.local}"
@@ -202,7 +200,7 @@ B<Examples:>
 
     var t = Time(1234567890)
     say t.to_s                     #=> "1234567890"
-    
+
     # String interpolation
     var msg = "Timestamp: #{t}"    # Calls to_s automatically
 
@@ -222,7 +220,7 @@ B<Examples:>
 
     var t = Time(1234567890)
     say t.dump                     #=> "Time(1234567890)"
-    
+
     # Useful for debugging
     var times = [Time(1000), Time(2000), Time(3000)]
     say times.map{.dump}           #=> ["Time(1000)", "Time(2000)", "Time(3000)"]
@@ -238,13 +236,5 @@ B<Examples:>
 =item * L<Sidef::Object::Object> - The parent class
 
 =back
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

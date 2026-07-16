@@ -36,9 +36,7 @@ The Mod class supports standard arithmetic operations (addition, subtraction, mu
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Number::Number
+Inherits methods from L<Sidef::Types::Number::Number>.
 
 =head1 METHODS
 
@@ -685,13 +683,5 @@ has a unique solution modulo M = m₁ * m₂ * ... * m_k.
 =item * L<Sidef::Math::Math>
 
 =back
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

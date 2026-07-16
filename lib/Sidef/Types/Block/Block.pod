@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Block::Block
+Sidef::Types::Block::Block - Executable code block (closure) with lexical scope and callable behavior.
 
 =head1 DESCRIPTION
 
@@ -52,9 +52,7 @@ Blocks in Sidef support:
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -609,13 +607,5 @@ Executes the block repeatedly as long as the condition block returns true.
 =item * L<Sidef::Types::Number::Number>
 
 =back
-
-=head1 AUTHOR
-
-Daniel Șuteu (trizen)
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Number::Complex - Complex number support for Sidef
+Sidef::Types::Number::Complex - Arbitrary-precision complex number type with advanced mathematical operations.
 
 =head1 DESCRIPTION
 
@@ -268,12 +268,16 @@ C<< <=> >> (Comparison)
 
 =back
 
-=head1 AUTHOR
+=cut
 
-Daniel "Trizen" Șuteu
+=head1 SEE ALSO
 
-=head1 LICENSE
+=over 4
 
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
+=item * L<Sidef::Types::Number::Number>
+
+=item * L<Sidef::Types::Number::Gauss>
+
+=back
 
 =cut

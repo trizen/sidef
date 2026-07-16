@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Bool::Bool
+Sidef::Types::Bool::Bool - Boolean value type supporting logical operations and conversions.
 
 =head1 DESCRIPTION
 
@@ -14,17 +14,17 @@ This class implements the Boolean type in Sidef, representing logical true and f
     var obj = Bool(0)           # false
     var obj = Bool("string")    # true
     var obj = Bool(nil)         # false
-    
+
     # Boolean operations
     true & false                # false (logical AND)
     true | false                # true (logical OR)
     true ^ false                # true (logical XOR)
     !true                       # false (logical NOT)
-    
+
     # Comparisons return Bool
     5 > 3                       # true
     "hello" == "world"          # false
-    
+
     # Conditionals use Bool
     if (true) {
         say "This executes"
@@ -32,9 +32,7 @@ This class implements the Boolean type in Sidef, representing logical true and f
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -253,7 +251,7 @@ All other values are considered true, including:
     if (is_valid) {
         say "Valid!"
     }
-    
+
     # Boolean algebra
     var a = true
     var b = false
@@ -261,18 +259,18 @@ All other values are considered true, including:
     say (a | b)          # true
     say (a ^ b)          # true
     say !a               # false
-    
+
     # Comparison operations return Bool
     var result = (10 > 5)
     say result.class     # Bool
     say result           # true
-    
+
     # Converting to boolean
     say Bool(42)         # true
     say Bool(0)          # false
     say Bool(nil)        # false
     say Bool([])         # true
-    
+
     # Random boolean
     var coin_flip = Bool.pick
     say (coin_flip ? "Heads" : "Tails")

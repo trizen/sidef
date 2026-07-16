@@ -32,9 +32,7 @@ the C<Math> object.
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -893,9 +891,5 @@ on-demand, enabling work with infinite sequences.
 =item * Berlekamp-Massey algorithm: Massey, "Shift-Register Synthesis and BCH Decoding"
 
 =back
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
 
 =cut

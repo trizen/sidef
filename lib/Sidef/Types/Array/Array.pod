@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Array::Array
+Sidef::Types::Array::Array - Dynamic ordered collection with rich functional, numeric, and utility methods.
 
 =head1 DESCRIPTION
 
@@ -25,15 +25,7 @@ This class implements arrays in Sidef: ordered, mutable, zero-indexed collection
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
-
-=head1 METHODS
-
-The Array class exposes a large operator and method surface. The entries below are grouped by topic for easier browsing.
-
-Within each category, methods are listed alphabetically, except for operators, which are grouped by related behavior.
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 Operators
 
@@ -3043,18 +3035,5 @@ Parses command-line style arguments with automatic type conversion.
 =head1 SEE ALSO
 
 L<Sidef::Types::Array::Matrix>, L<Sidef::Types::Array::Vector>, L<Sidef::Types::Hash::Hash>, L<Sidef::Types::Set::Set>
-
-=head1 AUTHOR
-
-Daniel Șuteu
-
-=head1 COPYRIGHT
-
-Copyright (C) 2013-2026 Daniel Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Sidef itself.
 
 =cut

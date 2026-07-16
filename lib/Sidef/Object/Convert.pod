@@ -285,12 +285,4 @@ Aliases: I<to_vector>
 
 =back
 
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
-
 =cut

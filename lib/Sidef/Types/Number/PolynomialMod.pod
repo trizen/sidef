@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Number::PolynomialMod - Polynomial arithmetic in quotient rings
+Sidef::Types::Number::PolynomialMod - Polynomial type over finite rings with modular arithmetic operations.
 
 =head1 DESCRIPTION
 
@@ -87,9 +87,7 @@ The same descending convention applies when constructing the modulus array.
 
 =head1 INHERITS
 
-Inherits methods from:
-
-    Sidef::Types::Number::Polynomial
+Inherits methods from L<Sidef::Types::Number::Polynomial>.
 
 Many methods not overridden here (such as C<degree>, C<coeffs>, C<exponents>,
 C<content>, C<leading_coefficient>, C<height>, etc.) are provided by the

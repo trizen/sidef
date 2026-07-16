@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Hash::Hash
+Sidef::Types::Hash::Hash - Associative hash table mapping keys to values with convenient collection methods.
 
 =head1 DESCRIPTION
 
@@ -50,9 +50,7 @@ A Hash is an unordered collection of key-value pairs where each unique key maps 
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 CONSTRUCTION
 
@@ -847,13 +845,5 @@ This is useful for visualizing or processing hashes as hierarchical data structu
 =head1 SEE ALSO
 
 L<Sidef::Types::Array::Array>, L<Sidef::Types::Set::Set>, L<Sidef::Types::Bag::Bag>
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

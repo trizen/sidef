@@ -34,9 +34,7 @@ The Sys class provides an interface to various system-level operations, includin
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -825,13 +823,5 @@ Converts a reference to a weak reference. Weak references do not prevent the ref
 =head1 SEE ALSO
 
 L<Sidef::Object::Object>
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

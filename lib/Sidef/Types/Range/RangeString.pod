@@ -18,23 +18,23 @@ String ranges iterate by incrementing characters according to their lexicographi
     var range1 = RangeString('a', 'z')      # 'a' to 'z'
     var range2 = 'A'..'Z'                    # 'A' to 'Z'
     var range3 = RangeString('aa', 'zz', 5)  # with step
-    
+
     # Iterate over a range
     'a'..'e' -> each { |char|
         say char    # prints: a, b, c, d, e
     }
-    
+
     # Convert to array
     var letters = 'a'..'f' -> to_a
     say letters    #=> ['a', 'b', 'c', 'd', 'e', 'f']
-    
+
     # Check containment
     say ('a'..'z').contains('m')    #=> true
     say ('a'..'z').contains('A')    #=> false
-    
+
     # Pick random elements
     say ('a'..'z').rand(3)    # e.g., ['h', 'q', 'b']
-    
+
     # Get bounds
     var r = 'c'..'x'
     say r.min    #=> 'c'
@@ -42,10 +42,7 @@ String ranges iterate by incrementing characters according to their lexicographi
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Range::Range
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Types::Range::Range>.
 
 =head1 METHODS
 
@@ -125,7 +122,7 @@ B<Example:>
 
     var range = 'a'..'z'
     say range.from           #=> 'a'
-    
+
     range.from('c')          # modify the starting point
     say range.from           #=> 'c'
 
@@ -143,12 +140,12 @@ B<Example:>
 
     var range = 'a'..'e'
     var iterator = range.iter
-    
+
     say iterator.run    #=> 'a'
     say iterator.run    #=> 'b'
     say iterator.run    #=> 'c'
     # ... and so on
-    
+
     # More commonly used with loops
     var it = ('x'..'z').iter
     loop {
@@ -170,7 +167,7 @@ B<Example:>
 
     var range = 'a'..'z'
     say range.max    #=> 'z'
-    
+
     var range2 = 'aa'..'zz'
     say range2.max   #=> 'zz'
 
@@ -188,7 +185,7 @@ B<Example:>
 
     var range = 'a'..'z'
     say range.min    #=> 'a'
-    
+
     var range2 = 'aa'..'zz'
     say range2.min   #=> 'aa'
 
@@ -230,7 +227,7 @@ B<Example:>
     var range = 'a'..'z'
     say range.pick(3)    #=> e.g., ['h', 'm', 't']
     say range.pick(5)    #=> e.g., ['b', 'q', 'e', 'w', 'k']
-    
+
     # All elements are unique
     var picked = ('a'..'e').pick(5)
     say picked    #=> ['d', 'b', 'e', 'a', 'c'] (some permutation)
@@ -284,7 +281,7 @@ B<Example:>
 
     var range = 'a'..'z'
     say range.to           #=> 'z'
-    
+
     range.to('m')          # modify the ending point
     say range.to           #=> 'm'
 
@@ -302,10 +299,10 @@ B<Example:>
 
     var range1 = 'a'..'z'
     say range1.to_s    #=> "a..z"
-    
+
     var range2 = RangeString('A', 'Z', 2)
     say range2.to_s    #=> "A..Z:2"
-    
+
     # Useful for debugging
     var range3 = 'aa'..'zz'
     say "Range: #{range3}"    #=> "Range: aa..zz"
@@ -344,7 +341,7 @@ See the Range class documentation for complete details on inherited methods.
     'a'..'z' -> each { |c|
         print c
     }
-    
+
     # Print every third letter
     RangeString('a', 'z', 3).each { |c|
         say c    # a, d, g, j, m, p, s, v, y
@@ -356,7 +353,7 @@ See the Range class documentation for complete details on inherited methods.
     var columns = 'A'..'Z' -> to_a
     say columns[0]     #=> 'A'
     say columns[25]    #=> 'Z'
-    
+
     # Multi-character ranges
     var codes = 'aa'..'az' -> to_a
     say codes          #=> ['aa', 'ab', 'ac', ..., 'az']
@@ -368,7 +365,7 @@ See the Range class documentation for complete details on inherited methods.
         c ~~ /[aeiou]/
     }
     say vowels    #=> ['a', 'e', 'i', 'o', 'u']
-    
+
     # Convert to uppercase
     var upper = ('a'..'z').map { |c|
         c.uc
@@ -380,7 +377,7 @@ See the Range class documentation for complete details on inherited methods.
     # Password generation with random characters
     var password = ('a'..'z').rand(8).join
     say password    #=> e.g., "qhbktmpa"
-    
+
     # Pick unique random letters
     var unique = ('a'..'z').pick(5)
     say unique    #=> e.g., ['m', 'z', 'c', 'k', 'p']
@@ -391,7 +388,7 @@ See the Range class documentation for complete details on inherited methods.
     func is_lowercase_letter(str) {
         ('a'..'z').contains(str)
     }
-    
+
     say is_lowercase_letter('m')    #=> true
     say is_lowercase_letter('M')    #=> false
     say is_lowercase_letter('5')    #=> false
@@ -407,13 +404,5 @@ See the Range class documentation for complete details on inherited methods.
 =item * L<Sidef::Types::String::String> - String manipulation
 
 =back
-
-=head1 AUTHOR
-
-Daniel Șuteu (trizen)
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

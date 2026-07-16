@@ -16,36 +16,34 @@ This class handles both simple directory operations (like creating or removing s
     var dir = Dir("/path/to/directory")
     var home = Dir.home
     var temp = Dir.tmp
-    
+
     # Directory creation
     dir.make                    # Create single directory
     dir.mkpath                  # Create directory with parents
-    
+
     # Directory navigation
     Dir.cwd                     # Get current working directory
     dir.chdir                   # Change to this directory
     dir.parent                  # Get parent directory
     dir.up                      # Go up one level
-    
+
     # Directory operations
     dir.is_empty                # Check if directory is empty
     dir.delete                  # Remove empty directory
     dir.remove_tree             # Recursively remove directory and contents
-    
+
     # Directory traversal
     dir.find { |file|
         say file                # Iterate over all files and subdirectories
     }
-    
+
     # Path manipulation
     var subdir = dir + "subdir" # Concatenate paths
     var parts = dir.split       # Split path into components
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Glob::File
+Inherits methods from L<Sidef::Types::Glob::File>.
 
 =head1 METHODS
 
@@ -87,7 +85,7 @@ Changes the current working directory to this directory's path. This affects the
 
     var dir = Dir("/tmp")
     dir.chdir                          # Current directory is now /tmp
-    
+
 Returns true if successful, false otherwise.
 
 =head2 chroot
@@ -147,7 +145,7 @@ Recursively traverses the directory tree. When given a block, calls the block fo
     dir.find { |item|
         say item if item.is_file
     }
-    
+
     # Getting an array
     var all_items = dir.find
     say "Found #{all_items.len} items"
@@ -216,7 +214,7 @@ Creates a temporary directory with a unique name. The directory will be automati
 
     var tmpdir = Dir.mktemp
     say tmpdir                         # e.g., /tmp/XXXXXXXXXX
-    
+
     var custom = Dir.mktemp(TEMPLATE => "myapp_XXXX")
 
 Returns a Dir object representing the temporary directory.
@@ -233,7 +231,7 @@ Opens the directory for reading, returning a DirHandle object. Can optionally st
 
     # Simple usage
     var dh = dir.open
-    
+
     # With references
     var fh_ref = \nil
     var err_ref = \nil
@@ -310,7 +308,7 @@ Splits the directory path into its component parts, returning an array of string
 
     var dir = Dir("/home/user/documents")
     var parts = dir.split              # ["", "home", "user", "documents"]
-    
+
     var rel = Dir("path/to/dir")
     var components = rel.split         # ["path", "to", "dir"]
 
@@ -361,7 +359,7 @@ Returns a Dir object representing one level up from the current directory (equiv
 
     var dir = Dir("/home/user/documents")
     var parent = dir.up                # Dir("/home/user/documents/..")
-    
+
     var updir = Dir.up                 # Dir("..")
 
 Can be called as both instance and class method.
@@ -374,7 +372,7 @@ Can be called as both instance and class method.
     var project = Dir("my_project")
     project.mkpath
     project.chdir
-    
+
     # Create subdirectories
     var src = project + "src"
     var lib = project + "lib"
@@ -390,7 +388,7 @@ Can be called as both instance and class method.
             say item
         }
     }
-    
+
     # Get list of all items
     var all = docs.find
     say "Total items: #{all.len}"
@@ -400,11 +398,11 @@ Can be called as both instance and class method.
     # Create temporary directory for processing
     var tmpdir = Dir.mktemp
     say "Using temp directory: #{tmpdir}"
-    
+
     # Do work in temp directory
     tmpdir.chdir
     # ... operations ...
-    
+
     # Temp directory automatically cleaned up on exit
 
 =head2 Directory Cleanup
@@ -414,7 +412,7 @@ Can be called as both instance and class method.
     if (old.is_empty) {
         old.delete
     }
-    
+
     # Remove directory tree
     var cache = Dir(".cache")
     cache.remove_tree  # Removes everything recursively
@@ -422,9 +420,5 @@ Can be called as both instance and class method.
 =head1 SEE ALSO
 
 L<Sidef::Types::Glob::File>, L<Sidef::Types::Glob::DirHandle>
-
-=head1 AUTHOR
-
-Daniel Șuteu
 
 =cut

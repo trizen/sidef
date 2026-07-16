@@ -67,9 +67,7 @@ L<https://en.wikipedia.org/wiki/Lucas_sequence>.
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Number::Number
+Inherits methods from L<Sidef::Types::Number::Number>.
 
 =head1 METHODS
 
@@ -1200,17 +1198,6 @@ L<Sidef::Types::Number::Number>
 
 L<https://en.wikipedia.org/wiki/Quadratic_integer>
 
-L<https://en.wikipedia.org/wiki/Lucas_sequence>
-
 L<https://en.wikipedia.org/wiki/Quadratic_field>
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Sidef itself.
 
 =cut

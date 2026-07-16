@@ -14,24 +14,24 @@ A range can be created using the range operator C<..> or by calling the Range co
 
     # Create a range from 1 to 10
     var r = (1..10)
-    
+
     # Iterate over range
     (1..10).each { |n|
         say n
     }
-    
+
     # Range with custom step
     var evens = (0..20 `by` 2)
-    
+
     # Infinite ranges
     var infinite = (1..Inf)
-    
+
     # Map over a range
     var squares = (1..5).map { |n| n**2 }
-    
+
     # Filter range values
     var odds = (1..20).grep { .is_odd }
-    
+
     # Range arithmetic
     var r1 = (1..5)
     var r2 = (10..15)
@@ -246,7 +246,7 @@ Returns a hash with counts of elements grouped by the result of applying the blo
 
     say (1..10).count_by { |n| n % 3 }
     #=> Hash(0 => 3, 1 => 4, 2 => 3)
-    
+
     say (1..10).count_by { |n| n.is_even ? "even" : "odd" }
     #=> Hash("even" => 5, "odd" => 5)
 
@@ -707,9 +707,5 @@ Zips the range with other ranges or arrays, applying an operator to correspondin
 =head1 SEE ALSO
 
 L<Sidef::Types::Array::Array>, L<Sidef::Types::Number::Number>
-
-=head1 AUTHOR
-
-Daniel Șuteu (trizen)
 
 =cut

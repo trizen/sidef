@@ -22,18 +22,16 @@ A Gaussian integer can be created using the C<Gauss(a, b)> constructor, which re
 
     say a.norm                 #=> 650 (17² + 19²)
     say a.conj                 #=> 17-19i
-    
+
     var g = Gauss(120, 84)
     say g.factor               #=> [Gauss(-1,1), Gauss(1,1), Gauss(1,1), Gauss(1,1), Gauss(2,1), Gauss(3,0)]
-    
+
     var p = Gauss(3, 2)
     say p.is_prime             #=> true
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Number::Number
+Inherits methods from L<Sidef::Types::Number::Number>.
 
 =head1 METHODS
 
@@ -591,13 +589,5 @@ The norm function N(a+bi) = a²+b² is multiplicative: N(zw) = N(z)N(w).
 =item * L<Sidef::Types::Number::Complex>
 
 =back
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

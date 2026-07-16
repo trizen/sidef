@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Glob::DirHandle
+Sidef::Types::Glob::DirHandle - Directory handle object for iterating and manipulating directories.
 
 =head1 DESCRIPTION
 
@@ -15,27 +15,25 @@ DirHandle objects are typically created by calling the C<open> method on a Dir o
     # Open a directory and get a DirHandle
     var dir = Dir('/path/to/directory')
     var dh = dir.open
-    
+
     # Read entries one by one
     while (var entry = dh.read) {
         say entry
     }
     dh.close
-    
+
     # Or iterate through entries with a block
     Dir('/path/to/directory').open.each { |entry|
         say "Found: #{entry}"
     }
-    
+
     # Get all entries as an array
     var entries = Dir('.').open.entries
     say entries
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -113,7 +111,7 @@ Iterates through each entry in the directory, calling the provided code block fo
     Dir('.').open.each { |entry|
         say "Entry: #{entry}"
     }
-    
+
     # With index
     Dir('.').open.each { |entry, idx|
         say "#{idx}: #{entry}"
@@ -160,7 +158,7 @@ Returns an iterator object that can be used to lazily iterate through directory 
 
     var dh = Dir('.').open
     var iterator = dh.iter
-    
+
     # Get entries one at a time
     while (var entry = iterator.next) {
         say entry
@@ -188,13 +186,13 @@ Returns a Stat object containing information about the directory itself (followi
 Reads and returns the next entry from the directory. Returns C<nil> when there are no more entries. Each call advances the directory position to the next entry.
 
     var dh = Dir('.').open
-    
+
     loop {
         var entry = dh.read
         entry || break
         say entry
     }
-    
+
     dh.close
 
 =cut
@@ -206,20 +204,20 @@ Reads and returns the next entry from the directory. Returns C<nil> when there a
 Resets the directory position back to the beginning, allowing you to read through the directory entries again from the start. This is useful when you need to make multiple passes through a directory.
 
     var dh = Dir('.').open
-    
+
     # First pass
     while (var entry = dh.read) {
         say "First pass: #{entry}"
     }
-    
+
     # Reset to beginning
     dh.rewind
-    
+
     # Second pass
     while (var entry = dh.read) {
         say "Second pass: #{entry}"
     }
-    
+
     dh.close
 
 =cut
@@ -231,12 +229,12 @@ Resets the directory position back to the beginning, allowing you to read throug
 Sets the position within the directory stream to the specified position. The position value should be obtained from a previous C<tell> call. Returns a boolean indicating success.
 
     var dh = Dir('.').open
-    
+
     dh.read  # read first entry
     var pos = dh.tell  # save position
     dh.read  # read second entry
     dh.read  # read third entry
-    
+
     dh.seek(pos)  # return to saved position
     say dh.read   # reads second entry again
 
@@ -263,7 +261,7 @@ Returns a Stat object containing information about the directory (following the 
 Returns the current position within the directory stream as an integer. This position can be used later with C<seek> to return to the same point in the directory.
 
     var dh = Dir('.').open
-    
+
     dh.read  # read first entry
     var pos = dh.tell  # get current position
     say "Current position: #{pos}"
@@ -303,12 +301,12 @@ The position value is opaque and should only be used with C<seek> on the same di
 
     func traverse_dir(dir_path) {
         var dh = Dir(dir_path).open
-        
+
         dh.each { |entry|
             next if (entry ~~ /^\.\.?$/)  # skip . and ..
-            
+
             var full_path = Dir(dir_path) + entry
-            
+
             if (full_path.is_dir) {
                 say "Directory: #{full_path}"
                 traverse_dir(full_path)  # recurse
@@ -316,17 +314,17 @@ The position value is opaque and should only be used with C<seek> on the same di
                 say "File: #{full_path}"
             }
         }
-        
+
         dh.close
     }
-    
+
     traverse_dir('/path/to/start')
 
 =head2 Using Iterator for Large Directories
 
     # Process large directory lazily
     var iter = Dir('/var/log').open.iter
-    
+
     while (var entry = iter.next) {
         if (entry ~~ /\.log$/) {
             say "Log file: #{entry}"

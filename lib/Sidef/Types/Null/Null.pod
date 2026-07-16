@@ -37,9 +37,7 @@ The Null object evaluates to false in boolean contexts and can be used for nil-c
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -134,13 +132,5 @@ Null can be compared with other values:
 =item * L<Sidef::Object::Object> - Base object class
 
 =back
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

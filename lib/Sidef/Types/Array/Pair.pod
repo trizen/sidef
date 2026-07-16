@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Array::Pair
+Sidef::Types::Array::Pair - Two-element key-value pair object used throughout the language.
 
 =head1 DESCRIPTION
 
@@ -16,21 +16,21 @@ In Sidef, pairs must be created using the C<Pair()> constructor or the C<Pair.ne
     var pair1 = Pair('key', 'value')
     var pair2 = Pair('name', 'Alice')
     var pair3 = Pair(10, 20)
-    
+
     # Accessing elements
     say pair1.key      #=> "key"
     say pair1.value    #=> "value"
     say pair1.first    #=> "key"
     say pair1.second   #=> "value"
-    
+
     # Converting pairs
     say pair2.to_a     #=> ["name", "Alice"]
     say pair2.to_h     #=> Hash(name => "Alice")
-    
+
     # Swapping elements
     var swapped = pair3.swap
     say swapped        #=> Pair(20, 10)
-    
+
     # Using pairs in iterations
     var hash = Hash(a => 1, b => 2, c => 3)
     hash.each { |pair|
@@ -39,9 +39,7 @@ In Sidef, pairs must be created using the C<Pair()> constructor or the C<Pair.ne
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Array::Array
+Inherits methods from L<Sidef::Types::Array::Array>.
 
 =head1 METHODS
 
@@ -54,7 +52,7 @@ Creates and returns a new Pair object with the specified key and value. This is 
 
     var pair = Pair.new('x', 100)
     say pair           #=> Pair(x, 100)
-    
+
     var coords = Pair.new(3.5, 7.2)
     say coords         #=> Pair(3.5, 7.2)
 
@@ -70,7 +68,7 @@ Returns the first element of the pair, conventionally referred to as the "key". 
 
     var pair = Pair('username', 'john_doe')
     say pair.key       #=> "username"
-    
+
     var point = Pair(10, 20)
     say point.key      #=> 10
 
@@ -86,7 +84,7 @@ Returns the second element of the pair, conventionally referred to as the "value
 
     var pair = Pair('username', 'john_doe')
     say pair.value     #=> "john_doe"
-    
+
     var point = Pair(10, 20)
     say point.value    #=> 20
 
@@ -102,9 +100,9 @@ Swaps the key and value positions in place and returns the modified pair. This m
 
     var original = Pair('name', 'Alice')
     original.swap
-    
+
     say original       #=> Pair(Alice, name)
-    
+
     # Useful for coordinate transformations
     var point = Pair(3, 4)
     point.swap         #=> Pair(4, 3)
@@ -119,11 +117,11 @@ Converts the Pair to a two-element Array containing the key and value in order. 
 
     var pair = Pair('color', 'blue')
     var array = pair.to_a
-    
+
     say array          #=> ["color", "blue"]
     say array[0]       #=> "color"
     say array[1]       #=> "blue"
-    
+
     # Useful for destructuring
     var (k, v) = pair.to_a
 
@@ -139,10 +137,10 @@ Converts the Pair to a Hash containing a single key-value entry. This is conveni
 
     var pair = Pair('age', 25)
     var hash = pair.to_h
-    
+
     say hash           #=> Hash(age => 25)
     say hash{:age}     #=> 25
-    
+
     # Merging multiple pairs
     var settings = [
         Pair('theme', 'dark'),
@@ -161,10 +159,10 @@ Returns a string representation of the Pair in the format C<Pair(key, value)>. T
 
     var pair = Pair('status', 'active')
     say pair.to_s      #=> "Pair(status, active)"
-    
+
     var numeric = Pair(42, 3.14)
     say numeric.to_s   #=> "Pair(42, 3.14)"
-    
+
     # Automatically called by say/print
     say pair           #=> Pair(status, active)
 
@@ -181,12 +179,12 @@ Aliases: I<dump>, I<to_str>
         age    => 30,
         city   => 'Boston'
     )
-    
+
     # Iterating as pairs
     hash.each { |pair|
         say "The #{pair.key} is #{pair.value}"
     }
-    
+
     # Filtering pairs
     var adults = hash.grep { |pair|
         pair.key == 'age' && pair.value >= 18
@@ -199,10 +197,10 @@ Aliases: I<dump>, I<to_str>
         Pair(3, 4),
         Pair(5, 12)
     ]
-    
+
     # Swap x and y coordinates
     var reflected = points.map { |p| p.swap }
-    
+
     # Calculate distances from origin
     var distances = points.map { |p|
         hypot(p.key, p.value)
@@ -216,10 +214,10 @@ Aliases: I<dump>, I<to_str>
         Pair('banana', 0.50),
         Pair('cherry', 2.00)
     ]
-    
+
     var prices = Hash(pairs.map{|p| p.to_a}...)
     say prices{:apple}    #=> 1.20
-    
+
     # Invert a hash (swap keys and values)
     var inverted = Hash(
         prices.map { |k, v| Pair(v, k).to_a }...
@@ -228,9 +226,5 @@ Aliases: I<dump>, I<to_str>
 =head1 SEE ALSO
 
 L<Sidef::Types::Array::Array>, L<Sidef::Types::Hash::Hash>
-
-=head1 AUTHOR
-
-Daniel Șuteu
 
 =cut

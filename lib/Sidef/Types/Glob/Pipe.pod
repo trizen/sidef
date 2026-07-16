@@ -41,9 +41,7 @@ object-oriented interface for pipe operations.
 
 =head1 INHERITS
 
-Inherits methods from:
-
-    * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -323,13 +321,5 @@ Pipe functionality depends on the underlying operating system:
 =item * L<Sidef::Sys::Sys> - for system-level operations
 
 =back
-
-=head1 AUTHOR
-
-Daniel Șuteu (trizen)
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

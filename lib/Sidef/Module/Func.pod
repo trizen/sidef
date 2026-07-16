@@ -190,13 +190,4 @@ B<Example:>
 
 =back
 
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Sidef itself.
-
 =cut

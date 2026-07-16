@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Number::Number
+Sidef::Types::Number::Number - Arbitrary-precision numeric type providing extensive mathematical and number-theoretic functionality.
 
 =head1 DESCRIPTION
 
@@ -67,9 +67,7 @@ B<NOTE:> the C<local> scope extends to any other functions or methods that the a
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 OPERATORS & COMPARISONS
 

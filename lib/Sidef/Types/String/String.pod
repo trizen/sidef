@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::String::String
+Sidef::Types::String::String - Unicode string type with comprehensive text processing and manipulation methods.
 
 =head1 DESCRIPTION
 
@@ -17,8 +17,8 @@ Sidef strings are Unicode-aware and support a rich set of operations including r
 
     # String operations
     say str.uc                          #=> "HELLO"
-    say str * 3                         #=> "hellohellohello"
-    say str + " world"                  #=> "hello world"
+    say (str * 3)                       #=> "hellohellohello"
+    say (str + " world")                #=> "hello world"
     say str.chars                       #=> ["h", "e", "l", "l", "o"]
 
     # Pattern matching
@@ -30,9 +30,7 @@ Sidef strings are Unicode-aware and support a rich set of operations including r
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 CONSTRUCTOR
 
@@ -95,8 +93,8 @@ Takes a string C<str> and a non-negative integer C<n> as input and returns a new
 
 Example:
 
-    say "ha" * 3           #=> "hahaha"
-    say "x" * 0            #=> ""
+    say ("ha" * 3)           #=> "hahaha"
+    say ("x" * 0)            #=> ""
 
 Aliases: I<mul>, I<repeat>
 
@@ -127,7 +125,6 @@ Example:
     var s = "aa"
     say s++              #=> "aa"
     say s                #=> "ab"
-    say "z"++            #=> "z" (returns current, then increments to "aa")
 
 Aliases: I<inc>
 
@@ -156,10 +153,7 @@ Aliases: I<diff>
 
 Returns a RangeStr object: C<RangeStr(a, b)>. This creates a range that can iterate through strings.
 
-Example:
-
-    say ('a'..'e').to_a    #=> ["a", "b", "c", "d", "e"]
-    say ('aa'..'ac').to_a  #=> ["aa", "ab", "ac"]
+    say ('a'..'e' -> to_a)    #=> ["a", "b", "c", "d", "e"]
 
 Aliases: I<to>, I<upto>
 
@@ -262,10 +256,10 @@ Parameters:
 
 Example:
 
-    var m = ("hello world" =~ /w\w+/)
+    var m = ("hello world" =~ /(w\w+)/)
     m && say m[0]                      #=> "world"
 
-    "testing" =~ /(\w+)ing/ && say $1  #=> "test"
+    if ("testing" =~ /(\w+)ing/) {|m| say m[0] }  #=> "test"
 
 Aliases: I<match>
 

@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Number::Fraction - Symbolic support for fractions
+Sidef::Types::Number::Fraction - Symbolic implementation for fractions.
 
 =head1 DESCRIPTION
 
@@ -240,13 +240,5 @@ C<< <=> >> (Comparison)
 =back
 
 Additionally, standard boolean comparison operators (C<==>, C<!=>, C<< < >>, C<< <= >>, C<< > >>, C<< >= >>) work as expected.
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

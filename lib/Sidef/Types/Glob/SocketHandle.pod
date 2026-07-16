@@ -14,18 +14,18 @@ This class implements a socket handle interface for network communication in Sid
     var server = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, Socket.IPPROTO_TCP)
     server.bind(Socket.pack_sockaddr_in(8080, Socket.INADDR_ANY))
     server.listen(5)
-    
+
     say "Server listening on port 8080..."
     var client = server.accept
-    
+
     # Read from client
     var data = client.readline
     say "Received: #{data}"
-    
+
     # Send response
     client.say("Hello from server!")
     client.close
-    
+
     # Create a client socket
     var sock = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, Socket.IPPROTO_TCP)
     var addr = Socket.pack_sockaddr_in(80, Socket.inet_aton("example.com"))
@@ -36,9 +36,7 @@ This class implements a socket handle interface for network communication in Sid
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Glob::FileHandle
+Inherits methods from L<Sidef::Types::Glob::FileHandle>.
 
 This means all file handle methods (like C<read>, C<write>, C<print>, C<say>, C<close>, etc.) are available on socket handles as well.
 
@@ -134,7 +132,7 @@ B<Example:>
     var server = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, 0)
     server.bind(Socket.pack_sockaddr_in(8080, Socket.INADDR_ANY))
     server.listen(5)
-    
+
     loop {
         var client = server.accept || next
         var peer = Socket.unpack_sockaddr_in(client.getpeername)
@@ -193,7 +191,7 @@ B<Example:>
 
     # TCP socket
     var sent = sock.send("Hello, World!")
-    
+
     # UDP socket with destination
     var addr = Socket.pack_sockaddr_in(9999, Socket.inet_aton("192.168.1.100"))
     sock.send("UDP message", 0, addr)
@@ -311,9 +309,9 @@ B<Returns:> True on success, false on failure.
 B<Example:>
 
     # Enable address reuse (useful for servers)
-    sock.setsockopt(Socket.SOL_SOCKET, Socket.SO_REUSEADDR, 1) || 
+    sock.setsockopt(Socket.SOL_SOCKET, Socket.SO_REUSEADDR, 1) ||
         die "Cannot set SO_REUSEADDR: #{$!}"
-    
+
     # Enable TCP keepalive
     sock.setsockopt(Socket.SOL_SOCKET, Socket.SO_KEEPALIVE, 1)
 
@@ -349,10 +347,10 @@ B<Example:>
 
     # Finish sending data and close the write side
     sock.shutdown(1)
-    
+
     # Read remaining data from the peer
     var remaining = sock.slurp
-    
+
     # Close completely
     sock.close
 
@@ -366,18 +364,18 @@ B<Example:>
     server.setsockopt(Socket.SOL_SOCKET, Socket.SO_REUSEADDR, 1)
     server.bind(Socket.pack_sockaddr_in(8080, Socket.INADDR_ANY))
     server.listen(10)
-    
+
     say "Server started on port 8080"
-    
+
     loop {
         var client = server.accept || next
         say "Client connected"
-        
+
         # Handle client in a fork or thread
         client.say("Welcome to the server!")
         var request = client.readline
         say "Received: #{request}"
-        
+
         client.close
     }
 
@@ -385,14 +383,14 @@ B<Example:>
 
     var sock = Socket.new(Socket.PF_INET, Socket.SOCK_STREAM, 0)
     var addr = Socket.pack_sockaddr_in(80, Socket.inet_aton("example.com"))
-    
+
     sock.connect(addr) || die "Cannot connect: #{$!}"
-    
+
     sock.say("GET / HTTP/1.1")
     sock.say("Host: example.com")
     sock.say("Connection: close")
     sock.say("")
-    
+
     say sock.slurp
     sock.close
 
@@ -400,13 +398,13 @@ B<Example:>
 
     var sock = Socket.new(Socket.PF_INET, Socket.SOCK_DGRAM, 0)
     sock.bind(Socket.pack_sockaddr_in(9999, Socket.INADDR_ANY))
-    
+
     say "UDP server listening on port 9999"
-    
+
     loop {
         var data = sock.recv(1024)
         defined(data) || next
-        
+
         var peer = sock.getpeername
         var (port, ip) = Socket.unpack_sockaddr_in(peer)
         say "Received from #{Socket.inet_ntoa(ip)}:#{port}: #{data}"
@@ -416,12 +414,12 @@ B<Example:>
 
     var sock = Socket.new(Socket.PF_INET, Socket.SOCK_DGRAM, 0)
     var addr = Socket.pack_sockaddr_in(9999, Socket.inet_aton("192.168.1.100"))
-    
+
     sock.send("Hello, UDP server!", 0, addr)
-    
+
     var response = sock.recv(1024)
     say "Response: #{response}" if defined(response)
-    
+
     sock.close
 
 =head1 SEE ALSO
@@ -433,13 +431,5 @@ B<Example:>
 =item * L<Socket> - Perl's Socket module documentation for constants and helper functions
 
 =back
-
-=head1 AUTHOR
-
-Daniel "trizen" Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

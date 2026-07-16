@@ -22,20 +22,20 @@ Quaternions are particularly useful in 3D graphics, robotics, and physics for re
     say a*b     #=> Quaternion(-60, 12, 30, 24)
     say b*a     #=> Quaternion(-60, 20, 14, 32)  # Note: multiplication is non-commutative
     say a/b     #=> Quaternion(35/87, 4/87, 0, 8/87)
-    
+
     # Basic operations
     say a.abs        #=> 5.477225575051661  (magnitude)
     say a.norm       #=> 30                  (squared magnitude)
     say a.conj       #=> Quaternion(1, -2, -3, -4)  (conjugate)
     say a.inv        #=> multiplicative inverse
-    
+
     # Component access
     say a.a          #=> 1  (real part)
     say a.b          #=> 2  (i coefficient)
     say a.c          #=> 3  (j coefficient)
     say a.d          #=> 4  (k coefficient)
     say a.parts      #=> [1, 2, 3, 4]
-    
+
     # Power and modular operations
     say a**3         #=> a cubed
     say a.sqr        #=> a squared
@@ -43,9 +43,7 @@ Quaternions are particularly useful in 3D graphics, robotics, and physics for re
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Number::Number
+Inherits methods from L<Sidef::Types::Number::Number>.
 
 =head1 METHODS
 
@@ -86,8 +84,8 @@ Aliases: I<and>
 Returns the product of C<a> and C<b> using quaternion multiplication. Note that quaternion multiplication is non-commutative (C<a*b> may not equal C<b*a>). If C<b> is a scalar, scales all components by C<b>.
 
 The quaternion product formula is:
-    (a₁ + b₁i + c₁j + d₁k)(a₂ + b₂i + c₂j + d₂k) = 
-    (a₁a₂ - b₁b₂ - c₁c₂ - d₁d₂) + 
+    (a₁ + b₁i + c₁j + d₁k)(a₂ + b₂i + c₂j + d₂k) =
+    (a₁a₂ - b₁b₂ - c₁c₂ - d₁d₂) +
     (a₁b₂ + b₁a₂ + c₁d₂ - d₁c₂)i +
     (a₁c₂ - b₁d₂ + c₁a₂ + d₁b₂)j +
     (a₁d₂ + b₁c₂ - c₁b₂ + d₁a₂)k
@@ -599,12 +597,12 @@ This makes quaternion multiplication non-commutative.
     var q2 = Quaternion(0, 1, 0, 0)    # Pure imaginary (i)
     var q3 = Quaternion(0, 0, 1, 0)    # Pure imaginary (j)
     var q4 = Quaternion(0, 0, 0, 1)    # Pure imaginary (k)
-    
+
     # Verifying fundamental properties
     say q2**2                           #=> Quaternion(-1, 0, 0, 0)
     say q2*q3                           #=> Quaternion(0, 0, 0, 1)  (= k)
     say q3*q2                           #=> Quaternion(0, 0, 0, -1) (= -k)
-    
+
     # Unit quaternion (rotation)
     var angle = 90.deg2rad
     var axis = [0, 0, 1]  # Z-axis
@@ -612,7 +610,7 @@ This makes quaternion multiplication non-commutative.
     var (x, y, z) = axis.map { _ * sin(angle/2) }...
     var rotation = Quaternion(w, x, y, z)
     say rotation.norm      #=> 1 (unit quaternion)
-    
+
     # Quaternion division
     var a = Quaternion(1, 2, 3, 4)
     var b = Quaternion(5, 6, 7, 8)

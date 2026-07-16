@@ -50,7 +50,7 @@ Signal handlers are blocks of code that execute when a specific signal is receiv
 
     # Retrieve current handler for a signal
     var old_handler = Sig.INT
-    
+
     # Set new handler and restore old one later
     Sig.INT { say "New handler" }
     # ... do work ...
@@ -155,12 +155,12 @@ Handles interrupt signals, typically sent when the user presses Ctrl+C.
 B<Example - Graceful shutdown:>
 
     var running = true
-    
+
     Sig.INT {
         say "\nInterrupt received, shutting down..."
         running = false
     }
-    
+
     while (running) {
         # main program loop
     }
@@ -240,41 +240,41 @@ Consult your system's signal documentation for a complete list.
 =head2 Making Warnings Fatal
 
     Sig.__WARN__ { |msg| die msg }
-    
+
     # Now warnings become fatal errors
     var x = "abc" + 0  # Dies instead of just warning
 
 =head2 Graceful Shutdown
 
     var should_exit = false
-    
+
     Sig.INT {
         say "Shutting down gracefully..."
         should_exit = true
     }
-    
+
     while (!should_exit) {
         # process work
         say "Working..."
         sleep(1)
     }
-    
+
     say "Cleanup complete"
 
 =head2 Timeout Handler
 
     var timeout_reached = false
-    
+
     Sig.ALRM {
         timeout_reached = true
     }
-    
+
     alarm(5)  # Set 5-second alarm
-    
+
     while (!timeout_reached) {
         # do work
     }
-    
+
     say "Timeout!"
 
 =head2 Custom Error Reporting
@@ -289,17 +289,17 @@ Consult your system's signal documentation for a complete list.
 
     # Ignore interrupt signal
     Sig.INT { nil }
-    
+
     # Now Ctrl+C won't terminate the program
 
 =head2 Restoring Default Handlers
 
     # Save original handler
     var original = Sig.INT
-    
+
     # Set custom handler
     Sig.INT { say "Custom handler" }
-    
+
     # Later, restore original
     Sig.INT(original)
 
@@ -334,13 +334,5 @@ Consult your system's signal documentation for a complete list.
 =item * signal(7) - Linux signal overview
 
 =back
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This module is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

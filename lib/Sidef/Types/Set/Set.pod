@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Set::Set
+Sidef::Types::Set::Set - Unordered collection of unique elements supporting mathematical set operations.
 
 =head1 DESCRIPTION
 
@@ -28,9 +28,7 @@ Sets are useful when you need to track unique items, test membership, or perform
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Hash::Hash
+Inherits methods from L<Sidef::Types::Hash::Hash>.
 
 =head1 METHODS
 
@@ -621,14 +619,5 @@ Returns a copy of the set.
 =head1 SEE ALSO
 
 L<Sidef::Types::Hash::Hash>, L<Sidef::Types::Array::Array>, L<Sidef::Types::Set::Bag>
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Sidef itself.
 
 =cut

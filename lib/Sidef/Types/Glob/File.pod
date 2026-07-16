@@ -11,36 +11,34 @@ The File class provides a comprehensive interface for file operations in Sidef, 
 =head1 SYNOPSIS
 
     var file = File("example.txt")
-    
+
     # Create and write to a file
     file.write("Hello, World!")
-    
+
     # Read file contents
     say file.read
-    
+
     # Check file properties
     if (file.exists && file.is_readable) {
         say "File exists and is readable"
     }
-    
+
     # Get file information
     say "Size: #{file.size} bytes"
     say "Directory: #{file.dir}"
     say "Basename: #{file.base}"
-    
+
     # Copy and move files
     file.copy("backup.txt")
     file.move("new_location.txt")
-    
+
     # Work with paths
     var abs_path = file.abs_path
     say "Absolute path: #{abs_path}"
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::String::String
+Inherits methods from L<Sidef::Types::String::String>.
 
 =head1 METHODS
 
@@ -155,7 +153,7 @@ Compares the contents of two files byte-by-byte. Returns C<0> if files are ident
 
     var file1 = File("original.txt")
     var file2 = File("copy.txt")
-    
+
     given (file1.compare(file2)) {
         when (0)  { say "Files are identical" }
         when (-1) { say "file1 < file2" }
@@ -540,7 +538,7 @@ Creates a temporary file with a unique name based on the provided template. The 
 
     var tmpfile = File.mktemp
     tmpfile.write("temporary data")
-    
+
     var custom = File.mktemp(template => "myapp_XXXX", dir => "/var/tmp")
 
 Aliases: I<make_tmp>, I<make_temp>
@@ -613,7 +611,7 @@ Opens the file with the specified mode and stores the filehandle reference in C<
     var file = File("data.txt")
     var fh = nil
     var err = nil
-    
+
     if (file.open('<', \fh, \err)) {
         # Read from fh
         fh.close
@@ -923,7 +921,7 @@ Deletes one or more files. If called without arguments, deletes the file object 
 
     var file = File("temp.txt")
     file.unlink                      # Delete this file
-    
+
     File.unlink("file1.txt", "file2.txt")  # Delete multiple files
 
 Returns the number of files successfully deleted.
@@ -965,13 +963,13 @@ Returns the File object for method chaining.
     # Create a file and write content
     var file = File("example.txt")
     file.write("Line 1\nLine 2\nLine 3\n")
-    
+
     # Read and print contents
     say file.read
-    
+
     # Append more content
     file.append("Line 4\n")
-    
+
     # Check file properties
     say "Size: #{file.size} bytes"
     say "Readable: #{file.is_readable}"
@@ -980,25 +978,25 @@ Returns the File object for method chaining.
 =head2 File Information and Metadata
 
     var file = File("/etc/passwd")
-    
+
     # Get path components
     say "Directory: #{file.dir}"
     say "Basename: #{file.base}"
     say "Absolute path: #{file.abs_path}"
-    
+
     # Get file statistics
     var stat = file.stat
     say "Inode: #{stat.ino}"
     say "Permissions: #{stat.mode.as_oct}"
     say "Owner UID: #{stat.uid}"
-    
+
     # Check age
     say "Modified #{file.modification_time_days_diff} days ago"
 
 =head2 Working with Checksums
 
     var file = File("download.iso")
-    
+
     # Compute various hash digests
     say "MD5:    #{file.md5}"
     say "SHA1:   #{file.sha1}"
@@ -1008,13 +1006,13 @@ Returns the File object for method chaining.
 =head2 File Copying and Moving
 
     var source = File("original.txt")
-    
+
     # Create a backup copy
     source.copy("backup.txt")
-    
+
     # Move to archive directory
     source.move("archive/original.txt")
-    
+
     # Create hard and symbolic links
     File("data.txt").link("hardlink.txt")
     File("data.txt").symlink("symlink.txt")
@@ -1025,12 +1023,12 @@ Returns the File object for method chaining.
     File("text.txt").edit { |content|
         content.uc
     }
-    
+
     # Replace all occurrences of a pattern
     File("config.ini").edit { |content|
         content.gsub(/old_value/, 'new_value')
     }
-    
+
     # Process line by line
     File("data.csv").edit { |content|
         content.lines.map { |line|
@@ -1047,7 +1045,7 @@ Returns the File object for method chaining.
         say line.trim
     }
     fh.close
-    
+
     # Write with explicit handle
     var output = File("output.txt")
     var fh = output.open_w
@@ -1062,13 +1060,13 @@ Returns the File object for method chaining.
     # Create a temporary file
     var tmp = File.mktemp
     tmp.write("temporary data")
-    
+
     # Use custom template
     var tmp2 = File.mktemp(
         template => "myapp_XXXXXX",
         dir => "/var/tmp"
     )
-    
+
     # Cleanup
     tmp.delete
     tmp2.delete
@@ -1076,7 +1074,7 @@ Returns the File object for method chaining.
 =head2 File Type Checking
 
     var path = File(ARGV[0])
-    
+
     given (path) {
         when { .is_file }      { say "Regular file" }
         when { .is_dir }       { say "Directory" }
@@ -1085,7 +1083,7 @@ Returns the File object for method chaining.
         when { .is_block }     { say "Block device" }
         default                { say "Unknown file type" }
     }
-    
+
     # Check content type
     if (path.is_file) {
         path.is_text   && say "Text file"

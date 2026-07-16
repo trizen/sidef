@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Object::Enumerator
+Sidef::Object::Enumerator - Lazy iterator object for generating and processing sequences.
 
 =head1 DESCRIPTION
 

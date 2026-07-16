@@ -13,25 +13,23 @@ The Socket class provides a comprehensive interface to socket networking operati
     # Create a TCP client socket
     var sock = Socket()
     sock.open(:PF_INET, :SOCK_STREAM, 0)
-    
+
     # Resolve a hostname
     var host_info = Socket.gethostbyname('www.example.com')
     say host_info
-    
+
     # Pack a socket address
     var port = 80
     var addr = Socket.inet_aton('127.0.0.1')
     var sockaddr = Socket.pack_sockaddr_in(port, addr)
-    
+
     # Create a socket pair for IPC
     var (reader, writer) = (nil, nil)
     Socket.socketpair(reader, writer, :PF_UNIX, :SOCK_STREAM, 0)
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -96,7 +94,7 @@ Example:
 
     var (parent, child) = (nil, nil)
     Socket.socketpair(parent, child, :PF_UNIX, :SOCK_STREAM, 0) || die "socketpair failed: #{$!}"
-    
+
     # Now parent and child can communicate bidirectionally
 
 =head1 HOSTNAME AND ADDRESS RESOLUTION
@@ -848,13 +846,13 @@ Returns [multiaddr, interface_index].
 
     var sock = Socket()
     sock.open(:PF_INET, :SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
-    
+
     var addr = Socket.inet_aton('127.0.0.1')
     var sockaddr = Socket.pack_sockaddr_in(80, addr)
-    
+
     sock.connect(sockaddr) || die "Cannot connect: #{$!}"
     sock.print("GET / HTTP/1.0\r\n\r\n")
-    
+
     while (var line = sock.readline) {
         say line
     }
@@ -864,7 +862,7 @@ Returns [multiaddr, interface_index].
 
     var sock = Socket()
     sock.open(:PF_INET, :SOCK_DGRAM, 0) || die "Cannot create socket: #{$!}"
-    
+
     var dest = Socket.pack_sockaddr_in(9999, Socket.inet_aton('192.168.1.100'))
     sock.send("Hello UDP", 0, dest)
 
@@ -872,7 +870,7 @@ Returns [multiaddr, interface_index].
 
     var sock = Socket()
     sock.open(:PF_UNIX, :SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
-    
+
     var addr = Socket.pack_sockaddr_un('/tmp/my.sock')
     sock.connect(addr) || die "Cannot connect: #{$!}"
 
@@ -880,7 +878,7 @@ Returns [multiaddr, interface_index].
 
     var sock = Socket()
     sock.open(:PF_INET6, :SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
-    
+
     var addr = Socket.inet_pton(:AF_INET6, '::1')
     var sockaddr = Socket.pack_sockaddr_in6(8080, addr)
     sock.connect(sockaddr) || die "Cannot connect: #{$!}"
@@ -898,9 +896,5 @@ Returns [multiaddr, interface_index].
 =item * connect(2), bind(2), listen(2), accept(2) - Socket operations
 
 =back
-
-=head1 AUTHOR
-
-Daniel Șuteu (trizen)
 
 =cut

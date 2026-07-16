@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Sidef::Types::Regex::Match
+Sidef::Types::Regex::Match - Regular expression match object exposing captures and match metadata.
 
 =head1 DESCRIPTION
 
@@ -12,33 +12,31 @@ This class implements a match object that represents the result of a regular exp
 
     # Basic matching
     var match = "Hello World".match(/(\w+)\s+(\w+)/)
-    
+
     # Access captured groups
     say match.cap             # ["Hello", "World"]
     say match[0]              # "Hello" (first capture group)
     say match[1]              # "World" (second capture group)
-    
+
     # Named captures
     var m = "John Doe".match(/(?<first>\w+)\s+(?<last>\w+)/)
     say m.ncap                # {first: "John", last: "Doe"}
-    
+
     # Check if match was successful
     if ("test".match(/\d+/).to_bool) {
         say "Contains digits"
     }
-    
+
     # Get match position
     var pos = "abc123def".match(/\d+/).pos
     say pos                   # Position where match occurred
-    
+
     # Get the matched string
     say "test123".match(/\d+/).to_s    # "123"
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -50,7 +48,7 @@ Returns an array containing all the captured groups from the regular expression 
 
     var match = "John Doe".match(/(\w+)\s+(\w+)/)
     say match.cap    # ["John", "Doe"]
-    
+
     var m2 = "abc".match(/abc/)
     say m2.cap       # [] (no capture groups)
 
@@ -78,7 +76,7 @@ Joins all the captured groups into a single string using the specified separator
 
     var match = "2024-12-28".match(/(\d+)-(\d+)-(\d+)/)
     say match.join('/')     # "2024/12/28"
-    
+
     var m2 = "a,b,c".match(/(\w),(\w),(\w)/)
     say m2.join(' ')        # "a b c"
 
@@ -94,7 +92,7 @@ Returns a hash containing all named capture groups from the regular expression m
     say match.ncap          # {first: "John", last: "Doe"}
     say match.ncap{:first}  # "John"
     say match.ncap{:last}   # "Doe"
-    
+
     # Using named captures with additional patterns
     var email = "user@example.com".match(/(?<user>\w+)@(?<domain>[\w.]+)/)
     say email.ncap{:user}   # "user"
@@ -113,7 +111,7 @@ Returns the position (index) in the original string where the match occurred. Th
     var str = "abc123def"
     var match = str.match(/\d+/)
     say match.pos           # 3 (position where "123" starts)
-    
+
     var m2 = "test".match(/s/)
     say m2.pos              # 2 (position where "s" is found)
 
@@ -130,7 +128,7 @@ Returns the original Regex object that was used to create this match. This allow
     var pattern = /\d+/
     var match = "test123".match(pattern)
     say match.regex         # Returns the Regex object /\d+/
-    
+
     # You can use it to match against other strings
     say "abc456".match(match.regex).to_s    # "456"
 
@@ -156,11 +154,11 @@ Returns the original string that was matched against. This is the complete input
 Returns true if the match was successful, false otherwise. This is useful for conditional checks to determine if a pattern was found in the string.
 
     var text = "test123"
-    
+
     if (text.match(/\d+/).to_bool) {
         say "Found digits"
     }
-    
+
     if (!text.match(/[A-Z]+/).to_bool) {
         say "No uppercase letters found"
     }
@@ -179,7 +177,7 @@ Returns the matched substring as a string. This is the portion of the original s
 
     var match = "Hello World".match(/\w+/)
     say match.to_s          # "Hello"
-    
+
     var m2 = "Price: $19.99".match(/\$\d+\.\d+/)
     say m2.to_s             # "$19.99"
 
@@ -202,7 +200,7 @@ Match objects support array-like indexing to access individual capture groups:
 
     var email = "user@example.com"
     var match = email.match(/(?<user>[\w.]+)@(?<domain>[\w.]+)/)
-    
+
     if (match.to_bool) {
         say "Username: #{match.ncap{:user}}"
         say "Domain: #{match.ncap{:domain}}"
@@ -212,7 +210,7 @@ Match objects support array-like indexing to access individual capture groups:
 
     var date = "2024-12-28"
     var match = date.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/)
-    
+
     if (match.to_bool) {
         say "Year: #{match.ncap{:year}}"
         say "Month: #{match.ncap{:month}}"
@@ -223,7 +221,7 @@ Match objects support array-like indexing to access individual capture groups:
 
     var phone = "Call me at (555) 123-4567"
     var match = phone.match(/\((\d{3})\)\s+(\d{3})-(\d{4})/)
-    
+
     if (match.to_bool) {
         var formatted = match.join('-')
         say "Phone: #{formatted}"    # "555-123-4567"
@@ -232,9 +230,5 @@ Match objects support array-like indexing to access individual capture groups:
 =head1 SEE ALSO
 
 L<Sidef::Types::Regex::Regex>, L<Sidef::Types::String::String>
-
-=head1 AUTHOR
-
-Daniel Șuteu (trizen)
 
 =cut

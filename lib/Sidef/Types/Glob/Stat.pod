@@ -12,7 +12,7 @@ This class implements an interface for retrieving and working with file system s
 
     # Create a Stat object for a file
     var stat = Stat('/path/to/file.txt')
-    
+
     # Check if file exists and get information
     if (stat) {
         say "Size: #{stat.size} bytes"
@@ -20,19 +20,17 @@ This class implements an interface for retrieving and working with file system s
         say "Owner UID: #{stat.uid}"
         say "Permissions: #{stat.mode}"
     }
-    
+
     # Use lstat for symbolic links (doesn't follow the link)
     var link_stat = Stat.lstat('/path/to/symlink')
-    
+
     # Get all stat information as an array
     var info = stat.all
     say "Device: #{info[0]}, Inode: #{info[1]}"
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -297,13 +295,5 @@ Example:
 =item * stat(2) - Unix system call documentation
 
 =back
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify it under the same terms as Sidef itself.
 
 =cut

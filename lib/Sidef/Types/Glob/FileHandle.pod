@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Types::Glob::FileHandle
+Sidef::Types::Glob::FileHandle - File handle object for reading, writing, and managing files.
 
 =head1 DESCRIPTION
 
@@ -34,9 +34,7 @@ This class implements file handle operations for reading from and writing to fil
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 METHODS
 

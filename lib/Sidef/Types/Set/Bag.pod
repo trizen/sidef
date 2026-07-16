@@ -30,9 +30,7 @@ A Bag is essentially a mapping from elements to their frequencies, where the fre
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Set::Set
+Inherits methods from L<Sidef::Types::Set::Set>.
 
 =head1 METHODS
 
@@ -822,14 +820,5 @@ Example:
 =head1 SEE ALSO
 
 L<Sidef::Types::Set::Set>
-
-=head1 AUTHOR
-
-Daniel "Trizen" Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Sidef itself.
 
 =cut

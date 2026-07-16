@@ -19,30 +19,28 @@ always contains numeric elements. Operations between vectors are performed eleme
     # Create vectors
     var v1 = Vector(1, 2, 3)
     var v2 = Vector(4, 5, 6)
-    
+
     # Basic arithmetic
     var sum = v1 + v2           # Vector(5, 7, 9)
     var diff = v1 - v2          # Vector(-3, -3, -3)
     var prod = v1 * v2          # Element-wise: Vector(4, 10, 18)
     var quot = v1 / v2          # Element-wise: Vector(0.25, 0.4, 0.5)
-    
+
     # Scalar operations
     var scaled = v1 * 2         # Vector(2, 4, 6)
     var powered = v1 ** 2       # Vector(1, 4, 9)
-    
+
     # Vector operations
     say v1.norm                 # Euclidean norm (magnitude)
     say v1.abs                  # Absolute value of each element
     say v1.dist(v2)             # Euclidean distance between vectors
-    
+
     # Create special vectors
     var zeros = Vector.zero(5)  # Vector of 5 zeros
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Types::Array::Array
+Inherits methods from L<Sidef::Types::Array::Array>.
 
 =head1 METHODS
 
@@ -368,29 +366,29 @@ class method used to create zero vectors of a specified dimension.
     # Vector arithmetic and operations
     var v1 = Vector(1, 2, 3)
     var v2 = Vector(4, 5, 6)
-    
+
     # Element-wise operations
     say (v1 + v2)  # Vector(5, 7, 9)
     say (v1 * v2)  # Vector(4, 10, 18)
-    
+
     # Scalar operations
     say (v1 * 2)   # Vector(2, 4, 6)
     say (v1 + 10)  # Vector(11, 12, 13)
-    
+
     # Norms and distances
     say v1.norm                # Magnitude of v1
     say v1.manhattan_norm      # L1 norm
     say v1.dist(v2)            # Euclidean distance
     say v1.manhattan_dist(v2)  # Manhattan distance
     say v1.chebyshev_dist(v2)  # Chebyshev distance
-    
+
     # Transformations
     say v1.abs                 # Absolute values
     say v1.neg                 # Negation
     say v1.round(2)            # Round to 2 decimals
     say v1.ceil                # Ceiling
     say v1.floor               # Floor
-    
+
     # Creating special vectors
     var zeros = Vector.zero(5)
     say zeros  # Vector(0, 0, 0, 0, 0)

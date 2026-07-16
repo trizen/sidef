@@ -16,33 +16,31 @@ LazyMethod objects are created using the C<method> or C<methods> methods availab
     var lazy = [1,2,3,4,5].method('map', {|x| x * 2})
     lazy = lazy.method('grep', {|x| x > 5})
     lazy = lazy.method('sum')
-    
+
     # Execute the chain
     say lazy.call()  # 30
-    
+
     # Or chain and execute in one expression
     var result = [1,2,3,4,5].method('map', {|x| x ** 2})
                             .method('sum')
                             .call()  # 55
-    
+
     # Using the 'methods' global method to get all available methods
     var array_methods = [1,2,3].methods()
     say array_methods.keys  # Returns all method names as an array
-    
+
     # Each value in the hash is a LazyMethod that can be executed
     say array_methods{:sum}.call()  # 6
-    
+
     # Lazy methods can be stored and reused
     var double_map = nil.method('map', {|x| x * 2})
-    
+
     say [1,2,3].method('map', {|x| x * 2}).call()  # [2, 4, 6]
     say [4,5,6].method('map', {|x| x * 2}).call()  # [8, 10, 12]
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Object
+Inherits methods from L<Sidef::Object::Object>.
 
 =head1 HOW LAZYMETHOD OBJECTS ARE CREATED
 
@@ -68,12 +66,12 @@ B<Example:>
 
     var lazy = "hello".method('uc')
     say lazy.call()  # "HELLO"
-    
+
     # Chaining multiple method calls
     var chain = [1,2,3,4,5].method('grep', {|x| x.is_even})
                            .method('map', {|x| x ** 2})
                            .method('sum')
-    
+
     say chain.call()  # 20
 
 =head2 obj.methods(*args)
@@ -93,14 +91,14 @@ B<Returns:> A Hash mapping method names to LazyMethod objects.
 B<Example:>
 
     var methods = [1,2,3].methods()
-    
+
     # Access specific method
     say methods{:sum}.call()      # 6
     say methods{:reverse}.call()  # [3, 2, 1]
-    
+
     # List all available methods
     say methods.keys.sort
-    
+
     # Methods can be further chained
     var result = methods{:map}.method('sum').call({|x| x * 2})  # 12
 
@@ -131,7 +129,7 @@ B<Example:>
     var lazy = [1,2,3,4,5].method('map', {|x| x ** 2})
     lazy = lazy.method('grep', {|x| x > 10})
     lazy = lazy.method('sum')
-    
+
     say lazy.call()  # 41 (16 + 25)
 
 =head2 call
@@ -156,9 +154,9 @@ B<Example:>
 
     var lazy = "hello world".method('split')
                             .method('map', {|s| s.uc})
-    
+
     say lazy.call(' ')  # ["HELLO", "WORLD"]
-    
+
     # The ' ' is passed to the first method (split)
     var lazy2 = "hello".method('uc').method('chars')
     say lazy2.call()  # ["H", "E", "L", "L", "O"]
@@ -189,7 +187,7 @@ The LazyMethod class implements AUTOLOAD to enable implicit execution. Any metho
 This allows you to execute and immediately operate on the result without explicitly calling C<.call()>:
 
     var lazy = [1,2,3].method('map', {|x| x * 2})
-    
+
     # These are equivalent:
     say lazy.call().sum()  # Explicit execution, then sum
     say lazy.sum()         # Implicit execution via AUTOLOAD
@@ -208,10 +206,10 @@ Create reusable transformation pipelines that can be applied to different data:
     var normalize = nil.method('map', { .to_n })
                        .method('grep', { .is_finite })
                        .method('sort')
-    
+
     var data1 = ["3", "1", "2", "inf"]
     var data2 = ["5.5", "2.2", "nan", "3.3"]
-    
+
     say data1.method('map', { .to_n })
              .method('grep', { .is_finite })
              .method('sort')
@@ -222,10 +220,10 @@ Create reusable transformation pipelines that can be applied to different data:
 Use the C<methods> method to explore available methods on objects:
 
     var str_methods = "hello".methods()
-    
+
     # See what methods are available
     say str_methods.keys.sort.first(10)
-    
+
     # Try out methods
     say str_methods{:uc}.call()       # "HELLO"
     say str_methods{:reverse}.call()  # "olleh"
@@ -240,10 +238,10 @@ Delay expensive computations until they're actually needed:
             .method('map', {|x| expensive_calculation(x) })
             .method('sum')
     }
-    
+
     var lazy_result = create_processor(1..1000)
     # No computation has happened yet
-    
+
     if (user_wants_result) {
         say lazy_result.call()  # Now it executes
     }
@@ -256,7 +254,7 @@ Build complex operations by chaining simple transformations:
                         -> method('map', {|x| x ** 2})
                         -> method('grep', {|x| x > 50})
                         -> method('sum')
-    
+
     say process.call()  # Sum of even squares > 50
 
 =head2 Creating Method Aliases
@@ -265,7 +263,7 @@ Store commonly used method chains for reuse:
 
     var square_map = nil.method('map', {|x| x ** 2})
     var sum_squares = nil.method('map', {|x| x ** 2}).method('sum')
-    
+
     say [1,2,3].concat(square_map.call())    # [1, 2, 3, 1, 4, 9]
     say sum_squares.call([1,2,3])            # 14
     say sum_squares.call([4,5,6])            # 77
@@ -301,14 +299,5 @@ Store commonly used method chains for reuse:
 =item * L<Sidef::Types::Array::Array> - For array methods like map, grep, sum
 
 =back
-
-=head1 AUTHOR
-
-Daniel Șuteu
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Sidef itself.
 
 =cut

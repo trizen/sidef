@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Sidef::Object::Object
+Sidef::Object::Object - Base class providing the common interface for all Sidef objects.
 
 =head1 DESCRIPTION
 
@@ -16,9 +16,7 @@ var obj = Object()
 
 =head1 INHERITS
 
-Inherits methods from:
-
-       * Sidef::Object::Convert
+Inherits methods from L<Sidef::Object::Convert>
 
 =head1 METHODS
 
