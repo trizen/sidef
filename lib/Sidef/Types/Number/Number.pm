@@ -10737,6 +10737,44 @@ sub is_pandigital {
     scalar(keys %hash) == $b_val ? $TRUE : $FALSE;
 }
 
+sub is_smith {
+    my ($n, $base) = @_;
+
+    $n    = $$n;
+    $base = defined($base) ? do { ref($base) eq __PACKAGE__ or _valid(\$base); _any2ui($$base) // return $FALSE } : 10;
+
+    return $FALSE if ($base < 2);
+
+    # Exclude primes and trivial small values
+    if (FAST_MODE and !ref($n)) {
+        return $FALSE if ($n <= 3);
+        return $FALSE if (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($n) : Math::Prime::Util::GMP::is_prime($n));
+    }
+    else {
+        return $FALSE if _is_prob_prime(_big2uistr($n) // return $FALSE);
+    }
+
+    my $digit_sum =
+      (HAS_PRIME_UTIL and $n < ULONG_MAX and $base == 10)
+      ? Math::Prime::Util::sumdigits($n)
+      : List::Util::sum(Math::Prime::Util::GMP::todigits($n, $base));
+
+    my $factor_digit_sum = 0;
+    foreach my $pp (_factor_exp($n)) {
+        my ($p, $e) = @$pp;
+        my $p_sum =
+          (HAS_PRIME_UTIL and $p < ULONG_MAX and $base == 10)
+          ? Math::Prime::Util::sumdigits($p)
+          : List::Util::sum(Math::Prime::Util::GMP::todigits($p, $base));
+        $factor_digit_sum += $p_sum * $e;
+        if ($factor_digit_sum > $digit_sum) {
+            return $FALSE;
+        }
+    }
+
+    ($factor_digit_sum == $digit_sum) ? $TRUE : $FALSE;
+}
+
 sub factorial_power {
     my ($n, $p) = @_;
 
@@ -12293,6 +12331,37 @@ sub sum_of_polygonals {
            } @results
         ]
     );
+}
+
+sub primitive_pythagorean_triples {
+    my ($limit) = @_;
+
+    $limit = _any2ui($$limit) // return _array();
+
+    my @triples;
+
+    # Seed the tree with the fundamental [3, 4, 5] triple
+    my @queue = ([3, 4, 5]);
+
+    while (@queue) {
+        my $t = shift @queue;
+        my ($A, $B, $C) = @$t;
+
+        # Prune branches where the perimeter exceeds the limit
+        my $p = $A + $B + $C;
+        next if $p > $limit;
+
+        # Standardize order (a < b)
+        push @triples, _array([map { bless \$_ } ($A < $B ? ($A, $B, $C) : ($B, $A, $C))]);
+
+        push @queue, [$A - 2 * $B + 2 * $C, 2 * $A - $B + 2 * $C, 2 * $A - 2 * $B + 3 * $C];
+        push @queue, [$A + 2 * $B + 2 * $C, 2 * $A + $B + 2 * $C, 2 * $A + 2 * $B + 3 * $C];
+        push @queue, [-$A + 2 * $B + 2 * $C, -2 * $A + $B + 2 * $C, -2 * $A + 2 * $B + 3 * $C];
+    }
+
+    # Sort results structurally
+    @triples = sort { ${$a->[0]} <=> ${$b->[0]} || ${$a->[1]} <=> ${$b->[1]} } @triples;
+    return _array(\@triples);
 }
 
 sub _modular_rational {
@@ -34630,7 +34699,7 @@ sub _partition_count_k_parts {
     return ONE  if ($k == 1);
 
     # Generating function in PARI/GP
-    if ($USE_PARI_GP and $n > 1000 and $k < 200) {
+    if ($USE_PARI_GP and $n > 1000 and $k < 500) {
         my $diff = $n - $k;
         my $code = "iferr(polcoeff(1/prod(i=1, $k, 1-x^i) + O(x^($diff+1)), $diff), E, \"\")";
         if (my $res = _execute_pari_gp($code)) {

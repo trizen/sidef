@@ -554,6 +554,22 @@ assert_eq(
 
 assert_eq(30.of { partition_count(_, 5) }, %n[0, 0, 0, 0, 0, 1, 1, 2, 3, 5, 7, 10, 13, 18, 23, 30, 37, 47, 57, 70, 84, 101, 119, 141, 164, 192, 221, 255, 291, 333])
 
+assert(1023456789.is_pandigital)
+assert(!123456789.is_pandigital)
+assert(9876543210.is_pandigital)
+
+assert(0b11010010.is_pandigital(2))
+assert(0x123456789ABCDEF0.is_pandigital(16))
+assert(200!.is_pandigital)
+assert(10**200 -> is_pandigital.not)
+assert(10**400 -> is_pandigital.not)
+
+assert_eq(30.by { .is_pandigital(2) }, %n[2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35])
+assert_eq(30.by { .is_pandigital(3) }, %n[11, 15, 19, 21, 29, 32, 33, 34, 35, 38, 42, 45, 46, 47, 48, 51, 55, 57, 58, 59, 61, 63, 64, 65, 66, 69, 73, 75, 83, 86])
+
+assert_eq(30.by { .is_smith }, %n[4, 22, 27, 58, 85, 94, 121, 166, 202, 265, 274, 319, 346, 355, 378, 382, 391, 438, 454, 483, 517, 526, 535, 562, 576, 588, 627, 634, 636, 645])
+assert_eq(30.by { .is_smith(2) }, %n[15, 51, 55, 85, 125, 159, 185, 190, 205, 215, 222, 238, 246, 249, 253, 287, 303, 319, 374, 407, 438, 442, 469, 471, 475, 489, 494, 501, 507, 591])
+
 assert_eq(prime_divisors(5040), %n[2, 3, 5, 7])
 assert_eq(prime_udivisors(5040), %n[5, 7])
 
@@ -595,5 +611,7 @@ do {
     omega_primes_each(8,42392440,52592440, {arr<<_; .diff_of_squares})
     assert(arr.contains(52492440))
 }
+
+assert_eq(primitive_pythagorean_triples(50), [[3, 4, 5], [5, 12, 13], [8, 15, 17]])
 
 say "** Test passed!"

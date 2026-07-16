@@ -4894,6 +4894,27 @@ Output:
 
 =cut
 
+=head2 primitive_pythagorean_triples
+
+    primitive_pythagorean_triples(limit)
+
+Returns all primitive Pythagorean triples whose perimeter does not exceed C<limit>.
+
+Each returned triple is an array C<[a, b, c]>, satisfying:
+
+    a² + b² = c²
+    gcd(a, b, c) = 1
+    a < b < c
+
+A primitive Pythagorean triple is one whose three components are
+coprime. Every primitive Pythagorean triple appears exactly once in the
+returned array.
+
+    say primitive_pythagorean_triples(50)
+    #=> [[3, 4, 5], [5, 12, 13], [8, 15, 17]]
+
+=cut
+
 =head2 tangent_number
 
     tangent_number(n)
@@ -9936,14 +9957,53 @@ Returns true when C<n> is an odd composite integer.
 
 =head2 is_palindrome
 
-    n.is_palindrome(b=10)
+    n.is_palindrome(base=10)
 
-Returns true if the given number C<n> is palindromic in the given base C<b>. When no base is given, it defaults to 10.
+Returns true if the given number C<n> is palindromic in the given C<base>. When no base is given, it defaults to 10.
 
     # Numbers that are palindromic in bases 2 and 10 (OEIS: A007632)
     say 1e6.range.grep{ .is_palindrome(2) && .is_palindrome(10) }
 
 Aliases: I<is_palindromic>
+
+=cut
+
+=head2 is_pandigital
+
+    n.is_pandigital(base=10)
+
+Returns C<true> if C<n> is pandigital in the specified base, and C<false> otherwise.
+
+A number is pandigital in base C<b> if its representation contains every
+digit from C<0> to C<b-1> at least once. Digits may appear more than once.
+
+If no base is specified, base 10 is assumed.
+
+    say 1023456789.is_pandigital      #=> true
+    say 123456789.is_pandigital       #=> false
+    say 9876543210.is_pandigital      #=> true
+
+Pandigitality can also be tested in other bases:
+
+    say 0b11010010.is_pandigital(2)            #=> true
+    say 0x123456789ABCDEF0.is_pandigital(16)   #=> true
+
+=cut
+
+=head2 is_smith
+
+    n.is_smith(base=10)
+
+Returns C<true> if C<n> is a Smith number, and C<false> otherwise.  (L<OEIS A006753|https://oeis.org/A006753>)
+
+A Smith number is a composite integer whose digit sum equals the sum of the
+digit sums of its prime factors, counted with multiplicity.
+
+By default, the comparison is performed in base 10. An alternative numeral
+base can be specified with the optional C<base> argument.
+
+    say 30.by { .is_smith(2) }      #=> OEIS: A278909
+    say 30.by { .is_smith(10) }     #=> OEIS: A006753
 
 =cut
 
