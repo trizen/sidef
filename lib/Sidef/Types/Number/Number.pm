@@ -30333,7 +30333,7 @@ sub cubefull_udivisors {
 *cubefull_unitary_divisors = \&cubefull_udivisors;
 *unitary_cubefull_divisors = \&cubefull_udivisors;
 
-my $power_divisors_func = sub {
+sub _power_divisors_func {
     my ($k, $factor_exp) = @_;
 
     my @d = ($ONE);
@@ -30366,7 +30366,7 @@ my $power_divisors_func = sub {
     @d = map  { bless \$_ } @d;
 
     _array(\@d);
-};
+}
 
 sub power_divisors {
     my ($k, $n) = @_;
@@ -30376,7 +30376,7 @@ sub power_divisors {
     $n = _big2pistr($$n) // return _array();
     $k = _any2ui($$k) || return _array();
 
-    $power_divisors_func->($k, [_factor_exp($n)]);
+    _power_divisors_func($k, [_factor_exp($n)]);
 }
 
 sub perfect_power_divisors {
@@ -30393,7 +30393,7 @@ sub perfect_power_divisors {
     }
 
     foreach my $k (2 .. $max_k) {
-        push @lists, $power_divisors_func->($k, \@factor_exp);
+        push @lists, _power_divisors_func($k, \@factor_exp);
     }
 
     _array([map { @$_ } @lists])->isort->iuniq;
