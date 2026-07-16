@@ -14702,6 +14702,39 @@ sub fibbinary {    # A003714: Fibbinary numbers
     bless \$s;
 }
 
+sub zeckendorf {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n) // return _array();
+    return _array() if Math::GMPz::Rmpz_sgn($n) <= 0;
+
+    # Global cache for Fibonacci sequence
+    state $fibs = [Math::GMPz::Rmpz_init_set_ui(1),    # F_2
+                   Math::GMPz::Rmpz_init_set_ui(2)     # F_3
+                  ];
+
+    # Expand cache dynamically if N exceeds current bounds
+    while (Math::GMPz::Rmpz_cmp($fibs->[-1], $n) <= 0) {
+        my $next_fib = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add($next_fib, $fibs->[-1], $fibs->[-2]);
+        push @$fibs, $next_fib;
+    }
+
+    my @representation;
+    my $rem = Math::GMPz::Rmpz_init_set($n);
+
+    for (my $i = $#$fibs - 1 ; $i >= 0 ; $i--) {
+        if (Math::GMPz::Rmpz_cmp($fibs->[$i], $rem) <= 0) {
+            my $t = Math::GMPz::Rmpz_init_set($fibs->[$i]);
+            push @representation, bless \$t;
+            Math::GMPz::Rmpz_sub($rem, $rem, $fibs->[$i]);
+            last if Math::GMPz::Rmpz_sgn($rem) == 0;
+        }
+    }
+
+    return _array(\@representation);
+}
+
 sub fibonorial {
     my ($n) = @_;
 

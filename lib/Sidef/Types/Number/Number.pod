@@ -4188,6 +4188,28 @@ Returns the n-th Fibbinary number. (L<OEIS A003714|https://oeis.org/A003714>)
 
 =cut
 
+=head2 zeckendorf
+
+    var terms = n.zeckendorf
+
+Returns the Zeckendorf representation of C<n> as an array of Fibonacci numbers.
+
+By Zeckendorf's theorem, every positive integer can be written uniquely as
+a sum of distinct, non-consecutive Fibonacci numbers. This function returns
+the Fibonacci terms in decreasing order.
+
+    say 10.zeckendorf     # => [8, 2]
+    say 42.zeckendorf     # => [34, 8]
+    say 100.zeckendorf    # => [89, 8, 3]
+
+The returned terms always satisfy:
+
+    n == terms.sum
+
+and no two consecutive Fibonacci numbers appear in the representation.
+
+=cut
+
 =head2 fibmod
 
     fibmod(n,m)
