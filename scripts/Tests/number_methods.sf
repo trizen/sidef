@@ -1998,4 +1998,16 @@ assert_eq(reduce_quadratic_form(112, -43, 5040), %n[112, -43, 5040])
 assert_eq(reduce_quadratic_form(5, 7, 12), %n[5, -3, 10])
 assert_eq(reduce_quadratic_form(2**127 + 5, 2**32 + 5, 10!), %n[3628800, 1531899, 170141183460469231731687302445027226741])
 
+assert(is_pseudoperfect(5040))
+assert(!is_pseudoperfect(5042))
+assert(is_pseudoperfect(2**64 - 4))
+assert(is_pseudoperfect(2**64 + 4))
+assert(is_pseudoperfect(2**64 + 8))
+assert(!is_pseudoperfect(2**64 - 8))
+
+assert_eq(
+    30.by { .is_pseudoperfect },    # A005835
+    %n[6, 12, 18, 20, 24, 28, 30, 36, 40, 42, 48, 54, 56, 60, 66, 72, 78, 80, 84, 88, 90, 96, 100, 102, 104, 108, 112, 114, 120, 126]
+)
+
 say "** Tests passed!"

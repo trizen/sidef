@@ -8848,6 +8848,22 @@ Returns true if C<n> is a perfect number (i.e.: sigma(n) == 2*n).
 
 =cut
 
+=head2 is_pseudoperfect
+
+    var bool = n.is_pseudoperfect
+
+Returns C<true> if C<n> is a pseudoperfect (semiperfect) number, and C<false> otherwise.
+
+A positive integer is pseudoperfect if it can be written as the sum of some
+(or all) of its proper divisors. Every perfect number is pseudoperfect,
+since the sum of all proper divisors equals the number itself.
+
+    say 30.by { .is_pseudoperfect }     # OEIS: A005835
+
+Aliases: I<is_semiperfect>
+
+=cut
+
 =head2 is_practical
 
     n.is_practical

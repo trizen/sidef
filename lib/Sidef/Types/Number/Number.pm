@@ -39742,6 +39742,68 @@ sub is_perfect {
     _set_int($v + 1)->is_mersenne_prime;
 }
 
+sub is_pseudoperfect {
+    my ($n) = @_;
+    $n = _any2mpz($$n) // return $FALSE;
+    return $FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
+
+    my @divs = map { Math::GMPz::Rmpz_init_set_str($_, 10) } _divisors(Math::GMPz::Rmpz_get_str($n, 10));
+    pop @divs;    # remove $n itself
+
+    my $sum = Math::GMPz::Rmpz_init_set_ui(0);
+    foreach my $d (@divs) {
+        Math::GMPz::Rmpz_add($sum, $sum, $d);
+    }
+
+    my $cmp = Math::GMPz::Rmpz_cmp($sum, $n);
+    return $FALSE if $cmp < 0;     # Deficient
+    return $TRUE  if $cmp == 0;    # Perfect
+
+    # For abundant numbers, find if a subset of divisors sums to 'n'
+    # We solve an equivalent problem: finding a subset of divisors that sums
+    # exactly to the difference (sum - n) which represents the elements to discard.
+    my $target = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sub($target, $sum, $n);
+
+    # Fast DP with GMP Bitsets for small abundance bounds (target <= 2*10^6)
+    if (Math::GMPz::Rmpz_fits_ulong_p($target) && Math::GMPz::Rmpz_cmp_ui($target, 2_000_000) <= 0) {
+        my $target_ui = Math::GMPz::Rmpz_get_ui($target);
+        my $dp        = Math::GMPz::Rmpz_init_set_ui(1);
+        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        foreach my $d (@divs) {
+            next if Math::GMPz::Rmpz_cmp_ui($d, $target_ui) > 0;
+            my $d_ui = Math::GMPz::Rmpz_get_ui($d);
+            Math::GMPz::Rmpz_mul_2exp($t, $dp, $d_ui);
+            Math::GMPz::Rmpz_ior($dp, $dp, $t);
+            return $TRUE if Math::GMPz::Rmpz_tstbit($dp, $target_ui);
+        }
+        return $FALSE;
+    }
+
+    # Recursive Pruning Search for massive targets
+    @divs = CORE::reverse(@divs);
+
+    sub {
+        my ($rem_target, $idx) = @_;
+        return 1 if (Math::GMPz::Rmpz_sgn($rem_target) == 0);
+        return 0 if (Math::GMPz::Rmpz_sgn($rem_target) < 0 || $idx > $#divs);
+
+        for my $i ($idx .. $#divs) {
+            my $d = $divs[$i];
+            next if Math::GMPz::Rmpz_cmp($rem_target, $d) < 0;
+
+            my $new_target = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_sub($new_target, $rem_target, $d);
+            return 1 if __SUB__->($new_target, $i + 1);
+        }
+        return 0;
+      }
+      ->($target, 0) ? $TRUE : $FALSE;
+}
+
+*is_semiperfect = \&is_pseudoperfect;
+
 sub _power_factor {
     my ($n) = @_;
 
