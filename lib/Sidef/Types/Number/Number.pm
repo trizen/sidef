@@ -34618,6 +34618,46 @@ sub factor_prod {
 
 *factors_prod = \&factor_prod;
 
+sub _partition_count_k_parts {
+    my ($n, $k) = @_;
+    ref($k) eq __PACKAGE__ or _valid(\$k);
+
+    $n = _any2ui($$n) // return ZERO;
+    $k = _any2ui($$k) // return ZERO;
+
+    return ONE  if ($k == $n);
+    return ZERO if ($k > $n or $k == 0);
+    return ONE  if ($k == 1);
+
+    # Generating function in PARI/GP
+    if ($USE_PARI_GP and $n > 1000 and $k < 200) {
+        my $diff = $n - $k;
+        my $code = "iferr(polcoeff(1/prod(i=1, $k, 1-x^i) + O(x^($diff+1)), $diff), E, \"\")";
+        if (my $res = _execute_pari_gp($code)) {
+            if ($res =~ /^\d+$/) {
+                return _set_int($res);
+            }
+        }
+    }
+
+    # O(n*k) DP array using GMPz
+    # P(n,k) = P(n-1, k-1) + P(n-k, k)
+    my @dp;
+    for my $i (0 .. $n) {
+        $dp[$i] = [map { Math::GMPz::Rmpz_init_set_ui(0) } 0 .. $k];
+    }
+    Math::GMPz::Rmpz_set_ui($dp[0][0], 1);
+
+    for my $i (1 .. $n) {
+        for my $j (1 .. ($i < $k ? $i : $k)) {
+            Math::GMPz::Rmpz_add($dp[$i][$j], $dp[$i - 1][$j - 1], $dp[$i - $j][$j]);
+        }
+    }
+
+    my $r = $dp[$n][$k];
+    bless \$r;
+}
+
 sub _partition_count_for_set {
     my ($n, $set) = @_;
 
@@ -34659,10 +34699,13 @@ sub _partition_count_for_set {
 }
 
 sub partition_count {
-    my ($n, $set) = @_;
+    my ($n, $argument) = @_;
 
-    if (defined($set)) {
-        return _partition_count_for_set($n, $set);
+    if (defined($argument)) {
+        if (ref($argument) eq __PACKAGE__) {
+            return _partition_count_k_parts($n, $argument);
+        }
+        return _partition_count_for_set($n, $argument);
     }
 
     $n = _big2uistr($$n) // goto &nan;

@@ -547,6 +547,13 @@ assert_eq(10.partition_count([2, 3, 5]), 4)
 assert_eq(8.partition_count([1, 3, 5, 7]), 6)
 assert_eq(partition_count(1e4+5, [1,2,3]), 8346672)
 
+assert_eq(
+    30.of {|n| sum(0..n, {|k| partition_count(n, k) }) },
+    30.of {|n| partition_count(n) }
+)
+
+assert_eq(30.of { partition_count(_, 5) }, %n[0, 0, 0, 0, 0, 1, 1, 2, 3, 5, 7, 10, 13, 18, 23, 30, 37, 47, 57, 70, 84, 101, 119, 141, 164, 192, 221, 255, 291, 333])
+
 assert_eq(prime_divisors(5040), %n[2, 3, 5, 7])
 assert_eq(prime_udivisors(5040), %n[5, 7])
 

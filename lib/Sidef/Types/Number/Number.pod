@@ -3730,6 +3730,7 @@ The inverse value for C<k> is given by C<Array#perm2num>:
 =head2 partition_count
 
     n.partition_count
+    n.partition_count(k)
     n.partition_count(set)
 
 Returns the number of integer partitions of C<n>.
@@ -3738,14 +3739,29 @@ With a single argument, this function returns the partition number
 C<p(n)>, that is, the number of ways to write C<n> as a sum of positive
 integers, where the order of the summands is ignored.
 
+Examples:
+
     say 0.partition_count      # => 1
     say 5.partition_count      # => 7
     say 10.partition_count     # => 42
     say 100.partition_count    # => 190569292
 
-When the optional C<set> argument is provided, the function counts only
-those partitions whose parts belong to the specified set of positive
-integers.
+=head3 Partitions into exactly C<k> parts
+
+When the second argument is an integer C<k>, the function returns the
+number of partitions of C<n> into exactly C<k> positive parts.
+
+    say 7.partition_count(1)   # => 1
+    say 7.partition_count(2)   # => 3
+    say 7.partition_count(3)   # => 4
+    say 7.partition_count(7)   # => 1
+    say 7.partition_count(8)   # => 0
+
+=head3 Restricted partitions
+
+When the second argument is an array, it is interpreted as the set of
+allowed part sizes. The function then counts only those partitions whose
+parts belong to the specified set.
 
     # Parts from {2, 3, 5}
     say 10.partition_count([2, 3, 5])  # => 4
