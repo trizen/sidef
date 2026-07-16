@@ -2022,5 +2022,6 @@ assert_eq(solve_binary_quadratic_form(2, 3, 4, 2**64 + 3), [[-2207753931, -86325
 assert_eq(solve_binary_quadratic_form(2, 3, 4, 2**32 - 3), [[-54459, 17609], [-19923, 37985], [19923, -37985], [54459, -17609]])
 assert_eq(30.of{solve_binary_quadratic_form(1, 0, 1, _).len}, 30.of { .squares_r(2) })
 assert_eq(30.of{solve_binary_quadratic_form(1, 1, 1, _).len}, %n[1, 6, 0, 6, 6, 0, 0, 12, 0, 6, 0, 0, 6, 12, 0, 0, 6, 0, 0, 12, 0, 12, 0, 0, 0, 6, 0, 6, 12, 0])  # A004016
+assert_eq(30.of{solve_binary_quadratic_form(1, 1, 2, _).len}, %n[1, 2, 4, 0, 6, 0, 0, 2, 8, 2, 0, 4, 0, 0, 4, 0, 10, 0, 4, 0, 0, 0, 8, 4, 0, 2, 0, 0, 6, 4])      # A002652
 
 say "** Tests passed!"

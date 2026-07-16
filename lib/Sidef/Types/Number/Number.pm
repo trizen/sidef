@@ -34618,8 +34618,52 @@ sub factor_prod {
 
 *factors_prod = \&factor_prod;
 
+sub _partition_count_for_set {
+    my ($n, $set) = @_;
+
+    $n = _any2ui($$n) // return ZERO;
+
+    my @S = map { _any2ui($$_) // return ZERO } @{$set};
+    @S = sort { $a <=> $b } grep { $_ > 0 } @S;
+
+    my %seen;
+    @S = grep { !$seen{$_}++ } @S;
+
+    return ONE if $n == 0;
+    return ZERO unless @S;
+
+    # PARI/GP Generating Functions for heavy values
+    if ($n > 10_000 and $USE_PARI_GP) {
+
+        # 1 / Prod(1 - x^c)
+        my $prod_str = join(" * ", map { "(1 - x^$_)" } @S);
+        my $code     = "iferr(polcoeff(1/($prod_str) + O(x^($n+1)), $n), E, \"\")";
+        if (my $res = _execute_pari_gp($code)) {
+            if ($res =~ /^\d+$/) {
+                return _set_int($res);
+            }
+        }
+    }
+
+    # Standard DP array using GMPz
+    my @dp = (Math::GMPz::Rmpz_init_set_ui(1), map { Math::GMPz::Rmpz_init_set_ui(0) } 1 .. $n);
+
+    for my $coin (@S) {
+        for my $i ($coin .. $n) {
+            Math::GMPz::Rmpz_add($dp[$i], $dp[$i], $dp[$i - $coin]);
+        }
+    }
+
+    my $r = $dp[$n];
+    bless \$r;
+}
+
 sub partition_count {
-    my ($n) = @_;
+    my ($n, $set) = @_;
+
+    if (defined($set)) {
+        return _partition_count_for_set($n, $set);
+    }
 
     $n = _big2uistr($$n) // goto &nan;
 
