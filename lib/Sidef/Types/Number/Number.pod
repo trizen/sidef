@@ -4295,6 +4295,34 @@ Aliases: I<fib>
 
 =cut
 
+=head2 fibonacci_inverse
+
+    fibonacci_inverse(n)
+
+Returns the index of the Fibonacci number C<n>.
+
+If C<n = F(k)>, where C<F(k)> denotes the C<k>-th Fibonacci number, the
+function returns C<k>. If C<n> is not a Fibonacci number, the function
+returns C<-1>.
+
+The Fibonacci indexing used is
+
+    F(0) = 0
+    F(1) = 1
+    F(2) = 1
+    F(3) = 2
+    F(4) = 3
+    ...
+
+Examples:
+
+    say 144.fibonacci_inverse    # => 12
+    say 145.fibonacci_inverse    # => -1
+
+Aliases: I<fib_inverse>
+
+=cut
+
 =head2 fusc
 
     fusc(n)

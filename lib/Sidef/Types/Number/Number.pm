@@ -1046,11 +1046,11 @@ sub _array {
 }
 
 sub _sanitize_mpz {
-    my ($n, $k) = @_;
+    my ($n) = @_;
 
     if (ref($n) ne 'Math::GMPz') {
         __is_int__($n) || return undef;
-        $n = _any2mpz($n, $k) // return undef;
+        $n = _any2mpz($n) // return undef;
     }
 
     $n;
@@ -10743,6 +10743,7 @@ sub is_smith {
     $n    = $$n;
     $base = defined($base) ? do { ref($base) eq __PACKAGE__ or _valid(\$base); _any2ui($$base) // return $FALSE } : 10;
 
+    __is_int__($n) || return $FALSE;
     return $FALSE if ($base < 2);
 
     # Exclude primes and trivial small values
@@ -21796,13 +21797,13 @@ sub is_ntf {
         }
     }
 
-    $x = _sanitize_mpz($x, 0) // return $FALSE;
+    $x = _sanitize_mpz($x) // return $FALSE;
 
     Math::GMPz::Rmpz_cmp_ui($x, 1) > 0
       or return $FALSE;
 
     ref($y) eq __PACKAGE__ or _valid(\$y);
-    $y = _sanitize_mpz($$y, 1) // return $FALSE;
+    $y = _sanitize_mpz($$y) // return $FALSE;
 
     (Math::GMPz::Rmpz_cmp($x, $y) < 0 and Math::GMPz::Rmpz_divisible_p($y, $x)) ? $TRUE : $FALSE;
 }
@@ -21819,18 +21820,18 @@ sub is_coprime {
 
     if (FAST_MODE and !ref($x)) {
         my $r = (!ref($y)) ? ((HAS_PRIME_UTIL ? Math::Prime::Util::gcd($x, $y) : Math::Prime::Util::GMP::gcd($x, $y)) == 1) : do {
-            $y = _sanitize_mpz($y, 0) // return $FALSE;
+            $y = _sanitize_mpz($y) // return $FALSE;
             Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $y, CORE::abs($x)) == 1;
         };
         return ($r ? $TRUE : $FALSE);
     }
     elsif (!ref($y)) {
-        $x = _sanitize_mpz($x, 0) // return $FALSE;
+        $x = _sanitize_mpz($x) // return $FALSE;
         return ((Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $x, CORE::abs($y)) == 1) ? $TRUE : $FALSE);
     }
 
-    $x = _sanitize_mpz($x, 0) // return $FALSE;
-    $y = _sanitize_mpz($y, 1) // return $FALSE;
+    $x = _sanitize_mpz($x) // return $FALSE;
+    $y = _sanitize_mpz($y) // return $FALSE;
 
     state $t = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_gcd($t, $x, $y);
@@ -21889,16 +21890,16 @@ sub gcd {
         if (!ref($y)) {
             return bless(\(my $g = (HAS_PRIME_UTIL ? Math::Prime::Util::gcd($x, $y) : Math::Prime::Util::GMP::gcd($x, $y))));
         }
-        $y = _sanitize_mpz($y, 0) // goto &nan;
+        $y = _sanitize_mpz($y) // goto &nan;
         return bless(\(my $g = Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $y, CORE::abs($x))));
     }
     elsif (FAST_MODE and !ref($y)) {
-        $x = _sanitize_mpz($x, 0) // goto &nan;
+        $x = _sanitize_mpz($x) // goto &nan;
         return bless(\(my $g = Math::GMPz::Rmpz_gcd_ui($Math::GMPz::NULL, $x, CORE::abs($y))));
     }
 
-    $x = _sanitize_mpz($x, 0) // goto &nan;
-    $y = _sanitize_mpz($y, 1) // goto &nan;
+    $x = _sanitize_mpz($x) // goto &nan;
+    $y = _sanitize_mpz($y) // goto &nan;
 
     state $r = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_gcd($r, $x, $y);
@@ -22707,7 +22708,7 @@ sub _primality_pretest {
         return 1;
     }
 
-    $n = _sanitize_mpz($n, 0) // return;
+    $n = _sanitize_mpz($n) // return;
 
     # Must be greater than 1 (first check)
     (Math::GMPz::Rmpz_cmp_ui($n, 1) > 0) || return;
@@ -22915,8 +22916,8 @@ sub is_gaussian_prime {
         $y = ZERO;
     }
 
-    $x = _sanitize_mpz($$x, 0) // return $FALSE;
-    $y = _sanitize_mpz($$y, 1) // return $FALSE;
+    $x = _sanitize_mpz($$x) // return $FALSE;
+    $y = _sanitize_mpz($$y) // return $FALSE;
 
     Math::Prime::Util::GMP::is_gaussian_prime($x, $y) ? $TRUE : $FALSE;
 }
@@ -22930,7 +22931,7 @@ sub is_safe_prime {
         return (Math::Prime::Util::is_safe_prime($n) ? $TRUE : $FALSE);
     }
 
-    $n = _sanitize_mpz($n, 0) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
 
     (Math::GMPz::Rmpz_odd_p($n) && _primality_pretest($n))
       || return $FALSE;
@@ -23255,7 +23256,7 @@ sub is_squarefree_almost_prime {
 
     my $n_obj = $n;
 
-    $n = _sanitize_mpz($$n, 0) // return $FALSE;
+    $n = _sanitize_mpz($$n) // return $FALSE;
 
     Math::GMPz::Rmpz_sgn($n) > 0
       or return $FALSE;
@@ -26793,9 +26794,17 @@ sub lpf {
 
     if (FAST_MODE and !ref($n) and $n < 0xffffffff) {
         $n >= 0 or goto &nan;
-        return _set_int($n) if ($n <= 1);
-        my @f = _factor($n);
-        return _set_int($f[0]);
+        return bless \$n if ($n <= 1);
+
+        $n % 2 == 0 and return TWO;
+        $n % 3 == 0 and return THREE;
+
+        my @f =
+          HAS_PRIME_UTIL
+          ? Math::Prime::Util::factor($n)
+          : Math::Prime::Util::GMP::factor($n);
+        my $r = $f[0];
+        return bless \$r;
     }
 
     $n = _any2mpz($n) // goto &nan;
@@ -34027,7 +34036,7 @@ sub prime_usigma {
 sub sigma0 {
     my ($n) = @_;
 
-    $n = _sanitize_mpz($$n, 0) // goto &nan;
+    $n = _sanitize_mpz($$n) // goto &nan;
 
     (Math::GMPz::Rmpz_sgn($n) || return ZERO) > 0 or goto &nan;
 
@@ -34063,7 +34072,7 @@ sub sigma {
         return _set_int(Math::Prime::Util::divisor_sum($n));
     }
 
-    $n = _sanitize_mpz($n, 0) // goto &nan;
+    $n = _sanitize_mpz($n) // goto &nan;
     (Math::GMPz::Rmpz_sgn($n) || return ZERO) > 0 or goto &nan;
 
     my $r;
@@ -34290,7 +34299,7 @@ sub aliquot {
         return _set_int(Math::Prime::Util::aliquot_sum($n));
     }
 
-    $n = _sanitize_mpz($n, 0) // goto &nan;
+    $n = _sanitize_mpz($n) // goto &nan;
     (Math::GMPz::Rmpz_sgn($n) || return ZERO) > 0 or goto &nan;
 
     if (defined($k)) {
@@ -38224,7 +38233,7 @@ sub is_squarefree {
                );
     }
 
-    $n = _sanitize_mpz($n, 0) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
 
     my $size = Math::GMPz::Rmpz_sizeinbase($n, 2);
 
@@ -38278,7 +38287,7 @@ sub is_powerfree {
         return ((bless \$n)->is_squarefree);
     }
 
-    $n = _sanitize_mpz($n, 0) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
 
     if (Math::GMPz::Rmpz_sgn($n) <= 0) {
         return $FALSE;
@@ -38340,7 +38349,7 @@ sub is_practical {    # OEIS: A005153
 sub is_fibonacci {    # OEIS: A010056
     my ($n) = @_;
 
-    $n = _sanitize_mpz($$n, 0) // return $FALSE;
+    $n = _sanitize_mpz($$n) // return $FALSE;
 
     state $t = Math::GMPz::Rmpz_init_nobless();
 
@@ -38362,10 +38371,45 @@ sub is_fibonacci {    # OEIS: A010056
 
 *is_fib = \&is_fibonacci;
 
+sub fibonacci_inverse {
+    my ($n) = @_;
+
+    $n = _sanitize_mpz($$n) // return MONE;
+    Math::GMPz::Rmpz_sgn($n) < 0 and return MONE;
+    (bless \$n)->is_fibonacci or return MONE;
+
+    # Handle base cases
+    return ZERO if Math::GMPz::Rmpz_sgn($n) == 0;
+    return ONE  if Math::GMPz::Rmpz_cmp_ui($n, 1) == 0;
+
+    # Use the property:
+    #   index ≈ round(log(n * sqrt(5)) / log(phi))
+
+    local $PREC = 64;
+    state $sqrt_5 = _set_int(5)->sqrt;
+    state $phi    = Sidef::Types::Number::Number->phi;
+
+    my $approx = (bless \$n)->mul($sqrt_5)->log($phi);
+    my $low    = ${$approx->floor->to_i};
+
+    $low = 0 if $low < 0;
+
+    state $fib = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_fib_ui($fib, $low);
+
+    if (Math::GMPz::Rmpz_cmp($fib, $n) == 0) {
+        return _set_int($low);
+    }
+
+    return _set_int($low + 1);
+}
+
+*fib_inverse = \&fibonacci_inverse;
+
 sub is_lucas {    # OEIS: A102460
     my ($n) = @_;
 
-    $n = _sanitize_mpz($$n, 0) // return $FALSE;
+    $n = _sanitize_mpz($$n) // return $FALSE;
 
     Math::GMPz::Rmpz_cmp_ui($n, 1) >= 0
       or return $FALSE;
@@ -38465,7 +38509,7 @@ sub is_cyclic {    # OEIS: A003277
         return $FALSE;
     }
 
-    $n = _sanitize_mpz($n, 0) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
 
     Math::GMPz::Rmpz_sgn($n) > 0
       or return $FALSE;
@@ -38584,7 +38628,7 @@ sub is_carmichael {    # OEIS: A002997
                ) ? $TRUE : $FALSE;
     }
 
-    $n = _sanitize_mpz($n, 0) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
 
     # Small or even
     Math::GMPz::Rmpz_odd_p($n)            or return $FALSE;
@@ -38677,7 +38721,7 @@ sub is_absolute_euler_psp {    # OEIS: A033181
           || return $FALSE;
     }
 
-    $n = _sanitize_mpz($n, 0) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
 
     Math::GMPz::Rmpz_odd_p($n)             or return $FALSE;
     Math::GMPz::Rmpz_cmp_ui($n, 1729) >= 0 or return $FALSE;
@@ -38764,7 +38808,7 @@ sub is_absolute_euler_psp {    # OEIS: A033181
 sub is_imprimitive_carmichael {    # OEIS: A328935
     my ($n) = @_;
 
-    $n = _sanitize_mpz($$n, 0) // return $FALSE;
+    $n = _sanitize_mpz($$n) // return $FALSE;
 
     Math::GMPz::Rmpz_cmp_ui($n, 294409) >= 0 or return $FALSE;
 
@@ -38835,7 +38879,7 @@ sub is_lucas_carmichael {    # OEIS: A006972
     # ---------------------------------------------------------
     # GMPz Initialization & Base Checks
     # ---------------------------------------------------------
-    $n = _sanitize_mpz($n, 0) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
 
     Math::GMPz::Rmpz_odd_p($n)            or return $FALSE;
     Math::GMPz::Rmpz_cmp_ui($n, 399) >= 0 or return $FALSE;
@@ -38925,8 +38969,8 @@ sub is_smooth_over_prod {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _sanitize_mpz($$n, 0) // return $FALSE;
-    $k = _sanitize_mpz($$k, 1) // return $FALSE;
+    $n = _sanitize_mpz($$n) // return $FALSE;
+    $k = _sanitize_mpz($$k) // return $FALSE;
 
     return $FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
     return $FALSE if Math::GMPz::Rmpz_sgn($k) <= 0;
@@ -38956,7 +39000,7 @@ sub is_smooth {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _sanitize_mpz($$n, 0) // return $FALSE;
+    $n = _sanitize_mpz($$n) // return $FALSE;
     $k = _any2ui($$k);
 
     if (!defined($k) or $k > 1e8) {
@@ -38992,7 +39036,7 @@ sub is_rough {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _sanitize_mpz($$n, 0) // return $FALSE;
+    $n = _sanitize_mpz($$n) // return $FALSE;
     $k = _any2ui($$k);
 
     if (!defined($k) or $k > 1e8) {
@@ -39320,8 +39364,8 @@ sub smooth_part {
 
     ref($n) eq __PACKAGE__ or _valid(\$n);
 
-    $n = _sanitize_mpz($$n, 0) // goto &nan;
-    $k = _any2ui($$k)          // goto &nan;
+    $n = _sanitize_mpz($$n) // goto &nan;
+    $k = _any2ui($$k)       // goto &nan;
 
     return ZERO if Math::GMPz::Rmpz_sgn($n) <= 0;
     return ONE  if $k <= 1;
@@ -39358,8 +39402,8 @@ sub rough_part {
 
     ref($n) eq __PACKAGE__ or _valid(\$n);
 
-    $n = _sanitize_mpz($$n, 0) // goto &nan;
-    $k = _any2ui($$k)          // goto &nan;
+    $n = _sanitize_mpz($$n) // goto &nan;
+    $k = _any2ui($$k)       // goto &nan;
 
     --$k;
 
@@ -39554,7 +39598,7 @@ sub is_power {
         return ($res ? $TRUE : $FALSE);
     }
 
-    $n = _sanitize_mpz($n, 0) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
 
     if (defined($k)) {
         ref($k) eq __PACKAGE__ or _valid(\$k);
@@ -39794,8 +39838,8 @@ sub prev_perfect_power {
 sub is_power_of {
     my ($n, $k) = @_;
 
-    $n = _sanitize_mpz($$n, 0) // return $FALSE;
-    $k = _sanitize_mpz($$k, 1) // return $FALSE;
+    $n = _sanitize_mpz($$n) // return $FALSE;
+    $k = _sanitize_mpz($$k) // return $FALSE;
 
     if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
         return $TRUE;
@@ -39967,7 +40011,7 @@ sub is_powerful {
         return $TRUE;
     }
 
-    $n = _sanitize_mpz($n, 0) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
 
     Math::GMPz::Rmpz_sgn($n) > 0
       or return $FALSE;
@@ -40056,7 +40100,7 @@ sub is_achilles {
 sub is_perfect {
     my ($n) = @_;
 
-    $n = _sanitize_mpz($$n, 0) // return $FALSE;
+    $n = _sanitize_mpz($$n) // return $FALSE;
 
     Math::GMPz::Rmpz_sgn($n) > 0
       or return $FALSE;
@@ -40101,7 +40145,8 @@ sub is_perfect {
 
 sub is_pseudoperfect {
     my ($n) = @_;
-    $n = _any2mpz($$n) // return $FALSE;
+
+    $n = _sanitize_mpz($$n) // return $FALSE;
     return $FALSE if Math::GMPz::Rmpz_sgn($n) <= 0;
 
     my @divs = map { Math::GMPz::Rmpz_init_set_str($_, 10) } _divisors(Math::GMPz::Rmpz_get_str($n, 10));
@@ -40413,8 +40458,8 @@ sub is_polygonal {
                );
     }
 
-    $n = _sanitize_mpz($n, 0) // return $FALSE;
-    $k = _sanitize_mpz($k, 1) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
+    $k = _sanitize_mpz($k) // return $FALSE;
 
     __is_polygonal__($n, $k) ? $TRUE : $FALSE;
 }
@@ -40424,8 +40469,8 @@ sub is_polygonal2 {
 
     ref($k) eq __PACKAGE__ or _valid(\$k);
 
-    $n = _sanitize_mpz($$n, 0) // return $FALSE;
-    $k = _sanitize_mpz($$k, 1) // return $FALSE;
+    $n = _sanitize_mpz($$n) // return $FALSE;
+    $k = _sanitize_mpz($$k) // return $FALSE;
 
     __is_polygonal__($n, $k, 1) ? $TRUE : $FALSE;
 }
@@ -40987,7 +41032,7 @@ sub is_palindrome {
         $k = _any2mpz($$k) // return $FALSE;
     }
 
-    $n = _sanitize_mpz($n, 5) // return $FALSE;
+    $n = _sanitize_mpz($n) // return $FALSE;
 
     Math::GMPz::Rmpz_sgn($n) >= 0
       or return $FALSE;
