@@ -26,7 +26,7 @@
 
 ---
 
-## 🌟 Why Sidef?
+## 🌟 What is Sidef?
 
 Sidef is a modern, expressive programming language that combines the elegance of Ruby, the versatility of Raku, and the mathematical power of a built-in computer algebra system. It features **exact rational arithmetic by default**, an extensive **number theory library** (1,000+ functions), and seamless **Perl module integration** — making it equally at home for scripting, mathematical research, and general-purpose programming.
 
@@ -36,31 +36,57 @@ say (1/3 + 1/6)         #=> 1/2
 
 # Built-in number theory
 say (2**127 - 1)        #=> 170141183460469231731687303715884105727 (Mersenne prime)
-say factor(2**64 - 1)   #=> [3, 5, 17, 257, 641, 65537, 6700417]
+say factor(2**128 + 1)  #=> [59649589127497217, 5704689200685129054721]
 
 # Expressive, concise syntax
-say 29.primes           #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+say 29.primes.map{.square}     #=> [4, 9, 25, 49, 121, 169, 289, 361, 529, 841]
 ```
 
-## ✨ Key Features
+## 🎯 Who is Sidef for?
 
-**Programming Paradigms**
-- Object-oriented programming with multiple dispatch
-- Functional programming and pattern matching
-- Lexical scoping and closures
-- Keyword arguments and optional lazy evaluation
+Sidef is an excellent choice for:
 
-**Numeric Computing**
-- Exact rational numbers by default
-- Arbitrary-precision integers, floats, and complex numbers
-- 1,000+ built-in number theory functions (backed by GMP, MPFR, MPC)
-- Gaussian integers, quaternions, matrices, polynomials
+- Mathematical research and experimentation
+- Number theory and cryptography
+- Project Euler and competitive programming
+- Symbolic computation and computer algebra
+- Scientific computing
+- Rapid scripting and automation
+- Algorithm prototyping
+- Perl developers seeking a higher-level language
 
-**Language & Integration**
-- Regular expressions and string interpolation
-- Optional dynamic type checking
-- Seamless Perl module integration
-- REPL with interactive help (`-H` flag)
+## 🏆 Why choose Sidef?
+
+| Feature | Sidef | Python | Ruby |
+|---|:---:|:---:|:---:|
+| Exact rational arithmetic by default | ✅ | ❌ | ❌ |
+| Arbitrary-precision integers | ✅ | ✅ | ✅ |
+| Extensive built-in number theory | ✅ | ❌ | ❌ |
+| Computer algebra features | ✅ | ❌ | ❌ |
+| Multiple dispatch | ✅ | ❌ | Limited |
+| Perl interoperability | ✅ | ❌ | ❌ |
+
+## ✨ Featured Capabilities
+
+- 🔢 Exact arithmetic by default
+- 🧮 Built-in computer algebra
+- 🔬 1,000+ number theory functions
+- ♾ Lazy evaluation and infinite sequences
+- 🧠 Pattern matching and multiple dispatch
+- 📐 Matrices, polynomials and Gaussian integers
+- ⚡ Arbitrary-precision arithmetic via GMP/MPFR/MPC
+- 📦 Seamless Perl module interoperability
+- 🖥 Interactive REPL with built-in help
+
+## 🚀 Real-world Uses
+
+- Project Euler solutions
+- OEIS research and experimentation
+- Integer factorization and primality testing
+- Cryptography and modular arithmetic
+- Scientific scripting
+- Algorithm prototyping
+- General-purpose automation
 
 ## 🚀 Quick Start
 
@@ -442,6 +468,10 @@ for y in (1 `downto` -1 `by` 0.05) {
 ```
 </details>
 
+## ⚡ Performance
+
+Although Sidef is a high-level language, its numerical core is powered by highly optimized native libraries including [GMP](https://gmplib.org/), [MPFR](https://www.mpfr.org/), [MPC](https://www.multiprecision.org/mpc/), and [Math::Prime::Util::GMP](https://metacpan.org/pod/Math::Prime::Util::GMP). This allows computations with extremely large integers and high-precision arithmetic while keeping programs concise and expressive.
+
 ## 📚 Documentation & Learning Resources
 
 | Resource | Description |
@@ -449,7 +479,9 @@ for y in (1 `downto` -1 `by` 0.05) {
 | 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
 | 📄 [Beginner's Guide](https://github.com/trizen/sidef/blob/master/SIDEF_BEGINNER_GUIDE.md) | Start here if you're new to Sidef |
 | 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | Comprehensive language tutorial |
-| 🔢 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
+| 📕 [Full PDF Documentation](https://github.com/trizen/sidef/releases/download/26.07/sidef-documentation.pdf) | Offline PDF version of the complete language documentation |
+| 📑 [Number Theory Cheatsheet](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_CHEATSHEET.md) | Quick reference for Sidef's number theory functions |
+| 📚 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
 | 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) | Complete function reference for number theory |
 
 ### Example Code
@@ -458,6 +490,10 @@ for y in (1 `downto` -1 `by` 0.05) {
 |----------|-------------|
 | 📂 [sidef-scripts](https://github.com/trizen/sidef-scripts) | Hundreds of real Sidef programs — the best way to learn by reading |
 | 🌹 [RosettaCode — Sidef](https://rosettacode.org/wiki/Sidef) | Classic programming tasks solved in Sidef, side-by-side with other languages |
+
+## 🎨 Design Philosophy
+
+Sidef combines expressive modern programming constructs with exact mathematics and symbolic computation. The language is designed to make advanced algorithms concise, readable, and practical while remaining fully interoperable with the Perl ecosystem.
 
 ## 💬 Community & Support
 
