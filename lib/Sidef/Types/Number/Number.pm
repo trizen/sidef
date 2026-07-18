@@ -10744,11 +10744,11 @@ sub is_smith {
     $base = defined($base) ? do { ref($base) eq __PACKAGE__ or _valid(\$base); _any2ui($$base) // return $FALSE } : 10;
 
     __is_int__($n) || return $FALSE;
+    return $FALSE if ($n <= 3);
     return $FALSE if ($base < 2);
 
     # Exclude primes and trivial small values
     if (FAST_MODE and !ref($n)) {
-        return $FALSE if ($n <= 3);
         return $FALSE if (HAS_PRIME_UTIL ? Math::Prime::Util::is_prime($n) : Math::Prime::Util::GMP::is_prime($n));
     }
     else {
