@@ -47,11 +47,10 @@ say 29.primes.map{.square}     #=> [4, 9, 25, 49, 121, 169, 289, 361, 529, 841]
 Sidef is an excellent choice for:
 
 - Mathematical research and experimentation
-- Number theory and cryptography
+- Computational number theory and cryptography
 - Project Euler and competitive programming
-- Symbolic computation and computer algebra
-- Scientific computing
-- Rapid scripting and automation
+- Scientific computing and computer algebra
+- Rapid scripting and general-purpose automation
 - Algorithm prototyping
 - Perl developers seeking a higher-level language
 
@@ -78,15 +77,6 @@ Sidef is an excellent choice for:
 - 📦 Seamless Perl module interoperability
 - 🖥 Interactive REPL with built-in help
 
-## 🚀 Real-world Uses
-
-- Project Euler solutions
-- OEIS research and experimentation
-- Integer factorization and primality testing
-- Cryptography and modular arithmetic
-- Scientific scripting
-- Algorithm prototyping
-- General-purpose automation
 
 ## 🚀 Quick Start
 
