@@ -14828,6 +14828,33 @@ sub fibonorial {
     bless \_binsplit(\@terms, \&__mul__);
 }
 
+sub _pisano_prime_power_period {
+    my ($p, $e) = @_;
+
+    # Start with the maximum possible rank of apparition modulo p: L = p - kronecker(5, p)
+    my $L = Math::Prime::Util::GMP::subint($p, Math::Prime::Util::GMP::kronecker(5, $p));
+
+    # Iteratively strip away prime factors to find the minimal period
+    foreach my $pe (_factor_exp($L)) {
+        my ($q, $k) = @$pe;
+
+        for (1 .. $k) {
+            my $next_L = Math::Prime::Util::GMP::divint($L, $q);
+
+            # If dividing by q still results in a valid rank, keep the smaller L
+            if (_modular_lucas_U(1, -1, $next_L, $p) == 0) {
+                $L = $next_L;
+            }
+            else {
+                last;    # q is an essential factor; stop trying to divide it out
+            }
+        }
+    }
+
+    $e == 1 and return $L;
+    Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::powint($p, $e - 1), $L);
+}
+
 sub pisano_period {
     my ($n) = @_;
 
@@ -14845,18 +14872,7 @@ sub pisano_period {
         $n == 1 and return ONE;
     }
 
-    my $prime_power_period = sub {
-        my ($p, $e) = @_;
-        foreach my $d (_divisors(Math::Prime::Util::GMP::subint($p, Math::Prime::Util::GMP::kronecker(5, $p)))) {
-            if (_modular_lucas_U(1, -1, $d, $p) == 0) {
-                $e == 1 and return $d;
-                return Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::powint($p, $e - 1), $d);
-            }
-        }
-        die "Conjecture disproved for prime power: $p^$e";
-    };
-
-    my $d = Math::GMPz::Rmpz_init_set_str(Math::Prime::Util::GMP::lcm(map { $prime_power_period->($_->[0], $_->[1]) } _factor_exp($n)), 10);
+    my $d = _any2mpz(Math::Prime::Util::GMP::lcm(map { _pisano_prime_power_period($_->[0], $_->[1]) } _factor_exp($n)));
 
     foreach my $k (0 .. 2) {
 
