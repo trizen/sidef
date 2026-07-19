@@ -15405,8 +15405,9 @@ sub solve_quadratic_form {
         return $n->sum_of_squares;
     }
 
+    # Intercept negative discriminant and route to the Generalized Pell solver
     if ($d->is_neg) {
-        return _array();
+        return $d->neg->solve_pell($n);
     }
 
     # FAST PATH: PARI/GP General Quadratic Form Solver
@@ -15506,16 +15507,84 @@ sub solve_binary_quadratic_form {
     my $c_z = _any2mpz($$C) // return _array();
     my $n_z = _any2mpz($$n) // return _array();
 
-    # Reduce to $X^2 + D Y^2 = 4an$ where X = 2ax + by, Y = y, D = 4ac - b^2
-    # Only applicable for positive-definite forms (D > 0, a > 0).
+    if (Math::GMPz::Rmpz_sgn($a_z) == 0) {
+        return _array();
+    }
+
+    # Normalize a > 0 to preserve the mathematical integrity of the reduction
+    if (Math::GMPz::Rmpz_sgn($a_z) < 0) {
+        Math::GMPz::Rmpz_neg($a_z, $a_z);
+        Math::GMPz::Rmpz_neg($b_z, $b_z);
+        Math::GMPz::Rmpz_neg($c_z, $c_z);
+        Math::GMPz::Rmpz_neg($n_z, $n_z);
+    }
+
+    # Reduce to X^2 + D Y^2 = 4an where X = 2ax + by, Y = y, D = 4ac - b^2
+    # Now universally applicable for elliptic (D > 0) and hyperbolic (D < 0) forms.
     my $D_z = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_mul($D_z, $a_z, $c_z);
     Math::GMPz::Rmpz_mul_ui($D_z, $D_z, 4);
+
+    # Parabolic form fallback (D == 0)
+    if (Math::GMPz::Rmpz_sgn($D_z) == 0) {
+        my $scaled_n = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul($scaled_n, $a_z, $n_z);
+        Math::GMPz::Rmpz_mul_ui($scaled_n, $scaled_n, 4);
+
+        # 4an must be a perfect square
+        if (!Math::GMPz::Rmpz_perfect_square_p($scaled_n)) {
+            return _array();
+        }
+
+        my $S = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sqrt($S, $scaled_n);
+
+        my $two_a = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul_ui($two_a, $a_z, 2);
+
+        # Extended Euclidean Algorithm: g = u*(2a) + v*(b)
+        my $g = Math::GMPz::Rmpz_init();
+        my $u = Math::GMPz::Rmpz_init();
+        my $v = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_gcdext($g, $u, $v, $two_a, $b_z);
+
+        my @base_sols;
+
+        # Test both +S and -S
+        for my $sign (1, -1) {
+            my $curr_S = Math::GMPz::Rmpz_init_set($S);
+            Math::GMPz::Rmpz_neg($curr_S, $curr_S) if $sign < 0;
+
+            if (Math::GMPz::Rmpz_divisible_p($curr_S, $g)) {
+                my $k = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_divexact($k, $curr_S, $g);
+
+                my $x0 = Math::GMPz::Rmpz_init();
+                my $y0 = Math::GMPz::Rmpz_init();
+
+                # Base solutions: x0 = u * (S/g), y0 = v * (S/g)
+                Math::GMPz::Rmpz_mul($x0, $u, $k);
+                Math::GMPz::Rmpz_mul($y0, $v, $k);
+
+                push @base_sols, _array([bless(\$x0), bless(\$y0)]);
+            }
+        }
+
+        if (@base_sols) {
+            my %seen;
+            @base_sols = grep { !$seen{"${$_->[0]};${$_->[1]}"}++ } @base_sols;
+            @base_sols = sort { ${$a->[0]} <=> ${$b->[0]} || ${$a->[1]} <=> ${$b->[1]} } @base_sols;
+            return _array(\@base_sols);
+        }
+        return _array();
+    }
+
     state $b2 = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_mul($b2, $b_z, $b_z);
     Math::GMPz::Rmpz_sub($D_z, $D_z, $b2);
 
-    if (Math::GMPz::Rmpz_sgn($D_z) > 0 && Math::GMPz::Rmpz_sgn($a_z) > 0) {
+    # Allow any non-parabolic form (D != 0)
+    if (Math::GMPz::Rmpz_sgn($D_z) != 0) {
         my $scaled_n = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mul($scaled_n, $a_z, $n_z);
         Math::GMPz::Rmpz_mul_ui($scaled_n, $scaled_n, 4);
