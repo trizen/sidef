@@ -1113,7 +1113,7 @@ Pell's equation $x^2 - D \cdot y^2 = 1$ has its fundamental solution encoded in 
 
 ```ruby
 # Built-in solver
-var (x, y) = solve_pell(61)
+var (x, y) = solve_pell(61)[0]...
 say "x = #{x}, y = #{y}"
 
 # Manual implementation using the CF period

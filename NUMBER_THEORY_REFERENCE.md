@@ -166,7 +166,7 @@ sqrt_cfrac_period_len(n)    # length of the continued fraction period of sqrt(n)
 convergents(n)              # continued fraction convergents of n
 rat_approx(n)               # rational approximation of n
 
-var(x,y)=solve_pell(n)      # smallest solution to Pell's equation: x^2 - n*y^2 = 1
+solve_pell(d, n)            # solutions to generalized Pell's equation: x^2 - d*y^2 = n
 
 digits(n, base=10)          # array with digits of n in a given base
 digits_sum(n, base=10)      # sum of digits of n in a given base

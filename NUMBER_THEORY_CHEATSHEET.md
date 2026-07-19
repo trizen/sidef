@@ -1409,18 +1409,16 @@ say Num.pi.rat_approx(1000)  # 355/113
 The fundamental solution comes from the convergents of √D:
 
 ```ruby
-say solve_pell(2)   # [3, 2]:  3^2 − 2·2^2 = 1
-say solve_pell(7)   # [8, 3]:  8^2 − 7·3^2 = 1
-say solve_pell(61)  # [1766319049, 226153980] — famously large
-
-var (x0, y0) = solve_pell(7)...
-say x0**2 - 7*y0**2  # 1 ✓
+say solve_pell(2)   # [[3, 2]]:  3^2 − 2·2^2 = 1
+say solve_pell(7)   # [[8, 3]]:  8^2 − 7·3^2 = 1
+say solve_pell(61)  # [[1766319049, 226153980]] — famously large
 
 # Optional second argument k: solve x² − D·y² = k:
-say solve_pell(2, -1)  # [1, 1]: 1 − 2·1 = −1
+say solve_pell(2, -1)  # [[1, 1]]: 1 − 2·1 = −1
 
 # Generating further solutions via composition:
 # (x_n + y_n√D) = (x_0 + y_0√D)^n
+var (x0, y0) = solve_pell(7)[0]...
 var (x, y) = (x0, y0)
 for k in (1..5) {
     say "Solution #{k}: (#{x}, #{y}),  x²-7y²=#{x**2 - 7*y**2}"
@@ -2642,9 +2640,9 @@ sqrtmod(a, m)               #=> √a mod m
 rootmod(a, k, m)            #=> k-th root of a mod m
 sqrtmod_all(a, m)           #=> all square roots of a mod m
 linear_congruence(a, b, m)  #=> all x with ax ≡ b (mod m)
-n.cornacchia(d)             #=> [x,y] with x^2+d·y^2=n
-solve_pell(D)               #=> [x,y] fundamental solution of x^2−Dy^2=1
-solve_pell(D, k)            #=> [x,y] for x^2−Dy^2=k
+cornacchia(D, n)            #=> [[x,y]] with x^2+Dy^2=n
+solve_pell(D)               #=> [[x,y]] fundamental solution of x^2−Dy^2=1
+solve_pell(D, n)            #=> [[x,y]] for x^2−Dy^2=n
 squares_r(n, k)             #=> r_k(n): representation count as sum of k squares
 
 #── Sublinear sums ──────────────────────────────────────────────────────
@@ -2737,7 +2735,7 @@ n.convergents(k)
 n.pisano_period
 x.rat_approx(max_den)  #=> best p/q with q ≤ max_den
 solve_pell(D)
-solve_pell(D, k)
+solve_pell(D, n)
 
 #── Combinatorics ───────────────────────────────────────────────────────
 partitions(n)
