@@ -9385,7 +9385,7 @@ sub solve_pell {
     }
 
     # Use PARI/GP for large Pell equations
-    if ($USE_PARI_GP && Math::GMPz::Rmpz_sizeinbase($d, 2) > 16) {
+    if ($USE_PARI_GP && (Math::GMPz::Rmpz_sizeinbase($d, 2) > 16 or Math::GMPz::Rmpz_sizeinbase($n, 2) > 32)) {
         my $d_str = Math::GMPz::Rmpz_get_str($d, 10);
 
         if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
