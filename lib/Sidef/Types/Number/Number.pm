@@ -9464,103 +9464,120 @@ sub solve_pell {
     }
 
     # --- Arbitrary N Path (LMM Algorithm) ---
-    my @roots = @{(bless \$d)->sqrtmod_all(bless \$abs_n)};
-    @roots or return _array();
+    my @sq_divs = @{(bless \$abs_n)->square_divisors};
 
+    my @solutions;
     my $sqrt_d = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_sqrt($sqrt_d, $d);
 
-    my $half_n = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_tdiv_q_2exp($half_n, $abs_n, 1);
-
     # Pre-allocate iteration variables to avoid GC thrashing in tight loops
-    my $P_var = Math::GMPz::Rmpz_init();
-    my $Q_var = Math::GMPz::Rmpz_init();
-    my $X_var = Math::GMPz::Rmpz_init();
-    my $Y_var = Math::GMPz::Rmpz_init();
-    my $a_var = Math::GMPz::Rmpz_init();
-    my $P_new = Math::GMPz::Rmpz_init();
-    my $Q_new = Math::GMPz::Rmpz_init();
-    my $X_new = Math::GMPz::Rmpz_init();
-    my $Y_new = Math::GMPz::Rmpz_init();
-    my $x2    = Math::GMPz::Rmpz_init();
-    my $y2    = Math::GMPz::Rmpz_init();
-    my $diff  = Math::GMPz::Rmpz_init();
-    my $dy    = Math::GMPz::Rmpz_init();
-    my $z_var = Math::GMPz::Rmpz_init();
+    my $P_var  = Math::GMPz::Rmpz_init();
+    my $Q_var  = Math::GMPz::Rmpz_init();
+    my $X_var  = Math::GMPz::Rmpz_init();
+    my $Y_var  = Math::GMPz::Rmpz_init();
+    my $a_var  = Math::GMPz::Rmpz_init();
+    my $P_new  = Math::GMPz::Rmpz_init();
+    my $Q_new  = Math::GMPz::Rmpz_init();
+    my $X_new  = Math::GMPz::Rmpz_init();
+    my $Y_new  = Math::GMPz::Rmpz_init();
+    my $x2     = Math::GMPz::Rmpz_init();
+    my $y2     = Math::GMPz::Rmpz_init();
+    my $diff   = Math::GMPz::Rmpz_init();
+    my $dy     = Math::GMPz::Rmpz_init();
+    my $z_var  = Math::GMPz::Rmpz_init();
+    my $g      = Math::GMPz::Rmpz_init();
+    my $m      = Math::GMPz::Rmpz_init();
+    my $abs_m  = Math::GMPz::Rmpz_init();
+    my $half_m = Math::GMPz::Rmpz_init();
 
-    my @solutions;
+    foreach my $s_obj (@sq_divs) {
+        my $s = _any2mpz($$s_obj);
 
-    foreach my $r (@roots) {
-        Math::GMPz::Rmpz_set_str($z_var, "$$r", 10);
+        Math::GMPz::Rmpz_sqrt($g, $s);
+        Math::GMPz::Rmpz_divexact($m, $n, $s);    # m = n / s
+        Math::GMPz::Rmpz_abs($abs_m, $m);
 
-        # Standardize z to the LMM bounds: (-|N|/2, |N|/2]
-        if (Math::GMPz::Rmpz_cmp($z_var, $half_n) > 0) {
-            Math::GMPz::Rmpz_sub($z_var, $z_var, $abs_n);
-        }
+        my @roots = @{sqrtmod_all((bless \$d), (bless \$abs_m))};
+        next unless @roots;
 
-        # Initialize P = z, Q = (z^2 - d) / n
-        Math::GMPz::Rmpz_set($P_var, $z_var);
-        Math::GMPz::Rmpz_mul($Q_var, $z_var, $z_var);
-        Math::GMPz::Rmpz_sub($Q_var, $Q_var, $d);
-        Math::GMPz::Rmpz_divexact($Q_var, $Q_var, $n);
+        Math::GMPz::Rmpz_tdiv_q_2exp($half_m, $abs_m, 1);
 
-        Math::GMPz::Rmpz_set($X_var, $z_var);
-        Math::GMPz::Rmpz_set_ui($Y_var, 1);
+        foreach my $r (@roots) {
+            Math::GMPz::Rmpz_set_str($z_var, "$$r", 10);
 
-        my %seen;
-
-        while (1) {
-
-            # Verification step: if X^2 - d*Y^2 == N, we found the fundamental solution
-            Math::GMPz::Rmpz_mul($x2, $X_var, $X_var);
-            Math::GMPz::Rmpz_mul($y2, $Y_var, $Y_var);
-            Math::GMPz::Rmpz_mul($y2, $y2,    $d);
-            Math::GMPz::Rmpz_sub($diff, $x2, $y2);
-
-            if (Math::GMPz::Rmpz_cmp($diff, $n) == 0) {
-                my $abs_x = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_abs($abs_x, $X_var);
-                my $abs_y = Math::GMPz::Rmpz_init();
-                Math::GMPz::Rmpz_abs($abs_y, $Y_var);
-
-                push @solutions, _array([bless(\$abs_x), bless(\$abs_y)]);
-                last;
+            # Standardize z to the LMM bounds: (-|m|/2, |m|/2]
+            if (Math::GMPz::Rmpz_cmp($z_var, $half_m) > 0) {
+                Math::GMPz::Rmpz_sub($z_var, $z_var, $abs_m);
             }
 
-            # Cycle detection
-            my $p_str = Math::GMPz::Rmpz_get_str($P_var, 16);
-            my $q_str = Math::GMPz::Rmpz_get_str($Q_var, 16);
-            last if $seen{"$p_str:$q_str"}++;
+            # Initialize P = z, Q = (z^2 - d) / m
+            Math::GMPz::Rmpz_set($P_var, $z_var);
+            Math::GMPz::Rmpz_mul($Q_var, $z_var, $z_var);
+            Math::GMPz::Rmpz_sub($Q_var, $Q_var, $d);
+            Math::GMPz::Rmpz_divexact($Q_var, $Q_var, $m);
 
-            # a = floor((P + sqrt(d)) / Q)
-            Math::GMPz::Rmpz_add($a_var, $P_var, $sqrt_d);
-            Math::GMPz::Rmpz_fdiv_q($a_var, $a_var, $Q_var);
+            Math::GMPz::Rmpz_set($X_var, $z_var);
+            Math::GMPz::Rmpz_set_ui($Y_var, 1);
 
-            # P_new = a * Q - P
-            Math::GMPz::Rmpz_mul($P_new, $a_var, $Q_var);
-            Math::GMPz::Rmpz_sub($P_new, $P_new, $P_var);
+            my %seen;
 
-            # Q_new = (d - P_new^2) / Q
-            Math::GMPz::Rmpz_mul($Q_new, $P_new, $P_new);
-            Math::GMPz::Rmpz_sub($Q_new, $d, $Q_new);
-            Math::GMPz::Rmpz_divexact($Q_new, $Q_new, $Q_var);
+            while (1) {
 
-            # X_new = (P_new * X + d * Y) / Q
-            Math::GMPz::Rmpz_mul($X_new, $P_new, $X_var);
-            Math::GMPz::Rmpz_mul($dy,    $d,     $Y_var);
-            Math::GMPz::Rmpz_add($X_new, $X_new, $dy);
-            Math::GMPz::Rmpz_divexact($X_new, $X_new, $Q_var);
+                # Verification step: if X^2 - d*Y^2 == m, we found the fundamental solution for this class
+                Math::GMPz::Rmpz_mul($x2, $X_var, $X_var);
+                Math::GMPz::Rmpz_mul($y2, $Y_var, $Y_var);
+                Math::GMPz::Rmpz_mul($y2, $y2,    $d);
+                Math::GMPz::Rmpz_sub($diff, $x2, $y2);
 
-            # Y_new = (P_new * Y + X) / Q
-            Math::GMPz::Rmpz_mul($Y_new, $P_new, $Y_var);
-            Math::GMPz::Rmpz_add($Y_new, $Y_new, $X_var);
-            Math::GMPz::Rmpz_divexact($Y_new, $Y_new, $Q_var);
+                if (Math::GMPz::Rmpz_cmp($diff, $m) == 0) {
 
-            Math::GMPz::Rmpz_set($P_var, $P_new);
-            Math::GMPz::Rmpz_set($Q_var, $Q_new);
-            Math::GMPz::Rmpz_set($X_var, $X_new);
-            Math::GMPz::Rmpz_set($Y_var, $Y_new);
+                    # Scale primitive solution by factor g
+                    my $final_x = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($final_x, $X_var, $g);
+                    Math::GMPz::Rmpz_abs($final_x, $final_x);
+
+                    my $final_y = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($final_y, $Y_var, $g);
+                    Math::GMPz::Rmpz_abs($final_y, $final_y);
+
+                    push @solutions, _array([bless(\$final_x), bless(\$final_y)]);
+                    last;
+                }
+
+                # Cycle detection
+                my $p_str = Math::GMPz::Rmpz_get_str($P_var, 16);
+                my $q_str = Math::GMPz::Rmpz_get_str($Q_var, 16);
+                last if $seen{"$p_str:$q_str"}++;
+
+                # a = floor((P + sqrt(d)) / Q)
+                Math::GMPz::Rmpz_add($a_var, $P_var, $sqrt_d);
+                Math::GMPz::Rmpz_fdiv_q($a_var, $a_var, $Q_var);
+
+                # P_new = a * Q - P
+                Math::GMPz::Rmpz_mul($P_new, $a_var, $Q_var);
+                Math::GMPz::Rmpz_sub($P_new, $P_new, $P_var);
+
+                # Q_new = (d - P_new^2) / Q
+                Math::GMPz::Rmpz_mul($Q_new, $P_new, $P_new);
+                Math::GMPz::Rmpz_sub($Q_new, $d, $Q_new);
+                Math::GMPz::Rmpz_divexact($Q_new, $Q_new, $Q_var);
+
+                # X_new = (P_new * X + d * Y) / Q
+                Math::GMPz::Rmpz_mul($X_new, $P_new, $X_var);
+                Math::GMPz::Rmpz_mul($dy,    $d,     $Y_var);
+                Math::GMPz::Rmpz_add($X_new, $X_new, $dy);
+                Math::GMPz::Rmpz_divexact($X_new, $X_new, $Q_var);
+
+                # Y_new = (P_new * Y + X) / Q
+                Math::GMPz::Rmpz_mul($Y_new, $P_new, $Y_var);
+                Math::GMPz::Rmpz_add($Y_new, $Y_new, $X_var);
+                Math::GMPz::Rmpz_divexact($Y_new, $Y_new, $Q_var);
+
+                Math::GMPz::Rmpz_set($P_var, $P_new);
+                Math::GMPz::Rmpz_set($Q_var, $Q_new);
+                Math::GMPz::Rmpz_set($X_var, $X_new);
+                Math::GMPz::Rmpz_set($Y_var, $Y_new);
+            }
         }
     }
 
