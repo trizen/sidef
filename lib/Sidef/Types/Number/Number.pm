@@ -9364,9 +9364,12 @@ sub solve_pell {
                 return _array();
             }
         }
-        else {
+        elsif (0) {
+
+            # XXX: Fails to find all the fundamental solutions for certain inputs, such as:
+            # solve_pell(43, 163412341) = [[23908, 3081], [12899183, 1967106]]
             my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
-            my $code  = "iferr(my(v=qfbsolve(Qfb(1,0,-$d_str), $n_str)); if(#v, v, \"\"), E, \"\")";
+            my $code  = "iferr(my(v=qfbsolve(Qfb(1,0,-$d_str), $n_str, 3)); if(#v, v, \"\"), E, \"\")";
 
             if (my $res = _execute_pari_gp($code)) {
                 return _array() if $res eq '';    # No solution exists
