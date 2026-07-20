@@ -12297,6 +12297,79 @@ sub sum_of_squares {
     );
 }
 
+sub sum_of_cubes {
+    my ($n_in) = @_;
+    my $n = _sanitize_mpz($$n_in) // return _array();
+
+    my $sgn_n = Math::GMPz::Rmpz_sgn($n);
+    $sgn_n == 0 and return _array();
+
+    # Calculate divisors based strictly on absolute value
+    my $abs_n = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_abs($abs_n, $n);
+
+    my @solutions;
+
+    # Reuse temporary scratchpad mpz objects across loop iterations
+    my $A      = Math::GMPz::Rmpz_init();
+    my $B      = Math::GMPz::Rmpz_init();
+    my $A2     = Math::GMPz::Rmpz_init();
+    my $D      = Math::GMPz::Rmpz_init();
+    my $C      = Math::GMPz::Rmpz_init();
+    my $Delta  = Math::GMPz::Rmpz_init();
+    my $sqrt_D = Math::GMPz::Rmpz_init();
+    my $num1   = Math::GMPz::Rmpz_init();
+    my $num2   = Math::GMPz::Rmpz_init();
+
+    foreach my $A_str (_divisors($abs_n)) {
+        Math::GMPz::Rmpz_set_str($A, $A_str, 10);
+
+        # A must carry the exact sign of n since B is strictly positive
+        if ($sgn_n < 0) {
+            Math::GMPz::Rmpz_neg($A, $A);
+        }
+
+        Math::GMPz::Rmpz_divexact($B, $n, $A);
+        Math::GMPz::Rmpz_mul($A2, $A, $A);
+        Math::GMPz::Rmpz_sub($D, $A2, $B);
+
+        # Use _ui functions to avoid allocating an mpz object for 3
+        if (Math::GMPz::Rmpz_divisible_ui_p($D, 3)) {
+            Math::GMPz::Rmpz_divexact_ui($C, $D, 3);
+
+            # Delta = A^2 - 4*C (computed directly in $Delta)
+            Math::GMPz::Rmpz_mul_ui($Delta, $C, 4);
+            Math::GMPz::Rmpz_sub($Delta, $A2, $Delta);
+
+            if (Math::GMPz::Rmpz_sgn($Delta) >= 0 && Math::GMPz::Rmpz_perfect_square_p($Delta)) {
+                Math::GMPz::Rmpz_sqrt($sqrt_D, $Delta);
+
+                Math::GMPz::Rmpz_add($num1, $A, $sqrt_D);
+                Math::GMPz::Rmpz_sub($num2, $A, $sqrt_D);
+
+                if (Math::GMPz::Rmpz_even_p($num1) && Math::GMPz::Rmpz_even_p($num2)) {
+                    Math::GMPz::Rmpz_tdiv_q_2exp($num1, $num1, 1);
+                    Math::GMPz::Rmpz_tdiv_q_2exp($num2, $num2, 1);
+
+                    # x >= y ensures we don't output permutations like (3, 4) and (4, 3)
+                    if (Math::GMPz::Rmpz_cmp($num1, $num2) >= 0) {
+
+                        # Instantiate fresh objects only when recording a valid pair
+                        my $x = Math::GMPz::Rmpz_init_set($num1);
+                        my $y = Math::GMPz::Rmpz_init_set($num2);
+
+                        push @solutions, _array([bless(\$x), bless(\$y)]);
+                    }
+                }
+            }
+        }
+    }
+
+    @solutions = sort { ${$a->[0]} <=> ${$b->[0]} } @solutions;
+
+    return _array(\@solutions);
+}
+
 # Sum of two k-gonal numbers
 sub sum_of_polygonals {
     my ($n, $k) = @_;
