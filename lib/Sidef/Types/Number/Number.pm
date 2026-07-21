@@ -12355,8 +12355,8 @@ sub sum_of_cubes {
                     if (Math::GMPz::Rmpz_cmp($num1, $num2) >= 0) {
 
                         # Instantiate fresh objects only when recording a valid pair
-                        my $x = Math::GMPz::Rmpz_init_set($num1);
-                        my $y = Math::GMPz::Rmpz_init_set($num2);
+                        my $x = Math::GMPz::Rmpz_init_set($num2);
+                        my $y = Math::GMPz::Rmpz_init_set($num1);
 
                         push @solutions, _array([bless(\$x), bless(\$y)]);
                     }

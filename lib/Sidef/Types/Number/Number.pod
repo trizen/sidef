@@ -4939,6 +4939,39 @@ Output:
 
 =cut
 
+=head2 sum_of_cubes
+
+    sum_of_cubes(n)
+
+Returns all integer solutions C<(x, y)> satisfying:
+
+    x^3 + y^3 = n
+
+The result is returned as an array of pairs, where each pair is itself an
+array C<[x, y]>.
+
+Returns an empty array when no integer solutions exist or when C<n = 0>.
+
+This implementation uses the factorization identity:
+
+    x^3 + y^3 = (x + y)(x^2 - xy + y^2)
+
+to reduce the problem to testing the divisors of C<|n|>. For each divisor
+C<A = x + y>, the algorithm derives the corresponding quadratic equation,
+checks whether its discriminant is a perfect square, and reconstructs the
+integer solution when possible.
+
+The algorithm naturally supports both positive and negative values of C<n>.
+
+Examples:
+
+    say sum_of_cubes(35)      # [[2, 3]]
+    say sum_of_cubes(1729)    # [[1, 12], [9, 10]]
+    say sum_of_cubes(-728)    # [[-12, 10], [-9, 1], [-8, -6]]
+    say sum_of_cubes(30)      # []
+
+=cut
+
 =head2 primitive_pythagorean_triples
 
     primitive_pythagorean_triples(limit)
