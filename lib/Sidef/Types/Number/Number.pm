@@ -12139,6 +12139,97 @@ sub difference_of_squares {
 
 *diff_of_squares = \&difference_of_squares;
 
+sub difference_of_cubes {
+    my ($n_in) = @_;
+    my $n = _sanitize_mpz($$n_in) // return _array();
+
+    my $sgn_n = Math::GMPz::Rmpz_sgn($n);
+    $sgn_n == 0 and return _array();
+
+    # Calculate divisors based strictly on absolute value
+    my $abs_n = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_abs($abs_n, $n);
+
+    my @solutions;
+
+    # Reuse temporary scratchpad mpz objects across loop iterations
+    my $A      = Math::GMPz::Rmpz_init();
+    my $B      = Math::GMPz::Rmpz_init();
+    my $A2     = Math::GMPz::Rmpz_init();
+    my $D      = Math::GMPz::Rmpz_init();
+    my $C      = Math::GMPz::Rmpz_init();
+    my $Delta  = Math::GMPz::Rmpz_init();
+    my $sqrt_D = Math::GMPz::Rmpz_init();
+    my $num1   = Math::GMPz::Rmpz_init();
+    my $num2   = Math::GMPz::Rmpz_init();
+
+    foreach my $A_str (_divisors($abs_n)) {
+        Math::GMPz::Rmpz_set_str($A, $A_str, 10);
+
+        # A must carry the exact sign of n since B is strictly positive
+        if ($sgn_n < 0) {
+            Math::GMPz::Rmpz_neg($A, $A);
+        }
+
+        Math::GMPz::Rmpz_divexact($B, $n, $A);
+        Math::GMPz::Rmpz_mul($A2, $A, $A);
+
+        # For differences: D = 3xy = B - A^2
+        Math::GMPz::Rmpz_sub($D, $B, $A2);
+
+        if (Math::GMPz::Rmpz_divisible_ui_p($D, 3)) {
+            Math::GMPz::Rmpz_divexact_ui($C, $D, 3);
+
+            # Delta = (x+y)^2 = A^2 + 4*C
+            Math::GMPz::Rmpz_mul_ui($Delta, $C, 4);
+            Math::GMPz::Rmpz_add($Delta, $A2, $Delta);
+
+            if (Math::GMPz::Rmpz_sgn($Delta) >= 0 && Math::GMPz::Rmpz_perfect_square_p($Delta)) {
+                Math::GMPz::Rmpz_sqrt($sqrt_D, $Delta);
+
+                # 2x = A + sqrt(Delta)
+                Math::GMPz::Rmpz_add($num1, $A, $sqrt_D);
+
+                # 2y = sqrt(Delta) - A
+                Math::GMPz::Rmpz_sub($num2, $sqrt_D, $A);
+
+                if (Math::GMPz::Rmpz_even_p($num1) && Math::GMPz::Rmpz_even_p($num2)) {
+                    Math::GMPz::Rmpz_tdiv_q_2exp($num1, $num1, 1);
+                    Math::GMPz::Rmpz_tdiv_q_2exp($num2, $num2, 1);
+
+                    # First solution pair (x, y)
+                    my $x1 = Math::GMPz->new();
+                    my $y1 = Math::GMPz->new();
+                    Math::GMPz::Rmpz_set($x1, $num1);
+                    Math::GMPz::Rmpz_set($y1, $num2);
+
+                    push @solutions, _array([bless(\$x1), bless(\$y1)]);
+
+                    # Because x^3 - y^3 = (-y)^3 - (-x)^3 = n, we get a second pair if sqrt(Delta) > 0
+                    if (Math::GMPz::Rmpz_sgn($sqrt_D) > 0) {
+                        my $x2 = Math::GMPz->new();
+                        my $y2 = Math::GMPz->new();
+
+                        # x2 = -y1
+                        Math::GMPz::Rmpz_neg($x2, $y1);
+
+                        # y2 = -x1
+                        Math::GMPz::Rmpz_neg($y2, $x1);
+
+                        push @solutions, _array([bless(\$x2), bless(\$y2)]);
+                    }
+                }
+            }
+        }
+    }
+
+    @solutions = sort { ${$a->[0]} <=> ${$b->[0]} } @solutions;
+
+    return _array(\@solutions);
+}
+
+*diff_of_cubes = \&difference_of_cubes;
+
 sub _primitive_sum_of_two_squares {
     my ($p) = @_;
 

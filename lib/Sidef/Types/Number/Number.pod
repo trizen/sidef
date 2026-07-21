@@ -9903,6 +9903,42 @@ Returns an array of C<[a,b]> pairs with all the possible solutions to the equati
 
     say difference_of_squares(48)   #=> [[7, 1], [8, 4], [13, 11]]
 
+Aliases: I<diff_of_squares>
+
+=cut
+
+=head2 difference_of_cubes
+
+    difference_of_cubes(n)
+
+Returns all integer solutions C<(x, y)> satisfying:
+
+    x^3 - y^3 = n
+
+The result is returned as an array of pairs, where each pair is itself an
+array C<[x, y]>. Returns an empty array when no integer solutions exist or
+when C<n = 0>.
+
+The implementation is based on the factorization:
+
+    x^3 - y^3 = (x - y)(x^2 + xy + y^2)
+
+and enumerates the divisors of C<|n|>. For each divisor
+C<A = x - y>, the corresponding quadratic equation is constructed, its
+discriminant is tested for being a perfect square, and any resulting integer
+solutions are recovered.
+
+The algorithm supports both positive and negative values of C<n>.
+
+Examples:
+
+    say difference_of_cubes(19)      # [[-2, -3], [3, 2]]
+    say difference_of_cubes(1729)    # [[1, -12], [9, -10], [10, -9], [12, -1]]
+    say difference_of_cubes(-728)    # [[-12, -10], [-9, -1], [-8, 6], [-6, 8], [1, 9], [10, 12]]
+    say difference_of_cubes(30)      # []
+
+Aliases: I<diff_of_cubes>
+
 =cut
 
 =head2 fibonorial
