@@ -34868,6 +34868,111 @@ sub is_amicable {
     (__is_int__($$n) && __is_int__($$m) && $n->aliquot->eq($m) && $m->aliquot->eq($n)) ? $TRUE : $FALSE;
 }
 
+sub is_zumkeller {
+    my ($n) = @_;
+
+    $n = _big2pistr($$n) // return $FALSE;
+
+    _is_prob_prime($n) && return $FALSE;
+
+    (
+     (HAS_PRIME_UTIL and $n < ULONG_MAX)
+     ? Math::Prime::Util::is_square($n)
+     : Math::Prime::Util::GMP::is_square($n)
+    )
+      && return $FALSE;
+
+    my $sigma =
+      (HAS_PRIME_UTIL and $n < (ULONG_MAX >> 3))
+      ? Math::Prime::Util::divisor_sum($n)
+      : ${_set_int($n)->sigma};
+
+    substr("$sigma", -1) & 1 and return $FALSE;
+
+    Math::Prime::Util::GMP::cmpint($sigma, Math::Prime::Util::GMP::addint($n, $n),) < 0 and return $FALSE;
+
+    substr($n, -1) & 1 and return $TRUE;    # conjecture?
+
+    my @mpz_divs;
+    foreach my $d (_divisors($n)) {
+        unshift @mpz_divs, ($d < ULONG_MAX) ? $d : _any2mpz($d);
+    }
+
+    state $total = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_set_str($total, "$sigma", 10);
+
+    state $target = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_fdiv_q_2exp($target, $total, 1);
+
+    # Optimization for small inputs
+    if (Math::GMPz::Rmpz_cmp_ui($target, 1e5) <= 0) {
+        state $reachable = Math::GMPz::Rmpz_init_nobless();
+        state $shifted   = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_set_ui($reachable, 1);
+        foreach my $d (@mpz_divs) {
+            Math::GMPz::Rmpz_mul_2exp($shifted, $reachable, $d);
+            Math::GMPz::Rmpz_ior($reachable, $reachable, $shifted);
+        }
+        return (Math::GMPz::Rmpz_tstbit($reachable, Math::GMPz::Rmpz_get_ui($target)) ? $TRUE : $FALSE);
+    }
+
+    # Precompute suffix sums to fold impossible branches early
+    my @suffix_sums;
+    state $sum_so_far = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_set_ui($sum_so_far, 0);
+    for (my $i = $#mpz_divs ; $i >= 0 ; $i--) {
+        ref($mpz_divs[$i])
+          ? Math::GMPz::Rmpz_add($sum_so_far, $sum_so_far, $mpz_divs[$i])
+          : Math::GMPz::Rmpz_add_ui($sum_so_far, $sum_so_far, $mpz_divs[$i]);
+        $suffix_sums[$i] = Math::GMPz::Rmpz_init_set($sum_so_far);
+    }
+
+    # Iterative Depth-First Search for the subset-sum target
+    # Stack stores references to arrays: [ divisor_index, current_sum ]
+    my @stack   = ([0, Math::GMPz::Rmpz_init_set_ui(0)]);
+    my $max_idx = $#mpz_divs;
+
+    my @mpz_obj = map { Math::GMPz::Rmpz_init() } 0 .. $max_idx;
+    state $max_possible = Math::GMPz::Rmpz_init_nobless();
+
+    while (@stack) {
+        my $node        = pop @stack;
+        my $idx         = $node->[0];
+        my $current_sum = $node->[1];
+
+        my $cmp = Math::GMPz::Rmpz_cmp($current_sum, $target);
+
+        # Target reached
+        if ($cmp == 0) {
+            return $TRUE;
+        }
+
+        # Prune if we exceeded the target or ran out of divisors
+        if ($cmp > 0 or $idx > $max_idx) {
+            next;
+        }
+
+        # Branch pruning: if the current sum plus all remaining divisors can't reach the target
+        Math::GMPz::Rmpz_add($max_possible, $current_sum, $suffix_sums[$idx]);
+        if (Math::GMPz::Rmpz_cmp($max_possible, $target) < 0) {
+            next;
+        }
+
+        # Branch 1: Exclude the current divisor
+        push @stack, [$idx + 1, $current_sum];
+
+        # Branch 2: Include the current divisor
+        # Pushed last so it gets popped first (Greedy DFS)
+        my $next_sum = $mpz_obj[$idx];
+        ref($mpz_divs[$idx])
+          ? Math::GMPz::Rmpz_add($next_sum, $current_sum, $mpz_divs[$idx])
+          : Math::GMPz::Rmpz_add_ui($next_sum, $current_sum, $mpz_divs[$idx]);
+        push @stack, [$idx + 1, $next_sum];
+    }
+
+    return $FALSE;
+}
+
 sub sopf {    # OEIS: A008472
     my ($n) = @_;
 
@@ -40642,11 +40747,14 @@ sub is_pseudoperfect {
     my $target = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_sub($target, $sum, $n);
 
-    # Fast DP with GMP Bitsets for small abundance bounds (target <= 2*10^6)
-    if (Math::GMPz::Rmpz_fits_ulong_p($target) && Math::GMPz::Rmpz_cmp_ui($target, 2_000_000) <= 0) {
+    # Fast DP with GMP Bitsets for small abundance bounds
+    if (Math::GMPz::Rmpz_cmp_ui($target, 1e5) <= 0) {
         my $target_ui = Math::GMPz::Rmpz_get_ui($target);
-        my $dp        = Math::GMPz::Rmpz_init_set_ui(1);
-        state $t = Math::GMPz::Rmpz_init_nobless();
+
+        state $dp = Math::GMPz::Rmpz_init_nobless();
+        state $t  = Math::GMPz::Rmpz_init_nobless();
+
+        Math::GMPz::Rmpz_set_ui($dp, 1);
 
         foreach my $d (@divs) {
             next if Math::GMPz::Rmpz_cmp_ui($d, $target_ui) > 0;
@@ -40661,6 +40769,8 @@ sub is_pseudoperfect {
     # Recursive Pruning Search for massive targets
     @divs = CORE::reverse(@divs);
 
+    my @mpz_obj = map { Math::GMPz::Rmpz_init() } 0 .. $#divs;
+
     sub {
         my ($rem_target, $idx) = @_;
         return 1 if (Math::GMPz::Rmpz_sgn($rem_target) == 0);
@@ -40670,7 +40780,7 @@ sub is_pseudoperfect {
             my $d = $divs[$i];
             next if Math::GMPz::Rmpz_cmp($rem_target, $d) < 0;
 
-            my $new_target = Math::GMPz::Rmpz_init();
+            my $new_target = $mpz_obj[$i];
             Math::GMPz::Rmpz_sub($new_target, $rem_target, $d);
             return 1 if __SUB__->($new_target, $i + 1);
         }
@@ -40680,6 +40790,13 @@ sub is_pseudoperfect {
 }
 
 *is_semiperfect = \&is_pseudoperfect;
+
+sub is_weird {
+    my ($n) = @_;
+    $n->is_abundant || return $FALSE;
+    $n->is_pseudoperfect && return $FALSE;
+    return $TRUE;
+}
 
 sub _power_factor {
     my ($n) = @_;

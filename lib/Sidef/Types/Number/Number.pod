@@ -6935,6 +6935,14 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 =cut
 
+=head2 is_coprime
+
+    is_coprime(a,b)
+
+Returns true if C<gcd(a,b) = 1>.
+
+=cut
+
 =head2 gcd
 
     gcd(...)
@@ -9086,14 +9094,6 @@ Amicable numbers are two different numbers so related that the sum of the proper
 
 =cut
 
-=head2 is_coprime
-
-    is_coprime(a,b)
-
-Returns true if C<gcd(a,b) = 1>.
-
-=cut
-
 =head2 is_deficient
 
     n.is_deficient
@@ -9125,6 +9125,34 @@ since the sum of all proper divisors equals the number itself.
     say 30.by { .is_pseudoperfect }     # OEIS: A005835
 
 Aliases: I<is_semiperfect>
+
+=cut
+
+=head2 is_weird
+
+    is_weird(n)
+
+Returns true if C<n> is a I<weird number>, and false otherwise.
+
+A weird number is a positive integer that is abundant, but not pseudoperfect.
+
+Equivalently, a weird number is an abundant number that cannot be expressed as
+the sum of a subset of its proper divisors.
+
+    say 10.by { .is_weird }         #=> OEIS: A006037
+
+=cut
+
+=head2 is_zumkeller
+
+    is_zumkeller(n)
+
+Returns true if C<n> is a I<Zumkeller number>, and false otherwise.
+
+A Zumkeller number is a positive integer whose positive divisors can be
+partitioned into two disjoint subsets having equal sums.
+
+    say 30.by { .is_zumkeller }     #=> OEIS: A083207
 
 =cut
 
