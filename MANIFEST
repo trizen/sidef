@@ -934,7 +934,6 @@ scripts/Tests/method_expressions.sf
 scripts/Tests/miller_rabin_primality_test.sf
 scripts/Tests/mod_class.sf
 scripts/Tests/modular_k-th_root_all_solutions_znlog.sf
-scripts/Tests/modular_quadratic_formula.sf
 scripts/Tests/Module/Bar.sm
 scripts/Tests/Module/Fact.sm
 scripts/Tests/Module/Fib.sm
@@ -1081,7 +1080,7 @@ scripts/Tests/slurpy_static.sf
 scripts/Tests/smart_match_operator.sf
 scripts/Tests/smooth_numbers.sf
 scripts/Tests/smooth_rough.sf
-scripts/Tests/solve_lcg.sf
+scripts/Tests/solve_modular_congruences.sf
 scripts/Tests/sort_disjoint_sublist.sf
 scripts/Tests/sort_with_custom_cmp.sf
 scripts/Tests/soundex.sf
