@@ -12153,15 +12153,15 @@ sub difference_of_cubes {
     my @solutions;
 
     # Reuse temporary scratchpad mpz objects across loop iterations
-    my $A      = Math::GMPz::Rmpz_init();
-    my $B      = Math::GMPz::Rmpz_init();
-    my $A2     = Math::GMPz::Rmpz_init();
-    my $D      = Math::GMPz::Rmpz_init();
-    my $C      = Math::GMPz::Rmpz_init();
-    my $Delta  = Math::GMPz::Rmpz_init();
-    my $sqrt_D = Math::GMPz::Rmpz_init();
-    my $num1   = Math::GMPz::Rmpz_init();
-    my $num2   = Math::GMPz::Rmpz_init();
+    state $A      = Math::GMPz::Rmpz_init_nobless();
+    state $B      = Math::GMPz::Rmpz_init_nobless();
+    state $A2     = Math::GMPz::Rmpz_init_nobless();
+    state $D      = Math::GMPz::Rmpz_init_nobless();
+    state $C      = Math::GMPz::Rmpz_init_nobless();
+    state $Delta  = Math::GMPz::Rmpz_init_nobless();
+    state $sqrt_D = Math::GMPz::Rmpz_init_nobless();
+    state $num1   = Math::GMPz::Rmpz_init_nobless();
+    state $num2   = Math::GMPz::Rmpz_init_nobless();
 
     foreach my $A_str (_divisors($abs_n)) {
         Math::GMPz::Rmpz_set_str($A, $A_str, 10);
@@ -12402,15 +12402,15 @@ sub sum_of_cubes {
     my @solutions;
 
     # Reuse temporary scratchpad mpz objects across loop iterations
-    my $A      = Math::GMPz::Rmpz_init();
-    my $B      = Math::GMPz::Rmpz_init();
-    my $A2     = Math::GMPz::Rmpz_init();
-    my $D      = Math::GMPz::Rmpz_init();
-    my $C      = Math::GMPz::Rmpz_init();
-    my $Delta  = Math::GMPz::Rmpz_init();
-    my $sqrt_D = Math::GMPz::Rmpz_init();
-    my $num1   = Math::GMPz::Rmpz_init();
-    my $num2   = Math::GMPz::Rmpz_init();
+    state $A      = Math::GMPz::Rmpz_init_nobless();
+    state $B      = Math::GMPz::Rmpz_init_nobless();
+    state $A2     = Math::GMPz::Rmpz_init_nobless();
+    state $D      = Math::GMPz::Rmpz_init_nobless();
+    state $C      = Math::GMPz::Rmpz_init_nobless();
+    state $Delta  = Math::GMPz::Rmpz_init_nobless();
+    state $sqrt_D = Math::GMPz::Rmpz_init_nobless();
+    state $num1   = Math::GMPz::Rmpz_init_nobless();
+    state $num2   = Math::GMPz::Rmpz_init_nobless();
 
     foreach my $A_str (_divisors($abs_n)) {
         Math::GMPz::Rmpz_set_str($A, $A_str, 10);

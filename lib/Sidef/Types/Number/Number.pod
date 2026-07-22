@@ -3189,24 +3189,6 @@ Aliases: I<quadratic_nonresidue>
 
 =cut
 
-=head2 quadratic_congruence
-
-    quadratic_congruence(a,b,c,m)
-
-Returns an array with all the positive solutions for C<x> to the following quadratic congruence:
-
-    a*x^2 + b*x + c == 0 (mod m)
-
-where C<a,b,c> are rational values and C<m> is a positive integer.
-
-Example:
-
-    say quadratic_congruence(3,4,5,124)  #=> [47, 55, 109, 117]
-
-Aliases: I<modular_quadratic_formula>
-
-=cut
-
 =head2 rootmod
 
     rootmod(a, k, n)
@@ -3233,24 +3215,6 @@ Returns an array with all the solutions C<x> to the following congruence:
 If no solution exists, an empty array is returned.
 
     say rootmod_all(243, 5, 1000)    #=> [3, 203, 403, 603, 803]
-
-=cut
-
-=head2 solve_lcg
-
-    solve_lcg(n, r, m)
-
-Return the smallest solution for C<x> to the following linear congruence:
-
-    n*x == r (mod m)
-
-Example:
-
-    say solve_lcg(143, 44, 231)     #=> 10
-
-Return C<NaN> when no solution exists (i.e.: when C<r> is not divisible by C<gcd(n, m)>).
-
-Aliases: I<solve_linear_congruence>
 
 =cut
 
@@ -4105,16 +4069,6 @@ Returns the number of halving and tripling steps to reach C<1> in the C<3x+1> Co
 
 =cut
 
-=head2 cubic_formula
-
-    cubic_formula(a, b, c, d)
-
-Returns a list of (complex) solutions C<(x_1, x_2, x_3)> to the cubic equation:
-
-    a*x^3 + b*x^2 + c*x + d = 0
-
-=cut
-
 =head2 cyclotomic
 
     cyclotomic(n)
@@ -4393,9 +4347,9 @@ Second integer k-gonal root of C<n>.
 
 =cut
 
-=head2 iquadratic_formula
+=head2 isolve_quadratic
 
-    iquadratic_formula(a,b,c)
+    isolve_quadratic(a,b,c)
 
 Returns a list of integer solutions C<(x_1, x_2)> to the quadratic equation: C<a*x^2 + b*x + c = 0>, defined as:
 
@@ -4403,9 +4357,9 @@ Returns a list of integer solutions C<(x_1, x_2)> to the quadratic equation: C<a
 
 Example:
 
-    say [iquadratic_formula(13, -42, -34)]  #=> [3, -1]
+    say [isolve_quadratic(13, -42, -34)]  #=> [3, -1]
 
-Aliases: I<integer_quadratic_formula>
+Aliases: I<integer_quadratic_formula>, I<iquadratic_formula>
 
 =cut
 
@@ -4762,34 +4716,6 @@ Returns the k-gonal pyramidal root of C<n>. Also defined for complex numbers.
 
 =cut
 
-=head2 quadratic_formula
-
-    quadratic_formula(a,b,c)
-
-Returns a list of solutions C<(x_1, x_2)> to the quadratic equation: C<a*x^2 + b*x + c = 0>, defined as:
-
-    (-b ± sqrt(b^2 - 4ac)) / (2a)
-
-Example:
-
-    say [quadratic_formula(13, -42, -34)]     #=> [3.9011...., -0.6704...]
-
-=cut
-
-=head2 quadratic_formulaQ
-
-    quadratic_formulaQ(a,b,c)
-
-Returns a list of Quadratic objects, which are solutions C<(x_1, x_2)> to the quadratic equation: C<a*x^2 + b*x + c = 0>.
-
-    say [quadratic_formulaQ(3,4,5)]
-
-Outputs:
-
-    [Quadratic(-2/3, 1/6, -44), Quadratic(-2/3, -1/6, -44)]
-
-=cut
-
 =head2 ramanujan_tau
 
     ramanujan_tau(n)
@@ -4816,6 +4742,82 @@ Find the smallest pair of integers C<(x,y)> that satisfy the Pell equation: C<x^
     say [solve_pell(953, -1)]   #=> [2746864744, 88979677]
 
 Return C<(nil,nil)> when a solution does not exist.
+
+=cut
+
+=head2 solve_lcg
+
+    solve_lcg(n, r, m)
+
+Return the smallest solution for C<x> to the following linear congruence:
+
+    n*x == r (mod m)
+
+Example:
+
+    say solve_lcg(143, 44, 231)     #=> 10
+
+Return C<NaN> when no solution exists (i.e.: when C<r> is not divisible by C<gcd(n, m)>).
+
+Aliases: I<solve_linear_congruence>
+
+=cut
+
+=head2 solve_quadratic
+
+    solve_quadratic(a,b,c)
+
+Returns a list of (complex) solutions C<(x_1, x_2)> to the quadratic equation: C<a*x^2 + b*x + c = 0>, defined as:
+
+    (-b ± sqrt(b^2 - 4ac)) / (2a)
+
+Example:
+
+    say [solve_quadratic(13, -42, -34)]     #=> [3.9011...., -0.6704...]
+
+Aliases: I<quadratic_formula>
+
+=cut
+
+=head2 solve_cubic
+
+    solve_cubic(a, b, c, d)
+
+Returns a list of (complex) solutions C<(x_1, x_2, x_3)> to the cubic equation:
+
+    a*x^3 + b*x^2 + c*x + d = 0
+
+Aliases: I<cubic_formula>
+
+=cut
+
+=head2 solve_quadraticQ
+
+    solve_quadraticQ(a,b,c)
+
+Returns a list of Quadratic objects, which are solutions C<(x_1, x_2)> to the quadratic equation: C<a*x^2 + b*x + c = 0>.
+
+    say [solve_quadraticQ(3,4,5)]     #=> [Quadratic(-2/3, 1/6, -44, 0), Quadratic(-2/3, -1/6, -44, 0)]
+
+Aliases: I<quadratic_formulaQ>
+
+=cut
+
+=head2 solve_quadratic_mod
+
+    solve_quadratic_mod(a,b,c,m)
+
+Returns an array with all the positive solutions for C<x> to the following quadratic congruence:
+
+    a*x^2 + b*x + c == 0 (mod m)
+
+where C<a,b,c> are rational values and C<m> is a positive integer.
+
+Example:
+
+    say solve_quadratic_mod(3,4,5,124)  #=> [47, 55, 109, 117]
+
+Aliases: I<modular_quadratic_formula>, I<quadratic_congruence>
 
 =cut
 
