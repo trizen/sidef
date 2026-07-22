@@ -4720,14 +4720,38 @@ Return the n-th secant/zig number. (L<OEIS A000364|https://oeis.org/A000364>)
 
 =head2 solve_pell
 
-    solve_pell(d, k=1)
+    solve_pell(D)
+    solve_pell(D, N)
 
-Find the smallest pair of integers C<(x,y)> that satisfy the Pell equation: C<x^2 - d*y^2 = k>.
+Finds all fundamental integer solutions C<(x, y)> of the generalized Pell equation:
 
-    say [solve_pell(863)]       #=> [18524026608, 630565199]
-    say [solve_pell(953, -1)]   #=> [2746864744, 88979677]
+    x^2 - D*y^2 = N
 
-Return C<(nil,nil)> when a solution does not exist.
+where C<D> is a positive non-square integer and C<N> is an arbitrary integer (default: C<1>).
+
+For the classical Pell equations (C<N = ±1>), the method computes the
+fundamental solution using the continued fraction expansion of
+C<sqrt(D)>. When available and advantageous, PARI/GP is used for large
+inputs to accelerate the computation. (with C<Num!USE_PARI_GP = true>)
+
+For arbitrary values of C<N>, the method implements the
+LMM (Lagrange–Matthews–Mollin) continued-fraction algorithm to enumerate all
+primitive solution classes. Each solution is then reduced to its
+fundamental representative under multiplication by the fundamental unit of
+C<Q(sqrt(D))>.
+
+Returns an array of C<[x, y]> pairs sorted by increasing C<x>. If the equation
+has no integer solutions, an empty array is returned.
+
+    say solve_pell(61)      #=> [[1766319049, 226153980]]
+    say solve_pell(61, -1)  #=> [[29718, 3805]]
+    say solve_pell(10, 9)   #=> [[3, 0], [7, 2], [7, -2]]
+
+    # Iterate over solutions
+    var (D, N) = (10, 9)
+    var U = Quadratic(solve_pell(D)[0]..., D)
+    var V = Quadratic(solve_pell(D, N)[0]..., D)
+    for n in (0..5) { say (U**n * V) }
 
 =cut
 

@@ -9307,20 +9307,192 @@ sub _solve_seq {    # Newton's forward difference formula
     return Sidef::Types::Number::Polynomial->new(@poly_args);
 }
 
-# Solution in integers to `x^2 - d*y^2 = n`
-# where `d` and `n` are provided (n=1 by default).
+sub _pell_fundamental_unit {
+    my ($d, $is_negative) = @_;
+
+    if ($USE_PARI_GP and Math::GMPz::Rmpz_sizeinbase($d, 2) > 16) {
+
+        my $code;
+        my $d_str = Math::GMPz::Rmpz_get_str($d, 10);
+
+        if ($is_negative) {
+            $code = "iferr(my(u=quadunit(4*$d_str)); my(p=u.pol);
+                           my(a=polcoef(p,0)); my(b=polcoef(p,1));
+                           if(a^2-$d_str*b^2==-1, [a,b], []), E, \"\")" =~ s/\s+/ /gr;
+        }
+        else {
+            $code = "iferr(my(u=quadunit(4*$d_str)); my(p=u.pol);
+                            my(a=polcoef(p,0)); my(b=polcoef(p,1));
+                            if(a^2-$d_str*b^2==-1, u=u^2; a=polcoef(u.pol,0);
+                            b=polcoef(u.pol,1)); [a,b], E, \"\")" =~ s/\s+/ /gr;
+        }
+
+        if (my $res = _execute_pari_gp($code)) {
+            if (my ($x_str, $y_str) = $res =~ /^\[(-?\d+),\s+(-?\d+)\]\z/) {
+                my $U = Math::GMPz::Rmpz_init_set_str($x_str, 10);
+                my $V = Math::GMPz::Rmpz_init_set_str($y_str, 10);
+                Math::GMPz::Rmpz_abs($U, $U);
+                Math::GMPz::Rmpz_abs($V, $V);
+                return ($U, $V);
+            }
+            return ();
+        }
+    }
+
+    state $a0 = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_sqrt($a0, $d);
+
+    state $P = Math::GMPz::Rmpz_init_nobless();
+    state $Q = Math::GMPz::Rmpz_init_nobless();
+    state $A = Math::GMPz::Rmpz_init_nobless();
+
+    Math::GMPz::Rmpz_set_ui($P, 0);
+    Math::GMPz::Rmpz_set_ui($Q, 1);
+    Math::GMPz::Rmpz_set($A, $a0);
+
+    state $h2 = Math::GMPz::Rmpz_init_nobless();
+    state $h1 = Math::GMPz::Rmpz_init_nobless();
+    state $k2 = Math::GMPz::Rmpz_init_nobless();
+    state $k1 = Math::GMPz::Rmpz_init_nobless();
+
+    Math::GMPz::Rmpz_set_ui($h2, 0);
+    Math::GMPz::Rmpz_set_ui($h1, 1);
+    Math::GMPz::Rmpz_set_ui($k2, 1);
+    Math::GMPz::Rmpz_set_ui($k1, 0);
+
+    state $h = Math::GMPz::Rmpz_init_nobless();
+    state $k = Math::GMPz::Rmpz_init_nobless();
+
+    state $next_P = Math::GMPz::Rmpz_init_nobless();
+    state $next_Q = Math::GMPz::Rmpz_init_nobless();
+
+    my $max = Math::GMPz::Rmpz_get_d($a0);
+    $max = CORE::int(4 * $max * CORE::log($max) + 10);
+
+    for (my $i = 0 ; $i <= $max ; ++$i) {
+        Math::GMPz::Rmpz_mul($h, $A, $h1);
+        Math::GMPz::Rmpz_add($h, $h, $h2);
+
+        Math::GMPz::Rmpz_mul($k, $A, $k1);
+        Math::GMPz::Rmpz_add($k, $k, $k2);
+
+        Math::GMPz::Rmpz_mul($next_P, $A, $Q);
+        Math::GMPz::Rmpz_sub($next_P, $next_P, $P);
+
+        Math::GMPz::Rmpz_mul($next_Q, $next_P, $next_P);
+        Math::GMPz::Rmpz_sub($next_Q, $d, $next_Q);
+        Math::GMPz::Rmpz_divexact($next_Q, $next_Q, $Q);
+
+        if (Math::GMPz::Rmpz_cmp_ui($next_Q, 1) == 0) {
+            my $sgn = ($i % 2 == 0) ? -1 : 1;
+
+            if ($is_negative) {
+                if ($sgn == -1) {
+                    my $ret_h = Math::GMPz::Rmpz_init_set($h);
+                    my $ret_k = Math::GMPz::Rmpz_init_set($k);
+                    return ($ret_h, $ret_k);
+                }
+            }
+            else {
+                if ($sgn == 1) {
+                    my $ret_h = Math::GMPz::Rmpz_init_set($h);
+                    my $ret_k = Math::GMPz::Rmpz_init_set($k);
+                    return ($ret_h, $ret_k);
+                }
+            }
+        }
+
+        Math::GMPz::Rmpz_set($P, $next_P);
+        Math::GMPz::Rmpz_set($Q, $next_Q);
+
+        Math::GMPz::Rmpz_add($A, $a0, $P);
+        Math::GMPz::Rmpz_div($A, $A, $Q);
+
+        Math::GMPz::Rmpz_set($h2, $h1);
+        Math::GMPz::Rmpz_set($h1, $h);
+
+        Math::GMPz::Rmpz_set($k2, $k1);
+        Math::GMPz::Rmpz_set($k1, $k);
+    }
+}
+
+sub _reduce_pell_solution {
+    my ($x, $y, $u1, $v1, $d) = @_;
+
+    # Standardize to x >= 0
+    if (Math::GMPz::Rmpz_sgn($x) < 0) {
+        Math::GMPz::Rmpz_neg($x, $x);
+        Math::GMPz::Rmpz_neg($y, $y);
+    }
+
+    state $x_next = Math::GMPz::Rmpz_init_nobless();
+    state $y_next = Math::GMPz::Rmpz_init_nobless();
+    state $dy     = Math::GMPz::Rmpz_init_nobless();
+
+    while (1) {
+        my $sgn_y = Math::GMPz::Rmpz_sgn($y);
+        last if $sgn_y == 0;
+
+        if ($sgn_y > 0) {
+            Math::GMPz::Rmpz_mul($x_next, $x,  $u1);
+            Math::GMPz::Rmpz_mul($dy,     $d,  $y);
+            Math::GMPz::Rmpz_mul($dy,     $dy, $v1);
+            Math::GMPz::Rmpz_sub($x_next, $x_next, $dy);
+
+            Math::GMPz::Rmpz_mul($y_next, $y, $u1);
+            Math::GMPz::Rmpz_mul($dy,     $x, $v1);
+            Math::GMPz::Rmpz_sub($y_next, $y_next, $dy);
+        }
+        else {
+            Math::GMPz::Rmpz_mul($x_next, $x,  $u1);
+            Math::GMPz::Rmpz_mul($dy,     $d,  $y);
+            Math::GMPz::Rmpz_mul($dy,     $dy, $v1);
+            Math::GMPz::Rmpz_add($x_next, $x_next, $dy);
+
+            Math::GMPz::Rmpz_mul($y_next, $y, $u1);
+            Math::GMPz::Rmpz_mul($dy,     $x, $v1);
+            Math::GMPz::Rmpz_add($y_next, $y_next, $dy);
+        }
+
+        if (Math::GMPz::Rmpz_sgn($x_next) < 0) {
+            Math::GMPz::Rmpz_neg($x_next, $x_next);
+            Math::GMPz::Rmpz_neg($y_next, $y_next);
+        }
+
+        if (Math::GMPz::Rmpz_cmp($x_next, $x) < 0) {
+            Math::GMPz::Rmpz_set($x, $x_next);
+            Math::GMPz::Rmpz_set($y, $y_next);
+        }
+        else {
+            last;
+        }
+    }
+}
+
+sub _sort_pell_solutions {
+    my (@sols) = @_;
+    my %seen;
+    @sols = grep {
+        my $key = join(';', Math::GMPz::Rmpz_get_str(${$_->[0]}, 16), Math::GMPz::Rmpz_get_str(${$_->[1]}, 16));
+        !$seen{$key}++
+    } @sols;
+    @sols = sort { (${$a->[0]} <=> ${$b->[0]}) || (${$b->[1]} <=> ${$a->[1]}) } @sols;
+    return \@sols;
+}
 
 sub solve_pell {
     my ($d_in, $n_in) = @_;
 
+    # Solution in integers to `x^2 - d*y^2 = n`
+    # where `d` and `n` are provided (n=1 by default).
+
     my $d = _any2mpz($$d_in) // return _array();
 
     # Default to Classical Pell (n = 1) if not provided
-    my $n = defined($n_in) ? _any2mpz($$n_in) : Math::GMPz::Rmpz_init_set_ui(1);
-    return _array() unless defined $n;
+    my $n = defined($n_in) ? do { _any2mpz($$n_in) // return _array() } : $ONE;
 
     # No solutions for d <= 0 or if d is a perfect square
-    if (Math::GMPz::Rmpz_sgn($d) <= 0 || Math::GMPz::Rmpz_perfect_square_p($d)) {
+    if (Math::GMPz::Rmpz_sgn($d) <= 0 or Math::GMPz::Rmpz_perfect_square_p($d)) {
         return _array();
     }
 
@@ -9331,168 +9503,70 @@ sub solve_pell {
         return _array([_array([bless(\$zero1), bless(\$zero2)])]);
     }
 
+    # --- Classical Pell (N = 1 or N = -1) via Continued Fractions ---
+    if (Math::GMPz::Rmpz_cmpabs_ui($n, 1) == 0) {
+        my ($x, $y) = _pell_fundamental_unit($d, Math::GMPz::Rmpz_sgn($n) < 0);
+        $x // return _array();
+        $y // return _array();
+        return _array(_array((bless \$x), (bless \$y)));
+    }
+
     my $abs_n = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_abs($abs_n, $n);
+
+    my ($u1, $v1) = _pell_fundamental_unit($d);
 
     # --- FAST PATH: PARI/GP ---
     if ($USE_PARI_GP && (Math::GMPz::Rmpz_sizeinbase($d, 2) > 16 or Math::GMPz::Rmpz_sizeinbase($abs_n, 2) > 32)) {
         my $d_str = Math::GMPz::Rmpz_get_str($d, 10);
+        my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
+        my $code  = "iferr(my(v=qfbsolve(Qfb(1,0,-$d_str), $n_str, 3)); if(#v, v, \"\"), E, \"\")";
 
-        if (Math::GMPz::Rmpz_cmp_ui($n, 1) == 0) {
-            my $code =
-"iferr(my(u=quadunit(4*$d_str)); my(p=u.pol); my(a=polcoef(p,0)); my(b=polcoef(p,1)); if(a^2-$d_str*b^2==-1, u=u^2; a=polcoef(u.pol,0); b=polcoef(u.pol,1)); [a,b], E, \"\")";
-            if (my $res = _execute_pari_gp($code)) {
-                if (my ($x_str, $y_str) = $res =~ /^\[(-?\d+),\s+(-?\d+)\]\z/) {
-                    my $U = Math::GMPz::Rmpz_init_set_str($x_str, 10);
-                    my $V = Math::GMPz::Rmpz_init_set_str($y_str, 10);
-                    Math::GMPz::Rmpz_abs($U, $U);
-                    Math::GMPz::Rmpz_abs($V, $V);
-                    return _array([_array([bless(\$U), bless(\$V)])]);
-                }
-            }
-        }
-        elsif (Math::GMPz::Rmpz_cmp_si($n, -1) == 0) {
-            my $code = "iferr(my(u=quadunit(4*$d_str)); my(p=u.pol); my(a=polcoef(p,0)); my(b=polcoef(p,1)); if(a^2-$d_str*b^2==-1, [a,b], []), E, \"\")";
-            if (my $res = _execute_pari_gp($code)) {
-                if (my ($x_str, $y_str) = $res =~ /^\[(-?\d+),\s+(-?\d+)\]\z/) {
-                    my $U = Math::GMPz::Rmpz_init_set_str($x_str, 10);
-                    my $V = Math::GMPz::Rmpz_init_set_str($y_str, 10);
-                    Math::GMPz::Rmpz_abs($U, $U);
-                    Math::GMPz::Rmpz_abs($V, $V);
-                    return _array([_array([bless(\$U), bless(\$V)])]);
-                }
-                return _array();
-            }
-        }
-        elsif (0) {
+        if (my $res = _execute_pari_gp($code)) {
+            $res =~ /[0-9]/ or return _array();    # no solution exists
 
-            # XXX: Fails to find all the fundamental solutions for certain inputs, such as:
-            # solve_pell(43, 163412341) = [[23908, 3081], [12899183, 1967106]]
-            my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
-            my $code  = "iferr(my(v=qfbsolve(Qfb(1,0,-$d_str), $n_str, 3)); if(#v, v, \"\"), E, \"\")";
-
-            if (my $res = _execute_pari_gp($code)) {
-                return _array() if $res eq '';    # No solution exists
-
-                my @sols;
-                while ($res =~ /\[(-?\d+),\s*(-?\d+)\]/g) {
-                    my $x = Math::GMPz::Rmpz_init_set_str($1, 10);
-                    my $y = Math::GMPz::Rmpz_init_set_str($2, 10);
-                    Math::GMPz::Rmpz_abs($x, $x);
-                    Math::GMPz::Rmpz_abs($y, $y);
-                    push @sols, _array([bless(\$x), bless(\$y)]);
-                }
-
-                if (@sols) {
-                    my %seen;
-                    @sols = grep { !$seen{"${$_->[0]};${$_->[1]}"}++ } @sols;
-                    @sols = sort { ${$a->[0]} <=> ${$b->[0]} } @sols;
-                    return _array(\@sols);
-                }
-            }
-        }
-    }
-
-    # --- Classical Pell (N = 1 or N = -1) via Continued Fractions ---
-    if (Math::GMPz::Rmpz_cmp_ui($abs_n, 1) == 0) {
-        my $a0 = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_sqrt($a0, $d);
-
-        my $P = Math::GMPz::Rmpz_init_set_ui(0);
-        my $Q = Math::GMPz::Rmpz_init_set_ui(1);
-        my $a = Math::GMPz::Rmpz_init_set($a0);
-
-        my $h2 = Math::GMPz::Rmpz_init_set_ui(0);
-        my $h1 = Math::GMPz::Rmpz_init_set_ui(1);
-        my $k2 = Math::GMPz::Rmpz_init_set_ui(1);
-        my $k1 = Math::GMPz::Rmpz_init_set_ui(0);
-
-        my $h = Math::GMPz::Rmpz_init();
-        my $k = Math::GMPz::Rmpz_init();
-
-        my $next_P = Math::GMPz::Rmpz_init();
-        my $next_Q = Math::GMPz::Rmpz_init();
-
-        my $max = Math::GMPz::Rmpz_get_d($a0);
-        $max = CORE::int(4 * $max * CORE::log($max) + 10);
-
-        my $is_negative_pell = (Math::GMPz::Rmpz_cmp_si($n, -1) == 0);
-
-        for (my $i = 0 ; $i <= $max ; ++$i) {
-            Math::GMPz::Rmpz_mul($h, $a, $h1);
-            Math::GMPz::Rmpz_add($h, $h, $h2);
-
-            Math::GMPz::Rmpz_mul($k, $a, $k1);
-            Math::GMPz::Rmpz_add($k, $k, $k2);
-
-            Math::GMPz::Rmpz_mul($next_P, $a, $Q);
-            Math::GMPz::Rmpz_sub($next_P, $next_P, $P);
-
-            Math::GMPz::Rmpz_mul($next_Q, $next_P, $next_P);
-            Math::GMPz::Rmpz_sub($next_Q, $d, $next_Q);
-            Math::GMPz::Rmpz_divexact($next_Q, $next_Q, $Q);
-
-            if (Math::GMPz::Rmpz_cmp_ui($next_Q, 1) == 0) {
-                my $sgn = ($i % 2 == 0) ? -1 : 1;
-
-                if ($is_negative_pell) {
-                    if ($sgn == -1) {
-                        my $ret_h = Math::GMPz::Rmpz_init_set($h);
-                        my $ret_k = Math::GMPz::Rmpz_init_set($k);
-                        return _array([_array([bless(\$ret_h), bless(\$ret_k)])]);
-                    }
-                }
-                else {
-                    if ($sgn == 1) {
-                        my $ret_h = Math::GMPz::Rmpz_init_set($h);
-                        my $ret_k = Math::GMPz::Rmpz_init_set($k);
-                        return _array([_array([bless(\$ret_h), bless(\$ret_k)])]);
-                    }
-                }
+            my @sols;
+            while ($res =~ /\[(-?\d+),\s*(-?\d+)\]/g) {
+                my $x = Math::GMPz::Rmpz_init_set_str($1, 10);
+                my $y = Math::GMPz::Rmpz_init_set_str($2, 10);
+                _reduce_pell_solution($x, $y, $u1, $v1, $d);
+                push @sols, _array([bless(\$x), bless(\$y)]);
             }
 
-            Math::GMPz::Rmpz_set($P, $next_P);
-            Math::GMPz::Rmpz_set($Q, $next_Q);
-
-            Math::GMPz::Rmpz_add($a, $a0, $P);
-            Math::GMPz::Rmpz_div($a, $a, $Q);
-
-            Math::GMPz::Rmpz_set($h2, $h1);
-            Math::GMPz::Rmpz_set($h1, $h);
-
-            Math::GMPz::Rmpz_set($k2, $k1);
-            Math::GMPz::Rmpz_set($k1, $k);
+            if (@sols) {
+                return _array(_sort_pell_solutions(@sols));
+            }
         }
-        return _array();
     }
 
     # --- Arbitrary N Path (LMM Algorithm) ---
     my @sq_divs = @{(bless \$abs_n)->square_divisors};
 
-    my @solutions;
-    my $sqrt_d = Math::GMPz::Rmpz_init();
+    state $sqrt_d = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_sqrt($sqrt_d, $d);
 
     # Pre-allocate iteration variables to avoid GC thrashing in tight loops
-    my $P_var  = Math::GMPz::Rmpz_init();
-    my $Q_var  = Math::GMPz::Rmpz_init();
-    my $X_var  = Math::GMPz::Rmpz_init();
-    my $Y_var  = Math::GMPz::Rmpz_init();
-    my $a_var  = Math::GMPz::Rmpz_init();
-    my $P_new  = Math::GMPz::Rmpz_init();
-    my $Q_new  = Math::GMPz::Rmpz_init();
-    my $X_new  = Math::GMPz::Rmpz_init();
-    my $Y_new  = Math::GMPz::Rmpz_init();
-    my $x2     = Math::GMPz::Rmpz_init();
-    my $y2     = Math::GMPz::Rmpz_init();
-    my $diff   = Math::GMPz::Rmpz_init();
-    my $dy     = Math::GMPz::Rmpz_init();
-    my $z_var  = Math::GMPz::Rmpz_init();
-    my $g      = Math::GMPz::Rmpz_init();
-    my $m      = Math::GMPz::Rmpz_init();
-    my $abs_m  = Math::GMPz::Rmpz_init();
-    my $half_m = Math::GMPz::Rmpz_init();
+    state $P_var  = Math::GMPz::Rmpz_init_nobless();
+    state $Q_var  = Math::GMPz::Rmpz_init_nobless();
+    state $X_var  = Math::GMPz::Rmpz_init_nobless();
+    state $Y_var  = Math::GMPz::Rmpz_init_nobless();
+    state $a_var  = Math::GMPz::Rmpz_init_nobless();
+    state $P_new  = Math::GMPz::Rmpz_init_nobless();
+    state $Q_new  = Math::GMPz::Rmpz_init_nobless();
+    state $X_new  = Math::GMPz::Rmpz_init_nobless();
+    state $Y_new  = Math::GMPz::Rmpz_init_nobless();
+    state $x2     = Math::GMPz::Rmpz_init_nobless();
+    state $y2     = Math::GMPz::Rmpz_init_nobless();
+    state $diff   = Math::GMPz::Rmpz_init_nobless();
+    state $dy     = Math::GMPz::Rmpz_init_nobless();
+    state $z_var  = Math::GMPz::Rmpz_init_nobless();
+    state $g      = Math::GMPz::Rmpz_init_nobless();
+    state $m      = Math::GMPz::Rmpz_init_nobless();
+    state $half_m = Math::GMPz::Rmpz_init_nobless();
 
+    my $abs_m = Math::GMPz::Rmpz_init();
+
+    my @solutions;
     foreach my $s_obj (@sq_divs) {
         my $s = _any2mpz($$s_obj);
 
@@ -9500,8 +9574,8 @@ sub solve_pell {
         Math::GMPz::Rmpz_divexact($m, $n, $s);    # m = n / s
         Math::GMPz::Rmpz_abs($abs_m, $m);
 
-        my @roots = @{sqrtmod_all((bless \$d), (bless \$abs_m))};
-        next unless @roots;
+        my @roots = @{(bless \$d)->sqrtmod_all(bless \$abs_m)};
+        @roots || next;
 
         Math::GMPz::Rmpz_tdiv_q_2exp($half_m, $abs_m, 1);
 
@@ -9526,7 +9600,7 @@ sub solve_pell {
 
             while (1) {
 
-                # Verification step: if X^2 - d*Y^2 == m, we found the fundamental solution for this class
+                # Verification step: if X^2 - d*Y^2 == m, we found a primitive solution
                 Math::GMPz::Rmpz_mul($x2, $X_var, $X_var);
                 Math::GMPz::Rmpz_mul($y2, $Y_var, $Y_var);
                 Math::GMPz::Rmpz_mul($y2, $y2,    $d);
@@ -9537,13 +9611,15 @@ sub solve_pell {
                     # Scale primitive solution by factor g
                     my $final_x = Math::GMPz::Rmpz_init();
                     Math::GMPz::Rmpz_mul($final_x, $X_var, $g);
-                    Math::GMPz::Rmpz_abs($final_x, $final_x);
 
                     my $final_y = Math::GMPz::Rmpz_init();
                     Math::GMPz::Rmpz_mul($final_y, $Y_var, $g);
-                    Math::GMPz::Rmpz_abs($final_y, $final_y);
+
+                    # Reduce to fundamental class solution
+                    _reduce_pell_solution($final_x, $final_y, $u1, $v1, $d);
 
                     push @solutions, _array([bless(\$final_x), bless(\$final_y)]);
+                    push @solutions, _array([bless(\$final_x), bless(\$final_y)->neg]);
                     last;
                 }
 
@@ -9584,13 +9660,7 @@ sub solve_pell {
         }
     }
 
-    if (@solutions) {
-        my %unique;
-        @solutions = grep { !$unique{"${$_->[0]};${$_->[1]}"}++ } @solutions;
-        @solutions = sort { ${$a->[0]} <=> ${$b->[0]} || ${$a->[1]} <=> ${$b->[1]} } @solutions;
-    }
-
-    return _array(\@solutions);
+    _array(_sort_pell_solutions(@solutions));
 }
 
 sub solve_lcg {

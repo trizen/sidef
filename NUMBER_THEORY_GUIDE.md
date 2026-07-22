@@ -1116,6 +1116,12 @@ Pell's equation $x^2 - D \cdot y^2 = 1$ has its fundamental solution encoded in 
 var (x, y) = solve_pell(61)[0]...
 say "x = #{x}, y = #{y}"
 
+# Generalized solver: iterate over solutions
+var (D, N) = (10, 9)
+var U = Quadratic(solve_pell(D)[0]..., D)
+var V = Quadratic(solve_pell(D, N)[0]..., D)
+for n in (0..5) { say (U**n * V) }
+
 # Manual implementation using the CF period
 func pell_fundamental(D) {
     # Return (x, y) the fundamental solution to x^2 - D*y^2 = 1
