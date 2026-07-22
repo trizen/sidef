@@ -553,6 +553,64 @@ collapsed). For polynomials with repeated roots, some roots may be missed.
 
 =cut
 
+=head2 roots_mod
+
+    poly.roots_mod(m)
+
+Returns all roots of the polynomial modulo C<m>.
+
+Given a polynomial C<f(x)> and a positive modulus C<m>, this method finds
+every residue class C<x> satisfying:
+
+    f(x) ≡ 0 (mod m)
+
+The result is returned as an array of distinct roots, sorted in ascending
+order.
+
+The implementation automatically selects the most appropriate solving
+algorithm depending on the polynomial and modulus:
+
+=over 4
+
+=item *
+
+Linear polynomials are solved using C<linear_congruence()>.
+
+=item *
+
+Quadratic polynomials are solved exactly using C<solve_quadratic_mod()>.
+
+=item *
+
+Cubic polynomials are solved exactly using C<solve_cubic_mod()>.
+
+=item *
+
+Sparse polynomials of the form C<a*x^k + b> are reduced to modular
+root extraction via C<rootmod_all()> whenever possible.
+
+=item *
+
+For general polynomials, the modulus is factorized into prime powers.
+Roots are computed modulo each prime power (using Hensel lifting when
+appropriate) and combined via the Chinese Remainder Theorem to obtain all
+solutions modulo C<m>.
+
+=back
+
+If the polynomial has no roots modulo C<m>, an empty array is returned.
+
+    var p = Polynomial([1, 0, -1])      # x^2 - 1
+    say p.roots_mod(7)                  # [1, 6]
+
+    var q = Polynomial([1, 0, 0, -1])   # x^3 - 1
+    say q.roots_mod(13)                 # [1, 3, 9]
+
+    var r = Polynomial([1, 3, 4, 2, 0, 5])  # x^5 + 3*x^4 + 4*x^3 + 2*x^2 + 5
+    say r.roots_mod(17)                     # [11, 14]
+
+=cut
+
 =head2 binomial
 
     n.binomial(k)

@@ -537,6 +537,23 @@ sub roots {
     Sidef::Types::Array::Array->new(\@polygonal_roots);
 }
 
+sub roots_mod {
+    my ($x, $m) = @_;
+
+    my @coeffs;
+    foreach my $pair (@{$x->coeffs}) {
+        my $d = ${$pair->[0]};
+        my $v = $pair->[1];
+        $coeffs[$d] = $v;
+    }
+
+    $_ //= Sidef::Types::Number::Number::ZERO for @coeffs;
+
+    my $roots = Sidef::Types::Number::Number::_solve_polynomial_congruence_all($m, \@coeffs);
+    $roots = [map { Sidef::Types::Number::Number::_set_int($_) } @$roots];
+    Sidef::Types::Array::Array->new($roots);
+}
+
 sub binomial {
     my ($n, $k) = @_;
 

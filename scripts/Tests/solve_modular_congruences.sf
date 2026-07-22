@@ -169,6 +169,109 @@ do {
     }.all{.is_zero})
 }
 
+do {
+    var x = 123456
+    var a = 32
+    var b = 48
+    var c = 262
+    var d = 810
+    var n = (43**2 * (2**16 + 1))
+
+    var r = (a*x**3 + b*x**2 + c*x + d % n)
+
+    assert_eq(
+        solve_cubic_mod(a, b, c, d - r, n),
+        %n[123456, 66315826, 99215400]
+    )
+
+    assert_eq(
+        Poly([a, b, c, d - r]).roots_mod(n),
+        %n[123456, 66315826, 99215400]
+    )
+}
+
+do {
+    var x = 123456
+    var a = 32
+    var b = 48
+    var c = 262
+    var d = 810
+    var n = (43 * (2**16 + 1))
+
+    var r = (a*x**3 + b*x**2 + c*x + d % n)
+
+    assert_eq(
+        solve_cubic_mod(a, b, c, d - r, n),
+        %n[123456, 582215, 1499733]
+    )
+
+    assert_eq(
+        Poly([a, b, c, d - r]).roots_mod(n),
+        %n[123456, 582215, 1499733]
+    )
+}
+
+do {
+    var x = 123456
+    var a = 32
+    var b = 48
+    var c = 262
+    var d = 810
+    var n = (2**16 + 1)
+
+    var r = (a*x**3 + b*x**2 + c*x + d % n)
+
+    assert_eq(
+        solve_cubic_mod(a, b, c, d - r, n),
+        %n[57919]
+    )
+
+    assert_eq(
+        Poly([a, b, c, d - r]).roots_mod(n),
+        %n[57919]
+    )
+}
+
+do {
+    var x = 123456
+    var a = 32
+    var b = 48
+    var c = 262
+    var d = 810
+    var e = 33
+    var n = 43*(2**16 + 1)
+
+    var r = (Poly([a,b,c,d,e]).eval(x) % n)
+
+    assert_eq(
+        Poly([a, b, c, d, e - r]).roots_mod(n),
+        [123456, 254530, 802555, 933629]
+    )
+}
+
+do {
+    var x = 123456
+    var a = 32
+    var b = 48
+    var c = 262
+    var d = 810
+    var e = 33
+    var n = (43**3 * (2**16 + 1))
+
+    var r = (Poly([a,b,c,d,e]).eval(x) % n)
+
+    assert_eq(
+        Poly([a, b, c, d, e - r]).roots_mod(n),
+        [123456, 333337293, 637143096, 970356933]
+    )
+
+    assert([123456, 333337293, 637143096, 970356933].map{|x|
+         Poly([a, b, c, d, e - r]).eval(x) % n
+    }.all{.is_zero})
+}
+
+assert_eq(roots_mod(Poly(6) + 1, 2**16 + 1), [256, 65281])
+
 assert_eq(solve_pell(61), [[1766319049, 226153980]])
 assert_eq(solve_pell(863), [[18524026608, 630565199]])
 assert_eq(solve_pell(953, -1), [[2746864744, 88979677]])
