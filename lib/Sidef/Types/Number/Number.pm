@@ -15311,6 +15311,8 @@ sub quadratic_formula {
     ((bless \$x1), (bless \$x2));
 }
 
+*solve_quadratic = \&quadratic_formula;
+
 sub quadratic_formulaQ {
     my ($A, $B, $C) = @_;
 
@@ -15338,6 +15340,8 @@ sub quadratic_formulaQ {
 
     ($x1, $x2);
 }
+
+*solve_quadraticQ = \&quadratic_formulaQ;
 
 sub cubic_formula {
     my ($A, $B, $C, $D) = @_;
@@ -15397,6 +15401,8 @@ sub cubic_formula {
     return @roots;
 }
 
+*solve_cubic = \&cubic_formula;
+
 sub iquadratic_formula {
     my ($A, $B, $C) = @_;
 
@@ -15445,6 +15451,7 @@ sub iquadratic_formula {
     ((bless \$u), (bless \$t));
 }
 
+*isolve_quadratic          = \&iquadratic_formula;
 *integer_quadratic_formula = \&iquadratic_formula;
 
 sub modular_quadratic_formula {
@@ -15532,6 +15539,7 @@ sub modular_quadratic_formula {
     _array(\@solutions)->isort->iuniq;
 }
 
+*solve_quadratic_mod  = \&modular_quadratic_formula;
 *quadratic_congruence = \&modular_quadratic_formula;
 
 sub reduce_quadratic_form {
