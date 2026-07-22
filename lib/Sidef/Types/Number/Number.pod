@@ -3105,20 +3105,6 @@ Aliases: I<δ>
 
 =cut
 
-=head2 linear_congruence
-
-    linear_congruence(n, r, m)
-
-Return an array with the values of C<x> satisfying the following linear congruence:
-
-    n*x == r (mod m)
-
-Example:
-
-    say linear_congruence(3, 12, 15)    #=> [4, 9, 14]
-
-=cut
-
 =head2 muladdmod
 
     muladdmod(a, b, c, m)
@@ -4763,6 +4749,22 @@ Aliases: I<solve_linear_congruence>
 
 =cut
 
+=head2 solve_lcg_all
+
+    solve_lcg_all(n, r, m)
+
+Return an array with the values of C<x> satisfying the following linear congruence:
+
+    n*x == r (mod m)
+
+Example:
+
+    say solve_lcg_all(3, 12, 15)    #=> [4, 9, 14]
+
+Aliases: I<linear_congruence>
+
+=cut
+
 =head2 solve_quadratic
 
     solve_quadratic(a,b,c)
@@ -4805,19 +4807,76 @@ Aliases: I<quadratic_formulaQ>
 
 =head2 solve_quadratic_mod
 
-    solve_quadratic_mod(a,b,c,m)
+    solve_quadratic_mod(a, b, c, m)
 
-Returns an array with all the positive solutions for C<x> to the following quadratic congruence:
+Returns all solutions to the quadratic congruence:
 
-    a*x^2 + b*x + c == 0 (mod m)
+    a*x^2 + b*x + c ≡ 0 (mod m)
 
-where C<a,b,c> are rational values and C<m> is a positive integer.
+The result is returned as an array containing all distinct solutions modulo
+C<m>, sorted in ascending order. If the congruence has no solutions, an empty
+array is returned.
 
-Example:
+If the leading coefficient C<a> is zero, the congruence degenerates into the
+linear congruence:
 
-    say solve_quadratic_mod(3,4,5,124)  #=> [47, 55, 109, 117]
+    b*x + c ≡ 0 (mod m)
+
+which is solved automatically using C<solve_lcg_all>.
+
+When C<m> is odd and the leading coefficient C<a> is invertible modulo C<m>,
+the function uses the modular analogue of the quadratic formula. After
+normalizing the equation by C<a>, it completes the square to obtain:
+
+    (x + b/(2a))^2 ≡ (b/2a)^2 - c/a (mod m)
+
+and computes all modular square roots using C<sqrtmod_all>.
+
+For the general case (including even moduli or noninvertible leading
+coefficients), the congruence is transformed into the equivalent square-root
+problem:
+
+    k^2 ≡ b^2 - 4ac (mod 4am)
+
+Solutions are then reconstructed from the corresponding square roots modulo C<4am>.
+
+Examples:
+
+    # x^2 - 1 ≡ 0 (mod 13)
+    say solve_quadratic_mod(1, 0, -1, 13)    #=> [1, 12]
+
+    # Linear congruence: 5x + 2 ≡ 0 (mod 11)
+    say solve_quadratic_mod(0, 5, 2, 11)     #=> [4]
+
+    # 3*x^2 + 4*x + 5 ≡ 0 (mod 124)
+    say solve_quadratic_mod(3, 4, 5, 124)    #=> [47, 55, 109, 117]
 
 Aliases: I<modular_quadratic_formula>, I<quadratic_congruence>
+
+=cut
+
+=head2 solve_cubic_mod
+
+    solve_cubic_mod(A, B, C, D, m)
+
+Returns all solutions to the cubic polynomial congruence:
+
+    A*x^3 + B*x^2 + C*x + D ≡ 0 (mod m)
+
+The result is returned as an array containing all distinct solutions modulo
+C<m>, sorted in ascending order. If no solutions exist, or if the equation
+cannot be transformed into a monic cubic modulo C<m>, an empty array is
+returned.
+
+The function requires that the modular inverses of C<2>, C<3>, C<27>, and the
+leading coefficient C<A> exist modulo C<m>. If any of these inverses do not
+exist, the function returns an empty array.
+
+    # x^3 - 1 ≡ 0 (mod 13)
+    say solve_cubic_mod(1, 0, 0, -1, 13)     # [1, 3, 9]
+
+    # x^3 + 2x + 5 ≡ 0 (mod 17)
+    say solve_cubic_mod(1, 0, 2, 5, 17)      # [2]
 
 =cut
 

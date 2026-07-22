@@ -9633,7 +9633,7 @@ sub solve_lcg {
 
 *solve_linear_congruence = \&solve_lcg;
 
-sub linear_congruence {
+sub solve_lcg_all {
     my ($n, $r, $m) = @_;
 
     if ($n->is_div($m)) {
@@ -9653,16 +9653,16 @@ sub linear_congruence {
     my $orig_m = Math::GMPz::Rmpz_init_set_str($m,     10);
     my $g_val  = Math::GMPz::Rmpz_init_set_str($g_str, 10);
 
-    my $r_val = Math::GMPz::Rmpz_init();
+    state $r_val = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_set_str($r_val, $r, 10);
     Math::GMPz::Rmpz_divexact($r_val, $r_val, $g_val);
 
-    my $m_val = Math::GMPz::Rmpz_init();
+    state $m_val = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_set_str($m_val, $m, 10);
     Math::GMPz::Rmpz_divexact($m_val, $m_val, $g_val);
 
     my $u_val = Math::GMPz::Rmpz_init_set_str($u_str, 10);
-    my $z     = Math::GMPz::Rmpz_init();
+    state $z = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_mul($z, $u_val, $r_val);
 
     my @solutions;
@@ -9686,6 +9686,8 @@ sub linear_congruence {
 
     _array([map { bless \$_ } sort { $a <=> $b } @solutions]);
 }
+
+*linear_congruence = \&solve_lcg_all;
 
 sub sqrt_cfrac_period_each {
     my ($n, $block, $max) = @_;
@@ -12030,6 +12032,8 @@ sub rootmod_all {
         my @roots = Math::Prime::Util::allrootmod($A, $k, $n);
         return _array([map { bless \$_ } @roots]);
     }
+
+    # return _array([map {_set_int($_)} Math::Prime::Util::GMP::allrootmod($$A, $$k, $$n)]);
 
     $A = Math::GMPz::Rmpz_init_set($A);    # copy
     $k = Math::GMPz::Rmpz_init_set($k);    # copy
@@ -15478,7 +15482,7 @@ sub modular_quadratic_formula {
 
     # x must not be zero
     if (Math::GMPz::Rmpz_sgn($x) == 0) {
-        return (bless \$y)->linear_congruence((bless \__neg__($z)), (bless \$m));
+        return (bless \$y)->solve_lcg_all((bless \__neg__($z)), (bless \$m));
     }
 
     state $inv_a = Math::GMPz::Rmpz_init_nobless();
@@ -15541,6 +15545,154 @@ sub modular_quadratic_formula {
 
 *solve_quadratic_mod  = \&modular_quadratic_formula;
 *quadratic_congruence = \&modular_quadratic_formula;
+
+# Cubic equation: A*x^3 + B*x^2 + C*x + D ≡ 0 (mod P)
+sub solve_cubic_mod {
+    my ($A_arg, $B_arg, $C_arg, $D_arg, $P_arg) = @_;
+
+    # Convert all inputs to Math::GMPz objects
+    my $A = _any2mpz($$A_arg) // return _array();
+    my $B = _any2mpz($$B_arg) // return _array();
+    my $C = _any2mpz($$C_arg) // return _array();
+    my $D = _any2mpz($$D_arg) // return _array();
+    my $P = _any2mpz($$P_arg) // return _array();
+
+    return _array() if Math::GMPz::Rmpz_sgn($P) == 0;
+
+    # Pre-allocate required objects to prevent loop allocations
+    state $t = Math::GMPz::Rmpz_init_nobless();
+    state $c = Math::GMPz::Rmpz_init_nobless();
+    state $d = Math::GMPz::Rmpz_init_nobless();
+    state $p = Math::GMPz::Rmpz_init_nobless();
+    state $q = Math::GMPz::Rmpz_init_nobless();
+
+    state $inv_3  = Math::GMPz::Rmpz_init_nobless();
+    state $inv_27 = Math::GMPz::Rmpz_init_nobless();
+    state $inv_2  = Math::GMPz::Rmpz_init_nobless();
+
+    state $temp1 = Math::GMPz::Rmpz_init_nobless();
+    state $temp2 = Math::GMPz::Rmpz_init_nobless();
+
+    # Setup modular inverses of 3, 27 and 2 modulo P
+    Math::GMPz::Rmpz_set_ui($temp1, 3);
+    Math::GMPz::Rmpz_invert($inv_3, $temp1, $P) or return _array();
+
+    Math::GMPz::Rmpz_set_ui($temp1, 27);
+    Math::GMPz::Rmpz_invert($inv_27, $temp1, $P) or return _array();
+
+    Math::GMPz::Rmpz_set_ui($temp1, 2);
+    Math::GMPz::Rmpz_invert($inv_2, $temp1, $P) or return _array();
+
+    # Make the polynomial monic: divide B, C, D by A modulo P
+    Math::GMPz::Rmpz_invert($temp1, $A, $P) or return _array();    # A must be invertible mod P
+
+    Math::GMPz::Rmpz_mul($t, $B, $temp1);
+    Math::GMPz::Rmpz_mod($t, $t, $P);
+
+    Math::GMPz::Rmpz_mul($c, $C, $temp1);
+    Math::GMPz::Rmpz_mod($c, $c, $P);
+
+    Math::GMPz::Rmpz_mul($d, $D, $temp1);
+    Math::GMPz::Rmpz_mod($d, $d, $P);
+
+    # b/3 (mod P)
+    my $t_over_3 = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($t_over_3, $t, $inv_3);
+    Math::GMPz::Rmpz_mod($t_over_3, $t_over_3, $P);
+
+    # p = c - b^2/3   (mod P)
+    Math::GMPz::Rmpz_mul($temp1, $t, $t);
+    Math::GMPz::Rmpz_mod($temp1, $temp1, $P);
+    Math::GMPz::Rmpz_mul($temp2, $temp1, $inv_3);
+
+    Math::GMPz::Rmpz_sub($p, $c, $temp2);
+    Math::GMPz::Rmpz_mod($p, $p, $P);
+
+    # q = d + 2*b^3/27 - b*c/3   (mod P)
+    Math::GMPz::Rmpz_mul($temp2, $temp1, $t);         # b^3
+    Math::GMPz::Rmpz_mod($temp2, $temp2, $P);
+    Math::GMPz::Rmpz_mul_ui($temp2, $temp2, 2);
+    Math::GMPz::Rmpz_mul($temp2, $temp2, $inv_27);    # 2*b^3/27
+
+    Math::GMPz::Rmpz_mul($temp1, $t,     $c);         # b*c
+    Math::GMPz::Rmpz_mul($temp1, $temp1, $inv_3);     # b*c/3
+
+    Math::GMPz::Rmpz_add($q, $d, $temp2);
+    Math::GMPz::Rmpz_sub($q, $q, $temp1);
+    Math::GMPz::Rmpz_mod($q, $q, $P);
+
+    # Discriminant Δ = q^2 + 4*p^3/27   (mod P)
+    my $delta = Math::GMPz::Rmpz_init();
+
+    Math::GMPz::Rmpz_mul($temp1, $p, $p);
+    Math::GMPz::Rmpz_mod($temp1, $temp1, $P);
+    Math::GMPz::Rmpz_mul($temp1, $temp1, $p);         # p^3
+    Math::GMPz::Rmpz_mod($temp1, $temp1, $P);
+
+    Math::GMPz::Rmpz_mul_ui($temp1, $temp1, 4);       # 4*p^3
+    Math::GMPz::Rmpz_mul($temp1, $temp1, $inv_27);    # 4*p^3/27
+
+    Math::GMPz::Rmpz_mul($delta, $q, $q);
+    Math::GMPz::Rmpz_add($delta, $delta, $temp1);
+    Math::GMPz::Rmpz_mod($delta, $delta, $P);
+
+    # Find all square roots of Δ modulo P
+    my @W_roots = @{(bless \$delta)->sqrtmod_all(bless \$P)};
+    my %seen;
+
+    my $U3 = Math::GMPz::Rmpz_init();
+    my $V3 = Math::GMPz::Rmpz_init();
+
+    foreach my $W (@W_roots) {
+
+        # U^3 = (-q + W) / 2   (mod P)
+        Math::GMPz::Rmpz_sub($U3, _any2mpz($$W), $q);
+        Math::GMPz::Rmpz_mul($U3, $U3, $inv_2);
+        Math::GMPz::Rmpz_mod($U3, $U3, $P);
+
+        # V^3 = (-q - W) / 2   (mod P)
+        Math::GMPz::Rmpz_neg($V3, _any2mpz($$W));
+        Math::GMPz::Rmpz_sub($V3, $V3, $q);
+        Math::GMPz::Rmpz_mul($V3, $V3, $inv_2);
+        Math::GMPz::Rmpz_mod($V3, $V3, $P);
+
+        # Extract all cube roots of U^3 and V^3
+        my @U_roots = @{(bless \$U3)->rootmod_all(THREE, bless \$P)};
+        my @V_roots = @{(bless \$V3)->rootmod_all(THREE, bless \$P)};
+
+        foreach my $U_obj (@U_roots) {
+            my $U = _any2mpz($$U_obj);
+
+            foreach my $V_obj (@V_roots) {
+                my $V = _any2mpz($$V_obj);
+
+                # Verify Cardano's condition: 3*U*V == -p (mod P)
+                Math::GMPz::Rmpz_mul($temp1, $U, $V);
+                Math::GMPz::Rmpz_mul_ui($temp1, $temp1, 3);
+                Math::GMPz::Rmpz_add($temp1, $temp1, $p);
+                Math::GMPz::Rmpz_mod($temp1, $temp1, $P);
+
+                if (Math::GMPz::Rmpz_sgn($temp1) == 0) {
+                    my $x = Math::GMPz::Rmpz_init();
+
+                    # Y = U + V
+                    Math::GMPz::Rmpz_add($x, $U, $V);
+
+                    # x = Y - b/3   (mod P)
+                    Math::GMPz::Rmpz_sub($x, $x, $t_over_3);
+                    Math::GMPz::Rmpz_mod($x, $x, $P);
+
+                    my $key = Math::GMPz::Rmpz_get_str($x, 16);
+                    if (!exists $seen{$key}) {
+                        $seen{$key} = _set_int($x);
+                    }
+                }
+            }
+        }
+    }
+
+    _array([sort { $$a <=> $$b } values %seen]);
+}
 
 sub reduce_quadratic_form {
     my ($A, $B, $C) = @_;
