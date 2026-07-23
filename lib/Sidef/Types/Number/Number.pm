@@ -12240,7 +12240,7 @@ sub _poly_bruteforce_roots_mod {
         my @solutions;
         my $m_obj = bless \$m;
         my $poly  = Sidef::Types::Number::PolynomialMod->new([CORE::reverse(@$coeffs)], $m_obj);
-        foreach my $f (@{$poly->factor}) {
+        foreach my $f (map { $_->[0] } @{$poly->factor_exp}) {
             ref($f) eq 'Sidef::Types::Number::PolynomialMod' or next;
             $f->degree->is_one                               or next;
             push @solutions, $m_obj->sub($f->coeff(ZERO))->mod($m_obj);
@@ -12311,14 +12311,13 @@ sub _reduce_coeffs_mod {
 sub _poly_solve_special_cases {
     my ($coeffs, $n) = @_;
 
+    return undef;
     FAST_MODE || return undef;
 
-    # Degree 0: a nonzero constant has no roots (the zero polynomial was
-    # already handled above).
+    # Degree 0: a nonzero constant has no roots
     return [] if $#$coeffs == 0;
 
-    # Degree 1: linear_congruence() handles this in full generality (unlike
-    # the invertible-leading-coefficient shortcut below).
+    # Degree 1: linear_congruence() handles this in full generality
     if ($#$coeffs == 1) {
         return solve_lcg_all(_set_int($coeffs->[1]), _set_int(__neg__($coeffs->[0])), _set_int($n));
     }

@@ -662,197 +662,338 @@ sub powmod {
     return $result;
 }
 
-# ------------------------------------------------------------------
-# Internal helper: Distinct Degree Factorization (DDF)
-#
-# Given a monic squarefree polynomial f in GF(p)[x], returns a list
-# of PolynomialMod objects @g where $g[k] is the product of every
-# monic irreducible factor of f whose degree is exactly (k+1).
-# (Factors of the wrong degree produce the constant 1 at that slot.)
-#
-# Algorithm:
-#   Set w = x.  For k = 1, 2, ...:
-#     w ← w^p mod f        (Frobenius: w accumulates x^(p^k) mod f)
-#     g_k = gcd(w − x, f)  (captures all degree-k irreducibles of f)
-#     f ← f / g_k
-#   Stop when f = 1.
-#
-# Correctness: x^(p^k) − x is divisible by every monic irreducible
-# over GF(p) of degree d whenever d | k.  After removing factors of
-# degree 1,...,k−1, the gcd isolates factors of degree exactly k.
-# ------------------------------------------------------------------
-my $_pm_ddf = sub {
-    my ($f, $p) = @_;
+sub _poly_clone {
+    my ($a) = @_;
+    return [map { Math::GMPz::Rmpz_init_set($_) } @$a];
+}
 
-    my $ONE    = Sidef::Types::Number::Number::ONE;
-    my $x_poly = __PACKAGE__->new(1 => $ONE, $p);     # monomial x
-    my $w      = $x_poly;
+sub _poly_deg {
+    my ($a) = @_;
+    my $d = $#$a;
+    while ($d >= 0 && Math::GMPz::Rmpz_sgn($a->[$d]) == 0) { $d--; }
+    return $d;
+}
+
+sub _poly_strip {
+    my ($a) = @_;
+    while (@$a && Math::GMPz::Rmpz_sgn($a->[-1]) == 0) { pop @$a; }
+    return $a;
+}
+
+sub _poly_monic {
+    my ($a, $p) = @_;
+    my $d = _poly_deg($a);
+    return [] if $d < 0;
+    my $lc = $a->[$d];
+    if (Math::GMPz::Rmpz_cmp_ui($lc, 1) != 0) {
+        my $inv = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_invert($inv, $lc, $p);
+        for my $i (0 .. $d) {
+            Math::GMPz::Rmpz_mul($a->[$i], $a->[$i], $inv);
+            Math::GMPz::Rmpz_mod($a->[$i], $a->[$i], $p);
+        }
+    }
+    return _poly_strip($a);
+}
+
+sub _poly_add {
+    my ($a, $b, $p) = @_;
+    my @res;
+    my $max  = @$a > @$b ? $#$a : $#$b;
+    my $zero = Math::GMPz::Rmpz_init();
+    for my $i (0 .. $max) {
+        my $v = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_add($v, $i <= $#$a ? $a->[$i] : $zero, $i <= $#$b ? $b->[$i] : $zero);
+        Math::GMPz::Rmpz_mod($v, $v, $p);
+        push @res, $v;
+    }
+    return _poly_strip(\@res);
+}
+
+sub _poly_sub {
+    my ($a, $b, $p) = @_;
+    my @res;
+    my $max  = @$a > @$b ? $#$a : $#$b;
+    my $zero = Math::GMPz::Rmpz_init();
+    for my $i (0 .. $max) {
+        my $v = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub($v, $i <= $#$a ? $a->[$i] : $zero, $i <= $#$b ? $b->[$i] : $zero);
+        Math::GMPz::Rmpz_mod($v, $v, $p);
+        push @res, $v;
+    }
+    return _poly_strip(\@res);
+}
+
+sub _poly_mul {
+    my ($a, $b, $p) = @_;
+    my $da = _poly_deg($a);
+    my $db = _poly_deg($b);
+    return [] if $da < 0 || $db < 0;
+
+    my @res = map { Math::GMPz::Rmpz_init() } 0 .. ($da + $db);
+    my $t   = Math::GMPz::Rmpz_init();
+
+    for my $i (0 .. $da) {
+        next if Math::GMPz::Rmpz_sgn($a->[$i]) == 0;
+        for my $j (0 .. $db) {
+            Math::GMPz::Rmpz_mul($t, $a->[$i], $b->[$j]);
+            Math::GMPz::Rmpz_add($res[$i + $j], $res[$i + $j], $t);
+        }
+    }
+    for my $r (@res) {
+        Math::GMPz::Rmpz_mod($r, $r, $p);
+    }
+    return _poly_strip(\@res);
+}
+
+sub _poly_divmod {
+    my ($x, $y, $p) = @_;
+    my $dx = _poly_deg($x);
+    my $dy = _poly_deg($y);
+
+    return ([], _poly_clone($x)) if $dx < $dy;
+
+    my $r = _poly_clone($x);
+    my @q = map { Math::GMPz::Rmpz_init() } 0 .. ($dx - $dy);
+
+    my $inv_lc = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_invert($inv_lc, $y->[$dy], $p);
+    my $t = Math::GMPz::Rmpz_init();
+
+    for (my $i = $dx ; $i >= $dy ; $i--) {
+        next if Math::GMPz::Rmpz_sgn($r->[$i]) == 0;
+
+        Math::GMPz::Rmpz_mul($t, $r->[$i], $inv_lc);
+        Math::GMPz::Rmpz_mod($t, $t, $p);
+        Math::GMPz::Rmpz_set($q[$i - $dy], $t);
+
+        for my $j (0 .. $dy) {
+            next if Math::GMPz::Rmpz_sgn($y->[$j]) == 0;
+            my $m = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($m, $t, $y->[$j]);
+            Math::GMPz::Rmpz_sub($r->[$i - $dy + $j], $r->[$i - $dy + $j], $m);
+            Math::GMPz::Rmpz_mod($r->[$i - $dy + $j], $r->[$i - $dy + $j], $p);
+        }
+    }
+    return (_poly_strip(\@q), _poly_strip($r));
+}
+
+sub _poly_mod {
+    my ($x, $y, $p) = @_;
+    my ($q, $r) = _poly_divmod($x, $y, $p);
+    return $r;
+}
+
+sub _poly_gcd {
+    my ($a, $b, $p) = @_;
+    my $r0 = _poly_clone($a);
+    my $r1 = _poly_clone($b);
+    while (_poly_deg($r1) >= 0) {
+        my $r = _poly_mod($r0, $r1, $p);
+        $r0 = $r1;
+        $r1 = $r;
+    }
+    return _poly_monic($r0, $p);
+}
+
+sub _poly_derivative {
+    my ($a, $p) = @_;
+    my $d = _poly_deg($a);
+    return [] if $d < 1;
+    my @res;
+    for my $i (1 .. $d) {
+        my $v = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul_ui($v, $a->[$i], $i);
+        Math::GMPz::Rmpz_mod($v, $v, $p);
+        push @res, $v;
+    }
+    return _poly_strip(\@res);
+}
+
+sub _poly_powmod {
+    my ($base, $exp, $modpoly, $p) = @_;
+    my $res = [Math::GMPz::Rmpz_init_set_ui(1)];
+    my $b   = _poly_mod($base, $modpoly, $p);
+
+    my $e = Math::GMPz::Rmpz_init_set($exp);
+    while (Math::GMPz::Rmpz_sgn($e) > 0) {
+        if (Math::GMPz::Rmpz_tstbit($e, 0)) {
+            $res = _poly_mod(_poly_mul($res, $b, $p), $modpoly, $p);
+        }
+        $b = _poly_mod(_poly_mul($b, $b, $p), $modpoly, $p);
+        Math::GMPz::Rmpz_fdiv_q_2exp($e, $e, 1);
+    }
+    return $res;
+}
+
+# ======================================================================
+# Sub-algorithms for Factorization
+# ======================================================================
+
+sub _poly_ddf {
+    my ($f, $p) = @_;
+    my $x_poly = [Math::GMPz::Rmpz_init(), Math::GMPz::Rmpz_init_set_ui(1)];
+    my $w      = _poly_clone($x_poly);
     my @factors;
 
-    for my $k (1 .. CORE::int($f->degree->numify)) {
-        $w = $w->powmod($p, $f);                      # w = x^(p^k) mod f
+    my $f_curr = _poly_clone($f);
+    my $deg_f  = _poly_deg($f_curr);
 
-        my $diff = $w->sub($x_poly);
-        my $gk   = $diff->monic_gcd($f);
-        push @factors, [$k, $gk];
+    for my $k (1 .. $deg_f) {
+        $w = _poly_powmod($w, $p, $f_curr, $p);
+        my $diff = _poly_sub($w, $x_poly, $p);
+        my $gk   = _poly_gcd($diff, $f_curr, $p);
 
-        $f = $f->div($gk);                            # exact division; remove all degree-k factors
-        last if $f->is_one;
+        if (_poly_deg($gk) > 0) {
+            push @factors, [$k, $gk];
+            my ($q, $r) = _poly_divmod($f_curr, $gk, $p);
+            $f_curr = $q;
+        }
+        last if _poly_deg($f_curr) <= 0;
     }
 
-    # Safety net for non-squarefree or degenerate input: if f is still
-    # non-trivial after the loop its remaining irreducible factors all
-    # have the same degree equal to deg(f) itself.
-    push @factors, [CORE::int($f->degree->numify), $f] unless $f->is_one;
+    if (_poly_deg($f_curr) > 0) {
+        push @factors, [_poly_deg($f_curr), $f_curr];
+    }
+    return @factors;
+}
 
-    return @factors;    # list of [degree, product_of_that_degree_irreducibles]
-};
+sub _poly_edf {
+    my ($f, $d, $p, $p_sidef) = @_;
+    my $deg_f = _poly_deg($f);
+    return ()   if $deg_f <= 0;
+    return ($f) if $deg_f == $d;
 
-# ------------------------------------------------------------------
-# Internal helper: Equal Degree Factorization (CZ splitting)
-#
-# Given a monic squarefree f in GF(p)[x] that is a product of m
-# distinct monic irreducibles each of degree d, returns the list of
-# those irreducibles.
-#
-# For odd p, uses the quadratic-residue (Euler-criterion) split:
-#   pick random t, compute h = t^((p^d−1)/2) − 1 mod f,
-#   then g = gcd(h, f).
-# A random t falls on each side of the QR/non-QR split for roughly
-# half the irreducible factors of f, giving a non-trivial g with
-# probability ≥ 1 − 2^(1−m).
-#
-# For p = 2, uses the absolute trace map instead:
-#   h = t + t^2 + t^(2^2) + ... + t^(2^(d−1)) mod f.
-# ------------------------------------------------------------------
-my $_pm_edf = sub {
-    my ($f, $d, $p) = @_;
+    my $is_char2 = (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0);
+    my $exp      = Math::GMPz::Rmpz_init();
 
-    my $deg_f = CORE::int($f->degree->numify);
+    if (!$is_char2) {
+        Math::GMPz::Rmpz_pow_ui($exp, $p, $d);
+        Math::GMPz::Rmpz_sub_ui($exp, $exp, 1);
+        Math::GMPz::Rmpz_fdiv_q_2exp($exp, $exp, 1);
+    }
 
-    return ()   if $deg_f == 0;
-    return ($f) if $deg_f == $d;    # already a single irreducible
-
-    my $ONE      = Sidef::Types::Number::Number::ONE;
-    my $is_char2 = $p->eq(Sidef::Types::Number::Number::TWO);
-    my $d_num    = Sidef::Types::Number::Number::_set_int($d);
-
-    # Exponent (p^d − 1) / 2 — only used for odd p.
-    my $exp =
-      $is_char2
-      ? undef
-      : $p->pow($d_num)->dec->idiv(Sidef::Types::Number::Number::TWO);
-
-    my ($g, $h);
-
-    for (1 .. 200) {    # retry up to 200 times (expected O(1) per call)
-
-        # --- Generate a random non-zero polynomial of degree < deg_f
-        #     with coefficients drawn uniformly from {0 ... p−1}.
-        my %terms;
+    my $g;
+    for (1 .. 200) {
+        my @t;
         for my $k (0 .. $deg_f - 1) {
-            my $c = $p->irand;
-            $terms{$k} = $c if $c;
+            my $c_sidef = $p_sidef->irand;
+            my $c       = Sidef::Types::Number::Number::_any2mpz($$c_sidef);
+            push @t, Math::GMPz::Rmpz_init_set($c);
         }
-        my $t = __PACKAGE__->new(%terms, $p);
-        next if $t->is_zero;
+        my $t_poly = _poly_strip(\@t);
+        next if _poly_deg($t_poly) < 0;
 
+        my $h;
         if ($is_char2) {
-
-            # --- Characteristic 2: absolute trace map
-            # T(t) = t + t^2 + t^(2^2) + ... + t^(2^(d−1))  mod f
-            $h = $t->mod($f);
-            my $ti = $h;
+            $h = _poly_mod($t_poly, $f, $p);
+            my $ti = _poly_clone($h);
             for my $i (1 .. $d - 1) {
-                $ti = $ti->powmod($p, $f);     # t^(2^i) mod f
-                $h  = $h->add($ti)->mod($f);
+                $ti = _poly_powmod($ti, $p, $f, $p);
+                $h  = _poly_add($h, $ti, $p);
             }
         }
         else {
-            # --- Odd characteristic: quadratic-residue split
-            # h = t^((p^d−1)/2) − 1  mod f
-            $h = $t->powmod($exp, $f)->sub(__PACKAGE__->new(0 => $ONE, $p));
+            my $t_pow = _poly_powmod($t_poly, $exp, $f, $p);
+            my $one   = [Math::GMPz::Rmpz_init_set_ui(1)];
+            $h = _poly_sub($t_pow, $one, $p);
         }
 
-        $g = $h->monic_gcd($f);
-
-        # Non-trivial split found
-        last if (!$g->is_one && !$g->eq($f));
+        $g = _poly_gcd($h, $f, $p);
+        last if _poly_deg($g) > 0 && _poly_deg($g) < $deg_f;
     }
 
-    # If we exhausted retries without a split (should not happen for
-    # valid squarefree input with a prime p), return f as-is.
-    return ($f) unless (defined($g) && !$g->is_one && !$g->eq($f));
+    return ($f) unless (defined($g) && _poly_deg($g) > 0 && _poly_deg($g) < $deg_f);
 
-    # Recurse on both halves.
-    my $f_over_g = $f->div($g);
-    return (__SUB__->($g, $d, $p), __SUB__->($f_over_g, $d, $p));
-};
+    my ($q, $r) = _poly_divmod($f, $g, $p);
+    return (__SUB__->($g, $d, $p, $p_sidef), __SUB__->($q, $d, $p, $p_sidef));
+}
 
 sub factor_exp {
     my ($original) = @_;
 
-    my $p   = $original->[1];                      # scalar prime (Number)
-    my $ONE = Sidef::Types::Number::Number::ONE;
+    my $p_sidef = $original->[1];
+    Sidef::Types::Number::Number::_valid(\$p_sidef);
+    my $p = Sidef::Types::Number::Number::_any2mpz($$p_sidef) // return Sidef::Types::Array::Array->new();
 
-    # -------------------------------------------------------------------
-    # Stage 1 – Preprocessing
-    # Extract leading coefficient, make monic, then squarefree.
-    # -------------------------------------------------------------------
-    my $lc = $original->lift->leading_coefficient;    # Number
+    # 1. Convert Sidef PolynomialMod into dense GMPz Array
+    my $hash     = $original->[0];
+    my $deg_orig = List::Util::max(CORE::keys %$hash) // -1;
+    my @orig_poly;
+    for my $i (0 .. $deg_orig) {
+        if (exists $hash->{$i}) {
+            push @orig_poly, Math::GMPz::Rmpz_init_set(Sidef::Types::Number::Number::_any2mpz(${$hash->{$i}}));
+        }
+        else {
+            push @orig_poly, Math::GMPz::Rmpz_init();
+        }
+    }
+    my $orig_poly = _poly_strip(\@orig_poly);
+    $deg_orig = _poly_deg($orig_poly);
 
-    my $f = $original->normalize_to_monic;
+    # Handle leading coefficient
+    my $lc_sidef;
+    if ($deg_orig < 0) {
+        $lc_sidef = Sidef::Types::Number::Number::ZERO;
+        return Sidef::Types::Array::Array->new([Sidef::Types::Array::Array->new([$lc_sidef, Sidef::Types::Number::Number::ONE])]);
+    }
+    else {
+        $lc_sidef = Sidef::Types::Number::Number::_set_int($orig_poly->[$deg_orig]);
+    }
 
-    # Squarefree part:  f / gcd(f, f′)
-    # Any repeated irreducible factor h^k (k ≥ 2) contributes h^(k−1)
-    # to the GCD, so dividing once strips exactly one copy of each
-    # repeated factor.
-    my $df = $f->derivative;
-    my $sq = $f->monic_gcd($df);    # = product of (irred ^ (mult−1))
-    $f = $f->div($sq);
+    # 2. Extract Monic and Squarefree part
+    my $f  = _poly_monic(_poly_clone($orig_poly), $p);
+    my $df = _poly_derivative($f, $p);
+    if (_poly_deg($df) >= 0) {
+        my $sq = _poly_gcd($f, $df, $p);
+        if (_poly_deg($sq) > 0) {
+            my ($q, $r) = _poly_divmod($f, $sq, $p);
+            $f = _poly_monic($q, $p);
+        }
+    }
 
-    # Renormalize to monic (the division may shift the leading coeff
-    # slightly due to coefficient arithmetic).
-    $f = $f->normalize_to_monic unless $f->is_zero || $f->is_one;
+    # 3. Factorization Stages
+    my @ddf_groups = _poly_deg($f) <= 0 ? () : _poly_ddf($f, $p);
 
-    # -------------------------------------------------------------------
-    # Stage 2 – Distinct Degree Factorization
-    # @ddf_groups is a list of [degree, poly] pairs.
-    # -------------------------------------------------------------------
-    my @ddf_groups = $f->is_one ? () : $_pm_ddf->($f, $p);
-
-    # -------------------------------------------------------------------
-    # Stage 3 – Equal Degree Factorization (Cantor-Zassenhaus)
-    # Collect all monic irreducible factors (without multiplicities yet).
-    # -------------------------------------------------------------------
     my @irreducibles;
     for my $pair (@ddf_groups) {
         my ($d, $fk) = @$pair;
-        next if $fk->is_one;
-        push @irreducibles, $_pm_edf->($fk, $d, $p);
+        next if _poly_deg($fk) <= 0;
+        push @irreducibles, _poly_edf($fk, $d, $p, $p_sidef);
     }
 
-    # -------------------------------------------------------------------
-    # Stage 4 – Compute multiplicities in the *original* polynomial.
-    # For each monic irreducible h, count the largest e such that
-    # h^e divides the original.
-    # -------------------------------------------------------------------
-    my $remainder = $original;
+    # 4. Trial Division for Multiplicities
+    my $remainder = _poly_clone($orig_poly);
     my @factors;
 
     for my $irred (@irreducibles) {
         my $e = 0;
         while (1) {
-            my ($q, $r) = $remainder->divmod($irred);
-            last unless $r->is_zero;
+            my ($q, $r) = _poly_divmod($remainder, $irred, $p);
+            last if _poly_deg($r) >= 0;    # Remainder is NOT zero
             $e++;
             $remainder = $q;
         }
-        ($e > 0) or next;
-        push @factors, Sidef::Types::Array::Array->new([$irred, Sidef::Types::Number::Number::_set_int($e)]);
+
+        if ($e > 0) {
+
+            # Map dense array back to Sidef object
+            my %h;
+            for my $i (0 .. _poly_deg($irred)) {
+                next if Math::GMPz::Rmpz_sgn($irred->[$i]) == 0;
+                my $r = $irred->[$i];
+                $h{$i} = bless(\$r, 'Sidef::Types::Number::Number');
+            }
+
+            my $irred_sidef = __PACKAGE__->new(%h, $p_sidef);
+            push @factors, Sidef::Types::Array::Array->new([$irred_sidef, Sidef::Types::Number::Number::_set_int($e)]);
+        }
     }
 
-    Sidef::Types::Array::Array->new(\@factors)->sort->unshift(Sidef::Types::Array::Array->new([$lc, $ONE]));
+    my $arr = Sidef::Types::Array::Array->new(\@factors)->sort;
+    $arr->unshift(Sidef::Types::Array::Array->new([$lc_sidef, Sidef::Types::Number::Number::ONE]));
+
+    return $arr;
 }
 
 sub factor {
