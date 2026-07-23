@@ -225,7 +225,7 @@ do {
 
     d -= (a*x**3 + b*x**2 + c*x + d % m)
     var S = solve_cubic_mod(a, b, c, d, m)
-    var S2 = roots_mod(Poly([a,b,c,d - r]), m)
+    var S2 = roots_mod(Poly([a,b,c,d]), m)
 
     assert_eq(S2, S)
     assert_eq(S, %n[123456, 20893936668460, 24600493445771, 51891795005810, 55598351783121, 68121763253547, 120013558135901, 123720114913212, 128384083210479])
