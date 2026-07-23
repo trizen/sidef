@@ -12311,7 +12311,6 @@ sub _reduce_coeffs_mod {
 sub _poly_solve_special_cases {
     my ($coeffs, $n) = @_;
 
-    return undef;
     FAST_MODE || return undef;
 
     # Degree 0: a nonzero constant has no roots

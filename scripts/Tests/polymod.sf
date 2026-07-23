@@ -209,4 +209,20 @@ assert_eq(powmod(PolyMod("x", 17), 17, PolyMod("x^5 + 11*x^4 + 4*x^2 + 11*x + 5"
 assert_eq(lift(powmod(PolyMod("x", 17), 17, PolyMod("x^5 + 11*x^4 + 4*x^2 + 11*x + 5", 17))), lift(PolyMod("x", Mod(Poly("x^5 + 11*x^4 + 4*x^2 + 11*x + 5"), 17))**17))
 assert_eq(chinese(PolyMod([97], [503, 0]), PolyMod([43], [127,0])), PolyMod([140], [63881, 0]))
 
+do {
+    func f(n) {
+        for (var p = 2; true; p.next_prime!) {
+            var f = PolyMod((n) => 1, 1 => -1, 0 => -1, p)
+            if (f.factor_exp.len == 2) {
+                return p
+            }
+        }
+    }
+
+    assert_eq(  # A223934
+        1..15 -> map(f),
+        %n[2, 2, 2, 2, 3, 2, 2, 7, 2, 17, 7, 5, 3, 3, 2]
+    )
+}
+
 say "** Test passed!"
