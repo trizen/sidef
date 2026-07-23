@@ -711,6 +711,8 @@ sub _mpfr2mpc {
 sub _any2mpc {
     my ($x) = @_;
 
+    $x = $$x if ref($x) eq __PACKAGE__;
+
     if (!ref($x)) {
         my $r = Math::MPC::Rmpc_init2(CORE::int($PREC));
         if (FAST_MODE and $x < ULONG_MAX and $x > LONG_MIN) {
@@ -736,6 +738,8 @@ sub _any2mpc {
 #
 sub _any2mpfr {
     my ($x) = @_;
+
+    $x = $$x if ref($x) eq __PACKAGE__;
 
     if (!ref($x)) {
         my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
@@ -773,6 +777,8 @@ sub _any2mpfr {
 sub _any2mpfr_mpc {
     my ($x) = @_;
 
+    $x = $$x if ref($x) eq __PACKAGE__;
+
     if (   ref($x) eq 'Math::MPFR'
         or ref($x) eq 'Math::MPC') {
         return $x;
@@ -788,6 +794,8 @@ sub _any2mpfr_mpc {
 #
 sub _any2mpz {
     my ($x) = @_;
+
+    $x = $$x if ref($x) eq __PACKAGE__;
 
     if (!ref($x)) {
 
@@ -823,6 +831,8 @@ sub _any2mpz {
 #
 sub _any2mpq {
     my ($x) = @_;
+
+    $x = $$x if ref($x) eq __PACKAGE__;
 
     if (!ref($x)) {
         my $q = Math::GMPq::Rmpq_init();
@@ -882,6 +892,9 @@ sub _get_slong {
 #
 sub _any2ui {
     my ($x) = @_;
+
+    $x = $$x if ref($x) eq __PACKAGE__;
+
     goto($DISPATCH_TAG{ref($x)});
 
   Scalar: {
@@ -939,6 +952,9 @@ sub _any2ui {
 #
 sub _any2si {
     my ($x) = @_;
+
+    $x = $$x if ref($x) eq __PACKAGE__;
+
     goto($DISPATCH_TAG{ref($x) || return $x});
 
   Math_GMPz: {
@@ -995,6 +1011,7 @@ sub _any2si {
 sub _big2istr {
     my ($x) = @_;
 
+    $x = $$x if ref($x) eq __PACKAGE__;
     ref($x) || return $x;
 
     # die ((caller(1))[3], ' -- ', (caller(0))[2]) if index(ref($x), 'Sidef::') == 0;
@@ -1010,6 +1027,7 @@ sub _big2istr {
 sub _big2uistr {
     my ($x) = @_;
 
+    $x = $$x if ref($x) eq __PACKAGE__;
     ref($x) || return (($x >= 0) ? $x : undef);
 
     # die ((caller(1))[3], ' -- ', (caller(0))[2]) if index(ref($x), 'Sidef::') == 0;
@@ -1025,6 +1043,7 @@ sub _big2uistr {
 sub _big2pistr {
     my ($x) = @_;
 
+    $x = $$x if ref($x) eq __PACKAGE__;
     ref($x) || return (($x > 0) ? $x : undef);
 
     # die ((caller(1))[3], ' -- ', (caller(0))[2]) if index(ref($x), 'Sidef::') == 0;
@@ -12169,9 +12188,18 @@ sub rootmod {
 
 sub _dedupe_sort_gmpz {
     my (@list) = @_;
-    my %seen;
-    return sort { Math::GMPz::Rmpz_cmp($a, $b) }
-      grep { !$seen{Math::GMPz::Rmpz_get_str($_, 16)}++ } @list;
+
+    return ()    if scalar(@list) == 0;
+    return @list if scalar(@list) == 1;
+
+    @list = sort { Math::GMPz::Rmpz_cmp($a, $b) } @list;
+
+    my @deduped = ($list[0]);
+    for my $i (1 .. $#list) {
+        push(@deduped, $list[$i]) if Math::GMPz::Rmpz_cmp($list[$i - 1], $list[$i]) != 0;
+    }
+
+    return @deduped;
 }
 
 sub _poly_eval_mod_dense {
@@ -12192,10 +12220,13 @@ sub _poly_eval_mod_dense {
 sub _poly_derivative_dense {
     my ($coeffs) = @_;
 
+    return [] if @$coeffs <= 1;
+
     my @d;
     for my $i (1 .. $#$coeffs) {
-        $d[$i - 1] = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mul_ui($d[$i - 1], $coeffs->[$i], $i);
+        my $c = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mul_ui($c, $coeffs->[$i], $i);
+        push @d, $c;
     }
 
     return \@d;
@@ -12210,8 +12241,8 @@ sub _poly_bruteforce_roots_mod {
     return [] if $mu == 0;
 
     my @roots;
-    my $x = Math::GMPz::Rmpz_init();
-    my $v = Math::GMPz::Rmpz_init();
+    state $x = Math::GMPz::Rmpz_init_nobless();
+    state $v = Math::GMPz::Rmpz_init_nobless();
 
     for (my $i = 0 ; $i < $mu ; ++$i) {
         Math::GMPz::Rmpz_set_ui($x, $i);
@@ -12220,48 +12251,6 @@ sub _poly_bruteforce_roots_mod {
     }
 
     return \@roots;
-}
-
-sub _poly_hensel_lift_root {
-    my ($coeffs, $x0, $p, $e) = @_;
-
-    return Math::GMPz::Rmpz_init_set($x0) if $e <= 1;
-
-    my $der = _poly_derivative_dense($coeffs);
-
-    my $x  = Math::GMPz::Rmpz_init_set($x0);
-    my $pe = Math::GMPz::Rmpz_init_set($p);
-
-    state $mod_next = Math::GMPz::Rmpz_init_nobless();
-    state $fx       = Math::GMPz::Rmpz_init_nobless();
-    state $df       = Math::GMPz::Rmpz_init_nobless();
-    state $q        = Math::GMPz::Rmpz_init_nobless();
-    state $inv      = Math::GMPz::Rmpz_init_nobless();
-    state $step     = Math::GMPz::Rmpz_init_nobless();
-    state $t        = Math::GMPz::Rmpz_init_nobless();
-
-    for (my $j = 1 ; $j < $e ; ++$j) {
-        Math::GMPz::Rmpz_mul($mod_next, $pe, $p);
-
-        _poly_eval_mod_dense($x, $coeffs, $mod_next, $fx);
-        Math::GMPz::Rmpz_mod($q, $fx, $pe);
-        return undef if Math::GMPz::Rmpz_sgn($q) != 0;
-
-        _poly_eval_mod_dense($x, $der, $p, $df);
-        return undef if !Math::GMPz::Rmpz_invert($inv, $df, $p);
-
-        Math::GMPz::Rmpz_divexact($q, $fx, $pe);
-        Math::GMPz::Rmpz_mod($q, $q, $p);
-        Math::GMPz::Rmpz_mul($step, $q, $inv);
-        Math::GMPz::Rmpz_mod($step, $step, $p);
-        Math::GMPz::Rmpz_mul($t, $step, $pe);
-        Math::GMPz::Rmpz_sub($x, $x, $t);
-        Math::GMPz::Rmpz_mod($x, $x, $mod_next);
-
-        Math::GMPz::Rmpz_set($pe, $mod_next);
-    }
-
-    return $x;
 }
 
 sub _poly_try_monomial {
@@ -12295,11 +12284,6 @@ sub _reduce_coeffs_mod {
 
     my @c = map { _any2mpz(__mod__($_, $n)) } @$coeffs;
 
-    # Remove trailling zero coefficients
-    while (@c and Math::GMPz::Rmpz_sgn($c[0]) == 0) {
-        shift(@c);
-    }
-
     # Remove leading zero coefficients
     while (@c and Math::GMPz::Rmpz_sgn($c[-1]) == 0) {
         pop(@c);
@@ -12308,30 +12292,111 @@ sub _reduce_coeffs_mod {
     return \@c;
 }
 
+sub _poly_solve_special_cases {
+    my ($coeffs, $n, $cubic_roots) = @_;
+
+    # Degree 0: a nonzero constant has no roots (the zero polynomial was
+    # already handled above).
+    return [] if $#$coeffs == 0;
+
+    # Degree 1: linear_congruence() handles this in full generality (unlike
+    # the invertible-leading-coefficient shortcut below).
+    if ($#$coeffs == 1) {
+        return solve_lcg_all(_set_int($coeffs->[1]), _set_int(__neg__($coeffs->[0])), _set_int($n));
+    }
+
+    # Sparse monomial/binomial (a*x^k + b == 0) with an invertible leading term.
+    if (my $sols = _poly_try_monomial($coeffs, $n)) {
+        return $sols;
+    }
+
+    # Degree 2: exact closed form, already handles composite moduli.
+    if ($#$coeffs == 2) {
+        return [grep { $_->is_int } @{solve_quadratic_mod(_set_int($coeffs->[2]), _set_int($coeffs->[1]), _set_int($coeffs->[0]), _set_int($n))}];
+    }
+
+    # Degree 3: exact closed form, already handles composite moduli.
+    if ($cubic_roots and $#$coeffs == 3) {
+        return solve_cubic_mod(_set_int($coeffs->[3]), _set_int($coeffs->[2]), _set_int($coeffs->[1]), _set_int($coeffs->[0]), _set_int($n));
+    }
+
+    return undef;    # no special case detected
+}
+
 sub _poly_roots_mod_prime_power {
     my ($coeffs, $p, $e) = @_;
 
     my $mod = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_pow_ui($mod, $p, $e);
 
-    if (my $sols = _poly_try_monomial($coeffs, $mod)) {
-        return $sols;
+    $coeffs = _reduce_coeffs_mod($coeffs, $mod);
+
+    if (defined(my $sol = _poly_solve_special_cases($coeffs, $mod, 0))) {
+        return $sol;
     }
 
-    # No closed form left: brute-force the roots mod p (only feasible when
-    # p itself is small), then Hensel-lift each one up to mod p^e.
     my $roots_p = _poly_bruteforce_roots_mod($coeffs, $p);
     return []       if !@$roots_p;
-    return $roots_p if $e == 1;      # already the final modulus, no lifting needed
+    return $roots_p if $e == 1;      # already the final modulus
 
-    my @lifted;
-    foreach my $r (@$roots_p) {
-        my $x = _poly_hensel_lift_root($coeffs, $r, $p, $e);
-        push @lifted, $x if defined($x);
+    # Hensel lifting (level by level, handling branches)
+    my @current_roots = @$roots_p;
+    my $der           = _poly_derivative_dense($coeffs);
+    my $pe            = Math::GMPz::Rmpz_init_set($p);
+
+    state $mod_next = Math::GMPz::Rmpz_init_nobless();
+    state $fx       = Math::GMPz::Rmpz_init_nobless();
+    state $df       = Math::GMPz::Rmpz_init_nobless();
+    state $q        = Math::GMPz::Rmpz_init_nobless();
+    state $inv      = Math::GMPz::Rmpz_init_nobless();
+    state $step     = Math::GMPz::Rmpz_init_nobless();
+
+    for (my $j = 1 ; $j < $e ; ++$j) {
+        Math::GMPz::Rmpz_mul($mod_next, $pe, $p);
+        my @next_roots;
+
+        for my $r (@current_roots) {
+            _poly_eval_mod_dense($r, $coeffs, $mod_next, $fx);
+            _poly_eval_mod_dense($r, $der,    $p,        $df);
+
+            if (Math::GMPz::Rmpz_sgn($df) == 0) {
+
+                # Case 1: f'(r) ≡ 0 (mod p)
+                if (Math::GMPz::Rmpz_sgn($fx) == 0) {
+
+                    # f(r) ≡ 0 (mod p^{j+1}) -> branches into p roots
+                    my $p_int = Math::GMPz::Rmpz_get_ui($p);
+                    for my $k (0 .. $p_int - 1) {
+                        my $nr = Math::GMPz::Rmpz_init();
+                        Math::GMPz::Rmpz_mul_ui($nr, $pe, $k);
+                        Math::GMPz::Rmpz_add($nr, $nr, $r);
+                        push @next_roots, $nr;
+                    }
+                }
+
+                # Else: f(r) ≢ 0 (mod p^{j+1}) -> 0 roots (lift dies)
+            }
+            else {
+                # Case 2: f'(r) ≢ 0 (mod p) -> 1 unique lift
+                Math::GMPz::Rmpz_invert($inv, $df, $p);
+                Math::GMPz::Rmpz_divexact($q, $fx, $pe);
+                Math::GMPz::Rmpz_mul($step, $q, $inv);
+                Math::GMPz::Rmpz_neg($step, $step);
+                Math::GMPz::Rmpz_mod($step, $step, $p);
+
+                my $nr = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($nr, $step, $pe);
+                Math::GMPz::Rmpz_add($nr, $nr, $r);
+                push @next_roots, $nr;
+            }
+        }
+
+        @current_roots = @next_roots;
+        last if !@current_roots;
+        Math::GMPz::Rmpz_set($pe, $mod_next);
     }
 
-    return [] if !@lifted;
-    return [_dedupe_sort_gmpz(@lifted)];
+    return [_dedupe_sort_gmpz(@current_roots)];
 }
 
 sub _solve_polynomial_congruence_all {
@@ -12343,7 +12408,6 @@ sub _solve_polynomial_congruence_all {
     Math::GMPz::Rmpz_sgn($n) > 0 or return [];
 
     $coeffs = [map { ref($_) eq __PACKAGE__ or _valid(\$_); _any2mpz($$_) } @$coeffs];
-
     $coeffs = _reduce_coeffs_mod($coeffs, $n);
 
     # Zero polynomial: every residue class is a solution.
@@ -12376,7 +12440,7 @@ sub _solve_polynomial_congruence_all {
 
         my @lifted;
         foreach my $r (@$sub) {
-            my $base = _any2mpz($$r) // next;
+            my $base = _any2mpz($r) // next;
             for my $t (0 .. $g - 1) {
                 my $x = Math::GMPz::Rmpz_init();
                 Math::GMPz::Rmpz_mul_ui($x, $n1, $t);
@@ -12389,34 +12453,13 @@ sub _solve_polynomial_congruence_all {
         return [_dedupe_sort_gmpz(@lifted)];
     }
 
-    # Degree 0: a nonzero constant has no roots (the zero polynomial was
-    # already handled above).
-    return [] if $#$coeffs == 0;
-
-    # Degree 1: linear_congruence() handles this in full generality (unlike
-    # the invertible-leading-coefficient shortcut below).
-    if ($#$coeffs == 1) {
-        return _set_int($coeffs->[1])->linear_congruence(_set_int(__neg__($coeffs->[0])), _set_int($n));
-    }
-
-    # Degree 2: exact closed form, already handles composite moduli.
-    if ($#$coeffs == 2) {
-        return solve_quadratic_mod(_set_int($coeffs->[2]), _set_int($coeffs->[1]), _set_int($coeffs->[0]), _set_int($n));
-    }
-
-    # Degree 3: exact closed form, already handles composite moduli.
-    if ($#$coeffs == 3) {
-        return solve_cubic_mod(_set_int($coeffs->[3]), _set_int($coeffs->[2]), _set_int($coeffs->[1]), _set_int($coeffs->[0]), _set_int($n));
-    }
-
-    # Sparse monomial/binomial (a*x^k + b == 0) with an invertible leading term.
-    if (my $sols = _poly_try_monomial($coeffs, $n)) {
-        return $sols;
+    if (defined(my $sol = _poly_solve_special_cases($coeffs, $n, 1))) {
+        return $sol;
     }
 
     # General case: factor the modulus, solve modulo each prime power
     # independently, and recombine the root sets with CRT.
-    my @factors = map { [Math::GMPz::Rmpz_init_set_str($_->[0], 10), $_->[1]] } _factor_exp($n);
+    my @factors = map { [_any2mpz($_->[0]), $_->[1]] } _factor_exp($n);
     return [] if !@factors;
 
     my ($roots, $mod);
@@ -12427,7 +12470,7 @@ sub _solve_polynomial_congruence_all {
         my $pe = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_pow_ui($pe, $p, $e);
 
-        my $sub = _poly_roots_mod_prime_power($coeffs, $p, $e);
+        my $sub = [map { _any2mpz($_) } @{_poly_roots_mod_prime_power($coeffs, $p, $e)}];
         return [] if !@$sub;
 
         if (!defined($roots)) {
@@ -12441,8 +12484,7 @@ sub _solve_polynomial_congruence_all {
         return [] if !@$roots;
     }
 
-    return [] if !defined($roots) or !@$roots;
-    return [_dedupe_sort_gmpz(map { ref($_) ? $_ : _any2mpz($_) } @$roots)];
+    [_dedupe_sort_gmpz(map { _any2mpz($_) } @$roots)];
 }
 
 sub difference_of_squares {
@@ -15896,152 +15938,367 @@ sub modular_quadratic_formula {
 *solve_quadratic_mod  = \&modular_quadratic_formula;
 *quadratic_congruence = \&modular_quadratic_formula;
 
-# Cubic equation: A*x^3 + B*x^2 + C*x + D ≡ 0 (mod P)
+# Helper: Polynomial multiplication modulo (y^3 + P_coef * y + Q_coef) and mod P
+sub _cz_mul {
+    my ($A, $B, $P_coef, $Q_coef, $mod) = @_;
+
+    my $h4 = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($h4, $A->[2], $B->[2]);
+    Math::GMPz::Rmpz_mod($h4, $h4, $mod);
+
+    my $h3 = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($h3, $A->[2], $B->[1]);
+    my $t = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($t, $A->[1], $B->[2]);
+    Math::GMPz::Rmpz_add($h3, $h3, $t);
+    Math::GMPz::Rmpz_mod($h3, $h3, $mod);
+
+    my $h2 = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($h2, $A->[2], $B->[0]);
+    Math::GMPz::Rmpz_mul($t,  $A->[1], $B->[1]);
+    Math::GMPz::Rmpz_add($h2, $h2, $t);
+    Math::GMPz::Rmpz_mul($t, $A->[0], $B->[2]);
+    Math::GMPz::Rmpz_add($h2, $h2, $t);
+    Math::GMPz::Rmpz_mod($h2, $h2, $mod);
+
+    my $h1 = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($h1, $A->[1], $B->[0]);
+    Math::GMPz::Rmpz_mul($t,  $A->[0], $B->[1]);
+    Math::GMPz::Rmpz_add($h1, $h1, $t);
+    Math::GMPz::Rmpz_mod($h1, $h1, $mod);
+
+    my $h0 = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($h0, $A->[0], $B->[0]);
+    Math::GMPz::Rmpz_mod($h0, $h0, $mod);
+
+    my $c2 = Math::GMPz::Rmpz_init_set($h2);
+    Math::GMPz::Rmpz_mul($t, $h4, $P_coef);
+    Math::GMPz::Rmpz_sub($c2, $c2, $t);
+    Math::GMPz::Rmpz_mod($c2, $c2, $mod);
+
+    my $c1 = Math::GMPz::Rmpz_init_set($h1);
+    Math::GMPz::Rmpz_mul($t, $h4, $Q_coef);
+    Math::GMPz::Rmpz_sub($c1, $c1, $t);
+    Math::GMPz::Rmpz_mul($t, $h3, $P_coef);
+    Math::GMPz::Rmpz_sub($c1, $c1, $t);
+    Math::GMPz::Rmpz_mod($c1, $c1, $mod);
+
+    my $c0 = Math::GMPz::Rmpz_init_set($h0);
+    Math::GMPz::Rmpz_mul($t, $h3, $Q_coef);
+    Math::GMPz::Rmpz_sub($c0, $c0, $t);
+    Math::GMPz::Rmpz_mod($c0, $c0, $mod);
+
+    return [$c0, $c1, $c2];
+}
+
+# Helper: Binary exponentiation for Cantor-Zassenhaus
+sub _cz_pow {
+    my ($base, $exp, $P_coef, $Q_coef, $mod) = @_;
+    my $res = [Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(0), Math::GMPz::Rmpz_init_set_ui(0)];
+    my $b   = $base;
+    my $e   = Math::GMPz::Rmpz_init_set($exp);
+
+    while (Math::GMPz::Rmpz_sgn($e) > 0) {
+        $res = _cz_mul($res, $b, $P_coef, $Q_coef, $mod) if Math::GMPz::Rmpz_tstbit($e, 0);
+        $b   = _cz_mul($b,   $b, $P_coef, $Q_coef, $mod);
+        Math::GMPz::Rmpz_fdiv_q_2exp($e, $e, 1);
+    }
+    return $res;
+}
+
+# Solve cubic precisely for a prime modulus
+sub _solve_cubic_prime_only {
+    my ($A, $B, $C, $D, $p) = @_;
+    my @roots;
+
+    # Fast path for small primes
+    if (Math::GMPz::Rmpz_cmp_ui($p, 1000) <= 0) {
+        my $x    = Math::GMPz::Rmpz_init();
+        my $v    = Math::GMPz::Rmpz_init();
+        my $p_ui = Math::GMPz::Rmpz_get_ui($p);
+        for (my $i = 0 ; $i < $p_ui ; $i++) {
+            Math::GMPz::Rmpz_set_ui($x, $i);
+            Math::GMPz::Rmpz_mul($v, $A, $x);
+            Math::GMPz::Rmpz_add($v, $v, $B);
+            Math::GMPz::Rmpz_mul($v, $v, $x);
+            Math::GMPz::Rmpz_add($v, $v, $C);
+            Math::GMPz::Rmpz_mul($v, $v, $x);
+            Math::GMPz::Rmpz_add($v, $v, $D);
+            Math::GMPz::Rmpz_mod($v, $v, $p);
+            push @roots, Math::GMPz::Rmpz_init_set_ui($i) if Math::GMPz::Rmpz_sgn($v) == 0;
+        }
+        return \@roots;
+    }
+
+    my $inv_A = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_invert($inv_A, $A, $p) or return [];
+    my $inv_3 = Math::GMPz::Rmpz_init_set_ui(3);
+    Math::GMPz::Rmpz_invert($inv_3, $inv_3, $p) or return [];
+    my $inv_27 = Math::GMPz::Rmpz_init_set_ui(27);
+    Math::GMPz::Rmpz_invert($inv_27, $inv_27, $p);
+    my $inv_2 = Math::GMPz::Rmpz_init_set_ui(2);
+    Math::GMPz::Rmpz_invert($inv_2, $inv_2, $p);
+
+    my $t = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($t, $B, $inv_A);
+    Math::GMPz::Rmpz_mod($t, $t, $p);
+    my $c = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($c, $C, $inv_A);
+    Math::GMPz::Rmpz_mod($c, $c, $p);
+    my $d = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($d, $D, $inv_A);
+    Math::GMPz::Rmpz_mod($d, $d, $p);
+
+    my $t_over_3 = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($t_over_3, $t, $inv_3);
+    Math::GMPz::Rmpz_mod($t_over_3, $t_over_3, $p);
+
+    # p_val = c - t^2 / 3
+    my $p_val = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($p_val, $t, $t);
+    Math::GMPz::Rmpz_mod($p_val, $p_val, $p);
+    my $t3 = Math::GMPz::Rmpz_init_set($p_val);
+    Math::GMPz::Rmpz_mul($p_val, $p_val, $inv_3);
+    Math::GMPz::Rmpz_sub($p_val, $c, $p_val);
+    Math::GMPz::Rmpz_mod($p_val, $p_val, $p);
+
+    # q_val = d + 2*t^3/27 - t*c/3
+    my $q_val = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($q_val, $t3, $t);
+    Math::GMPz::Rmpz_mod($q_val, $q_val, $p);
+    Math::GMPz::Rmpz_mul_ui($q_val, $q_val, 2);
+    Math::GMPz::Rmpz_mul($q_val, $q_val, $inv_27);
+    my $tc3 = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($tc3, $t,   $c);
+    Math::GMPz::Rmpz_mul($tc3, $tc3, $inv_3);
+    Math::GMPz::Rmpz_add($q_val, $q_val, $d);
+    Math::GMPz::Rmpz_sub($q_val, $q_val, $tc3);
+    Math::GMPz::Rmpz_mod($q_val, $q_val, $p);
+
+    # Discriminant Δ = q^2 + 4*p^3/27
+    my $delta = Math::GMPz::Rmpz_init();
+    my $p3    = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($p3, $p_val, $p_val);
+    Math::GMPz::Rmpz_mod($p3, $p3, $p);
+    Math::GMPz::Rmpz_mul($p3, $p3, $p_val);
+    Math::GMPz::Rmpz_mod($p3, $p3, $p);
+    Math::GMPz::Rmpz_mul_ui($delta, $p3, 4);
+    Math::GMPz::Rmpz_mul($delta, $delta, $inv_27);
+    my $q2 = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($q2, $q_val, $q_val);
+    Math::GMPz::Rmpz_mod($q2, $q2, $p);
+    Math::GMPz::Rmpz_add($delta, $delta, $q2);
+    Math::GMPz::Rmpz_mod($delta, $delta, $p);
+
+    my @W_roots = @{(bless \$delta)->sqrtmod_all(bless \$p)};
+
+    if (@W_roots) {
+
+        # Cardano's exact closed form
+        my %seen;
+        my $U3 = Math::GMPz::Rmpz_init();
+        foreach my $W (@W_roots) {
+            Math::GMPz::Rmpz_sub($U3, _any2mpz($$W), $q_val);
+            Math::GMPz::Rmpz_mul($U3, $U3, $inv_2);
+            Math::GMPz::Rmpz_mod($U3, $U3, $p);
+            my @U_roots = @{(bless \$U3)->rootmod_all(_set_int(3), bless \$p)};
+
+            foreach my $U_obj (@U_roots) {
+                my $U = _any2mpz($$U_obj);
+                my $x = Math::GMPz::Rmpz_init();
+
+                if (Math::GMPz::Rmpz_sgn($U) == 0) {
+                    Math::GMPz::Rmpz_neg($x, $t_over_3);
+                    Math::GMPz::Rmpz_mod($x, $x, $p);
+                }
+                else {
+                    my $inv_U = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_invert($inv_U, $U, $p);
+                    my $V = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_neg($V, $p_val);
+                    Math::GMPz::Rmpz_mul($V, $V, $inv_3);
+                    Math::GMPz::Rmpz_mul($V, $V, $inv_U);
+                    Math::GMPz::Rmpz_add($x, $U, $V);
+                    Math::GMPz::Rmpz_sub($x, $x, $t_over_3);
+                    Math::GMPz::Rmpz_mod($x, $x, $p);
+                }
+                my $key = Math::GMPz::Rmpz_get_str($x, 16);
+                if (!exists $seen{$key}) {
+                    $seen{$key} = 1;
+                    push @roots, Math::GMPz::Rmpz_init_set($x);
+                }
+            }
+        }
+    }
+    else {
+        # Cantor-Zassenhaus fallback for Casus Irreducibilis
+        my $Y     = Math::GMPz::Rmpz_init();
+        my $found = 0;
+
+        my $exp = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_sub_ui($exp, $p, 1);
+        Math::GMPz::Rmpz_fdiv_q_2exp($exp, $exp, 1);
+
+        for (my $d = 1 ; $d <= 1000 ; $d++) {
+            my $base = [Math::GMPz::Rmpz_init_set_ui($d), Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(0)];
+            my $H    = _cz_pow($base, $exp, $p_val, $q_val, $p);
+
+            my ($c0, $c1, $c2) = @$H;
+            Math::GMPz::Rmpz_sub_ui($c0, $c0, 1);
+            Math::GMPz::Rmpz_mod($c0, $c0, $p);
+
+            if (Math::GMPz::Rmpz_sgn($c2) == 0) {
+                if (Math::GMPz::Rmpz_sgn($c1) != 0) {
+                    my $inv_c1 = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_invert($inv_c1, $c1, $p);
+                    Math::GMPz::Rmpz_mul($Y, $c0, $inv_c1);
+                    Math::GMPz::Rmpz_neg($Y, $Y);
+                    Math::GMPz::Rmpz_mod($Y, $Y, $p);
+                    $found = 1;
+                    last;
+                }
+            }
+            else {
+                my $inv_c2 = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_invert($inv_c2, $c2, $p);
+                my $u = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($u, $c1, $inv_c2);
+                Math::GMPz::Rmpz_mod($u, $u, $p);
+                my $v = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($v, $c0, $inv_c2);
+                Math::GMPz::Rmpz_mod($v, $v, $p);
+
+                my $r1 = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($r1, $u, $u);
+                Math::GMPz::Rmpz_add($r1, $r1, $p_val);
+                Math::GMPz::Rmpz_sub($r1, $r1, $v);
+                Math::GMPz::Rmpz_mod($r1, $r1, $p);
+                my $r0 = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_mul($r0, $u, $v);
+                Math::GMPz::Rmpz_add($r0, $r0, $q_val);
+                Math::GMPz::Rmpz_mod($r0, $r0, $p);
+
+                if (Math::GMPz::Rmpz_sgn($r1) == 0) {
+                    Math::GMPz::Rmpz_set($Y, $u);
+                    $found = 1;
+                    last;
+                }
+                else {
+                    my $inv_r1 = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_invert($inv_r1, $r1, $p);
+                    Math::GMPz::Rmpz_mul($Y, $r0, $inv_r1);
+                    Math::GMPz::Rmpz_neg($Y, $Y);
+                    Math::GMPz::Rmpz_mod($Y, $Y, $p);
+                    $found = 1;
+                    last;
+                }
+            }
+        }
+
+        if ($found) {
+            my @depressed_roots = ($Y);
+            my $B_quad          = Math::GMPz::Rmpz_init_set($Y);
+            my $C_quad          = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($C_quad, $Y, $Y);
+            Math::GMPz::Rmpz_add($C_quad, $C_quad, $p_val);
+            Math::GMPz::Rmpz_mod($C_quad, $C_quad, $p);
+
+            my $D_quad = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul($D_quad, $Y, $Y);
+            Math::GMPz::Rmpz_mul_ui($D_quad, $D_quad, 3);
+            Math::GMPz::Rmpz_neg($D_quad, $D_quad);
+            my $four_p = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mul_ui($four_p, $p_val, 4);
+            Math::GMPz::Rmpz_sub($D_quad, $D_quad, $four_p);
+            Math::GMPz::Rmpz_mod($D_quad, $D_quad, $p);
+
+            my @sq_roots = @{(bless \$D_quad)->sqrtmod_all(bless \$p)};
+            foreach my $sq (@sq_roots) {
+                my $Y_other = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_neg($Y_other, $B_quad);
+                Math::GMPz::Rmpz_add($Y_other, $Y_other, _any2mpz($$sq));
+                Math::GMPz::Rmpz_mul($Y_other, $Y_other, $inv_2);
+                Math::GMPz::Rmpz_mod($Y_other, $Y_other, $p);
+                push @depressed_roots, $Y_other;
+            }
+
+            foreach my $y_root (@depressed_roots) {
+                my $x = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_sub($x, $y_root, $t_over_3);
+                Math::GMPz::Rmpz_mod($x, $x, $p);
+                push @roots, $x;
+            }
+        }
+    }
+
+    return \@roots;
+}
+
+# Solve a cubic equation modulo a prime power p^e
+sub _solve_cubic_prime_power {
+    my ($A, $B, $C, $D, $p, $e) = @_;
+
+    # Check if A is divisible by p, or if p is 2 or 3
+    state $A_mod_p = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_mod($A_mod_p, $A, $p);
+
+    # If the degree drops modulo p (p | A) or p is 2/3 (where Cardano fails),
+    # fall back to the general prime-power polynomial solver.
+    if (Math::GMPz::Rmpz_sgn($A_mod_p) == 0 || Math::GMPz::Rmpz_cmp_ui($p, 3) <= 0) {
+        return _poly_roots_mod_prime_power([$D, $C, $B, $A], $p, $e);
+    }
+
+    # Prime modulus case
+    if ($e == 1) {
+        return _solve_cubic_prime_only($A, $B, $C, $D, $p);
+    }
+
+    # Prime power case (e > 1)
+    return _poly_roots_mod_prime_power([$D, $C, $B, $A], $p, $e);
+}
+
+# Generalized cubic solver modulo arbitrary composite P
 sub solve_cubic_mod {
     my ($A_arg, $B_arg, $C_arg, $D_arg, $P_arg) = @_;
 
-    # Convert all inputs to Math::GMPz objects
+    ref($B_arg) eq __PACKAGE__ or _valid(\$B_arg);
+    ref($C_arg) eq __PACKAGE__ or _valid(\$C_arg);
+    ref($D_arg) eq __PACKAGE__ or _valid(\$D_arg);
+    ref($P_arg) eq __PACKAGE__ or _valid(\$P_arg);
+
     my $A = _any2mpz($$A_arg) // return _array();
     my $B = _any2mpz($$B_arg) // return _array();
     my $C = _any2mpz($$C_arg) // return _array();
     my $D = _any2mpz($$D_arg) // return _array();
     my $P = _any2mpz($$P_arg) // return _array();
 
-    return _array() if Math::GMPz::Rmpz_sgn($P) == 0;
+    return _array() if Math::GMPz::Rmpz_sgn($P) <= 0;
 
-    # Pre-allocate required objects to prevent loop allocations
-    state $t = Math::GMPz::Rmpz_init_nobless();
-    state $c = Math::GMPz::Rmpz_init_nobless();
-    state $d = Math::GMPz::Rmpz_init_nobless();
-    state $p = Math::GMPz::Rmpz_init_nobless();
-    state $q = Math::GMPz::Rmpz_init_nobless();
+    # Prime power factorization of P
+    my @factors = map { [_any2mpz($_->[0]), $_->[1]] } _factor_exp($P);
+    return _array() if !@factors;
 
-    state $inv_3  = Math::GMPz::Rmpz_init_nobless();
-    state $inv_27 = Math::GMPz::Rmpz_init_nobless();
-    state $inv_2  = Math::GMPz::Rmpz_init_nobless();
+    my ($roots, $mod);
 
-    state $temp1 = Math::GMPz::Rmpz_init_nobless();
-    state $temp2 = Math::GMPz::Rmpz_init_nobless();
+    foreach my $f (@factors) {
+        my ($p, $e) = @$f;
+        my $pe = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_pow_ui($pe, $p, $e);
 
-    # Setup modular inverses of 3, 27 and 2 modulo P
-    Math::GMPz::Rmpz_set_ui($temp1, 3);
-    Math::GMPz::Rmpz_invert($inv_3, $temp1, $P) or return _array();
+        my $sub = [map { _any2mpz($_) } @{_solve_cubic_prime_power($A, $B, $C, $D, $p, $e)}];
+        return _array() if !@$sub;
 
-    Math::GMPz::Rmpz_set_ui($temp1, 27);
-    Math::GMPz::Rmpz_invert($inv_27, $temp1, $P) or return _array();
-
-    Math::GMPz::Rmpz_set_ui($temp1, 2);
-    Math::GMPz::Rmpz_invert($inv_2, $temp1, $P) or return _array();
-
-    # Make the polynomial monic: divide B, C, D by A modulo P
-    Math::GMPz::Rmpz_invert($temp1, $A, $P) or return _array();    # A must be invertible mod P
-
-    Math::GMPz::Rmpz_mul($t, $B, $temp1);
-    Math::GMPz::Rmpz_mod($t, $t, $P);
-
-    Math::GMPz::Rmpz_mul($c, $C, $temp1);
-    Math::GMPz::Rmpz_mod($c, $c, $P);
-
-    Math::GMPz::Rmpz_mul($d, $D, $temp1);
-    Math::GMPz::Rmpz_mod($d, $d, $P);
-
-    # b/3 (mod P)
-    my $t_over_3 = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_mul($t_over_3, $t, $inv_3);
-    Math::GMPz::Rmpz_mod($t_over_3, $t_over_3, $P);
-
-    # p = c - b^2/3   (mod P)
-    Math::GMPz::Rmpz_mul($temp1, $t, $t);
-    Math::GMPz::Rmpz_mod($temp1, $temp1, $P);
-    Math::GMPz::Rmpz_mul($temp2, $temp1, $inv_3);
-
-    Math::GMPz::Rmpz_sub($p, $c, $temp2);
-    Math::GMPz::Rmpz_mod($p, $p, $P);
-
-    # q = d + 2*b^3/27 - b*c/3   (mod P)
-    Math::GMPz::Rmpz_mul($temp2, $temp1, $t);         # b^3
-    Math::GMPz::Rmpz_mod($temp2, $temp2, $P);
-    Math::GMPz::Rmpz_mul_ui($temp2, $temp2, 2);
-    Math::GMPz::Rmpz_mul($temp2, $temp2, $inv_27);    # 2*b^3/27
-
-    Math::GMPz::Rmpz_mul($temp1, $t,     $c);         # b*c
-    Math::GMPz::Rmpz_mul($temp1, $temp1, $inv_3);     # b*c/3
-
-    Math::GMPz::Rmpz_add($q, $d, $temp2);
-    Math::GMPz::Rmpz_sub($q, $q, $temp1);
-    Math::GMPz::Rmpz_mod($q, $q, $P);
-
-    # Discriminant Δ = q^2 + 4*p^3/27   (mod P)
-    my $delta = Math::GMPz::Rmpz_init();
-
-    Math::GMPz::Rmpz_mul($temp1, $p, $p);
-    Math::GMPz::Rmpz_mod($temp1, $temp1, $P);
-    Math::GMPz::Rmpz_mul($temp1, $temp1, $p);         # p^3
-    Math::GMPz::Rmpz_mod($temp1, $temp1, $P);
-
-    Math::GMPz::Rmpz_mul_ui($temp1, $temp1, 4);       # 4*p^3
-    Math::GMPz::Rmpz_mul($temp1, $temp1, $inv_27);    # 4*p^3/27
-
-    Math::GMPz::Rmpz_mul($delta, $q, $q);
-    Math::GMPz::Rmpz_add($delta, $delta, $temp1);
-    Math::GMPz::Rmpz_mod($delta, $delta, $P);
-
-    # Find all square roots of Δ modulo P
-    my @W_roots = @{(bless \$delta)->sqrtmod_all(bless \$P)};
-    my %seen;
-
-    my $U3 = Math::GMPz::Rmpz_init();
-    my $V3 = Math::GMPz::Rmpz_init();
-
-    foreach my $W (@W_roots) {
-
-        # U^3 = (-q + W) / 2   (mod P)
-        Math::GMPz::Rmpz_sub($U3, _any2mpz($$W), $q);
-        Math::GMPz::Rmpz_mul($U3, $U3, $inv_2);
-        Math::GMPz::Rmpz_mod($U3, $U3, $P);
-
-        # V^3 = (-q - W) / 2   (mod P)
-        Math::GMPz::Rmpz_neg($V3, _any2mpz($$W));
-        Math::GMPz::Rmpz_sub($V3, $V3, $q);
-        Math::GMPz::Rmpz_mul($V3, $V3, $inv_2);
-        Math::GMPz::Rmpz_mod($V3, $V3, $P);
-
-        # Extract all cube roots of U^3 and V^3
-        my @U_roots = @{(bless \$U3)->rootmod_all(THREE, bless \$P)};
-        my @V_roots = @{(bless \$V3)->rootmod_all(THREE, bless \$P)};
-
-        foreach my $U_obj (@U_roots) {
-            my $U = _any2mpz($$U_obj);
-
-            foreach my $V_obj (@V_roots) {
-                my $V = _any2mpz($$V_obj);
-
-                # Verify Cardano's condition: 3*U*V == -p (mod P)
-                Math::GMPz::Rmpz_mul($temp1, $U, $V);
-                Math::GMPz::Rmpz_mul_ui($temp1, $temp1, 3);
-                Math::GMPz::Rmpz_add($temp1, $temp1, $p);
-                Math::GMPz::Rmpz_mod($temp1, $temp1, $P);
-
-                if (Math::GMPz::Rmpz_sgn($temp1) == 0) {
-                    my $x = Math::GMPz::Rmpz_init();
-
-                    # Y = U + V
-                    Math::GMPz::Rmpz_add($x, $U, $V);
-
-                    # x = Y - b/3   (mod P)
-                    Math::GMPz::Rmpz_sub($x, $x, $t_over_3);
-                    Math::GMPz::Rmpz_mod($x, $x, $P);
-
-                    my $key = Math::GMPz::Rmpz_get_str($x, 16);
-                    if (!exists $seen{$key}) {
-                        $seen{$key} = _set_int($x);
-                    }
-                }
-            }
+        if (!defined($roots)) {
+            ($roots, $mod) = ($sub, $pe);
+        }
+        else {
+            $roots = _crt_combine($roots, $mod, $sub, $pe, 0);
+            Math::GMPz::Rmpz_mul($mod, $mod, $pe);
+            return _array() if !@$roots;
         }
     }
 
-    _array([sort { $$a <=> $$b } values %seen]);
+    _array([map { bless \$_ } _dedupe_sort_gmpz(map { _any2mpz($_) } @$roots)]);
 }
 
 sub reduce_quadratic_form {

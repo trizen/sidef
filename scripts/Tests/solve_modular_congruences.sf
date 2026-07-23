@@ -106,6 +106,7 @@ assert_eq(solve_quadratic_mod(1, 0, -1, 13), %n[1, 12])
 
 assert_eq(solve_cubic_mod(1, 0, 0, -1, 13), %n[1, 3, 9])
 assert_eq(solve_cubic_mod(1, 0, 2, 5, 17), %n[2])
+assert_eq(solve_cubic_mod(1, 0, 0, -1, 7), %n[1,2,4])
 
 assert_eq(solve_binary_quadratic_form(2, 3, 4, 12302134), [[-2910, 1271], [-1374, -1033], [1374, 1033], [2910, -1271]])
 assert_eq(solve_binary_quadratic_form(2, 3, 4, 2**64 + 3), [[-2207753931, -863254157], [2207753931, 863254157]])
@@ -149,24 +150,6 @@ do {
     assert(S.map{|x|
        (a*x**3 + b*x**2 + c*x + d - r % m)
     }.all { .is_zero })
-}
-
-do {
-    var x = 123456;
-    var a = 32;
-    var b = -15;
-    var c = -6;
-    var d = 43
-    var m = (863 * (2**32 + 1) * 43)
-
-    var r = (a*x**3 + b*x**2 + c*x + d % m)
-    var S = solve_cubic_mod(a, b, c, d - r, m)
-
-    assert_eq(S, %n[123456, 20893936668460, 24600493445771, 51891795005810, 55598351783121, 68121763253547, 120013558135901, 123720114913212, 128384083210479])
-
-    assert(S.map{|x|
-       (a*x**3 + b*x**2 + c*x + d - r % m)
-    }.all{.is_zero})
 }
 
 do {
@@ -233,20 +216,89 @@ do {
 }
 
 do {
+    var x = 123456;
+    var a = 32;
+    var b = -15;
+    var c = -6;
+    var d = 43
+    var m = (863 * (2**32 + 1) * 43)
+
+    d -= (a*x**3 + b*x**2 + c*x + d % m)
+    var S = solve_cubic_mod(a, b, c, d, m)
+    var S2 = roots_mod(Poly([a,b,c,d - r]), m)
+
+    assert_eq(S2, S)
+    assert_eq(S, %n[123456, 20893936668460, 24600493445771, 51891795005810, 55598351783121, 68121763253547, 120013558135901, 123720114913212, 128384083210479])
+
+    # Compute solutions, using polynomial factorization modulo primes
+    var table = Hash()
+    for p,e in (m.factor_exp) {
+        var pe = p**e
+        PolyMod([a,b,c,d], pe).factor.grep{.kind_of(Poly)}.each {|f|
+            f.degree == 1 || next
+            table{pe} := [] << [pe - f.coeff(0), pe]
+        }
+    }
+
+    var sol = []
+    table.values.cartesian.each {|a|
+        sol << Math.chinese(a...)
+    }
+
+    sol.isort!
+    assert_eq(sol, S)
+
+    assert(sol.map {|x|
+            (Poly([a,b,c,d]).eval(x) % m)
+    }.all{.is_zero})
+
+    assert(S.map{|x|
+       (a*x**3 + b*x**2 + c*x + d % m)
+    }.all{.is_zero})
+}
+
+do {
     var x = 123456
     var a = 32
     var b = 48
     var c = 262
     var d = 810
     var e = 33
-    var n = 43*(2**16 + 1)
+    var n = (43 * (2**16 + 1))
 
-    var r = (Poly([a,b,c,d,e]).eval(x) % n)
+    e -= (Poly([a,b,c,d,e]).eval(x) % n)
+
+    var S = %n[123456, 254530, 802555, 933629]
 
     assert_eq(
-        Poly([a, b, c, d, e - r]).roots_mod(n),
-        %n[123456, 254530, 802555, 933629]
+        Poly([a, b, c, d, e]).roots_mod(n),
+        S
     )
+
+    # Compute solutions, using polynomial factorization modulo primes
+    var table = Hash()
+    for pe in (n.factor_exp.map{ipow(_[0], _[1])}) {
+        PolyMod([a,b,c,d, e], pe).factor.grep{.kind_of(Poly)}.each {|f|
+            f.degree == 1 || next
+            table{pe} := [] << [pe - f.coeff(0), pe]
+        }
+    }
+
+    var sol = []
+    table.values.cartesian.each {|a|
+        sol << Math.chinese(a...)
+    }
+
+    sol.isort!
+    assert_eq(sol, S)
+
+    assert(sol.map {|x|
+            (Poly([a,b,c,d, e]).eval(x) % n)
+    }.all{.is_zero})
+
+    assert(S.map{|x|
+         Poly([a, b, c, d, e]).eval(x) % n
+    }.all{.is_zero})
 }
 
 do {
@@ -270,6 +322,18 @@ do {
     }.all{.is_zero})
 }
 
+assert_eq(Poly([16, 9, 3]).roots_mod(29), %n[3, 20])
+assert_eq(Poly([16, 9, 3]).roots_mod(16385), %n[757, 1209, 4034, 5182, 8007, 8459, 11284, 14317])
+assert_eq(solve_cubic_mod(13*29, -42, 9, 3, 5*29*113), %n[5704, 6284, 7009, 8529, 9109, 9834])
+assert_eq(roots_mod(Poly([13*29, -42, 9, 3]), 2**14 + 1), %n[5704, 6284, 7009, 8529, 9109, 9834])
+assert_eq(roots_mod(Poly([29, -42, 3]), 2**14 + 1), %n[346, 5247, 10177, 11801])
+assert_eq(roots_mod(Poly([29, 233, 129]) + 1, 2**14 + 1), %n[653, 3930, 7323, 10600])
+assert_eq(roots_mod(Poly([29, 233, 127]) + 1, 2**14 + 1), %n[3236, 3497, 10051, 13067])
+assert_eq(roots_mod(Poly([5, 3,4,3, 5, 19]) + 1, 2**14 + 1), %n[325, 1195, 1340, 10156, 11026, 11171])
+assert_eq(roots_mod(Poly([29, 3, 0, 5, 19]) + 1, 2**14 + 1), %n[138, 3415, 4093, 5223, 6663, 7370, 8500, 9940, 10618, 11748, 13895, 15025])
+assert_eq(roots_mod(Poly([29, 2*29, 29, 29 - 1]) + 1, 2**14 + 1), %n[361, 926, 1491, 2056, 2621, 3186, 3751, 4316, 4881, 5446, 6011, 6576, 7141, 7706, 8271, 8836, 9401, 9966, 10531, 11096, 11661, 12226, 12791, 13356, 13921, 14486, 15051, 15616, 16181])
+assert_eq(roots_mod(Poly([29, 3, 14]) + 1, 2**14 + 1), %n[1068, 4345, 5708, 8985])
+assert_eq(roots_mod(Poly(6) + 1, 2**14 + 1), %n[128, 1032, 5522, 6682, 9703, 10863, 15353, 16257])
 assert_eq(roots_mod(Poly(6) + 1, 2**16 + 1), %n[256, 65281])
 assert_eq(Polynomial([1, 0, -1]).roots_mod(7), %n[1, 6])
 assert_eq(Polynomial([1, 0, 0, -1]).roots_mod(13), %n[1, 3, 9])
@@ -285,6 +349,10 @@ assert_eq(Poly([13]).roots_mod(13), @(13.range))
 assert_eq(Poly([43,3, 1]).roots_mod(43), [14])
 assert_eq(Poly([43,43,3, 1]).roots_mod(43), [14])
 assert_eq(Poly([13,17,3]).roots_mod(43), [11,34])
+assert_eq(Poly([1, 2, 0]).roots_mod(4), [0, 2])
+assert_eq(Poly([2, 1, 0]).roots_mod(4), [0])
+assert_eq(Poly([20, 5, 0, 3]).roots_mod(29), %n[4, 10, 22])
+assert_eq(solve_cubic_mod(20, 5, 0, 3, 29), %n[4, 10, 22])
 
 assert_eq(solve_pell(61), [[1766319049, 226153980]])
 assert_eq(solve_pell(863), [[18524026608, 630565199]])
