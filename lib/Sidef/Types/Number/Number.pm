@@ -12276,7 +12276,7 @@ sub _poly_try_monomial {
     my $k = $nz[-1];
     return [] if $k == 0;                        # single nonzero constant term: no roots, ever
 
-    my $b0 = (@nz == 2) ? $coeffs->[0] : Math::GMPz::Rmpz_init_set_ui(0);
+    my $b0 = (@nz == 2) ? $coeffs->[0] : $ZERO;
     my $ak = $coeffs->[$k];
 
     my $inv = Math::GMPz::Rmpz_init();
@@ -12290,21 +12290,29 @@ sub _poly_try_monomial {
     return [map { _any2mpz($$_) } @{_set_int($A)->rootmod_all(_set_int($k), _set_int($mod))}];
 }
 
+sub _reduce_coeffs_mod {
+    my ($coeffs, $n) = @_;
+
+    my @c = map { _any2mpz(__mod__($_, $n)) } @$coeffs;
+
+    # Remove trailling zero coefficients
+    while (@c and Math::GMPz::Rmpz_sgn($c[0]) == 0) {
+        shift(@c);
+    }
+
+    # Remove leading zero coefficients
+    while (@c and Math::GMPz::Rmpz_sgn($c[-1]) == 0) {
+        pop(@c);
+    }
+
+    return \@c;
+}
+
 sub _poly_roots_mod_prime_power {
     my ($coeffs, $p, $e) = @_;
 
     my $mod = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_pow_ui($mod, $p, $e);
-
-    # Quadratic is exact and already supports composite moduli.
-    if ($#$coeffs == 2) {
-        return [map { _any2mpz($$_) } @{solve_quadratic_mod(_set_int($coeffs->[2]), _set_int($coeffs->[1]), _set_int($coeffs->[0]), _set_int($mod))}];
-    }
-
-    if ($#$coeffs == 3) {
-        return [map { _any2mpz($$_) }
-                @{solve_cubic_mod(_set_int($coeffs->[3]), _set_int($coeffs->[2]), _set_int($coeffs->[1]), _set_int($coeffs->[0]), _set_int($mod))}];
-    }
 
     if (my $sols = _poly_try_monomial($coeffs, $mod)) {
         return $sols;
@@ -12336,6 +12344,8 @@ sub _solve_polynomial_congruence_all {
 
     $coeffs = [map { ref($_) eq __PACKAGE__ or _valid(\$_); _any2mpz($$_) } @$coeffs];
 
+    $coeffs = _reduce_coeffs_mod($coeffs, $n);
+
     # Zero polynomial: every residue class is a solution.
     return _set_int($n)->range if !@$coeffs;
 
@@ -12355,7 +12365,7 @@ sub _solve_polynomial_congruence_all {
         my @c1 = map {
             my $t = Math::GMPz::Rmpz_init();
             Math::GMPz::Rmpz_divexact($t, $_, $common);
-            $t;
+            bless \$t;
         } @$coeffs;
 
         my $sub = __SUB__->(_set_int($n1), \@c1);
@@ -12386,9 +12396,7 @@ sub _solve_polynomial_congruence_all {
     # Degree 1: linear_congruence() handles this in full generality (unlike
     # the invertible-leading-coefficient shortcut below).
     if ($#$coeffs == 1) {
-        my $neg_c0 = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_neg($neg_c0, $coeffs->[0]);
-        return _set_int($coeffs->[1])->linear_congruence(_set_int($neg_c0), _set_int($n));
+        return _set_int($coeffs->[1])->linear_congruence(_set_int(__neg__($coeffs->[0])), _set_int($n));
     }
 
     # Degree 2: exact closed form, already handles composite moduli.
