@@ -8916,15 +8916,15 @@ sub _poly_mul_mod {
 
     # Polynomial multiplication (schoolbook)
     for my $i (0 .. $k - 1) {
-        my $a = $A->[$i] // next;
-        Math::GMPz::Rmpz_sgn($a) || next;
+        my $ai = $A->[$i] // next;
+        Math::GMPz::Rmpz_sgn($ai) || next;
 
         for my $j (0 .. $k - 1) {
-            my $b = $B->[$j] // next;
-            Math::GMPz::Rmpz_sgn($b) || next;
+            my $bj = $B->[$j] // next;
+            Math::GMPz::Rmpz_sgn($bj) || next;
 
             my $idx = $i + $j;
-            Math::GMPz::Rmpz_addmul($C[$idx], $a, $b);
+            Math::GMPz::Rmpz_addmul($C[$idx], $ai, $bj);
         }
     }
 
@@ -9156,11 +9156,11 @@ sub _solve_rec_seq {    # Berlekamp-Massey algorithm
 
     my @s = map { _any2mpq($$_) // return _array() } @seq;
 
-    my @C = (Math::GMPq->new(1));    # connection polynomial coefficients
-    my @B = (Math::GMPq->new(1));    # B from the last length-increase step
-    my $L = 0;                       # LFSR length
-    my $m = 1;                       # steps since last length increase
-    my $b = Math::GMPq->new(1);      # discrepancy at last length increase
+    my @C  = (Math::GMPq->new(1));    # connection polynomial coefficients
+    my @B  = (Math::GMPq->new(1));    # B from the last length-increase step
+    my $L  = 0;                       # LFSR length
+    my $m  = 1;                       # steps since last length increase
+    my $b0 = Math::GMPq->new(1);      # discrepancy at last length increase
 
     my $tmp   = Math::GMPq::Rmpq_init();
     my $coeff = Math::GMPq::Rmpq_init();
@@ -9182,7 +9182,7 @@ sub _solve_rec_seq {    # Berlekamp-Massey algorithm
         }
 
         # δ = d / b
-        Math::GMPq::Rmpq_div($coeff, $d, $b);
+        Math::GMPq::Rmpq_div($coeff, $d, $b0);
 
         my @T = map {
             my $q = Math::GMPq::Rmpq_init();
@@ -9203,7 +9203,7 @@ sub _solve_rec_seq {    # Berlekamp-Massey algorithm
         if (2 * $L <= $i) {
             $L = $i + 1 - $L;
             @B = @T;
-            Math::GMPq::Rmpq_set($b, $d);
+            Math::GMPq::Rmpq_set($b0, $d);
             $m = 1;
         }
         else {
@@ -10471,11 +10471,11 @@ sub __digits2num__ {
     if ($K > 1 and $len > $K) {
         for (my $i = 0 ; $i < $len ; $i += $K) {
             my $r     = 0;
-            my $b     = 1;
+            my $b0    = 1;
             my $limit = $i + $K < $len ? $i + $K : $len;
             for my $j ($i .. $limit - 1) {
-                $r += $D[$j] * $b;
-                $b *= $base;
+                $r  += $D[$j] * $b0;
+                $b0 *= $base;
             }
             push @d, Math::GMPz::Rmpz_init_set_ui($r);
         }
@@ -11669,7 +11669,7 @@ sub sqrtmod_all {
 # Tonelli-Shanks algorithm for k-th roots modulo a prime
 #----------------------------------------------------------
 sub _tonelli_shanks {
-    my ($a, $k, $p) = @_;
+    my ($A, $k, $p) = @_;
 
     my $exp = 0;
     my $q   = Math::GMPz::Rmpz_init();
@@ -11691,17 +11691,17 @@ sub _tonelli_shanks {
     Math::GMPz::Rmpz_invert($inv_k, $k_mod_q, $q);
 
     my $root = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_powm($root, $a, $inv_k, $p);
+    Math::GMPz::Rmpz_powm($root, $A, $inv_k, $p);
 
     my $root_k = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_powm($root_k, $root, $k, $p);
 
     my $inv_a = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_invert($inv_a, $a, $p);
+    Math::GMPz::Rmpz_invert($inv_a, $A, $p);
 
-    my $b = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_mul($b, $root_k, $inv_a);
-    Math::GMPz::Rmpz_mod($b, $b, $p);
+    my $B = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_mul($B, $root_k, $inv_a);
+    Math::GMPz::Rmpz_mod($B, $B, $p);
 
     # Find a generator of the k-th roots of unity
     my $candidate   = Math::GMPz::Rmpz_init_set_ui(2);
@@ -11729,14 +11729,14 @@ sub _tonelli_shanks {
         Math::GMPz::Rmpz_set($gen,       $new_gen);
 
         Math::GMPz::Rmpz_divexact($k_exp_div_k_inner, $k_exp, $k);
-        Math::GMPz::Rmpz_powm($test, $b, $k_exp_div_k_inner, $p);
+        Math::GMPz::Rmpz_powm($test, $B, $k_exp_div_k_inner, $p);
 
         while (Math::GMPz::Rmpz_cmp_ui($test, 1) != 0) {
             Math::GMPz::Rmpz_mul($root, $root, $candidate);
             Math::GMPz::Rmpz_mod($root, $root, $p);
 
-            Math::GMPz::Rmpz_mul($b, $b, $gen);
-            Math::GMPz::Rmpz_mod($b, $b, $p);
+            Math::GMPz::Rmpz_mul($B, $B, $gen);
+            Math::GMPz::Rmpz_mod($B, $B, $p);
 
             Math::GMPz::Rmpz_mul($test, $test, $zeta);
             Math::GMPz::Rmpz_mod($test, $test, $p);
@@ -11785,10 +11785,10 @@ sub _crt_combine {
 # All k-th roots of a modulo prime p
 #----------------------------------------------------------
 sub _roots_mod_prime {
-    my ($a, $k, $p, $single_root) = @_;
+    my ($A, $k, $p, $single_root) = @_;
 
     state $a_mod = Math::GMPz::Rmpz_init();
-    Math::GMPz::Rmpz_mod($a_mod, $a, $p);
+    Math::GMPz::Rmpz_mod($a_mod, $A, $p);
 
     if (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0 || Math::GMPz::Rmpz_cmp_ui($a_mod, 0) == 0) {
         return [Math::GMPz::Rmpz_init_set($a_mod)];
@@ -17029,8 +17029,8 @@ sub _factorial_without_prime {
 
     my $q2_pk = Math::Prime::Util::GMP::mulint($p, $p);
     if ($p > 2 && Math::Prime::Util::GMP::cmpint($pk, $q2_pk) == 0) {
-        my $a = Math::Prime::Util::GMP::divint($n, $p);
-        my $b = Math::Prime::Util::GMP::modint($n, $p);
+        my $A = Math::Prime::Util::GMP::divint($n, $p);
+        my $B = Math::Prime::Util::GMP::modint($n, $p);
 
         my $pm1_fact =
           (HAS_PRIME_UTIL and $pk < ULONG_MAX)
@@ -17039,22 +17039,22 @@ sub _factorial_without_prime {
 
         my $b_fact =
           (HAS_PRIME_UTIL and $pk < ULONG_MAX)
-          ? Math::Prime::Util::factorialmod($b, $pk)
-          : Math::Prime::Util::GMP::factorialmod($b, $pk);
+          ? Math::Prime::Util::factorialmod($B, $pk)
+          : Math::Prime::Util::GMP::factorialmod($B, $pk);
 
         my $Hb = 0;
-        for my $j (1 .. $b) {
+        for my $j (1 .. $B) {
             $Hb =
               HAS_PRIME_UTIL
               ? Math::Prime::Util::addmod($Hb, Math::Prime::Util::invmod($j, $p), $p)
               : Math::Prime::Util::GMP::addmod($Hb, Math::Prime::Util::GMP::invmod($j, $p), $p);
         }
 
-        my $res_q2 = Math::Prime::Util::GMP::powmod($pm1_fact, $a, $pk);
+        my $res_q2 = Math::Prime::Util::GMP::powmod($pm1_fact, $A, $pk);
         $res_q2 = Math::Prime::Util::GMP::mulmod($res_q2, $b_fact, $pk);
 
-        if ($a > 0 && $Hb > 0) {
-            my $ap   = Math::Prime::Util::GMP::mulmod($a,  $p,  $pk);
+        if ($A > 0 && $Hb > 0) {
+            my $ap   = Math::Prime::Util::GMP::mulmod($A,  $p,  $pk);
             my $apHb = Math::Prime::Util::GMP::mulmod($ap, $Hb, $pk);
             my $term = Math::Prime::Util::GMP::addmod(1, $apHb, $pk);
             $res_q2 = Math::Prime::Util::GMP::mulmod($res_q2, $term, $pk);
@@ -26776,7 +26776,7 @@ sub znprimroot {
 }
 
 sub _znlog_bsgs {    # Baby-step, Giant-step algorithm
-    my ($a, $g, $p, $n) = @_;
+    my ($A, $g, $p, $n) = @_;
 
     # Calculate m = ceil(sqrt(n))
     state $m = Math::GMPz::Rmpz_init_nobless();
@@ -26815,7 +26815,7 @@ sub _znlog_bsgs {    # Baby-step, Giant-step algorithm
         # Phase 2: Giant Steps setup
         # Calculate gm = g^{-m} mod p
         Math::GMPz::Rmpz_powm_ui($gm, $invg, $max_m, $p);
-        Math::GMPz::Rmpz_set($current_giant, $a);
+        Math::GMPz::Rmpz_set($current_giant, $A);
 
         # Calculate a * (g^{-m})^i mod p for 0 <= i < m
         for my $i (0 .. $max_m - 1) {
@@ -26987,7 +26987,7 @@ sub _znlog_pollard_rho {
 # Solve g^x = a (mod n) where g has order exactly p^e * r,
 # and we want x modulo p^e.
 sub _znlog_prime_power {
-    my ($a, $g, $n, $p, $e, $full_order) = @_;
+    my ($A, $g, $n, $p, $e, $full_order) = @_;
 
     my $L = $full_order;
     state $r = Math::GMPz::Rmpz_init_nobless();
@@ -26997,7 +26997,7 @@ sub _znlog_prime_power {
     state $g0 = Math::GMPz::Rmpz_init_nobless();
     state $a0 = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_powm($g0, $g, $r, $n);
-    Math::GMPz::Rmpz_powm($a0, $a, $r, $n);
+    Math::GMPz::Rmpz_powm($a0, $A, $r, $n);
 
     my $x = Math::GMPz::Rmpz_init_set_ui(0);
 
@@ -27045,12 +27045,12 @@ sub _znlog_prime_power {
 # Solve g^x = a (mod n) where gcd(g, n) = 1, using Pohlig-Hellman over order of g.
 # Suitable when n is a prime power (or when called per prime-power factor of n).
 sub _znlog_coprime_prime_power {
-    my ($a, $g, $n) = @_;
+    my ($A, $g, $n) = @_;
 
     # Pipe into PARI/GP for cryptographic-scale inputs
     # We bypass the system() overhead for small numbers
     if ($USE_PARI_GP && Math::GMPz::Rmpz_sizeinbase($n, 2) >= 20) {
-        my $a_str = Math::GMPz::Rmpz_get_str($a, 10);
+        my $a_str = Math::GMPz::Rmpz_get_str($A, 10);
         my $g_str = Math::GMPz::Rmpz_get_str($g, 10);
         my $n_str = Math::GMPz::Rmpz_get_str($n, 10);
 
@@ -27074,14 +27074,14 @@ sub _znlog_coprime_prime_power {
     state $p_mpz = Math::GMPz::Rmpz_init_nobless();
 
     # Quick necessary condition: a must lie in the subgroup generated by g
-    Math::GMPz::Rmpz_powm($tmp, $a, $order, $n);
+    Math::GMPz::Rmpz_powm($tmp, $A, $order, $n);
     if (Math::GMPz::Rmpz_cmp_ui($tmp, 1) != 0) {
         return undef;
     }
 
     # Trivial case
     if (Math::GMPz::Rmpz_cmp_ui($order, 1) == 0) {
-        if (Math::GMPz::Rmpz_cmp_ui($a, 1) == 0) {
+        if (Math::GMPz::Rmpz_cmp_ui($A, 1) == 0) {
             return 0;
         }
         return undef;
@@ -27094,7 +27094,7 @@ sub _znlog_coprime_prime_power {
     foreach my $pp (@factors) {
         my ($p, $e) = @$pp;
         Math::GMPz::Rmpz_set_str($p_mpz, $p, 10);
-        my $x = _znlog_prime_power($a, $g, $n, $p_mpz, $e, $order) // return undef;
+        my $x = _znlog_prime_power($A, $g, $n, $p_mpz, $e, $order) // return undef;
         push @residues, [$x, Math::Prime::Util::GMP::powint($p, $e)];
     }
 
@@ -27104,14 +27104,14 @@ sub _znlog_coprime_prime_power {
     # Verify
     Math::GMPz::Rmpz_set_str($tmp, $x, 10);
     Math::GMPz::Rmpz_powm($tmp, $g, $tmp, $n);
-    if (Math::GMPz::Rmpz_cmp($tmp, $a) == 0) {
+    if (Math::GMPz::Rmpz_cmp($tmp, $A) == 0) {
         return $x;
     }
     return undef;
 }
 
 sub _znlog_pohlig_hellman {
-    my ($a, $g, $n, $order) = @_;
+    my ($A, $g, $n, $order) = @_;
 
     my $tmp = Math::GMPz::Rmpz_init();
 
@@ -27122,7 +27122,7 @@ sub _znlog_pohlig_hellman {
 
         my $g_pow = Math::GMPz::Rmpz_init_set_ui(1);    # g^k mod n (original n), for direct equality check
         my $n_red = Math::GMPz::Rmpz_init_set($n);      # modulus being reduced
-        my $a_red = Math::GMPz::Rmpz_init_set($a);      # target being reduced
+        my $a_red = Math::GMPz::Rmpz_init_set($A);      # target being reduced
         my $d_acc = Math::GMPz::Rmpz_init_set_ui(1);    # accumulated product: (g/D_1)*(g/D_2)*...*(g/D_k) mod n_red
 
         my $k = 0;
@@ -27132,7 +27132,7 @@ sub _znlog_pohlig_hellman {
             Math::GMPz::Rmpz_cmp_ui($tmp, 1) == 0 and last;
 
             # Check if g^k already equals a (mod n)
-            if (Math::GMPz::Rmpz_cmp($g_pow, $a) == 0) {
+            if (Math::GMPz::Rmpz_cmp($g_pow, $A) == 0) {
                 return $k;
             }
 
@@ -27151,7 +27151,7 @@ sub _znlog_pohlig_hellman {
         }
 
         # Final direct check after stripping
-        if (Math::GMPz::Rmpz_cmp($g_pow, $a) == 0) {
+        if (Math::GMPz::Rmpz_cmp($g_pow, $A) == 0) {
             return $k;
         }
 
@@ -27188,7 +27188,7 @@ sub _znlog_pohlig_hellman {
         Math::GMPz::Rmpz_set_str($pe, $p, 10);
         Math::GMPz::Rmpz_pow_ui($pe, $pe, $e);
         Math::GMPz::Rmpz_mod($g_i, $g, $pe);
-        Math::GMPz::Rmpz_mod($a_i, $a, $pe);
+        Math::GMPz::Rmpz_mod($a_i, $A, $pe);
 
         my $r     = _znlog_coprime_prime_power($a_i, $g_i, $pe) // return undef;
         my $ord_i = Math::Prime::Util::GMP::znorder($g_i, $pe)  // return undef;
@@ -27200,7 +27200,7 @@ sub _znlog_pohlig_hellman {
 
     # Verify the result
     Math::GMPz::Rmpz_powm($tmp, $g, $x, $n);
-    if (Math::GMPz::Rmpz_cmp($tmp, $a) == 0) {
+    if (Math::GMPz::Rmpz_cmp($tmp, $A) == 0) {
         return $x;
     }
 
@@ -27208,12 +27208,12 @@ sub _znlog_pohlig_hellman {
 }
 
 sub znlog {
-    my ($a, $g, $n) = @_;
+    my ($A, $g, $n) = @_;
 
     ref($g) eq __PACKAGE__ or _valid(\$g);
     ref($n) eq __PACKAGE__ or _valid(\$n);
 
-    $a = _any2mpz($$a) // goto &nan;
+    $A = _any2mpz($$A) // goto &nan;
     $g = _any2mpz($$g) // goto &nan;
     $n = _any2mpz($$n) // goto &nan;
 
@@ -27228,18 +27228,18 @@ sub znlog {
         return ZERO;
     }
 
-    $a = Math::GMPz::Rmpz_init_set($a);    # copy
+    $A = Math::GMPz::Rmpz_init_set($A);    # copy
     $g = Math::GMPz::Rmpz_init_set($g);    # copy
 
-    Math::GMPz::Rmpz_mod($a, $a, $n);
+    Math::GMPz::Rmpz_mod($A, $A, $n);
     Math::GMPz::Rmpz_mod($g, $g, $n);
 
-    if (   Math::GMPz::Rmpz_cmp_ui($a, 1) == 0
+    if (   Math::GMPz::Rmpz_cmp_ui($A, 1) == 0
         or Math::GMPz::Rmpz_cmp_ui($g, 0) == 0) {
         return ZERO;
     }
 
-    _set_int(_znlog_pohlig_hellman($a, $g, $n) // goto &nan);
+    _set_int(_znlog_pohlig_hellman($A, $g, $n) // goto &nan);
 }
 
 *discrete_log = \&znlog;

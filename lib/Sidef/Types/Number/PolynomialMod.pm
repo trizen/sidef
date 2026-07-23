@@ -663,47 +663,47 @@ sub powmod {
 }
 
 sub _poly_clone {
-    my ($a) = @_;
-    return [map { Math::GMPz::Rmpz_init_set($_) } @$a];
+    my ($A) = @_;
+    return [map { Math::GMPz::Rmpz_init_set($_) } @$A];
 }
 
 sub _poly_deg {
-    my ($a) = @_;
-    my $d = $#$a;
-    while ($d >= 0 && Math::GMPz::Rmpz_sgn($a->[$d]) == 0) { $d--; }
+    my ($A) = @_;
+    my $d = $#$A;
+    while ($d >= 0 && Math::GMPz::Rmpz_sgn($A->[$d]) == 0) { $d--; }
     return $d;
 }
 
 sub _poly_strip {
-    my ($a) = @_;
-    while (@$a && Math::GMPz::Rmpz_sgn($a->[-1]) == 0) { pop @$a; }
-    return $a;
+    my ($A) = @_;
+    while (@$A && Math::GMPz::Rmpz_sgn($A->[-1]) == 0) { pop @$A; }
+    return $A;
 }
 
 sub _poly_monic {
-    my ($a, $p) = @_;
-    my $d = _poly_deg($a);
+    my ($A, $p) = @_;
+    my $d = _poly_deg($A);
     return [] if $d < 0;
-    my $lc = $a->[$d];
+    my $lc = $A->[$d];
     if (Math::GMPz::Rmpz_cmp_ui($lc, 1) != 0) {
         my $inv = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_invert($inv, $lc, $p);
         for my $i (0 .. $d) {
-            Math::GMPz::Rmpz_mul($a->[$i], $a->[$i], $inv);
-            Math::GMPz::Rmpz_mod($a->[$i], $a->[$i], $p);
+            Math::GMPz::Rmpz_mul($A->[$i], $A->[$i], $inv);
+            Math::GMPz::Rmpz_mod($A->[$i], $A->[$i], $p);
         }
     }
-    return _poly_strip($a);
+    return _poly_strip($A);
 }
 
 sub _poly_add {
-    my ($a, $b, $p) = @_;
+    my ($A, $B, $p) = @_;
     my @res;
-    my $max  = @$a > @$b ? $#$a : $#$b;
+    my $max  = @$A > @$B ? $#$A : $#$B;
     my $zero = Math::GMPz::Rmpz_init();
     for my $i (0 .. $max) {
         my $v = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_add($v, $i <= $#$a ? $a->[$i] : $zero, $i <= $#$b ? $b->[$i] : $zero);
+        Math::GMPz::Rmpz_add($v, $i <= $#$A ? $A->[$i] : $zero, $i <= $#$B ? $B->[$i] : $zero);
         Math::GMPz::Rmpz_mod($v, $v, $p);
         push @res, $v;
     }
@@ -711,13 +711,13 @@ sub _poly_add {
 }
 
 sub _poly_sub {
-    my ($a, $b, $p) = @_;
+    my ($A, $B, $p) = @_;
     my @res;
-    my $max  = @$a > @$b ? $#$a : $#$b;
+    my $max  = @$A > @$B ? $#$A : $#$B;
     my $zero = Math::GMPz::Rmpz_init();
     for my $i (0 .. $max) {
         my $v = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_sub($v, $i <= $#$a ? $a->[$i] : $zero, $i <= $#$b ? $b->[$i] : $zero);
+        Math::GMPz::Rmpz_sub($v, $i <= $#$A ? $A->[$i] : $zero, $i <= $#$B ? $B->[$i] : $zero);
         Math::GMPz::Rmpz_mod($v, $v, $p);
         push @res, $v;
     }
@@ -725,18 +725,18 @@ sub _poly_sub {
 }
 
 sub _poly_mul {
-    my ($a, $b, $p) = @_;
-    my $da = _poly_deg($a);
-    my $db = _poly_deg($b);
+    my ($A, $B, $p) = @_;
+    my $da = _poly_deg($A);
+    my $db = _poly_deg($B);
     return [] if $da < 0 || $db < 0;
 
     my @res = map { Math::GMPz::Rmpz_init() } 0 .. ($da + $db);
     my $t   = Math::GMPz::Rmpz_init();
 
     for my $i (0 .. $da) {
-        next if Math::GMPz::Rmpz_sgn($a->[$i]) == 0;
+        next if Math::GMPz::Rmpz_sgn($A->[$i]) == 0;
         for my $j (0 .. $db) {
-            Math::GMPz::Rmpz_mul($t, $a->[$i], $b->[$j]);
+            Math::GMPz::Rmpz_mul($t, $A->[$i], $B->[$j]);
             Math::GMPz::Rmpz_add($res[$i + $j], $res[$i + $j], $t);
         }
     }
@@ -785,9 +785,9 @@ sub _poly_mod {
 }
 
 sub _poly_gcd {
-    my ($a, $b, $p) = @_;
-    my $r0 = _poly_clone($a);
-    my $r1 = _poly_clone($b);
+    my ($A, $B, $p) = @_;
+    my $r0 = _poly_clone($A);
+    my $r1 = _poly_clone($B);
     while (_poly_deg($r1) >= 0) {
         my $r = _poly_mod($r0, $r1, $p);
         $r0 = $r1;
@@ -797,13 +797,13 @@ sub _poly_gcd {
 }
 
 sub _poly_derivative {
-    my ($a, $p) = @_;
-    my $d = _poly_deg($a);
+    my ($A, $p) = @_;
+    my $d = _poly_deg($A);
     return [] if $d < 1;
     my @res;
     for my $i (1 .. $d) {
         my $v = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mul_ui($v, $a->[$i], $i);
+        Math::GMPz::Rmpz_mul_ui($v, $A->[$i], $i);
         Math::GMPz::Rmpz_mod($v, $v, $p);
         push @res, $v;
     }
@@ -813,14 +813,14 @@ sub _poly_derivative {
 sub _poly_powmod {
     my ($base, $exp, $modpoly, $p) = @_;
     my $res = [Math::GMPz::Rmpz_init_set_ui(1)];
-    my $b   = _poly_mod($base, $modpoly, $p);
+    my $B   = _poly_mod($base, $modpoly, $p);
 
     my $e = Math::GMPz::Rmpz_init_set($exp);
     while (Math::GMPz::Rmpz_sgn($e) > 0) {
         if (Math::GMPz::Rmpz_tstbit($e, 0)) {
-            $res = _poly_mod(_poly_mul($res, $b, $p), $modpoly, $p);
+            $res = _poly_mod(_poly_mul($res, $B, $p), $modpoly, $p);
         }
-        $b = _poly_mod(_poly_mul($b, $b, $p), $modpoly, $p);
+        $B = _poly_mod(_poly_mul($B, $B, $p), $modpoly, $p);
         Math::GMPz::Rmpz_fdiv_q_2exp($e, $e, 1);
     }
     return $res;
