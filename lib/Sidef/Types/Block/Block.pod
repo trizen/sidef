@@ -8,11 +8,15 @@ Sidef::Types::Block::Block - Executable code block (closure) with lexical scope 
 
 This class implements blocks (closures/anonymous functions) in Sidef. Blocks are fundamental constructs that encapsulate executable code and can capture variables from their surrounding scope. They are first-class objects that can be passed as arguments, returned from functions, and stored in variables.
 
+A block's underlying C<type> is either C<block> (a plain closure, C<{ ... }>) or C<func> (a named/multiple-dispatch function, C<func name(...) { ... }>). Blocks with type C<func> support multiple dispatch: several candidate signatures (with optional type and subset constraints) can share the same name, and the first candidate whose parameters match the given arguments is invoked; if none match, a detailed dispatch error is raised.
+
 Blocks in Sidef support:
 
 =over 4
 
 =item * Lexical closures with captured variables
+
+=item * Multiple dispatch, with type- and subset-constrained parameters
 
 =item * Lazy evaluation and memoization
 
@@ -28,254 +32,76 @@ Blocks in Sidef support:
 
     # Simple block creation
     var square = {|n| n * n }
-    say square(5)           #=> 25
+    say(square(5))           #=> 25
 
     # Block with multiple parameters
     var add = {|a, b| a + b }
-    say add(3, 7)           #=> 10
+    say(add(3, 7))           #=> 10
 
     # Blocks as iterators
     var nums = [1, 2, 3, 4, 5]
-    nums << {|n| say n }    # Print each number
+    {|n| say(n) } << nums    # Print each number
 
     # Functional composition
     var double = {|x| x * 2 }
     var inc = {|x| x + 1 }
     var f = (double ∘ inc)
-    say f(5)                #=> 12  # (5+1)*2
+    say(f(5))                #=> 12  # (5+1)*2
 
     # Memoization
     var fib = {|n|
         n <= 1 ? n : (fib(n-1) + fib(n-2))
     }.cache
-    say fib(40)             # Fast due to caching
+    say(fib(40))             # Fast due to caching
 
 =head1 INHERITS
 
-Inherits methods from L<Sidef::Object::Object>.
+Inherits methods from:
 
-=head1 METHODS
+       * Sidef::Object::Object
 
-=head2 &
+=head1 CONSTRUCTION
 
-    block & condition
+=head2 new
 
-Filters elements using the block as a predicate function. Returns elements for which the block returns true.
+    Block.new(name: name, type: type, code: code_ref, ...)
 
-    var nums = [1, 2, 3, 4, 5, 6]
-    var evens = (nums & {|n| n.is_even })
-    say evens           #=> [2, 4, 6]
-
-Aliases: I<grep>
+Creates a new C<Block> object from a hash of named options. C<code> (a Perl code reference) is the essential one; C<type> defaults to C<"block"> (use C<"func"> for a multiple-dispatch function) and C<name> defaults to C<"__BLOCK__">. Other internal options (such as C<vars>, for parameter/type/subset metadata) are also accepted. Typically blocks are created using brace syntax (C<{ ... }>) or C<func> syntax rather than by calling this constructor directly.
 
 =cut
 
-=head2 *
-
-    block * n
-
-Repeats the block execution n times, returning an array of results.
-
-    var roll_die = { 6.rand.int + 1 }
-    var rolls = (roll_die * 10)
-    say rolls           #=> [3, 1, 6, 2, 5, 4, 1, 6, 3, 2]
-
-Aliases: I<repeat>
-
-=cut
-
-=head2 <<
-
-    array << block
-
-Iterates over array elements, calling the block with each element. Used for side effects.
-
-    var numbers = [1, 2, 3, 4, 5]
-    numbers << {|n| say "Number: #{n}" }
-    # Outputs:
-    # Number: 1
-    # Number: 2
-    # Number: 3
-    # Number: 4
-    # Number: 5
-
-Aliases: I<for>, I<each>, I<foreach>
-
-=cut
-
-=head2 >>
-
-    array >> block
-
-Maps array elements through the block, returning a new array with transformed values.
-
-    var numbers = [1, 2, 3, 4, 5]
-    var squares = (numbers >> {|n| n * n })
-    say squares         #=> [1, 4, 9, 16, 25]
-
-Aliases: I<map>
-
-=cut
-
-=head2 Π
-
-    block.Π(range)
-
-Calculates the product of all values returned by calling the block for each value in the range.
-
-    var factorial = {|n| n }
-    say factorial.Π(1..5)      #=> 120  # 1*2*3*4*5
-
-    var prod = {|n| n**2 }
-    say prod.Π(1..4)            #=> 576  # 1*4*9*16
-
-Aliases: I<prod>
-
-=cut
-
-=head2 Σ
-
-    block.Σ(range)
-
-Calculates the sum of all values returned by calling the block for each value in the range.
-
-    var identity = {|n| n }
-    say identity.Σ(1..10)       #=> 55  # Sum of 1 to 10
-
-    var squares = {|n| n**2 }
-    say squares.Σ(1..5)         #=> 55  # 1+4+9+16+25
-
-Aliases: I<sum>
-
-=cut
-
-=head2 ∘
-
-    block_a ∘ block_b
-
-Returns a new block that represents the composition of two blocks. The result is equivalent to block_a(block_b(x)).
-
-    var double = {|x| x * 2 }
-    var square = {|x| x ** 2 }
-    var f = (double ∘ square)
-    say f(5)            #=> 50  # double(square(5)) = double(25) = 50
-
-    # Multiple composition
-    var inc = {|x| x + 1 }
-    var g = (square ∘ double ∘ inc)
-    say g(3)            #=> 64  # square(double(inc(3))) = square(double(4)) = square(8) = 64
-
-Aliases: I<compose>
-
-=cut
-
-=head2 array_identity
-
-    block.array_identity
-
-Returns an identity block that returns an empty array. Used internally for certain operations.
-
-    var block = { ... }
-    var id = block.array_identity
-    say id()            #=> []
-
-=cut
-
-=head2 bsearch
-
-    block.bsearch(range)
-
-Performs a binary search on the range using the block as a comparison function. The block should return true for values greater than or equal to the target.
-
-    var find_sqrt = {|x| x**2 >= 50 }
-    say find_sqrt.bsearch(0..100)   #=> 8  # First integer where x^2 >= 50
-
-=cut
-
-=head2 bsearch_ge
-
-    block.bsearch_ge(range)
-
-Binary search that finds the first element in range where the block returns a value greater than or equal to zero.
-
-    var block = {|x| x**2 - 30 }
-    say block.bsearch_ge(0..100)    #=> 6  # First x where x^2 >= 30
-
-=cut
-
-=head2 bsearch_inverse
-
-    block.bsearch_inverse(value, range)
-
-Performs an inverse binary search to find the input that produces the given value when passed to the block.
-
-    var square = {|x| x**2 }
-    say square.bsearch_inverse(49, 0..100)  #=> 7
-
-=cut
-
-=head2 bsearch_le
-
-    block.bsearch_le(range)
-
-Binary search that finds the last element in range where the block returns a value less than or equal to zero.
-
-    var block = {|x| 50 - x**2 }
-    say block.bsearch_le(0..100)    #=> 7  # Last x where 50-x^2 >= 0
-
-=cut
-
-=head2 cache
-
-    block.cache
-
-Returns a memoized version of the block that caches results based on input arguments. Subsequent calls with the same arguments return cached results instead of recomputing.
-
-    var expensive = {|n|
-        say "Computing fib(#{n})"
-        n <= 1 ? n : (expensive(n-1) + expensive(n-2))
-    }.cache
-
-    say expensive(5)    # Computes only once per unique input
-    say expensive(5)    # Returns cached result
-
-=cut
+=head1 INVOCATION
 
 =head2 call
 
     block.call(*args)
+    block(*args)
 
-Calls the block with the provided arguments and returns the result.
+Calls the block with the provided arguments and returns the result. For a plain C<block>-type value this jumps straight to the underlying code; for a C<func>-type value (or one with multiple candidate signatures), this performs multiple dispatch and validates any declared return types.
 
     var multiply = {|a, b| a * b }
-    say multiply.call(6, 7)     #=> 42
+    say(multiply.call(6, 7))     #=> 42
 
     # Equivalent to:
-    say multiply(6, 7)          #=> 42
+    say(multiply(6, 7))          #=> 42
 
 =cut
 
-=head2 cap
+=head2 run
 
-    block.cap
+    block.run(*args)
 
-Captures the current state of the block and its environment, returning a callable object. This preserves the lexical scope at the time of capture.
+Executes the block with the given arguments and returns the result. For C<func>-type blocks this delegates to L</call> (multiple dispatch); for plain C<block>-type values it jumps directly to the underlying code with C<@_> intact.
 
-    var x = 10
-    var block = { x * 2 }
-    var captured = block.cap
-    x = 20
-    say captured()      #=> 20  # Uses current x value
-
-Aliases: I<capture>
+Aliases: I<do>
 
 =cut
 
 =head2 do
 
-    block.do
+    block.do(*args)
 
-Executes the block without arguments and returns the result. Useful for immediate execution of parameterless blocks.
+Executes the block with the given arguments (if any) and returns the result.
 
     var result = {
         var x = 5
@@ -283,7 +109,7 @@ Executes the block without arguments and returns the result. Useful for immediat
         x + y
     }.do
 
-    say result          #=> 15
+    say(result)          #=> 15
 
 Aliases: I<run>
 
@@ -293,40 +119,196 @@ Aliases: I<run>
 
     block.exec(*args)
 
-Executes the block with the given arguments. Similar to call but may have different semantics in certain contexts.
+Runs the block with the given arguments (as L</run> would), but discards its return value and returns C<self> instead. Useful for chaining side effects.
 
-    var greet = {|name| "Hello, #{name}!" }
-    say greet.exec("Alice")     #=> Hello, Alice!
-
-=cut
-
-=head2 ffork
-
-    block.ffork(*args)
-
-Forks a new process and executes the block in the child process. Returns a future-like object that can be used to retrieve the result. The 'f' stands for "future fork".
-
-    var compute = {|n|
-        # Heavy computation
-        (1..n).sum
-    }
-
-    var future = compute.ffork(1000000)
-    # Do other work...
-    say future.wait     # Wait for and get result
-
-Aliases: I<start>
+    var greet = {|name| say("Hello, #{name}!") }
+    var same_greet = greet.exec("Alice")   #=> prints "Hello, Alice!"
+    # same_greet == greet
 
 =cut
 
-=head2 first
+=head2 if
 
-    block.first(n, range)
+    block.if(condition)
 
-Returns the first n values from evaluating the block over the range.
+If C<condition> is truthy, runs the block and returns its result; otherwise, returns C<condition> itself unchanged (without running the block).
 
-    var squares = {|x| x**2 }
-    say squares.first(5, 1..100)    #=> [1, 4, 9, 16, 25]
+    var action = { say("Condition was true!") }
+    action.if(5 > 3)    # Executes and prints message
+    action.if(5 < 3)    # Does not execute; returns false
+
+=cut
+
+=head2 while
+
+    block.while(condition)
+
+Runs the block repeatedly for as long as calling C<condition.run> returns a truthy value. Returns C<self>.
+
+    var i = 0
+    {
+        say(i)
+        i++
+    }.while({ i < 5 })
+    # Prints: 0, 1, 2, 3, 4
+
+=cut
+
+=head2 loop
+
+    block.loop
+
+Runs the block in an infinite loop, until a C<break> or C<return> control-flow statement is encountered inside it. Returns C<self>.
+
+    var counter = 0
+    {
+        say(counter++)
+        counter >= 5 && break
+    }.loop
+    # Prints: 0, 1, 2, 3, 4
+
+=cut
+
+=head1 IDENTITY BLOCKS
+
+=head2 identity
+
+    Block.identity
+
+Returns a shared identity block that returns its single input argument unchanged.
+
+    var id = Block.identity
+    say(id(42))          #=> 42
+
+=cut
+
+=head2 list_identity
+
+    Block.list_identity
+
+Returns a shared identity block that returns all of its arguments as a list, unchanged.
+
+    var lid = Block.list_identity
+    say(lid(1, 2, 3))    #=> (1, 2, 3)
+
+=cut
+
+=head2 array_identity
+
+    Block.array_identity
+
+Returns a shared identity block that collects all of its arguments into a new C<Array>.
+
+    var aid = Block.array_identity
+    say(aid(1, 2, 3))    #=> [1, 2, 3]
+
+=cut
+
+=head2 null_identity
+
+    Block.null_identity
+
+Returns a shared identity block that ignores its arguments and returns nothing (C<nil>).
+
+    var nid = Block.null_identity
+    say(nid(1, 2, 3))    #=> nil
+
+=cut
+
+=head2 is_identity
+
+    block.is_identity
+
+Returns C<true> if the block is one of the built-in identity blocks (L</identity>, L</list_identity>, L</array_identity>, or L</null_identity>), otherwise C<false>. Ordinary user-defined blocks always return C<false>, even if they behave like an identity function.
+
+    say(Block.identity.is_identity)    #=> true
+    say({|x| x }.is_identity)          #=> false
+
+=cut
+
+=head1 FUNCTIONAL COMBINATORS
+
+=head2 compose
+
+    block_a.compose(block_b)
+    block_a ∘ block_b
+
+Returns a new block representing the composition of two blocks: calling the result is equivalent to C<block_a(block_b(*args))>.
+
+    var double = {|x| x * 2 }
+    var square = {|x| x ** 2 }
+    var f = (double ∘ square)
+    say(f(5))            #=> 50  # double(square(5)) = double(25) = 50
+
+    # Multiple composition
+    var inc = {|x| x + 1 }
+    var g = (square ∘ double ∘ inc)
+    say(g(3))            #=> 64  # square(double(inc(3))) = square(double(4)) = square(8) = 64
+
+Aliases: operator C<∘>
+
+=cut
+
+=head2 ∘
+
+    block_a ∘ block_b
+
+Operator form of L</compose>.
+
+Aliases: I<compose>
+
+=cut
+
+=head2 repeat
+
+    block.repeat(num)
+    block * num
+
+If C<num> is a C<Number>, calls C<num.times(block)>, running the block C<num> times and collecting the results into an array. If C<num> is another C<Block>, this is equivalent to L</compose> (i.e. C<block * other_block> behaves like C<block ∘ other_block>).
+
+    var roll_die = { 6.rand.int + 1 }
+    var rolls = (roll_die * 10)
+    say(rolls)           #=> [3, 1, 6, 2, 5, 4, 1, 6, 3, 2]
+
+Aliases: operator C<*>
+
+=cut
+
+=head2 *
+
+    block * num
+
+Operator form of L</repeat>.
+
+Aliases: I<repeat>
+
+=cut
+
+=head2 cache
+
+    block.cache
+
+Returns a memoized version of the block that caches results based on input arguments. Subsequent calls with the same arguments return cached results instead of recomputing. Modifies and returns C<self>.
+
+    var expensive = {|n|
+        say("Computing fib(#{n})")
+        n <= 1 ? n : (expensive(n-1) + expensive(n-2))
+    }.cache
+
+    say(expensive(5))    # Computes only once per unique input
+    say(expensive(5))    # Returns cached result
+
+=cut
+
+=head2 uncache
+
+    block.uncache
+
+Removes memoization from a previously cached block, so that subsequent calls are recomputed instead of using cached results. Modifies and returns C<self>; has no effect if the block is not cached.
+
+    var cached = {|n| n * 2 }.cache
+    var uncached = cached.uncache
+    # uncached will recompute each time
 
 =cut
 
@@ -334,10 +316,10 @@ Returns the first n values from evaluating the block over the range.
 
     block.flush_cache
 
-Clears the memoization cache for a cached block, forcing recomputation on subsequent calls.
+Clears the memoization cache for a cached block, forcing recomputation on subsequent calls, without removing its cached status. Returns C<self>; has no effect if the block is not cached.
 
     var block = {|n|
-        say "Computing..."
+        say("Computing...")
         n * 2
     }.cache
 
@@ -348,129 +330,307 @@ Clears the memoization cache for a cached block, forcing recomputation on subseq
 
 =cut
 
-=head2 fork
+=head1 ITERATION
 
-    block.fork(*args)
+The methods in this section are defined on C<Block>, so the block is always the invocant (and the left-hand operand of the corresponding operator): C<block.map(iterable)> / C<block E<gt>E<gt> iterable>, not the other way around. Container types such as C<Array> or C<Range> separately provide the more commonly seen calling convention (e.g. C<iterable.map{ ... }>).
 
-Forks a new process and executes the block in the child process with the given arguments. Returns the child process PID.
+=head2 for
 
-    var pid = {
-        say "Child process: #{$$ }"
-        # Do work in child
-    }.fork
+    block.for(*iterables)
+    block << iterable
 
-    say "Parent process: #{$$ }, child PID: #{pid}"
+Calls the block once for each element produced by the given iterable object(s) (arrays, ranges, and so on), for side effects. If the block performs a C<break>-like exit, iteration over the remaining iterables stops. Returns C<self>.
 
-=cut
+    var numbers = [1, 2, 3, 4, 5]
+    {|n| say("Number: #{n}") } << numbers
+    # Outputs:
+    # Number: 1
+    # Number: 2
+    # Number: 3
+    # Number: 4
+    # Number: 5
 
-=head2 identity
-
-    block.identity
-
-Returns a block that acts as the identity function, returning its input unchanged. Used internally for functional programming operations.
-
-    var id = block.identity
-    say id(42)          #=> 42
-    say id([1,2,3])     #=> [1, 2, 3]
+Aliases: I<each>, I<foreach>, operator C<< << >>
 
 =cut
 
-=head2 if
+=head2 each
 
-    block.if(condition)
+    block.each(*iterables)
 
-Conditionally executes the block if the condition is true.
+Alias for L</for>.
 
-    var action = { say "Condition was true!" }
-    action.if(5 > 3)    # Executes and prints message
-    action.if(5 < 3)    # Does not execute
+Aliases: I<for>, I<foreach>
 
 =cut
 
-=head2 is_identity
+=head2 foreach
 
-    block.is_identity
+    block.foreach(*iterables)
 
-Returns true if the block is an identity function (returns its input unchanged), false otherwise.
+Alias for L</for>.
 
-    var id = {|x| x }
-    say id.is_identity          #=> true
-
-    var double = {|x| x * 2 }
-    say double.is_identity      #=> false
+Aliases: I<for>, I<each>
 
 =cut
 
-=head2 list_identity
+=head2 <<
 
-    block.list_identity
+    block << iterable
 
-Returns an identity block that returns its arguments as a list. Used internally for list-oriented operations.
+Operator form of L</for>. The block is the left-hand operand.
 
-    var lid = block.list_identity
-    say lid(1, 2, 3)    #=> [1, 2, 3]
-
-=cut
-
-=head2 loop
-
-    block.loop
-
-Executes the block in an infinite loop until a break or return statement is encountered.
-
-    var counter = 0
-    {
-        say counter++
-        counter >= 5 && break
-    }.loop
-    # Prints: 0, 1, 2, 3, 4
+Aliases: I<for>, I<each>, I<foreach>
 
 =cut
 
-=head2 nest
+=head2 map
 
-    block.nest(n, initial_value)
+    block.map(*iterables)
+    block >> iterable
 
-Applies the block n times, using the result of each application as input for the next. Starts with initial_value.
+Calls the block once for each element produced by the given iterable object(s), collecting the returned values into a new C<Array>.
 
-    var double = {|x| x * 2 }
-    say double.nest(3, 5)       #=> 40  # 5 -> 10 -> 20 -> 40
+    var numbers = [1, 2, 3, 4, 5]
+    var squares = ({|n| n * n } >> numbers)
+    say(squares)         #=> [1, 4, 9, 16, 25]
 
-    var inc = {|x| x + 1 }
-    say inc.nest(10, 0)         #=> 10
+Aliases: operator C<< >> >>
 
 =cut
 
-=head2 new
+=head2 >>
 
-    Block.new(code)
+    block >> iterable
 
-Creates a new block object from code. Typically blocks are created using brace syntax rather than this constructor.
+Operator form of L</map>. The block is the left-hand operand.
 
-    var block = Block.new({|x| x * 2 })
-    say block(5)        #=> 10
+Aliases: I<map>
+
+=cut
+
+=head2 grep
+
+    block.grep(*iterables)
+    block & iterable
+
+Calls the block once for each element produced by the given iterable object(s), collecting into a new C<Array> only the elements for which the block returned a truthy value.
+
+    var nums = [1, 2, 3, 4, 5, 6]
+    var evens = ({|n| n.is_even } & nums)
+    say(evens)           #=> [2, 4, 6]
+
+Aliases: operator C<&>
+
+=cut
+
+=head2 &
+
+    block & iterable
+
+Operator form of L</grep>. The block is the left-hand operand.
+
+Aliases: I<grep>
+
+=cut
+
+=head2 first
+
+    block.first(n=1, range=(0..Inf))
+
+Uses the block as a predicate and returns the first C<n> elements of C<range> for which it returns a truthy value, as an C<Array>. If C<n> is omitted, returns the single first matching element directly (not wrapped in an array).
+
+    var is_even = {|n| n.is_even }
+    say(is_even.first(3, 1..10))    #=> [2, 4, 6]
+    say(is_even.first(nil, 1..10))  #=> 2
 
 =cut
 
 =head2 nth
 
-    block.nth(n, range)
+    block.nth(n, range=(0..Inf))
 
-Returns the nth value (0-indexed) from evaluating the block over the range.
+Uses the block as a predicate and returns the C<n>-th (1-indexed) element of C<range> for which it returns a truthy value, or C<nil> if no such element exists or if C<n> is not a positive number.
 
-    var squares = {|x| x**2 }
-    say squares.nth(5, 1..100)      #=> 36  # 6th square (0-indexed)
+    var is_even = {|n| n.is_even }
+    say(is_even.nth(3, 1..10))      #=> 6  # the 3rd even number in the range
 
 =cut
 
-=head2 null_identity
+=head2 nest
 
-    block.null_identity
+    block.nest(n, value=0)
 
-Returns an identity block that returns null/nil. Used internally for operations that need a null-returning identity.
+Applies the block C<n> times, feeding the result of each application into the next as its argument, starting from C<value>. Returns the final result.
 
-    var nid = block.null_identity
-    say nid()           #=> nil
+    var double = {|x| x * 2 }
+    say(double.nest(3, 5))       #=> 40  # 5 -> 10 -> 20 -> 40
+
+    var inc = {|x| x + 1 }
+    say(inc.nest(10, 0))         #=> 10
+
+=cut
+
+=head1 AGGREGATION
+
+=head2 sum
+
+    block.sum(range)
+
+Calculates the sum of all values returned by calling the block for each value in C<range> (equivalent to C<range.sum_by(block)>).
+
+    var identity = {|n| n }
+    say(identity.sum(1..10))       #=> 55  # Sum of 1 to 10
+
+    var squares = {|n| n**2 }
+    say(squares.sum(1..5))         #=> 55  # 1+4+9+16+25
+
+Aliases: I<Σ>
+
+=cut
+
+=head2 Σ
+
+    block.Σ(range)
+
+Alias for L</sum>.
+
+Aliases: I<sum>
+
+=cut
+
+=head2 prod
+
+    block.prod(range)
+
+Calculates the product of all values returned by calling the block for each value in C<range> (equivalent to C<range.prod_by(block)>).
+
+    var factorial = {|n| n }
+    say(factorial.prod(1..5))      #=> 120  # 1*2*3*4*5
+
+    var prod = {|n| n**2 }
+    say(prod.prod(1..4))           #=> 576  # 1*4*9*16
+
+Aliases: I<Π>
+
+=cut
+
+=head2 Π
+
+    block.Π(range)
+
+Alias for L</prod>.
+
+Aliases: I<prod>
+
+=cut
+
+=head1 SEARCHING
+
+=head2 bsearch
+
+    block.bsearch(from=0, upto=nil)
+
+Performs a binary search for a value satisfying the block, used as the underlying comparison function for C<Number>'s own C<bsearch>. C<from> defaults to C<0>; if C<upto> is omitted, it is computed automatically and the search range is doubled repeatedly until a satisfying value is bracketed within it. Returns the found value, or C<-1> if the search space is exhausted.
+
+    var find_sqrt = {|x| x**2 <=> 50 }
+    say(find_sqrt.bsearch())   #=> a value x where x**2 is close to 50
+
+=cut
+
+=head2 bsearch_le
+
+    block.bsearch_le(from=0, upto=nil)
+
+Like L</bsearch>, but delegates to C<Number>'s C<bsearch_le>: finds the greatest value for which the block's result is less than or equal to zero.
+
+    var block = {|x| 50 - x**2 }
+    say(block.bsearch_le())    #=> 7  # Last x where 50-x^2 >= 0
+
+=cut
+
+=head2 bsearch_ge
+
+    block.bsearch_ge(from=0, upto=nil)
+
+Like L</bsearch>, but delegates to C<Number>'s C<bsearch_ge>: finds the smallest value for which the block's result is greater than or equal to zero.
+
+    var block = {|x| x**2 - 30 }
+    say(block.bsearch_ge())    #=> 6  # First x where x^2 >= 30
+
+=cut
+
+=head2 bsearch_inverse
+
+    block.bsearch_inverse(from=0, upto=nil)
+
+Like L</bsearch>, but delegates to C<Number>'s C<bsearch_inverse>: finds a value whose image under the block matches the target used by the inverse search.
+
+    var square = {|x| x**2 }
+    say(square.bsearch_inverse())  #=> a value x where x**2 matches the target
+
+=cut
+
+=head1 CONCURRENCY
+
+=head2 ffork
+
+    block.ffork(*args)
+
+Forks a new process and calls the block with C<args> in the child process, serializing the result to a temporary file. Returns a C<Sidef::Types::Block::Fork> object that can be used to wait for and retrieve the result. The "f" stands for "future fork". Blocks cannot themselves be part of the returned value (attempting to serialize a C<Block> raises an error).
+
+    var compute = {|n|
+        (1..n).sum
+    }
+
+    var future = compute.ffork(1000000)
+    # Do other work...
+    say(future.wait)     # Wait for and get result
+
+Aliases: I<start>
+
+=cut
+
+=head2 start
+
+    block.start(*args)
+
+Alias for L</ffork>.
+
+Aliases: I<ffork>
+
+=cut
+
+=head2 fork
+
+    block.fork(*args)
+
+Forks a new process and calls the block with C<args> in the child process (without capturing a return value). Returns a C<Sidef::Types::Block::Fork> object wrapping the child process ID.
+
+    var forked = {
+        say("Child process")
+        # Do work in child
+    }.fork
+
+    say("Parent process, child PID: #{forked.pid}")
+
+=cut
+
+=head2 thread
+
+    block.thread(*args)
+
+Runs the block with C<args> in a new native thread (using the C<threads> or C<forks> module). Returns a thread handle object that can be joined (C<.join>, C<.get>, or C<.wait>) to retrieve the block's result.
+
+    var compute = {|n|
+        (1..n).sum
+    }
+
+    var t = compute.thread(1000)
+    # Do other work...
+    say(t.join)     # Wait for thread and get result
+
+Aliases: I<thr>
 
 =cut
 
@@ -478,32 +638,24 @@ Returns an identity block that returns null/nil. Used internally for operations 
 
     block.thr(*args)
 
-Executes the block in a new thread with the given arguments. Returns a thread object that can be joined to retrieve the result.
-
-    var compute = {|n|
-        (1..n).sum
-    }
-
-    var thread = compute.thr(1000)
-    # Do other work...
-    say thread.join     # Wait for thread and get result
+Alias for L</thread>.
 
 Aliases: I<thread>
 
 =cut
 
-=head2 time
+=head1 INTROSPECTION AND CONVERSION
 
-    block.time
+=head2 dump
 
-Measures and returns the execution time of the block in seconds.
+    block.dump
 
-    var duration = {
-        # Some computation
-        1000.times { |i| i**2 }
-    }.time
+Returns a string representation of the block (its declaration-style signature together with an internal name and address), the same representation used for automatic stringification.
 
-    say "Execution took #{duration} seconds"
+    var block = {|x| x * 2 }
+    say(block.dump)      #=> "{|x| ... }"-style representation
+
+Aliases: I<to_s>, I<to_str>
 
 =cut
 
@@ -511,39 +663,68 @@ Measures and returns the execution time of the block in seconds.
 
     block.to_s
 
-Returns a string representation of the block.
-
-    var block = {|x| x * 2 }
-    say block.to_s      #=> "Block(...)"
+Alias for L</dump>.
 
 Aliases: I<dump>, I<to_str>
 
 =cut
 
-=head2 uncache
+=head2 to_str
 
-    block.uncache
+    block.to_str
 
-Returns an uncached version of a cached block, removing memoization.
+Alias for L</dump>.
 
-    var cached = {|n| n * 2 }.cache
-    var uncached = cached.uncache
-    # uncached will recompute each time
+Aliases: I<dump>, I<to_s>
 
 =cut
 
-=head2 while
+=head2 time
 
-    block.while(condition)
+    block.time
 
-Executes the block repeatedly as long as the condition block returns true.
+Runs the block (with no arguments) and returns the wall-clock time it took to execute, in seconds, as a C<Number> with sub-second precision.
 
-    var i = 0
-    {
-        say i
-        i++
-    }.while({ i < 5 })
-    # Prints: 0, 1, 2, 3, 4
+    var duration = {
+        # Some computation
+        1000.times {|i| i**2 }
+    }.time
+
+    say("Execution took #{duration} seconds")
+
+=cut
+
+=head2 capture
+
+    block.capture
+
+Runs the block with its standard output redirected to an in-memory buffer, and returns everything the block printed as a C<String> (decoded as UTF-8), instead of letting it go to the console.
+
+    var output = {
+        say("Hello, world!")
+    }.capture
+
+    say(output)          #=> "Hello, world!\n"
+
+Aliases: I<cap>
+
+=cut
+
+=head2 cap
+
+    block.cap
+
+Alias for L</capture>.
+
+Aliases: I<capture>
+
+=cut
+
+=head2 get_value
+
+    block.get_value
+
+Returns a plain Perl code reference that, when called, invokes the block -- automatically forwarding Perl's topicalizing C<$_> (or C<$a>/C<$b>, when set) as arguments. Used internally to let blocks act as ordinary Perl subs (for example, as comparison functions for Perl-level sorting).
 
 =cut
 
@@ -558,7 +739,7 @@ Executes the block repeatedly as long as the condition block returns true.
     var doubled = evens.map{|n| n * 2 }
     var sum = doubled.sum
 
-    say sum             #=> 60
+    say(sum)             #=> 60
 
 =head2 Closures and Scope
 
@@ -572,20 +753,20 @@ Executes the block repeatedly as long as the condition block returns true.
     var counter1 = make_counter()
     var counter2 = make_counter()
 
-    say counter1()      #=> 1
-    say counter1()      #=> 2
-    say counter2()      #=> 1  # Independent counter
+    say(counter1())      #=> 1
+    say(counter1())      #=> 2
+    say(counter2())      #=> 1  # Independent counter
 
 =head2 Parallel Processing
 
     # Process data in parallel using threads
     var data = (1..8)
-    var threads = data.map{|n|
-        { n**3 }.thr
+    var threads = data.map {|n|
+        { n**3 }.thread
     }
 
-    var results = threads.map{|t| t.join }
-    say results         #=> [1, 8, 27, 64, 125, 216, 343, 512]
+    var results = threads.map {|t| t.join }
+    say(results)         #=> [1, 8, 27, 64, 125, 216, 343, 512]
 
 =head2 Memoization for Performance
 
@@ -594,7 +775,7 @@ Executes the block repeatedly as long as the condition block returns true.
         n <= 1 ? n : (fib(n-1) + fib(n-2))
     }.cache
 
-    say fib(100)        # Computes efficiently
+    say(fib(100))        # Computes efficiently
 
 =head1 SEE ALSO
 
