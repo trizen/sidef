@@ -128,6 +128,9 @@ assert_eq((2**2048 - 3) .. 2**2048 -> map { _ }, [2**2048 - 3, 2**2048 - 2, 2**2
 assert_eq(1 .. 2**2048 -> first(5), [1,2,3,4,5])
 assert_eq(-3 .. 2**2048 -> first(7), [-3,-2,-1,0,1,2,3])
 
+assert_eq(-(2**2048) .. (2**2048) -> first(3), 3.of{|k| -(2**2048 - k) })
+assert_eq((2**2049) .. (2**2048) `by` -1 -> first(3), 3.of{|k| 2**2049 - k })
+
 assert_eq(2**2048 .. 2**4096 -> first(3), [2**2048, 2**2048 + 1, 2**2048 + 2])
 
 assert_eq(1 .. 100 `by`  Inf -> map { _ }, [1])
@@ -224,5 +227,229 @@ assert_eq(
     gather { (-20 .. 3*9223372036854775798 `by` 9223372036854775798) -> each {|n| take(n)} },
     %n[-20, 9223372036854775778, 18446744073709551576, 27670116110564327374]
 )
+
+for n in (NaN .. 1 `by` -sqrt(2)) {
+    assert(false)
+}
+
+do {
+    var max = 10
+    var arr = %n[]
+    for k in (1..Inf) {
+        arr << k
+        break if (k == max)
+    }
+    assert_eq(arr.first, 1)
+    assert_eq(arr.last, max)
+}
+
+do {
+    var max = 10
+    for from ([30, 31, 32, 33, 62, 63, 64, 65]) {
+        var arr = %n[]
+        var i = 0
+        for k in (ipow(2,from) .. Inf) {
+            arr << k
+            break if (i++ == max)
+        }
+        assert(arr.diffs.all{ _ == 1 })
+        assert_eq(arr.first, ipow(2, from))
+        assert_eq(arr.last, max+ipow(2,from))
+
+        arr = %n[]
+        i = 0
+        for k in (-ipow(2,from) .. Inf) {
+            arr << k
+            break if (i++ == max)
+        }
+        assert(arr.diffs.all{ _ == 1 })
+        assert_eq(arr.first, -ipow(2, from))
+        assert_eq(arr.last, max + -ipow(2,from))
+
+        arr = %n[]
+        i = 0
+        for k in (ipow(2,from) .. Inf `by` 2) {
+            arr << k
+            break if (i++ == max)
+        }
+        assert(arr.diffs.all { _ == 2 })
+        assert_eq(arr.first, ipow(2,from))
+        assert_eq(arr.last, ipow(2,from) + 2*max)
+
+        arr = %n[]
+        i = 0
+        for k in (-ipow(2,from) .. Inf `by` 2) {
+            arr << k
+            break if (i++ == max)
+        }
+        assert(arr.diffs.all { _ == 2 })
+        assert_eq(arr.first, -ipow(2,from))
+        assert_eq(arr.last, -ipow(2,from) + 2*max)
+
+        arr = []
+        for n in (ipow(2,from) .. (ipow(2, from) - 10) `by` -1) {
+            arr << n
+        }
+        assert(arr.diffs.all { _ == -1 })
+        assert_eq(arr[0], ipow(2, from))
+        assert_eq(arr[-1], ipow(2, from) - 10)
+
+        arr = []
+        for n in (-(ipow(2,from) - 10) .. -ipow(2, from) `by` -1) {
+            arr << n
+        }
+        assert(arr.diffs.all { _ == -1 })
+        assert_eq(arr[0], -(ipow(2, from) - 10))
+        assert_eq(arr[-1], -ipow(2, from))
+
+        arr = []
+        for n in (ipow(2,from) .. (ipow(2, from) - 10) `by` -2) {
+            arr << n
+        }
+        assert(arr.diffs.all { _ == -2 })
+        assert_eq(arr[0], ipow(2, from))
+        assert_eq(arr[-1], ipow(2, from) - 10)
+
+        arr = []
+        for n in (-(ipow(2,from) - 10) .. -ipow(2, from) `by` -2) {
+            arr << n
+        }
+        assert(arr.diffs.all { _ == -2 })
+        assert_eq(arr[0], -(ipow(2, from) - 10))
+        assert_eq(arr[-1], -ipow(2, from))
+
+        arr = []
+        for n in (-ipow(2,from) .. -(ipow(2, from) - 10) `by` 2) {
+            arr << n
+        }
+        assert(arr.diffs.all { _ == 2 })
+        assert_eq(arr[0], -ipow(2, from))
+        assert_eq(arr[-1], -(ipow(2, from) - 10))
+
+        arr = []
+        for n in (-ipow(2,from) .. -(ipow(2, from) - 10)) {
+            arr << n
+        }
+        assert(arr.diffs.all { _ == 1 })
+        assert_eq(arr[0], -ipow(2, from))
+        assert_eq(arr[-1], -(ipow(2, from) - 10))
+
+        var k = 3
+        arr = []
+        for n in (2**from .. Inf `by` 0) {
+            arr << n
+            assert_eq(n, 2**from)
+            break if (--k == 0)
+        }
+        assert_eq(arr, 3.of(2**from))
+
+        k = 3
+        arr = []
+        for n in (2**from .. (2**from + 10) `by` 0) {
+            arr << n
+            assert_eq(n, 2**from)
+            break if (--k == 0)
+        }
+        assert_eq(arr, 3.of(2**from))
+
+        k = 3
+        arr = []
+        for n in (-(2**from + 10) .. -(2**from) `by` 0) {
+            arr << n
+            assert_eq(n, -(2**from + 10))
+            break if (--k == 0)
+        }
+        assert_eq(arr, 3.of(-(2**from + 10)))
+
+        for n in (-(2**from) .. -(2**from + 10) `by` 0) {
+            assert(false)
+        }
+
+        for n in ((2**from + 10) .. (2**from) `by` 0) {
+            assert(false)
+        }
+
+        for n in (-(2**from) .. -(2**from + 10) `by` 1) {
+            assert(false)
+        }
+
+        for n in ((2**from + 10) .. (2**from) `by` 1) {
+            assert(false)
+        }
+
+        for n in (-(2**from) .. -(2**from + 10) `by` 2) {
+            assert(false)
+        }
+
+        for n in ((2**from + 10) .. (2**from) `by` 2) {
+            assert(false)
+        }
+
+        k = 3
+        arr = []
+        for n in (-(2**from) .. -(2**from + 10) `by` -1) {
+            arr << n
+            break if (--k == 0)
+        }
+        assert_eq(arr, 3.of{|k| -(2**from) - k })
+
+        k = 3
+        arr = []
+        for n in ((2**from + 10) .. (2**from) `by` -2) {
+            arr << n
+            break if (--k == 0)
+        }
+        assert_eq(arr, 3.of{|k| (2**from + 10) - 2*k })
+    }
+}
+
+1..0 ->  by(1) -> each{ assert(false) }
+1..0 ->  by(2) -> each{ assert(false) }
+1..0 ->  by(43) -> each{ assert(false) }
+1..0 ->  by(2**99) -> each{ assert(false) }
+
+0..1 ->  by(-1) -> each{ assert(false) }
+0..1 ->  by(-2) -> each{ assert(false) }
+0..1 ->  by(-2) -> each{ assert(false) }
+0..1 ->  by(-43) -> each{ assert(false) }
+0..1 ->  by(-(2**99)) -> each{ assert(false) }
+
+for n in (NaN .. 1 `by` 2**65) {
+    assert(false)
+}
+
+for n in (1 .. NaN `by` 2**65) {
+    assert(false)
+}
+
+do {
+    var i = 0
+    var arr = []
+    for n in (1 .. Inf `by` 2**65) {
+        arr << n
+        break if (++i == 3)
+    }
+    assert_eq(arr, %n[1, 36893488147419103233, 73786976294838206465])
+}
+
+for n in (2**65 .. 2**66 `by` 2**69) {
+    assert_eq(n, 2**65)
+}
+
+for n in (-(2**66) .. (-2**65) `by` 2**69) {
+    assert_eq(n, -(2**66))
+}
+
+for n in (2**66 .. 2**65 `by` 2**69) {
+    assert(false)
+}
+
+for n in (-(2**65) .. (-2**66) `by` 2**69) {
+    assert(false)
+}
+
+for n in (1 .. Inf `by` -1) {
+    assert(false)
+}
 
 say "** Test passed!"

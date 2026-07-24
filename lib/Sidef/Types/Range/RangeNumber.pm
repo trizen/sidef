@@ -16,6 +16,13 @@ use Sidef::Types::Bool::Bool;
 use Sidef::Types::Number::Number;
 use Sidef::Types::Block::Block;
 
+# Pre-cached class names to bypass string allocations
+my $NUMBER_CLASS = 'Sidef::Types::Number::Number';
+my $BLOCK_CLASS  = 'Sidef::Types::Block::Block';
+
+# Pre-cached static block for empty/exhausted iterators
+state $EMPTY_ITERATOR = CORE::bless({code => sub { undef }}, $BLOCK_CLASS);
+
 sub new {
     my (undef, $from, $to, $step) = @_;
 
@@ -43,8 +50,6 @@ sub new {
 
 *call = \&new;
 
-my @cache;
-
 sub iter {
     my ($self) = @_;
 
@@ -52,113 +57,213 @@ sub iter {
     my $from = $self->{from};
     my $to   = $self->{to};
 
-    my $times = ($self->{_times} //= ((ref($$step) || ($$step != 1)) ? $to->sub($from)->add($step)->div($step) : $to->sub($from)->add($step)));
+    # -------------------------------------------------------------------------
+    # Fast native integers / single-word GMPz
+    # -------------------------------------------------------------------------
+    if (ref($step) eq $NUMBER_CLASS and ref($from) eq $NUMBER_CLASS and ref($to) eq $NUMBER_CLASS) {
 
-    if (ref($times) eq 'Sidef::Types::Number::Number') {
-        my $repetitions = ref($$times) ? CORE::int(Sidef::Types::Number::Number::__numify__($$times)) : $$times;
+        my $u_from = $$from;
+        my $u_step = $$step;
+        my $u_to   = $$to;
 
-        if ($repetitions < 0) {
-            return Sidef::Types::Block::Block->new(code => sub { undef; });
+        my $r_from = ref($u_from);
+        my $r_step = ref($u_step);
+        my $r_to   = ref($u_to);
+
+        # Extract native machine integers if available
+        if (   (!$r_to || ($r_to eq 'Math::GMPz' && Math::GMPz::Rmpz_fits_slong_p($u_to)))
+            && (!$r_from || ($r_from eq 'Math::GMPz' && Math::GMPz::Rmpz_fits_slong_p($u_from)))
+            && (!$r_step || ($r_step eq 'Math::GMPz' && Math::GMPz::Rmpz_fits_slong_p($u_step)))) {
+
+            my $curr  = $r_from ? Math::GMPz::Rmpz_get_si($u_from) : $u_from;
+            my $inc   = $r_step ? Math::GMPz::Rmpz_get_si($u_step) : $u_step;
+            my $limit = $r_to   ? Math::GMPz::Rmpz_get_si($u_to)   : $u_to;
+
+            #$inc || return $EMPTY_ITERATOR;
+            my $repetitions = ($inc == 0) ? 'Inf' : CORE::int(($limit - $curr + $inc) / $inc);
+            return $EMPTY_ITERATOR if $repetitions <= 0;
+
+            # Check if range guarantees no overflow of standard integer bounds
+            my $final_val = $curr + ($repetitions - 1) * $inc;
+
+            if (   $final_val > Sidef::Types::Number::Number::LONG_MIN
+                && $final_val < Sidef::Types::Number::Number::ULONG_MAX) {
+
+                # Step == 1 (Most common case)
+                if ($inc == 1) {
+                    return CORE::bless(
+                        {
+                         code => sub {
+                             $repetitions-- > 0 or return undef;
+                             my $v = $curr++;
+                             CORE::bless(\$v, $NUMBER_CLASS);
+                         }
+                        },
+                        $BLOCK_CLASS
+                    );
+                }
+
+                # Step == -1
+                if ($inc == -1) {
+                    return CORE::bless(
+                        {
+                         code => sub {
+                             $repetitions-- > 0 or return undef;
+                             my $v = $curr--;
+                             CORE::bless(\$v, $NUMBER_CLASS);
+                         }
+                        },
+                        $BLOCK_CLASS
+                    );
+                }
+
+                # Generic Native Integer Step
+                return CORE::bless(
+                    {
+                     code => sub {
+                         $repetitions-- > 0 or return undef;
+                         my $v = $curr;
+                         $curr += $inc;
+                         CORE::bless(\$v, $NUMBER_CLASS);
+                     }
+                    },
+                    $BLOCK_CLASS
+                );
+            }
         }
 
-        if (    ref($step) eq 'Sidef::Types::Number::Number'
-            and ref($from) eq 'Sidef::Types::Number::Number'
-            and (!ref($$from) or ref($$from) eq 'Math::GMPz')
-            and (!ref($$step) or ref($$step) eq 'Math::GMPz')) {
+        # -------------------------------------------------------------------------
+        # Pure Math::GMPz range iteration (Heavy/Overflow Path)
+        # -------------------------------------------------------------------------
+        if (   (!$r_to || ($r_to eq 'Math::GMPz'))
+            && (!$r_from || ($r_from eq 'Math::GMPz'))
+            && (!$r_step || ($r_step eq 'Math::GMPz'))) {
 
-            $from = $$from;
-            $step = $$step;
+            my $mpz_from  = $r_from ? $u_from : ($u_from > 0 ? Math::GMPz::Rmpz_init_set_ui($u_from) : Math::GMPz::Rmpz_init_set_si($u_from));
+            my $curr_mpz  = Math::GMPz::Rmpz_init_set($mpz_from);
+            my $times_mpz = $self->{_times};
 
-            if (    ref($to) eq 'Sidef::Types::Number::Number'
-                and (!ref($$to)  or (ref($$to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($$to)))
-                and (!ref($from) or Math::GMPz::Rmpz_fits_slong_p($from))
-                and (!ref($step) or Math::GMPz::Rmpz_fits_slong_p($step))) {
+            # Calculate repetition count via GMPz
+            if (!defined $times_mpz) {
+                my $mpz_step = $r_step ? $u_step : ($u_step > 0 ? Math::GMPz::Rmpz_init_set_ui($u_step) : Math::GMPz::Rmpz_init_set_si($u_step));
+                my $mpz_to   = $r_to   ? $u_to   : ($u_to > 0   ? Math::GMPz::Rmpz_init_set_ui($u_to)   : Math::GMPz::Rmpz_init_set_si($u_to));
 
-                $from = Math::GMPz::Rmpz_get_si($from) if ref($from);
-                $step = Math::GMPz::Rmpz_get_si($step) if ref($step);
+                $times_mpz = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_sub($times_mpz, $mpz_to, $mpz_from);
+                Math::GMPz::Rmpz_add($times_mpz, $times_mpz, $mpz_step);
 
-                return Sidef::Types::Block::Block->new(
-                    code => sub {
-                        --$repetitions >= 0 or return undef;
-                        my $obj = $from;
-                        $from += $step;
-                        bless(\$obj, 'Sidef::Types::Number::Number');
+                if (Math::GMPz::Rmpz_cmp_ui($mpz_step, 1) != 0 and Math::GMPz::Rmpz_sgn($mpz_step) != 0) {
+                    Math::GMPz::Rmpz_tdiv_q($times_mpz, $times_mpz, $mpz_step);
+                }
+
+                $self->{_times} = $times_mpz;
+            }
+
+            return $EMPTY_ITERATOR if Math::GMPz::Rmpz_sgn($times_mpz) <= 0;
+
+            # Repetitions stored as native counter if it fits
+            if (Math::GMPz::Rmpz_fits_ulong_p($times_mpz)) {
+                my $rep_count = Math::GMPz::Rmpz_get_ui($times_mpz);
+
+                # GMPz with native step
+                if (!$r_step and $u_step >= 0 and $u_step < Sidef::Types::Number::Number::ULONG_MAX) {
+                    return CORE::bless(
+                        {
+                         code => sub {
+                             $rep_count-- > 0 or return undef;
+                             my $out_mpz = Math::GMPz::Rmpz_init_set($curr_mpz);
+                             Math::GMPz::Rmpz_add_ui($curr_mpz, $curr_mpz, $u_step);
+                             CORE::bless(\$out_mpz, $NUMBER_CLASS);
+                         }
+                        },
+                        $BLOCK_CLASS
+                    );
+                }
+
+                # Generic GMPz Step
+                my $mpz_step = $r_step ? $u_step : ($u_step > 0 ? Math::GMPz::Rmpz_init_set_ui($u_step) : Math::GMPz::Rmpz_init_set_si($u_step));
+                return CORE::bless(
+                    {
+                     code => sub {
+                         $rep_count-- > 0 or return undef;
+                         my $out_mpz = Math::GMPz::Rmpz_init_set($curr_mpz);
+                         Math::GMPz::Rmpz_add($curr_mpz, $curr_mpz, $mpz_step);
+                         CORE::bless(\$out_mpz, $NUMBER_CLASS);
+                     }
                     },
+                    $BLOCK_CLASS
+                );
+            }
+        }
+
+        # -------------------------------------------------------------------------
+        # Pure Math::GMPz range iteration: infinite positive (ascending) range
+        # -------------------------------------------------------------------------
+        if (   ($r_to eq 'Math::MPFR' and Math::MPFR::Rmpfr_inf_p($u_to) and Math::MPFR::Rmpfr_sgn($u_to) > 0)
+            && (!$r_from || ($r_from eq 'Math::GMPz'))
+            && (!$r_step || ($r_step eq 'Math::GMPz'))) {
+
+            my $mpz_from = $r_from ? $u_from : ($u_from > 0 ? Math::GMPz::Rmpz_init_set_ui($u_from) : Math::GMPz::Rmpz_init_set_si($u_from));
+            my $curr_mpz = Math::GMPz::Rmpz_init_set($mpz_from);
+
+            # GMPz with native step
+            if (!$r_step and $u_step > 0 and $u_step < Sidef::Types::Number::Number::ULONG_MAX) {
+                return CORE::bless(
+                    {
+                     code => sub {
+                         my $out_mpz = Math::GMPz::Rmpz_init_set($curr_mpz);
+                         Math::GMPz::Rmpz_add_ui($curr_mpz, $curr_mpz, $u_step);
+                         CORE::bless(\$out_mpz, $NUMBER_CLASS);
+                     }
+                    },
+                    $BLOCK_CLASS
                 );
             }
 
-            if (    (!ref($from) or Math::GMPz::Rmpz_fits_slong_p($from))
-                and (!ref($step) or Math::GMPz::Rmpz_fits_slong_p($step))) {
-
-                $from = Math::GMPz::Rmpz_get_si($from) if ref($from);
-                $step = Math::GMPz::Rmpz_get_si($step) if ref($step);
-
-                my $counter_mpz = undef;
-                my $prev        = $from;
-
-                return Sidef::Types::Block::Block->new(
-                    code => sub {
-                        --$repetitions >= 0 or return undef;
-                        my $obj = $from;
-
-                        if (    $obj < Sidef::Types::Number::Number::ULONG_MAX
-                            and $obj > Sidef::Types::Number::Number::LONG_MIN) {
-                            $prev = $obj;
-                            $from += $step;
-                            if (    $from < Sidef::Types::Number::Number::ULONG_MAX
-                                and $from > Sidef::Types::Number::Number::LONG_MIN) {
-                                return bless(\$obj, 'Sidef::Types::Number::Number');
-                            }
-                        }
-
-                        # The code below handles overflow
-                        $counter_mpz //=
-                          ($prev < 0)
-                          ? Math::GMPz::Rmpz_init_set_si($prev)
-                          : Math::GMPz::Rmpz_init_set_ui($prev);
-
-                        my $value = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
-
-                        ref($step)      ? Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step)
-                          : ($step < 0) ? Math::GMPz::Rmpz_sub_ui($counter_mpz, $counter_mpz, -$step)
-                          :               Math::GMPz::Rmpz_add_ui($counter_mpz, $counter_mpz, $step);
-
-                        $value;
-                    }
-                );
+            if (!$r_step and $u_step < 0) {
+                return $EMPTY_ITERATOR;
             }
 
-            my $counter_mpz =
-                ref($from)  ? Math::GMPz::Rmpz_init_set($from)
-              : ($from < 0) ? Math::GMPz::Rmpz_init_set_si($from)
-              :               Math::GMPz::Rmpz_init_set_ui($from);
+            # Generic GMPz Step
+            my $mpz_step = $r_step ? $u_step : ($u_step > 0 ? Math::GMPz::Rmpz_init_set_ui($u_step) : Math::GMPz::Rmpz_init_set_si($u_step));
+            Math::GMPz::Rmpz_sgn($mpz_step) >= 0 or return $EMPTY_ITERATOR;
 
-            return Sidef::Types::Block::Block->new(
-                code => sub {
-                    --$repetitions >= 0 or return undef;
-
-                    my $value = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
-
-                    ref($step)      ? Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step)
-                      : ($step < 0) ? Math::GMPz::Rmpz_sub_ui($counter_mpz, $counter_mpz, -$step)
-                      :               Math::GMPz::Rmpz_add_ui($counter_mpz, $counter_mpz, $step);
-
-                    $value;
+            return CORE::bless(
+                {
+                 code => sub {
+                     my $out_mpz = Math::GMPz::Rmpz_init_set($curr_mpz);
+                     Math::GMPz::Rmpz_add($curr_mpz, $curr_mpz, $mpz_step);
+                     CORE::bless(\$out_mpz, $NUMBER_CLASS);
+                 }
                 },
+                $BLOCK_CLASS
             );
+
         }
     }
 
-    my $asc = ($self->{_asc} //= !!($step->is_pos // return Sidef::Types::Block::Block->new(code => sub { undef; })));
+    # -------------------------------------------------------------------------
+    # Generic Fallback Path (Objects, Fractions, Reals, Floats)
+    # -------------------------------------------------------------------------
+    my $asc = ($self->{_asc} //= !!($step->is_pos // return $EMPTY_ITERATOR));
 
-    my $tmp;
-    Sidef::Types::Block::Block->new(
-        code => sub {
-            ($asc ? $from->le($to) : $from->ge($to)) || return undef;
-            $tmp  = $from;
-            $from = $from->add($step);
-            $tmp;
+    return CORE::bless(
+        {
+         code => $asc
+         ? sub {
+             $from->le($to) || return undef;
+             my $tmp = $from;
+             $from = $from->add($step);
+             return $tmp;
+         }
+         : sub {
+             $from->ge($to) || return undef;
+             my $tmp = $from;
+             $from = $from->add($step);
+             return $tmp;
+         }
         },
+        $BLOCK_CLASS
     );
 }
 
