@@ -49,16 +49,6 @@ Aliases: I<call>
 
 =cut
 
-=head2 call
-
-    Set(*elements)
-
-Alias for L</new>, allowing C<Set> to be invoked directly as a function.
-
-Aliases: I<new>
-
-=cut
-
 =head1 SET ALGEBRA
 
 For L</union>, L</intersection>, L</difference>, and L</symmetric_difference>, the right-hand operand doesn't have to already be a C<Set> -- if it isn't one, it's first converted with C<.to_set> (so an C<Array>, a C<Range>, and so on all work directly). L</concat> (the C<+> operator) is the one exception: see its entry below.
@@ -81,16 +71,6 @@ Aliases: operator C<+>
 
 =cut
 
-=head2 +
-
-    self + other
-
-Operator form of L</concat>.
-
-Aliases: I<concat>
-
-=cut
-
 =head2 union
 
     self.union(other)
@@ -103,36 +83,6 @@ Returns a new set containing every element that appears in C<self> or C<other> (
     say(a | b)     #=> Set(1, 2, 3, 4, 5)
 
 Aliases: I<or>, operator C<|>, operator C<∪>
-
-=cut
-
-=head2 or
-
-    self.or(other)
-
-Alias for L</union>.
-
-Aliases: I<union>
-
-=cut
-
-=head2 |
-
-    self | other
-
-Operator form of L</union>.
-
-Aliases: I<union>, I<or>
-
-=cut
-
-=head2 ∪
-
-    self ∪ other
-
-Operator form of L</union>.
-
-Aliases: I<union>, I<or>
 
 =cut
 
@@ -151,36 +101,6 @@ Aliases: I<and>, operator C<&>, operator C<∩>
 
 =cut
 
-=head2 and
-
-    self.and(other)
-
-Alias for L</intersection>.
-
-Aliases: I<intersection>
-
-=cut
-
-=head2 &
-
-    self & other
-
-Operator form of L</intersection>.
-
-Aliases: I<intersection>, I<and>
-
-=cut
-
-=head2 ∩
-
-    self ∩ other
-
-Operator form of L</intersection>.
-
-Aliases: I<intersection>, I<and>
-
-=cut
-
 =head2 difference
 
     self.difference(other)
@@ -193,46 +113,6 @@ Returns a new set containing the elements of C<self> that are I<not> present in 
     say(a - b)     #=> Set(1, 2)
 
 Aliases: I<sub>, I<diff>, operator C<->, operator C<∖>
-
-=cut
-
-=head2 sub
-
-    self.sub(other)
-
-Alias for L</difference>.
-
-Aliases: I<difference>, I<diff>
-
-=cut
-
-=head2 diff
-
-    self.diff(other)
-
-Alias for L</difference>.
-
-Aliases: I<difference>, I<sub>
-
-=cut
-
-=head2 -
-
-    self - other
-
-Operator form of L</difference>.
-
-Aliases: I<difference>, I<sub>, I<diff>
-
-=cut
-
-=head2 ∖
-
-    self ∖ other
-
-Operator form of L</difference>.
-
-Aliases: I<difference>, I<sub>, I<diff>
 
 =cut
 
@@ -251,36 +131,6 @@ Aliases: I<xor>, I<symdiff>, operator C<^>
 
 =cut
 
-=head2 xor
-
-    self.xor(other)
-
-Alias for L</symmetric_difference>.
-
-Aliases: I<symmetric_difference>, I<symdiff>
-
-=cut
-
-=head2 symdiff
-
-    self.symdiff(other)
-
-Alias for L</symmetric_difference>.
-
-Aliases: I<symmetric_difference>, I<xor>
-
-=cut
-
-=head2 ^
-
-    self ^ other
-
-Operator form of L</symmetric_difference>.
-
-Aliases: I<symmetric_difference>, I<xor>, I<symdiff>
-
-=cut
-
 =head1 MEMBERSHIP AND COMPARISON
 
 =head2 has
@@ -295,86 +145,6 @@ Returns C<true> if C<obj> (compared the same way as for deduplication -- see L</
     say(s ∋ 5)     #=> false
 
 Aliases: I<haskey>, I<has_key>, I<exists>, I<include>, I<includes>, I<contain>, I<contains>, operator C<∋>
-
-=cut
-
-=head2 haskey
-
-    self.haskey(obj)
-
-Alias for L</has>.
-
-Aliases: I<has>
-
-=cut
-
-=head2 has_key
-
-    self.has_key(obj)
-
-Alias for L</has>.
-
-Aliases: I<has>
-
-=cut
-
-=head2 exists
-
-    self.exists(obj)
-
-Alias for L</has>.
-
-Aliases: I<has>
-
-=cut
-
-=head2 include
-
-    self.include(obj)
-
-Alias for L</has>.
-
-Aliases: I<has>
-
-=cut
-
-=head2 includes
-
-    self.includes(obj)
-
-Alias for L</has>.
-
-Aliases: I<has>
-
-=cut
-
-=head2 contain
-
-    self.contain(obj)
-
-Alias for L</has>.
-
-Aliases: I<has>
-
-=cut
-
-=head2 contains
-
-    self.contains(obj)
-
-Alias for L</has>.
-
-Aliases: I<has>
-
-=cut
-
-=head2 ∋
-
-    self ∋ obj
-
-Operator form of L</has>.
-
-Aliases: I<has>
 
 =cut
 
@@ -413,37 +183,7 @@ Returns C<true> if every element of C<self> is also in C<other> (C<other> is con
     var b = Set(1, 2, 3, 4)
     say(a <= b)     #=> true
 
-Aliases: operator C<<=>>, operator C<≤>, operator C<⊆>
-
-=cut
-
-=head2 <=
-
-    self <= other
-
-Operator form of L</is_subset>.
-
-Aliases: I<is_subset>
-
-=cut
-
-=head2 ≤
-
-    self ≤ other
-
-Operator form of L</is_subset>.
-
-Aliases: I<is_subset>
-
-=cut
-
-=head2 ⊆
-
-    self ⊆ other
-
-Operator form of L</is_subset>.
-
-Aliases: I<is_subset>
+Aliases: operator C<< <= >>, operator C<≤>, operator C<⊆>
 
 =cut
 
@@ -459,36 +199,6 @@ Returns C<true> if every element of C<other> is also in C<self> (C<other> is con
     say(a >= b)     #=> true
 
 Aliases: operator C<< >= >>, operator C<≥>, operator C<⊇>
-
-=cut
-
-=head2 >=
-
-    self >= other
-
-Operator form of L</is_superset>.
-
-Aliases: I<is_superset>
-
-=cut
-
-=head2 ≥
-
-    self ≥ other
-
-Operator form of L</is_superset>.
-
-Aliases: I<is_superset>
-
-=cut
-
-=head2 ⊇
-
-    self ⊇ other
-
-Operator form of L</is_superset>.
-
-Aliases: I<is_superset>
 
 =cut
 
@@ -523,36 +233,6 @@ Aliases: I<add>, I<push>, operator C<< << >>
 
 =cut
 
-=head2 add
-
-    self.add(*objects)
-
-Alias for L</append>.
-
-Aliases: I<append>, I<push>
-
-=cut
-
-=head2 push
-
-    self.push(*objects)
-
-Alias for L</append>.
-
-Aliases: I<append>, I<add>
-
-=cut
-
-=head2 <<
-
-    self << obj
-
-Operator form of L</append>.
-
-Aliases: I<append>, I<add>, I<push>
-
-=cut
-
 =head2 delete
 
     self.delete(*objects)
@@ -567,37 +247,15 @@ Aliases: I<remove>, I<discard>
 
 =cut
 
-=head2 remove
-
-    self.remove(*objects)
-
-Alias for L</delete>.
-
-Aliases: I<delete>, I<discard>
-
-=cut
-
-=head2 discard
-
-    self.discard(*objects)
-
-Alias for L</delete>.
-
-Aliases: I<delete>, I<remove>
-
-=cut
-
 =head2 pop
 
     self.pop
 
-Removes and returns an arbitrary element from the set. Since a set has no defined order, this is not guaranteed to be any particular element -- it's whichever one happens to come last according to the underlying hash's own (unordered) key order.
+Removes and returns an arbitrary element from the set. Since a set has no defined order, this is not guaranteed to be any particular element -- it's whichever one happens to come last according to the underlying hash's own (unordered) key order. Behaves identically to L</shift>.
 
     var s = Set(1, 2, 3)
     s.pop
     say(s.len)                   #=> 2
-
-Aliases: none (but behaves identically to L</shift>)
 
 =cut
 
@@ -721,16 +379,6 @@ Aliases: I<select>
 
 =cut
 
-=head2 select
-
-    self.select(block)
-
-Alias for L</grep>.
-
-Aliases: I<grep>
-
-=cut
-
 =head2 grep_2d
 
     self.grep_2d(block)
@@ -782,16 +430,6 @@ Aliases: I<sum_by>
 
 =cut
 
-=head2 sum_by
-
-    self.sum_by(block)
-
-Alias for L</sum>.
-
-Aliases: I<sum>
-
-=cut
-
 =head2 sum_2d
 
     self.sum_2d(block)
@@ -814,16 +452,6 @@ Returns the product of all elements, or the product of C<block> applied to each 
     say(s.prod {|n| n**2 })      #=> 576
 
 Aliases: I<prod_by>
-
-=cut
-
-=head2 prod_by
-
-    self.prod_by(block)
-
-Alias for L</prod>.
-
-Aliases: I<prod>
 
 =cut
 
@@ -956,26 +584,6 @@ Aliases: I<values>, I<to_array>
 
 =cut
 
-=head2 values
-
-    self.values
-
-Alias for L</to_a>.
-
-Aliases: I<to_a>, I<to_array>
-
-=cut
-
-=head2 to_array
-
-    self.to_array
-
-Alias for L</to_a>.
-
-Aliases: I<to_a>, I<values>
-
-=cut
-
 =head2 to_list
 
     self...
@@ -987,16 +595,6 @@ Returns every element of the set as a plain list (not wrapped in an C<Array> obj
     say([list])                  #=> [1, 2, 3]  (order may vary)
 
 Aliases: operator C<...>
-
-=cut
-
-=head2 ...
-
-    self...
-
-Operator form of L</to_list>.
-
-Aliases: I<to_list>
 
 =cut
 
