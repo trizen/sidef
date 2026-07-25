@@ -2,28 +2,38 @@
 
 =head1 NAME
 
-Sidef::Object::Enumerator - Lazy iterator object for generating and processing sequences.
+Sidef::Object::Enumerator - Lazy iterator object for generating and processing custom sequences.
 
 =head1 DESCRIPTION
 
-This class implements an enumerator object, allowing for functional-style operations such as mapping, filtering, and accessing elements within a collection.  The enumerator is designed with lazy evaluation in mind, making it suitable for working with potentially infinite sequences.
+This class implements a general-purpose enumerator: an object built around a single "generator" block that produces values by calling back into a callback it's given, however it likes (a loop, recursion, an infinite C<loop { ... }>, and so on). This makes it easy to build custom lazy sequences -- including infinite ones -- without writing a dedicated iterator class.
 
-An enumerator is created with a block that receives a callback function. The block calls this callback for each element it wants to yield. This enables the creation of custom iterators and generators.
+An C<Enumerator> is created with a block that receives one argument, conventionally named C<yield>, C<f>, or C<cb>: a callback the block should call, once per produced value, for as long as it wants to keep producing values.
+
+Two important behavioral points to keep in mind:
+
+=over 4
+
+=item * B<Early exit.> L</first>, L</nth>, and L</while> can stop consuming the generator block as soon as they have what they need -- internally, by jumping straight out of the (possibly still-running, possibly infinite) generator block the moment enough values have been produced. This is what makes it safe to call, say, C<.first(10)> on a generator that loops forever. Every I<other> method (L</each>, L</to_a>, L</map>, L</grep>, L</count>, L</length>) has no such escape hatch and will run the generator block to completion -- looping forever if it never stops on its own.
+
+=item * B<Multi-value yields.> The callback can technically be invoked with more than one value at a time (e.g. C<yield(a, b)>). L</map> and L</grep> handle this correctly, applying the block to each yielded value individually. L</first>, L</nth>, L</count>, and L</length>, however, treat each I<callback invocation> as a single unit: they don't count or split up multiple values yielded together in one call. In practice, nearly every generator yields one value at a time, so this rarely matters.
+
+=back
 
 =head1 SYNOPSIS
 
     # Create an enumerator that yields prime numbers
-    var primes = Enumerator({ |yield|
-        for n in (2.. Inf) {
+    var primes = Enumerator({|yield|
+        for n in (2..Inf) {
             yield(n) if n.is_prime
         }
     })
 
     # Get the first 10 primes
-    say primes.first(10)    # [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+    say(primes.first(10))    #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
 
     # Create a Fibonacci sequence enumerator
-    var fib = Enumerator({ |yield|
+    var fib = Enumerator({|yield|
         var (a, b) = (0, 1)
         loop {
             yield(a)
@@ -31,138 +41,70 @@ An enumerator is created with a block that receives a callback function. The blo
         }
     })
 
-    say fib.first(10)       # [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+    say(fib.first(10))       #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 
-=head1 METHODS
+=head1 INHERITS
+
+Inherits methods from L<Sidef::Object::Object>.
+
+=head1 CONSTRUCTION
 
 =head2 new
 
     Enumerator(block)
-    self. new
+    Enumerator.new(block)
 
-Creates a new enumerator instance with the given block.  The block receives a callback function (commonly named C<yield> or C<f> or C<cb>) that should be called for each element the enumerator produces.
+Creates a new enumerator from C<block>. C<block> receives a single callback argument (commonly named C<yield>, C<f>, or C<cb>) that it should call once per value it wants the enumerator to produce.
 
-    var squares = Enumerator({ |yield|
-        for n in (1.. Inf) {
+    var squares = Enumerator({|yield|
+        for n in (1..Inf) {
             yield(n * n)
         }
     })
 
-Aliases:  I<call>
+Aliases: I<call>
 
 =cut
 
-=head2 count
+=head2 call
 
-    self.count(block)
+    Enumerator(block)
 
-Counts and returns the number of elements in the enumerator collection that satisfy the given block condition.
+Alias for L</new>, allowing C<Enumerator> to be invoked directly as a function.
 
-    var e = Enumerator({ |f| 1.. 100 -> each { |i| f(i) } })
-    say e.count { . is_prime }    # 25
-
-B<Note: > This method consumes the entire enumerator.
-
-Aliases: I<count_by>
+Aliases: I<new>
 
 =cut
 
-=head2 each
+=head1 EARLY-EXIT CONSUMPTION
 
-    self.each(block)
-
-Iterates over all elements in the enumerator, passing each element to the given block.  Returns the enumerator itself.
-
-    var e = Enumerator({ |f| 1..5 -> each { |i| f(i) } })
-    e.each { |n| say n }    # prints 1, 2, 3, 4, 5
-
-B<Warning:> Do not use on infinite enumerators as it will loop forever.
-
-=cut
+These methods can stop consuming the generator block as soon as they have enough values, so they're safe to use even on an enumerator that produces values forever.
 
 =head2 first
 
     self.first(n)
     self.first(n, block)
 
-Returns the first C<n> elements of the enumerator as an array. If a block is provided, it retrieves the first C<n> elements that satisfy the block condition.
+Returns an C<Array> of the first C<n> values produced by the enumerator. If C<block> is given, only values for which C<block> returns a truthy value are counted and collected. If C<n> is less than or equal to C<1>, only the very first (matching) value found is collected before stopping.
 
-    var e = Enumerator({ |f| 1.. Inf -> each { |i| f(i) } })
+    var e = Enumerator({|f| (1..Inf).each {|i| f(i) } })
 
-    say e.first(5)                  # [1, 2, 3, 4, 5]
-    say e.first(5, { . is_prime })   # [2, 3, 5, 7, 11]
-
-=cut
-
-=head2 grep
-
-    self.grep(block)
-
-Filters the elements in the enumerator collection based on the given block condition. Returns a new array containing only the elements for which the block returns a true value.
-
-    var e = Enumerator({ |f| 1..20 -> each { |i| f(i) } })
-    say e.grep { .is_even }    # [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
-
-B<Note:> This method consumes the entire enumerator.
-
-Aliases: I<select>
-
-=cut
-
-=head2 len
-
-    self.len
-
-Returns the total number of elements in the enumerator by consuming all elements and counting them.
-
-    var e = Enumerator({ |f| 1..100 -> each { |i| f(i) if i.is_prime } })
-    say e.len    # 25
-
-B<Warning:> Do not use on infinite enumerators as it will loop forever.
-
-Aliases: I<size>, I<length>
-
-=cut
-
-=head2 map
-
-    self.map(block)
-
-Applies the given block to each element of the enumerator and returns a new array with the transformed elements.
-
-    var e = Enumerator({ |f| 1..5 -> each { |i| f(i) } })
-    say e.map { _ * 2 }    # [2, 4, 6, 8, 10]
-
-B<Note:> This method consumes the entire enumerator.
-
-Aliases: I<collect>
+    say(e.first(5))                   #=> [1, 2, 3, 4, 5]
+    say(e.first(5, {|n| n.is_prime })) #=> [2, 3, 5, 7, 11]
 
 =cut
 
 =head2 nth
 
-    e.nth(n)
-    e.nth(n, block)
+    self.nth(n)
+    self.nth(n, block)
 
-Retrieves the C<n>-th element from the enumerator collection (1-indexed). If an optional block is provided, it counts only the elements for which the block returns a true value, returning the C<n>-th matching element.
+Returns the C<n>-th (1-indexed) value produced by the enumerator, or C<nil> if the enumerator stops before reaching it. If C<block> is given, only values for which C<block> returns a truthy value are counted, so this returns the C<n>-th I<matching> value. If C<n> is less than or equal to C<1>, this returns the first (matching) value found.
 
-    var e = Enumerator({ |f| 1.. Inf -> each { |i| f(i) } })
+    var primes = Enumerator({|f| (2..Inf).each {|i| f(i) if i.is_prime } })
 
-    say e.nth(10)                   # 10
-    say e. nth(10, { .is_prime })    # 29 (the 10th prime number)
-
-=cut
-
-=head2 to_a
-
-    self.to_a
-
-Converts the enumerator into an array by consuming all elements and collecting them.  Returns the resulting array.
-
-    var e = Enumerator({ |f| 1..5 -> each { |i| f(i) } })
-    say e.to_a    # [1, 2, 3, 4, 5]
-
-B<Warning:> Do not use on infinite enumerators as it will loop forever.
+    say(primes.nth(10))    #=> 29   # the 10th prime
+    say(primes.nth(100))   #=> 541  # the 100th prime
 
 =cut
 
@@ -170,18 +112,147 @@ B<Warning:> Do not use on infinite enumerators as it will loop forever.
 
     self.while(block)
 
-Yields elements to the given block and collects them into an array until the block returns false.  Stops iterating immediately when the block returns a false value.
+Collects values produced by the enumerator into an C<Array> for as long as C<block> returns a truthy value for each one, and stops -- without including the value that failed -- as soon as C<block> returns a falsy value.
 
-    var palindromes = Enumerator({ |f|
+    var palindromes = Enumerator({|f|
         var n = 1
-        loop { f(n); n. next_palindrome!  }
+        loop {
+            f(n)
+            n = n.next_palindrome!
+        }
     })
 
     # Get all palindromes less than 100
-    say palindromes. while { _ < 100 }
-    # [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22, 33, 44, 55, 66, 77, 88, 99]
+    say(palindromes.while {|n| n < 100 })
+    #=> [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22, 33, 44, 55, 66, 77, 88, 99]
 
-This method is particularly useful for working with infinite enumerators when you want to collect elements up to a certain condition.
+=cut
+
+=head1 FULL CONSUMPTION
+
+These methods always run the generator block to completion, with no early exit -- they will never return if used on a genuinely infinite enumerator.
+
+=head2 each
+
+    self.each(block)
+
+Calls C<block> once for every value the enumerator produces (C<block> I<is> the callback the generator block invokes directly), and returns C<self>.
+
+    var e = Enumerator({|f| (1..5).each {|i| f(i) } })
+    e.each {|n| say(n) }    # prints 1, 2, 3, 4, 5
+
+=cut
+
+=head2 to_a
+
+    self.to_a
+
+Collects every value the enumerator produces into an C<Array>.
+
+    var e = Enumerator({|f| (1..5).each {|i| f(i) } })
+    say(e.to_a)    #=> [1, 2, 3, 4, 5]
+
+=cut
+
+=head2 map
+
+    self.map(block)
+
+Applies C<block> to every value the enumerator produces and returns a new C<Array> of the results.
+
+    var e = Enumerator({|f| (1..5).each {|i| f(i) } })
+    say(e.map {|n| n * 2 })    #=> [2, 4, 6, 8, 10]
+
+Aliases: I<collect>
+
+=cut
+
+=head2 collect
+
+    self.collect(block)
+
+Alias for L</map>.
+
+Aliases: I<map>
+
+=cut
+
+=head2 grep
+
+    self.grep(block)
+
+Returns a new C<Array> containing only the values produced by the enumerator for which C<block> returns a truthy value.
+
+    var e = Enumerator({|f| (1..20).each {|i| f(i) } })
+    say(e.grep {|n| n.is_even })    #=> [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+
+Aliases: I<select>
+
+=cut
+
+=head2 select
+
+    self.select(block)
+
+Alias for L</grep>.
+
+Aliases: I<grep>
+
+=cut
+
+=head2 count
+
+    self.count(block)
+
+Returns the number of values produced by the enumerator for which C<block> returns a truthy value.
+
+    var e = Enumerator({|f| (1..100).each {|i| f(i) } })
+    say(e.count {|n| n.is_prime })    #=> 25
+
+Aliases: I<count_by>
+
+=cut
+
+=head2 count_by
+
+    self.count_by(block)
+
+Alias for L</count>.
+
+Aliases: I<count>
+
+=cut
+
+=head2 length
+
+    self.length
+
+Returns the total number of values the enumerator produces.
+
+    var e = Enumerator({|f| (1..100).each {|i| f(i) if i.is_prime } })
+    say(e.length)    #=> 25
+
+Aliases: I<len>, I<size>
+
+=cut
+
+=head2 len
+
+    self.len
+
+Alias for L</length>.
+
+Aliases: I<length>, I<size>
+
+=cut
+
+=head2 size
+
+    self.size
+
+Alias for L</length>.
+
+Aliases: I<length>, I<len>
 
 =cut
 
@@ -190,37 +261,37 @@ This method is particularly useful for working with infinite enumerators when yo
 =head2 Ludic Numbers
 
     func ludics_upto(nmax = 100000) {
-        Enumerator({ |collect|
+        Enumerator({|collect|
             collect(1)
-            var arr = @(2.. nmax)
+            var arr = @(2..nmax)
             while (arr) {
                 collect(var n = arr[0])
-                arr. range. by(n).each { |i| arr[i] = nil }
-                arr. compact!
+                arr.range.by(n).each {|i| arr[i] = nil }
+                arr.compact!
             }
         })
     }
 
-    say ludics_upto(1000).first(25)
+    say(ludics_upto(1000).first(25))
 
 =head2 Infinite Prime Generator
 
-    var primes = Enumerator({ |yield|
+    var primes = Enumerator({|yield|
         for n in (2..Inf) {
             yield(n) if n.is_prime
         }
     })
 
-    say primes.first(10)             # First 10 primes
-    say primes.nth(100)              # The 100th prime
-    say primes. first(20, {_ > 50})   # First 20 primes greater than 50
+    say(primes.first(10))              # first 10 primes
+    say(primes.nth(100))               # the 100th prime
+    say(primes.first(20, {|n| n > 50 })) # first 20 primes greater than 50
 
 =head2 Word Wrapping
 
     func wordwrap(words, maxwidth) {
-        Enumerator({ |y|
+        Enumerator({|y|
             var cols = 0
-            words.slice_before { |w|
+            words.slice_before {|w|
                 cols += 1 if (cols != 0)
                 cols += w.len
                 if (maxwidth < cols) {
@@ -229,12 +300,12 @@ This method is particularly useful for working with infinite enumerators when yo
                 } else {
                     false
                 }
-            }. each { |ws| y(ws) }
+            }.each {|ws| y(ws) }
         })
     }
 
     var text = "The quick brown fox jumps over the lazy dog"
-    wordwrap(text. words, 15).each { |line| say line. join(" ") }
+    wordwrap(text.words, 15).each {|line| say(line.join(" ")) }
 
 =head1 SEE ALSO
 
