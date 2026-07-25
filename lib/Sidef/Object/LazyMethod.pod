@@ -2,240 +2,118 @@
 
 =head1 NAME
 
-Sidef::Object::LazyMethod - Lazy method chaining for deferred execution
+Sidef::Object::LazyMethod - Deferred, chainable method calls.
 
 =head1 DESCRIPTION
 
-The LazyMethod class implements lazy evaluation for method chains in Sidef. It stores a sequence of method calls that are not executed immediately, but only when explicitly invoked. This enables building reusable method call sequences, creating functional pipelines, and deferring computation until needed.
+A C<LazyMethod> object records a sequence of method calls (names and arguments) without running any of them. The very first call in the chain also carries the object it will eventually be called on; every later call in the chain runs on whatever the previous one returned. Nothing actually executes until the chain is triggered -- either explicitly, via L</call> or L</run>, or implicitly, by calling I<any> other not-already-defined method name on it (see L</IMPLICIT EXECUTION>).
 
-LazyMethod objects are created using the C<method> or C<methods> methods available on all objects (via the Object base class), not by calling LazyMethod directly.
+C<LazyMethod> objects are immutable: L</method> always returns a I<new> C<LazyMethod> with one more step appended, leaving the original chain untouched. This also means a chain can safely be triggered more than once -- each run replays the whole sequence of calls from scratch (assuming the underlying object and methods involved have no side effects that would make repeated calls behave differently).
+
+C<LazyMethod> objects aren't normally created directly; they come from calling C<.method(name, *args)> or C<.methods(*args)> on I<any> Sidef object, both provided by the common base class -- see L<Sidef::Object::Object/method> and L<Sidef::Object::Object/methods>. Once created, the object supplied to that very first call is fixed for the lifetime of the chain: there's no way to later swap in a different starting object and replay the same chain against it. What extra arguments given to L</call>/L</run> I<can> do is extend the arguments of the I<last> step in the chain -- see L</call> for details.
 
 =head1 SYNOPSIS
 
-    # Create a lazy method using the 'method' global method
-    var lazy = [1,2,3,4,5].method('map', {|x| x * 2})
-    lazy = lazy.method('grep', {|x| x > 5})
+    # Build a chain with the 'method' method, then run it with 'call'
+    var lazy = [1, 2, 3, 4, 5].method('map', {|x| x * 2 })
+    lazy = lazy.method('grep', {|x| x > 5 })
     lazy = lazy.method('sum')
 
-    # Execute the chain
-    say lazy.call()  # 30
+    say(lazy.call)    #=> 30
 
     # Or chain and execute in one expression
-    var result = [1,2,3,4,5].method('map', {|x| x ** 2})
-                            .method('sum')
-                            .call()  # 55
+    say([1, 2, 3, 4, 5].method('map', {|x| x ** 2 }).method('sum').call)    #=> 55
 
-    # Using the 'methods' global method to get all available methods
-    var array_methods = [1,2,3].methods()
-    say array_methods.keys  # Returns all method names as an array
-
-    # Each value in the hash is a LazyMethod that can be executed
-    say array_methods{:sum}.call()  # 6
-
-    # Lazy methods can be stored and reused
-    var double_map = nil.method('map', {|x| x * 2})
-
-    say [1,2,3].method('map', {|x| x * 2}).call()  # [2, 4, 6]
-    say [4,5,6].method('map', {|x| x * 2}).call()  # [8, 10, 12]
+    # Using '.methods()' to get a Hash of every method, pre-bound to the object
+    var array_methods = [1, 2, 3].methods
+    say(array_methods{:sum}.call)    #=> 6
 
 =head1 INHERITS
 
 Inherits methods from L<Sidef::Object::Object>.
 
-=head1 HOW LAZYMETHOD OBJECTS ARE CREATED
+=head1 CONSTRUCTION
 
-LazyMethod objects cannot be instantiated directly. They are created through two global methods available on all objects:
+=head2 new
 
-=head2 obj.method(method_name, *args)
+    LazyMethod.new(call, call, ...)
 
-Creates a LazyMethod object representing a deferred method call.
+Creates a C<LazyMethod> object directly from a list of raw internal call-descriptors (hashes with C<method>/C<args> keys, and an C<obj> key on the first one). This is an implementation detail used internally by L<Sidef::Object::Object/method> and by L</method> below -- user code should build chains with C<.method(name, *args)> instead of calling this directly.
 
-B<Parameters:>
+=cut
 
-=over 4
-
-=item * C<method_name> - The name of the method to call (as a string)
-
-=item * C<*args> - Zero or more arguments to pass to the method when executed
-
-=back
-
-B<Returns:> A LazyMethod object that can be further chained or executed.
-
-B<Example:>
-
-    var lazy = "hello".method('uc')
-    say lazy.call()  # "HELLO"
-
-    # Chaining multiple method calls
-    var chain = [1,2,3,4,5].method('grep', {|x| x.is_even})
-                           .method('map', {|x| x ** 2})
-                           .method('sum')
-
-    say chain.call()  # 20
-
-=head2 obj.methods(*args)
-
-Returns a Hash where keys are method names and values are LazyMethod objects representing those methods pre-configured with the given arguments.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<*args> - Optional arguments to pass to each method when creating the LazyMethod objects
-
-=back
-
-B<Returns:> A Hash mapping method names to LazyMethod objects.
-
-B<Example:>
-
-    var methods = [1,2,3].methods()
-
-    # Access specific method
-    say methods{:sum}.call()      # 6
-    say methods{:reverse}.call()  # [3, 2, 1]
-
-    # List all available methods
-    say methods.keys.sort
-
-    # Methods can be further chained
-    var result = methods{:map}.method('sum').call({|x| x * 2})  # 12
-
-=head1 LAZYMETHOD INSTANCE METHODS
-
-Once a LazyMethod object is created (via C<method> or C<methods>), the following methods are available:
+=head1 CHAINING
 
 =head2 method
 
-    lazy.method(method_name, *args)
+    self.method(name, *args)
 
-Adds another method call to the lazy evaluation chain. Returns a new LazyMethod object with the extended chain, allowing fluent chaining.
+Returns a I<new> C<LazyMethod> with one more step appended to the end of the chain: when eventually triggered, this step will call the method named C<name>, with C<args>, on whatever the previous step produced (or, if this is the very first step in the chain, on the object the chain was originally created from). C<self> itself is left unchanged.
 
-B<Parameters:>
-
-=over 4
-
-=item * C<method_name> - The name of the method to call (as a string)
-
-=item * C<*args> - Zero or more arguments to pass to the method when executed
-
-=back
-
-B<Returns:> A new LazyMethod object with the extended call chain.
-
-B<Example:>
-
-    var lazy = [1,2,3,4,5].method('map', {|x| x ** 2})
-    lazy = lazy.method('grep', {|x| x > 10})
+    var lazy = [1, 2, 3, 4, 5].method('map', {|x| x ** 2 })
+    lazy = lazy.method('grep', {|x| x > 10 })
     lazy = lazy.method('sum')
 
-    say lazy.call()  # 41 (16 + 25)
+    say(lazy.call)    #=> 41  # 16 + 25
+
+=cut
+
+=head1 EXECUTION
 
 =head2 call
 
-    lazy.call(*additional_args)
+    self.call(*extra_args)
 
-Executes the entire lazy method chain and returns the final result. Each method is called on the result of the previous method in sequence.
+Runs every step of the chain in order -- the first step's method is called on the chain's original object, and each following step's method is called on the previous step's result -- and returns the result of the I<last> step.
 
-Any additional arguments passed to C<call> are appended to the arguments of the final method in the chain.
+Any C<extra_args> given to C<call> are appended after the I<last> step's own pre-configured arguments (they do B<not> go to the first step, even though the first step is where the chain's object was set):
 
-B<Parameters:>
+    var array_methods = [1, 2, 3].methods
+    # array_methods{:map} is a chain whose only step is 'map', with no args yet
+    say(array_methods{:map}.method('sum').call({|x| x * 2 }))    #=> 12
+    # 'map' runs first with no block (its own configured args), THEN
+    # 'sum' runs with the block passed to call() appended to its own args
 
-=over 4
+C<call> is not a separately implemented method -- it's one of the two names (see L</run>) specially recognized by the same fallback mechanism described in L</IMPLICIT EXECUTION>.
 
-=item * C<*additional_args> - Optional additional arguments for the final method call
+Aliases: I<run>
 
-=back
-
-B<Returns:> The result of executing the complete method chain.
-
-B<Example:>
-
-    var lazy = "hello world".method('split')
-                            .method('map', {|s| s.uc})
-
-    say lazy.call(' ')  # ["HELLO", "WORLD"]
-
-    # The ' ' is passed to the first method (split)
-    var lazy2 = "hello".method('uc').method('chars')
-    say lazy2.call()  # ["H", "E", "L", "L", "O"]
+=cut
 
 =head2 run
 
-    lazy.run(*additional_args)
+    self.run(*extra_args)
 
-Alias for C<call>. Executes the lazy method chain with optional additional arguments.
+Alias for L</call> -- behaves identically in every respect.
 
-B<Parameters:>
+Aliases: I<call>
 
-=over 4
+=cut
 
-=item * C<*additional_args> - Optional additional arguments for the final method call
+=head1 IMPLICIT EXECUTION
 
-=back
+Calling I<any> method name on a C<LazyMethod> object that isn't already defined -- neither on C<LazyMethod> itself (L</new>, L</method>, L</call>, L</run>) nor inherited from L<Sidef::Object::Object> (C<class>, C<dump>, C<is_a>, and so on) -- triggers the chain via Perl's C<AUTOLOAD> mechanism: the whole chain runs exactly as L</call> would (but I<without> forwarding any arguments to the last step), and then the requested method is called, with whatever arguments were given, on that final result.
 
-B<Returns:> The result of executing the complete method chain.
-
-=head1 AUTOLOAD BEHAVIOR
-
-The LazyMethod class implements AUTOLOAD to enable implicit execution. Any method called on a LazyMethod object (except C<call>, C<run>, and C<method>) will:
-
-1. Execute the entire lazy chain
-2. Call the requested method on the final result
-
-This allows you to execute and immediately operate on the result without explicitly calling C<.call()>:
-
-    var lazy = [1,2,3].method('map', {|x| x * 2})
+    var lazy = [1, 2, 3].method('map', {|x| x * 2 })
 
     # These are equivalent:
-    say lazy.call().sum()  # Explicit execution, then sum
-    say lazy.sum()         # Implicit execution via AUTOLOAD
+    say(lazy.call.sum)    # explicit: run the chain, then call .sum
+    say(lazy.sum)         # implicit: 'sum' isn't a chain method, so it
+                          # triggers execution and is then called on the result
 
-    # Another example
-    var lazy2 = "hello".method('uc')
-    say lazy2.chars()      # Implicitly executes .uc() then calls .chars()
-    say lazy2.len()        # 5
+Because inherited methods are resolved normally I<before> C<AUTOLOAD> is ever consulted, calling something like C<.class> or C<.dump> on a C<LazyMethod> object reports on the C<LazyMethod> object itself (its class, its internal structure) rather than triggering the chain -- only names with no existing definition anywhere in the inheritance chain fall through to this behavior.
 
-=head1 USE CASES
+=cut
 
-=head2 Building Reusable Transformations
+=head1 EXAMPLES
 
-Create reusable transformation pipelines that can be applied to different data:
+=head2 Deferred computation
 
-    var normalize = nil.method('map', { .to_n })
-                       .method('grep', { .is_finite })
-                       .method('sort')
-
-    var data1 = ["3", "1", "2", "inf"]
-    var data2 = ["5.5", "2.2", "nan", "3.3"]
-
-    say data1.method('map', { .to_n })
-             .method('grep', { .is_finite })
-             .method('sort')
-             .call()  # [1, 2, 3]
-
-=head2 Method Exploration
-
-Use the C<methods> method to explore available methods on objects:
-
-    var str_methods = "hello".methods()
-
-    # See what methods are available
-    say str_methods.keys.sort.first(10)
-
-    # Try out methods
-    say str_methods{:uc}.call()       # "HELLO"
-    say str_methods{:reverse}.call()  # "olleh"
-    say str_methods{:chars}.call()    # ["h", "e", "l", "l", "o"]
-
-=head2 Deferred Computation
-
-Delay expensive computations until they're actually needed:
+Build a chain without running it, and only trigger it when the result is actually needed:
 
     func create_processor(data) {
-        data.method('grep', {|x| x.is_prime })
-            .method('map', {|x| expensive_calculation(x) })
+        data.method('grep', {|x| x.is_prime }) \
+            .method('map', {|x| x ** 2 }) \
             .method('sum')
     }
 
@@ -243,46 +121,45 @@ Delay expensive computations until they're actually needed:
     # No computation has happened yet
 
     if (user_wants_result) {
-        say lazy_result.call()  # Now it executes
+        say(lazy_result.call)    # now it executes
     }
 
-=head2 Functional Composition
+=head2 Method exploration
 
-Build complex operations by chaining simple transformations:
+C<.methods()> returns every available method pre-bound to the object, letting you look up and try one by name:
 
-    var process = 1..20 -> method('grep', {|x| x.is_even })
-                        -> method('map', {|x| x ** 2})
-                        -> method('grep', {|x| x > 50})
-                        -> method('sum')
+    var str_methods = "hello".methods
 
-    say process.call()  # Sum of even squares > 50
+    say(str_methods.keys.sort.first(10))
 
-=head2 Creating Method Aliases
+    say(str_methods{:uc}.call)       #=> "HELLO"
+    say(str_methods{:reverse}.call)  #=> "olleh"
+    say(str_methods{:chars}.call)    #=> ["h", "e", "l", "l", "o"]
 
-Store commonly used method chains for reuse:
+=head2 Functional composition
 
-    var square_map = nil.method('map', {|x| x ** 2})
-    var sum_squares = nil.method('map', {|x| x ** 2}).method('sum')
+Build up a multi-step pipeline one C<.method()> call at a time:
 
-    say [1,2,3].concat(square_map.call())    # [1, 2, 3, 1, 4, 9]
-    say sum_squares.call([1,2,3])            # 14
-    say sum_squares.call([4,5,6])            # 77
+    var process = (1..20).method('grep', {|x| x.is_even }) \
+                         .method('map', {|x| x ** 2 }) \
+                         .method('grep', {|x| x > 50 }) \
+                         .method('sum')
+
+    say(process.call)    # sum of even squares greater than 50
 
 =head1 IMPLEMENTATION NOTES
 
 =over 4
 
-=item * LazyMethod objects store the complete chain of method calls and arguments
+=item * A C<LazyMethod> object stores the complete chain of method-call descriptors (name + arguments); only the first one also carries the original object.
 
-=item * Each call to C<method> creates a new LazyMethod with the extended chain
+=item * Each call to L</method> returns a new C<LazyMethod> with the extended chain -- C<LazyMethod> objects are immutable.
 
-=item * Execution happens sequentially: first method on original object, each subsequent method on previous result
+=item * Execution is sequential: the first step's method runs on the original object, and each following step runs on the previous step's result.
 
-=item * The C<call> and C<run> methods are identical in functionality
+=item * L</call> and L</run> are the exact same underlying code path -- there is no behavioral difference between them.
 
-=item * AUTOLOAD enables syntactic sugar for immediate execution and method chaining
-
-=item * LazyMethod objects are immutable - each C<method> call returns a new object
+=item * There's no way to swap out the original object bound at chain creation and re-run the same chain against a different starting value.
 
 =back
 
@@ -290,13 +167,11 @@ Store commonly used method chains for reuse:
 
 =over 4
 
-=item * L<Sidef::Object::Object> - Parent class providing the C<method> and C<methods> methods
+=item * L<Sidef::Object::Object> - defines C<.method()> and C<.methods()>, the two ways to create a C<LazyMethod>
 
-=item * L<Sidef::Object::Lazy> - For lazy evaluation of single expressions
+=item * L<Sidef::Object::Lazy> - lazy evaluation over a whole iterable sequence, rather than a single chained value
 
-=item * L<Sidef::Types::Block::Block> - For lambda/closure syntax used in examples
-
-=item * L<Sidef::Types::Array::Array> - For array methods like map, grep, sum
+=item * L<Sidef::Types::Block::Block> - blocks/closures, used throughout the examples above
 
 =back
 
