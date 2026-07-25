@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,67 +6,55 @@ Sidef::Object::Lazy - Lazy evaluation wrapper that computes values only when nee
 
 =head1 DESCRIPTION
 
-This class implements lazy evaluation for iterable objects in Sidef.  Lazy evaluation delays the evaluation of an expression until its result is actually needed, processing elements in a pipeline fashion without creating temporary arrays in memory.
+This class implements lazy evaluation for iterable objects in Sidef. A C<Lazy> object wraps another iterable (anything with an C<iter> method -- ranges, arrays, file handles, and so on) together with a pipeline of pending operations. Nothing is computed until a I<terminal> method is called; values are then pulled one at a time from the wrapped iterable and pushed through the whole pipeline before the next one is pulled, without ever materializing an intermediate array in memory.
+
+Methods split into two kinds:
+
+=over 4
+
+=item * B<Intermediate> methods (L</grep>, L</select>, L</map>, L</collect>) don't run anything -- they return a I<new> C<Lazy> object with one more step appended to the pipeline, so they can be chained freely.
+
+=item * B<Terminal> methods (everything else: L</each>, L</to_a>, L</first>, L</nth>, L</sum>, L</reduce>, and so on) actually drive the iteration and produce a concrete result.
+
+=back
+
+At each step of the pipeline, only a single value is in flight -- blocks passed to L</grep> and L</map> each receive (and, for C<map>, must return) one value at a time, not a list.
 
 =head1 SYNOPSIS
 
-var obj = Lazy(...)
-
     # Create a lazy iterator from a range
-    say (^Inf -> lazy. grep{ . is_prime }. first(10))     # first 10 primes
+    say((^Inf).lazy.grep { .is_prime }.first(10))     # first 10 primes
 
     # Lazy processing of file lines
-    File("data.txt").open_r.lazy.grep{ .match(/pattern/) }.map{ . uc }. first(5)
+    File("data.txt").open_r.lazy.grep { .match(/pattern/) }.map { .uc }.first(5)
 
     # Lazy array processing
-    [1,2,3,4,5].lazy. grep{ .is_even }.map{ _**2 }.to_a
+    say([1, 2, 3, 4, 5].lazy.grep { .is_even }.map { _**2 }.to_a)
 
 =head1 INHERITS
 
 Inherits methods from L<Sidef::Object::Object>.
 
-=head1 METHODS
+=head1 CONSTRUCTION
+
+=head2 new
+
+    Lazy.new(obj: iterable)
+
+Creates a new C<Lazy> object wrapping C<iterable> (anything with an C<iter> method), with an empty pipeline. This is typically not called directly; instead, call C<.lazy> on the object you want to iterate lazily (see L<Sidef::Object::Object/lazy>), or use L</lazy> below to get an existing C<Lazy> object back unchanged.
+
+=cut
+
+=head1 ITERATION
 
 =head2 each
 
     self.each(block)
 
-Returns the Lazy object after iterating over each element and executing the given block.  The block receives each element as an argument.
+Drives the pipeline to completion, calling C<block> once per resulting element (for side effects), and returns C<self>.
 
-    (1..10).lazy.grep{ .is_prime }.each { say _ }
-
-=cut
-
-=head2 first
-
-    self.first(n)
-
-Returns the first I<n> elements from the lazy iterator as an Array.  If I<n> is not provided, returns only the first element.  If I<n> is a Block, it behaves like C<first_by>.
-
-    say (^Inf -> lazy.grep{ . is_prime }.first(5))      #=> [2, 3, 5, 7, 11]
-    say (^Inf -> lazy.grep{ .is_prime }.first)         #=> 2
-
-=cut
-
-=head2 first_by
-
-    self.first_by(block)
-
-Returns the first element for which the block returns a true value.
-
-    say (1..100).lazy.first_by { . is_prime && (_ > 50) }   #=> 53
-
-=cut
-
-=head2 grep
-
-    self.grep(block)
-
-Returns a new Lazy object that filters elements, keeping only those for which the block returns a true value.  The filtering is performed lazily.
-
-    (1..100).lazy.grep{ .is_even }.first(5).say    #=> [2, 4, 6, 8, 10]
-
-Aliases:  I<select>
+    (1..10).lazy.grep { .is_prime }.each {|p| say(p) }
+    # Prints: 2, 3, 5, 7
 
 =cut
 
@@ -75,120 +62,12 @@ Aliases:  I<select>
 
     self.iter
 
-Returns a Block (iterator) that, when called, returns the next element from the lazy sequence. Returns C<nil> when the sequence is exhausted.
+Returns a C<Block> (an iterator) that, each time it's called, pulls the next raw value from the wrapped iterable, runs it through the pipeline (skipping over any values filtered out by a C<grep> step), and returns the result -- or C<nil> once the underlying iterable is exhausted.
 
-    var iter = (1..5).lazy.map{ _**2 }.iter
-    say iter()    #=> 1
-    say iter()    #=> 4
-    say iter()    #=> 9
-
-=cut
-
-=head2 lazy
-
-    self.lazy
-
-Returns the Lazy object itself.  This method is idempotent and allows chaining.
-
-    var lz = (1..10).lazy.lazy    # same as (1..10).lazy
-
-=cut
-
-=head2 map
-
-    self. map(block)
-
-Returns a new Lazy object that transforms each element by applying the given block.  The transformation is performed lazily.
-
-    (1.. 5).lazy.map{ _**2 }. to_a. say    #=> [1, 4, 9, 16, 25]
-
-Aliases: I<collect>
-
-=cut
-
-=head2 new
-
-    self.new
-
-Returns a new Lazy object. This is typically not called directly; instead, use the C<. lazy> method on an iterable object.
-
-=cut
-
-=head2 nth
-
-    self.nth(n)
-
-Returns the I<n>-th element (1-indexed) from the lazy iterator. Returns C<nil> if I<n> is less than or equal to 0.
-
-    say (^Inf -> lazy. grep{ .is_prime }.nth(5))    #=> 11
-
-=cut
-
-=head2 prod
-
-    self.prod(block)
-
-Returns the product of all elements in the lazy sequence after applying the optional block transformation. If no block is given, computes the product of the elements directly.
-
-    say (1..5).lazy.prod                   #=> 120
-    say (1.. 5).lazy.prod { _**2 }          #=> 14400
-
-Aliases: I<prod_by>
-
-=cut
-
-=head2 prod_kv
-
-    self. prod_kv(block)
-
-Returns the product of results from calling the block with each index-value pair (key-value). The index is 0-based.
-
-    say (1..3).lazy.prod_kv { |k, v| k + v }    # product of (0+1), (1+2), (2+3)
-
-=cut
-
-=head2 reduce
-
-    self.reduce(operator, result)
-
-Reduces the lazy sequence using the given operator (as a string or Block), with an optional initial result value. Returns the accumulated result.
-
-    say (1..5).lazy.reduce('+')        #=> 15
-    say (1.. 5).lazy.reduce('*', 1)     #=> 120
-
-=cut
-
-=head2 reduce_by
-
-    self.reduce_by(block, result)
-
-Reduces the lazy sequence using a custom block. The block receives the accumulator and the current element.  If no initial result is provided, the first element is used.
-
-    say (1..5).lazy.reduce_by { |acc, v| acc + v }         #=> 15
-    say (1..5).lazy.reduce_by({ |acc, v| acc + v }, 10)    #=> 25
-
-=cut
-
-=head2 sum
-
-    self.sum(block)
-
-Returns the sum of all elements in the lazy sequence after applying the optional block transformation. If no block is given, computes the sum of the elements directly.
-
-    say (1..5).lazy.sum                #=> 15
-    say (1..5).lazy.sum { _**2 }       #=> 55
-
-Aliases: I<sum_by>
-
-=cut
-
-=head2 sum_kv
-
-    self.sum_kv(block)
-
-Returns the sum of results from calling the block with each index-value pair (key-value). The index is 0-based.
-
-    say (1..3).lazy.sum_kv { |k, v| k + v }    # sum of (0+1), (1+2), (2+3) = 9
+    var it = (1..5).lazy.map {|n| n**2 }.iter
+    say(it.run)    #=> 1
+    say(it.run)    #=> 4
+    say(it.run)    #=> 9
 
 =cut
 
@@ -196,9 +75,65 @@ Returns the sum of results from calling the block with each index-value pair (ke
 
     self.to_a
 
-Evaluates the entire lazy sequence and returns the results as an Array. Use with caution on infinite sequences.
+Drives the pipeline to completion and collects every resulting element into an C<Array>. Use with caution on an infinite or very large underlying sequence, since this method never stops on its own.
 
-    say (1..5).lazy.map{ _**2 }.to_a    #=> [1, 4, 9, 16, 25]
+    say((1..5).lazy.map {|n| n**2 }.to_a)    #=> [1, 4, 9, 16, 25]
+
+=cut
+
+=head2 lazy
+
+    self.lazy
+
+Returns C<self> unchanged. This method is idempotent and exists so that C<.lazy> can always be chained safely, even on a value that's already a C<Lazy> object.
+
+    var lz = (1..10).lazy.lazy    # same as (1..10).lazy
+
+=cut
+
+=head1 FILTERING AND TRANSFORMATION
+
+=head2 grep
+
+    self.grep(block)
+
+Returns a I<new> C<Lazy> object with a filtering step appended to the pipeline: only elements for which C<block> returns a truthy value are kept. Nothing is evaluated until a terminal method is called on the result.
+
+    say((1..100).lazy.grep {|n| n.is_even }.first(5))    #=> [2, 4, 6, 8, 10]
+
+Aliases: I<select>
+
+=cut
+
+=head2 select
+
+    self.select(block)
+
+Alias for L</grep>.
+
+Aliases: I<grep>
+
+=cut
+
+=head2 map
+
+    self.map(block)
+
+Returns a I<new> C<Lazy> object with a transformation step appended to the pipeline: each element is replaced with the result of calling C<block> on it. Nothing is evaluated until a terminal method is called on the result.
+
+    say((1..5).lazy.map {|n| n**2 }.to_a)    #=> [1, 4, 9, 16, 25]
+
+Aliases: I<collect>
+
+=cut
+
+=head2 collect
+
+    self.collect(block)
+
+Alias for L</map>.
+
+Aliases: I<map>
 
 =cut
 
@@ -206,8 +141,146 @@ Evaluates the entire lazy sequence and returns the results as an Array. Use with
 
     self.while(block)
 
-Returns an Array of elements from the lazy sequence while the block returns a true value.  Stops collecting elements as soon as the block returns false.
+I<Unlike> L</grep> and L</map>, this is a terminal method: it immediately drives the pipeline, collecting elements into an C<Array> for as long as C<block> returns a truthy value, and stops (without including the element that failed) as soon as C<block> returns a falsy value.
 
-    say (^Inf -> lazy. map { _**2 }. while { _ < 100 })    #=> [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+    say((^Inf).lazy.map {|n| n**2 }.while {|n| n < 100 })
+    #=> [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+
+=cut
+
+=head1 SEARCHING
+
+=head2 first
+
+    self.first
+    self.first(n)
+    self.first(block)
+
+With no argument, drives the pipeline just far enough to produce a single value and returns it directly (not wrapped in an array), or C<nil> if the sequence is empty. With a number C<n>, returns an C<Array> of the first C<n> resulting elements (an empty C<Array> immediately if C<n <= 0>, without touching the iterator at all). With a block, delegates entirely to L</first_by>.
+
+    say((^Inf).lazy.grep {|n| n.is_prime }.first(5))    #=> [2, 3, 5, 7, 11]
+    say((^Inf).lazy.grep {|n| n.is_prime }.first)       #=> 2
+    say((1..10).lazy.first(0))                          #=> []
+
+=cut
+
+=head2 first_by
+
+    self.first_by(block)
+
+Returns the first element for which C<block> returns a truthy value, or C<nil> if no such element exists. Implemented as C<self.grep(block).first>.
+
+    say((1..100).lazy.first_by {|n| n.is_prime && n > 50 })    #=> 53
+
+=cut
+
+=head2 nth
+
+    self.nth(n)
+
+Returns the C<n>-th (1-indexed) resulting element, or C<nil> if C<n> is less than or equal to C<0>. This is a positional lookup on the pipeline's output, not a predicate search -- chain a L</grep> first if you need the n-th element matching some condition.
+
+    say((^Inf).lazy.grep {|n| n.is_prime }.nth(5))    #=> 11
+
+=cut
+
+=head1 REDUCTION AND AGGREGATION
+
+=head2 reduce
+
+    self.reduce(op_name)
+    self.reduce(op_name, initial)
+    self.reduce(block)
+    self.reduce(block, initial)
+
+Drives the pipeline to completion, combining all resulting elements into a single value. If given a block, delegates entirely to L</reduce_by>. If given a string naming an operator (such as C<'+'> or C<'*'>), repeatedly calls that operator method on an accumulator, starting from C<initial> (or the first element, if C<initial> is omitted).
+
+    say((1..5).lazy.reduce('+'))       #=> 15
+    say((1..5).lazy.reduce('*', 1))    #=> 120
+
+=cut
+
+=head2 reduce_by
+
+    self.reduce_by(block, initial=nil)
+
+Drives the pipeline to completion, repeatedly calling C<block(accumulator, element)> and using the result as the new accumulator. Starts from C<initial> if given, or from the first element otherwise.
+
+    say((1..5).lazy.reduce_by {|acc, v| acc + v })            #=> 15
+    say((1..5).lazy.reduce_by({|acc, v| acc + v }, 10))       #=> 25
+
+=cut
+
+=head2 sum
+
+    self.sum
+    self.sum(block)
+
+Drives the pipeline to completion and returns the sum of the resulting elements. With a block, sums C<block> applied to each element instead. Processes elements in internal batches, so it doesn't need to hold the whole sequence in memory at once.
+
+    say((1..5).lazy.sum)                #=> 15
+    say((1..5).lazy.sum {|n| n**2 })    #=> 55
+
+Aliases: I<sum_by>
+
+=cut
+
+=head2 sum_by
+
+    self.sum_by(block)
+
+Alias for L</sum>.
+
+Aliases: I<sum>
+
+=cut
+
+=head2 prod
+
+    self.prod
+    self.prod(block)
+
+Drives the pipeline to completion and returns the product of the resulting elements. With a block, multiplies C<block> applied to each element instead. Processes elements in internal batches, so it doesn't need to hold the whole sequence in memory at once.
+
+    say((1..5).lazy.prod)                #=> 120
+    say((1..5).lazy.prod {|n| n**2 })    #=> 14400
+
+Aliases: I<prod_by>
+
+=cut
+
+=head2 prod_by
+
+    self.prod_by(block)
+
+Alias for L</prod>.
+
+Aliases: I<prod>
+
+=cut
+
+=head2 sum_kv
+
+    self.sum_kv(block)
+
+Drives the pipeline to completion and returns the sum of calling C<block(index, element)> for each resulting element, where C<index> is a 0-based position in the resulting sequence (not the original, pre-pipeline one).
+
+    say((1..3).lazy.sum_kv {|k, v| k + v })    #=> 9  # (0+1) + (1+2) + (2+3)
+
+=cut
+
+=head2 prod_kv
+
+    self.prod_kv(block)
+
+Drives the pipeline to completion and returns the product of calling C<block(index, element)> for each resulting element, where C<index> is a 0-based position in the resulting sequence (not the original, pre-pipeline one).
+
+    say((1..3).lazy.prod_kv {|k, v| k + v })    #=> 15  # (0+1) * (1+2) * (2+3)
+
+=cut
+
+=head1 SEE ALSO
+
+L<Sidef::Object::Object>
 
 =cut
