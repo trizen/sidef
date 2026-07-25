@@ -86,7 +86,7 @@ Logical OR. Returns C<a> if C<a> is truthy, otherwise returns C<b>. Like L</&&>,
 
     a ^ b
 
-Logical XOR. Returns C<true> if exactly one of C<a> or C<b> is truthy, otherwise returns C<false>. Unlike L</&&> and L</||>, this always returns a proper C<Bool> rather than one of the original operands.
+Logical XOR. Returns C<true> if exactly one of C<a> or C<b> is truthy, otherwise returns C<false>. Unlike C<&&> and C<||>, this always returns a proper C<Bool> rather than one of the original operands.
 
 =cut
 

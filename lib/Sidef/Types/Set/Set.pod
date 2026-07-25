@@ -6,230 +6,387 @@ Sidef::Types::Set::Set - Unordered collection of unique elements supporting math
 
 =head1 DESCRIPTION
 
-This class implements an unordered collection of unique elements. A Set automatically eliminates duplicate values and provides efficient membership testing. Sets support mathematical set operations like union, intersection, difference, and symmetric difference.
+This class implements an unordered collection of unique elements. A Set automatically eliminates duplicate values and provides efficient membership testing. Sets support mathematical set operations like union, intersection, difference, and symmetric difference. It's a subclass of L<Sidef::Types::Hash::Hash>: internally, each element is stored as a hash value, keyed by a string computed from the element itself.
 
-Sets are useful when you need to track unique items, test membership, or perform set algebra operations. Unlike arrays, sets don't maintain insertion order and don't allow duplicate elements.
+Two elements are considered duplicates -- and so only one is kept -- if they produce the same key string. For an object with its own C<dump> method (which covers essentially every built-in Sidef type), that C<dump> string is the key, so e.g. two C<Number> objects with the same numeric value are always deduplicated. For anything else (a raw, undumpable reference), Perl's own default stringification of the reference is used instead, which means two otherwise-identical-looking plain references are I<not> considered equal unless they're the very same reference. C<nil> is stored under the fixed key C<"nil">.
+
+A C<Set> is also falsy, and numifies to C<0>, exactly when it's empty -- both its boolean and numeric conversions come from its element count.
 
 =head1 SYNOPSIS
 
-    var a = Set(1,2,3,4)
-    var b = Set(2,3,5)
+    var a = Set(1, 2, 3, 4)
+    var b = Set(2, 3, 5)
 
-    say (a ^ b)     #=> Set(1, 4, 5)
-    say (a - b)     #=> Set(1, 4)
-    say (a | b)     #=> Set(1, 2, 3, 4, 5)
-    say (a & b)     #=> Set(2, 3)
+    say(a ^ b)     #=> Set(1, 4, 5)
+    say(a - b)     #=> Set(1, 4)
+    say(a | b)     #=> Set(1, 2, 3, 4, 5)
+    say(a & b)     #=> Set(2, 3)
 
-    say a.has(2)    #=> true
-    say a.len       #=> 4
+    say(a.has(2))    #=> true
+    say(a.len)       #=> 4
 
-    say b.map  {|n| n**2 }  #=> Set(4, 9, 25)
-    say b.grep {.is_odd}    #=> Set(3, 5)
+    say(b.map {|n| n**2 })      #=> Set(4, 9, 25)
+    say(b.grep {|n| n.is_odd }) #=> Set(3, 5)
 
 =head1 INHERITS
 
 Inherits methods from L<Sidef::Types::Hash::Hash>.
 
-=head1 METHODS
+=head1 CONSTRUCTION
 
-=head2 &
+=head2 new
 
-    a & b
+    Set(*elements)
+    Set.new(*elements)
 
-Returns the intersection of two sets (elements present in both sets).
+Creates a new set containing C<elements> (duplicates, per the rule described above, are silently merged into one). With no arguments, creates an empty set. Note that this constructor always blesses into the literal C<Sidef::Types::Set::Set> package itself, regardless of the invocant -- it is not polymorphic, unlike most of the other methods below (such as L</concat>, which does respect subclasses).
 
-    var a = Set(1,2,3,4)
-    var b = Set(3,4,5,6)
-    say (a & b)     #=> Set(3, 4)
+    var s1 = Set()
+    var s2 = Set(1, 2, 3)
+    var s3 = Set.new(1, 2, 2, 3)    # duplicates merged: Set(1, 2, 3)
 
-Aliases: I<∩>, I<and>, I<intersection>
+Aliases: I<call>
+
+=cut
+
+=head2 call
+
+    Set(*elements)
+
+Alias for L</new>, allowing C<Set> to be invoked directly as a function.
+
+Aliases: I<new>
+
+=cut
+
+=head1 SET ALGEBRA
+
+For L</union>, L</intersection>, L</difference>, and L</symmetric_difference>, the right-hand operand doesn't have to already be a C<Set> -- if it isn't one, it's first converted with C<.to_set> (so an C<Array>, a C<Range>, and so on all work directly). L</concat> (the C<+> operator) is the one exception: see its entry below.
+
+=head2 concat
+
+    self.concat(other)
+    self + other
+
+If C<other> is also a C<Set> (of the exact same class), returns a new set combining every element of both -- equivalent to L</union>. If C<other> is anything else, it is added as a single I<new element> of the result, not merged element-by-element -- unlike L</union> and the other set-algebra methods, C<other> is B<not> converted with C<.to_set> first.
+
+    var a = Set(1, 2, 3)
+    var b = Set(4, 5, 6)
+    say(a + b)      #=> Set(1, 2, 3, 4, 5, 6)     # same-class merge
+
+    say(Set(1, 2, 3) + [4, 5, 6])
+    #=> Set(1, 2, 3, [4, 5, 6])                   # the whole array added as ONE element
+
+Aliases: operator C<+>
 
 =cut
 
 =head2 +
 
-    a + b
+    self + other
 
-Returns the concatenation of two sets (union operation, same as C<|>).
-
-    var a = Set(1,2,3)
-    var b = Set(4,5,6)
-    say (a + b)     #=> Set(1, 2, 3, 4, 5, 6)
+Operator form of L</concat>.
 
 Aliases: I<concat>
 
 =cut
 
-=head2 -
+=head2 union
 
-    a - b
+    self.union(other)
+    self | other
 
-Returns the difference of two sets (elements in the first set but not in the second).
+Returns a new set containing every element that appears in C<self> or C<other> (or both).
 
-    var a = Set(1,2,3,4,5)
-    var b = Set(3,4,5)
-    say (a - b)     #=> Set(1, 2)
+    var a = Set(1, 2, 3)
+    var b = Set(3, 4, 5)
+    say(a | b)     #=> Set(1, 2, 3, 4, 5)
 
-Aliases: I<∖>, I<sub>, I<diff>, I<difference>
-
-=cut
-
-=head2 ...
-
-    a ... b
-
-Returns a range from the minimum element of set C<a> to the maximum element of set C<b> as a list.
-
-    var a = Set(1,2,3)
-    var b = Set(8,9,10)
-    say (a ... b)   #=> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-Aliases: I<to_list>
+Aliases: I<or>, operator C<|>, operator C<∪>
 
 =cut
 
-=head2 <<
+=head2 or
 
-    a << b
+    self.or(other)
 
-Adds element C<b> to set C<a> in-place and returns the modified set.
+Alias for L</union>.
 
-    var s = Set(1,2,3)
-    s << 4
-    say s           #=> Set(1, 2, 3, 4)
-
-Aliases: I<add>, I<push>, I<append>
-
-=cut
-
-=head2 ^
-
-    a ^ b
-
-Returns the symmetric difference of two sets (elements in either set but not in both).
-
-    var a = Set(1,2,3,4)
-    var b = Set(3,4,5,6)
-    say (a ^ b)     #=> Set(1, 2, 5, 6)
-
-Aliases: I<xor>, I<symdiff>, I<symmetric_difference>
+Aliases: I<union>
 
 =cut
 
 =head2 |
 
-    a | b
+    self | other
 
-Returns the union of two sets (all elements from both sets).
+Operator form of L</union>.
 
-    var a = Set(1,2,3)
-    var b = Set(3,4,5)
-    say (a | b)     #=> Set(1, 2, 3, 4, 5)
+Aliases: I<union>, I<or>
 
-Aliases: I<∪>, I<or>, I<union>
+=cut
+
+=head2 ∪
+
+    self ∪ other
+
+Operator form of L</union>.
+
+Aliases: I<union>, I<or>
+
+=cut
+
+=head2 intersection
+
+    self.intersection(other)
+    self & other
+
+Returns a new set containing only the elements present in both C<self> and C<other>.
+
+    var a = Set(1, 2, 3, 4)
+    var b = Set(3, 4, 5, 6)
+    say(a & b)     #=> Set(3, 4)
+
+Aliases: I<and>, operator C<&>, operator C<∩>
+
+=cut
+
+=head2 and
+
+    self.and(other)
+
+Alias for L</intersection>.
+
+Aliases: I<intersection>
+
+=cut
+
+=head2 &
+
+    self & other
+
+Operator form of L</intersection>.
+
+Aliases: I<intersection>, I<and>
+
+=cut
+
+=head2 ∩
+
+    self ∩ other
+
+Operator form of L</intersection>.
+
+Aliases: I<intersection>, I<and>
+
+=cut
+
+=head2 difference
+
+    self.difference(other)
+    self - other
+
+Returns a new set containing the elements of C<self> that are I<not> present in C<other>.
+
+    var a = Set(1, 2, 3, 4, 5)
+    var b = Set(3, 4, 5)
+    say(a - b)     #=> Set(1, 2)
+
+Aliases: I<sub>, I<diff>, operator C<->, operator C<∖>
+
+=cut
+
+=head2 sub
+
+    self.sub(other)
+
+Alias for L</difference>.
+
+Aliases: I<difference>, I<diff>
+
+=cut
+
+=head2 diff
+
+    self.diff(other)
+
+Alias for L</difference>.
+
+Aliases: I<difference>, I<sub>
+
+=cut
+
+=head2 -
+
+    self - other
+
+Operator form of L</difference>.
+
+Aliases: I<difference>, I<sub>, I<diff>
+
+=cut
+
+=head2 ∖
+
+    self ∖ other
+
+Operator form of L</difference>.
+
+Aliases: I<difference>, I<sub>, I<diff>
+
+=cut
+
+=head2 symmetric_difference
+
+    self.symmetric_difference(other)
+    self ^ other
+
+Returns a new set containing the elements that are in exactly one of C<self> or C<other>, but not both.
+
+    var a = Set(1, 2, 3, 4)
+    var b = Set(3, 4, 5, 6)
+    say(a ^ b)     #=> Set(1, 2, 5, 6)
+
+Aliases: I<xor>, I<symdiff>, operator C<^>
+
+=cut
+
+=head2 xor
+
+    self.xor(other)
+
+Alias for L</symmetric_difference>.
+
+Aliases: I<symmetric_difference>, I<symdiff>
+
+=cut
+
+=head2 symdiff
+
+    self.symdiff(other)
+
+Alias for L</symmetric_difference>.
+
+Aliases: I<symmetric_difference>, I<xor>
+
+=cut
+
+=head2 ^
+
+    self ^ other
+
+Operator form of L</symmetric_difference>.
+
+Aliases: I<symmetric_difference>, I<xor>, I<symdiff>
+
+=cut
+
+=head1 MEMBERSHIP AND COMPARISON
+
+=head2 has
+
+    self.has(obj)
+    self ∋ obj
+
+Returns C<true> if C<obj> (compared the same way as for deduplication -- see L</DESCRIPTION>) is an element of the set, otherwise C<false>.
+
+    var s = Set(1, 2, 3)
+    say(s ∋ 2)     #=> true
+    say(s ∋ 5)     #=> false
+
+Aliases: I<haskey>, I<has_key>, I<exists>, I<include>, I<includes>, I<contain>, I<contains>, operator C<∋>
+
+=cut
+
+=head2 haskey
+
+    self.haskey(obj)
+
+Alias for L</has>.
+
+Aliases: I<has>
+
+=cut
+
+=head2 has_key
+
+    self.has_key(obj)
+
+Alias for L</has>.
+
+Aliases: I<has>
+
+=cut
+
+=head2 exists
+
+    self.exists(obj)
+
+Alias for L</has>.
+
+Aliases: I<has>
+
+=cut
+
+=head2 include
+
+    self.include(obj)
+
+Alias for L</has>.
+
+Aliases: I<has>
+
+=cut
+
+=head2 includes
+
+    self.includes(obj)
+
+Alias for L</has>.
+
+Aliases: I<has>
+
+=cut
+
+=head2 contain
+
+    self.contain(obj)
+
+Alias for L</has>.
+
+Aliases: I<has>
+
+=cut
+
+=head2 contains
+
+    self.contains(obj)
+
+Alias for L</has>.
+
+Aliases: I<has>
 
 =cut
 
 =head2 ∋
 
-    a ∋ b
+    self ∋ obj
 
-Returns true if set C<a> contains element C<b>, false otherwise.
+Operator form of L</has>.
 
-    var s = Set(1,2,3)
-    say (s ∋ 2)     #=> true
-    say (s ∋ 5)     #=> false
-
-Aliases: I<has>, I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
+Aliases: I<has>
 
 =cut
 
 =head2 ∌
 
-    a ∌ b
+    self ∌ obj
 
-Returns true if set C<a> does not contain element C<b>, false otherwise.
+Returns C<true> if C<obj> is I<not> an element of the set -- the logical negation of L</has>.
 
-    var s = Set(1,2,3)
-    say (s ∌ 5)     #=> true
-    say (s ∌ 2)     #=> false
-
-=cut
-
-=head2 ≡
-
-    a ≡ b
-
-Returns true if sets C<a> and C<b> contain exactly the same elements, false otherwise.
-
-    var a = Set(1,2,3)
-    var b = Set(3,2,1)
-    var c = Set(1,2,4)
-    say (a ≡ b)     #=> true
-    say (a ≡ c)     #=> false
-
-=cut
-
-=head2 ≤
-
-    a ≤ b
-
-Returns true if set C<a> is a subset of or equal to set C<b> (all elements of C<a> are in C<b>).
-
-    var a = Set(1,2)
-    var b = Set(1,2,3,4)
-    say (a ≤ b)     #=> true
-
-Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
-
-=cut
-
-=head2 ≥
-
-    a ≥ b
-
-Returns true if set C<a> is a superset of or equal to set C<b> (all elements of C<b> are in C<a>).
-
-    var a = Set(1,2,3,4)
-    var b = Set(1,2)
-    say (a ≥ b)     #=> true
-
-Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
-
-=cut
-
-=head2 all
-
-    self.all(block)
-
-Returns true if the given block returns true for all elements in the set.
-
-    var s = Set(2,4,6,8)
-    say s.all { .is_even }      #=> true
-    say s.all { _ > 5 }         #=> false
-
-=cut
-
-=head2 any
-
-    self.any(block)
-
-Returns true if the given block returns true for any element in the set.
-
-    var s = Set(1,2,3,4)
-    say s.any { _ > 3 }         #=> true
-    say s.any { _ > 10 }        #=> false
-
-=cut
-
-=head2 collect
-
-    self.collect(block)
-
-Returns a new set with the results of running the block for each element (same as C<map>).
-
-    var s = Set(1,2,3)
-    say s.collect { _ * 2 }     #=> Set(2, 4, 6)
+    var s = Set(1, 2, 3)
+    say(s ∌ 5)     #=> true
+    say(s ∌ 2)     #=> false
 
 =cut
 
@@ -237,34 +394,162 @@ Returns a new set with the results of running the block for each element (same a
 
     self.contains_all(*objects)
 
-Returns true if the set contains all of the given objects.
+Returns C<true> if every one of C<objects> is an element of the set, otherwise C<false>.
 
-    var s = Set(1,2,3,4,5)
-    say s.contains_all(1,2,3)   #=> true
-    say s.contains_all(1,2,9)   #=> false
-
-=cut
-
-=head2 count
-
-    self.count(obj)
-
-Returns the number of occurrences of C<obj> in the set (always 0 or 1 for sets).
-
-    var s = Set(1,2,3)
-    say s.count(2)              #=> 1
-    say s.count(5)              #=> 0
+    var s = Set(1, 2, 3, 4, 5)
+    say(s.contains_all(1, 2, 3))   #=> true
+    say(s.contains_all(1, 2, 9))   #=> false
 
 =cut
 
-=head2 count_by
+=head2 is_subset
 
-    self.count_by(block)
+    self.is_subset(other)
+    self <= other
 
-Returns a hash with counts of elements grouped by the result of the block.
+Returns C<true> if every element of C<self> is also in C<other> (C<other> is converted with C<.to_set> first if it isn't already a set).
 
-    var s = Set(1,2,3,4,5,6)
-    say s.count_by { .is_even } #=> Hash(true => 3, false => 3)
+    var a = Set(1, 2)
+    var b = Set(1, 2, 3, 4)
+    say(a <= b)     #=> true
+
+Aliases: operator C<<=>>, operator C<≤>, operator C<⊆>
+
+=cut
+
+=head2 <=
+
+    self <= other
+
+Operator form of L</is_subset>.
+
+Aliases: I<is_subset>
+
+=cut
+
+=head2 ≤
+
+    self ≤ other
+
+Operator form of L</is_subset>.
+
+Aliases: I<is_subset>
+
+=cut
+
+=head2 ⊆
+
+    self ⊆ other
+
+Operator form of L</is_subset>.
+
+Aliases: I<is_subset>
+
+=cut
+
+=head2 is_superset
+
+    self.is_superset(other)
+    self >= other
+
+Returns C<true> if every element of C<other> is also in C<self> (C<other> is converted with C<.to_set> first if it isn't already a set).
+
+    var a = Set(1, 2, 3, 4)
+    var b = Set(1, 2)
+    say(a >= b)     #=> true
+
+Aliases: operator C<< >= >>, operator C<≥>, operator C<⊇>
+
+=cut
+
+=head2 >=
+
+    self >= other
+
+Operator form of L</is_superset>.
+
+Aliases: I<is_superset>
+
+=cut
+
+=head2 ≥
+
+    self ≥ other
+
+Operator form of L</is_superset>.
+
+Aliases: I<is_superset>
+
+=cut
+
+=head2 ⊇
+
+    self ⊇ other
+
+Operator form of L</is_superset>.
+
+Aliases: I<is_superset>
+
+=cut
+
+=head2 ≡
+
+    self ≡ other
+
+Returns C<true> if C<self> and C<other> contain exactly the same elements (order never matters, since sets are unordered). This delegates directly to the inherited C<Hash> equality check, rather than having its own C<Set>-specific implementation.
+
+    var a = Set(1, 2, 3)
+    var b = Set(3, 2, 1)
+    var c = Set(1, 2, 4)
+    say(a ≡ b)     #=> true
+    say(a ≡ c)     #=> false
+
+=cut
+
+=head1 ADDING AND REMOVING ELEMENTS
+
+=head2 append
+
+    self.append(*objects)
+    self << obj
+
+Adds every one of C<objects> to the set in-place (silently merging in place of any existing duplicate) and returns C<self>.
+
+    var s = Set(1, 2, 3)
+    s << 4
+    say(s)           #=> Set(1, 2, 3, 4)
+
+Aliases: I<add>, I<push>, operator C<< << >>
+
+=cut
+
+=head2 add
+
+    self.add(*objects)
+
+Alias for L</append>.
+
+Aliases: I<append>, I<push>
+
+=cut
+
+=head2 push
+
+    self.push(*objects)
+
+Alias for L</append>.
+
+Aliases: I<append>, I<add>
+
+=cut
+
+=head2 <<
+
+    self << obj
+
+Operator form of L</append>.
+
+Aliases: I<append>, I<add>, I<push>
 
 =cut
 
@@ -272,214 +557,33 @@ Returns a hash with counts of elements grouped by the result of the block.
 
     self.delete(*objects)
 
-Removes the specified objects from the set and returns the modified set.
+Removes every one of C<objects> from the set, if present, and returns the removed value(s).
 
-    var s = Set(1,2,3,4,5)
-    s.delete(2,4)
-    say s                       #=> Set(1, 3, 5)
+    var s = Set(1, 2, 3, 4, 5)
+    s.delete(2, 4)
+    say(s)                       #=> Set(1, 3, 5)
 
 Aliases: I<remove>, I<discard>
 
 =cut
 
-=head2 delete_first_if
+=head2 remove
 
-    self.delete_first_if(block)
+    self.remove(*objects)
 
-Removes the first element for which the block returns true and returns the modified set.
+Alias for L</delete>.
 
-    var s = Set(1,2,3,4,5)
-    s.delete_first_if { _ > 3 }
-    say s.len                   #=> 4
+Aliases: I<delete>, I<discard>
 
 =cut
 
-=head2 delete_if
+=head2 discard
 
-    self.delete_if(block)
+    self.discard(*objects)
 
-Removes all elements for which the block returns true and returns the modified set.
+Alias for L</delete>.
 
-    var s = Set(1,2,3,4,5,6)
-    s.delete_if { .is_even }
-    say s                       #=> Set(1, 3, 5)
-
-=cut
-
-=head2 dump
-
-    self.dump
-
-Returns a string representation of the set suitable for debugging.
-
-    var s = Set(1,2,3)
-    say s.dump                  #=> Set(1, 2, 3)
-
-=cut
-
-=head2 each
-
-    self.each(block)
-
-Iterates over each element in the set, passing it to the block. Returns the set itself.
-
-    var s = Set(1,2,3)
-    s.each { |n|
-        say n
-    }
-
-=cut
-
-=head2 each_2d
-
-    self.each_2d(block)
-
-Iterates over each element in the set with its index, passing both to the block.
-
-    var s = Set('a','b','c')
-    s.each_2d { |i, v|
-        say "#{i}: #{v}"
-    }
-
-=cut
-
-=head2 grep
-
-    self.grep(block)
-
-Returns a new set containing only the elements for which the block returns true.
-
-    var s = Set(1,2,3,4,5,6)
-    say s.grep { .is_even }     #=> Set(2, 4, 6)
-
-Aliases: I<select>
-
-=cut
-
-=head2 grep_2d
-
-    self.grep_2d(block)
-
-Returns a new set of elements for which the block returns true, with elements and indices passed to the block.
-
-    var s = Set(10,20,30)
-    say s.grep_2d { |i, v| v > 15 }   #=> Set(20, 30)
-
-=cut
-
-=head2 iter
-
-    self.iter
-
-Returns an iterator object for the set.
-
-    var s = Set(1,2,3)
-    var it = s.iter
-    say it.next                 #=> 1
-    say it.next                 #=> 2
-
-=cut
-
-=head2 join
-
-    self.join(*rest)
-
-Joins the elements of the set into a string, using the first argument as separator.
-
-    var s = Set(1,2,3)
-    say s.join(', ')            #=> "1, 2, 3" (order may vary)
-
-=cut
-
-=head2 map
-
-    self.map(block)
-
-Returns a new set with the results of running the block for each element.
-
-    var s = Set(1,2,3)
-    say s.map { _**2 }          #=> Set(1, 4, 9)
-
-=cut
-
-=head2 map_2d
-
-    self.map_2d(block)
-
-Returns a new set with the results of running the block for each element and its index.
-
-    var s = Set('a','b','c')
-    say s.map_2d { |i, v| "#{i}:#{v}" }
-
-=cut
-
-=head2 max
-
-    self.max
-
-Returns the maximum element in the set.
-
-    var s = Set(5,2,8,1,9)
-    say s.max                   #=> 9
-
-=cut
-
-=head2 max_by
-
-    self.max_by(block)
-
-Returns the element for which the block returns the maximum value.
-
-    var s = Set(-5, 3, -10, 7)
-    say s.max_by { .abs }       #=> -10
-
-=cut
-
-=head2 min
-
-    self.min
-
-Returns the minimum element in the set.
-
-    var s = Set(5,2,8,1,9)
-    say s.min                   #=> 1
-
-=cut
-
-=head2 min_by
-
-    self.min_by(block)
-
-Returns the element for which the block returns the minimum value.
-
-    var s = Set(-5, 3, -10, 7)
-    say s.min_by { .abs }       #=> 3
-
-=cut
-
-=head2 new
-
-    self.new
-
-Creates a new empty set, or a set from the given elements.
-
-    var s1 = Set.new
-    var s2 = Set.new(1,2,3)
-    var s3 = Set(1,2,3)         # shorthand
-
-Aliases: I<call>
-
-=cut
-
-=head2 none
-
-    self.none(block)
-
-Returns true if the block returns false for all elements in the set.
-
-    var s = Set(1,3,5,7)
-    say s.none { .is_even }     #=> true
-    say s.none { _ > 5 }        #=> false
+Aliases: I<delete>, I<remove>
 
 =cut
 
@@ -487,36 +591,13 @@ Returns true if the block returns false for all elements in the set.
 
     self.pop
 
-Removes and returns an arbitrary element from the set.
+Removes and returns an arbitrary element from the set. Since a set has no defined order, this is not guaranteed to be any particular element -- it's whichever one happens to come last according to the underlying hash's own (unordered) key order.
 
-    var s = Set(1,2,3)
-    say s.pop                   # returns and removes one element
-    say s.len                   #=> 2
+    var s = Set(1, 2, 3)
+    s.pop
+    say(s.len)                   #=> 2
 
-=cut
-
-=head2 prod
-
-    self.prod(block)
-
-Returns the product of all elements, or the product of the results of applying the block to each element.
-
-    var s = Set(2,3,4)
-    say s.prod                  #=> 24
-    say s.prod { _**2 }         #=> 576
-
-Aliases: I<prod_by>
-
-=cut
-
-=head2 prod_2d
-
-    self.prod_2d(block)
-
-Returns the product of the results of applying the block to each element and its index.
-
-    var s = Set(2,3,4)
-    say s.prod_2d { |i, v| v + i }
+Aliases: none (but behaves identically to L</shift>)
 
 =cut
 
@@ -524,33 +605,166 @@ Returns the product of the results of applying the block to each element and its
 
     self.shift
 
-Removes and returns an arbitrary element from the set (same as C<pop>).
+Removes and returns an arbitrary element from the set. As with L</pop>, since a set has no defined order, "first" here doesn't carry its usual array meaning -- C<pop> and C<shift> behave identically on a C<Set>.
 
-    var s = Set(1,2,3)
-    say s.shift                 # returns and removes one element
-
-=cut
-
-=head2 sort
-
-    self.sort(block)
-
-Returns an array of the set's elements sorted according to the optional comparison block.
-
-    var s = Set(3,1,4,1,5)
-    say s.sort                  #=> [1, 3, 4, 5]
-    say s.sort { |a,b| b <=> a } #=> [5, 4, 3, 1]
+    var s = Set(1, 2, 3)
+    s.shift
 
 =cut
 
-=head2 sort_by
+=head2 delete_if
 
-    self.sort_by(block)
+    self.delete_if(block)
 
-Returns an array of the set's elements sorted by the result of the block.
+Removes every element for which C<block> returns a truthy value, and returns C<self>.
 
-    var s = Set(-5, 3, -10, 7)
-    say s.sort_by { .abs }      #=> [3, -5, 7, -10]
+    var s = Set(1, 2, 3, 4, 5, 6)
+    s.delete_if {|n| n.is_even }
+    say(s)                       #=> Set(1, 3, 5)
+
+=cut
+
+=head2 delete_first_if
+
+    self.delete_first_if(block)
+
+Removes only the first element (in the underlying hash's own unordered iteration order) for which C<block> returns a truthy value, and returns C<self>.
+
+    var s = Set(1, 2, 3, 4, 5)
+    s.delete_first_if {|n| n > 3 }
+    say(s.len)                   #=> 4
+
+=cut
+
+=head1 ITERATION
+
+=head2 each
+
+    self.each(block)
+
+Calls C<block> once for every element in the set, and returns C<self>.
+
+    var s = Set(1, 2, 3)
+    s.each {|n| say(n) }
+
+=cut
+
+=head2 each_2d
+
+    self.each_2d(block)
+
+Iterates over a set I<whose elements are themselves array-like> (e.g. pairs or tuples), spreading each element's own contents as separate arguments to C<block>. This is B<not> related to element position/index -- it simply dereferences each stored element as an array.
+
+    var pairs = Set([1, "a"], [2, "b"], [3, "c"])
+    pairs.each_2d {|k, v| say("#{k}: #{v}") }
+
+=cut
+
+=head2 iter
+
+    self.iter
+
+Returns an iterator (a C<Block>) over the set's elements (in the underlying hash's own unordered order). Call it with C<.run> to get each successive element; it returns C<nil> once exhausted.
+
+    var s = Set(1, 2, 3)
+    var it = s.iter
+    say(it.run)                 # some element of the set
+    say(it.run)                 # another element
+
+=cut
+
+=head1 TRANSFORMATION AND FILTERING
+
+=head2 map
+
+    self.map(block)
+
+Returns a new set with the result of calling C<block> on each element (results are deduplicated, like any other set construction; if C<block> returns more than one value for a given element, each of those values becomes its own element in the result). If C<block> is omitted, elements are kept as-is.
+
+    var s = Set(1, 2, 3)
+    say(s.map {|n| n**2 })          #=> Set(1, 4, 9)
+
+=cut
+
+=head2 map_2d
+
+    self.map_2d(block)
+
+Like L</map>, but for a set I<whose elements are themselves array-like> -- each element's own contents are spread as separate arguments to C<block> (rather than passing the whole element as one argument).
+
+    var pairs = Set([1, "a"], [2, "b"])
+    say(pairs.map_2d {|k, v| "#{k}:#{v}" })
+
+=cut
+
+=head2 collect
+
+    self.collect(block)
+
+Calls C<block> once per element and collects every result into an C<Array> -- I<not> a new C<Set>. Unlike L</map>, results are kept in full (no deduplication), one per source element.
+
+    var s = Set(1, 2, 3)
+    say(s.collect {|n| n * 2 })     #=> [2, 4, 6]  (an Array, order may vary)
+
+=cut
+
+=head2 grep
+
+    self.grep(block)
+
+Returns a new set containing only the elements for which C<block> returns a truthy value. If C<block> is omitted, elements are kept based on their own truthiness.
+
+    var s = Set(1, 2, 3, 4, 5, 6)
+    say(s.grep {|n| n.is_even })    #=> Set(2, 4, 6)
+
+Aliases: I<select>
+
+=cut
+
+=head2 select
+
+    self.select(block)
+
+Alias for L</grep>.
+
+Aliases: I<grep>
+
+=cut
+
+=head2 grep_2d
+
+    self.grep_2d(block)
+
+Like L</grep>, but for a set I<whose elements are themselves array-like> -- each element's own contents are spread as separate arguments to C<block>.
+
+    var pairs = Set([10, "a"], [20, "b"], [5, "c"])
+    say(pairs.grep_2d {|n, label| n > 8 })   #=> Set([10, "a"], [20, "b"])
+
+=cut
+
+=head1 AGGREGATION AND PREDICATES
+
+=head2 count
+
+    self.count(obj)
+    self.count(block)
+
+If given a plain value, returns C<1> if the set L</has> it, or C<0> otherwise (a set never contains duplicates, so this is a membership test rather than a general tally). If given a block, delegates entirely to L</count_by>.
+
+    var s = Set(1, 2, 3)
+    say(s.count(2))              #=> 1
+    say(s.count(5))              #=> 0
+
+=cut
+
+=head2 count_by
+
+    self.count_by(block)
+
+Returns the number of elements for which C<block> returns a truthy value. (This is a plain count, not a group-by tally -- it returns a single C<Number>, the same thing C<count> returns when it's given a block.)
+
+    var s = Set(1, 2, 3, 4, 5, 6)
+    say(s.count_by {|n| n.is_even })    #=> 3
 
 =cut
 
@@ -558,13 +772,23 @@ Returns an array of the set's elements sorted by the result of the block.
 
     self.sum(block)
 
-Returns the sum of all elements, or the sum of the results of applying the block to each element.
+Returns the sum of all elements, or the sum of C<block> applied to each element if given.
 
-    var s = Set(1,2,3,4)
-    say s.sum                   #=> 10
-    say s.sum { _**2 }          #=> 30
+    var s = Set(1, 2, 3, 4)
+    say(s.sum)                   #=> 10
+    say(s.sum {|n| n**2 })       #=> 30
 
 Aliases: I<sum_by>
+
+=cut
+
+=head2 sum_by
+
+    self.sum_by(block)
+
+Alias for L</sum>.
+
+Aliases: I<sum>
 
 =cut
 
@@ -572,10 +796,150 @@ Aliases: I<sum_by>
 
     self.sum_2d(block)
 
-Returns the sum of the results of applying the block to each element and its index.
+Like L</sum>, but for a set I<whose elements are themselves array-like> -- each element's own contents are spread as separate arguments to C<block>.
 
-    var s = Set(10,20,30)
-    say s.sum_2d { |i, v| i + v }
+    var pairs = Set([1, 10], [2, 20])
+    say(pairs.sum_2d {|a, b| a + b })    #=> 33  # (1+10) + (2+20)
+
+=cut
+
+=head2 prod
+
+    self.prod(block)
+
+Returns the product of all elements, or the product of C<block> applied to each element if given.
+
+    var s = Set(2, 3, 4)
+    say(s.prod)                  #=> 24
+    say(s.prod {|n| n**2 })      #=> 576
+
+Aliases: I<prod_by>
+
+=cut
+
+=head2 prod_by
+
+    self.prod_by(block)
+
+Alias for L</prod>.
+
+Aliases: I<prod>
+
+=cut
+
+=head2 prod_2d
+
+    self.prod_2d(block)
+
+Like L</prod>, but for a set I<whose elements are themselves array-like> -- each element's own contents are spread as separate arguments to C<block>.
+
+    var pairs = Set([1, 10], [2, 20])
+    say(pairs.prod_2d {|a, b| a + b })   #=> 242  # (1+10) * (2+20)
+
+=cut
+
+=head2 min
+
+    self.min
+
+Returns the minimum element of the set.
+
+    var s = Set(5, 2, 8, 1, 9)
+    say(s.min)                   #=> 1
+
+=cut
+
+=head2 min_by
+
+    self.min_by(block)
+
+Returns the element for which C<block> returns the smallest value.
+
+    var s = Set(-5, 3, -10, 7)
+    say(s.min_by {|n| n.abs })   #=> 3
+
+=cut
+
+=head2 max
+
+    self.max
+
+Returns the maximum element of the set.
+
+    var s = Set(5, 2, 8, 1, 9)
+    say(s.max)                   #=> 9
+
+=cut
+
+=head2 max_by
+
+    self.max_by(block)
+
+Returns the element for which C<block> returns the largest value.
+
+    var s = Set(-5, 3, -10, 7)
+    say(s.max_by {|n| n.abs })   #=> -10
+
+=cut
+
+=head2 all
+
+    self.all(block)
+
+Returns C<true> if C<block> is truthy for every element in the set. If C<block> is omitted, elements are tested for their own truthiness.
+
+    var s = Set(2, 4, 6, 8)
+    say(s.all {|n| n.is_even })  #=> true
+    say(s.all {|n| n > 5 })      #=> false
+
+=cut
+
+=head2 any
+
+    self.any(block)
+
+Returns C<true> if C<block> is truthy for at least one element in the set. If C<block> is omitted, elements are tested for their own truthiness.
+
+    var s = Set(1, 2, 3, 4)
+    say(s.any {|n| n > 3 })      #=> true
+    say(s.any {|n| n > 10 })     #=> false
+
+=cut
+
+=head2 none
+
+    self.none(block)
+
+Returns C<true> if C<block> is falsy for every element in the set. If C<block> is omitted, elements are tested for their own truthiness.
+
+    var s = Set(1, 3, 5, 7)
+    say(s.none {|n| n.is_even }) #=> true
+    say(s.none {|n| n > 5 })     #=> false
+
+=cut
+
+=head1 SORTING AND CONVERSION
+
+=head2 sort
+
+    self.sort(block)
+
+Returns an C<Array> of the set's elements, sorted (in natural order, or by C<block> if given).
+
+    var s = Set(3, 1, 4, 1, 5)
+    say(s.sort)                    #=> [1, 3, 4, 5]
+    say(s.sort {|a, b| b <=> a })  #=> [5, 4, 3, 1]
+
+=cut
+
+=head2 sort_by
+
+    self.sort_by(block)
+
+Returns an C<Array> of the set's elements, sorted by the value C<block> returns for each one.
+
+    var s = Set(-5, 3, -10, 7)
+    say(s.sort_by {|n| n.abs })    #=> [3, -5, 7, -10]
 
 =cut
 
@@ -583,12 +947,56 @@ Returns the sum of the results of applying the block to each element and its ind
 
     self.to_a
 
-Returns an array containing all elements of the set.
+Returns an C<Array> containing every element of the set (in the underlying hash's own unordered order).
 
-    var s = Set(1,2,3)
-    say s.to_a                  #=> [1, 2, 3] (order may vary)
+    var s = Set(1, 2, 3)
+    say(s.to_a)                  #=> [1, 2, 3]  (order may vary)
 
 Aliases: I<values>, I<to_array>
+
+=cut
+
+=head2 values
+
+    self.values
+
+Alias for L</to_a>.
+
+Aliases: I<to_a>, I<to_array>
+
+=cut
+
+=head2 to_array
+
+    self.to_array
+
+Alias for L</to_a>.
+
+Aliases: I<to_a>, I<values>
+
+=cut
+
+=head2 to_list
+
+    self...
+
+Returns every element of the set as a plain list (not wrapped in an C<Array> object, unlike L</to_a>).
+
+    var s = Set(1, 2, 3)
+    var list = s...
+    say([list])                  #=> [1, 2, 3]  (order may vary)
+
+Aliases: operator C<...>
+
+=cut
+
+=head2 ...
+
+    self...
+
+Operator form of L</to_list>.
+
+Aliases: I<to_list>
 
 =cut
 
@@ -596,11 +1004,11 @@ Aliases: I<values>, I<to_array>
 
     self.to_bag
 
-Converts the set to a Bag (multiset) where each element has a count of 1.
+Converts the set to a C<Bag> (multiset), where every element starts with a count of 1.
 
-    var s = Set(1,2,3)
+    var s = Set(1, 2, 3)
     var b = s.to_bag
-    say b                       #=> Bag(1, 2, 3)
+    say(b)                       #=> Bag(1, 2, 3)
 
 =cut
 
@@ -608,11 +1016,43 @@ Converts the set to a Bag (multiset) where each element has a count of 1.
 
     self.to_set
 
-Returns a copy of the set.
+Returns C<self> unchanged (a C<Set> is already a set). Used internally by the set-algebra methods above to coerce any other object into a set before combining it.
 
-    var s1 = Set(1,2,3)
+    var s1 = Set(1, 2, 3)
     var s2 = s1.to_set
-    say s2                      #=> Set(1, 2, 3)
+    say(s2)                      #=> Set(1, 2, 3)
+
+=cut
+
+=head2 join
+
+    self.join(sep)
+
+Joins the elements of the set into a C<String>, separated by C<sep>.
+
+    var s = Set(1, 2, 3)
+    say(s.join(', '))            #=> "1, 2, 3"  (order may vary)
+
+=cut
+
+=head1 INSPECTION
+
+=head2 dump
+
+    self.dump
+
+Returns a C<String> representation of the set, in the format C<Set(element, element, ...)>. Each element is rendered by calling its own C<dump> method if it has one (falling back to plain stringification, or C<nil>, otherwise), and a circular reference back to the set itself is shown as an abbreviated placeholder rather than expanded infinitely. This is also what powers the set's automatic string conversion (e.g. when interpolated into a string).
+
+    var s = Set(1, 2, 3)
+    say(s.dump)                  #=> "Set(1, 2, 3)"
+
+=cut
+
+=head2 get_value
+
+    self.get_value
+
+Returns the set's contents as a plain Perl array reference, with every nested Sidef object recursively unwrapped to its own raw underlying value via its own C<get_value>. Circular references are handled by reusing the same array reference for a set already seen during the recursion. This is a low-level method, mainly useful for interop rather than everyday Sidef code.
 
 =cut
 
