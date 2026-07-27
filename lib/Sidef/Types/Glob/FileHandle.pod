@@ -1,4 +1,3 @@
-
 =encoding utf8
 
 =head1 NAME
@@ -7,23 +6,21 @@ Sidef::Types::Glob::FileHandle - File handle object for reading, writing, and ma
 
 =head1 DESCRIPTION
 
-This class implements file handle operations for reading from and writing to files, as well as in-memory string buffers. It provides methods for I/O operations, file positioning, locking, and iteration over file content.
+This class wraps an open Perl filehandle (from a real file, a standard stream, or an in-memory string buffer) and provides methods for reading, writing, positioning, locking, and line/character iteration.
 
 =head1 SYNOPSIS
 
     # Open a file and get a FileHandle
-    var fh = File("/path/to/file. txt").open_r
+    var fh = File("/path/to/file.txt").open_r
 
     # Read all content
     var content = fh.slurp
 
     # Read line by line
-    fh.each { |line|
-        say line
-    }
+    fh.each {|line| say(line) }
 
     # Create an in-memory buffer
-    var buf = FileHandle.new_buf(: raw, "initial content")
+    var buf = FileHandle.new_buf(:raw, "initial content")
     buf.print("more content")
 
     # Standard streams
@@ -31,405 +28,108 @@ This class implements file handle operations for reading from and writing to fil
     var stderr = FileHandle.stderr
     var stdin  = FileHandle.stdin
 
-
 =head1 INHERITS
 
 Inherits methods from L<Sidef::Object::Object>.
 
-=head1 METHODS
+=head1 CONSTRUCTION
 
-=head2 «
+=head2 new
 
-    a « b
+    FileHandle(fh, parent=nil)
+    FileHandle.new(fh, parent=nil)
 
-Writes the content of C<b> to the file handle C<a> and returns the file handle.  This is an operator alias for writing data to a file handle.
+Wraps a raw filehandle C<fh> (as obtained from opening a C<File> or building a buffer) into a C<FileHandle> object. C<parent> is stored for later retrieval via L</parent> -- normally a C<File> object, though this constructor doesn't enforce that. Not typically called directly; use C<File>'s own C<open>/C<open_r>/C<open_w>/etc. methods, or L</new_buf>, instead.
 
-Aliases:  I<E<lt>E<lt>>, I<write_from>
-
-=cut
-
-=head2 »
-
-    a » b
-
-Reads a line from file handle C<a> into variable reference C<b> (with newline removed) and returns the file handle. Sets C<b> to C<nil> at end of file.
-
-Aliases: I<E<gt>E<gt>>, I<read_to>
-
-=cut
-
-=head2 autoflush
-
-    self.autoflush(bool)
-
-Enables or disables autoflush mode on the file handle. When enabled (C<true>), output is flushed immediately after each write operation.  Returns the file handle.
-
-=cut
-
-=head2 binmode
-
-    self. binmode(encoding)
-
-Sets the encoding layer for the file handle. Common values include C<:raw>, C<:utf8>, C<:encoding(UTF-8)>. Returns the file handle.
-
-=cut
-
-=head2 byte
-
-    self.byte(var_ref)
-
-Reads a single byte from the file handle.  If C<var_ref> is provided, stores the byte value (as a Number) in it and returns C<true> on success or C<false> on failure.  Without C<var_ref>, returns the byte value directly or C<nil> at end of file.
-
-Aliases: I<getb>, I<read_byte>
-
-=cut
-
-=head2 call
-
-    self.call
-
-Creates a new FileHandle object.  This is an alias for the constructor.
-
-=cut
-
-=head2 char
-
-    self.char(var_ref)
-
-Reads a single character from the file handle. If C<var_ref> is provided, stores the character in it and returns C<true> on success or C<false> on failure. Without C<var_ref>, returns the character directly or C<nil> at end of file.
-
-Aliases: I<getc>, I<read_char>
-
-=cut
-
-=head2 chars
-
-    self.chars
-
-Reads the entire file and returns an Array of individual characters (as Strings).
-
-=cut
-
-=head2 close
-
-    self.close
-
-Closes the file handle. Returns C<true> on success, C<false> on failure.
-
-=cut
-
-=head2 cp
-
-    self.cp(fh)
-
-Copies the content from this file handle to another FileHandle C<fh>.  Returns C<true> on success, C<false> on failure.
-
-Aliases: I<copy>
-
-=cut
-
-=head2 each
-
-    self.each(code)
-
-Iterates over each line in the file, executing C<code> with each line (with newline removed) as an argument. Returns the file handle.
-
-    fh.each { |line|
-        say line
-    }
-
-Aliases: I<each_line>
-
-=cut
-
-=head2 each_char
-
-    self.each_char(code)
-
-Iterates over each character in the file, executing C<code> with each character as an argument. Returns the file handle.
-
-    fh.each_char { |char|
-        print char
-    }
-
-=cut
-
-=head2 eof
-
-    self. eof
-
-Returns C<true> if the file handle is at end of file, C<false> otherwise.
-
-=cut
-
-=head2 fcntl
-
-    self.fcntl(func, flags)
-
-Performs a file control operation on the file handle. Takes a function code and flags as arguments.  Returns C<true> on success, C<false> on failure.
-
-=cut
-
-=head2 file
-
-    self.file
-
-Returns the parent File object associated with this file handle, or the string buffer if this is a buffer handle.
-
-Aliases: I<parent>
-
-=cut
-
-=head2 fileno
-
-    self. fileno
-
-Returns the file descriptor number (as a Number) for the file handle.
-
-=cut
-
-=head2 flock
-
-    self. flock(mode)
-
-Applies an advisory lock on the file handle with the specified mode. Returns C<true> on success, C<false> on failure.
-
-=cut
-
-=head2 get
-
-    self.get(var_ref)
-
-Reads a single line from the file handle (with newline removed). If C<var_ref> is provided, stores the line in it and returns C<true> on success or C<false> at end of file.  Without C<var_ref>, returns the line directly or C<nil> at end of file.
-
-Aliases: I<line>, I<readln>, I<read_line>, I<readline>
-
-=cut
-
-=head2 grep
-
-    self.grep(obj)
-
-Reads all lines from the file and returns an Array containing only the lines for which C<obj> (a Block or Regex) returns true.
-
-    var matches = fh.grep { |line| line.contains("pattern") }
-
-Aliases: I<select>
-
-=cut
-
-=head2 isatty
-
-    self.isatty
-
-Returns C<true> if the file handle is connected to a terminal (TTY), C<false> otherwise.
-
-Aliases: I<is_on_tty>
-
-=cut
-
-=head2 iter
-
-    self.iter
-
-Returns an iterator Block that yields one line at a time (with newline removed) on each call. Returns C<nil> when end of file is reached.
-
-    var iter = fh. iter
-    while (defined(var line = iter.run)) {
-        say line
-    }
-
-=cut
-
-=head2 lines
-
-    self.lines
-
-Reads all lines from the file and returns them as an Array of Strings (with newlines removed).
-
-    var lines = fh. lines
-
-Aliases: I<read_lines>, I<readlines>
-
-=cut
-
-=head2 lock
-
-    self. lock
-
-Applies an exclusive lock (LOCK_EX) on the file handle.  Returns C<true> on success, C<false> on failure.
-
-=cut
-
-=head2 lstat
-
-    self.lstat
-
-Returns a Stat object with information about the file (without following symbolic links).
-
-=cut
-
-=head2 map
-
-    self.map(block)
-
-Reads all lines from the file and applies C<block> to each line, returning an Array of the transformed results.
-
-    var upper = fh.map { |line| line. uc }
-
-Aliases: I<collect>
+Aliases: I<call>
 
 =cut
 
 =head2 new_buf
 
-    self. new_buf(mode, initial_string)
+    FileHandle.new_buf(mode=:raw, initial_string="")
 
-Creates a new in-memory file handle backed by a string buffer. The C<mode> can be C<:raw> for binary mode or an encoding like C<:utf8>. The C<initial_string> provides the initial content. Returns the FileHandle (or in list context, both the FileHandle and the String buffer).
+Creates a new in-memory filehandle backed by a string buffer, seeded with C<initial_string>. In scalar context, returns just the C<FileHandle>; in list context, returns I<both> the C<FileHandle> and the underlying C<String> buffer object (also retrievable afterwards via L</parent>). If C<initial_string> is non-empty, the handle's position starts at the I<end> of it (so an immediate C<.print> appends rather than overwriting) -- use L</rewind> first if you want to read from the beginning.
 
     var buf = FileHandle.new_buf(:raw, "initial")
     buf.print("appended")
-    say buf.parent  # => "initialappended"
+    say(buf.parent)              #=> "initialappended"
+
+    var (fh, str) = FileHandle.new_buf
+    fh.print("hello")
+    say(str)                     #=> "hello"
 
 Aliases: I<new_buffer>
 
 =cut
 
-=head2 print
+=head2 stdout
 
-    self.print(*args)
+    FileHandle.stdout
 
-Writes the given arguments to the file handle without a trailing newline. Returns C<true> on success, C<false> on failure.
-
-Aliases: I<spurt>, I<write>
-
-=cut
-
-=head2 printf
-
-    self.printf(*args)
-
-Writes formatted output to the file handle using a format string and arguments (similar to C printf). Returns C<true> on success, C<false> on failure.
-
-    fh.printf("%s:  %d\n", name, value)
-
-=cut
-
-=head2 read
-
-    self.read(var_ref, length, offset)
-
-Reads up to C<length> bytes from the file handle into C<var_ref>, optionally at the specified C<offset>. Returns the number of bytes read.
-
-=cut
-
-=head2 rewind
-
-    self. rewind
-
-Repositions the file pointer to the beginning of the file. Returns C<true> on success, C<false> on failure.
-
-=cut
-
-=head2 say
-
-    self.say(*args)
-
-Writes the given arguments to the file handle followed by a newline.  Returns C<true> on success, C<false> on failure.
-
-Aliases: I<println>
-
-=cut
-
-=head2 sayf
-
-    self.sayf(format, *args)
-
-Writes formatted output to the file handle followed by a newline.  Returns C<true> on success, C<false> on failure.
-
-    fh. sayf("%s:  %d", name, value)
-
-Aliases: I<printlnf>
-
-=cut
-
-=head2 seek
-
-    self. seek(pos, whence)
-
-Positions the file pointer at C<pos> bytes relative to C<whence>. The C<whence> value can be 0 (beginning), 1 (current position), or 2 (end of file). Returns C<true> on success, C<false> on failure.
-
-=cut
-
-=head2 slurp
-
-    self.slurp
-
-Reads and returns the entire remaining content of the file as a single String.
-
-    var content = fh.slurp
-
-=cut
-
-=head2 stat
-
-    self.stat
-
-Returns a Stat object with information about the file.
+Returns a C<FileHandle> wrapping the standard output stream.
 
 =cut
 
 =head2 stderr
 
-    self.stderr
+    FileHandle.stderr
 
-Returns a FileHandle for the standard error stream (STDERR).
-
-    var stderr = FileHandle.stderr
+Returns a C<FileHandle> wrapping the standard error stream.
 
 =cut
 
 =head2 stdin
 
-    self.stdin
+    FileHandle.stdin
 
-Returns a FileHandle for the standard input stream (STDIN).
-
-    var stdin = FileHandle.stdin
+Returns a C<FileHandle> wrapping the standard input stream.
 
 =cut
 
-=head2 stdout
+=head1 INTROSPECTION
 
-    self.stdout
+=head2 get_value
 
-Returns a FileHandle for the standard output stream (STDOUT).
+    self.get_value
 
-    var stdout = FileHandle.stdout
-
-=cut
-
-=head2 sysread
-
-    self.sysread(var_ref, length, offset)
-
-Performs a low-level read of up to C<length> bytes from the file handle into C<var_ref>, optionally at the specified C<offset>. Returns the number of bytes read.  This bypasses buffered I/O.
+Returns the raw underlying Perl filehandle. A low-level method, mainly useful for interop rather than everyday Sidef code.
 
 =cut
 
-=head2 sysseek
+=head2 parent
 
-    self. sysseek(pos, whence)
+    self.parent
 
-Performs a low-level seek to position C<pos> relative to C<whence>. Returns C<true> on success, C<false> on failure.  This bypasses buffered I/O.
+Returns whatever was passed as the C<parent> argument when the handle was created -- typically the C<File> object it was opened from, or the C<String> buffer object for a handle created with L</new_buf>.
+
+Aliases: I<file>
 
 =cut
 
-=head2 syswrite
+=head2 is_on_tty
 
-    self.syswrite(scalar, length, offset)
+    self.is_on_tty
 
-Performs a low-level write of C<scalar> to the file handle, optionally writing only C<length> bytes starting at C<offset>. Returns C<true> on success, C<false> on failure.  This bypasses buffered I/O.
+Returns C<true> if the filehandle is connected to a terminal (TTY), C<false> otherwise.
+
+Aliases: I<isatty>
+
+=cut
+
+=head2 fileno
+
+    self.fileno
+
+Returns the numeric file descriptor for the filehandle.
+
+=cut
+
+=head2 eof
+
+    self.eof
+
+Returns C<true> if the filehandle is at end-of-file, C<false> otherwise.
 
 =cut
 
@@ -437,23 +137,317 @@ Performs a low-level write of C<scalar> to the file handle, optionally writing o
 
     self.tell
 
-Returns the current position (as a Number) of the file pointer in bytes from the beginning of the file.
+Returns the current position of the filehandle, in bytes from the beginning.
 
 =cut
 
-=head2 truncate
+=head2 stat
 
-    self. truncate(length)
+    self.stat
 
-Truncates the file to the specified C<length> in bytes (default 0). Returns C<true> on success, C<false> on failure.
+Returns a C<Stat> object describing the filehandle's current target (works even for a handle with no associated path, such as an in-memory buffer).
+
+=cut
+
+=head2 lstat
+
+    self.lstat
+
+Like L</stat>. Since the handle is already open (and opening a path always follows any symlink in it), there's no meaningful "don't follow the link" distinction left to make on an already-open handle -- this behaves the same as L</stat> here.
+
+=cut
+
+=head1 CONFIGURATION
+
+=head2 autoflush
+
+    self.autoflush(bool)
+
+Enables (C<true>) or disables (C<false>) autoflush on the filehandle, so that output is flushed immediately after every write. Returns C<self>.
+
+=cut
+
+=head2 binmode
+
+    self.binmode(encoding)
+
+Applies a PerlIO encoding layer (e.g. C<":raw">, C<":utf8">, C<":encoding(UTF-8)">) to the filehandle. Returns C<self>.
+
+=cut
+
+=head2 fcntl
+
+    self.fcntl(func, flags)
+
+Performs a low-level C<fcntl> operation on the filehandle with the given numeric C<func> and C<flags>. Returns C<true> on success, C<false> otherwise.
+
+=cut
+
+=head2 lock
+
+    self.lock
+
+Applies an exclusive advisory lock (C<LOCK_EX>) to the filehandle. Returns C<true> on success, C<false> otherwise.
 
 =cut
 
 =head2 unlock
 
-    self. unlock
+    self.unlock
 
-Releases the advisory lock on the file handle (LOCK_UN). Returns C<true> on success, C<false> on failure.
+Releases an advisory lock (C<LOCK_UN>) on the filehandle. Returns C<true> on success, C<false> otherwise.
+
+=cut
+
+=head2 flock
+
+    self.flock(mode)
+
+Applies an advisory lock to the filehandle using the given numeric C<mode> (see the C<Fcntl> C<LOCK_*> constants). L</lock> and L</unlock> are convenience wrappers around this for the two most common modes. Returns C<true> on success, C<false> otherwise.
+
+=cut
+
+=head1 READING
+
+=head2 read
+
+    self.read(var_ref, length, offset=nil)
+
+Reads up to C<length> bytes into C<var_ref> (optionally starting at C<offset> within whatever C<var_ref> already held), and returns the number of bytes actually read, as a C<Number>. C<var_ref> is always left holding a C<String> afterwards, even on a short or failed read.
+
+=cut
+
+=head2 sysread
+
+    self.sysread(var_ref, length, offset=nil)
+
+Like L</read>, but performs a low-level C<sysread>, bypassing buffered I/O.
+
+=cut
+
+=head2 slurp
+
+    self.slurp
+
+Reads and returns the entire remaining content of the filehandle as a single C<String>.
+
+    var content = File("data.txt").open_r.slurp
+
+=cut
+
+=head2 read_line
+
+    self.read_line
+    self.read_line(var_ref)
+
+Reads a single line (with the line terminator removed). With no argument, returns the line as a C<String>, or C<nil> at end-of-file. With C<var_ref>, stores the line through it and returns C<true>, or returns C<false> (leaving C<var_ref> untouched) at end-of-file.
+
+    var line = fh.read_line
+
+Aliases: I<readln>, I<readline>, I<get>, I<line>
+
+=cut
+
+=head2 read_char
+
+    self.read_char
+    self.read_char(var_ref)
+
+Reads a single character. With no argument, returns it as a C<String>, or C<nil> at end-of-file. With C<var_ref>, stores it through the reference and returns C<true>, or returns C<false> at end-of-file.
+
+Aliases: I<getc>, I<char>
+
+=cut
+
+=head2 read_byte
+
+    var byte = fh.read_byte
+
+    var value = 0
+    if (fh.read_byte(\value)) {
+        say value
+    }
+
+Reads a single byte from the file handle and returns its numeric value in the range C<0..255>.
+
+When called without an argument, the method returns the byte value as a C<Number>. If the end of the file has been reached, it returns C<nil>.
+
+An optional variable-reference may be provided to receive the byte value. In this form, the method returns a Boolean indicating success: C<true> if a byte was read, or C<false> on end-of-file.
+
+This method is equivalent to reading a single character with Perl's C<getc()> and converting it to its numeric byte value using C<ord()>.
+
+Examples:
+
+    var fh = File("data.bin").open_r
+
+    while (var b = fh.read_byte) {
+        say b
+    }
+
+Using the Boolean form:
+
+    var fh = File("data.bin").open_r
+    var byte
+
+    while (fh.read_byte(\byte)) {
+        say byte
+    }
+
+Aliases: I<getb>, I<byte>
+
+=cut
+
+=head2 read_lines
+
+    self.read_lines
+
+Reads every remaining line and returns them as an C<Array> of C<String>s, with line terminators removed.
+
+Aliases: I<readlines>, I<lines>
+
+=cut
+
+=head2 read_to
+
+    self.read_to(var_ref)
+    self >> var_ref
+    self » var_ref
+
+Reads a single line (with the line terminator removed) into C<var_ref>, or sets C<var_ref> to C<nil> at end-of-file, and returns C<self> (so it can be chained, unlike L</read_line>).
+
+    fh >> \line
+    say(line)
+
+Aliases: operator C<< >> >>, operator C<»>
+
+=cut
+
+=head2 iter
+
+    self.iter
+
+Returns an iterator (a C<Block>) that returns one line at a time (with the line terminator removed) each time it's called with C<.run>, or C<nil> once end-of-file is reached.
+
+    var it = fh.iter
+    while (defined(var line = it.run)) {
+        say(line)
+    }
+
+=cut
+
+=head1 WRITING
+
+=head2 print
+
+    self.print(*args)
+
+Writes C<args> to the filehandle with no trailing newline. Returns C<true> on success, C<false> otherwise.
+
+Aliases: I<write>, I<spurt>
+
+=cut
+
+=head2 println
+
+    self.println(*args)
+
+Writes C<args> to the filehandle, followed by a newline. Returns C<true> on success, C<false> otherwise.
+
+Aliases: I<say>
+
+=cut
+
+=head2 printf
+
+    self.printf(format, *args)
+
+Writes formatted output (C-style C<printf> semantics), with no trailing newline. Returns C<true> on success, C<false> otherwise.
+
+    fh.printf("%s: %d\n", name, value)
+
+=cut
+
+=head2 printlnf
+
+    self.printlnf(format, *args)
+
+Like L</printf>, but appends a newline to C<format> first. Returns C<true> on success, C<false> otherwise.
+
+    fh.printlnf("%s: %d", name, value)
+
+Aliases: I<sayf>
+
+=cut
+
+=head2 syswrite
+
+    self.syswrite(scalar, length=nil, offset=nil)
+
+Writes C<scalar> to the filehandle using a low-level C<syswrite>, bypassing buffered I/O (optionally only C<length> bytes, starting at C<offset>). Returns C<true> on success, C<false> otherwise.
+
+=cut
+
+=head2 write_from
+
+    self.write_from(*args)
+    self << args
+    self « args
+
+Writes C<args> to the filehandle (like L</print>), but I<always> returns C<self> regardless of whether the write actually succeeded -- unlike L</print>, this doesn't report success/failure through its return value.
+
+    fh << "some data"
+
+Aliases: operator C<< << >>, operator C<«>
+
+=cut
+
+=head1 BULK LINE AND CHARACTER PROCESSING
+
+The methods below all read the filehandle to exhaustion (there's no early-exit form), so they're only appropriate for a stream that actually ends.
+
+=head2 each
+
+    self.each(block)
+
+Calls C<block> once per remaining line (terminator removed), and returns C<self>.
+
+    fh.each {|line| say(line) }
+
+Aliases: I<each_line>
+
+=cut
+
+=head2 each_char
+
+    self.each_char(block)
+
+Calls C<block> once per remaining character, and returns C<self>.
+
+    fh.each_char {|c| print(c) }
+
+=cut
+
+=head2 grep
+
+    self.grep(obj)
+
+Reads every remaining line and returns an C<Array> of just the ones for which C<obj> (typically a C<Block>, or anything else responding to C<.run>) returns a truthy value.
+
+    var matches = fh.grep {|line| line.contains("pattern") }
+
+Aliases: I<select>
+
+=cut
+
+=head2 map
+
+    self.map(block)
+
+Reads every remaining line and returns an C<Array> of the results of calling C<block> on each one.
+
+    var upper = fh.map {|line| line.uc }
+
+Aliases: I<collect>
 
 =cut
 
@@ -461,8 +455,117 @@ Releases the advisory lock on the file handle (LOCK_UN). Returns C<true> on succ
 
     self.words
 
-Reads the entire file and returns an Array of all whitespace-separated words as Strings.
+Reads every remaining line, splits each on whitespace, and returns a flat C<Array> of every non-empty word (as C<String>s) across all lines.
 
-    var words = fh.words
+=cut
+
+=head2 chars
+
+    self.chars
+
+Reads the entire remaining content and returns an C<Array> of every individual character (as C<String>s).
+
+=cut
+
+=head1 POSITIONING AND SIZE
+
+=head2 rewind
+
+    self.rewind
+
+Repositions the filehandle to the very beginning. Returns C<true> on success, C<false> otherwise.
+
+=cut
+
+=head2 seek
+
+    self.seek(pos, whence)
+
+Repositions the filehandle to C<pos> bytes relative to C<whence> (C<0> = start, C<1> = current position, C<2> = end). Returns C<true> on success, C<false> otherwise.
+
+=cut
+
+=head2 sysseek
+
+    self.sysseek(pos, whence)
+
+Like L</seek>, but performs a low-level C<sysseek>, bypassing buffered I/O.
+
+=cut
+
+=head2 truncate
+
+    self.truncate(length=0)
+
+Truncates the file to C<length> bytes. Returns C<true> on success, C<false> otherwise.
+
+=cut
+
+=head1 FILE OPERATIONS
+
+=head2 close
+
+    self.close
+
+Closes the filehandle. Returns C<true> on success, C<false> otherwise.
+
+=cut
+
+=head2 copy
+
+    self.copy(other)
+
+Copies the remaining content of C<self> into C<other>, which must be another C<FileHandle> object (checked with an exact type match, so not even a subclass would be accepted) -- returns C<nil> immediately without copying anything if it isn't. Returns C<true> on success, C<false> on failure.
+
+Aliases: I<cp>
+
+=cut
+
+=head1 EXAMPLES
+
+=head2 Reading a file line by line
+
+    var fh = File("large.txt").open_r
+    fh.each {|line| say(line.trim) }
+    fh.close
+
+=head2 Writing with an explicit handle
+
+    var out = File("output.txt").open_w
+    out.say("Header")
+    10.times {|i| out.say("Line #{i}") }
+    out.close
+
+=head2 In-memory buffers
+
+    var buf = FileHandle.new_buf(:raw, "start:")
+    buf.print("more")
+    say(buf.parent)          #=> "start:more"
+
+    # Read the buffer back from the beginning
+    buf.rewind
+    say(buf.slurp)            #=> "start:more"
+
+=head2 Using the >> and << operators
+
+    var fh = File("data.txt").open_rw
+
+    fh << "first line\n"
+    fh.rewind
+
+    var line = nil
+    fh >> \line
+    say(line)                 #=> "first line"
+
+=head2 Filtering and transforming lines
+
+    var fh = File("access.log").open_r
+
+    var errors = fh.grep {|line| line.contains("ERROR") }
+    say(errors.len)
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Glob::File>, L<Sidef::Types::Glob::Dir>, L<Sidef::Types::String::String>
 
 =cut

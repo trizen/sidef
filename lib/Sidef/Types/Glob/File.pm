@@ -192,19 +192,19 @@ sub has_sticky_bit {
 sub modification_time_days_diff {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
-    (-M "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+    Sidef::Types::Number::Number->new(-M "$self");
 }
 
 sub access_time_days_diff {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
-    (-A "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+    Sidef::Types::Number::Number->new(-A "$self");
 }
 
 sub change_time_days_diff {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
-    (-C "$self") ? (Sidef::Types::Bool::Bool::TRUE) : (Sidef::Types::Bool::Bool::FALSE);
+    Sidef::Types::Number::Number->new(-C "$self");
 }
 
 sub is_executable {
@@ -313,7 +313,7 @@ sub abs_name {
 sub rel_name {
     my $class = ref($_[0]) || shift(@_);
     my ($self, $base) = @_;
-    $class->new(Encode::decode_utf8(File::Spec->rel2abs(Encode::encode_utf8("$self"), defined($base) ? Encode::encode_utf8("$base") : ())));
+    $class->new(Encode::decode_utf8(File::Spec->abs2rel(Encode::encode_utf8("$self"), defined($base) ? Encode::encode_utf8("$base") : ())));
 }
 
 *rel     = \&rel_name;

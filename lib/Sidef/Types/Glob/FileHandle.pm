@@ -219,7 +219,7 @@ sub read_char {
 sub read_byte {
     my ($self, $var_ref) = @_;
 
-    my $byte = CORE::ord(CORE::getc($self->{fh}));
+    my $byte = CORE::ord(CORE::getc($self->{fh}) // return (defined($var_ref) ? Sidef::Types::Bool::Bool::FALSE : undef));
 
     if (defined $var_ref) {
         $$var_ref = Sidef::Types::Number::Number::_set_int($byte // return Sidef::Types::Bool::Bool::FALSE);
