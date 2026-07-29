@@ -91,7 +91,7 @@ Performs a single step of a global (stepping) match against C<string>, regardles
 Called without C<pos>, each call continues from wherever the previous global match on this regex left off — so repeated calls walk through the successive matches in the string one at a time, and a failed call resets the internal position back to the start, ready to begin again.
 
     var text = "abc123def456ghi789"
-    var re = /\d+/
+    var re = /(\d+)/
 
     var m1 = re.global_match(text)
     say m1  # 123
