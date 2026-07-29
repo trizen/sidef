@@ -24,7 +24,7 @@ A regex constructed with the trailing C<g> modifier (e.g. C</\d+/g>, or C<Regex(
     }
 
     # Extract all matches
-    var matches = /\d+/.gmatches("abc123def456")
+    var matches = /(\d+)/.gmatches("abc123def456")
     say matches  # [123, 456]
 
     # Concatenate regexes
@@ -63,19 +63,19 @@ Aliases: I<call>
 Matches the regex pattern against a string, returning a L<Sidef::Types::Regex::Match> object. The Match object is truthy if the pattern was found. An optional starting offset C<pos> may be given to begin the search partway through the string; this is only meaningful for non-stepping regexes (see L</DESCRIPTION>) since a stepping regex tracks its own position internally.
 
     var text = "Hello, World!"
-    var match = (text =~ /W\w+/)
+    var match = (text =~ /(W\w+)/)
 
     if (match) {
         say match  # "World"
     }
 
     # With capturing groups
-    if (("age: 25" =~ /(\d+)/)) {
-        say $1  # 25
+    if ("age: 25" =~ /(\d+)/) { |m|
+        say m[0]  # 25
     }
 
     # With an explicit starting offset
-    var m = "aaa".match(/a/, 1)
+    var m = "aaa".match(/(a+)/, 1)
 
 Aliases: I<run>, I<=~>
 
@@ -124,14 +124,14 @@ Finds all successive matches of the regex pattern in C<string>, driven by the sa
 The scan stops automatically once the match position stops advancing, which protects against infinite loops on patterns that can match a zero-width string.
 
     var text = "The year 2024 has 365 days"
-    var numbers = /\d+/.gmatches(text)
+    var numbers = /(\d+)/.gmatches(text)
     say numbers  # [2024, 365]
 
     # Starting from an offset
-    var more = /\d+/.gmatches("a1b2c3d4", 4)
+    var more = /(\d+)/.gmatches("a1b2c3d4", 4)
 
     # With a block, transforming each match
-    var tagged = /\d+/.gmatches(text, { |i, m| "match ##{i}: #{m}" })
+    var tagged = /(\d+)/.gmatches(text, { |i, m| "match ##{i}: #{m}" })
 
 Aliases: I<gmatches>, I<all_matches>, I<map_matches>, I<repeated_match>
 
@@ -366,12 +366,12 @@ Example usage:
 =head2 Extracting All Numbers From Text
 
     var text = "The year 2024 has 365 days"
-    var numbers = /\d+/.gmatches(text)
+    var numbers = /(\d+)/.gmatches(text)
     say numbers  # [2024, 365]
 
 =head2 Stepping Through Matches One at a Time
 
-    var re = /\d+/
+    var re = /(\d+)/
     var text = "a1b2c3"
 
     loop {
