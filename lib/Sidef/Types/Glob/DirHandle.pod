@@ -22,12 +22,12 @@ DirHandle objects are typically created by calling the C<open> method on a Dir o
     }
     dh.close
 
-    # Or iterate through entries with a block
-    Dir('/path/to/directory').open.each { |entry|
-        say "Found: #{entry}"
+    # Or iterate through raw entry names with a block
+    Dir('/path/to/directory').open.each { |name|
+        say "Found: #{name}"
     }
 
-    # Get all entries as an array
+    # Get all entries (as Dir/File objects) as an array
     var entries = Dir('.').open.entries
     say entries
 
@@ -35,89 +35,53 @@ DirHandle objects are typically created by calling the C<open> method on a Dir o
 
 Inherits methods from L<Sidef::Object::Object>.
 
-=head1 METHODS
+=head1 CONSTRUCTION
 
-=head2 call
+=head2 new
 
-    self.call
+    Sidef::Types::Glob::DirHandle.new(dh, dir)
 
-Returns the DirHandle object itself, allowing the DirHandle to be called as a function. This enables using the directory handle in functional programming contexts.
+Constructs a new DirHandle object that wraps a raw directory handle (as produced internally by C<opendir>) together with the directory it belongs to. This is a low-level constructor: DirHandle objects are normally obtained by calling C<open> on a L<Sidef::Types::Glob::Dir> object rather than being built directly.
 
-    var dh = Dir('.').open
-    dh.call  # returns the DirHandle
-
-=cut
-
-=head2 chdir
-
-    self.chdir
-
-Changes the current working directory to the directory represented by this DirHandle. Returns a boolean indicating success or failure.
-
-    var dh = Dir('/tmp').open
-    dh.chdir  # changes current directory to /tmp
-    say Dir.cwd  # prints: /tmp
+Aliases: I<call>
 
 =cut
 
-=head2 close
-
-    self.close
-
-Closes the directory handle, releasing system resources. After closing, the DirHandle can no longer be used to read directory entries. Returns a boolean indicating success.
-
-    var dh = Dir('.').open
-    # ... read some entries ...
-    dh.close  # close the handle when done
-
-It's good practice to close directory handles when you're finished with them, although Sidef will automatically close them when they go out of scope.
-
-=cut
+=head1 DIRECTORY INFORMATION
 
 =head2 dir
 
     self.dir
 
-Returns the Dir object associated with this DirHandle. This provides access to the directory path and directory-level operations.
+Returns the directory this handle was opened from.
 
     var dh = Dir('/home/user').open
-    var dir = dh.dir        # returns the Dir object
+    var dir = dh.dir        # returns the associated Dir object
     say dir                 # prints: /home/user
 
 Aliases: I<parent>
 
 =cut
 
-=head2 dirs
+=head1 READING ENTRIES
 
-    self.dirs
+=head2 read
 
-Returns an array containing only the subdirectories within the directory (excluding regular files). This filters out file entries and special entries like '.' and '..'.
+    self.read
+
+Reads and returns the next entry from the directory as a L<Sidef::Types::Glob::Dir> or L<Sidef::Types::Glob::File> object, depending on the entry's type. Returns C<nil> when there are no more entries. Each call advances the directory position to the next entry.
+
+The special entries C<.> and C<..> are automatically skipped, and symbolic links are silently ignored (they are not returned at all).
 
     var dh = Dir('.').open
-    var subdirs = dh.dirs
-    subdirs.each { |subdir|
-        say "Subdirectory: #{subdir}"
+
+    loop {
+        var entry = dh.read
+        entry || break
+        say entry
     }
 
-=cut
-
-=head2 each
-
-    self.each(code)
-
-Iterates through each entry in the directory, calling the provided code block for each entry. The entry name is passed as an argument to the block. Returns the DirHandle object.
-
-    Dir('.').open.each { |entry|
-        say "Entry: #{entry}"
-    }
-
-    # With index
-    Dir('.').open.each { |entry, idx|
-        say "#{idx}: #{entry}"
-    }
-
-This method automatically skips the special '.' and '..' directory entries.
+    dh.close
 
 =cut
 
@@ -125,7 +89,7 @@ This method automatically skips the special '.' and '..' directory entries.
 
     self.entries
 
-Returns an array containing all entries (files and subdirectories) in the directory. This reads all entries at once and returns them as an array, including '.' and '..' if present.
+Returns an array containing all the entries in the directory, as L<Sidef::Types::Glob::Dir> and L<Sidef::Types::Glob::File> objects. Internally this rewinds the handle and then repeatedly calls C<read>, so, like C<read>, it excludes the C<.> and C<..> entries as well as symbolic links.
 
     var dh = Dir('/etc').open
     var all_entries = dh.entries
@@ -140,7 +104,7 @@ This is convenient when you need to work with all entries at once or want to app
 
     self.files
 
-Returns an array containing only the regular files within the directory (excluding subdirectories and special entries). This filters the directory contents to show only files.
+Returns an array containing only the regular files within the directory (i.e., the result of C<entries> filtered down to entries where C<is_file> is true). Subdirectories, symbolic links, and the C<.> / C<..> entries are excluded.
 
     var dh = Dir('.').open
     var files = dh.files
@@ -150,11 +114,41 @@ Returns an array containing only the regular files within the directory (excludi
 
 =cut
 
+=head2 dirs
+
+    self.dirs
+
+Returns an array containing only the subdirectories within the directory (i.e., the result of C<entries> filtered down to entries where C<is_dir> is true). Regular files, symbolic links, and the C<.> / C<..> entries are excluded.
+
+    var dh = Dir('.').open
+    var subdirs = dh.dirs
+    subdirs.each { |subdir|
+        say "Subdirectory: #{subdir}"
+    }
+
+=cut
+
+=head2 each
+
+    self.each(code)
+
+Iterates through each raw entry in the directory, calling the provided code block once per entry with the entry's name as a plain string. Returns the DirHandle object.
+
+Unlike C<read>, C<entries>, C<files>, and C<dirs>, this method reads directly from the underlying directory handle: it does B<not> skip the C<.> and C<..> entries, and it does B<not> filter out symbolic links.
+
+    Dir('.').open.each { |name|
+        say "Entry: #{name}"
+    }
+
+=cut
+
 =head2 iter
 
     self.iter
 
-Returns an iterator object that can be used to lazily iterate through directory entries. This is useful for processing large directories without loading all entries into memory at once.
+Returns a callable iterator (a Block) that lazily yields the next raw entry name (as a string) each time it's invoked, returning C<nil> once the directory is exhausted. This is useful for processing large directories without loading all entries into memory at once.
+
+Like C<each>, and unlike C<read>, this reads directly from the underlying directory handle, so it does B<not> skip the C<.> and C<..> entries and does B<not> filter out symbolic links.
 
     var dh = Dir('.').open
     var iterator = dh.iter
@@ -166,34 +160,39 @@ Returns an iterator object that can be used to lazily iterate through directory 
 
 =cut
 
-=head2 lstat
+=head1 POSITION CONTROL
 
-    self.lstat
+=head2 tell
 
-Returns a Stat object containing information about the directory itself (following the same semantics as the lstat system call). For symbolic links, this returns information about the link itself rather than the target.
+    self.tell
 
-    var dh = Dir('/tmp').open
-    var stat = dh.lstat
-    say "Directory inode: #{stat.ino}"
-    say "Permissions: #{stat.mode.as_oct}"
-
-=cut
-
-=head2 read
-
-    self.read
-
-Reads and returns the next entry from the directory. Returns C<nil> when there are no more entries. Each call advances the directory position to the next entry.
+Returns the current position within the directory stream as an integer. This position can be used later with C<seek> to return to the same point in the directory.
 
     var dh = Dir('.').open
 
-    loop {
-        var entry = dh.read
-        entry || break
-        say entry
-    }
+    dh.read  # read first entry
+    var pos = dh.tell  # get current position
+    say "Current position: #{pos}"
 
-    dh.close
+The position value is opaque and should only be used with C<seek> on the same directory handle.
+
+=cut
+
+=head2 seek
+
+    self.seek(pos)
+
+Sets the position within the directory stream to the specified position. The position value should be obtained from a previous C<tell> call. Returns a boolean indicating success.
+
+    var dh = Dir('.').open
+
+    dh.read  # read first entry
+    var pos = dh.tell  # save position
+    dh.read  # read second entry
+    dh.read  # read third entry
+
+    dh.seek(pos)  # return to saved position
+    say dh.read   # reads second entry again
 
 =cut
 
@@ -222,29 +221,41 @@ Resets the directory position back to the beginning, allowing you to read throug
 
 =cut
 
-=head2 seek
+=head1 HANDLE MANAGEMENT
 
-    self.seek(pos)
+=head2 close
 
-Sets the position within the directory stream to the specified position. The position value should be obtained from a previous C<tell> call. Returns a boolean indicating success.
+    self.close
+
+Closes the directory handle, releasing system resources. After closing, the DirHandle can no longer be used to read directory entries. Returns a boolean indicating success.
 
     var dh = Dir('.').open
+    # ... read some entries ...
+    dh.close  # close the handle when done
 
-    dh.read  # read first entry
-    var pos = dh.tell  # save position
-    dh.read  # read second entry
-    dh.read  # read third entry
-
-    dh.seek(pos)  # return to saved position
-    say dh.read   # reads second entry again
+It's good practice to close directory handles when you're finished with them, although Sidef will automatically close them when they go out of scope.
 
 =cut
+
+=head2 chdir
+
+    self.chdir
+
+Changes the current working directory to the directory represented by this DirHandle. Returns a boolean indicating success or failure.
+
+    var dh = Dir('/tmp').open
+    dh.chdir  # changes current directory to /tmp
+    say Dir.cwd  # prints: /tmp
+
+=cut
+
+=head1 FILE STATUS
 
 =head2 stat
 
     self.stat
 
-Returns a Stat object containing information about the directory (following the same semantics as the stat system call). For symbolic links, this returns information about the target rather than the link itself.
+Returns a L<Sidef::Types::Glob::Stat> object containing filesystem metadata about the directory represented by this handle.
 
     var dh = Dir('.').open
     var stat = dh.stat
@@ -254,19 +265,26 @@ Returns a Stat object containing information about the directory (following the 
 
 =cut
 
-=head2 tell
+=head2 lstat
 
-    self.tell
+    self.lstat
 
-Returns the current position within the directory stream as an integer. This position can be used later with C<seek> to return to the same point in the directory.
+Returns a L<Sidef::Types::Glob::Stat> object containing filesystem metadata about the directory represented by this handle, following C<lstat> semantics.
 
-    var dh = Dir('.').open
+    var dh = Dir('/tmp').open
+    var stat = dh.lstat
+    say "Directory inode: #{stat.ino}"
+    say "Permissions: #{stat.mode.as_oct}"
 
-    dh.read  # read first entry
-    var pos = dh.tell  # get current position
-    say "Current position: #{pos}"
+=cut
 
-The position value is opaque and should only be used with C<seek> on the same directory handle.
+=head1 LOW-LEVEL ACCESS
+
+=head2 get_value
+
+    self.get_value
+
+Returns the raw underlying directory handle wrapped by this object. This is a low-level accessor, mainly intended for internal use or interoperability rather than everyday scripting.
 
 =cut
 
@@ -284,9 +302,9 @@ The position value is opaque and should only be used with C<seek> on the same di
 =head2 Filtering Directory Contents
 
     # Find all .txt files
-    Dir('.').open.each { |entry|
-        if (entry ~~ /\.txt$/) {
-            say "Text file: #{entry}"
+    Dir('.').open.each { |name|
+        if (name ~~ /\.txt$/) {
+            say "Text file: #{name}"
         }
     }
 
@@ -302,10 +320,10 @@ The position value is opaque and should only be used with C<seek> on the same di
     func traverse_dir(dir_path) {
         var dh = Dir(dir_path).open
 
-        dh.each { |entry|
-            next if (entry ~~ /^\.\.?$/)  # skip . and ..
+        dh.each { |name|
+            next if (name ~~ /^\.\.?$/)  # skip . and ..
 
-            var full_path = Dir(dir_path) + entry
+            var full_path = Dir(dir_path) + name
 
             if (full_path.is_dir) {
                 say "Directory: #{full_path}"
@@ -339,6 +357,6 @@ L<Sidef::Types::Glob::Dir>, L<Sidef::Types::Glob::File>, L<Sidef::Types::Glob::F
 
 The order in which directory entries are returned is not guaranteed and may vary depending on the underlying filesystem. If you need sorted entries, use the C<entries> method and sort the resulting array.
 
-Special directory entries '.' (current directory) and '..' (parent directory) are typically included in the entry list unless filtered by methods like C<dirs> and C<files>.
+C<read>, C<entries>, C<files>, and C<dirs> all skip the special C<.> and C<..> entries and silently ignore symbolic links. In contrast, C<each> and C<iter> read directly from the underlying directory handle and include C<.>, C<..>, and symbolic links, returning plain entry-name strings rather than Dir/File objects.
 
 =cut
