@@ -4,14 +4,33 @@
 
 Sidef::Types::Glob::Pipe - Interface for creating and managing pipe handles
 
+=head1 DESCRIPTION
+
+The C<Pipe> class provides an interface for working with Unix-style pipes in Sidef. Pipes allow communication between your Sidef program and an external command: data can flow from a command into your program (read mode) or from your program into a command (write mode).
+
+A Pipe object is constructed from one or more strings:
+
+    Pipe("ls -la")        # a single command string
+    Pipe("ls", "-la")     # a command followed by its arguments
+
+This distinction matters: when the Pipe wraps a B<single> string, that string is handed to the shell for parsing (so shell metacharacters such as pipes, redirections and globs are interpreted). When the Pipe wraps B<multiple> strings, the first is executed directly as a program with the rest as its arguments, bypassing the shell entirely (safer, and immune to shell-injection issues).
+
+The command isn't actually executed until C<open>, C<open_r>, or C<open_w> is called.
+
 =head1 SYNOPSIS
 
-    # Create a pipe for reading command output
-    var pipe = Pipe("ls -la")
+    # Single string: parsed and run through the shell
+    var pipe = Pipe("ps aux | grep sidef")
     pipe.open_r(\var fh)
     fh.each { |line|
         say line
     }
+    fh.close
+
+    # Multiple arguments: run directly, no shell involved
+    var pipe = Pipe("grep", "pattern", "file.txt")
+    pipe.open_r(\var fh)
+    fh.each { |line| say line }
     fh.close
 
     # Create a pipe for writing to a command
@@ -20,125 +39,84 @@ Sidef::Types::Glob::Pipe - Interface for creating and managing pipe handles
     fh.say("banana")
     fh.say("apple")
     fh.say("banana")
-    fh.say("cherry")
     fh.close
 
-    # Alternative: using open with mode
+    # Alternative: using open with an explicit mode
     var pipe = Pipe("wc -l")
-    pipe.open('<', \var in_fh)   # read mode
+    pipe.open('-|:utf8', \var in_fh)   # read mode
     # or
-    pipe.open('>', \var out_fh)  # write mode
-
-=head1 DESCRIPTION
-
-The C<Pipe> class provides an interface for working with Unix-style pipes in Sidef.
-Pipes allow bidirectional communication between your Sidef program and external commands
-or processes, enabling data to flow from your program to a command (write mode) or from
-a command to your program (read mode).
-
-This class wraps the underlying system pipe mechanisms and provides a clean,
-object-oriented interface for pipe operations.
+    pipe.open('|-:utf8', \var out_fh)  # write mode
 
 =head1 INHERITS
 
 Inherits methods from L<Sidef::Object::Object>.
 
-=head1 METHODS
+=head1 CONSTRUCTION
 
 =head2 new
 
-    Pipe.new(command)
-    Pipe(command)
+    Pipe.new(command...)
+    Pipe(command...)
 
-Creates a new Pipe object for the specified command string.
+Creates a new Pipe object wrapping the given command. Accepts either a single command string (which will later be parsed by the shell) or a program name followed by its individual arguments (which will later be executed directly, without a shell).
 
-B<Parameters:>
+    var pipe1 = Pipe("grep 'error' /var/log/syslog")
+    var pipe2 = Pipe("grep", "error", "/var/log/syslog")
 
-=over 4
+The command is not executed until C<open>, C<open_r>, or C<open_w> is called.
 
-=item * C<command> - The shell command to execute (String)
-
-=back
-
-B<Returns:> A new Pipe object
-
-B<Example:>
-
-    var pipe = Pipe("grep 'error' /var/log/syslog")
-    var pipe2 = Pipe.new("cat file.txt | sed 's/foo/bar/g'")
-
-B<Note:> The command is not executed until C<open>, C<open_r>, or C<open_w> is called.
-
-B<Aliases:> I<call>
+Aliases: I<call>
 
 =cut
+
+=head1 COMMAND INFORMATION
 
 =head2 command
 
-    pipe.command
+    self.command
 
-Returns the command string associated with this Pipe object.
-
-B<Returns:> The command string (String)
-
-B<Example:>
+Returns the command wrapped by this Pipe object. If the Pipe was constructed from a single string, that string is returned. If it was constructed from multiple arguments, the full list of arguments is returned instead.
 
     var pipe = Pipe("ls -la")
-    say pipe.command          # prints: ls -la
+    say pipe.command             # prints: ls -la
+
+    var pipe2 = Pipe("ls", "-la", "/tmp")
+    say pipe2.command            # prints: ls -la /tmp (as a list)
 
 =cut
 
+=head1 OPENING THE PIPE
+
 =head2 open
 
-    pipe.open(mode, var_ref)
+    self.open(mode)
+    self.open(mode, var_ref)
 
-Opens the pipe in the specified mode and assigns the resulting filehandle
-to the variable reference provided.
+Opens the pipe using the given mode, executing the wrapped command as described in L</DESCRIPTION>. Valid modes are C<'-|'> for read (command output flows into your program) and C<'|-'> for write (your program's output flows into the command), optionally followed by a PerlIO layer such as C<':utf8'>.
 
-B<Parameters:>
-
-=over 4
-
-=item * C<mode> - The opening mode: '<' for read, '>' for write (String)
-
-=item * C<var_ref> - A reference to a variable that will receive the filehandle
-
-=back
-
-B<Returns:> The filehandle object
-
-B<Example:>
+If C<var_ref> is given, the resulting L<Sidef::Types::Glob::FileHandle> is stored into it, and C<open> returns the process ID of the spawned command (or C<nil> on failure). If C<var_ref> is omitted, C<open> returns the FileHandle directly instead (or C<nil> on failure).
 
     var pipe = Pipe("grep pattern file.txt")
-    pipe.open('<', \var fh)    # open for reading
 
-    var output_pipe = Pipe("sort")
-    output_pipe.open('>', \var out)  # open for writing
+    # capture the PID, get the filehandle via var_ref
+    var pid = pipe.open('-|:utf8', \var fh)
+    fh.each { |line| say line }
+    fh.close
 
-B<Note:> The mode parameter follows Perl/Unix conventions:
-    '<' or 'r' for read mode (input from command)
-    '>' or 'w' for write mode (output to command)
+    # or get the filehandle directly, ignoring the PID
+    var out_pipe = Pipe("sort")
+    var fh = out_pipe.open('|-:utf8')
+    fh.say("banana")
+    fh.close
 
 =cut
 
 =head2 open_r
 
-    pipe.open_r(var_ref)
+    self.open_r
+    self.open_r(var_ref)
 
-Opens the pipe in read mode, allowing your program to read output from the command.
-This is equivalent to C<open('<', var_ref)>.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<var_ref> - A reference to a variable that will receive the filehandle
-
-=back
-
-B<Returns:> The filehandle object configured for reading
-
-B<Example:>
+Opens the pipe in read mode (equivalent to C<open('-|:utf8', var_ref)>), allowing your program to read the command's output. As with C<open>, passing C<var_ref> makes this return the process ID (with the FileHandle stored into C<var_ref>); omitting it returns the FileHandle directly.
 
     var pipe = Pipe("ps aux | grep sidef")
     pipe.open_r(\var fh)
@@ -148,66 +126,56 @@ B<Example:>
     }
     fh.close
 
-B<Use Case:> Use this when you want to capture and process output from
-a shell command within your Sidef program.
-
-B<Aliases:> I<open_read>
+Aliases: I<open_read>
 
 =cut
 
 =head2 open_w
 
-    pipe.open_w(var_ref)
+    self.open_w
+    self.open_w(var_ref)
 
-Opens the pipe in write mode, allowing your program to send data to the command's
-standard input. This is equivalent to C<open('>', var_ref)>.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<var_ref> - A reference to a variable that will receive the filehandle
-
-=back
-
-B<Returns:> The filehandle object configured for writing
-
-B<Example:>
+Opens the pipe in write mode (equivalent to C<open('|-:utf8', var_ref)>), allowing your program to send data to the command's standard input. As with C<open>, passing C<var_ref> makes this return the process ID (with the FileHandle stored into C<var_ref>); omitting it returns the FileHandle directly.
 
     var pipe = Pipe("mail -s 'Report' user@example.com")
     pipe.open_w(\var fh)
 
     fh.say("This is the report content.")
-    fh.say("Generated at: #{Time.local}")
     fh.close
 
-B<Use Case:> Use this when you want to pipe data from your Sidef program
-into another command for processing.
-
-B<Aliases:> I<open_write>
+Aliases: I<open_write>
 
 =cut
 
-=head2 to_s
+=head1 STRING REPRESENTATION
 
-    pipe.to_s
+=head2 dump
 
-Returns a string representation of the Pipe object, typically showing
-the command it encapsulates.
+    self.dump
 
-B<Returns:> String representation of the Pipe object
+Returns a String representation of the Pipe object, showing each part of the wrapped command individually quoted, e.g. C<Pipe("grep", "pattern", "file.txt")>.
 
-B<Example:>
+    var pipe = Pipe("echo", "hello")
+    say pipe.dump             # prints: Pipe("echo", "hello")
 
-    var pipe = Pipe("echo 'hello'")
-    say pipe.to_s             # shows Pipe object info
-    say pipe.dump             # same output
-
-B<Aliases:> I<dump>, I<to_str>
+Aliases: I<to_s>, I<to_str>
 
 =cut
 
-=head1 USAGE EXAMPLES
+=head1 LOW-LEVEL ACCESS
+
+=head2 get_value
+
+    self.get_value
+
+Returns the underlying command as a single space-joined string, regardless of how many arguments the Pipe was constructed with. This is a low-level accessor, mainly intended for internal use or interoperability rather than everyday scripting.
+
+    var pipe = Pipe("ls", "-la", "/tmp")
+    say pipe.get_value        # prints: ls -la /tmp
+
+=cut
+
+=head1 EXAMPLES
 
 =head2 Reading from a Pipe
 
@@ -236,17 +204,22 @@ B<Aliases:> I<dump>, I<to_str>
     }
     fh.close
 
-=head2 Complex Pipeline
+=head2 Avoiding the Shell
 
-    # Chain multiple commands together
-    var pipe = Pipe("ps aux | awk '{print $2, $11}' | sort -n")
+    # Pass arguments separately to skip shell parsing entirely
+    var pipe = Pipe("grep", "-n", "TODO", "main.sf")
     pipe.open_r(\var fh)
 
-    say "PID\tCommand"
-    say "=" * 40
     fh.each { |line|
         say line
     }
+    fh.close
+
+=head2 Getting the Filehandle Without a Var Reference
+
+    # open_r/open_w can return the filehandle directly
+    var fh = Pipe("uptime").open_r
+    say fh.read
     fh.close
 
 =head2 Error Handling
@@ -262,64 +235,14 @@ B<Aliases:> I<dump>, I<to_str>
         say "Error: #{_}"
     }
 
-=head1 COMPARISON WITH FILE OPERATIONS
-
-While C<FileHandle> deals with regular files on disk, C<Pipe> works with
-commands and processes:
-
-    # File operations
-    var file = File("data.txt")
-    file.open_r(\var fh)
-    # reads from file
-
-    # Pipe operations
-    var pipe = Pipe("cat data.txt")
-    pipe.open_r(\var fh)
-    # reads from command output
-
-The key difference: Pipes execute commands and stream data to/from them,
-while FileHandles access data stored in files.
-
-=head1 TECHNICAL NOTES
-
-=over 4
-
-=item * Pipes use the underlying operating system's pipe mechanism
-
-=item * Commands are executed through the shell, so shell metacharacters are interpreted
-
-=item * Pipe handles should be closed when finished to avoid resource leaks
-
-=item * The command doesn't execute until the pipe is opened
-
-=item * Write operations are buffered; close the handle to ensure all data is flushed
-
-=back
-
-=head1 PLATFORM CONSIDERATIONS
-
-Pipe functionality depends on the underlying operating system:
-
-=over 4
-
-=item * B<Unix/Linux/macOS:> Full support for pipes with shell command execution
-
-=item * B<Windows:> Limited pipe support; some shell features may not work as expected
-
-=back
-
 =head1 SEE ALSO
 
-=over 4
+L<Sidef::Types::Glob::File>, L<Sidef::Types::Glob::FileHandle>, L<Sidef::Types::Glob::Dir>, L<Sidef::Sys::Sys>
 
-=item * L<Sidef::Types::Glob::File> - for file operations
+=head1 NOTES
 
-=item * L<Sidef::Types::Glob::FileHandle> - for file handle operations
+Pipes should be closed when finished with, to avoid resource leaks and, for write pipes, to ensure buffered data is flushed to the command.
 
-=item * L<Sidef::Types::Glob::Dir> - for directory operations
-
-=item * L<Sidef::Sys::Sys> - for system-level operations
-
-=back
+Whether shell metacharacters are interpreted depends entirely on how the Pipe was constructed: a single command string is parsed by the shell, while multiple arguments are executed directly without shell involvement.
 
 =cut
