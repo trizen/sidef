@@ -215,7 +215,7 @@ sub union {
 
     $flags .= $extra_flags if defined($extra_flags);
 
-    __PACKAGE__->new("$x$y", join('', sort split(//, $flags . $global)));
+    __PACKAGE__->new("$x|$y", join('', sort split(//, $flags . $global)));
 }
 
 sub dump {
