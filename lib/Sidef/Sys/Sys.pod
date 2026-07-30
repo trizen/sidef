@@ -336,7 +336,7 @@ L</scanln> is a thin wrapper around this that always uses C<String> as the type.
 
     self.select(fh)
 
-Sets the specified filehandle as the default output filehandle for L</print>, L</printf>, L</println>, etc. Returns the previously selected filehandle, as a raw (unwrapped) filehandle rather than a Sidef filehandle object — suitable for passing straight back into C<select> to restore it later, but not for calling Sidef filehandle methods on directly.
+Sets the specified filehandle as the default output filehandle for L</print>, L</printf>, L</println>, etc. Returns the previously selected filehandle, as a Sidef FileHandle object.
 
     Sys.open(\var fh, '>', 'output.txt')
     var old = Sys.select(fh)

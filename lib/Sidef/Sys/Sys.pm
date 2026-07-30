@@ -250,7 +250,7 @@ sub unweaken {
 
 sub select {
     my ($self, $fh) = @_;
-    CORE::select(CORE::ref($fh) eq 'GLOB' ? $fh : $fh->get_value);
+    Sidef::Types::Glob::FileHandle->new(scalar CORE::select(CORE::ref($fh) eq 'GLOB' ? $fh : $fh->get_value));
 }
 
 sub system {
