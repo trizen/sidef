@@ -6,7 +6,9 @@ Sidef::Sys::Sys - System-level operations and utilities
 
 =head1 DESCRIPTION
 
-The Sys class provides an interface to various system-level operations, including process control, I/O operations, user/group management, network queries, and other low-level system functions. This class wraps many Perl built-in functions and provides a Sidef-friendly interface to system programming capabilities.
+The Sys class provides an interface to various system-level operations, including process control, timing, I/O, object introspection, weak references, and the traditional Unix user/group/host/network/protocol/service databases. This class wraps many Perl built-in functions and provides a Sidef-friendly interface to system programming capabilities.
+
+Sys is normally used through the pre-existing global C<Sys> instance rather than by constructing your own (see L</new>).
 
 =head1 SYNOPSIS
 
@@ -25,8 +27,8 @@ The Sys class provides an interface to various system-level operations, includin
     say Sys.user         # Current username
 
     # File operations
-    Sys.open(var fh, '<', 'file.txt')
-    Sys.opendir(var dh, '/tmp')
+    Sys.open(\var fh, '<', 'file.txt')
+    Sys.opendir(\var dh, '/tmp')
 
     # User/group information
     var user_info = Sys.getpwnam('root')
@@ -36,107 +38,26 @@ The Sys class provides an interface to various system-level operations, includin
 
 Inherits methods from L<Sidef::Object::Object>.
 
-=head1 METHODS
+=head1 CONSTRUCTION
 
-=head2 alarm
+=head2 new
 
-    Sys.alarm(sec)
+    Sys.new
 
-Schedules a SIGALRM signal to be delivered to the process after the specified number of seconds. Returns the number of seconds remaining from any previously set alarm. Setting sec to 0 cancels any pending alarm.
-
-    Sys.alarm(10)  # Set alarm for 10 seconds
-    Sys.alarm(0)   # Cancel alarm
+Creates a new, empty Sys object. Any arguments given are ignored — this constructor takes none. There is normally no need to call this yourself; Sidef provides a ready-made C<Sys> instance for the whole program.
 
 =cut
 
-=head2 bless
-
-    Sys.bless(obj, class)
-
-Blesses an object into the specified class, changing its type. This is used for creating objects of specific classes. Returns the blessed object.
-
-    var obj = Hash()
-    Sys.bless(obj, :MyClass)
-
-=cut
-
-=head2 class_name
-
-    Sys.class_name(obj)
-
-Returns the class name (type) of the given object as a string.
-
-    say Sys.class_name(42)        # "Number"
-    say Sys.class_name("hello")   # "String"
-    say Sys.class_name([1,2,3])   # "Array"
-
-=cut
-
-=head2 defined
-
-    Sys.defined(obj)
-
-Returns true if the object is defined (not nil), false otherwise. This is useful for checking whether a variable has been assigned a value.
-
-    say Sys.defined(nil)      # false
-    say Sys.defined(0)        # true
-    say Sys.defined("")       # true
-
-=cut
-
-=head2 die
-
-    Sys.die(*args)
-
-Raises a fatal exception with the specified message and terminates the program unless caught by an eval or try-catch block. The arguments are concatenated to form the error message.
-
-    Sys.die("Fatal error occurred!")
-    Sys.die("Error: ", error_msg, " at line ", line_num)
-
-Aliases: I<raise>
-
-=cut
-
-=head2 eval
-
-    Sys.eval(code)
-
-Evaluates a string as Sidef code and returns the result. If an error occurs during evaluation, it returns nil and sets the error in STDERR.
-
-    var result = Sys.eval("2 + 2")  # 4
-    var result = Sys.eval("say 'Hello'")
-
-=cut
-
-=head2 exec
-
-    Sys.exec(*args)
-
-Executes an external command, replacing the current process. This function does not return on success. Arguments can be a single string or a list of command and arguments.
-
-    Sys.exec("ls", "-la", "/tmp")
-    Sys.exec("echo 'Hello World'")
-
-=cut
-
-=head2 exit
-
-    Sys.exit(code)
-
-Terminates the program immediately with the specified exit code. An exit code of 0 typically indicates success, while non-zero values indicate various error conditions.
-
-    Sys.exit(0)     # Success
-    Sys.exit(1)     # Error
-
-=cut
+=head1 PROCESS CONTROL
 
 =head2 fork
 
-    Sys.fork
+    self.fork
 
-Creates a child process. Returns the child process ID (PID) to the parent process, 0 to the child process, or nil on failure.
+Creates a child process. Returns the child's process ID (PID) to the parent process, C<0> to the child process, or C<nil> on failure.
 
     var pid = Sys.fork
+
     if (pid == 0) {
         say "I am the child"
         Sys.exit(0)
@@ -148,239 +69,40 @@ Creates a child process. Returns the child process ID (PID) to the parent proces
 
 =cut
 
-=head2 getgrent
+=head2 wait
 
-    Sys.getgrent
+    self.wait
 
-Returns the next group entry from the system group database. Returns nil when there are no more entries. Must be reset with setgrent() to iterate again.
+Waits for any child process to terminate and returns its process ID, or C<-1> if there are no child processes to wait for.
 
-    Sys.setgrent
-    while (var group = Sys.getgrent) {
-        say group
+    var pid = Sys.fork
+
+    if (pid == 0) {
+        Sys.exit(0)
+    }
+    else {
+        var terminated_pid = Sys.wait
+        say "Child #{terminated_pid} terminated"
     }
 
 =cut
 
-=head2 getgrgid
+=head2 exit
 
-    Sys.getgrgid(gid)
+    self.exit(code)
 
-Returns group information for the specified group ID (GID). Returns a hash containing group details including name, password, gid, and members.
+Terminates the program immediately with the specified exit code. An exit code of 0 typically indicates success, while non-zero values indicate various error conditions. If omitted, C<code> defaults to 0.
 
-    var group = Sys.getgrgid(0)
-    say group{:name}     # Usually "root" or "wheel"
-
-=cut
-
-=head2 getgrnam
-
-    Sys.getgrnam(name)
-
-Returns group information for the specified group name. Returns a hash containing group details including name, password, gid, and members.
-
-    var group = Sys.getgrnam('wheel')
-    say group{:gid}
-
-=cut
-
-=head2 gethostbyaddr
-
-    Sys.gethostbyaddr(addr, addrtype)
-
-Returns host information for the specified network address. The addrtype parameter specifies the address family (typically 2 for AF_INET).
-
-    var host = Sys.gethostbyaddr("127.0.0.1", 2)
-
-=cut
-
-=head2 gethostbyname
-
-    Sys.gethostbyname(name)
-
-Returns host information for the specified hostname. Returns a hash containing name, aliases, addrtype, and addresses.
-
-    var host = Sys.gethostbyname('localhost')
-    say host{:name}
-
-=cut
-
-=head2 gethostent
-
-    Sys.gethostent
-
-Returns the next host entry from the system hosts database. Returns nil when there are no more entries.
-
-=cut
-
-=head2 getnetbyaddr
-
-    Sys.getnetbyaddr(addr, addrtype)
-
-Returns network information for the specified network address and address type.
-
-=cut
-
-=head2 getnetbyname
-
-    Sys.getnetbyname(name)
-
-Returns network information for the specified network name.
-
-    var net = Sys.getnetbyname('loopback')
-
-=cut
-
-=head2 getnetent
-
-    Sys.getnetent
-
-Returns the next network entry from the system networks database. Returns nil when there are no more entries.
-
-=cut
-
-=head2 getpgrp
-
-    Sys.getpgrp(pid)
-
-Returns the process group ID for the specified process ID. If pid is 0 or nil, returns the process group of the current process.
-
-    var pgrp = Sys.getpgrp(0)  # Current process group
-
-=cut
-
-=head2 getppid
-
-    Sys.getppid
-
-Returns the process ID (PID) of the parent process.
-
-    say "My parent PID is: ", Sys.getppid
-
-=cut
-
-=head2 getpriority
-
-    Sys.getpriority(which, who)
-
-Returns the priority (nice value) of a process, process group, or user. The which parameter specifies the type (0=process, 1=process group, 2=user), and who specifies the ID.
-
-    var priority = Sys.getpriority(0, 0)  # Current process priority
-
-=cut
-
-=head2 getprotobyname
-
-    Sys.getprotobyname(name)
-
-Returns protocol information for the specified protocol name (e.g., 'tcp', 'udp', 'icmp').
-
-    var proto = Sys.getprotobyname('tcp')
-    say proto{:proto}  # Protocol number
-
-=cut
-
-=head2 getprotobynumber
-
-    Sys.getprotobynumber(num)
-
-Returns protocol information for the specified protocol number.
-
-    var proto = Sys.getprotobynumber(6)  # TCP
-
-=cut
-
-=head2 getprotoent
-
-    Sys.getprotoent
-
-Returns the next protocol entry from the system protocols database. Returns nil when there are no more entries.
-
-=cut
-
-=head2 getpwent
-
-    Sys.getpwent
-
-Returns the next user entry from the system password database. Returns nil when there are no more entries. Must be reset with setpwent() to iterate again.
-
-    Sys.setpwent
-    while (var user = Sys.getpwent) {
-        say user{:name}
-    }
-
-=cut
-
-=head2 getpwnam
-
-    Sys.getpwnam(name)
-
-Returns user information for the specified username. Returns a hash containing name, passwd, uid, gid, gecos, dir, and shell.
-
-    var user = Sys.getpwnam('root')
-    say user{:uid}
-    say user{:dir}
-
-=cut
-
-=head2 getpwuid
-
-    Sys.getpwuid(uid)
-
-Returns user information for the specified user ID (UID). Returns a hash containing name, passwd, uid, gid, gecos, dir, and shell.
-
-    var user = Sys.getpwuid(1000)
-    say user{:name}
-
-=cut
-
-=head2 getservbyname
-
-    Sys.getservbyname(name, proto)
-
-Returns service information for the specified service name and protocol.
-
-    var service = Sys.getservbyname('http', 'tcp')
-    say service{:port}  # 80
-
-=cut
-
-=head2 getservbyport
-
-    Sys.getservbyport(port, proto)
-
-Returns service information for the specified port number and protocol.
-
-    var service = Sys.getservbyport(80, 'tcp')
-    say service{:name}  # "http"
-
-=cut
-
-=head2 getservent
-
-    Sys.getservent
-
-Returns the next service entry from the system services database. Returns nil when there are no more entries.
-
-=cut
-
-=head2 isweak
-
-    Sys.isweak(obj)
-
-Returns true if the reference to the object is weak (will not prevent garbage collection), false otherwise.
-
-    var ref = \obj
-    say Sys.isweak(ref)  # false
-    Sys.weaken(ref)
-    say Sys.isweak(ref)  # true
+    Sys.exit(0)     # Success
+    Sys.exit(1)     # Error
 
 =cut
 
 =head2 kill
 
-    Sys.kill(signal, *list)
+    self.kill(signal, *list)
 
-Sends the specified signal to the list of process IDs. Returns the number of processes successfully signaled. Signal can be a number or a name (e.g., 'TERM', 'KILL', 'HUP').
+Sends C<signal> to each process ID in C<list>. C<signal> can be a signal name (e.g. C<'TERM'>, C<'KILL'>, C<'HUP'>) or number. Returns the number of processes successfully signaled.
 
     Sys.kill('TERM', 1234)        # Terminate process 1234
     Sys.kill(9, 1234, 5678)       # Kill multiple processes
@@ -388,339 +110,106 @@ Sends the specified signal to the list of process IDs. Returns the number of pro
 
 =cut
 
-=head2 nano_sleep
+=head2 system
 
-    Sys.nano_sleep(sec)
+    self.system(*args)
 
-Suspends execution for the specified number of seconds with nanosecond precision. Unlike sleep(), this accepts fractional seconds.
+Executes an external command and waits for it to complete, exactly like Perl's built-in C<system>. Output goes directly to STDOUT/STDERR. Returns the raw child status value: C<0> means the command exited successfully; any other value packs the exit code and signal information together (the actual exit code is the returned value shifted right by 8 bits).
 
-    Sys.nano_sleep(0.5)       # Sleep for 500 milliseconds
-    Sys.nano_sleep(1.25)      # Sleep for 1.25 seconds
+    Sys.system("ls", "-la")
 
-Aliases: I<nanosleep>
-
-=cut
-
-=head2 open
-
-    Sys.open(var, mode, filename)
-
-Opens a file and assigns the file handle to the specified variable. Mode can be '<' (read), '>' (write), '>>' (append), '+<' (read/write), etc. Returns true on success, false on failure.
-
-    Sys.open(var fh, '<', 'input.txt') && do {
-        say fh.readline
-        fh.close
-    }
-
-=cut
-
-=head2 opendir
-
-    Sys.opendir(var, dirname)
-
-Opens a directory and assigns the directory handle to the specified variable. Returns true on success, false on failure.
-
-    Sys.opendir(var dh, '/tmp') && do {
-        while (var entry = dh.read) {
-            say entry
-        }
-        dh.close
-    }
-
-=cut
-
-=head2 os
-
-    Sys.os
-
-Returns the operating system name as a string (e.g., 'linux', 'darwin', 'MSWin32', 'freebsd').
-
-    say Sys.os
-    if (Sys.os == 'linux') {
-        say "Running on Linux"
-    }
-
-Aliases: I<osname>
-
-=cut
-
-=head2 print
-
-    Sys.print(*args)
-
-Prints the arguments to the currently selected output filehandle (default STDOUT) without appending a newline. Returns true.
-
-    Sys.print("Hello")
-    Sys.print("Value: ", value, " at ", timestamp)
-
-=cut
-
-=head2 printf
-
-    Sys.printf(*args)
-
-Formats and prints output according to a format string (first argument) to the currently selected output filehandle. Uses sprintf-style formatting.
-
-    Sys.printf("Value: %d, Name: %s\n", 42, "Alice")
-    Sys.printf("%.2f%%\n", percentage)
-
-=cut
-
-=head2 printh
-
-    Sys.printh(fh, *args)
-
-Prints the arguments to the specified filehandle without appending a newline. Returns true.
-
-    Sys.open(var fh, '>', 'output.txt')
-    Sys.printh(fh, "Line 1")
-    Sys.printh(fh, "Line 2")
-    fh.close
-
-=cut
-
-=head2 read
-
-    Sys.read(type, opt_arg)
-
-Reads input from STDIN based on the specified type. The type parameter determines what kind of input to read, and opt_arg provides additional options.
-
-    var line = Sys.read(:line)
-    var char = Sys.read(:char)
-
-=cut
-
-=head2 readln
-
-    Sys.readln(text)
-
-Reads a line of input from STDIN, optionally displaying a prompt first. Returns the input string without the trailing newline.
-
-    var name = Sys.readln("Enter your name: ")
-    var age = Sys.readln("Enter your age: ")
-
-Aliases: I<scanln>, I<readline>
-
-=cut
-
-=head2 ref
-
-    Sys.ref(obj)
-
-Returns a reference to the object. This creates a reference that can be dereferenced later.
-
-    var x = 42
-    var r = Sys.ref(x)
-    say *r  # Dereference: 42
-
-=cut
-
-=head2 refaddr
-
-    Sys.refaddr(obj)
-
-Returns the memory address of the reference as a number. This is useful for debugging and understanding object identity.
-
-    var obj = [1, 2, 3]
-    say Sys.refaddr(obj)  # e.g., 140234567890123
-
-=cut
-
-=head2 reftype
-
-    Sys.reftype(obj)
-
-Returns the reference type of the object as a string (e.g., 'ARRAY', 'HASH', 'SCALAR', 'CODE').
-
-    say Sys.reftype([1,2,3])    # "ARRAY"
-    say Sys.reftype({a:1})      # "HASH"
-
-=cut
-
-=head2 run
-
-    Sys.run(*args)
-
-Executes an external command and waits for it to complete. Returns true if the command succeeded (exit status 0), false otherwise. Output is displayed to STDOUT/STDERR.
-
-    Sys.run("ls", "-la")
-    Sys.run("echo 'Hello World'")
-
-    if (Sys.run("command")) {
+    var status = Sys.system("false")
+    if (status == 0) {
         say "Command succeeded"
     }
-
-Aliases: I<s>
-
-=cut
-
-=head2 say
-
-    Sys.say(*args)
-
-Prints the arguments to the currently selected output filehandle (default STDOUT) and appends a newline. Returns true.
-
-    Sys.say("Hello, World!")
-    Sys.say("Value: ", value)
-    Sys.say()  # Print empty line
-
-Aliases: I<println>
-
-=cut
-
-=head2 select
-
-    Sys.select(fh)
-
-Sets the specified filehandle as the default output filehandle for print, printf, say, etc. Returns the previously selected filehandle.
-
-    Sys.open(var fh, '>', 'output.txt')
-    var old = Sys.select(fh)
-    say "This goes to the file"
-    Sys.select(old)
-    say "This goes to STDOUT"
-
-=cut
-
-=head2 setgrent
-
-    Sys.setgrent
-
-Resets the group database iterator to the beginning, allowing getgrent() to iterate from the start again.
-
-    Sys.setgrent
-    while (var group = Sys.getgrent) {
-        # Process groups
+    else {
+        say "Command failed with exit code #{status >> 8}"
     }
 
-=cut
-
-=head2 sethostent
-
-    Sys.sethostent(stayopen)
-
-Opens and rewinds the hosts database. If stayopen is true, the database connection remains open for efficiency.
+Aliases: I<run>
 
 =cut
 
-=head2 setnetent
+=head2 exec
 
-    Sys.setnetent(stayopen)
+    self.exec(*args)
 
-Opens and rewinds the networks database. If stayopen is true, the database connection remains open for efficiency.
+Replaces the current process image with the specified external command. This function does not return on success — the calling program is gone. Arguments can be a single command string or a command followed by its individual arguments.
+
+    Sys.exec("ls", "-la", "/tmp")
+    Sys.exec("echo 'Hello World'")
+
+=cut
+
+=head2 getppid
+
+    self.getppid
+
+Returns the process ID (PID) of the parent process.
+
+    say "My parent PID is: #{Sys.getppid}"
+
+=cut
+
+=head2 getpgrp
+
+    self.getpgrp(pid)
+
+Returns the process group ID for the specified process ID. If C<pid> is omitted, returns the process group of the current process.
+
+    var pgrp = Sys.getpgrp()   # Current process group
+    var pgrp2 = Sys.getpgrp(1234)
 
 =cut
 
 =head2 setpgrp
 
-    Sys.setpgrp(pid, pgrp)
+    self.setpgrp(pid, pgrp)
 
-Sets the process group for the specified process ID. Both parameters of 0 set the process group of the current process.
+Sets the process group for the specified process ID. Both parameters default to C<0> if omitted, which sets the current process as its own process group leader.
 
     Sys.setpgrp(0, 0)  # Set current process as process group leader
 
 =cut
 
+=head2 getpriority
+
+    self.getpriority(which, who)
+
+Returns the current priority (nice value) of a process, process group, or user. C<which> specifies the target kind (C<0> = process, C<1> = process group, C<2> = user), and C<who> specifies its ID.
+
+    var priority = Sys.getpriority(0, 0)  # Current process priority
+
+=cut
+
 =head2 setpriority
 
-    Sys.setpriority(which, who, priority)
+    self.setpriority(which, who, priority)
 
-Sets the priority (nice value) of a process, process group, or user. The which parameter specifies the type (0=process, 1=process group, 2=user), who specifies the ID, and priority is the new priority value (-20 to 20, where lower numbers mean higher priority).
+Sets the priority (nice value) of a process, process group, or user. C<which> specifies the target kind (C<0> = process, C<1> = process group, C<2> = user), C<who> specifies its ID, and C<priority> is the new value (lower numbers mean higher scheduling priority).
 
     Sys.setpriority(0, 0, 10)  # Lower priority of current process
 
 =cut
 
-=head2 setprotoent
+=head1 TIMING
 
-    Sys.setprotoent(stayopen)
+=head2 alarm
 
-Opens and rewinds the protocols database. If stayopen is true, the database connection remains open for efficiency.
+    self.alarm(sec)
 
-=cut
+Schedules a SIGALRM signal to be delivered to the process after C<sec> seconds (fractional seconds are supported). Setting C<sec> to 0 cancels any pending alarm. Returns a boolean: true if a previous alarm still had time remaining when this call replaced it, false otherwise (including when there was no previous alarm).
 
-=head2 setpwent
-
-    Sys.setpwent
-
-Resets the password database iterator to the beginning, allowing getpwent() to iterate from the start again.
-
-    Sys.setpwent
-    while (var user = Sys.getpwent) {
-        # Process users
-    }
-
-=cut
-
-=head2 setservent
-
-    Sys.setservent(stayopen)
-
-Opens and rewinds the services database. If stayopen is true, the database connection remains open for efficiency.
-
-=cut
-
-=head2 sidef
-
-    Sys.sidef
-
-Returns the version of the Sidef interpreter as a string.
-
-    say "Sidef version: ", Sys.sidef
-
-=cut
-
-=head2 sleep
-
-    Sys.sleep(sec)
-
-Suspends execution for the specified number of seconds (integer). For fractional seconds, use nano_sleep() or usleep().
-
-    Sys.sleep(5)   # Sleep for 5 seconds
-    Sys.sleep(1)   # Sleep for 1 second
-
-=cut
-
-=head2 stderr
-
-    Sys.stderr
-
-Returns the standard error filehandle (STDERR). This can be used for error output and diagnostics.
-
-    Sys.stderr.say("Error message")
-    Sys.printh(Sys.stderr, "Warning: ")
-
-=cut
-
-=head2 stdin
-
-    Sys.stdin
-
-Returns the standard input filehandle (STDIN). This can be used for reading input.
-
-    var line = Sys.stdin.readline
-    while (var line = Sys.stdin.readline) {
-        say line
-    }
-
-=cut
-
-=head2 stdout
-
-    Sys.stdout
-
-Returns the standard output filehandle (STDOUT). This can be used for explicit output operations.
-
-    Sys.stdout.say("Hello")
-    Sys.printh(Sys.stdout, "Output")
+    Sys.alarm(10)  # Set alarm for 10 seconds
+    Sys.alarm(0)   # Cancel alarm
 
 =cut
 
 =head2 ualarm
 
-    Sys.ualarm(sec)
+    self.ualarm(usec)
 
-Schedules a SIGALRM signal to be delivered after the specified number of microseconds. Returns the number of microseconds remaining from any previously set alarm. This provides finer granularity than alarm().
+Like L</alarm>, but C<usec> is given in microseconds, allowing finer granularity. Returns a boolean: true if a previous alarm still had time remaining, false otherwise.
 
     Sys.ualarm(500000)  # Alarm in 500,000 microseconds (0.5 seconds)
 
@@ -728,47 +217,35 @@ Aliases: I<micro_alarm>
 
 =cut
 
-=head2 umask
+=head2 sleep
 
-    Sys.umask(mode)
+    self.sleep(sec)
 
-Sets the file creation mask (umask) and returns the previous mask. The umask determines the default permissions for newly created files and directories.
+Suspends execution for C<sec> seconds (fractional seconds are supported). Returns a boolean indicating whether any (nonzero) amount of time was actually slept.
 
-    var old = Sys.umask(0o022)  # Set umask to 022 (octal)
-    # Create files...
-    Sys.umask(old)              # Restore old umask
-
-=cut
-
-=head2 unweaken
-
-    Sys.unweaken(obj)
-
-Converts a weak reference back to a strong reference, preventing the object from being garbage collected if this is the only reference.
-
-    var ref = \obj
-    Sys.weaken(ref)
-    Sys.unweaken(ref)  # Now strong again
+    Sys.sleep(5)     # Sleep for 5 seconds
+    Sys.sleep(0.5)   # Sleep for half a second
 
 =cut
 
-=head2 user
+=head2 nanosleep
 
-    Sys.user
+    self.nanosleep(nsec)
 
-Returns the username of the current user as a string.
+Suspends execution for C<nsec> I<nanoseconds> — despite the similarly-named L</sleep>, this method's argument is a nanosecond count, not a (possibly fractional) second count. Returns a boolean indicating whether any (nonzero) amount of time was actually slept.
 
-    say "Current user: ", Sys.user
+    Sys.nanosleep(500_000_000)   # Sleep for 500,000,000 ns = 0.5 seconds
+    Sys.nanosleep(1_000_000)     # Sleep for 1,000,000 ns = 1 millisecond
 
-Aliases: I<getlogin>
+Aliases: I<nano_sleep>
 
 =cut
 
 =head2 usleep
 
-    Sys.usleep(sec)
+    self.usleep(usec)
 
-Suspends execution for the specified number of microseconds.
+Suspends execution for C<usec> microseconds. Returns a boolean indicating whether any (nonzero) amount of time was actually slept.
 
     Sys.usleep(500000)     # Sleep for 500,000 microseconds (0.5 seconds)
     Sys.usleep(1000000)    # Sleep for 1,000,000 microseconds (1 second)
@@ -777,41 +254,290 @@ Aliases: I<micro_sleep>
 
 =cut
 
-=head2 wait
+=head1 INPUT/OUTPUT
 
-    Sys.wait
+=head2 print
 
-Waits for a child process to terminate and returns the process ID of the terminated child, or -1 if there are no child processes. The exit status can be retrieved from the $? variable.
+    self.print(*args)
 
-    var pid = Sys.fork
-    if (pid == 0) {
-        # Child process
-        Sys.exit(0)
-    }
-    else {
-        # Parent process
-        var terminated_pid = Sys.wait
-        say "Child #{terminated_pid} terminated"
+Prints the arguments to the currently selected output filehandle (default STDOUT), without appending a newline. Returns a boolean indicating success.
+
+    Sys.print("Hello")
+    Sys.print("Value: ", value, " at ", timestamp)
+
+=cut
+
+=head2 printf
+
+    self.printf(format, *args)
+
+Formats and prints output according to a C<sprintf>-style format string to the currently selected output filehandle. Returns a boolean indicating success.
+
+    Sys.printf("Value: %d, Name: %s\n", 42, "Alice")
+    Sys.printf("%.2f%%\n", percentage)
+
+=cut
+
+=head2 printh
+
+    self.printh(fh, *args)
+
+Prints the arguments to the specified filehandle without appending a newline. C<fh> may be a raw filehandle (as returned by, e.g., L</select>) or a Sidef filehandle-like object supporting its own C<print> method — in the latter case, this simply delegates to C<fh.print(*args)>. Returns a boolean indicating success.
+
+    Sys.open(\var fh, '>', 'output.txt')
+    Sys.printh(fh, "Line 1")
+    Sys.printh(fh, "Line 2")
+    fh.close
+
+=cut
+
+=head2 println
+
+    self.println(*args)
+
+Prints the arguments to the currently selected output filehandle (default STDOUT) and appends a newline. Returns a boolean indicating success.
+
+    Sys.println("Hello, World!")
+    Sys.println("Value: ", value)
+    Sys.println()  # Print empty line
+
+Aliases: I<say>
+
+=cut
+
+=head2 scanln
+
+    self.scanln(prompt)
+
+Displays C<prompt> (if given) and reads a single line of input from the terminal, returning it as a String with the trailing newline removed. Returns C<nil> on end of input.
+
+    var name = Sys.scanln("Enter your name: ")
+    var age = Sys.scanln("Enter your age: ")
+
+Aliases: I<readln>, I<readline>
+
+=cut
+
+=head2 read
+
+    self.read(type)
+    self.read(prompt, type)
+
+Displays C<prompt> (if given), reads a single line of input from the terminal, and constructs a new object of C<type> from it (i.e. C<type.new(input)>). C<type> must be a class that accepts a raw string in its constructor, such as C<String> or C<Number>. Returns C<nil> on end of input.
+
+    var name = Sys.read(String)
+    var count = Sys.read("How many? ", Number)
+
+L</scanln> is a thin wrapper around this that always uses C<String> as the type.
+
+=cut
+
+=head2 select
+
+    self.select(fh)
+
+Sets the specified filehandle as the default output filehandle for L</print>, L</printf>, L</println>, etc. Returns the previously selected filehandle, as a raw (unwrapped) filehandle rather than a Sidef filehandle object — suitable for passing straight back into C<select> to restore it later, but not for calling Sidef filehandle methods on directly.
+
+    Sys.open(\var fh, '>', 'output.txt')
+    var old = Sys.select(fh)
+    say "This goes to the file"
+    Sys.select(old)
+    say "This goes to STDOUT"
+
+=cut
+
+=head2 stdin
+
+    self.stdin
+
+Returns the standard input filehandle (STDIN).
+
+    var line = Sys.stdin.readline
+
+=cut
+
+=head2 stdout
+
+    self.stdout
+
+Returns the standard output filehandle (STDOUT).
+
+    Sys.stdout.say("Hello")
+
+=cut
+
+=head2 stderr
+
+    self.stderr
+
+Returns the standard error filehandle (STDERR).
+
+    Sys.stderr.say("Error message")
+
+=cut
+
+=head1 FILE AND DIRECTORY OPERATIONS
+
+=head2 open
+
+    self.open(var, mode, filename)
+
+Opens C<filename> (converted via its C<to_file> method) and assigns the resulting filehandle to C<var>. C<mode> follows the usual conventions (C<'<'> for read, C<'>'> for write, C<'>>'> for append, etc.). The actual return value and supported modes are governed by the file object's own C<open> method.
+
+    Sys.open(\var fh, '<', 'input.txt') && do {
+        say fh.readline
+        fh.close
     }
 
 =cut
 
-=head2 warn
+=head2 opendir
 
-    Sys.warn(*args)
+    self.opendir(var, dirname)
 
-Prints a warning message to STDERR. The arguments are concatenated to form the warning message. Unlike die(), this does not terminate the program.
+Opens the directory at C<dirname> (converted via its C<to_dir> method) and assigns the resulting directory handle to C<var>.
 
-    Sys.warn("Warning: low disk space")
-    Sys.warn("Deprecated function used at line ", line_num)
+    Sys.opendir(\var dh, '/tmp') && do {
+        while (var entry = dh.read) {
+            say entry
+        }
+        dh.close
+    }
 
 =cut
+
+=head1 SYSTEM INFORMATION
+
+=head2 osname
+
+    self.osname
+
+Returns the operating system name as a string (e.g., C<'linux'>, C<'darwin'>, C<'MSWin32'>, C<'freebsd'>), taken directly from Perl's C<$^O>.
+
+    say Sys.osname
+
+    if (Sys.osname == 'linux') {
+        say "Running on Linux"
+    }
+
+Aliases: I<os>
+
+=cut
+
+=head2 user
+
+    self.user
+
+Returns the login name of the current user as a string.
+
+    say "Current user: #{Sys.user}"
+
+Aliases: I<getlogin>
+
+=cut
+
+=head2 sidef
+
+    self.sidef
+
+Returns the absolute filesystem path of the currently running script.
+
+    say "Running: #{Sys.sidef}"
+
+=cut
+
+=head2 umask
+
+    self.umask(mode)
+
+Sets the file creation mask (umask) to C<mode> and returns the I<previous> mask. If C<mode> is omitted, simply returns the current mask without changing it.
+
+    var old = Sys.umask(0o022)  # Set umask to 022 (octal)
+    # Create files...
+    Sys.umask(old)              # Restore old umask
+
+=cut
+
+=head1 OBJECT INTROSPECTION
+
+=head2 ref
+
+    self.ref(obj)
+
+Returns a string describing what kind of reference C<obj> is: the blessed class name for an object, a bare type such as C<'ARRAY'>, C<'HASH'>, or C<'CODE'> for an unblessed reference, or an empty string if C<obj> is not a reference at all. This mirrors Perl's built-in C<ref> function.
+
+    say Sys.ref([1, 2, 3])          # "Sidef::Types::Array::Array"
+    say Sys.ref(Hash())             # "Sidef::Types::Hash::Hash"
+    say Sys.ref(42)                 # "Sidef::Types::Number::Number"
+
+See also L</reftype> (which ignores blessing) and L</class_name> (which strips the package prefix).
+
+=cut
+
+=head2 reftype
+
+    self.reftype(obj)
+
+Returns the underlying storage type of a reference as a string (e.g., C<'ARRAY'>, C<'HASH'>, C<'SCALAR'>, C<'CODE'>), ignoring any blessing — unlike L</ref>, this always reports the raw storage kind even for blessed objects.
+
+    say Sys.reftype([1,2,3])    # "ARRAY"
+    say Sys.reftype(Hash())     # "HASH"
+
+=cut
+
+=head2 class_name
+
+    self.class_name(obj)
+
+Returns the short class name of the given object — the part of its full package name after the last C<::>.
+
+    say Sys.class_name(42)        # "Number"
+    say Sys.class_name("hello")   # "String"
+    say Sys.class_name([1,2,3])   # "Array"
+
+=cut
+
+=head2 defined
+
+    self.defined(obj)
+
+Returns true if C<obj> is defined (not C<nil>), false otherwise.
+
+    say Sys.defined(nil)      # false
+    say Sys.defined(0)        # true
+    say Sys.defined("")       # true
+
+=cut
+
+=head2 refaddr
+
+    self.refaddr(obj)
+
+Returns the memory address of the reference as a number. Useful for debugging and checking object identity.
+
+    var obj = [1, 2, 3]
+    say Sys.refaddr(obj)  # e.g., 140234567890123
+
+=cut
+
+=head2 bless
+
+    self.bless(obj, class)
+
+Blesses C<obj> into C<class>, changing its type, and returns the blessed object.
+
+    var obj = Hash()
+    Sys.bless(obj, :MyClass)
+
+=cut
+
+=head1 WEAK REFERENCES
 
 =head2 weaken
 
-    Sys.weaken(obj)
+    self.weaken(obj)
 
-Converts a reference to a weak reference. Weak references do not prevent the referenced object from being garbage collected.
+Converts a reference to a weak reference in place. Weak references do not prevent the referenced object from being garbage collected. Returns a boolean indicating success.
 
     var obj = [1, 2, 3]
     var ref = \obj
@@ -819,6 +545,347 @@ Converts a reference to a weak reference. Weak references do not prevent the ref
     # obj can now be garbage collected even though ref exists
 
 =cut
+
+=head2 isweak
+
+    self.isweak(obj)
+
+Returns true if the reference is weak (won't prevent garbage collection), false otherwise.
+
+    var ref = \obj
+    say Sys.isweak(ref)  # false
+    Sys.weaken(ref)
+    say Sys.isweak(ref)  # true
+
+=cut
+
+=head2 unweaken
+
+    self.unweaken(obj)
+
+Converts a weak reference back into a strong reference in place. Returns a boolean indicating success.
+
+    Sys.weaken(ref)
+    Sys.unweaken(ref)  # Now strong again
+
+=cut
+
+=head1 ERROR HANDLING AND OUTPUT
+
+=head2 die
+
+    self.die(*args)
+
+Raises a fatal exception, concatenating the arguments to form the error message, and terminates the program unless caught. A trailing newline is added automatically, so Perl's usual "at FILE line N" suffix is suppressed.
+
+    Sys.die("Fatal error occurred!")
+    Sys.die("Error: ", error_msg, " at line ", line_num)
+
+Aliases: I<raise>
+
+=cut
+
+=head2 warn
+
+    self.warn(*args)
+
+Prints a warning message to STDERR, concatenating the arguments to form the message. A trailing newline is added automatically. Unlike L</die>, this does not terminate the program.
+
+    Sys.warn("Warning: low disk space")
+    Sys.warn("Deprecated function used at line ", line_num)
+
+=cut
+
+=head1 USER AND GROUP DATABASES
+
+These methods query the traditional Unix user and group databases (as one would with C<getpwnam(3)>/C<getgrnam(3)> and friends). A successful lookup returns an B<Array> of positional fields (not a hash) — see each method below for its exact field order.
+
+=head2 getpwnam
+
+    self.getpwnam(name)
+
+Looks up a user by login name. On success, returns an array with fields, in order: C<[name, passwd, uid, gid, quota, comment, gcos]>, followed by the shell, i.e. C<[name, passwd, uid, gid, quota, comment, gcos, shell]>. Note that the home directory is not included in the returned array. Returns C<nil> if the user isn't found.
+
+    var user = Sys.getpwnam('root')
+    say user[0]   # name
+    say user[2]   # uid
+
+=cut
+
+=head2 getpwuid
+
+    self.getpwuid(uid)
+
+Looks up a user by numeric user ID. Returns the same array shape as L</getpwnam>, or C<nil> if not found.
+
+    var user = Sys.getpwuid(1000)
+    say user[0]   # name
+
+=cut
+
+=head2 getpwent
+
+    self.getpwent
+
+Returns the next entry from the user database as the same array shape as L</getpwnam>, or C<nil> when there are no more entries. Use L</setpwent> to rewind and iterate again.
+
+    Sys.setpwent
+    while (var user = Sys.getpwent) {
+        say user[0]
+    }
+
+=cut
+
+=head2 setpwent
+
+    self.setpwent
+
+Resets the user database iterator to the beginning, so L</getpwent> starts over from the first entry. Returns a boolean.
+
+=cut
+
+=head2 getgrnam
+
+    self.getgrnam(name)
+
+Looks up a group by name. B<Note:> due to how this lookup is currently implemented, a I<successful> lookup returns just the group's name as a plain string (the passwd/gid/members fields are not accessible this way), while an I<unsuccessful> lookup returns an array of mostly-undefined values rather than C<nil> — the reverse of the not-found convention used elsewhere in this class.
+
+    var name = Sys.getgrnam('wheel')
+    say name   # "wheel"
+
+=cut
+
+=head2 getgrgid
+
+    self.getgrgid(gid)
+
+Looks up a group by numeric group ID. See the caveat under L</getgrnam> — this currently behaves the same way.
+
+    var name = Sys.getgrgid(0)
+
+=cut
+
+=head2 getgrent
+
+    self.getgrent
+
+Returns the next entry from the group database. See the caveat under L</getgrnam> — this currently behaves the same way. Use L</setgrent> to rewind and iterate again.
+
+    Sys.setgrent
+    while (var group = Sys.getgrent) {
+        say group
+    }
+
+=cut
+
+=head2 setgrent
+
+    self.setgrent
+
+Resets the group database iterator to the beginning, so L</getgrent> starts over from the first entry. Returns a boolean.
+
+=cut
+
+=head1 NETWORK DATABASES
+
+These methods query the traditional Unix host, network, protocol, and service databases. Like the user/group lookups above, a successful result is returned as an B<Array> of positional fields, and C<nil> is returned when nothing is found.
+
+=head2 gethostbyname
+
+    self.gethostbyname(name)
+
+Looks up a host by name. Returns an array C<[name, aliases, addrtype, length, addrs]>, where C<aliases> is a single (possibly space-separated) string of alternate names, and C<addrs> is an array of address strings.
+
+    var host = Sys.gethostbyname('localhost')
+    say host[0]   # name
+    say host[4]   # array of addresses
+
+=cut
+
+=head2 gethostbyaddr
+
+    self.gethostbyaddr(addr, addrtype)
+
+Looks up a host by network address. C<addrtype> specifies the address family (typically C<2> for AF_INET). Returns the same array shape as L</gethostbyname>.
+
+    var host = Sys.gethostbyaddr("127.0.0.1", 2)
+
+=cut
+
+=head2 gethostent
+
+    self.gethostent
+
+Returns the next entry from the hosts database, in the same array shape as L</gethostbyname>, or C<nil> when there are no more entries. Use L</sethostent> to rewind.
+
+=cut
+
+=head2 sethostent
+
+    self.sethostent(stayopen)
+
+Opens and rewinds the hosts database. If C<stayopen> is true, the database connection is kept open for efficiency. Returns a boolean.
+
+=cut
+
+=head2 getnetbyname
+
+    self.getnetbyname(name)
+
+Looks up a network by name. Returns an array C<[name, aliases, addrtype, net]>.
+
+    var net = Sys.getnetbyname('loopback')
+
+=cut
+
+=head2 getnetbyaddr
+
+    self.getnetbyaddr(addr, addrtype)
+
+Looks up a network by address and address type. Returns the same array shape as L</getnetbyname>.
+
+=cut
+
+=head2 getnetent
+
+    self.getnetent
+
+Returns the next entry from the networks database, in the same array shape as L</getnetbyname>, or C<nil> when there are no more entries. Use L</setnetent> to rewind.
+
+=cut
+
+=head2 setnetent
+
+    self.setnetent(stayopen)
+
+Opens and rewinds the networks database. If C<stayopen> is true, the database connection is kept open for efficiency. Returns a boolean.
+
+=cut
+
+=head2 getprotobyname
+
+    self.getprotobyname(name)
+
+Looks up a protocol by name (e.g., C<'tcp'>, C<'udp'>, C<'icmp'>). Returns an array C<[name, aliases, proto]>.
+
+    var proto = Sys.getprotobyname('tcp')
+    say proto[2]  # protocol number, as a string
+
+=cut
+
+=head2 getprotobynumber
+
+    self.getprotobynumber(num)
+
+Looks up a protocol by its number. Returns the same array shape as L</getprotobyname>.
+
+    var proto = Sys.getprotobynumber(6)  # TCP
+
+=cut
+
+=head2 getprotoent
+
+    self.getprotoent
+
+Returns the next entry from the protocols database, in the same array shape as L</getprotobyname>, or C<nil> when there are no more entries. Use L</setprotoent> to rewind.
+
+=cut
+
+=head2 setprotoent
+
+    self.setprotoent(stayopen)
+
+Opens and rewinds the protocols database. If C<stayopen> is true, the database connection is kept open for efficiency. Returns a boolean.
+
+=cut
+
+=head2 getservbyname
+
+    self.getservbyname(name, proto)
+
+Looks up a service by name and protocol. Returns an array C<[name, aliases, port, proto]>, where C<port> is a number.
+
+    var service = Sys.getservbyname('http', 'tcp')
+    say service[2]  # 80
+
+=cut
+
+=head2 getservbyport
+
+    self.getservbyport(port, proto)
+
+Looks up a service by port number and protocol. Returns the same array shape as L</getservbyname>.
+
+    var service = Sys.getservbyport(80, 'tcp')
+    say service[0]  # "http"
+
+=cut
+
+=head2 getservent
+
+    self.getservent
+
+Returns the next entry from the services database, in the same array shape as L</getservbyname>, or C<nil> when there are no more entries. Use L</setservent> to rewind.
+
+=cut
+
+=head2 setservent
+
+    self.setservent(stayopen)
+
+Opens and rewinds the services database. If C<stayopen> is true, the database connection is kept open for efficiency. Returns a boolean.
+
+=cut
+
+=head1 EXAMPLES
+
+=head2 Forking a Child Process
+
+    var pid = Sys.fork
+
+    if ((pid == 0)) {
+        say "Child process running"
+        Sys.exit(0)
+    }
+    else {
+        Sys.wait
+        say "Child has finished"
+    }
+
+=head2 Reading Typed Input
+
+    var name  = Sys.scanln("Name: ")
+    var count = Sys.read("How many apples? ", Number)
+    Sys.printf("%s has %d apples\n", name, count)
+
+=head2 Redirecting Output Temporarily
+
+    Sys.open(var fh, '>', 'log.txt')
+    var old = Sys.select(fh)
+    say "This line goes to log.txt"
+    Sys.select(old)
+    say "This line goes back to the terminal"
+    fh.close
+
+=head2 Running a Command and Checking the Result
+
+    var status = Sys.system("grep", "-q", "root", "/etc/passwd")
+
+    if ((status == 0)) {
+        say "Found it"
+    }
+    else {
+        say "grep exited with code #{status >> 8}"
+    }
+
+=head2 Looking Up a User
+
+    var pw = Sys.getpwnam('root')
+
+    if (pw) {
+        say "UID: #{pw[2]}"
+        say "Shell: #{pw[7]}"
+    }
 
 =head1 SEE ALSO
 
