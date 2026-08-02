@@ -6,880 +6,473 @@ Sidef::Types::Glob::Socket - Socket networking interface for Sidef
 
 =head1 DESCRIPTION
 
-The Socket class provides a comprehensive interface to socket networking operations in Sidef. It wraps the functionality of Perl's Socket module, enabling network communication using various protocols including TCP, UDP, and Unix domain sockets. This class supports both IPv4 and IPv6 addressing, multicast operations, and provides utilities for address resolution and conversion.
+The C<Socket> class provides an interface to socket networking operations in Sidef. A C<Socket> object itself is a lightweight, stateless helper: it is used to create sockets (via L</open> or L</socketpair>) and to reach the full set of constants and address-conversion helpers exported by Perl's core C<Socket> module — it does not itself represent an open connection.
+
+Once you have an actual connection, you work with it through a L<Sidef::Types::Glob::SocketHandle> object (returned by L</open>, L</socketpair>, or C<SocketHandle>'s own C<accept>) — that's where C<bind>, C<listen>, C<accept>, C<connect>, C<send>, C<recv>, and the inherited file-handle methods (C<read>, C<print>, C<say>, C<close>, ...) live.
+
+B<Constants and conversion helpers:> Every name exported by Perl's core L<Socket> module (address family constants like C<AF_INET>, socket type constants like C<SOCK_STREAM>, option constants like C<SO_REUSEADDR>, and helper functions such as C<inet_aton> or C<pack_sockaddr_in>) is automatically made available as a method on C<Socket> — called with no arguments for a constant, or with the appropriate arguments for a function. Arguments you pass in are unwrapped to plain values before being handed to the underlying Perl function, and results are wrapped back into the corresponding Sidef type. This means C<Socket.AF_INET>, C<Socket.SOCK_STREAM>, C<Socket.SO_REUSEADDR>, and so on are all available even though they aren't individually listed below — this documentation covers the ones you're most likely to need directly.
 
 =head1 SYNOPSIS
 
-    # Create a TCP client socket
-    var sock = Socket()
-    sock.open(:PF_INET, :SOCK_STREAM, 0)
+    # Create and open a TCP socket
+    var factory = Socket.new
+    var sock = factory.open(Socket.PF_INET, Socket.SOCK_STREAM, 0) || die "Cannot open socket: #{$!}"
 
-    # Resolve a hostname
-    var host_info = Socket.gethostbyname('www.example.com')
-    say host_info
+    # Resolve a hostname to its packed address
+    var addr = Socket.inet_aton('127.0.0.1')
 
     # Pack a socket address
-    var port = 80
-    var addr = Socket.inet_aton('127.0.0.1')
-    var sockaddr = Socket.pack_sockaddr_in(port, addr)
+    var sockaddr = Socket.pack_sockaddr_in(80, addr)
+    sock.connect(sockaddr) || die "Cannot connect: #{$!}"
 
     # Create a socket pair for IPC
-    var (reader, writer) = (nil, nil)
-    Socket.socketpair(reader, writer, :PF_UNIX, :SOCK_STREAM, 0)
+    Socket.new.socketpair(\var reader, \var writer, Socket.PF_UNIX, Socket.SOCK_STREAM, 0)
 
 =head1 INHERITS
 
 Inherits methods from L<Sidef::Object::Object>.
 
-=head1 METHODS
+=head1 CONSTRUCTION
 
 =head2 new
 
-    Socket.new()
-    Socket()
+    Socket.new
 
-Creates and returns a new Socket object. This is the constructor for the Socket class.
+Creates a new, empty Socket helper object. This does not open any actual socket by itself — it takes no arguments, and any given are ignored. Use L</open> on the resulting object to actually create a socket.
 
-Example:
+    var factory = Socket.new
+    var sock = factory.open(Socket.PF_INET, Socket.SOCK_STREAM, 0)
 
-    var sock = Socket()
-    var sock2 = Socket.new()
+=cut
+
+=head1 CREATING SOCKETS
 
 =head2 open
 
-    sock.open(domain, type, protocol)
+    self.open(domain, type, protocol)
 
-Opens a socket with the specified domain (address family), type, and protocol. Returns true on success, false on failure.
+Creates a new socket with the given domain (address family), type, and protocol, and returns it as a L<Sidef::Types::Glob::SocketHandle> — I<not> a boolean. Returns C<nil> on failure. C<domain>, C<type>, and C<protocol> should be plain numeric values, typically obtained from the constant methods below (e.g. C<Socket.PF_INET>, C<Socket.SOCK_STREAM>).
 
-Parameters:
+    var sock = Socket.new.open(Socket.PF_INET, Socket.SOCK_STREAM, 0)
+    sock || die "Cannot open socket: #{$!}"
 
-=over 4
+    var udp = Socket.new.open(Socket.PF_INET, Socket.SOCK_DGRAM, 0)
 
-=item * B<domain> - Address family (e.g., :PF_INET for IPv4, :PF_INET6 for IPv6, :PF_UNIX for Unix domain)
-
-=item * B<type> - Socket type (e.g., :SOCK_STREAM for TCP, :SOCK_DGRAM for UDP)
-
-=item * B<protocol> - Protocol number (usually 0 to let the system choose)
-
-=back
-
-Example:
-
-    var sock = Socket()
-    sock.open(:PF_INET, :SOCK_STREAM, 0) || die "Cannot open socket: #{$!}"
+=cut
 
 =head2 socketpair
 
-    Socket.socketpair(socket1, socket2, domain, type, protocol)
+    self.socketpair(var1, var2, domain, type, protocol)
 
-Creates a pair of connected sockets, useful for inter-process communication. Returns true on success, false on failure.
+Creates a pair of connected, unnamed sockets (typically for local inter-process communication) and assigns the two resulting L<Sidef::Types::Glob::SocketHandle> objects into C<var1> and C<var2>, which must be passed by reference. Returns a boolean indicating success.
 
-Parameters:
+    Socket.new.socketpair(\var parent, \var child, Socket.PF_UNIX, Socket.SOCK_STREAM, 0)
+        || die "socketpair failed: #{$!}"
 
-=over 4
+    parent.say("hello from parent")
+    say child.readline
 
-=item * B<socket1> - Variable to receive the first socket
+=cut
 
-=item * B<socket2> - Variable to receive the second socket
+=head1 HOST, NETWORK, PROTOCOL, AND SERVICE LOOKUPS
 
-=item * B<domain> - Address family (typically :PF_UNIX)
-
-=item * B<type> - Socket type (e.g., :SOCK_STREAM)
-
-=item * B<protocol> - Protocol number (usually 0)
-
-=back
-
-Example:
-
-    var (parent, child) = (nil, nil)
-    Socket.socketpair(parent, child, :PF_UNIX, :SOCK_STREAM, 0) || die "socketpair failed: #{$!}"
-
-    # Now parent and child can communicate bidirectionally
-
-=head1 HOSTNAME AND ADDRESS RESOLUTION
+These methods query the traditional Unix host/network/protocol/service databases. Unlike the array-returning lookups you may have seen elsewhere in Sidef, each of these calls the underlying Perl function in a way that yields a I<single> value rather than a full record — see each method for exactly what that value is.
 
 =head2 gethostbyname
 
-    Socket.gethostbyname(name)
+    self.gethostbyname(name)
 
-Looks up a host by name and returns host information including name, aliases, address type, and addresses.
+Resolves a hostname and returns its packed binary network address (not a hostname, and not a record). Returns C<nil> if the name can't be resolved.
 
-Parameters:
+    var addr = Socket.gethostbyname('localhost')
+    say Socket.inet_ntoa(addr)     # e.g. "127.0.0.1"
 
-=over 4
-
-=item * B<name> - The hostname to look up
-
-=back
-
-Returns an array containing: [hostname, aliases, addrtype, addresses...]
-
-Example:
-
-    var info = Socket.gethostbyname('localhost')
-    say "Host: #{info[0]}"
-    say "Address type: #{info[2]}"
+=cut
 
 =head2 gethostbyaddr
 
-    Socket.gethostbyaddr(addr, addrtype)
+    self.gethostbyaddr(addr, addrtype)
 
-Looks up a host by its address and returns host information.
-
-Parameters:
-
-=over 4
-
-=item * B<addr> - The packed binary address
-
-=item * B<addrtype> - Address family (e.g., :AF_INET)
-
-=back
-
-Returns an array containing: [hostname, aliases, addrtype, addresses...]
-
-Example:
+Resolves a packed binary address back to a hostname string. C<addrtype> is an address family, typically C<Socket.AF_INET>. Returns C<nil> if the address can't be resolved.
 
     var addr = Socket.inet_aton('127.0.0.1')
-    var info = Socket.gethostbyaddr(addr, :AF_INET)
-    say "Hostname: #{info[0]}"
+    var name = Socket.gethostbyaddr(addr, Socket.AF_INET)
+    say name    # e.g. "localhost"
+
+=cut
 
 =head2 gethostent
 
-    Socket.gethostent()
+    self.gethostent
 
-Retrieves the next entry from the hosts database. Used for iterating through the hosts file.
-
-Returns an array of host information, or nil when no more entries exist.
-
-Example:
+Returns the name of the next entry from the hosts database, or C<nil> when there are no more entries. Use L</sethostent> to rewind.
 
     Socket.sethostent(1)
-    while (var ent = Socket.gethostent()) {
-        say ent[0]  # Print hostname
+    while (defined(var name = Socket.gethostent)) {
+        say name
     }
+
+=cut
 
 =head2 sethostent
 
-    Socket.sethostent(stayopen)
+    self.sethostent(stayopen)
 
-Opens and rewinds the hosts database. If stayopen is true, the database connection stays open between calls.
+Opens and rewinds the hosts database. If C<stayopen> is true, the database connection is kept open between calls. Returns a boolean.
 
-Parameters:
-
-=over 4
-
-=item * B<stayopen> - Boolean indicating whether to keep the database open
-
-=back
-
-Example:
-
-    Socket.sethostent(1)
-    # ... iterate through hosts ...
-
-=head2 getaddrinfo
-
-    Socket.getaddrinfo(host, service, hints)
-
-Performs modern address resolution, supporting both IPv4 and IPv6. Returns a list of address structures.
-
-This is the preferred method for address resolution in modern code, as it handles both IPv4 and IPv6 transparently.
-
-Example:
-
-    var results = Socket.getaddrinfo('www.example.com', 'http')
-    results.each { |addr|
-        say addr
-    }
-
-=head2 getnameinfo
-
-    Socket.getnameinfo(sockaddr, flags)
-
-Converts a socket address to a hostname and service name. This is the reverse operation of getaddrinfo.
-
-Parameters:
-
-=over 4
-
-=item * B<sockaddr> - Packed socket address
-
-=item * B<flags> - Optional flags to control the conversion
-
-=back
-
-Returns a pair [hostname, servicename].
-
-Example:
-
-    var sockaddr = Socket.pack_sockaddr_in(80, Socket.inet_aton('127.0.0.1'))
-    var (host, service) = Socket.getnameinfo(sockaddr)
-    say "Host: #{host}, Service: #{service}"
-
-=head1 NETWORK DATABASE QUERIES
+=cut
 
 =head2 getnetbyname
 
-    Socket.getnetbyname(name)
+    self.getnetbyname(name)
 
-Looks up a network by name and returns network information.
+Looks up a network by name and returns its address as a single value. Returns C<nil> if not found.
 
-Parameters:
+    var net = Socket.getnetbyname('loopback')
 
-=over 4
-
-=item * B<name> - The network name to look up
-
-=back
-
-Returns an array containing: [net_name, aliases, addrtype, net_address]
-
-Example:
-
-    var net_info = Socket.getnetbyname('loopback')
+=cut
 
 =head2 getnetbyaddr
 
-    Socket.getnetbyaddr(addr, addrtype)
+    self.getnetbyaddr(addr, addrtype)
 
-Looks up a network by its address.
+Looks up a network by address and returns its name. Returns C<nil> if not found.
 
-Parameters:
-
-=over 4
-
-=item * B<addr> - The network address
-
-=item * B<addrtype> - Address family
-
-=back
-
-Returns an array of network information.
+=cut
 
 =head2 getnetent
 
-    Socket.getnetent()
+    self.getnetent
 
-Retrieves the next entry from the networks database.
+Returns the next entry's name from the networks database, or C<nil> when exhausted. Use L</setnetent> to rewind.
 
-Returns an array of network information, or nil when exhausted.
+=cut
 
 =head2 setnetent
 
-    Socket.setnetent(stayopen)
+    self.setnetent(stayopen)
 
-Opens and rewinds the networks database.
+Opens and rewinds the networks database. If C<stayopen> is true, the connection is kept open between calls. Returns a boolean.
 
-Parameters:
-
-=over 4
-
-=item * B<stayopen> - Boolean indicating whether to keep the database open
-
-=back
-
-=head1 PROTOCOL DATABASE QUERIES
+=cut
 
 =head2 getprotobyname
 
-    Socket.getprotobyname(name)
+    self.getprotobyname(name)
 
-Looks up a protocol by name and returns protocol information.
+Looks up a protocol by name (e.g. C<'tcp'>) and returns its protocol I<number>. Returns C<nil> if not found.
 
-Parameters:
+    say Socket.getprotobyname('tcp')     # 6
 
-=over 4
-
-=item * B<name> - Protocol name (e.g., 'tcp', 'udp', 'icmp')
-
-=back
-
-Returns an array containing: [proto_name, aliases, proto_number]
-
-Example:
-
-    var proto = Socket.getprotobyname('tcp')
-    say "TCP protocol number: #{proto[2]}"
+=cut
 
 =head2 getprotobynumber
 
-    Socket.getprotobynumber(num)
+    self.getprotobynumber(num)
 
-Looks up a protocol by its number.
+Looks up a protocol by number and returns its I<name>. Returns C<nil> if not found.
 
-Parameters:
+    say Socket.getprotobynumber(6)     # "tcp"
 
-=over 4
-
-=item * B<num> - Protocol number
-
-=back
-
-Returns an array of protocol information.
-
-Example:
-
-    var proto = Socket.getprotobynumber(6)  # 6 is TCP
-    say "Protocol name: #{proto[0]}"
+=cut
 
 =head2 getprotoent
 
-    Socket.getprotoent()
+    self.getprotoent
 
-Retrieves the next entry from the protocols database.
+Returns the next entry's protocol number from the protocols database, or C<nil> when exhausted. Use L</setprotoent> to rewind.
 
-Returns an array of protocol information, or nil when exhausted.
+=cut
 
 =head2 setprotoent
 
-    Socket.setprotoent(stayopen)
+    self.setprotoent(stayopen)
 
-Opens and rewinds the protocols database.
+Opens and rewinds the protocols database. If C<stayopen> is true, the connection is kept open between calls. Returns a boolean.
 
-Parameters:
-
-=over 4
-
-=item * B<stayopen> - Boolean indicating whether to keep the database open
-
-=back
-
-=head1 SERVICE DATABASE QUERIES
+=cut
 
 =head2 getservbyname
 
-    Socket.getservbyname(name, proto)
+    self.getservbyname(name, proto)
 
-Looks up a service by name and protocol.
+Looks up a service by name and protocol (e.g. C<'tcp'> or C<'udp'>) and returns its port number (as a string). Returns C<nil> if not found.
 
-Parameters:
+    say Socket.getservbyname('http', 'tcp')     # "80"
 
-=over 4
-
-=item * B<name> - Service name (e.g., 'http', 'ftp', 'ssh')
-
-=item * B<proto> - Protocol name ('tcp' or 'udp')
-
-=back
-
-Returns an array containing: [service_name, aliases, port, proto]
-
-Example:
-
-    var service = Socket.getservbyname('http', 'tcp')
-    say "HTTP port: #{service[2]}"  # Should be 80
+=cut
 
 =head2 getservbyport
 
-    Socket.getservbyport(port, proto)
+    self.getservbyport(port, proto)
 
-Looks up a service by port number and protocol.
+Looks up a service by port number and protocol, returning its name. Returns C<nil> if not found.
 
-Parameters:
+    say Socket.getservbyport(22, 'tcp')     # "ssh"
 
-=over 4
-
-=item * B<port> - Port number
-
-=item * B<proto> - Protocol name ('tcp' or 'udp')
-
-=back
-
-Returns an array of service information.
-
-Example:
-
-    var service = Socket.getservbyport(22, 'tcp')
-    say "Port 22 service: #{service[0]}"  # Should be 'ssh'
+=cut
 
 =head2 getservent
 
-    Socket.getservent()
+    self.getservent
 
-Retrieves the next entry from the services database.
+Returns the next entry's service name from the services database, or C<nil> when exhausted. Use L</setservent> to rewind.
 
-Returns an array of service information, or nil when exhausted.
+=cut
 
 =head2 setservent
 
-    Socket.setservent(stayopen)
+    self.setservent(stayopen)
 
-Opens and rewinds the services database.
+Opens and rewinds the services database. If C<stayopen> is true, the connection is kept open between calls. Returns a boolean.
 
-Parameters:
+=cut
 
-=over 4
+=head1 MODERN ADDRESS RESOLUTION
 
-=item * B<stayopen> - Boolean indicating whether to keep the database open
+=head2 getaddrinfo
 
-=back
+    self.getaddrinfo(host, service)
+    self.getaddrinfo(host, service, hints)
 
-=head1 ADDRESS CONVERSION FUNCTIONS
+Performs modern, protocol-agnostic address resolution (supporting both IPv4 and IPv6). The returned array's first element is an error message (empty on success), followed by one entry per resolved address.
+
+    var res = Socket.getaddrinfo('www.example.com', 'http')
+    var err = res[0]
+
+    if (err == '') {
+        res.slice(1).each { |entry|
+            say entry
+        }
+    }
+    else {
+        say "getaddrinfo failed: #{err}"
+    }
+
+=cut
+
+=head2 getnameinfo
+
+    self.getnameinfo(sockaddr)
+    self.getnameinfo(sockaddr, flags)
+
+Converts a socket address into a hostname and service name (the reverse of L</getaddrinfo>). Returns a three-element array: an error message (empty on success), the hostname, and the service name.
+
+    var sockaddr = Socket.pack_sockaddr_in(80, Socket.inet_aton('127.0.0.1'))
+    var res = Socket.getnameinfo(sockaddr)
+
+    if (res[0] == '') {
+        say "Host: #{res[1]}, Service: #{res[2]}"
+    }
+
+=cut
+
+=head1 ADDRESS CONVERSION
 
 =head2 inet_aton
 
-    Socket.inet_aton(hostname)
+    self.inet_aton(address)
 
-Converts an IPv4 address from dotted-quad string format to packed binary format.
-
-Parameters:
-
-=over 4
-
-=item * B<hostname> - IPv4 address as a string (e.g., '192.168.1.1')
-
-=back
-
-Returns the packed binary address, or nil on error.
-
-Example:
+Converts an IPv4 address from dotted-quad string format to packed binary format. Returns C<nil> on error.
 
     var addr = Socket.inet_aton('127.0.0.1')
-    # addr is now in binary format
+
+=cut
 
 =head2 inet_ntoa
 
-    Socket.inet_ntoa(addr)
+    self.inet_ntoa(addr)
 
-Converts an IPv4 address from packed binary format to dotted-quad string format. This is the reverse of inet_aton.
+Converts a packed binary IPv4 address to dotted-quad string format — the reverse of L</inet_aton>.
 
-Parameters:
+    say Socket.inet_ntoa(Socket.inet_aton('192.168.1.1'))     # "192.168.1.1"
 
-=over 4
-
-=item * B<addr> - Packed binary address
-
-=back
-
-Returns the address as a string.
-
-Example:
-
-    var addr = Socket.inet_aton('192.168.1.1')
-    var str = Socket.inet_ntoa(addr)
-    say str  # Prints: 192.168.1.1
+=cut
 
 =head2 inet_pton
 
-    Socket.inet_pton(af, hostname)
+    self.inet_pton(af, address)
 
-Converts an IPv4 or IPv6 address from presentation (string) format to network (binary) format. This is the modern, protocol-agnostic version of inet_aton.
+Converts an IPv4 or IPv6 address from string form to packed binary form. C<af> is C<Socket.AF_INET> or C<Socket.AF_INET6>. This is the protocol-agnostic successor to L</inet_aton>.
 
-Parameters:
+    var ipv4 = Socket.inet_pton(Socket.AF_INET, '192.168.1.1')
+    var ipv6 = Socket.inet_pton(Socket.AF_INET6, '::1')
 
-=over 4
-
-=item * B<af> - Address family (:AF_INET for IPv4, :AF_INET6 for IPv6)
-
-=item * B<hostname> - IP address as a string
-
-=back
-
-Returns the packed binary address.
-
-Example:
-
-    var ipv4 = Socket.inet_pton(:AF_INET, '192.168.1.1')
-    var ipv6 = Socket.inet_pton(:AF_INET6, '::1')
+=cut
 
 =head2 inet_ntop
 
-    Socket.inet_ntop(af, addr)
+    self.inet_ntop(af, addr)
 
-Converts an IPv4 or IPv6 address from network (binary) format to presentation (string) format. This is the reverse of inet_pton.
+Converts a packed binary address to string form — the reverse of L</inet_pton>.
 
-Parameters:
+    var addr = Socket.inet_pton(Socket.AF_INET6, '::1')
+    say Socket.inet_ntop(Socket.AF_INET6, addr)     # "::1"
 
-=over 4
-
-=item * B<af> - Address family (:AF_INET or :AF_INET6)
-
-=item * B<addr> - Packed binary address
-
-=back
-
-Returns the address as a string.
-
-Example:
-
-    var addr = Socket.inet_pton(:AF_INET6, '::1')
-    var str = Socket.inet_ntop(:AF_INET6, addr)
-    say str  # Prints: ::1
+=cut
 
 =head1 SOCKET ADDRESS PACKING/UNPACKING
 
 =head2 pack_sockaddr_in
 
-    Socket.pack_sockaddr_in(port, ip_addr)
+    self.pack_sockaddr_in(port, ip_addr)
 
-Packs a port number and IPv4 address into a binary sockaddr_in structure.
+Packs a port number and IPv4 address (from L</inet_aton>) into a binary C<sockaddr_in> structure, suitable for L<SocketHandle/bind> or L<SocketHandle/connect>.
 
-Parameters:
+    var sockaddr = Socket.pack_sockaddr_in(8080, Socket.inet_aton('127.0.0.1'))
 
-=over 4
-
-=item * B<port> - Port number (0-65535)
-
-=item * B<ip_addr> - Packed IPv4 address (from inet_aton)
-
-=back
-
-Returns a packed sockaddr_in structure.
-
-Example:
-
-    var addr = Socket.inet_aton('127.0.0.1')
-    var sockaddr = Socket.pack_sockaddr_in(8080, addr)
-    # Can now be used with connect, bind, etc.
+=cut
 
 =head2 unpack_sockaddr_in
 
-    Socket.unpack_sockaddr_in(sockaddr)
+    self.unpack_sockaddr_in(sockaddr)
 
-Unpacks a sockaddr_in structure into port and address.
-
-Parameters:
-
-=over 4
-
-=item * B<sockaddr> - Packed sockaddr_in structure
-
-=back
-
-Returns an array [port, ip_addr].
-
-Example:
+Unpacks a C<sockaddr_in> structure, returning a C<[port, ip_addr]> array.
 
     var sockaddr = Socket.pack_sockaddr_in(8080, Socket.inet_aton('127.0.0.1'))
-    var (port, addr) = Socket.unpack_sockaddr_in(sockaddr)
-    say "Port: #{port}"
-    say "IP: #{Socket.inet_ntoa(addr)}"
+    var res = Socket.unpack_sockaddr_in(sockaddr)
+    say "Port: #{res[0]}, IP: #{Socket.inet_ntoa(res[1])}"
+
+=cut
 
 =head2 pack_sockaddr_in6
 
-    Socket.pack_sockaddr_in6(port, ip6_addr, scope_id, flowinfo)
+    self.pack_sockaddr_in6(port, ip6_addr, scope_id=0, flowinfo=0)
 
-Packs a port number and IPv6 address into a binary sockaddr_in6 structure.
+Packs a port number and IPv6 address (from L</inet_pton>) into a binary C<sockaddr_in6> structure.
 
-Parameters:
-
-=over 4
-
-=item * B<port> - Port number
-
-=item * B<ip6_addr> - Packed IPv6 address (from inet_pton)
-
-=item * B<scope_id> - Scope ID (optional, usually 0)
-
-=item * B<flowinfo> - Flow info (optional, usually 0)
-
-=back
-
-Returns a packed sockaddr_in6 structure.
-
-Example:
-
-    var addr = Socket.inet_pton(:AF_INET6, '::1')
+    var addr = Socket.inet_pton(Socket.AF_INET6, '::1')
     var sockaddr = Socket.pack_sockaddr_in6(8080, addr)
+
+=cut
 
 =head2 unpack_sockaddr_in6
 
-    Socket.unpack_sockaddr_in6(sockaddr)
+    self.unpack_sockaddr_in6(sockaddr)
 
-Unpacks a sockaddr_in6 structure into its components.
+Unpacks a C<sockaddr_in6> structure, returning C<[port, ip6_addr, scope_id, flowinfo]>.
 
-Parameters:
-
-=over 4
-
-=item * B<sockaddr> - Packed sockaddr_in6 structure
-
-=back
-
-Returns an array [port, ip6_addr, scope_id, flowinfo].
-
-Example:
-
-    var (port, addr, scope, flow) = Socket.unpack_sockaddr_in6(sockaddr)
-    say "Port: #{port}"
-    say "IPv6: #{Socket.inet_ntop(:AF_INET6, addr)}"
+=cut
 
 =head2 pack_sockaddr_un
 
-    Socket.pack_sockaddr_un(path)
+    self.pack_sockaddr_un(path)
 
 Packs a filesystem path into a Unix domain socket address structure.
 
-Parameters:
-
-=over 4
-
-=item * B<path> - Filesystem path for the Unix socket
-
-=back
-
-Returns a packed sockaddr_un structure.
-
-Example:
-
     var sockaddr = Socket.pack_sockaddr_un('/tmp/my.sock')
+
+=cut
 
 =head2 unpack_sockaddr_un
 
-    Socket.unpack_sockaddr_un(sockaddr)
+    self.unpack_sockaddr_un(sockaddr)
 
-Unpacks a Unix domain socket address structure.
+Unpacks a Unix domain socket address structure, returning the filesystem path.
 
-Parameters:
-
-=over 4
-
-=item * B<sockaddr> - Packed sockaddr_un structure
-
-=back
-
-Returns the filesystem path.
-
-Example:
-
-    var path = Socket.unpack_sockaddr_un(sockaddr)
-    say "Socket path: #{path}"
+=cut
 
 =head2 sockaddr_family
 
-    Socket.sockaddr_family(sockaddr)
+    self.sockaddr_family(sockaddr)
 
-Extracts the address family from a packed socket address.
-
-Parameters:
-
-=over 4
-
-=item * B<sockaddr> - Packed socket address structure
-
-=back
-
-Returns the address family constant (e.g., :AF_INET, :AF_INET6).
-
-Example:
+Extracts the address family from any packed socket address structure.
 
     var family = Socket.sockaddr_family(sockaddr)
-    if (family == :AF_INET) {
+    if ((family == Socket.AF_INET)) {
         say "IPv4 address"
     }
 
-=head2 sockaddr_in
-
-    Socket.sockaddr_in(sockaddr)
-
-Convenience method combining unpack_sockaddr_in and inet_ntoa to extract human-readable information from an IPv4 socket address.
-
-Parameters:
-
-=over 4
-
-=item * B<sockaddr> - Packed sockaddr_in structure
-
-=back
-
-Returns [port, ip_string].
-
-Example:
-
-    var (port, ip) = Socket.sockaddr_in(sockaddr)
-    say "Connecting to #{ip}:#{port}"
-
-=head2 sockaddr_in6
-
-    Socket.sockaddr_in6(sockaddr)
-
-Convenience method for extracting human-readable information from an IPv6 socket address.
-
-Parameters:
-
-=over 4
-
-=item * B<sockaddr> - Packed sockaddr_in6 structure
-
-=back
-
-Returns [port, ip6_string, scope_id, flowinfo].
-
-=head2 sockaddr_un
-
-    Socket.sockaddr_un(sockaddr)
-
-Convenience method that unpacks a Unix domain socket address.
-
-Parameters:
-
-=over 4
-
-=item * B<sockaddr> - Packed sockaddr_un structure
-
-=back
-
-Returns the filesystem path.
+=cut
 
 =head1 MULTICAST GROUP MEMBERSHIP
 
 =head2 pack_ip_mreq
 
-    Socket.pack_ip_mreq(multiaddr, interface)
+    self.pack_ip_mreq(multiaddr, interface)
 
-Packs a multicast group membership request for IPv4.
+Packs an IPv4 multicast group membership request, for use with L<SocketHandle/setsockopt>.
 
-Parameters:
+    var mreq = Socket.pack_ip_mreq(Socket.inet_aton('239.255.0.1'), Socket.inet_aton('0.0.0.0'))
 
-=over 4
-
-=item * B<multiaddr> - Multicast group address (packed)
-
-=item * B<interface> - Local interface address (packed)
-
-=back
-
-Returns a packed ip_mreq structure for use with setsockopt.
-
-Example:
-
-    var mcast_addr = Socket.inet_aton('239.255.0.1')
-    var iface_addr = Socket.inet_aton('0.0.0.0')
-    var mreq = Socket.pack_ip_mreq(mcast_addr, iface_addr)
+=cut
 
 =head2 unpack_ip_mreq
 
-    Socket.unpack_ip_mreq(mreq)
+    self.unpack_ip_mreq(mreq)
 
-Unpacks an ip_mreq structure.
+Unpacks an C<ip_mreq> structure, returning C<[multiaddr, interface]>.
 
-Parameters:
-
-=over 4
-
-=item * B<mreq> - Packed ip_mreq structure
-
-=back
-
-Returns [multiaddr, interface].
+=cut
 
 =head2 pack_ip_mreq_source
 
-    Socket.pack_ip_mreq_source(multiaddr, source, interface)
+    self.pack_ip_mreq_source(multiaddr, source, interface)
 
-Packs a source-specific multicast group membership request for IPv4.
+Packs a source-specific IPv4 multicast group membership request.
 
-Parameters:
-
-=over 4
-
-=item * B<multiaddr> - Multicast group address
-
-=item * B<source> - Source address to receive from
-
-=item * B<interface> - Local interface address
-
-=back
-
-Returns a packed ip_mreq_source structure.
+=cut
 
 =head2 unpack_ip_mreq_source
 
-    Socket.unpack_ip_mreq_source(mreq_source)
+    self.unpack_ip_mreq_source(mreq_source)
 
-Unpacks an ip_mreq_source structure.
+Unpacks an C<ip_mreq_source> structure, returning C<[multiaddr, source, interface]>.
 
-Parameters:
-
-=over 4
-
-=item * B<mreq_source> - Packed ip_mreq_source structure
-
-=back
-
-Returns [multiaddr, source, interface].
+=cut
 
 =head2 pack_ipv6_mreq
 
-    Socket.pack_ipv6_mreq(multiaddr, interface_index)
+    self.pack_ipv6_mreq(multiaddr, interface_index)
 
-Packs a multicast group membership request for IPv6.
+Packs an IPv6 multicast group membership request.
 
-Parameters:
+    var mreq = Socket.pack_ipv6_mreq(Socket.inet_pton(Socket.AF_INET6, 'ff02::1'), 0)
 
-=over 4
-
-=item * B<multiaddr> - IPv6 multicast group address (packed)
-
-=item * B<interface_index> - Interface index number
-
-=back
-
-Returns a packed ipv6_mreq structure.
-
-Example:
-
-    var mcast_addr = Socket.inet_pton(:AF_INET6, 'ff02::1')
-    var mreq = Socket.pack_ipv6_mreq(mcast_addr, 0)
+=cut
 
 =head2 unpack_ipv6_mreq
 
-    Socket.unpack_ipv6_mreq(mreq)
+    self.unpack_ipv6_mreq(mreq)
 
-Unpacks an ipv6_mreq structure.
+Unpacks an C<ipv6_mreq> structure, returning C<[multiaddr, interface_index]>.
 
-Parameters:
-
-=over 4
-
-=item * B<mreq> - Packed ipv6_mreq structure
-
-=back
-
-Returns [multiaddr, interface_index].
+=cut
 
 =head1 EXAMPLES
 
 =head2 Simple TCP Client
 
-    var sock = Socket()
-    sock.open(:PF_INET, :SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
+    var sock = Socket.new.open(Socket.PF_INET, Socket.SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
 
-    var addr = Socket.inet_aton('127.0.0.1')
-    var sockaddr = Socket.pack_sockaddr_in(80, addr)
-
+    var sockaddr = Socket.pack_sockaddr_in(80, Socket.inet_aton('127.0.0.1'))
     sock.connect(sockaddr) || die "Cannot connect: #{$!}"
-    sock.print("GET / HTTP/1.0\r\n\r\n")
 
+    sock.print("GET / HTTP/1.0\r\n\r\n")
     while (var line = sock.readline) {
         say line
     }
-    sock.close()
+    sock.close
 
 =head2 UDP Socket
 
-    var sock = Socket()
-    sock.open(:PF_INET, :SOCK_DGRAM, 0) || die "Cannot create socket: #{$!}"
+    var sock = Socket.new.open(Socket.PF_INET, Socket.SOCK_DGRAM, 0) || die "Cannot create socket: #{$!}"
 
     var dest = Socket.pack_sockaddr_in(9999, Socket.inet_aton('192.168.1.100'))
     sock.send("Hello UDP", 0, dest)
 
 =head2 Unix Domain Socket
 
-    var sock = Socket()
-    sock.open(:PF_UNIX, :SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
+    var sock = Socket.new.open(Socket.PF_UNIX, Socket.SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
 
-    var addr = Socket.pack_sockaddr_un('/tmp/my.sock')
-    sock.connect(addr) || die "Cannot connect: #{$!}"
+    var sockaddr = Socket.pack_sockaddr_un('/tmp/my.sock')
+    sock.connect(sockaddr) || die "Cannot connect: #{$!}"
 
 =head2 IPv6 Socket
 
-    var sock = Socket()
-    sock.open(:PF_INET6, :SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
+    var sock = Socket.new.open(Socket.PF_INET6, Socket.SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
 
-    var addr = Socket.inet_pton(:AF_INET6, '::1')
+    var addr = Socket.inet_pton(Socket.AF_INET6, '::1')
     var sockaddr = Socket.pack_sockaddr_in6(8080, addr)
     sock.connect(sockaddr) || die "Cannot connect: #{$!}"
 
@@ -887,13 +480,13 @@ Returns [multiaddr, interface_index].
 
 =over 4
 
-=item * L<Sidef::Types::Glob::File> - File I/O operations
+=item * L<Sidef::Types::Glob::SocketHandle> - The open connection object returned by L</open>
 
-=item * L<Socket> - Perl Socket module documentation
+=item * L<Sidef::Types::Glob::FileHandle> - File I/O operations, inherited by SocketHandle
 
-=item * socket(2) - Unix socket system call
+=item * L<Socket> - Perl's Socket module, which this class delegates to
 
-=item * connect(2), bind(2), listen(2), accept(2) - Socket operations
+=item * socket(2), connect(2), bind(2), listen(2), accept(2) - Underlying Unix socket system calls
 
 =back
 
