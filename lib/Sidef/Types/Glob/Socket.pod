@@ -15,8 +15,7 @@ B<Constants and conversion helpers:> Every name exported by Perl's core L<Socket
 =head1 SYNOPSIS
 
     # Create and open a TCP socket
-    var factory = Socket.new
-    var sock = factory.open(Socket.PF_INET, Socket.SOCK_STREAM, 0) || die "Cannot open socket: #{$!}"
+    var sock = Socket.open(Socket.PF_INET, Socket.SOCK_STREAM, 0) || die "Cannot open socket: #{$!}"
 
     # Resolve a hostname to its packed address
     var addr = Socket.inet_aton('127.0.0.1')
@@ -26,7 +25,7 @@ B<Constants and conversion helpers:> Every name exported by Perl's core L<Socket
     sock.connect(sockaddr) || die "Cannot connect: #{$!}"
 
     # Create a socket pair for IPC
-    Socket.new.socketpair(\var reader, \var writer, Socket.PF_UNIX, Socket.SOCK_STREAM, 0)
+    Socket.socketpair(\var reader, \var writer, Socket.PF_UNIX, Socket.SOCK_STREAM, 0)
 
 =head1 INHERITS
 
@@ -40,9 +39,6 @@ Inherits methods from L<Sidef::Object::Object>.
 
 Creates a new, empty Socket helper object. This does not open any actual socket by itself — it takes no arguments, and any given are ignored. Use L</open> on the resulting object to actually create a socket.
 
-    var factory = Socket.new
-    var sock = factory.open(Socket.PF_INET, Socket.SOCK_STREAM, 0)
-
 =cut
 
 =head1 CREATING SOCKETS
@@ -53,10 +49,10 @@ Creates a new, empty Socket helper object. This does not open any actual socket 
 
 Creates a new socket with the given domain (address family), type, and protocol, and returns it as a L<Sidef::Types::Glob::SocketHandle> — I<not> a boolean. Returns C<nil> on failure. C<domain>, C<type>, and C<protocol> should be plain numeric values, typically obtained from the constant methods below (e.g. C<Socket.PF_INET>, C<Socket.SOCK_STREAM>).
 
-    var sock = Socket.new.open(Socket.PF_INET, Socket.SOCK_STREAM, 0)
+    var sock = Socket.open(Socket.PF_INET, Socket.SOCK_STREAM, 0)
     sock || die "Cannot open socket: #{$!}"
 
-    var udp = Socket.new.open(Socket.PF_INET, Socket.SOCK_DGRAM, 0)
+    var udp = Socket.open(Socket.PF_INET, Socket.SOCK_DGRAM, 0)
 
 =cut
 
@@ -66,7 +62,7 @@ Creates a new socket with the given domain (address family), type, and protocol,
 
 Creates a pair of connected, unnamed sockets (typically for local inter-process communication) and assigns the two resulting L<Sidef::Types::Glob::SocketHandle> objects into C<var1> and C<var2>, which must be passed by reference. Returns a boolean indicating success.
 
-    Socket.new.socketpair(\var parent, \var child, Socket.PF_UNIX, Socket.SOCK_STREAM, 0)
+    Socket.socketpair(\var parent, \var child, Socket.PF_UNIX, Socket.SOCK_STREAM, 0) \
         || die "socketpair failed: #{$!}"
 
     parent.say("hello from parent")
@@ -443,34 +439,34 @@ Unpacks an C<ipv6_mreq> structure, returning C<[multiaddr, interface_index]>.
 
 =head2 Simple TCP Client
 
-    var sock = Socket.new.open(Socket.PF_INET, Socket.SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
+    var sock = Socket.open(Socket.PF_INET, Socket.SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
 
     var sockaddr = Socket.pack_sockaddr_in(80, Socket.inet_aton('127.0.0.1'))
     sock.connect(sockaddr) || die "Cannot connect: #{$!}"
 
     sock.print("GET / HTTP/1.0\r\n\r\n")
-    while (var line = sock.readline) {
+    while (defined(var line = sock.readline)) {
         say line
     }
     sock.close
 
 =head2 UDP Socket
 
-    var sock = Socket.new.open(Socket.PF_INET, Socket.SOCK_DGRAM, 0) || die "Cannot create socket: #{$!}"
+    var sock = Socket.open(Socket.PF_INET, Socket.SOCK_DGRAM, 0) || die "Cannot create socket: #{$!}"
 
     var dest = Socket.pack_sockaddr_in(9999, Socket.inet_aton('192.168.1.100'))
     sock.send("Hello UDP", 0, dest)
 
 =head2 Unix Domain Socket
 
-    var sock = Socket.new.open(Socket.PF_UNIX, Socket.SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
+    var sock = Socket.open(Socket.PF_UNIX, Socket.SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
 
     var sockaddr = Socket.pack_sockaddr_un('/tmp/my.sock')
     sock.connect(sockaddr) || die "Cannot connect: #{$!}"
 
 =head2 IPv6 Socket
 
-    var sock = Socket.new.open(Socket.PF_INET6, Socket.SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
+    var sock = Socket.open(Socket.PF_INET6, Socket.SOCK_STREAM, 0) || die "Cannot create socket: #{$!}"
 
     var addr = Socket.inet_pton(Socket.AF_INET6, '::1')
     var sockaddr = Socket.pack_sockaddr_in6(8080, addr)
