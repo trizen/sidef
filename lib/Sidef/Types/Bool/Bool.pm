@@ -3,12 +3,12 @@ package Sidef::Types::Bool::Bool;
 use utf8;
 use 5.016;
 
-$JSON::true  //= 1;
-$JSON::false //= 0;
+$JSON::PP::true  //= 1;
+$JSON::PP::false //= 0;
 
 use overload
-  q{bool} => \&get_value,
-  q{0+}   => \&get_value,
+  q{bool} => sub { ${$_[0]} },
+  q{0+}   => sub { ${$_[0]} },
   q{""}   => sub { ${$_[0]} ? 'true' : 'false' };
 
 use constant {
@@ -37,7 +37,7 @@ sub pick {
 
 *rand = \&pick;
 
-sub get_value { ${$_[0]} ? $JSON::true : $JSON::false }
+sub get_value { ${$_[0]} ? $JSON::PP::true : $JSON::PP::false }
 sub to_bool   { $_[0] }
 
 *to_b = \&to_bool;
