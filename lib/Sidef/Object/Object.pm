@@ -372,7 +372,8 @@ sub dump {
 sub to_json {
     my ($self) = @_;
     state $x = require JSON::PP;
-    Sidef::Types::String::String->new(scalar JSON::PP::encode_json($self->get_value));
+    state $y = require Encode;
+    Sidef::Types::String::String->new(Encode::decode_utf8(scalar JSON::PP::encode_json($self->get_value)));
 }
 
 {
