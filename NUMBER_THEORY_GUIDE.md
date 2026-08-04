@@ -3109,19 +3109,25 @@ say moebius_invert({|d| sigma(d) }, 12)   # should be 12
 
 ## Appendix B: Further Reading and Resources
 
-### Official Documentation
+### Documentation & Learning Resources
 
-- **Sidef book**: [trizen.gitbook.io/sidef-lang](https://trizen.gitbook.io/sidef-lang/) ([PDF](https://github.com/trizen/sidef/releases/download/26.07/sidef-book.pdf))
-- **Advanced tutorial**: [SIDEF_ADVANCED_GUIDE.md](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md)
-- **Computational Algebra Guide**: [COMPUTATIONAL_ALGEBRA_GUIDE.md](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md)
-- **Function reference for number theory**: [NUMBER_THEORY_REFERENCE.md](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md)
-- **Full Number class documentation**: [Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number)
+| Resource | Description |
+|----------|-------------|
+| 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
+| 📄 [Beginner's Guide](https://github.com/trizen/sidef/blob/master/SIDEF_BEGINNER_GUIDE.md) | Start here if you're new to Sidef |
+| 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | Comprehensive language tutorial |
+| 📕 [Full PDF Documentation](https://github.com/trizen/sidef/releases/download/26.07/sidef-documentation.pdf) | Offline PDF version of the complete language documentation |
+| 📑 [Number Theory Cheatsheet](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_CHEATSHEET.md) | Quick reference for Sidef's number theory functions |
+| 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) | Complete function reference for number theory |
+| 📚 [Computational Algebra Guide](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md) | Complete guide for computational algebra |
 
-### Code Examples
+### Additional resources
 
 - **Sidef scripts repository**: [github.com/trizen/sidef-scripts](https://github.com/trizen/sidef-scripts)
 - **OEIS autoload**: [github.com/trizen/oeis-autoload](https://github.com/trizen/oeis-autoload)
 - **Special-purpose factorization**: [trizenx.blogspot.com](https://trizenx.blogspot.com/2019/08/special-purpose-factorization-algorithms.html)
+- **Documentation for the Number class**: [Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number)
+- **RosettaCode - Sidef**: [rosettacode.org/wiki/Sidef](https://rosettacode.org/wiki/Sidef)
 
 ### Mathematical References
 

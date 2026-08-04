@@ -233,7 +233,7 @@ Performs a three-way comparison between two regular expressions based on their c
     var re3 = /abc/
     say (re1 <=> re3)  # 0
 
-Aliases: I<<=>>
+Aliases: I<<< <=> >>>
 
 =cut
 
@@ -247,7 +247,7 @@ Returns true if the first regex is lexicographically less than the second, based
     var re2 = /xyz/
     say ((re1 < re2) ? true : false)  # true
 
-Aliases: I<<>
+Aliases: I<<< < >>>
 
 =cut
 
@@ -261,7 +261,7 @@ Returns true if the first regex is lexicographically less than or equal to the s
     var re2 = /abc/
     say ((re1 <= re2) ? true : false)  # true
 
-Aliases: I<<=>, I<≤>
+Aliases: I<<< <= >>>, I<≤>
 
 =cut
 
@@ -275,7 +275,7 @@ Returns true if the first regex is lexicographically greater than the second, ba
     var re2 = /abc/
     say ((re1 > re2) ? true : false)  # true
 
-Aliases: I<>>
+Aliases: I<<< > >>>
 
 =cut
 
@@ -289,7 +289,7 @@ Returns true if the first regex is lexicographically greater than or equal to th
     var re2 = /abc/
     say ((re1 >= re2) ? true : false)  # true
 
-Aliases: I<>=>, I<≥>
+Aliases: I<<< >= >>>, I<≥>
 
 =cut
 

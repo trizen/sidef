@@ -101,7 +101,7 @@ Returns the norm (absolute value) of the real part of the modular number.
 Adds two modular numbers or adds an integer to a modular number. The result is reduced modulo the modulus of B<a>.
 
     var a = Mod(10, 13)
-    say a + 5               # Mod(2, 13)  -- (10 + 5) mod 13
+    say (a + 5)               # Mod(2, 13)  -- (10 + 5) mod 13
 
 Aliases: I<add>
 
@@ -112,7 +112,7 @@ Aliases: I<add>
 Subtracts two modular numbers or subtracts an integer from a modular number.
 
     var a = Mod(3, 10)
-    say a - 5               # Mod(8, 10)  -- (3 - 5) mod 10
+    say (a - 5)               # Mod(8, 10)  -- (3 - 5) mod 10
 
 Aliases: I<sub>
 
@@ -123,7 +123,7 @@ Aliases: I<sub>
 Multiplies two modular numbers or multiplies a modular number by an integer.
 
     var a = Mod(7, 13)
-    say a * 4               # Mod(2, 13)  -- (7 * 4) mod 13
+    say (a * 4)               # Mod(2, 13)  -- (7 * 4) mod 13
 
 Aliases: I<mul>
 
@@ -134,7 +134,7 @@ Aliases: I<mul>
 Divides a modular number by another. This computes a * b^(-1) (mod m), where b^(-1) is the modular inverse of b.
 
     var a = Mod(10, 13)
-    say a / 2               # Mod(5, 13)  -- 10 * 2^(-1) mod 13
+    say (a / 2)               # Mod(5, 13)  -- 10 * 2^(-1) mod 13
 
 Raises an error if B<b> has no modular inverse (i.e., if gcd(b, m) ≠ 1).
 
@@ -147,7 +147,7 @@ Aliases: I<÷>, I<div>
 Computes modular exponentiation: a^b (mod m). Uses efficient binary exponentiation.
 
     var a = Mod(2, 1000)
-    say a ** 100            # Mod(376, 1000)
+    say (a ** 100)            # Mod(376, 1000)
 
 Aliases: I<pow>
 

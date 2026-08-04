@@ -486,14 +486,14 @@ sub roots {
     # We run the separated roots through the original Newton polisher
     # to guarantee they meet Sidef's exact deduplication and precision standards.
     my %seen;
-    my @polygonal_roots;
+    my @polynomial_roots;
 
     foreach my $root (@z) {
         my $solution = $f->newton_method($root, $df);
         if (defined($solution)) {
             my $key = join('', $solution->round($prec));
             if (!exists($seen{$key}) and $f->eval($solution)->round($prec_min)->is_zero) {
-                push @polygonal_roots, $solution;
+                push @polynomial_roots, $solution;
                 $seen{$key} = 1;
             }
         }
@@ -502,7 +502,7 @@ sub roots {
     # PHASE 4: Safety Fallback
     # In the incredibly rare case Aberth misses a root, we retain the old transformation
     # fallback to ensure this implementation is strictly >= in success rate to the original.
-    if (scalar(@polygonal_roots) != $degree) {
+    if (scalar(@polynomial_roots) != $degree) {
 
         my @transformations = (
                                sub { $_[0]->i },
@@ -524,17 +524,17 @@ sub roots {
                 if (defined($solution)) {
                     my $key = join('', $solution->round($prec));
                     if (!exists($seen{$key}) and $f->eval($solution)->round($prec_min)->is_zero) {
-                        push @polygonal_roots, $solution;
+                        push @polynomial_roots, $solution;
                         $seen{$key} = 1;
                     }
-                    last if (scalar(@polygonal_roots) == $degree);
+                    last if (scalar(@polynomial_roots) == $degree);
                 }
             }
-            last if (scalar(@polygonal_roots) == $degree);
+            last if (scalar(@polynomial_roots) == $degree);
         }
     }
 
-    Sidef::Types::Array::Array->new(\@polygonal_roots);
+    Sidef::Types::Array::Array->new(\@polynomial_roots)->sort;
 }
 
 sub roots_mod {
