@@ -19,4 +19,8 @@ do {
 
 }
 
+assert_eq(Hash(a => "ș€rban").to_json.from_json, Hash(a => "ș€rban"))
+assert_eq(Hash(a => "ș€rban").to_json, "{\"a\":\"\x{219}\x{20AC}rban\"}")
+assert_eq("{\"a\":\"\x{219}\x{20AC}rban\"}".from_json, Hash("a" => "\x{219}\x{20AC}rban"))
+
 say "** Tests passed!"

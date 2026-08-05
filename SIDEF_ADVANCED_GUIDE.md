@@ -1822,12 +1822,17 @@ model.keys.sort.each { |c|
 
 ## 21. Further Resources
 
-### Official Documentation
+### Documentation & Learning Resources
 
-- 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) — Complete language reference
-- 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.07/sidef-book.pdf) — Offline reading
-- 🔢 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) — Deep dive into Sidef's mathematical functions
-- 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) — Complete function reference for number theory
+| Resource | Description |
+|----------|-------------|
+| 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
+| 📄 [Beginner's Guide](https://github.com/trizen/sidef/blob/master/SIDEF_BEGINNER_GUIDE.md) | Start here if you're new to Sidef |
+| 📕 [Full PDF Documentation](https://github.com/trizen/sidef/releases/download/26.07/sidef-documentation.pdf) | Offline PDF version of the complete language documentation |
+| 📑 [Number Theory Cheatsheet](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_CHEATSHEET.md) | Quick reference for Sidef's number theory functions |
+| 📚 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
+| 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) | Complete function reference for number theory |
+| 📝 [Computational Algebra Guide](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md) | Complete guide for computational algebra |
 
 ### Example Script Collections
 
@@ -1844,9 +1849,13 @@ model.keys.sort.each { |c|
 
 ### Community
 
-- 💬 [GitHub Discussions](https://github.com/trizen/sidef/discussions)
-- 🌹 [RosettaCode Examples](https://rosettacode.org/wiki/Sidef) — Side-by-side comparisons with other languages
-- 🧪 [Try It Online](https://tio.run/#sidef) — Experiment without installing anything
+| Resource | Description |
+|----------|-------------|
+| 💬 [GitHub Discussions](https://github.com/trizen/sidef/discussions) | Ask questions, share ideas, get help |
+| 🐛 [GitHub Issues](https://github.com/trizen/sidef/issues) | Bug reports and feature requests |
+| 📦 [MetaCPAN](https://metacpan.org/pod/Sidef) | CPAN package page with additional documentation |
+| 🧪 [Try It Online](https://tio.run/#sidef) | Experiment without installing anything |
+| 🌹 [RosettaCode Examples](https://rosettacode.org/wiki/Sidef) | Side-by-side comparisons with other languages |
 
 ---
 

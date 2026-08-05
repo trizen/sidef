@@ -474,7 +474,7 @@ Although Sidef is a high-level language, its numerical core is powered by highly
 | 📚 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
 | 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) | Complete function reference for number theory |
 
-### Example Code
+### Code Examples
 
 | Resource | Description |
 |----------|-------------|

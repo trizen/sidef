@@ -318,7 +318,7 @@ to change the modulus of an existing polynomial.
 
     var p = PolynomialMod([1, 2, 3], [1, 0, 1])
     var q = PolynomialMod([1, 1],   [1, 0, 1])
-    say p % q      # remainder of p divided by q, mod (x^2 + 1)
+    say (p % q)      # remainder of p divided by q, mod (x^2 + 1)
 
 Aliases: I<mod>
 
@@ -431,7 +431,7 @@ extended Euclidean recursion.
 Example:
 
     var (g, u, v) = p.gcdext(q)
-    say u*p + v*q == g    # True
+    say ((u*p + v*q) == g)    # True
 
 Reference: L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#B%C3%A9zout's_identity_and_extended_GCD_algorithm>
 

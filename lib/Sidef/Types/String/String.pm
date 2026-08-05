@@ -1457,8 +1457,9 @@ sub gunzip {
 
 sub from_json {
     my ($self) = @_;
-    state $x = require JSON;
-    Sidef::Types::Perl::Perl->to_sidef(scalar JSON::from_json($$self));
+    state $x = require JSON::PP;
+    state $y = require Encode;
+    Sidef::Types::Perl::Perl->to_sidef(scalar JSON::PP::decode_json(Encode::encode_utf8($$self)));
 }
 
 sub _require {

@@ -25,9 +25,9 @@ polynomials with many zero terms.
     var d = Polynomial("x^3 - 2*x + 1")    # parsed from string
 
     # Arithmetic
-    var sum  = b + c                       # polynomial addition
-    var prod = b * c                       # polynomial multiplication
-    var quot = b / c                       # polynomial division
+    var sum  = (b + c)                     # polynomial addition
+    var prod = (b * c)                     # polynomial multiplication
+    var quot = (b / c)                     # polynomial division
 
     # Evaluation
     say(b.eval(2))                         # evaluate at x=2: 26

@@ -2,243 +2,628 @@
 
 =head1 NAME
 
-Sidef::Types::Number::Fraction - Symbolic implementation for fractions.
+Sidef::Types::Number::Fraction - A ratio of two numeric (or symbolic) values.
 
 =head1 DESCRIPTION
 
-This class implements symbolic support for rational values (fractions) in Sidef. It inherits from L<Sidef::Types::Number::Number>.
+This class represents a fraction: a numerator and a denominator kept as a pair, rather than eagerly reduced to a single numeric value. This avoids the rounding that immediate division would cause and lets you inspect the numerator and denominator separately.
+
+The numerator and denominator are not restricted to plain integers — anything that behaves like a C<Number> works, including another C<Fraction> or a C<Polynomial>. This lets a C<Fraction> double as a symbolic rational expression (a ratio of two polynomials) as well as an ordinary numeric fraction; see L</eval> and L</CONSTRUCTION> below.
 
 =head1 SYNOPSIS
 
     var f = Fraction(3, 4)
-    say f.class         # Fraction
+    say f.class          # "Fraction"
 
     var a = Fraction(1, 2)
     var b = Fraction(1, 3)
 
-    say (a + b)         # Fraction(5, 6)
-    say (a - b)         # Fraction(1, 6)
-    say (a * b)         # Fraction(1, 6)
-    say (a / b)         # Fraction(3, 2)
+    say (a + b)           # Fraction(5, 6)
+    say (a - b)           # Fraction(1, 6)
+    say (a * b)           # Fraction(1, 6)
+    say (a / b)           # Fraction(3, 2)
 
-    say f.numerator     # 3
-    say f.denominator   # 4
-    say f.as_float      # 0.75
+    say f.numerator       # 3
+    say f.denominator     # 4
+    say f.to_n            # 0.75
 
-=head1 INHERITANCE
+=head1 INHERITS
 
-  Sidef::Types::Number::Fraction
-  Sidef::Types::Number::Number
-  Sidef::Object::Object
+Inherits methods from L<Sidef::Types::Number::Number>.
 
-=head1 METHODS
+=head1 CONSTRUCTION
 
 =head2 new
 
     Fraction(num, den)
+    Fraction(num)
+    Fraction()
 
-Creates a new Fraction object with the given numerator C<num> and denominator C<den>.
+Creates a new Fraction with numerator C<num> and denominator C<den>. C<den> defaults to C<1> if omitted, and C<num> defaults to C<0>, so C<Fraction()> is C<0> and C<Fraction(5)> is C<5>.
 
-=head2 numerator
+    say Fraction(3, 4)     # Fraction(3, 4)
+    say Fraction(5)        # Fraction(5, 1)
+    say Fraction()         # Fraction(0, 1)
 
-    f.numerator
-    f.num
+Calling C<.new> (or the equivalent bareword call) on an B<existing> Fraction instead evaluates it as a symbolic rational expression at the given value — the same thing L</eval> does:
 
-Returns the numerator of the fraction as an integer.
+    var f = Fraction(Poly("x"), 1)
+    say f.new(3)            # evaluates f at x=3
 
-=head2 denominator
+Aliases: I<call>
 
-    f.denominator
-    f.den
+=cut
 
-Returns the denominator of the fraction as an integer. The denominator is always positive.
+=head2 with_value
+
+    self.with_value(num, den)
+
+Builds a new Fraction with the given numerator and denominator, ignoring the receiver's own value. Useful in generic code that has a Fraction in hand and wants to construct another one of the same type without naming the class directly.
+
+    var f = Fraction(1, 2)
+    var g = f.with_value(3, 4)
+    say g                    # Fraction(3, 4)
+
+=cut
+
+=head1 COMPONENTS
+
+=head2 nu
+
+    self.nu
+
+Returns the numerator.
+
+    say Fraction(3, 4).nu     # 3
+
+Aliases: I<num>, I<numerator>
+
+=cut
+
+=head2 de
+
+    self.de
+
+Returns the denominator, exactly as stored (no sign normalization is applied by this class).
+
+    say Fraction(3, 4).de     # 4
+
+Aliases: I<den>, I<denominator>
+
+=cut
+
+=head2 nude
+
+    self.nude
+
+Returns both the numerator and denominator together.
+
+    var (num, den) = Fraction(3, 4).nude
+    say "#{num}/#{den}"       # "3/4"
+
+=cut
 
 =head2 parts
 
-    f.parts
+    self.parts
 
-Returns a list containing the numerator and the denominator.
+Returns an array containing the numerator and the denominator: C<[numerator, denominator]>.
 
-=head2 int
+    say Fraction(3, 4).parts    # [3, 4]
 
-    f.int
-    f.to_i
-
-Returns the integer part of the fraction (truncates towards zero).
-
-=head2 float
-
-    f.float
-    f.to_f
-
-Returns the fraction converted to a floating-point number (Sidef Float).
-
-=head2 rat
-
-    f.rat
-
-Returns the object itself, as it is already a rational number.
-
-=head2 inv
-
-    f.inv
-
-Returns the multiplicative inverse (reciprocal) of the fraction ($1/f$).
-
-=head2 abs
-
-    f.abs
-
-Returns the absolute value of the fraction.
-
-=head2 neg
-
-    f.neg
-    -f
-
-Returns the negation of the fraction.
-
-=head2 inc
-
-    f.inc
-
-Returns the fraction incremented by 1.
-
-=head2 dec
-
-    f.dec
-
-Returns the fraction decremented by 1.
-
-=head2 sign
-
-    f.sign
-
-Returns -1 if the fraction is negative, 0 if it is zero, and 1 if it is positive.
-
-=head2 ceil
-
-    f.ceil
-
-Returns the smallest integer greater than or equal to the fraction.
-
-=head2 floor
-
-    f.floor
-
-Returns the largest integer less than or equal to the fraction.
-
-=head2 truncate
-
-    f.truncate
-
-Truncates the fraction to an integer (towards zero).
-
-=head2 round
-
-    f.round
-
-Rounds the fraction to the nearest integer.
-
-=head2 is_pos
-
-    f.is_pos
-
-Returns true if the fraction is strictly positive.
-
-=head2 is_neg
-
-    f.is_neg
-
-Returns true if the fraction is strictly negative.
-
-=head2 is_zero
-
-    f.is_zero
-
-Returns true if the fraction is equal to zero.
-
-=head2 is_one
-
-    f.is_one
-
-Returns true if the fraction is equal to one.
-
-=head2 is_int
-
-    f.is_int
-
-Returns true if the fraction represents an integer (denominator is 1).
-
-=head2 is_proper
-
-    f.is_proper
-
-Returns true if the absolute value of the fraction is less than 1 (numerator < denominator).
-
-=head2 is_improper
-
-    f.is_improper
-
-Returns true if the absolute value of the fraction is greater than or equal to 1.
+=cut
 
 =head2 as_mixed
 
-    f.as_mixed
+    self.as_mixed
 
-Returns a list of three elements representing the mixed fraction: integer part, numerator of the remainder, and the denominator.
+Returns a three-element array C<[quotient, remainder, denominator]> representing the fraction as a mixed number, computed as C<numerator.divmod(denominator)> plus the original denominator.
 
-    var f = Fraction(5, 3)
-    say f.as_mixed   # [1, 2, 3]  (representing 1 2/3)
+    say Fraction(5, 3).as_mixed    # [1, 2, 3]  (i.e. 1 and 2/3)
+
+=cut
+
+=head1 TYPE CONVERSION
+
+=head2 to_n
+
+    self.to_n
+
+Converts the fraction to a plain numeric value by dividing the numerator by the denominator (after first reducing each side with its own C<to_n>, so a symbolic numerator/denominator is resolved too). This backs the fraction's boolean and numeric contexts, so a Fraction is falsy exactly when C<to_n> is zero.
+
+    say Fraction(3, 4).to_n     # 0.75
+    say Fraction(6, 2).to_n     # 3
+
+    if (Fraction(0, 5)) { say "truthy" } else { say "falsy" }   # falsy
+
+=cut
+
+=head2 lift
+
+    self.lift
+
+Returns a new Fraction with both the numerator and denominator "lifted" via their own C<lift> method — typically used to promote plain values into a more general symbolic context (e.g. when mixing fractions with polynomials).
+
+=cut
+
+=head1 STRING REPRESENTATION
+
+=head2 stringify
+
+    self.stringify
+
+Returns a readable math-style representation of the fraction, built from each side's own C<stringify>, in the form C<(numerator)/(denominator)>. This is different from L</to_s>/L</dump>, which use a constructor-style form instead.
+
+    say Fraction(3, 4).stringify    # "(3)/(4)"
+
+Aliases: I<pretty>
+
+=cut
 
 =head2 to_s
 
-    f.to_s
+    self.to_s
 
-Returns the string representation of the fraction (e.g., "Fraction(3, 4)").
+Returns the constructor-style string representation of the fraction, e.g. C<"Fraction(3, 4)">. This is also what a Fraction produces when stringified implicitly (e.g. via interpolation).
+
+    say Fraction(3, 4).to_s     # "Fraction(3, 4)"
+    say "f = #{Fraction(3,4)}"  # "f = Fraction(3, 4)"
+
+=cut
 
 =head2 dump
 
-    f.dump
+    self.dump
 
-Returns a string representation of the object for debugging purposes.
+Same as L</to_s> — returns the constructor-style string representation, e.g. C<"Fraction(3, 4)">.
 
-=head1 OPERATORS
+    say Fraction(3, 4).dump     # "Fraction(3, 4)"
 
-The following operators are overloaded for C<Sidef::Types::Number::Fraction>:
+=cut
 
-=over 4
+=head1 ARITHMETIC OPERATIONS
 
-=item *
+=head2 add
 
-C<+> (Addition)
+    a + b
 
-=item *
+Adds two values. If C<b> is also a Fraction, the two are added via cross-multiplication (C<a/b + c/d = (ad+bc)/bd>); otherwise C<b> is treated as C<b/1>.
 
-C<-> (Subtraction)
+    say (Fraction(1, 2) + Fraction(1, 3))   # Fraction(5, 6)
+    say (Fraction(1, 2) + 1)                # Fraction(3, 2)
 
-=item *
+Aliases: I<+>
 
-C<*> (Multiplication)
+=cut
 
-=item *
+=head2 sub
 
-C</> (Division)
+    a - b
 
-=item *
+Subtracts C<b> from the fraction (implemented as C<a + (-b)>).
 
-C<%> (Modulo)
+    say (Fraction(1, 2) - Fraction(1, 3))   # Fraction(1, 6)
 
-=item *
+Aliases: I<->
 
-C<**> (Exponentiation)
+=cut
 
-=item *
+=head2 mul
 
-C<< <=> >> (Comparison)
+    a * b
 
-=back
+Multiplies two values. If C<b> is also a Fraction, numerators and denominators are multiplied pairwise; otherwise C<b> only multiplies the numerator.
 
-Additionally, standard boolean comparison operators (C<==>, C<!=>, C<< < >>, C<< <= >>, C<< > >>, C<< >= >>) work as expected.
+    say (Fraction(1, 2) * Fraction(2, 3))   # Fraction(1, 3)
+    say (Fraction(1, 2) * 3)                # Fraction(3, 2)
+
+Aliases: I<*>
+
+=cut
+
+=head2 div
+
+    a / b
+
+Divides the fraction by C<b>. If C<b> is also a Fraction, this multiplies by its reciprocal; otherwise C<b> only multiplies the denominator.
+
+    say (Fraction(1, 2) / Fraction(1, 3))   # Fraction(3, 2)
+    say (Fraction(1, 2) / 2)                # Fraction(1, 4)
+
+Aliases: I</>, I<÷>
+
+=cut
+
+=head2 sqr
+
+    self.sqr
+
+Returns the fraction squared (numerator and denominator each squared).
+
+    say Fraction(2, 3).sqr     # Fraction(4, 9)
+
+=cut
+
+=head2 inv
+
+    self.inv
+
+Returns the reciprocal of the fraction (numerator and denominator swapped).
+
+    say Fraction(3, 4).inv     # Fraction(4, 3)
+
+=cut
+
+=head2 neg
+
+    self.neg
+    -f
+
+Returns the negation of the fraction (numerator negated).
+
+    say Fraction(3, 4).neg     # Fraction(-3, 4)
+
+=cut
+
+=head2 inc
+
+    self.inc
+
+Returns the fraction plus one.
+
+    say Fraction(1, 2).inc     # Fraction(3, 2)
+
+Aliases: I<++>
+
+=cut
+
+=head2 dec
+
+    self.dec
+
+Returns the fraction minus one.
+
+    say Fraction(1, 2).dec     # Fraction(-1, 2)
+
+Aliases: I<-->
+
+=cut
+
+=head2 pow
+
+    a ** n
+
+Raises the fraction to the power C<n>. A negative exponent inverts the fraction and applies the absolute exponent instead, i.e. C<(a/b)**(-n) == (b/a)**n>.
+
+    say (Fraction(2, 3) ** 2)     # Fraction(4, 9)
+    say (Fraction(2, 3) ** -2)    # Fraction(9, 4)
+
+Aliases: I<**>
+
+=cut
+
+=head2 mod
+
+    a % b
+
+Computes the fraction modulo C<b>. If C<b> is B<not> a Fraction, this instead builds a new Fraction whose numerator and denominator are each reduced modulo C<b> (deferring to C<Sidef::Types::Number::Mod> arithmetic) — useful as a stepping stone for modular-inverse computations such as L</invmod>. If C<b> is itself a Fraction, the ordinary real-number definition is used: C<a - b * floor(a/b)>.
+
+    say (Fraction(7, 2) % Fraction(1, 1))   # Fraction(1, 2)
+
+Aliases: I<%>
+
+=cut
+
+=head2 invmod
+
+    self.invmod(n)
+
+Computes the modular inverse of the fraction with respect to C<n>, via C<self.inv.mod(n)>.
+
+=cut
+
+=head2 powmod
+
+    self.powmod(n, m)
+
+Computes C<self**n> modulo C<m> efficiently, using binary exponentiation. Supports negative exponents (via L</invmod> on the final result).
+
+    say Fraction(3, 1).powmod(10, 1000)    # 3**10 mod 1000
+
+=cut
+
+=head1 BIT SHIFTING
+
+=head2 lsft
+
+    a << n
+
+Left-shifts the fraction by C<n> bits — equivalent to multiplying by C<2**n> — by shifting the numerator.
+
+    say (Fraction(3, 4) << 2)    # Fraction(12, 4)
+
+Aliases: I<<< << >>>
+
+=cut
+
+=head2 rsft
+
+    a >> n
+
+Right-shifts the fraction by C<n> bits — equivalent to dividing by C<2**n> — by left-shifting the denominator.
+
+    say (Fraction(3, 4) >> 2)    # Fraction(3, 16)
+
+Aliases: I<<< >> >>>
+
+=cut
+
+=head1 ROUNDING
+
+=head2 floor
+
+    self.floor
+
+Returns the largest integer less than or equal to the fraction.
+
+    say Fraction(7, 2).floor     # 3
+    say Fraction(-7, 2).floor    # -4
+
+=cut
+
+=head2 ceil
+
+    self.ceil
+
+Returns the smallest integer greater than or equal to the fraction.
+
+    say Fraction(7, 2).ceil      # 4
+
+=cut
+
+=head2 round
+
+    self.round
+
+Rounds the fraction to the nearest integer.
+
+    say Fraction(7, 2).round     # 4
+
+=cut
+
+=head2 trunc
+
+    self.trunc
+
+Truncates the fraction toward zero.
+
+    say Fraction(7, 2).trunc      # 3
+    say Fraction(-7, 2).trunc     # -3
+
+=cut
+
+=head1 COMPARISON
+
+All comparisons work by cross-multiplication: comparing C<a/b> to C<c/d> compares C<a*d> to C<b*c> directly, without computing either division. If the right-hand side isn't already a Fraction, it's treated as C<value/1> first.
+
+=head2 eq
+
+    a == b
+
+Returns true if the two values represent the same fraction.
+
+    say ((Fraction(1, 2) == Fraction(2, 4)))   # true
+
+Aliases: I<==>
+
+=cut
+
+=head2 ne
+
+    a != b
+
+Returns true if the two values do not represent the same fraction.
+
+Aliases: I<!=>
+
+=cut
+
+=head2 lt
+
+    a < b
+
+Returns true if the fraction is less than C<b>.
+
+Aliases: I<<< < >>>
+
+=cut
+
+=head2 le
+
+    a <= b
+
+Returns true if the fraction is less than or equal to C<b>.
+
+Aliases: I<<< <= >>>, I<≤>
+
+=cut
+
+=head2 gt
+
+    a > b
+
+Returns true if the fraction is greater than C<b>.
+
+Aliases: I<<< > >>>
+
+=cut
+
+=head2 ge
+
+    a >= b
+
+Returns true if the fraction is greater than or equal to C<b>.
+
+Aliases: I<<< >= >>>, I<≥>
+
+=cut
+
+=head2 cmp
+
+    a <=> b
+
+Three-way comparison: returns -1, 0, or 1.
+
+Aliases: I<<< <=> >>>
+
+=cut
+
+=head1 BITWISE-STYLE OPERATIONS
+
+=head2 and
+
+    a & b
+
+Cross-multiplies C<a> and C<b> the same way the comparison operators do, then applies the underlying numeric C<and> (bitwise AND) to the two products.
+
+Aliases: I<&>
+
+=cut
+
+=head2 or
+
+    a | b
+
+Cross-multiplies C<a> and C<b>, then applies the underlying numeric C<or> (bitwise OR) to the two products.
+
+Aliases: I<|>
+
+=cut
+
+=head2 xor
+
+    a ^ b
+
+Cross-multiplies C<a> and C<b>, then applies the underlying numeric C<xor> (bitwise XOR) to the two products.
+
+Aliases: I<^>
+
+=cut
+
+=head1 PREDICATES
+
+=head2 is_zero
+
+    self.is_zero
+
+Returns true if the fraction is equal to zero.
+
+=cut
+
+=head2 is_one
+
+    self.is_one
+
+Returns true if the fraction is equal to one.
+
+=cut
+
+=head2 is_mone
+
+    self.is_mone
+
+Returns true if the fraction is equal to negative one.
+
+=cut
+
+=head2 is_proper
+
+    self.is_proper
+
+Returns true if the numerator is less than the denominator (a direct comparison — not of absolute values). Note that this means any fraction with a negative numerator and a positive denominator is "proper" by this test, regardless of magnitude.
+
+    say Fraction(2, 3).is_proper     # true
+    say Fraction(5, 3).is_proper     # false
+    say Fraction(-5, 3).is_proper    # true
+
+=cut
+
+=head2 is_improper
+
+    self.is_improper
+
+The negation of L</is_proper>.
+
+=cut
+
+=head2 is_nan
+
+    self.is_nan
+
+Returns true if the fraction is C<0/0>, or if either the numerator or the denominator is itself NaN.
+
+=cut
+
+=head2 is_real
+
+    self.is_real
+
+Returns false for C<0/0>; otherwise returns true only if both the numerator and the denominator are real.
+
+=cut
+
+=head1 SYMBOLIC EVALUATION
+
+=head2 eval
+
+    self.eval(value)
+
+Evaluates the fraction as a rational expression at C<value>, by evaluating the numerator and denominator separately and dividing the results. For a Fraction of plain numbers this just returns the fraction's own value; it's most useful when the numerator and/or denominator are polynomials.
+
+    var f = Fraction(Poly("x")**2, Poly("x") + 1)
+    say f.eval(3)    # (3**2) / (3+1) = 9/4
+
+=cut
+
+=head1 EXAMPLES
+
+=head2 Basic Fraction Arithmetic
+
+    var a = Fraction(1, 3)
+    var b = Fraction(1, 6)
+
+    say (a + b)        # Fraction(1, 2)
+    say (a - b)         # Fraction(1, 6)
+    say (a * b)         # Fraction(1, 18)
+    say (a / b)         # Fraction(2, 1)
+
+=head2 Converting to a Mixed Number
+
+    var f = Fraction(17, 5)
+    var mixed = f.as_mixed
+    say "#{mixed[0]} and #{mixed[1]}/#{mixed[2]}"    # "3 and 2/5"
+
+=head2 Comparing Fractions
+
+    var half   = Fraction(1, 2)
+    var third  = Fraction(1, 3)
+
+    say ((half > third))    # true
+    say (half <=> third)    # 1
+
+=head2 Modular Exponentiation
+
+    var f = Fraction(3, 1)
+    say f.powmod(100, 1000007)
+
+=head1 NOTES
+
+Fraction inherits from L<Sidef::Types::Number::Number>, so a number of general numeric methods — such as C<abs>, C<sign>, C<is_pos>, C<is_neg>, C<is_int>, and conversions like C<int>/C<to_i> and C<float>/C<to_f> — are available on Fraction objects even though they aren't defined in this file. Consult Number's own documentation for their exact behavior.
+
+This class does not normalize the sign of the denominator or automatically reduce fractions to lowest terms; the numerator and denominator are kept exactly as given (or as produced by an arithmetic operation).
+
+=head1 SEE ALSO
+
+L<Sidef::Types::Number::Number>
 
 =cut

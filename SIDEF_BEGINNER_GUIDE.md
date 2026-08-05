@@ -2127,22 +2127,25 @@ say sierpinski(4)
 
 You've covered the fundamentals! Here's where to go next.
 
-### Official Documentation
+### Documentation & Learning Resources
 
 | Resource | Description |
 |----------|-------------|
 | 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
-| 📄 [PDF Book](https://github.com/trizen/sidef/releases/download/26.07/sidef-book.pdf) | The full book in PDF format for offline reading |
-| 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | An advanced tutorial covering the full language |
-| 🔢 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
+| 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | Comprehensive language tutorial |
+| 📕 [Full PDF Documentation](https://github.com/trizen/sidef/releases/download/26.07/sidef-documentation.pdf) | Offline PDF version of the complete language documentation |
+| 📑 [Number Theory Cheatsheet](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_CHEATSHEET.md) | Quick reference for Sidef's number theory functions |
+| 📚 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
 | 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) | Complete function reference for number theory |
+| 📄 [Computational Algebra Guide](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md) | Complete guide for computational algebra |
 
-### Example Code
+### Additional resources
 
 | Resource | Description |
 |----------|-------------|
 | 📂 [sidef-scripts](https://github.com/trizen/sidef-scripts) | Hundreds of real Sidef programs — the best way to learn by reading |
 | 🌹 [RosettaCode — Sidef](https://rosettacode.org/wiki/Sidef) | Classic programming tasks solved in Sidef, side-by-side with other languages |
+| 📄 [Sidef::Types::Number::Number](https://metacpan.org/pod/Sidef::Types::Number::Number) | Full documentation for the Number class |
 
 ### Community
 
@@ -2151,10 +2154,7 @@ You've covered the fundamentals! Here's where to go next.
 | 💬 [GitHub Discussions](https://github.com/trizen/sidef/discussions) | Ask questions, share ideas, get help |
 | 🐛 [GitHub Issues](https://github.com/trizen/sidef/issues) | Bug reports and feature requests |
 | 📦 [MetaCPAN](https://metacpan.org/pod/Sidef) | CPAN package page with additional documentation |
-
-### Try Without Installing
-
-**[https://tio.run/#sidef](https://tio.run/#sidef)** — Run Sidef code instantly in your browser.
+| 🧪 [Try It Online](https://tio.run/#sidef) | Experiment without installing anything |
 
 ### What to explore next
 
