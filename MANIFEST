@@ -1065,7 +1065,6 @@ scripts/Tests/sets_1.sf
 scripts/Tests/sets_2.sf
 scripts/Tests/sidef_executor.sf
 scripts/Tests/sidef_keywords.sf
-scripts/Tests/sidef_to_json.sf
 scripts/Tests/sierpinski_alphabet.sf
 scripts/Tests/sierpinski_carpet.sf
 scripts/Tests/sierpinski_diamond.sf
