@@ -69,7 +69,7 @@ L<https://en.wikipedia.org/wiki/Lucas_sequence>.
 
 Inherits methods from L<Sidef::Types::Number::Number>.
 
-=head1 METHODS
+=head1 CONSTRUCTION
 
 =head2 new
 
@@ -91,12 +91,15 @@ B<Parameters:>
 
 =back
 
-B<Returns:> A new Quadratic object.
-
 B<Example:>
 
     var e = Quadratic(3, 4, 1, 1)    # 3 + 4t,  t^2 = 1 + t
     var z = Quadratic(0, 1, -1, 0)   # t,       t^2 = -1  (like i)
+
+Calling C<.new> (or the equivalent bareword call) on an B<existing> Quadratic instead evaluates it as a symbolic expression at the given value — the same thing L</eval> does:
+
+    var poly_elem = Quadratic(Poly("x"), 0, 1, 1)
+    say poly_elem.new(3)    # evaluates at x=3
 
 Aliases: I<call>
 
@@ -119,43 +122,7 @@ B<Example:>
 
 =cut
 
-=head2 eval
-
-    self.eval(x)
-
-Evaluates the element as a polynomial by substituting C<x> for C<t>. All four components (C<a>, C<b>, C<p>, C<q>) are individually evaluated at C<x>.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<x> - The value to substitute.
-
-=back
-
-B<Returns:> Quadratic after substitution.
-
-B<Example:>
-
-    var e = Quadratic(Poly([9,0,6]), Poly([3,4,5]), 3, 4)
-    say e.eval(5)   # substitutes x with 5 in the Poly objects
-
-=cut
-
-=head2 lift
-
-    self.lift
-
-Lifts the element by applying C<lift> to each of the four components. This is primarily useful after modular arithmetic to recover the representative in a larger ring.
-
-B<Returns:> Quadratic with lifted components.
-
-B<Example:>
-
-    var e = Quadratic(Mod(3, 97), Mod(4, 97), 1, 1)
-    say e.lift      # lift residues back
-
-=cut
+=head1 COMPONENTS
 
 =head2 a
 
@@ -194,6 +161,8 @@ Returns the parameter C<p> that defines the ring relation C<t^2 = p + q*t>.
 B<Example:>
 
     say Quadratic(3, 4, 5, 6).p      #=> 5
+
+Aliases: I<w>
 
 =cut
 
@@ -237,7 +206,49 @@ B<Example:>
 
 =cut
 
-=head2 +
+=head1 SYMBOLIC EVALUATION
+
+=head2 eval
+
+    self.eval(x)
+
+Evaluates the element as a polynomial by substituting C<x> for C<t>. All four components (C<a>, C<b>, C<p>, C<q>) are individually evaluated at C<x>.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<x> - The value to substitute.
+
+=back
+
+B<Returns:> Quadratic after substitution.
+
+B<Example:>
+
+    var e = Quadratic(Poly([9,0,6]), Poly([3,4,5]), 3, 4)
+    say e.eval(5)   # substitutes x with 5 in the Poly objects
+
+=cut
+
+=head2 lift
+
+    self.lift
+
+Lifts the element by applying C<lift> to each of the four components. This is primarily useful after modular arithmetic to recover the representative in a larger ring.
+
+B<Returns:> Quadratic with lifted components.
+
+B<Example:>
+
+    var e = Quadratic(Mod(3, 97), Mod(4, 97), 1, 1)
+    say e.lift      # lift residues back
+
+=cut
+
+=head1 ARITHMETIC OPERATIONS
+
+=head2 add
 
     a + b
 
@@ -258,16 +269,15 @@ B<Example:>
     say (x + y)       #=> Quadratic(4, 6, 1, 1)
     say (x + 10)      #=> Quadratic(11, 2, 1, 1)
 
-Aliases: I<add>
+Aliases: I<+>
 
 =cut
 
-=head2 -
+=head2 sub
 
     a - b
 
-Subtraction of two Quadratic values in the same ring, or subtraction of
-a scalar from a Quadratic.
+Subtraction of two Quadratic values in the same ring, or subtraction of a scalar from a Quadratic.
 
 For elements sharing the same C<(p, q)>:
 
@@ -283,11 +293,11 @@ B<Example:>
     var y = Quadratic(1, 2, 1, 1)
     say (x - y)       #=> Quadratic(4, 4, 1, 1)
 
-Aliases: I<sub>
+Aliases: I<->
 
 =cut
 
-=head2 *
+=head2 mul
 
     a * b
 
@@ -306,16 +316,15 @@ B<Example:>
     var x = Quadratic(1, 1, 1, 1)    # 1 + t,  t^2 = 1 + t
     say (x * x)       #=> Quadratic(2, 3, 1, 1)   (= (1+t)^2 = 2 + 3t)
 
-Aliases: I<mul>
+Aliases: I<*>
 
 =cut
 
-=head2 /
+=head2 div
 
     a / b
 
-Division of two Quadratic values in the same ring, or division of a
-Quadratic by a scalar.
+Division of two Quadratic values in the same ring, or division of a Quadratic by a scalar.
 
 For ring elements, computes C<x * conj(y) / norm(y)>.
 
@@ -329,91 +338,7 @@ B<Example:>
     var y = Quadratic(7, 5, 1, 0)
     say (x / y)       #=> Quadratic(1/24, 13/24, 1, 0)
 
-Aliases: I<÷>, I<div>
-
-=cut
-
-=head2 **
-
-    a ** b
-
-Raises the element to an integer power using binary (square-and-multiply)
-exponentiation.
-
-Negative integer exponents compute the multiplicative inverse first.
-
-B<Returns:> Quadratic (or Number for non-integer exponent).
-
-B<Example:>
-
-    var t = Quadratic(0, 1, 1, 1)    # t^2 = 1 + t
-    say t**10   #=> Quadratic(55, 89, 1, 1)
-    say t**20   #=> Quadratic(6765, 10946, 1, 1)
-
-    # Negative exponent
-    var e = Quadratic(1, 1, 1, 1)
-    say e**(-3)     # = inv(e^3)
-
-Aliases: I<pow>
-
-=cut
-
-=head2 %
-
-    a % b
-
-Modulo operation.
-
-When C<b> is a plain Number, reduces both components C<a> and C<b> component-wise modulo C<b>.
-
-When C<b> is a Quadratic in the same ring, computes the Euclidean remainder via C<divmod>.
-
-B<Returns:> Quadratic — the remainder.
-
-B<Example:>
-
-    var a = Quadratic(5, 3, -1, -1)
-    var b = Quadratic(4, 7, -1, -1)
-    say (a % b)       #=> Quadratic(-2, 0, -1, -1)
-
-    var e = Quadratic(13, 27, 1, 1)
-    say (e % 7)       #=> Quadratic(6, 6, 1, 1)
-
-Aliases: I<mod>
-
-=cut
-
-=head2 ++
-
-    ++a
-
-Increment: adds 1 to the constant part C<a>, leaving C<b>, C<p>, C<q> unchanged.
-
-B<Returns:> Quadratic — incremented value.
-
-B<Example:>
-
-    var e = Quadratic(3, 4, 1, 1)
-    say ++e     #=> Quadratic(4, 4, 1, 1)
-
-Aliases: I<inc>
-
-=cut
-
-=head2 --
-
-    --a
-
-Decrement: subtracts 1 from the constant part C<a>, leaving C<b>, C<p>, C<q> unchanged.
-
-B<Returns:> Quadratic — decremented value.
-
-B<Example:>
-
-    var e = Quadratic(3, 4, 1, 1)
-    say --e     #=> Quadratic(2, 4, 1, 1)
-
-Aliases: I<dec>
+Aliases: I</>, I<÷>
 
 =cut
 
@@ -447,20 +372,236 @@ B<Example:>
 
 =cut
 
-=head2 abs
+=head2 inv
 
-    x.abs
+    x.inv
 
-Computes the absolute value (magnitude) defined as C<sqrt(norm(x))>.
+Computes the multiplicative inverse of the element.
 
-B<Returns:> Number — the absolute value (may be complex if the norm is negative).
+For C<a + b*t> with norm C<N = a^2 + a*b*q - b^2*p>:
+
+    inv(x) = conj(x) / N
+
+B<Returns:> Quadratic — the multiplicative inverse.
 
 B<Example:>
 
-    var e = Quadratic(3, 4, 1, 0)    # t^2 = 1
-    say e.abs   # sqrt(norm(e)) = sqrt(3^2 - 4^2) = sqrt(-7)
+    var e = Quadratic(3, 4, 1, 1)
+    say e.inv             # 1/e
+    say (e * e.inv)       #=> Quadratic(1, 0, 1, 1)
 
 =cut
+
+=head2 inc
+
+    ++a
+
+Increment: adds 1 to the constant part C<a>, leaving C<b>, C<p>, C<q> unchanged.
+
+B<Returns:> Quadratic — incremented value.
+
+B<Example:>
+
+    var e = Quadratic(3, 4, 1, 1)
+    say ++e     #=> Quadratic(4, 4, 1, 1)
+
+Aliases: I<++>
+
+=cut
+
+=head2 dec
+
+    --a
+
+Decrement: subtracts 1 from the constant part C<a>, leaving C<b>, C<p>, C<q> unchanged.
+
+B<Returns:> Quadratic — decremented value.
+
+B<Example:>
+
+    var e = Quadratic(3, 4, 1, 1)
+    say --e     #=> Quadratic(2, 4, 1, 1)
+
+Aliases: I<-->
+
+=cut
+
+=head2 pow
+
+    a ** b
+
+Raises the element to an integer power using binary (square-and-multiply) exponentiation.
+
+Negative integer exponents compute the multiplicative inverse first. A non-integer exponent falls back to the numeric embedding (L</to_n>) raised to that power.
+
+B<Returns:> Quadratic (or Number for non-integer exponent).
+
+B<Example:>
+
+    var t = Quadratic(0, 1, 1, 1)    # t^2 = 1 + t
+    say t**10   #=> Quadratic(55, 89, 1, 1)
+    say t**20   #=> Quadratic(6765, 10946, 1, 1)
+
+    # Negative exponent
+    var e = Quadratic(1, 1, 1, 1)
+    say e**(-3)     # = inv(e^3)
+
+Aliases: I<**>
+
+=cut
+
+=head2 mod
+
+    a % b
+
+Modulo operation.
+
+When C<b> is a plain Number, reduces both components C<a> and C<b> component-wise modulo C<b>.
+
+When C<b> is a Quadratic in the same ring, computes the Euclidean remainder via C<divmod>.
+
+B<Returns:> Quadratic — the remainder.
+
+B<Example:>
+
+    var a = Quadratic(5, 3, -1, -1)
+    var b = Quadratic(4, 7, -1, -1)
+    say (a % b)       #=> Quadratic(-2, 0, -1, -1)
+
+    var e = Quadratic(13, 27, 1, 1)
+    say (e % 7)       #=> Quadratic(6, 6, 1, 1)
+
+Aliases: I<%>
+
+=cut
+
+=head2 divmod
+
+    self.divmod(other)
+
+Euclidean division with rounding to the nearest element.
+
+Computes the quotient C<q> and remainder C<r> such that C<self = q * other + r> and the norm of C<r> is minimised.
+
+B<Returns:> (Quadratic, Quadratic) — the pair C<(quotient, remainder)>.
+
+B<Example:>
+
+    var x = Quadratic(7, 5, 1, 1)
+    var y = Quadratic(2, 1, 1, 1)
+    var (q, r) = x.divmod(y)
+    say q   # rounded quotient
+    say r   # remainder: x - q*y
+
+=cut
+
+=head2 idiv
+
+    self.idiv(other)
+
+Integer (Euclidean) quotient: returns only the quotient part of C<divmod>.
+
+B<Returns:> Quadratic — the integer quotient.
+
+B<Example:>
+
+    var x = Quadratic(7, 5, 1, 1)
+    var y = Quadratic(2, 1, 1, 1)
+    say x.idiv(y)   # rounded-to-nearest quotient
+
+=cut
+
+=head2 invmod
+
+    x.invmod(m)
+
+Computes the modular multiplicative inverse modulo C<m>: finds C<x'> such that C<x * x' ≡ 1 (mod m)>.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<m> - the modulus (positive integer).
+
+=back
+
+B<Returns:> Quadratic — the modular inverse.
+
+B<Example:>
+
+    var e = Quadratic(3, 4, 1, 1)
+    var inv = e.invmod(97)
+    say ((e * inv) % 97)      #=> Quadratic(1, 0, 1, 1)
+
+=cut
+
+=head2 powmod
+
+    x.powmod(n, m)
+
+Modular exponentiation: computes C<x^n mod m> efficiently using binary exponentiation, reducing modulo C<m> at every step to keep components small.
+
+Supports negative exponents by first computing the modular inverse.
+
+B<Parameters:>
+
+=over 4
+
+=item * C<n> - the exponent (integer, may be negative).
+
+=item * C<m> - the modulus (positive integer).
+
+=back
+
+B<Returns:> Quadratic — the result of C<x^n mod m>.
+
+B<Example:>
+
+    var t = Quadratic(0, 1, 1, 1)    # t^2 = 1 + t
+    say t.powmod(100, 97)   # fast modular power
+
+    # Lucas / Fibonacci mod p
+    say t.powmod(1000, 101)
+
+=cut
+
+=head1 BIT SHIFTING
+
+=head2 shift_left
+
+    a << n
+
+Left bit-shift: multiplies the element by C<2^n>.
+
+B<Returns:> Quadratic — result after left shift.
+
+B<Example:>
+
+    var e = Quadratic(1, 1, 1, 1)
+    say (e << 3)      #=> Quadratic(8, 8, 1, 1)  (= e * 8)
+
+Aliases: I<lsft>, I<<< << >>>
+
+=cut
+
+=head2 shift_right
+
+    a >> n
+
+Right bit-shift: divides the element by C<2^n>.
+
+B<Returns:> Quadratic — result after right shift.
+
+B<Example:>
+
+    var e = Quadratic(8, 8, 1, 1)
+    say (e >> 3)      #=> Quadratic(1, 1, 1, 1)  (= e / 8)
+
+Aliases: I<rsft>, I<<< >> >>>
+
+=cut
+
+=head1 ROUNDING AND FLOATING POINT
 
 =head2 float
 
@@ -530,105 +671,7 @@ B<Example:>
 
 =cut
 
-=head2 divmod
-
-    self.divmod(other)
-
-Euclidean division with rounding to the nearest element.
-
-Computes the quotient C<q> and remainder C<r> such that C<self = q * other + r> and the norm of C<r> is minimised.
-
-B<Returns:> (Quadratic, Quadratic) — the pair C<(quotient, remainder)>.
-
-B<Example:>
-
-    var x = Quadratic(7, 5, 1, 1)
-    var y = Quadratic(2, 1, 1, 1)
-    var (q, r) = x.divmod(y)
-    say q   # rounded quotient
-    say r   # remainder: x - q*y
-
-=cut
-
-=head2 idiv
-
-    self.idiv(other)
-
-Integer (Euclidean) quotient: returns only the quotient part of C<divmod>.
-
-B<Returns:> Quadratic — the integer quotient.
-
-B<Example:>
-
-    var x = Quadratic(7, 5, 1, 1)
-    var y = Quadratic(2, 1, 1, 1)
-    say x.idiv(y)   # rounded-to-nearest quotient
-
-=cut
-
-=head2 <<
-
-    a << n
-
-Left bit-shift: multiplies the element by C<2^n>.
-
-B<Returns:> Quadratic — result after left shift.
-
-B<Example:>
-
-    var e = Quadratic(1, 1, 1, 1)
-    say (e << 3)      #=> Quadratic(8, 8, 1, 1)  (= e * 8)
-
-Aliases: I<lsft>, I<shift_left>
-
-=cut
-
-=head2 >>
-
-    a >> n
-
-Right bit-shift: divides the element by C<2^n>.
-
-B<Returns:> Quadratic — result after right shift.
-
-B<Example:>
-
-    var e = Quadratic(8, 8, 1, 1)
-    say (e >> 3)      #=> Quadratic(1, 1, 1, 1)  (= e / 8)
-
-Aliases: I<rsft>, I<shift_right>
-
-=cut
-
-=head2 powmod
-
-    x.powmod(n, m)
-
-Modular exponentiation: computes C<x^n mod m> efficiently using binary exponentiation, reducing modulo C<m> at every step to keep components small.
-
-Supports negative exponents by first computing the modular inverse.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<n> - the exponent (integer, may be negative).
-
-=item * C<m> - the modulus (positive integer).
-
-=back
-
-B<Returns:> Quadratic — the result of C<x^n mod m>.
-
-B<Example:>
-
-    var t = Quadratic(0, 1, 1, 1)    # t^2 = 1 + t
-    say t.powmod(100, 97)   # fast modular power
-
-    # Lucas / Fibonacci mod p
-    say t.powmod(1000, 101)
-
-=cut
+=head1 ALGEBRAIC PROPERTIES
 
 =head2 conj
 
@@ -636,8 +679,7 @@ B<Example:>
 
 Returns the conjugate of the element.
 
-For C<a + b*t>, the conjugate uses the other root C<t' = q - t> of the
-minimal polynomial.
+For C<a + b*t>, the conjugate uses the other root C<t' = q - t> of the minimal polynomial.
 
 Concretely:
 
@@ -692,107 +734,72 @@ B<Example:>
 
 =cut
 
-=head2 inv
+=head2 abs
 
-    x.inv
+    x.abs
 
-Computes the multiplicative inverse of the element.
+Computes the absolute value (magnitude) defined as C<sqrt(norm(x))>.
 
-For C<a + b*t> with norm C<N = a^2 + a*b*q - b^2*p>:
-
-    inv(x) = conj(x) / N
-
-B<Returns:> Quadratic — the multiplicative inverse.
+B<Returns:> Number — the absolute value (may be complex if the norm is negative).
 
 B<Example:>
 
-    var e = Quadratic(3, 4, 1, 1)
-    say e.inv             # 1/e
-    say (e * e.inv)       #=> Quadratic(1, 0, 1, 1)
+    var e = Quadratic(3, 4, 1, 0)    # t^2 = 1
+    say e.abs   # sqrt(norm(e)) = sqrt(3^2 - 4^2) = sqrt(-7)
 
 =cut
 
-=head2 invmod
+=head1 NUMBER THEORY
 
-    x.invmod(m)
+=head2 gcd
 
-Computes the modular multiplicative inverse modulo C<m>: finds C<x'> such that
-C<x * x' ≡ 1 (mod m)>.
+    self.gcd(other)
+
+Computes the greatest common divisor of two elements using the Euclidean algorithm in the ring (via repeated C<divmod>).
 
 B<Parameters:>
 
 =over 4
 
-=item * C<m> - the modulus (positive integer).
+=item * C<other> - another Quadratic in the same ring.
 
 =back
 
-B<Returns:> Quadratic — the modular inverse.
+B<Returns:> Quadratic — a GCD (defined up to units).
 
 B<Example:>
 
-    var e = Quadratic(3, 4, 1, 1)
-    var inv = e.invmod(97)
-    say ((e * inv) % 97)      #=> Quadratic(1, 0, 1, 1)
+    var x = Quadratic(6, 0, 1, 1)
+    var y = Quadratic(4, 0, 1, 1)
+    say x.gcd(y)    # GCD in the ring
 
 =cut
 
-=head2 is_zero
+=head2 lcm
 
-    x.is_zero
+    self.lcm(other)
 
-Returns true if the element is zero (both C<a = 0> and C<b = 0>).
+Computes the least common multiple of two elements as:
 
-B<Returns:> Bool
+     self * other / gcd(self, other)
 
-B<Example:>
+Returns zero if either argument is zero.
 
-    say Quadratic(0, 0, 1, 1).is_zero    #=> true
-    say Quadratic(1, 0, 1, 1).is_zero    #=> false
+B<Parameters:>
 
-=cut
+=over 4
 
-=head2 is_one
+=item * C<other> - another Quadratic in the same ring.
 
-    x.is_one
+=back
 
-Returns true if the element equals the multiplicative identity (C<a = 1>, C<b = 0>).
-
-B<Returns:> Bool
+B<Returns:> Quadratic — the LCM.
 
 B<Example:>
 
-    say Quadratic(1, 0, 1, 1).is_one     #=> true
-    say Quadratic(0, 1, 1, 1).is_one     #=> false
-
-=cut
-
-=head2 is_mone
-
-    x.is_mone
-
-Returns true if the element equals minus one (C<a = -1>, C<b = 0>).
-
-B<Returns:> Bool
-
-B<Example:>
-
-    say Quadratic(-1, 0, 1, 1).is_mone   #=> true
-
-=cut
-
-=head2 is_int
-
-    self.is_int
-
-Returns true if the element is a plain integer, i.e. the C<b> component is zero.
-
-B<Returns:> Bool
-
-B<Example:>
-
-    say Quadratic(5, 0, 1, 1).is_int     #=> true
-    say Quadratic(5, 3, 1, 1).is_int     #=> false
+    var x = Quadratic(4, 0, 1, 1)
+    var y = Quadratic(6, 0, 1, 1)
+    say x.lcm(y)
 
 =cut
 
@@ -868,8 +875,7 @@ B<Example:>
 
 Returns true if the norm of the element (in absolute value) is a prime integer.
 
-This is a sufficient but not necessary condition for the element to be
-irreducible in the ring.
+This is a sufficient but not necessary condition for the element to be irreducible in the ring.
 
 B<Returns:> Bool
 
@@ -880,71 +886,82 @@ B<Example:>
 
 =cut
 
-=head2 gcd
+=head1 PREDICATES
 
-    self.gcd(other)
+=head2 is_zero
 
-Computes the greatest common divisor of two elements using the Euclidean algorithm in the ring (via repeated C<divmod>).
+    x.is_zero
 
-B<Parameters:>
+Returns true if the element is zero (both C<a = 0> and C<b = 0>).
 
-=over 4
-
-=item * C<other> - another Quadratic in the same ring.
-
-=back
-
-B<Returns:> Quadratic — a GCD (defined up to units).
+B<Returns:> Bool
 
 B<Example:>
 
-    var x = Quadratic(6, 0, 1, 1)
-    var y = Quadratic(4, 0, 1, 1)
-    say x.gcd(y)    # GCD in the ring
+    say Quadratic(0, 0, 1, 1).is_zero    #=> true
+    say Quadratic(1, 0, 1, 1).is_zero    #=> false
 
 =cut
 
-=head2 lcm
+=head2 is_one
 
-    self.lcm(other)
+    x.is_one
 
-Computes the least common multiple of two elements as:
+Returns true if the element equals the multiplicative identity (C<a = 1>, C<b = 0>).
 
-     self * other / gcd(self, other)
-
-Returns zero if either argument is zero.
-
-B<Parameters:>
-
-=over 4
-
-=item * C<other> - another Quadratic in the same ring.
-
-=back
-
-B<Returns:> Quadratic — the LCM.
+B<Returns:> Bool
 
 B<Example:>
 
-    var x = Quadratic(4, 0, 1, 1)
-    var y = Quadratic(6, 0, 1, 1)
-    say x.lcm(y)
+    say Quadratic(1, 0, 1, 1).is_one     #=> true
+    say Quadratic(0, 1, 1, 1).is_one     #=> false
 
 =cut
 
-=head2 <=>
+=head2 is_mone
+
+    x.is_mone
+
+Returns true if the element equals minus one (C<a = -1>, C<b = 0>).
+
+B<Returns:> Bool
+
+B<Example:>
+
+    say Quadratic(-1, 0, 1, 1).is_mone   #=> true
+
+=cut
+
+=head2 is_int
+
+    self.is_int
+
+Returns true if the element is a plain integer, i.e. the C<b> component is zero.
+
+B<Returns:> Bool
+
+B<Example:>
+
+    say Quadratic(5, 0, 1, 1).is_int     #=> true
+    say Quadratic(5, 3, 1, 1).is_int     #=> false
+
+=cut
+
+=head1 COMPARISON
+
+=head2 cmp
 
     a <=> b
 
-Three-way (spaceship) comparison. Compares lexicographically first by C<a>, then C<b>, then C<p>, then C<q>.
+Three-way (spaceship) comparison. Compares lexicographically first by C<a>, then C<b>, then C<p>, then C<q>. When compared against a plain number, compares C<a> against that number, then C<b> against zero.
 
 B<Returns:> Number — C<-1>, C<0>, or C<1>.
 
-Aliases: I<cmp>
+Aliases: I<<< <=> >>>
 
 =cut
 
-=head2 ==
+=head2 eq
 
     a == b
 
@@ -956,74 +973,76 @@ B<Returns:> Bool
 
 B<Example:>
 
-    say Quadratic(3, 0, 1, 1) == 3      #=> true
-    say Quadratic(3, 1, 1, 1) == 3      #=> false
+    say (Quadratic(3, 0, 1, 1) == 3)      #=> true
+    say (Quadratic(3, 1, 1, 1) == 3)      #=> false
 
-Aliases: I<eq>
+Aliases: I<==>
 
 =cut
 
-=head2 !=
+=head2 ne
 
     a != b
 
-Inequality test — negation of C<==>.
+Inequality test — negation of L</eq>.
 
 B<Returns:> Bool
 
-Aliases: I<ne>
+Aliases: I<!=>
 
 =cut
 
-=head2 <
+=head2 lt
 
     a < b
 
-Less-than comparison based on the lexicographic ordering defined by C<< <=> >>.
+Less-than comparison based on the lexicographic ordering defined by L</cmp>.
 
 B<Returns:> Bool
 
-Aliases: I<lt>
+Aliases: I<<< < >>>
 
 =cut
 
-=head2 >
+=head2 gt
 
     a > b
 
-Greater-than comparison based on the lexicographic ordering defined by C<< <=> >>.
+Greater-than comparison based on the lexicographic ordering defined by L</cmp>.
 
 B<Returns:> Bool
 
-Aliases: I<gt>
+Aliases: I<<< < >>>
 
 =cut
 
-=head2 ≤
+=head2 le
 
-    a ≤ b
+    a <= b
 
 Less-than-or-equal comparison.
 
 B<Returns:> Bool
 
-Aliases: I<E<lt>=>, I<le>
+Aliases: I<<< <= >>>, I<≤>
 
 =cut
 
-=head2 ≥
+=head2 ge
 
-    a ≥ b
+    a >= b
 
 Greater-than-or-equal comparison.
 
 B<Returns:> Bool
 
-Aliases: I<E<gt>=>, I<ge>
+Aliases: I<<< >= >>>, I<≥>
 
 =cut
 
-=head2 &
+=head1 BITWISE-STYLE OPERATIONS
+
+=head2 and
 
     a & b
 
@@ -1035,11 +1054,11 @@ For a scalar, applies AND to the C<a> component only.
 
 B<Returns:> Quadratic
 
-Aliases: I<and>
+Aliases: I<&>
 
 =cut
 
-=head2 |
+=head2 or
 
     a | b
 
@@ -1047,11 +1066,11 @@ Bitwise OR applied component-wise to C<a> and C<b>.
 
 B<Returns:> Quadratic
 
-Aliases: I<or>
+Aliases: I<|>
 
 =cut
 
-=head2 ^
+=head2 xor
 
     a ^ b
 
@@ -1059,9 +1078,11 @@ Bitwise XOR applied component-wise to C<a> and C<b>.
 
 B<Returns:> Quadratic
 
-Aliases: I<xor>
+Aliases: I<^>
 
 =cut
+
+=head1 TYPE CONVERSION
 
 =head2 to_n
 
@@ -1071,7 +1092,7 @@ Converts the element to a regular Number (or Complex) by evaluating C<a + b*t> a
 
      t = (q + sqrt(q^2 + 4*p)) / 2
 
-When the discriminant C<q^2 + 4*p> is negative, the result is complex.
+When the discriminant C<q^2 + 4*p> is negative, the result is complex. This also backs the element's numeric-context overload.
 
 B<Returns:> Number (or Complex).
 
@@ -1084,11 +1105,41 @@ Aliases: I<to_c>
 
 =cut
 
+=head2 __boolify__
+
+    self.__boolify__
+
+Backs the element's boolean-context overload (e.g. C<if quadratic_value>). Note that this checks only the C<a> component's own truthiness — the C<b> component is not considered at all, unlike L</is_zero>, which requires both to be zero. In practice this means a value like C<Quadratic(0, 5, 1, 1)> is falsy in a boolean context even though it is not equal to zero as a ring element.
+
+    if (Quadratic(0, 5, 1, 1)) { say "truthy" } else { say "falsy" }   # falsy
+
+=cut
+
+=head1 STRING REPRESENTATION
+
+=head2 stringify
+
+    x.stringify
+
+Returns a readable string representation. When C<q = 0> (rings of the pure square-root form C<t^2 = p>) and C<b != 0>, this produces a math-style C<"a + b*sqrt(p)"> form; when C<b = 0> it's just C<"a">. For any ring where C<q != 0>, this falls back to the same constructor-style form as L</to_s>.
+
+B<Returns:> String
+
+B<Example:>
+
+    say Quadratic(3, 4, 5, 0).stringify    #=> "3 + 4*sqrt(5)"
+    say Quadratic(3, 0, 5, 0).stringify    #=> "3"
+    say Quadratic(0, 1, 1, 1).stringify    #=> "Quadratic(0, 1, 1, 1)"  (q != 0)
+
+Aliases: I<pretty>
+
+=cut
+
 =head2 to_s
 
     x.to_s
 
-Returns the constructor-form string representation C<"Quadratic(a, b, p, q)">.
+Returns the constructor-form string representation C<"Quadratic(a, b, p, q)">, regardless of C<p>/C<q>. This is also what implicit stringification (e.g. interpolation) produces.
 
 B<Returns:> String
 
@@ -1098,18 +1149,6 @@ B<Example:>
     say e.to_s   #=> "Quadratic(3, 4, 1, 1)"
 
 Aliases: I<dump>
-
-=cut
-
-=head2 pretty
-
-    x.pretty
-
-Same as C<to_s>: returns the string C<"Quadratic(a, b, p, q)">.
-
-B<Returns:> String
-
-Aliases: I<stringify>
 
 =cut
 
