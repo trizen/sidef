@@ -127,6 +127,9 @@ my $builder = $class->new(
 
         # For executing PARI/GP (with `Number!USE_PARI_GP = true`)
         'IPC::Open2' => 0,
+
+        # For Dir.home (as a last resort)
+        'File::HomeDir' => 0,
                   },
 
     # Metadata and Resources
