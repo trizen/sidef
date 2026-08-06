@@ -296,6 +296,8 @@ Equivalent with:
 
 When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
 
+    say (0.1f + 0.2f <~> 0.3)   #=> 0 (equal once rounded)
+
 Aliases: I<approx_cmp>
 
 =cut
@@ -370,7 +372,10 @@ Aliases: I<xdownto>
 
     n.abs
 
-The absolute value of C<n>.
+The absolute value of C<n>. Works for integers, rationals, floating-points and complex numbers.
+
+    say abs(-42)         #=> 42
+    say abs(-1/3)        #=> 1/3
 
 =cut
 
@@ -381,6 +386,9 @@ The absolute value of C<n>.
 Absolute comparison of C<a> and C<b>, defined as:
 
     abs(a) <=> abs(b)
+
+    say acmp(-10, 3)      #=> 1
+    say acmp(-3, 10)      #=> -1
 
 =cut
 
@@ -499,13 +507,17 @@ The value of the hypotenuse for catheti C<x> and C<y>, defined as:
 
 Also defined for complex numbers.
 
+    say hypot(3, 4)       #=> 5
+
 =cut
 
 =head2 iabs
 
     iabs(n)
 
-integer absolute value, by first truncating C<n> to an integer.
+Integer absolute value, by first truncating C<n> to an integer.
+
+    say iabs(-4.7)        #=> 4
 
 Aliases: I<absint>
 
@@ -515,7 +527,9 @@ Aliases: I<absint>
 
     iadd(a,b)
 
-Integer addition: C<a+b>.
+Integer addition, by first truncating C<a> and C<b> to integers: C<int(a) + int(b)>.
+
+    say iadd(2.9, 3.1)    #=> 5
 
 Aliases: I<addint>
 
@@ -527,6 +541,8 @@ Aliases: I<addint>
 
 Integer comparison, by first truncating C<x> and C<y> to integers.
 
+    say 5.5.icmp(5.1)     #=> 0 (both truncate to 5)
+
 Aliases: I<cmpint>
 
 =cut
@@ -535,7 +551,9 @@ Aliases: I<cmpint>
 
     imod(a,m)
 
-Integer remainder of C<a> when divided by C<m>: C<a % m>.
+Integer remainder of C<a> when divided by C<m>, by first truncating C<a> and C<m> to integers: C<int(a) % int(m)>.
+
+    say imod(17.9, 5)     #=> 2
 
 Aliases: I<modint>
 
@@ -545,7 +563,9 @@ Aliases: I<modint>
 
     imul(a,b)
 
-Integer multiplication: C<a*b>.
+Integer multiplication, by first truncating C<a> and C<b> to integers: C<int(a) * int(b)>.
+
+    say imul(2.9, 3.9)    #=> 6
 
 Aliases: I<mulint>
 
@@ -557,6 +577,8 @@ Aliases: I<mulint>
 
 Integer negation, by first truncating C<n> to an integer.
 
+    say ineg(4.7)         #=> -4
+
 Aliases: I<negint>
 
 =cut
@@ -567,6 +589,9 @@ Aliases: I<negint>
 
 Multiplicative inverse of C<n>: C<1/n>.
 
+    say inv(4)            #=> 1/4
+    say inv(1/3)          #=> 3
+
 =cut
 
 =head2 is_divisible
@@ -576,6 +601,9 @@ Multiplicative inverse of C<n>: C<1/n>.
 
 Returns true if C<n> is divisible by C<k>. False otherwise.
 
+    say 15.is_divisible(5)   #=> true
+    say (17 %% 5)            #=> false
+
 Aliases: I<%%>, I<is_divisible_by>, I<is_div>
 
 =cut
@@ -584,7 +612,9 @@ Aliases: I<%%>, I<is_divisible_by>, I<is_div>
 
     isub(a,b)
 
-Integer subtraction: C<a-b>.
+Integer subtraction, by first truncating C<a> and C<b> to integers: C<int(a) - int(b)>.
+
+    say isub(10.9, 3.1)   #=> 7
 
 Aliases: I<subint>
 
@@ -596,6 +626,8 @@ Aliases: I<subint>
 
 Returns the maximum value from a list of numbers.
 
+    say max(3, 7, 2, 9, 1)    #=> 9
+
 Aliases: I<vecmax>
 
 =cut
@@ -605,6 +637,8 @@ Aliases: I<vecmax>
     min(...)
 
 Returns the smallest value from a list of numbers.
+
+    say min(3, 7, 2, 9, 1)    #=> 1
 
 Aliases: I<vecmin>
 
@@ -631,6 +665,9 @@ Aliases: I<%>
 
 Negates the sign of C<x> (equivalent with: C<-x>).
 
+    say 5.neg             #=> -5
+    say (-5 -> neg)       #=> 5
+
 =cut
 
 =head2 prod
@@ -638,6 +675,8 @@ Negates the sign of C<x> (equivalent with: C<-x>).
     prod(...)
 
 Returns the product of a given list of numbers.
+
+    say prod(1, 2, 3, 4, 5)   #=> 120
 
 Aliases: I<Π>, I<vecprod>
 
@@ -661,11 +700,15 @@ Aliases: I<remove>
 
     sgn(x)
 
-Returns the sign of x.
+Returns the sign of C<x>, as C<-1>, C<0> or C<1>.
 
 Defined as:
 
-    x / abs(x)
+    x / abs(x)      # for x != 0
+
+    say sgn(-42)          #=> -1
+    say sgn(0)            #=> 0
+    say sgn(1/3)          #=> 1
 
 Aliases: I<sign>
 
@@ -687,6 +730,8 @@ Returns the residual mod C<m> such that it is within half of the modulus.
     sum(...)
 
 Returns the sum of a given list of numbers.
+
+    say sum(1, 2, 3, 4, 5)    #=> 15
 
 Aliases: I<Σ>, I<vecsum>
 
@@ -790,6 +835,8 @@ When C<k> is omitted, C<k=0> is assumed.
 
 Returns C<nil> if C<n> cannot be truncated to an integer or if C<k> is negative.
 
+    say 0b1011.bit_scan0     #=> 2
+
 =cut
 
 =head2 bit_scan1
@@ -802,6 +849,8 @@ Scan C<n>, starting from bit index C<k>, towards more significant bits, until a 
 When C<k> is omitted, C<k=0> is assumed.
 
 Returns C<nil> if C<n> cannot be truncated to an integer or if C<k> is negative.
+
+    say 0b1100.bit_scan1     #=> 2
 
 =cut
 
@@ -849,6 +898,8 @@ Flip the value of the k-th bit of integer C<n>.
 
 Returns the Hamming distance (number of bit-positions where the bits differ) between integers C<a> and C<b>.
 
+    say hamdist(0b1010, 0b0011)   #=> 2
+
 =cut
 
 =head2 lsb
@@ -878,6 +929,8 @@ Returns the index of the most significant bit of C<n>.
 Number of 1's in binary representation of C<n>.
 
 This value is also known as the Hamming weight value.
+
+    say 0b1011.popcount   #=> 3
 
 Aliases: I<hammingweight>
 
@@ -1037,6 +1090,9 @@ Returns C<nil> when C<n> cannot be converted to a rational number.
     n.base(b)
 
 Returns a String-representation of C<n> in a given base C<b>, which must be between 2 and 62.
+
+    say 255.base(16)      #=> ff
+    say 10.base(2)        #=> 1010
 
 Aliases: I<in_base>
 
@@ -1238,7 +1294,11 @@ Aliases: I<reverse>
     int(n)
     trunc(n)
 
-Truncate C<n> to an integer.
+Truncate C<n> to an integer (rounding towards zero).
+
+    say int(4.7)          #=> 4
+    say int(-4.7)         #=> -4
+    say int(7/2)          #=> 3
 
 Aliases: I<to_i>, I<to_int>, I<trunc>
 
@@ -1271,6 +1331,10 @@ Returns the self object.
     Num.new(string, base=10)
 
 Create a new Number object, given a string and a base.
+
+    say Number("42")        #=> 42
+    say Number("101", 2)    #=> 5
+    say Number("ff", 16)    #=> 255
 
 Aliases: I<call>
 
@@ -1326,6 +1390,9 @@ Although this may or may not be actually faster.
 
 Convert C<x> to a rational number. Returns C<NaN> when this conversion is not possible.
 
+    say 0.5.rat           #=> 1/2
+    say 4.rat             #=> 4
+
 Aliases: I<to_r>, I<to_rat>
 
 =cut
@@ -1356,6 +1423,9 @@ Aliases: I<best_rational_approx>
     x.to_f
 
 Convert C<x> to a floating-point value number.
+
+    say to_f(1/3)         #=> 0.333333333333333333333333333333333333333333333333
+    say 42.to_f           #=> 42
 
 Aliases: I<f>, I<float>, I<to_float>
 
@@ -1579,6 +1649,8 @@ Creates a new RangeNumber object.
 
 Given two arguments, it returns the second one.
 
+    say run(1, 42)      #=> 42
+
 =cut
 
 =head2 times
@@ -1597,7 +1669,10 @@ Call a given block of code C<n> times with k = 0,1,2,...,n-1.
 
     n.cbrt
 
-Cube root of C<n>, as a floating-point value.
+Cube root of C<n>, as a (complex) floating-point value.
+
+    say cbrt(27)          #=> 3
+    say cbrt(-8)          #=> 1 + 1.73205080756887729352744634150587236694280525381i
 
 =cut
 
@@ -1606,6 +1681,9 @@ Cube root of C<n>, as a floating-point value.
     n.ceil
 
 Round C<n> towards positive Infinity.
+
+    say ceil(2.1)         #=> 3
+    say ceil(-2.1)        #=> -2
 
 Aliases: I<ceiling>
 
@@ -1616,6 +1694,8 @@ Aliases: I<ceiling>
     cube(x)
 
 Returns the cube of C<x>. Equivalent with C<x**3>.
+
+    say cube(5)           #=> 125
 
 =cut
 
@@ -1628,6 +1708,9 @@ Exponential function: C<e^x>.
 
 When two arguments are given, it does floating-point exponentiation: C<b^x>.
 
+    say exp(1)            #=> 2.718281828459045
+    say exp(2, 10)        #=> 1024
+
 =cut
 
 =head2 exp10
@@ -1636,6 +1719,8 @@ When two arguments are given, it does floating-point exponentiation: C<b^x>.
 
 Exponential function: C<10^x>.
 
+    say exp10(3)          #=> 1000
+
 =cut
 
 =head2 exp2
@@ -1643,6 +1728,8 @@ Exponential function: C<10^x>.
     exp2(x)
 
 Exponential function: C<2^x>.
+
+    say exp2(10)          #=> 1024
 
 =cut
 
@@ -1689,6 +1776,9 @@ Round C<x> towards -Infinity.
 
 Integer cube root of C<n>.
 
+    say icbrt(27)         #=> 3
+    say icbrt(-8)         #=> -2
+
 Aliases: I<cbrtint>
 
 =cut
@@ -1702,6 +1792,9 @@ Integer division of integers C<a> and C<b>, rounded towards +Infinity.
 When C<a> and C<b> are integers, this is equivalent with:
 
     ceil(a/b)
+
+    say idiv_ceil(7, 2)   #=> 4
+    say idiv_ceil(-7, 2)  #=> -3
 
 Aliases: I<cld>
 
@@ -1717,6 +1810,9 @@ When C<a> and C<b> are integers, this is equivalent with:
 
     floor(a/b + 1/2)
 
+    say idiv_round(7, 2)  #=> 4
+    say idiv_round(5, 2)  #=> 3
+
 Aliases: I<rdd>
 
 =cut
@@ -1731,6 +1827,9 @@ When C<a> and C<b> are integers, this is equivalent with:
 
     trunc(a/b)
 
+    say idiv_trunc(7, 2)   #=> 3
+    say idiv_trunc(-7, 2)  #=> -3
+
 Aliases: I<trd>
 
 =cut
@@ -1742,6 +1841,8 @@ Aliases: I<trd>
 Integer logarithm of C<n> to base C<b>, satisfying:
 
     b**ilog(n,b) <= n < b**(ilog(n,b)+1)
+
+    say ilog(100, 3)      #=> 4    (3**4 = 81 <= 100 < 3**5 = 243)
 
 Aliases: I<logint>
 
@@ -1755,6 +1856,9 @@ Integer logarithm of C<n> to base C<10>, equivalent to:
 
     ilog(n,10)
 
+    say ilog10(999)       #=> 2
+    say ilog10(1000)      #=> 3
+
 =cut
 
 =head2 ilog2
@@ -1765,6 +1869,9 @@ Integer logarithm of C<n> to base C<2>, equivalent to:
 
     ilog(n,2)
 
+    say ilog2(1023)       #=> 9
+    say ilog2(1024)       #=> 10
+
 =cut
 
 =head2 ipow
@@ -1772,6 +1879,8 @@ Integer logarithm of C<n> to base C<2>, equivalent to:
     ipow(b,n)
 
 Integer exponentiation: C<b^n>.
+
+    say ipow(2, 10)       #=> 1024
 
 Aliases: I<powint>
 
@@ -1783,6 +1892,8 @@ Aliases: I<powint>
 
 Integer exponentiation: C<10^n>.
 
+    say ipow10(6)         #=> 1000000
+
 =cut
 
 =head2 ipow2
@@ -1791,13 +1902,18 @@ Integer exponentiation: C<10^n>.
 
 Integer exponentiation: C<2^n>.
 
+    say ipow2(10)         #=> 1024
+
 =cut
 
 =head2 iroot
 
     n.iroot(k)
 
-Integer k-th root of C<n>.
+Integer k-th root of C<n>: the largest integer C<r> such that C<r**k <= n>.
+
+    say iroot(100, 2)     #=> 10
+    say iroot(30, 3)      #=> 3
 
 Aliases: I<rootint>
 
@@ -1809,6 +1925,8 @@ Aliases: I<rootint>
 
 Returns a list with the integer k-th root of C<n> and k-th root remainder of C<n>.
 
+    say [30.irootrem(3)]   #=> [3, 3]
+
 Equivalent with:
 
     (n.iroot(k), n - n.iroot(k)**k)
@@ -1819,7 +1937,10 @@ Equivalent with:
 
     n.isqrt
 
-Integer square root of C<n>.
+Integer square root of C<n>: the largest integer C<r> such that C<r**2 <= n>.
+
+    say isqrt(100)        #=> 10
+    say isqrt(99)         #=> 9
 
 Aliases: I<sqrtint>
 
@@ -1830,6 +1951,8 @@ Aliases: I<sqrtint>
     n.isqrtrem
 
 Returns a list with the integer square root of C<n> and the square root remainder of C<n>.
+
+    say [99.isqrtrem]     #=> [9, 18]
 
 Equivalent with:
 
@@ -1854,6 +1977,9 @@ Returns the "logarithm-root" of C<x>, such that C<lgrt(x) ** lgrt(x) =~= x>.
 
 Natural logarithm of C<x>.
 
+    say ln(exp(1))        #=> 1
+    say ln(1)             #=> 0
+
 =cut
 
 =head2 ln2
@@ -1861,6 +1987,8 @@ Natural logarithm of C<x>.
     Num.ln2
 
 Returns the natural logarithm of 2 constant.
+
+    say Num.ln2           #=> 0.6931471805599453
 
 =cut
 
@@ -1871,6 +1999,9 @@ Returns the natural logarithm of 2 constant.
 
 Natural logarithm of C<x> to base I<e>, or to a given base C<b>.
 
+    say log(exp(1))       #=> 1
+    say log(100, 10)      #=> 2
+
 =cut
 
 =head2 log10
@@ -1879,6 +2010,8 @@ Natural logarithm of C<x> to base I<e>, or to a given base C<b>.
 
 Logarithm of C<x> to base 10.
 
+    say log10(1000)       #=> 3
+
 =cut
 
 =head2 log2
@@ -1886,6 +2019,8 @@ Logarithm of C<x> to base 10.
     x.log2
 
 Logarithm of C<x> to base 2.
+
+    say log2(1024)        #=> 10
 
 =cut
 
@@ -1903,9 +2038,10 @@ Returns the smallest root C<r> of C<n> for which there exists an integer C<k>, s
 
     root(n,k)
 
-The k-th root of C<n>, defined as:
+The k-th root of C<n>, defined as C<n**(1/k)>.
 
-    n**(1/k)
+    say root(8, 3)        #=> 2
+    say root(16, 4)       #=> 2
 
 =cut
 
@@ -1931,6 +2067,8 @@ Aliases: I<roundf>
 
 Returns the square of C<x>. Equivalent with C<x*x>.
 
+    say sqr(9)            #=> 81
+
 Aliases: I<square>
 
 =cut
@@ -1940,6 +2078,10 @@ Aliases: I<square>
     sqrt(x)
 
 Returns the square root of C<x>. Equivalent with C<x**(1/2)>.
+
+    say sqrt(16)          #=> 4
+    say sqrt(2)           #=> 1.414213562373095
+    say sqrt(-1)          #=> 1i
 
 =cut
 
@@ -1985,6 +2127,8 @@ Iterate over the period of the expansion of the continued fraction for square ro
 
 Returns the length of the period of continued fraction for square root of C<n>. (L<OEIS A003285|https://oeis.org/A003285>)
 
+    say sqrt_cfrac_period_len(28)   #=> 4
+
 =cut
 
 =head2 sqrtQ
@@ -1992,6 +2136,8 @@ Returns the length of the period of continued fraction for square root of C<n>. 
     sqrtQ(n)
 
 Returns a Quadratic object, representing C<sqrt(n)>.
+
+    say sqrtQ(2)**2       #=> Quadratic(2, 0, 2, 0)
 
 =cut
 
@@ -2003,6 +2149,9 @@ Returns a Quadratic object, representing C<sqrt(n)>.
 
 Inverse cosine of C<n> in radians.
 
+    say acos(1)           #=> 0
+    say acos(0)           #=> 1.570796326794897
+
 =cut
 
 =head2 acosh
@@ -2010,6 +2159,8 @@ Inverse cosine of C<n> in radians.
     n.acosh
 
 Inverse hyperbolic cosine of C<n>.
+
+    say acosh(1)          #=> 0
 
 =cut
 
@@ -2019,6 +2170,8 @@ Inverse hyperbolic cosine of C<n>.
 
 Inverse cotangent of C<n> in radians.
 
+    say acot(1)           #=> 0.7853981633974483
+
 =cut
 
 =head2 acoth
@@ -2026,6 +2179,8 @@ Inverse cotangent of C<n> in radians.
     n.acoth
 
 Inverse hyperbolic cotangent of C<n>.
+
+    say acoth(2)          #=> 0.5493061443340548
 
 =cut
 
@@ -2035,6 +2190,8 @@ Inverse hyperbolic cotangent of C<n>.
 
 Inverse cosecant of C<n> in radians.
 
+    say acsc(1)           #=> 1.570796326794897
+
 =cut
 
 =head2 acsch
@@ -2042,6 +2199,8 @@ Inverse cosecant of C<n> in radians.
     n.acsch
 
 Inverse hyperbolic cosecant of C<n>.
+
+    say acsch(1)          #=> 0.881373587019543
 
 =cut
 
@@ -2051,6 +2210,8 @@ Inverse hyperbolic cosecant of C<n>.
 
 Inverse secant of C<n> in radians.
 
+    say asec(1)           #=> 0
+
 =cut
 
 =head2 asech
@@ -2058,6 +2219,8 @@ Inverse secant of C<n> in radians.
     n.asech
 
 Inverse hyperbolic secant of C<n>.
+
+    say asech(1)          #=> 0
 
 =cut
 
@@ -2067,6 +2230,8 @@ Inverse hyperbolic secant of C<n>.
 
 Inverse sine of C<n> in radians.
 
+    say asin(1)           #=> 1.570796326794897
+
 =cut
 
 =head2 asinh
@@ -2074,6 +2239,8 @@ Inverse sine of C<n> in radians.
     n.asinh
 
 Inverse hyperbolic sine of C<n>.
+
+    say asinh(0)          #=> 0
 
 =cut
 
@@ -2083,13 +2250,18 @@ Inverse hyperbolic sine of C<n>.
 
 Inverse tangent of C<n> in radians.
 
+    say atan(1)           #=> 0.7853981633974483
+
 =cut
 
 =head2 atan2
 
     atan2(a, b)
 
-Four-quadrant inverse tangent of C<a> and C<b>.
+Four-quadrant inverse tangent of C<a> and C<b> (the angle, in radians, of the point C<(b,a)>).
+
+    say atan2(1, 1)       #=> 0.7853981633974483
+    say atan2(1, -1)      #=> 2.356194490192345
 
 =cut
 
@@ -2099,6 +2271,8 @@ Four-quadrant inverse tangent of C<a> and C<b>.
 
 Inverse hyperbolic tangent of C<n>.
 
+    say atanh(0)          #=> 0
+
 =cut
 
 =head2 cos
@@ -2106,6 +2280,9 @@ Inverse hyperbolic tangent of C<n>.
     cos(x)
 
 Trigonometric cosine function.
+
+    say cos(0)            #=> 1
+    say cos(Num.pi)       #=> -1
 
 =cut
 
@@ -2115,6 +2292,8 @@ Trigonometric cosine function.
 
 Hyperbolic cosine function.
 
+    say cosh(0)           #=> 1
+
 =cut
 
 =head2 cot
@@ -2122,6 +2301,8 @@ Hyperbolic cosine function.
     cot(x)
 
 Trigonometric cotangent function.
+
+    say cot(Num.pi/4)     #=> 1
 
 =cut
 
@@ -2131,6 +2312,8 @@ Trigonometric cotangent function.
 
 Hyperbolic cotangent function.
 
+    say coth(1)           #=> 1.313035285499331
+
 =cut
 
 =head2 csc
@@ -2139,6 +2322,8 @@ Hyperbolic cotangent function.
 
 Trigonometric cosecant function.
 
+    say csc(Num.pi/2)     #=> 1
+
 =cut
 
 =head2 csch
@@ -2146,6 +2331,8 @@ Trigonometric cosecant function.
     csch(x)
 
 Hyperbolic cosecant function.
+
+    say csch(1)           #=> 0.8509181282393215
 
 =cut
 
@@ -2175,6 +2362,8 @@ Convert radians to degrees.
 
 Trigonometric secant function.
 
+    say sec(0)            #=> 1
+
 =cut
 
 =head2 sech
@@ -2182,6 +2371,8 @@ Trigonometric secant function.
     sech(x)
 
 Hyperbolic secant function.
+
+    say sech(0)           #=> 1
 
 =cut
 
@@ -2191,6 +2382,9 @@ Hyperbolic secant function.
 
 Trigonometric sine function.
 
+    say sin(0)            #=> 0
+    say sin(Num.pi/2)     #=> 1
+
 =cut
 
 =head2 sin_cos
@@ -2198,6 +2392,8 @@ Trigonometric sine function.
     sin_cos(x)
 
 Returns a list with the values C<(sin(x), cos(x))>.
+
+    say [sin_cos(0)]      #=> [0, 1]
 
 =cut
 
@@ -2207,6 +2403,8 @@ Returns a list with the values C<(sin(x), cos(x))>.
 
 Hyperbolic sine function.
 
+    say sinh(0)           #=> 0
+
 =cut
 
 =head2 tan
@@ -2215,6 +2413,9 @@ Hyperbolic sine function.
 
 Trigonometric tangent function.
 
+    say tan(0)            #=> 0
+    say tan(Num.pi/4)     #=> 1
+
 =cut
 
 =head2 tanh
@@ -2222,6 +2423,8 @@ Trigonometric tangent function.
     tanh(x)
 
 Hyperbolic tangent function.
+
+    say tanh(0)           #=> 0
 
 =cut
 
@@ -2232,6 +2435,8 @@ Hyperbolic tangent function.
     agm(a, b)
 
 Arithmetic-geometric mean of C<a> and C<b>.
+
+    say agm(1, sqrt(2))   #=> 1.198140234735592
 
 =cut
 
@@ -2252,6 +2457,8 @@ Aliases: I<airy>
 
 First order Bessel function: C<J_n(x)>.
 
+    say bessel_j(1, 0)    #=> 0.7651976865579666
+
 =cut
 
 =head2 bessel_y
@@ -2259,6 +2466,8 @@ First order Bessel function: C<J_n(x)>.
     bessel_y(x, n)
 
 Second order Bessel function: C<Y_n(x)>.
+
+    say bessel_y(1, 0)    #=> 0.08825696421567696
 
 =cut
 
@@ -2272,13 +2481,17 @@ Defined as:
 
     beta(a, b) = gamma(a)*gamma(b) / gamma(a+b)
 
+    say beta(2, 3)        #=> 1/12
+
 =cut
 
 =head2 CatalanG
 
     Num.CatalanG
 
-Returns the Catalan constant: 0.915965594177...
+Returns the Catalan constant:
+
+    say Num.CatalanG      #=> 0.915965594177219015054603514932384110774149374282
 
 Aliases: I<C>
 
@@ -2288,11 +2501,9 @@ Aliases: I<C>
 
     digamma(x)
 
-The digamma function, defined as:
+The digamma function, defined as: C<Gamma'(x)/Gamma(x)>.
 
-     Γ'(x)
-    -------
-     Γ(x)
+    say digamma(1)        #=> -0.5772156649015329
 
 Aliases: I<Ψ>
 
@@ -2302,7 +2513,9 @@ Aliases: I<Ψ>
 
     Num.e
 
-Returns the I<e> mathematical constant: 2.71828...
+Returns the I<e> mathematical constant:
+
+    say Num.e             #=> 2.718281828459045
 
 =cut
 
@@ -2311,6 +2524,8 @@ Returns the I<e> mathematical constant: 2.71828...
     ei(x)
 
 Exponential integral function.
+
+    say ei(1)             #=> 1.895117816355937
 
 Aliases: I<eint>
 
@@ -2322,6 +2537,8 @@ Aliases: I<eint>
 
 The Gauss error function.
 
+    say erf(1)            #=> 0.8427007929497149
+
 =cut
 
 =head2 erfc
@@ -2329,6 +2546,8 @@ The Gauss error function.
     erfc(x)
 
 The complementary error function.
+
+    say erfc(1)           #=> 0.1572992070502851
 
 =cut
 
@@ -2511,6 +2730,8 @@ Aliases: I<bern_log>, I<lnbernreal>, I<bernoulli_log>
 
 Natural logarithm of C<Γ(x)>.
 
+    say lngamma(6)        #=> 4.787491742782046
+
 Aliases: I<gamma_log>
 
 =cut
@@ -2521,6 +2742,8 @@ Aliases: I<gamma_log>
 
 Returns the -1 value.
 
+    say Num.mone          #=> -1
+
 =cut
 
 =head2 nan
@@ -2528,6 +2751,9 @@ Returns the -1 value.
     Num.nan
 
 Returns the Not-a-Number special value (C<NaN>).
+
+    say Num.nan                #=> NaN
+    say (Num.nan == Num.nan)   #=> false
 
 =cut
 
@@ -2537,6 +2763,9 @@ Returns the Not-a-Number special value (C<NaN>).
 
 Returns the positive Infinity special floating-point value (C<Inf>).
 
+    say Num.inf           #=> Inf
+    say (1 / Num.inf)     #=> 0
+
 =cut
 
 =head2 ninf
@@ -2545,6 +2774,8 @@ Returns the positive Infinity special floating-point value (C<Inf>).
 
 Returns the negative infinity special value (C<-Inf>).
 
+    say Num.ninf          #=> -Inf
+
 =cut
 
 =head2 one
@@ -2552,6 +2783,8 @@ Returns the negative infinity special value (C<-Inf>).
     Num.one
 
 Returns the 1 value.
+
+    say Num.one           #=> 1
 
 =cut
 
@@ -2584,6 +2817,8 @@ Aliases: I<π>
 
 Returns the number 0.
 
+    say Num.zero          #=> 0
+
 =cut
 
 =head2 zeta
@@ -2608,6 +2843,10 @@ Aliases: I<ζ>
     z.phase
 
 Returns the argument (phase angle) of the complex number in radians.
+
+    say arg(1+1i)        #=> 0.7853981633974483
+
+=cut
 
 =head2 cadd
 
@@ -2732,6 +2971,9 @@ Complex integer exponentiation: returns C<(x,y)> such that C<x+y*i = (a+b*i)^n>.
 
 Complex conjugate of C<x>. For real integers, this is a fixed-point function.
 
+    say conj(3+4i)        #=> 3 - 4i
+    say 5.conj            #=> 5
+
 =cut
 
 =head2 cpow
@@ -2787,6 +3029,9 @@ Multiplies C<x> by the imaginary unit C<i>.
 
 The imaginary part of complex number C<x>. Return 0 when C<x> is a real number.
 
+    say im(3+4i)          #=> 4
+    say 5.im              #=> 0
+
 Aliases: I<imag>, I<imaginary>
 
 =cut
@@ -2833,6 +3078,9 @@ Returns true if C<x> is a real number.
 
 Returns the normalized value of C<x>: C<abs(x)^2>.
 
+    say norm(3+4i)        #=> 25
+    say norm(-5)          #=> 25
+
 =cut
 
 =head2 pair
@@ -2866,6 +3114,9 @@ Returns an array with the real and imaginary parts of C<x>.
 
 Returns the real part of a complex number C<z>.
 
+    say re(3+4i)          #=> 3
+    say 5.re              #=> 5
+
 Aliases: I<real>
 
 =cut
@@ -2876,13 +3127,17 @@ Aliases: I<real>
 
 Returns a list with the real and imaginary parts of C<z>.
 
+    say [reals(3+4i)]     #=> [3, 4]
+
 =cut
 
 =head2 roots_of_unity
 
     roots_of_unity(n)
 
-Returns an array with the complex n-th roots of 1.
+Returns an array with the complex n-th roots of 1, as floating-point approximations.
+
+    say roots_of_unity(4).map { .round(-5) }   #=> [1, 1i, -1, -1i]
 
 =cut
 
@@ -2903,6 +3158,8 @@ Modular integer addition: C<(a+b) % m>.
     addmulmod(a, b, c, m)
 
 Modular operation: C<(a + b*c) % m>.
+
+    say addmulmod(43, 97, 2, 127)     # == (43 + 97*2) % 127
 
 =cut
 
@@ -2935,6 +3192,8 @@ Geometric sum modulo C<m>: C<r^0 + r^1 + ... + r^n (mod m)>, using the following
 
 Returns the modular inverse of C<n> modulo C<m>.
 
+    say 3.invmod(7)       #=> 5     (since 3*5 % 7 == 1)
+
 =cut
 
 =head2 is_congruent
@@ -2957,6 +3216,9 @@ Also defined for rationals, floats and complex numbers:
     n.is_primitive_root(m)
 
 Returns true if C<n> is a primitive root modulo C<m>.
+
+    say 3.is_primitive_root(7)    #=> true
+    say 2.is_primitive_root(7)    #=> false
 
 =cut
 
@@ -2989,6 +3251,9 @@ The second argument C<k> must be a positive integer.
 
 Returns the Legendre symbol: C<(a|p)>.
 
+    say legendre(2, 7)    #=> 1
+    say legendre(3, 7)    #=> -1
+
 =cut
 
 =head2 jacobi
@@ -2997,6 +3262,9 @@ Returns the Legendre symbol: C<(a|p)>.
 
 Returns the Jacobi symbol: C<(a|n)>.
 
+    say jacobi(2, 15)     #=> 1
+    say jacobi(7, 15)     #=> -1
+
 =cut
 
 =head2 kronecker
@@ -3004,6 +3272,9 @@ Returns the Jacobi symbol: C<(a|n)>.
     kronecker(a,n)
 
 Returns the Kronecker symbol: C<(a|n)>.
+
+    say kronecker(2, 8)   #=> 0
+    say kronecker(5, 8)   #=> -1
 
 =cut
 
@@ -3101,6 +3372,9 @@ Reduced quadratic forms play a central role in the theory of binary quadratic fo
 
 The Kronecker delta function, which returns 1 iff C<a==b> and 0 otherwise.
 
+    say kronecker_delta(3, 3)   #=> 1
+    say kronecker_delta(3, 4)   #=> 0
+
 Aliases: I<δ>
 
 =cut
@@ -3111,6 +3385,8 @@ Aliases: I<δ>
 
 Modular operation: C<(a*b + c) % m>.
 
+    say muladdmod(43, 97, 5, 127)     # == (43*97 + 5) % 127
+
 =cut
 
 =head2 muladdmulmod
@@ -3118,6 +3394,8 @@ Modular operation: C<(a*b + c) % m>.
     muladdmulmod(a, b, c, d, m)
 
 Modular operation: C<(a*b + c*d) % m>.
+
+    say muladdmulmod(43, 97, 5, 3, 127)   # == (43*97 + 5*3) % 127
 
 =cut
 
@@ -3137,6 +3415,8 @@ Modular integer multiplication: C<(a*b) % m>.
 
 Modular operation: C<(a*b - c) % m>.
 
+    say mulsubmod(43, 97, 5, 127)     # == (43*97 - 5) % 127
+
 =cut
 
 =head2 mulsubmulmod
@@ -3144,6 +3424,8 @@ Modular operation: C<(a*b - c) % m>.
     mulsubmulmod(a, b, c, d, m)
 
 Modular operation: C<(a*b - c*d) % m>.
+
+    say mulsubmulmod(43, 97, 5, 3, 127)   # == (43*97 - 5*3) % 127
 
 =cut
 
@@ -3245,6 +3527,8 @@ Modular integer subtraction: C<(a-b) % m>.
 
 Modular operation: C<(a - b*c) % m>.
 
+    say submulmod(43, 97, 5, 127)     # == (43 - 97*5) % 127
+
 =cut
 
 =head2 znlog
@@ -3254,6 +3538,8 @@ Modular operation: C<(a - b*c) % m>.
 Returns the integer C<k> that solves the congruence: C<a = g^k (mod m)>.
 
 Returns C<NaN> if a solution is not found.
+
+    say znlog(9, 2, 11)   #=> 6    (since 2**6 % 11 == 9)
 
 =cut
 
@@ -3285,6 +3571,8 @@ The smallest primitive root of (Z/nZ)^*.
 
 Returns the n-th Bell number.
 
+    say 10.bell           #=> 115975
+
 Aliases: I<bell_number>
 
 =cut
@@ -3294,6 +3582,8 @@ Aliases: I<bell_number>
     bellmod(n, m)
 
 Returns the n-th Bell number modulo C<m>.
+
+    say bellmod(10, 1000)   #=> 975
 
 =cut
 
@@ -3402,6 +3692,9 @@ Aliases: I<complete_permutations>
 
 Double-factorial of C<n>. (L<OEIS A006882|https://oeis.org/A006882>)
 
+    say 8.double_factorial    #=> 384   (8*6*4*2)
+    say 7.double_factorial    #=> 105   (7*5*3*1)
+
 Aliases: I<!!>, I<dfac>, I<dfactorial>
 
 =cut
@@ -3450,6 +3743,8 @@ Equivalent with (but more efficient):
 
     valuation(n!, k)
 
+    say factorial_valuation(10, 2)   #=> 8    (10! has 2^8 as a factor)
+
 Aliases: I<factorial_power>
 
 =cut
@@ -3463,6 +3758,8 @@ Returns the factorial of C<n> modulo C<m>.
 Equivalent with (but much faster):
 
     factorial(n) % m
+
+    say factorialmod(20, 1000)   #=> 0
 
 =cut
 
@@ -3479,6 +3776,8 @@ For negative values of C<k>, falling factorial is defined as:
     falling_factorial(n, -k) = 1/falling_factorial(n + k, k)
 
 When the denominator is zero, C<NaN> is returned.
+
+    say falling_factorial(5, 3)    #=> 60    (5*4*3)
 
 =cut
 
@@ -3531,6 +3830,8 @@ Returns an array containing the Fubini numbers with indices in the range C<0..n>
 
 Hyperfactorial of C<n>, defined as C<Prod_{k=1..n} k^k>.
 
+    say hyperfactorial(4)     #=> 27648    (1^1 * 2^2 * 3^3 * 4^4)
+
 =cut
 
 =head2 hyperfactorial_ln
@@ -3538,6 +3839,8 @@ Hyperfactorial of C<n>, defined as C<Prod_{k=1..n} k^k>.
     hyperfactorial_ln(n)
 
 Natural logarithm of C<hyperfactorial(n)>, where C<n> is a nonnegative integer.
+
+    say hyperfactorial_ln(4)  #=> 10.22730867160378
 
 Aliases: I<lnhyperfactorial>, I<hyperfactorial_log>
 
@@ -3553,11 +3856,15 @@ Returns the smallest positive integer C<m> such that C<n> divides C<factorial(m)
 
 Aliases: I<smarandache>
 
+=cut
+
 =head2 lnsuperfactorial
 
     lnsuperfactorial(n)
 
 Natural logarithm of C<superfactorial(n)>.
+
+    say lnsuperfactorial(4)  #=> 5.662960480135946
 
 Aliases: I<superfactorial_ln>, I<superfactorial_log>
 
@@ -3759,6 +4066,8 @@ When the C<max_value> argument is provided, it returns only the partitions with 
 
 It uses the "Mathematica" ordering of the partitions (graded reverse lexicographic ordering).
 
+=cut
+
 =head2 permutations
 
     n.permutations
@@ -3781,6 +4090,8 @@ For negative values of C<k>, rising factorial is defined as:
 
     rising_factorial(n, -k) = 1/rising_factorial(n - k, k)
 
+    say rising_factorial(5, 3)   #=> 210    (5*6*7)
+
 =cut
 
 =head2 stirling
@@ -3788,6 +4099,8 @@ For negative values of C<k>, rising factorial is defined as:
     stirling(n,k)
 
 Stirling numbers of the first kind.
+
+    say stirling(5, 2)    #=> -50
 
 Aliases: I<stirling1>
 
@@ -3799,6 +4112,8 @@ Aliases: I<stirling1>
 
 Stirling numbers of the second kind.
 
+    say stirling2(5, 2)   #=> 15
+
 =cut
 
 =head2 stirling3
@@ -3806,6 +4121,8 @@ Stirling numbers of the second kind.
     stirling3(n,k)
 
 Stirling numbers of the third kind (also known as Lah numbers).
+
+    say stirling3(5, 2)   #=> 240
 
 =cut
 
@@ -3821,6 +4138,8 @@ Return an array of arrays with the additive B<strict> partitions of C<n> (partit
 When the C<max_value> argument is provided, it returns only the strict partitions with value <= C<max_value>.
 
     say strict_partitions(12, 5)   #=> [[5, 4, 3], [5, 4, 2, 1]]
+
+=cut
 
 =head2 subfactorial
 
@@ -3927,6 +4246,8 @@ Returns an array containing the Bernoulli numbers with indices in the range C<0.
 
 Returns the n-th Bernoulli polynomial: C<B_n(x)>.
 
+    say bernoulli_polynomial(3, 2)   #=> 3
+
 When C<x> is omitted, a Polynomial object is returned.
 
 =cut
@@ -3937,6 +4258,8 @@ When C<x> is omitted, a Polynomial object is returned.
     bernreal(n,x)
 
 Return an approximation to the n-th Bernoulli number as a floating-point number.
+
+    say bernreal(10)     #=> 0.0757575757575757575757575757575757575757575757576
 
 When a second argument C<x> is given, it return the n-th Bernoulli polynomial evaluated at C<x>:
 
@@ -3952,6 +4275,9 @@ When a second argument C<x> is given, it return the n-th Bernoulli polynomial ev
 Returns the n-th Catalan number.
 
 If two arguments are provided, it returns the C<C(n,k)> entry in Catalan's triangle.
+
+    say 10.catalan          #=> 16796
+    say catalan(4, 2)       #=> 9
 
 =cut
 
@@ -3983,6 +4309,8 @@ Returns the centered k-gonal root of C<n>. Also defined for complex numbers.
 
 Returns the n-th centered k-gonal pyramidal number.
 
+    say centered_pyramidal(4, 6)     #=> 54
+
 =cut
 
 =head2 centered_pyramidal_root
@@ -3990,6 +4318,8 @@ Returns the n-th centered k-gonal pyramidal number.
     n.centered_pyramidal_root(k)
 
 Returns the centered k-gonal pyramidal root of C<n>. Also defined for complex numbers.
+
+    say centered_pyramidal_root(54, 6)   #=> 4
 
 =cut
 
@@ -3999,6 +4329,8 @@ Returns the centered k-gonal pyramidal root of C<n>. Also defined for complex nu
     chebyshevT(n, x)
 
 Compute the Chebyshev polynomials of the first kind: C<T_n(x)>, where C<n> must be a native integer.
+
+    say chebyshevT(3, 2)      #=> 26
 
 Defined as:
 
@@ -4018,6 +4350,8 @@ Aliases: I<chebyshevt>
 
 Compute the modular Chebyshev polynomials of the first kind: C<T_n(x) mod m>, where C<n> and C<m> must be integers (arbitrarily large).
 
+    say chebyshevTmod(3, 2, 100)     #=> 26
+
 =cut
 
 =head2 chebyshevU
@@ -4026,6 +4360,8 @@ Compute the modular Chebyshev polynomials of the first kind: C<T_n(x) mod m>, wh
     chebyshevU(n, x)
 
 Compute the Chebyshev polynomials of the second kind: C<U_n(x)>, where C<n> must be a native integer.
+
+    say chebyshevU(3, 2)      #=> 56
 
 Defined as:
 
@@ -4045,6 +4381,8 @@ Aliases: I<chebyshevu>
 
 Compute the modular Chebyshev polynomials of the second kind: C<U_n(x) mod m>, where C<n> and C<m> must be integers (arbitrarily large).
 
+    say chebyshevUmod(3, 2, 100)     #=> 56
+
 =cut
 
 =head2 collatz
@@ -4052,6 +4390,8 @@ Compute the modular Chebyshev polynomials of the second kind: C<U_n(x) mod m>, w
     n.collatz
 
 Returns the number of halving and tripling steps to reach C<1> in the C<3x+1> Collatz problem.
+
+    say 27.collatz        #=> 111
 
 =cut
 
@@ -4118,6 +4458,8 @@ Returns an array containing the Euler numbers with indices in the range C<0..n>.
     euler_polynomial(n, x)
 
 Returns the n-th Euler polynomial evaluated at C<x>.
+
+    say euler_polynomial(3, 2)   #=> 9/4
 
 When C<x> is omitted, a Polynomial object is returned.
 
@@ -4292,6 +4634,8 @@ Defined as:
 
 Physicists' Hermite polynomials: C<H_n(x)>.
 
+    say hermiteH(3, 2)    #=> 40
+
 When C<x> is omitted, a Polynomial object is returned.
 
 Aliases: I<hermite_polynomialH>
@@ -4304,6 +4648,8 @@ Aliases: I<hermite_polynomialH>
     hermiteHe(n, x)
 
 Probabilists' Hermite polynomials: C<He_n(x)>.
+
+    say hermiteHe(3, 2)   #=> 2
 
 When C<x> is omitted, a Polynomial object is returned.
 
@@ -4448,6 +4794,8 @@ Equivalent to: C<lucasV(1, -2, n)>.
 
 Laguerre polynomials: C<L_n(x)>.
 
+    say laguerre(3, 2)    #=> -1/3
+
 When C<x> is omitted, a Polynomial object is returned.
 
 Aliases: I<laguerreL>, I<laguerre_polynomial>
@@ -4461,6 +4809,8 @@ Aliases: I<laguerreL>, I<laguerre_polynomial>
 
 Legendre polynomials: C<P_n(x)>.
 
+    say legendreP(3, 2)   #=> 17
+
 When C<x> is omitted, a Polynomial object is returned.
 
 Aliases: I<legendrep>, I<legendre_polynomial>
@@ -4473,6 +4823,8 @@ Aliases: I<legendrep>, I<legendre_polynomial>
 
 Returns the n-th Lucas number.
 
+    say 10.of { .lucas }  #=> [2, 1, 3, 4, 7, 11, 18, 29, 47, 76]
+
 =cut
 
 =head2 lucas_mod
@@ -4480,6 +4832,8 @@ Returns the n-th Lucas number.
     lucasmod(n,m)
 
 Efficiently compute the n-th Lucas number modulo C<m>.
+
+    say lucas_mod(100, 1000)    #=> (lucas(100) % 1000)
 
 Aliases: I<lucasmod>
 
@@ -4504,6 +4858,8 @@ Aliases: I<lucasu>
     lucasUmod(P,Q,n,m)
 
 Efficiently compute the Lucas C<U_n(P, Q)> function modulo C<m>.
+
+    say lucasUmod(1, -1, 100, 1000)   #=> (lucasU(1,-1,100) % 1000)
 
 Aliases: I<lucasumod>
 
@@ -4543,6 +4899,8 @@ Aliases: I<lucasv>
 
 Efficiently compute the Lucas C<V_n(P, Q)> function modulo C<m>.
 
+    say lucasvmod(1, -1, 100, 1000)   #=> (lucasV(1,-1,100) % 1000)
+
 Aliases: I<lucasVmod>
 
 =cut
@@ -4568,6 +4926,10 @@ Returns the n-th Padovan number (L<OEIS A000931|https://oeis.org/A000931>), defi
     a(2) = 0
     a(n) = a(n-2) + a(n-3)
 
+Example:
+
+    say 10.of { .padovan }   #=> [1, 0, 0, 1, 0, 1, 1, 1, 2, 2]
+
 =cut
 
 =head2 padovanmod
@@ -4576,6 +4938,8 @@ Returns the n-th Padovan number (L<OEIS A000931|https://oeis.org/A000931>), defi
 
 Returns the n-th Padovan number, modulo C<m>.
 
+    say padovanmod(1000, 97)   #=> (padovan(1000) % 97)
+
 =cut
 
 =head2 pell
@@ -4583,6 +4947,8 @@ Returns the n-th Padovan number, modulo C<m>.
     pell(n)
 
 Returns the n-th Pell number. (L<OEIS A000129|https://oeis.org/A000129>)
+
+    say 10.of { .pell }   #=> [0, 1, 2, 5, 12, 29, 70, 169, 408, 985]
 
 Equivalent to: C<lucasU(2, -1, n)>.
 
@@ -4593,6 +4959,8 @@ Equivalent to: C<lucasU(2, -1, n)>.
     pell_lucas(n)
 
 Returns the n-th Pell-Lucas number. (L<OEIS A002203|https://oeis.org/A002203>)
+
+    say 10.of { .pell_lucas }   #=> [2, 2, 6, 14, 34, 82, 198, 478, 1154, 2786]
 
 Equivalent to: C<lucasV(2, -1, n)>.
 
@@ -4609,6 +4977,10 @@ Returns the n-th Perrin number (L<OEIS A001608|https://oeis.org/A001608>), defin
     a(2) = 2
     a(n) = a(n-2) + a(n-3)
 
+Example:
+
+    say 10.of { .perrin }   #=> [3, 0, 2, 3, 2, 5, 5, 7, 10, 12]
+
 =cut
 
 =head2 perrinmod
@@ -4616,6 +4988,8 @@ Returns the n-th Perrin number (L<OEIS A001608|https://oeis.org/A001608>), defin
     perrinmod(n,m)
 
 Returns the n-th Perrin number, modulo C<m>.
+
+    say perrinmod(1000, 97)   #=> (perrin(1000) % 97)
 
 This function can be used as a pseudo-primality test for n > 1:
 
@@ -4708,6 +5082,10 @@ Returns the k-gonal pyramidal root of C<n>. Also defined for complex numbers.
 
 Ramanujan's tau function.
 
+    say ramanujan_tau(1)    #=> 1
+    say ramanujan_tau(2)    #=> -24
+    say ramanujan_tau(3)    #=> 252
+
 =cut
 
 =head2 secant_number
@@ -4715,6 +5093,11 @@ Ramanujan's tau function.
     secant_number(n)
 
 Return the n-th secant/zig number. (L<OEIS A000364|https://oeis.org/A000364>)
+
+    say secant_number(0)    #=> 1
+    say secant_number(1)    #=> 1
+    say secant_number(2)    #=> 5
+    say secant_number(3)    #=> 61
 
 =cut
 
@@ -5008,6 +5391,8 @@ Example:
     say sum_of_polygonals(99025, 4)      # sums of two squares numbers
     say sum_of_polygonals(10622, 5)      # sums of two pentagonal numbers
 
+=cut
+
 =head2 sum_of_squares
 
     sum_of_squares(n)
@@ -5084,6 +5469,8 @@ returned array.
 
 Returns the n-th tangent/zag number. (L<OEIS A000182|https://oeis.org/A000182>)
 
+    say 5.of { .tangent_number }   #=> [0, 1, 2, 16, 272]
+
 =cut
 
 =head2 tetranacci
@@ -5093,6 +5480,8 @@ Returns the n-th tangent/zag number. (L<OEIS A000182|https://oeis.org/A000182>)
 Returns the n-th Tetranacci number. (L<OEIS A000078|https://oeis.org/A000078>)
 
 Alias for: C<fibonacci(n,4)>.
+
+    say 10.of { .tetranacci }   #=> [0, 0, 0, 1, 1, 2, 4, 7, 13, 24]
 
 =cut
 
@@ -5104,6 +5493,8 @@ Returns the n-th Tribonacci number. (L<OEIS A000073|https://oeis.org/A000073>)
 
 Alias for: C<fibonacci(n, 3)>.
 
+    say 10.of { .tribonacci }   #=> [0, 0, 1, 1, 2, 4, 7, 13, 24, 44]
+
 =cut
 
 =head1 NUMBER THEORY: PRIMES & PRIMALITY
@@ -5113,6 +5504,9 @@ Alias for: C<fibonacci(n, 3)>.
     all_prime(...)
 
 Returns true if all the given values are prime numbers.
+
+    say all_prime(2, 3, 5, 7)   #=> true
+    say all_prime(2, 3, 4, 5)   #=> false
 
 =cut
 
@@ -5457,6 +5851,9 @@ It returns true if both C<n> and C<(n-1)/2> are prime. (L<OEIS A005385|https://o
 
 Returns true if C<n> and C<n+6> are both prime numbers.
 
+    say is_sexy_prime(5)     #=> true    (5 and 11 are both prime)
+    say is_sexy_prime(9)     #=> false
+
 =cut
 
 =head2 is_sophie_germain
@@ -5464,6 +5861,9 @@ Returns true if C<n> and C<n+6> are both prime numbers.
     is_sophie_germain(n)
 
 Returns true if C<n> and C<2*n + 1> are both prime numbers.
+
+    say is_sophie_germain(11)    #=> true    (11 and 23 are both prime)
+    say is_sophie_germain(7)     #=> false
 
 Aliases: I<is_sophie_germain_prime>
 
@@ -5563,6 +5963,9 @@ Aliases: I<is_super_pseudoprime>, I<is_superpseudoprime>
     is_twin_prime(n)
 
 Returns true if C<n> and C<n+2> are both prime numbers.
+
+    say is_twin_prime(11)    #=> true    (11 and 13 are both prime)
+    say is_twin_prime(7)     #=> false
 
 =cut
 
@@ -8761,6 +9164,8 @@ Generate or count the numbers C<k> in the range C<[A, B]> such that C<tau(k) = n
 
     say tau_inverse_len(1, 100, 6)          # count the numbers with exactly 6 divisors in range [1, 100]
     say tau_inverse_len(1, 2**40, 5040)     # count the numbers with exactly 5040 divisors in range [1, 2^40]
+
+=cut
 
 =head2 udivisors
 
