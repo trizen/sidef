@@ -105,16 +105,6 @@ Aliases: I<select>
 
 =cut
 
-=head2 select
-
-    self.select(block)
-
-Alias for L</grep>.
-
-Aliases: I<grep>
-
-=cut
-
 =head2 map
 
     self.map(block)
@@ -124,16 +114,6 @@ Returns a I<new> C<Lazy> object with a transformation step appended to the pipel
     say((1..5).lazy.map {|n| n**2 }.to_a)    #=> [1, 4, 9, 16, 25]
 
 Aliases: I<collect>
-
-=cut
-
-=head2 collect
-
-    self.collect(block)
-
-Alias for L</map>.
-
-Aliases: I<map>
 
 =cut
 
@@ -225,16 +205,6 @@ Aliases: I<sum_by>
 
 =cut
 
-=head2 sum_by
-
-    self.sum_by(block)
-
-Alias for L</sum>.
-
-Aliases: I<sum>
-
-=cut
-
 =head2 prod
 
     self.prod
@@ -246,16 +216,6 @@ Drives the pipeline to completion and returns the product of the resulting eleme
     say((1..5).lazy.prod {|n| n**2 })    #=> 14400
 
 Aliases: I<prod_by>
-
-=cut
-
-=head2 prod_by
-
-    self.prod_by(block)
-
-Alias for L</prod>.
-
-Aliases: I<prod>
 
 =cut
 

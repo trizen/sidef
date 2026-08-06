@@ -1396,14 +1396,10 @@ Example:
 
 =head2 downto
 
-    from.downto(to) { |str| ... }
-    from.downto(to, step) { |str| ... }
+    from.downto(to)
+    from.downto(to, step)
 
-Iterates from the string C<from> down to the string C<to>, executing the given block for each string in the sequence. The optional C<step> parameter controls the decrement.
-
-Example:
-
-    "c".downto("a", { |s| say s })    # Prints: c, b, a
+Returns a new C<RangeString> object as C<RangeStr(from, to, -step)>.
 
 =cut
 
@@ -1437,7 +1433,7 @@ Example:
 
 =head2 each_cons
 
-    str.each_cons(n) { |substr| ... }
+    str.each_cons(n, { |substr| ... })
 
 Iterates through each consecutive substring of length n and applies the given block to each one.
 
@@ -1501,7 +1497,7 @@ Aliases: I<each_number>
 
 =head2 each_slice
 
-    str.each_slice(n) { |slice| ... }
+    str.each_slice(n, { |slice| ... })
 
 Divides the string into slices of length n and applies the given block to each slice.
 
@@ -1571,25 +1567,25 @@ Aliases: I<replace_all>
 
 =head2 esub
 
-    str.esub(regex) { |match| ... }
+    str.esub(regex, { |match| ... })
 
 Performs a substitution on the first match of the regular expression, evaluating the block for the match and replacing it with the block's return value.
 
 Example:
 
-    say "hello world".esub(/\w+/, { |m| m.uc })    #=> "HELLO world"
+    say "hello world".esub(/(\w+)/, { |m| m.uc })    #=> "HELLO world"
 
 =cut
 
 =head2 gesub
 
-    str.gesub(regex) { |match| ... }
+    str.gesub(regex, { |match| ... })
 
 Performs global substitution on all matches of the regular expression, evaluating the block for each match and replacing it with the block's return value.
 
 Example:
 
-    say "hello world".gesub(/\w+/, { |m| m.uc })    #=> "HELLO WORLD"
+    say "hello world".gesub(/(\w+)/, { |m| m.uc })    #=> "HELLO WORLD"
 
 =cut
 

@@ -354,26 +354,6 @@ Aliases: I<each>, I<foreach>, operator C<< << >>
 
 =cut
 
-=head2 each
-
-    block.each(*iterables)
-
-Alias for L</for>.
-
-Aliases: I<for>, I<foreach>
-
-=cut
-
-=head2 foreach
-
-    block.foreach(*iterables)
-
-Alias for L</for>.
-
-Aliases: I<for>, I<each>
-
-=cut
-
 =head2 <<
 
     block << iterable
@@ -489,16 +469,6 @@ Aliases: I<Σ>
 
 =cut
 
-=head2 Σ
-
-    block.Σ(range)
-
-Alias for L</sum>.
-
-Aliases: I<sum>
-
-=cut
-
 =head2 prod
 
     block.prod(range)
@@ -512,16 +482,6 @@ Calculates the product of all values returned by calling the block for each valu
     say(prod.prod(1..4))           #=> 576  # 1*4*9*16
 
 Aliases: I<Π>
-
-=cut
-
-=head2 Π
-
-    block.Π(range)
-
-Alias for L</prod>.
-
-Aliases: I<prod>
 
 =cut
 
@@ -591,16 +551,6 @@ Aliases: I<start>
 
 =cut
 
-=head2 start
-
-    block.start(*args)
-
-Alias for L</ffork>.
-
-Aliases: I<ffork>
-
-=cut
-
 =head2 fork
 
     block.fork(*args)
@@ -634,16 +584,6 @@ Aliases: I<thr>
 
 =cut
 
-=head2 thr
-
-    block.thr(*args)
-
-Alias for L</thread>.
-
-Aliases: I<thread>
-
-=cut
-
 =head1 INTROSPECTION AND CONVERSION
 
 =head2 dump
@@ -656,26 +596,6 @@ Returns a string representation of the block (its declaration-style signature to
     say(block.dump)      #=> "{|x| ... }"-style representation
 
 Aliases: I<to_s>, I<to_str>
-
-=cut
-
-=head2 to_s
-
-    block.to_s
-
-Alias for L</dump>.
-
-Aliases: I<dump>, I<to_str>
-
-=cut
-
-=head2 to_str
-
-    block.to_str
-
-Alias for L</dump>.
-
-Aliases: I<dump>, I<to_s>
 
 =cut
 
@@ -707,16 +627,6 @@ Runs the block with its standard output redirected to an in-memory buffer, and r
     say(output)          #=> "Hello, world!\n"
 
 Aliases: I<cap>
-
-=cut
-
-=head2 cap
-
-    block.cap
-
-Alias for L</capture>.
-
-Aliases: I<capture>
 
 =cut
 

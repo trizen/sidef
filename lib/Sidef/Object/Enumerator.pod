@@ -66,16 +66,6 @@ Aliases: I<call>
 
 =cut
 
-=head2 call
-
-    Enumerator(block)
-
-Alias for L</new>, allowing C<Enumerator> to be invoked directly as a function.
-
-Aliases: I<new>
-
-=cut
-
 =head1 EARLY-EXIT CONSUMPTION
 
 These methods can stop consuming the generator block as soon as they have enough values, so they're safe to use even on an enumerator that produces values forever.
@@ -167,16 +157,6 @@ Aliases: I<collect>
 
 =cut
 
-=head2 collect
-
-    self.collect(block)
-
-Alias for L</map>.
-
-Aliases: I<map>
-
-=cut
-
 =head2 grep
 
     self.grep(block)
@@ -187,16 +167,6 @@ Returns a new C<Array> containing only the values produced by the enumerator for
     say(e.grep {|n| n.is_even })    #=> [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
 
 Aliases: I<select>
-
-=cut
-
-=head2 select
-
-    self.select(block)
-
-Alias for L</grep>.
-
-Aliases: I<grep>
 
 =cut
 
@@ -213,16 +183,6 @@ Aliases: I<count_by>
 
 =cut
 
-=head2 count_by
-
-    self.count_by(block)
-
-Alias for L</count>.
-
-Aliases: I<count>
-
-=cut
-
 =head2 length
 
     self.length
@@ -233,26 +193,6 @@ Returns the total number of values the enumerator produces.
     say(e.length)    #=> 25
 
 Aliases: I<len>, I<size>
-
-=cut
-
-=head2 len
-
-    self.len
-
-Alias for L</length>.
-
-Aliases: I<length>, I<size>
-
-=cut
-
-=head2 size
-
-    self.size
-
-Alias for L</length>.
-
-Aliases: I<length>, I<len>
 
 =cut
 

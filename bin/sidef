@@ -350,7 +350,7 @@ sub help_interactive {
     require Encode;
     require Term::ReadLine;
 
-    $term //= Term::ReadLine->new("$name $version -- help interactive mode");
+    $term //= ($Sidef::Term::ReadLine //= Term::ReadLine->new("$name $version -- help interactive mode"));
 
     print <<"HELP";
 Welcome to $name $version! This is the interactive help utility.
@@ -501,7 +501,7 @@ sub code_interactive {
     require File::Spec;
     require Term::ReadLine;
 
-    my $term = Term::ReadLine->new("$name $version -- interactive mode");
+    my $term = ($Sidef::Term::ReadLine //= Term::ReadLine->new("$name $version -- interactive mode"));
 
     my $sidef;
     my $init_sidef = sub {

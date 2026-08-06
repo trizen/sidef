@@ -181,7 +181,7 @@ sub read {
 
     state $term = do {
         require Term::ReadLine;
-        Term::ReadLine->new("$0");
+        $Sidef::Term::ReadLine //= Term::ReadLine->new("$0");
     };
 
     my $input = $term->readline($message) // return undef;

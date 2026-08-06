@@ -74,26 +74,6 @@ Aliases: I<to_s>, I<to_str>
 
 =cut
 
-=head2 to_s
-
-    self.to_s
-
-Alias for L</dump>.
-
-Aliases: I<dump>, I<to_str>
-
-=cut
-
-=head2 to_str
-
-    self.to_str
-
-Alias for L</dump>.
-
-Aliases: I<dump>, I<to_s>
-
-=cut
-
 =head1 ITERATION
 
 =head2 iter
@@ -125,17 +105,6 @@ Aliases: I<Σ>
 
 =cut
 
-=head2 Σ
-
-    self.Σ
-    self.Σ(block)
-
-Alias for L</sum>.
-
-Aliases: I<sum>
-
-=cut
-
 =head2 sum_by
 
     self.sum_by(block)
@@ -157,17 +126,6 @@ With no argument, returns the product of all elements in the range. If the range
     say((1..5).prod {|n| n**2 }) #=> 14400
 
 Aliases: I<Π>
-
-=cut
-
-=head2 Π
-
-    self.Π
-    self.Π(block)
-
-Alias for L</prod>.
-
-Aliases: I<prod>
 
 =cut
 
@@ -257,16 +215,6 @@ Returns the sum of the C<k>-th powers of all integers in the range, using Faulha
     say((1..10).faulhaber_sum(3))    #=> 3025 (sum of cubes: 1+8+27+...+1000)
 
 Aliases: I<faulhaber>
-
-=cut
-
-=head2 faulhaber
-
-    self.faulhaber(k)
-
-Alias for L</faulhaber_sum>.
-
-Aliases: I<faulhaber_sum>
 
 =cut
 

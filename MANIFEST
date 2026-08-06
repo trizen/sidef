@@ -1206,6 +1206,7 @@ utils/find_undefined_methods.pl
 utils/gource-video.sh
 utils/grep_errors.sh
 utils/make_pdfs.sh
+utils/make_pod2pdf.pl
 utils/pod_generator.pl
 utils/sidef2bin.sh
 utils/sidef2exe.txt

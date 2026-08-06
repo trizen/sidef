@@ -223,26 +223,6 @@ Aliases: I<is_an>, I<kind_of>
 
 =cut
 
-=head2 is_an
-
-    self.is_an(class)
-
-Alias for L</is_a>.
-
-Aliases: I<is_a>, I<kind_of>
-
-=cut
-
-=head2 kind_of
-
-    self.kind_of(class)
-
-Alias for L</is_a>.
-
-Aliases: I<is_a>, I<is_an>
-
-=cut
-
 =head2 is_object
 
     self.is_object
@@ -277,16 +257,6 @@ Aliases: I<reftype>
 
 =cut
 
-=head2 reftype
-
-    self.reftype
-
-Alias for L</object_type>.
-
-Aliases: I<object_type>
-
-=cut
-
 =head2 object_id
 
     self.object_id
@@ -294,16 +264,6 @@ Aliases: I<object_type>
 Returns a C<Number> representing the memory address of the underlying object reference. Useful for comparing object identity (two variables refer to the same underlying object if their C<object_id> values are equal).
 
 Aliases: I<refaddr>
-
-=cut
-
-=head2 refaddr
-
-    self.refaddr
-
-Alias for L</object_id>.
-
-Aliases: I<object_id>
 
 =cut
 
@@ -332,16 +292,6 @@ Returns a shallow copy of the object. For hash-based objects, creates a new hash
 Returns a deep copy of the object, recursively cloning nested hash and array structures. Circular references are handled by tracking already-cloned objects (so a cycle is reproduced in the copy rather than causing infinite recursion). Recursion only descends into nested values that are themselves hash- or array-based Sidef objects (i.e. instances of a class that inherits from C<Sidef::Object::Object>); any other kind of value -- including plain Perl data or scalar-based Sidef objects -- is shared as-is between the original and the copy, not cloned.
 
 Aliases: I<deep_clone>
-
-=cut
-
-=head2 deep_clone
-
-    self.deep_clone
-
-Alias for L</dclone>.
-
-Aliases: I<dclone>
 
 =cut
 
@@ -434,16 +384,6 @@ Creates C<new> as an alias for the existing method C<old> on the object's class,
 Prints the object to standard output, followed by a newline. Returns C<true> on success, C<false> on failure.
 
 Aliases: I<println>
-
-=cut
-
-=head2 println
-
-    self.println
-
-Alias for L</say>.
-
-Aliases: I<say>
 
 =cut
 

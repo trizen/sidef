@@ -192,16 +192,6 @@ Aliases: I<length>
 
 =cut
 
-=head2 length
-
-    self.length
-
-Alias for L</len>.
-
-Aliases: I<len>
-
-=cut
-
 =head2 reverse
 
     self.reverse
@@ -212,16 +202,6 @@ Returns a new range with C<from> and C<to> swapped and the step negated, effecti
     say((5..1).reverse...)    #=> [1, 2, 3, 4, 5]
 
 Aliases: I<flip>
-
-=cut
-
-=head2 flip
-
-    self.flip
-
-Alias for L</reverse>.
-
-Aliases: I<reverse>
 
 =cut
 
@@ -250,36 +230,6 @@ Checks whether C<value> falls within the range's bounds and lies exactly on its 
     say((1..10 `by` 2).contains(5)) #=> true
 
 Aliases: I<contain>, I<include>, I<includes>
-
-=cut
-
-=head2 contain
-
-    self.contain(value)
-
-Alias for L</contains>.
-
-Aliases: I<contains>, I<include>, I<includes>
-
-=cut
-
-=head2 include
-
-    self.include(value)
-
-Alias for L</contains>.
-
-Aliases: I<contains>, I<contain>, I<includes>
-
-=cut
-
-=head2 includes
-
-    self.includes(value)
-
-Alias for L</contains>.
-
-Aliases: I<contains>, I<contain>, I<include>
 
 =cut
 
@@ -324,26 +274,6 @@ Aliases: I<for>, I<foreach>
 
 =cut
 
-=head2 for
-
-    self.for(block)
-
-Alias for L</each>.
-
-Aliases: I<each>, I<foreach>
-
-=cut
-
-=head2 foreach
-
-    self.foreach(block)
-
-Alias for L</each>.
-
-Aliases: I<each>, I<for>
-
-=cut
-
 =head2 while
 
     self.while(block)
@@ -364,9 +294,9 @@ Iterates the range lazily, calling C<block> on each successive element, and stop
 
 Iterates the range lazily over overlapping, consecutive windows of C<n> elements, calling C<block> with each window's elements as separate arguments (not as a single array). Returns C<self>. If C<n> is zero or negative, this is a no-op.
 
-    (1..10).each_cons(3) { |*group|
+    (1..10).each_cons(3, { |*group|
         say(group)
-    }
+    })
     # Prints: [1, 2, 3], [2, 3, 4], [3, 4, 5], ...
 
 =cut
@@ -377,9 +307,9 @@ Iterates the range lazily over overlapping, consecutive windows of C<n> elements
 
 Iterates the range lazily over non-overlapping slices of C<n> elements, calling C<block> with each slice's elements as separate arguments. The final, possibly shorter, slice is still passed to C<block>. Returns C<self>. If C<n> is zero or negative, this is a no-op.
 
-    (1..10).each_slice(3) { |*slice|
+    (1..10).each_slice(3, { |*slice|
         say(slice)
-    }
+    })
     # Prints: [1, 2, 3], [4, 5, 6], [7, 8, 9], [10]
 
 =cut
@@ -399,16 +329,6 @@ With no argument, returns the single first element of the range (or C<nil> if em
     say((10..1).first(3))    #=> [10, 9, 8]
 
 Aliases: I<head>
-
-=cut
-
-=head2 head
-
-    self.head(n)
-
-Alias for L</first>.
-
-Aliases: I<first>
 
 =cut
 
@@ -435,16 +355,6 @@ With no argument, returns the single last element of the range. With a number C<
     say((1..10).last(3))   #=> [8, 9, 10]
 
 Aliases: I<tail>
-
-=cut
-
-=head2 tail
-
-    self.tail(n)
-
-Alias for L</last>.
-
-Aliases: I<last>
 
 =cut
 
@@ -520,35 +430,15 @@ Aliases: I<select>
 
 =cut
 
-=head2 select
-
-    self.select(block)
-
-Alias for L</grep>.
-
-Aliases: I<grep>
-
-=cut
-
 =head2 map_cons
 
     self.map_cons(n, block)
 
 Materializes the range into an C<Array> (via L</to_a>) and delegates to that array's own C<map_cons> method, which maps C<block> over overlapping, consecutive groups of C<n> elements and collects the results.
 
-    say((1..10).map_cons(3) { |*group| group.sum })  #=> [6, 9, 12, 15, 18, 21, 24, 27]
+    say((1..10).map_cons(3, { |*group| group.sum }))  #=> [6, 9, 12, 15, 18, 21, 24, 27]
 
 Aliases: I<cons>
-
-=cut
-
-=head2 cons
-
-    self.cons(n, block)
-
-Alias for L</map_cons>.
-
-Aliases: I<map_cons>
 
 =cut
 
@@ -558,20 +448,10 @@ Aliases: I<map_cons>
 
 Materializes the range into an C<Array> (via L</to_a>) and delegates to that array's own C<map_slice> method, which maps C<block> over non-overlapping slices of C<n> elements and collects the results.
 
-    say((1..10).map_slice(3) { |*slice| slice.sum })
+    say((1..10).map_slice(3, { |*slice| slice.sum }))
     #=> [6, 15, 24, 10]
 
 Aliases: I<slices>
-
-=cut
-
-=head2 slices
-
-    self.slices(n, block)
-
-Alias for L</map_slice>.
-
-Aliases: I<map_slice>
 
 =cut
 
@@ -713,16 +593,6 @@ Aliases: I<sample>
 
 =cut
 
-=head2 sample
-
-    self.sample(n)
-
-Alias for L</rand>.
-
-Aliases: I<rand>
-
-=cut
-
 =head2 pick
 
     self.pick
@@ -756,16 +626,6 @@ Materializes the range by iterating it fully and returns the result as a new C<A
     say((1..5).to_array)   #=> [1, 2, 3, 4, 5]
 
 Aliases: I<to_a>
-
-=cut
-
-=head2 to_a
-
-    self.to_a
-
-Alias for L</to_array>.
-
-Aliases: I<to_array>
 
 =cut
 
@@ -804,26 +664,6 @@ Aliases: I<to_v>, I<to_vec>
 
 =cut
 
-=head2 to_v
-
-    self.to_v
-
-Alias for L</to_vector>.
-
-Aliases: I<to_vector>, I<to_vec>
-
-=cut
-
-=head2 to_vec
-
-    self.to_vec
-
-Alias for L</to_vector>.
-
-Aliases: I<to_vector>, I<to_v>
-
-=cut
-
 =head2 join
 
     self.join(sep)
@@ -844,26 +684,6 @@ Materializes the range into an C<Array> (via L</to_a>) and delegates to that arr
     say((10..13).kv)  #=> [[0, 10], [1, 11], [2, 12], [3, 13]]
 
 Aliases: I<pairs>, I<zip_indices>
-
-=cut
-
-=head2 pairs
-
-    self.pairs
-
-Alias for L</kv>.
-
-Aliases: I<kv>, I<zip_indices>
-
-=cut
-
-=head2 zip_indices
-
-    self.zip_indices
-
-Alias for L</kv>.
-
-Aliases: I<kv>, I<pairs>
 
 =cut
 

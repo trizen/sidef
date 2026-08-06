@@ -80,16 +80,6 @@ Aliases: I<run>
 
 =cut
 
-=head2 run
-
-    self.run(*extra_args)
-
-Alias for L</call> -- behaves identically in every respect.
-
-Aliases: I<call>
-
-=cut
-
 =head1 IMPLICIT EXECUTION
 
 Calling I<any> method name on a C<LazyMethod> object that isn't already defined -- neither on C<LazyMethod> itself (L</new>, L</method>, L</call>, L</run>) nor inherited from L<Sidef::Object::Object> (C<class>, C<dump>, C<is_a>, and so on) -- triggers the chain via Perl's C<AUTOLOAD> mechanism: the whole chain runs exactly as L</call> would (but I<without> forwarding any arguments to the last step), and then the requested method is called, with whatever arguments were given, on that final result.

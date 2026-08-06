@@ -413,11 +413,11 @@ Creates an array of given size filled with object.
 
 =head2 make_by
 
-    Array.make_by(size) { |i| ... }
+    Array.make_by(size, { |i| ... })
 
 Creates an array by calling block for each index.
 
-    Array.make_by(5) { |i| i**2 }    #=> [0, 1, 4, 9, 16]
+    Array.make_by(5, { |i| i**2 })    #=> [0, 1, 4, 9, 16]
 
 =cut
 
@@ -1396,11 +1396,11 @@ Iterates over a 2D array, unpacking each sub-array.
 
 =head2 each_cons
 
-    arr.each_cons(n) { |*elements| ... }
+    arr.each_cons(n, { |*elements| ... })
 
 Iterates over consecutive n-element windows.
 
-    [1,2,3,4,5].each_cons(3) { |*c| say c }
+    [1,2,3,4,5].each_cons(3, { |*c| say c })
     # Prints: [1,2,3], [2,3,4], [3,4,5]
 
 =cut
@@ -1429,11 +1429,11 @@ Iterates over index-value pairs.
 
 =head2 each_slice
 
-    arr.each_slice(n) { |*slice| ... }
+    arr.each_slice(n, { |*slice| ... })
 
 Iterates over non-overlapping slices of size n.
 
-    [1,2,3,4,5].each_slice(2) { |*s| say s }
+    [1,2,3,4,5].each_slice(2, { |*s| say s })
     # Prints: [1,2], [3,4], [5]
 
 =cut
@@ -2199,7 +2199,7 @@ Generates all circular (rotational) permutations of the array.
 
     arr.combinations
     arr.combinations(k)
-    arr.combinations(k) { |*c| ... }
+    arr.combinations(k, { |*c| ... })
 
 Generates all k-combinations (subsets of size k) of the array.
 
@@ -2258,7 +2258,7 @@ Aliases: I<nth_permutation>
 
     arr.ordered_partitions
     arr.ordered_partitions(k)
-    arr.ordered_partitions(k) { |*parts| ... }
+    arr.ordered_partitions(k, { |*parts| ... })
 
 Generates ordered partitions where concatenation equals original array.
 
@@ -2270,7 +2270,7 @@ Generates ordered partitions where concatenation equals original array.
 
     arr.partitions
     arr.partitions(k)
-    arr.partitions(k) { |*parts| ... }
+    arr.partitions(k, { |*parts| ... })
 
 Generates all ways to partition array into k non-empty subsets.
 
@@ -2292,7 +2292,7 @@ Converts a permutation array to its lexicographic index.
 
     arr.permutations
     arr.permutations(k)
-    arr.permutations(k) { |*perm| ... }
+    arr.permutations(k, { |*perm| ... })
 
 Generates all permutations (or k-permutations).
 

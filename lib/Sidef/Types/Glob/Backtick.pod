@@ -65,13 +65,7 @@ Backtick expressions are typically used for:
 
 =head1 INHERITS
 
-This class inherits from:
-
-=over 4
-
-=item * L<Sidef::Object::Object>
-
-=back
+This class inherits from L<Sidef::Object::Object>.
 
 =head1 METHODS
 
@@ -367,7 +361,7 @@ where attackers can execute arbitrary commands.
 B<Unsafe example> (VULNERABLE):
 
     # DANGEROUS - DO NOT USE
-    var filename = readln              # User input
+    var filename = Sys.readln          # User input
     var content = `cat #{filename}`    # EXPLOITABLE!
 
     # If user enters: file.txt; rm -rf /
@@ -375,34 +369,30 @@ B<Unsafe example> (VULNERABLE):
 
 B<Safer alternatives:>
 
-=over 4
+1. B<Validate input> against a whitelist of allowed values
 
-=item 1. B<Validate input> against a whitelist of allowed values
-
-    var filename = readln.trim
+    var filename = Sys.readln.trim
     if (filename ~~ /^[a-zA-Z0-9._-]+$/) {
         var content = `cat #{filename}`
     } else {
         die "Invalid filename"
     }
 
-=item 2. B<Use File I/O instead> of shell commands when possible
+2. B<Use File I/O instead> of shell commands when possible
 
-    var filename = readln.trim
+    var filename = Sys.readln.trim
     var content = File(filename).read   # Safer - no shell involved
 
-=item 3. B<Use Sys.run with array arguments> for proper escaping
+3. B<Use Sys.run with array arguments> for proper escaping
 
-    var filename = readln.trim
+    var filename = Sys.readln.trim
     var content = Sys.run("cat", filename)
 
-=item 4. B<Escape shell metacharacters> (complex and error-prone)
+4. B<Escape shell metacharacters> (complex and error-prone)
 
     # Not recommended - easy to get wrong
     var escaped = filename.escape
     var content = `cat #{escaped}`
-
-=back
 
 =head2 Other Security Concerns
 

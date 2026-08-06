@@ -12,3 +12,4 @@ $markdown2pdf NUMBER_THEORY_CHEATSHEET.md --title="Sidef Programming Language - 
 $markdown2pdf COMPUTATIONAL_ALGEBRA_GUIDE.md --title="Sidef Programming Language - Computational Algebra Guide ($version)" 'sidef-computational-algebra-guide.pdf' --mathjax
 $markdown2pdf SIDEF_ADVANCED_GUIDE.md --title="Sidef Programming Language - Advanced Guide ($version)" 'sidef-advanced-guide.pdf' --mathjax
 $markdown2pdf SIDEF_BEGINNER_GUIDE.md --title="Sidef Programming Language - Beginner's Guide ($version)" 'sidef-beginner-guide.pdf' --mathjax
+perl "make_pod2pdf.pl"
