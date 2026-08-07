@@ -72,14 +72,14 @@
 
 | Notation | Meaning |
 |---|---|
-| `φ(n)` | Euler's totient function |
-| `μ(n)` | Möbius function |
-| `τ(n)` | Number of divisors |
-| `σ_k(n)` | Sum of k-th powers of divisors |
-| `ω(n)` | Number of distinct prime factors |
-| `Ω(n)` | Number of prime factors counted with multiplicity |
-| `λ(n)` | Carmichael’s lambda function |
-| `ψ(n)` | Dedekind psi function |
+| $φ(n)$ | Euler's totient function |
+| $μ(n)$ | Möbius function |
+| $τ(n)$ | Number of divisors |
+| $σ_k(n)$ | Sum of k-th powers of divisors |
+| $ω(n)$ | Number of distinct prime factors |
+| $Ω(n)$ | Number of prime factors counted with multiplicity |
+| $λ(n)$ | Carmichael’s lambda function |
+| $ψ(n)$ | Dedekind psi function |
 
 Reading conventions used throughout this document:
 
@@ -649,12 +649,12 @@ Individual methods:
 | Method | Best for |
 |---|---|
 | `n.trial_factor(limit)` | Small factors quickly |
-| `n.pm1_factor(B)` | p where p−1 is B-smooth |
-| `n.pp1_factor(B)` | p where p+1 is B-smooth |
+| `n.pm1_factor(B)` | $p$ where $p−1$ is B-smooth |
+| `n.pp1_factor(B)` | $p$ where $p+1$ is B-smooth |
 | `n.ecm_factor(B1, curves)` | Elliptic Curve Method — general |
 | `n.squfof_factor(tries)` | Medium-sized numbers (Shanks SQUFOF) |
-| `n.holf_factor(tries)` | Factors near √n |
-| `n.cyclotomic_factor(bases...)` | Numbers of the form a^k ± 1 |
+| `n.holf_factor(tries)` | Factors near $√n$ |
+| `n.cyclotomic_factor(bases...)` | Numbers of the form $a^k ± 1$ |
 | `n.flt_factor(base, tries)` | Factors with small multiplicative order |
 | `n.miller_factor(tries)` | Carmichael numbers, Fermat pseudoprimes |
 | `n.lucas_factor(j, tries)` | Lucas-Carmichael numbers |
@@ -726,14 +726,14 @@ say squarefree_divisors(120)
 say 96.idivisors
 ```
 
-### Divisor Count: τ(n)
+### Divisor Count: $τ(n)$
 
 ```ruby
 say tau(120)              #=> 16   (number of divisors)
 say 120.sigma(0)          #=> 16   (sigma_0 = count of divisors)
 ```
 
-### Divisor Sum: σ_k(n)
+### Divisor Sum: $σ_k(n)$
 
 ```ruby
 say sigma(12)             #=> 28   (sum of divisors)
@@ -862,9 +862,9 @@ say m/3
 
 ## Euler's Totient and Related Functions
 
-### Euler's Totient φ(n)
+### Euler's Totient $φ(n)$
 
-φ(n) counts integers in [1, n] coprime to n — it is the order of the multiplicative group (Z/nZ)*:
+$φ(n)$ counts integers in [1, n] coprime to $n$ — it is the order of the multiplicative group $(\Z/n\Z)*$:
 
 ```ruby
 euler_phi(12)          #=> 4
@@ -875,9 +875,9 @@ totient_range(7, 17)   # batch computation
 uphi(n)                # unitary totient
 ```
 
-### Carmichael's Lambda λ(n)
+### Carmichael's Lambda $λ(n)$
 
-λ(n) is the exponent of (Z/nZ)* — the smallest $m$ such that $a^m \equiv 1 \pmod{n}$ for all $a$ coprime to $n$:
+$λ(n)$ is the exponent of $(\Z/n\Z)*$ — the smallest $m$ such that $a^m \equiv 1 \pmod{n}$ for all $a$ coprime to $n$:
 
 ```ruby
 lambda(12)             #=> 2
@@ -888,7 +888,7 @@ lambda(1000)           #=> 100
 
 ## Multiplicative Functions
 
-### Möbius Function μ(n)
+### Möbius Function $μ(n)$
 
 $\mu(n) = 0$ if $n$ has a squared prime factor; $(-1)^k$ if $n$ is a product of $k$ distinct primes:
 
@@ -1421,7 +1421,7 @@ say "Computed in #{Time.now - start}s"
 
 ### Problem 1 — Primes in Arithmetic Progressions
 
-Find all primes of the form $4k + 3$ up to 200. (By Dirichlet's theorem, there are infinitely many.)
+Find all primes of the form $4k + 3$ up to $200$. (By Dirichlet's theorem, there are infinitely many.)
 
 ```ruby
 say primes(200).grep { _ % 4 == 3 }
@@ -1432,7 +1432,7 @@ say linear_forms_primes(0, 50, [4, 3])
 
 ### Problem 2 — Goldbach's Conjecture
 
-Verify that every even $n > 2$ up to 1000 is a sum of two primes.
+Verify that every even $n > 2$ up to $1000$ is a sum of two primes.
 
 ```ruby
 func goldbach(n) {
@@ -1574,11 +1574,11 @@ say verify_factorization(5040)      #=> true
 |---|---|
 | `prime(n)` | n-th prime |
 | `primes(a, b)` | Primes in [a, b] |
-| `pi(n)` | Prime counting function π(n) |
-| `prime_sum(n)` | Sum of primes ≤ n |
-| `n.next_prime` | Next prime after n |
-| `n.prev_prime` | Previous prime before n |
-| `primorial(n)` | Product of primes ≤ n |
+| `pi(n)` | Prime counting function $π(n)$ |
+| `prime_sum(n)` | Sum of primes $≤ n$ |
+| `n.next_prime` | Next prime after $n$ |
+| `n.prev_prime` | Previous prime before $n$ |
+| `primorial(n)` | Product of primes $≤ n$ |
 | `gpf(n)` | Greatest prime factor |
 | `lpf(n)` | Least prime factor |
 | `prime_cluster(lo,hi,*d)` | Prime clusters with given gaps |
@@ -1591,8 +1591,8 @@ say verify_factorization(5040)      #=> true
 | `n.factor` | Full prime factorization |
 | `n.factor_exp` | Factorization as [p,e] pairs |
 | `n.prime_divisors` | Unique prime factors |
-| `n.pm1_factor(B)` | Pollard p−1 |
-| `n.pp1_factor(B)` | Williams p+1 |
+| `n.pm1_factor(B)` | Pollard $p−1$ |
+| `n.pp1_factor(B)` | Williams $p+1$ |
 | `n.ecm_factor(B)` | Elliptic curve method |
 | `n.qs_factor` | Quadratic sieve |
 | `n.special_factor` | Auto multi-method |
@@ -1607,15 +1607,15 @@ say verify_factorization(5040)      #=> true
 | `phi(n)` / `euler_phi(n)` | Euler totient φ(n) |
 | `sigma(n)` | Sum of divisors σ(n) |
 | `sigma(n, k)` | Sum of k-th powers of divisors |
-| `tau(n)` | Number of divisors τ(n) |
-| `mu(n)` | Möbius function μ(n) |
-| `omega(n)` | Distinct prime factors ω(n) |
-| `bigomega(n)` | Prime factors with multiplicity Ω(n) |
-| `liouville(n)` | Liouville function (−1)^Ω(n) |
-| `psi(n)` | Dedekind psi ψ(n) |
+| `tau(n)` | Number of divisors $τ(n)$ |
+| `mu(n)` | Möbius function $μ(n)$ |
+| `omega(n)` | Distinct prime factors $ω(n)$ |
+| `bigomega(n)` | Prime factors with multiplicity $Ω(n)$ |
+| `liouville(n)` | Liouville function $(−1)^{Ω(n)}$ |
+| `psi(n)` | Dedekind psi $ψ(n)$ |
 | `sopfr(n)` | Sum of prime factors (with repetition) |
-| `mertens(n)` | Mertens function M(n) |
-| `lambda(n)` | Carmichael lambda λ(n) |
+| `mertens(n)` | Mertens function $M(n)$ |
+| `lambda(n)` | Carmichael lambda $λ(n)$ |
 | `n.factor_prod{...}` | Product over prime powers |
 
 ### Divisors
@@ -1624,64 +1624,64 @@ say verify_factorization(5040)      #=> true
 |---|---|
 | `n.divisors` | All positive divisors |
 | `n.udivisors` | Unitary divisors |
-| `n.proper_divisors` | Divisors less than n |
+| `n.proper_divisors` | Divisors less than $n$ |
 | `n.prime_power_divisors` | Prime power divisors |
 | `n.squarefree_divisors` | Squarefree divisors |
 | `n.square_divisors` | Square divisors |
-| `inverse_sigma(n)` | Solve σ(x) = n |
-| `inverse_phi(n)` | Solve φ(x) = n |
-| `inverse_psi(n)` | Solve ψ(x) = n |
+| `inverse_sigma(n)` | Solve $σ(x) = n$ |
+| `inverse_phi(n)` | Solve $φ(x) = n$ |
+| `inverse_psi(n)` | Solve $ψ(x) = n$ |
 
 ### Modular Arithmetic
 
 | Function | Description |
 |---|---|
-| `powmod(a, n, m)` | a^n mod m |
-| `invmod(a, m)` | a⁻¹ mod m |
-| `sqrtmod(a, m)` | √a mod m |
-| `sqrtmod_all(a, n)` | All square roots of a mod n |
-| `rootmod_all(a, k, n)` | All k-th roots of a mod n |
-| `znorder(a, m)` | Multiplicative order of a mod m |
-| `znlog(a, g, m)` | Discrete log: g^k ≡ a (mod m) |
-| `znprimroot(n)` | Smallest primitive root mod n |
-| `kronecker(a, n)` | Kronecker symbol (a\|n) |
-| `linear_congruence(n,r,m)` | Solve n*x ≡ r (mod m) |
+| `powmod(a, n, m)` | $a^n$ mod $m$ |
+| `invmod(a, m)` | $a⁻¹$ mod $m$ |
+| `sqrtmod(a, m)` | $√a$ mod $m$ |
+| `sqrtmod_all(a, n)` | All square roots of $a$ mod $n$ |
+| `rootmod_all(a, k, n)` | All k-th roots of $a$ mod $n$ |
+| `znorder(a, m)` | Multiplicative order of $a$ mod $m$ |
+| `znlog(a, g, m)` | Discrete log: $g^k ≡ a \mod m$ |
+| `znprimroot(n)` | Smallest primitive root mod $n$ |
+| `kronecker(a, n)` | Kronecker symbol $(a\|n)$ |
+| `linear_congruence(n,r,m)` | Solve $n x ≡ r \mod m$ |
 | `chinese(Mod(a,m), Mod(b,n))` | Chinese Remainder Theorem |
 
 ### Sequences and Special Numbers
 
 | Function | Description |
 |---|---|
-| `fib(n)` | n-th Fibonacci number |
-| `fibmod(n, m)` | n-th Fibonacci mod m |
-| `lucas(n)` | n-th Lucas number |
+| `fib(n)` | $n$-th Fibonacci number |
+| `fibmod(n, m)` | $n$-th Fibonacci mod $m$ |
+| `lucas(n)` | $n$-th Lucas number |
 | `lucasU(P,Q,n)` | Lucas U sequence |
 | `lucasV(P,Q,n)` | Lucas V sequence |
-| `bernoulli(n)` | n-th Bernoulli number |
-| `catalan(n)` | n-th Catalan number |
-| `bell(n)` | n-th Bell number |
-| `polygonal(n, k)` | n-th k-gonal number |
-| `squares_r(n, k)` | r_k(n): number of representations as k squares |
-| `sum_of_squares(n)` | Solutions to n = a² + b² |
-| `factorial(n)` | n! |
-| `binomial(n, k)` | C(n,k) |
-| `binomialmod(n, k, m)` | C(n,k) mod m |
+| `bernoulli(n)` | $n$-th Bernoulli number |
+| `catalan(n)` | $n$-th Catalan number |
+| `bell(n)` | $n$-th Bell number |
+| `polygonal(n, k)` | $n$-th $k$-gonal number |
+| `squares_r(n, k)` | $r_k(n)$: number of representations as $k$ squares |
+| `sum_of_squares(n)` | Solutions to $n = a² + b²$ |
+| `factorial(n)` | $n!$ |
+| `binomial(n, k)` | $C(n,k)$ |
+| `binomialmod(n, k, m)` | $C(n,k)$ mod $m$ |
 
 ### Number Classification Predicates
 
 | Predicate | True when |
 |---|---|
-| `n.is_prime` | n is prime |
-| `n.is_composite` | n is composite |
+| `n.is_prime` | $n$ is prime |
+| `n.is_composite` | $n$ is composite |
 | `n.is_squarefree` | No squared prime factor |
-| `n.is_perfect` | σ(n) = 2n |
-| `n.is_abundant` | σ(n) > 2n |
-| `n.is_deficient` | σ(n) < 2n |
-| `n.is_almost_prime(k)` | Ω(n) = k |
-| `n.is_omega_prime(k)` | ω(n) = k |
-| `n.is_powerful(k)` | Every prime factor appears ≥ k times |
-| `n.is_perfect_power` | n = a^k, k ≥ 2 |
-| `n.is_palindrome(b)` | Palindrome in base b |
+| `n.is_perfect` | $σ(n) = 2n$ |
+| `n.is_abundant` | $σ(n) > 2n$ |
+| `n.is_deficient` | $σ(n) < 2n$ |
+| `n.is_almost_prime(k)` | $Ω(n) = k$ |
+| `n.is_omega_prime(k)` | $ω(n) = k$ |
+| `n.is_powerful(k)` | Every prime factor appears $≥ k$ times |
+| `n.is_perfect_power` | $n = a^k$, $k ≥ 2$ |
+| `n.is_palindrome(b)` | Palindrome in base $b$ |
 
 ### Sequence Generation — Memory Aid
 
@@ -1911,7 +1911,7 @@ For $n < 3{,}317{,}044{,}064{,}679{,}887{,}385{,}961{,}981$, testing bases $\{2,
 
 ### Baillie-PSW Primality Test (BPSW)
 
-BPSW combines Miller-Rabin base 2 with a strong Lucas pseudoprime test. No composite is known to pass both. Sidef's `is_prime(n)` is exactly this test:
+BPSW combines Miller-Rabin base $2$ with a strong Lucas pseudoprime test. No composite is known to pass both. Sidef's `is_prime(n)` is exactly this test:
 
 ```ruby
 func bpsw(n) {
@@ -2014,7 +2014,7 @@ say 112391.pm1_factor(100)     # Sidef's built-in
 
 ### Williams' p+1 Method
 
-Analogous to p−1 but uses Lucas sequences; effective when $p + 1$ is smooth:
+Analogous to $p−1$ but uses Lucas sequences; effective when $p + 1$ is smooth:
 
 ```ruby
 # The key identity: V_{p+1}(P, 1) ≡ P (mod p) for prime p
@@ -2037,7 +2037,7 @@ say n.pp1_factor(10000)    # Sidef's built-in
 
 ### Lenstra's Elliptic Curve Method (ECM)
 
-ECM generalizes p−1 to elliptic curves. Method of choice for factors up to ~60 digits:
+ECM generalizes $p−1$ to elliptic curves. Method of choice for factors up to $~60$ digits:
 
 ```ruby
 say n.ecm_factor(2000)            # Stage-1 bound B1 = 2000

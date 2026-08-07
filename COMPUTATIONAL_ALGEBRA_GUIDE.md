@@ -32,7 +32,7 @@ Sidef ships with six built-in algebraic types — **Mod**, **Gauss**, **Quadrati
 
 ## Mod
 
-`Mod(n, m)` represents the integer `n` modulo `m`. Every arithmetic operation automatically reduces the result, which makes this type a natural fit for cryptography, primality testing, and modular sequences.
+`Mod(n, m)` represents the integer $n$ modulo $m$. Every arithmetic operation automatically reduces the result, which makes this type a natural fit for cryptography, primality testing, and modular sequences.
 
 ### Construction & reduction
 
@@ -98,7 +98,7 @@ say Mod(5, 13)!    # Mod(3, 13)  -- 5! = 120 == 3 (mod 13)
 
 ## Gauss
 
-`Gauss(a, b)` represents the Gaussian integer `a + bi`. Gaussian integers form a unique factorization domain, which makes them a computational gateway into algebraic number theory.
+`Gauss(a, b)` represents the Gaussian integer $a + bi$. Gaussian integers form a unique factorization domain, which makes them a computational gateway into algebraic number theory.
 
 ### Construction & arithmetic
 
@@ -169,12 +169,12 @@ say z.sgn    # the unit (one of 1, -1, i, -i) with the same argument as z
 
 ## Quadratic
 
-`Quadratic(a, b, p, q)` represents an element `a + b*t` of the quotient ring `Z[t] / (t^2 - q*t - p)`, where `t` satisfies `t^2 = p + q*t`. Every element carries four components: the two coordinates `a`, `b`, and the two ring parameters `p`, `q`.
+`Quadratic(a, b, p, q)` represents an element $a + b t$ of the quotient ring $\Z[t] / (t^2 - q t - p)$, where $t$ satisfies $t^2 = p + q t$. Every element carries four components: the two coordinates `a`, `b`, and the two ring parameters `p`, `q`.
 
 Two special cases cover almost everything you'll want to compute:
 
-- **Quadratic integers** `a + b*sqrt(w)`: call `Quadratic(a, b, w)` — this defaults `q` to `0`, so `t^2 = w`, i.e. `t = sqrt(w)`.
-- **Linear recurrences**: `t^2 = p + q*t` is exactly the recurrence relation `U(n) = q*U(n-1) + p*U(n-2)`, so powers of `t` generate Fibonacci-like sequences in `O(log n)` multiplications (see below).
+- **Quadratic integers** $a + b \sqrt w$: call `Quadratic(a, b, w)` — this defaults $q$ to $0$, so $t^2 = w$, i.e. $t = \sqrt w$.
+- **Linear recurrences**: $t^2 = p + q t$ is exactly the recurrence relation $U(n) = q U(n-1) + p U(n-2)$, so powers of $t$ generate Fibonacci-like sequences in $O(log n)$ multiplications (see below).
 
 ### Construction
 
@@ -201,7 +201,7 @@ say (a / b)   # a * conj(b) / norm(b)
 
 ### Norm, trace, conjugate, inverse
 
-For `e = a + b*t`, the conjugate uses the *other* root `t' = q - t` of the minimal polynomial:
+For $e = a + b*t$, the conjugate uses the *other* root $t' = q - t$ of the minimal polynomial:
 
 ```ruby
 var e = Quadratic(3, 4, 1, 1)   # t^2 = 1 + t
@@ -285,7 +285,7 @@ say q.pretty    # "3 + 4*sqrt(5)"
 
 ## Quaternion
 
-`Quaternion(a, b, c, d)` represents `a + bi + cj + dk`, the four-dimensional extension of the complex numbers. Multiplication is **non-commutative**, which is exactly what makes quaternions useful for representing 3D rotations without gimbal lock.
+`Quaternion(a, b, c, d)` represents $a + bi + cj + dk$, the four-dimensional extension of the complex numbers. Multiplication is **non-commutative**, which is exactly what makes quaternions useful for representing 3D rotations without gimbal lock.
 
 ### Construction
 
@@ -360,7 +360,7 @@ var (w, x, y, z) = q.reals    # destructure all four components
 
 ### Unit quaternions and rotation
 
-A unit quaternion `q = cos(theta/2) + sin(theta/2)*k` represents a rotation by `theta` around the z-axis:
+A unit quaternion $q = cos(\theta/2) + k sin(\theta/2)$ represents a rotation by $\theta$ around the $z$-axis:
 
 ```ruby
 var angle = 90.deg2rad
@@ -514,7 +514,7 @@ say base.powmod(100, mod)           # (x+1)^100 mod (x^2+1), computed efficientl
 
 ## PolynomialMod
 
-`PolynomialMod(coeffs, modulus)` represents an element of the quotient ring `R[x] / (m(x))`: every arithmetic result is automatically reduced modulo the polynomial `m(x)`. This is the algebraic engine behind finite fields, cyclotomic fields, and constructions like AES's `GF(2^8)`.
+`PolynomialMod(coeffs, modulus)` represents an element of the quotient ring $\R[x] / (m(x))$: every arithmetic result is automatically reduced modulo the polynomial `m(x)`. This is the algebraic engine behind finite fields, cyclotomic fields, and constructions like AES's $GF(2^8)$.
 
 The modulus can be given as a plain coefficient array or as an existing `Polynomial`.
 
@@ -528,7 +528,7 @@ var p = PolynomialMod([3, 2, 1], [1, 0, 1])
 var x = PolynomialMod([1, 0], [1, 0, 1])
 ```
 
-### Simulating Gaussian integers via Q[x]/(x²+1)
+### Simulating Gaussian integers via $\Q[x]/(x²+1)$
 
 ```ruby
 var i = PolynomialMod([1, 0], [1, 0, 1])   # x, reduced mod x^2+1
@@ -541,7 +541,7 @@ var b = PolynomialMod([4, 1], [1, 0, 1])   # 1 + 4x  ~  1 + 4i
 say ((a * b) ** 2)   # matches (3+2i)(1+4i), squared, in the ring
 ```
 
-### Finite field arithmetic GF(pⁿ)
+### Finite field arithmetic $GF(pⁿ)$
 
 ```ruby
 # GF(4) = GF(2)[x] / (x^2+x+1) — a field with 4 elements: {0, 1, x, x+1}
@@ -565,7 +565,7 @@ say (p * p.inv)     # 1
 say (p ** 1000)     # efficient even for large exponents
 ```
 
-The inverse of `f(x)` in `R[x]/(m(x))` exists exactly when `gcd(f, m) = 1`.
+The inverse of $f(x)$ in $\R[x]/(m(x))$ exists exactly when $\gcd(f, m) = 1$.
 
 ### GCD and modular inverse via gcdext
 
@@ -600,7 +600,7 @@ say lifted
 say p.modulus         # the modulus polynomial itself
 ```
 
-### Factoring polynomials over GF(p)
+### Factoring polynomials over $GF(p)$
 
 ```ruby
 # x^4 + 1 factors over GF(5) — Cantor-Zassenhaus factorization
@@ -639,7 +639,7 @@ say g.invmod(1009)         # multiplicative inverse mod 1009
 
 ### PolynomialMod as a generalization of Quadratic and Gauss
 
-All three describe the same relation `i^2 = -1` through different quotient rings:
+All three describe the same relation $i^2 = -1$ through different quotient rings:
 
 ```ruby
 var g = Gauss(0, 1)
@@ -697,10 +697,10 @@ This section develops the number-theoretic machinery that these six types collec
 
 ### Rings of Integers
 
-An **algebraic integer** is a root of a monic polynomial with integer coefficients. For the quadratic field `Q(sqrt(d))` with `d` square-free:
+An **algebraic integer** is a root of a monic polynomial with integer coefficients. For the quadratic field $\Q(\sqrt d)$ with $d$ square-free:
 
-- If `d == 2` or `3 (mod 4)`: the ring of integers is `Z[sqrt(d)]`, elements `a + b*sqrt(d)` with `a, b` integers.
-- If `d == 1 (mod 4)`: the ring of integers is `Z[(1+sqrt(d))/2]`, using a half-integer basis.
+- If `d == 2` or `3 (mod 4)`: the ring of integers is $\Z[\sqrt d]$, elements $a + b \sqrt d$ with $a$, $b$ integers.
+- If `d == 1 (mod 4)`: the ring of integers is $\Z[(1+\sqrt d)/2]$, using a half-integer basis.
 
 ```ruby
 # Z[sqrt(2)]: d=2, d == 2 (mod 4), so integers have the form a + b*sqrt(2)
@@ -717,11 +717,11 @@ say (phi ** 2)  # phi + 1, the defining property of the golden ratio
 
 ### Quadratic Fields: Real vs Imaginary
 
-The sign of `d` in `Q(sqrt(d))` determines whether the field is **real** (`d > 0`) or **imaginary** (`d < 0`), which profoundly affects the arithmetic.
+The sign of `d` in $\Q(\sqrt d)$ determines whether the field is **real** ($d > 0$) or **imaginary** ($d < 0$), which profoundly affects the arithmetic.
 
 #### Imaginary quadratic fields
 
-The norm `N(a + b*sqrt(d)) = a^2 - b^2*d = a^2 + b^2*|d|` is always non-negative:
+The norm $N(a + b \sqrt d) = a^2 - b^2 d = a^2 + b^2 |d|$ is always non-negative:
 
 ```ruby
 say Quadratic(3, 4, -1).norm   # 25  -- Gaussian integers: a^2 + b^2
@@ -763,7 +763,7 @@ say (u ** -1)   # -1 + sqrt(2)
 
 ### Norms, Traces, and Minimal Polynomials
 
-For `alpha = a + b*sqrt(d)`, the norm and trace are its two fundamental invariants, and together they give its minimal polynomial `x^2 - Tr(alpha)*x + N(alpha)`:
+For $\alpha = a + b \sqrt d$, the norm and trace are its two fundamental invariants, and together they give its minimal polynomial `x^2 - Tr(alpha)*x + N(alpha)`:
 
 ```ruby
 var alpha = Quadratic(3, 4, 5)   # 3 + 4*sqrt(5)
@@ -794,7 +794,7 @@ say min_poly_alpha.degree                  # 4 = [Q(sqrt(2)+sqrt(3)) : Q]
 
 ### Pell's Equation and Fundamental Units
 
-The **Pell equation** `x^2 - d*y^2 = +-1` is one of the oldest problems in number theory, and its solutions are exactly the powers of the fundamental unit of `Q(sqrt(d))`.
+The **Pell equation** $x^2 - d y^2 = +-1$ is one of the oldest problems in number theory, and its solutions are exactly the powers of the fundamental unit of $\Q(\sqrt d)$.
 
 ```ruby
 var u = Quadratic(1, 1, 2)   # fundamental unit of Q(sqrt(2))
@@ -811,7 +811,7 @@ for n in (1..8) {
 # ...alternating -1, 1, -1, 1...
 ```
 
-Each solution `(x_n, y_n)` also gives a best rational approximation of `sqrt(d)`:
+Each solution `(x_n, y_n)` also gives a best rational approximation of $\sqrt d$:
 
 ```ruby
 for n in (1..6) {
@@ -821,7 +821,7 @@ for n in (1..6) {
 # 1/1, 3/2, 7/5, 17/12, 41/29, 99/70 — converging on sqrt(2)
 ```
 
-Q(sqrt(5))'s fundamental unit is the golden ratio, with norm -1 rather than +1 — a reminder that not every real quadratic field has a norm-`+1` fundamental unit:
+$\Q(\sqrt 5)$'s fundamental unit is the golden ratio, with norm $-1$ rather than $+1$ — a reminder that not every real quadratic field has a norm-`+1` fundamental unit:
 
 ```ruby
 var phi = Quadratic(1/2, 1/2, 5)
@@ -833,7 +833,7 @@ say ((phi ** 2).norm)  # 1  -- squaring a norm(-1) unit always gives norm(+1)
 
 ### Splitting of Rational Primes
 
-A rational prime `p` behaves in one of three ways in the ring of integers of `Q(sqrt(d))`, determined by the Legendre symbol `(d/p)`:
+A rational prime $p$ behaves in one of three ways in the ring of integers of $\Q(\sqrt d)$, determined by the Legendre symbol $(d/p)$:
 
 | `(d/p)` | Behavior | Example in `Z[i]` |
 |---|---|---|
@@ -867,7 +867,7 @@ say pi11.norm             # 11
 
 ### Fermat's Two-Square Theorem
 
-Every prime `p == 1 (mod 4)` is a sum of two squares. The classical proof is constructive: find `x` with `x^2 == -1 (mod p)`, then take `gcd(x+i, p)` in `Z[i]`.
+Every prime $p \equiv 1 \pmod{4}$ is a sum of two squares. The classical proof is constructive: find $x$ with $x^2 \equiv -1 \pmod{p}$, then take $\gcd(x+i, p)$ in $\Z[i]$.
 
 ```ruby
 func two_squares(p) {
@@ -884,7 +884,7 @@ two_squares(29)    # 29 = 2^2 + 5^2
 two_squares(97)    # 97 = 4^2 + 9^2
 ```
 
-This composes with the **Brahmagupta–Fibonacci identity** `(a^2+b^2)(c^2+d^2) = (ac-bd)^2 + (ad+bc)^2` — which is just multiplication of Gaussian integers:
+This composes with the **Brahmagupta–Fibonacci identity** $(a^2+b^2)(c^2+d^2) = (ac-bd)^2 + (ad+bc)^2$ — which is just multiplication of Gaussian integers:
 
 ```ruby
 var z1 = Gauss(2, 3)   # norm 13
@@ -923,7 +923,7 @@ say ((qa * qb).norm)              # 77 = 7 * 11
 
 ### Cyclotomic Fields via PolynomialMod
 
-The **cyclotomic field** `Q(zeta_n)` is generated by a primitive `n`-th root of unity, satisfying the `n`-th cyclotomic polynomial `Phi_n(x) = 0`. In Sidef, this is exactly `PolynomialMod` with modulus `Phi_n(x)`.
+The **cyclotomic field** $\Q(\zeta_n)$ is generated by a primitive `n`-th root of unity, satisfying the `n`-th cyclotomic polynomial $\Phi_n(x) = 0$. In Sidef, this is exactly `PolynomialMod` with modulus $\Phi_n(x)$.
 
 ```ruby
 # Q(zeta_3): cube roots of unity, Phi_3(x) = x^2+x+1 — the Eisenstein integers
@@ -950,7 +950,7 @@ say (zeta8 + (zeta8 ** 7))   # zeta_8 + zeta_8^-1 represents sqrt(2)
 
 #### Galois action
 
-The Galois group `Gal(Q(zeta_n)/Q) = (Z/nZ)*` acts by `zeta -> zeta^k` for `gcd(k, n) = 1`:
+The Galois group $Gal(\Q(\zeta_n)/\Q) = (\Z/n\Z)*$ acts by `zeta -> zeta^k` for $\gcd(k, n) = 1$:
 
 ```ruby
 var mod5 = [1, 1, 1, 1, 1]    # Phi_5(x)
@@ -965,7 +965,7 @@ for k in (1, 2, 3, 4) {
 
 ### Finite Fields and the Frobenius Endomorphism
 
-In `GF(p^n) = GF(p)[x]/(f(x))`, the **Frobenius map** `phi: a -> a^p` is the fundamental automorphism, and its order equals the degree of the extension.
+In $GF(p^n) = GF(p)[x]/(f(x))$, the **Frobenius map** `phi: a -> a^p` is the fundamental automorphism, and its order equals the degree of the extension.
 
 ```ruby
 # GF(2^3) = GF(2)[x]/(x^3+x+1), an irreducible cubic over GF(2)
@@ -985,7 +985,7 @@ say (beta ** 9)   # back to beta -- Frobenius has order 2
 say (beta ** 8)   # 1  -- |GF(9)*| = 8
 ```
 
-`PolynomialMod` can also factor polynomials over `GF(p)` directly, using Cantor–Zassenhaus factorization:
+`PolynomialMod` can also factor polynomials over $GF(p)$ directly, using Cantor–Zassenhaus factorization:
 
 ```ruby
 var poly = PolynomialMod([1, 0, 0, 4], 5)   # x^3 + 4, over GF(5)
@@ -996,7 +996,7 @@ say poly.factor_exp
 
 ### Quadratic Residues and the Legendre Symbol
 
-The **Legendre symbol** `(a/p)` tells whether `a` is a quadratic residue modulo the prime `p`, via Euler's criterion `(a/p) == a^((p-1)/2) (mod p)`.
+The **Legendre symbol** $(a/p)$ tells whether $a$ is a quadratic residue modulo the prime $p$, via Euler's criterion $(a/p) \equiv a^{(p-1)/2} \pmod{p}$.
 
 ```ruby
 func legendre(a, p) { Mod(a, p) ** ((p-1)/2) }
@@ -1024,7 +1024,7 @@ This directly answers whether a prime splits in `Q(sqrt(d))`: it splits iff `(d/
 
 ### Hensel Lifting
 
-**Hensel's lemma** lifts a solution of `f(x) == 0 (mod p)` to a solution modulo `p^2`, `p^3`, and so on — Newton's method over the p-adic integers. `Polynomial` and `Mod` compose naturally here.
+**Hensel's lemma** lifts a solution of `f(x) == 0 (mod p)` to a solution modulo $p^2$, $p^3$, and so on — Newton's method over the p-adic integers. `Polynomial` and `Mod` compose naturally here.
 
 ```ruby
 func hensel_lift(f, a0, p, steps) {

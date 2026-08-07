@@ -175,8 +175,7 @@ Example:
 
 Returns the file mode, which includes both the file type and permissions as a numeric value. The mode is a bitmask that encodes file type (regular file, directory, symbolic link, etc.) and permission bits.
 
-To extract permissions: mode & 0777
-To check file type, use bitwise operations or File type checking methods.
+To extract permissions: mode & 0777 To check file type, use bitwise operations or File type checking methods.
 
 Example:
 

@@ -6,19 +6,11 @@ Sidef::Types::Number::PolynomialMod - Polynomial type over finite rings with mod
 
 =head1 DESCRIPTION
 
-This class implements polynomial arithmetic in quotient rings of the form
-R[x]/(m(x)), where polynomials are reduced modulo a fixed modulus polynomial
-C<m(x)>. This mirrors how integers modulo n work (via C<Sidef::Types::Number::Mod>),
-but in the polynomial domain.
+This class implements polynomial arithmetic in quotient rings of the form R[x]/(m(x)), where polynomials are reduced modulo a fixed modulus polynomial C<m(x)>. This mirrors how integers modulo n work (via C<Sidef::Types::Number::Mod>), but in the polynomial domain.
 
-A C<PolynomialMod> object is a pair C<[poly, modulus]> where C<poly> is the
-residue polynomial (already reduced) and C<modulus> is the polynomial by which
-all results are reduced. All arithmetic operations automatically reduce their
-result modulo the shared modulus.
+A C<PolynomialMod> object is a pair C<[poly, modulus]> where C<poly> is the residue polynomial (already reduced) and C<modulus> is the polynomial by which all results are reduced. All arithmetic operations automatically reduce their result modulo the shared modulus.
 
-Internally, polynomials are stored as a hash mapping integer exponents to
-their coefficients (C<Sidef::Types::Number::Number> objects). Zero coefficients
-are not stored.
+Internally, polynomials are stored as a hash mapping integer exponents to their coefficients (C<Sidef::Types::Number::Number> objects). Zero coefficients are not stored.
 
 Typical use cases include:
 
@@ -67,8 +59,7 @@ Typical use cases include:
 
 =head1 COEFFICIENT ORDER IN ARRAY CONSTRUCTORS
 
-When constructing from an array, coefficients are given in B<descending>
-degree order (highest-degree coefficient first):
+When constructing from an array, coefficients are given in B<descending> degree order (highest-degree coefficient first):
 
     PolynomialMod([a_n, a_{n-1}, ..., a_1, a_0], modulus)
     # represents a_n*x^n + a_{n-1}*x^{n-1} + ... + a_1*x + a_0
@@ -89,10 +80,7 @@ The same descending convention applies when constructing the modulus array.
 
 Inherits methods from L<Sidef::Types::Number::Polynomial>.
 
-Many methods not overridden here (such as C<degree>, C<coeffs>, C<exponents>,
-C<content>, C<leading_coefficient>, C<height>, etc.) are provided by the
-parent class and operate on the I<lifted> polynomial without the modulus
-constraint.
+Many methods not overridden here (such as C<degree>, C<coeffs>, C<exponents>, C<content>, C<leading_coefficient>, C<height>, etc.) are provided by the parent class and operate on the I<lifted> polynomial without the modulus constraint.
 
 =head1 METHODS
 
@@ -103,12 +91,9 @@ constraint.
     PolynomialMod(poly,      modulus)
     self.new(...)
 
-Constructs a new C<PolynomialMod> object. The last argument is always the
-modulus; everything before it specifies the polynomial residue.
+Constructs a new C<PolynomialMod> object. The last argument is always the modulus; everything before it specifies the polynomial residue.
 
-The modulus may be given as an array reference or as an existing
-C<Sidef::Types::Number::Polynomial> object. The residue polynomial is reduced
-modulo the modulus upon construction.
+The modulus may be given as an array reference or as an existing C<Sidef::Types::Number::Polynomial> object. The residue polynomial is reduced modulo the modulus upon construction.
 
     # From coefficient arrays (descending degree order)
     var p = PolynomialMod([3, 2, 1], [1, 0, 1])   # (3x^2 + 2x + 1) mod (x^2 + 1)
@@ -120,10 +105,7 @@ modulo the modulus upon construction.
     # Instance-method form (creates new object with same class)
     var q = p.new([1, 2], [1, 0, 1])
 
-B<Special case — instance call with one argument:> when called as an instance
-method with a single argument (no coefficients before the modulus), it
-evaluates the polynomial at that argument rather than constructing a new
-object. See L</eval>.
+B<Special case — instance call with one argument:> when called as an instance method with a single argument (no coefficients before the modulus), it evaluates the polynomial at that argument rather than constructing a new object. See L</eval>.
 
 Aliases: I<call>
 
@@ -133,9 +115,7 @@ Aliases: I<call>
 
     self.lift
 
-Returns the underlying C<Sidef::Types::Number::Polynomial> object, i.e. the
-reduced residue polynomial stripped of its modulus. The returned value is a
-plain C<Polynomial> in the free ring R[x].
+Returns the underlying C<Sidef::Types::Number::Polynomial> object, i.e. the reduced residue polynomial stripped of its modulus. The returned value is a plain C<Polynomial> in the free ring R[x].
 
     var p = PolynomialMod([1, 2, 3], [1, 0, 1])
     say p.lift    # Polynomial: 2x + (1 - 3) = -2 + 2x (after reduction)
@@ -148,8 +128,7 @@ Aliases: I<to_poly>
 
     self.modulus
 
-Returns the modulus polynomial by which all arithmetic in this quotient ring
-is reduced. The return value is a C<Sidef::Types::Number::Polynomial>.
+Returns the modulus polynomial by which all arithmetic in this quotient ring is reduced. The return value is a C<Sidef::Types::Number::Polynomial>.
 
     var p = PolynomialMod([1, 2], [1, 0, 1])
     say p.modulus   # x^2 + 1
@@ -160,9 +139,7 @@ is reduced. The return value is a C<Sidef::Types::Number::Polynomial>.
 
     a + b
 
-Returns the sum of C<a> and C<b>, reduced modulo the shared modulus. Both
-operands must share the same modulus polynomial. If C<b> is a scalar
-(non-PolynomialMod), it is added to the constant term after reduction.
+Returns the sum of C<a> and C<b>, reduced modulo the shared modulus. Both operands must share the same modulus polynomial. If C<b> is a scalar (non-PolynomialMod), it is added to the constant term after reduction.
 
 Aliases: I<add>
 
@@ -172,8 +149,7 @@ Aliases: I<add>
 
     a++
 
-Increments C<a> by 1 (adds the constant polynomial 1) and reduces modulo the
-modulus. Equivalent to C<a + 1>.
+Increments C<a> by 1 (adds the constant polynomial 1) and reduces modulo the modulus. Equivalent to C<a + 1>.
 
 Aliases: I<inc>
 
@@ -183,8 +159,7 @@ Aliases: I<inc>
 
     a - b
 
-Returns the difference C<a - b>, reduced modulo the shared modulus. If C<b>
-is a scalar, it is subtracted from the constant term after reduction.
+Returns the difference C<a - b>, reduced modulo the shared modulus. If C<b> is a scalar, it is subtracted from the constant term after reduction.
 
 Aliases: I<sub>
 
@@ -194,8 +169,7 @@ Aliases: I<sub>
 
     a--
 
-Decrements C<a> by 1 (subtracts the constant polynomial 1) and reduces
-modulo the modulus.
+Decrements C<a> by 1 (subtracts the constant polynomial 1) and reduces modulo the modulus.
 
 Aliases: I<dec>
 
@@ -205,12 +179,9 @@ Aliases: I<dec>
 
     a * b
 
-Returns the product of C<a> and C<b>, reduced modulo the shared modulus.
-Coefficient multiplication is also reduced modulo the modulus at each step,
-keeping intermediate values small.
+Returns the product of C<a> and C<b>, reduced modulo the shared modulus. Coefficient multiplication is also reduced modulo the modulus at each step, keeping intermediate values small.
 
-If C<b> is a scalar, each coefficient of C<a> is multiplied by C<b> (after
-reducing C<b> mod the modulus) without a full polynomial multiplication.
+If C<b> is a scalar, each coefficient of C<a> is multiplied by C<b> (after reducing C<b> mod the modulus) without a full polynomial multiplication.
 
 Aliases: I<mul>
 
@@ -228,8 +199,7 @@ Returns the square of C<x> modulo the modulus. Equivalent to C<x * x>.
 
     a ** n
 
-Returns C<a> raised to the integer power C<n>, computed modulo the modulus
-polynomial using the binary (square-and-multiply) method. C<n> may be:
+Returns C<a> raised to the integer power C<n>, computed modulo the modulus polynomial using the binary (square-and-multiply) method. C<n> may be:
 
 =over 4
 
@@ -251,9 +221,7 @@ Aliases: I<pow>
 
     base.powmod(exp, poly_mod)
 
-Computes C<base^exp mod poly_mod> using binary (square-and-multiply),
-reducing modulo C<poly_mod> after every multiplication to keep the
-degree below C<deg(poly_mod)>.
+Computes C<base^exp mod poly_mod> using binary (square-and-multiply), reducing modulo C<poly_mod> after every multiplication to keep the degree below C<deg(poly_mod)>.
 
 Returns a C<PolynomialMod> object, representing the modular exponentiation result.
 
@@ -267,22 +235,15 @@ Divides C<a> by C<b> in the quotient ring.
 
 =over 4
 
-=item * If C<b> is a C<PolynomialMod> with the same modulus, polynomial
-Euclidean division is attempted. If the division is exact, the quotient is
-returned. If not exact, a C<Sidef::Types::Number::Fraction> object is
-returned.
+=item * If C<b> is a C<PolynomialMod> with the same modulus, polynomial Euclidean division is attempted. If the division is exact, the quotient is returned. If not exact, a C<Sidef::Types::Number::Fraction> object is returned.
 
 =item * If C<b> is zero, returns a polynomial with an infinite coefficient.
 
-=item * If C<b> is a scalar, each coefficient of C<a> is divided by C<b>
-(after reducing C<b> mod the modulus).
+=item * If C<b> is a scalar, each coefficient of C<a> is divided by C<b> (after reducing C<b> mod the modulus).
 
 =back
 
-Note that exact division in a polynomial quotient ring requires the leading
-coefficient of C<b> to be invertible modulo the coefficient ring (e.g., the
-modulus is prime for GF(p)[x] arithmetic). If the inverse does not exist
-(e.g. working over a non-field), the result is NaN.
+Note that exact division in a polynomial quotient ring requires the leading coefficient of C<b> to be invertible modulo the coefficient ring (e.g., the modulus is prime for GF(p)[x] arithmetic). If the inverse does not exist (e.g. working over a non-field), the result is NaN.
 
 Aliases: I<div>, I<÷>
 
@@ -292,12 +253,9 @@ Aliases: I<div>, I<÷>
 
     a // b
 
-Returns the integer quotient from Euclidean division of C<a> by C<b>,
-discarding the remainder. Equivalent to the quotient component of L</divmod>.
+Returns the integer quotient from Euclidean division of C<a> by C<b>, discarding the remainder. Equivalent to the quotient component of L</divmod>.
 
-Note: The rounding variants (C<idiv_ceil>, C<idiv_floor>, C<idiv_round>,
-C<idiv_trunc>) are all currently aliased to the same integer-quotient
-behaviour.
+Note: The rounding variants (C<idiv_ceil>, C<idiv_floor>, C<idiv_round>, C<idiv_trunc>) are all currently aliased to the same integer-quotient behaviour.
 
 Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
 
@@ -307,14 +265,9 @@ Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
 
     a % b
 
-When C<b> is a C<PolynomialMod> with the B<same> modulus as C<a>, returns the
-remainder from Euclidean polynomial division (i.e. the second component of
-L</divmod>).
+When C<b> is a C<PolynomialMod> with the B<same> modulus as C<a>, returns the remainder from Euclidean polynomial division (i.e. the second component of L</divmod>).
 
-When C<b> is a different polynomial (or has a different modulus), B<reinterprets>
-C<b> as the new modulus and returns a new C<PolynomialMod> object with the same
-residue polynomial but reduced under the new modulus. This is the primary way
-to change the modulus of an existing polynomial.
+When C<b> is a different polynomial (or has a different modulus), B<reinterprets> C<b> as the new modulus and returns a new C<PolynomialMod> object with the same residue polynomial but reduced under the new modulus. This is the primary way to change the modulus of an existing polynomial.
 
     var p = PolynomialMod([1, 2, 3], [1, 0, 1])
     var q = PolynomialMod([1, 1],   [1, 0, 1])
@@ -328,16 +281,11 @@ Aliases: I<mod>
 
     x.divmod(y)
 
-Performs Euclidean polynomial division of C<x> by C<y> within the quotient
-ring, using the standard long-division algorithm. The leading coefficient of
-C<y> must be invertible in the coefficient ring (its modular inverse is
-computed and used at each step).
+Performs Euclidean polynomial division of C<x> by C<y> within the quotient ring, using the standard long-division algorithm. The leading coefficient of C<y> must be invertible in the coefficient ring (its modular inverse is computed and used at each step).
 
-Returns a list of two C<PolynomialMod> objects C<(quotient, remainder)>
-satisfying C<x == quotient * y + remainder> with C<deg(remainder) < deg(y)>.
+Returns a list of two C<PolynomialMod> objects C<(quotient, remainder)> satisfying C<x == quotient * y + remainder> with C<deg(remainder) < deg(y)>.
 
-If C<x> and C<y> have different moduli, both quotient and remainder are NaN.
-If the leading coefficient of C<y> has no modular inverse, returns NaN.
+If C<x> and C<y> have different moduli, both quotient and remainder are NaN. If the leading coefficient of C<y> has no modular inverse, returns NaN.
 
 =cut
 
@@ -345,8 +293,7 @@ If the leading coefficient of C<y> has no modular inverse, returns NaN.
 
     x.neg
 
-Returns the additive inverse of C<x>: the polynomial whose coefficients are
-all negated. Adding C<x> and C<x.neg> yields the zero polynomial.
+Returns the additive inverse of C<x>: the polynomial whose coefficients are all negated. Adding C<x> and C<x.neg> yields the zero polynomial.
 
 =cut
 
@@ -354,8 +301,7 @@ all negated. Adding C<x> and C<x.neg> yields the zero polynomial.
 
     x.abs
 
-Returns C<x> multiplied by the sign of its leading coefficient, ensuring the
-leading coefficient is positive. Equivalent to C<x * x.sgn>.
+Returns C<x> multiplied by the sign of its leading coefficient, ensuring the leading coefficient is positive. Equivalent to C<x * x.sgn>.
 
 =cut
 
@@ -365,18 +311,13 @@ leading coefficient is positive. Equivalent to C<x * x.sgn>.
 
 Compute the multiplicative inverse of a PolynomialMod element.
 
-In the quotient ring C<R[x]/(m(x))>, the inverse of C<f(x)> exists if and only
-if C<gcd(f, m) = 1>. When it exists, the extended Euclidean algorithm gives
-polynomials C<u> and C<v> such that:
+In the quotient ring C<R[x]/(m(x))>, the inverse of C<f(x)> exists if and only if C<gcd(f, m) = 1>. When it exists, the extended Euclidean algorithm gives polynomials C<u> and C<v> such that:
 
   u(x)*f(x) + v(x)*m(x) = 1
 
 which means C<u(x)*f(x) ≡ 1 (mod m(x))>, so C<u> is the inverse.
 
-We use C<Polynomial::gcdext> on the I<lifted> polynomials (plain polynomial
-ring arithmetic), which normalizes the GCD to monic. If the result is
-the constant polynomial C<1>, the Bézout coefficient C<u> is the inverse.
-The C<PolynomialMod> constructor automatically reduces C<u> modulo C<m>.
+We use C<Polynomial::gcdext> on the I<lifted> polynomials (plain polynomial ring arithmetic), which normalizes the GCD to monic. If the result is the constant polynomial C<1>, the Bézout coefficient C<u> is the inverse. The C<PolynomialMod> constructor automatically reduces C<u> modulo C<m>.
 
 =head3 Reference
 
@@ -395,16 +336,13 @@ L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#B%C3%A9zout's
 
     x.gcd(y)
 
-Returns the greatest common divisor of polynomials C<x> and C<y> in the
-quotient ring, using the polynomial Euclidean algorithm (repeated
-remainder computation):
+Returns the greatest common divisor of polynomials C<x> and C<y> in the quotient ring, using the polynomial Euclidean algorithm (repeated remainder computation):
 
     r0 = x, r1 = y
     loop: (r0, r1) = (r1, r0 mod r1) until r1 is zero
     return r0
 
-Both C<x> and C<y> must share the same modulus. The result is the GCD as a
-C<PolynomialMod> in the same ring.
+Both C<x> and C<y> must share the same modulus. The result is the GCD as a C<PolynomialMod> in the same ring.
 
 Reference: L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclid's_algorithm>
 
@@ -414,8 +352,7 @@ Reference: L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Eu
 
     x.gcdext(y)
 
-Extended Euclidean algorithm for polynomials in the quotient ring. Returns a
-list of B<five> values:
+Extended Euclidean algorithm for polynomials in the quotient ring. Returns a list of B<five> values:
 
     (g, u, v, a1, b1)
 
@@ -423,8 +360,7 @@ where C<g = gcd(x, y)> and C<u>, C<v> are Bézout coefficients satisfying:
 
     u*x + v*y == g
 
-The additional values C<a1> and C<b1> (the final remainders scaled by a sign
-factor) are also returned; they relate to the last non-trivial step of the
+The additional values C<a1> and C<b1> (the final remainders scaled by a sign factor) are also returned; they relate to the last non-trivial step of the
 
 extended Euclidean recursion.
 
@@ -451,11 +387,7 @@ Returns the least common multiple of polynomials C<x> and C<y>, computed as:
 
     x.normalize_to_monic
 
-Returns a monic version of C<x> (leading coefficient equal to 1) by
-multiplying each coefficient by the modular inverse of the leading coefficient.
-If the leading coefficient is already 1, C<x> is returned unchanged. If the
-inverse does not exist (e.g. the coefficient ring is not a field), returns
-C<x> unchanged.
+Returns a monic version of C<x> (leading coefficient equal to 1) by multiplying each coefficient by the modular inverse of the leading coefficient. If the leading coefficient is already 1, C<x> is returned unchanged. If the inverse does not exist (e.g. the coefficient ring is not a field), returns C<x> unchanged.
 
 =cut
 
@@ -463,9 +395,7 @@ C<x> unchanged.
 
     x.derivative
 
-Returns the formal derivative of C<x> with respect to the polynomial variable,
-reduced modulo the modulus. Each term C<c_k * t^k> maps to C<k * c_k * t^{k-1}>,
-with the coefficient also reduced modulo the modulus polynomial.
+Returns the formal derivative of C<x> with respect to the polynomial variable, reduced modulo the modulus. Each term C<c_k * t^k> maps to C<k * c_k * t^{k-1}>, with the coefficient also reduced modulo the modulus polynomial.
 
     var p = PolynomialMod([1, 3, 1], [1, 0, 1])   # x^2 + 3x + 1 mod (x^2+1)
     say p.derivative   # 3 + 2x, reduced mod (x^2 + 1)
@@ -476,10 +406,7 @@ with the coefficient also reduced modulo the modulus polynomial.
 
     x.eval(value)
 
-Evaluates the polynomial at C<value> by Horner-style substitution, using
-modular arithmetic throughout. The value is first reduced modulo the modulus
-polynomial, and powers of the value are computed as C<Sidef::Types::Number::Mod>
-elements to keep results in the quotient ring.
+Evaluates the polynomial at C<value> by Horner-style substitution, using modular arithmetic throughout. The value is first reduced modulo the modulus polynomial, and powers of the value are computed as C<Sidef::Types::Number::Mod> elements to keep results in the quotient ring.
 
 Returns a scalar (C<Sidef::Types::Number::Number>).
 
@@ -494,13 +421,11 @@ If the polynomial is the zero polynomial, returns 0 directly.
 
     n.binomial(k)
 
-Computes the generalised binomial coefficient C(n, k) where C<n> is a
-C<PolynomialMod> and C<k> is an integer. Uses the falling-factorial definition:
+Computes the generalised binomial coefficient C(n, k) where C<n> is a C<PolynomialMod> and C<k> is an integer. Uses the falling-factorial definition:
 
     C(n, k) = n * (n-1) * ... * (n-k+1) / k!
 
-The product is computed via binary splitting for efficiency, and the division
-by C<k!> is performed via L</div>.
+The product is computed via binary splitting for efficiency, and the division by C<k!> is performed via L</div>.
 
     var x = PolynomialMod([1, 0], [1, 0, 1])   # x mod (x^2+1)
     say x.binomial(2)   # x*(x-1)/2 mod (x^2+1)
@@ -511,10 +436,7 @@ by C<k!> is performed via L</div>.
 
     *polynomials.chinese
 
-Applies the Chinese Remainder Theorem (CRT) to a list of C<PolynomialMod>
-objects that may have different moduli. Finds a single polynomial congruent to
-each input modulo its respective modulus. The combined modulus is the LCM of
-all individual moduli.
+Applies the Chinese Remainder Theorem (CRT) to a list of C<PolynomialMod> objects that may have different moduli. Finds a single polynomial congruent to each input modulo its respective modulus. The combined modulus is the LCM of all individual moduli.
 
     var a = PolynomialMod([1, 2], [1, 0, 1])   # 2x+1 mod (x^2+1)
     var b = PolynomialMod([3, 1], [1, 1, 1])   # x+3 mod (x^2+x+1)
@@ -526,11 +448,7 @@ all individual moduli.
 
     a == b
 
-Returns true if C<a> and C<b> are equal as elements of the same quotient ring.
-Two C<PolynomialMod> objects are equal if and only if their moduli are equal
-and their residue polynomials are equal (coefficient by coefficient). When
-comparing against a non-C<PolynomialMod> value, the value is reduced modulo
-C<a>'s modulus before comparison.
+Returns true if C<a> and C<b> are equal as elements of the same quotient ring. Two C<PolynomialMod> objects are equal if and only if their moduli are equal and their residue polynomials are equal (coefficient by coefficient). When comparing against a non-C<PolynomialMod> value, the value is reduced modulo C<a>'s modulus before comparison.
 
 Aliases: I<eq>
 
@@ -540,8 +458,7 @@ Aliases: I<eq>
 
     a != b
 
-Returns true if C<a> is not equal to C<b>. Implemented as the logical negation
-of L</==>. See L</==> for the equality semantics.
+Returns true if C<a> is not equal to C<b>. Implemented as the logical negation of L</==>. See L</==> for the equality semantics.
 
 Aliases: I<ne>
 
@@ -551,10 +468,7 @@ Aliases: I<ne>
 
     a <=> b
 
-Three-way comparison. When both arguments are C<PolynomialMod> objects, the
-moduli are compared first; if they differ, that result is returned. Otherwise
-the residue polynomials are compared lexicographically (highest-degree
-coefficient first, then lower degrees). Returns -1, 0, or 1.
+Three-way comparison. When both arguments are C<PolynomialMod> objects, the moduli are compared first; if they differ, that result is returned. Otherwise the residue polynomials are compared lexicographically (highest-degree coefficient first, then lower degrees). Returns -1, 0, or 1.
 
 Aliases: I<cmp>
 
@@ -564,8 +478,7 @@ Aliases: I<cmp>
 
     a < b
 
-Returns true if C<a> is strictly less than C<b> under the lexicographic
-ordering defined by L</<=>>.
+Returns true if C<a> is strictly less than C<b> under the lexicographic ordering defined by L</<=>>.
 
 Aliases: I<lt>
 
@@ -605,8 +518,7 @@ Aliases: I<E<gt>=>, I<ge>
 
     x.is_zero
 
-Returns true if C<x> is the zero polynomial (the additive identity). Uses
-L</==> against 0.
+Returns true if C<x> is the zero polynomial (the additive identity). Uses L</==> against 0.
 
 =cut
 
@@ -614,8 +526,7 @@ L</==> against 0.
 
     x.is_one
 
-Returns true if C<x> is the polynomial 1 (the multiplicative identity). Uses
-L</==> against 1.
+Returns true if C<x> is the polynomial 1 (the multiplicative identity). Uses L</==> against 1.
 
 =cut
 
@@ -633,12 +544,9 @@ Returns true if C<x> equals the constant polynomial -1. Uses L</==> against -1.
 
 Performs complete Cantor-Zassenhaus factorization of a polynomial over C<GF(p)[x]>.
 
-The result includes multiplicities and is returned as an array of
-C<[factor, exponent]> pairs.
+The result includes multiplicities and is returned as an array of C<[factor, exponent]> pairs.
 
-Each irreducible factor is returned as a monic C<PolynomialMod> object with
-scalar modulus C<p>. The first entry in the result is the leading coefficient of
-the original polynomial, represented as a C<[lc, 1]> pair.
+Each irreducible factor is returned as a monic C<PolynomialMod> object with scalar modulus C<p>. The first entry in the result is the leading coefficient of the original polynomial, represented as a C<[lc, 1]> pair.
 
 =head3 Algorithm
 
@@ -646,8 +554,7 @@ the original polynomial, represented as a C<[lc, 1]> pair.
 
 =item 1. Preprocessing
 
-The polynomial is normalized to monic form, then made squarefree by dividing
-by C<gcd(f, f'>). This removes one copy of each repeated factor.
+The polynomial is normalized to monic form, then made squarefree by dividing by C<gcd(f, f'>). This removes one copy of each repeated factor.
 
 =item 2. DDF
 
@@ -659,8 +566,7 @@ Each DDF group is split into irreducible factors using Cantor-Zassenhaus.
 
 =item 4. Multiplicity recovery
 
-Each irreducible factor is repeatedly divided into the original polynomial to
-determine its multiplicity.
+Each irreducible factor is repeatedly divided into the original polynomial to determine its multiplicity.
 
 =back
 
@@ -670,8 +576,7 @@ determine its multiplicity.
 
     poly.factor
 
-Returns the factorization as a flat array of factors, with each irreducible
-factor repeated according to its multiplicity.
+Returns the factorization as a flat array of factors, with each irreducible factor repeated according to its multiplicity.
 
 =cut
 
@@ -679,8 +584,7 @@ factor repeated according to its multiplicity.
 
     x.float
 
-Returns a new C<PolynomialMod> with each coefficient converted to a
-floating-point approximation, preserving the modulus.
+Returns a new C<PolynomialMod> with each coefficient converted to a floating-point approximation, preserving the modulus.
 
 =cut
 
@@ -688,8 +592,7 @@ floating-point approximation, preserving the modulus.
 
     x.rat
 
-Returns a new C<PolynomialMod> with each coefficient converted to an exact
-rational number (C<Math::GMPq>), preserving the modulus.
+Returns a new C<PolynomialMod> with each coefficient converted to an exact rational number (C<Math::GMPq>), preserving the modulus.
 
 =cut
 
@@ -697,8 +600,7 @@ rational number (C<Math::GMPq>), preserving the modulus.
 
     x.rat_approx
 
-Returns a new C<PolynomialMod> with each floating-point coefficient replaced
-by a nearby rational approximation, preserving the modulus.
+Returns a new C<PolynomialMod> with each floating-point coefficient replaced by a nearby rational approximation, preserving the modulus.
 
 =cut
 
@@ -706,8 +608,7 @@ by a nearby rational approximation, preserving the modulus.
 
     x.floor
 
-Returns a new C<PolynomialMod> with C<floor()> applied to each coefficient,
-preserving the modulus.
+Returns a new C<PolynomialMod> with C<floor()> applied to each coefficient, preserving the modulus.
 
 =cut
 
@@ -715,8 +616,7 @@ preserving the modulus.
 
     x.ceil
 
-Returns a new C<PolynomialMod> with C<ceil()> applied to each coefficient,
-preserving the modulus.
+Returns a new C<PolynomialMod> with C<ceil()> applied to each coefficient, preserving the modulus.
 
 =cut
 
@@ -724,9 +624,7 @@ preserving the modulus.
 
     x.round(r)
 
-Returns a new C<PolynomialMod> with each coefficient rounded to C<r> decimal
-places (or to the nearest integer when C<r> is zero/unspecified), preserving
-the modulus.
+Returns a new C<PolynomialMod> with each coefficient rounded to C<r> decimal places (or to the nearest integer when C<r> is zero/unspecified), preserving the modulus.
 
 =cut
 
@@ -734,8 +632,7 @@ the modulus.
 
     x.to_s
 
-Returns a C<Sidef::Types::String::String> representation of the polynomial in
-the form:
+Returns a C<Sidef::Types::String::String> representation of the polynomial in the form:
 
     <polynomial expression> (mod <modulus expression>)
 
@@ -749,8 +646,7 @@ Aliases: I<stringify>
 
     x.pretty
 
-Like L</to_s> but uses the C<pretty> display method from the parent class,
-which renders Unicode superscripts and cleaner coefficient notation.
+Like L</to_s> but uses the C<pretty> display method from the parent class, which renders Unicode superscripts and cleaner coefficient notation.
 
 =cut
 
@@ -758,8 +654,7 @@ which renders Unicode superscripts and cleaner coefficient notation.
 
     x.dump
 
-Returns a C<Sidef::Types::String::String> containing a round-trippable
-representation of the C<PolynomialMod> object:
+Returns a C<Sidef::Types::String::String> containing a round-trippable representation of the C<PolynomialMod> object:
 
     PolynomialMod(<exponent> => <coeff>, ..., <modulus>)
 
@@ -769,8 +664,7 @@ This mirrors the internal sparse storage format and is suitable for debugging.
 
 =head1 BOOLEAN CONTEXT
 
-In boolean context (C<if>, C<while>, etc.), a C<PolynomialMod> is truthy if
-its constant term (coefficient of x^0) is truthy, and falsy if zero or absent.
+In boolean context (C<if>, C<while>, etc.), a C<PolynomialMod> is truthy if its constant term (coefficient of x^0) is truthy, and falsy if zero or absent.
 
 =head1 EXAMPLES
 
@@ -832,24 +726,16 @@ its constant term (coefficient of x^0) is truthy, and falsy if zero or absent.
 
 =item *
 
-B<Operand compatibility:> Most binary operations (C<+>, C<->, C<*>, C<gcd>,
-C<divmod>, etc.) require both operands to share the same modulus polynomial.
-Mixing operands with different moduli will either give wrong results or return
-NaN.
+B<Operand compatibility:> Most binary operations (C<+>, C<->, C<*>, C<gcd>, C<divmod>, etc.) require both operands to share the same modulus polynomial. Mixing operands with different moduli will either give wrong results or return NaN.
 
 =item *
 
-B<Coefficient ring:> Coefficients are general C<Sidef::Types::Number::Number>
-objects (arbitrary precision). For finite-field semantics (e.g. GF(p)[x]),
-you should use a modulus polynomial whose coefficients are already in GF(p) and
-ensure your input coefficients are also reduced mod p.
+B<Coefficient ring:> Coefficients are general C<Sidef::Types::Number::Number> objects (arbitrary precision). For finite-field semantics (e.g. GF(p)[x]), you should use a modulus polynomial whose coefficients are already in GF(p) and ensure your input coefficients are also reduced mod p.
 
 =back
 
 =head1 SEE ALSO
 
-L<Sidef::Types::Number::Polynomial>,
-L<Sidef::Types::Number::Mod>,
-L<Sidef::Types::Number::Fraction>
+L<Sidef::Types::Number::Polynomial>, L<Sidef::Types::Number::Mod>, L<Sidef::Types::Number::Fraction>
 
 =cut

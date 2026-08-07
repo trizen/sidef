@@ -2582,8 +2582,7 @@ When called as C<Num.gamma>, it returns the Euler-Mascheroni constant:
 
     say Num.gamma   #=> 0.5772156...
 
-When given a real numeric value, it computes the gamma function as a floating-point value.
-For positive integers, it satisfies the identity C<gamma(n) = (n-1)!>.
+When given a real numeric value, it computes the gamma function as a floating-point value. For positive integers, it satisfies the identity C<gamma(n) = (n-1)!>.
 
     say gamma(6)      #=> 120
     say gamma(1/2)    #=> 1.7724538...
@@ -3288,12 +3287,9 @@ For a prime C<p>, the Hilbert symbol determines whether the quadratic equation
 
     z² = ax² + by²
 
-has a nontrivial solution over the field of C<p>-adic numbers C<Q_p>. It is
-a fundamental invariant in algebraic number theory, quadratic forms, and
-local class field theory.
+has a nontrivial solution over the field of C<p>-adic numbers C<Q_p>. It is a fundamental invariant in algebraic number theory, quadratic forms, and local class field theory.
 
-The arguments C<a> and C<b> must be nonzero, and C<p> must be a positive prime.
-If either C<a> or C<b> is zero, or if C<<< p <= 0 >>>, the function returns C<0>.
+The arguments C<a> and C<b> must be nonzero, and C<p> must be a positive prime. If either C<a> or C<b> is zero, or if C<<< p <= 0 >>>, the function returns C<0>.
 
     say hilbert(2, 3, 5)     # => 1
     say hilbert(2, 3, 2)     # => -1
@@ -4009,9 +4005,7 @@ The inverse value for C<k> is given by C<Array#perm2num>:
 
 Returns the number of integer partitions of C<n>.
 
-With a single argument, this function returns the partition number
-C<p(n)>, that is, the number of ways to write C<n> as a sum of positive
-integers, where the order of the summands is ignored.
+With a single argument, this function returns the partition number C<p(n)>, that is, the number of ways to write C<n> as a sum of positive integers, where the order of the summands is ignored.
 
 Examples:
 
@@ -4022,8 +4016,7 @@ Examples:
 
 =head3 Partitions into exactly C<k> parts
 
-When the second argument is an integer C<k>, the function returns the
-number of partitions of C<n> into exactly C<k> positive parts.
+When the second argument is an integer C<k>, the function returns the number of partitions of C<n> into exactly C<k> positive parts.
 
     say 7.partition_count(1)   # => 1
     say 7.partition_count(2)   # => 3
@@ -4033,9 +4026,7 @@ number of partitions of C<n> into exactly C<k> positive parts.
 
 =head3 Restricted partitions
 
-When the second argument is an array, it is interpreted as the set of
-allowed part sizes. The function then counts only those partitions whose
-parts belong to the specified set.
+When the second argument is an array, it is interpreted as the set of allowed part sizes. The function then counts only those partitions whose parts belong to the specified set.
 
     # Parts from {2, 3, 5}
     say 10.partition_count([2, 3, 5])  # => 4
@@ -4523,9 +4514,7 @@ Returns the n-th Fibbinary number. (L<OEIS A003714|https://oeis.org/A003714>)
 
 Returns the Zeckendorf representation of C<n> as an array of Fibonacci numbers.
 
-By Zeckendorf's theorem, every positive integer can be written uniquely as
-a sum of distinct, non-consecutive Fibonacci numbers. This function returns
-the Fibonacci terms in decreasing order.
+By Zeckendorf's theorem, every positive integer can be written uniquely as a sum of distinct, non-consecutive Fibonacci numbers. This function returns the Fibonacci terms in decreasing order.
 
     say 10.zeckendorf     # => [8, 2]
     say 42.zeckendorf     # => [34, 8]
@@ -4565,8 +4554,7 @@ Returns the n-th Fibonacci number. (L<OEIS A000045|https://oeis.org/A000045>)
 
     say 10.of { .fibonacci }      #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 
-When an additional argument C<k> is provided, it returns the n-th k-th order Fibonacci number.
-For C<k E<gt> 2>, the sequence starts with zeros up to index C<k-2>.
+When an additional argument C<k> is provided, it returns the n-th k-th order Fibonacci number. For C<k E<gt> 2>, the sequence starts with zeros up to index C<k-2>.
 
     say 20.of { .fibonacci(3) }   #=> Tribonacci numbers
     say 20.of { .fibonacci(4) }   #=> Tetranacci numbers
@@ -4583,9 +4571,7 @@ Aliases: I<fib>
 
 Returns the index of the Fibonacci number C<n>.
 
-If C<n = F(k)>, where C<F(k)> denotes the C<k>-th Fibonacci number, the
-function returns C<k>. If C<n> is not a Fibonacci number, the function
-returns C<-1>.
+If C<n = F(k)>, where C<F(k)> denotes the C<k>-th Fibonacci number, the function returns C<k>. If C<n> is not a Fibonacci number, the function returns C<-1>.
 
 The Fibonacci indexing used is
 
@@ -5112,19 +5098,11 @@ Finds all fundamental integer solutions C<(x, y)> of the generalized Pell equati
 
 where C<D> is a positive non-square integer and C<N> is an arbitrary integer (default: C<1>).
 
-For the classical Pell equations (C<N = ±1>), the method computes the
-fundamental solution using the continued fraction expansion of
-C<sqrt(D)>. When available and advantageous, PARI/GP is used for large
-inputs to accelerate the computation. (with C<Num!USE_PARI_GP = true>)
+For the classical Pell equations (C<N = ±1>), the method computes the fundamental solution using the continued fraction expansion of C<sqrt(D)>. When available and advantageous, PARI/GP is used for large inputs to accelerate the computation. (with C<Num!USE_PARI_GP = true>)
 
-For arbitrary values of C<N>, the method implements the
-LMM (Lagrange–Matthews–Mollin) continued-fraction algorithm to enumerate all
-primitive solution classes. Each solution is then reduced to its
-fundamental representative under multiplication by the fundamental unit of
-C<Q(sqrt(D))>.
+For arbitrary values of C<N>, the method implements the LMM (Lagrange–Matthews–Mollin) continued-fraction algorithm to enumerate all primitive solution classes. Each solution is then reduced to its fundamental representative under multiplication by the fundamental unit of C<Q(sqrt(D))>.
 
-Returns an array of C<[x, y]> pairs sorted by increasing C<x>. If the equation
-has no integer solutions, an empty array is returned.
+Returns an array of C<[x, y]> pairs sorted by increasing C<x>. If the equation has no integer solutions, an empty array is returned.
 
     say solve_pell(61)      #=> [[1766319049, 226153980]]
     say solve_pell(61, -1)  #=> [[29718, 3805]]
@@ -5220,28 +5198,21 @@ Returns all solutions to the quadratic congruence:
 
     a*x^2 + b*x + c ≡ 0 (mod m)
 
-The result is returned as an array containing all distinct solutions modulo
-C<m>, sorted in ascending order. If the congruence has no solutions, an empty
-array is returned.
+The result is returned as an array containing all distinct solutions modulo C<m>, sorted in ascending order. If the congruence has no solutions, an empty array is returned.
 
-If the leading coefficient C<a> is zero, the congruence degenerates into the
-linear congruence:
+If the leading coefficient C<a> is zero, the congruence degenerates into the linear congruence:
 
     b*x + c ≡ 0 (mod m)
 
 which is solved automatically using C<solve_lcg_all>.
 
-When C<m> is odd and the leading coefficient C<a> is invertible modulo C<m>,
-the function uses the modular analogue of the quadratic formula. After
-normalizing the equation by C<a>, it completes the square to obtain:
+When C<m> is odd and the leading coefficient C<a> is invertible modulo C<m>, the function uses the modular analogue of the quadratic formula. After normalizing the equation by C<a>, it completes the square to obtain:
 
     (x + b/(2a))^2 ≡ (b/2a)^2 - c/a (mod m)
 
 and computes all modular square roots using C<sqrtmod_all>.
 
-For the general case (including even moduli or noninvertible leading
-coefficients), the congruence is transformed into the equivalent square-root
-problem:
+For the general case (including even moduli or noninvertible leading coefficients), the congruence is transformed into the equivalent square-root problem:
 
     k^2 ≡ b^2 - 4ac (mod 4am)
 
@@ -5270,14 +5241,9 @@ Returns all solutions to the cubic polynomial congruence:
 
     A*x^3 + B*x^2 + C*x + D ≡ 0 (mod m)
 
-The result is returned as an array containing all distinct solutions modulo
-C<m>, sorted in ascending order. If no solutions exist, or if the equation
-cannot be transformed into a monic cubic modulo C<m>, an empty array is
-returned.
+The result is returned as an array containing all distinct solutions modulo C<m>, sorted in ascending order. If no solutions exist, or if the equation cannot be transformed into a monic cubic modulo C<m>, an empty array is returned.
 
-The function requires that the modular inverses of C<2>, C<3>, C<27>, and the
-leading coefficient C<A> exist modulo C<m>. If any of these inverses do not
-exist, the function returns an empty array.
+The function requires that the modular inverses of C<2>, C<3>, C<27>, and the leading coefficient C<A> exist modulo C<m>. If any of these inverses do not exist, the function returns an empty array.
 
     # x^3 - 1 ≡ 0 (mod 13)
     say solve_cubic_mod(1, 0, 0, -1, 13)     # [1, 3, 9]
@@ -5314,12 +5280,9 @@ Returns all integer solutions C<[x, y]> of the binary quadratic equation:
 
     Ax² + Bxy + Cy² = n.
 
-The result is returned as an array of pairs C<[x, y]>, sorted
-lexicographically. If no integer solutions exist, an empty array is
-returned.
+The result is returned as an array of pairs C<[x, y]>, sorted lexicographically. If no integer solutions exist, an empty array is returned.
 
-The current implementation applies to positive definite binary quadratic
-forms, namely those satisfying:
+The current implementation applies to positive definite binary quadratic forms, namely those satisfying:
 
     A > 0
     4AC - B² > 0.
@@ -5334,9 +5297,7 @@ where
     X = 2Ax + By,
     Y = y.
 
-The transformed equation is solved using C<solve_quadratic_form>, after
-which all valid sign combinations are examined to recover the corresponding
-integer solutions C<[x, y]>.
+The transformed equation is solved using C<solve_quadratic_form>, after which all valid sign combinations are examined to recover the corresponding integer solutions C<[x, y]>.
 
 Examples:
 
@@ -5417,8 +5378,7 @@ Returns all integer solutions C<(x, y)> satisfying:
 
     x^3 + y^3 = n
 
-The result is returned as an array of pairs, where each pair is itself an
-array C<[x, y]>.
+The result is returned as an array of pairs, where each pair is itself an array C<[x, y]>.
 
 Returns an empty array when no integer solutions exist or when C<n = 0>.
 
@@ -5426,10 +5386,7 @@ This implementation uses the factorization identity:
 
     x^3 + y^3 = (x + y)(x^2 - xy + y^2)
 
-to reduce the problem to testing the divisors of C<|n|>. For each divisor
-C<A = x + y>, the algorithm derives the corresponding quadratic equation,
-checks whether its discriminant is a perfect square, and reconstructs the
-integer solution when possible.
+to reduce the problem to testing the divisors of C<|n|>. For each divisor C<A = x + y>, the algorithm derives the corresponding quadratic equation, checks whether its discriminant is a perfect square, and reconstructs the integer solution when possible.
 
 The algorithm naturally supports both positive and negative values of C<n>.
 
@@ -5454,9 +5411,7 @@ Each returned triple is an array C<[a, b, c]>, satisfying:
     gcd(a, b, c) = 1
     a < b < c
 
-A primitive Pythagorean triple is one whose three components are
-coprime. Every primitive Pythagorean triple appears exactly once in the
-returned array.
+A primitive Pythagorean triple is one whose three components are coprime. Every primitive Pythagorean triple appears exactly once in the returned array.
 
     say primitive_pythagorean_triples(50)
     #=> [[3, 4, 5], [5, 12, 13], [8, 15, 17]]
@@ -5686,8 +5641,7 @@ Returns true if C<2^p - 1> is a Mersenne prime.
     say 31.is_mersenne_prime    #=> true (2^31 - 1 is prime)
     say 11.is_mersenne_prime    #=> false
 
-Uses the Lucas-Lehmer test for efficiency.
-=cut
+Uses the Lucas-Lehmer test for efficiency. =cut
 
 =head2 is_nm1_prime
 
@@ -7248,8 +7202,7 @@ An optional block can specify custom factorization methods:
     say factor(10**120 - 10**40, {|k| k.ecm_factor })
     say factor(10**120 - 10**40, {|k| k.fermat_factor })
 
-The block is expected to return an array with zero or more factors of C<k>. These factors do not need to be prime.
-The block is applied recursively to each new composite factor until no further splitting is possible.
+The block is expected to return an array with zero or more factors of C<k>. These factors do not need to be prime. The block is applied recursively to each new composite factor until no further splitting is possible.
 
 Aliases: I<factors>
 
@@ -8051,8 +8004,7 @@ Count of the unitary cubefull (3-powerful) divisors of C<n>.
 
 Returns an array with the positive divisors of C<n> that are less than or equal to C<k>.
 
-When C<k> is omitted, all positive divisors of C<n> are returned in ascending order.
-Non-positive inputs produce an empty array.
+When C<k> is omitted, all positive divisors of C<n> are returned in ascending order. Non-positive inputs produce an empty array.
 
     say 120.divisors        #=> [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 30, 40, 60, 120]
     say 120.divisors(13)    #=> [1, 2, 3, 4, 5, 6, 8, 10, 12]
@@ -8226,8 +8178,7 @@ Returns an array with the non-bi-unitary divisors of C<n>.
 
     say 720.nbdivisors   #=> [3, 4, 6, 12, 15, 20, 24, 30, 36, 48, 60, 120, 180, 240]
 
-Equivalent to the set difference between the divisors and the
-bi-unitary-divisors:
+Equivalent to the set difference between the divisors and the bi-unitary-divisors:
 
     divisors(n) - bdivisors(n) == nbdivisors(n)
 
@@ -8286,8 +8237,7 @@ Returns an array with the nonexponential divisors of C<n>.
 
     say 120.nedivisors   #=> [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 20, 24, 40, 60]
 
-Equivalent to the set difference between the divisors and the exponential
-divisors:
+Equivalent to the set difference between the divisors and the exponential divisors:
 
     divisors(n) - edivisors(n) == nedivisors(n)
 
@@ -9547,9 +9497,7 @@ Returns true if C<n> is a perfect number (i.e.: sigma(n) == 2*n).
 
 Returns C<true> if C<n> is a pseudoperfect (semiperfect) number, and C<false> otherwise.
 
-A positive integer is pseudoperfect if it can be written as the sum of some
-(or all) of its proper divisors. Every perfect number is pseudoperfect,
-since the sum of all proper divisors equals the number itself.
+A positive integer is pseudoperfect if it can be written as the sum of some (or all) of its proper divisors. Every perfect number is pseudoperfect, since the sum of all proper divisors equals the number itself.
 
     say 30.by { .is_pseudoperfect }     # OEIS: A005835
 
@@ -9565,8 +9513,7 @@ Returns true if C<n> is a I<weird number>, and false otherwise.
 
 A weird number is a positive integer that is abundant, but not pseudoperfect.
 
-Equivalently, a weird number is an abundant number that cannot be expressed as
-the sum of a subset of its proper divisors.
+Equivalently, a weird number is an abundant number that cannot be expressed as the sum of a subset of its proper divisors.
 
     say 10.by { .is_weird }         #=> OEIS: A006037
 
@@ -9578,8 +9525,7 @@ the sum of a subset of its proper divisors.
 
 Returns true if C<n> is a I<Zumkeller number>, and false otherwise.
 
-A Zumkeller number is a positive integer whose positive divisors can be
-partitioned into two disjoint subsets having equal sums.
+A Zumkeller number is a positive integer whose positive divisors can be partitioned into two disjoint subsets having equal sums.
 
     say 30.by { .is_zumkeller }     #=> OEIS: A083207
 
@@ -9866,8 +9812,7 @@ Returns the golden ratio constant C<PHI>, or Euler's totient function of C<n>.
     say Num.phi      #=> 1.618033988749...
     say phi(12)      #=> 4
 
-When called with an integer argument, C<phi(n)> is the count of positive integers in the range C<1..n> that are coprime to C<n>.
-When C<k E<gt> 1>, it returns Jordan's totient function C<J_k(n)>.
+When called with an integer argument, C<phi(n)> is the count of positive integers in the range C<1..n> that are coprime to C<n>. When C<k E<gt> 1>, it returns Jordan's totient function C<J_k(n)>.
 
     say phi(12, 2)   #=> 96
 
@@ -10109,8 +10054,7 @@ Partial sums of the C<sopfr(k)> function: sum of primes dividing C<k> (with repe
 
 Euler's totient function.
 
-C<totient(n)> counts the positive integers in the range C<1..n> that are coprime to C<n>.
-For C<k E<gt> 1>, it returns the generalized Jordan totient C<J_k(n)>.
+C<totient(n)> counts the positive integers in the range C<1..n> that are coprime to C<n>. For C<k E<gt> 1>, it returns the generalized Jordan totient C<J_k(n)>.
 
     say totient(12)      #=> 4
     say totient(36)      #=> 12
@@ -10433,18 +10377,13 @@ Returns all integer solutions C<(x, y)> satisfying:
 
     x^3 - y^3 = n
 
-The result is returned as an array of pairs, where each pair is itself an
-array C<[x, y]>. Returns an empty array when no integer solutions exist or
-when C<n = 0>.
+The result is returned as an array of pairs, where each pair is itself an array C<[x, y]>. Returns an empty array when no integer solutions exist or when C<n = 0>.
 
 The implementation is based on the factorization:
 
     x^3 - y^3 = (x - y)(x^2 + xy + y^2)
 
-and enumerates the divisors of C<|n|>. For each divisor
-C<A = x - y>, the corresponding quadratic equation is constructed, its
-discriminant is tested for being a perfect square, and any resulting integer
-solutions are recovered.
+and enumerates the divisors of C<|n|>. For each divisor C<A = x - y>, the corresponding quadratic equation is constructed, its discriminant is tested for being a perfect square, and any resulting integer solutions are recovered.
 
 The algorithm supports both positive and negative values of C<n>.
 
@@ -10606,8 +10545,7 @@ Aliases: I<is_palindromic>
 
 Returns C<true> if C<n> is pandigital in the specified base, and C<false> otherwise.
 
-A number is pandigital in base C<b> if its representation contains every
-digit from C<0> to C<b-1> at least once. Digits may appear more than once.
+A number is pandigital in base C<b> if its representation contains every digit from C<0> to C<b-1> at least once. Digits may appear more than once.
 
 If no base is specified, base 10 is assumed.
 
@@ -10628,11 +10566,9 @@ Pandigitality can also be tested in other bases:
 
 Returns C<true> if C<n> is a Smith number, and C<false> otherwise.  (L<OEIS A006753|https://oeis.org/A006753>)
 
-A Smith number is a composite integer whose digit sum equals the sum of the
-digit sums of its prime factors, counted with multiplicity.
+A Smith number is a composite integer whose digit sum equals the sum of the digit sums of its prime factors, counted with multiplicity.
 
-By default, the comparison is performed in base 10. An alternative numeral
-base can be specified with the optional C<base> argument.
+By default, the comparison is performed in base 10. An alternative numeral base can be specified with the optional C<base> argument.
 
     say 30.by { .is_smith(2) }      #=> OEIS: A278909
     say 30.by { .is_smith(10) }     #=> OEIS: A006753

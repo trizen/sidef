@@ -1012,7 +1012,6 @@ sidef - The Sidef Programming Language interpreter
     sidef -i script.sf
 
     # Execute one-line program
-    sidef -E 'say "Hello, World!"'
     sidef -E '10.of { |i| say i**2 }'
 
     # Check syntax without execution
@@ -1052,16 +1051,9 @@ Special REPL commands:
 
 =head1 DESCRIPTION
 
-Sidef is a modern, high-level programming language designed for writing
-elegant and expressive code. This is the main interpreter for executing
-Sidef programs, providing both script execution and an interactive
-Read-Eval-Print Loop (REPL) environment.
+Sidef is a modern, high-level programming language designed for writing elegant and expressive code. This is the main interpreter for executing Sidef programs, providing both script execution and an interactive Read-Eval-Print Loop (REPL) environment.
 
-Sidef features arbitrary-precision arithmetic, functional programming
-constructs, object-oriented programming, powerful regex support, and
-extensive built-in methods for common tasks. The language emphasizes
-code readability and expressiveness while maintaining strong performance
-through optimization and optional precompilation.
+Sidef features arbitrary-precision arithmetic, functional programming constructs, object-oriented programming, powerful regex support, and extensive built-in methods for common tasks. The language emphasizes code readability and expressiveness while maintaining strong performance through optimization and optional precompilation.
 
 =head1 INSTALLATION
 
@@ -1081,10 +1073,7 @@ through optimization and optional precompilation.
 
 =head2 Dependencies
 
-Sidef requires Perl 5.16 or later, and depends on several CPAN modules
-including Math::GMPz, Math::GMPq, Math::MPFR, and Math::MPC for
-arbitrary-precision arithmetic. The installation process will
-automatically resolve and install these dependencies.
+Sidef requires Perl 5.16 or later, and depends on several CPAN modules including Math::GMPz, Math::GMPq, Math::MPFR, and Math::MPC for arbitrary-precision arithmetic. The installation process will automatically resolve and install these dependencies.
 
 =head1 LANGUAGE OVERVIEW
 
@@ -1096,8 +1085,7 @@ Everything in Sidef is an object. Methods can be chained fluently:
 
 =head2 Arbitrary-Precision Numbers
 
-Sidef supports integers, rationals, floats, and complex numbers with
-arbitrary precision:
+Sidef supports integers, rationals, floats, and complex numbers with arbitrary precision:
 
     say 2**1000            # exact large integer
     say 355/113            # rational, stored exactly
@@ -1162,9 +1150,7 @@ Sidef supports Unicode throughout — identifiers, strings, and I/O:
 
 =item B<-E> I<program>
 
-Execute a one-line program from the command line. The program is executed
-immediately without requiring a file. This is useful for quick calculations,
-text processing, or testing code snippets.
+Execute a one-line program from the command line. The program is executed immediately without requiring a file. This is useful for quick calculations, text processing, or testing code snippets.
 
     sidef -E 'say "Hello, World!"'
     sidef -E '10.times { |i| say i**2 }'
@@ -1176,10 +1162,7 @@ Alias for B<-E>. Execute a one-line program.
 
 =item B<-i> [I<file>]
 
-Enter interactive mode (REPL - Read-Eval-Print Loop). If a file is provided,
-its contents are loaded and executed line by line in the interactive session.
-The REPL provides immediate feedback, command history, tab completion, and
-persistent variable state throughout the session.
+Enter interactive mode (REPL - Read-Eval-Print Loop). If a file is provided, its contents are loaded and executed line by line in the interactive session. The REPL provides immediate feedback, command history, tab completion, and persistent variable state throughout the session.
 
     sidef -i                    # Start empty REPL
     sidef -i startup.sf         # Load file into REPL
@@ -1187,18 +1170,14 @@ persistent variable state throughout the session.
 
 =item B<-t>
 
-Test mode. Treat all command-line arguments as script files and execute them
-sequentially. Useful for running test suites. Reports which scripts succeed
-or fail and provides a summary at the end.
+Test mode. Treat all command-line arguments as script files and execute them sequentially. Useful for running test suites. Reports which scripts succeed or fail and provides a summary at the end.
 
     sidef -t test1.sf test2.sf test3.sf
     sidef -t tests/*.sf
 
 =item B<-->
 
-End of options marker. Everything after this is treated as a program file or
-arguments, even if it starts with a dash. Useful when script names begin
-with hyphens.
+End of options marker. Everything after this is treated as a program file or arguments, even if it starts with a dash. Useful when script names begin with hyphens.
 
     sidef -- -weird-script-name.sf
 
@@ -1210,33 +1189,24 @@ with hyphens.
 
 =item B<-c>
 
-Compile the Sidef code into a stand-alone Perl program. The output includes
-all necessary Sidef runtime modules embedded in a single file, making it
-distributable without requiring a Sidef installation. The resulting program
-can be executed directly with Perl.
+Compile the Sidef code into a stand-alone Perl program. The output includes all necessary Sidef runtime modules embedded in a single file, making it distributable without requiring a Sidef installation. The resulting program can be executed directly with Perl.
 
     sidef -c -o myprogram.pl script.sf
     chmod +x myprogram.pl
     ./myprogram.pl
 
-Note: Code using C<eval()> may not compile correctly as it requires
-parse-time information that is lost during compilation.
+Note: Code using C<eval()> may not compile correctly as it requires parse-time information that is lost during compilation.
 
 =item B<-C>
 
-Check syntax only. Parse the program and report any syntax errors without
-executing the code. Useful for validating code structure before deployment
-or as part of a continuous integration pipeline.
+Check syntax only. Parse the program and report any syntax errors without executing the code. Useful for validating code structure before deployment or as part of a continuous integration pipeline.
 
     sidef -C script.sf
     sidef -C *.sf               # Check all scripts
 
 =item B<-D>
 
-Dump the Abstract Syntax Tree (AST) of the program. The AST represents the
-internal structure of the parsed program before execution. Useful for
-debugging parser behavior, understanding how code is interpreted, and
-developing language extensions.
+Dump the Abstract Syntax Tree (AST) of the program. The AST represents the internal structure of the parsed program before execution. Useful for debugging parser behavior, understanding how code is interpreted, and developing language extensions.
 
     sidef -D script.sf > ast.dump
     sidef -D -E '1 + (2 * 3)' | less
@@ -1245,18 +1215,14 @@ Requires the C<Data::Dump> Perl module.
 
 =item B<-r>
 
-Parse and deparse the program back to Sidef code. This shows how the parser
-interpreted your code and can help identify parsing ambiguities, verify
-operator precedence, and understand method call transformations.
+Parse and deparse the program back to Sidef code. This shows how the parser interpreted your code and can help identify parsing ambiguities, verify operator precedence, and understand method call transformations.
 
     sidef -r script.sf
     sidef -r -E '1 + 2/3'       # Shows: (1)->+((2)->/(3));
 
 =item B<-R> I<language>
 
-Parse and deparse the program into the specified target language. This
-translates Sidef code into equivalent code in another language while
-preserving semantics. Valid values are:
+Parse and deparse the program into the specified target language. This translates Sidef code into equivalent code in another language while preserving semantics. Valid values are:
 
 =over 8
 
@@ -1279,22 +1245,15 @@ preserving semantics. Valid values are:
 
 =item B<-O> I<level>
 
-Perform code optimizations before execution. Higher optimization levels can
-significantly improve runtime performance for computation-heavy scripts by
-evaluating constant expressions at compile time. Valid levels:
+Perform code optimizations before execution. Higher optimization levels can significantly improve runtime performance for computation-heavy scripts by evaluating constant expressions at compile time. Valid levels:
 
 =over 8
 
 =item * B<0> - No optimization (default). Code is executed as parsed.
 
-=item * B<1> - Constant folding on AST (recommended for production). Pure
-expressions with constant operands are evaluated at compile time, reducing
-runtime computation.
+=item * B<1> - Constant folding on AST (recommended for production). Pure expressions with constant operands are evaluated at compile time, reducing runtime computation.
 
-=item * B<2> - Aggressive optimization with deparse and reparse. Performs
-constant folding, deparses to Sidef code, reparses, and does additional
-constant folding on the new AST. Increases compile time but may provide
-additional optimizations.
+=item * B<2> - Aggressive optimization with deparse and reparse. Performs constant folding, deparses to Sidef code, reparses, and does additional constant folding on the new AST. Increases compile time but may provide additional optimizations.
 
 =back
 
@@ -1312,34 +1271,24 @@ Example optimization:
 
 =item B<-s>
 
-Enable precompilation caching. Compiled code is saved in a database indexed
-by MD5 hash of the source code. On subsequent runs of the same code, the
-compiled version is loaded from cache, significantly reducing startup time
-for large programs.
+Enable precompilation caching. Compiled code is saved in a database indexed by MD5 hash of the source code. On subsequent runs of the same code, the compiled version is loaded from cache, significantly reducing startup time for large programs.
 
     sidef -s large_script.sf    # Slow first run (compiles and caches)
     sidef -s large_script.sf    # Fast subsequent runs (loads from cache)
 
-The cache is automatically maintained and periodically sanitized. Cache
-location: C<~/.sidef/cache/>
+The cache is automatically maintained and periodically sanitized. Cache location: C<~/.sidef/cache/>
 
 =back
 
 =head2 Number Configuration Options
 
-Sidef provides arbitrary-precision arithmetic through the GMP and MPFR
-libraries. These options control precision and behavior of numeric operations.
+Sidef provides arbitrary-precision arithmetic through the GMP and MPFR libraries. These options control precision and behavior of numeric operations.
 
 =over 4
 
 =item B<-P> I<precision>
 
-Set the precision of floating-point numbers as approximately the number
-of decimal digits. Internally the value is converted to bits (multiplied
-by approximately 3.32), so C<-P 50> gives roughly 50 decimal digits of
-precision. Higher precision allows more accurate calculations but increases
-memory usage and computation time. Default is approximately 58 decimal
-digits (192 bits).
+Set the precision of floating-point numbers as approximately the number of decimal digits. Internally the value is converted to bits (multiplied by approximately 3.32), so C<-P 50> gives roughly 50 decimal digits of precision. Higher precision allows more accurate calculations but increases memory usage and computation time. Default is approximately 58 decimal digits (192 bits).
 
     sidef -P 50 -E 'say sqrt(2)'          # ~50 decimal digits
     sidef -P 100 -E 'say sqrt(2)'         # ~100 decimal digits
@@ -1347,9 +1296,7 @@ digits (192 bits).
 
 =item B<-M> I<mode>
 
-Set the rounding mode for floating-point operations. Different rounding modes
-are useful for different numerical applications (financial calculations,
-scientific computing, interval arithmetic, etc.). Valid modes:
+Set the rounding mode for floating-point operations. Different rounding modes are useful for different numerical applications (financial calculations, scientific computing, interval arithmetic, etc.). Valid modes:
 
 =over 8
 
@@ -1363,8 +1310,7 @@ scientific computing, interval arithmetic, etc.). Valid modes:
 
 =item * B<-inf> - Round towards negative infinity (floor). Always rounds down.
 
-=item * B<faith> - Faithful rounding. Result is one of the two nearest
-floating-point numbers.
+=item * B<faith> - Faithful rounding. Result is one of the two nearest floating-point numbers.
 
 =back
 
@@ -1375,9 +1321,7 @@ floating-point numbers.
 
 =item B<-N> I<options>
 
-Configure Number class variables for fine-grained control over numeric
-computation behavior. Multiple options can be separated by semicolons.
-Format: C<'NAME1=VALUE1; NAME2=VALUE2'>
+Configure Number class variables for fine-grained control over numeric computation behavior. Multiple options can be separated by semicolons. Format: C<'NAME1=VALUE1; NAME2=VALUE2'>
 
 Available options:
 
@@ -1387,32 +1331,23 @@ Available options:
 
 =item * B<ROUND> - Rounding mode as integer: 0=near, 1=zero, 2=inf, 3=+inf, 4=-inf, 5=faith
 
-=item * B<VERBOSE> - Enable verbose/debug mode (true/false). Prints detailed
-information about numeric operations.
+=item * B<VERBOSE> - Enable verbose/debug mode (true/false). Prints detailed information about numeric operations.
 
-=item * B<USE_YAFU> - Use YAFU (Yet Another Factorization Utility) for
-factoring large integers (true/false). Requires YAFU installed.
+=item * B<USE_YAFU> - Use YAFU (Yet Another Factorization Utility) for factoring large integers (true/false). Requires YAFU installed.
 
-=item * B<USE_PFGW> - Use PFGW64 (PrimeForm/GW) as a primality pretest for
-large numbers (true/false). Requires PFGW64 installed.
+=item * B<USE_PFGW> - Use PFGW64 (PrimeForm/GW) as a primality pretest for large numbers (true/false). Requires PFGW64 installed.
 
-=item * B<USE_PARI_GP> - Use PARI/GP for various number theory operations
-(true/false). Requires PARI/GP installed.
+=item * B<USE_PARI_GP> - Use PARI/GP for various number theory operations (true/false). Requires PARI/GP installed.
 
-=item * B<USE_FACTORDB> - Use factordb.com web service for factoring large
-integers (true/false). Requires internet connection.
+=item * B<USE_FACTORDB> - Use factordb.com web service for factoring large integers (true/false). Requires internet connection.
 
-=item * B<USE_PRIMESUM> - Use Kim Walisch's primesum for computing sum of
-primes (true/false). Requires primesum installed.
+=item * B<USE_PRIMESUM> - Use Kim Walisch's primesum for computing sum of primes (true/false). Requires primesum installed.
 
-=item * B<USE_PRIMECOUNT> - Use Kim Walisch's primecount for computing prime
-counting function π(n) (true/false). Requires primecount installed.
+=item * B<USE_PRIMECOUNT> - Use Kim Walisch's primecount for computing prime counting function π(n) (true/false). Requires primecount installed.
 
-=item * B<USE_CONJECTURES> - Use conjectured (unproven but likely correct)
-methods for better performance (true/false).
+=item * B<USE_CONJECTURES> - Use conjectured (unproven but likely correct) methods for better performance (true/false).
 
-=item * B<SPECIAL_FACTORS> - Try to find factors of special form (Fermat,
-Mersenne, etc.) when factoring (true/false).
+=item * B<SPECIAL_FACTORS> - Try to find factors of special form (Fermat, Mersenne, etc.) when factoring (true/false).
 
 =back
 
@@ -1435,10 +1370,7 @@ Examples:
 
 =item B<-k>
 
-Keep track of potentially incorrect parser interpretations. Enables warnings
-when the parser makes assumptions that might not match your intent. This is
-especially useful for catching typos in function names that get interpreted
-as method calls.
+Keep track of potentially incorrect parser interpretations. Enables warnings when the parser makes assumptions that might not match your intent. This is especially useful for catching typos in function names that get interpreted as method calls.
 
     sidef -k script.sf
 
@@ -1464,15 +1396,11 @@ Common cases flagged:
 
 =item B<-w>
 
-Enable warnings with stack backtrace. When a warning occurs, displays a
-complete call stack showing the sequence of function/method calls that led
-to the warning. Useful for debugging complex code paths.
+Enable warnings with stack backtrace. When a warning occurs, displays a complete call stack showing the sequence of function/method calls that led to the warning. Useful for debugging complex code paths.
 
 =item B<-W>
 
-Make warnings fatal (with stack backtrace). The program terminates
-immediately on the first warning, showing a full stack trace. This is
-useful for strict error checking during development or testing.
+Make warnings fatal (with stack backtrace). The program terminates immediately on the first warning, showing a full stack trace. This is useful for strict error checking during development or testing.
 
 =back
 
@@ -1482,8 +1410,7 @@ useful for strict error checking during development or testing.
 
 =item B<-o> I<file>
 
-Specify output file for compiled or deparsed code. By default, output goes
-to STDOUT. This option is typically used with B<-c>, B<-r>, or B<-R>.
+Specify output file for compiled or deparsed code. By default, output goes to STDOUT. This option is typically used with B<-c>, B<-r>, or B<-R>.
 
     sidef -c -o program.pl script.sf        # Compile to file
     sidef -R perl -o script.pl script.sf    # Deparse to file
@@ -1497,9 +1424,7 @@ to STDOUT. This option is typically used with B<-c>, B<-r>, or B<-R>.
 
 =item B<-H>
 
-Enter interactive help mode. Provides access to documentation for Sidef
-objects, methods, and modules. You can enter any expression that evaluates
-to an object, and the help system will display its documentation.
+Enter interactive help mode. Provides access to documentation for Sidef objects, methods, and modules. You can enter any expression that evaluates to an object, and the help system will display its documentation.
 
     sidef -H
     help> Array()
@@ -1519,9 +1444,7 @@ Print version information and exit. Shows the Sidef version number.
 
 =head1 INTERACTIVE MODE (REPL)
 
-When invoked without a script file, Sidef enters interactive mode, providing
-a Read-Eval-Print Loop (REPL) for exploring the language, testing code
-snippets, and rapid prototyping.
+When invoked without a script file, Sidef enters interactive mode, providing a Read-Eval-Print Loop (REPL) for exploring the language, testing code snippets, and rapid prototyping.
 
 =head2 Starting the REPL
 
@@ -1541,8 +1464,7 @@ Or explicitly with the C<-i> option:
 
 =item * B<Persistent Variables>
 
-All variables, functions, and classes defined in the REPL persist throughout
-the session.
+All variables, functions, and classes defined in the REPL persist throughout the session.
 
     > var x = 42
     #1 = 42
@@ -1554,8 +1476,7 @@ the session.
 
 =item * B<Result History>
 
-Every expression result is stored and can be referenced using C<#n> notation,
-where C<n> is the result number. Negative indices count from the end.
+Every expression result is stored and can be referenced using C<#n> notation, where C<n> is the result number. Negative indices count from the end.
 
     > 3 + 4
     #1 = 7
@@ -1566,9 +1487,7 @@ where C<n> is the result number. Negative indices count from the end.
 
 =item * B<Multiline Input>
 
-End lines with backslash (C<\>) to continue on the next line, or the REPL
-will automatically continue incomplete expressions. The prompt changes from
-C<E<gt>> to C<  > to indicate continuation mode.
+End lines with backslash (C<\>) to continue on the next line, or the REPL will automatically continue incomplete expressions. The prompt changes from C<E<gt>> to C<  > to indicate continuation mode.
 
     > func factorial(n) {
         n == 0 ? 1 : n*factorial(n-1)
@@ -1578,13 +1497,11 @@ C<E<gt>> to C<  > to indicate continuation mode.
 
 =item * B<Tab Completion>
 
-Press Tab to complete variable/function names, show available methods on
-objects, and navigate command history.
+Press Tab to complete variable/function names, show available methods on objects, and navigate command history.
 
 =item * B<Command History>
 
-Use Up/Down arrow keys to navigate previous commands. History persists
-between sessions (saved to C<~/.sidef/sidef_history.txt>).
+Use Up/Down arrow keys to navigate previous commands. History persists between sessions (saved to C<~/.sidef/sidef_history.txt>).
 
 =back
 
@@ -1594,8 +1511,7 @@ between sessions (saved to C<~/.sidef/sidef_history.txt>).
 
 =item B<##>
 
-Display execution time of the last command. Useful for benchmarking and
-performance analysis.
+Display execution time of the last command. Useful for benchmarking and performance analysis.
 
     > factor(2**128 + 1)
     #1 = [59649589127497217, 5704689200685129054721]
@@ -1604,31 +1520,26 @@ performance analysis.
 
 =item B<# load> I<filename>
 
-Load and execute a Sidef file line by line in the REPL. Each line is executed
-as if typed into the REPL.
+Load and execute a Sidef file line by line in the REPL. Each line is executed as if typed into the REPL.
 
     > # load mylib.sf
 
 =item B<# exec> I<filename>
 
-Execute an entire Sidef file in the current REPL session. Unlike C<# load>,
-this executes the file as a complete unit, but within the REPL environment
-where variables persist.
+Execute an entire Sidef file in the current REPL session. Unlike C<# load>, this executes the file as a complete unit, but within the REPL environment where variables persist.
 
     > # exec script.sf
 
 =item B<# save> I<filename>
 
-Save all valid commands from the REPL session to a file. This creates a
-replayable script containing all successfully executed code.
+Save all valid commands from the REPL session to a file. This creates a replayable script containing all successfully executed code.
 
     > # save session.sf
     ** Created file: session.sf
 
 =item B<reset>
 
-Reset the REPL environment, clearing all variables, functions, and definitions.
-Result history is also cleared.
+Reset the REPL environment, clearing all variables, functions, and definitions. Result history is also cleared.
 
 =item B<help>
 
@@ -1746,26 +1657,21 @@ Normalize Sidef code style:
 
 =item B<SIDEF_CONFIG_DIR>
 
-Override the default user configuration directory. Default:
-C<~/.config/sidef/>
+Override the default user configuration directory. Default: C<~/.config/sidef/>
 
     export SIDEF_CONFIG_DIR=/path/to/config
 
 =item B<HOME>
 
-Used to determine the user's home directory for the default configuration
-path (C<~/.config/sidef/>). Also consulted via C<LOGDIR> as a fallback on
-some systems.
+Used to determine the user's home directory for the default configuration path (C<~/.config/sidef/>). Also consulted via C<LOGDIR> as a fallback on some systems.
 
 =item B<XDG_CONFIG_DIR>
 
-If set, used instead of C<HOME> to locate the configuration directory,
-following the XDG Base Directory specification.
+If set, used instead of C<HOME> to locate the configuration directory, following the XDG Base Directory specification.
 
 =item B<PERL5LIB>
 
-Colon-separated list of directories prepended to Perl's C<@INC>. Affects
-which Sidef and CPAN modules are loaded.
+Colon-separated list of directories prepended to Perl's C<@INC>. Affects which Sidef and CPAN modules are loaded.
 
     export PERL5LIB=/path/to/extra/lib
 
@@ -1815,8 +1721,7 @@ Successful execution. Program ran without errors.
 
 =item B<1>
 
-General error. Includes syntax errors, runtime errors, unhandled exceptions,
-file not found, and permission denied.
+General error. Includes syntax errors, runtime errors, unhandled exceptions, file not found, and permission denied.
 
 =item B<2>
 
@@ -1832,13 +1737,11 @@ Common error messages and their meanings:
 
 =item B<Can't open sidef script "filename": No such file or directory>
 
-The specified script file does not exist or is not readable. Check file name
-spelling and permissions.
+The specified script file does not exist or is not readable. Check file name spelling and permissions.
 
 =item B<Syntax error at line N>
 
-Parser encountered invalid syntax at the specified line. Use B<-k> for more
-detailed diagnostics.
+Parser encountered invalid syntax at the specified line. Use B<-k> for more detailed diagnostics.
 
 =item B<Invalid precision: C<< <<value>> >> (expected a positive integer)>
 
@@ -1850,18 +1753,15 @@ The B<-E> option requires a code argument.
 
 =item B<Invalid format: C<< <<option>> >>!>
 
-The B<-N> option format is incorrect. Expected format:
-C<'NAME1=VALUE1; NAME2=VALUE2'>
+The B<-N> option format is incorrect. Expected format: C<'NAME1=VALUE1; NAME2=VALUE2'>
 
 =item B<"Data::Dump" is not installed!>
 
-The B<-D> option requires the Perl module Data::Dump. Install with:
-C<cpan Data::Dump> or C<cpanm Data::Dump>
+The B<-D> option requires the Perl module Data::Dump. Install with: C<cpan Data::Dump> or C<cpanm Data::Dump>
 
 =item B<Variable 'name' is not declared in the current scope>
 
-Attempting to use an undeclared variable. Declare with C<var>, C<global>,
-C<const>, or C<define>.
+Attempting to use an undeclared variable. Declare with C<var>, C<global>, C<const>, or C<define>.
 
 =item B<Stopped by user...>
 
@@ -1869,23 +1769,19 @@ The user interrupted execution (e.g., Ctrl+C) during test mode (B<-t>).
 
 =item B<[ERROR] Can't parse the script `filename`: ...>
 
-Test mode (B<-t>) failed to parse the named script. The error detail
-follows the colon.
+Test mode (B<-t>) failed to parse the named script. The error detail follows the colon.
 
 =item B<[ERROR] Error encountered on script `filename`: ...>
 
-Test mode (B<-t>) encountered a runtime error while executing the named
-script. The error detail follows the colon.
+Test mode (B<-t>) encountered a runtime error while executing the named script. The error detail follows the colon.
 
 =item B<Can't open file C<< <<filename>> >> for reading: ...>
 
-A file I/O operation failed because the file could not be opened for
-reading. Check that the file exists and is readable.
+A file I/O operation failed because the file could not be opened for reading. Check that the file exists and is readable.
 
 =item B<Can't open file C<< <<filename>> >> for writing: ...>
 
-A file I/O operation failed because the file could not be opened for
-writing. Check directory permissions.
+A file I/O operation failed because the file could not be opened for writing. Check directory permissions.
 
 =back
 
@@ -1929,15 +1825,13 @@ Please include:
 
 =item * B<Use C<-O1> for production scripts>
 
-Constant folding evaluates pure constant expressions at compile time,
-often giving a noticeable speedup with no code changes:
+Constant folding evaluates pure constant expressions at compile time, often giving a noticeable speedup with no code changes:
 
     sidef -O1 script.sf
 
 =item * B<Use C<-s> for scripts run repeatedly>
 
-Precompilation caching skips the parse/compile phase on subsequent runs
-of unchanged code:
+Precompilation caching skips the parse/compile phase on subsequent runs of unchanged code:
 
     sidef -s script.sf
 
@@ -1947,26 +1841,19 @@ of unchanged code:
 
 =item * B<Use external tools via C<-N> for heavy number theory>
 
-For computationally expensive operations such as large-integer
-factorization or prime counting, enabling external programs like
-C<yafu>, C<primecount>, or C<pari-gp> can dramatically reduce
-runtime:
+For computationally expensive operations such as large-integer factorization or prime counting, enabling external programs like C<yafu>, C<primecount>, or C<pari-gp> can dramatically reduce runtime:
 
     sidef -N 'USE_PRIMECOUNT=true; USE_YAFU=true' script.sf
 
 =item * B<REPL overhead>
 
-The interactive REPL has per-line compilation overhead. For
-performance-sensitive work, prefer executing a script file directly
-over typing the same code interactively.
+The interactive REPL has per-line compilation overhead. For performance-sensitive work, prefer executing a script file directly over typing the same code interactively.
 
 =back
 
 =head1 HISTORY
 
-Sidef was started in 2013 by Daniel Șuteu as a personal language
-experiment and has been actively maintained and extended since then.
-Major milestones:
+Sidef was started in 2013 by Daniel Șuteu as a personal language experiment and has been actively maintained and extended since then. Major milestones:
 
 =over 4
 
@@ -1976,11 +1863,9 @@ Major milestones:
 
 =item * B<2016> - First CPAN release.
 
-=item * B<2018+> - Extensive number theory library; external tool
-integrations (YAFU, PARI/GP, primecount).
+=item * B<2018+> - Extensive number theory library; external tool integrations (YAFU, PARI/GP, primecount).
 
-=item * B<Present> - Ongoing improvements to the standard library,
-optimiser, and REPL.
+=item * B<Present> - Ongoing improvements to the standard library, optimiser, and REPL.
 
 =back
 
@@ -2043,8 +1928,7 @@ Or use C<perldoc> directly:
 
 =back
 
-For a complete list of contributors, see:
-L<https://github.com/trizen/sidef/graphs/contributors>
+For a complete list of contributors, see: L<https://github.com/trizen/sidef/graphs/contributors>
 
 =head1 ACKNOWLEDGMENTS
 
@@ -2070,24 +1954,12 @@ Sidef builds upon:
 
 Copyright © 2013-2026 Daniel Șuteu, Ioana Fălcușan. All Rights Reserved.
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the B<Artistic License (2.0)>. You may obtain a copy
-of the full license at:
+This program is free software; you can redistribute it and/or modify it under the terms of the B<Artistic License (2.0)>. You may obtain a copy of the full license at:
 
 L<https://www.perlfoundation.org/artistic-license-20.html>
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+Any use, modification, and distribution of the Standard or Modified Versions is governed by this Artistic License. By using, modifying or distributing the Package, you accept this license. Do not use, modify, or distribute the Package, if you do not accept this license.
 
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut

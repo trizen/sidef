@@ -176,8 +176,7 @@ A literal string on the right-hand side is escaped automatically:
 
 This produces a regex equivalent to C</cat|d\.g/>.
 
-An optional third argument lets you add extra modifier letters when calling
-this as a method:
+An optional third argument lets you add extra modifier letters when calling this as a method:
 
     var re2 = /foo/i.union(/bar/m, 'x')
 

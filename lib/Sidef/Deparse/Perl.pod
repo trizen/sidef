@@ -29,15 +29,9 @@ This documentation refers to Sidef::Deparse::Perl
 
 =head1 DESCRIPTION
 
-Sidef::Deparse::Perl is a core component of the Sidef programming language that
-converts Sidef Abstract Syntax Tree (AST) structures into executable Perl source
-code. It acts as a transpiler from Sidef's high-level syntax to Perl, enabling
-Sidef programs to run on the Perl runtime.
+Sidef::Deparse::Perl is a core component of the Sidef programming language that converts Sidef Abstract Syntax Tree (AST) structures into executable Perl source code. It acts as a transpiler from Sidef's high-level syntax to Perl, enabling Sidef programs to run on the Perl runtime.
 
-The deparser handles all Sidef language constructs including variables, control
-flow structures, object-oriented features, operators, and more. It performs
-optimizations, manages namespaces, handles scoping, and generates efficient Perl
-code that maintains Sidef's semantics.
+The deparser handles all Sidef language constructs including variables, control flow structures, object-oriented features, operators, and more. It performs optimizations, manages namespaces, handles scoping, and generates efficient Perl code that maintains Sidef's semantics.
 
 =head1 CONSTRUCTOR
 
@@ -93,8 +87,7 @@ B<Returns:> A blessed Sidef::Deparse::Perl object
 
     my $perl_code = $deparser->deparse($ast_structure);
 
-Main entry point for deparsing. Converts a complete Sidef AST structure into
-executable Perl source code.
+Main entry point for deparsing. Converts a complete Sidef AST structure into executable Perl source code.
 
 B<Parameters:>
 
@@ -120,8 +113,7 @@ B<Parameters:>
 
 =back
 
-B<Returns:> Array of deparsed statement strings (in array context) or the last
-statement (in scalar context)
+B<Returns:> Array of deparsed statement strings (in array context) or the last statement (in scalar context)
 
 =head3 deparse_expr
 
@@ -550,9 +542,7 @@ B<Returns:> List of collected items from the inheritance chain
 
 =head1 INTERNAL HANDLER METHODS
 
-The deparser uses a dispatch table to handle different AST node types. Each
-handler method follows the naming convention C<_deparse_*> and processes a
-specific type of Sidef construct.
+The deparser uses a dispatch table to handle different AST node types. Each handler method follows the naming convention C<_deparse_*> and processes a specific type of Sidef construct.
 
 =head2 Variable Handlers
 
@@ -828,29 +818,23 @@ The deparser handles Sidef operators through several mechanisms:
 
 =head2 Lazy Operators
 
-Operators like C<||>, C<&&>, C<?>, and C<//> are handled specially to preserve
-short-circuit evaluation semantics.
+Operators like C<||>, C<&&>, C<?>, and C<//> are handled specially to preserve short-circuit evaluation semantics.
 
 =head2 Assignment Operators
 
-Simple assignment (C<=>) and compound assignments (C<+=>, C<-=>, etc.) are
-converted to Perl equivalents, with compound assignments wrapped in lvalue
-subroutines.
+Simple assignment (C<=>) and compound assignments (C<+=>, C<-=>, etc.) are converted to Perl equivalents, with compound assignments wrapped in lvalue subroutines.
 
 =head2 Increment/Decrement
 
-Pre-increment (C<++$x>) and post-increment (C<$x++>) operators are handled
-differently to maintain proper semantics and return values.
+Pre-increment (C<++$x>) and post-increment (C<$x++>) operators are handled differently to maintain proper semantics and return values.
 
 =head2 Comparison Operators
 
-Comparison operators (C<==>, C<!=>, C<< <=> >>, C<~~>, C<!~>) are converted to
-appropriate Perl operations, with proper handling of Sidef's Bool objects.
+Comparison operators (C<==>, C<!=>, C<< <=> >>, C<~~>, C<!~>) are converted to appropriate Perl operations, with proper handling of Sidef's Bool objects.
 
 =head2 Unary Operators
 
-Unary operators (C<!>, C<->, C<+>, C<@>, C<~>, etc.) are handled with special
-cases for constant folding and type conversions.
+Unary operators (C<!>, C<->, C<+>, C<@>, C<~>, etc.) are handled with special cases for constant folding and type conversions.
 
 =head1 CONSTANT OPTIMIZATION
 
@@ -868,8 +852,7 @@ The deparser performs constant optimization for:
 
 =back
 
-Constants are created using the C<use constant> pragma and stored in the
-environment namespace for efficient reuse.
+Constants are created using the C<use constant> pragma and stored in the environment namespace for efficient reuse.
 
 =head1 SCOPE AND NAMESPACE MANAGEMENT
 

@@ -112,9 +112,7 @@ Aliases: I<not>, I<flip>, I<toggle>, I<is_false>
 
     Bool(value)
 
-Creates a new Boolean object from the given value. Any value can be converted to a boolean:
-- C<false>, C<0>, empty string, C<nil> become C<false>
-- Everything else becomes C<true>
+Creates a new Boolean object from the given value. Any value can be converted to a boolean: - C<false>, C<0>, empty string, C<nil> become C<false> - Everything else becomes C<true>
 
     Bool(1)          # true
     Bool(0)          # false

@@ -15,7 +15,7 @@ When a block is forked using C<ffork()>, it creates a new system process that ex
     # Basic forking - execute code in parallel
     var fork = { say "Hello from fork!"; 42 }.ffork
     var result = fork.get    # waits and returns 42
-    
+
     # Parallel quicksort example
     func quicksort(arr {.len <= 1}) { arr }
     func quicksort(arr) {
@@ -26,9 +26,9 @@ When a block is forked using C<ffork()>, it creates a new system process that ex
         ]
         forks[0].wait + [p] + forks[1].wait
     }
-    
+
     say quicksort(@("a".."z") -> shuffle)
-    
+
     # Parallel calculations on multiple values
     var nums = [
         1275792312878611,
@@ -36,21 +36,21 @@ When a block is forked using C<ffork()>, it creates a new system process that ex
         1578070919762253,
         14700694496703910,
     ]
-    
-    var factors = nums.map {|n| 
+
+    var factors = nums.map {|n|
         prime_factors.ffork(n)
     }.map { .wait }
-    
+
     say ((nums ~Z factors) -> max_by {|m| m[1][0] })
-    
+
     # Multiple independent forks
     var fork1 = { slow_computation_1() }.ffork
     var fork2 = { slow_computation_2() }.ffork
     var fork3 = { slow_computation_3() }.ffork
-    
+
     # Do some work while forks run in background
     do_other_work()
-    
+
     # Collect all results
     var results = [fork1.get, fork2.get, fork3.get]
 
@@ -129,7 +129,7 @@ Fork objects are not typically instantiated directly. Instead, they are created 
 
     var block = { expensive_computation() }
     var fork = block.ffork    # Creates and starts a Fork object
-    
+
     # Or more commonly:
     var fork = { expensive_computation() }.ffork
 
@@ -153,11 +153,11 @@ Recursive algorithms benefit from parallel execution:
     func parallel_sum(arr) {
         return 0 if arr.is_empty
         return arr[0] if (arr.len == 1)
-        
+
         var mid = arr.len // 2
         var left_fork = parallel_sum.ffork(arr.first(mid))
         var right_fork = parallel_sum.ffork(arr.last(arr.len - mid))
-        
+
         left_fork.wait + right_fork.wait
     }
 
@@ -168,7 +168,7 @@ Execute completely independent operations in parallel:
     var download_fork = { download_file(url) }.ffork
     var process_fork  = { process_data(data) }.ffork
     var upload_fork   = { upload_results(results) }.ffork
-    
+
     # Wait for all to complete
     download_fork.wait
     process_fork.wait
@@ -233,12 +233,12 @@ For lighter-weight concurrency, Sidef also provides:
     func prime_factors(n) {
         # Implementation here
     }
-    
+
     var numbers = [12345, 67890, 98765, 43210]
     var factors = numbers.map {|n|
         prime_factors.ffork(n)
     }.map { .wait }
-    
+
     numbers.zip(factors).each {|pair|
         say "#{pair[0]} = #{pair[1].join(' × ')}"
     }
@@ -247,7 +247,7 @@ For lighter-weight concurrency, Sidef also provides:
 
     var fork = { potentially_slow_operation() }.ffork
     var timeout = 5  # seconds
-    
+
     # Note: Sidef doesn't have built-in timeout for forks
     # You would need to implement timeout logic with sleep/kill
     var start = Time.sec

@@ -22,8 +22,7 @@ This class provides a bidirectional bridge between Sidef and Perl, allowing you 
 
 =back
 
-Results from Perl evaluation are automatically converted into equivalent Sidef data structures,
-enabling seamless interoperability between the two languages.
+Results from Perl evaluation are automatically converted into equivalent Sidef data structures, enabling seamless interoperability between the two languages.
 
 =head1 SYNOPSIS
 
@@ -69,8 +68,7 @@ enabling seamless interoperability between the two languages.
 
     var obj = Perl(perl_code)
 
-Constructs a new Perl object containing the specified Perl code string. The code is not
-executed until one of the evaluation methods (C<eval>, C<run>, or C<execute>) is called.
+Constructs a new Perl object containing the specified Perl code string. The code is not executed until one of the evaluation methods (C<eval>, C<run>, or C<execute>) is called.
 
 B<Parameters:>
 
@@ -108,8 +106,7 @@ B<Example:>
     obj.eval
     Perl.eval(perl_code)
 
-Evaluates the stored Perl code and converts the result into a Sidef data structure.
-This method can be called as both an instance method and a class method.
+Evaluates the stored Perl code and converts the result into a Sidef data structure. This method can be called as both an instance method and a class method.
 
 B<Instance Method Usage:>
 
@@ -181,10 +178,7 @@ B<Aliases:> I<eval>, I<run>
 
     Perl.to_sidef(perl_structure)
 
-Converts a given Perl data structure into its equivalent Sidef representation.
-This is the underlying method used by C<eval> to perform conversions, but can
-also be called directly when working with Perl data structures obtained through
-other means.
+Converts a given Perl data structure into its equivalent Sidef representation. This is the underlying method used by C<eval> to perform conversions, but can also be called directly when working with Perl data structures obtained through other means.
 
 B<Parameters:>
 
@@ -218,16 +212,13 @@ B<Supported Conversions:>
 
 =back
 
-B<Note:> Circular references in arrays and hashes are properly handled to avoid
-infinite loops.
+B<Note:> Circular references in arrays and hashes are properly handled to avoid infinite loops.
 
 =head2 tie
 
     Perl.tie(variable, class_name, *args)
 
-Binds a Sidef variable to a Perl package class using Perl's tie mechanism. This allows
-you to use Perl's tied variable interface, such as database file access, persistent
-storage, or custom variable behaviors.
+Binds a Sidef variable to a Perl package class using Perl's tie mechanism. This allows you to use Perl's tied variable interface, such as database file access, persistent storage, or custom variable behaviors.
 
 B<Parameters:>
 
@@ -293,8 +284,7 @@ B<Supported Variable Types:>
 
     Perl.untie(variable)
 
-Unbinds a previously tied variable, breaking the connection to the tied class.
-After untying, the variable returns to normal behavior.
+Unbinds a previously tied variable, breaking the connection to the tied class. After untying, the variable returns to normal behavior.
 
 B<Parameters:>
 
@@ -337,8 +327,7 @@ B<Example:>
 
     Perl.numeric_version
 
-Returns the version of the Perl interpreter as a Number object, suitable for
-numeric comparisons.
+Returns the version of the Perl interpreter as a Number object, suitable for numeric comparisons.
 
 B<Returns:> Number representing the Perl version (e.g., C<5.038>)
 
@@ -354,8 +343,7 @@ B<Example:>
 
     obj.dump
 
-Returns a string representation of the Perl object, showing how it would appear
-in Sidef code (e.g., C<Perl('...')>).
+Returns a string representation of the Perl object, showing how it would appear in Sidef code (e.g., C<Perl('...')>).
 
 B<Returns:> String representation of the object
 
@@ -452,31 +440,21 @@ B<Aliases:> I<dump>, I<to_s>
 
 =over 4
 
-=item * B<Performance:> Crossing the language boundary has overhead. For
-performance-critical code, consider implementing directly in Sidef or Perl
-rather than switching between them frequently.
+=item * B<Performance:> Crossing the language boundary has overhead. For performance-critical code, consider implementing directly in Sidef or Perl rather than switching between them frequently.
 
-=item * B<Error Handling:> Perl errors during evaluation will propagate as
-Sidef exceptions. Wrap Perl evaluation in try-catch blocks when appropriate.
+=item * B<Error Handling:> Perl errors during evaluation will propagate as Sidef exceptions. Wrap Perl evaluation in try-catch blocks when appropriate.
 
-=item * B<Variable Scope:> Each call to C<eval> creates a new evaluation
-context. Variables defined in one evaluation are not accessible in another
-unless you use Perl's package variables.
+=item * B<Variable Scope:> Each call to C<eval> creates a new evaluation context. Variables defined in one evaluation are not accessible in another unless you use Perl's package variables.
 
-=item * B<String Escaping:> When passing Perl code as strings, be mindful of
-escape sequences. Consider using Sidef's raw strings or triple-quoted strings
-for complex Perl code.
+=item * B<String Escaping:> When passing Perl code as strings, be mindful of escape sequences. Consider using Sidef's raw strings or triple-quoted strings for complex Perl code.
 
-=item * B<Memory:> Converted data structures are independent copies. Modifying
-a Sidef structure won't affect the original Perl data and vice versa (except
-for tied variables).
+=item * B<Memory:> Converted data structures are independent copies. Modifying a Sidef structure won't affect the original Perl data and vice versa (except for tied variables).
 
 =back
 
 =head1 SECURITY CONSIDERATIONS
 
-The Perl class executes arbitrary Perl code with the full privileges of the
-Sidef process. This means:
+The Perl class executes arbitrary Perl code with the full privileges of the Sidef process. This means:
 
 =over 4
 
@@ -490,8 +468,7 @@ Sidef process. This means:
 
 =back
 
-Only evaluate Perl code from trusted sources or implement proper input validation
-and sanitization.
+Only evaluate Perl code from trusted sources or implement proper input validation and sanitization.
 
 =head1 SEE ALSO
 

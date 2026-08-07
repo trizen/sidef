@@ -1,14 +1,12 @@
 # Advanced Number Theory with Sidef
 
-A hands-on guide for practitioners, covering Sidef's integer and number-theoretic
-facilities through worked examples.
+A hands-on guide for practitioners, covering Sidef's integer and number-theoretic facilities through worked examples.
 
 ---
 
 ## Operator Precedence via Whitespace
 
-Sidef determines operator priority from surrounding whitespace: an operator written
-**without** spaces binds **tighter** than one surrounded by spaces.
+Sidef determines operator priority from surrounding whitespace: an operator written **without** spaces binds **tighter** than one surrounded by spaces.
 
 ```ruby
 say (3+5 * 6+7)    # means: say((3+5) * (6+7))  — '+' is tight, '*' is loose
@@ -310,8 +308,7 @@ say 10.downto(1, 2)  # 10, 8, 6, ..., with step 2
 
 ### Binary Search
 
-`bsearch` and its variants perform binary search over arbitrarily large integer
-ranges using a comparison block, without needing the range materialized:
+`bsearch` and its variants perform binary search over arbitrarily large integer ranges using a comparison block, without needing the range materialized:
 
 ```ruby
 # Exact root: find k with f(k) == 0
@@ -349,6 +346,7 @@ var (sec, min, hours, days) = seconds.polymod(60, 60, 24)
 ### Complete Factorization
 
 `factor(n)` returns prime factors with repetition (sorted ascending).
+
 `factor_exp(n)` returns `[p, e]` pairs in ascending order of `p`.
 
 ```ruby
@@ -360,8 +358,7 @@ say n.factor
 #=> [3, 5, 17, 257, 641, 65537, 274177, 6700417, 67280421310721]
 ```
 
-An optional block supplies a custom sub-factoring routine. The block receives a
-composite sub-factor and must return an array of (not necessarily prime) factors:
+An optional block supplies a custom sub-factoring routine. The block receives a composite sub-factor and must return an array of (not necessarily prime) factors:
 
 ```ruby
 say factor(10**120 - 10**40, {|k| k.ecm_factor })
@@ -401,8 +398,7 @@ say n.core      # 30         — squarefree part = n / largest_square_divisor(n)
                 #            — aliases: squarefree_part          (A007913)
 ```
 
-`rad(n)` and `core(n)` agree only when n is squarefree. In general
-`core(n) = n / square_part(n)` while `rad(n) = ∏_{p | n} p`.
+`rad(n)` and `core(n)` agree only when n is squarefree. In general `core(n) = n / square_part(n)` while rad(n) = $∏_{p | n} p$.
 
 ```ruby
 say n.valuation(2)  # v_2(720) = 4
@@ -476,7 +472,7 @@ say sopfr_sum(10**6)  # Σ_{k=1}^{10^6} sopfr(k)(A025281)
 
 ## 7. Divisor Functions
 
-### σ_k and τ
+### $σ_k$ and $τ$
 
 ```ruby
 var n = 360
@@ -504,7 +500,7 @@ say n.proper_sigma0  # = τ(n) − 1 = number of proper divisors
 
 ### Divisor System Variants
 
-Sidef implements σ and τ for five divisor systems beyond the standard one:
+Sidef implements $σ$ and $τ$ for five divisor systems beyond the standard one:
 
 | Pair | Type | Key condition | OEIS |
 |---|---|---|---|
@@ -529,9 +525,9 @@ say n.idivisors  # infinitary divisors
 say n.edivisors  # exponential divisors
 ```
 
-A **unitary divisor** d | n has gcd(d, n/d) = 1, forcing each prime entirely into d
-or entirely into n/d. For p^a the unitary divisors are 1 and p^a.
-**Exponential divisors** of n = ∏ p_i^{e_i} are ∏ p_i^{b_i} with b_i | e_i.
+A **unitary divisor** $d | n$ has $\gcd(d, n/d) = 1$, forcing each prime entirely into $d$ or entirely into $n/d$. For $p^a$ the unitary divisors are $1$ and $p^a$.
+
+**Exponential divisors** of $n = ∏ p_i^{e_i}$ are $∏ p_i^{b_i}$ with $b_i | e_i$.
 
 ```ruby
 # Non-divisor complements:
@@ -571,8 +567,7 @@ say n.power_udivisors(2)  # unitary square divisors
 
 ### Iterating and Reducing over Divisors
 
-The `divisors_each`, `divisors_map`, `divisors_sum`, and `divisors_prod` methods
-iterate lazily over the divisors of n:
+The `divisors_each`, `divisors_map`, `divisors_sum`, and `divisors_prod` methods iterate lazily over the divisors of $n$:
 
 ```ruby
 # Sum of φ(d)^2 over all d | 5040:
@@ -584,8 +579,7 @@ say 120.divisors_sum {|d| d.is_prime ? d : 0 }  # 2+3+5 = 10
 
 ### Antidivisors
 
-The **antidivisors** of n (A066272) are integers d > 1 for which
-2n ≡ ±1 (mod d), but d does not divide n:
+The **antidivisors** of $n$ (A066272) are integers $d > 1$ for which $2n \equiv ±1 \pmod{d})$, but $d$ does not divide $n$:
 
 ```ruby
 say  14.antidivisors       # [3, 4, 9]
@@ -614,9 +608,9 @@ say nth_tau_inverse(1, 6)       # smallest n with τ(n) = 6  → 12
 ### Perfect, Abundant, Deficient
 
 ```ruby
-say  6.is_perfect    # σ(6) = 12 = 2·6  ✓
-say 12.is_abundant   # σ(12) = 28 > 24   ✓
-say  8.is_deficient  # σ(8)  = 15 < 16   ✓
+say  6.is_perfect    # σ(6) = 12 = 2·6
+say 12.is_abundant   # σ(12) = 28 > 24
+say  8.is_deficient  # σ(8)  = 15 < 16
 
 say 12.abundancy_index  # σ(n)/n = 7/3 as exact rational
 
@@ -628,7 +622,7 @@ say 12.is_practical           # every m ≤ σ(12) is a sum of distinct divisors
 
 ## 8. Euler's Totient and Variants
 
-### φ(n) and Its Partial Sum
+### $φ(n)$ and Its Partial Sum
 
 ```ruby
 say 36.euler_phi  # φ(36) = 12    (aliases: phi, totient, eulerphi)
@@ -661,9 +655,9 @@ say 14.is_totient  # false — 14 is a nontotient (all odd integers > 1 are nont
 say 12.is_totient  # true
 ```
 
-### Carmichael's λ
+### Carmichael's $λ$
 
-λ(n) is the exponent of (ℤ/nℤ)* — the lcm of the element orders:
+$λ(n)$ is the exponent of $(ℤ/nℤ)*$ — the lcm of the element orders:
 
 ```ruby
 say 12.carmichael_lambda  # λ(12) = 2
@@ -681,9 +675,9 @@ say 13.is_cyclic  # true   (A003277)
 say 12.is_cyclic  # false
 ```
 
-### Jordan's Totient J_k(n)
+### Jordan's Totient $J_k(n)$
 
-J_k(n) = n^k ∏_{p|n} (1 − p^{-k}). For k = 1 this is φ(n).
+$J_k(n) = n^k ∏_{p|n} (1 − p^{-k})$. For $k = 1$ this is $φ(n)$.
 
 ```ruby
 say 12.jordan_totient(1)  # = φ(12) = 4
@@ -699,9 +693,9 @@ say jordan_totient_sum(10**6, 2)  # alias: totient_sum(10^6, 2)
 say jordan_totient_sum(10**6, 3)
 ```
 
-### Dedekind's ψ
+### Dedekind's $ψ$
 
-ψ(n) = n ∏_{p|n} (1 + p^{-1}) — the multiplicative analog of φ in the unitary setting:
+$ψ(n) = n ∏_{p|n} (1 + p^{-1})$ — the multiplicative analog of $φ$ in the unitary setting:
 
 ```ruby
 say 12.dedekind_psi  # ψ(12) = 12 · 3/2 · 4/3 = 24   (alias: psi)
@@ -731,7 +725,7 @@ say 120.uphi_inverse  # all x with uphi(x) = 120
 
 ## 9. Möbius Function and Multiplicative Structure
 
-### μ(n) and Mertens M(n)
+### $μ(n)$ and Mertens $M(n)$
 
 ```ruby
 say  1.moebius  #  1   (aliases: mu, mobius)
@@ -751,9 +745,9 @@ for e in (1..9) {
 say mertens(21, 123)
 ```
 
-### Liouville's λ(n)
+### Liouville's $λ(n)$
 
-λ(n) = (−1)^{Ω(n)}:
+$λ(n) = (−1)^{Ω(n)}$:
 
 ```ruby
 say 12.liouville  # (−1)^3 = −1   (12 = 2^2·3, Ω=3)
@@ -766,10 +760,11 @@ say liouville_sum(10**9)
 say 906180359.liouville_sum  #=> 1  (first n with L(n) > 0)
 ```
 
-### Mangoldt's Λ(n)
+### Mangoldt's $Λ(n)$
 
-Λ(n) = log p if n = p^k for prime p, else 0.
-The integer version `exp_mangoldt(n)` = p if n = p^k, else 1:
+$Λ(n) = log p$ if $n = p^k$ for prime $p$, else $0$.
+
+The integer version `exp_mangoldt(n)` = $p$ if $n = p^k$, else $1$:
 
 ```ruby
 say  8.exp_mangoldt  # 2   — 8 = 2^3
@@ -783,29 +778,29 @@ say 1000.exp_mangoldt_sum  # A072107
 
 ### Pillai's Arithmetical Function
 
-f(n) = Σ_{k=1}^n gcd(k, n) (A018804):
+$f(n) = Σ_{k=1}^n gcd(k, n)$ (A018804):
 
 ```ruby
 say 12.pillai  # 40
 
 # Identity: pillai(n) = Σ_{d|n} φ(d)·(n/d)
-say 12.divisors_sum {|d| d.euler_phi * (12/d) }  # 40 ✓
+say 12.divisors_sum {|d| d.euler_phi * (12/d) }  # 40
 
 say 1000.pillai_sum  # Σ_{k=1}^{1000} pillai(k)
 ```
 
 ### Ramanujan's Sum
 
-c_q(n) = Σ_{1≤k≤q, gcd(k,q)=1} e^{2πikn/q} — always an integer:
+$c_q(n) = Σ_{1≤k≤q, \gcd(k,q)=1} e^{2πikn/q}$ — always an integer:
 
 ```ruby
-say 5.ramanujan_sum(1)  # c_5(1) = μ(5) = −1
+say 1.ramanujan_sum(5)  # c_5(1) = μ(5) = −1
 say 5.ramanujan_sum(5)  # c_5(5) = φ(5) = 4
 
 # Identity: c_q(n) = μ(q/gcd(q,n)) · φ(q) / φ(q/gcd(q,n)):
-var q = 12; var n = 8
+var (q,n) = (12,8)
 var g = q.gcd(n)
-say (moebius(q/g) * q.euler_phi / euler_phi(q/g) == q.ramanujan_sum(n))  # true
+say (moebius(q/g) * q.euler_phi / euler_phi(q/g) == n.ramanujan_sum(q))  # true
 ```
 
 ### Verifying Multiplicative Identities
@@ -815,21 +810,21 @@ var n = 360
 
 # φ = μ * id: Σ_{d|n} μ(d)·(n/d) = φ(n)
 say n.divisors_sum {|d| d.moebius * (n/d) }  # = φ(360) = 96
-say n.euler_phi                              # 96 ✓
+say n.euler_phi                              # 96
 
 # n = Σ_{d|n} φ(d):
-say n.divisors_sum {|d| d.euler_phi }  # = 360 ✓
+say n.divisors_sum {|d| d.euler_phi }  # = 360
 ```
 
 ---
 
 ## 10. Prime Counting and Distribution
 
-### π(n) — Exact, Range, and Approximate
+### $π(n)$ — Exact, Range, and Approximate
 
 ```ruby
 say prime_count(10**6)  # π(10^6) = 78498 — exact, sublinear
-                           # aliases: primepi, count_primes, pi (the method)
+                        # aliases: primepi, count_primes, pi (the method)
 
 say primepi(10**12)  #=> 37607912018
 
@@ -853,9 +848,9 @@ say 100.prime_lower  # lower bound on p_{100}  (alias: nth_prime_lower)
 say 100.prime_upper  # upper bound
 ```
 
-### Legendre's ϕ(n, k)
+### Legendre's $ϕ(n, k)$
 
-Counts integers in [1, n] coprime to the product of the first k primes:
+Counts integers in $[1, n]$ coprime to the product of the first $k$ primes:
 
 ```ruby
 say legendre_phi(100, 4)  # integers ≤ 100 coprime to 2·3·5·7
@@ -863,7 +858,7 @@ say legendre_phi(100, 4)  # integers ≤ 100 coprime to 2·3·5·7
 # Legendre's formula: π(n) = legendre_phi(n, π(√n)) + π(√n) − 1:
 var sqn = 100.isqrt
 say legendre_phi(100, sqn.prime_count) + sqn.prime_count - 1  # = 25
-say primepi(100)                                              # 25 ✓
+say primepi(100)                                              # 25
 ```
 
 ### Twin Primes and Prime Constellations
@@ -896,9 +891,9 @@ say inverse_count(25, { .prime_count })  # ≈ 97 (25th prime ≈ 97)
 say inverse_count(100, { |n| 10.smooth_count(n) })
 ```
 
-### Almost-Prime Counting π_k(n)
+### Almost-Prime Counting $π_k(n)$
 
-The receiver is the order k:
+The receiver is the order $k$:
 
 ```ruby
 say 1.almost_prime_count(100)      # = prime_count(100) = 25
@@ -909,8 +904,7 @@ say 3.almost_prime_count(100)
 
 ### Composite Numbers
 
-`composite(n)` (alias: `nth_composite`) returns the n-th composite.
-`composite_count(n)` counts composites ≤ n; `composite_sum(n)` sums them.
+`composite(n)` (alias: `nth_composite`) returns the n-th composite. `composite_count(n)` counts composites ≤ n; `composite_sum(n)` sums them.
 
 ```ruby
 say composite(10**9)  # 1053422339 — 10^9-th composite
@@ -1000,8 +994,7 @@ say   2.nd { .is_prime }  # 3
 
 ## 12. Integer Factorization Algorithms
 
-`factor(n)` dispatches automatically. The individual methods below let you target
-specific algebraic structures.
+`factor(n)` dispatches automatically. The individual methods below let you target specific algebraic structures.
 
 ### Trial Division
 
@@ -1011,7 +1004,7 @@ say ((17 * 19 * 100003).trial_factor(200))  # finds 17 and 19
 
 ### Fermat and Hart
 
-Effective when the factors are close (n = a² − b² with small a − b):
+Effective when the factors are close ($n = a² − b²$ with small $a − b$):
 
 ```ruby
 say ((1000003 * 1000033).fermat_factor)  # fast — factors differ by 30
@@ -1037,7 +1030,7 @@ say n.pp1_factor(100000)  # Williams p+1: exploits Lucas sequences (alias: pplus
 
 ### Elliptic Curve Method (ECM)
 
-Best general-purpose method for factors of 20–60 digits:
+Best general-purpose method for factors of $20–60$ digits:
 
 ```ruby
 var n = 2**128 + 1
@@ -1133,12 +1126,12 @@ say znlog(3, 2, 13)  # 4  — since 2^4 ≡ 3 (mod 13)
 say znlog(5, 3, 7)   # 5  — since 3^5 ≡ 5 (mod 7)
 
 var k = znlog(3, 2, 13)
-say (powmod(2, k, 13) == 3)  # true ✓
+say (powmod(2, k, 13) == 3)  # true
 ```
 
 ### Linear Congruences and CRT
 
-ax ≡ b (mod m) is solvable iff gcd(a, m) | b:
+$ax \equiv b \pmod{m}$ is solvable iff $\gcd(a, m) | b$:
 
 ```ruby
 say linear_congruence(7, 5, 12)  # 7x ≡ 5 (mod 12) → all solutions mod 12
@@ -1205,9 +1198,7 @@ say kronecker(2, -1)  # Kronecker symbol extension
 say kronecker(-1, 5)  # (−1)^{(5−1)/2} = 1
 ```
 
-The Jacobi symbol (a/n) = 1 does **not** imply a is a QR mod n — only the Legendre
-symbol at a prime guarantees that. This asymmetry underlies the Euler pseudoprime test
-and the Solovay-Strassen algorithm.
+The Jacobi symbol $(a/n) = 1$ does **not** imply $a$ is a QR mod $n$ — only the Legendre symbol at a prime guarantees that. This asymmetry underlies the Euler pseudoprime test and the Solovay-Strassen algorithm.
 
 ### Quadratic Residuosity and Square Roots
 
@@ -1248,7 +1239,7 @@ say iquadratic_formula(1, -5, 6)  # x^2 − 5x + 6 = 0  →  [2, 3]
 
 ### Cornacchia's Algorithm
 
-Express a prime p as x² + d·y²:
+Express a prime $p$ as $x² + d·y²$:
 
 ```ruby
 say 29.cornacchia(1)  # [5, 2]: 5^2 + 1·2^2 = 29
@@ -1269,26 +1260,26 @@ say solve_quadratic_form(1, 0, 1, 5)  # x^2 + y^2 = 5
 
 ## 15. Dirichlet Convolution
 
-(f * g)(n) = Σ_{d|n} f(d) g(n/d):
+$(f * g)(n) = Σ_{d|n} f(d) g(n/d)$:
 
 ```ruby
 var n = 12
 
 # σ = id * 1:
 say n.dirichlet_convolution({|d| d }, {|d| 1 })
-say n.sigma  # 28 ✓
+say n.sigma  # 28
 
 # τ = 1 * 1:
 say n.dirichlet_convolution({|d| 1 }, {|d| 1 })
-say n.sigma0  # 6 ✓
+say n.sigma0  # 6
 
 # φ = μ * id:
 say n.dirichlet_convolution({|d| d.moebius }, {|d| d })
-say n.euler_phi  # 4 ✓
+say n.euler_phi  # 4
 
 # ψ = |μ| * id (Dedekind psi):
 say n.dirichlet_convolution({|d| d.moebius.abs }, {|d| d })
-say n.dedekind_psi  # ✓
+say n.dedekind_psi
 ```
 
 ### Möbius Inversion
@@ -1299,26 +1290,26 @@ If g = f * **1**, then f = g * **μ**:
 var n = 60
 
 # σ = id * 1, so id = σ * μ:
-say n.dirichlet_convolution({|d| d.sigma }, {|d| d.moebius })  # = 60 ✓
+say n.dirichlet_convolution({|d| d.sigma }, {|d| d.moebius })  # = 60
 
 # τ = 1 * 1, so 1 = τ * μ:
-say n.dirichlet_convolution({|d| d.tau }, {|d| d.moebius })  # = 1 ✓
+say n.dirichlet_convolution({|d| d.tau }, {|d| d.moebius })  # = 1
 ```
 
 ### The Dirichlet Hyperbola Method
 
-Computes Σ_{n≤x} (f*g)(n) in O(x^{1/2}) given partial-sum functions for f and g:
+Computes $Σ_{n≤x} (f*g)(n)$ in $O(x^{1/2})$ given partial-sum functions for $f$ and $g$:
 
 ```ruby
 var n = 10**6
 
 # Σ_{k≤n} τ(k): the classical Dirichlet divisor problem
 say n.dirichlet_hyperbola({|k| 1 }, {|k| 1 }, {|k| k }, {|k| k })
-say n.tau_sum  # same ✓
+say n.tau_sum  # same
 
 # Σ_{k≤n} σ(k):
 say n.dirichlet_hyperbola({|k| k }, {|k| 1 }, {|k| k*(k+1)/2 }, {|k| k })
-say n.sigma_sum  # same ✓
+say n.sigma_sum  # same
 ```
 
 ### General Partial Sum
@@ -1333,8 +1324,7 @@ say 1000.dirichlet_sum {|k| k.euler_phi }  # = totient_sum(1000)
 
 ## 16. Arithmetic Derivative
 
-The arithmetic derivative n' is uniquely determined by 1' = 0, p' = 1 for all primes,
-and (ab)' = a'b + ab'. For n = ∏ p_i^{e_i}: n' = n · Σ_{p^e || n} e/p.
+The arithmetic derivative $n'$ is uniquely determined by $1' = 0$, $p' = 1$ for all primes, and $(ab)' = a'b + ab'$. For $n = ∏ p_i^{e_i}$: $n' = n · Σ_{p^e || n} e/p$.
 
 ```ruby
 say 1.arithmetic_derivative   # 0
@@ -1353,17 +1343,17 @@ for (a, b) in ([[6, 10], [12, 35], [15, 28]]) {
 
 ### Logarithmic Derivative
 
-n'/n = Σ_{p^e || n} e/p — an exact rational:
+$n'/n = Σ_{p^e || n} e/p$ — an exact rational:
 
 ```ruby
 # 360 = 2^3·3^2·5 → 360'/360 = 3/2 + 2/3 + 1/5 = 61/30
 say 360.logarithmic_derivative       # 61/30
-say 360.arithmetic_derivative / 360  # same ✓
+say 360.arithmetic_derivative / 360  # same
 ```
 
 ### Fixed Points (n' = n)
 
-n' = n iff n = p^p for some prime p:
+$n' = n$ iff $n = p^p$ for some prime $p$:
 
 ```ruby
 say 4.arithmetic_derivative == 4    # true  — 2^2
@@ -1391,7 +1381,7 @@ say Num.pi.convergents(5)
 
 say 7.sqrt.convergents(8)
 #=> [2/1, 3/1, 5/2, 8/3, 11/4, 19/7, 30/11, 49/18]
-# Note: 8^2 − 7·3^2 = 1 ✓ — p_3/q_3 is the fundamental Pell solution
+# Note: 8^2 − 7·3^2 = 1 — p_3/q_3 is the fundamental Pell solution
 ```
 
 ### Farey Sequences and Best Approximations
@@ -1406,7 +1396,7 @@ say Num.pi.rat_approx(1000)  # 355/113
 
 ### Pell's Equation x² − D·y² = 1
 
-The fundamental solution comes from the convergents of √D:
+The fundamental solution comes from the convergents of $√D$:
 
 ```ruby
 say solve_pell(2)   # [[3, 2]]:  3^2 − 2·2^2 = 1
@@ -1427,12 +1417,14 @@ for k in (1..5) {
 ```
 
 Period length parity determines which convergent gives the fundamental solution:
-even period → convergent p_{ℓ−1}/q_{ℓ−1};
-odd period → convergent p_{2ℓ−1}/q_{2ℓ−1}.
+
+even period → convergent $p_{ℓ−1}/q_{ℓ−1}$;
+
+odd period → convergent $p_{2ℓ−1}/q_{2ℓ−1}$.
 
 ### Pisano Periods
 
-The Pisano period π(m) is the period of the Fibonacci sequence mod m:
+The Pisano period $π(m)$ is the period of the Fibonacci sequence mod $m$:
 
 ```ruby
 say 10.pisano_period  # π(10) = 60
@@ -1448,7 +1440,7 @@ for p in (primes(3, 50)) {
 
 ### General Lucas Sequences
 
-U_n(P, Q) and V_n(P, Q) unify Fibonacci, Lucas, Pell, Jacobsthal, and many more:
+$U_n(P, Q)$ and $V_n(P, Q)$ unify Fibonacci, Lucas, Pell, Jacobsthal, and many more:
 
 ```ruby
 say 20.of {|n| lucasU(1, -1, n) }  # Fibonacci numbers  (P=1, Q=-1)
@@ -1466,8 +1458,7 @@ say fibonaccimod(10**18, 10**9 + 7)
 
 ## 18. Sublinear Summation
 
-All functions here run in O(n^{1/2}) or O(n^{2/3}) time via sieve or
-hyperbola methods.
+All functions here run in $O(n^{1/2})$ or $O(n^{2/3})$ time via sieve or hyperbola methods.
 
 ### Divisor Function Sums
 
@@ -1541,7 +1532,7 @@ say ((n.totient_sum / (3*n**2 / Num.pi**2)).as_float)  # → 1
 ### Smooth and Rough Numbers
 
 ```ruby
-say 720.is_smooth(5)               # all prime factors ≤ 5 ✓
+say 720.is_smooth(5)               # all prime factors ≤ 5
 say 7.smooth_count(1000)           # count of 7-smooth numbers ≤ 1000
 say 1000.smooth_numbers(7.primes)  # full list
 
@@ -1612,7 +1603,7 @@ say 100.squarefree_semiprime_count  # A072613
 say 100.squarefree_semiprimes
 
 # ω-primes: ω(n) = k
-say 30.is_omega_prime(3)  # 30 = 2·3·5, ω = 3 ✓
+say 30.is_omega_prime(3)  # 30 = 2·3·5, ω = 3
 say 100.omega_prime_count(2)
 say 50.next_omega_prime(3)
 ```
@@ -1622,8 +1613,8 @@ say 50.next_omega_prime(3)
 Product of exactly 3 distinct primes:
 
 ```ruby
-say 30.is_sphenic  # 30 = 2·3·5 ✓
-say 42.is_sphenic  # 42 = 2·3·7 ✓
+say 30.is_sphenic  # 30 = 2·3·5
+say 42.is_sphenic  # 42 = 2·3·7
 say 12.is_sphenic  # false — 12 = 2^2·3
 
 say 100.sphenic_count
@@ -1684,8 +1675,7 @@ say nth_tau_inverse(100, 6)  # 100th integer with exactly 6 divisors
 
 ### Practical Numbers
 
-n is **practical** (A005153) if every m ≤ σ(n) is a sum of distinct divisors of n.
-Primorials and even perfect numbers are practical:
+n is **practical** (A005153) if every $m ≤ σ(n)$ is a sum of distinct divisors of $n$. Primorials and even perfect numbers are practical:
 
 ```ruby
 say 12.is_practical  # true
@@ -1708,8 +1698,7 @@ for n in (2..10000) {
 
 ### Collatz Steps
 
-`collatz(n)` returns the **step count** to reach 1 in the 3x+1 map,
-not the trajectory:
+`collatz(n)` returns the **step count** to reach $1$ in the $3x+1$ map, not the trajectory:
 
 ```ruby
 say 27.collatz  # 111 — notorious long chain
@@ -1729,7 +1718,7 @@ for n in (1..100) {
 
 ### Fermat Pseudoprimes
 
-n is a Fermat psp(a) if n is composite and a^{n−1} ≡ 1 (mod n):
+$n$ is a Fermat psp(a) if $n$ is composite and $a^{n−1} ≡ 1 (mod n)$:
 
 ```ruby
 say 341.is_fermat_psp(2)  # true — first psp(2)  (alias: is_fermat_pseudoprime)
@@ -1740,7 +1729,7 @@ say 561.is_fermat_psp(2)  # true — first Carmichael number
 
 ### Strong Pseudoprimes
 
-Write n−1 = 2^s·d. n is a strong psp(a) if a^d ≡ 1 or a^{2^r·d} ≡ −1 for some r < s:
+Write $n−1 = 2^s·d$. Then, $n$ is a strong psp(a) if $a^d ≡ 1$ or $a^{2^r·d} ≡ −1$ for some $r < s$:
 
 ```ruby
 say 2047.is_strong_psp(2)  # first spsp(2)  (alias: is_strong_fermat_psp, miller_rabin)
@@ -1752,8 +1741,7 @@ say 4.strong_fermat_psp(2, 10**6)
 
 ### Carmichael Numbers
 
-By Korselt's criterion: n is Carmichael iff n is squarefree, composite,
-and (p−1) | (n−1) for all p | n. Equivalently: λ(n) | n−1.
+By Korselt's criterion: $n$ is Carmichael iff n is squarefree, composite, and $(p−1) | (n−1)$ for all $p | n$. Equivalently: $λ(n) | n−1$.
 
 ```ruby
 say 561.is_carmichael  # 561 = 3·11·17
@@ -1768,7 +1756,7 @@ func korselt(n) {
 }
 say korselt(561)  # true
 
-say ((561-1) % 561.carmichael_lambda == 0)  # true — λ(n) | n−1 ✓
+say ((561-1) % 561.carmichael_lambda == 0)  # true — λ(n) | n−1
 
 # Enumerate; receiver is the factor-count k:
 say 3.carmichael(100000)                  # 3-prime-factor Carmichaels ≤ 100000
@@ -1779,10 +1767,10 @@ say 3.carmichael_strong_fermat(2, 10**7)  # strong-Fermat Carmichaels
 
 ### Lucas Carmichael Numbers
 
-(p+1) | (n+1) for all p | n:
+$(p+1) | (n+1)$ for all $p | n$:
 
 ```ruby
-say 399.is_lucas_carmichael  # 399 = 3·7·19: 4|400, 8|400, 20|400 ✓
+say 399.is_lucas_carmichael  # 399 = 3·7·19: 4|400, 8|400, 20|400
 lucas_carmichael_each(1, 100000, {|n| say n })
 ```
 
@@ -1820,7 +1808,7 @@ say partition_count(100)  # p(100) = 190569292  (alias: partition_number)
 
 ### Multiplicative Partitions
 
-All factorisations of n into integers > 1 (A001055):
+All factorisations of $n$ into integers > 1 (A001055):
 
 ```ruby
 say multiplicative_partitions(30)
@@ -1850,8 +1838,7 @@ say stirling3(5, 2)  # Lah numbers
 
 ### Derangements and Rencontres Numbers
 
-`subfactorial(n, k)` = number of permutations of n elements with exactly k fixed
-points (D(n, k) — the rencontres numbers; A000166 for k=0):
+`subfactorial(n, k)` = number of permutations of $n$ elements with exactly $k$ fixed points ($D(n, k)$ — the rencontres numbers; A000166 for $k=0$):
 
 ```ruby
 say 20.of { .subfactorial }     # D(n, 0): derangements  (A000166)
@@ -1927,7 +1914,7 @@ say binomialmod(1e10, 1e5, 20!)  # C(10^10, 10^5) mod 20!
 
 ### Ramanujan's τ Function
 
-τ(n) is the coefficient of q^n in Δ(q) = q ∏_{k≥1}(1−q^k)^{24}:
+$τ(n)$ is the coefficient of $q^n$ in $Δ(q) = q ∏_{k≥1}(1−q^k)^{24}$:
 
 ```ruby
 say 1.ramanujan_tau  #  1
@@ -1948,7 +1935,7 @@ for p in (primes(2, 50)) {
 
 ### Smarandache / Kempner Function
 
-S(n) = smallest m with n | m! (alias: `kempner`):
+S(n) = smallest $m$ with $n | m!$ (alias: `kempner`):
 
 ```ruby
 say 1.smarandache  # 1
@@ -1969,7 +1956,7 @@ say cyclotomic(6, 2)   # Φ_6(2) = 3
 
 # Product identity x^n − 1 = ∏_{d|n} Φ_d(x):
 say 12.divisors_prod {|d| cyclotomic(d, 2) }  # = 2^12 − 1 = 4095
-say (2**12 - 1)                               # 4095 ✓
+say (2**12 - 1)                               # 4095
 
 say cyclotomicmod(12, 2, 10**9 + 7)  # Φ_{12}(2) mod 10^9+7
 ```
@@ -2001,12 +1988,12 @@ say irregular.first(10)  #=> [37, 59, 67, 101, 103, 131, 149, 157, 233, 257]
 
 ### Faulhaber's Formula
 
-Σ_{k=1}^n k^p exactly, via Bernoulli numbers:
+$Σ_{k=1}^n k^p$ exactly, via Bernoulli numbers:
 
 ```ruby
 say faulhaber_sum(100, 1)  # Σ k   = 5050
 say faulhaber_sum(100, 2)  # Σ k^2 = 338350
-say faulhaber_sum(100, 3)  # Σ k^3 = 25502500 = 5050^2 ✓
+say faulhaber_sum(100, 3)  # Σ k^3 = 25502500 = 5050^2
 
 # Range sum Σ_{k=a}^b k^p:
 say faulhaber_range(50, 100, 2)  # Σ_{k=50}^100 k^2
@@ -2046,7 +2033,7 @@ See Section 21. `subfactorial(n, k)` = D(n, k) (rencontres numbers).
 
 ### Perrin Sequence
 
-A(0)=3, A(1)=0, A(2)=2, A(n) = A(n−2) + A(n−3). Prime test: p prime → p | A(p):
+$A(0)=3, A(1)=0, A(2)=2, A(n) = A(n−2) + A(n−3)$. Prime test: $p$ prime → $p | A(p)$:
 
 ```ruby
 for p in (primes(3, 50)) {
@@ -2060,7 +2047,7 @@ say perrinmod(271441, 271441)  # 0 — passes despite being composite
 
 ### Padovan Sequence
 
-A(0)=1, A(1)=0, A(2)=0, A(n) = A(n−2) + A(n−3) (A000931):
+$A(0)=1, A(1)=0, A(2)=0, A(n) = A(n−2) + A(n−3)$ (A000931):
 
 ```ruby
 say 20.of {|n| padovan(n) }
@@ -2093,7 +2080,7 @@ say 5.superprimorial  # product of first n primorials (A006939)
 
 ### Primitive Parts
 
-`n.primitive_part(f)` returns the primitive part of f(n) relative to f(d) for d | n:
+`n.primitive_part(f)` returns the primitive part of $f(n)$ relative to $f(d)$ for $d | n$:
 
 ```ruby
 func f(n) { n.fibonacci }
@@ -2101,13 +2088,12 @@ func a(n) { n.primitive_part(f) }
 
 say 20.of {|n| a(n) }
 # Verify: f(n) = ∏_{d|n} a(d)
-say (12.divisors_prod {|d| a(d) } == f(12))  # true ✓
+say (12.divisors_prod {|d| a(d) } == f(12))  # true
 ```
 
 ### Classical Orthogonal Polynomials
 
-All of the following, when called without the evaluation point `x`, return a
-`Polynomial` object; supplying `x` evaluates the polynomial directly.
+All of the following, when called without the evaluation point `x`, return a `Polynomial` object; supplying `x` evaluates the polynomial directly.
 
 ```ruby
 say chebyshevT(5)     # T_5(x) as a Polynomial          (alias: chebyshevt)
@@ -2194,8 +2180,7 @@ say n.is_chebyshev  # odd composite Chebyshev pseudoprime (A175530)  (alias: is_
 
 ## 23. Trigonometric & Hyperbolic Functions
 
-Sidef provides the full complement of circular and hyperbolic functions and their
-inverses, all operating in radians and extending naturally to complex arguments.
+Sidef provides the full complement of circular and hyperbolic functions and their inverses, all operating in radians and extending naturally to complex arguments.
 
 ### Circular Functions
 
@@ -2352,7 +2337,7 @@ say complex(3, 4)  # 3+4i     — equivalent to Complex(3, 4)
 say 5.complex      # 5+0i     — real number lifted to complex
 
 say (3+4i).re     # 3   — real part           (alias: real)
-say (3+4i).im     # 4   — imaginary part       (aliases: imag, imaginary)
+say (3+4i).im     # 4   — imaginary part      (aliases: imag, imaginary)
 say (3+4i).parts  # [3, 4]
 say reals(3+4i)   # (3, 4) as a list
 
@@ -2364,7 +2349,7 @@ say (3+4i).pair(0)  # combine via a.pair(b) == Complex(a, b)
 ```ruby
 say (3+4i).abs   # 5   — modulus
 say norm(3+4i)   # 25  — abs(x)^2
-say (3+4i).arg   # phase angle in radians   (aliases: angle, phase)
+say (3+4i).arg   # phase angle in radians    (aliases: angle, phase)
 say (3+4i).conj  # 3-4i  — complex conjugate (fixed point for reals)
 
 say cis(Num.pi/2)  # cos(x) + sin(x)i  — Euler's formula, i
@@ -2383,16 +2368,15 @@ say is_imag(4i)    # true    (alias: is_imag)
 
 ### Complex Arithmetic on Component Pairs
 
-These operate directly on real/imaginary component pairs `(a, b)` representing
-`a + bi`, useful for high-performance code that avoids allocating Complex objects:
+These operate directly on real/imaginary component pairs $(a, b)$ representing $a + bi$, useful for high-performance code that avoids allocating Complex objects:
 
 ```ruby
 say [cadd(2, 3, 1, 1)]       # (3, 4)                       (alias: complex_add)
 say [csub(2, 3, 1, 1)]       # (1, 2)                       (alias: complex_sub)
-say [cmul(2, 3, 1, 1)]       # (a*x-b*y, a*y+b*x) = (-1, 5)  (alias: complex_mul)
-say [cdiv(2, 3, 1, 1)]       # complex division              (alias: complex_div)
-say [cmod(7, 9, 5)]          # (2, 4)  — componentwise mod    (alias: complex_mod)
-say [cpow(3, 4, 10)]         # (3+4i)^10, as (re, im)         (alias: complex_pow)
+say [cmul(2, 3, 1, 1)]       # (a*x-b*y, a*y+b*x) = (-1, 5) (alias: complex_mul)
+say [cdiv(2, 3, 1, 1)]       # complex division             (alias: complex_div)
+say [cmod(7, 9, 5)]          # (2, 4)  — componentwise mod  (alias: complex_mod)
+say [cpow(3, 4, 10)]         # (3+4i)^10, as (re, im)       (alias: complex_pow)
 say [complex_ipow(3, 4, 5)]  # integer-exponent variant
 say complex_cmp(2, 3, 2, 3)  # (a<=>x) || (b<=>y)
 ```
@@ -2419,8 +2403,7 @@ say kronecker_delta(3, 4)        # 0
 
 ## 26. Random Number Generation
 
-All of Sidef's integer random-number facilities are backed by a cryptographically
-secure ISAAC-32 CSPRNG.
+All of Sidef's integer random-number facilities are backed by a cryptographically secure ISAAC-32 CSPRNG.
 
 ### Random Integers and Floats
 

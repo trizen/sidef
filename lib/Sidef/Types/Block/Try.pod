@@ -178,7 +178,7 @@ While Sidef doesn't have a finally clause, you can ensure cleanup by placing cle
     catch { |e|
         say "Error: #{e}"
     }
-    
+
     # Cleanup always happens
     file && file.close
 
@@ -247,18 +247,18 @@ Provide default values when operations fail:
             return nil
         }
     }
-    
+
     var nums = ["42", "abc", "123", "xyz"].map { |s|
         parse_number(s)
     }.grep { defined(_) }
-    
+
     say nums  # [42, 123]
 
 =head2 Example 3: Retry Logic
 
     func fetch_with_retry(url, max_attempts = 3) {
         var attempts = 0
-        
+
         loop {
             try {
                 return fetch_url(url)

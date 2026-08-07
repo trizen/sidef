@@ -6,21 +6,11 @@ Sidef::Module::Func - Functional interface for Perl modules used from Sidef
 
 =head1 DESCRIPTION
 
-This class provides a functional (non-OO) bridge between Sidef and Perl modules, enabling
-Sidef code to call Perl functions exported by a module as if they were methods on an object.
-It is the underlying mechanism that powers Sidef's C<frequire()> built-in function and
-the C<%S> module literal syntax.
+This class provides a functional (non-OO) bridge between Sidef and Perl modules, enabling Sidef code to call Perl functions exported by a module as if they were methods on an object. It is the underlying mechanism that powers Sidef's C<frequire()> built-in function and the C<%S> module literal syntax.
 
-When a Perl module is loaded with C<frequire()>, the resulting object is an instance of
-C<Sidef::Module::Func>. Any method call on that object is intercepted by C<AUTOLOAD> and
-dispatched as a fully-qualified function call into the module's namespace
-(i.e., C<Module::Name::function_name(@args)>), with arguments and return values
-transparently converted between Sidef and Perl types.
+When a Perl module is loaded with C<frequire()>, the resulting object is an instance of C<Sidef::Module::Func>. Any method call on that object is intercepted by C<AUTOLOAD> and dispatched as a fully-qualified function call into the module's namespace (i.e., C<Module::Name::function_name(@args)>), with arguments and return values transparently converted between Sidef and Perl types.
 
-This is distinct from C<Sidef::Module::OO>, which wraps a Perl object and dispatches
-method calls on it. C<Sidef::Module::Func> instead calls free functions (package functions)
-in the module's namespace directly, making it suitable for functional-style Perl modules
-such as C<POSIX>, C<List::Util>, C<Scalar::Util>, and similar.
+This is distinct from C<Sidef::Module::OO>, which wraps a Perl object and dispatches method calls on it. C<Sidef::Module::Func> instead calls free functions (package functions) in the module's namespace directly, making it suitable for functional-style Perl modules such as C<POSIX>, C<List::Util>, C<Scalar::Util>, and similar.
 
 =head1 SYNOPSIS
 
@@ -62,8 +52,7 @@ such as C<POSIX>, C<List::Util>, C<Scalar::Util>, and similar.
 
     Sidef::Module::Func->__NEW__($module)
 
-Constructs a new C<Sidef::Module::Func> wrapper around the given Perl module name.
-The module must already be loaded (C<require>d) before or during construction.
+Constructs a new C<Sidef::Module::Func> wrapper around the given Perl module name. The module must already be loaded (C<require>d) before or during construction.
 
 B<Parameters:>
 
@@ -75,21 +64,15 @@ B<Parameters:>
 
 B<Returns:> A new C<Sidef::Module::Func> object
 
-B<Note:> This constructor is used internally by the Sidef runtime. In Sidef code, use
-C<frequire()> or the C<%S> syntax instead of calling C<__NEW__> directly.
+B<Note:> This constructor is used internally by the Sidef runtime. In Sidef code, use C<frequire()> or the C<%S> syntax instead of calling C<__NEW__> directly.
 
 =head2 AUTOLOAD
 
     $func_obj->some_function(@args)
 
-All method calls on a C<Sidef::Module::Func> object are intercepted by C<AUTOLOAD> and
-forwarded as function calls into the wrapped module's namespace. For example, calling
-C<$obj-E<gt>floor(3.7)> on a C<Sidef::Module::Func> wrapping C<"POSIX"> results in
-C<POSIX::floor(3.7)> being called.
+All method calls on a C<Sidef::Module::Func> object are intercepted by C<AUTOLOAD> and forwarded as function calls into the wrapped module's namespace. For example, calling C<$obj-E<gt>floor(3.7)> on a C<Sidef::Module::Func> wrapping C<"POSIX"> results in C<POSIX::floor(3.7)> being called.
 
-Arguments are automatically converted from Sidef types to plain Perl values before
-the call, and return values are automatically converted back to Sidef types using
-C<Sidef::Types::Perl::Perl-E<gt>to_sidef>.
+Arguments are automatically converted from Sidef types to plain Perl values before the call, and return values are automatically converted back to Sidef types using C<Sidef::Types::Perl::Perl-E<gt>to_sidef>.
 
 B<Argument Conversion:>
 
@@ -117,8 +100,7 @@ B<Return Value Conversion:>
 
 =item * Blessed Perl objects → C<Sidef::Module::OO>
 
-=item * Multiple return values → C<Sidef::Types::Array::Array> in scalar context,
-individual Sidef values in list context
+=item * Multiple return values → C<Sidef::Types::Array::Array> in scalar context, individual Sidef values in list context
 
 =back
 

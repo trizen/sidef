@@ -7,10 +7,7 @@ Sidef::Variable::NamedParam - Represents a named parameter used in function and 
 
 =head1 DESCRIPTION
 
-This class implements named parameters (also known as keyword arguments) in Sidef.
-A NamedParam object stores a name-value pair, where the name is a String and the
-value is an Array containing one or more arguments.  Named parameters allow functions
-to be called with arguments in any order by specifying the parameter name.
+This class implements named parameters (also known as keyword arguments) in Sidef. A NamedParam object stores a name-value pair, where the name is a String and the value is an Array containing one or more arguments.  Named parameters allow functions to be called with arguments in any order by specifying the parameter name.
 
 =head1 SYNOPSIS
 
@@ -59,8 +56,7 @@ Returns the name of the named parameter as a String.
     NamedParam(name, value1, value2, ...)
     self.new
 
-Creates a new NamedParam object with the given name and one or more values.
-The values are stored as an Array internally.
+Creates a new NamedParam object with the given name and one or more values. The values are stored as an Array internally.
 
     var np = NamedParam("arg", 42)
     var np2 = NamedParam("coords", 10, 20, 30)
@@ -73,8 +69,7 @@ Aliases: I<call>
 
     self.value
 
-Returns the value(s) stored in the NamedParam.  When multiple values were provided,
-they are returned as a list.
+Returns the value(s) stored in the NamedParam.  When multiple values were provided, they are returned as a list.
 
     var t = foo: (1, 2, 3)
     say [t.value]       #=> [1, 2, 3]

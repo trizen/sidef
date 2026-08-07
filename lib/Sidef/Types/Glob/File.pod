@@ -421,8 +421,7 @@ Example:
 
 Returns the number of days since the file's inode status was last changed.
 
-On Unix-like systems, this corresponds to the last metadata change (such as
-permissions, ownership, or renaming), and is not necessarily the same as the last modification of the file contents.
+On Unix-like systems, this corresponds to the last metadata change (such as permissions, ownership, or renaming), and is not necessarily the same as the last modification of the file contents.
 
 The returned value is a fractional number, where the integer part represents whole days and the fractional part represents the elapsed portion of the current day.
 

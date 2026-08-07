@@ -14,15 +14,9 @@ Sidef::Optimizer - AST optimization and constant folding for Sidef programs
 
 =head1 DESCRIPTION
 
-The C<Sidef::Optimizer> module provides Abstract Syntax Tree (AST) optimization
-capabilities for the Sidef programming language. It performs constant folding,
-expression simplification, and other compile-time optimizations to improve
-runtime performance.
+The C<Sidef::Optimizer> module provides Abstract Syntax Tree (AST) optimization capabilities for the Sidef programming language. It performs constant folding, expression simplification, and other compile-time optimizations to improve runtime performance.
 
-The optimizer works by traversing the AST and applying transformation rules
-based on the types of objects and operations involved. When expressions can be
-evaluated at compile-time (such as C<2 + 3> or C<"hello".uc>), the optimizer
-replaces them with their computed results.
+The optimizer works by traversing the AST and applying transformation rules based on the types of objects and operations involved. When expressions can be evaluated at compile-time (such as C<2 + 3> or C<"hello".uc>), the optimizer replaces them with their computed results.
 
 =head1 METHODS
 
@@ -30,8 +24,7 @@ replaces them with their computed results.
 
     my $optimizer = Sidef::Optimizer->new(%options);
 
-Creates a new optimizer instance. The C<%options> hash can contain various
-configuration parameters for the optimization process.
+Creates a new optimizer instance. The C<%options> hash can contain various configuration parameters for the optimization process.
 
 Returns a blessed C<Sidef::Optimizer> object.
 
@@ -40,12 +33,9 @@ Returns a blessed C<Sidef::Optimizer> object.
     my %optimized = $optimizer->optimize($struct);
     my $optimized_ref = $optimizer->optimize($struct);  # scalar context
 
-Optimizes an entire AST structure. The input C<$struct> is a hash reference
-where keys are class names and values are arrays of expressions.
+Optimizes an entire AST structure. The input C<$struct> is a hash reference where keys are class names and values are arrays of expressions.
 
-In list context, returns a hash of optimized expressions grouped by class.
-In scalar context, returns either a hash reference (if multiple expressions)
-or the last optimized expression (if only one).
+In list context, returns a hash of optimized expressions grouped by class. In scalar context, returns either a hash reference (if multiple expressions) or the last optimized expression (if only one).
 
 B<Parameters:>
 
@@ -61,8 +51,7 @@ B<Returns:> Optimized AST structure (hash in list context, varies in scalar cont
 
     my $optimized = $optimizer->optimize_expr($expression);
 
-Optimizes a single expression node from the AST. This is the core optimization
-method that handles different node types and applies appropriate transformations.
+Optimizes a single expression node from the AST. This is the core optimization method that handles different node types and applies appropriate transformations.
 
 The method recognizes and optimizes various node types including:
 
@@ -122,8 +111,7 @@ Supported for operations on:
 
 =head2 Method Call Optimization
 
-When method receivers and arguments are all compile-time constants, the method
-is invoked during optimization:
+When method receivers and arguments are all compile-time constants, the method is invoked during optimization:
 
     # "HELLO" computed at compile-time
     var greeting = "hello".uc;
@@ -251,8 +239,7 @@ Methods like C<first>, C<last>, C<length>, C<reverse> are optimizable.
 
     my @method_refs = methods($package, @method_names);
 
-Helper function that loads a package and returns method references for the
-specified method names. Uses caching to avoid repeated lookups.
+Helper function that loads a package and returns method references for the specified method names. Uses caching to avoid repeated lookups.
 
 B<Parameters:>
 
@@ -270,8 +257,7 @@ B<Returns:> List of code references
 
     my @method_refs = dtypes($datatype, @method_names);
 
-Similar to C<methods>, but works with data type to type class mappings.
-Converts data type names to their corresponding type class and retrieves methods.
+Similar to C<methods>, but works with data type to type class mappings. Converts data type names to their corresponding type class and retrieves methods.
 
 B<Parameters:>
 
@@ -289,8 +275,7 @@ B<Returns:> List of code references
 
     my $table_ref = table(@type_constants);
 
-Creates an array reference from type constants, used in building optimization
-rule tables.
+Creates an array reference from type constants, used in building optimization rule tables.
 
 B<Parameters:>
 
@@ -306,9 +291,7 @@ B<Returns:> Array reference
 
     my $tree = build_tree(@data);
 
-Constructs a hierarchical tree structure for optimization rules. The tree
-enables efficient lookup of optimization opportunities based on object type
-and method signature.
+Constructs a hierarchical tree structure for optimization rules. The tree enables efficient lookup of optimization opportunities based on object type and method signature.
 
 B<Parameters:>
 
@@ -322,8 +305,7 @@ B<Returns:> Hash reference representing the rule tree
 
 =head1 OPTIMIZATION RULES
 
-The module maintains a comprehensive C<%rules> hash that maps type classes to
-their optimizable operations. Each rule specifies:
+The module maintains a comprehensive C<%rules> hash that maps type classes to their optimizable operations. Each rule specifies:
 
 =over 4
 
@@ -335,8 +317,7 @@ their optimizable operations. Each rule specifies:
 
 =back
 
-The rule structure is built hierarchically using nested hashes for efficient
-lookup during optimization.
+The rule structure is built hierarchically using nested hashes for efficient lookup during optimization.
 
 =head1 TYPE CONSTANTS
 

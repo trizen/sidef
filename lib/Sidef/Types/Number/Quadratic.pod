@@ -26,9 +26,7 @@ Common special cases include:
 
 =back
 
-For more background see:
-L<https://en.wikipedia.org/wiki/Quadratic_integer> and
-L<https://en.wikipedia.org/wiki/Lucas_sequence>.
+For more background see: L<https://en.wikipedia.org/wiki/Quadratic_integer> and L<https://en.wikipedia.org/wiki/Lucas_sequence>.
 
 =head1 SYNOPSIS
 
@@ -1168,8 +1166,7 @@ Products reduce through that relation:
 
 =head2 Conjugate and Norm
 
-The minimal polynomial C<x^2 - q*x - p = 0> has two roots, C<t> and
-C<t' = q - t>. For C<e = a + b*t>:
+The minimal polynomial C<x^2 - q*x - p = 0> has two roots, C<t> and C<t' = q - t>. For C<e = a + b*t>:
 
 =over 4
 

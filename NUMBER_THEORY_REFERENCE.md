@@ -1533,9 +1533,9 @@ The `special_factor(n)` function efficiently tries to find special factors (not 
 * Lucas factorization method
 * Fibonacci factorization method
 * FLT factorization method
-* Pollard's p-1 method
+* Pollard's $p-1$ method
 * Pollard's rho method
-* Williams' p+1 method
+* Williams' $p+1$ method
 * Chebyshev factorization method
 * Cyclotomic factorization method
 * Lenstra's Elliptic Curve Method
