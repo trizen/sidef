@@ -1,4 +1,356 @@
 Revision history for Sidef
 
+26.08 2026-08-07
+
+    [BREAKING CHANGES]
+
+    - Regex union (`|`) operator now performs alternation instead of
+      concatenation.  `/foo/ | /bar/` now produces `/foo|bar/` rather
+      than `/foobar/`.  Code relying on the previous behavior must be
+      updated.
+
+    [ADDED]
+
+    - solve_pell(D, N=1)              full LMM solver returning all
+                                      fundamental solutions and supporting
+                                      gcd(D,N) != 1
+
+    - solve_quadratic_form(a,b,c,n)     extended to non-positive discriminants
+    - solve_binary_quadratic_form(...)  extended to non-positive discriminants
+    - solve_ternary_quadratic_form(...) extended to non-positive discriminants
+
+    - reduce_quadratic_form(A,B,C)    Gauss reduction of positive definite
+                                      binary quadratic forms
+
+    - coredisc(n)                     fundamental discriminant of Q(sqrt(n))
+    - dedekind_sum(h,k)               Dedekind sums
+    - hilbert(a,b,p)                  Hilbert symbols
+    - ellcard(A,B,p)                  elliptic curve point count over F_p
+
+    - Polynomial.roots_mod(f,m)       solve polynomial congruences modulo m
+    - solve_cubic_mod(A,B,C,D,m)      modular cubic solver
+
+    - is_zumkeller(n)
+    - is_weird(n)
+    - is_pseudoperfect(n)
+    - is_smith(n, base=10)
+
+    - sum_of_cubes(n)
+    - difference_of_cubes(n)
+
+    - zeckendorf(n)
+    - fibonacci_inverse(n)
+    - primitive_pythagorean_triples(limit)
+    - frobenius_number(a,b,...)
+    - eulerian(n,k)
+
+    - partition_count(n) now accepts an optional number of parts or a
+      custom part-set.
+
+    - antidivisor_sigma(n,k=1) and bphi(n,k=1) generalized with an
+      optional k parameter.
+
+    - utils/make_pod2pdf.pl utility for generating PDF documentation
+      from POD.
+
+    [FIXES]
+
+    - rootmod_all no longer mutates its arguments for non-native integers.
+
+    - Fixed File.abs2rel, change_time_days_diff,
+      access_time_days_diff, and modification_time_days_diff.
+
+    - Fixed FileHandle.read_byte handling of embedded null bytes.
+
+    - Sys.readln and Sys.read in the REPL no longer create multiple
+      Term::ReadLine instances.
+
+    - Dir.find no longer changes the current working directory while
+      iterating, allowing file tests such as is_file to behave correctly.
+
+    - Sys.select now returns the previously-selected filehandle as a
+      Sidef FileHandle object.
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - Added optional PARI/GP backend for expensive number-theoretic
+      routines.  Large inputs to znlog, hclassno, solve_pell,
+      ramanujan_tau, Chebyshev polynomials, Hermite polynomials,
+      Laguerre polynomials, and very large integer factorization can
+      now be substantially faster.
+
+    - PARI/GP is accessed through a persistent IPC::Open2 pipe,
+      significantly reducing repeated invocation overhead.
+
+    - Reimplemented PolyMod.factor_exp using GMPz.  Besides being much
+      faster, this also accelerates Polynomial.roots_mod and
+      solve_cubic_mod.
+
+    - Reimplemented linear_congruence using GMPz.
+
+    - Much faster fibmod, fibonacci(k-th order), and fubini for large
+      inputs.
+
+    - RangeNumber.iter reimplemented for approximately 10-20% higher
+      performance.
+
+    - Faster is_pandigital for bases below 64 and for very large inputs.
+
+    - Optimized digits, sumdigits, and digits2num for large bases.
+
+    - bphi is approximately twice as fast.
+
+    - Added FIFO caches for _factor, _factor_exp, _divisors, and
+      _is_prob_prime on non-native integers.
+
+    - Number constants (such as Num.pi) are now cached per precision.
+
+    - Replaced dynamic operator dispatch with a precomputed dispatch
+      table, improving performance across core arithmetic operators.
+
+    - Introduced a reusable Number object pool to reduce allocation
+      overhead in of{}, times{}, and integer construction.
+
+    - Faster min, max, gcd, and lcm when operating on many native
+      integer arguments.
+
+    [DOCUMENTATION]
+
+    - Reorganized nearly all core POD documentation into topical
+      sections, expanded examples, and synchronized documentation with
+      implementation.
+
+    - Word-unwrapped POD sources so perldoc and man handle wrapping
+      naturally.
+
+    - Expanded and polished NUMBER_THEORY_CHEATSHEET.md.
+
+26.07 2026-07-02
+
+    [BREAKING CHANGES]
+
+    - bernoulli(1) now returns -1/2 instead of 1/2, following the
+      modern convention for Bernoulli numbers of the first kind.
+      Use bernoulli(n, 1) for the previous second-kind behavior.
+
+    [ADDED]
+
+    - nedivisors(n)                  nonexponential divisors
+    - nidivisors(n)                  noninfinitary divisors
+    - nbdivisors(n)                  non-bi-unitary divisors
+    - nudivisors(n)                  non-unitary divisors
+
+    - k.power_part(n)                largest k-th power dividing n
+    - square_part(n)
+    - cube_part(n)
+
+    - k.powerful_part(n)
+    - squarefull_part(n)
+    - cubefull_part(n)
+
+    - k.powerfree_kernel(n)
+    - cubefree_kernel(n)
+    - cubefree_part(n)
+
+    - k.powerful_divisors(n)
+    - squarefull_divisors(n)
+    - cubefull_divisors(n)
+
+    - k.powerful_udivisors(n)
+    - squarefull_udivisors(n)
+    - cubefull_udivisors(n)
+
+    - k.powerful_sigma(n,j=1)
+    - squarefull_sigma(n,j=1)
+    - cubefull_sigma(n,j=1)
+
+    - k.powerful_sigma0(n)
+    - squarefull_sigma0(n)
+    - cubefull_sigma0(n)
+
+    - k.powerful_usigma(n,j=1)
+    - squarefull_usigma(n,j=1)
+    - cubefull_usigma(n,j=1)
+
+    - k.powerful_usigma0(n)
+    - squarefull_usigma0(n)
+    - cubefull_usigma0(n)
+
+    - usigma_sum(n,k=1)
+    - usigma0_sum(n)
+    - bsigma_sum(n,k=1)
+    - isigma_sum(n,k=1)
+    - nusigma_sum(n,k=1)
+    - nusigma0_sum(n)
+    - nbsigma_sum(n,k=1)
+    - nbsigma0_sum(n)
+    - nisigma_sum(n,k=1)
+    - nisigma0_sum(n)
+    - uphi_sum(n,k=1)
+    - iphi_sum(n,k=1)
+    - nuphi_sum(n,k=1)
+    - phi_sum(n,k)                   alias for totient_sum
+
+    - cototient(n,k=1)               generalized cototient
+    - cototient_sum(n,k=1)           summatory generalized cototient
+    - dirichlet_inverse(f)           alias: dinv
+    - moebius_inverse(f)
+    - necklaces(n,k)
+    - necklaces_aperiodic(n,k)
+
+    - nuphi(n,k) generalized with an optional second argument.
+
+    - bernreal(n,x) and lnbernreal(n,x) generalized to evaluate
+      Bernoulli polynomials at x.
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - Optimized dirichlet_hyperbola, accelerating sigma, totient,
+      Pillai, and related summatory functions.
+
+    - Large speed improvements for isigma_sum, usigma_sum,
+      sigma_sum, uphi_sum, and pillai_sum.
+
+    - faulhaber_sum now uses Math::Prime::Util::powersum for native
+      integer inputs.
+
+    [DOCUMENTATION]
+
+    - Added NUMBER_THEORY_CHEATSHEET.md quick-reference guide.
+
+    - Clarified Bernoulli documentation, including the new B1
+      convention and the second-kind variant.
+
+    - Updated nuphi documentation for the new optional k argument.
+
+26.06 2026-06-18
+
+    [ADDED]
+
+    - is_balanced_prime(n, order=1)   balanced prime test
+    - is_sophie_germain(n)            Sophie Germain prime test
+    - is_sexy_prime(n)                sexy prime test
+    - is_twin_prime(n)                twin prime test
+    - twin_primes(lo, hi)             generate twin primes
+    - is_emirp(n, base=10)            emirp test
+    - kempner(n)                      alias: smarandache(n)
+    - exp_mangoldt_sum(n)             summatory exponential Mangoldt function
+    - sopfr_sum(n)                    summatory SOPFR function
+    - sopf_sum(n)                     summatory SOPF function
+    - sigma0_sum(n)                   alias: tau_sum(n)
+    - genocchi(n)                     Genocchi numbers
+    - fibbinary(n)                    Fibbinary numbers
+    - tribonacci(n)                   alias for fibonacci(n,3)
+    - tetranacci(n)                   alias for fibonacci(n,4)
+
+    - pell(n)                         Pell numbers
+    - pell_lucas(n)                   Pell-Lucas numbers
+    - perrin(n)                       Perrin numbers
+    - perrinmod(n,m)                  Perrin numbers modulo m
+    - jacobsthal(n)                   Jacobsthal numbers
+    - jacobsthal_lucas(n)             Jacobsthal-Lucas numbers
+
+    - sphenic(a,b)                    generate sphenic numbers
+    - sphenic_count(a,b)              count sphenic numbers
+    - sphenic_each {...} a,b          iterate over sphenic numbers
+    - nth_sphenic(n)                  nth sphenic number
+    - prev_sphenic(n)                 previous sphenic number
+    - next_sphenic(n)                 next sphenic number
+
+    - strict_partitions(n)
+    - partitions(n)
+    - multiplicative_partitions(n)    alias: mpartitions
+    - multisets(n,k)
+    - sum_of_polygonals(n,k)
+
+    - tau_inverse(A,B,n)
+    - tau_inverse_len(A,B,n)
+    - next_tau_inverse(n,k)
+    - prev_tau_inverse(n,k)
+    - nth_tau_inverse(n,k)
+
+    - omega_inverse(A,B,k)
+    - bigomega_inverse(A,B,k)
+    - *_len and *_sum variants for omega_inverse and
+      bigomega_inverse.
+
+    - divisors_each {...}             lazy divisor iterator
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - solve_quadratic_form now returns all solutions instead of only
+      primitive ones.
+
+    - cornacchia is now an alias for solve_quadratic_form.
+
+    - solve_pell extended to solve the generalized Pell equation
+      x^2 - d*y^2 = n.
+
+    - Quadratic class constructor now accepts four arguments.
+
+    - Math.linear_recurrence and linear_recurrence_mod reimplemented
+      using Fiduccia's algorithm with Math::GMPz.
+
+    - Array.solve_rec_seq reimplemented using the Berlekamp-Massey
+      algorithm with Math::GMPq.
+
+    - Array.solve_seq significantly faster using Math::GMPq.
+
+    - Multiple optimizations for prime_sum on k >= 2, including
+      support for non-native integers on 32-bit platforms.
+
+    - factor_upto improved using multiple elliptic-curve parameters.
+
+    - perfect_power, perfect_root, prime_power, and prime_root are
+      substantially faster for very large integers.
+
+    - Optimized rad and prime_divisors for native integer inputs.
+
+    - Minor optimizations for prime_signature_inverse and
+      prime_signature_inverse_len.
+
+    - Improved performance for tau_inverse, tau_inverse_len,
+      next_tau_inverse, and prev_tau_inverse.
+
+    - Simplified and optimized internal _factor_remainder.
+
+    - special_factor no longer relies on the slower
+      cyclotomic_factor implementation.
+
+    - Increased default aggressiveness of _adaptive_trial_factor.
+
+    - Math::Prime::Util::prime_precalc(1e7) is automatically used
+      when available to accelerate prime-related routines.
+
+    [FIXES]
+
+    - Fixed prime_sum for non-native integers on 32-bit systems.
+
+    - Fixed solve_pell for generalized Pell equations that
+      previously failed for some n != 1.
+
+    - Fixed solve_quadratic_form so all solutions are generated
+      instead of only primitive ones.
+
+    [DOCUMENTATION]
+
+    - Updated POD documentation for the Quadratic class.
+
+    - Updated POD documentation for numerous Number methods.
+
+    - Reorganized documentation by grouping related methods.
+
+    - Merged NUMBER_THEORY_TUTORIAL.md into
+      NUMBER_THEORY_GUIDE.md.
+
+    - Improved the "Documentation & Learning Resources" section
+      in the README.
+
+    [OTHER]
+
+    - Changed package declarations from "package NAME { ... }"
+      to "package NAME;" for cleaner git diffs.
+
 0.01    2013-30-03
+
         First version, released on an unsuspecting world.
