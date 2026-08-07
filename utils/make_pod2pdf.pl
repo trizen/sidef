@@ -58,7 +58,10 @@ find(
     @dirs
 );
 
-$content =~ s{=head1 NAME\s+}{=head1 }g;
+$content =~ s{=head1 NAME\s+}{=headG }g;
+$content =~ s{^=head\K([0-9])}{ $1+1 }gem;
+$content =~ s{^=headG }{=head1 }gm;
+$content =~ s{^=head1 (?:\w+::)+(\w+) }{=head1 $1 }gm;
 
 my ($fh, $file) = tempfile();
 binmode($fh, ':utf8');
