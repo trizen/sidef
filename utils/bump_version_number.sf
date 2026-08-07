@@ -14,6 +14,7 @@ var regex = Regex('(?<=\D|^)' + old_version.escape + '(?=\D|$)')
 var files = `rg -l #{old_version.escape.escape}`.lines              # requires "ripgrep"
 
 files.each {|file|
+    next if File(file).basename == "Changes"
     say "Editing: #{file}"
     File(file).edit {|line|
         line.contains(old_version) ? line.gsub(regex, new_version) : line

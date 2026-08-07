@@ -52,7 +52,7 @@ Individual array elements may also be C<[exponent, coefficient]> pairs to set a 
 
 Inherits methods from L<Sidef::Types::Number::Number>.
 
-=head1 METHODS
+=head1 CONSTRUCTION
 
 =head2 new
 
@@ -85,12 +85,14 @@ Array elements may themselves be C<[exponent, coeff]> pairs for explicit placeme
     Polynomial("x^3 - 5")           # x^3 - 5
     Polynomial("1/2*x^2 + 3/4")     # (1/2)*x^2 + 3/4
 
+A string that can't be parsed in full returns the constant polynomial C<NaN>, rather than raising an error.
+
 =item B<Sparse key-value pairs> — alternating exponent/coefficient arguments:
 
     Polynomial(5 => 3, 2 => 10)   # 3*x^5 + 10*x^2
     Polynomial(0 => 7)            # constant 7
 
-Zero coefficients are silently dropped.
+Zero coefficients are silently dropped. If the same exponent is given more than once, only the last value for that exponent is kept.
 
 =item B<Instance call with one argument> — when called as a method on an existing polynomial, evaluates that polynomial at the given value (equivalent to L</eval>):
 
@@ -103,7 +105,20 @@ Aliases: I<call>
 
 =cut
 
-=head2 +
+=head2 with_value
+
+    self.with_value(value)
+
+Creates a new B<constant> polynomial holding just C<value> (equivalent to C<Polynomial(0 => value)>), discarding the receiver's own terms entirely. Useful in generic code that has a Polynomial in hand and wants to build a plain scalar-valued polynomial of the same type.
+
+    var p = Polynomial([1, 2, 3])
+    say(p.with_value(7))    # 7
+
+=cut
+
+=head1 ARITHMETIC OPERATIONS
+
+=head2 add
 
     a + b
 
@@ -111,25 +126,11 @@ Returns the sum of C<a> and C<b>. When both arguments are polynomials, correspon
 
     say(Polynomial([1, 2]) + Polynomial([3, 4]))   # 4*x + 6
 
-Aliases: I<add>
+Aliases: I<+>
 
 =cut
 
-=head2 ++
-
-    a++
-
-Adds 1 to the constant term of C<a>. Returns a new polynomial with the x^0 coefficient incremented by one.
-
-    var p = Polynomial([1, 2, 3])
-    p++
-    say(p)   # x^2 + 2*x + 4
-
-Aliases: I<inc>
-
-=cut
-
-=head2 -
+=head2 sub
 
     a - b
 
@@ -137,25 +138,11 @@ Returns the difference C<a - b>. When both arguments are polynomials, correspond
 
     say(Polynomial([1, 2, 3]) - Polynomial([0, 1]))   # x^2 + x + 3
 
-Aliases: I<sub>
+Aliases: I<->
 
 =cut
 
-=head2 --
-
-    a--
-
-Subtracts 1 from the constant term of C<a>. Returns a new polynomial with the x^0 coefficient decremented by one.
-
-    var p = Polynomial([1, 2, 3])
-    p--
-    say(p)   # x^2 + 2*x + 2
-
-Aliases: I<dec>
-
-=cut
-
-=head2 *
+=head2 mul
 
     a * b
 
@@ -163,7 +150,7 @@ Returns the product of C<a> and C<b>. When both are polynomials, performs full p
 
     say(Polynomial([1, 2, 3]) * Polynomial([4, 5])) # (x^2 + 2*x + 3) * (4*x + 5) = 4*x^3 + 13*x^2 + 22*x + 15
 
-Aliases: I<mul>
+Aliases: I<*>
 
 =cut
 
@@ -177,7 +164,7 @@ Returns the square of C<x>. Equivalent to C<x * x>.
 
 =cut
 
-=head2 **
+=head2 pow
 
     a ** n
 
@@ -189,17 +176,17 @@ Returns C<a> raised to the power C<n> using binary (square-and-multiply) exponen
 
 =item * If C<n> is a B<non-negative integer>, returns the polynomial product.
 
-=item * If C<n> is a B<negative integer>, returns C<Fraction(1, a^|n|)> — a rational function.
+=item * If C<n> is a B<negative integer>, returns the multiplicative inverse (L</inv>) of C<a> raised to C<|n|> — typically a rational function.
 
 =item * If C<n> is B<not an integer>, falls back to C<a.to_n.pow(n)>, converting the polynomial to a scalar first (only valid for constant polynomials).
 
 =back
 
-Aliases: I<pow>
+Aliases: I<**>
 
 =cut
 
-=head2 /
+=head2 div
 
     a / b
 
@@ -219,31 +206,19 @@ Divides C<a> by C<b>.
 
 =back
 
-Aliases: I<÷>, I<div>
+Aliases: I<÷>
 
 =cut
 
-=head2 //
+=head2 idiv
 
     a // b
 
 Returns only the quotient polynomial from Euclidean division, discarding the remainder. Equivalent to the first element of L</divmod>.
 
-B<Note:> The rounding-mode variants (C<idiv_ceil>, C<idiv_floor>, C<idiv_round>, C<idiv_trunc>) are all currently aliased to the same floor-division behaviour.
+B<Note:> The rounding-mode variants (C<idiv_ceil>, C<idiv_floor>, C<idiv_round>, C<idiv_trunc>) are all currently aliased to the same behaviour as plain C<idiv>.
 
-Aliases: I<idiv>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
-
-=cut
-
-=head2 %
-
-    a % b
-
-Returns the remainder polynomial from Euclidean division of C<a> by C<b>, i.e. the polynomial C<r> of degree less than C<deg(b)> satisfying C<a = q*b + r>. When C<b> is a scalar, each coefficient is reduced modulo C<b> by wrapping it in a C<Sidef::Types::Number::Mod> object.
-
-    say(Polynomial([1, 0, 0, 0]) % Polynomial([1, 0, 1]))   # x^3 mod (x^2+1) = -x
-
-Aliases: I<mod>
+Aliases: I<//>, I<idiv_ceil>, I<idiv_floor>, I<idiv_round>, I<idiv_trunc>
 
 =cut
 
@@ -259,6 +234,18 @@ Performs Euclidean polynomial long division and returns a two-element list C<(qu
 Returns C<(NaN, zero)> if the leading coefficient of C<y> is zero or NaN.
 
     var (q, r) = Polynomial([1, 0, 0]) .divmod( Polynomial([1, 1]) )    #=>  q = x-1,  r = 1
+
+=cut
+
+=head2 mod
+
+    a % b
+
+Returns the remainder polynomial from Euclidean division of C<a> by C<b>, i.e. the polynomial C<r> of degree less than C<deg(b)> satisfying C<a = q*b + r>. When C<b> is a scalar, each coefficient is reduced modulo C<b> by wrapping it in a C<Sidef::Types::Number::Mod> object.
+
+    say(Polynomial([1, 0, 0, 0]) % Polynomial([1, 0, 1]))   # x^3 mod (x^2+1) = -x
+
+Aliases: I<%>
 
 =cut
 
@@ -290,6 +277,32 @@ Returns the sign of the leading coefficient of C<x>: C<-1>, C<0>, or C<1> as a C
 
 =cut
 
+=head2 inc
+
+    ++a
+
+Adds 1 to the constant term of C<a>. Returns a new polynomial with the x^0 coefficient incremented by one.
+
+    var p = Polynomial([1, 2, 3])
+    say(++p)   # x^2 + 2*x + 4
+
+Aliases: I<++>
+
+=cut
+
+=head2 dec
+
+    --a
+
+Subtracts 1 from the constant term of C<a>. Returns a new polynomial with the x^0 coefficient decremented by one.
+
+    var p = Polynomial([1, 2, 3])
+    say(--p)   # x^2 + 2*x + 2
+
+Aliases: I<-->
+
+=cut
+
 =head2 inv
 
     x.inv
@@ -317,6 +330,8 @@ Computes C<x^n mod m> using binary (square-and-multiply) exponentiation, reducin
 
 =cut
 
+=head1 GCD, LCM, AND FACTORIZATION
+
 =head2 gcd
 
     x.gcd(y)
@@ -326,8 +341,6 @@ Returns the greatest common divisor of polynomials C<x> and C<y> using the polyn
     var p = Polynomial([1, 0, -1])   # x^2 - 1
     var q = Polynomial([1, -1])      # x - 1
     say(p.gcd(q))                    # x - 1  (monic)
-
-Reference: L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclid's_algorithm>
 
 =cut
 
@@ -350,8 +363,6 @@ B<Note:> The return list has five elements. If you only need the GCD and Bézout
     var (g, u, v) = x.gcdext(y)
     say(((u * x) + (v * y)) == g)   # true
 
-Reference: L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#B%C3%A9zout's_identity_and_extended_GCD_algorithm>
-
 =cut
 
 =head2 lcm
@@ -373,6 +384,31 @@ The C<abs> ensures the leading coefficient of the result is positive.
 Returns a monic version of C<x> by dividing all coefficients by the leading coefficient. If the leading coefficient is already 1, returns C<x> unchanged. If the leading coefficient is zero or the polynomial is empty, returns C<x> unchanged.
 
     say(Polynomial([3, 6, 9]).normalize_to_monic)   # x^2 + 2*x + 3
+
+=cut
+
+=head2 content
+
+    x.content
+
+Returns the content of the polynomial: the GCD of all its coefficients. Useful for extracting the largest scalar factor.
+
+    say(Polynomial([6, 9, 12]).content)   # 3  (gcd(6,9,12))
+
+Aliases: I<cont>
+
+=cut
+
+=head2 primitive_part
+
+    x.primitive_part
+
+Returns the primitive part of C<x>: the polynomial divided by its content. The result has integer coefficients whose GCD is 1.
+
+    say(Polynomial([6, 9, 12]).primitive_part)
+    # (6*x^2 + 9*x + 12) / 3 = 2*x^2 + 3*x + 4
+
+Aliases: I<prim_part>, I<primpart>
 
 =cut
 
@@ -401,6 +437,8 @@ Returns the square-free part of C<x>: the result of dividing C<x> by C<gcd(x, x.
 
 =cut
 
+=head1 CALCULUS
+
 =head2 derivative
 
     x.derivative
@@ -420,14 +458,14 @@ Evaluates the polynomial at C<value> by computing the sum:
 
     sum of:  coeff_k * value^k  for each nonzero term k
 
-Each coefficient is itself evaluated at C<value> via its own C<.eval> method, allowing polynomials with polynomial coefficients (multivariate use). Returns 0 for the zero polynomial.
-
-B<Operator-precedence note:> when chaining C<say> with C<eval>, wrap in parentheses:
+Each coefficient is itself evaluated at C<value> via its own C<.eval> method, allowing polynomials with polynomial coefficients (multivariate use). Returns 0 for the zero polynomial. As a special case, evaluating at the monomial C<x> itself (i.e. C<Polynomial(1 => 1)>) returns the polynomial unchanged.
 
     var p = Polynomial([1, 2, 3])   # x^2 + 2*x + 3
     say(p.eval(5))                  # 25 + 10 + 3 = 38
 
 =cut
+
+=head1 ROOT FINDING
 
 =head2 newton_method
 
@@ -463,15 +501,17 @@ The algorithm:
 
 =over 4
 
-=item 1. Uses C<deg(f)> evenly-spaced roots of unity as initial guesses.
+=item 1. Uses C<deg(f)> evenly-spaced roots of unity (slightly perturbed) as initial guesses.
 
-=item 2. Applies Newton's method from each starting point.
+=item 2. Refines all guesses simultaneously via the Aberth-Ehrlich method.
 
-=item 3. If fewer than C<deg(f)> distinct roots are found, retries with transformed starting points (e.g. multiplied by C<i>, C<exp>, etc.).
+=item 3. Polishes each candidate with Newton's method and deduplicates within working precision.
+
+=item 4. If fewer than C<deg(f)> distinct roots were found, retries with a series of transformed starting points (e.g. multiplied by C<i>, C<exp>, etc.) as a fallback.
 
 =back
 
-Only distinct roots are returned (duplicates within working precision are collapsed). For polynomials with repeated roots, some roots may be missed.
+For a constant polynomial (degree 0), no roots exist by construction and an empty array is returned. For polynomials with repeated roots, some roots may be missed.
 
     say(Polynomial([1, 0, -1]).roots)    # [-1, 1]  (roots of x^2 - 1)
     say(Polynomial([1, 0, 0, -1]).roots) # roots of x^3 - 1
@@ -488,35 +528,7 @@ Given a polynomial C<f(x)> and a positive modulus C<m>, this method finds every 
 
     f(x) ≡ 0 (mod m)
 
-The result is returned as an array of distinct roots, sorted in ascending order.
-
-The implementation automatically selects the most appropriate solving algorithm depending on the polynomial and modulus:
-
-=over 4
-
-=item *
-
-Linear polynomials are solved using C<linear_congruence()>.
-
-=item *
-
-Quadratic polynomials are solved exactly using C<solve_quadratic_mod()>.
-
-=item *
-
-Cubic polynomials are solved exactly using C<solve_cubic_mod()>.
-
-=item *
-
-Sparse polynomials of the form C<a*x^k + b> are reduced to modular root extraction via C<rootmod_all()> whenever possible.
-
-=item *
-
-For general polynomials, the modulus is factorized into prime powers. Roots are computed modulo each prime power (using Hensel lifting when appropriate) and combined via the Chinese Remainder Theorem to obtain all solutions modulo C<m>.
-
-=back
-
-If the polynomial has no roots modulo C<m>, an empty array is returned.
+The result is returned as an array of distinct roots, sorted in ascending order. If the polynomial has no roots modulo C<m>, an empty array is returned.
 
     var p = Polynomial([1, 0, -1])      # x^2 - 1
     say p.roots_mod(7)                  # [1, 6]
@@ -528,6 +540,8 @@ If the polynomial has no roots modulo C<m>, an empty array is returned.
     say r.roots_mod(17)                     # [11, 14]
 
 =cut
+
+=head1 COMBINATORICS
 
 =head2 binomial
 
@@ -543,6 +557,8 @@ The numerator product is computed via binary splitting for efficiency. Returns t
     say(x.binomial(2))                # x*(x-1)/2
 
 =cut
+
+=head1 INSPECTION
 
 =head2 degree
 
@@ -569,7 +585,7 @@ Returns the coefficient of the term with exponent C<k>. Returns C<0> if no such 
     say(p.coeff(2))                 # 3  (coefficient of x^2)
     say(p.coeff(5))                 # 0  (absent term)
 
-Alias: I<coefficient>
+Aliases: I<coefficient>
 
 =cut
 
@@ -584,7 +600,7 @@ Returns an C<Array> of C<[exponent, coefficient]> pairs for all nonzero terms, s
     # [[0, 3], [1, 2], [2, 1]]
     # (constant term first, highest-degree term last)
 
-Alias: I<coefficients>
+Aliases: I<coefficients>
 
 =cut
 
@@ -595,31 +611,6 @@ Alias: I<coefficients>
 Returns an C<Array> of all exponents that have nonzero coefficients, sorted in B<ascending> order.
 
     say(Polynomial(5 => 3, 2 => 1).exponents)   # [2, 5]
-
-=cut
-
-=head2 content
-
-    x.content
-
-Returns the content of the polynomial: the GCD of all its coefficients. Useful for extracting the largest scalar factor.
-
-    say(Polynomial([6, 9, 12]).content)   # 3  (gcd(6,9,12))
-
-Aliases: I<cont>
-
-=cut
-
-=head2 primitive_part
-
-    x.primitive_part
-
-Returns the primitive part of C<x>: the polynomial divided by its content. The result has integer coefficients whose GCD is 1.
-
-    say(Polynomial([6, 9, 12]).primitive_part)
-    # (6*x^2 + 9*x + 12) / 3 = 2*x^2 + 3*x + 4
-
-Aliases: I<prim_part>, I<primpart>
 
 =cut
 
@@ -665,17 +656,109 @@ Returns the maximum absolute value among all coefficients of C<x>. Also called t
 
 =cut
 
-=head2 re
+=head2 real
 
-    x.re
+    x.real
 
 Returns the constant term (coefficient of C<x^0>) of the polynomial, as a C<Sidef::Types::Number::Number>. Returns C<0> if no constant term is present. This reflects the embedding of scalars into the polynomial ring.
 
-    say(Polynomial([1, 2, 3]).re)   # 3  (a Number, not a Polynomial)
+    say(Polynomial([1, 2, 3]).real)   # 3  (a Number, not a Polynomial)
 
-Aliases: I<real>
+Aliases: I<re>
 
 =cut
+
+=head1 ROUNDING AND CONVERSION
+
+=head2 float
+
+    x.float
+
+Returns a new C<Polynomial> with each coefficient converted to a floating-point approximation.
+
+=cut
+
+=head2 rat
+
+    x.rat
+
+Returns a new C<Polynomial> with each coefficient converted to an exact rational number (C<Math::GMPq>).
+
+=cut
+
+=head2 rat_approx
+
+    x.rat_approx
+
+Returns a new C<Polynomial> with each floating-point coefficient replaced by a nearby rational approximation.
+
+=cut
+
+=head2 floor
+
+    x.floor
+
+Returns a new C<Polynomial> with C<floor()> applied to each coefficient, rounding each one down to the nearest integer.
+
+    say(Polynomial([1.8, 2.3]).floor)   # x + 2
+
+=cut
+
+=head2 ceil
+
+    x.ceil
+
+Returns a new C<Polynomial> with C<ceil()> applied to each coefficient, rounding each one up to the nearest integer.
+
+    say(Polynomial([1.5, 2.3]).ceil)   # 2*x + 3
+
+=cut
+
+=head2 round
+
+    x.round(r)
+
+Returns a new C<Polynomial> with each coefficient rounded to C<r> decimal places (or to the nearest integer when C<r> is zero).
+
+    say(Polynomial([1.456, 2.789]).round(1))   # 1.5*x + 2.8
+
+=cut
+
+=head2 lift
+
+    x.lift
+
+Returns a new C<Polynomial> with each coefficient replaced by its C<.lift> value. For plain C<Number> coefficients this is a no-op (returns an equivalent copy). For polynomials with C<Mod>-valued coefficients (e.g. after calling C<.mod(n)> on a polynomial over a modular ring), C<lift> unwraps each coefficient from its modular context.
+
+=cut
+
+=head2 to_n
+
+    x.to_n
+
+Converts the polynomial to a scalar C<Sidef::Types::Number::Number>:
+
+=over 4
+
+=item * B<Zero polynomial> (no terms): returns C<0>.
+
+=item * B<Constant polynomial> (only a C<x^0> term, all others zero or absent): returns the constant coefficient.
+
+=item * B<Non-constant polynomial>: returns C<NaN>.
+
+=back
+
+=cut
+
+=head2 to_poly
+
+    x.to_poly
+
+Returns the polynomial itself. Provides a uniform interface for type conversion (e.g. C<PolynomialMod> overrides this to return the underlying residue polynomial).
+
+=cut
+
+=head1 PREDICATES
 
 =head2 is_real
 
@@ -750,105 +833,9 @@ Returns the norm of the constant term: C<x.real.norm>. This is the norm of the C
 
 =cut
 
-=head2 to_n
+=head1 COMPARISON
 
-    x.to_n
-
-Converts the polynomial to a scalar C<Sidef::Types::Number::Number>:
-
-=over 4
-
-=item * B<Zero polynomial> (no terms): returns C<0>.
-
-=item * B<Constant polynomial> (only a C<x^0> term, all others zero or absent): returns the constant coefficient.
-
-=item * B<Non-constant polynomial>: returns C<NaN>.
-
-=back
-
-=cut
-
-=head2 to_poly
-
-    x.to_poly
-
-Returns the polynomial itself. Provides a uniform interface for type conversion (e.g. C<PolynomialMod> overrides this to return the underlying residue polynomial).
-
-=cut
-
-=head2 lift
-
-    x.lift
-
-Returns a new C<Polynomial> with each coefficient replaced by its C<.lift> value. For plain C<Number> coefficients this is a no-op (returns an equivalent copy). For polynomials with C<Mod>-valued coefficients (e.g. after calling C<.mod(n)> on a polynomial over a modular ring), C<lift> unwraps each coefficient from its modular context.
-
-=cut
-
-=head2 float
-
-    x.float
-
-Returns a new C<Polynomial> with each coefficient converted to a floating-point approximation.
-
-=cut
-
-=head2 rat
-
-    x.rat
-
-Returns a new C<Polynomial> with each coefficient converted to an exact rational number (C<Math::GMPq>).
-
-=cut
-
-=head2 rat_approx
-
-    x.rat_approx
-
-Returns a new C<Polynomial> with each floating-point coefficient replaced by a nearby rational approximation.
-
-=cut
-
-=head2 floor
-
-    x.floor
-
-Returns a new C<Polynomial> with C<floor()> applied to each coefficient, rounding each one down to the nearest integer.
-
-    say(Polynomial([1.8, 2.3]).floor)   # x + 2
-
-=cut
-
-=head2 ceil
-
-    x.ceil
-
-Returns a new C<Polynomial> with C<ceil()> applied to each coefficient, rounding each one up to the nearest integer.
-
-    say(Polynomial([1.5, 2.3]).ceil)   # 2*x + 3
-
-=cut
-
-=head2 round
-
-    x.round(r)
-
-Returns a new C<Polynomial> with each coefficient rounded to C<r> decimal places (or to the nearest integer when C<r> is zero).
-
-    say(Polynomial([1.456, 2.789]).round(1))   # 1.5*x + 2.8
-
-=cut
-
-=head2 !=
-
-    a != b
-
-Returns true if C<a> and C<b> are not equal. Implemented as the logical negation of L</==>. See L</==> for equality semantics.
-
-Aliases: I<ne>
-
-=cut
-
-=head2 ==
+=head2 eq
 
     a == b
 
@@ -862,11 +849,21 @@ Returns true if C<a> equals C<b>.
 
 =back
 
-Aliases: I<eq>
+Aliases: I<==>
 
 =cut
 
-=head2 <=>
+=head2 ne
+
+    a != b
+
+Returns true if C<a> and C<b> are not equal. Implemented as the logical negation of L</eq>.
+
+Aliases: I<!=>
+
+=cut
+
+=head2 cmp
 
     a <=> b
 
@@ -888,49 +885,51 @@ Three-way comparison. Returns -1, 0, or 1.
 
 =back
 
-Aliases: I<cmp>
+Aliases: I<<< <=> >>>
 
 =cut
 
-=head2 <
+=head2 lt
 
     a < b
 
-Returns true if C<a> is strictly less than C<b> under the ordering defined by L</<=>>.
+Returns true if C<a> is strictly less than C<b> under the ordering defined by L</cmp>.
 
-Aliases: I<lt>
+Aliases: I<<< < >>>
 
 =cut
 
-=head2 >
+=head2 gt
 
     a > b
 
 Returns true if C<a> is strictly greater than C<b>.
 
-Aliases: I<gt>
+Aliases: I<<< > >>>
 
 =cut
 
-=head2 ≤
+=head2 le
 
-    a ≤ b
+    a <= b
 
 Returns true if C<a> is less than or equal to C<b>.
 
-Aliases: I<E<lt>=>, I<le>
+Aliases: I<<< <= >>>, I<≤>
 
 =cut
 
-=head2 ≥
+=head2 ge
 
-    a ≥ b
+    a >= b
 
 Returns true if C<a> is greater than or equal to C<b>.
 
-Aliases: I<E<gt>=>, I<ge>
+Aliases: I<<< >= >>>, I<≥>
 
 =cut
+
+=head1 STRING REPRESENTATION AND BOOLEAN CONTEXT
 
 =head2 to_s
 
@@ -942,7 +941,7 @@ Returns a C<Sidef::Types::String::String> representation of the polynomial in st
     say(Polynomial([1, 0, -1]).to_s)  # "x^2 - 1"
     say(Polynomial([]).to_s)          # "0"
 
-Coefficient 1 is suppressed (C<x> not C<1*x>); negative signs replace leading C<+>. Parentheses are added around complex coefficients.
+Coefficient 1 is suppressed (C<x> not C<1*x>); negative signs replace leading C<+>. Parentheses are added around complex coefficients. This is also what a Polynomial produces when stringified implicitly (e.g. via interpolation).
 
 Aliases: I<stringify>
 
@@ -969,12 +968,16 @@ Terms are listed in B<ascending> exponent order with each coefficient shown via 
 
 =cut
 
-=head1 BOOLEAN CONTEXT
+=head2 __boolify__
 
-In boolean context (C<if>, C<while>, etc.), a C<Polynomial> is truthy if its constant term (C<x^0> coefficient) is truthy, and falsy if zero or absent.
+    self.__boolify__
+
+Backs the polynomial's boolean-context overload (e.g. C<if polynomial_value>). This checks only the constant term (the C<x^0> coefficient) — a polynomial with no constant term is falsy in a boolean context even if it has other nonzero terms, and one is not required to be the zero polynomial to be falsy this way.
 
     if (Polynomial([1, 0])) { ... }   # falsy: no constant term
     if (Polynomial([1, 3])) { ... }   # truthy: constant term is 3
+
+=cut
 
 =head1 EXAMPLES
 
@@ -1072,15 +1075,27 @@ B<Coefficient ring:> Coefficients are arbitrary C<Sidef::Types::Number::Number> 
 
 =item *
 
-B<No operator precedence:> See the L</IMPORTANT: OPERATOR PRECEDENCE> section at the top of this document. All operators share equal precedence and associate left-to-right. When in doubt, add parentheses.
-
-=item *
-
 B<Division:> The C</> operator returns a C<Sidef::Types::Number::Fraction> when division is inexact. Use C<//> (C<idiv>) to always get just the quotient polynomial, or C<divmod> to get both quotient and remainder.
 
 =item *
 
 B<Comparison vs scalar:> The C<< <=> >> operator returns C<undef> (not a defined value) when comparing a non-constant polynomial against a scalar. Guard with a defined-check when this is possible.
+
+=back
+
+=head1 REFERENCES
+
+=over 4
+
+=item * L<https://en.wikipedia.org/wiki/Polynomial>
+
+=item * L<https://metacpan.org/pod/Math::Polynomial>
+
+=item * L<https://metacpan.org/pod/Math::Polynomial::Cyclotomic>
+
+=item * L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclidean_division>
+
+=item * L<https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#B%C3%A9zout's_identity_and_extended_GCD_algorithm>
 
 =back
 
