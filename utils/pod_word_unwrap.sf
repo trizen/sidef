@@ -1,0 +1,45 @@
+#!/usr/bin/ruby
+
+# Remove word-wrapping from POD files.
+
+# usage: sidef pod_word_unwrap.sf [lib dir]
+
+var dir = ARGV[0] \\ die "usage: #{__MAIN__} [lib dir]\n";
+
+Dir(dir).find {|file|
+
+    if (file.is_file && file.ends_with(".pod")) {
+
+        var content = file.read(:utf8)
+        var new = []
+        var in_text = false
+
+        content.lines.each {|line|
+            line = line.trim_end
+            if (line.is_empty) {
+                in_text = false
+                new << line
+            }
+            elsif (line =~ /^\S/) {
+                if (in_text) {
+                    new[-1] += (" " + line)
+                }
+                else {
+                    in_text = true
+                    new << line
+                }
+            }
+            else {
+                in_text = false
+                new << line
+            }
+        }
+
+        var new_content = new.join("\n")+"\n"
+
+        if (content != new_content) {
+            say file
+            file.write(new_content)
+        }
+    }
+}

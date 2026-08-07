@@ -70,17 +70,20 @@ sub find {
     my $is_block = $ref eq 'Sidef::Types::Block::Block';
 
     File::Find::find(
-        sub {
-            my $file = Encode::decode_utf8($File::Find::name);
+        {
+         no_chdir => 1,
+         wanted   => sub {
+             my $file = Encode::decode_utf8($File::Find::name);
 
-            if (-d $file) {
-                $file = __PACKAGE__->new($file);
-            }
-            else {
-                $file = Sidef::Types::Glob::File->new($file);
-            }
+             if (-d $file) {
+                 $file = __PACKAGE__->new($file);
+             }
+             else {
+                 $file = Sidef::Types::Glob::File->new($file);
+             }
 
-            $is_block ? $arg->run($file) : push(@files, $file);
+             $is_block ? $arg->run($file) : push(@files, $file);
+         }
         },
         $$self
     );

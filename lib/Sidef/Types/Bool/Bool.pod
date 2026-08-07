@@ -110,19 +110,19 @@ Aliases: I<not>, I<flip>, I<toggle>, I<is_false>
 
 =head2 new
 
-    self.new
-    Bool.new(value)
+    Bool(value)
 
 Creates a new Boolean object from the given value. Any value can be converted to a boolean:
 - C<false>, C<0>, empty string, C<nil> become C<false>
 - Everything else becomes C<true>
 
-    Bool.new(1)          # true
-    Bool.new(0)          # false
-    Bool.new("text")     # true
-    Bool.new("")         # false
-    Bool.new(nil)        # false
-    Bool.new([])         # true (empty array is truthy)
+    Bool(1)          # true
+    Bool(0)          # false
+    Bool("text")     # true
+    Bool("0")        # false
+    Bool("")         # false
+    Bool(nil)        # false
+    Bool([])         # false
 
 Aliases: I<call>
 
@@ -224,6 +224,12 @@ In Sidef, the following values are considered false:
 
 =item * C<""> - empty string
 
+=item * C<"0"> - zero string
+
+=item * C<[]> - empty array
+
+=item * C<Hash()> - empty hash
+
 =item * C<nil> - the null/undefined value
 
 =back
@@ -236,11 +242,11 @@ All other values are considered true, including:
 
 =item * Any non-zero number
 
-=item * Any non-empty string (including C<"0">)
+=item * Any non-empty string (excluding C<"0">)
 
-=item * Any array or hash (even if empty)
+=item * Any non-empty array or hash
 
-=item * Any object
+=item * Any object that doesn't numify to C<0> or boolify to C<false>
 
 =back
 
@@ -269,7 +275,7 @@ All other values are considered true, including:
     say Bool(42)         # true
     say Bool(0)          # false
     say Bool(nil)        # false
-    say Bool([])         # true
+    say Bool([])         # false
 
     # Random boolean
     var coin_flip = Bool.pick
