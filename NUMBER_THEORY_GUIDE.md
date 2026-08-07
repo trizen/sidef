@@ -864,7 +864,7 @@ say m/3
 
 ### Euler's Totient $φ(n)$
 
-$φ(n)$ counts integers in [1, n] coprime to $n$ — it is the order of the multiplicative group $(\Z/n\Z)*$:
+$φ(n)$ counts integers in [1, n] coprime to $n$ — it is the order of the multiplicative group $(Z/nZ)*$:
 
 ```ruby
 euler_phi(12)          #=> 4
@@ -877,7 +877,7 @@ uphi(n)                # unitary totient
 
 ### Carmichael's Lambda $λ(n)$
 
-$λ(n)$ is the exponent of $(\Z/n\Z)*$ — the smallest $m$ such that $a^m \equiv 1 \pmod{n}$ for all $a$ coprime to $n$:
+$λ(n)$ is the exponent of $(Z/nZ)*$ — the smallest $m$ such that $a^m \equiv 1 \pmod{n}$ for all $a$ coprime to $n$:
 
 ```ruby
 lambda(12)             #=> 2

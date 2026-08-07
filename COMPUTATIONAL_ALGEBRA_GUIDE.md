@@ -169,7 +169,7 @@ say z.sgn    # the unit (one of 1, -1, i, -i) with the same argument as z
 
 ## Quadratic
 
-`Quadratic(a, b, p, q)` represents an element $a + b t$ of the quotient ring $\Z[t] / (t^2 - q t - p)$, where $t$ satisfies $t^2 = p + q t$. Every element carries four components: the two coordinates `a`, `b`, and the two ring parameters `p`, `q`.
+`Quadratic(a, b, p, q)` represents an element $a + b t$ of the quotient ring $Z[t] / (t^2 - q t - p)$, where $t$ satisfies $t^2 = p + q t$. Every element carries four components: the two coordinates `a`, `b`, and the two ring parameters `p`, `q`.
 
 Two special cases cover almost everything you'll want to compute:
 
@@ -514,7 +514,7 @@ say base.powmod(100, mod)           # (x+1)^100 mod (x^2+1), computed efficientl
 
 ## PolynomialMod
 
-`PolynomialMod(coeffs, modulus)` represents an element of the quotient ring $\R[x] / (m(x))$: every arithmetic result is automatically reduced modulo the polynomial `m(x)`. This is the algebraic engine behind finite fields, cyclotomic fields, and constructions like AES's $GF(2^8)$.
+`PolynomialMod(coeffs, modulus)` represents an element of the quotient ring $R[x] / (m(x))$: every arithmetic result is automatically reduced modulo the polynomial `m(x)`. This is the algebraic engine behind finite fields, cyclotomic fields, and constructions like AES's $GF(2^8)$.
 
 The modulus can be given as a plain coefficient array or as an existing `Polynomial`.
 
@@ -528,7 +528,7 @@ var p = PolynomialMod([3, 2, 1], [1, 0, 1])
 var x = PolynomialMod([1, 0], [1, 0, 1])
 ```
 
-### Simulating Gaussian integers via $\Q[x]/(x²+1)$
+### Simulating Gaussian integers via $Q[x]/(x²+1)$
 
 ```ruby
 var i = PolynomialMod([1, 0], [1, 0, 1])   # x, reduced mod x^2+1
@@ -565,7 +565,7 @@ say (p * p.inv)     # 1
 say (p ** 1000)     # efficient even for large exponents
 ```
 
-The inverse of $f(x)$ in $\R[x]/(m(x))$ exists exactly when $\gcd(f, m) = 1$.
+The inverse of $f(x)$ in $R[x]/(m(x))$ exists exactly when $\gcd(f, m) = 1$.
 
 ### GCD and modular inverse via gcdext
 
@@ -697,10 +697,10 @@ This section develops the number-theoretic machinery that these six types collec
 
 ### Rings of Integers
 
-An **algebraic integer** is a root of a monic polynomial with integer coefficients. For the quadratic field $\Q(\sqrt d)$ with $d$ square-free:
+An **algebraic integer** is a root of a monic polynomial with integer coefficients. For the quadratic field $Q(\sqrt d)$ with $d$ square-free:
 
-- If `d == 2` or `3 (mod 4)`: the ring of integers is $\Z[\sqrt d]$, elements $a + b \sqrt d$ with $a$, $b$ integers.
-- If `d == 1 (mod 4)`: the ring of integers is $\Z[(1+\sqrt d)/2]$, using a half-integer basis.
+- If $d \equiv {2,3} \pmod{4}$: the ring of integers is $Z[\sqrt d]$, elements $a + b \sqrt d$ with $a$, $b$ integers.
+- If $d \equiv 1 \pmod{4}$: the ring of integers is $Z[(1+\sqrt d)/2]$, using a half-integer basis.
 
 ```ruby
 # Z[sqrt(2)]: d=2, d == 2 (mod 4), so integers have the form a + b*sqrt(2)
@@ -717,7 +717,7 @@ say (phi ** 2)  # phi + 1, the defining property of the golden ratio
 
 ### Quadratic Fields: Real vs Imaginary
 
-The sign of `d` in $\Q(\sqrt d)$ determines whether the field is **real** ($d > 0$) or **imaginary** ($d < 0$), which profoundly affects the arithmetic.
+The sign of `d` in $Q(\sqrt d)$ determines whether the field is **real** ($d > 0$) or **imaginary** ($d < 0$), which profoundly affects the arithmetic.
 
 #### Imaginary quadratic fields
 
@@ -794,7 +794,7 @@ say min_poly_alpha.degree                  # 4 = [Q(sqrt(2)+sqrt(3)) : Q]
 
 ### Pell's Equation and Fundamental Units
 
-The **Pell equation** $x^2 - d y^2 = +-1$ is one of the oldest problems in number theory, and its solutions are exactly the powers of the fundamental unit of $\Q(\sqrt d)$.
+The **Pell equation** $x^2 - d y^2 = +-1$ is one of the oldest problems in number theory, and its solutions are exactly the powers of the fundamental unit of $Q(\sqrt d)$.
 
 ```ruby
 var u = Quadratic(1, 1, 2)   # fundamental unit of Q(sqrt(2))
@@ -821,7 +821,7 @@ for n in (1..6) {
 # 1/1, 3/2, 7/5, 17/12, 41/29, 99/70 — converging on sqrt(2)
 ```
 
-$\Q(\sqrt 5)$'s fundamental unit is the golden ratio, with norm $-1$ rather than $+1$ — a reminder that not every real quadratic field has a norm-`+1` fundamental unit:
+$Q(\sqrt 5)$'s fundamental unit is the golden ratio, with norm $-1$ rather than $+1$ — a reminder that not every real quadratic field has a norm-`+1` fundamental unit:
 
 ```ruby
 var phi = Quadratic(1/2, 1/2, 5)
@@ -833,7 +833,7 @@ say ((phi ** 2).norm)  # 1  -- squaring a norm(-1) unit always gives norm(+1)
 
 ### Splitting of Rational Primes
 
-A rational prime $p$ behaves in one of three ways in the ring of integers of $\Q(\sqrt d)$, determined by the Legendre symbol $(d/p)$:
+A rational prime $p$ behaves in one of three ways in the ring of integers of $Q(\sqrt d)$, determined by the Legendre symbol $(d/p)$:
 
 | `(d/p)` | Behavior | Example in `Z[i]` |
 |---|---|---|
@@ -867,7 +867,7 @@ say pi11.norm             # 11
 
 ### Fermat's Two-Square Theorem
 
-Every prime $p \equiv 1 \pmod{4}$ is a sum of two squares. The classical proof is constructive: find $x$ with $x^2 \equiv -1 \pmod{p}$, then take $\gcd(x+i, p)$ in $\Z[i]$.
+Every prime $p \equiv 1 \pmod{4}$ is a sum of two squares. The classical proof is constructive: find $x$ with $x^2 \equiv -1 \pmod{p}$, then take $\gcd(x+i, p)$ in $Z[i]$.
 
 ```ruby
 func two_squares(p) {
@@ -923,7 +923,7 @@ say ((qa * qb).norm)              # 77 = 7 * 11
 
 ### Cyclotomic Fields via PolynomialMod
 
-The **cyclotomic field** $\Q(\zeta_n)$ is generated by a primitive `n`-th root of unity, satisfying the `n`-th cyclotomic polynomial $\Phi_n(x) = 0$. In Sidef, this is exactly `PolynomialMod` with modulus $\Phi_n(x)$.
+The **cyclotomic field** $Q(\zeta_n)$ is generated by a primitive `n`-th root of unity, satisfying the `n`-th cyclotomic polynomial $\Phi_n(x) = 0$. In Sidef, this is exactly `PolynomialMod` with modulus $\Phi_n(x)$.
 
 ```ruby
 # Q(zeta_3): cube roots of unity, Phi_3(x) = x^2+x+1 — the Eisenstein integers
@@ -950,7 +950,7 @@ say (zeta8 + (zeta8 ** 7))   # zeta_8 + zeta_8^-1 represents sqrt(2)
 
 #### Galois action
 
-The Galois group $Gal(\Q(\zeta_n)/\Q) = (\Z/n\Z)*$ acts by `zeta -> zeta^k` for $\gcd(k, n) = 1$:
+The Galois group $Gal(Q(\zeta_n)/Q) = (Z/nZ)*$ acts by `zeta -> zeta^k` for $\gcd(k, n) = 1$:
 
 ```ruby
 var mod5 = [1, 1, 1, 1, 1]    # Phi_5(x)
