@@ -20045,7 +20045,7 @@ sub almost_prime_sum {
                 Math::GMPz::Rmpz_div($u, $n, $t);
 
                 my $w  = Math::GMPz::Rmpz_fits_ulong_p($u)      ? Math::GMPz::Rmpz_get_ui($u)       : Math::GMPz::Rmpz_get_str($u, 10);
-                my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
+                my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->primes_sum};
 
                 if (FAST_MODE and $ps < ULONG_MAX) {
                     Math::GMPz::Rmpz_addmul_ui($total, $t, $ps - $j);
@@ -20242,7 +20242,7 @@ sub squarefree_almost_prime_sum {
                 Math::GMPz::Rmpz_div($u, $n, $t);
 
                 my $w  = Math::GMPz::Rmpz_fits_ulong_p($u)      ? Math::GMPz::Rmpz_get_ui($u)       : Math::GMPz::Rmpz_get_str($u, 10);
-                my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
+                my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->primes_sum};
 
                 if (FAST_MODE and $ps < ULONG_MAX) {
                     Math::GMPz::Rmpz_addmul_ui($total, $t, $ps - $j);
@@ -20469,7 +20469,7 @@ sub omega_prime_sum {
                     }
 
                     my $w  = Math::GMPz::Rmpz_fits_ulong_p($u)      ? Math::GMPz::Rmpz_get_ui($u)       : Math::GMPz::Rmpz_get_str($u, 10);
-                    my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->sum_primes};
+                    my $ps = (HAS_PRIME_UTIL and $w < PRIMESUM_MIN) ? Math::Prime::Util::sum_primes($w) : ${_set_int($w)->primes_sum};
 
                     if (FAST_MODE and $ps < ULONG_MAX) {
                         Math::GMPz::Rmpz_addmul_ui($total, $v, $ps - $j);
@@ -21066,8 +21066,8 @@ sub prime_power_sum {
     my $sr = Math::Prime::Util::GMP::sqrtint($n);
     my $cr = Math::Prime::Util::GMP::rootint($n, 3);
 
-    my $ps1 = _set_int($n)->sum_primes;
-    my $ps2 = (TWO)->sum_primes(_set_int($sr), TWO);
+    my $ps1 = _set_int($n)->primes_sum;
+    my $ps2 = (TWO)->primes_sum(_set_int($sr), TWO);
 
     state $u = Math::GMPz::Rmpz_init_nobless();
 
@@ -26342,7 +26342,7 @@ sub primes_sum {
             return _set_int(Math::Prime::Util::GMP::vecsum(map { Math::Prime::Util::GMP::powint($_, $k) } @{_primes($from, $to)}));
         }
 
-        return ((TWO)->sum_primes(_set_int($to), _set_int($k))->sub((TWO)->sum_primes(_set_int($from)->dec, _set_int($k))));
+        return ((TWO)->primes_sum(_set_int($to), _set_int($k))->sub((TWO)->primes_sum(_set_int($from)->dec, _set_int($k))));
     }
 
     if (FAST_MODE and $to < ULONG_MAX) {
@@ -27614,7 +27614,7 @@ sub lpf_sum {    # sum of lpf(k)
             $sum += $p * Math::Prime::Util::legendre_phi(CORE::int($n / $p), $pi++);
         }
 
-        return _set_int($sum)->add(_set_int(_next_prime($s))->sum_primes(_set_int($n)));
+        return _set_int($sum)->add(_set_int(_next_prime($s))->primes_sum(_set_int($n)));
     }
 
     my $pi  = 0;
@@ -27638,7 +27638,7 @@ sub lpf_sum {    # sum of lpf(k)
         ++$pi;
     }
 
-    (bless \$sum)->add(_set_int(_next_prime($s))->sum_primes(_set_int($n)));
+    (bless \$sum)->add(_set_int(_next_prime($s))->primes_sum(_set_int($n)));
 }
 
 sub gpf {
@@ -27702,7 +27702,7 @@ sub gpf_sum {    # sum of gpf(k)
             $sum += $u * (
                           ($r - $p < PRIMESUM_MIN)
                           ? Math::Prime::Util::sum_primes($p, $r)
-                          : ${_set_int($p)->sum_primes(_set_int($r))}
+                          : ${_set_int($p)->primes_sum(_set_int($r))}
                          );
             $p = $r;
         }
@@ -27738,7 +27738,7 @@ sub gpf_sum {    # sum of gpf(k)
         my $u = Math::Prime::Util::GMP::divint($n, $p);
         my $r = Math::Prime::Util::GMP::divint($n, $u);
 
-        my $w = Math::Prime::Util::GMP::mulint($u, _set_int($p)->sum_primes(_set_int($r)));
+        my $w = Math::Prime::Util::GMP::mulint($u, _set_int($p)->primes_sum(_set_int($r)));
 
         if (FAST_MODE and $w < ULONG_MAX) {
             Math::GMPz::Rmpz_add_ui($sum, $sum, $w);

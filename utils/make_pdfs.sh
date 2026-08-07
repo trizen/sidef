@@ -1,7 +1,7 @@
 #!/bin/bash
 
 markdown2pdf='markdown2pdf.pl'
-version=26.07
+version=26.08
 js_delay=10000
 
 which $markdown2pdf

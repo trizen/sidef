@@ -1449,7 +1449,7 @@ When invoked without a script file, Sidef enters interactive mode, providing a R
 =head2 Starting the REPL
 
     $ sidef
-    Sidef 26.07, running on Linux, using Perl v5.42.1.
+    Sidef 26.08, running on Linux, using Perl v5.42.1.
     Type "help", "copyright" or "license" for more information.
     >
 

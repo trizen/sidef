@@ -2898,7 +2898,7 @@ eval(str)                                        #=> evaluate a Sidef expression
 | 📘 [Sidef GitBook](https://trizen.gitbook.io/sidef-lang/) | The complete language reference — covers everything |
 | 📄 [Beginner's Guide](https://github.com/trizen/sidef/blob/master/SIDEF_BEGINNER_GUIDE.md) | Start here if you're new to Sidef |
 | 📝 [Advanced Guide](https://github.com/trizen/sidef/blob/master/SIDEF_ADVANCED_GUIDE.md) | Comprehensive language tutorial |
-| 📕 [Full PDF Documentation](https://github.com/trizen/sidef/releases/download/26.07/sidef-documentation.pdf) | Offline PDF version of the complete language documentation |
+| 📕 [Full PDF Documentation](https://github.com/trizen/sidef/releases/download/26.08/sidef-documentation.pdf) | Offline PDF version of the complete language documentation |
 | 📚 [Number Theory Guide](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_GUIDE.md) | Deep dive into Sidef's mathematical superpowers |
 | 🔢 [Number Theory Reference](https://github.com/trizen/sidef/blob/master/NUMBER_THEORY_REFERENCE.md) | Complete function reference for number theory |
 | 📑 [Computational Algebra Guide](https://github.com/trizen/sidef/blob/master/COMPUTATIONAL_ALGEBRA_GUIDE.md) | Complete guide for computational algebra |

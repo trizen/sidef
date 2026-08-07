@@ -16,7 +16,7 @@ my $ext = 'pod';
 my @dirs = @ARGV ? @ARGV : ("bin/sidef", ".");
 
 my $pod2pdf = 'pod2pdf.pl';
-my $version = '26.07';
+my $version = '26.08';
 
 `which $pod2pdf` || die "pod2pdf.pl is not available";
 
