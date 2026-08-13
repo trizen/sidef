@@ -30215,12 +30215,12 @@ sub strict_partitions {
     sub {
         my ($n, $max_part) = @_;
         if ($n == 0) {
-            unshift @results, _array([@path]);
+            unshift @results, _array([map { bless \$_ } @path]);
             return;
         }
         my $upper = ($n < $max_part ? $n : $max_part);
         for my $part (1 .. $upper) {
-            push @path, bless \$part;
+            push @path, $part;
             __SUB__->($n - $part, $part - 1);
             pop @path;    # backtrack
         }
@@ -30249,7 +30249,7 @@ sub multisets {
         my ($pos, $max_value, $sum) = @_;
 
         if ($pos == $n) {
-            push @results, _array([@path]);
+            push @results, _array([map { bless \$_ } @path]);
             return;
         }
 
@@ -30257,7 +30257,7 @@ sub multisets {
             if (defined $max_sum) {
                 last if ($sum + $v > $max_sum);
             }
-            push @path, bless \$v;
+            push @path, $v;
             __SUB__->($pos + 1, $v, $sum + $v);
             pop @path;    # backtrack
         }
