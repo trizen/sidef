@@ -116,12 +116,39 @@ sub eval {
     my $m = $x->[1];
     $x = $x->[0];
 
-    CORE::keys(%$x) || return Sidef::Types::Number::Number::ZERO;
+    my @exponents = CORE::keys(%$x);
+    @exponents || return Sidef::Types::Number::Number::ZERO;
+
+    # Evaluate via Horner's method (nested multiplication), visiting terms
+    # from the highest exponent down to the lowest. Between two consecutive
+    # exponents e_i > e_{i+1}, the accumulator is advanced by a single
+    # multiplication by value^(e_i - e_{i+1}) instead of computing
+    # value^e_{i+1} from scratch for every term independently, which turns
+    # O(n) independent modular exponentiations into O(n) much cheaper gap
+    # exponentiations (trivial -- a single multiply -- for the common case
+    # of consecutive or closely-spaced exponents).
+    @exponents = CORE::sort { $b <=> $a } @exponents;
 
     $value = $value->mod($m);
-    Sidef::Types::Number::Number::sum(
-                 map { Sidef::Types::Number::Mod->new($value, $m)->pow(Sidef::Types::Number::Number::_set_int($_))->lift->mul($x->{$_}->eval($value))->mod($m) }
-                   CORE::keys(%$x))->mod($m);
+
+    my $prev_exp = CORE::shift(@exponents);
+    my $result   = $x->{$prev_exp}->eval($value)->mod($m);
+
+    foreach my $exp (@exponents) {
+        my $gap    = Sidef::Types::Number::Number::_set_int(Math::Prime::Util::GMP::subint($prev_exp, $exp));
+        my $factor = Sidef::Types::Number::Mod->new($value, $m)->pow($gap)->lift;
+
+        $result   = $result->mul($factor)->add($x->{$exp}->eval($value))->mod($m);
+        $prev_exp = $exp;
+    }
+
+    # Bring the accumulator down from the lowest nonzero exponent to x^0.
+    if ($prev_exp != 0) {
+        my $factor = Sidef::Types::Number::Mod->new($value, $m)->pow(Sidef::Types::Number::Number::_set_int($prev_exp))->lift;
+        $result = $result->mul($factor)->mod($m);
+    }
+
+    return $result;
 }
 
 sub binomial {
@@ -402,8 +429,8 @@ sub gcdext {
 
     my $i = 1;
     until ($r1->is_zero) {
-        my ($q) = $r0->divmod($r1);
-        ($r0, $r1) = ($r1, $r0->sub($q->mul($r1)));
+        my ($q, $r) = $r0->divmod($r1);
+        ($r0, $r1) = ($r1, $r);
         ($s0, $s1) = ($s1, $s0->sub($q->mul($s1)));
         ($t0, $t1) = ($t1, $t0->sub($q->mul($t1)));
         ++$i;
