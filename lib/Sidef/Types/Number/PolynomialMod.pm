@@ -372,7 +372,7 @@ sub lcm {
 
 sub normalize_to_monic {
     my ($x) = @_;
-    my $deg = $x->degree->numify;
+    my $deg = join('', $x->degree);
     return $x if $deg < 0;
 
     my $lc = $x->[0]{$deg};
