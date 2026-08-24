@@ -1527,7 +1527,7 @@ sub squeeze {
     my @result;
 
     foreach my $item (@$self) {
-        if (!@result || "$result[-1]" ne "$item") {
+        if (!@result || $result[-1] ne $item) {
             CORE::push(@result, $item);
         }
     }
