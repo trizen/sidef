@@ -471,6 +471,21 @@ Aliases: I<capitalize>
 
 =cut
 
+=head2 swapcase
+
+    str.swapcase
+
+Returns a new string with the case of every letter swapped: uppercase letters become lowercase and lowercase letters become uppercase. Non-letter characters are left unchanged. Unicode letters are handled correctly.
+
+Example:
+
+    say "Hello World".swapcase    #=> "hELLO wORLD"
+    say "ABC def".swapcase        #=> "abc DEF"
+
+Aliases: I<swap_case>
+
+=cut
+
 =head2 wc
 
     str.wc
@@ -808,6 +823,45 @@ Example:
 
     say "hello".ends_with("lo")    #=> true
     say "hello".ends_with("he")    #=> false
+
+=cut
+
+=head2 common_prefix
+
+    str.common_prefix(other)
+
+Returns the longest common prefix shared between C<self> and C<other> as a new string. Returns an empty string if the two strings share no common prefix.
+
+Example:
+
+    say "interspecies".common_prefix("interstellar")    #=> "inters"
+    say "foo".common_prefix("bar")                       #=> ""
+
+=cut
+
+=head2 common_suffix
+
+    str.common_suffix(other)
+
+Returns the longest common suffix shared between C<self> and C<other> as a new string. Returns an empty string if the two strings share no common suffix.
+
+Example:
+
+    say "testing".common_suffix("boxing")    #=> "ing"
+    say "foo".common_suffix("bar")           #=> ""
+
+=cut
+
+=head2 wrap
+
+    str.wrap(width=76)
+
+Word-wraps the string to at most C<width> characters per line, breaking only on whitespace between words. Returns an C<Array> of C<String> lines. Words longer than C<width> are placed alone on their own line without being split.
+
+Example:
+
+    say "The quick brown fox jumps over the lazy dog".wrap(20)
+    #=> ["The quick brown fox", "jumps over the lazy", "dog"]
 
 =cut
 

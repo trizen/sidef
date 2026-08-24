@@ -285,6 +285,62 @@ sub capitalize {
 
 *tclc = \&capitalize;
 
+sub swapcase {
+    my ($self) = @_;
+    (my $str = $$self) =~ s/(\p{Lu})|(\p{Ll})/defined($1) ? CORE::lc($1) : CORE::uc($2)/ge;
+    bless \$str;
+}
+
+*swap_case = \&swapcase;
+
+sub common_prefix {
+    my ($self, $other) = @_;
+    my $s = $$self;
+    my $t = "$other";
+    my $len = List::Util::min(CORE::length($s), CORE::length($t));
+    my $i = 0;
+    ++$i while $i < $len && CORE::substr($s, $i, 1) eq CORE::substr($t, $i, 1);
+    $self->new(CORE::substr($s, 0, $i));
+}
+
+sub common_suffix {
+    my ($self, $other) = @_;
+    my $s = $$self;
+    my $t = "$other";
+    my $ls = CORE::length($s);
+    my $lt = CORE::length($t);
+    my $len = List::Util::min($ls, $lt);
+    my $i = 0;
+    ++$i while $i < $len && CORE::substr($s, $ls - $i - 1, 1) eq CORE::substr($t, $lt - $i - 1, 1);
+    $i ? $self->new(CORE::substr($s, $ls - $i)) : $self->new('');
+}
+
+sub wrap {
+    my ($self, $width) = @_;
+    $width = defined($width) ? CORE::int($width) : 76;
+    $width = 1 if $width < 1;
+
+    my @lines;
+    my $line = '';
+
+    foreach my $word (CORE::split(' ', $$self)) {
+        if ($line eq '') {
+            $line = $word;
+        }
+        elsif (CORE::length($line) + 1 + CORE::length($word) <= $width) {
+            $line .= ' ' . $word;
+        }
+        else {
+            CORE::push(@lines, bless \(my $l = $line));
+            $line = $word;
+        }
+    }
+
+    CORE::push(@lines, bless \(my $l = $line)) if $line ne '';
+
+    Sidef::Types::Array::Array->new(\@lines);
+}
+
 sub chop {
     my ($self) = @_;
     $self->new(CORE::substr($$self, 0, -1));
