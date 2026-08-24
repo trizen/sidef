@@ -826,6 +826,36 @@ Example:
 
 =cut
 
+=head2 delete_prefix
+
+    str.delete_prefix(prefix)
+
+If the string starts with the given prefix, returns a new string with that prefix removed from the beginning. If the string does not start with the prefix, returns the string unchanged.
+
+Example:
+
+    say "hello world".delete_prefix("hello ")    #=> "world"
+    say "hello world".delete_prefix("xyz")       #=> "hello world"
+
+Aliases: I<remove_prefix>
+
+=cut
+
+=head2 delete_suffix
+
+    str.delete_suffix(suffix)
+
+If the string ends with the given suffix, returns a new string with that suffix removed from the end. If the string does not end with the suffix, returns the string unchanged.
+
+Example:
+
+    say "hello world".delete_suffix(" world")    #=> "hello"
+    say "hello world".delete_suffix("xyz")       #=> "hello world"
+
+Aliases: I<remove_suffix>
+
+=cut
+
 =head2 common_prefix
 
     str.common_prefix(other)
@@ -1070,6 +1100,38 @@ Example:
 
     say "hi".center(10)         #=> "    hi    "
     say "test".center(10, "-")  #=> "---test---"
+
+=cut
+
+=head2 pad_left
+
+    str.pad_left(width, padstr=" ")
+
+Left-justifies the string within a field of the given width by padding the right side with the specified padding string (default is a single space). If the string is already at or beyond the given width, it is returned unchanged.
+
+Example:
+
+    say "hi".pad_left(5)          #=> "hi   "
+    say "hi".pad_left(5, "*")     #=> "hi***"
+    say "hello".pad_left(3)       #=> "hello"
+
+Aliases: I<ljust>
+
+=cut
+
+=head2 pad_right
+
+    str.pad_right(width, padstr=" ")
+
+Right-justifies the string within a field of the given width by padding the left side with the specified padding string (default is a single space). If the string is already at or beyond the given width, it is returned unchanged.
+
+Example:
+
+    say "hi".pad_right(5)         #=> "   hi"
+    say "hi".pad_right(5, "0")    #=> "000hi"
+    say "hello".pad_right(3)      #=> "hello"
+
+Aliases: I<rjust>
 
 =cut
 

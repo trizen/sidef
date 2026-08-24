@@ -1092,6 +1092,50 @@ sub center {
     $self->new(($char x $lpad) . $string . ($char x $rpad));
 }
 
+sub pad_left {
+    my ($self, $size, $char) = @_;
+
+    my $string = $$self;
+
+    $size = defined($size) ? CORE::int($size) : 0;
+    $char = defined($char) ? "$char"          : ' ';
+
+    if (CORE::length($char) > 1) {
+        $char = CORE::substr($char, 0, 1);
+    }
+
+    my $len = CORE::length($string);
+
+    $size <= $len
+      && return $self;
+
+    $self->new($string . ($char x ($size - $len)));
+}
+
+*ljust = \&pad_left;
+
+sub pad_right {
+    my ($self, $size, $char) = @_;
+
+    my $string = $$self;
+
+    $size = defined($size) ? CORE::int($size) : 0;
+    $char = defined($char) ? "$char"          : ' ';
+
+    if (CORE::length($char) > 1) {
+        $char = CORE::substr($char, 0, 1);
+    }
+
+    my $len = CORE::length($string);
+
+    $size <= $len
+      && return $self;
+
+    $self->new(($char x ($size - $len)) . $string);
+}
+
+*rjust = \&pad_right;
+
 sub trim {
     my ($self, $arg) = @_;
 
@@ -1424,6 +1468,38 @@ sub ends_with {
 
     Sidef::Types::Bool::Bool::FALSE;
 }
+
+sub delete_prefix {
+    my ($self, $prefix) = @_;
+
+    $prefix = "$prefix";
+
+    my $len = CORE::length($prefix);
+
+    if ($len > 0 && CORE::substr($$self, 0, $len) eq $prefix) {
+        return $self->new(CORE::substr($$self, $len));
+    }
+
+    $self;
+}
+
+*remove_prefix = \&delete_prefix;
+
+sub delete_suffix {
+    my ($self, $suffix) = @_;
+
+    $suffix = "$suffix";
+
+    my $len = CORE::length($suffix);
+
+    if ($len > 0 && CORE::substr($$self, -$len) eq $suffix) {
+        return $self->new(CORE::substr($$self, 0, CORE::length($$self) - $len));
+    }
+
+    $self;
+}
+
+*remove_suffix = \&delete_suffix;
 
 sub looks_like_number {
     my ($self) = @_;
