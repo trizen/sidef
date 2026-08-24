@@ -647,6 +647,44 @@ Returns an array of arrays by slicing before each element for which the given bl
 
 =cut
 
+=head2 squeeze
+
+    arr.squeeze
+
+Returns a new array with consecutive duplicate elements removed, keeping only the first element of each run.
+
+Example:
+
+    say [1, 1, 2, 2, 3, 1, 1].squeeze    #=> [1, 2, 3, 1]
+
+Aliases: I<squeeze_dup>
+
+=cut
+
+=head2 squeeze_by
+
+    arr.squeeze_by { |prev, curr| ... }
+
+Returns a new array with consecutive elements removed when the given block returns a true value for the previous and current element.
+
+Example:
+
+    say [1, 2, 2, 3, 4, 4, 4, 5].squeeze_by { |a, b| a == b }    #=> [1, 2, 3, 4, 5]
+
+=cut
+
+=head2 chunk_while
+
+    arr.chunk_while { |prev, curr| ... }
+
+Splits the array into an array of sub-arrays, starting a new chunk whenever the block returns a false value for two consecutive elements.
+
+Example:
+
+    say [1, 2, 4, 5, 7, 8].chunk_while { |a, b| b - a == 1 }    #=> [[1, 2], [4, 5], [7, 8]]
+
+=cut
+
 =head2 slices
 
     array.slices(n)
