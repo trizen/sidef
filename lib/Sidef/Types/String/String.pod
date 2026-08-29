@@ -1107,7 +1107,7 @@ Example:
 
     str.pad_left(width, padstr=" ")
 
-Left-justifies the string within a field of the given width by padding the right side with the specified padding string (default is a single space). If the string is already at or beyond the given width, it is returned unchanged.
+Left-justifies the string within a field of the given width by padding the right side with the specified padding string (default is a single space). Only the first character of C<padstr> is used; multi-character padding strings are not repeated. If the string is already at or beyond the given width, it is returned unchanged.
 
 Example:
 
