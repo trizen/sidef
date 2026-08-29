@@ -9682,6 +9682,92 @@ sub solve_pell {
     _array(_sort_pell_solutions(@solutions));
 }
 
+sub solve_thue {
+    my ($D_in, $k_in, $N_in, $bound_in, $first_only) = @_;
+
+    my $D = _any2mpz($$D_in) // return _array();
+
+    ref($k_in) eq __PACKAGE__ or _valid(\$k_in);
+    my $k = _any2ui($$k_in) // return _array();
+
+    $k >= 1 or return _array();
+
+    my $N = defined($N_in) ? do { _any2mpz($$N_in) // return _array() } : Math::GMPz::Rmpz_init_set($ONE);
+
+    my $bound =
+      defined($bound_in)
+      ? do { ref($bound_in) eq __PACKAGE__ or _valid(\$bound_in); _any2ui($$bound_in) // return _array() }
+      : 1e6;
+
+    $bound > 0 or return _array();
+
+    # D = 0: equation reduces to x^k = N (a single check, not a search over y)
+    if (Math::GMPz::Rmpz_sgn($D) == 0) {
+
+        return _array() if Math::GMPz::Rmpz_sgn($N) < 0 and $k % 2 == 0;
+
+        my $neg = (Math::GMPz::Rmpz_sgn($N) < 0);
+        state $abs_N = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_abs($abs_N, $N);
+
+        if ($k == 1) {
+            my $x = Math::GMPz::Rmpz_init_set($neg ? do { Math::GMPz::Rmpz_neg((my $tmp = Math::GMPz::Rmpz_init()), $abs_N); $tmp } : $abs_N);
+            my $y = Math::GMPz::Rmpz_init_set_ui(0);
+            return _array([_array([bless(\$x), bless(\$y)])]);
+        }
+
+        Math::GMPz::Rmpz_perfect_power_p($abs_N) or return _array();
+
+        state $root = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_root($root, $abs_N, $k) or return _array();
+
+        my $x = Math::GMPz::Rmpz_init_set($root);
+        $neg and Math::GMPz::Rmpz_neg($x, $x);
+        my $y = Math::GMPz::Rmpz_init_set_ui(0);
+        return _array([_array([bless(\$x), bless(\$y)])]);
+    }
+
+    my $k_even = ($k % 2 == 0);
+
+    state $t   = Math::GMPz::Rmpz_init_nobless();
+    state $x_z = Math::GMPz::Rmpz_init_nobless();
+
+    my @solutions;
+
+    for (my $y = 1 ; $y <= $bound ; ++$y) {
+
+        Math::GMPz::Rmpz_ui_pow_ui($t, $y, $k);
+        Math::GMPz::Rmpz_mul($t, $t, $D);
+        Math::GMPz::Rmpz_add($t, $t, $N);
+
+        my $sign = Math::GMPz::Rmpz_sgn($t);
+
+        # IMPORTANT: mpz_root() invokes undefined behaviour when given a
+        # negative operand together with an even root.
+        next if $k_even and $sign < 0;
+
+        if ($sign == 0) {
+            push @solutions, [Math::GMPz::Rmpz_init_set_ui(0), Math::GMPz::Rmpz_init_set_ui($y)];
+        }
+        elsif ($k == 1) {
+            push @solutions, [Math::GMPz::Rmpz_init_set($t), Math::GMPz::Rmpz_init_set_ui($y)];
+        }
+        elsif (Math::GMPz::Rmpz_root($x_z, $t, $k)) {    # exact k-th root?
+                                                         # Rmpz_root acts as both the perfect power check and the extraction.
+            push @solutions, [Math::GMPz::Rmpz_init_set($x_z), Math::GMPz::Rmpz_init_set_ui($y)];
+        }
+        else {
+            next;
+        }
+
+        last if $first_only;
+    }
+
+    _array([map { _array([bless(\$_->[0]), bless(\$_->[1])]) } @solutions]);
+}
+
+*binomial_thue_solve = \&solve_thue;
+
 sub solve_lcg {
     my ($n, $r, $m) = @_;
 

@@ -5116,6 +5116,34 @@ Returns an array of C<[x, y]> pairs sorted by increasing C<x>. If the equation h
 
 =cut
 
+=head2 solve_thue
+
+    solve_thue(D, k)
+    solve_thue(D, k, N)
+    solve_thue(D, k, N, bound)
+    solve_thue(D, k, N, bound, first_only)
+
+Searches for integer solutions C<(x, y)>, with C<1 E<lt>= y E<lt>= bound>, of the binomial Thue equation:
+
+    x^k - D*y^k = N
+
+where C<k E<gt>= 1> is the degree, C<N> is an arbitrary integer (default: C<1>), and C<bound> caps the search on C<y> (default: C<10^6>). If C<first_only> is true, the search stops as soon as one solution is found.
+
+This is a bounded numerical search: for each C<y> up to C<bound> it tests whether C<D*y^k + N> is a perfect C<k>-th power. It is I<not> a complete Thue-equation solver in the sense of PARI/GP's C<thueinit()>+C<thue()>, which uses linear forms in logarithms and lattice reduction to provably find I<all> solutions regardless of size. An empty result here only shows there is no solution with C<y E<lt>= bound>.
+
+For C<k E<gt>= 3> and C<N = ±1>, Bennett's theorem (2001) guarantees at most one solution in positive integers, so C<first_only> is safe to use in that case without missing solutions.
+
+Returns an array of C<[x, y]> pairs. If no solution is found within C<bound>, an empty array is returned.
+
+    say solve_thue(5, 4)             #=> [[3, 2]]           (3^4 - 5*2^4 = 1)
+    say solve_thue(2, 4, -1)         #=> [[1, 1]]            (1^4 - 2*1^4 = -1)
+    say solve_thue(7140, 4, 1, 50)   #=> [[239, 26]]         (239^4 - 7140*26^4 = 1)
+    say solve_thue(-2, 3, 3)         #=> [[1, 1], [-5, 4]]   (both are exact)
+
+Aliases: I<binomial_thue_solve>
+
+=cut
+
 =head2 solve_lcg
 
     solve_lcg(n, r, m)
