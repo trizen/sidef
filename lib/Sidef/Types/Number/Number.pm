@@ -4824,6 +4824,115 @@ sub tetration {
     $x->pow($x->tetration($y->dec));
 }
 
+sub _log2_ceil {    # smallest integer T such that 2^T >= m  (m a Math::GMPz > 0)
+    my ($m) = @_;
+    my $bits = Math::GMPz::Rmpz_sizeinbase($m, 2);
+    state $pow2 = Math::GMPz::Rmpz_init_nobless();
+    Math::GMPz::Rmpz_ui_pow_ui($pow2, 2, $bits - 1);
+    (Math::GMPz::Rmpz_cmp($pow2, $m) == 0) ? ($bits - 1) : $bits;
+}
+
+# Returns (is_ge, value): is_ge=1 iff a^^h >= cap (value undef);
+# is_ge=0 iff a^^h < cap (value = exact Math::GMPz). Assumes a>=2, h>=0, cap>=1.
+sub _capped_tetration {
+    my ($a, $h, $cap) = @_;
+
+    if (Math::GMPz::Rmpz_sgn($h) == 0) {    # a^^0 = 1
+        return (Math::GMPz::Rmpz_cmp_ui($cap, 1) <= 0) ? (1, undef) : (0, Math::GMPz::Rmpz_init_set_ui(1));
+    }
+    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {    # a^^1 = a
+        return (Math::GMPz::Rmpz_cmp($a, $cap) >= 0) ? (1, undef) : (0, Math::GMPz::Rmpz_init_set($a));
+    }
+
+    # h >= 2, a >= 2:  a^^h >= a^a >= 4 for every a >= 2 (this is what proves
+    # termination below is bounded by O(log* cap) recursive steps, independent
+    # of how large h is).
+    if (Math::GMPz::Rmpz_cmp_ui($cap, 4) <= 0) {
+        return (1, undef);
+    }
+
+    my $bits    = Math::GMPz::Rmpz_sizeinbase($cap, 2);
+    my $sub_cap = Math::GMPz::Rmpz_init_set_ui($bits + 1);
+
+    my $h_dec = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sub_ui($h_dec, $h, 1);
+
+    my ($sub_ge, $sub_val) = _capped_tetration($a, $h_dec, $sub_cap);
+    return (1, undef) if $sub_ge;
+
+    my $val = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_pow_ui($val, $a, Math::GMPz::Rmpz_get_ui($sub_val));    # sub_val is small
+    return (Math::GMPz::Rmpz_cmp($val, $cap) >= 0) ? (1, undef) : (0, $val);
+}
+
+# a^^h mod m  (iterated exponentiation reduced modulo m), for arbitrarily
+# large h, via the generalized Euler/lifting-the-exponent recursion on the
+# totient chain m, phi(m), phi(phi(m)), ... (which reaches 1 in O(log m)
+# steps): for b >= log2(m),  a^b == a^(phi(m) + b mod phi(m))  (mod m),
+# regardless of gcd(a,m). This holds even when a shares prime factors
+# with m (ordinary Euler's theorem alone requires gcd(a,m)=1).
+sub _tetration_mod {
+    my ($a, $h, $m) = @_;
+
+    return $ZERO if Math::GMPz::Rmpz_cmp_ui($m, 1) == 0;
+
+    if (Math::GMPz::Rmpz_sgn($h) == 0) {    # a^^0 = 1
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r, $ONE, $m);
+        return $r;
+    }
+    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {    # a^^1 = a
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r, $a, $m);
+        return $r;
+    }
+
+    my $phi_m = _any2mpz(${(bless \$m)->euler_phi});
+
+    my $h_dec = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sub_ui($h_dec, $h, 1);
+
+    my $exponent_mod_phi = _tetration_mod($a, $h_dec, $phi_m);
+
+    my $T = Math::GMPz::Rmpz_init_set_ui(_log2_ceil($m));
+    my ($is_big) = _capped_tetration($a, $h_dec, $T);
+
+    my $exponent = Math::GMPz::Rmpz_init();
+    if ($is_big) {
+        Math::GMPz::Rmpz_add($exponent, $exponent_mod_phi, $phi_m);
+    }
+    else {
+        Math::GMPz::Rmpz_set($exponent, $exponent_mod_phi);
+    }
+
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_powm($r, $a, $exponent, $m);
+    return $r;
+}
+
+sub tetration_mod {
+    my ($x, $y, $m_in) = @_;
+
+    ref($y) eq __PACKAGE__    or _valid(\$y);
+    ref($m_in) eq __PACKAGE__ or _valid(\$m_in);
+
+    my $a = _any2mpz($$x)    // goto &nan;
+    my $h = _any2mpz($$y)    // goto &nan;
+    my $m = _any2mpz($$m_in) // goto &nan;
+
+    Math::GMPz::Rmpz_sgn($h) >= 0 or goto &nan;
+    Math::GMPz::Rmpz_sgn($m) > 0  or goto &nan;
+
+    if (Math::GMPz::Rmpz_cmp_ui($a, 2) < 0) {
+
+        # a = 0 or a = 1: value is tiny (0 or 1, at most), so just delegate
+        # to the ordinary (exact) tetration and reduce that instead.
+        return ((bless \$a)->tetration(bless \$h)->mod(bless \$m));
+    }
+
+    bless \_tetration_mod($a, $h, $m);
+}
+
 sub ipow {
     my ($x, $y) = @_;
     ref($y) eq __PACKAGE__ or _valid(\$y);
