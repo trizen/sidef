@@ -480,6 +480,19 @@ assert_eq(tetration(2, 4), 65536)
 assert_eq(tetration(3, 2), 27)
 assert_eq(tetration(3, 3), 7625597484987)
 
+# Tests for modular tetration
+assert_eq(tetrationmod(14,2015,20),16)
+assert_eq(tetrationmod(14,2016,100), 36)
+assert_eq(tetrationmod(14,2014,4), 0)
+assert_eq(tetrationmod(14,2013,2), 0)
+assert_eq(2.tetration_mod(100, 1000000007), 661944226)
+assert_eq(2.tetration_mod(2**64, 1000000007), 661944226)
+assert_eq(tetrationmod(993306745, 75707320, 1e9), 884765625)
+assert_eq(tetrationmod(3,3,345), 312)
+assert_eq(tetrationmod(3,2,20), 7)
+assert_eq(tetrationmod(7,6,97), 84)
+assert_eq(tetrationmod(3,13,1e12), 262464195387)
+
 # Tests for as_bin/as_oct/as_hex edge cases
 assert_eq(as_bin(0), '0')
 assert_eq(as_bin(1), '1')
