@@ -4933,6 +4933,8 @@ sub tetration_mod {
     bless \_tetration_mod($a, $h, $m);
 }
 
+*tetrationmod = \&tetration_mod;
+
 sub ipow {
     my ($x, $y) = @_;
     ref($y) eq __PACKAGE__ or _valid(\$y);

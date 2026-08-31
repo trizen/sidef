@@ -1933,17 +1933,19 @@ The mathematical notation C<x^^h> should not be confused with C<x^h>: tetration 
 
 =cut
 
-=head2 tetration_mod
+=head2 tetrationmod
 
-    x.tetration_mod(h, m)
+    tetrationmod(x, h, m)
 
 Computes C<x^^h mod m> (iterated exponentiation, reduced modulo C<m>), where C<x^^h> means C<x> raised to itself C<h> times: C<x^^0 = 1>, C<x^^1 = x>, C<x^^h = x^(x^^(h-1))>.
 
 Unlike L</tetration>, this never constructs the (typically incomprehensibly large) exact tower value, so C<h> may be arbitrarily large -- even a number with thousands of digits -- and this still returns instantly. It works via the generalized Euler/lifting-the-exponent theorem, recursing down the totient chain C<m, phi(m), phi(phi(m)), ...>, which reaches C<1> in C<O(log m)> steps regardless of C<h>. This holds correctly even when C<x> and C<m> share prime factors (plain Euler's theorem alone requires C<gcd(x,m) = 1>).
 
-    say 2.tetration_mod(100, 1000000007)        #=> 903583060
-    say 2.tetration_mod(2**64, 1000000007)      #=> (returns instantly)
-    say 2.tetration_mod(3, 8)                   #=> 0        (2^^3 = 16, shares factor 2 with 8)
+    say tetrationmod(2, 100, 1000000007)        #=> 903583060
+    say tetrationmod(2, 2**64, 1000000007)      #=> (returns instantly)
+    say tetrationmod(2, 3, 8)                   #=> 0 (2^^3 = 16, shares factor 2 with 8)
+
+Aliases: I<tetration_mod>
 
 =cut
 
