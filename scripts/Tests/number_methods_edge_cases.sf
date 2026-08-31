@@ -492,6 +492,7 @@ assert_eq(tetrationmod(3,3,345), 312)
 assert_eq(tetrationmod(3,2,20), 7)
 assert_eq(tetrationmod(7,6,97), 84)
 assert_eq(tetrationmod(3,13,1e12), 262464195387)
+assert_eq(tetrationmod(2,2,6), 4)
 
 # Tests for as_bin/as_oct/as_hex edge cases
 assert_eq(as_bin(0), '0')
