@@ -4824,12 +4824,11 @@ sub tetration {
     $x->pow($x->tetration($y->dec));
 }
 
-sub _log2_ceil {    # smallest integer T such that 2^T >= m  (m a Math::GMPz > 0)
+# smallest integer T such that 2^T >= m  (m a Math::GMPz > 0)
+sub _log2_ceil {
     my ($m) = @_;
     my $bits = Math::GMPz::Rmpz_sizeinbase($m, 2);
-    state $pow2 = Math::GMPz::Rmpz_init_nobless();
-    Math::GMPz::Rmpz_ui_pow_ui($pow2, 2, $bits - 1);
-    (Math::GMPz::Rmpz_cmp($pow2, $m) == 0) ? ($bits - 1) : $bits;
+    (Math::GMPz::Rmpz_popcount($m) == 1) ? ($bits - 1) : $bits;
 }
 
 # Returns (is_ge, value): is_ge=1 iff a^^h >= cap (value undef);
@@ -4844,10 +4843,13 @@ sub _capped_tetration {
         return (Math::GMPz::Rmpz_cmp($a, $cap) >= 0) ? (1, undef) : (0, Math::GMPz::Rmpz_init_set($a));
     }
 
-    # h >= 2, a >= 2:  a^^h >= a^a >= 4 for every a >= 2 (this is what proves
-    # termination below is bounded by O(log* cap) recursive steps, independent
-    # of how large h is).
-    if (Math::GMPz::Rmpz_cmp_ui($cap, 4) <= 0) {
+    # h>=2: if base 'a' is already >= cap, the tetration will vastly
+    # exceed cap. Return immediately to prevent calculating huge numbers.
+    if (Math::GMPz::Rmpz_cmp($a, $cap) >= 0) {
+        return (1, undef);
+    }
+
+    if (Math::GMPz::Rmpz_cmp_ui($cap, 4) <= 0) {    # a^^h >= 4 for a>=2, h>=2
         return (1, undef);
     }
 
@@ -4862,47 +4864,43 @@ sub _capped_tetration {
 
     my $val = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_pow_ui($val, $a, Math::GMPz::Rmpz_get_ui($sub_val));    # sub_val is small
-    return (Math::GMPz::Rmpz_cmp($val, $cap) >= 0) ? (1, undef) : (0, $val);
+    (Math::GMPz::Rmpz_cmp($val, $cap) >= 0) ? (1, undef) : (0, $val);
 }
 
-# a^^h mod m  (iterated exponentiation reduced modulo m), for arbitrarily
-# large h, via the generalized Euler/lifting-the-exponent recursion on the
-# totient chain m, phi(m), phi(phi(m)), ... (which reaches 1 in O(log m)
-# steps): for b >= log2(m),  a^b == a^(phi(m) + b mod phi(m))  (mod m),
-# regardless of gcd(a,m). This holds even when a shares prime factors
-# with m (ordinary Euler's theorem alone requires gcd(a,m)=1).
 sub _tetration_mod {
     my ($a, $h, $m) = @_;
 
     return $ZERO if Math::GMPz::Rmpz_cmp_ui($m, 1) == 0;
 
-    if (Math::GMPz::Rmpz_sgn($h) == 0) {    # a^^0 = 1
-        my $r = Math::GMPz::Rmpz_init();
-        Math::GMPz::Rmpz_mod($r, $ONE, $m);
-        return $r;
+    if (Math::GMPz::Rmpz_sgn($h) == 0) {                                     # a^^0 = 1
+                                                                             # m > 1 is guaranteed here, so 1 % m is always 1.
+        return $ONE;
     }
-    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {    # a^^1 = a
+    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {                               # a^^1 = a
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mod($r, $a, $m);
         return $r;
     }
 
-    my $phi_m = _any2mpz(${(bless \$m)->euler_phi});
-
     my $h_dec = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_sub_ui($h_dec, $h, 1);
 
-    my $exponent_mod_phi = _tetration_mod($a, $h_dec, $phi_m);
-
+    # We fetch capping BEFORE recursion. If the exponent hasn't saturated,
+    # we completely bypass the expensive modulo recursion tree.
     my $T = Math::GMPz::Rmpz_init_set_ui(_log2_ceil($m));
-    my ($is_big) = _capped_tetration($a, $h_dec, $T);
+    my ($is_big, $exact_val) = _capped_tetration($a, $h_dec, $T);
 
     my $exponent = Math::GMPz::Rmpz_init();
     if ($is_big) {
+        my $phi_boxed = (bless \$m)->euler_phi;
+        my $phi_m     = _any2mpz($$phi_boxed);
+
+        my $exponent_mod_phi = _tetration_mod($a, $h_dec, $phi_m);
         Math::GMPz::Rmpz_add($exponent, $exponent_mod_phi, $phi_m);
     }
     else {
-        Math::GMPz::Rmpz_set($exponent, $exponent_mod_phi);
+        # Modulo phi(m) is mathematically invalid if b < log2(m) because T can be > phi(m).
+        Math::GMPz::Rmpz_set($exponent, $exact_val);
     }
 
     my $r = Math::GMPz::Rmpz_init();
@@ -4924,9 +4922,6 @@ sub tetration_mod {
     Math::GMPz::Rmpz_sgn($m) > 0  or goto &nan;
 
     if (Math::GMPz::Rmpz_cmp_ui($a, 2) < 0) {
-
-        # a = 0 or a = 1: value is tiny (0 or 1, at most), so just delegate
-        # to the ordinary (exact) tetration and reduce that instead.
         return ((bless \$a)->tetration(bless \$h)->mod(bless \$m));
     }
 
