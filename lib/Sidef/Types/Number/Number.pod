@@ -10135,6 +10135,34 @@ Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
 
 =cut
 
+=head2 schemmel_totient
+
+    n.schemmel_totient(k)
+
+Computes the C<k>-th Schemmel totient function C<S_k(n)>.
+
+For
+
+    n = Product p^e
+
+we have
+
+    S_k(n) = 0
+
+if any prime factor C<<< p <= k >>>; otherwise:
+
+    S_k(n) = Product p^(e-1) * (p-k)
+
+For C<k = 1>, this is the Euler totient function:
+
+    say 30.of { .schemmel_totient(1) }     # OEIS: A000010
+    say 30.of { .schemmel_totient(2) }     # OEIS: A058026
+    say 30.of { .schemmel_totient(3) }     # OEIS: A123565
+
+Aliases: I<schemmel>
+
+=cut
+
 =head2 totient_range
 
     totient_range(a, b)

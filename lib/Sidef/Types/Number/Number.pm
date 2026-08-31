@@ -31674,6 +31674,42 @@ sub euler_phi {
 *euler_totient = \&euler_phi;
 *totient       = \&euler_phi;
 
+sub schemmel_totient {
+    my ($self, $k_in) = @_;
+
+    my $k       = defined($k_in) ? (_any2ui($$k_in) // return _array()) : 1;
+    my $factors = $self->factor_exp();
+
+    my $res = Math::GMPz::Rmpz_init_set_ui(1);
+    state $term      = Math::GMPz::Rmpz_init_nobless();
+    state $p_minus_k = Math::GMPz::Rmpz_init_nobless();
+
+    foreach my $pair (@$factors) {
+
+        # TODO: optimize for native prime factors
+        my $p = _any2mpz(${$pair->[0]});
+        my $e = _any2ui(${$pair->[1]});
+
+        if (Math::GMPz::Rmpz_cmp_ui($p, $k) <= 0) {
+
+            # If any prime factor p <= k, S_k(n) becomes 0
+            Math::GMPz::Rmpz_set_ui($res, 0);
+            last;
+        }
+
+        # p^(e-1) * (p - k)
+        Math::GMPz::Rmpz_pow_ui($term, $p, $e - 1);
+        Math::GMPz::Rmpz_sub_ui($p_minus_k, $p, $k);
+
+        Math::GMPz::Rmpz_mul($term, $term, $p_minus_k);
+        Math::GMPz::Rmpz_mul($res,  $res,  $term);
+    }
+
+    bless \$res;
+}
+
+*schemmel = \&schemmel_totient;
+
 sub phi_sum {
     my ($n, $k) = @_;
 
