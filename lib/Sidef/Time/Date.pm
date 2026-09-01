@@ -178,6 +178,14 @@ sub add_years {
     bless {time => scalar $self->{time}->add_years(CORE::int($years))};
 }
 
+sub is_today {
+    my ($self) = @_;
+    my $today = __PACKAGE__->today;
+    ($self->{time}->ymd eq $today->{time}->ymd)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
 sub is_leap_year {
     my ($self) = @_;
     my $y = $self->{time}->year;
@@ -202,9 +210,14 @@ sub is_weekday {
       : Sidef::Types::Bool::Bool::TRUE;
 }
 
+sub quarter {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::_set_int(CORE::int(($self->{time}->mon - 1) / 3) + 1);
+}
+
 sub cmp {
     my ($this, $that) = @_;
-    Sidef::Types::Number::Number->new(CORE::int($this) <=> CORE::int($that));
+    Sidef::Types::Number::Number::_set_int(CORE::int($this) <=> CORE::int($that));
 }
 
 sub eq {

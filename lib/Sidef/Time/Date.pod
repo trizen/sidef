@@ -350,6 +350,14 @@ Returns the week number of the year, as computed by L<Time::Piece>.
 
 =cut
 
+=head2 quarter
+
+    self.quarter
+
+Returns the calendar quarter (C<1> to C<4>) the date falls in.
+
+=cut
+
 =head2 month_last_day
 
     self.month_last_day
@@ -381,6 +389,14 @@ Returns C<true> if the date falls on a Saturday or Sunday, otherwise C<false>.
     self.is_weekday
 
 Returns C<true> if the date falls on Monday through Friday, otherwise C<false>. The logical complement of L</is_weekend>.
+
+=cut
+
+=head2 is_today
+
+    self.is_today
+
+Returns C<true> if the date is the same calendar day as C<Date.today>, otherwise C<false>.
 
 =cut
 
