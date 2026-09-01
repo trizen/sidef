@@ -761,6 +761,37 @@ Returns the harmonic mean of a list of numbers. The harmonic mean is the recipro
 
 =cut
 
+=head2 median
+
+    median(...)
+
+Returns the median (middle value) of a list of numbers — the average of the two middle values for an even-length list.
+
+    say median(1, 3, 5)        #=> 3
+    say median(1, 2, 3, 4)     #=> 2.5
+
+=cut
+
+=head2 variance
+
+    variance(...)
+
+Returns the population variance of a list of numbers (average squared deviation from the mean; divides by C<n>, not C<n-1>).
+
+    say variance(1,2,3,4)   #=> 1.25
+
+=cut
+
+=head2 stddev
+
+    stddev(...)
+
+Returns the population standard deviation — the square root of L</variance>.
+
+    say stddev(1,2,3,4,5)   #=> sqrt(2)
+
+=cut
+
 =head1 BITWISE OPERATIONS
 
 =head2 &

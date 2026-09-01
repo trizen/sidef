@@ -1147,6 +1147,51 @@ sub harmonic_mean {
     Sidef::Types::Number::Number::harmonic_mean(@$self);
 }
 
+sub median_by {
+    my ($self, $block) = @_;
+    $self->map($block)->median;
+}
+
+sub median {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &median_by;
+    }
+
+    Sidef::Types::Number::Number::median(@$self);
+}
+
+sub variance_by {
+    my ($self, $block) = @_;
+    $self->map($block)->variance;
+}
+
+sub variance {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &variance_by;
+    }
+
+    Sidef::Types::Number::Number::variance(@$self);
+}
+
+sub stddev_by {
+    my ($self, $block) = @_;
+    $self->map($block)->stddev;
+}
+
+sub stddev {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &stddev_by;
+    }
+
+    Sidef::Types::Number::Number::stddev(@$self);
+}
+
 sub prod_by {
     my ($self, $block) = @_;
     $block //= Sidef::Types::Block::Block::IDENTITY;

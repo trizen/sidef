@@ -82,6 +82,21 @@ sub harmonic_mean {
     Sidef::Types::Number::Number::harmonic_mean(@list);
 }
 
+sub median {
+    my ($self, @list) = @_;
+    Sidef::Types::Number::Number::median(@list);
+}
+
+sub variance {
+    my ($self, @list) = @_;
+    Sidef::Types::Number::Number::variance(@list);
+}
+
+sub stddev {
+    my ($self, @list) = @_;
+    Sidef::Types::Number::Number::stddev(@list);
+}
+
 sub solve_seq {
     my ($self, $seq, $offset) = @_;
     $seq->solve_seq($offset);

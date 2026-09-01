@@ -8754,6 +8754,32 @@ sub harmonic_mean {
     $n->div($sum);
 }
 
+sub median {
+    my (@list) = @_;
+
+    @list || goto &nan;
+
+    @list = @{Sidef::Types::Array::Array->new(\@list)->isort};
+    my $n = scalar(@list);
+    return $list[($n - 1) >> 1] if ($n % 2 == 1);
+    $list[($n >> 1) - 1]->add($list[$n >> 1])->div(Sidef::Types::Number::Number::TWO);
+}
+
+sub variance {
+    my (@list) = @_;
+
+    @list || goto &nan;
+
+    my $mean        = Sidef::Types::Number::Number::arithmetic_mean(@list);
+    my $sum_sq_diff = Sidef::Types::Number::Number::sum(map { $_->sub($mean)->sqr } @list);
+    $sum_sq_diff->div(Sidef::Types::Number::Number::_set_int(scalar(@list)));
+}
+
+sub stddev {
+    my (@list) = @_;
+    Sidef::Types::Number::Number::variance(@list)->sqrt;
+}
+
 sub max {
     my (@vals) = @_;
     _valid(\(@vals));
