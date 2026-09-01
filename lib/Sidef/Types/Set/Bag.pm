@@ -618,6 +618,13 @@ sub relative_frequencies {
                [map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})->div($total)]) } CORE::values(%$self)]);
 }
 
+sub variety {
+    my ($self) = @_;
+    my $total = $self->length;
+    $total->is_zero and return Sidef::Types::Number::Number::ZERO;
+    $self->elems->div($total);
+}
+
 sub most_common {
     my ($self, $n) = @_;
 

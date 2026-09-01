@@ -582,6 +582,16 @@ Returns an C<Array> of C<[value, proportion]> pairs, where C<proportion> is each
 
 =cut
 
+=head2 variety
+
+    self.variety
+
+Returns the ratio of distinct elements to total elements (C<elems / length>) -- C<1> means every element is unique, closer to C<0> means heavy repetition. A common measure of lexical diversity when the bag holds word counts.
+
+    say(Bag("a", "a", "b", "c").variety)   #=> 0.75
+
+=cut
+
 =head2 most_common
 
     self.most_common(n=1)
