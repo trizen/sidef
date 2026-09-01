@@ -207,6 +207,33 @@ Aliases: I<len>, I<size>
 
 =cut
 
+=head2 sum
+
+    self.sum(block)
+
+Fully consumes the enumerator and returns the sum of its values (or of C<block> applied to each).
+
+    var e = Enumerator({|f| (1..5).each {|i| f(i) } })
+    say(e.sum)   #=> 15
+
+=cut
+
+=head2 min
+
+    self.min(block)
+
+Fully consumes the enumerator and returns the element for which C<block> (or the element itself, if omitted) is smallest.
+
+=cut
+
+=head2 max
+
+    self.max(block)
+
+Fully consumes the enumerator and returns the element for which C<block> (or the element itself, if omitted) is largest.
+
+=cut
+
 =head1 EXAMPLES
 
 =head2 Ludic Numbers

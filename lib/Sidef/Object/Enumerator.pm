@@ -186,6 +186,55 @@ sub length {
 *len  = \&length;    # alias
 *size = \&length;
 
+sub sum {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    my $total;
+    $self->{block}->run(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                my $v = $block->run(@_);
+                $total = defined($total) ? $total->add($v) : $v;
+            }
+        )
+    );
+    $total // Sidef::Types::Number::Number::ZERO;
+}
+
+sub min {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    my ($best, $best_v);
+    $self->{block}->run(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                my $v = $block->run(@_);
+                if (!defined($best_v) || CORE::int($v cmp $best_v) < 0) {
+                    ($best, $best_v) = ($_[0], $v);
+                }
+            }
+        )
+    );
+    $best;
+}
+
+sub max {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+    my ($best, $best_v);
+    $self->{block}->run(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                my $v = $block->run(@_);
+                if (!defined($best_v) || CORE::int($v cmp $best_v) > 0) {
+                    ($best, $best_v) = ($_[0], $v);
+                }
+            }
+        )
+    );
+    $best;
+}
+
 #<<<
 #~ #
 #~ ## AUTOLOAD
