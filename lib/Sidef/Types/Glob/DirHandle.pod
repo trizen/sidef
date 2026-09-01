@@ -142,6 +142,16 @@ Unlike C<read>, C<entries>, C<files>, and C<dirs>, this method reads directly fr
 
 =cut
 
+=head2 grep
+
+    self.grep(block)
+
+Returns an C<Array> of entries (as produced by C<entries>) for which C<block> returns a truthy value.
+
+    dh.grep {|f| f.is_file && f.match(/\.txt$/) }
+
+=cut
+
 =head2 iter
 
     self.iter

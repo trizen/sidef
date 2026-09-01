@@ -148,6 +148,11 @@ sub each {
     $self;
 }
 
+sub grep {
+    my ($self, $block) = @_;
+    Sidef::Types::Array::Array->new([CORE::grep { $block->run($_) } @{$self->entries}]);
+}
+
 sub walk {
     my ($self, $code) = @_;
     foreach my $entry (@{$self->entries}) {
