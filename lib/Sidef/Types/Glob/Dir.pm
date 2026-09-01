@@ -92,6 +92,7 @@ sub find {
 }
 
 *browse = \&find;
+*walk   = \&find;
 
 sub cwd {
     state $x = require Cwd;

@@ -154,7 +154,19 @@ Like C<each>, and unlike C<read>, this reads directly from the underlying direct
     var iterator = dh.iter
 
     # Get entries one at a time
-    while (var entry = iterator.next) {
+    while (var entry = iterator.run) {
+        say entry
+    }
+
+=cut
+
+=head2 walk
+
+    self.walk(code)
+
+Recursively visits every entry in the directory tree rooted here, calling C<code> once per file or subdirectory encountered (depth-first). Returns the C<DirHandle>.
+
+    Dir('.').open.walk { |entry|
         say entry
     }
 
@@ -343,7 +355,7 @@ Returns the raw underlying directory handle wrapped by this object. This is a lo
     # Process large directory lazily
     var iter = Dir('/var/log').open.iter
 
-    while (var entry = iter.next) {
+    while (var entry = iter.run) {
         if (entry ~~ /\.log$/) {
             say "Log file: #{entry}"
         }

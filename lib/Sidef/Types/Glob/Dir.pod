@@ -302,21 +302,21 @@ Returns C<true> if the directory contains no entries (other than C<.> and C<..>)
 
 =cut
 
-=head2 find
+=head2 walk
 
-    self.find
-    self.find(block)
+    self.walk
+    self.walk(block)
 
 Recursively traverses the directory tree, starting from (and including) the directory itself. With a block, calls it once for every item found (a C<Dir> for each subdirectory, a C<File> for each regular file) and returns C<self>. With no block, collects everything into an C<Array> instead.
 
-    dir.find {|item|
+    dir.walk {|item|
         say(item) if item.is_file
     }
 
-    var all_items = dir.find
+    var all_items = dir.walk
     say("Found #{all_items.len} items")
 
-Aliases: I<browse>
+Aliases: I<browse>, I<find>
 
 =cut
 

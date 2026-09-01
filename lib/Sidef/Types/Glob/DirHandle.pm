@@ -148,4 +148,16 @@ sub each {
     $self;
 }
 
+sub walk {
+    my ($self, $code) = @_;
+    foreach my $entry (@{$self->entries}) {
+        $code->run($entry);
+        if ($entry->is_dir) {
+            my $dh = $entry->open() // next;
+            $dh->walk($code);
+        }
+    }
+    $self;
+}
+
 1
