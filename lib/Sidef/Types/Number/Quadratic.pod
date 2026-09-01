@@ -713,6 +713,28 @@ B<Example:>
 
 =cut
 
+=head2 discriminant
+
+    x.discriminant
+
+Returns the discriminant of the ring's minimal polynomial, C<q^2 + 4p>.
+
+    say Quadratic(0, 1, 1, 1).discriminant    # 5
+    say Quadratic(0, 1, -1, 0).discriminant   # -4
+
+=cut
+
+=head2 is_real_embedding
+
+    x.is_real_embedding
+
+Returns true if L</to_n> will produce a real number (discriminant >= 0) rather than a complex one — lets you check this without paying for a square root.
+
+    say Quadratic(0, 1, 1, 1).is_real_embedding    # true
+    say Quadratic(0, 1, -1, 0).is_real_embedding   # false  (t = i)
+
+=cut
+
 =head2 trace
 
     x.trace

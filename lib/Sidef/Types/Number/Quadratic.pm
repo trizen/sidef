@@ -342,6 +342,18 @@ sub norm {
     $x->{a}->sqr->add($x->{a}->mul($x->{b})->mul($x->{q}))->sub($x->{b}->sqr->mul($x->{p}));
 }
 
+sub discriminant {
+    my ($self) = @_;
+    state $two  = Sidef::Types::Number::Number::TWO;
+    state $four = $two->add($two);
+    $self->{q}->sqr->add($self->{p}->mul($four));
+}
+
+sub is_real_embedding {
+    my ($self) = @_;
+    $self->discriminant->ge(Sidef::Types::Number::Number::ZERO);
+}
+
 sub trace {
     my ($x) = @_;
     $x->{a}->mul(Sidef::Types::Number::Number::TWO)->add($x->{b}->mul($x->{q}));
