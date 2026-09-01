@@ -339,6 +339,26 @@ Returns the angle (in radians, as a plain C<Number>) between C<self> and C<other
 
 =cut
 
+=head2 project
+
+    self.project(onto)
+
+Returns the vector projection of C<self> onto C<onto>: the component of C<self> that points in C<onto>'s direction.
+
+    say(Vector(3, 4).project(Vector(1, 0)))   #=> Vector(3, 0)
+
+=cut
+
+=head2 reject
+
+    self.reject(onto)
+
+Returns the vector rejection of C<self> from C<onto>: C<self> minus its L</project>ion onto C<onto> -- the leftover component perpendicular to C<onto>.
+
+    say(Vector(3, 4).reject(Vector(1, 0)))    #=> Vector(0, 4)
+
+=cut
+
 =head1 CONVERSION
 
 =head2 to_array

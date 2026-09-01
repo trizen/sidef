@@ -113,6 +113,17 @@ sub atan2 {
     $v2->sub($p->mul($u1))->abs->atan2($p);
 }
 
+sub project {
+    my ($v1, $onto) = @_;
+    my $scale = $v1->mul($onto)->div($onto->mul($onto));
+    $onto->mul($scale);
+}
+
+sub reject {
+    my ($v1, $onto) = @_;
+    $v1->sub($v1->project($onto));
+}
+
 sub add {
     my ($v1, $v2) = @_;
 
