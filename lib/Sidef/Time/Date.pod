@@ -400,6 +400,32 @@ Returns C<true> if the date is the same calendar day as C<Date.today>, otherwise
 
 =cut
 
+=head2 is_future
+
+    self.is_future
+
+Returns C<true> if the date/time is later than the current moment, otherwise C<false>.
+
+=cut
+
+=head2 is_past
+
+    self.is_past
+
+Returns C<true> if the date/time is earlier than the current moment, otherwise C<false>.
+
+=cut
+
+=head2 age
+
+    self.age
+
+Treats the date as a birth date and returns the current age in whole years (accounting for whether this year's anniversary has passed yet).
+
+    say(Date.parse("2000-06-15", "%Y-%m-%d").age)
+
+=cut
+
 =head1 STRING REPRESENTATIONS
 
 =head2 monname

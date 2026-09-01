@@ -210,6 +210,31 @@ sub is_weekday {
       : Sidef::Types::Bool::Bool::TRUE;
 }
 
+sub is_future {
+    my ($self) = @_;
+    ($self->{time}->epoch > CORE::time)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_past {
+    my ($self) = @_;
+    ($self->{time}->epoch < CORE::time)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub age {
+    my ($self) = @_;
+    my $now    = Time::Piece->new(CORE::time);
+    my $years  = $now->year - $self->{time}->year;
+    if ($now->mon < $self->{time}->mon
+        or ($now->mon == $self->{time}->mon and $now->mday < $self->{time}->mday)) {
+        --$years;
+    }
+    Sidef::Types::Number::Number::_set_int($years);
+}
+
 sub quarter {
     my ($self) = @_;
     Sidef::Types::Number::Number::_set_int(CORE::int(($self->{time}->mon - 1) / 3) + 1);
