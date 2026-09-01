@@ -147,6 +147,26 @@ Aliases: I<open_write>
 
 =cut
 
+=head2 slurp
+
+    self.slurp
+
+Opens the pipe for reading, reads all of its output, and closes it — a one-call shortcut for C<open_r> + read-to-end + C<close>.
+
+    say Pipe("ls -la").slurp
+
+=cut
+
+=head2 write_all
+
+    self.write_all(data)
+
+Opens the pipe for writing, sends C<data>, and closes it. Returns true on success, or C<nil> if the pipe couldn't be opened.
+
+    Pipe("sort").write_all("banana\napple\n")
+
+=cut
+
 =head1 STRING REPRESENTATION
 
 =head2 dump

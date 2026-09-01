@@ -65,6 +65,24 @@ sub open_w {
 
 *open_write = \&open_w;
 
+sub slurp {
+    ref($_[0]) || shift(@_);
+    my ($self)  = @_;
+    my $fh      = $self->open_r // return undef;
+    my $content = $fh->slurp;
+    $fh->close;
+    $content;
+}
+
+sub write_all {
+    ref($_[0]) || shift(@_);
+    my ($self, $data) = @_;
+    my $fh = $self->open_w // return undef;
+    $fh->print($data);
+    $fh->close;
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
 sub dump {
     my ($self) = @_;
     Sidef::Types::String::String->new("$self");
