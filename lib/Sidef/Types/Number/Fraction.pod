@@ -332,6 +332,19 @@ Computes C<self**n> modulo C<m> efficiently, using binary exponentiation. Suppor
 
 =cut
 
+=head2 reduce
+
+    self.reduce
+
+Returns the fraction reduced to lowest terms, by dividing both the numerator and denominator by their GCD. If the fraction is already in lowest terms, or is C<0/0>, returns it unchanged.
+
+    say Fraction(6, 9).reduce     # Fraction(2, 3)
+    say Fraction(0, 5).reduce     # Fraction(0, 1)
+
+Aliases: I<simplify>
+
+=cut
+
 =head1 BIT SHIFTING
 
 =head2 lsft
