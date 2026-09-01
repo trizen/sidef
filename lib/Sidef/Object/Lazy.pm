@@ -278,6 +278,51 @@ sub drop {
     );
 }
 
+sub uniq {
+    my ($self) = @_;
+    my %seen;
+    __PACKAGE__->new(
+        obj   => $self->{obj},
+        calls => [
+            @{$self->{calls}},
+            sub {
+                my $key = "$_[0]";
+                $seen{$key}++ ? () : ($_[0]);
+            },
+        ],
+    );
+}
+
+sub take {
+    my ($self, $n) = @_;
+    $n = CORE::int($n);
+    my $orig      = $self->{obj};
+    my $remaining = $n;
+    my $limited = bless {
+                         obj => $orig,
+                         n   => $n,
+                        },
+      'Sidef::Object::Lazy::_Take';
+
+    {
+        no strict 'refs';
+        *{'Sidef::Object::Lazy::_Take::iter'} = sub {
+            my ($lim)     = @_;
+            my $inner     = $lim->{obj}->iter;
+            my $remaining = $lim->{n};
+            Sidef::Types::Block::Block->new(
+                code => sub {
+                    $remaining > 0 or return undef;
+                    --$remaining;
+                    $inner->run();
+                }
+            );
+        };
+    }
+
+    __PACKAGE__->new(obj => $limited, calls => [@{$self->{calls}}]);
+}
+
 sub lazy {
     my ($self) = @_;
     $self;

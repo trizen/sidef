@@ -117,6 +117,16 @@ Aliases: I<collect>
 
 =cut
 
+=head2 uniq
+
+    self.uniq
+
+Returns a new C<Lazy> object with a filtering step appended that skips any element equal to one already seen earlier in the pipeline.
+
+    say((1..10).lazy.map {|n| n % 3 }.uniq.to_a)   #=> [1, 2, 0]
+
+=cut
+
 =head2 while
 
     self.while(block)
@@ -135,6 +145,16 @@ I<Unlike> L</grep> and L</map>, this is a terminal method: it immediately drives
 Returns a new C<Lazy> object with a step appended that skips the first C<n> elements of the pipeline. Like L</grep> and L</map>, this is intermediate -- nothing runs until a terminal method is called.
 
     say((1..10).lazy.drop(3).to_a)   #=> [4, 5, 6, 7, 8, 9, 10]
+
+=cut
+
+=head2 take
+
+    self.take(n)
+
+Returns a new C<Lazy> object that stops pulling from the I<original> underlying source after C<n> raw items. B<Note:> this limits the source, not the pipeline's output -- C<self.grep(pred).take(5)> limits to the first 5 raw items and then filters those, which may yield fewer than 5 results. Put C<take> first if you want "the first 5 raw items," and after a C<grep> only if you specifically want to bound how much of the source is scanned.
+
+    say((1..Inf).lazy.take(5).to_a)   #=> [1, 2, 3, 4, 5]
 
 =cut
 
