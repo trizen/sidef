@@ -443,6 +443,16 @@ Returns C<true> if the matrix is square and equal to its own L</transpose>, C<fa
 
 =cut
 
+=head2 is_orthogonal
+
+    self.is_orthogonal
+
+Returns C<true> if the matrix is square and its L</mul> with its own L</transpose> gives the identity matrix, otherwise C<false>.
+
+    say(Matrix([0, -1], [1, 0]).is_orthogonal)   #=> true
+
+=cut
+
 =head2 size
 
     self.size

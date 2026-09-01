@@ -608,11 +608,31 @@ sub is_symmetric {
     Sidef::Types::Bool::Bool::TRUE;
 }
 
+sub is_orthogonal {
+    my ($self) = @_;
+    $self->is_square or return Sidef::Types::Bool::Bool::FALSE;
+    my $n       = CORE::int($self->row_count);
+    my $product = $self->mul($self->transpose);
+    foreach my $i (0 .. $n - 1) {
+        foreach my $j (0 .. $n - 1) {
+            my $expected =
+              ($i == $j)
+              ? Sidef::Types::Number::Number::ONE
+              : Sidef::Types::Number::Number::ZERO;
+            $product->[$i][$j]->eq($expected)
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
 sub is_identity {
     my ($self) = @_;
-    ($self->is_square && $self->is_diagonal) or return Sidef::Types::Bool::Bool::FALSE;
+    ($self->is_square && $self->is_diagonal)
+      or return Sidef::Types::Bool::Bool::FALSE;
     foreach my $d (@{$self->diagonal}) {
-        $d->is_one or return Sidef::Types::Bool::Bool::FALSE;
+        $d->is_one
+          or return Sidef::Types::Bool::Bool::FALSE;
     }
     Sidef::Types::Bool::Bool::TRUE;
 }
@@ -624,7 +644,8 @@ sub is_diagonal {
     foreach my $i (0 .. $n - 1) {
         foreach my $j (0 .. $m - 1) {
             next if $i == $j;
-            $self->[$i][$j]->is_zero or return Sidef::Types::Bool::Bool::FALSE;
+            $self->[$i][$j]->is_zero
+              or return Sidef::Types::Bool::Bool::FALSE;
         }
     }
     Sidef::Types::Bool::Bool::TRUE;
