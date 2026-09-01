@@ -137,6 +137,16 @@ Aliases: I<gmatches>, I<all_matches>, I<map_matches>, I<repeated_match>
 
 =cut
 
+=head2 is_match
+
+    self.is_match(string)
+
+Returns a plain boolean indicating whether the pattern matches C<string>, without needing to build and inspect a C<Match> object yourself.
+
+    say /\d/.is_match("abc123")   # true
+
+=cut
+
 =head1 COMBINING REGEXES
 
 =head2 add

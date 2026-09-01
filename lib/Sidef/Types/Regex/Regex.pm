@@ -102,6 +102,11 @@ sub match {
 
 *run = \&match;
 
+sub is_match {
+    my ($self, $object, $pos) = @_;
+    $self->match($object, $pos)->matched;
+}
+
 sub global_match {
     my ($self, $obj, $pos) = @_;
     local $self->{global} = 1;
