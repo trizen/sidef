@@ -574,13 +574,23 @@ Returns an C<Array> of plain C<[value, count]> 2-element arrays, one per distinc
 
 =head2 most_common
 
-    self.most_common(n)
+    self.most_common(n=1)
 
 Returns an C<Array> of the C<n> distinct elements with the highest counts, sorted by count in descending order, as C<[value, count]> pairs.
 
     say(Bag(1, 2, 2, 3, 3, 3).most_common(2))   #=> [[3, 3], [2, 2]]
 
 Aliases: I<top>
+
+=cut
+
+=head2 mode
+
+    self.mode
+
+Returns the single most frequent element (highest count), or C<nil> for an empty bag. On a tie, one of the tied elements is returned (unspecified which).
+
+    say(Bag(1, 2, 2, 3, 3, 3).mode)   #=> 3
 
 =cut
 

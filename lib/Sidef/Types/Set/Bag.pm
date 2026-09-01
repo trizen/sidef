@@ -614,6 +614,8 @@ sub freq {
 sub most_common {
     my ($self, $n) = @_;
 
+    $n //= Sidef::Types::Number::Number::ONE;
+
     my @sorted = sort { $b->{count} <=> $a->{count} } CORE::values(%$self);
     my @top    = splice(@sorted, 0, CORE::int($n));
 
@@ -621,6 +623,19 @@ sub most_common {
 }
 
 *top = \&most_common;
+
+sub mode {
+    my ($self) = @_;
+    my ($best_key, $best_count);
+    foreach my $key (CORE::keys(%$self)) {
+        my $count = $self->{$key}{count};
+        if (!defined($best_count) or $count > $best_count) {
+            $best_count = $count;
+            $best_key   = $key;
+        }
+    }
+    defined($best_key) ? $self->{$best_key}{value} : undef;
+}
 
 sub uniq {
     my ($self) = @_;
