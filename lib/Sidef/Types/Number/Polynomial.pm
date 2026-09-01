@@ -379,6 +379,21 @@ sub eval {
     return $result;
 }
 
+sub compose {
+    my ($x, $y) = @_;
+    if (ref($y) ne __PACKAGE__) {
+        $y = __PACKAGE__->new(0 => $y);
+    }
+    my @keys = CORE::keys(%$x);
+    @keys || return __PACKAGE__->new(0 => Sidef::Types::Number::Number::ZERO);
+    my $result;
+    foreach my $k (@keys) {
+        my $term = $y->pow(Sidef::Types::Number::Number::_set_int($k))->mul($x->{$k});
+        $result = defined($result) ? $result->add($term) : $term;
+    }
+    return $result;
+}
+
 sub exponents {
     my ($x) = @_;
     Sidef::Types::Array::Array->new(map { Sidef::Types::Number::Number::_set_int($_) } sort { ($a <=> $b) || ($a cmp $b) } CORE::keys(%$x));

@@ -465,6 +465,18 @@ Each coefficient is itself evaluated at C<value> via its own C<.eval> method, al
 
 =cut
 
+=head2 compose
+
+    p.compose(q)
+
+Returns the polynomial C<p(q(x))> — substitutes the polynomial C<q> for the variable in C<p>, using polynomial arithmetic throughout (unlike L</eval>, which substitutes a scalar value).
+
+    var p = Polynomial([1, 0, 1])   # x^2 + 1
+    var q = Polynomial([1, 1])      # x + 1
+    say p.compose(q)                # (x+1)^2 + 1 = x^2 + 2x + 2
+
+=cut
+
 =head1 ROOT FINDING
 
 =head2 newton_method
