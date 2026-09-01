@@ -31963,6 +31963,319 @@ sub inverse_euler_phi_max {
 *inverse_phi_max     = \&inverse_euler_phi_max;
 *inverse_totient_max = \&inverse_euler_phi_max;
 
+sub _cook_carmichael_lambda {
+    my ($N) = @_;
+
+    my $p = Math::GMPz::Rmpz_init();
+    my $v = Math::GMPz::Rmpz_init();
+
+    my %L;
+    my @D = _divisors($N);
+
+    foreach my $d (@D) {
+
+        Math::Prime::Util::GMP::is_prime(Math::Prime::Util::GMP::addint($d, 1)) || next;
+
+        (FAST_MODE and $d < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($p, $d)
+          : Math::GMPz::Rmpz_set_str($p, $d, 10);
+
+        Math::GMPz::Rmpz_add_ui($p, $p, 1);
+
+        if (Math::GMPz::Rmpz_cmp_ui($p, 2) == 0) {
+
+            # p = 2 is special: lambda(2) = 1, lambda(4) = 2,
+            # and lambda(2^e) = 2^(e-2) for e >= 3.
+
+            my $t = Math::GMPz::Rmpz_remove($v, $N, $p);    # 2-adic valuation of N
+
+            push @{$L{2}}, [Math::GMPz::Rmpz_init_set_ui(1), Math::GMPz::Rmpz_init_set_ui(2)];    # e=1
+
+            if ($t >= 1) {
+                push @{$L{2}}, [Math::GMPz::Rmpz_init_set_ui(2), Math::GMPz::Rmpz_init_set_ui(4)];    # e=2
+            }
+
+            foreach my $k (3 .. $t + 2) {                                                             # e=k: x = 2^(k-2), y = 2^k
+                my $x = Math::GMPz::Rmpz_init();
+                my $y = Math::GMPz::Rmpz_init();
+                Math::GMPz::Rmpz_ui_pow_ui($x, 2, $k - 2);
+                Math::GMPz::Rmpz_ui_pow_ui($y, 2, $k);
+                push @{$L{2}}, [$x, $y];
+            }
+
+            next;
+        }
+
+        # Odd prime p: lambda(p^k) = (p-1) * p^(k-1), for k = 1 .. t+1,
+        # where t is the p-adic valuation of N (same bound as _cook_euler_phi,
+        # since p is coprime to p-1, so all of N's p-power budget is free here).
+
+        my $t = Math::GMPz::Rmpz_remove($v, $N, $p);
+
+        push @{$L{$p}}, map {
+            my $x = Math::GMPz::Rmpz_init();
+            my $y = Math::GMPz::Rmpz_init();
+
+            Math::GMPz::Rmpz_pow_ui($v, $p, $_ - 1);
+            Math::GMPz::Rmpz_pow_ui($y, $p, $_);
+            Math::GMPz::Rmpz_sub_ui($x, $p, 1);
+            Math::GMPz::Rmpz_mul($x, $x, $v);
+
+            [$x, $y]
+        } 1 .. $t + 1;
+    }
+
+    [values %L];
+}
+
+sub _lcm_coverage_blocks {
+    my ($N, $L) = @_;
+
+    my @qf = _factor_exp($N);    # [[q1,f1], [q2,f2], ...]
+    my $r  = scalar(@qf);
+
+    my @qz = map {
+        my $q = $_->[0];
+        ($q < ULONG_MAX)
+          ? Math::GMPz::Rmpz_init_set_ui($q)
+          : Math::GMPz::Rmpz_init_set_str("$q", 10);
+    } @qf;
+
+    my $tmp = Math::GMPz::Rmpz_init();
+
+    my @blocks_by_prime;
+
+    foreach my $group (@$L) {
+        my @blocks;
+        foreach my $pair (@$group) {
+            my ($x, $y) = @$pair;
+            my $mask = 0;
+            for my $j (0 .. $r - 1) {
+                my $val = Math::GMPz::Rmpz_remove($tmp, $x, $qz[$j]);
+                $mask |= (1 << $j) if $val == $qf[$j][1];
+            }
+            push @blocks, [$mask, $y];
+        }
+        push @blocks_by_prime, \@blocks;
+    }
+
+    ($r, \@blocks_by_prime);
+}
+
+sub _dynamic_preimage_lcm {
+    my ($N, $L) = @_;
+
+    my ($r, $blocks_by_prime) = _lcm_coverage_blocks($N, $L);
+    my $full_mask = (1 << $r) - 1;
+
+    my %R = (0 => [Math::GMPz::Rmpz_init_set_ui(1)]);
+
+    foreach my $blocks (@$blocks_by_prime) {
+        my %t;
+
+        foreach my $block (@$blocks) {
+            my ($bmask, $y) = @$block;
+
+            foreach my $mask (keys %R) {
+                my $nm = $mask | $bmask;
+
+                push @{$t{$nm}}, map {
+                    my $w = Math::GMPz::Rmpz_init();
+                    Math::GMPz::Rmpz_mul($w, $_, $y);
+                    $w;
+                } @{$R{$mask}};
+            }
+        }
+
+        foreach my $k (keys %t) {
+            push @{$R{$k}}, @{delete $t{$k}};
+        }
+    }
+
+    $R{$full_mask} // [];
+}
+
+sub _dynamic_preimage_lcm_len_bigint {
+    my ($N, $L) = @_;
+
+    my ($r, $blocks_by_prime) = _lcm_coverage_blocks($N, $L);
+    my $full_mask = (1 << $r) - 1;
+
+    my %R = (0 => Math::GMPz::Rmpz_init_set_ui(1));
+
+    foreach my $blocks (@$blocks_by_prime) {
+        my %t;
+
+        foreach my $block (@$blocks) {
+            my $bmask = $block->[0];
+
+            foreach my $mask (keys %R) {
+                my $nm = $mask | $bmask;
+                $t{$nm} //= Math::GMPz::Rmpz_init_set_ui(0);
+                Math::GMPz::Rmpz_add($t{$nm}, $t{$nm}, $R{$mask});
+            }
+        }
+
+        foreach my $k (keys %t) {
+            $R{$k} //= Math::GMPz::Rmpz_init_set_ui(0);
+            Math::GMPz::Rmpz_add($R{$k}, $R{$k}, $t{$k});
+        }
+    }
+
+    exists($R{$full_mask}) ? Math::GMPz::Rmpz_get_str($R{$full_mask}, 10) : 0;
+}
+
+sub _dynamic_preimage_lcm_len {
+    my ($N, $L) = @_;
+
+    my ($r, $blocks_by_prime) = _lcm_coverage_blocks($N, $L);
+    my $full_mask = (1 << $r) - 1;
+
+    my %R = (0 => 1);
+
+    foreach my $blocks (@$blocks_by_prime) {
+        my %t;
+
+        foreach my $block (@$blocks) {
+            my $bmask = $block->[0];
+
+            foreach my $mask (keys %R) {
+                $t{$mask | $bmask} += $R{$mask};
+            }
+        }
+
+        foreach my $k (keys %t) {
+            $R{$k} += $t{$k};
+        }
+    }
+
+    my $r_val = $R{$full_mask} // 0;
+    ($r_val < ~0) || goto &_dynamic_preimage_lcm_len_bigint;
+    $r_val;
+}
+
+sub _dynamic_preimage_lcm_minmax {
+    my ($N, $L, %opt) = @_;
+
+    my ($r, $blocks_by_prime) = _lcm_coverage_blocks($N, $L);
+    my $full_mask = (1 << $r) - 1;
+    my $min       = $opt{min};
+
+    my %R = (0 => Math::GMPz::Rmpz_init_set_ui(1));
+    my $w = Math::GMPz::Rmpz_init();
+
+    foreach my $blocks (@$blocks_by_prime) {
+        my %t;
+
+        foreach my $block (@$blocks) {
+            my ($bmask, $y) = @$block;
+
+            foreach my $mask (keys %R) {
+                my $nm = $mask | $bmask;
+
+                Math::GMPz::Rmpz_mul($w, $R{$mask}, $y);
+
+                if (
+                    !exists($t{$nm})
+                    or (
+                        $min
+                        ? Math::GMPz::Rmpz_cmp($w, $t{$nm}) < 0
+                        : Math::GMPz::Rmpz_cmp($w, $t{$nm}) > 0
+                       )
+                  ) {
+                    $t{$nm} = Math::GMPz::Rmpz_init_set($w);
+                }
+            }
+        }
+
+        foreach my $k (keys %t) {
+            if (
+                !exists($R{$k})
+                or (
+                    $min
+                    ? Math::GMPz::Rmpz_cmp($t{$k}, $R{$k}) < 0
+                    : Math::GMPz::Rmpz_cmp($t{$k}, $R{$k}) > 0
+                   )
+              ) {
+                $R{$k} = $t{$k};
+            }
+        }
+    }
+
+    $R{$full_mask};
+}
+
+sub inverse_carmichael_lambda {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n) // return _array();
+
+    if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+        return _array(ZERO) if !Math::GMPz::Rmpz_sgn($n);
+        return _array();
+    }
+
+    my $result = _dynamic_preimage_lcm($n, _cook_carmichael_lambda($n));
+    _array([map { bless \$_ } sort { Math::GMPz::Rmpz_cmp($a, $b) } @$result]);
+}
+
+*lambda_inverse            = \&inverse_carmichael_lambda;
+*inverse_lambda            = \&inverse_carmichael_lambda;
+*carmichael_lambda_inverse = \&inverse_carmichael_lambda;
+
+sub inverse_carmichael_lambda_len {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n) // return ZERO;
+
+    if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+        return ONE if !Math::GMPz::Rmpz_sgn($n);
+        return ZERO;
+    }
+
+    _set_int(_dynamic_preimage_lcm_len($n, _cook_carmichael_lambda($n)));
+}
+
+*lambda_inverse_len            = \&inverse_carmichael_lambda_len;
+*inverse_lambda_len            = \&inverse_carmichael_lambda_len;
+*carmichael_lambda_inverse_len = \&inverse_carmichael_lambda_len;
+
+sub inverse_carmichael_lambda_min {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n) // return undef;
+
+    if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+        return ZERO if !Math::GMPz::Rmpz_sgn($n);
+        return undef;
+    }
+
+    my $r = _dynamic_preimage_lcm_minmax($n, _cook_carmichael_lambda($n), min => 1) // return undef;
+    bless \$r;
+}
+
+*lambda_inverse_min            = \&inverse_carmichael_lambda_min;
+*inverse_lambda_min            = \&inverse_carmichael_lambda_min;
+*carmichael_lambda_inverse_min = \&inverse_carmichael_lambda_min;
+
+sub inverse_carmichael_lambda_max {
+    my ($n) = @_;
+
+    $n = _any2mpz($$n) // return undef;
+
+    if (Math::GMPz::Rmpz_sgn($n) <= 0) {
+        return ZERO if !Math::GMPz::Rmpz_sgn($n);
+        return undef;
+    }
+
+    my $r = _dynamic_preimage_lcm_minmax($n, _cook_carmichael_lambda($n), min => 0) // return undef;
+    bless \$r;
+}
+
+*lambda_inverse_max            = \&inverse_carmichael_lambda_max;
+*inverse_lambda_max            = \&inverse_carmichael_lambda_max;
+*carmichael_lambda_inverse_max = \&inverse_carmichael_lambda_max;
+
 sub _cook_dedekind_psi {
     my ($N, $k) = @_;
 

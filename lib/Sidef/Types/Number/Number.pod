@@ -9583,6 +9583,64 @@ Alias: I<carmichael_lambda>.
 
 =cut
 
+=head2 lambda_inverse
+
+    n.lambda_inverse
+
+Returns all positive integers C<m> such that the Carmichael function satisfies C<lambda(m) = n>.
+
+    say 1.lambda_inverse    #=> [1, 2]
+    say 2.lambda_inverse    #=> [3, 4, 6, 8, 12, 24]
+    say 8.lambda_inverse    #=> [32, 96, 160, 480]
+
+The result is returned as a sorted array. This is the inverse of the Carmichael lambda function, analogous to C<inverse_totient> for Euler's totient function.
+
+Aliases: I<inverse_lambda>, I<inverse_carmichael_lambda>, I<carmichael_lambda_inverse>
+
+=cut
+
+=head2 lambda_inverse_len
+
+    n.lambda_inverse_len
+
+Returns the number of positive integers C<m> satisfying C<lambda(m) = n>.
+
+    say 1.lambda_inverse_len    #=> 2
+    say 2.lambda_inverse_len    #=> 6
+    say 8.lambda_inverse_len    #=> 4
+
+Aliases: I<inverse_lambda_len>, I<inverse_carmichael_lambda_len>, I<carmichael_lambda_inverse_len>
+
+=cut
+
+=head2 lambda_inverse_min
+
+    n.lambda_inverse_min
+
+Returns the smallest positive integer C<m> satisfying C<lambda(m) = n>, or C<nil> if no such integer exists.
+
+    say 1.lambda_inverse_min    #=> 1
+    say 2.lambda_inverse_min    #=> 3
+    say 8.lambda_inverse_min    #=> 32
+
+Aliases: I<inverse_lambda_min>, I<inverse_carmichael_lambda_min>, I<carmichael_lambda_inverse_min>
+
+=cut
+
+=head2 lambda_inverse_max
+
+    n.lambda_inverse_max
+
+Returns the largest positive integer C<m> satisfying C<lambda(m) = n>, or C<nil> if no such integer exists.
+
+    say 1.lambda_inverse_max    #=> 2
+    say 2.lambda_inverse_max    #=> 24
+    say 8.lambda_inverse_max    #=> 480
+
+Aliases: I<inverse_lambda_max>, I<inverse_carmichael_lambda_max>, I<carmichael_lambda_inverse_max>
+
+=cut
+
 =head2 legendre_phi
 
     n.legendre_phi(k)
