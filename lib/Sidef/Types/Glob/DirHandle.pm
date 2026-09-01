@@ -170,4 +170,9 @@ sub walk {
     $self;
 }
 
+sub count {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::_set_int(scalar(@{$self->entries}));
+}
+
 1

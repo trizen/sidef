@@ -100,6 +100,14 @@ This is convenient when you need to work with all entries at once or want to app
 
 =cut
 
+=head2 count
+
+    self.count
+
+Returns the number of entries in the directory (excluding C<.> and C<..>).
+
+=cut
+
 =head2 files
 
     self.files
