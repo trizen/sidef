@@ -591,6 +591,23 @@ sub determinant {
 
 *det = \&determinant;
 
+sub trace {
+    my ($self) = @_;
+    Sidef::Types::Number::Number::sum(@{$self->diagonal});
+}
+
+sub is_symmetric {
+    my ($self) = @_;
+    my $n = CORE::int($self->row_count);
+    foreach my $i (0 .. $n - 1) {
+        foreach my $j ($i + 1 .. $n - 1) {
+            $self->[$i][$j]->eq($self->[$j][$i])
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
 # Reduced row echelon form
 sub rref {
     my ($self) = @_;

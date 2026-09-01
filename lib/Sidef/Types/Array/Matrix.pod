@@ -649,6 +649,26 @@ Aliases: I<reduced_row_echelon_form>
 
 =cut
 
+=head2 trace
+
+    self.trace
+
+Returns the sum of the elements on the (square) matrix's main diagonal.
+
+    say(Matrix([1, 2], [3, 4]).trace)   #=> 5
+
+=cut
+
+=head2 is_symmetric
+
+    self.is_symmetric
+
+Returns C<true> if the matrix is square and equal to its own L</transpose>, C<false> otherwise.
+
+    say(Matrix([1, 2], [2, 3]).is_symmetric)   #=> true
+
+=cut
+
 =head1 AGGREGATION
 
 =head2 sum
