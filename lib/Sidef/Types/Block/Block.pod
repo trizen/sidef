@@ -249,13 +249,27 @@ Aliases: operator C<∘>
 
 =cut
 
-=head2 ∘
+=head2 curry
 
-    block_a ∘ block_b
+    block.curry(*args)
 
-Operator form of L</compose>.
+Returns a new block that, when called, invokes the original block with C<args> followed by whatever arguments it's given -- a way to partially apply a multi-argument block ahead of time.
 
-Aliases: I<compose>
+    var add  = {|a, b| a + b }
+    var add5 = add.curry(5)
+    say(add5(3))          #=> 8
+
+=cut
+
+=head2 negate
+
+    block.negate
+
+Returns a new block that returns the logical negation (as a proper C<Bool>) of whatever the original block returns.
+
+    var is_even = {|n| n.is_even }
+    var is_odd  = is_even.negate
+    say(is_odd(3))        #=> true
 
 =cut
 
@@ -271,16 +285,6 @@ If C<num> is a C<Number>, calls C<num.times(block)>, running the block C<num> ti
     say(rolls)           #=> [3, 1, 6, 2, 5, 4, 1, 6, 3, 2]
 
 Aliases: operator C<*>
-
-=cut
-
-=head2 *
-
-    block * num
-
-Operator form of L</repeat>.
-
-Aliases: I<repeat>
 
 =cut
 
@@ -354,16 +358,6 @@ Aliases: I<each>, I<foreach>, operator C<< << >>
 
 =cut
 
-=head2 <<
-
-    block << iterable
-
-Operator form of L</for>. The block is the left-hand operand.
-
-Aliases: I<for>, I<each>, I<foreach>
-
-=cut
-
 =head2 map
 
     block.map(*iterables)
@@ -379,16 +373,6 @@ Aliases: operator C<< >> >>
 
 =cut
 
-=head2 >>
-
-    block >> iterable
-
-Operator form of L</map>. The block is the left-hand operand.
-
-Aliases: I<map>
-
-=cut
-
 =head2 grep
 
     block.grep(*iterables)
@@ -401,16 +385,6 @@ Calls the block once for each element produced by the given iterable object(s), 
     say(evens)           #=> [2, 4, 6]
 
 Aliases: operator C<&>
-
-=cut
-
-=head2 &
-
-    block & iterable
-
-Operator form of L</grep>. The block is the left-hand operand.
-
-Aliases: I<grep>
 
 =cut
 

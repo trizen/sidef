@@ -91,6 +91,22 @@ sub run {
 
 *do = \&run;
 
+sub curry {
+    my ($self, @args) = @_;
+    __PACKAGE__->new(code => sub { $self->call(@args, @_) });
+}
+
+sub negate {
+    my ($self) = @_;
+    __PACKAGE__->new(
+        code => sub {
+            $self->run(@_)
+              ? Sidef::Types::Bool::Bool::FALSE
+              : Sidef::Types::Bool::Bool::TRUE;
+        }
+    );
+}
+
 # Recursively walks the ISA hierarchy to discover additional method candidates
 # from parent classes, appending them (with their kids/fallback) to @$methods.
 sub _collect_inherited_methods {
