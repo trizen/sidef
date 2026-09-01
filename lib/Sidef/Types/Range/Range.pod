@@ -285,6 +285,16 @@ Aliases: I<for>, I<foreach>
 
 =cut
 
+=head2 each_kv
+
+    self.each_kv(block)
+
+Iterates the range lazily, calling C<block(index, element)> once per element, with a 0-based index. Returns C<self>.
+
+    (10..13).each_kv {|i, v| say("#{i}: #{v}") }
+
+=cut
+
 =head2 while
 
     self.while(block)
@@ -450,6 +460,17 @@ Splits the range into two arrays in one pass: elements for which C<block> is tru
     var (evens, odds) = (1..10).partition {|n| n.is_even }
     say(evens)   #=> [2, 4, 6, 8, 10]
     say(odds)    #=> [1, 3, 5, 7, 9]
+
+=cut
+
+=head2 group_by
+
+    self.group_by(block)
+
+Groups the range's elements by the value C<block> returns for each one, returning a C<Hash> mapping each distinct key to an C<Array> of the elements that produced it.
+
+    say((1..10).group_by {|n| n % 3 })
+    #=> Hash(0 => [3,6,9], 1 => [1,4,7,10], 2 => [2,5,8])
 
 =cut
 

@@ -290,6 +290,31 @@ sub each {
 *for     = \&each;
 *foreach = \&each;
 
+sub group_by {
+    my ($self, $block) = @_;
+    my (%groups, @order);
+    my $iter = $self->iter;
+    for (; ;) {
+        my $obj = $iter->run() // last;
+        my $key = $block->run($obj);
+        my $k   = "$key";
+        push(@order, $key) unless exists $groups{$k};
+        push @{$groups{$k}}, $obj;
+    }
+    Sidef::Types::Hash::Hash->new(map { ("$_" => Sidef::Types::Array::Array->new($groups{"$_"})) } @order);
+}
+
+sub each_kv {
+    my ($self, $block) = @_;
+    my $i    = 0;
+    my $iter = $self->iter;
+    for (; ;) {
+        my $obj = $iter->run() // last;
+        $block->run(Sidef::Types::Number::Number::_set_int($i++), $obj);
+    }
+    $self;
+}
+
 sub while {
     my ($self, $block) = @_;
 
