@@ -244,7 +244,17 @@ sub is_empty {
         return (Sidef::Types::Bool::Bool::FALSE);
     }
     CORE::closedir($dir_h);
-    (Sidef::Types::Bool::Bool::TRUE);
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub size {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $total = 0;
+    foreach my $item (@{$self->find}) {
+        $item->is_file and $total += (-s "$item" // 0);
+    }
+    Sidef::Types::Number::Number::_set_int($total);
 }
 
 sub dump {

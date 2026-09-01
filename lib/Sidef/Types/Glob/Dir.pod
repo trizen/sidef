@@ -302,6 +302,16 @@ Returns C<true> if the directory contains no entries (other than C<.> and C<..>)
 
 =cut
 
+=head2 size
+
+    self.size
+
+Returns the total size, in bytes, of every regular file found recursively under this directory (via L</walk>).
+
+    say Dir("/var/log").size
+
+=cut
+
 =head2 walk
 
     self.walk
