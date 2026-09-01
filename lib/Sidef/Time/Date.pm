@@ -163,6 +163,11 @@ sub add_days {
     $self->add_seconds(86400 * CORE::int($days));
 }
 
+sub add_weeks {
+    my ($self, $weeks) = @_;
+    $self->add_days(7 * CORE::int($weeks));
+}
+
 sub add_months {
     my ($self, $months) = @_;
     bless {time => scalar $self->{time}->add_months(CORE::int($months))};
@@ -171,6 +176,30 @@ sub add_months {
 sub add_years {
     my ($self, $years) = @_;
     bless {time => scalar $self->{time}->add_years(CORE::int($years))};
+}
+
+sub is_leap_year {
+    my ($self) = @_;
+    my $y = $self->{time}->year;
+    (($y % 4 == 0 and $y % 100 != 0) or $y % 400 == 0)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_weekend {
+    my ($self) = @_;
+    my $wday = $self->{time}->wday;
+    ($wday == 1 or $wday == 7)    # 1 = Sunday, 7 = Saturday
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_weekday {
+    my ($self) = @_;
+    my $wday = $self->{time}->wday;
+    ($wday == 1 or $wday == 7)
+      ? Sidef::Types::Bool::Bool::FALSE
+      : Sidef::Types::Bool::Bool::TRUE;
 }
 
 sub cmp {

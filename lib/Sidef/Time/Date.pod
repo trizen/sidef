@@ -358,6 +358,32 @@ Returns the last day of the month for this date (28, 29, 30, or 31, depending on
 
 =cut
 
+=head2 is_leap_year
+
+    self.is_leap_year
+
+Returns C<true> if the date's year is a leap year, otherwise C<false>.
+
+    say Date.parse("2024-12-25", "%Y-%m-%d").is_leap_year   #=> true
+
+=cut
+
+=head2 is_weekend
+
+    self.is_weekend
+
+Returns C<true> if the date falls on a Saturday or Sunday, otherwise C<false>.
+
+=cut
+
+=head2 is_weekday
+
+    self.is_weekday
+
+Returns C<true> if the date falls on Monday through Friday, otherwise C<false>. The logical complement of L</is_weekend>.
+
+=cut
+
 =head1 STRING REPRESENTATIONS
 
 =head2 monname
@@ -512,6 +538,14 @@ Aliases: I<add_seconds>, operator C<+>
     self.add_days(days)
 
 Returns a new C<Date> object with C<days> days added to it. Accepts both positive and negative values.
+
+=cut
+
+=head2 add_weeks
+
+    self.add_weeks(n)
+
+Returns a new C<Date> object with C<n> weeks (C<n * 7> days) added. Accepts both positive and negative values.
 
 =cut
 
