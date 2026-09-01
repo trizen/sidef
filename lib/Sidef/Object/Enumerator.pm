@@ -135,6 +135,21 @@ sub grep {
 
 *select = \&grep;
 
+sub reduce {
+    my ($self, $block, $initial) = @_;
+
+    my $acc = $initial;
+    $self->{block}->run(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                $acc = defined($acc) ? $block->run($acc, @_) : $_[0];
+            }
+        )
+    );
+
+    $acc;
+}
+
 sub count {
     my ($self, $block) = @_;
 

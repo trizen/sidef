@@ -170,6 +170,17 @@ Aliases: I<select>
 
 =cut
 
+=head2 reduce
+
+    self.reduce(block, initial=nil)
+
+Fully consumes the enumerator, repeatedly calling C<block(accumulator, value)>, starting from C<initial> or the first produced value. Returns the final accumulated value.
+
+    var e = Enumerator({|f| (1..5).each(f) })
+    say(e.reduce({|a, b| a + b }, 0))   #=> 15
+
+=cut
+
 =head2 count
 
     self.count(block)
