@@ -107,6 +107,23 @@ sub negate {
     );
 }
 
+sub pipe {
+    my ($block1, $block2) = @_;
+    __PACKAGE__->new(code => sub { $block2->call($block1->call(@_)) });
+}
+
+sub once {
+    my ($self) = @_;
+    my ($called, $result);
+    __PACKAGE__->new(
+        code => sub {
+            $called and return $result;
+            $called = 1;
+            $result = $self->run(@_);
+        }
+    );
+}
+
 # Recursively walks the ISA hierarchy to discover additional method candidates
 # from parent classes, appending them (with their kids/fallback) to @$methods.
 sub _collect_inherited_methods {

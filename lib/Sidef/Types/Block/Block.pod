@@ -273,6 +273,31 @@ Returns a new block that returns the logical negation (as a proper C<Bool>) of w
 
 =cut
 
+=head2 pipe
+
+    block_a.pipe(block_b)
+
+Like L</compose>, but in the opposite order: C<block_a.pipe(block_b)(*args)> is equivalent to C<block_b(block_a(*args))> -- read left to right.
+
+    var inc    = {|x| x + 1}
+    var double = {|x| 2*x }
+    var f = inc.pipe(double)
+    say f(3)    #=> 8 -- double(inc(3))
+
+=cut
+
+=head2 once
+
+    block.once
+
+Returns a new block that runs the original block only the I<first> time it's called, caching that single result forever (regardless of what arguments are given on later calls) -- unlike L</cache>, which memoizes per distinct argument set.
+
+    var init = { say("initializing"); 42 }.once
+    init()   # prints "initializing", returns 42
+    init()   # returns 42, nothing printed
+
+=cut
+
 =head2 repeat
 
     block.repeat(num)
