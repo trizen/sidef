@@ -146,6 +146,17 @@ Creates a C<NamedParam> object from C<a> (the name) and C<b> (the value), using 
 
 =cut
 
+=head2 in
+
+    self.in(collection)
+
+Returns C<true> if C<collection> contains C<self> -- equivalent to C<collection.contains(self)>, but reads more naturally when C<self> is the focus of the expression.
+
+    say 5.in(1..10)          #=> true
+    say "x".in(["a", "b"])   #=> false
+
+=cut
+
 =head2 smartmatch
 
     a.smartmatch(b)
@@ -198,16 +209,6 @@ Performs a context-sensitive comparison between C<a> and C<b>, based on their ty
 =back
 
 Aliases: operator C<~~>
-
-=cut
-
-=head2 ~~
-
-    a ~~ b
-
-Operator form of L</smartmatch>.
-
-Aliases: I<smartmatch>
 
 =cut
 

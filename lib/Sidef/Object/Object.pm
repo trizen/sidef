@@ -168,6 +168,11 @@ sub then {
     $block->run($self);
 }
 
+sub in {
+    my ($self, $collection) = @_;
+    $collection->contains($self);
+}
+
 sub method {
     my ($self, $method, @args) = @_;
     Sidef::Object::LazyMethod->new({obj => $self, method => "$method", args => \@args});
