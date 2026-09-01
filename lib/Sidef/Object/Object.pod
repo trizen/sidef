@@ -34,6 +34,30 @@ Blesses the raw reference C<ref> into C<obj>'s own class (or, if C<obj> is itsel
 
 =cut
 
+=head1 CHAINING
+
+=head2 tap
+
+    self.tap(block)
+
+Calls C<block> with C<self> (for a side effect, such as logging), then returns C<self> unchanged -- lets you insert an inspection step into a method chain without breaking it.
+
+    var result = [1, 2, 3].map {|n| n * 2 } \
+                          .tap {|arr| say("after map: #{arr}") } \
+                          .sum
+
+=cut
+
+=head2 then
+
+    self.then(block)
+
+Calls C<block> with C<self> and returns I<whatever the block returns>, unlike L</tap>, which always returns C<self>.
+
+    say 5.then {|n| n * 2 }   #=> 10
+
+=cut
+
 =head1 IMPLICIT CONVERSIONS AND COMPARISON
 
 Every Sidef object gets the following fallback behavior for free (via Perl operator overloading), used whenever the language needs to treat an object as a boolean, a number, or a string, or needs to compare/order two objects and the object's own class doesn't define the relevant method itself:

@@ -157,6 +157,17 @@ sub lazy {
     Sidef::Object::Lazy->new(obj => $self);
 }
 
+sub tap {
+    my ($self, $block) = @_;
+    $block->run($self);
+    $self;
+}
+
+sub then {
+    my ($self, $block) = @_;
+    $block->run($self);
+}
+
 sub method {
     my ($self, $method, @args) = @_;
     Sidef::Object::LazyMethod->new({obj => $self, method => "$method", args => \@args});
