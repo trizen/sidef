@@ -202,6 +202,16 @@ Aliases: operator C<< >= >>, operator C<≥>, operator C<⊇>
 
 =cut
 
+=head2 disjoint
+
+    self.disjoint(other)
+
+Returns C<true> if C<self> and C<other> share no elements, C<false> otherwise (C<other> is converted with C<.to_set> first if needed).
+
+    say(Set(1, 2, 3).disjoint(Set(4, 5, 6)))   #=> true
+
+=cut
+
 =head2 ≡
 
     self ≡ other
@@ -387,6 +397,16 @@ Like L</grep>, but for a set I<whose elements are themselves array-like> -- each
 
     var pairs = Set([10, "a"], [20, "b"], [5, "c"])
     say(pairs.grep_2d {|n, label| n > 8 })   #=> Set([10, "a"], [20, "b"])
+
+=cut
+
+=head2 powerset
+
+    self.powerset
+
+Returns a C<Set> of every subset of C<self> (each itself a C<Set>, including the empty set and C<self>). Has C<2**n> elements for a set of size C<n>.
+
+    say(Set(1, 2).powerset)   #=> Set(Set(), Set(1), Set(2), Set(1, 2))
 
 =cut
 

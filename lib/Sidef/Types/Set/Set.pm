@@ -406,6 +406,21 @@ sub is_superset {
     return Sidef::Types::Bool::Bool::TRUE;
 }
 
+sub disjoint {
+    my ($A, $B) = @_;
+
+    if (ref($B) ne __PACKAGE__) {
+        $B = $B->to_set;
+    }
+
+    foreach my $key (CORE::keys(%$A)) {
+        CORE::exists($B->{$key})
+          and return Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    return Sidef::Types::Bool::Bool::TRUE;
+}
+
 sub contains_all {
     my ($self, @objects) = @_;
 
@@ -416,6 +431,16 @@ sub contains_all {
     }
 
     return Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub powerset {
+    my ($self)  = @_;
+    my @values  = CORE::values(%$self);
+    my @subsets = ([]);
+    foreach my $v (@values) {
+        push @subsets, map { [@$_, $v] } @subsets;
+    }
+    Sidef::Types::Array::Array->new([map { __PACKAGE__->new(@$_) } @subsets]);
 }
 
 sub join {
