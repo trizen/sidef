@@ -606,6 +606,24 @@ Compares the byte contents of C<self> and C<other>. Returns C<0> if identical, C
 
 =cut
 
+=head2 is_newer_than
+
+    file.is_newer_than(other)
+
+Returns C<true> if this file's modification time is later than C<other>'s, C<false> if not, or C<nil> if either file doesn't exist.
+
+    File("build/app.js").is_newer_than(File("src/app.js")) || rebuild()
+
+=cut
+
+=head2 is_older_than
+
+    file.is_older_than(other)
+
+The inverse of L</is_newer_than>.
+
+=cut
+
 =head1 OPENING FILES
 
 =head2 open

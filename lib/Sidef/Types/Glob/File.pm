@@ -95,6 +95,22 @@ sub compare {
       :            Sidef::Types::Number::Number::ZERO;
 }
 
+sub is_newer_than {
+    ref($_[0]) || shift(@_);
+    my ($self, $other) = @_;
+    my $self_mtime  = (CORE::stat("$self"))[9]  // return undef;
+    my $other_mtime = (CORE::stat("$other"))[9] // return undef;
+    ($self_mtime > $other_mtime) ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_older_than {
+    ref($_[0]) || shift(@_);
+    my ($self, $other) = @_;
+    my $self_mtime  = (CORE::stat("$self"))[9]  // return undef;
+    my $other_mtime = (CORE::stat("$other"))[9] // return undef;
+    ($self_mtime < $other_mtime) ? Sidef::Types::Bool::Bool::TRUE : Sidef::Types::Bool::Bool::FALSE;
+}
+
 sub mktemp {
     my ($self, %opts) = @_;
     state $x = require File::Temp;
