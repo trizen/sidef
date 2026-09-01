@@ -451,6 +451,16 @@ Aliases: I<select>
 
 =cut
 
+=head2 zip
+
+    self.zip(other)
+
+Pairs up corresponding elements of C<self> and C<other> into an C<Array> of 2-element arrays, stopping as soon as either one runs out.
+
+    say((1..3).zip(["a", "b", "c"]))   #=> [[1,"a"], [2,"b"], [3,"c"]]
+
+=cut
+
 =head2 partition
 
     self.partition(block)

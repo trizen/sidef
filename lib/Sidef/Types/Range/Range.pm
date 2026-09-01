@@ -397,6 +397,19 @@ sub map {
     Sidef::Types::Array::Array->new(\@values);
 }
 
+sub zip {
+    my ($self, $other) = @_;
+    my $iter1 = $self->iter;
+    my $iter2 = $other->iter;
+    my @pairs;
+    for (; ;) {
+        my $a = $iter1->run() // last;
+        my $b = $iter2->run() // last;
+        push @pairs, Sidef::Types::Array::Array->new([$a, $b]);
+    }
+    Sidef::Types::Array::Array->new(\@pairs);
+}
+
 sub map_cons {
     my ($self, $n, $block) = @_;
     $self->to_a->map_cons($n, $block);

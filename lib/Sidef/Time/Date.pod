@@ -422,7 +422,7 @@ Returns C<true> if the date/time is earlier than the current moment, otherwise C
 
 Treats the date as a birth date and returns the current age in whole years (accounting for whether this year's anniversary has passed yet).
 
-    say(Date.parse("2000-06-15", "%Y-%m-%d").age)
+    say Date.parse("2000-06-15", "%Y-%m-%d").age
 
 =cut
 
