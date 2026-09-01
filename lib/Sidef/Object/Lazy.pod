@@ -128,6 +128,16 @@ I<Unlike> L</grep> and L</map>, this is a terminal method: it immediately drives
 
 =cut
 
+=head2 drop
+
+    self.drop(n)
+
+Returns a new C<Lazy> object with a step appended that skips the first C<n> elements of the pipeline. Like L</grep> and L</map>, this is intermediate -- nothing runs until a terminal method is called.
+
+    say((1..10).lazy.drop(3).to_a)   #=> [4, 5, 6, 7, 8, 9, 10]
+
+=cut
+
 =head1 SEARCHING
 
 =head2 first

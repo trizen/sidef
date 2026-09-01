@@ -262,6 +262,22 @@ sub map {
 
 *collect = \&map;
 
+sub drop {
+    my ($self, $n) = @_;
+    $n = CORE::int($n);
+    my $count = 0;
+    __PACKAGE__->new(
+        obj   => $self->{obj},
+        calls => [
+            @{$self->{calls}},
+            sub {
+                if ($count < $n) { ++$count; return (); }
+                ($_[0]);
+            },
+        ],
+    );
+}
+
 sub lazy {
     my ($self) = @_;
     $self;
