@@ -320,6 +320,16 @@ sub each {
 
 *each_line = \&each;
 
+sub each_kv {
+    my ($self, $code) = @_;
+    my $i = 0;
+    while (defined(my $line = CORE::readline($self->{fh}))) {
+        chomp($line);
+        $code->run(Sidef::Types::Number::Number::_set_int($i++), Sidef::Types::String::String->new($line));
+    }
+    $self;
+}
+
 sub each_char {
     my ($self, $code) = @_;
 

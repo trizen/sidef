@@ -428,6 +428,16 @@ Aliases: I<each_line>
 
 =cut
 
+=head2 each_kv
+
+    self.each_kv(block)
+
+Like L</each>, but calls C<block(index, line)> with a 0-based line index alongside each line. Returns C<self>.
+
+    fh.each_kv {|i, line| say("#{i}: #{line}") }
+
+=cut
+
 =head2 each_char
 
     self.each_char(block)
