@@ -82,6 +82,18 @@ sub dist {
     $v1->dist_norm($v2)->sqrt;
 }
 
+sub normalize {
+    my ($v) = @_;
+    my $mag = $v->abs;
+    $mag->is_zero and return $v;
+    $v->div($mag);
+}
+
+sub lerp {
+    my ($v1, $v2, $t) = @_;
+    $v1->add($v2->sub($v1)->mul($t));
+}
+
 sub atan2 {
     my ($v1, $v2) = @_;
 

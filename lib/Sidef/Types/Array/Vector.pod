@@ -309,6 +309,26 @@ Returns the Chebyshev (L∞, chessboard) distance between C<self> and C<other>: 
 
 =cut
 
+=head2 normalize
+
+    self.normalize
+
+Returns a new vector in the same direction as C<self> but with magnitude (L</abs>) C<1>. Returns C<self> unchanged if its magnitude is C<0>.
+
+    say(Vector(3, 4).normalize)   #=> Vector(0.6, 0.8)
+
+=cut
+
+=head2 lerp
+
+    self.lerp(other, t)
+
+Returns the point C<t> of the way from C<self> to C<other>: C<self + (other - self) * t>. C<t=0> gives C<self>, C<t=1> gives C<other>.
+
+    say(Vector(0, 0).lerp(Vector(10, 10), 0.5))   #=> Vector(5, 5)
+
+=cut
+
 =head2 atan2
 
     self.atan2(other)
