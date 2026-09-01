@@ -8901,6 +8901,32 @@ Aliases: I<d>, I<tau>
 
 =cut
 
+=head2 piltz_tau
+
+    n.piltz_tau(k)
+
+Computes the C<k>-fold divisor function C<d_k(n)>, i.e. the number of ways to write C<n> as an ordered product of C<k> positive integers.
+
+For
+
+    n = Product p^e
+
+the value is
+
+    d_k(n) = Product binomial(e + k - 1, k - 1)
+
+For C<k = 2>, this is the usual divisor-counting function C<tau(n)>. The default value of C<k> is C<2>.
+
+    say 12.piltz_tau       #=> 6
+    say 12.piltz_tau(2)    #=> 6
+    say 12.piltz_tau(3)    #=> 18
+    say 12.piltz_tau(1)    #=> 1
+    say 12.piltz_tau(0)    #=> 0
+
+Aliases: I<piltz>
+
+=cut
+
 =head2 sigma0_sum
 
     sigma0_sum(n)

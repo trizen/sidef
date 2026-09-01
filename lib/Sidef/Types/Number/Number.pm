@@ -35026,6 +35026,37 @@ sub sigma0 {
 *d             = \&sigma0;
 *divisor_count = \&sigma0;
 
+sub piltz_tau {
+    my ($self, $k_in) = @_;
+
+    # Computes d_k(n), the number of ways to write n as an ordered product of k integers.
+    # Uses the prime factorization exponents of n: d_k(n) = prod( binomial(e_i + k - 1, k - 1) )
+
+    my $k = defined($k_in) ? (_any2ui($$k_in) // goto &nan) : 2;
+
+    if ($k == 0) {
+        my $res = (__cmp__($$self, 1) // goto &nan) == 0 ? ONE : ZERO;
+        return $res;
+    }
+
+    if ($k == 1) {
+        return ONE;
+    }
+
+    my $res = Math::GMPz::Rmpz_init_set_ui(1);
+    state $bin = Math::GMPz::Rmpz_init_nobless();
+
+    foreach my $pair (_factor_exp($$self)) {
+        my $e = $pair->[1];
+        Math::GMPz::Rmpz_bin_uiui($bin, $e + $k - 1, $k - 1);
+        Math::GMPz::Rmpz_mul($res, $res, $bin);
+    }
+
+    bless \$res;
+}
+
+*piltz = \&piltz_tau;
+
 sub sigma {
     my ($n, $k) = @_;
 
