@@ -1906,6 +1906,49 @@ Integer exponentiation: C<2^n>.
 
 =cut
 
+=head2 tetration
+
+    x.tetration(h)
+
+Computes C<x^^h> (iterated exponentiation), where C<x^^h> is defined by C<x^^0 = 1>, C<x^^1 = x>, and
+
+    x^^h = x^(x^^(h-1))
+
+for C<h >= 2>.
+
+Unlike ordinary exponentiation, tetration is right-associative and the result grows extremely rapidly. For example:
+
+    say 2.tetration(0)    #=> 1
+    say 2.tetration(1)    #=> 2
+    say 2.tetration(2)    #=> 4
+    say 2.tetration(3)    #=> 16
+    say 2.tetration(4)    #=> 65536
+
+The operation is evaluated recursively, so the height C<h> should generally be kept small. Even modest heights can produce extremely large integers.
+
+    say 3.tetration(3)    #=> 7625597484987
+    say 3.tetration(4)    #=> (an extremely large integer)
+
+The mathematical notation C<x^^h> should not be confused with C<x^h>: tetration represents a power tower rather than a single exponentiation.
+
+=cut
+
+=head2 tetrationmod
+
+    tetrationmod(x, h, m)
+
+Computes C<x^^h mod m> (iterated exponentiation, reduced modulo C<m>), where C<x^^h> means C<x> raised to itself C<h> times: C<x^^0 = 1>, C<x^^1 = x>, C<x^^h = x^(x^^(h-1))>.
+
+Unlike L</tetration>, this never constructs the (typically incomprehensibly large) exact tower value, so C<h> may be arbitrarily large -- even a number with thousands of digits -- and this still returns instantly. It works via the generalized Euler/lifting-the-exponent theorem, recursing down the totient chain C<m, phi(m), phi(phi(m)), ...>, which reaches C<1> in C<O(log m)> steps regardless of C<h>. This holds correctly even when C<x> and C<m> share prime factors (plain Euler's theorem alone requires C<gcd(x,m) = 1>).
+
+    say tetrationmod(2, 100, 1000000007)        #=> 661944226
+    say tetrationmod(2, 2**64, 1000000007)      #=> (returns instantly)
+    say tetrationmod(2, 3, 8)                   #=> 0 (2^^3 = 16, shares factor 2 with 8)
+
+Aliases: I<tetration_mod>
+
+=cut
+
 =head2 iroot
 
     n.iroot(k)
@@ -5113,6 +5156,34 @@ Returns an array of C<[x, y]> pairs sorted by increasing C<x>. If the equation h
     var U = Quadratic(solve_pell(D)[0]..., D)
     var V = Quadratic(solve_pell(D, N)[0]..., D)
     for n in (0..5) { say (U**n * V) }
+
+=cut
+
+=head2 solve_thue
+
+    solve_thue(D, k)
+    solve_thue(D, k, N)
+    solve_thue(D, k, N, bound)
+    solve_thue(D, k, N, bound, first_only)
+
+Searches for integer solutions C<(x, y)>, with C<1 E<lt>= y E<lt>= bound>, of the binomial Thue equation:
+
+    x^k - D*y^k = N
+
+where C<k E<gt>= 1> is the degree, C<N> is an arbitrary integer (default: C<1>), and C<bound> caps the search on C<y> (default: C<10^6>). If C<first_only> is true, the search stops as soon as one solution is found.
+
+This is a bounded numerical search: for each C<y> up to C<bound> it tests whether C<D*y^k + N> is a perfect C<k>-th power. It is I<not> a complete Thue-equation solver in the sense of PARI/GP's C<thueinit()>+C<thue()>, which uses linear forms in logarithms and lattice reduction to provably find I<all> solutions regardless of size. An empty result here only shows there is no solution with C<y E<lt>= bound>.
+
+For C<k E<gt>= 3> and C<N = ±1>, Bennett's theorem (2001) guarantees at most one solution in positive integers, so C<first_only> is safe to use in that case without missing solutions.
+
+Returns an array of C<[x, y]> pairs. If no solution is found within C<bound>, an empty array is returned.
+
+    say solve_thue(5, 4)             #=> [[3, 2]]           (3^4 - 5*2^4 = 1)
+    say solve_thue(2, 4, -1)         #=> [[1, 1]]            (1^4 - 2*1^4 = -1)
+    say solve_thue(7140, 4, 1, 50)   #=> [[239, 26]]         (239^4 - 7140*26^4 = 1)
+    say solve_thue(-2, 3, 3)         #=> [[1, 1], [-5, 4]]   (both are exact)
+
+Aliases: I<binomial_thue_solve>
 
 =cut
 
@@ -8830,6 +8901,32 @@ Aliases: I<d>, I<tau>
 
 =cut
 
+=head2 piltz_tau
+
+    n.piltz_tau(k)
+
+Computes the C<k>-fold divisor function C<d_k(n)>, i.e. the number of ways to write C<n> as an ordered product of C<k> positive integers.
+
+For
+
+    n = Product p^e
+
+the value is
+
+    d_k(n) = Product binomial(e + k - 1, k - 1)
+
+For C<k = 2>, this is the usual divisor-counting function C<tau(n)>. The default value of C<k> is C<2>.
+
+    say 12.piltz_tau       #=> 6
+    say 12.piltz_tau(2)    #=> 6
+    say 12.piltz_tau(3)    #=> 18
+    say 12.piltz_tau(1)    #=> 1
+    say 12.piltz_tau(0)    #=> 0
+
+Aliases: I<piltz>
+
+=cut
+
 =head2 sigma0_sum
 
     sigma0_sum(n)
@@ -10119,6 +10216,34 @@ C<totient(n)> counts the positive integers in the range C<1..n> that are coprime
     say totient(12, 2)   #=> 96
 
 Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
+
+=cut
+
+=head2 schemmel_totient
+
+    n.schemmel_totient(k)
+
+Computes the C<k>-th Schemmel totient function C<S_k(n)>.
+
+For
+
+    n = Product p^e
+
+we have
+
+    S_k(n) = 0
+
+if any prime factor C<<< p <= k >>>; otherwise:
+
+    S_k(n) = Product p^(e-1) * (p-k)
+
+For C<k = 1>, this is the Euler totient function:
+
+    say 30.of { .schemmel_totient(1) }     # OEIS: A000010
+    say 30.of { .schemmel_totient(2) }     # OEIS: A058026
+    say 30.of { .schemmel_totient(3) }     # OEIS: A123565
+
+Aliases: I<schemmel>
 
 =cut
 

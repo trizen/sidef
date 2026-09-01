@@ -4824,6 +4824,112 @@ sub tetration {
     $x->pow($x->tetration($y->dec));
 }
 
+# smallest integer T such that 2^T >= m  (m a Math::GMPz > 0)
+sub _log2_ceil {
+    my ($m) = @_;
+    my $bits = Math::GMPz::Rmpz_sizeinbase($m, 2);
+    (Math::GMPz::Rmpz_popcount($m) == 1) ? ($bits - 1) : $bits;
+}
+
+# Returns (is_ge, value): is_ge=1 iff a^^h >= cap (value undef);
+# is_ge=0 iff a^^h < cap (value = exact Math::GMPz). Assumes a>=2, h>=0, cap>=1.
+sub _capped_tetration {
+    my ($a, $h, $cap) = @_;
+
+    if (Math::GMPz::Rmpz_sgn($h) == 0) {    # a^^0 = 1
+        return (Math::GMPz::Rmpz_cmp_ui($cap, 1) <= 0) ? (1, undef) : (0, Math::GMPz::Rmpz_init_set_ui(1));
+    }
+    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {    # a^^1 = a
+        return (Math::GMPz::Rmpz_cmp($a, $cap) >= 0) ? (1, undef) : (0, Math::GMPz::Rmpz_init_set($a));
+    }
+
+    # h>=2: if base 'a' is already >= cap, the tetration will vastly
+    # exceed cap. Return immediately to prevent calculating huge numbers.
+    if (Math::GMPz::Rmpz_cmp($a, $cap) >= 0) {
+        return (1, undef);
+    }
+
+    if (Math::GMPz::Rmpz_cmp_ui($cap, 4) <= 0) {    # a^^h >= 4 for a>=2, h>=2
+        return (1, undef);
+    }
+
+    my $bits    = Math::GMPz::Rmpz_sizeinbase($cap, 2);
+    my $sub_cap = Math::GMPz::Rmpz_init_set_ui($bits + 1);
+
+    my $h_dec = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sub_ui($h_dec, $h, 1);
+
+    my ($sub_ge, $sub_val) = _capped_tetration($a, $h_dec, $sub_cap);
+    return (1, undef) if $sub_ge;
+
+    my $val = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_pow_ui($val, $a, Math::GMPz::Rmpz_get_ui($sub_val));    # sub_val is small
+    (Math::GMPz::Rmpz_cmp($val, $cap) >= 0) ? (1, undef) : (0, $val);
+}
+
+sub _tetration_mod {
+    my ($a, $h, $m) = @_;
+
+    return $ZERO if Math::GMPz::Rmpz_cmp_ui($m, 1) == 0;
+
+    if (Math::GMPz::Rmpz_sgn($h) == 0) {                                     # a^^0 = 1
+                                                                             # m > 1 is guaranteed here, so 1 % m is always 1.
+        return $ONE;
+    }
+    if (Math::GMPz::Rmpz_cmp_ui($h, 1) == 0) {                               # a^^1 = a
+        my $r = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_mod($r, $a, $m);
+        return $r;
+    }
+
+    my $h_dec = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sub_ui($h_dec, $h, 1);
+
+    # We fetch capping BEFORE recursion. If the exponent hasn't saturated,
+    # we completely bypass the expensive modulo recursion tree.
+    my $T = Math::GMPz::Rmpz_init_set_ui(_log2_ceil($m));
+    my ($is_big, $exact_val) = _capped_tetration($a, $h_dec, $T);
+
+    my $exponent = Math::GMPz::Rmpz_init();
+    if ($is_big) {
+        my $phi_boxed = (bless \$m)->euler_phi;
+        my $phi_m     = _any2mpz($$phi_boxed);
+
+        my $exponent_mod_phi = _tetration_mod($a, $h_dec, $phi_m);
+        Math::GMPz::Rmpz_add($exponent, $exponent_mod_phi, $phi_m);
+    }
+    else {
+        # Modulo phi(m) is mathematically invalid if b < log2(m) because T can be > phi(m).
+        Math::GMPz::Rmpz_set($exponent, $exact_val);
+    }
+
+    my $r = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_powm($r, $a, $exponent, $m);
+    return $r;
+}
+
+sub tetration_mod {
+    my ($x, $y, $m_in) = @_;
+
+    ref($y) eq __PACKAGE__    or _valid(\$y);
+    ref($m_in) eq __PACKAGE__ or _valid(\$m_in);
+
+    my $a = _any2mpz($$x)    // goto &nan;
+    my $h = _any2mpz($$y)    // goto &nan;
+    my $m = _any2mpz($$m_in) // goto &nan;
+
+    Math::GMPz::Rmpz_sgn($h) >= 0 or goto &nan;
+    Math::GMPz::Rmpz_sgn($m) > 0  or goto &nan;
+
+    if (Math::GMPz::Rmpz_cmp_ui($a, 2) < 0) {
+        return ((bless \$a)->tetration(bless \$h)->mod(bless \$m));
+    }
+
+    bless \_tetration_mod($a, $h, $m);
+}
+
+*tetrationmod = \&tetration_mod;
+
 sub ipow {
     my ($x, $y) = @_;
     ref($y) eq __PACKAGE__ or _valid(\$y);
@@ -9681,6 +9787,92 @@ sub solve_pell {
 
     _array(_sort_pell_solutions(@solutions));
 }
+
+sub solve_thue {
+    my ($D_in, $k_in, $N_in, $bound_in, $first_only) = @_;
+
+    my $D = _any2mpz($$D_in) // return _array();
+
+    ref($k_in) eq __PACKAGE__ or _valid(\$k_in);
+    my $k = _any2ui($$k_in) // return _array();
+
+    $k >= 1 or return _array();
+
+    my $N = defined($N_in) ? do { _any2mpz($$N_in) // return _array() } : Math::GMPz::Rmpz_init_set($ONE);
+
+    my $bound =
+      defined($bound_in)
+      ? do { ref($bound_in) eq __PACKAGE__ or _valid(\$bound_in); _any2ui($$bound_in) // return _array() }
+      : 1e6;
+
+    $bound > 0 or return _array();
+
+    # D = 0: equation reduces to x^k = N (a single check, not a search over y)
+    if (Math::GMPz::Rmpz_sgn($D) == 0) {
+
+        return _array() if Math::GMPz::Rmpz_sgn($N) < 0 and $k % 2 == 0;
+
+        my $neg = (Math::GMPz::Rmpz_sgn($N) < 0);
+        state $abs_N = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_abs($abs_N, $N);
+
+        if ($k == 1) {
+            my $x = Math::GMPz::Rmpz_init_set($neg ? do { Math::GMPz::Rmpz_neg((my $tmp = Math::GMPz::Rmpz_init()), $abs_N); $tmp } : $abs_N);
+            my $y = Math::GMPz::Rmpz_init_set_ui(0);
+            return _array([_array([bless(\$x), bless(\$y)])]);
+        }
+
+        Math::GMPz::Rmpz_perfect_power_p($abs_N) or return _array();
+
+        state $root = Math::GMPz::Rmpz_init_nobless();
+        Math::GMPz::Rmpz_root($root, $abs_N, $k) or return _array();
+
+        my $x = Math::GMPz::Rmpz_init_set($root);
+        $neg and Math::GMPz::Rmpz_neg($x, $x);
+        my $y = Math::GMPz::Rmpz_init_set_ui(0);
+        return _array([_array([bless(\$x), bless(\$y)])]);
+    }
+
+    my $k_even = ($k % 2 == 0);
+
+    state $t   = Math::GMPz::Rmpz_init_nobless();
+    state $x_z = Math::GMPz::Rmpz_init_nobless();
+
+    my @solutions;
+
+    for (my $y = 1 ; $y <= $bound ; ++$y) {
+
+        Math::GMPz::Rmpz_ui_pow_ui($t, $y, $k);
+        Math::GMPz::Rmpz_mul($t, $t, $D);
+        Math::GMPz::Rmpz_add($t, $t, $N);
+
+        my $sign = Math::GMPz::Rmpz_sgn($t);
+
+        # IMPORTANT: mpz_root() invokes undefined behaviour when given a
+        # negative operand together with an even root.
+        next if $k_even and $sign < 0;
+
+        if ($sign == 0) {
+            push @solutions, [Math::GMPz::Rmpz_init_set_ui(0), Math::GMPz::Rmpz_init_set_ui($y)];
+        }
+        elsif ($k == 1) {
+            push @solutions, [Math::GMPz::Rmpz_init_set($t), Math::GMPz::Rmpz_init_set_ui($y)];
+        }
+        elsif (Math::GMPz::Rmpz_root($x_z, $t, $k)) {    # exact k-th root?
+                                                         # Rmpz_root acts as both the perfect power check and the extraction.
+            push @solutions, [Math::GMPz::Rmpz_init_set($x_z), Math::GMPz::Rmpz_init_set_ui($y)];
+        }
+        else {
+            next;
+        }
+
+        last if $first_only;
+    }
+
+    _array([map { _array([bless(\$_->[0]), bless(\$_->[1])]) } @solutions]);
+}
+
+*binomial_thue_solve = \&solve_thue;
 
 sub solve_lcg {
     my ($n, $r, $m) = @_;
@@ -30215,12 +30407,12 @@ sub strict_partitions {
     sub {
         my ($n, $max_part) = @_;
         if ($n == 0) {
-            unshift @results, _array([@path]);
+            unshift @results, _array([map { bless \$_ } @path]);
             return;
         }
         my $upper = ($n < $max_part ? $n : $max_part);
         for my $part (1 .. $upper) {
-            push @path, bless \$part;
+            push @path, $part;
             __SUB__->($n - $part, $part - 1);
             pop @path;    # backtrack
         }
@@ -30249,7 +30441,7 @@ sub multisets {
         my ($pos, $max_value, $sum) = @_;
 
         if ($pos == $n) {
-            push @results, _array([@path]);
+            push @results, _array([map { bless \$_ } @path]);
             return;
         }
 
@@ -30257,7 +30449,7 @@ sub multisets {
             if (defined $max_sum) {
                 last if ($sum + $v > $max_sum);
             }
-            push @path, bless \$v;
+            push @path, $v;
             __SUB__->($pos + 1, $v, $sum + $v);
             pop @path;    # backtrack
         }
@@ -31481,6 +31673,42 @@ sub euler_phi {
 *eulerphi      = \&euler_phi;
 *euler_totient = \&euler_phi;
 *totient       = \&euler_phi;
+
+sub schemmel_totient {
+    my ($self, $k_in) = @_;
+
+    my $k       = defined($k_in) ? (_any2ui($$k_in) // return _array()) : 1;
+    my $factors = $self->factor_exp();
+
+    my $res = Math::GMPz::Rmpz_init_set_ui(1);
+    state $term      = Math::GMPz::Rmpz_init_nobless();
+    state $p_minus_k = Math::GMPz::Rmpz_init_nobless();
+
+    foreach my $pair (@$factors) {
+
+        # TODO: optimize for native prime factors
+        my $p = _any2mpz(${$pair->[0]});
+        my $e = _any2ui(${$pair->[1]});
+
+        if (Math::GMPz::Rmpz_cmp_ui($p, $k) <= 0) {
+
+            # If any prime factor p <= k, S_k(n) becomes 0
+            Math::GMPz::Rmpz_set_ui($res, 0);
+            last;
+        }
+
+        # p^(e-1) * (p - k)
+        Math::GMPz::Rmpz_pow_ui($term, $p, $e - 1);
+        Math::GMPz::Rmpz_sub_ui($p_minus_k, $p, $k);
+
+        Math::GMPz::Rmpz_mul($term, $term, $p_minus_k);
+        Math::GMPz::Rmpz_mul($res,  $res,  $term);
+    }
+
+    bless \$res;
+}
+
+*schemmel = \&schemmel_totient;
 
 sub phi_sum {
     my ($n, $k) = @_;
@@ -35110,6 +35338,37 @@ sub sigma0 {
 
 *d             = \&sigma0;
 *divisor_count = \&sigma0;
+
+sub piltz_tau {
+    my ($self, $k_in) = @_;
+
+    # Computes d_k(n), the number of ways to write n as an ordered product of k integers.
+    # Uses the prime factorization exponents of n: d_k(n) = prod( binomial(e_i + k - 1, k - 1) )
+
+    my $k = defined($k_in) ? (_any2ui($$k_in) // goto &nan) : 2;
+
+    if ($k == 0) {
+        my $res = (__cmp__($$self, 1) // goto &nan) == 0 ? ONE : ZERO;
+        return $res;
+    }
+
+    if ($k == 1) {
+        return ONE;
+    }
+
+    my $res = Math::GMPz::Rmpz_init_set_ui(1);
+    state $bin = Math::GMPz::Rmpz_init_nobless();
+
+    foreach my $pair (_factor_exp($$self)) {
+        my $e = $pair->[1];
+        Math::GMPz::Rmpz_bin_uiui($bin, $e + $k - 1, $k - 1);
+        Math::GMPz::Rmpz_mul($res, $res, $bin);
+    }
+
+    bless \$res;
+}
+
+*piltz = \&piltz_tau;
 
 sub sigma {
     my ($n, $k) = @_;

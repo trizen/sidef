@@ -285,6 +285,62 @@ sub capitalize {
 
 *tclc = \&capitalize;
 
+sub swapcase {
+    my ($self) = @_;
+    (my $str = $$self) =~ s/(\p{Lu})|(\p{Ll})/defined($1) ? CORE::lc($1) : CORE::uc($2)/ge;
+    bless \$str;
+}
+
+*swap_case = \&swapcase;
+
+sub common_prefix {
+    my ($self, $other) = @_;
+    my $s = $$self;
+    my $t = "$other";
+    my $len = List::Util::min(CORE::length($s), CORE::length($t));
+    my $i = 0;
+    ++$i while $i < $len && CORE::substr($s, $i, 1) eq CORE::substr($t, $i, 1);
+    $self->new(CORE::substr($s, 0, $i));
+}
+
+sub common_suffix {
+    my ($self, $other) = @_;
+    my $s = $$self;
+    my $t = "$other";
+    my $ls = CORE::length($s);
+    my $lt = CORE::length($t);
+    my $len = List::Util::min($ls, $lt);
+    my $i = 0;
+    ++$i while $i < $len && CORE::substr($s, $ls - $i - 1, 1) eq CORE::substr($t, $lt - $i - 1, 1);
+    $i ? $self->new(CORE::substr($s, $ls - $i)) : $self->new('');
+}
+
+sub wrap {
+    my ($self, $width) = @_;
+    $width = defined($width) ? CORE::int($width) : 76;
+    $width = 1 if $width < 1;
+
+    my @lines;
+    my $line = '';
+
+    foreach my $word (CORE::split(' ', $$self)) {
+        if ($line eq '') {
+            $line = $word;
+        }
+        elsif (CORE::length($line) + 1 + CORE::length($word) <= $width) {
+            $line .= ' ' . $word;
+        }
+        else {
+            CORE::push(@lines, bless \(my $l = $line));
+            $line = $word;
+        }
+    }
+
+    CORE::push(@lines, bless \(my $l = $line)) if $line ne '';
+
+    Sidef::Types::Array::Array->new(\@lines);
+}
+
 sub chop {
     my ($self) = @_;
     $self->new(CORE::substr($$self, 0, -1));
@@ -1036,6 +1092,50 @@ sub center {
     $self->new(($char x $lpad) . $string . ($char x $rpad));
 }
 
+sub pad_left {
+    my ($self, $size, $char) = @_;
+
+    my $string = $$self;
+
+    $size = defined($size) ? CORE::int($size) : 0;
+    $char = defined($char) ? "$char"          : ' ';
+
+    if (CORE::length($char) > 1) {
+        $char = CORE::substr($char, 0, 1);
+    }
+
+    my $len = CORE::length($string);
+
+    $size <= $len
+      && return $self;
+
+    $self->new($string . ($char x ($size - $len)));
+}
+
+*ljust = \&pad_left;
+
+sub pad_right {
+    my ($self, $size, $char) = @_;
+
+    my $string = $$self;
+
+    $size = defined($size) ? CORE::int($size) : 0;
+    $char = defined($char) ? "$char"          : ' ';
+
+    if (CORE::length($char) > 1) {
+        $char = CORE::substr($char, 0, 1);
+    }
+
+    my $len = CORE::length($string);
+
+    $size <= $len
+      && return $self;
+
+    $self->new(($char x ($size - $len)) . $string);
+}
+
+*rjust = \&pad_right;
+
 sub trim {
     my ($self, $arg) = @_;
 
@@ -1368,6 +1468,38 @@ sub ends_with {
 
     Sidef::Types::Bool::Bool::FALSE;
 }
+
+sub delete_prefix {
+    my ($self, $prefix) = @_;
+
+    $prefix = "$prefix";
+
+    my $len = CORE::length($prefix);
+
+    if ($len > 0 && CORE::substr($$self, 0, $len) eq $prefix) {
+        return $self->new(CORE::substr($$self, $len));
+    }
+
+    $self;
+}
+
+*remove_prefix = \&delete_prefix;
+
+sub delete_suffix {
+    my ($self, $suffix) = @_;
+
+    $suffix = "$suffix";
+
+    my $len = CORE::length($suffix);
+
+    if ($len > 0 && CORE::substr($$self, -$len) eq $suffix) {
+        return $self->new(CORE::substr($$self, 0, CORE::length($$self) - $len));
+    }
+
+    $self;
+}
+
+*remove_suffix = \&delete_suffix;
 
 sub looks_like_number {
     my ($self) = @_;

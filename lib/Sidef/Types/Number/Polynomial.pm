@@ -342,7 +342,8 @@ sub derivative {
 sub eval {
     my ($x, $value) = @_;
 
-    CORE::keys(%$x) || return Sidef::Types::Number::Number::ZERO;
+    my @exponents = CORE::keys(%$x);
+    @exponents || return Sidef::Types::Number::Number::ZERO;
 
     if (ref($value) eq __PACKAGE__ and exists($value->{'1'}) and $value->{'1'}->is_one) {
         if (scalar(keys %$value) == 1) {    # evaluation at x
@@ -350,7 +351,32 @@ sub eval {
         }
     }
 
-    Sidef::Types::Number::Number::sum(map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}->eval($value)) } CORE::keys %$x);
+    # Evaluate via Horner's method (nested multiplication), visiting terms
+    # from the highest exponent down to the lowest, instead of computing
+    # value^k from scratch for every single term independently. Between
+    # two consecutive exponents e_i > e_{i+1}, the accumulator advances
+    # with a single multiplication by value^(e_i - e_{i+1}), which is much
+    # cheaper than an unrelated full exponentiation per term for dense or
+    # closely-spaced polynomials.
+    @exponents = CORE::sort { $b <=> $a } @exponents;
+
+    my $prev_exp = CORE::shift(@exponents);
+    my $result   = $x->{$prev_exp}->eval($value);
+
+    foreach my $exp (@exponents) {
+        my $gap    = Sidef::Types::Number::Number::_set_int(Math::Prime::Util::GMP::subint($prev_exp, $exp));
+        my $factor = $value->pow($gap);
+
+        $result   = $result->mul($factor)->add($x->{$exp}->eval($value));
+        $prev_exp = $exp;
+    }
+
+    # Bring the accumulator down from the lowest nonzero exponent to x^0.
+    if ($prev_exp != 0) {
+        $result = $result->mul($value->pow(Sidef::Types::Number::Number::_set_int($prev_exp)));
+    }
+
+    return $result;
 }
 
 sub exponents {
@@ -669,6 +695,18 @@ sub divmod {
         return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::nan()), __PACKAGE__->new());
     }
 
+    # Track deg(r) incrementally with a lazy-deletion max-heap instead of
+    # rescanning every remaining term of r on each step. Each subtraction
+    # only ever touches exponents within [deg(r)-deg(y), deg(r)], so a
+    # candidate exponent, once confirmed absent from r, can never become
+    # present again in a later step (all later steps operate on strictly
+    # smaller degrees) -- so each exponent is pushed and permanently
+    # discarded from the heap at most once over the whole division. This
+    # keeps the per-step cost proportional to deg(y) instead of the size
+    # of the (possibly still-large) remainder r.
+    my @deg_heap;
+    _heap_push(\@deg_heap, $_) for CORE::keys(%$x);
+
     while ($deg_r >= $deg_y) {
 
         my $lc = $r->{$deg_r};    # Leading coefficient of r
@@ -680,12 +718,26 @@ sub divmod {
         }
 
         # s := t * x^(deg(r) - deg(y))
-        my $s = __PACKAGE__->new(Math::Prime::Util::GMP::subint($deg_r, $deg_y), $t);
+        my $s        = __PACKAGE__->new(Math::Prime::Util::GMP::subint($deg_r, $deg_y), $t);
+        my $sub_term = $s->mul($y);
         $q = $q->add($s);
-        $r = $r->sub($s->mul($y));
+        $r = $r->sub($sub_term);
 
-        # Find new degree of r
-        $deg_r = List::Util::max(CORE::keys(%$r)) // last;
+        # Only the exponents touched by this step's subtraction can have
+        # changed, so only they need to become new degree candidates.
+        _heap_push(\@deg_heap, $_) for CORE::keys(%$sub_term);
+
+        # Find new degree of r by lazily discarding stale candidates.
+        $deg_r = undef;
+        while (@deg_heap) {
+            my $top = $deg_heap[0];
+            if (CORE::exists($r->{$top})) {
+                $deg_r = $top;
+                last;
+            }
+            _heap_pop_max(\@deg_heap);
+        }
+        defined($deg_r) or last;
 
         if ($deg_r > ~0) {
             $deg_r = Math::GMPz::Rmpz_init_set_str("$deg_r", 10);
@@ -693,6 +745,44 @@ sub divmod {
     }
 
     return ($q, $r);
+}
+
+# --- Private lazy-deletion binary max-heap, used by divmod() above to ---
+# --- track the remainder's degree without rescanning all of its keys. ---
+
+sub _heap_push {
+    my ($heap, $val) = @_;
+    CORE::push(@$heap, $val);
+    my $i = $#$heap;
+    while ($i > 0) {
+        my $parent = ($i - 1) >> 1;
+        last if !($heap->[$i] > $heap->[$parent]);
+        @{$heap}[$i, $parent] = @{$heap}[$parent, $i];
+        $i = $parent;
+    }
+}
+
+sub _heap_pop_max {
+    my ($heap) = @_;
+    return undef if !@$heap;
+    my $top  = $heap->[0];
+    my $last = CORE::pop(@$heap);
+    if (@$heap) {
+        $heap->[0] = $last;
+        my $i = 0;
+        my $n = scalar(@$heap);
+        while (1) {
+            my $l       = 2 * $i + 1;
+            my $r       = 2 * $i + 2;
+            my $largest = $i;
+            $largest = $l if ($l < $n && $heap->[$l] > $heap->[$largest]);
+            $largest = $r if ($r < $n && $heap->[$r] > $heap->[$largest]);
+            last if ($largest == $i);
+            @{$heap}[$i, $largest] = @{$heap}[$largest, $i];
+            $i = $largest;
+        }
+    }
+    return $top;
 }
 
 sub sgn {
@@ -719,11 +809,13 @@ sub normalize_to_monic {
     if (defined($deg) && exists($x->{$deg})) {
         my $lc = $x->{$deg};
         if (!$lc->is_zero() && !$lc->is_one()) {
-            my $normalized = __PACKAGE__->new();
-            for my $d (CORE::keys(%$x)) {
-                $normalized->{$d} = $x->{$d}->div($lc);
-            }
-            return $normalized;
+
+            # Go through the normal constructor (rather than assigning
+            # directly into a bare-blessed hash) so that any coefficient
+            # which happens to divide out to exactly zero is dropped,
+            # preserving this class's invariant that only nonzero
+            # coefficients are ever stored.
+            return __PACKAGE__->new(map { $_ => $x->{$_}->div($lc) } CORE::keys(%$x));
         }
     }
 
@@ -774,8 +866,8 @@ sub gcdext {
 
     my $i = 1;
     until ($r1->is_zero) {
-        my ($q) = $r0->divmod($r1);
-        ($r0, $r1) = ($r1, $r0->sub($q->mul($r1)));
+        my ($q, $r) = $r0->divmod($r1);
+        ($r0, $r1) = ($r1, $r);
         ($s0, $s1) = ($s1, $s0->sub($q->mul($s1)));
         ($t0, $t1) = ($t1, $t0->sub($q->mul($t1)));
         ++$i;
@@ -1004,11 +1096,28 @@ sub cmp {
 
     if (ref($y) eq __PACKAGE__) {
 
+        # Cheap pre-checks (no sorting) that catch the common case of two
+        # polynomials that are obviously different -- either in how many
+        # nonzero terms they have, or in their highest-degree term -- so
+        # the full O(n log n) sort-and-walk below only runs when it's
+        # actually needed to find where they differ.
+        my $n_x = scalar(CORE::keys(%$x));
+        my $n_y = scalar(CORE::keys(%$y));
+
+        $n_x == $n_y
+          or return Sidef::Types::Number::Number::_set_int($n_x <=> $n_y);
+
+        if ($n_x > 0) {
+            my $max_x = List::Util::max(CORE::keys(%$x));
+            my $max_y = List::Util::max(CORE::keys(%$y));
+
+            if ($max_x != $max_y) {
+                return ($max_x > $max_y) ? Sidef::Types::Number::Number::ONE : Sidef::Types::Number::Number::MONE;
+            }
+        }
+
         my @keys_x = sort { ($a <=> $b) || ($a cmp $b) } CORE::keys %$x;
         my @keys_y = sort { ($a <=> $b) || ($a cmp $b) } CORE::keys %$y;
-
-        scalar(@keys_x) == scalar(@keys_y)
-          or return Sidef::Types::Number::Number::_set_int(scalar(@keys_x) <=> scalar(@keys_y));
 
         while (@keys_x and @keys_y) {
 

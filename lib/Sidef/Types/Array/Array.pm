@@ -1521,6 +1521,57 @@ sub slice_after {
     bless [map { bless($_) } @new];
 }
 
+sub squeeze {
+    my ($self) = @_;
+
+    my @result;
+
+    foreach my $item (@$self) {
+        if (!@result || $result[-1] ne $item) {
+            CORE::push(@result, $item);
+        }
+    }
+
+    bless \@result;
+}
+
+*squeeze_dup = \&squeeze;
+
+sub squeeze_by {
+    my ($self, $block) = @_;
+
+    my @result;
+
+    foreach my $item (@$self) {
+        if (@result && $block->run($result[-1], $item)) {
+            next;
+        }
+        CORE::push(@result, $item);
+    }
+
+    bless \@result;
+}
+
+sub chunk_while {
+    my ($self, $block) = @_;
+
+    my @chunks;
+    my @current;
+
+    foreach my $item (@$self) {
+        if (@current && !$block->run($current[-1], $item)) {
+            CORE::push(@chunks, bless [CORE::splice(@current)]);
+        }
+        CORE::push(@current, $item);
+    }
+
+    if (@current) {
+        CORE::push(@chunks, bless \@current);
+    }
+
+    bless \@chunks;
+}
+
 sub each_cons {
     my ($self, $n, $block) = @_;
 
