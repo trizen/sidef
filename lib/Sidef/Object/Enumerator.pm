@@ -80,6 +80,24 @@ sub while {
   RETURN: Sidef::Types::Array::Array->new(\@arr);
 }
 
+sub drop_while {
+    my ($self, $block) = @_;
+    my @arr;
+    my $dropping = 1;
+    $self->{block}->run(
+        Sidef::Types::Block::Block->new(
+            code => sub {
+                if ($dropping) {
+                    $block->run(@_) and return;
+                    $dropping = 0;
+                }
+                push @arr, @_;
+            }
+        )
+    );
+    Sidef::Types::Array::Array->new(\@arr);
+}
+
 sub to_a {
     my ($self) = @_;
 

@@ -170,6 +170,17 @@ Aliases: I<select>
 
 =cut
 
+=head2 drop_while
+
+    self.drop_while(block)
+
+Fully consumes the enumerator, discarding values from the start for as long as C<block> is truthy, and collects everything from the first falsy value onward into an C<Array>.
+
+    var e = Enumerator({|f| (1..10).each {|i| f(i) } })
+    say(e.drop_while {|n| n < 5 })   #=> [5, 6, 7, 8, 9, 10]
+
+=cut
+
 =head2 reduce
 
     self.reduce(block, initial=nil)
