@@ -572,6 +572,16 @@ Returns an C<Array> of plain C<[value, count]> 2-element arrays, one per distinc
 
 =cut
 
+=head2 relative_frequencies
+
+    self.relative_frequencies
+
+Returns an C<Array> of C<[value, proportion]> pairs, where C<proportion> is each element's count divided by the bag's total size (so all proportions sum to C<1>).
+
+    say(Bag(1, 1, 1, 2).relative_frequencies)   #=> [[1, 0.75], [2, 0.25]]
+
+=cut
+
 =head2 most_common
 
     self.most_common(n=1)
@@ -662,6 +672,14 @@ Returns an C<Array> with every element of the bag, each one repeated according t
     say(Bag(1, 2, 2, 3).to_a)   #=> [1, 2, 2, 3]
 
 Aliases: I<expand>, I<to_array>
+
+=cut
+
+=head2 to_h
+
+    self.to_h
+
+Returns a C<Hash> mapping each distinct element to its count -- the same information as L</freq>, in key/value form.
 
 =cut
 

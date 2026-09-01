@@ -611,6 +611,13 @@ sub freq {
                                     CORE::values(%$self));
 }
 
+sub relative_frequencies {
+    my ($self) = @_;
+    my $total = $self->length;
+    Sidef::Types::Array::Array->new(
+               [map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})->div($total)]) } CORE::values(%$self)]);
+}
+
 sub most_common {
     my ($self, $n) = @_;
 
@@ -822,6 +829,11 @@ sub to_a {
 
 *to_array = \&to_a;
 *expand   = \&to_a;
+
+sub to_h {
+    my ($self) = @_;
+    Sidef::Types::Hash::Hash->new(map { ($_->{value} => Sidef::Types::Number::Number::_set_int($_->{count})) } CORE::values(%$self));
+}
 
 sub keys {
     my ($self) = @_;
