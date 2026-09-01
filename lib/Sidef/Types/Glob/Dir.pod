@@ -292,6 +292,16 @@ Recursively removes the directory and everything inside it. This cannot be undon
 
 =head1 CONTENTS AND TRAVERSAL
 
+=head2 entries
+
+    self.entries
+
+Opens the directory, collects every entry (via C<DirHandle>'s C<entries>) into an C<Array>, and closes it again. Returns C<nil> if the directory couldn't be opened.
+
+    say Dir("/tmp").entries
+
+=cut
+
 =head2 is_empty
 
     self.is_empty
