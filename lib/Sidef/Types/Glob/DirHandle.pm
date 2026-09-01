@@ -148,6 +148,11 @@ sub each {
     $self;
 }
 
+sub map {
+    my ($self, $block) = @_;
+    Sidef::Types::Array::Array->new([CORE::map { $block->run($_) } @{$self->entries}]);
+}
+
 sub grep {
     my ($self, $block) = @_;
     Sidef::Types::Array::Array->new([CORE::grep { $block->run($_) } @{$self->entries}]);
