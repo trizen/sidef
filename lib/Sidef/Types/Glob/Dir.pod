@@ -320,6 +320,26 @@ Aliases: I<browse>, I<find>
 
 =cut
 
+=head2 each
+
+    self.each(block)
+
+Opens the directory, calls C<block> once per entry name (including C<.> and C<..>), and closes it again. Returns C<true> on success, C<false> if the directory couldn't be opened.
+
+    Dir("/tmp").each {|name| say name }
+
+=cut
+
+=head2 glob
+
+    self.glob(pattern)
+
+Returns an C<Array> of every entry matching the shell glob C<pattern> (e.g. C<"*.txt">), as C<File> or C<Dir> objects.
+
+    Dir("/var/log").glob("*.log").each {|f| say f }
+
+=cut
+
 =head2 open
 
     self.open

@@ -94,6 +94,23 @@ sub find {
 *browse = \&find;
 *walk   = \&find;
 
+sub each {
+    ref($_[0]) || shift(@_);
+    my ($self, $block) = @_;
+    my $dh = $self->open() // return Sidef::Types::Bool::Bool::FALSE;
+    $dh->each($block);
+    $dh->close;
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub glob {
+    ref($_[0]) || shift(@_);
+    my ($self, $pattern) = @_;
+    state $x = require File::Spec;
+    my @matches = CORE::glob(File::Spec->catfile("$self", "$pattern"));
+    Sidef::Types::Array::Array->new([map { (-d $_) ? __PACKAGE__->new($_) : Sidef::Types::Glob::File->new($_) } @matches]);
+}
+
 sub cwd {
     state $x = require Cwd;
     __PACKAGE__->new(Encode::decode_utf8(Cwd::getcwd()));
