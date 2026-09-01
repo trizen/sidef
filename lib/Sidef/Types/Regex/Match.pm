@@ -81,6 +81,20 @@ sub pos {
 
 *match_pos = \&pos;
 
+sub pre_match {
+    my ($self) = @_;
+    my $mp     = $self->{match_pos} or return undef;
+    @$mp or return undef;
+    Sidef::Types::String::String->new(CORE::substr($self->{string}, 0, $mp->[0]));
+}
+
+sub post_match {
+    my ($self) = @_;
+    my $mp     = $self->{match_pos} or return undef;
+    @$mp or return undef;
+    Sidef::Types::String::String->new(CORE::substr($self->{string}, $mp->[1]));
+}
+
 sub captures {
     my ($self) = @_;
     Sidef::Types::Array::Array->new([@{$self->{_cached_cap} //= [map { Sidef::Types::String::String->new($_) } @{$self->{captures}}]}]);
