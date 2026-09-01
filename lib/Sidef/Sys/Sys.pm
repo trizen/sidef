@@ -87,6 +87,29 @@ sub user {
 
 *getlogin = \&user;
 
+sub getenv {
+    my ($self, $name) = @_;
+    defined($ENV{"$name"}) ? Sidef::Types::String::String->new($ENV{"$name"}) : undef;
+}
+
+sub setenv {
+    my ($self, $name, $value) = @_;
+    if (defined($value)) { $ENV{"$name"} = "$value"; }
+    else                 { CORE::delete($ENV{"$name"}); }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub env {
+    my ($self) = @_;
+    my $hash = Sidef::Types::Hash::Hash->new;
+    foreach my $key (CORE::keys(%ENV)) {
+        $hash->{$key} = Sidef::Types::String::String->new($ENV{$key});
+    }
+    $hash;
+}
+
+*environ = \&env;
+
 sub umask {
     my ($self, $mode) = @_;
 

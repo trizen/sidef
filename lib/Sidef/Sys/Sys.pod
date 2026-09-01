@@ -52,7 +52,7 @@ Creates a new, empty Sys object. Any arguments given are ignored — this constr
 
 =head2 fork
 
-    self.fork
+    Sys.fork
 
 Creates a child process. Returns the child's process ID (PID) to the parent process, C<0> to the child process, or C<nil> on failure.
 
@@ -71,7 +71,7 @@ Creates a child process. Returns the child's process ID (PID) to the parent proc
 
 =head2 wait
 
-    self.wait
+    Sys.wait
 
 Waits for any child process to terminate and returns its process ID, or C<-1> if there are no child processes to wait for.
 
@@ -89,7 +89,7 @@ Waits for any child process to terminate and returns its process ID, or C<-1> if
 
 =head2 exit
 
-    self.exit(code)
+    Sys.exit(code)
 
 Terminates the program immediately with the specified exit code. An exit code of 0 typically indicates success, while non-zero values indicate various error conditions. If omitted, C<code> defaults to 0.
 
@@ -100,7 +100,7 @@ Terminates the program immediately with the specified exit code. An exit code of
 
 =head2 kill
 
-    self.kill(signal, *list)
+    Sys.kill(signal, *list)
 
 Sends C<signal> to each process ID in C<list>. C<signal> can be a signal name (e.g. C<'TERM'>, C<'KILL'>, C<'HUP'>) or number. Returns the number of processes successfully signaled.
 
@@ -112,7 +112,7 @@ Sends C<signal> to each process ID in C<list>. C<signal> can be a signal name (e
 
 =head2 system
 
-    self.system(*args)
+    Sys.system(*args)
 
 Executes an external command and waits for it to complete, exactly like Perl's built-in C<system>. Output goes directly to STDOUT/STDERR. Returns the raw child status value: C<0> means the command exited successfully; any other value packs the exit code and signal information together (the actual exit code is the returned value shifted right by 8 bits).
 
@@ -132,7 +132,7 @@ Aliases: I<run>
 
 =head2 exec
 
-    self.exec(*args)
+    Sys.exec(*args)
 
 Replaces the current process image with the specified external command. This function does not return on success — the calling program is gone. Arguments can be a single command string or a command followed by its individual arguments.
 
@@ -143,7 +143,7 @@ Replaces the current process image with the specified external command. This fun
 
 =head2 getppid
 
-    self.getppid
+    Sys.getppid
 
 Returns the process ID (PID) of the parent process.
 
@@ -153,7 +153,7 @@ Returns the process ID (PID) of the parent process.
 
 =head2 getpgrp
 
-    self.getpgrp(pid)
+    Sys.getpgrp(pid)
 
 Returns the process group ID for the specified process ID. If C<pid> is omitted, returns the process group of the current process.
 
@@ -164,7 +164,7 @@ Returns the process group ID for the specified process ID. If C<pid> is omitted,
 
 =head2 setpgrp
 
-    self.setpgrp(pid, pgrp)
+    Sys.setpgrp(pid, pgrp)
 
 Sets the process group for the specified process ID. Both parameters default to C<0> if omitted, which sets the current process as its own process group leader.
 
@@ -174,7 +174,7 @@ Sets the process group for the specified process ID. Both parameters default to 
 
 =head2 getpriority
 
-    self.getpriority(which, who)
+    Sys.getpriority(which, who)
 
 Returns the current priority (nice value) of a process, process group, or user. C<which> specifies the target kind (C<0> = process, C<1> = process group, C<2> = user), and C<who> specifies its ID.
 
@@ -184,7 +184,7 @@ Returns the current priority (nice value) of a process, process group, or user. 
 
 =head2 setpriority
 
-    self.setpriority(which, who, priority)
+    Sys.setpriority(which, who, priority)
 
 Sets the priority (nice value) of a process, process group, or user. C<which> specifies the target kind (C<0> = process, C<1> = process group, C<2> = user), C<who> specifies its ID, and C<priority> is the new value (lower numbers mean higher scheduling priority).
 
@@ -196,7 +196,7 @@ Sets the priority (nice value) of a process, process group, or user. C<which> sp
 
 =head2 alarm
 
-    self.alarm(sec)
+    Sys.alarm(sec)
 
 Schedules a SIGALRM signal to be delivered to the process after C<sec> seconds (fractional seconds are supported). Setting C<sec> to 0 cancels any pending alarm. Returns a boolean: true if a previous alarm still had time remaining when this call replaced it, false otherwise (including when there was no previous alarm).
 
@@ -207,7 +207,7 @@ Schedules a SIGALRM signal to be delivered to the process after C<sec> seconds (
 
 =head2 ualarm
 
-    self.ualarm(usec)
+    Sys.ualarm(usec)
 
 Like L</alarm>, but C<usec> is given in microseconds, allowing finer granularity. Returns a boolean: true if a previous alarm still had time remaining, false otherwise.
 
@@ -219,7 +219,7 @@ Aliases: I<micro_alarm>
 
 =head2 sleep
 
-    self.sleep(sec)
+    Sys.sleep(sec)
 
 Suspends execution for C<sec> seconds (fractional seconds are supported). Returns a boolean indicating whether any (nonzero) amount of time was actually slept.
 
@@ -230,7 +230,7 @@ Suspends execution for C<sec> seconds (fractional seconds are supported). Return
 
 =head2 nanosleep
 
-    self.nanosleep(nsec)
+    Sys.nanosleep(nsec)
 
 Suspends execution for C<nsec> I<nanoseconds> — despite the similarly-named L</sleep>, this method's argument is a nanosecond count, not a (possibly fractional) second count. Returns a boolean indicating whether any (nonzero) amount of time was actually slept.
 
@@ -243,7 +243,7 @@ Aliases: I<nano_sleep>
 
 =head2 usleep
 
-    self.usleep(usec)
+    Sys.usleep(usec)
 
 Suspends execution for C<usec> microseconds. Returns a boolean indicating whether any (nonzero) amount of time was actually slept.
 
@@ -258,7 +258,7 @@ Aliases: I<micro_sleep>
 
 =head2 print
 
-    self.print(*args)
+    Sys.print(*args)
 
 Prints the arguments to the currently selected output filehandle (default STDOUT), without appending a newline. Returns a boolean indicating success.
 
@@ -269,7 +269,7 @@ Prints the arguments to the currently selected output filehandle (default STDOUT
 
 =head2 printf
 
-    self.printf(format, *args)
+    Sys.printf(format, *args)
 
 Formats and prints output according to a C<sprintf>-style format string to the currently selected output filehandle. Returns a boolean indicating success.
 
@@ -280,7 +280,7 @@ Formats and prints output according to a C<sprintf>-style format string to the c
 
 =head2 printh
 
-    self.printh(fh, *args)
+    Sys.printh(fh, *args)
 
 Prints the arguments to the specified filehandle without appending a newline. C<fh> may be a raw filehandle (as returned by, e.g., L</select>) or a Sidef filehandle-like object supporting its own C<print> method — in the latter case, this simply delegates to C<fh.print(*args)>. Returns a boolean indicating success.
 
@@ -293,7 +293,7 @@ Prints the arguments to the specified filehandle without appending a newline. C<
 
 =head2 println
 
-    self.println(*args)
+    Sys.println(*args)
 
 Prints the arguments to the currently selected output filehandle (default STDOUT) and appends a newline. Returns a boolean indicating success.
 
@@ -307,7 +307,7 @@ Aliases: I<say>
 
 =head2 scanln
 
-    self.scanln(prompt)
+    Sys.scanln(prompt)
 
 Displays C<prompt> (if given) and reads a single line of input from the terminal, returning it as a String with the trailing newline removed. Returns C<nil> on end of input.
 
@@ -320,8 +320,8 @@ Aliases: I<readln>, I<readline>
 
 =head2 read
 
-    self.read(type)
-    self.read(prompt, type)
+    Sys.read(type)
+    Sys.read(prompt, type)
 
 Displays C<prompt> (if given), reads a single line of input from the terminal, and constructs a new object of C<type> from it (i.e. C<type.new(input)>). C<type> must be a class that accepts a raw string in its constructor, such as C<String> or C<Number>. Returns C<nil> on end of input.
 
@@ -334,7 +334,7 @@ L</scanln> is a thin wrapper around this that always uses C<String> as the type.
 
 =head2 select
 
-    self.select(fh)
+    Sys.select(fh)
 
 Sets the specified filehandle as the default output filehandle for L</print>, L</printf>, L</println>, etc. Returns the previously selected filehandle, as a Sidef FileHandle object.
 
@@ -348,7 +348,7 @@ Sets the specified filehandle as the default output filehandle for L</print>, L<
 
 =head2 stdin
 
-    self.stdin
+    Sys.stdin
 
 Returns the standard input filehandle (STDIN).
 
@@ -358,7 +358,7 @@ Returns the standard input filehandle (STDIN).
 
 =head2 stdout
 
-    self.stdout
+    Sys.stdout
 
 Returns the standard output filehandle (STDOUT).
 
@@ -368,7 +368,7 @@ Returns the standard output filehandle (STDOUT).
 
 =head2 stderr
 
-    self.stderr
+    Sys.stderr
 
 Returns the standard error filehandle (STDERR).
 
@@ -380,7 +380,7 @@ Returns the standard error filehandle (STDERR).
 
 =head2 open
 
-    self.open(var, mode, filename)
+    Sys.open(var, mode, filename)
 
 Opens C<filename> (converted via its C<to_file> method) and assigns the resulting filehandle to C<var>. C<mode> follows the usual conventions (C<'<'> for read, C<'>'> for write, C<'>>'> for append, etc.). The actual return value and supported modes are governed by the file object's own C<open> method.
 
@@ -393,7 +393,7 @@ Opens C<filename> (converted via its C<to_file> method) and assigns the resultin
 
 =head2 opendir
 
-    self.opendir(var, dirname)
+    Sys.opendir(var, dirname)
 
 Opens the directory at C<dirname> (converted via its C<to_dir> method) and assigns the resulting directory handle to C<var>.
 
@@ -410,7 +410,7 @@ Opens the directory at C<dirname> (converted via its C<to_dir> method) and assig
 
 =head2 osname
 
-    self.osname
+    Sys.osname
 
 Returns the operating system name as a string (e.g., C<'linux'>, C<'darwin'>, C<'MSWin32'>, C<'freebsd'>), taken directly from Perl's C<$^O>.
 
@@ -426,7 +426,7 @@ Aliases: I<os>
 
 =head2 user
 
-    self.user
+    Sys.user
 
 Returns the login name of the current user as a string.
 
@@ -436,9 +436,38 @@ Aliases: I<getlogin>
 
 =cut
 
+=head2 getenv
+
+    Sys.getenv(name)
+
+Returns the value of environment variable C<name>, or C<nil> if unset.
+
+    say Sys.getenv(:HOME)   # home dir
+
+=cut
+
+=head2 setenv
+
+    Sys.setenv(name, value)
+    Sys.setenv(name, nil)
+
+Sets environment variable C<name> to C<value>, or removes it entirely when C<value> is C<nil>. Returns true.
+
+=cut
+
+=head2 env
+
+    Sys.env
+
+Returns a Hash snapshot of the current environment variables.
+
+Aliases: I<environ>
+
+=cut
+
 =head2 sidef
 
-    self.sidef
+    Sys.sidef
 
 Returns the absolute filesystem path of the currently running script.
 
@@ -448,7 +477,7 @@ Returns the absolute filesystem path of the currently running script.
 
 =head2 umask
 
-    self.umask(mode)
+    Sys.umask(mode)
 
 Sets the file creation mask (umask) to C<mode> and returns the I<previous> mask. If C<mode> is omitted, simply returns the current mask without changing it.
 
@@ -462,7 +491,7 @@ Sets the file creation mask (umask) to C<mode> and returns the I<previous> mask.
 
 =head2 ref
 
-    self.ref(obj)
+    Sys.ref(obj)
 
 Returns a string describing what kind of reference C<obj> is: the blessed class name for an object, a bare type such as C<'ARRAY'>, C<'HASH'>, or C<'CODE'> for an unblessed reference, or an empty string if C<obj> is not a reference at all. This mirrors Perl's built-in C<ref> function.
 
@@ -476,7 +505,7 @@ See also L</reftype> (which ignores blessing) and L</class_name> (which strips t
 
 =head2 reftype
 
-    self.reftype(obj)
+    Sys.reftype(obj)
 
 Returns the underlying storage type of a reference as a string (e.g., C<'ARRAY'>, C<'HASH'>, C<'SCALAR'>, C<'CODE'>), ignoring any blessing — unlike L</ref>, this always reports the raw storage kind even for blessed objects.
 
@@ -487,7 +516,7 @@ Returns the underlying storage type of a reference as a string (e.g., C<'ARRAY'>
 
 =head2 class_name
 
-    self.class_name(obj)
+    Sys.class_name(obj)
 
 Returns the short class name of the given object — the part of its full package name after the last C<::>.
 
@@ -499,7 +528,7 @@ Returns the short class name of the given object — the part of its full packag
 
 =head2 defined
 
-    self.defined(obj)
+    Sys.defined(obj)
 
 Returns true if C<obj> is defined (not C<nil>), false otherwise.
 
@@ -511,7 +540,7 @@ Returns true if C<obj> is defined (not C<nil>), false otherwise.
 
 =head2 refaddr
 
-    self.refaddr(obj)
+    Sys.refaddr(obj)
 
 Returns the memory address of the reference as a number. Useful for debugging and checking object identity.
 
@@ -522,7 +551,7 @@ Returns the memory address of the reference as a number. Useful for debugging an
 
 =head2 bless
 
-    self.bless(obj, class)
+    Sys.bless(obj, class)
 
 Blesses C<obj> into C<class>, changing its type, and returns the blessed object.
 
@@ -535,7 +564,7 @@ Blesses C<obj> into C<class>, changing its type, and returns the blessed object.
 
 =head2 weaken
 
-    self.weaken(obj)
+    Sys.weaken(obj)
 
 Converts a reference to a weak reference in place. Weak references do not prevent the referenced object from being garbage collected. Returns a boolean indicating success.
 
@@ -548,7 +577,7 @@ Converts a reference to a weak reference in place. Weak references do not preven
 
 =head2 isweak
 
-    self.isweak(obj)
+    Sys.isweak(obj)
 
 Returns true if the reference is weak (won't prevent garbage collection), false otherwise.
 
@@ -561,7 +590,7 @@ Returns true if the reference is weak (won't prevent garbage collection), false 
 
 =head2 unweaken
 
-    self.unweaken(obj)
+    Sys.unweaken(obj)
 
 Converts a weak reference back into a strong reference in place. Returns a boolean indicating success.
 
@@ -574,7 +603,7 @@ Converts a weak reference back into a strong reference in place. Returns a boole
 
 =head2 die
 
-    self.die(*args)
+    Sys.die(*args)
 
 Raises a fatal exception, concatenating the arguments to form the error message, and terminates the program unless caught. A trailing newline is added automatically, so Perl's usual "at FILE line N" suffix is suppressed.
 
@@ -587,7 +616,7 @@ Aliases: I<raise>
 
 =head2 warn
 
-    self.warn(*args)
+    Sys.warn(*args)
 
 Prints a warning message to STDERR, concatenating the arguments to form the message. A trailing newline is added automatically. Unlike L</die>, this does not terminate the program.
 
@@ -602,7 +631,7 @@ These methods query the traditional Unix user and group databases (as one would 
 
 =head2 getpwnam
 
-    self.getpwnam(name)
+    Sys.getpwnam(name)
 
 Looks up a user by login name. On success, returns an array with fields, in order: C<[name, passwd, uid, gid, quota, comment, gcos]>, followed by the shell, i.e. C<[name, passwd, uid, gid, quota, comment, gcos, shell]>. Note that the home directory is not included in the returned array. Returns C<nil> if the user isn't found.
 
@@ -614,7 +643,7 @@ Looks up a user by login name. On success, returns an array with fields, in orde
 
 =head2 getpwuid
 
-    self.getpwuid(uid)
+    Sys.getpwuid(uid)
 
 Looks up a user by numeric user ID. Returns the same array shape as L</getpwnam>, or C<nil> if not found.
 
@@ -625,7 +654,7 @@ Looks up a user by numeric user ID. Returns the same array shape as L</getpwnam>
 
 =head2 getpwent
 
-    self.getpwent
+    Sys.getpwent
 
 Returns the next entry from the user database as the same array shape as L</getpwnam>, or C<nil> when there are no more entries. Use L</setpwent> to rewind and iterate again.
 
@@ -638,7 +667,7 @@ Returns the next entry from the user database as the same array shape as L</getp
 
 =head2 setpwent
 
-    self.setpwent
+    Sys.setpwent
 
 Resets the user database iterator to the beginning, so L</getpwent> starts over from the first entry. Returns a boolean.
 
@@ -646,7 +675,7 @@ Resets the user database iterator to the beginning, so L</getpwent> starts over 
 
 =head2 getgrnam
 
-    self.getgrnam(name)
+    Sys.getgrnam(name)
 
 Looks up a group by name. B<Note:> due to how this lookup is currently implemented, a I<successful> lookup returns just the group's name as a plain string (the passwd/gid/members fields are not accessible this way), while an I<unsuccessful> lookup returns an array of mostly-undefined values rather than C<nil> — the reverse of the not-found convention used elsewhere in this class.
 
@@ -657,7 +686,7 @@ Looks up a group by name. B<Note:> due to how this lookup is currently implement
 
 =head2 getgrgid
 
-    self.getgrgid(gid)
+    Sys.getgrgid(gid)
 
 Looks up a group by numeric group ID. See the caveat under L</getgrnam> — this currently behaves the same way.
 
@@ -667,7 +696,7 @@ Looks up a group by numeric group ID. See the caveat under L</getgrnam> — this
 
 =head2 getgrent
 
-    self.getgrent
+    Sys.getgrent
 
 Returns the next entry from the group database. See the caveat under L</getgrnam> — this currently behaves the same way. Use L</setgrent> to rewind and iterate again.
 
@@ -680,7 +709,7 @@ Returns the next entry from the group database. See the caveat under L</getgrnam
 
 =head2 setgrent
 
-    self.setgrent
+    Sys.setgrent
 
 Resets the group database iterator to the beginning, so L</getgrent> starts over from the first entry. Returns a boolean.
 
@@ -692,7 +721,7 @@ These methods query the traditional Unix host, network, protocol, and service da
 
 =head2 gethostbyname
 
-    self.gethostbyname(name)
+    Sys.gethostbyname(name)
 
 Looks up a host by name. Returns an array C<[name, aliases, addrtype, length, addrs]>, where C<aliases> is a single (possibly space-separated) string of alternate names, and C<addrs> is an array of address strings.
 
@@ -704,7 +733,7 @@ Looks up a host by name. Returns an array C<[name, aliases, addrtype, length, ad
 
 =head2 gethostbyaddr
 
-    self.gethostbyaddr(addr, addrtype)
+    Sys.gethostbyaddr(addr, addrtype)
 
 Looks up a host by network address. C<addrtype> specifies the address family (typically C<2> for AF_INET). Returns the same array shape as L</gethostbyname>.
 
@@ -714,7 +743,7 @@ Looks up a host by network address. C<addrtype> specifies the address family (ty
 
 =head2 gethostent
 
-    self.gethostent
+    Sys.gethostent
 
 Returns the next entry from the hosts database, in the same array shape as L</gethostbyname>, or C<nil> when there are no more entries. Use L</sethostent> to rewind.
 
@@ -722,7 +751,7 @@ Returns the next entry from the hosts database, in the same array shape as L</ge
 
 =head2 sethostent
 
-    self.sethostent(stayopen)
+    Sys.sethostent(stayopen)
 
 Opens and rewinds the hosts database. If C<stayopen> is true, the database connection is kept open for efficiency. Returns a boolean.
 
@@ -730,7 +759,7 @@ Opens and rewinds the hosts database. If C<stayopen> is true, the database conne
 
 =head2 getnetbyname
 
-    self.getnetbyname(name)
+    Sys.getnetbyname(name)
 
 Looks up a network by name. Returns an array C<[name, aliases, addrtype, net]>.
 
@@ -740,7 +769,7 @@ Looks up a network by name. Returns an array C<[name, aliases, addrtype, net]>.
 
 =head2 getnetbyaddr
 
-    self.getnetbyaddr(addr, addrtype)
+    Sys.getnetbyaddr(addr, addrtype)
 
 Looks up a network by address and address type. Returns the same array shape as L</getnetbyname>.
 
@@ -748,7 +777,7 @@ Looks up a network by address and address type. Returns the same array shape as 
 
 =head2 getnetent
 
-    self.getnetent
+    Sys.getnetent
 
 Returns the next entry from the networks database, in the same array shape as L</getnetbyname>, or C<nil> when there are no more entries. Use L</setnetent> to rewind.
 
@@ -756,7 +785,7 @@ Returns the next entry from the networks database, in the same array shape as L<
 
 =head2 setnetent
 
-    self.setnetent(stayopen)
+    Sys.setnetent(stayopen)
 
 Opens and rewinds the networks database. If C<stayopen> is true, the database connection is kept open for efficiency. Returns a boolean.
 
@@ -764,7 +793,7 @@ Opens and rewinds the networks database. If C<stayopen> is true, the database co
 
 =head2 getprotobyname
 
-    self.getprotobyname(name)
+    Sys.getprotobyname(name)
 
 Looks up a protocol by name (e.g., C<'tcp'>, C<'udp'>, C<'icmp'>). Returns an array C<[name, aliases, proto]>.
 
@@ -775,7 +804,7 @@ Looks up a protocol by name (e.g., C<'tcp'>, C<'udp'>, C<'icmp'>). Returns an ar
 
 =head2 getprotobynumber
 
-    self.getprotobynumber(num)
+    Sys.getprotobynumber(num)
 
 Looks up a protocol by its number. Returns the same array shape as L</getprotobyname>.
 
@@ -785,7 +814,7 @@ Looks up a protocol by its number. Returns the same array shape as L</getprotoby
 
 =head2 getprotoent
 
-    self.getprotoent
+    Sys.getprotoent
 
 Returns the next entry from the protocols database, in the same array shape as L</getprotobyname>, or C<nil> when there are no more entries. Use L</setprotoent> to rewind.
 
@@ -793,7 +822,7 @@ Returns the next entry from the protocols database, in the same array shape as L
 
 =head2 setprotoent
 
-    self.setprotoent(stayopen)
+    Sys.setprotoent(stayopen)
 
 Opens and rewinds the protocols database. If C<stayopen> is true, the database connection is kept open for efficiency. Returns a boolean.
 
@@ -801,7 +830,7 @@ Opens and rewinds the protocols database. If C<stayopen> is true, the database c
 
 =head2 getservbyname
 
-    self.getservbyname(name, proto)
+    Sys.getservbyname(name, proto)
 
 Looks up a service by name and protocol. Returns an array C<[name, aliases, port, proto]>, where C<port> is a number.
 
@@ -812,7 +841,7 @@ Looks up a service by name and protocol. Returns an array C<[name, aliases, port
 
 =head2 getservbyport
 
-    self.getservbyport(port, proto)
+    Sys.getservbyport(port, proto)
 
 Looks up a service by port number and protocol. Returns the same array shape as L</getservbyname>.
 
@@ -823,7 +852,7 @@ Looks up a service by port number and protocol. Returns the same array shape as 
 
 =head2 getservent
 
-    self.getservent
+    Sys.getservent
 
 Returns the next entry from the services database, in the same array shape as L</getservbyname>, or C<nil> when there are no more entries. Use L</setservent> to rewind.
 
@@ -831,7 +860,7 @@ Returns the next entry from the services database, in the same array shape as L<
 
 =head2 setservent
 
-    self.setservent(stayopen)
+    Sys.setservent(stayopen)
 
 Opens and rewinds the services database. If C<stayopen> is true, the database connection is kept open for efficiency. Returns a boolean.
 
