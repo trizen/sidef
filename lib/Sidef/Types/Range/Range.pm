@@ -124,6 +124,40 @@ sub max {
       : $self->{from};
 }
 
+sub min_max {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my $iter  = $self->iter;
+    my $first = $iter->run() // return (undef, undef);
+
+    my ($min, $max) = ($first, $first);
+    my ($min_v, $max_v) = ($block->run($first), $block->run($first));
+
+    while (1) {
+        my $curr   = $iter->run() // last;
+        my $curr_v = $block->run($curr);
+        if (CORE::int($curr_v cmp $min_v) < 0) { $min = $curr; $min_v = $curr_v; }
+        if (CORE::int($curr_v cmp $max_v) > 0) { $max = $curr; $max_v = $curr_v; }
+    }
+
+    ($min, $max);
+}
+
+sub partition {
+    my ($self, $block) = @_;
+    $block //= Sidef::Types::Block::Block::IDENTITY;
+
+    my (@yes, @no);
+    my $iter = $self->iter;
+    for (; ;) {
+        my $obj = $iter->run() // last;
+        $block->run($obj) ? push(@yes, $obj) : push(@no, $obj);
+    }
+
+    (Sidef::Types::Array::Array->new(\@yes), Sidef::Types::Array::Array->new(\@no));
+}
+
 sub step {
     $_[0]->{step};
 }
