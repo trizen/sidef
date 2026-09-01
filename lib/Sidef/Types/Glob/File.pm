@@ -289,6 +289,22 @@ sub dirname {
 *dir      = \&dirname;
 *dir_name = \&dirname;
 
+sub extension {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $base = "$self";
+    $base =~ s{.*/}{};
+    ($base =~ /\.([^.]+)\z/) ? Sidef::Types::String::String->new($1) : Sidef::Types::String::String->new('');
+}
+
+sub basename_without_ext {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $str = "" . $self->basename;
+    $str =~ s/\.[^.]+\z//;
+    Sidef::Types::String::String->new($str);
+}
+
 sub is_absolute {
     ref($_[0]) || shift(@_);
     my ($self) = @_;

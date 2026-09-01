@@ -69,7 +69,7 @@ Aliases: I<call>
 Returns the file's path exactly as given (or as joined, if constructed from multiple components), as a String -- this does not make it absolute or otherwise normalize it.
 
     var file = File("/home/user/file.txt")
-    say(file.name)                   #=> "/home/user/file.txt"
+    say file.name                   #=> "/home/user/file.txt"
 
 =cut
 
@@ -80,7 +80,7 @@ Returns the file's path exactly as given (or as joined, if constructed from mult
 Returns just the filename portion of the path (without any directory component), like the Unix C<basename> command.
 
     var file = File("/home/user/document.txt")
-    say(file.basename)               #=> "document.txt"
+    say file.basename               #=> "document.txt"
 
 Aliases: I<base>, I<base_name>
 
@@ -93,9 +93,30 @@ Aliases: I<base>, I<base_name>
 Returns the directory portion of the path, as a C<Dir> object (I<not> a plain String), like the Unix C<dirname> command.
 
     var file = File("/home/user/documents/file.txt")
-    say(file.dirname)                #=> Dir("/home/user/documents")
+    say file.dirname                #=> Dir("/home/user/documents")
 
 Aliases: I<dir>, I<dir_name>
+
+=cut
+
+=head2 extension
+
+    file.extension
+
+Returns the file's extension (without the leading dot), or an empty String if it has none.
+
+    say File("archive.tar.gz").extension   #=> "gz"
+    say File("README").extension           #=> ""
+
+=cut
+
+=head2 basename_without_ext
+
+    file.basename_without_ext
+
+Returns L</basename> with its final extension removed.
+
+    say File("/path/to/document.txt").basename_without_ext   #=> "document"
 
 =cut
 
