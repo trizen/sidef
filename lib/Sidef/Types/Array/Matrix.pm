@@ -608,6 +608,43 @@ sub is_symmetric {
     Sidef::Types::Bool::Bool::TRUE;
 }
 
+sub is_identity {
+    my ($self) = @_;
+    ($self->is_square && $self->is_diagonal) or return Sidef::Types::Bool::Bool::FALSE;
+    foreach my $d (@{$self->diagonal}) {
+        $d->is_one or return Sidef::Types::Bool::Bool::FALSE;
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub is_diagonal {
+    my ($self) = @_;
+    my $n      = CORE::int($self->row_count);
+    my $m      = CORE::int($self->column_count);
+    foreach my $i (0 .. $n - 1) {
+        foreach my $j (0 .. $m - 1) {
+            next if $i == $j;
+            $self->[$i][$j]->is_zero or return Sidef::Types::Bool::Bool::FALSE;
+        }
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub rank {
+    my ($self) = @_;
+    my $r      = $self->rref;
+    my $count  = 0;
+    foreach my $row (@$r) {
+        foreach my $value (@$row) {
+            if (!$value->is_zero) {
+                ++$count;
+                last;
+            }
+        }
+    }
+    Sidef::Types::Number::Number::_set_int($count);
+}
+
 # Reduced row echelon form
 sub rref {
     my ($self) = @_;
