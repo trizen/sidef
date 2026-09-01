@@ -368,19 +368,19 @@ sub edit {
     my ($self, $code) = @_;
 
     my @lines;
-    open(my $fh, '+<:utf8', "$self") || return (Sidef::Types::Bool::Bool::FALSE);
+    CORE::open(my $fh, '+<:utf8', "$self") || return (Sidef::Types::Bool::Bool::FALSE);
     while (defined(my $line = <$fh>)) {
         push @lines, $code->run(Sidef::Types::String::String->new($line));
     }
 
-    truncate($fh, 0) || return undef;
-    seek($fh, 0, 0)  || return undef;
+    CORE::truncate($fh, 0) || return undef;
+    CORE::seek($fh, 0, 0)  || return undef;
 
     do {
         local $, = q{};
         local $\ = q{};
         (print $fh @lines) || return undef;
-        close $fh;
+        CORE::close $fh;
       }
       ? (Sidef::Types::Bool::Bool::TRUE)
       : (Sidef::Types::Bool::Bool::FALSE);
@@ -391,7 +391,7 @@ sub read {
     my ($self, $mode) = @_;
 
     $mode = defined($mode) ? "$mode" : 'utf8';
-    open(my $fh, "<:$mode", "$self") || return undef;
+    CORE::open(my $fh, "<:$mode", "$self") || return undef;
 
     local $/;
     Sidef::Types::String::String->new(scalar <$fh>);
@@ -402,11 +402,11 @@ sub write {
     my ($self, $string, $mode) = @_;
 
     $mode = defined($mode) ? "$mode" : 'utf8';
-    open(my $fh, ">:$mode", "$self") || return undef;
+    CORE::open(my $fh, ">:$mode", "$self") || return undef;
 
     (print $fh "$string") || return undef;
 
-    (close $fh)
+    (CORE::close $fh)
       ? (Sidef::Types::Bool::Bool::TRUE)
       : (Sidef::Types::Bool::Bool::FALSE);
 }
@@ -416,13 +416,34 @@ sub append {
     my ($self, $string, $mode) = @_;
 
     $mode = defined($mode) ? "$mode" : 'utf8';
-    open(my $fh, ">>:$mode", "$self") || return undef;
+    CORE::open(my $fh, ">>:$mode", "$self") || return undef;
 
     (print $fh "$string") || return undef;
 
-    (close $fh)
+    (CORE::close $fh)
       ? (Sidef::Types::Bool::Bool::TRUE)
       : (Sidef::Types::Bool::Bool::FALSE);
+}
+
+sub lines {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    CORE::open(my $fh, '<:utf8', "$self") or return undef;
+    my @lines = map { chomp; Sidef::Types::String::String->new($_) } <$fh>;
+    CORE::close($fh);
+    Sidef::Types::Array::Array->new(\@lines);
+}
+
+sub each_line {
+    ref($_[0]) || shift(@_);
+    my ($self, $block) = @_;
+    CORE::open(my $fh, '<:utf8', "$self") or return Sidef::Types::Bool::Bool::FALSE;
+    while (defined(my $line = <$fh>)) {
+        chomp($line);
+        $block->run(Sidef::Types::String::String->new($line));
+    }
+    CORE::close($fh);
+    Sidef::Types::Bool::Bool::TRUE;
 }
 
 sub open {

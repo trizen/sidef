@@ -475,13 +475,33 @@ Returns the size of the file in bytes.
 
 =cut
 
+=head2 lines
+
+    file.lines
+
+Opens the file, reads every line (terminators removed) into an C<Array> of Strings, and closes it. Returns C<nil> if the file can't be opened.
+
+    File("data.txt").lines.each {|line| say(line) }
+
+=cut
+
+=head2 each_line
+
+    file.each_line(block)
+
+Opens the file, calls C<block> once per line, and closes it again -- without you needing to call L</open_r> and close the handle yourself. Returns C<true> on success, C<false> if the file couldn't be opened.
+
+    File("data.txt").each_line {|line| say(line.uc) }
+
+=cut
+
 =head2 read
 
     file.read(layer="utf8")
 
 Reads and returns the entire contents of the file as a String, decoded through the given PerlIO C<layer> (I<without> a leading colon -- just the layer name itself, e.g. C<"utf8"> or C<"raw">). Defaults to UTF-8. Returns C<nil> if the file can't be opened.
 
-    var content = File("data.txt").read           # read as UTF-8 text
+    var content = File("data.txt").read            # read as UTF-8 text
     var binary  = File("data.bin").read("raw")     # read as raw bytes
 
 =cut
@@ -514,7 +534,6 @@ Appends C<string> to the end of the file (creating it if it doesn't exist), thro
 Rewrites the file in place, one I<line at a time>: C<block> is called once per line (each as a String, including its line terminator), and the collected return values of every call replace the file's entire content. C<block> does I<not> receive the whole file at once.
 
     File("text.txt").edit {|line| line.uc }
-
     File("config.ini").edit {|line| line.gsub(/old_value/, "new_value") }
 
 =cut
