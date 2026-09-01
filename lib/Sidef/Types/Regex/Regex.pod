@@ -144,6 +144,7 @@ Aliases: I<gmatches>, I<all_matches>, I<map_matches>, I<repeated_match>
 Returns a plain boolean indicating whether the pattern matches C<string>, without needing to build and inspect a C<Match> object yourself.
 
     say /\d/.is_match("abc123")   # true
+    say /\d/.is_match("abcdef")   # false
 
 =cut
 

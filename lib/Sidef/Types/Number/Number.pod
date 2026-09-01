@@ -659,6 +659,17 @@ Aliases: I<%>
 
 =cut
 
+=head2 smod
+
+    x.smod(m)
+
+Returns the residual mod C<m> such that it is within half of the modulus.
+
+    say smod(1, 6)      #=> 1
+    say smod(4, 6)      #=> -2
+
+=cut
+
 =head2 neg
 
     x.neg
@@ -667,32 +678,6 @@ Negates the sign of C<x> (equivalent with: C<-x>).
 
     say 5.neg             #=> -5
     say (-5 -> neg)       #=> 5
-
-=cut
-
-=head2 prod
-
-    prod(...)
-
-Returns the product of a given list of numbers.
-
-    say prod(1, 2, 3, 4, 5)   #=> 120
-
-Aliases: I<Π>, I<vecprod>
-
-=cut
-
-=head2 remdiv
-
-    n.remdiv(k)
-
-Removes all occurrences of the divisor C<k> from integer C<n>.
-
-Equivalent with:
-
-    n / k**valuation(n,k)
-
-Aliases: I<remove>
 
 =cut
 
@@ -714,17 +699,6 @@ Aliases: I<sign>
 
 =cut
 
-=head2 smod
-
-    x.smod(m)
-
-Returns the residual mod C<m> such that it is within half of the modulus.
-
-    say smod(1, 6)      #=> 1
-    say smod(4, 6)      #=> -2
-
-=cut
-
 =head2 sum
 
     sum(...)
@@ -737,16 +711,53 @@ Aliases: I<Σ>, I<vecsum>
 
 =cut
 
-=head2 sum_remainders
+=head2 prod
 
-    sum_remainders(n, v)
+    prod(...)
 
-Returns the following sum: C<Sum_{k=1..n} v % k>, computed in C<O(sqrt(v))> steps.
+Returns the product of a given list of numbers.
 
-    say 20.of {|n| sum_remainders(n, n) }        #=> OEIS: A004125
-    say 20.of {|n| sum_remainders(n, n.prime) }  #=> OEIS: A099726
+    say prod(1, 2, 3, 4, 5)   #=> 120
 
-Negative values of C<v> are also supported.
+Aliases: I<Π>, I<vecprod>
+
+=cut
+
+=head2 arithmetic_mean
+
+    arithmetic_mean(...)
+
+Returns the arithmetic mean (average) of a list of numbers: the sum of all values divided by the count of values.
+
+    say arithmetic_mean(42, 50, 99, 147)   #=> 84.5
+    say arithmetic_mean(1, 2, 3, 4, 5)     #=> 3
+    say arithmetic_mean(10)                #=> 10
+
+Aliases: I<avg>
+
+=cut
+
+=head2 geometric_mean
+
+    geometric_mean(...)
+
+Returns the geometric mean of a list of numbers. The geometric mean is the n-th root of the product of n numbers, useful for averaging ratios and growth rates.
+
+    say geometric_mean(42, 50, 99, 147)    #=> 74.352051512093712...
+    say geometric_mean(1, 2, 4, 8)         #=> 2.8284271247461903...
+    say geometric_mean(3, 27)              #=> 9
+
+=cut
+
+=head2 harmonic_mean
+
+    harmonic_mean(...)
+
+Returns the harmonic mean of a list of numbers. The harmonic mean is the reciprocal of the arithmetic mean of reciprocals, useful for averaging rates.
+
+    say harmonic_mean(42, 50, 99, 147)     #=> 65.883471411109602...
+    say harmonic_mean(1, 2, 4)             #=> 1.7142857142857142...
+    say harmonic_mean(60, 40)              #=> 48
 
 =cut
 
@@ -7768,6 +7779,20 @@ Returns the number of times C<n> is divisible by C<k>.
 
 =cut
 
+=head2 remdiv
+
+    n.remdiv(k)
+
+Removes all occurrences of the divisor C<k> from integer C<n>.
+
+Equivalent with:
+
+    n / k**valuation(n,k)
+
+Aliases: I<remove>
+
+=cut
+
 =head1 NUMBER THEORY: DIVISORS & DIVISOR SUMS
 
 =head2 abundancy
@@ -9006,6 +9031,19 @@ Returns the sum of C<m^j * sigma_k(m)>, for C<m=1..n>, computed in C<O(sqrt(n))>
     say sigma_sum(100, 1)      #=> 8299
     say sigma_sum(100, 2)      #=> 407819
     say sigma_sum(100, 2, 3)   #=> 207528104123
+
+=cut
+
+=head2 sum_remainders
+
+    sum_remainders(n, v)
+
+Returns the following sum: C<Sum_{k=1..n} v % k>, computed in C<O(sqrt(v))> steps.
+
+    say 20.of {|n| sum_remainders(n, n) }        #=> OEIS: A004125
+    say 20.of {|n| sum_remainders(n, n.prime) }  #=> OEIS: A099726
+
+Negative values of C<v> are also supported.
 
 =cut
 

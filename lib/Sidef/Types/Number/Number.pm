@@ -8719,6 +8719,41 @@ sub prod {
 *Π       = \&prod;
 *vecprod = \&prod;
 
+sub arithmetic_mean {
+    my (@list) = @_;
+
+    @list || goto &nan;
+
+    my $sum = Sidef::Types::Number::Number::sum(@list);
+    my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
+
+    $sum->div($n);
+}
+
+*avg = \&arithmetic_mean;
+
+sub geometric_mean {
+    my (@list) = @_;
+
+    @list || return ONE;
+
+    my $prod = Sidef::Types::Number::Number::prod(@list);
+    my $n    = Sidef::Types::Number::Number::_set_int(scalar(@list));
+
+    $prod->root($n);
+}
+
+sub harmonic_mean {
+    my (@list) = @_;
+
+    @list || goto &nan;
+
+    my $sum = Sidef::Types::Number::Number::sum(map { $_->inv } @list);
+    my $n   = Sidef::Types::Number::Number::_set_int(scalar(@list));
+
+    $n->div($sum);
+}
+
 sub max {
     my (@vals) = @_;
     _valid(\(@vals));
