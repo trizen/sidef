@@ -18,8 +18,7 @@ C<LazyMethod> objects aren't normally created directly; they come from calling C
     var lazy = [1, 2, 3, 4, 5].method('map', {|x| x * 2 })
     lazy = lazy.method('grep', {|x| x > 5 })
     lazy = lazy.method('sum')
-
-    say(lazy.call)    #=> 30
+    say lazy.call    #=> 24
 
     # Or chain and execute in one expression
     say([1, 2, 3, 4, 5].method('map', {|x| x ** 2 }).method('sum').call)    #=> 55
@@ -53,8 +52,20 @@ Returns a I<new> C<LazyMethod> with one more step appended to the end of the cha
     var lazy = [1, 2, 3, 4, 5].method('map', {|x| x ** 2 })
     lazy = lazy.method('grep', {|x| x > 10 })
     lazy = lazy.method('sum')
+    say lazy.call    #=> 41  # 16 + 25
 
-    say(lazy.call)    #=> 41  # 16 + 25
+=cut
+
+=head1 INTROSPECTION
+
+=head2 steps
+
+    self.steps
+
+Returns an C<Array> of the method names queued in the chain, in order, without running any of them. Useful for inspecting/debugging a lazy chain before triggering it.
+
+    var lazy = [1,2,3].method('map', {|x| x*2}).method('sum')
+    say lazy.steps    #=> ["map", "sum"]
 
 =cut
 
@@ -135,7 +146,7 @@ Build up a multi-step pipeline one C<.method()> call at a time:
                          .method('grep', {|x| x > 50 }) \
                          .method('sum')
 
-    say(process.call)    # sum of even squares greater than 50
+    say process.call     # sum of even squares greater than 50
 
 =head1 IMPLEMENTATION NOTES
 

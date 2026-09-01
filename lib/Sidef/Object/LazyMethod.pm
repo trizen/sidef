@@ -25,6 +25,11 @@ sub method {
                     );
 }
 
+sub steps {
+    my ($self) = @_;
+    Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_->{method}) } @{$self->{calls}}]);
+}
+
 sub DESTROY { }
 
 sub AUTOLOAD {
