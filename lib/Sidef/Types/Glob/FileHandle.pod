@@ -167,6 +167,17 @@ Enables (C<true>) or disables (C<false>) autoflush on the filehandle, so that ou
 
 =cut
 
+=head2 flush
+
+    self.flush
+
+Forces any buffered output to be written out immediately, without permanently changing L</autoflush>. Returns C<self>.
+
+    fh.print("data")
+    fh.flush
+
+=cut
+
 =head2 binmode
 
     self.binmode(encoding)

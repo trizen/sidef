@@ -74,7 +74,20 @@ sub stdin {
 
 sub autoflush {
     my ($self, $bool) = @_;
-    select((select($self->{fh}), $| = $bool ? 1 : 0)[0]);
+    my $fh     = $self->{fh};
+    my $old_fh = CORE::select($fh);
+    local $| = ($bool ? 1 : 0);
+    CORE::select($old_fh);
+    $self;
+}
+
+sub flush {
+    my ($self) = @_;
+    my $fh     = $self->{fh};
+    my $old_fh = CORE::select($fh);
+    local $| = 1;
+    print $fh '';
+    CORE::select($old_fh);
     $self;
 }
 
