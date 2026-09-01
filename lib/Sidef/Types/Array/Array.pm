@@ -1100,8 +1100,10 @@ sub summod {
 
 sub avg_by {
     my ($self, $block) = @_;
-    $self->sum_by($block)->div($self->len);
+    $self->map($block)->avg;
 }
+
+*arithmetic_mean_by = \&avg_by;
 
 sub avg {
     my ($self, $arg) = @_;
@@ -1110,7 +1112,39 @@ sub avg {
         goto &avg_by;
     }
 
-    $self->sum->div($self->len);
+    Sidef::Types::Number::Number::arithmetic_mean(@$self);
+}
+
+*arithmetic_mean = \&avg;
+
+sub geometric_mean_by {
+    my ($self, $block) = @_;
+    $self->map($block)->geometric_mean;
+}
+
+sub geometric_mean {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &geometric_mean_by;
+    }
+
+    Sidef::Types::Number::Number::geometric_mean(@$self);
+}
+
+sub harmonic_mean_by {
+    my ($self, $block) = @_;
+    $self->map($block)->harmonic_mean;
+}
+
+sub harmonic_mean {
+    my ($self, $arg) = @_;
+
+    if (defined($arg)) {
+        goto &harmonic_mean_by;
+    }
+
+    Sidef::Types::Number::Number::harmonic_mean(@$self);
 }
 
 sub prod_by {

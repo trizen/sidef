@@ -1989,20 +1989,38 @@ Returns true if all elements in the array are prime numbers.
 =head2 avg
 
     arr.avg
+    arr.avg { ... }
 
 Returns the arithmetic mean (average) of a list of numbers.
 
-    say [1,2,3,4].avg   #=> 2.5
+    say [1,2,3,4].avg            #=> 2.5
+    say [1,2,3,4].avg { _**2 }   #=> 7.5
+
+Aliases: I<arithmetic_mean>
 
 =cut
 
-=head2 avg_by
+=head2 geometric_mean
 
-    arr.avg_by { ... }
+    arr.geometric_mean
+    arr.geometric_mean { ... }
 
-Returns the average of a list of numbers, by mapping each value to the given block first.
+Returns the geometric mean of a list of numbers. The geometric mean is the n-th root of the product of n numbers, useful for averaging ratios and growth rates.
 
-    say [1,2,3,4].avg_by { _**2 }   #=> 7.5
+    say [42, 50, 99, 147].geometric_mean             #=> 74.352051512093712...
+    say [42, 50, 99, 147].geometric_mean { _**2 }    #=> 5528.2275640570368...
+
+=cut
+
+=head2 harmonic_mean
+
+    arr.harmonic_mean
+    arr.harmonic_mean { ... }
+
+Returns the harmonic mean of a list of numbers. The harmonic mean is the reciprocal of the arithmetic mean of reciprocals, useful for averaging rates.
+
+    say [42, 50, 99, 147].harmonic_mean             #=> 65.883471411109602...
+    say [42, 50, 99, 147].harmonic_mean { _**2 }    #=> 3586.7978615843786...
 
 =cut
 
@@ -2100,16 +2118,6 @@ Returns the product of all elements.
 
 =cut
 
-=head2 prod_2d
-
-    arr.prod_2d { |a, b, c, ...| ... }
-
-Product over 2D array after mapping each row.
-
-    [[2,3], [4,2]].prod_2d { |a,b| a**b }    #=> 64
-
-=cut
-
 =head2 prod_by
 
     arr.prod_by { ... }
@@ -2117,6 +2125,16 @@ Product over 2D array after mapping each row.
 Product after mapping each element.
 
     [1, 2, 3, 4].prod_by { _**2 }    #=> 576
+
+=cut
+
+=head2 prod_2d
+
+    arr.prod_2d { |a, b, c, ...| ... }
+
+Product over 2D array after mapping each row.
+
+    [[2,3], [4,2]].prod_2d { |a,b| a**b }    #=> 64
 
 =cut
 
@@ -2149,17 +2167,7 @@ Returns the sum of all elements in the array. An optional initial value can be p
 
     say [1,2,3,4].sum           #=> 10
     say [1,2,3].sum(10)         #=> 16
-    say [].sum                   #=> 0
-
-=cut
-
-=head2 sum_2d
-
-    arr.sum_2d {|a,b,c,...| ... }
-
-Sum of a 2D array, by mapping each row to the given block.
-
-    say [[2,4],[3,2],[5,1],[7,1]].sum_2d {|p,k| p**k }     #=> 37
+    say [].sum                  #=> 0
 
 =cut
 
@@ -2170,6 +2178,16 @@ Sum of a 2D array, by mapping each row to the given block.
 Sum of an array, by mapping each element to the given block.
 
     say [1,2,3,4].sum_by {|n| n**2 }    # sum of each element squared
+
+=cut
+
+=head2 sum_2d
+
+    arr.sum_2d {|a,b,c,...| ... }
+
+Sum of a 2D array, by mapping each row to the given block.
+
+    say [[2,4],[3,2],[5,1],[7,1]].sum_2d {|p,k| p**k }     #=> 37
 
 =cut
 
