@@ -202,13 +202,32 @@ Aliases: operator C<< >= >>, operator C<≥>, operator C<⊇>
 
 =cut
 
-=head2 disjoint
+=head2 is_disjoint
 
-    self.disjoint(other)
+    self.is_disjoint(other)
 
 Returns C<true> if C<self> and C<other> share no elements, C<false> otherwise (C<other> is converted with C<.to_set> first if needed).
 
-    say(Set(1, 2, 3).disjoint(Set(4, 5, 6)))   #=> true
+    say(Set(1, 2, 3).is_disjoint(Set(4, 5, 6)))   #=> true
+
+=cut
+
+=head2 is_proper_subset
+
+    self.is_proper_subset(other)
+
+Like L</is_subset>, but also requires C<self> and C<other> to not be equal (a strict subset).
+
+    say(Set(1, 2).is_proper_subset(Set(1, 2, 3)))   #=> true
+    say(Set(1, 2).is_proper_subset(Set(1, 2)))      #=> false
+
+=cut
+
+=head2 is_proper_superset
+
+    self.is_proper_superset(other)
+
+Like L</is_superset>, but also requires C<self> and C<other> to not be equal (a strict superset).
 
 =cut
 

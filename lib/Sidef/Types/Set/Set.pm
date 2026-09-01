@@ -406,7 +406,7 @@ sub is_superset {
     return Sidef::Types::Bool::Bool::TRUE;
 }
 
-sub disjoint {
+sub is_disjoint {
     my ($A, $B) = @_;
 
     if (ref($B) ne __PACKAGE__) {
@@ -419,6 +419,30 @@ sub disjoint {
     }
 
     return Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub is_proper_subset {
+    my ($A, $B) = @_;
+
+    if (ref($B) ne __PACKAGE__) {
+        $B = $B->to_set;
+    }
+
+    ($A->is_subset($B) && !$A->eq($B))
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_proper_superset {
+    my ($A, $B) = @_;
+
+    if (ref($B) ne __PACKAGE__) {
+        $B = $B->to_set;
+    }
+
+    ($A->is_superset($B) && !$A->eq($B))
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
 }
 
 sub contains_all {
