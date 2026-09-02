@@ -124,6 +124,30 @@ sub once {
     );
 }
 
+sub constant {
+    my (undef, $value) = @_;
+    __PACKAGE__->new(code => sub { $value });
+}
+
+sub retry {
+    my ($self, $n) = @_;
+    $n = CORE::int($n // 1);
+    __PACKAGE__->new(
+        code => sub {
+            my @args     = @_;
+            my $attempts = 0;
+            my $result;
+            while (1) {
+                $result = eval { $self->call(@args) };
+                last unless $@;
+                ++$attempts;
+                $attempts >= $n and die $@;
+            }
+            $result;
+        }
+    );
+}
+
 # Recursively walks the ISA hierarchy to discover additional method candidates
 # from parent classes, appending them (with their kids/fallback) to @$methods.
 sub _collect_inherited_methods {

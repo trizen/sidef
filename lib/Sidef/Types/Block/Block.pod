@@ -97,6 +97,16 @@ Aliases: I<do>
 
 =cut
 
+=head2 retry
+
+    block.retry(n=1)
+
+Returns a new block that, if the original block raises an exception, calls it again (up to C<n> times total) before finally letting the exception propagate.
+
+    var fetch = unreliable_request.retry(3)
+
+=cut
+
 =head2 do
 
     block.do(*args)
@@ -295,6 +305,17 @@ Returns a new block that runs the original block only the I<first> time it's cal
     var init = { say("initializing"); 42 }.once
     init()   # prints "initializing", returns 42
     init()   # returns 42, nothing printed
+
+=cut
+
+=head2 constant
+
+    Block.constant(value)
+
+Returns a block that ignores whatever arguments it's given and always returns C<value>.
+
+    var always_zero = Block.constant(0)
+    say(always_zero(1, 2, 3))   #=> 0
 
 =cut
 
