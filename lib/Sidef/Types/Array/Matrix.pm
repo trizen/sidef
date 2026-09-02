@@ -252,6 +252,22 @@ sub vector_columns {
 *vec_cols    = \&vector_columns;
 *vec_columns = \&vector_columns;
 
+sub each_row {
+    my ($self, $block) = @_;
+    foreach my $row (@$self) {
+        $block->run(Sidef::Types::Array::Vector->new(@$row));
+    }
+    $self;
+}
+
+sub each_column {
+    my ($self, $block) = @_;
+    foreach my $col (@{$self->vector_columns}) {
+        $block->run($col);
+    }
+    $self;
+}
+
 sub neg {
     my ($m1) = @_;
     bless($m1->scalar_operator('neg'));

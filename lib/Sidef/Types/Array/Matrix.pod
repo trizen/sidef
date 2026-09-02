@@ -565,6 +565,24 @@ Aliases: I<vec_cols>, I<vec_columns>
 
 =cut
 
+=head2 each_row
+
+    self.each_row(block)
+
+Calls C<block> once per row, as a C<Vector>, and returns C<self>.
+
+    m.each_row {|row| say(row.sum) }
+
+=cut
+
+=head2 each_column
+
+    self.each_column(block)
+
+Calls C<block> once per column, as a C<Vector>, and returns C<self>.
+
+=cut
+
 =head2 row_count
 
     self.row_count
