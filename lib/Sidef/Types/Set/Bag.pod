@@ -117,6 +117,16 @@ Aliases: I<xor>, I<symdiff>, operator C<^>
 
 =cut
 
+=head2 scale
+
+    self.scale(factor)
+
+Returns a new bag with every element's count multiplied by C<factor> (rounded down to an integer).
+
+    say(Bag(1, 2, 2).scale(3))   #=> Bag(1, 1, 1, 2, 2, 2, 2, 2, 2)
+
+=cut
+
 =head1 MEMBERSHIP AND COMPARISON
 
 =head2 has

@@ -605,6 +605,17 @@ sub delete_first_if {
     $self;
 }
 
+sub scale {
+    my ($self, $factor) = @_;
+    $factor = CORE::int($factor // 1);
+    my %new;
+    foreach my $key (CORE::keys(%$self)) {
+        my $elem = $self->{$key};
+        $new{$key} = {value => $elem->{value}, count => CORE::int($elem->{count} * $factor)};
+    }
+    bless \%new, ref($self);
+}
+
 sub freq {
     my ($self) = @_;
     Sidef::Types::Array::Array->new(map { Sidef::Types::Array::Array->new([$_->{value}, Sidef::Types::Number::Number::_set_int($_->{count})]) }
