@@ -416,6 +416,14 @@ Returns C<true> if the date/time falls within C<[start, end]> (inclusive), other
 
 =cut
 
+=head2 is_same_day
+
+    self.is_same_day(other)
+
+Returns C<true> if C<self> and C<other> fall on the same calendar day, ignoring time-of-day.
+
+=cut
+
 =head2 age
 
     self.age
@@ -618,13 +626,13 @@ Aliases: I<sub>, operator C<->
 
 =cut
 
-=head2 sub
+=head2 days_until
 
-    self.sub(that)
+    self.days_until(other)
 
-If C<that> is another C<Date> object, returns the difference between the two dates in seconds. Otherwise, returns a new C<Date> object with C<that> seconds subtracted.
+Returns the number of whole days from C<self> to C<other> (negative if C<other> is earlier).
 
-Aliases: I<subtract>, operator C<->
+    say(Date.parse("2024-01-01", "%Y-%m-%d").days_until(Date.parse("2024-01-10", "%Y-%m-%d")))   #=> 9
 
 =cut
 
@@ -683,6 +691,14 @@ Returns a new C<Date> object with the seconds set to zero, preserving the date, 
     self.truncate_to_second
 
 Returns a new C<Date> object truncated to whole-second precision (a no-op for this class, since C<Date> objects already have second precision).
+
+=cut
+
+=head2 end_of_month
+
+    self.end_of_month
+
+Returns a new C<Date> set to the last day of the current month, at midnight. The counterpart to L</truncate_to_month>, which gives the first day.
 
 =cut
 

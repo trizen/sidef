@@ -232,6 +232,25 @@ sub is_between {
       : Sidef::Types::Bool::Bool::FALSE;
 }
 
+sub days_until {
+    my ($self, $other) = @_;
+    state $day_sec = Sidef::Types::Number::Number::_set_int(86400);
+    Sidef::Types::Number::Number->new($self->{time}->subtract($other->{time}))->div($day_sec)->int->neg;
+}
+
+sub is_same_day {
+    my ($self, $other) = @_;
+    ($self->{time}->ymd eq $other->{time}->ymd)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub end_of_month {
+    my ($self) = @_;
+    my $last_day = $self->{time}->month_last_day;
+    bless {time => scalar $self->{time}->truncate(to => 'day')->add(($last_day - $self->{time}->mday) * 86400)};
+}
+
 sub age {
     my ($self) = @_;
     my $now    = Time::Piece->new(CORE::time);
