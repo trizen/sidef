@@ -578,6 +578,12 @@ Returns true if C<x> equals the constant polynomial -1. Uses L</eq> against -1.
 
 =cut
 
+=head2 is_unit
+
+    self.is_unit
+
+Returns true if this element is invertible in the quotient ring (its L</inv> succeeds rather than producing C<NaN>).
+
 =head1 COMPARISON
 
 =head2 eq

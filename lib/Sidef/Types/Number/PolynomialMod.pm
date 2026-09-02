@@ -588,6 +588,11 @@ sub is_mone {
     $x->eq(Sidef::Types::Number::Number::MONE);
 }
 
+sub is_unit {
+    my ($x) = @_;
+    $x->inv->is_nan->not;
+}
+
 sub inc {
     my ($x) = @_;
     __PACKAGE__->new(%{$x->[0]}, 0 => ($x->[0]{0} // Sidef::Types::Number::Number::ZERO)->inc, $x->[1]);
