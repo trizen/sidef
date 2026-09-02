@@ -349,6 +349,15 @@ sub discriminant {
     $self->{q}->sqr->add($self->{p}->mul($four));
 }
 
+sub roots {
+    my ($self) = @_;
+    state $two = Sidef::Types::Number::Number::TWO;
+    my $sqrt_D = $self->discriminant->sqrt;
+    my $t1     = $self->{q}->add($sqrt_D)->div($two);
+    my $t2     = $self->{q}->sub($sqrt_D)->div($two);
+    Sidef::Types::Array::Array->new([$t1, $t2]);
+}
+
 sub is_real_embedding {
     my ($self) = @_;
     $self->discriminant->ge(Sidef::Types::Number::Number::ZERO);

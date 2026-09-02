@@ -724,6 +724,16 @@ Returns the discriminant of the ring's minimal polynomial, C<q^2 + 4p>.
 
 =cut
 
+=head2 roots
+
+    self.roots
+
+Returns both roots C<[t, t']> of the ring's minimal polynomial C<t^2 - q*t - p = 0>, as a two-element array. L</to_n> only exposes the principal root C<t>; this gives you both, complementing L</discriminant>.
+
+    say Quadratic(0, 1, 1, 1).roots     # [1.618033988..., -0.618033988...]
+
+=cut
+
 =head2 is_real_embedding
 
     x.is_real_embedding
