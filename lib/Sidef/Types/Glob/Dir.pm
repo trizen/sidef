@@ -220,6 +220,24 @@ sub entries {
     $result;
 }
 
+sub files {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $dh     = $self->open() // return undef;
+    my $result = $dh->files;
+    $dh->close;
+    $result;
+}
+
+sub subdirs {
+    ref($_[0]) || shift(@_);
+    my ($self) = @_;
+    my $dh     = $self->open() // return undef;
+    my $result = $dh->dirs;
+    $dh->close;
+    $result;
+}
+
 sub chdir {
     ref($_[0]) || shift(@_);
     my ($self) = @_;

@@ -302,6 +302,22 @@ Opens the directory, collects every entry (via C<DirHandle>'s C<entries>) into a
 
 =cut
 
+=head2 files
+
+    self.files
+
+Opens the directory, collects only its immediate regular-file entries (via C<DirHandle>'s C<files>), and closes it. Unlike L</find>, this does not recurse into subdirectories.
+
+=cut
+
+=head2 subdirs
+
+    self.subdirs
+
+Like L</files>, but collects only immediate subdirectory entries.
+
+=cut
+
 =head2 is_empty
 
     self.is_empty
