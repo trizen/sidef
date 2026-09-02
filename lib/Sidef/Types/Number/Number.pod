@@ -9657,6 +9657,23 @@ Returns true if C<n> is a perfect number (i.e.: sigma(n) == 2*n).
 
 =cut
 
+=head2 is_hyperperfect
+
+    n.is_hyperperfect(k=1)
+
+Returns true if C<n> is C<k>-hyperperfect, i.e. if:
+
+    n = 1 + k * (sigma(n) - n - 1)
+
+where C<sigma(n)> is the sum-of-divisors function. The default value of C<k> is C<1>, so C<is_hyperperfect> without an argument tests whether C<n> is a perfect number.
+
+    say 6.is_hyperperfect            #=> true
+    say 28.is_hyperperfect           #=> true
+    say 21.is_hyperperfect(1)        #=> false
+    say 21.is_hyperperfect(2)        #=> true
+
+=cut
+
 =head2 is_pseudoperfect
 
     var bool = n.is_pseudoperfect

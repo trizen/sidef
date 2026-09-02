@@ -41697,6 +41697,23 @@ sub is_weird {
     return $TRUE;
 }
 
+sub is_hyperperfect {
+    my ($n, $k_in) = @_;
+
+    my $k    = defined($k_in) ? (_any2mpz($$k_in) // return $FALSE) : $ONE;
+    my $temp = Math::GMPz::Rmpz_init_set_str("${$n->sigma}", 10);
+
+    $n = _any2mpz($$n) // return $FALSE;
+    Math::GMPz::Rmpz_sgn($n) > 0 or return $FALSE;
+
+    Math::GMPz::Rmpz_sub($temp, $temp, $n);
+    Math::GMPz::Rmpz_sub_ui($temp, $temp, 1);
+    Math::GMPz::Rmpz_mul($temp, $temp, $k);
+    Math::GMPz::Rmpz_add_ui($temp, $temp, 1);
+
+    Math::GMPz::Rmpz_cmp($n, $temp) == 0 ? $TRUE : $FALSE;
+}
+
 sub _power_factor {
     my ($n) = @_;
 
