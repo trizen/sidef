@@ -451,6 +451,16 @@ Aliases: I<select>
 
 =cut
 
+=head2 take_while
+
+    self.take_while(block)
+
+Collects elements into an C<Array> for as long as C<block> is truthy, stopping (without including the failing element) as soon as it's falsy.
+
+    say((1..100).take_while {|n| n < 5 })   #=> [1, 2, 3, 4]
+
+=cut
+
 =head2 zip
 
     self.zip(other)

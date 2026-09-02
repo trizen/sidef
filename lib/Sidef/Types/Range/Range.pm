@@ -442,6 +442,18 @@ sub grep {
 
 *select = \&grep;
 
+sub take_while {
+    my ($self, $block) = @_;
+    my @values;
+    my $iter = $self->iter;
+    for (; ;) {
+        my $obj = $iter->run() // last;
+        $block->run($obj) or last;
+        push @values, $obj;
+    }
+    Sidef::Types::Array::Array->new(\@values);
+}
+
 sub any {
     my ($self, $block) = @_;
 
