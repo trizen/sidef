@@ -837,6 +837,11 @@ sub normalize_to_monic {
     return $x;
 }
 
+sub is_monic {
+    my ($x) = @_;
+    $x->leading_coefficient->is_one;
+}
+
 sub gcd {
     my ($x, $y) = @_;
 

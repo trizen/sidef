@@ -387,6 +387,14 @@ Returns a monic version of C<x> by dividing all coefficients by the leading coef
 
 =cut
 
+=head2 is_monic
+
+    x.is_monic
+
+Returns true if the leading coefficient of C<x> is 1. Complements L</normalize_to_monic>.
+
+=cut
+
 =head2 content
 
     x.content
