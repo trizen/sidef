@@ -343,6 +343,14 @@ Returns the fraction reduced to lowest terms, by dividing both the numerator and
 
 Aliases: I<simplify>
 
+=head2 mediant
+
+    self.mediant(other)
+
+Returns the mediant of two fractions: C<(a+c)/(b+d)> for C<a/b> and C<c/d>. The mediant always lies strictly between the two fractions — the basis of the Stern-Brocot tree and Farey sequences.
+
+    say Fraction(1, 3).mediant(Fraction(1, 2))    # Fraction(2, 5)
+
 =cut
 
 =head1 BIT SHIFTING

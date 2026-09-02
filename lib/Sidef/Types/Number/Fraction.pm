@@ -66,6 +66,14 @@ sub is_real {
     $x->{a}->is_real and $x->{b}->is_real;
 }
 
+sub mediant {
+    my ($x, $y) = @_;
+    if (ref($y) ne __PACKAGE__) {
+        $y = __PACKAGE__->new($y);
+    }
+    __PACKAGE__->new($x->{a}->add($y->{a}), $x->{b}->add($y->{b}));
+}
+
 sub eval {
     my ($x, $v) = @_;
     $x->{a}->eval($v)->div($x->{b}->eval($v));
