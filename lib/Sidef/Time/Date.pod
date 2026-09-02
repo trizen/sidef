@@ -314,23 +314,13 @@ Aliases: I<yday>
 
 =cut
 
-=head2 isdst
+=head2 is_dst
 
-    self.isdst
+    self.is_dst
 
 Returns C<true> if daylight saving time is in effect for this date, otherwise C<false>.
 
 Aliases: I<daylight_savings>
-
-=cut
-
-=head2 daylight_savings
-
-    self.daylight_savings
-
-Returns C<true> if daylight saving time is in effect for this date, otherwise C<false>.
-
-Aliases: I<isdst>
 
 =cut
 
@@ -413,6 +403,16 @@ Returns C<true> if the date/time is later than the current moment, otherwise C<f
     self.is_past
 
 Returns C<true> if the date/time is earlier than the current moment, otherwise C<false>.
+
+=cut
+
+=head2 is_between
+
+    self.is_between(start, end)
+
+Returns C<true> if the date/time falls within C<[start, end]> (inclusive), otherwise C<false>.
+
+    say(Date.today.is_between(start_date, end_date))
 
 =cut
 

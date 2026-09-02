@@ -52,6 +52,7 @@ sub get_value {
     *month_day        = \&mday;
     *week_day         = \&wday;
     *year_day         = \&yday;
+    *is_dst           = \&isdst;
     *daylight_savings = \&isdst;
 
     foreach my $name (qw(monname fullmonth wdayname date)) {
@@ -220,6 +221,13 @@ sub is_future {
 sub is_past {
     my ($self) = @_;
     ($self->{time}->epoch < CORE::time)
+      ? Sidef::Types::Bool::Bool::TRUE
+      : Sidef::Types::Bool::Bool::FALSE;
+}
+
+sub is_between {
+    my ($self, $start, $end) = @_;
+    ($self->{time}->epoch >= $start->{time}->epoch and $self->{time}->epoch <= $end->{time}->epoch)
       ? Sidef::Types::Bool::Bool::TRUE
       : Sidef::Types::Bool::Bool::FALSE;
 }
