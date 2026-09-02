@@ -117,6 +117,16 @@ Aliases: I<collect>
 
 =cut
 
+=head2 zip
+
+    self.zip(other)
+
+Drives the pipeline (and C<other>'s own iterator) to completion, pairing up corresponding elements into an C<Array> of 2-element arrays, stopping as soon as either side runs out.
+
+    say((1..3).lazy.zip([10, 20, 30]))   #=> [[1,10],[2,20],[3,30]]
+
+=cut
+
 =head2 uniq
 
     self.uniq

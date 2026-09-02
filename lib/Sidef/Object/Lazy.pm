@@ -293,6 +293,19 @@ sub uniq {
     );
 }
 
+sub zip {
+    my ($self, $other) = @_;
+    my $iter1 = $self->iter;
+    my $iter2 = $other->iter;
+    my @pairs;
+    for (; ;) {
+        my $A = $iter1->run() // last;
+        my $B = $iter2->run() // last;
+        push @pairs, Sidef::Types::Array::Array->new([$A, $B]);
+    }
+    Sidef::Types::Array::Array->new(\@pairs);
+}
+
 sub take {
     my ($self, $n) = @_;
     $n = CORE::int($n);
