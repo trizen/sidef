@@ -229,6 +229,15 @@ sub read_char {
 *char = \&read_char;
 *getc = \&read_char;
 
+sub peek_char {
+    my ($self) = @_;
+    my $pos    = CORE::tell($self->{fh});
+    my $char   = CORE::getc($self->{fh});
+    defined($char) or return undef;
+    CORE::seek($self->{fh}, $pos, 0);
+    Sidef::Types::String::String->new($char);
+}
+
 sub read_byte {
     my ($self, $var_ref) = @_;
 

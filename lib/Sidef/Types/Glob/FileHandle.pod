@@ -270,6 +270,14 @@ Aliases: I<getc>, I<char>
 
 =cut
 
+=head2 peek_char
+
+    self.peek_char
+
+Returns the next character without consuming it (the filehandle's position is unchanged), or C<nil> at end-of-file.
+
+=cut
+
 =head2 read_byte
 
     var byte = fh.read_byte
