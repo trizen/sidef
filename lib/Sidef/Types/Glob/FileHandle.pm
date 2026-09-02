@@ -446,14 +446,19 @@ sub write_from {
 }
 
 sub copy {
-    my ($self, $fh) = @_;
-
-    if (ref($fh) ne __PACKAGE__) {
-        return;
-    }
+    my ($self, $other) = @_;
 
     state $x = require File::Copy;
-    File::Copy::copy($self->{fh}, $fh->{fh})
+
+    if (ref($other) eq __PACKAGE__) {
+        return (
+                File::Copy::copy($self->{fh}, $other->{fh})
+                ? (Sidef::Types::Bool::Bool::TRUE)
+                : (Sidef::Types::Bool::Bool::FALSE)
+               );
+    }
+
+    File::Copy::copy($self->{fh}, "$other")
       ? (Sidef::Types::Bool::Bool::TRUE)
       : (Sidef::Types::Bool::Bool::FALSE);
 }

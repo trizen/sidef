@@ -535,8 +535,16 @@ Closes the filehandle. Returns C<true> on success, C<false> otherwise.
 =head2 copy
 
     self.copy(other)
+    self.copy(path)
 
-Copies the remaining content of C<self> into C<other>, which must be another C<FileHandle> object (checked with an exact type match, so not even a subclass would be accepted) -- returns C<nil> immediately without copying anything if it isn't. Returns C<true> on success, C<false> on failure.
+Copies the remaining content of C<self> into C<other>, which must be another C<FileHandle> object or a filesystem path (a filename or C<File> object). Returns C<true> on success, C<false> on failure.
+
+    fh.copy(fh2)
+    fh.copy("backup.txt")
+
+B<LIMITATION>: The input and output filehandles much have C<":raw"> encoding:
+
+    fh.binmode(:raw)
 
 Aliases: I<cp>
 
