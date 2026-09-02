@@ -429,6 +429,22 @@ Returns a C<Set> of every subset of C<self> (each itself a C<Set>, including the
 
 =cut
 
+=head2 sample
+
+    self.sample(n=1)
+
+Returns an C<Array> of C<n> distinct random elements from the set (without replacement). If the set has fewer than C<n> elements, returns all of them.
+
+=cut
+
+=head2 pick
+
+    self.pick
+
+Returns a single random element from the set, or C<nil> if it's empty.
+
+=cut
+
 =head1 AGGREGATION AND PREDICATES
 
 =head2 count

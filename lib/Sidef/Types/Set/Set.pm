@@ -13,6 +13,7 @@ use overload
   q{@{}}  => sub { [CORE::values(%{$_[0]})] },
   q{""}   => \&_dump;
 
+use List::Util qw();
 use Sidef::Types::Block::Block;
 use Sidef::Types::Bool::Bool;
 use Sidef::Types::Number::Number;
@@ -312,6 +313,21 @@ sub sort_by {
 sub sort {
     my ($self, $block) = @_;
     $self->values->sort(defined($block) ? $block : ());
+}
+
+sub sample {
+    my ($self, $n) = @_;
+    my @values = CORE::values(%$self);
+    $n = defined($n) ? CORE::int($n) : 1;
+    my @shuffled = List::Util::shuffle(@values);
+    Sidef::Types::Array::Array->new([@shuffled[0 .. List::Util::min($n, scalar(@shuffled)) - 1]]);
+}
+
+sub pick {
+    my ($self) = @_;
+    my @values = CORE::values(%$self);
+    @values or return undef;
+    $values[CORE::int(CORE::rand(scalar(@values)))];
 }
 
 sub min {
