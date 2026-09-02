@@ -395,6 +395,14 @@ sub copy {
 
 *cp = \&copy;
 
+sub backup {
+    ref($_[0]) || shift(@_);
+    my ($self, $suffix) = @_;
+    $suffix //= '.bak';
+    my $dest = "$self" . "$suffix";
+    $self->copy($dest);
+}
+
 sub edit {
     ref($_[0]) || shift(@_);
     my ($self, $code) = @_;

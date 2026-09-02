@@ -792,6 +792,14 @@ Aliases: I<cp>
 
 =cut
 
+=head2 backup
+
+    file.backup(suffix=".bak")
+
+Copies the file to a new file with C<suffix> appended to its name (e.g. C<"data.txt.bak">). Returns C<true> on success, C<false> otherwise.
+
+=cut
+
 =head2 link
 
     file.link(new_name)
