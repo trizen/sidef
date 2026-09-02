@@ -667,6 +667,31 @@ sub is_diagonal {
     Sidef::Types::Bool::Bool::TRUE;
 }
 
+sub is_upper_triangular {
+    my ($self) = @_;
+    my $n = CORE::int($self->row_count);
+    foreach my $i (0 .. $n - 1) {
+        foreach my $j (0 .. $i - 1) {
+            $self->[$i][$j]->is_zero
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
+sub is_lower_triangular {
+    my ($self) = @_;
+    my $n      = CORE::int($self->row_count);
+    my $m      = CORE::int($self->column_count);
+    foreach my $i (0 .. $n - 1) {
+        foreach my $j ($i + 1 .. $m - 1) {
+            $self->[$i][$j]->is_zero
+              or return Sidef::Types::Bool::Bool::FALSE;
+        }
+    }
+    Sidef::Types::Bool::Bool::TRUE;
+}
+
 sub rank {
     my ($self) = @_;
     my $r      = $self->rref;
