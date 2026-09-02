@@ -278,10 +278,14 @@ sub dclone {
 *deep_clone = \&dclone;
 
 sub respond_to {
-    my ($self, $method) = @_;
-    UNIVERSAL::can($self, "$method")
-      ? (Sidef::Types::Bool::Bool::TRUE)
-      : (Sidef::Types::Bool::Bool::FALSE);
+    my ($self, @methods) = @_;
+
+    foreach my $method (@methods) {
+        UNIVERSAL::can($self, "$method")
+          || return (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    (Sidef::Types::Bool::Bool::TRUE);
 }
 
 sub is_a {

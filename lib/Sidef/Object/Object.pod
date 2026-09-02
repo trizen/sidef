@@ -266,9 +266,10 @@ Returns C<true> if the value is a bare typename string (not an instantiated obje
 
 =head2 respond_to
 
-    self.respond_to(method)
+    self.respond_to(name)
+    self.respond_to(*names)
 
-Returns C<true> if the object's class has a method with the given name (inherited methods count too), otherwise C<false>.
+Returns C<true> if the object's class responds to I<every> one of C<names> (inherited methods count too), otherwise C<false>.
 
 =cut
 
