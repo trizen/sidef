@@ -241,8 +241,9 @@ Returns the full class (package) name of the object as a C<String> -- for exampl
 =head2 is_a
 
     self.is_a(class)
+    self.is_a(class1, class2, ...)
 
-Returns C<true> if the object is an instance of C<class>, or of a subclass of C<class>, otherwise C<false>.
+Returns C<true> if the object is an instance of any of the given classes, otherwise C<false>.
 
 Aliases: I<is_an>, I<kind_of>
 

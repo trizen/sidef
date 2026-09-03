@@ -208,19 +208,22 @@ sub has_sticky_bit {
 sub modification_time_days_diff {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
-    Sidef::Types::Number::Number->new(-M "$self");
+    my $days = -M "$self";
+    defined($days) ? Sidef::Types::Number::Number->new($days) : undef;
 }
 
 sub access_time_days_diff {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
-    Sidef::Types::Number::Number->new(-A "$self");
+    my $days = -A "$self";
+    defined($days) ? Sidef::Types::Number::Number->new($days) : undef;
 }
 
 sub change_time_days_diff {
     ref($_[0]) || shift(@_);
     my ($self) = @_;
-    Sidef::Types::Number::Number->new(-C "$self");
+    my $days = -C "$self";
+    defined($days) ? Sidef::Types::Number::Number->new($days) : undef;
 }
 
 sub is_executable {
