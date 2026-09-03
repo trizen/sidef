@@ -16,20 +16,72 @@ use overload
 use Sidef::Types::String::String;
 use Sidef::Types::Number::Number;
 
+my @_DATE_AUTO_FORMATS = ('%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%Y/%m/%d', '%d-%m-%Y', '%m/%d/%Y',);
+
+sub _parse_auto {
+    my ($str) = @_;
+    foreach my $format (@_DATE_AUTO_FORMATS) {
+        my $t = eval { Time::Piece->strptime($str, $format) };
+        defined($t) and return $t;
+    }
+
+    my $tried = join(', ', @_DATE_AUTO_FORMATS);
+    die "[ERROR] Date: unable to parse date string '$str' (tried: $tried)\n";
+}
+
 sub new {
-    my (undef, $sec) = @_;
+    my (undef, @args) = @_;
 
-    if (defined $sec) {
-        $sec = CORE::int($sec) if ref($sec);
-    }
-    else {
-        $sec = CORE::time;
+    # No arguments: current moment
+    if (!@args) {
+        return bless {time => Time::Piece->new(CORE::time)};
     }
 
-    bless {time => Time::Piece->new($sec),};
+    # Single argument: epoch seconds, a Date to copy, or a date string to auto-parse
+    if (@args == 1) {
+        my ($arg) = @args;
+
+        if (ref($arg) eq __PACKAGE__) {
+            return bless {time => Time::Piece->new($arg->{time}->epoch)};
+        }
+
+        if (ref($arg) eq 'Sidef::Types::Number::Number' or (ref($arg) eq '' and $arg =~ /^[0-9]+\z/)) {
+            return bless {time => Time::Piece->new(CORE::int($arg))};
+        }
+
+        return bless {time => _parse_auto("$arg")};
+    }
+
+    # Two or more arguments: calendar components
+    __PACKAGE__->from_ymd(@args);
 }
 
 *call = \&new;
+
+sub from_ymd {
+    my (undef, $year, $month, $day, $hour, $min, $sec) = @_;
+
+    # Safely pad missing components to their POD-specified defaults
+    my $str = CORE::sprintf(
+                            '%04d-%02d-%02d %02d:%02d:%02d',
+                            CORE::int($year  // 0),
+                            CORE::int($month // 1),
+                            CORE::int($day   // 1),
+                            CORE::int($hour  // 0),
+                            CORE::int($min   // 0),
+                            CORE::int($sec   // 0)
+                           );
+
+    bless {time => Time::Piece->strptime($str, '%Y-%m-%d %H:%M:%S')};
+}
+
+sub from_string {
+    my (undef, $str, $format) = @_;
+
+    defined($format)
+      ? (bless {time => Time::Piece->strptime("$str", "$format")})
+      : (bless {time => _parse_auto("$str")});
+}
 
 sub get_value {
     $_[0]->{time} // Time::Piece->new(CORE::time);

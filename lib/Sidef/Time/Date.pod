@@ -29,20 +29,45 @@ Inherits methods from L<Sidef::Object::Object>.
 
 =head2 new
 
-    Date(sec)
-    Date.new(sec)
+    Date()
+    Date(epoch_seconds)
+    Date(other_date)
+    Date(date_string)
+    Date(year, month=1, day=1, hour=0, min=0, sec=0)
 
-Creates a new C<Date> object. If C<sec> is given, it is used as the number of seconds since the Unix epoch (a plain number, or anything that stringifies/numifies to one); otherwise, the current time is used.
+Creates a new C<Date> object. With no arguments, uses the current moment. With a single numeric argument, treats it as Unix epoch seconds. With a single C<Date> argument, copy-constructs from it. With a single non-numeric string, attempts to parse it against a short list of common formats, in order: C<"%Y-%m-%d %H:%M:%S">, C<"%Y-%m-%dT%H:%M:%S">, C<"%Y-%m-%d">, C<"%Y/%m/%d">, C<"%d-%m-%Y">, C<"%m/%d/%Y"> -- the first one that matches wins; if none do, this dies with an error naming the formats tried. For anything needing a specific, unambiguous format, use L</from_string> with an explicit format instead. With two or more arguments, builds a date from calendar components -- only C<year> is required; C<month> and C<day> default to C<1>, and C<hour>/C<min>/C<sec> default to C<0>.
+
+    var d1 = Date()
+    var d2 = Date(1735084800)
+    var d3 = Date("2024-01-15")
+    var d4 = Date("2024-01-15T10:30:00")
+    var d5 = Date(2024, 1, 15)
+    var d6 = Date(2024, 1, 15, 10, 30, 0)
+    var d7 = Date(d5)              # copy
 
 Aliases: I<call>
 
 =cut
 
-=head2 call
+=head2 from_ymd
 
-    Date(sec)
+    Date.from_ymd(year, month=1, day=1, hour=0, min=0, sec=0)
 
-Allows a C<Date> class to be invoked directly as a function/callable, equivalent to L</new>.
+Alias for the calendar-component form of L</new>, for readability at call sites.
+
+    var d = Date.from_ymd(2024, 12, 25)
+
+=cut
+
+=head2 from_string
+
+    Date.from_string(str)
+    Date.from_string(str, format)
+
+With C<format>, behaves exactly like L</parse>/L</strptime>: parses C<str> against that exact format. Without it, tries the same short list of common formats that L</new> does. Prefer this over relying on L</new>'s implicit string-parsing when you want the auto-detection behavior to be visible at the call site.
+
+    var d1 = Date.from_string("2024-01-15")
+    var d2 = Date.from_string("15.01.2024", "%d.%m.%Y")
 
 =cut
 

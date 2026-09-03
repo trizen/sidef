@@ -2,6 +2,8 @@ package Sidef::Object::Enumerator;
 
 use utf8;
 use 5.016;
+use Sidef::Types::Block::Block;
+
 ##use overload q{""} => \&to_a;
 
 sub new {
