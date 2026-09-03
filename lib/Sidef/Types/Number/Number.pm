@@ -30482,6 +30482,86 @@ sub strict_partitions {
     return _array(\@results);
 }
 
+sub prime_partitions {
+    my ($n, $max_value) = @_;
+
+    $n = _any2ui($$n) // return _array();
+
+    if (defined($max_value)) {
+        ref($max_value) eq __PACKAGE__ or _valid(\$max_value);
+        $max_value = _any2ui($$max_value) // return _array();
+    }
+    else {
+        $max_value = $n;
+    }
+
+    my @results;
+    my @path;
+
+    my @primes = @{_primes(2, $max_value)};
+
+    sub {
+        my ($n, $max_part) = @_;
+
+        if ($n == 0) {
+            unshift @results, _array([map { bless \$_ } @path]);
+            return;
+        }
+
+        my $upper = ($n < $max_part ? $n : $max_part);
+
+        foreach my $part (@primes) {
+            $part > $upper and last;
+            push @path, $part;
+            __SUB__->($n - $part, $part);
+            pop @path;    # backtrack
+        }
+      }
+      ->($n, $max_value);
+
+    return _array(\@results);
+}
+
+sub strict_prime_partitions {
+    my ($n, $max_value) = @_;
+
+    $n = _any2ui($$n) // return _array();
+
+    if (defined($max_value)) {
+        ref($max_value) eq __PACKAGE__ or _valid(\$max_value);
+        $max_value = _any2ui($$max_value) // return _array();
+    }
+    else {
+        $max_value = $n;
+    }
+
+    my @results;
+    my @path;
+
+    my @primes = @{_primes(2, $max_value)};
+
+    sub {
+        my ($n, $max_part) = @_;
+
+        if ($n == 0) {
+            unshift @results, _array([map { bless \$_ } @path]);
+            return;
+        }
+
+        my $upper = ($n < $max_part ? $n : $max_part);
+
+        foreach my $part (@primes) {
+            $part > $upper and last;
+            push @path, $part;
+            __SUB__->($n - $part, $part - 1);
+            pop @path;    # backtrack
+        }
+      }
+      ->($n, $max_value);
+
+    return _array(\@results);
+}
+
 sub multisets {
     my ($n, $k, $max_sum) = @_;
 
