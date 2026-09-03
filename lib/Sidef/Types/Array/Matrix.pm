@@ -281,35 +281,72 @@ sub abs {
 sub add {
     my ($m1, $m2) = @_;
 
+    if (ref($m2) eq 'Sidef::Types::Array::Vector') {
+        my @result;
+        foreach my $row (@$m1) {
+            my @new_row;
+            $new_row[$_] = $row->[$_]->add($m2->[$_]) for 0 .. $#$row;
+            push @result, bless(\@new_row, 'Sidef::Types::Array::Array');
+        }
+        return bless \@result;
+    }
+
     if (_is_matrix($m2)) {
         return bless($m1->wise_operator('+', $m2));
     }
-
     bless($m1->scalar_operator('+', $m2));
 }
 
 sub sub {
     my ($m1, $m2) = @_;
 
+    if (ref($m2) eq 'Sidef::Types::Array::Vector') {
+        my @result;
+        foreach my $row (@$m1) {
+            my @new_row;
+            $new_row[$_] = $row->[$_]->sub($m2->[$_]) for 0 .. $#$row;
+            push @result, bless(\@new_row, 'Sidef::Types::Array::Array');
+        }
+        return bless \@result;
+    }
+
     if (_is_matrix($m2)) {
         return bless($m1->wise_operator('-', $m2));
     }
-
     bless($m1->scalar_operator('-', $m2));
 }
 
 sub div {
     my ($m1, $m2) = @_;
 
+    if (ref($m2) eq 'Sidef::Types::Array::Vector') {
+        my @result;
+        foreach my $row (@$m1) {
+            my @new_row;
+            $new_row[$_] = $row->[$_]->div($m2->[$_]) for 0 .. $#$row;
+            push @result, bless(\@new_row, 'Sidef::Types::Array::Array');
+        }
+        return bless \@result;
+    }
+
     if (_is_matrix($m2)) {
         return $m1->mul($m2->inv);
     }
-
     bless($m1->scalar_operator('/', $m2));
 }
 
 sub mul {
     my ($m1, $m2) = @_;
+
+    if (ref($m2) eq 'Sidef::Types::Array::Vector') {
+        my @result;
+        foreach my $row (@$m1) {
+            my $sum = Sidef::Types::Number::Number::ZERO;
+            $sum = $sum->add($row->[$_]->mul($m2->[$_])) for 0 .. $#$row;
+            push @result, $sum;
+        }
+        return bless(\@result, 'Sidef::Types::Array::Vector');
+    }
 
     if (!_is_matrix($m2)) {
         return bless($m1->scalar_operator('*', $m2));

@@ -155,34 +155,6 @@ Returns an C<n>x<m> matrix where the element at row C<i>, column C<j> is C<block
 
 These operators are always genuinely per-element, whether the other operand is a plain scalar (applied to every element) or another matrix (combined element-by-element with the corresponding entry).
 
-=head2 add
-
-    self.add(other)
-    self + other
-
-Adds C<other> to every element (scalar), or adds corresponding elements together (matrix).
-
-    say(Matrix([1, 2], [3, 4]) + Matrix([5, 6], [7, 8]))   #=> Matrix([6, 8], [10, 12])
-    say(Matrix([1, 2], [3, 4]) + 10)                        #=> Matrix([11, 12], [13, 14])
-
-Aliases: operator C<+>
-
-=cut
-
-=head2 sub
-
-    self.sub(other)
-    self - other
-
-Subtracts C<other> from every element (scalar), or subtracts corresponding elements (matrix).
-
-    say(Matrix([5, 6], [7, 8]) - Matrix([1, 2], [3, 4]))   #=> Matrix([4, 4], [4, 4])
-    say(Matrix([5, 6], [7, 8]) - 5)                         #=> Matrix([0, 1], [2, 3])
-
-Aliases: operator C<->
-
-=cut
-
 =head2 and
 
     self.and(other)
@@ -266,10 +238,50 @@ Returns a new matrix with every element rounded up to the nearest integer.
 
 =head1 MATRIX-SPECIFIC ARITHMETIC
 
+=head2 add
+
+    self.add(other)
+    self + other
+
+If C<other> is a C<Vector>, adds its elements to the corresponding columns of every row:
+
+    say(Matrix([1, 2], [3, 4]) + Vector(10, 20))    #=> Matrix([11, 22], [13, 24])
+
+If C<other> is a scalar, adds it to every element. If C<other> is a matrix, adds corresponding elements (element-wise):
+
+    say(Matrix([1, 2], [3, 4]) + 10)                      #=> Matrix([11, 12], [13, 14])
+    say(Matrix([1, 2], [3, 4]) + Matrix([5, 6], [7, 8]))  #=> Matrix([6, 8], [10, 12])
+
+Aliases: operator C<+>
+
+=cut
+
+=head2 sub
+
+    self.sub(other)
+    self - other
+
+If C<other> is a C<Vector>, subtracts its elements from the corresponding columns of every row:
+
+    say(Matrix([5, 6], [7, 8]) - Vector(1, 2))  #=> Matrix([4, 4], [6, 6])
+
+If C<other> is a scalar, subtracts it from every element. If C<other> is a matrix, subtracts corresponding elements (element-wise):
+
+    say(Matrix([5, 6], [7, 8]) - 5)                       #=> Matrix([0, 1], [2, 3])
+    say(Matrix([5, 6], [7, 8]) - Matrix([1, 2], [3, 4]))  #=> Matrix([4, 4], [4, 4])
+
+Aliases: operator C<->
+
+=cut
+
 =head2 mul
 
     self.mul(other)
     self * other
+
+If C<other> is a C<Vector>, returns C<self * other> as a new C<Vector> (standard matrix-vector multiplication):
+
+    say(Matrix([1, 2], [3, 4]) * Vector(5, 6))   #=> Vector(17, 39)
 
 If C<other> is a scalar, scales every element by it. If C<other> is a matrix, returns the true B<matrix product> of C<self> and C<other> (standard row-by-column multiplication) -- not an element-wise product.
 
@@ -285,9 +297,13 @@ Aliases: operator C<*>
     self.div(other)
     self / other
 
+If C<other> is a C<Vector>, divides each element by the corresponding vector element in every row:
+
+    say(Matrix([2, 4], [6, 8]) / Vector(2, 4))  #=> Matrix([1, 1], [3, 2])
+
 If C<other> is a scalar, divides every element by it. If C<other> is a matrix, returns C<self * other.invert> (C<self> multiplied by the inverse of C<other>) -- not an element-wise division.
 
-    say(Matrix([2, 4], [6, 8]) / 2)   #=> Matrix([1, 2], [3, 4])
+    say(Matrix([2, 4], [6, 8]) / 2)     #=> Matrix([1, 2], [3, 4])
 
 Aliases: operator C<E<sol>>, operator C<÷>
 

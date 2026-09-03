@@ -434,6 +434,7 @@ sub read {
     my ($self, $mode) = @_;
 
     $mode = defined($mode) ? "$mode" : 'utf8';
+    $mode =~ s/^://;
     CORE::open(my $fh, "<:$mode", "$self") || return undef;
 
     local $/;
