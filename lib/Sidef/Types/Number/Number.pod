@@ -4365,7 +4365,7 @@ When C<x> is omitted, a Polynomial object is returned.
 
 Return an approximation to the n-th Bernoulli number as a floating-point number.
 
-    say bernreal(10)     #=> 0.0757575757575757575757575757575757575757575757576
+    say bernreal(10)     #=> 0.07575757575757575757575757...
 
 When a second argument C<x> is given, it return the n-th Bernoulli polynomial evaluated at C<x>:
 
@@ -5784,7 +5784,9 @@ Returns true if C<2^p - 1> is a Mersenne prime.
     say 31.is_mersenne_prime    #=> true (2^31 - 1 is prime)
     say 11.is_mersenne_prime    #=> false
 
-Uses the Lucas-Lehmer test for efficiency. =cut
+Uses the Lucas-Lehmer test for efficiency.
+
+=cut
 
 =head2 is_nm1_prime
 
@@ -6516,7 +6518,10 @@ By enabling the conjectured approach, the function becomes about 5x faster than 
 
     n.is_carmichael
 
-Determine if C<n> is a Carmichael number or not.
+Determine if C<n> is a Carmichael number or not, as defined by L<OEIS A002997|https://oeis.org/A002997>.
+
+    say 561.is_carmichael     #=> true
+    say 562.is_carmichael     #=> false
 
 =cut
 
@@ -6568,6 +6573,9 @@ By enabling the conjectured approach, the function becomes about 5x faster than 
 
 Returns true if C<n> is a power of some prime.
 
+    say 27.is_prime_power     #=> true    (3^3)
+    say 12.is_prime_power     #=> false
+
 =cut
 
 =head2 is_semiprime
@@ -6575,6 +6583,10 @@ Returns true if C<n> is a power of some prime.
     n.is_semiprime
 
 Returns true if C<n> has exactly two prime factors (not necessarily distinct).
+
+    say 15.is_semiprime       #=> true    (3*5)
+    say 9.is_semiprime        #=> true    (3*3)
+    say 12.is_semiprime       #=> false
 
 =cut
 
@@ -6595,6 +6607,8 @@ Returns an array with values C<m> in the range C<[A, B]>, such that C<m * a_1 + 
     lnsuperprimorial(n)
 
 Natural logarithm of C<superprimorial(n)>.
+
+    say lnsuperprimorial(4)   #=> 11.23321156216762
 
 Aliases: I<superprimorial_ln>, I<superprimorial_log>
 
@@ -6648,6 +6662,8 @@ Returns the next k-omega prime greater than C<n>.
 
 Given a nonnegative integer C<n>, returns the next prime power (C<p^k> with k >= 1) greater than C<n>.
 
+    say 15.next_prime_power   #=> 16    (2^4)
+
 =cut
 
 =head2 next_semiprime
@@ -6656,6 +6672,8 @@ Given a nonnegative integer C<n>, returns the next prime power (C<p^k> with k >=
 
 Returns the next semiprime greater than C<n>.
 
+    say 15.next_semiprime     #=> 21
+
 =cut
 
 =head2 next_sphenic
@@ -6663,6 +6681,8 @@ Returns the next semiprime greater than C<n>.
     n.next_sphenic
 
 Returns the next number that is the product of three distinct primes.
+
+    say 30.next_sphenic       #=> 42    (2*3*7)
 
 =cut
 
@@ -6815,6 +6835,8 @@ Aliases: I<each_omega_prime>
 
 Returns the product of the first C<n> primes.
 
+    say pn_primorial(4)   #=> 210    (2*3*5*7)
+
 =cut
 
 =head2 prev_almost_prime
@@ -6839,6 +6861,8 @@ Returns the previous k-omega prime smaller than C<n>.
 
 Returns the previous prime power smaller than C<n>.
 
+    say 16.prev_prime_power   #=> 13
+
 =cut
 
 =head2 prev_semiprime
@@ -6847,6 +6871,8 @@ Returns the previous prime power smaller than C<n>.
 
 Returns the previous semiprime smaller than C<n>.
 
+    say 21.prev_semiprime     #=> 15
+
 =cut
 
 =head2 prev_sphenic
@@ -6854,6 +6880,8 @@ Returns the previous semiprime smaller than C<n>.
     n.prev_sphenic
 
 Returns the previous number that is the product of three distinct primes.
+
+    say 42.prev_sphenic       #=> 30
 
 =cut
 
@@ -7266,6 +7294,8 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 Returns the least common multiple (LCM) of all the integers in the range C<1..n>.
 
+    say consecutive_lcm(10)   #=> 2520
+
 Aliases: I<consecutive_integer_lcm>
 
 =cut
@@ -7464,6 +7494,9 @@ The product of the factors will give back C<n>. However, some factors may be com
 
 Returns true if C<gcd(a,b) = 1>.
 
+    say is_coprime(8, 15)   #=> true
+    say is_coprime(6, 9)    #=> false
+
 =cut
 
 =head2 gcd
@@ -7512,6 +7545,10 @@ The value of C<d> is always nonnegative.
     gcud(...)
 
 Returns the greatest common unitary divisor of a list of integers.
+
+A unitary divisor C<d> of C<n> satisfies C<gcd(d, n/d) = 1>.
+
+    say gcud(24, 84)     #=> 3
 
 =cut
 
@@ -7715,6 +7752,8 @@ Aliases: I<pplus1_factor>
     prime_divisors(n)
 
 Returns the unique prime factors of C<n>.
+
+    say prime_divisors(180)   #=> [2, 3, 5]
 
 =cut
 
@@ -8012,6 +8051,8 @@ Equivalent with:
 
 Returns the count of cube divisors of C<n>.
 
+    say 10!.cube_sigma0    #=> 6
+
 =cut
 
 =head2 cube_udivisors
@@ -8113,6 +8154,8 @@ Returns the number of unitary cubefree divisors of C<n>.
 
 Return an array with the cubefull (3-powerful) divisors of C<n>.
 
+    say cubefull_divisors(5040)   #=> [1, 8, 16]
+
 =cut
 
 =head2 cubefull_sigma
@@ -8120,6 +8163,8 @@ Return an array with the cubefull (3-powerful) divisors of C<n>.
     cubefull_sigma(n, j=1)
 
 Sum of the cubefull (3-powerful) divisors of C<n>, each divisor raised to the power C<j>.
+
+    say cubefull_sigma(5040)      #=> 25    (1+8+16)
 
 =cut
 
@@ -8129,6 +8174,8 @@ Sum of the cubefull (3-powerful) divisors of C<n>, each divisor raised to the po
 
 Count of the cubefull (3-powerful) divisors of C<n>.
 
+    say cubefull_sigma0(5040)     #=> 3
+
 =cut
 
 =head2 cubefull_udivisors
@@ -8136,6 +8183,8 @@ Count of the cubefull (3-powerful) divisors of C<n>.
     cubefull_udivisors(n)
 
 Return an array with the unitary cubefull (3-powerful) divisors of C<n>.
+
+    say cubefull_udivisors(5040)  #=> [1, 16]
 
 =cut
 
@@ -8145,6 +8194,8 @@ Return an array with the unitary cubefull (3-powerful) divisors of C<n>.
 
 Sum of the unitary cubefull (3-powerful) divisors of C<n>, each divisor raised to the power C<j>.
 
+    say cubefull_usigma(5040)     #=> 17    (1+16)
+
 =cut
 
 =head2 cubefull_usigma0
@@ -8152,6 +8203,8 @@ Sum of the unitary cubefull (3-powerful) divisors of C<n>, each divisor raised t
     cubefull_usigma0(n)
 
 Count of the unitary cubefull (3-powerful) divisors of C<n>.
+
+    say cubefull_usigma0(5040)    #=> 2
 
 =cut
 
@@ -8363,6 +8416,8 @@ Returns the sum of the non-bi-unitary divisors of C<n>, each divisor raised to t
 
 Returns the count of the non-bi-unitary divisors of C<n>.
 
+    say 720.nbsigma0     #=> 14
+
 =cut
 
 =head2 nbsigma0_sum
@@ -8427,6 +8482,8 @@ Returns the count of the nonexponential divisors of C<n>. (L<OEIS A160097|https:
     next_tau_inverse(n, k)
 
 Returns the next number, greater than C<n>, that has exactly C<k> divisors.
+
+    say next_tau_inverse(10, 6)    #=> 12
 
 =cut
 
@@ -8915,6 +8972,8 @@ Equivalent with:
 
 Returns the unique unitary prime factors of C<n>.
 
+    say prime_udivisors(5040)   #=> [5, 7]
+
 Aliases: I<prime_unitary_divisors>, I<unitary_prime_divisors>
 
 =cut
@@ -9143,6 +9202,8 @@ Equivalent with:
 
 Returns the count of square divisors of C<n>.
 
+    say square_sigma0(5040)    #=> 6
+
 =cut
 
 =head2 square_udivisors
@@ -9175,6 +9236,8 @@ Equivalent with:
     square_usigma0(n)
 
 Returns the count of unitary square divisors of C<n>.
+
+    say square_usigma0(5040)   #=> 4
 
 =cut
 
@@ -9236,6 +9299,8 @@ Returns the number of unitary squarefree divisors of C<n>.
 
 Return an array with the squarefull (2-powerful) divisors of C<n>.
 
+    say squarefull_divisors(5040)   #=> [1, 4, 8, 9, 16, 36, 72, 144]
+
 =cut
 
 =head2 squarefull_sigma
@@ -9243,6 +9308,8 @@ Return an array with the squarefull (2-powerful) divisors of C<n>.
     squarefull_sigma(n, j=1)
 
 Sum of the squarefull (2-powerful) divisors of C<n>, each divisor raised to the power C<j>.
+
+    say squarefull_sigma(5040)      #=> 290
 
 =cut
 
@@ -9252,6 +9319,8 @@ Sum of the squarefull (2-powerful) divisors of C<n>, each divisor raised to the 
 
 Count of the squarefull (2-powerful) divisors of C<n>.
 
+    say squarefull_sigma0(5040)     #=> 8
+
 =cut
 
 =head2 squarefull_udivisors
@@ -9259,6 +9328,8 @@ Count of the squarefull (2-powerful) divisors of C<n>.
     squarefull_udivisors(n)
 
 Return an array with the unitary squarefull (2-powerful) divisors of C<n>.
+
+    say squarefull_udivisors(5040)  #=> [1, 9, 16, 144]
 
 =cut
 
@@ -9268,6 +9339,8 @@ Return an array with the unitary squarefull (2-powerful) divisors of C<n>.
 
 Sum of the unitary squarefull (2-powerful) divisors of C<n>, each divisor raised to the power C<j>.
 
+    say squarefull_usigma(5040)     #=> 170
+
 =cut
 
 =head2 squarefull_usigma0
@@ -9275,6 +9348,8 @@ Sum of the unitary squarefull (2-powerful) divisors of C<n>, each divisor raised
     squarefull_usigma0(n)
 
 Count of the unitary squarefull (2-powerful) divisors of C<n>.
+
+    say squarefull_usigma0(5040)    #=> 4
 
 =cut
 
@@ -9463,6 +9538,8 @@ where C<J_k(n)> is the Jordan totient function.
 
 For C<k=1>, it equals: C<n - phi(n)>.
 
+    say cototient(30)     #=> 22    (30 - phi(30) = 30 - 8)
+
 =cut
 
 =head2 cototient_sum
@@ -9554,6 +9631,8 @@ Aliases: I<dirichlet_hyperbola>, I<dsum>
 
 Returns the result of C<k**bigomega(n)>.
 
+    say exp_bigomega(360, 2)   #=> 64    (2^6, since bigomega(360)=6)
+
 =cut
 
 =head2 exp_bigomega_sum
@@ -9594,6 +9673,8 @@ Partial sums of the exponential of the Mangoldt function.
     exp_omega(n,k)
 
 Returns the result of C<k**omega(n)>.
+
+    say exp_omega(360, 2)   #=> 8    (2^3, since omega(360)=3)
 
 =cut
 
@@ -9676,6 +9757,9 @@ Amicable numbers are two different numbers so related that the sum of the proper
 Returns true if C<n> is a deficient number, else false.
 
 A deficient number is greater than the sum of its positive proper divisors.
+
+    say 8.is_deficient    #=> true    (1+2+4=7 < 8)
+    say 12.is_deficient   #=> false   (1+2+3+4+6=16 > 12)
 
 =cut
 
@@ -9770,6 +9854,9 @@ A primitive abundant number is an abundant number having no abundant proper divi
 
 Given an integer C<n>, returns true if there exists an integer C<x> such that C<euler_phi(x) == n>.
 
+    say 4.is_totient      #=> true    (euler_phi(5) == 4)
+    say 14.is_totient     #=> false
+
 =cut
 
 =head2 jordan_totient
@@ -9777,6 +9864,8 @@ Given an integer C<n>, returns true if there exists an integer C<x> such that C<
     jordan_totient(n,k)
 
 Jordan's totient C<J_k(n)>, which is a generalization of Euler's totient function.
+
+    say jordan_totient(6, 2)   #=> 24
 
 =cut
 
@@ -9858,9 +9947,13 @@ Aliases: I<inverse_lambda_max>, I<inverse_carmichael_lambda_max>, I<carmichael_l
 
 Returns the count of numbers <= C<n> that are not divisible by the first C<k> primes.
 
-Equivalent with:
+Equivalent to:
 
     prime(k+1).rough_count(n)
+
+Example:
+
+    say legendre_phi(50, 3)   #=> 14   (numbers <= 50 coprime to 2, 3 and 5)
 
 =cut
 
@@ -9868,11 +9961,11 @@ Equivalent with:
 
     liouville(n)
 
-The Liouville function.
+The Liouville function. Equivalent to C<(-1)**bigomega(n)>.
 
-Equivalent to:
-
-    (-1)**omega(n)
+    say liouville(1)      #=> 1
+    say liouville(12)     #=> -1   (12 = 2^2 * 3, bigomega(12) = 3)
+    say liouville(30)     #=> -1   (30 = 2*3*5, bigomega(30) = 3)
 
 =cut
 
@@ -9912,6 +10005,8 @@ Return the logarithmic derivative of C<n>, defined as:
 
 Returns the largest divisor of C<n> that is coprime to C<k>.
 
+    say 60.make_coprime(15)   #=> 4    (60 = 2^2*3*5; remove factors of 3 and 5)
+
 =cut
 
 =head2 mangoldt
@@ -9919,6 +10014,11 @@ Returns the largest divisor of C<n> that is coprime to C<k>.
     mangoldt(n)
 
 The Mangoldt function. For the exponential values, see C<exp_mangoldt>.
+
+Returns C<ln(p)> when C<n = p^k> for some prime C<p> and integer C<k>, and C<0> otherwise.
+
+    say mangoldt(8)       #=> 0.693147180559945...   (ln(2), since 8 = 2^3)
+    say mangoldt(6)       #=> 0
 
 =cut
 
@@ -10162,6 +10262,8 @@ Which has the identity:
     pillai_sum(n,k=1)
 
 Partial sums of the generalized Pillai arithmetical function C<pillai(n,k)>.
+
+    say 10.of { .pillai_sum }    #=> OEIS: A272718
 
 =cut
 
@@ -10422,6 +10524,9 @@ Partial sums of the unitary totient function C<uphi(x,k)> for C<x=1..n>.
 
 Returns true if all the given values are positive composite numbers.
 
+    say all_composite(4, 6, 9)    #=> true
+    say all_composite(4, 5, 9)    #=> false
+
 =cut
 
 =head2 composite
@@ -10561,6 +10666,8 @@ Largest cube dividing C<n>. (L<OEIS  A008834|https://oeis.org/A008834>)
 
 Returns an array with the cubefree numbers <= C<n>, or in the range C<a..b>.
 
+    say cubefree(20)      #=> [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20]
+
 =cut
 
 =head2 cubefree_count
@@ -10589,6 +10696,8 @@ Aliases: I<each_cubefree>
 
 Largest cubefree number dividing C<n>. (L<OEIS  A007948|https://oeis.org/A007948>)
 
+    say cubefree_kernel(2**5 * 3**9)   #=> 36   (2^2 * 3^2)
+
 =cut
 
 =head2 cubefree_part
@@ -10614,6 +10723,8 @@ Returns the sum of cubefree numbers <= C<n>, or in the range C<a..b>.
     cubefull(a,b)
 
 Returns an array with the cubefull numbers <= C<n>, or in the range C<a..b>.
+
+    say cubefull(100)     #=> [1, 8, 16, 27, 32, 64, 81]
 
 =cut
 
@@ -10701,6 +10812,8 @@ Aliases: I<diff_of_cubes>
 
 Returns the product of first C<n> nonzero Fibonacci numbers C<F(1), ..., F(n)>.
 
+    say fibonorial(5)     #=> 30    (1*1*2*3*5)
+
 =cut
 
 =head2 is_between
@@ -10708,6 +10821,9 @@ Returns the product of first C<n> nonzero Fibonacci numbers C<F(1), ..., F(n)>.
     n.is_between(min, max)
 
 Returns a true value when `n >= min` and `n <= max`.
+
+    say 5.is_between(1, 10)    #=> true
+    say 15.is_between(1, 10)   #=> false
 
 =cut
 
@@ -10717,6 +10833,9 @@ Returns a true value when `n >= min` and `n <= max`.
 
 Returns true if C<n> is a positive > 1 composite number.
 
+    say 6.is_composite    #=> true
+    say 7.is_composite    #=> false
+
 =cut
 
 =head2 is_cube
@@ -10724,6 +10843,9 @@ Returns true if C<n> is a positive > 1 composite number.
     n.is_cube
 
 Return true if C<n> is a cube number (i.e.: if it can be written as C<b^3>, for some integer C<b>).
+
+    say 27.is_cube        #=> true
+    say 30.is_cube        #=> false
 
 =cut
 
@@ -10733,6 +10855,9 @@ Return true if C<n> is a cube number (i.e.: if it can be written as C<b^3>, for 
 
 Returns true if C<n> is not divisible by any perfect cube > 1.
 
+    say 12.is_cubefree    #=> true
+    say 24.is_cubefree    #=> false (divisible by 8)
+
 =cut
 
 =head2 is_cubefull
@@ -10740,6 +10865,9 @@ Returns true if C<n> is not divisible by any perfect cube > 1.
     n.is_cubefull
 
 Returns true if C<n> is divisible by the cubes of all its prime factors.
+
+    say 16.is_cubefull    #=> true    (2^4, and 2^3 | 16)
+    say 12.is_cubefull    #=> false
 
 =cut
 
@@ -10767,6 +10895,9 @@ Returns true if C<n> is an integer divisible by 2.
 
 Returns true if C<n> is a fundamental discriminant.
 
+    say 5.is_fundamental     #=> true
+    say 4.is_fundamental     #=> false
+
 =cut
 
 =head2 is_noncubefree
@@ -10775,13 +10906,19 @@ Returns true if C<n> is a fundamental discriminant.
 
 Returns true if C<n> is a positive integer divisible by the cube of a prime.
 
+    say 24.is_noncubefree    #=> true    (divisible by 2^3)
+    say 12.is_noncubefree    #=> false
+
 =cut
 
 =head2 is_nonpowerfree
 
-    n.is_nonpowerfree
+    n.is_nonpowerfree(k=2)
 
 Returns true if C<n> is a positive integer divisible by the k-th power of a prime.
+
+    say 12.is_nonpowerfree(2)    #=> true    (divisible by 2^2)
+    say 30.is_nonpowerfree(2)    #=> false
 
 =cut
 
@@ -10790,6 +10927,9 @@ Returns true if C<n> is a positive integer divisible by the k-th power of a prim
     n.is_nonsquarefree
 
 Returns true if C<n> is a positive integer divisible by the square of a prime.
+
+    say 12.is_nonsquarefree   #=> true    (divisible by 2^2)
+    say 30.is_nonsquarefree   #=> false
 
 =cut
 
@@ -10820,6 +10960,9 @@ Returns true when C<n> is an integer not divisible by 2.
     n.is_odd_composite
 
 Returns true when C<n> is an odd composite integer.
+
+    say 9.is_odd_composite    #=> true
+    say 7.is_odd_composite    #=> false
 
 =cut
 
@@ -10921,6 +11064,9 @@ Returns true when all the exponents in the prime-power factorization of C<n> are
 
 Returns true when all the exponents in the prime-power factorization of C<n> are greater than or equal to C<k>.
 
+    say 16.is_powerful(2)    #=> true    (2^4)
+    say 12.is_powerful(2)    #=> false
+
 =cut
 
 =head2 is_prob_squarefree
@@ -10959,6 +11105,9 @@ Returns true if all prime factors of C<n> are >= C<k>.
 
 Returns true if all the prime factors of C<n> are <= C<k>. False otherwise.
 
+    say 12.is_smooth(3)     #=> true    (12 = 2^2 * 3)
+    say 14.is_smooth(3)     #=> false   (14 = 2 * 7)
+
 =cut
 
 =head2 is_smooth_over_prod
@@ -10967,6 +11116,9 @@ Returns true if all the prime factors of C<n> are <= C<k>. False otherwise.
 
 Returns true when C<n> is smooth over the prime factors of C<k>.
 
+    say 12.is_smooth_over_prod(30)   #=> true    (2 and 3 both divide 30)
+    say 14.is_smooth_over_prod(30)   #=> false    (7 does not divide 30)
+
 =cut
 
 =head2 is_square
@@ -10974,6 +11126,9 @@ Returns true when C<n> is smooth over the prime factors of C<k>.
     n.is_square
 
 Returns true if C<n> is a perfect square integer.
+
+    say 16.is_square      #=> true
+    say 15.is_square      #=> false
 
 Aliases: I<is_sqr>, I<is_perfect_square>
 
@@ -10984,6 +11139,9 @@ Aliases: I<is_sqr>, I<is_perfect_square>
     n.is_squarefree
 
 Returns true if the prime factorization of C<n> does not include duplicated factors (i.e.: C<n> is not divisible by a square).
+
+    say 15.is_squarefree   #=> true
+    say 12.is_squarefree   #=> false    (divisible by 4)
 
 Aliases: I<is_square_free>
 
@@ -11009,6 +11167,9 @@ Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == ome
 
 Returns true if C<n> is a squarefree semiprime (i.e.: C<n = p*q>, where C<p> and C<q> are two distinct primes).
 
+    say is_squarefree_semiprime(15)   #=> true    (3*5)
+    say is_squarefree_semiprime(9)    #=> false   (3*3)
+
 =cut
 
 =head2 is_squarefull
@@ -11016,6 +11177,9 @@ Returns true if C<n> is a squarefree semiprime (i.e.: C<n = p*q>, where C<p> and
     n.is_squarefull
 
 Returns true if C<n> is divisible by the squares of all its prime factors.
+
+    say 8.is_squarefull     #=> true    (2^3)
+    say 12.is_squarefull    #=> false   (2^2 * 3, but 3 is not squared)
 
 =cut
 
@@ -11139,19 +11303,29 @@ Returns the next k-powerful (or k-full) number greater than C<n>.
 
 =cut
 
-=head2 next_rough(n, k)
+=head2 next_rough
+
+    n.next_rough(k)
 
 Returns the smallest C<k>-rough integer strictly greater than C<n>.
 
 If C<n> is zero, it returns C<1>.
 
+    say 10.next_rough(3)   #=> 11
+    say 11.next_rough(3)   #=> 13
+
 =cut
 
-=head2 next_smooth(n, k)
+=head2 next_smooth
+
+    n.next_smooth(k)
 
 Returns the smallest C<k>-smooth integer strictly greater than C<n>.
 
 If C<n> is zero, it returns C<1>.
+
+    say 10.next_smooth(3)   #=> 12
+    say 12.next_smooth(3)   #=> 16
 
 =cut
 
@@ -11177,6 +11351,8 @@ Returns the next squarefull (or 2-full) number greater than C<n>.
     noncubefree(a,b)
 
 Returns an array with the noncubefree numbers <= C<n>, or in the range C<a..b>.
+
+    say noncubefree(30)   #=> [8, 16, 24, 27]
 
 =cut
 
@@ -11297,6 +11473,8 @@ Returns the sum of nonsquarefree numbers <= C<n>, or in the range C<a..b>.
 
 Returns the n-th cubefree number.
 
+    say 8.nth_cubefree    #=> 9    (8 = 2^3 is skipped)
+
 =cut
 
 =head2 nth_cubefull
@@ -11305,6 +11483,8 @@ Returns the n-th cubefree number.
 
 Returns the n-th cubefull (or 3-full) number.
 
+    say 3.nth_cubefull    #=> 16    (1, 8, 16, ...)
+
 =cut
 
 =head2 nth_noncubefree
@@ -11312,6 +11492,8 @@ Returns the n-th cubefull (or 3-full) number.
     n.nth_noncubefree
 
 Returns the n-th noncubefree number.
+
+    say 3.nth_noncubefree    #=> 24    (8, 16, 24, ...)
 
 =cut
 
@@ -11332,6 +11514,8 @@ Returns the n-th k-nonpowerfree number.
     n.nth_nonsquarefree
 
 Returns the n-th nonsquarefree number.
+
+    say 3.nth_nonsquarefree    #=> 9    (4, 8, 9, ...)
 
 =cut
 
@@ -11412,6 +11596,8 @@ Returns the n-th squarefree number. (L<OEIS A005117|https://oeis.org/A005117>)
 
 Returns the n-th squarefull (or 2-full) number.
 
+    say 3.nth_squarefull    #=> 8    (1, 4, 8, ...)
+
 =cut
 
 =head2 nth_tau_inverse
@@ -11469,6 +11655,9 @@ When C<k> is provided, it returns the sum of k-powers <= C<n>.
 
 Returns the number of k-th power positive integers in <= C<n>, or in the range C<a..b>.
 
+    say 2.power_count(100)     #=> 10    (number of perfect squares <= 100)
+    say 3.power_count(100)     #=> 4     (number of perfect cubes <= 100)
+
 =cut
 
 =head2 power_part
@@ -11488,6 +11677,8 @@ Returns the largest k-th power dividing C<n>.
     k.power_sum(a,b)
 
 Returns the sum of k-th power positive integers <= C<n>, or in the range C<a..b>.
+
+    say 2.power_sum(100)    #=> 385    (1+4+9+...+100)
 
 =cut
 
@@ -11739,19 +11930,29 @@ Returns the previous k-powerful (or k-full) number smaller than C<n>.
 
 =cut
 
-=head2 prev_rough(n, k)
+=head2 prev_rough
+
+    n.prev_rough(k)
 
 Returns the largest C<k>-rough integer strictly less than C<n>.
 
 Returns C<NaN> if C<<< n <= 1 >>>.
 
+    say 13.prev_rough(3)   #=> 11
+    say 11.prev_rough(3)   #=> 9
+
 =cut
 
-=head2 prev_smooth(n, k)
+=head2 prev_smooth
+
+    n.prev_smooth(k)
 
 Returns the largest C<k>-smooth integer strictly less than C<n>.
 
 Returns C<NaN> if C<<< n <= 1 >>>.
+
+    say 16.prev_smooth(3)   #=> 12
+    say 12.prev_smooth(3)   #=> 9
 
 =cut
 
@@ -12005,6 +12206,8 @@ Returns the sum of squarefree numbers <= C<n> or in the range C<a..b>. (L<OEIS A
 
 Returns an array with the squarefull numbers <= C<n>, or in the range C<a..b>.
 
+    say squarefull(100)   #=> [1, 4, 8, 9, 16, 25, 27, 32, 36, 49, 64, 72, 81, 100]
+
 =cut
 
 =head2 squarefull_count
@@ -12092,6 +12295,8 @@ The underlying CSPRNG is ISAAC-32.
 
 Return true if C<n> passes the Miller-Rabin primality test with C<k> random bases.
 
+    say 561.miller_rabin_random(20)   #=> false (561 is a Carmichael number)
+
 =cut
 
 =head2 rand
@@ -12101,6 +12306,9 @@ Return true if C<n> passes the Miller-Rabin primality test with C<k> random base
 
 Returns a pseudorandom floating-point in the interval C<[0,n)>, or in the interval C<[a,b)>.
 
+    say rand(1)        # pseudorandom float in [0,1)
+    say rand(10, 20)   # pseudorandom float in [10,20)
+
 =cut
 
 =head2 random_bytes
@@ -12109,6 +12317,8 @@ Returns a pseudorandom floating-point in the interval C<[0,n)>, or in the interv
 
 Returns an array with C<n> random values between 0 and 255.
 
+    say 5.random_bytes   # e.g.: [172, 4, 91, 250, 33]
+
 =cut
 
 =head2 random_maurer_nbit_prime
@@ -12116,6 +12326,8 @@ Returns an array with C<n> random values between 0 and 255.
     random_maurer_nbit_prime(n)
 
 Generate a random n-bit Marurer prime.
+
+    say random_maurer_nbit_prime(128)   # a random provable 128-bit prime
 
 Aliases: I<random_nbit_maurer_prime>
 
@@ -12149,6 +12361,8 @@ Provided by L<Math::Prime::Util::GMP> >= 0.52.
 
 Generate a random n-bit strong prime number.
 
+    say random_nbit_strong_prime(128)   # a random 128-bit strong prime
+
 Aliases: I<random_strong_nbit_prime>
 
 =cut
@@ -12181,6 +12395,8 @@ Returns a cryptographically-secure random prime <= C<n>, or in C<[a,b]>.
 
 Returns a string with C<n> random characters (bytes).
 
+    say 8.random_string   # e.g.: a random 8-byte string
+
 =cut
 
 =head2 seed
@@ -12188,6 +12404,9 @@ Returns a string with C<n> random characters (bytes).
     seed(n)
 
 Re-seed the C<rand()> function. The value for C<n> can be any arbitrary large integer.
+
+    seed(42)
+    say rand(100)   # deterministic sequence after seeding
 
 =cut
 
@@ -12222,6 +12441,9 @@ Takes a nonnegative integer C<n>, which is used to seed the internal CSPRNG (cur
 For good security, C<n> should be at least an 128-bit random integer.
 
 Internally, the value of C<n> is converted into a binary string, SHA-512 hashed and expanded into a 8192-bit key.
+
+    useed(42)
+    say irand(100)   # deterministic sequence after seeding
 
 =cut
 
@@ -12305,7 +12527,7 @@ Returns true when C<n> equals 1.
 
     x.is_pos
 
-Returns true when C<x> is a positive integer.
+Returns true when C<x> is a positive number.
 
 Aliases: I<is_positive>
 
@@ -12324,5 +12546,51 @@ Returns true if C<x> is a rational number.
     x.is_zero
 
 Returns true when C<x> equals 0.
+
+=cut
+
+=head1 EXAMPLES
+
+A few short programs that combine several of the methods documented above.
+
+=head2 Prime factorization
+
+    var n = 600851475143
+    say n.factor             #=> [71, 839, 1471, 6857]
+    say n.is_prime           #=> false
+    say n.factor.prod        #=> 600851475143
+
+=cut
+
+=head2 The first 10 terms of the Fibonacci sequence
+
+    say 10.of { .fib }      #=> [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+=cut
+
+=head2 Working with arbitrary precision
+
+Sidef's C<Number> type handles arbitrarily large integers and exact rationals natively:
+
+    say 100!                          # exact value of 100 factorial
+    say (1/3 + 1/6)                   #=> 1/2
+    say is_prime(2**127 - 1)          #=> true
+
+=cut
+
+=head2 Complex numbers
+
+    var z = (3 + 4i)
+    say z.abs            #=> 5
+    say z.conj           #=> 3 - 4i
+    say sqrt(-1)         #=> 1i
+
+=cut
+
+=head2 Modular exponentiation
+
+Efficiently compute large modular powers, without ever materializing the full power:
+
+    say powmod(2, 1000, 999999937)    #=> 257860488
 
 =cut
