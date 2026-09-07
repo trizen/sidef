@@ -5355,15 +5355,19 @@ sub __lgrt__ {
 
     $PREC = CORE::int($PREC) if ref($PREC);
 
-    my $p = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
-
     goto($DISPATCH_TAG{ref($c)});
 
   Math_MPFR: {
 
-        # Return a complex number for x < e^(-1/e)
-        if (Math::MPFR::Rmpfr_cmp_d($c, CORE::exp(-1 / CORE::exp(1))) < 0) {
+        # Exactly compute the branch point: e^(-1/e)
+        my $threshold = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_si($threshold, -1, $ROUND);
+        Math::MPFR::Rmpfr_exp($threshold, $threshold, $ROUND);           # e^(-1) = 1/e
+        Math::MPFR::Rmpfr_mul_si($threshold, $threshold, -1, $ROUND);    # -1/e
+        Math::MPFR::Rmpfr_exp($threshold, $threshold, $ROUND);           # e^(-1/e)
+
+        # Route to complex for c < e^(-1/e)
+        if (Math::MPFR::Rmpfr_cmp($c, $threshold) < 0) {
             $c = _mpfr2mpc($c);
             goto Math_MPC;
         }
@@ -5371,23 +5375,42 @@ sub __lgrt__ {
         my $r = Math::MPFR::Rmpfr_init2($PREC);
         Math::MPFR::Rmpfr_log($r, $c, $ROUND);
 
-        Math::MPFR::Rmpfr_set_ui((my $x = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
-        Math::MPFR::Rmpfr_set_ui((my $y = Math::MPFR::Rmpfr_init2($PREC)), 0, $ROUND);
+        my $x = Math::MPFR::Rmpfr_init2($PREC);
+
+        # Conditional initial guess to optimize convergence speed
+        if (Math::MPFR::Rmpfr_cmp_ui($r, 3) > 0) {
+
+            # For large numbers, x ~= r / log(r)
+            Math::MPFR::Rmpfr_log($x, $r, $ROUND);
+            Math::MPFR::Rmpfr_div($x, $r, $x, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_set_ui($x, 1, $ROUND);
+        }
+
+        my $y   = Math::MPFR::Rmpfr_init2($PREC);
+        my $tmp = Math::MPFR::Rmpfr_init2($PREC);
+
+        # Bitwise tolerance: 2^(-PREC)
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui_2exp($p, 1, -($PREC >> 1), $ROUND);
 
         my $count = 0;
-        my $tmp   = Math::MPFR::Rmpfr_init2($PREC);
 
         while (1) {
-            Math::MPFR::Rmpfr_sub($tmp, $x, $y, $ROUND);
-            Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0 and last;
-
             Math::MPFR::Rmpfr_set($y, $x, $ROUND);
 
+            # x_{new} = (x + r) / (ln(x) + 1)
             Math::MPFR::Rmpfr_log($tmp, $x, $ROUND);
             Math::MPFR::Rmpfr_add_ui($tmp, $tmp, 1, $ROUND);
 
             Math::MPFR::Rmpfr_add($x, $x, $r, $ROUND);
             Math::MPFR::Rmpfr_div($x, $x, $tmp, $ROUND);
+
+            # Check convergence
+            Math::MPFR::Rmpfr_sub($tmp, $x, $y, $ROUND);
+            last if Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0;
+
             last if ++$count > $PREC;
         }
 
@@ -5399,30 +5422,48 @@ sub __lgrt__ {
         Math::MPC::Rmpc_log($d, $c, $ROUND);
 
         my $x = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_sqrt($x, $c, $ROUND);
-        Math::MPC::Rmpc_add_ui($x, $x, 1, $ROUND);
-        Math::MPC::Rmpc_log($x, $x, $ROUND);
 
-        my $y = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_set_ui($y, 0, $ROUND);
+        my $abs_c = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($abs_c, $c, $ROUND);
 
+        if (Math::MPFR::Rmpfr_cmp_ui($abs_c, 3) > 0) {
+
+            # For large magnitudes, x ~= d / log(d)
+            my $log_d = Math::MPC::Rmpc_init2($PREC);
+            Math::MPC::Rmpc_log($log_d, $d, $ROUND);
+            Math::MPC::Rmpc_div($x, $d, $log_d, $ROUND);
+        }
+        else {
+            # For small magnitudes (or negatives), x = sqrt(c) + 1 prevents
+            # log(x) from throwing errors or division-by-zero on complex branch cuts.
+            Math::MPC::Rmpc_sqrt($x, $c, $ROUND);
+            Math::MPC::Rmpc_add_ui($x, $x, 1, $ROUND);
+        }
+
+        my $y   = Math::MPC::Rmpc_init2($PREC);
         my $tmp = Math::MPC::Rmpc_init2($PREC);
         my $abs = Math::MPFR::Rmpfr_init2($PREC);
 
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui_2exp($p, 1, -($PREC >> 1), $ROUND);
+
         my $count = 0;
+
         while (1) {
-            Math::MPC::Rmpc_sub($tmp, $x, $y, $ROUND);
-
-            Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
-            Math::MPFR::Rmpfr_cmp($abs, $p) <= 0 and last;
-
             Math::MPC::Rmpc_set($y, $x, $ROUND);
 
+            # x_{new} = (x + d) / (ln(x) + 1)
             Math::MPC::Rmpc_log($tmp, $x, $ROUND);
             Math::MPC::Rmpc_add_ui($tmp, $tmp, 1, $ROUND);
 
             Math::MPC::Rmpc_add($x, $x, $d, $ROUND);
             Math::MPC::Rmpc_div($x, $x, $tmp, $ROUND);
+
+            # Check convergence
+            Math::MPC::Rmpc_sub($tmp, $x, $y, $ROUND);
+            Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
+            last if Math::MPFR::Rmpfr_cmp($abs, $p) <= 0;
+
             last if ++$count > $PREC;
         }
 
@@ -5440,61 +5481,94 @@ sub __LambertW__ {
 
     $PREC = CORE::int($PREC) if ref($PREC);
 
-    my $p = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
-
     goto($DISPATCH_TAG{ref($x)});
 
   Math_MPFR: {
 
+        # Compute exact -1/e in MPFR to avoid double-precision truncation bugs
+        my $minus_inv_e = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_si($minus_inv_e, -1, $ROUND);
+        Math::MPFR::Rmpfr_exp($minus_inv_e, $minus_inv_e, $ROUND);
+
         # Return a complex number for x < -1/e
-        if (Math::MPFR::Rmpfr_cmp_d($x, -1 / CORE::exp(1)) < 0) {
+        if (Math::MPFR::Rmpfr_cmp($x, $minus_inv_e) < 0) {
             $x = _mpfr2mpc($x);
             goto Math_MPC;
         }
 
-        Math::MPFR::Rmpfr_set_ui((my $r = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
-        Math::MPFR::Rmpfr_set_ui((my $y = Math::MPFR::Rmpfr_init2($PREC)), 0, $ROUND);
+        my $r = Math::MPFR::Rmpfr_init2($PREC);
+
+        # Initial guess for r = e^W(x)
+        if (Math::MPFR::Rmpfr_cmp_ui($x, 3) > 0) {
+
+            # For large x, W(x) ~ ln(x), so r = e^W(x) ~ x
+            Math::MPFR::Rmpfr_set($r, $x, $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_set_ui($r, 1, $ROUND);
+        }
+
+        my $tmp = Math::MPFR::Rmpfr_init2($PREC);
+        my $y   = Math::MPFR::Rmpfr_init2($PREC);
+
+        # Tolerance: 2^(-PREC)
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui_2exp($p, 1, -($PREC >> 1), $ROUND);
 
         my $count = 0;
-        my $tmp   = Math::MPFR::Rmpfr_init2($PREC);
 
+        # Newton's method on r*ln(r) = x  =>  r_{n+1} = (r_n + x) / (ln(r_n) + 1)
         while (1) {
-            Math::MPFR::Rmpfr_sub($tmp, $r, $y, $ROUND);
-            Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0 and last;
-
             Math::MPFR::Rmpfr_set($y, $r, $ROUND);
 
-            Math::MPFR::Rmpfr_log($tmp, $r, $ROUND);
-            Math::MPFR::Rmpfr_add_ui($tmp, $tmp, 1, $ROUND);
+            Math::MPFR::Rmpfr_log($tmp, $r, $ROUND);            # tmp = ln(r)
+            Math::MPFR::Rmpfr_add_ui($tmp, $tmp, 1, $ROUND);    # tmp = ln(r) + 1
 
-            Math::MPFR::Rmpfr_add($r, $r, $x, $ROUND);
-            Math::MPFR::Rmpfr_div($r, $r, $tmp, $ROUND);
+            Math::MPFR::Rmpfr_add($r, $r, $x, $ROUND);          # r = r + x
+            Math::MPFR::Rmpfr_div($r, $r, $tmp, $ROUND);        # r = (r + x) / tmp
+
+            # Convergence check: |\Delta r| / |r| <= tolerance (equivalent to |\Delta w| <= tol)
+            Math::MPFR::Rmpfr_sub($tmp, $r, $y, $ROUND);
+            last if Math::MPFR::Rmpfr_cmpabs($tmp, $p) <= 0;
+
             last if ++$count > $PREC;
         }
 
+        # Return w = ln(r)
         Math::MPFR::Rmpfr_log($r, $r, $ROUND);
         return $r;
     }
 
   Math_MPC: {
         my $r = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_sqrt($r, $x, $ROUND);
-        Math::MPC::Rmpc_add_ui($r, $r, 1, $ROUND);
 
-        my $y = Math::MPC::Rmpc_init2($PREC);
-        Math::MPC::Rmpc_set_ui($y, 0, $ROUND);
+        # Calculate absolute magnitude of x
+        my $abs_x = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPC::Rmpc_abs($abs_x, $x, $ROUND);
 
-        my $tmp = Math::MPC::Rmpc_init2($PREC);
-        my $abs = Math::MPFR::Rmpfr_init2($PREC);
+        if (Math::MPFR::Rmpfr_cmp_ui($abs_x, 3) > 0) {
+
+            # For large magnitudes, W(x) ~ ln(x), so r = e^W(x) ~ x
+            Math::MPC::Rmpc_set($r, $x, $ROUND);
+        }
+        else {
+            # For smaller magnitudes, W(x) ~ ln(sqrt(x) + 1), so r ~ sqrt(x) + 1
+            # This safely prevents complex origin singularities.
+            Math::MPC::Rmpc_sqrt($r, $x, $ROUND);
+            Math::MPC::Rmpc_add_ui($r, $r, 1, $ROUND);
+        }
+
+        my $tmp   = Math::MPC::Rmpc_init2($PREC);
+        my $y     = Math::MPC::Rmpc_init2($PREC);
+        my $abs   = Math::MPFR::Rmpfr_init2($PREC);
+        my $abs_r = Math::MPFR::Rmpfr_init2($PREC);
+
+        my $p = Math::MPFR::Rmpfr_init2($PREC);
+        Math::MPFR::Rmpfr_set_ui_2exp($p, 1, -($PREC >> 1), $ROUND);
 
         my $count = 0;
+
         while (1) {
-            Math::MPC::Rmpc_sub($tmp, $r, $y, $ROUND);
-
-            Math::MPC::Rmpc_abs($abs, $tmp, $ROUND);
-            Math::MPFR::Rmpfr_cmp($abs, $p) <= 0 and last;
-
             Math::MPC::Rmpc_set($y, $r, $ROUND);
 
             Math::MPC::Rmpc_log($tmp, $r, $ROUND);
@@ -5502,9 +5576,18 @@ sub __LambertW__ {
 
             Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
             Math::MPC::Rmpc_div($r, $r, $tmp, $ROUND);
+
+            # Convergence check: |\Delta r| / |r| <= tolerance
+            Math::MPC::Rmpc_sub($tmp, $r, $y, $ROUND);
+            Math::MPC::Rmpc_abs($abs,   $tmp, $ROUND);
+            Math::MPC::Rmpc_abs($abs_r, $r,   $ROUND);
+            Math::MPFR::Rmpfr_div($abs, $abs, $abs_r, $ROUND);
+
+            last if Math::MPFR::Rmpfr_cmp($abs, $p) <= 0;
             last if ++$count > $PREC;
         }
 
+        # Return w = ln(r)
         Math::MPC::Rmpc_log($r, $r, $ROUND);
         return $r;
     }
