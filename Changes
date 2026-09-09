@@ -1,5 +1,196 @@
 Revision history for Sidef
 
+26.09 2026-09-09
+
+    [ADDED]
+
+    - tetration_mod(a,k,m)             modular tetration
+      tetrationmod                     alias for tetration_mod
+
+    - solve_thue(D,k,N=1,bound=1e6,first_only=false)
+                                      bounded binomial Thue solver
+
+    - prime_partitions(n,max_value=n)
+                                      partitions into prime parts
+    - strict_prime_partitions(n,max_value=n)
+                                      partitions into distinct prime parts
+
+    - lambda_inverse(n)
+    - lambda_inverse_len(n)
+    - lambda_inverse_min(n)
+    - lambda_inverse_max(n)           inverse Carmichael lambda functions
+
+    - piltz_tau(n,k=2)                k-fold divisor function
+    - schemmel_totient(n,k=1)         k-th Schemmel totient function
+    - is_hyperperfect(n,k=1)          generalized hyperperfect test
+
+    - arithmetic_mean(...)
+    - geometric_mean(...)
+    - harmonic_mean(...)
+    - median(...)
+    - variance(...)
+    - stddev(...)
+    - avg(...)                        alias for arithmetic_mean
+                                      Also available as Math functions
+                                      and Array methods.
+
+    - Date() / Date(timestamp) / Date(string)
+      Date(y,m,d) / Date(y,m,d,h,min,s) /
+      Date(other_date)                expanded Date constructors
+
+    - Date.from_ymd(...)
+    - Date.from_string(str,format)
+
+    - Date.days_until
+    - Date.is_same_day
+    - Date.is_between
+    - Date.end_of_month
+    - Date.is_future
+    - Date.is_past
+    - Date.is_today
+    - Date.age
+    - Date.quarter
+    - Date.is_leap_year
+    - Date.is_weekend
+    - Date.is_weekday
+    - Date.add_weeks
+
+    - Set.is_disjoint
+    - Set.powerset
+    - Set.is_proper_subset
+    - Set.is_proper_superset
+    - Set.sample(n)
+    - Set.pick
+
+    - Bag.scale(factor)
+    - Bag.to_h
+    - Bag.relative_frequencies
+    - Bag.mode
+    - Bag.variety
+
+    - Range.take_while {...}
+    - Range.zip(other)
+    - Range.group_by {...}
+    - Range.each_kv {...}
+    - Range.min_max
+    - Range.partition {...}
+
+    - Enumerator.drop_while {...}
+    - Enumerator.sum
+    - Enumerator.min
+    - Enumerator.max
+    - Enumerator.reduce(block,initial=nil)
+
+    - Lazy.zip(other)
+    - Lazy.uniq
+    - Lazy.take(n)
+    - Lazy.drop(n)
+
+    - Dir.files
+    - Dir.subdirs
+    - Dir.entries
+    - Dir.each {...}
+    - Dir.glob(pattern)
+    - Dir.size
+
+    - DirHandle.count
+    - DirHandle.map {...}
+    - DirHandle.grep {...}
+    - DirHandle.walk {...}
+
+    - File.backup
+    - File.is_newer_than
+    - File.is_older_than
+    - File.extension
+    - File.basename_without_ext
+    - File.lines
+    - File.each_line {...}
+
+    - FileHandle.peek_char
+    - FileHandle.copy now also accepts a path
+    - FileHandle.each_kv {...}
+    - FileHandle.flush
+
+    - Pipe.slurp
+    - Pipe.write_all(data)
+
+    - Sys.getenv
+    - Sys.setenv
+    - Sys.env
+
+    - Polynomial.is_monic
+    - Polynomial.compose(p,q)
+
+    - PolynomialMod.is_unit
+
+    - Quadratic.roots                  both roots [t,t']
+    - Quadratic.discriminant
+    - Quadratic.is_real_embedding
+
+    - Fraction.mediant(other)
+    - Fraction.reduce
+
+    - Matrix.is_upper_triangular
+    - Matrix.is_lower_triangular
+    - Matrix.is_diagonal
+    - Matrix.is_identity
+    - Matrix.is_orthogonal
+    - Matrix.is_symmetric
+    - Matrix.rank
+    - Matrix.trace
+    - Matrix.each_row {...}
+    - Matrix.each_column {...}
+
+    - Vector.project(onto)
+    - Vector.reject(onto)
+    - Vector.normalize
+    - Vector.lerp(other,t)
+
+    - Object.is_a now accepts multiple classes
+    - Object.respond_to now accepts multiple method names
+    - Object.in(collection)
+    - Object.tap {...}
+    - Object.then {...}
+
+    - Block.constant(value)
+    - Block.retry(n)
+    - Block.curry(...)
+    - Block.negate
+    - Block.pipe(other)
+    - Block.once
+
+    - Regex.is_match(string)
+
+    - Match.pre_match
+    - Match.post_match
+
+    - LazyMethod.steps
+
+    - String.pad_left / String.pad_right
+    - String.delete_prefix / String.delete_suffix
+    - String.swapcase
+    - String.common_prefix
+    - String.common_suffix
+    - String.wrap
+
+    - Array.squeeze
+    - Array.squeeze_by
+    - Array.chunk_while
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - Polynomial.eval and PolyMod.eval now use Horner's method for faster polynomial evaluation.
+    - strict_partitions and multisets now construct objects only when a partition is complete, reducing unnecessary allocations.
+
+    [FIXES]
+
+    - Fixed PolyMod.normalize_to_monic for polynomials with non-native exponents.
+
+    [DOCUMENTATION]
+
+    - Added additional usage examples throughout Number.pod.
+    - Improved, corrected, and extended PolynomialMod.pod and Polynomial.pod.
+
 26.08 2026-08-07
 
     [BREAKING CHANGES]
