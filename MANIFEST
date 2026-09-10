@@ -1104,6 +1104,7 @@ scripts/Tests/sum_remainders.sf
 scripts/Tests/swap.sf
 scripts/Tests/sylvesters_sequence.sf
 scripts/Tests/symbolic_fractions.sf
+scripts/Tests/symbolic_math.sf
 scripts/Tests/symmetric_difference.sf
 scripts/Tests/sysopen_and_sysread.sf
 scripts/Tests/tennis_tournament.sf

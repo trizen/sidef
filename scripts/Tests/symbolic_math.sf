@@ -1,0 +1,690 @@
+#!/usr/bin/ruby
+
+# Daniel "Trizen" Șuteu
+# License: GPLv3
+# Date: 25 February 2017
+# https://github.com/trizen
+
+# Experimental implementation of symbolic mathematical identities.
+
+class Base()            {}
+class Power()    < Base {}
+class Rational() < Base {}
+class Sum()      < Base {}
+class Product()  < Base {}
+class Log()      < Base {}
+class Exp()      < Base {}
+class Symbol()   < Base {}
+
+class Base {
+    #const I = Exp(Rational(1, 2) * Log(-1))
+    has I = Power(-1, Rational(1, 2))
+
+    method sin {
+        Rational(Exp(I * self) - Exp(-I * self), (2*I))
+    }
+
+    method cos {
+        Rational(Exp(-I * self) + Exp(I * self), 2)
+    }
+
+    method i {
+        Product(I, self)
+    }
+}
+
+class Symbol(name) {
+    method +(Object o) {
+        Sum(self, o)
+    }
+
+    method -(Object o) {
+        Sum(self, o.neg)
+    }
+
+    method *(Object o) {
+        Product(self, o)
+    }
+
+    method /(Object o) {
+        Product(self, o.inv)
+    }
+
+    method **(Object o) {
+        Power(self, o)
+    }
+
+    method neg {
+        Product(-1, self)
+    }
+
+    method inv {
+        Rational(1, self)
+    }
+
+    method simplify {
+        self
+    }
+
+    method ==(Symbol o) {
+        name == o.name
+    }
+
+    method ==(_) {
+        false
+    }
+
+    method to_s {
+        "Symbol('#{name}')"
+    }
+}
+
+class Rational(num, den) {
+
+    method +(Number o) {
+        self + Rational(o, 1)
+    }
+
+    method +(Rational o) {
+        Rational(
+            num*o.den + o.num*den,
+            den*o.den
+        )
+    }
+
+    method +(Object o) {
+        Sum(self, o)
+    }
+
+    method -(Number o) {
+        self + o.neg
+    }
+
+    method -(Rational o) {
+        self + o.neg
+    }
+
+    method -(Object o) {
+        Sum(self, o.neg)
+    }
+
+    method *(Number o) {
+        Rational(num*o, den)
+    }
+
+    method *(Rational o) {
+        Rational(num*o.num, den*o.den)
+    }
+
+    method *(Object o) {
+        Product(self, o)
+    }
+
+    method /(Number o) {
+        Rational(
+            num,
+            den * o
+        )
+    }
+
+    method /(Rational o) {
+        Rational(
+            num * o.den,
+            den * o.num,
+        )
+    }
+
+    method /(Object o) {
+        Product(self, o.inv)
+    }
+
+    method **(Number o) {
+        if (o < 0) {
+            var a = o.abs
+            Rational(den**a, num**a)
+        }
+        else {
+            Rational(num**o, den**o)
+        }
+    }
+
+    method ==(Rational o) {
+        (o.num == num) &&
+        (o.den == den)
+    }
+
+    method ==(_) {
+        false
+    }
+
+    method inv {
+        Rational(den, num)
+    }
+
+    method neg {
+        Rational(num.neg, den)
+    }
+
+    method simplify {
+        Rational(num.simplify, den.simplify)
+    }
+
+    method numeric {
+        num.numeric / den.numeric
+    }
+
+    method to_s {
+        "Rational(#{num}, #{den})"
+    }
+}
+
+class Sum(*values) {
+    method -(Sum o) {
+        Sum(values..., o.values.map{.neg}...)
+    }
+
+    method -(Object o) {
+        var copy = [values...]
+        #~ if (copy.remove_first(o)) {
+            #~ Sum(copy...)
+        #~ }
+        #~ else {
+            Sum(copy..., o.neg)
+        #~ }
+    }
+
+    method +(Sum o) {
+        Sum(values..., o.values...)
+    }
+
+    method +(Object o) {
+        var copy = [values...]
+        #~ if (copy.remove_first(o.neg)) {
+            #~ Sum(copy...)
+        #~ }
+        #~ else {
+            Sum(copy..., o)
+        #~ }
+    }
+
+    #~ method *(Sum o) {
+        #~ var terms = []
+        #~ for i,j in (values ~X o.values) {
+            #~ terms << i*j
+        #~ }
+        #~ Sum(terms...)
+    #~ }
+
+    method *(Object o) {
+        Sum(values.map { _ * o }...)
+    }
+
+    method /(Object o) {
+        Sum(values.map { _ / o }...)
+    }
+
+    method simplify {
+        var simple = values.map { .simplify }
+        var types = simple.map{ .ref }.uniq
+        var arr = (
+            gather {
+                for type in types {
+                    take(simple.grep { .kind_of(type) }.reduce('+'))
+                }
+            }
+        )
+        arr.len == 1 ? arr[0] : arr.reduce('+')
+    }
+
+    method inv {
+        Rational(1, self)
+    }
+
+    method neg {
+        Sum(values.map{.neg}...)
+    }
+
+    method numeric {
+        values.map { .numeric }.sum
+    }
+
+    method to_s {
+        "Sum(#{values.join(', ')})"
+    }
+}
+
+class Product(*values) {
+    method *(Product o) {
+        Product(values..., o.values...)
+    }
+
+    method /(Product o) {
+        Product(values..., o.values.map{.inv}...)
+    }
+
+    method /(Object o) {
+        var copy = [values...]
+        #~ if (copy.remove_first(o)) {
+            #~ Product(copy...)
+        #~ }
+        #~ else {
+            Product(copy..., o.inv)
+        #~ }
+    }
+
+    method *(Object o) {
+        var copy = [values...]
+        #~ if (copy.remove_first(o.inv)) {
+            #~ Product(copy...)
+        #~ }
+        #~ else {
+            Product(copy..., o)
+        #~ }
+    }
+
+    method **(Object o) {
+        Product(values.map{ _ ** o }...)
+    }
+
+    method +(Object o) {
+        Sum(self, o)
+    }
+
+    method -(Object o) {
+        Sum(self, o.neg)
+    }
+
+    method neg {
+        if (values) {
+            Product(values[0].neg, values.slice(1)...)
+        }
+        else {
+            Product(-1)
+        }
+    }
+
+    method simplify {
+        var simple = values.map { .simplify }
+        var types = simple.map{ .ref }.uniq
+        var arr = (
+            gather {
+                for type in types {
+                    take(simple.grep { .kind_of(type) }.reduce('*'))
+                }
+            }
+        )
+        arr.len == 1 ? arr[0] : arr.reduce('*')
+    }
+
+    method inv {
+        Product(values.map { .inv }...)
+    }
+
+    method numeric {
+        values.map { .numeric }.prod
+    }
+
+    method to_s {
+        "Product(#{values.join(', ')})"
+    }
+}
+
+class Exp(v) {
+    method *(Exp o) {
+        Exp(v + o.v)
+    }
+
+    method *(Object o) {
+        Product(self, o)
+    }
+
+    method /(Exp o) {
+        Exp(v + o.v.neg)
+    }
+
+    method /(Object o) {
+        o.inv * self
+    }
+
+    method +(Object o) {
+        Sum(self, o)
+    }
+
+    method -(Object o) {
+        Sum(self, o.neg)
+    }
+
+    method **(Object o) {
+        Exp(v * o)
+    }
+
+    method simplify {
+        var simple = v.simplify
+        given() {
+            case (simple.kind_of(Log)) {
+                simple.v
+            }
+            case (simple.kind_of(Product) && (simple.values.len == 2)) {
+                var (a, b) = simple.values...
+                if (a.class == :Log) {
+                    Power(a.v, b)
+                }
+                elsif (b.class == :Log) {
+                    Power(b.v, a)
+                }
+                else {
+                    continue
+                }
+            }
+            default {
+                Exp(simple)
+            }
+        }
+    }
+
+    method neg {
+        Product(-1, self)
+    }
+
+    method numeric {
+        v.numeric.exp
+    }
+
+    method to_s {
+        "Exp(#{v})"
+    }
+}
+
+class Log(v) {
+    method *(Object o) {
+        #Rational(self, o.inv)
+        Product(self, o)
+        #Log(Power(v, o))
+        #o * self
+    }
+
+    method /(Object o) {
+        #Rational(self, o)
+        o.inv * self
+        #Product(self, o.inv)
+        #Log(Power(v, o.inv))
+    }
+
+    method +(Log o) {
+        Log(v * o.v)
+    }
+
+    method +(Object o) {
+        Sum(self, o)
+    }
+
+    method -(Log o) {
+        Log(v / o.v)
+    }
+
+    method -(Object o) {
+        Sum(self, o.neg)
+    }
+
+    method inv {
+        Rational(1, self)
+    }
+
+    method neg {
+        Product(-1, self)
+    }
+
+    method simplify {
+        var simple = v.simplify
+
+        if (simple.kind_of(Exp)) {
+            simple.v
+        }
+        else {
+            Log(simple)
+        }
+    }
+
+    method numeric {
+        v.numeric.log
+    }
+
+    method to_s {
+        "Log(#{v})"
+    }
+}
+
+class Power(v, n) {
+
+    method +(Object o) {
+        Sum(self, o)
+    }
+
+    method -(Object o) {
+        Sum(self, o.neg)
+    }
+
+    method **(Number o) {
+        Power(v, n * o)
+    }
+
+    method **(Rational o) {
+        Power(v, n * o)
+    }
+
+    method ==(Power o) {
+        (v == o.v) &&
+        (n == o.n)
+    }
+
+    method /(Power o) {
+        #~ if (o.v == v) {
+            #~ Power(v, n - o.n)
+        #~ }
+        #~ else {
+            Product(self, o.inv)
+        #~ }
+    }
+
+    method /(Object o) {
+        Product(self, o.inv)
+    }
+
+    method *(Power o) {
+        #~ if (o.v == v) {
+            #~ Power(v, n + o.n)
+        #~ }
+        #~ else {
+            Product(self, o)
+        #~ }
+    }
+
+    method *(Object o) {
+        Product(self, o)
+    }
+
+    method ==(_) {
+        false
+    }
+
+    method inv {
+        Power(v, n.neg)
+    }
+
+    method neg {
+        Product(-1, self)
+    }
+
+    method simplify {
+        Power(v.simplify, n.simplify)
+    }
+
+    method numeric {
+        v.numeric ** n.numeric
+    }
+
+    method to_s {
+        "Power(#{v}, #{n})"
+    }
+}
+
+class Number {
+
+    # Addition
+    method +(Product o) {
+        o + self
+    }
+
+    method +(Sum o) {
+        o + self
+    }
+
+    method +(Power o) {
+        o + self
+    }
+
+    method +(Log o) {
+        o + self
+    }
+
+    method +(Symbol o) {
+        o + self
+    }
+
+    method +(Rational o) {
+        o + self
+    }
+
+    method +(Exp o) {
+        o + self
+    }
+
+    # Subtraction
+    method -(Rational o) {
+        o.neg + self
+    }
+
+    method -(Product o) {
+        o.neg + self
+    }
+
+    method -(Symbol o) {
+        o.neg + self
+    }
+
+    method -(Sum o) {
+        o.neg + self
+    }
+
+    method -(Log o) {
+        o.neg + self
+    }
+
+    method -(Power o) {
+        o.neg + self
+    }
+
+    method -(Exp o) {
+        o.neg + self
+    }
+
+    # Multiplication
+    method *(Rational o) {
+        o * self
+    }
+
+    method *(Log o) {
+        o * self
+    }
+
+    method *(Product o) {
+        o * self
+    }
+
+    method *(Power o) {
+        o * self
+    }
+
+    method *(Symbol o) {
+        o * self
+    }
+
+    method *(Sum o) {
+        o * self
+    }
+
+    method *(Exp o) {
+        o * self
+    }
+
+    # Division
+    method /(Sum o) {
+        o.inv * self
+    }
+
+    method /(Product o) {
+        o.inv * self
+    }
+
+    method /(Rational o) {
+        o.inv * self
+    }
+
+    method /(Log o) {
+        o.inv * self
+    }
+
+    method /(Power o) {
+        o.inv * self
+    }
+
+    method /(Symbol o) {
+        o.inv * self
+    }
+
+    method /(Exp o) {
+        o.inv * self
+    }
+
+    method simplify {
+        self
+    }
+
+    method numeric {
+        self
+    }
+}
+
+if (__MAIN__ == __FILE__) {
+
+    var n = Power(5, Rational(1,2))
+    say n
+    say n**2
+    say n**3
+    say n**Rational(2, 1)
+
+    say Exp(Log(5) * 3).simplify
+    say Power(3, Log(Exp(Sum(3, 4)))).simplify
+
+    say Log(42)-Log(6)
+    say Product(3, 4, 5)*Rational(1, 3)
+    say Log(42)/Log(6)
+    say Log(Symbol(:x))
+    say Log(Symbol(:x))+Log(Symbol(:y))
+    say Rational(Symbol(:a), Symbol(:b))+Rational(Symbol(:c), Symbol(:d))
+
+    say "\n=> Summing..."
+
+    var sum = Rational(0, 1)
+
+    for n in (0..10) {
+        sum += Rational(1, n!)
+        #sum += Rational(Symbol(:x), n!)
+        #sum += Power(n!, Rational(1, 2)).inv
+        say sum
+    }
+
+    try {
+        say sum.numeric
+    }
+}
