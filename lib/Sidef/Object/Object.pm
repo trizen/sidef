@@ -290,9 +290,8 @@ sub respond_to {
 
 sub is_a {
     my ($self, @classes) = @_;
-    my $ref = ref($self) || $self;
     foreach my $class (@classes) {
-        UNIVERSAL::isa($ref, ref($class) ? ref($class) : "$class")
+        UNIVERSAL::isa($self, "$class")
           and return Sidef::Types::Bool::Bool::TRUE;
     }
     Sidef::Types::Bool::Bool::FALSE;
