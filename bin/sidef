@@ -24,6 +24,14 @@ binmode STDIN,  ":utf8";
 binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8" if $^P == 0;    # to work under Devel::* modules
 
+if ($^O eq "MSWin32") {
+    eval {
+        # Workaround for warning on Windows
+        require Term::ReadLine::readline;
+        *Term::ReadLine::readline::get_window_size = sub { (80, 24) };
+    };
+}
+
 use Sidef;
 
 my $name    = 'Sidef';
