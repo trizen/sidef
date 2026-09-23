@@ -3,12 +3,31 @@
 # Tests for the sum of squares function: r_k(n).
 # https://en.wikipedia.org/wiki/Sum_of_squares_function
 
-func r_3(n) {   # n must be squarefree
+func r_3_squarefree(n) {   # n must be squarefree
 
     return 0 if n.is_congruent(7, 8)
 
     return 24*hclassno(-n) if n.is_congruent(3, 8)
     return 12*hclassno(-4*n)
+}
+
+func r_3(n) {
+
+    # For n >= 1, write n = 4^k * m with gcd(m, 4) = 1:
+    #   if m == 7 (mod 8), a(n) = 0;
+    #   if m == 3 (mod 4), a(n) = 24*hclassno(m);
+    # otherwise,           a(n) = 12*hclassno(4*m)
+
+    return 1 if (n == 0)
+
+    var m = n.remdiv(4)
+
+    if (m % 8 == 7) {
+        return 0
+    }
+
+    return 24*hclassno(m) if m.is_congruent(3, 4)
+    return 12*hclassno(4*m)
 }
 
 func r(n, k=2) is cached {
@@ -59,7 +78,11 @@ for k in (0..20) {
 }
 
 1000.each_squarefree {|n|
-    assert_eq(squares_r(n,3), r_3(n))
+    assert_eq(n.squares_r(3), r_3_squarefree(n))
+}
+
+1000.of {|n|
+    assert_eq(n.squares_r(3), r_3(n))
 }
 
 assert_eq(

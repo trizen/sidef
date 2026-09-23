@@ -22286,42 +22286,21 @@ sub _sos_k2 {    # OEIS: A004018
 sub _sos_k3 {    # OEIS: A005875
     my ($n, $t, $v) = @_;
 
+    # For n >= 1, write n = 4^k * m with gcd(m, 4) = 1:
+    #   if m == 7 (mod 8), a(n) = 0;
+    #   if m == 3 (mod 4), a(n) = 24*hclassno(m);
+    # otherwise,           a(n) = 12*hclassno(4*m)
+
     ((($v & 1) == 1) || !Math::GMPz::Rmpz_congruent_ui_p($t, 7, 8)) || return 0;
 
-    if (_is_squarefree($n)) {
-        if (HAS_PRIME_UTIL and Math::GMPz::Rmpz_fits_ulong_p($n)) {
-            my $count = 0;
-            if (Math::GMPz::Rmpz_congruent_ui_p($n, 3, 8)) {
-                $count = eval { Math::Prime::Util::GMP::mulint(Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($n)), 2); };
-            }
-            else {
-                my $tmp_n = $n << 2;
-                $count =
-                  Math::GMPz::Rmpz_fits_ulong_p($tmp_n)
-                  ? eval { Math::Prime::Util::hclassno(Math::GMPz::Rmpz_get_ui($tmp_n)) }
-                  : undef;
-            }
-            return Math::GMPz::Rmpz_init_set_str("$count", 10) if defined($count);
-        }
-
-        my $h;
-        my $count = Math::GMPz::Rmpz_init();
-        if (Math::GMPz::Rmpz_congruent_ui_p($n, 3, 8)) {
-            $h = ${(bless \$n)->hclassno->mul(_set_int(24))};
-        }
-        else {
-            $h = ${(bless \$n)->mul(_set_int(4))->hclassno->mul(_set_int(12))};
-        }
-
-        $h = _any2mpz($h) if !ref($h);
-        (ref($h) eq 'Math::GMPq')
-          ? Math::GMPz::Rmpz_set_q($count, $h)
-          : Math::GMPz::Rmpz_set($count, $h);
-
-        return $count;
+    if (Math::GMPz::Rmpz_congruent_ui_p($n, 3, 4)) {
+        my $t = (bless \$n)->hclassno;
+        state $twenty_four = _set_int(24);
+        return _any2mpz(${$t->mul($twenty_four)->int});
     }
 
-    return undef;
+    state $twelve = _set_int(12);
+    _any2mpz(${(bless \$n)->mul(FOUR)->hclassno->mul($twelve)->int});
 }
 
 sub _sos_k4 {    # OEIS: A000118
@@ -22761,7 +22740,8 @@ sub _compute_sos_count {
     # r_3(4*n) = r_3(n)
     if ($k == 3 and Math::GMPz::Rmpz_divisible_2exp_p($n, 2)) {
         $n = Math::GMPz::Rmpz_init_set($n);    # copy
-        Math::GMPz::Rmpz_div_2exp($n, $n, 2);
+        state $four = Math::GMPz::Rmpz_init_set_ui_nobless(4);
+        Math::GMPz::Rmpz_remove($n, $n, $four);
     }
 
     # Dispatch to optimized hardcoded formulas for known k
@@ -22844,7 +22824,7 @@ sub sum_of_squares_count {
 
     # 2. Delegate to the recursive computation engine
     my $result_val = _compute_sos_count($n, $k);
-    return _set_int($result_val);
+    bless \$result_val;
 }
 
 *squares_r = \&sum_of_squares_count;
