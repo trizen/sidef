@@ -22732,7 +22732,7 @@ sub _sos_k7 {
     my $n_obj = bless \$n;
     my $core  = $n_obj->core;
 
-    if ($core->gt($n_obj->isqrt)) {
+    if ($core->gt($n_obj->icbrt->sqr)) {
         return undef;
     }
 
