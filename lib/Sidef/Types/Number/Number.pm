@@ -22134,7 +22134,11 @@ sub ellcard {
 *elliptic_curve_cardinality = \&ellcard;
 
 sub hclassno {
-    my ($n) = @_;
+    my ($n, $k) = @_;
+
+    if (defined($k)) {
+        return $n->cohen_h($k);
+    }
 
     # Algorithm from Math::Prime::Util::PP
 
@@ -22263,6 +22267,342 @@ sub hclassno {
 
     return bless \$h;
 }
+
+*H = \&hclassno;
+
+#
+## Cohen's class number function H(r, N)
+#
+# H(r, 0) = zeta(1 - 2r) / 2
+# H(r, N) = 0                          when (-1)^r * N == 2, 3 (mod 4)
+# H(r, N) = L(1-r, chi_D) * Sum_{d|f} mu(d) * chi_D(d) * d^(r-1) * sigma_{2r-1}(f/d)
+#
+# where (-1)^r * N = D * f^2, with D a fundamental discriminant.
+# For r = 1, H(1, N) is the Hurwitz class number.
+#
+
+# Bernoulli number B_n as a Math::GMPq object, with B_1 = -1/2.
+# NOTE: the returned object may be cached/shared, so it must not be modified.
+sub _cohen_h_bernoulli {
+    my ($n) = @_;
+    _any2mpq(${(bless \$n)->bernfrac});
+}
+
+# q = q / k, for a positive native integer k
+sub _cohen_h_qdiv_ui {
+    my ($q, $k) = @_;
+
+    my $d = Math::GMPq::Rmpq_init();
+    Math::GMPq::Rmpq_set_ui($d, 1, $k);
+    Math::GMPq::Rmpq_mul($q, $q, $d);
+
+    return $q;
+}
+
+# sigma(n) for a positive Math::GMPz object (returns a native integer or a Math::GMPz object)
+sub _cohen_h_sigma1 {
+    my ($z) = @_;
+    my $n = Math::GMPz::Rmpz_fits_ulong_p($z) ? Math::GMPz::Rmpz_get_ui($z) : $z;
+    ${(bless \$n)->sigma};
+}
+
+# L(-1, chi_D) for a fundamental discriminant D > 1, in O(sqrt(D)) steps (Siegel's formula):
+#   L(-1, chi_D) = -(1/5) * Sum_{x^2 < D, x == D (mod 2)} sigma((D - x^2) / 4)
+sub _cohen_h_L2 {
+    my ($D) = @_;
+
+    my $limit = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_sub_ui($limit, $D, 1);
+    Math::GMPz::Rmpz_sqrt($limit, $limit);
+    Math::GMPz::Rmpz_fits_ulong_p($limit) || die "Too large value!";
+    $limit = Math::GMPz::Rmpz_get_ui($limit);
+
+    my $total = Math::GMPz::Rmpz_init_set_ui(0);
+    my $t     = Math::GMPz::Rmpz_init();
+
+    my $x = 1;
+
+    if (Math::GMPz::Rmpz_even_p($D)) {    # x = 0 is counted only once
+        Math::GMPz::Rmpz_div_2exp($t, $D, 2);
+        my $s = _cohen_h_sigma1($t);
+        ref($s) ? Math::GMPz::Rmpz_add($total, $total, $s) : Math::GMPz::Rmpz_add_ui($total, $total, $s);
+        $x = 2;
+    }
+
+    for (; $x <= $limit ; $x += 2) {      # +x and -x are counted twice
+
+        Math::GMPz::Rmpz_set_ui($t, $x);
+        Math::GMPz::Rmpz_mul($t, $t, $t);
+        Math::GMPz::Rmpz_sub($t, $D, $t);
+        Math::GMPz::Rmpz_div_2exp($t, $t, 2);
+
+        my $s = _cohen_h_sigma1($t);
+
+        if (ref($s)) {
+            Math::GMPz::Rmpz_addmul_ui($total, $s, 2);
+        }
+        else {
+            Math::GMPz::Rmpz_add_ui($total, $total, $s);
+            Math::GMPz::Rmpz_add_ui($total, $total, $s);
+        }
+    }
+
+    my $q = Math::GMPq::Rmpq_init();
+    Math::GMPq::Rmpq_set_z($q, $total);
+    Math::GMPq::Rmpq_neg($q, $q);
+    return _cohen_h_qdiv_ui($q, 5);
+}
+
+# L(1-r, chi_D) for a fundamental discriminant D with (-1)^r * D > 0, in O(|D|) steps.
+# Uses the Bernoulli polynomial expansion of the generalized Bernoulli number B_{r,chi}.
+sub _cohen_h_L_general {
+    my ($r, $D) = @_;
+
+    # The loop below is O(|D|), so D must fit in a native integer anyway.
+    Math::GMPz::Rmpz_fits_slong_p($D) || die "[ERROR] Number.cohen_h(): |D| is too large for the general algorithm\n";
+
+    my $Dn   = Math::GMPz::Rmpz_get_si($D);
+    my $absD = CORE::abs($Dn);
+    my $M    = $absD >> 1;
+
+    # Power-character sums: S[m] = Sum_{k=1..M} kronecker(D, k) * k^m
+    my @S    = map { Math::GMPz::Rmpz_init_set_ui(0) } 0 .. $r;
+    my $term = Math::GMPz::Rmpz_init();
+
+    foreach my $k (1 .. $M) {
+
+        my $c = (
+                 HAS_PRIME_UTIL
+                 ? Math::Prime::Util::kronecker($Dn, $k)
+                 : Math::Prime::Util::GMP::kronecker($Dn, $k)
+                )
+          || next;
+
+        Math::GMPz::Rmpz_set_si($term, $c);
+
+        foreach my $m (0 .. $r) {
+            Math::GMPz::Rmpz_add($S[$m], $S[$m], $term);
+            Math::GMPz::Rmpz_mul_ui($term, $term, $k);
+        }
+    }
+
+    my $absD_z = Math::GMPz::Rmpz_init_set_ui($absD);
+
+    my $total = Math::GMPq::Rmpq_init();
+    my $coeff = Math::GMPq::Rmpq_init();
+    my $D_pow = Math::GMPq::Rmpq_init();    # |D|^(j-1)
+    my $bin   = Math::GMPz::Rmpz_init();
+
+    Math::GMPq::Rmpq_set_ui($total, 0, 1);
+    Math::GMPq::Rmpq_set_ui($D_pow, 1, $absD);
+    Math::GMPq::Rmpq_set_ui($coeff, 0, 1);
+
+    foreach my $j (0 .. $r) {
+
+        my $Bj = _cohen_h_bernoulli($j);
+
+        if (Math::GMPq::Rmpq_sgn($Bj)) {
+            Math::GMPz::Rmpz_bin_uiui($bin, $r, $j);
+            Math::GMPq::Rmpq_mul_z($coeff, $D_pow, $bin);
+            Math::GMPq::Rmpq_mul($coeff, $coeff, $Bj);
+            Math::GMPq::Rmpq_mul_z($coeff, $coeff, $S[$r - $j]);
+            Math::GMPq::Rmpq_add($total, $total, $coeff);
+        }
+
+        Math::GMPq::Rmpq_mul_z($D_pow, $D_pow, $absD_z);
+    }
+
+    # Multiplied by 2 due to the Bernoulli polynomial symmetry:
+    #   chi_D(|D|-a) * B_r(1 - a/|D|) = chi_D(a) * B_r(a/|D|)
+    Math::GMPq::Rmpq_add($total, $total, $total);
+    Math::GMPq::Rmpq_neg($total, $total);
+    return _cohen_h_qdiv_ui($total, $r);
+}
+
+# L(1-r, chi_D) for a fundamental discriminant D with (-1)^r * D > 0
+sub _cohen_h_L_neg {
+    my ($r, $D) = @_;
+
+    # D = 1: L(1-r, chi_1) = zeta(1-r) = -B_r / r
+    if (Math::GMPz::Rmpz_cmp_ui($D, 1) == 0) {
+
+        my $q = Math::GMPq::Rmpq_init();
+
+        if ($r == 1) {
+            Math::GMPq::Rmpq_set_si($q, -1, 2);    # zeta(0) = -1/2
+            return $q;
+        }
+
+        Math::GMPq::Rmpq_neg($q, _cohen_h_bernoulli($r));
+        return _cohen_h_qdiv_ui($q, $r);
+    }
+
+    # r = 2 and D > 1: Siegel's formula
+    if ($r == 2 and Math::GMPz::Rmpz_sgn($D) > 0) {
+        return _cohen_h_L2($D);
+    }
+
+    _cohen_h_L_general($r, $D);
+}
+
+# Conductor divisor sum (multiplicative in the prime powers of the conductor f):
+#   Sum_{d|f} mu(d) * chi_D(d) * d^(r-1) * sigma_{2r-1}(f/d)
+#     = Product_{p^e || f} (sigma_{2r-1}(p^e) - chi_D(p) * p^(r-1) * sigma_{2r-1}(p^(e-1)))
+#
+# The conductor is given as an array-ref of [p, e] pairs.
+sub _cohen_h_conductor_sum {
+    my ($r, $D, $fexp) = @_;
+
+    my $res = Math::GMPz::Rmpz_init_set_ui(1);
+    my $k   = 2 * $r - 1;
+
+    my ($pz, $pk, $pke, $cur, $prev, $t) = map { Math::GMPz::Rmpz_init() } 1 .. 6;
+
+    foreach my $pair (@$fexp) {
+        my ($p, $e) = @$pair;
+
+        (FAST_MODE and $p < ULONG_MAX)
+          ? Math::GMPz::Rmpz_set_ui($pz, $p)
+          : Math::GMPz::Rmpz_set_str($pz, "$p", 10);
+
+        my $chi = Math::GMPz::Rmpz_kronecker($D, $pz);
+
+        Math::GMPz::Rmpz_pow_ui($pk,  $pz, $k);    # p^k
+        Math::GMPz::Rmpz_pow_ui($pke, $pk, $e);    # p^(k*e)
+        Math::GMPz::Rmpz_sub_ui($t, $pk, 1);       # p^k - 1
+
+        Math::GMPz::Rmpz_sub_ui($prev, $pke, 1);
+        Math::GMPz::Rmpz_divexact($prev, $prev, $t);    # sigma_k(p^(e-1))
+
+        Math::GMPz::Rmpz_mul($cur, $pke, $pk);
+        Math::GMPz::Rmpz_sub_ui($cur, $cur, 1);
+        Math::GMPz::Rmpz_divexact($cur, $cur, $t);      # sigma_k(p^e)
+
+        if ($chi) {
+            Math::GMPz::Rmpz_pow_ui($t, $pz, $r - 1);
+            Math::GMPz::Rmpz_mul($t, $t, $prev);
+            ($chi > 0)
+              ? Math::GMPz::Rmpz_sub($cur, $cur, $t)
+              : Math::GMPz::Rmpz_add($cur, $cur, $t);
+        }
+
+        Math::GMPz::Rmpz_mul($res, $res, $cur);
+    }
+
+    return $res;
+}
+
+# Math::GMPq --> Sidef Number (an integer, whenever possible)
+sub _cohen_h_result {
+    my ($q) = @_;
+
+    if (Math::GMPq::Rmpq_integer_p($q)) {
+        $q = _mpq2mpz($q);
+        $q = Math::GMPz::Rmpz_get_si($q) if Math::GMPz::Rmpz_fits_slong_p($q);
+    }
+
+    bless \$q;
+}
+
+# Core computation of H(r, N), for a native integer r >= 1 and a Math::GMPz object N >= 0
+sub _cohen_h_core {
+    my ($r, $N) = @_;
+
+    # H(r, 0) = zeta(1 - 2r) / 2 = -B_{2r} / (4r)
+    if (Math::GMPz::Rmpz_sgn($N) == 0) {
+        my $q = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_neg($q, _cohen_h_bernoulli(2 * $r));
+        Math::GMPq::Rmpq_div_2exp($q, $q, 2);
+        return _cohen_h_result(_cohen_h_qdiv_ui($q, $r));
+    }
+
+    # (-1)^r * N must be congruent to 0 or 1 (mod 4)
+    my $N_mod4 = Math::GMPz::Rmpz_fdiv_ui($N, 4);
+    my $rem    = ($r & 1) ? ((4 - $N_mod4) & 3) : $N_mod4;
+
+    $rem <= 1 or return ZERO;
+
+    # Factor N = D0 * f0^2, where D0 is squarefree.
+    # The prime factorization of the conductor f0 is stored in @fexp.
+    my $D0 = Math::GMPz::Rmpz_init_set_ui(1);
+    my $pz = Math::GMPz::Rmpz_init();
+
+    my @fexp;
+    foreach my $pe (_factor_exp($N)) {
+        my ($p, $e) = @$pe;
+
+        if ($e & 1) {
+            (FAST_MODE and $p < ULONG_MAX)
+              ? Math::GMPz::Rmpz_mul_ui($D0, $D0, $p)
+              : do {
+                Math::GMPz::Rmpz_set_str($pz, "$p", 10);
+                Math::GMPz::Rmpz_mul($D0, $D0, $pz);
+              };
+        }
+
+        if ($e > 1) {
+            push @fexp, [$p, $e >> 1];
+        }
+    }
+
+    # D = (-1)^r * D0 if that is a fundamental discriminant (D == 1 mod 4),
+    # otherwise D = 4 * (-1)^r * D0, with the conductor f = f0 / 2.
+    my $negative = ($r & 1);
+    my $D0_mod4  = Math::GMPz::Rmpz_fdiv_ui($D0, 4);
+    my $D_mod4   = $negative ? ((4 - $D0_mod4) & 3) : $D0_mod4;
+
+    my $D = Math::GMPz::Rmpz_init_set($D0);
+
+    if ($D_mod4 != 1) {
+        Math::GMPz::Rmpz_mul_2exp($D, $D, 2);
+
+        # f0 is always even here (otherwise (-1)^r * N would be 2 or 3 mod 4)
+        foreach my $pair (@fexp) {
+            if ($pair->[0] == 2) {
+                --$pair->[1];
+                last;
+            }
+        }
+
+        @fexp = grep { $_->[1] > 0 } @fexp;
+    }
+
+    Math::GMPz::Rmpz_neg($D, $D) if $negative;
+
+    my $L = _cohen_h_L_neg($r, $D);
+    my $S = _cohen_h_conductor_sum($r, $D, \@fexp);
+
+    my $q = Math::GMPq::Rmpq_init();
+    Math::GMPq::Rmpq_mul_z($q, $L, $S);
+
+    _cohen_h_result($q);
+}
+
+sub cohen_h {
+    my ($r, $N) = @_;
+
+    ref($N) eq __PACKAGE__ or _valid(\$N);
+
+    __is_int__($$r) or goto &nan;
+    __is_int__($$N) or goto &nan;
+
+    my $n_obj = $N;
+
+    $r = _any2ui($$r)  // goto &nan;
+    $N = _any2mpz($$N) // goto &nan;
+
+    $r >= 1                       or goto &nan;
+    Math::GMPz::Rmpz_sgn($N) >= 0 or goto &nan;
+
+    # H(1, N) is the Hurwitz class number
+    if ($r == 1) {
+        return $n_obj->hclassno;
+    }
+
+    _cohen_h_core($r, $N);
+}
+
+*CohenH = \&cohen_h;
 
 sub _sos_k2 {    # OEIS: A004018
     my ($n, $t, $v) = @_;
