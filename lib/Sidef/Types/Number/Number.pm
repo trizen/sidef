@@ -22295,7 +22295,6 @@ sub _cohen_h_qdiv_ui {
     my $d = Math::GMPq::Rmpq_init();
     Math::GMPq::Rmpq_set_ui($d, 1, $k);
     Math::GMPq::Rmpq_mul($q, $q, $d);
-
     return $q;
 }
 
@@ -22634,9 +22633,8 @@ sub _sos_k3 {    # OEIS: A005875
     ((($v & 1) == 1) || !Math::GMPz::Rmpz_congruent_ui_p($t, 7, 8)) || return 0;
 
     if (Math::GMPz::Rmpz_congruent_ui_p($n, 3, 4)) {
-        my $t = (bless \$n)->hclassno;
         state $twenty_four = _set_int(24);
-        return _any2mpz(${$t->mul($twenty_four)->int});
+        return _any2mpz(${(bless \$n)->hclassno->mul($twenty_four)->int});
     }
 
     state $twelve = _set_int(12);
@@ -22647,6 +22645,19 @@ sub _sos_k4 {    # OEIS: A000118
     my ($n, $t, $v) = @_;
     my $count = Math::Prime::Util::GMP::mulint(Math::Prime::Util::GMP::sigma(($v >= 1) ? ($t << 1) : $t), 8);
     return Math::GMPz::Rmpz_init_set_str($count, 10);
+}
+
+sub _sos_k5 {
+    my ($n, $t, $v) = @_;
+
+    # r_5(n) = -40*CohenH(2, 4*n) + 160*CohenH(2, n)
+
+    my $n_obj = bless \$n;
+
+    state $c1 = _set_int(-40);
+    state $c2 = _set_int(160);
+
+    ${(TWO)->cohen_h($n_obj->mul(FOUR))->mul($c1)->add((TWO)->cohen_h($n_obj)->mul($c2))};
 }
 
 sub _sos_k6 {    # OEIS: A000141
@@ -22711,6 +22722,24 @@ sub _sos_k6 {    # OEIS: A000141
     Math::GMPz::Rmpz_sub($prod1, $prod1, $prod2);
 
     return $prod1;
+}
+
+sub _sos_k7 {
+    my ($n, $t, $v) = @_;
+
+    # r_7(n) = -28*CohenH(3, 4*n) - 224*CohenH(3, n)
+
+    my $n_obj = bless \$n;
+    my $core  = $n_obj->core;
+
+    if ($core->gt($n_obj->isqrt)) {
+        return undef;
+    }
+
+    state $c1 = _set_int(-28);
+    state $c2 = _set_int(224);
+
+    ${(THREE)->cohen_h($n_obj->mul(FOUR))->mul($c1)->sub((THREE)->cohen_h($n_obj)->mul($c2))};
 }
 
 sub _sos_k8 {    # OEIS: A000143
@@ -23089,7 +23118,9 @@ sub _compute_sos_count {
                               2  => \&_sos_k2,
                               3  => \&_sos_k3,
                               4  => \&_sos_k4,
+                              5  => \&_sos_k5,
                               6  => \&_sos_k6,
+                              7  => \&_sos_k7,
                               8  => \&_sos_k8,
                               10 => \&_sos_k10,
                               12 => \&_sos_k12,

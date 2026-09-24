@@ -2676,7 +2676,7 @@ Aliases: I<Γ>
 
 =cut
 
-=head2 harm
+=head2 harmonic
 
     harmonic(n)
     harmonic(n, k)
@@ -2689,7 +2689,7 @@ When an additional argument is given, it returns the n-th Harmonic number of the
 
     say harmonic(10, 2).as_rat   # 55991/2520
 
-Aliases: I<harmfrac>, I<harmonic>, I<harmonic_number>
+Aliases: I<harm>, I<harmfrac>, I<harmonic_number>
 
 =cut
 
@@ -2711,12 +2711,37 @@ When an additional argument is given, it returns the n-th Harmonic number of the
 =head2 hclassno
 
     hclassno(n)
+    hclassno(r, n)
 
 Returns the Hurwitz-Kronecker class number.
 
     say 30.of { .hclassno.nu }      # OEIS: A058305
     say 30.of { .hclassno.de }      # OEIS: A058306
     say 30.of { 12 * .hclassno }    # OEIS: A259825
+
+When an additional argument is provided, it computes the generalized C<CohenH(r,n)> function.
+
+Aliases: I<H>
+
+=cut
+
+=head2 cohen_h
+
+    cohen_h(r, n)
+
+Returns Cohen's class number C<H(r,n)> for weight index C<r ≥ 1> and non-negative integer C<n>.
+
+For C<r = 1>, it evaluates to the Hurwitz class number.
+
+Definition:
+
+    H(r, 0) = zeta(1 - 2r) / 2 = -B_{2r} / (4r)
+    H(r, n) = 0   when (-1)^r * n ≡ 2, 3 (mod 4)
+    H(r, n) = L(1-r, χ_D) * ∑_{d|f} μ(d) * χ_D(d) * d^(r-1) * σ_{2r-1}(f/d)
+
+where C<(-1)^r * n = D * f²>, with C<D> being a fundamental discriminant and C<f> the conductor.
+
+Aliases: I<CohenH>
 
 =cut
 
