@@ -22273,7 +22273,7 @@ sub hclassno {
 #
 ## Cohen's class number function H(r, N)
 #
-# H(r, 0) = zeta(1 - 2r) / 2
+# H(r, 0) = zeta(1 - 2r)
 # H(r, N) = 0                          when (-1)^r * N == 2, 3 (mod 4)
 # H(r, N) = L(1-r, chi_D) * Sum_{d|f} mu(d) * chi_D(d) * d^(r-1) * sigma_{2r-1}(f/d)
 #
@@ -22354,6 +22354,11 @@ sub _cohen_h_L2 {
 
 # L(1-r, chi_D) for a fundamental discriminant D with (-1)^r * D > 0, in O(|D|) steps.
 # Uses the Bernoulli polynomial expansion of the generalized Bernoulli number B_{r,chi}.
+#
+# Only k = 1..|D|/2 is summed and the result doubled: this is valid
+# because the caller guarantees sign(D) == (-1)^r, so the Bernoulli polynomial
+# symmetry chi_D(|D|-a) * B_r(1 - a/|D|) = chi_D(a) * B_r(a/|D|) applies, making
+# the terms for k and |D|-k equal (the k = |D|/2 term itself has chi_D = 0).
 sub _cohen_h_L_general {
     my ($r, $D) = @_;
 
@@ -22394,7 +22399,6 @@ sub _cohen_h_L_general {
 
     Math::GMPq::Rmpq_set_ui($total, 0, 1);
     Math::GMPq::Rmpq_set_ui($D_pow, 1, $absD);
-    Math::GMPq::Rmpq_set_ui($coeff, 0, 1);
 
     foreach my $j (0 .. $r) {
 
@@ -22411,9 +22415,9 @@ sub _cohen_h_L_general {
         Math::GMPq::Rmpq_mul_z($D_pow, $D_pow, $absD_z);
     }
 
-    # Multiplied by 2 due to the Bernoulli polynomial symmetry:
-    #   chi_D(|D|-a) * B_r(1 - a/|D|) = chi_D(a) * B_r(a/|D|)
+    # Multiplied by 2 due to the Bernoulli polynomial symmetry
     Math::GMPq::Rmpq_add($total, $total, $total);
+
     Math::GMPq::Rmpq_neg($total, $total);
     return _cohen_h_qdiv_ui($total, $r);
 }
@@ -22507,12 +22511,11 @@ sub _cohen_h_result {
 sub _cohen_h_core {
     my ($r, $N) = @_;
 
-    # H(r, 0) = zeta(1 - 2r) / 2 = -B_{2r} / (4r)
+    # H(r, 0) = zeta(1 - 2r) = -B_{2r} / (2r)
     if (Math::GMPz::Rmpz_sgn($N) == 0) {
         my $q = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_neg($q, _cohen_h_bernoulli(2 * $r));
-        Math::GMPq::Rmpq_div_2exp($q, $q, 2);
-        return _cohen_h_result(_cohen_h_qdiv_ui($q, $r));
+        return _cohen_h_result(_cohen_h_qdiv_ui($q, 2 * $r));
     }
 
     # (-1)^r * N must be congruent to 0 or 1 (mod 4)
@@ -22523,7 +22526,7 @@ sub _cohen_h_core {
 
     # Factor N = D0 * f0^2, where D0 is squarefree.
     # The prime factorization of the conductor f0 is stored in @fexp.
-    my $D0 = Math::GMPz::Rmpz_init_set_ui(1);
+    my $D  = Math::GMPz::Rmpz_init_set_ui(1);
     my $pz = Math::GMPz::Rmpz_init();
 
     my @fexp;
@@ -22532,10 +22535,10 @@ sub _cohen_h_core {
 
         if ($e & 1) {
             (FAST_MODE and $p < ULONG_MAX)
-              ? Math::GMPz::Rmpz_mul_ui($D0, $D0, $p)
+              ? Math::GMPz::Rmpz_mul_ui($D, $D, $p)
               : do {
                 Math::GMPz::Rmpz_set_str($pz, "$p", 10);
-                Math::GMPz::Rmpz_mul($D0, $D0, $pz);
+                Math::GMPz::Rmpz_mul($D, $D, $pz);
               };
         }
 
@@ -22547,10 +22550,8 @@ sub _cohen_h_core {
     # D = (-1)^r * D0 if that is a fundamental discriminant (D == 1 mod 4),
     # otherwise D = 4 * (-1)^r * D0, with the conductor f = f0 / 2.
     my $negative = ($r & 1);
-    my $D0_mod4  = Math::GMPz::Rmpz_fdiv_ui($D0, 4);
-    my $D_mod4   = $negative ? ((4 - $D0_mod4) & 3) : $D0_mod4;
-
-    my $D = Math::GMPz::Rmpz_init_set($D0);
+    my $D_mod4   = Math::GMPz::Rmpz_fdiv_ui($D, 4);
+    $D_mod4 = ((4 - $D_mod4) & 3) if $negative;
 
     if ($D_mod4 != 1) {
         Math::GMPz::Rmpz_mul_2exp($D, $D, 2);
