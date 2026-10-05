@@ -1199,6 +1199,7 @@ utils/Examples/sidef_in_perl.pl
 utils/Examples/sidef_parsing.pl
 utils/Experiments/C-inline-function-call.pl
 utils/Experiments/operator_precendece.pl
+utils/Experiments/Parser-with-operator-precedence.pm
 utils/Experiments/regexp_grammars_op_precedence.pl
 utils/Experiments/regexp_grammars_parser.pl
 utils/find_class_typos.pl
