@@ -29,9 +29,9 @@ for m in (2..53 -> lazy.grep{.is_prime}) {
     var q
     { |k|
         q = (2*k*m + 1)
-        q%8 ~~ [1,7] || q.is_prime || next
-        q*q > x || (f = mtest(m, q)) && break
-    } << 1..Inf
+        q%8 ~~ [1,7] or q.is_prime or next
+        q*q > x or (f = mtest(m, q)) -> && break
+    } << (1..Inf)
     results << (f ? "#{m}:#{q}" :  "#{m}:p")
 }
 

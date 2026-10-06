@@ -9,6 +9,129 @@ use Scalar::Util qw(refaddr);
 
 # our $REGMARK;
 
+# ---------------------------------------------------------------------------
+# Operator precedence
+#
+# The precedence of the binary operators is similar to the one from Ruby.
+# The operators are listed from the highest to the lowest precedence:
+#
+#   terms, .method, [...], {...}, (...)                      postfix:   n!  x++  list...
+#   !  ~  \  unary+  *  √  ^  @  @|  (prefix operators)      PREC_OPERAND
+#   **                                                       PREC_POW         (right)
+#   unary -                                                  (its argument is parsed at PREC_POW)
+#   *  /  //  %  %%  ÷  ...                                  PREC_MUL  (`//` is the integer division)
+#   +  -                                                     PREC_ADD
+#   <<  >>                                                   PREC_SHIFT
+#   ..  ^..  ..^                                             PREC_RANGE
+#   a `method` b,  |>  |>>  |X>  |Z>,  »op»  ~Zop  ~Xop ...  PREC_WORD_OP    (chained from left to right)
+#   &                                                        PREC_BITAND
+#   |  ^                                                     PREC_BITOR
+#   <  <=  >  >=  ∈ ...                                      PREC_RELATIONAL
+#   ==  !=  <=>  ~~  =~  !~ ...                              PREC_EQUALITY
+#   &&                                                       PREC_ANDAND
+#   ||  \\  (defined-or)                                      PREC_OROR
+#   :  ：  ⫶  (pair constructors)                            PREC_PAIR
+#   ?:                                                       PREC_TERNARY     (right)
+#   =                                                        PREC_ASSIGN      (right)
+#   +=  -=  *=  :=  ||=  etc.                                PREC_ASSIGN      (left: `x += 1 *= 2` is `(x += 1) *= 2`)
+#   and                                                      PREC_AND
+#   or                                                       PREC_OR
+#   if  while  (statement modifiers)                         PREC_STMT
+#   expr -> method                                           PREC_ARROW       (applies on the whole expression from its left)
+#
+# Some examples:
+#
+#   2 + 3 * 4            is  2 + (3 * 4)
+#   -2 ** 2              is  -(2 ** 2)
+#   x & 1 == 0           is  (x & 1) == 0
+#   1..n+1               is  1..(n+1)
+#   x ~~ 1..5            is  x ~~ (1..5)
+#   1..9 `by` 2          is  (1..9) `by` 2
+#   a.len `add` 2 == 3   is  (a.len `add` 2) == 3
+#   var x = "a":1        is  var x = ("a":1)
+#   a || b ? c : d       is  (a || b) ? c : d
+#   a = b ? c : d        is  a = (b ? c : d)
+#   a and b or c         is  (a and b) or c
+#
+# Unlike Ruby, `and` binds tighter than `or`, as in all the other languages.
+# ---------------------------------------------------------------------------
+
+use constant {
+              PREC_ARROW      => 5,
+              PREC_STMT       => 10,
+              PREC_OR         => 20,
+              PREC_AND        => 30,
+              PREC_NOT        => 35,
+              PREC_ASSIGN     => 50,
+              PREC_TERNARY    => 60,
+              PREC_PAIR       => 65,
+              PREC_OROR       => 80,
+              PREC_ANDAND     => 90,
+              PREC_EQUALITY   => 100,
+              PREC_RELATIONAL => 110,
+              PREC_BITOR      => 120,
+              PREC_BITAND     => 130,
+              PREC_WORD_OP    => 140,
+              PREC_RANGE      => 150,
+              PREC_SHIFT      => 160,
+              PREC_ADD        => 170,
+              PREC_MUL        => 180,
+              PREC_POW        => 200,
+              PREC_OPERAND    => 100_000,    # parse only an operand (no infix operators)
+             };
+
+# Precedence and associativity (L = left, R = right) of the infix operators.
+my %INFIX_PREC;
+
+{
+    my @table = (
+                 [PREC_POW,        'R', '**'],
+                 [PREC_MUL,        'L', '*',  '/',   '//', '%', '%%', '÷', '×', '⋅', '∙', '∘', '∩', '⊗', '∣', '∤'],
+                 [PREC_ADD,        'L', '+',  '-',   '−',  '∪', '∖',  '⊕', '⊖', '⊎'],
+                 [PREC_SHIFT,      'L', '<<', '>>',  '≪',  '≫'],
+                 [PREC_RANGE,      'L', '..', '^..', '..^'],
+                 [PREC_WORD_OP,    'L', '|>', '|>>', '|X>', '|Z>'],
+                 [PREC_BITAND,     'L', '&'],
+                 [PREC_BITOR,      'L', '|',  '^',  '⊻'],
+                 [PREC_RELATIONAL, 'L', '<',  '>',  '<=',  '>=', '≤',   '≥',   '∈', '∉', '∋', '∌', '⊂', '⊃', '⊄',  '⊅', '⊆', '⊇', '⊈', '⊉'],
+                 [PREC_EQUALITY,   'L', '==', '!=', '<=>', '~~', '<~>', '=~=', '≅', '≠', '≡', '≢', '≈', '≉', '=~', '!~'],
+                 [PREC_ANDAND,     'L', '&&', '∧'],
+                 [PREC_OROR,       'L', '||', '\\\\', '∨'],
+                 [PREC_PAIR,       'L', ':',  '：',    '⫶'],
+                 [PREC_ASSIGN,     'R', '='],
+                 [PREC_ASSIGN,     'L', ':=', '||=', '&&=', '//=', '\\\\=', '+=', '-=', '*=', '/=', '÷=', '%=', '**=', '^=', '|=', '&=', '<<=', '>>='],
+                );
+
+    foreach my $row (@table) {
+        my ($prec, $assoc, @ops) = @{$row};
+        $INFIX_PREC{$_} = [$prec, $assoc] for @ops;
+    }
+}
+
+# Comparison operators that can be chained: `a < b <= c`  =>  `a < b && b <= c`
+# (the middle operands are evaluated only once)
+my %CHAIN_CLASS = (
+                   '<'  => 'relational',
+                   '>'  => 'relational',
+                   '<=' => 'relational',
+                   '>=' => 'relational',
+                   '≤'  => 'relational',
+                   '≥'  => 'relational',
+                   '==' => 'equality',
+                   '!=' => 'equality',
+                   '≠'  => 'equality',
+                  );
+
+# Precedence of the keyword operators
+my %KEYWORD_PREC = (
+                    'if'     => PREC_STMT,
+                    'while'  => PREC_STMT,
+                    'unless' => PREC_STMT,
+                    'until'  => PREC_STMT,
+                    'or'     => PREC_OR,
+                    'and'    => PREC_AND,
+                   );
+
 sub new {
     my (undef, %opts) = @_;
 
@@ -138,6 +261,8 @@ sub new {
               if\b                                       (?{ bless({}, 'Sidef::Types::Block::If') })
             | with\b                                     (?{ bless({}, 'Sidef::Types::Block::With') })
             | while\b                                    (?{ bless({}, 'Sidef::Types::Block::While') })
+            | unless\b                                   (?{ bless({}, 'Sidef::Types::Block::If') })
+            | until\b                                    (?{ bless({}, 'Sidef::Types::Block::While') })
             | foreach\b                                  (?{ bless({}, 'Sidef::Types::Block::ForEach') })
             | for\b                                      (?{ bless({}, 'Sidef::Types::Block::For') })
             | return\b                                   (?{ state $x = bless({}, 'Sidef::Types::Block::Return') })
@@ -258,7 +383,7 @@ sub new {
               break
               return
               for foreach
-              if elsif else
+              if elsif else unless until not
               with orwith
               while
               given
@@ -409,6 +534,22 @@ sub new {
         %opts,
     );
 
+    # Words that have a special meaning in parse_expr(). Any other plain identifier
+    # is a variable, which allows skipping all the other checks (see `parse_expr`).
+    $options{special_words} //= {
+        map { $_ => 1 } (
+            keys(%{$options{keywords}}),
+            keys(%{$options{built_in_classes}}),
+            qw(
+              say print defined goto unless until not do loop try catch gather take
+              when case default has method eval Parser Inf NaN Infi NaNi
+              Arr Array Vec Vector Str String Num Number Poly Polynomial
+              PolyMod PolynomialMod Frac Fraction Regex Regexp
+              RangeNum RangeNumber RangeStr RangeString
+              )
+        )
+    };
+
     $options{ref_vars} = $options{vars};
     $options{file_name}   //= '-';
     $options{script_name} //= '-';
@@ -424,7 +565,7 @@ sub fatal_error {
     my $line   = $opt{line} // $self->{line};
     my $column = $point;
 
-    my $error_line = (split(/\R/, substr($opt{code}, $start, $point + 80)))[0];
+    my $error_line = (split(/\R/, substr($opt{code}, $start, $point + 80)))[0] // '';
 
     if (length($error_line) > 80 && $point > 60) {
         my $from = $point - 40;
@@ -718,15 +859,18 @@ sub parse_delim {
 
     local *_ = $opt{code};
 
-    my @delims = ('|', keys(%{$self->{delim_pairs}}));
-    if (exists $opt{ignore_delim}) {
-        @delims = grep { not exists $opt{ignore_delim}{$_} } @delims;
-    }
+    my $cache_key = (exists($opt{ignore_delim}) ? join('', sort keys %{$opt{ignore_delim}}) : '');
 
-    my $regex = do {
-        local $" = "";
-        qr/\G([@delims])\h*/;
-    };
+    my $regex = (
+        $self->{_delim_re}{$cache_key} //= do {
+            my @delims = ('|', keys(%{$self->{delim_pairs}}));
+            if (exists $opt{ignore_delim}) {
+                @delims = grep { not exists $opt{ignore_delim}{$_} } @delims;
+            }
+            local $" = "";
+            qr/\G([@delims])\h*/;
+        }
+    );
 
     my $end_delim;
     if (/$regex/gc) {
@@ -794,6 +938,7 @@ sub get_init_vars {
 
             if (/$self->{var_init_sep_re}/goc) {
                 my $pos = pos($_);
+                local $self->{no_pipe_op} = (defined($end_delim) && $end_delim eq '|') ? 1 : 0;
                 $self->parse_obj(code => $opt{code}, multiline => 1);
                 $declaration .= '=' . substr($_, $pos, pos($_) - $pos);
             }
@@ -924,6 +1069,7 @@ sub parse_init_vars {
             }
 
             if (/$self->{var_init_sep_re}/goc) {
+                local $self->{no_pipe_op} = ($end_delim eq '|') ? 1 : 0;
                 my $obj = $self->parse_obj(code => $opt{code}, multiline => 1);
                 $value = (
                           ref($obj) eq 'HASH'
@@ -1010,6 +1156,11 @@ sub parse_whitespace {
     {
         ++$found_space;
 
+        # Fast exit: the next character can't start whitespace or a comment
+        if (!/\G(?=[\s#\/\x{200B}])/) {
+            return ($found_space > 0 ? 1 : ());
+        }
+
         # Whitespace
         if (/\G(?=\s)/) {
 
@@ -1031,14 +1182,14 @@ sub parse_whitespace {
 
                     my $spaces = 0;
                     my $acc    = '';
-                    until (/\G$name(?:\R|\z)/gc) {
+                    until (/\G\Q$name\E(?:\R|\z)/gc) {
 
                         if (/\G(.*)/gc) {
                             $acc .= "$1\n";
                         }
 
                         # Indentation is true
-                        if ($indent && /\G\R(\h*)$name(?:\R|\z)/gc) {
+                        if ($indent && /\G\R(\h*)\Q$name\E(?:\R|\z)/gc) {
                             $spaces = length($1);
                             ++$self->{line};
                             last;
@@ -1098,9 +1249,20 @@ sub parse_whitespace {
 
         # Multi-line C comment
         if (m{\G/\*}gc) {
+            my ($comment_pos, $comment_line) = (pos($_) - 2, $self->{line});
             while (1) {
                 m{\G.*?\*/}gc && last;
-                /\G.+/gc || (/\G\R/gc ? $self->{line}++ : last);
+                /\G.+/gc
+                  || (
+                      /\G\R/gc
+                      ? $self->{line}++
+                      : $self->fatal_error(
+                                           error => "can't find the end of the multi-line comment",
+                                           code  => $_,
+                                           pos   => $comment_pos,
+                                           line  => $comment_line,
+                                          )
+                     );
             }
             redo;
         }
@@ -1123,6 +1285,22 @@ sub parse_expr {
         # End of an expression, or end of the script
         if (/\G;/gc || /\G\z/) {
             return;
+        }
+
+        # Fast paths for the most common tokens (decimal numbers and plain identifiers),
+        # which skip all the checks for keywords and special objects
+        if (not $self->{no_fast_path}) {
+
+            if (/\G(?=[0-9])/) {
+                goto PARSE_NUMBER;
+            }
+
+            if (    /\G(?=[^\W\d])/
+                and /\G([^\W\d]\w*+)(?!::|![^\W\d]|:(?![=:])|\h*=>)/
+                and not exists($self->{special_words}{$1})
+                and index($1, '__') != 0) {
+                goto VARIABLE_ACCESS;
+            }
         }
 
         if (/$self->{quote_operators_re}/goc) {
@@ -1532,7 +1710,7 @@ sub parse_expr {
 
         # Local variables
         if (/\Glocal\b\h*/gc) {
-            my $expr = $self->parse_obj(code => $opt{code});
+            my $expr = $self->parse_obj(code => $opt{code}, prec => PREC_OPERAND);
             return bless({expr => $expr}, 'Sidef::Variable::Local');
         }
 
@@ -2252,6 +2430,7 @@ sub parse_expr {
         }
 
         # Binary, hexadecimal and octal numbers
+      PARSE_NUMBER:
         if (/\G0(b[10_]*|x[0-9A-Fa-f_]*|o[0-7_]*|[0-7_]+)\b/gc) {
             my $num = $1 =~ tr/_//dr;
             return
@@ -2415,6 +2594,24 @@ sub parse_expr {
                    );
         }
 
+        # Function-style `not(...)`: it is applied only on the parenthesized expression
+        if (/\Gnot(?=\()/gc) {
+            return $self->_negate($self->parse_arg(code => $opt{code}));
+        }
+
+        # Logical `not` (it has a lower precedence than comparisons: `not a == b` is `not (a == b)`)
+        if (/\Gnot\b\h*/gc) {
+            my $arg = $self->parse_obj(code => $opt{code}, prec => PREC_NOT);
+
+            $arg // $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_),
+                                       error => "expected an expression after `not`",
+                                      );
+
+            return $self->_negate($arg);
+        }
+
         # die/warn
         if (/\G(die|warn)\b\h*/gc) {
             my $action = $1;
@@ -2466,8 +2663,24 @@ sub parse_expr {
 
         # Regular expression
         if (m{\G(?=/)} || /\G%r\b/gc) {
-            my $string = $self->get_quoted_string(code => $opt{code});
-            return Sidef::Types::Regex::Regex->new($string, /\G($self->{match_flags_re})/goc ? $1 : undef);
+            my $beg_pos = pos($_);
+            my $string  = $self->get_quoted_string(code => $opt{code});
+            my $flags   = (/\G($self->{match_flags_re})/goc ? $1 : undef);
+
+            my $regex = eval { Sidef::Types::Regex::Regex->new($string, $flags) };
+
+            if (not defined $regex) {
+                my $reason = (split(/\R/, $@ // ''))[0] // 'unknown error';
+                $reason =~ s/ at \S+ line \d+\.?.*//s;
+                $self->fatal_error(
+                                   code   => $_,
+                                   pos    => $beg_pos,
+                                   error  => "invalid regular expression",
+                                   reason => $reason,
+                                  );
+            }
+
+            return $regex;
         }
 
         # Class variable in form of `Class!var_name`
@@ -2597,6 +2810,7 @@ sub parse_expr {
         }
 
         # Variable access
+      VARIABLE_ACCESS:
         if (/\G($self->{var_name_re})/goc) {
             my $len_var = length($1);
             my ($name, $class) = $self->get_name_and_class($1);
@@ -2765,6 +2979,8 @@ sub parse_arg {
     if (/\G\(/gc) {
         my $p = pos($_);
         local $self->{parentheses} = 1;
+        local $self->{no_pipe_op}  = 0;
+        local $self->{no_pair_op}  = 0;
         my $obj = $self->parse_script(code => $opt{code});
 
         $self->{parentheses}
@@ -2788,6 +3004,8 @@ sub parse_array {
     if (/\G\[/gc) {
         my $p = pos($_);
         local $self->{right_brackets} = 1;
+        local $self->{no_pipe_op}     = 0;
+        local $self->{no_pair_op}     = 0;
         my $obj = $self->parse_script(code => $opt{code});
 
         $self->{right_brackets}
@@ -2811,6 +3029,8 @@ sub parse_lookup {
     if (/\G\{/gc) {
         my $p = pos($_);
         local $self->{curly_brackets} = 1;
+        local $self->{no_pipe_op}     = 0;
+        local $self->{no_pair_op}     = 0;
         my $obj = $self->parse_script(code => $opt{code});
 
         $self->{curly_brackets}
@@ -2834,6 +3054,8 @@ sub parse_block {
 
         my $p = pos($_);
         local $self->{curly_brackets} = 1;
+        local $self->{no_pipe_op}     = 0;
+        local $self->{no_pair_op}     = 0;
 
         my $class_name = $self->{class};
 
@@ -2934,7 +3156,9 @@ sub parse_methods {
     my $orig_pos = pos($_);
 
     {
-        if ((/\G(?![-=]>)/ && /\G(?=$self->{operators_re})/o) || /\G\./gc) {
+        # Method calls introduced by a dot (e.g.: `.name`, `.name(...)`, `.+(...)`).
+        # The infix operators are handled by parse_infix().
+        if (/\G\.(?!\.)/gc) {    # a single dot (`...` and `..` are operators)
             my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
 
             if (defined($method)) {
@@ -2942,7 +3166,7 @@ sub parse_methods {
                 my $has_arg;
                 if (/\G\h*(?=[({])/gc || $req_arg) {
                     my $arg = (
-                                 $req_arg   ? $self->parse_obj(code => $opt{code}, multiline => 1)
+                                 $req_arg   ? $self->parse_obj(code => $opt{code}, multiline => 1, prec => PREC_OPERAND)
                                : /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
                                : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
                                :              die "[PARSER ERROR] Something is wrong in the if condition"
@@ -3083,10 +3307,607 @@ sub backtrack_whitespace {
     }
 }
 
+# Returns the logical negation of an expression: `!(expr)`
+sub _negate {
+    my ($self, $expr) = @_;
+    scalar {
+            $self->{class} => [
+                               {
+                                self => bless({}, 'Sidef::Operator::Unary'),
+                                call => [{method => '!', arg => [$expr]}],
+                               }
+                              ]
+           };
+}
+
+# Looks ahead (on the current line) for an infix operator, a postfix operator,
+# or one of the keyword operators (`if`, `while`, `and`, `or`).
+#
+# When something is found, the position is left right after the token and
+# a hash-ref describing it is returned. Otherwise, the position is restored
+# and nothing is returned.
+#
+# The `start` field is the position where the token was found (after any whitespace),
+# which can be used for putting the token back: `pos($_) = $token->{start}`.
+sub _peek_operator {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $start = pos($_) // 0;
+    my $tight = 1;              # true when there is no whitespace before the operator
+
+    if ($opt{postfix_only}) {
+
+        # The postfix operators that bind to the operand must be attached to it
+        # (e.g.: `n!`, `x++`, `list...`) and they start with one of: - + . ! » « < >
+        /\G(?=[-+.!»«<>])/ or return;
+    }
+    else {
+
+        # Fast exit: the end of an expression
+        /\G\h*(?:[;,)\]}\r\n]|\z)/ and return;
+
+        while (1) {
+
+            # Horizontal whitespace, zero width spaces and inline C comments
+            if (/\G(?:\h+|\x{200B}+|\/\*(?:(?!\*\/)[^\n\r])*+\*\/)/gc) {
+                $tight = 0;
+                next;
+            }
+
+            # Code extended on a newline (the backslash is consumed for good)
+            if (/\G\\(?!\\)/gc) {
+                $self->parse_whitespace(code => $opt{code});
+                $start = pos($_);
+                $tight = 0;
+                next;
+            }
+
+            last;
+        }
+
+        # Fast exit: the end of an expression, or a token that can't be an operator
+        if (/\G(?:[;,)\]}\n\r]|\z)/ or (/\G(?=[\w"'\$\[{(])/ and !/\G(?:if|unless|while|until|and|or)\b/)) {
+            pos($_) = $start;
+            return;
+        }
+
+        # Keyword operators
+        if (/\G(if|unless|while|until|and|or)\b/gc) {
+            return {kind => 'keyword', name => $1, start => $start, tight => $tight};
+        }
+
+        # Super-script power (e.g.: x²), only when attached to the operand
+        if ($tight and /\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/) {
+            return {kind => 'op', method => '**', req_arg => 1, op_type => 'op', start => $start, tight => 1};
+        }
+    }
+
+    # The operators start with one of these characters (the full regex is expensive)
+    if (
+           /\G(?=[-|&^.%~!<=:>+\/÷*\\：«»`\x{2200}-\x{22FF}\x{2A00}-\x{2AFF}])/
+        && /\G(?![=-]>)/    # not '=>' or '->'
+        && (
+            /\G(?=$self->{operators_re})/o                      # operator
+            || /\G\.\h*(?!\.\.)(?=$self->{operators_re})/gco    # dot followed by operator
+           )
+      ) {
+
+        my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
+
+        if (
+                defined($method)
+            and not ref($method)
+            and not($method eq '|'      and $self->{no_pipe_op})    # `|` is the delimiter in `{|a, b| ...}`
+            and not($self->{no_pair_op} and ($method eq ':' or $method eq '：' or $method eq '⫶')) and not($opt{postfix_only} and $req_arg)
+          ) {
+            return {
+                    kind    => 'op',
+                    method  => $method,
+                    req_arg => $req_arg,
+                    op_type => $op_type,
+                    start   => $start,
+                    tight   => $tight,
+                   };
+        }
+    }
+
+    pos($_) = $start;
+    return;
+}
+
+# Returns the precedence and the associativity of an infix operator
+sub _infix_info {
+    my ($self, $token) = @_;
+
+    my ($method, $op_type) = @{$token}{qw(method op_type)};
+
+    # The hyper-operators (e.g.: »+», ~Z*, ~X+) have the same precedence as the pipe
+    # operators (|>, |>>, |X>, |Z>) and the method-like operators (a `method` b).
+    # They are chained from left to right, which allows writing pipelines such as:
+    #   x |>> :cos ~Z* y |> :sum
+    if ($op_type ne 'op') {
+        return (PREC_WORD_OP, 'L');
+    }
+
+    my $info = $INFIX_PREC{$method};
+
+    if (not defined $info) {
+        if ($method =~ /^[^\W\d]/) {    # `method`-like operators
+            $info = [PREC_WORD_OP, 'L'];
+        }
+        elsif ($method =~ /=\z/ and exists $INFIX_PREC{substr($method, 0, -1)}) {    # e.g.: ∪=
+            $info = [PREC_ASSIGN, 'L'];
+        }
+        else {                                                                       # any other operator
+            $info = [PREC_ADD, 'L'];
+        }
+    }
+
+    return @{$info};
+}
+
+# Returns true when the expression is a plain variable or literal, which is
+# safe to be used more than once (e.g.: the middle operand of `a < b < c`).
+sub _is_simple_operand {
+    my ($self, $struct) = @_;
+
+    ref($struct) eq 'HASH' or return 0;
+    exists($struct->{call}) and return 0;
+    exists($struct->{ind})  and return 0;
+
+    if (exists $struct->{self}) {
+        my $obj = $struct->{self};
+        return $self->_is_simple_operand($obj) if ref($obj) eq 'HASH';
+        return 1 if ref($obj)                                                 =~ /^Sidef::Types::(?:Number::Number|String::String|Bool::Bool)\z/;
+        return 1 if ref($obj) eq 'Sidef::Variable::Variable' and $obj->{type} =~ /^(?:var|global)\z/;
+        return 0;
+    }
+
+    my @statements = map { ref($_) eq 'ARRAY' ? @{$_} : () } values %{$struct};
+    @statements == 1 or return 0;
+    return $self->_is_simple_operand($statements[0]);
+}
+
+# Builds the AST of a chain of comparisons: `a < b <= c < d`
+#
+#   => (a < b) && (b <= c) && (c < d)
+#
+# The middle operands that are not simple (e.g.: function calls) are stored in temporary
+# variables, with the help of an anonymous block, to be evaluated only once:
+#
+#   a < f(x) < c   =>   {|t| a < t && t < c}.call(f(x))
+sub _build_comparison_chain {
+    my ($self, $operands, $ops) = @_;
+
+    my $class = $self->{class};
+    my ($left, $right) = @{$operands}[0, 1];
+    my $method = $ops->[0];
+
+    my $call = sub {
+        my ($lhs, $name, $rhs) = @_;
+        scalar {$class => [{self => $lhs, call => [{method => $name, arg => [$rhs]}]}]};
+    };
+
+    @{$ops} == 1 and return $call->($left, $method, $right);
+
+    my @rest_operands = @{$operands}[2 .. $#{$operands}];
+    my @rest_ops      = @{$ops}[1 .. $#{$ops}];
+
+    # Simple middle operand: it can be repeated
+    if ($self->_is_simple_operand($right)) {
+        return $call->($call->($left, $method, $right), '&&', $self->_build_comparison_chain([$right, @rest_operands], \@rest_ops));
+    }
+
+    # Complex middle operand: bind it to a temporary variable
+    state $counter = 0;
+
+    my $new_var = sub {
+        my $var = bless({name => '__cmp' . ++$counter, type => 'var', class => $class}, 'Sidef::Variable::Variable');
+        return ($var, scalar {$class => [{self => $var}]});
+    };
+
+    my (@vars, @args);
+
+    if (not $self->_is_simple_operand($left)) {    # keep the left-to-right evaluation order
+        my ($var, $ref) = $new_var->();
+        push @vars, $var;
+        push @args, $left;
+        $left = $ref;
+    }
+
+    my ($var, $ref) = $new_var->();
+    push @vars, $var;
+    push @args, $right;
+
+    my $inner = $call->($call->($left, $method, $ref), '&&', $self->_build_comparison_chain([$ref, @rest_operands], \@rest_ops));
+
+    my $block = bless(
+                      {
+                       init_vars => bless({vars => \@vars}, 'Sidef::Variable::Init'),
+                       code      => {$class => [{self => $inner}]},
+                      },
+                      'Sidef::Types::Block::BlockInit'
+                     );
+
+    return
+      scalar {
+              $class => [
+                         {
+                          self => $block,
+                          call => [{method => 'call', arg => [{$class => [map { @{$_->{$class}} } @args]}]}],
+                         }
+                        ]
+             };
+}
+
+# Appends a pending chain of comparisons to the expression
+sub _flush_chain {
+    my ($self, $struct_ref, $chain_ref) = @_;
+
+    my ($ops, $operands) = @{${$chain_ref}}{qw(ops operands)};
+    undef ${$chain_ref};
+
+    if (@{$ops} == 1) {
+        $self->append_method(
+                             array   => \@{${$struct_ref}->{$self->{class}}[-1]{call}},
+                             method  => $ops->[0],
+                             arg     => $operands->[1],
+                             op_type => 'op',
+                            );
+    }
+    else {
+        ${$struct_ref} = $self->_build_comparison_chain($operands, $ops);
+    }
+
+    return;
+}
+
+# Parses the infix operators that follow an operand, using precedence climbing.
+#
+#   struct => the operand (as returned by parse_operand)
+#   wrap   => true when the operand is a prefix-operator expression
+#   prec   => the minimum precedence of the operators that are consumed
+#
+# The operators of the same precedence are chained, from left to right, in the
+# list of calls of the left-hand side:  a + b - c  =>  {self => a, call => [+b, -c]}
+# while the right-hand sides are parsed recursively:  a + b * c  =>  {self => a, call => [+(b*c)]}
+sub parse_infix {
+    my ($self, %opt) = @_;
+
+    my $struct   = $opt{struct};
+    my $wrap     = $opt{wrap};
+    my $min_prec = $opt{prec} // PREC_ASSIGN;
+
+    local *_ = $opt{code};
+
+    return $struct if $min_prec >= PREC_OPERAND;
+
+    # A pending chain of comparisons: `a < b < c`
+    my $chain;
+
+    while (1) {
+
+        # Fast exit: the end of an expression
+        if (/\G\h*(?:[;,)\]}]|\z)/) {
+            last;
+        }
+
+        # Arrow method call: `expr -> method(...)`
+        # It has the lowest precedence and it is applied on the whole expression
+        # from its left (e.g.: `^10 -> map {...}` is the same as `(^10).map {...}`).
+        if ($min_prec <= PREC_ARROW and /\G\h*(?:\\(?!\\)\s*)?->\h*/gc) {
+
+            $self->_flush_chain(\$struct, \$chain) if defined $chain;
+
+            my $code   = substr($_, pos($_));
+            my $dot_op = $code =~ /^\./;
+            if   ($dot_op) { $code = ". $code" }
+            else           { $code = ".$code" }
+
+            my $methods = $self->parse_methods(code => \$code);
+            pos($_) += pos($code) - ($dot_op ? 2 : 1);
+
+            @{$methods}
+              || $self->fatal_error(
+                                    error => 'incomplete method name',
+                                    code  => $_,
+                                    pos   => pos($_) - 1,
+                                   );
+
+            if ($wrap) {
+                $struct = {$self->{class} => [{self => $struct}]};
+                $wrap   = 0;
+            }
+
+            push @{$struct->{$self->{class}}[-1]{call}}, @{$methods};
+
+            # Calls and indices applied on the result: `x -> method(...)(...)`, `x -> method(...)[...]`
+            $self->parse_suffixes(code => $opt{code}, struct => $struct);
+            next;
+        }
+
+        # Ternary operator (the `?` is allowed to be on the next line)
+        if ($min_prec <= PREC_TERNARY and /\G(?=\s*\?)/) {
+
+            $self->_flush_chain(\$struct, \$chain) if defined $chain;
+
+            $self->parse_whitespace(code => $opt{code});
+            /\G\?/gc;
+            my $q_pos = pos($_);
+            $self->parse_whitespace(code => $opt{code});
+
+            # The `:` that follows is the one from the ternary operator, not a pair constructor
+            my $true = do {
+                local $self->{no_pair_op} = 1;
+                $self->parse_obj(code => $opt{code}, multiline => 1, prec => PREC_ASSIGN);
+            };
+
+            $true // $self->fatal_error(
+                                        code   => $_,
+                                        pos    => pos($_),
+                                        error  => "invalid usage of the ternary operator",
+                                        reason => "expected an expression after '?'",
+                                       );
+
+            $self->parse_whitespace(code => $opt{code});
+
+            /\G:/gc
+              || $self->fatal_error(
+                                    code   => $_,
+                                    pos    => pos($_),
+                                    error  => "invalid usage of the ternary operator",
+                                    reason => "expected ':'",
+                                   );
+
+            $self->parse_whitespace(code => $opt{code});
+
+            my $false = $self->parse_obj(code => $opt{code}, multiline => 1, prec => PREC_TERNARY);
+
+            $false // $self->fatal_error(
+                                         code   => $_,
+                                         pos    => pos($_),
+                                         error  => "invalid usage of the ternary operator",
+                                         reason => "expected an expression after ':'",
+                                        );
+
+            my $node = bless(
+                             {
+                              cond  => $struct,
+                              true  => $true,
+                              false => $false,
+                             },
+                             'Sidef::Types::Bool::Ternary'
+                            );
+
+            $struct = {$self->{class} => [{self => $node}]};
+            $wrap   = 0;
+            next;
+        }
+
+        my $token = $self->_peek_operator(code => $opt{code}) // last;
+
+        # Keyword operators: if, while, and, or
+        if ($token->{kind} eq 'keyword') {
+
+            my $name = $token->{name};
+            my $prec = $KEYWORD_PREC{$name};
+
+            if ($prec < $min_prec) {
+                pos($_) = $token->{start};
+                last;
+            }
+
+            $self->_flush_chain(\$struct, \$chain) if defined $chain;
+
+            my $arg = $self->parse_obj(code => $opt{code}, prec => $prec + 1);
+
+            $arg // $self->fatal_error(
+                                       code  => $_,
+                                       pos   => $token->{start},
+                                       error => "keyword `$name` requires a right-side expression",
+                                      );
+
+            if ($wrap) {
+                $struct = {$self->{class} => [{self => $struct}]};
+                $wrap   = 0;
+            }
+
+            # `unless` and `until` are the negated forms of `if` and `while`
+            if ($name eq 'unless' or $name eq 'until') {
+                $arg  = $self->_negate($arg);
+                $name = ($name eq 'unless' ? 'if' : 'while');
+            }
+
+            push @{$struct->{$self->{class}}[-1]{call}}, {keyword => $name, arg => [$arg]};
+            next;
+        }
+
+        # Infix and postfix operators
+        my ($method, $req_arg, $op_type) = @{$token}{qw(method req_arg op_type)};
+
+        # Hyper-operator with an empty argument list (e.g.: `x »name»()`): it is a postfix operator
+        if ($req_arg and $op_type ne 'op' and /\G\h*\(\h*\)/gc) {
+            $req_arg = 0;
+        }
+
+        if (not $req_arg) {    # postfix operator, applied on the whole left-hand side
+
+            # Postfix operators that are not attached to the operand apply on the entire expression
+            if ($min_prec > PREC_ARROW) {
+                pos($_) = $token->{start};
+                last;
+            }
+
+            $self->_flush_chain(\$struct, \$chain) if defined $chain;
+
+            $self->append_method(
+                                 array   => \@{$struct->{$self->{class}}[-1]{call}},
+                                 method  => $method,
+                                 op_type => $op_type,
+                                );
+            next;
+        }
+
+        my ($prec, $assoc) = $self->_infix_info($token);
+
+        if ($prec < $min_prec) {
+            pos($_) = $token->{start};
+            last;
+        }
+
+        my $arg = $self->parse_obj(
+                                   code      => $opt{code},
+                                   multiline => 1,
+                                   prec      => ($assoc eq 'R' ? $prec : $prec + 1),
+                                  );
+
+        $arg // $self->fatal_error(
+                                   code  => $_,
+                                   pos   => $token->{start},
+                                   error => "operator `$method` requires a right-side operand",
+                                  );
+
+        # The result of a prefix operator is a new operand
+        if ($wrap) {
+            $struct = {$self->{class} => [{self => $struct}]};
+            $wrap   = 0;
+        }
+
+        # Comparison operators that can be chained: `a < b < c`
+        my $chain_class = ($op_type eq 'op' ? $CHAIN_CLASS{$method} : undef);
+
+        if (defined $chain_class) {
+
+            if (defined($chain) and $chain->{class} eq $chain_class) {
+                push @{$chain->{ops}},      $method;
+                push @{$chain->{operands}}, $arg;
+            }
+            else {
+                $self->_flush_chain(\$struct, \$chain) if defined $chain;
+                $chain = {
+                          class    => $chain_class,
+                          operands => [$struct, $arg],
+                          ops      => [$method],
+                         };
+            }
+
+            next;
+        }
+
+        $self->_flush_chain(\$struct, \$chain) if defined $chain;
+
+        $self->append_method(
+                             array   => \@{$struct->{$self->{class}}[-1]{call}},
+                             method  => $method,
+                             arg     => $arg,
+                             op_type => $op_type,
+                            );
+    }
+
+    $self->_flush_chain(\$struct, \$chain) if defined $chain;
+
+    return $struct;
+}
+
+# Parses the argument of a prefix operator or of a keyword (e.g.: -x, !x, say x, return x, if (x) {...})
+sub _parse_prefix_arg {
+    my ($self, %opt) = @_;
+
+    local *_ = $opt{code};
+
+    my $obj    = $opt{obj};
+    my $method = $opt{method};
+    my $ref    = ref($obj);
+
+    # Bare `return` (without a value): `return`, `return;`, `return if cond`, `cond or return`
+    if ($ref eq 'Sidef::Types::Block::Return'
+        and /\G(?=\h*(?:[;})\]#]|\R|\z|(?:if|unless|while|until|and|or)\b))/) {
+        return {};
+    }
+
+    # Block constructs: if (...) {...}, while (...) {...}, for (...) {...}, etc.
+    if ($ref =~ /^Sidef::Types::Block::(?:If|With|While|ForEach|For)\z/) {
+        return (
+                /\G(?=\()/
+                ? $self->parse_arg(code => $opt{code})
+                : $self->parse_obj(code => $opt{code}, prec => PREC_ASSIGN)
+               );
+    }
+
+    # Function-style operators: say (...), print (...), defined (...), @(...), :(...)
+    # The operator is applied only on the parenthesized expression, and any method call
+    # that follows is applied on the result: `@(1..2).combinations(2)` is `(@(1..2)).combinations(2)`
+    if (
+        $ref eq 'Sidef::Meta::PrefixColon'
+        or (
+            $ref eq 'Sidef::Operator::Unary'
+            and (   $method eq 'say'
+                 or $method eq 'print'
+                 or $method eq 'defined'
+                 or $method eq '>'
+                 or $method eq '>>'
+                 or $method eq '@'
+                 or $method eq '@|')
+           )
+      ) {
+        if (/\G(?=\()/) {
+            return $self->parse_arg(code => $opt{code});
+        }
+    }
+
+    # Prefix operators (! ~ \ + * √ ^ @ @|) are applied on the next operand: `!a == b` is `(!a) == b`
+    my $prec = PREC_OPERAND;
+
+    if ($ref eq 'Sidef::Operator::Unary') {
+        if ($method eq '-') {    # `-a ** b` is `-(a ** b)`
+            $prec = PREC_POW;
+        }
+        elsif ($method eq 'defined') {    # named unary operator: `defined a + 1` is `defined(a + 1)`
+            $prec = PREC_SHIFT;
+        }
+        elsif ($method eq 'say' or $method eq 'print' or $method eq '>' or $method eq '>>') {    # list operators
+            $prec = PREC_ASSIGN;
+        }
+    }
+    elsif ($ref eq 'Sidef::Variable::Ref' or $ref eq 'Sidef::Meta::PrefixColon') {
+        $prec = PREC_OPERAND;
+    }
+    else {    # return, read, goto
+        $prec = PREC_ASSIGN;
+    }
+
+    return $self->parse_obj(code => $opt{code}, prec => $prec);
+}
+
+# Parses an expression, using the operator precedence rules.
+#
+# The `prec` option sets the minimum precedence of the operators that are consumed.
+# By default, a full expression is parsed (everything that binds tighter than
+# a comma). The statement-level expressions (see parse_script) also consume the
+# pair constructors and the keyword operators (if, while, and, or).
 sub parse_obj {
     my ($self, %opt) = @_;
 
+    my ($struct, $wrap) = $self->parse_operand(%opt);
+
+    defined($struct) || return;
+
+    return
+      $self->parse_infix(
+                         code   => $opt{code},
+                         struct => $struct,
+                         wrap   => $wrap,
+                         prec   => $opt{prec} // PREC_ASSIGN,
+                        );
+}
+
+sub parse_operand {
+    my ($self, %opt) = @_;
+
     my %struct;
+    my $wrap;
     local *_ = $opt{code};
 
     if (not($opt{multiline}) and /\G\h*(?=\R)/gc) {
@@ -3102,8 +3923,16 @@ sub parse_obj {
     if (defined $obj) {
         push @{$struct{$self->{class}}}, {self => $obj};
 
+        # for (var in array) { ... }
+        my $for_paren = 0;
+        if (ref($obj) eq 'Sidef::Types::Block::For'
+            and /\G\h*\((?=\h*[*:]?$self->{var_name_re}(?:\h*,\h*[*:]?$self->{var_name_re})*\h+(?:in|∈)\b)/goc) {
+            $for_paren = 1;
+            /\G\h*/gc;
+        }
+
         # for var in array { ... }
-        if (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h*(?=[*:]?$self->{var_name_re})/goc) {
+        if ($for_paren or (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h*(?=[*:]?$self->{var_name_re})/goc)) {
 
             my $class_name = $self->{class};
 
@@ -3167,6 +3996,16 @@ sub parse_obj {
                 /\G\h*,\h*/gc && redo;
             }
 
+            if ($for_paren) {
+                $self->parse_whitespace(code => $opt{code});
+                /\G\)/gc
+                  || $self->fatal_error(
+                                        error => "unbalanced parenthesis in the `for` loop",
+                                        code  => $_,
+                                        pos   => pos($_),
+                                       );
+            }
+
             my $block = (
                          /\G\h*(?=\{)/gc
                          ? $self->parse_block(code => $opt{code})
@@ -3197,11 +4036,7 @@ sub parse_obj {
             bless $obj, 'Sidef::Types::Block::ForIn';
         }
         elsif ($obj_key) {
-            my $arg = (
-                       /\G(?=\()/
-                       ? $self->parse_arg(code => $opt{code})
-                       : $self->parse_obj(code => $opt{code})
-                      );
+            my $arg = $self->_parse_prefix_arg(code => $opt{code}, obj => $obj, method => $method);
 
             if (defined $arg) {
                 my @arg = ($arg);
@@ -3279,6 +4114,9 @@ sub parse_obj {
                 }
                 elsif (ref($obj) eq 'Sidef::Types::Block::If') {
 
+                    # `unless (cond) {...}` is the same as `if (!cond) {...}`
+                    $arg = $self->_negate($arg) if $method eq 'unless';
+
                     if (/\G\h*(?=\{)/gc) {
                         my $block = $self->parse_block(code => $opt{code}, with_vars => 1);
                         push @{$obj->{if}}, {expr => $arg, block => $block};
@@ -3287,7 +4125,7 @@ sub parse_obj {
 
                             $self->parse_whitespace(code => $opt{code});
 
-                            if (/\Gelsif\h*(?=\()/gc) {
+                            if (/\G(?:elsif|else\h+if)\h*(?=\()/gc) {
                                 my $arg = $self->parse_arg(code => $opt{code});
                                 $self->parse_whitespace(code => $opt{code});
 
@@ -3362,6 +4200,10 @@ sub parse_obj {
                     }
                 }
                 elsif (ref($obj) eq 'Sidef::Types::Block::While') {
+
+                    # `until (cond) {...}` is the same as `while (!cond) {...}`
+                    $arg = $self->_negate($arg) if $method eq 'until';
+
                     if (/\G\h*(?=\{)/gc) {
                         my $block = $self->parse_block(code => $opt{code}, with_vars => 1);
                         $obj->{expr}  = $arg;
@@ -3378,6 +4220,7 @@ sub parse_obj {
                 }
                 else {
                     push @{$struct{$self->{class}}[-1]{call}}, {method => $method, arg => \@arg};
+                    $wrap = 1;    # the result of a prefix operator is a new operand
                 }
             }
             else {
@@ -3391,9 +4234,33 @@ sub parse_obj {
 
         {
             # Method call
-            if (/\G\h*(?=\.\h*(?:$self->{method_name_re}|[(\$]))/ogc) {
+            if (/\G\h*(?=\.\s*(?:$self->{method_name_re}|[(\$]))/ogc) {
                 my $methods = $self->parse_methods(code => $opt{code});
                 push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
+                redo;
+            }
+
+            # Method call on the next line (leading dot):
+            #
+            #   obj
+            #     .method1
+            #     .method2(...)
+            #
+            # A leading dot at the beginning of a statement is the implicit method
+            # call on the special variable `_`. When this variable doesn't exist,
+            # the dot continues the expression from the previous line.
+            if (/\G(?=(?:[ \t]*(?:#[^\r\n]*)?\R)+\s*\.(?![.0-9]))/
+                and not defined($self->find_var('_', $self->{class}))) {
+                $self->parse_whitespace(code => $opt{code});
+                redo;
+            }
+
+            # Operators used with the method-call syntax: `a .+ b`, or `a \.` followed by
+            # the operator on the next line. The operator binds tighter than any other operator.
+            if (/\G\h*(?:\\(?!\\)\s*)?(?=\.(?!\.)\s*(?:$self->{operators_re}))/ogc) {
+                my $methods = $self->parse_methods(code => $opt{code});
+                push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
+                redo;
             }
 
             # Code extended on a newline
@@ -3416,8 +4283,10 @@ sub parse_obj {
             }
 
             # Do-while construct
-            if (ref($obj) eq 'Sidef::Types::Block::Do' and /\G\h*while\b/gc) {
-                my $arg = $self->parse_obj(code => $opt{code});
+            if (ref($obj) eq 'Sidef::Types::Block::Do' and /\G\h*(while|until)\b/gc) {
+                my $kind = $1;
+                my $arg  = $self->parse_obj(code => $opt{code});
+                $arg = $self->_negate($arg) if $kind eq 'until';
                 push @{$struct{$self->{class}}[-1]{call}}, {keyword => 'while', arg => [$arg]};
             }
 
@@ -3426,61 +4295,14 @@ sub parse_obj {
                 $self->parse_suffixes(code => $opt{code}, struct => \%struct) && redo;
             }
 
-            # Tightly-binded operator
-            if (
-                /\G(?![=-]>)/    # not '=>' or '->'
-                && (
-                    /\G(?=$self->{operators_re})/o                         # operator
-                    || /\G\h*\.\h*(?!\.\.)(?=$self->{operators_re})/gco    # dot followed by operator
-                    || /\G(?=[⁰¹²³⁴⁵⁶⁷⁸⁹])/                                # unicode superscript
-                   )
-              ) {
-
-                my $orig_pos = pos($_);
-                my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
-
-                if (defined($method)) {
-
-                    my $has_arg;
-                    if ($req_arg) {
-                        my $arg = $self->parse_obj(code => $opt{code}, multiline => 1);
-
-                        if (defined $arg) {
-                            if (ref $arg ne 'HASH') {
-                                $arg = {$self->{class} => [{self => $arg}]};
-                            }
-
-                            my $methods = $self->parse_methods(code => $opt{code});
-                            if (@{$methods}) {
-                                push @{$arg->{$self->{class}}[-1]{call}}, @{$methods};
-                            }
-
-                            $has_arg = 1;
-                            $self->append_method(
-                                                 array   => \@{$struct{$self->{class}}[-1]{call}},
-                                                 method  => $method,
-                                                 arg     => $arg,
-                                                 op_type => $op_type,
-                                                );
-                        }
-                        else {
-                            $self->fatal_error(
-                                               code  => $_,
-                                               pos   => $orig_pos,
-                                               error => "operator `$method` requires a right-side operand",
-                                              );
-                        }
-                    }
-
-                    $has_arg || do {
-                        $self->append_method(
-                                             array   => \@{$struct{$self->{class}}[-1]{call}},
-                                             method  => $method,
-                                             op_type => $op_type,
-                                            );
-                    };
-                    redo;
-                }
+            # Postfix operators (e.g.: x++, x--, n!, n!!, x...)
+            if (defined(my $token = $self->_peek_operator(code => $opt{code}, postfix_only => 1))) {
+                $self->append_method(
+                                     array   => \@{$struct{$self->{class}}[-1]{call}},
+                                     method  => $token->{method},
+                                     op_type => $token->{op_type},
+                                    );
+                redo;
             }
         }
     }
@@ -3488,7 +4310,7 @@ sub parse_obj {
         return;
     }
 
-    return \%struct;
+    return (wantarray ? (\%struct, $wrap) : \%struct);
 }
 
 sub parse_script {
@@ -3508,110 +4330,24 @@ sub parse_script {
             redo;
         }
 
-        my $obj;
-
-        # Ternary operator
-        if (%struct && /\G\?/gc) {
-            $self->parse_whitespace(code => $opt{code});
-
-            my $true = (
-                        /\G(?=\()/
-                        ? $self->parse_arg(code => $opt{code})
-                        : $self->parse_obj(code => $opt{code})
-                       );
-
-            $self->parse_whitespace(code => $opt{code});
-
-            /\G:/gc
-              || $self->fatal_error(
-                                    code   => $_,
-                                    pos    => pos($_),
-                                    error  => "invalid usage of the ternary operator",
-                                    reason => "expected ':'",
-                                   );
-
-            $self->parse_whitespace(code => $opt{code});
-
-            my $false = (
-                         /\G(?=\()/
-                         ? $self->parse_arg(code => $opt{code})
-                         : $self->parse_obj(code => $opt{code})
-                        );
-
-            $obj = bless(
-                         {
-                          cond  => scalar {$self->{class} => [pop @{$struct{$self->{class}}}]},
-                          true  => $true,
-                          false => $false
-                         },
-                         'Sidef::Types::Bool::Ternary'
-                        );
-        }
-        else {
-            $obj = $self->parse_obj(code => $opt{code});
-        }
+        # A statement is a full expression: everything is allowed here, including
+        # the pair constructors, the keyword operators (if, while, and, or) and the arrow calls (->).
+        my $start_pos = pos($_) // 0;
+        my $obj       = $self->parse_obj(code => $opt{code}, prec => PREC_ARROW);
 
         if (defined $obj) {
-            push @{$struct{$self->{class}}}, {self => $obj};
 
-            {
-                my $pos_before = pos($_);
-                $self->parse_whitespace(code => $opt{code});
-
-                # End of expression
-                if (/\G(?:[;,]+|=>)/gc or substr($_, $pos_before, pos($_) - $pos_before) =~ /\R/) {
-                    redo MAIN;
-                }
-
-                # Code extended on a newline
-                if (/\G\\(?!\\)/gc) {
-                    $self->parse_whitespace(code => $opt{code});
-                }
-
-                my $is_operator = /\G(?!->)/ && /\G(?=($self->{operators_re}))/o;
-
-                if ($is_operator or /\G(?:->|\.)\h*/gc) {
-
-                    # Implicit end of statement -- redo
-                    $self->parse_whitespace(code => $opt{code});
-
-                    my $methods;
-                    if ($is_operator) {
-                        $methods = $self->parse_methods(code => $opt{code});
-                    }
-                    else {
-                        my $code   = substr($_, pos);
-                        my $dot_op = $code =~ /^\./;
-                        if   ($dot_op) { $code = ". $code" }
-                        else           { $code = ".$code" }
-                        $methods = $self->parse_methods(code => \$code);
-                        pos($_) += pos($code) - ($dot_op ? 2 : 1);
-                    }
-
-                    if (@{$methods}) {
-                        push @{$struct{$self->{class}}[-1]{call}}, @{$methods};
-                    }
-                    else {
-                        $self->fatal_error(
-                                           error => 'incomplete method name',
-                                           code  => $_,
-                                           pos   => pos($_) - 1,
-                                          );
-                    }
-
-                    $self->parse_suffixes(code => $opt{code}, struct => \%struct);
-                    redo;
-                }
-                elsif (/\G(if|while|and|or)\b\h*/gc) {
-                    my $keyword = $1;
-                    my $obj     = $self->parse_obj(code => $opt{code});
-                    push @{$struct{$self->{class}}[-1]{call}}, {keyword => $keyword, arg => [$obj]};
-                    redo;
-                }
-                else {
-                    redo MAIN;
-                }
+            # A statement that doesn't consume any input would be parsed forever
+            if ((pos($_) // 0) == $start_pos) {
+                $self->fatal_error(
+                                   code  => $_,
+                                   pos   => $start_pos,
+                                   error => (substr($_, $start_pos, 1) eq '.' ? 'incomplete method name' : 'unexpected token'),
+                                  );
             }
+
+            push @{$struct{$self->{class}}}, {self => $obj};
+            redo;
         }
 
         if (/\G(?:[;,]+|=>)/gc) {

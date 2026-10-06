@@ -5,7 +5,7 @@ var i = 15;
 #
 ## while {bool} {...}
 #
-while (i -= 1 >= 10) {
+while ((i -= 1) >= 10) {
     "Hello".say;
 
     i == 13 && (
