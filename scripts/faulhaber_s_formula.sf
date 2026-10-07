@@ -9,7 +9,7 @@ func faulhaber_s_formula(p) {
     var formula = gather {
         { |j|
             take "#{binomial(p+1, j) * bern(j,1) -> as_rat}*x^#{p+1 - j}"
-        } << 0..p
+        } << (0..p)
     }
 
     var str = Poly(formula.join(' + ')).to_s

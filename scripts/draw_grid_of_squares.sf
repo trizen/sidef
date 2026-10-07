@@ -9,8 +9,8 @@ func draw_grid(n, k) {
     for a in (0 .. n) {
         for b in (0 .. n) {
 
-            var u = (a %% n/k)
-            var v = (b %% n/k)
+            var u = (a %% (n/k))
+            var v = (b %% (n/k))
 
             if (u && v) {
                 print '+'

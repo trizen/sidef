@@ -27,7 +27,7 @@ var foo = HistoryVar(0)
 
 foo ≔ 1
 foo ≔ 2
-foo ≔ foo+3
+foo ≔ (foo+3)
 foo ≔ 42
 
 say "History: #{foo.history}"
