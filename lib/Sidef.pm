@@ -43,6 +43,11 @@ package Sidef {
 
         local %INCLUDED;
 
+        # A string that is not flagged as UTF-8 is faster to parse (the offsets of the
+        # regular expression matches are byte offsets). This is done only when the code
+        # contains no wide characters (the characters are not changed).
+        utf8::downgrade($code, 1);
+
         $self->{parser} //= Sidef::Parser->new(
                                                opt         => $self->{opt},
                                                file_name   => $self->{name} // '-',
@@ -150,7 +155,13 @@ package Sidef {
 
     sub _init_db {
         my ($self, $hash, $db_file) = @_;
-        dbmopen(%$hash, $db_file, 0640);
+
+        if (not dbmopen(%$hash, $db_file, 0640)) {
+            warn "[WARNING] Can't open the cache database <<$db_file>>: $!\n";
+            warn "[WARNING] The compiled code won't be cached on the disk.\n";
+        }
+
+        return;
     }
 
     sub _init_time_db {
@@ -193,8 +204,32 @@ package Sidef {
             my $compressed_code = $self->{$lang}{_code_hash}{$md5};
 
             state $_x = require IO::Uncompress::RawInflate;
-            IO::Uncompress::RawInflate::rawinflate(\$compressed_code => \my $decompressed_code)
-              or die "rawinflate failed: $IO::Uncompress::RawInflate::RawInflateError";
+
+            my $decompressed_code;
+
+            # The entries have a header with a checksum, which is used for detecting corrupted data
+            # (the entries without a header were created by older versions and they are not verified)
+            my $valid = defined($compressed_code);
+
+            if ($valid and substr($compressed_code, 0, 3) eq "SC\x01") {
+                state $_md5 = require Digest::MD5;
+                my $checksum = substr($compressed_code, 3, 4);
+                $compressed_code = substr($compressed_code, 7);
+                $valid = (substr(Digest::MD5::md5($compressed_code), 0, 4) eq $checksum);
+            }
+
+            if (   not $valid
+                or not IO::Uncompress::RawInflate::rawinflate(\$compressed_code => \$decompressed_code)) {
+
+                # A corrupted entry in the cache: ignore it (the code will be compiled again)
+                warn "[WARNING] Ignoring a corrupted entry from the cache database ($md5): "
+                  . ($valid ? ($IO::Uncompress::RawInflate::RawInflateError || 'unknown error') : 'the checksum does not match') . "\n";
+
+                delete $self->{$lang}{_time_hash}{$md5};
+                delete $self->{$lang}{_code_hash}{$md5};
+
+                return;
+            }
 
             return Encode::decode_utf8($decompressed_code);
         }
@@ -228,10 +263,15 @@ package Sidef {
 
         state $_x = require IO::Compress::RawDeflate;
         IO::Compress::RawDeflate::rawdeflate(\$code => \my $compressed_code)
-          or die "rawdeflate failed: $IO::Compress::RawDeflate::RawDeflateError";
+          or do {
+            warn "[WARNING] Can't store the compiled code in the cache: $IO::Compress::RawDeflate::RawDeflateError\n";
+            return;
+          };
+
+        state $_md5 = require Digest::MD5;
 
         $self->{$lang}{_time_hash}{$md5} = time;
-        $self->{$lang}{_code_hash}{$md5} = $compressed_code;
+        $self->{$lang}{_code_hash}{$md5} = "SC\x01" . substr(Digest::MD5::md5($compressed_code), 0, 4) . $compressed_code;
     }
 
     sub compile_code {

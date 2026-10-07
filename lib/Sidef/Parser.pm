@@ -138,12 +138,13 @@ sub new {
     my %options = (
         line          => 1,
         inc           => [],
-        class         => 'main',    # a.k.a. namespace
+        class         => 'main',            # a.k.a. namespace
         vars          => {'main' => []},
-        ref_vars_refs => {'main' => []},
+        ref_vars_refs => {'main' => []},    # the chain of enclosing scopes (nearest first)
+        seen_names    => {},                # the names that were declared (see `find_var`)
         EOT           => [],
 
-        postfix_ops => {            # postfix operators
+        postfix_ops => {                    # postfix operators
            '--'  => 1,
            '++'  => 1,
            '...' => 1,
@@ -544,7 +545,7 @@ sub new {
               say print defined goto unless until not do loop try catch gather take
               when case default has method eval Parser Inf NaN Infi NaNi
               Arr Array Vec Vector Str String Num Number Poly Polynomial
-              PolyMod PolynomialMod Frac Fraction Regex Regexp
+              PolyMod PolynomialMod Frac Fraction Regex Regexp elif elseif
               RangeNum RangeNumber RangeStr RangeString
               )
         )
@@ -560,12 +561,18 @@ sub new {
 sub fatal_error {
     my ($self, %opt) = @_;
 
-    my $start  = rindex($opt{code}, "\n", $opt{pos}) + 1;
-    my $point  = $opt{pos} - $start;
-    my $line   = $opt{line} // $self->{line};
-    my $column = $point;
+    my $code = $opt{code} // '';
+    my $pos  = $opt{pos}  // 0;
 
-    my $error_line = (split(/\R/, substr($opt{code}, $start, $point + 80)))[0] // '';
+    $pos = 0             if $pos < 0;
+    $pos = length($code) if $pos > length($code);
+
+    my $start  = ($pos > 0 ? rindex($code, "\n", $pos - 1) + 1 : 0);
+    my $point  = $pos - $start;
+    my $line   = $opt{line} // $self->{line};
+    my $column = $point + 1;
+
+    my $error_line = (split(/\R/, substr($code, $start, $point + 80)))[0] // '';
 
     if (length($error_line) > 80 && $point > 60) {
         my $from = $point - 40;
@@ -640,6 +647,10 @@ sub fatal_error {
 
     $error .= ' ' x ($point) . '^' . "\n" . ('~' x 80) . "\n";
 
+    if (defined $opt{hint}) {
+        $error .= "[!] Hint: $opt{hint}\n";
+    }
+
     if (exists($opt{var})) {
 
         my ($name, $class) = $self->get_name_and_class($opt{var});
@@ -653,10 +664,12 @@ sub fatal_error {
             }
         }
 
-        foreach my $var (@{$self->{ref_vars_refs}{$class}}) {
-            next if ref $var eq 'ARRAY';
-            if (!$seen{$var->{name}}++) {
-                push @names, $var->{name};
+        foreach my $scope (@{$self->{ref_vars_refs}{$class}}) {
+            foreach my $var (@{$scope}) {
+                next if ref $var eq 'ARRAY';
+                if (!$seen{$var->{name}}++) {
+                    push @names, $var->{name};
+                }
             }
         }
 
@@ -667,6 +680,15 @@ sub fatal_error {
             $class .= '::';
         }
 
+        # The keywords and the built-in classes can be suggested too (e.g.: `retrun` => `return`)
+        my %is_var = map { $_ => 1 } @names;
+        if ($class eq '') {
+            foreach my $word (sort(keys(%{$self->{keywords}}), keys(%{$self->{built_in_classes}}))) {
+                next                if substr($word, 0, 2) eq '__';
+                push(@names, $word) if !$is_var{$word}++;
+            }
+        }
+
         if (my @candidates = Sidef::best_matches($name, [grep { $_ ne $name } @names])) {
             $error .= ("[?] Did you mean: " . join("\n" . (' ' x 18), map { $class . $_ } sort(@candidates)) . "\n");
         }
@@ -675,8 +697,19 @@ sub fatal_error {
     die $error;
 }
 
+# Declares a new variable (or function, class, etc.) in the current scope
+sub _unshift_var {
+    my ($self, $class_name, $entry) = @_;
+    unshift @{$self->{vars}{$class_name}}, $entry;
+    $self->{seen_names}{$class_name}{$entry->{name}} = 1;
+    return;
+}
+
 sub find_var {
     my ($self, $var_name, $class) = @_;
+
+    # Fast exit: no variable with this name was ever declared in this namespace
+    exists($self->{seen_names}{$class}{$var_name}) or return;
 
     foreach my $var (@{$self->{vars}{$class}}) {
         next if ref $var eq 'ARRAY';
@@ -685,10 +718,13 @@ sub find_var {
         }
     }
 
-    foreach my $var (@{$self->{ref_vars_refs}{$class}}) {
-        next if ref $var eq 'ARRAY';
-        if ($var->{name} eq $var_name) {
-            return (wantarray ? ($var, 0) : $var);
+    # The enclosing scopes (from the nearest to the farthest)
+    foreach my $scope (@{$self->{ref_vars_refs}{$class}}) {
+        foreach my $var (@{$scope}) {
+            next if ref $var eq 'ARRAY';
+            if ($var->{name} eq $var_name) {
+                return (wantarray ? ($var, 0) : $var);
+            }
         }
     }
 
@@ -904,15 +940,17 @@ sub get_init_vars {
 
                 my ($name, $class_name) = $self->get_name_and_class((split(' ', $declaration))[-1]);
 
-                undef $classes{$class_name};
-                unshift @{$self->{vars}{$class_name}},
-                  {
-                    obj   => '',
-                    name  => $name,
-                    count => 0,
-                    type  => $opt{type},
-                    line  => $self->{line},
-                  };
+                ++$classes{$class_name};
+                $self->_unshift_var(
+                                    $class_name,
+                                    {
+                                     obj   => '',
+                                     name  => $name,
+                                     count => 0,
+                                     type  => $opt{type},
+                                     line  => $self->{line},
+                                    }
+                                   );
             }
 
             if (/\G<<?\h*/gc) {
@@ -953,9 +991,14 @@ sub get_init_vars {
 
     # Remove the newly added variables
     foreach my $class_name (keys %classes) {
-        for (my $i = 0 ; $i <= $#{$self->{vars}{$class_name}} ; $i++) {
-            if (ref($self->{vars}{$class_name}[$i]) eq 'HASH' and not ref($self->{vars}{$class_name}[$i]{obj})) {
-                splice(@{$self->{vars}{$class_name}}, $i--, 1);
+
+        my $scope     = $self->{vars}{$class_name};
+        my $remaining = $classes{$class_name};        # the number of entries that were added
+
+        for (my $i = 0 ; $remaining > 0 and $i <= $#{$scope} ; $i++) {
+            if (ref($scope->[$i]) eq 'HASH' and not ref($scope->[$i]{obj})) {
+                splice(@{$scope}, $i--, 1);
+                --$remaining;
             }
         }
     }
@@ -983,10 +1026,12 @@ sub parse_init_vars {
     my $end_delim = $self->parse_delim(%opt);
 
     my @var_objs;
+    my %seen_params;
     while (   /\G(?<type>$self->{var_name_re})\h+($self->{var_name_re})\h*/goc
            || /\G([*:]?)($self->{var_name_re})\h*/goc
            || (defined($end_delim) && /\G(?=[({])/)) {
         my ($attr, $name) = ($1, $2);
+        my $name_pos = $-[2] // pos($_);
 
         my $ref_type;
         if (defined($+{type})) {
@@ -1013,6 +1058,18 @@ sub parse_init_vars {
         }
 
         my ($var_name, $class_name) = $self->get_name_and_class($name);
+
+        if (    $opt{params}
+            and $var_name ne ''
+            and substr($var_name, 0, 1) ne '_'
+            and $seen_params{$var_name}++) {
+            $self->fatal_error(
+                               code   => $_,
+                               pos    => $name_pos,
+                               error  => "duplicate parameter name `$var_name`",
+                               reason => "each parameter must have a different name",
+                              );
+        }
 
         if ($opt{type} eq 'del') {
             my $var = $self->find_var($var_name, $class_name);
@@ -1104,14 +1161,16 @@ sub parse_init_vars {
         }
 
         if (!$opt{private} and $var_name ne '') {
-            unshift @{$self->{vars}{$class_name}},
-              {
-                obj   => $obj,
-                name  => $var_name,
-                count => 0,
-                type  => $opt{type},
-                line  => $self->{line},
-              };
+            $self->_unshift_var(
+                                $class_name,
+                                {
+                                 obj   => $obj,
+                                 name  => $var_name,
+                                 count => 0,
+                                 type  => $opt{type},
+                                 line  => $self->{line},
+                                }
+                               );
         }
 
         if ($var_name eq '') {
@@ -1414,6 +1473,14 @@ sub parse_expr {
             my $vars     = $self->parse_init_vars(code => $opt{code}, type => $type);
             my $init_obj = bless({vars => $vars}, 'Sidef::Variable::Init');
 
+            @{$vars}
+              || $self->fatal_error(
+                                    code   => $_,
+                                    pos    => pos($_),
+                                    error  => "expected a variable name after `$type`",
+                                    reason => "a variable name can contain letters, digits and underscores, but it can't start with a digit",
+                                   );
+
             if (/\G\h*=\h*/gc) {
 
                 my $args = $self->parse_obj(code => $opt{code}, multiline => 1);
@@ -1493,14 +1560,16 @@ sub parse_expr {
 
                 push @var_objs, $var;
 
-                unshift @{$self->{vars}{$class_name}},
-                  {
-                    obj   => $var,
-                    name  => $name,
-                    count => 0,
-                    type  => $type,
-                    line  => $line,
-                  };
+                $self->_unshift_var(
+                                    $class_name,
+                                    {
+                                     obj   => $var,
+                                     name  => $name,
+                                     count => 0,
+                                     type  => $type,
+                                     line  => $line,
+                                    }
+                                   );
             };
 
             my $vars = $self->parse_init_vars(
@@ -1573,14 +1642,16 @@ sub parse_expr {
                               );
 
             if (defined $name) {
-                unshift @{$self->{vars}{$class_name}},
-                  {
-                    obj   => $struct,
-                    name  => $name,
-                    count => 0,
-                    type  => 'struct',
-                    line  => $self->{line},
-                  };
+                $self->_unshift_var(
+                                    $class_name,
+                                    {
+                                     obj   => $struct,
+                                     name  => $name,
+                                     count => 0,
+                                     type  => 'struct',
+                                     line  => $self->{line},
+                                    }
+                                   );
             }
 
             my $vars =
@@ -1620,14 +1691,16 @@ sub parse_expr {
 
             my $subset = bless({name => $name, class => $class_name}, 'Sidef::Variable::Subset');
 
-            unshift @{$self->{vars}{$class_name}},
-              {
-                obj   => $subset,
-                name  => $name,
-                count => 0,
-                type  => 'subset',
-                line  => $self->{line},
-              };
+            $self->_unshift_var(
+                                $class_name,
+                                {
+                                 obj   => $subset,
+                                 name  => $name,
+                                 count => 0,
+                                 type  => 'subset',
+                                 line  => $self->{line},
+                                }
+                               );
 
             # Inheritance
             if (/\G<<?\h*/gc) {
@@ -1695,14 +1768,16 @@ sub parse_expr {
                                       );
                 }
 
-                unshift @{$self->{vars}{$self->{class}}},
-                  {
-                    obj   => $value,
-                    name  => $name,
-                    count => 0,
-                    type  => 'enum',
-                    line  => $self->{line},
-                  };
+                $self->_unshift_var(
+                                    $self->{class},
+                                    {
+                                     obj   => $value,
+                                     name  => $name,
+                                     count => 0,
+                                     type  => 'enum',
+                                     line  => $self->{line},
+                                    }
+                                   );
             }
 
             return $value;
@@ -1711,6 +1786,13 @@ sub parse_expr {
         # Local variables
         if (/\Glocal\b\h*/gc) {
             my $expr = $self->parse_obj(code => $opt{code}, prec => PREC_OPERAND);
+
+            $expr // $self->fatal_error(
+                                        code  => $_,
+                                        pos   => pos($_),
+                                        error => "expected a variable after `local`",
+                                       );
+
             return bless({expr => $expr}, 'Sidef::Variable::Local');
         }
 
@@ -1812,14 +1894,16 @@ sub parse_expr {
             }
 
             if (not $has_kids) {
-                unshift @{$self->{vars}{$class_name}},
-                  {
-                    obj   => $obj,
-                    name  => $name,
-                    count => 0,
-                    type  => $type,
-                    line  => $self->{line},
-                  };
+                $self->_unshift_var(
+                                    $class_name,
+                                    {
+                                     obj   => $obj,
+                                     name  => $name,
+                                     count => 0,
+                                     type  => $type,
+                                     line  => $self->{line},
+                                    }
+                                   );
             }
 
             if ($type eq 'class') {
@@ -1983,7 +2067,8 @@ sub parse_expr {
                     $obj->{returns} = \@ref;
                 }
 
-                /\G\h*\{\h*/gc
+                my $brace_pos;
+                (/\G\h*(?=\{)/gc and ($brace_pos = pos($_)) and /\G\{\h*/gc)
                   || $self->fatal_error(
                                         error  => "invalid `$type` declaration",
                                         reason => "expected: $type $name(...){...}",
@@ -1994,9 +2079,13 @@ sub parse_expr {
                 local $self->{$type eq 'func' ? 'current_function' : 'current_method'} = $has_kids ? $parent : $obj;
                 my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
 
-                my $code  = '{' . $args . substr($_, pos);
-                my $block = $self->parse_block(code => \$code, with_vars => 1);
-                pos($_) += pos($code) - length($args) - 1;
+                # The parameters are parsed from a separate string, to avoid copying the rest of the code
+                my $block = $self->parse_block(
+                                               code      => $opt{code},
+                                               with_vars => 1,
+                                               init_code => \$args,
+                                               no_brace  => $brace_pos,
+                                              );
 
                 # Set the block of the function/method
                 $obj->{value} = $block;
@@ -2233,14 +2322,16 @@ sub parse_expr {
 
                 $var->{count}++;
 
-                unshift @{$self->{vars}{$self->{class}}},
-                  {
-                    obj   => $var->{obj},
-                    name  => $name,
-                    count => 0,
-                    type  => $var->{type},
-                    line  => $self->{line},
-                  };
+                $self->_unshift_var(
+                                    $self->{class},
+                                    {
+                                     obj   => $var->{obj},
+                                     name  => $name,
+                                     count => 0,
+                                     type  => $var->{type},
+                                     line  => $self->{line},
+                                    }
+                                   );
             }
 
             return 1;
@@ -2403,6 +2494,8 @@ sub parse_expr {
                 my $content = do { local $/; <$fh> };
                 close $fh;
 
+                utf8::downgrade($content, 1);    # faster to parse, when there are no wide characters
+
                 next if $Sidef::INCLUDED{$full_path};
 
                 local $self->{class}               = $name if defined $name;    # new namespace
@@ -2444,7 +2537,19 @@ sub parse_expr {
 
         # Integer or float number
         if (/\G((?=\.?[0-9])[0-9_]*+(?:\.[0-9_]++)?(?:[Ee](?:[+-]?+[0-9_]+))?)/gc) {
-            my $num = $1 =~ tr/_//dr;
+            my $num_text = $1;
+            my $num      = $1 =~ tr/_//dr;
+
+            # A number can't be directly followed by letters (e.g.: `0b102`, `12abc`)
+            if (/\G(?![if]\b)(?=[^\W\d])/) {
+                my ($rest) = /\G(\w+)/;
+                $self->fatal_error(
+                                   code   => $_,
+                                   pos    => pos($_) - length($num_text),
+                                   error  => "invalid numeric literal `$num_text$rest`",
+                                   reason => "unexpected `$rest` after the number `$num_text`",
+                                  );
+            }
 
             if (/\Gi\b/gc) {    # imaginary
                 return Sidef::Types::Number::Complex->new(0, $num);
@@ -2480,11 +2585,21 @@ sub parse_expr {
                 return $var->{obj};
             }
 
+            if (/\G\.(?!\.)(?!\h*(?:$self->{method_name_re}|[(\$])|\s*$self->{operators_re})/o) {
+                $self->fatal_error(
+                                   code   => $_,
+                                   pos    => pos($_),
+                                   error  => "incomplete method call",
+                                   reason => "expected a method name after `.`",
+                                  );
+            }
+
             $self->fatal_error(
-                               code  => $_,
-                               pos   => pos($_),
-                               error => q{attempt of using an implicit method call on an inexistent "_" variable},
-                              );
+                       code  => $_,
+                       pos   => pos($_),
+                       error => q{attempt of using an implicit method call on an inexistent "_" variable},
+                       hint => q{a leading `.method` is the method call on the topic variable `_`, which exists only inside blocks, such as: arr.each { .say }},
+            );
         }
 
         # Quoted words, numbers, vectors and matrices
@@ -2809,6 +2924,56 @@ sub parse_expr {
             /\G__METHOD_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_method}{name});
         }
 
+        # Misplaced keywords (for better error messages)
+        if (/\G(elsif|else|orwith)\b/gc) {
+            my $word = $1;
+            $self->fatal_error(
+                               code   => $_,
+                               pos    => pos($_) - length($word),
+                               error  => "unexpected `$word`",
+                               reason => (
+                                          $word eq 'orwith'
+                                          ? "`orwith` must follow a `with` statement"
+                                          : "`$word` must follow an `if` statement"
+                                         ),
+                              );
+        }
+
+        if (/\G(elif|elseif)\b/gc) {
+            my $word = $1;
+            $self->fatal_error(
+                               code  => $_,
+                               pos   => pos($_) - length($word),
+                               error => "unknown keyword `$word`",
+                               hint  => "use `elsif` (or `else if`) instead",
+                              );
+        }
+
+        if (/\Gcatch\h*(?=\{)/gc) {
+            $self->fatal_error(
+                               code   => $_,
+                               pos    => pos($_) - 5,
+                               error  => "unexpected `catch`",
+                               reason => "`catch` must follow a `try` block",
+                              );
+        }
+
+        if (   /\G(when|case)\h*(?=\()/gc
+            || /\G(default)\h*(?=\{)/gc
+            || /\G(continue)\b/gc) {
+            my $word = $1;
+            if ($word eq 'continue' or not defined $self->find_var($word, $self->{class})) {
+                $self->fatal_error(
+                                   code   => $_,
+                                   pos    => pos($_) - length($word),
+                                   error  => "unexpected `$word`",
+                                   reason => "`$word` can only be used inside a `given(...) {...}` block",
+                                  );
+            }
+            pos($_) -= length($word);
+            /\G\Q$word\E\h*/gc;
+        }
+
         # Variable access
       VARIABLE_ACCESS:
         if (/\G($self->{var_name_re})/goc) {
@@ -2835,14 +3000,16 @@ sub parse_expr {
                 my $type     = 'var';
                 my $variable = bless({name => $name, type => $type, class => $class}, 'Sidef::Variable::Variable');
 
-                unshift @{$self->{vars}{$class}},
-                  {
-                    obj   => $variable,
-                    name  => $name,
-                    count => 1,
-                    type  => $type,
-                    line  => $self->{line},
-                  };
+                $self->_unshift_var(
+                                    $class,
+                                    {
+                                     obj   => $variable,
+                                     name  => $name,
+                                     count => 1,
+                                     type  => $type,
+                                     line  => $self->{line},
+                                    }
+                                   );
 
                 return $variable;
             }
@@ -2977,7 +3144,8 @@ sub parse_arg {
     local *_ = $opt{code};
 
     if (/\G\(/gc) {
-        my $p = pos($_);
+        my $p    = pos($_);
+        my $line = $self->{line};
         local $self->{parentheses} = 1;
         local $self->{no_pipe_op}  = 0;
         local $self->{no_pair_op}  = 0;
@@ -2985,9 +3153,11 @@ sub parse_arg {
 
         $self->{parentheses}
           && $self->fatal_error(
-                                code  => $_,
-                                pos   => $p - 1,
-                                error => "unbalanced parenthesis",
+                                code   => $_,
+                                pos    => $p - 1,
+                                error  => "unbalanced parenthesis",
+                                reason => "the `(` opened here has no matching `)`",
+                                line   => $line,
                                );
 
         return $obj;
@@ -3002,7 +3172,8 @@ sub parse_array {
     local *_ = $opt{code};
 
     if (/\G\[/gc) {
-        my $p = pos($_);
+        my $p    = pos($_);
+        my $line = $self->{line};
         local $self->{right_brackets} = 1;
         local $self->{no_pipe_op}     = 0;
         local $self->{no_pair_op}     = 0;
@@ -3010,9 +3181,11 @@ sub parse_array {
 
         $self->{right_brackets}
           && $self->fatal_error(
-                                code  => $_,
-                                pos   => $p - 1,
-                                error => "unbalanced right bracket",
+                                code   => $_,
+                                pos    => $p - 1,
+                                error  => "unbalanced right bracket",
+                                reason => "the `[` opened here has no matching `]`",
+                                line   => $line,
                                );
 
         return $obj;
@@ -3027,7 +3200,8 @@ sub parse_lookup {
     local *_ = $opt{code};
 
     if (/\G\{/gc) {
-        my $p = pos($_);
+        my $p    = pos($_);
+        my $line = $self->{line};
         local $self->{curly_brackets} = 1;
         local $self->{no_pipe_op}     = 0;
         local $self->{no_pair_op}     = 0;
@@ -3035,9 +3209,11 @@ sub parse_lookup {
 
         $self->{curly_brackets}
           && $self->fatal_error(
-                                code  => $_,
-                                pos   => $p - 1,
-                                error => "unbalanced curly bracket",
+                                code   => $_,
+                                pos    => $p - 1,
+                                error  => "unbalanced curly bracket",
+                                reason => "the `{` opened here has no matching `}`",
+                                line   => $line,
                                );
 
         return $obj;
@@ -3050,9 +3226,12 @@ sub parse_block {
     my ($self, %opt) = @_;
 
     local *_ = $opt{code};
-    if (/\G\{/gc) {
+    if (defined($opt{no_brace}) or /\G\{/gc) {
 
-        my $p = pos($_);
+        # The position of the opening curly bracket
+        my $p    = (defined($opt{no_brace}) ? $opt{no_brace} + 1 : pos($_));
+        my $line = $self->{line};
+
         local $self->{curly_brackets} = 1;
         local $self->{no_pipe_op}     = 0;
         local $self->{no_pair_op}     = 0;
@@ -3063,13 +3242,13 @@ sub parse_block {
             $class_name = $opt{prev_class};
         }
 
-        my $ref   = $self->{vars}{$class_name} //= [];
-        my $count = scalar(@{$self->{vars}{$class_name}});
+        my $ref = $self->{vars}{$class_name} //= [];
 
-        unshift @{$self->{ref_vars_refs}{$class_name}}, @{$ref};
-        unshift @{$self->{vars}{$class_name}},          [];
+        # The enclosing scope becomes the nearest one in the chain, and a new scope is created
+        unshift @{$self->{ref_vars_refs}{$class_name}}, $ref;
+        unshift @{$ref},                                [];
 
-        $self->{vars}{$class_name} = $self->{vars}{$class_name}[0];
+        $self->{vars}{$class_name} = $ref->[0];
 
         my $block = bless({}, 'Sidef::Types::Block::BlockInit');
 
@@ -3079,11 +3258,11 @@ sub parse_block {
         my $has_vars;
         my $var_objs = [];
 
-        if (($opt{topic_var} || $opt{with_vars}) && /\G(?=\|)/) {
+        if (($opt{topic_var} || $opt{with_vars}) && (defined($opt{init_code}) || /\G(?=\|)/)) {
             $has_vars = 1;
             $var_objs = $self->parse_init_vars(
                                                params => 1,
-                                               code   => $opt{code},
+                                               code   => (defined($opt{init_code}) ? $opt{init_code} : $opt{code}),
                                                type   => 'var',
                                               );
         }
@@ -3101,9 +3280,11 @@ sub parse_block {
 
         $self->{curly_brackets}
           && $self->fatal_error(
-                                code  => $_,
-                                pos   => $p - 1,
-                                error => "unbalanced curly bracket",
+                                code   => $_,
+                                pos    => $p - 1,
+                                error  => "unbalanced curly bracket",
+                                reason => "the `{` opened here has no matching `}`",
+                                line   => $line,
                                );
 
         #$block->{vars} = [
@@ -3116,7 +3297,7 @@ sub parse_block {
         }
 
         $block->{code} = $obj;
-        splice @{$self->{ref_vars_refs}{$class_name}}, 0, $count;
+        shift @{$self->{ref_vars_refs}{$class_name}};
         $self->{vars}{$class_name} = $ref;
 
         return $block;
@@ -3155,10 +3336,13 @@ sub parse_methods {
     local *_ = $opt{code};
     my $orig_pos = pos($_);
 
+    # After an arrow (`->`), the first method name is not preceded by a dot
+    my $arrow = $opt{arrow};
+
     {
         # Method calls introduced by a dot (e.g.: `.name`, `.name(...)`, `.+(...)`).
         # The infix operators are handled by parse_infix().
-        if (/\G\.(?!\.)/gc) {    # a single dot (`...` and `..` are operators)
+        if ($arrow ? ($arrow = 0, 1) : /\G\.(?!\.)/gc) {    # a single dot (`...` and `..` are operators)
             my ($method, $req_arg, $op_type) = $self->get_method_name(code => $opt{code});
 
             if (defined($method)) {
@@ -3601,13 +3785,7 @@ sub parse_infix {
 
             $self->_flush_chain(\$struct, \$chain) if defined $chain;
 
-            my $code   = substr($_, pos($_));
-            my $dot_op = $code =~ /^\./;
-            if   ($dot_op) { $code = ". $code" }
-            else           { $code = ".$code" }
-
-            my $methods = $self->parse_methods(code => \$code);
-            pos($_) += pos($code) - ($dot_op ? 2 : 1);
+            my $methods = $self->parse_methods(code => $opt{code}, arrow => 1);
 
             @{$methods}
               || $self->fatal_error(
@@ -3961,14 +4139,16 @@ sub parse_operand {
                             'Sidef::Variable::Variable'
                            );
 
-                    unshift @{$self->{vars}{$class_name}},
-                      {
-                        obj   => $vars[-1],
-                        name  => $name,
-                        count => 1,
-                        type  => 'var',
-                        line  => $self->{line},
-                      };
+                    $self->_unshift_var(
+                                        $class_name,
+                                        {
+                                         obj   => $vars[-1],
+                                         name  => $name,
+                                         count => 1,
+                                         type  => 'var',
+                                         line  => $self->{line},
+                                        }
+                                       );
 
                     $type && last;
                     /\G\h*,\h*/gc || last;
@@ -4010,9 +4190,10 @@ sub parse_operand {
                          /\G\h*(?=\{)/gc
                          ? $self->parse_block(code => $opt{code})
                          : $self->fatal_error(
-                                              error => "expected a block",
-                                              code  => $_,
-                                              pos   => pos($_),
+                                              error  => "invalid declaration of the `for` loop",
+                                              reason => "expected a block after the loop expression: for x in expr { ... }",
+                                              code   => $_,
+                                              pos    => pos($_),
                                              )
                         );
 
@@ -4365,9 +4546,10 @@ sub parse_script {
 
             if (--$self->{right_brackets} < 0) {
                 $self->fatal_error(
-                                   error => 'unbalanced right bracket',
-                                   code  => $_,
-                                   pos   => pos($_) - 1,
+                                   error  => 'unbalanced right bracket',
+                                   reason => 'unexpected `]`: there is no matching `[` before it',
+                                   code   => $_,
+                                   pos    => pos($_) - 1,
                                   );
             }
 
@@ -4378,9 +4560,10 @@ sub parse_script {
 
             if (--$self->{curly_brackets} < 0) {
                 $self->fatal_error(
-                                   error => 'unbalanced curly bracket',
-                                   code  => $_,
-                                   pos   => pos($_) - 1,
+                                   error  => 'unbalanced curly bracket',
+                                   reason => 'unexpected `}`: there is no matching `{` before it',
+                                   code   => $_,
+                                   pos    => pos($_) - 1,
                                   );
             }
 
@@ -4392,19 +4575,22 @@ sub parse_script {
 
             if (--$self->{parentheses} < 0) {
                 $self->fatal_error(
-                                   error => 'unbalanced parenthesis',
-                                   code  => $_,
-                                   pos   => pos($_) - 1,
+                                   error  => 'unbalanced parenthesis',
+                                   reason => 'unexpected `)`: there is no matching `(` before it',
+                                   code   => $_,
+                                   pos    => pos($_) - 1,
                                   );
             }
 
             return \%struct;
         }
 
+        my ($token) = /\G(\S{1,12})/;
+
         $self->fatal_error(
                            code  => $_,
                            pos   => (pos($_)),
-                           error => "expected a method",
+                           error => (defined($token) ? "unexpected token `$token`" : "unexpected end of input"),
                           );
 
         pos($_) += 1;
