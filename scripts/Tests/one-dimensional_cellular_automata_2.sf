@@ -15,9 +15,9 @@ class Automaton(rule, cells) {
         var len = previous.len;
         cells = [rule[
                 previous.range.map { |i|
-                    4*previous[i-1 % len] +
+                    4*previous[i-1 ->% len] +
                     2*previous[i]         +
-                      previous[i+1 % len]
+                      previous[i+1 ->% len]
                 }]
             ];
     }

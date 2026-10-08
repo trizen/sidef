@@ -5,7 +5,7 @@ var T = sqrt(1.25)-0.5;
 var W = S+T;    #=> sqrt(5);
 
 func fib(n) {
-    pow(S, n) - pow(-T, n) / W -> round;
+    (pow(S, n) - pow(-T, n))/ W -> round;
 }
 
 func is_fib (i, fib) {

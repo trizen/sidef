@@ -34,7 +34,7 @@ func solve_apollonius(Array c, Array s) -> Circle {
     var 𝑐 = (c[0].x**2 + 𝑀**2 - 2*𝑀*c[0].x + 𝑃**2 + c[0].y**2 - 2*𝑃*c[0].y - c[0].r**2);
 
     var 𝐷 = (𝑏**2 - 4*𝑎*𝑐);
-    var rs = ((-𝑏 - 𝐷.sqrt) / 2*𝑎);
+    var rs = ((-𝑏 - 𝐷.sqrt) / (2*𝑎));
 
     var xs = (𝑀 + 𝑁*rs);
     var ys = (𝑃 + 𝑄*rs);

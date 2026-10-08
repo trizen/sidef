@@ -13,7 +13,7 @@ func draw_grid(n, k) {
 
     0..n -> map {|a|
         0..n -> map {|b|
-            sym(a %% n/k, b %% n/k)
+            sym(a ->%% n/k, b ->%% n/k)
         }.join
     }.join("\n").say
 }

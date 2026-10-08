@@ -268,7 +268,7 @@ class new(diacritics            = true,
             number -= number.int;
 
             while (number != number.int) {
-                number *= 10 < 1 && (words.append(DIGITS{0}));
+                (number *= 10) < 1 && (words.append(DIGITS{0}));
             }
 
             words.append(__METHOD__(self, number.int)...);

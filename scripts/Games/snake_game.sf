@@ -106,8 +106,8 @@ func move {
     # Move the head
     var (y, x) = head_pos...;
 
-    var new_y = (y+dir[0] % h);
-    var new_x = (x+dir[1] % w);
+    var new_y = (y+dir[0] ->% h);
+    var new_x = (x+dir[1] ->% w);
 
     var cell = grid[new_y][new_x];
 
@@ -131,8 +131,8 @@ func move {
         var (y, x) = tail_pos...;
 
         var pos   = grid[y][x][1];
-        var new_y = (y+pos[0] % h);
-        var new_x = (x+pos[1] % w);
+        var new_y = (y+pos[0] ->% h);
+        var new_x = (x+pos[1] ->% w);
 
         grid[y][x][0]         = VOID;    # erase the current tail
         grid[new_y][new_x][0] = TAIL;    # create a new tail

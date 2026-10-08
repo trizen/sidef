@@ -3,8 +3,8 @@
 # Translation of: https://rosettacode.org/wiki/Averages/Pythagorean_means#Perl_6
 
 func A(a) { a«+» / a.len }
-func G(a) { a«*» ** 1/a.len }
-func H(a) { a «/« 1 «+» / a.len ** -1 }
+func G(a) { a«*» ->** 1/a.len }
+func H(a) { a «/« 1 «+» / a.len ->** -1 }
 
 var ints = @(1..10)
 say("A(1,...,10) = ", A(ints))

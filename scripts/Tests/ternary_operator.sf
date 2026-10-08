@@ -45,8 +45,12 @@ assert_eq(f ? 4 : 9 -> isqrt, 3)
 assert_eq(t?(3):(4), 3)
 assert_eq(f?(3):(4), 4)
 
-assert_eq(t?(3):(4) + 9, 12)
+assert_eq(t?(3):(4) + 9, 3)
 assert_eq(f?(3):(4) + 9, 13)
+
+assert_eq(false ? 'error' : true ? 'ok' : 'no', 'ok')
+assert_eq(true ? 'ok' : true ? 'error' : 'no', 'ok')
+assert_eq(false ? 'error' : false ? 'no' : 'ok', 'ok')
 
 assert_eq(
     t
@@ -61,7 +65,7 @@ assert_eq(
 assert_eq(
     t
         ? 4
-        : 9 + 7, 11)
+        : 9 + 7, 4)
 
 assert_eq(
     f
@@ -80,23 +84,23 @@ assert_eq(t || f ? 2 : 5, 2)
 assert_eq(t && f ? 2 : 5, 5)
 assert_eq(f && t ? 2 : 5, 5)
 
-assert_eq(t && t ? 2 : 5 + 11, 13)
-assert_eq(t || f ? 2 : 5 + 11, 13)
-assert_eq(f || t ? 2 : 5 + 11, 13)
+assert_eq(t && t ? 2 + 11 : 5 + 11, 13)
+assert_eq(t || f ? 2 + 11 : 5 + 11, 13)
+assert_eq(f || t ? 2 + 11 : 5 + 11, 13)
 
 assert_eq(t && f ? 2 : 5 + 11, 16)
 assert_eq(f && t ? 2 : 5 + 11, 16)
 assert_eq(f && f ? 2 : 5 + 11, 16)
 
-assert_eq(3 == 3 ? 2 : 5 + 11, 13)
-assert_eq(3 == 4 ? 2 : 5 + 11, 16)
+assert_eq(3 == 3 ? 2 + 11 : 5 + 11, 13)
+assert_eq(3 == 4 ? 2 + 11 : 5 + 11, 16)
 
 assert_eq(3 == 4
-    ? 2
+    ? 2 + 11
     : 5 + 11, 16)
 
 assert_eq(3 == 3
-    ? 2
+    ? 2 + 11
     : 5 + 11, 13)
 
 say "** Test passed!"

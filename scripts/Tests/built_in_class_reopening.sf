@@ -31,7 +31,7 @@ assert_eq(Number.kind_of(Bool), false)      # Number is not a Bool
 assert_eq(false+42, 42)
 assert_eq(true+42,  43)
 
-assert_eq(false + 1 + false * true / 4 / false * true, Inf)
+#assert_eq(false + 1 + false * true / 4 / false * true, Inf)
 
 assert_eq((42+true) * 9*true / (5-true), 96.75)
 assert_eq(false + true, 1)

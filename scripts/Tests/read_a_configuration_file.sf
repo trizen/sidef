@@ -18,7 +18,7 @@ DATA.each { |line|
         when ("FAVOURITEFRUIT") { favouritefruit = value }
         when ("NEEDSPEELING")   { needspeeling = true }
         when ("SEEDSREMOVED")   { seedsremoved = true }
-        when ("OTHERFAMILY")    { otherfamily = value.split(',')»strip»() }
+        when ("OTHERFAMILY")    { otherfamily = value.split(',') |>> :strip }
         default                 { say "#{key}: unknown key" }
     }
 }

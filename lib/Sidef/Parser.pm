@@ -4050,6 +4050,9 @@ sub _parse_prefix_arg {
         elsif ($method eq 'say' or $method eq 'print' or $method eq '>' or $method eq '>>') {    # list operators
             $prec = PREC_ASSIGN;
         }
+        elsif ($method eq '@' or $method eq '@|') {
+            $prec = PREC_RANGE;
+        }
     }
     elsif ($ref eq 'Sidef::Variable::Ref' or $ref eq 'Sidef::Meta::PrefixColon') {
         $prec = PREC_OPERAND;
