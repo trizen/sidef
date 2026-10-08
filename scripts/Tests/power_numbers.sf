@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 for (1..15) { |i|
-    var pow = (1 << (i-1) / i);
+    var pow = (1 << (i-1) -> / i);
 
     var num = (i**i);
     {num=(num.sqrt)} * (i-1);

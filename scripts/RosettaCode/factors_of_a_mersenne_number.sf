@@ -20,8 +20,8 @@ func mtest(b, p) {
     { |k|
         q = (2*k*m + 1)
         q%8 ~~ [1,7] || q.is_prime || next
-        q*q > x || (f = mtest(m, q)) && break
-    } << 1..Inf
+        q*q > x || (f = mtest(m, q)) ->&& break
+    } .<< 1..Inf
     say (f ? "M#{m} is composite with factor #{q}"
            : "M#{m} is prime")
 } << (2..60 -> lazy.grep{ .is_prime }, 929)

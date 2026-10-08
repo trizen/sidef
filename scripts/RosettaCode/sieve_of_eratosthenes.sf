@@ -5,7 +5,7 @@
 #
 
 func sieve_iter(limit) {
-    var is_prime = [false, false, ([true] * limit-1)...]
+    var is_prime = [false, false, ([true] * (limit-1))...]
     gather {
         is_prime.each_kv { |number, prime|
             if (prime) {

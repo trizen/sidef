@@ -9,7 +9,7 @@ var a = 17.of { 17.of(0) }
 17.times{|i| a[i][i] = '-' }
 4.times { |k|
   17.times { |i|
-    var j = ((i + 1<<k) % 17)
+    var j = ((i + (1<<k)) % 17)
     a[i][j] = (a[j][i] = 1)
   }
 }

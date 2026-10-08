@@ -8,7 +8,7 @@ func factors(n) {
   gather {
     { |d|
         take(d, n//d) if d.divides(n)
-    } << 1..n.isqrt
+    } << (1..n.isqrt)
   }.sort.uniq
 }
  
