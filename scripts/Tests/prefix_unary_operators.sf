@@ -27,10 +27,10 @@ assert_eq([(-(42))-43], [-85])
 
 assert_eq(-x**2, -9)
 assert_eq(-(x**2), -9)
-assert_eq(-(x)**2, 9)
+assert_eq(-(x)**2, -9)
 
 assert_eq(-42**2, -1764)
-assert_eq(-(42)**2, 1764)
+assert_eq(-(42)**2, -1764)
 assert_eq(-(42) -> pow(2), 1764)
 assert_eq(-(42**2), -1764)
 assert_eq(-(x+y), -7)

@@ -22,7 +22,7 @@ func merge(left, right) {
 func merge_sort(array { .len < 2 }) { array }
 
 func merge_sort(array) {
-    var (left, right) = @|array/2
+    var (left, right) = @|(array/2)
 
     __FUNC__(left)
     __FUNC__(right)

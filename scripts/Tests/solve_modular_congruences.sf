@@ -143,12 +143,12 @@ do {
     var d = 1212387123
     var m = (2**32 + 1)
 
-    var r = (a*x**3 + b*x**2 + c*x + d % m)
+    var r = (a*x**3 + b*x**2 + c*x + d ->% m)
     var S = solve_cubic_mod(a, b, c, d - r, m)
     assert_eq(S, %n[1464167034, 2788039718, 3252142948])
 
     assert(S.map{|x|
-       (a*x**3 + b*x**2 + c*x + d - r % m)
+       (a*x**3 + b*x**2 + c*x + d - r ->% m)
     }.all { .is_zero })
 }
 
@@ -160,7 +160,7 @@ do {
     var d = 810
     var n = (43**2 * (2**16 + 1))
 
-    var r = (a*x**3 + b*x**2 + c*x + d % n)
+    var r = (a*x**3 + b*x**2 + c*x + d ->% n)
 
     assert_eq(
         solve_cubic_mod(a, b, c, d - r, n),
@@ -181,7 +181,7 @@ do {
     var d = 810
     var n = (43 * (2**16 + 1))
 
-    var r = (a*x**3 + b*x**2 + c*x + d % n)
+    var r = (a*x**3 + b*x**2 + c*x + d ->% n)
 
     assert_eq(
         solve_cubic_mod(a, b, c, d - r, n),
@@ -223,7 +223,7 @@ do {
     var d = 43
     var m = (863 * (2**32 + 1) * 43)
 
-    d -= (a*x**3 + b*x**2 + c*x + d % m)
+    d -= (a*x**3 + b*x**2 + c*x + d ->% m)
     var S = solve_cubic_mod(a, b, c, d, m)
     var S2 = roots_mod(Poly([a,b,c,d]), m)
 
@@ -236,7 +236,7 @@ do {
         var pe = p**e
         PolyMod([a,b,c,d], pe).factor.grep{.kind_of(Poly)}.each {|f|
             f.degree == 1 || next
-            table{pe} := [] << [pe - f.coeff(0), pe]
+            table{pe} := [] -> << [pe - f.coeff(0), pe]
         }
     }
 
@@ -253,7 +253,7 @@ do {
     }.all{.is_zero})
 
     assert(S.map{|x|
-       (a*x**3 + b*x**2 + c*x + d % m)
+       (a*x**3 + b*x**2 + c*x + d ->% m)
     }.all{.is_zero})
 }
 

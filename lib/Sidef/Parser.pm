@@ -86,9 +86,10 @@ my %INFIX_PREC;
 {
     my @table = (
                  [PREC_POW,        'R', '**'],
-                 [PREC_MUL,        'L', '*',  '/',   '//', '%', '%%', '÷', '×', '⋅', '∙', '∘', '∩', '⊗', '∣', '∤'],
-                 [PREC_ADD,        'L', '+',  '-',   '−',  '∪', '∖',  '⊕', '⊖', '⊎'],
-                 [PREC_SHIFT,      'L', '<<', '>>',  '≪',  '≫'],
+                 [PREC_MUL,        'L', '*', '/', '//', '%', '%%', '÷', '×', '⋅', '∙', '∘', '∩', '⊗', '∣', '∤'],
+                 [PREC_ADD,        'L', '+', '-', '−',  '∪', '∖',  '⊕', '⊖', '⊎'],
+                 [PREC_OPERAND,    'L', ':='],
+                 [PREC_SHIFT,      'L', '<<', '>>',  '≪', '≫'],
                  [PREC_RANGE,      'L', '..', '^..', '..^'],
                  [PREC_WORD_OP,    'L', '|>', '|>>', '|X>', '|Z>'],
                  [PREC_BITAND,     'L', '&'],
@@ -99,7 +100,7 @@ my %INFIX_PREC;
                  [PREC_OROR,       'L', '||', '\\\\', '∨'],
                  [PREC_PAIR,       'L', ':',  '：',    '⫶'],
                  [PREC_ASSIGN,     'R', '='],
-                 [PREC_ASSIGN,     'L', ':=', '||=', '&&=', '//=', '\\\\=', '+=', '-=', '*=', '/=', '÷=', '%=', '**=', '^=', '|=', '&=', '<<=', '>>='],
+                 [PREC_ASSIGN,     'L', '||=', '&&=', '//=', '\\\\=', '+=', '-=', '*=', '/=', '÷=', '%=', '**=', '^=', '|=', '&=', '<<=', '>>='],
                 );
 
     foreach my $row (@table) {
@@ -3350,7 +3351,7 @@ sub parse_methods {
                 my $has_arg;
                 if (/\G\h*(?=[({])/gc || $req_arg) {
                     my $arg = (
-                                 $req_arg   ? $self->parse_obj(code => $opt{code}, multiline => 1, prec => PREC_OPERAND)
+                                 $req_arg   ? $self->parse_obj(code => $opt{code}, multiline => 1, prec => PREC_BITOR)
                                : /\G(?=\()/ ? $self->parse_arg(code => $opt{code})
                                : /\G(?=\{)/ ? $self->parse_block(code => $opt{code}, topic_var => 1)
                                :              die "[PARSER ERROR] Something is wrong in the if condition"
@@ -4026,6 +4027,7 @@ sub _parse_prefix_arg {
                  or $method eq 'defined'
                  or $method eq '>'
                  or $method eq '>>'
+                 or $method eq '+'
                  or $method eq '@'
                  or $method eq '@|')
            )
