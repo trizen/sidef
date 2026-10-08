@@ -22369,6 +22369,35 @@ sub _cohen_h_L_general {
     my $absD = CORE::abs($Dn);
     my $M    = $absD >> 1;
 
+    if ($absD > 1e3 and $USE_PARI_GP) {
+        my $pari_gp_code = qq{
+            ((r,D)->{
+                my(absD = abs(D));
+                my(DB = 1);
+                for (j = 0, r,
+                    DB = lcm(DB, denominator(bernfrac(j)));
+                );
+                \\\\ Multiplier M guarantees M * L(1-r, chi_D) is an integer
+                my(M = r * DB * absD);
+
+                \\\\ Calculate needed decimal digits for exact rounding
+                my(digits = ceil(log(M + 1) / log(10)) + 20);
+                my(val);
+                localprec(digits);
+
+                \\\\ Evaluate L(1-r, chi_D) numerically in O(sqrt(|D|)) time via lfun
+                val = lfun(D, 1 - r);
+                return(round(val * M) / M);
+            })($r, $D)
+        };
+
+        my $res = _execute_pari_gp($pari_gp_code);
+        if (defined($res) and $res =~ /[0-9]/) {
+            my $q = _any2mpq(_str2obj($res));
+            defined($q) and return $q;
+        }
+    }
+
     # Power-character sums: S[m] = Sum_{k=1..M} kronecker(D, k) * k^m
     my @S    = map { Math::GMPz::Rmpz_init_set_ui(0) } 0 .. $r;
     my $term = Math::GMPz::Rmpz_init();
