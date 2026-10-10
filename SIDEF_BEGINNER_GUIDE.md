@@ -878,68 +878,119 @@ say ("banana" > "apple")    # true  (alphabetically greater than)
 
 ## 11. Operator Precedence
 
-> ⚠️ **This is the single most important rule to understand in Sidef.** Get this wrong and your programs will produce surprising results.
-
-Most languages have complex precedence rules (multiply before add, etc.). Sidef is different: **it uses whitespace to determine how operators group**.
-
-### The rule: no spaces bind tighter than spaces
-
-When operators are written **without spaces around them**, they are grouped into a single unit first. When operators are written **with spaces around them**, they are evaluated left to right.
+Sidef uses conventional operator precedence, similar to Ruby's: multiplication binds tighter than addition, `**` binds tighter than multiplication, and so on. Operators higher in the table below bind tighter. **Whitespace never changes how an expression is grouped.**
 
 ```ruby
-#
-# Example 1: spaces between ALL operators → left to right
-#
-say (1 + 2 * 3 + 4)    # means: ((1+2) * 3) + 4 = 13
-#          ↑
-#     evaluated as: ((1 + 2) * 3) + 4
-
-#
-# Example 2: no spaces → binds tightly
-#
-say (1 + 2*3 + 4)      # means: 1 + (2*3) + 4 = 11
-#         ↑
-#     2*3 is one tight unit
-
-#
-# Example 3: mixing both
-#
-say (1+2 * 3+4)        # means: (1+2) * (3+4) = 21
-#    ↑↑↑   ↑↑↑
-#   tight  tight → each becomes a unit, then * is evaluated
+say (1 + 2 * 3)      # 7   → 1 + (2 * 3)
+say (1+2 * 3+4)      # 11  → spacing is irrelevant: (1+(2*3))+4
+say (-2 ** 2)        # -4  → -(2 ** 2)
+say (2 ** 3 ** 2)    # 512 → 2 ** (3 ** 2)   (** is right-associative)
 ```
 
-### The safest approach: always use parentheses
+### Precedence table (highest to lowest)
 
-When in doubt, use explicit parentheses. This always works correctly and makes your intention clear to anyone reading the code:
+| Level | Operators | Notes |
+|-------|-----------|-------|
+| Postfix / terms | `.method`, `[...]`, `{...}`, `(...)`, `n!`, `x++`, `list...` | binds tightest |
+| Prefix | `!` `~` `\` unary `+` `*` `√` `^` `@` | apply to one operand |
+| Power | `**` | right-associative |
+| Unary minus | `-x` | its argument is parsed at the `**` level |
+| Multiplicative | `*` `/` `//` `%` `%%` `÷` ... | `//` is integer division |
+| Additive | `+` `-` | |
+| Shift | `<<` `>>` | |
+| Range | `..` `^..` `..^` | |
+| Word operators | ``a `method` b``, `\|>`, `\|>>`, `»op»`, `~Zop`, `~Xop` ... | chained from left to right |
+| Bitwise AND | `&` | |
+| Bitwise OR / XOR | `\|` `^` | |
+| Relational | `<` `<=` `>` `>=` `∈` ... | chainable |
+| Equality | `==` `!=` `<=>` `~~` `=~` `!~` ... | chainable (`==`, `!=`) |
+| Logical AND | `&&` | |
+| Logical OR | `\|\|` `\\` | `\\` is the defined-or operator |
+| Pair | `:` | builds a pair: `"a":1` |
+| Ternary | `?:` | right-associative |
+| Assignment | `=` (right-associative); `+=` `-=` `*=` `\|\|=` ... (left-associative) | see the note on `:=` below |
+| Low-precedence AND | `and` | binds tighter than `or` |
+| Low-precedence OR | `or` | |
+| Statement modifiers | `if` `unless` `while` `until` | |
+| Arrow | `expr -> method` | applies to the whole expression on its left |
+
+### Examples
 
 ```ruby
-# These are all clear and unambiguous:
+say (2 + 3 * 4)                     # 14   → 2 + (3 * 4)
+say (-2 ** 2)                       # -4   → -(2 ** 2)
+say (2 ** 3 ** 2)                   # 512  → 2 ** (3 ** 2)
+var x = 6
+say (x & 1 == 0)                    # true → (x & 1) == 0
+var n = 4
+say (1..n+1 -> to_a)                # [1, 2, 3, 4, 5] → 1..(n+1)
+say (3 ~~ 1..5)                     # true → 3 ~~ (1..5)
+say ("a":1)                         # Pair("a", 1)
+var (a, b, c, d) = (true, false, "c", "d")
+say (a || b ? c : d)                # c    → (a || b) ? c : d
+say (true and false or true)        # true → (true and false) or true
+say (7 // 2)                        # 3    (integer division)
+say (nil \\ 5)                       # 5    (defined-or)
+```
+
+### Chained comparisons
+
+Relational operators (`<` `<=` `>` `>=`) can be chained with each other, and so can the equality operators `==` and `!=`. The chain `a < b <= c` means `a < b && b <= c`, and the middle operand is evaluated only once:
+
+```ruby
+say (1 < 2 <= 3)     # true → 1 < 2 && 2 <= 3
+say (1 != 2 != 3)    # true → 1 != 2 && 2 != 3
+```
+
+> 📝 **Note:** Chaining works only inside one class: you can chain relational operators with relational operators, or equality operators with equality operators.
+
+### `and` vs `or`
+
+`and` binds tighter than `or`, and both bind more loosely than assignment:
+
+```ruby
+say (true or false and false)   # true  → true or (false and false)
+```
+
+> 💡 **Tip:** Unlike Ruby, where `and` and `or` have the same precedence, in Sidef `and` binds tighter than `or`, as in most other languages.
+
+### The `:=` operator
+
+The `:=` operator (assign only if the left-hand side is `nil`) is a special case: it binds **tightly**, to the operand immediately on its right, rather than like `=`:
+
+```ruby
+var h = Hash()
+h{:k} := [] << (1,2)    # (h{:k} := []) << (1,2)
+h{:k} := [] << 3        # (h{:k} := []) << 3
+say h{:k}               # [1, 2, 3]
+
+var x
+x := 2 * 3              # (x := 2) * 3
+say x                   # 2
+```
+
+### The arrow operator
+
+The arrow `->` has the lowest precedence of all. It is applied to the *whole* expression on its left, including statement-level words such as `var` or `say`:
+
+```ruby
+say (1..5 -> to_a)                    # [1, 2, 3, 4, 5]
+say (5 + 3 -> sqrt)                   # 2.828... → (5 + 3).sqrt
+var h = Hash()
+h{:k} := 0 -> max!(10)
+say h{:k}                             # 10
+```
+
+### Use parentheses when in doubt
+
+Parentheses are never required, but they make your intention clear to anyone reading the code:
+
+```ruby
 var area    = (length * width)
 var average = ((a + b + c) / 3)
 var hyp     = ((a**2 + b**2).sqrt)
 var tax     = (price * (1 + tax_rate))
 ```
-
-### Using backslash or dot to override grouping
-
-You can use `\` or a leading `.` to force a different grouping:
-
-```ruby
-say (1 + 2 \* 3)     # means 1 + (2 * 3) = 7
-say (1 + 2 .* 3)     # same thing
-```
-
-### Summary table
-
-| Expression    | Meaning            | Result |
-|---------------|--------------------|--------|
-| `1 + 2 * 3`   | `(1 + 2) * 3`      | 9      |
-| `1 + 2*3`     | `1 + (2*3)`        | 7      |
-| `1+2 * 3+4`   | `(1+2) * (3+4)`    | 21     |
-| `(1 + 2) * 3` | `(1 + 2) * 3`      | 9      |
-
-> 💡 **Best practice:** Until you are very comfortable with this rule, wrap every binary operation in its own parentheses. It costs nothing and prevents bugs.
 
 ---
 
