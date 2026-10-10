@@ -892,13 +892,13 @@ say (2 ** 3 ** 2)    # 512 → 2 ** (3 ** 2)   (** is right-associative)
 | Level | Operators | Notes |
 |-------|-----------|-------|
 | Postfix / terms | `.method`, `[...]`, `{...}`, `(...)`, `n!`, `x++`, `list...` | binds tightest |
-| Prefix | `!` `~` `\` unary `+` `*` `√` `^` `@` | apply to one operand |
+| Prefix | `!` `~` `\` unary `+` `*` `√` `^` | apply to one operand |
 | Power | `**` | right-associative |
 | Unary minus | `-x` | its argument is parsed at the `**` level |
 | Multiplicative | `*` `/` `//` `%` `%%` `÷` ... | `//` is integer division |
 | Additive | `+` `-` | |
 | Shift | `<<` `>>` | |
-| Range | `..` `^..` `..^` | |
+| Range | `..` `^..` `..^` `@` `@|` | `@1..5` is `@(1..5)` |
 | Word operators | ``a `method` b``, `\|>`, `\|>>`, `»op»`, `~Zop`, `~Xop` ... | chained from left to right |
 | Bitwise AND | `&` | |
 | Bitwise OR / XOR | `\|` `^` | |
