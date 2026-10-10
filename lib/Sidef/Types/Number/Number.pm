@@ -22760,9 +22760,12 @@ sub _sos_k7 {
     # r_7(n) = -28*CohenH(3, 4*n) - 224*CohenH(3, n)
 
     my $n_obj = bless \$n;
-    my $core  = $n_obj->core;
 
-    if ($core->gt($n_obj->icbrt->sqr)) {
+    if (
+        $USE_PARI_GP
+        ? 0
+        : do { my $core = $n_obj->core; $core->gt($n_obj->icbrt->sqr) }
+      ) {
         return undef;
     }
 
