@@ -878,7 +878,7 @@ say ("banana" > "apple")    # true  (alphabetically greater than)
 
 ## 11. Operator Precedence
 
-Sidef uses conventional operator precedence, similar to Ruby's: multiplication binds tighter than addition, `**` binds tighter than multiplication, and so on. Operators higher in the table below bind tighter. **Whitespace never changes how an expression is grouped.**
+Sidef uses conventional operator precedence, similar to Ruby's: multiplication binds tighter than addition, `**` binds tighter than multiplication, and so on. Operators higher in the table below bind tighter. Whitespace normally does not change grouping, except postfix operators bind directly to their operand only when attached: `a + b++` and `a + b ++` group differently.
 
 ```ruby
 say (1 + 2 * 3)      # 7   → 1 + (2 * 3)
@@ -902,13 +902,14 @@ say (2 ** 3 ** 2)    # 512 → 2 ** (3 ** 2)   (** is right-associative)
 | Word operators | ``a `method` b``, `\|>`, `\|>>`, `»op»`, `~Zop`, `~Xop` ... | chained from left to right |
 | Bitwise AND | `&` | |
 | Bitwise OR / XOR | `\|` `^` | |
-| Relational | `<` `<=` `>` `>=` `∈` ... | chainable |
+| Relational | `<` `<=` `>` `>=` `∈` ... | only `<` `<=` `>` `>=` `≤` `≥` are chainable |
 | Equality | `==` `!=` `<=>` `~~` `=~` `!~` ... | chainable (`==`, `!=`) |
 | Logical AND | `&&` | |
 | Logical OR | `\|\|` `\\` | `\\` is the defined-or operator |
 | Pair | `:` | builds a pair: `"a":1` |
 | Ternary | `?:` | right-associative |
 | Assignment | `=` (right-associative); `+=` `-=` `*=` `\|\|=` ... (left-associative) | see the note on `:=` below |
+| Low-precedence NOT | `not` | `not a = b` is `not (a = b)` |
 | Low-precedence AND | `and` | binds tighter than `or` |
 | Low-precedence OR | `or` | |
 | Statement modifiers | `if` `unless` `while` `until` | |
@@ -983,7 +984,7 @@ say h{:k}                             # 10
 
 ### Use parentheses when in doubt
 
-Parentheses are never required, but they make your intention clear to anyone reading the code:
+Parentheses are required when you need to override the default precedence, and they can also make your intention clear to anyone reading the code:
 
 ```ruby
 var area    = (length * width)
